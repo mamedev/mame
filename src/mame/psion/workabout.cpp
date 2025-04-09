@@ -186,8 +186,14 @@ uint16_t workabout_state::kbd_r()
 void workabout_state::palette_init(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(190, 220, 190));
-	palette.set_pen_color(1, rgb_t(130, 130, 110));
-	palette.set_pen_color(2, rgb_t(190, 210, 180));
+
+	for (int i = 1; i < 3; i++)
+	{
+		const int r = (0x99 * i) / 2;
+		const int g = (0xaa * i) / 2;
+		const int b = (0x88 * i) / 2;
+		m_palette->set_pen_color(i, rgb_t(r, g, b));
+	}
 }
 
 
@@ -232,6 +238,7 @@ void workabout_state::workabout(machine_config &config)
 	//PSION_EXP_SLOT(config, m_exp, psion_exp_devices, nullptr);
 
 	SOFTWARE_LIST(config, "ssd_list").set_original("psion_ssd").set_filter("WA");
+	//SOFTWARE_LIST(config, "flop_list").set_original("psion_flop").set_filter("WA");
 }
 
 
@@ -246,7 +253,22 @@ void workabout_state::psionwamx(machine_config &config)
 {
 	workabout(config);
 
-	m_asic9->set_clock(3.6864_MHz_XTAL * 15 / 2); // V30MX
+	PSION_ASIC9MX(config.replace(), m_asic9, 3.6864_MHz_XTAL * 15 / 2); // V30MX
+	m_asic9->set_screen("screen");
+	m_asic9->set_ram_rom("ram", "rom");
+	m_asic9->port_ab_r().set(FUNC(workabout_state::kbd_r));
+	m_asic9->buz_cb().set(m_speaker, FUNC(speaker_sound_device::level_w));
+	m_asic9->col_cb().set([this](uint8_t data) { m_key_col = data; });
+	m_asic9->data_r<0>().set(m_ssd[1], FUNC(psion_ssd_device::data_r));      // SSD Pack 1
+	m_asic9->data_w<0>().set(m_ssd[1], FUNC(psion_ssd_device::data_w));
+	m_asic9->data_r<1>().set(m_ssd[0], FUNC(psion_ssd_device::data_r));      // SSD Pack 2
+	m_asic9->data_w<1>().set(m_ssd[0], FUNC(psion_ssd_device::data_w));
+	//m_asic9->data_r<2>().set(m_exp[0], FUNC(psion_exp_slot_device::data_r)); // Expansion port A
+	//m_asic9->data_w<2>().set(m_exp[0], FUNC(psion_exp_slot_device::data_w));
+	//m_asic9->data_r<3>().set(m_exp[1], FUNC(psion_exp_slot_device::data_r)); // Expansion port B
+	//m_asic9->data_w<3>().set(m_exp[1], FUNC(psion_exp_slot_device::data_w));
+	//m_asic9->data_r<4>().set(m_exp[2], FUNC(psion_exp_slot_device::data_r)); // Expansion port C
+	//m_asic9->data_w<4>().set(m_exp[2], FUNC(psion_exp_slot_device::data_w));
 
 	m_ram->set_default_size("2M");
 }

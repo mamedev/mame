@@ -5963,6 +5963,19 @@ ROM_START( mjelct3a )
 	ROM_LOAD( "eb-02.rom", 0x100000, 0x080000, CRC(e1f1b431) SHA1(04a612aff4c30cb8ea741f228bfa7e4289acfee8) )
 ROM_END
 
+ROM_START( mjelct3b ) // code almost identical to mjelct3
+	ROM_REGION( 0x50000, "maincpu", 0 ) // Z80 Code
+	ROM_LOAD( "se-3010",   0x00000, 0x20000, CRC(bcdb5827) SHA1(f27987a0ef2146ba18f0243cb4409f48da772140) )
+	ROM_RELOAD(            0x10000, 0x08000 )
+	ROM_CONTINUE(          0x28000, 0x08000 )
+	ROM_CONTINUE(          0x20000, 0x08000 )
+	ROM_CONTINUE(          0x18000, 0x08000 )
+
+	ROM_REGION( 0x200000, "blitter", 0 )   // blitter data
+	ROM_LOAD( "eb-01.rom", 0x000000, 0x100000, CRC(e5c41448) SHA1(b8322e32b0cb3d771316c9c4f7be91de6e422a24) )
+	ROM_LOAD( "eb-02.rom", 0x100000, 0x080000, CRC(f5b354d1) SHA1(d3f35d090de9af3f50aae9ff11de731950256212) ) // different GFX ROM
+ROM_END
+
 /***************************************************************************
 Mahjong Electron Base (bootleg)
 
@@ -7252,6 +7265,7 @@ GAME( 1993, mjelctrn,   0,        mjelctrn,   mjelctrn, dynax_adpcm_state, init_
 GAME( 1989, mjembase,   mjelctrn, mjembase,   mjembase, dynax_adpcm_state, init_mjelct3,  ROT180, "Dynax",                     "Mahjong Electromagnetic Base (Japan)",                          MACHINE_SUPPORTS_SAVE )
 GAME( 1990, mjelct3,    mjelctrn, mjelctrn,   mjelct3,  dynax_adpcm_state, init_mjelct3,  ROT180, "Dynax",                     "Mahjong Electron Base (parts 2 & 3, Japan set 1)",              MACHINE_SUPPORTS_SAVE )
 GAME( 1990, mjelct3a,   mjelctrn, mjelctrn,   mjelct3,  dynax_adpcm_state, init_mjelct3a, ROT180, "Dynax",                     "Mahjong Electron Base (parts 2 & 3, Japan set 2)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1990, mjelct3b,   mjelctrn, mjelctrn,   mjelct3,  dynax_adpcm_state, init_mjelct3,  ROT180, "Dynax",                     "Mahjong Electron Base (parts 2 & 3, Japan set 3)",              MACHINE_SUPPORTS_SAVE )
 GAME( 1993, mjelctrb,   mjelctrn, mjelctrn,   mjelct3,  dynax_adpcm_state, init_mjelct3,  ROT180, "bootleg",                   "Mahjong Electron Base (parts 2 & 4, Japan bootleg)",            MACHINE_SUPPORTS_SAVE )
 GAME( 1993, mjelct3bl,  mjelctrn, mjelctrn,   mjelct3,  dynax_adpcm_state, init_mjelct3,  ROT180, "bootleg",                   "Mahjong Electron Base (parts 2 & 3, Japan bootleg)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, majxtal7,   7jigen,   neruton,    majxtal7, dynax_adpcm_state, init_mjelct3,  ROT180, "Dynax",                     "Mahjong X-Tal 7 - Crystal Mahjong / Mahjong Diamond 7 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // reuses a subset of 7jigen assets

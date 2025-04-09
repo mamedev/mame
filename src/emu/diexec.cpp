@@ -584,21 +584,28 @@ TIMER_CALLBACK_MEMBER(device_execute_interface::trigger_periodic_interrupt)
 
 void device_execute_interface::pulse_input_line(int irqline, const attotime &duration)
 {
-	// treat instantaneous pulses as ASSERT+CLEAR
+	const attotime expiry = m_pulse_end_timers[irqline]->expire();
 	if (duration == attotime::zero)
 	{
+		// treat instantaneous pulses as ASSERT+CLEAR
 		if (irqline != INPUT_LINE_RESET && !input_edge_triggered(irqline))
 			throw emu_fatalerror("device '%s': zero-width pulse is not allowed for input line %d\n", device().tag(), irqline);
 
-		set_input_line(irqline, ASSERT_LINE);
-		set_input_line(irqline, CLEAR_LINE);
+		if (expiry.is_never() || (expiry <= m_scheduler->time()))
+		{
+			set_input_line(irqline, ASSERT_LINE);
+			set_input_line(irqline, CLEAR_LINE);
+		}
 	}
 	else
 	{
-		set_input_line(irqline, ASSERT_LINE);
+		const attotime target_time = local_time() + duration;
+		if (expiry.is_never() || (target_time > expiry))
+		{
+			set_input_line(irqline, ASSERT_LINE);
 
-		attotime target_time = local_time() + duration;
-		m_pulse_end_timers[irqline]->adjust(target_time - m_scheduler->time(), irqline);
+			m_pulse_end_timers[irqline]->adjust(target_time - m_scheduler->time(), irqline);
+		}
 	}
 }
 

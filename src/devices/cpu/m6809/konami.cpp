@@ -10,6 +10,9 @@
     TODO:
     - verify cycle timing
     - verify status flag handling
+    - EXG/TFR DP: DP here is apparently part of a 16-bit register. DP is
+      the high byte, and the low byte is an unknown hidden register? It
+      doesn't look like any game uses this. See MAME issue #13544.
 
     References:
 
@@ -184,15 +187,15 @@ inline uint16_t &konami_cpu_device::ireg()
 {
 	switch(m_opcode & 0x70)
 	{
-		case 0x20:  return m_x.w;
-		case 0x30:  return m_y.w;
-		case 0x50:  return m_u.w;
-		case 0x60:  return m_s.w;
-		case 0x70:  return m_pc.w;
+		case 0x20: return m_x.w;  // X
+		case 0x30: return m_y.w;  // Y
+		case 0x50: return m_u.w;  // U
+		case 0x60: return m_s.w;  // S
+		case 0x70: return m_pc.w; // PC
+
 		default:
 			fatalerror("Should not get here");
 			// never executed
-			//return m_x.w;
 	}
 }
 
@@ -203,16 +206,18 @@ inline uint16_t &konami_cpu_device::ireg()
 
 inline uint16_t konami_cpu_device::read_exgtfr_register(uint8_t reg)
 {
-	uint16_t result = 0x00FF;
+	uint16_t result = 0;
 
 	switch(reg & 0x07)
 	{
-		case  0: result = m_q.r.a;   break;  // A
-		case  1: result = m_q.r.b;   break;  // B
-		case  2: result = m_x.w;     break;  // X
-		case  3: result = m_y.w;     break;  // Y
-		case  4: result = m_s.w;     break;  // S
-		case  5: result = m_u.w;     break;  // U
+		case 0: result = m_q.r.a | 0x1000; break; // A (high byte is always 0x10)
+		case 1: result = m_q.r.d;   break; // D!
+		case 2: result = m_x.w;     break; // X
+		case 3: result = m_y.w;     break; // Y
+		case 4: logerror("EXG/TFR unemulated DP reg\n"); break; // DP
+		case 5: result = m_u.w;     break; // U
+		case 6: result = m_s.w;     break; // S
+		case 7: result = m_pc.w;    break; // PC
 	}
 
 	return result;
@@ -227,12 +232,14 @@ inline void konami_cpu_device::write_exgtfr_register(uint8_t reg, uint16_t value
 {
 	switch(reg & 0x07)
 	{
-		case  0: m_q.r.a = value;    break;  // A
-		case  1: m_q.r.b = value;    break;  // B
-		case  2: m_x.w   = value;    break;  // X
-		case  3: m_y.w   = value;    break;  // Y
-		case  4: m_s.w   = value;    break;  // S
-		case  5: m_u.w   = value;    break;  // U
+		case 0: m_q.r.a = value;    break; // A
+		case 1: m_q.r.b = value;    break; // B
+		case 2: m_x.w   = value;    break; // X
+		case 3: m_y.w   = value;    break; // Y
+		case 4: logerror("EXG/TFR unemulated DP reg\n"); break; // DP
+		case 5: m_u.w   = value;    break; // U
+		case 6: m_s.w   = value;    break; // S
+		case 7: m_pc.w  = value;    break; // PC
 	}
 }
 

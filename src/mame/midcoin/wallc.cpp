@@ -633,9 +633,12 @@ ROM_START( wallca )
 	ROM_LOAD( "74s288.c2",  0x0000, 0x0020, CRC(83e3e293) SHA1(a98c5e63b688de8d175adb6539e0cdc668f313fd) )
 ROM_END
 
+/* The original Fadesa PCB was distributed with two 2764 program ROMs, but these were later replaced, for cost reduction,
+    with a single 27128 (at 6M) with the same contents, with CRC(4e96ca15) SHA1(87f1a3538712aa3d6c3713b845679dd42a4ba5a4) */
 ROM_START( brkblast )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "fadesa-r0.6m", 0x0000, 0x4000, CRC(4e96ca15) SHA1(87f1a3538712aa3d6c3713b845679dd42a4ba5a4) )
+	ROM_LOAD( "4.bin",        0x0000, 0x2000, CRC(aced127e) SHA1(516e1d4977816b1d43955850c30a5d0563a4fbcb) )
+	ROM_LOAD( "5.bin",        0x2000, 0x2000, CRC(b789a705) SHA1(2b62b14d1a3ad5eff5b8d502d7891e58379ee820) )
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
 	ROM_LOAD( "rom3.rom",     0x0800, 0x0800, CRC(6634db73) SHA1(fe6104f974495a250e0cd14c0745eec8e44b8d3a) )

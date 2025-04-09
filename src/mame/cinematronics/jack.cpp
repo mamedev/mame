@@ -44,6 +44,7 @@ Notes:
 
 Todo:
   - fix striv hanging notes
+  - verify zzyzzyxx port b sound timer
   - fix tripool palette problems (see attract)
     The tripool driver used to have a hack making the vblank interrupt go off
     twice per frame, this made the game run way too fast, but no palette bug.
@@ -84,8 +85,7 @@ Stephh's Notes:
 #include "jack.h"
 
 #include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
-#include "screen.h"
+
 #include "speaker.h"
 
 
@@ -96,17 +96,29 @@ Stephh's Notes:
  *
  *************************************/
 
-uint8_t jack_state::timer_r()
+uint8_t jack_state::jack_timer_r()
 {
-	/* wrong! there should be no need for timer_rate, the same function */
-	/* should work for both games */
-	return m_audiocpu->total_cycles() / m_timer_rate;
+	// jack, tripool, sucasino: checks bit 3
+	// zzyzzyxx, joinem, unclepoo: adds 0x0a and expects 0 (0xf6 + 0x0a)
+	// loverboy: checks bit 6
+	// freeze, striv: unused
+
+	// 74LS74 and 74LS393 to divide audiocpu clock
+	uint64_t input = m_audiocpu->total_cycles() >> 9;
+
+	// 74LS393 2QD: 74LS90 in bi-quinary count mode
+	static const int lut_74ls90[10] = { 0, 2, 4, 6, 8, 1, 3, 5, 7, 9 };
+	uint8_t output = lut_74ls90[(input >> 1) % 10];
+
+	// B3,B6,B7: 74LS90 QC,QD,QA
+	// B4: 74LS393 2QD
+	return (BIT(output, 0) << 7) | (BIT(output, 3) << 6) | ((input & 1) << 4) | (BIT(output, 2) << 3);
 }
 
-IRQ_CALLBACK_MEMBER(jack_state::jack_sh_irq_ack)
+uint8_t jack_state::zzyzzyxx_timer_r()
 {
-	m_audiocpu->set_input_line(0, CLEAR_LINE);
-	return 0xff;
+	// zzyzzyxx sound driver doesn't work with how it's described in jack schematics, so let's use the old method
+	return m_audiocpu->total_cycles() / 32;
 }
 
 
@@ -244,8 +256,8 @@ void jack_state::sound_map(address_map &map)
 void jack_state::sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x40, 0x40).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
-	map(0x80, 0x80).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x40, 0x40).rw(m_aysnd, FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
+	map(0x80, 0x80).w(m_aysnd, FUNC(ay8910_device::address_w));
 }
 
 
@@ -929,7 +941,7 @@ MACHINE_RESET_MEMBER(jack_state,joinem)
 
 void jack_state::jack(machine_config &config)
 {
-	constexpr XTAL MASTER_XTAL = 18_MHz_XTAL; // labeled "18MHz" in the schematics, but might this really be 18.432 (like Galaxian, etc.)?
+	constexpr XTAL MASTER_XTAL = 18_MHz_XTAL; // 18MHz in the schematics, should be correct
 
 	/* basic machine hardware */
 	Z80(config, m_maincpu, MASTER_XTAL / 6);
@@ -939,13 +951,12 @@ void jack_state::jack(machine_config &config)
 	Z80(config, m_audiocpu, MASTER_XTAL / 6);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &jack_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &jack_state::sound_io_map);
-	m_audiocpu->set_irq_acknowledge_callback(FUNC(jack_state::jack_sh_irq_ack));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(MASTER_XTAL / 3, 384, 0, 256, 264, 16, 240);
-	screen.set_screen_update(FUNC(jack_state::screen_update_jack));
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(MASTER_XTAL / 3, 384, 0, 256, 264, 16, 240);
+	m_screen->set_screen_update(FUNC(jack_state::screen_update_jack));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jack);
 	PALETTE(config, m_palette).set_format(palette_device::BGR_233_inverted, 32);
@@ -954,18 +965,24 @@ void jack_state::jack(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
-	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0, ASSERT_LINE);
+	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0, HOLD_LINE);
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", MASTER_XTAL / 12));
-	aysnd.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
-	aysnd.port_b_read_callback().set(FUNC(jack_state::timer_r));
-	aysnd.add_route(ALL_OUTPUTS, "mono", 1.0);
+	AY8910(config, m_aysnd, MASTER_XTAL / 12);
+	m_aysnd->port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	m_aysnd->port_b_read_callback().set(FUNC(jack_state::jack_timer_r));
+	m_aysnd->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void jack_state::treahunt(machine_config &config)
 {
 	jack(config);
 	m_maincpu->set_addrmap(AS_OPCODES, &jack_state::decrypted_opcodes_map);
+}
+
+void jack_state::zzyzzyxx(machine_config &config)
+{
+	jack(config);
+	m_aysnd->port_b_read_callback().set(FUNC(jack_state::zzyzzyxx_timer_r));
 }
 
 
@@ -980,7 +997,7 @@ void jack_state::striv(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(jack_state,striv)
 
 	/* video hardware */
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(jack_state::screen_update_striv));
+	m_screen->set_screen_update(FUNC(jack_state::screen_update_striv));
 }
 
 
@@ -992,7 +1009,7 @@ INTERRUPT_GEN_MEMBER(jack_state::joinem_vblank_irq)
 		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-void jack_state::joinem(machine_config &config)
+void jack_state::loverboy(machine_config &config)
 {
 	jack(config);
 
@@ -1005,7 +1022,7 @@ void jack_state::joinem(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(jack_state,joinem)
 
 	/* video hardware */
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(jack_state::screen_update_joinem));
+	m_screen->set_screen_update(FUNC(jack_state::screen_update_joinem));
 
 	m_gfxdecode->set_info(gfx_joinem);
 
@@ -1014,6 +1031,11 @@ void jack_state::joinem(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(jack_state,joinem)
 }
 
+void jack_state::joinem(machine_config &config)
+{
+	loverboy(config);
+	m_aysnd->port_b_read_callback().set(FUNC(jack_state::zzyzzyxx_timer_r));
+}
 
 void jack_state::unclepoo(machine_config &config)
 {
@@ -1023,8 +1045,7 @@ void jack_state::unclepoo(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &jack_state::unclepoo_map);
 
 	/* video hardware */
-	subdevice<screen_device>("screen")->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
-
+	m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	m_palette->set_entries(256);
 }
 
@@ -1515,19 +1536,7 @@ ROM_END
  *
  *************************************/
 
-void jack_state::init_jack()
-{
-	m_timer_rate = 256;
-}
-
-
-void jack_state::init_zzyzzyxx()
-{
-	m_timer_rate = 32;
-}
-
-
-void jack_state::treahunt_decode(  )
+void jack_state::init_treahunt()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -1559,17 +1568,11 @@ void jack_state::treahunt_decode(  )
 					(~data & 0x81) |
 					((data & 0x02) << 3) |
 					((data & 0x04) << 4) |
-						(data & 0x28) |
+					(data & 0x28) |
 					((data & 0x10) >> 3) |
 					((data & 0x40) >> 4);
 		}
 	}
-}
-
-void jack_state::init_treahunt()
-{
-	m_timer_rate = 256;
-	treahunt_decode();
 }
 
 
@@ -1589,8 +1592,6 @@ void jack_state::init_loverboy()
 	uint8_t *ROM = memregion("maincpu")->base();
 	ROM[0x13] = 0x01;
 	ROM[0x12] = 0x9d;
-
-	m_timer_rate = 32;
 }
 
 
@@ -1619,8 +1620,6 @@ void jack_state::init_striv()
 				ROM[A] = bitswap<8>(data,0,2,5,1,3,6,4,7);
 		}
 	}
-
-	m_timer_rate = 256;
 }
 
 
@@ -1632,20 +1631,20 @@ void jack_state::init_striv()
  *************************************/
 
 //    YEAR  NAME       PARENT    MACHINE   INPUT     CLASS       INIT           SCREEN  COMPANY, FULLNAME, FLAGS
-GAME( 1982, jack,      0,        jack,     jack,     jack_state, init_jack,     ROT90,  "Hara Industries (Cinematronics license)", "Jack the Giantkiller (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, jack2,     jack,     jack,     jack2,    jack_state, init_jack,     ROT90,  "Hara Industries (Cinematronics license)", "Jack the Giantkiller (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, jack3,     jack,     jack,     jack3,    jack_state, init_jack,     ROT90,  "Hara Industries (Cinematronics license)", "Jack the Giantkiller (set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, jack,      0,        jack,     jack,     jack_state, empty_init,    ROT90,  "Hara Industries (Cinematronics license)", "Jack the Giantkiller (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, jack2,     jack,     jack,     jack2,    jack_state, empty_init,    ROT90,  "Hara Industries (Cinematronics license)", "Jack the Giantkiller (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, jack3,     jack,     jack,     jack3,    jack_state, empty_init,    ROT90,  "Hara Industries (Cinematronics license)", "Jack the Giantkiller (set 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, treahunt,  jack,     treahunt, treahunt, jack_state, init_treahunt, ROT90,  "Hara Industries", "Treasure Hunt", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, zzyzzyxx,  0,        jack,     zzyzzyxx, jack_state, init_zzyzzyxx, ROT90,  "Cinematronics / Advanced Microcomputer Systems", "Zzyzzyxx (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, zzyzzyxx2, zzyzzyxx, jack,     zzyzzyxx, jack_state, init_zzyzzyxx, ROT90,  "Cinematronics / Advanced Microcomputer Systems", "Zzyzzyxx (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, brix,      zzyzzyxx, jack,     zzyzzyxx, jack_state, init_zzyzzyxx, ROT90,  "Cinematronics / Advanced Microcomputer Systems", "Brix", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, freeze,    0,        jack,     freeze,   jack_state, init_jack,     ROT90,  "Cinematronics", "Freeze", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1981, tripool,   0,        jack,     tripool,  jack_state, init_jack,     ROT90,  "Noma (Casino Tech license)", "Tri-Pool: 3-In-One (Casino Tech)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, tripoola,  tripool,  jack,     tripool,  jack_state, init_jack,     ROT90,  "Noma (Coastal Games license)", "Tri-Pool: 3-In-One (Coastal Games)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, sucasino,  0,        jack,     sucasino, jack_state, init_jack,     ROT90,  "Data Amusement", "Super Casino", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, zzyzzyxx,  0,        zzyzzyxx, zzyzzyxx, jack_state, empty_init,    ROT90,  "Cinematronics / Advanced Microcomputer Systems", "Zzyzzyxx (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, zzyzzyxx2, zzyzzyxx, zzyzzyxx, zzyzzyxx, jack_state, empty_init,    ROT90,  "Cinematronics / Advanced Microcomputer Systems", "Zzyzzyxx (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, brix,      zzyzzyxx, zzyzzyxx, zzyzzyxx, jack_state, empty_init,    ROT90,  "Cinematronics / Advanced Microcomputer Systems", "Brix", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, freeze,    0,        jack,     freeze,   jack_state, empty_init,    ROT90,  "Cinematronics", "Freeze", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1981, tripool,   0,        jack,     tripool,  jack_state, empty_init,    ROT90,  "Noma (Casino Tech license)", "Tri-Pool: 3-In-One (Casino Tech)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, tripoola,  tripool,  jack,     tripool,  jack_state, empty_init,    ROT90,  "Noma (Coastal Games license)", "Tri-Pool: 3-In-One (Coastal Games)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, sucasino,  0,        jack,     sucasino, jack_state, empty_init,    ROT90,  "Data Amusement", "Super Casino", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, striv,     0,        striv,    striv,    jack_state, init_striv,    ROT270, "Nova du Canada", "Super Triv (English questions)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1985, strivf,    striv,    striv,    striv,    jack_state, init_striv,    ROT270, "Nova du Canada", "Super Triv (French questions)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // Hara Industries PCB
-GAME( 1983, joinem,    0,        joinem,   joinem,   jack_state, init_zzyzzyxx, ROT90,  "Global Corporation", "Joinem", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, unclepoo,  0,        unclepoo, unclepoo, jack_state, init_zzyzzyxx, ROT90,  "Diatec", "Uncle Poo", MACHINE_SUPPORTS_SAVE ) // based on Joinem?
-GAME( 1983, loverboy,  0,        joinem,   loverboy, jack_state, init_loverboy, ROT90,  "G.T Enterprise Inc", "Lover Boy", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, trikitri,  loverboy, joinem,   loverboy, jack_state, init_loverboy, ROT90,  "bootleg (DDT Enterprise Inc)", "Triki Triki (bootleg of Lover Boy)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, joinem,    0,        joinem,   joinem,   jack_state, empty_init,    ROT90,  "Global Corporation", "Joinem", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, unclepoo,  0,        unclepoo, unclepoo, jack_state, empty_init,    ROT90,  "Diatec", "Uncle Poo", MACHINE_SUPPORTS_SAVE ) // based on Joinem?
+GAME( 1983, loverboy,  0,        loverboy, loverboy, jack_state, init_loverboy, ROT90,  "G.T Enterprise Inc", "Lover Boy", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, trikitri,  loverboy, loverboy, loverboy, jack_state, init_loverboy, ROT90,  "bootleg (DDT Enterprise Inc)", "Triki Triki (bootleg of Lover Boy)", MACHINE_SUPPORTS_SAVE )

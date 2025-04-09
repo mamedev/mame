@@ -66,6 +66,8 @@ class Opcode:
         step = 0
         for i in range(0, len(self.source)):
             il = self.source[i]
+            if not has_steps:
+                il.indent = ""
             line = il.line()
             tokens = line.split()
             if tokens[0] == '+':
@@ -220,6 +222,12 @@ class OpcodeList:
 
     def save_exec(self, f):
         prefix = None
+        print("if (m_wait_state)", file=f)
+        print("{", file=f)
+        print("\tm_icount = 0; // stalled", file=f)
+        print("\treturn;", file=f)
+        print("}", file=f)
+        print("while (true) {", file=f)
         print("switch (u8(m_ref >> 16)) // prefix", file=f)
         print("{", file=f)
         for opc in self.opcode_info:
@@ -237,10 +245,8 @@ class OpcodeList:
                 print("\tswitch (u8(m_ref >> 8)) // opcode", file=f)
                 print("\t{", file=f)
             print("\tcase 0x%s:" % (opc.code[2:]), file=f)
-            #print("\t{", file=f)
             opc.save_dasm(f)
-            #print("\t}", file=f)
-            print("\t\tbreak;", file=f)
+            print("\t\tgoto rop;", file=f)
             print("", file=f)
         print("\t} // switch opcode", file=f)
         print("}", file=f)
@@ -248,7 +254,7 @@ class OpcodeList:
         print("", file=f)
         print("} // switch prefix", file=f)
         print("", file=f)
-        print("m_ref = 0xffff00;", file=f)
+        print("} // while (true)", file=f)
 
 def main(argv):
     if len(argv) != 3 and len(argv) != 4:

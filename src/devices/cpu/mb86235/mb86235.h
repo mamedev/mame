@@ -53,6 +53,7 @@ public:
 
 	void internal_abus(address_map &map) ATTR_COLD;
 	void internal_bbus(address_map &map) ATTR_COLD;
+
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -74,7 +75,6 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
-
 	struct mb86235_flags
 	{
 		uint32_t az;
@@ -181,9 +181,9 @@ private:
 	{
 		compiler_state &operator=(compiler_state const &) = delete;
 
-		uint32_t cycles;                             /* accumulated cycles */
-		uint8_t  checkints;                          /* need to check interrupts before next instruction */
-		uml::code_label  labelnum;                 /* index for local labels */
+		uint32_t cycles;                            /* accumulated cycles */
+		uint8_t  checkints;                         /* need to check interrupts before next instruction */
+		uml::code_label  labelnum;                  /* index for local labels */
 	};
 
 	void run_drc();
@@ -235,7 +235,7 @@ private:
 	static void full_fifoout0(void *param);
 	static void full_fifoout1(void *param);
 
-//  interpreter
+	// interpreter
 	void execute_op(uint32_t h, uint32_t l);
 	void do_alu1(uint32_t h, uint32_t l);
 	void do_alu2(uint32_t h, uint32_t l);

@@ -213,7 +213,6 @@ protected:
 
 	uint8_t pc9801_a0_r(offs_t offset);
 	void pc9801_a0_w(offs_t offset, uint8_t data);
-	u8 unk_r(offs_t offset);
 	uint8_t f0_r(offs_t offset);
 
 	uint8_t m_nmi_ff = 0;
@@ -234,6 +233,7 @@ private:
 	void write_sasi_req(int state);
 	uint8_t sasi_status_r();
 	void sasi_ctrl_w(uint8_t data);
+
 	void draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd, int pitch, int lr, int cursor_on, int cursor_addr, int cursor_bot, int cursor_top, bool lower);
 
 //  uint8_t winram_r();
@@ -480,11 +480,19 @@ private:
 	emu_timer *m_fdc_timer = nullptr;
 
 	u8 m_fdc_mode = 0;
+	struct {
+		u8 dev_sel;
+		bool access_144mb;
+	} m_fdc_3mode;
+
 	u8 fdc_mode_r();
 	void fdc_mode_w(u8 data);
 	void fdc_set_density_mode(bool is_2hd);
-
 protected:
+	// $4be, roughly around UV model
+	u8 fdc_3mode_r(offs_t offset);
+	void fdc_3mode_w(offs_t offset, uint8_t data);
+
 	struct {
 		uint8_t pal_entry = 0;
 		uint8_t r[16]{}, g[16]{}, b[16]{};

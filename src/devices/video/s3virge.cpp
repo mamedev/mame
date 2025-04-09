@@ -21,6 +21,7 @@
  * - Fix PLL calculation for 1k+ width VESA modes (tends to either be too fast or too slow);
  * - 1600x1200x4 needs line compare fix in downstream pc_vga (cuts too early);
  * - 1280x1024x16 draws 256 H and stupid high refresh rate;
+ * - make PD pin strapping configurable from host card rather than here and pc_vga_s3;
  * - virgevx: stub, uses a beefier RAMDAC (can do up to 1600x1200x16 / 1280x1024x24)
  *
  * Notes:
@@ -61,7 +62,6 @@
 DEFINE_DEVICE_TYPE(S3VIRGE,    s3virge_vga_device,        "virge_vga",      "S3 86C325 VGA core")
 DEFINE_DEVICE_TYPE(S3VIRGEVX,  s3virgevx_vga_device,      "virgevx_vga",    "S3 86C988 VGA core")
 DEFINE_DEVICE_TYPE(S3VIRGEDX,  s3virgedx_vga_device,      "virgedx_vga",    "S3 86C375 VGA core")
-DEFINE_DEVICE_TYPE(S3VIRGEDX1, s3virgedx_rev1_vga_device, "virgedx_vga_r1", "S3 86C375 (rev 1) VGA core")
 
 s3virge_vga_device::s3virge_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: s3virge_vga_device(mconfig, S3VIRGE, tag, owner, clock)
@@ -93,13 +93,6 @@ s3virgedx_vga_device::s3virgedx_vga_device(const machine_config &mconfig, const 
 s3virgedx_vga_device::s3virgedx_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: s3virge_vga_device(mconfig, type, tag, owner, clock)
 {
-}
-
-s3virgedx_rev1_vga_device::s3virgedx_rev1_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: s3virgedx_vga_device(mconfig, S3VIRGEDX1, tag, owner, clock)
-{
-	m_crtc_space_config = address_space_config("crtc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(s3virgedx_rev1_vga_device::crtc_map), this));
-	m_seq_space_config = address_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(s3virgedx_rev1_vga_device::sequencer_map), this));
 }
 
 void s3virge_vga_device::device_start()
@@ -146,6 +139,8 @@ void s3virge_vga_device::device_start()
 	s3.id_low = 0x31;   // CR2E
 	s3.revision = 0x00; // CR2F  (value unknown)
 	s3.id_cr30 = 0xe1;  // CR30
+
+	m_serial_enable = false;
 }
 
 void s3virgevx_vga_device::device_start()
@@ -166,18 +161,7 @@ void s3virgedx_vga_device::device_start()
 	// set device ID
 	s3.id_high = 0x8a;  // CR2D
 	s3.id_low = 0x01;   // CR2E
-	s3.revision = 0x00; // CR2F  (value unknown)
-	s3.id_cr30 = 0xe1;  // CR30
-}
-
-void s3virgedx_rev1_vga_device::device_start()
-{
-	s3virge_vga_device::device_start();
-
-	// set device ID
-	s3.id_high = 0x8a;  // CR2D
-	s3.id_low = 0x01;   // CR2E
-	s3.revision = 0x01; // CR2F
+	s3.revision = 0x01; // CR2F, rev 1 from Diamond Stealth 3D 2000 Pro
 	s3.id_cr30 = 0xe1;  // CR30
 }
 
@@ -221,16 +205,9 @@ void s3virgedx_vga_device::device_reset()
 {
 	s3virge_vga_device::device_reset();
 	// Power-on strapping bits.  Sampled at reset, but can be modified later.
-	// These are just assumed defaults.
-	s3.strapping = 0x000f0912;
-}
-
-void s3virgedx_rev1_vga_device::device_reset()
-{
-	s3virgedx_vga_device::device_reset();
-	// Power-on strapping bits.  Sampled at reset, but can be modified later.
 	// These are based on results from a Diamond Stealth 3D 2000 Pro (Virge/DX based)
 	// bits 8-15 are still unknown, S3ID doesn't show config register 2 (CR37)
+	// NOTE: S600DX wants PD25 high, PD26 low, hardwires serial port calls to $e2
 	s3.strapping = 0x0aff0912;
 }
 
@@ -1443,4 +1420,31 @@ void s3virge_vga_device::s3d_register_map(address_map &map)
 				add_command(0);
 		})
 	);
+}
+
+// Serial Port Register (DDC/I2C, pins 205-206, aliased at I/O ports $e2 or $e8)
+u8 s3virge_vga_device::serial_port_r(offs_t offset)
+{
+	// bits 8-12 are mirrored, 16-31 aren't
+	if (BIT(offset, 2))
+	{
+		if (!machine().side_effects_disabled())
+			LOG("MMFF20: access <Reserved> area %d read\n", offset + 0xff20);
+		return 0;
+	}
+	// TODO: S600DX enables DDC at POST, this is enough to not make it go off the rails
+	return (m_serial_enable << 4) | 0x04;
+}
+
+void s3virge_vga_device::serial_port_w(offs_t offset, u8 data)
+{
+	if (BIT(offset, 2))
+	{
+		if (!machine().side_effects_disabled())
+			LOG("MMFF20: access <Reserved> area %d write %02x\n", offset + 0xff20, data);
+		return;
+	}
+	// TODO: bit 0-2 to SPCLK, 1-3 to SPD
+
+	m_serial_enable = !!BIT(data, 4);
 }

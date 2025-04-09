@@ -476,7 +476,7 @@ void pc9821_state::pc9821_io(address_map &map)
 //  map(0x043c, 0x043f) ROM/RAM bank (EPSON)
 	map(0x0460, 0x0463).rw(FUNC(pc9821_state::window_bank_r), FUNC(pc9821_state::window_bank_w));
 	map(0x04a0, 0x04af).w(FUNC(pc9821_state::pc9821_egc_w));
-//  map(0x04be, 0x04be) FDC "RPM" register
+	map(0x04be, 0x04be).rw(FUNC(pc9821_state::fdc_3mode_r), FUNC(pc9821_state::fdc_3mode_w));
 //  map(0x0640, 0x064f).rw(FUNC(pc9821_state::ide_cs0_r), FUNC(pc9821_state::ide_cs0_w));
 //  map(0x0740, 0x074f).rw(FUNC(pc9821_state::ide_cs1_r), FUNC(pc9821_state::ide_cs1_w));
 //  map(0x08e0, 0x08ea) <undefined> / EMM SIO registers

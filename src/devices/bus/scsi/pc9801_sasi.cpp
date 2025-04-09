@@ -22,8 +22,35 @@ void pc9801_sasi_device::ExecCommand()
 			m_transfer_length = 10;
 			break;
 
+		// TODO: command 0x0e during pc88va2 HDFORM command (failed earlier?)
+
 		default:
 			scsihd_device::ExecCommand();
 			break;
 	}
 }
+
+void pc9801_sasi_device::ReadData(uint8_t *data, int dataLength)
+{
+	switch(command[0])
+	{
+		default:
+			scsihd_device::ReadData(data, dataLength);
+			break;
+	}
+}
+
+void pc9801_sasi_device::WriteData( uint8_t *data, int dataLength )
+{
+	switch( command[0] )
+	{
+		case SASI_CMD_SPECIFY:
+			logerror("pc9801-07: C2 SPECIFY %d\n", dataLength);
+			break;
+
+		default:
+			scsihd_device::WriteData( data, dataLength );
+			break;
+	}
+}
+

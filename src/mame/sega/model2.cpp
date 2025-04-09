@@ -30,9 +30,6 @@
                 (compute_fmul_avg, shift operation 0x11, ALU operation 0x89 (compute_favg));
     - manxtt: no escape from "active motion slider" tutorial (needs analog inputs),
               bypass it by entering then exiting service mode;
-    - manxtt: no bikes are visible (not a z-sort issue!);
-    - manxtt: course select island map doesn't rotate properly:
-              timing issue, i960 sends read/write geo addresses to bufferram 0x918000/4 which TGP never reads in time.
     - sgt24h: first turn in easy reverse course has ugly rendered mountain in background;
     - skytargt: really slow during gameplay (fixed?);
     - skytargt: short draw distance (might be down to z-sort);
@@ -610,6 +607,9 @@ void model2_tgp_state::copro_fifo_w(u32 data)
 	}
 	else
 		m_copro_fifo_in->push(u32(data));
+
+	// 1 wait state for i960; prevents Manx TT course select rotation bug
+	m_maincpu->spin_until_time(attotime::from_nsec(40));
 }
 
 
@@ -675,7 +675,8 @@ void model2b_state::copro_sharc_iop_w(offs_t offset, u32 data)
 		(strcmp(machine().system().name, "vonj" ) == 0) ||
 		(strcmp(machine().system().name, "vonr" ) == 0) ||
 		(strcmp(machine().system().name, "vonu" ) == 0) ||
-		(strcmp(machine().system().name, "rchase2" ) == 0))
+		(strcmp(machine().system().name, "rchase2" ) == 0) ||
+		(strcmp(machine().system().name, "rchase2a" ) == 0))
 	{
 		m_copro_adsp->external_iop_write(offset, data);
 	}
@@ -2039,6 +2040,30 @@ static INPUT_PORTS_START( rchase2 )
 	PORT_BIT(0xff, 0x80, IPT_AD_STICK_Y) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(2) PORT_REVERSE
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( rchase2a )
+	PORT_INCLUDE(model2crx)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2)
+	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_MODIFY("IN2")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("P1_X")
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(1)
+
+	PORT_START("P1_Y")
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_Y) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(1)
+
+	PORT_START("P2_X")
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_X) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(2)
+
+	PORT_START("P2_Y")
+	PORT_BIT(0xff, 0x80, IPT_AD_STICK_Y) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(15) PORT_PLAYER(2)
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( vstriker )
 	PORT_INCLUDE(model2crx)
 
@@ -2509,12 +2534,12 @@ void model2_state::model2_scsp(machine_config &config)
 /* original Model 2 */
 void model2o_state::model2o(machine_config &config)
 {
-	I960(config, m_maincpu, 25000000);
+	I960(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2o_state::model2o_mem);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(model2_state::model2_interrupt), "screen", 0, 1);
 
-	MB86234(config, m_copro_tgp, 16000000);
+	MB86234(config, m_copro_tgp, 50_MHz_XTAL);
 	m_copro_tgp->set_addrmap(AS_PROGRAM, &model2o_state::copro_tgp_prog_map);
 	m_copro_tgp->set_addrmap(AS_DATA, &model2o_state::copro_tgp_data_map);
 	m_copro_tgp->set_addrmap(AS_IO, &model2o_state::copro_tgp_io_map);
@@ -2660,11 +2685,11 @@ void model2o_state::vcop(machine_config &config)
 /* 2A-CRX */
 void model2a_state::model2a(machine_config &config)
 {
-	I960(config, m_maincpu, 25000000);
+	I960(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2a_state::model2a_crx_mem);
 	TIMER(config, "scantimer").configure_scanline(FUNC(model2_state::model2_interrupt), "screen", 0, 1);
 
-	MB86234(config, m_copro_tgp, 16000000);
+	MB86234(config, m_copro_tgp, 50_MHz_XTAL);
 	m_copro_tgp->set_addrmap(AS_PROGRAM, &model2a_state::copro_tgp_prog_map);
 	m_copro_tgp->set_addrmap(AS_DATA, &model2a_state::copro_tgp_data_map);
 	m_copro_tgp->set_addrmap(AS_IO, &model2a_state::copro_tgp_io_map);
@@ -2780,7 +2805,7 @@ void model2a_state::zeroguna(machine_config &config)
 /* 2B-CRX */
 void model2b_state::model2b(machine_config &config)
 {
-	I960(config, m_maincpu, 25000000);
+	I960(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2b_state::model2b_crx_mem);
 
 	TIMER(config, "scantimer", 0).configure_scanline(FUNC(model2_state::model2_interrupt), "screen", 0, 1);
@@ -2935,7 +2960,7 @@ void model2b_state::zerogun(machine_config &config)
 /* 2C-CRX */
 void model2c_state::model2c(machine_config &config)
 {
-	I960(config, m_maincpu, 25000000);
+	I960(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2c_state::model2c_crx_mem);
 	TIMER(config, "scantimer").configure_scanline(FUNC(model2c_state::model2c_interrupt), "screen", 0, 1);
 
@@ -5447,6 +5472,48 @@ ROM_START( rchase2 ) /* Rail Chase 2 Revision A, Model 2B. Sega game ID# 833-118
 	ROM_LOAD("epr-17895.ic8", 0x0000, 0x8000, CRC(8fd7003d) SHA1(b8b16e20e3ed07326330ba335ea1e701cc0bec17) )
 ROM_END
 
+ROM_START( rchase2a ) /* Rail Chase 2, Model 2B */
+	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
+	ROM_LOAD32_WORD("epr-18143.15", 0x000000, 0x080000, CRC(07ae7e58) SHA1(8802529e33a598618480a81dcd2b9541ff481e04) ) // X & Y axis controls reversed compared to rchase2
+	ROM_LOAD32_WORD("epr-18144.16", 0x000002, 0x080000, CRC(a1aa3e54) SHA1(6fc0394abce176b503a350d669f7b54d2c0c4033) ) // maybe a factory conversion set??
+	ROM_LOAD32_WORD("epr-18145.13", 0x100000, 0x080000, CRC(8d685f38) SHA1(4a8997d0fd20c771a5d66aff7d2c6170e94b130e) )
+	ROM_LOAD32_WORD("epr-18146.14", 0x100002, 0x080000, CRC(412df17a) SHA1(f963dd72bbf1bc7ab707aecf21471677177e0f5a) )
+
+	ROM_REGION32_LE( 0x2000000, "main_data", 0 ) // Data
+	ROM_LOAD32_WORD("mpr-18037.11",  0x000000, 0x200000, CRC(dea8f896) SHA1(8eb45e46bd14a2ffbdaac47d381a1ea9b9a03ca2) )
+	ROM_LOAD32_WORD("mpr-18038.12",  0x000002, 0x200000, CRC(441f7709) SHA1(cbfa687839b6cad6a5ace45b44b95c45e4cfab0d) )
+	ROM_LOAD32_WORD("mpr-18039.9",   0x400000, 0x200000, CRC(b98c6f06) SHA1(dd1ff9c682778de1c6c09e7a5cbc95a8149488c4) )
+	ROM_LOAD32_WORD("mpr-18040.10",  0x400002, 0x200000, CRC(0d872667) SHA1(33e56486ec6b953341552b6bc21dc66f6f8aaf74) )
+	ROM_LOAD32_WORD("mpr-18041.7",   0x800000, 0x200000, CRC(e511ab0a) SHA1(c6ea14b3bdefdc59603bd2fc152ac0421fae4d6f) )
+	ROM_LOAD32_WORD("mpr-18042.8",   0x800002, 0x200000, CRC(e9a04159) SHA1(0204ba86af2707bc9e277cac68dd9ef759189c23) )
+	ROM_LOAD32_WORD("mpr-18043.5",   0xc00000, 0x200000, CRC(ff84dfd6) SHA1(82833bf4cb1f367aea5fec6cffb7023cbbd3c8cb) )
+	ROM_LOAD32_WORD("mpr-18044.6",   0xc00002, 0x200000, CRC(ab9b406d) SHA1(62e95ceea6f71eedbebae59e188aac03e6129e62) )
+
+	ROM_REGION32_LE( 0x800000, "copro_data", ROMREGION_ERASEFF ) // Copro extra data (collision/height map/etc)
+	/* empty?? */
+
+	ROM_REGION( 0x1000000, "polygons", 0 ) // Models
+	ROM_LOAD32_WORD("mpr-18031.17", 0x0000000, 0x200000, CRC(25d0deae) SHA1(2d0339dd7eeb2625f78e2fbe4ebdc976967175a4) )
+	ROM_LOAD32_WORD("mpr-18032.21", 0x0000002, 0x200000, CRC(dbae35c2) SHA1(9510104975192a0ef1750251636daff7f089feb9) )
+	ROM_LOAD32_WORD("mpr-18033.18", 0x0400000, 0x200000, CRC(1e75946c) SHA1(7dee991f0c43de9bfe17ae44767f65f12e83c811) )
+	ROM_LOAD32_WORD("mpr-18034.22", 0x0400002, 0x200000, CRC(215235ad) SHA1(48227544209412fca3035e85a00d33ea654dc7b5) )
+
+	ROM_REGION( 0x1000000, "textures", 0 ) // Textures
+	ROM_LOAD32_WORD("mpr-18035.27", 0x000000, 0x200000, CRC(4423f66e) SHA1(c1f8dda4781dea00bd97dbf9ecfbb626dadd2c35) )
+	ROM_LOAD32_WORD("mpr-18036.25", 0x000002, 0x200000, CRC(69221cf5) SHA1(e39644a08aa631dbdcfc7c0dc356e73f6a4412a9) )
+
+	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-18047.31", 0x000000, 0x080000, CRC(4c31d459) SHA1(424d5e5a7787d0d4c68aa919ba7d575babfd1ce0) )
+
+	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
+	ROM_LOAD16_WORD_SWAP("mpr-18029.32", 0x0000000, 0x200000, CRC(f6804150) SHA1(ef40c11008c75d04159772ad30f02cdb8c5464f3) )
+	ROM_LOAD16_WORD_SWAP("mpr-18030.34", 0x0400000, 0x200000, CRC(1167615d) SHA1(bae0060aec3c15f08342f11df665c05c5703523d) )
+
+	/* Z80 code located on the I/O board type 837-11694. Z80 @ 4Mhz with 8-way DSW & SONY CXD1095Q QFP64 chip */
+	ROM_REGION( 0x8000, "iocpu", 0 )
+	ROM_LOAD("epr-17895.ic8", 0x0000, 0x8000, CRC(8fd7003d) SHA1(b8b16e20e3ed07326330ba335ea1e701cc0bec17) )
+ROM_END
+
 
 /*
 Behind Enemy Lines
@@ -7467,6 +7534,7 @@ GAME( 1998, hpyagu98,   0,        model2a,      vf2,       model2a_state, empty_
 
 // Model 2B-CRX (SHARC, SCSP sound board)
 GAME( 1994, rchase2,    0,        rchase2,      rchase2,   model2b_state, empty_init,    ROT0, "Sega",   "Rail Chase 2 (Revision A)", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )
+GAME( 1994, rchase2a,   rchase2,  rchase2,      rchase2a,  model2b_state, empty_init,    ROT0, "Sega",   "Rail Chase 2", MACHINE_IMPERFECT_GRAPHICS|MACHINE_IMPERFECT_SOUND )
 GAME( 1994, vstriker,   0,        model2b,      vstriker,  model2b_state, empty_init,    ROT0, "Sega",   "Virtua Striker (Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1994, vstrikero,  vstriker, model2b,      vstriker,  model2b_state, empty_init,    ROT0, "Sega",   "Virtua Striker", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, fvipers,    0,        model2b,      vf2,       model2b_state, empty_init,    ROT0, "Sega",   "Fighting Vipers (Revision D)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )

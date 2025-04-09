@@ -166,6 +166,7 @@ scsp_device::scsp_device(const machine_config &mconfig, const char *tag, device_
 {
 	std::fill(std::begin(m_RINGBUF), std::end(m_RINGBUF), 0);
 	std::fill(std::begin(m_MidiStack), std::end(m_MidiStack), 0);
+	std::fill(std::begin(m_MidiOutStack), std::end(m_MidiOutStack), 0);
 	std::fill(std::begin(m_LPANTABLE), std::end(m_LPANTABLE), 0);
 	std::fill(std::begin(m_RPANTABLE), std::end(m_RPANTABLE), 0);
 	std::fill(std::begin(m_TimPris), std::end(m_TimPris), 0);
@@ -243,6 +244,7 @@ void scsp_device::device_start()
 	save_item(NAME(m_IrqTimBC));
 	save_item(NAME(m_IrqMidi));
 
+	save_item(NAME(m_MidiOutStack));
 	save_item(NAME(m_MidiOutW));
 	save_item(NAME(m_MidiOutR));
 	save_item(NAME(m_MidiStack));
@@ -359,7 +361,6 @@ void scsp_device::CheckPendingIRQ()
 		if (en & 8)
 		{
 			m_irq_cb(m_IrqMidi, ASSERT_LINE);
-			m_udata.data[0x20/2] &= ~8;
 			return;
 		}
 
@@ -733,7 +734,7 @@ void scsp_device::UpdateReg(int reg)
 			break;
 		case 0x6:
 		case 0x7:
-			midi_in(m_udata.data[0x6/2] & 0xff);
+			midi_out_w(m_udata.data[0x6/2] & 0xff);
 			break;
 		case 8:
 		case 9:
@@ -899,12 +900,16 @@ void scsp_device::UpdateRegR(int reg)
 				u16 v = m_udata.data[0x4/2];
 				v &= 0xff00;
 				v |= m_MidiStack[m_MidiR];
-				m_irq_cb(m_IrqMidi, CLEAR_LINE);   // cancel the IRQ
 				logerror("Read %x from SCSP MIDI\n", v);
 				if (m_MidiR != m_MidiW)
 				{
 					++m_MidiR;
 					m_MidiR &= 31;
+				}
+				if (m_MidiR == m_MidiW)		// if the input FIFO is empty, clear the IRQ
+				{
+					m_irq_cb(m_IrqMidi, CLEAR_LINE);
+					m_udata.data[0x20 / 2] &= ~8;
 				}
 				m_udata.data[0x4/2] = v;
 			}
@@ -1451,9 +1456,17 @@ void scsp_device::midi_in(u8 data)
 
 u16 scsp_device::midi_out_r()
 {
-	u8 val = m_MidiStack[m_MidiR++];
-	m_MidiR &= 31;
+	u8 val = m_MidiOutStack[m_MidiOutR++];
+	m_MidiOutR &= 31;
 	return val;
+}
+
+void scsp_device::midi_out_w(u8 data)
+{
+	m_MidiOutStack[m_MidiOutW++] = data;
+	m_MidiOutW &= 31;
+
+	//CheckPendingIRQ();
 }
 
 //LFO handling

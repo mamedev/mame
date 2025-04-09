@@ -18,7 +18,7 @@
 =============================================================================
 
 Meng Hong Lou (Dream of the Red Chamber), Sealy, 2008
-Crazy Dou Di Zhu II, Sealy, 2006
+Jue Zhan Shanghai Tan, Sealy, 2006
 Hardware Info By Guru
 ---------------------
 
@@ -45,7 +45,8 @@ Notes:
                      CPU Clock Input Pins 6 & 7 - 14.31818MHz
                      Video Clock Input Pin 103 - 28.63636MHz
                      Another identical PCB has this chip marked "ADC Amazon-LF EISC" so these are 100% compatible.
-           0260F8A - unknown TQFP44 (Microcontroller?). Clock Input 8.000MHz
+           0260F8A - Renesas M30260F8AGP (TQFP44) (M16C/26A based microcontroller with internal 64K + 4K Flash ROM).
+                     Clock Input 8.000MHz.
               HY04 - rebadged DIP8 PIC - type unknown (*). PCB marked "SAM1"
                      Some chips are marked "SL01". Chip data is unique to each game but different
                      versions of the same game work ok with swapped HY04 or swapped main program EPROM.
@@ -534,7 +535,7 @@ ROM_START( menghonga )
 	ROM_LOAD("hy04_fake_data.bin", 0, 0x100, BAD_DUMP CRC(73cc964b) SHA1(39d223c550e38c97135322e43ccabb70f04964b9) )
 ROM_END
 
-ROM_START( crzyddz2 )
+ROM_START( jzst )
 	ROM_REGION32_LE( 0x1000000, "flash", 0 ) // Flash
 	ROM_LOAD( "rom.u48", 0x000000, 0x1000000, CRC(0f3a1987) SHA1(6cad943846c79db31226676c7391f32216cfff79) )
 
@@ -547,9 +548,76 @@ ROM_START( crzyddz2 )
 	ROM_REGION( 0x0100, "pic_data", ROMREGION_ERASEFF )
 ROM_END
 
+// PCB is very similar to the one documented at the top, but with HY03 instead of HY04 and standard ROMs instead of flash
+ROM_START( fkddz2 )
+	ROM_REGION32_LE( 0x1000000, "flash", ROMREGION_ERASEFF )
+	ROM_LOAD( "exrom.u9", 0x000000, 0x400000, CRC(798d992d) SHA1(67e23ba8ee5867ef6cf6678c3942fe71077648b1) )
+	ROM_LOAD( "rom2.u8",  0x400000, 0x400000, CRC(da43ba27) SHA1(495cb36393c358498171e0e3fd3c5bbcdf2edefc) )
+	ROM_LOAD( "rom3.u7",  0x800000, 0x400000, CRC(48c2b302) SHA1(8b995cdf1d1763ec610732b8f8ebe24ceab3745a) )
+
+	ROM_REGION( 0x0400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "rom.u13", 0x000000, 0x0200000, CRC(ed5faeea) SHA1(f5055a74c153dda5cdc035853f773bdf0bf89924) ) // 1xxxxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x4280, "pic", 0 ) // hy03
+	ROM_LOAD("hy-03", 0x000000, 0x4280, NO_DUMP )
+
+	ROM_REGION( 0x0100, "pic_data", ROMREGION_ERASEFF )
+ROM_END
+
+// Sealy 2005.7 PCB
+// PCB is very similar to the one documented at the top, but with KEY02 instead of HY04 and standard ROMs instead of flash
+ROM_START( jpddz )
+	ROM_REGION32_LE( 0x1000000, "flash", ROMREGION_ERASEFF )
+	ROM_LOAD( "exrom.u19", 0x000000, 0x400000, CRC(755dd9f9) SHA1(2361ee329777ea42fee5bbdf9c7e962a96863e28) )
+	ROM_LOAD( "rom.u18",   0x400000, 0x400000, CRC(39a0def4) SHA1(b84681e603a7c5eb49e81c3c622f3ce498a5f40c) )
+	ROM_LOAD( "rom.u17",   0x800000, 0x400000, CRC(1bd2f550) SHA1(f8283a5d4750f1c435c0bba993381bb6849ed490) )
+
+	ROM_REGION( 0x0400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "rom.u13", 0x000000, 0x0200000, CRC(2cf079f1) SHA1(b924ab4e5359ec56b9c5203d3a277f487c2553fe) ) // 1xxxxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x4280, "pic", 0 ) // key02
+	ROM_LOAD("hy-02", 0x000000, 0x4280, NO_DUMP )
+
+	ROM_REGION( 0x0100, "pic_data", ROMREGION_ERASEFF )
+ROM_END
+
+ROM_START( jpddza )
+	ROM_REGION32_LE( 0x1000000, "flash", ROMREGION_ERASEFF )
+	ROM_LOAD( "exrom.u19", 0x000000, 0x400000, CRC(755dd9f9) SHA1(2361ee329777ea42fee5bbdf9c7e962a96863e28) )
+	ROM_LOAD( "rom.u18",   0x400000, 0x400000, CRC(39a0def4) SHA1(b84681e603a7c5eb49e81c3c622f3ce498a5f40c) )
+	ROM_LOAD( "rom.u17",   0x800000, 0x400000, CRC(1bd2f550) SHA1(f8283a5d4750f1c435c0bba993381bb6849ed490) )
+
+	ROM_REGION( 0x0400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "rom.u13", 0x000000, 0x0200000, CRC(3af68f42) SHA1(e51be0578891ba3b6e4a1a999c08ec8b64cf3924) ) // 1xxxxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x4280, "pic", 0 ) // key02
+	ROM_LOAD("hy-02", 0x000000, 0x4280, NO_DUMP )
+
+	ROM_REGION( 0x0100, "pic_data", ROMREGION_ERASEFF )
+ROM_END
+
+ROM_START( sandayi )
+	ROM_REGION32_LE( 0x1000000, "flash", ROMREGION_ERASEFF )
+	ROM_LOAD( "exr01.u19", 0x000000, 0x400000, CRC(c9808384) SHA1(6e1d893e125c9aa187881a866ba78d0173a46409) )
+	ROM_LOAD( "rom.u18",   0x400000, 0x400000, CRC(8c8dbdb4) SHA1(9fc8b7da52b5bda3d209db735e6d6534b9b2082d) )
+	ROM_LOAD( "rom.u17",   0x800000, 0x400000, CRC(7c7f57d8) SHA1(5f7a0dbfead4b3f90b0b5502130cbf92e2811036) ) // 1111xxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x0400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "r0.u13", 0x000000, 0x0200000, CRC(176ec98e) SHA1(b699a84aa365881ac43d3ad72ba78699afbf5f3d) ) // 11xxxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x4280, "pic", 0 ) // HY-02
+	ROM_LOAD("hy-02", 0x000000, 0x4280, NO_DUMP )
+
+	ROM_REGION( 0x0100, "pic_data", ROMREGION_ERASEFF )
+ROM_END
+
 } // anonymous namespace
 
 
-GAME( 2004?, menghong,  0,        menghong, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Meng Hong Lou",           MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2004?, menghonga, menghong, menghong, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Meng Hong Lou (earlier)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2006,  crzyddz2,  0,        crzyddz2, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Crazy Dou Di Zhu II",     MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2004?, menghong,  0,        menghong, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Meng Hong Lou",            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2004?, menghonga, menghong, menghong, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Meng Hong Lou (earlier)",  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2006,  jzst,      fkddz2,   crzyddz2, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Jue Zhan Shanghai Tan",    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2006,  fkddz2,    0,        crzyddz2, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Feng Kuang Dou Di Zhu II", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2005,  jpddz,     0,        crzyddz2, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Jipin Dou Di Zhu (set 1)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // this one boots
+GAME( 2005,  jpddza,    jpddz,    crzyddz2, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Jipin Dou Di Zhu (set 2)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // this one doesn't
+GAME( 2005,  sandayi,   0,        crzyddz2, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "San Da Yi",                MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )

@@ -42,7 +42,7 @@
               Wildest computer robot "Daigander" (Korean version) /TAKARA/Korea                               -           -               -           -               -                   -                       -
     2001      Ping-pong(Chinese version) /Tenpon/China                                                        -           -               -           -               -                   -                       -
               Baseball Korean version /SONOKONG/Korea                                                         -           -               -           -               -                   -                       -
-    1999      ABC Jungle Fun Hippo /VTech/HK, USA, France                                                     -           -               -           -               -                   -                       -
+    1999      ABC Jungle Fun Hippo VTech/HK (USA and UK versions only, FR is dumped)                          -           -               -           -               -                   -                       -
 
     not dumped: no TSOP pads
     2003      Beyblade Arcade Challenge 5-in-1 /Hasbro/USA                                                    -           -               -           -               -                   -                       have
@@ -2795,6 +2795,10 @@ ROM_START( tak_beyb )
 	ROM_LOAD( "beyblade.u2", 0x000000, 0x200000, CRC(bcf6b3a7) SHA1(1c80f1241138b9d7816f1e5285ff8f3c61739c95) )
 ROM_END
 
+ROM_START( hippofr )
+	ROM_REGION( 0x200000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "54-6447-010.u3", 0x000000, 0x200000, CRC(1fb15364) SHA1(ff2bb54f7d6ccd3c83e722599c6f2b213bf35df8) )
+ROM_END
 
 /* XaviX hardware titles (1st Generation)
 
@@ -2807,6 +2811,13 @@ ROM_END
     only new opcodes are callf and retf?
 
 */
+
+// product code 80-32705.
+// Some sites say 1997, but 1999 is what SSD had listed, and seems more fitting.
+// Also exists as
+// 80-32703 Hippo's Alphabet Adventure (UK)
+// 80-32700 ABC Jungle Fun (US?)
+CONS( 1999, hippofr,  0,          0,  xavix_2mb, xavix,xavix_state,      init_xavix,    "VTech",             "Hippo: et la formidable aventure des lettres (France)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // needs keyboard emulating
 
 // Let's!TVプレイCLASSIC タイトーノスタルジア1
 CONS( 2006, taitons1,  0,          0,  xavix_i2c_24lc04_2mb, nostalgia,xavix_i2c_state,      init_xavix,    "Bandai / SSD Company LTD / Taito",             "Let's! TV Play Classic - Taito Nostalgia 1 (Japan)", MACHINE_IMPERFECT_SOUND )

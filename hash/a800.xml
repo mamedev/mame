@@ -3565,7 +3565,7 @@ Hangs on green screen, looping on [PIO porta] read/writes, expects tablet comms 
 		</part>
 	</software>
 
-	<software name="lprfct80" supported ="no">
+	<software name="lprfct80" supported="no">
 		<description>Letter Perfect (80 column version)</description>
 		<year>1981</year>
 		<publisher>LJK</publisher>

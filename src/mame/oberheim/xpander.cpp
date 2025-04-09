@@ -236,7 +236,7 @@ private:
 	u8 m_firq_timer_preset = 0xff;  // Preset for 40103 timer. Pulled high.
 	u8 m_selected_cv_in = 0x07;  // MUX A-C inputs. Pulled high.
 	bool m_inhibit_cv_in = true;  // MUX INHibit input. Pulled high.
-	std::array<bool, 4> m_haltreq = { false, false, false, false };	 // Halt request to the voice board (HALTREQ).
+	std::array<bool, 4> m_haltreq = { false, false, false, false };  // Halt request to the voice board (HALTREQ).
 	std::array<bool, 6> m_encoder_dir = { false, false, false, false, false, false };
 	std::array<bool, 6> m_encoder_changed = { false, false, false, false, false, false };
 	std::array<u64, 3> m_vfd_anode_masks = { 0, 0, 0 };
@@ -453,7 +453,7 @@ void xpander_state::haltset_w(u8 data)
 
 	// Bit 4: RES* (voice cpu reset).
 	const bool reset_voice = !BIT(data, 4);  // Active low.
-	const bool voice_resetting = (m_voicecpu->input_state(INPUT_LINE_RESET) == ASSERT_LINE);
+	const bool voice_resetting = (m_voicecpu->input_line_state(INPUT_LINE_RESET) == ASSERT_LINE);
 	if (reset_voice != voice_resetting)
 	{
 		m_voicecpu->set_input_line(INPUT_LINE_RESET, reset_voice ? ASSERT_LINE : CLEAR_LINE);

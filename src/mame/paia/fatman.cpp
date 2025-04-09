@@ -56,6 +56,7 @@ until a restart or reset (F3).
 #include "bus/midi/midiinport.h"
 #include "bus/midi/midioutport.h"
 #include "machine/rescap.h"
+#include "sound/va_eg.h"
 #include "video/pwm.h"
 
 #include "attotime.h"
@@ -71,67 +72,6 @@ until a restart or reset (F3).
 
 #include "logmacro.h"
 
-// Emulates a (DC) RC circuit with a variable resistance. Useful for emulating
-// envelope generators. This is not a simulation, just uses the standard RC
-// equations to return voltage at a specific time.
-class fatman_rc_network_state_device : public device_t
-{
-public:
-	fatman_rc_network_state_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) ATTR_COLD;
-
-	void set_c(float c);
-	void reset(float v_target, float r, const attotime &t);
-	float get_v(const attotime &t) const;
-
-protected:
-	void device_start() override ATTR_COLD;
-
-private:
-	// Initialize to a slow (large RC) but valid charging state.
-	float m_c = CAP_U(1000);
-	float m_r = RES_M(100);
-	float m_v_start = 0;
-	float m_v_end = 1;
-	attotime m_start_t;
-};
-
-DEFINE_DEVICE_TYPE(FATMAN_RC_NETWORK_STATE, fatman_rc_network_state_device, "fatman_rc_network_state", "Fatman EG RC network");
-
-fatman_rc_network_state_device::fatman_rc_network_state_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, FATMAN_RC_NETWORK_STATE, tag, owner, clock)
-{
-}
-
-void fatman_rc_network_state_device::device_start()
-{
-	save_item(NAME(m_c));
-	save_item(NAME(m_r));
-	save_item(NAME(m_v_start));
-	save_item(NAME(m_v_end));
-	save_item(NAME(m_start_t));
-}
-
-void fatman_rc_network_state_device::set_c(float c)
-{
-	m_c = c;
-}
-
-void fatman_rc_network_state_device::reset(float v_target, float r, const attotime &t)
-{
-	m_v_start = get_v(t);
-	m_v_end = v_target;
-	m_r = r;
-	m_start_t = t;
-}
-
-float fatman_rc_network_state_device::get_v(const attotime &t) const
-{
-	assert(t >= m_start_t);
-	const attotime delta_t = t - m_start_t;
-	return m_v_start + (m_v_end - m_v_start) * (1.0F - expf(-delta_t.as_double() / (m_r * m_c)));
-}
-
-
 namespace {
 
 constexpr const char MAINCPU_TAG[] = "8031";
@@ -142,8 +82,8 @@ public:
 	fatman_state(const machine_config &mconfig, device_type type, const char *tag) ATTR_COLD
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, MAINCPU_TAG)
-		, m_vca_adsr_state(*this, "vca_dsr_eg")
-		, m_vcf_ar_state(*this, "vcf_ar_eg")
+		, m_vca_adsr(*this, "vca_adsr_eg")
+		, m_vcf_ar(*this, "vcf_ar_eg")
 		, m_midi_led_pwm(*this, "midi_led_pwm_device")
 		, m_gate_led(*this, "gate_led")
 		, m_dsw_io(*this, "dsw")
@@ -170,7 +110,7 @@ private:
 	int vca_adsr_attack_r() const;
 	void vca_adsr_decay_w(int state);
 	void vca_adsr_release_w(int state);
-	void update_vca_adsr_state();
+	void update_vca_adsr();
 
 	int vcf_ar_attack_r() const;
 	void vcf_ar_release_w(int state);
@@ -189,8 +129,8 @@ private:
 	void external_memory_map(address_map &map) ATTR_COLD;
 
 	required_device<mcs51_cpu_device> m_maincpu;
-	required_device<fatman_rc_network_state_device> m_vca_adsr_state;
-	required_device<fatman_rc_network_state_device> m_vcf_ar_state;
+	required_device<va_rc_eg_device> m_vca_adsr;
+	required_device<va_rc_eg_device> m_vcf_ar;
 	required_device<pwm_display_device> m_midi_led_pwm;  // D2
 	output_finder<> m_gate_led;  // D13
 	required_ioport m_dsw_io;
@@ -265,8 +205,7 @@ void fatman_state::midi_rxd_w(int state)
 
 int fatman_state::vca_adsr_attack_r() const
 {
-	const float v = m_vca_adsr_state->get_v(machine().time());
-	return (v >= V_EG_COMP) ? 1 : 0;
+	return (m_vca_adsr->get_v() >= V_EG_COMP) ? 1 : 0;
 }
 
 void fatman_state::vca_adsr_decay_w(int state)
@@ -277,7 +216,7 @@ void fatman_state::vca_adsr_decay_w(int state)
 
 	m_vca_adsr_decay = decay;
 	LOGMASKED(LOG_EG, "vca decay: %d\n", m_vca_adsr_decay);
-	update_vca_adsr_state();
+	update_vca_adsr();
 }
 
 void fatman_state::vca_adsr_release_w(int state)
@@ -292,10 +231,10 @@ void fatman_state::vca_adsr_release_w(int state)
 	// LED cathode connected to ground, anode connected to IC7:F inverter,
 	// which inverts the 'release' signal.
 	m_gate_led = m_vca_adsr_release ? 0 : 1;
-	update_vca_adsr_state();
+	update_vca_adsr();
 }
 
-void fatman_state::update_vca_adsr_state()
+void fatman_state::update_vca_adsr()
 {
 	// This function only needs to be called on a state change. For instance, if
 	// either m_vca_adsr_decay or m_vca_adsr_release has changed.
@@ -303,15 +242,14 @@ void fatman_state::update_vca_adsr_state()
 	if (m_vca_adsr_decay && m_vca_adsr_release)  // Release.
 	{
 		const float r96 = m_vca_release_pot->read() * POT_R96 / 100.0F;
-		m_vca_adsr_state->reset(V_GND, r96 + R95, machine().time());
+		m_vca_adsr->set_r(r96 + R95).set_target_v(V_GND);
 	}
 	else if (m_vca_adsr_decay)  // Decay.
 	{
-		const attotime now = machine().time();
 		const float sustain_v = V_PLUS * m_vca_sustain_pot->read() / 100.0F;
-		const float current_v = m_vca_adsr_state->get_v(now);
+		const float current_v = m_vca_adsr->get_v();
 		const float r92 = m_vca_decay_pot->read() * POT_R92 / 100.0F;
-		m_vca_adsr_state->reset(std::min(sustain_v, current_v), r92 + R91, now);
+		m_vca_adsr->set_r(r92 + R91).set_target_v(std::min(sustain_v, current_v));
 	}
 	else if (m_vca_adsr_release)  // "Invalid" state.
 	{
@@ -324,12 +262,12 @@ void fatman_state::update_vca_adsr_state()
 		const float r_release = r96 + R95;
 		const float target_v = V_PLUS * RES_VOLTAGE_DIVIDER(r_attack, r_release);
 		const float effective_r = RES_2_PARALLEL(r_attack, r_release);
-		m_vca_adsr_state->reset(target_v, effective_r, machine().time());
+		m_vca_adsr->set_r(effective_r).set_target_v(target_v);
 	}
 	else // Attack.
 	{
 		const float r94 = m_vca_attack_pot->read() * POT_R94 / 100.0F;
-		m_vca_adsr_state->reset(V_PLUS, POT_R90 + R93 + r94, machine().time());
+		m_vca_adsr->set_r(POT_R90 + R93 + r94).set_target_v(V_PLUS);
 	}
 }
 
@@ -343,8 +281,7 @@ int fatman_state::vcf_ar_attack_r() const
 		// completed, and it doesn't start the EG release.
 		return 0;
 	}
-	const float v = m_vcf_ar_state->get_v(machine().time());
-	return (v >= V_EG_COMP) ? 1 : 0;
+	return (m_vcf_ar->get_v() >= V_EG_COMP) ? 1 : 0;
 }
 
 void fatman_state::vcf_ar_release_w(int state)
@@ -359,12 +296,12 @@ void fatman_state::vcf_ar_release_w(int state)
 	if (m_vcf_ar_release)  // Start release.
 	{
 		const float r82 = m_vcf_release_pot->read() * POT_R82 / 100.0;
-		m_vcf_ar_state->reset(V_GND, r82 + R81, machine().time());
+		m_vcf_ar->set_r(r82 + R81).set_target_v(V_GND);
 	}
 	else // Start attack.
 	{
 		const float r84 = m_vcf_attack_pot->read() * POT_R84 / 100.0;
-		m_vcf_ar_state->reset(V_PLUS, R80 + R83 + r84, machine().time());
+		m_vcf_ar->set_r(R80 + R83 + r84).set_target_v(V_PLUS);
 	}
 }
 
@@ -505,8 +442,8 @@ void fatman_state::fatman(machine_config &config)
 	m_maincpu->port_out_cb<3>().set(FUNC(fatman_state::vcf_ar_release_w)).bit(1);
 	m_maincpu->port_out_cb<3>().append(FUNC(fatman_state::cv_mux_w)).mask(0x30);  // Bits 4, 5.
 
-	FATMAN_RC_NETWORK_STATE(config, m_vca_adsr_state).set_c(C19);
-	FATMAN_RC_NETWORK_STATE(config, m_vcf_ar_state).set_c(C22);
+	VA_RC_EG(config, m_vca_adsr).set_c(C19);
+	VA_RC_EG(config, m_vcf_ar).set_c(C22);
 
 	midi_port_device &midi_in(MIDI_PORT(config, "mdin", midiin_slot, "midiin"));
 	MIDI_PORT(config, "mdthru", midiout_slot, "midiout");

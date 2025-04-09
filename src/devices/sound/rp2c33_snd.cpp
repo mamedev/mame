@@ -7,7 +7,7 @@
     Based on:
     - NSFplay github code by Brad Smith/Brezza
     - Information from NESDev wiki
-      (https://wiki.nesdev.com/w/index.php/FDS_audio)
+      (https://www.nesdev.org/wiki/FDS_audio)
 
     TODO:
     - verify register behaviors

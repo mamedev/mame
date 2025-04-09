@@ -431,8 +431,6 @@ void atm_state::machine_start()
 
 	ram_pages_mask = (m_ram->size() - 1) / 0x4000;
 	m_bank_ram[0]->configure_entries(0, ram_pages_mask + 1, m_ram->pointer(), 0x4000);
-
-	m_maincpu->space(AS_PROGRAM).specific(m_program);
 }
 
 void atm_state::machine_reset()
