@@ -55,6 +55,7 @@ t6a84_device::t6a84_device(const machine_config &mconfig, device_type type, cons
 {
 	// Interrupt vectors need to be fetched and executed from their corresponding page.
 	// For simplicity, we switch pages via callbacks, instead of using a dedicated address space.
+	// TODO: Find a better way to solve this, at least these hacks are isolated to t6a84.cpp for now.
 	irqfetch_cb().set([this](int state) {
 		LOGMASKED(LOG_PAGE_W, "IRQ FETCH %02x => %02x\n", m_code_page, m_vector_page);
 		m_prev_code_page = m_code_page;
