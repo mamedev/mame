@@ -87,13 +87,27 @@ macro   push
 macro   jp
 	call arg16
 	PC = TDAT; WZ = PC;
-	if (branch_en) m_branch_cb(1);
+
+macro   t6a84:jp
+	call arg16
+	PC = TDAT; WZ = PC;
+	m_branch_cb(1);
 
 macro   jp_cond
 	if (TDAT8) {
 		call arg16
 		PC = TDAT; WZ = PC;
-		if (branch_en) m_branch_cb(1);
+	} else {
+		// implicit do PC += 2
+		call arg16
+		WZ = TDAT;
+	}
+
+macro   t6a84:jp_cond
+	if (TDAT8) {
+		call arg16
+		PC = TDAT; WZ = PC;
+		m_branch_cb(1);
 	} else {
 		// implicit do PC += 2
 		call arg16
@@ -105,7 +119,13 @@ macro   jr
 	TADR = PC-1;
 	5 * call nomreq_addr
 	PC += (s8)TDAT8; WZ = PC;
-	if (branch_en) m_branch_cb(1);
+
+macro   t6a84:jr
+	call arg
+	TADR = PC-1;
+	5 * call nomreq_addr
+	PC += (s8)TDAT8; WZ = PC;
+	m_branch_cb(1);
 
 macro   r800:jr
 	call arg
@@ -167,6 +187,11 @@ macro   z80n:retn
 	LOGMASKED(LOG_INT, "RETN m_iff1:%d m_iff2:%d\n", m_iff1, m_iff2); WZ = PC; m_iff1 = m_iff2;
 
 macro   reti
+	call pop
+	PC = TDAT; WZ = PC; m_iff1 = m_iff2;
+	daisy_call_reti_device();
+
+macro   t6a84:reti
 	call pop
 	PC = TDAT; WZ = PC; m_iff1 = m_iff2;
 	m_reti_cb(1);
@@ -530,6 +555,23 @@ macro   take_nmi
 	WZ = PC;
 	m_nmi_pending = false;
 
+macro   irqfetch
+	{
+		// fetch the IRQ vector
+		device_z80daisy_interface *intf = daisy_get_irq_device();
+		m_tmp_irq_vector = (intf != nullptr) ? intf->z80daisy_irq_ack() : standard_irq_callback(0, m_pc.w);
+		LOGMASKED(LOG_INT, "single INT m_tmp_irq_vector $%02x\n", m_tmp_irq_vector);
+	}
+
+macro   t6a84:irqfetch
+	{
+		// fetch the IRQ vector
+		m_irqfetch_cb(1);
+		device_z80daisy_interface *intf = daisy_get_irq_device();
+		m_tmp_irq_vector = (intf != nullptr) ? intf->z80daisy_irq_ack() : standard_irq_callback(0, m_pc.w);
+		LOGMASKED(LOG_INT, "single INT m_tmp_irq_vector $%02x\n", m_tmp_irq_vector);
+	}
+
 macro   take_interrupt
 	// check if processor was halted
 	leave_halt();
@@ -539,13 +581,7 @@ macro   take_interrupt
 	// Not precise in all cases. z80 must finish current instruction (NOP) to reach this state - in such case frame timings are shifter from cb event if calculated based on it.
 	m_irqack_cb(1);
 	m_r++;
-	{
-		// fetch the IRQ vector
-		m_irqfetch_cb(1);
-		device_z80daisy_interface *intf = daisy_get_irq_device();
-		m_tmp_irq_vector = (intf != nullptr) ? intf->z80daisy_irq_ack() : standard_irq_callback(0, m_pc.w);
-		LOGMASKED(LOG_INT, "single INT m_tmp_irq_vector $%02x\n", m_tmp_irq_vector);
-	}
+	call irqfetch
 	// 'interrupt latency' cycles
 	+ 2
 	// Interrupt mode 2. Call [i:databyte]
