@@ -67,7 +67,7 @@ void venteta_state::program_map(address_map &map)
 
 void venteta_state::data_map(address_map &map)
 {
-	//map(0x0020, 0x005f) Internal I/O registers - incorrect
+	//map(0x0020, 0x005f) Internal I/O registers
 	map(0x0060, 0x0fff).ram(); // 4000 bytes internal RAM
 }
 
