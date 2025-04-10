@@ -28,7 +28,6 @@
 #include "screen.h"
 
 // Debugging
-#undef VERBOSE
 #define VERBOSE 0
 #include "logmacro.h"
 
