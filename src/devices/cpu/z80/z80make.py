@@ -18,31 +18,31 @@ class IndStr:
 
     def line(self):
         return self.str
-    
+
     def get_indent(self):
         return self.indent
-    
+
     def is_comment(self):
         return self.str.startswith("#") and not self.str.startswith("#if") and not self.str.startswith("#endif")
-    
+
     def is_blank(self):
         return not self.str
-    
+
     def has_indent(self):
         return self.indent != ''
 
     def replace(self, new):
         self.str = new
-    
+
     def replace(self, old, new):
         return IndStr(self.str.replace(old, new), self.indent)
-    
+
     def with_str(self, new_str):
         return IndStr(new_str, self.indent)
-    
+
     def split(self):
         return self.str.split()
-    
+
     def print(self, str, f):
         print("\t\t%s%s" % (self.indent, str), file=f)
 
@@ -258,7 +258,7 @@ class OpcodeList:
             print("switch (u8(m_ref >> 16)) // prefix", file=f)
             print("{", file=f)
 
-        for prefix in prefixes:
+        for prefix in sorted(prefixes):
             is_rop = prefix == 'ff'
             if prefix_switch:
                 print("case 0x%s:" % (prefix), file=f)
