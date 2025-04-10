@@ -9900,17 +9900,6 @@ https://tcrf.net/World_Championship_Soccer_(Genesis)
 		</part>
 	</software>
 
-	<software name="zeroundr">
-		<description>Zero Tolerance Underground (from "QUByte Classics: Zero Tolerance Collection by PIKO" on Switch eShop)</description>
-		<year>2022</year>
-		<publisher>Piko Interactive / QUByte Interactive</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="1955536">
-				<rom name="ZEROTOL_1_5.bin " size="1955536" crc="e2288416" sha1="9f8df85692bea0b794dbf6a5f4f3ee579840694a" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="zerowing">
 		<description>Zero Wing (Europe)</description>
 		<year>1991</year>
@@ -10121,19 +10110,6 @@ https://tcrf.net/World_Championship_Soccer_(Genesis)
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="Zero Tolerance (Germany) (En).bin " size="2097152" crc="6fb49ff8" sha1="c2ea98f595cb477495a9d326ff25d91f3dbfa90b" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="zerotol_swt" cloneof="zerotol">
-		<description>Zero Tolerance (from "QUByte Classics: Zero Tolerance Collection by PIKO" on Switch eShop)</description>
-		<year>2022</year>
-		<publisher>Piko Interactive / QUByte Interactive</publisher>
-		<info name="developer" value="Technopop" />
-		<info name="language" value="English" />
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<rom name="ZeroTolerance_Piko.bin " size="2097152" crc="de1f0797" sha1="f31737565359eb55d9c23954783bd0d94458c776" />
 			</dataarea>
 		</part>
 	</software>
