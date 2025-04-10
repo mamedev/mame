@@ -61,7 +61,7 @@ const int i8275_device::character_attribute[3][16] =
 // device type definitions
 DEFINE_DEVICE_TYPE(I8275, i8275_device, "i8275", "Intel 8275 CRTC")
 DEFINE_DEVICE_TYPE(I8276, i8276_device, "i8276", "Intel 8276 CRTC")
-
+DEFINE_DEVICE_TYPE(IBM4178629, ibm4178629_device, "ibm4178629", "IBM 418629 CRTC")
 
 
 //**************************************************************************
@@ -102,7 +102,8 @@ i8275_device::i8275_device(const machine_config &mconfig, device_type type, cons
 	m_cursor_blink(0),
 	m_char_blink(0),
 	m_stored_attr(0),
-	m_field_attr(0)
+	m_field_attr(0),
+	m_ibmCRTC(false)
 {
 	memset(m_param, 0x00, sizeof(m_param));
 }
@@ -115,6 +116,12 @@ i8275_device::i8275_device(const machine_config &mconfig, const char *tag, devic
 i8276_device::i8276_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	i8275_device(mconfig, I8276, tag, owner, clock)
 {
+}
+
+ibm4178629_device::ibm4178629_device(const machine_config &mconfig, const char * tag, device_t *owner, uint32_t clock) :
+	i8275_device(mconfig, IBM4178629, tag, owner, clock)
+{
+	this->m_ibmCRTC = true;
 }
 
 

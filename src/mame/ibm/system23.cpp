@@ -68,7 +68,7 @@ namespace
 			required_device<i8255_device> m_ppi_diag;
 			required_device<i8255_device> m_ppi_settings;
 			required_device<i8257_device> m_dmac;
-			required_device<i8275_device> m_crtc;
+			required_device<ibm4178629_device> m_crtc;
 			required_device<pit8253_device> m_pit;
 			required_device<pic8259_device> m_pic;
 			required_device<i8251_device> m_usart;
@@ -228,11 +228,11 @@ namespace
 
 		using namespace i8275_attributes;
 
-		int hi_char = BIT(charcode,6);
-		int char_page = 0;
-		char_page |= ((hi_char && BIT(m_bus_test_register, 1)) << 0);
-		char_page |= ((hi_char && BIT(m_bus_test_register, 2)) << 1);
-		char_page |= ((hi_char && BIT(m_bus_test_register, 3)) << 2);
+		// int hi_char = BIT(charcode,6);
+		// int char_page = 0;
+		// char_page |= ((hi_char && BIT(m_bus_test_register, 1)) << 0);
+		// char_page |= ((hi_char && BIT(m_bus_test_register, 2)) << 1);
+		// char_page |= ((hi_char && BIT(m_bus_test_register, 3)) << 2);
 
 		if (!BIT(attrcode, VSP))
 			gfx = m_chargen[(linecount & 0x0f) | ((charcode & 0x7f) << 4) /* | (char_page << 10) */];
@@ -264,14 +264,19 @@ namespace
 		//LOG("x=%x y=%x attrcode=%x\n",x,y,attrcode);
 
 		// Highlight not used
-		bitmap.pix(y, x++) = (BIT(gfx, 7)? rgb_t::green() : rgb_t::black());
-		bitmap.pix(y, x++) = (BIT(gfx, 6)? rgb_t::green() : rgb_t::black());
-		bitmap.pix(y, x++) = (BIT(gfx, 5)? rgb_t::green() : rgb_t::black());
-		bitmap.pix(y, x++) = (BIT(gfx, 4)? rgb_t::green() : rgb_t::black());
-		bitmap.pix(y, x++) = (BIT(gfx, 3)? rgb_t::green() : rgb_t::black());
-		bitmap.pix(y, x++) = (BIT(gfx, 2)? rgb_t::green() : rgb_t::black());
-		bitmap.pix(y, x++) = (BIT(gfx, 1)? rgb_t::green() : rgb_t::black());
-		bitmap.pix(y, x++) = (BIT(gfx, 0)? rgb_t::green() : rgb_t::black());
+		// bitmap.pix(y, x++) = (BIT(gfx, 7)? rgb_t::green() : rgb_t::black());
+		// bitmap.pix(y, x++) = (BIT(gfx, 6)? rgb_t::green() : rgb_t::black());
+		// bitmap.pix(y, x++) = (BIT(gfx, 5)? rgb_t::green() : rgb_t::black());
+		// bitmap.pix(y, x++) = (BIT(gfx, 4)? rgb_t::green() : rgb_t::black());
+		// bitmap.pix(y, x++) = (BIT(gfx, 3)? rgb_t::green() : rgb_t::black());
+		// bitmap.pix(y, x++) = (BIT(gfx, 2)? rgb_t::green() : rgb_t::black());
+		// bitmap.pix(y, x++) = (BIT(gfx, 1)? rgb_t::green() : rgb_t::black());
+		// bitmap.pix(y, x++) = (BIT(gfx, 0)? rgb_t::green() : rgb_t::black());
+
+		for(int pixel=7; pixel >= 0; pixel--)
+		{
+			bitmap.pix(y, x++) = (BIT(gfx, pixel)? rgb_t::green() : rgb_t::black());
+		}
 	}
 
 	//This routine compiles the retraces and pixel data from the CRTC into a single byte
@@ -497,7 +502,7 @@ namespace
 		m_screen->set_raw(18'432'000, 800, 0, 640, 324, 0, 300);
 		m_screen->set_screen_update(m_crtc, FUNC(i8275_device::screen_update));
 
-		I8275(config, m_crtc, (18'432'000 / 8));
+		IBM4178629(config, m_crtc, (18'432'000 / 8));
 		m_crtc->set_character_width(8);
 		m_crtc->set_screen(m_screen);
 		m_crtc->set_display_callback(FUNC(system23_state::display_pixels));
@@ -549,6 +554,20 @@ namespace
 		//m_ram_bank_dma->configure_entries(0, 16, m_ram->pointer() + 0x4000, 0x4000);
 		m_sod = CLEAR_LINE;
 		m_ros_w = ASSERT_LINE;
+
+		save_item(NAME(m_bus_test_register));
+		save_item(NAME(lpen_ct));
+
+		save_item(NAME(m_hrtc));
+		save_item(NAME(m_vrtc));
+		save_item(NAME(m_pixel));
+
+		save_item(NAME(m_ros_page));
+		save_item(NAME(m_ram_r_page));
+		save_item(NAME(m_ram_w_page));
+		save_item(NAME(m_dma_page));
+
+		save_item(NAME(m_port_4e));
 	}
 
 	void system23_state::machine_reset()
