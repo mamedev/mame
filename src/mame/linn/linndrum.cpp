@@ -209,7 +209,6 @@ protected:
 
 private:
 	static void write_dac(dac76_device& dac, u8 sample);
-	static float get_dac_scaler(float iref);
 	static s32 get_ls267_freq(const std::array<s32, 2>& freq_range_hz, float cv);
 	static float get_snare_tom_pitch_cv(float v);
 
@@ -243,7 +242,6 @@ private:
 	required_memory_region m_sidestick_samples;  // 2732 ROMs (U78).
 	required_device<timer_device> m_snare_timer;  // 74L627 (U80A).
 	required_device<dac76_device> m_snare_dac;  // AM6070 (U92).
-	required_device<filter_volume_device> m_snare_volume;  // R69, R72, R71, R70.
 	required_device<filter_volume_device> m_snare_out;  // U90A (CD4053) pin 12 (ax).
 	required_device<filter_volume_device> m_sidestick_out;  // U90A (CD4053) pin 13 (ay).
 	required_device<timer_device> m_click_timer;  // 556 (U65A).
@@ -305,6 +303,9 @@ private:
 	static constexpr const float VCC = 5;  // Volts.
 	static constexpr const float MUX_DAC_IREF = VPLUS / (RES_K(15) + RES_K(15));  // R55 + R57.
 	static constexpr const float TOM_DAC_IREF = MUX_DAC_IREF;  // Configured in the same way.
+	// All DAC current-to-voltage converter resistors, for both positive and
+	// negative values, are 2.49 KOhm.
+	static constexpr const float R_DAC_I2V = RES_K(2.49);  // R58, R59, R127, R126, tom DAC I2V (missing designation).
 
 	// Constants for hi hat envelope generator circuit.
 	static constexpr const float HAT_C22 = CAP_U(1);
@@ -361,7 +362,6 @@ linndrum_audio_device::linndrum_audio_device(const machine_config &mconfig, cons
 	, m_sidestick_samples(*this, ":sample_sidestick")
 	, m_snare_timer(*this, "snare_sidestick_timer")
 	, m_snare_dac(*this, "snare_sidestick_dac")
-	, m_snare_volume(*this, "snare_sidestick_volume")
 	, m_snare_out(*this, "snare_output")
 	, m_sidestick_out(*this, "sidestick_output")
 	, m_click_timer(*this, "click_timer")
@@ -465,12 +465,9 @@ void linndrum_audio_device::snare_w(u8 data)
 	const float v2 = BIT(data, 2) ? VCC : 0;
 	const float v3 = BIT(data, 3) ? VCC : 0;
 	const float iref = (a * VPLUS + b * v2 + c * v3) / (R0 * (a + b + c + d));
+	m_snare_dac->set_fixed_iref(iref);
 
-	const float gain = get_dac_scaler(iref);
-	m_snare_volume->set_gain(gain);
-
-	LOGMASKED(LOG_STROBES, "Strobed snare / sidestick: %02x (iref: %f, gain: %f)\n",
-			  data, iref, gain);
+	LOGMASKED(LOG_STROBES, "Strobed snare / sidestick: %02x (iref: %f)\n", data, iref);
 }
 
 void linndrum_audio_device::tom_w(u8 data)
@@ -572,8 +569,10 @@ void linndrum_audio_device::device_add_mconfig(machine_config &config)
 	for (int voice = 0; voice < NUM_MUX_VOICES; ++voice)
 	{
 		DAC76(config, m_mux_dac[voice], 0);  // AM6070 (U88).
+		m_mux_dac[voice]->configure_voltage_output(R_DAC_I2V, R_DAC_I2V);  // R58, R59.
+		m_mux_dac[voice]->set_fixed_iref(MUX_DAC_IREF);
 		FILTER_VOLUME(config, m_mux_volume[voice]);  // CD4053 (U90), R60, R62 (see mux_drum_w()).
-		m_mux_dac[voice]->add_route(0, m_mux_volume[voice], get_dac_scaler(MUX_DAC_IREF));
+		m_mux_dac[voice]->add_route(0, m_mux_volume[voice], 1.0);
 	}
 
 	TIMER(config, m_hat_trigger_timer).configure_generic(FUNC(linndrum_audio_device::hat_trigger_timer_tick));  // LM556 (U37B).
@@ -586,17 +585,15 @@ void linndrum_audio_device::device_add_mconfig(machine_config &config)
 
 	TIMER(config, m_snare_timer).configure_generic(FUNC(linndrum_audio_device::snare_timer_tick));  // 74LS627 (U80A).
 	DAC76(config, m_snare_dac, 0);  // AM6070 (U92)
-	FILTER_VOLUME(config, m_snare_volume);  // See snare_w().
-	// DAC output scaling is incorporated in m_snare_volume's gain.
-	m_snare_dac->add_route(0, m_snare_volume, 1.0);
+	m_snare_dac->configure_voltage_output(R_DAC_I2V, R_DAC_I2V);  // R127, R126.
 
 	// The DAC's current outputs are processed by a current-to-voltage converter
 	// that embeds an RC filter. This consists of an op-amp (U103), R127 and C65
 	// (for positive voltages), and R126 and C31 (for negative voltages). The
 	// two resistors and capacitors have the same value.
 	auto &snare_dac_filter = FILTER_RC(config, "snare_sidestick_dac_filter");
-	snare_dac_filter.set_lowpass(RES_K(2.49), CAP_P(2700));  // R127-C65, R126-C31. Cutoff: ~23.7KHz.
-	m_snare_volume->add_route(0, snare_dac_filter, 1.0);
+	snare_dac_filter.set_lowpass(R_DAC_I2V, CAP_P(2700));  // R127-C65, R126-C31. Cutoff: ~23.7KHz.
+	m_snare_dac->add_route(0, snare_dac_filter, 1.0);
 
 	FILTER_VOLUME(config, m_snare_out);
 	FILTER_VOLUME(config, m_sidestick_out);
@@ -612,10 +609,14 @@ void linndrum_audio_device::device_add_mconfig(machine_config &config)
 
 	TIMER(config, m_tom_timer).configure_generic(FUNC(linndrum_audio_device::tom_timer_tick));  // 74LS627 (U77B).
 	DAC76(config, m_tom_dac, 0);  // AM6070 (U82).
+	// Schematic is missing the second resistor, but that's almost certainly an error.
+	// It is also missing component designations.
+	m_tom_dac->configure_voltage_output(R_DAC_I2V, R_DAC_I2V);
+	m_tom_dac->set_fixed_iref(TOM_DAC_IREF);
 	for (int i = 0; i < NUM_TOM_VOICES; ++i)
 	{
 		FILTER_VOLUME(config, m_tom_out[i]);  // One of U87'S (CD4051) outputs.
-		m_tom_dac->add_route(0, m_tom_out[i], get_dac_scaler(TOM_DAC_IREF));
+		m_tom_dac->add_route(0, m_tom_out[i], 1.0);
 	}
 
 	// *** Mixer.
@@ -709,20 +710,6 @@ void linndrum_audio_device::write_dac(dac76_device &dac, u8 sample)
 	dac.b5_w(BIT(sample, 2));
 	dac.b6_w(BIT(sample, 1));
 	dac.b7_w(BIT(sample, 0));
-}
-
-float linndrum_audio_device::get_dac_scaler(float iref)
-{
-	// Given the reference current into the DAC, computes the scaler that needs
-	// to be applied to the dac76_device output, to convert it to a voltage.
-
-	// The maximum output current on each of the "+" and "-" outputs of the
-	// AM6070 is `3.8 * Iref`, according to the datasheet.
-	// That current gets converted to a voltage by an op-amp configured as
-	// a current-to-voltage converter (I2V). All I2Vs on the LinnDrum use
-	// 2.49K resistors for both the "+" and "-" current outputs of the DAC.
-
-	return 3.8F * iref * float(RES_K(2.49));
 }
 
 s32 linndrum_audio_device::get_ls267_freq(const std::array<s32, 2>& freq_range, float cv)
