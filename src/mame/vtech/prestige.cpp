@@ -126,7 +126,11 @@ public:
 		, m_bank3(*this, "bank3")
 		, m_bank4(*this, "bank4")
 		, m_bank5(*this, "bank5")
-	{ }
+	{
+		EXTRA_PROGRAM_OFFSET = 0x40000;
+		NUM_ROM_ENTRIES = 64;
+		ROM_BANK_MASK = 0x3f;
+	}
 
 	void prestige_base(machine_config &config);
 	void gl6000sl(machine_config &config);
@@ -137,6 +141,10 @@ public:
 	void gl7007sl(machine_config &config);
 
 protected:
+	u32 EXTRA_PROGRAM_OFFSET;
+	u16 NUM_ROM_ENTRIES;
+	u16 ROM_BANK_MASK;
+
 	virtual void machine_start() override ATTR_COLD;
 
 private:
@@ -203,21 +211,21 @@ void prestige_state::bankswitch_w(offs_t offset, uint8_t data)
 	switch (offset)
 	{
 	case 0:
-		m_bank1->set_entry(data & 0x3f);
+		m_bank1->set_entry(data & ROM_BANK_MASK);
 		break;
 
 	case 1:
 		if (!(m_bank[5] & 0x01) && (m_bank[5] & 0x02) && (m_cart_type->read() == 0x02 || m_cart->exists()))
-			m_bank2->set_entry(0x40 + (data & 0x1f));
+			m_bank2->set_entry(NUM_ROM_ENTRIES + (data & 0x1f));
 		else
-			m_bank2->set_entry(data & 0x3f);
+			m_bank2->set_entry(data & ROM_BANK_MASK);
 		break;
 
 	case 2:
 		if (!(m_bank[5] & 0x01) && (m_bank[5] & 0x04) && (m_cart_type->read() == 0x02 || m_cart->exists()))
-			m_bank3->set_entry(0x40 + (data & 0x1f));
+			m_bank3->set_entry(NUM_ROM_ENTRIES + (data & 0x1f));
 		else
-			m_bank3->set_entry(data & 0x3f);
+			m_bank3->set_entry(data & ROM_BANK_MASK);
 		break;
 
 	case 3:
@@ -675,19 +683,28 @@ void prestige_state::machine_start()
 	}
 	else
 	{
-		cart = rom + 0x40000;   // internal ROM also includes extra contents that are activated by a cartridge that works as a jumper
+		/*
+		    Each internal ROM also includes an extra program, activated by a
+		    blank cartridge that works as a jumper (pins 14 and 18 are shorted):
+
+		    - [snotec] Lucky Check Fortune Telling (ラッキーチェックうらない)
+		    - [snotecex] Super Cassette: Guessing Card Game / Jungle Cruise (スーパーカセット あてっこ カードゲーム / ジャングル クルーズ)
+		    - [snotecu, snotecug] Super AquaMate (スーパーアクアメイト)
+		    - [snotecut] Little Sorcery (リトルソーサリー)
+		*/
+		cart = rom + EXTRA_PROGRAM_OFFSET;
 	}
 	uint8_t *ram = m_ram->pointer();
 	memset(ram, 0x00, m_ram->size());
 
-	m_bank1->configure_entries(0, 64, rom,  0x4000);
-	m_bank1->configure_entries(64,32, cart, 0x4000);
-	m_bank2->configure_entries(0, 64, rom,  0x4000);
-	m_bank2->configure_entries(64,32, cart, 0x4000);
-	m_bank3->configure_entries(0, 64, rom,  0x4000);
-	m_bank3->configure_entries(64,32, cart, 0x4000);
-	m_bank4->configure_entries(0, 4,  ram,  0x2000);
-	m_bank5->configure_entries(0, 4,  ram,  0x2000);
+	m_bank1->configure_entries(0,               NUM_ROM_ENTRIES, rom,  0x4000);
+	m_bank1->configure_entries(NUM_ROM_ENTRIES, 32,              cart, 0x4000);
+	m_bank2->configure_entries(0,               NUM_ROM_ENTRIES, rom,  0x4000);
+	m_bank2->configure_entries(NUM_ROM_ENTRIES, 32,              cart, 0x4000);
+	m_bank3->configure_entries(0,               NUM_ROM_ENTRIES, rom,  0x4000);
+	m_bank3->configure_entries(NUM_ROM_ENTRIES, 32,              cart, 0x4000);
+	m_bank4->configure_entries(0,               4,               ram,  0x2000);
+	m_bank5->configure_entries(0,               4,               ram,  0x2000);
 
 	m_bank1->set_entry(0);
 	m_bank2->set_entry(0);
@@ -859,6 +876,17 @@ void prestige_state::gl7007sl(machine_config &config)
 	SOFTWARE_LIST(config, "misterx_cart").set_compatible("misterx");
 }
 
+class snotecut_state : public prestige_state
+{
+public:
+	snotecut_state(const machine_config &mconfig, device_type type, const char *tag)
+		: prestige_state(mconfig, type, tag)
+	{
+		EXTRA_PROGRAM_OFFSET = 0x100000;
+		NUM_ROM_ENTRIES = 128;
+		ROM_BANK_MASK = 0x7f;
+	}
+};
 
 /* ROM definition */
 ROM_START( gl6000sl )
@@ -911,12 +939,17 @@ ROM_END
 
 ROM_START( snotecu )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD("27-6100-00.u1", 0x00000, 0x100000, CRC(b2f979d5) SHA1(d2a76e99351971d1fb4cf4df9fe5741a606eb844))
+	ROM_LOAD( "27-6100-00.u1", 0x00000, 0x100000, CRC(b2f979d5) SHA1(d2a76e99351971d1fb4cf4df9fe5741a606eb844) )
 ROM_END
 
 ROM_START( snotecug )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD("27-6100-02.u1", 0x00000, 0x100000, CRC(1e14e6ea) SHA1(3e3b8dbea5f559ff98f525e3c7029b9d55e5515b))
+	ROM_LOAD( "27-6100-02.u1", 0x00000, 0x100000, CRC(1e14e6ea) SHA1(3e3b8dbea5f559ff98f525e3c7029b9d55e5515b) )
+ROM_END
+
+ROM_START( snotecut )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD( "27-6429-00.u1", 0x00000, 0x200000, CRC(16b1a0d6) SHA1(72f467e2f3bef4995d0eadb8387a88b0d9fa2893) )
 ROM_END
 
 ROM_START( glmcolor )
@@ -948,6 +981,7 @@ COMP( 1996, glmcolor, 0,       0,      glmcolor, glmcolor, prestige_state, empty
 COMP( 1997, gl6000sl, 0,       0,      gl6000sl, prestige, prestige_state, empty_init, "VTech",  "Genius Leader 6000SL (Germany)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1998, snotecu,  0,       0,      snotec,   glcolor,  prestige_state, empty_init, "Bandai", u8"Super Note Club µ (Japan)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1999, snotecug, snotecu, 0,      snotec,   glcolor,  prestige_state, empty_init, "Bandai", u8"Super Note Club µ girlish (Japan)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1999, snotecut, snotecu, 0,      snotec,   glcolor,  snotecut_state, empty_init, "Bandai", u8"Super Note Club µ teen's time (Japan)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1998, gl7007sl, 0,       0,      gl7007sl, prestige, prestige_state, empty_init, "VTech",  "Genius Leader 7007SL (Germany)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1998, prestige, 0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "PreComputer Prestige Elite",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 COMP( 1999, gwnf,     0,       0,      prestige, prestige, prestige_state, empty_init, "VTech",  "Genius Winner Notebook Fun (Germany)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
