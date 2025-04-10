@@ -40,10 +40,6 @@ public:
 	uint32_t data_address(uint16_t address);
 	uint32_t stack_address(uint16_t address);
 
-	auto branch_cb() { return m_branch_cb.bind(); }
-	auto irqfetch_cb() { return m_irqfetch_cb.bind(); }
-	auto reti_cb() { return m_reti_cb.bind(); }
-
 protected:
 	t6a84_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor io_map);
 
@@ -67,6 +63,10 @@ protected:
 	void stack_page_w(uint8_t page);
 	void vector_page_w(uint8_t page);
 
+	void paged_irqfetch();
+	void paged_reti();
+	void paged_jump();
+
 	void internal_io_map(address_map &map) const;
 	virtual space_config_vector memory_space_config() const override;
 	virtual bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
@@ -77,10 +77,6 @@ protected:
 	const address_space_config m_io_space_config;
 
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_stack;
-
-	devcb_write_line m_branch_cb;
-	devcb_write_line m_irqfetch_cb;
-	devcb_write_line m_reti_cb;
 
 private:
 	uint8_t m_code_page;
