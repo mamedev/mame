@@ -270,12 +270,11 @@ u8 ncr5385_device::int_status_r()
 	LOGMASKED(LOG_REGR, "%10s: int_status_r 0x%02x (%s)\n", machine().time().as_string(8), data, machine().describe_context());
 	m_aux_status &= ~AUX_STATUS_PARITY_ERR;
 	m_int_status = 0;
-	update_int();			// Q: when does this raise the IRQ?  immediately or as part of a state machine?
+	update_int();
 
-	// tek4404 reads this reg from inside IRQ3, clear its flag ($2c3) and then spinloops waiting for it to be set by an IRQ
-	// the update_int() above has happened too fast
+	// REQUIRED delay for tek4404 to avoid missed IRQ
 	if (m_state != IDLE)
-		m_state_timer->adjust(attotime::from_usec(1024));
+		m_state_timer->adjust(attotime::from_usec(128));
 
 	return data;
 }
@@ -309,8 +308,10 @@ void ncr5385_device::dat_w(u8 data)
 		m_dat = data;
 		m_aux_status |= AUX_STATUS_DATA_FULL;
 
+		// REQUIRED delay for tek4404 to avoid missed IRQ
+		// scsi write loop on tek4404 has very specific timing
 		if (m_state != IDLE)
-			m_state_timer->adjust(attotime::zero);
+			m_state_timer->adjust(attotime::from_nsec(40));
 	}
 	else
 		logerror("data register full\n");
@@ -767,6 +768,7 @@ int ncr5385_device::state_step()
 			else
 				m_sbx = false;
 
+			// REQUIRED delay for tek4404 to read boot file
 			delay = 3'600;		// >=3.5us delay works, < 3.5us fails
 			LOGMASKED(LOG_STATE, "%10s: XFI_OUT_ACK delay %d\n", machine().time().as_string(8), delay);
 			
