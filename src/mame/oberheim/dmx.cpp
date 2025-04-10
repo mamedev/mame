@@ -83,7 +83,6 @@ Usage notes:
 #include "sound/mixer.h"
 #include "sound/spkrdev.h"
 #include "sound/va_eg.h"
-#include "sound/va_vca.h"
 #include "video/dl1416.h"
 #include "speaker.h"
 
@@ -207,7 +206,6 @@ private:
 
 	required_device<timer_device> m_timer;  // 555, U5.
 	required_device<dac76_device> m_dac;  // AM6070, U8. Compatible with DAC76.
-	required_device<va_vca_device> m_dac_mult;  // AM6070 is a multiplying DAC.
 	optional_device<va_rc_eg_device> m_eg;  // Volume envelope generator. Input to U8 Iref.
 	required_device_array<filter_biquad_device, 3> m_filters;
 
@@ -234,7 +232,6 @@ dmx_voice_card_device::dmx_voice_card_device(const machine_config &mconfig, cons
 	, device_sound_interface(mconfig, *this)
 	, m_timer(*this, "555_u5")
 	, m_dac(*this, "dac_u8")
-	, m_dac_mult(*this, "dac_mult_u8")
 	, m_eg(*this, "envelope_generator")
 	, m_filters(*this, "aa_sk_filter_%d", 0)
 	, m_config(config)
@@ -249,7 +246,6 @@ dmx_voice_card_device::dmx_voice_card_device(const machine_config &mconfig, cons
 	, device_sound_interface(mconfig, *this)
 	, m_timer(*this, "555_u5")
 	, m_dac(*this, "dac_u8")
-	, m_dac_mult(*this, "dac_mult_u8")
 	, m_eg(*this, "envelope_generator")
 	, m_filters(*this, "aa_sk_filter_%d", 0)
 	// Need non-zero entries for the filter for validation to pass.
@@ -281,7 +277,7 @@ void dmx_voice_card_device::trigger(bool tr0, bool tr1)
 	if (has_decay())  // Gain is controled by an envelope generator.
 		m_eg->set_instant_v(iref);
 	else  // Constant gain.
-		m_dac_mult->set_fixed_cv(iref);
+		m_dac->set_fixed_iref(iref);
 
 	LOGMASKED(LOG_SOUND, "Trigger: (%d, %d) %d, %f uA\n", tr0, tr1, m_trigger_mode, iref * 1e6F);
 }
@@ -295,23 +291,17 @@ void dmx_voice_card_device::set_pitch_adj(s32 t1_percent)
 
 void dmx_voice_card_device::device_add_mconfig(machine_config &config)
 {
-	// This multiplier relates the DAC reference current to the output voltage.
-	// Iout = dac value (normalized to -1 - 1) * 3.8 * Iref.
-	// Vout = Iout * R_current_to_voltage_converter.
-	static constexpr const double DAC_MULTIPLIER = 3.8 * RES_K(2.4);  // R16, R11 on voice card.
 	static constexpr const double SK_R3 = RES_M(999.99);
 	static constexpr const double SK_R4 = RES_R(0.001);
 
 	TIMER(config, m_timer).configure_generic(FUNC(dmx_voice_card_device::clock_callback));
-	DAC76(config, m_dac, 0U);
-	VA_VCA(config, m_dac_mult);
-	m_dac->add_route(0, m_dac_mult, DAC_MULTIPLIER);
+	DAC76(config, m_dac, 0U).configure_voltage_output(RES_K(2.4), RES_K(2.4));  // R16, R11 on voice card.
 
 	if (has_decay())
 	{
 		VA_RC_EG(config, m_eg).set_c(m_config.c3);
-		m_dac_mult->configure_streaming_cv(true);
-		m_eg->add_route(0, m_dac_mult, 1.0);
+		m_dac->configure_streaming_iref(true);
+		m_eg->add_route(0, m_dac, 1.0);
 	}
 
 	FILTER_BIQUAD(config, m_filters[0]).opamp_sk_lowpass_setup(
@@ -324,7 +314,7 @@ void dmx_voice_card_device::device_add_mconfig(machine_config &config)
 		m_config.filter.r19, m_config.filter.r20, SK_R3, SK_R4,
 		m_config.filter.c8, m_config.filter.c9);
 
-	m_dac_mult->add_route(0, m_filters[0], 1.0);
+	m_dac->add_route(0, m_filters[0], 1.0);
 	m_filters[0]->add_route(0, m_filters[1], 1.0);
 	m_filters[1]->add_route(0, m_filters[2], 1.0);
 	m_filters[2]->add_route(0, *this, 1.0);
