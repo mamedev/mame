@@ -9,9 +9,13 @@
 #include "emu.h"
 #include "t6a84.h"
 
-#define LOG_PAGE_R (1U << 1)
-#define LOG_PAGE_W (1U << 2)
-#define LOG_MEM    (1U << 3)
+#include "z80.inc"
+
+#define LOG_INT    (1U << 1) // z80.lst
+#define LOG_UNDOC  (1U << 2)
+#define LOG_PAGE_R (1U << 3)
+#define LOG_PAGE_W (1U << 4)
+#define LOG_MEM    (1U << 5)
 
 //#define VERBOSE (LOG_PAGE_R | LOG_PAGE_W | LOG_MEM)
 #include "logmacro.h"
@@ -38,6 +42,9 @@ t6a84_device::t6a84_device(const machine_config &mconfig, device_type type, cons
 	, m_data_space_config("data", ENDIANNESS_LITTLE, 8, 20, 0, 16, 0)
 	, m_stack_space_config("stack", ENDIANNESS_LITTLE, 8, 20, 0, 16, 0)
 	, m_io_space_config("io", ENDIANNESS_LITTLE, 8, 16, 0, io_map)
+	, m_branch_cb(*this)
+	, m_irqfetch_cb(*this)
+	, m_reti_cb(*this)
 	, m_code_page(0)
 	, m_delay_code_page(0)
 	, m_is_delay_code_page_set(false)
@@ -48,6 +55,7 @@ t6a84_device::t6a84_device(const machine_config &mconfig, device_type type, cons
 {
 	// Interrupt vectors need to be fetched and executed from their corresponding page.
 	// For simplicity, we switch pages via callbacks, instead of using a dedicated address space.
+	// TODO: Find a better way to solve this, at least these hacks are isolated to t6a84.cpp for now.
 	irqfetch_cb().set([this](int state) {
 		LOGMASKED(LOG_PAGE_W, "IRQ FETCH %02x => %02x\n", m_code_page, m_vector_page);
 		m_prev_code_page = m_code_page;
@@ -74,6 +82,11 @@ t6a84_device::t6a84_device(const machine_config &mconfig, device_type type, cons
 			m_is_delay_code_page_set = false;
 		}
 	});
+}
+
+void t6a84_device::execute_run()
+{
+	#include "cpu/z80/t6a84.hxx"
 }
 
 void t6a84_device::device_start()

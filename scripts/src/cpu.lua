@@ -3031,9 +3031,10 @@ end
 --@src/devices/cpu/z80/kl5c80a12.h,CPUS["KC80"] = true
 --@src/devices/cpu/z80/kl5c80a16.h,CPUS["KC80"] = true
 --@src/devices/cpu/z80/ky80.h,CPUS["KC80"] = true
+--@src/devices/cpu/z80/t6a84.h,CPUS["T6A84"] = true
 --------------------------------------------------
 
-if CPUS["Z80"] or CPUS["KC80"] or CPUS["Z80N"] then
+if CPUS["Z80"] or CPUS["KC80"] or CPUS["Z80N"] or CPUS["T6A84"] then
 	files {
 		MAME_DIR .. "src/devices/cpu/z80/z80.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/z80.h",
@@ -3055,18 +3056,22 @@ if CPUS["Z80"] or CPUS["KC80"] or CPUS["Z80N"] then
 		MAME_DIR .. "src/devices/cpu/z80/r800.h",
 		MAME_DIR .. "src/devices/cpu/z80/z84c015.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/z84c015.h",
+		MAME_DIR .. "src/devices/cpu/z80/t6a84.cpp",
+		MAME_DIR .. "src/devices/cpu/z80/t6a84.h",
 	}
 
 	dependency {
 		{ MAME_DIR .. "src/devices/cpu/z80/z80.cpp", GEN_DIR .. "emu/cpu/z80/z80.hxx" },
 		{ MAME_DIR .. "src/devices/cpu/z80/nsc800.cpp", GEN_DIR .. "emu/cpu/z80/ncs800.hxx" },
 		{ MAME_DIR .. "src/devices/cpu/z80/r800.cpp", GEN_DIR .. "emu/cpu/z80/r800.hxx" },
+		{ MAME_DIR .. "src/devices/cpu/z80/t6a84.cpp", GEN_DIR .. "emu/cpu/z80/t6a84.hxx" },
 	}
 
 	custombuildtask {
-		{ MAME_DIR .. "src/devices/cpu/z80/z80.lst", GEN_DIR .. "emu/cpu/z80/z80.hxx", { MAME_DIR .. "src/devices/cpu/z80/z80make.py" }, { "@echo Generating Z80 source file...",   PYTHON .. "  $(1) $(<) $(@)" } },
-		{ MAME_DIR .. "src/devices/cpu/z80/z80.lst", GEN_DIR .. "emu/cpu/z80/ncs800.hxx", { MAME_DIR .. "src/devices/cpu/z80/z80make.py" }, { "@echo Generating NSC800 source file...",   PYTHON .. " $(1) ncs800 $(<) $(@)" } },
-		{ MAME_DIR .. "src/devices/cpu/z80/z80.lst", GEN_DIR .. "emu/cpu/z80/r800.hxx", { MAME_DIR .. "src/devices/cpu/z80/z80make.py" }, { "@echo Generating R800 source file...",   PYTHON .. "  $(1) r800 $(<) $(@)" } },
+		{ MAME_DIR .. "src/devices/cpu/z80/z80.lst", GEN_DIR .. "emu/cpu/z80/z80.hxx",    { MAME_DIR .. "src/devices/cpu/z80/z80make.py" }, { "@echo Generating Z80 source file...",    PYTHON .. " $(1) $(<) $(@)" } },
+		{ MAME_DIR .. "src/devices/cpu/z80/z80.lst", GEN_DIR .. "emu/cpu/z80/ncs800.hxx", { MAME_DIR .. "src/devices/cpu/z80/z80make.py" }, { "@echo Generating NSC800 source file...", PYTHON .. " $(1) ncs800 $(<) $(@)" } },
+		{ MAME_DIR .. "src/devices/cpu/z80/z80.lst", GEN_DIR .. "emu/cpu/z80/r800.hxx",   { MAME_DIR .. "src/devices/cpu/z80/z80make.py" }, { "@echo Generating R800 source file...",   PYTHON .. " $(1) r800 $(<) $(@)" } },
+		{ MAME_DIR .. "src/devices/cpu/z80/z80.lst", GEN_DIR .. "emu/cpu/z80/t6a84.hxx",  { MAME_DIR .. "src/devices/cpu/z80/z80make.py" }, { "@echo Generating T6A84 source file...",  PYTHON .. " $(1) t6a84 $(<) $(@)" } },
 	}
 end
 

@@ -40,12 +40,19 @@ public:
 	uint32_t data_address(uint16_t address);
 	uint32_t stack_address(uint16_t address);
 
+	auto branch_cb() { return m_branch_cb.bind(); }
+	auto irqfetch_cb() { return m_irqfetch_cb.bind(); }
+	auto reti_cb() { return m_reti_cb.bind(); }
+
 protected:
 	t6a84_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor io_map);
 
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+
+	// device_execute_interface implementation
+	virtual void execute_run() override;
 
 	// z80 overrides
 	virtual uint8_t stack_read(uint16_t addr) override;
@@ -70,6 +77,10 @@ protected:
 	const address_space_config m_io_space_config;
 
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_stack;
+
+	devcb_write_line m_branch_cb;
+	devcb_write_line m_irqfetch_cb;
+	devcb_write_line m_reti_cb;
 
 private:
 	uint8_t m_code_page;
