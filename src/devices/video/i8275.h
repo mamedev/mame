@@ -247,6 +247,7 @@ protected:
 	uint8_t m_field_attr;
 
 	bool m_ibmCRTC;
+	bool m_init;
 
 	// timers
 	emu_timer *m_hrtc_on_timer;

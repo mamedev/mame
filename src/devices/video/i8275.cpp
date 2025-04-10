@@ -103,7 +103,8 @@ i8275_device::i8275_device(const machine_config &mconfig, device_type type, cons
 	m_char_blink(0),
 	m_stored_attr(0),
 	m_field_attr(0),
-	m_ibmCRTC(false)
+	m_ibmCRTC(false),
+	m_init(false)
 {
 	memset(m_param, 0x00, sizeof(m_param));
 }
@@ -186,6 +187,8 @@ void i8275_device::device_start()
 	save_item(NAME(m_char_blink));
 	save_item(NAME(m_stored_attr));
 	save_item(NAME(m_field_attr));
+	save_item(NAME(m_ibmCRTC));
+	save_item(NAME(m_init));
 }
 
 
@@ -313,7 +316,8 @@ TIMER_CALLBACK_MEMBER(i8275_device::scanline_tick)
 	{
 		for (i8275_device *crtc = this; crtc != nullptr; crtc = crtc->m_next_crtc)
 		{
-			if ((crtc->m_status & ST_IE) && !(crtc->m_status & ST_IR))
+			// If either the IC is initialized or it is an IBM CRTC the interrupt is set if the EI flag is set
+			if ((crtc->m_status & ST_IE) && !(crtc->m_status & ST_IR) && (crtc->m_init || crtc->m_ibmCRTC))
 			{
 				LOG("I8275 IRQ Set\n");
 				crtc->m_status |= ST_IR;
@@ -580,7 +584,7 @@ void i8275_device::write(offs_t offset, uint8_t data)
 		 */
 		case CMD_RESET:
 			LOG("I8275 Reset\n");
-
+			m_init = true;
 			m_status &= ~(ST_IE | ST_IR | ST_VE);
 			LOG("I8275 IRQ 0\n");
 			m_write_irq(CLEAR_LINE);
