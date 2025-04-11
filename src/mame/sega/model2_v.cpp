@@ -42,6 +42,9 @@
     - The system allows for Z-Sort override, by means of specifying whether a polygon will use the same Z value ordinal as the
     previous polygon, or the calculated minimum or maximum from it's points. This allows for a full object to be in front of
     another, even though the first object might have some z coordinates that are bigger than the second object's z coordinates.
+	- Polygons from later windows will always be rendered on top of polygons from earlier windows, regardless of z value. This
+	can be seen in the name entry screen in Sega Rally for example, where letters meant to be behind the car are rendered in an
+	earlier window and letters in front of the car are rendered in a later window.
     - The current implementation takes the effective computed z value for the polygon and converts it into a 4.12 fixed point
     representation, used as an index into an array of linked polygons. Every polygon with the same z value is linked with any
     previous polygon that had that same z value:
@@ -55,17 +58,14 @@
     As we add polygons to the array, we also keep track of the minimum and maximum z-value indexes seen this frame.
     When it's time to render, we start and the max z-value seen, and iterate through the array going down to the minimum
     z-value seen, clipping and rendering the linked polygons as we go.
-    Unfortunately, it seems there's something not quite right, as there are some visible Z-Sort problems in various games.
-    Perhaps the linked list of polygons need to be presorted by a unknown factor before rendering.
 
 
 
     Clip Notes and Known Bugs:
 
-    - The Z-Clip happens at z=0. Since dividing by 0 during projection would give bogus values, we scale by a distance of
-    1, thus our projection equation turns into vd.x = (d*vs.x) / (d+vs.z) where d = 1, since we know we won't have polygons
-    with a z < 0. This, however, poses the problem that for objects originally between 0.0 and 1.0 are not going to be
-    scaled properly. We still need to find a solution for this.
+	- Four clipping planes representing the viewing frustum are used to clip polygons prior to projection. In the rare event
+	that a polygon intersects with the origin exactly, it will produce a clipped vertex at (0.0, 0.0, 0,0) which would result
+	in NaNs being generated during projection; a tiny value is added to z to prevent this.
     - A small offset need to be added horizontally and vertically to the viewport and center variables for certain games (like
     the original Model 2 games). The coordinate system has been worked out from the 2B specifications, but the older games
     need a slight adjustment.
@@ -92,6 +92,7 @@
 #include "model2.h"
 
 #include <cmath>
+#include <limits>
 
 #define pz      p[0]
 #define pu      p[1]
@@ -196,17 +197,11 @@ inline u16 model2_state::float_to_zval( float floatval )
 	return 0xffff;
 }
 
-static int32_t clip_polygon(poly_vertex *v, int32_t num_vertices, poly_vertex *vout)
+static int32_t clip_polygon(poly_vertex *v, int32_t num_vertices, poly_vertex *vout, model2_state::plane clip_plane)
 {
 	poly_vertex *cur, *out;
 	float   curdot, nextdot, scale;
 	int32_t   i, curin, nextin, nextvert, outcount;
-	model2_state::plane clip_plane;
-
-	clip_plane.normal.x = 0.0f;
-	clip_plane.normal.y = 0.0f;
-	clip_plane.normal.pz = 1.0f;
-	clip_plane.distance = 0.0f;
 
 	outcount = 0;
 
@@ -265,7 +260,7 @@ inline bool model2_state::check_culling( raster_state *raster, u32 attr, float m
 		return true;
 
 	/* if the minimum z value is bigger than the master z clip value, don't render */
-	if ( (int32_t)(1.0/min_z) > raster->master_z_clip )
+	if (raster->master_z_clip != 0xFF && (int32_t)(1.0 / min_z) > raster->master_z_clip)
 		return true;
 
 	/* if the maximum z value is < 0 then we can safely clip the entire polygon */
@@ -316,6 +311,7 @@ void model2_state::raster_init( memory_region *texture_rom )
 
 void model2_state::model2_3d_zclip_w(u32 data)
 {
+	// setting this register to 0xFF disables z-clip
 	m_raster->master_z_clip = data;
 }
 
@@ -444,10 +440,20 @@ void model2_state::model2_3d_process_quad( raster_state *raster, u32 attr )
 	if ( cull == false )
 	{
 		int32_t clipped_verts;
-		poly_vertex verts[10];
+		poly_vertex verts_in[10], verts_out[10];
 
-		/* do near z clipping */
-		clipped_verts = clip_polygon( object.v, 4, verts);
+		for (int i = 0; i < 4; i++)
+			verts_in[i] = object.v[i];
+
+		clipped_verts = 4;
+
+		/* do clipping */
+		for (int i = 0; i < 4; i++)
+		{
+			clipped_verts = clip_polygon(verts_in, clipped_verts, verts_out, raster->clip_plane[raster->center_sel][i]);
+			for (int j = 0; j < clipped_verts; j++)
+				verts_in[j] = verts_out[j];
+		}
 
 		if ( clipped_verts > 2 )
 		{
@@ -495,9 +501,12 @@ void model2_state::model2_3d_process_quad( raster_state *raster, u32 attr )
 				tri->center[0] = raster->center[raster->center_sel][0];
 				tri->center[1] = raster->center[raster->center_sel][1];
 
-				memcpy( &tri->v[0], &verts[0], sizeof( poly_vertex ) );
-				memcpy( &tri->v[1], &verts[i-1], sizeof( poly_vertex ) );
-				memcpy( &tri->v[2], &verts[i], sizeof( poly_vertex ) );
+				/* set the window */
+				tri->window = raster->cur_window;
+
+				memcpy( &tri->v[0], &verts_out[0], sizeof( poly_vertex ) );
+				memcpy( &tri->v[1], &verts_out[i-1], sizeof( poly_vertex ) );
+				memcpy( &tri->v[2], &verts_out[i], sizeof( poly_vertex ) );
 
 				/* add to our sorted list */
 				tri->next = nullptr;
@@ -654,14 +663,24 @@ void model2_state::model2_3d_process_triangle( raster_state *raster, u32 attr )
 
 	raster->triangle_z = zvalue;
 
-	/* if we're not culling, do z-clip and add to out triangle list */
+	/* if we're not culling, do clipping and add to out triangle list */
 	if ( cull == false )
 	{
 		int32_t       clipped_verts;
-		poly_vertex verts[10];
+		poly_vertex verts_in[10], verts_out[10];
 
-		/* do near z clipping */
-		clipped_verts = clip_polygon( object.v, 3, verts);
+		for (int i = 0; i < 3; i++)
+			verts_in[i] = object.v[i];
+
+		clipped_verts = 3;
+
+		/* do clipping */
+		for (int i = 0; i < 4; i++)
+		{
+			clipped_verts = clip_polygon(verts_in, clipped_verts, verts_out, raster->clip_plane[raster->center_sel][i]);
+			for (int j = 0; j < clipped_verts; j++)
+				verts_in[j] = verts_out[j];
+		}
 
 		if ( clipped_verts > 2 )
 		{
@@ -709,9 +728,12 @@ void model2_state::model2_3d_process_triangle( raster_state *raster, u32 attr )
 				tri->center[0] = raster->center[raster->center_sel][0];
 				tri->center[1] = raster->center[raster->center_sel][1];
 
-				memcpy( &tri->v[0], &verts[0], sizeof( poly_vertex ) );
-				memcpy( &tri->v[1], &verts[i-1], sizeof( poly_vertex ) );
-				memcpy( &tri->v[2], &verts[i], sizeof( poly_vertex ) );
+				/* set the window */
+				tri->window = raster->cur_window;
+
+				memcpy( &tri->v[0], &verts_out[0], sizeof( poly_vertex ) );
+				memcpy( &tri->v[1], &verts_out[i-1], sizeof( poly_vertex ) );
+				memcpy( &tri->v[2], &verts_out[i], sizeof( poly_vertex ) );
 
 				/* add to our sorted list */
 				tri->next = nullptr;
@@ -796,13 +818,13 @@ void model2_renderer::model2_3d_render(triangle *tri, const rectangle &cliprect)
 		extra.texmirrory = 0;//(tri->texheader[0] >> 8) & 1;
 		extra.texsheet = (tri->texheader[2] & 0x1000) ? m_state.m_textureram1 : m_state.m_textureram0;
 
-		tri->v[0].pz = 1.0f / (1.0f + tri->v[0].pz);
+		tri->v[0].pz = 1.0f / (tri->v[0].pz + std::numeric_limits<float>::min());
 		tri->v[0].pu = tri->v[0].pu * tri->v[0].pz * (1.0f / 8.0f);
 		tri->v[0].pv = tri->v[0].pv * tri->v[0].pz * (1.0f / 8.0f);
-		tri->v[1].pz = 1.0f / (1.0f + tri->v[1].pz);
+		tri->v[1].pz = 1.0f / (tri->v[1].pz + std::numeric_limits<float>::min());
 		tri->v[1].pu = tri->v[1].pu * tri->v[1].pz * (1.0f / 8.0f);
 		tri->v[1].pv = tri->v[1].pv * tri->v[1].pz * (1.0f / 8.0f);
-		tri->v[2].pz = 1.0f / (1.0f + tri->v[2].pz);
+		tri->v[2].pz = 1.0f / (tri->v[2].pz + std::numeric_limits<float>::min());
 		tri->v[2].pu = tri->v[2].pu * tri->v[2].pz * (1.0f / 8.0f);
 		tri->v[2].pv = tri->v[2].pv * tri->v[2].pz * (1.0f / 8.0f);
 
@@ -878,8 +900,8 @@ inline void model2_state::model2_3d_project( triangle *tri )
 	for( i = 0; i < 3; i++ )
 	{
 		/* project the vertices */
-		tri->v[i].x = m_crtc_xoffset + tri->center[0] + (tri->v[i].x / (1.0f+tri->v[i].pz));
-		tri->v[i].y = ((384 - tri->center[1])+m_crtc_yoffset) - (tri->v[i].y / (1.0f+tri->v[i].pz));
+		tri->v[i].x = m_crtc_xoffset + tri->center[0] + (tri->v[i].x / (tri->v[i].pz + std::numeric_limits<float>::min()));
+		tri->v[i].y = ((384 - tri->center[1])+m_crtc_yoffset) - (tri->v[i].y / (tri->v[i].pz + std::numeric_limits<float>::min()));
 	}
 }
 
@@ -897,6 +919,13 @@ void model2_state::model2_3d_frame_start( void )
 	/* reset the min-max sortable Z values */
 	raster->min_z = 0xFFFF;
 	raster->max_z = 0;
+
+	/* reset the triangle z value */
+	// Zero Gunner sets backgrounds with "previous z value" mode at the start of the display list,
+	// needs this to be this big in order to work properly
+	raster->triangle_z = 1e10;
+
+	raster->cur_window = 0;
 }
 
 void model2_state::model2_3d_frame_end( bitmap_rgb32 &bitmap, const rectangle &cliprect )
@@ -910,23 +939,29 @@ void model2_state::model2_3d_frame_end( bitmap_rgb32 &bitmap, const rectangle &c
 
 	m_poly->destmap().fill(0x00000000, cliprect);
 
-	/* go through the Z levels, and render each bucket */
-	for( z = raster->max_z; z >= raster->min_z; z-- )
+	for (u8 window = 0; window <= raster->cur_window; window++)
 	{
-		/* see if we have items at this z level */
-		if ( raster->tri_sorted_list[z] != nullptr )
+		/* go through the Z levels, and render each bucket */
+		for ( z = raster->max_z; z >= raster->min_z; z-- )
 		{
-			/* get a pointer to the first triangle */
-			triangle *tri = raster->tri_sorted_list[z];
-
-			/* and loop clipping and rendering each triangle */
-			while( tri != nullptr )
+			/* see if we have items at this z level */
+			if ( raster->tri_sorted_list[z] != nullptr )
 			{
-				/* project and render */
-				model2_3d_project( tri );
-				m_poly->model2_3d_render(tri, cliprect);
+				/* get a pointer to the first triangle */
+				triangle *tri = raster->tri_sorted_list[z];
 
-				tri = (triangle *)tri->next;
+				/* and loop clipping and rendering each triangle */
+				while( tri != nullptr )
+				{
+					if (tri->window == window)
+					{
+						/* project and render */
+						model2_3d_project( tri );
+						m_poly->model2_3d_render(tri, cliprect);
+					}
+
+					tri = (triangle *)tri->next;
+				}
 			}
 		}
 	}
@@ -1067,6 +1102,26 @@ void model2_state::model2_3d_push( raster_state *raster, u32 input )
 
 					if ( raster->center[i][1] & 0x800 )
 						raster->center[i][1] = -( 0x800 - (raster->center[i][1] & 0x7FF) );
+
+					// calculate left clipping plane
+					raster->clip_plane[i][0].normal.x = 1.0f / float(raster->center[i][0] - raster->viewport[0]);
+					raster->clip_plane[i][0].normal.y = 0.0f;
+					raster->clip_plane[i][0].normal.pz = 1.0f;
+
+					// calculate right clipping plane
+					raster->clip_plane[i][1].normal.x = 1.0f / float(raster->center[i][0] - raster->viewport[2]);
+					raster->clip_plane[i][1].normal.y = 0.0f;
+					raster->clip_plane[i][1].normal.pz = 1.0f;
+
+					// calculate top clipping plane
+					raster->clip_plane[i][2].normal.x = 0.0f;
+					raster->clip_plane[i][2].normal.y = 1.0f / float(raster->center[i][1] - raster->viewport[3]);
+					raster->clip_plane[i][2].normal.pz = 1.0f;
+
+					// calculate bottom clipping plane
+					raster->clip_plane[i][3].normal.x = 0.0f;
+					raster->clip_plane[i][3].normal.y = 1.0f / float(raster->center[i][1] - raster->viewport[1]);
+					raster->clip_plane[i][3].normal.pz = 1.0f;
 				}
 
 				/* done with this command */
@@ -1140,11 +1195,6 @@ void model2_state::model2_3d_push( raster_state *raster, u32 input )
 
 			/* extract center select */
 			raster->center_sel = ( input >> 6 ) & 3;
-
-			/* reset the triangle z value */
-			// Zero Gunner sets backgrounds with "previous z value" mode at the start of the display list,
-			// needs this to be this big in order to work properly
-			raster->triangle_z = 1e10;
 		}
 	}
 }
@@ -2018,6 +2068,8 @@ u32 *model2_state::geo_window_data( geo_state *geo, u32 opcode, u32 *input )
 	/* start by pushing the opcode */
 	model2_3d_push( raster, opcode >> 23 );
 
+	raster->cur_window++;
+
 	/*
 	    we're going to move 6 coordinates to the 3d rasterizer:
 	    - starting coordinate
@@ -2526,11 +2578,6 @@ void model2_state::geo_parse( void )
 		/* if it's a jump opcode, do the jump */
 		if ( opcode & 0x80000000 )
 		{
-			// TODO: daytona with master network enabled hardlocks by trying a jump with 0xffff0080 as opcode
-			//       bad timings for geo_parse?
-			if(opcode & 0x078000000 )
-				return;
-
 			/* get the address */
 			address = (opcode & 0x1FFFF) / 4;
 

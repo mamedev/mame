@@ -10,15 +10,13 @@
     MAME driver by R. Belmont, Olivier Galibert, ElSemi and Angelo Salese.
 
     TODO:
-    - z-sort, focal distance, color gamma and Mip Mapping still needs to be properly sorted in the renderer;
+    - color gamma and Mip Mapping still needs to be properly sorted in the renderer;
     - sound comms still needs some work (sometimes m68k doesn't get some commands or play them with a delay);
     - 2C games needs TGPx4 emulation;
     - outputs and artwork (for gearbox indicators);
     - clean-ups;
 
     TODO (per-game issues)
-    - daytona: crashes when coining it up with master network active
-               culprit is a wrong command parameter in geo_parse texture data opcode;
     - daytona: car glasses doesn't get loaded during gameplay;
     - doa, doaa: corrupted sound, eventually becomes silent;
     - dynamcopc: corrupts palette for 2d (most likely unrelated with the lack of DSP);
@@ -31,11 +29,8 @@
     - manxtt: no escape from "active motion slider" tutorial (needs analog inputs),
               bypass it by entering then exiting service mode;
     - sgt24h: first turn in easy reverse course has ugly rendered mountain in background;
-    - skytargt: really slow during gameplay (fixed?);
-    - skytargt: short draw distance (might be down to z-sort);
     - srallyc: some 3d elements doesn't show up properly (tree models, last hill in course 1 is often black colored);
     - vcop: sound dies at enter initial screen (i.e. after played the game once) (untested);
-    - vcop: missing 3d at stage select screen (priority?);
     - vstriker: stadium ads have terrible colors (they uses the wrong color table, @see video/model2rd.hxx)
 
     Notes:
