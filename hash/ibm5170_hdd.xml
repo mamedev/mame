@@ -55,7 +55,7 @@ license:CC0-1.0
 		<info name="version" value="1.4" />
 		<part name="hdd" interface="ide_hdd">
 			<diskarea name="harddriv">
-				<disk name="freedos14" sha1="c1ffb2c1cbf3f9c8f6193d5ba9c5c01ce74d3d4e" writable="yes" />
+				<disk name="freedos14" sha1="c1ffb2c1cbf3f9c8f6193d5ba9c5c01ce74d3d4e" writeable="yes" />
 			</diskarea>
 		</part>
 	</software>
