@@ -259,6 +259,10 @@ inline bool model2_state::check_culling( raster_state *raster, u32 attr, float m
 	if ( ((attr >> 8) & 3) == 0 )
 		return true;
 
+	/* if the minimum z value is bigger than the master z clip value, don't render */
+	if (raster->master_z_clip != 0xFF && (int32_t)(1.0 / min_z) > raster->master_z_clip)
+		return true;
+
 	/* if the maximum z value is < 0 then we can safely clip the entire polygon */
 	if ( max_z < 0 )
 		return true;
@@ -307,8 +311,7 @@ void model2_state::raster_init( memory_region *texture_rom )
 
 void model2_state::model2_3d_zclip_w(u32 data)
 {
-	// TODO: all games seem to set this to 0xFF, or sometimes 0 when not rendering
-	// Seems more likely to be a "render enable" register than a z-clip value?
+	// setting this register to 0xFF disables z-clip
 	m_raster->master_z_clip = data;
 }
 
@@ -660,7 +663,7 @@ void model2_state::model2_3d_process_triangle( raster_state *raster, u32 attr )
 
 	raster->triangle_z = zvalue;
 
-	/* if we're not culling, do z-clip and add to out triangle list */
+	/* if we're not culling, do clipping and add to out triangle list */
 	if ( cull == false )
 	{
 		int32_t       clipped_verts;
@@ -916,6 +919,11 @@ void model2_state::model2_3d_frame_start( void )
 	/* reset the min-max sortable Z values */
 	raster->min_z = 0xFFFF;
 	raster->max_z = 0;
+
+	/* reset the triangle z value */
+	// Zero Gunner sets backgrounds with "previous z value" mode at the start of the display list,
+	// needs this to be this big in order to work properly
+	raster->triangle_z = 1e10;
 
 	raster->cur_window = 0;
 }
@@ -1187,11 +1195,6 @@ void model2_state::model2_3d_push( raster_state *raster, u32 input )
 
 			/* extract center select */
 			raster->center_sel = ( input >> 6 ) & 3;
-
-			/* reset the triangle z value */
-			// Zero Gunner sets backgrounds with "previous z value" mode at the start of the display list,
-			// needs this to be this big in order to work properly
-			raster->triangle_z = 1e10;
 		}
 	}
 }
