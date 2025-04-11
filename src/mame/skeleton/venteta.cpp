@@ -105,7 +105,7 @@ void venteta_state::venteta(machine_config &config)
 {
 	ATMEGA1280(config, m_maincpu, 24_MHz_XTAL); // TODO: actually ATMEGA103
 	m_maincpu->set_addrmap(AS_PROGRAM, &venteta_state::program_map);
-	m_maincpu->set_addrmap(AS_PROGRAM, &venteta_state::data_map);
+	m_maincpu->set_addrmap(AS_DATA, &venteta_state::data_map);
 	m_maincpu->set_eeprom_tag("eeprom");
 
 	// TODO: everything
