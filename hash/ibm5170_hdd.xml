@@ -48,7 +48,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="freedos14">
-		<description>FreeDOS (version 1.4)</description>
+		<description>FreeDOS 1.4</description>
 		<year>2025</year>
 		<publisher>The FreeDOS Project</publisher>
 		<info name="language" value="English" />
