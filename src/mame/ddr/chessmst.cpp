@@ -24,11 +24,6 @@ A newer version of Chess-Master had a 4MHz UA880 and 2 ROM chips (8KB + 2KB).
 BTANB:
 - corner leds flicker sometimes
 
-TODO:
-- chessmsta isn't working, needs a redump of u2616. Program differences are
-  minor so it seems to boot fine if you take 064/065 from chessmst, but will
-  probably have some problems.
-
 *******************************************************************************/
 
 #include "emu.h"
@@ -288,7 +283,7 @@ ROM_END
 ROM_START( chessmsta )
 	ROM_REGION( 0x2800, "maincpu", 0 )
 	ROM_LOAD("bm001.d204", 0x0000, 0x2000, CRC(6be28876) SHA1(fd7d77b471e7792aef3b2b3f7ff1de4cdafc94c9) ) // U2364D45
-	ROM_LOAD("bm108.d205", 0x2000, 0x0800, CRC(6e69ace3) SHA1(e099b6b6cc505092f64b8d51ab9c70aa64f58f70) BAD_DUMP ) // U2616D45 - problem with d3
+	ROM_LOAD("bm108.d205", 0x2000, 0x0800, CRC(2599794f) SHA1(8d612d6159b29f9fc6a58d8f1e5a86d0e7c2ce75) ) // U2616D45
 ROM_END
 
 } // anonymous namespace
@@ -299,6 +294,6 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME        PARENT    COMPAT  MACHINE    INPUT     CLASS           INIT        COMPANY                                     FULLNAME                FLAGS
-SYST( 1984, chessmst,   0,        0,      chessmst,  chessmst, chessmst_state, empty_init, "VEB Mikroelektronik \"Karl Marx\" Erfurt", "Chess-Master (set 1)", MACHINE_SUPPORTS_SAVE )
-SYST( 1984, chessmsta,  chessmst, 0,      chessmsta, chessmst, chessmst_state, empty_init, "VEB Mikroelektronik \"Karl Marx\" Erfurt", "Chess-Master (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+//    YEAR  NAME        PARENT    COMPAT  MACHINE    INPUT     CLASS           INIT        COMPANY                                     FULLNAME                           FLAGS
+SYST( 1984, chessmst,   0,        0,      chessmst,  chessmst, chessmst_state, empty_init, "VEB Mikroelektronik \"Karl Marx\" Erfurt", "Chess-Master (model G-5003-500)", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, chessmsta,  chessmst, 0,      chessmsta, chessmst, chessmst_state, empty_init, "VEB Mikroelektronik \"Karl Marx\" Erfurt", "Chess-Master (model G-5003-501)", MACHINE_SUPPORTS_SAVE )

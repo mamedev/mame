@@ -513,7 +513,7 @@ int device_execute_interface::standard_irq_callback(int irqline, offs_t pc)
 		vector = m_driver_irq(device(), irqline);
 
 	// notify the debugger
-	if (device().machine().debug_flags & DEBUG_FLAG_ENABLED)
+	if (debugger_enabled())
 		device().debug()->interrupt_hook(irqline, pc);
 
 	return vector;
