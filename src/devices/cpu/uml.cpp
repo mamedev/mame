@@ -1072,6 +1072,18 @@ public:
 		if (inst.param(0) == inst.param(1))
 			inst.nop();
 	}
+
+	static void fread(instruction &inst)
+	{
+		// truncate immediate address to size
+		truncate_immediate(inst, 1, 0xffffffff);
+	}
+
+	static void fwrite(instruction &inst)
+	{
+		// truncate immediate address to size
+		truncate_immediate(inst, 0, 0xffffffff);
+	}
 };
 
 
@@ -1196,6 +1208,9 @@ void uml::instruction::simplify()
 		origop = m_opcode;
 		switch (m_opcode)
 		{
+		case OP_DEBUG:  simplify_op::truncate_imm(*this);             break;
+		case OP_EXIT:   simplify_op::truncate_imm(*this);             break;
+		case OP_EXH:    simplify_op::truncate_imm(*this);             break;
 		case OP_READ:   simplify_op::read(*this);                     break;
 		case OP_READM:  simplify_op::readm(*this);                    break;
 		case OP_WRITE:  simplify_op::write(*this);                    break;
@@ -1230,6 +1245,8 @@ void uml::instruction::simplify()
 		case OP_ROLC:   simplify_op::rolrc(*this);                    break;
 		case OP_ROR:    simplify_op::ror(*this);                      break;
 		case OP_RORC:   simplify_op::rolrc(*this);                    break;
+		case OP_FREAD:  simplify_op::fread(*this);                    break;
+		case OP_FWRITE: simplify_op::fwrite(*this);                   break;
 
 		default:                                                      break;
 		}

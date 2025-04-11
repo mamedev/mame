@@ -109,8 +109,7 @@ namespace uml
 		SCALE_x1 = 0,               // index * 1
 		SCALE_x2,                   // index * 2
 		SCALE_x4,                   // index * 4
-		SCALE_x8,                   // index * 8
-		SCALE_DEFAULT
+		SCALE_x8                    // index * 8
 	};
 
 	// spaces
@@ -118,7 +117,8 @@ namespace uml
 	{
 		SPACE_PROGRAM = AS_PROGRAM,
 		SPACE_DATA = AS_DATA,
-		SPACE_IO = AS_IO
+		SPACE_IO = AS_IO,
+		SPACE_OPCODES = AS_OPCODES
 	};
 
 	// opcodes
@@ -444,13 +444,13 @@ namespace uml
 		void restore(drcuml_machine_state *src) { configure(OP_RESTORE, 4, parameter::make_memory(src)); }
 
 		// 32-bit integer operations
-		void load(parameter dst, void const *base, parameter index, operand_size size, memory_scale scale = SCALE_DEFAULT) { configure(OP_LOAD, 4, dst, parameter::make_memory(base), index, parameter(size, scale)); }
-		void loads(parameter dst, void const *base, parameter index, operand_size size, memory_scale scale = SCALE_DEFAULT) { configure(OP_LOADS, 4, dst, parameter::make_memory(base), index, parameter(size, scale)); }
-		void store(void *base, parameter index, parameter src1, operand_size size, memory_scale scale = SCALE_DEFAULT) { configure(OP_STORE, 4, parameter::make_memory(base), index, src1, parameter(size, scale)); }
-		void read(parameter dst, parameter src1, operand_size size, memory_space space = SPACE_PROGRAM) { configure(OP_READ, 4, dst, src1, parameter(size, space)); }
-		void readm(parameter dst, parameter src1, parameter mask, operand_size size, memory_space space = SPACE_PROGRAM) { configure(OP_READM, 4, dst, src1, mask, parameter(size, space)); }
-		void write(parameter dst, parameter src1, operand_size size, memory_space space = SPACE_PROGRAM) { configure(OP_WRITE, 4, dst, src1, parameter(size, space)); }
-		void writem(parameter dst, parameter src1, parameter mask, operand_size size, memory_space space = SPACE_PROGRAM) { configure(OP_WRITEM, 4, dst, src1, mask, parameter(size, space)); }
+		void load(parameter dst, void const *base, parameter index, operand_size size, memory_scale scale) { configure(OP_LOAD, 4, dst, parameter::make_memory(base), index, parameter(size, scale)); }
+		void loads(parameter dst, void const *base, parameter index, operand_size size, memory_scale scale) { configure(OP_LOADS, 4, dst, parameter::make_memory(base), index, parameter(size, scale)); }
+		void store(void *base, parameter index, parameter src1, operand_size size, memory_scale scale) { configure(OP_STORE, 4, parameter::make_memory(base), index, src1, parameter(size, scale)); }
+		void read(parameter dst, parameter addr, operand_size size, memory_space space = SPACE_PROGRAM) { configure(OP_READ, 4, dst, addr, parameter(size, space)); }
+		void readm(parameter dst, parameter addr, parameter mask, operand_size size, memory_space space = SPACE_PROGRAM) { configure(OP_READM, 4, dst, addr, mask, parameter(size, space)); }
+		void write(parameter addr, parameter src1, operand_size size, memory_space space = SPACE_PROGRAM) { configure(OP_WRITE, 4, addr, src1, parameter(size, space)); }
+		void writem(parameter addr, parameter src1, parameter mask, operand_size size, memory_space space = SPACE_PROGRAM) { configure(OP_WRITEM, 4, addr, src1, mask, parameter(size, space)); }
 		void carry(parameter src, parameter bitnum) { configure(OP_CARRY, 4, src, bitnum); }
 		void set(condition_t cond, parameter dst) { configure(OP_SET, 4, dst, cond); }
 		void mov(parameter dst, parameter src1) { configure(OP_MOV, 4, dst, src1); }
@@ -485,13 +485,13 @@ namespace uml
 		void rorc(parameter dst, parameter src, parameter count) { configure(OP_RORC, 4, dst, src, count); }
 
 		// 64-bit integer operations
-		void dload(parameter dst, void const *base, parameter index, operand_size size, memory_scale scale = SCALE_DEFAULT) { configure(OP_LOAD, 8, dst, parameter::make_memory(base), index, parameter(size, scale)); }
-		void dloads(parameter dst, void const *base, parameter index, operand_size size, memory_scale scale = SCALE_DEFAULT) { configure(OP_LOADS, 8, dst, parameter::make_memory(base), index, parameter(size, scale)); }
-		void dstore(void *base, parameter index, parameter src1, operand_size size, memory_scale scale = SCALE_DEFAULT) { configure(OP_STORE, 8, parameter::make_memory(base), index, src1, parameter(size, scale)); }
-		void dread(parameter dst, parameter src1, operand_size size, memory_space space = SPACE_PROGRAM) { configure(OP_READ, 8, dst, src1, parameter(size, space)); }
-		void dreadm(parameter dst, parameter src1, parameter mask, operand_size size, memory_space space = SPACE_PROGRAM) { configure(OP_READM, 8, dst, src1, mask, parameter(size, space)); }
-		void dwrite(parameter dst, parameter src1, operand_size size, memory_space space = SPACE_PROGRAM) { configure(OP_WRITE, 8, dst, src1, parameter(size, space)); }
-		void dwritem(parameter dst, parameter src1, parameter mask, operand_size size, memory_space space = SPACE_PROGRAM) { configure(OP_WRITEM, 8, dst, src1, mask, parameter(size, space)); }
+		void dload(parameter dst, void const *base, parameter index, operand_size size, memory_scale scale) { configure(OP_LOAD, 8, dst, parameter::make_memory(base), index, parameter(size, scale)); }
+		void dloads(parameter dst, void const *base, parameter index, operand_size size, memory_scale scale) { configure(OP_LOADS, 8, dst, parameter::make_memory(base), index, parameter(size, scale)); }
+		void dstore(void *base, parameter index, parameter src1, operand_size size, memory_scale scale) { configure(OP_STORE, 8, parameter::make_memory(base), index, src1, parameter(size, scale)); }
+		void dread(parameter dst, parameter addr, operand_size size, memory_space space = SPACE_PROGRAM) { configure(OP_READ, 8, dst, addr, parameter(size, space)); }
+		void dreadm(parameter dst, parameter addr, parameter mask, operand_size size, memory_space space = SPACE_PROGRAM) { configure(OP_READM, 8, dst, addr, mask, parameter(size, space)); }
+		void dwrite(parameter addr, parameter src1, operand_size size, memory_space space = SPACE_PROGRAM) { configure(OP_WRITE, 8, addr, src1, parameter(size, space)); }
+		void dwritem(parameter addr, parameter src1, parameter mask, operand_size size, memory_space space = SPACE_PROGRAM) { configure(OP_WRITEM, 8, addr, src1, mask, parameter(size, space)); }
 		void dcarry(parameter src, parameter bitnum) { configure(OP_CARRY, 8, src, bitnum); }
 		void dset(condition_t cond, parameter dst) { configure(OP_SET, 8, dst, cond); }
 		void dmov(parameter dst, parameter src1) { configure(OP_MOV, 8, dst, src1); }
@@ -528,8 +528,8 @@ namespace uml
 		// 32-bit floating point operations
 		void fsload(parameter dst, void const *base, parameter index) { configure(OP_FLOAD, 4, dst, parameter::make_memory(base), index); }
 		void fsstore(void *base, parameter index, parameter src1) { configure(OP_FSTORE, 4, parameter::make_memory(base), index, src1); }
-		void fsread(parameter dst, parameter src1, memory_space space) { configure(OP_FREAD, 4, dst, src1, parameter(SIZE_SHORT, space)); }
-		void fswrite(parameter dst, parameter src1, memory_space space) { configure(OP_FWRITE, 4, dst, src1, parameter(SIZE_SHORT, space)); }
+		void fsread(parameter dst, parameter addr, memory_space space) { configure(OP_FREAD, 4, dst, addr, parameter(SIZE_SHORT, space)); }
+		void fswrite(parameter addr, parameter src1, memory_space space) { configure(OP_FWRITE, 4, addr, src1, parameter(SIZE_SHORT, space)); }
 		void fsmov(parameter dst, parameter src1) { configure(OP_FMOV, 4, dst, src1); }
 		void fsmov(condition_t cond, parameter dst, parameter src1) { configure(OP_FMOV, 4, dst, src1, cond); }
 		void fstoint(parameter dst, parameter src1, operand_size size, float_rounding_mode round) { configure(OP_FTOINT, 4, dst, src1, parameter::make_size(size), parameter::make_rounding(round)); }
@@ -551,8 +551,8 @@ namespace uml
 		// 64-bit floating point operations
 		void fdload(parameter dst, void const *base, parameter index) { configure(OP_FLOAD, 8, dst, parameter::make_memory(base), index); }
 		void fdstore(void *base, parameter index, parameter src1) { configure(OP_FSTORE, 8, parameter::make_memory(base), index, src1); }
-		void fdread(parameter dst, parameter src1, memory_space space) { configure(OP_FREAD, 8, dst, src1, parameter(SIZE_DOUBLE, space)); }
-		void fdwrite(parameter dst, parameter src1, memory_space space) { configure(OP_FWRITE, 8, dst, src1, parameter(SIZE_DOUBLE, space)); }
+		void fdread(parameter dst, parameter addr, memory_space space) { configure(OP_FREAD, 8, dst, addr, parameter(SIZE_DOUBLE, space)); }
+		void fdwrite(parameter addr, parameter src1, memory_space space) { configure(OP_FWRITE, 8, addr, src1, parameter(SIZE_DOUBLE, space)); }
 		void fdmov(parameter dst, parameter src1) { configure(OP_FMOV, 8, dst, src1); }
 		void fdmov(condition_t cond, parameter dst, parameter src1) { configure(OP_FMOV, 8, dst, src1, cond); }
 		void fdtoint(parameter dst, parameter src1, operand_size size, float_rounding_mode round) { configure(OP_FTOINT, 8, dst, src1, parameter::make_size(size), parameter::make_rounding(round)); }
