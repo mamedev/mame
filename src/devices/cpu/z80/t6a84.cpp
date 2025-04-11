@@ -179,12 +179,12 @@ uint32_t t6a84_device::stack_address(uint16_t address)
 
 uint8_t t6a84_device::stack_read(uint16_t addr)
 {
-	return m_stack.read_byte(translate_memory_address(addr));
+	return m_stack.read_byte(addr);
 }
 
 void t6a84_device::stack_write(uint16_t addr, uint8_t value)
 {
-	m_stack.write_byte(translate_memory_address((uint32_t) addr), value);
+	m_stack.write_byte(addr, value);
 }
 
 uint8_t t6a84_device::data_page_r()

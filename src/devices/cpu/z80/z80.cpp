@@ -73,7 +73,7 @@ void z80_device::leave_halt()
  ***************************************************************/
 u8 z80_device::data_read(u16 addr)
 {
-	return m_data.read_interruptible(translate_memory_address(addr));
+	return m_data.read_interruptible(addr);
 }
 
 /***************************************************************
@@ -81,7 +81,7 @@ u8 z80_device::data_read(u16 addr)
  ***************************************************************/
 void z80_device::data_write(u16 addr, u8 value)
 {
-	m_data.write_interruptible(translate_memory_address((u32)addr), value);
+	m_data.write_interruptible(addr, value);
 }
 
 /***************************************************************
@@ -91,7 +91,7 @@ void z80_device::data_write(u16 addr, u8 value)
  ***************************************************************/
 u8 z80_device::opcode_read()
 {
-	return m_opcodes.read_byte(translate_memory_address(PC));
+	return m_opcodes.read_byte(PC);
 }
 
 /****************************************************************
@@ -103,7 +103,7 @@ u8 z80_device::opcode_read()
  ***************************************************************/
 u8 z80_device::arg_read()
 {
-	return m_args.read_byte(translate_memory_address(PC));
+	return m_args.read_byte(PC);
 }
 
 /***************************************************************
@@ -467,14 +467,13 @@ void z80_device::set_f(u8 f)
 void z80_device::illegal_1()
 {
 	LOGMASKED(LOG_UNDOC, "ill. opcode $%02x $%02x ($%04x)\n",
-			m_opcodes.read_byte(translate_memory_address((PC - 1) & 0xffff)),
-			m_opcodes.read_byte(translate_memory_address(PC)), PC - 1);
+			m_opcodes.read_byte((PC - 1) & 0xffff), m_opcodes.read_byte(PC), PC - 1);
 }
 
 void z80_device::illegal_2()
 {
 	LOGMASKED(LOG_UNDOC, "ill. opcode $ed $%02x\n",
-			m_opcodes.read_byte(translate_memory_address((PC - 1) & 0xffff)));
+			m_opcodes.read_byte((PC - 1) & 0xffff));
 }
 
 /****************************************************************************
