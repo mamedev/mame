@@ -1004,8 +1004,7 @@ static void execute_one(dsp56156_core* cpustate)
 
 	/* For MAME */
 	cpustate->ppc = PC;
-	if (cpustate->device->machine().debug_flags & DEBUG_FLAG_CALL_HOOK) // FIXME: if this was a member, the helper would work
-		cpustate->device->debug()->instruction_hook(PC);
+	cpustate->device->debug()->instruction_hook(PC);
 
 	cpustate->op = ROPCODE(PC);
 	/* The words we're going to be working with */

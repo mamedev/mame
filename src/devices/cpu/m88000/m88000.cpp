@@ -1394,7 +1394,7 @@ void mc88100_device::exception(unsigned vector, bool const trap)
 	m_fip = m_cr[VBR] | (vector << 3) | IP_V;
 
 	// notify debugger
-	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+	if (debugger_enabled())
 	{
 		if (vector == E_INTERRUPT)
 			debug()->interrupt_hook(INPUT_LINE_IRQ0, m_xip & IP_A);

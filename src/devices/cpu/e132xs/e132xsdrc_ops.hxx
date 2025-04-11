@@ -635,7 +635,7 @@ void hyperstone_device::generate_trap_exception_or_int(drcuml_block &block, uml:
 	const uint32_t clear_flags = T_MASK | M_MASK;
 	const uint32_t update_sr = FP_MASK | FL_MASK | set_flags | clear_flags;
 
-	if ((TYPE != IS_INT) && (machine().debug_flags & DEBUG_FLAG_ENABLED))
+	if ((TYPE != IS_INT) && debugger_enabled())
 	{
 		if (!trapno.is_int_register())
 		{
@@ -3918,7 +3918,7 @@ void hyperstone_device::generate_dbr(drcuml_block &block, compiler_state &compil
 #endif
 
 		// if we are debugging, call the debugger
-		if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+		if (debugger_enabled())
 		{
 			//save_fast_iregs(block);
 			UML_DEBUG(block, delayslot->pc);

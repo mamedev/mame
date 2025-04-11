@@ -452,7 +452,7 @@ inline void sh34_base_device::LDCSR(const uint16_t opcode)
 	// important to store the value now so that it doesn't get affected by the bank change
 	uint32_t reg = m_sh2_state->r[REG_N];
 
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if (debugger_enabled())
 		sh4_syncronize_register_bank((m_sh2_state->sr & sRB) >> 29);
 
 	if ((m_sh2_state->r[REG_N] & sRB) != (m_sh2_state->sr & sRB))
@@ -468,7 +468,7 @@ inline void sh34_base_device::LDCMSR(const uint16_t opcode)
 	uint32_t old = m_sh2_state->sr;
 	m_sh2_state->ea = m_sh2_state->r[REG_N];
 	m_sh2_state->sr = read_long(m_sh2_state->ea) & SH34_FLAGS;
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if (debugger_enabled())
 		sh4_syncronize_register_bank((old & sRB) >> 29);
 	if ((old & sRB) != (m_sh2_state->sr & sRB))
 		sh4_change_register_bank(m_sh2_state->sr & sRB ? 1 : 0);
@@ -482,7 +482,7 @@ inline void sh34_base_device::RTE()
 {
 	m_sh2_state->m_delay = m_sh2_state->ea = m_sh2_state->m_spc;
 
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if (debugger_enabled())
 		sh4_syncronize_register_bank((m_sh2_state->sr & sRB) >> 29);
 	if ((m_sh2_state->m_ssr & sRB) != (m_sh2_state->sr & sRB))
 		sh4_change_register_bank(m_sh2_state->m_ssr & sRB ? 1 : 0);
@@ -512,7 +512,7 @@ inline void sh34_base_device::TRAPA(uint32_t i)
 	m_sh2_state->m_sgr = m_sh2_state->r[15];
 
 	m_sh2_state->sr |= MD;
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if (debugger_enabled())
 		sh4_syncronize_register_bank((m_sh2_state->sr & sRB) >> 29);
 	if (!(m_sh2_state->sr & sRB))
 		sh4_change_register_bank(1);
@@ -2814,7 +2814,7 @@ void sh34_base_device::static_generate_memory_accessor(int size, int iswrite, co
 
 	UML_LABEL(block, label++);              // label:
 
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) == 0)
+	if (!debugger_enabled())
 	{
 		for (auto & elem : m_fastram)
 		{

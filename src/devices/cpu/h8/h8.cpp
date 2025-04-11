@@ -357,7 +357,7 @@ void h8_device::execute_run()
 		while(m_icount > m_bcount) {
 			if(m_inst_state < 0x10000) {
 				m_PPC = m_NPC;
-				if(machine().debug_flags & DEBUG_FLAG_ENABLED)
+				if(debugger_enabled())
 					debugger_instruction_hook(m_NPC);
 			}
 			do_exec_full();
