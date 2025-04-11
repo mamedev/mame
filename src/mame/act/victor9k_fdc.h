@@ -52,8 +52,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(gen_tick);
-	TIMER_CALLBACK_MEMBER(tach0_tick);
-	TIMER_CALLBACK_MEMBER(tach1_tick);
+	TIMER_CALLBACK_MEMBER(scp_tick);
 
 private:
 	static const int rpm[0x100];
@@ -106,7 +105,6 @@ private:
 	devcb_write_line m_syn_cb;
 	devcb_write_line m_lbrdy_cb;
 
-	required_device<i8048_device> m_maincpu;
 	required_device<via6522_device> m_via4;
 	required_device<via6522_device> m_via5;
 	required_device<via6522_device> m_via6;
@@ -115,8 +113,6 @@ private:
 	output_finder<2> m_leds;
 
 	void update_stepper_motor(floppy_image_device *floppy, int stp, int old_st, int st);
-	void update_spindle_motor(floppy_image_device *floppy, emu_timer *t_tach, bool start, bool stop, bool sel, uint8_t &da);
-	void update_rpm(floppy_image_device *floppy, emu_timer *t_tach, bool sel, uint8_t &da);
 	void update_rdy();
 
 	void load0_cb(floppy_image_device *device);
@@ -128,21 +124,14 @@ private:
 	uint8_t m_p2;
 
 	/* floppy state */
-	uint8_t m_data;
-	uint8_t m_da[2];
-	int m_start[2];
-	int m_stop[2];
-	int m_sel[2];
-	int m_tach[2];
-	int m_rdy[2];
-	int m_scp_rdy0;
-	int m_scp_rdy1;
 	int m_via_rdy0;
 	int m_via_rdy1;
-	uint8_t m_scp_l0ms;
-	uint8_t m_scp_l1ms;
+	int m_scp_rdy0;
+	int m_scp_rdy1;
 	uint8_t m_via_l0ms;
 	uint8_t m_via_l1ms;
+	uint8_t m_scp_l0ms;
+	uint8_t m_scp_l1ms;
 	int m_st[2];
 	int m_stp[2];
 	int m_drive;
@@ -160,7 +149,7 @@ private:
 
 	live_info cur_live, checkpoint_live;
 	fdc_pll_t cur_pll, checkpoint_pll;
-	emu_timer *t_gen, *t_tach[2];
+	emu_timer *t_gen, *t_scp;
 
 	floppy_image_device* get_floppy();
 	void live_start();
@@ -180,14 +169,6 @@ private:
 	void live_run(const attotime &limit = attotime::never);
 
 	static void floppy_formats(format_registration &fr);
-
-	uint8_t floppy_p1_r();
-	void floppy_p1_w(uint8_t data);
-	uint8_t floppy_p2_r();
-	void floppy_p2_w(uint8_t data);
-	int tach0_r();
-	int tach1_r();
-	void da_w(uint8_t data);
 
 	uint8_t via4_pa_r();
 	void via4_pa_w(uint8_t data);
