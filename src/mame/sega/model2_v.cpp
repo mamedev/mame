@@ -1103,25 +1103,27 @@ void model2_state::model2_3d_push( raster_state *raster, u32 input )
 					if ( raster->center[i][1] & 0x800 )
 						raster->center[i][1] = -( 0x800 - (raster->center[i][1] & 0x7FF) );
 
-					// calculate left clipping plane
-					raster->clip_plane[i][0].normal.x = 1.0f / float(raster->center[i][0] - raster->viewport[0]);
+					// calculate clipping planes
+					float left_plane = float(raster->center[i][0] - raster->viewport[0]);
+					float right_plane = float(raster->viewport[2] - raster->center[i][0]);
+					float top_plane = float(raster->viewport[3] - raster->center[i][1]);
+					float bottom_plane = float(raster->center[i][1] - raster->viewport[1]);
+
+					raster->clip_plane[i][0].normal.x = 1.0f / std::hypot(1.0f, left_plane);
 					raster->clip_plane[i][0].normal.y = 0.0f;
-					raster->clip_plane[i][0].normal.pz = 1.0f;
+					raster->clip_plane[i][0].normal.pz = left_plane / std::hypot(1.0f, left_plane);
 
-					// calculate right clipping plane
-					raster->clip_plane[i][1].normal.x = 1.0f / float(raster->center[i][0] - raster->viewport[2]);
+					raster->clip_plane[i][1].normal.x = -1.0f / std::hypot(-1.0f, right_plane);
 					raster->clip_plane[i][1].normal.y = 0.0f;
-					raster->clip_plane[i][1].normal.pz = 1.0f;
+					raster->clip_plane[i][1].normal.pz = right_plane / std::hypot(-1.0f, right_plane);
 
-					// calculate top clipping plane
 					raster->clip_plane[i][2].normal.x = 0.0f;
-					raster->clip_plane[i][2].normal.y = 1.0f / float(raster->center[i][1] - raster->viewport[3]);
-					raster->clip_plane[i][2].normal.pz = 1.0f;
+					raster->clip_plane[i][2].normal.y = -1.0f / std::hypot(-1.0f, top_plane);
+					raster->clip_plane[i][2].normal.pz = top_plane / std::hypot(-1.0f, top_plane);
 
-					// calculate bottom clipping plane
 					raster->clip_plane[i][3].normal.x = 0.0f;
-					raster->clip_plane[i][3].normal.y = 1.0f / float(raster->center[i][1] - raster->viewport[1]);
-					raster->clip_plane[i][3].normal.pz = 1.0f;
+					raster->clip_plane[i][3].normal.y = 1.0f / std::hypot(1.0f, bottom_plane);
+					raster->clip_plane[i][3].normal.pz = bottom_plane / std::hypot(1.0f, bottom_plane);
 				}
 
 				/* done with this command */
