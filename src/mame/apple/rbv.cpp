@@ -403,7 +403,7 @@ void rbv_device::dac_w(offs_t offset, u8 data)
 
 u32 rbv_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint8_t const *vram8 = (uint8_t *)m_ram_ptr;
+	auto const vram8 = util::big_endian_cast<uint8_t const>(m_ram_ptr);
 
 	// video disabled?
 	if (m_video_config & 0x40)
@@ -420,9 +420,9 @@ u32 rbv_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
 			uint32_t *scanline = &bitmap.pix(y, cliprect.left() & ~7);
-			for (int x = cliprect.left() & ~7; x <= cliprect.right(); x += 8)
+			for (int x = cliprect.left() / 8; x <= cliprect.right() / 8; x++)
 			{
-				uint8_t const pixels = vram8[(y * (m_hres / 8)) + ((x / 8) ^ 3)];
+				uint8_t const pixels = vram8[(y * (m_hres / 8)) + x];
 
 				*scanline++ = pens[0xfe | (pixels >> 7)];
 				*scanline++ = pens[0xfe | ((pixels >> 6) & 1)];
@@ -442,7 +442,7 @@ u32 rbv_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 			uint32_t *scanline = &bitmap.pix(y, cliprect.left() & ~3);
 			for (int x = cliprect.left() / 4; x <= cliprect.right() / 4; x++)
 			{
-				uint8_t const pixels = vram8[(y * (m_hres / 4)) + (BYTE4_XOR_BE(x))];
+				uint8_t const pixels = vram8[(y * (m_hres / 4)) + x];
 
 				*scanline++ = pens[0xfc | ((pixels >> 6) & 3)];
 				*scanline++ = pens[0xfc | ((pixels >> 4) & 3)];
@@ -458,7 +458,7 @@ u32 rbv_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 			uint32_t *scanline = &bitmap.pix(y, cliprect.left() & ~1);
 			for (int x = cliprect.left() / 2; x <= cliprect.right() / 2; x++)
 			{
-				uint8_t const pixels = vram8[(y * (m_hres / 2)) + (BYTE4_XOR_BE(x))];
+				uint8_t const pixels = vram8[(y * (m_hres / 2)) + x];
 
 				*scanline++ = pens[0xf0 | (pixels >> 4)];
 				*scanline++ = pens[0xf0 | (pixels & 0xf)];
@@ -470,9 +470,9 @@ u32 rbv_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
 			uint32_t *scanline = &bitmap.pix(y, cliprect.left());
-			for (int x = cliprect.left(); x < cliprect.right(); x++)
+			for (int x = cliprect.left(); x <= cliprect.right(); x++)
 			{
-				uint8_t const pixels = vram8[(y * m_hres) + (BYTE4_XOR_BE(x))];
+				uint8_t const pixels = vram8[(y * m_hres) + x];
 				*scanline++ = pens[pixels];
 			}
 		}
