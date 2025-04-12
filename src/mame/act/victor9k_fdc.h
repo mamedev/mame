@@ -121,8 +121,6 @@ private:
 	void load1_cb(floppy_image_device *device);
 	void unload1_cb(floppy_image_device *device);
 
-	uint8_t m_p2;
-
 	/* floppy state */
 	int m_via_rdy0;
 	int m_via_rdy1;
