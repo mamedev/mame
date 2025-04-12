@@ -20,7 +20,7 @@ MC68000P10
 M28 (OKI 6295, next to ROM C9)
 BMC ADB40817(80 Pin PQFP - Google hits, but no datasheet or description)
 RAMDAC TRC1710-80PCA (Monolithic 256-word by 18bit Look-up Table & Triple Video DAC with 6-bit DACs)
-File 89C67 (MCU?? Next to 3.57954MHz OSC)
+File 89C67 (Clone of YM2413. Next to 3.57954MHz OSC)
 OSC: 21.47727MHz & 3.57954MHz
 2 8-way dipswitches
 part # scratched 64 pin PLCC (soccer ball sticker over this chip ;-)
