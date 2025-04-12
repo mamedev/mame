@@ -401,9 +401,10 @@ uint8_t pc9801_state::pc9801_a0_r(offs_t offset)
 			{
 				uint32_t pcg_offset;
 
-				pcg_offset = (m_font_addr & 0x7f7f) << 5;
-				pcg_offset|= m_font_line;
-				pcg_offset|= m_font_lr;
+				pcg_offset  = (m_font_addr & 0x7f7f) << 5;
+				pcg_offset |= m_font_line;
+				pcg_offset |= m_font_lr;
+				pcg_offset |= (!m_video_ff[KAC_REG] << 12);
 
 				return m_kanji_rom[pcg_offset];
 			}
@@ -479,6 +480,8 @@ void pc9801_state::pc9801_a0_w(offs_t offset, uint8_t data)
 				//logerror("%04x %02x %02x %08x\n",m_font_addr,m_font_line,m_font_lr,pcg_offset);
 				if((m_font_addr & 0xff00) == 0x5600 || (m_font_addr & 0xff00) == 0x5700)
 				{
+					pcg_offset |= (!m_video_ff[KAC_REG] << 12);
+
 					m_kanji_rom[pcg_offset] = data;
 					m_gfxdecode->gfx(2)->mark_dirty(pcg_offset >> 5);
 				}

@@ -704,8 +704,7 @@ uint8_t pc9801vm_state::pc9801rs_knjram_r(offs_t offset)
 	// rxtrain wants the LR setting for PCG area ...
 	if((m_font_addr & 0xff00) == 0x5600 || (m_font_addr & 0xff00) == 0x5700)
 	{
-		// TODO: cfr. below
-		pcg_offset |= m_video_ff[KAC_REG] << 7;
+		pcg_offset |= (!m_video_ff[KAC_REG] << 12);
 		return m_kanji_rom[pcg_offset | m_font_lr];
 	}
 
@@ -725,11 +724,11 @@ void pc9801vm_state::pc9801rs_knjram_w(offs_t offset, uint8_t data)
 	{
 		// HACK: don't know yet how KAC works
 		// 0=code access, 1=dot access
-		// os2warp expects a kanjiram flag to RAM $596 -> PCG offset 000ac429,
+		// os2warp3 expects a kanjiram flag to RAM $596 -> PCG offset 000ac429,
 		// will otherwise moan for CPU not set High.
 		// This traces back by POST routines setting that location with 0x80, then it successively
 		// wipes out a good chunk of the area with KAC mode enabled ...
-		pcg_offset |= m_video_ff[KAC_REG] << 7;
+		pcg_offset |= (!m_video_ff[KAC_REG] << 12);
 		m_kanji_rom[pcg_offset] = data;
 		m_gfxdecode->gfx(2)->mark_dirty(pcg_offset >> 5);
 	}

@@ -439,8 +439,10 @@ void pc9821_state::pc9821_map(address_map &map)
 
 void pc9821_state::pc9821_io(address_map &map)
 {
+	// later SW expects unmapped C-Bus accesses to return high for proper card detection
+	// cfr. entax, amarankh, freebsd21
+	map.unmap_value_high();
 	pc9801bx2_io(map);
-//  map.unmap_value_high(); // TODO: a read to somewhere makes this to fail at POST
 	map(0x0000, 0x001f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask32(0xff00ff00);
 	map(0x0000, 0x001f).lr8(NAME([this] (offs_t o) { return BIT(o, 1) ? 0xff : pic_r(o); })).umask32(0x00ff00ff);
 	map(0x0000, 0x001f).w(FUNC(pc9821_state::pic_w)).umask32(0x00ff00ff);  // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
@@ -1254,8 +1256,10 @@ ROM_START( pc9821cx3 )
 	// 0x1fda8 (?) - 0x2458f: monitor GFXs
 	// 0x24590 - 0x36xxx: more CanBe mascot GFX animations
 	// 0x3c000: NEC & CanBe logo GFXs
-	ROM_COPY( "biosrom", 0x68000, 0x00000, 0x18000 )
-	ROM_COPY( "biosrom", 0x30000, 0x18000, 0x18000 )
+	// 0x40000: IDE BIOS (NEC D3766 / Caviar CP30344 / WDC AC2340H)
+	// 0x42000: setup menu
+	ROM_COPY( "biosrom", 0x78000, 0x10000, 0x08000 ) // ITF
+	ROM_COPY( "biosrom", 0x60000, 0x18000, 0x18000 ) // BIOS, probably wrong (reset vector at 0x67ff0)
 
 	// "microcode" memory dump, probably identical to above but shuffled
 	// left for consultation
