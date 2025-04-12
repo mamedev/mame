@@ -16189,6 +16189,9 @@ casloopy
 cfx9850
 cfx9850gb
 
+@source:casio/cps2000.cpp
+cps2000
+
 @source:casio/ct8000.cpp
 ct8000
 ctfk1
