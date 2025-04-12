@@ -408,20 +408,26 @@ void mc68hc11_cpu_device::serial_w(u8 val)
 // unimplemented
 uint8_t mc68hc11_cpu_device::baud_r()
 {
+	if (!machine().side_effects_disabled())
+		logerror("HC11: BAUD serial register read\n");
 	return m_baud;
 }
 void mc68hc11_cpu_device::baud_w(uint8_t data)
 {
+	logerror("HC11: BAUD serial register write %02x\n", data);
 	m_baud = data;
 }
 
 // unimplemented
 uint8_t mc68hc11_cpu_device::sccr1_r()
 {
+	if (!machine().side_effects_disabled())
+		logerror("HC11: SCCR1 serial register read\n");
 	return m_sccr1;
 }
 void mc68hc11_cpu_device::sccr1_w(uint8_t data)
 {
+	logerror("HC11: SCCR1 serial register write %02x\n", data);
 	m_sccr1 = data;
 }
 
@@ -449,13 +455,15 @@ void mc68hc11_cpu_device::scsr_w(uint8_t data)
 
 uint8_t mc68hc11_cpu_device::scdr_r()
 {
-	set_irq_state(0x14, false);
-	m_scsr |= 0b10000000;
+	if (!machine().side_effects_disabled())
+		set_irq_state(0x14, false);
+
+	m_scsr |= 0x80;
 	return m_scdr;
 }
 void mc68hc11_cpu_device::scdr_w(uint8_t data)
 {
-	m_scsr &= 0b01111111;
+	m_scsr &= 0x7f;
 	if ((m_sccr2 & 0x80) != 0)
 		set_irq_state(0x14, true);
 	
@@ -1113,7 +1121,7 @@ void mc68hc11_cpu_device::device_reset()
 	m_sccr2 = 0;
 	m_scsr  = 0xc0;
 	m_scdr  = 0;
-	m_baud &= 0b111;
+	m_baud &= 0x7;
 }
 
 void mc68hc11a1_device::device_reset()
