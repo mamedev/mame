@@ -456,12 +456,15 @@ protected:
 	void pc9801rs_knjram_w(offs_t offset, uint8_t data);
 
 	required_ioport m_dsw3;
+
+	virtual void itf_43d_bank_w(offs_t offset, uint8_t data);
+	virtual void cbus_43f_bank_w(offs_t offset, uint8_t data);
+
 private:
 	optional_device_array<ata_interface_device, 2> m_ide;
 //  optional_device<dac_1bit_device> m_dac1bit;
 	required_device<speaker_sound_device> m_dac1bit;
 
-	void pc9801rs_bank_w(offs_t offset, uint8_t data);
 	uint8_t midi_r();
 
 	// 286-based machines except for PC98XA

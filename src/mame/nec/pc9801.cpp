@@ -735,31 +735,30 @@ void pc9801vm_state::pc9801rs_knjram_w(offs_t offset, uint8_t data)
 	}
 }
 
-void pc9801vm_state::pc9801rs_bank_w(offs_t offset, uint8_t data)
+void pc9801vm_state::itf_43d_bank_w(offs_t offset, uint8_t data)
 {
-	if(offset == 1)
+	if((data & 0xf0) == 0x00 || (data & 0xf0) == 0x10)
 	{
-		if((data & 0xf0) == 0x00 || (data & 0xf0) == 0x10)
+		if((data & 0xed) == 0x00)
 		{
-			if((data & 0xed) == 0x00)
-			{
-				m_ipl->set_bank((data & 2) >> 1);
-				return;
-			}
+			m_ipl->set_bank((data & 2) >> 1);
+			return;
 		}
-
-		logerror("Unknown EMS ROM setting %02x\n",data);
 	}
-	if(offset == 3)
+
+	logerror("Unknown ITF $43d ROM bank setting %02x\n",data);
+}
+
+void pc9801vm_state::cbus_43f_bank_w(offs_t offset, uint8_t data)
+{
+	if((data & 0xf0) == 0x20)
+		m_vram_bank = (data & 2) >> 1;
+	else
 	{
-		if((data & 0xf0) == 0x20)
-			m_vram_bank = (data & 2) >> 1;
-		else
-		{
-			logerror("Unknown EMS RAM setting %02x\n",data);
-		}
+		logerror("Unknown C-Bus $43f bank setting %02x\n",data);
 	}
 }
+
 
 uint8_t pc9801vm_state::a20_ctrl_r(offs_t offset)
 {
@@ -1206,7 +1205,8 @@ void pc9801vm_state::pc9801ux_io(address_map &map)
 	map(0x00cc, 0x00cc).rw(FUNC(pc9801vm_state::fdc_2hd_2dd_ctrl_r<0>), FUNC(pc9801vm_state::fdc_2hd_2dd_ctrl_w<0>));
 	map(0x00f0, 0x00ff).rw(FUNC(pc9801vm_state::a20_ctrl_r), FUNC(pc9801vm_state::a20_ctrl_w)).umask16(0x00ff);
 	map(0x0439, 0x0439).rw(FUNC(pc9801vm_state::dma_access_ctrl_r), FUNC(pc9801vm_state::dma_access_ctrl_w));
-	map(0x043c, 0x043f).w(FUNC(pc9801vm_state::pc9801rs_bank_w)); //ROM/RAM bank
+	map(0x043d, 0x043d).w(FUNC(pc9801vm_state::itf_43d_bank_w));
+	map(0x043f, 0x043f).w(FUNC(pc9801vm_state::cbus_43f_bank_w));
 	map(0x04a0, 0x04af).w(FUNC(pc9801vm_state::egc_w));
 	map(0x04be, 0x04be).rw(FUNC(pc9801vm_state::fdc_3mode_r), FUNC(pc9801vm_state::fdc_3mode_w));
 	map(0x3fd8, 0x3fdf).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0xff00);

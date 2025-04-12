@@ -77,6 +77,7 @@ class pc9821_mate_a_state : public pc9821_state
 public:
 	pc9821_mate_a_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc9821_state(mconfig, type, tag)
+		, m_bios_view(*this, "bios_view")
 	{
 	}
 
@@ -84,10 +85,17 @@ public:
 	void pc9821ap2(machine_config &config);
 
 protected:
+	void pc9821as_map(address_map &map) ATTR_COLD;
 	void pc9821as_io(address_map &map) ATTR_COLD;
+
+	virtual void itf_43d_bank_w(offs_t offset, uint8_t data) override;
+	virtual void cbus_43f_bank_w(offs_t offset, uint8_t data) override;
 
 private:
 	DECLARE_MACHINE_START(pc9821ap2);
+
+	// Starting from Af
+	memory_view m_bios_view;
 
 	// Ap, As, Ae only
 	u8 ext_sdip_data_r(offs_t offset);
