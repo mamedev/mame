@@ -80,7 +80,7 @@ rbv_device::rbv_device(const machine_config &mconfig, const char *tag, device_t 
 	device_t(mconfig, RBV, tag, owner, clock),
 	write_6015(*this),
 	write_irq(*this),
-	m_montype(*this, "MONTYPE"),
+	m_io_montype(*this, "MONTYPE"),
 	m_screen(*this, "screen"),
 	m_palette(*this, "palette"),
 	m_pseudovia(*this, "pseudovia")
@@ -96,6 +96,13 @@ void rbv_device::device_start()
 	m_6015_timer = timer_alloc(FUNC(rbv_device::mac_6015_tick), this);
 	m_6015_timer->adjust(attotime::never);
 
+	m_configured = false;
+	m_hres = m_vres = 0;
+	m_montype = 0;
+
+	save_item(NAME(m_hres));
+	save_item(NAME(m_vres));
+	save_item(NAME(m_montype));
 	save_item(NAME(m_pal_address));
 	save_item(NAME(m_pal_idx));
 
@@ -110,6 +117,33 @@ void rbv_device::device_reset()
 {
 	// start 60.15 Hz timer
 	m_6015_timer->adjust(attotime::from_hz(60.15), 0, attotime::from_hz(60.15));
+
+	if (!m_configured)
+	{
+		m_montype = m_io_montype->read() << 3;
+		switch (m_montype >> 3)
+		{
+		case 1: // 15" portrait display
+			m_hres = 640;
+			m_vres = 870;
+			m_screen->configure(832, 918, rectangle(0, 639, 0, 869), HZ_TO_ATTOSECONDS(74.99));
+			break;
+
+		case 2: // 12" RGB
+			m_hres = 512;
+			m_vres = 384;
+			m_screen->configure(640, 407, rectangle(0, 511, 0, 383), HZ_TO_ATTOSECONDS(60.15));
+			break;
+
+		case 6: // 13" RGB
+		default:
+			m_hres = 640;
+			m_vres = 480;
+			m_screen->configure(864, 525, rectangle(0, 639, 0, 479), HZ_TO_ATTOSECONDS(66.66));
+			break;
+		}
+		m_configured = true;
+	}
 }
 
 void rbv_device::set_ram_info(u32 *ram, u32 size)
@@ -175,7 +209,7 @@ void rbv_device::pseudovia_recalc_irqs()
 
 u8 rbv_device::via2_video_config_r()
 {
-	return m_montype->read() << 3;
+	return m_montype;
 }
 
 void rbv_device::via2_video_config_w(u8 data)
@@ -199,7 +233,7 @@ uint8_t rbv_device::pseudovia_r(offs_t offset)
 		if (offset == 0x10)
 		{
 			data &= ~0x38;
-			data |= (m_montype->read() << 3);
+			data |= m_montype;
 		}
 
 		// bit 7 of these registers always reads as 0 on pseudo-VIAs
@@ -369,27 +403,7 @@ void rbv_device::dac_w(offs_t offset, u8 data)
 
 u32 rbv_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int hres, vres;
 	uint8_t const *vram8 = (uint8_t *)m_ram_ptr;
-
-	switch (m_montype->read())
-	{
-	case 1: // 15" portrait display
-		hres = 640;
-		vres = 870;
-		break;
-
-	case 2: // 12" RGB
-		hres = 512;
-		vres = 384;
-		break;
-
-	case 6: // 13" RGB
-	default:
-		hres = 640;
-		vres = 480;
-		break;
-	}
 
 	// video disabled?
 	if (m_video_config & 0x40)
@@ -403,13 +417,12 @@ u32 rbv_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 	switch (m_video_config & 7)
 	{
 	case 0: // 1bpp
-	{
-		for (int y = 0; y < vres; y++)
+		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
-			uint32_t *scanline = &bitmap.pix(y);
-			for (int x = 0; x < hres; x += 8)
+			uint32_t *scanline = &bitmap.pix(y, cliprect.left() & ~7);
+			for (int x = cliprect.left() & ~7; x <= cliprect.right(); x += 8)
 			{
-				uint8_t const pixels = vram8[(y * (hres / 8)) + ((x / 8) ^ 3)];
+				uint8_t const pixels = vram8[(y * (m_hres / 8)) + ((x / 8) ^ 3)];
 
 				*scanline++ = pens[0xfe | (pixels >> 7)];
 				*scanline++ = pens[0xfe | ((pixels >> 6) & 1)];
@@ -421,17 +434,15 @@ u32 rbv_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 				*scanline++ = pens[0xfe | (pixels & 1)];
 			}
 		}
-	}
-	break;
+		break;
 
 	case 1: // 2bpp
-	{
-		for (int y = 0; y < vres; y++)
+		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
-			uint32_t *scanline = &bitmap.pix(y);
-			for (int x = 0; x < hres / 4; x++)
+			uint32_t *scanline = &bitmap.pix(y, cliprect.left() & ~3);
+			for (int x = cliprect.left() / 4; x <= cliprect.right() / 4; x++)
 			{
-				uint8_t const pixels = vram8[(y * (hres / 4)) + (BYTE4_XOR_BE(x))];
+				uint8_t const pixels = vram8[(y * (m_hres / 4)) + (BYTE4_XOR_BE(x))];
 
 				*scanline++ = pens[0xfc | ((pixels >> 6) & 3)];
 				*scanline++ = pens[0xfc | ((pixels >> 4) & 3)];
@@ -439,40 +450,33 @@ u32 rbv_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 				*scanline++ = pens[0xfc | (pixels & 3)];
 			}
 		}
-	}
-	break;
+		break;
 
 	case 2: // 4bpp
-	{
-		for (int y = 0; y < vres; y++)
+		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
-			uint32_t *scanline = &bitmap.pix(y);
-
-			for (int x = 0; x < hres / 2; x++)
+			uint32_t *scanline = &bitmap.pix(y, cliprect.left() & ~1);
+			for (int x = cliprect.left() / 2; x <= cliprect.right() / 2; x++)
 			{
-				uint8_t const pixels = vram8[(y * (hres / 2)) + (BYTE4_XOR_BE(x))];
+				uint8_t const pixels = vram8[(y * (m_hres / 2)) + (BYTE4_XOR_BE(x))];
 
 				*scanline++ = pens[0xf0 | (pixels >> 4)];
 				*scanline++ = pens[0xf0 | (pixels & 0xf)];
 			}
 		}
-	}
-	break;
+		break;
 
 	case 3: // 8bpp
-	{
-		for (int y = 0; y < vres; y++)
+		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
-			uint32_t *scanline = &bitmap.pix(y);
-
-			for (int x = 0; x < hres; x++)
+			uint32_t *scanline = &bitmap.pix(y, cliprect.left());
+			for (int x = cliprect.left(); x < cliprect.right(); x++)
 			{
-				uint8_t const pixels = vram8[(y * hres) + (BYTE4_XOR_BE(x))];
+				uint8_t const pixels = vram8[(y * m_hres) + (BYTE4_XOR_BE(x))];
 				*scanline++ = pens[pixels];
 			}
 		}
-	}
-	break;
+		break;
 	}
 
 	return 0;

@@ -44,12 +44,17 @@ protected:
 private:
 	devcb_write_line write_6015, write_irq;
 
-	required_ioport m_montype;
+	required_ioport m_io_montype;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<pseudovia_device> m_pseudovia;
 
 	emu_timer *m_6015_timer;
+
+	bool m_configured;
+	s32 m_hres, m_vres;
+	u8 m_montype;
+
 	u8 m_pseudovia_regs[256], m_pseudovia_ier, m_pseudovia_ifr;
 	u8 m_pal_address, m_pal_idx;
 	u32 *m_ram_ptr;
