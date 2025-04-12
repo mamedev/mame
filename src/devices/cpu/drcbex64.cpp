@@ -4683,8 +4683,7 @@ void drcbe_x64::op_and(Assembler &a, const instruction &inst)
 				return false;
 			});
 
-		if ((inst.size() == 4) || !src2p.is_immediate_value(util::make_bitmask<uint64_t>(inst.size() * 8)))
-			mov_param_reg(a, dstp, dstreg);
+		mov_param_reg(a, dstp, dstreg);
 	}
 }
 
