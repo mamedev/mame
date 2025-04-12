@@ -222,6 +222,48 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="anpaeigo" supported="yes">
+		<description>Soreike! Anpanman Waku Waku Eigo Game!</description>
+		<year>2011</year>
+		<publisher>Sega Toys</publisher>
+		<info name="alt_title" value="それいけ!アンパンマンわくわくえいごゲーム!"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x800000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="S-100043-1000 - Soreike Anpanman Waku Waku Eigo Game (Japan).bin" size="0x800000" crc="e3ae0ac6" sha1="833a0c3da4b2b08869fcb7f0e0ec2066cb92a678"/>
+			</dataarea>
+			<dataarea name="page1" size="0x1a91a28">
+				<rom name="0 - 0001.png" size="0x1a91a28" crc="814a1015" sha1="d05a27579a9136c25c315b8e902a9a167c4c05b6"/>
+			</dataarea>
+			<dataarea name="page2" size="0x18d5d41">
+				<rom name="0 - 0002.png" size="0x18d5d41" crc="9ae07a01" sha1="e243397faa889b6ee7b3bdbfdd5814b1a3c97037"/>
+			</dataarea>
+			<dataarea name="page3" size="0x19cc5f5">
+				<rom name="0 - 0003.png" size="0x19cc5f5" crc="48bb1bdf" sha1="94b2a3da7b542348f16e4741e842aafdaaa573d3"/>
+			</dataarea>
+			<dataarea name="page4" size="0x19e59f0">
+				<rom name="0 - 0004.png" size="0x19e59f0" crc="f8464742" sha1="e2a69fd39ccea7d183a60cc8db916388089bfec3"/>
+			</dataarea>
+			<dataarea name="page5" size="0x1b2f0a2">
+				<rom name="0 - 0005.png" size="0x1b2f0a2" crc="916b5d88" sha1="1e2680a197294104cfde571e0f512e08f5b40d9d"/>
+			</dataarea>
+			<dataarea name="page6" size="0x186173e">
+				<rom name="0 - 0006.png" size="0x186173e" crc="986eabe5" sha1="b158794e47d70135d1561689d79c4275bd7bf28f"/>
+			</dataarea>
+			<dataarea name="page7" size="0x17fd351">
+				<rom name="0 - 0007.png" size="0x17fd351" crc="04e77306" sha1="12aa6e1084254617e229c37a1fd895b6692ed013"/>
+			</dataarea>
+			<dataarea name="page8" size="0x117323c">
+				<rom name="0 - 0008.png" size="0x117323c" crc="70af1b10" sha1="ed4a2b2f0b7a34015f0c92c7088f8e902acb0d51"/>
+			</dataarea>
+			<dataarea name="page9" size="0x11d4a7c">
+				<rom name="0 - 0009.png" size="0x11d4a7c" crc="043b4c92" sha1="7d2718c18e743394306a259fb3b7a041152cff0a"/>
+			</dataarea>
+			<dataarea name="page10" size="0x1274ca4">
+				<rom name="0 - 0010.png" size="0x1274ca4" crc="bbc8e6a0" sha1="916d9156299ca2d8e0ac90554d7e321f4cc9a645"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="anpasaga" supported="partial">
 		<description>Anpanman o Sagase!</description>
 		<year>2009</year>
@@ -1203,6 +1245,55 @@ license:CC0-1.0
 			</dataarea>
 			<dataarea name="page10" size="0x1798a61"> <!-- book pages -->
 				<rom name="0 - 0010.png" size="0x1798a61" crc="81de18d9" sha1="5a27602c43b6e3497018ce26655c93b1a207cc65"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jusenge" supported="partial">
+		<description>Juuken Sentai Gekiranger: Niki Niki! Kazu Katachi ni Challenge!</description>
+		<year>2007</year>
+		<publisher>Bandai</publisher>
+		<notes>SD-Card Reader is not emulated</notes>
+		<info name="alt_title" value="獣拳戦隊ゲキレンジャーニキニキ!かず・かたちにチャレンジ!"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x800000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="T-110007-1000 - Juuken Sentai Gekiranger Niki Niki Kazu Katachi ni Challenge (Japan).bin" size="0x800000" crc="9be4c4cf" sha1="922dbd2f926d0370eed5eb71807915c935a4ee00"/>
+			</dataarea>
+			<dataarea name="page1" size="0x169eee2">
+				<rom name="0 - 0001.png" size="0x169eee2" crc="5d09906c" sha1="563f09d6d922ef93b5202668e365278188d76ec9"/>
+			</dataarea>
+			<dataarea name="page2" size="0x180ac0d">
+				<rom name="0 - 0002.png" size="0x180ac0d" crc="8c8732f8" sha1="ff14e863b8121ac18a659809824a72a66c15e06f"/>
+			</dataarea>
+			<dataarea name="page3" size="0x17a1761">
+				<rom name="0 - 0003.png" size="0x17a1761" crc="00b62fe3" sha1="d763d2fa20105bfb799f1dcdaf91cd597bda3ead"/>
+			</dataarea>
+			<dataarea name="page4" size="0x189a548">
+				<rom name="0 - 0004.png" size="0x189a548" crc="049e2dca" sha1="2e61615545670b1fe7a85bb15abbbda221115685"/>
+			</dataarea>
+			<dataarea name="page5" size="0x1886de6">
+				<rom name="0 - 0005.png" size="0x1886de6" crc="45771640" sha1="4ed8dbb91599253f3b36241a0c5dc6f1f07eb403"/>
+			</dataarea>
+			<dataarea name="page6" size="0x18273de">
+				<rom name="0 - 0006.png" size="0x18273de" crc="7e6cc414" sha1="6186566fad1a1e00919a94e15eee47c7f0604ac9"/>
+			</dataarea>
+			<dataarea name="page7" size="0x17ee74a">
+				<rom name="0 - 0007.png" size="0x17ee74a" crc="9ed0377c" sha1="73ec4a76d534f0c44a8a4c4501f4f8a909a38cc9"/>
+			</dataarea>
+			<dataarea name="page8" size="0x1864def">
+				<rom name="0 - 0008.png" size="0x1864def" crc="2aa8c266" sha1="4855bc438a853d839946b08785867ba9a3b4443b"/>
+			</dataarea>
+			<dataarea name="page9" size="0x1931318">
+				<rom name="0 - 0009.png" size="0x1931318" crc="4b90b065" sha1="c6df4e7cc280e2ddddf211f9cd6180a2913843fb"/>
+			</dataarea>
+			<dataarea name="page10" size="0x17bab4b">
+				<rom name="0 - 0010.png" size="0x17bab4b" crc="dc796ee4" sha1="fef408465dbe1b1accab42d26767229399e19970"/>
+			</dataarea>
+			<dataarea name="page11" size="0x174ee4c">
+				<rom name="0 - 0011.png" size="0x174ee4c" crc="a9b1f244" sha1="4b2e0a3b82e61a569730f618a023ca6ec34be6ba"/>
+			</dataarea>
+			<dataarea name="page12" size="0x181b2d4">
+				<rom name="0 - 0012.png" size="0x181b2d4" crc="0551cdeb" sha1="f8f9de9c4f1f7b2daa18213cac0168c65e2557c6"/>
 			</dataarea>
 		</part>
 	</software>
