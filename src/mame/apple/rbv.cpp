@@ -57,9 +57,7 @@ void rbv_device::map(address_map &map)
 void rbv_device::device_add_mconfig(machine_config &config)
 {
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(25175000, 800, 0, 640, 525, 0, 480);
-	m_screen->set_size(1024, 768);
-	m_screen->set_visarea(0, 640 - 1, 0, 480 - 1);
+	m_screen->set_raw(30.24_MHz_XTAL, 864, 0, 640, 525, 0, 480);
 	m_screen->set_screen_update(FUNC(rbv_device::screen_update));
 	m_screen->screen_vblank().set(m_pseudovia, FUNC(pseudovia_device::slot_irq_w<0x40>));
 	config.set_default_layout(layout_monitors);
@@ -126,20 +124,20 @@ void rbv_device::device_reset()
 		case 1: // 15" portrait display
 			m_hres = 640;
 			m_vres = 870;
-			m_screen->configure(832, 918, rectangle(0, 639, 0, 869), HZ_TO_ATTOSECONDS(74.99));
+			m_screen->configure(832, 918, rectangle(0, 639, 0, 869), HZ_TO_ATTOSECONDS(57.2832_MHz_XTAL / (832 * 918)));
 			break;
 
 		case 2: // 12" RGB
 			m_hres = 512;
 			m_vres = 384;
-			m_screen->configure(640, 407, rectangle(0, 511, 0, 383), HZ_TO_ATTOSECONDS(60.15));
+			m_screen->configure(640, 407, rectangle(0, 511, 0, 383), HZ_TO_ATTOSECONDS(31.3344_MHz_XTAL / (2 * 640 * 407)));
 			break;
 
 		case 6: // 13" RGB
 		default:
 			m_hres = 640;
 			m_vres = 480;
-			m_screen->configure(864, 525, rectangle(0, 639, 0, 479), HZ_TO_ATTOSECONDS(66.66));
+			m_screen->configure(864, 525, rectangle(0, 639, 0, 479), HZ_TO_ATTOSECONDS(30.24_MHz_XTAL / (864 * 525)));
 			break;
 		}
 		m_configured = true;
