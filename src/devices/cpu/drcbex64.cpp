@@ -3744,23 +3744,16 @@ void drcbe_x64::op_sext(Assembler &a, const instruction &inst)
 			else if (sizep.size() == SIZE_DWORD)
 				a.mov(dstreg, MABS(srcp.memory()));
 		}
-		else if (srcp.is_int_register())
+		else
 		{
+			Gp const srcreg = srcp.select_register(dstreg);
+			mov_reg_param(a, srcreg, srcp);
 			if (sizep.size() == SIZE_BYTE)
-				a.movsx(dstreg, GpbLo(srcp.ireg()));
+				a.movsx(dstreg, srcreg.r8());
 			else if (sizep.size() == SIZE_WORD)
-				a.movsx(dstreg, Gpw(srcp.ireg()));
+				a.movsx(dstreg, srcreg.r16());
 			else if (sizep.size() == SIZE_DWORD)
-				a.mov(dstreg, Gpd(srcp.ireg()));
-		}
-		else if (srcp.is_immediate())
-		{
-			if (sizep.size() == SIZE_BYTE)
-				a.mov(dstreg, int32_t(int8_t(uint8_t(srcp.immediate()))));
-			else if (sizep.size() == SIZE_WORD)
-				a.mov(dstreg, int32_t(int16_t(uint16_t(srcp.immediate()))));
-			else if (sizep.size() == SIZE_DWORD)
-				a.mov(dstreg, int32_t(uint32_t(srcp.immediate())));
+				a.mov(dstreg, srcreg);
 		}
 
 		mov_param_reg(a, dstp, dstreg);
@@ -3779,27 +3772,18 @@ void drcbe_x64::op_sext(Assembler &a, const instruction &inst)
 			else if (sizep.size() == SIZE_QWORD)
 				a.mov(dstreg, MABS(srcp.memory()));
 		}
-		else if (srcp.is_int_register())
+		else
 		{
+			Gp const srcreg = srcp.select_register(dstreg);
+			mov_reg_param(a, srcreg, srcp);
 			if (sizep.size() == SIZE_BYTE)
-				a.movsx(dstreg, GpbLo(srcp.ireg()));
+				a.movsx(dstreg, srcreg.r8());
 			else if (sizep.size() == SIZE_WORD)
-				a.movsx(dstreg, Gpw(srcp.ireg()));
+				a.movsx(dstreg, srcreg.r16());
 			else if (sizep.size() == SIZE_DWORD)
-				a.movsxd(dstreg, Gpd(srcp.ireg()));
+				a.movsxd(dstreg, srcreg.r32());
 			else if (sizep.size() == SIZE_QWORD)
-				a.mov(dstreg, Gpq(srcp.ireg()));
-		}
-		else if (srcp.is_immediate())
-		{
-			if (sizep.size() == SIZE_BYTE)
-				a.mov(dstreg, int64_t(int8_t(uint8_t(srcp.immediate()))));
-			else if (sizep.size() == SIZE_WORD)
-				a.mov(dstreg, int64_t(int16_t(uint16_t(srcp.immediate()))));
-			else if (sizep.size() == SIZE_DWORD)
-				a.mov(dstreg, int64_t(int32_t(uint32_t(srcp.immediate()))));
-			else if (sizep.size() == SIZE_QWORD)
-				a.mov(dstreg, int64_t(srcp.immediate()));
+				a.mov(dstreg, srcreg);
 		}
 
 		mov_param_reg(a, dstp, dstreg);

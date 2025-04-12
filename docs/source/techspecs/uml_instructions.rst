@@ -751,6 +751,88 @@ Simplification rules
 * Converted to :ref:`NOP <umlinst-nop>` if the ``src`` and ``dst``
   operands refer to the same memory location or register.
 
+.. _umlinst-fcopyi:
+
+FCOPYI
+~~~~~~
+
+Reinterpret an integer value as a floating point value.  The binary
+value will be preserved even if it is not a valid representation of a
+floating point number.
+
++---------------------+-----------------------------------+
+| Disassembly         | Usage                             |
++=====================+===================================+
+| .. code-block::     | .. code-block:: C++               |
+|                     |                                   |
+|     fscopyi dst,src |     UML_FSCOPYI(block, dst, src); |
+|     fdcopyi dst,src |     UML_FDCOPYI(block, dst, src); |
++---------------------+-----------------------------------+
+
+Operands
+^^^^^^^^
+
+dst (32-bit or 64-bit – memory, floating point register)
+    The destination where the value will be copied to.
+src (32-bit or 64-bit – memory, integer register)
+    The source value to copy.
+
+Flags
+^^^^^
+
++---------------+------------+
+| carry (C)     | Unchanged. |
++---------------+------------+
+| overflow (V)  | Unchanged. |
++---------------+------------+
+| zero (Z)      | Unchanged. |
++---------------+------------+
+| sign (S)      | Unchanged. |
++---------------+------------+
+| unordered (U) | Unchanged. |
++---------------+------------+
+
+.. _umlinst-icopyf:
+
+ICOPYF
+~~~~~~
+
+Reinterpret a floating point value as an integer value.  The binary
+value will be preserved even if it is not a valid representation of a
+floating point number.
+
++---------------------+-----------------------------------+
+| Disassembly         | Usage                             |
++=====================+===================================+
+| .. code-block::     | .. code-block:: C++               |
+|                     |                                   |
+|     icopyfs dst,src |     UML_ICOPYFS(block, dst, src); |
+|     icopyfd dst,src |     UML_ICOPYFD(block, dst, src); |
++---------------------+-----------------------------------+
+
+Operands
+^^^^^^^^
+
+dst (32-bit or 64-bit – memory, integer register)
+    The destination where the value will be copied to.
+src (32-bit or 64-bit – memory, floating point register)
+    The source value to copy.
+
+Flags
+^^^^^
+
++---------------+------------+
+| carry (C)     | Unchanged. |
++---------------+------------+
+| overflow (V)  | Unchanged. |
++---------------+------------+
+| zero (Z)      | Unchanged. |
++---------------+------------+
+| sign (S)      | Unchanged. |
++---------------+------------+
+| unordered (U) | Unchanged. |
++---------------+------------+
+
 .. _umlinst-load:
 
 LOAD

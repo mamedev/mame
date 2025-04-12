@@ -3659,7 +3659,7 @@ void drcbe_x86::op_load(Assembler &a, const instruction &inst)
 	{
 		// other index
 		Gp const indreg = indp.select_register(ecx);
-		emit_mov_r32_p32(a, indreg, indp);
+		emit_mov_r32_p32_keepflags(a, indreg, indp);
 		if (size == SIZE_BYTE)
 			a.movzx(dstreg, ptr(uintptr_t(basep.memory()), indreg, scalesizep.scale(), 1));   // movzx dstreg,[basep + scale*indp]
 		else if (size == SIZE_WORD)
@@ -3679,18 +3679,17 @@ void drcbe_x86::op_load(Assembler &a, const instruction &inst)
 	// 64-bit form stores upper 32 bits
 	if (inst.size() == 8)
 	{
-		// 1, 2, or 4-byte case
 		if (size != SIZE_QWORD)
 		{
+			// 1, 2, or 4-byte case
 			if (dstp.is_memory())
 				a.mov(MABS(dstp.memory(4), 4), 0);                                      // mov   [dstp+4],0
 			else if (dstp.is_int_register())
 				a.mov(MABS(m_reghi[dstp.ireg()], 4), 0);                                // mov   [reghi],0
 		}
-
-		// 8-byte case
 		else
 		{
+			// 8-byte case
 			if (dstp.is_memory())
 				a.mov(MABS(dstp.memory(4)), edx);                                       // mov   [dstp+4],edx
 			else if (dstp.is_int_register())
@@ -3745,7 +3744,7 @@ void drcbe_x86::op_loads(Assembler &a, const instruction &inst)
 	{
 		// other index
 		Gp const indreg = indp.select_register(ecx);
-		emit_mov_r32_p32(a, indreg, indp);
+		emit_mov_r32_p32_keepflags(a, indreg, indp);
 		if (size == SIZE_BYTE)
 			a.movsx(dstreg, ptr(uintptr_t(basep.memory()), indreg, scalesizep.scale(), 1));   // movsx dstreg,[basep + scale*indp]
 		else if (size == SIZE_WORD)
@@ -3829,9 +3828,9 @@ void drcbe_x86::op_store(Assembler &a, const instruction &inst)
 		{
 			// variable source
 			if (size != SIZE_QWORD)
-				emit_mov_r32_p32(a, srcreg, srcp);                                      // mov   srcreg,srcp
+				emit_mov_r32_p32_keepflags(a, srcreg, srcp);                            // mov   srcreg,srcp
 			else
-				emit_mov_r64_p64(a, srcreg, edx, srcp);                                 // mov   edx:srcreg,srcp
+				emit_mov_r64_p64_keepflags(a, srcreg, edx, srcp);                       // mov   edx:srcreg,srcp
 
 			if (size == SIZE_BYTE)
 				a.mov(MABS(basep.memory(scale*indp.immediate())), srcreg.r8());         // mov   [basep + scale*indp],srcreg
@@ -3850,7 +3849,7 @@ void drcbe_x86::op_store(Assembler &a, const instruction &inst)
 	{
 		// normal case: variable index
 		Gp const indreg = indp.select_register(ecx);
-		emit_mov_r32_p32(a, indreg, indp);                                              // mov   indreg,indp
+		emit_mov_r32_p32_keepflags(a, indreg, indp);                                    // mov   indreg,indp
 
 		if (srcp.is_immediate())
 		{
@@ -3872,9 +3871,9 @@ void drcbe_x86::op_store(Assembler &a, const instruction &inst)
 		{
 			// variable source
 			if (size != SIZE_QWORD)
-				emit_mov_r32_p32(a, srcreg, srcp);                                      // mov   srcreg,srcp
+				emit_mov_r32_p32_keepflags(a, srcreg, srcp);                            // mov   srcreg,srcp
 			else
-				emit_mov_r64_p64(a, srcreg, edx, srcp);                                 // mov   edx:srcreg,srcp
+				emit_mov_r64_p64_keepflags(a, srcreg, edx, srcp);                       // mov   edx:srcreg,srcp
 			if (size == SIZE_BYTE)
 				a.mov(ptr(uintptr_t(basep.memory()), indreg, scalesizep.scale()), srcreg.r8());   // mov   [basep + 1*ecx],srcreg
 			else if (size == SIZE_WORD)
@@ -6534,19 +6533,18 @@ void drcbe_x86::op_fload(Assembler &a, const instruction &inst)
 	be_parameter basep(*this, inst.param(1), PTYPE_M);
 	be_parameter indp(*this, inst.param(2), PTYPE_MRI);
 
-	// immediate index
 	if (indp.is_immediate())
 	{
+		// immediate index
 		a.mov(eax, MABS(basep.memory(inst.size()*indp.immediate())));
 		if (inst.size() == 8)
 			a.mov(edx, MABS(basep.memory(4 + inst.size()*indp.immediate())));
 	}
-
-	// other index
 	else
 	{
+		// other index
 		Gp const indreg = indp.select_register(ecx);
-		emit_mov_r32_p32(a, indreg, indp);
+		emit_mov_r32_p32_keepflags(a, indreg, indp);
 		a.mov(eax, ptr(uintptr_t(basep.memory(0)), indreg, (inst.size() == 8) ? 3 : 2));
 		if (inst.size() == 8)
 			a.mov(edx, ptr(uintptr_t(basep.memory(4)), indreg, (inst.size() == 8) ? 3 : 2));
@@ -6590,7 +6588,7 @@ void drcbe_x86::op_fstore(Assembler &a, const instruction &inst)
 	{
 		// other index
 		Gp const indreg = indp.select_register(ecx);
-		emit_mov_r32_p32(a, indreg, indp);
+		emit_mov_r32_p32_keepflags(a, indreg, indp);
 		a.mov(ptr(uintptr_t(basep.memory(0)), indreg, (inst.size() == 8) ? 3 : 2), eax);
 		if (inst.size() == 8)
 			a.mov(ptr(uintptr_t(basep.memory(4)), indreg, (inst.size() == 8) ? 3 : 2), edx);

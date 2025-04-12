@@ -3089,6 +3089,7 @@ void drcbe_arm64::op_sext(a64::Assembler &a, const uml::instruction &inst)
 	{
 		if (srcp.is_memory())
 		{
+			// FIXME: need to mangle addresses for big Endian hosts
 			if (size == SIZE_BYTE)
 				emit_ldrsb_mem(a, dstreg.x(), srcp.memory());
 			else if (size == SIZE_WORD)
