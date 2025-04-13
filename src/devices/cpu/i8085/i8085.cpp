@@ -643,7 +643,7 @@ void i8085a_cpu_device::set_inte(int state)
 
 void i8085a_cpu_device::set_status(u8 status)
 {
-	if (status != m_status)
+	if (!m_out_status_func.isunset() && status != m_status)
 		m_out_status_func(status);
 
 	m_status = status;
