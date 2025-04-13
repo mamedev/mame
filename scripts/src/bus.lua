@@ -3675,6 +3675,8 @@ if (BUSES["SNES"]~=null) then
 		MAME_DIR .. "src/devices/bus/snes/sgb.h",
 		MAME_DIR .. "src/devices/bus/snes/spc7110.cpp",
 		MAME_DIR .. "src/devices/bus/snes/spc7110.h",
+		MAME_DIR .. "src/devices/bus/snes/st018.cpp",
+		MAME_DIR .. "src/devices/bus/snes/st018.h",
 		MAME_DIR .. "src/devices/bus/snes/sufami.cpp",
 		MAME_DIR .. "src/devices/bus/snes/sufami.h",
 		MAME_DIR .. "src/devices/bus/snes/upd.cpp",
