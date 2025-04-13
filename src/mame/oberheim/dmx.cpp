@@ -46,7 +46,6 @@ PCBoards:
 Possible audio inaccuracies:
 - Some uncertainty on component values for HIHAT and PERC2 (see comments in
   HIHAT_CONFIG and PERC_CONFIG).
-- Linear- instead of audio-taper faders.
 - Envelope decay ignores diodes in capacitor discharge path. Given the quick
   decay, and that the error is larger at low volumes, this might not be
   noticeable.
@@ -1206,7 +1205,7 @@ void dmx_state::update_mix_level(int voice)
 	static constexpr const float R_FEEDBACK_RIGHT = RES_K(27);  // R29.
 
 	const s32 pot_percent = m_faders[VOICE_TO_FADER_MAP[voice]]->read();
-	const float r_pot_bottom = P_MAX * pot_percent / 100.0F;
+	const float r_pot_bottom = P_MAX * RES_AUDIO_POT_LAW(pot_percent / 100.0F);
 	const float r_pot_top = P_MAX - r_pot_bottom;
 	const float r_mix_left = std::get<0>(MIX_RESISTORS[voice]);
 	const float r_mix_right = std::get<1>(MIX_RESISTORS[voice]);
@@ -1237,7 +1236,7 @@ void dmx_state::update_master_volume()
 	static constexpr const float VOLTAGE_TO_SOUND_SCALER = 0.04F;
 
 	const s32 volume_value = m_master_volume->read();
-	const float gain = VOLTAGE_TO_SOUND_SCALER * volume_value / 100.0F;
+	const float gain = VOLTAGE_TO_SOUND_SCALER * RES_AUDIO_POT_LAW(volume_value / 100.0F);
 	m_left_mixer->set_output_gain(0, gain);
 	m_right_mixer->set_output_gain(0, gain);
 	LOGMASKED(LOG_FADERS, "Master volume changed: %d - %f\n", volume_value, gain);

@@ -65,7 +65,6 @@ Reasons for MACHINE_IMPERFECT_SOUND:
 * Missing snare / sidestick volume envelope.
 * Missing tom / conga LPF and filter envelope.
 * Inaccurate filter for "click".
-* Linear, instead of audio-taper volume sliders and master volume knob.
 * Linear, instead of tanh response for hi-hat VCA.
 
 PCBoards:
@@ -856,7 +855,7 @@ void linndrum_audio_device::update_volume_and_pan(int channel)
 	static constexpr const float C_VOICE = CAP_U(10);
 
 	const s32 volume = m_volume[channel]->read();
-	const float r_vol_bottom = volume * R_VOL_MAX / 100.0F;
+	const float r_vol_bottom = R_VOL_MAX * RES_AUDIO_POT_LAW(volume / 100.0F);
 	const float r_vol_top = R_VOL_MAX - r_vol_bottom;
 	const float r_pan_left = m_pan[channel]->read() * R_PAN_MAX / 100.0F;
 	const float r_pan_right = R_PAN_MAX - r_pan_left;
@@ -903,7 +902,7 @@ void linndrum_audio_device::update_master_volume()
 {
 	static constexpr const float R_MASTER_VOLUME_MAX = RES_K(10);
 
-	const float r_pot_bottom = m_master_volume->read() * R_MASTER_VOLUME_MAX / 100.0F;
+	const float r_pot_bottom = R_MASTER_VOLUME_MAX * RES_AUDIO_POT_LAW(m_master_volume->read() / 100.0F);
 	const float r_pot_top = R_MASTER_VOLUME_MAX - r_pot_bottom;
 	const float v_input = RES_VOLTAGE_DIVIDER(r_pot_top, RES_2_PARALLEL(r_pot_bottom, OUTPUT_R_INPUT));
 
