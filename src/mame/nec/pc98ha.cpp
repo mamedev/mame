@@ -443,7 +443,7 @@ void pc98lt_state::lt_config(machine_config &config)
 	pc9801_serial(config);
 
 	I8251(config, m_sio_kbd, 0);
-	m_sio_kbd->txd_handler().set("keyb", FUNC(pc9801_kbd_device::input_txd));
+	m_sio_kbd->txd_handler().set("keyb", FUNC(pc98_kbd_device::input_txd));
 	m_sio_kbd->rxrdy_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
 	m_sio_kbd->write_cts(0);
 	m_sio_kbd->write_dsr(0);
@@ -452,7 +452,7 @@ void pc98lt_state::lt_config(machine_config &config)
 	kbd_clock.signal_handler().set(m_sio_kbd, FUNC(i8251_device::write_rxc));
 	kbd_clock.signal_handler().append(m_sio_kbd, FUNC(i8251_device::write_txc));
 
-	PC9801_KBD(config, m_keyb, 0);
+	PC98_KBD(config, m_keyb, 0);
 	m_keyb->rxd_callback().set("sio_kbd", FUNC(i8251_device::write_rxd));
 
 	I8255(config, m_ppi_sys, 0);

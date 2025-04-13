@@ -77,7 +77,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "pc9801_memsw.h"
+#include "pc98_memsw.h"
 
 #include "coreutil.h"
 
@@ -86,7 +86,7 @@
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(PC9801_MEMSW, pc9801_memsw_device, "pc9801_memsw", "NEC PC-9801 Memory Switch device")
+DEFINE_DEVICE_TYPE(PC98_MEMSW, pc98_memsw_device, "pc98_memsw", "NEC PC-98 Memory Switch device")
 
 
 //**************************************************************************
@@ -94,11 +94,11 @@ DEFINE_DEVICE_TYPE(PC9801_MEMSW, pc9801_memsw_device, "pc9801_memsw", "NEC PC-98
 //**************************************************************************
 
 //-------------------------------------------------
-//  pc9801_memsw_device - constructor
+//  pc98_memsw_device - constructor
 //-------------------------------------------------
 
-pc9801_memsw_device::pc9801_memsw_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PC9801_MEMSW, tag, owner, clock),
+pc98_memsw_device::pc98_memsw_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, PC98_MEMSW, tag, owner, clock),
 	device_nvram_interface(mconfig, *this)
 {
 }
@@ -109,7 +109,7 @@ pc9801_memsw_device::pc9801_memsw_device(const machine_config &mconfig, const ch
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void pc9801_memsw_device::device_start()
+void pc98_memsw_device::device_start()
 {
 	save_pointer(NAME(m_bram), m_bram_size);
 }
@@ -119,12 +119,12 @@ void pc9801_memsw_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void pc9801_memsw_device::device_reset()
+void pc98_memsw_device::device_reset()
 {
 }
 
 
-void pc9801_memsw_device::nvram_default()
+void pc98_memsw_device::nvram_default()
 {
 	system_time systime;
 
@@ -142,13 +142,13 @@ void pc9801_memsw_device::nvram_default()
 	m_bram[0xf] = dec_2_bcd(systime.local_time.year - 2000) & 0xff;
 }
 
-bool pc9801_memsw_device::nvram_read(util::read_stream &file)
+bool pc98_memsw_device::nvram_read(util::read_stream &file)
 {
 	auto const [err, actual_size] = util::read(file, m_bram, m_bram_size);
 	return !err && (actual_size == m_bram_size);
 }
 
-bool pc9801_memsw_device::nvram_write(util::write_stream &file)
+bool pc98_memsw_device::nvram_write(util::write_stream &file)
 {
 	auto const [err, actual_size] = util::write(file, m_bram, m_bram_size);
 	return !err;
@@ -158,12 +158,12 @@ bool pc9801_memsw_device::nvram_write(util::write_stream &file)
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-uint8_t pc9801_memsw_device::read(uint8_t offset)
+uint8_t pc98_memsw_device::read(uint8_t offset)
 {
 	return m_bram[offset];
 }
 
-void pc9801_memsw_device::write( uint8_t offset, uint8_t data )
+void pc98_memsw_device::write( uint8_t offset, uint8_t data )
 {
 	m_bram[offset] = data;
 }

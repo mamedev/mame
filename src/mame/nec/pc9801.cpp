@@ -2262,15 +2262,15 @@ TIMER_DEVICE_CALLBACK_MEMBER( pc9801_state::mouse_irq_cb )
 
 void pc9801_atapi_devices(device_slot_interface &device)
 {
-	device.option_add("pc9801_cd", PC9801_CD);
+	device.option_add("pc98_cd", PC98_CD);
 }
 
-void pc9801_state::pc9801_keyboard(machine_config &config)
+void pc9801_state::config_keyboard(machine_config &config)
 {
 	I8251(config, m_sio_kbd, 0);
-	m_sio_kbd->txd_handler().set("keyb", FUNC(pc9801_kbd_device::input_txd));
-	m_sio_kbd->dtr_handler().set("keyb", FUNC(pc9801_kbd_device::input_rty));
-	m_sio_kbd->rts_handler().set("keyb", FUNC(pc9801_kbd_device::input_kbde));
+	m_sio_kbd->txd_handler().set("keyb", FUNC(pc98_kbd_device::input_txd));
+	m_sio_kbd->dtr_handler().set("keyb", FUNC(pc98_kbd_device::input_rty));
+	m_sio_kbd->rts_handler().set("keyb", FUNC(pc98_kbd_device::input_kbde));
 	m_sio_kbd->write_cts(0);
 	m_sio_kbd->write_dsr(0);
 	m_sio_kbd->rxrdy_handler().set(m_pic1, FUNC(pic8259_device::ir1_w));
@@ -2279,7 +2279,7 @@ void pc9801_state::pc9801_keyboard(machine_config &config)
 	kbd_clock.signal_handler().set(m_sio_kbd, FUNC(i8251_device::write_rxc));
 	kbd_clock.signal_handler().append(m_sio_kbd, FUNC(i8251_device::write_txc));
 
-	PC9801_KBD(config, m_keyb, 0);
+	PC98_KBD(config, m_keyb, 0);
 	m_keyb->rxd_callback().set("sio_kbd", FUNC(i8251_device::write_rxd));
 }
 
@@ -2375,9 +2375,9 @@ void pc9801vm_state::pc9801_ide(machine_config &config)
 	SPEAKER(config, "rheadphone").front_right();
 	ATA_INTERFACE(config, m_ide[0]).options(ata_devices, "hdd", nullptr, false);
 	m_ide[0]->irq_handler().set("ideirq", FUNC(input_merger_device::in_w<0>));
-	ATA_INTERFACE(config, m_ide[1]).options(pc9801_atapi_devices, "pc9801_cd", nullptr, false);
+	ATA_INTERFACE(config, m_ide[1]).options(pc9801_atapi_devices, "pc98_cd", nullptr, false);
 	m_ide[1]->irq_handler().set("ideirq", FUNC(input_merger_device::in_w<1>));
-	m_ide[1]->slot(0).set_option_machine_config("pc9801_cd", cdrom_headphones);
+	m_ide[1]->slot(0).set_option_machine_config("pc98_cd", cdrom_headphones);
 
 	INPUT_MERGER_ANY_HIGH(config, "ideirq").output_handler().set("pic8259_slave", FUNC(pic8259_device::ir1_w));
 
@@ -2443,13 +2443,13 @@ void pc9801_state::pc9801_common(machine_config &config)
 	// TODO: other ports
 	m_ppi_prn->in_pb_callback().set(FUNC(pc9801_state::ppi_prn_portb_r));
 
-	pc9801_keyboard(config);
+	config_keyboard(config);
 	pc9801_mouse(config);
 	pc9801_cbus(config);
 
 	pc9801_serial(config);
 
-	PC9801_MEMSW(config, m_memsw, 0);
+	PC98_MEMSW(config, m_memsw, 0);
 
 	UPD765A(config, m_fdc_2hd, 8'000'000, true, true);
 	m_fdc_2hd->intrq_wr_callback().set(m_pic2, FUNC(pic8259_device::ir3_w));

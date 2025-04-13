@@ -25,7 +25,6 @@
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/output_latch.h"
-#include "pc9801_memsw.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
@@ -55,8 +54,9 @@
 #include "bus/cbus/pc9801_cbus.h"
 #include "bus/cbus/sb16_ct2720.h"
 
-#include "pc9801_kbd.h"
-#include "pc9801_cd.h"
+#include "pc98_cd.h"
+#include "pc98_kbd.h"
+#include "pc98_memsw.h"
 
 #include "bus/ata/atadev.h"
 #include "bus/ata/ataintf.h"
@@ -113,7 +113,7 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
-	required_device<pc9801_kbd_device> m_keyb;
+	required_device<pc98_kbd_device> m_keyb;
 	optional_device<upd1990a_device> m_rtc;
 	required_device<i8255_device> m_ppi_sys;
 	required_device<i8255_device> m_ppi_prn;
@@ -187,7 +187,7 @@ protected:
 	required_device<pic8259_device> m_pic1;
 	required_device<pic8259_device> m_pic2;
 private:
-	required_device<pc9801_memsw_device> m_memsw;
+	required_device<pc98_memsw_device> m_memsw;
 	optional_device<scsi_port_device> m_sasibus;
 	optional_device<output_latch_device> m_sasi_data_out;
 	optional_device<input_buffer_device> m_sasi_data_in;
@@ -198,7 +198,7 @@ protected:
 	DECLARE_MACHINE_START(pc9801_common);
 	DECLARE_MACHINE_RESET(pc9801_common);
 
-	void pc9801_keyboard(machine_config &config);
+	void config_keyboard(machine_config &config);
 	void pc9801_mouse(machine_config &config);
 	void pc9801_cbus(machine_config &config);
 	void pc9801_sasi(machine_config &config);

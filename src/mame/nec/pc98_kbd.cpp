@@ -25,7 +25,7 @@ TODO:
 **************************************************************************************************/
 
 #include "emu.h"
-#include "pc9801_kbd.h"
+#include "pc98_kbd.h"
 #include "machine/keyboard.ipp"
 
 //**************************************************************************
@@ -33,7 +33,7 @@ TODO:
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(PC9801_KBD, pc9801_kbd_device, "pc9801_kbd", "PC-9801 Keyboard")
+DEFINE_DEVICE_TYPE(PC98_KBD, pc98_kbd_device, "pc98_kbd", "NEC PC-98 Keyboard")
 
 
 //**************************************************************************
@@ -41,11 +41,11 @@ DEFINE_DEVICE_TYPE(PC9801_KBD, pc9801_kbd_device, "pc9801_kbd", "PC-9801 Keyboar
 //**************************************************************************
 
 //-------------------------------------------------
-//  pc9801_kbd_device - constructor
+//  pc98_kbd_device - constructor
 //-------------------------------------------------
 
-pc9801_kbd_device::pc9801_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PC9801_KBD, tag, owner, clock)
+pc98_kbd_device::pc98_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, PC98_KBD, tag, owner, clock)
 	, device_buffered_serial_interface(mconfig, *this)
 	, device_matrix_keyboard_interface(mconfig, *this, "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7", "KEY8", "KEY9", "KEYA", "KEYB", "KEYC", "KEYD", "KEYE", "KEYF")
 	, m_tx_cb(*this)
@@ -59,7 +59,7 @@ pc9801_kbd_device::pc9801_kbd_device(const machine_config &mconfig, const char *
 //  on this device
 //-------------------------------------------------
 
-void pc9801_kbd_device::device_validity_check(validity_checker &valid) const
+void pc98_kbd_device::device_validity_check(validity_checker &valid) const
 {
 }
 
@@ -68,7 +68,7 @@ void pc9801_kbd_device::device_validity_check(validity_checker &valid) const
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void pc9801_kbd_device::device_start()
+void pc98_kbd_device::device_start()
 {
 	// ...
 }
@@ -78,7 +78,7 @@ void pc9801_kbd_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void pc9801_kbd_device::device_reset()
+void pc98_kbd_device::device_reset()
 {
 	clear_fifo();
 	set_data_frame(START_BIT_COUNT, DATA_BIT_COUNT, PARITY, STOP_BITS);
@@ -94,7 +94,7 @@ void pc9801_kbd_device::device_reset()
 //  m_repeat_state = false;
 }
 
-uint8_t pc9801_kbd_device::translate(uint8_t row, uint8_t column)
+uint8_t pc98_kbd_device::translate(uint8_t row, uint8_t column)
 {
 	return row * 8 + column;
 }
@@ -263,7 +263,7 @@ static INPUT_PORTS_START( pc9801_kbd )
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_UNUSED) //IPT_KEYBOARD) PORT_NAME(" un 7-8")
 INPUT_PORTS_END
 
-ioport_constructor pc9801_kbd_device::device_input_ports() const
+ioport_constructor pc98_kbd_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( pc9801_kbd );
 }
@@ -273,7 +273,7 @@ ioport_constructor pc9801_kbd_device::device_input_ports() const
 //  device_matrix_keyboard
 //**************************************************************************
 
-void pc9801_kbd_device::key_make(uint8_t row, uint8_t column)
+void pc98_kbd_device::key_make(uint8_t row, uint8_t column)
 {
 	uint8_t code = translate(row, column);
 
@@ -289,7 +289,7 @@ void pc9801_kbd_device::key_make(uint8_t row, uint8_t column)
 	}
 }
 
-void pc9801_kbd_device::key_break(uint8_t row, uint8_t column)
+void pc98_kbd_device::key_break(uint8_t row, uint8_t column)
 {
 	if (typematic_is(row, column))
 		typematic_stop();
@@ -299,7 +299,7 @@ void pc9801_kbd_device::key_break(uint8_t row, uint8_t column)
 	send_key(code | 0x80);
 }
 
-void pc9801_kbd_device::key_repeat(uint8_t row, uint8_t column)
+void pc98_kbd_device::key_repeat(uint8_t row, uint8_t column)
 {
 //  uint8_t code = translate(row, column);
 
@@ -309,7 +309,7 @@ void pc9801_kbd_device::key_repeat(uint8_t row, uint8_t column)
 //    send_key(code);
 }
 
-void pc9801_kbd_device::send_key(uint8_t code)
+void pc98_kbd_device::send_key(uint8_t code)
 {
 	transmit_byte(code);
 	if (fifo_full())
@@ -320,7 +320,7 @@ void pc9801_kbd_device::send_key(uint8_t code)
 //  Serial implementation
 //**************************************************************************
 
-void pc9801_kbd_device::tra_complete()
+void pc98_kbd_device::tra_complete()
 {
 	if (fifo_full())
 		start_processing(attotime::from_hz(BAUD));
@@ -328,7 +328,7 @@ void pc9801_kbd_device::tra_complete()
 	device_buffered_serial_interface::tra_complete();
 }
 
-void pc9801_kbd_device::transmit_byte(u8 byte)
+void pc98_kbd_device::transmit_byte(u8 byte)
 {
 	device_buffered_serial_interface::transmit_byte(byte);
 	if (fifo_full())
@@ -339,7 +339,7 @@ void pc9801_kbd_device::transmit_byte(u8 byte)
  * 0xff: reset
  * everything else: implementation specific, TBD (0x9* command, some have extra parameters)
  */
-void pc9801_kbd_device::received_byte(u8 byte)
+void pc98_kbd_device::received_byte(u8 byte)
 {
 	logerror("received_byte 0x%02x\n", byte);
 	if (byte == 0xff)
@@ -354,13 +354,13 @@ void pc9801_kbd_device::received_byte(u8 byte)
 	}
 }
 
-void pc9801_kbd_device::rcv_complete()
+void pc98_kbd_device::rcv_complete()
 {
 	receive_register_extract();
 	received_byte(get_received_char());
 }
 
-void pc9801_kbd_device::input_kbde(int state)
+void pc98_kbd_device::input_kbde(int state)
 {
 	if (!m_kbde_state && state)
 		start_processing(attotime::from_hz(BAUD));
@@ -369,7 +369,7 @@ void pc9801_kbd_device::input_kbde(int state)
 	m_kbde_state = state;
 }
 
-void pc9801_kbd_device::input_rty(int state)
+void pc98_kbd_device::input_rty(int state)
 {
 	m_rty_state = state;
 }

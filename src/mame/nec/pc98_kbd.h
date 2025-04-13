@@ -5,8 +5,8 @@
     PC-9801 Keyboard simulation
 
 ***************************************************************************/
-#ifndef MAME_NEC_PC9801_KBD_H
-#define MAME_NEC_PC9801_KBD_H
+#ifndef MAME_NEC_PC98_KBD_H
+#define MAME_NEC_PC98_KBD_H
 
 #pragma once
 
@@ -17,15 +17,15 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> pc9801_kbd_device
+// ======================> pc98_kbd_device
 
-class pc9801_kbd_device : public device_t
+class pc98_kbd_device : public device_t
 						, public device_buffered_serial_interface<16U>
 						, protected device_matrix_keyboard_interface<16>
 {
 public:
 	// construction/destruction
-	pc9801_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pc98_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
@@ -77,7 +77,7 @@ private:
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(PC9801_KBD, pc9801_kbd_device)
+DECLARE_DEVICE_TYPE(PC98_KBD, pc98_kbd_device)
 
 
 
@@ -87,4 +87,4 @@ DECLARE_DEVICE_TYPE(PC9801_KBD, pc9801_kbd_device)
 
 
 
-#endif // MAME_NEC_PC9801_KBD_H
+#endif // MAME_NEC_PC98_KBD_H
