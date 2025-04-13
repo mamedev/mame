@@ -28,7 +28,7 @@ constexpr double RES_VOLTAGE_DIVIDER(double r1, double r2) { return r2 / (r1 + r
 
 // Audio taper (aka "logarithmic") potentiometer law.
 // `x` should be in the range 0-1, and so is the return value.
-constexpr double RES_AUDIO_POT_LAW(double x)
+inline double RES_AUDIO_POT_LAW(double x)
 {
 	// The implementation is that of an ideal log potentiometer, based on:
 	// https://electronics.stackexchange.com/questions/304692/formula-for-logarithmic-audio-taper-pot
@@ -39,10 +39,9 @@ constexpr double RES_AUDIO_POT_LAW(double x)
 	// The 10% midpoint ("A2" potentiometer curve) is typical for audio
 	// applications. See any datasheet for a log potentiometer.
 	constexpr const double MIDPOINT = 0.1;
-	constexpr const double B = pow(1.0 / MIDPOINT - 1, 2);
+	constexpr const double B = (1.0 / MIDPOINT - 1.0) * (1.0 / MIDPOINT - 1.0);  // pow(1.0 / MIDPOINT - 1.0, 2);
 	constexpr const double A = 1.0 / (B - 1.0);
-	constexpr const double C = -A;
-	return (A * pow(B, x) + C);
+	return A * pow(B, x) - A;
 }
 
 // macro for the RC time constant on a 74LS123 with C > 1000pF
