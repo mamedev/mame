@@ -424,6 +424,7 @@ protected:
 	virtual void border_color_w(offs_t offset, u8 data) override;
 
 	uint8_t ide_ctrl_r();
+	uint8_t ide_ctrl_hack_r();
 	void ide_ctrl_w(uint8_t data);
 	uint16_t ide_cs0_r(offs_t offset, uint16_t mem_mask = ~0);
 	void ide_cs0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);

@@ -81,7 +81,8 @@
     - "SYSTEM SHUTDOWN" after BIOS sets up the SDIP values;
 
     TODO (PC-9801BX2)
-    - "SYSTEM SHUTDOWN" at POST, a soft reset fixes it?
+    - "SYSTEM SHUTDOWN" at POST, SDIP related, soft reset to bypass;
+	- Accesses $8f0-$8f2 PMC area, shared with 98NOTE machines;
     - A non-fatal "MEMORY ERROR" is always thrown no matter the RAM size afterwards, related?
     - unemulated conventional or EMS RAM bank, definitely should have one given the odd minimum RAM
       size;
@@ -457,11 +458,22 @@ void pc9801_state::fdc_2dd_ctrl_w(uint8_t data)
 	m_fdc_2dd->subdevice<floppy_connector>("1")->get_device()->mon_w(data & 8 ? CLEAR_LINE : ASSERT_LINE);
 }
 
+u8 pc9801vm_state::ide_ctrl_hack_r()
+{
+	if (!machine().side_effects_disabled())
+	{
+		// HACK: RS IDE driver will try to do 512 to 256 byte sector translations
+		// MEMSW has no setting for this, is it concealed?
+		// SDIP based machines don't need this (they will default to 512 bps, shadowed from
+		// gaiji $ac403 bit 6).
+		address_space &ram = m_maincpu->space(AS_PROGRAM);
+		ram.write_byte(0x457, ram.read_byte(0x457) | 0xc0);
+	}
+	return m_ide_sel;
+}
+
 u8 pc9801vm_state::ide_ctrl_r()
 {
-	address_space &ram = m_maincpu->space(AS_PROGRAM);
-	// this makes the ide driver not do 512 to 256 byte sector translation, the 9821 looks for bit 6 of offset 0xac403 of the kanji ram to set this, the rs unknown
-	ram.write_byte(0x457, ram.read_byte(0x457) | 0xc0);
 	return m_ide_sel;
 }
 
@@ -1224,7 +1236,7 @@ void pc9801vm_state::pc9801rs_io(address_map &map)
 {
 //  map.unmap_value_high();
 	pc9801ux_io(map);
-	map(0x0430, 0x0433).rw(FUNC(pc9801vm_state::ide_ctrl_r), FUNC(pc9801vm_state::ide_ctrl_w)).umask16(0x00ff);
+	map(0x0430, 0x0433).rw(FUNC(pc9801vm_state::ide_ctrl_hack_r), FUNC(pc9801vm_state::ide_ctrl_w)).umask16(0x00ff);
 	map(0x0640, 0x064f).rw(FUNC(pc9801vm_state::ide_cs0_r), FUNC(pc9801vm_state::ide_cs0_w));
 	map(0x0740, 0x074f).rw(FUNC(pc9801vm_state::ide_cs1_r), FUNC(pc9801vm_state::ide_cs1_w));
 	map(0x1e8c, 0x1e8f).noprw(); // temp
@@ -1259,6 +1271,7 @@ void pc9801us_state::sdip_bank_w(offs_t offset, u8 data)
 void pc9801us_state::pc9801us_io(address_map &map)
 {
 	pc9801rs_io(map);
+	map(0x0430, 0x0433).rw(FUNC(pc9801us_state::ide_ctrl_r), FUNC(pc9801us_state::ide_ctrl_w)).umask16(0x00ff);
 	map(0x841e, 0x841e).rw(FUNC(pc9801us_state::sdip_r<0x0>), FUNC(pc9801us_state::sdip_w<0x0>));
 	map(0x851e, 0x851e).rw(FUNC(pc9801us_state::sdip_r<0x1>), FUNC(pc9801us_state::sdip_w<0x1>));
 	map(0x861e, 0x861e).rw(FUNC(pc9801us_state::sdip_r<0x2>), FUNC(pc9801us_state::sdip_w<0x2>));
@@ -2976,6 +2989,7 @@ ROM_START( pc9801bx2 )
 	ROM_LOAD( "pc98bank7.bin",  0x38000, 0x08000, BAD_DUMP CRC(1bd6537b) SHA1(ff9ee1c976a12b87851635ce8991ac4ad607675b) )
 
 	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+	// 0x1a000: setup mode
 	ROM_COPY( "biosrom", 0x20000, 0x10000, 0x8000 ) // ITF ROM
 	ROM_COPY( "biosrom", 0x28000, 0x18000, 0x8000 ) // BIOS ROM
 	ROM_COPY( "biosrom", 0x30000, 0x20000, 0x8000 )

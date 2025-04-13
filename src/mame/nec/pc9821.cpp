@@ -22,23 +22,23 @@ TODO (PC-9821As):
 
 TODO (PC-9821Cx3):
 - "MICON ERROR" at POST, we currently return a ready state in remote control register
-	to bypass it, is it expected behaviour?
+  to bypass it, is it expected behaviour?
 - Hangs normally with "Set the SDIP" message, on soft reset tries to r/w I/Os
-	$b00-$b03, kanji RAM $a9 and $f0 (mostly bit 5, built-in 27 inches HDD check?) then keeps
-	looping;
+  $b00-$b03, kanji RAM $a9 and $f0 (mostly bit 5, built-in 27 inches HDD check?) then keeps
+  looping;
 - 0xfa2c8 contains ITF test routines, to access it's supposedly CTRL+CAPS+KANA,
-	which currently doesn't work. It also never returns a valid processor or CPU clock,
-	is it a debug side-effect or supposed to be read somehow?
+  which currently doesn't work. It also never returns a valid processor or CPU clock,
+  is it a debug side-effect or supposed to be read somehow?
 - Expects 0xc0000-0xdffff to be r/w at PC=0x104e8, currently failing for inner C-Bus mappings.
-	Is PCI supposed to overlay the C-Bus section?
+  Is PCI supposed to overlay the C-Bus section?
 - Eventually jump off the weeds by taking an invalid irq in timer test;
 - Reportedly should display a CanBe logo at POST (always blue with white fg?),
-	at least pc9821cx3 ROM has some VRAM data in first half of BIOS ROM.
-	Where this is mapped is currently unknown;
+  at least pc9821cx3 ROM has some VRAM data in first half of BIOS ROM.
+  Where this is mapped is currently unknown;
 
 TODO (PC-9821Xa16/PC-9821Ra20/PC-9821Ra266/PC-9821Ra333):
 - "MICON ERROR" at POST (processor microcode detection fails, basically down to a more
-	involved bankswitch with Pentium based machines);
+  involved bankswitch with Pentium based machines);
 
 TODO: (PC-9821Nr15/PC-9821Nr166)
 - Tests conventional RAM then keeps polling $03c4 (should be base VGA regs read);
