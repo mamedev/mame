@@ -5,7 +5,6 @@
     PC-9801 (c) 1981 NEC
 
     TODO:
-    - proper 8251 uart hook-up on keyboard;
     - text scrolling, μPD52611 (cfr. clipping in edge & arcus2, madoum* too?);
     - Abnormal 90 Hz refresh rate adjust for normal display mode (15KHz).
       Should really be 61.xx instead, understand how CRTC really switches clock;
@@ -80,9 +79,14 @@
     - "Invalid Command Byte 13" for bitmap upd7220 at POST (?)
     - "SYSTEM SHUTDOWN" after BIOS sets up the SDIP values;
 
+    TODO (PC-9801FS):
+    - RAM check detects more RAM than what's really installed (and saves previous detection in MEMSW);
+    - Crashes with Japanese error for "HDD failure" when mounted with IDE BIOS,
+      incompatible with 512 bps or IDE itself?
+
     TODO (PC-9801BX2)
     - "SYSTEM SHUTDOWN" at POST, SDIP related, soft reset to bypass;
-	- Accesses $8f0-$8f2 PMC area, shared with 98NOTE machines;
+    - Accesses $8f0-$8f2 PMC area, shared with 98NOTE machines;
     - A non-fatal "MEMORY ERROR" is always thrown no matter the RAM size afterwards, related?
     - unemulated conventional or EMS RAM bank, definitely should have one given the odd minimum RAM
       size;
@@ -2628,14 +2632,15 @@ void pc9801us_state::pc9801us(machine_config &config)
 	config_floppy_35hd(config);
 }
 
-void pc9801vm_state::pc9801fs(machine_config &config)
+void pc9801us_state::pc9801fs(machine_config &config)
 {
 	pc9801rs(config);
 	const XTAL xtal = XTAL(20'000'000); // ~20 MHz
 	I386SX(config.replace(), m_maincpu, xtal);
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801vm_state::pc9801rs_map);
-	m_maincpu->set_addrmap(AS_IO, &pc9801vm_state::pc9801rs_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801us_state::pc9801rs_map);
+	m_maincpu->set_addrmap(AS_IO, &pc9801us_state::pc9801us_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
+
 
 	// optional 3'5 floppies x2
 	config_floppy_525hd(config);
@@ -3194,7 +3199,7 @@ COMP( 1990, pc9801dx,   0,        0, pc9801dx,  pc9801rs, pc9801vm_state, init_p
 // UF/UR/US class (i386SX + SDIP, optional high-reso according to BIOS? Derivatives of UX)
 COMP( 1992, pc9801us,   0,        0, pc9801us,  pc9801rs, pc9801us_state, init_pc9801_kanji,   "NEC",   "PC-9801US",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 // FS class (i386SX + ?)
-COMP( 1992, pc9801fs,   0,        0, pc9801fs,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801FS",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+COMP( 1992, pc9801fs,   0,        0, pc9801fs,  pc9801rs, pc9801us_state, init_pc9801_kanji,   "NEC",   "PC-9801FS",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 // FA class (i486SX)
 // ...
 // BX class (official nickname "98 FELLOW", last releases prior to 9821 line)

@@ -393,7 +393,6 @@ public:
 	void pc9801vx(machine_config &config);
 	void pc9801rs(machine_config &config);
 	void pc9801dx(machine_config &config);
-	void pc9801fs(machine_config &config);
 
 	void init_pc9801vm_kanji();
 
@@ -542,6 +541,7 @@ public:
 	{
 	}
 	void pc9801us(machine_config &config);
+	void pc9801fs(machine_config &config);
 
 protected:
 	void pc9801us_io(address_map &map) ATTR_COLD;
