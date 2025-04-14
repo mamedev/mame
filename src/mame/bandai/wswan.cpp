@@ -311,12 +311,11 @@ void wswan_state::wswan_base(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	WSWAN_SND(config, m_sound, X1 / 4);
 	m_sound->set_addrmap(0, &wswan_state::snd_map);
-	m_sound->add_route(0, "lspeaker", 0.50);
-	m_sound->add_route(1, "rspeaker", 0.50);
+	m_sound->add_route(0, "speaker", 0.50, 0);
+	m_sound->add_route(1, "speaker", 0.50, 1);
 
 	// cartridge
 	WS_CART_SLOT(config, m_cart, X1 / 32, wswan_cart, nullptr);

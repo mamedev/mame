@@ -930,12 +930,11 @@ void gticlub_state::gticlub(machine_config &config)
 	K056800(config, m_k056800, XTAL(33'868'800)/2);
 	m_k056800->int_callback().set_inputline(m_audiocpu, M68K_IRQ_2);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	rf5c400_device &rfsnd(RF5C400(config, "rfsnd", XTAL(33'868'800)/2));
-	rfsnd.add_route(0, "lspeaker", 1.0);
-	rfsnd.add_route(1, "rspeaker", 1.0);
+	rfsnd.add_route(0, "speaker", 1.0, 0);
+	rfsnd.add_route(1, "speaker", 1.0, 1);
 
 	KONPPC(config, m_konppc, 0);
 	m_konppc->set_dsp_tag(0, m_dsp[0]);
@@ -1035,12 +1034,11 @@ void hangplt_state::hangplt(machine_config &config)
 	K056800(config, m_k056800, XTAL(33'868'800)/2);
 	m_k056800->int_callback().set_inputline(m_audiocpu, M68K_IRQ_2);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	rf5c400_device &rfsnd(RF5C400(config, "rfsnd", XTAL(33'868'800)/2));
-	rfsnd.add_route(0, "lspeaker", 1.0);
-	rfsnd.add_route(1, "rspeaker", 1.0);
+	rfsnd.add_route(0, "speaker", 1.0, 0);
+	rfsnd.add_route(1, "speaker", 1.0, 1);
 
 	KONPPC(config, m_konppc, 0);
 	m_konppc->set_dsp_tag(0, m_dsp[0]);

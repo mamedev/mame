@@ -14,7 +14,7 @@ DEFINE_DEVICE_TYPE(INDER_AUDIO, inder_sb_device, "indersb", "Inder 4xDAC Sound B
 
 inder_sb_device::inder_sb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, INDER_AUDIO, tag, owner, clock)
-	, device_mixer_interface(mconfig, *this, 2)
+	, device_mixer_interface(mconfig, *this)
 	, m_audiocpu(*this, "audiocpu")
 	, m_ctc(*this, "ctc")
 	, m_audiocpu_rom(*this, "audiocpu")

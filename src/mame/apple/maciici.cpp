@@ -545,12 +545,11 @@ void maciici_state::maciixi_base(machine_config &config)
 	rs232b.dcd_handler().set(m_scc, FUNC(z80scc_device::dcdb_w));
 	rs232b.cts_handler().set(m_scc, FUNC(z80scc_device::ctsb_w));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	ASC(config, m_asc, C15M, asc_device::asc_type::ASC);
 	m_asc->irqf_callback().set(m_rbv, FUNC(rbv_device::asc_irq_w));
-	m_asc->add_route(0, "lspeaker", 1.0);
-	m_asc->add_route(1, "rspeaker", 1.0);
+	m_asc->add_route(0, "speaker", 1.0, 0);
+	m_asc->add_route(1, "speaker", 1.0, 1);
 
 	R65NC22(config, m_via1, C7M / 10);
 	m_via1->readpa_handler().set(FUNC(maciici_state::via_in_a));
@@ -567,8 +566,8 @@ void maciici_state::maciixi_base(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
 		[](device_t *device)
 		{
-			device->subdevice<cdda_device>("cdda")->add_route(0, "^^lspeaker", 1.0);
-			device->subdevice<cdda_device>("cdda")->add_route(1, "^^rspeaker", 1.0);
+			device->subdevice<cdda_device>("cdda")->add_route(0, "^^speaker", 1.0, 0);
+			device->subdevice<cdda_device>("cdda")->add_route(1, "^^speaker", 1.0, 1);
 		});
 	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);

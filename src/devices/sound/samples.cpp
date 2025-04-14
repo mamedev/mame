@@ -315,34 +315,33 @@ void samples_device::device_post_load()
 //  sound_stream_update - update a sound stream
 //-------------------------------------------------
 
-void samples_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void samples_device::sound_stream_update(sound_stream &stream)
 {
 	// find the channel with this stream
-	constexpr stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
+	constexpr sound_stream::sample_t sample_scale = 1.0 / 32768.0;
 	for (int channel = 0; channel < m_channels; channel++)
 		if (&stream == m_channel[channel].stream)
 		{
 			channel_t &chan = m_channel[channel];
-			auto &buffer = outputs[0];
 
 			// process if we still have a source and we're not paused
 			if (chan.source != nullptr && !chan.paused)
 			{
 				// load some info locally
-				double step = double(chan.curfreq) / double(buffer.sample_rate());
+				double step = double(chan.curfreq) / double(stream.sample_rate());
 				double endpos = chan.source_len;
 				const int16_t *sample = chan.source;
 
-				for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
+				for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 				{
 					// do a linear interp on the sample
 					double pos_floor = floor(chan.pos);
 					double frac = chan.pos - pos_floor;
 					int32_t ipos = int32_t(pos_floor);
 
-					stream_buffer::sample_t sample1 = stream_buffer::sample_t(sample[ipos++]);
-					stream_buffer::sample_t sample2 = stream_buffer::sample_t(sample[(ipos + 1) % chan.source_len]);
-					buffer.put(sampindex, sample_scale * ((1.0 - frac) * sample1 + frac * sample2));
+					sound_stream::sample_t sample1 = sound_stream::sample_t(sample[ipos++]);
+					sound_stream::sample_t sample2 = sound_stream::sample_t(sample[(ipos + 1) % chan.source_len]);
+					stream.put(0, sampindex, sample_scale * ((1.0 - frac) * sample1 + frac * sample2));
 
 					// advance
 					chan.pos += step;
@@ -356,14 +355,11 @@ void samples_device::sound_stream_update(sound_stream &stream, std::vector<read_
 						{
 							chan.source = nullptr;
 							chan.source_num = -1;
-							buffer.fill(0, sampindex);
 							break;
 						}
 					}
 				}
 			}
-			else
-				buffer.fill(0);
 			break;
 		}
 }

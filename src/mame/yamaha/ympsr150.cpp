@@ -245,11 +245,10 @@ void psr150_state::psr150(machine_config &config)
 
 	// set up AC filters since the keyboard purposely outputs a DC offset when idle
 	// TODO: there is also a RLC lowpass with R=120, L=3.3mH, C=0.33uF (or R=150 for psr110)
-	FILTER_RC(config, "lfilter").set_ac().add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_RC(config, "rfilter").set_ac().add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_RC(config, "lfilter").set_ac().add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_RC(config, "rfilter").set_ac().add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	config.set_default_layout(layout_psr150);
 }
@@ -362,11 +361,10 @@ void psr150_state::psr180(machine_config &config)
 
 	// set up AC filters since the keyboard purposely outputs a DC offset when idle
 	// TODO: there is also a RLC lowpass with R=120, L=3.3mH, C=0.39uF
-	FILTER_RC(config, "lfilter").set_ac().add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_RC(config, "rfilter").set_ac().add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_RC(config, "lfilter").set_ac().add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_RC(config, "rfilter").set_ac().add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	config.set_default_layout(layout_psr180);
 }
@@ -448,11 +446,10 @@ void psr150_state::psr190(machine_config &config)
 
 	// set up AC filters since the keyboard purposely outputs a DC offset when idle
 	// TODO: there is also a RLC lowpass with R=120, L=3.3mH, C=0.33uF
-	FILTER_RC(config, "lfilter").set_ac().add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_RC(config, "rfilter").set_ac().add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_RC(config, "lfilter").set_ac().add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_RC(config, "rfilter").set_ac().add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 }
 
 void psr150_state::psr78(machine_config &config)

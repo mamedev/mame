@@ -217,16 +217,16 @@ void bingoc_state::bingoc(machine_config &config)
 	PALETTE(config, "palette").set_entries(0x100);
 
 
-	SPEAKER(config, "lspeaker").front_left(); //might just be mono...
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front(); //might just be mono...
+
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	YM2151(config, "ymsnd", 7159160/2).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
+	YM2151(config, "ymsnd", 7159160/2).add_route(0, "speaker", 1.0, 0).add_route(1, "speaker", 1.0, 1);
 
 	UPD7759(config, m_upd7759);
-	m_upd7759->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_upd7759->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_upd7759->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	m_upd7759->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 	// terminals
 	BINGOCT(config, "term1");

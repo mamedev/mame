@@ -877,11 +877,10 @@ void cz1_state::mz1(machine_config &config)
 	config.set_default_layout(layout_mz1);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	MIXER(config, m_mixer[0]).add_route(0, "lspeaker", 1.0);
-	MIXER(config, m_mixer[1]).add_route(0, "rspeaker", 1.0);
+	MIXER(config, m_mixer[0]).add_route(0, "speaker", 1.0, 0);
+	MIXER(config, m_mixer[1]).add_route(0, "speaker", 1.0, 1);
 
 	UPD933(config, m_upd933[0], 8.96_MHz_XTAL / 2);
 	m_upd933[0]->irq_cb().set("irq",  FUNC(input_merger_any_high_device::in_w<0>));

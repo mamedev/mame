@@ -388,10 +388,10 @@ void s11b_state::s11b_jokerz(machine_config &config)
 	PINSND88(config, m_ps88);
 	// the dac and cvsd volumes should be equally mixed on the s11 board send to the audio board, whatever type it is
 	// the 4 gain values in the add_route statements are actually irrelevant, the ps88 device will override them
-	m_dac->add_route(ALL_OUTPUTS, m_ps88, 0.29, AUTO_ALLOC_INPUT, 0);
-	m_dac->add_route(ALL_OUTPUTS, m_ps88, 0.25, AUTO_ALLOC_INPUT, 1);
-	m_cvsd_filter2->add_route(ALL_OUTPUTS, m_ps88, (0.29*4.0), AUTO_ALLOC_INPUT, 0);
-	m_cvsd_filter2->add_route(ALL_OUTPUTS, m_ps88, (0.25*4.0), AUTO_ALLOC_INPUT, 1);
+	m_dac->add_route(ALL_OUTPUTS, m_ps88, 0.29, 0);
+	m_dac->add_route(ALL_OUTPUTS, m_ps88, 0.25, 1);
+	m_cvsd_filter2->add_route(ALL_OUTPUTS, m_ps88, (0.29*4.0), 0);
+	m_cvsd_filter2->add_route(ALL_OUTPUTS, m_ps88, (0.25*4.0), 1);
 	m_pia34->ca2_handler().set(m_ps88, FUNC(pinsnd88_device::resetq_w));
 	m_ps88->syncq_cb().set(m_pia34, FUNC(pia6821_device::ca1_w)); // the sync connection comes from sound connector pin 16 to MCA1, not the usual pin 12 to MCB1
 	SPEAKER(config, "cabinet").front_floor(); // the cabinet speaker is aimed down underneath the pinball table itself

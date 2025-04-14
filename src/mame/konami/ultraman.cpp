@@ -393,16 +393,15 @@ void ultraman_state::ultraman(machine_config &config)
 	m_k051316[2]->set_zoom_callback(FUNC(ultraman_state::zoom_callback<2>));
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	YM2151(config, "ymsnd", 24'000'000 / 6).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
+	YM2151(config, "ymsnd", 24'000'000 / 6).add_route(0, "speaker", 1.0, 0).add_route(1, "speaker", 1.0, 1);
 
 	okim6295_device &oki(OKIM6295(config, "oki", 1'056'000, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
-	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	oki.add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
+	oki.add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 }
 
 

@@ -186,18 +186,17 @@ void mu128_state::mu128(machine_config &config)
 
 	MULCD(config, m_lcd);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	SWP30(config, m_swp30m);
 	m_swp30m->set_addrmap(AS_DATA, &mu128_state::swp30_map);
-	m_swp30m->add_route(0, "lspeaker", 1.0);
-	m_swp30m->add_route(1, "rspeaker", 1.0);
+	m_swp30m->add_route(0, "speaker", 1.0, 0);
+	m_swp30m->add_route(1, "speaker", 1.0, 1);
 
 	SWP30(config, m_swp30s);
 	m_swp30s->set_addrmap(AS_DATA, &mu128_state::swp30_map);
-	m_swp30s->add_route(0, "lspeaker", 1.0);
-	m_swp30s->add_route(1, "rspeaker", 1.0);
+	m_swp30s->add_route(0, "speaker", 1.0, 0);
+	m_swp30s->add_route(1, "speaker", 1.0, 1);
 
 	INPUT_MERGER_ANY_HIGH(config, "irq0").output_handler().set_inputline(m_maincpu, 0);
 	I8251(config, m_sci, 10_MHz_XTAL); // uPD71051GU-10

@@ -179,7 +179,7 @@ zac1b111xx_melody_base::zac1b111xx_melody_base(
 		device_t *owner,
 		u32 clock)
 	: device_t(mconfig, devtype, tag, owner, clock)
-	, device_mixer_interface(mconfig, *this, 1)
+	, device_mixer_interface(mconfig, *this)
 	, m_melodycpu(*this, "melodycpu")
 	, m_melodypia(*this, "melodypia")
 	, m_melodypsg1(*this, "melodypsg1")
@@ -314,10 +314,10 @@ void zac1b11107_audio_device::device_add_mconfig(machine_config &config)
 	m_melodycpu->set_addrmap(AS_PROGRAM, &zac1b11107_audio_device::zac1b11107_melody_map);
 
 	m_melodypsg1->port_a_write_callback().set(FUNC(zac1b11107_audio_device::melodypsg1_porta_w));
-	m_melodypsg1->add_route(ALL_OUTPUTS, *this, 0.5, AUTO_ALLOC_INPUT, 0);
+	m_melodypsg1->add_route(ALL_OUTPUTS, *this, 0.5, 0);
 
 	m_melodypsg2->port_a_write_callback().set(FUNC(zac1b11107_audio_device::melodypsg2_porta_w));
-	m_melodypsg2->add_route(ALL_OUTPUTS, *this, 0.5, AUTO_ALLOC_INPUT, 0);
+	m_melodypsg2->add_route(ALL_OUTPUTS, *this, 0.5, 0);
 }
 
 
@@ -435,7 +435,7 @@ void zac1b11142_audio_device::device_add_mconfig(machine_config &config)
 	m_pia_1i->writepa_handler().set(m_speech, FUNC(tms5220_device::data_w));
 	m_pia_1i->writepb_handler().set(FUNC(zac1b11142_audio_device::pia_1i_portb_w));
 
-	//MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.30, AUTO_ALLOC_INPUT, 0); // mc1408.1f
+	//MC1408(config, "dac", 0).add_route(ALL_OUTPUTS, *this, 0.30, 0); // mc1408.1f
 	MC1408(config, "dac").add_route(ALL_OUTPUTS, "sound_nl", 1.0, 7); // mc1408.1f
 
 	// There is no xtal, the clock is obtained from a RC oscillator as shown in the TMS5220 datasheet (R=100kOhm C=22pF)
@@ -447,7 +447,7 @@ void zac1b11142_audio_device::device_add_mconfig(machine_config &config)
 
 	NETLIST_SOUND(config, "sound_nl", 48000)
 		.set_source(netlist_zac1b11142)
-		.add_route(ALL_OUTPUTS, *this, 1.0, AUTO_ALLOC_INPUT, 0);
+		.add_route(ALL_OUTPUTS, *this, 1.0, 0);
 
 	NETLIST_LOGIC_INPUT(config, "sound_nl:ioa0",   "I_IOA0.IN",   0);
 	NETLIST_LOGIC_INPUT(config, "sound_nl:ioa1",   "I_IOA1.IN",   0);

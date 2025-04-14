@@ -120,13 +120,6 @@ public:
 		assert(m_buffer);
 		return m_buffer->Stop();
 	}
-	HRESULT set_volume(LONG volume) const
-	{
-		assert(m_buffer);
-		return m_buffer->SetVolume(volume);
-	}
-	HRESULT set_min_volume() { return set_volume(DSBVOLUME_MIN); }
-
 	HRESULT get_current_positions(DWORD &play_pos, DWORD &write_pos) const
 	{
 		assert(m_buffer);
@@ -225,8 +218,7 @@ public:
 	virtual void exit() override;
 
 	// sound_module
-	virtual void update_audio_stream(bool is_throttled, int16_t const *buffer, int samples_this_frame) override;
-	virtual void set_mastervolume(int attenuation) override;
+	virtual void stream_sink_update(uint32_t, int16_t const *buffer, int samples_this_frame) override;
 
 private:
 	HRESULT         dsound_init();
@@ -297,11 +289,11 @@ void sound_direct_sound::exit()
 
 
 //============================================================
-//  update_audio_stream
+//  stream_sink_update
 //============================================================
 
-void sound_direct_sound::update_audio_stream(
-		bool is_throttled,
+void sound_direct_sound::stream_sink_update(
+		uint32_t,
 		int16_t const *buffer,
 		int samples_this_frame)
 {
@@ -360,26 +352,6 @@ void sound_direct_sound::update_audio_stream(
 
 	// adjust the input pointer
 	m_stream_buffer_in = (m_stream_buffer_in + bytes_this_frame) % m_stream_buffer.size();
-}
-
-
-//============================================================
-//  set_mastervolume
-//============================================================
-
-void sound_direct_sound::set_mastervolume(int attenuation)
-{
-	// clamp the attenuation to 0-32 range
-	attenuation = std::clamp(attenuation, -32, 0);
-
-	// set the master volume
-	if (m_stream_buffer)
-	{
-		if (-32 == attenuation)
-			m_stream_buffer.set_min_volume();
-		else
-			m_stream_buffer.set_volume(100 * attenuation);
-	}
 }
 
 

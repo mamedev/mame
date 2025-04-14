@@ -449,8 +449,8 @@ void ctk551_state::ap10(machine_config& config)
 	// CPU
 	GT913(config, m_maincpu, 24_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_DATA, &ctk551_state::ap10_map);
-	m_maincpu->add_route(0, "lspeaker", 1.0);
-	m_maincpu->add_route(1, "rspeaker", 1.0);
+	m_maincpu->add_route(0, "speaker", 1.0, 0);
+	m_maincpu->add_route(1, "speaker", 1.0, 1);
 	m_maincpu->read_adc<0>().set_constant(0);
 	m_maincpu->read_adc<1>().set_constant(0);
 	m_maincpu->read_port1().set_ioport("P1");
@@ -474,8 +474,7 @@ void ctk551_state::ap10(machine_config& config)
 	midiout_slot(mdout);
 	m_maincpu->write_sci_tx<0>().set(mdout, FUNC(midi_port_device::write_txd));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	config.set_default_layout(layout_ap10);
 }
@@ -485,8 +484,8 @@ void ctk551_state::ctk530(machine_config& config)
 	// CPU
 	GT913(config, m_maincpu, 20_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_DATA, &ctk551_state::ctk530_map);
-	m_maincpu->add_route(0, "lspeaker", 1.0);
-	m_maincpu->add_route(1, "rspeaker", 1.0);
+	m_maincpu->add_route(0, "speaker", 1.0, 0);
+	m_maincpu->add_route(1, "speaker", 1.0, 1);
 	m_maincpu->read_adc<0>().set_constant(0);
 	m_maincpu->read_adc<1>().set_constant(0);
 	m_maincpu->read_port1().set_ioport("P1");
@@ -509,8 +508,7 @@ void ctk551_state::ctk530(machine_config& config)
 	m_pwm->set_size(4, 8);
 	m_pwm->set_segmask(0x7, 0xff);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	config.set_default_layout(layout_ctk530);
 }
@@ -520,8 +518,8 @@ void ctk551_state::gz70sp(machine_config& config)
 	// CPU
 	GT913(config, m_maincpu, 30_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_DATA, &ctk551_state::gz70sp_map);
-	m_maincpu->add_route(0, "lspeaker", 1.0);
-	m_maincpu->add_route(1, "rspeaker", 1.0);
+	m_maincpu->add_route(0, "speaker", 1.0, 0);
+	m_maincpu->add_route(1, "speaker", 1.0, 1);
 	m_maincpu->read_adc<0>().set_constant(0);
 	m_maincpu->read_adc<1>().set_constant(0);
 	m_maincpu->read_port1().set_ioport("P1");
@@ -537,8 +535,7 @@ void ctk551_state::gz70sp(machine_config& config)
 	midiin_slot(mdin);
 	mdin.rxd_handler().set(m_maincpu, FUNC(gt913_device::sci_rx_w<1>));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 }
 
 void ctk551_state::ctk601(machine_config& config)
@@ -546,8 +543,8 @@ void ctk551_state::ctk601(machine_config& config)
 	// CPU
 	GT913(config, m_maincpu, 30_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_DATA, &ctk551_state::ctk601_map);
-	m_maincpu->add_route(0, "lspeaker", 1.0);
-	m_maincpu->add_route(1, "rspeaker", 1.0);
+	m_maincpu->add_route(0, "speaker", 1.0, 0);
+	m_maincpu->add_route(1, "speaker", 1.0, 1);
 	m_maincpu->read_adc<0>().set_constant(0);
 	m_maincpu->read_adc<1>().set_constant(0);
 	m_maincpu->read_port1().set_ioport("P1_R");
@@ -579,8 +576,7 @@ void ctk551_state::ctk601(machine_config& config)
 	screen.set_visarea_full();
 	screen.screen_vblank().set(FUNC(ctk551_state::render_w));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	m_switch = 0x8;
 }
@@ -590,8 +586,8 @@ void ctk551_state::ctk551(machine_config &config)
 	// CPU
 	GT913(config, m_maincpu, 30'000'000 / 2);
 	m_maincpu->set_addrmap(AS_DATA, &ctk551_state::ctk530_map);
-	m_maincpu->add_route(0, "lspeaker", 1.0);
-	m_maincpu->add_route(1, "rspeaker", 1.0);
+	m_maincpu->add_route(0, "speaker", 1.0, 0);
+	m_maincpu->add_route(1, "speaker", 1.0, 1);
 	m_maincpu->read_adc<0>().set_ioport("AN0");
 	m_maincpu->read_adc<1>().set_ioport("AN1");
 	m_maincpu->read_port1().set_ioport("P1_R");
@@ -621,8 +617,7 @@ void ctk551_state::ctk551(machine_config &config)
 	screen.set_visarea_full();
 	screen.screen_vblank().set(FUNC(ctk551_state::render_w));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	m_switch = 0x2;
 }

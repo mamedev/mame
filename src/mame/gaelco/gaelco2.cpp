@@ -200,14 +200,13 @@ void gaelco2_state::maniacsq(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	gaelco_gae1_device &gaelco(GAELCO_GAE1(config, "gaelco", XTAL(30'000'000) / 30));
 	gaelco.set_device_rom_tag("gfx");
 	gaelco.set_bank_offsets(0 * 0x0080000, 1 * 0x0080000, 0, 0);
-	gaelco.add_route(0, "lspeaker", 1.0);
-	gaelco.add_route(1, "rspeaker", 1.0);
+	gaelco.add_route(0, "speaker", 1.0, 0);
+	gaelco.add_route(1, "speaker", 1.0, 1);
 }
 
 void gaelco2_state::maniacsq_d5002fp(machine_config &config)
@@ -484,15 +483,14 @@ void gaelco2_state::saltcrdi(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	// unused? ROMs contain no sound data
 	gaelco_gae1_device &gaelco(GAELCO_GAE1(config, "gaelco", XTAL(24'000'000) / 24)); // TODO : Correct OSC?
 	gaelco.set_device_rom_tag("gfx");
 	gaelco.set_bank_offsets(0 * 0x0080000, 1 * 0x0080000, 0, 0);
-	gaelco.add_route(0, "lspeaker", 1.0);
-	gaelco.add_route(1, "rspeaker", 1.0);
+	gaelco.add_route(0, "speaker", 1.0, 0);
+	gaelco.add_route(1, "speaker", 1.0, 1);
 }
 
 /*============================================================================
@@ -1038,14 +1036,13 @@ void gaelco2_state::play2000(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	gaelco_gae1_device &gaelco(GAELCO_GAE1(config, "gaelco", XTAL(34'000'000) / 34));
 	gaelco.set_device_rom_tag("gfx");
 	gaelco.set_bank_offsets(0 * 0x080000, 0 * 0x080000, 0 * 0x080000, 0 * 0x080000);
-	gaelco.add_route(0, "lspeaker", 1.0);
-	gaelco.add_route(1, "rspeaker", 1.0);
+	gaelco.add_route(0, "speaker", 1.0, 0);
+	gaelco.add_route(1, "speaker", 1.0, 1);
 }
 
 void gaelco2_state::srollnd(machine_config& config)
@@ -1077,14 +1074,13 @@ void gaelco2_state::srollnd(machine_config& config)
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	gaelco_gae1_device &gaelco(GAELCO_GAE1(config, "gaelco", XTAL(34'000'000) / 34));
 	gaelco.set_device_rom_tag("gfx");
 	gaelco.set_bank_offsets(0 * 0x080000, 0 * 0x080000, 0 * 0x080000, 0 * 0x080000);
-	gaelco.add_route(0, "lspeaker", 1.0);
-	gaelco.add_route(1, "rspeaker", 1.0);
+	gaelco.add_route(0, "speaker", 1.0, 0);
+	gaelco.add_route(1, "speaker", 1.0, 1);
 }
 
 
@@ -1180,14 +1176,13 @@ void bang_state::bang(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(bang_state,gaelco2)
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	gaelco_cg1v_device &gaelco(GAELCO_CG1V(config, "gaelco", XTAL(30'000'000) / 30));
 	gaelco.set_device_rom_tag("gfx");
 	gaelco.set_bank_offsets(0 * 0x0200000, 1 * 0x0200000, 2 * 0x0200000, 3 * 0x0200000);
-	gaelco.add_route(0, "lspeaker", 1.0);
-	gaelco.add_route(1, "rspeaker", 1.0);
+	gaelco.add_route(0, "speaker", 1.0, 0);
+	gaelco.add_route(1, "speaker", 1.0, 1);
 }
 
 
@@ -1425,14 +1420,13 @@ void gaelco2_state::alighunt(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(gaelco2_state,gaelco2)
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	gaelco_gae1_device &gaelco(GAELCO_GAE1(config, "gaelco", XTAL(30'000'000) / 30));
 	gaelco.set_device_rom_tag("gfx");
 	gaelco.set_bank_offsets(0 * 0x0400000, 1 * 0x0400000, 2 * 0x0400000, 3 * 0x0400000);
-	gaelco.add_route(0, "lspeaker", 1.0);
-	gaelco.add_route(1, "rspeaker", 1.0);
+	gaelco.add_route(0, "speaker", 1.0, 0);
+	gaelco.add_route(1, "speaker", 1.0, 1);
 }
 
 void gaelco2_state::alighunt_d5002fp(machine_config &config)
@@ -1796,14 +1790,13 @@ void gaelco2_state::touchgo(machine_config &config)
 	// sound hardware
 	/* the chip is stereo, but the game sound is mono because the right channel
 	   output is for cabinet 1 and the left channel output is for cabinet 2 */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	gaelco_gae1_device &gaelco(GAELCO_GAE1(config, "gaelco", XTAL(40'000'000) / 40));
 	gaelco.set_device_rom_tag("gfx");
 	gaelco.set_bank_offsets(0 * 0x0400000, 1 * 0x0400000, 0, 0);
-	gaelco.add_route(0, "rspeaker", 1.0);
-	gaelco.add_route(1, "lspeaker", 1.0);
+	gaelco.add_route(0, "speaker", 1.0, 1);
+	gaelco.add_route(1, "speaker", 1.0, 0);
 }
 
 void gaelco2_state::touchgo_d5002fp(machine_config &config)
@@ -2095,14 +2088,13 @@ void snowboar_state::snowboar(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(snowboar_state,gaelco2)
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	gaelco_cg1v_device &gaelco(GAELCO_CG1V(config, "gaelco", XTAL(34'000'000) / 34));
 	gaelco.set_device_rom_tag("gfx");
 	gaelco.set_bank_offsets(0 * 0x0400000, 1 * 0x0400000, 0, 0);
-	gaelco.add_route(0, "lspeaker", 1.0);
-	gaelco.add_route(1, "rspeaker", 1.0);
+	gaelco.add_route(0, "speaker", 1.0, 0);
+	gaelco.add_route(1, "speaker", 1.0, 1);
 }
 
 void snowboar_state::maniacsqs(machine_config &config)
@@ -2139,14 +2131,13 @@ void snowboar_state::maniacsqs(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(snowboar_state,gaelco2)
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	gaelco_gae1_device &gaelco(GAELCO_GAE1(config, "gaelco", XTAL(30'000'000) / 30));
 	gaelco.set_device_rom_tag("gfx");
 	gaelco.set_bank_offsets(0 * 0x0080000, 1 * 0x0080000, 0, 0);
-	gaelco.add_route(0, "lspeaker", 1.0);
-	gaelco.add_route(1, "rspeaker", 1.0);
+	gaelco.add_route(0, "speaker", 1.0, 0);
+	gaelco.add_route(1, "speaker", 1.0, 1);
 }
 
 
@@ -2440,14 +2431,13 @@ void wrally2_state::wrally2(machine_config &config)
 	// sound hardware
 	/* the chip is stereo, but the game sound is mono because the right channel
 	   output is for cabinet 1 and the left channel output is for cabinet 2 */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	gaelco_gae1_device &gaelco(GAELCO_GAE1(config, "gaelco", XTAL(34'000'000) / 34));
 	gaelco.set_device_rom_tag("gfx");
 	gaelco.set_bank_offsets(0 * 0x0200000, 1 * 0x0200000, 0, 0);
-	gaelco.add_route(0, "rspeaker", 1.0);
-	gaelco.add_route(1, "lspeaker", 1.0);
+	gaelco.add_route(0, "speaker", 1.0, 1);
+	gaelco.add_route(1, "speaker", 1.0, 0);
 }
 
 /*

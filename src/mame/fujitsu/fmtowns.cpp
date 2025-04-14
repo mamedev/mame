@@ -2607,34 +2607,33 @@ void towns_state::towns_base(machine_config &config)
 	PALETTE(config, m_palette16[1]).set_entries(16);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym3438_device &fm(YM3438(config, "fm", 16000000 / 2)); // actual clock speed unknown
 	fm.irq_handler().set(FUNC(towns_state::towns_fm_irq));
-	fm.add_route(0, "lspeaker", 1.00);
-	fm.add_route(1, "rspeaker", 1.00);
+	fm.add_route(0, "speaker", 1.00, 0);
+	fm.add_route(1, "speaker", 1.00, 1);
 
 /*
     // Later model uses YMF276 for FM
     ymf276_device &fm(YMF276(config, "fm", 16000000 / 2)); // actual clock speed unknown
     fm.irq_handler().set(FUNC(towns_state::towns_fm_irq));
-    fm.add_route(0, "lspeaker", 1.00);
-    fm.add_route(1, "rspeaker", 1.00);
+    fm.add_route(0, "speaker", 1.00);
+    fm.add_route(1, "speaker", 1.00);
 */
 
 	rf5c68_device &pcm(RF5C68(config, "pcm", 16000000 / 2));  // actual clock speed unknown
 	pcm.set_end_callback(FUNC(towns_state::towns_pcm_irq));
 	pcm.set_addrmap(0, &towns_state::pcm_mem);
-	pcm.add_route(0, "lspeaker", 1.00);
-	pcm.add_route(1, "rspeaker", 1.00);
+	pcm.add_route(0, "speaker", 1.00, 0);
+	pcm.add_route(1, "speaker", 1.00, 1);
 
 	CDDA(config, m_cdda);
-	m_cdda->add_route(0, "lspeaker", 0.30);
-	m_cdda->add_route(1, "rspeaker", 0.30);
+	m_cdda->add_route(0, "speaker", 0.30, 0);
+	m_cdda->add_route(1, "speaker", 0.30, 1);
 	SPEAKER_SOUND(config, m_speaker);
-	m_speaker->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	m_speaker->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	m_speaker->add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
+	m_speaker->add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 
 	PIT8253(config, m_pit, 0);
 	m_pit->set_clk<0>(307200);

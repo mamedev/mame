@@ -27,7 +27,7 @@ DEFINE_DEVICE_TYPE(GCM394, sunplus_gcm394_device, "gcm394", "GeneralPlus GPL1625
 
 sunplus_gcm394_base_device::sunplus_gcm394_base_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock, address_map_constructor internal) :
 	unsp_20_device(mconfig, type, tag, owner, clock, internal),
-	device_mixer_interface(mconfig, *this, 2),
+	device_mixer_interface(mconfig, *this),
 	m_screen(*this, finder_base::DUMMY_TAG),
 	m_spg_video(*this, "spgvideo"),
 	m_spg_audio(*this, "spgaudio"),
@@ -1845,8 +1845,8 @@ void sunplus_gcm394_base_device::device_add_mconfig(machine_config &config)
 	m_spg_audio->write_irq_callback().set(FUNC(sunplus_gcm394_base_device::audioirq_w));
 	m_spg_audio->space_read_callback().set(FUNC(sunplus_gcm394_base_device::read_space));
 
-	m_spg_audio->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
-	m_spg_audio->add_route(1, *this, 1.0, AUTO_ALLOC_INPUT, 1);
+	m_spg_audio->add_route(0, *this, 1.0, 0);
+	m_spg_audio->add_route(1, *this, 1.0, 1);
 
 	GCM394_VIDEO(config, m_spg_video, DERIVED_CLOCK(1, 1), DEVICE_SELF, m_screen);
 	m_spg_video->write_video_irq_callback().set(FUNC(sunplus_gcm394_base_device::videoirq_w));

@@ -386,10 +386,6 @@ void okim6376_device::generate_adpcm(struct ADPCMVoice *voice, int16_t *buffer, 
 		voice->count = count;
 	}
 
-	/* fill the rest with silence */
-	while (samples--)
-		*buffer++ = 0;
-
 	if ((!voice->playing)&&(m_stage[channel]))//end of samples, load anything staged in
 	{
 		m_stage[channel] = 0;
@@ -581,14 +577,11 @@ void okim6376_device::write(uint8_t data)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void okim6376_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void okim6376_device::sound_stream_update(sound_stream &stream)
 {
-	outputs[0].fill(0);
-
 	for (int i = 0; i < OKIM6376_VOICES; i++)
 	{
 		struct ADPCMVoice *voice = &m_voice[i];
-		auto &buffer = outputs[0];
 		int16_t sample_data[MAX_SAMPLE_CHUNK];
 		if (i == 0) //channel 1 is the only channel to affect NAR
 		{
@@ -603,19 +596,16 @@ void okim6376_device::sound_stream_update(sound_stream &stream, std::vector<read
 		}
 
 		/* loop while we have samples remaining */
-		for (int sampindex = 0; sampindex < buffer.samples(); )
+		for (int sampindex = 0; sampindex < stream.samples(); )
 		{
-			int remaining = buffer.samples() - sampindex;
+			int remaining = stream.samples() - sampindex;
 			int samples = (remaining > MAX_SAMPLE_CHUNK) ? MAX_SAMPLE_CHUNK : remaining;
 
 			generate_adpcm(voice, sample_data, samples,i);
 			for (int samp = 0; samp < samples; samp++)
-				buffer.add_int(sampindex + samp, sample_data[samp], 32768);
+				stream.add_int(0, sampindex + samp, sample_data[samp], 32768);
 
 			sampindex += samples;
 		}
 	}
-
-	for (int i = 0; i < outputs[0].samples(); i++)
-		outputs[0].put(i, std::clamp(outputs[0].getraw(i), -1.0f, 1.0f));
 }

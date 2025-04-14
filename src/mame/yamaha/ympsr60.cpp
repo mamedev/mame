@@ -144,7 +144,10 @@ private:
 	void ppi_pc_w(u8 data);
 	void recalc_irqs();
 
-	attoseconds_t cv_handler(attotime const &curtime);
+	TIMER_CALLBACK_MEMBER(bbd_tick);
+	void bbd_setup_next_tick();
+
+	emu_timer *m_bbd_timer;
 
 	int m_acia_irq, m_ym_irq, m_drvif_irq, m_ym2154_irq;
 	u16 m_keyboard_select;
@@ -227,9 +230,15 @@ void psr60_state::ryp4_out_w(u8 data)
 	// modulation, which we simulate in a periodic timer
 }
 
-attoseconds_t psr60_state::cv_handler(attotime const &cvtime)
+TIMER_CALLBACK_MEMBER(psr60_state::bbd_tick)
 {
-	attotime curtime = cvtime;
+	m_bbd->tick();
+	bbd_setup_next_tick();
+}
+
+void psr60_state::bbd_setup_next_tick()
+{
+	attotime curtime = machine().time();
 
 	// only two states have been observed to be measured: CT1=1/CT2=0 and CT1=0/CT2=1
 	double bbd_freq;
@@ -252,7 +261,7 @@ attoseconds_t psr60_state::cv_handler(attotime const &cvtime)
 	}
 
 	// BBD driver provides two out-of-phase clocks to basically run the BBD at 2x
-	return HZ_TO_ATTOSECONDS(bbd_freq * 2);
+	m_bbd_timer->adjust(attotime::from_ticks(1, bbd_freq * 2));
 }
 
 //
@@ -313,6 +322,8 @@ void psr60_state::recalc_irqs()
 
 void psr60_state::machine_start()
 {
+	m_bbd_timer = timer_alloc(FUNC(psr60_state::bbd_tick), this);
+
 	m_drvif_out.resolve();
 	m_rom2bank->configure_entries(0, 2, memregion("rom2")->base(), 0x4000);
 	m_rom2bank->set_entry(0);
@@ -324,6 +335,7 @@ void psr60_state::machine_start()
 
 void psr60_state::machine_reset()
 {
+	bbd_setup_next_tick();
 }
 
 #define DRVIF_PORT(num, sw1, sw2, sw3, sw4) \
@@ -628,14 +640,13 @@ void psr60_state::psr_common(machine_config &config)
 	clock_device &acia_clock(CLOCK(config, "acia_clock", 500_kHz_XTAL));    // 31250 * 16 = 500,000
 	acia_clock.signal_handler().set(FUNC(psr60_state::write_acia_clock));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	MIXER(config, m_lmixer);
-	m_lmixer->add_route(0, "lspeaker", 1.0);
+	m_lmixer->add_route(0, "speaker", 1.0, 0);
 
 	MIXER(config, m_rmixer);
-	m_rmixer->add_route(0, "rspeaker", 1.0);
+	m_rmixer->add_route(0, "speaker", 1.0, 1);
 
 	// begin BBD filter chain....
 	// thanks to Lord Nightmare for figuring this out
@@ -660,8 +671,7 @@ void psr60_state::psr_common(machine_config &config)
 	MIXER(config, m_bbd_mixer);
 	m_bbd_mixer->add_route(0, m_postbbd_rc, 1.0);
 
-	MN3204P(config, m_bbd, 50000);
-	m_bbd->set_cv_handler(FUNC(psr60_state::cv_handler));
+	MN3204P(config, m_bbd);
 	m_bbd->add_route(0, m_bbd_mixer, 0.5);
 	m_bbd->add_route(1, m_bbd_mixer, 0.5);
 

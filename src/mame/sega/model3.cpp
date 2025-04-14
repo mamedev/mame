@@ -6357,19 +6357,18 @@ void model3_state::add_base_devices(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	SCSP(config, m_scsp1, 45.1584_MHz_XTAL / 2); // 45.158 MHz XTAL
 	m_scsp1->set_addrmap(0, &model3_state::scsp1_map);
 	m_scsp1->irq_cb().set(FUNC(model3_state::scsp_irq));
-	m_scsp1->add_route(0, "lspeaker", 1.0);
-	m_scsp1->add_route(1, "rspeaker", 1.0);
+	m_scsp1->add_route(0, "speaker", 1.0, 0);
+	m_scsp1->add_route(1, "speaker", 1.0, 1);
 
 	scsp_device &scsp2(SCSP(config, "scsp2", 45.1584_MHz_XTAL / 2));
 	scsp2.set_addrmap(0, &model3_state::scsp2_map);
-	scsp2.add_route(0, "lspeaker", 1.0);
-	scsp2.add_route(1, "rspeaker", 1.0);
+	scsp2.add_route(0, "speaker", 1.0, 0);
+	scsp2.add_route(1, "speaker", 1.0, 1);
 
 	SEGA_BILLBOARD(config, m_billboard, 0);
 
@@ -6458,8 +6457,8 @@ void model3_state::scud(machine_config &config)
 	model3_15(config);
 
 	DSBZ80(config, m_dsbz80, 0);
-	m_dsbz80->add_route(0, "lspeaker", 1.0);
-	m_dsbz80->add_route(1, "rspeaker", 1.0);
+	m_dsbz80->add_route(0, "speaker", 1.0, 0);
+	m_dsbz80->add_route(1, "speaker", 1.0, 1);
 
 	I8251(config, m_uart, 8000000); // uPD71051
 	m_uart->txd_handler().set(m_dsbz80, FUNC(dsbz80_device::write_txd));

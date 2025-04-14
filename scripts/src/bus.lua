@@ -5859,3 +5859,17 @@ if (BUSES["AMIGA_CPUSLOT"]~=null) then
 		MAME_DIR .. "src/devices/bus/amiga/cpuslot/megamix500.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/bus/st/stcart.h,BUSES["STCART_CONNECTOR"] = true
+---------------------------------------------------
+
+if (BUSES["STCART_CONNECTOR"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/st/stcart.cpp",
+		MAME_DIR .. "src/devices/bus/st/stcart.h",
+		MAME_DIR .. "src/devices/bus/st/replay.cpp",
+		MAME_DIR .. "src/devices/bus/st/replay.h",
+	}
+end

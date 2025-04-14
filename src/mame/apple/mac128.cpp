@@ -1169,8 +1169,7 @@ void mac128_state::macplus(machine_config &config)
 	// SCSI bus and devices
 	// These machines were strictly external CD-ROMs so sound didn't route back into them; the AppleCD SC had
 	// RCA jacks for connection to speakers/a stereo.
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speakers", 2).front();
 
 	NSCSI_BUS(config, m_scsibus);
 	NSCSI_CONNECTOR(config, "scsi:0", mac_scsi_devices, nullptr);
@@ -1179,8 +1178,8 @@ void mac128_state::macplus(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
 		[](device_t *device)
 		{
-			device->subdevice<cdda_device>("cdda")->add_route(0, "^^lspeaker", 1.0);
-			device->subdevice<cdda_device>("cdda")->add_route(1, "^^rspeaker", 1.0);
+			device->subdevice<cdda_device>("cdda")->add_route(0, "^^speakers", 1.0, 0);
+			device->subdevice<cdda_device>("cdda")->add_route(1, "^^speakers", 1.0, 1);
 		});
 	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);

@@ -128,12 +128,11 @@ void korgz3_state::korgz3(machine_config &config)
 
 	M58990(config, m_adc, 1'000'000); // M58990P-1
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2414_device &ymsnd(YM2414(config, "ymsnd", 3'579'545)); // YM2414B
-	ymsnd.add_route(0, "lspeaker", 0.60);
-	ymsnd.add_route(1, "rspeaker", 0.60);
+	ymsnd.add_route(0, "speaker", 0.60, 0);
+	ymsnd.add_route(1, "speaker", 0.60, 1);
 }
 
 ROM_START(korgz3)

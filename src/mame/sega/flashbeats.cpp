@@ -143,14 +143,13 @@ void flashbeats_state::flashbeats(machine_config &config)
 	//te7752.out_port6_cb().set(FUNC(flashbeats_state::te7752_port6_w));
 	//te7752.out_port7_cb().set(FUNC(flashbeats_state::te7752_port7_w));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	SCSP(config, m_scsp, 22579200); // TODO : Unknown clock, divider
 	m_scsp->set_addrmap(0, &flashbeats_state::scsp_mem);
 	m_scsp->irq_cb().set(FUNC(flashbeats_state::scsp_irq));
-	m_scsp->add_route(0, "lspeaker", 1.0);
-	m_scsp->add_route(1, "rspeaker", 1.0);
+	m_scsp->add_route(0, "speaker", 1.0, 0);
+	m_scsp->add_route(1, "speaker", 1.0, 1);
 }
 
 void flashbeats_state::scsp_irq(offs_t offset, uint8_t data)

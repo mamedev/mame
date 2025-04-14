@@ -578,16 +578,15 @@ void koftball_state::koftball(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_koftball);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2413_device &ymsnd(YM2413(config, "ymsnd", 3.579545_MHz_XTAL));
-	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	ymsnd.add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
+	ymsnd.add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 
 	okim6295_device &oki(OKIM6295(config, "oki", 21.477272_MHz_XTAL / 22, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 verified for jxzh
-	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	oki.add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
+	oki.add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 }
 
 void koftball_state::jxzh(machine_config &config)

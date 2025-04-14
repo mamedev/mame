@@ -110,6 +110,14 @@ Network Devices
     Shows the Network Devices menu, where you can set up emulated network
     adapters that support bridging to a host network.  This item is not shown if
     there are no network adaptors that support bridging in the running system.
+Audio Mixer
+    Shows the :ref:`Audio Mixer <menus-audiomixer>` menu, where you
+    decide how to connect your system audio inputs and outputs to the
+    emulated system's microphones and speakers.
+Audio Effects
+    Shows the :ref:`Audio Effects <menus-audioeffects>` menu, which
+    allows to configure the audio effects applied between the emulated
+    system's speakers and the actual system audio outputs.
 Slider Controls
     Shows the Slider Controls menu, where you can adjust various settings,
     including video adjustments and individual sound channel levels.
@@ -285,3 +293,101 @@ graphical form below the menu.  Digital control states are either zero
 ID** to copy the device’s ID to the clipboard.  This is useful for setting up
 :ref:`stable controller IDs <devicemap>` in :ref:`controller configuration files
 <ctrlrcfg>`.
+
+
+.. _menus-audiomixer:
+
+Audio Mixer menu
+----------------
+
+The Audio Mixer menu allows to establish connections between emulated
+speakers and microphones, and system audio inputs and outputs.  It
+uses the standard up/down arrows to select a device and/or current
+mapping, left/right arrows to change a value (system audio port,
+level, channel...) and [ ] to change column.  In addition the (by
+default) F key adds a full mapping, C a channel mapping, and Delete
+clears a mapping.
+
+A full mapping sends all channels of a speaker to the appropriate(s)
+channel(s) of the system output, and similarly retrieves all channels
+of a microphone from the appropriate(s) input(s) of a system input.
+For instance a mono speaker will send audio to both channels of a
+stereo system output.
+
+A channel mapping maps between one channel of speaker or a microphone
+and one channel of a system input or output.  It can be a little
+tedious, but it allows for instance to take two mono speakers and turn
+it into the left and right channels of a system output, whcih is
+useful for some cabinets.
+
+Every mapping has a configurable volume associated.
+
+The mapping configuration is saved in the system cfg file.
+
+Some OSes propose an external interface to change mappings and volumes
+dynamically, for instance pipewire on linux.  Mame does its best to
+follow that and keep the information in the cfg file for future runs.
+
+
+.. _menus-audioeffects:
+
+Audio Effects menu
+------------------
+
+This menu allows to configure the audio effects that are applied to
+the speaker outputs between the speaker device and the audio mixer.
+In other words, the output channels as seen in the audio mixer are the
+outputs of the effect chains.  Each speaker has an independant effect
+chain applied.
+
+The chain itself is not configurable it is always in order:
+
+* Filter
+* Compressor
+* Reverb
+* EQ
+
+The parameters of each are fully configurable though.  A configured
+parameter shows as white, a default as grey, and Clear allows to go
+back to the default value.  The default parameters for the chain of a
+given speaker are the parameters of the Default chain, and the default
+parameters of the Default chain are fixed.  The default chain allows
+to create a global setup that one likes and have it applied everywhere
+by default.
+
+Filter effect
+~~~~~~~~~~~~~
+
+This effect proposes an order-2 high-pass and order-2 low-pass filter.
+The high-pass filter allows to remove the DC offset some emulated
+hardware has which can create saturation when not needed.  The
+low-pass filter (defaulting to off) allows to reproduce how muffled
+the sound of a number of cabinets and TVs were.
+
+The Q factor defines how sharp the transition is, the higher the
+sharper.  Over 0.7 the filter starts amplifying the frequencies arount
+the cutoff though, which can be surprising.
+
+
+Compression effect
+~~~~~~~~~~~~~~~~~~
+
+Not implemented yet.
+
+
+Reverb effect
+~~~~~~~~~~~~~
+
+Not implemented yet.
+
+
+EQ effect
+~~~~~~~~~
+
+The 5-band parametric equalizer allows to amplify or reduce certains
+bands of frequency in the spectrum.  The three middle filters, and
+also the extreme ones if configured as "Peak", change frequencies
+around the cutoff.  The Q factor selects the sharpness of the peak,
+the higher the sharper.  The extreme filters in "Shelf" mode move all
+the frequencies under (or over) the cutoff frequency.
+

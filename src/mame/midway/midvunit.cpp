@@ -1231,15 +1231,14 @@ void midvplus_state::midvplus(machine_config &config)
 	m_midway_ioasic->set_yearoffs(94);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DCS2_AUDIO_2115(config, m_dcs, 0);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(2);
 	m_dcs->set_polling_offset(0x3839);
-	m_dcs->add_route(0, "rspeaker", 1.0);
-	m_dcs->add_route(1, "lspeaker", 1.0);
+	m_dcs->add_route(0, "speaker", 1.0, 1);
+	m_dcs->add_route(1, "speaker", 1.0, 0);
 }
 
 

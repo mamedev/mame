@@ -1457,18 +1457,17 @@ void c65_state::c65(machine_config &config)
 
 	PALETTE(config, m_palette, FUNC(c65_state::palette_init), 0x100);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	// 8580 SID
 	MOS6581(config, m_sid[0], MAIN_C64_CLOCK);
 	//m_sid->potx().set(FUNC(c64_state::sid_potx_r));
 	//m_sid->poty().set(FUNC(c64_state::sid_poty_r));
-	m_sid[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	m_sid[0]->add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
 
 	MOS6581(config, m_sid[1], MAIN_C64_CLOCK);
 	//m_sid->potx().set(FUNC(c64_state::sid_potx_r));
 	//m_sid->poty().set(FUNC(c64_state::sid_poty_r));
-	m_sid[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	m_sid[1]->add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 
 	VCS_CONTROL_PORT(config, m_joy[0], vcs_control_port_devices, "joy");
 	//m_joy1->trigger_wr_callback().set(MOS6567_TAG, FUNC(mos6567_device::lp_w));

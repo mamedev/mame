@@ -730,8 +730,7 @@ void xavix2_state::config(machine_config &config)
 	m_screen->set_visarea(0, 639, 0, 399);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	// unknown sound hardware
 }

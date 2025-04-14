@@ -1811,3 +1811,15 @@ if (SOUNDS["MMC5"]~=null) then
 		MAME_DIR .. "src/devices/sound/mmc5.h",
 	}
 end
+
+---------------------------------------------------
+-- ADCs
+--@src/devices/sound/adc.h,SOUNDS["ADC"] = true
+---------------------------------------------------
+
+if (SOUNDS["ADC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/adc.cpp",
+		MAME_DIR .. "src/devices/sound/adc.h",
+	}
+end

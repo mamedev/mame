@@ -214,8 +214,8 @@ void qs300_state::qs300(machine_config &config)
 	m_subcpu->read_porta().set(FUNC(qs300_state::spa_r));
 
 	SWP00(config, m_swp00);
-	m_swp00->add_route(0, "lspeaker", 1.0);
-	m_swp00->add_route(1, "rspeaker", 1.0);
+	m_swp00->add_route(0, "speaker", 1.0, 0);
+	m_swp00->add_route(1, "speaker", 1.0, 1);
 
 	T6963C(config, m_lcdc, 270000);
 	m_lcdc->set_addrmap(0, &qs300_state::lcdmap);
@@ -233,8 +233,7 @@ void qs300_state::qs300(machine_config &config)
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_NONE);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	auto &mdin(MIDI_PORT(config, "mdin"));
 	midiin_slot(mdin);

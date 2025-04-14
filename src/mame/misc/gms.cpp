@@ -2274,16 +2274,15 @@ void gms_2layers_state::rbmk(machine_config &config)
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	OKIM6295(config, m_oki, 22_MHz_XTAL / 20, okim6295_device::PIN7_HIGH); // pin 7 not verified, but seems to match recordings
-	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 0.47);
-	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 0.47);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.47, 0);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.47, 1);
 
 	YM2151(config, m_ymsnd, 22_MHz_XTAL / 8);
-	m_ymsnd->add_route(0, "lspeaker", 0.60);
-	m_ymsnd->add_route(1, "rspeaker", 0.60);
+	m_ymsnd->add_route(0, "speaker", 0.60, 0);
+	m_ymsnd->add_route(1, "speaker", 0.60, 1);
 }
 
 void gms_2layers_state::rbspm(machine_config &config)
@@ -2305,8 +2304,8 @@ void gms_2layers_state::ssanguoj(machine_config &config)
 	config.device_remove("ymsnd");
 
 	ym3812_device &ym(YM3812(config, "ym3812", 22_MHz_XTAL / 8));
-	ym.add_route(0, "lspeaker", 0.60);
-	ym.add_route(1, "rspeaker", 0.60);
+	ym.add_route(0, "speaker", 0.60, 0);
+	ym.add_route(1, "speaker", 0.60, 1);
 }
 
 void gms_2layers_state::super555(machine_config &config)

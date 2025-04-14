@@ -551,12 +551,11 @@ void undrfire_state::undrfire(machine_config &config)
 	m_tc0480scp->set_offsets_tx(-1, 0);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	taito_en_device &taito_en(TAITO_EN(config, "taito_en", 0));
-	taito_en.add_route(0, "lspeaker", 1.0);
-	taito_en.add_route(1, "rspeaker", 1.0);
+	taito_en.add_route(0, "speaker", 1.0, 0);
+	taito_en.add_route(1, "speaker", 1.0, 1);
 }
 
 
@@ -616,12 +615,11 @@ void undrfire_state::cbombers(machine_config &config)
 	TC0360PRI(config, m_tc0360pri, 0);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	taito_en_device &taito_en(TAITO_EN(config, "taito_en", 0));
-	taito_en.add_route(0, "lspeaker", 1.0);
-	taito_en.add_route(1, "rspeaker", 1.0);
+	taito_en.add_route(0, "speaker", 1.0, 0);
+	taito_en.add_route(1, "speaker", 1.0, 1);
 }
 
 

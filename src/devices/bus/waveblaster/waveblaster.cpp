@@ -15,7 +15,7 @@ DEFINE_DEVICE_TYPE(WAVEBLASTER_CONNECTOR, waveblaster_connector, "waveblaster_co
 waveblaster_connector::waveblaster_connector(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, WAVEBLASTER_CONNECTOR, tag, owner, clock),
 	device_single_card_slot_interface<device_waveblaster_interface>(mconfig, *this),
-	device_mixer_interface(mconfig, *this, 2),
+	device_mixer_interface(mconfig, *this),
 	m_midi_tx(*this)
 {
 }

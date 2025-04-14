@@ -310,9 +310,9 @@ void scsp_device::rom_bank_pre_change()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void scsp_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void scsp_device::sound_stream_update(sound_stream &stream)
 {
-	DoMasterSamples(inputs, outputs);
+	DoMasterSamples(stream);
 }
 
 u8 scsp_device::DecodeSCI(u8 irq)
@@ -1264,12 +1264,9 @@ inline s32 scsp_device::UpdateSlot(SCSP_SLOT *slot)
 	return sample;
 }
 
-void scsp_device::DoMasterSamples(std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void scsp_device::DoMasterSamples(sound_stream &stream)
 {
-	auto &bufr = outputs[1];
-	auto &bufl = outputs[0];
-
-	for (int s = 0; s < bufl.samples(); ++s)
+	for (int s = 0; s < stream.samples(); ++s)
 	{
 		s32 smpl = 0, smpr = 0;
 
@@ -1325,7 +1322,7 @@ void scsp_device::DoMasterSamples(std::vector<read_stream_view> const &inputs, s
 			SCSP_SLOT *slot = m_Slots + i + 16; // 100217, 100237 EFSDL, EFPAN for EXTS0/1
 			if (EFSDL(slot))
 			{
-				m_DSP.EXTS[i] = s32(inputs[i].get(s) * 32768.0);
+				m_DSP.EXTS[i] = s32(stream.get(i, s) * 32768.0);
 				u16 Enc = ((EFPAN(slot)) << 0x8) | ((EFSDL(slot)) << 0xd);
 				smpl += (m_DSP.EXTS[i] * m_LPANTABLE[Enc]) >> SHIFT;
 				smpr += (m_DSP.EXTS[i] * m_RPANTABLE[Enc]) >> SHIFT;
@@ -1334,13 +1331,13 @@ void scsp_device::DoMasterSamples(std::vector<read_stream_view> const &inputs, s
 
 		if (DAC18B())
 		{
-			bufl.put_int_clamp(s, smpl, 131072);
-			bufr.put_int_clamp(s, smpr, 131072);
+			stream.put_int_clamp(0, s, smpl, 131072);
+			stream.put_int_clamp(1, s, smpr, 131072);
 		}
 		else
 		{
-			bufl.put_int_clamp(s, smpl >> 2, 32768);
-			bufr.put_int_clamp(s, smpr >> 2, 32768);
+			stream.put_int_clamp(0, s, smpl >> 2, 32768);
+			stream.put_int_clamp(1, s, smpr >> 2, 32768);
 		}
 	}
 }

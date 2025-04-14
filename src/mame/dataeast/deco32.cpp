@@ -1906,8 +1906,8 @@ void captaven_state::captaven(machine_config &config)
 
 	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL(32'220'000)/4/3));  // pin 10 is 32mhz/4, pin 14 is High so internal divisor is 3 (verified on pcb)
 	audiocpu.set_addrmap(AS_PROGRAM, &captaven_state::h6280_sound_map);
-	audiocpu.add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
-	audiocpu.add_route(ALL_OUTPUTS, "rspeaker", 0);
+	audiocpu.add_route(ALL_OUTPUTS, "speaker", 0, 0); // internal sound unused
+	audiocpu.add_route(ALL_OUTPUTS, "speaker", 0, 1);
 
 	INPUT_MERGER_ANY_HIGH(config, "irq_merger").output_handler().set_inputline(m_maincpu, ARM_IRQ_LINE);
 
@@ -1960,22 +1960,21 @@ void captaven_state::captaven(machine_config &config)
 	m_ioprot->soundlatch_irq_cb().set_inputline(m_audiocpu, 0);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	YM2151(config, m_ym2151, XTAL(32'220'000)/9); // verified on pcb
 	m_ym2151->irq_handler().set_inputline(m_audiocpu, 1);
 	m_ym2151->port_write_handler().set(FUNC(deco32_state::sound_bankswitch_w));
-	m_ym2151->add_route(0, "lspeaker", 0.42);
-	m_ym2151->add_route(1, "rspeaker", 0.42);
+	m_ym2151->add_route(0, "speaker", 0.42, 0);
+	m_ym2151->add_route(1, "speaker", 0.42, 1);
 
 	OKIM6295(config, m_oki[0], XTAL(32'220'000)/32, okim6295_device::PIN7_HIGH);  // verified on pcb; pin 7 is floating to 2.5V (left unconnected), so I presume High
-	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 	OKIM6295(config, m_oki[1], XTAL(32'220'000)/16, okim6295_device::PIN7_HIGH); // verified on pcb; pin 7 is floating to 2.5V (left unconnected), so I presume High
-	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.35);
-	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.35);
+	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.35, 0);
+	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.35, 1);
 }
 
 // DE-0380-2
@@ -1987,8 +1986,8 @@ void fghthist_state::fghthist(machine_config &config)
 
 	h6280_device &audiocpu(H6280(config, m_audiocpu, XTAL(32'220'000) / 8));
 	audiocpu.set_addrmap(AS_PROGRAM, &fghthist_state::h6280_sound_custom_latch_map);
-	audiocpu.add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
-	audiocpu.add_route(ALL_OUTPUTS, "rspeaker", 0);
+	audiocpu.add_route(ALL_OUTPUTS, "speaker", 0, 0); // internal sound unused
+	audiocpu.add_route(ALL_OUTPUTS, "speaker", 0, 1);
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
@@ -2036,8 +2035,7 @@ void fghthist_state::fghthist(machine_config &config)
 	m_ioprot->set_use_magic_read_address_xor(true);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
@@ -2045,16 +2043,16 @@ void fghthist_state::fghthist(machine_config &config)
 	YM2151(config, m_ym2151, 32220000/9);
 	m_ym2151->irq_handler().set_inputline(m_audiocpu, 1);
 	m_ym2151->port_write_handler().set(FUNC(deco32_state::sound_bankswitch_w));
-	m_ym2151->add_route(0, "lspeaker", 0.42);
-	m_ym2151->add_route(1, "rspeaker", 0.42);
+	m_ym2151->add_route(0, "speaker", 0.42, 0);
+	m_ym2151->add_route(1, "speaker", 0.42, 1);
 
 	OKIM6295(config, m_oki[0], 32220000/32, okim6295_device::PIN7_HIGH);
-	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 	OKIM6295(config, m_oki[1], 32220000/16, okim6295_device::PIN7_HIGH);
-	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.35);
-	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.35);
+	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.35, 0);
+	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.35, 1);
 }
 
 // DE-0395-1
@@ -2084,8 +2082,8 @@ void fghthist_state::fghthistu(machine_config &config)
 
 	m_ym2151->irq_handler().set("sound_irq_merger", FUNC(input_merger_any_high_device::in_w<1>));
 	m_ym2151->reset_routes();
-	m_ym2151->add_route(0, "lspeaker", 0.40);
-	m_ym2151->add_route(1, "rspeaker", 0.40);
+	m_ym2151->add_route(0, "speaker", 0.40, 0);
+	m_ym2151->add_route(1, "speaker", 0.40, 1);
 }
 
 // DE-0359-2 + Bottom board DE-0360-4
@@ -2097,8 +2095,8 @@ void dragngun_state::dragngun(machine_config &config)
 
 	h6280_device &audiocpu(H6280(config, m_audiocpu, 32220000/8));
 	audiocpu.set_addrmap(AS_PROGRAM, &dragngun_state::h6280_sound_map);
-	audiocpu.add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
-	audiocpu.add_route(ALL_OUTPUTS, "rspeaker", 0);
+	audiocpu.add_route(ALL_OUTPUTS, "speaker", 0, 0); // internal sound unused
+	audiocpu.add_route(ALL_OUTPUTS, "speaker", 0, 1);
 
 	INPUT_MERGER_ANY_HIGH(config, "irq_merger").output_handler().set_inputline("maincpu", ARM_IRQ_LINE);
 
@@ -2160,22 +2158,21 @@ void dragngun_state::dragngun(machine_config &config)
 	m_ioprot->set_interface_scramble_reverse();
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	YM2151(config, m_ym2151, 32220000/9);
 	m_ym2151->irq_handler().set_inputline(m_audiocpu, 1);
 	m_ym2151->port_write_handler().set(FUNC(deco32_state::sound_bankswitch_w));
-	m_ym2151->add_route(0, "lspeaker", 0.42);
-	m_ym2151->add_route(1, "rspeaker", 0.42);
+	m_ym2151->add_route(0, "speaker", 0.42, 0);
+	m_ym2151->add_route(1, "speaker", 0.42, 1);
 
 	OKIM6295(config, m_oki[0], 32220000/32, okim6295_device::PIN7_HIGH);
-	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 	OKIM6295(config, m_oki[1], 32220000/16, okim6295_device::PIN7_HIGH);
-	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.35);
-	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.35);
+	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.35, 0);
+	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.35, 1);
 
 	SPEAKER(config, "gun_speaker").front_center();
 
@@ -2294,22 +2291,21 @@ void dragngun_state::lockload(machine_config &config)
 	m_ioprot->set_interface_scramble_reverse();
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	YM2151(config, m_ym2151, 32220000/9);
 	m_ym2151->irq_handler().set("sound_irq_merger", FUNC(input_merger_any_high_device::in_w<1>));
 	m_ym2151->port_write_handler().set(FUNC(dragngun_state::lockload_okibank_lo_w));
-	m_ym2151->add_route(0, "lspeaker", 0.42);
-	m_ym2151->add_route(1, "rspeaker", 0.42);
+	m_ym2151->add_route(0, "speaker", 0.42, 0);
+	m_ym2151->add_route(1, "speaker", 0.42, 1);
 
 	OKIM6295(config, m_oki[0], 32220000/32, okim6295_device::PIN7_HIGH);
-	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 	OKIM6295(config, m_oki[1], 32220000/16, okim6295_device::PIN7_HIGH);
-	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.35);
-	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.35);
+	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.35, 0);
+	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.35, 1);
 
 	LC7535(config, m_vol_main);
 	m_vol_main->select().set_constant(1);
@@ -2371,12 +2367,11 @@ void tattass_state::tattass(machine_config &config)
 	m_ioprot->set_interface_scramble_interleave();
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DECOBSMT(config, m_decobsmt, 0);
-	m_decobsmt->add_route(0, "lspeaker", 1.0);
-	m_decobsmt->add_route(1, "rspeaker", 1.0);
+	m_decobsmt->add_route(0, "speaker", 1.0, 0);
+	m_decobsmt->add_route(1, "speaker", 1.0, 1);
 }
 
 void nslasher_state::nslasher(machine_config &config)
@@ -2442,22 +2437,21 @@ void nslasher_state::nslasher(machine_config &config)
 	m_ioprot->set_interface_scramble_interleave();
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	YM2151(config, m_ym2151, 32220000/9);
 	m_ym2151->irq_handler().set("sound_irq_merger", FUNC(input_merger_any_high_device::in_w<1>));
 	m_ym2151->port_write_handler().set(FUNC(deco32_state::sound_bankswitch_w));
-	m_ym2151->add_route(0, "lspeaker", 0.40);
-	m_ym2151->add_route(1, "rspeaker", 0.40);
+	m_ym2151->add_route(0, "speaker", 0.40, 0);
+	m_ym2151->add_route(1, "speaker", 0.40, 1);
 
 	OKIM6295(config, m_oki[0], 32220000/32, okim6295_device::PIN7_HIGH);
-	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.80);
-	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.80);
+	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 0.80, 0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 0.80, 1);
 
 	OKIM6295(config, m_oki[1], 32220000/16, okim6295_device::PIN7_HIGH);
-	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.10);
-	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.10);
+	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.10, 0);
+	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.10, 1);
 }
 
 // the US release uses a H6280 instead of a Z80, much like Lock 'n' Loaded
@@ -2468,8 +2462,8 @@ void nslasher_state::nslasheru(machine_config &config)
 
 	h6280_device &audiocpu(H6280(config, m_audiocpu, 32220000/8));
 	audiocpu.set_addrmap(AS_PROGRAM, &nslasher_state::h6280_sound_map);
-	audiocpu.add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
-	audiocpu.add_route(ALL_OUTPUTS, "rspeaker", 0);
+	audiocpu.add_route(ALL_OUTPUTS, "speaker", 0, 0); // internal sound unused
+	audiocpu.add_route(ALL_OUTPUTS, "speaker", 0, 1);
 
 	config.device_remove("sound_irq_merger");
 

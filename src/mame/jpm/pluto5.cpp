@@ -272,8 +272,7 @@ void pluto5_state::pluto5(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pluto5_state::pluto5_map);
 
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	// unknown sound
 }
 

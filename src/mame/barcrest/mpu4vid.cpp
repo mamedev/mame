@@ -2086,8 +2086,8 @@ void mpu4vid_state::mpu4_vid(machine_config &config)
 	AY8913(config, m_ay8913, MPU4_MASTER_CLOCK/4);
 	m_ay8913->set_flags(AY8910_SINGLE_OUTPUT);
 	m_ay8913->set_resistors_load(820, 0, 0);
-	m_ay8913->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_ay8913->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_ay8913->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	m_ay8913->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);               /* confirm */
 
@@ -2124,13 +2124,12 @@ void mpu4vid_state::mpu4_vid(machine_config &config)
 	m_ptm->o3_callback().set(FUNC(mpu4vid_state::vid_o3_callback));
 	m_ptm->irq_callback().set(FUNC(mpu4vid_state::cpu1_ptm_irq));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	/* Present on all video cards */
 	saa1099_device &saa(SAA1099(config, "saa", 8000000));
-	saa.add_route(0, "lspeaker", 0.5);
-	saa.add_route(1, "rspeaker", 0.5);
+	saa.add_route(0, "speaker", 0.5, 0);
+	saa.add_route(1, "speaker", 0.5, 1);
 
 	ACIA6850(config, m_acia_0, 0);
 	m_acia_0->txd_handler().set("acia6850_1", FUNC(acia6850_device::write_rxd));
@@ -2187,8 +2186,8 @@ void mpu4vid_state::vid_oki(machine_config &config)
 	//and all samples are adjusted to fit the different clock speed.
 
 	MPU4_OKI_SAMPLED_SOUND(config, m_okicard, VIDEO_MASTER_CLOCK/10);
-	m_okicard->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_okicard->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_okicard->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	m_okicard->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 	m_okicard->cb2_handler().set(FUNC(mpu4vid_state::pia_gb_cb2_w));
 

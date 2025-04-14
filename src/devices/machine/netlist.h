@@ -249,19 +249,20 @@ private:
 // ----------------------------------------------------------------------------------------
 // netlist_mame_sound_input_buffer
 //
-// This is a wrapper device to provide operator[] on read_stream_view.
+// This is a wrapper device to provide operator[] on an input stream.
 // ----------------------------------------------------------------------------------------
 
-class netlist_mame_sound_input_buffer : public read_stream_view
+class netlist_mame_sound_input_buffer
 {
 public:
-	netlist_mame_sound_input_buffer() :
-		read_stream_view() { }
+	sound_stream *m_stream = nullptr;
+	int m_stream_input = 0;
 
-	netlist_mame_sound_input_buffer(read_stream_view const &src) :
-		read_stream_view(src) { }
+	netlist_mame_sound_input_buffer() {}
 
-	stream_buffer::sample_t operator[](std::size_t index) { return get(index); }
+	netlist_mame_sound_input_buffer(sound_stream &stream, int input) : m_stream(&stream), m_stream_input(input) { }
+
+	sound_stream::sample_t operator[](std::size_t index) { return m_stream->get(m_stream_input, index); }
 };
 
 // ----------------------------------------------------------------------------------------
@@ -302,7 +303,7 @@ protected:
 	// device_t overrides
 	virtual void device_start() override ATTR_COLD;
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 	virtual void device_validity_check(validity_checker &valid) const override;
 	//virtual void device_reset() override ATTR_COLD;
 
@@ -634,7 +635,7 @@ public:
 		m_buffer.clear();
 	}
 
-	void sound_update_fill(write_stream_view &target);
+	void sound_update_fill(sound_stream &stream, int output);
 
 	void set_sample_time(netlist::netlist_time t) { m_sample_time = t; }
 
@@ -649,7 +650,7 @@ private:
 	uint32_t                     m_channel;
 	const char *                 m_out_name;
 
-	std::vector<stream_buffer::sample_t> m_buffer;
+	std::vector<sound_stream::sample_t> m_buffer;
 	double                       m_cur;
 
 	netlist::netlist_time        m_sample_time;

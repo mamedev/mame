@@ -1075,13 +1075,12 @@ void x68k_state::x68000_base(machine_config &config)
 	config.set_default_layout(layout_x68000);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	YM2151(config, m_ym2151, 16_MHz_XTAL / 4);
 	m_ym2151->irq_handler().set(FUNC(x68k_state::fm_irq));
 	m_ym2151->port_write_handler().set(FUNC(x68k_state::ct_w));  // CT1, CT2 from YM2151 port 0x1b
-	m_ym2151->add_route(0, "lspeaker", 0.50);
-	m_ym2151->add_route(1, "rspeaker", 0.50);
+	m_ym2151->add_route(0, "speaker", 0.50, 0);
+	m_ym2151->add_route(1, "speaker", 0.50, 1);
 
 	OKIM6258(config, m_okim6258, 16_MHz_XTAL / 4);
 	m_okim6258->set_start_div(okim6258_device::FOSC_DIV_BY_512);
@@ -1090,8 +1089,8 @@ void x68k_state::x68000_base(machine_config &config)
 	m_okim6258->add_route(ALL_OUTPUTS, "adpcm_outl", 0.50);
 	m_okim6258->add_route(ALL_OUTPUTS, "adpcm_outr", 0.50);
 
-	FILTER_VOLUME(config, m_adpcm_out[0]).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, m_adpcm_out[1]).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_VOLUME(config, m_adpcm_out[0]).add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_VOLUME(config, m_adpcm_out[1]).add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 	UPD72065(config, m_upd72065, 16_MHz_XTAL / 2, true, false); // clocked through SED9420CAC
 	m_upd72065->intrq_wr_callback().set(FUNC(x68k_state::ioc_irq<IOC_FDC_INT>));

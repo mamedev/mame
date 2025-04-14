@@ -1753,18 +1753,17 @@ void segaxbd_state::xboard_base_mconfig(machine_config &config)
 	SEGAIC16_ROAD(config, m_segaic16road, 0);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", SOUND_CLOCK/4));
 	ymsnd.irq_handler().set_inputline(m_soundcpu, 0);
-	ymsnd.add_route(0, "lspeaker", 0.43);
-	ymsnd.add_route(1, "rspeaker", 0.43);
+	ymsnd.add_route(0, "speaker", 0.43, 0);
+	ymsnd.add_route(1, "speaker", 0.43, 1);
 
 	segapcm_device &pcm(SEGAPCM(config, "pcm", SOUND_CLOCK/4));
 	pcm.set_bank(segapcm_device::BANK_512);
-	pcm.add_route(0, "lspeaker", 1.0);
-	pcm.add_route(1, "rspeaker", 1.0);
+	pcm.add_route(0, "speaker", 1.0, 0);
+	pcm.add_route(1, "speaker", 1.0, 1);
 }
 
 
@@ -1866,8 +1865,8 @@ void segaxbd_lastsurv_fd1094_state::device_add_mconfig(machine_config &config)
 
 	// sound hardware - ym2151 stereo is reversed
 	subdevice<ym2151_device>("ymsnd")->reset_routes();
-	subdevice<ym2151_device>("ymsnd")->add_route(0, "rspeaker", 0.43);
-	subdevice<ym2151_device>("ymsnd")->add_route(1, "lspeaker", 0.43);
+	subdevice<ym2151_device>("ymsnd")->add_route(0, "speaker", 0.43, 1);
+	subdevice<ym2151_device>("ymsnd")->add_route(1, "speaker", 0.43, 0);
 }
 
 void segaxbd_new_state::sega_lastsurv_fd1094(machine_config &config)
@@ -1895,8 +1894,8 @@ void segaxbd_lastsurv_state::device_add_mconfig(machine_config &config)
 
 	// sound hardware - ym2151 stereo is reversed
 	subdevice<ym2151_device>("ymsnd")->reset_routes();
-	subdevice<ym2151_device>("ymsnd")->add_route(0, "rspeaker", 0.43);
-	subdevice<ym2151_device>("ymsnd")->add_route(1, "lspeaker", 0.43);
+	subdevice<ym2151_device>("ymsnd")->add_route(0, "speaker", 0.43, 1);
+	subdevice<ym2151_device>("ymsnd")->add_route(1, "speaker", 0.43, 0);
 }
 
 void segaxbd_new_state::sega_lastsurv(machine_config &config)
@@ -2019,8 +2018,7 @@ void segaxbd_rascot_state::device_add_mconfig(machine_config &config)
 	config.device_remove("soundcpu");
 	config.device_remove("ymsnd");
 	config.device_remove("pcm");
-	config.device_remove("lspeaker");
-	config.device_remove("rspeaker");
+	config.device_remove("speaker");
 	m_cmptimer_1->zint_callback().set_nop();
 
 	cpu_device &commcpu(Z80(config, "commcpu", 8'000'000)); // clock unknown

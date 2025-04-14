@@ -1202,15 +1202,14 @@ void segaorun_state::outrun_base(machine_config &config)
 	SEGAIC16_ROAD(config, m_segaic16road, 0);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	YM2151(config, "ymsnd", SOUND_CLOCK/4).add_route(0, "lspeaker", 0.43).add_route(1, "rspeaker", 0.43);
+	YM2151(config, "ymsnd", SOUND_CLOCK/4).add_route(0, "speaker", 0.43, 0).add_route(1, "speaker", 0.43, 1);
 
 	segapcm_device &pcm(SEGAPCM(config, "pcm", SOUND_CLOCK/4));
 	pcm.set_bank(segapcm_device::BANK_512);
-	pcm.add_route(0, "lspeaker", 1.0);
-	pcm.add_route(1, "rspeaker", 1.0);
+	pcm.add_route(0, "speaker", 1.0, 0);
+	pcm.add_route(1, "speaker", 1.0, 1);
 }
 
 

@@ -1725,13 +1725,12 @@ void amiga_state::amiga_base(machine_config &config)
 	m_cia_1->pb_wr_callback().set(m_fdc, FUNC(paula_fdc_device::ciaaprb_w));
 
 	// audio
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	PAULA_8364(config, m_paula, amiga_state::CLK_C1_PAL);
-	m_paula->add_route(0, "lspeaker", 0.50);
-	m_paula->add_route(1, "rspeaker", 0.50);
-	m_paula->add_route(2, "rspeaker", 0.50);
-	m_paula->add_route(3, "lspeaker", 0.50);
+	m_paula->add_route(0, "speaker", 0.50, 0);
+	m_paula->add_route(1, "speaker", 0.50, 1);
+	m_paula->add_route(2, "speaker", 0.50, 1);
+	m_paula->add_route(3, "speaker", 0.50, 0);
 	m_paula->mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
 	m_paula->int_cb().set(FUNC(amiga_state::paula_int_w));
 
@@ -1979,8 +1978,8 @@ void cdtv_state::cdtv(machine_config &config)
 	m_tpi->out_pb_cb().set(FUNC(cdtv_state::tpi_portb_w));
 
 	CR511B(config, m_cdrom, 0);
-	m_cdrom->add_route(0, "lspeaker", 1.0);
-	m_cdrom->add_route(1, "rspeaker", 1.0);
+	m_cdrom->add_route(0, "speaker", 1.0, 0);
+	m_cdrom->add_route(1, "speaker", 1.0, 1);
 	m_cdrom->scor_cb().set(m_tpi, FUNC(tpi6525_device::i1_w)).invert();
 	m_cdrom->stch_cb().set(m_tpi, FUNC(tpi6525_device::i2_w)).invert();
 	m_cdrom->sten_cb().set(m_tpi, FUNC(tpi6525_device::i3_w));

@@ -421,13 +421,13 @@ void ics2115_device::ics2115_voice::update_ramp()
 	}
 }
 
-int ics2115_device::fill_output(ics2115_voice& voice, std::vector<write_stream_view> &outputs)
+int ics2115_device::fill_output(ics2115_voice& voice, sound_stream &stream)
 {
 	bool irq_invalid = false;
 	const u16 fine = 1 << (3*(voice.vol.incr >> 6));
 	voice.vol.add = (voice.vol.incr & 0x3f)<< (10 - fine);
 
-	for (int i = 0; i < outputs[0].samples(); i++)
+	for (int i = 0; i < stream.samples(); i++)
 	{
 		constexpr int RAMP_SHIFT = 6;
 		const u32 volacc = (voice.vol.acc >> 14) & 0xfff;
@@ -448,8 +448,8 @@ int ics2115_device::fill_output(ics2115_voice& voice, std::vector<write_stream_v
 		//if (voice.playing())
 		if (!m_vmode || voice.playing())
 		{
-			outputs[0].add_int(i, (sample * vleft) >> (5 + volume_bits), 32768);
-			outputs[1].add_int(i, (sample * vright) >> (5 + volume_bits), 32768);
+			stream.add_int(0, i, (sample * vleft) >> (5 + volume_bits), 32768);
+			stream.add_int(1, i, (sample * vright) >> (5 + volume_bits), 32768);
 		}
 
 		voice.update_ramp();
@@ -464,11 +464,8 @@ int ics2115_device::fill_output(ics2115_voice& voice, std::vector<write_stream_v
 	return irq_invalid;
 }
 
-void ics2115_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void ics2115_device::sound_stream_update(sound_stream &stream)
 {
-	outputs[0].fill(0);
-	outputs[1].fill(0);
-
 	bool irq_invalid = false;
 	for (int osc = 0; osc <= m_active_osc; osc++)
 	{
@@ -485,7 +482,7 @@ void ics2115_device::sound_stream_update(sound_stream &stream, std::vector<read_
         logerror("[%06x=%04x]", curaddr, (s16)sample);
 #endif
 */
-		if (fill_output(voice, outputs))
+		if (fill_output(voice, stream))
 			irq_invalid = true;
 
 #ifdef ICS2115_DEBUG

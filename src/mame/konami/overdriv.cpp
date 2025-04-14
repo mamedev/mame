@@ -496,20 +496,19 @@ void overdriv_state::overdriv(machine_config &config)
 	m_k053252->set_offsets(13*8, 2*8);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 0.5).add_route(1, "rspeaker", 0.5);
+	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "speaker", 0.5, 0).add_route(1, "speaker", 0.5, 1);
 
 	k053260_device &k053260_1(K053260(config, "k053260_1", XTAL(3'579'545)));
 	k053260_1.set_device_rom_tag("k053260");
-	k053260_1.add_route(0, "lspeaker", 0.35);
-	k053260_1.add_route(1, "rspeaker", 0.35);
+	k053260_1.add_route(0, "speaker", 0.35, 0);
+	k053260_1.add_route(1, "speaker", 0.35, 1);
 
 	k053260_device &k053260_2(K053260(config, "k053260_2", XTAL(3'579'545)));
 	k053260_2.set_device_rom_tag("k053260");
-	k053260_2.add_route(0, "lspeaker", 0.35);
-	k053260_2.add_route(1, "rspeaker", 0.35);
+	k053260_2.add_route(0, "speaker", 0.35, 0);
+	k053260_2.add_route(1, "speaker", 0.35, 1);
 }
 
 

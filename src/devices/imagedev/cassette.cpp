@@ -448,33 +448,29 @@ std::string cassette_image_device::call_display()
 //  Cassette sound
 //-------------------------------------------------
 
-void cassette_image_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void cassette_image_device::sound_stream_update(sound_stream &stream)
 {
 	cassette_state state = get_state() & (CASSETTE_MASK_UISTATE | CASSETTE_MASK_MOTOR | CASSETTE_MASK_SPEAKER);
 
 	if (exists() && (state == (CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)))
 	{
+		int samples = stream.samples();
 		cassette_image *cassette = get_image();
 		double time_index = get_position();
-		double duration = ((double) outputs[0].samples()) / outputs[0].sample_rate();
+		double duration = ((double) samples) / stream.sample_rate();
 
-		if (m_samples.size() < outputs[0].samples())
-			m_samples.resize(outputs[0].samples());
+		if (m_samples.size() < samples)
+			m_samples.resize(samples);
 
 		const cassette_image::Info info = cassette->get_info();
-		for (int ch = 0; ch < outputs.size(); ch++)
+		for (int ch = 0; ch < stream.output_count(); ch++)
 		{
 			if (ch < info.channels)
-				cassette->get_samples(ch, time_index, duration, outputs[0].samples(), 2, &m_samples[0], cassette_image::WAVEFORM_16BIT);
+				cassette->get_samples(ch, time_index, duration, samples, 2, &m_samples[0], cassette_image::WAVEFORM_16BIT);
 			else
-				cassette->get_samples(0, time_index, duration, outputs[0].samples(), 2, &m_samples[0], cassette_image::WAVEFORM_16BIT);
-			for (int sampindex = 0; sampindex < outputs[ch].samples(); sampindex++)
-				outputs[ch].put_int(sampindex, m_samples[sampindex], 32768);
+				cassette->get_samples(0, time_index, duration, samples, 2, &m_samples[0], cassette_image::WAVEFORM_16BIT);
+			for (int sampindex = 0; sampindex < samples; sampindex++)
+				stream.put_int(ch, sampindex, m_samples[sampindex], 32768);
 		}
-	}
-	else
-	{
-		for (int ch = 0; ch < outputs.size(); ch++)
-			outputs[ch].fill(0);
 	}
 }

@@ -743,8 +743,7 @@ void gyruss_state::gyruss(machine_config &config)
 	PALETTE(config, m_palette, FUNC(gyruss_state::palette), 16*4+16*16, 32);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 	GENERIC_LATCH_8(config, "soundlatch2");
@@ -788,8 +787,8 @@ void gyruss_state::gyruss(machine_config &config)
 	ay5.add_route(2, "discrete", 1.0, 14);
 
 	DISCRETE(config, m_discrete, sound_discrete);
-	m_discrete->add_route(0, "rspeaker", 1.0);
-	m_discrete->add_route(1, "lspeaker", 1.0);
+	m_discrete->add_route(0, "speaker", 1.0, 1);
+	m_discrete->add_route(1, "speaker", 1.0, 0);
 }
 
 

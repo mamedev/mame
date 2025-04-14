@@ -214,7 +214,7 @@ void k007232_device::set_bank(int chan_a_bank, int chan_b_bank)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void k007232_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void k007232_device::sound_stream_update(sound_stream &stream)
 {
 	if (K007232_LOG_PCM)
 	{
@@ -240,7 +240,7 @@ void k007232_device::sound_stream_update(sound_stream &stream, std::vector<read_
 		}
 	}
 
-	for (int j = 0; j < outputs[0].samples(); j++)
+	for (int j = 0; j < stream.samples(); j++)
 	{
 		s32 lsum = 0, rsum = 0;
 		for (int i = 0; i < PCM_MAX; i++)
@@ -285,7 +285,7 @@ void k007232_device::sound_stream_update(sound_stream &stream, std::vector<read_
 				rsum += out * vol_b;
 			}
 		}
-		outputs[0].put_int(j, lsum, 32768);
-		outputs[1].put_int(j, rsum, 32768);
+		stream.put_int(0, j, lsum, 32768);
+		stream.put_int(1, j, rsum, 32768);
 	}
 }

@@ -7827,12 +7827,11 @@ void setaroul_state::setaroul(machine_config &config)
 	PALETTE(config, m_palette, FUNC(setaroul_state::setaroul_palette), 512);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	X1_010(config, m_x1snd, 16_MHz_XTAL);   // 16 MHz
-	m_x1snd->add_route(0, "lspeaker", 1.0);
-	m_x1snd->add_route(1, "rspeaker", 1.0);
+	m_x1snd->add_route(0, "speaker", 1.0, 0);
+	m_x1snd->add_route(1, "speaker", 1.0, 1);
 
 	// layout
 	config.set_default_layout(layout_setaroul);
@@ -7931,12 +7930,11 @@ void seta_state::extdwnhl(machine_config &config)
 	PALETTE(config, m_palette, FUNC(seta_state::zingzip_palette), 16*32 + 16*32 + 64*32*2, 0x600);    // sprites, layer2, layer1 - layer 1 gfx is 6 planes deep
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	X1_010(config, m_x1snd, 16000000);   // 16 MHz
-	m_x1snd->add_route(0, "lspeaker", 1.0);
-	m_x1snd->add_route(1, "rspeaker", 1.0);
+	m_x1snd->add_route(0, "speaker", 1.0, 0);
+	m_x1snd->add_route(1, "speaker", 1.0, 1);
 }
 
 
@@ -8186,12 +8184,11 @@ void seta_state::orbs(machine_config &config)
 	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	X1_010(config, m_x1snd, 14.318181_MHz_XTAL);   // 14.318180 MHz
-	m_x1snd->add_route(0, "lspeaker", 1.0);
-	m_x1snd->add_route(1, "rspeaker", 1.0);
+	m_x1snd->add_route(0, "speaker", 1.0, 0);
+	m_x1snd->add_route(1, "speaker", 1.0, 1);
 }
 
 
@@ -8225,12 +8222,11 @@ void keroppi_state::keroppi(machine_config &config)
 	PALETTE(config, m_palette).set_entries(512);    // sprites only
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	X1_010(config, m_x1snd, 14318180);   // 14.318180 MHz
-	m_x1snd->add_route(0, "lspeaker", 1.0);
-	m_x1snd->add_route(1, "rspeaker", 1.0);
+	m_x1snd->add_route(0, "speaker", 1.0, 0);
+	m_x1snd->add_route(1, "speaker", 1.0, 1);
 }
 
 
@@ -8510,12 +8506,11 @@ void seta_state::oisipuzl(machine_config &config)
 	set_tilemaps_flip(1); // flip is inverted for the tilemaps
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	X1_010(config, m_x1snd, 16000000);   // 16 MHz
-	m_x1snd->add_route(0, "lspeaker", 1.0);
-	m_x1snd->add_route(1, "rspeaker", 1.0);
+	m_x1snd->add_route(0, "speaker", 1.0, 0);
+	m_x1snd->add_route(1, "speaker", 1.0, 1);
 }
 
 
@@ -8557,12 +8552,11 @@ void seta_state::triplfun(machine_config &config)
 	set_tilemaps_flip(1); // flip is inverted for the tilemaps
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	okim6295_device &oki(OKIM6295(config, "oki", 792000, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
-	oki.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	oki.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	oki.add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	oki.add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 }
 
 
@@ -9126,12 +9120,11 @@ void jockeyc_state::jockeyc(machine_config &config)
 	PALETTE(config, m_palette, FUNC(seta_state::palette_init_RRRRRGGGGGBBBBB_proms), 512 * 1);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	X1_010(config, m_x1snd, 16000000);
-	m_x1snd->add_route(0, "lspeaker", 1.0);
-	m_x1snd->add_route(1, "rspeaker", 1.0);
+	m_x1snd->add_route(0, "speaker", 1.0, 0);
+	m_x1snd->add_route(1, "speaker", 1.0, 1);
 
 	// layout
 	config.set_default_layout(layout_jockeyc);

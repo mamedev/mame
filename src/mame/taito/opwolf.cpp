@@ -876,8 +876,7 @@ void opwolf_state::opwolf(machine_config &config)
 	m_pc090oj->set_colpri_callback(FUNC(opwolf_state::colpri_cb));
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 8_MHz_XTAL / 2)); /* 4 MHz */
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
@@ -902,8 +901,8 @@ void opwolf_state::opwolf(machine_config &config)
 	mixer.add_route(0, m_tc0060dca[1], 1.0, 1);
 
 	TC0060DCA(config, m_tc0060dca[1]);
-	m_tc0060dca[1]->add_route(0, "lspeaker", 1.0);
-	m_tc0060dca[1]->add_route(1, "rspeaker", 1.0);
+	m_tc0060dca[1]->add_route(0, "speaker", 1.0, 0);
+	m_tc0060dca[1]->add_route(1, "speaker", 1.0, 1);
 }
 
 void opwolf_state::opwolfp(machine_config &config)

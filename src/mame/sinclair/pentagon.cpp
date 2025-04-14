@@ -203,14 +203,13 @@ void pentagon_state::pentagon(machine_config &config)
 
 	BETA_DISK(config, m_beta, 0);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speakers", 2).front();
 
 	ay8912_device &ay8912(AY8912(config.replace(), "ay8912", 14_MHz_XTAL / 8));
-	ay8912.add_route(0, "lspeaker", 0.50);
-	ay8912.add_route(1, "lspeaker", 0.25);
-	ay8912.add_route(1, "rspeaker", 0.25);
-	ay8912.add_route(2, "rspeaker", 0.50);
+	ay8912.add_route(0, "speakers", 0.50, 0);
+	ay8912.add_route(1, "speakers", 0.25, 0);
+	ay8912.add_route(1, "speakers", 0.25, 1);
+	ay8912.add_route(2, "speakers", 0.50, 1);
 
 	config.device_remove("exp");
 

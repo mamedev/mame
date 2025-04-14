@@ -719,17 +719,16 @@ void roundup5_state::roundup5(machine_config &config)
 	m_palette->set_membits(8).set_endianness(ENDIANNESS_BIG);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	YM2151(config, m_ym2151, roundup5_state::CLOCK_1 / 4);
 	m_ym2151->irq_handler().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
-	m_ym2151->add_route(0, "lspeaker", 0.45);
-	m_ym2151->add_route(1, "rspeaker", 0.45);
+	m_ym2151->add_route(0, "speaker", 0.45, 0);
+	m_ym2151->add_route(1, "speaker", 0.45, 1);
 
 	OKIM6295(config, m_oki, roundup5_state::CLOCK_1 / 4 / 2, okim6295_device::PIN7_HIGH);
-	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 0.75);
-	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 0.75);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.75, 0);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.75, 1);
 }
 
 

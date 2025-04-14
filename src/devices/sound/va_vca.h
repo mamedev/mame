@@ -37,7 +37,7 @@ public:
 
 protected:
 	void device_start() override ATTR_COLD;
-	void sound_stream_update(sound_stream &stream, const std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs) override;
+	void sound_stream_update(sound_stream &stream) override;
 
 private:
 	float cv_to_gain(float cv) const;

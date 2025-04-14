@@ -212,7 +212,9 @@ void running_machine::start()
 	add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&running_machine::reset_all_devices, this));
 	add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&running_machine::stop_all_devices, this));
 	save().register_presave(save_prepost_delegate(FUNC(running_machine::presave_all_devices), this));
+	m_sound->before_devices_init();
 	start_all_devices();
+	m_sound->after_devices_init();
 	save().register_postload(save_prepost_delegate(FUNC(running_machine::postload_all_devices), this));
 
 	// save outputs created before start time
@@ -331,9 +333,12 @@ int running_machine::run(bool quiet)
 			// execute CPUs if not paused
 			if (!m_paused)
 				m_scheduler.timeslice();
-			// otherwise, just pump video updates through
+			// otherwise, just pump video updates and sound mapping updates through
 			else
+			{
 				m_video->frame_update();
+				sound().mapping_update();
+			}
 
 			// handle save/load
 			if (m_saveload_schedule != saveload_schedule::NONE)

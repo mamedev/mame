@@ -4164,7 +4164,7 @@ class discrete_sound_output_interface
 public:
 	virtual ~discrete_sound_output_interface() { }
 
-	virtual void set_output_ptr(write_stream_view &view) = 0;
+	virtual void set_output_ptr(sound_stream &stream, int output) = 0;
 };
 
 //**************************************************************************
@@ -4305,7 +4305,7 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	typedef std::vector<discrete_dss_input_stream_node *> istream_node_list_t;

@@ -147,8 +147,7 @@ void belatra_state::belatra(machine_config &config)
 
 	// AT90S2313(config, "mcu", xxxx); // TODO: AVR 8-bit core, only the fairyl2 set has a dump
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	// unknown sound
 }
 

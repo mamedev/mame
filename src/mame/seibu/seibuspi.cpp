@@ -1793,17 +1793,16 @@ void seibuspi_state::spi(machine_config &config)
 	crtc.layer_scroll_callback().set(FUNC(seibuspi_state::scroll_w));
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ymf271_device &ymf(YMF271(config, "ymf", 16.9344_MHz_XTAL));
 	ymf.irq_handler().set(FUNC(seibuspi_state::ymf_irqhandler));
 	ymf.set_addrmap(0, &seibuspi_state::spi_ymf271_map);
 
-	ymf.add_route(0, "lspeaker", 1.0);
-	ymf.add_route(1, "rspeaker", 1.0);
-//  ymf.add_route(2, "lspeaker", 1.0); Output 2/3 not used?
-//  ymf.add_route(3, "rspeaker", 1.0);
+	ymf.add_route(0, "speaker", 1.0, 0);
+	ymf.add_route(1, "speaker", 1.0, 1);
+//  ymf.add_route(2, "speaker", 1.0); Output 2/3 not used?
+//  ymf.add_route(3, "speaker", 1.0);
 }
 
 void seibuspi_state::ejanhs(machine_config &config)
@@ -1848,8 +1847,7 @@ void seibuspi_state::sxx2e(machine_config &config)
 
 	/* sound hardware */
 	// Single PCBs only output mono sound, SXX2E : unverified
-	config.device_remove("lspeaker");
-	config.device_remove("rspeaker");
+	config.device_remove("speaker");
 	SPEAKER(config, "mono").front_center();
 
 	ymf271_device &ymf(YMF271(config.replace(), "ymf", 16.9344_MHz_XTAL));

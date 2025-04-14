@@ -509,19 +509,18 @@ void scorpion_state::scorpion(machine_config &config)
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_scorpion);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker2", 2).front();
 
 	AY8912(config, m_ay[0], 14_MHz_XTAL / 8) // BAC
-		.add_route(1, "lspeaker", 0.50)
-		.add_route(0, "lspeaker", 0.25)
-		.add_route(0, "rspeaker", 0.25)
-		.add_route(2, "rspeaker", 0.50);
+		.add_route(1, "speaker2", 0.50, 0)
+		.add_route(0, "speaker2", 0.25, 0)
+		.add_route(0, "speaker2", 0.25, 1)
+		.add_route(2, "speaker2", 0.50, 1);
 	AY8912(config, m_ay[1], 14_MHz_XTAL / 8)
-		.add_route(1, "lspeaker", 0.50)
-		.add_route(0, "lspeaker", 0.25)
-		.add_route(0, "rspeaker", 0.25)
-		.add_route(2, "rspeaker", 0.50);
+		.add_route(1, "speaker2", 0.50, 0)
+		.add_route(0, "speaker2", 0.25, 0)
+		.add_route(0, "speaker2", 0.25, 1)
+		.add_route(2, "speaker2", 0.50, 1);
 
 	BETA_DISK(config, m_beta, 0);
 

@@ -365,16 +365,14 @@ inline bool sn76496_base_device::in_noise_mode()
 	return ((m_register[6] & 4)!=0);
 }
 
-void sn76496_base_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void sn76496_base_device::sound_stream_update(sound_stream &stream)
 {
 	int i;
-	auto *lbuffer = &outputs[0];
-	auto *rbuffer = m_stereo ? &outputs[1] : nullptr;
 
 	int16_t out;
 	int16_t out2 = 0;
 
-	for (int sampindex = 0; sampindex < lbuffer->samples(); sampindex++)
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 	{
 		// clock chip once
 		if (m_current_clock > 0) // not ready for new divided clock
@@ -440,9 +438,9 @@ void sn76496_base_device::sound_stream_update(sound_stream &stream, std::vector<
 
 		if (m_negate) { out = -out; out2 = -out2; }
 
-		lbuffer->put_int(sampindex, out, 32768);
+		stream.put_int(0, sampindex, out, 32768);
 		if (m_stereo)
-			rbuffer->put_int(sampindex, out2, 32768);
+			stream.put_int(1, sampindex, out2, 32768);
 	}
 }
 

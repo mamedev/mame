@@ -3221,7 +3221,7 @@ void contcirc_state::contcirc(machine_config &config) //OSC: 26.686, 24.000, 16.
 	/* sound hardware */
 	SPEAKER(config, "front").front_center();
 	SPEAKER(config, "rear").rear_center();
-	SPEAKER(config, "subwoofer").set_position(0.0, 0.0, 0.0); // FIXME: where is this speaker located?
+	SPEAKER(config, "subwoofer").set_position(0, 0.0, 0.0, 0.0); // FIXME: where is this speaker located?
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(16'000'000)/2));    // 8 MHz
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
@@ -3280,7 +3280,7 @@ void chasehq_state::chasehq(machine_config &config) //OSC: 26.686, 24.000, 16.00
 	/* sound hardware */
 	SPEAKER(config, "front").front_center();
 	SPEAKER(config, "rear").rear_center();
-	SPEAKER(config, "subwoofer").set_position(0.0, 0.0, 0.0); // FIXME: where is this speaker located?
+	SPEAKER(config, "subwoofer").set_position(0, 0.0, 0.0, 0.0); // FIXME: where is this speaker located?
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(16'000'000)/2));    // 8 MHz
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
@@ -3340,22 +3340,21 @@ void contcirc_state::enforce(machine_config &config)
 	TC0110PCR(config, m_tc0110pcr, 0);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(16'000'000)/2));    // 8 MHz
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "lspeaker", 0.75);
-	ymsnd.add_route(0, "rspeaker", 0.75);
+	ymsnd.add_route(0, "speaker", 0.75, 0);
+	ymsnd.add_route(0, "speaker", 0.75, 1);
 	ymsnd.add_route(1, "2610.1.l", 20.0);
 	ymsnd.add_route(1, "2610.1.r", 20.0);
 	ymsnd.add_route(2, "2610.2.l", 20.0);
 	ymsnd.add_route(2, "2610.2.r", 20.0);
 
-	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 
 	TC0140SYT(config, m_tc0140syt, 0);
 	m_tc0140syt->nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
@@ -3396,22 +3395,21 @@ void taitoz_state::bshark_base(machine_config &config)
 	TC0150ROD(config, m_tc0150rod, 0);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16000000/2));
 	//ymsnd.irq_handler().set_inputline(m_audiocpu, 0); // DG: this is probably specific to Z80 and wrong?
-	ymsnd.add_route(0, "lspeaker", 0.75);
-	ymsnd.add_route(0, "rspeaker", 0.75);
+	ymsnd.add_route(0, "speaker", 0.75, 0);
+	ymsnd.add_route(0, "speaker", 0.75, 1);
 	ymsnd.add_route(1, "2610.1.l", 28.0);
 	ymsnd.add_route(1, "2610.1.r", 28.0);
 	ymsnd.add_route(2, "2610.2.l", 28.0);
 	ymsnd.add_route(2, "2610.2.r", 28.0);
 
-	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 }
 
 void taitoz_state::bshark(machine_config &config)
@@ -3471,22 +3469,21 @@ void sci_state::sci(machine_config &config)
 	TC0150ROD(config, m_tc0150rod, 0);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(32'000'000)/4));    // 8 MHz
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "lspeaker", 0.75);
-	ymsnd.add_route(0, "rspeaker", 0.75);
+	ymsnd.add_route(0, "speaker", 0.75, 0);
+	ymsnd.add_route(0, "speaker", 0.75, 1);
 	ymsnd.add_route(1, "2610.1.l", 2.0);
 	ymsnd.add_route(1, "2610.1.r", 2.0);
 	ymsnd.add_route(2, "2610.2.l", 2.0);
 	ymsnd.add_route(2, "2610.2.r", 2.0);
 
-	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 
 	TC0140SYT(config, m_tc0140syt, 0);
 	m_tc0140syt->nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
@@ -3542,7 +3539,7 @@ void nightstr_state::nightstr(machine_config &config) //OSC: 26.686, 24.000, 16.
 	/* sound hardware */
 	SPEAKER(config, "front").front_center();
 	SPEAKER(config, "rear").rear_center();
-	SPEAKER(config, "subwoofer").set_position(0.0, 0.0, 0.0); // FIXME: where is this located in the cabinet?
+	SPEAKER(config, "subwoofer").set_position(0, 0.0, 0.0, 0.0); // FIXME: where is this located in the cabinet?
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(16'000'000)/2));    // 8 MHz
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
@@ -3601,22 +3598,21 @@ void taitoz_z80_sound_state::aquajack(machine_config &config) //OSC: 26.686, 24.
 	TC0110PCR(config, m_tc0110pcr, 0);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(16'000'000)/2));    // 8 MHz
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "lspeaker", 0.75);
-	ymsnd.add_route(0, "rspeaker", 0.75);
+	ymsnd.add_route(0, "speaker", 0.75, 0);
+	ymsnd.add_route(0, "speaker", 0.75, 1);
 	ymsnd.add_route(1, "2610.1.l", 2.0);
 	ymsnd.add_route(1, "2610.1.r", 2.0);
 	ymsnd.add_route(2, "2610.2.l", 2.0);
 	ymsnd.add_route(2, "2610.2.r", 2.0);
 
-	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 
 	TC0140SYT(config, m_tc0140syt, 0);
 	m_tc0140syt->nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
@@ -3668,22 +3664,21 @@ void spacegun_state::spacegun(machine_config &config) //OSC: 26.686, 24.000, 16.
 	TC0110PCR(config, m_tc0110pcr, 0);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(16'000'000)/2));    // 8 MHz
 	//ymsnd.irq_handler().set_inputline(m_audiocpu, 0); // DG: this is probably specific to Z80 and wrong?
-	ymsnd.add_route(0, "lspeaker", 0.75);
-	ymsnd.add_route(0, "rspeaker", 0.75);
+	ymsnd.add_route(0, "speaker", 0.75, 0);
+	ymsnd.add_route(0, "speaker", 0.75, 1);
 	ymsnd.add_route(1, "2610.1.l", 8.0);
 	ymsnd.add_route(1, "2610.1.r", 8.0);
 	ymsnd.add_route(2, "2610.2.l", 8.0);
 	ymsnd.add_route(2, "2610.2.r", 8.0);
 
-	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 }
 
 void taitoz_z80_sound_state::dblaxle(machine_config &config)
@@ -3726,22 +3721,21 @@ void taitoz_z80_sound_state::dblaxle(machine_config &config)
 	TC0150ROD(config, m_tc0150rod, 0);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(32'000'000)/4));   // 8 MHz
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "lspeaker", 0.75);
-	ymsnd.add_route(0, "rspeaker", 0.75);
+	ymsnd.add_route(0, "speaker", 0.75, 0);
+	ymsnd.add_route(0, "speaker", 0.75, 1);
 	ymsnd.add_route(1, "2610.1.l", 8.0);
 	ymsnd.add_route(1, "2610.1.r", 8.0);
 	ymsnd.add_route(2, "2610.2.l", 8.0);
 	ymsnd.add_route(2, "2610.2.r", 8.0);
 
-	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 
 	TC0140SYT(config, m_tc0140syt, 0);
 	m_tc0140syt->nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
@@ -3787,22 +3781,21 @@ void sci_state::racingb(machine_config &config)
 	TC0150ROD(config, m_tc0150rod, 0);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(32'000'000)/4));   // 8 MHz
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "lspeaker", 0.75);
-	ymsnd.add_route(0, "rspeaker", 0.75);
+	ymsnd.add_route(0, "speaker", 0.75, 0);
+	ymsnd.add_route(0, "speaker", 0.75, 1);
 	ymsnd.add_route(1, "2610.1.l", 8.0);
 	ymsnd.add_route(1, "2610.1.r", 8.0);
 	ymsnd.add_route(2, "2610.2.l", 8.0);
 	ymsnd.add_route(2, "2610.2.r", 8.0);
 
-	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "rspeaker", 1.0);
-	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	FILTER_VOLUME(config, "2610.1.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	FILTER_VOLUME(config, "2610.1.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_VOLUME(config, "2610.2.r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	FILTER_VOLUME(config, "2610.2.l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 
 	TC0140SYT(config, m_tc0140syt, 0);
 	m_tc0140syt->nmi_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);

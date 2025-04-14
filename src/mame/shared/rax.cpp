@@ -494,7 +494,7 @@ DEFINE_DEVICE_TYPE(ACCLAIM_RAX, acclaim_rax_device, "rax_audio", "Acclaim RAX")
 
 acclaim_rax_device::acclaim_rax_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ACCLAIM_RAX, tag, owner, clock)
-	, device_mixer_interface(mconfig, *this, 2)
+	, device_mixer_interface(mconfig, *this)
 	, m_cpu(*this, "adsp")
 	, m_dmadac(*this, { "dacl", "dacr" })
 	, m_reg_timer(*this, "adsp_reg_timer")
@@ -527,9 +527,8 @@ void acclaim_rax_device::device_add_mconfig(machine_config &config)
 	GENERIC_LATCH_16(config, m_data_in);
 	GENERIC_LATCH_16(config, m_data_out);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	DMADAC(config, m_dmadac[0]).add_route(ALL_OUTPUTS, *this, 1.0, AUTO_ALLOC_INPUT, 0);
-	DMADAC(config, m_dmadac[1]).add_route(ALL_OUTPUTS, *this, 1.0, AUTO_ALLOC_INPUT, 1);
+	DMADAC(config, m_dmadac[0]).add_route(ALL_OUTPUTS, *this, 1.0, 0);
+	DMADAC(config, m_dmadac[1]).add_route(ALL_OUTPUTS, *this, 1.0, 1);
 }
