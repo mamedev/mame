@@ -53,15 +53,10 @@ private:
 	u8 m_montype;
 	bool m_monochrome;
 
-	u8 m_pseudovia_regs[256], m_pseudovia_ier, m_pseudovia_ifr;
 	u8 m_pal_address, m_pal_idx;
 	u32 *m_ram_ptr;
 	u32 m_ram_size;
 	u8 m_video_config;
-
-	u8 pseudovia_r(offs_t offset);
-	void pseudovia_w(offs_t offset, u8 data);
-	void pseudovia_recalc_irqs();
 
 	u8 via2_video_config_r();
 	void via2_video_config_w(u8 data);
