@@ -656,7 +656,7 @@ void pc9801_state::pc9801_common_io(address_map &map)
 //  map.unmap_value_high();
 	map(0x0000, 0x001f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask16(0xff00);
 	map(0x0000, 0x001f).rw(FUNC(pc9801_state::pic_r), FUNC(pc9801_state::pic_w)).umask16(0x00ff); // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
-	map(0x0020, 0x002f).w(FUNC(pc9801_state::rtc_w)).umask16(0x00ff);
+	map(0x0020, 0x0020).w(FUNC(pc9801_state::rtc_w));
 	map(0x0030, 0x0037).rw(m_ppi_sys, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00);
 	map(0x0030, 0x0033).rw(m_sio_rs, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff); //i8251 RS232c / i8255 system port
 	map(0x0040, 0x0047).rw(m_ppi_prn, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
@@ -1248,47 +1248,23 @@ void pc9801vm_state::pc9801rs_io(address_map &map)
 	map(0xe0d0, 0xe0d3).r(FUNC(pc9801vm_state::midi_r));
 }
 
-// SDIP handling
-// TODO: move to device
-
-template<unsigned port> u8 pc9801us_state::sdip_r(offs_t offset)
-{
-	u8 sdip_offset = port + (m_sdip_bank * 12);
-
-	return m_sdip[sdip_offset];
-}
-
-template<unsigned port> void pc9801us_state::sdip_w(offs_t offset, u8 data)
-{
-	u8 sdip_offset = port + (m_sdip_bank * 12);
-
-	m_sdip[sdip_offset] = data;
-}
-
-void pc9801us_state::sdip_bank_w(offs_t offset, u8 data)
-{
-	// TODO: depending on model type this is hooked up differently
-	// (or be not hooked up at all like in 9801US case)
-	m_sdip_bank = (data & 0x40) >> 6;
-}
-
 void pc9801us_state::pc9801us_io(address_map &map)
 {
 	pc9801rs_io(map);
 	map(0x0430, 0x0433).rw(FUNC(pc9801us_state::ide_ctrl_r), FUNC(pc9801us_state::ide_ctrl_w)).umask16(0x00ff);
-	map(0x841e, 0x841e).rw(FUNC(pc9801us_state::sdip_r<0x0>), FUNC(pc9801us_state::sdip_w<0x0>));
-	map(0x851e, 0x851e).rw(FUNC(pc9801us_state::sdip_r<0x1>), FUNC(pc9801us_state::sdip_w<0x1>));
-	map(0x861e, 0x861e).rw(FUNC(pc9801us_state::sdip_r<0x2>), FUNC(pc9801us_state::sdip_w<0x2>));
-	map(0x871e, 0x871e).rw(FUNC(pc9801us_state::sdip_r<0x3>), FUNC(pc9801us_state::sdip_w<0x3>));
-	map(0x881e, 0x881e).rw(FUNC(pc9801us_state::sdip_r<0x4>), FUNC(pc9801us_state::sdip_w<0x4>));
-	map(0x891e, 0x891e).rw(FUNC(pc9801us_state::sdip_r<0x5>), FUNC(pc9801us_state::sdip_w<0x5>));
-	map(0x8a1e, 0x8a1e).rw(FUNC(pc9801us_state::sdip_r<0x6>), FUNC(pc9801us_state::sdip_w<0x6>));
-	map(0x8b1e, 0x8b1e).rw(FUNC(pc9801us_state::sdip_r<0x7>), FUNC(pc9801us_state::sdip_w<0x7>));
-	map(0x8c1e, 0x8c1e).rw(FUNC(pc9801us_state::sdip_r<0x8>), FUNC(pc9801us_state::sdip_w<0x8>));
-	map(0x8d1e, 0x8d1e).rw(FUNC(pc9801us_state::sdip_r<0x9>), FUNC(pc9801us_state::sdip_w<0x9>));
-	map(0x8e1e, 0x8e1e).rw(FUNC(pc9801us_state::sdip_r<0xa>), FUNC(pc9801us_state::sdip_w<0xa>));
-	map(0x8f1e, 0x8f1e).rw(FUNC(pc9801us_state::sdip_r<0xb>), FUNC(pc9801us_state::sdip_w<0xb>));
-	map(0x8f1f, 0x8f1f).w(FUNC(pc9801us_state::sdip_bank_w));
+	map(0x841e, 0x841e).rw(m_sdip, FUNC(pc98_sdip_device::read<0x0>), FUNC(pc98_sdip_device::write<0x0>));
+	map(0x851e, 0x851e).rw(m_sdip, FUNC(pc98_sdip_device::read<0x1>), FUNC(pc98_sdip_device::write<0x1>));
+	map(0x861e, 0x861e).rw(m_sdip, FUNC(pc98_sdip_device::read<0x2>), FUNC(pc98_sdip_device::write<0x2>));
+	map(0x871e, 0x871e).rw(m_sdip, FUNC(pc98_sdip_device::read<0x3>), FUNC(pc98_sdip_device::write<0x3>));
+	map(0x881e, 0x881e).rw(m_sdip, FUNC(pc98_sdip_device::read<0x4>), FUNC(pc98_sdip_device::write<0x4>));
+	map(0x891e, 0x891e).rw(m_sdip, FUNC(pc98_sdip_device::read<0x5>), FUNC(pc98_sdip_device::write<0x5>));
+	map(0x8a1e, 0x8a1e).rw(m_sdip, FUNC(pc98_sdip_device::read<0x6>), FUNC(pc98_sdip_device::write<0x6>));
+	map(0x8b1e, 0x8b1e).rw(m_sdip, FUNC(pc98_sdip_device::read<0x7>), FUNC(pc98_sdip_device::write<0x7>));
+	map(0x8c1e, 0x8c1e).rw(m_sdip, FUNC(pc98_sdip_device::read<0x8>), FUNC(pc98_sdip_device::write<0x8>));
+	map(0x8d1e, 0x8d1e).rw(m_sdip, FUNC(pc98_sdip_device::read<0x9>), FUNC(pc98_sdip_device::write<0x9>));
+	map(0x8e1e, 0x8e1e).rw(m_sdip, FUNC(pc98_sdip_device::read<0xa>), FUNC(pc98_sdip_device::write<0xa>));
+	map(0x8f1e, 0x8f1e).rw(m_sdip, FUNC(pc98_sdip_device::read<0xb>), FUNC(pc98_sdip_device::write<0xb>));
+	map(0x8f1f, 0x8f1f).w(m_sdip, FUNC(pc98_sdip_device::bank_w));
 }
 
 void pc9801bx_state::pc9801bx2_map(address_map &map)
@@ -2137,8 +2113,6 @@ MACHINE_START_MEMBER(pc9801vm_state,pc9801rs)
 MACHINE_START_MEMBER(pc9801us_state,pc9801us)
 {
 	MACHINE_START_CALL_MEMBER(pc9801rs);
-
-	save_pointer(NAME(m_sdip), 24);
 }
 
 MACHINE_START_MEMBER(pc9801bx_state,pc9801bx2)
@@ -2630,6 +2604,8 @@ void pc9801us_state::pc9801us(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	config_floppy_35hd(config);
+
+	PC98_SDIP(config, "sdip", 0);
 }
 
 void pc9801us_state::pc9801fs(machine_config &config)
@@ -2641,13 +2617,14 @@ void pc9801us_state::pc9801fs(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pc9801us_state::pc9801us_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-
 	// optional 3'5 floppies x2
 	config_floppy_525hd(config);
 
 	// optional SCSI HDD
 
 	pit_clock_config(config, xtal / 4);
+
+	PC98_SDIP(config, "sdip", 0);
 }
 
 void pc9801bx_state::pc9801bx2(machine_config &config)
@@ -2663,6 +2640,8 @@ void pc9801bx_state::pc9801bx2(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801bx_state, pc9801bx2)
 
 	pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST, /4 ~ /7
+
+	PC98_SDIP(config, "sdip", 0);
 
 	// minimum RAM: 1.8 / 3.6 MB (?)
 	// maximum RAM: 19.6 MB

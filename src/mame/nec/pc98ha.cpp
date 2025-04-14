@@ -150,7 +150,7 @@ void pc98lt_state::lt_io(address_map &map)
 {
 	map.unmap_value_high();
 //  map(0x0000, 0x001f) // PIC (bit 3 ON slave / master), V50 internal / <undefined>
-	map(0x0020, 0x002f).w(FUNC(pc98lt_state::rtc_w)).umask16(0x00ff);
+	map(0x0020, 0x0020).w(FUNC(pc98lt_state::rtc_w));
 	map(0x0030, 0x0037).rw(m_ppi_sys, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0xff00);
 	map(0x0030, 0x0033).rw(m_sio_rs, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff); //i8251 RS232c / i8255 system port
 	map(0x0040, 0x0047).rw(m_ppi_prn, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);

@@ -28,21 +28,7 @@ TODO:
 #include "pc98_kbd.h"
 #include "machine/keyboard.ipp"
 
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-// device type definition
 DEFINE_DEVICE_TYPE(PC98_KBD, pc98_kbd_device, "pc98_kbd", "NEC PC-98 Keyboard")
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  pc98_kbd_device - constructor
-//-------------------------------------------------
 
 pc98_kbd_device::pc98_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PC98_KBD, tag, owner, clock)
@@ -54,29 +40,16 @@ pc98_kbd_device::pc98_kbd_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-//-------------------------------------------------
-//  device_validity_check - perform validity checks
-//  on this device
-//-------------------------------------------------
-
 void pc98_kbd_device::device_validity_check(validity_checker &valid) const
 {
 }
 
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
 
 void pc98_kbd_device::device_start()
 {
 	// ...
 }
 
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
 
 void pc98_kbd_device::device_reset()
 {

@@ -1,10 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
-/***************************************************************************
-
-Template for skeleton device
-
-***************************************************************************/
 
 #ifndef MAME_NEC_PC98_MEMSW_H
 #define MAME_NEC_PC98_MEMSW_H
@@ -14,26 +9,14 @@ Template for skeleton device
 #include "machine/nvram.h"
 
 
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-
-
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-// ======================> pc98_memsw_device
-
 class pc98_memsw_device : public device_t,
-							public device_nvram_interface
+                          public device_nvram_interface
 {
 public:
 	pc98_memsw_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	uint8_t read(uint8_t offset);
-	void write(uint8_t offset, uint8_t data);
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
 
 protected:
 	virtual void device_start() override ATTR_COLD;

@@ -57,6 +57,7 @@
 #include "pc98_cd.h"
 #include "pc98_kbd.h"
 #include "pc98_memsw.h"
+#include "pc98_sdip.h"
 
 #include "bus/ata/atadev.h"
 #include "bus/ata/ataintf.h"
@@ -538,6 +539,7 @@ class pc9801us_state : public pc9801vm_state
 public:
 	pc9801us_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc9801vm_state(mconfig, type, tag)
+		, m_sdip(*this, "sdip")
 	{
 	}
 	void pc9801us(machine_config &config);
@@ -551,12 +553,7 @@ protected:
 
 	// SDIP, PC9801DA onward
 protected:
-	u8 m_sdip[24];
-private:
-	u8 m_sdip_bank;
-	template<unsigned port> u8 sdip_r(offs_t offset);
-	template<unsigned port> void sdip_w(offs_t offset, u8 data);
-	void sdip_bank_w(offs_t offset, u8 data);
+	required_device<pc98_sdip_device> m_sdip;
 };
 
 /**********************************************************

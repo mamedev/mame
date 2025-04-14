@@ -1,10 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
-/***************************************************************************
 
-    PC-9801 Keyboard simulation
-
-***************************************************************************/
 #ifndef MAME_NEC_PC98_KBD_H
 #define MAME_NEC_PC98_KBD_H
 

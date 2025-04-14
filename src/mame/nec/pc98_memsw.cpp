@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
-/***************************************************************************
+/**************************************************************************************************
 
     PC-9801 MEMSW interface
 
@@ -74,50 +74,26 @@
     - Is the mapping truly aligned to 2 bytes? Looks more like 4, needs real
       HW verification.
 
-***************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "pc98_memsw.h"
 
 #include "coreutil.h"
 
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-// device type definition
 DEFINE_DEVICE_TYPE(PC98_MEMSW, pc98_memsw_device, "pc98_memsw", "NEC PC-98 Memory Switch device")
 
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  pc98_memsw_device - constructor
-//-------------------------------------------------
-
 pc98_memsw_device::pc98_memsw_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PC98_MEMSW, tag, owner, clock),
-	device_nvram_interface(mconfig, *this)
+	: device_t(mconfig, PC98_MEMSW, tag, owner, clock)
+	, device_nvram_interface(mconfig, *this)
 {
 }
-
-
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
 
 void pc98_memsw_device::device_start()
 {
 	save_pointer(NAME(m_bram), m_bram_size);
 }
 
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
 
 void pc98_memsw_device::device_reset()
 {
@@ -154,16 +130,13 @@ bool pc98_memsw_device::nvram_write(util::write_stream &file)
 	return !err;
 }
 
-//**************************************************************************
-//  READ/WRITE HANDLERS
-//**************************************************************************
 
-uint8_t pc98_memsw_device::read(uint8_t offset)
+uint8_t pc98_memsw_device::read(offs_t offset)
 {
 	return m_bram[offset];
 }
 
-void pc98_memsw_device::write( uint8_t offset, uint8_t data )
+void pc98_memsw_device::write(offs_t offset, uint8_t data )
 {
 	m_bram[offset] = data;
 }

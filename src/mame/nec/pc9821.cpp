@@ -446,7 +446,13 @@ void pc9821_state::pc9821_io(address_map &map)
 	map(0x0000, 0x001f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask32(0xff00ff00);
 	map(0x0000, 0x001f).lr8(NAME([this] (offs_t o) { return BIT(o, 1) ? 0xff : pic_r(o); })).umask32(0x00ff00ff);
 	map(0x0000, 0x001f).w(FUNC(pc9821_state::pic_w)).umask32(0x00ff00ff);  // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
-	map(0x0020, 0x002f).w(FUNC(pc9821_state::rtc_w)).umask32(0x000000ff);
+	map(0x0020, 0x0020).w(FUNC(pc9821_state::rtc_w));
+	map(0x0022, 0x0022).lw8(NAME([this] (offs_t offset, u8 data) {
+		// TODO: r/w to both ports, superset of uPD4990A
+		// Reportedly buggy with DOS/Win95 off the bat, can use HRTIMER.SYS/BCKWHEAT.SYS as fallback
+		if (BIT(data, 4))
+			popmessage("rtc_w: extended uPD4993(A) mode enable %02x", data);
+	}));
 	map(0x0020, 0x002f).w(FUNC(pc9821_state::dmapg8_w)).umask32(0xff00ff00);
 	map(0x0030, 0x0037).rw(m_ppi_sys, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask32(0xff00ff00); //i8251 RS232c / i8255 system port
 	map(0x0040, 0x0047).rw(m_ppi_prn, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask32(0x00ff00ff);
@@ -497,7 +503,7 @@ void pc9821_state::pc9821_io(address_map &map)
 	map(0x0ca0, 0x0ca0).lr8(NAME([] () { return 0xff; })); // high reso detection
 //  map(0x0cc0, 0x0cc7) SCSI interface / <undefined>
 //  map(0x0cfc, 0x0cff) PCI bus
-	map(0x1e8c, 0x1e8f).noprw(); // IDE RAM switch
+	map(0x1e8c, 0x1e8f).noprw(); // TODO: IDE RAM switch
 	map(0x2ed0, 0x2edf).lr8(NAME([] (address_space &s, offs_t o, u8 mm) { return 0xff; })).umask32(0xffffffff); // unknown sound related
 	map(0x3fd8, 0x3fdf).r(m_pit, FUNC(pit8253_device::read)).umask16(0xff00);
 	map(0x3fd8, 0x3fdf).w(FUNC(pc9821_state::pit_latch_delay)).umask16(0xff00);
@@ -846,6 +852,8 @@ void pc9821_state::pc9821(machine_config &config)
 	PALETTE(config.replace(), m_palette, FUNC(pc9821_state::pc9801_palette), 16 + 16 + 256);
 
 //  m_hgdc[1]->set_display_pixels(FUNC(pc9821_state::pegc_display_pixels));
+
+	PC98_SDIP(config, "sdip", 0);
 }
 
 void pc9821_mate_a_state::pc9821as(machine_config &config)
@@ -1224,7 +1232,8 @@ ROM_END
 
 ROM_START( pc9821ce2 )
 	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "itf_ce2.rom",  0x10000, 0x008000, CRC(273e9e88) SHA1(9bca7d5116788776ed0f297bccb4dfc485379b41) )
+	// baddump: missing setup menu bank
+	ROM_LOAD( "itf_ce2.rom",  0x10000, 0x008000, BAD_DUMP CRC(273e9e88) SHA1(9bca7d5116788776ed0f297bccb4dfc485379b41) )
 	ROM_LOAD( "bios_ce2.rom", 0x18000, 0x018000, BAD_DUMP CRC(76affd90) SHA1(910fae6763c0cd59b3957b6cde479c72e21f33c1) )
 
 	ROM_REGION( 0x80000, "chargen", 0 )
