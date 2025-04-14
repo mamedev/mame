@@ -4633,9 +4633,9 @@ void drcbe_x86::op_rolins(Assembler &a, const instruction &inst)
 	// pick a target register for the general case
 	Gp const dstreg = dstp.select_register(ecx, shiftp, maskp);
 
-	// 32-bit form
 	if (inst.size() == 4)
 	{
+		// 32-bit form
 		emit_mov_r32_p32(a, eax, srcp);                                                 // mov   eax,srcp
 		shift_op_param(a, Inst::kIdRol, inst.size(), eax, shiftp,                                    // rol   eax,shiftp
 			[inst](Assembler &a, Operand const &dst, be_parameter const &src)
@@ -4662,10 +4662,9 @@ void drcbe_x86::op_rolins(Assembler &a, const instruction &inst)
 		if (inst.flags())
 			a.test(dstreg, dstreg);
 	}
-
-	// 64-bit form
 	else if (inst.size() == 8)
 	{
+		// 64-bit form
 		emit_mov_r64_p64(a, eax, edx, srcp);                                            // mov   edx:eax,srcp
 		emit_rol_r64_p64(a, eax, edx, shiftp, inst);                                    // rol   edx:eax,shiftp
 		if (maskp.is_immediate())
@@ -4697,9 +4696,15 @@ void drcbe_x86::op_rolins(Assembler &a, const instruction &inst)
 			a.not_(ecx);                                                                // not   ecx
 			if (dstp.is_int_register())
 			{
-				a.and_(Gpd(dstp.ireg()), ebx);                                          // and   dstp.lo,ebx
+				if (dstp.ireg() == Gp::kIdBx)
+					a.and_(ptr(esp, -8), ebx);                                          // and   dstp.lo,ebx
+				else
+					a.and_(Gpd(dstp.ireg()), ebx);                                      // and   dstp.lo,ebx
 				a.and_(MABS(m_reghi[dstp.ireg()]), ecx);                                // and   dstp.hi,ecx
-				a.or_(Gpd(dstp.ireg()), eax);                                           // or    dstp.lo,eax
+				if (dstp.ireg() == Gp::kIdBx)
+					a.or_(ptr(esp, -8), eax);                                           // or    dstp.lo,eax
+				else
+					a.or_(Gpd(dstp.ireg()), eax);                                       // or    dstp.lo,eax
 				a.or_(MABS(m_reghi[dstp.ireg()]), edx);                                 // or    dstp.hi,edx
 			}
 			else
@@ -4709,6 +4714,8 @@ void drcbe_x86::op_rolins(Assembler &a, const instruction &inst)
 				a.or_(MABS(dstp.memory(0)), eax);                                       // or    dstp.lo,eax
 				a.or_(MABS(dstp.memory(4)), edx);                                       // or    dstp.hi,edx
 			}
+
+			a.mov(ebx, ptr(esp, -8));                                                   // mov   ebx,[esp-8]
 
 			if (inst.flags())
 			{
@@ -4726,8 +4733,6 @@ void drcbe_x86::op_rolins(Assembler &a, const instruction &inst)
 
 				emit_combine_z_flags(a);
 			}
-
-			a.mov(ebx, ptr(esp, -8));                                                   // mov   ebx,[esp-8]
 		}
 	}
 }

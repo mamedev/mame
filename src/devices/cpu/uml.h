@@ -298,7 +298,7 @@ namespace uml
 		constexpr parameter(parameter const &param) : m_type(param.m_type), m_value(param.m_value) { }
 		constexpr parameter(u64 val) : m_type(PTYPE_IMMEDIATE), m_value(val) { }
 		parameter(operand_size size, memory_scale scale) : m_type(PTYPE_SIZE_SCALE), m_value((scale << 4) | size) { assert(size >= SIZE_BYTE && size <= SIZE_QWORD); assert(scale >= SCALE_x1 && scale <= SCALE_x8); }
-		parameter(operand_size size, memory_space space) : m_type(PTYPE_SIZE_SPACE), m_value((space << 4) | size) { assert(size >= SIZE_BYTE && size <= SIZE_QWORD); assert(space >= SPACE_PROGRAM && space <= SPACE_IO); }
+		parameter(operand_size size, memory_space space) : m_type(PTYPE_SIZE_SPACE), m_value((space << 4) | size) { assert(size >= SIZE_BYTE && size <= SIZE_QWORD); }
 		parameter(code_handle &handle) : m_type(PTYPE_CODE_HANDLE), m_value(reinterpret_cast<parameter_value>(&handle)) { }
 		constexpr parameter(code_label const &label) : m_type(PTYPE_CODE_LABEL), m_value(label) { }
 

@@ -2906,12 +2906,13 @@ void drcbe_arm64::op_carry(a64::Assembler &a, const uml::instruction &inst)
 	}
 	else
 	{
-		const a64::Gp shift = bitp.select_register(TEMP_REG2, inst.size());
+		const a64::Gp bitreg = bitp.select_register(TEMP_REG2, inst.size());
+		const a64::Gp shift = select_register(TEMP_REG2, inst.size());
 
-		mov_reg_param(a, inst.size(), shift, bitp);
+		mov_reg_param(a, inst.size(), bitreg, bitp);
 		mov_reg_param(a, inst.size(), src, srcp);
 
-		a.and_(shift, shift, inst.size() * 8 - 1);
+		a.and_(shift, bitreg, (inst.size() * 8) - 1);
 
 		// move carry bit to lsb
 		a.lsr(scratch, src, shift);
@@ -3135,44 +3136,11 @@ void drcbe_arm64::op_roland(a64::Assembler &a, const uml::instruction &inst)
 
 	const a64::Gp output = dstp.select_register(TEMP_REG1, inst.size());
 	const a64::Gp shift = shiftp.select_register(TEMP_REG2, inst.size());
-	const a64::Gp scratch = shiftp.select_register(FUNC_SCRATCH_REG, inst.size());
+	const a64::Gp scratch = select_register(FUNC_SCRATCH_REG, inst.size());
 	const uint64_t instbits = inst.size() * 8;
 
-	if (maskp.is_immediate() && maskp.is_immediate_value(0))
-	{
-		// A zero mask will always result in zero so optimize it out
-		const a64::Gp zero = select_register(a64::xzr, inst.size());
-
-		mov_param_reg(a, inst.size(), dstp, zero);
-
-		if (inst.flags())
-		{
-			a.tst(zero, zero);
-			m_carry_state = carry_state::POISON;
-		}
-
-		return;
-	}
-
 	bool optimized = false;
-	if (srcp.is_immediate() && shiftp.is_immediate() && maskp.is_immediate())
-	{
-		// Optimize all constant inputs into a single mov
-		uint64_t result = srcp.immediate();
-
-		if (shiftp.immediate() != 0)
-		{
-			if (inst.size() == 4)
-				result = rotl_32(result, shiftp.immediate());
-			else
-				result = rotl_64(result, shiftp.immediate());
-		}
-
-		a.mov(output, result & maskp.immediate());
-
-		optimized = true;
-	}
-	else if (maskp.is_immediate() && shiftp.is_immediate() && !maskp.is_immediate_value(util::make_bitmask<uint64_t>(instbits)))
+	if (maskp.is_immediate() && shiftp.is_immediate() && !maskp.is_immediate_value(util::make_bitmask<uint64_t>(instbits)))
 	{
 		// A mask of all 1s will be handled efficiently in the unoptimized path, so only optimize for the other cases if possible
 		const auto pop = population_count_64(maskp.immediate());
@@ -3284,20 +3252,6 @@ void drcbe_arm64::op_rolins(a64::Assembler &a, const uml::instruction &inst)
 
 	a64::Gp dst;
 
-	if (maskp.is_immediate() && maskp.is_immediate_value(0))
-	{
-		// A zero mask means no bits will be inserted so it can be optimized out
-		if (inst.flags())
-		{
-			dst = dstp.select_register(TEMP_REG2, inst.size());
-			mov_reg_param(a, inst.size(), dst, dstp);
-			a.tst(dst, dst);
-			m_carry_state = carry_state::POISON;
-		}
-
-		return;
-	}
-
 	bool can_use_dst_reg = dstp.is_int_register();
 	if (can_use_dst_reg && srcp.is_int_register())
 		can_use_dst_reg = srcp.ireg() != dstp.ireg();
@@ -3307,35 +3261,7 @@ void drcbe_arm64::op_rolins(a64::Assembler &a, const uml::instruction &inst)
 		can_use_dst_reg = shiftp.ireg() != dstp.ireg();
 
 	bool optimized = false;
-	if (srcp.is_immediate() && maskp.is_immediate() && shiftp.is_immediate() && maskp.is_immediate_value(util::make_bitmask<uint64_t>(instbits)))
-	{
-		dst = dstp.select_register(TEMP_REG2, inst.size());
-
-		uint64_t result = 0;
-		if (inst.size() == 4)
-			result = rotl_32(srcp.immediate(), shiftp.immediate());
-		else
-			result = rotl_64(srcp.immediate(), shiftp.immediate());
-
-		a.mov(dst, result);
-
-		optimized = true;
-	}
-	else if (maskp.is_immediate() && shiftp.is_immediate() && maskp.is_immediate_value(util::make_bitmask<uint64_t>(instbits)))
-	{
-		// a mask of all 1s means that the result of the rol will completely overwrite
-		// the output value, so just load the source value into the output register and rol on that
-		dst = dstp.select_register(TEMP_REG2, inst.size());
-		mov_reg_param(a, inst.size(), dst, srcp);
-
-		const auto shift = -int64_t(shiftp.immediate()) & (instbits - 1);
-
-		if (shift != 0)
-			a.ror(dst, dst, shift);
-
-		optimized = true;
-	}
-	else if (maskp.is_immediate() && shiftp.is_immediate())
+	if (maskp.is_immediate() && shiftp.is_immediate())
 	{
 		const auto pop = population_count_64(maskp.immediate());
 		const auto lz = count_leading_zeros_64(maskp.immediate()) & (instbits - 1);
@@ -3452,7 +3378,7 @@ void drcbe_arm64::op_rolins(a64::Assembler &a, const uml::instruction &inst)
 		else
 		{
 			const a64::Gp shift = shiftp.select_register(SCRATCH_REG2, inst.size());
-			const a64::Gp scratch2 = shiftp.select_register(FUNC_SCRATCH_REG, inst.size());
+			const a64::Gp scratch2 = select_register(FUNC_SCRATCH_REG, inst.size());
 			mov_reg_param(a, inst.size(), shift, shiftp);
 
 			a.mov(scratch, inst.size() * 8);
@@ -4087,6 +4013,12 @@ void drcbe_arm64::op_and(a64::Assembler &a, const uml::instruction &inst)
 	be_parameter src1p(*this, inst.param(1), PTYPE_MRI);
 	be_parameter src2p(*this, inst.param(2), PTYPE_MRI);
 
+	if (inst.param(0) == inst.param(2))
+	{
+		using std::swap;
+		swap(src1p, src2p);
+	}
+
 	const a64::Gp dst = dstp.select_register(TEMP_REG3, inst.size());
 	const a64::Gp src1 = src1p.select_register(dst, inst.size());
 
@@ -4194,6 +4126,12 @@ void drcbe_arm64::op_or(a64::Assembler &a, const uml::instruction &inst)
 	be_parameter src1p(*this, inst.param(1), PTYPE_MRI);
 	be_parameter src2p(*this, inst.param(2), PTYPE_MRI);
 
+	if (inst.param(0) == inst.param(2))
+	{
+		using std::swap;
+		swap(src1p, src2p);
+	}
+
 	const a64::Gp dst = dstp.select_register(TEMP_REG3, inst.size());
 	const a64::Gp src1 = src1p.select_register(dst, inst.size());
 
@@ -4234,6 +4172,12 @@ void drcbe_arm64::op_xor(a64::Assembler &a, const uml::instruction &inst)
 	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
 	be_parameter src1p(*this, inst.param(1), PTYPE_MRI);
 	be_parameter src2p(*this, inst.param(2), PTYPE_MRI);
+
+	if (inst.param(0) == inst.param(2))
+	{
+		using std::swap;
+		swap(src1p, src2p);
+	}
 
 	const a64::Gp dst = dstp.select_register(TEMP_REG3, inst.size());
 	const a64::Gp src1 = src1p.select_register(dst, inst.size());
