@@ -292,7 +292,6 @@ class OpcodeList:
         print("", file=f)
         print("const bool nomemrq_en = !m_nomreq_cb.isunset();", file=f)
         print("[[maybe_unused]] const bool refresh_en = !m_refresh_cb.isunset();", file=f)
-        print("const bool busack_en = !m_busack_cb.isunset();", file=f)
         print("", file=f)
         print("bool interrupted = true;", file=f)
         print("while (u8(m_ref) != 0x00) {", file=f)
