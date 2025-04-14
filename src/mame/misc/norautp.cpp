@@ -751,6 +751,26 @@
     ddellf97d, ddellf97e.
   - Hopper support for winbank88, nor6007a and nor6007b.
 
+  - Identified the unkljfpk set as Poker Plus 6 Cards.
+  - Added new set of Turbo Poker II as parent.
+  - Added new inputs, worked machine configs, and
+    buttons-lamps layouts for new games.
+  - Got rid of some now unnecessary driver inits
+  - Added another set of Turbo Poker II as first clone.
+  - Added support for special Turbo Poker II NVRAM.
+  - Created an extended memory map and respective machine config.
+  - Added support for enable/disable the NVRAM, required
+    by the Turbo Poker II MCU handling.
+  - Created a machine start to init all the necessary things.
+  - Added new sets: cgip30e, hilokimb, norautpb,
+    gtipokrb, pokplusa, pokplusb, tpoker2, & tpoker2a.
+  - More sets: krampcb2, krampcb5 (now working),
+    and krampcb3, krampcb4, krampcb6 (encrypted).
+  - Added the PLDs to the Turbo Poker II games as binaries.
+  - Unified the bipolar PROM palette size in 256 entries.
+  - Added more documentation, and ASCII PCB layouts.
+  - Added technical notes.
+
 
   TODO:
 
@@ -786,9 +806,9 @@
 #define DPHL_CPU_CLOCK          DPHL_MASTER_CLOCK / 9       // 2 MHz (from 8224)
 
 // Discrete Sound Input Nodes
-#define NORAUTP_SND_EN                  NODE_01
-#define NORAUTP_FREQ_DATA               NODE_02
-
+#define NORAUTP_SND_EN          NODE_01
+#define NORAUTP_FREQ_DATA       NODE_02
+#define TP_NVRAM_SIZE           0x800
 
 class norautp_state : public driver_device
 {
@@ -796,6 +816,7 @@ public:
 	norautp_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_nvram(*this, "nvram"),
 		m_ppi8255(*this, "ppi8255_%u", 0),
 		m_discrete(*this, "discrete"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -819,6 +840,7 @@ public:
 	void ssjkrpkr(machine_config &config);
 	void dphl(machine_config &config);
 	void dphla(machine_config &config);
+	void dphlxtnd(machine_config &config);
 	void drhl(machine_config &config);
 	void norautxp(machine_config &config);
 	void noraut3(machine_config &config);
@@ -826,12 +848,10 @@ public:
 	void cdrawpkr(machine_config &config);
 
 	void init_enc();
-	void init_deb();
 	void init_unka();
-	void init_gtipa();
 
 protected:
-	virtual void machine_start() override { m_lamps.resolve(); save_item(NAME(m_videoram));}
+	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
@@ -857,6 +877,7 @@ private:
 	void dphl_portmap(address_map &map) ATTR_COLD;
 	void dphla_portmap(address_map &map) ATTR_COLD;
 	void dphla_map(address_map &map) ATTR_COLD;
+	void dphlxtnd_map(address_map &map) ATTR_COLD;
 	void drhl_portmap(address_map &map) ATTR_COLD;
 	void dphltest_map(address_map &map) ATTR_COLD;
 	void drhl_map(address_map &map) ATTR_COLD;
@@ -873,9 +894,14 @@ private:
 	void norautxp_portmap(address_map &map) ATTR_COLD;
 	void nortest1_map(address_map &map) ATTR_COLD;
 	void ssjkrpkr_map(address_map &map) ATTR_COLD;
-
+	
+	uint8_t nvram_r(offs_t offset);
+	void nvram_w(offs_t offset, uint8_t data);
+	void nvunlock_w(offs_t offset, uint8_t data);
+	
 	std::unique_ptr<uint16_t[]> m_np_vram;
 	required_device<cpu_device> m_maincpu;
+	required_device<nvram_device> m_nvram;
 	required_device_array<i8255_device, 3> m_ppi8255;
 	required_device<discrete_sound_device> m_discrete;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -885,14 +911,27 @@ private:
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	output_finder<12> m_lamps;
 
+	std::unique_ptr<uint8_t[]> m_nvram8;
+	
 	bool m_display_line_control = false;
+	bool m_nvunlock = false;
+	uint8_t m_videoram[0x800] = {};
 	int m_vreg = 0;
 	int m_test3 = 1;
 	int m_test3b = 0;
 	int m_test_count = 0;
-	uint8_t m_videoram[0x800] = {};
+
 };
 
+
+void norautp_state::machine_start()
+{
+	m_lamps.resolve();
+	m_nvram8 = std::make_unique<uint8_t[]>(TP_NVRAM_SIZE);
+	m_nvram->set_base(m_nvram8.get(),TP_NVRAM_SIZE);
+	save_item(NAME(m_videoram));
+	save_item(NAME(m_nvunlock));
+}
 
 /*********************************************
 *               Video Hardware               *
@@ -900,7 +939,7 @@ private:
 
 void norautp_state::video_start()
 {
-	m_np_vram = make_unique_clear<uint16_t[]>(0x1000/2);
+	m_np_vram = make_unique_clear<uint16_t[]>(0x800);
 }
 
 uint32_t norautp_state::screen_update_norautp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -1121,7 +1160,7 @@ void norautp_state::ppi2_b_w(uint8_t data)
     -x-- ----  *
     x--- ----  *
 */
-	logerror("PPI2-B: pc:%04x - data:%02x\n", m_maincpu->pc(), data);
+	//logerror("PPI2-B: pc:%04x - data:%02x\n", m_maincpu->pc(), data);
 
 }
 
@@ -1174,6 +1213,38 @@ uint8_t norautp_state::test4_r()
 TIMER_DEVICE_CALLBACK_MEMBER(norautp_state::test_timer_cb)
 {
 	m_test_count++;
+}
+
+
+void norautp_state::nvunlock_w(offs_t offset, uint8_t data)
+{
+	logerror("I/O Port: unlock NVRAM (w) access\n");
+	m_nvunlock = true;
+}
+
+void norautp_state::nvram_w(offs_t offset, uint8_t data)
+{
+	if((offset >= 0x700) && (offset < 0x70a))
+	{
+		if(m_nvunlock)
+			m_nvram8[offset] = data;
+		else
+			logerror("nvram(w) locked: offs:%04x - data: %02x\n", offset, data);
+	}
+	else
+		m_nvram8[offset] = data;
+
+	m_nvram8[0x721] = 0x00;
+	m_nvram8[0x725] = 0x01;
+	if((offset == 0x724) && (data == 6))
+		m_nvram8[0x724] = 0xff;
+
+	m_nvunlock = false;
+}
+
+uint8_t norautp_state::nvram_r(offs_t offset)
+{
+	return m_nvram8[offset];
 }
 
 
@@ -1255,7 +1326,7 @@ void norautp_state::norautp_portmap(address_map &map)
 	map(0x60, 0x63).mirror(0x1c).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xa0, 0xa3).mirror(0x1c).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xc0, 0xc3).mirror(0x3c).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xef, 0xef).r(FUNC(norautp_state::test2_r));
+	map(0xef, 0xef).rw(FUNC(norautp_state::test2_r), FUNC(norautp_state::nvunlock_w));
 }
 
 /*
@@ -1351,6 +1422,12 @@ void norautp_state::dphla_map(address_map &map)
 	map(0x2000, 0x23ff).ram().share("nvram");
 }
 
+void norautp_state::dphlxtnd_map(address_map &map)
+{
+	map(0x0000, 0xbfff).rom();
+	map(0xc000, 0xc3ff).ram().share("nvram");  // should be 2x 0x100 segments (4x 2111)
+}
+
 void norautp_state::ssjkrpkr_map(address_map &map)
 {
 	map.global_mask(0x7fff);
@@ -1363,7 +1440,7 @@ void norautp_state::dphltest_map(address_map &map)
 //  map.global_mask(0x7fff); /* A15 not connected */
 	map(0x0000, 0x6fff).rom();
 	map(0x7000, 0x7fff).ram();
-	map(0x8000, 0x87ff).ram().share("nvram");
+	map(0x8000, 0x87ff).rw(FUNC(norautp_state::nvram_r), FUNC(norautp_state::nvram_w));
 }
 
 /*
@@ -2213,6 +2290,75 @@ static INPUT_PORTS_START( newhilop )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( tpoker2 )
+
+	PORT_INCLUDE( dphl )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )  PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "Coupon" )              PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unused ) )     PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Coin Type" )           PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(    0x04, "Nickle" )
+	PORT_DIPSETTING(    0x00, "Quarter" )
+	PORT_DIPNAME( 0x08, 0x08, "Ticket" )              PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPSETTING(    0x08, "10 Ticket" )
+	PORT_DIPSETTING(    0x00, "5 Ticket" )
+	PORT_DIPNAME( 0x10, 0x10, "Unknown Item 1" )      PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPSETTING(    0x00, "No Limit" )
+	PORT_DIPSETTING(    0x10, "1 per Game" )
+	PORT_DIPNAME( 0x20, 0x20, "Unknown Item 2" )      PORT_DIPLOCATION("DSW1:3")
+	PORT_DIPSETTING(    0x20, "DL-1275" )
+	PORT_DIPSETTING(    0x00, "DL-4-PS" )
+	PORT_DIPNAME( 0x40, 0x40, "Mode" )                PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPSETTING(    0x40, "Play Mode" )
+	PORT_DIPSETTING(    0x00, "Stats Mode" )
+	PORT_DIPNAME( 0x80, 0x80, "Setup" )               PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tpoker2a )
+
+	PORT_INCLUDE( dphl )
+
+//	PORT_MODIFY("IN0")  // in case of need ticket/hopper
+//	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )  PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )     PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unused ) )     PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Coin Type" )           PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(    0x04, "Nickle" )
+	PORT_DIPSETTING(    0x00, "Quarter" )
+	PORT_DIPNAME( 0x08, 0x08, "Bonus" )              PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Replays" )             PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "XCards" )              PORT_DIPLOCATION("DSW1:3")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Mode" )                PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPSETTING(    0x40, "Play Mode" )
+	PORT_DIPSETTING(    0x00, "Stats Mode" )
+	PORT_DIPNAME( 0x80, 0x80, "Setup" )               PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
 
 /*********************************************
 *              Graphics Layouts              *
@@ -2300,11 +2446,11 @@ DISCRETE_SOUND_END
 
 /***** Noraut Poker *****/
 
-/* Parts List - Resistors */
+// Parts List - Resistors
 #define NORAUTP_R1      RES_K(120)
 #define NORAUTP_R2      RES_K(2.2)
 
-/* Parts List - Capacitors */
+// Parts List - Capacitors
 #define NORAUTP_C1      CAP_U(.01)
 #define NORAUTP_C2      CAP_U(.022)
 #define NORAUTP_C3      CAP_U(.047)
@@ -2317,11 +2463,11 @@ NORAUTP_SOUND_CIRCUIT(norautp,
 
 /***** Draw Poker HI-LO *****/
 
-/* Parts List - Resistors */
+// Parts List - Resistors
 #define DPHL_R1     RES_K(120)
 #define DPHL_R2     RES_K(1)
 
-/* Parts List - Capacitors */
+// Parts List - Capacitors
 #define DPHL_C1     CAP_U(.01)
 #define DPHL_C2     CAP_U(.022)
 #define DPHL_C3     CAP_U(.05)
@@ -2334,11 +2480,11 @@ NORAUTP_SOUND_CIRCUIT(dphl,
 
 /***** Kimble Double HI-LO *****/
 
-/* Parts List - Resistors */
+// Parts List - Resistors
 #define KIMBLE_R1       RES_K(100)
 #define KIMBLE_R2       RES_K(1)
 
-/* Parts List - Capacitors */
+// Parts List - Capacitors
 #define KIMBLE_C1       CAP_U(.01)
 #define KIMBLE_C2       CAP_U(.022)
 #define KIMBLE_C3       CAP_U(.047)
@@ -2503,7 +2649,7 @@ void norautp_state::dphl(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
 	m_screen->set_screen_update(FUNC(norautp_state::screen_update_dphl));
 
-	PALETTE(config.replace(), "palette", FUNC(norautp_state::bp_based_palette), 512);
+	PALETTE(config.replace(), "palette", FUNC(norautp_state::bp_based_palette), 256);
 
 	TIMER(config, "test_timer").configure_periodic(FUNC(norautp_state::test_timer_cb), attotime::from_usec(100));
 
@@ -2539,6 +2685,27 @@ void norautp_state::dphla(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::dphla_map);
 	m_maincpu->set_addrmap(AS_IO, &norautp_state::dphla_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
+
+	// sound hardware
+	m_discrete->set_intf(dphl_discrete);
+}
+
+void norautp_state::dphlxtnd(machine_config &config)
+{
+	noraut_base(config);
+
+	// basic machine hardware
+	I8080(config.replace(), m_maincpu, DPHL_CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::dphlxtnd_map);
+	m_maincpu->set_addrmap(AS_IO, &norautp_state::dphl_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
+	m_screen->set_screen_update(FUNC(norautp_state::screen_update_dphl));
+
+	PALETTE(config.replace(), "palette", FUNC(norautp_state::bp_based_palette), 512);
+
+	TIMER(config, "test_timer").configure_periodic(FUNC(norautp_state::test_timer_cb), attotime::from_usec(100));
+
+	m_display_line_control = true;
 
 	// sound hardware
 	m_discrete->set_intf(dphl_discrete);
@@ -3433,6 +3600,24 @@ ROM_START( ndxron10 )
 ROM_END
 
 /*
+  CGI - Credit Poker, VERSION 30E,
+  EXTRA BONUS, 21/12/99 BY V.S. for CGI,
+  AddOn sub board, Change Gamble Card Always,
+  Random Raise/Ante, SWAP HOLD-Fixed,
+  Extra Bonus 7's and 9's for bet 5-9 pay 5-20,
+  for bet 10-maxbet pay 5-50,
+  Fixed Big Payout, GambleLimit
+
+*/
+ROM_START( cgip30e )
+	ROM_REGION( 0x10000, "maincpu", 0 )  // Program ROM is 0000-3fff, duplicated to fit the ROM size
+	ROM_LOAD( "u23.bin", 0x0000, 0x8000, CRC(bc31f0b5) SHA1(8b624f825e0def9a8a44dd88a7bfa34b48a29a43) )  // 1ST AND 2ND HALF IDENTICAL
+
+	ROM_REGION( 0x8000,  "gfx", 0 )
+	ROM_LOAD( "u1.bin",  0x0000, 0x8000, CRC(839884a3) SHA1(adb562f2b0e3e7a5c0bd9263141ee78434d00ff7) )
+ROM_END
+
+/*
 
   CGI - Credit Poker (v.30c, standard)
 
@@ -3687,6 +3872,17 @@ ROM_START( kimblz80 )
 	ROM_LOAD( "quiz_char_ii.bin", 0x0800, 0x0800, CRC(ad645a41) SHA1(a2c47f21609cda20a6cfee17a7bfd32fb2afd6fe) )
 ROM_END
 
+// Hi Lo Kimble, Z80 
+ROM_START( hilokimb )
+	ROM_REGION( 0x10000, "maincpu", 0 )  // not encrypted. extended addressing.
+	ROM_LOAD( "wolfie02_u11_2764.u11", 0x0000, 0x2000, CRC(ec26e205) SHA1(a778365a22c83d285c0896bab62bc04a718a5324) )
+	ROM_LOAD( "wolfie03_u16_2764.u16", 0x8000, 0x2000, CRC(15adf4a0) SHA1(66936151e71cfed73faeec5075eb99c19a871576) )
+
+	ROM_REGION( 0x1000, "gfx",0 )
+	ROM_LOAD( "5.bin", 0x0000, 0x1000, CRC(d94be899) SHA1(b7212162324fa2d67383a475052e3b351bb1af5f) )
+ROM_END
+
+
 /*
 
   PCB silkscreened PMA-32-C.
@@ -3884,6 +4080,17 @@ ROM_START( winbnk88 )
 
 	ROM_REGION( 0x1000, "gfx", 0 )
 	ROM_LOAD( "gu2732.bin",  0x0000, 0x1000, CRC(2f00ccae) SHA1(914967ee7f60158225defbece6d33d66f619f8e9) )
+ROM_END
+
+ROM_START( norautpb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "512.bin", 0x0000,  0x10000,   CRC(24d231b9) SHA1(838d9cbb6cec1132c3d7ab16c4ce5b20dc6f5d2b) )
+
+	ROM_REGION( 0x10000, "other", 0 )  // unknown... can't find relation.
+	ROM_LOAD( "72_percent_primer_8_4_2000.bin", 0x0000, 0x10000, CRC(b7c2e734) SHA1(3f79393c96b0c93e2629661a7796e01af8d4c6d6) )
+
+	ROM_REGION( 0x01000, "gfx", 0 )
+	ROM_LOAD( "32.bin", 0x00000, 0x1000, CRC(41112cd7) SHA1(62895300f3482f219acb3b30ddebd7f6c93ffc33) )
 ROM_END
 
 
@@ -4523,6 +4730,20 @@ ROM_START( gtipokra )
 	ROM_LOAD( "82s129an.u51", 0x0000, 0x0100, CRC(c64f5b20) SHA1(ffbd46c59516f2f69cceb0bf423c489bdbe5d46d) )
 ROM_END
 
+ROM_START( gtipokrb )  // cleco, maybe wrong palette, since is blue background
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "gtipokrb.u12", 0x0000, 0x1000, CRC(e78a10d7) SHA1(e0ac382b02a1fc490b5d08344a20f2eaa3899002) )
+	ROM_LOAD( "gtipokrb.u18", 0x1000, 0x1000, CRC(4c3c5b15) SHA1(0584c0a6b52465686967f98ea3bd86c22b5bd526) )
+
+	ROM_REGION( 0x1000, "gfx",0 )
+	ROM_LOAD( "gtipokrb.u31", 0x0000, 0x1000, CRC(47e63fd2) SHA1(27bd1af9c910afb4e9955842f781954d5e8785d4) )
+
+	ROM_REGION( 0x0100,  "proms", 0 )  // EPROM 27E256 from daaughterboard. High nibble is 0xF instead of 0
+	ROM_LOAD( "sub-pcb_w27e512_cleco.u51", 0x0000, 0x0100, CRC(b0594d12) SHA1(1640b2e6a3d5714158b5b5f7d63422ff12be1f96) )
+	ROM_IGNORE(                                    0xff00)
+ROM_END
+
+
 /*
 
   HI-LO Double Up Joker Poker
@@ -4723,8 +4944,54 @@ ROM_END
 
 /*
 
-  Turbo Poker 2 by Micro MFG.
-  ---------------------------
+  TURBO POKER 2 (100491-1)
+  1991 by MICRO MANUFACTURING.
+
+*/
+ROM_START(tpoker2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "turbo-2_u39-015_collins_101291.u39", 0x0000, 0x8000, CRC(35dac6e0) SHA1(01e73ac51b4a18f0ccc7964700cd1a7523f48b2b) )
+
+	ROM_REGION( 0x0800,  "mcu", 0 )  // 68705
+	ROM_LOAD( "tp2-01_u35-ic4_11067_032599.u35", 0x0000, 0x0800, NO_DUMP )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_LOAD( "turbo_poker_char_rom.u30", 0x0000, 0x1000, CRC(6df86e08) SHA1(a451f71db7b59500b99207234ef95793afc11f03) )
+
+	ROM_REGION( 0x0800,  "nvram", 0 )  // nvram
+	ROM_LOAD( "mk48z02.u44", 0x0000, 0x0800, CRC(fcb12763) SHA1(66a672c15db7f514d190f84fba023b2733d1f194) )
+
+	ROM_REGION( 0x0200,  "proms", 0 )
+	ROM_LOAD( "82s131n.u23", 0x0000, 0x0200, SHA1(77270591aeb3ed06f72897b8f57302502f752336) )
+
+	ROM_REGION( 0x02a1,  "plds", 0 )
+	ROM_LOAD( "pal12l6.u37",  0x0000, 0x0034, CRC(25651948) SHA1(62cd4d73c6ca8ea5d4beb9ae262d1383f8149462) )
+ROM_END
+
+
+// second set
+ROM_START(tpoker2a )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "turbo-2_u39-014_u5_ut81_051894.u39", 0x0000, 0x8000, CRC(543149fe) SHA1(beb61a27c2797341e23e020e754d63fde3b4fbb2) )
+
+	ROM_REGION( 0x0800,  "mcu", 0 )  // 68705
+	ROM_LOAD( "tp2_01_u35-ic4_10834_080494.u35", 0x0000, 0x0800, NO_DUMP )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_LOAD( "turbo_poker_char_rom.u30", 0x0000, 0x1000, CRC(6df86e08) SHA1(a451f71db7b59500b99207234ef95793afc11f03) )
+
+	ROM_REGION( 0x0200,  "proms", 0 )
+	ROM_LOAD( "82s131n.u23", 0x0000, 0x0200, SHA1(77270591aeb3ed06f72897b8f57302502f752336) )
+
+	ROM_REGION( 0x02a1,  "plds", 0 )
+	ROM_LOAD( "pal12l6.u37",  0x0000, 0x0034, CRC(25651948) SHA1(62cd4d73c6ca8ea5d4beb9ae262d1383f8149462) )
+ROM_END
+
+
+/*
+
+  Turbo Poker 2 (022190-1) by Micro MFG.
+  ------------------------------------
 
   Hardware Layout (Turbo Poker 2 by Micro MFG):
 
@@ -4754,16 +5021,14 @@ ROM_END
 
   .U38  8255     ; stickered  MICRO MANUFACTURING, INC.  DATE: 02-24-1994  SER# LKY-PCB-142728.
 
-  .U37  MMI PAL12L6-2  ; Blue dot on it. Saved in Jedec format.
+  .U37  MMI PAL12L6-2  ; Blue dot on it.
 
   .U44  DS1220AD-150   ; Dallas 2K x 8 CMOS nonvolatile SRAM.
 
   .U23  82S131         ; Bipolar PROM.
 
 
-
-        27256 @U39                               Estimated U35 pinouts
-
+        27256 @U39                                Estimated U35 pinouts
        .----------.                                   .----------.
   VPP -|01      28|- VCC                         GND -|01      28|- Pin 10 of U14 (7404)
   A12 -|02      27|- A14                         VCC -|02      27|- A7
@@ -4834,13 +5099,13 @@ ROM_END
   -------------------------
                           .---v---.
   GND --------------------|1     8|-----VCC
-                    N/C---|2 555 7|------------------------------------|---|1K Ohm|--- VCC
-  Volume Pot -------------|3     6|--------------------|--|100K Ohm|---|
+                    N/C---|2 555 7|------------------------------------+---|1K Ohm|--- VCC
+  Volume Pot -------------|3     6|--------------------+--|100K Ohm|---+
   Pin 10 U36 (8255)-------|4     5|---|0.1uF|---GND    |
-                          '-------'                    |-|0.01uF|---- GND
-                                                       |-|0.01uF|---- pin 12 U13 (KA2667)
-                                                       |-|0.022uF|--- pin 11 U13 (KA2667)
-                                                       |-|0.05uF|---- pin 10 U13 (KA2667)
+                          '-------'                    +-|0.01uF|---- GND
+                                                       +-|0.01uF|---- pin 12 U13 (KA2667)
+                                                       +-|0.022uF|--- pin 11 U13 (KA2667)
+                                                       +-|0.05uF|---- pin 10 U13 (KA2667)
   DIP Switches:
 
   DIP #1: SETUP      ON/OFF         ;"setup menu to change all the settings"
@@ -4854,24 +5119,24 @@ ROM_END
 
 */
 
-ROM_START( tpoker2 )
+ROM_START( tpoker2b )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "tp2.u39", 0x0000, 0x8000, CRC(543149fe) SHA1(beb61a27c2797341e23e020e754d63fde3b4fbb2) )
+	ROM_LOAD( "1993_micro_mfg_turbo-2_u39-014_us_utbk_022190.u39", 0x0000, 0x8000, CRC(543149fe) SHA1(beb61a27c2797341e23e020e754d63fde3b4fbb2) )
 
-	ROM_REGION( 0x0800,  "mcu", 0 ) /* 68705 */
-	ROM_LOAD( "tp2.u35", 0x0000, 0x0800, NO_DUMP )
+	ROM_REGION( 0x0800,  "mcu", 0 ) // 68705 MCU
+	ROM_LOAD( "1993_micro_mfg_tp2_01_u35_ic4_16228_022194.u35", 0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x1000,  "gfx", 0 )
-	ROM_LOAD( "tp2.u30", 0x0000, 0x1000, CRC(6df86e08) SHA1(a451f71db7b59500b99207234ef95793afc11f03) )
+	ROM_LOAD( "1993_micro_mfg_turbo_poker_char_rom.u30", 0x0000, 0x1000, CRC(6df86e08) SHA1(a451f71db7b59500b99207234ef95793afc11f03) )
 
-	ROM_REGION( 0x0800,  "other", 0 )
-	ROM_LOAD( "tp2.u44", 0x0000, 0x0800, CRC(6b5453b7) SHA1(6793952800de067fd76b889f4f7c62c8474b8c3a) )
+	ROM_REGION( 0x0800,  "nvram", 0 )  // DS1220AD-150 ; Dallas 2K x 8 CMOS nonvolatile SRAM
+	ROM_LOAD( "tpoker2a_nvram.bin", 0x0000, 0x0800, CRC(615f3888) SHA1(b7d5aeb1c52748061f8913571bc5ac3e839c3595) )
 
 	ROM_REGION( 0x0400,  "proms", 0 )
-	ROM_LOAD( "tp2.u23", 0x0000, 0x0400, CRC(0222124f) SHA1(5cd8d24ee8e6525a5f9e6a93fa8854f36f4319ee) )
+	ROM_LOAD( "tpoker2a_82s131.u23", 0x0000, 0x0400, CRC(0222124f) SHA1(5cd8d24ee8e6525a5f9e6a93fa8854f36f4319ee) )
 
 	ROM_REGION( 0x0034,  "plds", 0 )
-	ROM_LOAD( "tp2_pld.u37",  0x0000, 0x0034, CRC(25651948) SHA1(62cd4d73c6ca8ea5d4beb9ae262d1383f8149462) )
+	ROM_LOAD( "mmi_pal12l6-2_blue_dot.u37", 0x0000, 0x0034, CRC(25651948) SHA1(62cd4d73c6ca8ea5d4beb9ae262d1383f8149462) )
 ROM_END
 
 
@@ -4955,9 +5220,8 @@ ROM_START( sureshoto )
 	ROM_REGION( 0x1000,  "gfx", 0 )
 	ROM_LOAD( "u-31_ss.u31", 0x0000, 0x1000, CRC(7afa583e) SHA1(e897c6dbcc5452fdb99894203131886a529eed37) )
 
-	ROM_REGION( 0x0200,  "proms", 0 )
+	ROM_REGION( 0x0100,  "proms", 0 )
 	ROM_LOAD( "n82s129n_2",  0x0000, 0x0100, CRC(ee452994) SHA1(315913ce4a92fe0ea7b76e862507c933d6104616) )
-	ROM_LOAD( "n82s129n_1",  0x0100, 0x0100, CRC(812dc1f1) SHA1(b2af33ff36f2eca2f782bc2239bc9e54c2564f6a) )
 ROM_END
 
 /*
@@ -5010,18 +5274,408 @@ ROM_START( pkii_dm )
 ROM_END
 
 
-/****************************** Unknown Sets ********************************/
-
-ROM_START( unkljfpk ) // encrypted, has 'Copyright  1982, 1989 LJF Corporation' plaintext in ROM
+ROM_START( pokplus ) // encrypted, has 'Copyright  1982, 1989 LJF Corporation' plaintext in ROM
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "nickphan.u3", 0x0000, 0x8000, CRC(bb03826c) SHA1(249283427dcbfbd16d02cad8e5885e651085954f) )
 
-	ROM_REGION( 0x1000,  "gfx", 0 )
-	ROM_LOAD( "phan.u31", 0x0000, 0x1000, CRC(0501ac8f) SHA1(98154a049db2343a8ab12193ddf5c547590fc625) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_REGION( 0x1000,  "gfx", 0 ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "phan.u31", 0x0000, 0x1000, CRC(0501ac8f) SHA1(98154a049db2343a8ab12193ddf5c547590fc625) )
 
 	ROM_REGION( 0x0100,  "proms", 0 )
 	ROM_LOAD( "phanprom.pr", 0x0000, 0x0100, CRC(fc2aace1) SHA1(eba975274da310196db53f799112d8bbac1d0ca8) )
 ROM_END
+
+ROM_START( pokplusa ) // encrypted, has 'Copyright  1982, 1989 LJF Corporation' plaintext in ROM
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "u3_subpcb.u3", 0x0000, 0x8000, CRC(aaecf689) SHA1(fe6f9763365d82a59999a70aa1bfa533f980637c) )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )  // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "u-31_char_gen_revb_2732.u31", 0x0000, 0x1000, CRC(0501ac8f) SHA1(98154a049db2343a8ab12193ddf5c547590fc625) )
+
+	ROM_REGION( 0x0100,  "proms", 0 )
+	ROM_LOAD( "82s129.r13", 0x0000, 0x0100, CRC(fc2aace1) SHA1(eba975274da310196db53f799112d8bbac1d0ca8) )
+ROM_END
+
+ROM_START( pokplusb ) // encrypted, has 'Copyright  1982, 1989 LJF Corporation' plaintext in ROM
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "u3_subpcb.u3", 0x0000, 0x8000, CRC(fd3dddcc) SHA1(8024e4f2f4e72b8d554c34ea2a0f74ee84312f96) )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )  // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "u31_2732.u31", 0x0000, 0x1000, CRC(3cbdc7e0) SHA1(05ebefcd989e64e425b35b7bc23769214990d4d4) )
+
+	ROM_REGION( 0x0100,  "proms", 0 )
+	ROM_LOAD( "82s129.r13", 0x0000, 0x0100, CRC(ea2fa08e) SHA1(5ca2afcce9395a6421ab5ead02855583cb619328) )
+ROM_END
+
+
+/*
+   Hardware Layout (PCB2):
+
+  - CPU:             1x 8080
+  - RAM:             2x 2111A-2: Static Random Access Memory 256 x 4 bit.
+  - RAM:             1X 6116-3
+  - I/O:             3x 8255: Peripeheral Interface Adapter.
+  - Prg ROMs:        2x 2732: U12,U18: Eprom. 
+  - Gfx ROMs:        1x 2732: U31: Eprom.
+  - Sound:           Discrete.
+  - Crystal:         1x 18.000 MHz.
+  - PROM             1x 82S129: Bipolar PROM: U51.
+                     1x 3.6 Vcc Battery.
+
+  PCB/EPROM MARKINGS = NONE
+  U51 LABEL:98CC
+ 
+
+  PCB Layout (PCB2):                                                                       Edge Connector 36x2
+  .------------------------------------------------------------------------------------------------------------.
+  | .---------.                          .---------.  .---------.  .-----.       .........    .---------.      |
+  | |HCF4093BE|         NO IC            | 74174PC |  | 82S129N |  |NE555|       .........    |ULN2003A |      |
+  | '---------'                          '---------'  '---------'  '-----'      916C471X2PE   '---------'      |
+  |    U54               U53                 U52          U51        U50            U49          U48           |
+  |.--------------------.                                                                                      |
+  || 3.6v NI-CD BATTERY |                                                                                      |
+  |'--------------------'                                                                                      |
+  |.---------.        .---------.        .---------.               .---------.  .---------.   .---------.      |
+  ||CD4040BE |        | 74123PC |        | 74157PC |     NO IC     | 74161   |  |  7486   |   |ULN2003A |      |
+  |'---------'        '---------'        '---------'               '---------'  '---------'   '---------'      |
+  |    U47                U46                U45          U44          U43          U42           U41          |
+  |                                                                                                            |
+  |                                                                                                            | 36
+  |                .---------.           .---------.  MDP1601 471G .---------.                .---------.      '---.
+  |                |  7404   |           |SN74166J |   .........   | 74161N  |     NO IC      |ULN2003A |       ---|
+  |   NO IC        '---------'           '---------'   .........   '---------'                '---------'       ---|
+  |    U40             U39                   U38          U37          U36          U35           U34           ---|
+  |                                                                                         .----------------.  ---|
+  |                            .-------------.  .-.-.-.-.-.-.-.-.  .---------.  .---------. |      8255      |  ---|
+  |                            |    2732     |  |1|2|3|4|5|6|7|8|  | 74161   |  | 74157   | |                |  ---|
+  |                  NO IC     |             |  '-'-'-'-'-'-'-'-'  '---------'  '---------' '----------------'  ---|
+  |   NO IC                    '-------------'         U30             U29          U28            U27          ---|
+  |    U33            U32            U31            DIP SW x 8                                                  ---|
+  |                                                                                         .----------------.  ---|
+  |                                                                                         |      8255      |  ---|
+  | .---------.                    .---------.     .---------.     .---------.  .---------. |                |  ---|
+  | |  6116   |       NO IC        | 2111A-2 |     | 2111A-2 |     | 74161   |  | 74157   | '----------------'  ---|
+  | '---------'                    '---------'     '---------'     '---------'  '---------'        U20          ---|
+  |    U26             U25             U24             U23             U22          U21                         ---|
+  |                                                                                                             ---|
+  |               .--------------.     .----------------.                                                       ---|
+  |               |     2732     |     |      8255      |          .---------.  .---------.   MDP1601 471G      ---|
+  |   NO IC       |              |     |                |          | 74161   |  | 74157   |     .........       ---|
+  |               '--------------'     '----------------'          '---------'  '---------'     .........       ---|
+  |    U19              U18                   U17                      U16          U15            U14         .---'
+  |                                                                                                            | 01
+  |               .--------------.       .------------.     .---------.     .---------.      .---------.       |
+  |.---------.    |     2732     |       |    8228    |     | 74161N  |     |  7486   |      |  7404   |       |
+  ||74LS 541F|    |              |       |            |     '---------'     '---------'      '---------'       |
+  |'---------'    '--------------'       '------------'         U10             U9               U8            |
+  |    U13              U12                   U11           XTAL                                               |
+  |                                                        .----. 18Mhz                                        |
+  |.---------.    .--------------------.   .----------.    .---------.  .---------.  .---------.  .---------.  |
+  ||  7405   |    |        8080        |   |   74155  |    |  8224   |  | 74157   |  |  7411   |  |  7474   |  |
+  |'---------'    |                    |   '----------'    '---------'  '---------'  '---------'  '---------'  |
+  |    U7         '--------------------'        U5              U4           U3           U2           U1      |
+  |                        U6                                                                                  |
+  '------------------------------------------------------------------------------------------------------------'
+
+*/
+ROM_START( krampcb2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "prog2732.u12", 0x0000, 0x1000, CRC(de60748c) SHA1(b1e2690ba31e3e38fd0ec2504ee8fc562ab856bf) )
+	ROM_LOAD( "prog2732.u18", 0x1000, 0x1000, CRC(4559dd72) SHA1(2120bff08a125dcef01c0e133d52354d78802d15) )
+
+	ROM_REGION( 0x1000, "gfx",0 )
+	ROM_LOAD( "char2732.u31", 0x0000, 0x1000, CRC(4711c041) SHA1(41e458050ac56d05d15d3eb4b3c093fc5aa442eb) )
+
+	ROM_REGION( 0x0100,  "proms", 0 )
+	ROM_LOAD( "98cc.u51", 0x0000, 0x0100,     CRC(812dc1f1) SHA1(b2af33ff36f2eca2f782bc2239bc9e54c2564f6a) )
+ROM_END
+
+/*
+   Set similar to pkii_dm, but with different bipolar PROM,
+   and running in a different hardware.
+
+   Hardware Layout(PCB5) :
+
+  - CPU:             1x 8080
+  - RAM:             2x 2111A-2: Static Random Access Memory 256 x 4 bit.
+  - I/O:             3x 8255: Peripeheral Interface Adapter.
+  - Prg ROMs:        2x 2732: U12,U18: Eprom. 
+  - Gfx ROMs:        1x 2716: U31: Eprom.
+  - Sound:           Discrete.
+  - Crystal:         1x 18.000 MHz.
+  - PROM             1x 82S129: Bipolar PROM: U51.
+  -BATTERY ADDON PCB:
+   LABELED:NONE
+   BATTERY PCB CONTAINS:
+   1x CD4093
+   1x 3.6V NI-CD
+   1x CD4040
+   2x NEC D5101LC-1: 256x4 static CMOS RAM.                  
+
+
+  PCB MARKINGS Silkscreened: NONE
+
+  PCB MARKED:5239
+  PCB MARKED:8310    
+  
+  EPROM MARKINGS:
+  U12: U12 ANTI STAT CB0A
+  U18: U18 ANTI STAT 36E3
+  U31: U31 CGIT F506
+  U51: 98CE
+  
+  PCB Layout (PCB5):                                                                       Edge Connector 36x2
+  .------------------------------------------------------------------------------------------------------------.
+  |PIN'S BATTERY PCB                     .---------.  .---------.  .-----.       .........    .---------.      |
+  | ***************                      | 74174PC |  | 82S129N |  |NE555|       .........    |ULN2003A |      |
+  |   NO IC             NO IC            '---------'  '---------'  '-----'       16-2-472     '---------'      |
+  |    U54               U53                 U52          U51        U50            U49          U48           |
+  |                                                                                                            |
+  |                                                                                                            |
+  |                                                                                                            |
+  |                   .---------.        .---------.               .---------.  .---------.   .---------.      |
+  |                   | 74123PC |        | 74157PC |     NO IC     | 74161   |  |  7486   |   |ULN2003A |      |
+  |   NO IC           '---------'        '---------'               '---------'  '---------'   '---------'      |
+  |    U47                U46                U45          U44          U43          U42           U41          |
+  |                                                                                                            |
+  |                                                                                                            | 36
+  |                .---------.           .---------.   16-2-472    .---------.                .---------.      '---.
+  |                |  7404   |           |SN74166J |   .........   | 74161N  |     NO IC      |ULN2003A |       ---|
+  |   NO IC        '---------'           '---------'   .........   '---------'                '---------'       ---|
+  |    U40             U39                   U38          U37          U36          U35           U34           ---|
+  |                                                                                         .----------------.  ---|
+  |PIN'S BATTERY PCB           .-------------.  .-.-.-.-.-.-.-.-.  .---------.  .---------. |      8255      |  ---|
+  | *************              |    2716     |  |1|2|3|4|5|6|7|8|  | 74161   |  | 74157   | |                |  ---|
+  |                  NO IC     |             |  '-'-'-'-'-'-'-'-'  '---------'  '---------' '----------------'  ---|
+  |   NO IC                    '-------------'         U30             U29          U28            U27          ---|
+  |    U33            U32            U31            DIP SW x 8                                                  ---|
+  |                                                                                         .----------------.  ---|
+  |                                                                                         |      8255      |  ---|
+  |                                .---------.     .---------.     .---------.  .---------. |                |  ---|
+  |                                | 2111A-2 |     | 2111A-2 |     | 74161   |  | 74157   | '----------------'  ---|
+  |   NO IC           NO IC        '---------'     '---------'     '---------'  '---------'        U20          ---|
+  |    U26             U25             U24             U23             U22          U21                         ---|
+  |                                                                                                             ---|
+  |               .--------------.     .----------------.                                                       ---|
+  |               |     2732     |     |      8255      |          .---------.  .---------.     16-2-472        ---|
+  |   NO IC       |              |     |                |          | 74161   |  | 74157   |     .........       ---|
+  |               '--------------'     '----------------'          '---------'  '---------'     .........       ---|
+  |    U19              U18                   U17                      U16          U15            U14         .---'
+  |                                                                                                            | 01
+  |               .--------------.       .------------.     .---------.     .---------.      .---------.       |
+  |.---------.    |     2732     |       |    8228    |     | 74161N  |     |  7486   |      |  7404   |       |
+  || 74LS541 |    |              |       |            |     '---------'     '---------'      '---------'       |
+  |'---------'    '--------------'       '------------'         U10             U9               U8            |
+  |    U13              U12                   U11           XTAL                                               |
+  |                                                        .----. 18Mhz                                        |
+  |.---------.    .--------------------.   .----------.    .---------.  .---------.  .---------.  .---------.  |
+  ||  7405   |    |        8080        |   |  74155   |    |   8224  |  | 74157   |  |  7411   |  |  7474   |  |
+  |'---------'    |                    |   '----------'    '---------'  '---------'  '---------'  '---------'  |
+  |    U7         '--------------------'        U5              U4           U3           U2           U1      |
+  |                        U6                                                                                  |
+  '------------------------------------------------------------------------------------------------------------'
+
+*/
+ROM_START( krampcb5 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "anti_stat_cb0a.u12", 0x0000, 0x1000, CRC(048e70d8) SHA1(f0eb16ba68455638de2ce68f51f305a13d0df287) )
+	ROM_LOAD( "anti_stat_36e3.u18", 0x1000, 0x1000, CRC(06cf6789) SHA1(587d883c399348b518e3be4d1dc2581824055328) )
+
+	ROM_REGION( 0x1000, "gfx",0 )
+	ROM_FILL(                      0x0000, 0x0800, 0xff )
+	ROM_LOAD( "cg1t_f506.u31",     0x0800, 0x0800, CRC(412fc492) SHA1(094ea0ffd0c22274cfe164f07c009ffe022331fd) )
+
+	ROM_REGION( 0x0100,  "proms", 0 )
+	ROM_LOAD( "98ce.u51",        0x0000, 0x0100, CRC(812dc1f1) SHA1(b2af33ff36f2eca2f782bc2239bc9e54c2564f6a) )
+ROM_END
+
+
+/*
+  PCB MARKINGS Silkscreened = PATENT PENDING. COPYRIGHT 1983 M.KRAMER MFG.INC. MODEL 3000 M.KRAMER INC
+
+  PCB Layout (PCB3, PCB4, PCB6):                                                            Edge Connector 36x2
+  .------------------------------------------------------------------------------------------------------------.
+  |PIN'S BATTERY PCB   .-----.           .---------.  .---------.  .-----.       .........    .---------.      |
+  | ***************    |LM393|           | 74174PC |  | 82S129N |  |NE555|       .........    |ULN2003A |      |
+  |   NO IC            '-----'           '---------'  '---------'  '-----'       16-2-472     '---------'      |
+  |    U54               U53                 U52          U51        U50            U49          U48           |
+  |                                                                                                            |
+  |                                                                                                            |
+  |                                                                                                            |
+  |                   .---------.        .---------.               .---------.  .---------.   .---------.      |
+  |                   | 74123PC |        | 74157PC |     NO IC     | 74161   |  |  7486   |   |ULN2003A |      |
+  |   NO IC           '---------'        '---------'               '---------'  '---------'   '---------'      |
+  |    U47                U46                U45          U44          U43          U42           U41          |
+  |                                                                                                            |
+  |                                                                                                            | 36
+  |                .---------.           .---------.   16-2-472    .---------.                .---------.      '---.
+  |                |  7404   |           |SN74166J |   .........   | 74161N  |     NO IC      |ULN2003A |       ---|
+  |   NO IC        '---------'           '---------'   .........   '---------'                '---------'       ---|
+  |    U40             U39                   U38          U37          U36          U35           U34           ---|
+  |                                                                                         .----------------.  ---|
+  |PIN'S BATTERY PCB           .-------------.  .-.-.-.-.-.-.-.-.  .---------.  .---------. |      8255      |  ---|
+  | *************              |    2732     |  |1|2|3|4|5|6|7|8|  | 74161   |  | 74157   | |                |  ---|
+  |                  NO IC     |             |  '-'-'-'-'-'-'-'-'  '---------'  '---------' '----------------'  ---|
+  |   NO IC                    '-------------'         U30             U29          U28            U27          ---|
+  |    U33            U32            U31            DIP SW x 8                                                  ---|
+  |                                                                                         .----------------.  ---|
+  |                                                                                         |      8255      |  ---|
+  |                 .---------.    .---------.     .---------.     .---------.  .---------. |                |  ---|
+  |                 | 2111A-2 |    | 2111A-2 |     | 2111A-2 |     | 74161   |  | 74157   | '----------------'  ---|
+  |   NO IC         '---------'    '---------'     '---------'     '---------'  '---------'        U20          ---|
+  |    U26             U25             U24             U23             U22          U21                         ---|
+  |                                                                                                             ---|
+  |               .--------------.     .----------------.                                                       ---|
+  |               |     2764     |     |      8255      |          .---------.  .---------.     16-2-472        ---|
+  |   NO IC       |              |     |                |          | 74161   |  | 74157   |     .........       ---|
+  |               '--------------'     '----------------'          '---------'  '---------'     .........       ---|
+  |    U19              U18                   U17                      U16          U15            U14         .---'
+  |                                                                                                            | 01
+  |               .--------------.       .------------.     .---------.     .---------.      .---------.       |
+  |.---------.    |     2764     |       |    8228    |     | 74161N  |     |  7486   |      |  7404   |       |
+  || 74LS244 |    |              |       |            |     '---------'     '---------'      '---------'       |
+  |'---------'    '--------------'       '------------'         U10             U9               U8            |
+  |    U13              U12                   U11           XTAL                                               |
+  |                                                        .----. 18Mhz                                        |
+  |.---------.    .--------------------.   .----------.    .---------.  .---------.  .---------.  .---------.  |
+  ||  7402   |    |        8080        |   |  74155   |    |   8224  |  | 74157   |  |  7411   |  |  7474   |  |
+  |'---------'    |                    |   '----------'    '---------'  '---------'  '---------'  '---------'  |
+  |    U7         '--------------------'        U5              U4           U3           U2           U1      |
+  |                        U6                                                                                  |
+  '------------------------------------------------------------------------------------------------------------'
+
+   Hardware Layout(PCB3) :
+
+  - CPU:             1x 8080
+  - RAM:             3x 2111A-2: Static Random Access Memory 256 x 4 bit.
+  - I/O:             3x 8255: Peripeheral Interface Adapter.
+  - Prg ROMs:        2x 2764: U12, U18: Eprom. 
+  - Gfx ROMs:        1x 2732: U31: Eprom.
+  - Sound:           Discrete.
+  - Crystal:         1x 18.144 MHz.
+  - PROM             1x 82S129: Bipolar PROM: U51.
+
+  - BATTERY ADDON PCB: ENCASED IN RESIN
+    LABELED: MODEL 4000 BATTERY BOARD
+
+  PCB MARKINGS Silkscreened = PATENT PENDING. COPYRIGHT 1983 M.KRAMER MFG.INC. MODEL 3000 M.KRAMER INC
+  R.A.B.
+  W.S.B.
+  DECMO 3084
+  
+  STICKERED: DEC 14'84
+  STICKERED: DEC 17'84  
+  STICKERED: TESTED OK W.S.B 6998 
+  PCB MARKED:6998     
+  
+  EPROM MARKINGS:
+  U12: 6000 U12 5-25
+  U18: 6000 U18
+  U31: U31B MOD3000 CF7B
+  U51: U51 0726
+
+*/
+ROM_START( krampcb3 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "6000_5-25.u12",     0x0000, 0x2000, CRC(e98cf05f) SHA1(929dcb8e30535465f1229004bb35872c520ede40) )
+	ROM_LOAD( "6000.u18",          0x2000, 0x2000, CRC(01a5014f) SHA1(9240259d094c77a146304f3dc7d3cd6f66d25018) )
+
+	ROM_REGION( 0x1000, "gfx",0 )
+	ROM_LOAD( "mod3000_cf7b.u31",  0x0000, 0x1000, CRC(fcfc4d25) SHA1(31455903244ec8ef9005748f265f561b7a082a9c) )
+
+	ROM_REGION( 0x0100,  "proms", 0 )
+	ROM_LOAD( "0726.u51",          0x0000, 0x0100, CRC(d1a2e2be) SHA1(9593e345aab794a0171900bc302a89a7f4f05b27) )
+ROM_END
+
+/*
+  Hardware Layout(PCB4) :
+
+  - CPU:             1x 8080
+  - RAM:             3x 2111A-2: Static Random Access Memory 256 x 4 bit.
+  - I/O:             3x 8255: Peripeheral Interface Adapter.
+  - Prg ROMs:        2x 2764: U12, U18: Eprom. 
+  - Gfx ROMs:        1x 2732: U31: Eprom.
+  - Sound:           Discrete.
+  - Crystal:         1x 18.144 MHz.
+  - PROM             1x 82S129: Bipolar PROM: U51.
+
+  - BATTERY ADDON PCB:ENCASED IN RESIN
+    LABELED:14690 MODEL 4036 BATTERY BOARD
+                 
+  PCB MARKINGS Silkscreened = PATENT PENDING. COPYRIGHT 1983 M.KRAMER MFG.INC. MODEL 3000 M.KRAMER INC
+  R.A.B.
+  W.S.B.
+  
+  STICKERED: TEST 1 JUN 12'84
+  STICKERED: TEST 3 JUN 5 '84 
+  PCB MARKED:5253     
+  
+  EPROM MARKINGS:
+  U12: JPB M8 USA U12 5/25
+  U18: JPB U18 USA M8 5/25
+  U31: U31 RM03031US0 CF7B
+  U51: U51-06EC
+
+*/
+ROM_START( krampcb4 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "jpb_m8_5-25.u12",      0x0000, 0x2000, CRC(e5022d2d) SHA1(f7a7d90b03fd3158d0f2919f2c852e43e15bc89f) )
+	ROM_LOAD( "jpb_usa_m8_5-25.u18",  0x2000, 0x2000, CRC(c05e1382) SHA1(08f3bc0c0b5c39cbc29dcc8921b20a8dd2392772) )
+
+	ROM_REGION( 0x1000, "gfx",0 )
+	ROM_LOAD( "rm03031us0_cf7b.u31",  0x0000, 0x1000, CRC(fcfc4d25) SHA1(31455903244ec8ef9005748f265f561b7a082a9c) )
+
+	ROM_REGION( 0x0100,  "proms", 0 )
+	ROM_LOAD( "06ec.u51",             0x0000, 0x0100, CRC(ad33e582) SHA1(355cdf3cdc34f8c56da1f815b1ae86bba5a19821) )
+ROM_END
+
+/*
+ Hardware Layout(PCB6) :
+
+  - CPU:             1x 8080
+  - RAM:             3x 2111A-2: Static Random Access Memory 256 x 4 bit.
+  - I/O:             3x 8255: Peripeheral Interface Adapter.
+  - Prg ROMs:        2x 2764: U12, U18: Eprom. 
+  - Gfx ROMs:        1x 2732: U31: Eprom.
+  - Sound:           Discrete.
+  - Crystal:         1x 18.144 MHz.
+  - PROM             1x 82S129: Bipolar PROM: U51.
+
+  - BATTERY ADDON PCB: ENCASED IN RESIN
+    LABELED: MODEL 16304 4000 BATTERY BOARD
+                 
+  PCB MARKINGS Silkscreened = PATENT PENDING. COPYRIGHT 1983 M.KRAMER MFG.INC. MODEL 3000 M.KRAMER INC
+  R.A.B.
+  W.S.B.
+  DECMO 3384
+  
+  STICKERED: TEST 5 NOV 31 '84
+  STICKERED: TEST 3 NOV 27 '84 
+  STICKERED: K TESTED OK W.S.B 6759 NOV 27 84
+  PCB MARKED:6759     
+  
+  EPROM MARKINGS:
+  U12: U12 JF30 TN 5 25 6200-1F06
+  U18: U18 JF30 MODEL 6000 5E4F--33CB
+  U31: U31B MOD3000 CF7B
+  U51: U51-06EC
+  
+*/
+ROM_START( krampcb6 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "jf30_tn_5_25_6200-1f06.u12",      0x0000, 0x2000, CRC(411d9b9d) SHA1(1db50fe6435d838eae44c8f4d21bc9c7fdf21234) )
+	ROM_LOAD( "jf30_model_6000_5e4f--33cb.u18",  0x2000, 0x2000, CRC(4efab715) SHA1(2e9f05ff917a516091642d1b213641d39bfa604a) )
+
+	ROM_REGION( 0x1000, "gfx",0 )
+	ROM_LOAD( "mod3000_cf7b.u31",  0x0000, 0x1000, CRC(fcfc4d25) SHA1(31455903244ec8ef9005748f265f561b7a082a9c) )
+
+	ROM_REGION( 0x0100,  "proms", 0 )
+	ROM_LOAD( "06ec.u51",          0x0000, 0x0100, CRC(ad33e582) SHA1(355cdf3cdc34f8c56da1f815b1ae86bba5a19821) )
+ROM_END
+
+
+/****************************** Unknown Sets ********************************/
+
 
 
 /*********************************************
@@ -5736,16 +6390,6 @@ void norautp_state::init_enc()
 }
 
 
-void norautp_state::init_deb()
-// Just for debugging purposes
-// Should be removed soon
-{
-	uint8_t *ROM = memregion("maincpu")->base();
-	ROM[0x02f7] = 0xca;
-	ROM[0x02f8] = 0x18;
-	ROM[0x206c] = 0xff;
-}
-
 void norautp_state::init_unka()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -5758,14 +6402,6 @@ void norautp_state::init_unka()
 	ROM[0x0006] = 0x80;
 	ROM[0x0007] = 0x01;
 	ROM[0x01d5] = 0xaf;
-}
-
-void norautp_state::init_gtipa()
-{
-	uint8_t *ROM = memregion("maincpu")->base();
-
-//  ROM[0x07a6] = 0xaf;  // xor a (no checksum)
-	ROM[0x1ffe] = 0xff;
 }
 
 
@@ -5797,16 +6433,19 @@ GAMEL( 198?, mainline,  0,        norautp,  mainline, norautp_state, empty_init,
 GAMEL( 1996, df_djpkr,  mainline, norautp,  mainline, norautp_state, empty_init, ROT0, "DellFern Ltd.",            "Double Joker Poker / Jacks Plus (45%-75% payout)",      0,                    layout_noraut12 )
 GAMEL( 1996, df_djpkra, mainline, norautp,  mainline, norautp_state, empty_init, ROT0, "DellFern Ltd.",            "Double Joker Poker / Jacks Plus (45%-75% payout, alt)", 0,                    layout_noraut12 )
 GAMEL( 2005, ndxron10,  0,        norautp,  ndxron10, norautp_state, empty_init, ROT0, "<unknown>",                "Royal on Ten (hack of Noraut Deluxe Poker)",   0,                             layout_noraut12 )
-GAMEL( 1999, cgip30cs,  0,        norautx4, norautkl, norautp_state, init_deb,   ROT0, "CGI",                      "Credit Poker (ver.30c, standard)",             0,                             layout_noraut12 )  // CGI - Credit Poker, VERSION 30C, 21/12/99
+GAMEL( 1999, cgip30e,   0,        norautx4, norautkl, norautp_state, empty_init, ROT0, "CGI",                      "Credit Poker (ver.30e, Extra Bonus)",          0,                             layout_noraut12 )  // CGI - Credit Poker, VERSION 30E
+GAMEL( 1999, cgip30cs,  0,        norautx4, norautkl, norautp_state, empty_init, ROT0, "CGI",                      "Credit Poker (ver.30c, standard)",             0,                             layout_noraut12 )  // CGI - Credit Poker, VERSION 30C, 21/12/99
 GAMEL( 1999, cgip30b,   cgip30cs, norautx4, norautkl, norautp_state, empty_init, ROT0, "CGI",                      "Credit Poker (ver.30b, 7 & 9 bonus)",          0,                             layout_noraut12 )  // CGI - Credit Poker, VERSION 30B, 7 &9 BONUS, 21/12/99 BY V.S. for CGI
 GAMEL( 1998, cgip23b,   cgip30cs, norautx4, norautkl, norautp_state, empty_init, ROT0, "CGI",                      "Credit Poker (ver.23b, 7 & 9 bonus)",          0,                             layout_noraut12 )  // CGI - Credit Poker, VERSION 23B, 7 &9 BONUS, 31.03.98. BY V.S.
 GAMEL( 198?, cgidjp,    0,        cgidjp,   mainline, norautp_state, empty_init, ROT0, "CGI",                      "Double Joker Poker (CGI)",                     0,                             layout_noraut12 )  // very similar to df_djpkr
-GAME(  198?, kimblz80,  0,        kimble,   norautp,  norautp_state, empty_init, ROT0, "Kimble Ireland",           "Kimble Double HI-LO (z80 version)",            MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME(  198?, kimblz80,  0,        kimble,   norautp,  norautp_state, empty_init, ROT0, "Kimble Ireland",           "Kimble Double HI-LO (z80 version, encrypted)",   MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME(  198?, hilokimb,  0,        kimble,   norautp,  norautp_state, empty_init, ROT0, "Kimble Ireland",           "Kimble Double HI-LO (z80 version, unencrypted)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME(  198?, bjpoker,   0,        norautxp, norautrh, norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",  "Poker / Black Jack (Model 7521)",              MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )  // starts ok, but after the jump to $180 goes to hell
 GAMEL( 1984, cdrawpkr,  0,        cdrawpkr, cdrawpkr, norautp_state, empty_init, ROT0, "Coinmaster",               "Draw Poker (Joker Poker V.01)",                0,                             layout_noraut11 )
 
 // --------------------
 GAMEL( 1988, winbnk88,  0,        norautp,  norautp,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Winbank Joker Poker",                          0,                             layout_noraut11 )
+GAMEL( 1988, norautpb,  0,        norautxp, norautp,  norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Joker Poker 2000 (£15, Winbank)",              0,                             layout_noraut11 )
 GAMEL( 1988, nor6007a,  0,        norautxp, nor6700a, norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Poker (6007 32k)",                      0,                             layout_noraut11 )
 GAMEL( 1988, nor6007b,  0,        norautxp, nor6700b, norautp_state, empty_init, ROT0, "Noraut Ltd.",              "Noraut Poker (6007 64k)",                      0,                             layout_noraut11 )
 GAMEL( 1996, ddellf96,  0,        norautp,  mainline, norautp_state, empty_init, ROT0, "Dellfern Ltd.",            "Double Joker Poker Dellfern 1996",             0,                             layout_noraut11 )
@@ -5822,26 +6461,38 @@ GAMEL( 1997, ddellf97e, ddellf97, norautxp, delv18ap, norautp_state, empty_init,
 //*  The following ones are 'Draw Poker HI-LO' type, running in a i8080 based hardware  *
 //***************************************************************************************
 
-//     YEAR  NAME       PARENT    MACHINE    INPUT      STATE          INIT        ROT   COMPANY                        FULLNAME                            FLAGS                       LAYOUT
-GAMEL( 1982, dphl,      0,        dphl,      dphl,      norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",     "Draw Poker HI-LO (M.Kramer)",      0,                          layout_noraut10 )
-GAMEL( 1983, dphla,     0,        dphla,     dphla,     norautp_state, empty_init, ROT0, "<unknown>",                   "Joker Poker (Kramer, alt)",        0,                          layout_noraut10 )
-GAMEL( 1983, dphljp,    0,        dphl,      dphl,      norautp_state, empty_init, ROT0, "<unknown>",                   "Draw Poker HI-LO (Japanese)",      0,                          layout_noraut10 )
-GAMEL( 198?, newhilop,  0,        dphl,      newhilop,  norautp_state, empty_init, ROT0, "Song Won?",                   "New Hi-Low Poker",                 0,                          layout_noraut10 )
-GAMEL( 198?, pkii_dm,   0,        dphl,      newhilop,  norautp_state, empty_init, ROT0, "<unknown>",                   "unknown poker game PKII/DM",       0,                          layout_noraut10 )
-GAMEL( 1983, pma,       0,        dphl,      newhilop,  norautp_state, empty_init, ROT0, "PMA",                         "PMA Poker",                        0,                          layout_noraut10 )
-GAME(  198?, kimbldhl,  0,        kimbldhl,  norautp,   norautp_state, empty_init, ROT0, "Kimble Ireland",              "Kimble Double HI-LO",              MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAMEL( 1983, gtipoker,  0,        dphl,      gtipoker,  norautp_state, empty_init, ROT0, "Game Technology Inc.",        "GTI Double or Nothing Draw Poker", 0,                          layout_noraut10 )
-GAME(  1983, gtipokra,  0,        gtipkra,   gtipoker,  norautp_state, init_gtipa, ROT0, "Game Technology Inc.",        "GTI Poker (SMS hardware)",         MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )  // second ROM 1000-1fff encrypted
-GAMEL( 1983, smshilo,   0,        dphl,      dphl,      norautp_state, empty_init, ROT0, "SMS Manufacturing Corp.",     "HI-LO Double Up Joker Poker",      0,                          layout_noraut10 )
-GAMEL( 1986, drhl,      0,        drhl,      drhl,      norautp_state, empty_init, ROT0, "Drews Inc.",                  "Drews Revenge (v.2.89, set 1)",    0,                          layout_noraut10 )
-GAMEL( 1986, drhla,     drhl,     drhl,      drhl,      norautp_state, empty_init, ROT0, "Drews Inc.",                  "Drews Revenge (v.2.89, set 2)",    0,                          layout_noraut10 )
-GAMEL( 1982, ssjkrpkr,  0,        ssjkrpkr,  ssjkrpkr,  norautp_state, empty_init, ROT0, "Southern Systems & Assembly", "Southern Systems Joker Poker",     0,                          layout_noraut10 )
-GAMEL( 198?, fastdrwp,  0,        dphl,      fastdrwp,  norautp_state, empty_init, ROT0, "Stern Electronics",           "Fast Draw (poker conversion kit)", 0,                          layout_noraut10 )
-GAMEL( 1983, sureshoto, 0,        dphl,      sureshoto, norautp_state, init_unka,  ROT0, "SMS Manufacturing Corp.",     "Sure Shot (older, dphl hardware)", MACHINE_IMPERFECT_COLORS,   layout_noraut09_sureshot )
-GAMEL( 198?, dphlunkb,  0,        dphl,      dphla,     norautp_state, empty_init, ROT0, "<unknown>",                   "Unknown Draw Poker HI-LO",         0,                          layout_noraut10 )
+//     YEAR  NAME       PARENT    MACHINE    INPUT      STATE          INIT        ROT   COMPANY                        FULLNAME                             FLAGS                       LAYOUT
+GAMEL( 1982, dphl,      0,        dphl,      dphl,      norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",     "Draw Poker HI-LO (M.Kramer)",       0,                          layout_noraut10 )
+GAMEL( 1983, dphla,     0,        dphla,     dphla,     norautp_state, empty_init, ROT0, "<unknown>",                   "Joker Poker (Kramer, alt)",         0,                          layout_noraut10 )
+GAMEL( 1983, dphljp,    0,        dphl,      dphl,      norautp_state, empty_init, ROT0, "<unknown>",                   "Draw Poker HI-LO (Japanese)",       0,                          layout_noraut10 )
+GAMEL( 198?, newhilop,  0,        dphl,      newhilop,  norautp_state, empty_init, ROT0, "Song Won?",                   "New Hi-Low Poker",                  0,                          layout_noraut10 )
+GAMEL( 198?, pkii_dm,   0,        dphl,      newhilop,  norautp_state, empty_init, ROT0, "<unknown>",                   "Draw Poker HI-LO (PKII/DM)",        0,                          layout_noraut10 )
+GAMEL( 1983, krampcb2,  0,        dphl,      dphla,     norautp_state, empty_init, ROT0, "bootleg",                     "Draw Poker HI-LO (bootleg, set 1)", 0,                          layout_noraut10 )
+GAMEL( 198?, krampcb5,  0,        dphl,      dphl,      norautp_state, empty_init, ROT0, "bootleg",                     "Draw Poker HI-LO (bootleg, set 2)", 0,                          layout_noraut10 )
+GAMEL( 1983, pma,       0,        dphl,      newhilop,  norautp_state, empty_init, ROT0, "PMA",                         "PMA Poker",                         0,                          layout_noraut10 )
+GAME(  198?, kimbldhl,  0,        kimbldhl,  norautp,   norautp_state, empty_init, ROT0, "Kimble Ireland",              "Kimble Double HI-LO",               MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAMEL( 1983, gtipoker,  0,        dphl,      gtipoker,  norautp_state, empty_init, ROT0, "Game Technology Inc.",        "GTI Double or Nothing Draw Poker",  0,                          layout_noraut10 )
+GAME(  1983, gtipokra,  0,        gtipkra,   gtipoker,  norautp_state, empty_init, ROT0, "Game Technology Inc.",        "GTI Poker (SMS hardware)",          MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )  // second ROM 1000-1fff encrypted
+GAMEL( 1983, gtipokrb,  gtipoker, dphl,      gtipoker,  norautp_state, empty_init, ROT0, "Game Technology Inc.",        "GTI Double or Nothing Draw Poker (Cleco)", 0,                   layout_noraut10 )  // working input under test
+GAMEL( 1983, smshilo,   0,        dphl,      dphl,      norautp_state, empty_init, ROT0, "SMS Manufacturing Corp.",     "HI-LO Double Up Joker Poker",       0,                          layout_noraut10 )
+GAMEL( 1986, drhl,      0,        drhl,      drhl,      norautp_state, empty_init, ROT0, "Drews Inc.",                  "Drews Revenge (v.2.89, set 1)",     0,                          layout_noraut10 )
+GAMEL( 1986, drhla,     drhl,     drhl,      drhl,      norautp_state, empty_init, ROT0, "Drews Inc.",                  "Drews Revenge (v.2.89, set 2)",     0,                          layout_noraut10 )
+GAMEL( 1982, ssjkrpkr,  0,        ssjkrpkr,  ssjkrpkr,  norautp_state, empty_init, ROT0, "Southern Systems & Assembly", "Southern Systems Joker Poker",      0,                          layout_noraut10 )
+GAMEL( 198?, fastdrwp,  0,        dphl,      fastdrwp,  norautp_state, empty_init, ROT0, "Stern Electronics",           "Fast Draw (poker conversion kit)",  0,                          layout_noraut10 )
+GAMEL( 1983, sureshoto, 0,        dphl,      sureshoto, norautp_state, init_unka,  ROT0, "SMS Manufacturing Corp.",     "Sure Shot (older, dphl hardware)",  MACHINE_IMPERFECT_COLORS,   layout_noraut09_sureshot )
+GAMEL( 198?, dphlunkb,  0,        dphl,      dphla,     norautp_state, empty_init, ROT0, "<unknown>",                   "Unknown Draw Poker HI-LO",          0,                          layout_noraut10 )
+GAME(  1989, pokplus,   0,        dphlxtnd,  norautp,   norautp_state, empty_init, ROT0, "LJF Corporation",             "Poker Plus 6 Cards (set 1)",        MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )  // encriypted
+GAME(  1989, pokplusa,  pokplus,  dphlxtnd,  norautp,   norautp_state, empty_init, ROT0, "LJF Corporation",             "Poker Plus 6 Cards (set 2)",        MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )  // encriypted
+GAME(  1989, pokplusb,  pokplus,  dphlxtnd,  norautp,   norautp_state, empty_init, ROT0, "LJF Corporation",             "Poker Plus 6 Cards (set 3)",        MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )  // encriypted
+GAME(  198?, krampcb3,  0,        dphl,      dphl,      norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",     "unknown Kramer Poker (pcb3, encrypted)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )  // encriypted
+GAME(  198?, krampcb4,  0,        dphl,      dphl,      norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",     "unknown Kramer Poker (pcb4, encrypted)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )  // encriypted
+GAME(  198?, krampcb6,  0,        dphl,      dphl,      norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",     "unknown Kramer Poker (pcb6, encrypted)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )  // encriypted
 
-// The following one also has a custom 68705 MCU
-GAME(  1993, tpoker2,   0,        dphltest,  norautp,   norautp_state, empty_init, ROT0, "Micro Manufacturing",         "Turbo Poker 2",                    MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+
+// The following ones also have a custom 68705 MCU
+GAMEL(  1991, tpoker2,   0,        dphltest,  tpoker2,  norautp_state, empty_init, ROT0, "Micro Manufacturing",         "Turbo Poker 2 (set 1)",             MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,  layout_noraut10 )
+GAMEL(  1990, tpoker2a,  tpoker2,  dphltest,  tpoker2a, norautp_state, empty_init, ROT0, "Micro Manufacturing",         "Turbo Poker 2 (set 2)",             MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,  layout_noraut10 )
+GAMEL(  1990, tpoker2b,  tpoker2,  dphltest,  tpoker2a, norautp_state, empty_init, ROT0, "Micro Manufacturing",         "Turbo Poker 2 (set 3)",             MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,  layout_noraut10 )
 
 
 //************************************ unknown sets ************************************
@@ -5849,4 +6500,3 @@ GAME(  1993, tpoker2,   0,        dphltest,  norautp,   norautp_state, empty_ini
 //**************************************************************************************
 
 //     YEAR  NAME       PARENT    MACHINE    INPUT      STATE          INIT        ROT   COMPANY                     FULLNAME                               FLAGS                       LAYOUT
-GAME(  1989, unkljfpk,  0,        nortest1,  norautp,   norautp_state, empty_init, ROT0, "LJF Corporation",          "unknown LJF Corporation poker game",  MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )

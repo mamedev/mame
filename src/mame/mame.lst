@@ -31907,6 +31907,7 @@ cdrawpkr
 cgip23b
 cgip30b
 cgip30cs
+cgip30e
 cgidjp
 ddellf96
 ddellf97
@@ -31926,8 +31927,15 @@ drhla
 fastdrwp
 gtipoker
 gtipokra
+gtipokrb
+hilokimb
 kimbldhl
 kimblz80
+krampcb2
+krampcb3
+krampcb4
+krampcb5
+krampcb6
 mainline
 ndxron10
 newhilop
@@ -31940,6 +31948,7 @@ norautjo
 norautjp
 norautn1a
 norautp
+norautpb
 norautpl
 norautpn
 norautpt
@@ -31950,11 +31959,15 @@ norautua
 norautub
 pkii_dm
 pma
+pokplus
+pokplusa
+pokplusb
 smshilo
 ssjkrpkr
 sureshoto
 tpoker2
-unkljfpk
+tpoker2a
+tpoker2b
 winbnk88
 
 @source:misc/notechan.cpp
