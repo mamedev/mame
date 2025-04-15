@@ -62,6 +62,7 @@ multibus_slot_device::multibus_slot_device(machine_config const &mconfig, char c
 
 void multibus_slot_device::device_start()
 {
+	set_clock(m_bus->clock());
 }
 
 device_multibus_interface::device_multibus_interface(machine_config const &mconfig, device_t &device)
