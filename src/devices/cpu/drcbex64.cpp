@@ -3547,7 +3547,7 @@ void drcbe_x64::op_carry(Assembler &a, const instruction &inst)
 	// degenerate case: source is immediate
 	if (srcp.is_immediate() && bitp.is_immediate())
 	{
-		if (srcp.immediate() & ((uint64_t)1 << (bitp.immediate() & (inst.size() * 8 - 1))))
+		if (BIT(srcp.immediate(), bitp.immediate() & ((inst.size() * 8) - 1)))
 			a.stc();
 		else
 			a.clc();
@@ -3556,35 +3556,28 @@ void drcbe_x64::op_carry(Assembler &a, const instruction &inst)
 	}
 
 	// load non-immediate bit numbers into a register
-
-	Gp const bitreg = rcx;
+	Gp const bitreg = (inst.size() == 8) ? Gp(rcx) : Gp(ecx);
 	if (!bitp.is_immediate())
 	{
 		mov_reg_param(a, bitreg, bitp);
-		a.and_(bitreg, inst.size() * 8 - 1);
+		a.and_(bitreg, (inst.size() * 8) - 1);
 	}
 
 	if (srcp.is_memory())
 	{
 		if (bitp.is_immediate())
-			a.bt(MABS(srcp.memory(), inst.size()), (bitp.immediate() & (inst.size() * 8 - 1)));
+			a.bt(MABS(srcp.memory(), inst.size()), bitp.immediate() & ((inst.size() * 8) - 1));
 		else
 			a.bt(MABS(srcp.memory(), inst.size()), bitreg);
 	}
-	else if (srcp.is_int_register())
+	else
 	{
-		Gp const src = Gp::fromTypeAndId(RegType::kX86_Gpq, srcp.ireg());
+		Gp const src = srcp.select_register(Gp(bitreg, Gp::kIdAx));
+		mov_reg_param(a, src, srcp);
 		if (bitp.is_immediate())
-			a.bt(src, (bitp.immediate() & (inst.size() * 8 - 1)));
+			a.bt(src, bitp.immediate() & ((inst.size() * 8) - 1));
 		else
 			a.bt(src, bitreg);
-	}
-	else if (srcp.is_immediate())
-	{
-		a.push(rax);
-		mov_reg_param(a, rax, srcp);
-		a.bt(rax, bitreg);
-		a.pop(rax);
 	}
 }
 

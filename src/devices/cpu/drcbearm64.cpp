@@ -3421,8 +3421,13 @@ template <bool CarryIn> void drcbe_arm64::op_add(a64::Assembler &a, const uml::i
 	const a64::Gp zero = select_register(a64::xzr, inst.size());
 	const a64::Gp output = dstp.select_register(TEMP_REG3, inst.size());
 
-	if (CarryIn)
-		load_carry(a);
+	if (CarryIn && (m_carry_state != carry_state::CANONICAL))
+	{
+		m_carry_state = carry_state::CANONICAL;
+
+		a.sbfx(TEMP_REG1, FLAGS_REG, FLAG_BIT_C, 1);
+		a.cmn(TEMP_REG1, 1);
+	}
 
 	if (src1p.is_immediate_value(0))
 	{
@@ -3551,8 +3556,13 @@ template <bool CarryIn> void drcbe_arm64::op_sub(a64::Assembler &a, const uml::i
 	be_parameter src1p(*this, inst.param(1), PTYPE_MRI);
 	be_parameter src2p(*this, inst.param(2), PTYPE_MRI);
 
-	if (CarryIn)
-		load_carry(a, true);
+	if (CarryIn && (m_carry_state != carry_state::LOGICAL))
+	{
+		m_carry_state = carry_state::LOGICAL;
+
+		a.ubfx(TEMP_REG1, FLAGS_REG, FLAG_BIT_C, 1);
+		a.cmp(a64::xzr, TEMP_REG1);
+	}
 
 	const a64::Gp zero = select_register(a64::xzr, inst.size());
 	const a64::Gp output = dstp.select_register(TEMP_REG3, inst.size());
