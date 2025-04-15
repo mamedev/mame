@@ -4,8 +4,22 @@
 
 PC-9801 S[oftware]DIP interface
 
+References:
+- https://bitchinbits.foolproofdesigns.com/pc-9821/pc-9821-cheat-sheet/
+
 TODO:
-- Discards saved settings;
+- Discards saved settings in PC-9821 and later;
+
+===================================================================================================
+
+To enter setup mode:
+- Target loopy check for i8251 keyboard status bit 1, pull high;
+- help key should pop up in keyboard data as 0x3f
+\- pc9821 and later just do individual scanning of the key repeat
+   i.e. for pc9821ap2 bp f8a32,1,{esi=0x40;g}
+\- pc9801fs is a bit more involved given it scans from a fixed table instead.
+   bp f88ea,1,{eax|=2;g}
+   bp f88fc,1,{eax=3f;g}
 
 **************************************************************************************************/
 
@@ -65,11 +79,9 @@ template<unsigned port> void pc98_sdip_device::write(offs_t offset, u8 data)
 	m_sdip_ram[sdip_offset] = data;
 }
 
-void pc98_sdip_device::bank_w(offs_t offset, u8 data)
+void pc98_sdip_device::bank_w(int state)
 {
-	// TODO: depending on model type this is hooked up differently
-	// (or be not hooked up at all like in 9801US case)
-	m_bank = !!(BIT(data, 6));
+	m_bank = !!(state);
 }
 
 template u8 pc98_sdip_device::read<0>(offs_t offset);

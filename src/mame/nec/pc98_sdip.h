@@ -17,7 +17,7 @@ public:
 
 	template <unsigned port> u8 read(offs_t offset);
 	template <unsigned port> void write(offs_t offset, u8 data);
-	void bank_w(offs_t offset, u8 data);
+	void bank_w(int state);
 
 protected:
 	virtual void device_start() override ATTR_COLD;

@@ -35,18 +35,6 @@
         - Export mouse support to an actual PC9871 device;
         - Implement IF-SEGA/98 support (Sega Saturn peripheral compatibility for Windows,
           cfr. BeOS PnP driver);
-    - Incomplete SDIP support:
-        - SDIP never returns a valid state and returns default values even if machine is
-          soft resetted. By logic should read-back the already existing state, instead
-          all machines just returns a "set SDIP" warning message at POST no matter what;
-        - SDIP bank hookup is different across machines, either unmapped or diverging
-          implementation wise both in port select and behaviour;
-        - In theory SDIP can be initialized via a BIOS menu, callable by holding down
-          HELP key at POST. This actually doesn't work for any machine, is it expected to
-          have key repeat support? Later BIOSes actually have strings for an extended menu
-          with 3 or 4 pages strings, may be also requiring a jump/bankswitch to unmapped area?
-        - Expose SDIP to an actual device_nvram_interface;
-        - Derive defaults off what the model sets up at POST;
     - clean-up functions/variables naming by actual documentation nomenclature;
     - derive machine configs & romsets by actual default options, examples:
         - 3.5 built-in floppy drives vs. default 5.25;
@@ -75,13 +63,10 @@
       it's not a 286 CPU;
     - Floppy boot fails;
 
-    TODO (PC-9801US):
+    TODO (PC-9801US / PC-9801FS):
     - "Invalid Command Byte 13" for bitmap upd7220 at POST (?)
-    - "SYSTEM SHUTDOWN" after BIOS sets up the SDIP values;
-
-    TODO (PC-9801FS):
     - RAM check detects more RAM than what's really installed (and saves previous detection in MEMSW);
-    - Crashes with Japanese error for "HDD failure" when mounted with IDE BIOS,
+    - pc9801fs at least: Crashes with Japanese error for "HDD failure" when mounted with IDE BIOS,
       incompatible with 512 bps or IDE itself?
 
     TODO (PC-9801BX2)
@@ -1252,6 +1237,13 @@ void pc9801us_state::pc9801us_io(address_map &map)
 {
 	pc9801rs_io(map);
 	map(0x0430, 0x0433).rw(FUNC(pc9801us_state::ide_ctrl_r), FUNC(pc9801us_state::ide_ctrl_w)).umask16(0x00ff);
+	map(0x00f6, 0x00f6).lw8(NAME([this] (offs_t offset, u8 data) {
+		// despite what undocumented mem claims US and FS actually access this for SDIP banking
+		if (data == 0xa0 || data == 0xe0)
+			m_sdip->bank_w(BIT(data, 6));
+		else
+			logerror("SDIP: I/O $00f6 unrecognized write %02x\n", data);
+	}));
 	map(0x841e, 0x841e).rw(m_sdip, FUNC(pc98_sdip_device::read<0x0>), FUNC(pc98_sdip_device::write<0x0>));
 	map(0x851e, 0x851e).rw(m_sdip, FUNC(pc98_sdip_device::read<0x1>), FUNC(pc98_sdip_device::write<0x1>));
 	map(0x861e, 0x861e).rw(m_sdip, FUNC(pc98_sdip_device::read<0x2>), FUNC(pc98_sdip_device::write<0x2>));
@@ -1264,7 +1256,7 @@ void pc9801us_state::pc9801us_io(address_map &map)
 	map(0x8d1e, 0x8d1e).rw(m_sdip, FUNC(pc98_sdip_device::read<0x9>), FUNC(pc98_sdip_device::write<0x9>));
 	map(0x8e1e, 0x8e1e).rw(m_sdip, FUNC(pc98_sdip_device::read<0xa>), FUNC(pc98_sdip_device::write<0xa>));
 	map(0x8f1e, 0x8f1e).rw(m_sdip, FUNC(pc98_sdip_device::read<0xb>), FUNC(pc98_sdip_device::write<0xb>));
-	map(0x8f1f, 0x8f1f).w(m_sdip, FUNC(pc98_sdip_device::bank_w));
+//	map(0x8f1f, 0x8f1f).w(m_sdip, FUNC(pc98_sdip_device::bank_w));
 }
 
 void pc9801bx_state::pc9801bx2_map(address_map &map)
@@ -1320,8 +1312,17 @@ void pc9801bx_state::gdc_31kHz_w(offs_t offset, u8 data)
 void pc9801bx_state::pc9801bx2_io(address_map &map)
 {
 	pc9801us_io(map);
+	// NOP legacy SDIP bank access
+	map(0x00f6, 0x00f6).lw8(NAME([] (offs_t offset, u8 data) {}));
 	map(0x0534, 0x0534).r(FUNC(pc9801bx_state::i486_cpu_mode_r));
 	map(0x09a8, 0x09a8).rw(FUNC(pc9801bx_state::gdc_31kHz_r), FUNC(pc9801bx_state::gdc_31kHz_w));
+	map(0x8f1f, 0x8f1f).lw8(NAME([this] (offs_t offset, u8 data) {
+		// BA2 onward and every PC-9821 uses this method for SDIP bank
+		if (data == 0x80 || data == 0xc0)
+			m_sdip->bank_w(BIT(data, 6));
+		else
+			logerror("SDIP: I/O $8f1f unrecognized write %02x\n", data);
+	}));
 }
 
 /*uint8_t pc9801_state::winram_r(offs_t offset)
@@ -2598,12 +2599,15 @@ void pc9801vm_state::pc9801vx(machine_config &config)
 void pc9801us_state::pc9801us(machine_config &config)
 {
 	pc9801rs(config);
-	I386SX(config.replace(), m_maincpu, MAIN_CLOCK_X1*8); // unknown clock
+	const XTAL xtal = BASE_CLOCK / 2; // ~16 MHz
+	I386SX(config.replace(), m_maincpu, xtal);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc9801us_state::pc9801rs_map);
 	m_maincpu->set_addrmap(AS_IO, &pc9801us_state::pc9801us_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	config_floppy_35hd(config);
+
+	pit_clock_config(config, xtal / 4);
 
 	PC98_SDIP(config, "sdip", 0);
 }
