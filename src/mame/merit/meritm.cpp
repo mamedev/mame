@@ -455,7 +455,7 @@ void meritm_state::crt250_questions_bank_w(uint8_t data)
 	}
 	else
 	{
-		if (m_region_extra->bytes() == 0xc0000)
+		if (!BIT(data, 7))
 		{
 			switch(data)
 			{
@@ -474,7 +474,7 @@ void meritm_state::crt250_questions_bank_w(uint8_t data)
 				default: logerror( "crt250_questions_bank_w: unknown data = %02x\n", data ); return;
 			}
 		}
-		else if (m_region_extra->bytes() == 0x180000)
+		else
 		{
 			switch(data)
 			{
