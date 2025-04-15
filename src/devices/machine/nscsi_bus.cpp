@@ -902,7 +902,7 @@ attotime nscsi_full_device::scsi_cable_skew_delay()
 // Data release delay (400ns)
 attotime nscsi_full_device::scsi_data_release_delay()
 {
-	return attotime::from_nsec(40);
+	return attotime::from_nsec(400);
 }
 
 // Deskew delay (45ns)
