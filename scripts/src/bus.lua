@@ -3015,6 +3015,8 @@ if (BUSES["A2BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2bus/a2dx1.h",
 		MAME_DIR .. "src/devices/bus/a2bus/a2echoii.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/a2echoii.h",
+		MAME_DIR .. "src/devices/bus/a2bus/a2frob.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/a2frob.h",
 		MAME_DIR .. "src/devices/bus/a2bus/a2eext80col.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/a2eext80col.h",
 		MAME_DIR .. "src/devices/bus/a2bus/a2eramworks3.cpp",

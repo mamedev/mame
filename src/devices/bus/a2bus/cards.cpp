@@ -21,6 +21,7 @@
 #include "a2diskiing.h"
 #include "a2dx1.h"
 #include "a2echoii.h"
+#include "a2frob.h"
 #include "a2hsscsi.h"
 #include "a2iwm.h"
 #include "a2mcms.h"
@@ -106,6 +107,7 @@ void apple2_cards(device_slot_interface &device)
 	device.option_add("sam", A2BUS_SAM);                       // SAM Software Automated Mouth (8-bit DAC + speaker)
 	device.option_add("alfam2", A2BUS_ALFAM2);                 // ALF Apple Music II
 	device.option_add("echoii", A2BUS_ECHOII);                 // Street Electronics Echo II
+	device.option_add("frob", A2BUS_FROB);                     // FrobCo Frob
 	device.option_add("ap16", A2BUS_IBSAP16);                  // IBS AP16 (German VideoTerm clone)
 	device.option_add("ap16alt", A2BUS_IBSAP16ALT);            // IBS AP16 (German VideoTerm clone), alternate revision
 	device.option_add("vtc1", A2BUS_VTC1);                     // Unknown VideoTerm clone
@@ -178,6 +180,7 @@ void apple2e_cards(device_slot_interface &device)
 	device.option_add("sam", A2BUS_SAM);                       // SAM Software Automated Mouth (8-bit DAC + speaker)
 	device.option_add("alfam2", A2BUS_ALFAM2);                 // ALF Apple Music II
 	device.option_add("echoii", A2BUS_ECHOII);                 // Street Electronics Echo II
+	device.option_add("frob", A2BUS_FROB);                     // FrobCo Frob
 	device.option_add("ap16", A2BUS_IBSAP16);                  // IBS AP16 (German VideoTerm clone)
 	device.option_add("ap16alt", A2BUS_IBSAP16ALT);            // IBS AP16 (German VideoTerm clone), alternate revision
 	device.option_add("vtc1", A2BUS_VTC1);                     // Unknown VideoTerm clone
@@ -258,6 +261,7 @@ void apple2gs_cards(device_slot_interface &device)
 	device.option_add("sam", A2BUS_SAM);                       // SAM Software Automated Mouth (8-bit DAC + speaker)
 	device.option_add("alfam2", A2BUS_ALFAM2);                 // ALF Apple Music II
 	device.option_add("echoii", A2BUS_ECHOII);                 // Street Electronics Echo II
+	device.option_add("frob", A2BUS_FROB);                     // FrobCo Frob
 	device.option_add("ap16", A2BUS_IBSAP16);                  // IBS AP16 (German VideoTerm clone)
 	device.option_add("ap16alt", A2BUS_IBSAP16ALT);            // IBS AP16 (German VideoTerm clone), alternate revision
 	device.option_add("vtc1", A2BUS_VTC1);                     // Unknown VideoTerm clone
