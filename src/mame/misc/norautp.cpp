@@ -773,6 +773,9 @@
 
   - Added workaround to show cards in tpoker2a and tpoker2b
     attract for testing purposes.
+  - Turbo Poker II palette decoded from bipolar PROMs.
+  - Adjusted the Poker Plus palette to 256 entries.
+  - Dedicated Turbo Poker II memory map and machine config.
 
 
   TODO:
@@ -838,7 +841,7 @@ public:
 	void norautu(machine_config &config);
 	void norautx4(machine_config &config);
 	void norautpl(machine_config &config);
-	void dphltest(machine_config &config);
+	void tpoker2(machine_config &config);
 	void nortest1(machine_config &config);
 	void ssjkrpkr(machine_config &config);
 	void dphl(machine_config &config);
@@ -882,7 +885,7 @@ private:
 	void dphla_map(address_map &map) ATTR_COLD;
 	void dphlxtnd_map(address_map &map) ATTR_COLD;
 	void drhl_portmap(address_map &map) ATTR_COLD;
-	void dphltest_map(address_map &map) ATTR_COLD;
+	void tpoker2_map(address_map &map) ATTR_COLD;
 	void drhl_map(address_map &map) ATTR_COLD;
 	void gtipa_map(address_map &map) ATTR_COLD;
 	void kimbldhl_map(address_map &map) ATTR_COLD;
@@ -1454,9 +1457,8 @@ void norautp_state::ssjkrpkr_map(address_map &map)
 	map(0x4000, 0x43ff).ram().share("nvram");
 }
 
-void norautp_state::dphltest_map(address_map &map)
+void norautp_state::tpoker2_map(address_map &map)
 {
-//  map.global_mask(0x7fff); /* A15 not connected */
 	map(0x0000, 0x6fff).rom();
 	map(0x7000, 0x7fff).ram();
 	map(0x8000, 0x87ff).rw(FUNC(norautp_state::nvram_r), FUNC(norautp_state::nvram_w));
@@ -2720,7 +2722,7 @@ void norautp_state::dphlxtnd(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
 	m_screen->set_screen_update(FUNC(norautp_state::screen_update_dphl));
 
-	PALETTE(config.replace(), "palette", FUNC(norautp_state::bp_based_palette), 512);
+	PALETTE(config.replace(), "palette", FUNC(norautp_state::bp_based_palette), 256);
 
 	TIMER(config, "test_timer").configure_periodic(FUNC(norautp_state::test_timer_cb), attotime::from_usec(100));
 
@@ -2759,15 +2761,18 @@ void norautp_state::kimbldhl(machine_config &config)
 	m_discrete->set_intf(kimble_discrete);
 }
 
-void norautp_state::dphltest(machine_config &config)
+void norautp_state::tpoker2(machine_config &config)
 {
 	noraut_base(config);
 
 	// basic machine hardware
 	I8080(config.replace(), m_maincpu, DPHL_CPU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::dphltest_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::tpoker2_map);
 	m_maincpu->set_addrmap(AS_IO, &norautp_state::norautp_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
+	m_screen->set_screen_update(FUNC(norautp_state::screen_update_dphl));
+
+	PALETTE(config.replace(), "palette", FUNC(norautp_state::bp_based_palette), 512);
 
 	// sound hardware
 	m_discrete->set_intf(dphl_discrete);
@@ -5151,8 +5156,9 @@ ROM_START( tpoker2b )
 	ROM_REGION( 0x0800,  "nvram", 0 )  // DS1220AD-150 ; Dallas 2K x 8 CMOS nonvolatile SRAM
 	ROM_LOAD( "tpoker2a_nvram.bin", 0x0000, 0x0800, CRC(615f3888) SHA1(b7d5aeb1c52748061f8913571bc5ac3e839c3595) )
 
-	ROM_REGION( 0x0400,  "proms", 0 )
-	ROM_LOAD( "tpoker2a_82s131.u23", 0x0000, 0x0400, CRC(0222124f) SHA1(5cd8d24ee8e6525a5f9e6a93fa8854f36f4319ee) )
+	ROM_REGION( 0x0200,  "proms", 0 )
+	ROM_LOAD( "tpoker2a_82s131.u23", 0x0000, 0x0200, CRC(0222124f) SHA1(5cd8d24ee8e6525a5f9e6a93fa8854f36f4319ee) )
+	ROM_IGNORE(                              0x0200)  // second half filled with 0x80
 
 	ROM_REGION( 0x0034,  "plds", 0 )
 	ROM_LOAD( "mmi_pal12l6-2_blue_dot.u37", 0x0000, 0x0034, CRC(25651948) SHA1(62cd4d73c6ca8ea5d4beb9ae262d1383f8149462) )
@@ -6509,9 +6515,9 @@ GAME(  198?, krampcb6,  0,        dphl,      dphl,      norautp_state, empty_ini
 
 
 // The following ones also have a custom 68705 MCU
-GAMEL(  1991, tpoker2,   0,        dphltest,  tpoker2,  norautp_state, empty_init, ROT0, "Micro Manufacturing",         "Turbo Poker 2 (set 1)",             MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,  layout_noraut10 )
-GAMEL(  1990, tpoker2a,  tpoker2,  dphltest,  tpoker2a, norautp_state, empty_init, ROT0, "Micro Manufacturing",         "Turbo Poker 2 (set 2)",             MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,  layout_noraut10 )
-GAMEL(  1990, tpoker2b,  tpoker2,  dphltest,  tpoker2a, norautp_state, empty_init, ROT0, "Micro Manufacturing",         "Turbo Poker 2 (set 3)",             MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,  layout_noraut10 )
+GAMEL( 1991, tpoker2,   0,        tpoker2,   tpoker2,   norautp_state, empty_init, ROT0, "Micro Manufacturing",         "Turbo Poker 2 (set 1)",             MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,  layout_noraut10 )
+GAMEL( 1990, tpoker2a,  tpoker2,  tpoker2,   tpoker2a,  norautp_state, empty_init, ROT0, "Micro Manufacturing",         "Turbo Poker 2 (set 2)",             MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,  layout_noraut10 )
+GAMEL( 1990, tpoker2b,  tpoker2,  tpoker2,   tpoker2a,  norautp_state, empty_init, ROT0, "Micro Manufacturing",         "Turbo Poker 2 (set 3)",             MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,  layout_noraut10 )
 
 
 //************************************ unknown sets ************************************
