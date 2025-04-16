@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders:Golden Child
 /***********************************************************************
 
+  Apple 2 Frob Card by Frobco
 
 ***********************************************************************/
 #ifndef MAME_BUS_A2BUS_A2FROB_H

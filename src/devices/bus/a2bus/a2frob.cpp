@@ -1,13 +1,22 @@
 // license:BSD-3-Clause
-// copyright-holders:Nathan Woods, Wilbert Pol, David Shah
+// copyright-holders:Nathan Woods, Wilbert Pol, David Shah, Golden Child
 /***************************************************************************
 
-  Atari VCS 2600 driver / Apple 2 Frob Card by Frobco
+  Apple 2 Frob Card by Frobco
 
-********************************/
-//
-// Notes: Once the Frob memory is loaded, you can reset the 2600 with Numpad Minus
-//
+  The Frob Card is a ROM emulator device for the Atari 2600 that operates
+  under the control of an Apple II.  It also allows the Apple II and Atari 2600
+  to exchange information with a bidirectional port.
+
+  The Atari 2600 code comes directly from a2600.cpp and has been converted
+  to be a device instead of a driver.
+
+  The slot interface for the a2600 has been removed for simplicity as well as
+  the PAL a2600 variant.
+
+  Note: Once the Frob memory is loaded, you can reset the 2600 with Numpad Minus
+
+***************************************************************************/
 
 
 #include "emu.h"
@@ -36,32 +45,17 @@ namespace {
 
 static const uint16_t supported_screen_heights[4] = { 262, 312, 328, 342 };
 
-
-// convert it from a driver_device to a
-//  public device_t,
-//  public device_a2bus_card_interface
-// machine_start -> device_start
-// machine_reset -> device_reset
-
-// remove the slot interface for simplicity
-
-
-
-//class a2600_frob_base_device : public driver_device
 class a2600_frob_base_device :
 	public device_t,
 	public device_a2bus_card_interface
 {
 
 public:
-
 	a2600_frob_base_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	INPUT_CHANGED_MEMBER(reset_a2600);
 
-
 protected:
-
 	a2600_frob_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
 		device_a2bus_card_interface(mconfig, *this),
@@ -75,8 +69,6 @@ protected:
 		m_xtal(3.579575_MHz_XTAL)
 	{ }
 
-// convert machine_start to device_start
-//  virtual void machine_start() override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 
 	void a2600_mem(address_map &map) ATTR_COLD;
@@ -88,9 +80,11 @@ protected:
 	virtual u8 read_c0nx(u8 offset) override;
 	virtual void write_c0nx(u8 offset, u8 data) override;
 
-	virtual u8 read_cnxx(u8 offset) override { return !m_frob_apple_control ? m_frob_mem[(offset & 0xff)|(m_frob_page << 8)] : 0; }
+	virtual u8 read_cnxx(u8 offset) override
+	{ return !m_frob_apple_control ? m_frob_mem[(offset & 0xff)|(m_frob_page << 8)] : 0; }
 
-	virtual void write_cnxx(u8 offset, u8 data) override { if (!m_frob_apple_control) m_frob_mem[(offset & 0xff)|(m_frob_page << 8)] = data; }
+	virtual void write_cnxx(u8 offset, u8 data) override
+	{ if (!m_frob_apple_control) m_frob_mem[(offset & 0xff)|(m_frob_page << 8)] = data; }
 
 	virtual bool take_c800() override { return false; }
 
@@ -188,7 +182,7 @@ void a2600_frob_base_device::write_c0nx(u8 offset, u8 data)
 			m_frob_apple_control = BIT(data, 4);
 			m_bidirectional_active = BIT(data, 5);
 			m_frob_page = BIT(data, 0, 4);
-			printf("m_frob_apple_control = %x  m_frob_page = %x\n",m_frob_apple_control, m_frob_page);
+//          printf("m_frob_apple_control = %x  m_frob_page = %x\n",m_frob_apple_control, m_frob_page);
 			break;
 		case 1:
 			m_byte_waiting_flag_vcs = 1;
@@ -199,10 +193,6 @@ void a2600_frob_base_device::write_c0nx(u8 offset, u8 data)
 	}
 }
 
-
-
-
-
 void a2600_frob_base_device::a2600_mem(address_map &map) // 6507 has 13-bit address space, 0x0000 - 0x1fff
 {
 	map(0x0000, 0x007f).mirror(0x0f00).rw(m_tia, FUNC(tia_video_device::read), FUNC(tia_video_device::write));
@@ -212,10 +202,7 @@ void a2600_frob_base_device::a2600_mem(address_map &map) // 6507 has 13-bit addr
 	map(0x1ff0, 0x1ff0).w(FUNC(a2600_frob_base_device::a2600_write_fff0));
 	map(0x1ff1, 0x1ff1).r(FUNC(a2600_frob_base_device::a2600_read_fff1));
 	map(0x1ff2, 0x1ff2).r(FUNC(a2600_frob_base_device::a2600_read_fff2));
-//  map(0x1000, 0x1fff).mirror(0xe000).rw(FUNC(a2600_frob_base_device::read_frob_mem),FUNC(a2600_frob_base_device::write_frob_mem));
 }
-
-
 
 void a2600_frob_base_device::switch_A_w(uint8_t data)
 {
@@ -342,6 +329,15 @@ void a2600_frob_base_device::device_start()
 
 	save_item(NAME(m_current_screen_height));
 	save_pointer(NAME(m_frob_mem), 0x1000);
+
+	save_item(NAME(m_frob_apple_control));
+	save_item(NAME(m_byte_waiting_flag_apple));
+	save_item(NAME(m_byte_waiting_flag_vcs));
+	save_item(NAME(m_byte_for_vcs));
+	save_item(NAME(m_byte_for_apple));
+	save_item(NAME(m_bidirectional_active));
+	save_item(NAME(m_frob_page));
+	save_item(NAME(m_frob_control_reg));
 }
 
 
@@ -349,13 +345,12 @@ INPUT_CHANGED_MEMBER( a2600_frob_base_device::reset_a2600 )
 {
 	 if (newval == 0)
 	 {
-		m_maincpu->reset();
-		m_tia->reset();
-//      this->reset(); // too much resetting?
+		m_maincpu->reset(); // reset a2600 cpu
+		m_tia->reset(); // need to reset tia or will segfault
+//      this->reset(); // reset whole device, too much?
 		m_byte_waiting_flag_apple = 0;
+		m_byte_waiting_flag_vcs = 0;
 	 }
-	 //m_maincpu->set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
-
 }
 
 static INPUT_PORTS_START( a2600_frob )
