@@ -1362,7 +1362,7 @@ void gameboy_sound_device::sound_stream_update(sound_stream &stream, std::vector
 		right *= 1 + m_snd_control.vol_right;
 
 		/* Update the buffers */
-		outputl.put_int(sampindex, left, 32768 / 64);
-		outputr.put_int(sampindex, right, 32768 / 64);
+		outputl.put_int(sampindex, left, 15 * 4 * (1 + 7));
+		outputr.put_int(sampindex, right, 15 * 4 * (1 + 7));
 	}
 }
