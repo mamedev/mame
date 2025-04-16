@@ -70,6 +70,9 @@
 #ifndef ASTCENC_NEON
   #if defined(__aarch64__)
     #define ASTCENC_NEON 1
+    #undef ASTCENC_SSE
+    #undef ASTCENC_AVX
+    #undef ASTCENC_POPCNT
   #else
     #define ASTCENC_NEON 0
   #endif
