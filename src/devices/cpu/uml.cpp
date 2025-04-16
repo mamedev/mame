@@ -47,7 +47,6 @@ using namespace uml;
 //  DEBUGGING
 //**************************************************************************
 
-#define VALIDATE_BACKEND        (0)
 #define LOG_SIMPLIFICATIONS     (0)
 
 
@@ -57,19 +56,19 @@ using namespace uml;
 //**************************************************************************
 
 // opcode validation condition/flag valid bitmasks
-#define OPFLAGS_NONE    0x00
-#define OPFLAGS_C       FLAG_C
-#define OPFLAGS_Z       FLAG_Z
-#define OPFLAGS_SZ      (FLAG_S | FLAG_Z)
-#define OPFLAGS_SZC     (FLAG_S | FLAG_Z | FLAG_C)
-#define OPFLAGS_SZV     (FLAG_S | FLAG_Z | FLAG_V)
-#define OPFLAGS_SZVC    (FLAG_S | FLAG_Z | FLAG_V | FLAG_C)
-#define OPFLAGS_UZC     (FLAG_U | FLAG_Z | FLAG_C)
-#define OPFLAGS_ALL     0x1f
-#define OPFLAGS_P1      0x81
-#define OPFLAGS_P2      0x82
-#define OPFLAGS_P3      0x83
-#define OPFLAGS_P4      0x84
+constexpr u8 OPFLAGS_NONE   = FLAGS_NONE;
+constexpr u8 OPFLAGS_C      = FLAG_C;
+constexpr u8 OPFLAGS_Z      = FLAG_Z;
+constexpr u8 OPFLAGS_SZ     = FLAG_S | FLAG_Z;
+constexpr u8 OPFLAGS_SZC    = FLAG_S | FLAG_Z | FLAG_C;
+constexpr u8 OPFLAGS_SZV    = FLAG_S | FLAG_Z | FLAG_V;
+constexpr u8 OPFLAGS_SZVC   = FLAG_S | FLAG_Z | FLAG_V | FLAG_C;
+constexpr u8 OPFLAGS_UZC    = FLAG_U | FLAG_Z | FLAG_C;
+constexpr u8 OPFLAGS_ALL    = FLAGS_ALL;
+constexpr u8 OPFLAGS_P1     = 0x81;
+constexpr u8 OPFLAGS_P2     = 0x82;
+constexpr u8 OPFLAGS_P3     = 0x83;
+constexpr u8 OPFLAGS_P4     = 0x84;
 
 // parameter input/output states
 #define PIO_IN          0x01
@@ -1204,6 +1203,10 @@ void uml::instruction::simplify()
 	opcode_t origop;
 	do
 	{
+#if LOG_SIMPLIFICATIONS
+		uml::instruction const orig = *this;
+#endif
+
 		// switch off the opcode
 		origop = m_opcode;
 		switch (m_opcode)
@@ -1251,13 +1254,9 @@ void uml::instruction::simplify()
 		default:                                                      break;
 		}
 
-#if 0
-		if (LOG_SIMPLIFICATIONS && memcmp(&orig, inst, sizeof(orig)) != 0)
-		{
-			std::string disasm1 = orig.disasm(block->drcuml);
-			std::string disasm2 = inst->disasm(block->drcuml);
-			osd_printf_debug("Simplified: %-50.50s -> %s\n", disasm1, disasm2);
-		}
+#if LOG_SIMPLIFICATIONS
+		if (orig != *this)
+			osd_printf_debug("Simplified: %-50.50s -> %s\n", orig.disasm(), disasm());
 #endif
 
 		// loop until we stop changing opcodes
@@ -1483,22 +1482,24 @@ std::string uml::instruction::disasm(drcuml_state *drcuml) const
 				const char *symbol;
 				u32 symoffset;
 
-				// symbol
-				if (drcuml != nullptr && (symbol = drcuml->symbol_find(param.memory(), &symoffset)) != nullptr)
+				if (drcuml && (symbol = drcuml->symbol_find(param.memory(), &symoffset)) != nullptr)
 				{
+					// symbol
 					if (symoffset == 0)
 						util::stream_format(buffer, "[%s]", symbol);
 					else
 						util::stream_format(buffer, "[%s+$%X]", symbol, symoffset);
 				}
-
-				// cache memory
 				else if (drcuml != nullptr && drcuml->cache().contains_pointer(param.memory()))
+				{
+					// cache memory
 					util::stream_format(buffer, "[+$%X]", u32(uintptr_t(drccodeptr(param.memory()) - drcuml->cache().near())));
-
-				// general memory
+				}
 				else
+				{
+					// general memory
 					util::stream_format(buffer, "[[$%p]]", param.memory());
+				}
 			}
 			break;
 
@@ -1542,5 +1543,5 @@ std::string uml::instruction::disasm(drcuml_state *drcuml) const
 		if (m_flags & FLAG_C)
 			buffer.put('C');
 	}
-	return buffer.str();
+	return std::move(buffer).str();
 }

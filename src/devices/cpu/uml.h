@@ -14,6 +14,8 @@
 
 #include "drccache.h"
 
+#include <algorithm>
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -49,6 +51,10 @@ namespace uml
 	constexpr u8 FLAG_Z = 0x04;     // zero flag
 	constexpr u8 FLAG_S = 0x08;     // sign flag (defined for integer only)
 	constexpr u8 FLAG_U = 0x10;     // unordered flag (defined for FP only)
+
+	// flag combinations
+	constexpr u8 FLAGS_NONE = 0x00;
+	constexpr u8 FLAGS_ALL  = FLAG_U | FLAG_S | FLAG_Z | FLAG_V | FLAG_C;
 
 	// testable conditions; note that these are defined such that (condition ^ 1) is
 	// always the opposite
@@ -384,6 +390,9 @@ namespace uml
 	class instruction
 	{
 	public:
+		// constants
+		static constexpr int MAX_PARAMS = 4;
+
 		// construction/destruction
 		constexpr instruction() : m_param{ } { }
 
@@ -407,6 +416,22 @@ namespace uml
 		u8 output_flags() const;
 		u8 modified_flags() const;
 		void simplify();
+
+		// operators
+		bool operator==(instruction const &that) const
+		{
+			if ((m_opcode != that.m_opcode) || (m_condition != that.m_condition) || (m_flags != that.m_flags) || (m_size != that.m_size) || (m_numparams != that.m_numparams))
+				return false;
+			auto const last = m_param + m_numparams;
+			return std::mismatch(std::begin(m_param), last, std::begin(that.m_param)).first == last;
+		}
+		bool operator!=(instruction const &that) const
+		{
+			if ((m_opcode != that.m_opcode) || (m_condition != that.m_condition) || (m_flags != that.m_flags) || (m_size != that.m_size) || (m_numparams != that.m_numparams))
+				return true;
+			auto const last = m_param + m_numparams;
+			return std::mismatch(std::begin(m_param), last, std::begin(that.m_param)).first != last;
+		}
 
 		// compile-time opcodes
 		void handle(code_handle &hand) { configure(OP_HANDLE, 4, hand); }
@@ -571,9 +596,6 @@ namespace uml
 		void fdrsqrt(parameter dst, parameter src1) { configure(OP_FRSQRT, 8, dst, src1); }
 		void fdcopyi(parameter dst, parameter src) { configure(OP_FCOPYI, 8, dst, src); }
 		void icopyfd(parameter dst, parameter src) { configure(OP_ICOPYF, 8, dst, src); }
-
-		// constants
-		static constexpr int MAX_PARAMS = 4;
 
 	private:
 		// internal configuration
