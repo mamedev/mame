@@ -83,6 +83,7 @@ const double XTAL::known_xtals[] = {
 	  2'250'000, // 2.25_MHz_XTAL          Resonator - YM2154 on Yamaha PSR-60 & PSR-70
 	  2'376'000, // 2.376_MHz_XTAL         CIT-101 keyboard
 	  2'457'600, // 2.4576_MHz_XTAL        Atari ST MFP
+	  2'470'000, // 2.47_MHz_XTAL          CSA2.47MG ceramic oscillator - Casio CZ-1
 	  2'500'000, // 2.5_MHz_XTAL           Janken Man units
 	  2'600'000, // 2.6_MHz_XTAL           Sharp PC-1500
 	  2'700'000, // 2.7_MHz_XTAL           Resonator - YM2154 on Yamaha RX15
