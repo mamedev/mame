@@ -305,7 +305,7 @@ void necdsp_device::execute_run()
 	do
 	{
 		// call debugger hook if necessary
-		if (device_t::machine().debug_flags & DEBUG_FLAG_ENABLED)
+		if (debugger_enabled())
 		{
 			debugger_instruction_hook(regs.pc);
 		}

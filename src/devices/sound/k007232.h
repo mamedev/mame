@@ -27,9 +27,9 @@ public:
 	then volumeB will be 0 for channel 0, and volumeA will be 0 for channel 1.
 	Volume is in the range 0-255.
 	*/
-	void set_volume(int channel,int volumeA,int volumeB);
+	void set_volume(int channel, int vol_a, int vol_b);
 
-	void set_bank( int chABank, int chBBank );
+	void set_bank(int chan_a_bank, int chan_b_bank);
 
 protected:
 	// device-level overrides
@@ -45,7 +45,7 @@ protected:
 	address_space_config m_data_config;
 
 private:
-	static constexpr unsigned KDAC_A_PCM_MAX = 2;      /* Channels per chip */
+	static constexpr unsigned PCM_MAX = 2;      /* Channels per chip */
 
 	// internal state
 	memory_access<17, 0, 0, ENDIANNESS_LITTLE>::cache m_cache;
@@ -65,7 +65,7 @@ private:
 	u8 read_rom_default(offs_t offset) { return m_rom[(m_bank + (offset & 0x1ffff)) & (m_rom.length() - 1)]; }
 	inline u8 read_sample(int channel, u32 addr) { m_bank = m_channel[channel].bank; return m_cache.read_byte(addr & 0x1ffff); }
 
-	channel_t     m_channel[KDAC_A_PCM_MAX]; // 2 channels
+	channel_t     m_channel[PCM_MAX]; // 2 channels
 
 	u8            m_wreg[0x10]; /* write data */
 

@@ -43,12 +43,6 @@ public:
 	auto halt_cb() { return m_halt_cb.bind(); }
 	auto busack_cb() { return m_busack_cb.bind(); }
 
-	// Extra callbacks that do not map to any documented signals.
-	// Used by derived classes to customise instruction behaviour.
-	auto branch_cb() { return m_branch_cb.bind(); }
-	auto irqfetch_cb() { return m_irqfetch_cb.bind(); }
-	auto reti_cb() { return m_reti_cb.bind(); }
-
 	// output pins state
 	int halt_r() { return m_halt; }
 	int busack_r() { return m_busack_state; }
@@ -72,7 +66,6 @@ protected:
 
 	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
-	virtual u32 translate_memory_address(u16 address) { return address; }
 
 	// device_state_interface implementation
 	virtual void state_import(const device_state_entry &entry) override;
@@ -142,12 +135,6 @@ protected:
 	devcb_write8 m_nomreq_cb;
 	devcb_write_line m_halt_cb;
 	devcb_write_line m_busack_cb;
-
-	// Extra callbacks that do not map to any documented signals.
-	// Used by derived classes to customise instruction behaviour.
-	devcb_write_line m_branch_cb;
-	devcb_write_line m_irqfetch_cb;
-	devcb_write_line m_reti_cb;
 
 	PAIR16       m_prvpc;
 	PAIR16       m_pc;

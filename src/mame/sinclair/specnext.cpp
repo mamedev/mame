@@ -3445,7 +3445,6 @@ void specnext_state::tbblue(machine_config &config)
 	m_maincpu->out_nextreg_cb().set(FUNC(specnext_state::reg_w));
 	m_maincpu->in_nextreg_cb().set(FUNC(specnext_state::reg_r));
 	m_maincpu->out_retn_seen_cb().set(FUNC(specnext_state::leave_nmi));
-	m_maincpu->nomreq_cb().set_nop();
 	m_maincpu->busack_cb().set(m_dma, FUNC(specnext_dma_device::bai_w));
 
 	SPECNEXT_CTC(config, m_ctc, 28_MHz_XTAL / 8);

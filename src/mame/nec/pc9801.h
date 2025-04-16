@@ -25,7 +25,6 @@
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/output_latch.h"
-#include "pc9801_memsw.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
@@ -55,8 +54,10 @@
 #include "bus/cbus/pc9801_cbus.h"
 #include "bus/cbus/sb16_ct2720.h"
 
-#include "pc9801_kbd.h"
-#include "pc9801_cd.h"
+#include "pc98_cd.h"
+#include "pc98_kbd.h"
+#include "pc98_memsw.h"
+#include "pc98_sdip.h"
 
 #include "bus/ata/atadev.h"
 #include "bus/ata/ataintf.h"
@@ -113,7 +114,7 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
-	required_device<pc9801_kbd_device> m_keyb;
+	required_device<pc98_kbd_device> m_keyb;
 	optional_device<upd1990a_device> m_rtc;
 	required_device<i8255_device> m_ppi_sys;
 	required_device<i8255_device> m_ppi_prn;
@@ -187,7 +188,7 @@ protected:
 	required_device<pic8259_device> m_pic1;
 	required_device<pic8259_device> m_pic2;
 private:
-	required_device<pc9801_memsw_device> m_memsw;
+	required_device<pc98_memsw_device> m_memsw;
 	optional_device<scsi_port_device> m_sasibus;
 	optional_device<output_latch_device> m_sasi_data_out;
 	optional_device<input_buffer_device> m_sasi_data_in;
@@ -198,7 +199,7 @@ protected:
 	DECLARE_MACHINE_START(pc9801_common);
 	DECLARE_MACHINE_RESET(pc9801_common);
 
-	void pc9801_keyboard(machine_config &config);
+	void config_keyboard(machine_config &config);
 	void pc9801_mouse(machine_config &config);
 	void pc9801_cbus(machine_config &config);
 	void pc9801_sasi(machine_config &config);
@@ -393,7 +394,6 @@ public:
 	void pc9801vx(machine_config &config);
 	void pc9801rs(machine_config &config);
 	void pc9801dx(machine_config &config);
-	void pc9801fs(machine_config &config);
 
 	void init_pc9801vm_kanji();
 
@@ -424,6 +424,7 @@ protected:
 	virtual void border_color_w(offs_t offset, u8 data) override;
 
 	uint8_t ide_ctrl_r();
+	uint8_t ide_ctrl_hack_r();
 	void ide_ctrl_w(uint8_t data);
 	uint16_t ide_cs0_r(offs_t offset, uint16_t mem_mask = ~0);
 	void ide_cs0_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -456,12 +457,15 @@ protected:
 	void pc9801rs_knjram_w(offs_t offset, uint8_t data);
 
 	required_ioport m_dsw3;
+
+	virtual void itf_43d_bank_w(offs_t offset, uint8_t data);
+	virtual void cbus_43f_bank_w(offs_t offset, uint8_t data);
+
 private:
 	optional_device_array<ata_interface_device, 2> m_ide;
 //  optional_device<dac_1bit_device> m_dac1bit;
 	required_device<speaker_sound_device> m_dac1bit;
 
-	void pc9801rs_bank_w(offs_t offset, uint8_t data);
 	uint8_t midi_r();
 
 	// 286-based machines except for PC98XA
@@ -535,9 +539,11 @@ class pc9801us_state : public pc9801vm_state
 public:
 	pc9801us_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pc9801vm_state(mconfig, type, tag)
+		, m_sdip(*this, "sdip")
 	{
 	}
 	void pc9801us(machine_config &config);
+	void pc9801fs(machine_config &config);
 
 protected:
 	void pc9801us_io(address_map &map) ATTR_COLD;
@@ -547,12 +553,7 @@ protected:
 
 	// SDIP, PC9801DA onward
 protected:
-	u8 m_sdip[24];
-private:
-	u8 m_sdip_bank;
-	template<unsigned port> u8 sdip_r(offs_t offset);
-	template<unsigned port> void sdip_w(offs_t offset, u8 data);
-	void sdip_bank_w(offs_t offset, u8 data);
+	required_device<pc98_sdip_device> m_sdip;
 };
 
 /**********************************************************

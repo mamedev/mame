@@ -19097,9 +19097,7 @@ legacy FM implementations cannot find it.
 		<part name="cart" interface="msx_cart">
 			<feature name="slot" value="disk_vy0010" />
 			<dataarea name="rom" size="0x4000">
-				<!-- Dump contains contents of the memory mapped FDC registers -->
-				<!-- ROM label taken from schematic, possibly incorrect -->
-				<rom name="27128q25-8.ic2" size="0x4000" crc="164f5a6d" sha1="8924e3e11eb1c8c1edcb7efa63c26d2bdc142473" status="baddump" />
+				<rom name="vy0010_jvc.rom" size="0x4000" crc="4ad08ce4" sha1="28b683d5f6fd4a59046d5a8843233596fced104a" />
 			</dataarea>
 		</part>
 	</software>
@@ -27681,6 +27679,17 @@ legacy FM implementations cannot find it.
 		</part>
 	</software>
 
+	<software name="video80">
+		<description>Video-80 80-column video card</description>
+		<year>1988</year>
+		<publisher>F.Ulivi</publisher>
+		<part name="cart" interface="msx_cart">
+			<feature name="slot" value="video80" />
+			<dataarea name="rom" size="0x1000">
+				<rom name="video80_101.bin" size="0x1000" crc="9b7e4743" sha1="bba13511c8d4f1efb753e653da1691c0fad08eb3" />
+			</dataarea>
+		</part>
+	</software>
 <!--
 
  Sets below are hacked games "converted" from their original format into cartridge.

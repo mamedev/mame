@@ -558,7 +558,7 @@ void segaxbd_state::iocontrol_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 void segaxbd_state::loffire_sync0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_loffire_sync[offset]);
-	machine().scheduler().perfect_quantum(attotime::from_usec(10));
+	machine().scheduler().add_quantum(attotime::from_ticks(4, m_maincpu->clock()), attotime::from_usec(10));
 }
 
 
@@ -803,7 +803,7 @@ void segaxbd_state::update_main_irqs()
 	if (irq)
 	{
 		m_maincpu->set_input_line(irq, ASSERT_LINE);
-		machine().scheduler().perfect_quantum(attotime::from_usec(100));
+		machine().scheduler().add_quantum(attotime::from_ticks(4, m_maincpu->clock()), attotime::from_usec(100));
 	}
 }
 
@@ -816,7 +816,7 @@ void segaxbd_state::update_main_irqs()
 void segaxbd_state::m68k_reset_callback(int state)
 {
 	m_subcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-	machine().scheduler().perfect_quantum(attotime::from_usec(100));
+	machine().scheduler().add_quantum(attotime::from_ticks(4, m_maincpu->clock()), attotime::from_usec(100));
 }
 
 

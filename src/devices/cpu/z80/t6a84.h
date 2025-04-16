@@ -47,6 +47,9 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// device_execute_interface implementation
+	virtual void execute_run() override;
+
 	// z80 overrides
 	virtual uint8_t stack_read(uint16_t addr) override;
 	virtual void stack_write(uint16_t addr, uint8_t value) override;
@@ -59,6 +62,10 @@ protected:
 	void data_page_w(uint8_t page);
 	void stack_page_w(uint8_t page);
 	void vector_page_w(uint8_t page);
+
+	void paged_irqfetch();
+	void paged_reti();
+	void paged_jump();
 
 	void internal_io_map(address_map &map) const;
 	virtual space_config_vector memory_space_config() const override;

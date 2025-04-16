@@ -42,12 +42,13 @@ public:
 	void venteta(machine_config &config);
 
 private:
-	required_device<atmega168_device> m_maincpu;
+	required_device<atmega1280_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void program_map(address_map &map) ATTR_COLD;
+	void data_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -61,7 +62,13 @@ uint32_t venteta_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 void venteta_state::program_map(address_map &map)
 {
-	map(0x0000, 0xffff).rom();
+	map(0x00000, 0x1ffff).rom();
+}
+
+void venteta_state::data_map(address_map &map)
+{
+	//map(0x0020, 0x005f) Internal I/O registers
+	map(0x0060, 0x0fff).ram(); // 4000 bytes internal RAM
 }
 
 
@@ -96,8 +103,9 @@ GFXDECODE_END
 
 void venteta_state::venteta(machine_config &config)
 {
-	ATMEGA168(config, m_maincpu, 24_MHz_XTAL); // TODO: actually ATMEGA103
+	ATMEGA1280(config, m_maincpu, 24_MHz_XTAL); // TODO: actually ATMEGA103
 	m_maincpu->set_addrmap(AS_PROGRAM, &venteta_state::program_map);
+	m_maincpu->set_addrmap(AS_DATA, &venteta_state::data_map);
 	m_maincpu->set_eeprom_tag("eeprom");
 
 	// TODO: everything

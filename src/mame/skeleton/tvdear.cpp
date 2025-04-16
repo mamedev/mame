@@ -4,6 +4,9 @@
 // TV Word Processor, with printer
 
 #include "emu.h"
+
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
 #include "cpu/nec/v25.h"
 #include "softlist_dev.h"
 
@@ -16,6 +19,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "systemcpu")
 		, m_keyboard(*this, "KEY%u", 0U)
+		, m_cart(*this, "cartslot")
 	{
 	}
 
@@ -32,8 +36,11 @@ private:
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
+
 	required_device<v25_device> m_maincpu;
 	required_ioport_array<10> m_keyboard;
+	required_device<generic_slot_device> m_cart;
 
 	u8 m_p0 = 0;
 };
@@ -175,6 +182,16 @@ static INPUT_PORTS_START(tvdear)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Key 0017")
 INPUT_PORTS_END
 
+DEVICE_IMAGE_LOAD_MEMBER(tvdear_state::cart_load)
+{
+	uint32_t const size = m_cart->common_get_size("rom");
+
+	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
+	return std::make_pair(std::error_condition(), std::string());
+}
+
 void tvdear_state::tvdear(machine_config &config)
 {
 	V25(config, m_maincpu, 16000000); // NEC D70320DGJ-8; XTAL marked 16AKSS5HT
@@ -185,6 +202,9 @@ void tvdear_state::tvdear(machine_config &config)
 	m_maincpu->pt_in_cb().set(FUNC(tvdear_state::pt_r));
 
 	//MB90076(config, "tvvc", 14318181); // XTAL marked 14AKSS5JT
+
+	GENERIC_CARTSLOT(config, m_cart, generic_linear_slot, "tvdear_cart");
+	m_cart->set_device_load(FUNC(tvdear_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("tvdear");
 }

@@ -849,7 +849,7 @@ void hyperstone_device::generate_sequence_instruction(drcuml_block &block, compi
 #endif
 
 	// if we are debugging, call the debugger
-	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+	if (debugger_enabled())
 	{
 		//save_fast_iregs(block);
 		UML_DEBUG(block, desc->pc);

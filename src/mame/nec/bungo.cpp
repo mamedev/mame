@@ -136,7 +136,7 @@ void bungo_mini5sx_state::mini5sx_config(machine_config &config)
 //  kbd_clock.signal_handler().append(m_sio_kbd, FUNC(i8251_device::write_txc));
 
 	// TODO: should be PC-98 based with no numpad and some extra keys.
-	PC9801_KBD(config, m_keyb, 0);
+	PC98_KBD(config, m_keyb, 0);
 //  m_keyb->rxd_callback().set("sio_kbd", FUNC(i8251_device::write_rxd));
 
 	I8255(config, m_ppi_sys, 0);

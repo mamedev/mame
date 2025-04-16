@@ -1,13 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:smf
 #include "emu.h"
-#include "pc9801_cd.h"
+#include "pc98_cd.h"
 
 // device type definition
-DEFINE_DEVICE_TYPE(PC9801_CD, pc9801_cd_device, "pc9801_cd", "PC9801 CD-ROM Drive")
+DEFINE_DEVICE_TYPE(PC98_CD, pc98_cd_device, "pc98_cd", "NEC PC-98 CD-ROM Drive")
 
-pc9801_cd_device::pc9801_cd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	atapi_cdrom_device(mconfig, PC9801_CD, tag, owner, clock)
+pc98_cd_device::pc98_cd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	atapi_cdrom_device(mconfig, PC98_CD, tag, owner, clock)
 {
 }
 
@@ -30,19 +30,19 @@ pc9801_cd_device::pc9801_cd_device(const machine_config &mconfig, const char *ta
 //  data[7] = 0;
 
 
-void pc9801_cd_device::fill_buffer()
+void pc98_cd_device::fill_buffer()
 {
 	atapi_cdrom_device::fill_buffer();
 	m_status |= IDE_STATUS_DRDY | IDE_STATUS_SERV;
 }
 
-void pc9801_cd_device::process_buffer()
+void pc98_cd_device::process_buffer()
 {
 	atapi_cdrom_device::process_buffer();
 	m_status |= IDE_STATUS_DRDY | IDE_STATUS_SERV;
 }
 
-void pc9801_cd_device::process_command()
+void pc98_cd_device::process_command()
 {
 	atapi_cdrom_device::process_command();
 	switch(m_command)

@@ -2,43 +2,47 @@
 // copyright-holders:Angelo Salese,Carl
 /**************************************************************************************************
 
-    NEC PC-9821
+NEC PC-9821
 
-    follow-up to PC-9801 for the consumer market
+follow-up to PC-9801 for the consumer market
 
-    TODO (PC-9821):
-    - non-fatal "cache error" at POST for all machines listed here;
-    - undumped IDE ROM, kludged to work;
-    - further state machine breakdowns;
+TODO (PC-9821):
+- non-fatal "cache error" at POST for all machines listed here;
+- undumped IDE ROM, kludged to work;
+- further state machine breakdowns;
 
-    TODO (PC-9821As):
-    - unimplemented SDIP specific access;
-    - "SYSTEM SHUTDOWN" while accessing above;
-    - Update: it never goes into above after I changed default m_dma_access_ctrl to 0xfe?
+TODO (PC-9821Ap2):
+- Lack of key repeat makes it unable to enter SETUP mode normally.
+  bp 0xf8a32,1,{esi|=40;g} to simulate holding HELP key at power-on/reset;
 
-    TODO (PC-9821Cx3):
-    - "MICON ERROR" at POST, we currently return a ready state in remote control register
-      to bypass it, is it expected behaviour?
-    - Hangs normally with "Set the SDIP" message, on soft reset tries to r/w I/Os
-      $b00-$b03, kanji RAM $a9 and $f0 (mostly bit 5, built-in 27 inches HDD check?) then keeps
-      looping;
-    - 0xfa2c8 contains ITF test routines, to access it's supposedly CTRL+CAPS+KANA,
-      which currently doesn't work. It also never returns a valid processor or CPU clock,
-      is it a debug side-effect or supposed to be read somehow?
-    - Expects 0xc0000-0xdffff to be r/w at PC=0x104e8, currently failing for inner C-Bus mappings.
-      Is PCI supposed to overlay the C-Bus section?
-    - Eventually jump off the weeds by taking an invalid irq in timer test;
-    - Reportedly should display a CanBe logo at POST (always blue with white fg?),
-      at least pc9821cx3 ROM has some VRAM data in first half of BIOS ROM.
-      Where this is mapped is currently unknown;
+TODO (PC-9821As):
+- unimplemented SDIP specific access;
+- "SYSTEM SHUTDOWN" while accessing above;
+- Update: it never goes into above after I changed default m_dma_access_ctrl to 0xfe?
 
-    TODO (PC-9821Xa16/PC-9821Ra20/PC-9821Ra266/PC-9821Ra333):
-    - "MICON ERROR" at POST (processor microcode detection fails, basically down to a more
-      involved bankswitch with Pentium based machines);
+TODO (PC-9821Cx3):
+- "MICON ERROR" at POST, we currently return a ready state in remote control register
+  to bypass it, is it expected behaviour?
+- Hangs normally with "Set the SDIP" message, on soft reset tries to r/w I/Os
+  $b00-$b03, kanji RAM $a9 and $f0 (mostly bit 5, built-in 27 inches HDD check?) then keeps
+  looping;
+- 0xfa2c8 contains ITF test routines, to access it's supposedly CTRL+CAPS+KANA,
+  which currently doesn't work. It also never returns a valid processor or CPU clock,
+  is it a debug side-effect or supposed to be read somehow?
+- Expects 0xc0000-0xdffff to be r/w at PC=0x104e8, currently failing for inner C-Bus mappings.
+  Is PCI supposed to overlay the C-Bus section?
+- Eventually jump off the weeds by taking an invalid irq in timer test;
+- Reportedly should display a CanBe logo at POST (always blue with white fg?),
+  at least pc9821cx3 ROM has some VRAM data in first half of BIOS ROM.
+  Where this is mapped is currently unknown;
 
-    TODO: (PC-9821Nr15/PC-9821Nr166)
-    - Tests conventional RAM then keeps polling $03c4 (should be base VGA regs read);
-    - Skipping that will eventually die with a "MEMORY ERROR" (never reads extended memory);
+TODO (PC-9821Xa16/PC-9821Ra20/PC-9821Ra266/PC-9821Ra333):
+- "MICON ERROR" at POST (processor microcode detection fails, basically down to a more
+  involved bankswitch with Pentium based machines);
+
+TODO: (PC-9821Nr15/PC-9821Nr166)
+- Tests conventional RAM then keeps polling $03c4 (should be base VGA regs read);
+- Skipping that will eventually die with a "MEMORY ERROR" (never reads extended memory);
 
 **************************************************************************************************/
 
@@ -435,12 +439,20 @@ void pc9821_state::pc9821_map(address_map &map)
 
 void pc9821_state::pc9821_io(address_map &map)
 {
+	// later SW expects unmapped C-Bus accesses to return high for proper card detection
+	// cfr. entax, amarankh, freebsd21
+	map.unmap_value_high();
 	pc9801bx2_io(map);
-//  map.unmap_value_high(); // TODO: a read to somewhere makes this to fail at POST
 	map(0x0000, 0x001f).rw(m_dmac, FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask32(0xff00ff00);
 	map(0x0000, 0x001f).lr8(NAME([this] (offs_t o) { return BIT(o, 1) ? 0xff : pic_r(o); })).umask32(0x00ff00ff);
 	map(0x0000, 0x001f).w(FUNC(pc9821_state::pic_w)).umask32(0x00ff00ff);  // i8259 PIC (bit 3 ON slave / master) / i8237 DMA
-	map(0x0020, 0x002f).w(FUNC(pc9821_state::rtc_w)).umask32(0x000000ff);
+	map(0x0020, 0x0020).w(FUNC(pc9821_state::rtc_w));
+	map(0x0022, 0x0022).lw8(NAME([this] (offs_t offset, u8 data) {
+		// TODO: r/w to both ports, superset of uPD4990A
+		// Reportedly buggy with DOS/Win95 off the bat, can use HRTIMER.SYS/BCKWHEAT.SYS as fallback
+		if (BIT(data, 4))
+			popmessage("rtc_w: extended uPD4993(A) mode enable %02x", data);
+	}));
 	map(0x0020, 0x002f).w(FUNC(pc9821_state::dmapg8_w)).umask32(0xff00ff00);
 	map(0x0030, 0x0037).rw(m_ppi_sys, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask32(0xff00ff00); //i8251 RS232c / i8255 system port
 	map(0x0040, 0x0047).rw(m_ppi_prn, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask32(0x00ff00ff);
@@ -491,7 +503,7 @@ void pc9821_state::pc9821_io(address_map &map)
 	map(0x0ca0, 0x0ca0).lr8(NAME([] () { return 0xff; })); // high reso detection
 //  map(0x0cc0, 0x0cc7) SCSI interface / <undefined>
 //  map(0x0cfc, 0x0cff) PCI bus
-	map(0x1e8c, 0x1e8f).noprw(); // IDE RAM switch
+	map(0x1e8c, 0x1e8f).noprw(); // TODO: IDE RAM switch
 	map(0x2ed0, 0x2edf).lr8(NAME([] (address_space &s, offs_t o, u8 mm) { return 0xff; })).umask32(0xffffffff); // unknown sound related
 	map(0x3fd8, 0x3fdf).r(m_pit, FUNC(pit8253_device::read)).umask16(0xff00);
 	map(0x3fd8, 0x3fdf).w(FUNC(pc9821_state::pit_latch_delay)).umask16(0xff00);
@@ -544,13 +556,49 @@ void pc9821_mate_a_state::ext_sdip_address_w(offs_t offset, uint8_t data)
 	m_ext_sdip_addr = data;
 }
 
+void pc9821_mate_a_state::itf_43d_bank_w(offs_t offset, uint8_t data)
+{
+	// assume overlay disabled on writes to $43d
+	m_bios_view.disable();
+	pc9801vm_state::itf_43d_bank_w(offset, data);
+}
+
+void pc9821_mate_a_state::cbus_43f_bank_w(offs_t offset, uint8_t data)
+{
+	if ((data & 0xf8) == 0xe0)
+	{
+		logerror("C-Bus overlay set %02x\n", data);
+		m_bios_view.select(data & 0x7);
+		return;
+	}
+
+	// Exit setup mode disarms overlay with a 0xe8 write
+	// (or writes are >> 1 and undocumented mem is wrong?)
+	if ((data & 0xf8) == 0xe8)
+	{
+		logerror("C-Bus overlay disable (%02x)\n", data);
+		m_bios_view.disable();
+		return;
+	}
+
+	pc9801vm_state::cbus_43f_bank_w(offset, data);
+}
+
+void pc9821_mate_a_state::pc9821as_map(address_map &map)
+{
+	pc9821_map(map);
+	map(0x000f8000, 0x000fffff).view(m_bios_view);
+	// TODO: remaining settings
+	m_bios_view[6](0x000f8000, 0x000fffff).rom().region("biosrom", 0x18000);
+}
+
 void pc9821_mate_a_state::pc9821as_io(address_map &map)
 {
 	pc9821_io(map);
 	map(0x0468, 0x0468).rw(FUNC(pc9821_mate_a_state::ext_sdip_data_r), FUNC(pc9821_mate_a_state::ext_sdip_data_w));
 	map(0x046a, 0x046a).w(FUNC(pc9821_mate_a_state::ext_sdip_access_w));
 	map(0x046c, 0x046c).w(FUNC(pc9821_mate_a_state::ext_sdip_address_w));
-	// TODO: specific MATE A local bus (location?)
+	// TODO: specific MATE A local bus (overlays just like C-Bus?)
 }
 
 /*
@@ -804,6 +852,8 @@ void pc9821_state::pc9821(machine_config &config)
 	PALETTE(config.replace(), m_palette, FUNC(pc9821_state::pc9801_palette), 16 + 16 + 256);
 
 //  m_hgdc[1]->set_display_pixels(FUNC(pc9821_state::pegc_display_pixels));
+
+	PC98_SDIP(config, "sdip", 0);
 }
 
 void pc9821_mate_a_state::pc9821as(machine_config &config)
@@ -811,7 +861,7 @@ void pc9821_mate_a_state::pc9821as(machine_config &config)
 	pc9821(config);
 	const XTAL xtal = XTAL(33'000'000);
 	I486(config.replace(), m_maincpu, xtal); // i486dx
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_mate_a_state::pc9821_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_mate_a_state::pc9821as_map);
 	m_maincpu->set_addrmap(AS_IO, &pc9821_mate_a_state::pc9821as_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
@@ -826,7 +876,7 @@ void pc9821_mate_a_state::pc9821ap2(machine_config &config)
 	pc9821(config);
 	const XTAL xtal = XTAL(66'000'000);
 	I486(config.replace(), m_maincpu, xtal); // i486dx2
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_mate_a_state::pc9821_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_mate_a_state::pc9821as_map);
 	m_maincpu->set_addrmap(AS_IO, &pc9821_mate_a_state::pc9821_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
@@ -1182,7 +1232,8 @@ ROM_END
 
 ROM_START( pc9821ce2 )
 	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "itf_ce2.rom",  0x10000, 0x008000, CRC(273e9e88) SHA1(9bca7d5116788776ed0f297bccb4dfc485379b41) )
+	// baddump: missing setup menu bank
+	ROM_LOAD( "itf_ce2.rom",  0x10000, 0x008000, BAD_DUMP CRC(273e9e88) SHA1(9bca7d5116788776ed0f297bccb4dfc485379b41) )
 	ROM_LOAD( "bios_ce2.rom", 0x18000, 0x018000, BAD_DUMP CRC(76affd90) SHA1(910fae6763c0cd59b3957b6cde479c72e21f33c1) )
 
 	ROM_REGION( 0x80000, "chargen", 0 )
@@ -1214,8 +1265,10 @@ ROM_START( pc9821cx3 )
 	// 0x1fda8 (?) - 0x2458f: monitor GFXs
 	// 0x24590 - 0x36xxx: more CanBe mascot GFX animations
 	// 0x3c000: NEC & CanBe logo GFXs
-	ROM_COPY( "biosrom", 0x68000, 0x00000, 0x18000 )
-	ROM_COPY( "biosrom", 0x30000, 0x18000, 0x18000 )
+	// 0x40000: IDE BIOS (NEC D3766 / Caviar CP30344 / WDC AC2340H)
+	// 0x42000: setup menu
+	ROM_COPY( "biosrom", 0x78000, 0x10000, 0x08000 ) // ITF
+	ROM_COPY( "biosrom", 0x60000, 0x18000, 0x18000 ) // BIOS, probably wrong (reset vector at 0x67ff0)
 
 	// "microcode" memory dump, probably identical to above but shuffled
 	// left for consultation

@@ -930,7 +930,6 @@ void chloe_state::chloe(machine_config &config)
 	m_maincpu->set_memory_map(&chloe_state::map_mem);
 	m_maincpu->set_io_map(&chloe_state::map_io);
 	m_maincpu->set_vblank_int("screen", FUNC(chloe_state::chloe_interrupt));
-	m_maincpu->nomreq_cb().set_nop();
 
 	ADDRESS_MAP_BANK(config, m_regs_map).set_map(&chloe_state::map_regs).set_options(ENDIANNESS_LITTLE, 8, 8, 0);
 

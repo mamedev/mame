@@ -42,7 +42,20 @@ license:CC0-1.0
 		<info name="usage" value="FreeDOS contains a CPU detection bug in VINFO.COM, always reporting a 80186.  Edit C:\FDAUTO.BAT to remove calls to VINFO and always run Support286 or Support386 routines to work around the problem." />
 		<part name="hdd" interface="ide_hdd">
 			<diskarea name="harddriv">
-				<disk name="freedos13" sha1="72eef7bf0ad53b8a240ce05244173df54db923f0" writeable="yes"/>
+				<disk name="freedos13" sha1="756df2d38608588678c670a17cfc3c098c127df6" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="freedos14">
+		<description>FreeDOS 1.4</description>
+		<year>2025</year>
+		<publisher>The FreeDOS Project</publisher>
+		<info name="language" value="English" />
+		<info name="version" value="1.4" />
+		<part name="hdd" interface="ide_hdd">
+			<diskarea name="harddriv">
+				<disk name="freedos14" sha1="c1ffb2c1cbf3f9c8f6193d5ba9c5c01ce74d3d4e" writeable="yes" />
 			</diskarea>
 		</part>
 	</software>

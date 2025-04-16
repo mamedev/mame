@@ -34,10 +34,12 @@
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "machine/ram.h"
+#include "machine/rescap.h"
 #include "victor9k_kb.h"
 #include "victor9k_fdc.h"
 #include "machine/z80sio.h"
 #include "sound/hc55516.h"
+#include "sound/flt_biquad.h"
 #include "video/mc6845.h"
 #include "emupal.h"
 #include "screen.h"
@@ -104,6 +106,8 @@ public:
 		m_cvsd(*this, HC55516_TAG),
 		m_crtc(*this, HD46505S_TAG),
 		m_ram(*this, RAM_TAG),
+		m_cvsd_filter(*this, "cvsd_filter"),
+		m_cvsd_filter2(*this, "cvsd_filter2"),
 		m_kb(*this, KB_TAG),
 		m_fdc(*this, "fdc"),
 		m_centronics(*this, "centronics"),
@@ -138,6 +142,8 @@ private:
 	required_device<hc55516_device> m_cvsd;
 	required_device<mc6845_device> m_crtc;
 	required_device<ram_device> m_ram;
+	optional_device<filter_biquad_device> m_cvsd_filter;
+	optional_device<filter_biquad_device> m_cvsd_filter2;
 	required_device<victor_9000_keyboard_device> m_kb;
 	required_device<victor_9000_fdc_device> m_fdc;
 	required_device<centronics_device> m_centronics;
@@ -391,7 +397,12 @@ void victor9k_state::ssda_sm_dtr_w(int state)
 {
 	m_ssda->cts_w(state);
 	m_ssda->dcd_w(!state);
-	//m_cvsd->enc_dec_w(!state);
+
+    /*                           ___
+     * We're supposed to set the ENC/DEC input of the HC55516 to !state,
+     * but only playback/decode is currently supported, and that input
+     * is not implemenented.
+     */
 }
 
 
@@ -733,10 +744,12 @@ void victor9k_state::victor9k(machine_config &config)
 	m_crtc->set_begin_update_callback(FUNC(victor9k_state::crtc_begin_update));
 
 	// sound hardware
+	FILTER_BIQUAD(config, m_cvsd_filter2).opamp_mfb_lowpass_setup(RES_K(27), RES_K(15), RES_K(27), CAP_P(4700), CAP_P(1200));
+	FILTER_BIQUAD(config, m_cvsd_filter).opamp_mfb_lowpass_setup(RES_K(43), RES_K(36), RES_K(180), CAP_P(1800), CAP_P(180));
+	HC55516(config, m_cvsd, 0).add_route(ALL_OUTPUTS, m_cvsd_filter, 1.0);
+	m_cvsd_filter->add_route(ALL_OUTPUTS, m_cvsd_filter2, 1.0);
+	m_cvsd_filter2->add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER(config, "mono").front_center();
-	HC55516(config, m_cvsd, 0);
-	//MCFG_HC55516_DIG_OUT_CB(WRITELINE(MC6852_TAG, mc6852_device, rx_w))
-	m_cvsd->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
 	IEEE488(config, m_ieee488, 0);
@@ -853,4 +866,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                     FULLNAME       FLAGS
-COMP( 1982, victor9k, 0,      0,      victor9k, victor9k, victor9k_state, empty_init, "Victor Business Products", "Victor 9000", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1982, victor9k, 0,      0,      victor9k, victor9k, victor9k_state, empty_init, "Victor Business Products", "Victor 9000", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
