@@ -8,7 +8,7 @@ References:
 - https://bitchinbits.foolproofdesigns.com/pc-9821/pc-9821-cheat-sheet/
 
 TODO:
-- Discards saved settings in PC-9821 and later;
+- Discards saved settings in PC-9821 and later, access thru MMIO?
 
 ===================================================================================================
 
@@ -65,16 +65,16 @@ bool pc98_sdip_device::nvram_write(util::write_stream &file)
 }
 
 
-template<unsigned port> u8 pc98_sdip_device::read(offs_t offset)
+u8 pc98_sdip_device::read(offs_t offset)
 {
-	u8 sdip_offset = port + (m_bank * 12);
+	u8 sdip_offset = offset + (m_bank * 12);
 
 	return m_sdip_ram[sdip_offset];
 }
 
-template<unsigned port> void pc98_sdip_device::write(offs_t offset, u8 data)
+void pc98_sdip_device::write(offs_t offset, u8 data)
 {
-	u8 sdip_offset = port + (m_bank * 12);
+	u8 sdip_offset = offset + (m_bank * 12);
 
 	m_sdip_ram[sdip_offset] = data;
 }
@@ -83,29 +83,3 @@ void pc98_sdip_device::bank_w(int state)
 {
 	m_bank = !!(state);
 }
-
-template u8 pc98_sdip_device::read<0>(offs_t offset);
-template u8 pc98_sdip_device::read<1>(offs_t offset);
-template u8 pc98_sdip_device::read<2>(offs_t offset);
-template u8 pc98_sdip_device::read<3>(offs_t offset);
-template u8 pc98_sdip_device::read<4>(offs_t offset);
-template u8 pc98_sdip_device::read<5>(offs_t offset);
-template u8 pc98_sdip_device::read<6>(offs_t offset);
-template u8 pc98_sdip_device::read<7>(offs_t offset);
-template u8 pc98_sdip_device::read<8>(offs_t offset);
-template u8 pc98_sdip_device::read<9>(offs_t offset);
-template u8 pc98_sdip_device::read<10>(offs_t offset);
-template u8 pc98_sdip_device::read<11>(offs_t offset);
-
-template void pc98_sdip_device::write<0>(offs_t offset, u8 data);
-template void pc98_sdip_device::write<1>(offs_t offset, u8 data);
-template void pc98_sdip_device::write<2>(offs_t offset, u8 data);
-template void pc98_sdip_device::write<3>(offs_t offset, u8 data);
-template void pc98_sdip_device::write<4>(offs_t offset, u8 data);
-template void pc98_sdip_device::write<5>(offs_t offset, u8 data);
-template void pc98_sdip_device::write<6>(offs_t offset, u8 data);
-template void pc98_sdip_device::write<7>(offs_t offset, u8 data);
-template void pc98_sdip_device::write<8>(offs_t offset, u8 data);
-template void pc98_sdip_device::write<9>(offs_t offset, u8 data);
-template void pc98_sdip_device::write<10>(offs_t offset, u8 data);
-template void pc98_sdip_device::write<11>(offs_t offset, u8 data);

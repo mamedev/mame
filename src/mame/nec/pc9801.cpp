@@ -1244,18 +1244,17 @@ void pc9801us_state::pc9801us_io(address_map &map)
 		else
 			logerror("SDIP: I/O $00f6 unrecognized write %02x\n", data);
 	}));
-	map(0x841e, 0x841e).rw(m_sdip, FUNC(pc98_sdip_device::read<0x0>), FUNC(pc98_sdip_device::write<0x0>));
-	map(0x851e, 0x851e).rw(m_sdip, FUNC(pc98_sdip_device::read<0x1>), FUNC(pc98_sdip_device::write<0x1>));
-	map(0x861e, 0x861e).rw(m_sdip, FUNC(pc98_sdip_device::read<0x2>), FUNC(pc98_sdip_device::write<0x2>));
-	map(0x871e, 0x871e).rw(m_sdip, FUNC(pc98_sdip_device::read<0x3>), FUNC(pc98_sdip_device::write<0x3>));
-	map(0x881e, 0x881e).rw(m_sdip, FUNC(pc98_sdip_device::read<0x4>), FUNC(pc98_sdip_device::write<0x4>));
-	map(0x891e, 0x891e).rw(m_sdip, FUNC(pc98_sdip_device::read<0x5>), FUNC(pc98_sdip_device::write<0x5>));
-	map(0x8a1e, 0x8a1e).rw(m_sdip, FUNC(pc98_sdip_device::read<0x6>), FUNC(pc98_sdip_device::write<0x6>));
-	map(0x8b1e, 0x8b1e).rw(m_sdip, FUNC(pc98_sdip_device::read<0x7>), FUNC(pc98_sdip_device::write<0x7>));
-	map(0x8c1e, 0x8c1e).rw(m_sdip, FUNC(pc98_sdip_device::read<0x8>), FUNC(pc98_sdip_device::write<0x8>));
-	map(0x8d1e, 0x8d1e).rw(m_sdip, FUNC(pc98_sdip_device::read<0x9>), FUNC(pc98_sdip_device::write<0x9>));
-	map(0x8e1e, 0x8e1e).rw(m_sdip, FUNC(pc98_sdip_device::read<0xa>), FUNC(pc98_sdip_device::write<0xa>));
-	map(0x8f1e, 0x8f1e).rw(m_sdip, FUNC(pc98_sdip_device::read<0xb>), FUNC(pc98_sdip_device::write<0xb>));
+
+	// 0x841e ~ 0x8f1e SDIP I/O mapping
+	// NOTE: split in half for pleasing emumem
+	map(0x841e, 0x841e).select(0x300).lrw8(
+		NAME([this] (offs_t offset) { return m_sdip->read(offset >> 8); }),
+		NAME([this] (offs_t offset, u8 data) { m_sdip->write(offset >> 8, data); })
+	);
+	map(0x881e, 0x881e).select(0x700).lrw8(
+		NAME([this] (offs_t offset) { return m_sdip->read((offset >> 8) + 4); }),
+		NAME([this] (offs_t offset, u8 data) { m_sdip->write((offset >> 8) + 4, data); })
+	);
 //	map(0x8f1f, 0x8f1f).w(m_sdip, FUNC(pc98_sdip_device::bank_w));
 }
 
