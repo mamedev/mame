@@ -1298,7 +1298,7 @@ void cgb04_apu_device::apu_power_off()
 
 
 // convert output: 1 (0) to -1 (15)
-static inline s32 convert_output(s32 sample)
+constexpr s32 convert_output(s32 sample)
 {
 	return 0xf - (sample * 2);
 }
