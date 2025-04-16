@@ -771,6 +771,9 @@
   - Added more documentation, and ASCII PCB layouts.
   - Added technical notes.
 
+  - Added workaround to show cards in tpoker2a and tpoker2b
+    attract for testing purposes.
+
 
   TODO:
 
@@ -1244,6 +1247,22 @@ void norautp_state::nvram_w(offs_t offset, uint8_t data)
 
 uint8_t norautp_state::nvram_r(offs_t offset)
 {
+//  showing cards in attract
+//  for testing purposes
+//  sets: tpoker2a, tpoker2b
+
+	m_nvram8[0x70b] = 0xa8;
+	m_nvram8[0x70c] = 0xb8;
+	m_nvram8[0x70d] = 0xc8;
+	m_nvram8[0x70e] = 0xd8;
+	m_nvram8[0x70f] = 0xe8;
+
+	m_nvram8[0x710] = 0x20;
+	m_nvram8[0x711] = 0x30;
+	m_nvram8[0x712] = 0x40;
+	m_nvram8[0x713] = 0x50;
+	m_nvram8[0x714] = 0x60;
+
 	return m_nvram8[offset];
 }
 
@@ -4962,7 +4981,7 @@ ROM_START(tpoker2 )
 	ROM_LOAD( "mk48z02.u44", 0x0000, 0x0800, CRC(fcb12763) SHA1(66a672c15db7f514d190f84fba023b2733d1f194) )
 
 	ROM_REGION( 0x0200,  "proms", 0 )
-	ROM_LOAD( "82s131n.u23", 0x0000, 0x0200, SHA1(77270591aeb3ed06f72897b8f57302502f752336) )
+	ROM_LOAD( "82s131n.u23", 0x0000, 0x0200, CRC(6834053a) SHA1(77270591aeb3ed06f72897b8f57302502f752336) )
 
 	ROM_REGION( 0x02a1,  "plds", 0 )
 	ROM_LOAD( "pal12l6.u37",  0x0000, 0x0034, CRC(25651948) SHA1(62cd4d73c6ca8ea5d4beb9ae262d1383f8149462) )
@@ -4981,7 +5000,7 @@ ROM_START(tpoker2a )
 	ROM_LOAD( "turbo_poker_char_rom.u30", 0x0000, 0x1000, CRC(6df86e08) SHA1(a451f71db7b59500b99207234ef95793afc11f03) )
 
 	ROM_REGION( 0x0200,  "proms", 0 )
-	ROM_LOAD( "82s131n.u23", 0x0000, 0x0200, SHA1(77270591aeb3ed06f72897b8f57302502f752336) )
+	ROM_LOAD( "82s131n.u23", 0x0000, 0x0200, CRC(6834053a) SHA1(77270591aeb3ed06f72897b8f57302502f752336) )
 
 	ROM_REGION( 0x02a1,  "plds", 0 )
 	ROM_LOAD( "pal12l6.u37",  0x0000, 0x0034, CRC(25651948) SHA1(62cd4d73c6ca8ea5d4beb9ae262d1383f8149462) )
