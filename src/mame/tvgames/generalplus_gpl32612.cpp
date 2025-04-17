@@ -304,6 +304,12 @@ ROM_START( sanxpet )
 	ROM_LOAD( "25l64.u1", 0x0000, 0x800000, CRC(f28b9fd3) SHA1(8ed4668f271cbe01065bc0836e49ce70faf10834) )
 ROM_END
 
+ROM_START( sanxpeta )
+	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "gpr25l6403f.u1", 0x0000, 0x800000, CRC(cb5dc7b6) SHA1(425c4d01b56784278b77824a354d9efa46e1a74e) )
+ROM_END
+
+
 ROM_START( tomyegg )
 	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
 	ROM_LOAD( "gpr25l6403f.u1", 0x0000, 0x800000, CRC(2acd6752) SHA1(85e59546a1af4618c75c275cead7ef0f5e3faa44) )
@@ -386,6 +392,8 @@ CONS( 2019, pocketmr,        0,        0,      gpl32612, gpl32612, generalplus_g
 // uses GP327902, might not fit here, 2019 date from case
 // すみっコぐらし すみっコさがし
 CONS( 2019, sanxpet,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "San-X / Tomy",        "Sumikko Gurashi - Sumikko Sagashi",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+// same SoC as above
+CONS( 2019, sanxpeta,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "San-X / Tomy",        "San-X / Tomy Pet",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 // same SoC as above
 CONS( 2019, tomyegg,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Tomy",        "Tomy Egg Pet",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
