@@ -944,6 +944,12 @@ ROM_START( matet100 )
 	ROM_IGNORE(0x100)
 ROM_END
 
+ROM_START( nesvt270 )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "w25q128jvs.u3", 0x00000, 0x1000300, CRC(fe189a90) SHA1(7f07ae89ae7ff49f139e936b08c9ef2a3467ea92) )
+ROM_END
+
+
 void nes_vt369_vtunknown_state::init_lxcmcypp()
 {
 	int size = memregion("mainrom")->bytes()/2;
@@ -1114,6 +1120,8 @@ CONS( 201?, hkb502a,  hkb502, 0,  nes_vt369_vtunknown_hh_4mb, nes_vt369_vtunknow
 // contains a protection chip, command 80 XX returns a byte
 CONS( 201?, lxcap,    0,      0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Lexibook", "Cyber Arcade Pocket (JL1895)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
+// 2022 date on 'BL-867 PCB03' PCB
+CONS( 2022, nesvt270,    0,  0,  nes_vt369_vtunknown_hh_16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "unknown VT3xx based 270-in-1 (BL-867 PCB03)", MACHINE_NOT_WORKING )
 
 // VT369, but doesn't use most features
 CONS( 201?, myarccn,   0, 0,  nes_vt369_vtunknown_hh_1mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "DreamGear", "My Arcade Caveman Ninja", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
