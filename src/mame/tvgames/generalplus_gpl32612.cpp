@@ -33,16 +33,16 @@
 
 namespace {
 
-class generalplus_gpm453x_game_state : public driver_device
+class generalplus_gpl32612_game_state : public driver_device
 {
 public:
-	generalplus_gpm453x_game_state(const machine_config &mconfig, device_type type, const char *tag) :
+	generalplus_gpl32612_game_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen")
 	{ }
 
-	void gpm453x(machine_config &config);
+	void gpl32612(machine_config &config);
 
 	void nand_init840();
 	void nand_init880();
@@ -56,7 +56,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 
-	uint32_t screen_update_gpm453x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_gpl32612(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
 
@@ -73,11 +73,11 @@ private:
 };
 
 
-class generalplus_zippity_game_state : public generalplus_gpm453x_game_state
+class generalplus_zippity_game_state : public generalplus_gpl32612_game_state
 {
 public:
 	generalplus_zippity_game_state(const machine_config &mconfig, device_type type, const char *tag) :
-		generalplus_gpm453x_game_state(mconfig, type, tag),
+		generalplus_gpl32612_game_state(mconfig, type, tag),
 		m_cart(*this, "cartslot"),
 		m_cart_region(nullptr)
 	{ }
@@ -96,55 +96,55 @@ protected:
 };
 
 
-uint32_t generalplus_gpm453x_game_state::unk_d000003c_r(offs_t offset, uint32_t mem_mask)
+uint32_t generalplus_gpl32612_game_state::unk_d000003c_r(offs_t offset, uint32_t mem_mask)
 {
 	return machine().rand();
 }
 
-uint32_t generalplus_gpm453x_game_state::unk_d0800018_r(offs_t offset, uint32_t mem_mask)
+uint32_t generalplus_gpl32612_game_state::unk_d0800018_r(offs_t offset, uint32_t mem_mask)
 {
 	return machine().rand();
 }
 
-uint32_t generalplus_gpm453x_game_state::unk_d0900140_r(offs_t offset, uint32_t mem_mask)
+uint32_t generalplus_gpl32612_game_state::unk_d0900140_r(offs_t offset, uint32_t mem_mask)
 {
 	return machine().rand();
 }
 
-uint32_t generalplus_gpm453x_game_state::unk_d0900153_r(offs_t offset, uint32_t mem_mask)
+uint32_t generalplus_gpl32612_game_state::unk_d0900153_r(offs_t offset, uint32_t mem_mask)
 {
 	return machine().rand();
 }
 
-void generalplus_gpm453x_game_state::arm_map(address_map &map)
+void generalplus_gpl32612_game_state::arm_map(address_map &map)
 {
 	map(0x00000000, 0x03ffffff).ram();
 
-	map(0xd000003c, 0xd000003f).r(FUNC(generalplus_gpm453x_game_state::unk_d000003c_r));
+	map(0xd000003c, 0xd000003f).r(FUNC(generalplus_gpl32612_game_state::unk_d000003c_r));
 
-	map(0xd0800018, 0xd080001b).r(FUNC(generalplus_gpm453x_game_state::unk_d0800018_r));
+	map(0xd0800018, 0xd080001b).r(FUNC(generalplus_gpl32612_game_state::unk_d0800018_r));
 
-	map(0xd0900140, 0xd0900143).r(FUNC(generalplus_gpm453x_game_state::unk_d0900140_r));
-	map(0xd0900150, 0xd0900153).r(FUNC(generalplus_gpm453x_game_state::unk_d0900153_r));
+	map(0xd0900140, 0xd0900143).r(FUNC(generalplus_gpl32612_game_state::unk_d0900140_r));
+	map(0xd0900150, 0xd0900153).r(FUNC(generalplus_gpl32612_game_state::unk_d0900153_r));
 }
 
-uint32_t generalplus_gpm453x_game_state::screen_update_gpm453x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t generalplus_gpl32612_game_state::screen_update_gpl32612(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
 
-void generalplus_gpm453x_game_state::machine_start()
+void generalplus_gpl32612_game_state::machine_start()
 {
 }
 
-void generalplus_gpm453x_game_state::machine_reset()
+void generalplus_gpl32612_game_state::machine_reset()
 {
 }
 
-static INPUT_PORTS_START( gpm453x )
+static INPUT_PORTS_START( gpl32612 )
 INPUT_PORTS_END
 
-void generalplus_gpm453x_game_state::copy_block(int i, int blocksize, int blocksize_stripped, uint8_t* nandrom, int dest)
+void generalplus_gpl32612_game_state::copy_block(int i, int blocksize, int blocksize_stripped, uint8_t* nandrom, int dest)
 {
 	const int base = i * blocksize;
 	address_space& mem = m_maincpu->space(AS_PROGRAM);
@@ -157,7 +157,7 @@ void generalplus_gpm453x_game_state::copy_block(int i, int blocksize, int blocks
 	}
 }
 
-void generalplus_gpm453x_game_state::bootstrap()
+void generalplus_gpl32612_game_state::bootstrap()
 {
 	uint8_t* rom = memregion("nand")->base();
 
@@ -173,16 +173,16 @@ void generalplus_gpm453x_game_state::bootstrap()
 	}
 }
 
-void generalplus_gpm453x_game_state::gpm453x(machine_config &config)
+void generalplus_gpl32612_game_state::gpl32612(machine_config &config)
 {
 	ARM9(config, m_maincpu, 240'000'000); // unknown core / frequency, but ARM based
-	m_maincpu->set_addrmap(AS_PROGRAM, &generalplus_gpm453x_game_state::arm_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &generalplus_gpl32612_game_state::arm_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320, 262);
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
-	m_screen->set_screen_update(FUNC(generalplus_gpm453x_game_state::screen_update_gpm453x));
+	m_screen->set_screen_update(FUNC(generalplus_gpl32612_game_state::screen_update_gpl32612));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -190,7 +190,7 @@ void generalplus_gpm453x_game_state::gpm453x(machine_config &config)
 
 void generalplus_zippity_game_state::machine_start()
 {
-	generalplus_gpm453x_game_state::machine_start();
+	generalplus_gpl32612_game_state::machine_start();
 
 	// if there's a cart, override the standard mapping
 	if (m_cart && m_cart->exists())
@@ -213,7 +213,7 @@ DEVICE_IMAGE_LOAD_MEMBER(generalplus_zippity_game_state::cart_load)
 
 void generalplus_zippity_game_state::zippity(machine_config &config)
 {
-	// don't inherit from gpm453x as in reality this is GPL32300A and could differ
+	// don't inherit from gpl32612 as in reality this is GPL32300A and could differ
 
 	ARM9(config, m_maincpu, 240'000'000); // unknown core / frequency, but ARM based
 	m_maincpu->set_addrmap(AS_PROGRAM, &generalplus_zippity_game_state::arm_map);
@@ -222,7 +222,7 @@ void generalplus_zippity_game_state::zippity(machine_config &config)
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320, 262);
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
-	m_screen->set_screen_update(FUNC(generalplus_zippity_game_state::screen_update_gpm453x));
+	m_screen->set_screen_update(FUNC(generalplus_zippity_game_state::screen_update_gpl32612));
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
@@ -300,7 +300,7 @@ ROM_START( sanxpet )
 ROM_END
 
 
-void generalplus_gpm453x_game_state::nand_init(int blocksize, int blocksize_stripped)
+void generalplus_gpl32612_game_state::nand_init(int blocksize, int blocksize_stripped)
 {
 	uint8_t* rom = memregion("nand")->base();
 	int size = memregion("nand")->bytes();
@@ -333,13 +333,13 @@ void generalplus_gpm453x_game_state::nand_init(int blocksize, int blocksize_stri
 	}
 }
 
-void generalplus_gpm453x_game_state::nand_init840()
+void generalplus_gpl32612_game_state::nand_init840()
 {
 	nand_init(0x840, 0x800);
 	bootstrap();
 }
 
-void generalplus_gpm453x_game_state::nand_init880()
+void generalplus_gpl32612_game_state::nand_init880()
 {
 	nand_init(0x880, 0x800);
 	bootstrap();
@@ -349,25 +349,25 @@ void generalplus_gpm453x_game_state::nand_init880()
 
 
 //    year, name,         parent,  compat, machine,      input,        class,              init,       company,  fullname,                             flags
-CONS( 200?, jak_swbstrik,    0,       0,      gpm453x, gpm453x, generalplus_gpm453x_game_state, nand_init840, "JAKKS Pacific Inc", "Star Wars Blaster Strike", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 200?, jak_tmnthp,      0,       0,      gpm453x, gpm453x, generalplus_gpm453x_game_state, nand_init840, "JAKKS Pacific Inc", "Teenage Mutant Ninja Turtles Hero Portal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 200?, jak_ddhp,        0,       0,      gpm453x, gpm453x, generalplus_gpm453x_game_state, nand_init840, "JAKKS Pacific Inc", "DreamWorks Dragons Hero Portal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 200?, jak_prhp,        0,       0,      gpm453x, gpm453x, generalplus_gpm453x_game_state, nand_init840, "JAKKS Pacific Inc", "Power Rangers Super Megaforce Hero Portal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // from a PAL unit (probably not region specific)
-CONS( 200?, jak_dchp,        0,       0,      gpm453x, gpm453x, generalplus_gpm453x_game_state, nand_init840, "JAKKS Pacific Inc", "DC Super Heroes The Watchtower Hero Portal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 200?, jak_swbstrik,    0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "Star Wars Blaster Strike", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 200?, jak_tmnthp,      0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "Teenage Mutant Ninja Turtles Hero Portal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 200?, jak_ddhp,        0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "DreamWorks Dragons Hero Portal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 200?, jak_prhp,        0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "Power Rangers Super Megaforce Hero Portal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // from a PAL unit (probably not region specific)
+CONS( 200?, jak_dchp,        0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "DC Super Heroes The Watchtower Hero Portal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // Might not belong here, SoC is marked GPL32300A instead, but is still ARM based, and has GPNAND strings
-CONS( 201?, zippity,         0,       0,      zippity, gpm453x, generalplus_zippity_game_state, empty_init,  "LeapFrog",         "Zippity (US)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 201?, zippity,         0,       0,      zippity, gpl32612, generalplus_zippity_game_state, empty_init,  "LeapFrog",         "Zippity (US)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 // TODO, check if code differs, or just unused areas of the NAND
-CONS( 201?, zippityuk,       zippity, 0,      zippity, gpm453x, generalplus_zippity_game_state, empty_init,  "LeapFrog",         "Zippity (UK)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 201?, zippityuk,       zippity, 0,      zippity, gpl32612, generalplus_zippity_game_state, empty_init,  "LeapFrog",         "Zippity (UK)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // GP32C01 (maybe, picture is unclear) - Camera for kids
-CONS( 2013, kidizmp,         0,        0,      gpm453x, gpm453x, generalplus_gpm453x_game_state, empty_init,  "VTech",         "Kidizoom Connect (Germany, pink camera)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2013, kidizmp,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "VTech",         "Kidizoom Connect (Germany, pink camera)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 // seems to be older tech, just glob + ROM, assuming it's a GP32 series based on above and due to having ARM code
-CONS( 201?, kidizmb,         0,        0,      gpm453x, gpm453x, generalplus_gpm453x_game_state, empty_init,  "VTech",         "Kidizoom (Germany, blue camera)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 201?, kidizmb,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "VTech",         "Kidizoom (Germany, blue camera)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
-CONS( 2019, pocketmp,        0,        0,      gpm453x, gpm453x, generalplus_gpm453x_game_state, nand_init880,  "Takara Tomy",        "Pocket Monsters PC",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-CONS( 2019, pocketmr,        0,        0,      gpm453x, gpm453x, generalplus_gpm453x_game_state, nand_init880,  "Takara Tomy",        "Pocket Monsters Rotom Tablet",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2019, pocketmp,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Takara Tomy",        "Pocket Monsters PC",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2019, pocketmr,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Takara Tomy",        "Pocket Monsters Rotom Tablet",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // uses GP327902, might not fit here, 2019 date from case
 // すみっコぐらし すみっコさがし
-CONS( 2019, sanxpet,         0,        0,      gpm453x, gpm453x, generalplus_gpm453x_game_state, empty_init,  "San-X / Tomy",        "Sumikko Gurashi - Sumikko Sagashi",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2019, sanxpet,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "San-X / Tomy",        "Sumikko Gurashi - Sumikko Sagashi",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
