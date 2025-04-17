@@ -68,3 +68,48 @@ jobs:
           chdman.exe
           unidasm.exe
         if-no-files-found: error
+
+  build-windows-arm64:
+    runs-on: windows-11-arm
+    defaults:
+      run:
+        shell: msys2 {0}
+    strategy:
+      matrix:
+        subtarget: [mame, tiny]
+        include:
+          - subtarget: mame
+            executable: mame
+          - subtarget: tiny
+            executable: mametiny
+    steps:
+    - uses: msys2/setup-msys2@v2
+      with:
+        msystem: CLANGARM64
+        install: git make mingw-w64-clang-aarch64-cc mingw-w64-clang-aarch64-python mingw-w64-clang-aarch64-libc++ mingw-w64-clang-aarch64-gcc-compat
+    - uses: actions/checkout@main
+      with:
+        fetch-depth: 0
+    - name: Build
+      env:
+        MINGW64: "/clangarm64"
+        OVERRIDE_AR: "llvm-ar"
+        OVERRIDE_CC: clang
+        OVERRIDE_CXX: clang++
+        ARCHOPTS: "-fuse-ld=lld"
+        SUBTARGET: ${{ matrix.subtarget }}
+        ARCHOPTS_C: " -Wno-nontrivial-memcall -march=armv8.2-a"
+        ARCHOPTS_CXX: " -Wno-nontrivial-memcall -march=armv8.2-a"
+        TOOLS: 1
+        PLATFORM: arm64
+      run: make -j3
+    - name: Validate
+      run: ./${{ matrix.executable }}.exe -validate
+    - uses: actions/upload-artifact@main
+      with:
+        name: ${{ matrix.executable }}-windows-clang-arm64-${{ github.sha }}
+        path: |
+          ${{ matrix.executable }}.exe
+          chdman.exe
+          unidasm.exe
+        if-no-files-found: error

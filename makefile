@@ -142,7 +142,7 @@ MAKEPARAMS := -R
 ifeq ($(OS),Windows_NT)
 OS := windows
 GENIEOS := windows
-PLATFORM := x86
+PLATFORM ?= x86
 else
 UNAME := $(shell uname -mps)
 UNAME_M := $(shell uname -m)
