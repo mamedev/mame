@@ -140,9 +140,14 @@ MAKEPARAMS := -R
 #
 
 ifeq ($(OS),Windows_NT)
+OSARCH := $(shell wmic OS get OSArchitecture)
 OS := windows
 GENIEOS := windows
+ifneq ($(findstring ARM 64-bit,$(OSARCH)),)
+PLATFORM := arm64
+else
 PLATFORM := x86
+endif
 else
 UNAME := $(shell uname -mps)
 UNAME_M := $(shell uname -m)
