@@ -46314,7 +46314,11 @@ tagalaga
 taspinv
 taturtf
 
-@source:tvgames/gpm4530a_lexibook_jg7420.cpp
+@source:tvgames/generalplus_gpm453x_nand.cpp
+leapland
+leappawp
+
+@source:tvgames/generalplus_gpm453x_sdcard.cpp
 lx_jg7420
 
 @source:tvgames/magiceyes_pollux_vr3520f.cpp
