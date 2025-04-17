@@ -5230,7 +5230,7 @@ https://segaretro.org/Delisoba_Deluxe
 	<software name="keio2jd" cloneof="keio2" supported="no">
 		<description>Keiou Yuugekitai - Okiraku Tamatebako (Japan)</description>
 		<year>1996</year>
-		<publisher>Victor Entertainment</publisher>
+		<publisher>Soft Bank</publisher>
 		<info name="serial" value="610-6321-01"/>
 		<info name="release" value="19960830"/>
 		<info name="alt_title" value="慶応遊撃隊 ～お気楽玉手箱～"/>
@@ -9227,9 +9227,8 @@ Sega logo animation draws offset [VDP2]
 	<software name="vfremixk" cloneof="vfremix" supported="no">
 		<description>Virtua Fighter Remix (Korea)</description>
 		<year>1995</year>
-		<publisher>Sega</publisher>
+		<publisher>Samsung</publisher>
 		<info name="serial" value="GS-9503J"/>
-		<info name="release" value="19950714"/>
 		<info name="alt_title" value="버쳐 파이터 리믹스"/>
 		<sharedfeat name="compatibility" value="NTSC-K"/>
 		<part name="cdrom" interface="cdrom">
@@ -14315,7 +14314,7 @@ Sega logo animation draws offset [VDP2]
 	<software name="vf2k" cloneof="vf2" supported="no">
 		<description>Virtua Fighter 2 (Korea)</description>
 		<year>1995</year>
-		<publisher>Sega</publisher>
+		<publisher>Samsung</publisher>
 		<info name="serial" value="GS-9507J"/>
 		<info name="alt_title" value="버쳐 파이터2"/>
 		<sharedfeat name="compatibility" value="NTSC-K"/>
