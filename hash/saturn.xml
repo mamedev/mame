@@ -3369,8 +3369,8 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="alt_title" value="ダークセイバー"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
 			<feature name="cd_matrix" value="610-6297-P1K   V"/>
+			<diskarea name="cdrom">
 				<disk name="dark savior (japan, taikenban, 19960409)" sha1="f51b316ead15b0c225fb04e5f2e4369827c52f67" />
 			</diskarea>
 		</part>
@@ -3385,8 +3385,8 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="alt_title" value="ダークセイバー"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
 			<feature name="cd_matrix" value="610-6200P-00704-P1K   V"/>
+			<diskarea name="cdrom">
 				<disk name="dark savior (japan, taikenban, 19960205)" sha1="a0ad545203a811340e42298efb6cc1de73981174" />
 			</diskarea>
 		</part>
@@ -5236,8 +5236,8 @@ https://segaretro.org/Delisoba_Deluxe
 		<info name="alt_title" value="慶応遊撃隊 ～お気楽玉手箱～"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
 			<feature name="cd_matrix" value="610-6321P-00977-P1C   V"/>
+			<diskarea name="cdrom">
 				<disk name="keiou yuugekitai - okiraku tamatebako (japan)" sha1="737ac41c36b20d1350b4c3017d916b3252e4e893" />
 			</diskarea>
 		</part>
@@ -9233,8 +9233,8 @@ Sega logo animation draws offset [VDP2]
 		<info name="alt_title" value="버쳐 파이터 리믹스"/>
 		<sharedfeat name="compatibility" value="NTSC-K"/>
 		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
 			<feature name="cd_matrix" value="MK-81023P-00484-P1K   V"/>
+			<diskarea name="cdrom">
 				<disk name="virtua fighter remix (korea)" sha1="4d5c22230eb87de20a6364232b6283158290414d" />
 			</diskarea>
 		</part>
@@ -11702,8 +11702,8 @@ Sega logo animation draws offset [VDP2]
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<sharedfeat name="requirement" value="sat_cart:ram8"/>
 		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
 			<feature name="cd_matrix" value="610-6869P-02188-P2K"/>
+			<diskarea name="cdrom">
 				<disk name="king of fighters '97, the (japan) (sample)" sha1="41f14f5fd571af76a5f3fa2c8d3bd547eb8e1405" />
 			</diskarea>
 		</part>
@@ -14320,8 +14320,8 @@ Sega logo animation draws offset [VDP2]
 		<info name="alt_title" value="버쳐 파이터2"/>
 		<sharedfeat name="compatibility" value="NTSC-K"/>
 		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
 			<feature name="cd_matrix" value="MK-81014P-00594   1MM1   C   5Z   66   Z"/>
+			<diskarea name="cdrom">
 				<disk name="virtua fighter 2 (korea)" sha1="6108349e0200dfb76dd00aa0808aceb6d8ba1a4d" />
 			</diskarea>
 		</part>
@@ -17810,8 +17810,8 @@ Sega logo animation draws offset [VDP2]
 		<info name="alt_title" value="銀河英雄伝説"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
 			<feature name="cd_matrix" value="610-6452P-01169-P1K   V"/>
+			<diskarea name="cdrom">
 				<disk name="ginga eiyuu densetsu (japan) (demo)" sha1="4cc789d80ed79e2e6f2945e164c65f44bf446981" />
 			</diskarea>
 		</part>
@@ -21878,8 +21878,8 @@ Sega logo animation draws offset [VDP2]
 		<info name="serial" value="GS-9073"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
 			<feature name="cd_matrix" value="VFCG-001P-00349-P2K   V"/>
+			<diskarea name="cdrom">
 				<disk name="virtua fighter cg portrait collection (japan)" sha1="024d8c74d8df69aacd5087b58e6efaa00c9e1202" />
 			</diskarea>
 		</part>
@@ -27674,8 +27674,8 @@ Sega logo animation draws offset [VDP2]
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<sharedfeat name="requirement" value="sat_cart:ram8"/>
 		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
 			<feature name="cd_matrix" value="610-6379P-01014   1MB1   C   68"/>
+			<diskarea name="cdrom">
 				<disk name="real bout garou densetsu (japan) (en,ja,es,pt) (sample)" sha1="a9a282d9849558b32a49dff2555fcbe05e2febca" />
 			</diskarea>
 		</part>
