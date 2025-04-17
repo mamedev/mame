@@ -250,7 +250,7 @@ uint64_t segasp_state::sp_io_r(offs_t offset, uint64_t mem_mask)
 void segasp_state::segasp_map(address_map &map)
 {
 	/* Area 0 */
-	map(0x00000000, 0x001fffff).mirror(0xa2000000).rom().region("maincpu", 0); // BIOS
+	map(0x00000000, 0x001fffff).mirror(0x02000000).rom().region("maincpu", 0); // BIOS
 
 	map(0x005f6800, 0x005f69ff).mirror(0x02000000).rw(FUNC(segasp_state::dc_sysctrl_r), FUNC(segasp_state::dc_sysctrl_w));
 	map(0x005f6c00, 0x005f6cff).mirror(0x02000000).m(m_maple, FUNC(maple_dc_device::amap));

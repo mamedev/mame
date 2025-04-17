@@ -183,10 +183,6 @@ void dc_cons_state::dc_map(address_map &map)
 
 //  map(0x14000000, 0x17ffffff) G2 Ext Device #3
 
-	map(0x8c000000, 0x8cffffff).ram().share("dc_ram");  // another RAM mirror
-
-	map(0xa0000000, 0xa01fffff).rom().region("maincpu", 0);
-
 	map(0xf4000000, 0xf4003fff).noprw(); // SH-4 operand cache address array
 }
 
@@ -381,7 +377,7 @@ void dc_cons_state::gdrom_config(device_t *device)
 void dc_cons_state::dc_base(machine_config &config)
 {
 	/* basic machine hardware */
-	SH4LE(config, m_maincpu, CPU_CLOCK);
+	SH7091(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_md(0, 1);
 	m_maincpu->set_md(1, 0);
 	m_maincpu->set_md(2, 1);

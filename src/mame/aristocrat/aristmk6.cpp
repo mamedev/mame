@@ -167,7 +167,7 @@ private:
 	u8 irl3pend0 = 0, irl3en0 = 0;
 	u8 irl3pend1 = 0, irl3en1 = 0;
 
-	required_device<sh4_device> m_maincpu;
+	required_device<sh7750_device> m_maincpu;
 	required_device<ns16550_device> m_uart0;
 	required_device<ns16550_device> m_uart1;
 	required_device<eeprom_serial_93cxx_device> m_eeprom0;
@@ -438,7 +438,7 @@ static constexpr XTAL ARISTMK6_CPU_CLOCK = 200_MHz_XTAL;
 void aristmk6_state::aristmk6(machine_config &config)
 {
 	/* basic machine hardware */
-	SH4LE(config, m_maincpu, ARISTMK6_CPU_CLOCK);
+	SH7750(config, m_maincpu, ARISTMK6_CPU_CLOCK);
 	m_maincpu->set_md(0, 1);
 	m_maincpu->set_md(1, 0);
 	m_maincpu->set_md(2, 1);
