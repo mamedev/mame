@@ -17812,7 +17812,7 @@ Sega logo animation draws offset [VDP2]
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 			<feature name="cd_matrix" value="610-6452P-01169-P1K   V"/>
-				<disk name="Ginga Eiyuu Densetsu (Japan) (Demo)" sha1="4cc789d80ed79e2e6f2945e164c65f44bf446981" />
+				<disk name="ginga eiyuu densetsu (japan) (demo)" sha1="4cc789d80ed79e2e6f2945e164c65f44bf446981" />
 			</diskarea>
 		</part>
 	</software>
