@@ -294,6 +294,11 @@ ROM_START( pocketmr )
 	ROM_LOAD( "tc58nvg0s3hta00_withspare.u6", 0x0000, 0x8800000, CRC(ec839dde) SHA1(18b77c7e1cf3c66787ccfde9f450671e3d1b0e36) )
 ROM_END
 
+ROM_START( dmnslayg )
+	ROM_REGION(  0x8800000, "nand", ROMREGION_ERASE00 )
+	ROM_LOAD( "tc58nvg0s3hta00_with_spare.u3", 0x0000, 0x8800000, CRC(a9402fdb) SHA1(0809a8da176f65efc2926131ba0259278d3c644d) )
+ROM_END
+
 ROM_START( sanxpet )
 	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
 	ROM_LOAD( "25l64.u1", 0x0000, 0x800000, CRC(f28b9fd3) SHA1(8ed4668f271cbe01065bc0836e49ce70faf10834) )
@@ -380,3 +385,6 @@ CONS( 2019, sanxpet,         0,        0,      gpl32612, gpl32612, generalplus_g
 // uses GPL32610
 CONS( 2019, anpanm19,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "JoyPalette",        "Anpanman: 2019 Floor Mat (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
+// unknown (uses a glob) but it's GeneralPlus and ARM based, so put in here for now
+// ROM has 'GPNandTag2' header rather than the usual
+CONS( 2021, dmnslayg,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Bandai",        "Demon Slayer Tablet (Green) (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
