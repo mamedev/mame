@@ -299,6 +299,11 @@ ROM_START( sanxpet )
 	ROM_LOAD( "25l64.u1", 0x0000, 0x800000, CRC(f28b9fd3) SHA1(8ed4668f271cbe01065bc0836e49ce70faf10834) )
 ROM_END
 
+ROM_START( anpanm19 )
+	ROM_REGION(  0x1000000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "25l1280.u3", 0x0000, 0x1000000, CRC(7932fb3e) SHA1(a381eeba5357fe71e4d6081b9b91b57e5705f7f1) )
+ROM_END
+
 
 void generalplus_gpl32612_game_state::nand_init(int blocksize, int blocksize_stripped)
 {
@@ -371,3 +376,7 @@ CONS( 2019, pocketmr,        0,        0,      gpl32612, gpl32612, generalplus_g
 // uses GP327902, might not fit here, 2019 date from case
 // すみっコぐらし すみっコさがし
 CONS( 2019, sanxpet,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "San-X / Tomy",        "Sumikko Gurashi - Sumikko Sagashi",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// uses GPL32610
+CONS( 2019, anpanm19,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "JoyPalette",        "Anpanman: 2019 Floor Mat (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
