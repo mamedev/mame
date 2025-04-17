@@ -5227,8 +5227,8 @@ https://segaretro.org/Delisoba_Deluxe
 	</software>
 
 	<!-- Demo disc bundled with Keiou Yuugekitai: Katsugeki-hen Kouryaku & Settei Shiryou-shu book -->
-	<software name="keio2jd" cloneof="keio2" supported="no">
-		<description>Keiou Yuugekitai - Okiraku Tamatebako (Japan)</description>
+	<software name="keio2jd" cloneof="keio2" supported="partial">
+		<description>Keiou Yuugekitai - Okiraku Tamatebako (Japan, demo)</description>
 		<year>1996</year>
 		<publisher>Soft Bank</publisher>
 		<info name="serial" value="610-6321-01"/>
@@ -17802,7 +17802,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Self-playing demo disc -->
 	<software name="gingaedd" cloneof="gingaed" supported="no">
-		<description>Ginga Eiyuu Densetsu (Japan, Sample)</description>
+		<description>Ginga Eiyuu Densetsu (Japan, demo)</description>
 		<year>1996</year>
 		<publisher>Tokuma Shoten</publisher>
 		<info name="serial" value="ST-22301G"/>
@@ -21870,7 +21870,7 @@ Sega logo animation draws offset [VDP2]
 		</part>
 	</software>
 
-	<software name="vfportj" cloneof="vfport" supported="no">
+	<software name="vfportj" cloneof="vfport" supported="yes">
 		<description>Virtua Fighter CG Portrait Collection (Japan)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
@@ -27664,7 +27664,7 @@ Sega logo animation draws offset [VDP2]
 	</software>
 
 	<!-- Version 1.000, graphic glitches with 32mb RAM cart, build date 19960804 -->
-	<software name="rbffa" supported="no" cloneof="rbff">
+	<software name="rbffa" cloneof="rbff" supported="no">
 		<description>Real Bout Garou Densetsu (Japan, Sample)</description>
 		<year>1996</year>
 		<publisher>SNK</publisher>
