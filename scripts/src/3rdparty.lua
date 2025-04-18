@@ -1395,13 +1395,6 @@ project "bimg"
 		"BX_CONFIG_DEBUG=0",
 	}
 
-	configuration { "x64", "mingw*", "not arm64" }
-		defines {
-			"ASTCENC_AVX=0",
-			"ASTCENC_SSE=20",
-		}
-	configuration { }
-
 	configuration { "x32" }
 		defines {
 			"ASTCENC_AVX=0",
