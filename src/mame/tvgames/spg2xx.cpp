@@ -485,6 +485,28 @@ static INPUT_PORTS_START( spg2xx ) // base structure for easy debugging / figuri
 	PORT_DIPSETTING(      0x8000, "8000" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( wordlnch )
+	PORT_INCLUDE( spg2xx )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON2 ) // might be multiple inputs here
+	PORT_DIPNAME( 0x8000, 0x8000, "PAL/NTSC" ) // shows in test mode, changes Z from 'Zed' to 'Zee'
+	PORT_DIPSETTING(      0x0000, "NTSC" )
+	PORT_DIPSETTING(      0x8000, "PAL" )
+
+	PORT_MODIFY("P2")
+	PORT_DIPNAME( 0x0040, 0x0000, "Test Pin?" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON3 )
+
+	PORT_MODIFY("P3")
+	PORT_DIPNAME( 0x4000, 0x0000, "P3:4000 (Battery?)" ) // state of this can cause shutdowns too?
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x4000, "4000" )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( epo_tetr ) // all inputs verified against hidden test mode
 	PORT_INCLUDE( spg2xx )
 
@@ -2547,6 +2569,24 @@ ROM_START( prail )
 	ROM_LOAD16_WORD_SWAP( "traingame.u1", 0x000000, 0x8000000, CRC(5c96d526) SHA1(cda0280b320762bda7a7358ec7ce29690aa815fb) )
 ROM_END
 
+ROM_START( wordlnch )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	// TODO: probably just need to swap the upper 2 address lines
+	ROM_LOAD16_WORD_SWAP( "wordplay.u7", 0x000000, 0x200000, CRC(8e48a14b) SHA1(e85f06fef765a3caf0602bf6d98f10664468c4b7) )
+	ROM_CONTINUE(0x400000, 0x200000)
+	ROM_CONTINUE(0x200000, 0x200000)
+	ROM_CONTINUE(0x600000, 0x200000)
+
+	// these are needed to boot right now, checksum passes without them
+	// patch start-up check
+	ROM_FILL(                      0x97f9e, 1, 0x42 )
+	ROM_FILL(                      0x97f9f, 1, 0x40 )
+
+	// patch loop on leapfrog logo
+	ROM_FILL(                      0x95bc8, 1, 0x44 )
+	ROM_FILL(                      0x95bc9, 1, 0x40 )	
+ROM_END
+
 
 void spg2xx_game_state::init_crc()
 {
@@ -2749,3 +2789,5 @@ CONS( 2007, epo_tetr,   0,        0, epo_tetr,  epo_tetr,  epo_tetr_game_state, 
 // Last few bytes of SEEPROM have 'JUNGT' in them, is this developed by JungleSoft/JungleTac?
 CONS( 2012, prail,      0,        0, prail,     prail,     spg2xx_game_prail_state,    empty_init,   "Takara Tomy",                                            "Boku wa Plarail Untenshi - Shinkansen de Ikou! (Japan)",                MACHINE_IMPERFECT_SOUND )
 // the 'plus' version from 2015 runs on newer hardware, see generalplus_gpl16250_spi.cpp
+
+CONS( 2007, wordlnch,   0,        0, spg2xx,    wordlnch,  spg2xx_game_state,          empty_init,    "LeapFrog",                                                "Word Launch (UK)",                MACHINE_NOT_WORKING )
