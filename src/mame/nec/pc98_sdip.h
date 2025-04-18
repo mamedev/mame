@@ -19,6 +19,12 @@ public:
 	void write(offs_t offset, u8 data);
 	void bank_w(int state);
 
+	// legacy i/f
+	// TODO: not necessarily linear
+	ioport_value dsw1_r() { return m_sdip_ram[0]; }
+	ioport_value dsw2_r() { return m_sdip_ram[1]; }
+	ioport_value dsw3_r() { return m_sdip_ram[2]; }
+
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;

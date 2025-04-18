@@ -792,6 +792,8 @@ void pc9801vm_state::a20_ctrl_w(offs_t offset, uint8_t data)
 			m_gate_a20 = 1;
 		else if(data == 0x03)
 			m_gate_a20 = 0;
+		else
+			logerror("CPU port $00f6: unmapped data write %02x\n", data);
 	}
 	m_maincpu->set_input_line(INPUT_LINE_A20, m_gate_a20);
 }
@@ -1242,7 +1244,7 @@ void pc9801us_state::pc9801us_io(address_map &map)
 		if (data == 0xa0 || data == 0xe0)
 			m_sdip->bank_w(BIT(data, 6));
 		else
-			logerror("SDIP: I/O $00f6 unrecognized write %02x\n", data);
+			a20_ctrl_w(3, data);
 	}));
 
 	// 0x841e ~ 0x8f1e SDIP I/O mapping
@@ -1312,7 +1314,7 @@ void pc9801bx_state::pc9801bx2_io(address_map &map)
 {
 	pc9801us_io(map);
 	// NOP legacy SDIP bank access
-	map(0x00f6, 0x00f6).lw8(NAME([] (offs_t offset, u8 data) {}));
+	map(0x00f6, 0x00f6).lw8(NAME([this] (offs_t offset, u8 data) { a20_ctrl_w(3, data); }));
 	map(0x0534, 0x0534).r(FUNC(pc9801bx_state::i486_cpu_mode_r));
 	map(0x09a8, 0x09a8).rw(FUNC(pc9801bx_state::gdc_31kHz_r), FUNC(pc9801bx_state::gdc_31kHz_w));
 	map(0x8f1f, 0x8f1f).lw8(NAME([this] (offs_t offset, u8 data) {
@@ -1752,6 +1754,7 @@ void pc9801_state::dack3_w(int state) { /*logerror("%02x 3\n",state);*/ set_dma_
 
 u8 pc9801_state::ppi_sys_portb_r()
 {
+	// TODO: should be active low for rs232
 	u8 res = 0;
 
 	res |= BIT(m_dsw1->read(), 0) << 3;
