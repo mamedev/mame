@@ -31,7 +31,6 @@ jobs:
             os: windows-latest
             msys: MINGW64
             slug: mingw-w64-x86_64
-            root: "/mingw64"
             cc: gcc
             cxx: g++
             subtarget: mame
@@ -40,7 +39,6 @@ jobs:
             os: windows-latest
             msys: MINGW64
             slug: mingw-w64-x86_64
-            root: "/mingw64"
             cc: clang
             cxx: clang++
             subtarget: tiny
@@ -50,7 +48,6 @@ jobs:
             msys: CLANGARM64
             slug: mingw-w64-clang-aarch64
             extrapkg: mingw-w64-clang-aarch64-gcc-compat
-            root: "/clangarm64"
             cc: clang
             cxx: clang++
             subtarget: mame
@@ -69,7 +66,6 @@ jobs:
         fetch-depth: 0
     - name: Build
       env:
-        MINGW64: ${{ matrix.root }}
         OVERRIDE_AR: "llvm-ar"
         OVERRIDE_CC: ${{ matrix.cc }}
         OVERRIDE_CXX: ${{ matrix.cxx }}

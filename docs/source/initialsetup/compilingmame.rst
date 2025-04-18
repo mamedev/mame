@@ -150,14 +150,8 @@ with MSYS2 and the **pacman** package manager.
 * To generate API documentation from source, you’ll need ``doxygen``.
 * If you plan to rebuild bgfx shaders and you want to rebuild the GLSL parser,
   you’ll need ``bison``.
-* For 64-bit builds, open **MSYS2 MinGW 64-bit** from the start menu, and set
-  up the environment variables ``MINGW64`` to ``/mingw64`` and ``MINGW32`` to an
-  empty string (e.g. using the command **export MINGW64=/mingw64 MINGW32=** in
-  the Bash shell).
-* For 32-bit builds, open **MSYS2 MinGW 32-bit** from the start menu, and set
-  up the environment variables ``MINGW32`` to ``/mingw32`` and ``MINGW64`` to an
-  empty string (e.g. using the command **export MINGW32=/mingw32 MINGW64=** in
-  the Bash shell).
+* For 64-bit builds, open **MSYS2 MinGW 64-bit** from the start menu.
+* For 32-bit builds, open **MSYS2 MinGW 32-bit** from the start menu.
 
 For example you could use these commands to ensure you have the packages you
 need to compile MAME, omitting the ones for configurations you don’t plan to
