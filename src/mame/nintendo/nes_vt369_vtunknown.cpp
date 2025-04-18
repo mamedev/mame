@@ -708,6 +708,13 @@ ROM_START( lxccplan )
 	ROM_IGNORE(0x4000000)
 ROM_END
 
+ROM_START( lxpcsp )
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	// standard flash ROM
+	ROM_LOAD( "s29gl512n11tfi02.u2", 0x00000, 0x4000000, CRC(113e22f2) SHA1(c57184131db3f3c82d09d7757f0977223698f62c) )
+ROM_END
+
+
 ROM_START( red5mam )
 	ROM_REGION( 0x8000000, "mainrom", 0 )
 	ROM_LOAD( "mam.u3", 0x00000, 0x8000000, CRC(0c0a0ecd) SHA1(2dfd8437de17fc9975698f1933dd81fbac78466d) )
@@ -1013,6 +1020,8 @@ CONS( 200?, lxcmcypp,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknow
 CONS( 200?, lxccminn,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init,    "Lexibook", "Console Colour - Minnie Mouse", MACHINE_NOT_WORKING )
 CONS( 200?, lxccplan,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init,    "Lexibook", "Console Colour - Disney's Planes", MACHINE_NOT_WORKING )
 
+CONS( 2020, lxpcsp,    0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init,    "Lexibook", "Power Console - Marvel Spider-Man", MACHINE_NOT_WORKING )
+
 // GB-NO13-Main-VT389-2 on PCBs
 CONS( 2016, rtvgc300,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init,    "Lexibook", "Retro TV Game Console - 300 Games", MACHINE_NOT_WORKING )
 CONS( 2017, rtvgc300fz,0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init,    "Lexibook", "Retro TV Game Console - Frozen - 300 Games", MACHINE_NOT_WORKING )
@@ -1039,7 +1048,6 @@ CONS( 2017, rtvgc300fz,0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknow
 	Power Console - Generic EN/ES model
 	Power Console - Generic EN/DE model
 	Power Console - Paw Patrol
-	Power Console - Spiderman
 
     (units for use with TV)
     Lexibook Retro TV Game Console (300 Games) - Cars
