@@ -2571,11 +2571,7 @@ ROM_END
 
 ROM_START( wordlnch )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
-	// TODO: probably just need to swap the upper 2 address lines
-	ROM_LOAD16_WORD_SWAP( "wordplay.u7", 0x000000, 0x200000, CRC(8e48a14b) SHA1(e85f06fef765a3caf0602bf6d98f10664468c4b7) )
-	ROM_CONTINUE(0x400000, 0x200000)
-	ROM_CONTINUE(0x200000, 0x200000)
-	ROM_CONTINUE(0x600000, 0x200000)
+	ROM_LOAD16_WORD_SWAP( "wordplay.u7", 0x000000, 0x800000, CRC(604f59ff) SHA1(024d554a15e6c3a6b9c3a15bfd657964d1deba83) )
 
 	// these are needed to boot right now, checksum passes without them
 	// patch start-up check
