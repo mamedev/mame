@@ -691,16 +691,15 @@ void pc9821_canbe_state::pc9821cx3_io(address_map &map)
 }
 
 static INPUT_PORTS_START( pc9821 )
-	// TODO: verify how many "switches" are really present on pc9821
-	// I suspect there are none: if you flip some of these then BIOS keeps throwing
-	// "set the sdip" warning until it matches parity odd.
-	// They may actually be hardwired defaults that should return constant values depending
-	// on machine type.
 	PORT_START("DSW1")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("sdip", FUNC(pc98_sdip_device::dsw1_r))
 
 	PORT_START("DSW2")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("sdip", FUNC(pc98_sdip_device::dsw2_r))
+	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("sdip", FUNC(pc98_sdip_device::dsw2_r))
+	// HACK: PC-9821 defaults to 5 MHz, which isn't ideal in several cases without -debug
+	PORT_DIPNAME( 0x80, 0x80, "GDC clock" )
+	PORT_DIPSETTING(    0x80, "2.5 MHz" )
+	PORT_DIPSETTING(    0x00, "5 MHz" )
 
 	PORT_START("DSW3")
 	PORT_BIT( 0x23, IP_ACTIVE_LOW, IPT_CUSTOM ) //PORT_CUSTOM_DEVICE_MEMBER("sdip", FUNC(pc98_sdip_device::dsw3_r))
