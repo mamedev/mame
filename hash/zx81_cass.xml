@@ -348,6 +348,7 @@ RAND USR 16530
 		<description>5 Programmes Pour Jouer</description>
 		<year>1984</year>
 		<publisher>Direco International</publisher>
+		<info name="language" value="French" />
 		<part name="cass1" interface="zx81_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="2483">
@@ -363,9 +364,10 @@ RAND USR 16530
 	</software>
 
 	<software name="5pourflech">
-		<description>5 Programmes Pour Reflechir</description>
+		<description>5 Programmes Pour Réfléchir</description>
 		<year>1984</year>
 		<publisher>Direco International</publisher>
+		<info name="language" value="French" />
 		<part name="cass1" interface="zx81_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="2271">
@@ -1315,7 +1317,7 @@ RAND USR 16530
 	</software>
 
 	<software name="breakoutj">
-		<description>Breakout (J.K.G.)</description>
+		<description>Breakout (J.K. Greye)</description>
 		<year>1981</year>
 		<publisher>J.K. Greye Software</publisher>
 		<part name="cass1" interface="zx81_cass">
@@ -1326,7 +1328,7 @@ RAND USR 16530
 	</software>
 
 	<software name="breakoutn">
-		<description>Breakout (N.G.S.)</description>
+		<description>Breakout (New Generation)</description>
 		<year>1982</year>
 		<publisher>New Generation Software</publisher>
 		<part name="cass1" interface="zx81_cass">
@@ -3154,7 +3156,7 @@ RAND USR 16530
 				<rom name="Fortaleza de Zorlac - A.tzx" size="7497" crc="8133edf7" sha1="69083d18819d4c52136b10ceb8a447b5298c2b30"/>
 			</dataarea>
 		</part>
-		<part name="cass1" interface="zx81_cass">
+		<part name="cass2" interface="zx81_cass">
 			<dataarea name="cass" size="7497">
 				<rom name="Fortaleza de Zorlac - B.tzx" size="7497" crc="5812c1d5" sha1="706ef48a13c11279e503fdc169370de6d11cb60a"/>
 			</dataarea>
@@ -6416,6 +6418,25 @@ Defender: not working
 		</part>
 	</software>
 
+	<software name="othello_di">
+		<description>Othello (Direco)</description>
+		<year>1982</year>
+		<publisher>Direco International</publisher>
+		<info name="language" value="French" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Face A - OTHELLO en basic - 3 niveaux"/>
+			<dataarea name="cass" size="11216">
+				<rom name="OthelloReversi (basic) - Face A.p" size="11216" crc="08bd891f" sha1="f23c02f68615341e595fd964a79da19fe5bd7694"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Face B - OTHELLO langage machine - 9 niveaux"/>
+			<dataarea name="cass" size="6792">
+				<rom name="OthelloReversi (langage machine) - Face B.p" size="6792" crc="aac73c93" sha1="752dd4dd76be97921caec004367ce4c1b6b22b2a"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="othellom">
 		<description>Othello (Moi)</description>
 		<year>1982</year>
@@ -8769,7 +8790,7 @@ Defender: not working
 	<software name="talkback">
 		<description>Talkback</description>
 		<year>1983</year>
-		<publisher>M.W.F.Ringrose</publisher>
+		<publisher>M.W.F. Ringrose</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="12740">
 				<rom name="Talkback.tzx" size="12740" crc="36724d18" sha1="6b32ff6dd4930ad62cadb59b3c4ecdb6eb4a2654"/>
