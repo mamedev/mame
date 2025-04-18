@@ -393,7 +393,7 @@ CONS( 2019, pocketmr,        0,        0,      gpl32612, gpl32612, generalplus_g
 // すみっコぐらし すみっコさがし
 CONS( 2019, sanxpet,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "San-X / Tomy",        "Sumikko Gurashi - Sumikko Sagashi",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 // same SoC as above
-CONS( 2019, sanxpeta,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "San-X / Tomy",        "San-X / Tomy Pet",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2021, sanxpeta,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "San-X / Tomy",        "San-X / Tomy Pet",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 // same SoC as above
 CONS( 2019, tomyegg,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Tomy",        "Tomy Egg Pet",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
