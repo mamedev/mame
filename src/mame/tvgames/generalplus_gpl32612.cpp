@@ -394,8 +394,8 @@ CONS( 2019, pocketmr,        0,        0,      gpl32612, gpl32612, generalplus_g
 CONS( 2019, sanxpet,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "San-X / Tomy",        "Sumikko Gurashi - Sumikko Sagashi",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 // same SoC as above
 CONS( 2021, sanxpeta,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "San-X / Tomy",        "San-X / Tomy Pet",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-// same SoC as above
-CONS( 2019, tomyegg,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Tomy",        "Tomy Egg Pet",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+// same SoC as above - キラッとプリ☆チャン プリたまGO ミスティパープル
+CONS( 2019, tomyegg,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Tomy",        "Kiratto Pri-Chan - Pritama Go: Misty Purple (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // uses GPL32610
 CONS( 2019, anpanm19,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "JoyPalette",        "Anpanman: 2019 Floor Mat (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
