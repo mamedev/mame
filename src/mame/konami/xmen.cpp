@@ -746,6 +746,7 @@ void xmen6p_state::xmen6p(machine_config &config)
 	// video hardware
 	config.set_default_layout(layout_dualhsxs);
 
+	// TODO: why doesn't just changing m_screen parameters work? nor config.replace()?
 	config.device_remove("screen");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
