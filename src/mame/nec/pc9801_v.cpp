@@ -130,7 +130,6 @@ void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd,
 			// ... but then ginga and gage expects working LR for PCG depending on the attribute.
 			// beast3 uses tile bit 7 for the heart shaped char displayed on first screen.
 			// TODO: rename pcg to gaiji (actual nomenclature)
-			const u8 pcg_lr = (BIT(knj_tile, 7) || BIT(tile, 7));
 			tile &= 0x7f;
 			tile <<= 8;
 			tile |= (knj_tile & 0x7f);
@@ -141,7 +140,7 @@ void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd,
 				// draws these PCG strips where first tile is identical to second,
 				// with LR disabled on both but expecting the right half at the repetition anyway.
 				// TODO: what happens with LR enabled?
-				if(lasttile == (tile | knj_tile))
+				if(lasttile == tile)
 				{
 					tile_lr = 1;
 					lasttile = -1;
@@ -149,10 +148,10 @@ void pc9801_state::draw_text(bitmap_rgb32 &bitmap, uint32_t addr, int y, int wd,
 				}
 				else
 				{
-					if((lasttile & 0x7f7f) == tile)
+					if(lasttile == tile)
 						pair = true;
-					tile_lr = pcg_lr;
-					lasttile = (tile | knj_tile);
+					tile_lr = 0;
+					lasttile = tile;
 				}
 				x_step = 1;
 			}
