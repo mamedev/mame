@@ -74,7 +74,7 @@ u8 r800_device::r800_sll(u8 value)
 {
 	const u8 c = (value & 0x80) ? CF : 0;
 	const u8 res = u8(value << 1);
-	set_f(SZP[res] | c);
+	set_f(flags_szp(res) | c);
 	return res;
 }
 

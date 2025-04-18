@@ -206,10 +206,10 @@ macro   r800:ld_r_a
 
 macro   ld_a_r
 	call nomreq_ir 1
-	A = (m_r & 0x7f) | m_r2; set_f((F & CF) | SZ[A] | (m_iff2 << 2)); m_after_ldair = true;
+	A = (m_r & 0x7f) | m_r2; set_f((F & CF) | flags_sz(A) | (m_iff2 << 2)); m_after_ldair = true;
 
 macro   r800:ld_a_r
-	A = (m_r & 0x7f) | m_r2; set_f((F & CF) | SZ[A] | (m_iff2 << 2)); m_after_ldair = true;
+	A = (m_r & 0x7f) | m_r2; set_f((F & CF) | flags_sz(A) | (m_iff2 << 2)); m_after_ldair = true;
 
 macro   ld_i_a
 	call nomreq_ir 1
@@ -220,10 +220,10 @@ macro   r800:ld_i_a
 
 macro   ld_a_i
 	call nomreq_ir 1
-	A = m_i; set_f((F & CF) | SZ[A] | (m_iff2 << 2)); m_after_ldair = true;
+	A = m_i; set_f((F & CF) | flags_sz(A) | (m_iff2 << 2)); m_after_ldair = true;
 
 macro   r800:ld_a_i
-	A = m_i; set_f((F & CF) | SZ[A] | (m_iff2 << 2)); m_after_ldair = true;
+	A = m_i; set_f((F & CF) | flags_sz(A) | (m_iff2 << 2)); m_after_ldair = true;
 
 macro   rst	 addr
 	TDAT = PC;
@@ -237,7 +237,7 @@ macro   rrd
 	4 * call nomreq_addr
 	TDAT_H = TDAT8; TDAT8 = (TDAT8 >> 4) | (A << 4);
 	call wm
-	A = (A & 0xf0) | (TDAT_H & 0x0f); set_f((F & CF) | SZP[A]);
+	A = (A & 0xf0) | (TDAT_H & 0x0f); set_f((F & CF) | flags_szp(A));
 
 macro   rld
 	TADR = HL;
@@ -246,7 +246,7 @@ macro   rld
 	4 * call nomreq_addr
 	TDAT_H = TDAT8; TDAT8 = (TDAT8 << 4) | (A & 0x0f);
 	call wm
-	A = (A & 0xf0) | (TDAT_H >> 4); set_f((F & CF) | SZP[A]);
+	A = (A & 0xf0) | (TDAT_H >> 4); set_f((F & CF) | flags_szp(A));
 
 macro   ex_sp
 	TDAT2 = TDAT;
@@ -300,13 +300,13 @@ macro   cpi
 	TADR = HL;
 	call rm
 	5 * call nomreq_addr
-	{ u8 res = A - TDAT8; WZ++; HL++; BC--; set_f((F & CF) | (SZ[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF); if (F & HF) res -= 1; if (res & 0x02) F |= YF; if (res & 0x08) F |= XF; if (BC) F |= VF; }
+	{ u8 res = A - TDAT8; WZ++; HL++; BC--; set_f((F & CF) | (flags_sz(res)&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF); if (F & HF) res -= 1; if (res & 0x02) F |= YF; if (res & 0x08) F |= XF; if (BC) F |= VF; }
 
 macro   r800:cpi
 	TADR = HL;
 	call rm
 	call nomreq_addr
-	{ u8 res = A - TDAT8; WZ++; HL++; BC--; set_f((F & CF) | (SZ[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF); if (F & HF) res -= 1; if (res & 0x02) F |= YF; if (res & 0x08) F |= XF; if (BC) F |= VF; }
+	{ u8 res = A - TDAT8; WZ++; HL++; BC--; set_f((F & CF) | (flags_sz(res)&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF); if (F & HF) res -= 1; if (res & 0x02) F |= YF; if (res & 0x08) F |= XF; if (BC) F |= VF; }
 
 macro   ini
 	call nomreq_ir 1
@@ -314,14 +314,14 @@ macro   ini
 	call in
 	WZ = BC + 1; B--; TADR = HL;
 	call wm
-	{ HL++; set_f(SZ[B]); unsigned t = (unsigned)((C + 1) & 0xff) + (unsigned)TDAT8; if (TDAT8 & SF) F |= NF; if (t & 0x100) F |= HF | CF; F |= SZP[(u8)(t & 0x07) ^ B] & PF; }
+	{ HL++; set_f(flags_sz(B)); unsigned t = (unsigned)((C + 1) & 0xff) + (unsigned)TDAT8; if (TDAT8 & SF) F |= NF; if (t & 0x100) F |= HF | CF; F |= flags_szp((u8)(t & 0x07) ^ B) & PF; }
 
 macro   r800:ini
 	TADR = BC;
 	call in
 	WZ = BC + 1; B--; TADR = HL;
 	call wm
-	{ HL++; set_f(SZ[B]); unsigned t = (unsigned)((C + 1) & 0xff) + (unsigned)TDAT8; if (TDAT8 & SF) F |= NF; if (t & 0x100) F |= HF | CF; F |= SZP[(u8)(t & 0x07) ^ B] & PF; }
+	{ HL++; set_f(flags_sz(B)); unsigned t = (unsigned)((C + 1) & 0xff) + (unsigned)TDAT8; if (TDAT8 & SF) F |= NF; if (t & 0x100) F |= HF | CF; F |= flags_szp((u8)(t & 0x07) ^ B) & PF; }
 
 macro   outi
 	call nomreq_ir 1
@@ -329,14 +329,14 @@ macro   outi
 	call rm
 	B--; WZ = BC + 1; TADR = BC;
 	call out
-	{ HL++; set_f(SZ[B]); unsigned t = (unsigned)L + (unsigned)TDAT8; if (TDAT8 & SF) F |= NF; if (t & 0x100) F |= HF | CF; F |= SZP[(u8)(t & 0x07) ^ B] & PF; }
+	{ HL++; set_f(flags_sz(B)); unsigned t = (unsigned)L + (unsigned)TDAT8; if (TDAT8 & SF) F |= NF; if (t & 0x100) F |= HF | CF; F |= flags_szp((u8)(t & 0x07) ^ B) & PF; }
 
 macro   r800:outi
 	TADR = HL;
 	call rm
 	B--; WZ = BC + 1; TADR = BC;
 	call out
-	{ HL++; set_f(SZ[B]); unsigned t = (unsigned)L + (unsigned)TDAT8; if (TDAT8 & SF) F |= NF; if (t & 0x100) F |= HF | CF; F |= SZP[(u8)(t & 0x07) ^ B] & PF; }
+	{ HL++; set_f(flags_sz(B)); unsigned t = (unsigned)L + (unsigned)TDAT8; if (TDAT8 & SF) F |= NF; if (t & 0x100) F |= HF | CF; F |= flags_szp((u8)(t & 0x07) ^ B) & PF; }
 
 macro   ldd
 	TADR = HL;
@@ -359,14 +359,14 @@ macro   cpd
 	call rm
 	TADR = HL;
 	5 * call nomreq_addr
-	{ u8 res = A - TDAT8; WZ--; HL--; BC--; set_f((F & CF) | (SZ[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF); if (F & HF) res -= 1; if (res & 0x02) F |= YF; if (res & 0x08) F |= XF; if (BC) F |= VF; }
+	{ u8 res = A - TDAT8; WZ--; HL--; BC--; set_f((F & CF) | (flags_sz(res)&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF); if (F & HF) res -= 1; if (res & 0x02) F |= YF; if (res & 0x08) F |= XF; if (BC) F |= VF; }
 
 macro   r800:cpd
 	TADR = HL;
 	call rm
 	TADR = HL;
 	call nomreq_addr
-	{ u8 res = A - TDAT8; WZ--; HL--; BC--; set_f((F & CF) | (SZ[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF); if (F & HF) res -= 1; if (res & 0x02) F |= YF; if (res & 0x08) F |= XF; if (BC) F |= VF; }
+	{ u8 res = A - TDAT8; WZ--; HL--; BC--; set_f((F & CF) | (flags_sz(res)&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF); if (F & HF) res -= 1; if (res & 0x02) F |= YF; if (res & 0x08) F |= XF; if (BC) F |= VF; }
 
 macro   ind
 	call nomreq_ir 1
@@ -374,14 +374,14 @@ macro   ind
 	call in
 	WZ = BC - 1; B--; TADR = HL;
 	call wm
-	{ HL--; set_f(SZ[B]); unsigned t = ((unsigned)(C - 1) & 0xff) + (unsigned)TDAT8; if (TDAT8 & SF) F |= NF; if (t & 0x100) F |= HF | CF; F |= SZP[(u8)(t & 0x07) ^ B] & PF; }
+	{ HL--; set_f(flags_sz(B)); unsigned t = ((unsigned)(C - 1) & 0xff) + (unsigned)TDAT8; if (TDAT8 & SF) F |= NF; if (t & 0x100) F |= HF | CF; F |= flags_szp((u8)(t & 0x07) ^ B) & PF; }
 
 macro   r800:ind
 	TADR = BC;
 	call in
 	WZ = BC - 1; B--; TADR = HL;
 	call wm
-	{ HL--; set_f(SZ[B]); unsigned t = ((unsigned)(C - 1) & 0xff) + (unsigned)TDAT8; if (TDAT8 & SF) F |= NF; if (t & 0x100) F |= HF | CF; F |= SZP[(u8)(t & 0x07) ^ B] & PF; }
+	{ HL--; set_f(flags_sz(B)); unsigned t = ((unsigned)(C - 1) & 0xff) + (unsigned)TDAT8; if (TDAT8 & SF) F |= NF; if (t & 0x100) F |= HF | CF; F |= flags_szp((u8)(t & 0x07) ^ B) & PF; }
 
 macro   outd
 	call nomreq_ir 1
@@ -389,14 +389,14 @@ macro   outd
 	call rm
 	B--; WZ = BC - 1; TADR = BC;
 	call out
-	{ HL--; set_f(SZ[B]); unsigned t = (unsigned)L + (unsigned)TDAT8; if (TDAT8 & SF) F |= NF; if (t & 0x100) F |= HF | CF; F |= SZP[(u8)(t & 0x07) ^ B] & PF; }
+	{ HL--; set_f(flags_sz(B)); unsigned t = (unsigned)L + (unsigned)TDAT8; if (TDAT8 & SF) F |= NF; if (t & 0x100) F |= HF | CF; F |= flags_szp((u8)(t & 0x07) ^ B) & PF; }
 
 macro   r800:outd
 	TADR = HL;
 	call rm
 	B--; WZ = BC - 1; TADR = BC;
 	call out
-	{ HL--; set_f(SZ[B]); unsigned t = (unsigned)L + (unsigned)TDAT8; if (TDAT8 & SF) F |= NF; if (t & 0x100) F |= HF | CF; F |= SZP[(u8)(t & 0x07) ^ B] & PF; }
+	{ HL--; set_f(flags_sz(B)); unsigned t = (unsigned)L + (unsigned)TDAT8; if (TDAT8 & SF) F |= NF; if (t & 0x100) F |= HF | CF; F |= flags_szp((u8)(t & 0x07) ^ B) & PF; }
 
 macro   ldir
 	call ldi
@@ -3605,10 +3605,10 @@ dd93	# DB   DD
 	call jump 0093
 
 dd94	# SUB  HX
-	sub(HX);
+	sub_a(HX);
 
 dd95	# SUB  LX
-	sub(LX);
+	sub_a(LX);
 
 dd96	# SUB  (IX+o)
 	call eax
@@ -3616,7 +3616,7 @@ dd96	# SUB  (IX+o)
 	5 * call nomreq_addr
 	TADR = m_ea;
 	call rm
-	sub(TDAT8);
+	sub_a(TDAT8);
 
 dd97	# DB   DD
 	illegal_1();
@@ -4693,10 +4693,10 @@ fd93	# DB   FD
 	call jump 0093
 
 fd94	# SUB  HY
-	sub(HY);
+	sub_a(HY);
 
 fd95	# SUB  LY
-	sub(LY);
+	sub_a(LY);
 
 fd96	# SUB  (IY+o)
 	call eay
@@ -4704,7 +4704,7 @@ fd96	# SUB  (IY+o)
 	5 * call nomreq_addr
 	TADR = m_ea;
 	call rm
-	sub(TDAT8);
+	sub_a(TDAT8);
 
 fd97	# DB   FD
 	illegal_1();
@@ -5338,7 +5338,7 @@ ed3f	# DB   ED
 ed40	# IN   B,(C)
 	TADR = BC;
 	call in
-	B = TDAT8; set_f((F & CF) | SZP[B]); WZ = TADR + 1;
+	B = TDAT8; set_f((F & CF) | flags_szp(B)); WZ = TADR + 1;
 
 ed41	# OUT  (C),B
 	TADR = BC; TDAT8 = B;
@@ -5370,7 +5370,7 @@ ed47	# LD   i,A
 ed48	# IN   C,(C)
 	TADR = BC;
 	call in
-	C = TDAT8; set_f((F & CF) | SZP[C]); WZ = TADR + 1;
+	C = TDAT8; set_f((F & CF) | flags_szp(C)); WZ = TADR + 1;
 
 ed49	# OUT  (C),C
 	TADR = BC; TDAT8 = C;
@@ -5402,7 +5402,7 @@ ed4f	# LD   r,A
 ed50	# IN   D,(C)
 	TADR = BC;
 	call in
-	D = TDAT8; set_f((F & CF) | SZP[D]); WZ = TADR + 1;
+	D = TDAT8; set_f((F & CF) | flags_szp(D)); WZ = TADR + 1;
 
 ed51	# OUT  (C),D
 	TADR = BC; TDAT8 = D;
@@ -5434,7 +5434,7 @@ ed57	# LD   A,i
 ed58	# IN   E,(C)
 	TADR = BC;
 	call in
-	E = TDAT8; set_f((F & CF) | SZP[E]); WZ = TADR + 1;
+	E = TDAT8; set_f((F & CF) | flags_szp(E)); WZ = TADR + 1;
 
 ed59	# OUT  (C),E
 	TADR = BC; TDAT8 = E;
@@ -5466,7 +5466,7 @@ ed5f	# LD   A,r
 ed60	# IN   H,(C)
 	TADR = BC;
 	call in
-	H = TDAT8; set_f((F & CF) | SZP[H]); WZ = TADR + 1;
+	H = TDAT8; set_f((F & CF) | flags_szp(H)); WZ = TADR + 1;
 
 ed61	# OUT  (C),H
 	TADR = BC; TDAT8 = H;
@@ -5498,7 +5498,7 @@ ed67	# RRD  (HL)
 ed68	# IN   L,(C)
 	TADR = BC;
 	call in
-	L = TDAT8; set_f((F & CF) | SZP[L]); WZ = TADR + 1;
+	L = TDAT8; set_f((F & CF) | flags_szp(L)); WZ = TADR + 1;
 
 ed69	# OUT  (C),L
 	TADR = BC; TDAT8 = L;
@@ -5530,7 +5530,7 @@ ed6f	# RLD  (HL)
 ed70	# IN   0,(C)
 	TADR = BC;
 	call in
-	set_f((F & CF) | SZP[TDAT8]); WZ = TADR + 1;
+	set_f((F & CF) | flags_szp(TDAT8)); WZ = TADR + 1;
 
 ed71	# OUT  (C),0
 	TADR = BC; TDAT8 = 0;
@@ -5562,7 +5562,7 @@ ed77	# DB   ED,77
 ed78	# IN   A,(C)
 	TADR = BC;
 	call in
-	A = TDAT8; set_f((F & CF) | SZP[A]); WZ = TADR + 1;
+	A = TDAT8; set_f((F & CF) | flags_szp(A)); WZ = TADR + 1;
 
 ed79	# OUT  (C),A
 	TADR = BC; TDAT8 = A;
@@ -6490,30 +6490,30 @@ edff	# DB   ED
 	adc_a(A);
 
 0090	# SUB  B
-	sub(B);
+	sub_a(B);
 
 0091	# SUB  C
-	sub(C);
+	sub_a(C);
 
 0092	# SUB  D
-	sub(D);
+	sub_a(D);
 
 0093	# SUB  E
-	sub(E);
+	sub_a(E);
 
 0094	# SUB  H
-	sub(H);
+	sub_a(H);
 
 0095	# SUB  L
-	sub(L);
+	sub_a(L);
 
 0096	# SUB  (HL)
 	TADR = HL;
 	call rm
-	sub(TDAT8);
+	sub_a(TDAT8);
 
 0097	# SUB  A
-	sub(A);
+	sub_a(A);
 
 0098	# SBC  A,B
 	sbc_a(B);
@@ -6733,7 +6733,7 @@ edff	# DB   ED
 
 00d6	# SUB  n
 	call arg
-	sub(TDAT8);
+	sub_a(TDAT8);
 
 00d7	# RST  2
 	call rst 0x10
