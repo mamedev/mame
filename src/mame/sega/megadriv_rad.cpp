@@ -775,6 +775,11 @@ ROM_START( ra145 )
 	ROM_LOAD16_WORD_SWAP( "ra145.bin", 0x000000, 0x8000000, BAD_DUMP CRC(30583950) SHA1(855eae232e3830a505f9bc1a26edb3a7d15ce4d1) )
 ROM_END
 
+ROM_START( banmrid )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "b75909a.u10", 0x000000, 0x400000, CRC(b439e06e) SHA1(3a87fc16186b7042dd92c7cf68c4284cd86f9175) )
+ROM_END
+
 void megadriv_b010xx_select_state::init_atgame40()
 {
 	m_romsize = 0x1000000;
@@ -902,6 +907,7 @@ CONS( 2004, rad_orun,  0,        0, megadriv_radica_3button_pal,  radica_3button
 // this has been verified as identical to the 6-in-1 cartridge that came with the Menacer gun for the MD
 CONS( 2004, rad_mncr,  0,        0, megadriv_radica_3button_ntsc, radica_3button_1player, megadriv_radica_state, init_megadriv, "Radica / Sega",                     "Menacer (Radica Plug & Play)", MACHINE_NOT_WORKING )
 
+CONS( 2002, banmrid,    0,        0, megadriv_radica_3button_ntsc, radica_3button_1player, megadriv_radica_state, init_megadriv, "Bandai",                     "Masked Rider Plug & Play (Japan)", MACHINE_NOT_WORKING )
 
 // From a European unit but NTSC? - code is hacked from original USA Genesis game with region check still intact? (does the clone hardware always identify as such? or does the bypassed boot code skip the check?)
 // TODO: move out of here eventually once the enhanced MD part is emulated rather than bypassed (it's probably the same as the 145-in-1 multigame unit, but modified to only include this single game)
