@@ -1395,6 +1395,25 @@ project "bimg"
 		"BX_CONFIG_DEBUG=0",
 	}
 
+	if not string.find(_OPTIONS["gcc"], "clang") then
+		-- This is a gross hack.  For some reason GitHub Actions MinGW GCC seems to define SSE feature macros for features that are not enabled.
+		local archopts = (_OPTIONS["ARCHOPTS"] or "") .. " " .. (_OPTIONS["ARCHOPTS_CXX"] or "")
+		local ssever = "20"
+		if string.find(archopts, "-msse4.2") then
+			ssever = "42"
+		elseif string.find(archopts, "-msse4.1") then
+			ssever = "41"
+		elseif string.find(archopts, "-msse3") then
+			ssever = "30"
+		end
+		configuration { "x64", "mingw*", "not arm64" }
+			defines {
+				"ASTCENC_AVX=0",
+				"ASTCENC_SSE=" .. ssever,
+			}
+		configuration { }
+	end
+
 	configuration { "x32" }
 		defines {
 			"ASTCENC_AVX=0",
