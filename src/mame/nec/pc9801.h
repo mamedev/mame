@@ -389,6 +389,7 @@ public:
 	}
 
 	void pc9801vm(machine_config &config);
+	void pc9801uv(machine_config &config);
 
 	void pc9801ux(machine_config &config);
 	void pc9801vx(machine_config &config);

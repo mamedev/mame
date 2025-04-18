@@ -2555,6 +2555,17 @@ void pc9801vm_state::pc9801vm(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9801vm_state, pc9801_common)
 }
 
+// UV is essentially a VM with 3.5 drives
+// Released as UV2 (384KB RAM), UV21 (640KB RAM) then UV11 (UV21 but smaller?)
+void pc9801vm_state::pc9801uv(machine_config &config)
+{
+	pc9801vm(config);
+
+	config_floppy_35hd(config);
+
+	m_ram->set_default_size("640K").set_extra_options("384K");
+}
+
 void pc9801vm_state::pc9801ux(machine_config &config)
 {
 	pc9801rs(config);
@@ -2772,6 +2783,37 @@ ROM_START( pc9801vm )
 	ROM_LOAD16_BYTE( "cpu_board_3a_23c256e.bin",   0x08000, 0x4000, CRC(4128276e) SHA1(32acb7eee779a31838a17ce51b05a9a987af4099) )
 	ROM_CONTINUE( 0x00000, 0x4000 )
 
+	ROM_REGION( 0x80000, "chargen", 0 )
+//  ROM_LOAD( "font_vm.rom",     0x000000, 0x046800, BAD_DUMP CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff) )
+	// TODO: contains 8x8 "graphics" characters but we don't use them
+	ROM_LOAD( "main_board_12f_d2364ec.bin", 0x000000, 0x002000, CRC(11197271) SHA1(8dbd2f25daeed545ea2c74d849f0a209ceaf4dd7) )
+
+	ROM_REGION( 0x80000, "raw_kanji", ROMREGION_ERASEFF )
+	// on main board, uPD23100 type roms
+	// kanji and most other 16x16 characters
+	ROM_LOAD16_BYTE( "main_board_12h_231000.bin", 0x00000, 0x20000, CRC(ecc2c062) SHA1(36c935c0f26c02a2b1ea46f5b6cd03fc11c7b003) )
+	ROM_LOAD16_BYTE( "main_board_10h_231000.bin", 0x00001, 0x20000, CRC(91d78281) SHA1(85a18ad40e281e68071f91800201e43d78fb4f1c) )
+	// 8x16 characters and the remaining 16x16 characters, with inverted bit order like 12f
+	ROM_LOAD16_BYTE( "main_board_8h_d23256ac.bin", 0x40000, 0x04000, CRC(62a32ba6) SHA1(cdab480ae0dad9d128e52afb15e6c0b2b122cc3f) )
+	ROM_CONTINUE( 0x40001, 0x04000 )
+
+	ROM_REGION( 0x100000, "kanji", ROMREGION_ERASEFF )
+	ROM_REGION( 0x80000, "new_chargen", ROMREGION_ERASEFF )
+
+//  LOAD_KANJI_ROMS
+//  LOAD_IDE_ROM
+ROM_END
+
+ROM_START( pc9801uv2 )
+	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "d23c128ec-195.bin", 0x10000, 0x4000, CRC(082c86eb) SHA1(6f503b75906fd4932152f45c6d37c1e230934773) )
+	ROM_LOAD16_BYTE( "d23c128ec-196.bin", 0x10001, 0x4000, CRC(d90b730b) SHA1(27f9b67c0454ee6107db20912f08f87ff682adcc) )
+	ROM_LOAD16_BYTE( "d23c256ec-164.bin", 0x08000, 0x4000, CRC(d6cd9fef) SHA1(4ade6f891ee4c5ccb31031a520ab5ba757a6944c) )
+	ROM_CONTINUE( 0x00000, 0x4000 )
+	ROM_LOAD16_BYTE( "d23c256ec-165.bin", 0x08001, 0x4000, CRC(2d348381) SHA1(a1c7ebb7727380bcb879b2c609a1fe6cd5bfa0bb) )
+	ROM_CONTINUE( 0x00001, 0x4000 )
+
+	// borrowed from pc9801vm
 	ROM_REGION( 0x80000, "chargen", 0 )
 //  ROM_LOAD( "font_vm.rom",     0x000000, 0x046800, BAD_DUMP CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff) )
 	// TODO: contains 8x8 "graphics" characters but we don't use them
@@ -3152,6 +3194,8 @@ COMP( 1983, pc9801f,    pc9801,   0, pc9801,    pc9801,   pc9801_state, init_pc9
 
 // VM class (V30)
 COMP( 1985, pc9801vm,   0,        0, pc9801vm,  pc9801rs, pc9801vm_state, init_pc9801vm_kanji, "NEC",   "PC-9801VM",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // genuine dump
+// UV class (V30)
+COMP( 1986, pc9801uv2,  pc9801vm, 0, pc9801uv,  pc9801rs, pc9801vm_state, init_pc9801vm_kanji, "NEC",   "PC-9801UV2",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // genuine dump
 
 // UX class (i286)
 COMP( 1987, pc9801ux,   0,        0, pc9801ux,  pc9801rs, pc9801vm_state, init_pc9801_kanji,   "NEC",   "PC-9801UX",                     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
