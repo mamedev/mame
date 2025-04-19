@@ -505,7 +505,10 @@ u8 z80_device::flags_sz_bit(u8 value)
 u8 z80_device::flags_szp(u8 value)
 {
 	u8 f = flags_sz(value);
-	f |= __builtin_parity(value) ? 0 : PF;
+	value ^= value >> 4;
+	value ^= value << 2;
+	value ^= value >> 1;
+	f |= ~value & PF;
 	return f;
 }
 
