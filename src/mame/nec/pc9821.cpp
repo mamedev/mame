@@ -479,7 +479,7 @@ void pc9821_state::pc9821_io(address_map &map)
 	map(0x00c8, 0x00cb).m(m_fdc_2hd, FUNC(upd765a_device::map)).umask32(0x00ff00ff);
 //  map(0x00cc, 0x00cc).rw(FUNC(pc9821_state::fdc_2hd_ctrl_r), FUNC(pc9821_state::fdc_2hd_ctrl_w));
 	//  map(0x00d8, 0x00df) AMD98 (sound?) board
-//	map(0x00f0, 0x00ff).rw(FUNC(pc9821_state::a20_ctrl_r), FUNC(pc9821_state::a20_ctrl_w)).umask32(0x00ff00ff);
+//  map(0x00f0, 0x00ff).rw(FUNC(pc9821_state::a20_ctrl_r), FUNC(pc9821_state::a20_ctrl_w)).umask32(0x00ff00ff);
 //  map(0x0188, 0x018f).rw(FUNC(pc9821_state::pc9801_opn_r), FUNC(pc9821_state::pc9801_opn_w)); //ym2203 opn / <undefined>
 //  map(0x018c, 0x018f) YM2203 OPN extended ports / <undefined>
 //  map(0x0430, 0x0433).rw(FUNC(pc9821_state::ide_ctrl_r), FUNC(pc9821_state::ide_ctrl_w)).umask32(0x00ff00ff);
@@ -694,12 +694,34 @@ static INPUT_PORTS_START( pc9821 )
 	PORT_START("DSW1")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("sdip", FUNC(pc98_sdip_device::dsw1_r))
 
+	// HACK: should read from SDIP dsw2_r
+	// will break pc9821 for parity check, cfr. dump notes
 	PORT_START("DSW2")
-	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("sdip", FUNC(pc98_sdip_device::dsw2_r))
-	// HACK: PC-9821 defaults to 5 MHz, which isn't ideal in several cases without -debug
+	PORT_DIPNAME( 0x01, 0x00, "DSW2" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "GDC clock" )
 	PORT_DIPSETTING(    0x80, "2.5 MHz" )
 	PORT_DIPSETTING(    0x00, "5 MHz" )
+	// PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("sdip", FUNC(pc98_sdip_device::dsw2_r))
 
 	PORT_START("DSW3")
 	PORT_BIT( 0x23, IP_ACTIVE_LOW, IPT_CUSTOM ) //PORT_CUSTOM_DEVICE_MEMBER("sdip", FUNC(pc98_sdip_device::dsw3_r))
@@ -1058,7 +1080,7 @@ void pc9821_note_lavie_state::pc9821nw150(machine_config &config)
 /*
 98MATE A - 80486SX 25
 
-(note: might be a different model!)
+TODO: should access SDIP from $00f6, most likely a partial A Mate dump instead
 */
 
 ROM_START( pc9821 )
