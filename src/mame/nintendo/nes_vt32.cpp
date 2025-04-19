@@ -366,6 +366,12 @@ ROM_START( myaass )
 	ROM_LOAD( "s29gl256.u2", 0x00000, 0x2000000, CRC(71a3298d) SHA1(5a2441ae5a8bf3e5efe9f22843ad2b8ef2df0f40) )
 ROM_END
 
+ROM_START( myaasa )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "mx29gl256el.u2", 0x00000, 0x2000000, CRC(1882264c) SHA1(e594b5cea634fadc4aac217b6d651be72a3024c0) )
+ROM_END
+
+
 
 ROM_START( fcpocket )
 	ROM_REGION( 0x8000000, "mainrom", 0 )
@@ -401,6 +407,7 @@ CONS( 201?, dgunl3202, 0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empt
 
 // many of the games don't work or have scrambled graphics, it writes 0xc0 to vtfp_411e_encryption_state_w in such cases
 CONS( 201?, myaass,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init, "dreamGEAR", "My Arcade All Star Stadium - Pocket Player (307-in-1)", MACHINE_NOT_WORKING )
+CONS( 201?, myaasa,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init, "dreamGEAR", "My Arcade All Star Arena - Pocket Player (307-in-1)", MACHINE_NOT_WORKING )
 
 CONS( 2021, matet300,  0,         0,  nes_vt32_32mb,     nes_vt32, nes_vt32_unk_state, empty_init, "dreamGEAR", "My Arcade Tetris (DGUNL-7029, Go Gamer, with 300 bonus games)", MACHINE_NOT_WORKING )
 
