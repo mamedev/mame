@@ -1,0 +1,222 @@
+// license:BSD-3-Clause
+// copyright-holders:Mark Garlanger
+/***************************************************************************
+
+  Heathkit 8080 CPU card
+
+****************************************************************************/
+
+#include "emu.h"
+#include "cpu8080.h"
+
+#include "bus/heathzenith/intr_cntrl/intr_cntrl.h"
+#include "cpu/i8085/i8085.h"
+
+
+
+namespace {
+
+class h_8_cpu_8080_device : public device_t, public device_h8bus_p2_card_interface
+{
+public:
+
+	h_8_cpu_8080_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	virtual void int1_w(int state) override;
+	virtual void int2_w(int state) override;
+	virtual void int3_w(int state) override;
+	virtual void int4_w(int state) override;
+	virtual void int5_w(int state) override;
+	virtual void int6_w(int state) override;
+	virtual void int7_w(int state) override;
+
+	virtual void p201_reset_w(int state) override;
+	virtual void p201_int1_w(int state) override;
+	virtual void p201_int2_w(int state) override;
+
+protected:
+
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+private:
+	// 2.048 MHz
+	static constexpr XTAL H8_CLOCK = XTAL(18'432'000) / 9;
+
+	void h8_status_callback(u8 data);
+	void h8_inte_callback(int state);
+
+	void mem_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+
+	void bus_mem_w(offs_t offset, u8 data) { h8bus().space(AS_PROGRAM).write_byte(offset, data); }
+	u8 bus_mem_r(offs_t offset) { return h8bus().space(AS_PROGRAM).read_byte(offset); }
+	void bus_io_w(offs_t offset, u8 data) { h8bus().space(AS_IO).write_byte(offset, data); }
+	u8 bus_io_r(offs_t offset) { return h8bus().space(AS_IO).read_byte(offset); }
+
+	required_device<i8080_cpu_device> m_maincpu;
+	required_device<heath_intr_socket> m_intr_socket;
+
+	bool m_m1_state;
+};
+
+h_8_cpu_8080_device::h_8_cpu_8080_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
+	device_t(mconfig, H8BUS_CPU_8080, tag, owner, 0),
+	device_h8bus_p2_card_interface(mconfig, *this),
+	m_maincpu(*this, "maincpu"),
+	m_intr_socket(*this, "intr_socket")
+{
+}
+
+void h_8_cpu_8080_device::h8_inte_callback(int state)
+{
+	set_p201_inte(state);
+}
+
+void h_8_cpu_8080_device::h8_status_callback(u8 data)
+{
+	int state = (data & i8080_cpu_device::STATUS_M1) ? 1 : 0;
+
+	if (state != m_m1_state)
+	{
+		set_slot_m1(state);
+
+		m_m1_state = state;
+	}
+}
+
+void h_8_cpu_8080_device::int1_w(int state)
+{
+	m_intr_socket->set_irq_level(1, state);
+}
+
+void h_8_cpu_8080_device::int2_w(int state)
+{
+	m_intr_socket->set_irq_level(2, state);
+}
+
+void h_8_cpu_8080_device::int3_w(int state)
+{
+	m_intr_socket->set_irq_level(3, state);
+}
+
+void h_8_cpu_8080_device::int4_w(int state)
+{
+	m_intr_socket->set_irq_level(4, state);
+}
+
+void h_8_cpu_8080_device::int5_w(int state)
+{
+	m_intr_socket->set_irq_level(5, state);
+}
+
+void h_8_cpu_8080_device::int6_w(int state)
+{
+	m_intr_socket->set_irq_level(6, state);
+}
+
+void h_8_cpu_8080_device::int7_w(int state)
+{
+	m_intr_socket->set_irq_level(7, state);
+}
+
+void h_8_cpu_8080_device::p201_reset_w(int state)
+{
+	if (state){
+		m_maincpu->reset();
+	}
+
+	set_slot_reset(state);
+}
+
+void h_8_cpu_8080_device::p201_int1_w(int state)
+{
+	m_intr_socket->set_irq_level(1, state);
+}
+
+void h_8_cpu_8080_device::p201_int2_w(int state)
+{
+	m_intr_socket->set_irq_level(2, state);
+}
+
+static void intr_ctrl_options(device_slot_interface &device)
+{
+	device.option_add("original", HEATH_INTR_CNTRL);
+}
+
+void h_8_cpu_8080_device::mem_map(address_map &map)
+{
+	map.unmap_value_high();
+
+	// default mem access to h8bus
+	map(0x0000, 0xffff).rw(FUNC(h_8_cpu_8080_device::bus_mem_r), FUNC(h_8_cpu_8080_device::bus_mem_w));
+
+	map(0x0000, 0x0fff).rom(); // main rom
+	map(0x1400, 0x17ff).ram(); // fdc ram
+	map(0x1800, 0x1fff).rom(); // fdc rom
+}
+
+void h_8_cpu_8080_device::io_map(address_map &map)
+{
+	map.unmap_value_high();
+	map.global_mask(0xff);
+
+	// default io access to h8bus
+	map(0x0000, 0xff).rw(FUNC(h_8_cpu_8080_device::bus_io_r), FUNC(h_8_cpu_8080_device::bus_io_w));
+}
+
+
+// ROM definition
+ROM_START( h8 )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASEFF )
+
+	// H17 fdc bios - needed by bios2&3
+	ROM_LOAD( "2716_444-19_h17.rom", 0x1800, 0x0800,     CRC(26e80ae3) SHA1(0c0ee95d7cb1a760f924769e10c0db1678f2435c))
+
+	ROM_SYSTEM_BIOS(0, "bios0", "Standard")
+	ROMX_LOAD( "2708_444-13_pam8.rom", 0x0000, 0x0400,   CRC(e0745513) SHA1(0e170077b6086be4e5cd10c17e012c0647688c39), ROM_BIOS(0) )
+
+	ROM_SYSTEM_BIOS(1, "bios1", "Alternate")
+	ROMX_LOAD( "2708_444-13_pam8go.rom", 0x0000, 0x0400, CRC(9dbad129) SHA1(72421102b881706877f50537625fc2ab0b507752), ROM_BIOS(1) )
+
+	ROM_SYSTEM_BIOS(2, "bios2", "Disk OS")
+	ROMX_LOAD( "2716_444-13_pam8at.rom", 0x0000, 0x0800,  CRC(fd95ddc1) SHA1(eb1f272439877239f745521139402f654e5403af), ROM_BIOS(2) )
+
+	ROM_SYSTEM_BIOS(3, "bios3", "Disk OS Alt")
+	ROMX_LOAD( "2732_444-70_xcon8.rom", 0x0000, 0x1000,   CRC(b04368f4) SHA1(965244277a3a8039a987e4c3593b52196e39b7e7), ROM_BIOS(3) )
+
+	// this one runs off into the weeds
+	// - it is for the ZA-8-6 Z-80 replacement CPU card, keeping it here, until that card is implemented.
+	ROM_SYSTEM_BIOS(4, "bios4", "not working")
+	ROMX_LOAD( "2732_444-140_pam37.rom", 0x0000, 0x1000,  CRC(53a540db) SHA1(90082d02ffb1d27e8172b11fff465bd24343486e), ROM_BIOS(4) )
+ROM_END
+
+
+const tiny_rom_entry *h_8_cpu_8080_device::device_rom_region() const
+{
+	return ROM_NAME(h8);
+}
+
+void h_8_cpu_8080_device::device_start()
+{
+	save_item(NAME(m_m1_state));
+}
+
+void h_8_cpu_8080_device::device_add_mconfig(machine_config &config)
+{
+	I8080(config, m_maincpu, H8_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &h_8_cpu_8080_device::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &h_8_cpu_8080_device::io_map);
+	m_maincpu->out_status_func().set(FUNC(h_8_cpu_8080_device::h8_status_callback));
+	m_maincpu->out_inte_func().set(FUNC(h_8_cpu_8080_device::h8_inte_callback));
+	m_maincpu->set_irq_acknowledge_callback("intr_socket", FUNC(heath_intr_socket::irq_callback));
+
+	HEATH_INTR_SOCKET(config, m_intr_socket, intr_ctrl_options, nullptr);
+	m_intr_socket->irq_line_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_intr_socket->set_default_option("original");
+	m_intr_socket->set_fixed(true);
+}
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(H8BUS_CPU_8080, device_h8bus_card_interface, h_8_cpu_8080_device, "h8_h_8_cpu_8080", "Heath 8080 CPU board");
