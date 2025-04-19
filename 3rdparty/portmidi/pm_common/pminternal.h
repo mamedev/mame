@@ -160,7 +160,7 @@ PmTimestamp none_synchronize(PmInternal *midi);
 PmError pm_fail_fn(PmInternal *midi);
 PmError pm_fail_timestamp_fn(PmInternal *midi, PmTimestamp timestamp);
 PmError pm_success_fn(PmInternal *midi);
-PmError pm_add_interf(char *interf, pm_create_fn create_fn,
+PmError pm_add_interf(const char *interf, pm_create_fn create_fn,
                       pm_delete_fn delete_fn);
 PmError pm_add_device(const char *interf, const char *name, int is_input,
                       int is_virtual, void *descriptor, pm_fns_type dictionary);

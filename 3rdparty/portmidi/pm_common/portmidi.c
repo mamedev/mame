@@ -121,7 +121,7 @@ static int pm_interf_list_len = 0;
  * returns pmInsufficientMemor if interface memory is
  * exceeded, otherwise returns pmNoError.
  */
-PmError pm_add_interf(char *interf, pm_create_fn create_fn,
+PmError pm_add_interf(const char *interf, pm_create_fn create_fn,
                       pm_delete_fn delete_fn)
 {
     if (pm_interf_list_len >= MAX_INTERF) {
