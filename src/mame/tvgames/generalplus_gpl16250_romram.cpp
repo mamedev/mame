@@ -1,4 +1,4 @@
-﻿// license:BSD-3-Clause
+// license:BSD-3-Clause
 // copyright-holders:David Haywood
 /*
     GPL16250 / GPAC800 / GMC384 / GCM420 related support
@@ -618,7 +618,7 @@ ROM_START(tomycar)
 	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
 
 	ROM_REGION(0x2000000, "maincpu", ROMREGION_ERASE00)
-	// this loading gives correct sprites (upper address lines connected in reverse?)
+	// this loading gives correct sprites (must be swapped somewhere on PCB because this was otherwise a standard pinout?)
 	// but backgrounds are still broken (different issue maybe? there are writes to CS0 ROM area)
 	ROM_LOAD16_WORD_SWAP( "tomycar.bin", 0x000000, 0x800000, CRC(bd98a198) SHA1(117aba55bf98bf76cbc9ed169e2a968bfdd9ed1a) )
 	ROM_CONTINUE(0x1000000, 0x800000)
