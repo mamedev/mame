@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
 
-#ifndef MAME_APPLE_PSEUDOVIA_H
-#define MAME_APPLE_PSEUDOVIA_H
+#ifndef MAME_MACHINE_PSEUDOVIA_H
+#define MAME_MACHINE_PSEUDOVIA_H
 
 #pragma once
 
@@ -51,4 +51,4 @@ private:
 // device type definition
 DECLARE_DEVICE_TYPE(APPLE_PSEUDOVIA, pseudovia_device)
 
-#endif // MAME_APPLE_PSEUDOVIA_H
+#endif // MAME_MACHINE_PSEUDOVIA_H
