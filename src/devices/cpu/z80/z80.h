@@ -77,6 +77,12 @@ protected:
 
 	void illegal_1();
 	void illegal_2();
+	u8 flags_szyxc(u16 value);
+	u8 flags_sz(u8 value);
+	u8 flags_sz_bit(u8 value);
+	u8 flags_szp(u8 value);
+	u8 flags_szhv_inc(u8 value);
+	u8 flags_szhv_dec(u8 value);
 
 	void halt();
 	void leave_halt();
@@ -88,7 +94,7 @@ protected:
 	void rra();
 	void add_a(u8 value);
 	void adc_a(u8 value);
-	void sub(u8 value);
+	void sub_a(u8 value);
 	void sbc_a(u8 value);
 	void neg();
 	void daa();
@@ -180,16 +186,6 @@ protected:
 	u8 m_m1_cycles;
 	u8 m_memrq_cycles;
 	u8 m_iorq_cycles;
-
-	static bool tables_initialised;
-	static u8 SZ[0x100];       // zero and sign flags
-	static u8 SZ_BIT[0x100];   // zero, sign and parity/overflow (=zero) flags for BIT opcode
-	static u8 SZP[0x100];      // zero, sign and parity flags
-	static u8 SZHV_inc[0x100]; // zero, sign, half carry and overflow flags INC r8
-	static u8 SZHV_dec[0x100]; // zero, sign, half carry and overflow flags DEC r8
-
-	static u8 SZHVC_add[2 * 0x100 * 0x100];
-	static u8 SZHVC_sub[2 * 0x100 * 0x100];
 };
 
 DECLARE_DEVICE_TYPE(Z80, z80_device)
