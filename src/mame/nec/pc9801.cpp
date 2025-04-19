@@ -85,6 +85,7 @@
     This series features a huge number of models released between 1982 and 1997. They
     were not IBM PC-compatible, but they had similar hardware (and software: in the
     1990s, they run MS Windows as OS)
+    TODO: move this table in a markdown, upgrade
 
     Models:
 
@@ -333,18 +334,6 @@ Ext Video F/F (i/o 0x6a):
 1000 111x related to GFX accelerator cards (like Vision864)
 1100 010x chart GDC operating mode (?)
 (everything else is undocumented / unknown)
-
-Keyboard TX commands:
-0xfa ACK
-0xfc NACK
-0x95
----- --xx extension key settings (00 normal 11 Win and App Keys enabled)
-0x96 identification codes
-0x9c
--xx- ---- key delay (11 = 1000 ms, 10 = 500 ms, 01 = 500 ms, 00 = 250 ms)
----x xxxx repeat rate (slow 11111 -> 00001 fast)
-0x9d keyboard LED settings
-0x9f keyboard ID
 
 **************************************************************************************************/
 

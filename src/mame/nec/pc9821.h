@@ -170,17 +170,21 @@ public:
 	void pc9821ra333(machine_config &config);
 };
 
-class pc9821_valuestar_state : public pc9821_mate_x_state
-{
-public:
-	pc9821_valuestar_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pc9821_mate_x_state(mconfig, type, tag)
-	{
-	}
-
-	void pc9821v13(machine_config &config);
-	void pc9821v20(machine_config &config);
-};
+// VLSI Supercore594 (Wildcat) or Intel 430FX (Triton) PCI 2.0
+// V166 / V200 / V233 uses an Intel 430VX PCI 2.1
+// https://www.pc-9800.net/db_98/data/pc-9821v13.htm
+// https://www.pc-9800.net/db_98/data/pc-9821v20.htm
+//class pc9821_valuestar_state : public pc9821_mate_x_state
+//{
+//public:
+//	pc9821_valuestar_state(const machine_config &mconfig, device_type type, const char *tag)
+//		: pc9821_mate_x_state(mconfig, type, tag)
+//	{
+//	}
+//
+//	void pc9821v13(machine_config &config);
+//	void pc9821v20(machine_config &config);
+//};
 
 // 9821NOTE
 

@@ -22,6 +22,20 @@ TODO:
     STOP is correct, verified with branmar2
 - Problems with natural keyboard (most nonprinting keys don't work);
 
+===================================================================================================
+
+Keyboard TX commands:
+0xfa ACK
+0xfc NACK
+0x95
+---- --xx extension key settings (00 normal 11 Win and App Keys enabled)
+0x96 identification codes
+0x9c
+-xx- ---- key delay (11 = 1000 ms, 10 = 500 ms, 01 = 500 ms, 00 = 250 ms)
+---x xxxx repeat rate (slow 11111 -> 00001 fast)
+0x9d keyboard LED settings
+0x9f keyboard ID
+
 **************************************************************************************************/
 
 #include "emu.h"
