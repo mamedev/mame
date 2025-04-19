@@ -3605,10 +3605,10 @@ dd93	# DB   DD
 	call jump 0093
 
 dd94	# SUB  HX
-	sub(HX);
+	sub_a(HX);
 
 dd95	# SUB  LX
-	sub(LX);
+	sub_a(LX);
 
 dd96	# SUB  (IX+o)
 	call eax
@@ -3616,7 +3616,7 @@ dd96	# SUB  (IX+o)
 	5 * call nomreq_addr
 	TADR = m_ea;
 	call rm
-	sub(TDAT8);
+	sub_a(TDAT8);
 
 dd97	# DB   DD
 	illegal_1();
@@ -4693,10 +4693,10 @@ fd93	# DB   FD
 	call jump 0093
 
 fd94	# SUB  HY
-	sub(HY);
+	sub_a(HY);
 
 fd95	# SUB  LY
-	sub(LY);
+	sub_a(LY);
 
 fd96	# SUB  (IY+o)
 	call eay
@@ -4704,7 +4704,7 @@ fd96	# SUB  (IY+o)
 	5 * call nomreq_addr
 	TADR = m_ea;
 	call rm
-	sub(TDAT8);
+	sub_a(TDAT8);
 
 fd97	# DB   FD
 	illegal_1();
@@ -6490,30 +6490,30 @@ edff	# DB   ED
 	adc_a(A);
 
 0090	# SUB  B
-	sub(B);
+	sub_a(B);
 
 0091	# SUB  C
-	sub(C);
+	sub_a(C);
 
 0092	# SUB  D
-	sub(D);
+	sub_a(D);
 
 0093	# SUB  E
-	sub(E);
+	sub_a(E);
 
 0094	# SUB  H
-	sub(H);
+	sub_a(H);
 
 0095	# SUB  L
-	sub(L);
+	sub_a(L);
 
 0096	# SUB  (HL)
 	TADR = HL;
 	call rm
-	sub(TDAT8);
+	sub_a(TDAT8);
 
 0097	# SUB  A
-	sub(A);
+	sub_a(A);
 
 0098	# SBC  A,B
 	sbc_a(B);
@@ -6733,7 +6733,7 @@ edff	# DB   ED
 
 00d6	# SUB  n
 	call arg
-	sub(TDAT8);
+	sub_a(TDAT8);
 
 00d7	# RST  2
 	call rst 0x10
