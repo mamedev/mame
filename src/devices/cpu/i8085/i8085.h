@@ -19,7 +19,7 @@
 class i8085a_cpu_device : public cpu_device
 {
 public:
-	// FIXME: public because drivers/altair.cpp, drivers/ipc.cpp and drivers/unior.cpp set initial PC through state interface
+	// FIXME: public because drivers/altair.cpp and drivers/unior.cpp set initial PC through state interface
 	// should fix boot vector loading in these drivers
 	// machine/lviv.cpp and machine/poly88.cpp also access registers via state interface when handling snapshot files
 	enum
