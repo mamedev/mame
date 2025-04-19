@@ -173,7 +173,7 @@ void z80_device::add_a(u8 value)
  ***************************************************************/
 void z80_device::adc_a(u8 value)
 {
-	const bool c = F & CF;
+	const int c = (F & CF) ? 1 : 0;
 	const u16 res = A + value + c;
 	u8 f = (((A ^ res) & (value ^ res)) >> 5) & VF;
 	f |= flags_szyxc(res);
@@ -202,7 +202,7 @@ void z80_device::sub_a(u8 value)
  ***************************************************************/
 void z80_device::sbc_a(u8 value)
 {
-	const bool c = F & CF;
+	const int c = (F & CF) ? 1 : 0;
 	const u16 res = A - value - c;
 	u8 f = (((A ^ value) & (A ^ res)) >> 5) & VF;
 	f |= NF | flags_szyxc(res);
