@@ -94,6 +94,8 @@ ROM_END
 
 // dates for each of these taken from back of case, there are 2018 and 2020 versions too at least
 
+// 2018 version is a square device
+
 // 2019 version is house shaped device - すみっコぐらし すみっコさがし
 CONS( 2019, sanxpet,         0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, empty_init,  "San-X / Tomy",        "Sumikko Gurashi - Sumikko Sagashi",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
