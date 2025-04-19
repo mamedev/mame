@@ -158,16 +158,6 @@ newoption {
 }
 
 newoption {
-	trigger = "distro",
-	description = "Choose distribution",
-	allowed = {
-		{ "generic",           "generic"            },
-		{ "debian-stable",     "debian-stable"      },
-		{ "ubuntu-intrepid",   "ubuntu-intrepid"    },
-	},
-}
-
-newoption {
 	trigger = "target",
 	description = "Building target",
 }
@@ -694,32 +684,18 @@ else
 	}
 end
 
-if _OPTIONS["NOASM"]=="1" then
+if _OPTIONS["NOASM"] == "1" then
 	defines {
 		"MAME_NOASM"
 	}
 end
 
-if not _OPTIONS["FORCE_DRC_C_BACKEND"] then
-	if _OPTIONS["BIGENDIAN"]~="1" then
-		if (_OPTIONS["PLATFORM"]=="arm64") then
-			configuration { }
-				defines {
-					"NATIVE_DRC=drcbe_arm64",
-				}
-		else
-			configuration { "x64" }
-				defines {
-					"NATIVE_DRC=drcbe_x64",
-				}
-			configuration { "x32" }
-				defines {
-					"NATIVE_DRC=drcbe_x86",
-				}
-			configuration {  }
-		end
-	end
-
+if _OPTIONS["FORCE_DRC_C_BACKEND"] then
+	configuration { }
+		defines {
+			"NATIVE_DRC=drcbe_c",
+		}
+elseif (_OPTIONS["PLATFORM"] == "x86") or (_OPTIONS["PLATFORM"] == "arm64") then
 	configuration { }
 		defines {
 			"ASMJIT_STATIC",
@@ -1228,12 +1204,6 @@ configuration { "linux-*" }
 		flags {
 			"LinkSupportCircularDependencies",
 		}
-		if _OPTIONS["distro"]=="debian-stable" then
-			defines
-			{
-				"NO_AFFINITY_NP",
-			}
-		end
 
 
 configuration { "freebsd or netbsd" }

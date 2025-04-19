@@ -1602,14 +1602,6 @@ end
 		end
 	end
 
-	if _OPTIONS["targetos"]=="macosx" and _OPTIONS["gcc"]~=nil then
-		if string.find(_OPTIONS["gcc"], "clang") and (version < 80000) then
-			defines {
-				"TARGET_OS_OSX=1",
-			}
-		end
-	end
-
 	files {
 		MAME_DIR .. "3rdparty/bgfx/src/bgfx.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/debug_renderdoc.cpp",
@@ -1954,7 +1946,7 @@ project "ymfm"
 -- asmjit library
 --------------------------------------------------
 
-if not _OPTIONS["FORCE_DRC_C_BACKEND"] then
+if (not _OPTIONS["FORCE_DRC_C_BACKEND"]) and ((_OPTIONS["PLATFORM"] == "x86") or (_OPTIONS["PLATFORM"] == "arm64")) then
 project "asmjit"
 	uuid "4539757c-6e99-4bae-b3d0-b342a7c49539"
 	kind "StaticLib"
@@ -1970,14 +1962,6 @@ project "asmjit"
 		defines {
 			"ASMJIT_STATIC",
 		}
-
-	if _OPTIONS["targetos"]=="macosx" and _OPTIONS["gcc"]~=nil then
-		if string.find(_OPTIONS["gcc"], "clang") and (version < 80000) then
-			defines {
-				"TARGET_OS_OSX=1",
-			}
-		end
-	end
 
 	files {
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/a64.h",
