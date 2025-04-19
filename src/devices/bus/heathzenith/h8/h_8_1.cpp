@@ -75,7 +75,7 @@ void h_8_1_device::device_reset()
 
 		u16 base_addr = (jumpers & 0x07) << 13;
 
-		h8bus().install_mem_device(base_addr, base_addr + 0x1fff,
+		h8bus().space(AS_PROGRAM).install_readwrite_handler(base_addr, base_addr + 0x1fff,
 			read8sm_delegate(m_ram, FUNC(ram_device::read)),
 			write8sm_delegate(m_ram, FUNC(ram_device::write)));
 
@@ -120,7 +120,7 @@ void h_8_1_4k_device::device_reset()
 
 		u16 base_addr = (jumpers & 0x07) << 13;
 
-		h8bus().install_mem_device(base_addr, base_addr + 0x0fff,
+		h8bus().space(AS_PROGRAM).install_readwrite_handler(base_addr, base_addr + 0x0fff,
 			read8sm_delegate(m_ram, FUNC(ram_device::read)),
 			write8sm_delegate(m_ram, FUNC(ram_device::write)));
 

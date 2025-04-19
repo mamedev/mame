@@ -153,10 +153,11 @@ void h_8_5_device::device_reset()
 
 	if (!m_installed)
 	{
-		h8bus().install_io_device(0xf8, 0xf9,
+		h8bus().space(AS_IO).install_readwrite_handler(0xf8, 0xf9,
 			read8sm_delegate(m_uart, FUNC(i8251_device::read)),
 			write8sm_delegate(m_uart, FUNC(i8251_device::write)));
-		h8bus().install_io_device(0xfa, 0xfb,
+
+		h8bus().space(AS_IO).install_readwrite_handler(0xfa, 0xfb,
 			read8sm_delegate(m_console, FUNC(i8251_device::read)),
 			write8sm_delegate(m_console, FUNC(i8251_device::write)));
 

@@ -41,17 +41,17 @@
     30  -------   /A0
     29  -------   /RESET
     28  -------   MEMR
-    27  -------   /HOLD
+    27  -------   /HOLD   *
     26  -------   I/O R
-    25  -------   HLDA
+    25  -------   HLDA    *
 
-    24  -------   GND
+    24  -------   GND     *
     23  -------   MEMW
     22  -------   O2
     21  -------   I/O W
-    20  -------   RDYIN
+    20  -------   RDYIN   *
     19  -------   M1
-    18  -------   GND
+    18  -------   GND     *
     17  -------   /D7
     16  -------   /D6
     15  -------   /D5
@@ -60,8 +60,8 @@
     12  -------   /D2
     11  -------   /D1
     10  -------   /D0
-     9  -------   /INT2
-     8  -------   /INT1
+     9  -------   /INT2   *
+     8  -------   /INT1   *
      7  -------   /INT7
      6  -------   /INT6
      5  -------   /INT5
@@ -71,9 +71,12 @@
      1  -------   GND
      0  -------   GND
 
+     Notes:
+       *  -  Heath Company reserves the right to change these pin designations.
 
 
     Signal         Pin       Direction        Description
+                             (wrt CPU board)
     --------------------------------------------------------
 
     A0-A15         30-45     Output           Address bus
@@ -89,7 +92,9 @@
 
     I/O W          21        Output           I/O Write
 
-    INT1-INT7      8-9,3-7   Input            Interrupt 1-7
+    INT1-INT2      8-9       Input            Interrupt 1-2 (10, 20)
+
+    INT3-INT7      3-7       Input            Interrupt 3-7 (30, 40, 50, 60, 70)
 
     M1             19        Output           Machine cycle 1 - CPU fetch cycle of the first byte of an instruction
 
@@ -111,6 +116,24 @@
     -18 V          2                          -18 V Unregulated
     GND            0,1                        Ground
     CPU GND        18,24                      CPU Ground
+
+
+***************************************************************************
+
+  P201 Cable
+
+  Between P1 and P2 was a cable labeled P201 in the schematics. This connected
+  the Front Panel(P1) card to the CPU board(P2), providing dedicated signal lines
+  between the two boards.
+
+    Signal         Pin       Direction        Description
+    --------------------------------------------------------
+
+    GND             1                         Ground
+    /INT2 (20)      2        P1 -> P2         Interrupt 20
+    /INTE           3        P2 -> P1         Interrupts enabled.
+    /INT1 (10)      4        P1 -> P2         Interrupt 10
+    /RESIN          5        P1 -> P2         Reset in, allowed keypad to initiate a reset of the computer
 
 ***************************************************************************/
 
@@ -134,7 +157,17 @@ class device_h8bus_card_interface : public device_interface
 public:
 	virtual ~device_h8bus_card_interface();
 
-	void set_slot_int0(int state);
+	virtual void m1_w(int state) {}
+	virtual void reset_w(int state) {}
+	virtual void hold_w(int state) {}
+	virtual void rom_disable_w(int state) {}
+
+	void set_h8bus_tag(h8bus_device *h8bus, const char *slottag) { m_h8bus = h8bus; m_h8bus_slottag = slottag; }
+
+protected:
+	device_h8bus_card_interface(const machine_config &mconfig, device_t &device);
+	virtual void interface_pre_start() override;
+
 	void set_slot_int1(int state);
 	void set_slot_int2(int state);
 	void set_slot_int3(int state);
@@ -145,14 +178,7 @@ public:
 	void set_slot_reset(int state);
 	void set_slot_hold(int state);
 	void set_slot_rom_disable(int state);
-
-	virtual void set_hold_ack(int state) {}
-
-	void set_h8bus_tag(h8bus_device *h8bus, const char *slottag) { m_h8bus = h8bus; m_h8bus_slottag = slottag; }
-
-protected:
-	device_h8bus_card_interface(const machine_config &mconfig, device_t &device);
-	virtual void interface_pre_start() override;
+	void set_slot_m1(int state);
 
 	h8bus_device &h8bus() { assert(m_h8bus); return *m_h8bus; }
 
@@ -160,6 +186,48 @@ protected:
 
 private:
 	h8bus_device *m_h8bus;
+};
+
+class device_h8bus_p1_card_interface : public device_h8bus_card_interface
+{
+public:
+	virtual ~device_h8bus_p1_card_interface();
+
+	virtual void p201_inte(int state) {}
+
+protected:
+	device_h8bus_p1_card_interface(const machine_config &mconfig, device_t &device);
+
+	void set_p201_reset(int state);
+	void set_p201_int1(int state);
+	void set_p201_int2(int state);
+};
+
+
+class device_h8bus_p2_card_interface : public device_h8bus_card_interface
+{
+public:
+	virtual ~device_h8bus_p2_card_interface();
+
+	// signals from the Bus
+	virtual void int1_w(int state) {}
+	virtual void int2_w(int state) {}
+	virtual void int3_w(int state) {}
+	virtual void int4_w(int state) {}
+	virtual void int5_w(int state) {}
+	virtual void int6_w(int state) {}
+	virtual void int7_w(int state) {}
+
+	// signals from P201 cable
+	virtual void p201_reset_w(int state) {}
+	virtual void p201_int1_w(int state) {}
+	virtual void p201_int2_w(int state) {}
+
+protected:
+	device_h8bus_p2_card_interface(const machine_config &mconfig, device_t &device);
+
+	void set_p201_inte(int state);
+
 };
 
 
@@ -198,46 +266,28 @@ protected:
 DECLARE_DEVICE_TYPE(H8BUS_SLOT, h8bus_slot_device)
 
 
-class h8bus_device : public device_t
+class h8bus_device : public device_t, public device_memory_interface
 {
 	friend class h8bus_slot_device;
 	friend class device_h8bus_card_interface;
+	friend class device_h8bus_p1_card_interface;
+	friend class device_h8bus_p2_card_interface;
 
 public:
 	h8bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~h8bus_device();
 
-	template <typename T> void set_program_space(T &&tag, int spacenum) { m_program_space.set_tag(std::forward<T>(tag), spacenum); }
-	template <typename T> void set_io_space(T &&tag, int spacenum) { m_io_space.set_tag(std::forward<T>(tag), spacenum); }
-
-	void install_mem_device(offs_t start, offs_t end, read8sm_delegate rhandler, write8sm_delegate whandler);
-
-	void install_io_device(offs_t start, offs_t end, read8sm_delegate rhandler, write8sm_delegate whandler);
-	void install_io_device(offs_t start, offs_t end, read8smo_delegate rhandler, write8smo_delegate whandler);
-	void install_io_device_w(offs_t start, offs_t end, write8smo_delegate whandler);
-
-	auto out_int0_callback() { return m_out_int0_cb.bind(); }
-	auto out_int1_callback() { return m_out_int1_cb.bind(); }
-	auto out_int2_callback() { return m_out_int2_cb.bind(); }
-	auto out_int3_callback() { return m_out_int3_cb.bind(); }
-	auto out_int4_callback() { return m_out_int4_cb.bind(); }
-	auto out_int5_callback() { return m_out_int5_cb.bind(); }
-	auto out_int6_callback() { return m_out_int6_cb.bind(); }
-	auto out_int7_callback() { return m_out_int7_cb.bind(); }
-	auto out_reset_callback() { return m_out_reset_cb.bind(); }
-	auto out_hold_callback() { return m_out_hold_cb.bind(); }
-	auto out_rom_disable_callback() { return m_out_rom_disable_cb.bind(); }
-
-	void set_hold_ack(u8 val);
-
 protected:
 	h8bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
+	virtual void interface_pre_start() override;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
+	// device_memory_interface overrides
+	virtual space_config_vector memory_space_config() const override;
+
 	void add_h8bus_card(device_h8bus_card_interface &card);
-	void set_int0_line(int state);
 	void set_int1_line(int state);
 	void set_int2_line(int state);
 	void set_int3_line(int state);
@@ -245,23 +295,28 @@ protected:
 	void set_int5_line(int state);
 	void set_int6_line(int state);
 	void set_int7_line(int state);
+	void set_p201_inte(int state);
+	void set_p201_reset(int state);
+	void set_p201_int1(int state);
+	void set_p201_int2(int state);
 	void set_reset_line(int state);
 	void set_hold_line(int state);
 	void set_disable_rom_line(int state);
+	void set_m1_line(int state);
+
+	void mem_map(address_map &map);
+	void io_map(address_map &map);
 
 private:
-	required_address_space m_program_space, m_io_space;
-	devcb_write_line m_out_int0_cb, m_out_int1_cb, m_out_int2_cb, m_out_int3_cb,
-					 m_out_int4_cb, m_out_int5_cb, m_out_int6_cb, m_out_int7_cb;
-	devcb_write_line m_out_reset_cb, m_out_hold_cb, m_out_rom_disable_cb;
+	address_space_config const m_mem_config;
+	address_space_config const m_io_config;
 
 	std::vector<std::reference_wrapper<device_h8bus_card_interface>> m_device_list;
+
+	device_h8bus_p1_card_interface *m_p1_card;
+	device_h8bus_p2_card_interface *m_p2_card;
 };
 
-inline void device_h8bus_card_interface::set_slot_int0(int state)
-{
-	h8bus().set_int0_line(state);
-}
 
 inline void device_h8bus_card_interface::set_slot_int1(int state)
 {
@@ -298,6 +353,11 @@ inline void device_h8bus_card_interface::set_slot_int7(int state)
 	h8bus().set_int7_line(state);
 }
 
+inline void device_h8bus_card_interface::set_slot_m1(int state)
+{
+	h8bus().set_m1_line(state);
+}
+
 inline void device_h8bus_card_interface::set_slot_reset(int state)
 {
 	h8bus().set_reset_line(state);
@@ -311,6 +371,26 @@ inline void device_h8bus_card_interface::set_slot_hold(int state)
 inline void device_h8bus_card_interface::set_slot_rom_disable(int state)
 {
 	h8bus().set_disable_rom_line(state);
+}
+
+inline void device_h8bus_p1_card_interface::set_p201_reset(int state)
+{
+	h8bus().set_p201_reset(state);
+}
+
+inline void device_h8bus_p1_card_interface::set_p201_int1(int state)
+{
+	h8bus().set_p201_int1(state);
+}
+
+inline void device_h8bus_p1_card_interface::set_p201_int2(int state)
+{
+	h8bus().set_p201_int2(state);
+}
+
+inline void device_h8bus_p2_card_interface::set_p201_inte(int state)
+{
+	h8bus().set_p201_inte(state);
 }
 
 DECLARE_DEVICE_TYPE(H8BUS, h8bus_device)

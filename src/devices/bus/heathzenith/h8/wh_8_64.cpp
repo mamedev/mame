@@ -78,35 +78,35 @@ void wh_8_64_device::device_reset()
 {
 	if (!m_installed)
 	{
-		h8bus().install_mem_device(0x2000, 0x3fff,
+		h8bus().space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3fff,
 			read8sm_delegate(m_ram[0], FUNC(ram_device::read)),
 			write8sm_delegate(m_ram[0], FUNC(ram_device::write)));
 
-		h8bus().install_mem_device(0x4000, 0x5fff,
+		h8bus().space(AS_PROGRAM).install_readwrite_handler(0x4000, 0x5fff,
 			read8sm_delegate(m_ram[1], FUNC(ram_device::read)),
 			write8sm_delegate(m_ram[1], FUNC(ram_device::write)));
 
-		h8bus().install_mem_device(0x6000, 0x7fff,
+		h8bus().space(AS_PROGRAM).install_readwrite_handler(0x6000, 0x7fff,
 			read8sm_delegate(m_ram[2], FUNC(ram_device::read)),
 			write8sm_delegate(m_ram[2], FUNC(ram_device::write)));
 
-		h8bus().install_mem_device(0x8000, 0x9fff,
+		h8bus().space(AS_PROGRAM).install_readwrite_handler(0x8000, 0x9fff,
 			read8sm_delegate(m_ram[3], FUNC(ram_device::read)),
 			write8sm_delegate(m_ram[3], FUNC(ram_device::write)));
 
-		h8bus().install_mem_device(0xa000, 0xbfff,
+		h8bus().space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff,
 			read8sm_delegate(m_ram[4], FUNC(ram_device::read)),
 			write8sm_delegate(m_ram[4], FUNC(ram_device::write)));
 
-		h8bus().install_mem_device(0xc000, 0xdfff,
+		h8bus().space(AS_PROGRAM).install_readwrite_handler(0xc000, 0xdfff,
 			read8sm_delegate(m_ram[5], FUNC(ram_device::read)),
 			write8sm_delegate(m_ram[5], FUNC(ram_device::write)));
 
-		h8bus().install_mem_device(0xe000, 0xffff,
+		h8bus().space(AS_PROGRAM).install_readwrite_handler(0xe000, 0xffff,
 			read8sm_delegate(m_ram[6], FUNC(ram_device::read)),
 			write8sm_delegate(m_ram[6], FUNC(ram_device::write)));
 
-// TODO to properly map the last 8k, needs an HA-8-6 Z80 CPU or HA-8-8 Extended
+// TODO: Properly map the last 8k, needs an HA-8-6 Z80 CPU or HA-8-8 Extended
 // Configuration board to handle the ROM/RAM swap
 #if 0
 		h8bus().install_mem_device(0x0000, 0x1fff,
@@ -249,27 +249,27 @@ void wh_8_64_48k_device::device_reset()
 {
 	if (!m_installed)
 	{
-		h8bus().install_mem_device(0x2000, 0x3fff,
+		h8bus().space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3fff,
 			read8sm_delegate(m_ram[0], FUNC(ram_device::read)),
 			write8sm_delegate(m_ram[0], FUNC(ram_device::write)));
 
-		h8bus().install_mem_device(0x4000, 0x5fff,
+		h8bus().space(AS_PROGRAM).install_readwrite_handler(0x4000, 0x5fff,
 			read8sm_delegate(m_ram[1], FUNC(ram_device::read)),
 			write8sm_delegate(m_ram[1], FUNC(ram_device::write)));
 
-		h8bus().install_mem_device(0x6000, 0x7fff,
+		h8bus().space(AS_PROGRAM).install_readwrite_handler(0x6000, 0x7fff,
 			read8sm_delegate(m_ram[2], FUNC(ram_device::read)),
 			write8sm_delegate(m_ram[2], FUNC(ram_device::write)));
 
-		h8bus().install_mem_device(0x8000, 0x9fff,
+		h8bus().space(AS_PROGRAM).install_readwrite_handler(0x8000, 0x9fff,
 			read8sm_delegate(m_ram[3], FUNC(ram_device::read)),
 			write8sm_delegate(m_ram[3], FUNC(ram_device::write)));
 
-		h8bus().install_mem_device(0xa000, 0xbfff,
+		h8bus().space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff,
 			read8sm_delegate(m_ram[4], FUNC(ram_device::read)),
 			write8sm_delegate(m_ram[4], FUNC(ram_device::write)));
 
-		h8bus().install_mem_device(0xc000, 0xdfff,
+		h8bus().space(AS_PROGRAM).install_readwrite_handler(0xc000, 0xdfff,
 			read8sm_delegate(m_ram[5], FUNC(ram_device::read)),
 			write8sm_delegate(m_ram[5], FUNC(ram_device::write)));
 
@@ -287,19 +287,19 @@ void wh_8_64_32k_device::device_reset()
 {
 	if (!m_installed)
 	{
-		h8bus().install_mem_device(0x2000, 0x3fff,
+		h8bus().space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3fff,
 			read8sm_delegate(m_ram[0], FUNC(ram_device::read)),
 			write8sm_delegate(m_ram[0], FUNC(ram_device::write)));
 
-		h8bus().install_mem_device(0x4000, 0x5fff,
+		h8bus().space(AS_PROGRAM).install_readwrite_handler(0x4000, 0x5fff,
 			read8sm_delegate(m_ram[1], FUNC(ram_device::read)),
 			write8sm_delegate(m_ram[1], FUNC(ram_device::write)));
 
-		h8bus().install_mem_device(0x6000, 0x7fff,
+		h8bus().space(AS_PROGRAM).install_readwrite_handler(0x6000, 0x7fff,
 			read8sm_delegate(m_ram[2], FUNC(ram_device::read)),
 			write8sm_delegate(m_ram[2], FUNC(ram_device::write)));
 
-		h8bus().install_mem_device(0x8000, 0x9fff,
+		h8bus().space(AS_PROGRAM).install_readwrite_handler(0x8000, 0x9fff,
 			read8sm_delegate(m_ram[3], FUNC(ram_device::read)),
 			write8sm_delegate(m_ram[3], FUNC(ram_device::write)));
 
