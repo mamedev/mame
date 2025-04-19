@@ -3522,7 +3522,7 @@ void debugger_commands::execute_trace(const std::vector<std::string_view> &param
 		// opening for append?
 		if ((filename[0] == '>') && (filename[1] == '>'))
 		{
-			mode |= std::ios_base::ate;
+			mode |= std::ios_base::app;
 			filename = filename.substr(2);
 		}
 		else
