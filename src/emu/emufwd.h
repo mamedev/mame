@@ -84,6 +84,10 @@ class debug_watchpoint;
 class debug_registerpoint;
 class debug_exceptionpoint;
 
+// declared in debug/srcdbg_provider.h
+class srcdbg_provider_base;
+class file_line;
+
 // declared in debugger.h
 class debugger_manager;
 
