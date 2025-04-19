@@ -155,7 +155,7 @@ static void *allocate(size_t size)
     return result;
 }
 
-void bplist_free_data()
+void bplist_free_data(void)
 {
     while (block_list) {
         void *next = *(void **)block_list;
@@ -206,7 +206,7 @@ typedef struct bplist_info
 
 
 static value_ptr bplist_read_pldata(pldata_ptr data);
-static value_ptr bplist_read_pref(char *filename, OSType folder_type);
+static value_ptr bplist_read_pref(const char *filename, OSType folder_type);
 static uint64_t read_sized_int(bplist_info_ptr bplist, uint64_t offset,
                                uint8_t size);
 static uint64_t read_offset(bplist_info_ptr bplist, uint64_t index);
@@ -344,7 +344,7 @@ BOOL is_binary_plist(pldata_ptr data)
 }
 
 
-value_ptr bplist_read_file(char *filename)
+value_ptr bplist_read_file(const char *filename)
 {
     struct stat stbuf;
     pldata_node pldata;
@@ -391,7 +391,7 @@ value_ptr bplist_read_file(char *filename)
 }
 
 
-value_ptr bplist_read_pref(char *filename, OSType folder_type)
+value_ptr bplist_read_pref(const char *filename, OSType folder_type)
 {
     FSRef prefdir;
     char cstr[MAX_PATH_LEN];
@@ -413,12 +413,12 @@ value_ptr bplist_read_pref(char *filename, OSType folder_type)
 }
 
 
-value_ptr bplist_read_system_pref(char *filename) {
+value_ptr bplist_read_system_pref(const char *filename) {
     return bplist_read_pref(filename, kSystemPreferencesFolderType);
 }
 
 
-value_ptr bplist_read_user_pref(char *filename) {
+value_ptr bplist_read_user_pref(const char *filename) {
     return bplist_read_pref(filename, kPreferencesFolderType);
 }
 

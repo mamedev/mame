@@ -71,10 +71,10 @@ typedef struct value_struct {
 } value_node, *value_ptr;
 
 
-value_ptr bplist_read_file(char *filename);
-value_ptr bplist_read_user_pref(char *filename);
-value_ptr bplist_read_system_pref(char *filename);
-void bplist_free_data();
+value_ptr bplist_read_file(const char *filename);
+value_ptr bplist_read_user_pref(const char *filename);
+value_ptr bplist_read_system_pref(const char *filename);
+void bplist_free_data(void);
 
 /*************** functions for accessing values ****************/
 

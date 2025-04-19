@@ -24,7 +24,7 @@ PmDeviceID find_default_device(char *path, int input, PmDeviceID id)
    returns matching device id if found, otherwise id
 */
 {
-    static char *pref_file = "com.apple.java.util.prefs.plist";
+    static char const *const pref_file = "com.apple.java.util.prefs.plist";
     char *pref_str = NULL;
     // read device preferences
     value_ptr prefs = bplist_read_user_pref(pref_file);

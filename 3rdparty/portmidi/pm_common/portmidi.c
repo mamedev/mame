@@ -179,7 +179,7 @@ PmError pm_create_virtual(PmInternal *midi, int is_input, const char *interf,
  * device would take the name of an existing device.
  * otherwise returns index (portmidi device_id) of the added device
  */
-PmError pm_add_device(char *interf, const char *name, int is_input, 
+PmError pm_add_device(const char *interf, const char *name, int is_input, 
                 int is_virtual, void *descriptor, pm_fns_type dictionary) {
     /* printf("pm_add_device: %s %s %d %p %p\n",
            interf, name, is_input, descriptor, dictionary); */
@@ -293,7 +293,7 @@ int pm_find_default_device(char *pattern, int is_input)
     int id = pmNoDevice;
     int i;
     /* first parse pattern into name, interf parts */
-    char *interf_pref = ""; /* initially assume it is not there */
+    char const *interf_pref = ""; /* initially assume it is not there */
     char *name_pref = strstr(pattern, ", ");
 
     if (name_pref) { /* found separator, adjust the pointer */
@@ -909,7 +909,7 @@ PMEXPORT PmError Pm_OpenInput(PortMidiStream** stream,
                               PmTimeProcPtr time_proc,
                               void *time_info)
 {
-    PmInternal *midi;
+    PmInternal *midi = NULL;
     PmError err = pmNoError;
     pm_hosterror = FALSE;
     *stream = NULL;  /* invariant: *stream == midi */

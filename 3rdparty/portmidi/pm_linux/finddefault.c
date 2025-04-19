@@ -22,7 +22,7 @@ void skip_spaces(FILE *inf)
 }
 
 /* trim leading spaces and match a string */
-int match_string(FILE *inf, char *s)
+int match_string(FILE *inf, const char *s)
 {
     skip_spaces(inf);
     while (*s && *s == getc(inf)) s++;
@@ -33,17 +33,18 @@ int match_string(FILE *inf, char *s)
 /* 
 /* Parse preference files, find default device, search devices --
  */
-PmDeviceID find_default_device(char *path, int input, PmDeviceID id)
+PmDeviceID find_default_device(const char *path, int input, PmDeviceID id)
 /* path -- the name of the preference we are searching for
    input -- true iff this is an input device
    id -- current default device id
    returns matching device id if found, otherwise id
 */
 {
-    static char *pref_2 = "/.java/.userPrefs/";
-    static char *pref_3 = "prefs.xml";
-    char *pref_1 = getenv("HOME");
-    char *full_name, *path_ptr;
+    static char const *const pref_2 = "/.java/.userPrefs/";
+    static char const *const pref_3 = "prefs.xml";
+    const char *pref_1 = getenv("HOME");
+    const char *path_ptr;
+    char *full_name;
     FILE *inf;
     int c, i;
     if (!pref_1) goto nopref; // cannot find preference file

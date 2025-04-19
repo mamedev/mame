@@ -162,7 +162,7 @@ PmError pm_fail_timestamp_fn(PmInternal *midi, PmTimestamp timestamp);
 PmError pm_success_fn(PmInternal *midi);
 PmError pm_add_interf(char *interf, pm_create_fn create_fn,
                       pm_delete_fn delete_fn);
-PmError pm_add_device(char *interf, const char *name, int is_input,
+PmError pm_add_device(const char *interf, const char *name, int is_input,
                       int is_virtual, void *descriptor, pm_fns_type dictionary);
 void pm_undo_add_device(int id);
 uint32_t pm_read_bytes(PmInternal *midi, const unsigned char *data, int len,

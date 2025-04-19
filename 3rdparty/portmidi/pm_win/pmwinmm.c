@@ -139,7 +139,7 @@ typedef struct winmm_info_struct {
 general MIDI device queries
 =============================================================================
 */
-static void pm_winmm_general_inputs()
+static void pm_winmm_general_inputs(void)
 {
     UINT i;
     WORD wRtn;
@@ -168,7 +168,7 @@ static void pm_winmm_general_inputs()
 }
 
 
-static void pm_winmm_mapper_input()
+static void pm_winmm_mapper_input(void)
 {
     WORD wRtn;
     /* Note: if MIDIMAPPER opened as input (documentation implies you
@@ -186,7 +186,7 @@ static void pm_winmm_mapper_input()
 }
 
 
-static void pm_winmm_general_outputs()
+static void pm_winmm_general_outputs(void)
 {
     UINT i;
     DWORD wRtn;
@@ -210,7 +210,7 @@ static void pm_winmm_general_outputs()
 }
 
 
-static void pm_winmm_mapper_output()
+static void pm_winmm_mapper_output(void)
 {
     WORD wRtn;
     /* Note: if MIDIMAPPER opened as output (pseudo MIDI device
@@ -400,7 +400,7 @@ static unsigned int allocate_input_buffer(HMIDIIN h, long buffer_len)
 }
 
 
-static winmm_info_type winmm_info_create()
+static winmm_info_type winmm_info_create(void)
 {
     winmm_info_type info = (winmm_info_type) pm_alloc(sizeof(winmm_info_node));
     info->handle.in = NULL;
@@ -501,10 +501,10 @@ static PmError winmm_in_close(PmInternal *midi)
     winmm_info_type info = (winmm_info_type) midi->api_info;
     if (!info) return pmBadPtr;
     /* device to close */
-    if (pm_hosterror = midiInStop(info->handle.in)) {
+    if ((pm_hosterror = midiInStop(info->handle.in))) {
         midiInReset(info->handle.in); /* try to reset and close port */
         midiInClose(info->handle.in);
-    } else if (pm_hosterror = midiInReset(info->handle.in)) {
+    } else if ((pm_hosterror = midiInReset(info->handle.in))) {
         midiInClose(info->handle.in); /* best effort to close midi port */
     } else {
         pm_hosterror = midiInClose(info->handle.in);
@@ -988,7 +988,7 @@ static PmError winmm_write_byte(PmInternal *midi, unsigned char byte,
         info->hdr = hdr = get_free_output_buffer(midi);
         assert(hdr);
         midi->fill_base = (unsigned char *) info->hdr->lpData;
-        midi->fill_offset_ptr = &(hdr->dwBytesRecorded);
+        midi->fill_offset_ptr = (unsigned int *) &(hdr->dwBytesRecorded);
         /* when buffer fills, Pm_WriteSysEx will revert to calling
          * pmwin_write_byte, which expect to have space, so leave
          * one byte free for pmwin_write_byte. Leave another byte

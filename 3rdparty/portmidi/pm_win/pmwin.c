@@ -56,7 +56,7 @@ void pm_term(void) {
 }
 
 
-static PmDeviceID pm_get_default_device_id(int is_input, char *key) {
+static PmDeviceID pm_get_default_device_id(int is_input, const char *key) {
     HKEY hkey;
 #define PATTERN_MAX 256
     char pattern[PATTERN_MAX];
