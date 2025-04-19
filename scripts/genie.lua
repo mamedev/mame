@@ -563,10 +563,6 @@ dofile ("toolchain.lua")
 -- Avoid error when invoking genie --help.
 if (_ACTION == nil) then return false end
 
--- define PTR64 if we are a 64-bit target
-configuration { "x64 or android-*64"}
-	defines { "PTR64=1" }
-
 -- define MAME_DEBUG if we are a debugging build
 configuration { "Debug" }
 	defines {
@@ -1084,12 +1080,6 @@ end
 		end
 	end
 
-if (_OPTIONS["PLATFORM"]=="alpha") then
-	defines {
-		"PTR64=1",
-	}
-end
-
 if (_OPTIONS["PLATFORM"]=="arm") then
 	buildoptions {
 		"-Wno-cast-align",
@@ -1099,21 +1089,6 @@ end
 if (_OPTIONS["PLATFORM"]=="arm64") then
 	buildoptions {
 		"-Wno-cast-align",
-	}
-	defines {
-		"PTR64=1",
-	}
-end
-
-if (_OPTIONS["PLATFORM"]=="riscv64") then
-	defines {
-		"PTR64=1",
-	}
-end
-
-if (_OPTIONS["PLATFORM"]=="mips64") then
-	defines {
-		"PTR64=1",
 	}
 end
 
