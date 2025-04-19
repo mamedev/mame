@@ -129,13 +129,8 @@ u8 h89bus_z37_device::data_r()
 	return m_access_track_sector ? m_fdc->track_r() : m_fdc->data_r();
 }
 
-void h89bus_z37_device::write(u8 select_lines, u8 offset, u8 data)
+void h89bus_z37_device::write(offs_t offset, u8 data)
 {
-	if (!(select_lines & h89bus_device::H89_CASS))
-	{
-		return;
-	}
-
 	LOGFUNC("%s: reg: %d val: 0x%02x\n", FUNCNAME, offset, data);
 
 	switch (offset)
@@ -155,13 +150,8 @@ void h89bus_z37_device::write(u8 select_lines, u8 offset, u8 data)
 	}
 }
 
-u8 h89bus_z37_device::read(u8 select_lines, u8 offset)
+u8 h89bus_z37_device::read(offs_t offset)
 {
-	if (!(select_lines & h89bus_device::H89_CASS))
-	{
-		return 0;
-	}
-
 	// default return for the h89
 	u8 value = 0xff;
 
@@ -186,6 +176,9 @@ u8 h89bus_z37_device::read(u8 select_lines, u8 offset)
 
 void h89bus_z37_device::device_start()
 {
+	m_installed = false;
+
+	save_item(NAME(m_installed));
 	save_item(NAME(m_irq_allowed));
 	save_item(NAME(m_drq_allowed));
 	save_item(NAME(m_access_track_sector));
@@ -193,6 +186,21 @@ void h89bus_z37_device::device_start()
 
 void h89bus_z37_device::device_reset()
 {
+	if (!m_installed)
+	{
+		std::pair<u8, u8> addr = h89bus().get_address_range(h89bus::IO_CASS);
+
+		// only install if non-zero address
+		if (addr.first)
+		{
+			h89bus().install_io_device(addr.first, addr.second,
+				read8sm_delegate(*this, FUNC(h89bus_z37_device::read)),
+				write8sm_delegate(*this, FUNC(h89bus_z37_device::write)));
+		}
+
+		m_installed = true;
+	}
+
 	m_irq_allowed         = false;
 	m_drq_allowed         = false;
 	m_access_track_sector = false;

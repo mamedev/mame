@@ -112,14 +112,9 @@ void mms77316_fdc_device::data_w(u8 val)
 	m_fdc->data_w(val);
 }
 
-void mms77316_fdc_device::write(u8 select_lines, u8 reg, u8 val)
+void mms77316_fdc_device::write(offs_t reg, u8 val)
 {
-	if (!(select_lines & h89bus_device::H89_GPP))
-	{
-		return;
-	}
-
-	if (reg != 2) LOGREG("%s: reg: %d val: 0x%02x\n", FUNCNAME, reg, val);
+	LOGREG("%s: reg: %d val: 0x%02x\n", FUNCNAME, reg, val);
 
 	switch (reg)
 	{
@@ -169,13 +164,8 @@ u8 mms77316_fdc_device::data_r()
 	return data;
 }
 
-u8 mms77316_fdc_device::read(u8 select_lines, u8 reg)
+u8 mms77316_fdc_device::read(offs_t reg)
 {
-	if (!(select_lines & h89bus_device::H89_GPP))
-	{
-		return 0;
-	}
-
 	// default return for the h89
 	u8 value = 0xff;
 
@@ -209,6 +199,9 @@ u8 mms77316_fdc_device::read(u8 select_lines, u8 reg)
 
 void mms77316_fdc_device::device_start()
 {
+	m_installed = false;
+
+	save_item(NAME(m_installed));
 	save_item(NAME(m_irq_allowed));
 	save_item(NAME(m_drq_allowed));
 	save_item(NAME(m_irq));
@@ -218,6 +211,21 @@ void mms77316_fdc_device::device_start()
 
 void mms77316_fdc_device::device_reset()
 {
+	if (!m_installed)
+	{
+		std::pair<u8, u8>  addr = h89bus().get_address_range(h89bus::IO_GPP);
+
+		// only install if non-zero address
+		if (addr.first)
+		{
+			h89bus().install_io_device(addr.first, addr.second,
+				read8sm_delegate(*this, FUNC(mms77316_fdc_device::read)),
+				write8sm_delegate(*this, FUNC(mms77316_fdc_device::write)));
+		}
+
+		m_installed = true;
+	}
+
 	m_irq_allowed = false;
 	m_drq_allowed = false;
 	m_irq         = false;
