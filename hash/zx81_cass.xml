@@ -348,6 +348,7 @@ RAND USR 16530
 		<description>5 Programmes Pour Jouer</description>
 		<year>1984</year>
 		<publisher>Direco International</publisher>
+		<info name="language" value="French" />
 		<part name="cass1" interface="zx81_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="2483">
@@ -363,9 +364,10 @@ RAND USR 16530
 	</software>
 
 	<software name="5pourflech">
-		<description>5 Programmes Pour Reflechir</description>
+		<description>5 Programmes Pour Réfléchir</description>
 		<year>1984</year>
 		<publisher>Direco International</publisher>
+		<info name="language" value="French" />
 		<part name="cass1" interface="zx81_cass">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="cass" size="2271">
@@ -747,6 +749,19 @@ RAND USR 16530
 		</part>
 	</software>
 
+	<software name="aritmetc">
+		<description>Aritmética I</description>
+		<year>1983</year>
+		<publisher>Timex Portugal</publisher>
+		<info name="language" value="Portuguese" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="10818">
+				<rom name="AritmeticaI(TS1000).tzx" size="10818" crc="ac1b1300" sha1="ba00450a8b16480d4ee63139b7e723fc655b3b5b"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="aeurope80">
 		<description>Around Europe in 80 Hours</description>
 		<year>1982</year>
@@ -1012,6 +1027,18 @@ RAND USR 16530
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="1446">
 				<rom name="BatCage.tzx" size="1446" crc="650a94d8" sha1="8f6842f02e416e8b66c8d6172f2e852a5e14d2f8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batbrit">
+		<description>Battle of Britain</description>
+		<year>1981</year>
+		<publisher>Microgame Simulations</publisher>
+		<info name="usage" value="type RUN after loading the tape" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="12201">
+				<rom name="Battle of Britain.tzx" size="12201" crc="39fa781f" sha1="a7c08b535892d58099527d158429e9af59eed0a7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1290,7 +1317,7 @@ RAND USR 16530
 	</software>
 
 	<software name="breakoutj">
-		<description>Breakout (J.K.G.)</description>
+		<description>Breakout (J.K. Greye)</description>
 		<year>1981</year>
 		<publisher>J.K. Greye Software</publisher>
 		<part name="cass1" interface="zx81_cass">
@@ -1301,7 +1328,7 @@ RAND USR 16530
 	</software>
 
 	<software name="breakoutn">
-		<description>Breakout (N.G.S.)</description>
+		<description>Breakout (New Generation)</description>
 		<year>1982</year>
 		<publisher>New Generation Software</publisher>
 		<part name="cass1" interface="zx81_cass">
@@ -1678,6 +1705,19 @@ RAND USR 16530
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="6510">
 				<rom name="CaveCrusade.tzx" size="6510" crc="9dec44e3" sha1="bc4a46fdec5734a88afc005df4864feae26549e1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cedriccl">
+		<description>Cedric the Clown (type-in, Sinclair User № 17 - August 1983)</description>
+		<year>1983</year>
+		<publisher>ECC Publications</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K; type RUN after loading the program" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="4391">
+				<rom name="Cedric the Clown.tzx" size="4391" crc="2aebfcac" sha1="4fb13393fe2e98a0224f21af22ada29b2c1bb2b4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2190,6 +2230,32 @@ RAND USR 16530
 		</part>
 	</software>
 
+	<software name="contabanc">
+		<description>Conta Bancária</description>
+		<year>1983</year>
+		<publisher>Timex Portugal</publisher>
+		<info name="language" value="Portuguese" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="4950">
+				<rom name="ContaBancaria.p" size="4950" crc="549ff4d9" sha1="d5dbf7960bfdace574ef4c7ef26b29ce9ac3ece5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ctogrimm">
+		<description>Contos de Grimm</description>
+		<year>1983</year>
+		<publisher>Timex Portugal</publisher>
+		<info name="language" value="Portuguese" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="9735">
+				<rom name="Contos de Grimm.p" size="9735" crc="f6a18e89" sha1="b6794a7f08ba595ea55fe63cbcc05bccd61e6db4"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ctrltech">
 		<description>Control Technology Tapes 1,2,3</description>
 		<year>198?</year>
@@ -2369,6 +2435,37 @@ RAND USR 16530
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="13498">
 				<rom name="Deflexx - Green Inlay (DK Tronics).tzx" size="13498" crc="0a8a287f" sha1="0a37170275e3956ed5e78cd4a42f4beea6acf5b8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="demots1000">
+		<description>Demonstração TS 1000</description>
+		<year>1983</year>
+		<publisher>Timex Portugal</publisher>
+		<info name="language" value="Portuguese" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass1" size="7247">
+				<rom name="DemonstracaoTS1000 - A.tzx" size="7247" crc="016a41b2" sha1="e85b07c97b43c71cf5f69d4432c1166ba4a54ae2"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<dataarea name="cass1" size="7247">
+				<rom name="DemonstracaoTS1000 - B.tzx" size="7247" crc="fb0bd6b4" sha1="049025b7fb2b991c3ca8f53401d38995bb433d56"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="desenho1">
+		<description>Desenho I</description>
+		<year>1983</year>
+		<publisher>Timex Portugal</publisher>
+		<info name="language" value="Portuguese" />
+		<info name="usage" value="16K" />
+		<part name="cass" interface="zx81_cass">
+			<dataarea name="cass1" size="2124">
+				<rom name="DesenhoI.tzx" size="2124" crc="98ac616a" sha1="a5c5972c8e3c358cdbc5666adbe7a86cb3f20ed7"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2773,6 +2870,26 @@ RAND USR 16530
 		</part>
 	</software>
 
+	<software name="familyfun">
+		<description>Family Fun</description>
+		<year>1983</year>
+		<publisher>Meow Micros</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="cass1" size="16817">
+				<rom name="Family Fun - Side A.tzx" size="16817" crc="3baa2945" sha1="4d1587655603a7f71af10619da711bab3951388a"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="cass1" size="16222">
+				<rom name="Family Fun - Side B.tzx" size="16222" crc="2da00e16" sha1="35da914651ec1bd8e09508d1e25514958e9f42a4"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="famquiz">
 		<description>Family Quiz</description>
 		<year>1981</year>
@@ -2948,6 +3065,19 @@ RAND USR 16530
 		</part>
 	</software>
 
+	<software name="flipper">
+		<description>Flipper</description>
+		<year>1983</year>
+		<publisher>Timex Portugal</publisher>
+		<info name="language" value="Portuguese" />
+		<info name="usage" value="16K" />
+		<part name="cass" interface="zx81_cass">
+			<dataarea name="cass1" size="4862">
+				<rom name="Flipper.p" size="4862" crc="5bb87650" sha1="97f8732868dd88fb76a70b01f526beac164b6be9"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="football">
 		<description>Football</description>
 		<year>198?</year>
@@ -3007,9 +3137,28 @@ RAND USR 16530
 		<description>Fortress of Zorlac</description>
 		<year>1982</year>
 		<publisher>Timex</publisher>
+		<info name="language" value="English" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="7442">
 				<rom name="FortressOfZorlac.tzx" size="7442" crc="30d3ba7d" sha1="13f8969e92932f3f6e4c6f177bbe34512780b96f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fortzorl_pt" cloneof="fortzorl">
+		<description>Fortaleza de Zorlac</description>
+		<year>1983</year>
+		<publisher>Timex Portugal</publisher>
+		<info name="language" value="Portuguese" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="7497">
+				<rom name="Fortaleza de Zorlac - A.tzx" size="7497" crc="8133edf7" sha1="69083d18819d4c52136b10ceb8a447b5298c2b30"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<dataarea name="cass" size="7497">
+				<rom name="Fortaleza de Zorlac - B.tzx" size="7497" crc="5812c1d5" sha1="706ef48a13c11279e503fdc169370de6d11cb60a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3648,10 +3797,34 @@ RAND USR 16530
 		</part>
 	</software>
 
+	<software name="giprogram">
+		<description>General Interest Programs</description>
+		<year>1981</year>
+		<publisher>Zipprint</publisher>
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Calendar"/>
+			<dataarea name="cass" size="2701">
+				<rom name="Calendar.p" size="2701" crc="ba739e7a" sha1="088d557d8838143e2ff40051cf89b031fc0bccf2"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Index"/>
+			<dataarea name="cass" size="4406">
+				<rom name="Index.p" size="4406" crc="0d6d81e4" sha1="db00bbea2d4d786325b454e76fafe1d114510b03"/>
+			</dataarea>
+		</part>
+		<part name="cass3" interface="zx81_cass">
+			<feature name="part_id" value="Artist"/>
+			<dataarea name="cass" size="16107">
+				<rom name="Artist.p" size="16107" crc="5ff6a618" sha1="572cafb6f3cb38f6fabfae4affdea256538cf7ff"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="genstats">
 		<description>General Statistics</description>
 		<year>1982</year>
-		<publisher>W.H.Smith</publisher>
+		<publisher>W.H. Smith</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="14466">
 				<rom name="GeneralStatistics.tzx" size="14466" crc="8889d5e3" sha1="a1f94c7ca3a27e24ebfaba575700cfccf8640356"/>
@@ -4334,6 +4507,19 @@ RAND USR 16530
 		</part>
 	</software>
 
+	<software name="inic1000">
+		<description>Iniciação TS 1000</description>
+		<year>1983</year>
+		<publisher>Timex Portugal</publisher>
+		<info name="language" value="Portuguese" />
+		<info name="usage" value="2K" />
+		<part name="cass" interface="zx81_cass">
+			<dataarea name="cass1" size="7196">
+				<rom name="IniciacaoTS1000.tzx" size="7196" crc="d512846b" sha1="8437d38352205d5979ecd26f2be9266f2dd5a341"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="intcobalt">
 		<description>Intercepteur Cobalt</description>
 		<year>1984</year>
@@ -4862,7 +5048,26 @@ Defender: not working
 	</software>
 
 	<software name="keysgond">
-		<description>Keys To Gondrun</description>
+		<description>The Keys of Gondrun (two sides)</description>
+		<year>1982</year>
+		<publisher>International Publishing &amp; Software Inc.</publisher>
+		<info name="usage" value="16K; type RUN after loading the program" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Side 1"/>
+			<dataarea name="cass" size="16333">
+				<rom name="The Keys of Gondrun - Side 1.tzx" size="16333" crc="480cfc81" sha1="62ad100c4f9e2c7f47611fbb26b117de55d5cf4e"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Side 2"/>
+			<dataarea name="cass" size="16333">
+				<rom name="The Keys of Gondrun - Side 2.tzx" size="16333" crc="b8bdc096" sha1="297cbc61723ecc8cdc8896c08ac9bb96e645d2fc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keysgond_a" cloneof="keysgond">
+		<description>The Keys of Gondrun (one side)</description>
 		<year>1982</year>
 		<publisher>International Publishing &amp; Software Inc.</publisher>
 		<part name="cass1" interface="zx81_cass">
@@ -5994,10 +6199,30 @@ Defender: not working
 		</part>
 	</software>
 
+	<software name="nparkmpl" supported="partial">
+		<description>Nightmare Park + Music Plus</description>
+		<year>1981</year>
+		<publisher>Macronics Software</publisher>
+		<notes>Side 2 - Music Plus doesn't work</notes>
+		<info name="usage" value="16K; type RUN after loading the program" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Nightmare Park"/>
+			<dataarea name="cass" size="11756">
+				<rom name="Nightmare Park - Music Plus - Side 1.tzx" size="11756" crc="ab117c56" sha1="ff122fe1788ed5bf1a2984b8bd254adf7103ff1f"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Music Plus"/>
+			<dataarea name="cass" size="2177">
+				<rom name="Nightmare Park - Music Plus - Side 2.tzx" size="2177" crc="19927bdf" sha1="95bebda845bd9b363ffd8defc03e3563de4c88e9"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nightmpk">
 		<description>ZX Nightmare Park</description>
 		<year>1981</year>
-		<publisher>Macronics</publisher>
+		<publisher>Macronics Software</publisher>
 		<info name="language" value="English" />
 		<info name="usage" value="16K; type RUN after loading the program" />
 		<part name="cass1" interface="zx81_cass">
@@ -6131,6 +6356,26 @@ Defender: not working
 		</part>
 	</software>
 
+	<software name="orcadome">
+		<description>Orçamento Doméstico</description>
+		<year>1983</year>
+		<publisher>Timex Portugal</publisher>
+		<info name="language" value="Portuguese" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Face A"/>
+			<dataarea name="cass" size="8499">
+				<rom name="Orcamento Domestico - Face A.p" size="8499" crc="477f123e" sha1="f45bab5b13cb4b657cc6dfc711dbaf220c7d921a"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Face B"/>
+			<dataarea name="cass" size="8499">
+				<rom name="Orcamento Domestico - Face B.p" size="8499" crc="1b0ac32b" sha1="ecad81629b5f7a94fc2c9e0a134d72877e338d3f"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ordidact">
 		<description>Ordidactic - 1. Language Machine</description>
 		<year>1984</year>
@@ -6169,6 +6414,25 @@ Defender: not working
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="11885">
 				<rom name="Othello.tzx" size="11885" crc="09d487fe" sha1="47c8980d14972b59fab5098667b170169894515d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="othello_di">
+		<description>Othello (Direco)</description>
+		<year>1982</year>
+		<publisher>Direco International</publisher>
+		<info name="language" value="French" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Face A - OTHELLO en basic - 3 niveaux"/>
+			<dataarea name="cass" size="11216">
+				<rom name="OthelloReversi (basic) - Face A.p" size="11216" crc="08bd891f" sha1="f23c02f68615341e595fd964a79da19fe5bd7694"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Face B - OTHELLO langage machine - 9 niveaux"/>
+			<dataarea name="cass" size="6792">
+				<rom name="OthelloReversi (langage machine) - Face B.p" size="6792" crc="aac73c93" sha1="752dd4dd76be97921caec004367ce4c1b6b22b2a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6505,6 +6769,17 @@ Defender: not working
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="5127">
 				<rom name="Planetoids.tzx" size="5127" crc="02a6b2ad" sha1="270765be9b076e4eaa0704eece81137ad2c0ae10"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="plandefd">
+		<description>Planet Defender</description>
+		<year>1982</year>
+		<publisher>John Prince Software</publisher>
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="14145">
+				<rom name="Planet Defender (John Prince Software).tzx" size="14145" crc="ad5bb7a6" sha1="0f652fdda1c18b5a2522807b6740268547e1b790"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8515,7 +8790,7 @@ Defender: not working
 	<software name="talkback">
 		<description>Talkback</description>
 		<year>1983</year>
-		<publisher>M.W.F.Ringrose</publisher>
+		<publisher>M.W.F. Ringrose</publisher>
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="12740">
 				<rom name="Talkback.tzx" size="12740" crc="36724d18" sha1="6b32ff6dd4930ad62cadb59b3c4ecdb6eb4a2654"/>
@@ -8714,6 +8989,18 @@ Defender: not working
 		</part>
 	</software>
 
+	<software name="treahunt">
+		<description>Treasure Hunt (type-in)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="type RUN after loading the tape" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="6892">
+				<rom name="Treasure Hunt.tzx" size="6892" crc="54cbbb1f" sha1="7fd9116ee1a1d24b79e9e39b44d3deee4ffbc7e9"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="tsdestry">
 		<description>TS Destroyer and Space Raid</description>
 		<year>198?</year>
@@ -8843,6 +9130,18 @@ Defender: not working
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="12101">
 				<rom name="VectorMathematics.tzx" size="12101" crc="c33b86ba" sha1="b82230bcc7f57f7b1f12720d82440031135be44b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nastymont">
+		<description>Very Nasty Mountain</description>
+		<year>1982</year>
+		<publisher>Giltrole</publisher>
+		<info name="usage" value="16K, type RUN after loading the tape" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="16080">
+				<rom name="Very Nasty Mountain.tzx" size="16080" crc="22ccb9cc" sha1="0bc91eeda5d786f8a79714e8f8d297b4864d9484"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9218,6 +9517,18 @@ Defender: not working
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="10657">
 				<rom name="WorldCupFootball.tzx" size="10657" crc="685d01ce" sha1="d081ccd8b759a2866bff5676a112481bb73d5f88"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmen">
+		<description>X-Men</description>
+		<year>198?</year>
+		<publisher>Amba Software</publisher>
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="7924">
+				<rom name="X-Men (Amba Software).tzx" size="7924" crc="0f931ef3" sha1="c007a651461b212201a7652b0a98b63253eb4007"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10049,6 +10360,20 @@ Defender: not working
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="7225">
 				<rom name="cacorm.p" size="7225" crc="c45b7e70" sha1="17032d1bdc87ed9dc899be0b0ca4335eae751756"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cpayback" supported="partial">
+		<description>Cosmic Payback</description>
+		<year>2025</year>
+		<publisher>John Connolly</publisher>
+		<notes>Wrong graphics during gameplay</notes>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="11257">
+				<rom name="CosmicPaybackZX81.p" size="11257" crc="77f31eeb" sha1="ba33cdc4c7f703d0f1e0670f4aac8db51230cadf"/>
 			</dataarea>
 		</part>
 	</software>
