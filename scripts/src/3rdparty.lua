@@ -1188,14 +1188,14 @@ end
 		defines {
 			"PMALSA=1",
 		}
-
 	configuration { }
 
-	if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") and str_to_version(_OPTIONS["gcc_version"]) >= 150000 then
+	configuration { "gmake or ninja" }
 		buildoptions_c {
-			"-Wno-strict-prototypes",
+			"-Wno-unused-function",
+			"-Wno-unused-variable",
 		}
-	end
+	configuration { }
 
 	files {
 		MAME_DIR .. "3rdparty/portmidi/pm_common/portmidi.c",
@@ -1232,7 +1232,6 @@ end
 			MAME_DIR .. "3rdparty/portmidi/pm_mac/pmmacosxcm.c",
 			MAME_DIR .. "3rdparty/portmidi/pm_mac/finddefault.c",
 			MAME_DIR .. "3rdparty/portmidi/pm_mac/readbinaryplist.c",
-			MAME_DIR .. "3rdparty/portmidi/pm_mac/osxsupport.m",
 			MAME_DIR .. "3rdparty/portmidi/porttime/ptmacosx_mach.c",
 		}
 	end
