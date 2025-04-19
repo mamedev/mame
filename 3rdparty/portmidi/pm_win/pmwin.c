@@ -116,13 +116,13 @@ static PmDeviceID pm_get_default_device_id(int is_input, const char *key) {
 }
 
 
-PmDeviceID Pm_GetDefaultInputDeviceID() {
+PmDeviceID Pm_GetDefaultInputDeviceID(void) {
     return pm_get_default_device_id(TRUE, 
            "/P/M_/R/E/C/O/M/M/E/N/D/E/D_/I/N/P/U/T_/D/E/V/I/C/E");
 }
 
 
-PmDeviceID Pm_GetDefaultOutputDeviceID() {
+PmDeviceID Pm_GetDefaultOutputDeviceID(void) {
   return pm_get_default_device_id(FALSE,
           "/P/M_/R/E/C/O/M/M/E/N/D/E/D_/O/U/T/P/U/T_/D/E/V/I/C/E");
 }
