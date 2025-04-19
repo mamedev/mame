@@ -1192,6 +1192,7 @@ end
 
 	configuration { "gmake or ninja" }
 		buildoptions_c {
+			"-Wno-unknown-pragmas",
 			"-Wno-unused-function",
 			"-Wno-unused-variable",
 		}

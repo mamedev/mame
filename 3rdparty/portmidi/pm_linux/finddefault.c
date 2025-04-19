@@ -31,7 +31,7 @@ int match_string(FILE *inf, const char *s)
 
 
 /* 
-/* Parse preference files, find default device, search devices --
+   Parse preference files, find default device, search devices --
  */
 PmDeviceID find_default_device(const char *path, int input, PmDeviceID id)
 /* path -- the name of the preference we are searching for
