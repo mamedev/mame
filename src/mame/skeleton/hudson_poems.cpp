@@ -963,5 +963,5 @@ CONS( 2005, poemzet2,     0,       0,      hudson_poems, poemzet,      hudson_po
 
 CONS( 2005, poemspoo,     0,       0,      hudson_poems, poemspoo,     hudson_poems_state, init_marimba, "Konami", "Goo Choco Lantan Spoo Daisuki! Playmat", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
 
-// TV unit to analyze data from e-walkeylife2 pedometer
-CONS( 2006, ewalk2tv,     0,       0,      hudson_poems, ewalk,        hudson_poems_state, init_marimba, "Konami", "e-walkeylife2 Option TV", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+// Kenshinkeikaku TV (健身計画TV) - TV unit to analyze data from e-walkeylife2 pedometer
+CONS( 2006, ewalk2tv,     0,       0,      hudson_poems, ewalk,        hudson_poems_state, init_marimba, "Konami", "Kenshinkeikaku TV (for e-walkeylife2) (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)

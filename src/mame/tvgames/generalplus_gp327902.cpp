@@ -92,20 +92,26 @@ ROM_END
 
 // Tomy / San-X devices
 
-// dates for each of these taken from back of case, there are 2018 and 2020 versions too at least
+// dates for each of these taken from back of case, are the DX versions different software or just different accessories?
 
-// 2018 version is a square device
+// 2018 version is a square device - Sumikko Gurashi - Sumikko Atsume (すみっコぐらし すみっコあつめ)
 
 // 2019 version is house shaped device - すみっコぐらし すみっコさがし
 CONS( 2019, sanxpet,         0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, empty_init,  "San-X / Tomy",        "Sumikko Gurashi - Sumikko Sagashi",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+// or Sumikko Gurashi - Sumikko Sagashi DX (すみっコぐらし すみっコさがしDX "Sumikko Gurashi the movie" alt version)
 
-// 2020 version is a cloud shaped device
-
-// 2021 version is a square device with a tiny 'mole' figure on top
-CONS( 2021, sanxpeta,        0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, empty_init,  "San-X / Tomy",        "San-X / Tomy Pet",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+// 2020 version is a cloud shaped device - Sumikko Gurashi - Sumikko Catch (すみっコぐらし すみっコキャッチ)
+// or Sumikko Gurashi - Sumikko Catch DX (すみっコぐらし すみっコキャッチDX) = Sumikko Catch with pouch and strap
+ 
+// 2021 version is a square device with a tiny 'mole' figure on top - すみっコぐらし すみっコみっけDX
+// or Sumikko Gurashi - Sumikko Mikke (すみっコぐらし すみっコみっけ)
+CONS( 2021, sanxpeta,        0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, empty_init,  "San-X / Tomy",        "Sumikko Gurashi - Sumikko Mikke",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // DX?
 
 
 // other devices on the same Soc
 
 // キラッとプリ☆チャン プリたまGO ミスティパープル
 CONS( 2019, tomyegg,         0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, empty_init,  "Tomy",        "Kiratto Pri-Chan - Pritama Go: Misty Purple (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+// these also exist, are they the same software or different versions?
+// Powder Pink (パウダーピンク)
+// Mint Blue (ミントブルー).

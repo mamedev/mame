@@ -373,8 +373,8 @@ CONS( 201?, kidizmb,         0,        0,      gpl32612, gpl32612, generalplus_g
 CONS( 2019, pocketmp,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Takara Tomy",        "Pocket Monsters PC",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 CONS( 2019, pocketmr,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Takara Tomy",        "Pocket Monsters Rotom Tablet",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
-// uses GPL32610
-CONS( 2019, anpanm19,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "JoyPalette",        "Anpanman: 2019 Floor Mat (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+// uses GPL32610 - 「それいけ！アンパンマン」スポーツ育脳マット
+CONS( 2019, anpanm19,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "JoyPalette",        "Anpanman: Sports Ikunou Mat (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // unknown (uses a glob) but it's GeneralPlus and ARM based, so put in here for now
 // ROM has 'GPNandTag2' header rather than the usual
