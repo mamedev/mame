@@ -2426,7 +2426,7 @@ TYPE ImGui::RoundScalarWithFormatT(const char* format, ImGuiDataType data_type, 
     return v;
 }
 
-template float ImGui::RoundScalarWithFormatT(const char* format, ImGuiDataType data_type, float v);
+template float ImGui::RoundScalarWithFormatT<float>(const char* format, ImGuiDataType data_type, float v);
 
 //-------------------------------------------------------------------------
 // [SECTION] Widgets: DragScalar, DragFloat, DragInt, etc.
