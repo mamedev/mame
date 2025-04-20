@@ -353,7 +353,7 @@ value_ptr bplist_read_file(const char *filename)
     value_ptr value;
     int rslt = stat(filename, &stbuf);
     if (rslt) {
-        #if BPLIST_LOG
+        #if defined(BPLIST_LOG) && (BPLIST_LOG != 0)
             perror("in stat");
         #endif
         bplist_log("Could not stat %s, error %d\n", filename, rslt);
