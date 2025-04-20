@@ -519,7 +519,7 @@ static PmError midi_in_open(PmInternal *midi, void *driverInfo)
 {
     MIDIEndpointRef endpoint;
     coremidi_info_type info;
-    OSStatus macHostError;
+    OSStatus macHostError = noErr;
     int is_virtual = pm_descriptors[midi->device_id].pub.is_virtual;
     
     /* if this is an external device, descriptor is a MIDIEndpointRef.
@@ -771,7 +771,7 @@ static PmError send_packet(PmInternal *midi, Byte *message,
     info->packet = MIDIPacketListAdd(info->packetList,
                                      sizeof(info->packetBuffer), info->packet,
                                      timestamp, messageLength, message);
-#if LIMIT_SEND_RATE
+#if defined(LIMIT_SEND_RATE) && (LIMIT_SEND_RATE != 0)
     info->byte_count += messageLength;
 #endif
     if (info->packet == NULL) {
@@ -1201,7 +1201,7 @@ PmError pm_macosxcm_init(void)
     MIDIEndpointRef endpoint;
     int i;
     OSStatus macHostError = noErr;
-    char *error_text;
+    const char *error_text;
 
     memset(isIAC, 0, sizeof(isIAC)); /* initialize all FALSE */
 

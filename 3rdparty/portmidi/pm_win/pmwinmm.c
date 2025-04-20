@@ -988,7 +988,7 @@ static PmError winmm_write_byte(PmInternal *midi, unsigned char byte,
         info->hdr = hdr = get_free_output_buffer(midi);
         assert(hdr);
         midi->fill_base = (unsigned char *) info->hdr->lpData;
-        midi->fill_offset_ptr = (unsigned int *) &(hdr->dwBytesRecorded);
+        midi->fill_offset_ptr = (uint32_t *) &(hdr->dwBytesRecorded);
         /* when buffer fills, Pm_WriteSysEx will revert to calling
          * pmwin_write_byte, which expect to have space, so leave
          * one byte free for pmwin_write_byte. Leave another byte
