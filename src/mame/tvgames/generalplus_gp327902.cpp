@@ -97,7 +97,7 @@ ROM_END
 // 2018 version is a square device - Sumikko Gurashi - Sumikko Atsume (すみっコぐらし すみっコあつめ)
 
 // 2019 version is house shaped device - すみっコぐらし すみっコさがし
-CONS( 2019, sanxpet,         0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, empty_init,  "San-X / Tomy",        "Sumikko Gurashi - Sumikko Sagashi",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2019, sanxpet,         0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, empty_init,  "San-X / Tomy",        "Sumikko Gurashi - Sumikko Sagashi (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 // or Sumikko Gurashi - Sumikko Sagashi DX (すみっコぐらし すみっコさがしDX "Sumikko Gurashi the movie" alt version)
 
 // 2020 version is a cloud shaped device - Sumikko Gurashi - Sumikko Catch (すみっコぐらし すみっコキャッチ)
@@ -105,7 +105,7 @@ CONS( 2019, sanxpet,         0,        0,      gp327902, gp327902, generalplus_g
  
 // 2021 version is a square device with a tiny 'mole' figure on top - すみっコぐらし すみっコみっけDX
 // or Sumikko Gurashi - Sumikko Mikke (すみっコぐらし すみっコみっけ)
-CONS( 2021, sanxpeta,        0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, empty_init,  "San-X / Tomy",        "Sumikko Gurashi - Sumikko Mikke",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // DX?
+CONS( 2021, sanxpeta,        0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, empty_init,  "San-X / Tomy",        "Sumikko Gurashi - Sumikko Mikke (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // DX?
 
 
 // other devices on the same Soc

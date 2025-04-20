@@ -378,4 +378,5 @@ CONS( 2019, anpanm19,        0,        0,      gpl32612, gpl32612, generalplus_g
 
 // unknown (uses a glob) but it's GeneralPlus and ARM based, so put in here for now
 // ROM has 'GPNandTag2' header rather than the usual
-CONS( 2021, dmnslayg,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Bandai",        "Demon Slayer Tablet (Green) (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+// 鬼滅の刃 全集中パッド（グリーン)
+CONS( 2021, dmnslayg,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init880,  "Bandai",        "Demon Slayer: Kimetsu no Yaiba Zenshuuchuu Pad (green ver.) (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
