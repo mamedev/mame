@@ -803,6 +803,9 @@ void pc9821_state::pc9821(machine_config &config)
 
 	PALETTE(config.replace(), m_palette, FUNC(pc9821_state::pc9801_palette), 16 + 16 + 256);
 
+	PC98_119_KBD(config.replace(), m_keyb, 0);
+	m_keyb->rxd_callback().set("sio_kbd", FUNC(i8251_device::write_rxd));
+
 //  m_hgdc[1]->set_display_pixels(FUNC(pc9821_state::pegc_display_pixels));
 
 	PC98_SDIP(config, "sdip", 0);

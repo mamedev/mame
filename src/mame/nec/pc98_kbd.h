@@ -9,18 +9,11 @@
 #include "machine/keyboard.h"
 #include "diserial.h"
 
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-// ======================> pc98_kbd_device
-
 class pc98_kbd_device : public device_t
 						, public device_buffered_serial_interface<16U>
 						, protected device_matrix_keyboard_interface<16>
 {
 public:
-	// construction/destruction
 	pc98_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
@@ -36,7 +29,8 @@ public:
 	void input_kbde(int state);
 
 protected:
-	// device-level overrides
+	pc98_kbd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -51,6 +45,9 @@ protected:
 	virtual void key_make(uint8_t row, uint8_t column) override;
 	virtual void key_break(uint8_t row, uint8_t column) override;
 	virtual void key_repeat(uint8_t row, uint8_t column) override;
+
+	uint8_t translate(uint8_t row, uint8_t column);
+	void send_key(uint8_t code);
 private:
 
 	static constexpr int START_BIT_COUNT = 1;
@@ -58,9 +55,6 @@ private:
 	static constexpr device_serial_interface::parity_t PARITY = device_serial_interface::PARITY_ODD;
 	static constexpr device_serial_interface::stop_bits_t STOP_BITS = device_serial_interface::STOP_BITS_1;
 	static constexpr int BAUD = 1'200;
-
-	uint8_t translate(uint8_t row, uint8_t column);
-	void send_key(uint8_t code);
 
 	devcb_write_line m_tx_cb;
 //  devcb_write_line m_rdy_cb;
@@ -71,16 +65,28 @@ private:
 	int m_rty_state;
 };
 
+class pc98_119_kbd_device : public pc98_kbd_device
+{
+public:
+	pc98_119_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-// device type definition
+protected:
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	virtual void key_make(uint8_t row, uint8_t column) override;
+	//virtual void key_break(uint8_t row, uint8_t column) override;
+	virtual void key_repeat(uint8_t row, uint8_t column) override;
+
+	virtual void received_byte(u8 byte) override;
+
+private:
+	bool m_repeat_state[0x80];
+	u8 m_cmd_state;
+};
+
+
 DECLARE_DEVICE_TYPE(PC98_KBD, pc98_kbd_device)
-
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-
+DECLARE_DEVICE_TYPE(PC98_119_KBD, pc98_119_kbd_device)
 
 #endif // MAME_NEC_PC98_KBD_H

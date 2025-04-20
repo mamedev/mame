@@ -22,30 +22,29 @@ TODO:
     STOP is correct, verified with branmar2
 - Problems with natural keyboard (most nonprinting keys don't work);
 
-===================================================================================================
-
-Keyboard TX commands:
-0xfa ACK
-0xfc NACK
-0x95
----- --xx extension key settings (00 normal 11 Win and App Keys enabled)
-0x96 identification codes
-0x9c
--xx- ---- key delay (11 = 1000 ms, 10 = 500 ms, 01 = 500 ms, 00 = 250 ms)
----x xxxx repeat rate (slow 11111 -> 00001 fast)
-0x9d keyboard LED settings
-0x9f keyboard ID
-
 **************************************************************************************************/
 
 #include "emu.h"
 #include "pc98_kbd.h"
 #include "machine/keyboard.ipp"
 
-DEFINE_DEVICE_TYPE(PC98_KBD, pc98_kbd_device, "pc98_kbd", "NEC PC-98 Keyboard")
+#define LOG_COMMAND     (1U << 1)
 
-pc98_kbd_device::pc98_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PC98_KBD, tag, owner, clock)
+//#include <iostream>
+
+#define VERBOSE (LOG_GENERAL | LOG_COMMAND)
+//#define LOG_OUTPUT_STREAM std::cout
+
+#include "logmacro.h"
+
+#define LOGCOMMAND(...)       LOGMASKED(LOG_COMMAND, __VA_ARGS__)
+
+
+DEFINE_DEVICE_TYPE(PC98_KBD,     pc98_kbd_device,     "pc98_kbd",     "NEC PC-98 Keyboard")
+DEFINE_DEVICE_TYPE(PC98_119_KBD, pc98_119_kbd_device, "pc98_119_kbd", "NEC PC-9801-119 Keyboard")
+
+pc98_kbd_device::pc98_kbd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
 	, device_buffered_serial_interface(mconfig, *this)
 	, device_matrix_keyboard_interface(mconfig, *this, "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7", "KEY8", "KEY9", "KEYA", "KEYB", "KEYC", "KEYD", "KEYE", "KEYF")
 	, m_tx_cb(*this)
@@ -53,6 +52,12 @@ pc98_kbd_device::pc98_kbd_device(const machine_config &mconfig, const char *tag,
 	, m_rty_state(0)
 {
 }
+
+pc98_kbd_device::pc98_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pc98_kbd_device(mconfig, PC98_KBD, tag, owner, clock)
+{
+}
+
 
 void pc98_kbd_device::device_validity_check(validity_checker &valid) const
 {
@@ -359,4 +364,134 @@ void pc98_kbd_device::input_kbde(int state)
 void pc98_kbd_device::input_rty(int state)
 {
 	m_rty_state = state;
+}
+
+/*
+ * PC-9801-119 overrides
+ */
+
+ pc98_119_kbd_device::pc98_119_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pc98_kbd_device(mconfig, PC98_119_KBD, tag, owner, clock)
+{
+}
+
+void pc98_119_kbd_device::device_start()
+{
+	pc98_kbd_device::device_start();
+
+	save_item(NAME(m_cmd_state));
+	save_pointer(NAME(m_repeat_state), 0x80);
+}
+
+void pc98_119_kbd_device::device_reset()
+{
+	pc98_kbd_device::device_reset();
+
+	m_cmd_state = 0;
+	std::fill(std::begin(m_repeat_state), std::end(m_repeat_state), 0);
+}
+
+void pc98_119_kbd_device::key_make(uint8_t row, uint8_t column)
+{
+	uint8_t code = translate(row, column);
+
+	send_key(code);
+
+	// HACK: enable key repeat for the only key that matters for now (HELP -> setup mode)
+	// acts wild in any game that uses numpad and keys only (cfr. runners, weaponsf)
+	// as if it's expecting typematic being entirely disabled there
+	//if (code != 0x71 && code != 0x72)
+	if (code == 0x3f)
+	{
+		m_repeat_state[code] = 0;
+		typematic_start(row, column, attotime::from_msec(500), attotime::from_msec(60));
+	}
+}
+
+void pc98_119_kbd_device::key_repeat(uint8_t row, uint8_t column)
+{
+	uint8_t code = translate(row, column);
+
+	m_repeat_state[code] ^= 1;
+	code |= m_repeat_state[code] << 7;
+
+    send_key(code);
+}
+
+void pc98_119_kbd_device::received_byte(u8 byte)
+{
+	const u8 ACK = 0xfa;
+	const u8 NACK = 0xfc;
+
+	if (m_cmd_state)
+	{
+		// ignore same byte, we expect specific signature in 0x9d already
+		if (m_cmd_state == byte)
+			return;
+
+		LOGCOMMAND("Command: [%02x] %02x\n", m_cmd_state, byte);
+
+		switch(m_cmd_state)
+		{
+			case 0x9d:
+				// TODO: caps/kana/num lock handling
+				// 0110 ---- reads back LEDs
+				// 0111 ---- sets lock state
+				// ---- x--- Kana lock
+				// ---- -x-- CAPS lock
+				// ---- ---x Num lock
+				send_key(ACK);
+				break;
+		}
+
+		m_cmd_state = 0;
+		return;
+	}
+
+	LOGCOMMAND("Command: %02x\n", byte);
+
+	switch(byte)
+	{
+		// 0x95 Extended key settings (expects param byte)
+		// 0x00 normal mode
+		// 0x03 windows & application keys enabled (bitwise?)
+
+		// 0x96 Mode identification, PC9801-98 only?
+		// ACK -> 0xa0 -> 0x86 automatic conversion mode
+		// ACK -> 0xa0 -> 0x85 normal mode
+
+		// 0x99 <unknown>
+		//      returns 0xfa ACK -> 0xfb (not ready?)
+
+		// 0x9c key repeat (expects param byte)
+		// -xx- ---- key delay
+		// -11- ---- 1000 ms
+		// -10- ---- 500 ms
+		// -01- ---- 500 ms (default)
+		// -00- ---- 250 ms
+		// ---x xxxx repeat rate (slow 11111 -> 00001 fast)
+
+		case 0x9d:
+			// NOTE: different for PC-9801NS/T
+			LOGCOMMAND("\tKeyboard LED settings\n");
+			m_cmd_state = byte;
+			send_key(ACK);
+			break;
+
+		// 0x9e ?, assume it returns ACK
+
+		case 0x9f:
+			LOGCOMMAND("\tKeyboard Type ID\n");
+			send_key(ACK);
+			send_key(0xa0);
+			send_key(0x80);
+			break;
+
+		default:
+			// return a NACK for any unrecognized command
+			send_key(NACK);
+			if ((byte & 0xf0) == 0x90)
+				popmessage("pc98_kbd: unemulated command %02x", byte);
+			break;
+	}
 }
