@@ -16,11 +16,13 @@ TODO:
 \- Most keyboards don't have a method for disabling typematic, depends on RTY?
 - Undumped i8048 MCU;
 - GRPH + SHIFT scancodes;
-- Subclass keyboard variants (cfr. PC-9801-119 with Windows & Menu keys and PC-9801-115 Bungo);
+- Subclass keyboard variants (cfr. PC-9801-115 Bungo);
 - Verify untested keys:
     STOP, COPY, and vf-1 through vf-5
     STOP is correct, verified with branmar2
 - Problems with natural keyboard (most nonprinting keys don't work);
+- pc9801fs: doesn't capture HELP key even with -119, need to mash for entering setup mode (verify)
+- slotify
 
 **************************************************************************************************/
 

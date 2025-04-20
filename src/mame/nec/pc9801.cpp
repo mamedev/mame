@@ -2611,6 +2611,9 @@ void pc9801us_state::pc9801us(machine_config &config)
 
 	pit_clock_config(config, xtal / 4);
 
+	PC98_119_KBD(config.replace(), m_keyb, 0);
+	m_keyb->rxd_callback().set("sio_kbd", FUNC(i8251_device::write_rxd));
+
 	PC98_SDIP(config, "sdip", 0);
 }
 
@@ -2629,6 +2632,9 @@ void pc9801us_state::pc9801fs(machine_config &config)
 	// optional SCSI HDD
 
 	pit_clock_config(config, xtal / 4);
+
+//	PC98_119_KBD(config.replace(), m_keyb, 0);
+//	m_keyb->rxd_callback().set("sio_kbd", FUNC(i8251_device::write_rxd));
 
 	PC98_SDIP(config, "sdip", 0);
 }
