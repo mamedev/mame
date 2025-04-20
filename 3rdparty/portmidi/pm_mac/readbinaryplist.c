@@ -101,19 +101,19 @@ memory requested or calls longjmp, so callers don't have to check.
  
 /* #define BPLIST_LOG_VERBOSE 1 */
 
-#if BPLIST_LOG_VERBOSE
+#if defined(BPLIST_LOG_VERBOSE) && (BPLIST_LOG_VERBOSE != 0)
     #ifndef BPLIST_LOG
         #define BPLIST_LOG 1
     #endif
 #endif
 
-#if BPLIST_LOG
+#if defined(BPLIST_LOG) && (BPLIST_LOG != 0)
     #define bplist_log printf
 #else
     #define bplist_log(...)
 #endif
 
-#if BPLIST_LOG_VERBOSE
+#if defined(BPLIST_LOG_VERBOSE) && (BPLIST_LOG_VERBOSE != 0)
     #define bplist_log_verbose bplist_log
 #else
     #define bplist_log_verbose(...)
@@ -749,7 +749,7 @@ static value_ptr extract_date(bplist_info_ptr bplist, uint64_t offset)
 
 
 uint64_t bplist_get_a_size(bplist_info_ptr bplist, 
-                           uint64_t *offset_ptr, char *msg)
+                           uint64_t *offset_ptr, const char *msg)
 {
     uint64_t size = bplist->data_bytes[*offset_ptr] & 0x0F;
     (*offset_ptr)++;
