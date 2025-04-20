@@ -2,7 +2,54 @@
 // copyright-holders:Mark Garlanger
 /***************************************************************************
 
-  Heathkit 8080 CPU card
+  Heathkit 8080A CPU card
+
+  Original 8080A 2.048MHz CPU board from Heath Company.
+
+
+
+  Onboard Jumpers (none are configurable yet)
+
+  Label    Default     Description (if jumper is closed)
+  -------------------------------------------------------------------------
+  B1-B2     Open       Allow /INT1 (INT 10) from the BH Bus (pin 8).
+
+  C1-C2     Open       Allow /INT2 (Int 20) from the BH Bus (pin 9).
+
+  E1-E2     Close      Allow inverted signal from J jumper to HOLD/HLDA on BH Bus (pin 25)
+
+  F1-F2     Close      Allow /HOLD from the BH Bus (pin 27) to CPU Hold line.
+
+  H1-H3     Open       Tie Ready-in from IC212 Generator to CPU Wait line
+  H2-H3     Close      Tie Ready-in from IC212 Generator to CPU Ready line
+
+  J1-J2     Close      CPU HLDA out through flip-flop, use /Q output to E jumper
+  J2-J3     Open       CPU HLDA out through flip-flop, use Q output to E jumper
+
+  K1-K2     Close      Affects Data-in/out buffers enabled signals based on /MEMR & /IOR signals
+  K1-K3     Open       Affects Data-in/out buffers enabled signals based on /MEMR & /IOR signals
+
+  L1-L2     Close      Tie CPU /INTA to interrupt buffer
+  L2-L3     Open       Tie CPU /INTA to +12V
+
+  P1-P2     Open       A10 to pin 19 of IC204 ROM
+  P2-P3     Close      R jumper to pin 19 of IC204 ROM
+
+  R1-R2     Close      +12V selected
+  R2-R3     Open       S jumper selection selected
+
+  S1-S2     Open       +5V selected
+  S2-S3     Close      GND selected
+
+  T1-T2     Close      -5V to pin 21 of IC204 ROM
+  T2-T3     Open       +5V to pin 21 of IC204 ROM
+
+  X1-X2     Open       Allow /ROM_Disable from BH bus (pin 46) to disable ROM
+
+  Z1-Z2     Close      Tie /A10 to ROM decoder select line
+  Z2-Z3     Open       Tie +5V to ROM decoder select line
+
+  RDYIN     Close      Allow RDYIN from BH Bus (pin 20) to IC212 Generator
 
 ****************************************************************************/
 
@@ -13,7 +60,6 @@
 #include "cpu/i8085/i8085.h"
 
 
-
 namespace {
 
 class h_8_cpu_8080_device : public device_t, public device_h8bus_p2_card_interface
@@ -21,6 +67,7 @@ class h_8_cpu_8080_device : public device_t, public device_h8bus_p2_card_interfa
 public:
 
 	h_8_cpu_8080_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
 	virtual void int1_w(int state) override;
 	virtual void int2_w(int state) override;
 	virtual void int3_w(int state) override;
@@ -180,15 +227,15 @@ ROM_START( h8 )
 	ROMX_LOAD( "2708_444-13_pam8go.rom", 0x0000, 0x0400, CRC(9dbad129) SHA1(72421102b881706877f50537625fc2ab0b507752), ROM_BIOS(1) )
 
 	ROM_SYSTEM_BIOS(2, "bios2", "Disk OS")
-	ROMX_LOAD( "2716_444-13_pam8at.rom", 0x0000, 0x0800,  CRC(fd95ddc1) SHA1(eb1f272439877239f745521139402f654e5403af), ROM_BIOS(2) )
+	ROMX_LOAD( "2716_444-13_pam8at.rom", 0x0000, 0x0800, CRC(fd95ddc1) SHA1(eb1f272439877239f745521139402f654e5403af), ROM_BIOS(2) )
 
 	ROM_SYSTEM_BIOS(3, "bios3", "Disk OS Alt")
-	ROMX_LOAD( "2732_444-70_xcon8.rom", 0x0000, 0x1000,   CRC(b04368f4) SHA1(965244277a3a8039a987e4c3593b52196e39b7e7), ROM_BIOS(3) )
+	ROMX_LOAD( "2732_444-70_xcon8.rom", 0x0000, 0x1000,  CRC(b04368f4) SHA1(965244277a3a8039a987e4c3593b52196e39b7e7), ROM_BIOS(3) )
 
 	// this one runs off into the weeds
 	// - it is for the ZA-8-6 Z-80 replacement CPU card, keeping it here, until that card is implemented.
 	ROM_SYSTEM_BIOS(4, "bios4", "not working")
-	ROMX_LOAD( "2732_444-140_pam37.rom", 0x0000, 0x1000,  CRC(53a540db) SHA1(90082d02ffb1d27e8172b11fff465bd24343486e), ROM_BIOS(4) )
+	ROMX_LOAD( "2732_444-140_pam37.rom", 0x0000, 0x1000, CRC(53a540db) SHA1(90082d02ffb1d27e8172b11fff465bd24343486e), ROM_BIOS(4) )
 ROM_END
 
 
@@ -219,4 +266,4 @@ void h_8_cpu_8080_device::device_add_mconfig(machine_config &config)
 
 } // anonymous namespace
 
-DEFINE_DEVICE_TYPE_PRIVATE(H8BUS_CPU_8080, device_h8bus_card_interface, h_8_cpu_8080_device, "h8_h_8_cpu_8080", "Heath 8080 CPU board");
+DEFINE_DEVICE_TYPE_PRIVATE(H8BUS_CPU_8080, device_h8bus_card_interface, h_8_cpu_8080_device, "h8_cpu_8080", "Heath 8080A CPU board");
