@@ -1057,9 +1057,6 @@ end
 				"-Wno-error=stringop-truncation", -- ImGui again
 				"-Wno-stringop-overflow", -- generates false positives when assigning an int rvalue to a u8 variable without an explicit cast
 			}
-			buildoptions_cpp {
-				"-Wno-error=class-memaccess", -- many instances in ImGui and BGFX
-			}
 			if version >= 110000 then
 				buildoptions {
 					"-Wno-nonnull",                 -- luaengine.cpp lambdas do not need "this" captured but GCC 11.1 erroneously insists
