@@ -519,7 +519,7 @@ static PmError midi_in_open(PmInternal *midi, void *driverInfo)
 {
     MIDIEndpointRef endpoint;
     coremidi_info_type info;
-    OSStatus macHostError = noErr;
+    OSStatus macHostError;
     int is_virtual = pm_descriptors[midi->device_id].pub.is_virtual;
     
     /* if this is an external device, descriptor is a MIDIEndpointRef.
@@ -731,7 +731,7 @@ static PmError midi_abort(PmInternal *midi)
 
 static PmError midi_write_flush(PmInternal *midi, PmTimestamp timestamp)
 {
-    OSStatus macHostError;
+    OSStatus macHostError = noErr;
     coremidi_info_type info = (coremidi_info_type) midi->api_info;
     MIDIEndpointRef endpoint = (MIDIEndpointRef) (intptr_t)
                                pm_descriptors[midi->device_id].descriptor;
