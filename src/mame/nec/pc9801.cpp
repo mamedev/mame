@@ -2347,6 +2347,7 @@ void pc9801vm_state::pc9801_ide(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, "ideirq").output_handler().set("pic8259_slave", FUNC(pic8259_device::ir1_w));
 
+	SOFTWARE_LIST(config, "hdd_list").set_original("pc98_hdd");
 	SOFTWARE_LIST(config, "cd_list").set_original("pc98_cd");
 }
 
