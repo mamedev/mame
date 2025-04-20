@@ -165,13 +165,15 @@ UNAME_P := $(shell uname -p)
 GENIEOS := linux
 PLATFORM := unknown
 
-ifneq ($(filter x86_64,$(UNAME_P)),)
+ifneq ($(filter %86,$(UNAME_M)),)
 PLATFORM := x86
 else ifneq ($(filter %86,$(UNAME_P)),)
 PLATFORM := x86
-else ifneq ($(filter x86_64,$(UNAME_M)),)
+endif
+
+ifneq ($(filter x86_64,$(UNAME_M)),)
 PLATFORM := x86
-else ifneq ($(filter %86,$(UNAME_M)),)
+else ifneq ($(filter x86_64,$(UNAME_P)),)
 PLATFORM := x86
 else ifneq ($(filter alpha,$(UNAME_M)),)
 PLATFORM := alpha
