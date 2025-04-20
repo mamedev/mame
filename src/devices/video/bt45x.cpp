@@ -269,7 +269,10 @@ void bt45x_rgb_device_base::palette_w(u8 data)
 {
 	LOGMASKED(LOG_WRITES, "%s: palette_w 0x%02x\n", machine().describe_context(), data);
 
-	m_color_ram[m_address][m_address_rgb] = data & get_mask();
+	if (m_palette_colors == 16)
+		m_color_ram[m_address][m_address_rgb] = ((data & get_mask()) << 4) | 0xf;
+	else
+		m_color_ram[m_address][m_address_rgb] = data & get_mask();
 
 	// update the mame palette to match the device
 	if (m_address_rgb == 2)
