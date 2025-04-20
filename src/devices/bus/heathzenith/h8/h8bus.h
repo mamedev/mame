@@ -13,7 +13,7 @@
       P1           Reserved for control/front panel board
       P2           Reserved for CPU board
     P3 - P9        Available
-      P10          Reserved for Expansion connector
+      P10          Reserved for Expansion connector/HA-8-8 Extended Configuration Option
 
 
 
