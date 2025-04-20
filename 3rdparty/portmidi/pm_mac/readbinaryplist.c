@@ -1012,7 +1012,7 @@ char *value_get_asciistring(value_ptr v)
 }
 
 
-value_ptr value_dict_lookup_using_string(value_ptr v, char *key)
+value_ptr value_dict_lookup_using_string(value_ptr v, const char *key)
 {
     dict_ptr dict;
     if (v->tag != kTAG_DICTIONARY) return NULL; // not a dictionary
@@ -1028,7 +1028,7 @@ value_ptr value_dict_lookup_using_string(value_ptr v, char *key)
     return NULL; /* not found */
 }
 
-value_ptr value_dict_lookup_using_path(value_ptr v, char *path)
+value_ptr value_dict_lookup_using_path(value_ptr v, const char *path)
 {
     char key[MAX_KEY_SIZE];
     while (*path) { /* more to the path */

@@ -17,7 +17,7 @@
    plist files (user and system) open at once (due to a simple
    memory management scheme).
 */
-PmDeviceID find_default_device(char *path, int input, PmDeviceID id)
+PmDeviceID find_default_device(const char *path, int input, PmDeviceID id)
 /* path -- the name of the preference we are searching for
    input -- true iff this is an input device
    id -- current default device id
