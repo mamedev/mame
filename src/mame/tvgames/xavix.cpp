@@ -35,7 +35,6 @@
     year        name                                                                                            PCB ID      ROM width       TSOP pads   ROM size        SEEPROM             die markings            extra components / notes
 
     2006      Hello Kitty カードでおままごと　あいうおえ図鑑 / エポック社 / 日本       Hello Kitty Play House with Cards Aiuoe Illustrated Book / Epochsha / Japan
-              スーパーテレビパソコンLink / エポック社 / 日本   Super TV PC Link / Epoch / Japan
               Let's!TVプレイ ふしぎ星のふたご姫Gyu! ドレスチェンジでキュートにダンス / バンダイ / 日本   Let's!TV Play Gyu, the Twin Princess of the Mysterious Planet! Dance cutely with a dress change / Bandai / Japan
               Jala Jaland /atlus/Japan (arcade version)                                                       -           -               -           -               -                   -                       -
     2004      Printer for TV computer /EPOCH/Japan                                                            -           -               -           -               -                   -                       -
@@ -55,6 +54,7 @@
     2005      Let's!TVプレイ ドラゴンボ－ルＺ バトル体感かめはめ波～ おめぇとフュージョン / バンダイ / 日本          Let's! TV Play Dragon Ball Z Battle Taikan Kamehameha~ Omee to Fusion / Bandai / Japan
 
     dumped: either here, xavix_2000.cpp, or xavix_2002.cpp
+	          スーパーテレビパソコンLink / エポック社 / 日本   Super TV PC Link / Epoch / Japan
               Let's!TVプレイ なりきりファイト ウルトラマン 撃て！必殺光線！！ / タカラトミー / 日本   Let's!TV Play Narikiri Fight Ultraman Shoot! Deadly ray! ! / Takara Tomy / Japan
               Hello Kitty TV computer /EPOCH/Japan                                                            -           -               -           -               -                   -                       -
               Popira Korea version /SONOKONG/Korea                                                            -           -               -           -               -                   -                       -
