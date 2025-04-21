@@ -99,12 +99,12 @@ void deecoseal_state::mcs51_map(address_map &map)
 
 void deecoseal_state::crtc_map(address_map &map)
 {
-	map(0x0000, 0x7fff).ram().share("vram");
+	map(0x0000, 0x3fff).ram().share("vram");
 }
 
 UPD7220_DISPLAY_PIXELS_MEMBER( deecoseal_state::draw )
 {
-	u16 const gfx = m_vram[address & 0x7fff];
+	u16 const gfx = m_vram[address & 0x3fff];
 	pen_t const *const pen = m_palette->pens();
 
 	for(u16  i = 0; i < 16; i++)
@@ -117,7 +117,7 @@ void deecoseal_state::deecoseal(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &deecoseal_state::map);
 	m_maincpu->set_addrmap(AS_IO, &deecoseal_state::io);
 
-	I80C31(config, m_mcs51, XTAL(24'000'000) / 4); // clock?
+	I80C31(config, m_mcs51, XTAL(24'000'000) / 4).disabled(); // clock?
 	m_mcs51->set_addrmap(AS_PROGRAM, &deecoseal_state::mcs51_map);
 
 	I2C_X2404P(config, "eeprom");
@@ -133,7 +133,7 @@ void deecoseal_state::deecoseal(machine_config &config)
 
 	SCN2681(config, m_duart, XTAL(3'686'400)); // scn2692
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD, rgb_t::amber));
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD, rgb_t::amber()));
 	screen.set_raw(XTAL(16'257'000), 848, 0, 640, 440, 0, 400);
 	screen.set_screen_update(m_crtc, FUNC(upd7220_device::screen_update));
 }
