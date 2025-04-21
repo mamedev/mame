@@ -117,7 +117,7 @@ void deecoseal_state::deecoseal(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &deecoseal_state::map);
 	m_maincpu->set_addrmap(AS_IO, &deecoseal_state::io);
 
-	I80C31(config, m_mcs51, XTAL(24'000'000) / 4).disabled(); // clock?
+	I80C31(config, m_mcs51, XTAL(24'000'000) / 4).set_disable(); // clock?
 	m_mcs51->set_addrmap(AS_PROGRAM, &deecoseal_state::mcs51_map);
 
 	I2C_X2404P(config, "eeprom");
