@@ -3597,7 +3597,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="readnme">
+	<software name="readandme">
 		<description>Reading and Me (version 1.0)</description>
 		<year>1988</year>
 		<publisher>Davidson &amp; Associates</publisher>
@@ -4177,7 +4177,7 @@ license:CC0-1.0
 	<software name="mthbpl11">
 		<description>Math Blaster Plus! (version 1.1)</description>
 		<year>1989</year>
-		<publisher>Davidson and Associates</publisher>
+		<publisher>Davidson &amp; Associates</publisher>
 		<info name="author" value="Jan Davidson and Cathy Johnson" />
 		<info name="programmer" value="C.K. Haun" />
 		<info name="usage" value="Requires a 512K Apple IIgs ROM1 or later." />

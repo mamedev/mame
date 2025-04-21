@@ -3382,4 +3382,58 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="nigworld">
+		<description>Nigel's World (version 1.0.1)</description>
+		<year>1991</year>
+		<publisher> Lawrence Productions</publisher>
+		<info name="programmer" value="Todd James Harris, Susan Wiltse, Justine R. Hencey, Jamie McCarthy, Renee West, and Steve Vance" />
+		<info name="usage" value="Requires hard disk installation and runs on Mac II or later." />
+		<info name="version" value="1.0.1" />
+		<sharedfeat name="compatibility" value="macii" />
+		<!-- Dump released: 2025-04-03 -->
+		<!-- educational game -->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1296221">
+				<rom name="nigel's world v1.0.1 disk 1.moof" size="1296221" crc="65a23944" sha1="c14d86eb175cd9622ee27299290a6c16ea956c89" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1296221">
+				<rom name="nigel's world v1.0.1 disk 2.moof" size="1296221" crc="a5e5e132" sha1="5cfcf768aefa146abdbeefe909ab42c6b52e47c2" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1296221">
+				<rom name="nigel's world v1.0.1 disk 3.moof" size="1296221" crc="f213e721" sha1="214dccfe7d3a5d68d4f6f3d8c3656ee1a8fb631d" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1296221">
+				<rom name="nigel's world v1.0.1 disk 4.moof" size="1296221" crc="609cca01" sha1="afbb05ac27b42b1bb0e9c32dd8dacf7a8ded879a" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5" />
+			<dataarea name="flop" size="1296221">
+				<rom name="nigel's world v1.0.1 disk 5.moof" size="1296221" crc="3b7795af" sha1="9d1c834fc39044acfb08c3b3785faf57248dcee2" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6" />
+			<dataarea name="flop" size="1296221">
+				<rom name="nigel's world v1.0.1 disk 6.moof" size="1296221" crc="6721d700" sha1="a824d544a8f58cea87792c4b5e93af0469dfcc2e" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 7" />
+			<dataarea name="flop" size="1296221">
+				<rom name="nigel's world v1.0.1 disk 7.moof" size="1296221" crc="3f0816c2" sha1="0c48018bc388c0c7d04581d7211e1b9eecd6b3d3" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
