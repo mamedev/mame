@@ -188,22 +188,31 @@ public:
 
 // 9821NOTE
 
-class pc9821_note_state : public pc9821_state
-{
-public:
-	pc9821_note_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pc9821_state(mconfig, type, tag)
-	{
-	}
+// https://www.pc-9800.net/db_98/data/pc-9821ne.htm
+// https://www.pc-9800.net/db_98/data/pc-9821ne2.htm
+//class pc9821_note_state : public pc9821_state
+//{
+//public:
+//	pc9821_note_state(const machine_config &mconfig, device_type type, const char *tag)
+//		: pc9821_state(mconfig, type, tag)
+//		, m_pmc(*this, "pmc")
+//	{
+//	}
+//
+//	void pc9821ne(machine_config &config);
+//
+//protected:
+//	void pc9821ne_io(address_map &map) ATTR_COLD;
+//
+//private:
+//	required_device<redwood1_device> m_pmc;
+//};
 
-	void pc9821ne(machine_config &config);
-};
-
-class pc9821_note_lavie_state : public pc9821_note_state
+class pc9821_note_lavie_state : public pc9821_state
 {
 public:
 	pc9821_note_lavie_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pc9821_note_state(mconfig, type, tag)
+		: pc9821_state(mconfig, type, tag)
 	{
 	}
 

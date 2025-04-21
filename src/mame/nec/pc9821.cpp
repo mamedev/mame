@@ -946,26 +946,6 @@ void pc9821_mate_r_state::pc9821ra333(machine_config &config)
 
 // 9821 NOTE machine configs
 
-void pc9821_note_state::pc9821ne(machine_config &config)
-{
-	pc9821(config);
-	const XTAL xtal = XTAL(33'000'000);
-	I486(config.replace(), m_maincpu, xtal); // i486sx
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_note_state::pc9821_map);
-	m_maincpu->set_addrmap(AS_IO, &pc9821_note_state::pc9821_io);
-	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
-
-	pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST
-
-	// 9.5 TFT with 640x480x256 mode
-	// 1x internal 3.5 floppy
-	// PCMCIA2.0/JEIDA 4.1
-	// 110-pin expansion bus (?)
-	// Ni-Cd battery, around 1 hour of session duration
-	// minimum RAM: 3.6MB
-	// maximum RAM: 14.6MB
-}
-
 void pc9821_note_lavie_state::pc9821nr15(machine_config &config)
 {
 	pc9821(config);
@@ -1137,19 +1117,18 @@ ROM_END
 
 /*
 98NOTE - i486SX 33
+
+NOTE: regular Ne shouldn't have Pico|Power Redwood PT86C768, and bios_ne.rom accesses one.
+Incomplete dump, will require standalone driver out of interactions with PMC so removed.
+
+cfr. https://github.com/angelosa/mame_scratch/blob/main/src/redwood1.cpp
+
 */
 
-ROM_START( pc9821ne )
-	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "itf.rom",     0x10000, 0x08000, BAD_DUMP CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
-	ROM_LOAD( "bios_ne.rom", 0x18000, 0x18000, BAD_DUMP CRC(2ae070c4) SHA1(d7963942042bfd84ed5fc9b7ba8f1c327c094172) )
-
-	ROM_REGION( 0x80000, "chargen", 0 )
-	ROM_LOAD( "font_ne.rom", 0x00000, 0x46800, BAD_DUMP CRC(fb213757) SHA1(61525826d62fb6e99377b23812faefa291d78c2e) )
-
-	LOAD_KANJI_ROMS
-	LOAD_IDE_ROM
-ROM_END
+//ROM_START( pc9821ne )
+//	ROM_LOAD( "itf.rom",     0x10000, 0x08000, BAD_DUMP CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
+//	ROM_LOAD( "bios_ne.rom", 0x18000, 0x18000, BAD_DUMP CRC(2ae070c4) SHA1(d7963942042bfd84ed5fc9b7ba8f1c327c094172) )
+//	ROM_LOAD( "font_ne.rom", 0x00000, 0x46800, BAD_DUMP CRC(fb213757) SHA1(61525826d62fb6e99377b23812faefa291d78c2e) )
 
 /*
 98MULTi Ce2 - 80486SX 25
@@ -1499,7 +1478,7 @@ COMP( 1998, pc9821ra333, pc9821ra20,   0, pc9821ra333, pc9821,   pc9821_mate_r_s
 
 // PC-9821 NOTE[book] class
 // 98NOTE
-COMP( 1994, pc9821ne,    0,            0, pc9821ne,    pc9821,   pc9821_note_state,       init_pc9801_kanji,   "NEC",   "PC-9821Ne (98NOTE)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+//COMP( 1994, pc9821ne,    0,            0, pc9821ne,    pc9821,   pc9821_note_state,       init_pc9801_kanji,   "NEC",   "PC-9821Ne (98NOTE)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 98NOTE Lavie
 COMP( 1996, pc9821nr15,  0,            0, pc9821nr15,  pc9821,   pc9821_note_lavie_state, init_pc9801_kanji,   "NEC",   "PC-9821Nr15 (98NOTE Lavie)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
