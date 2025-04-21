@@ -10,10 +10,12 @@
 #include "cpu/i86/i186.h"
 #include "cpu/mcs51/mcs51.h"
 #include "screen.h"
+#include "emupal.h"
 #include "video/upd7220.h"
 #include "bus/rs232/rs232.h"
 #include "machine/mc68681.h"
 #include "machine/i2cmem.h"
+#include "machine/nvram.h"
 
 namespace {
 
@@ -25,7 +27,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_mcs51(*this, "mcs51"),
 		m_crtc(*this, "crtc"),
-		m_duart(*this, "duart")
+		m_duart(*this, "duart"),
+		m_palette(*this, "palette"),
+		m_vram(*this, "vram")
 	{ }
 
 	void deecoseal(machine_config &config);
@@ -36,6 +40,7 @@ private:
 	void io(address_map &map);
 	void mcs51_map(address_map &map);
 	void crtc_map(address_map &map);
+	UPD7220_DISPLAY_PIXELS_MEMBER(draw);
 
 	bool m_port0;
 
@@ -43,6 +48,8 @@ private:
 	required_device<cpu_device> m_mcs51;
 	required_device<upd7220_device> m_crtc;
 	required_device<scn2681_device> m_duart;
+	required_device<palette_device> m_palette;
+	required_shared_ptr<u16> m_vram;
 };
 
 void deecoseal_state::machine_start()
@@ -74,7 +81,7 @@ void deecoseal_state::machine_start()
 void deecoseal_state::map(address_map &map)
 {
 	map(0x00000, 0x0ffff).ram();
-	map(0x40000, 0x43fff).ram();
+	map(0x40000, 0x4ffff).ram().share("nvram");
 	map(0xf0000, 0xfffff).rom().region("bios", 0);
 }
 
@@ -92,7 +99,16 @@ void deecoseal_state::mcs51_map(address_map &map)
 
 void deecoseal_state::crtc_map(address_map &map)
 {
-	map(0x0000, 0x7fff).ram();
+	map(0x0000, 0x7fff).ram().share("vram");
+}
+
+UPD7220_DISPLAY_PIXELS_MEMBER( deecoseal_state::draw )
+{
+	u16 const gfx = m_vram[address & 0x7fff];
+	pen_t const *const pen = m_palette->pens();
+
+	for(u16  i = 0; i < 16; i++)
+		bitmap.pix(y, x + i) = pen[BIT(gfx, i)];
 }
 
 void deecoseal_state::deecoseal(machine_config &config)
@@ -106,13 +122,18 @@ void deecoseal_state::deecoseal(machine_config &config)
 
 	I2C_X2404P(config, "eeprom");
 
+	NVRAM(config, "nvram",  nvram_device::DEFAULT_ALL_1); // 2x 28c256
+
 	UPD7220(config, m_crtc, XTAL(16'257'000) / 2); // unknown clock
 	m_crtc->set_addrmap(AS_PROGRAM, &deecoseal_state::crtc_map);
 	m_crtc->set_screen("screen");
+	m_crtc->set_display_pixels(FUNC(deecoseal_state::draw));
+
+	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	SCN2681(config, m_duart, XTAL(3'686'400)); // scn2692
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD, rgb_t::amber));
 	screen.set_raw(XTAL(16'257'000), 848, 0, 640, 440, 0, 400);
 	screen.set_screen_update(m_crtc, FUNC(upd7220_device::screen_update));
 }
