@@ -558,10 +558,10 @@ void filter_biquad_device::recalc()
 				m_b1 = m_b2 = m_a2 = 0.0;
 				break;
 			case biquad_type::HIGHPASS1P:
-				m_a1 = -exp(-2.0 * M_PI * (0.5 - m_fc / m_stream->sample_rate()));
-				m_b0 = 1.0 + m_a1;
-				m_a1 = -m_a1;
-				m_b1 = m_b2 = m_a2 = 0.0;
+				m_b0 = 1.0 / (K + 1.0);
+				m_b1 = -m_b0;
+				m_a1 = (K - 1.0) / (K + 1.0);
+				m_b2 = m_a2 = 0.0;
 				break;
 			case biquad_type::LOWPASS:
 				m_b0 = Ksquared * normal;
