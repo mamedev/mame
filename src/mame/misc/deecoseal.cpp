@@ -29,6 +29,7 @@ public:
 		m_crtc(*this, "crtc"),
 		m_duart(*this, "duart"),
 		m_palette(*this, "palette"),
+		m_eeprom(*this, "eeprom"),
 		m_vram(*this, "vram")
 	{ }
 
@@ -41,6 +42,8 @@ private:
 	void mcs51_map(address_map &map);
 	void crtc_map(address_map &map);
 	UPD7220_DISPLAY_PIXELS_MEMBER(draw);
+	u8 i2c_r();
+	void i2c_w(u8 data);
 
 	bool m_port0;
 
@@ -49,6 +52,7 @@ private:
 	required_device<upd7220_device> m_crtc;
 	required_device<scn2681_device> m_duart;
 	required_device<palette_device> m_palette;
+	required_device<i2c_x2404p_device> m_eeprom;
 	required_shared_ptr<u16> m_vram;
 };
 
@@ -90,6 +94,7 @@ void deecoseal_state::io(address_map &map)
 	map(0x0000, 0x0001).lr16([this](){ m_port0 = !m_port0; return m_port0 ? 0x10 : 0; }, "port0");
 	map(0x0110, 0x011f).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0x00ff);
 	map(0x0180, 0x0183).rw(m_crtc, FUNC(upd7220_device::read), FUNC(upd7220_device::write)).umask16(0x00ff);
+	map(0x0200, 0x0200).rw(FUNC(deecoseal_state::i2c_r), FUNC(deecoseal_state::i2c_w));
 }
 
 void deecoseal_state::mcs51_map(address_map &map)
@@ -99,16 +104,27 @@ void deecoseal_state::mcs51_map(address_map &map)
 
 void deecoseal_state::crtc_map(address_map &map)
 {
-	map(0x0000, 0x3fff).ram().share("vram");
+	map(0x0000, 0xffff).ram().share("vram");
 }
 
 UPD7220_DISPLAY_PIXELS_MEMBER( deecoseal_state::draw )
 {
-	u16 const gfx = m_vram[address & 0x3fff];
+	u16 const gfx = m_vram[address];
 	pen_t const *const pen = m_palette->pens();
 
 	for(u16  i = 0; i < 16; i++)
 		bitmap.pix(y, x + i) = pen[BIT(gfx, i)];
+}
+
+u8 deecoseal_state::i2c_r()
+{
+	return m_eeprom->read_sda() ? 0x10 : 0;
+}
+
+void deecoseal_state::i2c_w(u8 data)
+{
+	m_eeprom->write_scl(data & 0x40 ? 1 : 0);
+	m_eeprom->write_sda(data & 0x10 ? 1 : 0);
 }
 
 void deecoseal_state::deecoseal(machine_config &config)
@@ -120,7 +136,7 @@ void deecoseal_state::deecoseal(machine_config &config)
 	I80C31(config, m_mcs51, XTAL(24'000'000) / 4).set_disable(); // clock?
 	m_mcs51->set_addrmap(AS_PROGRAM, &deecoseal_state::mcs51_map);
 
-	I2C_X2404P(config, "eeprom");
+	I2C_X2404P(config, m_eeprom);
 
 	NVRAM(config, "nvram",  nvram_device::DEFAULT_ALL_1); // 2x 28c256
 
