@@ -150,8 +150,8 @@ PLATFORM := x86
 else ifeq ($(MSYSTEM),CLANGARM64)
 PLATFORM := arm64
 else # MSYSTEM
-OSARCH := $(shell wmic OS get OSArchitecture)
-ifneq ($(findstring ARM 64-bit,$(OSARCH)),)
+OSARCH := $(shell reg query "HKLM\System\CurrentControlSet\Control\Session Manager\Environment" /v PROCESSOR_ARCHITECTURE)
+ifneq ($(findstring ARM64,$(OSARCH)),)
 PLATFORM := arm64
 else # OSARCH
 PLATFORM := x86
