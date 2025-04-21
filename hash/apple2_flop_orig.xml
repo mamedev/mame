@@ -19244,7 +19244,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="cglibrary_525" cloneof="cglibrary">
-		<description>Curious George Visits The Library</description>
+		<description>Curious George Visits the Library</description>
 		<year>1989</year>
 		<publisher>Developmental Learning Materials (DLM)</publisher>
 		<info name="developer" value="Ahead Designs" />
