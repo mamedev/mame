@@ -29800,6 +29800,9 @@ cjmx
 crzclass
 ddz
 
+@source:misc/deecoseal.cpp
+deecoseal
+
 @source:misc/dfruit.cpp
 dfruit
 dfruita
