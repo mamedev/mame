@@ -9229,7 +9229,7 @@ Sega logo animation draws offset [VDP2]
 		<year>1995</year>
 		<publisher>Samsung</publisher>
 		<info name="serial" value="GS-9503J"/>
-		<info name="alt_title" value="버쳐 파이터 리믹스"/>
+		<info name="alt_title" value="버쳐 파이터 리믹스"/> <!-- Samsung Saturn releases used this transliteration -->
 		<sharedfeat name="compatibility" value="NTSC-K"/>
 		<part name="cdrom" interface="cdrom">
 			<feature name="cd_matrix" value="MK-81023P-00484-P1K   V"/>
@@ -14316,7 +14316,7 @@ Sega logo animation draws offset [VDP2]
 		<year>1995</year>
 		<publisher>Samsung</publisher>
 		<info name="serial" value="GS-9507J"/>
-		<info name="alt_title" value="버쳐 파이터2"/>
+		<info name="alt_title" value="버쳐 파이터 2"/> <!-- Samsung Saturn releases used this transliteration -->
 		<sharedfeat name="compatibility" value="NTSC-K"/>
 		<part name="cdrom" interface="cdrom">
 			<feature name="cd_matrix" value="MK-81014P-00594   1MM1   C   5Z   66   Z"/>
