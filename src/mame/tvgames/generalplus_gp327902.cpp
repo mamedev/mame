@@ -22,6 +22,8 @@ public:
 
 	void gp327902(machine_config &config);
 
+	void init_spi();
+
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
@@ -34,12 +36,13 @@ protected:
 	uint32_t screen_update_gp327902(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
-
+	uint32_t d000003c_unk_r() { return 0xffffffff; }
 };
 
 void generalplus_gp327902_game_state::arm_map(address_map &map)
 {
 	map(0x00000000, 0x03ffffff).ram();
+	map(0xd000003c, 0xd000003f).r(FUNC(generalplus_gp327902_game_state::d000003c_unk_r));
 }
 
 uint32_t generalplus_gp327902_game_state::screen_update_gp327902(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -73,6 +76,20 @@ void generalplus_gp327902_game_state::gp327902(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 }
 
+void generalplus_gp327902_game_state::init_spi()
+{
+	// perform some kind of bootstrap likely done by an internal ROM
+	uint8_t* spirom = memregion("spi")->base();
+	address_space& mem = m_maincpu->space(AS_PROGRAM);
+
+	int copybase = 0x16000; // there are also programs at 0x800 and 0x3400
+	for (int i = 0; i < (0x800000 - copybase) / 2; i++)
+	{
+		uint16_t word = spirom[copybase + (i * 2) + 0] | (spirom[copybase + (i * 2) + 1] << 8);
+		mem.write_word(i * 2, word);
+	}
+}
+
 ROM_START( sanxpet )
 	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
 	ROM_LOAD( "25l64.u1", 0x0000, 0x800000, CRC(f28b9fd3) SHA1(8ed4668f271cbe01065bc0836e49ce70faf10834) )
@@ -97,7 +114,7 @@ ROM_END
 // 2018 version is a square device - Sumikko Gurashi - Sumikko Atsume (すみっコぐらし すみっコあつめ)
 
 // 2019 version is house shaped device - すみっコぐらし すみっコさがし
-CONS( 2019, sanxpet,         0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, empty_init,  "San-X / Tomy",        "Sumikko Gurashi - Sumikko Sagashi (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2019, sanxpet,         0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "San-X / Tomy",        "Sumikko Gurashi - Sumikko Sagashi (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 // or Sumikko Gurashi - Sumikko Sagashi DX (すみっコぐらし すみっコさがしDX "Sumikko Gurashi the movie" alt version)
 
 // 2020 version is a cloud shaped device - Sumikko Gurashi - Sumikko Catch (すみっコぐらし すみっコキャッチ)
@@ -105,13 +122,13 @@ CONS( 2019, sanxpet,         0,        0,      gp327902, gp327902, generalplus_g
  
 // 2021 version is a square device with a tiny 'mole' figure on top - すみっコぐらし すみっコみっけDX
 // or Sumikko Gurashi - Sumikko Mikke (すみっコぐらし すみっコみっけ)
-CONS( 2021, sanxpeta,        0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, empty_init,  "San-X / Tomy",        "Sumikko Gurashi - Sumikko Mikke DX (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2021, sanxpeta,        0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "San-X / Tomy",        "Sumikko Gurashi - Sumikko Mikke DX (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 
 // other devices on the same Soc
 
 // キラッとプリ☆チャン プリたまGO ミスティパープル
-CONS( 2019, tomyegg,         0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, empty_init,  "Tomy",        "Kiratto Pri-Chan - Pritama Go: Misty Purple (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2019, tomyegg,         0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "Tomy",        "Kiratto Pri-Chan - Pritama Go: Misty Purple (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 // these also exist, are they the same software or different versions?
 // Powder Pink (パウダーピンク)
 // Mint Blue (ミントブルー).
