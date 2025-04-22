@@ -48611,7 +48611,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">
-				<rom name="Maerchen Adventure Cotton 100% (USA) (Strictly Limited Games).sfc" size="2097152" crc="c232ad18" sha1="8755565d48d457d046a7eb8d7588677e5443814d" offset="0x000000" />
+				<rom name="Maerchen Adventure Cotton 100 (USA) (Strictly Limited Games).sfc" size="2097152" crc="c232ad18" sha1="8755565d48d457d046a7eb8d7588677e5443814d" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -67607,7 +67607,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			<feature name="lockout" value="ATMELU TINY13A 22402KT" />
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="hy29f800bt-70 0041a.u0" size="1048576" crc="b57c9228" sha1="701cb7610b465eafa59b6c814b5cc5b0d315841c" offset="0x100000" />
+				<rom name="hy29f800bt-70 0041a.u0" size="1048576" crc="b57c9228" sha1="701cb7610b465eafa59b6c814b5cc5b0d315841c" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
