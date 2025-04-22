@@ -828,16 +828,18 @@ void natural_keyboard::internal_post(char32_t ch)
 
 	// add to the buffer, resizing if necessary
 	m_buffer[m_bufend] = ch;
-	if ((m_bufend + 1) % m_buffer.size() == m_bufbegin)
+	size_t size = m_buffer.size();
+
+	if ((m_bufend + 1) % size == m_bufbegin)
 	{
-		if (m_buffer.size() >= KEY_BUFFER_MAX_SIZE)
+		if (size >= KEY_BUFFER_MAX_SIZE)
 			return;
 
 		m_buffer.insert(m_buffer.begin() + m_bufbegin, KEY_BUFFER_CHUNK_SIZE, INVALID_CHAR);
 		m_bufbegin += KEY_BUFFER_CHUNK_SIZE;
 	}
 
-	m_bufend = (m_bufend + 1) % m_buffer.size();
+	m_bufend = (m_bufend + 1) % size;
 }
 
 
