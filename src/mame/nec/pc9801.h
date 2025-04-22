@@ -389,6 +389,7 @@ public:
 	}
 
 	void pc9801vm(machine_config &config);
+	void pc9801uv(machine_config &config);
 
 	void pc9801ux(machine_config &config);
 	void pc9801vx(machine_config &config);
@@ -473,8 +474,10 @@ private:
 	void dma_access_ctrl_w(offs_t offset, u8 data);
 
 	uint8_t a20_ctrl_r(offs_t offset);
+protected:
+	// TODO: map me as a cpu_f0_map
 	void a20_ctrl_w(offs_t offset, uint8_t data);
-
+private:
 	template <unsigned port> u8 fdc_2hd_2dd_ctrl_r();
 	template <unsigned port> void fdc_2hd_2dd_ctrl_w(u8 data);
 

@@ -34,15 +34,12 @@
 #include "emu.h"
 #include "drcuml.h"
 
-#include "emuopts.h"
-#include "drcbec.h"
-#ifdef NATIVE_DRC
-#ifndef ASMJIT_NO_X86
-#include "drcbex86.h"
-#include "drcbex64.h"
-#endif
 #include "drcbearm64.h"
-#endif
+#include "drcbec.h"
+#include "drcbex64.h"
+#include "drcbex86.h"
+
+#include "emuopts.h"
 
 #include <fstream>
 
@@ -62,8 +59,17 @@
 
 // determine the type of the native DRC, falling back to C
 #ifndef NATIVE_DRC
+#if !defined(MAME_NOASM) && (defined(__x86_64__) || defined(_M_X64))
+#define NATIVE_DRC drcbe_x64
+#elif !defined(MAME_NOASM) && (defined(__i386__) || defined(_M_IX86))
+#define NATIVE_DRC drcbe_x86
+#elif !defined(MAME_NOASM) && (defined(__aarch64__) || defined(_M_ARM64))
+#define NATIVE_DRC drcbe_arm64
+#else
 #define NATIVE_DRC drcbe_c
 #endif
+#endif
+
 #define MAKE_DRCBE_IMPL(name) make_##name
 #define MAKE_DRCBE(name) MAKE_DRCBE_IMPL(name)
 #define make_drcbe_native MAKE_DRCBE(NATIVE_DRC)

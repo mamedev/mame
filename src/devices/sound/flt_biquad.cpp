@@ -527,6 +527,7 @@ void filter_biquad_device::recalc()
 				break;
 			// For highpass and friends, block the entire signal.
 			case biquad_type::HIGHPASS1P:
+			case biquad_type::HIGHPASS1P1Z:
 			case biquad_type::HIGHPASS:
 			case biquad_type::BANDPASS:
 			case biquad_type::PEAK:
@@ -562,6 +563,13 @@ void filter_biquad_device::recalc()
 				m_b0 = 1.0 + m_a1;
 				m_a1 = -m_a1;
 				m_b1 = m_b2 = m_a2 = 0.0;
+				break;
+			case biquad_type::HIGHPASS1P1Z:
+				normal = 1.0 / (K + 1.0);
+				m_b0 = normal;
+				m_b1 = -normal;
+				m_a1 = (K - 1.0) * normal;
+				m_b2 = m_a2 = 0.0;
 				break;
 			case biquad_type::LOWPASS:
 				m_b0 = Ksquared * normal;

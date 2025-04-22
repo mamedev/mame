@@ -1188,14 +1188,16 @@ end
 		defines {
 			"PMALSA=1",
 		}
-
 	configuration { }
 
-	if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") and str_to_version(_OPTIONS["gcc_version"]) >= 150000 then
+	configuration { "gmake or ninja" }
 		buildoptions_c {
-			"-Wno-strict-prototypes",
+			"-Wno-unknown-pragmas",
+			"-Wno-unused-but-set-variable",
+			"-Wno-unused-function",
+			"-Wno-unused-variable",
 		}
-	end
+	configuration { }
 
 	files {
 		MAME_DIR .. "3rdparty/portmidi/pm_common/portmidi.c",
@@ -1232,7 +1234,6 @@ end
 			MAME_DIR .. "3rdparty/portmidi/pm_mac/pmmacosxcm.c",
 			MAME_DIR .. "3rdparty/portmidi/pm_mac/finddefault.c",
 			MAME_DIR .. "3rdparty/portmidi/pm_mac/readbinaryplist.c",
-			MAME_DIR .. "3rdparty/portmidi/pm_mac/osxsupport.m",
 			MAME_DIR .. "3rdparty/portmidi/porttime/ptmacosx_mach.c",
 		}
 	end
@@ -1395,12 +1396,24 @@ project "bimg"
 		"BX_CONFIG_DEBUG=0",
 	}
 
-	configuration { "x64", "mingw*", "not arm64" }
-		defines {
-			"ASTCENC_AVX=0",
-			"ASTCENC_SSE=20",
-		}
-	configuration { }
+	if not string.find(_OPTIONS["gcc"], "clang") then
+		-- This is a gross hack.  For some reason GitHub Actions MinGW GCC seems to define SSE feature macros for features that are not enabled.
+		local archopts = (_OPTIONS["ARCHOPTS"] or "") .. " " .. (_OPTIONS["ARCHOPTS_CXX"] or "")
+		local ssever = "20"
+		if string.find(archopts, "-msse4.2") then
+			ssever = "42"
+		elseif string.find(archopts, "-msse4.1") then
+			ssever = "41"
+		elseif string.find(archopts, "-msse3") then
+			ssever = "30"
+		end
+		configuration { "x64", "mingw*", "not arm64" }
+			defines {
+				"ASTCENC_AVX=0",
+				"ASTCENC_SSE=" .. ssever,
+			}
+		configuration { }
+	end
 
 	configuration { "x32" }
 		defines {
@@ -1586,14 +1599,6 @@ end
 			}
 			buildoptions {
 				backtick(pkgconfigcmd() .. " --cflags wayland-egl-backend"),
-			}
-		end
-	end
-
-	if _OPTIONS["targetos"]=="macosx" and _OPTIONS["gcc"]~=nil then
-		if string.find(_OPTIONS["gcc"], "clang") and (version < 80000) then
-			defines {
-				"TARGET_OS_OSX=1",
 			}
 		end
 	end
@@ -1942,7 +1947,7 @@ project "ymfm"
 -- asmjit library
 --------------------------------------------------
 
-if not _OPTIONS["FORCE_DRC_C_BACKEND"] then
+if (not _OPTIONS["FORCE_DRC_C_BACKEND"]) and ((_OPTIONS["PLATFORM"] == "x86") or (_OPTIONS["PLATFORM"] == "arm64")) then
 project "asmjit"
 	uuid "4539757c-6e99-4bae-b3d0-b342a7c49539"
 	kind "StaticLib"
@@ -1958,14 +1963,6 @@ project "asmjit"
 		defines {
 			"ASMJIT_STATIC",
 		}
-
-	if _OPTIONS["targetos"]=="macosx" and _OPTIONS["gcc"]~=nil then
-		if string.find(_OPTIONS["gcc"], "clang") and (version < 80000) then
-			defines {
-				"TARGET_OS_OSX=1",
-			}
-		end
-	end
 
 	files {
 		MAME_DIR .. "3rdparty/asmjit/src/asmjit/a64.h",

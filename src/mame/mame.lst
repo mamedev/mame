@@ -29800,6 +29800,9 @@ cjmx
 crzclass
 ddz
 
+@source:misc/deecoseal.cpp
+deecoseal
+
 @source:misc/dfruit.cpp
 dfruit
 dfruita
@@ -34148,6 +34151,7 @@ pc9801fs
 pc9801rs
 pc9801rx
 pc9801us
+pc9801uv2
 pc9801ux
 pc9801vm
 pc9801vx
@@ -34165,15 +34169,12 @@ pc9821ap2
 pc9821as
 pc9821ce2
 pc9821cx3
-pc9821ne
 pc9821nr15
 pc9821nr166
 pc9821nw150
 pc9821ra20
 pc9821ra266
 pc9821ra333
-pc9821v13
-pc9821v20
 pc9821xa16
 pc9821xs
 
@@ -39014,6 +39015,7 @@ roboti
 scram_tp
 socrking
 socrkinga
+socrkingb
 socrkingg
 socrkingi
 spookyi

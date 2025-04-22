@@ -2901,6 +2901,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/pseudovia.h,MACHINES["PSEUDOVIA"] = true
+---------------------------------------------------
+
+if (MACHINES["PSEUDOVIA"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/pseudovia.cpp",
+		MAME_DIR .. "src/devices/machine/pseudovia.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/psion_asic1.h,MACHINES["PSION_ASIC"] = true
 --@src/devices/machine/psion_asic2.h,MACHINES["PSION_ASIC"] = true
 --@src/devices/machine/psion_asic3.h,MACHINES["PSION_ASIC"] = true

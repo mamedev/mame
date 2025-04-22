@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "pseudovia.h"
+#include "machine/pseudovia.h"
 
 #include "screen.h"
 

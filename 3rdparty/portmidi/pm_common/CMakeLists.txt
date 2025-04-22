@@ -1,32 +1,69 @@
-# pm_common
+# pm_common/CMakeLists.txt -- how to build portmidi library
+
+# creates the portmidi library
+# exports PM_NEEDED_LIBS to parent. It seems that PM_NEEDED_LIBS for
+#   Linux should include Thread::Thread and ALSA::ALSA, but these
+#   are not visible in other CMake files, even though the portmidi
+#   target is. Therefore, Thread::Thread is replaced by
+#   CMAKE_THREAD_LIBS_INIT and ALSA::ALSA is replaced by ALSA_LIBRARIES.
+#   Is there a better way to do this? Maybe this whole file should be
+#   at the parent level.
+
+# Support alternative name for static libraries to avoid confusion.
+# (In particular, Xcode has automatically converted portmidi.a to
+# portmidi.dylib without warning, so using portmidi-static.a eliminates
+# this possibility, but default for all libs is "portmidi"):
+set(PM_STATIC_LIB_NAME "portmidi" CACHE STRING 
+    "For static builds, the PortMidi library name, e.g. portmidi-static.
+     Default is portmidi")
+set(PM_ACTUAL_LIB_NAME "portmidi")
+if(NOT BUILD_SHARED_LIBS)
+  set(PM_ACTUAL_LIB_NAME ${PM_STATIC_LIB_NAME})
+endif()
 
 # set the build directory for libportmidi.a to be in portmidi, not in 
-#    portmidi/pm_common
+#    portmidi/pm_common. Must be done here BEFORE add_library below.
 if(APPLE OR WIN32)
   set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
   # set the build directory for .dylib libraries
   set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
   set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR})
-
-  # the first time CMake configures, save off CMake's built-in flags
-  if(NOT DEFAULT_DEBUG_FLAGS)
-    set(DEFAULT_DEBUG_FLAGS ${CMAKE_C_FLAGS_DEBUG} CACHE 
-        STRING "CMake's default debug flags" FORCE)
-    set(DEFAULT_RELEASE_FLAGS ${CMAKE_C_FLAGS_RELEASE} CACHE 
-        STRING "CMake's default release flags" FORCE)
-  else(NOT DEFAULT_DEBUG_FLAGS)
-    message(STATUS "DEFAULT_DEBUG_FLAGS not nil: " ${DEFAULT_DEBUG_FLAGS})
-  endif(NOT DEFAULT_DEBUG_FLAGS)
-else(APPLE OR WIN32)
-  set(LINUX_FLAGS "-DPMALSA")
 endif(APPLE OR WIN32)
 
-if(APPLE)
-  set(CMAKE_OSX_SYSROOT /Developer/SDKs/MacOSX10.5.sdk CACHE 
-      PATH "-isysroot parameter for compiler" FORCE)
-  set(CMAKE_C_FLAGS "-mmacosx-version-min=10.5" CACHE 
-      STRING "needed in conjunction with CMAKE_OSX_SYSROOT" FORCE)
-endif(APPLE)
+# we need full paths to sources because they are shared with other targets
+# (in particular pmjni). Set PMDIR to the top-level portmidi directory:
+get_filename_component(PMDIR ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)
+set(PM_LIB_PUBLIC_SRC ${PMDIR}/pm_common/portmidi.c
+                      ${PMDIR}/pm_common/pmutil.c
+                      ${PMDIR}/porttime/porttime.c)
+add_library(portmidi ${PM_LIB_PUBLIC_SRC})
+
+# MSVCRT_DLL is "DLL" for shared runtime library, and "" for static:
+set_target_properties(portmidi PROPERTIES
+                      VERSION ${LIBRARY_VERSION}
+                      SOVERSION ${LIBRARY_SOVERSION}
+                      OUTPUT_NAME "${PM_ACTUAL_LIB_NAME}"
+                      MSVC_RUNTIME_LIBRARY 
+                      "MultiThreaded$<$<CONFIG:Debug>:Debug>${MSVCRT_DLL}"
+                      WINDOWS_EXPORT_ALL_SYMBOLS TRUE)
+target_include_directories(portmidi PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+
+
+option(PM_CHECK_ERRORS
+"Insert a check for error return values at the end of each PortMidi function.
+If an error is encountered, a text message is printed using printf(), the user
+is asked to type ENTER, and then exit(-1) is called to clean up and terminate
+the program.
+
+You should not use PM_CHECK_ERRORS if printf() does not work (e.g. this is not
+a console application under Windows, or there is no visible console on some
+other OS), and you should not use PM_CHECK_ERRORS if you intend to recover
+from errors rather than abruptly terminate the program." OFF)
+if(PM_CHECK_ERRORS)
+  target_compile_definitions(portmidi PRIVATE PM_CHECK_ERRORS)
+endif(PM_CHECK_ERRORS)
 
 macro(prepend_path RESULT PATH)
   set(${RESULT})
@@ -35,94 +72,79 @@ macro(prepend_path RESULT PATH)
   endforeach(FILE)
 endmacro(prepend_path)
 
-set(CMAKE_C_FLAGS_DEBUG 
-    "${DEFAULT_DEBUG_FLAGS} -DPM_CHECK_ERRORS=1 -DDEBUG ${LINUX_FLAGS}"
-    CACHE STRING "enable extra checks for debugging" FORCE)
-
-set(CMAKE_C_FLAGS_RELEASE "${DEFAULT_RELEASE_FLAGS} ${LINUX_FLAGS}"
-    CACHE STRING "flags for release version" FORCE)
+# UNIX needs pthread library
+if(NOT WIN32)
+  set(THREADS_PREFER_PTHREAD_FLAG ON)
+  find_package(Threads REQUIRED)
+endif()
 
 # first include the appropriate system-dependent file:
-if(UNIX)
-  # add the -g switch for Linux and Mac OS X (not used in Win32)
-  set (CMAKE_C_FLAGS_DEBUG "-g ${CMAKE_C_FLAGS_DEBUG}" 
-       CACHE STRING "enable extra checks for debugging" FORCE)
-  if(APPLE)
-    set(MACSRC pmmacosxcm pmmac readbinaryplist finddefault)
-    prepend_path(LIBSRC ../pm_mac/ ${MACSRC})
-    list(APPEND LIBSRC ../porttime/ptmacosx_mach)
-
-    include_directories(${CMAKE_OSX_SYSROOT}/Developer/Headers/FlatCarbon)
-    set(FRAMEWORK_PATH ${CMAKE_OSX_SYSROOT}/System/Library/Frameworks)
-    set(COREAUDIO_LIB "${FRAMEWORK_PATH}/CoreAudio.framework")
-    set(COREFOUNDATION_LIB "${FRAMEWORK_PATH}/CoreFoundation.framework")
-    set(COREMIDI_LIB "${FRAMEWORK_PATH}/CoreMIDI.framework")
-    set(CORESERVICES_LIB "${FRAMEWORK_PATH}/CoreServices.framework")
-    set(PM_NEEDED_LIBS ${COREAUDIO_LIB} ${COREFOUNDATION_LIB}
-                             ${COREMIDI_LIB} ${CORESERVICES_LIB}
-        CACHE INTERNAL "")
-
-    set(JAVAVM_LIB "${FRAMEWORK_PATH}/JavaVM.framework")
-    set(JAVA_INCLUDE_PATHS ${JAVAVM_LIB}/Headers)
-    message(STATUS "SYSROOT: " ${CMAKE_OSX_SYSROOT})
-  else(APPLE)
-    # LINUX settings...
-    include(FindJNI)
-    message(STATUS "JAVA_JVM_LIB_PATH is " ${JAVA_JVM_LIB_PATH})
-    message(STATUS "JAVA_INCLUDE_PATH is " ${JAVA_INCLUDE_PATH})
-    message(STATUS "JAVA_INCLUDE_PATH2 is " ${JAVA_INCLUDE_PATH2})
-    message(STATUS "JAVA_JVM_LIBRARY is " ${JAVA_JVM_LIBRARY})
-    set(JAVA_INCLUDE_PATHS ${JAVA_INCLUDE_PATH} ${JAVA_INCLUDE_PATH2})
-    # libjvm.so is found relative to JAVA_INCLUDE_PATH:
-    set(JAVAVM_LIB ${JAVA_JVM_LIBRARY}/libjvm.so)
-
-    set(LINUXSRC pmlinuxalsa pmlinux finddefault)
-    prepend_path(LIBSRC ../pm_linux/ ${LINUXSRC})
-    list(APPEND LIBSRC ../porttime/ptlinux)
-
-    set(PM_NEEDED_LIBS pthread asound)
-  endif(APPLE)
-else(UNIX)
-  if(WIN32)
+if(UNIX AND APPLE)
+  set(Threads::Threads "" PARENT_SCOPE)
+  find_library(COREAUDIO_LIBRARY CoreAudio REQUIRED)
+  find_library(COREFOUNDATION_LIBRARY CoreFoundation REQUIRED)
+  find_library(COREMIDI_LIBRARY CoreMIDI REQUIRED)
+  find_library(CORESERVICES_LIBRARY CoreServices REQUIRED)
+  set(PM_LIB_PRIVATE_SRC 
+      ${PMDIR}/porttime/ptmacosx_mach.c
+      ${PMDIR}/pm_mac/pmmac.c
+      ${PMDIR}/pm_mac/pmmacosxcm.c
+      ${PMDIR}/pm_mac/finddefault.c
+      ${PMDIR}/pm_mac/readbinaryplist.c)
+  set(PM_NEEDED_LIBS ${CMAKE_THREAD_LIBS_INIT} ${COREAUDIO_LIBRARY}
+      ${COREFOUNDATION_LIBRARY} ${COREMIDI_LIBRARY} ${CORESERVICES_LIBRARY}
+      PARENT_SCOPE)
+  target_link_libraries(portmidi PRIVATE Threads::Threads ${COREAUDIO_LIBRARY}
+      ${COREFOUNDATION_LIBRARY} ${COREMIDI_LIBRARY} ${CORESERVICES_LIBRARY})
+  # set to CMake default; is this right?:
+  set_target_properties(portmidi PROPERTIES MACOSX_RPATH ON)
+elseif(HAIKU)
+  set(PM_LIB_PRIVATE_SRC
+      ${PMDIR}/porttime/pthaiku.cpp
+      ${PMDIR}/pm_haiku/pmhaiku.cpp
+      ${PMDIR}/pm_linux/finddefault.c)
+  set(PM_NEEDED_LIBS be midi midi2 PARENT_SCOPE)
+  target_link_libraries(portmidi PRIVATE be midi midi2)
+elseif(UNIX)
+  target_compile_definitions(portmidi PRIVATE ${LINUX_FLAGS})
+  set(PM_LIB_PRIVATE_SRC
+      ${PMDIR}/porttime/ptlinux.c
+      ${PMDIR}/pm_linux/pmlinux.c
+      ${PMDIR}/pm_linux/pmlinuxnull.c
+      ${PMDIR}/pm_linux/finddefault.c)
+  if(${LINUX_DEFINES} MATCHES ".*PMALSA.*")
+    # Note that ALSA is not required if PMNULL is defined -- PortMidi will then
+    # compile without ALSA and report no MIDI devices. Later, PMSNDIO or PMJACK
+    # might be additional options.
+    find_package(ALSA REQUIRED)
+    list(APPEND PM_LIB_PRIVATE_SRC ${PMDIR}/pm_linux/pmlinuxalsa.c)
+    set(PM_NEEDED_LIBS ${CMAKE_THREAD_LIBS_INIT} ${ALSA_LIBRARIES} PARENT_SCOPE)
+    target_link_libraries(portmidi PRIVATE Threads::Threads ALSA::ALSA)
+    set(PKGCONFIG_REQUIRES_PRIVATE "alsa" PARENT_SCOPE)
+  else()
+    message(WARNING "No PMALSA, so PortMidi will not use ALSA, "
+                    "and will not find or open MIDI devices.")
+    set(PM_NEEDED_LIBS ${CMAKE_THREAD_LIBS_INIT} PARENT_SCOPE)
+    target_link_libraries(portmidi PRIVATE Threads::Threads)
+  endif()
+elseif(WIN32)
+  set(PM_LIB_PRIVATE_SRC
+      ${PMDIR}/porttime/ptwinmm.c
+      ${PMDIR}/pm_win/pmwin.c
+      ${PMDIR}/pm_win/pmwinmm.c)
+    set(PM_NEEDED_LIBS winmm PARENT_SCOPE)
+    target_link_libraries(portmidi PRIVATE winmm)
+#  if(NOT BUILD_SHARED_LIBS AND PM_USE_STATIC_RUNTIME)
     # /MDd is multithread debug DLL, /MTd is multithread debug
     # /MD is multithread DLL, /MT is multithread. Change to static:
-    include(../pm_win/static.cmake)
-    
-    include(FindJNI)
+#    include(../pm_win/static.cmake)
+#  endif()
+else()
+  message(FATAL_ERROR "Operating system not supported.")
+endif()
 
-    set(JAVA_INCLUDE_PATHS ${JAVA_INCLUDE_PATH} ${JAVA_INCLUDE_PATH2})
-    # message(STATUS "JAVA_INCLUDE_PATHS: " ${JAVA_INCLUDE_PATHS})
+set(PM_LIB_PUBLIC_SRC ${PM_LIB_PUBLIC_SRC} PARENT_SCOPE) # export to parent
+set(PM_LIB_PRIVATE_SRC ${PM_LIB_PRIVATE_SRC} PARENT_SCOPE) # export to parent
 
-    set(WINSRC pmwin pmwinmm)
-    prepend_path(LIBSRC ../pm_win/ ${WINSRC})
-    list(APPEND LIBSRC ../porttime/ptwinmm)
-    set(PM_NEEDED_LIBS winmm.lib)
-  endif(WIN32)
-endif(UNIX)
-set(JNI_EXTRA_LIBS ${PM_NEEDED_LIBS} ${JAVA_JVM_LIBRARY})
+target_sources(portmidi PRIVATE ${PM_LIB_PRIVATE_SRC})
 
-# this completes the list of library sources by adding shared code
-list(APPEND LIBSRC pmutil portmidi)
-
-# now add the shared files to make the complete list of library sources
-add_library(portmidi-static ${LIBSRC})
-set_target_properties(portmidi-static PROPERTIES OUTPUT_NAME "portmidi_s")
-target_link_libraries(portmidi-static ${PM_NEEDED_LIBS})
-
-# define the jni library
-include_directories(${JAVA_INCLUDE_PATHS})
-
-set(JNISRC ${LIBSRC} ../pm_java/pmjni/pmjni.c)
-add_library(pmjni SHARED ${JNISRC})
-target_link_libraries(pmjni ${JNI_EXTRA_LIBS})
-set_target_properties(pmjni PROPERTIES EXECUTABLE_EXTENSION "jnilib")
-
-# install the libraries (Linux and Mac OS X command line)
-if(UNIX)
-  INSTALL(TARGETS portmidi-static pmjni
-    LIBRARY DESTINATION /usr/local/lib
-    ARCHIVE DESTINATION /usr/local/lib)
-# .h files installed by pm_dylib/CMakeLists.txt, so don't need them here
-#  INSTALL(FILES portmidi.h ../porttime/porttime.h
-#    DESTINATION /usr/local/include)
-endif(UNIX)

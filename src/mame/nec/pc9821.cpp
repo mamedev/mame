@@ -691,37 +691,11 @@ void pc9821_canbe_state::pc9821cx3_io(address_map &map)
 }
 
 static INPUT_PORTS_START( pc9821 )
-	// TODO: verify how many "switches" are really present on pc9821
-	// I suspect there are none: if you flip some of these then BIOS keeps throwing
-	// "set the sdip" warning until it matches parity odd.
-	// They may actually be hardwired defaults that should return constant values depending
-	// on machine type.
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "Display Type" )
-	PORT_DIPSETTING(    0x00, "Normal Display (15KHz)" )
-	PORT_DIPSETTING(    0x01, "Hi-Res Display (24KHz)" )
-	PORT_DIPNAME( 0x02, 0x00, "DSW1" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Monitor Type" )
-	PORT_DIPSETTING(    0x04, "RGB" )
-	PORT_DIPSETTING(    0x00, "Plasma" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Graphic Function" )
-	PORT_DIPSETTING(    0x80, "Basic (8 Colors)" )
-	PORT_DIPSETTING(    0x00, "Expanded (16/4096 Colors)" )
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("sdip", FUNC(pc98_sdip_device::dsw1_r))
 
+	// HACK: should read from SDIP dsw2_r
+	// will break pc9821 for parity check, cfr. dump notes
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x00, "DSW2" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -747,32 +721,10 @@ static INPUT_PORTS_START( pc9821 )
 	PORT_DIPNAME( 0x80, 0x80, "GDC clock" )
 	PORT_DIPSETTING(    0x80, "2.5 MHz" )
 	PORT_DIPSETTING(    0x00, "5 MHz" )
+	// PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("sdip", FUNC(pc98_sdip_device::dsw2_r))
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x01, "FDD Fix Mode" )
-	PORT_DIPSETTING(    0x00, "Auto-Detection" )
-	PORT_DIPSETTING(    0x01, "Fixed" )
-	PORT_DIPNAME( 0x02, 0x02, "FDD Density Select" )
-	PORT_DIPSETTING(    0x00, "2DD" )
-	PORT_DIPSETTING(    0x02, "2HD" )
-	PORT_DIPNAME( 0x04, 0x04, "DSW3" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Conventional RAM size" )
-	PORT_DIPSETTING(    0x40, "640 KB" )
-	PORT_DIPSETTING(    0x00, "512 KB" )
-	PORT_DIPNAME( 0x80, 0x00, "CPU Type" )
-	PORT_DIPSETTING(    0x80, "V30" )
-	PORT_DIPSETTING(    0x00, "I386" )
+	PORT_BIT( 0x23, IP_ACTIVE_LOW, IPT_CUSTOM ) //PORT_CUSTOM_DEVICE_MEMBER("sdip", FUNC(pc98_sdip_device::dsw3_r))
 
 	// TODO: make a mouse device, not unlike pc9801_epson.cpp
 	PORT_START("MOUSE_X")
@@ -850,6 +802,9 @@ void pc9821_state::pc9821(machine_config &config)
 	m_dmac->set_clock(xtal); // unknown clock
 
 	PALETTE(config.replace(), m_palette, FUNC(pc9821_state::pc9801_palette), 16 + 16 + 256);
+
+	PC98_119_KBD(config.replace(), m_keyb, 0);
+	m_keyb->rxd_callback().set("sio_kbd", FUNC(i8251_device::write_rxd));
 
 //  m_hgdc[1]->set_display_pixels(FUNC(pc9821_state::pegc_display_pixels));
 
@@ -948,37 +903,6 @@ void pc9821_mate_x_state::pc9821xa16(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 }
 
-void pc9821_valuestar_state::pc9821v13(machine_config &config)
-{
-	pc9821(config);
-	const double xtal = 133000000;
-	PENTIUM(config.replace(), m_maincpu, xtal); // Pentium Pro, 256kB cache RAM
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_valuestar_state::pc9821_map);
-	m_maincpu->set_addrmap(AS_IO, &pc9821_valuestar_state::pc9821_io);
-	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
-
-	// VLSI Supercore594 (Wildcat) / Intel 430FX (Triton) PCI 2.0
-	// PCI slot x 1
-	// GD5440
-	// built-in 3.5 floppy x 1
-	// file bay with built-in CD-Rom (4x, 6x, 8x depending on sub-model type)
-	// HDD with pre-installed software (850MB, 1.2GB, 1.6GB)
-	// minimum RAM: 16MB
-	// maximum RAM: 128MB
-	// C-Bus x 2
-	// PC-9801-120 pre-installed (fax/modem 28'000 bps) or PC-9801-121 (ISDN)
-}
-
-void pc9821_valuestar_state::pc9821v20(machine_config &config)
-{
-	pc9821(config);
-	const double xtal = 200000000;
-	PENTIUM(config.replace(), m_maincpu, xtal); // Pentium Pro
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_valuestar_state::pc9821_map);
-	m_maincpu->set_addrmap(AS_IO, &pc9821_valuestar_state::pc9821_io);
-	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
-}
-
 void pc9821_mate_r_state::pc9821ra20(machine_config &config)
 {
 	pc9821(config);
@@ -1021,26 +945,6 @@ void pc9821_mate_r_state::pc9821ra333(machine_config &config)
 }
 
 // 9821 NOTE machine configs
-
-void pc9821_note_state::pc9821ne(machine_config &config)
-{
-	pc9821(config);
-	const XTAL xtal = XTAL(33'000'000);
-	I486(config.replace(), m_maincpu, xtal); // i486sx
-	m_maincpu->set_addrmap(AS_PROGRAM, &pc9821_note_state::pc9821_map);
-	m_maincpu->set_addrmap(AS_IO, &pc9821_note_state::pc9821_io);
-	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
-
-	pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST
-
-	// 9.5 TFT with 640x480x256 mode
-	// 1x internal 3.5 floppy
-	// PCMCIA2.0/JEIDA 4.1
-	// 110-pin expansion bus (?)
-	// Ni-Cd battery, around 1 hour of session duration
-	// minimum RAM: 3.6MB
-	// maximum RAM: 14.6MB
-}
 
 void pc9821_note_lavie_state::pc9821nr15(machine_config &config)
 {
@@ -1128,12 +1032,13 @@ void pc9821_note_lavie_state::pc9821nw150(machine_config &config)
 /*
 98MATE A - 80486SX 25
 
-(note: might be a different model!)
+TODO: should access SDIP from $00f6, most likely a partial A Mate dump instead
 */
 
 ROM_START( pc9821 )
 	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "itf.rom",  0x10000, 0x08000, CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
+	// baddump: has no code for setup mode
+	ROM_LOAD( "itf.rom",  0x10000, 0x08000, BAD_DUMP CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
 	ROM_LOAD( "bios.rom", 0x18000, 0x18000, BAD_DUMP CRC(34a19a59) SHA1(2e92346727b0355bc1ec9a7ded1b444a4917f2b9) )
 	ROM_FILL(0x24c40, 4, 0) // hide the _32_ marker until we have a 32-bit clean IDE bios otherwise windows tries to
 							// make a 32-bit call into 16-bit code
@@ -1212,19 +1117,18 @@ ROM_END
 
 /*
 98NOTE - i486SX 33
+
+NOTE: regular Ne shouldn't have Pico|Power Redwood PT86C768, and bios_ne.rom accesses one.
+Incomplete dump, will require standalone driver out of interactions with PMC so removed.
+
+cfr. https://github.com/angelosa/mame_scratch/blob/main/src/redwood1.cpp
+
 */
 
-ROM_START( pc9821ne )
-	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
-	ROM_LOAD( "itf.rom",     0x10000, 0x08000, BAD_DUMP CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
-	ROM_LOAD( "bios_ne.rom", 0x18000, 0x18000, BAD_DUMP CRC(2ae070c4) SHA1(d7963942042bfd84ed5fc9b7ba8f1c327c094172) )
-
-	ROM_REGION( 0x80000, "chargen", 0 )
-	ROM_LOAD( "font_ne.rom", 0x00000, 0x46800, BAD_DUMP CRC(fb213757) SHA1(61525826d62fb6e99377b23812faefa291d78c2e) )
-
-	LOAD_KANJI_ROMS
-	LOAD_IDE_ROM
-ROM_END
+//ROM_START( pc9821ne )
+//	ROM_LOAD( "itf.rom",     0x10000, 0x08000, BAD_DUMP CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
+//	ROM_LOAD( "bios_ne.rom", 0x18000, 0x18000, BAD_DUMP CRC(2ae070c4) SHA1(d7963942042bfd84ed5fc9b7ba8f1c327c094172) )
+//	ROM_LOAD( "font_ne.rom", 0x00000, 0x46800, BAD_DUMP CRC(fb213757) SHA1(61525826d62fb6e99377b23812faefa291d78c2e) )
 
 /*
 98MULTi Ce2 - 80486SX 25
@@ -1424,43 +1328,23 @@ ROM_END
 
 /*
 98MATE VALUESTAR - Pentium based
+
+Both bad dumps, requires separate PCI-based driver anyway.
 */
 
-ROM_START( pc9821v13 )
-	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
-	// "ROM SUM ERROR"
-	ROM_LOAD( "itf.rom",      0x10000, 0x08000, BAD_DUMP CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
-//  ROM_LOAD( "itf_v20.rom",  0x10000, 0x08000, BAD_DUMP CRC(10e52302) SHA1(f95b8648e3f5a23e507a9fbda8ab2e317d8e5151) )
-	ROM_LOAD( "bios_v13.rom", 0x18000, 0x18000, BAD_DUMP CRC(0a682b93) SHA1(76a7360502fa0296ea93b4c537174610a834d367) )
+//ROM_START( pc9821v13 )
+//  "ROM SUM ERROR"
+//	ROM_LOAD( "itf.rom",      0x10000, 0x08000, BAD_DUMP CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
+//	ROM_LOAD( "bios_v13.rom", 0x18000, 0x18000, BAD_DUMP CRC(0a682b93) SHA1(76a7360502fa0296ea93b4c537174610a834d367) )
 
-	ROM_REGION( 0x80000, "chargen", 0 )
-	ROM_LOAD( "font_v13.rom",   0x00000, 0x46800, BAD_DUMP CRC(c9a77d8f) SHA1(deb8563712eb2a634a157289838b95098ba0c7f2) )
-
-	LOAD_KANJI_ROMS
-	LOAD_IDE_ROM
-
-	// TODO: factory HDDs
-ROM_END
-
-/*
-98MATE VALUESTAR - Pentium based
-*/
-
-ROM_START( pc9821v20 )
-	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
-	// Doesn't boot, not an ITF ROM!
-	ROM_LOAD( "itf.rom",      0x10000, 0x08000, BAD_DUMP CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
+//ROM_START( pc9821v20 )
+//	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+// 	"ROM SUM ERROR"
+//	ROM_LOAD( "itf.rom",      0x10000, 0x08000, BAD_DUMP CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
+//  Not an ITF ROM
 //  ROM_LOAD( "itf_v20.rom",  0x10000, 0x08000, CRC(10e52302) SHA1(f95b8648e3f5a23e507a9fbda8ab2e317d8e5151) )
-	ROM_LOAD( "bios_v20.rom", 0x18000, 0x18000, BAD_DUMP CRC(d5d1f13b) SHA1(bf44b5f4e138e036f1b848d6616fbd41b5549764) )
+//	ROM_LOAD( "bios_v20.rom", 0x18000, 0x18000, BAD_DUMP CRC(d5d1f13b) SHA1(bf44b5f4e138e036f1b848d6616fbd41b5549764) )
 
-	ROM_REGION( 0x80000, "chargen", 0 )
-	ROM_LOAD( "font_v20.rom", 0x00000, 0x046800, BAD_DUMP CRC(6244c4c0) SHA1(9513cac321e89b4edb067b30e9ecb1adae7e7be7) )
-
-	LOAD_KANJI_ROMS
-	LOAD_IDE_ROM
-
-	// TODO: factory HDDs
-ROM_END
 
 /*
 PC-9821Nr15
@@ -1581,8 +1465,8 @@ COMP( 1994, pc9821xs,    0,           0, pc9821xs,     pc9821,   pc9821_mate_x_s
 COMP( 1996, pc9821xa16,  pc9821xs,    0, pc9821xa16,   pc9821,   pc9821_mate_x_state, init_pc9801_kanji,   "NEC",   "PC-9821Xa16 (98MATE X)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 98MATE VALUESTAR (Pentium, comes with Windows 95 and several programs pre-installed)
-COMP( 1998, pc9821v13,   0,           0, pc9821v13,    pc9821,   pc9821_valuestar_state, init_pc9801_kanji,   "NEC",   "PC-9821V13 (98MATE VALUESTAR)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-COMP( 1998, pc9821v20,   pc9821v13,   0, pc9821v20,    pc9821,   pc9821_valuestar_state, init_pc9801_kanji,   "NEC",   "PC-9821V20 (98MATE VALUESTAR)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+//COMP( 1998, pc9821v13,   0,           0, pc9821v13,    pc9821,   pc9821_valuestar_state, init_pc9801_kanji,   "NEC",   "PC-9821V13 (98MATE VALUESTAR)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+//COMP( 1998, pc9821v20,   pc9821v13,   0, pc9821v20,    pc9821,   pc9821_valuestar_state, init_pc9801_kanji,   "NEC",   "PC-9821V20 (98MATE VALUESTAR)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 98MATE R (Pentium Pro, otherwise same as 98MATE X?)
 COMP( 1996, pc9821ra20,  0,            0, pc9821ra20,  pc9821,   pc9821_mate_r_state, init_pc9801_kanji,   "NEC",   "PC-9821Ra20 (98MATE R)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
@@ -1594,7 +1478,7 @@ COMP( 1998, pc9821ra333, pc9821ra20,   0, pc9821ra333, pc9821,   pc9821_mate_r_s
 
 // PC-9821 NOTE[book] class
 // 98NOTE
-COMP( 1994, pc9821ne,    0,            0, pc9821ne,    pc9821,   pc9821_note_state,       init_pc9801_kanji,   "NEC",   "PC-9821Ne (98NOTE)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+//COMP( 1994, pc9821ne,    0,            0, pc9821ne,    pc9821,   pc9821_note_state,       init_pc9801_kanji,   "NEC",   "PC-9821Ne (98NOTE)",              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // 98NOTE Lavie
 COMP( 1996, pc9821nr15,  0,            0, pc9821nr15,  pc9821,   pc9821_note_lavie_state, init_pc9801_kanji,   "NEC",   "PC-9821Nr15 (98NOTE Lavie)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

@@ -18,8 +18,7 @@ TODO:
    dispensed" than the number of coins/tickets the games are supposed to
    pay out.
  * dbshahb: Implement different video chip, different memory map
- * xyddzhh: Verify mahjong-style inputs and improve DSW definitions
- * xyddzhh: Verify Oki banking
+ * xyddzhh: Improve DSW definitions
 
 ***************************************************************************/
 

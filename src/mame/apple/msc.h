@@ -6,9 +6,8 @@
 
 #pragma once
 
-#include "pseudovia.h"
-
 #include "machine/6522via.h"
+#include "machine/pseudovia.h"
 #include "sound/asc.h"
 #include "speaker.h"
 
