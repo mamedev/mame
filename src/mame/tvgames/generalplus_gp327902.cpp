@@ -4,6 +4,7 @@
 #include "emu.h"
 
 #include "cpu/arm7/arm7.h"
+#include "machine/timer.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -36,6 +37,8 @@ protected:
 	uint32_t screen_update_gp327902(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
+	TIMER_DEVICE_CALLBACK_MEMBER(timer);
+
 	uint32_t c0020070_unk_r() { return machine().rand(); }
 	void c0060000_unk_w(uint32_t data);
 	uint32_t c008000c_unk_r() { return machine().rand(); }
@@ -71,6 +74,13 @@ void generalplus_gp327902_game_state::arm_map(address_map &map)
 	map(0xc0060000, 0xc0060003).w(FUNC(generalplus_gp327902_game_state::c0060000_unk_w));
 	map(0xc008000c, 0xc008000f).r(FUNC(generalplus_gp327902_game_state::c008000c_unk_r));
 	map(0xd000003c, 0xd000003f).r(FUNC(generalplus_gp327902_game_state::d000003c_unk_r));
+
+	map(0xf8000000, 0xf8000017).ram(); // writes pointers used by exceptions (including IRQs) here
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER( generalplus_gp327902_game_state::timer )
+{
+	m_maincpu->set_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, HOLD_LINE);
 }
 
 uint32_t generalplus_gp327902_game_state::screen_update_gp327902(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -102,6 +112,8 @@ void generalplus_gp327902_game_state::gp327902(machine_config &config)
 
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
+
+	TIMER(config, "timer").configure_periodic(FUNC(generalplus_gp327902_game_state::timer), attotime::from_hz(1000));
 }
 
 void generalplus_gp327902_game_state::init_spi()
