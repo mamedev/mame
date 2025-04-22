@@ -24,8 +24,8 @@
 #define LIB_NAME    "wpcap.dll"
 
 #elif defined(SDLMAME_MACOSX)
+#include <atomic>
 #include <pthread.h>
-#include <libkern/OSAtomic.h>
 #define LIB_NAME    "libpcap.dylib"
 
 #else
@@ -116,20 +116,6 @@ private:
 	pcap_dispatch_fn     pcap_dispatch_dl;
 };
 
-#ifdef SDLMAME_MACOSX
-struct netdev_pcap_context
-{
-	uint8_t *pkt;
-	int len;
-	pcap_t *p;
-
-	uint8_t packets[32][1600];
-	int packetlens[32];
-	int head;
-	int tail;
-};
-#endif
-
 class pcap_module::netdev_pcap : public network_device_base
 {
 public:
@@ -145,35 +131,49 @@ private:
 	pcap_module &m_module;
 	pcap_t *m_p;
 #ifdef SDLMAME_MACOSX
-	struct netdev_pcap_context m_ctx;
 	pthread_t m_thread;
+	uint8_t *pkt;
+	int len;
+	pcap_t *p;
+
+	uint8_t packets[32][1600];
+	int packetlens[32];
+	std::atomic<int> head;
+	std::atomic<int> tail;
+
+	static void pcap_handler(u_char *user, const struct pcap_pkthdr *h, const u_char *bytes);
+	static void *pcap_blocker(void *arg);
 #endif
 };
 
 #ifdef SDLMAME_MACOSX
-static void netdev_pcap_handler(u_char *user, const struct pcap_pkthdr *h, const u_char *bytes)
+void pcap_module::netdev_pcap::pcap_handler(u_char *user, const struct pcap_pkthdr *h, const u_char *bytes)
 {
-	struct netdev_pcap_context *ctx = (struct netdev_pcap_context*)user;
+	netdev_pcap *const ctx = reinterpret_cast<netdev_pcap *>(user);
 
-	if(!ctx->p) return;
+	if (!ctx->p)
+		return;
 
-	if(OSAtomicCompareAndSwapInt((ctx->head+1) & 0x1F, ctx->tail, &ctx->tail)) {
+	int const curr = ctx->head;
+	int const next = (curr + 1) & 0x1f;
+	if (ctx->tail.load(std::memory_order_acquire) == next)
+	{
 		printf("buffer full, dropping packet\n");
 		return;
 	}
-	memcpy(ctx->packets[ctx->head], bytes, h->len);
-	ctx->packetlens[ctx->head] = h->len;
-	OSAtomicCompareAndSwapInt(ctx->head, (ctx->head+1) & 0x1F, &ctx->head);
+	memcpy(ctx->packets[curr], bytes, h->len);
+	ctx->packetlens[curr] = h->len;
+	ctx->head.store(next, std::memory_order_release);
 }
 
-static void *netdev_pcap_blocker(void *arg) {
-	struct netdev_pcap_context *ctx = (struct netdev_pcap_context*)arg;
+void *pcap_module::netdev_pcap::pcap_blocker(void *arg)
+{
+	netdev_pcap *const ctx = reinterpret_cast<netdev_pcap *>(arg);
 
-	while(ctx && ctx->p) {
-		(*m_module.pcap_dispatch_dl)(ctx->p, 1, netdev_pcap_handler, (u_char*)ctx);
-	}
+	while (ctx && ctx->p)
+		(*ctx->m_module.pcap_dispatch_dl)(ctx->p, 1, &netdev_pcap::pcap_handler, reinterpret_cast<u_char *>(ctx));
 
-	return 0;
+	return nullptr;
 }
 #endif
 
@@ -202,10 +202,10 @@ pcap_module::netdev_pcap::netdev_pcap(pcap_module &module, const char *name, net
 	}
 
 #ifdef SDLMAME_MACOSX
-	m_ctx.head = 0;
-	m_ctx.tail = 0;
-	m_ctx.p = m_p;
-	pthread_create(&m_thread, nullptr, netdev_pcap_blocker, &m_ctx);
+	head = 0;
+	tail = 0;
+	p = m_p;
+	pthread_create(&m_thread, nullptr, &netdev_pcap::pcap_blocker, this);
 #endif
 }
 
@@ -232,13 +232,14 @@ int pcap_module::netdev_pcap::recv_dev(uint8_t **buf)
 	if(!m_p) return 0;
 
 	// Empty
-	if(OSAtomicCompareAndSwapInt(m_ctx.head, m_ctx.tail, &m_ctx.tail)) {
-		return 0;
-	}
 
-	memcpy(pktbuf, m_ctx.packets[m_ctx.tail], m_ctx.packetlens[m_ctx.tail]);
-	ret = m_ctx.packetlens[m_ctx.tail];
-	OSAtomicCompareAndSwapInt(m_ctx.tail, (m_ctx.tail+1) & 0x1F, &m_ctx.tail);
+	int const curr = tail;
+	if (head.load(std::memory_order_acquire) == curr)
+		return 0;
+
+	memcpy(pktbuf, packets[curr], packetlens[curr]);
+	ret = packetlens[curr];
+	tail.store((curr + 1) & 0x1f, std::memory_order_release);
 	*buf = pktbuf;
 	return ret;
 #else
@@ -251,7 +252,7 @@ int pcap_module::netdev_pcap::recv_dev(uint8_t **buf)
 pcap_module::netdev_pcap::~netdev_pcap()
 {
 #ifdef SDLMAME_MACOSX
-	m_ctx.p = nullptr;
+	p = nullptr;
 	pthread_cancel(m_thread);
 	pthread_join(m_thread, nullptr);
 #endif
