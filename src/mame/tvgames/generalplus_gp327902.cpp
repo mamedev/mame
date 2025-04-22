@@ -36,12 +36,40 @@ protected:
 	uint32_t screen_update_gp327902(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
+	uint32_t c0020070_unk_r() { return machine().rand(); }
+	void c0060000_unk_w(uint32_t data);
+	uint32_t c008000c_unk_r() { return machine().rand(); }
 	uint32_t d000003c_unk_r() { return 0xffffffff; }
 };
+
+
+void generalplus_gp327902_game_state::c0060000_unk_w(uint32_t data)
+{
+	/*
+
+	this is some kind of debug serial output, it currently outputs the following sequence
+
+	adc_init
+	DAC Task Create[0]
+	DAC BG Task Create[0]
+	Audio Task Create[4]
+	Audio BG Task Create[6]
+	FileServ Task Create[8]
+	Image Task Create[10]
+	audio_init()
+	watch-dog enable
+	power on
+	*/
+//	printf("%c", data & 0xff);
+}
 
 void generalplus_gp327902_game_state::arm_map(address_map &map)
 {
 	map(0x00000000, 0x03ffffff).ram();
+	
+	map(0xc0020070, 0xc0020073).r(FUNC(generalplus_gp327902_game_state::c0020070_unk_r));
+	map(0xc0060000, 0xc0060003).w(FUNC(generalplus_gp327902_game_state::c0060000_unk_w));
+	map(0xc008000c, 0xc008000f).r(FUNC(generalplus_gp327902_game_state::c008000c_unk_r));
 	map(0xd000003c, 0xd000003f).r(FUNC(generalplus_gp327902_game_state::d000003c_unk_r));
 }
 
