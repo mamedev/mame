@@ -68,7 +68,7 @@ void generalplus_gp327902_game_state::c0060000_unk_w(uint32_t data)
 
 void generalplus_gp327902_game_state::arm_map(address_map &map)
 {
-	map(0x00000000, 0x03ffffff).ram();
+	map(0x00000000, 0x001fffff).ram(); // 16M-bit internal SDRAM
 	
 	map(0xc0020070, 0xc0020073).r(FUNC(generalplus_gp327902_game_state::c0020070_unk_r));
 	map(0xc0060000, 0xc0060003).w(FUNC(generalplus_gp327902_game_state::c0060000_unk_w));
@@ -123,7 +123,7 @@ void generalplus_gp327902_game_state::init_spi()
 	address_space& mem = m_maincpu->space(AS_PROGRAM);
 
 	int copybase = 0x16000; // there are also programs at 0x800 and 0x3400
-	for (int i = 0; i < (0x800000 - copybase) / 2; i++)
+	for (int i = 0; i < 0x200000 / 2; i++)
 	{
 		uint16_t word = spirom[copybase + (i * 2) + 0] | (spirom[copybase + (i * 2) + 1] << 8);
 		mem.write_word(i * 2, word);
