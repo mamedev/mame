@@ -67,7 +67,6 @@ copyright-holders:m1macrophage
 	<element name="txt_tune_4"><text string="LO"><color red="0.82" green="0.43" blue="0.31"/></text></element>
 	<element name="txt_tune_5"><text string="HI"><color red="0.82" green="0.43" blue="0.31"/></text></element>
 	<element name="txt_tune_6"><text string="LO"><color red="0.82" green="0.43" blue="0.31"/></text></element>
-	<element name="txt_tune_7"><text string="HIHAT"><color red="0.82" green="0.43" blue="0.31"/></text></element>
 
 	<element name="txt_mixer"><text string="MIXER"><color red="0.82" green="0.43" blue="0.31"/></text></element>
 	<element name="txt_left_1"><text string="LEFT" align="1"><color red="0.82" green="0.43" blue="0.31"/></text></element>
@@ -534,13 +533,16 @@ copyright-holders:m1macrophage
 		<element ref="txt_tuning"><bounds x="1473" y="435" width="118" height="24"/></element>
 		<element ref="line"><bounds x="1183" y="445" width="295" height="2"/></element>
 		<element ref="line"><bounds x="1590" y="445" width="295" height="2"/></element>
-		<repeat count="7">
+		<repeat count="6">
 			<param name="i" start="1" increment="1"/>
 			<param name="x" start="1183" increment="106"/>
 			<param name="knob_input" value="pot_tuning_~i~"/>
 			<group ref="knob"><bounds x="~x~" y="495" width="54" height="54"/></group>
 			<element ref="txt_tune_~i~"><bounds x="~x~" y="560" width="54" height="17"/></element>
 		</repeat>
+		<param name="knob_input" value="pot_hihat_decay"/>
+		<group ref="knob"><bounds x="1819" y="495" width="54" height="54"/></group>
+		<element ref="txt_hihat"><bounds x="1819" y="560" width="54" height="17"/></element>
 		<element ref="txt_snare"><bounds x="1183" y="582" width="54" height="17"/></element>
 		<element ref="txt_toms"><bounds x="1395" y="582" width="54" height="17"/></element>
 		<element ref="line"><bounds x="1286" y="590" width="108" height="2"/></element>
@@ -608,10 +610,11 @@ copyright-holders:m1macrophage
 
 				add_simplecounter_knob(view, "knob_pot_tempo", "pot_tempo", 1.5)
 				add_simplecounter_knob(view, "knob_pot_volume", "pot_volume", 1.5)
-				for i = 1, 7 do
+				for i = 1, 6 do
 					local knob_input = "pot_tuning_" .. i
 					add_simplecounter_knob(view, "knob_" .. knob_input, knob_input, 3.5)
 				end
+				add_simplecounter_knob(view, "knob_pot_hihat_decay", "pot_hihat_decay", 3.5)
 
 				for i = 1, 16 do
 					local pan_input = "pot_pan_" .. i
