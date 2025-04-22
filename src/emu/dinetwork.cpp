@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "dinetwork.h"
 
-#include "osdnet.h"
+#include "osdepend.h"
 
 #include <algorithm>
 
@@ -143,7 +143,7 @@ void device_network_interface::set_interface(int id)
 	if (m_dev)
 		stop_net_device();
 
-	m_dev.reset(open_netdev(id, *this));
+	m_dev = device().machine().osd().open_network_device(id, *this);
 	if (m_dev)
 	{
 		if (!m_loopback_control)

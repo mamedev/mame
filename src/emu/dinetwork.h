@@ -6,8 +6,6 @@
 #include "interface/nethandler.h"
 
 
-class osd_network_device;
-
 class device_network_interface : public device_interface, public osd::network_handler
 {
 public:
@@ -51,7 +49,7 @@ private:
 	void start_net_device();
 	void stop_net_device();
 
-	std::unique_ptr<osd_network_device> m_dev;
+	std::unique_ptr<osd::network_device> m_dev;
 	emu_timer *m_poll_timer;
 	emu_timer *m_send_timer;
 	emu_timer *m_recv_timer;
