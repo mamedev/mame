@@ -9647,6 +9647,111 @@ static INPUT_PORTS_START( flaming7 )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( ttactoe )
+	PORT_INCLUDE( lucky8 )
+
+	PORT_MODIFY( "DSW1" )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )         PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )         PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )         PORT_DIPLOCATION("DSW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x18, 0x18, "Double Up Game Pay Rate" )  PORT_DIPLOCATION("DSW1:4,5")    // OK
+	PORT_DIPSETTING(    0x00, "90%" )
+	PORT_DIPSETTING(    0x08, "80%" )
+	PORT_DIPSETTING(    0x10, "70%" )
+	PORT_DIPSETTING(    0x18, "60%" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )         PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )         PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )         PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x03, 0x03, "Main Game Pay Rate" )  PORT_DIPLOCATION("DSW2:1,2")  // OK
+	PORT_DIPSETTING(    0x03, "60%" )
+	PORT_DIPSETTING(    0x02, "70%" )
+	PORT_DIPSETTING(    0x01, "80%" )
+	PORT_DIPSETTING(    0x00, "90%" )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW2:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW2:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_MODIFY("DSW3")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW4:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW4:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW4:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW4:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x70, 0x60, "Coin C Rate" )         PORT_DIPLOCATION("DSW4:5,6,7")  // OK
+	PORT_DIPSETTING(    0x70, "10 Coins/1 Credit" )
+	PORT_DIPSETTING(    0x10, "9 Coins/1 Credit" )
+	PORT_DIPSETTING(    0x20, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x50, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0x80, 0x80, "4th Coin" )            PORT_DIPLOCATION("DSW4:8")      // OK
+	PORT_DIPSETTING(    0x80, "As Coin A" )
+	PORT_DIPSETTING(    0x00, "As Hopper Line" )
+
+	PORT_MODIFY("DSW4")
+	PORT_DIPNAME( 0x07, 0x07, "Key In Rate" )         PORT_DIPLOCATION("DSW3:1,2,3")  // OK
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x01, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(    0x02, "1 Coin/20 Credits" )
+	PORT_DIPSETTING(    0x03, "1 Coin/25 Credits" )
+	PORT_DIPSETTING(    0x04, "1 Coin/40 Credits" )
+	PORT_DIPSETTING(    0x05, "1 Coin/50 Credits" )
+	PORT_DIPSETTING(    0x06, "1 Coin/60 Credits" )
+	PORT_DIPSETTING(    0x07, "1 Coin/100 Credits" )
+	PORT_DIPNAME( 0x38, 0x38, "Coin A Rate" )         PORT_DIPLOCATION("DSW3:4,5,6")  // OK
+	PORT_DIPSETTING(    0x38, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_6C ) )    // manual says 1C/8C
+	PORT_DIPSETTING(    0x28, "1 Coin/10 Credits" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW3:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )    PORT_DIPLOCATION("DSW3:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+
 /*****************************************************
 *            Graphics Layouts & Decode               *
 *****************************************************/
@@ -15971,17 +16076,22 @@ ROM_END
   Tic Tac Toe.
   Sundance.
 
-  Bootleg of F5 hardware.
+  Bootleg of Wing F5 hardware.
+
+  Another version exist with a daughterboard and 2x 68705 MCUs.
 
 */
 ROM_START( ttactoe )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tic_8.14b", 0x0000, 0x8000, CRC(a3b8f6ce) SHA1(e85803a0683f11f763bbcec82b0ab5b6dcc31d8f) )
 
-	ROM_REGION( 0x18000, "gfx1", 0 )
-	ROM_LOAD( "t5.7h", 0x00000, 0x8000, CRC(868fd100) SHA1(00b09049c34865206d324fb329cee74f35dce7ea) )  // 1ST AND 2ND HALF IDENTICAL
-	ROM_LOAD( "t6.8h", 0x08000, 0x8000, CRC(f39ac672) SHA1(80f1b734e4321917778ce226348c31b19dc677c7) )  // 1ST AND 2ND HALF IDENTICAL
-	ROM_LOAD( "t7.9h", 0x10000, 0x8000, CRC(8b23b265) SHA1(3fc66ab5844d49e12e20f30deb6aa0d07cac3333) )  // 1ST AND 2ND HALF IDENTICAL
+	ROM_REGION( 0xc000, "gfx1", 0 )
+	ROM_LOAD( "t5.7h", 0x0000, 0x4000, CRC(868fd100) SHA1(00b09049c34865206d324fb329cee74f35dce7ea) )  // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE(                0x4000)
+	ROM_LOAD( "t6.8h", 0x4000, 0x4000, CRC(f39ac672) SHA1(80f1b734e4321917778ce226348c31b19dc677c7) )  // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE(                0x4000)
+	ROM_LOAD( "t7.9h", 0x8000, 0x4000, CRC(8b23b265) SHA1(3fc66ab5844d49e12e20f30deb6aa0d07cac3333) )  // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE(                0x4000)
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_LOAD( "t1.1h", 0x0000, 0x2000, CRC(be8b3c26) SHA1(369703a91f430af91083cde2bbec210fa355c4a7) )
@@ -15989,19 +16099,19 @@ ROM_START( ttactoe )
 	ROM_LOAD( "t3.4h", 0x4000, 0x2000, CRC(e2074f7f) SHA1(d2ccfd52372d37fd258d8544f0d53440b6b575f9) )
 	ROM_LOAD( "t4.5h", 0x6000, 0x2000, CRC(da56407d) SHA1(9a02c8b9d2489332ac64e8af5059bc6e7a1c9902) )
 
-	// PROMs were not included in this set
+	// PROMs are the same as lucky8 (W4), colors were compared against the real ingame pics.
 	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "u4.bin", 0x0000, 0x0100, NO_DUMP CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
-	ROM_LOAD( "u5.bin", 0x0100, 0x0100, NO_DUMP CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
+	ROM_LOAD( "u4.bin", 0x0000, 0x0100, CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
+	ROM_LOAD( "u5.bin", 0x0100, 0x0100, CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
 
 	ROM_REGION( 0x40, "proms2", 0 )
-	ROM_LOAD( "u2.bin", 0x0000, 0x0020, NO_DUMP CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+	ROM_LOAD( "u2.bin", 0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
 
 	ROM_REGION( 0x100, "unkprom", 0 )
-	ROM_LOAD( "u3.bin", 0x0000, 0x0100, NO_DUMP CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+	ROM_LOAD( "u3.bin", 0x0000, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
 
 	ROM_REGION( 0x20, "unkprom2", 0 )
-	ROM_LOAD( "u1.bin", 0x0000, 0x0020, NO_DUMP CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+	ROM_LOAD( "u1.bin", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
 ROM_END
 
 /*
@@ -23801,7 +23911,7 @@ GAME(  1995, wcat3,      0,        wcat3,    lucky8,   wingco_state,   init_wcat
 GAMEL( 199?, animalw,    0,        lucky8,   animalw,  wingco_state,   empty_init,     ROT0, "bootleg",           "Animal Wonders (ver A900)",                                MACHINE_NOT_WORKING,   layout_lucky8 )    // inputs / DIPs need to be checked
 GAMEL( 1989, cb2,        0,        lucky8,   lucky8,   wingco_state,   init_cb2,       ROT0, "Dyna",              "Cherry Bonus II (V2.00 06/01)",                            MACHINE_NOT_WORKING,   layout_lucky8 )    // I/O need to be checked, seems reasonably working
 GAMEL( 1990, cbaai,      0,        lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "bootleg (A.A.I.)",  "Cherry Bonus (A.A.I. bootleg)",                            MACHINE_NOT_WORKING,   layout_lucky8 )    // jumps to 0xf430 but there's nothing there?
-GAMEL( 199?, ttactoe,    0,        lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "bootleg (Sundance)","Tic Tac Toe (Sundance bootleg of New Lucky 8 Lines)",      MACHINE_NOT_WORKING,   layout_lucky8 )    // I/O need to be checked, seems reasonably working
+GAMEL( 199?, ttactoe,    0,        lucky8,   ttactoe,  wingco_state,   empty_init,     ROT0, "bootleg (Sundance)","Tic Tac Toe (Sundance bootleg of New Lucky 8 Lines)",      0,                     layout_lucky8 )    // needs more DSW figured out
 
 GAME(  1985, luckylad,   0,        luckylad, luckylad, wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "Lucky Lady (Wing, encrypted)",                             MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS )  // controls / dips, colors not correctly decoded
 
@@ -23932,7 +24042,7 @@ GAME( 1996, cherry96,    scmaster,  unkch,    unkch4,    unkch_state,    init_un
 GAME( 1998, rolling,     scmaster,  rolling,  unkch4,    unkch_state,    empty_init,     ROT0, "bootleg", "Rolling",                                                      MACHINE_NOT_WORKING ) // inputs, outputs
 
 // this has a 4th reel
-GAME( 200?, ss2001,      0,        ss2001,   cmaster,   cmaster_state,  empty_init,     ROT0, "bootleg", "Super Shanghai 2001",                                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // TODO: everything
+GAME( 200?, ss2001,      0,         ss2001,   cmaster,   cmaster_state,  empty_init,     ROT0, "bootleg", "Super Shanghai 2001",                                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // TODO: everything
 
 
 // ******************* Stealth sets *******************
