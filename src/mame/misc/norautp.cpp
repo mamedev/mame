@@ -852,9 +852,11 @@ public:
 	void noraut3(machine_config &config);
 	void cgidjp(machine_config &config);
 	void cdrawpkr(machine_config &config);
+	void krampcb4(machine_config &config);
 
 	void init_enc();
 	void init_unka();
+	void init_kram4();
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -900,7 +902,8 @@ private:
 	void norautxp_portmap(address_map &map) ATTR_COLD;
 	void nortest1_map(address_map &map) ATTR_COLD;
 	void ssjkrpkr_map(address_map &map) ATTR_COLD;
-	
+	void krampcb4_map(address_map &map) ATTR_COLD;
+
 	uint8_t nvram_r(offs_t offset);
 	void nvram_w(offs_t offset, uint8_t data);
 	void nvunlock_w(offs_t offset, uint8_t data);
@@ -938,6 +941,7 @@ void norautp_state::machine_start()
 	save_item(NAME(m_videoram));
 	save_item(NAME(m_nvunlock));
 }
+
 
 /*********************************************
 *               Video Hardware               *
@@ -1489,6 +1493,13 @@ void norautp_state::drhl_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x5000, 0x53ff).ram().share("nvram");
 	map(0x5400, 0x57ff).ram();
+}
+
+void norautp_state::krampcb4_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
+	map(0xa000, 0xa7ff).ram().share("nvram");
+//	map(0xff00, 0xffff).ram();
 }
 
 
@@ -2803,6 +2814,27 @@ void norautp_state::ssjkrpkr(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::ssjkrpkr_map);
 	m_maincpu->set_addrmap(AS_IO, &norautp_state::norautp_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
+
+	// sound hardware
+	m_discrete->set_intf(dphl_discrete);
+}
+
+void norautp_state::krampcb4(machine_config &config)
+{
+	noraut_base(config);
+
+	// basic machine hardware
+	I8080(config.replace(), m_maincpu, DPHL_CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &norautp_state::krampcb4_map);
+	m_maincpu->set_addrmap(AS_IO, &norautp_state::dphl_portmap);
+	m_maincpu->set_vblank_int("screen", FUNC(norautp_state::irq0_line_hold));
+	m_screen->set_screen_update(FUNC(norautp_state::screen_update_dphl));
+
+	PALETTE(config.replace(), "palette", FUNC(norautp_state::bp_based_palette), 256);
+
+	TIMER(config, "test_timer").configure_periodic(FUNC(norautp_state::test_timer_cb), attotime::from_usec(100));
+
+	m_display_line_control = true;
 
 	// sound hardware
 	m_discrete->set_intf(dphl_discrete);
@@ -6430,6 +6462,22 @@ void norautp_state::init_unka()
 }
 
 
+void norautp_state::init_kram4()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+	std::vector<uint8_t> buffer(0x4000);
+
+	memcpy(&buffer[0], rom, 0x4000);
+
+	for (int i = 0; i < 0x4000; i++)
+	{
+		if ((i & 0x03) == 0x01) rom[i] = buffer[i + 0x01];
+		if ((i & 0x03) == 0x02) rom[i] = buffer[i - 0x01];
+		rom[i] = bitswap<8>(rom[i], 7, 5, 6, 4, 3, 2, 1, 0);
+	}
+}
+
+
 /*********************************************
 *                Game Drivers                *
 *********************************************/
@@ -6509,9 +6557,9 @@ GAMEL( 198?, dphlunkb,  0,        dphl,      dphla,     norautp_state, empty_ini
 GAME(  1989, pokplus,   0,        dphlxtnd,  norautp,   norautp_state, empty_init, ROT0, "LJF Corporation",             "Poker Plus 6 Cards (set 1)",        MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )  // encriypted
 GAME(  1989, pokplusa,  pokplus,  dphlxtnd,  norautp,   norautp_state, empty_init, ROT0, "LJF Corporation",             "Poker Plus 6 Cards (set 2)",        MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )  // encriypted
 GAME(  1989, pokplusb,  pokplus,  dphlxtnd,  norautp,   norautp_state, empty_init, ROT0, "LJF Corporation",             "Poker Plus 6 Cards (set 3)",        MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )  // encriypted
-GAME(  198?, krampcb3,  0,        dphl,      dphl,      norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",     "unknown Kramer Poker (pcb3, encrypted)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )  // encriypted
-GAME(  198?, krampcb4,  0,        dphl,      dphl,      norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",     "unknown Kramer Poker (pcb4, encrypted)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )  // encriypted
-GAME(  198?, krampcb6,  0,        dphl,      dphl,      norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",     "unknown Kramer Poker (pcb6, encrypted)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )  // encriypted
+GAMEL( 198?, krampcb3,  0,        krampcb4,  dphl,      norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",     "unknown Kramer Poker (pcb3, encrypted)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_noraut10 )  // encriypted
+GAMEL( 198?, krampcb4,  0,        krampcb4,  dphl,      norautp_state, init_kram4, ROT0, "M.Kramer Manufacturing.",     "unknown Kramer Poker (pcb4, encrypted)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_noraut10 )  // encriypted
+GAMEL( 198?, krampcb6,  0,        krampcb4,  dphl,      norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",     "unknown Kramer Poker (pcb6, encrypted)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_noraut10 )  // encriypted
 
 
 // The following ones also have a custom 68705 MCU
