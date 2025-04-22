@@ -938,7 +938,7 @@ void linndrum_audio_device::update_volume_and_pan(int channel)
 			//   w = 1 / (R * (C1 + C2))
 			fc = 1.0F / (2 * float(M_PI) * r_voice_gnd * (C_CLICK_DCBLOCK + C_CLICK_WIPER));
 			gain = C_CLICK_DCBLOCK / (C_CLICK_DCBLOCK + C_CLICK_WIPER);
-			m_click_bpf->modify(filter_biquad_device::biquad_type::HIGHPASS1P, fc, 1, gain * CLICK_GAIN_CORRECTION);
+			m_click_bpf->modify(filter_biquad_device::biquad_type::HIGHPASS1P1Z, fc, 1, gain * CLICK_GAIN_CORRECTION);
 		}
 		else if (volume > 0)
 		{
