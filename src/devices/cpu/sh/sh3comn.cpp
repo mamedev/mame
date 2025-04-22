@@ -881,10 +881,10 @@ void sh3_base_device::irr0_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 	COMBINE_DATA(&m_irr0);
 	logerror("'%s' (%08x): INTC unmapped internal write %02x & %02x (IRR0)\n", tag(), m_sh2_state->pc, data, mem_mask);
 	//	not sure if this is how we should clear lines in this core...
-	if (!(data & 0x01000000)) execute_set_input(0, CLEAR_LINE);
-	if (!(data & 0x02000000)) execute_set_input(1, CLEAR_LINE);
-	if (!(data & 0x04000000)) execute_set_input(2, CLEAR_LINE);
-	if (!(data & 0x08000000)) execute_set_input(3, CLEAR_LINE);
+	if (!(data & 0x01)) execute_set_input(0, CLEAR_LINE);
+	if (!(data & 0x02)) execute_set_input(1, CLEAR_LINE);
+	if (!(data & 0x04)) execute_set_input(2, CLEAR_LINE);
+	if (!(data & 0x08)) execute_set_input(3, CLEAR_LINE);
 }
 
 uint8_t sh3_base_device::irr1_r(offs_t offset, uint8_t mem_mask)
