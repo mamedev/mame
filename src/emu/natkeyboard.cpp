@@ -35,6 +35,7 @@
 //**************************************************************************
 
 const u32 KEY_BUFFER_CHUNK_SIZE = 0x1000;
+const u32 KEY_BUFFER_MAX_SIZE = 0x800000;
 const char32_t INVALID_CHAR = '?';
 
 
@@ -829,6 +830,9 @@ void natural_keyboard::internal_post(char32_t ch)
 	m_buffer[m_bufend] = ch;
 	if ((m_bufend + 1) % m_buffer.size() == m_bufbegin)
 	{
+		if (m_buffer.size() >= KEY_BUFFER_MAX_SIZE)
+			return;
+
 		m_buffer.insert(m_buffer.begin() + m_bufbegin, KEY_BUFFER_CHUNK_SIZE, INVALID_CHAR);
 		m_bufbegin += KEY_BUFFER_CHUNK_SIZE;
 	}
