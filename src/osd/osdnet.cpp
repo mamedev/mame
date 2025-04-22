@@ -62,21 +62,8 @@ void osd_network_device::poll()
 {
 	uint8_t *buf;
 	int len;
-	//const char atalkmac[] = { 0x09, 0x00, 0x07, 0xff, 0xff, 0xff };
 	while(!m_stopped && (len = recv_dev(&buf)))
 	{
-#if 0
-		if(buf[0] & 1)
-		{
-			if(memcmp("\xff\xff\xff\xff\xff\xff", buf, 6) && memcmp(atalkmac, buf, 6) && !m_dev.mcast_chk(buf, len)) continue;
-		}
-		else {
-			//const unsigned char *ourmac = (const unsigned char *)get_mac();
-			//printf("our mac: %.2X:%.2X:%.2X:%.2X:%.2X:%.2X dst mac: %.2X:%.2X:%.2X:%.2X:%.2X:%.2X\n", ourmac[0], ourmac[1], ourmac[2], ourmac[3], ourmac[4], ourmac[5], buf[0], buf[1], buf[2], buf[3], buf[4], buf[5]);
-			if(memcmp(get_mac(), buf, 6) && !get_promisc()) continue;
-		}
-#endif
-
 		m_dev.recv_cb(buf, len);
 	}
 }
@@ -89,22 +76,4 @@ int osd_network_device::send(uint8_t *buf, int len)
 int osd_network_device::recv_dev(uint8_t **buf)
 {
 	return 0;
-}
-
-void osd_network_device::set_mac(const uint8_t *mac)
-{
-}
-
-void osd_network_device::set_promisc(bool promisc)
-{
-}
-
-bool osd_network_device::get_promisc()
-{
-	return m_dev.get_promisc();
-}
-
-const std::array<uint8_t, 6> &osd_network_device::get_mac()
-{
-	return m_dev.get_mac();
 }

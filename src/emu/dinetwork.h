@@ -18,7 +18,6 @@ public:
 	void interface_post_load() override ATTR_COLD;
 
 	void set_interface(int id) ATTR_COLD;
-	void set_promisc(bool promisc);
 	void set_mac(const u8 *mac);
 	void set_loopback(bool loopback);
 

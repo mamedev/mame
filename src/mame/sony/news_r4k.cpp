@@ -453,10 +453,6 @@ void news_r4k_state::machine_common(machine_config &config)
 	m_sonic->out_int_cb().set(m_sonic3, FUNC(cxd8452aq_device::irq_w));
 	m_sonic->set_bus(m_sonic3, 1);
 
-	// Use promiscuous mode to force network driver to accept all packets, since SONIC has its own filter (CAM table)
-	// Not sure if needing to use this means something else isn't set up correctly.
-	m_sonic->set_promisc(true);
-
 	// Unlike 68k and R3000 NEWS machines, the keyboard and mouse seem to share an interrupt
 	// See https://github.com/NetBSD/src/blob/trunk/sys/arch/newsmips/apbus/ms_ap.c#L103
 	// where the mouse interrupt handler is initialized using the Keyboard interrupt.

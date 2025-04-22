@@ -44,11 +44,6 @@ public:
 	void poll();
 
 	virtual int send(uint8_t *buf, int len);
-	virtual void set_mac(const uint8_t *mac);
-	virtual void set_promisc(bool promisc);
-
-	const std::array<uint8_t, 6> &get_mac();
-	bool get_promisc();
 
 protected:
 	virtual int recv_dev(uint8_t **buf);

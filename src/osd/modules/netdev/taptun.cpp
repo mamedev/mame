@@ -67,7 +67,6 @@ public:
 	~netdev_tap();
 
 	int send(uint8_t *buf, int len) override;
-	void set_mac(const uint8_t *mac) override;
 
 protected:
 	int recv_dev(uint8_t **buf) override;
@@ -81,7 +80,6 @@ private:
 	int m_fd = -1;
 	char m_ifname[10];
 #endif
-	char m_mac[6];
 	uint8_t m_buf[2048];
 };
 
@@ -142,11 +140,6 @@ netdev_tap::~netdev_tap()
 #else
 	close(m_fd);
 #endif
-}
-
-void netdev_tap::set_mac(const uint8_t *mac)
-{
-	memcpy(m_mac, mac, 6);
 }
 
 static u32 finalise_frame(u8 buf[], u32 length)
@@ -335,13 +328,9 @@ int netdev_tap::send(uint8_t *buf, int len)
 
 int netdev_tap::recv_dev(uint8_t **buf)
 {
-	int len;
 	if(m_fd == -1) return 0;
-	// exit if we didn't receive anything, got an error, got a broadcast or multicast packet,
-	// are in promiscuous mode or got a packet with our mac.
-	do {
-		len = read(m_fd, m_buf, sizeof(m_buf));
-	} while((len > 0) && memcmp(&get_mac()[0], m_buf, 6) && !get_promisc() && !(m_buf[0] & 1));
+
+	int len = read(m_fd, m_buf, sizeof(m_buf));
 
 	if (len > 0)
 		len = finalise_frame(m_buf, len);
