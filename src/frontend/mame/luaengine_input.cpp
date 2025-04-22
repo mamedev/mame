@@ -208,7 +208,6 @@ void lua_engine::initialize_input(sol::table &emu)
 	natkeyboard_type["paste"] = &natural_keyboard::paste;
 	natkeyboard_type["dump"] = static_cast<std::string (natural_keyboard::*)() const>(&natural_keyboard::dump);
 	natkeyboard_type["empty"] = sol::property(&natural_keyboard::empty);
-	natkeyboard_type["full"] = sol::property(&natural_keyboard::full);
 	natkeyboard_type["can_post"] = sol::property(&natural_keyboard::can_post);
 	natkeyboard_type["is_posting"] = sol::property(&natural_keyboard::is_posting);
 	natkeyboard_type["in_use"] = sol::property(&natural_keyboard::in_use, &natural_keyboard::set_in_use);
