@@ -133,18 +133,9 @@ TIMER_CALLBACK_MEMBER(device_network_interface::recv_complete)
 		start_net_device();
 }
 
-void device_network_interface::set_promisc(bool promisc)
-{
-	m_promisc = promisc;
-	if (m_dev)
-		m_dev->set_promisc(promisc);
-}
-
 void device_network_interface::set_mac(const u8 *mac)
 {
 	std::copy_n(mac, std::size(m_mac), std::begin(m_mac));
-	if (m_dev)
-		m_dev->set_mac(&m_mac[0]);
 }
 
 void device_network_interface::set_interface(int id)

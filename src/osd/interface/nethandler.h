@@ -33,12 +33,10 @@ public:
 	virtual void recv_cb(u8 *buf, int len) = 0;
 
 	std::array<u8, 6> const &get_mac() noexcept { return m_mac; }
-	bool get_promisc() noexcept { return m_promisc; }
 
 protected:
 	~network_handler() = default;
 
-	bool m_promisc;
 	std::array<u8, 6> m_mac;
 };
 
