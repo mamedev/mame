@@ -484,6 +484,20 @@ public:
 		m_map_control_ptr = map_control;
 		m_map_ptr = map;
 	}
+	
+	uint32_t get_D7()
+	{
+		return m68010_device::m_dar[7];
+	}
+
+	uint32_t get_A0()
+	{
+		return m68010_device::m_dar[8];
+	}
+	uint32_t get_A4()
+	{
+		return m68010_device::m_dar[12];
+	}
 
 };
 DECLARE_DEVICE_TYPE(M68010_TEKMMU, m68010_tekmmu_device)
@@ -713,6 +727,7 @@ void tek440x_state::machine_reset()
 
 	m_vint->in_w<0>(0);		// VBL enable
 	m_vint->in_w<1>(0);		// VBL
+	m_vint->in_w<2>(0);		// VBL
 
 	m_novram->recall(ASSERT_LINE);
 	m_novram->recall(CLEAR_LINE);
@@ -774,64 +789,154 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 	if (m_boot)
 		return m_prom[offset & 0x3fff];
 
-	if (!machine().side_effects_disabled())
-	{
-		if ((m_maincpu->get_fc() & 4) == 0)				// User mode access updates map_control from write latch
-		{
-				if ((m_latched_map_control & 0x1f) != (m_map_control & 0x1f))
-				{
-					LOGMASKED(LOG_MMU,"memory_r: m_map_control updated 0x%04x\n", m_latched_map_control);
-				}
-				m_map_control &= ~0x1f;
-				m_map_control |= (m_latched_map_control & 0x1f);
-		}
 
-		const offs_t offset0 = offset;
+if (OFF16_TO_OFF8(offset) == 0x7538)
+{
+	// AO contains function to be executed
+	uint32_t a0 = m_maincpu->get_A0();
+
+	if (a0 == 0x13820)
+	{
+		//LOG("tek4404: KERNEL:  DisplayState\n");
+	}
+	else
+	if (a0 == 0xba28)
+		LOG("tek4404: KERNEL:  TRAP 15\n");
+	else
+	if (a0 == 0x14c82)
+		LOG("tek4404: KERNEL:  CLOCK_alrm_resetting\n");
+	else
+	if (a0 == 0x10728)
+		LOG("tek4404: KERNEL:  screenOutput_buffer\n");
+	else
+	if (a0 == 0x1283e)
+		LOG("tek4404: KERNEL:  scsi_read_ncr5385_status\n");
+	else
+	if (a0 == 0x10ad0)
+		LOG("tek4404: KERNEL:  MMU_page_fault_stuff_possibly\n");
+	else
+	if (a0 == 0x106c0)
+		LOG("tek4404: KERNEL:  DUART keyboard reading\n");
+	else
+		LOG("tek4404: KERNEL:  UNKNOWN function 0x%x **************** \n", a0);
+
+}
+
+#if 0
+// TRAP 15 argument
+if (OFF16_TO_OFF8(offset) == 0xba3c)
+{
+	uint32_t a4 = m_maincpu->get_A4();
+
+	a4 = BIT(a4, 0, 11) | BIT(m_map[a4 >> 11], 0, 11) << 11;
+
+	LOG("tek4404: KERNEL:  TRAP 15  0x%x\n", m_vm->read16(OFF8_TO_OFF16(a4), mem_mask));
+}
+
+// debugging ncr5385 delays
+if (OFF16_TO_OFF8(offset) == 0x12620)
+	LOG("tek4404:  scsi_writing_block START\n");
+if (OFF16_TO_OFF8(offset) == 0x126c8)
+	LOG("tek4404:  scsi_writing_block END\n");
+
+if (OFF16_TO_OFF8(offset) == 0x12454)
+	LOG("tek4404: scsi_write block START\n");
+if (OFF16_TO_OFF8(offset) == 0x125ea)
+	LOG("tek4404: %10s: scsi block END\n", machine().time().as_string(8));
+#endif
+
+
+if (OFF16_TO_OFF8(offset) == 0x104b4)
+	LOG("tek4404: %10s: IRQ1_handler ********\n", machine().time().as_string(8));
+if (OFF16_TO_OFF8(offset) == 0x6009a)
+	LOG("tek4404: %10s: IRQ2_handler ********\n", machine().time().as_string(8));
+if (OFF16_TO_OFF8(offset) == 0x740a72)
+	LOG("tek4404: %10s: IRQ4_handler ********\n", machine().time().as_string(8));
+if (OFF16_TO_OFF8(offset) == 0x10642)
+	LOG("tek4404: %10s: IRQ5_handler ********\n", machine().time().as_string(8));
+//if (OFF16_TO_OFF8(offset) == 0x1330c)
+//	LOG("tek4404: %10s: IRQ6_handler ********\n", machine().time().as_string(8));
+if (OFF16_TO_OFF8(offset) == 0x743956)
+	LOG("tek4404: %10s: IRQ7_handler ********\n", machine().time().as_string(8));
+
+if (OFF16_TO_OFF8(offset) == 0x1062e)
+	LOG("tek4404: %10s: scsi_IRQ3_handler ********\n", machine().time().as_string(8));
+if (OFF16_TO_OFF8(offset) == 0x1283e)
+	LOG("tek4404: %10s: scsi_read_ncr5385_status\n", machine().time().as_string(8));
+if (OFF16_TO_OFF8(offset) == 0x127de)
+	LOG("tek4404: %10s: set_flags_handling_clear_pending\n", machine().time().as_string(8));
+if (OFF16_TO_OFF8(offset) == 0x1279a)
+	LOG("tek4404: %10s: scsi_wait_for_data_full_clear\n", machine().time().as_string(8));
+if (OFF16_TO_OFF8(offset) == 0x127f4)
+	LOG("tek4404: %10s: scsi_update_pending_flags\n", machine().time().as_string(8));
+
+if (OFF16_TO_OFF8(offset) == 0x12770)
+	LOG("tek4404: SCSI_wait_full\n");
+if (OFF16_TO_OFF8(offset) == 0x12746)
+	LOG("tek4404: SCSI_wait_empty\n");
+if (OFF16_TO_OFF8(offset) == 0x1279a)
+	LOG("tek4404: SCSI_wait_empty_with_interrupts\n");
+if (OFF16_TO_OFF8(offset) == 0x11f1e)
+	LOG("tek4404: scsi_wait_then_write\n");
+
+
+	if ((m_maincpu->get_fc() & 4) == 0)				// User mode access updates map_control from write latch
+	{
+			if ((m_latched_map_control & 0x1f) != (m_map_control & 0x1f))
+			{
+				LOGMASKED(LOG_MMU,"memory_r: m_map_control updated 0x%04x\n", m_latched_map_control);
+			}
+			m_map_control &= ~0x1f;
+			m_map_control |= (m_latched_map_control & 0x1f);
+	}
+
+	const offs_t offset0 = offset;
 
 #ifndef USE_MMU
-		if (!inbuserr)			// not in buserr interrupt
-		if ((m_maincpu->get_fc() & 4) == 0)			// only in User mode
-		if (BIT(m_map_control, MAP_VM_ENABLE) )
+	if (!inbuserr)			// not in buserr interrupt
+	if ((m_maincpu->get_fc() & 4) == 0)			// only in User mode
+	if (BIT(m_map_control, MAP_VM_ENABLE) )
+	{
+
+		// is !cpuWr
+		m_map_control &= ~(1 << MAP_CPU_WR);
+
+		// skip guards in debug reads
+		// selftest expects fail if page.pid != map_control.pid
+		if (!machine().side_effects_disabled() && BIT(m_map[offset >> 11], 11, 3) != (m_map_control & 7))
 		{
-
-			// is !cpuWr
-			m_map_control &= ~(1 << MAP_CPU_WR);
-
-			// selftest expects fail if page.pid != map_control.pid
-			if ( BIT(m_map[offset >> 11], 11, 3) != (m_map_control & 7))
-			{
-				m_map_control &= ~(1 << MAP_BLOCK_ACCESS);
+			m_map_control &= ~(1 << MAP_BLOCK_ACCESS);
 
 // FIXME: if this is a prefetch, it will be cancelled in src/devices/cpu/m68000/m68kcpu.h, but we've changed m_map_control..
 
-				inbuserr = 1;
+			inbuserr = 1;
 
-				LOGMASKED(LOG_MMU,"memory_r: %06x: bus error: PTE_PID(%d) != mapcntl_PID(%d) fc(%d) pc(%08x) berr(%d) map_control(%02x) latch(%02x)\n", offset<<1,
-					BIT(m_map[offset >> 11], 11, 3), (m_map_control & 7), m_maincpu->get_fc(), m_maincpu->pc(),
-					inbuserr, m_map_control, m_latched_map_control);
-				m_maincpu->set_buserror_details(OFF16_TO_OFF8(offset0), true, m_maincpu->get_fc(), true);
+			LOGMASKED(LOG_MMU,"memory_r: %06x: bus error: PTE_PID(%d) != mapcntl_PID(%d) fc(%d) pc(%08x) berr(%d) map_control(%02x) latch(%02x)\n", offset<<1,
+				BIT(m_map[offset >> 11], 11, 3), (m_map_control & 7), m_maincpu->get_fc(), m_maincpu->pc(),
+				inbuserr, m_map_control, m_latched_map_control);
+			m_maincpu->set_buserror_details(OFF16_TO_OFF8(offset0), true, m_maincpu->get_fc(), true);
 
-				mem_mask = 0;
-				return 0;
-		
-			}
-			else
-			{
-				m_map_control |= (1 << MAP_BLOCK_ACCESS);
-			}
-			
-			//LOG("memory_r: map %08x => paddr(%08x) fc(%d) pc(%08x)\n",OFF16_TO_OFF8(offset), OFF16_TO_OFF8(BIT(offset, 0, 11) | BIT(m_map[offset >> 11], 0, 11) << 11), m_maincpu->get_fc(), m_maincpu->pc());
-			
-			offset = BIT(offset, 0, 11) | BIT(m_map[offset >> 11], 0, 11) << 11;
+			mem_mask = 0;
+			return 0;
+	
 		}
+		else
+		{
+			m_map_control |= (1 << MAP_BLOCK_ACCESS);
+		}
+		
+		//LOG("memory_r: map %08x => paddr(%08x) fc(%d) pc(%08x)\n",OFF16_TO_OFF8(offset), OFF16_TO_OFF8(BIT(offset, 0, 11) | BIT(m_map[offset >> 11], 0, 11) << 11), m_maincpu->get_fc(), m_maincpu->pc());
+		
+		offset = BIT(offset, 0, 11) | BIT(m_map[offset >> 11], 0, 11) << 11;
+	}
 #endif
 
-		// NB byte memory limit, offset is *word* offset
-		if (offset >= OFF8_TO_OFF16(MAXRAM) && offset < OFF8_TO_OFF16(0x600000))
-		{
-			LOGMASKED(LOG_MMU,"memory_r: %08x bus error: NOMEM fc(%d) pc(%08x)\n",  OFF16_TO_OFF8(offset), m_maincpu->get_fc(), m_maincpu->pc());
-			m_maincpu->set_buserror_details(OFF16_TO_OFF8(offset0), true, m_maincpu->get_fc(), true);
-		}
+	// NB byte memory limit, offset is *word* offset
+	if (!machine().side_effects_disabled())
+	if (offset >= OFF8_TO_OFF16(MAXRAM) && offset < OFF8_TO_OFF16(0x600000))
+	{
+		LOGMASKED(LOG_MMU,"memory_r: %08x bus error: NOMEM fc(%d) pc(%08x)\n",  OFF16_TO_OFF8(offset), m_maincpu->get_fc(), m_maincpu->pc());
+		m_maincpu->set_buserror_details(OFF16_TO_OFF8(offset0), true, m_maincpu->get_fc(), true);
 	}
 
 	if (inbuserr && (m_maincpu->get_fc() & 4))
@@ -868,7 +973,7 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 			m_map_control |= (1 << MAP_CPU_WR);
 				
 		// matching pid?
-		if ( (BIT(m_map[offset >> 11], 11, 3) != (m_map_control & 7)))
+		if (!machine().side_effects_disabled() && (BIT(m_map[offset >> 11], 11, 3) != (m_map_control & 7)))
 		{
 			if (!inbuserr)
 			{
@@ -890,6 +995,7 @@ void tek440x_state::memory_w(offs_t offset, u16 data, u16 mem_mask)
 			mem_mask = 0;	// disable write
 
 		// write-enabled page?
+		if (!machine().side_effects_disabled())
 		if (mem_mask)
 		if (BIT(m_map[offset >> 11], 14) == 0)
 		{
@@ -1162,9 +1268,10 @@ void tek440x_state::videocntl_w(u8 data)
 	}
 
 	m_vint->in_w<0>(BIT(data, 6));
-	
-  if (BIT(m_videocntl ^ data, 6) && !BIT(data, 6))
-			m_vint->in_w<2>(0);
+
+	// VBenable was ON, now OFF
+	if (BIT(m_videocntl ^ data, 6) && !BIT(data, 6))
+		m_vint->in_w<2>(0);
 
 	m_videocntl = data;
 }
@@ -1344,7 +1451,7 @@ void tek440x_state::irq1_raise(int state)
 	
 	if (state == 0)
 	{
-		LOG("M68K_IRQ_1 assert\n");
+		//LOG("M68K_IRQ_1 assert\n");
 		m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
 
 		m_u244latch = 1;
@@ -1358,7 +1465,7 @@ u16 tek440x_state::timer_r(offs_t offset)
 
 	if (m_u244latch)
 	{
-		LOG("timer_r: M68K_IRQ_1 clear\n");
+		//LOG("timer_r: M68K_IRQ_1 clear\n");
 		m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 		m_u244latch = 0;
 	}
@@ -1613,7 +1720,7 @@ void tek440x_state::tek4404(machine_config &config)
 
 	I8255A(config, m_printer);
 	m_printer->in_pb_callback().set_constant(0x30);
-m_printer->in_pb_callback().set_constant(0xbf);		// HACK:  vblank always checks if printer status < 0
+m_printer->in_pb_callback().set_constant(0xb0);		// HACK:  vblank always checks if printer status < 0
 	m_printer->out_pc_callback().set(FUNC(tek440x_state::printer_pc_w));
 
 	NS32081(config, m_fpu, 20_MHz_XTAL / 2);
