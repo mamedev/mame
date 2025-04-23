@@ -150,7 +150,7 @@ PLATFORM := x86
 else ifeq ($(MSYSTEM),CLANGARM64)
 PLATFORM := arm64
 else # MSYSTEM
-OSARCH := $(shell reg query "HKLM\System\CurrentControlSet\Control\Session Manager\Environment" /v PROCESSOR_ARCHITECTURE)
+OSARCH := $(shell reg query "HKLM\System\CurrentControlSet\Control\Session Manager\Environment" -v PROCESSOR_ARCHITECTURE)
 ifneq ($(findstring ARM64,$(OSARCH)),)
 PLATFORM := arm64
 else # OSARCH
