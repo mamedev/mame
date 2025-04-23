@@ -92,8 +92,8 @@ void pc9801_86_device::pc9801_86_config(machine_config &config)
 		m_joy_sel = data;
 	});
 	// TODO: confirm mixing
-	m_opna->add_route(0, "lspeaker", 0.25);
-	m_opna->add_route(0, "rspeaker", 0.25);
+	m_opna->add_route(0, "lspeaker", 0.75);
+	m_opna->add_route(0, "rspeaker", 0.75);
 	m_opna->add_route(1, "lspeaker", 1.00);
 	m_opna->add_route(2, "rspeaker", 1.00);
 

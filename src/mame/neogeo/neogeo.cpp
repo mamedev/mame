@@ -1971,8 +1971,8 @@ void neogeo_base_state::neogeo_stereo(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	m_ym->add_route(0, "lspeaker", 0.28);
-	m_ym->add_route(0, "rspeaker", 0.28);
+	m_ym->add_route(0, "lspeaker", 0.84);
+	m_ym->add_route(0, "rspeaker", 0.84);
 	m_ym->add_route(1, "lspeaker", 0.98);
 	m_ym->add_route(2, "rspeaker", 0.98);
 }
@@ -2009,7 +2009,7 @@ void ngarcade_base_state::neogeo_mono(machine_config &config)
 {
 	SPEAKER(config, "speaker").front_center();
 
-	m_ym->add_route(0, "speaker", 0.28);
+	m_ym->add_route(0, "speaker", 0.84);
 	m_ym->add_route(1, "speaker", 0.49);
 	m_ym->add_route(2, "speaker", 0.49);
 }

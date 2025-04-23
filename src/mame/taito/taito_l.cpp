@@ -1356,7 +1356,7 @@ void taitol_2cpu_state::raimais(machine_config &config)
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8_MHz_XTAL)); /* verified on pcb (8Mhz OSC is also for the 2nd z80) */
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
-	ymsnd.add_route(0, "mono", 0.25);
+	ymsnd.add_route(0, "mono", 0.75);
 	ymsnd.add_route(1, "mono", 1.0);
 	ymsnd.add_route(2, "mono", 1.0);
 

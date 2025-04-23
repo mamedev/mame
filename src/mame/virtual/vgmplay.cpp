@@ -3726,15 +3726,15 @@ void vgmplay_state::vgmplay(machine_config &config)
 	// TODO: prevent error.log spew
 	YM2608(config, m_ym2608[0], 0);
 	m_ym2608[0]->set_addrmap(0, &vgmplay_state::ym2608_map<0>);
-	m_ym2608[0]->add_route(0, m_mixer, 0.25, AUTO_ALLOC_INPUT, 0);
-	m_ym2608[0]->add_route(0, m_mixer, 0.25, AUTO_ALLOC_INPUT, 1);
+	m_ym2608[0]->add_route(0, m_mixer, 0.75, AUTO_ALLOC_INPUT, 0);
+	m_ym2608[0]->add_route(0, m_mixer, 0.75, AUTO_ALLOC_INPUT, 1);
 	m_ym2608[0]->add_route(1, m_mixer, 1.00, AUTO_ALLOC_INPUT, 0);
 	m_ym2608[0]->add_route(2, m_mixer, 1.00, AUTO_ALLOC_INPUT, 1);
 
 	YM2608(config, m_ym2608[1], 0);
 	m_ym2608[1]->set_addrmap(0, &vgmplay_state::ym2608_map<1>);
-	m_ym2608[1]->add_route(0, m_mixer, 0.25, AUTO_ALLOC_INPUT, 0);
-	m_ym2608[1]->add_route(0, m_mixer, 0.25, AUTO_ALLOC_INPUT, 1);
+	m_ym2608[1]->add_route(0, m_mixer, 0.75, AUTO_ALLOC_INPUT, 0);
+	m_ym2608[1]->add_route(0, m_mixer, 0.75, AUTO_ALLOC_INPUT, 1);
 	m_ym2608[1]->add_route(1, m_mixer, 1.00, AUTO_ALLOC_INPUT, 0);
 	m_ym2608[1]->add_route(2, m_mixer, 1.00, AUTO_ALLOC_INPUT, 1);
 
@@ -3742,16 +3742,16 @@ void vgmplay_state::vgmplay(machine_config &config)
 	YM2610(config, m_ym2610[0], 0);
 	m_ym2610[0]->set_addrmap(0, &vgmplay_state::ym2610_adpcm_a_map<0>);
 	m_ym2610[0]->set_addrmap(1, &vgmplay_state::ym2610_adpcm_b_map<0>);
-	m_ym2610[0]->add_route(0, m_mixer, 0.25, AUTO_ALLOC_INPUT, 0);
-	m_ym2610[0]->add_route(0, m_mixer, 0.25, AUTO_ALLOC_INPUT, 1);
+	m_ym2610[0]->add_route(0, m_mixer, 0.75, AUTO_ALLOC_INPUT, 0);
+	m_ym2610[0]->add_route(0, m_mixer, 0.75, AUTO_ALLOC_INPUT, 1);
 	m_ym2610[0]->add_route(1, m_mixer, 0.50, AUTO_ALLOC_INPUT, 0);
 	m_ym2610[0]->add_route(2, m_mixer, 0.50, AUTO_ALLOC_INPUT, 1);
 
 	YM2610(config, m_ym2610[1], 0);
 	m_ym2610[1]->set_addrmap(0, &vgmplay_state::ym2610_adpcm_a_map<1>);
 	m_ym2610[1]->set_addrmap(1, &vgmplay_state::ym2610_adpcm_b_map<1>);
-	m_ym2610[1]->add_route(0, m_mixer, 0.25, AUTO_ALLOC_INPUT, 0);
-	m_ym2610[1]->add_route(0, m_mixer, 0.25, AUTO_ALLOC_INPUT, 1);
+	m_ym2610[1]->add_route(0, m_mixer, 0.75, AUTO_ALLOC_INPUT, 0);
+	m_ym2610[1]->add_route(0, m_mixer, 0.75, AUTO_ALLOC_INPUT, 1);
 	m_ym2610[1]->add_route(1, m_mixer, 0.50, AUTO_ALLOC_INPUT, 0);
 	m_ym2610[1]->add_route(2, m_mixer, 0.50, AUTO_ALLOC_INPUT, 1);
 

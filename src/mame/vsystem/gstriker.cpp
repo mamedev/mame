@@ -676,8 +676,8 @@ void gstriker_state::base(machine_config &config)
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8_MHz_XTAL));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(0, "lspeaker", 0.75);
+	ymsnd.add_route(0, "rspeaker", 0.75);
 	ymsnd.add_route(1, "lspeaker", 1.0);
 	ymsnd.add_route(2, "rspeaker", 1.0);
 }

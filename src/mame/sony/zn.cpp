@@ -966,8 +966,8 @@ public:
 
 		YM2610B(config, m_ym2610b, 16_MHz_XTAL / 2);
 		m_ym2610b->irq_handler().set_inputline(m_audiocpu, 0);
-		m_ym2610b->add_route(0, m_speaker[0], 0.25);
-		m_ym2610b->add_route(0, m_speaker[1], 0.25);
+		m_ym2610b->add_route(0, m_speaker[0], 0.75);
+		m_ym2610b->add_route(0, m_speaker[1], 0.75);
 		m_ym2610b->add_route(1, m_speaker[0], 1.0);
 		m_ym2610b->add_route(2, m_speaker[1], 1.0);
 
