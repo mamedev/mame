@@ -150,6 +150,10 @@ PLATFORM := x86
 else ifeq ($(MSYSTEM),CLANGARM64)
 PLATFORM := arm64
 else # MSYSTEM
+
+# Get system processor architecture. Note that PROCESSOR_ARCHITECTURE local
+# environment variable is for the currently running process, so we go through
+# the registry instead.
 OSARCH := $(shell reg query "HKLM\System\CurrentControlSet\Control\Session Manager\Environment" -v PROCESSOR_ARCHITECTURE)
 ifneq ($(findstring ARM64,$(OSARCH)),)
 PLATFORM := arm64
@@ -327,8 +331,6 @@ else # windows
 UNAME    := $(shell uname -mps)
 TARGETOS := $(OS)
 
-ARCHITECTURE := _x86
-
 ifeq ($(firstword $(filter x86_64,$(UNAME))),x86_64)
 ARCHITECTURE := _x64
 else ifeq ($(firstword $(filter amd64,$(UNAME))),amd64)
@@ -341,6 +343,8 @@ else ifeq ($(firstword $(filter powerpc64,$(UNAME))),powerpc64)
 ARCHITECTURE := _x64
 else ifeq ($(firstword $(filter s390x,$(UNAME))),s390x)
 ARCHITECTURE := _x64
+else
+ARCHITECTURE := _x86
 endif
 
 endif # windows
