@@ -38,24 +38,30 @@ TODO:
 
 #define QUEUE_SIZE 32768
 
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
 
-// device type definition
 DEFINE_DEVICE_TYPE(PC9801_86, pc9801_86_device, "pc9801_86", "NEC PC-9801-86")
+DEFINE_DEVICE_TYPE(PC9801_SPEAKBOARD, pc9801_speakboard_device, "pc9801_spb", "NEC PC-9801 SpeakBoard")
+DEFINE_DEVICE_TYPE(OTOMICHAN_KAI, otomichan_kai_device, "pc98_otomichan_kai", "MAD Factory Otomi-chan Kai") // 音美(おとみ)ちゃん改
 
-// only for derived designs?
-void pc9801_86_device::opna_map(address_map &map)
+pc9801_86_device::pc9801_86_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, m_bus(*this, DEVICE_SELF_OWNER)
+	, m_opna(*this, "opna")
+	, m_irqs(*this, "irqs")
+	, m_ldac(*this, "ldac")
+	, m_rdac(*this, "rdac")
+	, m_queue(QUEUE_SIZE)
+	, m_joy(*this, "joy_port")
 {
-	// TODO: confirm it really is ROMless
-	// TODO: confirm size
-	map(0x000000, 0x1fffff).ram();
 }
 
-//-------------------------------------------------
-//  device_add_mconfig - add device configuration
-//-------------------------------------------------
+pc9801_86_device::pc9801_86_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pc9801_86_device(mconfig, PC9801_86, tag, owner, clock)
+{
+
+}
+
+
 
 void pc9801_86_device::pc9801_86_config(machine_config &config)
 {
@@ -76,17 +82,26 @@ void pc9801_86_device::pc9801_86_config(machine_config &config)
 	// shouldn't have one
 //  m_opna->set_addrmap(0, &pc9801_86_device::opna_map);
 	m_opna->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
-	m_opna->port_a_read_callback().set(FUNC(pc9801_86_device::opn_porta_r));
-	//m_opna->port_b_read_callback().set(FUNC(pc8801_state::opn_portb_r));
-	//m_opna->port_a_write_callback().set(FUNC(pc8801_state::opn_porta_w));
-	m_opna->port_b_write_callback().set(FUNC(pc9801_86_device::opn_portb_w));
-	m_opna->add_route(0, "lspeaker", 1.00);
-	m_opna->add_route(0, "rspeaker", 1.00);
+	m_opna->port_a_read_callback().set([this] () {
+		if((m_joy_sel & 0xc0) == 0x80)
+			return m_joy->read();
+
+		return (u8)0xff;
+	});
+	m_opna->port_b_write_callback().set([this] (u8 data) {
+		m_joy_sel = data;
+	});
+	// TODO: confirm mixing
+	m_opna->add_route(0, "lspeaker", 0.25);
+	m_opna->add_route(0, "rspeaker", 0.25);
 	m_opna->add_route(1, "lspeaker", 1.00);
 	m_opna->add_route(2, "rspeaker", 1.00);
 
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // burr brown pcm61p
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // burr brown pcm61p
+
+	// NOTE: 1 DE-9 port only
+	MSX_GENERAL_PURPOSE_PORT(config, m_joy, msx_general_purpose_port_devices, "joystick");
 }
 
 void pc9801_86_device::device_add_mconfig(machine_config &config)
@@ -98,8 +113,8 @@ void pc9801_86_device::device_add_mconfig(machine_config &config)
 void pc9801_86_device::opna_reset_routes_config(machine_config &config)
 {
 	m_opna->reset_routes();
-	m_opna->add_route(0, "lspeaker", 0.50);
-	m_opna->add_route(0, "rspeaker", 0.50);
+	m_opna->add_route(0, "lspeaker", 0.125);
+	m_opna->add_route(0, "rspeaker", 0.125);
 	m_opna->add_route(1, "lspeaker", 0.50);
 	m_opna->add_route(2, "rspeaker", 0.50);
 }
@@ -131,8 +146,6 @@ const tiny_rom_entry *pc9801_86_device::device_rom_region() const
 //-------------------------------------------------
 
 static INPUT_PORTS_START( pc9801_86 )
-	PORT_INCLUDE( pc9801_joy_port )
-
 	// Single 8-bit DSW bank
 	PORT_START("OPNA_DSW")
 	PORT_DIPNAME( 0x01, 0x00, "PC-9801-86: Port Base" ) PORT_DIPLOCATION("OPNA_SW:!1")
@@ -166,29 +179,12 @@ ioport_constructor pc9801_86_device::device_input_ports() const
 	return INPUT_PORTS_NAME( pc9801_86 );
 }
 
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  pc9801_86_device - constructor
-//-------------------------------------------------
-
-pc9801_86_device::pc9801_86_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: pc9801_snd_device(mconfig, type, tag, owner, clock)
-	, m_bus(*this, DEVICE_SELF_OWNER)
-	, m_opna(*this, "opna")
-	, m_irqs(*this, "irqs")
-	, m_ldac(*this, "ldac")
-	, m_rdac(*this, "rdac")
-	, m_queue(QUEUE_SIZE)
+// only for derived designs?
+void pc9801_86_device::opna_map(address_map &map)
 {
-}
-
-pc9801_86_device::pc9801_86_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pc9801_86_device(mconfig, PC9801_86, tag, owner, clock)
-{
-
+	// TODO: confirm it really is ROMless
+	// TODO: confirm size
+	map(0x000000, 0x1fffff).ram();
 }
 
 //-------------------------------------------------
@@ -204,10 +200,6 @@ u16 pc9801_86_device::read_io_base()
 {
 	return ((ioport("OPNA_DSW")->read() & 1) << 8) + 0x188;
 }
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
 
 void pc9801_86_device::device_start()
 {
@@ -238,11 +230,6 @@ void pc9801_86_device::device_start()
 	save_item(NAME(m_queue));
 	save_item(NAME(m_irq_rate));
 }
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
 
 void pc9801_86_device::device_reset()
 {
@@ -499,8 +486,6 @@ TIMER_CALLBACK_MEMBER(pc9801_86_device::dac_tick)
 //
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(PC9801_SPEAKBOARD, pc9801_speakboard_device, "pc9801_spb", "NEC PC-9801 SpeakBoard")
-
 ROM_START( pc9801_spb )
 	ROM_REGION( 0x4000, "sound_bios", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "spb lh5764 ic21_pink.bin",    0x0001, 0x2000, CRC(5bcefa1f) SHA1(ae88e45d411bf5de1cb42689b12b6fca0146c586) )
@@ -569,8 +554,6 @@ void pc9801_speakboard_device::opna_slave_w(offs_t offset, u8 data)
 //  Otomi-chan Kai device section
 //
 //**************************************************************************
-
-DEFINE_DEVICE_TYPE(OTOMICHAN_KAI, otomichan_kai_device, "pc98_otomichan_kai", "MAD Factory Otomi-chan Kai") // 音美(おとみ)ちゃん改
 
 otomichan_kai_device::otomichan_kai_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pc9801_86_device(mconfig, OTOMICHAN_KAI, tag, owner, clock)

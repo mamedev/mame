@@ -2,14 +2,14 @@
 // copyright-holders:Angelo Salese
 /**************************************************************************************************
 
-    NEC PC-9801-26 sound card
+NEC PC-9801-26 sound card
 
-    Legacy sound card for PC-98xx family, composed by a single YM2203
+Legacy sound card for PC-98xx family, composed by a single YM2203
 
-    TODO:
-    - verify sound irq;
-    - understand if dips can be read by SW;
-    - configurable irq level needs a binding flush in C-bus handling;
+TODO:
+- DE-9 output writes (cfr. page 419 of PC-9801 Bible, needs software testing the functionality)
+- understand if dips can be read by SW;
+- configurable irq level needs a binding flush in C-bus handling;
 
 **************************************************************************************************/
 
@@ -25,27 +25,31 @@
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(PC9801_26, pc9801_26_device, "pc9801_26", "NEC PC-9801-26")
+DEFINE_DEVICE_TYPE(PC9801_26, pc9801_26_device, "pc9801_26", "NEC PC-9801-26/K")
 
-void pc9801_26_device::sound_irq(int state)
+pc9801_26_device::pc9801_26_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, PC9801_26, tag, owner, clock)
+	, m_bus(*this, DEVICE_SELF_OWNER)
+	, m_opn(*this, "opn")
+	, m_joy(*this, "joy_p%u", 1U)
 {
-	m_bus->int_w<5>(state);
 }
-
-
-//-------------------------------------------------
-//  device_add_mconfig - add device configuration
-//-------------------------------------------------
 
 void pc9801_26_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 	YM2203(config, m_opn, 15.9744_MHz_XTAL / 4); // divider not verified
-	m_opn->irq_handler().set(FUNC(pc9801_26_device::sound_irq));
-	m_opn->port_a_read_callback().set(FUNC(pc9801_26_device::opn_porta_r));
-	//m_opn->port_b_read_callback().set(FUNC(pc8801_state::opn_portb_r));
-	//m_opn->port_a_write_callback().set(FUNC(pc8801_state::opn_porta_w));
-	m_opn->port_b_write_callback().set(FUNC(pc9801_26_device::opn_portb_w));
+	m_opn->irq_handler().set([this] (int state) { m_bus->int_w<5>(state); });
+	m_opn->port_a_read_callback().set([this] () {
+		if(BIT(m_joy_sel, 7))
+			return m_joy[BIT(m_joy_sel, 6)]->read();
+
+		return (u8)0xff;
+	});
+	m_opn->port_b_write_callback().set([this] (u8 data) {
+		m_joy_sel = data;
+	});
+
 	// TODO: verify mixing on HW
 	// emerald stage 1 BGM uses ch. 3 for bassline, which sounds way more prominent
 	// than the others combined (0.25 1/4 ratio even?)
@@ -53,6 +57,9 @@ void pc9801_26_device::device_add_mconfig(machine_config &config)
 	m_opn->add_route(1, "mono", 0.50);
 	m_opn->add_route(2, "mono", 0.50);
 	m_opn->add_route(3, "mono", 1.00);
+
+	MSX_GENERAL_PURPOSE_PORT(config, m_joy[0], msx_general_purpose_port_devices, "joystick");
+	MSX_GENERAL_PURPOSE_PORT(config, m_joy[1], msx_general_purpose_port_devices, "joystick");
 }
 
 // to load a different bios for slots:
@@ -77,13 +84,7 @@ const tiny_rom_entry *pc9801_26_device::device_rom_region() const
 	return ROM_NAME( pc9801_26 );
 }
 
-//-------------------------------------------------
-//  input_ports - device-specific input ports
-//-------------------------------------------------
-
 static INPUT_PORTS_START( pc9801_26 )
-	PORT_INCLUDE( pc9801_joy_port )
-
 	// On-board jumpers
 	// TODO: any way to actually read these from HW?
 	PORT_START("OPN_JP6A1_JP6A3")
@@ -112,35 +113,6 @@ ioport_constructor pc9801_26_device::device_input_ports() const
 	return INPUT_PORTS_NAME( pc9801_26 );
 }
 
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  pc9801_26_device - constructor
-//-------------------------------------------------
-
-pc9801_26_device::pc9801_26_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pc9801_snd_device(mconfig, PC9801_26, tag, owner, clock)
-	, m_bus(*this, DEVICE_SELF_OWNER)
-	, m_opn(*this, "opn")
-{
-}
-
-
-//-------------------------------------------------
-//  device_validity_check - perform validity checks
-//  on this device
-//-------------------------------------------------
-
-void pc9801_26_device::device_validity_check(validity_checker &valid) const
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
 u16 pc9801_26_device::read_io_base()
 {
 	return ((ioport("OPN_JP6A4")->read() & 1) << 8) + 0x0088;
@@ -150,12 +122,9 @@ void pc9801_26_device::device_start()
 {
 	m_rom_base = 0;
 	m_io_base = 0;
+
+	save_item(NAME(m_joy_sel));
 }
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
 
 void pc9801_26_device::device_reset()
 {
@@ -201,6 +170,10 @@ void pc9801_26_device::device_reset()
 	// install IRQ line
 //  static const u8 irq_levels[4] = {0, 4, 5, 6};
 //  m_irq_level = irq_levels[ioport("OPN_JP6A1_JP6A3")->read() & 3];
+}
+
+void pc9801_26_device::device_validity_check(validity_checker &valid) const
+{
 }
 
 
