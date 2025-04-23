@@ -1396,7 +1396,7 @@ project "bimg"
 		"BX_CONFIG_DEBUG=0",
 	}
 
-	if not string.find(_OPTIONS["gcc"], "clang") then
+	if _OPTIONS["gcc"]~=nil and not string.find(_OPTIONS["gcc"], "clang") then
 		-- This is a gross hack.  For some reason GitHub Actions MinGW GCC seems to define SSE feature macros for features that are not enabled.
 		local archopts = (_OPTIONS["ARCHOPTS"] or "") .. " " .. (_OPTIONS["ARCHOPTS_CXX"] or "")
 		local ssever = "20"
