@@ -43,6 +43,10 @@ private:
 	void c0060000_unk_w(uint32_t data);
 	uint32_t c008000c_unk_r() { return machine().rand(); }
 	uint32_t d000003c_unk_r() { return 0xffffffff; }
+
+	int m_copybase;
+	int m_copylength;
+	int m_copydest;
 };
 
 
@@ -50,7 +54,7 @@ void generalplus_gp327902_game_state::c0060000_unk_w(uint32_t data)
 {
 	/*
 
-	this is some kind of debug serial output, it currently outputs the following sequence
+	this is some kind of debug serial output, it currently outputs (if copy_lowest_block is set to false) the following sequence
 
 	adc_init
 	DAC Task Create[0]
@@ -62,8 +66,14 @@ void generalplus_gp327902_game_state::c0060000_unk_w(uint32_t data)
 	audio_init()
 	watch-dog enable
 	power on
+
+	with copy_lowest_block as true you get
+
+	GP DV BootLoader v2.2 Entry @ 0 MHz
+	GPDV  chip detect
+
 	*/
-//	printf("%c", data & 0xff);
+	//printf("%c", data & 0xff);
 }
 
 void generalplus_gp327902_game_state::arm_map(address_map &map)
@@ -75,7 +85,7 @@ void generalplus_gp327902_game_state::arm_map(address_map &map)
 	map(0xc008000c, 0xc008000f).r(FUNC(generalplus_gp327902_game_state::c008000c_unk_r));
 	map(0xd000003c, 0xd000003f).r(FUNC(generalplus_gp327902_game_state::d000003c_unk_r));
 
-	map(0xf8000000, 0xf8000017).ram(); // writes pointers used by exceptions (including IRQs) here
+	map(0xf8000000, 0xf80003ff).ram(); // writes pointers used by exceptions (including IRQs) here
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( generalplus_gp327902_game_state::timer )
@@ -94,6 +104,17 @@ void generalplus_gp327902_game_state::machine_start()
 
 void generalplus_gp327902_game_state::machine_reset()
 {
+	// perform some kind of bootstrap likely done by an internal ROM
+	uint8_t* spirom = memregion("spi")->base();
+	address_space& mem = m_maincpu->space(AS_PROGRAM);
+
+	for (int i = 0; i < m_copylength / 2; i++)
+	{
+		uint16_t word = spirom[m_copybase + (i * 2) + 0] | (spirom[m_copybase + (i * 2) + 1] << 8);
+		mem.write_word(m_copydest + (i * 2), word);
+	}
+
+	m_maincpu->set_state_int(arm7_cpu_device::ARM7_R15, m_copydest);
 }
 
 static INPUT_PORTS_START( gp327902 )
@@ -118,15 +139,22 @@ void generalplus_gp327902_game_state::gp327902(machine_config &config)
 
 void generalplus_gp327902_game_state::init_spi()
 {
-	// perform some kind of bootstrap likely done by an internal ROM
-	uint8_t* spirom = memregion("spi")->base();
-	address_space& mem = m_maincpu->space(AS_PROGRAM);
+	const bool copy_lowest_block = true; // change this to true to copy a later part of the bootstrap sequence on sanpetx?
 
-	int copybase = 0x16000; // there are also programs at 0x800 and 0x3400
-	for (int i = 0; i < 0x200000 / 2; i++)
+	// these likely come from the header at the start of the ROM
+	if (copy_lowest_block)
 	{
-		uint16_t word = spirom[copybase + (i * 2) + 0] | (spirom[copybase + (i * 2) + 1] << 8);
-		mem.write_word(i * 2, word);
+		// all dumped sets have a block here
+		m_copybase = 0x800;
+		m_copydest = 0x1f8000;
+		m_copylength = 0x2800;
+	}
+	else
+	{
+		// sanxpet has the main block here, which is likely copied to RAM by previous parts of the bootloader above
+		m_copybase = 0x16000;
+		m_copydest = 0x0;
+		m_copylength = 0x200000;
 	}
 }
 
