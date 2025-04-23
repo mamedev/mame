@@ -21,7 +21,7 @@
 // before the setup has been executed and IRQ handler fails to process the interrupt. => HANGS
 // A correctly functioning call sequence looks like this:
 
-// set_flags_handling_clear_pending
+// SCSI_wait
 // scsi_update_pending_flags
 // IRQ3_handler_scsi
 // scsi_read_ncr5385_status
@@ -30,11 +30,17 @@
 
 // IRQ3_handler_scsi
 // scsi_read_ncr5385_status
-// set_flags_handling_clear_pending
+// SCSI_wait
 // scsi_update_pending_flags
 
-// 5us
-unsigned constexpr TEK4404_XFI_OUT_ACK_DELAY = 10'000;
+// scsi write code is ~90 cycles / loop
+
+// then ~240 cycles before setting SR |= 0700
+
+// IRQ6 occasionally arrives between end of scsi write code and getting IRQ3.  unclear why it isn't masked out.
+
+// 40us
+unsigned constexpr TEK4404_XFI_OUT_ACK_DELAY = 80'000;
 
 
 #include "emu.h"
@@ -186,6 +192,12 @@ void ncr5385_device::device_reset()
 	update_int();
 }
 
+attotime ncr5385_device::scsi_data_byte_period()
+{
+//	return attotime::zero;
+	return attotime::from_nsec(200);
+}
+
 void ncr5385_device::scsi_ctrl_changed()
 {
 	u32 const ctrl = scsi_bus->ctrl_r();
@@ -201,7 +213,7 @@ void ncr5385_device::scsi_ctrl_changed()
 				ctrl & S_REQ ? " REQ" : "", ctrl & S_ACK ? " ACK" : "");
 
 		if (m_state != IDLE)
-			m_state_timer->adjust(attotime::from_usec(40));
+			m_state_timer->adjust(attotime::from_usec(80));
 	}
 	else
 	{
@@ -674,7 +686,7 @@ int ncr5385_device::state_step()
 			}
 			else
 			{
-				LOGMASKED(LOG_STATE, "xfi_in: %s\n", remaining() ? "phase change" : "transfer complete");
+				//LOGMASKED(LOG_STATE, "xfi_in: %s\n", remaining() ? "phase change" : "transfer complete");
 
 				m_int_status |= INT_BUS_SERVICE;
 				m_state = IDLE;
@@ -688,7 +700,7 @@ int ncr5385_device::state_step()
 	case XFI_IN_DRQ:
 		m_state = XFI_IN_ACK;
 
-		LOGMASKED(LOG_STATE, "%10s: xfi_in: data 0x%02x\n", machine().time().as_string(8), m_dat);
+		//LOGMASKED(LOG_STATE, "%10s: xfi_in: data 0x%02x\n", machine().time().as_string(8), m_dat);
 
 		// assert ACK
 		scsi_bus->ctrl_w(scsi_refid, S_ACK, S_ACK);
@@ -702,7 +714,7 @@ int ncr5385_device::state_step()
 			{
 				m_cnt--;
 
-				LOGMASKED(LOG_STATE, "%10s: xfi_in: %d remaining\n", machine().time().as_string(8), m_cnt);
+				//LOGMASKED(LOG_STATE, "%10s: xfi_in: %d remaining\n", machine().time().as_string(8), m_cnt);
 
 				if (!m_cnt)
 					m_aux_status |= AUX_STATUS_TC_ZERO;
@@ -713,7 +725,7 @@ int ncr5385_device::state_step()
 			// clear ACK except after last byte of message input phase
 			if (!remaining() && (ctrl & S_PHASE_MASK) == S_PHASE_MSG_IN)
 			{
-				LOGMASKED(LOG_STATE, "xfi_in: INT_FUNC_COMPLETE\n" );
+				//LOGMASKED(LOG_STATE, "xfi_in: INT_FUNC_COMPLETE\n" );
 			
 				m_int_status |= INT_FUNC_COMPLETE;
 				m_state = IDLE;
@@ -789,6 +801,10 @@ int ncr5385_device::state_step()
 			else
 				m_sbx = false;
 
+			// clear data and ACK
+			scsi_bus->data_w(scsi_refid, 0);
+			scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
+
 			if (m_cnt == 0)
 			{
 				// REQUIRED delay for tek4404 to write successfully
@@ -810,13 +826,11 @@ int ncr5385_device::state_step()
 				// set_flags_handling_clear_pending
 				// scsi_update_pending_flags
 				
+				// scsi write code is ~90 cycles / loop
+
 				delay = TEK4404_XFI_OUT_ACK_DELAY;
 				LOGMASKED(LOG_STATE, "%10s: XFI_OUT_ACK delay %d\n", machine().time().as_string(8), delay);
 			}
-
-			// clear data and ACK
-			scsi_bus->data_w(scsi_refid, 0);
-			scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
 
 		}
 		else
@@ -831,7 +845,7 @@ int ncr5385_device::state_step()
 			else
 			{
 				LOGMASKED(LOG_STATE, "%10s: xfi_out: %s\n", machine().time().as_string(8), remaining() ? "phase change" : "transfer complete");
-				m_int_status |= INT_BUS_SERVICE;
+				m_int_status |= INT_FUNC_COMPLETE;
 				m_state = IDLE;
 
 				update_int();
