@@ -803,6 +803,12 @@ void pc9821_state::pc9821(machine_config &config)
 
 	PALETTE(config.replace(), m_palette, FUNC(pc9821_state::pc9801_palette), 16 + 16 + 256);
 
+	// win95 expects to be A revision, otherwise it will overlay startup text prompts over desktop GFX
+	// NOTE: possibly this bump happened around PC-9801BX series
+	UPD7220A(config.replace(), m_hgdc[0], 21.0526_MHz_XTAL / 8, "screen");
+	UPD7220A(config.replace(), m_hgdc[1], 21.0526_MHz_XTAL / 8, "screen");
+	config_video(config);
+
 	PC98_119_KBD(config.replace(), m_keyb, 0);
 	m_keyb->rxd_callback().set("sio_kbd", FUNC(i8251_device::write_rxd));
 
