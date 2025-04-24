@@ -262,9 +262,9 @@ void sns_rom_setadsp_device::chip_write(offs_t offset, uint8_t data)
 
 	if (offset >= 0x680000 && offset < 0x700000 && (offset & 0xffff) < 0x8000)
 	{
-		uint16_t const address = offset & 0xffff;
+		uint16_t const address = (offset & 0xffff) >> 1;
 		uint8_t const shift = BIT(offset, 0) << 3;
-		m_upd96050->dataram_w(address >> 1, uint16_t(data) << shift, uint16_t(0xff) << shift);
+		m_upd96050->dataram_w(address, (uint16_t(data) << 8) | data, uint16_t(0xff) << shift);
 		return;
 	}
 }
