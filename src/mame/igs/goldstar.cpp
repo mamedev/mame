@@ -21657,8 +21657,19 @@ ROM_START( fl7_tw )  // Serial 00000050E9B7.
 ROM_END
 
 
-// PCB pic is blurred, but main components appear to be: TMPZ84C00AP-8, Winbond WF19054, 5 8-dip banks (dip sheet available)
-// it's a 3-reel 5-liner with an extra reel. Puts PATRICK SHANGHAI in NVRAM, so some kind of hack / bootleg
+/*
+  Super Shanghai 2001
+
+  it's a 3-reel 5-liner with an extra reel.
+  Puts PATRICK SHANGHAI in NVRAM, so some kind of hack / bootleg
+
+  PCB pic is blurred, but main components appear to be:
+
+  TMPZ84C00AP-8,
+  Winbond WF19054,
+  5 8-dip banks (dip sheet available)
+
+*/
 ROM_START( ss2001 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "9.u26",   0x00000, 0x10000, CRC(9ddb0239) SHA1(15733481996de9becccd5b920e40220c6101becf) )
@@ -21683,6 +21694,64 @@ ROM_START( ss2001 )
 
 	ROM_REGION( 0x2000, "proms", 0 )
 	ROM_LOAD( "d27hc65d.bin",   0x0000, 0x02000, CRC(af8ce88d) SHA1(59d59b6b739aed4f6ee618db04af9ab9d2873bed) )  // colour data is at 0x1800-0x18ff
+ROM_END
+
+/*
+  Super Shanghai 2000
+
+  PCB pic is blurred, but main components appear to be:
+
+  Zilog Z80,
+  Winbond WF19054,
+  5 8-dip banks (dip sheet available)
+
+*/
+ROM_START( ss2000 )  // main program (green board)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "main_program_set_2_green_board.bin",  0x00000, 0x10000, CRC(a5017fa0) SHA1(af985a15fe2c6195b3310ece8dc9e431d1b8c673) )
+
+	ROM_REGION( 0x80000, "gfx", 0 )  // all 27c512, same gfx set as ss2001 but half sized roms
+	ROM_LOAD( "rom1_m27c512.u1",  0x00000, 0x10000, CRC(52d1914b) SHA1(f8e5e7ba8809006e4109b82dd84e019d0d1e5447) )
+	ROM_LOAD( "rom2_m27c512.u2",  0x10000, 0x10000, CRC(d5d50ef8) SHA1(60016d62922b369ce78130b8a94d967585657cd1) )
+	ROM_LOAD( "rom3_m27c512.u3",  0x20000, 0x10000, CRC(56e6e11b) SHA1(0a20ef1e05ded62b0aece5a94565736cbc83edf7) )
+	ROM_LOAD( "rom4_m27c512.u4",  0x30000, 0x10000, CRC(2cd3eb2d) SHA1(31f804cf9ddcd7dd8501946f9bf2f8a13b5b48f3) )
+	ROM_LOAD( "rom5_m27c512.u5",  0x40000, 0x10000, CRC(57328ec5) SHA1(0f5cddb4b45ddef8f6d352220e32cff27edac2b4) )
+	ROM_LOAD( "rom6_m27c512.u6",  0x50000, 0x10000, CRC(dd228316) SHA1(2d618758e870224284efc0dc8d3a83f3447d0e48) )
+	ROM_LOAD( "rom7_m27c512.u7",  0x60000, 0x10000, CRC(a7c2a38b) SHA1(149ccc4b36bca6a149f3a26f5a580f34f4020ef3) )
+	ROM_LOAD( "rom8_m27c512.u8",  0x70000, 0x10000, CRC(f6ef214c) SHA1(1f50ea87214b86416feda58fb5065175eb18df6a) )
+
+	ROM_REGION( 0x2000, "proms", 0 )
+	ROM_LOAD( "am27s29.bin",   0x0000, 0x0200, CRC(3ad40503) SHA1(5f7516001ac4286df3ca4f6ab36882a15019546a) )
+ROM_END
+
+/*
+  Super Shanghai 2000
+  Wrestle Fiesta.
+  Main program 30% bonus by Vegas (red board)
+
+  PCB pic is blurred, but main components appear to be:
+
+  TMPZ84C00AP-8,
+  Winbond WF19054,
+  5 8-dip banks
+
+*/
+ROM_START( ss2000a )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "main_program_set_3_red_board.bin",  0x00000, 0x10000, CRC(4aaa348c) SHA1(a33656798807906ce72351a1740f77563c5b2640) )
+
+	ROM_REGION( 0x80000, "gfx", 0 )  // all 27c512
+	ROM_LOAD( "27c512.u1",  0x00000, 0x10000, CRC(26df6ee7) SHA1(3221639174b432ea93e0db33b7554f2ce8125052) )
+	ROM_LOAD( "27c512.u2",  0x10000, 0x10000, CRC(5983a654) SHA1(6374e1fb0eda2454370e54d4dd8bf6c82b2f177e) )
+	ROM_LOAD( "27c512.u3",  0x20000, 0x10000, CRC(0c2cd067) SHA1(a1c749ee0c0c3d25a80af6d56c41057430646ce9) )
+	ROM_LOAD( "27c512.u4",  0x30000, 0x10000, CRC(e3adb317) SHA1(817a885236c28dc5dee02cc1d7e9e1c780560cae) )
+	ROM_LOAD( "27c512.u5",  0x40000, 0x10000, CRC(e693e419) SHA1(8834419d02eb0f4f4a1619195a87b00e3f315a39) )
+	ROM_LOAD( "27c512.u6",  0x50000, 0x10000, CRC(096c691a) SHA1(59a45ad654981cdfecaa3390253850491baccb9f) )
+	ROM_LOAD( "27c512.u7",  0x60000, 0x10000, CRC(f26a3eeb) SHA1(83bbe0b068549f3bceb083d17894fb080e9b58a1) )
+	ROM_LOAD( "27c512.u8",  0x70000, 0x10000, CRC(1444ee50) SHA1(6e6137869d4c46762bab92ed54071d9292243532) )
+
+	ROM_REGION( 0x2000, "proms", 0 )
+	ROM_LOAD( "am27s29.bin",   0x0000, 0x0200, CRC(3ad40503) SHA1(5f7516001ac4286df3ca4f6ab36882a15019546a) )
 ROM_END
 
 
@@ -24042,7 +24111,9 @@ GAME( 1996, cherry96,    scmaster,  unkch,    unkch4,    unkch_state,    init_un
 GAME( 1998, rolling,     scmaster,  rolling,  unkch4,    unkch_state,    empty_init,     ROT0, "bootleg", "Rolling",                                                      MACHINE_NOT_WORKING ) // inputs, outputs
 
 // this has a 4th reel
-GAME( 200?, ss2001,      0,         ss2001,   cmaster,   cmaster_state,  empty_init,     ROT0, "bootleg", "Super Shanghai 2001",                                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // TODO: everything
+GAME( 2001, ss2001,      0,         ss2001,   cmaster,   cmaster_state,  empty_init,     ROT0, "bootleg", "Super Shanghai 2001",                                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // TODO: everything
+GAME( 2000, ss2000,      0,         ss2001,   cmaster,   cmaster_state,  empty_init,     ROT0, "bootleg", "Super Shanghai 2000 (standard. green board)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // TODO: everything
+GAME( 2000, ss2000a,     0,         ss2001,   cmaster,   cmaster_state,  empty_init,     ROT0, "bootleg", "Super Shanghai 2000 - Wrestle Fiesta (30% bonus, red board)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // TODO: everything
 
 
 // ******************* Stealth sets *******************
