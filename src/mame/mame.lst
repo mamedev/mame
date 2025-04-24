@@ -35055,6 +35055,7 @@ m82
 @source:nintendo/nes_sh6578.cpp
 6578cjz1
 6578cjz2
+bancook
 bandgpad
 bandggcn
 bb6578
@@ -35083,6 +35084,7 @@ dgun2869
 dgun2959
 dgun851
 dgun853
+fccomp88
 gamezn2
 gprnrs1
 gprnrs16
@@ -35180,6 +35182,7 @@ dgunl3202
 fcpocket
 matet220
 matet300
+myaasa
 myaass
 rminitv
 
@@ -35215,12 +35218,14 @@ lxcmcypp
 lxcmcysp
 lxcmcysw
 lxcyber
+lxpcsp
 matet10
 matet100
 mc_cb280
 mc_hh210
 mog_m320
 myarccn
+nesvt270
 nubsupmf
 otrail
 pactin
@@ -39940,6 +39945,7 @@ twinktmb
 
 @source:sega/megadriv_rad.cpp
 atgame40
+banmrid
 dgunl3227
 dgunl3227a
 matet
@@ -42911,6 +42917,7 @@ ht68k
 wlzb
 
 @source:skeleton/hudson_poems.cpp
+ewalk2tv
 marimba
 poembase
 poemgolf
@@ -46220,6 +46227,11 @@ spidtt
 teentit
 tsbuzz
 
+@source:tvgames/generalplus_gp327902.cpp
+sanxpet
+sanxpeta
+tomyegg
+
 @source:tvgames/generalplus_gpl16250_mobigo.cpp
 mobigo
 mobigos
@@ -46273,10 +46285,12 @@ jak_prft
 jak_tink
 jak_totm
 jak_ths
+tomycar
 wrlshunt
 
 @source:tvgames/generalplus_gpl16250_spi.cpp
 anpanbd
+anpanm15
 bk139in1
 bkrankp
 prailpls
@@ -46298,6 +46312,8 @@ pcp8728
 bkid218
 
 @source:tvgames/generalplus_gpl32612.cpp
+anpanm19
+dmnslayg
 jak_swbstrik
 jak_tmnthp
 jak_dchp
@@ -46307,7 +46323,6 @@ kidizmb
 kidizmp
 pocketmp
 pocketmr
-sanxpet
 zippity
 zippityuk
 
@@ -46318,8 +46333,13 @@ tagalaga
 taspinv
 taturtf
 
-@source:tvgames/gpm4530a_lexibook_jg7420.cpp
+@source:tvgames/generalplus_gpm453x_nand.cpp
+leapland
+leappawp
+
+@source:tvgames/generalplus_gpm453x_sdcard.cpp
 lx_jg7420
+rizstals
 
 @source:tvgames/magiceyes_pollux_vr3520f.cpp
 didj
@@ -46415,6 +46435,7 @@ vtechtvsgr
 vtechtvssp
 wfart
 wfcentro
+wordlnch
 
 @source:tvgames/spg2xx_digimake.cpp
 rad_digi
@@ -46766,6 +46787,7 @@ ndpbj
 suprtvpc
 suprtvpcdo
 suprtvpchk
+suprtvpcln
 tmy_rkmj
 tmy_thom
 udance

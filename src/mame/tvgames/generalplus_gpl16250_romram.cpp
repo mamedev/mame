@@ -612,6 +612,19 @@ which is also found in the Wireless Air 60 ROM.
 
 */
 
+// Bokudora Ver1.4 2014-09-20 on PCB
+ROM_START(tomycar)
+	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION(0x2000000, "maincpu", ROMREGION_ERASE00)
+	// this loading gives correct sprites (must be swapped somewhere on PCB because this was otherwise a standard pinout?)
+	// but backgrounds are still broken (different issue maybe? there are writes to CS0 ROM area)
+	ROM_LOAD16_WORD_SWAP( "tomycar.bin", 0x000000, 0x800000, CRC(bd98a198) SHA1(117aba55bf98bf76cbc9ed169e2a968bfdd9ed1a) )
+	ROM_CONTINUE(0x1000000, 0x800000)
+	ROM_CONTINUE(0x0800000, 0x800000)
+	ROM_CONTINUE(0x1800000, 0x800000)
+ROM_END
 
 
 
@@ -629,4 +642,7 @@ CONS(2009, jak_tink, 0, 0, gpl16250_romram, jak_s500, jak_prft_game_state, init_
 CONS(2009, jak_ths,  0, 0, gpl16250_romram, jak_ths,  jak_s500_game_state, init_ths,      "JAKKS Pacific Inc / Super Happy Fun Fun", "Triple Header Sports (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 CONS(2011, wrlshunt, 0, 0, gpl16250_romram, wrlshunt, wrlshunt_game_state, init_wrlshunt, "Hamy / Kids Station Toys Inc", "Wireless Hunting Video Game System", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// ぼくはトミカドライバー はたらくのりもの大集合！
+CONS(2014, tomycar,  0, 0, gpl16250_romram, paccon, jak_prft_game_state, init_wrlshunt, "Tomy Takara", "Boku wa Tomica Driver - Hataraku Norimono Daishuugou! (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 

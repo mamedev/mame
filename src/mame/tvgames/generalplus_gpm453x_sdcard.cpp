@@ -82,13 +82,22 @@ void gpm4530a_lexibook_state::gpm4530a_lexibook(machine_config &config)
 
 ROM_START( lx_jg7420 )
 	ROM_REGION( 0x10000, "boot", ROMREGION_ERASEFF )
-	ROM_LOAD( "bootrom.bin", 0x00000, 0x10000, NO_DUMP ) // unknown size/capacity/type
+	ROM_LOAD( "bootrom.bin", 0x00000, 0x10000, NO_DUMP ) // unknown size/capacity/type (internal?)
 
 	DISK_REGION( "sdcard" ) // 4GB SD Card
 	DISK_IMAGE( "jg7420", 0, SHA1(214a1686c7eefdb4cb5d723e98957600c8cb138d) )
+ROM_END
+
+ROM_START( rizstals )
+	ROM_REGION( 0x100000, "spi", ROMREGION_ERASEFF )
+	ROM_LOAD( "mx25v8035f.u5", 0x0000, 0x100000, CRC(1ba0c7b8) SHA1(d3f4fdabf07c1d8bbd73da54280e3fab006a72b6) )
+
+	DISK_REGION( "sdcard" ) // 8GB SD Card
+	DISK_IMAGE( "sdcard", 0, SHA1(79462dd4a632d9b9710581ed170a696c059e8a2d) )
 ROM_END
 
 } // anonymous namespace
 
 // JG7420_24 on sticker
 CONS( 201?, lx_jg7420,    0,       0,      gpm4530a_lexibook, gpm4530a_lexibook, gpm4530a_lexibook_state, empty_init, "Lexibook", "Lexibook JG7420 200-in-1", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2021, rizstals,     0,       0,      gpm4530a_lexibook, gpm4530a_lexibook, gpm4530a_lexibook_state, empty_init, "Takara Tomy", "RizSta Live Studio", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
