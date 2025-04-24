@@ -21,12 +21,12 @@
 
 #include "emu.h"
 
-#include "cpu/arm7/arm7.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
-#include "softlist_dev.h"
+#include "cpu/arm7/arm7.h"
 
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -41,7 +41,7 @@ public:
 		m_screen(*this, "screen")
 	{ }
 
-	void gpm453x(machine_config &config);
+	void gpm453x(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
