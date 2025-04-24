@@ -46,10 +46,12 @@ private:
 	required_device<pc9801_slot_device> m_bus;
 	required_device<ym2203_device>  m_opn;
 	required_device_array<msx_general_purpose_port_device, 2U> m_joy;
+	required_ioport m_irq_jp;
 
 	u32 m_rom_base;
 	u16 m_io_base;
 	u8 m_joy_sel;
+	u8 m_int_level;
 };
 
 

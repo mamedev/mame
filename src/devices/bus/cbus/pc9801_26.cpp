@@ -32,6 +32,7 @@ pc9801_26_device::pc9801_26_device(const machine_config &mconfig, const char *ta
 	, m_bus(*this, DEVICE_SELF_OWNER)
 	, m_opn(*this, "opn")
 	, m_joy(*this, "joy_p%u", 1U)
+	, m_irq_jp(*this, "JP6A1_JP6A3")
 {
 }
 
@@ -39,15 +40,41 @@ void pc9801_26_device::device_add_mconfig(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
 	YM2203(config, m_opn, 15.9744_MHz_XTAL / 4); // divider not verified
-	m_opn->irq_handler().set([this] (int state) { m_bus->int_w<5>(state); });
-	m_opn->port_a_read_callback().set([this] () {
-		if(BIT(m_joy_sel, 7))
-			return m_joy[BIT(m_joy_sel, 6)]->read();
-
-		return (u8)0xff;
+	m_opn->irq_handler().set([this] (int state) {
+		switch(m_int_level & 3)
+		{
+			case 0: m_bus->int_w<0>(state); break;
+			case 1: m_bus->int_w<4>(state); break;
+			case 2: m_bus->int_w<6>(state); break;
+			case 3: m_bus->int_w<5>(state); break;
+		}
 	});
+	/*
+	 * xx-- ---- IRSTx interrupt status 0/1
+	 * --xx ---- TRIGx Trigger 1/2
+	 * ---- xxxx <directions>
+	 */
+	m_opn->port_a_read_callback().set([this] () {
+		u8 res = (BIT(m_joy_sel, 7)) ? m_joy[BIT(m_joy_sel, 6)]->read() : 0x3f;
+		res   |= m_int_level << 6;
+		return (u8)res;
+	});
+	/*
+	 * x--- ---- OUTE Output Enable (DDR?)
+	 * -x-- ---- INSL Input Select
+	 * --21 2211 OUTxy x = port / y (2-1) = number (1-3)
+	 */
 	m_opn->port_b_write_callback().set([this] (u8 data) {
 		m_joy_sel = data;
+		// TODO: guesswork, verify
+		if (BIT(data, 7))
+			return;
+		m_joy[0]->pin_6_w(BIT(~data, 0));
+		m_joy[0]->pin_7_w(BIT(~data, 1));
+		m_joy[1]->pin_6_w(BIT(~data, 2));
+		m_joy[1]->pin_7_w(BIT(~data, 3));
+		m_joy[0]->pin_8_w(BIT(~data, 4));
+		m_joy[1]->pin_8_w(BIT(~data, 5));
 	});
 
 	// TODO: verify mixing on HW
@@ -86,15 +113,14 @@ const tiny_rom_entry *pc9801_26_device::device_rom_region() const
 
 static INPUT_PORTS_START( pc9801_26 )
 	// On-board jumpers
-	// TODO: any way to actually read these from HW?
-	PORT_START("OPN_JP6A1_JP6A3")
-	PORT_CONFNAME( 0x03, 0x02, "PC-9801-26: Interrupt level")
-	PORT_CONFSETTING(    0x00, "IRQ 0" ) // 2-3, 2-3
-	PORT_CONFSETTING(    0x01, "IRQ 4" ) // 2-3, 1-2
-	PORT_CONFSETTING(    0x02, "IRQ 5" ) // 1-2, 1-2
-	PORT_CONFSETTING(    0x03, "IRQ 6" ) // 1-2, 2-3
+	PORT_START("JP6A1_JP6A3")
+	PORT_CONFNAME( 0x03, 0x03, "PC-9801-26: Interrupt level")
+	PORT_CONFSETTING(    0x00, "INT0 (IRQ3)" ) // 2-3, 2-3
+	PORT_CONFSETTING(    0x02, "INT41 (IRQ10)" ) // 2-3, 1-2
+	PORT_CONFSETTING(    0x03, "INT5 (IRQ12)" ) // 1-2, 1-2
+	PORT_CONFSETTING(    0x01, "INT6 (IRQ13)" ) // 1-2, 2-3
 
-	PORT_START("OPN_JP6A2")
+	PORT_START("JP6A2")
 	PORT_CONFNAME( 0x07, 0x01, "PC-9801-26: Sound ROM address")
 	PORT_CONFSETTING(    0x00, "0xc8000" )    // 1-10
 	PORT_CONFSETTING(    0x01, "0xcc000" )    // 2-9
@@ -102,7 +128,7 @@ static INPUT_PORTS_START( pc9801_26 )
 	PORT_CONFSETTING(    0x03, "0xd4000" )    // 4-7
 	PORT_CONFSETTING(    0x04, "Disable ROM") // 5-6
 
-	PORT_START("OPN_JP6A4")
+	PORT_START("JP6A4")
 	PORT_CONFNAME( 0x01, 0x01, "PC-9801-26: Port Base" )
 	PORT_CONFSETTING(    0x00, "0x088" ) // 1-4
 	PORT_CONFSETTING(    0x01, "0x188" ) // 2-3
@@ -115,7 +141,7 @@ ioport_constructor pc9801_26_device::device_input_ports() const
 
 u16 pc9801_26_device::read_io_base()
 {
-	return ((ioport("OPN_JP6A4")->read() & 1) << 8) + 0x0088;
+	return ((ioport("JP6A4")->read() & 1) << 8) + 0x0088;
 }
 
 void pc9801_26_device::device_start()
@@ -129,7 +155,7 @@ void pc9801_26_device::device_start()
 void pc9801_26_device::device_reset()
 {
 	// install the ROM to the physical program space
-	u8 rom_setting = ioport("OPN_JP6A2")->read() & 7;
+	u8 rom_setting = ioport("JP6A2")->read() & 7;
 	static const u32 rom_addresses[8] = { 0xc8000, 0xcc000, 0xd0000, 0xd4000, 0, 0, 0, 0 };
 	u32 current_rom = rom_addresses[rom_setting & 7];
 	memory_region *rom_region = memregion(this->subtag("sound_bios").c_str());
@@ -167,9 +193,8 @@ void pc9801_26_device::device_reset()
 	);
 	m_io_base = current_io;
 
-	// install IRQ line
-//  static const u8 irq_levels[4] = {0, 4, 5, 6};
-//  m_irq_level = irq_levels[ioport("OPN_JP6A1_JP6A3")->read() & 3];
+	// read INT line
+	m_int_level = m_irq_jp->read() & 3;
 }
 
 void pc9801_26_device::device_validity_check(validity_checker &valid) const
