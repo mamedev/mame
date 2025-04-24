@@ -14,6 +14,8 @@ TODO:
 \- triggered in bokosuka when it starts losing a key break along the way.
 - key repeat: alternates break and make keys when typematic kicks in, 30ms per swap?
 \- Most keyboards don't have a method for disabling typematic, depends on RTY?
+\- pc9821ap2: specifically wants F3 to be unmapped for calling setup mode with soft reset:
+   HELP key is recognized but code overrides with the F3 path, any way to avoid it?
 - Undumped i8048 MCU;
 - GRPH + SHIFT scancodes;
 - Subclass keyboard variants (cfr. PC-9801-115 Bungo);
@@ -22,7 +24,7 @@ TODO:
     STOP is correct, verified with branmar2
 - Problems with natural keyboard (most nonprinting keys don't work);
 - pc9801fs: doesn't capture HELP key even with -119, need to mash for entering setup mode (verify)
-- slotify
+- slotify;
 
 **************************************************************************************************/
 
@@ -382,6 +384,7 @@ void pc98_119_kbd_device::device_start()
 	pc98_kbd_device::device_start();
 
 	save_item(NAME(m_cmd_state));
+	save_item(NAME(m_key_delay));
 	save_pointer(NAME(m_repeat_state), 0x80);
 }
 
@@ -390,6 +393,7 @@ void pc98_119_kbd_device::device_reset()
 	pc98_kbd_device::device_reset();
 
 	m_cmd_state = 0;
+	m_key_delay = 500;
 	std::fill(std::begin(m_repeat_state), std::end(m_repeat_state), 0);
 }
 
@@ -406,7 +410,7 @@ void pc98_119_kbd_device::key_make(uint8_t row, uint8_t column)
 	if (code == 0x3f)
 	{
 		m_repeat_state[code] = 0;
-		typematic_start(row, column, attotime::from_msec(500), attotime::from_msec(60));
+		typematic_start(row, column, attotime::from_msec(m_key_delay), attotime::from_msec(60));
 	}
 }
 
@@ -427,7 +431,7 @@ void pc98_119_kbd_device::received_byte(u8 byte)
 
 	if (m_cmd_state)
 	{
-		// ignore same byte, we expect specific signature in 0x9d already
+		// ignore same byte, we expect a 0 in bit 7 anyway
 		if (m_cmd_state == byte)
 			return;
 
@@ -435,13 +439,29 @@ void pc98_119_kbd_device::received_byte(u8 byte)
 
 		switch(m_cmd_state)
 		{
+			// -xx- ---- key delay
+			// -11- ---- 1000 ms
+			// -10- ---- 500 ms
+			// -01- ---- 500 ms (default)
+			// -00- ---- 250 ms
+			// ---x xxxx repeat rate (slow 11111 -> 00001 fast)
+			// win95: sets 0x70 at startup by default, 0x51 at shutdown
+			case 0x9c:
+			{
+				static const u16 key_delay_ms[] = {250, 500, 500, 1000 };
+				m_key_delay = key_delay_ms[(byte >> 5) & 3];
+				// TODO: repeat rate
+				send_key(ACK);
+				break;
+			}
+
+			// TODO: caps/kana/num lock handling
+			// 0110 ---- reads back LEDs
+			// 0111 ---- sets lock state
+			// ---- x--- Kana lock
+			// ---- -x-- CAPS lock
+			// ---- ---x Num lock
 			case 0x9d:
-				// TODO: caps/kana/num lock handling
-				// 0110 ---- reads back LEDs
-				// 0111 ---- sets lock state
-				// ---- x--- Kana lock
-				// ---- -x-- CAPS lock
-				// ---- ---x Num lock
 				send_key(ACK);
 				break;
 		}
@@ -465,17 +485,15 @@ void pc98_119_kbd_device::received_byte(u8 byte)
 		// 0x99 <unknown>
 		//      returns 0xfa ACK -> 0xfb (not ready?)
 
-		// 0x9c key repeat (expects param byte)
-		// -xx- ---- key delay
-		// -11- ---- 1000 ms
-		// -10- ---- 500 ms
-		// -01- ---- 500 ms (default)
-		// -00- ---- 250 ms
-		// ---x xxxx repeat rate (slow 11111 -> 00001 fast)
+		case 0x9c:
+			LOGCOMMAND("\t$9c Key Repeat rate settings\n");
+			m_cmd_state = byte;
+			send_key(ACK);
+			break;
 
 		case 0x9d:
 			// NOTE: different for PC-9801NS/T
-			LOGCOMMAND("\tKeyboard LED settings\n");
+			LOGCOMMAND("\t$9d Keyboard LED settings\n");
 			m_cmd_state = byte;
 			send_key(ACK);
 			break;
@@ -483,7 +501,7 @@ void pc98_119_kbd_device::received_byte(u8 byte)
 		// 0x9e ?, assume it returns ACK
 
 		case 0x9f:
-			LOGCOMMAND("\tKeyboard Type ID\n");
+			LOGCOMMAND("\t$9f Keyboard Type ID\n");
 			send_key(ACK);
 			send_key(0xa0);
 			send_key(0x80);

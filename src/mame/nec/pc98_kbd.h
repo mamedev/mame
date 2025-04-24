@@ -83,6 +83,8 @@ protected:
 private:
 	bool m_repeat_state[0x80];
 	u8 m_cmd_state;
+
+	u16 m_key_delay;
 };
 
 
