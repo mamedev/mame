@@ -42,9 +42,9 @@
     - The system allows for Z-Sort override, by means of specifying whether a polygon will use the same Z value ordinal as the
     previous polygon, or the calculated minimum or maximum from it's points. This allows for a full object to be in front of
     another, even though the first object might have some z coordinates that are bigger than the second object's z coordinates.
-	- Polygons from later windows will always be rendered on top of polygons from earlier windows, regardless of z value. This
-	can be seen in the name entry screen in Sega Rally for example, where letters meant to be behind the car are rendered in an
-	earlier window and letters in front of the car are rendered in a later window.
+    - Polygons from later windows will always be rendered on top of polygons from earlier windows, regardless of z value. This
+    can be seen in the name entry screen in Sega Rally for example, where letters meant to be behind the car are rendered in an
+    earlier window and letters in front of the car are rendered in a later window.
     - The current implementation takes the effective computed z value for the polygon and converts it into a 4.12 fixed point
     representation, used as an index into an array of linked polygons. Every polygon with the same z value is linked with any
     previous polygon that had that same z value:
@@ -63,9 +63,9 @@
 
     Clip Notes and Known Bugs:
 
-	- Four clipping planes representing the viewing frustum are used to clip polygons prior to projection. In the rare event
-	that a polygon intersects with the origin exactly, it will produce a clipped vertex at (0.0, 0.0, 0,0) which would result
-	in NaNs being generated during projection; a tiny value is added to z to prevent this.
+    - Four clipping planes representing the viewing frustum are used to clip polygons prior to projection. In the rare event
+    that a polygon intersects with the origin exactly, it will produce a clipped vertex at (0.0, 0.0, 0,0) which would result
+    in NaNs being generated during projection; a tiny value is added to z to prevent this.
     - A small offset need to be added horizontally and vertically to the viewport and center variables for certain games (like
     the original Model 2 games). The coordinate system has been worked out from the 2B specifications, but the older games
     need a slight adjustment.

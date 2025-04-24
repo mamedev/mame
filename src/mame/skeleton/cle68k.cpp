@@ -138,7 +138,7 @@ void cle68k_state::program_map(address_map &map)
 	map(0x1e0013, 0x1e0013).w(m_ramdac[1], FUNC(ramdac_device::pal_w));
 	map(0x1e0014, 0x1e0014).w(m_ramdac[0], FUNC(ramdac_device::mask_w));
 	map(0x1e0015, 0x1e0015).w(m_ramdac[1], FUNC(ramdac_device::mask_w));
-//	map(0x1e0020, 0x1e0023) 8-bit address/data pair for a device (MCU or RAMDAC)
+//  map(0x1e0020, 0x1e0023) 8-bit address/data pair for a device (MCU or RAMDAC)
 	map(0x1e0030, 0x1e0031).portr("IN1").nopw(); // TODO: video reg? outputs?
 	map(0x1e0032, 0x1e0033).portr("DSW1");
 	map(0x1e0034, 0x1e0035).portr("DSW2");

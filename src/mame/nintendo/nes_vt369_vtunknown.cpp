@@ -1039,15 +1039,15 @@ CONS( 2017, rtvgc300fz,0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknow
     (Handheld units, but different form factor to Compact Cyber Arcade, charged via USB, different menus)
     Lexibook Console Colour - Barbie
 
-	(Handheld units, charged via USB-C, more educational focused, contain bootleg NES Pinball game in games section)
-	Power Console - Gabby's Dollhouse
-	Power Console - Disney Princess
-	Power Console - Stitch
-	Power Console - Frozen
-	Power Console - Generic EN/FR model
-	Power Console - Generic EN/ES model
-	Power Console - Generic EN/DE model
-	Power Console - Paw Patrol
+    (Handheld units, charged via USB-C, more educational focused, contain bootleg NES Pinball game in games section)
+    Power Console - Gabby's Dollhouse
+    Power Console - Disney Princess
+    Power Console - Stitch
+    Power Console - Frozen
+    Power Console - Generic EN/FR model
+    Power Console - Generic EN/ES model
+    Power Console - Generic EN/DE model
+    Power Console - Paw Patrol
 
     (units for use with TV)
     Lexibook Retro TV Game Console (300 Games) - Cars

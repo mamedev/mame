@@ -54,7 +54,7 @@
     2005      Let's!TVプレイ ドラゴンボ－ルＺ バトル体感かめはめ波～ おめぇとフュージョン / バンダイ / 日本          Let's! TV Play Dragon Ball Z Battle Taikan Kamehameha~ Omee to Fusion / Bandai / Japan
 
     dumped: either here, xavix_2000.cpp, or xavix_2002.cpp
-	          スーパーテレビパソコンLink / エポック社 / 日本   Super TV PC Link / Epoch / Japan
+              スーパーテレビパソコンLink / エポック社 / 日本   Super TV PC Link / Epoch / Japan
               Let's!TVプレイ なりきりファイト ウルトラマン 撃て！必殺光線！！ / タカラトミー / 日本   Let's!TV Play Narikiri Fight Ultraman Shoot! Deadly ray! ! / Takara Tomy / Japan
               Hello Kitty TV computer /EPOCH/Japan                                                            -           -               -           -               -                   -                       -
               Popira Korea version /SONOKONG/Korea                                                            -           -               -           -               -                   -                       -

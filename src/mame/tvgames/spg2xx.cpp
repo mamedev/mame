@@ -2580,7 +2580,7 @@ ROM_START( wordlnch )
 
 	// patch loop on leapfrog logo
 	ROM_FILL(                      0x95bc8, 1, 0x44 )
-	ROM_FILL(                      0x95bc9, 1, 0x40 )	
+	ROM_FILL(                      0x95bc9, 1, 0x40 )
 ROM_END
 
 

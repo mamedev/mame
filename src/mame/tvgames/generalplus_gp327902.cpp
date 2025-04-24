@@ -81,7 +81,7 @@ void generalplus_gp327902_game_state::c0060000_unk_w(uint32_t data)
 void generalplus_gp327902_game_state::arm_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).ram(); // 16M-bit internal SDRAM
-	
+
 	map(0xc0020070, 0xc0020073).r(FUNC(generalplus_gp327902_game_state::c0020070_unk_r));
 	map(0xc0060000, 0xc0060003).w(FUNC(generalplus_gp327902_game_state::c0060000_unk_w));
 	map(0xc008000c, 0xc008000f).r(FUNC(generalplus_gp327902_game_state::c008000c_unk_r));
@@ -189,7 +189,7 @@ CONS( 2019, sanxpet,         0,        0,      gp327902, gp327902, generalplus_g
 
 // 2020 version is a cloud shaped device - Sumikko Gurashi - Sumikko Catch (すみっコぐらし すみっコキャッチ)
 // or Sumikko Gurashi - Sumikko Catch DX (すみっコぐらし すみっコキャッチDX) = Sumikko Catch with pouch and strap
- 
+
 // 2021 version is a square device with a tiny 'mole' figure on top - すみっコぐらし すみっコみっけDX
 // or Sumikko Gurashi - Sumikko Mikke (すみっコぐらし すみっコみっけ)
 CONS( 2021, sanxpeta,        0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "San-X / Tomy",        "Sumikko Gurashi - Sumikko Mikke DX (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

@@ -984,7 +984,7 @@ void macii_state::macii(machine_config &config)
 	m_scsihelp->cpu_halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 	m_scsihelp->timeout_error_callback().set(FUNC(macii_state::scsi_berr_w));
 
-	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
+	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd").set_filter("MC68020");
 	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68020");
 
 	nubus_device &nubus(NUBUS(config, "nubus", 0));
@@ -1033,9 +1033,9 @@ void macii_state::macii(machine_config &config)
 	// This was fixed for the II FDHD/IIx/IIcx/SE30 ROM.
 	m_ram->set_extra_options("1M,4M,5M,8M");
 
-	SOFTWARE_LIST(config, "flop_mac35_orig").set_original("mac_flop_orig");
-	SOFTWARE_LIST(config, "flop_mac35_clean").set_original("mac_flop_clcracked");
-	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
+	SOFTWARE_LIST(config, "flop_mac35_orig").set_original("mac_flop_orig").set_filter("MC68020");
+	SOFTWARE_LIST(config, "flop_mac35_clean").set_original("mac_flop_clcracked").set_filter("MC68020");
+	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop").set_filter("MC68020");
 }
 
 void macii_state::maciihmu(machine_config &config)
@@ -1060,7 +1060,7 @@ void macii_state::maciihd(machine_config &config)
 
 	applefdintf_device::add_35_hd(config, m_floppy[0]);
 	applefdintf_device::add_35_hd(config, m_floppy[1]);
-	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
+	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop").set_filter("MC68020");
 
 	// The table of valid RAM sizes is at 0x4080366E in the 97221136 ROM (II FDHD, IIx, IIcx, SE/30).
 	// Shift each byte left by 20 bits to get the size in bytes.  0x01 => 0x00100000 (1 MiB) and so on.
@@ -1078,7 +1078,11 @@ void macii_state::maciix(machine_config &config)
 
 	m_via2->readpb_handler().set(FUNC(macii_state::iix_via2_in_b));
 
-	SOFTWARE_LIST(config.replace(), "cd_list").set_original("mac_cdrom").set_filter("MC68030");
+	subdevice<software_list_device>("hdd_list")->set_filter("MC68030");
+	subdevice<software_list_device>("cd_list")->set_filter("MC68030");
+	subdevice<software_list_device>("flop_mac35_orig")->set_filter("MC68030");
+	subdevice<software_list_device>("flop_mac35_clean")->set_filter("MC68030");
+	subdevice<software_list_device>("flop35_list")->set_filter("MC68030");
 }
 
 void macii_state::maciicx(machine_config &config)

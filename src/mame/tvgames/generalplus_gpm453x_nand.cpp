@@ -6,15 +6,15 @@
 
     ARM Cortex M4F based GPM453x series chips
 
-	all game data is stored on a NAND
+    all game data is stored on a NAND
 
-	both games here are on HDMI sticks
+    both games here are on HDMI sticks
 
-	These likely boot from an internal ROM so will need bootstrapping without
-	a dump of it
+    These likely boot from an internal ROM so will need bootstrapping without
+    a dump of it
 
-	LeapLand Adventures - GPM4530A
-	Paw Patrol - GPM4532C
+    LeapLand Adventures - GPM4530A
+    Paw Patrol - GPM4532C
 
 *****************************************************************************/
 

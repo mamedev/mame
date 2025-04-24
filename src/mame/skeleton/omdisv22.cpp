@@ -1,17 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Devin Acker
 /*
-	Skeleton driver for the uPD78C14-based "Driver Information System" used by
-	the circa-1990 Oldsmobile 98 and other models.
+    Skeleton driver for the uPD78C14-based "Driver Information System" used by
+    the circa-1990 Oldsmobile 98 and other models.
 
-	Press 6, then Test/Reset, then enter a distance of 8192 to show a debug display
-	with information about the current ADC readings. After that, press any button
-	to display the ROM version.
+    Press 6, then Test/Reset, then enter a distance of 8192 to show a debug display
+    with information about the current ADC readings. After that, press any button
+    to display the ROM version.
 
-	TODO:
-	- identify/hook up the display hardware
-	- properly hook up or at least figure out other inputs (port B, SCK/RX, CI, most ADCs, etc)
-	  The function at 09D5 handles reading the ADC values.
+    TODO:
+    - identify/hook up the display hardware
+    - properly hook up or at least figure out other inputs (port B, SCK/RX, CI, most ADCs, etc)
+      The function at 09D5 handles reading the ADC values.
 */
 
 #include "emu.h"
@@ -78,7 +78,7 @@ static INPUT_PORTS_START(omdisv22)
 	PORT_BIT( 0x2, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("5 / FUEL") PORT_CODE(KEYCODE_5_PAD);
 	PORT_BIT( 0x4, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("6 / DEST") PORT_CODE(KEYCODE_6_PAD);
 	PORT_BIT( 0x8, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("7 / ETA")  PORT_CODE(KEYCODE_7_PAD);
-	
+
 	PORT_START("IN2")
 	PORT_BIT( 0x1, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("8 / E/T")   PORT_CODE(KEYCODE_8_PAD);
 	PORT_BIT( 0x2, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("9 / SPEED") PORT_CODE(KEYCODE_9_PAD);
