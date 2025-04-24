@@ -9,6 +9,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "multibyte.h"
+
 
 namespace {
 
@@ -21,9 +23,9 @@ public:
 		m_screen(*this, "screen")
 	{ }
 
-	void gp327902(machine_config &config);
+	void gp327902(machine_config &config) ATTR_COLD;
 
-	void init_spi();
+	void init_spi() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -105,12 +107,12 @@ void generalplus_gp327902_game_state::machine_start()
 void generalplus_gp327902_game_state::machine_reset()
 {
 	// perform some kind of bootstrap likely done by an internal ROM
-	uint8_t* spirom = memregion("spi")->base();
-	address_space& mem = m_maincpu->space(AS_PROGRAM);
+	uint8_t *spirom = memregion("spi")->base();
+	address_space &mem = m_maincpu->space(AS_PROGRAM);
 
 	for (int i = 0; i < m_copylength / 2; i++)
 	{
-		uint16_t word = spirom[m_copybase + (i * 2) + 0] | (spirom[m_copybase + (i * 2) + 1] << 8);
+		uint16_t word = get_u16le(&spirom[m_copybase + (i * 2)]);
 		mem.write_word(m_copydest + (i * 2), word);
 	}
 
@@ -139,7 +141,7 @@ void generalplus_gp327902_game_state::gp327902(machine_config &config)
 
 void generalplus_gp327902_game_state::init_spi()
 {
-	const bool copy_lowest_block = true; // change this to true to copy a later part of the bootstrap sequence on sanpetx?
+	const bool copy_lowest_block = true; // change this to false to copy a later part of the bootstrap sequence on sanpetx?
 
 	// these likely come from the header at the start of the ROM
 	if (copy_lowest_block)
@@ -196,7 +198,7 @@ CONS( 2021, sanxpeta,        0,        0,      gp327902, gp327902, generalplus_g
 // other devices on the same Soc
 
 // キラッとプリ☆チャン プリたまGO ミスティパープル
-CONS( 2019, tomyegg,         0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "Tomy",        "Kiratto Pri-Chan - Pritama Go: Misty Purple (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2019, tomyegg,         0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "Tomy",        "Kiratto Pri-Chan - PritamaGO: Misty Purple (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 // these also exist, are they the same software or different versions?
 // Powder Pink (パウダーピンク)
 // Mint Blue (ミントブルー).
