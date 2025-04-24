@@ -13,13 +13,13 @@
 
 
 // helpers
-inline uint32_t get_prg(uint8_t *CPU, uint32_t addr)
+inline uint32_t get_prg(uint8_t const *CPU, uint32_t addr)
 {
-	return ((CPU[addr * 4] << 24) | (CPU[addr * 4 + 1] << 16) | (CPU[addr * 4 + 2] << 8) | 0x00);
+	return (CPU[addr * 4] << 24) | (CPU[addr * 4 + 1] << 16) | (CPU[addr * 4 + 2] << 8) | 0x00;
 }
-inline uint16_t get_data(uint8_t *CPU, uint32_t addr)
+inline uint16_t get_data(uint8_t const *CPU, uint32_t addr)
 {
-	return ((CPU[addr * 2] << 8) | CPU[addr * 2 + 1]);
+	return (CPU[addr * 2] << 8) | CPU[addr * 2 + 1];
 }
 
 //-------------------------------------------------
@@ -234,6 +234,7 @@ uint8_t sns_rom_setadsp_device::chip_read(offs_t offset)
 		else
 			return m_upd96050->data_r();
 	}
+
 	if (offset >= 0x680000 && offset < 0x700000 && (offset & 0xffff) < 0x8000)
 	{
 		uint16_t const address = offset & 0xffff;
