@@ -44,6 +44,14 @@
 
 void c6280_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
 {
+	// Fast method if none of the channels are enabled (most Data East arcade games)
+	if (!(m_enabled & 0x3f))
+	{
+		outputs[0].fill(0);
+		outputs[1].fill(0);
+		return;
+	}
+
 	static const u8 scale_tab[16] =
 	{
 		0x00, 0x03, 0x05, 0x07, 0x09, 0x0b, 0x0d, 0x0f,
@@ -53,24 +61,21 @@ void c6280_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 	const u8 lmal = scale_tab[(m_balance >> 4) & 0x0f];
 	const u8 rmal = scale_tab[(m_balance >> 0) & 0x0f];
 
-	/* Clear buffer */
-	outputs[0].fill(0);
-	outputs[1].fill(0);
-
 	for (int i = 0; i < outputs[0].samples(); i++)
 	{
 		s32 lout = 0, rout = 0;
 		for (int ch = 0; ch < 6; ch++)
 		{
-			channel &chan = m_channel[ch];
-			/* Only look at enabled channels */
-			if (BIT(chan.control, 7))
+			// Only look at enabled channels
+			if (BIT(m_enabled, ch))
 			{
+				channel &chan = m_channel[ch];
+
 				const u8 lal = scale_tab[(chan.balance >> 4) & 0x0f];
 				const u8 ral = scale_tab[(chan.balance >> 0) & 0x0f];
 				const u8 al  = chan.control & 0x1f;
 
-				// verified from both patent and manual
+				// Verified from both patent and manual
 				int vll = (0x1f - lmal) + (0x1f - al) + (0x1f - lal);
 				if (vll > 0x1f) vll = 0x1f;
 
@@ -80,10 +85,10 @@ void c6280_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 				vll = m_volume_table[vll];
 				vlr = m_volume_table[vlr];
 
-				/* Check channel mode */
+				// Check channel mode
 				if ((ch >= 4) && BIT(chan.noise_control, 7))
 				{
-					/* Noise mode */
+					// Noise mode
 					const u32 step = (chan.noise_control & 0x1f) ^ 0x1f;
 					const s16 data = BIT(chan.noise_seed, 0) ? 0x1f : 0;
 					chan.noise_counter--;
@@ -99,7 +104,7 @@ void c6280_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 				}
 				else if (BIT(chan.control, 6))
 				{
-					/* DDA mode */
+					// DDA mode
 					lout += vll * (chan.dda - 16);
 					rout += vlr * (chan.dda - 16);
 				}
@@ -109,7 +114,7 @@ void c6280_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 					{
 						if (ch == 0)
 						{
-							/* Waveform mode with LFO */
+							// Waveform mode with LFO
 							channel &lfo_srcchan = m_channel[1];
 							channel &lfo_dstchan = m_channel[0];
 							const u16 lfo_step = lfo_srcchan.frequency ? lfo_srcchan.frequency : 0x1000;
@@ -149,7 +154,7 @@ void c6280_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 					}
 					else
 					{
-						/* Waveform mode */
+						// Waveform mode
 						const u32 step = chan.frequency ? chan.frequency : 0x1000;
 						const s16 data = chan.waveform[chan.index];
 						chan.tick--;
@@ -222,30 +227,30 @@ void c6280_device::c6280_w(offs_t offset, uint8_t data)
 {
 	channel &chan = m_channel[m_select];
 
-	/* Update stream */
+	// Update stream
 	m_stream->update();
 
 	switch (offset & 0x0f)
 	{
-		case 0x00: /* Channel select */
+		case 0x00: // Channel select
 			m_select = data & 0x07;
 			break;
 
-		case 0x01: /* Global balance */
-			m_balance  = data;
+		case 0x01: // Global balance
+			m_balance = data;
 			break;
 
-		case 0x02: /* Channel frequency (LSB) */
+		case 0x02: // Channel frequency (LSB)
 			chan.frequency = (chan.frequency & 0x0f00) | data;
 			break;
 
-		case 0x03: /* Channel frequency (MSB) */
+		case 0x03: // Channel frequency (MSB)
 			chan.frequency = (chan.frequency & 0x00ff) | ((data << 8) & 0x0f00);
 			break;
 
-		case 0x04: /* Channel control (key-on, DDA mode, volume) */
+		case 0x04: // Channel control (key-on, DDA mode, volume)
 
-			/* 1-to-0 transition of DDA bit resets waveform index */
+			// 1-to-0 transition of DDA bit resets waveform index
 			if (BIT(chan.control, 6) && BIT(~data, 6))
 			{
 				chan.index = 0;
@@ -255,13 +260,17 @@ void c6280_device::c6280_w(offs_t offset, uint8_t data)
 				chan.tick = chan.frequency;
 			}
 			chan.control = data;
+
+			// Cache channel enable flag
+			m_enabled &= ~(1 << m_select);
+			m_enabled |= BIT(data, 7) << m_select;
 			break;
 
-		case 0x05: /* Channel balance */
+		case 0x05: // Channel balance
 			chan.balance = data;
 			break;
 
-		case 0x06: /* Channel waveform data */
+		case 0x06: // Channel waveform data
 
 			switch (chan.control & 0x40)
 			{
@@ -278,15 +287,15 @@ void c6280_device::c6280_w(offs_t offset, uint8_t data)
 
 			break;
 
-		case 0x07: /* Noise control (enable, frequency) */
+		case 0x07: // Noise control (enable, frequency)
 			chan.noise_control = data;
 			break;
 
-		case 0x08: /* LFO frequency */
+		case 0x08: // LFO frequency
 			m_lfo_frequency = data;
 			break;
 
-		case 0x09: /* LFO control (enable, mode) */
+		case 0x09: // LFO control (enable, mode)
 			m_lfo_control = data;
 			break;
 
@@ -314,11 +323,12 @@ void c6280_device::device_clock_changed()
 
 void c6280_device::device_start()
 {
-	/* Loudest volume level for table */
+	// Loudest volume level for table
 	double level = 65535.0 / 6.0 / 32.0;
 
-	/* Clear context */
+	// Clear context
 	m_select = 0;
+	m_enabled = 0;
 	m_balance = 0;
 	m_lfo_frequency = 0;
 	m_lfo_control = 0;
@@ -326,8 +336,8 @@ void c6280_device::device_start()
 
 	m_stream = stream_alloc(0, 2, clock());
 
-	/* Make volume table */
-	/* PSG has 48dB volume range spread over 32 steps */
+	// Make volume table
+	// PSG has 48dB volume range spread over 32 steps
 	double step = 48.0 / 32.0;
 	for (int i = 0; i < 31; i++)
 	{
@@ -337,6 +347,7 @@ void c6280_device::device_start()
 	m_volume_table[31] = 0;
 
 	save_item(NAME(m_select));
+	save_item(NAME(m_enabled));
 	save_item(NAME(m_balance));
 	save_item(NAME(m_lfo_frequency));
 	save_item(NAME(m_lfo_control));
