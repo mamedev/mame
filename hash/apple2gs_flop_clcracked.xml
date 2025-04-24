@@ -1145,44 +1145,40 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="mathblst">
-		<description>Math Blaster Plus! (version 1.1) (cleanly cracked)</description>
-		<year>1989</year>
-		<publisher>Davidson and Associates</publisher>
-		<info name="author" value="Jan Davidson and Cathy Johnson" />
-		<info name="programmer" value="C.K. Haun" />
-		<info name="version" value="1.1" />
-		<info name="usage" value="Requires a 512K Apple IIgs ROM1 or later." />
-		<sharedfeat name="compatibility" value="A2GS"/>
-		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 512K Apple IIgs ROM1 or later. -->
-		<!-- "Math Blaster Plus!" is a 1989 educational program designed by Jan Davidson and Cathy Johnson, written by C.K. Haun, and distributed by Davidson and Associates. -->
-		<!-- Protection: Bad block check for block $308 -->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="819264">
-				<rom name="math blaster plus v1.1 iigs (trex crack).2mg" size="819264" crc="96b3a909" sha1="5c7a1e8172f25ef328239971175b1f28a317fe2a" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mathblsta" cloneof="mathblst">
-		<description>Math Blaster Plus! (version 1.0) (cleanly cracked)</description>
+		<description>Math Blaster Plus! (version 1.0) (trex crack)</description>
 		<year>1989</year>
-		<publisher>Davidson and Associates</publisher>
+		<publisher>Davidson &amp; Associates</publisher>
 		<info name="author" value="Jan Davidson and Cathy Johnson" />
 		<info name="programmer" value="C.K. Haun" />
 		<info name="version" value="1.0" />
 		<info name="usage" value="Requires a 512K Apple IIgs ROM1 or later." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 512K Apple IIgs ROM1 or later. -->
-		<!-- "Math Blaster Plus!" is a 1989 educational program designed by Jan Davidson and Cathy Johnson, written by C.K. Haun, and distributed by Davidson and Associates. -->
+		<!-- educational program -->
 		<!-- Protection: Bad block check for block $308 -->
-
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="math blaster plus v1.0 iigs (trex crack).2mg" size="819264" crc="37120366" sha1="b6a585415cbac0f69182da911bf7ec298df5fcbc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathblst">
+		<description>Math Blaster Plus! (version 1.1) (trex crack)</description>
+		<year>1989</year>
+		<publisher>Davidson &amp; Associates</publisher>
+		<info name="author" value="Jan Davidson and Cathy Johnson" />
+		<info name="programmer" value="C.K. Haun" />
+		<info name="version" value="1.1" />
+		<info name="usage" value="Requires a 512K Apple IIgs ROM1 or later." />
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- Dump released: 2021-08-13 -->
+		<!-- educational program -->
+		<!-- It requires a 512K Apple IIgs ROM1 or later. -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819264">
+				<rom name="math blaster plus v1.1 iigs (trex crack).2mg" size="819264" crc="96b3a909" sha1="5c7a1e8172f25ef328239971175b1f28a317fe2a" />
 			</dataarea>
 		</part>
 	</software>
@@ -1571,19 +1567,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="readingme">
-		<description>Reading and Me (version 1.0) (cleanly cracked)</description>
+	<software name="readandme">
+		<description>Reading and Me (version 1.0) (trex crack)</description>
 		<year>1988</year>
-		<publisher>Davidson and Associates</publisher>
+		<publisher>Davidson &amp; Associates</publisher>
 		<info name="programmer" value="Louis X. Savain and C. K. Haun" />
 		<info name="version" value="1.0" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 512K Apple IIgs. -->
-		<!-- "Reading and Me" is a 1988 educational program developed by Louis X. Savain and C. K. Haun, and distributed by Davidson & Associates. -->
 		<!-- Protection: Bad block check for block $308 -->
-
+		<!-- educational program -->
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1 - Program disk"/>
 			<dataarea name="flop" size="819264">
