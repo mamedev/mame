@@ -135,11 +135,12 @@ private:
 	uint8_t *pkt;
 	int len;
 	pcap_t *p;
+	uint8_t m_pktbuf[2048];
 
-	uint8_t packets[32][1600];
-	int packetlens[32];
-	std::atomic<int> head;
-	std::atomic<int> tail;
+	uint8_t m_packets[32][1600];
+	int m_packetlens[32];
+	std::atomic<int> m_head;
+	std::atomic<int> m_tail;
 
 	static void pcap_handler(u_char *user, const struct pcap_pkthdr *h, const u_char *bytes);
 	static void *pcap_blocker(void *arg);
@@ -154,16 +155,16 @@ void pcap_module::netdev_pcap::pcap_handler(u_char *user, const struct pcap_pkth
 	if (!ctx->p)
 		return;
 
-	int const curr = ctx->head;
+	int const curr = ctx->m_head.load(std::memory_order_relaxed);
 	int const next = (curr + 1) & 0x1f;
-	if (ctx->tail.load(std::memory_order_acquire) == next)
+	if (ctx->m_tail.load(std::memory_order_acquire) == next)
 	{
 		printf("buffer full, dropping packet\n");
 		return;
 	}
-	memcpy(ctx->packets[curr], bytes, h->len);
-	ctx->packetlens[curr] = h->len;
-	ctx->head.store(next, std::memory_order_release);
+	memcpy(ctx->m_packets[curr], bytes, h->len);
+	ctx->m_packetlens[curr] = h->len;
+	ctx->m_head.store(next, std::memory_order_release);
 }
 
 void *pcap_module::netdev_pcap::pcap_blocker(void *arg)
@@ -202,8 +203,8 @@ pcap_module::netdev_pcap::netdev_pcap(pcap_module &module, const char *name, net
 	}
 
 #ifdef SDLMAME_MACOSX
-	head = 0;
-	tail = 0;
+	m_head = 0;
+	m_tail = 0;
 	p = m_p;
 	pthread_create(&m_thread, nullptr, &netdev_pcap::pcap_blocker, this);
 #endif
@@ -211,40 +212,36 @@ pcap_module::netdev_pcap::netdev_pcap(pcap_module &module, const char *name, net
 
 int pcap_module::netdev_pcap::send(void const *buf, int len)
 {
-	int ret;
-	if(!m_p) {
+	if (!m_p)
+	{
 		printf("send invoked, but no pcap context\n");
 		return 0;
 	}
-	ret = (*m_module.pcap_sendpacket_dl)(m_p, reinterpret_cast<const u_char *>(buf), len);
+	int ret = (*m_module.pcap_sendpacket_dl)(m_p, reinterpret_cast<const u_char *>(buf), len);
 	printf("sent packet length %d, returned %d\n", len, ret);
 	return ret ? len : 0;
-	//return (!pcap_sendpacket_dl(m_p, reinterpret_cast<const u_char *>(buf), len))?len:0;
+	//return (!pcap_sendpacket_dl(m_p, reinterpret_cast<const u_char *>(buf), len)) ? len : 0;
 }
 
 int pcap_module::netdev_pcap::recv_dev(uint8_t **buf)
 {
-#ifdef SDLMAME_MACOSX
-	uint8_t pktbuf[2048];
-	int ret;
-
 	// no device open?
-	if(!m_p) return 0;
-
-	// Empty
-
-	int const curr = tail;
-	if (head.load(std::memory_order_acquire) == curr)
+	if (!m_p)
 		return 0;
 
-	memcpy(pktbuf, packets[curr], packetlens[curr]);
-	ret = packetlens[curr];
-	tail.store((curr + 1) & 0x1f, std::memory_order_release);
-	*buf = pktbuf;
+#ifdef SDLMAME_MACOSX
+	// Empty
+	int const curr = m_tail.load(std::memory_order_relaxed);
+	if (m_head.load(std::memory_order_acquire) == curr)
+		return 0;
+
+	memcpy(m_pktbuf, m_packets[curr], m_packetlens[curr]);
+	int ret = m_packetlens[curr];
+	m_tail.store((curr + 1) & 0x1f, std::memory_order_release);
+	*buf = m_pktbuf;
 	return ret;
 #else
 	struct pcap_pkthdr *header;
-	if(!m_p) return 0;
 	return ((*m_module.pcap_next_ex_dl)(m_p, &header, (const u_char **)buf) == 1)?header->len:0;
 #endif
 }

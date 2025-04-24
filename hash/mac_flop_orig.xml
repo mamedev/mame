@@ -13,7 +13,7 @@ license:CC0-1.0
 		<info name="programmer" value="Glenn Axworthy" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.0" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-09-28-->
 		<!--action game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -30,7 +30,8 @@ license:CC0-1.0
 		<info name="programmer" value="Chris Crawford" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, and Mac Plus." />
 		<info name="version" value="1.03" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="macse,macclasc" />
 		<!--Dump released: 2022-09-28-->
 		<!--simulation game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -47,7 +48,7 @@ license:CC0-1.0
 		<info name="programmer" value="Brodie Lockard" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.0" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-09-28-->
 		<!--board game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -64,7 +65,8 @@ license:CC0-1.0
 		<info name="author" value="Ray E. Tobey" />
 		<info name="developer" value="Dynamix" />
 		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2022-09-28-->
 		<!--action game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -82,7 +84,8 @@ license:CC0-1.0
 		<info name="developer" value="Westwood" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, and Mac Plus." />
 		<info name="version" value="1985-09-30" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="macse,macclasc" />
 		<!--Dump released:  2022-09-28-->
 		<!--roleplaying game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -115,7 +118,8 @@ license:CC0-1.0
 		<publisher>Mindscape</publisher>
 		<info name="programmer" value="Craig Erickson, Jay Zipnick, Billy Wolfe, Terry Schulenburg, Mark Waterman, Darin Adler, David Marsh, Todd Squires, Tod Zipnick, Steve Hays, and Waldemar Horwat" />
 		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2022-09-28-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -139,7 +143,8 @@ license:CC0-1.0
 		<info name="programmer" value="Roberta Williams, Charles Tingley, Ken MacNeill, Arthur Abraham, Doug MacNeill, Greg Rowland, Jeff Stephenson, Sol Ackerman, Chris Iden, and Mark Langbehn" />
 		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.10" />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2022-09-28-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -195,7 +200,8 @@ license:CC0-1.0
 		<publisher>Activision</publisher>
 		<info name="developer" value="Activision" />
 		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2022-09-28-->
 		<!--strategy game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -211,7 +217,7 @@ license:CC0-1.0
 		<publisher>Mindscape</publisher>
 		<info name="developer" value="Angelsoft" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-09-28-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -243,7 +249,7 @@ license:CC0-1.0
 		<publisher>Mindscape</publisher>
 		<info name="developer" value="Angelsoft" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-09-28-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -260,7 +266,8 @@ license:CC0-1.0
 		<info name="developer" value="Action Games" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, and Mac Plus." />
 		<info name="version" value="1985-10-24" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="macse,macclasc" />
 		<!--Dump released: 2022-09-28-->
 		<!--sports game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -277,7 +284,8 @@ license:CC0-1.0
 		<info name="developer" value="Action Games" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, and Mac Plus." />
 		<info name="version" value="1985-10-31" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="macse,macclasc" />
 		<!--Dump released: 2022-09-28-->
 		<!--sports game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -311,7 +319,8 @@ license:CC0-1.0
 		<publisher>Miles Computing</publisher>
 		<info name="programmer" value="Tim Hays" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, and Mac Plus." />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="macse,macclasc" />
 		<!--Dump released: 2022-09-29-->
 		<!--action game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -329,7 +338,7 @@ license:CC0-1.0
 		<info name="developer" value="MindBender" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.3" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-09-29-->
 		<!--simulation game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -403,7 +412,8 @@ license:CC0-1.0
 		<info name="developer" value="ICOM Simulations" />
 		<info name="programmer" value="Dave Feldman, David Marsh, Terry Schulenburg, Karl Roelofs, Jay Zipnick, Todd Squires, Darin Adler, Tod Zipnick, Waldemar Horwat, Steve Hays" />
 		<info name="usage" value="Self-boots and runs on a Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2022-10-05-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -500,7 +510,8 @@ license:CC0-1.0
 		<info name="programmer" value="Thomas A. Roden" />
 		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.02" />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2022-10-07-->
 		<!--board game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -516,7 +527,8 @@ license:CC0-1.0
 		<publisher>BLUE WHALE gameworks</publisher>
 		<info name="programmer" value="L. Bardi, B. Arias, and P. Fritz" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, and Mac Plus." />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="macse,macclasc" />
 		<!--Dump released: 2022-10-14-->
 		<!--action game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -591,7 +603,7 @@ license:CC0-1.0
 		<info name="programmer" value="Michael Berlyn" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="release 23 / 840809-C" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-10-28-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -608,7 +620,7 @@ license:CC0-1.0
 		<info name="programmer" value="Stu Galley" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="release 22 / 840924-C" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-10-28-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -625,7 +637,7 @@ license:CC0-1.0
 		<info name="programmer" value="Stu Galley" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="release 15 / 840522-C" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-10-28-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -642,7 +654,7 @@ license:CC0-1.0
 		<info name="programmer" value="Marc Blank and Dave Lebling" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="release 17 / 840727-C" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-10-28-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -725,9 +737,9 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Infocom</publisher>
 		<info name="programmer" value="Douglas Adams and Steve Meretzky" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="release 47 / 840914-C" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-12-08-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -742,9 +754,9 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Infocom</publisher>
 		<info name="programmer" value="Dave Lebling and Marc Blank" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="release 76 / 840509" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2023-05-29-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -759,9 +771,9 @@ license:CC0-1.0
 		<year>1983</year>
 		<publisher>Infocom</publisher>
 		<info name="programmer" value="Marc Blank" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="release 27 / 831005-C" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2023-05-29-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -776,9 +788,9 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Infocom</publisher>
 		<info name="programmer" value="Michael Berlyn" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="release 22 / 840522-C" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2023-05-29-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -793,9 +805,9 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Infocom</publisher>
 		<info name="programmer" value="Dave Lebling" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="release 14 / 841005-C" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2023-05-29-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -810,9 +822,9 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Infocom</publisher>
 		<info name="programmer" value="Steve Meretzky" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="release 29 / 840118-B" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2023-05-29-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -827,9 +839,9 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Infocom</publisher>
 		<info name="programmer" value="Jeff O'Neill" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="release 97 / 851218-G" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2023-05-29-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -844,9 +856,9 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Infocom</publisher>
 		<info name="programmer" value="Marc Blank and Dave Lebling" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="release 24 / 851118-G" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2023-05-29-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -861,9 +873,9 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Infocom</publisher>
 		<info name="programmer" value="Dave Lebling" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="release 63 / 850916-F" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2023-05-29-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -878,9 +890,9 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Infocom</publisher>
 		<info name="programmer" value="Brian Moriarty" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="release 11 / 860509-3H" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2023-05-29-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -895,9 +907,9 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Infocom</publisher>
 		<info name="programmer" value="Steve Meretzky" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="release 107 / 870430-G" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2023-05-29-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -912,9 +924,9 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Infocom</publisher>
 		<info name="programmer" value="Dave Lebling" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="release 203 / 870506-G" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2023-05-30-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -932,7 +944,7 @@ license:CC0-1.0
 		<info name="programmer" value="E.C. Horvath" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.0" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-10-28-->
 		<!--simulation game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -963,7 +975,7 @@ license:CC0-1.0
 		<info name="programmer" value="E.C. Horvath" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.1 female" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-10-28-->
 		<!--simulation game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1017,7 +1029,7 @@ license:CC0-1.0
 		<info name="programmer" value="Bruce Artwick, Mike Kulas, and Paul Travis" />
 		<info name="usage" value="Self-boots and runs on Mac 128K (some features unavailable), Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.02" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-11-02-->
 		<!--simulation game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1065,7 +1077,7 @@ license:CC0-1.0
 		<year>1990</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="programmer" value="Gene Portwood, Lauren Elliott, Jack Trainor, Matt Siegel, Don Albrecht, Leila Bronstein, Michelle Bushneff, Maureen Gilhooly, Julie Glavin, Barbara Lawrence, Tom Rettig, and Michael Barrett" />
-		<info name="usage" value="Self-boots and runs on Mac Plus, Mac SE, Mac SE/FD, Mac Classic, Mac LC, and Mac II." />
+		<info name="usage" value="Self-boots and runs on Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, Mac LC, and Mac II." />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="macplus,macse,macsefd,macclasc,maclc,macii" />
 		<!--Dump released: 2022-11-07-->
@@ -1095,9 +1107,9 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="programmer" value="Geoff Brown and John MacMillan" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.0" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-11-07-->
 		<!--music program-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1112,7 +1124,7 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Silicon Beach Software</publisher>
 		<info name="programmer" value="William Appleton, Frank Boosman, Eric Zocher, Charlie Jackson, Mari Hughes, Glenn Arnold, John Knott, Mark Pierce, Linda McLennan" />
-		<info name="usage" value="Self-boots and runs on Mac Plus, Mac SE, Mac SE/FD, Mac Classic, and Mac II." />
+		<info name="usage" value="Self-boots and runs on Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
 		<info name="version" value="1.2" />
 		<sharedfeat name="compatibility" value="macplus,macse,macsefd,macclasc,macii" />
 		<!--Dump released: 2022-11-18-->
@@ -1129,8 +1141,8 @@ license:CC0-1.0
 		<year>1990</year>
 		<publisher>Sir-Tech Software</publisher>
 		<info name="programmer" value="D. W. Bradley, Gary Speegle, Chris Appel, Renata Dolnick, Suzanne Snelling, Paul McCall, Brenda Garno, Steve Miller, Jeff Noyle and David Triggerson" />
-		<info name="usage" value="Self-boots and runs on Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="macplus,macse,macsefd,macclasc" />
+		<info name="usage" value="Self-boots and runs on Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="macplus,macse,macclasc" />
 		<!--Dump released: 2022-11-18-->
 		<!--roleplaying game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1192,8 +1204,8 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Silicon Beach Software</publisher>
 		<info name="programmer" value="Jonathan Gay, Eric Zocher, Charlie Jackson, and Joe Ferrara" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-11-19-->
 		<!--action game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1208,9 +1220,10 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Videx</publisher>
 		<info name="programmer" value="Darrel Aldrich, Ron Aldrich, Walter Wittel, Robert Scott Bettis, Mark Borgerson, and Randy Dana-Frigault" />
-		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SEFD, and Mac Classic." />
 		<info name="version" value="1.1" />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2022-11-24-->
 		<!--simulation game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1225,8 +1238,9 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Telarium</publisher>
 		<info name="programmer" value="Byron Press, Michael Reaves, J. Brynne Stephens, Michael P. Meyer, John Pierard, Robert Strong, Seth McEvoy, and Lee Jacknow" />
-		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2022-12-03-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1248,7 +1262,7 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Innovative Data Design</publisher>
 		<info name="developer" value="Innovative Data Design" />
-		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, Mac Classic, and Mac II." />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
 		<info name="version" value="1.2" />
 		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc,macii" />
 		<!--Dump released: 2022-12-04-->
@@ -1272,9 +1286,9 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Human Edge Software</publisher>
 		<info name="developer" value="Human Edge Software" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.0" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-12-04-->
 		<!--educational progam-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1289,9 +1303,10 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="programmer" value="Jim Calhoun, Kyle Wickware, Glenn Axworthy, and Lauren Elliott" />
-		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.1" />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2022-12-04-->
 		<!--graphics progam-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1319,9 +1334,9 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>PBI Software</publisher>
 		<info name="programmer" value="Peter Merrill" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.2" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-12-04-->
 		<!--simulation game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1336,9 +1351,9 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Continental Software</publisher>
 		<info name="developer" value="Arrays, Inc." />
-		<info name="usage" value="Self-boots and runs on Mac 128K, 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.01" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-12-04-->
 		<!--productivity application-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1353,7 +1368,7 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Epyx</publisher>
 		<info name="programmer" value="Gordon Walton, John Polasek, D.R. Gilman, Mike Jones, and Sean Hill" />
-		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, Mac Classic, and Mac II." />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
 		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc,macii" />
 		<!--Dump released:  2022-12-08-->
 		<!--simulation game-->
@@ -1369,8 +1384,9 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Applications Plus</publisher>
 		<info name="developer" value="Applications Plus" />
-		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2022-12-08-->
 		<!--simulation game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1386,9 +1402,10 @@ license:CC0-1.0
 		<publisher>Rainbird</publisher>
 		<info name="developer" value="Magnetic Scrolls" />
 		<info name="programmer" value="Geoff Quilley, Rob Steggles, Tony Lambert, Jeremy San, and Duncan Maclean" />
-		<info name="usage" value="Requires a bootable system disk (not included) and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Requires a bootable system disk (not included) and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="2.3" />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2022-12-08-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1403,8 +1420,9 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Miles Computing</publisher>
 		<info name="programmer" value="Gregory Simons, Scott Levy, Mark Jeffery, and Mei-Ying C. Dell'Aquila" />
-		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2022-12-08-->
 		<!--sports game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1419,9 +1437,9 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Monogram Publishing</publisher>
 		<info name="programmer" value="Frank Mullin and Curt Bianchi" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.3" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-12-08-->
 		<!--productivity application-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1461,8 +1479,8 @@ license:CC0-1.0
 		<publisher>Activision</publisher>
 		<info name="developer" value="Interplay Productions" />
 		<info name="programmer" value="Ayman Adham, Rebecca Heineman, Jay Patel, Troy P. Worrell, David Lowery, Curt Tourmanian, Greg Miller, Brian Fargo, Michael Cranford" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-12-12-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1478,7 +1496,7 @@ license:CC0-1.0
 		<publisher>Penguin Software</publisher>
 		<info name="author" value="Dallas Snell, Joe Toler, and Joel Ellis Rea" />
 		<info name="programmer" value="Ed Loewenstein" />
-		<info name="usage" value="Self--boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, Mac Classic, and Mac II." />
+		<info name="usage" value="Self--boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
 		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc,macii" />
 		<!--Dump released: 2022-12-14-->
 		<!--adventure game-->
@@ -1496,7 +1514,8 @@ license:CC0-1.0
 		<info name="author" value="Antonio Antiochia" />
 		<info name="programmer" value="Robert Hardy" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, and Mac Plus." />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="macse,macclasc" />
 		<!--Dump released: 2022-12-14-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1512,8 +1531,8 @@ license:CC0-1.0
 		<publisher>Activision</publisher>
 		<info name="developer" value="Interplay Productions" />
 		<info name="programmer" value="Allen Adham, Rebecca Heineman, and Troy P. Worrell" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-12-14-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1529,9 +1548,9 @@ license:CC0-1.0
 		<publisher>Penguin Software</publisher>
 		<info name="author" value="John Besnard" />
 		<info name="programmer" value="Robert Hardy" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.1" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-12-14-->
 		<!--board game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1546,8 +1565,8 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="programmer" value="Dave Murry and Barry Murry" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-12-14-->
 		<!--sports game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1562,8 +1581,8 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Gamestar</publisher>
 		<info name="developer" value="Gamestar" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-12-14-->
 		<!--sports game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1578,8 +1597,8 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Mindscape</publisher>
 		<info name="developer" value="Angelsoft" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-12-14-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1594,7 +1613,7 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Mindscape</publisher>
 		<info name="programmer" value="Jack Trainor, Steve Quinn, Jim Cuomo, Phyllis Jacob, Robert Jacob, Peter Oliphant, John Cutter, and Kellyn Beeck" />
-		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, Mac Classic, and Mac II." />
+		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
 		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc,macii" />
 		<!--Dump released: 2022-12-14-->
 		<!--strategy game-->
@@ -1610,8 +1629,9 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Mindscape</publisher>
 		<info name="programmer" value="Doug Sharp, Robert Jacob, Phyllis Jacob, John Cutter, Eric Rosser, Paul Walsh, and Inga Velde" />
-		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc" />
+		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k,mac512k" />
 		<!--Dump released: 2022-12-14-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1626,9 +1646,9 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>THINK Technologies</publisher>
 		<info name="programmer" value="Terry L. Lucas, Peter J. Maruhnic, Andrew Singer, Mel Conway, and Jon Hueras" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.0" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-12-19-->
 		<!--development tool-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1643,9 +1663,9 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Miles Computing</publisher>
 		<info name="programmer" value="David Simons and Alvin Wen" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.0" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-12-22-->
 		<!--action game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1660,9 +1680,10 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>QWare</publisher>
 		<info name="programmer" value="Edward Schultz and Michael M. Mayer" />
-		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.04" />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2022-12-24-->
 		<!--roleplaying game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1677,9 +1698,10 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Davidson &amp; Associates</publisher>
 		<info name="programmer" value="Jan Davidson, Ph.D. and Joel Cannon" />
-		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.1" />
-		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k,mac512k" />
 		<!--Dump released: 2023-01-01-->
 		<!--educational program-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1694,9 +1716,10 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>COMPUTER:applications, Inc.</publisher>
 		<info name="programmer" value="Randy Ubillos" />
-		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="2.03" />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2023-01-01-->
 		<!--productivity program-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1711,9 +1734,10 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Digidesign, Inc.</publisher>
 		<info name="programmer" value="Evan Brooks" />
-		<info name="usage" value="Runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.0" />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2023-01-01-->
 		<!--sound program-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1735,9 +1759,10 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Altsys</publisher>
 		<info name="developer" value="Altsys" />
-		<info name="usage" value="Runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="2.4.1" />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2023-01-01-->
 		<!--graphics program-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1752,9 +1777,9 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Mark of the Unicorn</publisher>
 		<info name="programmer" value="Tom Wade" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.00" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2023-02-19-->
 		<!--action game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1769,8 +1794,8 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Mindscape</publisher>
 		<info name="developer" value="Angelsoft" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2023-02-19-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1785,8 +1810,9 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Activision</publisher>
 		<info name="programmer" value="Rebecca Heineman" />
-		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FD/HD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2023-02-22-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1803,7 +1829,7 @@ license:CC0-1.0
 		<info name="programmer" value="Bill Budge and Bob Upshaw" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="2.5" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2023-02-22-->
 		<!--action game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1820,7 +1846,7 @@ license:CC0-1.0
 		<info name="author" value="Antonio Antiochia" />
 		<info name="programmer" value="Robert Hardry" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2023-02-22-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1835,8 +1861,9 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Mindscape</publisher>
 		<info name="programmer" value="Todd Squires, Craig Erickson, Kurt Nelson, Steve Hays, Terry Schulenberg, Darin Adler, Jay Zipnick, Waldemar Horwat, and Mark Waterman" />
-		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FD/HD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2023-02-27-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1858,7 +1885,7 @@ license:CC0-1.0
 		<year>1988</year>
 		<publisher>Mindscape</publisher>
 		<info name="programmer" value="Fred Allen, Darin Adler, Julia Ulano, Michael Manning, Jay Zipnick, Todd Squires, Brian Maker, David Feldman, Steve Hays, Mitch Adler, Karl Roelofs, Tod Zipnick, David Marsh, Waldemar Horwat, Paul Snively, and Ed Dluzen" />
-		<info name="usage" value="Runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FD/HD, Mac Classic, and Mac II." />
+		<info name="usage" value="Runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
 		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc,macii" />
 		<!--Dump released: 2023-03-30-->
 		<!--adventure game-->
@@ -1911,7 +1938,8 @@ license:CC0-1.0
 		<info name="programmer" value="Tim Hays" />
 		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.2" />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2023-03-30-->
 		<!--action game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1944,7 +1972,7 @@ license:CC0-1.0
 		<publisher>Origin Systems</publisher>
 		<info name="author" value="Greg Malone" />
 		<info name="developer" value="MicroMagic" />
-		<info name="usage" value="Runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FD/HD, Mac Classic, and Mac II." />
+		<info name="usage" value="Runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
 		<info name="version" value="1.03" />
 		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc,macii" />
 		<!--Dump released: 2023-03-31-->
@@ -1961,7 +1989,7 @@ license:CC0-1.0
 		<year>1990</year>
 		<publisher>Inline Design</publisher>
 		<info name="programmer" value="Nicholas Schlott" />
-		<info name="usage" value="Runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FD/HD, Mac Classic, and Mac II (supports 256 colors)." />
+		<info name="usage" value="Runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II (supports 256 colors)." />
 		<info name="version" value="1.06" />
 		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc,macii" />
 		<!--Dump released: 2023-04-04-->
@@ -1978,7 +2006,7 @@ license:CC0-1.0
 		<year>1989</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="programmer" value="Gene Portwood, Lauren Elliott, Chris Jochumson, Don Albrecht, Arturo Sinclair, Mark Schlicting, and Tom Rettig" />
-		<info name="usage" value="Runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, Mac Classic, and Mac II." />
+		<info name="usage" value="Runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc,macii" />
 		<!--Dump released: 2023-04-05-->
@@ -2002,7 +2030,7 @@ license:CC0-1.0
 		<year>1988</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="programmer" value="Christopher Gross, Lauren Elliott, and Gene Portwood" />
-		<info name="usage" value="Runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, Mac Classic, and Mac II." />
+		<info name="usage" value="Runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc,macii" />
 		<!--Dump released: 2023-04-05-->
@@ -2019,9 +2047,10 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="developer" value="Sensei Software" />
-		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.1" />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2023-04-05-->
 		<!--educational program-->
 		<part name="flop1" interface="floppy_3_5">
@@ -2043,9 +2072,10 @@ license:CC0-1.0
 		<year>1989</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="developer" value="Sensei Software" />
-		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.2" />
-		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k,mac512k" />
 		<!--Dump released: 2023-04-06-->
 		<!--educational program-->
 		<part name="flop1" interface="floppy_3_5">
@@ -2060,9 +2090,10 @@ license:CC0-1.0
 		<year>1989</year>
 		<publisher>Maxis</publisher>
 		<info name="programmer" value="Will Wright, Robert A. Strobel, and Brett G. Durrett" />
-		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.1" />
-		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k,mac512k" />
 		<!--Dump released: 2023-04-06-->
 		<!--simulation game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -2077,8 +2108,8 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Thunder Mountain</publisher>
 		<info name="developer" value="BrainBank" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2023-04-06-->
 		<!--strategy game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -2111,7 +2142,8 @@ license:CC0-1.0
 		<info name="programmer" value="Dave Kusek and Don Williams" />
 		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.10" />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2023-04-07-->
 		<!--audio program-->
 		<part name="flop1" interface="floppy_3_5">
@@ -2128,7 +2160,8 @@ license:CC0-1.0
 		<info name="programmer" value="Dave Kusek and Don Williams" />
 		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="2.00h" />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2023-04-07-->
 		<!--audio program-->
 		<part name="flop1" interface="floppy_3_5">
@@ -2162,7 +2195,8 @@ license:CC0-1.0
 		<info name="programmer" value="Jim Zuber" />
 		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.1" />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2023-05-25-->
 		<!--simulation game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -2180,7 +2214,7 @@ license:CC0-1.0
 		<info name="programmer" value="Bert Porter" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.0" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2023-05-25-->
 		<!--simulation game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -2197,7 +2231,8 @@ license:CC0-1.0
 		<info name="developer" value="Microsoft" />
 		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.04" />
-		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k,mac512k" />
 		<!--Dump released: 2023-05-28-->
 		<!--productivity program-->
 		<part name="flop1" interface="floppy_3_5">
@@ -2214,7 +2249,8 @@ license:CC0-1.0
 		<info name="developer" value="Microsoft" />
 		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.00" />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2023-05-28-->
 		<!--productivity program-->
 		<part name="flop1" interface="floppy_3_5">
@@ -2236,9 +2272,9 @@ license:CC0-1.0
 		<year>1988</year>
 		<publisher>Miles Computing</publisher>
 		<info name="programmer" value="Cliff Johnson" />
-		<info name="usage" value="Self-boots and runs on Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="2.0" />
-		<sharedfeat name="compatibility" value="macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="macplus,macse,macclasc" />
 		<!--Dump released: 2023-05-29-->
 		<!--puzzle game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -2262,7 +2298,7 @@ license:CC0-1.0
 		<info name="programmer" value="Thomas Hoffman and Steven Slesinger" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.0" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2023-06-15-->
 		<!--board game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -2294,7 +2330,8 @@ license:CC0-1.0
 		<publisher>Unicorn Software</publisher>
 		<info name="programmer" value="David Howard Flatman and Ray Tripamer" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, and Mac Plus." />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="macse,macclasc" />
 		<!-- Dump released: 2025-01-14 -->
 		<!-- educational game -->
 		<part name="flop1" interface="floppy_3_5">
@@ -2311,7 +2348,6 @@ license:CC0-1.0
 		<info name="developer" value="Bitstream" />
 		<info name="usage" value="Each font is available in AFM, Suitcase, and Type 1 format." />
 		<info name="version" value="2.0" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
 		<!-- Dump released: 2025-03-28 -->
 		<!-- font collection -->
 		<part name="flop1" interface="floppy_3_5">
@@ -3287,9 +3323,10 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Ann Arbor Softworks</publisher>
 		<info name="programmer" value="Steve Newman, Scott Wiener, and Jeff Young" />
-		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, and Mac SE/FD" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, and Mac SE FDHD" />
 		<info name="version" value="1.0" />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k,macclasc" />
 		<!-- Dump released: 2025-01-23 -->
 		<!-- graphics program -->
 		<part name="flop1" interface="floppy_3_5">
@@ -3304,8 +3341,9 @@ license:CC0-1.0
 		<year>1989</year>
 		<publisher>Accolade</publisher>
 		<info name="programmer" value="Steve Cartwright, Greg Hospelhorn, George Wong, and Roseann Mitchell" />
-		<info name="usage" value="Self-boots and runs on Mac 512KE, Mac Plus, Mac SE, Mac SE FD/HD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc" />
+		<info name="usage" value="Self-boots and runs on Mac 512KE, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k,mac512k" />
 		<!-- Dump released: 2025-04-01 -->
 		<!-- sports game -->
 		<part name="flop1" interface="floppy_3_5">
@@ -3322,7 +3360,7 @@ license:CC0-1.0
 		<info name="programmer" value="Roy Harvey and Fred Zinn" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.0" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!-- Dump released: 2025-04-01 -->
 		<!-- action game -->
 		<part name="flop1" interface="floppy_3_5">
@@ -3338,8 +3376,8 @@ license:CC0-1.0
 		<publisher>Activision</publisher>
 		<info name="developer" value="Activision" />
 		<info name="programmer" value="Steve Cartwright" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SEFD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!-- Dump released: 2025-04-01 -->
 		<!-- strategy game -->
 		<part name="flop1" interface="floppy_3_5">
@@ -3354,9 +3392,10 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher> Bullseye Software</publisher>
 		<info name="programmer" value="Donald A. Hill" />
-		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512KE, Mac Plus, Mac SE, Mac SE FD/HD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512KE, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.37" />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!-- Dump released: 2025-04-01 -->
 		<!-- racing game -->
 		<part name="flop1" interface="floppy_3_5">
@@ -3371,8 +3410,9 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Accolade</publisher>
 		<info name="programmer" value="Bob Whitehead, Mike Benna, Tony Lee, and Ed Bogas" />
-		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SEFD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!-- Dump released: 2025-04-01 -->
 		<!-- sports game -->
 		<part name="flop1" interface="floppy_3_5">
@@ -3389,7 +3429,7 @@ license:CC0-1.0
 		<info name="programmer" value="Todd James Harris, Susan Wiltse, Justine R. Hencey, Jamie McCarthy, Renee West, and Steve Vance" />
 		<info name="usage" value="Requires hard disk installation and runs on Mac II or later." />
 		<info name="version" value="1.0.1" />
-		<sharedfeat name="compatibility" value="macii" />
+		<sharedfeat name="incompatibility" value="MC68000" />
 		<!-- Dump released: 2025-04-03 -->
 		<!-- educational game -->
 		<part name="flop1" interface="floppy_3_5">

@@ -347,17 +347,17 @@ void drifto94_state::dsp_data_map(address_map &map)
 	map(0x0000, 0x07ff).rom().region("dspdata", 0);
 }
 
-uint16_t drifto94_state::dsp_r(offs_t offset)
+uint8_t drifto94_state::dsp_r(offs_t offset)
 {
 	const uint16_t temp = m_dsp->dataram_r(offset / 2);
 	const uint8_t shift = BIT(offset, 0) << 3;
 	return (temp >> shift) & 0xff;
 }
 
-void drifto94_state::dsp_w(offs_t offset, uint16_t data)
+void drifto94_state::dsp_w(offs_t offset, uint8_t data)
 {
 	const uint8_t shift = BIT(offset, 0) << 3;
-	m_dsp->dataram_w(offset / 2, (data & 0xff) << shift, 0xff << shift);
+	m_dsp->dataram_w(offset / 2, (uint16_t(data) << 8) | data, uint16_t(0xff) << shift);
 }
 
 /***************************************************************************
