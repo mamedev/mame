@@ -10,6 +10,8 @@ R6502AP CPU
 20.0000 MHz XTAL (near CPU)
 HD46505SP CRTC
 Excellent ES-8712 custom
+2x SN76489A (probably, chips are partially covered in the pic) with a 104K yellow capacitor each
+unmarked 22 (?) pin chip with a 104K yellow capacitor
 4x 6116ALSP-12 RAM (near ES-8712)
 4x bank of 8 DIP switches (SW2-5)
 reset button (SW1)
@@ -20,15 +22,14 @@ TODO:
 * complete inputs
 * outputs
 * use CRTC device for drawing routines
-* sound? PCB pics show an unmarked 22 (?) pin chip with a 104K yellow resonator
-* first half of the program ROM?
-* why doesn't the game draw the title? pics show it should
+* is sound complete? what's the unmarked 22 (?) pin chip?
 */
 
 #include "emu.h"
 
 #include "cpu/m6502/m6502.h"
 #include "sound/es8712.h"
+#include "sound/sn76496.h"
 #include "video/mc6845.h"
 
 #include "emupal.h"
@@ -80,7 +81,7 @@ void es8906_state::video_start()
 	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(es8906_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(es8906_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
-	m_tilemap[1]->set_transparent_pen(0);
+	m_tilemap[0]->set_transparent_pen(0);
 }
 
 template <uint8_t Which>
@@ -108,8 +109,8 @@ void es8906_state::attrram_w(offs_t offset, uint8_t data)
 
 uint32_t es8906_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
 	m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -124,18 +125,19 @@ void es8906_state::program_map(address_map &map)
 	map(0x0801, 0x0801).rw("crtc", FUNC(hd6845s_device::register_r), FUNC(hd6845s_device::register_w));
 	map(0x1000, 0x17ff).ram().w(FUNC(es8906_state::tileram_w<0>)).share(m_tileram[0]);
 	map(0x1800, 0x1fff).ram().w(FUNC(es8906_state::attrram_w<0>)).share(m_attrram[0]);
-	map(0x2000, 0x27ff).ram().w(FUNC(es8906_state::tileram_w<0>)).share(m_tileram[1]); // only 0-ed at start up?
-	map(0x2800, 0x2fff).ram().w(FUNC(es8906_state::attrram_w<0>)).share(m_attrram[1]); // only 0-ed at start up?
+	map(0x2000, 0x27ff).ram().w(FUNC(es8906_state::tileram_w<1>)).share(m_tileram[1]);
+	map(0x2800, 0x2fff).ram().w(FUNC(es8906_state::attrram_w<1>)).share(m_attrram[1]);
 	map(0x3000, 0x3000).portr("IN1");
 	map(0x3010, 0x3010).portr("IN2");
 	map(0x3020, 0x3020).portr("IN3");
 	map(0x3030, 0x3030).portr("IN4");
 	map(0x3040, 0x3040).portr("IN5");
-	map(0x3800, 0x3800).portr("SW2");
+	map(0x3800, 0x3800).portr("SW2").w("sn1", FUNC(sn76489a_device::write));
 	map(0x3801, 0x3801).portr("SW3");
 	map(0x3802, 0x3802).portr("SW4");
 	map(0x3803, 0x3803).portr("SW5");
-	map(0x8000, 0xffff).rom();
+	map(0x3810, 0x3810).w("sn2", FUNC(sn76489a_device::write));
+	map(0x4000, 0xffff).rom();
 }
 
 
@@ -331,12 +333,16 @@ void es8906_state::es8906(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	ES8712(config, "essnd", 0);
+
+	SN76489A(config, "sn1", 20_MHz_XTAL / 10).add_route(ALL_OUTPUTS, "speaker", 0.50); // TODO: divider not verified
+
+	SN76489A(config, "sn2", 20_MHz_XTAL / 10).add_route(ALL_OUTPUTS, "speaker", 0.50); // TODO: divider not verified
 }
 
 
 ROM_START( dream9 ) // (C)1989 EXCELLENT SYSTEM SUPER 9 Ver1.52 PROGRAM by KAY/AMTECH Feb,6 1990, but pics show "Dream 9"
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "d5-00_excellent.3h", 0x00000, 0x10000, CRC(7c0ad390) SHA1(b173f7d4521a4bea4246b988e6b4fce179ac12bc) )
+	ROM_LOAD( "d5-00_excellent.3h", 0x00000, 0x10000, CRC(7c0ad390) SHA1(b173f7d4521a4bea4246b988e6b4fce179ac12bc) ) // 0x0000 - 0x3fff and 0x4000 - 0x7fff are identical
 
 	ROM_REGION( 0x20000, "tiles1", 0 ) // all labels have "エクセレント システム" (means "Excellent System") before what's below
 	ROM_LOAD( "9l.9l",   0x00000, 0x10000, CRC(63692c62) SHA1(ef06ffe4204b0c1e40f9685b62f403b94a9b6693) )
@@ -355,4 +361,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1990, dream9, 0, es8906, dream9, es8906_state, empty_init, ROT0, "Excellent System", "Dream 9 (v1.52)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1990, dream9, 0, es8906, dream9, es8906_state, empty_init, ROT0, "Excellent System", "Dream 9 (v1.52)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
