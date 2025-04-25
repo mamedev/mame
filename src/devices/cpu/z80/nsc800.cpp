@@ -49,7 +49,7 @@ void nsc800_device::device_reset()
 //-------------------------------------------------
 void nsc800_device::execute_run()
 {
-	#include "cpu/z80/ncs800.hxx"
+	#include "cpu/z80/nsc800.hxx"
 }
 
 void nsc800_device::execute_set_input(int inputnum, int state)
