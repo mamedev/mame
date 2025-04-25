@@ -531,31 +531,13 @@ macro   r800:otdr
 		PC -= 2; block_io_interrupted_flags();
 	}
 
-macro   jump	%opcode
-	{
-	#if defined(__clang__)
-		#pragma clang diagnostic push
-		#pragma clang diagnostic ignored "-Wtautological-bitwise-compare"
-	#endif
-		constexpr u16 idx = ((0x%opcode & 0xff00) ? (((0x%opcode & 0xff00) == 0xfe00) ? 0x0500 : ((0x%opcode & 0x3000) >> 4)) : 0x0400) | (0x%opcode & 0xff);
-		goto *opc_label[idx];
-	#if defined(__clang__)
-		#pragma clang diagnostic pop
-	#endif
-	}
+macro   jump	%po
+	prefix_op = %po;
+	goto process;
 
 macro   jump_prefixed   %prefix
-	{
-	#if defined(__clang__)
-		#pragma clang diagnostic push
-		#pragma clang diagnostic ignored "-Wtautological-bitwise-compare"
-	#endif
-		constexpr u16 p = (%prefix ? ((%prefix == 0xfe) ? 0x0500 : ((%prefix & 0x30) << 4)) : 0x0400);
-		goto *opc_label[p | TDAT8];
-	#if defined(__clang__)
-		#pragma clang diagnostic pop
-	#endif
-	}
+	prefix_op = p_%prefix | TDAT8;
+	goto process;
 
 macro   take_nmi
 	// Check if processor was halted
@@ -754,7 +736,8 @@ ffff
 		PRVPC = PC;
 		debugger_instruction_hook(PC);
 		call rop
-		goto *opc_label[0x0400 | TDAT8];
+		prefix_op = p_00 | TDAT8;
+		goto process;
 	}
 
 
@@ -2008,22 +1991,22 @@ fe3f	# SRL  A = (XY+o)
 	call wm
 
 fe40	# BIT  0,(XY+o)
-	call jump fe46
+	call jump p_fe | 0x46
 
 fe41	# BIT  0,(XY+o)
-	call jump fe46
+	call jump p_fe | 0x46
 
 fe42	# BIT  0,(XY+o)
-	call jump fe46
+	call jump p_fe | 0x46
 
 fe43	# BIT  0,(XY+o)
-	call jump fe46
+	call jump p_fe | 0x46
 
 fe44	# BIT  0,(XY+o)
-	call jump fe46
+	call jump p_fe | 0x46
 
 fe45	# BIT  0,(XY+o)
-	call jump fe46
+	call jump p_fe | 0x46
 
 fe46	# BIT  0,(XY+o)
 	TADR = m_ea;
@@ -2031,25 +2014,25 @@ fe46	# BIT  0,(XY+o)
 	bit_xy(0, TDAT8);
 
 fe47	# BIT  0,(XY+o)
-	call jump fe46
+	call jump p_fe | 0x46
 
 fe48	# BIT  1,(XY+o)
-	call jump fe4e
+	call jump p_fe | 0x4e
 
 fe49	# BIT  1,(XY+o)
-	call jump fe4e
+	call jump p_fe | 0x4e
 
 fe4a	# BIT  1,(XY+o)
-	call jump fe4e
+	call jump p_fe | 0x4e
 
 fe4b	# BIT  1,(XY+o)
-	call jump fe4e
+	call jump p_fe | 0x4e
 
 fe4c	# BIT  1,(XY+o)
-	call jump fe4e
+	call jump p_fe | 0x4e
 
 fe4d	# BIT  1,(XY+o)
-	call jump fe4e
+	call jump p_fe | 0x4e
 
 fe4e	# BIT  1,(XY+o)
 	TADR = m_ea;
@@ -2057,25 +2040,25 @@ fe4e	# BIT  1,(XY+o)
 	bit_xy(1, TDAT8);
 
 fe4f	# BIT  1,(XY+o)
-	call jump fe4e
+	call jump p_fe | 0x4e
 
 fe50	# BIT  2,(XY+o)
-	call jump fe56
+	call jump p_fe | 0x56
 
 fe51	# BIT  2,(XY+o)
-	call jump fe56
+	call jump p_fe | 0x56
 
 fe52	# BIT  2,(XY+o)
-	call jump fe56
+	call jump p_fe | 0x56
 
 fe53	# BIT  2,(XY+o)
-	call jump fe56
+	call jump p_fe | 0x56
 
 fe54	# BIT  2,(XY+o)
-	call jump fe56
+	call jump p_fe | 0x56
 
 fe55	# BIT  2,(XY+o)
-	call jump fe56
+	call jump p_fe | 0x56
 
 fe56	# BIT  2,(XY+o)
 	TADR = m_ea;
@@ -2083,25 +2066,25 @@ fe56	# BIT  2,(XY+o)
 	bit_xy(2, TDAT8);
 
 fe57	# BIT  2,(XY+o)
-	call jump fe56
+	call jump p_fe | 0x56
 
 fe58	# BIT  3,(XY+o)
-	call jump fe5e
+	call jump p_fe | 0x5e
 
 fe59	# BIT  3,(XY+o)
-	call jump fe5e
+	call jump p_fe | 0x5e
 
 fe5a	# BIT  3,(XY+o)
-	call jump fe5e
+	call jump p_fe | 0x5e
 
 fe5b	# BIT  3,(XY+o)
-	call jump fe5e
+	call jump p_fe | 0x5e
 
 fe5c	# BIT  3,(XY+o)
-	call jump fe5e
+	call jump p_fe | 0x5e
 
 fe5d	# BIT  3,(XY+o)
-	call jump fe5e
+	call jump p_fe | 0x5e
 
 fe5e	# BIT  3,(XY+o)
 	TADR = m_ea;
@@ -2109,25 +2092,25 @@ fe5e	# BIT  3,(XY+o)
 	bit_xy(3, TDAT8);
 
 fe5f	# BIT  3,(XY+o)
-	call jump fe5e
+	call jump p_fe | 0x5e
 
 fe60	# BIT  4,(XY+o)
-	call jump fe66
+	call jump p_fe | 0x66
 
 fe61	# BIT  4,(XY+o)
-	call jump fe66
+	call jump p_fe | 0x66
 
 fe62	# BIT  4,(XY+o)
-	call jump fe66
+	call jump p_fe | 0x66
 
 fe63	# BIT  4,(XY+o)
-	call jump fe66
+	call jump p_fe | 0x66
 
 fe64	# BIT  4,(XY+o)
-	call jump fe66
+	call jump p_fe | 0x66
 
 fe65	# BIT  4,(XY+o)
-	call jump fe66
+	call jump p_fe | 0x66
 
 fe66	# BIT  4,(XY+o)
 	TADR = m_ea;
@@ -2135,25 +2118,25 @@ fe66	# BIT  4,(XY+o)
 	bit_xy(4, TDAT8);
 
 fe67	# BIT  4,(XY+o)
-	call jump fe66
+	call jump p_fe | 0x66
 
 fe68	# BIT  5,(XY+o)
-	call jump fe6e
+	call jump p_fe | 0x6e
 
 fe69	# BIT  5,(XY+o)
-	call jump fe6e
+	call jump p_fe | 0x6e
 
 fe6a	# BIT  5,(XY+o)
-	call jump fe6e
+	call jump p_fe | 0x6e
 
 fe6b	# BIT  5,(XY+o)
-	call jump fe6e
+	call jump p_fe | 0x6e
 
 fe6c	# BIT  5,(XY+o)
-	call jump fe6e
+	call jump p_fe | 0x6e
 
 fe6d	# BIT  5,(XY+o)
-	call jump fe6e
+	call jump p_fe | 0x6e
 
 fe6e	# BIT  5,(XY+o)
 	TADR = m_ea;
@@ -2161,25 +2144,25 @@ fe6e	# BIT  5,(XY+o)
 	bit_xy(5, TDAT8);
 
 fe6f	# BIT  5,(XY+o)
-	call jump fe6e
+	call jump p_fe | 0x6e
 
 fe70	# BIT  6,(XY+o)
-	call jump fe76
+	call jump p_fe | 0x76
 
 fe71	# BIT  6,(XY+o)
-	call jump fe76
+	call jump p_fe | 0x76
 
 fe72	# BIT  6,(XY+o)
-	call jump fe76
+	call jump p_fe | 0x76
 
 fe73	# BIT  6,(XY+o)
-	call jump fe76
+	call jump p_fe | 0x76
 
 fe74	# BIT  6,(XY+o)
-	call jump fe76
+	call jump p_fe | 0x76
 
 fe75	# BIT  6,(XY+o)
-	call jump fe76
+	call jump p_fe | 0x76
 
 fe76	# BIT  6,(XY+o)
 	TADR = m_ea;
@@ -2187,25 +2170,25 @@ fe76	# BIT  6,(XY+o)
 	bit_xy(6, TDAT8);
 
 fe77	# BIT  6,(XY+o)
-	call jump fe76
+	call jump p_fe | 0x76
 
 fe78	# BIT  7,(XY+o)
-	call jump fe7e
+	call jump p_fe | 0x7e
 
 fe79	# BIT  7,(XY+o)
-	call jump fe7e
+	call jump p_fe | 0x7e
 
 fe7a	# BIT  7,(XY+o)
-	call jump fe7e
+	call jump p_fe | 0x7e
 
 fe7b	# BIT  7,(XY+o)
-	call jump fe7e
+	call jump p_fe | 0x7e
 
 fe7c	# BIT  7,(XY+o)
-	call jump fe7e
+	call jump p_fe | 0x7e
 
 fe7d	# BIT  7,(XY+o)
-	call jump fe7e
+	call jump p_fe | 0x7e
 
 fe7e	# BIT  7,(XY+o)
 	TADR = m_ea;
@@ -2213,7 +2196,7 @@ fe7e	# BIT  7,(XY+o)
 	bit_xy(7, TDAT8);
 
 fe7f	# BIT  7,(XY+o)
-	call jump fe7e
+	call jump p_fe | 0x7e
 
 fe80	# RES  0,B = (XY+o)
 	TADR = m_ea;
@@ -2989,39 +2972,39 @@ feff	# SET  7,A = (XY+o)
 ##########################################################
 dd00	# DB   DD
 	illegal_1();
-	call jump 0000
+	call jump p_00 | 0x00
 
 dd01	# DB   DD
 	illegal_1();
-	call jump 0001
+	call jump p_00 | 0x01
 
 dd02	# DB   DD
 	illegal_1();
-	call jump 0002
+	call jump p_00 | 0x02
 
 dd03	# DB   DD
 	illegal_1();
-	call jump 0003
+	call jump p_00 | 0x03
 
 dd04	# DB   DD
 	illegal_1();
-	call jump 0004
+	call jump p_00 | 0x04
 
 dd05	# DB   DD
 	illegal_1();
-	call jump 0005
+	call jump p_00 | 0x05
 
 dd06	# DB   DD
 	illegal_1();
-	call jump 0006
+	call jump p_00 | 0x06
 
 dd07	# DB   DD
 	illegal_1();
-	call jump 0007
+	call jump p_00 | 0x07
 
 dd08	# DB   DD
 	illegal_1();
-	call jump 0008
+	call jump p_00 | 0x08
 
 dd09	# ADD  IX,BC
 	TDAT = IX; TDAT2 = BC;
@@ -3030,63 +3013,63 @@ dd09	# ADD  IX,BC
 
 dd0a	# DB   DD
 	illegal_1();
-	call jump 000a
+	call jump p_00 | 0x0a
 
 dd0b	# DB   DD
 	illegal_1();
-	call jump 000b
+	call jump p_00 | 0x0b
 
 dd0c	# DB   DD
 	illegal_1();
-	call jump 000c
+	call jump p_00 | 0x0c
 
 dd0d	# DB   DD
 	illegal_1();
-	call jump 000d
+	call jump p_00 | 0x0d
 
 dd0e	# DB   DD
 	illegal_1();
-	call jump 000e
+	call jump p_00 | 0x0e
 
 dd0f	# DB   DD
 	illegal_1();
-	call jump 000f
+	call jump p_00 | 0x0f
 
 dd10	# DB   DD
 	illegal_1();
-	call jump 0010
+	call jump p_00 | 0x10
 
 dd11	# DB   DD
 	illegal_1();
-	call jump 0011
+	call jump p_00 | 0x11
 
 dd12	# DB   DD
 	illegal_1();
-	call jump 0012
+	call jump p_00 | 0x12
 
 dd13	# DB   DD
 	illegal_1();
-	call jump 0013
+	call jump p_00 | 0x13
 
 dd14	# DB   DD
 	illegal_1();
-	call jump 0014
+	call jump p_00 | 0x14
 
 dd15	# DB   DD
 	illegal_1();
-	call jump 0015
+	call jump p_00 | 0x15
 
 dd16	# DB   DD
 	illegal_1();
-	call jump 0016
+	call jump p_00 | 0x16
 
 dd17	# DB   DD
 	illegal_1();
-	call jump 0017
+	call jump p_00 | 0x17
 
 dd18	# DB   DD
 	illegal_1();
-	call jump 0018
+	call jump p_00 | 0x18
 
 dd19	# ADD  IX,DE
 	TDAT = IX; TDAT2 = DE;
@@ -3095,31 +3078,31 @@ dd19	# ADD  IX,DE
 
 dd1a	# DB   DD
 	illegal_1();
-	call jump 001a
+	call jump p_00 | 0x1a
 
 dd1b	# DB   DD
 	illegal_1();
-	call jump 001b
+	call jump p_00 | 0x1b
 
 dd1c	# DB   DD
 	illegal_1();
-	call jump 001c
+	call jump p_00 | 0x1c
 
 dd1d	# DB   DD
 	illegal_1();
-	call jump 001d
+	call jump p_00 | 0x1d
 
 dd1e	# DB   DD
 	illegal_1();
-	call jump 001e
+	call jump p_00 | 0x1e
 
 dd1f	# DB   DD
 	illegal_1();
-	call jump 001f
+	call jump p_00 | 0x1f
 
 dd20	# DB   DD
 	illegal_1();
-	call jump 0020
+	call jump p_00 | 0x20
 
 dd21	# LD   IX,w
 	call arg16
@@ -3147,11 +3130,11 @@ dd26	# LD   HX,n
 
 dd27	# DB   DD
 	illegal_1();
-	call jump 0027
+	call jump p_00 | 0x27
 
 dd28	# DB   DD
 	illegal_1();
-	call jump 0028
+	call jump p_00 | 0x28
 
 dd29	# ADD  IX,IX
 	TDAT = IX; TDAT2 = IX;
@@ -3180,23 +3163,23 @@ dd2e	# LD   LX,n
 
 dd2f	# DB   DD
 	illegal_1();
-	call jump 002f
+	call jump p_00 | 0x2f
 
 dd30	# DB   DD
 	illegal_1();
-	call jump 0030
+	call jump p_00 | 0x30
 
 dd31	# DB   DD
 	illegal_1();
-	call jump 0031
+	call jump p_00 | 0x31
 
 dd32	# DB   DD
 	illegal_1();
-	call jump 0032
+	call jump p_00 | 0x32
 
 dd33	# DB   DD
 	illegal_1();
-	call jump 0033
+	call jump p_00 | 0x33
 
 dd34	# INC  (IX+o)
 	call eax
@@ -3226,11 +3209,11 @@ dd36	# LD   (IX+o),n
 
 dd37	# DB   DD
 	illegal_1();
-	call jump 0037
+	call jump p_00 | 0x37
 
 dd38	# DB   DD
 	illegal_1();
-	call jump 0038
+	call jump p_00 | 0x38
 
 dd39	# ADD  IX,SP
 	TDAT = IX; TDAT2 = SP;
@@ -3239,43 +3222,43 @@ dd39	# ADD  IX,SP
 
 dd3a	# DB   DD
 	illegal_1();
-	call jump 003a
+	call jump p_00 | 0x3a
 
 dd3b	# DB   DD
 	illegal_1();
-	call jump 003b
+	call jump p_00 | 0x3b
 
 dd3c	# DB   DD
 	illegal_1();
-	call jump 003c
+	call jump p_00 | 0x3c
 
 dd3d	# DB   DD
 	illegal_1();
-	call jump 003d
+	call jump p_00 | 0x3d
 
 dd3e	# DB   DD
 	illegal_1();
-	call jump 003e
+	call jump p_00 | 0x3e
 
 dd3f	# DB   DD
 	illegal_1();
-	call jump 003f
+	call jump p_00 | 0x3f
 
 dd40	# DB   DD
 	illegal_1();
-	call jump 0040
+	call jump p_00 | 0x40
 
 dd41	# DB   DD
 	illegal_1();
-	call jump 0041
+	call jump p_00 | 0x41
 
 dd42	# DB   DD
 	illegal_1();
-	call jump 0042
+	call jump p_00 | 0x42
 
 dd43	# DB   DD
 	illegal_1();
-	call jump 0043
+	call jump p_00 | 0x43
 
 dd44	# LD   B,HX
 	B = HX;
@@ -3293,23 +3276,23 @@ dd46	# LD   B,(IX+o)
 
 dd47	# DB   DD
 	illegal_1();
-	call jump 0047
+	call jump p_00 | 0x47
 
 dd48	# DB   DD
 	illegal_1();
-	call jump 0048
+	call jump p_00 | 0x48
 
 dd49	# DB   DD
 	illegal_1();
-	call jump 0049
+	call jump p_00 | 0x49
 
 dd4a	# DB   DD
 	illegal_1();
-	call jump 004a
+	call jump p_00 | 0x4a
 
 dd4b	# DB   DD
 	illegal_1();
-	call jump 004b
+	call jump p_00 | 0x4b
 
 dd4c	# LD   C,HX
 	C = HX;
@@ -3327,23 +3310,23 @@ dd4e	# LD   C,(IX+o)
 
 dd4f	# DB   DD
 	illegal_1();
-	call jump 004f
+	call jump p_00 | 0x4f
 
 dd50	# DB   DD
 	illegal_1();
-	call jump 0050
+	call jump p_00 | 0x50
 
 dd51	# DB   DD
 	illegal_1();
-	call jump 0051
+	call jump p_00 | 0x51
 
 dd52	# DB   DD
 	illegal_1();
-	call jump 0052
+	call jump p_00 | 0x52
 
 dd53	# DB   DD
 	illegal_1();
-	call jump 0053
+	call jump p_00 | 0x53
 
 dd54	# LD   D,HX
 	D = HX;
@@ -3361,23 +3344,23 @@ dd56	# LD   D,(IX+o)
 
 dd57	# DB   DD
 	illegal_1();
-	call jump 0057
+	call jump p_00 | 0x57
 
 dd58	# DB   DD
 	illegal_1();
-	call jump 0058
+	call jump p_00 | 0x58
 
 dd59	# DB   DD
 	illegal_1();
-	call jump 0059
+	call jump p_00 | 0x59
 
 dd5a	# DB   DD
 	illegal_1();
-	call jump 005a
+	call jump p_00 | 0x5a
 
 dd5b	# DB   DD
 	illegal_1();
-	call jump 005b
+	call jump p_00 | 0x5b
 
 dd5c	# LD   E,HX
 	E = HX;
@@ -3395,7 +3378,7 @@ dd5e	# LD   E,(IX+o)
 
 dd5f	# DB   DD
 	illegal_1();
-	call jump 005f
+	call jump p_00 | 0x5f
 
 dd60	# LD   HX,B
 	HX = B;
@@ -3497,7 +3480,7 @@ dd75	# LD   (IX+o),L
 
 dd76	# DB   DD
 	illegal_1();
-	call jump 0076
+	call jump p_00 | 0x76
 
 dd77	# LD   (IX+o),A
 	call eax
@@ -3508,19 +3491,19 @@ dd77	# LD   (IX+o),A
 
 dd78	# DB   DD
 	illegal_1();
-	call jump 0078
+	call jump p_00 | 0x78
 
 dd79	# DB   DD
 	illegal_1();
-	call jump 0079
+	call jump p_00 | 0x79
 
 dd7a	# DB   DD
 	illegal_1();
-	call jump 007a
+	call jump p_00 | 0x7a
 
 dd7b	# DB   DD
 	illegal_1();
-	call jump 007b
+	call jump p_00 | 0x7b
 
 dd7c	# LD   A,HX
 	A = HX;
@@ -3538,23 +3521,23 @@ dd7e	# LD   A,(IX+o)
 
 dd7f	# DB   DD
 	illegal_1();
-	call jump 007f
+	call jump p_00 | 0x7f
 
 dd80	# DB   DD
 	illegal_1();
-	call jump 0080
+	call jump p_00 | 0x80
 
 dd81	# DB   DD
 	illegal_1();
-	call jump 0081
+	call jump p_00 | 0x81
 
 dd82	# DB   DD
 	illegal_1();
-	call jump 0082
+	call jump p_00 | 0x82
 
 dd83	# DB   DD
 	illegal_1();
-	call jump 0083
+	call jump p_00 | 0x83
 
 dd84	# ADD  A,HX
 	add_a(HX);
@@ -3572,23 +3555,23 @@ dd86	# ADD  A,(IX+o)
 
 dd87	# DB   DD
 	illegal_1();
-	call jump 0087
+	call jump p_00 | 0x87
 
 dd88	# DB   DD
 	illegal_1();
-	call jump 0088
+	call jump p_00 | 0x88
 
 dd89	# DB   DD
 	illegal_1();
-	call jump 0089
+	call jump p_00 | 0x89
 
 dd8a	# DB   DD
 	illegal_1();
-	call jump 008a
+	call jump p_00 | 0x8a
 
 dd8b	# DB   DD
 	illegal_1();
-	call jump 008b
+	call jump p_00 | 0x8b
 
 dd8c	# ADC  A,HX
 	adc_a(HX);
@@ -3606,23 +3589,23 @@ dd8e	# ADC  A,(IX+o)
 
 dd8f	# DB   DD
 	illegal_1();
-	call jump 008f
+	call jump p_00 | 0x8f
 
 dd90	# DB   DD
 	illegal_1();
-	call jump 0090
+	call jump p_00 | 0x90
 
 dd91	# DB   DD
 	illegal_1();
-	call jump 0091
+	call jump p_00 | 0x91
 
 dd92	# DB   DD
 	illegal_1();
-	call jump 0092
+	call jump p_00 | 0x92
 
 dd93	# DB   DD
 	illegal_1();
-	call jump 0093
+	call jump p_00 | 0x93
 
 dd94	# SUB  HX
 	sub_a(HX);
@@ -3640,23 +3623,23 @@ dd96	# SUB  (IX+o)
 
 dd97	# DB   DD
 	illegal_1();
-	call jump 0097
+	call jump p_00 | 0x97
 
 dd98	# DB   DD
 	illegal_1();
-	call jump 0098
+	call jump p_00 | 0x98
 
 dd99	# DB   DD
 	illegal_1();
-	call jump 0099
+	call jump p_00 | 0x99
 
 dd9a	# DB   DD
 	illegal_1();
-	call jump 009a
+	call jump p_00 | 0x9a
 
 dd9b	# DB   DD
 	illegal_1();
-	call jump 009b
+	call jump p_00 | 0x9b
 
 dd9c	# SBC  A,HX
 	sbc_a(HX);
@@ -3674,23 +3657,23 @@ dd9e	# SBC  A,(IX+o)
 
 dd9f	# DB   DD
 	illegal_1();
-	call jump 009f
+	call jump p_00 | 0x9f
 
 dda0	# DB   DD
 	illegal_1();
-	call jump 00a0
+	call jump p_00 | 0xa0
 
 dda1	# DB   DD
 	illegal_1();
-	call jump 00a1
+	call jump p_00 | 0xa1
 
 dda2	# DB   DD
 	illegal_1();
-	call jump 00a2
+	call jump p_00 | 0xa2
 
 dda3	# DB   DD
 	illegal_1();
-	call jump 00a3
+	call jump p_00 | 0xa3
 
 dda4	# AND  HX
 	and_a(HX);
@@ -3708,23 +3691,23 @@ dda6	# AND  (IX+o)
 
 dda7	# DB   DD
 	illegal_1();
-	call jump 00a7
+	call jump p_00 | 0xa7
 
 dda8	# DB   DD
 	illegal_1();
-	call jump 00a8
+	call jump p_00 | 0xa8
 
 dda9	# DB   DD
 	illegal_1();
-	call jump 00a9
+	call jump p_00 | 0xa9
 
 ddaa	# DB   DD
 	illegal_1();
-	call jump 00aa
+	call jump p_00 | 0xaa
 
 ddab	# DB   DD
 	illegal_1();
-	call jump 00ab
+	call jump p_00 | 0xab
 
 ddac	# XOR  HX
 	xor_a(HX);
@@ -3742,23 +3725,23 @@ ddae	# XOR  (IX+o)
 
 ddaf	# DB   DD
 	illegal_1();
-	call jump 00af
+	call jump p_00 | 0xaf
 
 ddb0	# DB   DD
 	illegal_1();
-	call jump 00b0
+	call jump p_00 | 0xb0
 
 ddb1	# DB   DD
 	illegal_1();
-	call jump 00b1
+	call jump p_00 | 0xb1
 
 ddb2	# DB   DD
 	illegal_1();
-	call jump 00b2
+	call jump p_00 | 0xb2
 
 ddb3	# DB   DD
 	illegal_1();
-	call jump 00b3
+	call jump p_00 | 0xb3
 
 ddb4	# OR   HX
 	or_a(HX);
@@ -3776,23 +3759,23 @@ ddb6	# OR   (IX+o)
 
 ddb7	# DB   DD
 	illegal_1();
-	call jump 00b7
+	call jump p_00 | 0xb7
 
 ddb8	# DB   DD
 	illegal_1();
-	call jump 00b8
+	call jump p_00 | 0xb8
 
 ddb9	# DB   DD
 	illegal_1();
-	call jump 00b9
+	call jump p_00 | 0xb9
 
 ddba	# DB   DD
 	illegal_1();
-	call jump 00ba
+	call jump p_00 | 0xba
 
 ddbb	# DB   DD
 	illegal_1();
-	call jump 00bb
+	call jump p_00 | 0xbb
 
 ddbc	# CP   HX
 	cp(HX);
@@ -3810,142 +3793,142 @@ ddbe	# CP   (IX+o)
 
 ddbf	# DB   DD
 	illegal_1();
-	call jump 00bf
+	call jump p_00 | 0xbf
 
 ddc0	# DB   DD
 	illegal_1();
-	call jump 00c0
+	call jump p_00 | 0xc0
 
 ddc1	# DB   DD
 	illegal_1();
-	call jump 00c1
+	call jump p_00 | 0xc1
 
 ddc2	# DB   DD
 	illegal_1();
-	call jump 00c2
+	call jump p_00 | 0xc2
 
 ddc3	# DB   DD
 	illegal_1();
-	call jump 00c3
+	call jump p_00 | 0xc3
 
 ddc4	# DB   DD
 	illegal_1();
-	call jump 00c4
+	call jump p_00 | 0xc4
 
 ddc5	# DB   DD
 	illegal_1();
-	call jump 00c5
+	call jump p_00 | 0xc5
 
 ddc6	# DB   DD
 	illegal_1();
-	call jump 00c6
+	call jump p_00 | 0xc6
 
 ddc7	# DB   DD
 	illegal_1();
-	call jump 00c7
+	call jump p_00 | 0xc7
 
 ddc8	# DB   DD
 	illegal_1();
-	call jump 00c8
+	call jump p_00 | 0xc8
 
 ddc9	# DB   DD
 	illegal_1();
-	call jump 00c9
+	call jump p_00 | 0xc9
 
 ddca	# DB   DD
 	illegal_1();
-	call jump 00ca
+	call jump p_00 | 0xca
 
 ddcb	# **   DD CB xx
 	call eax
 	call arg
 	TADR = PC-1;
 	2 * call nomreq_addr
-	call jump_prefixed 0xfe
+	call jump_prefixed fe
 
 ddcc	# DB   DD
 	illegal_1();
-	call jump 00cc
+	call jump p_00 | 0xcc
 
 ddcd	# DB   DD
 	illegal_1();
-	call jump 00cd
+	call jump p_00 | 0xcd
 
 ddce	# DB   DD
 	illegal_1();
-	call jump 00ce
+	call jump p_00 | 0xce
 
 ddcf	# DB   DD
 	illegal_1();
-	call jump 00cf
+	call jump p_00 | 0xcf
 
 ddd0	# DB   DD
 	illegal_1();
-	call jump 00d0
+	call jump p_00 | 0xd0
 
 ddd1	# DB   DD
 	illegal_1();
-	call jump 00d1
+	call jump p_00 | 0xd1
 
 ddd2	# DB   DD
 	illegal_1();
-	call jump 00d2
+	call jump p_00 | 0xd2
 
 ddd3	# DB   DD
 	illegal_1();
-	call jump 00d3
+	call jump p_00 | 0xd3
 
 ddd4	# DB   DD
 	illegal_1();
-	call jump 00d4
+	call jump p_00 | 0xd4
 
 ddd5	# DB   DD
 	illegal_1();
-	call jump 00d5
+	call jump p_00 | 0xd5
 
 ddd6	# DB   DD
 	illegal_1();
-	call jump 00d6
+	call jump p_00 | 0xd6
 
 ddd7	# DB   DD
 	illegal_1();
-	call jump 00d7
+	call jump p_00 | 0xd7
 
 ddd8	# DB   DD
 	illegal_1();
-	call jump 00d8
+	call jump p_00 | 0xd8
 
 ddd9	# DB   DD
 	illegal_1();
-	call jump 00d9
+	call jump p_00 | 0xd9
 
 ddda	# DB   DD
 	illegal_1();
-	call jump 00da
+	call jump p_00 | 0xda
 
 dddb	# DB   DD
 	illegal_1();
-	call jump 00db
+	call jump p_00 | 0xdb
 
 dddc	# DB   DD
 	illegal_1();
-	call jump 00dc
+	call jump p_00 | 0xdc
 
 dddd	# DB   DD
 	illegal_1();
-	call jump 00dd
+	call jump p_00 | 0xdd
 
 ddde	# DB   DD
 	illegal_1();
-	call jump 00de
+	call jump p_00 | 0xde
 
 dddf	# DB   DD
 	illegal_1();
-	call jump 00df
+	call jump p_00 | 0xdf
 
 dde0	# DB   DD
 	illegal_1();
-	call jump 00e0
+	call jump p_00 | 0xe0
 
 dde1	# POP  IX
 	call pop
@@ -3953,7 +3936,7 @@ dde1	# POP  IX
 
 dde2	# DB   DD
 	illegal_1();
-	call jump 00e2
+	call jump p_00 | 0xe2
 
 dde3	# EX   (SP),IX
 	TDAT = IX;
@@ -3962,7 +3945,7 @@ dde3	# EX   (SP),IX
 
 dde4	# DB   DD
 	illegal_1();
-	call jump 00e4
+	call jump p_00 | 0xe4
 
 dde5	# PUSH IX
 	TDAT = IX;
@@ -3970,78 +3953,78 @@ dde5	# PUSH IX
 
 dde6	# DB   DD
 	illegal_1();
-	call jump 00e6
+	call jump p_00 | 0xe6
 
 dde7	# DB   DD
 	illegal_1();
-	call jump 00e7
+	call jump p_00 | 0xe7
 
 dde8	# DB   DD
 	illegal_1();
-	call jump 00e8
+	call jump p_00 | 0xe8
 
 dde9	# JP   (IX)
 	PC = IX;
 
 ddea	# DB   DD
 	illegal_1();
-	call jump 00ea
+	call jump p_00 | 0xea
 
 ddeb	# DB   DD
 	illegal_1();
-	call jump 00eb
+	call jump p_00 | 0xeb
 
 ddec	# DB   DD
 	illegal_1();
-	call jump 00ec
+	call jump p_00 | 0xec
 
 dded	# DB   DD
 	illegal_1();
-	call jump 00ed
+	call jump p_00 | 0xed
 
 ddee	# DB   DD
 	illegal_1();
-	call jump 00ee
+	call jump p_00 | 0xee
 
 ddef	# DB   DD
 	illegal_1();
-	call jump 00ef
+	call jump p_00 | 0xef
 
 ddf0	# DB   DD
 	illegal_1();
-	call jump 00f0
+	call jump p_00 | 0xf0
 
 ddf1	# DB   DD
 	illegal_1();
-	call jump 00f1
+	call jump p_00 | 0xf1
 
 ddf2	# DB   DD
 	illegal_1();
-	call jump 00f2
+	call jump p_00 | 0xf2
 
 ddf3	# DB   DD
 	illegal_1();
-	call jump 00f3
+	call jump p_00 | 0xf3
 
 ddf4	# DB   DD
 	illegal_1();
-	call jump 00f4
+	call jump p_00 | 0xf4
 
 ddf5	# DB   DD
 	illegal_1();
-	call jump 00f5
+	call jump p_00 | 0xf5
 
 ddf6	# DB   DD
 	illegal_1();
-	call jump 00f6
+	call jump p_00 | 0xf6
 
 ddf7	# DB   DD
 	illegal_1();
-	call jump 00f7
+	call jump p_00 | 0xf7
 
 ddf8	# DB   DD
 	illegal_1();
-	call jump 00f8
+	call jump p_00 | 0xf8
 
 ddf9	# LD   SP,IX
 	call nomreq_ir 2
@@ -4049,27 +4032,27 @@ ddf9	# LD   SP,IX
 
 ddfa	# DB   DD
 	illegal_1();
-	call jump 00fa
+	call jump p_00 | 0xfa
 
 ddfb	# DB   DD
 	illegal_1();
-	call jump 00fb
+	call jump p_00 | 0xfb
 
 ddfc	# DB   DD
 	illegal_1();
-	call jump 00fc
+	call jump p_00 | 0xfc
 
 ddfd	# DB   DD
 	illegal_1();
-	call jump 00fd
+	call jump p_00 | 0xfd
 
 ddfe	# DB   DD
 	illegal_1();
-	call jump 00fe
+	call jump p_00 | 0xfe
 
 ddff	# DB   DD
 	illegal_1();
-	call jump 00ff
+	call jump p_00 | 0xff
 
 
 ##########################################################
@@ -4077,39 +4060,39 @@ ddff	# DB   DD
 ##########################################################
 fd00	# DB   FD
 	illegal_1();
-	call jump 0000
+	call jump p_00 | 0x00
 
 fd01	# DB   FD
 	illegal_1();
-	call jump 0001
+	call jump p_00 | 0x01
 
 fd02	# DB   FD
 	illegal_1();
-	call jump 0002
+	call jump p_00 | 0x02
 
 fd03	# DB   FD
 	illegal_1();
-	call jump 0003
+	call jump p_00 | 0x03
 
 fd04	# DB   FD
 	illegal_1();
-	call jump 0004
+	call jump p_00 | 0x04
 
 fd05	# DB   FD
 	illegal_1();
-	call jump 0005
+	call jump p_00 | 0x05
 
 fd06	# DB   FD
 	illegal_1();
-	call jump 0006
+	call jump p_00 | 0x06
 
 fd07	# DB   FD
 	illegal_1();
-	call jump 0007
+	call jump p_00 | 0x07
 
 fd08	# DB   FD
 	illegal_1();
-	call jump 0008
+	call jump p_00 | 0x08
 
 fd09	# ADD  IY,BC
 	TDAT = IY; TDAT2 = BC;
@@ -4118,63 +4101,63 @@ fd09	# ADD  IY,BC
 
 fd0a	# DB   FD
 	illegal_1();
-	call jump 000a
+	call jump p_00 | 0x0a
 
 fd0b	# DB   FD
 	illegal_1();
-	call jump 000b
+	call jump p_00 | 0x0b
 
 fd0c	# DB   FD
 	illegal_1();
-	call jump 000c
+	call jump p_00 | 0x0c
 
 fd0d	# DB   FD
 	illegal_1();
-	call jump 000d
+	call jump p_00 | 0x0d
 
 fd0e	# DB   FD
 	illegal_1();
-	call jump 000e
+	call jump p_00 | 0x0e
 
 fd0f	# DB   FD
 	illegal_1();
-	call jump 000f
+	call jump p_00 | 0x0f
 
 fd10	# DB   FD
 	illegal_1();
-	call jump 0010
+	call jump p_00 | 0x10
 
 fd11	# DB   FD
 	illegal_1();
-	call jump 0011
+	call jump p_00 | 0x11
 
 fd12	# DB   FD
 	illegal_1();
-	call jump 0012
+	call jump p_00 | 0x12
 
 fd13	# DB   FD
 	illegal_1();
-	call jump 0013
+	call jump p_00 | 0x13
 
 fd14	# DB   FD
 	illegal_1();
-	call jump 0014
+	call jump p_00 | 0x14
 
 fd15	# DB   FD
 	illegal_1();
-	call jump 0015
+	call jump p_00 | 0x15
 
 fd16	# DB   FD
 	illegal_1();
-	call jump 0016
+	call jump p_00 | 0x16
 
 fd17	# DB   FD
 	illegal_1();
-	call jump 0017
+	call jump p_00 | 0x17
 
 fd18	# DB   FD
 	illegal_1();
-	call jump 0018
+	call jump p_00 | 0x18
 
 fd19	# ADD  IY,DE
 	TDAT = IY; TDAT2 = DE;
@@ -4183,31 +4166,31 @@ fd19	# ADD  IY,DE
 
 fd1a	# DB   FD
 	illegal_1();
-	call jump 001a
+	call jump p_00 | 0x1a
 
 fd1b	# DB   FD
 	illegal_1();
-	call jump 001b
+	call jump p_00 | 0x1b
 
 fd1c	# DB   FD
 	illegal_1();
-	call jump 001c
+	call jump p_00 | 0x1c
 
 fd1d	# DB   FD
 	illegal_1();
-	call jump 001d
+	call jump p_00 | 0x1d
 
 fd1e	# DB   FD
 	illegal_1();
-	call jump 001e
+	call jump p_00 | 0x1e
 
 fd1f	# DB   FD
 	illegal_1();
-	call jump 001f
+	call jump p_00 | 0x1f
 
 fd20	# DB   FD
 	illegal_1();
-	call jump 0020
+	call jump p_00 | 0x20
 
 fd21	# LD   IY,w
 	call arg16
@@ -4235,11 +4218,11 @@ fd26	# LD   HY,n
 
 fd27	# DB   FD
 	illegal_1();
-	call jump 0027
+	call jump p_00 | 0x27
 
 fd28	# DB   FD
 	illegal_1();
-	call jump 0028
+	call jump p_00 | 0x28
 
 fd29	# ADD  IY,IY
 	TDAT = IY; TDAT2 = IY;
@@ -4268,23 +4251,23 @@ fd2e	# LD   LY,n
 
 fd2f	# DB   FD
 	illegal_1();
-	call jump 002f
+	call jump p_00 | 0x2f
 
 fd30	# DB   FD
 	illegal_1();
-	call jump 0030
+	call jump p_00 | 0x30
 
 fd31	# DB   FD
 	illegal_1();
-	call jump 0031
+	call jump p_00 | 0x31
 
 fd32	# DB   FD
 	illegal_1();
-	call jump 0032
+	call jump p_00 | 0x32
 
 fd33	# DB   FD
 	illegal_1();
-	call jump 0033
+	call jump p_00 | 0x33
 
 fd34	# INC  (IY+o)
 	call eay
@@ -4314,11 +4297,11 @@ fd36	# LD   (IY+o),n
 
 fd37	# DB   FD
 	illegal_1();
-	call jump 0037
+	call jump p_00 | 0x37
 
 fd38	# DB   FD
 	illegal_1();
-	call jump 0038
+	call jump p_00 | 0x38
 
 fd39	# ADD  IY,SP
 	TDAT = IY; TDAT2 = SP;
@@ -4327,43 +4310,43 @@ fd39	# ADD  IY,SP
 
 fd3a	# DB   FD
 	illegal_1();
-	call jump 003a
+	call jump p_00 | 0x3a
 
 fd3b	# DB   FD
 	illegal_1();
-	call jump 003b
+	call jump p_00 | 0x3b
 
 fd3c	# DB   FD
 	illegal_1();
-	call jump 003c
+	call jump p_00 | 0x3c
 
 fd3d	# DB   FD
 	illegal_1();
-	call jump 003d
+	call jump p_00 | 0x3d
 
 fd3e	# DB   FD
 	illegal_1();
-	call jump 003e
+	call jump p_00 | 0x3e
 
 fd3f	# DB   FD
 	illegal_1();
-	call jump 003f
+	call jump p_00 | 0x3f
 
 fd40	# DB   FD
 	illegal_1();
-	call jump 0040
+	call jump p_00 | 0x40
 
 fd41	# DB   FD
 	illegal_1();
-	call jump 0041
+	call jump p_00 | 0x41
 
 fd42	# DB   FD
 	illegal_1();
-	call jump 0042
+	call jump p_00 | 0x42
 
 fd43	# DB   FD
 	illegal_1();
-	call jump 0043
+	call jump p_00 | 0x43
 
 fd44	# LD   B,HY
 	B = HY;
@@ -4381,23 +4364,23 @@ fd46	# LD   B,(IY+o)
 
 fd47	# DB   FD
 	illegal_1();
-	call jump 0047
+	call jump p_00 | 0x47
 
 fd48	# DB   FD
 	illegal_1();
-	call jump 0048
+	call jump p_00 | 0x48
 
 fd49	# DB   FD
 	illegal_1();
-	call jump 0049
+	call jump p_00 | 0x49
 
 fd4a	# DB   FD
 	illegal_1();
-	call jump 004a
+	call jump p_00 | 0x4a
 
 fd4b	# DB   FD
 	illegal_1();
-	call jump 004b
+	call jump p_00 | 0x4b
 
 fd4c	# LD   C,HY
 	C = HY;
@@ -4415,23 +4398,23 @@ fd4e	# LD   C,(IY+o)
 
 fd4f	# DB   FD
 	illegal_1();
-	call jump 004f
+	call jump p_00 | 0x4f
 
 fd50	# DB   FD
 	illegal_1();
-	call jump 0050
+	call jump p_00 | 0x50
 
 fd51	# DB   FD
 	illegal_1();
-	call jump 0051
+	call jump p_00 | 0x51
 
 fd52	# DB   FD
 	illegal_1();
-	call jump 0052
+	call jump p_00 | 0x52
 
 fd53	# DB   FD
 	illegal_1();
-	call jump 0053
+	call jump p_00 | 0x53
 
 fd54	# LD   D,HY
 	D = HY;
@@ -4449,23 +4432,23 @@ fd56	# LD   D,(IY+o)
 
 fd57	# DB   FD
 	illegal_1();
-	call jump 0057
+	call jump p_00 | 0x57
 
 fd58	# DB   FD
 	illegal_1();
-	call jump 0058
+	call jump p_00 | 0x58
 
 fd59	# DB   FD
 	illegal_1();
-	call jump 0059
+	call jump p_00 | 0x59
 
 fd5a	# DB   FD
 	illegal_1();
-	call jump 005a
+	call jump p_00 | 0x5a
 
 fd5b	# DB   FD
 	illegal_1();
-	call jump 005b
+	call jump p_00 | 0x5b
 
 fd5c	# LD   E,HY
 	E = HY;
@@ -4483,7 +4466,7 @@ fd5e	# LD   E,(IY+o)
 
 fd5f	# DB   FD
 	illegal_1();
-	call jump 005f
+	call jump p_00 | 0x5f
 
 fd60	# LD   HY,B
 	HY = B;
@@ -4585,7 +4568,7 @@ fd75	# LD   (IY+o),L
 
 fd76	# DB   FD
 	illegal_1();
-	call jump 0076
+	call jump p_00 | 0x76
 
 fd77	# LD   (IY+o),A
 	call eay
@@ -4596,19 +4579,19 @@ fd77	# LD   (IY+o),A
 
 fd78	# DB   FD
 	illegal_1();
-	call jump 0078
+	call jump p_00 | 0x78
 
 fd79	# DB   FD
 	illegal_1();
-	call jump 0079
+	call jump p_00 | 0x79
 
 fd7a	# DB   FD
 	illegal_1();
-	call jump 007a
+	call jump p_00 | 0x7a
 
 fd7b	# DB   FD
 	illegal_1();
-	call jump 007b
+	call jump p_00 | 0x7b
 
 fd7c	# LD   A,HY
 	A = HY;
@@ -4626,23 +4609,23 @@ fd7e	# LD   A,(IY+o)
 
 fd7f	# DB   FD
 	illegal_1();
-	call jump 007f
+	call jump p_00 | 0x7f
 
 fd80	# DB   FD
 	illegal_1();
-	call jump 0080
+	call jump p_00 | 0x80
 
 fd81	# DB   FD
 	illegal_1();
-	call jump 0081
+	call jump p_00 | 0x81
 
 fd82	# DB   FD
 	illegal_1();
-	call jump 0082
+	call jump p_00 | 0x82
 
 fd83	# DB   FD
 	illegal_1();
-	call jump 0083
+	call jump p_00 | 0x83
 
 fd84	# ADD  A,HY
 	add_a(HY);
@@ -4660,23 +4643,23 @@ fd86	# ADD  A,(IY+o)
 
 fd87	# DB   FD
 	illegal_1();
-	call jump 0087
+	call jump p_00 | 0x87
 
 fd88	# DB   FD
 	illegal_1();
-	call jump 0088
+	call jump p_00 | 0x88
 
 fd89	# DB   FD
 	illegal_1();
-	call jump 0089
+	call jump p_00 | 0x89
 
 fd8a	# DB   FD
 	illegal_1();
-	call jump 008a
+	call jump p_00 | 0x8a
 
 fd8b	# DB   FD
 	illegal_1();
-	call jump 008b
+	call jump p_00 | 0x8b
 
 fd8c	# ADC  A,HY
 	adc_a(HY);
@@ -4694,23 +4677,23 @@ fd8e	# ADC  A,(IY+o)
 
 fd8f	# DB   FD
 	illegal_1();
-	call jump 008f
+	call jump p_00 | 0x8f
 
 fd90	# DB   FD
 	illegal_1();
-	call jump 0090
+	call jump p_00 | 0x90
 
 fd91	# DB   FD
 	illegal_1();
-	call jump 0091
+	call jump p_00 | 0x91
 
 fd92	# DB   FD
 	illegal_1();
-	call jump 0092
+	call jump p_00 | 0x92
 
 fd93	# DB   FD
 	illegal_1();
-	call jump 0093
+	call jump p_00 | 0x93
 
 fd94	# SUB  HY
 	sub_a(HY);
@@ -4728,23 +4711,23 @@ fd96	# SUB  (IY+o)
 
 fd97	# DB   FD
 	illegal_1();
-	call jump 0097
+	call jump p_00 | 0x97
 
 fd98	# DB   FD
 	illegal_1();
-	call jump 0098
+	call jump p_00 | 0x98
 
 fd99	# DB   FD
 	illegal_1();
-	call jump 0099
+	call jump p_00 | 0x99
 
 fd9a	# DB   FD
 	illegal_1();
-	call jump 009a
+	call jump p_00 | 0x9a
 
 fd9b	# DB   FD
 	illegal_1();
-	call jump 009b
+	call jump p_00 | 0x9b
 
 fd9c	# SBC  A,HY
 	sbc_a(HY);
@@ -4762,23 +4745,23 @@ fd9e	# SBC  A,(IY+o)
 
 fd9f	# DB   FD
 	illegal_1();
-	call jump 009f
+	call jump p_00 | 0x9f
 
 fda0	# DB   FD
 	illegal_1();
-	call jump 00a0
+	call jump p_00 | 0xa0
 
 fda1	# DB   FD
 	illegal_1();
-	call jump 00a1
+	call jump p_00 | 0xa1
 
 fda2	# DB   FD
 	illegal_1();
-	call jump 00a2
+	call jump p_00 | 0xa2
 
 fda3	# DB   FD
 	illegal_1();
-	call jump 00a3
+	call jump p_00 | 0xa3
 
 fda4	# AND  HY
 	and_a(HY);
@@ -4796,23 +4779,23 @@ fda6	# AND  (IY+o)
 
 fda7	# DB   FD
 	illegal_1();
-	call jump 00a7
+	call jump p_00 | 0xa7
 
 fda8	# DB   FD
 	illegal_1();
-	call jump 00a8
+	call jump p_00 | 0xa8
 
 fda9	# DB   FD
 	illegal_1();
-	call jump 00a9
+	call jump p_00 | 0xa9
 
 fdaa	# DB   FD
 	illegal_1();
-	call jump 00aa
+	call jump p_00 | 0xaa
 
 fdab	# DB   FD
 	illegal_1();
-	call jump 00ab
+	call jump p_00 | 0xab
 
 fdac	# XOR  HY
 	xor_a(HY);
@@ -4830,23 +4813,23 @@ fdae	# XOR  (IY+o)
 
 fdaf	# DB   FD
 	illegal_1();
-	call jump 00af
+	call jump p_00 | 0xaf
 
 fdb0	# DB   FD
 	illegal_1();
-	call jump 00b0
+	call jump p_00 | 0xb0
 
 fdb1	# DB   FD
 	illegal_1();
-	call jump 00b1
+	call jump p_00 | 0xb1
 
 fdb2	# DB   FD
 	illegal_1();
-	call jump 00b2
+	call jump p_00 | 0xb2
 
 fdb3	# DB   FD
 	illegal_1();
-	call jump 00b3
+	call jump p_00 | 0xb3
 
 fdb4	# OR   HY
 	or_a(HY);
@@ -4864,23 +4847,23 @@ fdb6	# OR   (IY+o)
 
 fdb7	# DB   FD
 	illegal_1();
-	call jump 00b7
+	call jump p_00 | 0xb7
 
 fdb8	# DB   FD
 	illegal_1();
-	call jump 00b8
+	call jump p_00 | 0xb8
 
 fdb9	# DB   FD
 	illegal_1();
-	call jump 00b9
+	call jump p_00 | 0xb9
 
 fdba	# DB   FD
 	illegal_1();
-	call jump 00ba
+	call jump p_00 | 0xba
 
 fdbb	# DB   FD
 	illegal_1();
-	call jump 00bb
+	call jump p_00 | 0xbb
 
 fdbc	# CP   HY
 	cp(HY);
@@ -4898,142 +4881,142 @@ fdbe	# CP   (IY+o)
 
 fdbf	# DB   FD
 	illegal_1();
-	call jump 00bf
+	call jump p_00 | 0xbf
 
 fdc0	# DB   FD
 	illegal_1();
-	call jump 00c0
+	call jump p_00 | 0xc0
 
 fdc1	# DB   FD
 	illegal_1();
-	call jump 00c1
+	call jump p_00 | 0xc1
 
 fdc2	# DB   FD
 	illegal_1();
-	call jump 00c2
+	call jump p_00 | 0xc2
 
 fdc3	# DB   FD
 	illegal_1();
-	call jump 00c3
+	call jump p_00 | 0xc3
 
 fdc4	# DB   FD
 	illegal_1();
-	call jump 00c4
+	call jump p_00 | 0xc4
 
 fdc5	# DB   FD
 	illegal_1();
-	call jump 00c5
+	call jump p_00 | 0xc5
 
 fdc6	# DB   FD
 	illegal_1();
-	call jump 00c6
+	call jump p_00 | 0xc6
 
 fdc7	# DB   FD
 	illegal_1();
-	call jump 00c7
+	call jump p_00 | 0xc7
 
 fdc8	# DB   FD
 	illegal_1();
-	call jump 00c8
+	call jump p_00 | 0xc8
 
 fdc9	# DB   FD
 	illegal_1();
-	call jump 00c9
+	call jump p_00 | 0xc9
 
 fdca	# DB   FD
 	illegal_1();
-	call jump 00ca
+	call jump p_00 | 0xca
 
 fdcb	# **   FD CB xx
 	call eay
 	call arg
 	TADR = PC-1;
 	2 * call nomreq_addr
-	call jump_prefixed 0xfe
+	call jump_prefixed fe
 
 fdcc	# DB   FD
 	illegal_1();
-	call jump 00cc
+	call jump p_00 | 0xcc
 
 fdcd	# DB   FD
 	illegal_1();
-	call jump 00cd
+	call jump p_00 | 0xcd
 
 fdce	# DB   FD
 	illegal_1();
-	call jump 00ce
+	call jump p_00 | 0xce
 
 fdcf	# DB   FD
 	illegal_1();
-	call jump 00cf
+	call jump p_00 | 0xcf
 
 fdd0	# DB   FD
 	illegal_1();
-	call jump 00d0
+	call jump p_00 | 0xd0
 
 fdd1	# DB   FD
 	illegal_1();
-	call jump 00d1
+	call jump p_00 | 0xd1
 
 fdd2	# DB   FD
 	illegal_1();
-	call jump 00d2
+	call jump p_00 | 0xd2
 
 fdd3	# DB   FD
 	illegal_1();
-	call jump 00d3
+	call jump p_00 | 0xd3
 
 fdd4	# DB   FD
 	illegal_1();
-	call jump 00d4
+	call jump p_00 | 0xd4
 
 fdd5	# DB   FD
 	illegal_1();
-	call jump 00d5
+	call jump p_00 | 0xd5
 
 fdd6	# DB   FD
 	illegal_1();
-	call jump 00d6
+	call jump p_00 | 0xd6
 
 fdd7	# DB   FD
 	illegal_1();
-	call jump 00d7
+	call jump p_00 | 0xd7
 
 fdd8	# DB   FD
 	illegal_1();
-	call jump 00d8
+	call jump p_00 | 0xd8
 
 fdd9	# DB   FD
 	illegal_1();
-	call jump 00d9
+	call jump p_00 | 0xd9
 
 fdda	# DB   FD
 	illegal_1();
-	call jump 00da
+	call jump p_00 | 0xda
 
 fddb	# DB   FD
 	illegal_1();
-	call jump 00db
+	call jump p_00 | 0xdb
 
 fddc	# DB   FD
 	illegal_1();
-	call jump 00dc
+	call jump p_00 | 0xdc
 
 fddd	# DB   FD
 	illegal_1();
-	call jump 00dd
+	call jump p_00 | 0xdd
 
 fdde	# DB   FD
 	illegal_1();
-	call jump 00de
+	call jump p_00 | 0xde
 
 fddf	# DB   FD
 	illegal_1();
-	call jump 00df
+	call jump p_00 | 0xdf
 
 fde0	# DB   FD
 	illegal_1();
-	call jump 00e0
+	call jump p_00 | 0xe0
 
 fde1	# POP  IY
 	call pop
@@ -5041,7 +5024,7 @@ fde1	# POP  IY
 
 fde2	# DB   FD
 	illegal_1();
-	call jump 00e2
+	call jump p_00 | 0xe2
 
 fde3	# EX   (SP),IY
 	TDAT = IY;
@@ -5050,7 +5033,7 @@ fde3	# EX   (SP),IY
 
 fde4	# DB   FD
 	illegal_1();
-	call jump 00e4
+	call jump p_00 | 0xe4
 
 fde5	# PUSH IY
 	TDAT = IY;
@@ -5058,78 +5041,78 @@ fde5	# PUSH IY
 
 fde6	# DB   FD
 	illegal_1();
-	call jump 00e6
+	call jump p_00 | 0xe6
 
 fde7	# DB   FD
 	illegal_1();
-	call jump 00e7
+	call jump p_00 | 0xe7
 
 fde8	# DB   FD
 	illegal_1();
-	call jump 00e8
+	call jump p_00 | 0xe8
 
 fde9	# JP   (IY)
 	PC = IY;
 
 fdea	# DB   FD
 	illegal_1();
-	call jump 00ea
+	call jump p_00 | 0xea
 
 fdeb	# DB   FD
 	illegal_1();
-	call jump 00eb
+	call jump p_00 | 0xeb
 
 fdec	# DB   FD
 	illegal_1();
-	call jump 00ec
+	call jump p_00 | 0xec
 
 fded	# DB   FD
 	illegal_1();
-	call jump 00ed
+	call jump p_00 | 0xed
 
 fdee	# DB   FD
 	illegal_1();
-	call jump 00ee
+	call jump p_00 | 0xee
 
 fdef	# DB   FD
 	illegal_1();
-	call jump 00ef
+	call jump p_00 | 0xef
 
 fdf0	# DB   FD
 	illegal_1();
-	call jump 00f0
+	call jump p_00 | 0xf0
 
 fdf1	# DB   FD
 	illegal_1();
-	call jump 00f1
+	call jump p_00 | 0xf1
 
 fdf2	# DB   FD
 	illegal_1();
-	call jump 00f2
+	call jump p_00 | 0xf2
 
 fdf3	# DB   FD
 	illegal_1();
-	call jump 00f3
+	call jump p_00 | 0xf3
 
 fdf4	# DB   FD
 	illegal_1();
-	call jump 00f4
+	call jump p_00 | 0xf4
 
 fdf5	# DB   FD
 	illegal_1();
-	call jump 00f5
+	call jump p_00 | 0xf5
 
 fdf6	# DB   FD
 	illegal_1();
-	call jump 00f6
+	call jump p_00 | 0xf6
 
 fdf7	# DB   FD
 	illegal_1();
-	call jump 00f7
+	call jump p_00 | 0xf7
 
 fdf8	# DB   FD
 	illegal_1();
-	call jump 00f8
+	call jump p_00 | 0xf8
 
 fdf9	# LD   SP,IY
 	call nomreq_ir 2
@@ -5137,27 +5120,27 @@ fdf9	# LD   SP,IY
 
 fdfa	# DB   FD
 	illegal_1();
-	call jump 00fa
+	call jump p_00 | 0xfa
 
 fdfb	# DB   FD
 	illegal_1();
-	call jump 00fb
+	call jump p_00 | 0xfb
 
 fdfc	# DB   FD
 	illegal_1();
-	call jump 00fc
+	call jump p_00 | 0xfc
 
 fdfd	# DB   FD
 	illegal_1();
-	call jump 00fd
+	call jump p_00 | 0xfd
 
 fdfe	# DB   FD
 	illegal_1();
-	call jump 00fe
+	call jump p_00 | 0xfe
 
 fdff	# DB   FD
 	illegal_1();
-	call jump 00ff
+	call jump p_00 | 0xff
 
 
 ##########################################################
@@ -6709,7 +6692,7 @@ edff	# DB   ED
 
 00cb	# **** CB xx
 	call rop
-	call jump_prefixed 0xcb
+	call jump_prefixed cb
 
 00cc	# CALL Z,a
 	TDAT8 = F & ZF;
@@ -6781,7 +6764,7 @@ edff	# DB   ED
 
 00dd	# **** DD xx
 	call rop
-	call jump_prefixed 0xdd
+	call jump_prefixed dd
 
 00de	# SBC  A,n
 	call arg
@@ -6842,7 +6825,7 @@ edff	# DB   ED
 
 00ed	# **** ED xx
 	call rop
-	call jump_prefixed 0xed
+	call jump_prefixed ed
 
 00ee	# XOR  n
 	call arg
@@ -6902,7 +6885,7 @@ edff	# DB   ED
 
 00fd	# **** FD xx
 	call rop
-	call jump_prefixed 0xfd
+	call jump_prefixed fd
 
 00fe	# CP   n
 	call arg

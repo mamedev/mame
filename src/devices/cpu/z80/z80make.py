@@ -23,7 +23,7 @@ class IndStr:
         return self.indent
 
     def is_comment(self):
-        return self.str.startswith("#") and not self.str.startswith("#if") and not self.str.startswith("#endif") and not self.str.startswith("#pragma")
+        return self.str.startswith("#") and not self.str.startswith("#if") and not self.str.startswith("#endif")
 
     def is_blank(self):
         return not self.str
@@ -240,7 +240,7 @@ class OpcodeList:
                 name = line_toc[1]
                 arg = None
                 if len(line_toc) > 2:
-                    arg = line_toc[2]
+                    arg = " ".join(line_toc[2:])
                 if name in self.macros:
                     macro = self.macros[name]
                     ([out.extend(self.pre_process(il)) for il in macro.apply(arg)])
@@ -273,7 +273,7 @@ class OpcodeList:
                     if opc_switch:
                         print("\tcase 0x%s:" % (opc.code), file=f)
                     elif not is_rop:
-                        print("%s_%s%s:" % (self.gen or "z80", prefix, opc.code), file=f)
+                        print("\tcase p_%s | 0x%s:" % (prefix, opc.code), file=f)
                     opc.save_dasm(step_switch=reenter, f=f)
                     print("\t\tgoto rop;", file=f)
                     print("", file=f)
@@ -293,14 +293,13 @@ class OpcodeList:
         print("\treturn;", file=f)
         print("}", file=f)
         print("", file=f)
-        labels = ""
-        for p in ["cb", "dd", "ed", "fd", "00", "fe"]:
-            labels += "\n"
-            for i in range(0x100, 0x200):
-                if labels.__len__() > 1:
-                    labels += ", "
-                labels += "&&%s_%s%s" % (self.gen or "z80", p, hex(i)[3:])
-        print("constexpr void* opc_label[0x100 * 6] = {%s\n};" % (labels), file=f)
+        print("const u16 p_cb = 0x000;", file=f)
+        print("const u16 p_dd = 0x100;", file=f)
+        print("const u16 p_ed = 0x200;", file=f)
+        print("const u16 p_fd = 0x300;", file=f)
+        print("const u16 p_00 = 0x400;", file=f)
+        print("const u16 p_fe = 0x500;", file=f)
+        print("u16 prefix_op;", file=f)
         print("", file=f)
         print("const bool nomemrq_en = !m_nomreq_cb.isunset();", file=f)
         print("[[maybe_unused]] const bool refresh_en = !m_refresh_cb.isunset();", file=f)
@@ -309,19 +308,25 @@ class OpcodeList:
         print("\tgoto rop;", file=f)
         print("} else if (u8(m_ref) == 0x00) {", file=f)
         print("\tconst u8 p = m_ref >> 16;", file=f)
-        print("\tgoto *opc_label[(p ? ((p == 0xfe) ? 0x0500 : ((p & 0x30) << 4)) : 0x0400) | u8(m_ref >> 8)];", file=f)
+        print("\tprefix_op = (p ? ((p == 0xfe) ? p_fe : ((p & 0x30) << 4)) : p_00) | u8(m_ref >> 8);", file=f)
+        print("\tgoto process;", file=f)
         print("} else {", file=f)
         print("// slow re-enter", file=f)
         self.switch_prefix(self.opcode_info.keys(), reenter=True, f=f)
         print("} // end: slow", file=f)
         print('assert((void("switch statement above must cover all possible cases!"), false));', file=f)
         print("", file=f)
-        print("{ // fast process", file=f)
+        print("// fast process", file=f)
+        print("{", file=f)
         print("rop:", file=f)
         self.switch_prefix(['ff'], reenter=False, f=f)
+        print("}", file=f)
         print("", file=f)
+        print("process:", file=f)
+        print("switch (prefix_op & 0x7ff)", file=f)
+        print("{", file=f)
         self.switch_prefix(self.opcode_info.keys() - ['ff'], reenter=False, f=f)
-        print("} // end: fast", file=f)
+        print("} // switch: prefix_op", file=f)
         print('assert((void("unreachable!"), false));', file=f)
 
 def main(argv):
