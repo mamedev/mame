@@ -292,7 +292,7 @@ void h8_adc_3337_device::mode_update()
 	m_trigger = m_adcr & 0x80 ? T_EXT : T_SOFT;
 
 	if(m_adcsr & 0x10) {
-		m_start_mode = ACTIVE | ROTATE;
+		m_start_mode = ACTIVE | REPEAT | ROTATE;
 		m_start_channel = m_adcsr & 4;
 		m_end_channel = m_adcsr & 7;
 	} else {

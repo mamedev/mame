@@ -123,6 +123,24 @@ Editor and HD Install untested
 		</part>
 	</software>
 
+	<software name="wendetta" supported="no">
+		<!-- "A1200/A4000 CD32" on cover art -->
+		<!-- http://redump.org/disc/106519/ -->
+		<description>Wendetta 2175 (Europe)</description>
+		<year>1996</year>
+		<publisher>Skills</publisher>
+		<notes><![CDATA[
+[Lisa] Uses SPRESx for intro credits text
+[Lisa] heavy graphic corruptions in ship select and gameplay
+]]></notes>
+		<info name="developer" value="Vortex Design" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="wendetta_2175_(europe)" sha1="c7a4e4c9cc2acbe6b561bf2230c22529d6592e8c"/>
+			</diskarea>
+		</part>
+	</software>
+
 <!-- !Collections -->
 
 	<software name="17bitph4" supported="no">

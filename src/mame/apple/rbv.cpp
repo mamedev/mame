@@ -14,9 +14,6 @@
 
 #include "layout/generic.h"
 
-static constexpr u32 C7M  = 7833600;
-static constexpr u32 C15M = (C7M * 2);
-
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
@@ -37,7 +34,16 @@ INPUT_PORTS_END
 
 ioport_constructor rbv_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME( rbv );
+	return INPUT_PORTS_NAME(rbv);
+}
+
+//-------------------------------------------------
+//  palette_entries - palette size
+//-------------------------------------------------
+
+u32 rbv_device::palette_entries() const noexcept
+{
+	return 256;
 }
 
 //-------------------------------------------------
@@ -57,16 +63,12 @@ void rbv_device::map(address_map &map)
 void rbv_device::device_add_mconfig(machine_config &config)
 {
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(25175000, 800, 0, 640, 525, 0, 480);
-	m_screen->set_size(1024, 768);
-	m_screen->set_visarea(0, 640 - 1, 0, 480 - 1);
+	m_screen->set_raw(30.24_MHz_XTAL, 864, 0, 640, 525, 0, 480);
 	m_screen->set_screen_update(FUNC(rbv_device::screen_update));
 	m_screen->screen_vblank().set(m_pseudovia, FUNC(pseudovia_device::slot_irq_w<0x40>));
 	config.set_default_layout(layout_monitors);
 
-	PALETTE(config, m_palette).set_entries(256);
-
-	APPLE_PSEUDOVIA(config, m_pseudovia, C15M);
+	APPLE_PSEUDOVIA(config, m_pseudovia, DERIVED_CLOCK(1, 2));
 	m_pseudovia->readvideo_handler().set(FUNC(rbv_device::via2_video_config_r));
 	m_pseudovia->writevideo_handler().set(FUNC(rbv_device::via2_video_config_w));
 	m_pseudovia->irq_callback().set(FUNC(rbv_device::via2_irq_w));
@@ -76,13 +78,13 @@ void rbv_device::device_add_mconfig(machine_config &config)
 //  rbv_device - constructor
 //-------------------------------------------------
 
-rbv_device::rbv_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+rbv_device::rbv_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, RBV, tag, owner, clock),
+	device_palette_interface(mconfig, *this),
 	write_6015(*this),
 	write_irq(*this),
-	m_montype(*this, "MONTYPE"),
+	m_io_montype(*this, "MONTYPE"),
 	m_screen(*this, "screen"),
-	m_palette(*this, "palette"),
 	m_pseudovia(*this, "pseudovia")
 {
 }
@@ -96,6 +98,15 @@ void rbv_device::device_start()
 	m_6015_timer = timer_alloc(FUNC(rbv_device::mac_6015_tick), this);
 	m_6015_timer->adjust(attotime::never);
 
+	m_configured = false;
+	m_hres = m_vres = 0;
+	m_montype = 0;
+	m_monochrome = false;
+
+	save_item(NAME(m_hres));
+	save_item(NAME(m_vres));
+	save_item(NAME(m_montype));
+	save_item(NAME(m_monochrome));
 	save_item(NAME(m_pal_address));
 	save_item(NAME(m_pal_idx));
 
@@ -109,7 +120,37 @@ void rbv_device::device_start()
 void rbv_device::device_reset()
 {
 	// start 60.15 Hz timer
-	m_6015_timer->adjust(attotime::from_hz(60.15), 0, attotime::from_hz(60.15));
+	m_6015_timer->adjust(attotime::from_ticks(2 * 640 * 407, clock()), 0, attotime::from_ticks(2 * 640 * 407, 31.3344_MHz_XTAL));
+
+	if (!m_configured)
+	{
+		m_montype = m_io_montype->read() << 3;
+		switch (m_montype >> 3)
+		{
+		case 1: // 15" portrait display
+			m_hres = 640;
+			m_vres = 870;
+			m_monochrome = true;
+			m_screen->configure(832, 918, rectangle(0, 639, 0, 869), HZ_TO_ATTOSECONDS(57.2832_MHz_XTAL / (832 * 918)));
+			break;
+
+		case 2: // 12" RGB
+			m_hres = 512;
+			m_vres = 384;
+			m_monochrome = false;
+			m_screen->configure(640, 407, rectangle(0, 511, 0, 383), HZ_TO_ATTOSECONDS(double(clock()) / (2 * 640 * 407)));
+			break;
+
+		case 6: // 13" RGB
+		default:
+			m_hres = 640;
+			m_vres = 480;
+			m_monochrome = false;
+			m_screen->configure(864, 525, rectangle(0, 639, 0, 479), HZ_TO_ATTOSECONDS(30.24_MHz_XTAL / (864 * 525)));
+			break;
+		}
+		m_configured = true;
+	}
 }
 
 void rbv_device::set_ram_info(u32 *ram, u32 size)
@@ -143,39 +184,9 @@ void rbv_device::asc_irq_w(int state)
 	m_pseudovia->asc_irq_w(state);
 }
 
-void rbv_device::pseudovia_recalc_irqs()
-{
-	// check slot interrupts and bubble them down to IFR
-	uint8_t slot_irqs = (~m_pseudovia_regs[2]) & 0x78;
-	slot_irqs &= (m_pseudovia_regs[0x12] & 0x78);
-
-	if (slot_irqs)
-	{
-		m_pseudovia_regs[3] |= 2; // any slot
-	}
-	else // no slot irqs, clear the pending bit
-	{
-		m_pseudovia_regs[3] &= ~2; // any slot
-	}
-
-	uint8_t ifr = (m_pseudovia_regs[3] & m_pseudovia_ier) & 0x1b;
-
-	if (ifr != 0)
-	{
-		m_pseudovia_regs[3] = ifr | 0x80;
-		m_pseudovia_ifr = ifr | 0x80;
-
-		write_irq(ASSERT_LINE);
-	}
-	else
-	{
-		write_irq(CLEAR_LINE);
-	}
-}
-
 u8 rbv_device::via2_video_config_r()
 {
-	return m_montype->read() << 3;
+	return m_montype;
 }
 
 void rbv_device::via2_video_config_w(u8 data)
@@ -186,141 +197,6 @@ void rbv_device::via2_video_config_w(u8 data)
 void rbv_device::via2_irq_w(int state)
 {
 	write_irq(state);
-}
-
-uint8_t rbv_device::pseudovia_r(offs_t offset)
-{
-	int data = 0;
-
-	if (offset < 0x100)
-	{
-		data = m_pseudovia_regs[offset];
-
-		if (offset == 0x10)
-		{
-			data &= ~0x38;
-			data |= (m_montype->read() << 3);
-		}
-
-		// bit 7 of these registers always reads as 0 on pseudo-VIAs
-		if ((offset == 0x12) || (offset == 0x13))
-		{
-			data &= ~0x80;
-		}
-	}
-	else
-	{
-		offset >>= 9;
-
-		switch (offset)
-		{
-		case 13: // IFR
-			data = m_pseudovia_ifr;
-			break;
-
-		case 14: // IER
-			data = m_pseudovia_ier;
-			break;
-
-		default:
-			logerror("pseudovia_r: Unknown pseudo-VIA register %d access\n", offset);
-			break;
-		}
-	}
-	return data;
-}
-
-void rbv_device::pseudovia_w(offs_t offset, uint8_t data)
-{
-	if (offset < 0x100)
-	{
-		switch (offset)
-		{
-		case 0x02:
-			m_pseudovia_regs[offset] |= (data & 0x40);
-			pseudovia_recalc_irqs();
-			break;
-
-		case 0x03:           // write here to ack
-			if (data & 0x80) // 1 bits write 1s
-			{
-				m_pseudovia_regs[offset] |= data & 0x7f;
-				m_pseudovia_ifr |= data & 0x7f;
-			}
-			else // 1 bits write 0s
-			{
-				m_pseudovia_regs[offset] &= ~(data & 0x7f);
-				m_pseudovia_ifr &= ~(data & 0x7f);
-			}
-			pseudovia_recalc_irqs();
-			break;
-
-		case 0x10:
-			m_pseudovia_regs[offset] = data;
-			break;
-
-		case 0x12:
-			if (data & 0x80) // 1 bits write 1s
-			{
-				m_pseudovia_regs[offset] |= data & 0x7f;
-			}
-			else // 1 bits write 0s
-			{
-				m_pseudovia_regs[offset] &= ~(data & 0x7f);
-			}
-			pseudovia_recalc_irqs();
-			break;
-
-		case 0x13:
-			if (data & 0x80) // 1 bits write 1s
-			{
-				m_pseudovia_regs[offset] |= data & 0x7f;
-
-				if (data == 0xff)
-					m_pseudovia_regs[offset] = 0x1f; // I don't know why this is special, but the IIci ROM's POST demands it
-			}
-			else // 1 bits write 0s
-			{
-				m_pseudovia_regs[offset] &= ~(data & 0x7f);
-			}
-			break;
-
-		default:
-			m_pseudovia_regs[offset] = data;
-			break;
-		}
-	}
-	else
-	{
-		offset >>= 9;
-
-		switch (offset)
-		{
-		case 13: // IFR
-			if (data & 0x80)
-			{
-				data = 0x7f;
-			}
-			pseudovia_recalc_irqs();
-			break;
-
-		case 14:             // IER
-			if (data & 0x80) // 1 bits write 1s
-			{
-				m_pseudovia_ier |= data & 0x7f;
-			}
-			else // 1 bits write 0s
-			{
-				m_pseudovia_ier &= ~(data & 0x7f);
-			}
-			pseudovia_recalc_irqs();
-			break;
-
-		default:
-			logerror("pseudovia_w: Unknown extended pseudo-VIA register %d access\n", offset);
-			break;
-		}
-	}
 }
 
 u8 rbv_device::dac_r(offs_t offset)
@@ -348,13 +224,13 @@ void rbv_device::dac_w(offs_t offset, u8 data)
 		switch (m_pal_idx)
 		{
 		case 0:
-			m_palette->set_pen_red_level(m_pal_address, data);
+			set_pen_red_level(m_pal_address, data);
 			break;
 		case 1:
-			m_palette->set_pen_green_level(m_pal_address, data);
+			set_pen_green_level(m_pal_address, data);
 			break;
 		case 2:
-			m_palette->set_pen_blue_level(m_pal_address, data);
+			set_pen_blue_level(m_pal_address, data);
 			break;
 		}
 		m_pal_idx++;
@@ -369,27 +245,16 @@ void rbv_device::dac_w(offs_t offset, u8 data)
 
 u32 rbv_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int hres, vres;
-	uint8_t const *vram8 = (uint8_t *)m_ram_ptr;
+	if (m_monochrome)
+		return update_screen<true>(screen, bitmap, cliprect);
+	else
+		return update_screen<false>(screen, bitmap, cliprect);
+}
 
-	switch (m_montype->read())
-	{
-	case 1: // 15" portrait display
-		hres = 640;
-		vres = 870;
-		break;
-
-	case 2: // 12" RGB
-		hres = 512;
-		vres = 384;
-		break;
-
-	case 6: // 13" RGB
-	default:
-		hres = 640;
-		vres = 480;
-		break;
-	}
+template <bool Mono>
+u32 rbv_device::update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	auto const vram8 = util::big_endian_cast<u8 const>(m_ram_ptr);
 
 	// video disabled?
 	if (m_video_config & 0x40)
@@ -398,81 +263,79 @@ u32 rbv_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 		return 0;
 	}
 
-	const pen_t *pens = m_palette->pens();
+	auto const pen =
+			[this] (unsigned n) -> rgb_t
+			{
+				rgb_t const val = pen_color(n);
+				if (Mono)
+					return rgb_t(val.b(), val.b(), val.b());
+				else
+					return val;
+			};
 
 	switch (m_video_config & 7)
 	{
 	case 0: // 1bpp
-	{
-		for (int y = 0; y < vres; y++)
+		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
-			uint32_t *scanline = &bitmap.pix(y);
-			for (int x = 0; x < hres; x += 8)
+			u32 *scanline = &bitmap.pix(y, cliprect.left() & ~7);
+			for (int x = cliprect.left() / 8; x <= cliprect.right() / 8; x++)
 			{
-				uint8_t const pixels = vram8[(y * (hres / 8)) + ((x / 8) ^ 3)];
+				u8 const pixels = vram8[(y * (m_hres / 8)) + x];
 
-				*scanline++ = pens[0xfe | (pixels >> 7)];
-				*scanline++ = pens[0xfe | ((pixels >> 6) & 1)];
-				*scanline++ = pens[0xfe | ((pixels >> 5) & 1)];
-				*scanline++ = pens[0xfe | ((pixels >> 4) & 1)];
-				*scanline++ = pens[0xfe | ((pixels >> 3) & 1)];
-				*scanline++ = pens[0xfe | ((pixels >> 2) & 1)];
-				*scanline++ = pens[0xfe | ((pixels >> 1) & 1)];
-				*scanline++ = pens[0xfe | (pixels & 1)];
+				*scanline++ = pen(0xfe | BIT(pixels, 7));
+				*scanline++ = pen(0xfe | BIT(pixels, 6));
+				*scanline++ = pen(0xfe | BIT(pixels, 5));
+				*scanline++ = pen(0xfe | BIT(pixels, 4));
+				*scanline++ = pen(0xfe | BIT(pixels, 3));
+				*scanline++ = pen(0xfe | BIT(pixels, 2));
+				*scanline++ = pen(0xfe | BIT(pixels, 1));
+				*scanline++ = pen(0xfe | BIT(pixels, 0));
 			}
 		}
-	}
-	break;
+		break;
 
 	case 1: // 2bpp
-	{
-		for (int y = 0; y < vres; y++)
+		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
-			uint32_t *scanline = &bitmap.pix(y);
-			for (int x = 0; x < hres / 4; x++)
+			u32 *scanline = &bitmap.pix(y, cliprect.left() & ~3);
+			for (int x = cliprect.left() / 4; x <= cliprect.right() / 4; x++)
 			{
-				uint8_t const pixels = vram8[(y * (hres / 4)) + (BYTE4_XOR_BE(x))];
+				u8 const pixels = vram8[(y * (m_hres / 4)) + x];
 
-				*scanline++ = pens[0xfc | ((pixels >> 6) & 3)];
-				*scanline++ = pens[0xfc | ((pixels >> 4) & 3)];
-				*scanline++ = pens[0xfc | ((pixels >> 2) & 3)];
-				*scanline++ = pens[0xfc | (pixels & 3)];
+				*scanline++ = pen(0xfc | ((pixels >> 6) & 3));
+				*scanline++ = pen(0xfc | ((pixels >> 4) & 3));
+				*scanline++ = pen(0xfc | ((pixels >> 2) & 3));
+				*scanline++ = pen(0xfc | (pixels & 3));
 			}
 		}
-	}
-	break;
+		break;
 
 	case 2: // 4bpp
-	{
-		for (int y = 0; y < vres; y++)
+		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
-			uint32_t *scanline = &bitmap.pix(y);
-
-			for (int x = 0; x < hres / 2; x++)
+			u32 *scanline = &bitmap.pix(y, cliprect.left() & ~1);
+			for (int x = cliprect.left() / 2; x <= cliprect.right() / 2; x++)
 			{
-				uint8_t const pixels = vram8[(y * (hres / 2)) + (BYTE4_XOR_BE(x))];
+				u8 const pixels = vram8[(y * (m_hres / 2)) + x];
 
-				*scanline++ = pens[0xf0 | (pixels >> 4)];
-				*scanline++ = pens[0xf0 | (pixels & 0xf)];
+				*scanline++ = pen(0xf0 | (pixels >> 4));
+				*scanline++ = pen(0xf0 | (pixels & 0xf));
 			}
 		}
-	}
-	break;
+		break;
 
 	case 3: // 8bpp
-	{
-		for (int y = 0; y < vres; y++)
+		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
-			uint32_t *scanline = &bitmap.pix(y);
-
-			for (int x = 0; x < hres; x++)
+			u32 *scanline = &bitmap.pix(y, cliprect.left());
+			for (int x = cliprect.left(); x <= cliprect.right(); x++)
 			{
-				uint8_t const pixels = vram8[(y * hres) + (BYTE4_XOR_BE(x))];
-				*scanline++ = pens[pixels];
+				u8 const pixels = vram8[(y * m_hres) + x];
+				*scanline++ = pen(pixels);
 			}
 		}
-	}
-	break;
+		break;
 	}
 
 	return 0;

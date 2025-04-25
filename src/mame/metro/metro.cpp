@@ -3486,8 +3486,8 @@ void blzntrnd_state::blzntrnd(machine_config &config)
 
 	ym2610_device &ymsnd(YM2610(config, m_ymsnd, 16_MHz_XTAL/2));
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(0, "lspeaker", 0.75);
+	ymsnd.add_route(0, "rspeaker", 0.75);
 	ymsnd.add_route(1, "lspeaker", 1.0);
 	ymsnd.add_route(2, "rspeaker", 1.0);
 }
@@ -3510,9 +3510,9 @@ void blzntrnd_state::gstrik2(machine_config &config)
 
 	ym2610_device &ymsnd(YM2610(config.replace(), m_ymsnd, 16_MHz_XTAL/2));
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
-	ymsnd.add_route(0, "mono", 0.5);
-	ymsnd.add_route(1, "mono", 0.5);
-	ymsnd.add_route(2, "mono", 0.5);
+	ymsnd.add_route(0, "mono", 0.75);
+	ymsnd.add_route(1, "mono", 0.25);
+	ymsnd.add_route(2, "mono", 0.25);
 }
 
 

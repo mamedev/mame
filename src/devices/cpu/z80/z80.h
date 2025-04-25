@@ -43,12 +43,6 @@ public:
 	auto halt_cb() { return m_halt_cb.bind(); }
 	auto busack_cb() { return m_busack_cb.bind(); }
 
-	// Extra callbacks that do not map to any documented signals.
-	// Used by derived classes to customise instruction behaviour.
-	auto branch_cb() { return m_branch_cb.bind(); }
-	auto irqfetch_cb() { return m_irqfetch_cb.bind(); }
-	auto reti_cb() { return m_reti_cb.bind(); }
-
 	// output pins state
 	int halt_r() { return m_halt; }
 	int busack_r() { return m_busack_state; }
@@ -72,7 +66,6 @@ protected:
 
 	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
-	virtual u32 translate_memory_address(u16 address) { return address; }
 
 	// device_state_interface implementation
 	virtual void state_import(const device_state_entry &entry) override;
@@ -84,6 +77,7 @@ protected:
 
 	void illegal_1();
 	void illegal_2();
+	u8 flags_szyxc(u16 value);
 
 	void halt();
 	void leave_halt();
@@ -95,7 +89,7 @@ protected:
 	void rra();
 	void add_a(u8 value);
 	void adc_a(u8 value);
-	void sub(u8 value);
+	void sub_a(u8 value);
 	void sbc_a(u8 value);
 	void neg();
 	void daa();
@@ -121,8 +115,6 @@ protected:
 	void set_f(u8 f);
 	void block_io_interrupted_flags();
 
-	virtual void do_op();
-
 	virtual u8 data_read(u16 addr);
 	virtual void data_write(u16 addr, u8 value);
 	virtual u8 stack_read(u16 addr) { return data_read(addr); }
@@ -144,12 +136,6 @@ protected:
 	devcb_write8 m_nomreq_cb;
 	devcb_write_line m_halt_cb;
 	devcb_write_line m_busack_cb;
-
-	// Extra callbacks that do not map to any documented signals.
-	// Used by derived classes to customise instruction behaviour.
-	devcb_write_line m_branch_cb;
-	devcb_write_line m_irqfetch_cb;
-	devcb_write_line m_reti_cb;
 
 	PAIR16       m_prvpc;
 	PAIR16       m_pc;
@@ -202,9 +188,6 @@ protected:
 	static u8 SZP[0x100];      // zero, sign and parity flags
 	static u8 SZHV_inc[0x100]; // zero, sign, half carry and overflow flags INC r8
 	static u8 SZHV_dec[0x100]; // zero, sign, half carry and overflow flags DEC r8
-
-	static u8 SZHVC_add[2 * 0x100 * 0x100];
-	static u8 SZHVC_sub[2 * 0x100 * 0x100];
 };
 
 DECLARE_DEVICE_TYPE(Z80, z80_device)

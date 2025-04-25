@@ -459,7 +459,7 @@ void cdi_state::cdimono1_base(machine_config &config)
 	m_slave_hle->int_callback().set(m_maincpu, FUNC(scc68070_device::in2_w));
 
 	CDROM(config, m_cdrom);
-	m_cdrom->set_interface("cdi_cdrom");
+	m_cdrom->set_interface("cdrom");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -503,8 +503,9 @@ void cdi_state::cdimono2(machine_config &config)
 	M68HC05C8(config, m_servo, 4_MHz_XTAL);
 	M68HC05C8(config, m_slave, 4_MHz_XTAL);
 
-	CDROM(config, m_cdrom).set_interface("cdi_cdrom");
+	CDROM(config, m_cdrom).set_interface("cdrom");
 	SOFTWARE_LIST(config, "cd_list").set_original("cdi").set_filter("!DVC");
+	SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -547,8 +548,9 @@ void cdi_state::cdi910(machine_config &config)
 	M68HC05C8(config, m_servo, 4_MHz_XTAL);
 	M68HC05C8(config, m_slave, 4_MHz_XTAL);
 
-	CDROM(config, "cdrom").set_interface("cdi_cdrom");
+	CDROM(config, "cdrom").set_interface("cdrom");
 	SOFTWARE_LIST(config, "cd_list").set_original("cdi").set_filter("!DVC");
+	SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");
 
 	/* sound hardware */
 	SPEAKER(config, "lspeaker").front_left();
@@ -573,6 +575,7 @@ void cdi_state::cdimono1(machine_config &config)
 	m_slave_hle->read_mousebtn().set_ioport("MOUSEBTN");
 
 	SOFTWARE_LIST(config, "cd_list").set_original("cdi").set_filter("!DVC");
+	SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");
 }
 
 void quizard_state::quizard(machine_config &config)

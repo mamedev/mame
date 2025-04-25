@@ -164,12 +164,10 @@ protected:
 class device_dio16_card_interface : public device_interface
 {
 	friend class dio16_device;
-	template <class ElementType> friend class simple_list;
 public:
 	// construction/destruction
 	virtual ~device_dio16_card_interface();
 
-	device_dio16_card_interface *next() const { return m_next; }
 	// inline configuration
 	void set_diobus(dio16_device &dio_device) {
 		m_dio_dev = &dio_device;
@@ -221,7 +219,6 @@ protected:
 
 private:
 	void set_bus(dio16_device & bus);
-	device_dio16_card_interface *m_next;
 	unsigned int m_index;
 };
 

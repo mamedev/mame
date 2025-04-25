@@ -1768,8 +1768,8 @@ void pc8801fh_state::pc8801fh(machine_config &config)
 	m_opna->port_b_write_callback().set(FUNC(pc8801fh_state::opn_portb_w));
 
 	// TODO: per-channel mixing is unconfirmed
-	m_opna->add_route(0, m_lspeaker, 0.25);
-	m_opna->add_route(0, m_rspeaker, 0.25);
+	m_opna->add_route(0, m_lspeaker, 0.75);
+	m_opna->add_route(0, m_rspeaker, 0.75);
 	m_opna->add_route(1, m_lspeaker, 0.75);
 	m_opna->add_route(2, m_rspeaker, 0.75);
 

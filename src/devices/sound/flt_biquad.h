@@ -25,7 +25,8 @@ public:
 		PEAK,
 		LOWSHELF,
 		HIGHSHELF,
-		RAWPARAMS
+		RAWPARAMS,
+		HIGHPASS1P1Z
 	};
 
 	struct biquad_params

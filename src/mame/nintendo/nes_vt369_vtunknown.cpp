@@ -170,6 +170,7 @@ public:
 
 	void nes_vt369_vtunknown_unk(machine_config& config);
 	void nes_vt369_vtunknown_unk_1mb(machine_config& config);
+	void nes_vt369_vtunknown_unk_2mb(machine_config& config);
 	void nes_vt369_vtunknown_unk_4mb(machine_config& config);
 	void nes_vt369_vtunknown_unk_16mb(machine_config& config);
 
@@ -449,6 +450,12 @@ void nes_vt369_vtunknown_unk_state::nes_vt369_vtunknown_unk_1mb(machine_config& 
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt369_vtunknown_unk_state::vt_external_space_map_1mbyte);
 }
 
+void nes_vt369_vtunknown_unk_state::nes_vt369_vtunknown_unk_2mb(machine_config& config)
+{
+	nes_vt369_vtunknown_unk(config);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt369_vtunknown_unk_state::vt_external_space_map_2mbyte);
+}
+
 void nes_vt369_vtunknown_unk_state::nes_vt369_vtunknown_unk_4mb(machine_config& config)
 {
 	nes_vt369_vtunknown_unk(config);
@@ -672,6 +679,11 @@ ROM_START( lxcmcypj )
 	ROM_LOAD( "cob66-1g-new02.u4", 0x00000, 0x4000000, CRC(78149671) SHA1(00dab8c0919e909e910525c18142e6a195b364f8) )
 ROM_END
 
+ROM_START( lxcmcyba )
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "barbie.bin", 0x00000, 0x4000000, CRC(e38af9d0) SHA1(a978a4da61f007c152c70233e9628dbebb427743) )
+ROM_END
+
 ROM_START( lxcmcypp )
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	// marked 512mbit, possible A22 / A23 are swapped as they were marked on the board in a different way.
@@ -695,6 +707,13 @@ ROM_START( lxccplan )
 	ROM_LOAD( "planes_lexibook.bin", 0x00000, 0x4000000, CRC(76e1a962) SHA1(83b801c0e0e941ceb1c93e565e833b07c09412c3))
 	ROM_IGNORE(0x4000000)
 ROM_END
+
+ROM_START( lxpcsp )
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	// standard flash ROM
+	ROM_LOAD( "s29gl512n11tfi02.u2", 0x00000, 0x4000000, CRC(113e22f2) SHA1(c57184131db3f3c82d09d7757f0977223698f62c) )
+ROM_END
+
 
 ROM_START( red5mam )
 	ROM_REGION( 0x8000000, "mainrom", 0 )
@@ -920,6 +939,23 @@ ROM_START( lexi30 )
 	ROM_LOAD( "lexi30.u3", 0x00000, 0x800000, CRC(0d4307ea) SHA1(0d7cf492f796b0bb871deebaca38a3ff3b2ed1e6) )
 ROM_END
 
+ROM_START( matet10 )
+	ROM_REGION( 0x200000, "mainrom", 0 )
+	ROM_LOAD( "tetriskeychain_p25q16sh_856015.bin", 0x00000, 0x200000, CRC(7a7251ea) SHA1(7ace8482a54f6b06982a90328779c21266d864fa) )
+	ROM_IGNORE(0x300)
+ROM_END
+
+ROM_START( matet100 )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "picotetris_s29gl064n90tfi04_0001227e.bin", 0x00000, 0x800000, CRC(7d9296f2) SHA1(0db5883028d14783d0abff1f7672e59534b0e513) )
+	ROM_IGNORE(0x100)
+ROM_END
+
+ROM_START( nesvt270 )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "w25q128jvs.u3", 0x00000, 0x1000300, CRC(fe189a90) SHA1(7f07ae89ae7ff49f139e936b08c9ef2a3467ea92) )
+ROM_END
+
 
 void nes_vt369_vtunknown_state::init_lxcmcypp()
 {
@@ -968,35 +1004,50 @@ CONS( 2012, lexi30,  0,0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_
 CONS( 2012, dgun2561,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init, "dreamGEAR", "My Arcade Portable Gaming System with 140 Games (DGUN-2561)", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
 
 CONS( 2012, lxccatv,   0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init,    "Lexibook", "Compact Cyber Arcade TV - 120 in 1 (JL2370)", MACHINE_NOT_WORKING ) // 32MByte ROM, 2011 on case, 2012 on PCB
-CONS( 200?, lxcmcy,    0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init,    "Lexibook", "Compact Cyber Arcade", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
-CONS( 200?, lxcmc250,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init,    "Lexibook", "Compact Cyber Arcade - 250-in-1 (JL2375)", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
-CONS( 200?, lxcmcysw,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Star Wars Rebels", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
-CONS( 200?, lxcmcyfz,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Frozen", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
-CONS( 200?, lxcmcydp,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Disney Princess", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
-CONS( 200?, lxcmcysp,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Marvel Ultimate Spider-Man", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
-CONS( 200?, lxcmcycr,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Cars", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
-CONS( 200?, lxcmcypj,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init,    "Lexibook", "Compact Cyber Arcade - PJ Masks", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
+// All Lexibook units below have 64Mbyte ROMs, must be externally banked, or different addressing scheme
+CONS( 200?, lxcmcy,    0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init,    "Lexibook", "Compact Cyber Arcade", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmc250,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init,    "Lexibook", "Compact Cyber Arcade - 250-in-1 (JL2375)", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmcysw,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Star Wars Rebels", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmcyfz,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Frozen", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmcydp,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Disney Princess", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmcysp,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Marvel Ultimate Spider-Man", MACHINE_NOT_WORKING ) // is this the low-resolution pocket version? ROM structure is quite different
+CONS( 200?, lxcmcycr,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Cars", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmcypj,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init,    "Lexibook", "Compact Cyber Arcade - PJ Masks", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmcyba,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Barbie (JL2365BB)", MACHINE_NOT_WORKING )
 // the data order is swapped for this one, maybe other internal differences?
-CONS( 200?, lxcmcypp,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Paw Patrol", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 200?, lxcmcypp,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Paw Patrol", MACHINE_NOT_WORKING )
 
+CONS( 200?, lxccminn,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init,    "Lexibook", "Console Colour - Minnie Mouse", MACHINE_NOT_WORKING )
+CONS( 200?, lxccplan,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init,    "Lexibook", "Console Colour - Disney's Planes", MACHINE_NOT_WORKING )
 
-CONS( 200?, lxccminn,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init,    "Lexibook", "Console Colour - Minnie Mouse", MACHINE_NOT_WORKING ) // 64Mbyte (used) ROM, must be externally banked, or different addressing scheme
-CONS( 200?, lxccplan,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init,    "Lexibook", "Console Colour - Disney's Planes", MACHINE_NOT_WORKING ) // 64Mbyte (used) ROM, must be externally banked, or different addressing scheme
-
+CONS( 2020, lxpcsp,    0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init,    "Lexibook", "Power Console - Marvel Spider-Man", MACHINE_NOT_WORKING )
 
 // GB-NO13-Main-VT389-2 on PCBs
-CONS( 2016, rtvgc300,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init,    "Lexibook", "Retro TV Game Console - 300 Games", MACHINE_NOT_WORKING )  // 64Mbyte ROM, must be externally banked, or different addressing scheme
-CONS( 2017, rtvgc300fz,0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init,    "Lexibook", "Retro TV Game Console - Frozen - 300 Games", MACHINE_NOT_WORKING )  // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 2016, rtvgc300,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init,    "Lexibook", "Retro TV Game Console - 300 Games", MACHINE_NOT_WORKING )
+CONS( 2017, rtvgc300fz,0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init,    "Lexibook", "Retro TV Game Console - Frozen - 300 Games", MACHINE_NOT_WORKING )
 
 
 /* The following are also confirmed to be NES/VT derived units, most having a standard set of games with a handful of lazy graphic mods thrown in to fit the unit theme
 
     (handheld units, use standard AAA batteries)
-    Lexibook Compact Cyber Arcade - Barbie
+    Lexibook Compact Cyber Arcade - Batman
     Lexibook Compact Cyber Arcade - Finding Dory
 
-    (Handheld units, but different form factor to Compact Cyber Arcade, charged via USB)
+    (handheld units, use standard AAA batteries, smaller display)
+    Lexibook Compact Cyber Arcade Pocket - Spiderman (may be what the dump above is)
+
+    (Handheld units, but different form factor to Compact Cyber Arcade, charged via USB, different menus)
     Lexibook Console Colour - Barbie
+
+    (Handheld units, charged via USB-C, more educational focused, contain bootleg NES Pinball game in games section)
+    Power Console - Gabby's Dollhouse
+    Power Console - Disney Princess
+    Power Console - Stitch
+    Power Console - Frozen
+    Power Console - Generic EN/FR model
+    Power Console - Generic EN/ES model
+    Power Console - Generic EN/DE model
+    Power Console - Paw Patrol
 
     (units for use with TV)
     Lexibook Retro TV Game Console (300 Games) - Cars
@@ -1091,6 +1142,8 @@ CONS( 201?, hkb502a,  hkb502, 0,  nes_vt369_vtunknown_hh_4mb, nes_vt369_vtunknow
 // contains a protection chip, command 80 XX returns a byte
 CONS( 201?, lxcap,    0,      0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Lexibook", "Cyber Arcade Pocket (JL1895)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
+// 2022 date on 'BL-867 PCB03' PCB
+CONS( 2022, nesvt270,    0,  0,  nes_vt369_vtunknown_hh_16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "unknown VT3xx based 270-in-1 (BL-867 PCB03)", MACHINE_NOT_WORKING )
 
 // VT369, but doesn't use most features
 CONS( 201?, myarccn,   0, 0,  nes_vt369_vtunknown_hh_1mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "DreamGear", "My Arcade Caveman Ninja", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
@@ -1109,3 +1162,9 @@ CONS( 2021, tetrtin,    0,        0,  nes_vt369_vtunknown_unk_1mb, nes_vt369_vtu
 
 // boots, has a lower resolution screen. menu is natively in low resolution, other games should be scaled down
 CONS( 2021, unk128vt,   0,        0,  nes_vt369_vtunknown_unk_4mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "unknown VT369 based 128-in-1 (GC31-369-20210702-V2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
+// uses a low res display like the above
+CONS( 2021, matet10,   0,        0,  nes_vt369_vtunknown_unk_2mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "dreamGEAR", "My Arcade Tetris (DGUNL-7083, Pixel Pocket, with 10 bonus games)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
+// unknown tech level, scrambled opcodes
+CONS( 2021, matet100,  0,        0,  nes_vt369_vtunknown_hh_8mb,  nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "dreamGEAR", "My Arcade Tetris (DGUNL-7027, Pico Player, with 100+ bonus games)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // box says 100+ bonus games

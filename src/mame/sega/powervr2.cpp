@@ -17,7 +17,6 @@
 #include "powervr2.h"
 #include "dc.h"
 
-#include "cpu/sh/sh4.h"
 #include "video/rgbutil.h"
 #include "rendutil.h"
 

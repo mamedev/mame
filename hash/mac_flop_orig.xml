@@ -13,7 +13,7 @@ license:CC0-1.0
 		<info name="programmer" value="Glenn Axworthy" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.0" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-09-28-->
 		<!--action game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -30,7 +30,8 @@ license:CC0-1.0
 		<info name="programmer" value="Chris Crawford" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, and Mac Plus." />
 		<info name="version" value="1.03" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="macse,macclasc" />
 		<!--Dump released: 2022-09-28-->
 		<!--simulation game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -47,7 +48,7 @@ license:CC0-1.0
 		<info name="programmer" value="Brodie Lockard" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.0" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-09-28-->
 		<!--board game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -64,7 +65,8 @@ license:CC0-1.0
 		<info name="author" value="Ray E. Tobey" />
 		<info name="developer" value="Dynamix" />
 		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2022-09-28-->
 		<!--action game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -82,7 +84,8 @@ license:CC0-1.0
 		<info name="developer" value="Westwood" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, and Mac Plus." />
 		<info name="version" value="1985-09-30" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="macse,macclasc" />
 		<!--Dump released:  2022-09-28-->
 		<!--roleplaying game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -115,7 +118,8 @@ license:CC0-1.0
 		<publisher>Mindscape</publisher>
 		<info name="programmer" value="Craig Erickson, Jay Zipnick, Billy Wolfe, Terry Schulenburg, Mark Waterman, Darin Adler, David Marsh, Todd Squires, Tod Zipnick, Steve Hays, and Waldemar Horwat" />
 		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2022-09-28-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -139,7 +143,8 @@ license:CC0-1.0
 		<info name="programmer" value="Roberta Williams, Charles Tingley, Ken MacNeill, Arthur Abraham, Doug MacNeill, Greg Rowland, Jeff Stephenson, Sol Ackerman, Chris Iden, and Mark Langbehn" />
 		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.10" />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2022-09-28-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -195,7 +200,8 @@ license:CC0-1.0
 		<publisher>Activision</publisher>
 		<info name="developer" value="Activision" />
 		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2022-09-28-->
 		<!--strategy game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -211,7 +217,7 @@ license:CC0-1.0
 		<publisher>Mindscape</publisher>
 		<info name="developer" value="Angelsoft" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-09-28-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -243,7 +249,7 @@ license:CC0-1.0
 		<publisher>Mindscape</publisher>
 		<info name="developer" value="Angelsoft" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-09-28-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -260,7 +266,8 @@ license:CC0-1.0
 		<info name="developer" value="Action Games" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, and Mac Plus." />
 		<info name="version" value="1985-10-24" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="macse,macclasc" />
 		<!--Dump released: 2022-09-28-->
 		<!--sports game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -277,7 +284,8 @@ license:CC0-1.0
 		<info name="developer" value="Action Games" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, and Mac Plus." />
 		<info name="version" value="1985-10-31" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="macse,macclasc" />
 		<!--Dump released: 2022-09-28-->
 		<!--sports game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -311,7 +319,8 @@ license:CC0-1.0
 		<publisher>Miles Computing</publisher>
 		<info name="programmer" value="Tim Hays" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, and Mac Plus." />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="macse,macclasc" />
 		<!--Dump released: 2022-09-29-->
 		<!--action game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -329,7 +338,7 @@ license:CC0-1.0
 		<info name="developer" value="MindBender" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.3" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-09-29-->
 		<!--simulation game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -403,7 +412,8 @@ license:CC0-1.0
 		<info name="developer" value="ICOM Simulations" />
 		<info name="programmer" value="Dave Feldman, David Marsh, Terry Schulenburg, Karl Roelofs, Jay Zipnick, Todd Squires, Darin Adler, Tod Zipnick, Waldemar Horwat, Steve Hays" />
 		<info name="usage" value="Self-boots and runs on a Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2022-10-05-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -500,7 +510,8 @@ license:CC0-1.0
 		<info name="programmer" value="Thomas A. Roden" />
 		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.02" />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2022-10-07-->
 		<!--board game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -516,7 +527,8 @@ license:CC0-1.0
 		<publisher>BLUE WHALE gameworks</publisher>
 		<info name="programmer" value="L. Bardi, B. Arias, and P. Fritz" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, and Mac Plus." />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="macse,macclasc" />
 		<!--Dump released: 2022-10-14-->
 		<!--action game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -591,7 +603,7 @@ license:CC0-1.0
 		<info name="programmer" value="Michael Berlyn" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="release 23 / 840809-C" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-10-28-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -608,7 +620,7 @@ license:CC0-1.0
 		<info name="programmer" value="Stu Galley" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="release 22 / 840924-C" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-10-28-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -625,7 +637,7 @@ license:CC0-1.0
 		<info name="programmer" value="Stu Galley" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="release 15 / 840522-C" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-10-28-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -642,7 +654,7 @@ license:CC0-1.0
 		<info name="programmer" value="Marc Blank and Dave Lebling" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="release 17 / 840727-C" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-10-28-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -725,9 +737,9 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Infocom</publisher>
 		<info name="programmer" value="Douglas Adams and Steve Meretzky" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="release 47 / 840914-C" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-12-08-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -742,9 +754,9 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Infocom</publisher>
 		<info name="programmer" value="Dave Lebling and Marc Blank" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="release 76 / 840509" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2023-05-29-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -759,9 +771,9 @@ license:CC0-1.0
 		<year>1983</year>
 		<publisher>Infocom</publisher>
 		<info name="programmer" value="Marc Blank" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="release 27 / 831005-C" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2023-05-29-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -776,9 +788,9 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Infocom</publisher>
 		<info name="programmer" value="Michael Berlyn" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="release 22 / 840522-C" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2023-05-29-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -793,9 +805,9 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Infocom</publisher>
 		<info name="programmer" value="Dave Lebling" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="release 14 / 841005-C" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2023-05-29-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -810,9 +822,9 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Infocom</publisher>
 		<info name="programmer" value="Steve Meretzky" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="release 29 / 840118-B" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2023-05-29-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -827,9 +839,9 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Infocom</publisher>
 		<info name="programmer" value="Jeff O'Neill" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="release 97 / 851218-G" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2023-05-29-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -844,9 +856,9 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Infocom</publisher>
 		<info name="programmer" value="Marc Blank and Dave Lebling" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="release 24 / 851118-G" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2023-05-29-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -861,9 +873,9 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Infocom</publisher>
 		<info name="programmer" value="Dave Lebling" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="release 63 / 850916-F" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2023-05-29-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -878,9 +890,9 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Infocom</publisher>
 		<info name="programmer" value="Brian Moriarty" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="release 11 / 860509-3H" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2023-05-29-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -895,9 +907,9 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Infocom</publisher>
 		<info name="programmer" value="Steve Meretzky" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="release 107 / 870430-G" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2023-05-29-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -912,9 +924,9 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Infocom</publisher>
 		<info name="programmer" value="Dave Lebling" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="release 203 / 870506-G" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2023-05-30-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -932,7 +944,7 @@ license:CC0-1.0
 		<info name="programmer" value="E.C. Horvath" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.0" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-10-28-->
 		<!--simulation game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -963,7 +975,7 @@ license:CC0-1.0
 		<info name="programmer" value="E.C. Horvath" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.1 female" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-10-28-->
 		<!--simulation game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1017,7 +1029,7 @@ license:CC0-1.0
 		<info name="programmer" value="Bruce Artwick, Mike Kulas, and Paul Travis" />
 		<info name="usage" value="Self-boots and runs on Mac 128K (some features unavailable), Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.02" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-11-02-->
 		<!--simulation game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1065,7 +1077,7 @@ license:CC0-1.0
 		<year>1990</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="programmer" value="Gene Portwood, Lauren Elliott, Jack Trainor, Matt Siegel, Don Albrecht, Leila Bronstein, Michelle Bushneff, Maureen Gilhooly, Julie Glavin, Barbara Lawrence, Tom Rettig, and Michael Barrett" />
-		<info name="usage" value="Self-boots and runs on Mac Plus, Mac SE, Mac SE/FD, Mac Classic, Mac LC, and Mac II." />
+		<info name="usage" value="Self-boots and runs on Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, Mac LC, and Mac II." />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="macplus,macse,macsefd,macclasc,maclc,macii" />
 		<!--Dump released: 2022-11-07-->
@@ -1095,9 +1107,9 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="programmer" value="Geoff Brown and John MacMillan" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.0" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-11-07-->
 		<!--music program-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1112,7 +1124,7 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Silicon Beach Software</publisher>
 		<info name="programmer" value="William Appleton, Frank Boosman, Eric Zocher, Charlie Jackson, Mari Hughes, Glenn Arnold, John Knott, Mark Pierce, Linda McLennan" />
-		<info name="usage" value="Self-boots and runs on Mac Plus, Mac SE, Mac SE/FD, Mac Classic, and Mac II." />
+		<info name="usage" value="Self-boots and runs on Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
 		<info name="version" value="1.2" />
 		<sharedfeat name="compatibility" value="macplus,macse,macsefd,macclasc,macii" />
 		<!--Dump released: 2022-11-18-->
@@ -1129,8 +1141,8 @@ license:CC0-1.0
 		<year>1990</year>
 		<publisher>Sir-Tech Software</publisher>
 		<info name="programmer" value="D. W. Bradley, Gary Speegle, Chris Appel, Renata Dolnick, Suzanne Snelling, Paul McCall, Brenda Garno, Steve Miller, Jeff Noyle and David Triggerson" />
-		<info name="usage" value="Self-boots and runs on Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="macplus,macse,macsefd,macclasc" />
+		<info name="usage" value="Self-boots and runs on Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="macplus,macse,macclasc" />
 		<!--Dump released: 2022-11-18-->
 		<!--roleplaying game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1192,8 +1204,8 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Silicon Beach Software</publisher>
 		<info name="programmer" value="Jonathan Gay, Eric Zocher, Charlie Jackson, and Joe Ferrara" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-11-19-->
 		<!--action game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1208,9 +1220,10 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Videx</publisher>
 		<info name="programmer" value="Darrel Aldrich, Ron Aldrich, Walter Wittel, Robert Scott Bettis, Mark Borgerson, and Randy Dana-Frigault" />
-		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SEFD, and Mac Classic." />
 		<info name="version" value="1.1" />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2022-11-24-->
 		<!--simulation game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1225,8 +1238,9 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Telarium</publisher>
 		<info name="programmer" value="Byron Press, Michael Reaves, J. Brynne Stephens, Michael P. Meyer, John Pierard, Robert Strong, Seth McEvoy, and Lee Jacknow" />
-		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2022-12-03-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1248,7 +1262,7 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Innovative Data Design</publisher>
 		<info name="developer" value="Innovative Data Design" />
-		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, Mac Classic, and Mac II." />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
 		<info name="version" value="1.2" />
 		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc,macii" />
 		<!--Dump released: 2022-12-04-->
@@ -1272,9 +1286,9 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Human Edge Software</publisher>
 		<info name="developer" value="Human Edge Software" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.0" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-12-04-->
 		<!--educational progam-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1289,9 +1303,10 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="programmer" value="Jim Calhoun, Kyle Wickware, Glenn Axworthy, and Lauren Elliott" />
-		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.1" />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2022-12-04-->
 		<!--graphics progam-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1319,9 +1334,9 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>PBI Software</publisher>
 		<info name="programmer" value="Peter Merrill" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.2" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-12-04-->
 		<!--simulation game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1336,9 +1351,9 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Continental Software</publisher>
 		<info name="developer" value="Arrays, Inc." />
-		<info name="usage" value="Self-boots and runs on Mac 128K, 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.01" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-12-04-->
 		<!--productivity application-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1353,7 +1368,7 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Epyx</publisher>
 		<info name="programmer" value="Gordon Walton, John Polasek, D.R. Gilman, Mike Jones, and Sean Hill" />
-		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, Mac Classic, and Mac II." />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
 		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc,macii" />
 		<!--Dump released:  2022-12-08-->
 		<!--simulation game-->
@@ -1369,8 +1384,9 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Applications Plus</publisher>
 		<info name="developer" value="Applications Plus" />
-		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2022-12-08-->
 		<!--simulation game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1386,9 +1402,10 @@ license:CC0-1.0
 		<publisher>Rainbird</publisher>
 		<info name="developer" value="Magnetic Scrolls" />
 		<info name="programmer" value="Geoff Quilley, Rob Steggles, Tony Lambert, Jeremy San, and Duncan Maclean" />
-		<info name="usage" value="Requires a bootable system disk (not included) and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Requires a bootable system disk (not included) and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="2.3" />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2022-12-08-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1403,8 +1420,9 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Miles Computing</publisher>
 		<info name="programmer" value="Gregory Simons, Scott Levy, Mark Jeffery, and Mei-Ying C. Dell'Aquila" />
-		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2022-12-08-->
 		<!--sports game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1419,9 +1437,9 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Monogram Publishing</publisher>
 		<info name="programmer" value="Frank Mullin and Curt Bianchi" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.3" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-12-08-->
 		<!--productivity application-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1461,8 +1479,8 @@ license:CC0-1.0
 		<publisher>Activision</publisher>
 		<info name="developer" value="Interplay Productions" />
 		<info name="programmer" value="Ayman Adham, Rebecca Heineman, Jay Patel, Troy P. Worrell, David Lowery, Curt Tourmanian, Greg Miller, Brian Fargo, Michael Cranford" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-12-12-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1478,7 +1496,7 @@ license:CC0-1.0
 		<publisher>Penguin Software</publisher>
 		<info name="author" value="Dallas Snell, Joe Toler, and Joel Ellis Rea" />
 		<info name="programmer" value="Ed Loewenstein" />
-		<info name="usage" value="Self--boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, Mac Classic, and Mac II." />
+		<info name="usage" value="Self--boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
 		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc,macii" />
 		<!--Dump released: 2022-12-14-->
 		<!--adventure game-->
@@ -1496,7 +1514,8 @@ license:CC0-1.0
 		<info name="author" value="Antonio Antiochia" />
 		<info name="programmer" value="Robert Hardy" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, and Mac Plus." />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="macse,macclasc" />
 		<!--Dump released: 2022-12-14-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1512,8 +1531,8 @@ license:CC0-1.0
 		<publisher>Activision</publisher>
 		<info name="developer" value="Interplay Productions" />
 		<info name="programmer" value="Allen Adham, Rebecca Heineman, and Troy P. Worrell" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-12-14-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1529,9 +1548,9 @@ license:CC0-1.0
 		<publisher>Penguin Software</publisher>
 		<info name="author" value="John Besnard" />
 		<info name="programmer" value="Robert Hardy" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.1" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-12-14-->
 		<!--board game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1546,8 +1565,8 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="programmer" value="Dave Murry and Barry Murry" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-12-14-->
 		<!--sports game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1562,8 +1581,8 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Gamestar</publisher>
 		<info name="developer" value="Gamestar" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-12-14-->
 		<!--sports game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1578,8 +1597,8 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Mindscape</publisher>
 		<info name="developer" value="Angelsoft" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-12-14-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1594,7 +1613,7 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Mindscape</publisher>
 		<info name="programmer" value="Jack Trainor, Steve Quinn, Jim Cuomo, Phyllis Jacob, Robert Jacob, Peter Oliphant, John Cutter, and Kellyn Beeck" />
-		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, Mac Classic, and Mac II." />
+		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
 		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc,macii" />
 		<!--Dump released: 2022-12-14-->
 		<!--strategy game-->
@@ -1610,8 +1629,9 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Mindscape</publisher>
 		<info name="programmer" value="Doug Sharp, Robert Jacob, Phyllis Jacob, John Cutter, Eric Rosser, Paul Walsh, and Inga Velde" />
-		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc" />
+		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k,mac512k" />
 		<!--Dump released: 2022-12-14-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1626,9 +1646,9 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>THINK Technologies</publisher>
 		<info name="programmer" value="Terry L. Lucas, Peter J. Maruhnic, Andrew Singer, Mel Conway, and Jon Hueras" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.0" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-12-19-->
 		<!--development tool-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1643,9 +1663,9 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Miles Computing</publisher>
 		<info name="programmer" value="David Simons and Alvin Wen" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.0" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2022-12-22-->
 		<!--action game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1660,9 +1680,10 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>QWare</publisher>
 		<info name="programmer" value="Edward Schultz and Michael M. Mayer" />
-		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.04" />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2022-12-24-->
 		<!--roleplaying game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1677,9 +1698,10 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Davidson &amp; Associates</publisher>
 		<info name="programmer" value="Jan Davidson, Ph.D. and Joel Cannon" />
-		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.1" />
-		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k,mac512k" />
 		<!--Dump released: 2023-01-01-->
 		<!--educational program-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1694,9 +1716,10 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>COMPUTER:applications, Inc.</publisher>
 		<info name="programmer" value="Randy Ubillos" />
-		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="2.03" />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2023-01-01-->
 		<!--productivity program-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1711,9 +1734,10 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Digidesign, Inc.</publisher>
 		<info name="programmer" value="Evan Brooks" />
-		<info name="usage" value="Runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.0" />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2023-01-01-->
 		<!--sound program-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1735,9 +1759,10 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>Altsys</publisher>
 		<info name="developer" value="Altsys" />
-		<info name="usage" value="Runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="2.4.1" />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2023-01-01-->
 		<!--graphics program-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1752,9 +1777,9 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Mark of the Unicorn</publisher>
 		<info name="programmer" value="Tom Wade" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.00" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2023-02-19-->
 		<!--action game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1769,8 +1794,8 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Mindscape</publisher>
 		<info name="developer" value="Angelsoft" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2023-02-19-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1785,8 +1810,9 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Activision</publisher>
 		<info name="programmer" value="Rebecca Heineman" />
-		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FD/HD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2023-02-22-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1803,7 +1829,7 @@ license:CC0-1.0
 		<info name="programmer" value="Bill Budge and Bob Upshaw" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="2.5" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2023-02-22-->
 		<!--action game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1820,7 +1846,7 @@ license:CC0-1.0
 		<info name="author" value="Antonio Antiochia" />
 		<info name="programmer" value="Robert Hardry" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2023-02-22-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1835,8 +1861,9 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Mindscape</publisher>
 		<info name="programmer" value="Todd Squires, Craig Erickson, Kurt Nelson, Steve Hays, Terry Schulenberg, Darin Adler, Jay Zipnick, Waldemar Horwat, and Mark Waterman" />
-		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FD/HD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2023-02-27-->
 		<!--adventure game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1858,7 +1885,7 @@ license:CC0-1.0
 		<year>1988</year>
 		<publisher>Mindscape</publisher>
 		<info name="programmer" value="Fred Allen, Darin Adler, Julia Ulano, Michael Manning, Jay Zipnick, Todd Squires, Brian Maker, David Feldman, Steve Hays, Mitch Adler, Karl Roelofs, Tod Zipnick, David Marsh, Waldemar Horwat, Paul Snively, and Ed Dluzen" />
-		<info name="usage" value="Runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FD/HD, Mac Classic, and Mac II." />
+		<info name="usage" value="Runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
 		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc,macii" />
 		<!--Dump released: 2023-03-30-->
 		<!--adventure game-->
@@ -1911,7 +1938,8 @@ license:CC0-1.0
 		<info name="programmer" value="Tim Hays" />
 		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.2" />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2023-03-30-->
 		<!--action game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -1944,7 +1972,7 @@ license:CC0-1.0
 		<publisher>Origin Systems</publisher>
 		<info name="author" value="Greg Malone" />
 		<info name="developer" value="MicroMagic" />
-		<info name="usage" value="Runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FD/HD, Mac Classic, and Mac II." />
+		<info name="usage" value="Runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
 		<info name="version" value="1.03" />
 		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc,macii" />
 		<!--Dump released: 2023-03-31-->
@@ -1961,7 +1989,7 @@ license:CC0-1.0
 		<year>1990</year>
 		<publisher>Inline Design</publisher>
 		<info name="programmer" value="Nicholas Schlott" />
-		<info name="usage" value="Runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FD/HD, Mac Classic, and Mac II (supports 256 colors)." />
+		<info name="usage" value="Runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II (supports 256 colors)." />
 		<info name="version" value="1.06" />
 		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc,macii" />
 		<!--Dump released: 2023-04-04-->
@@ -1978,7 +2006,7 @@ license:CC0-1.0
 		<year>1989</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="programmer" value="Gene Portwood, Lauren Elliott, Chris Jochumson, Don Albrecht, Arturo Sinclair, Mark Schlicting, and Tom Rettig" />
-		<info name="usage" value="Runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, Mac Classic, and Mac II." />
+		<info name="usage" value="Runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc,macii" />
 		<!--Dump released: 2023-04-05-->
@@ -2002,7 +2030,7 @@ license:CC0-1.0
 		<year>1988</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="programmer" value="Christopher Gross, Lauren Elliott, and Gene Portwood" />
-		<info name="usage" value="Runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, Mac Classic, and Mac II." />
+		<info name="usage" value="Runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, Mac Classic, and Mac II." />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc,macii" />
 		<!--Dump released: 2023-04-05-->
@@ -2019,9 +2047,10 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="developer" value="Sensei Software" />
-		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.1" />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2023-04-05-->
 		<!--educational program-->
 		<part name="flop1" interface="floppy_3_5">
@@ -2043,9 +2072,10 @@ license:CC0-1.0
 		<year>1989</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="developer" value="Sensei Software" />
-		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.2" />
-		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k,mac512k" />
 		<!--Dump released: 2023-04-06-->
 		<!--educational program-->
 		<part name="flop1" interface="floppy_3_5">
@@ -2060,9 +2090,10 @@ license:CC0-1.0
 		<year>1989</year>
 		<publisher>Maxis</publisher>
 		<info name="programmer" value="Will Wright, Robert A. Strobel, and Brett G. Durrett" />
-		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.1" />
-		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k,mac512k" />
 		<!--Dump released: 2023-04-06-->
 		<!--simulation game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -2077,8 +2108,8 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Thunder Mountain</publisher>
 		<info name="developer" value="BrainBank" />
-		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2023-04-06-->
 		<!--strategy game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -2111,7 +2142,8 @@ license:CC0-1.0
 		<info name="programmer" value="Dave Kusek and Don Williams" />
 		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.10" />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2023-04-07-->
 		<!--audio program-->
 		<part name="flop1" interface="floppy_3_5">
@@ -2128,7 +2160,8 @@ license:CC0-1.0
 		<info name="programmer" value="Dave Kusek and Don Williams" />
 		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="2.00h" />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2023-04-07-->
 		<!--audio program-->
 		<part name="flop1" interface="floppy_3_5">
@@ -2162,7 +2195,8 @@ license:CC0-1.0
 		<info name="programmer" value="Jim Zuber" />
 		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.1" />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2023-05-25-->
 		<!--simulation game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -2180,7 +2214,7 @@ license:CC0-1.0
 		<info name="programmer" value="Bert Porter" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.0" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2023-05-25-->
 		<!--simulation game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -2197,7 +2231,8 @@ license:CC0-1.0
 		<info name="developer" value="Microsoft" />
 		<info name="usage" value="Self-boots and runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.04" />
-		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k,mac512k" />
 		<!--Dump released: 2023-05-28-->
 		<!--productivity program-->
 		<part name="flop1" interface="floppy_3_5">
@@ -2214,7 +2249,8 @@ license:CC0-1.0
 		<info name="developer" value="Microsoft" />
 		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.00" />
-		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
 		<!--Dump released: 2023-05-28-->
 		<!--productivity program-->
 		<part name="flop1" interface="floppy_3_5">
@@ -2236,9 +2272,9 @@ license:CC0-1.0
 		<year>1988</year>
 		<publisher>Miles Computing</publisher>
 		<info name="programmer" value="Cliff Johnson" />
-		<info name="usage" value="Self-boots and runs on Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="usage" value="Self-boots and runs on Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="2.0" />
-		<sharedfeat name="compatibility" value="macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="macplus,macse,macclasc" />
 		<!--Dump released: 2023-05-29-->
 		<!--puzzle game-->
 		<part name="flop1" interface="floppy_3_5">
@@ -2262,12 +2298,1180 @@ license:CC0-1.0
 		<info name="programmer" value="Thomas Hoffman and Steven Slesinger" />
 		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
 		<info name="version" value="1.0" />
-		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<sharedfeat name="compatibility" value="MC68000" />
 		<!--Dump released: 2023-06-15-->
 		<!--board game-->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="649039">
 				<rom name="macgammon v1.0.moof" size="649039" crc="0d4d3426" sha1="25557c494052c3dea650574f5a29df166453f58a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="archon">
+		<description>Archon</description>
+		<year>1986</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="programmer" value="Anne Westfall, Jon Freeman, Paul Reiche III, and Jim Nitchals" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, and Mac Plus." />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus" />
+		<!-- Dump released: 2024-11-09 -->
+		<!-- strategy game -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649022">
+				<rom name="archon.moof" size="649022" crc="1613732e" sha1="58e128f28ebb7935de83fcf3c2fead8305cb1944" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fractact">
+		<description>Fraction Action</description>
+		<year>1985</year>
+		<publisher>Unicorn Software</publisher>
+		<info name="programmer" value="David Howard Flatman and Ray Tripamer" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, and Mac Plus." />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="macse,macclasc" />
+		<!-- Dump released: 2025-01-14 -->
+		<!-- educational game -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="692196">
+				<rom name="fraction action.moof" size="692196" crc="7a32ac3e" sha1="b102d78731228bcbf165d6a28c7984b215e165c8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bitstyl">
+		<description>The Bitstream Typeface Library (version 2.0)</description>
+		<year>1991</year>
+		<publisher>Bitstream</publisher>
+		<info name="developer" value="Bitstream" />
+		<info name="usage" value="Each font is available in AFM, Suitcase, and Type 1 format." />
+		<info name="version" value="2.0" />
+		<!-- Dump released: 2025-03-28 -->
+		<!-- font collection -->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 1 - Aachen - Americana" />
+			<dataarea name="flop" size="1312544">
+				<rom name="the bitstream typeface library - afms disk 1 aachen - americana.moof" size="1312544" crc="88890226" sha1="1fd16f1a30900c42cac2959e5cfd954274dc3c11" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 2 - Amerigo, Bitstream - Aurora" />
+			<dataarea name="flop" size="1312553">
+				<rom name="the bitstream typeface library - afms disk 2 amerigo, bitstream - aurora.moof" size="1312553" crc="8a1a0432" sha1="075d9fea98e331dfcc24bd11db8b8d212d4a32c4" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 3 - Avant Garde Gothic, ITC - Baskerville, Fry's" />
+			<dataarea name="flop" size="1312570">
+				<rom name="the bitstream typeface library - afms disk 3 avant garde gothic, itc - baskerville, fry's.moof" size="1312570" crc="46fc0fdd" sha1="b5896f2880341bdc147e3bbbd3c806ad37d1d4a8" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 4 - Baskerville, ITC New - Belwe" />
+			<dataarea name="flop" size="1312554">
+				<rom name="the bitstream typeface library - afms disk 4 baskerville, itc new - belwe.moof" size="1312554" crc="c0a7f99d" sha1="581030cdcaa8eb0cdf3a859ea08363a3d9074bf8" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 5 - Benguiat Gothic, ITC - Benguiat, ITC" />
+			<dataarea name="flop" size="1312562">
+				<rom name="the bitstream typeface library - afms disk 5 benguiat gothic, itc - benguiat, itc.moof" size="1312562" crc="afbee62c" sha1="3458eebbbc61188a88d2244a24692fbfd61ecb6b" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 6 - Berkeley Oldstyle, ITC - Bodoni" />
+			<dataarea name="flop" size="1312557">
+				<rom name="the bitstream typeface library - afms disk 6 berkeley oldstyle, itc - bodoni.moof" size="1312557" crc="c162ba7f" sha1="4faf0e715de02064b5bef110103f6c6528a247ee" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 7 - Bodoni, Bauer - Brush 445" />
+			<dataarea name="flop" size="1312551">
+				<rom name="the bitstream typeface library - afms disk 7 bodoni, bauer - brush 445.moof" size="1312551" crc="bca9686b" sha1="d829807798c29b13eed6711d77b45aabb2bd82ce" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 8 - Brush 738 - Carmina, Bitstream" />
+			<dataarea name="flop" size="1312556">
+				<rom name="the bitstream typeface library - afms disk 8 brush 738 - carmina, bitstream.moof" size="1312556" crc="82bc2d81" sha1="1772d547baa1ae627fc3b76655d1609d7ee7252f" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 9 - Caslon 224, ITC - Caxton" />
+			<dataarea name="flop" size="1312550">
+				<rom name="the bitstream typeface library - afms disk 9 caslon 224, itc - caxton.moof" size="1312550" crc="9f71a55f" sha1="288749f9d8e54388bc92ee9d20a877473f741de8" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 10 - Century 725 - Century Schoolbook" />
+			<dataarea name="flop" size="1312560">
+				<rom name="the bitstream typeface library - afms disk 10 century 725 - century schoolbook.moof" size="1312560" crc="f838822c" sha1="e0396bb636ac7773fa5911c964af11d44e757362" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 11 - Century, ITC - Charter, Bitstream" />
+			<dataarea name="flop" size="1312561">
+				<rom name="the bitstream typeface library - afms disk 11 century, itc - charter, bitstream.moof" size="1312561" crc="74de29fe" sha1="ec24be59032642bcd289ddd598fe56902f8fe326" />
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 12 - Cheltenham - Clarendon" />
+			<dataarea name="flop" size="1312550">
+				<rom name="the bitstream typeface library - afms disk 12 cheltenham - clarendon.moof" size="1312550" crc="e9067b21" sha1="ea216be9f30d3299fe3dddf02dc6660f54466550" />
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 13 - Clearface, ITC - Compacta" />
+			<dataarea name="flop" size="1312553">
+				<rom name="the bitstream typeface library - afms disk 13 clearface, itc - compacta.moof" size="1312553" crc="022f35de" sha1="fb63c0260f8475a734722dd6ad43d248c045c673" />
+			</dataarea>
+		</part>
+		<part name="flop14" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 14 - Cooper, Bitstream - Courier 10 Pitch" />
+			<dataarea name="flop" size="1312564">
+				<rom name="the bitstream typeface library - afms disk 14 cooper, bitstream - courier 10 pitch.moof" size="1312564" crc="3ad3ff39" sha1="f55f9bbec1cbd851a09217013ba02d0eba96775e" />
+			</dataarea>
+		</part>
+		<part name="flop15" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 15 - Cushing - Dutch 766" />
+			<dataarea name="flop" size="1312547">
+				<rom name="the bitstream typeface library - afms disk 15 cushing - dutch 766.moof" size="1312547" crc="97f384ef" sha1="e48e932f350c23aaa71bed30dc122949e671beb0" />
+			</dataarea>
+		</part>
+		<part name="flop16" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 16 - Dutch 801 - Engravers' Old English" />
+			<dataarea name="flop" size="1312562">
+				<rom name="the bitstream typeface library - afms disk 16 dutch 801 - engravers' old english.moof" size="1312562" crc="7dff7e66" sha1="59e1e9f3220dff1bd657957e111637d6feb55039" />
+			</dataarea>
+		</part>
+		<part name="flop17" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 17 - Engravers' Roman - Flemish Script" />
+			<dataarea name="flop" size="1312561">
+				<rom name="the bitstream typeface library - afms disk 17 engravers' roman - flemish script.moof" size="1312561" crc="ff341897" sha1="699e7cf1e99d7a36f7abefacf724349a7983142e" />
+			</dataarea>
+		</part>
+		<part name="flop18" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 18 - Folio - Freehand 575" />
+			<dataarea name="flop" size="1312548">
+				<rom name="the bitstream typeface library - afms disk 18 folio - freehand 575.moof" size="1312548" crc="89aa8d61" sha1="2e0579621023fa44a3f8c288dbb898c26e1e5c87" />
+			</dataarea>
+		</part>
+		<part name="flop19" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 19 - Freehand 591 - Friz Quadrata, ITC" />
+			<dataarea name="flop" size="1312561">
+				<rom name="the bitstream typeface library - afms disk 19 freehand 591 - friz quadrata, itc.moof" size="1312561" crc="0c4ddf6b" sha1="5eff388a4ca16f26fc54a29cd89bfaf88a110748" />
+			</dataarea>
+		</part>
+		<part name="flop20" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 20 - Futura - Futura Black" />
+			<dataarea name="flop" size="1312549">
+				<rom name="the bitstream typeface library - afms disk 20 futura - futura black.moof" size="1312549" crc="7dcf88e3" sha1="192f6fb0599cc63439c42363d3c11632ce85094c" />
+			</dataarea>
+		</part>
+		<part name="flop21" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 21 - Galliard, ITC - Garamond, Italian" />
+			<dataarea name="flop" size="1312561">
+				<rom name="the bitstream typeface library - afms disk 21 galliard, itc - garamond, italian.moof" size="1312561" crc="ea6d8b74" sha1="fab63f1d23a8e66d7142302c6799a063216c33fc" />
+			</dataarea>
+		</part>
+		<part name="flop22" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 22 - Garamond, ITC - Geometric 231" />
+			<dataarea name="flop" size="1312557">
+				<rom name="the bitstream typeface library - afms disk 22 garamond, itc - geometric 231.moof" size="1312557" crc="b2a615e4" sha1="fc309d4c831ed49af807122061a5a1f6e16e8116" />
+			</dataarea>
+		</part>
+		<part name="flop23" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 23 - Geometric 415 - Geometric Slabserif 703" />
+			<dataarea name="flop" size="1312567">
+				<rom name="the bitstream typeface library - afms disk 23 geometric 415 - geometric slabserif 703.moof" size="1312567" crc="70e36285" sha1="14e6960e8d4b07cd33fd10568136e196d8f69630" />
+			</dataarea>
+		</part>
+		<part name="flop24" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 24 - Geometric Slabserif 712 - Goudy Old Style" />
+			<dataarea name="flop" size="1312569">
+				<rom name="the bitstream typeface library - afms disk 24 geometric slabserif 712 - goudy old style.moof" size="1312569" crc="3d367009" sha1="c376e125d43101948a3f56facd07a130f07849de" />
+			</dataarea>
+		</part>
+		<part name="flop25" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 25 - Goudy Sans, ITC - Humanist 531" />
+			<dataarea name="flop" size="1312558">
+				<rom name="the bitstream typeface library - afms disk 25 goudy sans, itc - humanist 531.moof" size="1312558" crc="b741264c" sha1="03e7f65963e49aa2f0cc6f8817c581979b8f9c0f" />
+			</dataarea>
+		</part>
+		<part name="flop26" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 26 - Humanist 777 - Impuls" />
+			<dataarea name="flop" size="1312549">
+				<rom name="the bitstream typeface library - afms disk 26 humanist 777 - impuls.moof" size="1312549" crc="9f2ad477" sha1="f3f2452af6b64013f17a017fc2036b16529ab3ef" />
+			</dataarea>
+		</part>
+		<part name="flop27" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 27 - Incised 901 - Kaufmann" />
+			<dataarea name="flop" size="1312550">
+				<rom name="the bitstream typeface library - afms disk 27 incised 901 - kaufmann.moof" size="1312550" crc="2f147483" sha1="0d57da5b08fd4a44b388db54d146712a64db2875" />
+			</dataarea>
+		</part>
+		<part name="flop28" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 28 - Kis - Lapidary 333" />
+			<dataarea name="flop" size="1312546">
+				<rom name="the bitstream typeface library - afms disk 28 kis - lapidary 333.moof" size="1312546" crc="d57d729a" sha1="86fd5231c55b0a236f225c101dcae26b9af4e828" />
+			</dataarea>
+		</part>
+		<part name="flop29" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 29 - Latin 725 - Life" />
+			<dataarea name="flop" size="1312544">
+				<rom name="the bitstream typeface library - afms disk 29 latin 725 - life.moof" size="1312544" crc="731d10c8" sha1="7e1b1a917ef01f84788e3366e8d822cb0bdded5c" />
+			</dataarea>
+		</part>
+		<part name="flop30" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 30 - Lubalin Graph, ITC - Maximus" />
+			<dataarea name="flop" size="1312556">
+				<rom name="the bitstream typeface library - afms disk 30 lubalin graph, itc - maximus.moof" size="1312556" crc="a990583c" sha1="826784145e293c1e46bee45793c445f7bc71bec1" />
+			</dataarea>
+		</part>
+		<part name="flop31" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 31 - Mixage, ITC - News 705" />
+			<dataarea name="flop" size="1312550">
+				<rom name="the bitstream typeface library - afms disk 31 mixage, itc - news 705.moof" size="1312550" crc="d5fbfd0d" sha1="98748e7fee5d2d77ffb7cf12c0e8525f77f689d0" />
+			</dataarea>
+		</part>
+		<part name="flop32" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 32 - News 706 - Normande" />
+			<dataarea name="flop" size="1312547">
+				<rom name="the bitstream typeface library - afms disk 32 news 706 - normande.moof" size="1312547" crc="7feaced8" sha1="280233b93d7d6737b3fd2a39ec0dc00b836dae2f" />
+			</dataarea>
+		</part>
+		<part name="flop33" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 33 - Novarese, ITC - Quorum, ITC" />
+			<dataarea name="flop" size="1312555">
+				<rom name="the bitstream typeface library - afms disk 33 novarese, itc - quorum, itc.moof" size="1312555" crc="9a55184b" sha1="07e32629ccfae8326531a52c56f287504e884d49" />
+			</dataarea>
+		</part>
+		<part name="flop34" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 34 - Raleigh - Schadow" />
+			<dataarea name="flop" size="1312545">
+				<rom name="the bitstream typeface library - afms disk 34 raleigh - schadow.moof" size="1312545" crc="2e4031d1" sha1="29971c896cbda4854d990e9461a3283df248fa08" />
+			</dataarea>
+		</part>
+		<part name="flop35" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 35 - Schneidler - Serif Gothic, ITC" />
+			<dataarea name="flop" size="1312558">
+				<rom name="the bitstream typeface library - afms disk 35 schneidler - serif gothic, itc.moof" size="1312558" crc="1e0ea5a9" sha1="57a10699d0cf93e77cd2aaba4d10a435c8e707d2" />
+			</dataarea>
+		</part>
+		<part name="flop36" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 36 - Serifa - Souvenir, ITC" />
+			<dataarea name="flop" size="1312550">
+				<rom name="the bitstream typeface library - afms disk 36 serifa - souvenir, itc.moof" size="1312550" crc="afceb2f2" sha1="1f7175722cfde40c3f4d631410ff5666e21b67c3" />
+			</dataarea>
+		</part>
+		<part name="flop37" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 37 - Square 721 - Stymie" />
+			<dataarea name="flop" size="1312547">
+				<rom name="the bitstream typeface library - afms disk 37 square 721 - stymie.moof" size="1312547" crc="43ef2b0e" sha1="97960bddf8e8f5310f5ee2925bff9c6ae32bc8a2" />
+			</dataarea>
+		</part>
+		<part name="flop38" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 38 - Swiss 721" />
+			<dataarea name="flop" size="1312537">
+				<rom name="the bitstream typeface library - afms disk 38 swiss 721.moof" size="1312537" crc="a3faceb9" sha1="0d8088ca49155bf84cf8309a6f843b8b7f0d365a" />
+			</dataarea>
+		</part>
+		<part name="flop39" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 39 - Swiss 721, Monospace 821 - Thunderbird" />
+			<dataarea name="flop" size="1312566">
+				<rom name="the bitstream typeface library - afms disk 39 swiss 721, monospace 821 - thunderbird.moof" size="1312566" crc="e0d1e219" sha1="083ff55405ce80b0b9da03bf0f6ebdd4627ab290" />
+			</dataarea>
+		</part>
+		<part name="flop40" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 40 - Tiffany, ITC - Wedding Text" />
+			<dataarea name="flop" size="1312555">
+				<rom name="the bitstream typeface library - afms disk 40 tiffany, itc - wedding text.moof" size="1312555" crc="9b11bb7b" sha1="a8d693162daaab6c45958f0ffcbfcfe0c2e48e37" />
+			</dataarea>
+		</part>
+		<part name="flop41" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 41 - Weidemann, ITC - Zapf Calligraphic 801" />
+			<dataarea name="flop" size="1312566">
+				<rom name="the bitstream typeface library - afms disk 41 weidemann, itc - zapf calligraphic 801.moof" size="1312566" crc="f70b5742" sha1="fdc9a064987bd6d1ef4561c83a730d9a612b7480" />
+			</dataarea>
+		</part>
+		<part name="flop42" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 42 - Zapf Chancery, ITC - Zapf Humanist 601" />
+			<dataarea name="flop" size="1312566">
+				<rom name="the bitstream typeface library - afms disk 42 zapf chancery, itc - zapf humanist 601.moof" size="1312566" crc="a67fe08a" sha1="e89dff1ad796d1d2574421132caa005893080903" />
+			</dataarea>
+		</part>
+		<part name="flop43" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 43 - Zapf International, ITC" />
+			<dataarea name="flop" size="1312551">
+				<rom name="the bitstream typeface library - afms disk 43 zapf international, itc.moof" size="1312551" crc="5ece85bf" sha1="838ed87e80399e6ba5846660bcb3324b12bc3230" />
+			</dataarea>
+		</part>
+		<part name="flop44" interface="floppy_3_5">
+			<feature name="part_id" value="AFMS Disk 44 - Zurich" />
+			<dataarea name="flop" size="1312534">
+				<rom name="the bitstream typeface library - afms disk 44 zurich.moof" size="1312534" crc="46357426" sha1="6bc24eaa0247bc990e8c2ac8088c779ee99911ae" />
+			</dataarea>
+		</part>
+		<part name="flop45" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 1 - Aachen - American Text" />
+			<dataarea name="flop" size="1312553">
+				<rom name="the bitstream typeface library - suitcases disk 1 aachen - american text.moof" size="1312553" crc="cf81d972" sha1="e09d5060f2deb9a90a4a8bdf8077341210dda4f0" />
+			</dataarea>
+		</part>
+		<part name="flop46" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 2 - American Typewriter, ITC - Aurora" />
+			<dataarea name="flop" size="1312564">
+				<rom name="the bitstream typeface library - suitcases disk 2 american typewriter, itc - aurora.moof" size="1312564" crc="a613c979" sha1="e680a9467722f3d3dcfbc0fff6d95a1588d3565c" />
+			</dataarea>
+		</part>
+		<part name="flop47" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 3 - Avant Garde Gothic, ITC - Bank Gothic" />
+			<dataarea name="flop" size="1312568">
+				<rom name="the bitstream typeface library - suitcases disk 3 avant garde gothic, itc - bank gothic.moof" size="1312568" crc="939c4251" sha1="bbb4c07eac3b719fabe9d721b13d8c7ef1a26c61" />
+			</dataarea>
+		</part>
+		<part name="flop48" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 4 - Baskerville - Baskerville, ITC New" />
+			<dataarea name="flop" size="1312565">
+				<rom name="the bitstream typeface library - suitcases disk 4 baskerville - baskerville, itc new.moof" size="1312565" crc="08942b7b" sha1="cd9ee2d5c0d50c57b3683a3ed9e8273dac8668ff" />
+			</dataarea>
+		</part>
+		<part name="flop49" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 5 - Bauhaus, ITC - Belwe" />
+			<dataarea name="flop" size="1312551">
+				<rom name="the bitstream typeface library - suitcases disk 5 bauhaus, itc - belwe.moof" size="1312551" crc="71e3ab49" sha1="83a499cd61bb5c56eb1cc90818452c58328b5d81" />
+			</dataarea>
+		</part>
+		<part name="flop50" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 6 - Benguiat Gothic, ITC - Benguiat, ITC" />
+			<dataarea name="flop" size="1312567">
+				<rom name="the bitstream typeface library - suitcases disk 6 benguiat gothic, itc - benguiat, itc.moof" size="1312567" crc="8ac989ee" sha1="cb8e28c700197370b72b8b7c0f6531b7867af663" />
+			</dataarea>
+		</part>
+		<part name="flop51" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 7 - Berkeley Oldstyle, ITC - Blippo" />
+			<dataarea name="flop" size="1312562">
+				<rom name="the bitstream typeface library - suitcases disk 7 berkeley oldstyle, itc - blippo.moof" size="1312562" crc="87ed089f" sha1="fae4c59c030125492182a9aa353069b26fdc9dc1" />
+			</dataarea>
+		</part>
+		<part name="flop52" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 8 - Bodoni - Bolt Bold, ITC" />
+			<dataarea name="flop" size="1312554">
+				<rom name="the bitstream typeface library - suitcases disk 8 bodoni - bolt bold, itc.moof" size="1312554" crc="6272d0fa" sha1="3faf672814636651c7ac9bb2a4b3bcf5abe65f1c" />
+			</dataarea>
+		</part>
+		<part name="flop53" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 9 - Bookman - Brush Script" />
+			<dataarea name="flop" size="1312553">
+				<rom name="the bitstream typeface library - suitcases disk 9 bookman - brush script.moof" size="1312553" crc="c1b7690f" sha1="acb630e83ac039cb7315476b7b938c247e7f14d2" />
+			</dataarea>
+		</part>
+		<part name="flop54" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 10 - Bulmer - Carmina, Bitstream" />
+			<dataarea name="flop" size="1312560">
+				<rom name="the bitstream typeface library - suitcases disk 10 bulmer - carmina, bitstream.moof" size="1312560" crc="f3bfeaf2" sha1="1421c3742848f0b566974ac99bcee88ced65ac88" />
+			</dataarea>
+		</part>
+		<part name="flop55" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 11 - Caslon 224, ITC - Caslon Openface" />
+			<dataarea name="flop" size="1312566">
+				<rom name="the bitstream typeface library - suitcases disk 11 caslon 224, itc - caslon openface.moof" size="1312566" crc="dcf1e51e" sha1="799fcc567930e4ade7cbcf65817c4bf9a591e8f6" />
+			</dataarea>
+		</part>
+		<part name="flop56" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 12 - Caxton - Century 751" />
+			<dataarea name="flop" size="1312553">
+				<rom name="the bitstream typeface library - suitcases disk 12 caxton - century 751.moof" size="1312553" crc="3b4e5ae3" sha1="0b964840bd401a8d2330a83ac61309065bd11bca" />
+			</dataarea>
+		</part>
+		<part name="flop57" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 13 - Century Expanded - Century Schoolbook" />
+			<dataarea name="flop" size="1312570">
+				<rom name="the bitstream typeface library - suitcases disk 13 century expanded - century schoolbook.moof" size="1312570" crc="2ad11bb0" sha1="27383e8c6cf06006188d3eb1c9a5b7894d29ce3c" />
+			</dataarea>
+		</part>
+		<part name="flop58" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 14 - Century, ITC" />
+			<dataarea name="flop" size="1312545">
+				<rom name="the bitstream typeface library - suitcases disk 14 century, itc.moof" size="1312545" crc="c7a79c5d" sha1="42cad675e785b4c1e635bdca0e1426cc8a505d72" />
+			</dataarea>
+		</part>
+		<part name="flop59" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 15 - Charter, Bitstream - Cheltenham" />
+			<dataarea name="flop" size="1312564">
+				<rom name="the bitstream typeface library - suitcases disk 15 charter, bitstream - cheltenham.moof" size="1312564" crc="f082717d" sha1="29abf8fc2330935f7fc3d87e34a678756ea4816d" />
+			</dataarea>
+		</part>
+		<part name="flop60" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 16 - Cheltenham, ITC - Clarendon" />
+			<dataarea name="flop" size="1312560">
+				<rom name="the bitstream typeface library - suitcases disk 16 cheltenham, itc - clarendon.moof" size="1312560" crc="417b9269" sha1="3f223aa54acdf861bcc0178658e06cec052bce70" />
+			</dataarea>
+		</part>
+		<part name="flop61" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 17 - Clearface, ITC - Compacta" />
+			<dataarea name="flop" size="1312558">
+				<rom name="the bitstream typeface library - suitcases disk 17 clearface, itc - compacta.moof" size="1312558" crc="ee0d188e" sha1="db09af18ffdd6b7ac1e83a212e90e91488b17427" />
+			</dataarea>
+		</part>
+		<part name="flop62" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 18 - Cooper, Bitstream - Courier 10 Pitch" />
+			<dataarea name="flop" size="1312569">
+				<rom name="the bitstream typeface library - suitcases disk 18 cooper, bitstream - courier 10 pitch.moof" size="1312569" crc="ca14c688" sha1="5aa39c9bf2178a2df394297ea75d1d1cfaa650ff" />
+			</dataarea>
+		</part>
+		<part name="flop63" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 19 - Cushing - Dom" />
+			<dataarea name="flop" size="1312546">
+				<rom name="the bitstream typeface library - suitcases disk 19 cushing - dom.moof" size="1312546" crc="19fac236" sha1="ffaacee13d9aa1ac42b720052dc421677237d662" />
+			</dataarea>
+		</part>
+		<part name="flop64" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 20 - Dutch 766 - Dutch 811" />
+			<dataarea name="flop" size="1312554">
+				<rom name="the bitstream typeface library - suitcases disk 20 dutch 766 - dutch 811.moof" size="1312554" crc="40afaece" sha1="bed747b378cfef55524bd201a5195e7f8dca2cf5" />
+			</dataarea>
+		</part>
+		<part name="flop65" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 21 - Dutch 823 - Engravers' Roman" />
+			<dataarea name="flop" size="1312561">
+				<rom name="the bitstream typeface library - suitcases disk 21 dutch 823 - engravers' roman.moof" size="1312561" crc="f6d5c7eb" sha1="85fb7e5ee2a41c8c4243f079420471768a64a5ac" />
+			</dataarea>
+		</part>
+		<part name="flop66" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 22 - Eras, ITC - Flareserif 821" />
+			<dataarea name="flop" size="1312559">
+				<rom name="the bitstream typeface library - suitcases disk 22 eras, itc - flareserif 821.moof" size="1312559" crc="c71239b1" sha1="d30dc93198e93e4f6cd1139d4fcdfc778494f1ce" />
+			</dataarea>
+		</part>
+		<part name="flop67" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 23 - Flemish Script - Franklin Gothic, ITC" />
+			<dataarea name="flop" size="1312570">
+				<rom name="the bitstream typeface library - suitcases disk 23 flemish script - franklin gothic, itc.moof" size="1312570" crc="b708f01b" sha1="b3cdfebced3cfed5025482b1eb80b9d439dc8bdb" />
+			</dataarea>
+		</part>
+		<part name="flop68" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 24 - Freeform 710 - Friz Quadrata, ITC" />
+			<dataarea name="flop" size="1296182">
+				<rom name="the bitstream typeface library - suitcases disk 24 freeform 710 - friz quadrata, itc.moof" size="1296182" crc="a2ab0fb4" sha1="23545a18393c0d7d4759ddc196f584309dbe3a41" />
+			</dataarea>
+		</part>
+		<part name="flop69" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 25 - Futura - Futura Black" />
+			<dataarea name="flop" size="1296170">
+				<rom name="the bitstream typeface library - suitcases disk 25 futura - futura black.moof" size="1296170" crc="99fe7c67" sha1="4f713df18b37bffd49cc1f3c465ebaf7459fa8ae" />
+			</dataarea>
+		</part>
+		<part name="flop70" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 26 - Galliard, ITC - Garamond, Elegant" />
+			<dataarea name="flop" size="1296182">
+				<rom name="the bitstream typeface library - suitcases disk 26 galliard, itc - garamond, elegant.moof" size="1296182" crc="a663794f" sha1="309c503de376f44593c56c3f1c46dfd0b4f2c41b" />
+			</dataarea>
+		</part>
+		<part name="flop71" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 27 - Garamond, Italian - Garamond, ITC" />
+			<dataarea name="flop" size="1312566">
+				<rom name="the bitstream typeface library - suitcases disk 27 garamond, italian - garamond, itc.moof" size="1312566" crc="60ab7083" sha1="bc78b07af3f93fb194373fd3d01326c948fe3deb" />
+			</dataarea>
+		</part>
+		<part name="flop72" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 28 - Garamond, Original - Geometric 415" />
+			<dataarea name="flop" size="1312567">
+				<rom name="the bitstream typeface library - suitcases disk 28 garamond, original - geometric 415.moof" size="1312567" crc="ea3cb86c" sha1="111c3acc00bfdd5aeaa473a60dc51bb3755df881" />
+			</dataarea>
+		</part>
+		<part name="flop73" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 29 - Geometric 706 - Geometric Slabserif 712" />
+			<dataarea name="flop" size="1312572">
+				<rom name="the bitstream typeface library - suitcases disk 29 geometric 706 - geometric slabserif 712.moof" size="1312572" crc="dfeff1b3" sha1="576d046b150e69f5623956f089df5b879bbee54d" />
+			</dataarea>
+		</part>
+		<part name="flop74" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 30 - Gorilla, ITC - Goudy Old Style" />
+			<dataarea name="flop" size="1312563">
+				<rom name="the bitstream typeface library - suitcases disk 30 gorilla, itc - goudy old style.moof" size="1312563" crc="89999d02" sha1="0f492400551a63d79d7e24a937f8476b62511398" />
+			</dataarea>
+		</part>
+		<part name="flop75" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 31 - Goudy Sans, ITC - Hobo" />
+			<dataarea name="flop" size="1312555">
+				<rom name="the bitstream typeface library - suitcases disk 31 goudy sans, itc - hobo.moof" size="1312555" crc="7569c890" sha1="a02a752b333c5591d30ffa12090eb7d9b4e12d5e" />
+			</dataarea>
+		</part>
+		<part name="flop76" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 32 - Humanist 521 - Humanist 531" />
+			<dataarea name="flop" size="1312560">
+				<rom name="the bitstream typeface library - suitcases disk 32 humanist 521 - humanist 531.moof" size="1312560" crc="344d7566" sha1="3bb38cd65ebf1c76fd60c5e32370f719ae340808" />
+			</dataarea>
+		</part>
+		<part name="flop77" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 33 - Humanist 777 - Impuls" />
+			<dataarea name="flop" size="1312554">
+				<rom name="the bitstream typeface library - suitcases disk 33 humanist 777 - impuls.moof" size="1312554" crc="c9edd220" sha1="a1b0fa56d563d767c72c2a974f6cd78c2c2d041a" />
+			</dataarea>
+		</part>
+		<part name="flop78" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 34 - Incised 901 - Informal 011" />
+			<dataarea name="flop" size="1312559">
+				<rom name="the bitstream typeface library - suitcases disk 34 incised 901 - informal 011.moof" size="1312559" crc="3f4d7c32" sha1="74fc6bfb696013700db3842845285423430ae830" />
+			</dataarea>
+		</part>
+		<part name="flop79" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 35 - Isbell, ITC - Kis" />
+			<dataarea name="flop" size="1312550">
+				<rom name="the bitstream typeface library - suitcases disk 35 isbell, itc - kis.moof" size="1312550" crc="57260ef6" sha1="09bc2e9c0871034c7c983660a25bef3a3bf0f572" />
+			</dataarea>
+		</part>
+		<part name="flop80" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 36 - Korinna, ITC - Lapidary 333" />
+			<dataarea name="flop" size="1312560">
+				<rom name="the bitstream typeface library - suitcases disk 36 korinna, itc - lapidary 333.moof" size="1312560" crc="c84449ff" sha1="a75b96a039a87dd1128b744e8adfefe9eca707d0" />
+			</dataarea>
+		</part>
+		<part name="flop81" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 37 - Latin 725 - Libra" />
+			<dataarea name="flop" size="1312550">
+				<rom name="the bitstream typeface library - suitcases disk 37 latin 725 - libra.moof" size="1312550" crc="b0e29888" sha1="27dd2f03616d88df16a277186c3e16e549036e04" />
+			</dataarea>
+		</part>
+		<part name="flop82" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 38 - Life - Lydian" />
+			<dataarea name="flop" size="1312546">
+				<rom name="the bitstream typeface library - suitcases disk 38 life - lydian.moof" size="1312546" crc="8bd48354" sha1="72a8cd7a40df41d93a5bdb978a3fb653d9136254" />
+			</dataarea>
+		</part>
+		<part name="flop83" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 39 - Lydian Cursive - Murray Hill" />
+			<dataarea name="flop" size="1312561">
+				<rom name="the bitstream typeface library - suitcases disk 39 lydian cursive - murray hill.moof" size="1312561" crc="580a0bf7" sha1="da3007aa769ca37ef2d643d0b515c9f4172408d1" />
+			</dataarea>
+		</part>
+		<part name="flop84" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 40 - News 701 - News 706" />
+			<dataarea name="flop" size="1312552">
+				<rom name="the bitstream typeface library - suitcases disk 40 news 701 - news 706.moof" size="1312552" crc="fe77c9de" sha1="fab2c61a4617617f8563b3b5526b28930bc0be4d" />
+			</dataarea>
+		</part>
+		<part name="flop85" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 41 - News Gothic - Newtext, ITC" />
+			<dataarea name="flop" size="1312559">
+				<rom name="the bitstream typeface library - suitcases disk 41 news gothic - newtext, itc.moof" size="1312559" crc="05073239" sha1="cec062ae357d445ad9675ae76461b895d0117c39" />
+			</dataarea>
+		</part>
+		<part name="flop86" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 42 - Normande - Playbill" />
+			<dataarea name="flop" size="1312552">
+				<rom name="the bitstream typeface library - suitcases disk 42 normande - playbill.moof" size="1312552" crc="6775e442" sha1="d3461e67c23e7411a85f9444221e1cc1f94ee0e9" />
+			</dataarea>
+		</part>
+		<part name="flop87" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 43 - Prestige 12 Pitch - Ribbon 131" />
+			<dataarea name="flop" size="1312563">
+				<rom name="the bitstream typeface library - suitcases disk 43 prestige 12 pitch - ribbon 131.moof" size="1312563" crc="de4abdb2" sha1="0dbb98cb59ccdedd4e879cd455e26414cf073223" />
+			</dataarea>
+		</part>
+		<part name="flop88" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 44 - Romana - Seagull" />
+			<dataarea name="flop" size="1312549">
+				<rom name="the bitstream typeface library - suitcases disk 44 romana - seagull.moof" size="1312549" crc="a11caacf" sha1="1db7b7f1f1d976253e89a845851ef6a01e589dd6" />
+			</dataarea>
+		</part>
+		<part name="flop89" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 45 - Serif Gothic, ITC - Shotgun" />
+			<dataarea name="flop" size="1312560">
+				<rom name="the bitstream typeface library - suitcases disk 45 serif gothic, itc - shotgun.moof" size="1312560" crc="e40a9a2a" sha1="00296c2b6c8a0942d26ed7fda199fd4f38a7c020" />
+			</dataarea>
+		</part>
+		<part name="flop90" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 46 - Snell - Square 721" />
+			<dataarea name="flop" size="1312551">
+				<rom name="the bitstream typeface library - suitcases disk 46 snell - square 721.moof" size="1312551" crc="58911461" sha1="2bea424a41c367f95d4d7545f6115597e396a743" />
+			</dataarea>
+		</part>
+		<part name="flop91" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 47 - Square Slabserif 711 - Stymie" />
+			<dataarea name="flop" size="1312562">
+				<rom name="the bitstream typeface library - suitcases disk 47 square slabserif 711 - stymie.moof" size="1312562" crc="cc38f23a" sha1="2c14a8f8a50993f1d7d34511b3310bcb86e812cc" />
+			</dataarea>
+		</part>
+		<part name="flop92" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 48 - Swiss 721, Part 1" />
+			<dataarea name="flop" size="1312550">
+				<rom name="the bitstream typeface library - suitcases disk 48 swiss 721, part 1.moof" size="1312550" crc="49f57220" sha1="e229021f94ab1b23a506dc3a6965277b562e6491" />
+			</dataarea>
+		</part>
+		<part name="flop93" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 49 - Swiss 721, Part 2 - Swiss 924" />
+			<dataarea name="flop" size="1312562">
+				<rom name="the bitstream typeface library - suitcases disk 49 swiss 721, part 2 - swiss 924.moof" size="1312562" crc="a8ddc612" sha1="37d710c5db7e159d608a2a24142a89b353d03bfe" />
+			</dataarea>
+		</part>
+		<part name="flop94" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 50 - Symbol and Pi - Thunderbird" />
+			<dataarea name="flop" size="1312560">
+				<rom name="the bitstream typeface library - suitcases disk 50 symbol and pi - thunderbird.moof" size="1312560" crc="d14e1643" sha1="3f44c01428a861c94ace37153d956d7b323f09ed" />
+			</dataarea>
+		</part>
+		<part name="flop95" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 51 - Tiffany, ITC - Umbra" />
+			<dataarea name="flop" size="1312553">
+				<rom name="the bitstream typeface library - suitcases disk 51 tiffany, itc - umbra.moof" size="1312553" crc="b17dbbd0" sha1="e14036a7e3a2b56ed0f0ecbc77cfe77c2ecc6fb0" />
+			</dataarea>
+		</part>
+		<part name="flop96" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 52 - University Roman - Windsor" />
+			<dataarea name="flop" size="1312559">
+				<rom name="the bitstream typeface library - suitcases disk 52 university roman - windsor.moof" size="1312559" crc="b2d3ec84" sha1="fb8d12c5ecb402fa594bcaf51cc9b13c750769c5" />
+			</dataarea>
+		</part>
+		<part name="flop97" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 53 - Zapf Book, ITC - Zapf Chancery, ITC" />
+			<dataarea name="flop" size="1312568">
+				<rom name="the bitstream typeface library - suitcases disk 53 zapf book, itc - zapf chancery, itc.moof" size="1312568" crc="0fca2fe2" sha1="8a09e81f4ff751a03a5708667dd6c6cd0aaf2bad" />
+			</dataarea>
+		</part>
+		<part name="flop98" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 54 - Zapf Elliptical 711 - Zapf International, ITC" />
+			<dataarea name="flop" size="1312578">
+				<rom name="the bitstream typeface library - suitcases disk 54 zapf elliptical 711 - zapf international, itc.moof" size="1312578" crc="fe83608b" sha1="42ecaf15dcabc2bb2a89d2c9e102395bf52e95d3" />
+			</dataarea>
+		</part>
+		<part name="flop99" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 55 - Zurich, Part 1" />
+			<dataarea name="flop" size="1312547">
+				<rom name="the bitstream typeface library - suitcases disk 55 zurich, part 1.moof" size="1312547" crc="c76f1f49" sha1="7ca94af15c74d14aa536bb9bfd6f4bcac5056d57" />
+			</dataarea>
+		</part>
+		<part name="flop100" interface="floppy_3_5">
+			<feature name="part_id" value="Suitcases Disk 56 - Zurich, Part 2" />
+			<dataarea name="flop" size="1312547">
+				<rom name="the bitstream typeface library - suitcases disk 56 zurich, part 2.moof" size="1312547" crc="2e05637b" sha1="c3c620fbdf2c04a03248874433ff1ed4c2ebf6a3" />
+			</dataarea>
+		</part>
+		<part name="flop101" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 1 - Aachen - American Text" />
+			<dataarea name="flop" size="1296166">
+				<rom name="the bitstream typeface library - type 1 disk 1 aachen - american text.moof" size="1296166" crc="e73ebcd5" sha1="a1e43fcf43edfa8d5b1967dac528ca2b8f7d499d" />
+			</dataarea>
+		</part>
+		<part name="flop102" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 2 - American Typewriter, ITC - Aurora" />
+			<dataarea name="flop" size="1296177">
+				<rom name="the bitstream typeface library - type 1 disk 2 american typewriter, itc - aurora.moof" size="1296177" crc="3b5fdaa2" sha1="fdf3f89741676a3d32e9d0613297e883fca7d9f0" />
+			</dataarea>
+		</part>
+		<part name="flop103" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 3 - Avant Garde Gothic, ITC - Bank Gothic" />
+			<dataarea name="flop" size="1296181">
+				<rom name="the bitstream typeface library - type 1 disk 3 avant garde gothic, itc - bank gothic.moof" size="1296181" crc="ec4d1e62" sha1="e336f6a0bdcd1ef70a359d91cf2c1e043b1b207a" />
+			</dataarea>
+		</part>
+		<part name="flop104" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 4 - Baskerville - Baskerville, ITC New" />
+			<dataarea name="flop" size="1296178">
+				<rom name="the bitstream typeface library - type 1 disk 4 baskerville - baskerville, itc new.moof" size="1296178" crc="727bf058" sha1="c9cbd1714423095b4be3bce1abbfe500212e10da" />
+			</dataarea>
+		</part>
+		<part name="flop105" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 5 - Bauhaus, ITC - Belwe" />
+			<dataarea name="flop" size="1296164">
+				<rom name="the bitstream typeface library - type 1 disk 5 bauhaus, itc - belwe.moof" size="1296164" crc="86099fe2" sha1="055a339c8aa32312883381dda090ad9d54de2539" />
+			</dataarea>
+		</part>
+		<part name="flop106" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 6 - Benguiat Gothic, ITC" />
+			<dataarea name="flop" size="1296164">
+				<rom name="the bitstream typeface library - type 1 disk 6 benguiat gothic, itc.moof" size="1296164" crc="2eab2368" sha1="5a127002f60adf0c0ebf970b098d1899abb404d3" />
+			</dataarea>
+		</part>
+		<part name="flop107" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 7 - Benguiat, ITC" />
+			<dataarea name="flop" size="1312541">
+				<rom name="the bitstream typeface library - type 1 disk 7 benguiat, itc.moof" size="1312541" crc="c0b4eb5b" sha1="8d9b2270dc99e37017467864b8f11c9fa8ddc8de" />
+			</dataarea>
+		</part>
+		<part name="flop108" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 8 - Berkeley Oldstyle, ITC - Blippo" />
+			<dataarea name="flop" size="1312559">
+				<rom name="the bitstream typeface library - type 1 disk 8 berkeley oldstyle, itc - blippo.moof" size="1312559" crc="a36816c2" sha1="8ca5954ea2b3159093515733932bfe521a2ef916" />
+			</dataarea>
+		</part>
+		<part name="flop109" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 9 - Bodoni - Bolt Bold, ITC" />
+			<dataarea name="flop" size="1312551">
+				<rom name="the bitstream typeface library - type 1 disk 9 bodoni - bolt bold, itc.moof" size="1312551" crc="59f77f9a" sha1="2d7563828a30852d2badd1657dcb662d458e571b" />
+			</dataarea>
+		</part>
+		<part name="flop110" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 10 - Bookman - Brush Script" />
+			<dataarea name="flop" size="1312552">
+				<rom name="the bitstream typeface library - type 1 disk 10 bookman - brush script.moof" size="1312552" crc="34ab209b" sha1="cd169110ce140232026ac58b2b4bfa63dd8e0a00" />
+			</dataarea>
+		</part>
+		<part name="flop111" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 11 - Bulmer - Carmina, Bitstream" />
+			<dataarea name="flop" size="1312557">
+				<rom name="the bitstream typeface library - type 1 disk 11 bulmer - carmina, bitstream.moof" size="1312557" crc="4e421f29" sha1="1575dca08a9c208abf13c60369361014766e08f4" />
+			</dataarea>
+		</part>
+		<part name="flop112" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 12 - Caslon 224, ITC - Caslon Openface" />
+			<dataarea name="flop" size="1312563">
+				<rom name="the bitstream typeface library - type 1 disk 12 caslon 224, itc - caslon openface.moof" size="1312563" crc="ed948036" sha1="afe7b511450a3fdc822350c06c00033ec34013bf" />
+			</dataarea>
+		</part>
+		<part name="flop113" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 13 - Caxton - Century 751" />
+			<dataarea name="flop" size="1312550">
+				<rom name="the bitstream typeface library - type 1 disk 13 caxton - century 751.moof" size="1312550" crc="b81b1376" sha1="322007b56352099cf9518f82f6dae364a56dd586" />
+			</dataarea>
+		</part>
+		<part name="flop114" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 14 - Century Expanded - Century Schoolbook" />
+			<dataarea name="flop" size="1312567">
+				<rom name="the bitstream typeface library - type 1 disk 14 century expanded - century schoolbook.moof" size="1312567" crc="c8e8a506" sha1="eef3670f7f8b89c51549f928da7b2220f3704688" />
+			</dataarea>
+		</part>
+		<part name="flop115" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 15 - Century, ITC" />
+			<dataarea name="flop" size="1312542">
+				<rom name="the bitstream typeface library - type 1 disk 15 century, itc.moof" size="1312542" crc="d84d702c" sha1="9709a9bd953371aa24a2a5041ead718649749837" />
+			</dataarea>
+		</part>
+		<part name="flop116" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 16 - Charter, Bitstream - Cheltenham" />
+			<dataarea name="flop" size="1312561">
+				<rom name="the bitstream typeface library - type 1 disk 16 charter, bitstream - cheltenham.moof" size="1312561" crc="c64ddd13" sha1="4e62c94710bf1a9d4296a18509a75067e635c981" />
+			</dataarea>
+		</part>
+		<part name="flop117" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 17 - Cheltenham, ITC - Clarendon" />
+			<dataarea name="flop" size="1312557">
+				<rom name="the bitstream typeface library - type 1 disk 17 cheltenham, itc - clarendon.moof" size="1312557" crc="78c6a899" sha1="6f1d1ab2b58c8c614af3852e815a6e9bea8e4199" />
+			</dataarea>
+		</part>
+		<part name="flop118" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 18 - Clearface, ITC - Compacta" />
+			<dataarea name="flop" size="1312555">
+				<rom name="the bitstream typeface library - type 1 disk 18 clearface, itc - compacta.moof" size="1312555" crc="db2b1b0f" sha1="c1e22bd2ac4d3a5ebc698c03e3d803799c79ed98" />
+			</dataarea>
+		</part>
+		<part name="flop119" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 19 - Cooper, Bitstream - Copperplate Gothic" />
+			<dataarea name="flop" size="1312568">
+				<rom name="the bitstream typeface library - type 1 disk 19 cooper, bitstream - copperplate gothic.moof" size="1312568" crc="a1f373a9" sha1="220a26e541718bac0d23db84e565842050204031" />
+			</dataarea>
+		</part>
+		<part name="flop120" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 20 - Courier 10 Pitch - Decorated 035" />
+			<dataarea name="flop" size="1312562">
+				<rom name="the bitstream typeface library - type 1 disk 20 courier 10 pitch - decorated 035.moof" size="1312562" crc="dbaa3fac" sha1="3aa6883b7ad4e8e5cb459d4a7c6e1a1060dd3802" />
+			</dataarea>
+		</part>
+		<part name="flop121" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 21 - Dom - Dutch 801" />
+			<dataarea name="flop" size="1312545">
+				<rom name="the bitstream typeface library - type 1 disk 21 dom - dutch 801.moof" size="1312545" crc="b527c503" sha1="7e3d59837028998493f272b0f865e1cd64d77fe2" />
+			</dataarea>
+		</part>
+		<part name="flop122" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 22 - Dutch 809 - Engravers' Gothic" />
+			<dataarea name="flop" size="1312559">
+				<rom name="the bitstream typeface library - type 1 disk 22 dutch 809 - engravers' gothic.moof" size="1312559" crc="c6892592" sha1="df2b9d295bc2988a19a2fceebe6ca712ccfdbb29" />
+			</dataarea>
+		</part>
+		<part name="flop123" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 23 - Engravers' Old English - Exotic 350" />
+			<dataarea name="flop" size="1312565">
+				<rom name="the bitstream typeface library - type 1 disk 23 engravers' old english - exotic 350.moof" size="1312565" crc="2e7291c3" sha1="543687afaaf07032396a764903e039d4284d0de9" />
+			</dataarea>
+		</part>
+		<part name="flop124" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 24 - Fenice, ITC - Fraktur" />
+			<dataarea name="flop" size="1312551">
+				<rom name="the bitstream typeface library - type 1 disk 24 fenice, itc - fraktur.moof" size="1312551" crc="203b4b13" sha1="2a564c9253344128b6d4079e24922a5b026e7eaf" />
+			</dataarea>
+		</part>
+		<part name="flop125" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 25 - Franklin Gothic - Freehand 471" />
+			<dataarea name="flop" size="1312560">
+				<rom name="the bitstream typeface library - type 1 disk 25 franklin gothic - freehand 471.moof" size="1312560" crc="92bf4f9f" sha1="5bcb6e583e1ff2dbf07df83d8ede1832ae283cb4" />
+			</dataarea>
+		</part>
+		<part name="flop126" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 26 - Freehand 521 - Friz Quadrata, ITC" />
+			<dataarea name="flop" size="1312563">
+				<rom name="the bitstream typeface library - type 1 disk 26 freehand 521 - friz quadrata, itc.moof" size="1312563" crc="127887bb" sha1="364ed141271b9aa8d7a0f5f5b705f534ef7ed821" />
+			</dataarea>
+		</part>
+		<part name="flop127" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 27 - Futura - Futura Black" />
+			<dataarea name="flop" size="1312551">
+				<rom name="the bitstream typeface library - type 1 disk 27 futura - futura black.moof" size="1312551" crc="d2019a71" sha1="93748910cdcea6e012effbfb9781aa2102f8366c" />
+			</dataarea>
+		</part>
+		<part name="flop128" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 28 - Galliard, ITC - Garamond, Classical" />
+			<dataarea name="flop" size="1312565">
+				<rom name="the bitstream typeface library - type 1 disk 28 galliard, itc - garamond, classical.moof" size="1312565" crc="719bb6ea" sha1="c711f4f3d70a0ceae95a6b3c917aa44dfac4d464" />
+			</dataarea>
+		</part>
+		<part name="flop129" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 29 - Garamond, Elegant - Garamond, Italian" />
+			<dataarea name="flop" size="1312567">
+				<rom name="the bitstream typeface library - type 1 disk 29 garamond, elegant - garamond, italian.moof" size="1312567" crc="d76f7edf" sha1="5c4e100458a7e35fba3b42ddf804d7533e37721f" />
+			</dataarea>
+		</part>
+		<part name="flop130" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 30 - Garamond, ITC" />
+			<dataarea name="flop" size="1312543">
+				<rom name="the bitstream typeface library - type 1 disk 30 garamond, itc.moof" size="1312543" crc="79b151c3" sha1="94423b1a3e01e21ed6dc9fe93615a171f58939fb" />
+			</dataarea>
+		</part>
+		<part name="flop131" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 31 - Garamond, Original - Geometric 706" />
+			<dataarea name="flop" size="1312564">
+				<rom name="the bitstream typeface library - type 1 disk 31 garamond, original - geometric 706.moof" size="1312564" crc="b18e1891" sha1="e4b12a3513ac33200f234a3ee5302302b6e7e580" />
+			</dataarea>
+		</part>
+		<part name="flop132" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 32 - Geometric Slabserif 703 - Gorilla, ITC" />
+			<dataarea name="flop" size="1312568">
+				<rom name="the bitstream typeface library - type 1 disk 32 geometric slabserif 703 - gorilla, itc.moof" size="1312568" crc="67f2722a" sha1="35b8aed81efcba0e8a7d7c730472a50ed0fdea06" />
+			</dataarea>
+		</part>
+		<part name="flop133" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 33 - Gothic 720 - Goudy Heavyface" />
+			<dataarea name="flop" size="1312558">
+				<rom name="the bitstream typeface library - type 1 disk 33 gothic 720 - goudy heavyface.moof" size="1312558" crc="58e88942" sha1="c5a34a309bdd8efb751ffcbdcd310be41ac09240" />
+			</dataarea>
+		</part>
+		<part name="flop134" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 34 - Goudy Old Style - Hobo" />
+			<dataarea name="flop" size="1312552">
+				<rom name="the bitstream typeface library - type 1 disk 34 goudy old style - hobo.moof" size="1312552" crc="45ec1994" sha1="3ea46fb609c55137a7eeaf7902c5d66ea4c72a4f" />
+			</dataarea>
+		</part>
+		<part name="flop135" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 35 - Humanist 521 - Humanist 777" />
+			<dataarea name="flop" size="1312557">
+				<rom name="the bitstream typeface library - type 1 disk 35 humanist 521 - humanist 777.moof" size="1312557" crc="9883cc22" sha1="620cf7a679f6791f5ff43917d237e58f8d67ea8c" />
+			</dataarea>
+		</part>
+		<part name="flop136" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 36 - Humanist 970 - Incised 901" />
+			<dataarea name="flop" size="1312556">
+				<rom name="the bitstream typeface library - type 1 disk 36 humanist 970 - incised 901.moof" size="1312556" crc="09ab2e38" sha1="f5751625d9599dc905b6ad6283e9872c1e3d06f7" />
+			</dataarea>
+		</part>
+		<part name="flop137" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 37 - Industrial 736 - Italia, ITC" />
+			<dataarea name="flop" size="1312558">
+				<rom name="the bitstream typeface library - type 1 disk 37 industrial 736 - italia, itc.moof" size="1312558" crc="2bf90a7c" sha1="51039c39aa73cb49d33cfaca19b9e04126cf5210" />
+			</dataarea>
+		</part>
+		<part name="flop138" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 38 - Kabel, ITC - Korinna, ITC" />
+			<dataarea name="flop" size="1312555">
+				<rom name="the bitstream typeface library - type 1 disk 38 kabel, itc - korinna, itc.moof" size="1312555" crc="5016dc1e" sha1="a3ebec58a00e115b12da362379ade8f11083dc7b" />
+			</dataarea>
+		</part>
+		<part name="flop139" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 39 - Kuenstler 480 - Latin Extra Condensed" />
+			<dataarea name="flop" size="1312567">
+				<rom name="the bitstream typeface library - type 1 disk 39 kuenstler 480 - latin extra condensed.moof" size="1312567" crc="cdd48160" sha1="898c95dcb81503920ad3d51d48ca5694fd2afcdf" />
+			</dataarea>
+		</part>
+		<part name="flop140" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 40 - Leawood, ITC - Life" />
+			<dataarea name="flop" size="1312549">
+				<rom name="the bitstream typeface library - type 1 disk 40 leawood, itc - life.moof" size="1312549" crc="ed7dd808" sha1="bbd7a6a3a167f635441581f731a56d6c199c61df" />
+			</dataarea>
+		</part>
+		<part name="flop141" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 41 - Lubalin Graph, ITC - Matt Antique" />
+			<dataarea name="flop" size="1312563">
+				<rom name="the bitstream typeface library - type 1 disk 41 lubalin graph, itc - matt antique.moof" size="1312563" crc="ea10abe9" sha1="3a1b201f2dadd565866b848a5779853be0e8997e" />
+			</dataarea>
+		</part>
+		<part name="flop142" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 42 - Maximus - Murray Hill" />
+			<dataarea name="flop" size="1312551">
+				<rom name="the bitstream typeface library - type 1 disk 42 maximus - murray hill.moof" size="1312551" crc="1273acdd" sha1="160f1f8d19b96f2b6293866ae9aaf51319b755da" />
+			</dataarea>
+		</part>
+		<part name="flop143" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 43 - News 701 - News 706" />
+			<dataarea name="flop" size="1312549">
+				<rom name="the bitstream typeface library - type 1 disk 43 news 701 - news 706.moof" size="1312549" crc="13d3ce3a" sha1="24842224179b2a30a9b6bd0a80dbbbe8d076fc4e" />
+			</dataarea>
+		</part>
+		<part name="flop144" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 44 - News Gothic - Newtext, ITC" />
+			<dataarea name="flop" size="1312556">
+				<rom name="the bitstream typeface library - type 1 disk 44 news gothic - newtext, itc.moof" size="1312556" crc="421e137e" sha1="8b4a4ef1ad0dad9269d55ff55dbafca6830fa8fd" />
+			</dataarea>
+		</part>
+		<part name="flop145" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 45 - Normande - Parisian" />
+			<dataarea name="flop" size="1312549">
+				<rom name="the bitstream typeface library - type 1 disk 45 normande - parisian.moof" size="1312549" crc="08fb61b1" sha1="c63917e6825e2486379e9d9b41563f8d90870089" />
+			</dataarea>
+		</part>
+		<part name="flop146" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 46 - Park Avenue - Quorum, ITC" />
+			<dataarea name="flop" size="1312555">
+				<rom name="the bitstream typeface library - type 1 disk 46 park avenue - quorum, itc.moof" size="1312555" crc="1c37648b" sha1="8a2360dd6de36ed58eb4d3dc43c86c568dabef3d" />
+			</dataarea>
+		</part>
+		<part name="flop147" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 47 - Raleigh - Schadow" />
+			<dataarea name="flop" size="1312547">
+				<rom name="the bitstream typeface library - type 1 disk 47 raleigh - schadow.moof" size="1312547" crc="236e8d61" sha1="873a785f7dd6b727968d4768da32173be197b580" />
+			</dataarea>
+		</part>
+		<part name="flop148" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 48 - Schneidler - Seagull" />
+			<dataarea name="flop" size="1312550">
+				<rom name="the bitstream typeface library - type 1 disk 48 schneidler - seagull.moof" size="1312550" crc="af06439f" sha1="e9262123da0056f82de0a76b85acbca9cfe3b381" />
+			</dataarea>
+		</part>
+		<part name="flop149" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 49 - Seric Gothic, ITC - Shelley" />
+			<dataarea name="flop" size="1312557">
+				<rom name="the bitstream typeface library - type 1 disk 49 seric gothic, itc - shelley.moof" size="1312557" crc="987edd1c" sha1="b3fd7597d4815b071523d75c0ea88e227021154b" />
+			</dataarea>
+		</part>
+		<part name="flop150" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 50 - Shotgun - Souvenir, ITC" />
+			<dataarea name="flop" size="1312553">
+				<rom name="the bitstream typeface library - type 1 disk 50 shotgun - souvenir, itc.moof" size="1312553" crc="d4dc1895" sha1="b02478dc0d764ef7301e1a3f95f16b8da098548f" />
+			</dataarea>
+		</part>
+		<part name="flop151" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 51 - Square 721 - Stuyvesant" />
+			<dataarea name="flop" size="1312553">
+				<rom name="the bitstream typeface library - type 1 disk 51 square 721 - stuyvesant.moof" size="1312553" crc="0afe8836" sha1="7b68be561bc281a2156a5fd87a76f31216dfbf17" />
+			</dataarea>
+		</part>
+		<part name="flop152" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 52 - Stymie" />
+			<dataarea name="flop" size="1312536">
+				<rom name="the bitstream typeface library - type 1 disk 52 stymie.moof" size="1312536" crc="e68f7d31" sha1="fae233ab76eaddf265786034d69d1af596d24d1b" />
+			</dataarea>
+		</part>
+		<part name="flop153" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 53 - Swiss 721, Part 1" />
+			<dataarea name="flop" size="1312547">
+				<rom name="the bitstream typeface library - type 1 disk 53 swiss 721, part 1.moof" size="1312547" crc="01b71db0" sha1="1162c7a094cd51bf744c058cf694ab50d8904fbc" />
+			</dataarea>
+		</part>
+		<part name="flop154" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 54 - Swiss 721, Part 2 - Swiss 924" />
+			<dataarea name="flop" size="1312559">
+				<rom name="the bitstream typeface library - type 1 disk 54 swiss 721, part 2 - swiss 924.moof" size="1312559" crc="d87e5c8e" sha1="cc5698d39318a51b5bf4fa0fa4e95dee93faeea0" />
+			</dataarea>
+		</part>
+		<part name="flop155" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 55 - Symbol and Pi - Thunderbird" />
+			<dataarea name="flop" size="1312557">
+				<rom name="the bitstream typeface library - type 1 disk 55 symbol and pi - thunderbird.moof" size="1312557" crc="5dea60b6" sha1="db3eca7bf9121899ee6d6dc1e7b0fc336752256a" />
+			</dataarea>
+		</part>
+		<part name="flop156" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 56 - Tiffany, ITC - Transitional 551" />
+			<dataarea name="flop" size="1312561">
+				<rom name="the bitstream typeface library - type 1 disk 56 tiffany, itc - transitional 551.moof" size="1312561" crc="ee9a26d7" sha1="25aef3ba202bcbdb6f4de8d43cefe7ae7abe0aa8" />
+			</dataarea>
+		</part>
+		<part name="flop157" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 57 - Typo Upright - Weidemann, ITC" />
+			<dataarea name="flop" size="1312559">
+				<rom name="the bitstream typeface library - type 1 disk 57 typo upright - weidemann, itc.moof" size="1312559" crc="88373af0" sha1="d126fd449de8196dde32973c91c84e3ea9bdefa3" />
+			</dataarea>
+		</part>
+		<part name="flop158" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 58 - Windsor - Zapf Challigraphic 801" />
+			<dataarea name="flop" size="1312562">
+				<rom name="the bitstream typeface library - type 1 disk 58 windsor - zapf challigraphic 801.moof" size="1312562" crc="6281c596" sha1="f47fe0c5a2f504051eba3c23de345f3a8b03659b" />
+			</dataarea>
+		</part>
+		<part name="flop159" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 59 - Zapf Chancery, ITC - Zapf Humanist 601" />
+			<dataarea name="flop" size="1312568">
+				<rom name="the bitstream typeface library - type 1 disk 59 zapf chancery, itc - zapf humanist 601.moof" size="1312568" crc="af0c222b" sha1="79d338f6fb08d9d2e3a28bb415709249d36f47a7" />
+			</dataarea>
+		</part>
+		<part name="flop160" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 60 - Zapf International, ITC" />
+			<dataarea name="flop" size="1312553">
+				<rom name="the bitstream typeface library - type 1 disk 60 zapf international, itc.moof" size="1312553" crc="c05c0153" sha1="3abb6300a238edcb625e055e95a0c3ea2c447c48" />
+			</dataarea>
+		</part>
+		<part name="flop161" interface="floppy_3_5">
+			<feature name="part_id" value="Type 1 Disk 61 - Zurich" />
+			<dataarea name="flop" size="1312536">
+				<rom name="the bitstream typeface library - type 1 disk 61 zurich.moof" size="1312536" crc="f8f99cee" sha1="0360b547d99885a5ac4c9cd97e0c222d25d93c95" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fullpnt">
+		<description>FullPaint (version 1.0)</description>
+		<year>1986</year>
+		<publisher>Ann Arbor Softworks</publisher>
+		<info name="programmer" value="Steve Newman, Scott Wiener, and Jeff Young" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, and Mac SE FDHD" />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k,macclasc" />
+		<!-- Dump released: 2025-01-23 -->
+		<!-- graphics program -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649024">
+				<rom name="fullpaint v1.0.moof" size="649024" crc="7ee08f5d" sha1="423cc425767552a6b605e14e2d7cf6dd76f81796" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fastbrk">
+		<description>Fast Break</description>
+		<year>1989</year>
+		<publisher>Accolade</publisher>
+		<info name="programmer" value="Steve Cartwright, Greg Hospelhorn, George Wong, and Roseann Mitchell" />
+		<info name="usage" value="Self-boots and runs on Mac 512KE, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k,mac512k" />
+		<!-- Dump released: 2025-04-01 -->
+		<!-- sports game -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296182">
+				<rom name="fast break.moof" size="1296182" crc="4907edbf" sha1="268c77d9e37b8f1a4b5ec84cfaf353ecf4ad8a8c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gridwars">
+		<description>Grid Wars (version 1.0)</description>
+		<year>1985</year>
+		<publisher>Ann Arbor Softworks</publisher>
+		<info name="programmer" value="Roy Harvey and Fred Zinn" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<!-- Dump released: 2025-04-01 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649029">
+				<rom name="grid wars v1.0.moof" size="649029" crc="1b93f011" sha1="42dae4c021e288b478bd77b8f64051c99784f257" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hacker">
+		<description>Hacker</description>
+		<year>1986</year>
+		<publisher>Activision</publisher>
+		<info name="developer" value="Activision" />
+		<info name="programmer" value="Steve Cartwright" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SEFD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<!-- Dump released: 2025-04-01 -->
+		<!-- strategy game -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="648994">
+				<rom name="hacker.moof" size="648994" crc="3b485551" sha1="7f30da8004449fb308ea71e029a0e5d16697c8c5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fergrprix">
+		<description>Ferrari Grand Prix (version 1.37)</description>
+		<year>1986</year>
+		<publisher> Bullseye Software</publisher>
+		<info name="programmer" value="Donald A. Hill" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512KE, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="1.37" />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
+		<!-- Dump released: 2025-04-01 -->
+		<!-- racing game -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649025">
+				<rom name="ferrari grand prix v1.37.moof" size="649025" crc="230c002e" sha1="c39af1b9d5add8b0fde55bffbcbf40610fff6bb0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hardball">
+		<description>HardBall</description>
+		<year>1986</year>
+		<publisher>Accolade</publisher>
+		<info name="programmer" value="Bob Whitehead, Mike Benna, Tony Lee, and Ed Bogas" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SEFD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="MC68000" />
+		<sharedfeat name="incompatibility" value="mac128k" />
+		<!-- Dump released: 2025-04-01 -->
+		<!-- sports game -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="649022">
+				<rom name="hardball.moof" size="649022" crc="af36de30" sha1="5cbdb11aa5fbe64bf31c3738d82d8f97ee154c3b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nigworld">
+		<description>Nigel's World (version 1.0.1)</description>
+		<year>1991</year>
+		<publisher> Lawrence Productions</publisher>
+		<info name="programmer" value="Todd James Harris, Susan Wiltse, Justine R. Hencey, Jamie McCarthy, Renee West, and Steve Vance" />
+		<info name="usage" value="Requires hard disk installation and runs on Mac II or later." />
+		<info name="version" value="1.0.1" />
+		<sharedfeat name="incompatibility" value="MC68000" />
+		<!-- Dump released: 2025-04-03 -->
+		<!-- educational game -->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="1296221">
+				<rom name="nigel's world v1.0.1 disk 1.moof" size="1296221" crc="65a23944" sha1="c14d86eb175cd9622ee27299290a6c16ea956c89" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="1296221">
+				<rom name="nigel's world v1.0.1 disk 2.moof" size="1296221" crc="a5e5e132" sha1="5cfcf768aefa146abdbeefe909ab42c6b52e47c2" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="1296221">
+				<rom name="nigel's world v1.0.1 disk 3.moof" size="1296221" crc="f213e721" sha1="214dccfe7d3a5d68d4f6f3d8c3656ee1a8fb631d" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="1296221">
+				<rom name="nigel's world v1.0.1 disk 4.moof" size="1296221" crc="609cca01" sha1="afbb05ac27b42b1bb0e9c32dd8dacf7a8ded879a" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5" />
+			<dataarea name="flop" size="1296221">
+				<rom name="nigel's world v1.0.1 disk 5.moof" size="1296221" crc="3b7795af" sha1="9d1c834fc39044acfb08c3b3785faf57248dcee2" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6" />
+			<dataarea name="flop" size="1296221">
+				<rom name="nigel's world v1.0.1 disk 6.moof" size="1296221" crc="6721d700" sha1="a824d544a8f58cea87792c4b5e93af0469dfcc2e" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 7" />
+			<dataarea name="flop" size="1296221">
+				<rom name="nigel's world v1.0.1 disk 7.moof" size="1296221" crc="3f0816c2" sha1="0c48018bc388c0c7d04581d7211e1b9eecd6b3d3" />
 			</dataarea>
 		</part>
 	</software>

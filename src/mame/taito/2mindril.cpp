@@ -379,8 +379,8 @@ void _2mindril_state::drill(machine_config &config)
 
 	ym2610b_device &ymsnd(YM2610B(config, "ymsnd", 16000000/2));
 	ymsnd.irq_handler().set(FUNC(_2mindril_state::irqhandler));
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(0, "lspeaker", 0.75);
+	ymsnd.add_route(0, "rspeaker", 0.75);
 	ymsnd.add_route(1, "lspeaker", 1.0);
 	ymsnd.add_route(2, "rspeaker", 1.0);
 }

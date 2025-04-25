@@ -7,7 +7,13 @@
                                  |_| XML parser
 
    Copyright (c) 1997-2000 Thai Open Source Software Center Ltd
-   Copyright (c) 2000-2017 Expat development team
+   Copyright (c) 2000      Clark Cooper <coopercc@users.sourceforge.net>
+   Copyright (c) 2001-2004 Fred L. Drake, Jr. <fdrake@users.sourceforge.net>
+   Copyright (c) 2002-2009 Karl Waclawek <karl@waclawek.net>
+   Copyright (c) 2016-2017 Sebastian Pipping <sebastian@pipping.org>
+   Copyright (c) 2017      Rhodri James <rhodri@wildebeest.org.uk>
+   Copyright (c) 2017      Franek Korta <fkorta@gmail.com>
+   Copyright (c) 2022      Sean McBride <sean@rogue-research.com>
    Licensed under the MIT license:
 
    Permission is  hereby granted,  free of charge,  to any  person obtaining
@@ -45,14 +51,14 @@
 #if defined(_MSC_VER)
 #  include <io.h>
 /* https://msdn.microsoft.com/en-us/library/wyssk1bs(v=vs.100).aspx */
-#  define _EXPAT_read _read
-#  define _EXPAT_read_count_t int
-#  define _EXPAT_read_req_t unsigned int
+#  define EXPAT_read _read
+#  define EXPAT_read_count_t int
+#  define EXPAT_read_req_t unsigned int
 #else /* POSIX */
 /* http://pubs.opengroup.org/onlinepubs/009695399/functions/read.html */
-#  define _EXPAT_read read
-#  define _EXPAT_read_count_t ssize_t
-#  define _EXPAT_read_req_t size_t
+#  define EXPAT_read read
+#  define EXPAT_read_count_t ssize_t
+#  define EXPAT_read_req_t size_t
 #endif
 
 #ifndef S_ISREG
@@ -62,7 +68,7 @@
 #  ifndef S_IFMT
 #    define S_IFMT _S_IFMT
 #  endif
-#  define S_ISREG(m) (((m)&S_IFMT) == S_IFREG)
+#  define S_ISREG(m) (((m) & S_IFMT) == S_IFREG)
 #endif /* not S_ISREG */
 
 #ifndef O_BINARY
@@ -82,7 +88,7 @@ filemap(const tchar *name,
         void *arg) {
   size_t nbytes;
   int fd;
-  _EXPAT_read_count_t n;
+  EXPAT_read_count_t n;
   struct stat sb;
   void *p;
 
@@ -120,14 +126,14 @@ filemap(const tchar *name,
     close(fd);
     return 0;
   }
-  n = _EXPAT_read(fd, p, (_EXPAT_read_req_t)nbytes);
+  n = EXPAT_read(fd, p, (EXPAT_read_req_t)nbytes);
   if (n < 0) {
     tperror(name);
     free(p);
     close(fd);
     return 0;
   }
-  if (n != (_EXPAT_read_count_t)nbytes) {
+  if (n != (EXPAT_read_count_t)nbytes) {
     ftprintf(stderr, T("%s: read unexpected number of bytes\n"), name);
     free(p);
     close(fd);

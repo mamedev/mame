@@ -98,8 +98,8 @@ private:
 
 	/* misc */
 	emu_timer *m_vblank_end_timer = nullptr;
-	int       m_subcpu_resetline = 0;
-	int       m_cpu_trigger = 0;
+	bool      m_subcpu_resetline = false;
+	int32_t   m_cpu_trigger = 0;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -157,7 +157,7 @@ void hyprduel_state::subcpu_control_w(uint16_t data)
 			if (!m_subcpu_resetline)
 			{
 				m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-				m_subcpu_resetline = 1;
+				m_subcpu_resetline = true;
 			}
 			break;
 
@@ -165,7 +165,7 @@ void hyprduel_state::subcpu_control_w(uint16_t data)
 			if (m_subcpu_resetline)
 			{
 				m_subcpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-				m_subcpu_resetline = 0;
+				m_subcpu_resetline = false;
 			}
 			m_maincpu->spin_until_interrupt();
 			break;
@@ -390,7 +390,7 @@ void hyprduel_state::machine_reset()
 {
 	/* start with cpu2 halted */
 	m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	m_subcpu_resetline = 1;
+	m_subcpu_resetline = true;
 	m_cpu_trigger = 0;
 }
 

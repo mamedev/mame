@@ -185,19 +185,19 @@ public:
 	static constexpr u8 ATTR_DIRECTORY = 0x10;
 	static constexpr u8 ATTR_ARCHIVE = 0x20;
 
-	directory_entry(const fsblk_t::block_t &block, u32 offset)
+	directory_entry(fsblk_t::block_t::ptr block, u32 offset)
 		: m_block(block)
 		, m_offset(offset)
 	{
 	}
 
-	std::string_view raw_stem() const   { return std::string_view((const char *) &m_block.rodata()[m_offset + OFFSET_FNAME], 8); }
-	std::string_view raw_ext() const    { return std::string_view((const char *) &m_block.rodata()[m_offset + OFFSET_FNAME + 8], 3); }
-	u8 attributes() const               { return m_block.r8(m_offset + OFFSET_ATTRIBUTES); }
-	u32 raw_create_datetime() const     { return m_block.r32l(m_offset + OFFSET_CREATE_DATETIME); }
-	u32 raw_modified_datetime() const   { return m_block.r32l(m_offset + OFFSET_MODIFIED_DATETIME); }
-	u32 start_cluster() const           { return ((u32)m_block.r16l(m_offset + OFFSET_START_CLUSTER_HI)) << 16 | m_block.r16l(m_offset + OFFSET_START_CLUSTER); }
-	u32 file_size() const               { return m_block.r32l(m_offset + OFFSET_FILE_SIZE); }
+	std::string_view raw_stem() const   { return m_block->rstr(m_offset + OFFSET_FNAME, 8); }
+	std::string_view raw_ext() const    { return m_block->rstr(m_offset + OFFSET_FNAME + 8, 3); }
+	u8 attributes() const               { return m_block->r8(m_offset + OFFSET_ATTRIBUTES); }
+	u32 raw_create_datetime() const     { return m_block->r32l(m_offset + OFFSET_CREATE_DATETIME); }
+	u32 raw_modified_datetime() const   { return m_block->r32l(m_offset + OFFSET_MODIFIED_DATETIME); }
+	u32 start_cluster() const           { return ((u32)m_block->r16l(m_offset + OFFSET_START_CLUSTER_HI)) << 16 | m_block->r16l(m_offset + OFFSET_START_CLUSTER); }
+	u32 file_size() const               { return m_block->r32l(m_offset + OFFSET_FILE_SIZE); }
 
 	bool is_read_only() const           { return (attributes() & 0x01) != 0x00; }
 	bool is_hidden() const              { return (attributes() & 0x02) != 0x00; }
@@ -206,18 +206,18 @@ public:
 	bool is_long_file_name() const      { return attributes() == 0x0f; }
 	bool is_subdirectory() const        { return (attributes() & 0x10) != 0x00; }
 	bool is_archive() const             { return (attributes() & 0x20) != 0x00; }
-	bool is_deleted() const             { return m_block.r8(m_offset) == DELETED_FILE_MARKER; }
+	bool is_deleted() const             { return m_block->r8(m_offset) == DELETED_FILE_MARKER; }
 
 	std::string name() const;
 	meta_data metadata() const;
 
-	void set_file_size(u32 file_size)   { m_block.w32l(m_offset + OFFSET_FILE_SIZE, file_size); }
-	void set_raw_modified_datetime(u32 datetime) { m_block.w32l(m_offset + OFFSET_MODIFIED_DATETIME, datetime); }
-	void mark_deleted()                 { m_block.w8(m_offset + OFFSET_FNAME, DELETED_FILE_MARKER); }
+	void set_file_size(u32 file_size)   { m_block->w32l(m_offset + OFFSET_FILE_SIZE, file_size); }
+	void set_raw_modified_datetime(u32 datetime) { m_block->w32l(m_offset + OFFSET_MODIFIED_DATETIME, datetime); }
+	void mark_deleted()                 { m_block->w8(m_offset + OFFSET_FNAME, DELETED_FILE_MARKER); }
 
 private:
-	fsblk_t::block_t    m_block;
-	u32                 m_offset;
+	fsblk_t::block_t::ptr   m_block;
+	u32                     m_offset;
 };
 
 // ======================> directory_span
@@ -240,7 +240,7 @@ class impl : public filesystem_t
 {
 public:
 	// ctor/dtor
-	impl(fsblk_t &blockdev, fsblk_t::block_t &&boot_sector_block, std::vector<u8> &&file_allocation_table, u32 starting_sector, u32 sector_count, u16 reserved_sector_count, u8 bits_per_fat_entry);
+	impl(fsblk_t &blockdev, fsblk_t::block_t::ptr &&boot_sector_block, std::vector<u8> &&file_allocation_table, u32 starting_sector, u32 sector_count, u16 reserved_sector_count, u8 bits_per_fat_entry);
 	virtual ~impl() = default;
 
 	// accessors
@@ -250,12 +250,12 @@ public:
 
 	// virtuals
 	virtual meta_data volume_metadata() override;
-	virtual std::pair<err_t, meta_data> metadata(const std::vector<std::string> &path) override;
-	virtual std::pair<err_t, std::vector<dir_entry>> directory_contents(const std::vector<std::string> &path) override;
-	virtual std::pair<err_t, std::vector<u8>> file_read(const std::vector<std::string> &path) override;
-	virtual err_t file_create(const std::vector<std::string> &path, const meta_data &meta) override;
-	virtual err_t file_write(const std::vector<std::string> &path, const std::vector<u8> &data) override;
-	virtual err_t remove(const std::vector<std::string> &path) override;
+	virtual std::pair<std::error_condition, meta_data> metadata(const std::vector<std::string> &path) override;
+	virtual std::pair<std::error_condition, std::vector<dir_entry>> directory_contents(const std::vector<std::string> &path) override;
+	virtual std::pair<std::error_condition, std::vector<u8>> file_read(const std::vector<std::string> &path) override;
+	virtual std::error_condition file_create(const std::vector<std::string> &path, const meta_data &meta) override;
+	virtual std::error_condition file_write(const std::vector<std::string> &path, const std::vector<u8> &data) override;
+	virtual std::error_condition remove(const std::vector<std::string> &path) override;
 
 	// methods
 	std::vector<u32> get_sectors_from_fat(const directory_entry &dirent) const;
@@ -271,7 +271,7 @@ public:
 private:
 	static constexpr u32 FIRST_VALID_CLUSTER = 2;
 
-	fsblk_t::block_t                m_boot_sector_block;
+	fsblk_t::block_t::ptr           m_boot_sector_block;
 	std::vector<u8>                 m_file_allocation_table;
 	u32                             m_starting_sector;
 	u32                             m_sector_count;
@@ -291,13 +291,13 @@ private:
 	std::optional<directory_entry> find_child(const directory_span &current_dir, std::string_view target) const;
 	template <typename T> void iterate_directory_entries(const directory_span &dir, T &&callback) const;
 	bool is_valid_short_filename(std::string const &filename);
-	err_t build_direntry_filename(std::string const &filename, std::string &fname);
-	err_t file_create_root(std::string &fname, u8 attributes = 0);
-	err_t file_create_directory(directory_entry &dirent, std::string &fname, u8 attributes = 0);
-	err_t file_create_sector(u32 sector, std::string &fname, u8 attributes);
-	err_t initialize_directory(u32 directory_cluster, u32 parent_cluster);
-	err_t initialize_directory_entry(fsblk_t::block_t &dirblk, u32 offset, const std::string_view &fname, u8 attributes, u32 start_cluster);
-	err_t free_clusters(u32 start_cluster);
+	std::error_condition build_direntry_filename(std::string const &filename, std::string &fname);
+	std::error_condition file_create_root(std::string &fname, u8 attributes = 0);
+	std::error_condition file_create_directory(directory_entry &dirent, std::string &fname, u8 attributes = 0);
+	std::error_condition file_create_sector(u32 sector, std::string &fname, u8 attributes);
+	std::error_condition initialize_directory(u32 directory_cluster, u32 parent_cluster);
+	std::error_condition initialize_directory_entry(fsblk_t::block_t &dirblk, u32 offset, std::string_view fname, u8 attributes, u32 start_cluster);
+	std::error_condition free_clusters(u32 start_cluster);
 	void clear_cluster_sectors(u32 cluster, u8 fill_byte);
 	u32 first_cluster_sector(u32 cluster);
 	u32 get_next_cluster(u32 cluster);
@@ -494,19 +494,19 @@ std::vector<meta_description> fs::fat_image::directory_meta_description() const
 std::unique_ptr<filesystem_t> fs::fat_image::mount_partition(fsblk_t &blockdev, u32 starting_sector, u32 sector_count, u8 bits_per_fat_entry)
 {
 	// load the boot sector block and get some basic info
-	fsblk_t::block_t boot_sector_block = blockdev.get(starting_sector);
-	u16 reserved_sector_count = boot_sector_block.r16l(impl::OFFSET_RESERVED_SECTOR_COUNT);
+	fsblk_t::block_t::ptr boot_sector_block = blockdev.get(starting_sector);
+	u16 reserved_sector_count = boot_sector_block->r16l(impl::OFFSET_RESERVED_SECTOR_COUNT);
 
 	// load all file allocation table sectors
-	u32 fat_count = boot_sector_block.r8(impl::OFFSET_FAT_COUNT);
-	u32 sectors_per_fat = boot_sector_block.r16l(impl::OFFSET_FAT_SECTOR_COUNT);
-	u16 bytes_per_sector = boot_sector_block.r16l(impl::OFFSET_BYTES_PER_SECTOR);
+	u32 fat_count = boot_sector_block->r8(impl::OFFSET_FAT_COUNT);
+	u32 sectors_per_fat = boot_sector_block->r16l(impl::OFFSET_FAT_SECTOR_COUNT);
+	u16 bytes_per_sector = boot_sector_block->r16l(impl::OFFSET_BYTES_PER_SECTOR);
 	std::vector<u8> file_allocation_table;
 	file_allocation_table.reserve(fat_count * sectors_per_fat * bytes_per_sector);
 	for (auto i = 0; i < fat_count * sectors_per_fat; i++)
 	{
-		fsblk_t::block_t fatblk = blockdev.get(starting_sector + reserved_sector_count + i);
-		file_allocation_table.insert(file_allocation_table.end(), fatblk.rodata(), fatblk.rodata() + bytes_per_sector);
+		fsblk_t::block_t::ptr fatblk = blockdev.get(starting_sector + reserved_sector_count + i);
+		file_allocation_table.insert(file_allocation_table.end(), fatblk->rodata(), fatblk->rodata() + bytes_per_sector);
 	}
 
 	// and return the implementation
@@ -548,18 +548,18 @@ meta_data directory_entry::metadata() const
 //  impl ctor
 //-------------------------------------------------
 
-impl::impl(fsblk_t &blockdev, fsblk_t::block_t &&boot_sector_block, std::vector<u8> &&file_allocation_table, u32 starting_sector, u32 sector_count, u16 reserved_sector_count, u8 bits_per_fat_entry)
+impl::impl(fsblk_t &blockdev, fsblk_t::block_t::ptr &&boot_sector_block, std::vector<u8> &&file_allocation_table, u32 starting_sector, u32 sector_count, u16 reserved_sector_count, u8 bits_per_fat_entry)
 	: filesystem_t(blockdev, 512)
 	, m_boot_sector_block(std::move(boot_sector_block))
 	, m_file_allocation_table(std::move(file_allocation_table))
 	, m_starting_sector(starting_sector)
 	, m_sector_count(sector_count)
 	, m_reserved_sector_count(reserved_sector_count)
-	, m_bytes_per_sector(m_boot_sector_block.r16l(OFFSET_BYTES_PER_SECTOR))
-	, m_root_directory_size(m_boot_sector_block.r16l(OFFSET_DIRECTORY_ENTRY_COUNT))
-	, m_sectors_per_cluster(m_boot_sector_block.r8(OFFSET_CLUSTER_SECTOR_COUNT))
-	, m_fat_count(m_boot_sector_block.r8(OFFSET_FAT_COUNT))
-	, m_fat_sector_count(m_boot_sector_block.r16l(OFFSET_FAT_SECTOR_COUNT))
+	, m_bytes_per_sector(m_boot_sector_block->r16l(OFFSET_BYTES_PER_SECTOR))
+	, m_root_directory_size(m_boot_sector_block->r16l(OFFSET_DIRECTORY_ENTRY_COUNT))
+	, m_sectors_per_cluster(m_boot_sector_block->r8(OFFSET_CLUSTER_SECTOR_COUNT))
+	, m_fat_count(m_boot_sector_block->r8(OFFSET_FAT_COUNT))
+	, m_fat_sector_count(m_boot_sector_block->r16l(OFFSET_FAT_SECTOR_COUNT))
 	, m_bits_per_fat_entry(bits_per_fat_entry)
 	, m_last_cluster_indicator(((u64)1 << bits_per_fat_entry) - 1)
 	, m_last_valid_cluster(m_last_cluster_indicator - 0x10)
@@ -594,7 +594,7 @@ meta_data impl::volume_metadata()
 	if (!results.has(meta_name::name))
 		results.set(meta_name::name, "UNTITLED");
 
-	results.set(meta_name::oem_name, m_boot_sector_block.rstr(3, 8));
+	results.set(meta_name::oem_name, m_boot_sector_block->rstr(3, 8));
 	return results;
 }
 
@@ -603,13 +603,13 @@ meta_data impl::volume_metadata()
 //  impl::metadata
 //-------------------------------------------------
 
-std::pair<err_t, meta_data> impl::metadata(const std::vector<std::string> &path)
+std::pair<std::error_condition, meta_data> impl::metadata(const std::vector<std::string> &path)
 {
 	std::optional<directory_entry> dirent = find_entity(path);
 	if (!dirent)
-		return std::make_pair(ERR_NOT_FOUND, meta_data());
+		return std::make_pair(error::not_found, meta_data());
 
-	return std::make_pair(ERR_OK, dirent->metadata());
+	return std::make_pair(std::error_condition(), dirent->metadata());
 }
 
 
@@ -617,11 +617,11 @@ std::pair<err_t, meta_data> impl::metadata(const std::vector<std::string> &path)
 //  impl::directory_contents
 //-------------------------------------------------
 
-std::pair<err_t, std::vector<dir_entry>> impl::directory_contents(const std::vector<std::string> &path)
+std::pair<std::error_condition, std::vector<dir_entry>> impl::directory_contents(const std::vector<std::string> &path)
 {
 	directory_span::ptr dir = find_directory(path.begin(), path.end());
 	if (!dir)
-		return std::make_pair(ERR_NOT_FOUND, std::vector<dir_entry>());
+		return std::make_pair(error::not_found, std::vector<dir_entry>());
 
 	std::vector<dir_entry> results;
 	auto const callback = [&results] (const directory_entry &dirent)
@@ -634,7 +634,7 @@ std::pair<err_t, std::vector<dir_entry>> impl::directory_contents(const std::vec
 		return false;
 	};
 	iterate_directory_entries(*dir, callback);
-	return std::make_pair(ERR_OK, std::move(results));
+	return std::make_pair(std::error_condition(), std::move(results));
 }
 
 
@@ -642,12 +642,14 @@ std::pair<err_t, std::vector<dir_entry>> impl::directory_contents(const std::vec
 //  impl::file_read
 //-------------------------------------------------
 
-std::pair<err_t, std::vector<u8>> impl::file_read(const std::vector<std::string> &path)
+std::pair<std::error_condition, std::vector<u8>> impl::file_read(const std::vector<std::string> &path)
 {
 	// find the file
 	std::optional<directory_entry> dirent = find_entity(path);
-	if (!dirent || dirent->is_subdirectory())
-		return std::make_pair(ERR_NOT_FOUND, std::vector<u8>());
+	if (!dirent)
+		return std::make_pair(error::not_found, std::vector<u8>());
+	if (dirent->is_subdirectory())
+		return std::make_pair(error::invalid_name, std::vector<u8>());
 
 	// get the list of sectors for this file
 	std::vector<u32> sectors = get_sectors_from_fat(*dirent);
@@ -659,12 +661,12 @@ std::pair<err_t, std::vector<u8>> impl::file_read(const std::vector<std::string>
 	// and add data from all sectors
 	for (u32 sector : sectors)
 	{
-		fsblk_t::block_t block = m_blockdev.get(sector);
-		const u8 *data = block.rodata();
-		size_t length = std::min((size_t)dirent->file_size() - result.size(), (size_t)block.size());
+		fsblk_t::block_t::ptr block = m_blockdev.get(sector);
+		const u8 *data = block->rodata();
+		size_t length = std::min((size_t)dirent->file_size() - result.size(), (size_t)block->size());
 		result.insert(result.end(), data, data + length);
 	}
-	return std::make_pair(ERR_OK, std::move(result));
+	return std::make_pair(std::error_condition(), std::move(result));
 }
 
 
@@ -684,14 +686,14 @@ bool impl::is_valid_short_filename(std::string const &filename)
 }
 
 
-err_t impl::build_direntry_filename(std::string const &filename, std::string &fname)
+std::error_condition impl::build_direntry_filename(std::string const &filename, std::string &fname)
 {
 	std::regex filename_regex("([A-Z0-9!#\\$%&\\(\\)\\-@^_`\\{\\}~]{0,8})(\\.([A-Z0-9!#\\$%&\\(\\)\\-@^_`\\{\\}~]{0,3}))?");
 	std::smatch smatch;
 	if (!std::regex_match(filename, smatch, filename_regex))
-		return ERR_INVALID;
+		return error::invalid_name;
 	if (smatch.size() != 4)
-		return ERR_INVALID;
+		return error::invalid_name;
 
 	fname.resize(directory_entry::FNAME_LENGTH, ' ');
 
@@ -701,16 +703,16 @@ err_t impl::build_direntry_filename(std::string const &filename, std::string &fn
 	for (int j = 0; j < 3 && j < smatch.str(3).size(); j++)
 		fname[8 + j] = smatch.str(3)[j];
 
-	return ERR_OK;
+	return std::error_condition();
 }
 
 
-err_t impl::file_create(const std::vector<std::string> &path, const meta_data &meta)
+std::error_condition impl::file_create(const std::vector<std::string> &path, const meta_data &meta)
 {
 	std::string filename = meta.get_string(meta_name::name, "");
 	std::string fname;
-	err_t err = build_direntry_filename(filename, fname);
-	if (err != ERR_OK)
+	std::error_condition err = build_direntry_filename(filename, fname);
+	if (err)
 		return err;
 
 	if (path.empty())
@@ -732,37 +734,37 @@ err_t impl::file_create(const std::vector<std::string> &path, const meta_data &m
 				if (!dir_entry)
 				{
 					if (!is_valid_short_filename(path_part))
-						return ERR_INVALID;
+						return error::invalid_name;
 
 					std::string part_fname;
-					err_t err = build_direntry_filename(path_part, part_fname);
-					if (err != ERR_OK)
+					std::error_condition err = build_direntry_filename(path_part, part_fname);
+					if (err)
 						return err;
 					err = !parent_entry ?
 							file_create_root(part_fname, directory_entry::ATTR_DIRECTORY) :
 							file_create_directory(parent_entry.value(), part_fname, directory_entry::ATTR_DIRECTORY);
-					if (err != ERR_OK)
+					if (err)
 						return err;
 
 					dir_entry = find_entity(partial_path);
 					if (!dir_entry)
-						return ERR_INVALID;
+						return error::invalid_name;
 
 					err = initialize_directory(dir_entry->start_cluster(), parent_entry ? parent_entry->start_cluster() : 0);
-					if (err != ERR_OK)
+					if (err)
 						return err;
 				}
 				else
 				{
 					if (!dir_entry->is_subdirectory())
-						return ERR_INVALID;
+						return error::invalid_name;
 				}
 				parent_entry = dir_entry;
 			}
 
 			dirent = find_entity(path);
 			if (!dirent)
-				return ERR_INVALID;
+				return error::invalid_name;
 		}
 
 		return file_create_directory(*dirent, fname);
@@ -770,7 +772,7 @@ err_t impl::file_create(const std::vector<std::string> &path, const meta_data &m
 }
 
 
-err_t impl::initialize_directory(u32 directory_cluster, u32 parent_cluster)
+std::error_condition impl::initialize_directory(u32 directory_cluster, u32 parent_cluster)
 {
 	clear_cluster_sectors(directory_cluster, 0x00);
 
@@ -780,23 +782,23 @@ err_t impl::initialize_directory(u32 directory_cluster, u32 parent_cluster)
 	std::string dir_fname;
 	dir_fname.resize(directory_entry::FNAME_LENGTH, ' ');
 	dir_fname[0] = '.';
-	err_t err = initialize_directory_entry(dirblk, 0, dir_fname, directory_entry::ATTR_DIRECTORY, directory_cluster);
-	if (err != ERR_OK)
+	std::error_condition err = initialize_directory_entry(*dirblk, 0, dir_fname, directory_entry::ATTR_DIRECTORY, directory_cluster);
+	if (err)
 		return err;
 
 	dir_fname[1] = '.';
-	err = initialize_directory_entry(dirblk, directory_entry::SIZE, dir_fname, directory_entry::ATTR_DIRECTORY, parent_cluster);
-	if (err != ERR_OK)
+	err = initialize_directory_entry(*dirblk, directory_entry::SIZE, dir_fname, directory_entry::ATTR_DIRECTORY, parent_cluster);
+	if (err)
 		return err;
 
-	return ERR_OK;
+	return std::error_condition();
 }
 
 
-err_t impl::initialize_directory_entry(fsblk_t::block_t &dirblk, u32 offset, const std::string_view &fname, u8 attributes, u32 start_cluster)
+std::error_condition impl::initialize_directory_entry(fsblk_t::block_t &dirblk, u32 offset, std::string_view fname, u8 attributes, u32 start_cluster)
 {
 	if (fname.size() != directory_entry::FNAME_LENGTH)
-		return ERR_INVALID;
+		return error::invalid_name;
 
 	for (int i = 0; i < directory_entry::SIZE; i += 4)
 		dirblk.w32l(offset + i, 0);
@@ -808,33 +810,33 @@ err_t impl::initialize_directory_entry(fsblk_t::block_t &dirblk, u32 offset, con
 	dirblk.w16l(offset + directory_entry::OFFSET_START_CLUSTER_HI, u16(start_cluster >> 16));
 	dirblk.w16l(offset + directory_entry::OFFSET_START_CLUSTER, u16(start_cluster & 0xffff));
 
-	return ERR_OK;
+	return std::error_condition();
 }
 
 
-err_t impl::file_create_root(std::string &fname, u8 attributes)
+std::error_condition impl::file_create_root(std::string &fname, u8 attributes)
 {
 	const u32 first_directory_sector = m_starting_sector + m_reserved_sector_count + ((u32)m_file_allocation_table.size() / m_bytes_per_sector);
 	const u32 directory_sector_count = (m_root_directory_size * directory_entry::SIZE) / m_bytes_per_sector;
 	for (u32 sector = first_directory_sector; sector < first_directory_sector + directory_sector_count; sector++)
 	{
-		err_t err = file_create_sector(sector, fname, attributes);
-		if (err != ERR_NOT_FOUND)
+		std::error_condition err = file_create_sector(sector, fname, attributes);
+		if (err != error::not_found)
 			return err;
 	}
-	return ERR_NO_SPACE;
+	return error::no_space;
 }
 
 
-err_t impl::file_create_directory(directory_entry &dirent, std::string &fname, u8 attributes)
+std::error_condition impl::file_create_directory(directory_entry &dirent, std::string &fname, u8 attributes)
 {
 	u32 current_cluster = dirent.start_cluster();
 	do {
 		const u32 first_sector = first_cluster_sector(current_cluster);
 		for (int i = 0; i < m_sectors_per_cluster; i++)
 		{
-			err_t err = file_create_sector(first_sector + i, fname, attributes);
-			if (err != ERR_NOT_FOUND)
+			std::error_condition err = file_create_sector(first_sector + i, fname, attributes);
+			if (err != error::not_found)
 				return err;
 		}
 
@@ -844,7 +846,7 @@ err_t impl::file_create_directory(directory_entry &dirent, std::string &fname, u
 		{
 			next_cluster = find_free_cluster();
 			if (next_cluster == 0)
-				return ERR_NO_SPACE;
+				return error::no_space;
 
 			set_next_cluster(current_cluster, next_cluster);
 			set_next_cluster(next_cluster, m_last_cluster_indicator);
@@ -853,7 +855,7 @@ err_t impl::file_create_directory(directory_entry &dirent, std::string &fname, u
 		}
 		current_cluster = next_cluster;
 	} while (current_cluster > FIRST_VALID_CLUSTER && current_cluster < m_last_valid_cluster);
-	return ERR_NO_SPACE;
+	return error::no_space;
 }
 
 
@@ -873,44 +875,44 @@ void impl::clear_cluster_sectors(u32 cluster, u8 fill_byte)
 	{
 		auto dirblk = m_blockdev.get(sector + i);
 		for (int offset = 0; offset < m_bytes_per_sector; offset++)
-			dirblk.w8(offset, fill_byte);
+			dirblk->w8(offset, fill_byte);
 	}
 }
 
 
-// Returns ERR_NOT_FOUND when no room could be found to create the file in the sector.
-err_t impl::file_create_sector(u32 sector, std::string &fname, u8 attributes)
+// Returns error::not_found when no room could be found to create the file in the sector.
+std::error_condition impl::file_create_sector(u32 sector, std::string &fname, u8 attributes)
 {
 	auto dirblk = m_blockdev.get(sector);
 	for (u32 blkoffset = 0; blkoffset < m_bytes_per_sector; blkoffset += directory_entry::SIZE)
 	{
-		u8 first_byte = dirblk.r8(blkoffset);
+		u8 first_byte = dirblk->r8(blkoffset);
 		if (first_byte == 0x00 || first_byte == directory_entry::DELETED_FILE_MARKER)
 		{
 			u32 start_cluster = find_free_cluster();
 			if (start_cluster == 0)
-				return ERR_NO_SPACE;
+				return error::no_space;
 			set_next_cluster(start_cluster, m_last_cluster_indicator);
 
-			err_t err = initialize_directory_entry(dirblk, blkoffset, fname, attributes, start_cluster);
-			if (err != ERR_OK)
+			std::error_condition err = initialize_directory_entry(*dirblk, blkoffset, fname, attributes, start_cluster);
+			if (err)
 				return err;
 
-			return ERR_OK;
+			return std::error_condition();
 		}
 	}
-	return ERR_NOT_FOUND;
+	return error::not_found;
 }
 
 
-err_t impl::file_write(const std::vector<std::string> &path, const std::vector<u8> &data)
+std::error_condition impl::file_write(const std::vector<std::string> &path, const std::vector<u8> &data)
 {
 	std::optional<directory_entry> dirent = find_entity(path);
 	if (!dirent)
-		return ERR_NOT_FOUND;
+		return error::not_found;
 
 	if (dirent->is_subdirectory())
-		return ERR_INVALID;
+		return error::invalid_name;
 
 	u32 current_length = dirent->file_size();
 	const size_t data_length = data.size();
@@ -925,13 +927,13 @@ err_t impl::file_write(const std::vector<std::string> &path, const std::vector<u
 		do {
 			next_cluster = get_next_cluster(current_cluster);
 			if (next_cluster < FIRST_VALID_CLUSTER)
-				return ERR_INVALID;
+				return error::invalid_block;
 		} while (next_cluster < m_last_valid_cluster);
 		for (int i = current_clusters; i < required_clusters; i++)
 		{
 			u32 free_cluster = find_free_cluster();
 			if (free_cluster < FIRST_VALID_CLUSTER)
-				return ERR_NO_SPACE;
+				return error::no_space;
 
 			set_next_cluster(current_cluster, free_cluster);
 			set_next_cluster(free_cluster, m_last_cluster_indicator);
@@ -948,8 +950,8 @@ err_t impl::file_write(const std::vector<std::string> &path, const std::vector<u
 		u32 next_cluster = get_next_cluster(current_cluster);
 		set_next_cluster(current_cluster, m_last_cluster_indicator);
 
-		err_t err = free_clusters(next_cluster);
-		if (err != ERR_OK)
+		std::error_condition err = free_clusters(next_cluster);
+		if (err)
 			return err;
 	}
 
@@ -961,7 +963,7 @@ err_t impl::file_write(const std::vector<std::string> &path, const std::vector<u
 		{
 			auto datablk = m_blockdev.get(sector);
 			u32 bytes = (data_length - offset > m_bytes_per_sector) ? m_bytes_per_sector : data_length - offset;
-			memcpy(datablk.data(), data.data() + offset, bytes);
+			datablk->write(0, data.data() + offset, bytes);
 			offset += m_bytes_per_sector;
 		}
 	}
@@ -969,41 +971,41 @@ err_t impl::file_write(const std::vector<std::string> &path, const std::vector<u
 	dirent->set_raw_modified_datetime(encode_now_fat_datetime());
 	dirent->set_file_size(data_length);
 
-	return ERR_OK;
+	return std::error_condition();
 }
 
 
-err_t impl::remove(const std::vector<std::string> &path)
+std::error_condition impl::remove(const std::vector<std::string> &path)
 {
 	if (path.size() != 0)
-		return ERR_UNSUPPORTED;
+		return error::unsupported;
 
 	std::optional<directory_entry> dirent = find_entity(path);
 	if (!dirent)
-		return ERR_OK;
+		return std::error_condition();
 
 	// Removing directories is not supported yet
 	if (dirent->is_subdirectory())
-		return ERR_UNSUPPORTED;
+		return error::unsupported;
 
 	dirent->mark_deleted();
 
-	return ERR_OK;
+	return std::error_condition();
 }
 
 
-err_t impl::free_clusters(u32 start_cluster)
+std::error_condition impl::free_clusters(u32 start_cluster)
 {
 	while (start_cluster < m_last_valid_cluster)
 	{
 		if (start_cluster < FIRST_VALID_CLUSTER)
-			return ERR_INVALID;
+			return error::invalid_block;
 
 		u32 next_cluster = get_next_cluster(start_cluster);
 		set_next_cluster(start_cluster, 0);
 		start_cluster = next_cluster;
 	}
-	return ERR_OK;
+	return std::error_condition();
 }
 
 //-------------------------------------------------
@@ -1108,7 +1110,7 @@ void impl::set_next_cluster(u32 cluster, u32 next_cluster)
 			{
 				u32 fat_sector = m_fat_start_sector + (i * m_fat_sector_count) + (byte_pos / m_bytes_per_sector);
 				auto fatblk = m_blockdev.get(fat_sector);
-				fatblk.w8(byte_pos % m_bytes_per_sector, m_file_allocation_table[byte_pos]);
+				fatblk->w8(byte_pos % m_bytes_per_sector, m_file_allocation_table[byte_pos]);
 			}
 		}
 	}
@@ -1225,7 +1227,7 @@ void impl::iterate_directory_entries(const directory_span &dir, T &&callback) co
 	for (u32 sector : sectors)
 	{
 		bool done = false;
-		fsblk_t::block_t block = m_blockdev.get(sector);
+		fsblk_t::block_t::ptr block = m_blockdev.get(sector);
 		for (u32 index = 0; !done && (index < dirents_per_sector()); index++)
 		{
 			directory_entry dirent(block, index * 32);

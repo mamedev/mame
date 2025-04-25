@@ -34,15 +34,12 @@
 #include "emu.h"
 #include "drcuml.h"
 
-#include "emuopts.h"
-#include "drcbec.h"
-#ifdef NATIVE_DRC
-#ifndef ASMJIT_NO_X86
-#include "drcbex86.h"
-#include "drcbex64.h"
-#endif
 #include "drcbearm64.h"
-#endif
+#include "drcbec.h"
+#include "drcbex64.h"
+#include "drcbex86.h"
+
+#include "emuopts.h"
 
 #include <fstream>
 
@@ -52,32 +49,30 @@
 //  DEBUGGING
 //**************************************************************************
 
-#define VALIDATE_BACKEND        (0)
 #define LOG_SIMPLIFICATIONS     (0)
 
 
 
 //**************************************************************************
-//  TYPE DEFINITIONS
+//  MACROS
 //**************************************************************************
 
 // determine the type of the native DRC, falling back to C
 #ifndef NATIVE_DRC
-typedef drcbe_c drcbe_native;
+#if !defined(MAME_NOASM) && (defined(__x86_64__) || defined(_M_X64))
+#define NATIVE_DRC drcbe_x64
+#elif !defined(MAME_NOASM) && (defined(__i386__) || defined(_M_IX86))
+#define NATIVE_DRC drcbe_x86
+#elif !defined(MAME_NOASM) && (defined(__aarch64__) || defined(_M_ARM64))
+#define NATIVE_DRC drcbe_arm64
 #else
-typedef NATIVE_DRC drcbe_native;
+#define NATIVE_DRC drcbe_c
+#endif
 #endif
 
-
-// structure describing back-end validation test
-struct bevalidate_test
-{
-	uml::opcode_t   opcode;
-	u8              size;
-	u8              iflags;
-	u8              flags;
-	u64             param[4];
-};
+#define MAKE_DRCBE_IMPL(name) make_##name
+#define MAKE_DRCBE(name) MAKE_DRCBE_IMPL(name)
+#define make_drcbe_native MAKE_DRCBE(NATIVE_DRC)
 
 
 
@@ -95,7 +90,6 @@ drcbe_interface::drcbe_interface(drcuml_state &drcuml, drc_cache &cache, device_
 	, m_device(device)
 	, m_space()
 	, m_state(*reinterpret_cast<drcuml_machine_state *>(cache.alloc_near(sizeof(m_state))))
-	, m_accessors(nullptr)
 {
 	// reset the machine state
 	memset(&m_state, 0, sizeof(m_state));
@@ -105,17 +99,12 @@ drcbe_interface::drcbe_interface(drcuml_state &drcuml, drc_cache &cache, device_
 	if (device.interface(memory))
 	{
 		int const count = memory->max_space_count();
-		m_accessors = reinterpret_cast<data_accessors *>(cache.alloc_near(sizeof(*m_accessors) * count));
-		memset(m_accessors, 0, sizeof(*m_accessors) * count);
 		m_space.resize(count, nullptr);
 
 		for (int spacenum = 0; spacenum < count; ++spacenum)
 		{
 			if (memory->has_space(spacenum))
-			{
 				m_space[spacenum] = &memory->space(spacenum);
-				m_space[spacenum]->accessors(m_accessors[spacenum]);
-			}
 		}
 	}
 }
@@ -143,8 +132,8 @@ drcuml_state::drcuml_state(device_t &device, drc_cache &cache, u32 flags, int mo
 	: m_device(device)
 	, m_cache(cache)
 	, m_beintf(device.machine().options().drc_use_c()
-			? std::unique_ptr<drcbe_interface>{ new drcbe_c(*this, device, cache, flags, modes, addrbits, ignorebits) }
-			: std::unique_ptr<drcbe_interface>{ new drcbe_native(*this, device, cache, flags, modes, addrbits, ignorebits) })
+			? drc::make_drcbe_c(*this, device, cache, flags, modes, addrbits, ignorebits)
+			: drc::make_drcbe_native(*this, device, cache, flags, modes, addrbits, ignorebits))
 	, m_umllog(device.machine().options().drc_log_uml()
 			? new std::ofstream(util::string_format("drcuml_%s.asm", device.shortname()))
 			: nullptr)
@@ -183,19 +172,6 @@ void drcuml_state::reset()
 
 		// call the backend to reset
 		m_beintf->reset();
-
-		// do a one-time validation if requested
-#if 0
-		if (VALIDATE_BACKEND)
-		{
-			static bool validated = false;
-			if (!validated)
-			{
-				validated = true;
-				validate_backend(this);
-			}
-		}
-#endif
 	}
 	catch (drcuml_block::abort_compilation &)
 	{
@@ -421,18 +397,30 @@ void drcuml_block::optimize()
 		}
 		inst.set_flags(accumflags);
 
-		// track mapvars
 		if (inst.opcode() == uml::OP_MAPVAR)
+		{
+			// track mapvars
 			mapvar[inst.param(0).mapvar() - uml::MAPVAR_M0] = inst.param(1).immediate();
-
-		// convert all mapvar parameters to immediates
+		}
 		else if (inst.opcode() != uml::OP_RECOVER)
+		{
+			// convert all mapvar parameters to immediates
 			for (int pnum = 0; pnum < inst.numparams(); pnum++)
+			{
 				if (inst.param(pnum).is_mapvar())
 					inst.set_mapvar(pnum, mapvar[inst.param(pnum).mapvar() - uml::MAPVAR_M0]);
+			}
+		}
 
 		// now that flags are correct, simplify the instruction
+#if LOG_SIMPLIFICATIONS
+		uml::instruction const orig = inst;
+#endif
 		inst.simplify();
+#if LOG_SIMPLIFICATIONS
+		if (orig != inst)
+			osd_printf_debug("Simplified: %-50.50s -> %s\n", orig.disasm(&m_drcuml), inst.disasm(&m_drcuml));
+#endif
 	}
 }
 
@@ -527,606 +515,3 @@ char const *drcuml_block::get_comment_text(uml::instruction const &inst, std::st
 		return nullptr;
 	}
 }
-
-
-
-#if 0
-
-/***************************************************************************
-    BACK-END VALIDATION
-***************************************************************************/
-
-//-------------------------------------------------
-//  effective_test_psize - return the effective
-//  parameter size based on the size and fixed
-//  array of parameter values
-//-------------------------------------------------
-
-inline uint8_t effective_test_psize(const opcode_info &opinfo, int pnum, int instsize, const uint64_t *params)
-{
-	switch (opinfo.param[pnum].size)
-	{
-		case PSIZE_4:   return 4;
-		case PSIZE_8:   return 8;
-		case PSIZE_OP:  return instsize;
-		case PSIZE_P1:  return 1 << (params[0] & 3);
-		case PSIZE_P2:  return 1 << (params[1] & 3);
-		case PSIZE_P3:  return 1 << (params[2] & 3);
-		case PSIZE_P4:  return 1 << (params[3] & 3);
-	}
-	return instsize;
-}
-
-#define TEST_ENTRY_2(op, size, p1, p2, flags) { OP_##op, size, 0, flags, { u64(p1), u64(p2) } },
-#define TEST_ENTRY_2F(op, size, p1, p2, iflags, flags) { OP_##op, size, iflags, flags, { u64(p1), u64(p2) } },
-#define TEST_ENTRY_3(op, size, p1, p2, p3, flags) { OP_##op, size, 0, flags, { u64(p1), u64(p2), u64(p3) } },
-#define TEST_ENTRY_3F(op, size, p1, p2, p3, iflags, flags) { OP_##op, size, iflags, flags, { u64(p1), u64(p2), u64(p3) } },
-#define TEST_ENTRY_4(op, size, p1, p2, p3, p4, flags) { OP_##op, size, 0, flags, { u64(p1), u64(p2), u64(p3), u64(p4) } },
-#define TEST_ENTRY_4F(op, size, p1, p2, p3, p4, iflags, flags) { OP_##op, size, iflags, flags, { u64(p1), u64(p2), u64(p3), u64(p4) } },
-
-static const bevalidate_test bevalidate_test_list[] =
-{
-	TEST_ENTRY_3(ADD, 4, 0x7fffffff, 0x12345678, 0x6dcba987, 0)
-	TEST_ENTRY_3(ADD, 4, 0x80000000, 0x12345678, 0x6dcba988, FLAG_V | FLAG_S)
-	TEST_ENTRY_3(ADD, 4, 0xffffffff, 0x92345678, 0x6dcba987, FLAG_S)
-	TEST_ENTRY_3(ADD, 4, 0x00000000, 0x92345678, 0x6dcba988, FLAG_C | FLAG_Z)
-
-	TEST_ENTRY_3(ADD, 8, 0x7fffffffffffffff, 0x0123456789abcdef, 0x7edcba9876543210, 0)
-	TEST_ENTRY_3(ADD, 8, 0x8000000000000000, 0x0123456789abcdef, 0x7edcba9876543211, FLAG_V | FLAG_S)
-	TEST_ENTRY_3(ADD, 8, 0xffffffffffffffff, 0x8123456789abcdef, 0x7edcba9876543210, FLAG_S)
-	TEST_ENTRY_3(ADD, 8, 0x0000000000000000, 0x8123456789abcdef, 0x7edcba9876543211, FLAG_C | FLAG_Z)
-
-	TEST_ENTRY_3F(ADDC, 4, 0x7fffffff, 0x12345678, 0x6dcba987, 0,       0)
-	TEST_ENTRY_3F(ADDC, 4, 0x7fffffff, 0x12345678, 0x6dcba986, FLAG_C, 0)
-	TEST_ENTRY_3F(ADDC, 4, 0x80000000, 0x12345678, 0x6dcba988, 0,             FLAG_V | FLAG_S)
-	TEST_ENTRY_3F(ADDC, 4, 0x80000000, 0x12345678, 0x6dcba987, FLAG_C, FLAG_V | FLAG_S)
-	TEST_ENTRY_3F(ADDC, 4, 0xffffffff, 0x92345678, 0x6dcba987, 0,             FLAG_S)
-	TEST_ENTRY_3F(ADDC, 4, 0xffffffff, 0x92345678, 0x6dcba986, FLAG_C, FLAG_S)
-	TEST_ENTRY_3F(ADDC, 4, 0x00000000, 0x92345678, 0x6dcba988, 0,             FLAG_C | FLAG_Z)
-	TEST_ENTRY_3F(ADDC, 4, 0x00000000, 0x92345678, 0x6dcba987, FLAG_C, FLAG_C | FLAG_Z)
-	TEST_ENTRY_3F(ADDC, 4, 0x12345678, 0x12345678, 0xffffffff, FLAG_C, FLAG_C)
-
-	TEST_ENTRY_3F(ADDC, 8, 0x7fffffffffffffff, 0x0123456789abcdef, 0x7edcba9876543210, 0,             0)
-	TEST_ENTRY_3F(ADDC, 8, 0x7fffffffffffffff, 0x0123456789abcdef, 0x7edcba987654320f, FLAG_C, 0)
-	TEST_ENTRY_3F(ADDC, 8, 0x8000000000000000, 0x0123456789abcdef, 0x7edcba9876543211, 0,             FLAG_V | FLAG_S)
-	TEST_ENTRY_3F(ADDC, 8, 0x8000000000000000, 0x0123456789abcdef, 0x7edcba9876543210, FLAG_C, FLAG_V | FLAG_S)
-	TEST_ENTRY_3F(ADDC, 8, 0xffffffffffffffff, 0x8123456789abcdef, 0x7edcba9876543210, 0,             FLAG_S)
-	TEST_ENTRY_3F(ADDC, 8, 0xffffffffffffffff, 0x8123456789abcdef, 0x7edcba987654320f, FLAG_C, FLAG_S)
-	TEST_ENTRY_3F(ADDC, 8, 0x0000000000000000, 0x8123456789abcdef, 0x7edcba9876543211, 0,             FLAG_C | FLAG_Z)
-	TEST_ENTRY_3F(ADDC, 8, 0x0000000000000000, 0x8123456789abcdef, 0x7edcba9876543210, FLAG_C, FLAG_C | FLAG_Z)
-	TEST_ENTRY_3F(ADDC, 8, 0x123456789abcdef0, 0x123456789abcdef0, 0xffffffffffffffff, FLAG_C, FLAG_C)
-
-	TEST_ENTRY_3(SUB, 4, 0x12345678, 0x7fffffff, 0x6dcba987, 0)
-	TEST_ENTRY_3(SUB, 4, 0x12345678, 0x80000000, 0x6dcba988, FLAG_V)
-	TEST_ENTRY_3(SUB, 4, 0x92345678, 0xffffffff, 0x6dcba987, FLAG_S)
-	TEST_ENTRY_3(SUB, 4, 0x92345678, 0x00000000, 0x6dcba988, FLAG_C | FLAG_S)
-	TEST_ENTRY_3(SUB, 4, 0x00000000, 0x12345678, 0x12345678, FLAG_Z)
-
-	TEST_ENTRY_3(SUB, 8, 0x0123456789abcdef, 0x7fffffffffffffff, 0x7edcba9876543210, 0)
-	TEST_ENTRY_3(SUB, 8, 0x0123456789abcdef, 0x8000000000000000, 0x7edcba9876543211, FLAG_V)
-	TEST_ENTRY_3(SUB, 8, 0x8123456789abcdef, 0xffffffffffffffff, 0x7edcba9876543210, FLAG_S)
-	TEST_ENTRY_3(SUB, 8, 0x8123456789abcdef, 0x0000000000000000, 0x7edcba9876543211, FLAG_C | FLAG_S)
-	TEST_ENTRY_3(SUB, 8, 0x0000000000000000, 0x0123456789abcdef, 0x0123456789abcdef, FLAG_Z)
-
-	TEST_ENTRY_3F(SUBB, 4, 0x12345678, 0x7fffffff, 0x6dcba987, 0,             0)
-	TEST_ENTRY_3F(SUBB, 4, 0x12345678, 0x7fffffff, 0x6dcba986, FLAG_C, 0)
-	TEST_ENTRY_3F(SUBB, 4, 0x12345678, 0x80000000, 0x6dcba988, 0,             FLAG_V)
-	TEST_ENTRY_3F(SUBB, 4, 0x12345678, 0x80000000, 0x6dcba987, FLAG_C, FLAG_V)
-	TEST_ENTRY_3F(SUBB, 4, 0x92345678, 0xffffffff, 0x6dcba987, 0,             FLAG_S)
-	TEST_ENTRY_3F(SUBB, 4, 0x92345678, 0xffffffff, 0x6dcba986, FLAG_C, FLAG_S)
-	TEST_ENTRY_3F(SUBB, 4, 0x92345678, 0x00000000, 0x6dcba988, 0,             FLAG_C | FLAG_S)
-	TEST_ENTRY_3F(SUBB, 4, 0x92345678, 0x00000000, 0x6dcba987, FLAG_C, FLAG_C | FLAG_S)
-	TEST_ENTRY_3F(SUBB, 4, 0x12345678, 0x12345678, 0xffffffff, FLAG_C, FLAG_C)
-	TEST_ENTRY_3F(SUBB, 4, 0x00000000, 0x12345678, 0x12345677, FLAG_C, FLAG_Z)
-
-	TEST_ENTRY_3F(SUBB, 8, 0x0123456789abcdef, 0x7fffffffffffffff, 0x7edcba9876543210, 0,             0)
-	TEST_ENTRY_3F(SUBB, 8, 0x0123456789abcdef, 0x7fffffffffffffff, 0x7edcba987654320f, FLAG_C, 0)
-	TEST_ENTRY_3F(SUBB, 8, 0x0123456789abcdef, 0x8000000000000000, 0x7edcba9876543211, 0,             FLAG_V)
-	TEST_ENTRY_3F(SUBB, 8, 0x0123456789abcdef, 0x8000000000000000, 0x7edcba9876543210, FLAG_C, FLAG_V)
-	TEST_ENTRY_3F(SUBB, 8, 0x8123456789abcdef, 0xffffffffffffffff, 0x7edcba9876543210, 0,             FLAG_S)
-	TEST_ENTRY_3F(SUBB, 8, 0x8123456789abcdef, 0xffffffffffffffff, 0x7edcba987654320f, FLAG_C, FLAG_S)
-	TEST_ENTRY_3F(SUBB, 8, 0x8123456789abcdef, 0x0000000000000000, 0x7edcba9876543211, 0,             FLAG_C | FLAG_S)
-	TEST_ENTRY_3F(SUBB, 8, 0x8123456789abcdef, 0x0000000000000000, 0x7edcba9876543210, FLAG_C, FLAG_C | FLAG_S)
-	TEST_ENTRY_3F(SUBB, 8, 0x123456789abcdef0, 0x123456789abcdef0, 0xffffffffffffffff, FLAG_C, FLAG_C)
-	TEST_ENTRY_3F(SUBB, 8, 0x0000000000000000, 0x123456789abcdef0, 0x123456789abcdeef, FLAG_C, FLAG_Z)
-
-	TEST_ENTRY_2(CMP, 4, 0x7fffffff, 0x6dcba987, 0)
-	TEST_ENTRY_2(CMP, 4, 0x80000000, 0x6dcba988, FLAG_V)
-	TEST_ENTRY_2(CMP, 4, 0xffffffff, 0x6dcba987, FLAG_S)
-	TEST_ENTRY_2(CMP, 4, 0x00000000, 0x6dcba988, FLAG_C | FLAG_S)
-	TEST_ENTRY_2(CMP, 4, 0x12345678, 0x12345678, FLAG_Z)
-
-	TEST_ENTRY_2(CMP, 8, 0x7fffffffffffffff, 0x7edcba9876543210, 0)
-	TEST_ENTRY_2(CMP, 8, 0x8000000000000000, 0x7edcba9876543211, FLAG_V)
-	TEST_ENTRY_2(CMP, 8, 0xffffffffffffffff, 0x7edcba9876543210, FLAG_S)
-	TEST_ENTRY_2(CMP, 8, 0x0000000000000000, 0x7edcba9876543211, FLAG_C | FLAG_S)
-	TEST_ENTRY_2(CMP, 8, 0x0123456789abcdef, 0x0123456789abcdef, FLAG_Z)
-
-	TEST_ENTRY_4(MULU, 4, 0x77777777, 0x00000000, 0x11111111, 0x00000007, 0)
-	TEST_ENTRY_4(MULU, 4, 0xffffffff, 0x00000000, 0x11111111, 0x0000000f, 0)
-	TEST_ENTRY_4(MULU, 4, 0x00000000, 0x00000000, 0x11111111, 0x00000000, FLAG_Z)
-	TEST_ENTRY_4(MULU, 4, 0xea61d951, 0x37c048d0, 0x77777777, 0x77777777, FLAG_V)
-	TEST_ENTRY_4(MULU, 4, 0x32323233, 0xcdcdcdcc, 0xcdcdcdcd, 0xffffffff, FLAG_V | FLAG_S)
-
-	TEST_ENTRY_4(MULU, 8, 0x7777777777777777, 0x0000000000000000, 0x1111111111111111, 0x0000000000000007, 0)
-	TEST_ENTRY_4(MULU, 8, 0xffffffffffffffff, 0x0000000000000000, 0x1111111111111111, 0x000000000000000f, 0)
-	TEST_ENTRY_4(MULU, 8, 0x0000000000000000, 0x0000000000000000, 0x1111111111111111, 0x0000000000000000, FLAG_Z)
-	TEST_ENTRY_4(MULU, 8, 0x0c83fb72ea61d951, 0x37c048d159e26af3, 0x7777777777777777, 0x7777777777777777, FLAG_V)
-	TEST_ENTRY_4(MULU, 8, 0x3232323232323233, 0xcdcdcdcdcdcdcdcc, 0xcdcdcdcdcdcdcdcd, 0xffffffffffffffff, FLAG_V | FLAG_S)
-
-	TEST_ENTRY_4(MULS, 4, 0x77777777, 0x00000000, 0x11111111, 0x00000007, 0)
-	TEST_ENTRY_4(MULS, 4, 0xffffffff, 0x00000000, 0x11111111, 0x0000000f, FLAG_V)
-	TEST_ENTRY_4(MULS, 4, 0x00000000, 0x00000000, 0x11111111, 0x00000000, FLAG_Z)
-	TEST_ENTRY_4(MULS, 4, 0x9e26af38, 0xc83fb72e, 0x77777777, 0x88888888, FLAG_V | FLAG_S)
-	TEST_ENTRY_4(MULS, 4, 0x32323233, 0x00000000, 0xcdcdcdcd, 0xffffffff, 0)
-
-	TEST_ENTRY_4(MULS, 8, 0x7777777777777777, 0x0000000000000000, 0x1111111111111111, 0x0000000000000007, 0)
-	TEST_ENTRY_4(MULS, 8, 0xffffffffffffffff, 0x0000000000000000, 0x1111111111111111, 0x000000000000000f, FLAG_V)
-	TEST_ENTRY_4(MULS, 8, 0x0000000000000000, 0x0000000000000000, 0x1111111111111111, 0x0000000000000000, FLAG_Z)
-	TEST_ENTRY_4(MULS, 8, 0x7c048d159e26af38, 0xc83fb72ea61d950c, 0x7777777777777777, 0x8888888888888888, FLAG_V | FLAG_S)
-	TEST_ENTRY_4(MULS, 8, 0x3232323232323233, 0x0000000000000000, 0xcdcdcdcdcdcdcdcd, 0xffffffffffffffff, 0)
-
-	TEST_ENTRY_4(DIVU, 4, 0x02702702, 0x00000003, 0x11111111, 0x00000007, 0)
-	TEST_ENTRY_4(DIVU, 4, 0x00000000, 0x11111111, 0x11111111, 0x11111112, FLAG_Z)
-	TEST_ENTRY_4(DIVU, 4, 0x7fffffff, 0x00000000, 0xfffffffe, 0x00000002, 0)
-	TEST_ENTRY_4(DIVU, 4, 0xfffffffe, 0x00000000, 0xfffffffe, 0x00000001, FLAG_S)
-	TEST_ENTRY_4(DIVU, 4, UNDEFINED,  UNDEFINED,  0xffffffff, 0x00000000, FLAG_V)
-
-	TEST_ENTRY_4(DIVU, 8, 0x0270270270270270, 0x0000000000000001, 0x1111111111111111, 0x0000000000000007, 0)
-	TEST_ENTRY_4(DIVU, 8, 0x0000000000000000, 0x1111111111111111, 0x1111111111111111, 0x1111111111111112, FLAG_Z)
-	TEST_ENTRY_4(DIVU, 8, 0x7fffffffffffffff, 0x0000000000000000, 0xfffffffffffffffe, 0x0000000000000002, 0)
-	TEST_ENTRY_4(DIVU, 8, 0xfffffffffffffffe, 0x0000000000000000, 0xfffffffffffffffe, 0x0000000000000001, FLAG_S)
-	TEST_ENTRY_4(DIVU, 8, UNDEFINED,          UNDEFINED,          0xffffffffffffffff, 0x0000000000000000, FLAG_V)
-
-	TEST_ENTRY_4(DIVS, 4, 0x02702702, 0x00000003, 0x11111111, 0x00000007, 0)
-	TEST_ENTRY_4(DIVS, 4, 0x00000000, 0x11111111, 0x11111111, 0x11111112, FLAG_Z)
-	TEST_ENTRY_4(DIVS, 4, 0xffffffff, 0x00000000, 0xfffffffe, 0x00000002, FLAG_S)
-	TEST_ENTRY_4(DIVS, 4, UNDEFINED,  UNDEFINED,  0xffffffff, 0x00000000, FLAG_V)
-
-	TEST_ENTRY_4(DIVS, 8, 0x0270270270270270, 0x0000000000000001, 0x1111111111111111, 0x0000000000000007, 0)
-	TEST_ENTRY_4(DIVS, 8, 0x0000000000000000, 0x1111111111111111, 0x1111111111111111, 0x1111111111111112, FLAG_Z)
-	TEST_ENTRY_4(DIVS, 8, 0xffffffffffffffff, 0x0000000000000000, 0xfffffffffffffffe, 0x0000000000000002, FLAG_S)
-	TEST_ENTRY_4(DIVS, 8, UNDEFINED,          UNDEFINED,          0xffffffffffffffff, 0x0000000000000000, FLAG_V)
-};
-
-
-/*-------------------------------------------------
-    validate_backend - execute a number of
-    generic tests on the backend code generator
--------------------------------------------------*/
-
-static void validate_backend(drcuml_state *drcuml)
-{
-	uml::code_handle *handles[3];
-	int tnum;
-
-	// allocate handles for the code
-	handles[0] = drcuml->handle_alloc("test_entry");
-	handles[1] = drcuml->handle_alloc("code_start");
-	handles[2] = drcuml->handle_alloc("code_end");
-
-	// iterate over test entries
-	printf("Backend validation....\n");
-	for (tnum = 31; tnum < std::size(bevalidate_test_list); tnum++)
-	{
-		const bevalidate_test *test = &bevalidate_test_list[tnum];
-		parameter param[std::size(test->param)];
-		char mnemonic[20], *dst;
-		const char *src;
-
-		// progress
-		dst = mnemonic;
-		for (src = opcode_info_table[test->opcode()]->mnemonic; *src != 0; src++)
-		{
-			if (*src == '!')
-			{
-				if (test->size == 8)
-					*dst++ = 'd';
-			}
-			else if (*src == '#')
-				*dst++ = (test->size == 8) ? 'd' : 's';
-			else
-				*dst++ = *src;
-		}
-		*dst = 0;
-		printf("Executing test %d/%d (%s)", tnum + 1, (int)std::size(bevalidate_test_list), mnemonic);
-
-		// reset parameter list and iterate
-		memset(param, 0, sizeof(param));
-		bevalidate_iterate_over_params(drcuml, handles, test, param, 0);
-		printf("\n");
-	}
-	fatalerror("All tests passed!\n");
-}
-
-
-/*-------------------------------------------------
-    bevalidate_iterate_over_params - iterate over
-    all supported types and values of a parameter
-    and recursively hand off to the next parameter,
-    or else move on to iterate over the flags
--------------------------------------------------*/
-
-static void bevalidate_iterate_over_params(drcuml_state *drcuml, uml::code_handle **handles, const bevalidate_test *test, parameter *paramlist, int pnum)
-{
-	const opcode_info *opinfo = opcode_info_table[test->opcode()];
-	drcuml_ptype ptype;
-
-	// if no parameters, execute now
-	if (pnum >= std::size(opinfo->param) || opinfo->param[pnum].typemask == PTYPES_NONE)
-	{
-		bevalidate_iterate_over_flags(drcuml, handles, test, paramlist);
-		return;
-	}
-
-	// iterate over valid parameter types
-	for (ptype = parameter::PTYPE_IMMEDIATE; ptype < parameter::PTYPE_MAX; ptype++)
-		if (opinfo->param[pnum].typemask & (1 << ptype))
-		{
-			int pindex, pcount;
-
-			// mapvars can only do 32-bit tests
-			if (ptype == parameter::PTYPE_MAPVAR && effective_test_psize(opinfo, pnum, test->size, test->param) == 8)
-				continue;
-
-			// for some parameter types, we wish to iterate over all possibilities
-			switch (ptype)
-			{
-				case parameter::PTYPE_INT_REGISTER:     pcount = REG_I_END - REG_I0;        break;
-				case parameter::PTYPE_FLOAT_REGISTER:   pcount = REG_F_END - REG_F0;        break;
-				default:                            pcount = 1;                                     break;
-			}
-
-			// iterate over possibilities
-			for (pindex = 0; pindex < pcount; pindex++)
-			{
-				bool skip = false;
-				int pscannum;
-
-				// for param 0, print a dot
-				if (pnum == 0)
-					printf(".");
-
-				// can't duplicate multiple source parameters unless they are immediates
-				if (ptype != parameter::PTYPE_IMMEDIATE && (opinfo->param[pnum].output & PIO_IN))
-
-					// loop over all parameters we've done before; if the parameter is a source and matches us, skip this case
-					for (pscannum = 0; pscannum < pnum; pscannum++)
-						if ((opinfo->param[pscannum].output & PIO_IN) && ptype == paramlist[pscannum].type && pindex == paramlist[pscannum].value)
-							skip = true;
-
-				// can't duplicate multiple dest parameters
-				if (opinfo->param[pnum].output & PIO_OUT)
-
-					// loop over all parameters we've done before; if the parameter is a source and matches us, skip this case
-					for (pscannum = 0; pscannum < pnum; pscannum++)
-						if ((opinfo->param[pscannum].output & PIO_OUT) && ptype == paramlist[pscannum].type && pindex == paramlist[pscannum].value)
-							skip = true;
-
-				// iterate over the next parameter in line
-				if (!skip)
-				{
-					paramlist[pnum].type = ptype;
-					paramlist[pnum].value = pindex;
-					bevalidate_iterate_over_params(drcuml, handles, test, paramlist, pnum + 1);
-				}
-			}
-		}
-}
-
-
-/*-------------------------------------------------
-    bevalidate_iterate_over_flags - iterate over
-    all supported flag masks
--------------------------------------------------*/
-
-static void bevalidate_iterate_over_flags(drcuml_state *drcuml, uml::code_handle **handles, const bevalidate_test *test, parameter *paramlist)
-{
-	const opcode_info *opinfo = opcode_info_table[test->opcode()];
-	uint8_t flagmask = opinfo->outflags;
-	uint8_t curmask;
-
-	// iterate over all possible flag combinations
-	for (curmask = 0; curmask <= flagmask; curmask++)
-		if ((curmask & flagmask) == curmask)
-			bevalidate_execute(drcuml, handles, test, paramlist, curmask);
-}
-
-
-/*-------------------------------------------------
-    bevalidate_execute - execute a single instance
-    of a test, generating code and verifying the
-    results
--------------------------------------------------*/
-
-static void bevalidate_execute(drcuml_state *drcuml, uml::code_handle **handles, const bevalidate_test *test, const parameter *paramlist, uint8_t flagmask)
-{
-	parameter params[std::size(test->param)];
-	drcuml_machine_state istate, fstate;
-	instruction testinst;
-	drcuml_block *block;
-	uint64_t *parammem;
-	int numparams;
-
-	// allocate memory for parameters
-	parammem = (uint64_t *)drcuml->cache->alloc_near(sizeof(uint64_t) * (std::size(test->param) + 1));
-
-	// flush the cache
-	drcuml->reset();
-
-	// start a new block
-	block = drcuml->block_begin(30);
-	UML_HANDLE(block, handles[0]);
-
-	// set up a random initial state
-	bevalidate_initialize_random_state(drcuml, block, &istate);
-
-	// then populate the state with the parameters
-	numparams = bevalidate_populate_state(block, &istate, test, paramlist, params, parammem);
-
-	// generate the code
-	UML_RESTORE(block, &istate);
-	UML_HANDLE(block, handles[1]);
-	switch (numparams)
-	{
-		case 0:
-			block->append(test->opcode(), test->size);
-			break;
-
-		case 1:
-			block->append(test->opcode(), test->size, params[0]);
-			break;
-
-		case 2:
-			block->append(test->opcode(), test->size, params[0], params[1]);
-			break;
-
-		case 3:
-			block->append(test->opcode(), test->size, params[0], params[1], params[2]);
-			break;
-
-		case 4:
-			block->append(test->opcode(), test->size, params[0], params[1], params[2], params[3]);
-			break;
-	}
-	testinst = block->inst[block->nextinst - 1];
-	UML_HANDLE(block, handles[2]);
-	UML_GETFLGS(block, MEM(&parammem[std::size(test->param)]), flagmask);
-	UML_SAVE(block, &fstate);
-	UML_EXIT(block, IMM(0));
-
-	// end the block
-	block->end();
-
-	// execute
-	drcuml->execute(*handles[0]);
-
-	// verify the results
-	bevalidate_verify_state(drcuml, &istate, &fstate, test, *(uint32_t *)&parammem[std::size(test->param)], params, &testinst, handles[1]->code, handles[2]->code, flagmask);
-
-	// free memory
-	drcuml->cache->dealloc(parammem, sizeof(uint64_t) * (std::size(test->param) + 1));
-}
-
-
-/*-------------------------------------------------
-    bevalidate_initialize_random_state -
-    initialize the machine state to randomness
--------------------------------------------------*/
-
-static void bevalidate_initialize_random_state(drcuml_state *drcuml, drcuml_block *block, drcuml_machine_state *state)
-{
-	running_machine &machine = drcuml->device->machine();
-	int regnum;
-
-	// initialize core state to random values
-	state->fmod = machine.rand() & 0x03;
-	state->flags = machine.rand() & 0x1f;
-	state->exp = machine.rand();
-
-	// initialize integer registers to random values
-	for (regnum = 0; regnum < std::size(state->r); regnum++)
-	{
-		state->r[regnum].w.h = machine.rand();
-		state->r[regnum].w.l = machine.rand();
-	}
-
-	// initialize float registers to random values
-	for (regnum = 0; regnum < std::size(state->f); regnum++)
-	{
-		*(uint32_t *)&state->f[regnum].s.h = machine.rand();
-		*(uint32_t *)&state->f[regnum].s.l = machine.rand();
-	}
-
-	// initialize map variables to random values
-	for (regnum = 0; regnum < MAPVAR_COUNT; regnum++)
-		UML_MAPVAR(block, MVAR(regnum), machine.rand());
-}
-
-
-/*-------------------------------------------------
-    bevalidate_populate_state - populate the
-    machine state with the proper values prior
-    to executing a test
--------------------------------------------------*/
-
-static int bevalidate_populate_state(drcuml_block *block, drcuml_machine_state *state, const bevalidate_test *test, const parameter *paramlist, parameter *params, uint64_t *parammem)
-{
-	const opcode_info *opinfo = opcode_info_table[test->opcode()];
-	int numparams = std::size(test->param);
-	int pnum;
-
-	// copy flags as-is
-	state->flags = test->iflags;
-
-	// iterate over parameters
-	for (pnum = 0; pnum < std::size(test->param); pnum++)
-	{
-		int psize = effective_test_psize(opinfo, pnum, test->size, test->param);
-		parameter *curparam = &params[pnum];
-
-		// start with a copy of the parameter from the list
-		*curparam = paramlist[pnum];
-
-		// switch off the type
-		switch (curparam->type)
-		{
-			// immediate parameters: take the value from the test entry
-			case parameter::PTYPE_IMMEDIATE:
-				curparam->value = test->param[pnum];
-				break;
-
-			// register parameters: set the register value in the state and set the parameter value to the register index
-			case parameter::PTYPE_INT_REGISTER:
-				state->r[curparam->value].d = test->param[pnum];
-				curparam->value += REG_I0;
-				break;
-
-			// register parameters: set the register value in the state and set the parameter value to the register index
-			case parameter::PTYPE_FLOAT_REGISTER:
-				state->f[curparam->value].d = test->param[pnum];
-				curparam->value += REG_F0;
-				break;
-
-			// memory parameters: set the memory value in the parameter space and set the parameter value to point to it
-			case parameter::PTYPE_MEMORY:
-				curparam->value = (uintptr_t)&parammem[pnum];
-				if (psize == 4)
-					*(uint32_t *)(uintptr_t)curparam->value = test->param[pnum];
-				else
-					*(uint64_t *)(uintptr_t)curparam->value = test->param[pnum];
-				break;
-
-			// map variables: issue a MAPVAR instruction to set the value and set the parameter value to the mapvar index
-			case parameter::PTYPE_MAPVAR:
-				UML_MAPVAR(block, MVAR(curparam->value), test->param[pnum]);
-				curparam->value += MAPVAR_M0;
-				break;
-
-			// use anything else to count the number of parameters
-			default:
-				numparams = MIN(numparams, pnum);
-				break;
-		}
-	}
-
-	// return the total number of parameters
-	return numparams;
-}
-
-
-/*-------------------------------------------------
-    bevalidate_verify_state - verify the final
-    state after executing a test, and report any
-    discrepancies
--------------------------------------------------*/
-
-static int bevalidate_verify_state(drcuml_state *drcuml, const drcuml_machine_state *istate, drcuml_machine_state *state, const bevalidate_test *test, uint32_t flags, const parameter *params, const instruction *testinst, drccodeptr codestart, drccodeptr codeend, uint8_t flagmask)
-{
-	const opcode_info *opinfo = opcode_info_table[test->opcode()];
-	uint8_t ireg[REG_I_END - REG_I0] = { 0 };
-	uint8_t freg[REG_F_END - REG_F0] = { 0 };
-	char errorbuf[1024];
-	char *errend = errorbuf;
-	int pnum, regnum;
-
-	*errend = 0;
-
-	// check flags
-	if (flags != (test->flags & flagmask))
-	{
-		errend += sprintf(errend, "  Flags ... result:%c%c%c%c%c  expected:%c%c%c%c%c\n",
-			(flagmask & FLAG_U) ? ((flags & FLAG_U) ? 'U' : '.') : '-',
-			(flagmask & FLAG_S) ? ((flags & FLAG_S) ? 'S' : '.') : '-',
-			(flagmask & FLAG_Z) ? ((flags & FLAG_Z) ? 'Z' : '.') : '-',
-			(flagmask & FLAG_V) ? ((flags & FLAG_V) ? 'V' : '.') : '-',
-			(flagmask & FLAG_C) ? ((flags & FLAG_C) ? 'C' : '.') : '-',
-			(flagmask & FLAG_U) ? ((test->flags & FLAG_U) ? 'U' : '.') : '-',
-			(flagmask & FLAG_S) ? ((test->flags & FLAG_S) ? 'S' : '.') : '-',
-			(flagmask & FLAG_Z) ? ((test->flags & FLAG_Z) ? 'Z' : '.') : '-',
-			(flagmask & FLAG_V) ? ((test->flags & FLAG_V) ? 'V' : '.') : '-',
-			(flagmask & FLAG_C) ? ((test->flags & FLAG_C) ? 'C' : '.') : '-');
-	}
-
-	// check destination parameters
-	for (pnum = 0; pnum < std::size(test->param); pnum++)
-		if (opinfo->param[pnum].output & PIO_OUT)
-		{
-			int psize = effective_test_psize(opinfo, pnum, test->size, test->param);
-			uint64_t mask = u64(0xffffffffffffffff) >> (64 - 8 * psize);
-			uint64_t result = 0;
-
-			// fetch the result from the parameters
-			switch (params[pnum].type)
-			{
-				// integer registers fetch from the state
-				case parameter::PTYPE_INT_REGISTER:
-					ireg[params[pnum].value - REG_I0] = 1;
-					result = state->r[params[pnum].value - REG_I0].d;
-					break;
-
-				// float registers fetch from the state
-				case parameter::PTYPE_FLOAT_REGISTER:
-					freg[params[pnum].value - REG_I0] = 1;
-					result = state->f[params[pnum].value - REG_F0].d;
-					break;
-
-				// memory registers fetch from the memory address
-				case parameter::PTYPE_MEMORY:
-					if (psize == 4)
-						result = *(uint32_t *)(uintptr_t)params[pnum].value;
-					else
-						result = *(uint64_t *)(uintptr_t)params[pnum].value;
-					break;
-
-				default:
-					break;
-			}
-
-			// check against the mask
-			if (test->param[pnum] != UNDEFINED_U64 && (result & mask) != (test->param[pnum] & mask))
-			{
-				if ((uint32_t)mask == mask)
-					errend += sprintf(errend, "  Parameter %d ... result:%08X  expected:%08X\n", pnum,
-										(uint32_t)(result & mask), (uint32_t)(test->param[pnum] & mask));
-				else
-					errend += sprintf(errend, "  Parameter %d ... result:%08X%08X  expected:%08X%08X\n", pnum,
-										(uint32_t)((result & mask) >> 32), (uint32_t)(result & mask),
-										(uint32_t)((test->param[pnum] & mask) >> 32), (uint32_t)(test->param[pnum] & mask));
-			}
-		}
-
-	// check source integer parameters for unexpected alterations
-	for (regnum = 0; regnum < std::size(state->r); regnum++)
-		if (ireg[regnum] == 0 && istate->r[regnum].d != state->r[regnum].d)
-			errend += sprintf(errend, "  Register i%d ... result:%08X%08X  originally:%08X%08X\n", regnum,
-								(uint32_t)(state->r[regnum].d >> 32), (uint32_t)state->r[regnum].d,
-								(uint32_t)(istate->r[regnum].d >> 32), (uint32_t)istate->r[regnum].d);
-
-	// check source float parameters for unexpected alterations
-	for (regnum = 0; regnum < std::size(state->f); regnum++)
-		if (freg[regnum] == 0 && *(uint64_t *)&istate->f[regnum].d != *(uint64_t *)&state->f[regnum].d)
-			errend += sprintf(errend, "  Register f%d ... result:%08X%08X  originally:%08X%08X\n", regnum,
-								(uint32_t)(*(uint64_t *)&state->f[regnum].d >> 32), (uint32_t)*(uint64_t *)&state->f[regnum].d,
-								(uint32_t)(*(uint64_t *)&istate->f[regnum].d >> 32), (uint32_t)*(uint64_t *)&istate->f[regnum].d);
-
-	// output the error if we have one
-	if (errend != errorbuf)
-	{
-		// disassemble the test instruction
-		std::string disasm = testinst->disasm(drcuml);
-
-		// output a description of what went wrong
-		printf("\n");
-		printf("----------------------------------------------\n");
-		printf("Backend validation error:\n");
-		printf("   %s\n", disasm.c_str());
-		printf("\n");
-		printf("Errors:\n");
-		printf("%s\n", errorbuf);
-		fatalerror("Error during validation\n");
-	}
-	return errend != errorbuf;
-}
-
-#endif

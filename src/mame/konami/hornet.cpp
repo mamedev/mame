@@ -998,7 +998,7 @@ void terabrst_state::gn680_memmap(address_map &map)
 
 /*****************************************************************************/
 
-template <unsigned Board> 
+template <unsigned Board>
 void hornet_state::sharc_map(address_map &map)
 {
 	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_shared_sharc_r<Board>), FUNC(konppc_device::cgboard_shared_sharc_w<Board>));

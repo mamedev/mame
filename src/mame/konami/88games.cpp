@@ -373,6 +373,15 @@ static INPUT_PORTS_START( 88games )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( konami88 )
+	PORT_INCLUDE(88games)
+
+	PORT_MODIFY("IN0")
+	PORT_DIPNAME( 0x80, 0x80, "Rounds Per Game" )      PORT_DIPLOCATION("SW3:4")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x80, "4" )
+INPUT_PORTS_END
+
 
 /*************************************
  *
@@ -661,6 +670,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1988, 88games,  0,       _88games, 88games, _88games_state, empty_init, ROT0, "Konami", "'88 Games", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, konami88, 88games, _88games, 88games, _88games_state, empty_init, ROT0, "Konami", "Konami '88", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, hypsptsp, 88games, _88games, 88games, _88games_state, empty_init, ROT0, "Konami", "Hyper Sports Special (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, 88games,  0,       _88games, 88games,  _88games_state, empty_init, ROT0, "Konami", "'88 Games", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, konami88, 88games, _88games, konami88, _88games_state, empty_init, ROT0, "Konami", "Konami '88", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, hypsptsp, 88games, _88games, konami88, _88games_state, empty_init, ROT0, "Konami", "Hyper Sports Special (Japan)", MACHINE_SUPPORTS_SAVE )

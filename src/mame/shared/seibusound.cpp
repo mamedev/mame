@@ -74,15 +74,16 @@
 
 DEFINE_DEVICE_TYPE(SEIBU_SOUND, seibu_sound_device, "seibu_sound", "Seibu Sound System")
 
-seibu_sound_device::seibu_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+seibu_sound_device::seibu_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, SEIBU_SOUND, tag, owner, clock),
 		m_int_cb(*this),
+		m_coin_io_cb(*this, 0),
 		m_ym_read_cb(*this, 0),
 		m_ym_write_cb(*this),
 		m_sound_rom(*this, finder_base::DUMMY_TAG),
 		m_rom_bank(*this, finder_base::DUMMY_TAG),
-		m_main2sub_pending(0),
-		m_sub2main_pending(0),
+		m_main2sub_pending(false),
+		m_sub2main_pending(false),
 		m_rst10_irq(false),
 		m_rst18_irq(false),
 		m_rst10_service(false),
@@ -181,17 +182,20 @@ IRQ_CALLBACK_MEMBER(seibu_sound_device::im0_vector_cb)
 {
 	if (m_rst18_irq && !m_rst18_service)
 	{
-		update_irq_lines(RST18_ACKNOWLEDGE);
+		if (!machine().side_effects_disabled())
+			update_irq_lines(RST18_ACKNOWLEDGE);
 		return 0xdf;
 	}
 	else if (m_rst10_irq && !m_rst10_service)
 	{
-		update_irq_lines(RST10_ACKNOWLEDGE);
+		if (!machine().side_effects_disabled())
+			update_irq_lines(RST10_ACKNOWLEDGE);
 		return 0xd7;
 	}
 	else
 	{
-		logerror("Spurious interrupt taken\n");
+		if (!machine().side_effects_disabled())
+			logerror("Spurious interrupt taken\n");
 		return 0x00;
 	}
 }
@@ -233,13 +237,18 @@ void seibu_sound_device::ym_w(offs_t offset, u8 data)
 void seibu_sound_device::bank_w(u8 data)
 {
 	if (m_rom_bank.found())
-		m_rom_bank->set_entry(data & 1);
+		m_rom_bank->set_entry(BIT(data, 0));
+}
+
+u8 seibu_sound_device::coin_r(offs_t offset)
+{
+	return m_coin_io_cb(offset);
 }
 
 void seibu_sound_device::coin_w(u8 data)
 {
-	machine().bookkeeping().coin_counter_w(0, data & 1);
-	machine().bookkeeping().coin_counter_w(1, data & 2);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 }
 
 u8 seibu_sound_device::soundlatch_r(offs_t offset)
@@ -260,8 +269,8 @@ void seibu_sound_device::main_data_w(offs_t offset, u8 data)
 void seibu_sound_device::pending_w(u8)
 {
 	/* just a guess */
-	m_main2sub_pending = 0;
-	m_sub2main_pending = 1;
+	m_main2sub_pending = false;
+	m_sub2main_pending = true;
 }
 
 u8 seibu_sound_device::main_r(offs_t offset)
@@ -271,7 +280,7 @@ u8 seibu_sound_device::main_r(offs_t offset)
 	{
 		case 2:
 		case 3:
-			return m_sub2main[offset-2];
+			return m_sub2main[offset - 2];
 		case 5:
 			return m_main2sub_pending ? 1 : 0;
 		default:
@@ -294,8 +303,8 @@ void seibu_sound_device::main_w(offs_t offset, u8 data)
 		case 2: //Sengoku Mahjong writes here
 		case 6:
 			/* just a guess */
-			m_sub2main_pending = 0;
-			m_main2sub_pending = 1;
+			m_sub2main_pending = false;
+			m_main2sub_pending = true;
 			break;
 		default:
 			//logerror("%s: seibu_main_w(%x,%02x)\n",machine().describe_context(),offset,data);
@@ -330,18 +339,18 @@ void seibu_sound_common::seibu_sound_map(address_map &map)
 	map(0x4008, 0x4009).rw("seibu_sound", FUNC(seibu_sound_device::ym_r), FUNC(seibu_sound_device::ym_w));
 	map(0x4010, 0x4011).r("seibu_sound", FUNC(seibu_sound_device::soundlatch_r));
 	map(0x4012, 0x4012).r("seibu_sound", FUNC(seibu_sound_device::main_data_pending_r));
-	map(0x4013, 0x4013).portr("COIN");
+	map(0x4013, 0x4013).r("seibu_sound", FUNC(seibu_sound_device::coin_r));
 	map(0x4018, 0x4019).w("seibu_sound", FUNC(seibu_sound_device::main_data_w));
 	map(0x401b, 0x401b).w("seibu_sound", FUNC(seibu_sound_device::coin_w));
 	map(0x6000, 0x6000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x8000, 0xffff).bankr("seibu_bank1");
+	map(0x8000, 0xffff).bankr("seibu_bank");
 }
 
 /***************************************************************************/
 
 DEFINE_DEVICE_TYPE(SEI80BU, sei80bu_device, "sei80bu", "SEI80BU Encrypted Z80 Interface")
 
-sei80bu_device::sei80bu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sei80bu_device::sei80bu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, SEI80BU, tag, owner, clock),
 		device_rom_interface(mconfig, *this)
 {
@@ -349,7 +358,7 @@ sei80bu_device::sei80bu_device(const machine_config &mconfig, const char *tag, d
 
 u8 sei80bu_device::data_r(offs_t offset)
 {
-	u16 a = offset;
+	u16 const a = offset;
 	u8 src = read_byte(offset);
 
 	if ( BIT(a,9)  &  BIT(a,8))             src ^= 0x80;
@@ -366,7 +375,7 @@ u8 sei80bu_device::data_r(offs_t offset)
 
 u8 sei80bu_device::opcode_r(offs_t offset)
 {
-	u16 a = offset;
+	u16 const a = offset;
 	u8 src = read_byte(offset);
 
 	if ( BIT(a,9)  &  BIT(a,8))             src ^= 0x80;
@@ -393,13 +402,13 @@ u8 sei80bu_device::opcode_r(offs_t offset)
 
 DEFINE_DEVICE_TYPE(SEIBU_ADPCM, seibu_adpcm_device, "seibu_adpcm", "Seibu ADPCM interface")
 
-seibu_adpcm_device::seibu_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+seibu_adpcm_device::seibu_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, SEIBU_ADPCM, tag, owner, clock)
 	, m_msm(*this, finder_base::DUMMY_TAG)
 	, m_current(0)
 	, m_end(0)
 	, m_nibble(0)
-	, m_playing(0)
+	, m_playing(false)
 	, m_base(*this, DEVICE_SELF)
 {
 }
@@ -418,7 +427,7 @@ void seibu_adpcm_device::device_start()
 
 void seibu_adpcm_device::device_reset()
 {
-	m_playing = 0;
+	m_playing = false;
 	m_msm->reset_w(1);
 }
 
@@ -438,11 +447,11 @@ void seibu_adpcm_device::adr_w(offs_t offset, u8 data)
 {
 	if (offset)
 	{
-		m_end = data<<8;
+		m_end = data << 8;
 	}
 	else
 	{
-		m_current = data<<8;
+		m_current = data << 8;
 		m_nibble = 4;
 	}
 }
@@ -454,13 +463,13 @@ void seibu_adpcm_device::ctl_w(u8 data)
 	{
 		case 0:
 			m_msm->reset_w(1);
-			m_playing = 0;
+			m_playing = false;
 			break;
 		case 2:
 			break;
 		case 1:
 			m_msm->reset_w(0);
-			m_playing = 1;
+			m_playing = true;
 			break;
 	}
 }
@@ -470,7 +479,7 @@ void seibu_adpcm_device::msm_int(int state)
 	if (!state || !m_playing)
 		return;
 
-	int val = (m_base[m_current] >> m_nibble) & 15;
+	u8 const val = (m_base[m_current] >> m_nibble) & 15;
 	m_msm->data_w(val);
 
 	m_nibble ^= 4;
@@ -480,7 +489,7 @@ void seibu_adpcm_device::msm_int(int state)
 		if (m_current >= m_end)
 		{
 			m_msm->reset_w(1);
-			m_playing = 0;
+			m_playing = false;
 		}
 	}
 }

@@ -831,7 +831,7 @@ void segaorun_state::update_main_irqs()
 
 	// boost interleave during VBLANK and IRQ2 signals
 	if (m_vblank_irq_state || m_irq2_state)
-		machine().scheduler().perfect_quantum(attotime::from_usec(100));
+		machine().scheduler().add_quantum(attotime::from_ticks(4, m_maincpu->clock()), attotime::from_usec(100));
 }
 
 

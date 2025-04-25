@@ -36,8 +36,9 @@ public:
 	auto p0() { return m_out_p0_cb.bind(); }
 	auto p1() { return m_out_p1_cb.bind(); }
 
-	uint8_t snesdsp_read(bool mode);
-	void snesdsp_write(bool mode, uint8_t data);
+	uint8_t status_r();
+	uint8_t data_r();
+	void data_w(uint8_t data);
 
 protected:
 	// construction/destruction
@@ -175,7 +176,10 @@ public:
 	upd96050_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	uint16_t dataram_r(uint16_t addr) { return dataRAM[addr & 0x07ff]; }
-	void dataram_w(uint16_t addr, uint16_t data) { dataRAM[addr & 0x07ff] = data; }
+	void dataram_w(uint16_t addr, uint16_t data, uint16_t mem_mask = uint16_t(~0))
+	{
+		COMBINE_DATA(&dataRAM[addr & 0x07ff]);
+	}
 };
 
 // device type definition

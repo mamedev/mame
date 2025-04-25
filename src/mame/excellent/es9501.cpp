@@ -141,19 +141,8 @@ static INPUT_PORTS_START( specd9 )
 INPUT_PORTS_END
 
 
-static const gfx_layout char_16x16_layout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0,1,2,3 },
-	{ 4,0, 12,8, 20,16, 28,24, 36,32, 44,40, 52,48, 60,56 },
-	{ STEP16(0,8*8) },
-	8*8*16
-};
-
 static GFXDECODE_START( gfx_es9501 )
-	GFXDECODE_ENTRY( "gfx", 0, char_16x16_layout, 0, 0x10 )
+	GFXDECODE_ENTRY( "gfx", 0, gfx_16x16x4_packed_lsb, 0, 0x10 )
 GFXDECODE_END
 
 

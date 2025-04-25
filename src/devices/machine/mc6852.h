@@ -47,6 +47,8 @@ public:
 	void set_rx_clock(int clock) { m_rx_clock = clock; }
 	void set_tx_clock(int clock) { m_tx_clock = clock; }
 
+	void set_tx_pull_mode(bool tx_pull_mode) { m_tx_pull_mode = tx_pull_mode; }
+
 	auto tx_data_callback() { return m_write_tx_data.bind(); }
 	auto irq_callback() { return m_write_irq.bind(); }
 	auto sm_dtr_callback() { return m_write_sm_dtr.bind(); }
@@ -120,7 +122,8 @@ private:
 		C2_1_2_BYTE = 0x04,
 		C2_PC_MASK = 0x03,
 		C2_PC2 = 0x02,
-		C2_PC1 = 0x01
+		C2_PC1 = 0x01,
+		C2_WS_SHIFT = 3
 	};
 
 	enum
@@ -146,6 +149,13 @@ private:
 
 	std::queue<uint8_t> m_rx_fifo;
 	std::queue<uint8_t> m_tx_fifo;
+
+	// If m_tx_pull_mode is true, get_tx_byte() must be called to retrieve
+	// the next byte to transmit, and the actual transmission must be
+	// carried out by some external mechanism.
+	bool m_tx_pull_mode;
+
+	bool m_tx_active;
 
 	int m_rx_clock;
 	int m_tx_clock;

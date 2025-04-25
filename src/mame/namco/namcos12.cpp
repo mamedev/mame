@@ -3557,7 +3557,7 @@ ROM_START( truckk )
 	ROM_LOAD( "tkk1prg0.ic7",             0x0000000, 0x020000, CRC(11fd9c31) SHA1(068b8364ec0eb1e88f9f85f40b8b322876f6f3e2) )
 
 	DISK_REGION( "cdxa_pcb:ata:0:cdrom" )
-	DISK_IMAGE_READONLY( "tkk2-a", 0, SHA1(6b7c3686b22a508c44f67295b188504b757dd482) )
+	DISK_IMAGE_READONLY( "tkk2-a", 0, SHA1(6b7c3686b22a508c44f67295b188504b757dd482) ) // TKK1-A CD is confirmed to have the same content as the TKK2-A CD
 ROM_END
 
 ROM_START( ujlnow )
@@ -3641,7 +3641,9 @@ GAME( 1999, pacappsp,   0,        coh700b,  pacapp2,  namcos12_state,         em
 GAME( 1999, aquarush,   0,        coh700,   lbgrande, namcos12_state,         empty_init, ROT0, "Namco",           "Aqua Rush (Japan, AQ1/VER.A1)", 0 ) /* KC053 */
 GAME( 1999, golgo13,    0,        golgo13,  golgo13,  golgo13_state,          empty_init, ROT0, "Eighting / Raizing / Namco", "Golgo 13 (Japan, GLG1/VER.A)", 0 ) /* KC054 */
 GAME( 2000, sws2000,    0,        coh700b,  namcos12, namcos12_state,         empty_init, ROT0, "Namco",           "Super World Stadium 2000 (Japan, SS01/VER.A)", MACHINE_NOT_WORKING ) /* KC055 */
-GAME( 2000, truckk,     0,        truckk,   truckk,   truckk_state,           empty_init, ROT0, "Metro / Namco",   "Truck Kyosokyoku (Japan, TKK2/VER.A)", MACHINE_IMPERFECT_SOUND ) /* KC056 */
+// truckk can't be a Japanese set despite the game title still being in Japanese.  The option for in-game Japanese text is disabled in this set, and it has a Parental Advisory screen usually associated with US releases
+// TKK1 is probably the Japanese release, although a TKK1 CD contains identical data to a TKK2 CD, so any difference is in the ROM data rather than the CD
+GAME( 2000, truckk,     0,        truckk,   truckk,   truckk_state,           empty_init, ROT0, "Metro / Namco",   "Truck Kyosokyoku (US?, TKK2/VER.A)", MACHINE_IMPERFECT_SOUND ) /* KC056 */
 GAME( 2000, kartduel,   0,        kartduel, kartduel, kartduel_state,         empty_init, ROT0, "Gaps / Namco",    "Kart Duel (World, KTD2/VER.A)", 0 ) /* KC057 */
 GAME( 2000, kartduelja, kartduel, kartduel, kartduel, kartduel_state,         empty_init, ROT0, "Gaps / Namco",    "Kart Duel (Japan, KTD1/VER.A)", 0 ) /* KC057 */
 GAME( 2000, g13knd,     0,        golgo13,  golgo13,  golgo13_state,          empty_init, ROT0, "Eighting / Raizing / Namco", "Golgo 13 Kiseki no Dandou (Japan, GLS1/VER.A)", 0 ) /* KC059 */

@@ -71,7 +71,7 @@
 
 void tms3203x_device::illegal(uint32_t op)
 {
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if (debugger_enabled())
 	{
 		logerror("Illegal op @ %06X: %08X (tbl=%03X)\n", m_pc - 1, op, op >> 21);
 		machine().debug_break();
@@ -5492,7 +5492,7 @@ inline void tms3203x_device::execute_delayed(uint32_t newpc)
 {
 	m_delayed = true;
 
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) == 0)
+	if (!debugger_enabled())
 	{
 		execute_one();
 		execute_one();

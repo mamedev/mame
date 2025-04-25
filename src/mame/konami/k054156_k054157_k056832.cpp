@@ -506,7 +506,7 @@ void k056832_device::get_tile_info(  tile_data &tileinfo, int tile_index, int pa
 	color = (attr & smptr->palm1) | (attr >> smptr->pals2 & smptr->palm2);
 	flags = TILE_FLIPYX(flip);
 
-	m_k056832_cb(layer, &code, &color, &flags, &priority);
+	m_k056832_cb(layer, &code, &color, &flags, &priority, attr);
 
 	tileinfo.set(m_gfx_num,
 			code,

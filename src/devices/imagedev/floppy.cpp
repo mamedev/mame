@@ -610,7 +610,10 @@ std::pair<std::error_condition, const floppy_image_format_t *> floppy_image_devi
 		}
 	}
 
-	return{ std::error_condition(), best_format };
+	if(best_format)
+		return{ std::error_condition(), best_format };
+	else
+		return{ image_error::INVALIDIMAGE, nullptr };
 }
 
 void floppy_image_device::init_floppy_load(bool write_supported)

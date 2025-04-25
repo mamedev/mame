@@ -47,8 +47,7 @@ void nsc800_device::device_reset()
 //-------------------------------------------------
 //  execute
 //-------------------------------------------------
-
-void nsc800_device::do_op()
+void nsc800_device::execute_run()
 {
 	#include "cpu/z80/ncs800.hxx"
 }

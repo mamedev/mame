@@ -2,9 +2,9 @@
 // copyright-holders:Aaron Giles, Paul Leaman
 /***************************************************************************
 
-    Cinemat/Leland driver
+    Cinematronics / Leland Cinemat System driver
 
-    driver by Aaron Giles and Paul Leaman
+    Leland machine hardware
 
 ***************************************************************************/
 
@@ -34,11 +34,9 @@
 #define VERBOSE             LOG_WARN
 #include "logmacro.h"
 
+
+
 /* Internal routines */
-
-
-
-
 
 /*************************************
  *
@@ -104,7 +102,6 @@ u8 leland_state::cerberus_dial_2_r()
  *  Alley Master inputs
  *
  *************************************/
-
 
 void leland_state::alleymas_joystick_kludge(u8 data)
 {
@@ -416,7 +413,7 @@ void ataxx_state::machine_reset()
 
 TIMER_CALLBACK_MEMBER(leland_state::leland_interrupt_callback)
 {
-	int scanline = param;
+	u8 scanline = param;
 
 	/* interrupts generated on the VA10 line, which is every */
 	/* 16 scanlines starting with scanline #8 */
@@ -424,15 +421,13 @@ TIMER_CALLBACK_MEMBER(leland_state::leland_interrupt_callback)
 
 	/* set a timer for the next one */
 	scanline += 16;
-	if (scanline > 248)
-		scanline = 8;
 	m_master_int_timer->adjust(m_screen->time_until_pos(scanline), scanline);
 }
 
 
 TIMER_CALLBACK_MEMBER(leland_state::ataxx_interrupt_callback)
 {
-	int scanline = param;
+	u8 scanline = param;
 
 	/* interrupts generated according to the interrupt control register */
 	m_master->set_input_line(0, HOLD_LINE);
@@ -859,6 +854,7 @@ void ataxx_state::ataxx_battery_ram_w(offs_t offset, u8 data)
 	}
 	else if ((m_master_bank & 0x30) == 0x20)
 	{
+		m_screen->update_partial(m_screen->vpos() - 1);
 		m_ataxx_qram[((m_master_bank & 0xc0) << 8) | offset] = data;
 		m_tilemap->mark_tile_dirty(((m_master_bank & 0x80) << 8) | offset);
 	}
@@ -1208,8 +1204,11 @@ void ataxx_state::ataxx_master_output_w(offs_t offset, u8 data)
 			break;
 
 		case 0x08:  /*  */
-			m_master_int_timer->adjust(m_screen->time_until_pos(data + 1), data + 1);
+		{
+			u8 scanline = data + 1;
+			m_master_int_timer->adjust(m_screen->time_until_pos(scanline), scanline);
 			break;
+		}
 
 		default:
 			LOGMASKED(LOG_WARN, "Master I/O write offset %02X=%02X\n", offset, data);
@@ -1410,9 +1409,8 @@ void leland_state::rotate_memory(const char *cpuname)
 	int banks = (memregion(cpuname)->bytes() - startaddr) / 0x8000;
 	u8 *ram = memregion(cpuname)->base();
 	u8 temp[0x2000];
-	int i;
 
-	for (i = 0; i < banks; i++)
+	for (int i = 0; i < banks; i++)
 	{
 		memmove(temp, &ram[startaddr + 0x0000], 0x2000);
 		memmove(&ram[startaddr + 0x0000], &ram[startaddr + 0x2000], 0x6000);

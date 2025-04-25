@@ -1784,7 +1784,7 @@ ROM_START( grobda3 )
 	ROM_LOAD( "gr1-3.3m",  0x0000, 0x0100, CRC(66eb1467) SHA1(02b99ced4afd9ac139f634739769f7bf353274f9) )
 ROM_END
 
-ROM_START( phozon )
+ROM_START( phozon ) // 22139611 PCB
 	ROM_REGION( 0x10000, "maincpu", 0 ) // 64k for code for the MAIN CPU
 	ROM_LOAD( "6e.rom", 0x8000, 0x2000, CRC(a6686af1) SHA1(87a948b289356675d0418c87c3c0ae36ceba3ee0) )
 	ROM_LOAD( "6h.rom", 0xa000, 0x2000, CRC(72a65ba0) SHA1(b1d5146c009469d4c6695f08ea2c6ad5d05b5b9b) )
@@ -1814,6 +1814,11 @@ ROM_START( phozon )
 
 	ROM_REGION( 0x0100, "namco", 0 )    // sound PROMs
 	ROM_LOAD( "sound.prm", 0x0000, 0x0100, CRC(ad43688f) SHA1(072f427453efb1dda8147da61804fff06e1bc4d5) )
+
+	ROM_REGION( 0x600, "plds", ROMREGION_ERASE00 ) // bruteforced, target device is GAL16V8
+	ROM_LOAD( "ph1-7.7b", 0x000, 0x117, CRC(9a00af9a) SHA1(b5d5a3d8a091e0e3d62b2cce34ae9b8dc1cfcbff) )
+	ROM_LOAD( "ph1-8.4b", 0x200, 0x117, CRC(fb180f00) SHA1(c0a355fb5287e715b0c39b78eacfdcd00db953b1) )
+	ROM_LOAD( "ph1-9.7r", 0x400, 0x117, CRC(3b21d560) SHA1(905f9a6b7440b2eeb34475879751748300b42428) )
 ROM_END
 
 ROM_START( phozons )
@@ -1846,7 +1851,7 @@ ROM_START( phozons )
 	ROM_REGION( 0x0100, "namco", 0 )    // sound PROMs
 	ROM_LOAD( "ph1-4.3e", 0x0000, 0x0100, CRC(ad43688f) SHA1(072f427453efb1dda8147da61804fff06e1bc4d5) )
 
-	ROM_REGION( 0x0600, "plds", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0600, "plds", ROMREGION_ERASE00 ) // bruteforced, target device is GAL16V8
 	ROM_LOAD( "ph1-7.7b", 0x0000, 0x0117, CRC(9a00af9a) SHA1(b5d5a3d8a091e0e3d62b2cce34ae9b8dc1cfcbff) )
 	ROM_LOAD( "ph1-8.4b", 0x0200, 0x0117, CRC(fb180f00) SHA1(c0a355fb5287e715b0c39b78eacfdcd00db953b1) )
 	ROM_LOAD( "ph1-9.7r", 0x0400, 0x0117, CRC(3b21d560) SHA1(905f9a6b7440b2eeb34475879751748300b42428) )

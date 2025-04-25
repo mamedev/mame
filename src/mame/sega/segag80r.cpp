@@ -75,6 +75,10 @@
         * Unknown boardset (background doesn't match consolidated)
         * System 1 Sound (Z80, 2xSN76496)
 
+    From the way this PCB recording sounds (notably the hole open/close sound
+    effect), there's also a Sindbad Mystery with different sound hardware,
+    possibly Sega USB: https://x.com/ZAVIGA84/status/1905972208390062179
+
 ****************************************************************************
 
     See also segag80v.cpp for the Sega G-80 Vector games.
@@ -124,7 +128,6 @@
 
 #define CPU_CLOCK           8_MHz_XTAL     /* not used when video board is connected */
 #define VIDEO_CLOCK         15.46848_MHz_XTAL
-#define SINDBADM_SOUND_CLOCK 8_MHz_XTAL
 
 #define PIXEL_CLOCK         (VIDEO_CLOCK/3)
 
@@ -312,13 +315,10 @@ void segag80r_state::sindbadm_misc_w(uint8_t data)
 
 
 /* the data lines are flipped */
-void segag80r_state::sindbadm_sn1_SN76496_w(uint8_t data)
+template <int N>
+void segag80r_state::sindbadm_sn_w(uint8_t data)
 {
-	m_sn1->write(bitswap<8>(data, 0,1,2,3,4,5,6,7));
-}
-void segag80r_state::sindbadm_sn2_SN76496_w(uint8_t data)
-{
-	m_sn2->write(bitswap<8>(data, 0,1,2,3,4,5,6,7));
+	m_sn[N]->write(bitswap<8>(data, 0,1,2,3,4,5,6,7));
 }
 
 
@@ -395,8 +395,8 @@ void segag80r_state::sindbadm_sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x8000, 0x87ff).mirror(0x1800).ram();
-	map(0xa000, 0xa003).mirror(0x1ffc).w(FUNC(segag80r_state::sindbadm_sn1_SN76496_w));
-	map(0xc000, 0xc003).mirror(0x1ffc).w(FUNC(segag80r_state::sindbadm_sn2_SN76496_w));
+	map(0xa000, 0xa003).mirror(0x1ffc).w(FUNC(segag80r_state::sindbadm_sn_w<0>));
+	map(0xc000, 0xc003).mirror(0x1ffc).w(FUNC(segag80r_state::sindbadm_sn_w<1>));
 	map(0xe000, 0xe000).mirror(0x1fff).r("ppi8255", FUNC(i8255_device::acka_r));
 }
 
@@ -973,14 +973,13 @@ void segag80r_state::sindbadm(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	/* sound boards */
-	Z80(config, m_audiocpu, SINDBADM_SOUND_CLOCK/2);
+	Z80(config, m_audiocpu, 8_MHz_XTAL/2);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &segag80r_state::sindbadm_sound_map);
 	m_audiocpu->set_periodic_int(FUNC(segag80r_state::irq0_line_hold), attotime::from_hz(4*60));
 
 	/* sound hardware */
-	SN76496(config, m_sn1, SINDBADM_SOUND_CLOCK/2).add_route(ALL_OUTPUTS, "speaker", 1.0); /* matches PCB videos, correct? */
-
-	SN76496(config, m_sn2, SINDBADM_SOUND_CLOCK/4).add_route(ALL_OUTPUTS, "speaker", 1.0); /* matches PCB videos, correct? */
+	SN76496(config, m_sn[0], 8_MHz_XTAL/2).add_route(ALL_OUTPUTS, "speaker", 1.0); // matches PCB videos, correct?
+	SN76496(config, m_sn[1], 8_MHz_XTAL/4).add_route(ALL_OUTPUTS, "speaker", 1.0); // "
 }
 
 

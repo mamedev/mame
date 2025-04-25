@@ -308,11 +308,6 @@ protected:
 		// wants SSG streams first; to do this, we rotate the outputs
 		// by the number of SSG output channels
 		parent::update_internal(outputs, ChipClass::SSG_OUTPUTS);
-
-		// for the single-output case, also apply boost the gain to better match
-		// previous version, which summed instead of averaged the outputs
-		if (ChipClass::SSG_OUTPUTS == 1)
-			outputs[0].apply_gain(3.0);
 	}
 };
 

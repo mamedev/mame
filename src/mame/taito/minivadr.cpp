@@ -3,12 +3,12 @@
 /***************************************************************************
 
 Mini Vaders (Space Invaders's mini game)
-(c)1990 Taito Corporation
+(c) 1990 Taito Corporation
 
 Driver by Takahiro Nogi 1999/12/19 -
 
-This is a test board sold together with the cabinet (as required by law in
-Japan). It has no sound.
+This is a test board sold together with cabinets (as required by law in
+Japan).  It has no sound.
 
 PCB Layout
 ----------
@@ -45,18 +45,20 @@ class minivadr_state : public driver_device
 {
 public:
 	minivadr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_videoram(*this, "videoram"),
-		m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag)
+		, m_videoram(*this, "videoram")
+		, m_maincpu(*this, "maincpu")
+	{}
 
-	void minivadr(machine_config &config);
+	void minivadr(machine_config &config) ATTR_COLD;
 
 private:
-	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
-	uint32_t screen_update_minivadr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
-	void minivadr_map(address_map &map) ATTR_COLD;
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 /*************************************
@@ -65,21 +67,15 @@ private:
  *
  *************************************/
 
-uint32_t minivadr_state::screen_update_minivadr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t minivadr_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	for (offs_t offs = 0; offs < m_videoram.bytes(); offs++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		uint8_t x = offs << 3;
-		const int y = offs >> 5;
-		uint8_t data = m_videoram[offs];
-
-		for (int i = 0; i < 8; i++)
+		uint8_t const *const src = &m_videoram[y << 5];
+		uint32_t *const dst = &bitmap.pix(y);
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
-			pen_t pen = (data & 0x80) ? rgb_t::white() : rgb_t::black();
-			bitmap.pix(y, x) = pen;
-
-			data <<= 1;
-			x++;
+			dst[x] = BIT(src[x >> 3], ~x & 7) ? rgb_t::white() : rgb_t::black();
 		}
 	}
 
@@ -87,10 +83,10 @@ uint32_t minivadr_state::screen_update_minivadr(screen_device &screen, bitmap_rg
 }
 
 
-void minivadr_state::minivadr_map(address_map &map)
+void minivadr_state::main_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-	map(0xa000, 0xbfff).ram().share("videoram");
+	map(0xa000, 0xbfff).ram().share(m_videoram);
 	map(0xe008, 0xe008).portr("INPUTS").nopw();     // W - ???
 }
 
@@ -110,20 +106,20 @@ INPUT_PORTS_END
 
 void minivadr_state::minivadr(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(24'000'000) / 6);
-	m_maincpu->set_addrmap(AS_PROGRAM, &minivadr_state::minivadr_map);
+	// basic machine hardware
+	Z80(config, m_maincpu, 24_MHz_XTAL / 6);
+	m_maincpu->set_addrmap(AS_PROGRAM, &minivadr_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(minivadr_state::irq0_line_hold));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(256, 256);
 	screen.set_visarea(0, 256-1, 16, 240-1);
-	screen.set_screen_update(FUNC(minivadr_state::screen_update_minivadr));
+	screen.set_screen_update(FUNC(minivadr_state::screen_update));
 
-	/* the board has no sound hardware */
+	// the board has no sound hardware
 }
 
 

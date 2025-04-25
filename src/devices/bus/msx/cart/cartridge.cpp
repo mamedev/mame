@@ -42,6 +42,7 @@
 #include "super_swangi.h"
 #include "superloderunner.h"
 #include "yamaha_ucn01.h"
+#include "video80.h"
 
 #include "bus/msx/slot/cartridge.h"
 
@@ -100,6 +101,7 @@ void msx_cart(device_slot_interface &device, bool is_in_subslot)
 	device.option_add_internal(slotoptions::SUPERLODERUNNER, MSX_CART_SUPERLODERUNNER);
 	device.option_add_internal(slotoptions::SYNTHESIZER,     MSX_CART_SYNTHESIZER);
 	device.option_add_internal(slotoptions::EC701,           MSX_CART_EC701);
+	device.option_add_internal(slotoptions::VIDEO80,         MSX_CART_VIDEO80);
 	device.option_add(slotoptions::BEEPACK,        MSX_CART_BEEPACK);
 	device.option_add(slotoptions::BM_012,         MSX_CART_BM_012);
 	device.option_add(slotoptions::FRANKY,         MSX_CART_FRANKY);

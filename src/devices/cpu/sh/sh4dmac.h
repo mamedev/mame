@@ -26,38 +26,3 @@
 #define DMAOR_AE    0x0004
 #define DMAOR_NMIF  0x0002
 #define DMAOR_DME   0x0001
-
-void sh4_handle_sar0_addr_w(uint32_t data, uint32_t mem_mask);
-void sh4_handle_sar1_addr_w(uint32_t data, uint32_t mem_mask);
-void sh4_handle_sar2_addr_w(uint32_t data, uint32_t mem_mask);
-void sh4_handle_sar3_addr_w(uint32_t data, uint32_t mem_mask);
-void sh4_handle_dar0_addr_w(uint32_t data, uint32_t mem_mask);
-void sh4_handle_dar1_addr_w(uint32_t data, uint32_t mem_mask);
-void sh4_handle_dar2_addr_w(uint32_t data, uint32_t mem_mask);
-void sh4_handle_dar3_addr_w(uint32_t data, uint32_t mem_mask);
-void sh4_handle_dmatcr0_addr_w(uint32_t data, uint32_t mem_mask);
-void sh4_handle_dmatcr1_addr_w(uint32_t data, uint32_t mem_mask);
-void sh4_handle_dmatcr2_addr_w(uint32_t data, uint32_t mem_mask);
-void sh4_handle_dmatcr3_addr_w(uint32_t data, uint32_t mem_mask);
-void sh4_handle_chcr0_addr_w(uint32_t data, uint32_t mem_mask);
-void sh4_handle_chcr1_addr_w(uint32_t data, uint32_t mem_mask);
-void sh4_handle_chcr2_addr_w(uint32_t data, uint32_t mem_mask);
-void sh4_handle_chcr3_addr_w(uint32_t data, uint32_t mem_mask);
-void sh4_handle_dmaor_addr_w(uint32_t data, uint32_t mem_mask);
-uint32_t sh4_handle_sar0_addr_r(uint32_t mem_mask);
-uint32_t sh4_handle_sar1_addr_r(uint32_t mem_mask);
-uint32_t sh4_handle_sar2_addr_r(uint32_t mem_mask);
-uint32_t sh4_handle_sar3_addr_r(uint32_t mem_mask);
-uint32_t sh4_handle_dar0_addr_r(uint32_t mem_mask);
-uint32_t sh4_handle_dar1_addr_r(uint32_t mem_mask);
-uint32_t sh4_handle_dar2_addr_r(uint32_t mem_mask);
-uint32_t sh4_handle_dar3_addr_r(uint32_t mem_mask);
-uint32_t sh4_handle_dmatcr0_addr_r(uint32_t mem_mask);
-uint32_t sh4_handle_dmatcr1_addr_r(uint32_t mem_mask);
-uint32_t sh4_handle_dmatcr2_addr_r(uint32_t mem_mask);
-uint32_t sh4_handle_dmatcr3_addr_r(uint32_t mem_mask);
-uint32_t sh4_handle_chcr0_addr_r(uint32_t mem_mask);
-uint32_t sh4_handle_chcr1_addr_r(uint32_t mem_mask);
-uint32_t sh4_handle_chcr2_addr_r(uint32_t mem_mask);
-uint32_t sh4_handle_chcr3_addr_r(uint32_t mem_mask);
-uint32_t sh4_handle_dmaor_addr_r(uint32_t mem_mask);

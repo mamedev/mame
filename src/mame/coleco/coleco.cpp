@@ -345,7 +345,6 @@ static INPUT_PORTS_START( bit90 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SPACE") PORT_CODE(KEYCODE_SPACE)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FCTN") PORT_CODE(KEYCODE_RCONTROL)
-
 INPUT_PORTS_END
 
 /* Interrupts */
@@ -575,6 +574,7 @@ void coleco_state::coleco(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(7'159'090)/2); // 3.579545 MHz
+	m_maincpu->z80_set_m1_cycles(4+1); // 1 WAIT CLK per M1
 	m_maincpu->set_addrmap(AS_PROGRAM, &coleco_state::coleco_map);
 	m_maincpu->set_addrmap(AS_IO, &coleco_state::coleco_io_map);
 
@@ -589,8 +589,7 @@ void coleco_state::coleco(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	sn76489a_device &psg(SN76489A(config, "sn76489a", XTAL(7'159'090)/2)); // 3.579545 MHz
 	psg.add_route(ALL_OUTPUTS, "mono", 1.00);
-	// TODO: enable when Z80 has better WAIT pin emulation, this currently breaks pitfall2 for example
-	//psg.ready_cb().set_inputline("maincpu", Z80_INPUT_LINE_WAIT).invert();
+	psg.ready_cb().set_inputline("maincpu", Z80_INPUT_LINE_WAIT).invert();
 
 	/* cartridge */
 	COLECOVISION_CARTRIDGE_SLOT(config, m_cart, colecovision_cartridges, nullptr);
@@ -624,6 +623,7 @@ void bit90_state::bit90(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(7'159'090)/2); // 3.579545 MHz
+	m_maincpu->z80_set_m1_cycles(4+1); // 1 WAIT CLK per M1
 	m_maincpu->set_addrmap(AS_PROGRAM, &bit90_state::bit90_map);
 	m_maincpu->set_addrmap(AS_IO, &bit90_state::bit90_io_map);
 
@@ -638,8 +638,7 @@ void bit90_state::bit90(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	sn76489a_device &psg(SN76489A(config, "sn76489a", XTAL(7'159'090)/2)); // 3.579545 MHz
 	psg.add_route(ALL_OUTPUTS, "mono", 1.00);
-	// TODO: enable when Z80 has better WAIT pin emulation, this currently breaks pitfall2 for example
-	//psg.ready_cb().set_inputline("maincpu", Z80_INPUT_LINE_WAIT).invert();
+	psg.ready_cb().set_inputline("maincpu", Z80_INPUT_LINE_WAIT).invert();
 
 	/* cartridge */
 	COLECOVISION_CARTRIDGE_SLOT(config, m_cart, colecovision_cartridges, nullptr);

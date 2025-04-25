@@ -558,7 +558,7 @@ void segaxbd_state::iocontrol_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 void segaxbd_state::loffire_sync0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_loffire_sync[offset]);
-	machine().scheduler().perfect_quantum(attotime::from_usec(10));
+	machine().scheduler().add_quantum(attotime::from_ticks(4, m_maincpu->clock()), attotime::from_usec(10));
 }
 
 
@@ -803,7 +803,7 @@ void segaxbd_state::update_main_irqs()
 	if (irq)
 	{
 		m_maincpu->set_input_line(irq, ASSERT_LINE);
-		machine().scheduler().perfect_quantum(attotime::from_usec(100));
+		machine().scheduler().add_quantum(attotime::from_ticks(4, m_maincpu->clock()), attotime::from_usec(100));
 	}
 }
 
@@ -816,7 +816,7 @@ void segaxbd_state::update_main_irqs()
 void segaxbd_state::m68k_reset_callback(int state)
 {
 	m_subcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-	machine().scheduler().perfect_quantum(attotime::from_usec(100));
+	machine().scheduler().add_quantum(attotime::from_ticks(4, m_maincpu->clock()), attotime::from_usec(100));
 }
 
 
@@ -1181,6 +1181,42 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( aburner2 )
 	PORT_INCLUDE( aburner )
+
+	PORT_MODIFY("mainpcb:IO1PORTC")
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SWA:1,2,3,4")
+	PORT_DIPSETTING(    0x0a, DEF_STR( 7C_1C ) )
+	PORT_DIPSETTING(    0x0b, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x09, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x05, "2 Coins/1 Credit, 3/2, 5/3, 6/4" )
+	PORT_DIPSETTING(    0x04, "2 Coins/1 Credit, 4/3" )
+	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x03, "1 Coin/1 Credit, 5/6" )
+	PORT_DIPSETTING(    0x02, "1 Coin/1 Credit, 4/5" )
+	PORT_DIPSETTING(    0x06, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x01, "1 Coin/1 Credit, 2/3" )
+	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x00, "Free Play (if Coin B too) or 1/1" )
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SWA:5,6,7,8")
+	PORT_DIPSETTING(    0xa0, DEF_STR( 7C_1C ) )
+	PORT_DIPSETTING(    0xb0, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x70, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x90, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x50, "2 Coins/1 Credit, 3/2, 5/3, 6/4" )
+	PORT_DIPSETTING(    0x40, "2 Coins/1 Credit, 4/3" )
+	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x30, "1 Coin/1 Credit, 5/6" )
+	PORT_DIPSETTING(    0x20, "1 Coin/1 Credit, 4/5" )
+	PORT_DIPSETTING(    0x60, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x10, "1 Coin/1 Credit, 2/3" )
+	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x00, "Free Play (if Coin A too) or 1/1" )
 
 	PORT_MODIFY("mainpcb:IO1PORTD")
 	PORT_DIPNAME( 0x03, 0x01, "Cabinet Type" ) PORT_DIPLOCATION("SWB:1,2")

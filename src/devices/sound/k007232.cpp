@@ -70,7 +70,7 @@ void k007232_device::device_start()
 	space(0).cache(m_cache);
 
 	/* Set up the chips */
-	for (int i = 0; i < KDAC_A_PCM_MAX; i++)
+	for (int i = 0; i < PCM_MAX; i++)
 	{
 		m_channel[i].addr = 0;
 		m_channel[i].start = 0;
@@ -87,7 +87,7 @@ void k007232_device::device_start()
 	for (auto & elem : m_wreg)
 		elem = 0;
 
-	m_stream = stream_alloc(0, 2, clock()/128);
+	m_stream = stream_alloc(0, 2, clock() / 128);
 
 	save_item(STRUCT_MEMBER(m_channel, vol));
 	save_item(STRUCT_MEMBER(m_channel, addr));
@@ -106,7 +106,7 @@ void k007232_device::device_start()
 
 void k007232_device::device_clock_changed()
 {
-	m_stream->set_sample_rate(clock()/128);
+	m_stream->set_sample_rate(clock() / 128);
 }
 
 //-------------------------------------------------
@@ -140,8 +140,8 @@ void k007232_device::write(offs_t offset, u8 data)
 	}
 	else
 	{
-		channel_t *channel = &m_channel[(offset >= 6 ? 1 : 0)];
-		int reg_index = (offset >= 6 ? 6 : 0);
+		channel_t &channel = m_channel[(offset >= 6 ? 1 : 0)];
+		int const reg_index = (offset >= 6 ? 6 : 0);
 		if (offset >= 6)
 			offset -= 6;
 
@@ -149,21 +149,21 @@ void k007232_device::write(offs_t offset, u8 data)
 		{
 		case 0: // address step, LSB
 		case 1: // address step, MSB
-			channel->step = (BIT(m_wreg[reg_index + 1], 0, 4) << 8) | m_wreg[reg_index];
+			channel.step = (BIT(m_wreg[reg_index + 1], 0, 4) << 8) | m_wreg[reg_index];
 			// TODO: Bit 4-5 is frequency divider, but not implemented now
 			break;
 		case 2:
 		case 3:
 		case 4:
 			// working data for start address
-			channel->start = (BIT(m_wreg[reg_index + 4], 0) << 16) | (m_wreg[reg_index + 3] << 8) | m_wreg[reg_index + 2];
+			channel.start = (BIT(m_wreg[reg_index + 4], 0) << 16) | (m_wreg[reg_index + 3] << 8) | m_wreg[reg_index + 2];
 			break;
 		case 5: // start address
-			if (channel->start < m_pcmlimit)
+			if (channel.start < m_pcmlimit)
 			{
-				channel->play = true;
-				channel->addr = channel->start;
-				channel->counter = 0x1000;
+				channel.play = true;
+				channel.addr = channel.start;
+				channel.counter = 0x1000;
 			}
 			break;
 		}
@@ -176,15 +176,18 @@ void k007232_device::write(offs_t offset, u8 data)
 
 u8 k007232_device::read(offs_t offset)
 {
-	if (offset == 5 || offset == 11)
+	if (!machine().side_effects_disabled())
 	{
-		channel_t *channel = &m_channel[(offset == 11) ? 1 : 0];
-
-		if (channel->start < m_pcmlimit)
+		if (offset == 5 || offset == 11)
 		{
-			channel->play = true;
-			channel->addr = channel->start;
-			channel->counter = 0x1000;
+			channel_t &channel = m_channel[(offset == 11) ? 1 : 0];
+
+			if (channel.start < m_pcmlimit)
+			{
+				channel.play = true;
+				channel.addr = channel.start;
+				channel.counter = 0x1000;
+			}
 		}
 	}
 	return 0;
@@ -215,17 +218,17 @@ void k007232_device::sound_stream_update(sound_stream &stream, std::vector<read_
 {
 	if (K007232_LOG_PCM)
 	{
-		for (int i = 0; i < KDAC_A_PCM_MAX; i++)
+		for (int i = 0; i < PCM_MAX; i++)
 		{
-			channel_t *channel = &m_channel[i];
-			if (channel->play)
+			channel_t &channel = m_channel[i];
+			if (channel.play)
 			{
 				char filebuf[256];
-				snprintf(filebuf, 256, "pcm%08x.wav", channel->start);
+				snprintf(filebuf, 256, "pcm%08x.wav", channel.start);
 				util::wav_file_ptr file = util::wav_open(filebuf, stream.sample_rate(), 1);
 				if (file)
 				{
-					u32 addr = channel->start;
+					u32 addr = channel.start;
 					while (!BIT(read_sample(i, addr), 7) && addr < m_pcmlimit)
 					{
 						int16_t out = ((read_sample(i, addr) & 0x7f) - 0x40) << 7;
@@ -240,17 +243,17 @@ void k007232_device::sound_stream_update(sound_stream &stream, std::vector<read_
 	for (int j = 0; j < outputs[0].samples(); j++)
 	{
 		s32 lsum = 0, rsum = 0;
-		for (int i = 0; i < KDAC_A_PCM_MAX; i++)
+		for (int i = 0; i < PCM_MAX; i++)
 		{
-			channel_t *channel = &m_channel[i];
-			if (channel->play)
+			channel_t &channel = m_channel[i];
+			if (channel.play)
 			{
 				/**** PCM setup ****/
-				int vol_a = channel->vol[0] * 2;
-				int vol_b = channel->vol[1] * 2;
+				int const vol_a = channel.vol[0] * 2;
+				int const vol_b = channel.vol[1] * 2;
 
-				u32 addr = channel->addr & 0x1ffff;
-				while (channel->counter <= channel->step) // result : clock / (4 * (4096 - frequency))
+				u32 addr = channel.addr & 0x1ffff;
+				while (channel.counter <= channel.step) // result : clock / (4 * (4096 - frequency))
 				{
 					if (BIT(read_sample(i, addr++), 7) || addr >= m_pcmlimit)
 					{
@@ -258,25 +261,25 @@ void k007232_device::sound_stream_update(sound_stream &stream, std::vector<read_
 						if (BIT(m_wreg[13], i))
 						{
 							/* loop to the beginning */
-							addr = channel->start;
+							addr = channel.start;
 						}
 						else
 						{
 							/* stop sample */
-							channel->play = false;
+							channel.play = false;
 							break;
 						}
 					}
-					channel->counter += (0x1000 - channel->step);
+					channel.counter += (0x1000 - channel.step);
 				}
-				channel->addr = addr;
+				channel.addr = addr;
 
-				if (!channel->play)
+				if (!channel.play)
 					break;
 
-				channel->counter -= 32;
+				channel.counter -= 32;
 
-				int out = (read_sample(i, addr) & 0x7f) - 0x40;
+				int const out = (read_sample(i, addr) & 0x7f) - 0x40;
 
 				lsum += out * vol_a;
 				rsum += out * vol_b;
