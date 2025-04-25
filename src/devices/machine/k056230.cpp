@@ -13,7 +13,8 @@ Device Notes:
 -HYC2485S RS485 transceiver
 
 TODO:
-- nearly everything, currently a wrapper to make games happy and don't fail POSTs
+- interupts (racinfrc lan check shows debug info while holding F2)
+- "manual" TX/RX mode
 - LANC part name for konami/viper.cpp
 
 **************************************************************************************************/
@@ -22,6 +23,7 @@ TODO:
 #include "k056230.h"
 
 #include "emuopts.h"
+#include "multibyte.h"
 
 #include "asio.h"
 
@@ -281,18 +283,18 @@ void k056230_device::device_start()
 
 	// state saving
 	save_item(NAME(m_irq_state));
-	save_item(NAME(m_ctrl_reg));
 	save_item(NAME(m_status));
 
 	save_item(NAME(m_linkenable));
 	save_item(NAME(m_linkid));
+	save_item(NAME(m_linksize));
 	save_item(NAME(m_txmode));
 }
 
 void k056230_device::device_reset()
 {
+	m_irq_enable = false;
 	m_irq_state = CLEAR_LINE;
-	m_ctrl_reg = 0;
 	m_status = 0;
 
 	std::fill(std::begin(m_buffer), std::end(m_buffer), 0);
@@ -304,6 +306,7 @@ void k056230_device::device_reset()
 
 	m_linkenable = 0;
 	m_linkid = 0;
+	m_linksize = 0x0100;
 	m_txmode = 0;
 }
 
@@ -317,24 +320,54 @@ void k056230_device::regs_map(address_map &map)
 {
 	map(0x00, 0x00).lrw8(
 		NAME([this] (offs_t offset) {
+			/*
+			status register bits:
+				2,1,0 = TID, transmit status
+				3     = RXD
+				4     = INTST-, 0 when INT
+				5     = RUNST, 1 when comms active
+				7,6   = unused
+			*/
 			u8 data = 0x08 | m_status;
 			if (!machine().side_effects_disabled())
 				LOGMASKED(LOG_REG_READS, "%s: Status Register read %02x\n", machine().describe_context(), data);
 			return data;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
+			/*
+			mode register bits:
+				2,1,0 = ID  - 0 to 7
+				4,3   = IDM - 0, 1, 3 valid, 2 invalid
+				5     = M/S - 1 means MASTER
+				6     = TXD
+				7     = TXM - 1 means TX line will be whatever TXD is set to. (not implemented)
+			*/
 			LOGMASKED(LOG_REG_WRITES, "%s: Mode Register write %02x\n", machine().describe_context(), data);
 			set_mode(data);
 		})
 	),
 	map(0x01, 0x01).lrw8(
 		NAME([this] (offs_t offset) {
+			/*
+			crc error register bits:
+				each bit signals a receive error from the corrosponding main-id (bit 0 = id 0 etc.)
+			*/
 			const u8 res = 0x00;
 			if (!machine().side_effects_disabled())
 				LOGMASKED(LOG_REG_READS, "%s: CRC Error Register read %02x\n", machine().describe_context(), res);
 			return res;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
+			/*
+			control register bits:
+				0   = START
+				1   = INTPR - 1 enables int
+				2   = CRCR - 1 enables crc error register
+				4,3 = SIZE - 0 32byte, 1 64 byte, 2 128 byte, 3, 256 byte
+				5   = SLEEP- - 0 means disabled, 1 means enabled?
+				6   = H/S - comm speed - 0 = clk / 16, 1 = clk / 8
+				7   = unused
+			*/
 			LOGMASKED(LOG_REG_WRITES, "%s: Control Register write %02x\n", machine().describe_context(), data);
 			set_ctrl(data);
 			// TODO: This is a literal translation of the previous device behaviour, and is incorrect.
@@ -358,6 +391,12 @@ void k056230_device::regs_map(address_map &map)
 	);
 	map(0x02, 0x02).lw8(
 		NAME([this] (offs_t offset, u8 data) {
+			/*
+			sub-id register bits:
+				1,0     = SID, sub-id
+				3,2     = MSID, master sub-id
+				7,6,5,4 = unused
+			*/
 			LOGMASKED(LOG_REG_WRITES, "%s: regs_w: Sub ID Register = %02x\n", machine().describe_context(), data);
 		})
 	);
@@ -382,50 +421,64 @@ void k056230_device::ram_w(offs_t offset, u32 data, u32 mem_mask)
 
 void k056230_device::set_mode(u8 data)
 {
-	switch (data & 0xf0)
+	m_linkid = data & 0x07;
+	switch ((data & 0x18) >> 3)
 	{
-		case 0x00:
-		case 0x20:
-			m_linkid = data & 0x0f;
+		case 0:
+			// 8 cabinet mode
+			m_linksize = 0x0100;
 			break;
-
+		case 1:
+			// 4 cabinet mode
+			m_linksize = 0x0200;
+			break;
+		case 3:
+			// 2 cabinet mode
+			m_linksize = 0x0400;
+			break;
+		case 2:
+			// invalid
 		default:
-			logerror("k056230-set_mode: %02x\n", data);
+			m_linksize = 0x0100;
+			logerror("set_mode: %02x invalid IDM selected\n", data);
 			break;
+	}
+	if (data & 0x80)
+	{
+		logerror("set_mode: %02x manual tx/rx mode NOT implemented\n", data);
 	}
 }
 
 void k056230_device::set_ctrl(u8 data)
 {
-	m_linkenable = (data & 0x10) ? 0x01 : 0x00;
-
+	m_linkenable = (data & 0x20) ? 0x01 : 0x00;
 	switch (data)
 	{
 		case 0x10:
 		case 0x18:
-			// prepare for tx?
+			// prepare for rx?
 			break;
 
 		case 0x14:
 		case 0x1c:
-			// prepare for rx? - clear bit5
+			// prepare for tx? - clear bit5
 			m_status = 0x00;
 			break;
 
 		case 0x36:
 		case 0x3e:
 			// plygonet, polynetw, gticlub = 36, midnrun 3e
-			// tx mode?
-			m_txmode = 0x01;
+			// rx mode?
+			m_txmode = 0x00;
 			comm_tick();
 			break;
 
 		case 0x37:
 		case 0x3f:
-			// rx mode? - set bit 5
+			// tx mode? - set bit 5
 			// plygonet, polynetw, gticlub = 37, midnrun 3f
 			m_status = 0x20;
-			m_txmode = 0x00;
+			m_txmode = 0x01;
 			comm_tick();
 			break;
 
@@ -444,7 +497,7 @@ void k056230_device::comm_tick()
 		// if both sockets are there check ring
 		if (m_context->connected())
 		{
-			unsigned data_size = 0x201;
+			unsigned data_size = m_linksize + 1;
 
 			if (m_txmode == 0x00)
 			{
@@ -459,15 +512,15 @@ void k056230_device::comm_tick()
 						if (idx != m_linkid)
 						{
 							// save message to ram
-							unsigned frame_start = (idx & 0x07) * 0x0100;
-							unsigned frame_size = (idx & 0x08) ? 0x0200 : 0x0100;
+							unsigned frame_start = idx * 0x0100;
+							unsigned frame_size = m_linksize;
 							unsigned frame_offset = 0;
 							u32 frame_data = 0;
 
-							for (unsigned j = 0x00; j < frame_size; j += 4)
+							for (unsigned i = 0; i < frame_size; i += 4)
 							{
-								frame_offset = (frame_start + j) / 4;
-								frame_data = m_buffer[4 + j] |  m_buffer[3 + j] << 8 |  m_buffer[2 + j] << 16 |  m_buffer[1 + j] << 24;
+								frame_offset = (frame_start + i) / 4;
+								frame_data = get_u32be(&m_buffer[i + 1]);
 								ram_w(frame_offset, frame_data, 0xffffffff);
 							}
 
@@ -483,21 +536,18 @@ void k056230_device::comm_tick()
 			else if (m_txmode == 0x01)
 			{
 				// send local data to network (once)
-				unsigned frame_start = (m_linkid & 0x07) * 0x100;
-				unsigned frame_size = (m_linkid & 0x08) ? 0x200 : 0x100;
+				unsigned frame_start = m_linkid * 0x100;
+				unsigned frame_size = m_linksize;
 
 				unsigned frame_offset = 0;
 				u32 frame_data = 0;
 
 				m_buffer[0] = m_linkid;
-				for (unsigned i = 0x00; i < frame_size; i += 4)
+				for (unsigned i = 0; i < frame_size; i += 4)
 				{
 					frame_offset = (frame_start + i) / 4;
 					frame_data = ram_r(frame_offset, 0xffffffff);
-					m_buffer[4 + i] = frame_data & 0xff;
-					m_buffer[3 + i] = (frame_data >> 8) & 0xff;
-					m_buffer[2 + i] = (frame_data >> 16) & 0xff;
-					m_buffer[1 + i] = (frame_data >> 24) & 0xff;
+					put_u32be(&m_buffer[i + 1], frame_data);
 				}
 
 				send_frame(data_size);
@@ -543,7 +593,6 @@ void k056230_viper_device::device_reset()
 {
 	k056230_device::device_reset();
 	m_control = 0;
-	m_irq_enable = false;
 	m_unk[0] = m_unk[1] = 0;
 }
 

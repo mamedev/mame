@@ -36,17 +36,18 @@ protected:
 	memory_share_creator<u32> m_ram;
 
 	devcb_write_line m_irq_cb;
+	bool m_irq_enable;
 	int m_irq_state;
-	u8 m_ctrl_reg;
 	u8 m_status;
 
 private:
 	class context;
 	std::unique_ptr<context> m_context;
 
-	u8 m_buffer[0x201];
+	u8 m_buffer[0x401];
 	u8 m_linkenable;
 	u8 m_linkid;
+	u16 m_linksize;
 	u8 m_txmode;
 
 	void set_mode(u8 data);
@@ -69,7 +70,6 @@ protected:
 
 private:
 	u8 m_control;
-	bool m_irq_enable;
 	u8 m_unk[2];
 };
 
