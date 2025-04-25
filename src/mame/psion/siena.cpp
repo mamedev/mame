@@ -325,7 +325,7 @@ ROM_END
 ROM_START(siena_fr)
 	ROM_REGION16_LE(0x100000, "rom", 0)
 	ROM_SYSTEM_BIOS(0, "421f", "V4.21F/FRN")
-	ROMX_LOAD("vine_v4.21f_frn.bin", 0x00000, 0x100000, CRC(6419cae9) SHA1(c1539aeb6760eac47604375fa3060b5949b9d9b7), ROM_BIOS(0))
+	ROMX_LOAD("vine_v4.21f_frn.bin", 0x00000, 0x100000, CRC(104691d6) SHA1(d1e12b305cd2de7dbf6b1a342adb7bf196d7abcb), ROM_BIOS(0))
 ROM_END
 
 } // anonymous namespace
