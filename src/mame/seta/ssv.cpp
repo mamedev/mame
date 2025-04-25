@@ -406,7 +406,7 @@ void drifto94_state::drifto94_map(address_map &map)
 	ssv_map(map, 0xc00000);
 //  map(0x210002, 0x210003).nopw();                                      // ? 1 at the start
 	map(0x400000, 0x47ffff).nopw();                                       // ?
-	map(0x480000, 0x480001).rw(m_dsp, FUNC(upd96050_device::data_r), FUNC(upd96050_device::data_w));
+	map(0x480000, 0x480000).rw(m_dsp, FUNC(upd96050_device::data_r), FUNC(upd96050_device::data_w));
 	map(0x482000, 0x482fff).rw(FUNC(drifto94_state::dsp_r), FUNC(drifto94_state::dsp_w)).umask16(0x00ff);
 	map(0x483000, 0x485fff).nopw();                                        // ?
 	map(0x500000, 0x500001).nopw();                                        // ??
@@ -765,7 +765,7 @@ void drifto94_state::twineag2_map(address_map &map)
 	ssv_map(map, 0xe00000);
 	map(0x010000, 0x03ffff).ram();                         // More RAM
 	map(0x210000, 0x210001).r("watchdog", FUNC(watchdog_timer_device::reset16_r)); // Watchdog (also value is cmp.b with mem 8)
-	map(0x480000, 0x480001).rw(m_dsp, FUNC(upd96050_device::data_r), FUNC(upd96050_device::data_w));
+	map(0x480000, 0x480000).rw(m_dsp, FUNC(upd96050_device::data_r), FUNC(upd96050_device::data_w));
 	map(0x482000, 0x482fff).rw(FUNC(drifto94_state::dsp_r), FUNC(drifto94_state::dsp_w)).umask16(0x00ff);
 }
 
