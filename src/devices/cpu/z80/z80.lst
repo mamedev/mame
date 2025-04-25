@@ -693,7 +693,7 @@ macro   nsc800_take_interrupt
 		if (m_after_ldair) F &= ~PF;
 	#endif
 
-macro   ncs800:check_interrupts
+macro   nsc800:check_interrupts
 	if (m_nmi_pending) {
 		call take_nmi
 	} else if ((m_nsc800_irq_state[0] != CLEAR_LINE || m_nsc800_irq_state[1] != CLEAR_LINE || m_nsc800_irq_state[2] != CLEAR_LINE) && m_iff1 && !m_after_ei) {
