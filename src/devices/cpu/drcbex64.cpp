@@ -4082,7 +4082,7 @@ void drcbe_x64::op_rolins(Assembler &a, const instruction &inst)
 			if (bits != 32)
 			{
 				maskimm =
-						((util::sext(mask, 32) == mask) && (uint32_t(~mask) == ~mask)) |
+						((util::sext(mask, 32) == mask) && (uint32_t(~mask) == ~mask)) ||
 						((util::sext(~mask, 32) == ~mask) && (uint32_t(mask) == mask));
 			}
 		}
