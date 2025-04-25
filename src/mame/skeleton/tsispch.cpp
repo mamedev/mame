@@ -155,7 +155,7 @@ public:
 private:
 	uint8_t dsw_r();
 	void peripheral_w(uint8_t data);
-	void dsp_status_w(uint16_t data);
+	void dsp_status_w(uint8_t data);
 	void dsp_to_8086_p0_w(int state);
 	void dsp_to_8086_p1_w(int state);
 
@@ -212,7 +212,7 @@ void tsispch_state::peripheral_w(uint8_t data)
  UPD77P20 stuff
 *****************************************************************************/
 
-void tsispch_state::dsp_status_w(uint16_t data)
+void tsispch_state::dsp_status_w(uint8_t data)
 {
 	LOG("warning: upd772x status register should never be written to!\n");
 }
@@ -311,8 +311,8 @@ void tsispch_state::i8086_mem(address_map &map)
 	map(0x03200, 0x03203).mirror(0x341fc).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff); // AMD P8259 PIC @ U5 (reads as 04 and 7c, upper byte is open bus)
 	map(0x03400, 0x03400).mirror(0x341fe).r(FUNC(tsispch_state::dsw_r)); // verified, read from dipswitch s4
 	map(0x03401, 0x03401).mirror(0x341fe).w(FUNC(tsispch_state::peripheral_w)); // verified, write to the 4 leds, plus 4 control bits
-	map(0x03600, 0x03601).mirror(0x341fc).rw(m_dsp, FUNC(upd7725_device::data_r), FUNC(upd7725_device::data_w)); // verified; UPD77P20 data reg r/w
-	map(0x03602, 0x03603).mirror(0x341fc).r(m_dsp, FUNC(upd7725_device::status_r)).w(FUNC(tsispch_state::dsp_status_w)); // verified; UPD77P20 status reg r
+	map(0x03600, 0x03600).mirror(0x341fc).rw(m_dsp, FUNC(upd7725_device::data_r), FUNC(upd7725_device::data_w)); // verified; UPD77P20 data reg r/w
+	map(0x03602, 0x03602).mirror(0x341fc).r(m_dsp, FUNC(upd7725_device::status_r)).w(FUNC(tsispch_state::dsp_status_w)); // verified; UPD77P20 status reg r
 	map(0xc0000, 0xfffff).rom(); // verified
 }
 
