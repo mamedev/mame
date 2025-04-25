@@ -533,20 +533,28 @@ macro   r800:otdr
 
 macro   jump	%opcode
 	{
-		#pragma GCC diagnostic push
-		#pragma GCC diagnostic ignored "-Wtautological-bitwise-compare"
+	#if defined(__clang__)
+		#pragma clang diagnostic push
+		#pragma clang diagnostic ignored "-Wtautological-bitwise-compare"
+	#endif
 		constexpr u16 idx = ((0x%opcode & 0xff00) ? (((0x%opcode & 0xff00) == 0xfe00) ? 0x0500 : ((0x%opcode & 0x3000) >> 4)) : 0x0400) | (0x%opcode & 0xff);
 		goto *opc_label[idx];
-		#pragma GCC diagnostic pop
+	#if defined(__clang__)
+		#pragma clang diagnostic pop
+	#endif
 	}
 
 macro   jump_prefixed   %prefix
 	{
-		#pragma GCC diagnostic push
-		#pragma GCC diagnostic ignored "-Wtautological-bitwise-compare"
+	#if defined(__clang__)
+		#pragma clang diagnostic push
+		#pragma clang diagnostic ignored "-Wtautological-bitwise-compare"
+	#endif
 		constexpr u16 p = (%prefix ? ((%prefix == 0xfe) ? 0x0500 : ((%prefix & 0x30) << 4)) : 0x0400);
 		goto *opc_label[p | TDAT8];
-		#pragma GCC diagnostic pop
+	#if defined(__clang__)
+		#pragma clang diagnostic pop
+	#endif
 	}
 
 macro   take_nmi
