@@ -859,7 +859,7 @@ cassette_image::error cassette_image::legacy_construct(const LegacyWaveFiller *l
 	/* if there has to be a header */
 	if (args.header_samples > 0)
 	{
-		length = args.fill_wave(&samples[pos], sample_count - pos, CODE_HEADER);
+		length = args.fill_wave(&samples[pos], sample_count - pos, CODE_HEADER, -1);
 		if (length < 0)
 		{
 			err = error::INVALID_IMAGE;
@@ -877,20 +877,11 @@ cassette_image::error cassette_image::legacy_construct(const LegacyWaveFiller *l
 	}
 	while ((pos < sample_count) && (offset < size))
 	{
-		image_read(chunk.get(), offset, args.chunk_size);
-		offset += args.chunk_size;
+		const int slice = std::min<int>(args.chunk_size, size - offset);
+		image_read(chunk.get(), offset, slice);
+		offset += slice;
 
-		/*
-		This approach is problematic because we don't have control on incomming image size when processing the data
-		(at least in tap implementation).
-		The method sending the size of output (calculated in 'chunk_sample_calc' above) which uses same data as a input  but
-		without knowing how much data available in the image. Having wrong header with size bigger than image couses illegal
-		access beyond image data.
-		Desired state is:
-		    length = args.fill_wave(&samples[pos], args.chunk_size, chunk.get());
-		    aslo the fix for tap is commented out in 'tap_cas_fill_wave'
-		*/
-		length = args.fill_wave(&samples[pos], sample_count - pos, chunk.get());
+		length = args.fill_wave(&samples[pos], sample_count - pos, chunk.get(), slice);
 		if (length < 0)
 		{
 			err = error::INVALID_IMAGE;
@@ -905,7 +896,7 @@ cassette_image::error cassette_image::legacy_construct(const LegacyWaveFiller *l
 	/* if there has to be a trailer */
 	if (args.trailer_samples > 0)
 	{
-		length = args.fill_wave(&samples[pos], sample_count - pos, CODE_TRAILER);
+		length = args.fill_wave(&samples[pos], sample_count - pos, CODE_TRAILER, -1);
 		if (length < 0)
 		{
 			err = error::INVALID_IMAGE;
