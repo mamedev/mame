@@ -38,6 +38,14 @@ TODO:
 
 #define QUEUE_SIZE 32768
 
+#define LOG_DAC        (1U << 1)
+
+#define VERBOSE (LOG_GENERAL)
+//#define LOG_OUTPUT_FUNC osd_printf_info
+#include "logmacro.h"
+
+#define LOGDAC(...)    LOGMASKED(LOG_DAC, __VA_ARGS__)
+
 
 DEFINE_DEVICE_TYPE(PC9801_86, pc9801_86_device, "pc9801_86", "NEC PC-9801-86")
 DEFINE_DEVICE_TYPE(PC9801_SPEAKBOARD, pc9801_speakboard_device, "pc9801_spb", "NEC PC-9801 SpeakBoard")
@@ -293,12 +301,20 @@ void pc9801_86_device::pcm_control_w(u8 data)
 	const u32 rate = (25.4_MHz_XTAL).value() / 16;
 	const int divs[8] = {36, 48, 72, 96, 144, 192, 288, 384};
 
+	LOGDAC("$a468 FIFO Control %02x\n", data);
 	if(((data & 7) != (m_pcm_ctrl & 7)) || !m_init)
+	{
+		LOGDAC("\tclk rate %01x (%d)\n", data, divs[data & 7]);
 		m_dac_timer->adjust(attotime::from_ticks(divs[data & 7], rate), 0, attotime::from_ticks(divs[data & 7], rate));
+	}
 	if(data & 8)
+	{
+		LOGDAC("\tFIFO reset\n");
 		m_head = m_tail = m_count = 0;
+	}
 	if(!(data & 0x10))
 	{
+		LOGDAC("\tIRQ clear\n");
 		//m_bus->int_w<5>(m_fmirq ? ASSERT_LINE : CLEAR_LINE);
 		if(!(queue_count() < m_irq_rate) || !(data & 0x80))
 		{
@@ -350,9 +366,20 @@ void pc9801_86_device::io_map(address_map &map)
 				if (data == 0xff)
 					popmessage("pc9801_86: $a46a irq_rate == 0xff");
 				m_irq_rate = (data + 1) * 128;
+				LOGDAC("$a468 irq_rate %d (%02x)\n", m_irq_rate, data);
 			}
 			else
+			{
 				m_pcm_mode = data;
+				LOGDAC("$a468 pcm_mode %02x\n", data);
+				LOGDAC("\tclock %d quantization %d-bit output %d mode %d\n"
+					, BIT(data, 7)
+					, BIT(data, 6) ? 16 : 8
+					// 3 = stereo, 2 Left only, 1 Right only, 0 = No PCM output
+					, (data >> 4) & 3
+					, data & 3
+				);
+			}
 		})
 	);
 	map(0x0c, 0x0c).lrw8(
@@ -474,6 +501,7 @@ TIMER_CALLBACK_MEMBER(pc9801_86_device::dac_tick)
 	dac_transfer();
 	if((queue_count() < m_irq_rate) && (m_pcm_ctrl & 0x20))
 	{
+		//LOGDAC("\tIRQ set\n");
 		m_pcmirq = true;
 		//m_bus->int_w<5>(ASSERT_LINE);
 		m_irqs->in_w<1>(ASSERT_LINE);
