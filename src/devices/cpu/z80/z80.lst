@@ -532,12 +532,22 @@ macro   r800:otdr
 	}
 
 macro   jump	%opcode
-	m_ref = 0x%opcode00;
-	goto process;
+	{
+		#pragma GCC diagnostic push
+		#pragma GCC diagnostic ignored "-Wtautological-bitwise-compare"
+		constexpr u16 idx = ((0x%opcode & 0xff00) ? (((0x%opcode & 0xff00) == 0xfe00) ? 0x0500 : ((0x%opcode & 0x3000) >> 4)) : 0x0400) | (0x%opcode & 0xff);
+		goto *opc_label[idx];
+		#pragma GCC diagnostic pop
+	}
 
 macro   jump_prefixed   %prefix
-	m_ref = (%prefix << 16) | (TDAT8 << 8);
-	goto process;
+	{
+		#pragma GCC diagnostic push
+		#pragma GCC diagnostic ignored "-Wtautological-bitwise-compare"
+		constexpr u16 p = (%prefix ? ((%prefix == 0xfe) ? 0x0500 : ((%prefix & 0x30) << 4)) : 0x0400);
+		goto *opc_label[p | TDAT8];
+		#pragma GCC diagnostic pop
+	}
 
 macro   take_nmi
 	// Check if processor was halted
@@ -707,8 +717,10 @@ macro   ncs800:check_interrupts
 # ROP
 ##########################################################
 ffff
-	m_ref = 0xffff00;
-	if (m_icount <= 0) return;
+	if (m_icount <= 0) {
+		m_ref = 0xffff00;
+		return;
+	}
 	if (m_busrq_state) {
 		if (!m_busack_state) {
 			m_busack_state = 1;
@@ -716,6 +728,7 @@ ffff
 		}
 		if (m_icount > 0)
 			m_icount = 0;
+		m_ref = 0xffff00;
 		return;
 	} else if (m_busack_state) {
 		m_busack_state = 0;
@@ -728,13 +741,12 @@ ffff
 		debugger_wait_hook();
 		call rop
 		PC--;
-		continue;
+		goto rop;
 	} else {
 		PRVPC = PC;
 		debugger_instruction_hook(PC);
 		call rop
-		m_ref = (0x00 << 16) | (TDAT8 << 8);
-		goto process;
+		goto *opc_label[0x0400 | TDAT8];
 	}
 
 

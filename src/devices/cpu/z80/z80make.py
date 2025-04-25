@@ -23,7 +23,7 @@ class IndStr:
         return self.indent
 
     def is_comment(self):
-        return self.str.startswith("#") and not self.str.startswith("#if") and not self.str.startswith("#endif")
+        return self.str.startswith("#") and not self.str.startswith("#if") and not self.str.startswith("#endif") and not self.str.startswith("#pragma")
 
     def is_blank(self):
         return not self.str
@@ -252,7 +252,7 @@ class OpcodeList:
         return out
 
     def switch_prefix(self, prefixes, reenter: bool, f):
-        prefix_switch = len(prefixes) > 1
+        prefix_switch = len(prefixes) > 1 and reenter
 
         if prefix_switch:
             print("switch (u8(m_ref >> 16)) // prefix", file=f)
@@ -260,21 +260,24 @@ class OpcodeList:
 
         for prefix in sorted(prefixes):
             is_rop = prefix == 'ff'
+            opc_switch = reenter and not is_rop
             if prefix_switch:
                 print("case 0x%s:" % (prefix), file=f)
                 print("{", file=f)
-            if not is_rop:
+            if opc_switch:
                 print("\tswitch (u8(m_ref >> 8)) // opcode", file=f)
                 print("\t{", file=f)
             for opc in self.opcode_info[prefix]:
                 # reenter loop only process steps > 0
                 if not reenter or opc.with_steps():
-                    if not is_rop:
+                    if opc_switch:
                         print("\tcase 0x%s:" % (opc.code), file=f)
+                    elif not is_rop:
+                        print("%s_%s%s:" % (self.gen or "z80", prefix, opc.code), file=f)
                     opc.save_dasm(step_switch=reenter, f=f)
-                    print("\t\tcontinue;", file=f)
+                    print("\t\tgoto rop;", file=f)
                     print("", file=f)
-            if not is_rop:
+            if opc_switch:
                 print("\t}", file=f)
 
             if prefix_switch:
@@ -290,34 +293,36 @@ class OpcodeList:
         print("\treturn;", file=f)
         print("}", file=f)
         print("", file=f)
+        labels = ""
+        for p in ["cb", "dd", "ed", "fd", "00", "fe"]:
+            labels += "\n"
+            for i in range(0x100, 0x200):
+                if labels.__len__() > 1:
+                    labels += ", "
+                labels += "&&%s_%s%s" % (self.gen or "z80", p, hex(i)[3:])
+        print("constexpr void* opc_label[0x100 * 6] = {%s\n};" % (labels), file=f)
+        print("", file=f)
         print("const bool nomemrq_en = !m_nomreq_cb.isunset();", file=f)
         print("[[maybe_unused]] const bool refresh_en = !m_refresh_cb.isunset();", file=f)
         print("", file=f)
-        print("bool interrupted = true;", file=f)
-        print("while (u8(m_ref) != 0x00) {", file=f)
-        print("\t// workaround to simulate main loop behavior where continue statement relays on having it set after", file=f)
-        print("\tif (!interrupted) {", file=f)
-        print("\t\tm_ref = 0xffff00;", file=f)
-        print("\t\tcontinue;", file=f)
-        print("\t}", file=f)
-        print("\tinterrupted = false;", file=f)
-        print("", file=f)
+        print("if (m_ref == 0xffff00) {", file=f)
+        print("\tgoto rop;", file=f)
+        print("} else if (u8(m_ref) == 0x00) {", file=f)
+        print("\tconst u8 p = m_ref >> 16;", file=f)
+        print("\tgoto *opc_label[(p ? ((p == 0xfe) ? 0x0500 : ((p & 0x30) << 4)) : 0x0400) | u8(m_ref >> 8)];", file=f)
+        print("} else {", file=f)
+        print("// slow re-enter", file=f)
         self.switch_prefix(self.opcode_info.keys(), reenter=True, f=f)
-        print("", file=f)
+        print("} // end: slow", file=f)
         print('assert((void("switch statement above must cover all possible cases!"), false));', file=f)
-        print("}", file=f)
         print("", file=f)
-        print("if (m_ref != 0xffff00) goto process;", file=f)
-        print("", file=f)
-        print("while (true) {", file=f)
-        print("", file=f)
-        print("\t\t// unwrapped ff prefix", file=f)
+        print("{ // fast process", file=f)
+        print("rop:", file=f)
         self.switch_prefix(['ff'], reenter=False, f=f)
         print("", file=f)
-        print("process:", file=f)
         self.switch_prefix(self.opcode_info.keys() - ['ff'], reenter=False, f=f)
-        print("", file=f)
-        print("} // while (true)", file=f)
+        print("} // end: fast", file=f)
+        print('assert((void("unreachable!"), false));', file=f)
 
 def main(argv):
     if len(argv) != 3 and len(argv) != 4:
