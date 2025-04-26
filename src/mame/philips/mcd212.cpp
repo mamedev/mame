@@ -740,39 +740,45 @@ void mcd212_device::mix_lines(uint32_t *plane_a, bool *transparent_a, uint32_t *
 void mcd212_device::draw_cursor(uint32_t *scanline)
 {
 	if (!(m_cursor_control & CURCNT_EN))
-	{
+	{ // Cursor is Disabled
 		return;
 	}
 
-	uint16_t y = (uint16_t)screen().vpos();
-	const uint16_t cursor_x =  m_cursor_position & 0x3ff;
-	const uint16_t cursor_y = ((m_cursor_position >> 12) & 0x3ff) + m_ica_height;
-	if (y >= cursor_y && y < (cursor_y + 16))
+	const bool invert = BIT(m_cursor_control, CURCNT_BLKC_SHIFT);
+	uint8_t color_index = (m_cursor_control & CURCNT_COLOR);
+
+	if (m_blink_active)
 	{
-		const int width = get_screen_width();
-		uint32_t color = s_4bpp_color[m_cursor_control & CURCNT_COLOR];
-		y -= cursor_y;
-		if (m_cursor_control & CURCNT_CUW)
-		{
-			for (int x = cursor_x; x < cursor_x + 64 && x < width; x++)
-			{
-				if (m_cursor_pattern[y] & (1 << (15 - ((x - cursor_x) >> 2))))
-				{
-					scanline[x++] = color;
-					scanline[x++] = color;
-					scanline[x++] = color;
-					scanline[x] = color;
-				}
-			}
+		if (!invert)
+		{ // Normal Blink
+			return;
 		}
 		else
+		{ // Inverted Color Blink
+			color_index = (~color_index) & 0xf;
+		}
+	}
+
+	const uint16_t cursor_x = m_cursor_position & 0x3ff;
+	const uint16_t cursor_y = ((m_cursor_position >> 12) & 0x3ff) + m_ica_height;
+	const int32_t y = screen().vpos() - cursor_y;
+	const int width = get_screen_width();
+
+	if (0 <= y && y < 16)
+	{
+		const uint32_t color = s_4bpp_color[color_index];
+		const uint8_t resolution = (m_cursor_control & CURCNT_CUW) ? 4 : 2;
+		for (int x = 0; x < 16; x++)
 		{
-			for (int x = cursor_x; x < cursor_x + 32 && x < width; x++)
+			if (m_cursor_pattern[y] & (1 << (15 - x)))
 			{
-				if (m_cursor_pattern[y] & (1 << (15 - ((x - cursor_x) >> 1))))
+				uint32_t index = cursor_x + x * resolution
+				for (uint32_t j = 0; j < resolution; j++, index++)
 				{
-					scanline[x++] = color;
-					scanline[x] = color;
+					if (index < width)
+					{
+						scanline[index] = color;
+					}
 				}
 			}
 		}
@@ -943,6 +949,19 @@ TIMER_CALLBACK_MEMBER(mcd212_device::ica_tick)
 		m_dca[1] = get_dcp<1>();
 
 	m_ica_timer->adjust(screen().time_until_pos(0, 0));
+
+	// Cursor Blink
+	m_blink_time += (5 + BIT(m_dcr[0], DCR_FD_BIT)); // FD bit * 8... Page 4-3 MCD
+	// Adjust the blink time once per frame
+	if ((!m_blink_active) && (m_blink_time >= ((m_cursor_control & CURCNT_CON) >> CURCNT_CON_SHIFT) * 60)) {
+		m_blink_active = true;
+		m_blink_time = 0;
+	}
+	// If blink off time is 0, immediately turn back on.
+	if (m_blink_active && (m_blink_time >= ((m_cursor_control & CURCNT_COF) >> CURCNT_COF_SHIFT) * 60)) {
+		m_blink_active = false;
+		m_blink_time = 0;
+	}
 }
 
 TIMER_CALLBACK_MEMBER(mcd212_device::dca_tick)
@@ -1121,6 +1140,7 @@ void mcd212_device::device_reset()
 
 	m_ica_height = 32;
 	m_total_height = 312;
+	m_blink_time = 0;
 
 	m_int_callback(CLEAR_LINE);
 
