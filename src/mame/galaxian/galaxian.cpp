@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles, Couriersud, Stephane Humbert, Robbbert
+// copyright-holders: Aaron Giles, Couriersud, Stephane Humbert, Robbbert
 /***************************************************************************
 
     Galaxian-derived hardware
@@ -14657,6 +14657,26 @@ ROM_START( mandingaeg )
 	ROM_LOAD( "eg-mb7051.6e", 0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) ) // Dumped as 82s123
 ROM_END
 
+// GGI PCB
+ROM_START( mandingag )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "am2732.2c", 0x0000, 0x1000, CRC(792cb087) SHA1(9ebfdd210c5bf44064b1b59b79a417ced5af985c) )
+	ROM_LOAD( "am2732.2f", 0x1000, 0x1000, CRC(f7e2061c) SHA1(b41cfd1e9afe3b009250d6b50f6330ba80dbfcf6) )
+	ROM_LOAD( "2732.2j",   0x2000, 0x1000, CRC(25e07e4f) SHA1(64a7e2b0ecdb73f9ce5018c66d65cd652dbb90ed) )
+	ROM_LOAD( "am2732.2m", 0x3000, 0x1000, CRC(79b7b4ce) SHA1(ef6fb645e5ec759f115ed641407d1319fe3230fd) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "2532.5c",   0x0000, 0x1000, CRC(8ca7b750) SHA1(4f4c2915503b85abe141d717fd254ee10c9da99e) )
+	ROM_LOAD( "2532.5d",   0x1000, 0x1000, CRC(9b5bdc0a) SHA1(84d953618c8bf510d23b42232a856ac55f1baff5) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "am2716.5f", 0x0000, 0x0800, CRC(7e7f1e67) SHA1(910672be1afbfb73e5f865865a177ba97832aa92) )
+	ROM_LOAD( "am2716.5h", 0x0800, 0x0800, CRC(3029f94f) SHA1(3b432b42e79f8b0a7d65e197f373a04e3c92ff20) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "74288.6e",  0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
+ROM_END
+
 ROM_START( mandingarf )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2716-mg1.bin",  0x0000, 0x0800, CRC(a684a494) SHA1(76885bb3bdab09f46c7daa25164a2fdaa744742f) ) // 2716
@@ -16920,6 +16940,7 @@ GAME( 1982, amigo2,      amidar,   amigo2,     amidaru,    galaxian_state, init_
 GAME( 1982, amidars,     amidar,   scramble,   amidars,    galaxian_state, init_scramble,   ROT90,  "Konami",                             "Amidar (Scramble hardware)",                                             MACHINE_SUPPORTS_SAVE )
 GAME( 1982, mandinga,    amidar,   scramble,   amidars,    galaxian_state, init_mandinga,   ROT90,  "bootleg (Artemi)",                   "Mandinga (Artemi bootleg of Amidar)",                                    MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // color PROM needs bitswap<8> on addressing, reference: http://www.youtube.com/watch?v=6uGK4AZxV2U
 GAME( 1982, mandingaeg,  amidar,   scramble,   amidars,    galaxian_state, init_mandingaeg, ROT90,  "bootleg (Electrogame S.A.)",         "Mandinga (Electrogame S.A. bootleg of Amidar)",                          MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, mandingag,   amidar,   scramble,   amidars,    galaxian_state, init_mandingaeg, ROT90,  "bootleg",                            "Mandinga (bootleg of Amidar)",                                           MACHINE_SUPPORTS_SAVE )
 GAME( 1982, mandinka,    amidar,   mandinka,   amidar,     galaxian_state, init_scramble,   ROT90,  "bootleg",                            "Mandinka (bootleg of Amidar)",                                           MACHINE_NO_SOUND | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // bad / missing audio CPU ROMs and color PROM
 GAME( 1982, mandingarf,  amidar,   mandingarf, mandingarf, galaxian_state, init_galaxian,   ROT90,  "bootleg (Recreativos Franco S.A.)",  "Mandanga (bootleg of Mandinga on Galaxian hardware, set 1)",             MACHINE_NO_COCKTAIL | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // assume same issue as mandinga
 GAME( 1982, mandingac,   amidar,   mandingarf, mandingarf, galaxian_state, init_galaxian,   ROT90,  "bootleg (Centromatic)",              "Mandanga (bootleg of Mandinga on Galaxian hardware, set 2)",             MACHINE_NO_COCKTAIL | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // assume same issue as mandinga

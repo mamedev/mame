@@ -222,13 +222,11 @@ private:
 	required_device<device_palette_interface> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 	tilemap_t *m_tilemap;
-	memory_region *m_rom;
 	memory_share_creator<u8> m_vram;
 	memory_share_creator<u8> m_fastram;
 	memory_bank_creator m_bank0_fastram;
 	memory_view m_bank_view0;
 	memory_view m_bank_view3;
-	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 	output_finder<> m_turbo_led;
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
@@ -1461,14 +1459,13 @@ void sprinter_state::machine_start()
 	m_beta->enable();
 
 	// reconfigure ROMs
-	m_rom = memregion("maincpu");
-	m_bank_rom[0]->configure_entries(0, m_rom->bytes() / 0x4000, m_rom->base(), 0x4000);
+	memory_region *rom = memregion("maincpu");
+	m_bank_rom[0]->configure_entries(0, rom->bytes() / 0x4000, rom->base(), 0x4000);
 	m_bank0_fastram->configure_entries(0, m_fastram.bytes() / 0x4000, m_fastram.target(), 0x4000);
 	for (auto i = 0; i < 4; i++)
 		m_bank_ram[i]->configure_entries(0, m_ram->size() / 0x4000, m_ram->pointer(), 0x4000);
 
 	m_dcp_location = m_ram->pointer() + (0x40 << 14);
-	m_maincpu->space(AS_PROGRAM).specific(m_program);
 
 	const u8 port_default[0x40] = {
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // Cx - SYS PORTS COPIES
@@ -1885,7 +1882,6 @@ void sprinter_state::sprinter(machine_config &config)
 	m_maincpu->set_m1_map(&sprinter_state::map_fetch);
 	m_maincpu->set_memory_map(&sprinter_state::map_mem);
 	m_maincpu->set_io_map(&sprinter_state::map_io);
-	m_maincpu->nomreq_cb().set_nop();
 	m_maincpu->set_irq_acknowledge_callback(NAME([](device_t &, int){ return 0xff; }));
 	m_maincpu->irqack_cb().set(m_irqs, FUNC(input_merger_any_high_device::in_clear<2>));
 	m_maincpu->irqack_cb().append(m_irqs, FUNC(input_merger_any_high_device::in_clear<1>));

@@ -170,7 +170,7 @@ public:
 
 private:
 	/* devices */
-	required_device<e132xt_device> m_maincpu;
+	required_device<e132x_device> m_maincpu;
 	optional_device_array<okim6295_device, 2> m_oki;
 
 	/* memory pointers */
@@ -353,13 +353,13 @@ void gstream_state::gstream_oki_4040_w(uint32_t data)
 
 void gstream_state::gstream_io(address_map &map)
 {
-	map(0x4000, 0x4003).portr("IN0");
-	map(0x4010, 0x4013).portr("IN1");
-	map(0x4020, 0x4023).portr("IN2");    // extra coin switches etc
-	map(0x4030, 0x4033).w(FUNC(gstream_state::gstream_oki_banking_w));    // oki banking
-	map(0x4040, 0x4043).w(FUNC(gstream_state::gstream_oki_4040_w));   // some clocking?
-	map(0x4053, 0x4053).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // music and samples
-	map(0x4063, 0x4063).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // music and samples
+	map(0x1000, 0x1000).portr("IN0");
+	map(0x1004, 0x1004).portr("IN1");
+	map(0x1008, 0x1008).portr("IN2");    // extra coin switches etc
+	map(0x100c, 0x100c).w(FUNC(gstream_state::gstream_oki_banking_w));    // oki banking
+	map(0x1010, 0x1010).w(FUNC(gstream_state::gstream_oki_4040_w));   // some clocking?
+	map(0x1014, 0x1014).umask32(0x000000ff).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // music and samples
+	map(0x1018, 0x1018).umask32(0x000000ff).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // music and samples
 }
 
 
@@ -391,12 +391,12 @@ void gstream_state::x2222_sound_w(uint32_t data)
 
 void gstream_state::x2222_io(address_map &map)
 {
-	map(0x4000, 0x4003).portr("P1");
-	map(0x4004, 0x4007).portr("P2");
-	map(0x4008, 0x400b).portr("SYS");
-	map(0x4010, 0x4013).portr("DSW");
-	map(0x4028, 0x402b).w(FUNC(gstream_state::x2222_sound_w));
-	map(0x4034, 0x4037).portr("IN4");
+	map(0x1000, 0x1000).portr("P1");
+	map(0x1001, 0x1001).portr("P2");
+	map(0x1002, 0x1002).portr("SYS");
+	map(0x1004, 0x1004).portr("DSW");
+	map(0x100a, 0x100a).w(FUNC(gstream_state::x2222_sound_w));
+	map(0x100d, 0x100d).portr("IN4");
 }
 
 static INPUT_PORTS_START( gstream )
@@ -832,7 +832,7 @@ void gstream_state::machine_reset()
 void gstream_state::gstream(machine_config &config)
 {
 	/* basic machine hardware */
-	E132XT(config, m_maincpu, 16000000*4); /* 4x internal multiplier */
+	E132X(config, m_maincpu, 16'000'000*4); // E1-32XT (TQFP), 4x internal multiplier
 	m_maincpu->set_addrmap(AS_PROGRAM, &gstream_state::gstream_32bit_map);
 	m_maincpu->set_addrmap(AS_IO, &gstream_state::gstream_io);
 	m_maincpu->set_vblank_int("screen", FUNC(gstream_state::irq0_line_hold));
@@ -861,7 +861,7 @@ void gstream_state::gstream(machine_config &config)
 void gstream_state::x2222(machine_config &config)
 {
 	/* basic machine hardware */
-	E132XT(config, m_maincpu, 16000000*4); /* 4x internal multiplier */
+	E132X(config, m_maincpu, 16'000'000*4); // E1-32XT (TQFP) 4x internal multiplier
 	m_maincpu->set_addrmap(AS_PROGRAM, &gstream_state::x2222_32bit_map);
 	m_maincpu->set_addrmap(AS_IO, &gstream_state::x2222_io);
 	m_maincpu->set_vblank_int("screen", FUNC(gstream_state::irq0_line_hold));

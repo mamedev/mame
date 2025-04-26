@@ -210,16 +210,14 @@ static const int tc0080vco_zoomy_conv_table[] =
 	0x67,0x68,0x6a,0x6b,0x6c,0x6e,0x6f,0x71, 0x72,0x74,0x76,0x78,0x80,0x7b,0x7d,0x7f
 };
 
-/* Y chain size is 16/32?/64/64? pixels. X chain size
-   is always 64 pixels. */
-
-static const u8 size[] = { 1, 2, 4, 4 };
-
 void tc0080vco_device::get_sprite_params(int offs, bool zoomy_enable)
 {
 	m_sprite.tile_offs = (m_spriteram[offs + 3] & 0x1fff) << 2;
 	if (m_sprite.tile_offs)
 	{
+		// Y chain size is 16/32?/64/64? pixels. X chain size is always 64 pixels.
+		static const u8 size[] = { 1, 2, 4, 4 };
+
 		m_sprite.x0    =  m_spriteram[offs + 1] & 0x03ff;
 		m_sprite.y0    =  m_spriteram[offs + 0] & 0x03ff;
 		m_sprite.zoomx = (m_spriteram[offs + 2] & 0x7f00) >> 8;
@@ -369,10 +367,7 @@ TILE_GET_INFO_MEMBER(tc0080vco_device::get_tx_tile_info)
 		tileinfo.category = 0;
 	}
 
-	tileinfo.set(1,
-			tile,
-			0,
-			0);
+	tileinfo.set(1, tile, 0, 0);
 }
 
 
@@ -706,8 +701,8 @@ void tc0080vco_device::bg1_tilemap_draw(screen_device &screen, bitmap_ind16 &bit
 		else
 		{
 			/* adjustment for zx is entirely speculative */
-			sx =  (( 0x200 + m_scroll_ram[layer + 1]) << 16) - (max_x + min_x) * (zx - 0x10000);
-			sy =  (( 0x3fe - m_scroll_ram[layer + 3]) << 16) - (max_y + min_y) * (zy - 0x10000);
+			sx = (( 0x200 + m_scroll_ram[layer + 1]) << 16) - (max_x + min_x) * (zx - 0x10000);
+			sy = (( 0x3fe - m_scroll_ram[layer + 3]) << 16) - (max_y + min_y) * (zy - 0x10000);
 		}
 
 		copyrozbitmap_core(bitmap, cliprect, srcbitmap, sx, sy, zx, 0, 0, zy, false, screen.priority(), [privalue = priority, primask = pmask](u16 &destp, u8 &pri, const u16 &srcp) { PIXEL_OP_COPY_TRANS0_SET_PRIORITY(destp, pri, srcp); });
@@ -786,4 +781,6 @@ void tc0080vco_device::device_post_load()
 	m_bg1_scrollx = m_scroll_ram[2] & 0x03ff;
 	m_bg0_scrolly = m_scroll_ram[3] & 0x03ff;
 	m_bg1_scrolly = m_scroll_ram[4] & 0x03ff;
+
+	gfx(1)->mark_all_dirty();
 }

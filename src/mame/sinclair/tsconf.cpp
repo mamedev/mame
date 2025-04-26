@@ -172,7 +172,6 @@ void tsconf_state::video_start()
 void tsconf_state::machine_start()
 {
 	spectrum_128_state::machine_start();
-	m_maincpu->space(AS_PROGRAM).specific(m_program);
 
 	// reconfigure ROMs
 	memory_region *rom = memregion("maincpu");
@@ -281,6 +280,10 @@ void tsconf_state::tsconf(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(FUNC(tsconf_state::irq_vector));
 
 	m_maincpu->set_vblank_int("screen", FUNC(tsconf_state::tsconf_vblank_interrupt));
+
+	SPI_SDCARD(config, m_sdcard, 0);
+	m_sdcard->set_prefer_sdhc();
+	m_sdcard->spi_miso_callback().set(FUNC(tsconf_state::tsconf_spi_miso_w));
 
 	zxbus_device &zxbus(ZXBUS(config, "zxbus", 0));
 	ZXBUS_SLOT(config, "zxbus1", 0, zxbus, zxbus_cards, nullptr);

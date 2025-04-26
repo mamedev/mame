@@ -308,8 +308,13 @@ void DebuggerView::mousePressEvent(QMouseEvent *event)
 	debug_view_xy const topLeft = m_view->visible_position();
 	debug_view_xy const visibleCharDims = m_view->visible_size();
 	debug_view_xy clickViewPosition;
-	clickViewPosition.x = (std::min)(int(topLeft.x + (event->x() / fontWidth)), topLeft.x + visibleCharDims.x - 1);
-	clickViewPosition.y = (std::min)(int(topLeft.y + (event->y() / fontHeight)), topLeft.y + visibleCharDims.y - 1);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+	const QPointF mousePosition = event->position();
+#else
+	const QPointF mousePosition = event->localPos();
+#endif
+	clickViewPosition.x = (std::min)(int(topLeft.x + (mousePosition.x() / fontWidth)), topLeft.x + visibleCharDims.x - 1);
+	clickViewPosition.y = (std::min)(int(topLeft.y + (mousePosition.y() / fontHeight)), topLeft.y + visibleCharDims.y - 1);
 
 	if (event->button() == Qt::LeftButton)
 	{

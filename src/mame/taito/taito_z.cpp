@@ -3225,7 +3225,7 @@ void contcirc_state::contcirc(machine_config &config) //OSC: 26.686, 24.000, 16.
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(16'000'000)/2));    // 8 MHz
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "subwoofer", 0.20);
+	ymsnd.add_route(0, "subwoofer", 0.60);
 	ymsnd.add_route(1, "2610.1.l", 2.0);
 	ymsnd.add_route(1, "2610.1.r", 2.0);
 	ymsnd.add_route(2, "2610.2.l", 2.0);
@@ -3284,7 +3284,7 @@ void chasehq_state::chasehq(machine_config &config) //OSC: 26.686, 24.000, 16.00
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(16'000'000)/2));    // 8 MHz
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "subwoofer", 0.20);
+	ymsnd.add_route(0, "subwoofer", 0.60);
 	ymsnd.add_route(1, "2610.1.l", 1.0);
 	ymsnd.add_route(1, "2610.1.r", 1.0);
 	ymsnd.add_route(2, "2610.2.l", 1.0);
@@ -3345,8 +3345,8 @@ void contcirc_state::enforce(machine_config &config)
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(16'000'000)/2));    // 8 MHz
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(0, "lspeaker", 0.75);
+	ymsnd.add_route(0, "rspeaker", 0.75);
 	ymsnd.add_route(1, "2610.1.l", 20.0);
 	ymsnd.add_route(1, "2610.1.r", 20.0);
 	ymsnd.add_route(2, "2610.2.l", 20.0);
@@ -3401,8 +3401,8 @@ void taitoz_state::bshark_base(machine_config &config)
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16000000/2));
 	//ymsnd.irq_handler().set_inputline(m_audiocpu, 0); // DG: this is probably specific to Z80 and wrong?
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(0, "lspeaker", 0.75);
+	ymsnd.add_route(0, "rspeaker", 0.75);
 	ymsnd.add_route(1, "2610.1.l", 28.0);
 	ymsnd.add_route(1, "2610.1.r", 28.0);
 	ymsnd.add_route(2, "2610.2.l", 28.0);
@@ -3476,8 +3476,8 @@ void sci_state::sci(machine_config &config)
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(32'000'000)/4));    // 8 MHz
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(0, "lspeaker", 0.75);
+	ymsnd.add_route(0, "rspeaker", 0.75);
 	ymsnd.add_route(1, "2610.1.l", 2.0);
 	ymsnd.add_route(1, "2610.1.r", 2.0);
 	ymsnd.add_route(2, "2610.2.l", 2.0);
@@ -3546,7 +3546,7 @@ void nightstr_state::nightstr(machine_config &config) //OSC: 26.686, 24.000, 16.
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(16'000'000)/2));    // 8 MHz
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "subwoofer", 0.20);
+	ymsnd.add_route(0, "subwoofer", 0.60);
 	ymsnd.add_route(1, "2610.1.l", 2.0);
 	ymsnd.add_route(1, "2610.1.r", 2.0);
 	ymsnd.add_route(2, "2610.2.l", 2.0);
@@ -3606,8 +3606,8 @@ void taitoz_z80_sound_state::aquajack(machine_config &config) //OSC: 26.686, 24.
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(16'000'000)/2));    // 8 MHz
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(0, "lspeaker", 0.75);
+	ymsnd.add_route(0, "rspeaker", 0.75);
 	ymsnd.add_route(1, "2610.1.l", 2.0);
 	ymsnd.add_route(1, "2610.1.r", 2.0);
 	ymsnd.add_route(2, "2610.2.l", 2.0);
@@ -3673,8 +3673,8 @@ void spacegun_state::spacegun(machine_config &config) //OSC: 26.686, 24.000, 16.
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(16'000'000)/2));    // 8 MHz
 	//ymsnd.irq_handler().set_inputline(m_audiocpu, 0); // DG: this is probably specific to Z80 and wrong?
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(0, "lspeaker", 0.75);
+	ymsnd.add_route(0, "rspeaker", 0.75);
 	ymsnd.add_route(1, "2610.1.l", 8.0);
 	ymsnd.add_route(1, "2610.1.r", 8.0);
 	ymsnd.add_route(2, "2610.2.l", 8.0);
@@ -3731,8 +3731,8 @@ void taitoz_z80_sound_state::dblaxle(machine_config &config)
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(32'000'000)/4));   // 8 MHz
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(0, "lspeaker", 0.75);
+	ymsnd.add_route(0, "rspeaker", 0.75);
 	ymsnd.add_route(1, "2610.1.l", 8.0);
 	ymsnd.add_route(1, "2610.1.r", 8.0);
 	ymsnd.add_route(2, "2610.2.l", 8.0);
@@ -3792,8 +3792,8 @@ void sci_state::racingb(machine_config &config)
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(32'000'000)/4));   // 8 MHz
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(0, "lspeaker", 0.75);
+	ymsnd.add_route(0, "rspeaker", 0.75);
 	ymsnd.add_route(1, "2610.1.l", 8.0);
 	ymsnd.add_route(1, "2610.1.r", 8.0);
 	ymsnd.add_route(2, "2610.2.l", 8.0);

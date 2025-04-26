@@ -7468,6 +7468,23 @@ Other stuff untested
 		</part>
 	</software>
 
+	<!-- DOS, Windows 95B, Windows 98, Windows Me, Windows 2000, Windows XP
+	     and El Torito bootable. -->
+	<software name="pmagic">
+		<description>PartitionMagic 8.05</description>
+		<year>2004</year>
+		<publisher>Symantec</publisher>
+		<info name="language" value="English/French/German/Italian/Spanish" />
+		<info name="release" value="20040505" />
+		<info name="usage" value="Windows installer accepts any string starting with &quot;PM805EN1-&quot; for a product key." />
+		<info name="version" value="8.05" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="partitionmagic 8.05" sha1="f783735693288fa20c8d2d7a614a3d0674ede2bf" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!--                                         -->
 	<!--                Multimedia               -->
 	<!--                                         -->
@@ -7704,6 +7721,37 @@ Installation and Open Circulation CDs are bootable.
 			<feature name="part_id" value="Boot Floppy" />
 			<dataarea name="flop" size="1474560">
 				<rom name="FD13BOOT.img" size="1474560" crc="5c647576" sha1="ec08f57f36b0bbc4d2b7613dc0857f0b43fd08e5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="freedos14">
+		<description>FreeDOS 1.4</description>
+		<year>2025</year>
+		<publisher>The FreeDOS Project</publisher>
+		<info name="version" value="1.4" />
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="LiveCD" />
+			<diskarea name="cdrom">
+				<disk name="fd14live" sha1="05d928a57c1197a78f0503f8c56d3b63e5334a5e" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="Legacy CD" />
+			<diskarea name="cdrom">
+				<disk name="fd14lgcy" sha1="e0c4ccec6b798811df2849f2d7112f95e29cd4e3" />
+			</diskarea>
+		</part>
+		<part name="cdrom3" interface="cdrom">
+			<feature name="part_id" value="Bonus CD" />
+			<diskarea name="cdrom">
+				<disk name="fd14bns" sha1="12b6f445a75d4b1bc236626631396efd638f2381" />
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Boot Floppy" />
+			<dataarea name="flop" size="1474560">
+				<rom name="FD14BOOT.img" size="1474560" crc="930a7c56" sha1="67581ee9c6b20d44599626c2a68939de85b5b4a9" />
 			</dataarea>
 		</part>
 	</software>

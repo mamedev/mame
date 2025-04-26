@@ -526,8 +526,8 @@ void tail2nos_state::tail2nos(machine_config &config)
 	ym2608_device &ymsnd(YM2608(config, "ymsnd", XTAL(8'000'000))); // verified on PCB
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.port_b_write_callback().set(FUNC(tail2nos_state::sound_bankswitch_w));
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(0, "lspeaker", 0.75);
+	ymsnd.add_route(0, "rspeaker", 0.75);
 	ymsnd.add_route(1, "lspeaker", 1.0);
 	ymsnd.add_route(2, "rspeaker", 1.0);
 }

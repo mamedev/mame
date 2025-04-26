@@ -163,18 +163,25 @@ uint32_t rampart_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = m_mob->bitmap();
-	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->top(); y <= rect->bottom(); y++)
-		{
-			uint16_t const *const mo = &mobitmap.pix(y);
-			uint16_t *const pf = &bitmap.pix(y);
-			for (int x = rect->left(); x <= rect->right(); x++)
-				if (mo[x] != 0xffff)
+	m_mob->iterate_dirty_rects(
+			cliprect,
+			[&bitmap, &mobitmap] (rectangle const &rect)
+			{
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
-					// the PCB supports more complex priorities, but the PAL is not stuffed, so we get the default
-					pf[x] = mo[x];
+					uint16_t const *const mo = &mobitmap.pix(y);
+					uint16_t *const pf = &bitmap.pix(y);
+					for (int x = rect.left(); x <= rect.right(); x++)
+					{
+						if (mo[x] != 0xffff)
+						{
+							// the PCB supports more complex priorities, but the PAL is not stuffed, so we get the default
+							pf[x] = mo[x];
+						}
+					}
 				}
-		}
+			});
+
 	return 0;
 }
 

@@ -288,8 +288,6 @@ private:
 	void port_e7_reg_w(u8 data);
 
 	memory_access<8, 0, 0, ENDIANNESS_LITTLE>::specific m_next_regs;
-	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
-	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
 	memory_view m_io_shadow_view;
 	memory_bank_creator m_bank_boot_rom;
 	memory_bank_array_creator<8> m_bank_ram;
@@ -2802,8 +2800,6 @@ void specnext_state::machine_start()
 	m_spi_clock = timer_alloc(FUNC(specnext_state::spi_clock), this);
 
 	m_regs_map->space(AS_PROGRAM).specific(m_next_regs);
-	m_maincpu->space(AS_PROGRAM).specific(m_program);
-	m_maincpu->space(AS_IO).specific(m_io);
 
 	for (auto i = 0; i < 8; i++)
 		m_bank_ram[i]->configure_entries(0, m_ram->size() / 0x2000, m_ram->pointer(), 0x2000);
@@ -3455,7 +3451,6 @@ void specnext_state::tbblue(machine_config &config)
 	m_maincpu->out_nextreg_cb().set(FUNC(specnext_state::reg_w));
 	m_maincpu->in_nextreg_cb().set(FUNC(specnext_state::reg_r));
 	m_maincpu->out_retn_seen_cb().set(FUNC(specnext_state::leave_nmi));
-	m_maincpu->nomreq_cb().set_nop();
 	m_maincpu->busack_cb().set(m_dma, FUNC(specnext_dma_device::bai_w));
 
 	SPECNEXT_CTC(config, m_ctc, 28_MHz_XTAL / 8);

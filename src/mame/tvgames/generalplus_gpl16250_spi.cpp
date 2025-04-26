@@ -148,6 +148,16 @@ ROM_START( anpanbd )
 	ROM_LOAD16_WORD_SWAP( "mx25l12835f.u2", 0x0000, 0x1000000, CRC(c4be09d7) SHA1(c9098d0c1c9db649a010f67469f500b69407372f) )
 ROM_END
 
+ROM_START( anpanm15 )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
+
+	ROM_REGION(0x1000000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "mx25l12835f.ic3", 0x0000, 0x1000000, CRC(47c36cbd) SHA1(f1cae506e21c1795401004d79f6bb1b1d982d657) )
+ROM_END
+
+
+
 ROM_START( bk139in1 )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
@@ -209,6 +219,9 @@ CONS(2015, prailpls, 0, 0, generalplus_gpspispi,         gcm394, generalplus_gps
 
 // this is a half-head shaped unit, SHP13017-R1 main PCB  -  アンパンマン レッツゴー！育脳ドライブ きみものれるよ！アンパンマンごう「それいけ！アンパンマン」
 CONS(2014, anpanbd,  0, 0, generalplus_gpspispi,         gcm394, generalplus_gpspispi_game_state,         init_spi, "JoyPalette", "Anpanman: Let's Go! Ikunou Drive (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+//  それいけ！アンパンマン」みんなで！育脳マット
+CONS(2015, anpanm15, 0, 0, generalplus_gpspispi,         gcm394, generalplus_gpspispi_game_state,         init_spi, "JoyPalette", "Anpanman: Minnade! Ikunou Mat (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 CONS(2015, bkrankp,  0, 0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state, init_spi, "Bandai", "Karaoke Ranking Party (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 

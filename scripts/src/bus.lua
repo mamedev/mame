@@ -2110,6 +2110,8 @@ if (BUSES["MSX_SLOT"]~=null) then
 		MAME_DIR .. "src/devices/bus/msx/cart/superloderunner.h",
 		MAME_DIR .. "src/devices/bus/msx/cart/super_swangi.cpp",
 		MAME_DIR .. "src/devices/bus/msx/cart/super_swangi.h",
+		MAME_DIR .. "src/devices/bus/msx/cart/video80.h",
+		MAME_DIR .. "src/devices/bus/msx/cart/video80.cpp",
 		MAME_DIR .. "src/devices/bus/msx/cart/yamaha_ucn01.cpp",
 		MAME_DIR .. "src/devices/bus/msx/cart/yamaha_ucn01.h",
 		MAME_DIR .. "src/devices/bus/msx/minicart/minicart.cpp",
@@ -3675,6 +3677,8 @@ if (BUSES["SNES"]~=null) then
 		MAME_DIR .. "src/devices/bus/snes/sgb.h",
 		MAME_DIR .. "src/devices/bus/snes/spc7110.cpp",
 		MAME_DIR .. "src/devices/bus/snes/spc7110.h",
+		MAME_DIR .. "src/devices/bus/snes/st018.cpp",
+		MAME_DIR .. "src/devices/bus/snes/st018.h",
 		MAME_DIR .. "src/devices/bus/snes/sufami.cpp",
 		MAME_DIR .. "src/devices/bus/snes/sufami.h",
 		MAME_DIR .. "src/devices/bus/snes/upd.cpp",
@@ -5308,8 +5312,6 @@ if (BUSES["CBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_118.h",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_cbus.cpp",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_cbus.h",
-		MAME_DIR .. "src/devices/bus/cbus/pc9801_snd.cpp",
-		MAME_DIR .. "src/devices/bus/cbus/pc9801_snd.h",
 		MAME_DIR .. "src/devices/bus/cbus/sb16_ct2720.cpp",
 		MAME_DIR .. "src/devices/bus/cbus/sb16_ct2720.h",
 	}
@@ -5820,13 +5822,13 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/heathzenith/h89/intr_cntrl.h,BUSES["HEATH_INTR_SOCKET"] = true
+--@src/devices/bus/heathzenith/intr_cntrl/intr_cntrl.h,BUSES["HEATH_INTR_SOCKET"] = true
 ---------------------------------------------------
 
 if (BUSES["HEATH_INTR_SOCKET"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/bus/heathzenith/h89/intr_cntrl.cpp",
-		MAME_DIR .. "src/devices/bus/heathzenith/h89/intr_cntrl.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/intr_cntrl/intr_cntrl.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/intr_cntrl/intr_cntrl.h",
 	}
 end
 

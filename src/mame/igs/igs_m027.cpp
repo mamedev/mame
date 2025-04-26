@@ -163,6 +163,8 @@ public:
 	void init_gonefsh2() ATTR_COLD;
 	void init_cjddz() ATTR_COLD;
 	void init_cjddzp() ATTR_COLD;
+	void init_cjddzs() ATTR_COLD;
+	void init_cjddzps() ATTR_COLD;
 	void init_cjddzlf() ATTR_COLD;
 	void init_cjtljp() ATTR_COLD;
 	void init_zhongguo() ATTR_COLD;
@@ -184,6 +186,7 @@ public:
 	void init_chessc2() ATTR_COLD;
 	void init_tct2p() ATTR_COLD;
 	void init_xypdk() ATTR_COLD;
+	void init_ccly() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -3047,6 +3050,127 @@ ROM_START( cjddzp )
 	ROM_LOAD( "cjddzp_sp-1.u4", 0x00000, 0x200000, CRC(7ef65d95) SHA1(345c587cd449d6d06908e9687480be76b2cb2d28) )
 ROM_END
 
+/*
+Chaoji Dou Dizhu (V302CN) (hard version)
+IGS, 2007
+
+PCB: IGS PCB-0489-07-FM-1
+
+Main program is on a plug-in daughterboard containing one 27C322 EPROM, Lattice LC4128V CPLD,
+3.3V regulator and a 2-position DIP switch.
+DIP#1 off sets V219CN. DIP#1 on sets V302CN
+
+IGS027 Sticker: B1
+ROM String: WED NOV 3 17:21:49 2004
+            FIGHT_213CN
+
+Oki Clock (from PAL): 1.000MHz [22/22]
+Oki Pin 7: High
+*/
+
+ROM_START( cjddzs )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS027A ARM based MCU
+	ROM_LOAD( "b1_igs027a", 0x00000, 0x4000, CRC(124f4bee) SHA1(bf9785516ef36290c2a7bac307bb2d849f2045ae) )
+
+	ROM_REGION32_LE( 0x100000, "user1", 0 ) // external ARM data / prg
+	// this has 2 programs, each repeated 4 times (cjddz at 0x000000, 0x080000, 0x200000, 0x280000, cjddzp at the remaining offsets).
+	// cjddz works correctly with the internal ROM, once a small address line swap is applied. cjddzp doesn't work.
+	// it is tested on PCB that regardless of DIP setting the same internal ROM string appears, when the external ROM is removed, so there
+	// must be some kind of additional work done by the CPLD to make cjddzp work.
+	ROM_LOAD( "v-302cn.u1", 0x000000, 0x080000, CRC(fc525368) SHA1(293a0b30b384b2f294ab7d9dbaafc899002c7a32) ) // BADADDR  -x-xxxxxxxxxxxxxxxxxxx
+	ROM_IGNORE(                       0x080000 )
+	ROM_CONTINUE(           0x080000, 0x080000 )
+	ROM_IGNORE(                       0x280000 )
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD16_WORD_SWAP( "text.u27", 0x000000, 0x80000, CRC(520dc392) SHA1(0ab2620f20af8253806b6ff4e1d9d77a694da17c) )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "ani_cg.u28", 0x000000, 0x400000, CRC(72487508) SHA1(9f4bbc858960ddaae403e4a3330b2345f6fd6cb3) )
+
+	// OKI, sample tables are every 0x20000 starting at 0x40000
+	// 00000-1ffff and 20000-3ffff are likely music, always mapped at 20000 for any of the above banks
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "sp-1.u5", 0x00000, 0x200000, CRC(7ef65d95) SHA1(345c587cd449d6d06908e9687480be76b2cb2d28) )
+ROM_END
+
+/*
+Chaoji Dou Dizhu (V219GN) (hard version)
+IGS, 2009
+
+PCB: IGS PCB-0489-03-FM-1
+
+Main program is on a plug-in daughterboard containing one 27C322 EPROM, Lattice LC4128V CPLD,
+3.3V regulator and a 2-position DIP switch.
+DIP#1 off sets V219CN. DIP#1 on sets V405CN
+
+IGS027 Sticker: not present
+ROM String: WED NOV 3 17:21:49 2004
+            FIGHT_213CN
+
+Oki Clock (from PAL): 1.000MHz [22/22]
+Oki Pin 7: High
+*/
+
+ROM_START( cjddzsa )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS027A ARM based MCU
+	ROM_LOAD( "igs027a", 0x00000, 0x4000, CRC(124f4bee) SHA1(bf9785516ef36290c2a7bac307bb2d849f2045ae) )
+
+	ROM_REGION32_LE( 0x100000, "user1", 0 ) // external ARM data / prg
+	// this has 2 programs, each repeated 2 times (cjddz at 0x200000, 0x300000, cjddzp at 0x280000, 0x380000). First 0x200000 are 0xff filled.
+	// cjddz works correctly with the internal ROM, once a small address line swap is applied. cjddzp doesn't work.
+	// it is tested on PCB that regardless of DIP setting the same internal ROM string appears, when the external ROM is removed, so there
+	// must be some kind of additional work done by the CPLD to make cjddzp work.
+	ROM_LOAD( "v-219gn.u1", 0x000000, 0x080000, CRC(33ded435) SHA1(ed9911b4d3ab4a0924faf02e0090c24ff83a0d45) ) // 0xxxxxxxxxxxxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(           0x000000, 0x080000 )
+	ROM_CONTINUE(           0x000000, 0x080000 )
+	ROM_CONTINUE(           0x000000, 0x080000 )
+	ROM_CONTINUE(           0x000000, 0x100000 )
+	ROM_IGNORE(                       0x100000 )
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD16_WORD_SWAP( "text.u27", 0x000000, 0x80000, CRC(520dc392) SHA1(0ab2620f20af8253806b6ff4e1d9d77a694da17c) )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "ani_cg.u28", 0x000000, 0x400000, CRC(72487508) SHA1(9f4bbc858960ddaae403e4a3330b2345f6fd6cb3) )
+
+	// OKI, sample tables are every 0x20000 starting at 0x40000
+	// 00000-1ffff and 20000-3ffff are likely music, always mapped at 20000 for any of the above banks
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "sp-1.u5", 0x00000, 0x200000, CRC(64fbba95) SHA1(1aecb1b8426939262688e4dbed09d6a56e71b8d5) )
+ROM_END
+
+ROM_START( cjddzps )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS027A ARM based MCU
+	ROM_LOAD( "igs027a", 0x00000, 0x4000, CRC(6cf26c3d) SHA1(c74d4ff71ff07c38449242e7e067e956a5c441be) )
+
+	ROM_REGION32_LE( 0x100000, "user1", 0 ) // external ARM data / prg
+	// this has 2 programs, (cjddzp at 0x200000, an unknown one at 0x280000). First 0x200000 and last 0x100000 are 0xff filled.
+	// cjddzp works correctly with the internal ROM, once a small address line swap is applied. the other game doesn't work.
+	// it's unknown which game it is, since the PCB doesn't work, but given the GFX and sound ROMs match, it should be some variation of cjddz/cjddzp
+	ROM_LOAD( "rom.u1", 0x000000, 0x080000, CRC(969f7d09) SHA1(6e5eab99d0ab7913d6838e5c357813960640cc14) ) // 01xxxxxxxxxxxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(       0x000000, 0x080000 )
+	ROM_CONTINUE(       0x000000, 0x080000 )
+	ROM_CONTINUE(       0x000000, 0x080000 )
+	ROM_CONTINUE(       0x000000, 0x100000 )
+	ROM_IGNORE(                   0x100000 )
+
+	ROM_REGION( 0x200000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD16_WORD_SWAP( "rom.u27", 0x000000, 0x200000, CRC(c4daedd6) SHA1(1c06e9b8f8c9849d808e12d81588f8d5603941d1) ) // 1xxxxxxxxxxxxxxxxxxxx = 0x00
+
+	ROM_REGION( 0x600000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "rom.u26", 0x000000, 0x400000, CRC(72487508) SHA1(9f4bbc858960ddaae403e4a3330b2345f6fd6cb3) )
+	ROM_LOAD( "rom.u29", 0x400000, 0x200000, CRC(b0447269) SHA1(bf639abc135b52781340a24820e402db497d8d09) )
+
+	// OKI, sample tables are every 0x20000 starting at 0x40000
+	// 00000-1ffff and 20000-3ffff are likely music, always mapped at 20000 for any of the above banks
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "rom.u11", 0x00000, 0x200000, CRC(7ef65d95) SHA1(345c587cd449d6d06908e9687480be76b2cb2d28) )
+ROM_END
+
 // 超级斗地主 两副牌 (Chāojí Dòu Dìzhǔ Liǎng Fù Pái)
 ROM_START( cjddzlf )
 	ROM_REGION( 0x04000, "maincpu", 0 )
@@ -3256,6 +3380,44 @@ ROM_START( extradrw ) // IGS PCB 0326-05-DV-1
 	ROM_LOAD( "igs s3002.u18", 0x00000, 0x200000, CRC(48601c32) SHA1(8ef3bad80931f4b1badf0598463e15508602f104) ) // BADADDR   --xxxxxxxxxxxxxxxxxxx
 ROM_END
 
+ROM_START( cjdh6th ) // IGS PCB 0226-03. While sharing mask ROMs with extradrw, this PCB doesn't have a second PPI
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal rom of IGS027A ARM based MCU
+	ROM_LOAD( "igs027a.u24", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x80000, "user1", ROMREGION_ERASEFF ) // external ARM data / prg
+	ROM_LOAD( "u5", 0x00000, 0x40000, CRC(76db4f1c) SHA1(df625f20c1743c205181bf1d5053085f4761ac69) )
+	ROM_RELOAD(     0x40000, 0x40000 )
+
+	ROM_REGION( 0x080000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "igs_m3004.u9",  0x000000, 0x080000, CRC(d161f8f7) SHA1(4b495197895fd805979c5d5c5a4b7f07a68f4171) )
+
+	ROM_REGION( 0x200000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "igs_m3001.u19",  0x000000, 0x200000, CRC(642247fb) SHA1(69c01c3551551120a3786522b28a80621a0d5082) ) // 1xxxxxxxxxxxxxxxxxxxx = 0xFF
+	// u21 unpopulated socket
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "igs s3002.u6", 0x00000, 0x80000, CRC(74b64969) SHA1(faaf1765f0982259382657665b82f0b1fb8ad8af) ) // matches the Extra Draw one when split
+ROM_END
+
+ROM_START( ccly ) // IGS PCB-0415-05-GD - no XA, contrary to the other regions sets in igs_m027xa.cpp
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal rom of IGS027A ARM based MCU
+	ROM_LOAD( "b5_027a.u30", 0x00000, 0x4000, CRC(5007bbf1) SHA1(e98753e299905ac13b31ae606b821d089fe045d0) )
+
+	ROM_REGION32_LE( 0x80000, "user1", ROMREGION_ERASEFF ) // external ARM data / prg
+	ROM_LOAD( "rom.u21", 0x00000, 0x80000, CRC(f5fd7279) SHA1(4d91c0655bd852c8ff1f0fc9c882e87b37830268) )
+
+	ROM_REGION( 0x080000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "rom.u9", 0x000000, 0x080000, CRC(776f198c) SHA1(e567ef98160ccb51688189eac13594ab6aaf13bc) )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "rom.u8", 0x000000, 0x400000, CRC(5b9863ba) SHA1(c4080076e03994056ac94d7c0a5ffcabd9505f9a) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "rom.u18", 0x00000, 0x200000, CRC(2cbfc5aa) SHA1(94817f5d1babad4ff1bb12701797982e7a106a72) )
+ROM_END
+
 
 void igs_m027_state::pgm_create_dummy_internal_arm_region()
 {
@@ -3313,6 +3475,40 @@ void igs_m027_state::init_cjddzp()
 	cjddzp_decrypt(machine());
 	m_igs017_igs031->sdwx_gfx_decrypt();
 	m_igs017_igs031->tarzan_decrypt_sprites(0x400000, 0x400000);
+}
+
+void igs_m027_state::init_cjddzs()
+{
+	// extra scrambling applied by CPLD?
+	uint8_t *rom = memregion("user1")->base();
+	std::vector<uint8_t> buffer(0x100000);
+
+	memcpy(&buffer[0], rom, 0x100000);
+
+	for (int i = 0; i < 0x100000; i++)
+		rom[i] = buffer[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 11, 12, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)];
+
+	// the second program seems to also have additional address based XORs
+	// TODO
+
+	init_cjddz();
+}
+
+void igs_m027_state::init_cjddzps()
+{
+	// extra scrambling applied by CPLD?
+	uint8_t *rom = memregion("user1")->base();
+	std::vector<uint8_t> buffer(0x100000);
+
+	memcpy(&buffer[0], rom, 0x100000);
+
+	for (int i = 0; i < 0x100000; i++)
+		rom[i] = buffer[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 11, 12, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)];
+
+	// the second program seems to also have additional address based XORs
+	// TODO
+
+	init_cjddzp();
 }
 
 void igs_m027_state::init_cjddzlf()
@@ -3467,6 +3663,13 @@ void igs_m027_state::init_xypdk()
 	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
 }
 
+void igs_m027_state::init_ccly()
+{
+	crzybugs_decrypt(machine());
+	m_igs017_igs031->sdwx_gfx_decrypt();
+	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
+}
+
 } // anonymous namespace
 
 
@@ -3507,10 +3710,16 @@ GAME(  2005, cjddzlf,       0,        cjddz,        cjddz,         igs_m027_stat
 GAME(  2005, cjtljp,        0,        xypdk,        lhzb4,         igs_m027_state, init_cjtljp,   ROT0, "IGS", "Chaoji Tuolaji Jiaqiang Ban (V206CN)", 0 ) // 2005 date in internal ROM
 GAME(  2005, xypdk,         0,        xypdk,        lhzb4,         igs_m027_state, init_xypdk,    ROT0, "IGS", "Xingyun Pao De Kuai (V106CN)", 0 )
 GAMEL( 2007, tripslot,      0,        tripslot,     tripslot,      igs_m027_state, init_tripslot, ROT0, "IGS", "Triple Slot (V200VE)", 0, layout_tripslot ) // 2007 date in internal ROM at least, could be later, default settings password is all 'start 1'
+GAME(  2005, ccly,          crzybugs, m027_1ppi<true>, base,       igs_m027_state, init_ccly,     ROT0, "IGS", "Chong Chong Le Yuan (V100CN)", MACHINE_NOT_WORKING )
 // this has a 2nd 8255
 GAME(  2001, extradrw,      0,        extradrw,     base,          igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw (V100VE)", MACHINE_NOT_WORKING )
 // these have an IGS025 protection device instead of the 8255
 GAME(  2002, chessc2,       0,        chessc2,      chessc2,       igs_m027_state, init_chessc2,  ROT0, "IGS", "Chess Challenge II (ver. 1445A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+
+// these can select between two different games via DIP switch (currently unemulated feature)
+GAME(  2007, cjddzs,        0,        cjddz,        cjddz,         igs_m027_state, init_cjddzs,   ROT0, "bootleg (WDF)", "Chaoji Dou Dizhu (V219CN) / Chaoji Dou Dizhu Jianan Ban (V302CN)", MACHINE_NOT_WORKING )
+GAME(  2009, cjddzsa,       cjddzs,   cjddz,        cjddz,         igs_m027_state, init_cjddzs,   ROT0, "bootleg (WDF)", "Chaoji Dou Dizhu (V219CN) / Chaoji Dou Dizhu Jianan Ban (V405CN)", MACHINE_NOT_WORKING )
+GAME(  200?, cjddzps,       0,        cjddz,        cjddzp,        igs_m027_state, init_cjddzps,  ROT0, "bootleg (WDF)", "Chaoji Dou Dizhu Jiaqiang Ban (S300CN) / unknown second set", MACHINE_NOT_WORKING )
 
 // Incomplete dumps
 GAME(  1999, amazonia,      0,        m027_1ppi<false>, amazonia, igs_m027_state, init_amazonia, ROT0, "IGS", "Amazonia King (V104BR)", MACHINE_NOT_WORKING )
@@ -3521,5 +3730,6 @@ GAME(  200?, luckycrs,      0,        m027_1ppi<false>, base,     igs_m027_state
 GAME(  2003, amazoni2,      0,        m027_1ppi<false>, base,     igs_m027_state, init_amazoni2, ROT0, "IGS", "Amazonia King II (V202BR)", MACHINE_NOT_WORKING )
 GAME(  2002, sdwx,          0,        m027_1ppi<false>, base,     igs_m027_state, init_sdwx,     ROT0, "IGS", "Sheng Dan Wu Xian", MACHINE_NOT_WORKING ) // aka Christmas 5 Line? (or Amazonia King II, shares roms at least?)
 GAME(  200?, klxyj,         0,        m027_1ppi<false>, base,     igs_m027_state, init_klxyj,    ROT0, "IGS", "Kuai Le Xi You Ji", MACHINE_NOT_WORKING )
+GAME(  2001, cjdh6th,       0,        m027_1ppi<false>, base,     igs_m027_state, init_extradrw, ROT0, "IGS", "Chaoji Daheng 6th", MACHINE_NOT_WORKING )
 // these have an IGS025 protection device instead of the 8255
 GAME(  200?, gonefsh2,      0,        m027_noppi<false>,base,     igs_m027_state, init_gonefsh2, ROT0, "IGS", "Gone Fishing 2", MACHINE_NOT_WORKING )

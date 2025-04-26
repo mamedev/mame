@@ -15,8 +15,10 @@
 
 #include <intrin.h>
 #include <stdlib.h>
+
 #pragma intrinsic(_BitScanReverse)
-#ifdef PTR64
+
+#if defined(_M_X64) || defined(_M_ARM64)
 #pragma intrinsic(_BitScanReverse64)
 #endif
 
@@ -65,7 +67,7 @@ __forceinline uint8_t _count_leading_ones_32(uint32_t value)
 __forceinline uint8_t _count_leading_zeros_64(uint64_t value)
 {
 	unsigned long index;
-#ifdef PTR64
+#if defined(_M_X64) || defined(_M_ARM64)
 	return _BitScanReverse64(&index, value) ? (63U - index) : 64U;
 #else
 	return _BitScanReverse(&index, uint32_t(value >> 32)) ? (31U - index) : _BitScanReverse(&index, uint32_t(value)) ? (63U - index) : 64U;
@@ -84,7 +86,7 @@ __forceinline uint8_t _count_leading_zeros_64(uint64_t value)
 __forceinline uint8_t _count_leading_ones_64(uint64_t value)
 {
 	unsigned long index;
-#ifdef PTR64
+#if defined(_M_X64) || defined(_M_ARM64)
 	return _BitScanReverse64(&index, ~value) ? (63U - index) : 64U;
 #else
 	return _BitScanReverse(&index, ~uint32_t(value >> 32)) ? (31U - index) : _BitScanReverse(&index, ~uint32_t(value)) ? (63U - index) : 64U;

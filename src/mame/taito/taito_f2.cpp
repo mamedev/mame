@@ -2831,8 +2831,8 @@ void taitof2_state::taito_f2(machine_config &config)
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", 24000000/3)); /* Was 16000000/2, but only a 24Mhz OSC */
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(0, "lspeaker", 0.75);
+	ymsnd.add_route(0, "rspeaker", 0.75);
 	ymsnd.add_route(1, "lspeaker", 1.0);
 	ymsnd.add_route(2, "rspeaker", 1.0);
 
@@ -5685,4 +5685,4 @@ GAME( 1993, qcrayon2,   0,        qcrayon2,  qcrayon2,   taitof2_state,  empty_i
 GAME( 1991, driftout,   0,        driftout,  driftout,   dondokod_state, empty_init,    ROT270, "Visco",                     "Drift Out (Europe)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, driftoutct, driftout, driftoutct,driftoutct, cameltry_state, empty_init,    ROT270, "Visco",                     "Drift Out (Europe, Cameltry conversion)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, driftoutj,  driftout, driftout,  driftout,   dondokod_state, empty_init,    ROT270, "Visco",                     "Drift Out (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, driveout,   driftout, driveout,  driftout,   driveout_state, empty_init,    ROT270, "bootleg",                   "Drive Out (bootleg of Drift Out)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, driveout,   driftout, driveout,  driftout,   driveout_state, empty_init,    ROT270, "bootleg (Electronic Devices)", "Drive Out (bootleg of Drift Out)", MACHINE_SUPPORTS_SAVE )

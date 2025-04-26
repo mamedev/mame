@@ -50,8 +50,6 @@ function osdmodulesbuild()
 	}
 
 	files {
-		MAME_DIR .. "src/osd/osdnet.cpp",
-		MAME_DIR .. "src/osd/osdnet.h",
 		MAME_DIR .. "src/osd/watchdog.cpp",
 		MAME_DIR .. "src/osd/watchdog.h",
 		MAME_DIR .. "src/osd/interface/inputcode.h",
@@ -111,6 +109,8 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/monitor/monitor_module.h",
 		MAME_DIR .. "src/osd/modules/monitor/monitor_sdl.cpp",
 		MAME_DIR .. "src/osd/modules/monitor/monitor_win32.cpp",
+		MAME_DIR .. "src/osd/modules/netdev/netdev_common.cpp",
+		MAME_DIR .. "src/osd/modules/netdev/netdev_common.h",
 		MAME_DIR .. "src/osd/modules/netdev/netdev_module.h",
 		MAME_DIR .. "src/osd/modules/netdev/none.cpp",
 		MAME_DIR .. "src/osd/modules/netdev/pcap.cpp",
@@ -498,14 +498,23 @@ function osdmodulestargetconf()
 				"Qt5Widgets.dll",
 			}
 		elseif _OPTIONS["targetos"]=="macosx" then
+			local qt_version = str_to_version(backtick("qmake -query QT_VERSION"))
 			linkoptions {
 				"-F" .. backtick("qmake -query QT_INSTALL_LIBS"),
 			}
-			links {
-				"Qt5Core.framework",
-				"Qt5Gui.framework",
-				"Qt5Widgets.framework",
-			}
+			if qt_version < 60000 then
+				links {
+					"Qt5Core.framework",
+					"Qt5Gui.framework",
+					"Qt5Widgets.framework",
+				}
+			else
+				links {
+					"QtCore.framework",
+					"QtGui.framework",
+					"QtWidgets.framework",
+				}
+			end
 		else
 			if _OPTIONS["QT_HOME"]~=nil then
 				local qt_version = str_to_version(backtick(_OPTIONS["QT_HOME"] .. "/bin/qmake -query QT_VERSION"))

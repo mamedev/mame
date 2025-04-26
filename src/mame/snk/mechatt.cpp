@@ -524,8 +524,8 @@ void mechatt_state::mechatt(machine_config &config)
 
 	ym2608_device &ymsnd(YM2608(config, "ymsnd", 8000000));
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
-	ymsnd.add_route(0, "lspeaker", 0.15);
-	ymsnd.add_route(0, "rspeaker", 0.15);
+	ymsnd.add_route(0, "lspeaker", 0.45);
+	ymsnd.add_route(0, "rspeaker", 0.45);
 	ymsnd.add_route(1, "lspeaker", 0.80);
 	ymsnd.add_route(2, "rspeaker", 0.80);
 }

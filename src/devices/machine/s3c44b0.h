@@ -13,6 +13,7 @@
 
 #pragma once
 
+#include <algorithm>
 
 /*******************************************************************************
     MACROS & CONSTANTS
@@ -214,6 +215,16 @@ private:
 
 	struct s3c44b0_lcd_regs_t
 	{
+		void clear()
+		{
+			lcdcon1 = lcdcon2 = 0;
+			lcdsaddr1 = lcdsaddr2 = lcdsaddr3 = 0;
+			redlut = greenlut = bluelut = 0;
+			std::fill(std::begin(reserved), std::end(reserved), 0);
+			lcdcon3 = 0;
+			dithmode = 0;
+		}
+
 		uint32_t lcdcon1;
 		uint32_t lcdcon2;
 		uint32_t lcdsaddr1;
@@ -390,6 +401,22 @@ private:
 
 	struct s3c44b0_lcd_t
 	{
+		void clear()
+		{
+			regs.clear();
+			timer = nullptr;
+			vramaddr_cur = vramaddr_max = 0;
+			offsize = 0;
+			pagewidth_cur = pagewidth_max = 0;
+			modesel = 0;
+			bswp = 0;
+			vpos = hpos = 0;
+			framerate = 0;
+			hpos_min = hpos_max = hpos_end = vpos_min = vpos_max = vpos_end = 0;
+			frame_time = attotime::zero;
+			frame_period = pixeltime = scantime = 0;
+		}
+
 		s3c44b0_lcd_regs_t regs;
 		emu_timer *timer;
 		std::unique_ptr<uint8_t[]> bitmap;

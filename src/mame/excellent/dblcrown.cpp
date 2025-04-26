@@ -501,20 +501,9 @@ static INPUT_PORTS_START( dblcrown )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static const gfx_layout char_16x16_layout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{ 0,1,2,3 },
-	{ 4,0, 12,8, 20,16, 28,24, 36,32, 44,40, 52,48, 60,56 },
-	{ STEP16(0,8*8) },
-	8*8*16
-};
-
 
 static GFXDECODE_START( gfx_dblcrown )
-	GFXDECODE_ENTRY( "gfx1", 0, char_16x16_layout, 0, 0x10 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_16x16x4_packed_lsb, 0, 0x10 )
 	GFXDECODE_RAM( nullptr, 0, gfx_8x8x4_packed_lsb, 0, 0x10 )
 GFXDECODE_END
 

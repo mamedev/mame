@@ -1021,32 +1021,30 @@ void ppc_device::static_generate_memory_accessor(int mode, int size, int iswrite
 	/* check for unaligned accesses and break into two */
 	if (!ismasked && size != 1)
 	{
-		/* in little-endian mode, anything misaligned generates an exception */
 		if ((mode & MODE_LITTLE_ENDIAN) || masked == nullptr || !(m_cap & PPCCAP_MISALIGNED))
 		{
+			/* in little-endian mode, anything misaligned generates an exception */
 			UML_TEST(block, I0, size - 1);                                      // test    i0,size-1
-			UML_JMPc(block, COND_NZ, alignex = label++);                                        // jmp     alignex,nz
+			UML_JMPc(block, COND_NZ, alignex = label++);                        // jmp     alignex,nz
 		}
-
-		/* in big-endian mode, it's more complicated */
 		else
 		{
-			/* 8-byte accesses must be word-aligned */
+			/* in big-endian mode, it's more complicated */
 			if (size == 8)
 			{
+				/* 8-byte accesses must be word-aligned */
 				UML_TEST(block, I0, 3);                                         // test    i0,3
-				UML_JMPc(block, COND_NZ, alignex = label++);                                    // jmp     alignex,nz
+				UML_JMPc(block, COND_NZ, alignex = label++);                    // jmp     alignex,nz
 
 				/* word aligned accesses need to be broken up */
 				UML_TEST(block, I0, 4);                                         // test    i0,4
 				UML_JMPc(block, COND_NZ, unaligned = label++);                  // jmp     unaligned, nz
 			}
-
-			/* unaligned 2 and 4 byte accesses need to be broken up */
 			else
 			{
+				/* unaligned 2 and 4 byte accesses need to be broken up */
 				UML_TEST(block, I0, size - 1);                                  // test    i0,size-1
-				UML_JMPc(block, COND_NZ, unaligned = label++);                              // jmp     unaligned,nz
+				UML_JMPc(block, COND_NZ, unaligned = label++);                  // jmp     unaligned,nz
 			}
 		}
 	}
@@ -1054,18 +1052,18 @@ void ppc_device::static_generate_memory_accessor(int mode, int size, int iswrite
 	/* general case: assume paging and perform a translation */
 	if (((m_cap & PPCCAP_OEA) && (mode & MODE_DATA_TRANSLATION)) || (iswrite && (m_cap & PPCCAP_4XX) && (mode & MODE_PROTECTION)))
 	{
-		UML_SHR(block, I3, I0, 12);                                         // shr     i3,i0,12
-		UML_LOAD(block, I3, (void *)vtlb_table(), I3, SIZE_DWORD, SCALE_x4);// load    i3,[vtlb],i3,dword
-		UML_TEST(block, I3, (uint64_t)1 << translate_type);                           // test    i3,1 << translate_type
-		UML_JMPc(block, COND_Z, tlbmiss = label++);                                         // jmp     tlbmiss,z
-		UML_LABEL(block, tlbreturn = label++);                                          // tlbreturn:
-		UML_ROLINS(block, I0, I3, 0, 0xfffff000);                       // rolins  i0,i3,0,0xfffff000
+		UML_SHR(block, I3, I0, 12);                                             // shr     i3,i0,12
+		UML_LOAD(block, I3, (void *)vtlb_table(), I3, SIZE_DWORD, SCALE_x4);    // load    i3,[vtlb],i3,dword
+		UML_TEST(block, I3, (uint64_t)1 << translate_type);                     // test    i3,1 << translate_type
+		UML_JMPc(block, COND_Z, tlbmiss = label++);                             // jmp     tlbmiss,z
+		UML_LABEL(block, tlbreturn = label++);                                  // tlbreturn:
+		UML_ROLINS(block, I0, I3, 0, 0xfffff000);                               // rolins  i0,i3,0,0xfffff000
 	}
 	else if (m_cap & PPCCAP_4XX)
 		UML_AND(block, I0, I0, 0x7fffffff);                                 // and     i0,i0,0x7fffffff
 	UML_XOR(block, I0, I0, (mode & MODE_LITTLE_ENDIAN) ? (8 - size) : 0);   // xor     i0,i0,8-size
 
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) == 0)
+	if (!debugger_enabled())
 		for (ramnum = 0; ramnum < PPC_MAX_FASTRAM; ramnum++)
 			if (m_fastram[ramnum].base != nullptr && (!iswrite || !m_fastram[ramnum].readonly))
 			{
@@ -1713,7 +1711,7 @@ void ppc_device::generate_sequence_instruction(drcuml_block &block, compiler_sta
 	}
 
 	/* if we are debugging, call the debugger */
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if (debugger_enabled())
 	{
 		UML_MOV(block, mem(&m_core->pc), desc->pc);                                        // mov     [pc],desc->pc
 		save_fast_iregs(block);                                                        // <save fastregs>
@@ -2741,9 +2739,10 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 		case 0x14b: /* DIV (POWER) */
 			assert(m_cap & PPCCAP_LEGACY_POWER);
 
-			UML_SHL(block, I0, R32(G_RB(op)), 32);          // I0 = RA << 32
-			UML_OR(block, I0, I0, SPR32(SPR601_MQ));            // I0 |= MQ
-			UML_CMP(block, I0, 0x0);           // cmp I0, #0
+			UML_MOV(block, I0, R32(G_RA(op)));
+			UML_MOV(block, I1, SPR32(SPR601_MQ));
+			UML_DSHL(block, I0, I0, 32);          // I0 = RA << 32
+			UML_DOR(block, I0, I0, I1);            // I0 |= MQ
 			UML_JMPc(block, COND_NZ, compiler->labelnum); // bne 0:
 
 			UML_MOV(block, R32(G_RD(op)), 0x0); // mov rd, #0
@@ -2761,8 +2760,12 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 
 			UML_JMP(block, compiler->labelnum + 1); // jmp 1:
 
-			UML_LABEL(block, compiler->labelnum++);                                            // 0:
-			UML_DIVS(block, R32(G_RD(op)), SPR32(SPR601_MQ), I0, R32(G_RB(op)));       // divs    rd,mq,I0,rb
+			UML_LABEL(block, compiler->labelnum++);
+			UML_MOV(block, I1, R32(G_RB(op)));
+			UML_DSEXT(block, I1, I1, SIZE_DWORD);
+			UML_DDIVS(block, I0, I1, I0, I1);
+			UML_MOV(block, R32(G_RD(op)), I0);
+			UML_MOV(block, SPR32(SPR601_MQ), I1);
 			generate_compute_flags(block, desc, op & M_RC, ((op & M_OE) ? XER_OV | XER_SO : 0), false); // <update flags>
 			UML_LABEL(block, compiler->labelnum++); // 1:
 			return true;

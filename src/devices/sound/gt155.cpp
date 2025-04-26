@@ -129,10 +129,9 @@ void gt155_device::mix_sample(voice_t &voice, s64 &left, s64 &right)
 
 	// interpolate, apply envelope + channel gain and lowpass, and mix into output
 	s64 sample = voice.m_sample_last + (s64(voice.m_sample - voice.m_sample_last) * voice.m_addr_frac >> 15);
-
 	// TODO: does this produce accurate filter output?
 	sample = sample * voice.m_filter_gain;
-	sample += s32(voice.m_filter_out) * (voice.m_filter ^ 0xffff);
+	sample += s64(voice.m_filter_out) * (voice.m_filter ^ 0xffff);
 	sample >>= 16;
 	voice.m_filter_out = sample;
 

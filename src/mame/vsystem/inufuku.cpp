@@ -592,8 +592,8 @@ void inufuku_state::inufuku(machine_config &config)
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(32'000'000)/4));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "mono", 0.50);
-	ymsnd.add_route(1, "mono", 0.75);
-	ymsnd.add_route(2, "mono", 0.75);
+	ymsnd.add_route(1, "mono", 0.25);
+	ymsnd.add_route(2, "mono", 0.25);
 }
 
 

@@ -39,24 +39,6 @@ public:
 	virtual uint8_t palette_read(offs_t offset) override;
 	virtual void palette_write(offs_t offset, uint8_t data) override;
 
-	void init_vt03_palette_tables(int palmode);
-	void init_vtxx_rgb555_palette_tables();
-	void init_vtxx_rgb444_palette_tables();
-
-	virtual void read_tile_plane_data(int address, int color) override;
-	virtual void shift_tile_plane_data(uint8_t &pix) override;
-	virtual void draw_tile_pixel(uint8_t pix, int color, uint32_t back_pen, uint32_t *&dest) override;
-	inline void draw_tile_pixel_inner(uint8_t pen, uint32_t *dest);
-	virtual void draw_back_pen(uint32_t* dst, int back_pen) override;
-
-	virtual void read_sprite_plane_data(int address) override;
-	virtual void make_sprite_pixel_data(uint8_t &pixel_data, int flipx) override;
-	virtual void draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_rgb32 &bitmap) override;
-	virtual void read_extra_sprite_bits(int sprite_index) override;
-
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
-
 	void set_201x_reg(int reg, uint8_t data);
 	uint8_t get_201x_reg(int reg);
 
@@ -68,10 +50,25 @@ public:
 	bool get_is_50hz() { return m_is_50hz; }
 
 protected:
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	virtual u32 palette_entries() const noexcept override { return (0x40 * 8) + (0x1000 * 8); } 
+
+	virtual void read_tile_plane_data(int address, int color) override;
+	virtual void shift_tile_plane_data(uint8_t &pix) override;
+	virtual void draw_tile_pixel(uint8_t pix, int color, uint32_t back_pen, uint32_t *&dest) override;
+	inline void draw_tile_pixel_inner(uint8_t pen, uint32_t *dest);
+	virtual void draw_back_pen(uint32_t* dst, int back_pen) override;
+
+	virtual void read_sprite_plane_data(int address) override;
+	virtual void make_sprite_pixel_data(uint8_t &pixel_data, bool flipx) override;
+	virtual void draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_rgb32 &bitmap) override;
+	virtual void read_extra_sprite_bits(int sprite_index) override;
+
 	bool m_is_pal;
 	bool m_is_50hz;
 
-	uint32_t m_vtpens[0x1000*8];
 	uint32_t m_vtpens_rgb555[0x8000*8];
 	uint32_t m_vtpens_rgb444[0x1000*8];
 
@@ -79,8 +76,8 @@ private:
 	devcb_read8 m_read_bg;
 	devcb_read8 m_read_sp;
 
-	int m_read_bg4_bg3;
-	int m_va34;
+	int32_t m_read_bg4_bg3;
+	bool m_va34;
 
 	uint8_t m_extplanebuf[2];
 	uint8_t m_extra_sprite_bits;
@@ -92,6 +89,11 @@ private:
 	vtxx_pal_mode m_pal_mode = PAL_MODE_VT0x;
 
 	void set_2010_reg(uint8_t data);
+	void init_vt03_palette_tables(int palmode);
+	void init_vtxx_rgb555_palette_tables();
+	void init_vtxx_rgb444_palette_tables();
+
+	static constexpr unsigned YUV444_COLOR = (0x40 * 8);
 };
 
 class ppu_vt03pal_device : public ppu_vt03_device {

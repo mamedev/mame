@@ -59,35 +59,43 @@ uint32_t segas16b_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_TEXT, 1, 0x08);
 
 	// mix in sprites
-	if (!m_sprites.found()) return 0;
+	if (!m_sprites)
+		return 0;
 	bitmap_ind16 &sprites = m_sprites->bitmap();
-	for (const sparse_dirty_rect *rect = m_sprites->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->min_y; y <= rect->max_y; y++)
-		{
-			uint16_t *dest = &bitmap.pix(y);
-			uint16_t *src = &sprites.pix(y);
-			uint8_t *pri = &screen.priority().pix(y);
-			for (int x = rect->min_x; x <= rect->max_x; x++)
+	m_sprites->iterate_dirty_rects(
+			cliprect,
+			[this, &screen, &bitmap, &sprites] (rectangle const &rect)
 			{
-				// only process written pixels
-				uint16_t pix = src[x];
-				if (pix != 0xffff)
+				for (int y = rect.min_y; y <= rect.max_y; y++)
 				{
-					// compare sprite priority against tilemap priority
-					int priority = (pix >> 10) & 3;
-					if ((1 << priority) > pri[x])
+					uint16_t *const dest = &bitmap.pix(y);
+					uint16_t const *const src = &sprites.pix(y);
+					uint8_t const *const pri = &screen.priority().pix(y);
+					for (int x = rect.min_x; x <= rect.max_x; x++)
 					{
-						// if the color is set to maximum, shadow pixels underneath us
-						if ((pix & 0x03f0) == 0x03f0)
-							dest[x] += m_palette_entries;
-
-						// otherwise, just add in sprite palette base
-						else
-							dest[x] = m_spritepalbase | (pix & 0x3ff);
+						// only process written pixels
+						uint16_t const pix = src[x];
+						if (pix != 0xffff)
+						{
+							// compare sprite priority against tilemap priority
+							int const priority = (pix >> 10) & 3;
+							if ((1 << priority) > pri[x])
+							{
+								if ((pix & 0x03f0) == 0x03f0)
+								{
+									// if the color is set to maximum, shadow pixels underneath us
+									dest[x] += m_palette_entries;
+								}
+								else
+								{
+									// otherwise, just add in sprite palette base
+									dest[x] = m_spritepalbase | (pix & 0x3ff);
+								}
+							}
+						}
 					}
 				}
-			}
-		}
+			});
 
 	return 0;
 }

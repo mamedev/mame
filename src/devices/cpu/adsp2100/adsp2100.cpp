@@ -1175,13 +1175,13 @@ void adsp21xx_device::execute_set_input(int inputnum, int state)
 void adsp21xx_device::execute_run()
 {
 	// Return if CPU is halted
-	if (current_input_state(INPUT_LINE_HALT)) {
+	if (input_line_state(INPUT_LINE_HALT)) {
 		debugger_wait_hook();
 		m_icount = 0;
 		return;
 	}
 
-	bool check_debugger = ((device_t::machine().debug_flags & DEBUG_FLAG_ENABLED) != 0);
+	const bool check_debugger = debugger_enabled();
 
 	check_irqs();
 

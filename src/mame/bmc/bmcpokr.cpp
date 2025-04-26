@@ -17,8 +17,8 @@ TODO:
  * Hopper hookup doesn't work properly.  MAME counts far more "tickets
    dispensed" than the number of coins/tickets the games are supposed to
    pay out.
- * xyddzhh: Hook up mahjong-style inputs and improve DSW definitions
- * xyddzhh: Add Oki banking
+ * dbshahb: Implement different video chip, different memory map
+ * xyddzhh: Improve DSW definitions
 
 ***************************************************************************/
 
@@ -47,14 +47,15 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
 		m_hopper(*this,"hopper"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_oki(*this, "oki"),
 		m_videoram(*this, "videoram_%u", 1U),
 		m_scrollram(*this, "scrollram_%u", 1U),
 		m_pixram(*this, "pixram"),
 		m_priority(*this, "priority"),
 		m_layerctrl(*this, "layerctrl"),
 		m_backpen(*this, "backpen"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
 		m_dsw(*this, "DSW%u", 1U),
 		m_key(*this, "KEY%u", 1U),
 		m_inputs(*this, "INPUTS")
@@ -74,17 +75,18 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	// Devices
 	required_device<m68000_device> m_maincpu;
 	required_device<ticket_dispenser_device> m_hopper;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<okim6295_device> m_oki;
+
 	required_shared_ptr_array<uint16_t, 2> m_videoram;
 	required_shared_ptr_array<uint16_t, 3> m_scrollram;
 	required_shared_ptr<uint16_t> m_pixram;
 	required_shared_ptr<uint16_t> m_priority;
 	required_shared_ptr<uint16_t> m_layerctrl;
 	required_shared_ptr<uint16_t> m_backpen;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 
 	// Protection
 	uint16_t m_prot_val = 0;
@@ -101,9 +103,9 @@ private:
 	optional_ioport_array<5> m_key;
 	required_ioport m_inputs;
 	void mux_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
+	uint16_t mahjong_key_r();
 	uint16_t dsw_r();
 	uint16_t mjmaglmp_dsw_r();
-	uint16_t mjmaglmp_key_r();
 	uint16_t xyddzhh_dsw_r();
 
 	// Interrupts
@@ -385,10 +387,11 @@ void bmcpokr_state::mux_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 	m_hopper->motor_w(BIT(data, 0)); // hopper motor
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));  // coin-in / key-in
 	machine().bookkeeping().coin_counter_w(2, BIT(data, 2));  // pay-out
+	m_oki->set_rom_bank(BIT(data, 3));
 	//                           data & 0x60                  // DSW mux
 	//                           data & 0x80                  // ? always on
 
-//  popmessage("mux %04x", m_mux);
+	// popmessage("mux %04x", m_mux);
 }
 uint16_t bmcpokr_state::dsw_r()
 {
@@ -458,7 +461,7 @@ void bmcpokr_state::bmcpokr_mem(address_map &map)
 	map(0x380001, 0x380001).w(FUNC(bmcpokr_state::mux_w));
 
 	map(0x390000, 0x390003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff);
-	map(0x398001, 0x398001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x398001, 0x398001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
 	map(0x3b0000, 0x3b0001).portr("INPUTS2");
 }
@@ -476,6 +479,7 @@ void bmcpokr_state::xyddzhh_map(address_map &map)
 	map(0x330000, 0x330001).r(FUNC(bmcpokr_state::xyddzhh_prot_r));
 	map(0x340009, 0x340009).lr8(NAME([] () -> uint8_t { return 0xff; })); // andi.b  #$7f, so returning 0x00 stops it from working
 	map(0x360000, 0x360001).r(FUNC(bmcpokr_state::xyddzhh_dsw_r));
+	map(0x370000, 0x370001).r(FUNC(bmcpokr_state::mahjong_key_r));
 }
 
 
@@ -491,7 +495,7 @@ uint16_t bmcpokr_state::mjmaglmp_dsw_r()
 	return 0xff << 8;
 }
 
-uint16_t bmcpokr_state::mjmaglmp_key_r()
+uint16_t bmcpokr_state::mahjong_key_r()
 {
 	uint16_t key = 0x3f;
 	switch ((m_mux >> 4) & 7)
@@ -527,10 +531,10 @@ void bmcpokr_state::mjmaglmp_map(address_map &map)
 
 	map(0x390000, 0x390001).r(FUNC(bmcpokr_state::mjmaglmp_dsw_r));
 
-	map(0x398000, 0x398001).r(FUNC(bmcpokr_state::mjmaglmp_key_r));
+	map(0x398000, 0x398001).r(FUNC(bmcpokr_state::mahjong_key_r));
 
 	map(0x3c8800, 0x3c8803).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff);
-	map(0x3c9001, 0x3c9001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x3c9001, 0x3c9001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
 	map(0x3c9801, 0x3c9801).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x3c9803, 0x3c9803).w("ramdac", FUNC(ramdac_device::pal_w));
@@ -565,7 +569,7 @@ void bmcpokr_state::shendeng_map(address_map &map)
 
 	map(0x320000, 0x320003).ram().share(m_layerctrl);
 	map(0x330000, 0x330001).rw(FUNC(bmcpokr_state::shendeng_prot_r), FUNC(bmcpokr_state::prot_w));
-	map(0x340000, 0x340001).r(FUNC(bmcpokr_state::mjmaglmp_key_r));
+	map(0x340000, 0x340001).r(FUNC(bmcpokr_state::mahjong_key_r));
 	map(0x350000, 0x350001).r(FUNC(bmcpokr_state::mjmaglmp_dsw_r));
 	map(0x360001, 0x360001).w(FUNC(bmcpokr_state::mux_w));
 	map(0x370000, 0x370001).ram(); // 370001.b, rw
@@ -581,7 +585,7 @@ void bmcpokr_state::shendeng_map(address_map &map)
 	map(0x380003, 0x380003).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x380005, 0x380005).w("ramdac", FUNC(ramdac_device::mask_w));
 	map(0x390000, 0x390003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff);
-	map(0x3a0001, 0x3a0001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x3a0001, 0x3a0001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
 void bmcpokr_state::fengyunh_map(address_map &map)
@@ -594,6 +598,43 @@ void bmcpokr_state::fengyunh_map(address_map &map)
 /***************************************************************************
                                 Input Ports
 ***************************************************************************/
+
+#define MAHJONG_KEYS_COMMON(port, mask) \
+	PORT_START("KEY1") \
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A        ) PORT_CONDITION(port, mask, EQUALS, mask) \
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E        ) PORT_CONDITION(port, mask, EQUALS, mask) \
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I        ) PORT_CONDITION(port, mask, EQUALS, mask) \
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M        ) PORT_CONDITION(port, mask, EQUALS, mask) \
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN      ) PORT_CONDITION(port, mask, EQUALS, mask) \
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1           ) PORT_CONDITION(port, mask, EQUALS, mask) \
+	PORT_START("KEY2") \
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B        ) PORT_CONDITION(port, mask, EQUALS, mask) \
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F        ) PORT_CONDITION(port, mask, EQUALS, mask) \
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J        ) PORT_CONDITION(port, mask, EQUALS, mask) \
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N        ) PORT_CONDITION(port, mask, EQUALS, mask) \
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH    ) PORT_CONDITION(port, mask, EQUALS, mask) \
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET      ) PORT_CONDITION(port, mask, EQUALS, mask) \
+	PORT_START("KEY3") \
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C        ) PORT_CONDITION(port, mask, EQUALS, mask) \
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G        ) PORT_CONDITION(port, mask, EQUALS, mask) \
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K        ) PORT_CONDITION(port, mask, EQUALS, mask) \
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI      ) PORT_CONDITION(port, mask, EQUALS, mask) \
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON      ) PORT_CONDITION(port, mask, EQUALS, mask) \
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN          ) PORT_CONDITION(port, mask, EQUALS, mask) \
+	PORT_START("KEY4") \
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D        ) PORT_CONDITION(port, mask, EQUALS, mask) \
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H        ) PORT_CONDITION(port, mask, EQUALS, mask) \
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L        ) PORT_CONDITION(port, mask, EQUALS, mask) \
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON      ) PORT_CONDITION(port, mask, EQUALS, mask) \
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN          ) PORT_CONDITION(port, mask, EQUALS, mask) \
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN          ) PORT_CONDITION(port, mask, EQUALS, mask) \
+	PORT_START("KEY5") \
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN          ) PORT_CONDITION(port, mask, EQUALS, mask) \
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE    ) PORT_CONDITION(port, mask, EQUALS, mask) \
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP) PORT_CONDITION(port, mask, EQUALS, mask) \
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN          ) PORT_CONDITION(port, mask, EQUALS, mask) \
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG      ) PORT_CONDITION(port, mask, EQUALS, mask) \
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL    ) PORT_CONDITION(port, mask, EQUALS, mask)
 
 static INPUT_PORTS_START( bmcpokr )
 	PORT_START("INPUTS")
@@ -735,45 +776,7 @@ static INPUT_PORTS_START( mjmaglmp )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3        ) PORT_CONDITION("DSW2",0x01,EQUALS,0x00) // 1P E3 (select)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN1          ) // COIN
 
-	PORT_START("KEY1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A        ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E        ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I        ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M        ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN      ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1           ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
-
-	PORT_START("KEY2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B        ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F        ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J        ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N        ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH    ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET      ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
-
-	PORT_START("KEY3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C        ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G        ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K        ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI      ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON      ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN          ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
-
-	PORT_START("KEY4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D        ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H        ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L        ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON      ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN          ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN          ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
-
-	PORT_START("KEY5")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN          ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE    ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN          ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG      ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL    ) PORT_CONDITION("DSW2",0x01,EQUALS,0x01)
+	MAHJONG_KEYS_COMMON("DSW2", 0x01)
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("DIP1:1")
@@ -883,46 +886,7 @@ static INPUT_PORTS_START( fengyunh )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3        ) PORT_CONDITION("DSW3",0x01,EQUALS,0x00) // 1P E3 (select)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN1          ) // COIN
 
-	PORT_START("KEY1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A        ) PORT_CONDITION("DSW3",0x01,EQUALS,0x01)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E        ) PORT_CONDITION("DSW3",0x01,EQUALS,0x01)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I        ) PORT_CONDITION("DSW3",0x01,EQUALS,0x01)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M        ) PORT_CONDITION("DSW3",0x01,EQUALS,0x01)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN      ) PORT_CONDITION("DSW3",0x01,EQUALS,0x01)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1           ) PORT_CONDITION("DSW3",0x01,EQUALS,0x01)
-
-	PORT_START("KEY2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B        ) PORT_CONDITION("DSW3",0x01,EQUALS,0x01)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F        ) PORT_CONDITION("DSW3",0x01,EQUALS,0x01)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J        ) PORT_CONDITION("DSW3",0x01,EQUALS,0x01)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N        ) PORT_CONDITION("DSW3",0x01,EQUALS,0x01)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH    ) PORT_CONDITION("DSW3",0x01,EQUALS,0x01)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET      ) PORT_CONDITION("DSW3",0x01,EQUALS,0x01)
-
-	PORT_START("KEY3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C        ) PORT_CONDITION("DSW3",0x01,EQUALS,0x01)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G        ) PORT_CONDITION("DSW3",0x01,EQUALS,0x01)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K        ) PORT_CONDITION("DSW3",0x01,EQUALS,0x01)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI      ) PORT_CONDITION("DSW3",0x01,EQUALS,0x01)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON      ) PORT_CONDITION("DSW3",0x01,EQUALS,0x01)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN          ) PORT_CONDITION("DSW3",0x01,EQUALS,0x01)
-
-	PORT_START("KEY4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D        ) PORT_CONDITION("DSW3",0x01,EQUALS,0x01)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H        ) PORT_CONDITION("DSW3",0x01,EQUALS,0x01)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L        ) PORT_CONDITION("DSW3",0x01,EQUALS,0x01)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON      ) PORT_CONDITION("DSW3",0x01,EQUALS,0x01)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN          ) PORT_CONDITION("DSW3",0x01,EQUALS,0x01)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN          ) PORT_CONDITION("DSW3",0x01,EQUALS,0x01)
-
-	PORT_START("KEY5")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN          ) PORT_CONDITION("DSW3",0x01,EQUALS,0x01)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE    ) PORT_CONDITION("DSW3",0x01,EQUALS,0x01)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP) PORT_CONDITION("DSW3",0x01,EQUALS,0x01)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN          ) PORT_CONDITION("DSW3",0x01,EQUALS,0x01)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG      ) PORT_CONDITION("DSW3",0x01,EQUALS,0x01)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL    ) PORT_CONDITION("DSW3",0x01,EQUALS,0x01)
-
+	MAHJONG_KEYS_COMMON("DSW3", 0x01)
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, "Max Bet" )                   PORT_DIPLOCATION("DIP4:1")     // 最大押分
@@ -1125,24 +1089,24 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( xyddzhh )
 	PORT_START("INPUTS")
 	// Entertainment controls:
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1         ) // PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) // PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) // PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) // PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) // PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 )        // PORT_CONDITION("DSW2",0x01,EQUALS,0x00) // choose
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN   ) // PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT  ) // PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OTHER          ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O) // PAY  // PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1         ) PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 )        PORT_CONDITION("DSW2",0x01,EQUALS,0x00) // choose
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN   )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT  )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OTHER          ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH,IPT_CUSTOM         ) PORT_READ_LINE_MEMBER(FUNC(bmcpokr_state::hopper_r)) // TODO: verify?
-	PORT_SERVICE_NO_TOGGLE( 0x0400, IP_ACTIVE_LOW       ) // PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE1       ) // PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED         ) // PORT_CONDITION("DSW2",0x01,EQUALS,0x00) // no effect in test mode
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_GAMBLE_BET     ) // PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2        ) // PORT_CONDITION("DSW2",0x01,EQUALS,0x00) // pass
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN1          ) // PORT_CONDITION("DSW2",0x01,EQUALS,0x00) PORT_IMPULSE(5)
+	PORT_SERVICE_NO_TOGGLE( 0x0400, IP_ACTIVE_LOW       )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE1       )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED         ) PORT_CONDITION("DSW2",0x01,EQUALS,0x00) // no effect in test mode
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_GAMBLE_BET     ) PORT_CONDITION("DSW2",0x01,EQUALS,0x00)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2        ) PORT_CONDITION("DSW2",0x01,EQUALS,0x00) // pass
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN1          )
 
-	// TODO: Mahjong controls:
+	MAHJONG_KEYS_COMMON("DSW2", 0x01)
 
 	PORT_START("INPUTS2")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1330,7 +1294,7 @@ void bmcpokr_state::bmcpokr(machine_config &config)
 
 	YM2413(config, "ymsnd", 42_MHz_XTAL / 12).add_route(ALL_OUTPUTS, "mono", 1.00); // UM3567 @3.50MHz (42/12)
 
-	OKIM6295(config, "oki", 42_MHz_XTAL / 40, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.00); // M6295 @1.05MHz (42/40)
+	OKIM6295(config, m_oki, 42_MHz_XTAL / 40, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.00); // M6295 @1.05MHz (42/40)
 }
 
 void bmcpokr_state::fengyunh(machine_config &config)
@@ -1629,10 +1593,27 @@ ROM_START( mjmaglmp )
 	ROM_LOAD( "ja-a-901.u6", 0x00000, 0x40000, CRC(25f36d00) SHA1(c182348340ca67ad69d1a67c58b47d6371a725c9) )
 ROM_END
 
+// HB PCB. Has BMC AIA90610 (rebadged M68K), BMC VDA90513 + BMC SYA70521 + Inmos IMSG171P-35 for video, UM3567 + U6295 for sound, 4 banks of 8 DIP switches
+ROM_START( dbshahb )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 Code
+	ROM_LOAD16_BYTE( "rom.u12", 0x000000, 0x20000, CRC(ae7f1544) SHA1(c2b150ad5927fa7905713baa1222ca0b990c927b) )
+	ROM_LOAD16_BYTE( "rom.u13", 0x000001, 0x20000, CRC(761d4d0f) SHA1(e07b376d539b9e78a31694accdf3079a7b1fa723) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "rom.u41", 0x000000, 0x80000, CRC(8d9d6168) SHA1(a7f2f220d2e2b50074adee3f6c26a41c371b7275) )
+	ROM_LOAD16_BYTE( "rom.u33", 0x000001, 0x80000, CRC(6b45ee5f) SHA1(fe2270f3a30d0850c90bb978f51b928d4ebb819a) )
+	ROM_LOAD16_BYTE( "rom.u40", 0x100000, 0x80000, CRC(80db7375) SHA1(14b62be2f350cecd60f42d177e87e4e6ced57831) )
+	ROM_LOAD16_BYTE( "rom.u35", 0x100001, 0x80000, CRC(6bd5c23f) SHA1(4891d1c7031834f3957f6830d75246de84494afc) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) // Samples
+	ROM_LOAD( "rom.u15", 0x00000, 0x40000, CRC(843546c6) SHA1(ad408b182a3c2e0bfe1779fe81e1e4ea9b79daf6) )
+ROM_END
+
 } // anonymous namespace
 
 GAME( 1998, fengyunh, 0,        fengyunh, fengyunh, bmcpokr_state, empty_init, ROT0, "BMC",       "Fengyun Hui",              MACHINE_SUPPORTS_SAVE )
 GAME( 1998, shendeng, mjmaglmp, shendeng, shendeng, bmcpokr_state, empty_init, ROT0, "BMC",       "Pili Shen Deng",           MACHINE_SUPPORTS_SAVE )
 GAME( 1999, bmcpokr,  0,        bmcpokr,  bmcpokr,  bmcpokr_state, empty_init, ROT0, "BMC",       "Dongfang Shenlong",        MACHINE_SUPPORTS_SAVE )
 GAME( 2000, mjmaglmp, 0,        mjmaglmp, mjmaglmp, bmcpokr_state, empty_init, ROT0, "BMC",       "Mahou no Lamp (v. JAA02)", MACHINE_SUPPORTS_SAVE )
-GAME( 2006, xyddzhh,  0,        xyddzhh,  xyddzhh,  bmcpokr_state, empty_init, ROT0, "Herb Home", "Xingyun Dou Dizhu",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2006, xyddzhh,  0,        xyddzhh,  xyddzhh,  bmcpokr_state, empty_init, ROT0, "Herb Home", "Xingyun Dou Dizhu",        MACHINE_SUPPORTS_SAVE )
+GAME( 200?, dbshahb,  0,        bmcpokr,  xyddzhh,  bmcpokr_state, empty_init, ROT0, "H.B.",      "Da Bai Sha (H.B.)",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

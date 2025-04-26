@@ -16,6 +16,10 @@
 
 #include "bus/cbus/pc9801_cbus.h"
 #include "bus/msx/ctrl/ctrl.h"
+#include "bus/scsi/pc9801_sasi.h"
+#include "bus/scsi/scsi.h"
+#include "bus/scsi/scsihd.h"
+
 #include "cpu/nec/v5x.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
@@ -73,6 +77,10 @@ public:
 		, m_kanji_rom(*this, "kanji")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
+		, m_sasibus(*this, "sasi")
+		, m_sasi_data_out(*this, "sasi_data_out")
+		, m_sasi_data_in(*this, "sasi_data_in")
+		, m_sasi_ctrl_in(*this, "sasi_ctrl_in")
 	{ }
 
 	void pc88va(machine_config &config);
@@ -113,6 +121,7 @@ protected:
 
 protected:
 	void pc88va_cbus(machine_config &config);
+	void pc88va_sasi(machine_config &config);
 
 private:
 
@@ -175,8 +184,6 @@ private:
 	uint8_t kanji_ram_r(offs_t offset);
 	void kanji_ram_w(offs_t offset, uint8_t data);
 
-	uint8_t hdd_status_r();
-
 	uint16_t sysop_r();
 	void timer3_ctrl_reg_w(uint8_t data);
 	uint8_t backupram_dsw_r(offs_t offset);
@@ -232,6 +239,11 @@ private:
 		u8 rop[2];
 	} m_singleplane;
 
+	struct {
+		u16 top, bottom;
+		u16 left, right;
+	} m_picture_mask;
+
 	u8 rop_execute(u8 plane_rop, u8 src, u8 dst, u8 pat);
 	u8 gvram_singleplane_r(offs_t offset);
 	void gvram_singleplane_w(offs_t offset, u8 data);
@@ -247,6 +259,7 @@ private:
 	void color_mode_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void text_transpen_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void text_control_1_w(u8 data);
+	void picture_mask_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	u8 m_kanji_cg_line = 0;
 	u8 m_kanji_cg_jis[2]{};
@@ -263,12 +276,12 @@ private:
 	void draw_graphic_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 which);
 
 	void draw_indexed_gfx_1bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u8 pal_base);
-	void draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u8 pal_base, u16 fb_width, u16 fb_height);
-	void draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u16 fb_width, u16 fb_height);
-	void draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u16 fb_width, u16 fb_height);
+	void draw_indexed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u16 dsp_start_base, u16 scrollx, u8 pal_base, u16 fb_width, u16 fb_height);
+	void draw_direct_gfx_8bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u16 dsp_start_base, u16 scrollx, u16 fb_width, u16 fb_height);
+	void draw_direct_gfx_rgb565(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u16 scrollx, u16 fb_width, u16 fb_height);
 
-	void draw_packed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u8 pal_base, u16 fb_width, u16 fb_height);
-	void draw_packed_gfx_5bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u8 pal_base, u16 fb_width, u16 fb_height);
+	void draw_packed_gfx_4bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u16 scrollx, u8 pal_base, u16 fb_width, u16 fb_height);
+	void draw_packed_gfx_5bpp(bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 fb_start_offset, u32 display_start_offset, u16 dsp_start_base, u16 scrollx, u8 pal_base, u16 fb_width, u16 fb_height);
 
 	uint32_t calc_kanji_rom_addr(uint8_t jis1,uint8_t jis2,int x,int y);
 	void draw_text(bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -308,10 +321,14 @@ private:
 
 	void sgp_map(address_map &map) ATTR_COLD;
 
-// TODO: stuff backported from PC8801 as QoL that should really be common
+// TODO: stuff backported from PC88/PC98 as QoL that should really be common
 protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<scsi_port_device> m_sasibus;
+	required_device<output_latch_device> m_sasi_data_out;
+	required_device<input_buffer_device> m_sasi_data_in;
+	required_device<input_buffer_device> m_sasi_ctrl_in;
 
 private:
 	uint8_t misc_ctrl_r();
@@ -328,6 +345,18 @@ private:
 	bool m_sound_irq_enable = false;
 	bool m_sound_irq_pending = false;
 	void int4_irq_w(int state);
+
+	// C-Bus SASI
+	void sasi_data_w(uint8_t data);
+	uint8_t sasi_data_r();
+	void write_sasi_io(int state);
+	void write_sasi_req(int state);
+	uint8_t sasi_status_r();
+	void sasi_ctrl_w(uint8_t data);
+
+	uint8_t m_sasi_data = 0;
+	int m_sasi_data_enable = 0;
+	uint8_t m_sasi_ctrl = 0;
 };
 
 

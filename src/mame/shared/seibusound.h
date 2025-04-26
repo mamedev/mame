@@ -46,13 +46,14 @@ protected:
 class seibu_sound_device : public device_t
 {
 public:
-	seibu_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	seibu_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	~seibu_sound_device() { }
 
 	//  configuration
 	template <typename T> void set_rom_tag(T &&tag) { m_sound_rom.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_rombank_tag(T &&tag) { m_rom_bank.set_tag(std::forward<T>(tag)); }
 	auto int_callback()  { return m_int_cb.bind(); }
+	auto coin_io_callback()  { return m_coin_io_cb.bind(); }
 	auto ym_read_callback()  { return m_ym_read_cb.bind(); }
 	auto ym_write_callback() { return m_ym_write_cb.bind(); }
 
@@ -65,6 +66,7 @@ public:
 	u8 ym_r(offs_t offset);
 	void ym_w(offs_t offset, u8 data);
 	void bank_w(u8 data);
+	u8 coin_r(offs_t offset);
 	void coin_w(u8 data);
 	void fm_irqhandler(int state);
 	u8 soundlatch_r(offs_t offset);
@@ -85,16 +87,17 @@ private:
 
 	// device callbacks
 	devcb_write_line m_int_cb;
+	devcb_read8 m_coin_io_cb;
 	devcb_read8 m_ym_read_cb;
 	devcb_write8 m_ym_write_cb;
 
 	// internal state
-	optional_region_ptr<uint8_t> m_sound_rom;
+	optional_region_ptr<u8> m_sound_rom;
 	optional_memory_bank m_rom_bank;
-	uint8_t m_main2sub[2];
-	uint8_t m_sub2main[2];
-	int m_main2sub_pending;
-	int m_sub2main_pending;
+	u8 m_main2sub[2];
+	u8 m_sub2main[2];
+	bool m_main2sub_pending;
+	bool m_sub2main_pending;
 	bool m_rst10_irq;
 	bool m_rst18_irq;
 	bool m_rst10_service;
@@ -121,7 +124,7 @@ DECLARE_DEVICE_TYPE(SEIBU_SOUND, seibu_sound_device)
 class sei80bu_device : public device_t, public device_rom_interface<16>
 {
 public:
-	sei80bu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sei80bu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	u8 data_r(offs_t offset);
 	u8 opcode_r(offs_t offset);
@@ -138,12 +141,12 @@ DECLARE_DEVICE_TYPE(SEI80BU, sei80bu_device)
 class seibu_adpcm_device : public device_t
 {
 public:
-	template <typename T> seibu_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&msm5205_tag)
+	template <typename T> seibu_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&msm5205_tag)
 		: seibu_adpcm_device(mconfig, tag, owner, clock)
 	{
 		m_msm.set_tag(std::forward<T>(msm5205_tag));
 	}
-	seibu_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	seibu_adpcm_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	~seibu_adpcm_device() { }
 
 	void decrypt();
@@ -159,11 +162,11 @@ protected:
 private:
 	// internal state
 	required_device<msm5205_device> m_msm;
-	uint32_t m_current;
-	uint32_t m_end;
-	uint8_t m_nibble;
-	uint8_t m_playing;
-	required_region_ptr<uint8_t> m_base;
+	u32 m_current;
+	u32 m_end;
+	u8 m_nibble;
+	bool m_playing;
+	required_region_ptr<u8> m_base;
 };
 
 DECLARE_DEVICE_TYPE(SEIBU_ADPCM, seibu_adpcm_device)

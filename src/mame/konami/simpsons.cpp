@@ -681,14 +681,14 @@ void simpsons_state::simpsons(machine_config &config)
 	SPEAKER(config, "rspeaker").front_right();
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545))); /* verified on pcb */
-	ymsnd.add_route(0, "lspeaker", 1.0);    /* only left channel is connected */
-	ymsnd.add_route(0, "rspeaker", 1.0);
+	ymsnd.add_route(0, "lspeaker", 0.5);    /* only left channel is connected */
+	ymsnd.add_route(0, "rspeaker", 0.5);
 	ymsnd.add_route(1, "lspeaker", 0.0);
 	ymsnd.add_route(1, "rspeaker", 0.0);
 
 	k053260_device &k053260(K053260(config, "k053260", XTAL(3'579'545))); /* verified on pcb */
-	k053260.add_route(0, "lspeaker", 1.00);
-	k053260.add_route(1, "rspeaker", 1.00);
+	k053260.add_route(0, "lspeaker", 0.5);
+	k053260.add_route(1, "rspeaker", 0.5);
 	k053260.sh1_cb().set(FUNC(simpsons_state::z80_nmi_w));
 }
 

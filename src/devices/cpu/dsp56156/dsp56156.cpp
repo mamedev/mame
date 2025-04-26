@@ -250,8 +250,6 @@ void dsp56156_device::alu_init()
 
 void dsp56156_device::device_start()
 {
-	memset(&m_core, 0, sizeof(m_core));
-
 	m_core.device = this;
 	m_core.program_ram = m_program_ram;
 
@@ -263,7 +261,7 @@ void dsp56156_device::device_start()
 	/* HACK - You're not in bootstrap mode upon bootup */
 	m_core.bootstrap_mode = BOOTSTRAP_OFF;
 
-	/* Clear the irq states */
+	/* Clear the IRQ states */
 	m_core.modA_state = false;
 	m_core.modB_state = false;
 	m_core.modC_state = false;

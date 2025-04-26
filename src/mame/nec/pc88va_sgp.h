@@ -30,13 +30,14 @@ private:
 
 	u16 m_vdp_address[2]{};
 	u32 m_work_address = 0;
+	u16 m_color_code;
 
 	struct BufferArea {
 		u8 start_dot = 0;
 		u8 pixel_mode = 0;
 		u16 hsize = 0;
 		u16 vsize = 0;
-		u16 fb_pitch = 0;
+		s16 fb_pitch = 0;
 		u32 address = 0;
 	};
 

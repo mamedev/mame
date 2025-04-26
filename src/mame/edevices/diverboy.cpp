@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders: David Haywood
+
 /* Diver Boy
  (c)1992 Device Electronics
 
@@ -46,13 +47,16 @@
       * 5th coin : adds 1 credit
       * 6th coin : adds 1 credit ...
 
+TODO: tumblebed uses more GFX features, which need implementing
 */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+
 #include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -71,68 +75,57 @@ public:
 		m_oki(*this, "oki"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch")
+		m_palette(*this, "palette")
 	{ }
 
-	void diverboy(machine_config &config);
+	void diverboy(machine_config &config) ATTR_COLD;
+	void tumblebed(machine_config &config) ATTR_COLD;
 
 private:
-	/* memory pointers */
 	required_shared_ptr<uint16_t> m_spriteram;
 
-	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_device<generic_latch_8_device> m_soundlatch;
 
-	void soundcmd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void okibank_w(uint8_t data);
-	virtual void machine_start() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
-	uint32_t screen_update_diverboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect );
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void diverboy_map(address_map &map) ATTR_COLD;
+	void tumblebed_map(address_map &map) ATTR_COLD;
 	void snd_map(address_map &map) ATTR_COLD;
 };
 
 
-void diverboy_state::video_start()
-{
-}
-
-void diverboy_state::draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect )
+void diverboy_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint16_t *source = m_spriteram;
-	uint16_t *finish = source + (m_spriteram.bytes() / 2);
+	uint16_t const *finish = source + (m_spriteram.bytes() / 2);
 
 	while (source < finish)
 	{
-		int16_t xpos, ypos, number, colr, bank, flash;
-
-		ypos = source[4];
-		xpos = source[0];
-		colr = (source[1] & 0x00f0) >> 4;
-		number = source[3];
-		flash = source[1] & 0x1000;
+		int16_t ypos = source[4];
+		int16_t const xpos = source[0];
+		int16_t colr = (source[1] & 0x00f0) >> 4;
+		int16_t const number = source[3];
+		int16_t const flash = source[1] & 0x1000;
 
 		colr |= ((source[1] & 0x000c) << 2);
 
 		ypos = 0x100 - ypos;
 
-		bank = (source[1] & 0x0002) >> 1;
+		int16_t const bank = (source[1] & 0x0002) >> 1;
 
 		if (!flash || (m_screen->frame_number() & 1))
 		{
-			m_gfxdecode->gfx(bank)->transpen(bitmap,cliprect,
+			m_gfxdecode->gfx(bank)->transpen(bitmap, cliprect,
 					number,
 					colr,
-					0,0,
-					xpos,ypos,
+					0, 0,
+					xpos, ypos,
 					(source[1] & 0x0008) ? -1 : 0);
 		}
 
@@ -140,7 +133,7 @@ void diverboy_state::draw_sprites(  bitmap_ind16 &bitmap, const rectangle &clipr
 	}
 }
 
-uint32_t diverboy_state::screen_update_diverboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t diverboy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 //  bitmap.fill(m_palette->black_pen(), cliprect);
 	draw_sprites(bitmap, cliprect);
@@ -148,19 +141,10 @@ uint32_t diverboy_state::screen_update_diverboy(screen_device &screen, bitmap_in
 }
 
 
-void diverboy_state::soundcmd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_soundlatch->write(data & 0xff);
-		m_audiocpu->set_input_line(0, HOLD_LINE);
-	}
-}
-
 void diverboy_state::okibank_w(uint8_t data)
 {
-	/* bit 2 might be reset */
-//  popmessage("%02x",data);
+	// bit 2 might be reset
+//  popmessage("%02x", data);
 	m_oki->set_rom_bank(data & 3);
 }
 
@@ -171,8 +155,27 @@ void diverboy_state::diverboy_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 	map(0x040000, 0x04ffff).ram();
 	map(0x080000, 0x083fff).ram().share("spriteram");
-	map(0x100000, 0x100001).w(FUNC(diverboy_state::soundcmd_w));
+	map(0x100001, 0x100001).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x140000, 0x1407ff).w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x180000, 0x180001).portr("P1_P2");
+	map(0x180002, 0x180003).portr("DSW");
+	map(0x180008, 0x180009).portr("COINS");
+//  map(0x18000a, 0x18000b).nopr();
+//  map(0x18000c, 0x18000d).nopw();
+	map(0x320000, 0x3207ff).nopw(); /* ?? */
+	map(0x322000, 0x3227ff).nopw(); /* ?? */
+//  map(0x340000, 0x340001).nopw();
+//  map(0x340002, 0x340003).nopw();
+}
+
+void diverboy_state::tumblebed_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x080000, 0x083fff).ram().share("spriteram");
+	map(0x100001, 0x100001).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x120000, 0x123fff).ram();
+	map(0x140000, 0x1407ff).w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x1a0000, 0x1a07ff).ram();
 	map(0x180000, 0x180001).portr("P1_P2");
 	map(0x180002, 0x180003).portr("DSW");
 	map(0x180008, 0x180009).portr("COINS");
@@ -190,7 +193,7 @@ void diverboy_state::snd_map(address_map &map)
 	map(0x8000, 0x87ff).ram();
 	map(0x9000, 0x9000).w(FUNC(diverboy_state::okibank_w));
 	map(0x9800, 0x9800).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xa000, 0xa000).r(m_soundlatch, FUNC(generic_latch_8_device::read));
+	map(0xa000, 0xa000).r("soundlatch", FUNC(generic_latch_8_device::read));
 }
 
 
@@ -258,13 +261,9 @@ static GFXDECODE_START( gfx_diverboy )
 GFXDECODE_END
 
 
-void diverboy_state::machine_start()
-{
-}
-
 void diverboy_state::diverboy(machine_config &config)
 {
-	M68000(config, m_maincpu, 12000000); /* guess */
+	M68000(config, m_maincpu, 12000000); // guess
 	m_maincpu->set_addrmap(AS_PROGRAM, &diverboy_state::diverboy_map);
 	m_maincpu->set_vblank_int("screen", FUNC(diverboy_state::irq6_line_hold));
 
@@ -279,7 +278,7 @@ void diverboy_state::diverboy(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(0*8+4, 40*8+1, 2*8, 32*8-1);
-	m_screen->set_screen_update(FUNC(diverboy_state::screen_update_diverboy));
+	m_screen->set_screen_update(FUNC(diverboy_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x400);
@@ -287,14 +286,21 @@ void diverboy_state::diverboy(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	OKIM6295(config, m_oki, 1320000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.50); // clock frequency & pin 7 not verified
 }
 
+void diverboy_state::tumblebed(machine_config &config)
+{
+	diverboy(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &diverboy_state::tumblebed_map);
+}
+
 /*
 
-both program roms contain the following string (at the same location)
+both program ROMs contain the following string (at the same location)
 
 This Game is programmed by the freelance group GAMART.
 ADRESS: C\SAnt Ramon,11 08130-STA PERPETUA DE MOGODA - BARCELONA (SPAIN)
@@ -304,36 +310,69 @@ Fax (93) 574 18 34
 */
 
 ROM_START( diverboy )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 Code */
+	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "db_01.bin", 0x00000, 0x20000, CRC(6aa11366) SHA1(714c8a4a64c18632825a734a76a2d1b031106d76) )
 	ROM_LOAD16_BYTE( "db_02.bin", 0x00001, 0x20000, CRC(45f8a673) SHA1(4eea1374cafacb4a2e0b623fcb802deb5fca1b3a) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) /* z80 */
-	ROM_LOAD( "db_05.bin", 0x00000, 0x8000, CRC(ffeb49ec) SHA1(911b13897ff4ace3940bfff4ab88584a93796c24) ) /* this part is empty */
-	ROM_CONTINUE( 0x0000, 0x8000 ) /* this part contains the code */
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // z80
+	ROM_LOAD( "db_05.bin", 0x00000, 0x8000, CRC(ffeb49ec) SHA1(911b13897ff4ace3940bfff4ab88584a93796c24) ) // this part is empty
+	ROM_CONTINUE( 0x0000, 0x8000 ) // this part contains the code
 
-	ROM_REGION( 0x100000, "gfx1", 0 ) /* GFX */
+	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "db_08.bin", 0x000000, 0x80000, CRC(7bb96220) SHA1(671b3f218106e594b13ae5f2e680cf2e2cfc5501) )
 	ROM_LOAD16_BYTE( "db_09.bin", 0x000001, 0x80000, CRC(12b15476) SHA1(400a5b846f70567de137e0b95586dd9cfc27becb) )
 
-	ROM_REGION( 0x180000, "gfx2", 0 ) /* GFX */
+	ROM_REGION( 0x180000, "gfx2", 0 )
 	ROM_LOAD16_BYTE( "db_07.bin", 0x000000, 0x20000, CRC(18485741) SHA1(a8edceaf34a98f2aa2bfada9d6e06fb82639a4e0) )
 	ROM_LOAD16_BYTE( "db_10.bin", 0x000001, 0x20000, CRC(c381d1cc) SHA1(88b97d8893c500951cfe8e7e7f0b547b36bbe2c0) )
 	ROM_LOAD16_BYTE( "db_06.bin", 0x040000, 0x20000, CRC(21b4e352) SHA1(a553de67e5dc751ea81ec4739724e0e46e8c5fab) )
 	ROM_LOAD16_BYTE( "db_11.bin", 0x040001, 0x20000, CRC(41d29c81) SHA1(448fd5c1b16159d03436b8bd71ffe871c8daf7fa) )
 
-	ROM_REGION( 0x100000, "oki", 0 ) /* Sound */
+	ROM_REGION( 0x100000, "oki", 0 )
 	ROM_LOAD( "db_03.bin", 0x00000, 0x20000, CRC(50457505) SHA1(faf1c055ec56d2ed7f5e6993cc04d3317bf1c3cc) )
 	ROM_CONTINUE(          0x40000, 0x20000 )
 	ROM_CONTINUE(          0x80000, 0x20000 )
 	ROM_CONTINUE(          0xc0000, 0x20000 )
-	ROM_LOAD( "db_04.bin", 0x20000, 0x20000, CRC(01b81da0) SHA1(914802f3206dc59a720af9d57eb2285bc8ba822b) ) /* same as tumble pop?, is this used? */
+	ROM_LOAD( "db_04.bin", 0x20000, 0x20000, CRC(01b81da0) SHA1(914802f3206dc59a720af9d57eb2285bc8ba822b) ) // same as Tumble Pop?, is this used?
 	ROM_RELOAD(            0x60000, 0x20000 )
 	ROM_RELOAD(            0xa0000, 0x20000 )
 	ROM_RELOAD(            0xe0000, 0x20000 )
 ROM_END
 
+ROM_START( tumblebed )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_BYTE ("3.ep1", 0x00000, 0x20000, CRC(8b6950ec) SHA1(b55a84df208822084304109bf85a17ccee210e25) )
+	ROM_LOAD16_BYTE( "4.ep0", 0x00001, 0x20000, CRC(8199c74d) SHA1(7436a4bebc85ff5e47eae93353ab8fcb98c2fd30) )
+	ROM_LOAD16_BYTE ("2.ep3", 0x40000, 0x20000, CRC(cb27d9ca) SHA1(d105e6397efa4d5d31faad7d7e574f21d3bc14b5) )
+	ROM_LOAD16_BYTE( "5.ep2", 0x40001, 0x20000, CRC(3a9ad326) SHA1(7d2078e8e98fa4ae6d251ff100792b36c0506e86) )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_LOAD( "1.u4", 0x0000, 0x8000, CRC(ffeb49ec) SHA1(911b13897ff4ace3940bfff4ab88584a93796c24) ) // 011xxxxxxxxxxxxx = 0xFF
+	ROM_CONTINUE(     0x0000, 0x8000 )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "10.u33", 0x00000, 0x80000, CRC(631b8d08) SHA1(4cb9b314209d863361d04683a881c92614640344) )
+	ROM_LOAD16_BYTE( "11.u34", 0x00001, 0x80000, CRC(b686cf86) SHA1(9fe83abc5bd687056d814bce36d93564fb99256f) )
+
+	ROM_REGION( 0x180000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "9.u35",  0x00000, 0x20000, CRC(d3227e05) SHA1(2d11b5feae84545c3d3e48c55f7d9f4feac7a481) )
+	ROM_LOAD16_BYTE( "12.u36", 0x00001, 0x20000, CRC(0c468815) SHA1(9cc086e252851c6e461a85549019fb3113912ce0) )
+	ROM_LOAD16_BYTE( "8.u37",  0x40000, 0x20000, CRC(9a7f7866) SHA1(0f275d6f5696b064fbee1ce93bf7623d9d3d3738) )
+	ROM_LOAD16_BYTE( "13.u38", 0x40001, 0x20000, CRC(effa3b5d) SHA1(e33b221f77f05ac7808d4b056f7a46efa4957837) )
+
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "7.u11", 0x00000, 0x20000, CRC(50457505) SHA1(faf1c055ec56d2ed7f5e6993cc04d3317bf1c3cc) )
+	ROM_CONTINUE(      0x40000, 0x20000 )
+	ROM_CONTINUE(      0x80000, 0x20000 )
+	ROM_CONTINUE(      0xc0000, 0x20000 )
+	ROM_LOAD( "6.u22", 0x20000, 0x20000, CRC(01b81da0) SHA1(914802f3206dc59a720af9d57eb2285bc8ba822b) )
+	ROM_RELOAD(        0x60000, 0x20000 )
+	ROM_RELOAD(        0xa0000, 0x20000 )
+	ROM_RELOAD(        0xe0000, 0x20000 )
+ROM_END
+
 } // anonymous namespace
 
 
-GAME( 1992, diverboy, 0, diverboy, diverboy, diverboy_state, empty_init, ORIENTATION_FLIP_X, "Gamart (Electronic Devices Italy license)", "Diver Boy", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, diverboy,  0,       diverboy,  diverboy, diverboy_state, empty_init, ORIENTATION_FLIP_X, "Gamart (Electronic Devices Italy license)", "Diver Boy",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tumblebed, tumblep, tumblebed, diverboy, diverboy_state, empty_init, ORIENTATION_FLIP_X, "bootleg (Electronic Devices)",              "Tumble Pop (Electronic Devices bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

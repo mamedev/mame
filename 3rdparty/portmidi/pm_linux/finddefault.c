@@ -7,8 +7,9 @@
 #include <string.h>
 #include <ctype.h>
 #include "portmidi.h"
-
-extern int pm_find_default_device(char *pattern, int is_input);
+#include "pmutil.h"
+#include "pminternal.h"
+#include "finddefault.h"
 
 #define STRING_MAX 256
 
@@ -21,7 +22,7 @@ void skip_spaces(FILE *inf)
 }
 
 /* trim leading spaces and match a string */
-int match_string(FILE *inf, char *s)
+int match_string(FILE *inf, const char *s)
 {
     skip_spaces(inf);
     while (*s && *s == getc(inf)) s++;
@@ -29,19 +30,21 @@ int match_string(FILE *inf, char *s)
 } 
 
 
-/* Parse preference files, find default device, search devices --
+/* 
+   Parse preference files, find default device, search devices --
  */
-PmDeviceID find_default_device(char *path, int input, PmDeviceID id)
+PmDeviceID find_default_device(const char *path, int input, PmDeviceID id)
 /* path -- the name of the preference we are searching for
    input -- true iff this is an input device
    id -- current default device id
    returns matching device id if found, otherwise id
 */
 {
-    static char *pref_2 = (char *)"/.java/.userPrefs/";
-    static char *pref_3 = (char *)"prefs.xml";
-    char *pref_1 = getenv("HOME");
-    char *full_name, *path_ptr;
+    static char const *const pref_2 = "/.java/.userPrefs/";
+    static char const *const pref_3 = "prefs.xml";
+    const char *pref_1 = getenv("HOME");
+    const char *path_ptr;
+    char *full_name;
     FILE *inf;
     int c, i;
     if (!pref_1) goto nopref; // cannot find preference file
@@ -54,8 +57,8 @@ PmDeviceID find_default_device(char *path, int input, PmDeviceID id)
     if (*path == '/') path++; // skip initial slash in path
     path_ptr = strrchr(path, '/'); 
     if (path_ptr) { // copy up to slash after full_name
-        path_ptr++;
         int offset = strlen(full_name);
+        path_ptr++;
         memcpy(full_name + offset, path, path_ptr - path);
         full_name[offset + path_ptr - path] = 0; // end of string
     } else {
@@ -63,7 +66,6 @@ PmDeviceID find_default_device(char *path, int input, PmDeviceID id)
     }
     strcat(full_name, pref_3);
     inf = fopen(full_name, "r");
-	free(full_name);
     if (!inf) goto nopref; // cannot open preference file
     // We're not going to build or link in a full XML parser.
     // Instead, find the path string and quoute. Then, look for
@@ -74,9 +76,9 @@ PmDeviceID find_default_device(char *path, int input, PmDeviceID id)
         // look for quote string quote
         if (!match_string(inf, path_ptr)) continue; // path not found
         if (getc(inf) != '"') continue; // path not found, keep scanning
-        if (!match_string(inf, (char *)"value")) goto nopref; // value not found
-        if (!match_string(inf, (char *)"=")) goto nopref; // = not found
-        if (!match_string(inf, (char *)"\"")) goto nopref; // quote not found
+        if (!match_string(inf, "value")) goto nopref; // value not found
+        if (!match_string(inf, "=")) goto nopref; // = not found
+        if (!match_string(inf, "\"")) goto nopref; // quote not found
         // now read the value up to the close quote
         for (i = 0; i < STRING_MAX; i++) {
             if ((c = getc(inf)) == '"') break;

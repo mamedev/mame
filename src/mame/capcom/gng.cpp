@@ -738,6 +738,37 @@ ROM_START( gngbl )
 	ROM_LOAD( "14.84490.1l",     0x18000, 0x4000, CRC(7780a925) SHA1(3f129ca6d695548b659955fe538584bd9ac2ff17) ) // sprites 2 Plane 3-4
 ROM_END
 
+ROM_START( gngbla )
+	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_LOAD( "3.10n",           0x04000, 0x4000, CRC(4f94130f) SHA1(6863fee3c97c76ba314ccbada7efacb6783e7d32) )
+	ROM_LOAD( "4.9n",            0x08000, 0x4000, CRC(08322bef) SHA1(7107ed1f9eae2618b0d420d53af04df680bd4b99) )
+	ROM_LOAD( "5.8n",            0x0c000, 0x4000, CRC(b6582167) SHA1(47be2b9d6a23fefcc131e10456c5ba71df5461c5) )
+	ROM_LOAD( "1.13n",           0x10000, 0x4000, CRC(fd9a8dda) SHA1(222c3c759c6b60f82351b9e6bf748fb4872e82b4) )
+	ROM_LOAD( "2.12n",           0x14000, 0x4000, CRC(f32c2e55) SHA1(0eab4b4e567f4b87233a5f259654c4dde4f8cad2) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "6.13h",           0x00000, 0x8000, CRC(615f5b6f) SHA1(7ef9ec5c2072e21c787a6bbf700033f50c759c1d) )
+
+	ROM_REGION( 0x04000, "chars", 0 )
+	ROM_LOAD( "7.10e",           0x00000, 0x4000, CRC(ecfccf07) SHA1(0a1518e19a2e0a4cc3dde4b9568202ea911b5ece) )
+
+	ROM_REGION( 0x18000, "tiles", 0 )
+	ROM_LOAD( "19.e3",           0x00000, 0x4000, CRC(ddd56fa9) SHA1(f9d77eee5e2738b7e83ba02fcc55dd480391479f) ) // 0-1 Plane 1
+	ROM_LOAD( "12.e1",           0x04000, 0x4000, CRC(7302529d) SHA1(8434c994cc55d2586641f3b90b6b15fd65dfb67c) ) // 2-3 Plane 1
+	ROM_LOAD( "11.c3",           0x08000, 0x4000, CRC(20035bda) SHA1(bbb1fba0eb19471f66d29526fa8423ccb047bd63) ) // 0-1 Plane 2
+	ROM_LOAD( "10.c1",           0x0c000, 0x4000, CRC(f12ba271) SHA1(1c42fa02cb27b35d10c3f7f036005e747f9f6b79) ) // 2-3 Plane 2
+	ROM_LOAD( "9.b3",            0x10000, 0x4000, CRC(e525207d) SHA1(1947f159189b3a53f1251d8653b6e7c65c91fc3c) ) // 0-1 Plane 3
+	ROM_LOAD( "8.1b",            0x14000, 0x4000, CRC(2d77e9b2) SHA1(944da1ce29a18bf0fc8deff78bceacba0bf23a07) ) // 2-3 Plane 3
+
+	ROM_REGION( 0x20000, "sprites", ROMREGION_ERASEFF )
+	ROM_LOAD( "13.n4",           0x00000, 0x4000, CRC(4613afdc) SHA1(13e5a38a134bd7cfa16c63a18fa332c6d66b9345) ) // sprites 0 Plane 1-2
+	ROM_LOAD( "14.n3",           0x04000, 0x4000, CRC(06d7e5ca) SHA1(9e06012bcd82f98fad43de666ef9a75979d940ab) ) // sprites 1 Plane 1-2
+	ROM_LOAD( "15.n1",           0x08000, 0x4000, CRC(bc1fe02d) SHA1(e3a1421d465b87148ffa94f5673b2307f0246afe) ) // sprites 2 Plane 1-2
+	ROM_LOAD( "16.l4",           0x10000, 0x4000, CRC(608d68d5) SHA1(af207f9ee2f93a0cf9cf25cfe72b0fdfe55481b8) ) // sprites 0 Plane 3-4
+	ROM_LOAD( "17.l3",           0x14000, 0x4000, CRC(e80c3fca) SHA1(cb641c25bb04b970b2cbeca41adb792bbe142fb5) ) // sprites 1 Plane 3-4
+	ROM_LOAD( "18.l1",           0x18000, 0x4000, CRC(7780a925) SHA1(3f129ca6d695548b659955fe538584bd9ac2ff17) ) // sprites 2 Plane 3-4
+ROM_END
+
 ROM_START( gngprot )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "gg10n.bin",      0x04000, 0x4000, CRC(5d2a2c90) SHA1(39db20ebf95deb61d887bd88e3cb66c7bbd11f15) )
@@ -1088,6 +1119,7 @@ ROM_END
 GAME( 1985, gng,         0,   gng,     gng,      gng_state, empty_init, ROT0, "Capcom",   "Ghosts'n Goblins (World? set 1)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1985, gnga,        gng, gng,     gng,      gng_state, empty_init, ROT0, "Capcom",   "Ghosts'n Goblins (World? set 2)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1985, gngbl,       gng, gng,     gng,      gng_state, empty_init, ROT0, "bootleg",  "Ghosts'n Goblins (bootleg with Cross)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gngbla,      gng, gng,     gng,      gng_state, empty_init, ROT0, "bootleg",  "Ghosts'n Goblins (bootleg)",                  MACHINE_SUPPORTS_SAVE )
 GAME( 1985, gngprot,     gng, gng,     gng,      gng_state, empty_init, ROT0, "Capcom",   "Ghosts'n Goblins (prototype)",                MACHINE_SUPPORTS_SAVE )
 GAME( 1985, gngblita,    gng, gng,     gng,      gng_state, empty_init, ROT0, "bootleg",  "Ghosts'n Goblins (Italian bootleg, harder)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1985, gngc,        gng, gng,     gng,      gng_state, empty_init, ROT0, "Capcom",   "Ghosts'n Goblins (World? set 3)",             MACHINE_SUPPORTS_SAVE ) // rev c?

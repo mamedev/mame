@@ -6,8 +6,10 @@
                         \___/_/\_\ .__/ \__,_|\__|
                                  |_| XML parser
 
-   Copyright (c) 1997-2000 Thai Open Source Software Center Ltd
-   Copyright (c) 2000-2017 Expat development team
+   Copyright (c) 2003-2006 Karl Waclawek <karl@waclawek.net>
+   Copyright (c) 2005-2007 Steven Solie <steven@solie.ca>
+   Copyright (c) 2017-2023 Sebastian Pipping <sebastian@pipping.org>
+   Copyright (c) 2017      Rhodri James <rhodri@wildebeest.org.uk>
    Licensed under the MIT license:
 
    Permission is  hereby granted,  free of charge,  to any  person obtaining
@@ -31,6 +33,8 @@
 */
 
 #include <sys/stat.h>
+#include <assert.h>
+#include <stddef.h> // ptrdiff_t
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
@@ -60,7 +64,8 @@ main(int argc, char *argv[]) {
   char *XMLBuf, *XMLBufEnd, *XMLBufPtr;
   FILE *fd;
   struct stat fileAttr;
-  int nrOfLoops, bufferSize, fileSize, i, isFinal;
+  int nrOfLoops, bufferSize, i, isFinal;
+  size_t fileSize;
   int j = 0, ns = 0;
   clock_t tstart, tend;
   double cpuTime = 0.0;
@@ -112,12 +117,13 @@ main(int argc, char *argv[]) {
     isFinal = 0;
     tstart = clock();
     do {
-      int parseBufferSize = XMLBufEnd - XMLBufPtr;
-      if (parseBufferSize <= bufferSize)
+      ptrdiff_t parseBufferSize = XMLBufEnd - XMLBufPtr;
+      if (parseBufferSize <= (ptrdiff_t)bufferSize)
         isFinal = 1;
       else
         parseBufferSize = bufferSize;
-      if (! XML_Parse(parser, XMLBufPtr, parseBufferSize, isFinal)) {
+      assert(parseBufferSize <= (ptrdiff_t)bufferSize);
+      if (! XML_Parse(parser, XMLBufPtr, (int)parseBufferSize, isFinal)) {
         fprintf(stderr,
                 "error '%" XML_FMT_STR "' at line %" XML_FMT_INT_MOD
                 "u character %" XML_FMT_INT_MOD "u\n",

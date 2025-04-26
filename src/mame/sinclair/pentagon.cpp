@@ -46,8 +46,6 @@ private:
 	void pentagon_io(address_map &map) ATTR_COLD;
 	void pentagon_mem(address_map &map) ATTR_COLD;
 	void pentagon_switch(address_map &map) ATTR_COLD;
-
-	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 };
 
 class pent1024_state : public pentagon_state
@@ -158,7 +156,6 @@ void pentagon_state::machine_start()
 {
 	spectrum_128_state::machine_start();
 	m_bank_rom[0]->configure_entries(3, 1, memregion("beta:beta")->base(), 0x4000);
-	m_maincpu->space(AS_PROGRAM).specific(m_program);
 }
 
 void pentagon_state::machine_reset()
@@ -199,7 +196,7 @@ void pentagon_state::pentagon(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pentagon_state::pentagon_io);
 	m_maincpu->set_addrmap(AS_OPCODES, &pentagon_state::pentagon_switch);
 	m_maincpu->set_vblank_int("screen", FUNC(pentagon_state::pentagon_interrupt));
-	m_maincpu->nomreq_cb().set_nop();
+	m_maincpu->nomreq_cb().remove();
 
 	m_screen->set_raw(14_MHz_XTAL / 2, 448, 320, {get_screen_area().left() - 48, get_screen_area().right() + 48, get_screen_area().top() - 48, get_screen_area().bottom() + 48});
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_pentagon);

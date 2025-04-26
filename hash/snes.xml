@@ -5783,7 +5783,6 @@ more investigation needed...
         <description>Estpolis Denki II (Japan, prototype)</description>
         <year>1994</year>
         <publisher>Taito</publisher>
-        <info name="serial" value="" />
         <info name="release" value="199403xx" /> <!- - based on some chips date stamp - ->
         <info name="alt_title" value="¨エストポリス伝記II" />
         <part name="cart" interface="snes_cart">
@@ -7996,7 +7995,6 @@ more investigation needed...
 		<year>1993</year>
 		<publisher>Konami</publisher>
 		<info name="serial" value="SNSP-BJ-NOE" />
-		<info name="release" value="" />
 		<sharedfeat name="compatibility" value="PAL" />
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-1A0N-10" />
@@ -15399,7 +15397,7 @@ more investigation needed...
 			</dataarea>
 			<dataarea name="addon" size="163840">
 				<rom name="0xf3.u3" size="131072" crc="f73d5e10" sha1="388e3721b94cd074d6ba0eca8616523d2118a6c3" offset="0x000000" />
-				<rom name="0xf4.u3" size="32768" crc="b5255459" sha1="b19c0f8f207d62fdabf4bf71442826063bccc626" offset="0x000000" />
+				<rom name="0xf4.u3" size="32768" crc="b5255459" sha1="b19c0f8f207d62fdabf4bf71442826063bccc626" offset="0x020000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -16963,7 +16961,6 @@ more investigation needed...
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="serial" value="SNSP-7K-EUR" />
-		<info name="release" value="" />
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-1A0N-30" />
 			<feature name="u1" value="U1 MASK ROM" />
@@ -18538,7 +18535,6 @@ more investigation needed...
 		<year>1994</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="serial" value="SNSP-ANLP-NOE" />
-		<info name="release" value="" />
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-1J3M-11" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
@@ -31052,7 +31048,6 @@ Alternate board (XL-1)
 		<year>1998</year>
 		<publisher>T*HQ</publisher>
 		<info name="serial" value="SNSP-AJ9P-EUR" />
-		<info name="release" value="" />
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-1J0N-20" />
 			<feature name="u1" value="U1 MASKROM" />
@@ -31946,7 +31941,6 @@ Alternate board (XL-1)
 		<year>1993</year>
 		<publisher>Hudson</publisher>
 		<info name="serial" value="SNSP-VX-NOE" />
-		<info name="release" value="" />
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-1A1M-10" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
@@ -33582,7 +33576,6 @@ Alternate board (XL-1)
 		<description>FIFA - A Caminho Da Copa 98 (Brazil)</description>
 		<year>1997</year>
 		<publisher>Gradiente Entertainment Ltda.</publisher>
-		<info name="serial" value="" />
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="EA-1A3M-30/P10019" />
 			<feature name="u1" value="U1 MASK ROM(N)" />
@@ -34663,7 +34656,6 @@ Alternate board (XL-1)
 		<year>1993</year>
 		<publisher>LJN</publisher>
 		<info name="serial" value="SNSP-WU-FAH-1" />
-		<info name="release" value="" />
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-2A0N-01" />
 			<feature name="u1" value="U1 P0" />

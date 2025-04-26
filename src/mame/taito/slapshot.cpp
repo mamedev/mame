@@ -442,8 +442,8 @@ void slapshot_state::slapshot(machine_config &config)
 
 	ym2610b_device &ymsnd(YM2610B(config, "ymsnd", 32_MHz_XTAL/4)); /* 8 MHz */
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(0, "lspeaker", 0.75);
+	ymsnd.add_route(0, "rspeaker", 0.75);
 	ymsnd.add_route(1, "lspeaker", 1.0);
 	ymsnd.add_route(2, "rspeaker", 1.0);
 
@@ -508,8 +508,8 @@ void slapshot_state::opwolf3(machine_config &config)
 
 	ym2610b_device &ymsnd(YM2610B(config, "ymsnd", 32_MHz_XTAL/4)); /* 8 MHz */
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(0, "lspeaker", 0.75);
+	ymsnd.add_route(0, "rspeaker", 0.75);
 	ymsnd.add_route(1, "lspeaker", 1.0);
 	ymsnd.add_route(2, "rspeaker", 1.0);
 

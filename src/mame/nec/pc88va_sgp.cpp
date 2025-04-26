@@ -8,7 +8,7 @@ Unknown part number, used as GPU for PC88VA
 
 TODO:
 - timing details;
-- unemulated CLS, LINE and SCAN;
+- unemulated CLS, LINE, SCAN;
 - Uneven src/dst sizes or color depths (mostly for PATBLT);
 - specifics about what exactly happens in work area when either SGP runs or is idle;
 - famista: during gameplay it BITBLT same source to destination 0x00037076
@@ -21,9 +21,9 @@ TODO:
 #include "emu.h"
 #include "pc88va_sgp.h"
 
-//#include <iostream>
-
 #define LOG_COMMAND     (1U << 1)
+
+//#include <iostream>
 
 #define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_STREAM std::cout
@@ -98,10 +98,10 @@ void pc88va_sgp_device::control_w(u8 data)
 u8 pc88va_sgp_device::status_r()
 {
 // crude debug single-stepping
-//	if (machine().input().code_pressed(KEYCODE_S))
-//		return 0;
-//	if (!machine().input().code_pressed_once(KEYCODE_A))
-//		return 1;
+//  if (machine().input().code_pressed(KEYCODE_S))
+//      return 0;
+//  if (!machine().input().code_pressed_once(KEYCODE_A))
+//      return 1;
 	return 0;
 }
 
@@ -190,11 +190,11 @@ void pc88va_sgp_device::start_exec()
 				ptr->hsize = m_data->read_word(vdp_pointer + 4) & 0x0fff;
 				ptr->vsize = m_data->read_word(vdp_pointer + 6) & 0x0fff;
 				// NOTE: & 0xfffc causes pitch issues in boomer intro/title text, shinraba gameplay
-				ptr->fb_pitch = m_data->read_word(vdp_pointer + 8) & 0xfffe;
+				ptr->fb_pitch = (s16)(m_data->read_word(vdp_pointer + 8) & 0xfffe);
 				ptr->address = (m_data->read_word(vdp_pointer + 10) & 0xfffe)
 					| (m_data->read_word(vdp_pointer + 12) << 16);
 
-				LOGCOMMAND("SGP: (PC=%08x) SET %s %02x|H %4u|V %4u|Pitch %5u| address %08x\n"
+				LOGCOMMAND("SGP: (PC=%08x) SET %s %02x|H %4u|V %4u|Pitch %5d| address %08x\n"
 					, vdp_pointer
 					, mode ? "DESTINATION" : "SOURCE     "
 					, param1
@@ -209,10 +209,10 @@ void pc88va_sgp_device::start_exec()
 			}
 			case 0x0006:
 			{
-				const u16 color_code = m_data->read_word(vdp_pointer + 2);
+				m_color_code = m_data->read_word(vdp_pointer + 2);
 				LOGCOMMAND("SGP: (PC=%08x) SET COLOR %04x\n"
 					, vdp_pointer
-					, color_code
+					, m_color_code
 				);
 				next_pc += 2;
 				break;
@@ -246,7 +246,7 @@ void pc88va_sgp_device::start_exec()
 				// in pixels
 				const u16 h_size = m_data->read_word(vdp_pointer + 6);
 				const u16 v_size = m_data->read_word(vdp_pointer + 8);
-				const u16 fb_pitch = m_data->read_word(vdp_pointer + 10) & 0xfffe;
+				const s16 fb_pitch = m_data->read_word(vdp_pointer + 10) & 0xfffe;
 				const u32 src_address = (m_data->read_word(vdp_pointer + 12) & 0xfffe)
 					| (m_data->read_word(vdp_pointer + 14) << 16);
 
@@ -363,6 +363,7 @@ bool pc88va_sgp_device::tpmod_1_src(u16 src, u16 dst) { return src != 0; }
 bool pc88va_sgp_device::tpmod_2_dst(u16 src, u16 dst) { return dst == 0; }
 bool pc88va_sgp_device::tpmod_3_never(u16 src, u16 dst) { return false; }
 
+
 /*
  * ---x ---- ---- ---- SF (0) shift source according to destination position
  * ---- x--- ---- ---- VD vertical transfer direction (1) negative (0) positive
@@ -397,14 +398,14 @@ void pc88va_sgp_device::execute_blit(u16 draw_mode, bool is_patblt)
 {
 	const u8 logical_op = draw_mode & 0xf;
 	const u8 tp_mod = (draw_mode >> 8) & 0x3;
-//	const bool hd = !!BIT(draw_mode, 10);
+	const bool hd = !!BIT(draw_mode, 10);
 	// TODO: rtype gameplay enables VD
-//	const bool vd = !!BIT(draw_mode, 11);
-//	const bool sf = !!BIT(draw_mode, 12);
+	const bool vd = !!BIT(draw_mode, 11);
+	const bool sf = !!BIT(draw_mode, 12);
 
-	if (draw_mode & 0xfc00)
+	if (hd || vd || sf)
 	{
-		popmessage("SGP: Warning draw_mode = %04x (HD %d VD %d SF %d)", draw_mode, BIT(draw_mode, 10), BIT(draw_mode, 11), BIT(draw_mode, 12));
+		popmessage("SGP: Warning draw_mode = %04x (HD %d VD %d SF %d)", draw_mode, hd, vd, sf);
 	}
 
 	// boomer title screen just sets the same h/v size, irrelevant
@@ -420,9 +421,11 @@ void pc88va_sgp_device::execute_blit(u16 draw_mode, bool is_patblt)
 		return;
 	}
 
-	if (m_src.pixel_mode == 0 || m_src.pixel_mode == 3 || m_src.pixel_mode != m_dst.pixel_mode)
+	if (m_src.pixel_mode != m_dst.pixel_mode && m_src.pixel_mode != 0 && m_dst.pixel_mode != 1)
 	{
-		LOG("SGP: Warning BITBLT pixel mode %d x %d\n", m_src.pixel_mode, m_dst.pixel_mode);
+		static const char *const pixel_mode[] = { "1bpp", "4bpp", "8bpp", "rgb565" };
+
+		LOG("SGP: Warning BITBLT pixel mode src %s against dst %s\n", pixel_mode[m_src.pixel_mode], pixel_mode[m_dst.pixel_mode]);
 		return;
 	}
 
@@ -431,24 +434,71 @@ void pc88va_sgp_device::execute_blit(u16 draw_mode, bool is_patblt)
 		u32 src_address = m_src.address + (yi * m_src.fb_pitch);
 		u32 dst_address = m_dst.address + (yi * m_dst.fb_pitch);
 
-		// TODO: should fetch on demand, depending on color mode/start dot etc.
+		// TODO: should fetch on demand, depending on m_dst.pixel_mode etc.
+		// m_src.start_dot is used by famista (pitcher throws)
 		for (int xi = 0; xi < m_src.hsize; xi ++)
 		{
 			switch(m_src.pixel_mode)
 			{
+				// 1bpp
+				case 0:
+				{
+					const u32 src_offset = src_address + ((xi + m_src.start_dot) >> 3);
+					const u8 src_nibble = ((xi + m_src.start_dot) ^ 7) & 7;
+
+					// famista, before expanding (1bpp -> 1bpp)
+					if (m_dst.pixel_mode == 0)
+					{
+						const u32 dst_offset = dst_address + ((xi + m_dst.start_dot) >> 3);
+						const u8 dst_nibble = ((xi + m_dst.start_dot) ^ 7) & 7;
+
+						u8 src = (m_data->read_byte(src_offset) >> src_nibble) & 0x1;
+						u8 result = m_data->read_byte(dst_offset);
+						u8 dst = (result >> dst_nibble) & 0x1;
+
+						if ((this->*tpmod_table[tp_mod])(src, dst))
+						{
+							result &= ~(1 << dst_nibble);
+							result |= ((this->*rop_table[logical_op])(src, dst) & 1) << dst_nibble;
+							m_data->write_byte(dst_offset, result);
+						}
+					}
+					else if (m_dst.pixel_mode == 1) // famista and pceva2tb:SKYBD.BAT (1bpp -> 4bpp)
+					{
+						const u32 dst_offset = dst_address + ((xi + m_dst.start_dot) >> 1);
+						const u8 dst_nibble = (((xi + m_dst.start_dot) ^ 1) & 1) * 4;
+
+						u8 src = (m_data->read_byte(src_offset) >> src_nibble) & 0x1;
+						u8 result = m_data->read_byte(dst_offset);
+						u8 dst = (result >> dst_nibble) & 0xf;
+
+						if ((this->*tpmod_table[tp_mod])(src, dst))
+						{
+							result &= dst_nibble ? 0x0f : 0xf0;
+							result |= ((this->*rop_table[logical_op])(src, dst) ? m_color_code & 0xf : 0) << dst_nibble;
+							m_data->write_byte(dst_offset, result);
+						}
+					}
+
+					break;
+				}
 				// 4bpp (shinraba)
 				case 1:
 				{
-					const u8 nibble = xi & 1;
-					const u32 dst_offset = dst_address + ((xi + m_dst.start_dot) >> 1);
+					const u32 src_offset = src_address + ((xi + m_src.start_dot) >> 1);
+					const u8 src_nibble = (((xi + m_src.start_dot) ^ 1) & 1) * 4;
 
-					u8 src = (m_data->read_byte(src_address + (xi >> 1)) >> (nibble * 4)) & 0xf;
-					u8 dst = m_data->read_byte(dst_offset);
-					u8 result = dst & (nibble ? 0x0f : 0xf0);
+					const u32 dst_offset = dst_address + ((xi + m_dst.start_dot) >> 1);
+					const u8 dst_nibble = (((xi + m_dst.start_dot) ^ 1) & 1) * 4;
+
+					u8 src = (m_data->read_byte(src_offset) >> src_nibble) & 0xf;
+					u8 result = m_data->read_byte(dst_offset);
+					u8 dst = (result >> dst_nibble) & 0xf;
 
 					if ((this->*tpmod_table[tp_mod])(src, dst))
 					{
-						result |= (this->*rop_table[logical_op])(src, dst) << (nibble * 4);
+						result &= dst_nibble ? 0x0f : 0xf0;
+						result |= (this->*rop_table[logical_op])(src, dst) << dst_nibble;
 						m_data->write_byte(dst_offset, result);
 					}
 
@@ -458,9 +508,10 @@ void pc88va_sgp_device::execute_blit(u16 draw_mode, bool is_patblt)
 				// 8bpp (tetris)
 				case 2:
 				{
+					const u32 src_offset = src_address + (xi + m_src.start_dot);
 					const u32 dst_offset = dst_address + (xi + m_dst.start_dot);
 
-					u8 src = m_data->read_byte(src_address + xi) & 0xff;
+					u8 src = m_data->read_byte(src_offset) & 0xff;
 					u8 dst = m_data->read_byte(dst_offset) & 0xff;
 					u8 result = dst;
 
@@ -468,6 +519,25 @@ void pc88va_sgp_device::execute_blit(u16 draw_mode, bool is_patblt)
 					{
 						result = (this->*rop_table[logical_op])(src, dst);
 						m_data->write_byte(dst_offset, result);
+					}
+
+					break;
+				}
+
+				// RGB565 (ballbrkr title)
+				case 3:
+				{
+					const u32 src_offset = src_address + ((xi + m_src.start_dot) << 1);
+					const u32 dst_offset = dst_address + ((xi + m_dst.start_dot) << 1);
+
+					u16 src = m_data->read_word(src_offset) & 0xffff;
+					u16 dst = m_data->read_word(dst_offset) & 0xffff;
+					u16 result = dst;
+
+					if ((this->*tpmod_table[tp_mod])(src, dst))
+					{
+						result = (this->*rop_table[logical_op])(src, dst);
+						m_data->write_word(dst_offset, result);
 					}
 
 					break;

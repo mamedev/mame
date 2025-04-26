@@ -333,7 +333,7 @@ uint32_t moo_state::screen_update_moo(screen_device &screen, bitmap_rgb32 &bitma
 	// There is probably a control bit somewhere to turn off alpha blending.
 	m_alpha_enabled = m_k054338->register_r(K338_REG_CONTROL) & K338_CTL_MIXPRI; // DUMMY
 
-	alpha = (m_alpha_enabled) ? m_k054338->set_alpha_level(1) : 255;
+	alpha = (m_alpha_enabled) ? m_k054338->set_alpha_level(1) & 0xff : 255;
 
 	if (alpha > 0)
 		m_k056832->tilemap_draw(screen, bitmap, cliprect, layers[2], TILEMAP_DRAW_ALPHA(alpha), 4);

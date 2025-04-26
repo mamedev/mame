@@ -322,7 +322,7 @@ void zsg2_device::sound_stream_update(sound_stream &stream, std::vector<read_str
 			int32_t sample = elem.samples[sample_pos];
 
 			// linear interpolation (hardware certainly does something similar)
-			sample += ((uint16_t)(elem.step_ptr << 2 & 0xffff) * (int16_t)(elem.samples[sample_pos+1] - sample)) >> 16;
+			sample += (uint16_t(elem.step_ptr << 2 & 0xffff) * int16_t(elem.samples[sample_pos+1] - sample)) >> 16;
 
 			// another filter...
 			elem.output_filter_state += (sample - (elem.output_filter_state >> 16)) * elem.output_cutoff;
