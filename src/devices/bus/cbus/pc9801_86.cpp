@@ -448,7 +448,10 @@ u8 pc9801_86_device::queue_pop()
 {
 	u8 ret = m_queue[m_tail++];
 	m_tail %= QUEUE_SIZE;
-	m_count = (m_count - 1) % QUEUE_SIZE; // dangel resets the fifo after filling it completely so maybe it expects an underflow
+	// TODO: dangel resets the fifo after filling it completely so maybe it expects an underflow
+	// this breaks win95, that expects FIFO empty flags to stay consistant
+	//m_count = (m_count - 1) % QUEUE_SIZE;
+	m_count = std::max(m_count - 1, 0);
 	return ret;
 }
 
@@ -503,7 +506,8 @@ TIMER_CALLBACK_MEMBER(pc9801_86_device::dac_tick)
 	{
 		//LOGDAC("\tIRQ set\n");
 		m_pcmirq = true;
-		//m_bus->int_w<5>(ASSERT_LINE);
+		// win95 expects edge triggers
+		m_irqs->in_w<1>(CLEAR_LINE);
 		m_irqs->in_w<1>(ASSERT_LINE);
 	}
 }
