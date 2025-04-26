@@ -396,7 +396,7 @@
    6      Bet setting       see below              Bet setting
 
   MAX BET
-  Switch 4       Switch 6 
+  Switch 4       Switch 6
   on                on         =max bet 25  (5- 8 setting)
   off               on         =max bet 20  (1- 8 setting)
   on                off        =max bet 15
@@ -907,7 +907,7 @@ private:
 	uint8_t nvram_r(offs_t offset);
 	void nvram_w(offs_t offset, uint8_t data);
 	void nvunlock_w(offs_t offset, uint8_t data);
-	
+
 	std::unique_ptr<uint16_t[]> m_np_vram;
 	required_device<cpu_device> m_maincpu;
 	required_device<nvram_device> m_nvram;
@@ -921,7 +921,7 @@ private:
 	output_finder<12> m_lamps;
 
 	std::unique_ptr<uint8_t[]> m_nvram8;
-	
+
 	bool m_display_line_control = false;
 	bool m_nvunlock = false;
 	uint8_t m_videoram[0x800] = {};
@@ -1499,7 +1499,7 @@ void norautp_state::krampcb4_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0xa000, 0xa7ff).ram().share("nvram");
-//	map(0xff00, 0xffff).ram();
+//  map(0xff00, 0xffff).ram();
 }
 
 
@@ -1957,7 +1957,7 @@ static INPUT_PORTS_START( ddellf97 )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x00, "Bonus 5-Cards (D-UP)" )  PORT_DIPLOCATION("DSW1:6")
-	PORT_DIPSETTING(    0x04, DEF_STR( No	) )
+	PORT_DIPSETTING(    0x04, DEF_STR( No   ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x08, 0x08, "Raise Bet" )             PORT_DIPLOCATION("DSW1:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
@@ -2062,7 +2062,7 @@ static INPUT_PORTS_START( delv18ap )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW1:4")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) ) 
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW1:3")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
@@ -2360,8 +2360,8 @@ static INPUT_PORTS_START( tpoker2a )
 
 	PORT_INCLUDE( dphl )
 
-//	PORT_MODIFY("IN0")  // in case of need ticket/hopper
-//	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )  PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
+//  PORT_MODIFY("IN0")  // in case of need ticket/hopper
+//  PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )  PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 
 	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )     PORT_DIPLOCATION("DSW1:8")
@@ -3928,7 +3928,7 @@ ROM_START( kimblz80 )
 	ROM_LOAD( "quiz_char_ii.bin", 0x0800, 0x0800, CRC(ad645a41) SHA1(a2c47f21609cda20a6cfee17a7bfd32fb2afd6fe) )
 ROM_END
 
-// Hi Lo Kimble, Z80 
+// Hi Lo Kimble, Z80
 ROM_START( hilokimb )
 	ROM_REGION( 0x10000, "maincpu", 0 )  // not encrypted. extended addressing.
 	ROM_LOAD( "wolfie02_u11_2764.u11", 0x0000, 0x2000, CRC(ec26e205) SHA1(a778365a22c83d285c0896bab62bc04a718a5324) )
@@ -4220,9 +4220,9 @@ ROM_END
 
   Dellfern UK LTD
   MADE IN ENGLAND (C)1997
-                              
+
   Rom: VERSION 18, 16.05.97 BY V.S
- 
+
   - CPU:      1x Z84C0006PEC
   - RAM:      1x 6264A  8K X 8 - Bit CMOS SRAM
   - RAM:      1x GM76C28A - 2048 x 8 bit CMOS Static RAM
@@ -4233,7 +4233,7 @@ ROM_END
   - Crystal:  1x 18.432 MHz
   - PLDs:     1x PALCE16V8H read protected
 
-  Pack of six programs inside for different cabs types. 
+  Pack of six programs inside for different cabs types.
 
   Program offsets:
 
@@ -5372,7 +5372,7 @@ ROM_END
   - RAM:             2x 2111A-2: Static Random Access Memory 256 x 4 bit.
   - RAM:             1X 6116-3
   - I/O:             3x 8255: Peripeheral Interface Adapter.
-  - Prg ROMs:        2x 2732: U12,U18: Eprom. 
+  - Prg ROMs:        2x 2732: U12,U18: Eprom.
   - Gfx ROMs:        1x 2732: U31: Eprom.
   - Sound:           Discrete.
   - Crystal:         1x 18.000 MHz.
@@ -5381,7 +5381,7 @@ ROM_END
 
   PCB/EPROM MARKINGS = NONE
   U51 LABEL:98CC
- 
+
 
   PCB Layout (PCB2):                                                                       Edge Connector 36x2
   .------------------------------------------------------------------------------------------------------------.
@@ -5456,7 +5456,7 @@ ROM_END
   - CPU:             1x 8080
   - RAM:             2x 2111A-2: Static Random Access Memory 256 x 4 bit.
   - I/O:             3x 8255: Peripeheral Interface Adapter.
-  - Prg ROMs:        2x 2732: U12,U18: Eprom. 
+  - Prg ROMs:        2x 2732: U12,U18: Eprom.
   - Gfx ROMs:        1x 2716: U31: Eprom.
   - Sound:           Discrete.
   - Crystal:         1x 18.000 MHz.
@@ -5467,20 +5467,20 @@ ROM_END
    1x CD4093
    1x 3.6V NI-CD
    1x CD4040
-   2x NEC D5101LC-1: 256x4 static CMOS RAM.                  
+   2x NEC D5101LC-1: 256x4 static CMOS RAM.
 
 
   PCB MARKINGS Silkscreened: NONE
 
   PCB MARKED:5239
-  PCB MARKED:8310    
-  
+  PCB MARKED:8310
+
   EPROM MARKINGS:
   U12: U12 ANTI STAT CB0A
   U18: U18 ANTI STAT 36E3
   U31: U31 CGIT F506
   U51: 98CE
-  
+
   PCB Layout (PCB5):                                                                       Edge Connector 36x2
   .------------------------------------------------------------------------------------------------------------.
   |PIN'S BATTERY PCB                     .---------.  .---------.  .-----.       .........    .---------.      |
@@ -5606,7 +5606,7 @@ ROM_END
   - CPU:             1x 8080
   - RAM:             3x 2111A-2: Static Random Access Memory 256 x 4 bit.
   - I/O:             3x 8255: Peripeheral Interface Adapter.
-  - Prg ROMs:        2x 2764: U12, U18: Eprom. 
+  - Prg ROMs:        2x 2764: U12, U18: Eprom.
   - Gfx ROMs:        1x 2732: U31: Eprom.
   - Sound:           Discrete.
   - Crystal:         1x 18.144 MHz.
@@ -5619,12 +5619,12 @@ ROM_END
   R.A.B.
   W.S.B.
   DECMO 3084
-  
+
   STICKERED: DEC 14'84
-  STICKERED: DEC 17'84  
-  STICKERED: TESTED OK W.S.B 6998 
-  PCB MARKED:6998     
-  
+  STICKERED: DEC 17'84
+  STICKERED: TESTED OK W.S.B 6998
+  PCB MARKED:6998
+
   EPROM MARKINGS:
   U12: 6000 U12 5-25
   U18: 6000 U18
@@ -5650,7 +5650,7 @@ ROM_END
   - CPU:             1x 8080
   - RAM:             3x 2111A-2: Static Random Access Memory 256 x 4 bit.
   - I/O:             3x 8255: Peripeheral Interface Adapter.
-  - Prg ROMs:        2x 2764: U12, U18: Eprom. 
+  - Prg ROMs:        2x 2764: U12, U18: Eprom.
   - Gfx ROMs:        1x 2732: U31: Eprom.
   - Sound:           Discrete.
   - Crystal:         1x 18.144 MHz.
@@ -5658,15 +5658,15 @@ ROM_END
 
   - BATTERY ADDON PCB:ENCASED IN RESIN
     LABELED:14690 MODEL 4036 BATTERY BOARD
-                 
+
   PCB MARKINGS Silkscreened = PATENT PENDING. COPYRIGHT 1983 M.KRAMER MFG.INC. MODEL 3000 M.KRAMER INC
   R.A.B.
   W.S.B.
-  
+
   STICKERED: TEST 1 JUN 12'84
-  STICKERED: TEST 3 JUN 5 '84 
-  PCB MARKED:5253     
-  
+  STICKERED: TEST 3 JUN 5 '84
+  PCB MARKED:5253
+
   EPROM MARKINGS:
   U12: JPB M8 USA U12 5/25
   U18: JPB U18 USA M8 5/25
@@ -5692,7 +5692,7 @@ ROM_END
   - CPU:             1x 8080
   - RAM:             3x 2111A-2: Static Random Access Memory 256 x 4 bit.
   - I/O:             3x 8255: Peripeheral Interface Adapter.
-  - Prg ROMs:        2x 2764: U12, U18: Eprom. 
+  - Prg ROMs:        2x 2764: U12, U18: Eprom.
   - Gfx ROMs:        1x 2732: U31: Eprom.
   - Sound:           Discrete.
   - Crystal:         1x 18.144 MHz.
@@ -5700,23 +5700,23 @@ ROM_END
 
   - BATTERY ADDON PCB: ENCASED IN RESIN
     LABELED: MODEL 16304 4000 BATTERY BOARD
-                 
+
   PCB MARKINGS Silkscreened = PATENT PENDING. COPYRIGHT 1983 M.KRAMER MFG.INC. MODEL 3000 M.KRAMER INC
   R.A.B.
   W.S.B.
   DECMO 3384
-  
+
   STICKERED: TEST 5 NOV 31 '84
-  STICKERED: TEST 3 NOV 27 '84 
+  STICKERED: TEST 3 NOV 27 '84
   STICKERED: K TESTED OK W.S.B 6759 NOV 27 84
-  PCB MARKED:6759     
-  
+  PCB MARKED:6759
+
   EPROM MARKINGS:
   U12: U12 JF30 TN 5 25 6200-1F06
   U18: U18 JF30 MODEL 6000 5E4F--33CB
   U31: U31B MOD3000 CF7B
   U51: U51-06EC
-  
+
 */
 ROM_START( krampcb6 )
 	ROM_REGION( 0x10000, "maincpu", 0 )

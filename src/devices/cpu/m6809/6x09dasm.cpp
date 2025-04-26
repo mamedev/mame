@@ -17,7 +17,7 @@
     Thanks to Franklin Bowen for bug fixes, ideas
 
     TODO:
-	- KONAMI EXG/TFR isn't disassembled accurately:
+    - KONAMI EXG/TFR isn't disassembled accurately:
       0x3E/0x3F + param bit 7 clear = EXG
       0x3E/0x3F + param bit 7 set = TFR
 

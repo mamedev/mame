@@ -421,7 +421,7 @@ void pc98_119_kbd_device::key_repeat(uint8_t row, uint8_t column)
 	m_repeat_state[code] ^= 1;
 	code |= m_repeat_state[code] << 7;
 
-    send_key(code);
+	send_key(code);
 }
 
 void pc98_119_kbd_device::received_byte(u8 byte)

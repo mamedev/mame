@@ -1,12 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Devin Acker
 /*
-	Skeleton driver for Casio CPS-2000 piano.
+    Skeleton driver for Casio CPS-2000 piano.
 
-	Sound hardware:
-	- 2x uPD932 consonant-vowel synth
-	- uPD934 PCM rhythm
-	- monophonic square wave bass w/ RC envelope and filter
+    Sound hardware:
+    - 2x uPD932 consonant-vowel synth
+    - uPD934 PCM rhythm
+    - monophonic square wave bass w/ RC envelope and filter
 */
 
 #include "emu.h"
@@ -55,7 +55,7 @@ private:
 	required_device<msm6200_device> m_kbd;
 	required_device<va_rc_eg_device> m_bass_env;
 	required_device<upd934g_device> m_pcm;
-	
+
 	required_ioport_array<5> m_keys;
 
 	ioport_value m_key_sel;

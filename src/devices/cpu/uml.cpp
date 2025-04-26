@@ -332,7 +332,7 @@ public:
 	static void truncate_imm(instruction &inst)
 	{
 		u64 const mask = size_mask(inst);
-		
+
 		for (int i = 0; inst.numparams() > i; ++i)
 			truncate_immediate(inst, i, mask);
 	}

@@ -398,11 +398,11 @@ void victor9k_state::ssda_sm_dtr_w(int state)
 	m_ssda->cts_w(state);
 	m_ssda->dcd_w(!state);
 
-    /*                           ___
-     * We're supposed to set the ENC/DEC input of the HC55516 to !state,
-     * but only playback/decode is currently supported, and that input
-     * is not implemenented.
-     */
+	/*                           ___
+	 * We're supposed to set the ENC/DEC input of the HC55516 to !state,
+	 * but only playback/decode is currently supported, and that input
+	 * is not implemenented.
+	 */
 }
 
 

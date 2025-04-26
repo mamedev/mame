@@ -529,7 +529,7 @@ public:
 	void system_outputb_w(uint8_t data);
 	void system_outputc_w(uint8_t data);
 
-    // handlers for lucky bar MCU ports
+	// handlers for lucky bar MCU ports
 	uint8_t mcu_portb_r();
 	void mcu_porta_w(uint8_t data);
 	void mcu_portb_w(uint8_t data);
@@ -584,7 +584,7 @@ public:
 protected:
 	TILE_GET_INFO_MEMBER(get_magical_fg_tile_info);
 	//virtual void machine_start() override { goldstar_state::machine_start(); m_tile_bank = 0; }
-	virtual void machine_start() override;	
+	virtual void machine_start() override;
 
 private:
 	optional_device<ds2401_device> m_fl7w4_id;
@@ -598,7 +598,7 @@ private:
 	void lucky8p_map(address_map &map) ATTR_COLD;
 	void nd8lines_map(address_map &map) ATTR_COLD;
 	void magodds_map(address_map &map) ATTR_COLD;
-	void luckybar_map(address_map &map) ATTR_COLD;	
+	void luckybar_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -1614,10 +1614,10 @@ void wingco_state::mcu_portc_w(uint8_t data)
 uint8_t wingco_state::nvram_r(offs_t offset)
 {
 	uint8_t ret = m_nvram8[offset];
-	
-	if(offset == 0x7ff) 
+
+	if(offset == 0x7ff)
 		ret = 0;
-	
+
 	if(offset == 0x7fd)
 	{
 		switch(m_nvram8[0x7fd])
@@ -1626,9 +1626,9 @@ uint8_t wingco_state::nvram_r(offs_t offset)
 			case 0x04: ret = 0x02; break;
 			case 0x10: ret = 0x20; break;
 			case 0x40: ret = 0x80; break;
-		}			
+		}
 	}
-	
+
 	return ret;
 }
 
@@ -11838,7 +11838,7 @@ ROM_START( crazybon )
 
 	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
 
-	// proms taken from cmv4, probably wrong 
+	// proms taken from cmv4, probably wrong
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) BAD_DUMP )
 	ROM_LOAD( "82s129.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) BAD_DUMP )
@@ -11859,7 +11859,7 @@ ROM_START( crazybona )
 
 	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
 
-	// proms taken from cmv4, probably wrong 
+	// proms taken from cmv4, probably wrong
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) BAD_DUMP )
 	ROM_LOAD( "82s129.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) BAD_DUMP )
@@ -11880,7 +11880,7 @@ ROM_START( crazybonb )
 
 	ROM_REGION( 0x10000, "user1", ROMREGION_ERASE00 )
 
-	// proms taken from cmv4, probably wrong 
+	// proms taken from cmv4, probably wrong
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) BAD_DUMP )
 	ROM_LOAD( "82s129.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) BAD_DUMP )
@@ -12412,7 +12412,7 @@ ROM_END
 /*
   Original Wing W4 PCB + Dyna D9005 subboard with Z80,
   ROM, RAM and Dyna DP 1200-5 custom.
-  
+
   GFX ROMs are identical to many other sets.
 
 */
@@ -13062,7 +13062,7 @@ ROM_START( cmasterb )
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "u53.8",  0x0000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
 
-	// proms taken from cmv4, probably wrong 
+	// proms taken from cmv4, probably wrong
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
 	ROM_LOAD( "82s129.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
@@ -13097,7 +13097,7 @@ ROM_START( cmezspin )
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "u53.8",  0x0000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
 
-	// proms taken from cmv4, probably wrong 
+	// proms taken from cmv4, probably wrong
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
 	ROM_LOAD( "82s129.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
@@ -13201,7 +13201,7 @@ ROM_START( cmasterc )
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "msii841.u53",  0x0000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
 
-	// proms taken from cmv4, probably wrong 
+	// proms taken from cmv4, probably wrong
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
 	ROM_LOAD( "82s129.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
@@ -13313,7 +13313,7 @@ ROM_START( cmasterd )
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "u53.8",  0x0000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
 
-	// proms taken from cmv4, probably wrong 
+	// proms taken from cmv4, probably wrong
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
 	ROM_LOAD( "82s129.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
@@ -13348,7 +13348,7 @@ ROM_START( cmastere )
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "u53.8",  0x0000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
 
-	// proms taken from cmv4, probably wrong 
+	// proms taken from cmv4, probably wrong
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
 	ROM_LOAD( "82s129.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
@@ -13383,7 +13383,7 @@ ROM_START( cmasterf )
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "u53.8",  0x0000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
 
-	// proms taken from cmv4, probably wrong 
+	// proms taken from cmv4, probably wrong
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
 	ROM_LOAD( "82s129.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
@@ -20705,7 +20705,7 @@ ROM_START( cmpacman )
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "8.u53",  0x0000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
 
-	// proms taken from cmv4, probably wrong 
+	// proms taken from cmv4, probably wrong
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
 	ROM_LOAD( "82s129.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
@@ -20732,7 +20732,7 @@ ROM_START( cmpacmana )
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "8.u53",  0x0000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
 
-	// proms taken from cmv4, probably wrong 
+	// proms taken from cmv4, probably wrong
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
 	ROM_LOAD( "82s129.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
@@ -20809,7 +20809,7 @@ ROM_START( cmtetris )
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "8.u53",  0x0000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
 
-	// proms taken from cmv4, probably wrong 
+	// proms taken from cmv4, probably wrong
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
 	ROM_LOAD( "82s129.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
@@ -20958,7 +20958,7 @@ ROM_START( cmtetrisb )
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "rom8.u53",  0x0000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
 
-	// proms taken from cmv4, probably wrong 
+	// proms taken from cmv4, probably wrong
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
 	ROM_LOAD( "82s129.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
@@ -22195,7 +22195,7 @@ void wingco_state::init_wcat3()
     as the game needs to be soft resets 4-5 times before
     working apparently fine
 
-	see from 0xb0 - 0xcf range for an example
+    see from 0xb0 - 0xcf range for an example
     (comparable to range 0x96 - 0xb5 in lucky8)
 */
 	uint8_t *rom = memregion("maincpu")->base();
@@ -23716,7 +23716,7 @@ void cmaster_state::init_super7()
 {
 /*  possibly incomplete decryption. Game appears to work with clean NVRAM,
     but stops with 'scheda da inizializzare" (PCB to be initialized)
-	message with NVRAM present
+    message with NVRAM present
 */
 	uint8_t *rom = memregion("maincpu")->base();
 

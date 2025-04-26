@@ -906,7 +906,7 @@ void scsp_device::UpdateRegR(int reg)
 					++m_MidiR;
 					m_MidiR &= 31;
 				}
-				if (m_MidiR == m_MidiW)		// if the input FIFO is empty, clear the IRQ
+				if (m_MidiR == m_MidiW)     // if the input FIFO is empty, clear the IRQ
 				{
 					m_irq_cb(m_IrqMidi, CLEAR_LINE);
 					m_udata.data[0x20 / 2] &= ~8;

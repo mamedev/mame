@@ -341,7 +341,7 @@ protected:
     ----FFEEDDCCBBAA---------------- (layer A-F mix codes in forced blending)
     ---x---------------------------- (disable shadows)
     --x----------------------------- (disable z-buffering)
-	yy------------------------------ (last encountered tile mix code)
+    yy------------------------------ (last encountered tile mix code)
 */
 #define GXMIX_BLEND_AUTO    0           // emulate all blend effects
 #define GXMIX_BLEND_NONE    1           // disable all blend effects

@@ -52,8 +52,8 @@ void pc9801_118_device::device_add_mconfig(machine_config &config)
 	// 5B is near both CS-4232 and this
 	YM2608(config, m_opn3, XTAL_5B * 2 / 5);
 	m_opn3->irq_handler().set([this] (int state) { m_bus->int_w<5>(state); });
-//	m_opn3->port_a_read_callback().set(FUNC(pc9801_118_device::opn_porta_r));
-//	m_opn3->port_b_write_callback().set(FUNC(pc9801_118_device::opn_portb_w));
+//  m_opn3->port_a_read_callback().set(FUNC(pc9801_118_device::opn_porta_r));
+//  m_opn3->port_b_write_callback().set(FUNC(pc9801_118_device::opn_portb_w));
 	m_opn3->add_route(ALL_OUTPUTS, "lspeaker", 1.00);
 	m_opn3->add_route(ALL_OUTPUTS, "rspeaker", 1.00);
 
