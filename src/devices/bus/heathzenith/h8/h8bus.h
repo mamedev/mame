@@ -216,15 +216,6 @@ class device_h8bus_p2_card_interface : public device_h8bus_card_interface
 public:
 	virtual ~device_h8bus_p2_card_interface();
 
-	// signals from the Bus
-	virtual void int1_w(int state) {}
-	virtual void int2_w(int state) {}
-	virtual void int3_w(int state) {}
-	virtual void int4_w(int state) {}
-	virtual void int5_w(int state) {}
-	virtual void int6_w(int state) {}
-	virtual void int7_w(int state) {}
-
 	// signals from P201 cable
 	virtual void p201_reset_w(int state) {}
 	virtual void p201_int1_w(int state) {}
