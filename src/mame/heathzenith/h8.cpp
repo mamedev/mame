@@ -83,7 +83,7 @@ void h8_state::h8(machine_config &config)
 
 	H8BUS_SLOT(config,  "p1", "h8bus", h8_p1_cards,  "fp");
 	H8BUS_SLOT(config,  "p2", "h8bus", h8_p2_cards,  "cpu8080");
-	H8BUS_SLOT(config,  "p3", "h8bus", h8_cards,     "wh_8_64_32k");
+	H8BUS_SLOT(config,  "p3", "h8bus", h8_cards,     "wh_8_64");
 	H8BUS_SLOT(config,  "p4", "h8bus", h8_cards,     nullptr);
 	H8BUS_SLOT(config,  "p5", "h8bus", h8_cards,     nullptr);
 	H8BUS_SLOT(config,  "p6", "h8bus", h8_cards,     nullptr);

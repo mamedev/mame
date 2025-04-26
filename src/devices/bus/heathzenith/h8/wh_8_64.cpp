@@ -12,6 +12,23 @@
 
 #include "machine/ram.h"
 
+#include <vector>
+#include <algorithm>
+
+#define LOG_SW (1U << 1)    // Shows register setup
+
+#define VERBOSE (LOG_SW)
+
+#include "logmacro.h"
+
+#define LOGSW(...)        LOGMASKED(LOG_SW, __VA_ARGS__)
+
+#ifdef _MSC_VER
+#define FUNCNAME __func__
+#else
+#define FUNCNAME __PRETTY_FUNCTION__
+#endif
+
 namespace {
 
 class wh_8_64_device : public device_t, public device_h8bus_card_interface
@@ -24,35 +41,21 @@ protected:
 
 	wh_8_64_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
 
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+
+	std::vector<int> get_addr(u8 sw);
+
+	void install_mem_bank(u8 bank);
 
 	bool m_installed;
 
 	memory_share_array_creator<u8, 8> m_ram;
+	required_ioport_array<4>          m_sw;
+	required_ioport                   m_config;
 };
 
-class wh_8_64_48k_device : public wh_8_64_device
-{
-public:
-
-	wh_8_64_48k_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
-
-protected:
-
-	virtual void device_reset() override ATTR_COLD;
-};
-
-class wh_8_64_32k_device : public wh_8_64_device
-{
-public:
-
-	wh_8_64_32k_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
-
-protected:
-
-	virtual void device_reset() override ATTR_COLD;
-};
 
 wh_8_64_device::wh_8_64_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
 	wh_8_64_device(mconfig, H8BUS_WH_8_64, tag, owner, 0)
@@ -62,7 +65,9 @@ wh_8_64_device::wh_8_64_device(const machine_config &mconfig, const char *tag, d
 wh_8_64_device::wh_8_64_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock):
 	device_t(mconfig, type, tag, owner, 0),
 	device_h8bus_card_interface(mconfig, *this),
-	m_ram(*this, "rambank%u", 0U, 0x2000U, ENDIANNESS_LITTLE)
+	m_ram(*this, "rambank%u", 0U, 0x2000U, ENDIANNESS_LITTLE),
+	m_sw(*this, "SW%u", 1U),
+	m_config(*this, "CONFIG")
 {
 }
 
@@ -77,36 +82,69 @@ void wh_8_64_device::device_reset()
 {
 	if (!m_installed)
 	{
-		h8bus().space(AS_PROGRAM).install_ram(0x2000, 0x3fff, m_ram[0]);
+		u8 config = m_config->read();
 
-		h8bus().space(AS_PROGRAM).install_ram(0x4000, 0x5fff, m_ram[1]);
-
-		h8bus().space(AS_PROGRAM).install_ram(0x6000, 0x7fff, m_ram[2]);
-
-		h8bus().space(AS_PROGRAM).install_ram(0x8000, 0x9fff, m_ram[3]);
-
-		h8bus().space(AS_PROGRAM).install_ram(0xa000, 0xbfff, m_ram[4]);
-
-		h8bus().space(AS_PROGRAM).install_ram(0xc000, 0xdfff, m_ram[5]);
-
-		h8bus().space(AS_PROGRAM).install_ram(0xe000, 0xffff, m_ram[6]);
-
-// TODO: Properly map the last 8k, needs an HA-8-6 Z80 CPU or HA-8-8 Extended
-// Configuration board to handle the ROM/RAM swap
-#if 0
-		h8bus().install_mem_device(0x0000, 0x1fff,
-			read8sm_delegate(m_ram[7], FUNC(ram_device::read)),
-			write8sm_delegate(m_ram[7], FUNC(ram_device::write)));
-#endif
+		if (BIT(config, 0))
+		{
+			install_mem_bank(0);
+		}
+		if (BIT(config, 1))
+		{
+			install_mem_bank(1);
+		}
+		if (BIT(config, 2))
+		{
+			install_mem_bank(2);
+		}
+		if (BIT(config, 3))
+		{
+			install_mem_bank(3);
+		}
 
 		m_installed = true;
 	}
 }
 
-// TODO - Add support for setting memory map based on switch settings
-#if 0
+std::vector<int> wh_8_64_device::get_addr(u8 sw)
+{
+	std::vector<int> result;
+
+	u8 sw_value = m_sw[sw]->read();
+
+    for (int i = 0; i < 8; i++) {
+		if (BIT(sw_value, i))
+		{
+			result.push_back(i * 0x2000);
+		} 
+    }
+
+    return result;
+}
+
+void wh_8_64_device::install_mem_bank(u8 bank)
+{
+	std::vector<int> addresses = get_addr(3 - bank);
+
+	// each switch defines where to start one 8k block, ensure
+	// setting a max of 2 blocks.
+	int num_addresses = std::min((int) addresses.size(), 2);
+	int block = bank << 1;
+
+	for (int i = 0; i < num_addresses; i++)
+	{
+		int addr = addresses[i];
+
+		LOGSW("Installing block %d at 0x%04x\n", block, addr);
+
+		h8bus().space(AS_PROGRAM).install_ram(addr, addr + 0x1fff, m_ram[block++]);
+	}
+}
+
 static INPUT_PORTS_START( wh_8_64_jumpers )
 	PORT_START("SW1")
+	// TODO: Properly map the last 8k, needs an HA-8-6 Z80 CPU or HA-8-8 Extended
+	// Configuration board to handle the ROM/RAM swap. Only one switch is set to 1
+	// on SW1.
 	PORT_DIPNAME( 0x01, 0x00, "Bank 3 - Address Block 0k - 8k")    PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -210,57 +248,27 @@ static INPUT_PORTS_START( wh_8_64_jumpers )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
+	PORT_START("CONFIG")
+	PORT_CONFNAME(0x01, 0x01, "Memory Bank 0 Present")
+	PORT_CONFSETTING(   0x00, DEF_STR( No ))
+	PORT_CONFSETTING(   0x01, DEF_STR( Yes ))
+	PORT_CONFNAME(0x02, 0x02, "Memory Bank 1 Present")
+	PORT_CONFSETTING(   0x00, DEF_STR( No ))
+	PORT_CONFSETTING(   0x02, DEF_STR( Yes ))
+	PORT_CONFNAME(0x04, 0x04, "Memory Bank 2 Present")
+	PORT_CONFSETTING(   0x00, DEF_STR( No ))
+	PORT_CONFSETTING(   0x04, DEF_STR( Yes ))
+	PORT_CONFNAME(0x08, 0x08, "Memory Bank 3 Present")
+	PORT_CONFSETTING(   0x00, DEF_STR( No ))
+	PORT_CONFSETTING(   0x08, DEF_STR( Yes ))
+
 INPUT_PORTS_END
-#endif
 
-wh_8_64_48k_device::wh_8_64_48k_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
-	wh_8_64_device(mconfig, H8BUS_WH_8_64_48K, tag, owner, 0)
+ioport_constructor wh_8_64_device::device_input_ports() const
 {
-}
-
-void wh_8_64_48k_device::device_reset()
-{
-	if (!m_installed)
-	{
-		h8bus().space(AS_PROGRAM).install_ram(0x2000, 0x3fff, m_ram[0]);
-
-		h8bus().space(AS_PROGRAM).install_ram(0x4000, 0x5fff, m_ram[1]);
-
-		h8bus().space(AS_PROGRAM).install_ram(0x6000, 0x7fff, m_ram[2]);
-
-		h8bus().space(AS_PROGRAM).install_ram(0x8000, 0x9fff, m_ram[3]);
-
-		h8bus().space(AS_PROGRAM).install_ram(0xa000, 0xbfff, m_ram[4]);
-
-		h8bus().space(AS_PROGRAM).install_ram(0xc000, 0xdfff, m_ram[5]);
-
-		m_installed = true;
-	}
-}
-
-
-wh_8_64_32k_device::wh_8_64_32k_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
-	wh_8_64_device(mconfig, H8BUS_WH_8_64_32K, tag, owner, 0)
-{
-}
-
-void wh_8_64_32k_device::device_reset()
-{
-	if (!m_installed)
-	{
-		h8bus().space(AS_PROGRAM).install_ram(0x2000, 0x3fff, m_ram[0]);
-
-		h8bus().space(AS_PROGRAM).install_ram(0x4000, 0x5fff, m_ram[1]);
-
-		h8bus().space(AS_PROGRAM).install_ram(0x6000, 0x7fff, m_ram[2]);
-
-		h8bus().space(AS_PROGRAM).install_ram(0x8000, 0x9fff, m_ram[3]);
-		m_installed = true;
-	}
+	return INPUT_PORTS_NAME(wh_8_64_jumpers);
 }
 
 } // anonymous namespace
 
 DEFINE_DEVICE_TYPE_PRIVATE(H8BUS_WH_8_64,     device_h8bus_card_interface, wh_8_64_device,     "wh8_h_8_64",     "Heath WH-8-64 64k Dynamic RAM");
-DEFINE_DEVICE_TYPE_PRIVATE(H8BUS_WH_8_64_48K, device_h8bus_card_interface, wh_8_64_48k_device, "wh8_h_8_64_48k", "Heath WH-8-64 48k Dynamic RAM");
-DEFINE_DEVICE_TYPE_PRIVATE(H8BUS_WH_8_64_32K, device_h8bus_card_interface, wh_8_64_32k_device, "wh8_h_8_64_32k", "Heath WH-8-64 32k Dynamic RAM");
