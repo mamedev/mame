@@ -173,7 +173,7 @@
   The hardware was designed to manage 4096 tiles with a size of 8x4 pixels each.
   Also support 4bpp graphics and the palette limitation is 8 bits for color codes (256 x 16 colors).
   It means the hardware was designed for more elaborated graphics than Jolly Card games...
-  Color PROMs from current games are 512 bytes lenght, but they only can use the first or the last 256 bytes.
+  Color PROMs from current games are 512 bytes length, but they only can use the first or the last 256 bytes.
 
   Normal hardware capabilities:
 

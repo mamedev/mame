@@ -422,8 +422,6 @@ ROM_START( madalienb )
 	ROM_REGION( 0x0400, "gfx2", 0 )    /* headlight */
 	ROM_LOAD( "ma-.2bc", 0x0000, 0x0400, CRC(aab16446) SHA1(d2342627cc2766004343f27515d8a7989d5fe932) )
 
-
-
 	ROM_REGION( 0x0400, "user1", 0 )                    // background tile map
 	ROM_LOAD( "mf-1.4h", 0x0000, 0x0400, CRC(9b04c446) SHA1(918013f3c0244ab6a670b9d1b6b642298e2c5ab8) )
 
@@ -449,7 +447,7 @@ ROM_START( madalienb )
 	ROM_LOAD( "prom.7e", 0x0000, 0x0020, CRC(e622396a) SHA1(8972704bd25fed462e25c453771cc5ca4fc74034) )
 ROM_END
 
-/*          set       parent    machine   inp       init */
-GAME( 1980, madalien, 0,        madalien, madalien, madalien_state, empty_init, ROT270, "Data East Corporation", "Mad Alien (set 1)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1980, madaliena,madalien, madalien, madalien, madalien_state, empty_init, ROT270, "Data East Corporation", "Mad Alien (set 2)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1980, madalienb,madalien, madalien, madalien, madalien_state, empty_init, ROT270, "Data East Corporation", "Mad Alien (set 2, alt gfx)", MACHINE_SUPPORTS_SAVE )
+/*          set        parent    machine   inp       init */
+GAME( 1980, madalien,  0,        madalien, madalien, madalien_state, empty_init, ROT270, "Data East Corporation", "Mad Alien (set 1)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1980, madaliena, madalien, madalien, madalien, madalien_state, empty_init, ROT270, "Data East Corporation", "Mad Alien (set 2)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1980, madalienb, madalien, madalien, madalien, madalien_state, empty_init, ROT270, "Data East Corporation", "Mad Alien (set 2, alt gfx)", MACHINE_SUPPORTS_SAVE )

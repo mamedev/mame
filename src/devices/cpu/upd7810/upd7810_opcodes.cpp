@@ -309,7 +309,10 @@ void upd7810_device::DIV_A()
 		A = remainder;
 	}
 	else
-		EA = 0xffff;    /* guess */
+	{
+		A = EAL;
+		EA = 0xffff;
+	}
 }
 
 /* 48 3e: 0100 1000 0011 1110 */

@@ -8,31 +8,19 @@
 
 #if BX_PLATFORM_ANDROID
 #	define VK_USE_PLATFORM_ANDROID_KHR
-#	define KHR_SURFACE_EXTENSION_NAME VK_KHR_ANDROID_SURFACE_EXTENSION_NAME
 #	define VK_IMPORT_INSTANCE_PLATFORM VK_IMPORT_INSTANCE_ANDROID
 #elif BX_PLATFORM_LINUX
-#	if defined(WL_EGL_PLATFORM)
-#		define VK_USE_PLATFORM_WAYLAND_KHR
-#	endif // defined(WL_EGL_PLATFORM)
+#	define VK_USE_PLATFORM_WAYLAND_KHR
 #	define VK_USE_PLATFORM_XLIB_KHR
 #	define VK_USE_PLATFORM_XCB_KHR
-#	if defined(WL_EGL_PLATFORM)
-#		define KHR_SURFACE_EXTENSION_NAME VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME, \
-		VK_KHR_XCB_SURFACE_EXTENSION_NAME
-#	else
-#		define KHR_SURFACE_EXTENSION_NAME VK_KHR_XCB_SURFACE_EXTENSION_NAME
-#	endif // defined(WL_EGL_PLATFORM)
 #	define VK_IMPORT_INSTANCE_PLATFORM VK_IMPORT_INSTANCE_LINUX
 #elif BX_PLATFORM_WINDOWS
 #	define VK_USE_PLATFORM_WIN32_KHR
-#	define KHR_SURFACE_EXTENSION_NAME  VK_KHR_WIN32_SURFACE_EXTENSION_NAME
 #	define VK_IMPORT_INSTANCE_PLATFORM VK_IMPORT_INSTANCE_WINDOWS
 #elif BX_PLATFORM_OSX
 #	define VK_USE_PLATFORM_MACOS_MVK
-#	define KHR_SURFACE_EXTENSION_NAME  VK_MVK_MACOS_SURFACE_EXTENSION_NAME
 #	define VK_IMPORT_INSTANCE_PLATFORM VK_IMPORT_INSTANCE_MACOS
 #else
-#	define KHR_SURFACE_EXTENSION_NAME ""
 #	define VK_IMPORT_INSTANCE_PLATFORM
 #endif // BX_PLATFORM_*
 
@@ -69,7 +57,6 @@
 			/* VK_KHR_android_surface */                               \
 			VK_IMPORT_INSTANCE_FUNC(true,  vkCreateAndroidSurfaceKHR); \
 
-#if defined(WL_EGL_PLATFORM)
 #define VK_IMPORT_INSTANCE_LINUX                                                              \
 			/* VK_KHR_wayland_surface */                                                      \
 			VK_IMPORT_INSTANCE_FUNC(true,  vkCreateWaylandSurfaceKHR);                        \
@@ -80,17 +67,6 @@
 			/* VK_KHR_xcb_surface */                                                          \
 			VK_IMPORT_INSTANCE_FUNC(true,  vkCreateXcbSurfaceKHR);                            \
 			VK_IMPORT_INSTANCE_FUNC(true,  vkGetPhysicalDeviceXcbPresentationSupportKHR);     \
-
-#else
-#define VK_IMPORT_INSTANCE_LINUX                                                           \
-			/* VK_KHR_xlib_surface */                                                      \
-			VK_IMPORT_INSTANCE_FUNC(true,  vkCreateXlibSurfaceKHR);                        \
-			VK_IMPORT_INSTANCE_FUNC(true,  vkGetPhysicalDeviceXlibPresentationSupportKHR); \
-			/* VK_KHR_xcb_surface */                                                       \
-			VK_IMPORT_INSTANCE_FUNC(true,  vkCreateXcbSurfaceKHR);                         \
-			VK_IMPORT_INSTANCE_FUNC(true,  vkGetPhysicalDeviceXcbPresentationSupportKHR);  \
-
-#endif // defined(WL_EGL_PLATFORM)
 
 #define VK_IMPORT_INSTANCE_WINDOWS                                                          \
 			/* VK_KHR_win32_surface */                                                      \
@@ -762,7 +738,7 @@ VK_DESTROY_FUNC(DescriptorSet);
 		VkSemaphore m_lastImageAcquiredSemaphore;
 
 		bool m_needPresent;
-		bool m_needToRefreshSwapchain;
+		bool m_needToRecreateSwapchain;
 		bool m_needToRecreateSurface;
 
 		TextureVK   m_backBufferDepthStencil;

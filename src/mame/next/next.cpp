@@ -908,7 +908,7 @@ void next_state::next_mem(address_map &map)
 	map(0x02014020, 0x02014023).mirror(0x300000).rw(FUNC(next_state::scsictrl_r), FUNC(next_state::scsictrl_w));
 	map(0x02016000, 0x02016003).mirror(0x300000).rw(FUNC(next_state::timer_data_r), FUNC(next_state::timer_data_w));
 	map(0x02016004, 0x02016007).mirror(0x300000).rw(FUNC(next_state::timer_ctrl_r), FUNC(next_state::timer_ctrl_w));
-	map(0x02018000, 0x02018003).mirror(0x300000).rw(scc, FUNC(scc8530_legacy_device::reg_r), FUNC(scc8530_legacy_device::reg_w));
+	map(0x02018000, 0x02018003).mirror(0x300000).rw(scc, FUNC(scc8530_device::dc_ab_r), FUNC(scc8530_device::dc_ab_w));
 //  map(0x02018004, 0x02018007).mirror(0x300000); SCC CLK
 //  map(0x02018190, 0x02018197).mirror(0x300000); warp 9c DRAM timing
 //  map(0x02018198, 0x0201819f).mirror(0x300000); warp 9c VRAM timing
@@ -1036,7 +1036,7 @@ void next_state::next_base(machine_config &config)
 	MCCS1850(config, rtc, XTAL(32'768));
 
 	SCC8530(config, scc, XTAL(25'000'000));
-	scc->intrq_callback().set(FUNC(next_state::scc_irq));
+	scc->out_int_callback().set(FUNC(next_state::scc_irq));
 
 	NEXTKBD(config, keyboard, 0);
 	keyboard->int_change_wr_callback().set(FUNC(next_state::keyboard_irq));

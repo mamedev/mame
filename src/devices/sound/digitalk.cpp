@@ -156,7 +156,7 @@ quantization is done, but the whole 128 samples are adpcm-encoded.
 
 
 Finally, silent zones are compressed specifically by storing their
-lenghts.
+lengths.
 
 
 Decoding is simpler.  The 128-samples waveform is decoded using the

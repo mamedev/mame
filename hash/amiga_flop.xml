@@ -9438,5 +9438,17 @@ General Purpose Amiga Floppy Software List, anything listed here may, or may not
 		</part>
 	</software>
 
+	<software name="emutos93">
+		<description>EmuTOS 0.9.3</description>
+			<year>2014</year>
+			<publisher>EmuTOS development team</publisher>
+			<part name="flop1" interface="floppy_3_5">
+				<feature name="part_id" value="EmuTOS 0.9.3" />
+				<dataarea name="flop" size="901120">
+				<rom name="emutos_093.adf" size="901120" crc="96f5cc88" sha1="fa3a3aa314d50e1131a5b65a048519c76c836bd2"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
 

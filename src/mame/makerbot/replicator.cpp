@@ -605,12 +605,12 @@ void replicator_state::port_l_w(uint8_t data)
 
 void replicator_state::prg_map(address_map &map)
 {
-	map(0x0000, 0x1FFFF).rom();
+	map(0x00000, 0x1ffff).rom();
 }
 
 void replicator_state::data_map(address_map &map)
 {
-	map(0x0200, 0x21FF).ram();  /* ATMEGA1280 Internal SRAM */
+	map(0x0200, 0x21ff).ram();  /* ATMEGA1280 Internal SRAM */
 }
 
 /****************************************************\

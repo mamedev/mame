@@ -51,8 +51,6 @@ private:
 	u8 m_prdia;
 	u8 m_poff;
 	u8 m_nmi;
-
-	bool m_installed;
 };
 
 DECLARE_DEVICE_TYPE(CPUAP, cpuap_device)

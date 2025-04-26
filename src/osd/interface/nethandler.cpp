@@ -16,7 +16,6 @@
 namespace osd {
 
 network_handler::network_handler() noexcept
-	: m_promisc(false)
 {
 	std::fill(std::begin(m_mac), std::end(m_mac), 0);
 }

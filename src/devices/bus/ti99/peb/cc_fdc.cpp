@@ -367,8 +367,10 @@ void corcomp_fdc_device::select_dsk(int state)
 		if (m_floppy[m_selected_drive-1]->get_device() != nullptr)
 		{
 			m_wdc->set_floppy(m_floppy[m_selected_drive-1]->get_device());
-			m_floppy[m_selected_drive-1]->get_device()->ss_w(m_tms9901->read_bit(tms9901_device::INT15_P7));
+			side_select(m_tms9901->read_bit(tms9901_device::INT15_P7));
 		}
+		else
+			LOGMASKED(LOG_WARN, "No drive connected as DSK%d\n", m_selected_drive);
 	}
 }
 
@@ -377,8 +379,13 @@ void corcomp_fdc_device::side_select(int state)
 	// Select side of disk (bit 7)
 	if (m_selected_drive != 0)
 	{
-		LOGMASKED(LOG_DRIVE, "Set side (bit 7) = %d on DSK%d\n", state, m_selected_drive);
-		m_floppy[m_selected_drive-1]->get_device()->ss_w(state);
+		if (m_floppy[m_selected_drive-1]->get_device() != nullptr)
+		{
+			LOGMASKED(LOG_DRIVE, "Set side (bit 7) = %d on DSK%d\n", state, m_selected_drive);
+			m_floppy[m_selected_drive-1]->get_device()->ss_w(state);
+		}
+		else
+			LOGMASKED(LOG_WARN, "No drive connected as DSK%d\n", m_selected_drive);
 	}
 }
 

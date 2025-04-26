@@ -3,7 +3,7 @@
 // thanks-to:Sean Riddle
 /*******************************************************************************
 
-CXG Sphinx Junior
+CXG Sphinx Junior (model 237)
 
 NOTE: Before exiting MAME, press the OFF button to turn the power off. Otherwise,
 NVRAM won't save properly.
@@ -21,19 +21,21 @@ Hardware notes:
 Sphinx Junior:
 - PCB label: CXG 237 600-002
 - Hitachi HD614140H, 8MHz XTAL
-- LCD with 4 7segs and custom segments (same as the one in CXG Pocket Chess)
+- LCD with 4 7segs and custom segments (same as the one in CXG Pocketchess)
 - embedded non-electronic chessboard, piezo
 
 Fidelity Micro Chess Challenger (16 buttons):
 - PCB label: CXG 249 600-001
 - rest is similar to Sphinx Junior
 
-Fidelity MCC 12-button version has a HD44820 MCU instead.
+CXG didn't sell a handheld version of their own, CXG model 249 does not exist.
+Fidelity MCC 12-button version has a HD44820 MCU instead (see pchess.cpp).
 
 HD614140HA27 MCU is used in:
 - CXG Sphinx Junior
 - Fidelity Chess Pal Challenger (Fidelity brand Sphinx Junior)
 - Fidelity Micro Chess Challenger (16 buttons)
+- Schneider Pocket Chess (same housing as Fidelity MCC)
 
 *******************************************************************************/
 
@@ -111,14 +113,15 @@ INPUT_CHANGED_MEMBER(junior_state::on_button)
 
 void junior_state::update_lcd()
 {
-	m_lcd_pwm->write_row(0, m_lcd_com ? ~m_lcd_segs : m_lcd_segs);
+	const u32 lcd_segs = bitswap<30>(m_lcd_segs,4,12,13,5,27,20,17,9,1,24,15,7,29,22,18,10,2,25,14,6,28,21,16,8,0,23,19,11,3,26);
+	m_lcd_pwm->write_row(0, m_lcd_com ? ~lcd_segs : lcd_segs);
 }
 
 template<int N>
 void junior_state::lcd_segs_w(u8 data)
 {
 	// R0x-R4x: LCD segment data, input mux
-	const u8 shift = N * 4 + 10;
+	const u8 shift = N * 4;
 	m_lcd_segs = (m_lcd_segs & ~(0xf << shift)) | (data << shift);
 	update_lcd();
 }
@@ -129,7 +132,8 @@ void junior_state::control_w(u16 data)
 	m_lcd_com = data & 1;
 
 	// D4-D13: LCD segment data
-	m_lcd_segs = (m_lcd_segs & ~0x3ff) | (data >> 4 & 0x3ff);
+	const u32 mask = 0x3ff << 20;
+	m_lcd_segs = (m_lcd_segs & ~mask) | (data << 16 & mask);
 	update_lcd();
 
 	// D14: speaker out
@@ -141,11 +145,11 @@ u16 junior_state::input_r()
 	u16 data = 0;
 
 	// D1: read buttons from R03-R43
-	if ((m_lcd_segs >> 13 & 0x1ffff) & m_inputs->read())
+	if ((m_lcd_segs >> 3 & 0x1ffff) & m_inputs->read())
 		data |= 2;
 
 	// D2: R30 (freq sel)
-	data |= BIT(m_lcd_segs, 23) << 2;
+	data |= BIT(~m_lcd_segs, 12) << 2;
 	return data | 9;
 }
 
@@ -230,8 +234,8 @@ ROM_START( sjunior )
 	ROM_REGION( 0x2000, "maincpu", 0 )
 	ROM_LOAD("1988_newcrest_614140ha27", 0x0000, 0x2000, CRC(9eb77d94) SHA1(84306ee39986847f9ae82a1117dc6fb8bd309bab) )
 
-	ROM_REGION( 57384, "screen", 0 )
-	ROM_LOAD("sjunior.svg", 0, 57384, CRC(1b3d450f) SHA1(1b55bb2fe23d2e719258be196663ea117158cd35) )
+	ROM_REGION( 57412, "screen", 0 )
+	ROM_LOAD("pchess.svg", 0, 57412, CRC(7859b1ac) SHA1(518c5cd08fa8562628345e8e28048c01c9e4edd6) )
 ROM_END
 
 } // anonymous namespace

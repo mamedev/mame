@@ -21,7 +21,6 @@
 namespace fs {
 
 enum class meta_name {
-	basic,
 	creation_date,
 	length,
 	loading_address,

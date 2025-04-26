@@ -41,7 +41,7 @@ void namcona1_state::tilemap_get_info(
 		tileinfo.set(gfx, tile, color, 0);
 		tileinfo.mask_data = &m_shaperam[tile << 3];
 	}
-} /* tilemap_get_info */
+}
 
 TILE_GET_INFO_MEMBER(namcona1_state::tilemap_get_info0)
 {
@@ -83,7 +83,7 @@ TILE_GET_INFO_MEMBER(namcona1_state::roz_get_info)
 		tileinfo.set(gfx, tile, color, 0);
 		tileinfo.mask_data = &m_shaperam[tile << 3];
 	}
-} /* roz_get_info */
+}
 
 /*************************************************************************/
 
@@ -107,7 +107,7 @@ void namcona1_state::videoram_w(offs_t offset, u16 data, u16 mem_mask)
 			}
 		}
 	}
-} /* videoram_w */
+}
 
 /*************************************************************************/
 
@@ -132,7 +132,8 @@ void namcona1_state::paletteram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_paletteram[offset]);
 	if (m_vreg[0x8e / 2])
-	{ /* graphics enabled; update palette immediately */
+	{
+		/* graphics enabled; update palette immediately */
 		update_palette(offset);
 	}
 	else
@@ -158,7 +159,7 @@ u16 namcona1_state::gfxram_r(offs_t offset)
 		return m_cgram[offset];
 	}
 	return 0x0000;
-} /* gfxram_r */
+}
 
 void namcona1_state::gfxram_w(offs_t offset, u16 data, u16 mem_mask)
 {
@@ -186,7 +187,7 @@ void namcona1_state::gfxram_w(offs_t offset, u16 data, u16 mem_mask)
 			m_gfxdecode->gfx(1)->mark_dirty(offset >> 5);
 		}
 	}
-} /* gfxram_w */
+}
 
 void namcona1_state::video_start()
 {
@@ -205,12 +206,6 @@ void namcona1_state::video_start()
 
 	save_item(NAME(m_shaperam));
 	save_item(NAME(m_palette_is_dirty));
-} /* video_start */
-
-void namcona1_state::device_post_load()
-{
-	for (int i = 0; i < 3; i++)
-		m_gfxdecode->gfx(i)->mark_all_dirty();
 }
 
 
@@ -268,31 +263,36 @@ void namcona1_state::pdraw_tile(
 	}
 
 	if (sx < clip.min_x)
-	{ /* clip left */
+	{
+		/* clip left */
 		int pixels = clip.min_x - sx;
 		sx += pixels;
 		x_index_base += pixels * dx;
 	}
 	if (sy < clip.min_y)
-	{ /* clip top */
+	{
+		/* clip top */
 		int pixels = clip.min_y - sy;
 		sy += pixels;
 		y_index += pixels * dy;
 	}
 	/* NS 980211 - fixed incorrect clipping */
 	if (ex > clip.max_x + 1)
-	{ /* clip right */
+	{
+		/* clip right */
 		int pixels = ex - clip.max_x - 1;
 		ex -= pixels;
 	}
 	if (ey > clip.max_y + 1)
-	{ /* clip bottom */
+	{
+		/* clip bottom */
 		int pixels = ey - clip.max_y - 1;
 		ey -= pixels;
 	}
 
 	if (ex > sx)
-	{ /* skip if inner loop doesn't draw anything */
+	{
+		/* skip if inner loop doesn't draw anything */
 		for (int y = sy; y < ey; y++)
 		{
 			u8 const *const source = source_base + y_index * gfx->rowbytes();
@@ -348,7 +348,7 @@ void namcona1_state::pdraw_tile(
 			y_index += dy;
 		}
 	}
-} /* pdraw_tile */
+}
 
 void namcona1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -358,7 +358,8 @@ void namcona1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 	if (sprite_control & 1) source += 0x400; /* alternate spriteram bank */
 
 	for (int which = 0; which < 0x100; which++)
-	{ /* max 256 sprites */
+	{
+		/* max 256 sprites */
 		int bpp4,palbase;
 		const u16 ypos    = source[0];    /* FHHH---Y YYYYYYYY    flipy, height, ypos */
 		const u16 tile    = source[1];    /* O???TTTT TTTTTTTT    opaque tile */
@@ -423,7 +424,7 @@ void namcona1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 		} /* next row */
 		source += 4;
 	}
-} /* draw_sprites */
+}
 
 void namcona1_state::draw_pixel_line(const rectangle &cliprect, u16 *pDest, u8 *pPri, u16 *pSource, const pen_t *paldata)
 {
@@ -437,7 +438,7 @@ void namcona1_state::draw_pixel_line(const rectangle &cliprect, u16 *pDest, u8 *
 		if (x+1 >= cliprect.min_x && x+1 <= cliprect.max_x)
 			pDest[x+1] = paldata[data&0xff];
 	} /* next x */
-} /* draw_pixel_line */
+}
 
 void namcona1_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int which, int primask)
 {
@@ -520,7 +521,7 @@ void namcona1_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap
 			}
 		}
 	}
-} /* draw_background */
+}
 
 // CRTC safety checks
 bool namcona1_state::screen_enabled(const rectangle &cliprect)

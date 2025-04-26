@@ -163,7 +163,7 @@ public:
 	void set_input_line(int linenum, int state) { assert(device().started()); m_input[linenum].set_state_synced(state); }
 	void set_input_line_vector(int linenum, int vector) { assert(device().started()); m_input[linenum].set_vector(vector); }
 	void set_input_line_and_vector(int linenum, int state, int vector) { assert(device().started()); m_input[linenum].set_state_synced(state, vector); }
-	int input_state(int linenum) const { assert(device().started()); return m_input[linenum].m_curstate; }
+	int input_line_state(int linenum) const { assert(device().started()); return m_input[linenum].m_curstate; }
 	void pulse_input_line(int irqline, const attotime &duration);
 
 	// suspend/resume
@@ -188,8 +188,7 @@ public:
 	// required operation overrides
 	void run() { execute_run(); }
 
-	// deliberately ambiguous functions; if you have the execute interface
-	// just use it
+	// deliberately ambiguous functions; if you have the execute interface just use it
 	device_execute_interface &execute() { return *this; }
 
 protected:
@@ -216,7 +215,6 @@ protected:
 	virtual void interface_clock_changed(bool sync_on_new_clock_domain) override;
 
 	// for use by devcpu for now...
-	int current_input_state(unsigned i) const { return m_input[i].m_curstate; }
 	void set_icountptr(int &icount) { assert(!m_icountptr); m_icountptr = &icount; }
 	int standard_irq_callback(int irqline, offs_t pc);
 

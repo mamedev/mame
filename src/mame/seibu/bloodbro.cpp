@@ -880,8 +880,9 @@ void bloodbro_state::bloodbro(machine_config &config)
 
 	SEIBU_SOUND(config, m_seibu_sound, 0);
 	m_seibu_sound->int_callback().set_inputline(m_audiocpu, 0);
+	m_seibu_sound->coin_io_callback().set_ioport("COIN");
 	m_seibu_sound->set_rom_tag("audiocpu");
-	m_seibu_sound->set_rombank_tag("seibu_bank1");
+	m_seibu_sound->set_rombank_tag("seibu_bank");
 	m_seibu_sound->ym_read_callback().set(m_ymsnd, FUNC(ym3812_device::read));
 	m_seibu_sound->ym_write_callback().set(m_ymsnd, FUNC(ym3812_device::write));
 }

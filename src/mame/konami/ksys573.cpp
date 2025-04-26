@@ -91,7 +91,7 @@ N drummania 10thMIX                                   2004.04
 P Fisherman's Bait                                    1998.06    GE765 UA          765 UA B02
 P Fisherman's Bait 2                                  1998       GC865 UA          865 UA B02
 P Fisherman's Bait Marlin Challenge                   1999       GX889             889 AA/EA/JA/UA(needs redump)
-P Gachagachamp                                        1999.01    GQ877 JA          GE877-JA(PCMCIA card)
+P Gacha Gachamp                                       1999.01    GQ877 JA          GE877-JA(PCMCIA card)
 P Great Bishi Bashi Champ                             2002.??    GBA48 JA          (no CD)
 A GUITARFREAKS                                        1999.02    GQ886 EA/JA/UA/AA 886 ** A02/C02/D02
 A GUITARFREAKS 2ndMIX                                 1999.07    GQ883 JA          883 ** A02
@@ -287,7 +287,7 @@ K: uses karaoke I/O board GX921-PWB(B)
 |                          |
 |         JAMMA IN         |
 |--------------------------|
- Notes: This PCB is used for Gachagachamp. No ICs.
+ Notes: This PCB is used for Gacha Gachamp. No ICs.
 
         CN5 - To control lever unit (1P). uses 9 pins out of 15 pins of B15P-SHF-1AA
         CN6 - To control lever unit (2P). uses 9 pins out of 14 pins of B14P-SHF-1AA
@@ -3565,7 +3565,7 @@ INPUT_PORTS_END
 
 #define SYS573_BIOS_A \
 	ROM_SYSTEM_BIOS( 0, "std",        "Standard" ) \
-	ROM_SYSTEM_BIOS( 1, "gchgchmp",   "Found on Gachagachamp" ) \
+	ROM_SYSTEM_BIOS( 1, "gchgchmp",   "Found on Gacha Gachamp" ) \
 	ROM_SYSTEM_BIOS( 2, "dsem2",      "Found on Dancing Stage Euro Mix 2" ) \
 	ROM_REGION32_LE( 0x080000, "maincpu:rom", 0 ) \
 	ROMX_LOAD( "700a01.22g",           0x0000000, 0x080000, CRC(11812ef8) SHA1(e1284add4aaddd5337bd7f4e27614460d52b5b48), ROM_BIOS(0) ) \
@@ -6312,7 +6312,7 @@ GAME( 1998, bassang2,  fbait2bc, fbaitbc,    fbaitbc,   ksys573_state, empty_ini
 GAME( 1998, hyperbbc,  sys573,   hyperbbc,   hyperbbc,  ksys573_state, init_hyperbbc, ROT0,  "Konami", "Hyper Bishi Bashi Champ (GQ876 VER. EAA)", MACHINE_IMPERFECT_SOUND )
 GAME( 1998, hyperbbca, hyperbbc, hyperbbc,   hyperbbc,  ksys573_state, init_hyperbbc, ROT0,  "Konami", "Hyper Bishi Bashi Champ (GQ876 VER. AAA)", MACHINE_IMPERFECT_SOUND )
 GAME( 1998, hyperbbck, hyperbbc, hyperbbc,   hyperbbc,  ksys573_state, init_hyperbbc, ROT0,  "Konami", "Hyper Bishi Bashi Champ (GE876 VER. KAA)", MACHINE_IMPERFECT_SOUND )
-GAME( 1999, gchgchmp,  sys573,   gchgchmp,   gchgchmp,  ksys573_state, empty_init,    ROT0,  "Konami", "Gachaga Champ (GE877 VER. JAB)", MACHINE_IMPERFECT_SOUND )
+GAME( 1999, gchgchmp,  sys573,   gchgchmp,   gchgchmp,  ksys573_state, empty_init,    ROT0,  "Konami", "Gacha Gachamp (GE877 VER. JAB)", MACHINE_IMPERFECT_SOUND )
 GAME( 1999, gtrfrks,   sys573,   gtrfrks,    gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks Ver 1.01 (GQ886 VER. EAD)", MACHINE_IMPERFECT_SOUND )
 GAME( 1999, gtrfrksu,  gtrfrks,  gtrfrks,    gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks Ver 1.01 (GQ886 VER. UAD)", MACHINE_IMPERFECT_SOUND )
 GAME( 1999, gtrfrksj,  gtrfrks,  gtrfrks,    gtrfrks,   ksys573_state, empty_init,    ROT0,  "Konami", "Guitar Freaks Ver 1.01 (GQ886 VER. JAD)", MACHINE_IMPERFECT_SOUND )

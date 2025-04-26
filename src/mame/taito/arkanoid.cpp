@@ -796,7 +796,7 @@ DIP locations verified for:
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
-#include "screen.h"
+
 #include "speaker.h"
 
 
@@ -1280,6 +1280,29 @@ static INPUT_PORTS_START( brixian )
 	PORT_DIPSETTING(    0x00, "6" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( cruisin5 )
+	PORT_INCLUDE( arkatayt )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW1:8") // must be on?
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW1:7" )
+	PORT_DIPNAME( 0x04, 0x00, "Loop" )            PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x04, "Auto" )
+	PORT_DIPSETTING(    0x00, "Manual" )
+	PORT_DIPNAME( 0x08, 0x08, "??? Animation" )   PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x08, "Squeeze Out" )
+	PORT_DIPSETTING(    0x00, "Tear Apart" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW1:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW1:3" )
+	PORT_DIPNAME( 0x40, 0x00, "Sound Hardware" )  PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x40, "AY-3-8910" )
+	PORT_DIPSETTING(    0x00, "YM2149" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW1:1" )
+INPUT_PORTS_END
+
+
 /***************************************************************************/
 
 /* Graphics Layouts */
@@ -1329,40 +1352,26 @@ void arkanoid_state::machine_reset()
 	m_bootleg_cmd = 0;
 }
 
-/*
-Pixel clock: 3 MHz = 192 HTotal, assuming it's 6 MHz
-*/
-#define ARKANOID_PIXEL_CLOCK XTAL(12'000'000)/2
-#define ARKANOID_HTOTAL 384
-#define ARKANOID_HBEND 0
-#define ARKANOID_HBSTART 256
-#define ARKANOID_VTOTAL 264
-#define ARKANOID_VBEND 16
-#define ARKANOID_VBSTART 240
 
 void arkanoid_state::arkanoid(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(12'000'000)/2); /* verified on pcb */
+	Z80(config, m_maincpu, 12_MHz_XTAL/2); /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &arkanoid_state::arkanoid_map);
-	m_maincpu->set_vblank_int("screen", FUNC(arkanoid_state::irq0_line_hold));
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // 74LS393 at ic21, counts 128 vblanks before firing watchdog; z80 /RESET ls08 ic19 pin 9 input comes from ls04 ic20 pin 8, ls04 ic20 pin 9 input comes from ic21 ls393 pin 8, and ls393 is set to chain both 4 bit counters together
 
 	ARKANOID_68705P5(config, m_mcuintf, 12_MHz_XTAL / 4); // verified on PCB
 	m_mcuintf->portb_r_cb().set(FUNC(arkanoid_state::input_mux_r));
 
-	config.set_maximum_quantum(attotime::from_hz(6000));                  // 100 CPU slices per second to synchronize between the MCU and the main CPU
+	config.set_maximum_quantum(attotime::from_hz(6000)); // 100 CPU slices per second to synchronize between the MCU and the main CPU
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-//  screen.set_refresh_hz(60);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-//  screen.set_size(32*8, 32*8);
-//  screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_raw(ARKANOID_PIXEL_CLOCK,ARKANOID_HTOTAL,ARKANOID_HBEND,ARKANOID_HBSTART,ARKANOID_VTOTAL,ARKANOID_VBEND,ARKANOID_VBSTART);
-	screen.set_screen_update(FUNC(arkanoid_state::screen_update_arkanoid));
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(12_MHz_XTAL/2, 384, 0, 256, 264, 16, 240);
+	m_screen->set_screen_update(FUNC(arkanoid_state::screen_update_arkanoid));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_arkanoid);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 512);
@@ -1370,7 +1379,7 @@ void arkanoid_state::arkanoid(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ym2149_device &aysnd(YM2149(config, "aysnd", XTAL(12'000'000)/4)); /* YM2149 clock is 3mhz, pin 26 is low so final clock is 3mhz/2, handled inside the ay core */
+	ym2149_device &aysnd(YM2149(config, "aysnd", 12_MHz_XTAL/4)); /* YM2149 clock is 3mhz, pin 26 is low so final clock is 3mhz/2, handled inside the ay core */
 	aysnd.set_flags(AY8910_SINGLE_OUTPUT | YM2149_PIN26_LOW); // all outputs are tied together with no resistors, and pin 26 is low
 	aysnd.port_a_read_callback().set_ioport("UNUSED");
 	aysnd.port_b_read_callback().set_ioport("DSW");
@@ -1390,7 +1399,7 @@ void arkanoid_state::p3mcuay(machine_config &config)
 {
 	p3mcu(config);
 
-	ay8910_device &aysnd(AY8910(config.replace(), "aysnd", XTAL(12'000'000)/4)); // AY-3-8910A
+	ay8910_device &aysnd(AY8910(config.replace(), "aysnd", 12_MHz_XTAL/4)); // AY-3-8910A
 	aysnd.set_flags(AY8910_SINGLE_OUTPUT);
 	aysnd.port_a_read_callback().set_ioport("UNUSED");
 	aysnd.port_b_read_callback().set_ioport("DSW");
@@ -1411,7 +1420,7 @@ void arkanoid_state::aysnd(machine_config &config)
 {
 	bootleg(config);
 
-	ay8910_device &aysnd(AY8910(config.replace(), "aysnd", XTAL(12'000'000)/4));
+	ay8910_device &aysnd(AY8910(config.replace(), "aysnd", 12_MHz_XTAL/4));
 	aysnd.set_flags(AY8910_SINGLE_OUTPUT);
 	aysnd.port_a_read_callback().set_ioport("UNUSED");
 	aysnd.port_b_read_callback().set_ioport("DSW");
@@ -1422,28 +1431,24 @@ void arkanoid_state::aysnd(machine_config &config)
 void arkanoid_state::hexa(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(12'000'000)/2);  /* Imported from arkanoid - correct? */
+	Z80(config, m_maincpu, 12_MHz_XTAL/2);  /* Imported from arkanoid - correct? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &arkanoid_state::hexa_map);
-	m_maincpu->set_vblank_int("screen", FUNC(arkanoid_state::irq0_line_hold));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-//  screen.set_refresh_hz(60);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-//  screen.set_size(32*8, 32*8);
-//  screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_raw(ARKANOID_PIXEL_CLOCK,ARKANOID_HTOTAL,ARKANOID_HBEND,ARKANOID_HBSTART,ARKANOID_VTOTAL,ARKANOID_VBEND,ARKANOID_VBSTART);
-	screen.set_screen_update(FUNC(arkanoid_state::screen_update_hexa));
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(12_MHz_XTAL/2, 384, 0, 256, 264, 16, 240);
+	m_screen->set_screen_update(FUNC(arkanoid_state::screen_update_hexa));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_hexa);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 256);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(12'000'000)/4/2)); /* Imported from arkanoid - correct? */
+	ay8910_device &aysnd(AY8910(config, "aysnd", 12_MHz_XTAL/4/2)); /* Imported from arkanoid - correct? */
 	aysnd.port_a_read_callback().set_ioport("INPUTS");
 	aysnd.port_b_read_callback().set_ioport("DSW");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
@@ -1453,9 +1458,8 @@ void arkanoid_state::hexaa(machine_config &config)
 {
 	hexa(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &arkanoid_state::hexaa_map);
-	m_maincpu->set_vblank_int("screen", FUNC(arkanoid_state::irq0_line_hold));
 
-	z80_device &subcpu(Z80(config, "subcpu", XTAL(12'000'000)/2)); // ?
+	z80_device &subcpu(Z80(config, "subcpu", 12_MHz_XTAL/2)); // ?
 	subcpu.set_addrmap(AS_PROGRAM, &arkanoid_state::hexaa_sub_map);
 	subcpu.set_addrmap(AS_IO, &arkanoid_state::hexaa_sub_iomap);
 }
@@ -1464,32 +1468,37 @@ void arkanoid_state::hexaa(machine_config &config)
 void arkanoid_state::brixian(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(12'000'000)/2);
+	Z80(config, m_maincpu, 12_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &arkanoid_state::brixian_map);
-	m_maincpu->set_vblank_int("screen", FUNC(arkanoid_state::irq0_line_hold));
 
 	/* there is a 68705 but it's only role appears to be to copy data to RAM at startup */
 	/* the RAM is also battery backed, making the 68705 almost redundant as long as the battery doesn't die(!) */
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-//  screen.set_refresh_hz(60);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-//  screen.set_size(32*8, 32*8);
-//  screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	screen.set_raw(ARKANOID_PIXEL_CLOCK,ARKANOID_HTOTAL,ARKANOID_HBEND,ARKANOID_HBSTART,ARKANOID_VTOTAL,ARKANOID_VBEND,ARKANOID_VBSTART);
-	screen.set_screen_update(FUNC(arkanoid_state::screen_update_hexa));
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(12_MHz_XTAL/2, 384, 0, 256, 264, 16, 240);
+	m_screen->set_screen_update(FUNC(arkanoid_state::screen_update_hexa));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_arkanoid);
 	PALETTE(config, m_palette, palette_device::RGB_444_PROMS, "proms", 512);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(12'000'000)/4/2)); /* Imported from arkanoid - correct? */
+	ay8910_device &aysnd(AY8910(config, "aysnd", 12_MHz_XTAL/4/2)); /* Imported from arkanoid - correct? */
 	aysnd.port_a_read_callback().set_ioport("INPUTS");
 	aysnd.port_b_read_callback().set_ioport("DSW");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
+
+void arkanoid_state::cruisin5(machine_config &config)
+{
+	bootleg(config);
+
+	// for sprite multiplexing, it expects interrupt at vblank end instead of vblank start?
+	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
+	m_screen->screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE).invert();
 }
 
 
@@ -2148,6 +2157,22 @@ ROM_START( brixian )
 	ROM_LOAD( "n82s131n.6m", 0x0400, 0x0200, CRC(05297649) SHA1(35f99cf8dddd66e26e2110619eb46bd6ccff41df) )
 ROM_END
 
+ROM_START( cruisin5 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ic81-v.3f",   0x0000, 0x8000, CRC(41ed7668) SHA1(afd1600317d210b6da2c63a65f1614be1f77854b) )
+	ROM_LOAD( "ic82-w.5f",   0x8000, 0x8000, CRC(77e310cc) SHA1(e2638bf6c565df9dab98d92c857d2212b150a2d1) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "1-ic33.2c",   0x00000, 0x8000, CRC(7fb9dafc) SHA1(74a312729f10ab4753204b41de59ff41b93e80cb) )
+	ROM_LOAD( "2-ic34.3c",   0x08000, 0x8000, CRC(05229af9) SHA1(76c469506430bc23ee77bbcefbc357478437bba7) )
+	ROM_LOAD( "3-ic35.5c",   0x10000, 0x8000, CRC(a4c1a25f) SHA1(29d49572c1e7c6c8ac428ad2a3e625f0f548f66c) )
+
+	ROM_REGION( 0x0600, "proms", 0 )
+	ROM_LOAD( "ic73.11e",    0x0000, 0x0200, CRC(0af8b289) SHA1(6bc589e8a609b4cf450aebedc8ce02d5d45c970f) ) // red component
+	ROM_LOAD( "ic74.12e",    0x0200, 0x0200, CRC(abb002fb) SHA1(c14f56b8ef103600862e7930709d293b0aa97a73) ) // green component
+	ROM_LOAD( "ic75.13e",    0x0400, 0x0200, CRC(a7c6c277) SHA1(adaa003dcd981576ea1cc5f697d709b2d6b2ea29) ) // blue component
+ROM_END
+
 
 
 /* Driver Initialization */
@@ -2276,8 +2301,8 @@ void arkanoid_state::init_brixian()
 {
 	uint8_t *RAM = memregion("protdata")->base();
 
-	for (int i=0x000;i<0x200;i++)
-		m_protram[i+0x600] = RAM[i];
+	for (int i = 0x000; i < 0x200; i++)
+		m_protram[i + 0x600] = RAM[i];
 
 }
 
@@ -2292,6 +2317,7 @@ GAME( 1986, arkanoidj,    arkanoid, arkanoid, arkanoidj, arkanoid_state, empty_i
 GAME( 1986, arkanoidja,   arkanoid, arkanoid, arkanoidj, arkanoid_state, empty_init,     ROT90, "Taito Corporation",                                   "Arkanoid (Japan, newer w/level select)",      MACHINE_SUPPORTS_SAVE )
 GAME( 1986, arkanoidjb,   arkanoid, arkanoid, arkanoidj, arkanoid_state, empty_init,     ROT90, "Taito Corporation",                                   "Arkanoid (Japan, older)",                     MACHINE_SUPPORTS_SAVE )
 GAME( 1986, arkanoidpe,   arkanoid, arkanoid, arkanoid,  arkanoid_state, empty_init,     ROT90, "Taito Corporation (Phoenix Electronics Co. license)", "Arkanoid (Phoenix Electronics Co. license)",  MACHINE_SUPPORTS_SAVE )
+
 // bootlegs of Arkanoid
 GAME( 1986, arkanoidjbl,  arkanoid, p3mcu,    arkanoidj, arkanoid_state, empty_init,     ROT90, "bootleg",                                             "Arkanoid (bootleg with MCU, set 1)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1986, arkanoidjbl2, arkanoid, p3mcu,    arkanoidj, arkanoid_state, empty_init,     ROT90, "bootleg (Beta)",                                      "Arkanoid (bootleg with MCU, set 2)",          MACHINE_SUPPORTS_SAVE )
@@ -2307,6 +2333,7 @@ GAME( 1986, arkgcbla,     arkanoid, aysnd,    arkgcbl,   arkanoid_state, init_ar
 GAME( 1988, paddle2,      arkanoid, bootleg,  paddle2,   arkanoid_state, init_paddle2,   ROT90, "bootleg",                                             "Paddle 2 (bootleg on Block hardware)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1986, arkatayt,     arkanoid, aysnd,    arkatayt,  arkanoid_state, empty_init,     ROT90, "bootleg (Tayto)",                                     "Arkanoid (Tayto bootleg)",                    MACHINE_SUPPORTS_SAVE )
 GAME( 1986, arktayt2,     arkanoid, aysnd,    arktayt2,  arkanoid_state, empty_init,     ROT90, "bootleg (Tayto)",                                     "Arkanoid (Tayto bootleg, harder)",            MACHINE_SUPPORTS_SAVE )
+
 // Other games
 GAME( 1987, arkatour,     0,        arkanoid, arkanoid,  arkanoid_state, empty_init,     ROT90, "Taito America Corporation (Romstar license)",         "Tournament Arkanoid (US, older)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1987, arkatour2,    arkatour, arkanoid, arkanoid,  arkanoid_state, empty_init,     ROT90, "Taito America Corporation (Romstar license)",         "Tournament Arkanoid (US, newer)",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // same FRI,  6 JUN 1986, 15:49 string for both sets, but labels show this is newer
@@ -2318,3 +2345,6 @@ GAME( 199?, hexa,         0,        hexa,     hexa,      arkanoid_state, init_he
 GAME( 199?, hexaa,        hexa,     hexaa,    hexa,      arkanoid_state, init_hexaa,     ROT0,  "D.R. Korea",                                          "Hexa (with 2xZ80, protected)",                MACHINE_NOT_WORKING )
 
 GAME( 1993, brixian,      0,        brixian,  brixian,   arkanoid_state, init_brixian,   ROT0,  "Cheil Computer System",                               "Brixian",                                     MACHINE_SUPPORTS_SAVE )
+
+// demo, winner of Revision 2023 wild compo, on Arkanoid PCB with MCU stripped off
+GAME( 2023, cruisin5,     0,        cruisin5, cruisin5,  arkanoid_state, empty_init,     ROT90, "Abyss",                                               "Cruisin 5: Cruise Back",                      MACHINE_SUPPORTS_SAVE )

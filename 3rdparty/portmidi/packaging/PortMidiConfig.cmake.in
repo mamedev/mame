@@ -1,0 +1,10 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+if(UNIX AND NOT APPLE AND NOT HAIKU AND (@LINUX_DEFINES@ MATCHES ".*PMALSA.*"))
+  find_dependency(ALSA)
+endif()
+
+include("${CMAKE_CURRENT_LIST_DIR}/PortMidiTargets.cmake")
+
+check_required_components(PortMidi)

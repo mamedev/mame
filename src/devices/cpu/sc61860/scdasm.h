@@ -6,7 +6,7 @@
  *   portable sharp 61860 emulator interface
  *   (sharp pocket computers)
  *
- *   Copyright Peter Trauner, all rights reserved.
+ *   Copyright Peter Trauner
  *
  *****************************************************************************/
 

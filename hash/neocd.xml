@@ -16,7 +16,7 @@ license:CC0-1.0
 		<info name="alt_title" value="パズルボブル" />
 		<info name="serial" value="NGCD-083 (JPN)" />
 		<info name="release" value="19950502 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="bust-a-move (1995)(snk)(jp-us)[puzzle bobble]" sha1="e9ae51499f1790b402307c0d1c8a62c2ff0cfea9"/>
 			</diskarea>
@@ -30,7 +30,7 @@ license:CC0-1.0
 		<info name="alt_title" value="リーグボウリング" />
 		<info name="serial" value="NGCD-019 (JPN)" />
 		<info name="release" value="19940909 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="league bowling (1994)(snk)(jp-us)" sha1="ca657fa76e16ae70745a6938770677c523daa041"/>
 			</diskarea>
@@ -44,7 +44,7 @@ license:CC0-1.0
 		<info name="alt_title" value="クロススウォードII" />
 		<info name="serial" value="ADCD-102" />
 		<info name="release" value="19950502" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="crossed swords ii (1995)(adk)(jp)" sha1="dc65e9a937bfc912c3fdaff0b8200bfd4df4c34c"/>
 			</diskarea>
@@ -58,7 +58,7 @@ license:CC0-1.0
 		<info name="alt_title" value="押し出しジントリック" />
 		<info name="serial" value="ADCD-104" />
 		<info name="release" value="19960322" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="oshidashi zintrick (1996)(adk)(jp)[zintrick]" sha1="46ab081316ffc6d5cca76fee679e80270fe1a8ab"/>
 			</diskarea>
@@ -72,7 +72,7 @@ license:CC0-1.0
 		<info name="alt_title" value="アイドル麻雀 ファイナルロマンス2" />
 		<info name="serial" value="NGCD-098" />
 		<info name="release" value="19950825" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="idol mahjong final romance 2 (1995)(video system)(jp)" sha1="63c2b6c8cccfbcba9c41efb61954db9885ff9869"/>
 			</diskarea>
@@ -83,7 +83,7 @@ license:CC0-1.0
 		<description>Last Hope (Europe)</description>
 		<year>2007</year>
 		<publisher>NG:DEV.TEAM</publisher>
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="cd-rom [ngdt cd-300j] [v2007-10-03]" sha1="4cf60613098531b49c447a2b223aeb49a6395fd2"/>
 			</diskarea>
@@ -97,7 +97,7 @@ license:CC0-1.0
 		<info name="alt_title" value="超鉄ブリキンガー" />
 		<info name="serial" value="NGCD-220" />
 		<info name="release" value="19960920" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="choutetsu brikin'ger (1996)(saurus)(jp)[ironclad]" sha1="4d518370686853c727eb300a91c0f070c3333225"/>
 			</diskarea>
@@ -110,7 +110,7 @@ license:CC0-1.0
 		<publisher>SNK</publisher>
 		<info name="serial" value="NGCD-205" />
 		<info name="release" value="19951222" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="neo geo cd special (1996)(snk)(jp)" sha1="20ceb3e2cb21c6ccad99e0e21dc990affb4ecc39"/>
 			</diskarea>
@@ -124,7 +124,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ '96 ネオジオコレクション" />
 		<info name="serial" value="NGCD-229" />
 		<info name="release" value="19970214" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="king of fighters '96 neogeo collection, the (1997)(snk)(jp)[ngcd-229 mt b07]" sha1="4f0fa12fc1e6b77e08fbbfa84366dbb04ca09f32"/>
 			</diskarea>
@@ -138,7 +138,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ラリーチェイス" />
 		<info name="serial" value="ADCD-003" />
 		<info name="release" value="19941031" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="rally chase (1994)(adk)(jp)" sha1="07a394aaf9937206f4bd61e2c9f46afe1a43aecb"/>
 			</diskarea>
@@ -152,7 +152,7 @@ license:CC0-1.0
 		<info name="alt_title" value="エーディーケイワールド" />
 		<info name="serial" value="ADCD-103" />
 		<info name="release" value="19951110" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="adk world (1995)(adk)(jp)" sha1="c99032d62ce5bf6be9b1dc37c70ef45a4dc37180"/>
 			</diskarea>
@@ -166,7 +166,7 @@ license:CC0-1.0
 		<info name="alt_title" value="真説サムライスピリッツ 武士道烈伝" />
 		<info name="serial" value="NGCD-0850" />
 		<info name="release" value="19970627" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="shinsetsu samurai spirits - bushidohretsuden (1997)(snk)(jp)[ngcd-0850 mt a01]" sha1="5df33f9533c2bc55c3354790bcafb1350039b438"/>
 			</diskarea>
@@ -180,7 +180,7 @@ license:CC0-1.0
 		<info name="alt_title" value="2020年スーパーベースボール" />
 		<info name="serial" value="NGCD-030 (JPN)" />
 		<info name="release" value="19950225 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="2020 super baseball (1995)(snk)(jp-us)" sha1="047a91393b7391d4ef772c706a034d57417a7a46"/>
 			</diskarea>
@@ -194,7 +194,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ファイヤー・スープレックス" />
 		<info name="serial" value="NGCD-034 (JPN)" />
 		<info name="release" value="19950421 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="3 count bout (1995)(snk)(jp-us)[fire suplex]" sha1="d31d934452ed3d90c73a5f7ec2f13b502293287b"/>
 			</diskarea>
@@ -208,7 +208,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ソニックウイングス2" />
 		<info name="serial" value="NGCD-075 (JPN)" />
 		<info name="release" value="19940929 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="aero fighters 2 (1994)(snk)(jp-us)[sonic wings 2]" sha1="12a453dd787b6407f9bf18eec044095edb5c4511"/>
 			</diskarea>
@@ -222,7 +222,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ソニックウイングス3" />
 		<info name="serial" value="NGCD-097 (JPN)" />
 		<info name="release" value="19951208 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="aero fighters 3 (1995)(snk)(jp-us)[sonic wings 3]" sha1="3bd2b3931429d67e5443a2e931a6f75041cb3030"/>
 			</diskarea>
@@ -236,7 +236,7 @@ license:CC0-1.0
 		<info name="alt_title" value="痛快ガンガン行進曲" />
 		<info name="serial" value="ADCD-008 (JPN)" />
 		<info name="release" value="19950113 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="aggressors of dark kombat (1995)(adk)(jp-us)[tsuukai gangan koushinkyoku]" sha1="76d7972b3dd81fb476e4b89cd1b02e6ad794956d"/>
 			</diskarea>
@@ -250,7 +250,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ASO II - ラストガーディアン" />
 		<info name="serial" value="NGCD-007 (JPN)" />
 		<info name="release" value="19940909 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="alpha mission ii (1994)(snk)(jp-us)[aso ii - last guardian]" sha1="be27801500ae7f4e40f2715dec343943fb0fb0e5"/>
 			</diskarea>
@@ -264,7 +264,7 @@ license:CC0-1.0
 		<info name="alt_title" value="龍虎の拳" />
 		<info name="serial" value="NGCD-044" />
 		<info name="release" value="19940909" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="art of fighting (1994)(snk)(jp)[ryuuko no ken]" sha1="77f4910e0b1d82a0b1d17594408bda368b619c0c"/>
 			</diskarea>
@@ -278,7 +278,7 @@ license:CC0-1.0
 		<info name="alt_title" value="龍虎の拳2" />
 		<info name="serial" value="NGCD-056 (JPN)" />
 		<info name="release" value="19940909 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="art of fighting 2 (1994)(snk)(jp-us)[ryuuko no ken 2]" sha1="91f57d4a159e95a63c5992a69a8e7d02934432f0"/>
 			</diskarea>
@@ -292,7 +292,7 @@ license:CC0-1.0
 		<info name="alt_title" value="アート・オブ・ファイティング 龍虎の拳外伝" />
 		<info name="serial" value="NGCD-096" />
 		<info name="release" value="19960614" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="art of fighting 3 - path of the warrior (1996)(snk)(jp)[art of fighting - ryuuko no ken gaiden][ngcd-0961]" sha1="275e2265e56d719d55a80cac811d421e0f81c669"/>
 			</diskarea>
@@ -306,7 +306,7 @@ license:CC0-1.0
 		<info name="alt_title" value="アート・オブ・ファイティング 龍虎の拳外伝" />
 		<info name="serial" value="NGCD-096 (JPN)" />
 		<info name="release" value="19960614 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="art of fighting 3 - path of the warrior (1996)(snk)(jp-us)[art of fighting - ryuuko no ken gaiden][ngcd-096, ngcd-096e]" sha1="39502261dc15f4279659ed074b1b4e62b683f266"/>
 			</diskarea>
@@ -321,7 +321,7 @@ license:CC0-1.0
 		<info name="alt_title" value="幕末浪漫第二幕 月華の剣士 月に咲く華、散りゆく花" />
 		<info name="serial" value="NGCD-2430" />
 		<info name="release" value="19980325" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="bakumatsu roman daini maku - gekka no kenshi - tsuki ni saku hana, chiri yuku hana (1999)(snk)(jp)[last blade 2, the]" sha1="d4a4dc25b27ecb26f64242acf06fe6da98ee3777"/>
 			</diskarea>
@@ -342,7 +342,7 @@ license:CC0-1.0
 		<info name="alt_title" value="バンバン バスターズ"/>
 		<info name="language" value="English/Japanese" />
 		<info name="release" value="20111222" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Bang Bang Busters (France) (En,Ja) (Unl)" sha1="2112eca62613c4ebaff3a62334b6395009c05c37"/>
 			</diskarea>
@@ -356,7 +356,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ベースボールスターズ2" />
 		<info name="serial" value="NGCD-041 (JPN)" />
 		<info name="release" value="19940909 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="baseball stars 2 (1994)(snk)(jp-us)" sha1="e8963b17212889ac5307e8d40f940f8d941cd46a"/>
 			</diskarea>
@@ -370,7 +370,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ベースボールスターズ プロフェッショナル" />
 		<info name="serial" value="NGCD-002 (JPN)" />
 		<info name="release" value="19950421 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="baseball stars professional (1995)(snk)(jp-us)" sha1="85fa71ab8576dd7bcc9717111297926ce6cec29e"/>
 			</diskarea>
@@ -384,7 +384,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ブレイカーズ" />
 		<info name="serial" value="NGCD-2300" />
 		<info name="release" value="19970425" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="breakers (1997)(visco)(jp)" sha1="f203ef8f2a431a2e841af09deaedda3d33238104"/>
 			</diskarea>
@@ -398,7 +398,7 @@ license:CC0-1.0
 		<info name="alt_title" value="バーニングファイト" />
 		<info name="serial" value="NGCD-018 (JPN)" />
 		<info name="release" value="19940909 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="burning fight (1994)(snk)(jp-us)" sha1="fb851b5fc2bc5ce2addf8c1bae5b65401c10eceb"/>
 			</diskarea>
@@ -409,7 +409,7 @@ license:CC0-1.0
 		<description>Treasure of the Caribbean (France)</description>
 		<year>2011?</year>
 		<publisher>Neo Conception International</publisher>
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="cd-rom [ngcd-500] [v2011-12-22]" sha1="95c9e0b42410ac4e384529b3c067cb55e9b0e537"/>
 			</diskarea>
@@ -423,7 +423,7 @@ license:CC0-1.0
 		<info name="alt_title" value="クロスソード" />
 		<info name="serial" value="ADCD-002" />
 		<info name="release" value="19941031" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="crossed swords (1994)(adk)(jp)" sha1="854759d12584d2bded3bd6355016ac1302acf973"/>
 			</diskarea>
@@ -437,7 +437,7 @@ license:CC0-1.0
 		<info name="alt_title" value="サイバーリップ" />
 		<info name="serial" value="NGCD-010 (JPN)" />
 		<info name="release" value="19950421 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="cyber-lip (1995)(snk)(jp-us)" sha1="4f4667df89005623200bb6a0a49d55beda1128db"/>
 			</diskarea>
@@ -453,7 +453,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ダブルドラゴン" />
 		<info name="serial" value="NGCD-082 (JPN)" />
 		<info name="release" value="19950602 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="double dragon (1995)(snk)(jp-us)[ngcd-082 mt b01, ngcd-082e mt b04]" sha1="404856deac6875ec1fac00fa36c2aed1b6900c09"/>
 			</diskarea>
@@ -490,7 +490,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ダブルドラゴン" />
 		<info name="serial" value="NGCD-082" />
 		<info name="release" value="19950602 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<feature name="cd_matrix" value="NGCD-082 MT B06 (JPN)"/>
 			<diskarea name="cdrom">
 				<disk name="double dragon (1995)(snk)(jp)[ngcd-082 mt b06]" sha1="64bf06de31105900dacbdd927ef635f71d264725"/>
@@ -505,7 +505,7 @@ license:CC0-1.0
 		<info name="alt_title" value="餓狼伝説 宿命の闘い" />
 		<info name="serial" value="NGCD-033 (JPN)" />
 		<info name="release" value="19940909 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="fatal fury - the battle of fury (1994)(snk)(jp-us)[garou densetsu - shukumei no tatakai]" sha1="098d6b48b45afad41bb17467e460990069f9385b"/>
 			</diskarea>
@@ -519,7 +519,7 @@ license:CC0-1.0
 		<info name="alt_title" value="餓狼伝説2 ―新たなる闘い―" />
 		<info name="serial" value="NGCD-047 (JPN)" />
 		<info name="release" value="19940909 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="fatal fury 2 (1994)(snk)(jp-us)[garou densetsu 2 - aratanaru tatakai]" sha1="886f605d800cdab23de381135a3938bcbd821662"/>
 			</diskarea>
@@ -534,7 +534,7 @@ license:CC0-1.0
 		<info name="alt_title" value="餓狼伝説3―遥かなる闘い―" />
 		<info name="serial" value="NGCD-069 (JPN)" />
 		<info name="release" value="19950428 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="fatal fury 3 - road to the final victory (1995)(snk)(jp-us)[garou densetsu 3 - harukanaru tatakai][ngcd-069, ngcd-069e mt b02]" sha1="5bcf25e0a4f01389e028632fa2f2a13f31444a87"/>
 			</diskarea>
@@ -546,7 +546,7 @@ license:CC0-1.0
 		<description>Fatal Fury 3 - Road to the Final Victory (USA)</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="fatal fury 3 - road to the final victory (1995)(snk)(us)[garou densetsu 3 - harukanaru tatakai][ngcd-069e mt b03]" sha1="3a808e3bda8b1eb77e1f30bfd6e38e1b303b11ec"/>
 			</diskarea>
@@ -560,7 +560,7 @@ license:CC0-1.0
 		<info name="alt_title" value="餓狼伝説 スペシャル" />
 		<info name="serial" value="NGCD-058 (JPN)" />
 		<info name="release" value="19940909 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="fatal fury special (1994)(snk)(jp-us)[garou densetsu special]" sha1="a4a3a5b7c95214bec4b77d1a91686a83f6600638"/>
 			</diskarea>
@@ -574,7 +574,7 @@ license:CC0-1.0
 		<info name="alt_title" value="フットボールフレンジー" />
 		<info name="serial" value="NGCD-034 (JPN)" />
 		<info name="release" value="19940909 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="football frenzy (1994)(snk)(jp-us)" sha1="e2fed1652c5d513edaae11481b4345e3b19fd760"/>
 			</diskarea>
@@ -588,7 +588,7 @@ license:CC0-1.0
 		<info name="alt_title" value="フットサル" />
 		<info name="serial" value="NGCD-219" />
 		<info name="release" value="19960719" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="futsal - 5 on 5 mini soccer (1996)(saurus)(jp)[pleasuregoal - 5 on 5 mini soccer]" sha1="8e70456d560e6c8f1a484af86b953d9ed6bbf724"/>
 			</diskarea>
@@ -602,7 +602,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ギャラクシーファイト ユニバーサル ウォリアーズ" />
 		<info name="serial" value="NGCD-078 (JPN)" />
 		<info name="release" value="19950421 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="galaxy fight - universal warriors (1995)(sunsoft)(jp-us)" sha1="65ca73d11d98e9c9e26bf0753e52378188c79471"/>
 			</diskarea>
@@ -616,7 +616,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ゴーストパイロット" />
 		<info name="serial" value="NGCD-020" />
 		<info name="release" value="19950317" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="ghost pilots (1995)(snk)(jp)" sha1="77f8425c27c314aa746951c517f9a44c2624baae"/>
 			</diskarea>
@@ -630,7 +630,7 @@ license:CC0-1.0
 		<info name="alt_title" value="雀神伝説" />
 		<info name="serial" value="AICD-048" />
 		<info name="release" value="19950331" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="janshin densetsu - quest of the jongmaster (1995)(snk)(jp)" sha1="074807c2a48f5c915a253e7b9bff2b8a3ad0ced3"/>
 			</diskarea>
@@ -644,7 +644,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ファイターズヒストリー・ダイナマイト" />
 		<info name="serial" value="DECD-003 (JPN)" />
 		<info name="release" value="19941222 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="karnov's revenge (1994)(snk)(jp-us)[fighter's history dynamite]" sha1="89acc598b304e97749f632c4883935cf1f41100e"/>
 			</diskarea>
@@ -658,7 +658,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ '94" />
 		<info name="serial" value="NGCD-055 (JPN)" />
 		<info name="release" value="19941102 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="king of fighters '94, the (1994)(snk)(jp-us)[ngcd-055 mt b01+b04, ngcd-055e mt b01]" sha1="a6a461dc12ab4a0bb4385d2800a97b64a5792414"/>
 			</diskarea>
@@ -672,7 +672,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ '94" />
 		<info name="serial" value="NGCD-055 (JPN)" />
 		<info name="release" value="19941102 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="king of fighters '94, the (1994)(snk)(jp-us)[ngcd-055 mt b12, ngcd-055e]" sha1="60319c764eef1814825b3440bb0838f3f16fd447"/>
 			</diskarea>
@@ -686,7 +686,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ '95" />
 		<info name="serial" value="NGCD-084 (JPN)" />
 		<info name="release" value="19950929 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="king of fighters '95, the (1995)(snk)(jp-us)[ngcd-084 mt b01+b03+b06, ngcd-084e mt b01]" sha1="dee363caf747ecd92e9e98b88094aecf181173e4"/>
 			</diskarea>
@@ -700,7 +700,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ '95" />
 		<info name="serial" value="NGCD-084 (JPN)" />
 		<info name="release" value="19950929 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="king of fighters '95, the (1995)(snk)(jp-us)[ngcd-084 mt b10, ngcd-084e mt b03]" sha1="67f0ce0da3585043b3813be2fc0b7664b60c32d3"/>
 			</diskarea>
@@ -714,7 +714,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ '96" />
 		<info name="serial" value="NGCD-214" />
 		<info name="release" value="19961025" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="king of fighters '96, the (1996)(snk)(jp)[ngcd-214 mt a02+a03]" sha1="e162d33d5a33049bf26226a651b359815efae16b"/>
 			</diskarea>
@@ -728,7 +728,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ '96" />
 		<info name="serial" value="NGCD-214 (JPN)" />
 		<info name="release" value="19961025 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="king of fighters '96, the (1996)(snk)(jp-us)[ngcd-214 mt a01, ngcd-214e]" sha1="a3b663994339fd6c8244fed1865895a87e8365b2"/>
 			</diskarea>
@@ -742,7 +742,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ '97" />
 		<info name="serial" value="NGCD-2320" />
 		<info name="release" value="19971030" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="king of fighters '97, the (1997)(snk)(jp)" sha1="3985560edfda8e5095e888b8fd8f5ae6a9a820dd"/>
 			</diskarea>
@@ -756,7 +756,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ '98" />
 		<info name="serial" value="NGCD-2420" />
 		<info name="release" value="19981223" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="king of fighters '98, the - the slugfest (1998)(snk)(jp)[king of fighters '98, the - dream match never ends]" sha1="a9347d7ca911be575fc1d4da01b9376f05057181"/>
 			</diskarea>
@@ -770,7 +770,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ザ・キング・オブ・ファイターズ '99" />
 		<info name="serial" value="NGCD-2510" />
 		<info name="release" value="19991202" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="king of fighters '99, the - millennium battle (1999)(snk)(jp)[king of fighters '99, the]" sha1="813e7880f72e19074beb8cc1d96eb4f9e2f87c09"/>
 			</diskarea>
@@ -784,7 +784,7 @@ license:CC0-1.0
 		<info name="alt_title" value="キング・オブ・ザ・モンスターズ2 ―ネクストシング―" />
 		<info name="serial" value="NGCD-039 (JPN)" />
 		<info name="release" value="19940909 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="king of the monsters 2 (1994)(snk)(jp-us)" sha1="c041b07f6057b818fb666b450e65b227c1f0c56d"/>
 			</diskarea>
@@ -798,7 +798,7 @@ license:CC0-1.0
 		<info name="alt_title" value="幕末浪漫 月華の剣士" />
 		<info name="serial" value="NGCD-2340" />
 		<info name="release" value="19980325" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="last blade, the (1998)(snk)(jp)[bakumatsu roman - gekka no kenshi]" sha1="72dd53d44e0b253246e4d1a3815f7c4e9d27c5ec"/>
 			</diskarea>
@@ -812,7 +812,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ラストリゾート" />
 		<info name="serial" value="NGCD-024 (JPN)" />
 		<info name="release" value="19940909 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="last resort (1994)(snk)(jp-us)" sha1="372b9642cf861d3c7507b8485fc43fc144b16874"/>
 			</diskarea>
@@ -828,7 +828,7 @@ license:CC0-1.0
 		<year>2021</year>
 		<publisher>Blastar</publisher>
 		<info name="release" value="20211226" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="looptris" sha1="890b3a08bf9a88d5ae6d4fbd73bd903ad929af64"/>
 			</diskarea>
@@ -845,7 +845,7 @@ license:CC0-1.0
 		<year>2022</year>
 		<publisher>Blastar</publisher>
 		<info name="release" value="20221224" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Looptris Plus" sha1="154085e56b1bbbba4a866796c3f385da7cb6a3ed"/>
 			</diskarea>
@@ -859,7 +859,7 @@ license:CC0-1.0
 		<info name="alt_title" value="マジカルドロップ2" />
 		<info name="serial" value="NGCD-221" />
 		<info name="release" value="19960524" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="magical drop 2 (1996)(data east)(jp)" sha1="69135e129dd3587910f3b6042175788298e31a71"/>
 			</diskarea>
@@ -873,7 +873,7 @@ license:CC0-1.0
 		<info name="alt_title" value="マジシャンロード" />
 		<info name="serial" value="ADCD-100" />
 		<info name="release" value="19941031" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="magician lord (1994)(adk)(jp)" sha1="e537fefc2179c2017ebb1d0794f77b1d18581555"/>
 			</diskarea>
@@ -887,7 +887,7 @@ license:CC0-1.0
 		<info name="alt_title" value="麻雀狂列伝 ―西日本編―" />
 		<info name="serial" value="NGCD-004" />
 		<info name="release" value="19940909" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="mahjong kyo retsuden - nishi nihon hen (1994)(snk)(jp)" sha1="8cc5def122d2638d7c63f02922150cc046ef3c1a"/>
 			</diskarea>
@@ -901,7 +901,7 @@ license:CC0-1.0
 		<info name="alt_title" value="メタルスラッグ" />
 		<info name="serial" value="NGCD-201 (JPN)" />
 		<info name="release" value="19960705 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="metal slug (1996)(snk)(jp-us)" sha1="b4f83b0b7046e9445f9cc16c40e57fd84b575ef9"/>
 			</diskarea>
@@ -915,7 +915,7 @@ license:CC0-1.0
 		<info name="alt_title" value="メタルスラッグ2" />
 		<info name="serial" value="NGCD-2410" />
 		<info name="release" value="19980625" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="metal slug 2 (1998)(snk)(jp)" sha1="8cc8fc89d4effec887c25ca18d6caf4893572302"/>
 			</diskarea>
@@ -929,7 +929,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ミューテイション ネイション" />
 		<info name="serial" value="NGCD-014 (JPN)" />
 		<info name="release" value="19950225 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="mutation nation (1995)(snk)(jp-us)" sha1="624efc927077f87f7fea2d5b14bf3cf8c68a5514"/>
 			</diskarea>
@@ -943,7 +943,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ナム-1975" />
 		<info name="serial" value="NGCD-001 (JPN)" />
 		<info name="release" value="19940909 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="nam-1975 (1994)(snk)(jp-us)" sha1="8a0ea9a98551286da76bb75137211b9f0aec5541"/>
 			</diskarea>
@@ -957,7 +957,7 @@ license:CC0-1.0
 		<info name="alt_title" value="NEOドリフトアウト" />
 		<info name="serial" value="NGCD-213" />
 		<info name="release" value="19960726" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="neo driftout (1996)(visco)(jp)" sha1="9bad0585e54fc505c635d7d6e0ded79c175c6c8d"/>
 			</diskarea>
@@ -971,7 +971,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ビッグトーナメントゴルフ" />
 		<info name="serial" value="NGCD-200" />
 		<info name="release" value="19960503" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="neo turf masters (1996)(snk)(jp)[big tournament golf]" sha1="806597142c6e7939009494c8f3a84fcbdc1fca38"/>
 			</diskarea>
@@ -985,7 +985,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ニンジャコンバット" />
 		<info name="serial" value="ADCD-101" />
 		<info name="release" value="19941031" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="ninja combat (1994)(adk)(jp)" sha1="713aefb92722b41926da4676adba6ea428420b19"/>
 			</diskarea>
@@ -999,7 +999,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ニンジャコマンドー" />
 		<info name="serial" value="ADCD-004" />
 		<info name="release" value="19941031" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="ninja commando (1994)(adk)(jp)" sha1="55e4e119a9fb3cd284eda0712f1fd79c1aced861"/>
 			</diskarea>
@@ -1013,7 +1013,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ニンジャマスターズ 覇王忍法帖" />
 		<info name="serial" value="ADCD-012" />
 		<info name="release" value="19960927" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="ninja master's - haou ninpou-chou (1996)(adk)(jp)" sha1="b2a9a6cb38d66af1e02450a2967b4eeff39e2ad6"/>
 			</diskarea>
@@ -1027,7 +1027,7 @@ license:CC0-1.0
 		<info name="alt_title" value="オーバートップ" />
 		<info name="serial" value="ADCD-011" />
 		<info name="release" value="19960726" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="overtop (1996)(adk)(jp)" sha1="e5d510ffa771cc8caa5a6ca7465ac69fe75ae3e5"/>
 			</diskarea>
@@ -1041,7 +1041,7 @@ license:CC0-1.0
 		<info name="alt_title" value="パワースパイクスII" />
 		<info name="serial" value="NGCD-068" />
 		<info name="release" value="19950317" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="power spikes ii (1995)(video system)(jp)" sha1="a0b7b551971f2f0c76b92ad09f271f0d96575a5a"/>
 			</diskarea>
@@ -1055,7 +1055,7 @@ license:CC0-1.0
 		<info name="alt_title" value="パルスター" />
 		<info name="serial" value="NGCD-089 (JPN)" />
 		<info name="release" value="19951027 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="pulstar (1995)(snk)(jp-us)" sha1="a7836434d5180beb460c3100c29812dd3928228c"/>
 			</diskarea>
@@ -1069,7 +1069,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ジョイジョイキッド" />
 		<info name="serial" value="NGCD-021 (JPN)" />
 		<info name="release" value="19940909 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="puzzled (1994)(snk)(jp-us)[joy joy kid]" sha1="738d0194042cc9c7093bcdbacfbb99f97dc07ba2"/>
 			</diskarea>
@@ -1083,7 +1083,7 @@ license:CC0-1.0
 		<info name="alt_title" value="クイズ キングオブファイターズ" />
 		<info name="serial" value="NGCD-080" />
 		<info name="release" value="19950407" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="quiz king of fighters (1995)(saurus)(jp)" sha1="e361db324e54e4e523e46c2803c831e3b51750de"/>
 			</diskarea>
@@ -1097,7 +1097,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ラギ" />
 		<info name="serial" value="ADCD-001" />
 		<info name="release" value="19941031" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="raguy (1994)(adk)(jp)[blue's journey]" sha1="b1063594b9e214765b95e0446c041c2a5663ae20"/>
 			</diskarea>
@@ -1111,7 +1111,7 @@ license:CC0-1.0
 		<info name="alt_title" value="リアルバウト餓狼伝説" />
 		<info name="serial" value="NGCD-095 (JPN)" />
 		<info name="release" value="19960223 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="real bout fatal fury (1996)(snk)(jp-us)[real bout garou densetsu][ngcd-095 mt b06+b08, ngcd-095e]" sha1="634906800d14029e0e86f1ff531139ec47e213c6"/>
 			</diskarea>
@@ -1125,7 +1125,7 @@ license:CC0-1.0
 		<info name="alt_title" value="リアルバウト餓狼伝説2" />
 		<info name="serial" value="NGCD-2400 (JPN)" />
 		<info name="release" value="19980723 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="real bout fatal fury 2 - the newcomers (1998)(snk)(jp-us)[real bout garou densetsu 2 - the newcomers]" sha1="d738ff116843cedeb719d5ee033d98e05f62d92e"/>
 			</diskarea>
@@ -1139,7 +1139,7 @@ license:CC0-1.0
 		<info name="alt_title" value="リアルバウト餓狼伝説スペシャル" />
 		<info name="serial" value="NGCD-2230" />
 		<info name="release" value="19970330" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="real bout fatal fury special (1997)(snk)(jp)[real bout special]" sha1="22da9b42359f4c9281dd9569baf043a6f86eb746"/>
 			</diskarea>
@@ -1153,7 +1153,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ライディングヒーロー" />
 		<info name="serial" value="NGCD-006 (JPN)" />
 		<info name="release" value="19950526 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="riding hero (1995)(snk)(jp-us)" sha1="0289f10c5bfffad8575cda05088fad52e256474d"/>
 			</diskarea>
@@ -1167,7 +1167,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ロボアーミー" />
 		<info name="serial" value="NGCD-032 (JPN)" />
 		<info name="release" value="19950421 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="robo army (1995)(snk)(jp-us)" sha1="1e3a592681df2ec8e7c983c7a2192ae8ae563121"/>
 			</diskarea>
@@ -1181,7 +1181,7 @@ license:CC0-1.0
 		<info name="alt_title" value="サムライスピリッツ" />
 		<info name="serial" value="NGCD-045 (JPN)" />
 		<info name="release" value="19940909 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="samurai shodown (1994)(snk)(jp-us)[samurai spirits][ngcd-045 mt b02+b05, ngcd-045e mt b02]" sha1="26181f36ae317a2eb93ade832d2cf0b9ccfd1c42"/>
 			</diskarea>
@@ -1195,7 +1195,7 @@ license:CC0-1.0
 		<info name="alt_title" value="真 サムライスピリッツ 覇王丸地獄変" />
 		<info name="serial" value="NGCD-063 (JPN)" />
 		<info name="release" value="19941215 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="samurai shodown ii (1994)(snk)(jp-us)[shin samurai spirits - haoumaru jigoku hen]" sha1="ee5a32a77152f7408c62dc7321e5f2adf322d46c"/>
 			</diskarea>
@@ -1209,7 +1209,7 @@ license:CC0-1.0
 		<info name="alt_title" value="サムライスピリッツ 斬紅郎無双剣" />
 		<info name="serial" value="NGCD-087" />
 		<info name="release" value="19951229" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="samurai shodown iii (1995)(snk)(jp)[samurai spirits - zankurou musouken][ngcd-087 mt a04]" sha1="ad0b2dee64bf8b34e27ec2c1435859d568b49981"/>
 			</diskarea>
@@ -1223,7 +1223,7 @@ license:CC0-1.0
 		<info name="alt_title" value="サムライスピリッツ 天草降臨" />
 		<info name="serial" value="NGCD-222 (JPN)" />
 		<info name="release" value="19961227 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="samurai shodown iv - amakusa's revenge (1996)(snk)(jp-us)[samurai spirits - amakusa kourin]" sha1="b90bff26f7977049935ca3d761f3ce692f117813"/>
 			</diskarea>
@@ -1237,7 +1237,7 @@ license:CC0-1.0
 		<info name="alt_title" value="風雲黙示録 格闘創世" />
 		<info name="serial" value="NGCD-059 (JPN)" />
 		<info name="release" value="19950616 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="savage reign (1995)(snk)(jp-us)[fu'un mokujiroku - kakutou sousei]" sha1="67cdf5abc7f52b8c2f9d7ad5cec73528d6a456bd"/>
 			</diskarea>
@@ -1251,7 +1251,7 @@ license:CC0-1.0
 		<info name="alt_title" value="戦国伝承" />
 		<info name="serial" value="NGCD-017 (JPN)" />
 		<info name="release" value="19950317 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sengoku (1995)(snk)(jp-us)[sengoku denshou]" sha1="eac1b1a0b884bcd4d9e02891c85c34ea182ccdb1"/>
 			</diskarea>
@@ -1265,7 +1265,7 @@ license:CC0-1.0
 		<info name="alt_title" value="戦国伝承2" />
 		<info name="serial" value="NGCD-040 (JPN)" />
 		<info name="release" value="19950317 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sengoku 2 (1995)(snk)(jp-us)[sengoku denshou 2]" sha1="52f016131ccd4f5835f5ddf35b20114c474c62d9"/>
 			</diskarea>
@@ -1279,7 +1279,7 @@ license:CC0-1.0
 		<info name="alt_title" value="神凰拳" />
 		<info name="serial" value="NGCD-218" />
 		<info name="release" value="19960823" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="shinouken (1996)(saurus)(jp)[ragnagard]" sha1="ae219a7382645c648a78a2126f3cd1dfc01cd708"/>
 			</diskarea>
@@ -1293,7 +1293,7 @@ license:CC0-1.0
 		<info name="alt_title" value="将棋の達人" />
 		<info name="serial" value="ADCD-010" />
 		<info name="release" value="19951020" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="shougi no tatsujin - master of syougi (1995)(adk)(jp)" sha1="d61ec46215b07bb8d7f070e439212641cc409792"/>
 			</diskarea>
@@ -1307,7 +1307,7 @@ license:CC0-1.0
 		<info name="alt_title" value="サッカーブロール" />
 		<info name="serial" value="NGCD-031 (JPN)" />
 		<info name="release" value="19950331 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="soccer brawl (1995)(snk)(jp-us)" sha1="97e9a937f211536197a96a9cbcafaec0ffc21662"/>
 			</diskarea>
@@ -1321,7 +1321,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ステークスウィナーGI完全制覇への道" />
 		<info name="serial" value="NGCD-088" />
 		<info name="release" value="19960322" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="stakes winner - gi kanzen seiha e no machi (1996)(saurus)(jp)" sha1="e72ce998b2d91542df5ae05ac0714284b6926e5d"/>
 			</diskarea>
@@ -1335,7 +1335,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ダンク・ドリーム" />
 		<info name="serial" value="DECD-004 (JPN)" />
 		<info name="release" value="19950120 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="street hoop (1995)(data east)(jp-us)[dunk dream]" sha1="7bb971e4dd218a65c40e0f2f368711a6889e1b05"/>
 			</diskarea>
@@ -1349,7 +1349,7 @@ license:CC0-1.0
 		<info name="alt_title" value="得点王" />
 		<info name="serial" value="NGCD-052 (JPN)" />
 		<info name="release" value="19950331 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="super sidekicks (1995)(snk)(jp-us)[tokuten ou]" sha1="9bda953cb1b5354cb19ec3f8d2792de6bd1fba1a"/>
 			</diskarea>
@@ -1363,7 +1363,7 @@ license:CC0-1.0
 		<info name="alt_title" value="得点王2" />
 		<info name="serial" value="NGCD-061 (JPN)" />
 		<info name="release" value="19940909 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="super sidekicks 2 (1994)(snk)(jp-us)[tokuten ou 2]" sha1="ef2a5fee5502561d25922aad1656319de18c72a0"/>
 			</diskarea>
@@ -1377,7 +1377,7 @@ license:CC0-1.0
 		<info name="alt_title" value="得点王3 栄光への挑戦" />
 		<info name="serial" value="NGCD-081 (JPN)" />
 		<info name="release" value="19950623 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="super sidekicks 3 - the next glory (1995)(snk)(jp-us)[tokuten ou 3 - eikou e no chousen]" sha1="ac8e645615318789535513b5861d99d6e45b99f9"/>
 			</diskarea>
@@ -1391,7 +1391,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ザ・スーパースパイ" />
 		<info name="serial" value="NGCD-011 (JPN)" />
 		<info name="release" value="19940909 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="super spy, the (1994)(snk)(jp-us)" sha1="46297a94d8db0e4e6abaebbf33e4560cdec9be85"/>
 			</diskarea>
@@ -1405,7 +1405,7 @@ license:CC0-1.0
 		<info name="alt_title" value="天外魔境 真伝" />
 		<info name="serial" value="NGCD-092" />
 		<info name="release" value="19951124" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="tengai makyou shinden - far east of eden (1995)(hudson)(jp)[kabuki klash]" sha1="922c307ef433c412d65a1ff3f8a8327fdfb1d1c9"/>
 			</diskarea>
@@ -1419,7 +1419,7 @@ license:CC0-1.0
 		<info name="alt_title" value="トップハンター" />
 		<info name="serial" value="NGCD-046 (JPN)" />
 		<info name="release" value="19940929 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="top hunter - roddy &amp; cathy (1994)(snk)(jp-us)[ngcd-046 mt b02, ngcd-046e]" sha1="fdde6325416fabf1929b61f64c87a5398e6e8e5d"/>
 			</diskarea>
@@ -1433,7 +1433,7 @@ license:CC0-1.0
 		<info name="alt_title" value="トッププレイヤーズ・ゴルフ" />
 		<info name="serial" value="NGCD-003 (JPN)" />
 		<info name="release" value="19940909 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="top player's golf (1994)(snk)(jp-us)" sha1="fe6326f015917a87fd1f436311be6f48def2b2cf"/>
 			</diskarea>
@@ -1447,7 +1447,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ティンクルスター スプライツ" />
 		<info name="serial" value="ADCD-013" />
 		<info name="release" value="19970221" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="twinkle star sprites (1997)(adk)(jp)" sha1="169ad6845fe9baa6ca3e08f92e554ede71b3b13e"/>
 			</diskarea>
@@ -1461,7 +1461,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ビューポイント" />
 		<info name="serial" value="AICD-051 (JPN)" />
 		<info name="release" value="19950225 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="viewpoint (1995)(snk)(jp-us)" sha1="8a13861b34cbe5953843a535c7b50d691aefa069"/>
 			</diskarea>
@@ -1475,7 +1475,7 @@ license:CC0-1.0
 		<info name="alt_title" value="超人学園ゴウカイザー" />
 		<info name="serial" value="NGCD-094" />
 		<info name="release" value="19951124" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="voltage fighter gowcaizer (1995)(technos)(jp)[choujin gakuen gowcaizer]" sha1="9a645a7dc3f723b55393090f11d5ae425f7411c6"/>
 			</diskarea>
@@ -1489,7 +1489,7 @@ license:CC0-1.0
 		<info name="alt_title" value="フライングパワーディスク" />
 		<info name="serial" value="DECD-002 (JPN)" />
 		<info name="release" value="19950120 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="windjammers (1995)(snk)(jp-us)[flying power disc]" sha1="2d4dc090fa7d55f04c2f6484f1e892d93ce42aa4"/>
 			</diskarea>
@@ -1503,7 +1503,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ワールドヒーローズ" />
 		<info name="serial" value="ADCD-005 (JPN)" />
 		<info name="release" value="19950317 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="world heroes (1995)(adk)(jp-us)" sha1="10b4a5ef5613982edbc07da1894208ec6a468583"/>
 			</diskarea>
@@ -1517,7 +1517,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ワールドヒーローズ2" />
 		<info name="serial" value="ADCD-006 (JPN)" />
 		<info name="release" value="19950414 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="world heroes 2 (1995)(adk)(jp-us)" sha1="4dba3f8107f798c089d8be7b1b1fbe2dfb4e1d8b"/>
 			</diskarea>
@@ -1531,7 +1531,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ワールドヒーローズ2ジェット" />
 		<info name="serial" value="ADCD-007" />
 		<info name="release" value="19941111" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="world heroes 2 jet (1994)(adk)(jp)" sha1="b2ce705d16b82963a2eafbbefe37975225b7b145"/>
 			</diskarea>
@@ -1545,7 +1545,7 @@ license:CC0-1.0
 		<info name="alt_title" value="ワールドヒーローズ パーフェクト" />
 		<info name="serial" value="ADCD-009 (JPN)" />
 		<info name="release" value="19950721 (JPN)" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="world heroes perfect (1995)(adk)(jp-us)" sha1="7d444937c98b08845a00f965ced83e6677109cb7"/>
 			</diskarea>
@@ -1617,7 +1617,7 @@ license:CC0-1.0
 		<notes>Freeze after the loading screen</notes>
 		<info name="release" value="20210810" />
 		<info name="serial" value="NGCD-BB01 / NGCD-BB01E" />
-		<part name="cdrom" interface="neocd_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Xeno Crisis (World) (Unl)" sha1="792ee3aa806d06163b4d613f47d8ac9802a20c92"/>
 			</diskarea>

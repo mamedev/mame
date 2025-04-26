@@ -124,7 +124,7 @@ Check zr107.cpp for details on the top board.
 
 Operation Thunder Hurricane uses an additional top board gun/analog controls. Analog inputs are controlled by two CCD
 cameras, one from each gun. This specific variation uses a K056230 for networking between the cpu board to receive
-the analog values that way. Teraburst uses a different variation of this I/O board replacing the K056230 with a K056800 (see hornet.cpp).
+the analog values that way. Teraburst uses a different variation of this I/O board replacing the K056230 with a K056800 (see konami/hornet.cpp).
 
 GN680 PWB(E)403381B
 |------------------------------------------|
@@ -245,6 +245,16 @@ Hang Pilot (uses an unknown but similar video board)                12W         
 #include "speaker.h"
 
 
+#define LOG_SYSREG (1 << 1)
+
+#define LOG_ALL (LOG_SYSREG)
+
+#define VERBOSE (0)
+
+#include "logmacro.h"
+
+#define LOGSYSREG(...) LOGMASKED(LOG_SYSREG, __VA_ARGS__)
+
 namespace {
 
 #define DEBUG_GTI (0)
@@ -256,7 +266,7 @@ protected:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
-		, m_dsp(*this, {"dsp", "dsp2"}) // TODO: hardcoded tags in machine/konpc.cpp
+		, m_dsp(*this, "dsp%u", 1U)
 		, m_k056800(*this, "k056800")
 		, m_adc1038(*this, "adc1038")
 		, m_eeprom(*this, "eeprom")
@@ -266,6 +276,7 @@ protected:
 		, m_k001604(*this, "k001604%u", 1U)
 		, m_work_ram(*this, "work_ram")
 		, m_sharc_dataram(*this, "sharc%u_dataram", 0U)
+		, m_cgboard_bank(*this, "cgboard_%u_bank", 0U)
 		, m_analog(*this, "AN%u", 0U)
 		, m_ports(*this, "IN%u", 0)
 		, m_pcb_digit(*this, "pcbdigit%u", 0U)
@@ -290,12 +301,14 @@ protected:
 	optional_device_array<k001604_device, 2> m_k001604;
 	required_shared_ptr<uint32_t> m_work_ram;
 	optional_shared_ptr_array<uint32_t, 2> m_sharc_dataram;
+	optional_memory_bank_array<2> m_cgboard_bank;
 	optional_ioport_array<4> m_analog;
 	required_ioport_array<4> m_ports;
 	output_finder<2> m_pcb_digit;
 	memory_view m_cg_view;
 
-	static rgb_t gticlub_XR5G5B5(uint32_t raw);
+	emu_timer *m_sound_irq_timer = nullptr;
+
 	uint8_t sysreg_r(offs_t offset);
 	void sysreg_w(offs_t offset, uint8_t data);
 	void soundtimer_en_w(uint16_t data);
@@ -306,8 +319,6 @@ protected:
 	int adc1038_input_callback(int input);
 
 	void sound_memmap(address_map &map) ATTR_COLD;
-
-	emu_timer *m_sound_irq_timer = nullptr;
 };
 
 // with GN678 Video board
@@ -361,7 +372,6 @@ private:
 };
 
 // with Voodoo based video board
-
 class hangplt_state : public gticlub_base_state
 {
 public:
@@ -382,15 +392,9 @@ private:
 	template <uint8_t Which> uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void hangplt_map(address_map &map) ATTR_COLD;
-	void hangplt_sharc0_map(address_map &map) ATTR_COLD;
-	void hangplt_sharc1_map(address_map &map) ATTR_COLD;
+	template <unsigned Board> void hangplt_sharc_map(address_map &map) ATTR_COLD;
 };
 
-
-rgb_t gticlub_base_state::gticlub_XR5G5B5(uint32_t raw)
-{
-	return rgb_t(pal5bit(raw >> 10), pal5bit(raw >> 5), pal5bit(raw >> 0));
-}
 
 /******************************************************************/
 
@@ -420,7 +424,8 @@ uint8_t gticlub_base_state::sysreg_r(offs_t offset)
 		}
 
 		default:
-			osd_printf_debug("sysreg_r %d\n", offset);
+			if (!machine().side_effects_disabled())
+				LOGSYSREG("sysreg_r %d\n", offset);
 			break;
 	}
 	return 0;
@@ -436,20 +441,20 @@ void gticlub_base_state::sysreg_w(offs_t offset, uint8_t data)
 			break;
 
 		case 3:
-			m_eeprom->di_write((data & 0x01) ? 1 : 0);
-			m_eeprom->clk_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
-			m_eeprom->cs_write((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+			m_eeprom->di_write(BIT(data, 0));
+			m_eeprom->clk_write(BIT(data, 1));
+			m_eeprom->cs_write(BIT(data, 2));
 			break;
 
 		case 4:
-			if (data & 0x80)    // CG Board 1 IRQ Ack
+			if (BIT(data, 7))    // CG Board 1 IRQ Ack
 				m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 
-			if (data & 0x40)    // CG Board 0 IRQ Ack
+			if (BIT(data, 6))    // CG Board 0 IRQ Ack
 				m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 
-			m_adc1038->di_write((data >> 0) & 1);
-			m_adc1038->clk_write((data >> 1) & 1);
+			m_adc1038->di_write(BIT(data, 0));
+			m_adc1038->clk_write(BIT(data, 1));
 
 			m_konppc->set_cgboard_id((data >> 4) & 0x3);
 			m_cg_view.select(m_konppc->get_cgboard_id() ? 1 : 0);
@@ -470,7 +475,7 @@ TIMER_CALLBACK_MEMBER(gticlub_base_state::sound_irq)
 
 void gticlub_base_state::soundtimer_en_w(uint16_t data)
 {
-	if (data & 1)
+	if (BIT(data, 0))
 	{
 		// Reset and disable timer
 		m_sound_irq_timer->adjust(attotime::from_usec(m_sound_timer_usec));
@@ -585,34 +590,23 @@ void thunderh_state::gn680_memmap(address_map &map)
 
 void gticlub_state::sharc_map(address_map &map)
 {
-	map(0x400000, 0x41ffff).rw(m_konppc, FUNC(konppc_device::cgboard_0_shared_sharc_r), FUNC(konppc_device::cgboard_0_shared_sharc_w));
+	map(0x400000, 0x41ffff).rw(m_konppc, FUNC(konppc_device::cgboard_shared_sharc_r<0>), FUNC(konppc_device::cgboard_shared_sharc_w<0>));
 	map(0x500000, 0x5fffff).ram().share(m_sharc_dataram[0]).lr32(NAME([this](offs_t offset) { return m_sharc_dataram[0][offset] & 0xffff; }));
 	map(0x600000, 0x6fffff).rw(m_k001005, FUNC(k001005_device::read), FUNC(k001005_device::write));
-	map(0x700000, 0x7000ff).rw(m_konppc, FUNC(konppc_device::cgboard_0_comm_sharc_r), FUNC(konppc_device::cgboard_0_comm_sharc_w));
+	map(0x700000, 0x7000ff).rw(m_konppc, FUNC(konppc_device::cgboard_comm_sharc_r<0>), FUNC(konppc_device::cgboard_comm_sharc_w<0>));
 }
 
-void hangplt_state::hangplt_sharc0_map(address_map &map)
+template <unsigned Board>
+void hangplt_state::hangplt_sharc_map(address_map &map)
 {
-	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_0_shared_sharc_r), FUNC(konppc_device::cgboard_0_shared_sharc_w));
-	map(0x0500000, 0x05fffff).ram().share(m_sharc_dataram[0]).lr32(NAME([this](offs_t offset) { return m_sharc_dataram[0][offset] & 0xffff; }));
+	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_shared_sharc_r<Board>), FUNC(konppc_device::cgboard_shared_sharc_w<Board>));
+	map(0x0500000, 0x05fffff).ram().share(m_sharc_dataram[Board]).lr32(NAME([this](offs_t offset) { return m_sharc_dataram[Board][offset] & 0xffff; }));
 	map(0x1400000, 0x14fffff).ram();
-	map(0x2400000, 0x27fffff).r(m_konppc, FUNC(konppc_device::nwk_voodoo_0_r)).w(m_voodoo[0], FUNC(generic_voodoo_device::write));
-	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_0_comm_sharc_r), FUNC(konppc_device::cgboard_0_comm_sharc_w));
-	map(0x3401000, 0x34fffff).w(m_konppc, FUNC(konppc_device::nwk_fifo_0_w));
-	map(0x3500000, 0x3507fff).rw(m_konppc, FUNC(konppc_device::K033906_0_r), FUNC(konppc_device::K033906_0_w));
-	map(0x3600000, 0x37fffff).bankr("master_cgboard_bank");
-}
-
-void hangplt_state::hangplt_sharc1_map(address_map &map)
-{
-	map(0x0400000, 0x041ffff).rw(m_konppc, FUNC(konppc_device::cgboard_1_shared_sharc_r), FUNC(konppc_device::cgboard_1_shared_sharc_w));
-	map(0x0500000, 0x05fffff).ram().share(m_sharc_dataram[1]).lr32(NAME([this](offs_t offset) { return m_sharc_dataram[1][offset] & 0xffff; }));
-	map(0x1400000, 0x14fffff).ram();
-	map(0x2400000, 0x27fffff).r(m_konppc, FUNC(konppc_device::nwk_voodoo_1_r)).w(m_voodoo[1], FUNC(generic_voodoo_device::write));
-	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_1_comm_sharc_r), FUNC(konppc_device::cgboard_1_comm_sharc_w));
-	map(0x3401000, 0x34fffff).w(m_konppc, FUNC(konppc_device::nwk_fifo_1_w));
-	map(0x3500000, 0x3507fff).rw(m_konppc, FUNC(konppc_device::K033906_1_r), FUNC(konppc_device::K033906_1_w));
-	map(0x3600000, 0x37fffff).bankr("slave_cgboard_bank");
+	map(0x2400000, 0x27fffff).r(m_konppc, FUNC(konppc_device::nwk_voodoo_r<Board>)).w(m_voodoo[Board], FUNC(generic_voodoo_device::write));
+	map(0x3400000, 0x34000ff).rw(m_konppc, FUNC(konppc_device::cgboard_comm_sharc_r<Board>), FUNC(konppc_device::cgboard_comm_sharc_w<Board>));
+	map(0x3401000, 0x34fffff).w(m_konppc, FUNC(konppc_device::nwk_voodoo_fifo_w<Board>));
+	map(0x3500000, 0x3507fff).rw(m_konppc, FUNC(konppc_device::cgboard_k033906_r<Board>), FUNC(konppc_device::cgboard_k033906_w<Board>));
+	map(0x3600000, 0x37fffff).bankr(m_cgboard_bank[Board]);
 }
 
 /*****************************************************************************/
@@ -918,7 +912,7 @@ void gticlub_state::gticlub(machine_config &config)
 	screen.set_visarea(40, 511+40, 28, 383+28);     // needs CRTC emulation
 	screen.set_screen_update(FUNC(gticlub_state::screen_update));
 
-	PALETTE(config, m_palette[0]).set_format(4, &gticlub_state::gticlub_XR5G5B5, 16384);
+	PALETTE(config, m_palette[0]).set_format(4, raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 10,5,0>, 16384);
 
 	K001604(config, m_k001604[0], 0);
 	m_k001604[0]->set_palette(m_palette[0]);
@@ -944,8 +938,9 @@ void gticlub_state::gticlub(machine_config &config)
 	rfsnd.add_route(1, "rspeaker", 1.0);
 
 	KONPPC(config, m_konppc, 0);
+	m_konppc->set_dsp_tag(0, m_dsp[0]);
 	m_konppc->set_num_boards(1);
-	m_konppc->set_cbboard_type(konppc_device::CGBOARD_TYPE_GTICLUB);
+	m_konppc->set_cgboard_type(konppc_device::CGBOARD_TYPE_GTICLUB);
 }
 
 void thunderh_state::thunderh(machine_config &config)
@@ -978,11 +973,11 @@ void hangplt_state::hangplt(machine_config &config)
 
 	ADSP21062(config, m_dsp[0], XTAL(36'000'000));
 	m_dsp[0]->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
-	m_dsp[0]->set_addrmap(AS_DATA, &hangplt_state::hangplt_sharc0_map);
+	m_dsp[0]->set_addrmap(AS_DATA, &hangplt_state::hangplt_sharc_map<0>);
 
 	ADSP21062(config, m_dsp[1], XTAL(36'000'000));
 	m_dsp[1]->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
-	m_dsp[1]->set_addrmap(AS_DATA, &hangplt_state::hangplt_sharc1_map);
+	m_dsp[1]->set_addrmap(AS_DATA, &hangplt_state::hangplt_sharc_map<1>);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
@@ -1016,8 +1011,8 @@ void hangplt_state::hangplt(machine_config &config)
 	K033906(config, "k033906_2", 0, m_voodoo[1]);
 
 	// video hardware
-	PALETTE(config, m_palette[0]).set_format(4, &gticlub_state::gticlub_XR5G5B5, 16384);
-	PALETTE(config, m_palette[1]).set_format(4, &gticlub_state::gticlub_XR5G5B5, 16384);
+	PALETTE(config, m_palette[0]).set_format(4, raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 10,5,0>, 16384);
+	PALETTE(config, m_palette[1]).set_format(4, raw_to_rgb_converter::standard_rgb_decoder<5,5,5, 10,5,0>, 16384);
 
 	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
 	lscreen.set_refresh_hz(60);
@@ -1048,8 +1043,16 @@ void hangplt_state::hangplt(machine_config &config)
 	rfsnd.add_route(1, "rspeaker", 1.0);
 
 	KONPPC(config, m_konppc, 0);
+	m_konppc->set_dsp_tag(0, m_dsp[0]);
+	m_konppc->set_dsp_tag(1, m_dsp[1]);
+	m_konppc->set_k033906_tag(0, "k033906_1");
+	m_konppc->set_k033906_tag(1, "k033906_2");
+	m_konppc->set_voodoo_tag(0, m_voodoo[0]);
+	m_konppc->set_voodoo_tag(1, m_voodoo[1]);
+	m_konppc->set_texture_bank_tag(0, m_cgboard_bank[0]);
+	m_konppc->set_texture_bank_tag(1, m_cgboard_bank[1]);
 	m_konppc->set_num_boards(2);
-	m_konppc->set_cbboard_type(konppc_device::CGBOARD_TYPE_HANGPLT);
+	m_konppc->set_cgboard_type(konppc_device::CGBOARD_TYPE_HANGPLT);
 }
 
 /*************************************************************************/
@@ -1348,7 +1351,7 @@ ROM_START( hangplt ) // Japan version JAB
 	ROM_LOAD( "685a09.9s", 0x000000, 0x400000, CRC(b8ae40aa) SHA1(eee27a8929e0e805f1045fd9638e661b36a1e3c7) )
 	ROM_LOAD( "685a10.7s", 0x400000, 0x400000, CRC(fef3dc36) SHA1(566c7469fc452b5965a31fa42291082ec8e48a24) )
 
-	ROM_REGION(0x800000, "master_cgboard", 0)    // texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)    // texture roms
 	ROM_LOAD32_WORD( "685a13.4w",  0x000002, 0x400000, CRC(06329af4) SHA1(76cad9db604751ce48bb67bfd29e57bac0ee9a16) )
 	ROM_LOAD32_WORD( "685a14.12w", 0x000000, 0x400000, CRC(87437739) SHA1(0d45637af40938a54d5efd29c125b0fafd55f9a4) )
 
@@ -1374,7 +1377,7 @@ ROM_START( hangpltu ) // USA version UAA
 	ROM_LOAD( "685a09.9s", 0x000000, 0x400000, CRC(b8ae40aa) SHA1(eee27a8929e0e805f1045fd9638e661b36a1e3c7) )
 	ROM_LOAD( "685a10.7s", 0x400000, 0x400000, CRC(fef3dc36) SHA1(566c7469fc452b5965a31fa42291082ec8e48a24) )
 
-	ROM_REGION(0x800000, "master_cgboard", 0)    // texture roms
+	ROM_REGION(0x1000000, "cgboard_0", ROMREGION_ERASE00)    // texture roms
 	ROM_LOAD32_WORD( "685a13.4w",  0x000002, 0x400000, CRC(06329af4) SHA1(76cad9db604751ce48bb67bfd29e57bac0ee9a16) )
 	ROM_LOAD32_WORD( "685a14.12w", 0x000000, 0x400000, CRC(87437739) SHA1(0d45637af40938a54d5efd29c125b0fafd55f9a4) )
 
@@ -1390,8 +1393,8 @@ void gticlub_state::init_gticlub()
 
 void hangplt_state::init_hangplt_common()
 {
-	m_konppc->set_cgboard_texture_bank(0, "master_cgboard_bank", memregion("master_cgboard")->base());
-	m_konppc->set_cgboard_texture_bank(1, "slave_cgboard_bank", memregion("master_cgboard")->base());
+	m_cgboard_bank[0]->configure_entries(0, 2, memregion("cgboard_0")->base(), 0x800000);
+	m_cgboard_bank[1]->configure_entries(0, 2, memregion("cgboard_0")->base(), 0x800000);
 }
 
 void hangplt_state::init_hangplt() //fixme: remove hacks and actually emulate the step lock. Possibly similar to Alpine Racer 1/2 and Alpine Surfer?

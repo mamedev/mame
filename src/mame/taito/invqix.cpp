@@ -158,7 +158,7 @@ private:
 
 	void vctl_w(uint16_t data);
 
-	void invqix_prg_map(address_map &map) ATTR_COLD;
+	void prg_map(address_map &map) ATTR_COLD;
 
 	// devices
 	required_device<h8s2394_device> m_maincpu;
@@ -182,41 +182,19 @@ uint32_t invqix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 		return 0;
 	}
 
-	if (m_vctl == 0x0000)
+	if ((m_vctl & 0xfffe) == 0x0000)
 	{
-		for(int y=0;y<256;y++)
+		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
-			for(int x=0;x<256;x++)
+			uint16_t const *const src = &m_vram[((BIT(m_vctl, 0) ? (255 - y) : y) << 8)];
+			uint32_t *const dst = &bitmap.pix(y);
+			for (int x = cliprect.left(); x <= cliprect.right(); x++)
 			{
-				int pen_data = (m_vram[(x+y*256)]);
-				uint8_t b = (pen_data & 0x001f);
-				uint8_t g = (pen_data & 0x03e0) >> 5;
-				uint8_t r = (pen_data & 0x7c00) >> 10;
-				r = (r << 3) | (r & 0x7);
-				g = (g << 3) | (g & 0x7);
-				b = (b << 3) | (b & 0x7);
-
-				if(cliprect.contains(x, y))
-					bitmap.pix(y, x) = r << 16 | g << 8 | b;
-			}
-		}
-	}
-	else if (m_vctl == 0x0001)  // flip
-	{
-		for(int y=0;y<256;y++)
-		{
-			for(int x=0;x<256;x++)
-			{
-				int pen_data = (m_vram[(256-x)+((256-y)*256)]);
-				uint8_t b = (pen_data & 0x001f);
-				uint8_t g = (pen_data & 0x03e0) >> 5;
-				uint8_t r = (pen_data & 0x7c00) >> 10;
-				r = (r << 3) | (r & 0x7);
-				g = (g << 3) | (g & 0x7);
-				b = (b << 3) | (b & 0x7);
-
-				if(cliprect.contains(x, y))
-					bitmap.pix(y, x) = r << 16 | g << 8 | b;
+				uint16_t const pen_data = src[BIT(m_vctl, 0) ? (255 - x) : x];
+				uint8_t const b = pal5bit(pen_data & 0x001f);
+				uint8_t const g = pal5bit((pen_data & 0x03e0) >> 5);
+				uint8_t const r = pal5bit((pen_data & 0x7c00) >> 10);
+				dst[x] = (r << 16) | (g << 8) | b;
 			}
 		}
 	}
@@ -235,9 +213,9 @@ uint8_t invqix_state::port3_r()
 
 void invqix_state::port3_w(uint8_t data)
 {
-	m_eeprom->cs_write((data >> 2) & 1);
-	m_eeprom->di_write((data >> 4) & 1);
-	m_eeprom->clk_write((data >> 3) & 1);
+	m_eeprom->cs_write(BIT(data, 2));
+	m_eeprom->di_write(BIT(data, 4));
+	m_eeprom->clk_write(BIT(data, 3));
 }
 
 uint8_t invqix_state::port5_r()
@@ -273,14 +251,14 @@ void invqix_state::vctl_w(uint16_t data)
 	m_vctl = data;
 }
 
-void invqix_state::invqix_prg_map(address_map &map)
+void invqix_state::prg_map(address_map &map)
 {
 	map(0x000000, 0x1fffff).rom().region("program", 0);
 	map(0x200000, 0x21ffff).ram();
 	map(0x400001, 0x400001).w("oki", FUNC(okim9810_device::tmp_register_w));
 	map(0x400000, 0x400000).w("oki", FUNC(okim9810_device::write));
 	map(0x400002, 0x400002).r("oki", FUNC(okim9810_device::read));
-	map(0x600000, 0x61ffff).ram().share("vram");
+	map(0x600000, 0x61ffff).ram().share(m_vram);
 	map(0x620004, 0x620005).w(FUNC(invqix_state::vctl_w));
 }
 
@@ -319,7 +297,7 @@ INPUT_PORTS_END
 void invqix_state::invqix(machine_config &config)
 {
 	H8S2394(config, m_maincpu, XTAL(20'000'000));
-	m_maincpu->set_addrmap(AS_PROGRAM, &invqix_state::invqix_prg_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &invqix_state::prg_map);
 	m_maincpu->set_vblank_int("screen", FUNC(invqix_state::irq1_line_hold));
 	m_maincpu->set_periodic_int(FUNC(invqix_state::irq0_line_hold), attotime::from_hz(60));
 	m_maincpu->read_port1().set_ioport("P1");
@@ -343,8 +321,6 @@ void invqix_state::invqix(machine_config &config)
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 256-1, 0, 240-1);
 
-	PALETTE(config, "palette").set_entries(65536);
-
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
@@ -357,7 +333,7 @@ void invqix_state::invqix(machine_config &config)
 
 ROM_START( invqix )
 	ROM_REGION16_BE(0x200000, "program", 0)
-	ROM_LOAD16_WORD_SWAP( "f34-02.ic2",   0x000000, 0x200000, CRC(035ace40) SHA1(e61f180024102c7a136b1c7f974c71e5dc698a1e) )
+	ROM_LOAD16_WORD_SWAP( "f34-02.ic2",   0x000000, 0x200000, CRC(035ace40) SHA1(e61f180024102c7a136b1c7f974c71e5dc698a1e) ) // VER 2.03 2003/10/25 18:15
 
 	ROM_REGION(0x1000000, "oki", 0)
 	ROM_LOAD( "f34-01.ic13",  0x000000, 0x200000, CRC(7b055722) SHA1(8152bf04a58de15aefc4244e40733275e21818e1) ) /* Can also be labeled F34-03 based on ROM chip type */

@@ -129,17 +129,45 @@ public:
   //! Resets vector element type to none.
   ASMJIT_INLINE_NODEBUG void resetElementType() noexcept { _signature.setField<kSignatureRegElementTypeMask>(0); }
 
-  ASMJIT_INLINE_NODEBUG constexpr bool isVecB8() const noexcept { return _signature.subset(kBaseSignatureMask | kSignatureRegElementTypeMask) == (RegTraits<RegType::kARM_VecD>::kSignature | kSignatureElementB); }
-  ASMJIT_INLINE_NODEBUG constexpr bool isVecH4() const noexcept { return _signature.subset(kBaseSignatureMask | kSignatureRegElementTypeMask) == (RegTraits<RegType::kARM_VecD>::kSignature | kSignatureElementH); }
-  ASMJIT_INLINE_NODEBUG constexpr bool isVecS2() const noexcept { return _signature.subset(kBaseSignatureMask | kSignatureRegElementTypeMask) == (RegTraits<RegType::kARM_VecD>::kSignature | kSignatureElementS); }
-  ASMJIT_INLINE_NODEBUG constexpr bool isVecD1() const noexcept { return _signature.subset(kBaseSignatureMask | kSignatureRegElementTypeMask) == (RegTraits<RegType::kARM_VecD>::kSignature); }
+  ASMJIT_INLINE_NODEBUG constexpr bool isVecB8() const noexcept {
+    return _signature.subset(uint32_t(kBaseSignatureMask) | uint32_t(kSignatureRegElementTypeMask)) == (RegTraits<RegType::kARM_VecD>::kSignature | kSignatureElementB);
+  }
 
-  ASMJIT_INLINE_NODEBUG constexpr bool isVecB16() const noexcept { return _signature.subset(kBaseSignatureMask | kSignatureRegElementTypeMask) == (RegTraits<RegType::kARM_VecV>::kSignature | kSignatureElementB); }
-  ASMJIT_INLINE_NODEBUG constexpr bool isVecH8() const noexcept { return _signature.subset(kBaseSignatureMask | kSignatureRegElementTypeMask) == (RegTraits<RegType::kARM_VecV>::kSignature | kSignatureElementH); }
-  ASMJIT_INLINE_NODEBUG constexpr bool isVecS4() const noexcept { return _signature.subset(kBaseSignatureMask | kSignatureRegElementTypeMask) == (RegTraits<RegType::kARM_VecV>::kSignature | kSignatureElementS); }
-  ASMJIT_INLINE_NODEBUG constexpr bool isVecD2() const noexcept { return _signature.subset(kBaseSignatureMask | kSignatureRegElementTypeMask) == (RegTraits<RegType::kARM_VecV>::kSignature | kSignatureElementD); }
-  ASMJIT_INLINE_NODEBUG constexpr bool isVecB4x4() const noexcept { return _signature.subset(kBaseSignatureMask | kSignatureRegElementTypeMask) == (RegTraits<RegType::kARM_VecV>::kSignature | kSignatureElementB4); }
-  ASMJIT_INLINE_NODEBUG constexpr bool isVecH2x4() const noexcept { return _signature.subset(kBaseSignatureMask | kSignatureRegElementTypeMask) == (RegTraits<RegType::kARM_VecV>::kSignature | kSignatureElementH2); }
+  ASMJIT_INLINE_NODEBUG constexpr bool isVecH4() const noexcept {
+    return _signature.subset(uint32_t(kBaseSignatureMask) | uint32_t(kSignatureRegElementTypeMask)) == (RegTraits<RegType::kARM_VecD>::kSignature | kSignatureElementH);
+  }
+
+  ASMJIT_INLINE_NODEBUG constexpr bool isVecS2() const noexcept {
+    return _signature.subset(uint32_t(kBaseSignatureMask) | uint32_t(kSignatureRegElementTypeMask)) == (RegTraits<RegType::kARM_VecD>::kSignature | kSignatureElementS);
+  }
+
+  ASMJIT_INLINE_NODEBUG constexpr bool isVecD1() const noexcept {
+    return _signature.subset(uint32_t(kBaseSignatureMask) | uint32_t(kSignatureRegElementTypeMask)) == (RegTraits<RegType::kARM_VecD>::kSignature);
+  }
+
+  ASMJIT_INLINE_NODEBUG constexpr bool isVecB16() const noexcept {
+    return _signature.subset(uint32_t(kBaseSignatureMask) | uint32_t(kSignatureRegElementTypeMask)) == (RegTraits<RegType::kARM_VecV>::kSignature | kSignatureElementB);
+  }
+
+  ASMJIT_INLINE_NODEBUG constexpr bool isVecH8() const noexcept {
+    return _signature.subset(uint32_t(kBaseSignatureMask) | uint32_t(kSignatureRegElementTypeMask)) == (RegTraits<RegType::kARM_VecV>::kSignature | kSignatureElementH);
+  }
+
+  ASMJIT_INLINE_NODEBUG constexpr bool isVecS4() const noexcept {
+    return _signature.subset(uint32_t(kBaseSignatureMask) | uint32_t(kSignatureRegElementTypeMask)) == (RegTraits<RegType::kARM_VecV>::kSignature | kSignatureElementS);
+  }
+
+  ASMJIT_INLINE_NODEBUG constexpr bool isVecD2() const noexcept {
+    return _signature.subset(uint32_t(kBaseSignatureMask) | uint32_t(kSignatureRegElementTypeMask)) == (RegTraits<RegType::kARM_VecV>::kSignature | kSignatureElementD);
+  }
+
+  ASMJIT_INLINE_NODEBUG constexpr bool isVecB4x4() const noexcept {
+    return _signature.subset(uint32_t(kBaseSignatureMask) | uint32_t(kSignatureRegElementTypeMask)) == (RegTraits<RegType::kARM_VecV>::kSignature | kSignatureElementB4);
+  }
+
+  ASMJIT_INLINE_NODEBUG constexpr bool isVecH2x4() const noexcept {
+    return _signature.subset(uint32_t(kBaseSignatureMask) | uint32_t(kSignatureRegElementTypeMask)) == (RegTraits<RegType::kARM_VecV>::kSignature | kSignatureElementH2);
+  }
 
   //! Creates a cloned register with element access.
   ASMJIT_INLINE_NODEBUG Vec at(uint32_t elementIndex) const noexcept {

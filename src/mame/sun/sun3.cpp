@@ -1049,7 +1049,7 @@ void sun3_state::sun3(machine_config &config)
 
 	TIMER(config, "timer").configure_periodic(FUNC(sun3_state::sun3_timer), attotime::from_hz(100));
 
-	SCC8530N(config, m_scc1, 4.9152_MHz_XTAL);
+	SCC8530(config, m_scc1, 4.9152_MHz_XTAL);
 	m_scc1->out_txda_callback().set(KEYBOARD_TAG, FUNC(sun_keyboard_port_device::write_txd));
 	m_scc1->out_txdb_callback().set(MOUSE_TAG, FUNC(sun_mouse_port_device::write_txd));
 
@@ -1057,7 +1057,7 @@ void sun3_state::sun3(machine_config &config)
 
 	SUNMOUSE_PORT(config, MOUSE_TAG, default_sun_mouse_devices, "hle1200").rxd_handler().set(m_scc1, FUNC(z80scc_device::rxb_w));
 
-	SCC8530N(config, m_scc2, 4.9152_MHz_XTAL);
+	SCC8530(config, m_scc2, 4.9152_MHz_XTAL);
 	m_scc2->out_txda_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_txd));
 	m_scc2->out_txdb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_txd));
 
@@ -1157,7 +1157,7 @@ void sun3_state::sun3_50(machine_config &config)
 	// MMU Type 3 device space
 	ADDRESS_MAP_BANK(config, "type3").set_map(&sun3_state::vmetype3space_map).set_options(ENDIANNESS_BIG, 32, 32, 0x80000000);
 
-	SCC8530N(config, m_scc1, 4.9152_MHz_XTAL);
+	SCC8530(config, m_scc1, 4.9152_MHz_XTAL);
 	m_scc1->out_txda_callback().set(KEYBOARD_TAG, FUNC(sun_keyboard_port_device::write_txd));
 	m_scc1->out_txdb_callback().set(MOUSE_TAG, FUNC(sun_mouse_port_device::write_txd));
 
@@ -1165,7 +1165,7 @@ void sun3_state::sun3_50(machine_config &config)
 
 	SUNMOUSE_PORT(config, MOUSE_TAG, default_sun_mouse_devices, "hle1200").rxd_handler().set(m_scc1, FUNC(z80scc_device::rxb_w));
 
-	SCC8530N(config, m_scc2, 4.9152_MHz_XTAL);
+	SCC8530(config, m_scc2, 4.9152_MHz_XTAL);
 	m_scc2->out_txda_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_txd));
 	m_scc2->out_txdb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_txd));
 

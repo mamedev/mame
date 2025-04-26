@@ -245,6 +245,7 @@ consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
 		// add the settings menu
 		HMENU const settingsmenu = CreatePopupMenu();
 		AppendMenu(settingsmenu, MF_ENABLED, ID_SAVE_WINDOWS, TEXT("Save Window Arrangement"));
+		AppendMenu(settingsmenu, MF_ENABLED, ID_GROUP_WINDOWS, TEXT("Group Debugger Windows (requires restart)"));
 		AppendMenu(settingsmenu, MF_DISABLED | MF_SEPARATOR, 0, TEXT(""));
 		AppendMenu(settingsmenu, MF_ENABLED, ID_LIGHT_BACKGROUND, TEXT("Light Background"));
 		AppendMenu(settingsmenu, MF_ENABLED, ID_DARK_BACKGROUND, TEXT("Dark Background"));
@@ -449,6 +450,7 @@ void consolewin_info::update_menu()
 
 	HMENU const menu = GetMenu(window());
 	CheckMenuItem(menu, ID_SAVE_WINDOWS, MF_BYCOMMAND | (debugger().get_save_window_arrangement() ? MF_CHECKED : MF_UNCHECKED));
+	CheckMenuItem(menu, ID_GROUP_WINDOWS, MF_BYCOMMAND | (debugger().get_group_windows_setting() ? MF_CHECKED : MF_UNCHECKED));
 	CheckMenuItem(menu, ID_LIGHT_BACKGROUND, MF_BYCOMMAND | ((ui_metrics::THEME_LIGHT_BACKGROUND == metrics().get_color_theme()) ? MF_CHECKED : MF_UNCHECKED));
 	CheckMenuItem(menu, ID_DARK_BACKGROUND, MF_BYCOMMAND | ((ui_metrics::THEME_DARK_BACKGROUND == metrics().get_color_theme()) ? MF_CHECKED : MF_UNCHECKED));
 }
@@ -517,6 +519,9 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 		{
 		case ID_SAVE_WINDOWS:
 			debugger().set_save_window_arrangement(!debugger().get_save_window_arrangement());
+			return true;
+		case ID_GROUP_WINDOWS:
+			debugger().set_group_windows_setting(!debugger().get_group_windows_setting());
 			return true;
 		case ID_LIGHT_BACKGROUND:
 			debugger().set_color_theme(ui_metrics::THEME_LIGHT_BACKGROUND);

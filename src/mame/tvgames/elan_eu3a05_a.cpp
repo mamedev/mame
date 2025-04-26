@@ -330,7 +330,8 @@ uint8_t elan_eu3a05_sound_device::elan_eu3a05_50a8_r()
 	m_stream->update();
 
 	LOGMASKED( LOG_AUDIO, "%s: elan_eu3a05_50a8_r\n", machine().describe_context());
-	return m_isstopped;
+	// batvgc checks bit 0x80
+	return m_isstopped | 0xc0;
 }
 
 uint8_t elan_eu3a05_sound_device::elan_eu3a05_sound_volume_r(offs_t offset)

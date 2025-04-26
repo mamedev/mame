@@ -9,9 +9,13 @@
 #include "emu.h"
 #include "t6a84.h"
 
-#define LOG_PAGE_R (1U << 1)
-#define LOG_PAGE_W (1U << 2)
-#define LOG_MEM    (1U << 3)
+#include "z80.inc"
+
+#define LOG_INT    (1U << 1) // z80.lst
+#define LOG_UNDOC  (1U << 2)
+#define LOG_PAGE_R (1U << 3)
+#define LOG_PAGE_W (1U << 4)
+#define LOG_MEM    (1U << 5)
 
 //#define VERBOSE (LOG_PAGE_R | LOG_PAGE_W | LOG_MEM)
 #include "logmacro.h"
@@ -46,34 +50,46 @@ t6a84_device::t6a84_device(const machine_config &mconfig, device_type type, cons
 	, m_stack_page(8)
 	, m_vector_page(0)
 {
-	// Interrupt vectors need to be fetched and executed from their corresponding page.
-	// For simplicity, we switch pages via callbacks, instead of using a dedicated address space.
-	irqfetch_cb().set([this](int state) {
-		LOGMASKED(LOG_PAGE_W, "IRQ FETCH %02x => %02x\n", m_code_page, m_vector_page);
-		m_prev_code_page = m_code_page;
-		m_code_page = m_vector_page;
-	});
-	reti_cb().set([this](int state) {
-		LOGMASKED(LOG_PAGE_W, "IRQ RET %02x => %02x\n", m_code_page, m_prev_code_page);
-		m_code_page = m_prev_code_page;
-	});
-	branch_cb().set([this](int state) {
-		LOGMASKED(LOG_PAGE_W, "BRANCH %02x => %02x\n", m_code_page, m_prev_code_page);
-		/*
-		    When setting a code page, it only becomes effective after jumping to a far address in that page.
-		    Any instructions fetched and executed before that jump still use the previous code page.
-		    This can be seen in Sega Ferie Kitten, when test program at page 7 gets mapped, as we are still
-		    executing on page 0, but we expect to start executing that program when jumping to RST0:
+}
 
-		    ROM_00::1ea9 3e 07      LD   A,0x7
-		    ROM_00::1eab d3 fe      OUT  (DAT_io_00fe),A
-		    ROM_00::1ead c3 00 00   JP   RST0
-		*/
-		if (!machine().side_effects_disabled() && m_is_delay_code_page_set) {
-			m_code_page = m_delay_code_page;
-			m_is_delay_code_page_set = false;
-		}
-	});
+// Interrupt vectors need to be fetched and executed from their corresponding page.
+// For simplicity, we switch pages via callbacks, instead of using a dedicated address space.
+// TODO: Find a better way to solve this, at least these hacks are isolated to t6a84.cpp for now.
+void t6a84_device::paged_irqfetch()
+{
+	LOGMASKED(LOG_PAGE_W, "IRQ FETCH %02x => %02x\n", m_code_page, m_vector_page);
+	m_prev_code_page = m_code_page;
+	m_code_page = m_vector_page;
+}
+
+void t6a84_device::paged_reti()
+{
+	LOGMASKED(LOG_PAGE_W, "IRQ RET %02x => %02x\n", m_code_page, m_prev_code_page);
+	m_code_page = m_prev_code_page;
+}
+
+void t6a84_device::paged_jump()
+{
+	/*
+	    When setting a code page, it only becomes effective after jumping to a far address in that page.
+	    Any instructions fetched and executed before that jump still use the previous code page.
+	    This can be seen in Sega Ferie Kitten, when test program at page 7 gets mapped, as we are still
+	    executing on page 0, but we expect to start executing that program when jumping to RST0:
+
+	    ROM_00::1ea9 3e 07      LD   A,0x7
+	    ROM_00::1eab d3 fe      OUT  (DAT_io_00fe),A
+	    ROM_00::1ead c3 00 00   JP   RST0
+	*/
+	if (!machine().side_effects_disabled() && m_is_delay_code_page_set) {
+		LOGMASKED(LOG_PAGE_W, "BRANCH %02x => %02x\n", m_code_page, m_prev_code_page);
+		m_code_page = m_delay_code_page;
+		m_is_delay_code_page_set = false;
+	}
+}
+
+void t6a84_device::execute_run()
+{
+	#include "cpu/z80/t6a84.hxx"
 }
 
 void t6a84_device::device_start()
@@ -163,12 +179,12 @@ uint32_t t6a84_device::stack_address(uint16_t address)
 
 uint8_t t6a84_device::stack_read(uint16_t addr)
 {
-	return m_stack.read_byte(translate_memory_address(addr));
+	return m_stack.read_byte(addr);
 }
 
 void t6a84_device::stack_write(uint16_t addr, uint8_t value)
 {
-	m_stack.write_byte(translate_memory_address((uint32_t) addr), value);
+	m_stack.write_byte(addr, value);
 }
 
 uint8_t t6a84_device::data_page_r()

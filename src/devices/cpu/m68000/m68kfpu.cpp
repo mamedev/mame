@@ -727,7 +727,7 @@ u64 m68000_musashi_device::READ_EA_64(int ea)
 	return 0;
 }
 
-extFloat80_t m68000_musashi_device::READ_EA_FPE(int mode, int reg, uint32_t di_mode_ea)
+extFloat80_t m68000_musashi_device::READ_EA_FPE(int mode, int reg, uint32_t offset)
 {
 	extFloat80_t fpr;
 
@@ -736,7 +736,7 @@ extFloat80_t m68000_musashi_device::READ_EA_FPE(int mode, int reg, uint32_t di_m
 		case 2:     // (An)
 		{
 			u32 ea = REG_A()[reg];
-			fpr = load_extended_float80(ea);
+			fpr = load_extended_float80(ea + offset);
 			break;
 		}
 
@@ -756,14 +756,20 @@ extFloat80_t m68000_musashi_device::READ_EA_FPE(int mode, int reg, uint32_t di_m
 		}
 		case 5:     // (d16, An)
 		{
-			fpr = load_extended_float80(di_mode_ea);
+			u32 ea = REG_A()[reg];
+			fpr = load_extended_float80(ea + offset);
 			break;
 		}
+#if 0
+		// FIXME: this addressing mode is broken, and fixing it so it works properly
+		// for FMOVEM is quite challenging; disabling it for now.
 		case 6:     // (An) + (Xn) + d8
 		{
-			fpr = load_extended_float80(di_mode_ea);
+			u32 ea = REG_A()[reg];
+			fpr = load_extended_float80(ea + offset);
 			break;
 		}
+#endif
 
 		case 7: // extended modes
 		{
@@ -1147,22 +1153,20 @@ void m68000_musashi_device::WRITE_EA_64(int ea, u64 data)
 	}
 }
 
-void m68000_musashi_device::WRITE_EA_FPE(int mode, int reg, extFloat80_t fpr, uint32_t di_mode_ea)
+void m68000_musashi_device::WRITE_EA_FPE(int mode, int reg, extFloat80_t fpr, uint32_t offset)
 {
 	switch (mode)
 	{
 		case 2:     // (An)
 		{
-			u32 ea;
-			ea = REG_A()[reg];
-			store_extended_float80(ea, fpr);
+			u32 ea = REG_A()[reg];
+			store_extended_float80(ea + offset, fpr);
 			break;
 		}
 
 		case 3:     // (An)+
 		{
-			u32 ea;
-			ea = REG_A()[reg];
+			u32 ea = REG_A()[reg];
 			store_extended_float80(ea, fpr);
 			REG_A()[reg] += 12;
 			break;
@@ -1170,18 +1174,16 @@ void m68000_musashi_device::WRITE_EA_FPE(int mode, int reg, extFloat80_t fpr, ui
 
 		case 4:     // -(An)
 		{
-			u32 ea;
 			REG_A()[reg] -= 12;
-			ea = REG_A()[reg];
+			u32 ea = REG_A()[reg];
 			store_extended_float80(ea, fpr);
 			break;
 		}
 
 		case 5:     // (d16,An)
 		{
-			// EA_AY_DI_32() should not be done here because fmovem would increase
-			// PC each time, reading incorrect displacement & advancing PC too much.
-			store_extended_float80(di_mode_ea, fpr);
+			u32 ea = REG_A()[reg];
+			store_extended_float80(ea + offset, fpr);
 			break;
 		}
 
@@ -1272,8 +1274,8 @@ void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 			{
 				int imode = (ea >> 3) & 0x7;
 				int reg = (ea & 0x7);
-				uint32_t di_mode_ea = imode == 5 ? (REG_A()[reg] + MAKE_INT_16(m68ki_read_imm_16())) : 0;
-				source = READ_EA_FPE(imode, reg, di_mode_ea);
+				uint32_t offset = (imode == 5) ? MAKE_INT_16(m68ki_read_imm_16()) : 0;
+				source = READ_EA_FPE(imode, reg, offset);
 				break;
 			}
 			case 3:     // Packed-decimal Real
@@ -1810,9 +1812,9 @@ void m68000_musashi_device::fmove_reg_mem(u16 w2)
 		{
 			int mode = (ea >> 3) & 0x7;
 			int reg = (ea & 0x7);
-			uint32_t di_mode_ea = mode == 5 ? (REG_A()[reg] + MAKE_INT_16(m68ki_read_imm_16())) : 0;
+			uint32_t offset = (mode == 5) ? MAKE_INT_16(m68ki_read_imm_16()) : 0;
 
-			WRITE_EA_FPE(mode, reg, m_fpr[src], di_mode_ea);
+			WRITE_EA_FPE(mode, reg, m_fpr[src], offset);
 			break;
 		}
 		case 3:     // Packed-decimal Real with Static K-factor
@@ -2052,11 +2054,10 @@ void m68000_musashi_device::fmovem(u16 w2)
 	{
 		switch (mode)
 		{
-			case 1: // Dynamic register list, postincrement or control addressing mode.
-				// FIXME: not really tested, but seems to work
+			case 1: // dynamic register list, predecrement addressing mode
 				reglist = REG_D()[(reglist >> 4) & 7];
 				[[fallthrough]];
-			case 0:     // Static register list, predecrement or control addressing mode
+			case 0: // static register list, predecrement addressing mode
 			{
 				// the "di_mode_ea" parameter kludge is required here else WRITE_EA_FPE would have
 				// to call EA_AY_DI_32() (that advances PC & reads displacement) each time
@@ -2064,18 +2065,14 @@ void m68000_musashi_device::fmovem(u16 w2)
 				// this forces to pre-read the mode (named "imode") so we can decide to read displacement, only once
 				int imode = (ea >> 3) & 0x7;
 				int reg = (ea & 0x7);
-				int di_mode = imode == 5;
-				uint32_t di_mode_ea = di_mode ? (REG_A()[reg] + MAKE_INT_16(m68ki_read_imm_16())) : 0;
+				uint32_t offset = (imode == 5) ? MAKE_INT_16(m68ki_read_imm_16()) : 0;
 
 				for (i=0; i < 8; i++)
 				{
 					if (reglist & (1 << i))
 					{
-						WRITE_EA_FPE(imode, reg, m_fpr[i], di_mode_ea);
-						if (di_mode)
-						{
-							di_mode_ea += 12;
-						}
+						WRITE_EA_FPE(imode, reg, m_fpr[i], offset);
+						offset += 12;
 
 						m_icount -= 2;
 					}
@@ -2083,27 +2080,21 @@ void m68000_musashi_device::fmovem(u16 w2)
 				break;
 			}
 
-			case 3: // Dynamic register list, postincrement or control addressing mode.
-				// FIXME: not really tested, but seems to work
+			case 3: // dynamic register list, postincrement or control addressing mode
 				reglist = REG_D()[(reglist >> 4) & 7];
 				[[fallthrough]];
-			case 2:     // Static register list, postdecrement or control addressing mode
+			case 2: // static register list, postincrement or control addressing mode
 			{
 				int imode = (ea >> 3) & 0x7;
 				int reg = (ea & 0x7);
-				int di_mode = imode == 5;
-
-				uint32_t di_mode_ea = di_mode ? (REG_A()[reg] + MAKE_INT_16(m68ki_read_imm_16())) : 0;
+				uint32_t offset = (imode == 5) ? MAKE_INT_16(m68ki_read_imm_16()) : 0;
 
 				for (i=0; i < 8; i++)
 				{
 					if (reglist & (1 << i))
 					{
-						WRITE_EA_FPE(imode, reg, m_fpr[7 - i], di_mode_ea);
-						if (di_mode)
-						{
-							di_mode_ea += 12;
-						}
+						WRITE_EA_FPE(imode, reg, m_fpr[7 - i], offset);
+						offset += 12;
 
 						m_icount -= 2;
 					}
@@ -2118,26 +2109,22 @@ void m68000_musashi_device::fmovem(u16 w2)
 	{
 		switch (mode)
 		{
-			case 3: // Dynamic register list, predecrement addressing mode.
+			case 3: // dynamic register list, postincrement or control addressing mode
 				// FIXME: not really tested, but seems to work
 				reglist = REG_D()[(reglist >> 4) & 7];
 				[[fallthrough]];
-			case 2:     // Static register list, postincrement or control addressing mode
+			case 2: // static register list, postincrement or control addressing mode
 			{
 				int imode = (ea >> 3) & 0x7;
 				int reg = (ea & 0x7);
-				int di_mode = imode == 5;
-				uint32_t di_mode_ea = di_mode ? (REG_A()[reg] + MAKE_INT_16(m68ki_read_imm_16())) : 0;
+				uint32_t offset = (imode == 5) ? MAKE_INT_16(m68ki_read_imm_16()) : 0;
 
 				for (i=0; i < 8; i++)
 				{
 					if (reglist & (1 << i))
 					{
-						m_fpr[7 - i] = READ_EA_FPE(imode, reg, di_mode_ea);
-						if (di_mode)
-						{
-							di_mode_ea += 12;
-						}
+						m_fpr[7 - i] = READ_EA_FPE(imode, reg, offset);
+						offset += 12;
 
 						m_icount -= 2;
 					}

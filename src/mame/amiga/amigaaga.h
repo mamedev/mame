@@ -5,6 +5,4 @@
 
 #pragma once
 
-void amiga_aga_palette_write(running_machine &machine, int color_reg, uint16_t data);
-
 #endif // MAME_AMIGA_AMIGAAGA_H

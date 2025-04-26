@@ -51,7 +51,6 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/ldp1450.h"
 #include "machine/nvram.h"
-#include "machine/amigafdc.h"
 #include "speaker.h"
 
 
@@ -341,7 +340,7 @@ void alg_state::alg_r1(machine_config &config)
 	// Video hardware
 	ntsc_video(config);
 
-	AMIGA_COPPER(config, m_copper, amiga_state::CLK_7M_NTSC);
+	AGNUS_COPPER(config, m_copper, amiga_state::CLK_7M_NTSC);
 	m_copper->set_host_cpu_tag(m_maincpu);
 	m_copper->mem_read_cb().set(FUNC(amiga_state::chip_ram_r));
 	m_copper->set_ecs_mode(false);
@@ -380,7 +379,7 @@ void alg_state::alg_r1(machine_config &config)
 	MOS8520(config, m_cia_1, amiga_state::CLK_E_NTSC);
 	m_cia_1->irq_wr_callback().set(FUNC(amiga_state::cia_1_irq));
 
-	AMIGA_FDC(config, m_fdc, amiga_state::CLK_7M_NTSC);
+	PAULA_FDC(config, m_fdc, amiga_state::CLK_7M_NTSC);
 	m_fdc->index_callback().set("cia_1", FUNC(mos8520_device::flag_w));
 	m_fdc->read_dma_callback().set(FUNC(amiga_state::chip_ram_r));
 	m_fdc->write_dma_callback().set(FUNC(amiga_state::chip_ram_w));

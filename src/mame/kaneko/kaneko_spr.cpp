@@ -93,7 +93,7 @@ void kaneko_vu002_sprite_device::device_start()
 
 
 /*
-    16x16x8 made of 4 8x8x8 blocks arrenged like:   01
+    16x16x8 made of 4 8x8x8 blocks arranged like:   01
                                                     23
 */
 static gfx_layout layout_16x16x8 =

@@ -1848,10 +1848,10 @@ void dec0_state::dec0(machine_config &config)
 
 	ym3812_device &ym2(YM3812(config, "ym2", XTAL(12'000'000) / 4));
 	ym2.irq_handler().set("audio_irq", FUNC(input_merger_device::in_w<1>));
-	ym2.add_route(ALL_OUTPUTS, "mono", 0.72);
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.32);
 
 	okim6295_device &oki(OKIM6295(config, "oki", XTAL(20'000'000) / 2 / 10, okim6295_device::PIN7_HIGH));
-	oki.add_route(ALL_OUTPUTS, "mono", 0.72);
+	oki.add_route(ALL_OUTPUTS, "mono", 0.66);
 }
 
 
@@ -1877,7 +1877,7 @@ void dec0_state::dec1(machine_config &config)
 
 	ym3812_device &ym2(YM3812(config, "ym2", XTAL(12'000'000)/4)); /* verified on pcb */
 	ym2.irq_handler().set_inputline(m_audiocpu, 1);
-	ym2.add_route(ALL_OUTPUTS, "mono", 0.80);
+	ym2.add_route(ALL_OUTPUTS, "mono", 0.35);
 
 	okim6295_device &oki(OKIM6295(config, "oki", XTAL(12'000'000)/12, okim6295_device::PIN7_HIGH)); /* verified on pcb */
 	oki.add_route(ALL_OUTPUTS, "mono", 0.80);
@@ -2038,7 +2038,7 @@ void automat_state::secretab(machine_config &config) // all clocks verified on P
 	ym2203a.add_route(3, "mono", 0.35);
 
 	ym3812_device &ym3812(YM3812(config, "ym3812", 20_MHz_XTAL / 8));
-	ym3812.add_route(ALL_OUTPUTS, "mono", 0.80);
+	ym3812.add_route(ALL_OUTPUTS, "mono", 0.35);
 
 	LS157(config, m_adpcm_select[0], 0);
 	m_adpcm_select[0]->out_callback().set("msm1", FUNC(msm5205_device::data_w));
@@ -2289,7 +2289,6 @@ void dec0_state::midresb(machine_config &config)
 	M68705R3(config, m_mcu, XTAL(3'579'545));
 
 	subdevice<ym3812_device>("ym2")->irq_handler().set_inputline(m_audiocpu, 0);
-	subdevice<ym3812_device>("ym2")->add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	// bootleg doesn't seem to support row/col scroll (or enable is different)
 //  m_tilegen[0]->disable_16x16();

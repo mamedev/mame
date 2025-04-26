@@ -9,6 +9,11 @@
 
 #pragma once
 
+#include "interface/nethandler.h"
+
+#include <memory>
+#include <vector>
+
 
 //============================================================
 //  CONSTANTS
@@ -20,7 +25,9 @@ class netdev_module
 {
 public:
 	virtual ~netdev_module() = default;
-	// no specific routines below ... may change
+
+	virtual std::unique_ptr<osd::network_device> open_device(int id, osd::network_handler &handler) = 0;
+	virtual std::vector<osd::network_device_info> list_devices() = 0;
 };
 
 #endif // MAME_OSD_NETDEV_NETDEV_MODULE_H

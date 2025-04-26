@@ -478,5 +478,5 @@ void qb3_state::sound_reset()
 void qb3_state::qb3_sound(machine_config &config)
 {
 	demon_sound(config);
-	m_outlatch->q_out_cb<4>().set_nop(); // not mapped through LS259
+	m_outlatch->q_out_cb<4>().remove(); // not mapped through LS259
 }

@@ -2,19 +2,16 @@ README for PortMidi
 
 Roger B. Dannenberg
 
-VERSION: please use "svn info" to get info.
-
 Documentation for PortMidi is found in pm_common/portmidi.h.
+Documentation in HTML is available at portmidi.github.io/portmidi_docs/
 
 Additional documentation:
+  - README.md (overview, how to build, what's new)
   - Windows: see pm_win/README_WIN.txt and pm_win/debugging_dlls.txt
   - Linux: see pm_linux/README_LINUX.txt
   - Mac OSX: see pm_mac/README_MAC.txt
-  - Common Lisp: see pm_cl/README_CL.txt
-  - Eclipse: see portmidi_cdt.zip (this was contributed as is; the dlls here
-        are now -- Sep 09 -- out of date. What is really needed is a script
-        to generate this release automatically so we can maintain it.)
-  - C-Sharp: see pm_csharp.zip (also contributed as is)
+  - Other Languages: look for other repos at github.com/PortMidi,
+        and search README.md for pointers to other projects.
 
 ---------- some notes on the design of PortMidi ----------
 
@@ -82,3 +79,10 @@ abruptly terminate the program.
 
 The Windows version (and perhaps others) also offers a DEBUG
 compile-time option. See README_WIN.txt.
+
+RELEASE
+
+To make a new release, update VERSION variable in CMakeLists.txt.
+
+Update CHANGELOG.txt. What's new?
+

@@ -31,14 +31,6 @@ uint16_t sh4_frontend::read_word(opcode_desc &desc)
 	return m_sh->m_pr16(desc.physpc & SH34_AM);
 }
 
-uint16_t sh4be_frontend::read_word(opcode_desc &desc)
-{
-	if (desc.physpc >= 0xe0000000)
-		return m_sh->m_pr16(desc.physpc);
-
-	return m_sh->m_pr16(desc.physpc & SH34_AM);
-}
-
 
 bool sh4_frontend::describe_group_0(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode)
 {

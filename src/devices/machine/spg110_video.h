@@ -27,58 +27,57 @@ public:
 		m_screen.set_tag(std::forward<U>(screen_tag));
 	}
 
-	void set_video_irq_spidman(bool is_spiderman) { m_is_spiderman = is_spiderman; }
-
 	void map_video(address_map &map) ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vblank(int state);
 
-	void spg110_201c_w(uint16_t data);
-	void spg110_2020_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void vcomp_val_201c_w(uint16_t data);
+	void segment_202x_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	void spg110_2028_w(uint16_t data);
-	void spg110_2029_w(uint16_t data);
+	void adr_mode_2028_w(uint16_t data);
+	void ext_bus_2029_w(uint16_t data);
 
-	uint16_t spg110_2028_r();
-	uint16_t spg110_2029_r();
+	uint16_t adr_mode_2028_r();
+	uint16_t ext_bus_2029_r();
 
-	void spg110_2031_w(uint16_t data);
-	void spg110_2032_w(uint16_t data);
-	void spg110_2033_w(uint16_t data);
-	void spg110_2034_w(uint16_t data);
-	void spg110_2035_w(uint16_t data);
-	void spg110_2036_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void spg110_2037_w(uint16_t data);
-	void spg110_2039_w(uint16_t data);
+	void win_mask_1_2031_w(uint16_t data);
+	void win_mask_2_2032_w(uint16_t data);
+	void win_attribute_w(uint16_t data);
+	void win_mask_3_2034_w(uint16_t data);
+	void win_mask_4_2035_w(uint16_t data);
+	void irq_tm_v_2036_w(uint16_t data);
+	void irq_tm_h_2037_w(uint16_t data);
+	void effect_control_2039_w(uint16_t data);
 
-	void spg110_203c_w(uint16_t data);
-	void spg110_203d_w(uint16_t data);
+	void huereference_203c_w(uint16_t data);
+	void lum_adjust_203d_w(uint16_t data);
 
-	void spg110_2042_w(uint16_t data);
+	void sp_control_2042_w(uint16_t data);
 
 	void spg110_2045_w(uint16_t data);
 
-	void spg110_205x_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void transparent_color_205x_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 
-	uint16_t spg110_2037_r();
-	uint16_t spg110_2042_r();
+	uint16_t irq_tm_h_2037_r();
+	uint16_t sp_control_2042_r();
 
-	void dma_dst_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void dma_unk_2061_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void dma_len_trigger_w(uint16_t data);
+	void dma_dst_2060_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void dma_dst_seg_2061_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void dma_len_trigger_2062_w(uint16_t data);
 	void spg110_2063_w(uint16_t data);
-	void dma_dst_step_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void dma_src_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void dma_unk_2067_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void dma_src_step_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void dma_dst_step_2064_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void dma_source_2066_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void dma_source_seg_2067_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void dma_src_step_2068_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t dma_src_step_2068_r(offs_t offset, uint16_t mem_mask);
 
-	uint16_t dma_len_status_r();
+	uint16_t dma_len_status_2062_r();
 	uint16_t spg110_2063_r();
 
-	uint16_t dma_manual_r();
-	void dma_manual_w(uint16_t data);
+	uint16_t dma_manual_2065_r();
+	void dma_manual_2065_w(uint16_t data);
 
 	uint16_t tmap0_regs_r(offs_t offset);
 	uint16_t tmap1_regs_r(offs_t offset);
@@ -105,9 +104,7 @@ private:
 
 		PAGE_PRIORITY_FLAG_MASK    = 0x3000,
 		PAGE_PRIORITY_FLAG_SHIFT   = 12,
-		PAGE_TILE_HEIGHT_MASK   = 0x00c0,
 		PAGE_TILE_HEIGHT_SHIFT  = 6,
-		PAGE_TILE_WIDTH_MASK    = 0x0030,
 		PAGE_TILE_WIDTH_SHIFT   = 4,
 
 		TILE_X_FLIP             = 0x0004,
@@ -140,21 +137,21 @@ private:
 
 	uint16_t m_dma_src_step;
 	uint16_t m_dma_dst_step;
-	uint16_t m_dma_unk_2061;
-	uint16_t m_dma_src_high;
+	uint16_t m_dma_dst_seg;
+	uint16_t m_dma_src_seg;
 
 	uint16_t m_dma_dst;
 	uint16_t m_dma_src;
 
 	uint16_t m_bg_scrollx;
 	uint16_t m_bg_scrolly;
-	uint16_t m_2036_scroll;
+	uint16_t m_tm_v_2036;
+	uint16_t m_tm_h_2037;
 
-	uint16_t m_tilebase;
+	uint16_t m_tilebase[8];
 
 	uint16_t m_video_irq_enable;
 	uint16_t m_video_irq_status;
-	void check_video_irq();
 
 	void tilemap_write_regs(int which, uint16_t* regs, int regno, uint16_t data);
 
@@ -164,8 +161,28 @@ private:
 	void draw_sprite(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t base_addr);
 	void draw_sprites(const rectangle &cliprect, uint32_t scanline, int priority);
 
+	void update_raster_interrupt_timer();
+
+	TIMER_CALLBACK_MEMBER(screenpos_hit);
+	TIMER_CALLBACK_MEMBER(dma_done);
+
+	void update_video_irqs();
+
+	uint8_t m_blk_irq_enable;
+	uint8_t m_blk_irq_flag;
+
+	uint8_t m_dma_irq_enable;
+	uint8_t m_dma_irq_flag;
+
+	uint8_t m_vdo_irq_enable;
+	uint8_t m_vdo_irq_flag;
+
+	uint8_t m_dma_busy;
+
+	emu_timer *m_screenpos_timer;
+	emu_timer *m_dma_timer;
+
 	uint32_t m_screenbuf[320 * 240];
-	bool m_is_spiderman;
 
 	devcb_write_line m_video_irq_cb;
 };

@@ -662,7 +662,7 @@
         SSI Poker (v4.0)
 
     - Added a list of official/unofficial games, and their states.
-    - Fixed a bug introduced when extended the color PROM region to eliminate colortable lenght.
+    - Fixed a bug introduced when extended the color PROM region to eliminate colortable length.
     - Other changes/fixes.
     - Updated technical notes.
 

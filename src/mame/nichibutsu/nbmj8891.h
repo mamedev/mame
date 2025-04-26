@@ -30,9 +30,9 @@ public:
 	void chinmoku(machine_config &config);
 	void msjiken(machine_config &config);
 	void hnageman(machine_config &config);
-	void mjcamerb(machine_config &config);
+	void mjcamera(machine_config &config);
 	void mjnanpas(machine_config &config);
-	void mmcamera(machine_config &config);
+	void mjcameram(machine_config &config);
 	void pairsnb(machine_config &config);
 	void taiwanmb(machine_config &config);
 	void hanaoji(machine_config &config);

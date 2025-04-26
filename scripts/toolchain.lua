@@ -141,11 +141,6 @@ function toolchain(_buildDir, _subDir)
 		end
 
 		if "linux-gcc" == _OPTIONS["gcc"] then
-			-- Force gcc-4.2 on ubuntu-intrepid
-			if _OPTIONS["distro"]=="ubuntu-intrepid" then
-				premake.gcc.cc   = "@gcc -V 4.2"
-				premake.gcc.cxx  = "@g++-4.2"
-			end
 			premake.gcc.ar  = "ar"
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-linux")
 		end
@@ -163,10 +158,10 @@ function toolchain(_buildDir, _subDir)
 		end
 
 		if "mingw32-gcc" == _OPTIONS["gcc"] then
-			if not os.getenv("MINGW32") then
-				print("Set MINGW32 envrionment variable.")
-			end
 			if toolchainPrefix == nil or toolchainPrefix == "" then
+				if not os.getenv("MINGW32") then
+					print("Set MINGW32 environment variable.")
+				end
 				toolchainPrefix = "$(MINGW32)/bin/i686-w64-mingw32-"
 			end
 			premake.gcc.cc  = toolchainPrefix .. "gcc"
@@ -176,10 +171,10 @@ function toolchain(_buildDir, _subDir)
 		end
 
 		if "mingw64-gcc" == _OPTIONS["gcc"] then
-			if not os.getenv("MINGW64") then
-				print("Set MINGW64 envrionment variable.")
-			end
 			if toolchainPrefix == nil or toolchainPrefix == "" then
+				if not os.getenv("MINGW64") then
+					print("Set MINGW64 environment variable.")
+				end
 				toolchainPrefix = "$(MINGW64)/bin/x86_64-w64-mingw32-"
 			end
 			premake.gcc.cc  = toolchainPrefix .. "gcc"

@@ -578,9 +578,9 @@ static INPUT_PORTS_START( drgnbstr )
 	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "SWA:1" )
 
 	PORT_START("DSWB")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SWB:8") // Does not work?
-	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SWB:8") // When vitality is under 32
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x02, 0x02, "Bonus Level" )          PORT_DIPLOCATION("SWB:7") // Clear Round
 	PORT_DIPSETTING(    0x00, "Partial" )
 	PORT_DIPSETTING(    0x02, "Full" )

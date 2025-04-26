@@ -15,7 +15,7 @@
 
 #include "slot.h"
 #include "machine/mc146818.h"
-#include "machine/ds1315.h"
+#include "machine/ds1215.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -62,7 +62,7 @@ protected:
 	virtual uint8_t read(offs_t offset) override;
 
 private:
-	required_device<ds1315_device> m_rtc;
+	required_device<ds1216e_device> m_rtc;
 };
 
 // device type definition

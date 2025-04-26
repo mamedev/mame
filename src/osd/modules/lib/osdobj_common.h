@@ -197,6 +197,7 @@ class font_module;
 class input_module;
 class midi_module;
 class monitor_module;
+class netdev_module;
 class osd_watchdog;
 class osd_window;
 class output_module;
@@ -234,15 +235,21 @@ public:
 	virtual void add_audio_to_recording(const int16_t *buffer, int samples_this_frame) override;
 	virtual std::vector<ui::menu_item> get_slider_list() override;
 
-	// command option overrides
-	virtual bool execute_command(const char *command) override;
-
+	// font interface
 	virtual osd_font::ptr font_alloc() override;
 	virtual bool get_font_families(std::string const &font_path, std::vector<std::pair<std::string, std::string> > &result) override;
 
+	// command option overrides
+	virtual bool execute_command(const char *command) override;
+
+	// MIDI interface
 	virtual std::unique_ptr<osd::midi_input_port> create_midi_input(std::string_view name) override;
 	virtual std::unique_ptr<osd::midi_output_port> create_midi_output(std::string_view name) override;
 	virtual std::vector<osd::midi_port_info> list_midi_ports() override;
+
+	// network interface
+	virtual std::unique_ptr<osd::network_device> open_network_device(int id, osd::network_handler &handler) override;
+	virtual std::vector<osd::network_device_info> list_network_devices() override;
 
 	// FIXME: everything below seems to be osd specific and not part of
 	//        this INTERFACE but part of the osd IMPLEMENTATION
@@ -317,6 +324,7 @@ protected:
 	sound_module*   m_sound;
 	debug_module*   m_debugger;
 	midi_module*    m_midi;
+	netdev_module*  m_network;
 	input_module*   m_keyboard_input;
 	input_module*   m_mouse_input;
 	input_module*   m_lightgun_input;

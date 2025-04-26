@@ -329,7 +329,7 @@ void triplex_state::triplex(machine_config &config)
 		downcast<ncr5380_device&>(*device).drq_handler().set(":dmac", FUNC(hd63450_device::drq0_w));
 	});
 
-	scc8530_device &scc(SCC8530N(config, "scc", 4.9152_MHz_XTAL));
+	scc8530_device &scc(SCC8530(config, "scc", 4.9152_MHz_XTAL));
 	scc.out_int_callback().set_inputline(m_maincpu, M68K_IRQ_5);
 	scc.out_wreqa_callback().set("dmac", FUNC(hd63450_device::drq1_w));
 	scc.out_dtra_callback().set("dmac", FUNC(hd63450_device::drq2_w));

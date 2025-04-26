@@ -12,6 +12,7 @@ Atari Tank 8 driver
 #include "tank8_a.h"
 
 #include "cpu/m6800/m6800.h"
+#include "machine/74259.h"
 #include "sound/discrete.h"
 
 #include "emupal.h"
@@ -66,7 +67,7 @@ private:
 	emu_timer *m_collision_timer = nullptr;
 
 	uint8_t collision_r();
-	void lockout_w(offs_t offset, uint8_t data);
+	template <int N> void lockout_w(int state);
 	void int_reset_w(uint8_t data);
 	void video_ram_w(offs_t offset, uint8_t data);
 	void crash_w(uint8_t data);
@@ -74,7 +75,6 @@ private:
 	void bugle_w(uint8_t data);
 	void bug_w(uint8_t data);
 	void attract_w(uint8_t data);
-	void motor_w(offs_t offset, uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
@@ -365,9 +365,10 @@ uint8_t tank8_state::collision_r()
 	return m_collision_index;
 }
 
-void tank8_state::lockout_w(offs_t offset, uint8_t data)
+template <int N>
+void tank8_state::lockout_w(int state)
 {
-	machine().bookkeeping().coin_lockout_w(offset, ~data & 1);
+	machine().bookkeeping().coin_lockout_w(N, !state);
 }
 
 
@@ -422,11 +423,6 @@ void tank8_state::attract_w(uint8_t data)
 	m_discrete->write(TANK8_ATTRACT_EN, data);
 }
 
-void tank8_state::motor_w(offs_t offset, uint8_t data)
-{
-	m_discrete->write(NODE_RELATIVE(TANK8_MOTOR1_EN, offset), data);
-}
-
 void tank8_state::cpu_map(address_map &map)
 {
 	map(0x0000, 0x00ff).ram();
@@ -453,16 +449,15 @@ void tank8_state::cpu_map(address_map &map)
 	map(0x1c10, 0x1c1f).writeonly().share(m_pos_v_ram);
 	map(0x1c20, 0x1c2f).writeonly().share(m_pos_d_ram);
 
-	map(0x1c30, 0x1c37).w(FUNC(tank8_state::lockout_w));
-	map(0x1d00, 0x1d00).w(FUNC(tank8_state::int_reset_w));
-	map(0x1d01, 0x1d01).w(FUNC(tank8_state::crash_w));
-	map(0x1d02, 0x1d02).w(FUNC(tank8_state::explosion_w));
-	map(0x1d03, 0x1d03).w(FUNC(tank8_state::bugle_w));
-	map(0x1d04, 0x1d04).w(FUNC(tank8_state::bug_w));
-	map(0x1d05, 0x1d05).writeonly().share(m_team);
-	map(0x1d06, 0x1d06).w(FUNC(tank8_state::attract_w));
-	map(0x1e00, 0x1e07).w(FUNC(tank8_state::motor_w));
-
+	map(0x1c30, 0x1c37).nopr().w("locklatch", FUNC(f9334_device::write_d0));
+	map(0x1d00, 0x1d00).nopr().w(FUNC(tank8_state::int_reset_w));
+	map(0x1d01, 0x1d01).nopr().w(FUNC(tank8_state::crash_w));
+	map(0x1d02, 0x1d02).nopr().w(FUNC(tank8_state::explosion_w));
+	map(0x1d03, 0x1d03).nopr().w(FUNC(tank8_state::bugle_w));
+	map(0x1d04, 0x1d04).nopr().w(FUNC(tank8_state::bug_w));
+	map(0x1d05, 0x1d05).nopr().writeonly().share(m_team);
+	map(0x1d06, 0x1d06).nopr().w(FUNC(tank8_state::attract_w));
+	map(0x1e00, 0x1e07).nopr().w("motorlatch", FUNC(f9334_device::write_d0));
 }
 
 
@@ -662,16 +657,33 @@ GFXDECODE_END
 void tank8_state::tank8(machine_config &config)
 {
 	// basic machine hardware
-	M6800(config, m_maincpu, 11'055'000 / 10); // ?
+	M6800(config, m_maincpu, 11.055_MHz_XTAL / 10); // divider not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &tank8_state::cpu_map);
+
+	f9334_device &locklatch(F9334(config, "locklatch")); // C5 on audio board
+	locklatch.q_out_cb<0>().set(FUNC(tank8_state::lockout_w<0>));
+	locklatch.q_out_cb<1>().set(FUNC(tank8_state::lockout_w<1>));
+	locklatch.q_out_cb<2>().set(FUNC(tank8_state::lockout_w<2>));
+	locklatch.q_out_cb<3>().set(FUNC(tank8_state::lockout_w<3>));
+	locklatch.q_out_cb<4>().set(FUNC(tank8_state::lockout_w<4>));
+	locklatch.q_out_cb<5>().set(FUNC(tank8_state::lockout_w<5>));
+	locklatch.q_out_cb<6>().set(FUNC(tank8_state::lockout_w<6>));
+	locklatch.q_out_cb<7>().set(FUNC(tank8_state::lockout_w<7>));
+
+	f9334_device &motorlatch(F9334(config, "motorlatch")); // D5 on audio board
+	motorlatch.q_out_cb<0>().set(m_discrete, FUNC(discrete_device::write_line<TANK8_MOTOR1_EN>));
+	motorlatch.q_out_cb<1>().set(m_discrete, FUNC(discrete_device::write_line<TANK8_MOTOR2_EN>));
+	motorlatch.q_out_cb<2>().set(m_discrete, FUNC(discrete_device::write_line<TANK8_MOTOR3_EN>));
+	motorlatch.q_out_cb<3>().set(m_discrete, FUNC(discrete_device::write_line<TANK8_MOTOR4_EN>));
+	motorlatch.q_out_cb<4>().set(m_discrete, FUNC(discrete_device::write_line<TANK8_MOTOR5_EN>));
+	motorlatch.q_out_cb<5>().set(m_discrete, FUNC(discrete_device::write_line<TANK8_MOTOR6_EN>));
+	motorlatch.q_out_cb<6>().set(m_discrete, FUNC(discrete_device::write_line<TANK8_MOTOR7_EN>));
+	motorlatch.q_out_cb<7>().set(m_discrete, FUNC(discrete_device::write_line<TANK8_MOTOR8_EN>));
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(30 * 1000000 / 15681));
-	m_screen->set_size(512, 524);
-	m_screen->set_visarea(16, 495, 0, 463);
+	m_screen->set_raw(11.055_MHz_XTAL * 2, 703, 16, 496, 524, 0, 464); // FIXME: should be 30 Hz interlaced, with two VBLANK interrupts per frame
 	m_screen->set_screen_update(FUNC(tank8_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(tank8_state::screen_vblank));
 	m_screen->set_palette(m_palette);

@@ -3835,7 +3835,7 @@ ROM_START( otonano )
 	ROM_LOAD( "otona_13.bin", 0x0e0000, 0x20000, CRC(208dee43) SHA1(f154ac4dab929c6f610038dbbebcf5283258e553) )
 ROM_END
 
-ROM_START( mjcamera )
+ROM_START( mjcamerao )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "mcam_01.bin", 0x00000, 0x10000, CRC(73d4b9ff) SHA1(219bc9617c14490d70bb3e28ab497dfd2ef01cf8) )
 
@@ -3987,4 +3987,4 @@ GAME( 1988, mjsikakc, mjsikaku, mjsikaku,        mjsikaku, nbmj8688_state, empty
 GAME( 1988, mjsikakd, mjsikaku, mjsikaku,        mjsikaku, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Mahjong Shikaku (Japan 880802)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, mmsikaku, mjsikaku, mmsikaku,        mmsikaku, nbmj8688_state, empty_init,    ROT0, "Nichibutsu",     "Mahjong Shikaku (Japan 880929, medal)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, otonano,  0,        otonano,         otonano,  nbmj8688_state, empty_init,    ROT0, "Apple",          "Otona no Mahjong (Japan 880628)", MACHINE_SUPPORTS_SAVE ) // おとなの麻雀
-GAME( 1988, mjcamera, 0,        mjcamera,        mjcamera, nbmj8688_state, init_mjcamera, ROT0, "Miki Syouji",    "Mahjong Camera Kozou (set 1) (Japan 881109)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, mjcamerao,mjcamera, mjcamera,        mjcamera, nbmj8688_state, init_mjcamera, ROT0, "Miki Syouji",    "Mahjong Camera Kozou (Japan 881109, older hardware)", MACHINE_SUPPORTS_SAVE )

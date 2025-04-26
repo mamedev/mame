@@ -196,10 +196,9 @@ Notes:
   RAM is cleared on purpose during boot and there is no default.
 
 - bakutotu:
-  The main and sub processors work closely together and the game
-  quickly runs into trouble when one of them lacks behind. Heavy
-  sync and overclocking will help but there's a particularly nasty
-  loop appearing in more than 40 places of the code:
+  The main and sub processors work closely together and the game quickly runs into
+  trouble when one of them lags behind. Heavy sync and overclocking will help but
+  there's a particularly nasty loop appearing in more than 40 places of the code:
 
   1) kick the watchdog
   2) raise a flag
@@ -419,11 +418,12 @@ void namcos1_state::virtual_map(address_map &map)
 
 void namcos1_state::sound_map(address_map &map)
 {
-	map(0x0000, 0x3fff).bankr(m_soundbank);   /* Banked ROMs */
+	map(0x0000, 0x3fff).bankr(m_soundbank); /* Banked ROMs */
 	map(0x4000, 0x4001).rw("ymsnd", FUNC(ym2151_device::status_r), FUNC(ym2151_device::write));
-	map(0x5000, 0x53ff).rw("namco", FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w)).mirror(0x400); /* PSG ( Shared ) */
-	map(0x7000, 0x77ff).ram().share(m_triram);
+	map(0x5000, 0x53ff).rw("namco", FUNC(namco_cus30_device::namcos1_cus30_r), FUNC(namco_cus30_device::namcos1_cus30_w)).mirror(0xc00); /* PSG ( Shared ) */
+	map(0x7000, 0x77ff).ram().share(m_triram).mirror(0x800);
 	map(0x8000, 0x9fff).ram(); /* Sound RAM 3 */
+	map(0xa000, 0xa000).nopr();
 	map(0xc000, 0xc001).w(FUNC(namcos1_state::sound_bankswitch_w)); /* ROM bank selector */
 	map(0xd001, 0xd001).w(m_c117, FUNC(namco_c117_device::sound_watchdog_w));
 	map(0xe000, 0xe000).w(FUNC(namcos1_state::audiocpu_irq_ack_w));
@@ -493,7 +493,7 @@ static INPUT_PORTS_START( ns1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM )   /* OUT:coin counter 2 */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_F1)  // service switch from the edge connector
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_F1)  // service switch from the edge connector
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END

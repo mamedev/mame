@@ -16,7 +16,7 @@
 
     Upper bits come from the low 5 bits of the HSCROLL value in alpha RAM
     Playfield bank comes from low 2 bits of the VSCROLL value in alpha RAM
-    For GX2, there are 4 bits of bank1
+    For GX2, there are 4 bits of bank
 
 ****************************************************************************/
 
@@ -35,27 +35,27 @@
 
 TILE_GET_INFO_MEMBER(atarigx2_state::get_alpha_tile_info)
 {
-	uint16_t data = m_alpha_tilemap->basemem_read(tile_index);
-	int code = data & 0xfff;
-	int color = (data >> 12) & 0x0f;
-	int opaque = data & 0x8000;
+	uint16_t const data = m_alpha_tilemap->basemem_read(tile_index);
+	int const code = data & 0xfff;
+	int const color = (data >> 12) & 0x0f;
+	bool const opaque = BIT(data, 15);
 	tileinfo.set(1, code, color, opaque ? TILE_FORCE_LAYER0 : 0);
 }
 
 
 TILE_GET_INFO_MEMBER(atarigx2_state::get_playfield_tile_info)
 {
-	uint16_t data = m_playfield_tilemap->basemem_read(tile_index);
-	int code = (m_playfield_tile_bank << 12) | (data & 0xfff);
-	int color = (m_playfield_base >> 5) + ((m_playfield_color_bank << 3) & 0x18) + ((data >> 12) & 7);
-	tileinfo.set(0, code, color, (data >> 15) & 1);
+	uint16_t const data = m_playfield_tilemap->basemem_read(tile_index);
+	int const code = (m_playfield_tile_bank << 12) | (data & 0xfff);
+	int const color = (m_playfield_base >> 5) + ((m_playfield_color_bank << 3) & 0x18) + ((data >> 12) & 7);
+	tileinfo.set(0, code, color, BIT(data, 15));
 	tileinfo.category = (m_playfield_color_bank >> 2) & 7;
 }
 
 
 TILEMAP_MAPPER_MEMBER(atarigx2_state::atarigx2_playfield_scan)
 {
-	int bank = 1 - (col / (num_cols / 2));
+	int const bank = 1 - (col / (num_cols / 2));
 	return bank * (num_rows * num_cols / 2) + row * (num_cols / 2) + (col % (num_cols / 2));
 }
 
@@ -99,7 +99,7 @@ void atarigx2_state::atarigx2_mo_control_w(offs_t offset, uint16_t data, uint16_
 
 TIMER_DEVICE_CALLBACK_MEMBER(atarigx2_state::scanline_update)
 {
-	int scanline = param;
+	int const scanline = param;
 
 	if (scanline == 0) logerror("-------\n");
 
@@ -112,11 +112,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(atarigx2_state::scanline_update)
 	for (int i = 0; i < 8; i++)
 	{
 		uint16_t word = m_alpha_tilemap->basemem_read(offset++);
-
-		if (word & 0x8000)
+		if (BIT(word, 15))
 		{
-			int newscroll = (word >> 5) & 0x3ff;
-			int newbank = (word >> 0) & 0x1f;
+			int const newscroll = (word >> 5) & 0x3ff;
+			int const newbank = (word >> 0) & 0x1f;
 			if (newscroll != m_playfield_xscroll)
 			{
 				if (scanline + i > 0)
@@ -134,10 +133,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(atarigx2_state::scanline_update)
 		}
 
 		word = m_alpha_tilemap->basemem_read(offset++);
-		if (word & 0x8000)
+		if (BIT(word, 15))
 		{
-			int newscroll = ((word >> 6) - (scanline + i)) & 0x1ff;
-			int newbank = word & 15;
+			int const newscroll = ((word >> 6) - (scanline + i)) & 0x1ff;
+			int const newbank = word & 15;
 			if (newscroll != m_playfield_yscroll)
 			{
 				if (scanline + i > 0)
@@ -164,7 +163,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(atarigx2_state::scanline_update)
  *
  *************************************/
 
-uint32_t atarigx2_state::screen_update_atarigx2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t atarigx2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap_ind8 &priority_bitmap = screen.priority();
 
@@ -194,8 +193,8 @@ uint32_t atarigx2_state::screen_update_atarigx2(screen_device &screen, bitmap_in
 			uint16_t const *const mo = &mo_bitmap.pix(y);
 			uint8_t const *const pri = &priority_bitmap.pix(y);
 			for (int x = left; x < right; x++)
-				if (mo[x] && (mo[x] >> ATARIRLE_PRIORITY_SHIFT) >= pri[x])
-					pf[x] = mo[x] & ATARIRLE_DATA_MASK;
+				if (mo[x] && (mo[x] >> atari_rle_objects_device::PRIORITY_SHIFT) >= pri[x])
+					pf[x] = mo[x] & atari_rle_objects_device::DATA_MASK;
 		}
 	}
 

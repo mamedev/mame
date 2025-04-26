@@ -312,15 +312,13 @@ void m58_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		}
 
 		m_gfxdecode->gfx(1)->transmask(bitmap, cliprect,
-			code1 + 256 * bank, color,
-			flipx, flipy, sx, visarea.min_y + sy1,
-			m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, 512)
-		);
+				code1 + 256 * bank, color,
+				flipx, flipy, sx, visarea.min_y + sy1,
+				m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, 512));
 		m_gfxdecode->gfx(1)->transmask(bitmap, cliprect,
-			code2 + 256 * bank, color,
-			flipx, flipy, sx, visarea.min_y + sy2,
-			m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, 512)
-		);
+				code2 + 256 * bank, color,
+				flipx, flipy, sx, visarea.min_y + sy2,
+				m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, 512));
 	}
 }
 

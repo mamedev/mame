@@ -2,10 +2,8 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
-
-NOTE: This list is here only to document available dumps and it's not used (yet) by MAME!
 -->
-<softwarelist name="pippin" description="Pippin CD-ROMs">
+<softwarelist name="pippin" description="Apple / Bandai Pippin CD-ROMs">
 
 <!-- Todo: Some (maybe all?) Pippin discs are compatible with macs
 
@@ -56,999 +54,999 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 
 -->
 
-	<software name="atcard">
-		<description>@Card SD Gundam Gaiden (Jpn)</description>
+	<software name="atcard" supported="no">
+		<description>@Card SD Gundam Gaiden (Japan)</description>
 		<year>1997</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-10034" />
 		<info name="alt_title" value="@Card SDガンダム外伝" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="atcard" sha1="85510c817c27619464bbaba64a842459328e2e40"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="atworldb">
+	<software name="atworldb" supported="no">
 		<description>@World Basics (USA)</description>
 		<year>1996</year>
 		<publisher>Apple</publisher>
 		<info name="serial" value="01338C" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="atworldb" sha1="33ac653d8d28929694c00d50837fd6141c1fcad7"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="browserb">
+	<software name="browserb" supported="no">
 		<description>@World Browser (USA, Prototype)</description>
 		<year>1997</year>
 		<publisher>Apple</publisher>
 		<info name="serial" value="41458" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="browserb" sha1="e8c909b179210f3bf92f518a3d31b518a84e07de"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="atworldo">
+	<software name="atworldo" supported="no">
 		<description>@World Online Suite Browser (USA)</description>
 		<year>1997</year>
 		<publisher>Apple</publisher>
 		<info name="serial" value="41588" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="atworldo" sha1="9968e26ec29e99a778c516758217883a88ed01af"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="hanshind">
-		<description>1995.1.17 Hanshin Daishinsai (Jpn)</description>
+	<software name="hanshind" supported="no">
+		<description>1995.1.17 Hanshin Daishinsai (Japan)</description>
 		<year>1996</year>
 		<publisher>Keikakudo</publisher>    <!-- 計画堂 -->
 		<info name="serial" value="BDS-20005" />
 		<info name="alt_title" value="1995.1.17 阪神大震災" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="hanshind" sha1="d83d9883ad6a64d30a92d966efe24db26a1d4cb6"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="actdesu">
-		<description>ActionDesigner Ultraman Tiga (Jpn)</description>
+	<software name="actdesu" supported="no">
+		<description>ActionDesigner Ultraman Tiga (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-70018" />
 		<info name="alt_title" value="アクションデザイナー　ウルトラマンティガ" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="actdesu" sha1="039f8e9a149686a9901ee36366896ee3ad762e30"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="aishogi">
-		<description>AI Shogi (Jpn)</description>
+	<software name="aishogi" supported="no">
+		<description>AI Shogi (Japan)</description>
 		<year>1996</year>
 		<publisher>ASG</publisher>
 		<info name="serial" value="BDS-20032" />
 		<info name="alt_title" value="AI将棋" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="aishogi" sha1="00c04dcfcfc8ec9bf4878f8c2a5f7b8fe4c9d4ab"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="animedbz">
-		<description>AnimeDesigner - Dragon Ball Z (Jpn)</description>
+	<software name="animedbz" supported="no">
+		<description>AnimeDesigner - Dragon Ball Z (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-10019" />
 		<info name="alt_title" value="アニメデザイナー　ドラゴンボールZ" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="animedbz" sha1="cf680e743e4efde824b150d1564ac57bbfcffa98"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="anpanain">
-		<description>Anpanman no AIUEO~N! (Jpn)</description>
+	<software name="anpanain" supported="no">
+		<description>Anpanman no AIUEO~N! (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-10015" />
 		<info name="alt_title" value="アンパンマンのあいうえお～ん！" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="anpanain" sha1="208a6f3fc77fab7cd81733e3cf68c9847b6080e3"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="anpanas1">
-		<description>Anpanman to Asobou! 1 (Jpn)</description>
+	<software name="anpanas1" supported="no">
+		<description>Anpanman to Asobou! 1 (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-10009" />
 		<info name="alt_title" value="アンパンマンとあそぼう！1" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="anpanas1" sha1="0ee04adbe9279fa1703f7e0d7f1e35635a118805"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="anpanas2">
-		<description>Anpanman to Asobou! 2 (Jpn)</description>
+	<software name="anpanas2" supported="no">
+		<description>Anpanman to Asobou! 2 (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-70016" />
 		<info name="alt_title" value="アンパンマンとあそぼう！2" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="anpanas2" sha1="e2a0694f0c46628fc17d95b487eaf2da7231fba0"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="atmtown">
-		<description>Atmark Town (Jpn, Ver. 1.0)</description>
+	<software name="atmtown" supported="no">
+		<description>Atmark Town (Japan, Ver. 1.0)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDB-005 (Disk 6 vol.1)" />
 		<info name="alt_title" value="アットマークタウン" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="atmtown" sha1="37e770e8824e5a990cb71143eb17cc55bbc97fb7"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="atmtowna" cloneof="atmtown">
-		<description>Atmark Town (Jpn, Ver. 1.0, Alt)</description>
+	<software name="atmtowna" cloneof="atmtown" supported="no">
+		<description>Atmark Town (Japan, Ver. 1.0, alt)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDB-005 (Disk 6 vol.1.1)" />
 		<info name="alt_title" value="アットマークタウン" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="atmtowna" sha1="f9273af774fedf209e1eac0ceb6ec601fc1e3886"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="atmtown2">
-		<description>Atmark Town (Jpn, Ver. 2.0)</description>
+	<software name="atmtown2" supported="no">
+		<description>Atmark Town (Japan, Ver. 2.0)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDB-022" />
 		<info name="alt_title" value="アットマークタウン" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="atmtown2" sha1="7e0909d1be9d27684aa45241f9fc00b1a8c59101"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="chisatom">
-		<description>Chisato Moritaka CD-Rom Watarase Bashi (Jpn)</description>
+	<software name="chisatom" supported="no">
+		<description>Chisato Moritaka CD-Rom Watarase Bashi (Japan)</description>
 		<year>1996</year>
 		<publisher>Oracion</publisher>  <!-- オラシオン -->
 		<info name="serial" value="BDE-10007" />
 		<info name="alt_title" value="森高千里CD-ROM　渡良瀬橋" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="chisatom" sha1="0c1a34b194179a2c993ab211f4b3f420eebe5563"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="circus">
-		<description>Circus! (Jpn)</description>
+	<software name="circus" supported="no">
+		<description>Circus! (Japan)</description>
 		<year>1996</year>
 		<publisher>Voyager</publisher>  <!-- ボイジャー -->
 		<info name="serial" value="BDS-20031" />
 		<info name="alt_title" value="サーカス！" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="circus" sha1="826b2ad9c271126e13e898dddf29d40d60ba1754"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="compton">
+	<software name="compton" supported="no">
 		<description>Compton's Interactive Encyclopedia (USA)</description>
 		<year>1996</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="71278C" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="compton" sha1="d30c34a1f32761e8dc0a8b8e01051099e1255d02"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="dazzloid">
-		<description>Dazzeloids (Jpn)</description>
+	<software name="dazzloid" supported="no">
+		<description>Dazzeloids (Japan)</description>
 		<year>1996</year>
 		<publisher>Voyager</publisher>  <!-- ボイジャー -->
 		<info name="serial" value="BDS-20030" />
 		<info name="alt_title" value="ダズロイド" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="dazzloid" sha1="d5b68846455e3dbe33d33c932c4fe02778c16a12"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="egwordp">
-		<description>EGWord Pure (Jpn, Ver. 1.0)</description>
+	<software name="egwordp" supported="no">
+		<description>EGWord Pure (Japan, Ver. 1.0)</description>
 		<year>1996</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="BDE-10021" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="egwordp" sha1="1db32f1fc16d3c639ddecd2e39a070b8e5783383"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="franky">
-		<description>Franky Online (Jpn)</description>
+	<software name="franky" supported="no">
+		<description>Franky Online (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDB-006 (Disk 6 vol.1)" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="franky" sha1="fbac6fcf5d43c68acbe1ba30288228f83268652b"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="frankya" cloneof="franky">
-		<description>Franky Online (Jpn, Alt)</description>
+	<software name="frankya" cloneof="franky" supported="no">
+		<description>Franky Online (Japan, alt)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDB-006 (Disk 6 vol.1.1)" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="frankya" sha1="dbdb2947b30369e06b49276e678ba10fc54607f9"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="fortulia">
-		<description>Fortullia (Jpn)</description>
+	<software name="fortulia" supported="no">
+		<description>Fortullia (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-10003" />
 		<info name="alt_title" value="フォルチュリア" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="fortulia" sha1="d9ba61dc93d168da603ef66a581d2e8bad239c98"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="ffaliens">
-		<description>Funky Funny Aliens (Jpn)</description>
+	<software name="ffaliens" supported="no">
+		<description>Funky Funny Aliens (Japan)</description>
 		<year>1996</year>
 		<publisher>Amuse</publisher>    <!-- アミューズ -->
 		<info name="serial" value="BDS-20014" />
 		<info name="alt_title" value="ファンキー ファニー エイリアンズ" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="ffaliens" sha1="a4f0cec5f084720f07684c3b326547d1a19cfe55"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="gadget">
-		<description>Gadget (Jpn)</description>
+	<software name="gadget" supported="no">
+		<description>Gadget (Japan)</description>
 		<year>1996</year>
 		<publisher>Synergy Ikunangaku</publisher>   <!-- シナジー幾何学 -->
 		<info name="serial" value="BDS-20033" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="gadget" sha1="e9e7996b6f767c887e1ac9cd053bf28084a59ccf"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="gakkoku">
-		<description>Gakko no Kowai Uwasa - Hanako-san ga Kita!! (Jpn)</description>
+	<software name="gakkoku" supported="no">
+		<description>Gakko no Kowai Uwasa - Hanako-san ga Kita!! (Japan)</description>
 		<year>1996</year>
 		<publisher>Amuse</publisher>    <!-- アミューズ -->
 		<info name="serial" value="BDS-20012" />
 		<info name="alt_title" value="学校のコワイうわさ　花子さんがきた!!" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="gakkoku" sha1="0acb92329d2e0a632d2e51d0a182e2d5efd14e35"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="gundamwe">
-		<description>Gundam 0079 - The War for Earth (Jpn)</description>
+	<software name="gundamwe" supported="no">
+		<description>Gundam 0079 - The War for Earth (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-10030" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="gundamwe" sha1="207af452e557386909f68756d5cf2c35a8185c39"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="gundtact">
-		<description>Gundam Tactics - Mobility Fleet0079 (Jpn)</description>
+	<software name="gundtact" supported="no">
+		<description>Gundam Tactics - Mobility Fleet0079 (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-10008" />
 		<info name="alt_title" value="ガンダムタクティクス モビリティーフリート0079" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="gundtact" sha1="11a2b1e31f373bd7c683fcb32bd46927c0ca4458"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="gundtacta" cloneof="gundtact">
-		<description>Gundam Tactics - Mobility Fleet0079 (Jpn, Alt)</description>
+	<software name="gundtacta" cloneof="gundtact" supported="no">
+		<description>Gundam Tactics - Mobility Fleet0079 (Japan, alt)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-10008" />
 		<info name="alt_title" value="ガンダムタクティクス モビリティーフリート0079" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="gundtacta" sha1="6495e1f9bb17099b21c83dfd5d28b2d47a1de097"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="gundamvm">
-		<description>Gundam Virtual Modeler Light (Jpn)</description>
+	<software name="gundamvm" supported="no">
+		<description>Gundam Virtual Modeler Light (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-10029" />
 		<info name="alt_title" value="ガンダムバーチャルモデラーライト" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="gundamvm" sha1="98e03fa882108200fd211269288e682d2a8a6e0a"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="kidsbox">
-		<description>Kids Box (Jpn)</description>
+	<software name="kidsbox" supported="no">
+		<description>Kids Box (Japan)</description>
 		<year>1996</year>
 		<publisher>Ask Kodansha</publisher> <!-- アスク講談社 -->
 		<info name="serial" value="BDS-20003" />
 		<info name="alt_title" value="キッズ・ボックス" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="kidsbox" sha1="2b60fa2ac195c323f23f5f743a5eb911903d112d"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="thomas">
-		<description>Hashitte Asobou! Kikansha Thomas (Jpn)</description>
+	<software name="thomas" supported="no">
+		<description>Hashitte Asobou! Kikansha Thomas (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-70024" />
 		<info name="alt_title" value="はしってあそぼう！きかんしゃトーマス" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="thomas" sha1="6b99e021257a4a784d1238d3f6a0e5386b955157"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="interkit">
-		<description>Internet Kit (Jpn)</description>
+	<software name="interkit" supported="no">
+		<description>Internet Kit (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDB-004 (Disk 6 vol.1)" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="interkit" sha1="387977e2643a255ead93536a63ed2748c35b263b"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="interkt2">
-		<description>Internet Kit (Jpn, Ver. 2.0)</description>
+	<software name="interkt2" supported="no">
+		<description>Internet Kit (Japan, Ver. 2.0)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDB-012 (Disk 6 vol.1.1)" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="interkt2" sha1="9fdd2082459450fa11f55e430affb059a1494b5b"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="lzone">
-		<description>L-Zone (Jpn)</description>
+	<software name="lzone" supported="no">
+		<description>L-Zone (Japan)</description>
 		<year>1996</year>
 		<publisher>Synergy Ikunangaku</publisher>   <!-- シナジー幾何学 -->
 		<info name="serial" value="BDS-20017" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="lzone" sha1="1e9b79b0bfd6ef11b9b44e0bd90c34d7da32617c"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="macbin38">
-		<description>Mac Bin 38 (Jpn)</description>
+	<software name="macbin38" supported="no">
+		<description>Mac Bin 38 (Japan)</description>
 		<year>1997</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="MUJ-9701" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="macbin38" sha1="f5fee76b5586064da06eb396ccfd931534133b46"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="macbin40">
-		<description>Mac Bin 40 A (Jpn)</description>
+	<software name="macbin40" supported="no">
+		<description>Mac Bin 40 A (Japan)</description>
 		<year>1997</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="MUJ-9703-1" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="macbin40" sha1="36255caf7922598a193bfaa2a8264bbcdc103890"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="macbin4b">
-		<description>Mac Bin 40 B (Jpn)</description>
+	<software name="macbin4b" supported="no">
+		<description>Mac Bin 40 B (Japan)</description>
 		<year>1997</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="MUJ-9703-2" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="macbin4b" sha1="bdbd0aa161dd38bd141da7ece319df94ef1f1ca6"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="maconpip">
+	<software name="maconpip" supported="no">
 		<description>Macintosh on Pippin (USA)</description>
 		<!-- Also known as Tuscon -->
 		<year>1996</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="maconpip" sha1="278be8ad232a83d9fa6a7c4fb0f28337b37d3b0f"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="gundamzd">
-		<description>Mobile Suit Gundam - Zion Dukedom Military-File (Jpn)</description>
+	<software name="gundamzd" supported="no">
+		<description>Mobile Suit Gundam - Zion Dukedom Military-File (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-10038" />
 		<info name="alt_title" value="機動戦士ガンダム　ジオン軍ミリタリーファイル" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="gundamzd" sha1="c6705c416af0ac59a802a86e68fffaf973564435"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="gundamwb">
-		<description>Mobile Suit Gundam - White Base (Jpn)</description>
+	<software name="gundamwb" supported="no">
+		<description>Mobile Suit Gundam - White Base (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-10031" />
 		<info name="alt_title" value="機動戦士ガンダム　第13独立部隊　ホワイトベース" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="gundamwb" sha1="0c4ea52dc8fbcbf523203eec0f6d14e525032baf"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="music1">
-		<description>Music Island Vol. 1 (Prokofiev Peter &amp; the Wolf) (Jpn)</description>
+	<software name="music1" supported="no">
+		<description>Music Island Vol. 1 (Prokofiev Peter &amp; the Wolf) (Japan)</description>
 		<year>1996</year>
 		<publisher>Oracion</publisher>  <!-- オラシオン -->
 		<info name="serial" value="BDS-20007" />
 		<info name="alt_title" value="MUSIC ISLAND プロコフィエフ　ピーターと狼 PETER AND THE WOLF" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="music1" sha1="445690344db76dcd35365be47c6a61b10c23f0ca"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="music2">
-		<description>Music Island Vol. 2 (Tchaikovsky The Nutcracker) (Jpn)</description>
+	<software name="music2" supported="no">
+		<description>Music Island Vol. 2 (Tchaikovsky The Nutcracker) (Japan)</description>
 		<year>1996</year>
 		<publisher>Oracion</publisher>  <!-- オラシオン -->
 		<info name="serial" value="BDS-20027" />
 		<info name="alt_title" value="MUSIC ISLAND チャイコフスキー　くるみわり人形 The Nutcracker" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="music2" sha1="b6b55459da9c46ef4f43183772581e4c35cdd2a3"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="music3">
-		<description>Music Island Vol. 3 (Vivaldi The Four Seasons) (Jpn)</description>
+	<software name="music3" supported="no">
+		<description>Music Island Vol. 3 (Vivaldi The Four Seasons) (Japan)</description>
 		<year>1996</year>
 		<publisher>Oracion</publisher>  <!-- オラシオン -->
 		<info name="serial" value="BDS-20028" />
 		<info name="alt_title" value="MUSIC ISLAND ヴィヴァルディ　四季 The Four Seasons" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="music3" sha1="84993f48ad434ea941331fbbdaa30bf67169cc15"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="music4">
-		<description>Music Island Vol. 4 (Saint-Saens Carnival of the Animals) (Jpn)</description>
+	<software name="music4" supported="no">
+		<description>Music Island Vol. 4 (Saint-Saens Carnival of the Animals) (Japan)</description>
 		<year>1996</year>
 		<publisher>Oracion</publisher>  <!-- オラシオン -->
 		<info name="serial" value="BDS-20029" />
 		<info name="alt_title" value="MUSIC ISLAND サン=サーンス 動物の謝肉祭 Carnival of the Animals" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="music4" sha1="5902202f84c0632a912c95f758ad531ff2d9aa0f"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="nemuyoru">
-		<description>Nemurenu Yoru no Chiisana Ohanashi (Jpn)</description>
+	<software name="nemuyoru" supported="no">
+		<description>Nemurenu Yoru no Chiisana Ohanashi (Japan)</description>
 		<year>1996</year>
 		<publisher>Amuse</publisher>    <!-- アミューズ -->
 		<info name="serial" value="BDS-20015" />
 		<info name="alt_title" value="眠れぬ夜の小さなお話" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="nemuyoru" sha1="e27663ada1a6b982ac1283220cd6f8a8eaedf203"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="pease">
-		<description>Pease (Jpn)</description>
+	<software name="pease" supported="no">
+		<description>Pease (Japan)</description>
 		<year>1996</year>
 		<publisher>MAKI Enterprise</publisher>
 		<info name="serial" value="PEASE002" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="pease" sha1="d4d2dda44abcda23c8affd09f7067d948efa7f56"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="peasetur">
-		<description>Pease Turbo (Jpn)</description>
+	<software name="peasetur" supported="no">
+		<description>Pease Turbo (Japan)</description>
 		<year>1996</year>
 		<publisher>MAKI Enterprise</publisher>
 		<info name="serial" value="PEASE 2001" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="peasetur" sha1="a340819b3602c6688f764af1f276f54a61f20f6e"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="navcd">
-		<description>Pippin Navigator CD (Jpn)</description>
+	<software name="navcd" supported="no">
+		<description>Pippin Navigator CD (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDB-001 (Disk 6 vol.1)" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="navcd" sha1="3017223b57681b060fe2983274abeecb6d068b11"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="navcd11">
-		<description>Pippin Navigator CD (Jpn, Ver. 1.1)</description>
+	<software name="navcd11" supported="no">
+		<description>Pippin Navigator CD (Japan, Ver. 1.1)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDB-008 (Disk 4 vol.1)" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="navcd11" sha1="d6e34bf571ac7c008a3b372e2fa26323cbdec99b"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="netcd">
-		<description>Pippin Network CD (Jpn)</description>
+	<software name="netcd" supported="no">
+		<description>Pippin Network CD (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDB-002 (Disk 6 vol.1)" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="netcd" sha1="864e1df2e6f5dd2d71600477687e6b5abd831b16"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="netcd2">
-		<description>Pippin Network CD (Jpn, Ver. 2.0)</description>
+	<software name="netcd2" supported="no">
+		<description>Pippin Network CD (Japan, Ver. 2.0)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDB-011 (Disk 4 vol.1)" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="netcd2" sha1="ac7f93fd1b9cec9c7e06227b415e0c99c31b0cd5"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="netcd21">
-		<description>Pippin Network CD (Jpn, Ver. 2.1)</description>
+	<software name="netcd21" supported="no">
+		<description>Pippin Network CD (Japan, Ver. 2.1)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDB-014 (Disk 6 vol.1.1)" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="netcd21" sha1="68dddea21c109fccad615255a37c45aadb8f0dac"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="catalog">
-		<description>Pippin Title CD-ROM Catalog: Vol. I: 1996.3 (Jpn)</description>
+	<software name="catalog" supported="no">
+		<description>Pippin Title CD-ROM Catalog: Vol. I: 1996.3 (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDB-007" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="catalog" sha1="5d831463dc423bf119de14857cd5f06f6bf146a4"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="sdk">
+	<software name="sdk" supported="no">
 		<description>Pippin Software Develepment Kit (1996.11)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="?" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sdk" sha1="c4632cb71506d280da41893cb244b9c628c256f3"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="cataloga" cloneof="catalog">
-		<description>Pippin Title CD-ROM Catalog: Vol. I: 1996.3 (Jpn, Alt)</description>
+	<software name="cataloga" cloneof="catalog" supported="no">
+		<description>Pippin Title CD-ROM Catalog: Vol. I: 1996.3 (Japan, alt)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDB-007 (Disk 4 vol.1)" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="cataloga" sha1="5154396aca522c0216236a0949da2e2bc10c3bb5"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="postcard">
-		<description>Post de Card Light (Jpn, Ver. 3.0)</description>
+	<software name="postcard" supported="no">
+		<description>Post de Card Light (Japan, Ver. 3.0)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-10028" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="postcard" sha1="72115d95908c778ba60c7cb7dd5cbc03779a8559"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="powerran">
+	<software name="powerran" supported="no">
 		<description>Power Rangers Zeo Vs. The Machine Empire (USA)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="41018F" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="powerran" sha1="7eb631487f4ee521d157c2e5b5280af9346cd6a7"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="racingd">
-		<description>Racing Days (Jpn)</description>
+	<software name="racingd" supported="no">
+		<description>Racing Days (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-20008" />
 		<info name="alt_title" value="レーシング・デイズ フォー ピピン" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="racingd" sha1="06895708d6538f595a28db46e2ca36e559a6caa3"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="sdgundam">
-		<description>SD Gundam Wars (Jpn)</description>
+	<software name="sdgundam" supported="no">
+		<description>SD Gundam Wars (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-10017" />
 		<info name="alt_title" value="SD ガンダム ウォーズ" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sdgumdam" sha1="386027d308faef30da461486b138dd8dae616c94"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="sdultram">
-		<description>SD Ultraman no Chyousen! Meiro Island (Jpn)</description>
+	<software name="sdultram" supported="no">
+		<description>SD Ultraman no Chyousen! Meiro Island (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-10010" />
 		<info name="alt_title" value="SDウルトラマンの挑戦！　迷路アイランド" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sdultram" sha1="11762569031abff107d947af89f56776037b2d9b"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="seesawc1">
-		<description>SeesawC 1 - My favorite things - Sukinamonodake Eitango 120 (Jpn)</description>
+	<software name="seesawc1" supported="no">
+		<description>SeesawC 1 - My favorite things - Sukinamonodake Eitango 120 (Japan)</description>
 		<year>1996</year>
 		<publisher>Aigaareba Daijoubu</publisher>   <!-- 愛があれば大丈夫 -->
 		<info name="serial" value="BDE-10006" />
 		<info name="alt_title" value="シーソーシー1" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="seesawc1" sha1="fa3e0fb2bd5a1c75f4c50d9e67c6cab5ad02b892"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="seesawc2">
-		<description>SeesawC 2 - My favorite places - Sukinatokorode Eitango 400 (Jpn)</description>
+	<software name="seesawc2" supported="no">
+		<description>SeesawC 2 - My favorite places - Sukinatokorode Eitango 400 (Japan)</description>
 		<year>1996</year>
 		<publisher>Aigaareba Daijoubu</publisher>   <!-- 愛があれば大丈夫 -->
 		<info name="serial" value="BDE-10023" />
 		<info name="alt_title" value="シーソーシー2" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="seesawc2" sha1="59189f06f8e82eab1f7c01705bb0c3c780483e00"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="shichiso">
-		<description>Shichisokusen (Jpn)</description>
+	<software name="shichiso" supported="no">
+		<description>Shichisokusen (Japan)</description>
 		<year>1996</year>
 		<publisher>Media Five</publisher>   <!-- メディアファイブ -->
 		<info name="serial" value="BDS-20019" />
 		<info name="alt_title" value="死地則戦 ビジネスエデュテイメントソフト" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="shichiso" sha1="0f9229cfc7db40339c949ff264be80f10cfe7545"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="shockwav">
-		<description>Shockwave - Invasion Earth 2019 (Jpn)</description>
+	<software name="shockwav" supported="no">
+		<description>Shockwave - Invasion Earth 2019 (Japan)</description>
 		<year>1996</year>
 		<publisher>Electronic Arts Victor</publisher>
 		<info name="serial" value="BDS-20024" />
 		<info name="alt_title" value="ショックウェーブ" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="shockwav" sha1="8aae6a286ac6a04632378f7bf8b912cf3597cd94"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="supermar">
+	<software name="supermar" supported="no">
 		<description>Super Marathon (USA)</description>
 		<year>19??</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="41028C" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="supermar" sha1="b5aed18581524caaf03c582869a9166bc1fdb2f3"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="supermara" cloneof="supermar">
-		<description>Super Marathon (USA, Alt)</description>
+	<software name="supermara" cloneof="supermar" supported="no">
+		<description>Super Marathon (USA, alt)</description>
 		<year>19??</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="41028C" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="supermara" sha1="f9833a88b0b0ea094be099df3357652dc06d7243"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="tbreak">
-		<description>T-Break (Jpn)</description>
+	<software name="tbreak" supported="no">
+		<description>T-Break (Japan)</description>
 		<year>1996</year>
 		<publisher>Infocity</publisher> <!-- インフォシティ -->
 		<info name="serial" value="BDS-20026" />
 		<info name="alt_title" value="ティ・ブレイク" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="tbreak" sha1="302c04fc7a0a660f3e8849a9f3ed190188f2b6de"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="tamagotc">
-		<description>Tamagotchi CD-ROM (Jpn)</description>
+	<software name="tamagotc" supported="no">
+		<description>Tamagotchi CD-ROM (Japan)</description>
 		<year>1997</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-10033" />
 		<info name="release" value="19970808?" />
 		<info name="alt_title" value="たまごっち CD-ROM" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="tamagotc" sha1="3cc169f56144262b345a5fce3dfdded1f44bd5d7"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="tropicis">
-		<description>Tropic Island (Jpn)</description>
+	<software name="tropicis" supported="no">
+		<description>Tropic Island (Japan)</description>
 		<year>1996</year>
 		<publisher>Momoderazu Brand</publisher> <!-- モモデラーズブランド -->
 		<info name="serial" value="BDS-20011" />
 		<info name="alt_title" value="トロピック　アイランド" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="tropicis" sha1="9c929f38229a17d6bd65ed68d4d396dc06239d39"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="tunglue">
-		<description>Tunin' Glue (Jpn)</description>
+	<software name="tunglue" supported="no">
+		<description>Tunin' Glue (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-10005" />
 		<info name="alt_title" value="チューニングルー" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="tunglue" sha1="54585da0ce3774e621a50b47b2723ea529e889d5"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="tvworks">
-		<description>TV Works - Word Paint Mail (Jpn, Ver. 1.0)</description>
+	<software name="tvworks" supported="no">
+		<description>TV Works - Word Paint Mail (Japan, Ver. 1.0)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDB-003 (Disk 6 vol.1)" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="tvworks" sha1="353d4c82e29fed3cab1ea8ce93107f6aa58bf6a0"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="tvwrks2">
-		<description>TV Works (Jpn, Ver. 2.0)</description>
+	<software name="tvwrks2" supported="no">
+		<description>TV Works (Japan, Ver. 2.0)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDB-009 (Disk 4 vol.1)" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="tvwrks2" sha1="a6fdba7bec60e7ceb3b29b3e4900ba0100a3da09"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="tvwrks21">
-		<description>TV Works (Jpn, Ver. 2.1)</description>
+	<software name="tvwrks21" supported="no">
+		<description>TV Works (Japan, Ver. 2.1)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDB-013 (Disk 6 vol.1.1)" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="tvwrks21" sha1="d56fa2c12d74c5ae053a750ffa14625b61aa5656"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="tvwrks3">
+	<software name="tvwrks3" supported="no">
 		<description>TV Works (USA, Ver. 3.0)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="61528" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="tvwrks3" sha1="e4c4dd7128fb98818c37d48951d539edba911ed0"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="tvwrksp">
-		<description>TV Works (Jpn, Ver. POP)</description>
+	<software name="tvwrksp" supported="no">
+		<description>TV Works (Japan, Ver. POP)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDB-020" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="tvwrksp" sha1="cde8f993e4c8d99a34f3c54429b8ec4cebc65103"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="ultraman">
-		<description>Ultraman - The Digital Board Game (Jpn)</description>
+	<software name="ultraman" supported="no">
+		<description>Ultraman - The Digital Board Game (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-70002" />
 		<info name="alt_title" value="ウルトラマン　デジタルボードゲーム" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="ultraman" sha1="a47f7953f2cbeb9e0106aebf67cda9f6e25b18dd"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="ultramana" cloneof="ultraman">
-		<description>Ultraman - The Digital Board Game (Jpn, Alt)</description>
+	<software name="ultramana" cloneof="ultraman" supported="no">
+		<description>Ultraman - The Digital Board Game (Japan, alt)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-70002" />
 		<info name="alt_title" value="ウルトラマン　デジタルボードゲーム" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="ultramana" sha1="4e0b449d2e534a3ea5f1f1a7b33be086a64ee1b7"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="ultramaq">
-		<description>Ultraman Quiz King (Jpn)</description>
+	<software name="ultramaq" supported="no">
+		<description>Ultraman Quiz King (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-70020" />
 		<info name="alt_title" value="ウルトラマンクイズ王" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="ultramaq" sha1="d611d2faabdf654a84737b501dbbb95e4c8804a4"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="victorp">
-		<description>Victorian Park (Jpn)</description>
+	<software name="victorp" supported="no">
+		<description>Victorian Park (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-10004-1,BDE-10004-2" />
 		<info name="alt_title" value="ビクトリアンパーク" />
-		<part name="cdrom1" interface="scd_cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<feature name="part_id" value="Disc 1" />
 			<diskarea name="cdrom">
 				<disk name="victorp1" sha1="07e48a9f50be90f1243f917e5f1491a33aedb32d"/>
 			</diskarea>
 		</part>
-		<part name="cdrom2" interface="scd_cdrom">
+		<part name="cdrom2" interface="cdrom">
 			<feature name="part_id" value="Disc 2" />
 			<diskarea name="cdrom">
 				<disk name="victorp2" sha1="bff02e88df613b39aba35258e8e6012807a8c081"/>
@@ -1056,44 +1054,44 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-	<software name="webview">
-		<description>WebViewer With Microsoft Internet Explorer 3.0 for Macintosh (Jpn)</description>
+	<software name="webview" supported="no">
+		<description>WebViewer With Microsoft Internet Explorer 3.0 for Macintosh (Japan)</description>
 		<year>1996</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="BDB-026" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="webview" sha1="e4164d3e13ad93f2a604fb97dc2061b077fa256f"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="yellow1">
-		<description>Yellow Brick Road I (Jpn)</description>
+	<software name="yellow1" supported="no">
+		<description>Yellow Brick Road I (Japan)</description>
 		<year>1996</year>
 		<publisher>Synergy Ikunangaku</publisher>   <!-- シナジー幾何学 -->
 		<info name="serial" value="BDS-20022" />
 		<info name="alt_title" value="イエロー・ブリック・ロード I" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="yellow1" sha1="ac9f59cca09608e034c695a560aa7948d8e649b5"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="yellow2">
-		<description>Yellow Brick Road II - Glinda to Nishi no Majo (Jpn)</description>
+	<software name="yellow2" supported="no">
+		<description>Yellow Brick Road II - Glinda to Nishi no Majo (Japan)</description>
 		<year>1996</year>
 		<publisher>Synergy Ikunangaku</publisher>   <!-- シナジー幾何学 -->
 		<info name="serial" value="BDS-20023" />
 		<info name="alt_title" value="イエロー・ブリック・ロード II　グリンダと西の魔女" />
-		<part name="cdrom1" interface="scd_cdrom">
+		<part name="cdrom1" interface="cdrom">
 			<feature name="part_id" value="Disc 1" />
 			<diskarea name="cdrom">
 				<disk name="yellow21" sha1="84d6f55c14a3f72c3c324ebf7b60a462ea914a2f"/>
 			</diskarea>
 		</part>
-		<part name="cdrom2" interface="scd_cdrom">
+		<part name="cdrom2" interface="cdrom">
 			<feature name="part_id" value="Disc 2" />
 			<diskarea name="cdrom">
 				<disk name="yellow22" sha1="b707ada43a3ecee8fefb41d112919021001a05df"/>
@@ -1101,51 +1099,51 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		</part>
 	</software>
 
-	<software name="yellows">
-		<description>Yellows - Akira Gomi Photographs (Jpn)</description>
+	<software name="yellows" supported="no">
+		<description>Yellows - Akira Gomi Photographs (Japan)</description>
 		<year>1996</year>
 		<publisher>Digitalogue</publisher>  <!-- デジタローグ -->
 		<info name="serial" value="BDS-20001" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="yellows" sha1="0a88a47018b6d7e5750b916e74e22bd35ac007a6"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="yellws2">
-		<description>Yellows 2.0 - Tokyo 1993 Akira Gomi Photographs (Jpn)</description>
+	<software name="yellws2" supported="no">
+		<description>Yellows 2.0 - Tokyo 1993 Akira Gomi Photographs (Japan)</description>
 		<year>1996</year>
 		<publisher>Digitalogue</publisher>  <!-- デジタローグ -->
 		<info name="serial" value="BDS-20002" />
 		<info name="alt_title" value="イエローズ 2.0" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="yellws2" sha1="bdeacbbadfc8acba80e3778ed33a757416dd1767"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="yokumite">
-		<description>Yoku Mite Goran! (Jpn)</description>
+	<software name="yokumite" supported="no">
+		<description>Yoku Mite Goran! (Japan)</description>
 		<year>1996</year>
 		<publisher>Voyager</publisher>  <!-- ボイジャー -->
 		<info name="serial" value="BDS-20018" />
 		<info name="alt_title" value="よく見てごらん！美術館へ行こう" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="yokumite" sha1="9edbbb48a197ddaf386db7cf5902adc766f65b27"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="zukkoke">
-		<description>Zukkoke Sanningumi - Drama Satsujin Jiken (Jpn)</description>
+	<software name="zukkoke" supported="no">
+		<description>Zukkoke Sanningumi - Drama Satsujin Jiken (Japan)</description>
 		<year>1996</year>
 		<publisher>Bandai</publisher>
 		<info name="serial" value="BDE-10032" />
 		<info name="alt_title" value="ズッコケ三人組 ～ドラマ殺人事件～" />
-		<part name="cdrom" interface="pippin_cdrom">
+		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="zukkoke" sha1="2a541850909403f4ce30a798079e66b2a68364c0"/>
 			</diskarea>

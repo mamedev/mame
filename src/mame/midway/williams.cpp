@@ -1654,8 +1654,10 @@ void williams_state::joust(machine_config &config)
 void williams_state::splat(machine_config &config)
 {
 	williams_base(config);
-	WILLIAMS_BLITTER_SC2(config, m_blitter, 0xc000, m_maincpu, m_videoram);
 	williams_muxed(config);
+
+	WILLIAMS_BLITTER_SC2(config, m_blitter, 0xc000, m_maincpu, m_videoram);
+	m_maincpu->set_addrmap(AS_PROGRAM, &williams_state::main_map_blitter);
 }
 
 void williams_state::alienar(machine_config &config)

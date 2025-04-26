@@ -54,6 +54,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
+#include "cpu/upd177x/upd177x.h"
 #include "imagedev/floppy.h"
 #include "machine/am9517a.h"
 #include "machine/nvram.h"
@@ -61,7 +62,6 @@
 #include "machine/pit8253.h"
 #include "machine/upd1990a.h"
 #include "machine/upd765.h"
-#include "sound/upd1771.h"
 #include "video/upd7220.h"
 #include "emupal.h"
 #include "screen.h"
@@ -123,7 +123,7 @@ private:
 	uint8_t *m_char_rom = nullptr;
 
 	required_device<speaker_device> m_speaker;
-	required_device<upd1771c_device> m_sound;
+	required_device<upd1771c_cpu_device> m_sound;
 
 	required_shared_ptr<uint16_t> m_video_ram_1;
 	required_shared_ptr<uint16_t> m_video_ram_2;
@@ -500,7 +500,7 @@ void apc_state::apc_io(address_map &map)
 //  0x5a  APU data (Arithmetic Processing Unit!)
 //  0x5b, Power Off
 //  0x5e  APU status/command
-	map(0x60, 0x60).rw(m_sound, FUNC(upd1771c_device::read), FUNC(upd1771c_device::write));
+	map(0x60, 0x60).rw(m_sound, FUNC(upd1771c_cpu_device::pa_r), FUNC(upd1771c_cpu_device::pa_w));
 //  map(0x68, 0x6f) i8255 , ODA printer port (A: status (R) B: data (W) C: command (W))
 //  map(0x70, 0x76).rw("upd7220_btm", FUNC(upd7220_device::read), FUNC(upd7220_device::write)).umask16(0x00ff);
 //  0x71, 0x77 IDA Controller
@@ -992,6 +992,9 @@ ROM_START( apc )
 
 	ROM_REGION( 0x2000, "gfx", ROMREGION_ERASE00 )
 	ROM_LOAD("pfcu1r.bin",   0x000000, 0x002000, CRC(683efa94) SHA1(43157984a1746b2e448f3236f571011af9a3aa73) )
+
+	ROM_REGION( 0x400, "upd1771c", ROMREGION_ERASE00 )
+	ROM_LOAD( "upd1771c_006", 0, 0x400, NO_DUMP )
 ROM_END
 
 void apc_state::init_apc()

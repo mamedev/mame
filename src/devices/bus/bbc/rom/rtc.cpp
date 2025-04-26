@@ -33,8 +33,8 @@ void bbc_stlrtc_device::device_add_mconfig(machine_config &config)
 
 void bbc_pmsrtc_device::device_add_mconfig(machine_config &config)
 {
-	/* Dallas DS1216 SmartWatch RAM */
-	DS1315(config, m_rtc, 0);
+	/* Dallas DS1216 SmartWatch ROM */
+	DS1216E(config, m_rtc);
 }
 
 //**************************************************************************
@@ -107,18 +107,10 @@ uint8_t bbc_pmsrtc_device::read(offs_t offset)
 {
 	uint8_t data = get_rom_base()[offset & 0x1fff];
 
-	switch (offset)
-	{
-	case 0x00:
-		data |= m_rtc->read_0();
-		break;
-	case 0x01:
-		data |= m_rtc->read_1();
-		break;
-	case 0x04:
-		if (m_rtc->chip_enable())
-			data = m_rtc->read_data() & 0x01;
-		break;
-	}
+	if (m_rtc->ceo_r())
+		data = m_rtc->read(offset);
+	else
+		m_rtc->read(offset);
+
 	return data;
 }

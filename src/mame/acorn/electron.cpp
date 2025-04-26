@@ -9,8 +9,8 @@ Basic specs are:
 6502 CPU @ 2MHz or 1MHz
 32k RAM and 32k ROM
 Text modes: 20x32, 40x25, 40x32, 80x25, 80x32
-Graphics modes: 160x256 (4 or 16 colors), 320x256 (2 or 4 colors), 640x256 (2 colors), 320x200 (2 colors), 640x200 (2 colors)
-Colors: 8 colors (either solid or flashing)
+Graphics modes: 160x256 (4 or 16 colours), 320x256 (2 or 4 colours), 640x256 (2 colours), 320x200 (2 colors), 640x200 (2 colors)
+Colours: 8 colours (either solid or flashing)
 Sound: 1 channel, 7 octaves; built-in speaker
 Internal ports for cassette storage, RGB/CVBS monitors and TV output
 Various expansions can be added via the rear expansion port
@@ -37,7 +37,7 @@ Notes: (all IC's shown. Only 16 ICs are used)
       ROM - Hitachi HN613256 32k x8-bit mask ROM containing OS & BASIC
     LM324 - Texas Instruments LM324 Operational Amplifier
       MOD - UHF TV modulator UM1233-E36
-     CVBS - Composite color video output socket
+     CVBS - Composite colour video output socket
       RGB - RGB monitor video output socket
      CASS - Cassette port
       PWR - 3-pin power input from internal power supply
@@ -68,7 +68,6 @@ ROM/RAM sockets and User Port for a mouse.
 Emulation notes:
 
 Incomplete:
-    - Graphics (seems to be wrong for several games)
     - 1 MHz bus is not emulated
     - Bus claiming by ULA is not implemented
 
@@ -80,39 +79,421 @@ Other internal boards to emulate:
 ******************************************************************************/
 
 #include "emu.h"
+#include "electron_ula.h"
+
+#include "bus/bbc/userport/userport.h"
+#include "bus/electron/exp.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
 #include "cpu/m6502/m6502.h"
-#include "electron.h"
-#include "imagedev/cassette.h"
 #include "formats/uef_cas.h"
 #include "formats/csw_cas.h"
-#include "sound/beep.h"
+#include "imagedev/cassette.h"
+#include "machine/6522via.h"
+#include "machine/input_merger.h"
+#include "machine/ram.h"
+
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
 
 
-void electron_state::electron_colours(palette_device &palette) const
+namespace {
+
+class electron_state : public driver_device
 {
-	for (int i = 0; i < palette.entries(); i++)
+public:
+	electron_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_irqs(*this, "irqs")
+		, m_screen(*this, "screen")
+		, m_cassette(*this, "cassette")
+		, m_ula(*this, "ula")
+		, m_region_mos(*this, "mos")
+		, m_keybd(*this, "LINE.%u", 0)
+		, m_exp(*this, "exp")
+		, m_ram(*this, RAM_TAG)
+		, m_mrb(*this, "MRB")
+		, m_capslock_led(*this, "capslock_led")
+	{ }
+
+	void electron(machine_config &config);
+	void btm2105(machine_config &config);
+
+	void electron64(machine_config &config);
+
+	static void plus3_default(device_t* device);
+
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+	uint8_t fetch_r(offs_t offset);
+	uint8_t ram_r(offs_t offset);
+	void ram_w(offs_t offset, uint8_t data);
+	virtual uint8_t rom_r(offs_t offset);
+	virtual void rom_w(offs_t offset, uint8_t data);
+	virtual uint8_t io_r(offs_t offset);
+	virtual void io_w(offs_t offset, uint8_t data);
+	uint8_t keyboard_r(offs_t offset);
+
+	void mem_map(address_map &map) ATTR_COLD;
+	void opcodes_map(address_map &map) ATTR_COLD;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<input_merger_device> m_irqs;
+	required_device<screen_device> m_screen;
+	required_device<cassette_image_device> m_cassette;
+	required_device<electron_ula_device> m_ula;
+	required_memory_region m_region_mos;
+	required_ioport_array<14> m_keybd;
+	required_device<electron_expansion_slot_device> m_exp;
+	required_device<ram_device> m_ram;
+	optional_ioport m_mrb;
+	output_finder<> m_capslock_led;
+
+	bool m_mrb_mapped = false;
+	bool m_vdu_drivers = false;
+};
+
+
+class electronsp_state : public electron_state
+{
+public:
+	electronsp_state(const machine_config &mconfig, device_type type, const char *tag)
+		: electron_state(mconfig, type, tag)
+		, m_region_sp64(*this, "sp64")
+		, m_via(*this, "via6522")
+		, m_userport(*this, "userport")
+		, m_romi(*this, "romi%u", 1)
+		, m_rompages(*this, "ROMPAGES")
+	{ }
+
+	void electronsp(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+	virtual uint8_t rom_r(offs_t offset) override;
+	virtual void rom_w(offs_t offset, uint8_t data) override;
+	virtual uint8_t io_r(offs_t offset) override;
+	virtual void io_w(offs_t offset, uint8_t data) override;
+
+private:
+	required_memory_region m_region_sp64;
+	required_device<via6522_device> m_via;
+	required_device<bbc_userport_slot_device> m_userport;
+	required_device_array<generic_slot_device, 2> m_romi;
+	required_ioport m_rompages;
+
+	uint8_t m_rompage = 0;
+	uint8_t m_sp64_bank = 0;
+	std::unique_ptr<uint8_t[]> m_sp64_ram;
+
+	std::pair<std::error_condition, std::string> load_rom(device_image_interface &image, generic_slot_device *slot);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom1_load) { return load_rom(image, m_romi[0]); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom2_load) { return load_rom(image, m_romi[1]); }
+};
+
+
+void electron_state::mem_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rw(FUNC(electron_state::ram_r), FUNC(electron_state::ram_w));          /* 32KB of RAM */
+	map(0x8000, 0xffff).rw(FUNC(electron_state::rom_r), FUNC(electron_state::rom_w));          /* 32KB of ROM */
+	map(0xfc00, 0xfeff).rw(FUNC(electron_state::io_r), FUNC(electron_state::io_w));            /* IO */
+}
+
+void electron_state::opcodes_map(address_map &map)
+{
+	map(0x0000, 0xffff).r(FUNC(electron_state::fetch_r));
+}
+
+
+uint8_t electron_state::keyboard_r(offs_t offset)
+{
+	uint8_t data = 0;
+
+	for (int i = 0; i < 14; i++)
 	{
-		palette.set_pen_color(i ^ 7, rgb_t(pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2)));
+		if (!BIT(offset, i))
+			data |= m_keybd[i]->read() & 0x0f;
+	}
+
+	return data;
+}
+
+
+uint8_t electron_state::fetch_r(offs_t offset)
+{
+	m_vdu_drivers = (offset & 0xe000) == 0xc000 ? true : false;
+
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
+}
+
+
+uint8_t electron_state::ram_r(offs_t offset)
+{
+	uint8_t data = 0xff;
+
+	data &= m_exp->expbus_r(offset);
+
+	switch (m_mrb.read_safe(0))
+	{
+	case 0x00: /* Normal */
+		data &= m_ula->read(offset);
+		break;
+
+	case 0x01: /* Turbo */
+		if (m_mrb_mapped && offset < 0x3000) offset += 0x8000;
+		data &= m_ram->read(offset);
+		break;
+
+	case 0x02: /* Shadow */
+		if (m_mrb_mapped && (offset < 0x3000 || !m_vdu_drivers)) offset += 0x8000;
+		data &= m_ram->read(offset);
+		break;
+	}
+
+	return data;
+}
+
+void electron_state::ram_w(offs_t offset, uint8_t data)
+{
+	m_exp->expbus_w(offset, data);
+
+	switch (m_mrb.read_safe(0))
+	{
+	case 0x00: /* Normal */
+		m_ula->write(offset, data);
+		break;
+
+	case 0x01: /* Turbo */
+		if (m_mrb_mapped && offset < 0x3000) offset += 0x8000;
+		m_ram->write(offset, data);
+		break;
+
+	case 0x02: /* Shadow */
+		if (m_mrb_mapped && (offset < 0x3000 || !m_vdu_drivers)) offset += 0x8000;
+		m_ram->write(offset, data);
+		break;
 	}
 }
 
-void electron_state::electron_mem(address_map &map)
+
+uint8_t electron_state::rom_r(offs_t offset)
 {
-	map(0x0000, 0x7fff).rw(FUNC(electron_state::electron_mem_r), FUNC(electron_state::electron_mem_w));          /* 32KB of RAM */
-	map(0x8000, 0xbfff).rw(FUNC(electron_state::electron_paged_r), FUNC(electron_state::electron_paged_w));      /* Banked ROM pages */
-	map(0xc000, 0xffff).rw(FUNC(electron_state::electron_mos_r), FUNC(electron_state::electron_mos_w));          /* OS ROM */
-	map(0xfc00, 0xfcff).rw(FUNC(electron_state::electron_fred_r), FUNC(electron_state::electron_fred_w));        /* FRED */
-	map(0xfd00, 0xfdff).rw(FUNC(electron_state::electron_jim_r), FUNC(electron_state::electron_jim_w));          /* JIM */
-	map(0xfe00, 0xfeff).rw(FUNC(electron_state::electron_sheila_r), FUNC(electron_state::electron_sheila_w));    /* SHEILA */
+	/* 0,1   Second external socket on the expansion module (SK2) */
+	/* 2,3   First external socket on the expansion module (SK1)  */
+	/* 4     Disc                                                 */
+	/* 5,6   USER applications                                    */
+	/* 7     Modem interface ROM                                  */
+	/* 8,9   Keyboard                                             */
+	/* 10,11 BASIC                                                */
+	/* 12    Expansion module operating system                    */
+	/* 13    High priority slot in expansion module               */
+	/* 14    ECONET                                               */
+	/* 15    Reserved                                             */
+
+	uint8_t data = 0xff;
+
+	offset += 0x8000;
+
+	data &= m_ula->read(offset);
+	data &= m_exp->expbus_r(offset);
+
+	return data;
 }
 
-void electron_state::electron64_opcodes(address_map &map)
+void electron_state::rom_w(offs_t offset, uint8_t data)
 {
-	map(0x0000, 0xffff).r(FUNC(electron_state::electron64_fetch_r));
+	offset += 0x8000;
+
+	m_ula->write(offset, data);
+	m_exp->expbus_w(offset, data);
 }
+
+uint8_t electronsp_state::rom_r(offs_t offset)
+{
+	uint8_t data = electron_state::rom_r(offset);
+
+	switch (offset & 0x4000)
+	{
+	case 0x0000:
+		if ((m_rompage & 0x0e) == m_rompages->read())
+		{
+			data = m_romi[m_rompage & 0x01]->read_rom(offset);
+		}
+		else
+		{
+			switch (m_rompage)
+			{
+			case 10:
+				/* SP64 ROM utilises the spare BASIC ROM page */
+				if (BIT(m_sp64_bank, 7) && (offset & 0x2000))
+				{
+					data = m_sp64_ram[offset & 0x1fff];
+				}
+				else
+				{
+					data = m_region_sp64->base()[(!BIT(m_sp64_bank, 0) << 14) | offset];
+				}
+				break;
+			}
+		}
+		break;
+	}
+
+	return data;
+}
+
+void electronsp_state::rom_w(offs_t offset, uint8_t data)
+{
+	electron_state::rom_w(offset, data);
+
+	switch (offset & 0x4000)
+	{
+	case 0x0000:
+		if ((m_rompage & 0x0e) == m_rompages->read())
+		{
+			/* TODO: sockets are writeable if RAM */
+		}
+		else
+		{
+			switch (m_rompage)
+			{
+			case 10:
+				/* SP64 ROM utilises the spare BASIC ROM page */
+				if (BIT(m_sp64_bank, 7) && (offset & 0x2000))
+				{
+					m_sp64_ram[offset & 0x1fff] = data;
+				}
+				break;
+			}
+		}
+		break;
+	}
+}
+
+
+uint8_t electron_state::io_r(offs_t offset)
+{
+	uint8_t data = 0xff;
+
+	offset += 0xfc00;
+
+	data &= m_ula->read(offset);
+	data &= m_exp->expbus_r(offset);
+
+	return data;
+}
+
+void electron_state::io_w(offs_t offset, uint8_t data)
+{
+	m_ula->write(0xfc00 + offset, data);
+
+	offset += 0xfc00;
+
+	/* Master RAM Board */
+	if (offset == 0xfc7f)
+	{
+		m_mrb_mapped = !BIT(data, 7);
+	}
+
+	m_exp->expbus_w(offset, data);
+}
+
+
+uint8_t electronsp_state::io_r(offs_t offset)
+{
+	uint8_t data = electron_state::io_r(offset);
+
+	offset += 0xfc00;
+
+	if ((offset & 0xfff0) == 0xfcb0)
+	{
+		data = m_via->read(offset & 0x0f);
+	}
+
+	return data;
+}
+
+void electronsp_state::io_w(offs_t offset, uint8_t data)
+{
+	electron_state::io_w(offset, data);
+
+	offset += 0xfc00;
+
+	if ((offset & 0xfff0) == 0xfcb0)
+	{
+		m_via->write(offset & 0x0f, data);
+	}
+	else if (offset == 0xfcfa)
+	{
+		m_sp64_bank = data;
+	}
+	else if ((offset == 0xfe05) && !(data & 0xf0))
+	{
+		m_rompage = data & 0x0f;
+	}
+}
+
+
+/**************************************
+   Machine Initialisation functions
+***************************************/
+
+void electron_state::machine_start()
+{
+	m_capslock_led.resolve();
+
+	/* set ULA RAM/ROM pointers */
+	m_ula->set_ram(m_ram->pointer());
+	m_ula->set_rom(m_region_mos->base());
+
+	/* register save states */
+	save_item(NAME(m_mrb_mapped));
+	save_item(NAME(m_vdu_drivers));
+}
+
+void electron_state::machine_reset()
+{
+	m_mrb_mapped = true;
+	m_vdu_drivers = false;
+}
+
+void electronsp_state::machine_start()
+{
+	electron_state::machine_start();
+
+	m_sp64_ram = std::make_unique<uint8_t[]>(0x2000);
+
+	/* register save states */
+	save_item(NAME(m_sp64_bank));
+	save_pointer(NAME(m_sp64_ram), 0x2000);
+}
+
+
+std::pair<std::error_condition, std::string> electronsp_state::load_rom(device_image_interface &image, generic_slot_device *slot)
+{
+	uint32_t size = slot->common_get_size("rom");
+
+	// socket accepts 8K and 16K ROM only
+	if (size != 0x2000 && size != 0x4000)
+		return std::make_pair(image_error::INVALIDLENGTH, "Invalid size: Only 8K/16K is supported");
+
+	slot->rom_alloc(0x4000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	slot->common_load_rom(slot->get_rom_base(), size, "rom");
+
+	// mirror 8K ROMs
+	uint8_t *crt = slot->get_rom_base();
+	if (size <= 0x2000) memcpy(crt + 0x2000, crt, 0x2000);
+
+	return std::make_pair(std::error_condition(), std::string());
+}
+
 
 INPUT_CHANGED_MEMBER(electron_state::trigger_reset)
 {
@@ -246,24 +627,31 @@ void electron_state::plus3_default(device_t* device)
 void electron_state::electron(machine_config &config)
 {
 	M6502(config, m_maincpu, 16_MHz_XTAL / 8);
-	m_maincpu->set_addrmap(AS_PROGRAM, &electron_state::electron_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &electron_state::mem_map);
 	config.set_perfect_quantum(m_maincpu);
 
 	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 256);
-	//m_screen->set_raw(16_MHz_XTAL, 1024, 264, 264 + 640, 312, 28, 28 + 256)
-	m_screen->set_screen_update(FUNC(electron_state::screen_update_electron));
+	m_screen->set_screen_update(m_ula, FUNC(electron_ula_device::screen_update));
 	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
-	m_screen->set_palette("palette");
 
-	PALETTE(config, "palette", FUNC(electron_state::electron_colours), 8);
+	PALETTE(config, "palette").set_entries(8);
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, m_beeper, 300).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	RAM(config, m_ram).set_default_size("32K");
+
+	ELECTRON_ULA(config, m_ula, 16_MHz_XTAL);
+	m_ula->set_cpu_tag("maincpu");
+	m_ula->kbd_cb().set(FUNC(electron_state::keyboard_r));
+	m_ula->caps_lock_cb().set([this](int state) { m_capslock_led = state; });
+	m_ula->cas_mo_cb().set([this](int state) { m_cassette->set_motor(state); });
+	m_ula->cas_in_cb("cassette", FUNC(cassette_image_device::input));
+	m_ula->cas_out_cb("cassette", FUNC(cassette_image_device::output));
+	m_ula->add_route(ALL_OUTPUTS, "mono", 0.25);
+	m_ula->irq_cb().set(m_irqs, FUNC(input_merger_device::in_w<0>));
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(bbc_cassette_formats);
@@ -307,8 +695,8 @@ void electron_state::electron64(machine_config &config)
 {
 	electron(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &electron_state::electron_mem);
-	m_maincpu->set_addrmap(AS_OPCODES, &electron_state::electron64_opcodes);
+	m_maincpu->set_addrmap(AS_PROGRAM, &electron_state::mem_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &electron_state::opcodes_map);
 
 	m_ram->set_default_size("64K");
 }
@@ -374,6 +762,8 @@ ROM_START(electronsp)
 ROM_END
 
 #define rom_btm2105 rom_electron
+
+} // anonymous namespace
 
 
 /*     YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY                             FULLNAME                                 FLAGS */

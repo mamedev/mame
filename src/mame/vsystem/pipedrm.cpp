@@ -684,9 +684,9 @@ void pipedrm_state::pipedrm(machine_config &config)
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8_MHz_XTAL));
 	ymsnd.irq_handler().set_inputline("sub", 0);
-	ymsnd.add_route(0, "mono", 0.50);
-	ymsnd.add_route(1, "mono", 1.0);
-	ymsnd.add_route(2, "mono", 1.0);
+	ymsnd.add_route(0, "mono", 0.75);
+	ymsnd.add_route(1, "mono", 0.5);
+	ymsnd.add_route(2, "mono", 0.5);
 }
 
 void hatris_state::hatris(machine_config &config)
@@ -728,9 +728,9 @@ void hatris_state::hatris(machine_config &config)
 
 	ym2608_device &ym2608(YM2608(config, "ymsnd", 8_MHz_XTAL));
 	ym2608.irq_handler().set_inputline("sub", 0);
-	ym2608.add_route(0, "mono", 0.50);
-	ym2608.add_route(1, "mono", 1.0);
-	ym2608.add_route(2, "mono", 1.0);
+	ym2608.add_route(0, "mono", 0.75);
+	ym2608.add_route(1, "mono", 0.5);
+	ym2608.add_route(2, "mono", 0.5);
 }
 
 

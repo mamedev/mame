@@ -48,16 +48,19 @@ Official test program from pages 4 to 8 of the operator's manual:
 
 #include "emu.h"
 
-#include "cpu/i8085/i8085.h"
-#include "machine/i8251.h"
-#include "machine/clock.h"
-#include "machine/timer.h"
+#include "bus/heathzenith/intr_cntrl/intr_cntrl.h"
 #include "bus/rs232/rs232.h"
+#include "cpu/i8085/i8085.h"
 #include "imagedev/cassette.h"
+#include "machine/clock.h"
+#include "machine/i8251.h"
+#include "machine/timer.h"
 #include "sound/beep.h"
+
 #include "speaker.h"
 
 #include "formats/h8_cas.h"
+
 #include "h8.lh"
 
 namespace {
@@ -68,6 +71,7 @@ public:
 	h8_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_intr_socket(*this, "intr_socket")
 		, m_uart(*this, "uart")
 		, m_console(*this, "console")
 		, m_cass(*this, "cassette")
@@ -116,6 +120,7 @@ private:
 	static constexpr XTAL H8_IRQ_PULSE = H8_BEEP_FRQ / 2;
 
 	required_device<i8080_cpu_device> m_maincpu;
+	required_device<heath_intr_socket> m_intr_socket;
 	required_device<i8251_device> m_uart;
 	required_device<i8251_device> m_console;
 	required_device<cassette_image_device> m_cass;
@@ -142,7 +147,9 @@ DEVICE_INPUT_DEFAULTS_END
 TIMER_DEVICE_CALLBACK_MEMBER(h8_state::h8_irq_pulse)
 {
 	if (BIT(m_irq_ctl, 0))
-		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xcf); // I8080
+	{
+		m_intr_socket->set_irq_level(1, ASSERT_LINE);
+	}
 }
 
 u8 h8_state::portf0_r()
@@ -190,7 +197,8 @@ void h8_state::portf0_w(u8 data)
 	m_mon_led = !BIT(data, 5);
 	m_beep->set_state(!BIT(data, 7));
 
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+	m_intr_socket->set_irq_level(1, CLEAR_LINE);
+
 	m_irq_ctl &= 0xf0;
 	if (BIT(data, 6)) m_irq_ctl |= 1;
 	if (!BIT(data, 4)) m_irq_ctl |= 2;
@@ -260,10 +268,13 @@ INPUT_CHANGED_MEMBER(h8_state::button_0)
 	{
 		u8 data = m_io_keyboard[1]->read() ^ 0xff;
 		if (BIT(data, 5))
+		{
 			m_maincpu->reset();
-		else
-		if (BIT(data, 6))
-			m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xcf); // INT 10   // I8080
+		}
+		else if (BIT(data, 6))
+		{
+			m_intr_socket->set_irq_level(1, ASSERT_LINE);
+		}
 	}
 }
 
@@ -322,7 +333,9 @@ But, all of this can only occur if bit 4 of port F0 is low. */
 			c = !m_ff_b; // from /Q of 2nd flipflop
 			m_ff_b = a; // from Q of 1st flipflop
 			if (c)
-				m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xd7); // I8080
+			{
+				m_intr_socket->set_irq_level(2, ASSERT_LINE);
+			}
 		}
 	}
 	else
@@ -338,9 +351,7 @@ But, all of this can only occur if bit 4 of port F0 is low. */
 
 void h8_state::h8_level3_irq_callback(int state)
 {
-	if (state) {
-		m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xdf); // RST3
-	}
+	m_intr_socket->set_irq_level(3, state);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(h8_state::kansas_w)
@@ -373,6 +384,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(h8_state::kansas_r)
 	}
 }
 
+static void intr_ctrl_options(device_slot_interface &device)
+{
+	device.option_add("original", HEATH_INTR_CNTRL);
+}
+
 void h8_state::h8(machine_config &config)
 {
 	/* basic machine hardware */
@@ -381,9 +397,15 @@ void h8_state::h8(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &h8_state::io_map);
 	m_maincpu->out_status_func().set(FUNC(h8_state::h8_status_callback));
 	m_maincpu->out_inte_func().set(FUNC(h8_state::h8_inte_callback));
+	m_maincpu->set_irq_acknowledge_callback("intr_socket", FUNC(heath_intr_socket::irq_callback));
 
 	/* video hardware */
 	config.set_default_layout(layout_h8);
+
+	HEATH_INTR_SOCKET(config, m_intr_socket, intr_ctrl_options, nullptr);
+	m_intr_socket->irq_line_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_intr_socket->set_default_option("original");
+	m_intr_socket->set_fixed(true);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

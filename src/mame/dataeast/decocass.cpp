@@ -995,10 +995,10 @@ static const gfx_layout objlayout =
 };
 
 static GFXDECODE_START( gfx_decocass )
-	GFXDECODE_ENTRY( nullptr, 0x6000, charlayout,       0, 4 )  /* char set #1 */
-	GFXDECODE_ENTRY( nullptr, 0x6000, spritelayout,     0, 4 )  /* sprites */
-	GFXDECODE_ENTRY( nullptr, 0xd000, tilelayout,       0, 8 )  /* background tiles */
-	GFXDECODE_ENTRY( nullptr, 0xd800, objlayout,        0, 64 )  /* object */
+	GFXDECODE_RAM( nullptr, 0x6000, charlayout,       0, 4 )  /* char set #1 */
+	GFXDECODE_RAM( nullptr, 0x6000, spritelayout,     0, 4 )  /* sprites */
+	GFXDECODE_RAM( nullptr, 0xd000, tilelayout,       0, 8 )  /* background tiles */
+	GFXDECODE_RAM( nullptr, 0xd800, objlayout,        0, 64 )  /* object */
 GFXDECODE_END
 
 void decocass_state::decocass_palette(palette_device &palette) const

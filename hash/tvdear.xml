@@ -9,11 +9,22 @@ license:CC0-1.0
 	Known undumped carts:
 
 	Illust-Cassette No. 1 - Pochacco
-	Illust-Cassette No. 2 - Bad Badtz-Maru
 
 	There is also a Memory Cassette that may not contain any ROM.
 
 	-->
+
+	<software name="illust2" supported="no">
+		<description>Illust-Cassette No. 2 - Bad Badtz-Maru</description>
+		<year>1995</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="イラストカセット No.2 バッドばつ丸"/>
+		<part name="cart" interface="tvdear_cart">
+			<dataarea name="rom" size="0x20000">
+				<rom name="lc371100.u15" size="0x20000" crc="4f13611b" sha1="1b50ef534f9d35eb55850a9b0844d5bf1dec0abc"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="shoujo" supported="no">
 		<description>Shoujo Manga Collection</description>

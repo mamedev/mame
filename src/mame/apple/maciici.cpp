@@ -46,8 +46,8 @@
 
 namespace {
 
-static constexpr u32 C7M = 7833600;
-static constexpr u32 C15M = (C7M * 2);
+static constexpr XTAL C15M = 31.3344_MHz_XTAL / 2;
+static constexpr XTAL C7M = 31.3344_MHz_XTAL / 4;
 
 class maciici_state : public driver_device
 {
@@ -597,7 +597,7 @@ void maciici_state::maciixi_base(machine_config &config)
 	SOFTWARE_LIST(config, "flop_mac35_clean").set_original("mac_flop_clcracked");
 	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
 
-	RBV(config, m_rbv, C15M);
+	RBV(config, m_rbv, 31.3344_MHz_XTAL); // main clock input - additional 30.24MHz and 57.2832MHz pixel clock inputs
 	m_rbv->via6015_callback().set(m_via1, FUNC(via6522_device::write_ca1));
 	m_rbv->irq_callback().set(FUNC(maciici_state::set_via2_interrupt));
 

@@ -499,7 +499,7 @@ void alto2_cpu_device::f2_late_evenfield()
  */
 void alto2_cpu_device::init_disp()
 {
-	memset(&m_dsp, 0, sizeof(m_dsp));
+	m_dsp = decltype(m_dsp)();
 	save_item(NAME(m_dsp.state));
 	save_item(NAME(m_dsp.hlc));
 	save_item(NAME(m_dsp.setmode));

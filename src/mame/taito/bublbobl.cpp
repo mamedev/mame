@@ -848,7 +848,7 @@ void bublbobl_state::tokio(machine_config &config)
 
 	TAITO68705_MCU(config, "bmcu", MAIN_XTAL/8); // 3 Mhz
 
-	config.set_perfect_quantum(m_maincpu); // is this necessary?
+	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // 74LS393, counts 128 vblanks before firing watchdog; same circuit as taitosj uses
 
@@ -943,7 +943,7 @@ void bublbobl_state::bublbobl_nomcu(machine_config &config)
 	Z80(config, m_audiocpu, MAIN_XTAL/8); // 3 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &bublbobl_state::sound_map); // IRQs are triggered by the YM2203
 
-	config.set_maximum_quantum(attotime::from_hz(6000)); // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
+	config.set_maximum_quantum(attotime::from_hz(6000)); // a high value to ensure proper synchronization of the CPUs
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 128); // 74LS393, counts 128 vblanks before firing watchdog; same circuit as taitosj uses
 
@@ -2127,11 +2127,11 @@ GAME( 1986, tokioo,     tokio,    tokio,     tokio,      bublbobl_state, init_co
 GAME( 1986, tokiou,     tokio,    tokio,     tokio,      bublbobl_state, init_common, ROT90, "Taito America Corporation (Romstar license)", "Tokio / Scramble Formation (US)",      MACHINE_SUPPORTS_SAVE )
 GAME( 1986, tokiob,     tokio,    tokiob,    tokio_base, bublbobl_state, init_common, ROT90, "bootleg",                                     "Tokio / Scramble Formation (bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, bublboblp,  bublbobl, bublboblp, bublboblp,  bublbobl_state, init_common, ROT0,  "Taito Corporation",                           "Bubble Bobble (prototype on Tokio hardware)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, bublbobl,   0,        bublbobl,  bublbobl,   bublbobl_state, init_common, ROT0,  "Taito Corporation",                           "Bubble Bobble (Japan, Ver 0.1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, bublbobl1,  bublbobl, bublbobl,  bublbobl,   bublbobl_state, init_common, ROT0,  "Taito Corporation",                           "Bubble Bobble (Japan, Ver 0.0)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, bublboblr,  bublbobl, bublbobl,  bublbobl,   bublbobl_state, init_common, ROT0,  "Taito America Corporation (Romstar license)", "Bubble Bobble (US, Ver 5.1)",    MACHINE_SUPPORTS_SAVE ) // newest release, with mode select
 GAME( 1986, bublboblr1, bublbobl, bublbobl,  bublbobl,   bublbobl_state, init_common, ROT0,  "Taito America Corporation (Romstar license)", "Bubble Bobble (US, Ver 1.0)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1986, bublboblp,  bublbobl, bublboblp, bublboblp,  bublbobl_state, init_common, ROT0,  "Taito Corporation",                           "Bubble Bobble (prototype on Tokio hardware)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1986, boblbobl,   bublbobl, boblbobl,  boblbobl,   bublbobl_state, init_common, ROT0,  "bootleg",         "Bobble Bobble (bootleg of Bubble Bobble)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, sboblbobl,  bublbobl, boblbobl,  sboblbobl,  bublbobl_state, init_common, ROT0,  "bootleg (Datsu)", "Super Bobble Bobble (bootleg, set 1)",                MACHINE_SUPPORTS_SAVE )

@@ -2,10 +2,10 @@
 // copyright-holders:Steve Ellenoff,R. Belmont,Ryan Holtz
 /*****************************************************************************
  *
- *   arm7dasm.c
+ *   arm7dasm.cpp
  *   Portable ARM7TDMI Core Emulator - Disassembler
  *
- *   Copyright Steve Ellenoff, all rights reserved.
+ *   Copyright Steve Ellenoff
  *
  *  This work is based on:
  *  #1) 'Atmel Corporation ARM7TDMI (Thumb) Datasheet - January 1999'

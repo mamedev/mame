@@ -263,7 +263,7 @@ void macvail_state::maclc3_base(machine_config &config)
 	m_ram->set_extra_options("8M,16M,32M,48M,64M,80M");
 
 	NSCSI_BUS(config, "scsi");
-	NSCSI_CONNECTOR(config, "scsi:0", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:0", mac_scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsi:1", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
@@ -274,7 +274,7 @@ void macvail_state::maclc3_base(machine_config &config)
 		});
 	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr5380", NCR53C80).machine_config([this](device_t *device)
 	{
 		ncr53c80_device &adapter = downcast<ncr53c80_device &>(*device);
@@ -384,7 +384,9 @@ void macvail_state::maclc520(machine_config &config)
 	m_cuda->iic_scl_callback().set(m_omega, FUNC(omega_device::clock_write));
 	m_cuda->iic_sda_callback().set(m_omega, FUNC(omega_device::data_write));
 	m_cuda->dfac_latch_callback().set(m_omega, FUNC(omega_device::latch_write));
+	m_cuda->nmi_callback().set_inputline(m_maincpu, M68K_IRQ_7);
 	m_macadb->adb_data_callback().set(m_cuda, FUNC(cuda_device::set_adb_line));
+	m_macadb->adb_power_callback().set(m_cuda, FUNC(cuda_device::set_adb_power));
 	config.set_perfect_quantum(m_maincpu);
 
 	m_sonora->pb3_callback().set(m_cuda, FUNC(cuda_device::get_treq));

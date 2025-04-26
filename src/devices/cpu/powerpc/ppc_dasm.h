@@ -30,8 +30,8 @@ public:
 		I_POWERPC = 1 << 1,
 	};
 
-	powerpc_disassembler(bool powerpc = true)
-		: m_implementation(powerpc ? I_POWERPC : I_POWER)
+	powerpc_disassembler(implementation impl = I_POWERPC)
+		: m_implementation(impl)
 	{
 	};
 	virtual ~powerpc_disassembler() = default;
@@ -157,7 +157,7 @@ class power_disassembler : public powerpc_disassembler
 {
 public:
 	power_disassembler()
-		: powerpc_disassembler(false)
+		: powerpc_disassembler(implementation::I_POWER)
 	{
 	};
 };

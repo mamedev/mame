@@ -794,7 +794,7 @@ void i386_device::i386_trap_with_error(int irq, int irq_gate, int trap_level, ui
 				PUSH16(error);
 		}
 	}
-	catch(uint64_t e)
+	catch([[maybe_unused]] uint64_t e)
 	{
 		trap_level++;
 		if(trap_level == 1)

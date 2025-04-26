@@ -92,6 +92,7 @@ public:
 	}
 
 	void add_slot(zxbus_slot_device &slot);
+	void install_shadow_io(memory_view::memory_view_entry &io_view);
 
 protected:
 	zxbus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
@@ -100,6 +101,7 @@ protected:
 
 private:
 	required_address_space m_iospace;
+	memory_view::memory_view_entry *m_shadow_io_view;
 
 	std::forward_list<zxbus_slot_device *> m_slot_list;
 };
@@ -110,6 +112,9 @@ DECLARE_DEVICE_TYPE(ZXBUS, zxbus_device)
 class device_zxbus_card_interface : public device_interface
 {
 	friend class zxbus_slot_device;
+
+public:
+	virtual void map_shadow_io(address_map &map) ATTR_COLD {}
 
 protected:
 	device_zxbus_card_interface(const machine_config &mconfig, device_t &device);
@@ -123,6 +128,6 @@ protected:
 
 
 void zxbus_cards(device_slot_interface &device);
-
+void zxbus_gmx_cards(device_slot_interface &device);
 
 #endif // MAME_BUS_SPECTRUM_ZXBUS_H

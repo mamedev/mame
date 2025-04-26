@@ -66,7 +66,7 @@ private:
 
 	maple_device *devices[4];
 
-	required_device<sh4_device> cpu;
+	required_device<sh7091_device> cpu;
 	emu_timer *timer;
 
 	uint32_t mdstar, mden, mdst, msys;

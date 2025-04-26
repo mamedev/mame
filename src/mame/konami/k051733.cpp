@@ -57,7 +57,6 @@ reads from 0x0006, and only uses bit 1.
 
 #include "emu.h"
 #include "k051733.h"
-#include "konami_helper.h"
 
 #define VERBOSE 0
 #include "logmacro.h"
@@ -88,9 +87,7 @@ void k051733_device::device_start()
 
 void k051733_device::device_reset()
 {
-	int i;
-
-	for (i = 0; i < 0x20; i++)
+	for (int i = 0; i < 0x20; i++)
 		m_ram[i] = 0;
 
 	m_rng = 0;
@@ -102,13 +99,13 @@ void k051733_device::device_reset()
 
 void k051733_device::write(offs_t offset, uint8_t data)
 {
-	//logerror("%s: write %02x to 051733 address %02x\n", m_maincpu->pc(), data, offset);
+	LOG("%s: write %02x to 051733 address %02x\n", machine().describe_context(), data, offset);
 
 	m_ram[offset] = data;
 }
 
 
-static int k051733_int_sqrt( uint32_t op )
+static int k051733_int_sqrt(uint32_t op)
 {
 	uint32_t i = 0x8000;
 	uint32_t step = 0x4000;
@@ -128,15 +125,15 @@ static int k051733_int_sqrt( uint32_t op )
 
 uint8_t k051733_device::read(offs_t offset)
 {
-	int op1 = (m_ram[0x00] << 8) | m_ram[0x01];
-	int op2 = (m_ram[0x02] << 8) | m_ram[0x03];
-	int op3 = (m_ram[0x04] << 8) | m_ram[0x05];
+	int const op1 = (m_ram[0x00] << 8) | m_ram[0x01];
+	int const op2 = (m_ram[0x02] << 8) | m_ram[0x03];
+	int const op3 = (m_ram[0x04] << 8) | m_ram[0x05];
 
-	int rad = (m_ram[0x06] << 8) | m_ram[0x07];
-	int yobj1c = (m_ram[0x08] << 8) | m_ram[0x09];
-	int xobj1c = (m_ram[0x0a] << 8) | m_ram[0x0b];
-	int yobj2c = (m_ram[0x0c] << 8) | m_ram[0x0d];
-	int xobj2c = (m_ram[0x0e] << 8) | m_ram[0x0f];
+	int const rad = (m_ram[0x06] << 8) | m_ram[0x07];
+	int const yobj1c = (m_ram[0x08] << 8) | m_ram[0x09];
+	int const xobj1c = (m_ram[0x0a] << 8) | m_ram[0x0b];
+	int const yobj2c = (m_ram[0x0c] << 8) | m_ram[0x0d];
+	int const xobj2c = (m_ram[0x0e] << 8) | m_ram[0x0f];
 
 	switch (offset)
 	{
@@ -165,33 +162,34 @@ uint8_t k051733_device::read(offs_t offset)
 
 		case 0x04:
 			return k051733_int_sqrt(op3 << 16) >> 8;
-
 		case 0x05:
 			return k051733_int_sqrt(op3 << 16) & 0xff;
 
 		case 0x06:
-			m_rng += m_ram[0x13];
-			return m_rng; //RNG read, used by Chequered Flag for differentiate cars, implementation is a raw guess
+			{
+				uint8_t const rng = m_rng + m_ram[0x13];
+				if (!machine().side_effects_disabled())
+					m_rng = rng;
+				return rng; //RNG read, used by Chequered Flag for differentiate cars, implementation is a raw guess
+			}
 
-		case 0x07:{ /* note: Chequered Flag definitely wants all these bits to be enabled */
+		case 0x07: /* note: Chequered Flag definitely wants all these bits to be enabled */
 			if (xobj1c + rad < xobj2c)
 				return 0xff;
-
-			if (xobj2c + rad < xobj1c)
+			else if (xobj2c + rad < xobj1c)
 				return 0xff;
-
-			if (yobj1c + rad < yobj2c)
+			else if (yobj1c + rad < yobj2c)
 				return 0xff;
-
-			if (yobj2c + rad < yobj1c)
+			else if (yobj2c + rad < yobj1c)
 				return 0xff;
+			else
+				return 0;
 
-			return 0;
-		}
 		case 0x0e: /* best guess */
 			return (xobj2c - xobj1c) >> 8;
 		case 0x0f:
 			return (xobj2c - xobj1c) & 0xff;
+
 		default:
 			return m_ram[offset];
 	}

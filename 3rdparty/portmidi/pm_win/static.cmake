@@ -1,4 +1,12 @@
 # static.cmake -- change flags to link with static runtime libraries
+#
+# Even when BUILD_SHARED_LIBS is OFF, CMake specifies linking wtih
+# multithread DLL, so you give inconsistent linking instructions
+# resulting in warning messages from MS Visual Studio. If you want
+# a static binary, I've found this approach works to eliminate
+# warnings and make everything static:
+#
+# Changes /MD (multithread DLL) to /MT (multithread static)
 
 if(MSVC)
   foreach(flag_var

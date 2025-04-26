@@ -2,8 +2,6 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    eepromser.c
-
     Serial EEPROM devices.
 
 ****************************************************************************
@@ -106,8 +104,8 @@
 
     Issues with:
 
-    kickgoal.c - code seems wrong, clock logic writes 0-0-0 instead of 0-1-0 as expected
-    overdriv.c - drops CS, raises CS, keeps DI=1, triggering extraneous start bit
+    kickgoal.cpp - code seems wrong, clock logic writes 0-0-0 instead of 0-1-0 as expected
+    overdriv.cpp - drops CS, raises CS, keeps DI=1, triggering extraneous start bit
 
 ***************************************************************************/
 
@@ -155,24 +153,24 @@ ALLOW_SAVE_TYPE(eeprom_serial_base_device::eeprom_state);
 //  eeprom_serial_base_device - constructor
 //-------------------------------------------------
 
-eeprom_serial_base_device::eeprom_serial_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, eeprom_serial_streaming enable_streaming)
-	: eeprom_base_device(mconfig, devtype, tag, owner),
-		m_command_address_bits(0),
-		m_streaming_enabled(bool(enable_streaming)),
-		m_output_on_falling_clock_enabled(false),
-		m_do_cb(*this),
-		m_state(STATE_IN_RESET),
-		m_cs_state(CLEAR_LINE),
-		m_last_cs_rising_edge_time(attotime::zero),
-		m_oe_state(CLEAR_LINE),
-		m_clk_state(CLEAR_LINE),
-		m_di_state(CLEAR_LINE),
-		m_locked(true),
-		m_bits_accum(0),
-		m_command_address_accum(0),
-		m_command(COMMAND_INVALID),
-		m_address(0),
-		m_shift_register(0)
+eeprom_serial_base_device::eeprom_serial_base_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, eeprom_serial_streaming enable_streaming) :
+	eeprom_base_device(mconfig, devtype, tag, owner),
+	m_command_address_bits(0),
+	m_streaming_enabled(bool(enable_streaming)),
+	m_output_on_falling_clock_enabled(false),
+	m_do_cb(*this),
+	m_state(STATE_IN_RESET),
+	m_cs_state(CLEAR_LINE),
+	m_last_cs_rising_edge_time(attotime::zero),
+	m_oe_state(CLEAR_LINE),
+	m_clk_state(CLEAR_LINE),
+	m_di_state(CLEAR_LINE),
+	m_locked(true),
+	m_bits_accum(0),
+	m_command_address_accum(0),
+	m_command(COMMAND_INVALID),
+	m_address(0),
+	m_shift_register(0)
 {
 }
 
@@ -193,6 +191,7 @@ void eeprom_serial_base_device::device_start()
 	// save the current state
 	save_item(NAME(m_state));
 	save_item(NAME(m_cs_state));
+	save_item(NAME(m_last_cs_rising_edge_time));
 	save_item(NAME(m_oe_state));
 	save_item(NAME(m_clk_state));
 	save_item(NAME(m_di_state));
@@ -607,8 +606,8 @@ void eeprom_serial_base_device::execute_write_command()
 //  STANDARD INTERFACE IMPLEMENTATION
 //**************************************************************************
 
-eeprom_serial_s29x90_device::eeprom_serial_s29x90_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, eeprom_serial_streaming ignored)
-	: eeprom_serial_93cxx_device(mconfig, devtype, tag, owner, eeprom_serial_streaming::ENABLE)
+eeprom_serial_s29x90_device::eeprom_serial_s29x90_device(const machine_config &mconfig, device_type devtype, const char *tag, device_t *owner, eeprom_serial_streaming ignored) :
+	eeprom_serial_93cxx_device(mconfig, devtype, tag, owner, eeprom_serial_streaming::ENABLE)
 {
 	enable_output_on_falling_clock(true);
 }
@@ -1079,14 +1078,14 @@ void eeprom_serial_x24c44_device::di_write(int state) { base_di_write(state); }
 
 // macro for defining a new device class
 #define DEFINE_SERIAL_EEPROM_DEVICE(_baseclass, _lowercase, _uppercase, _bits, _cells, _addrbits) \
-eeprom_serial_##_lowercase##_##_bits##bit_device::eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, eeprom_serial_streaming enable_streaming) \
-	: eeprom_serial_##_baseclass##_device(mconfig, EEPROM_##_uppercase##_##_bits##BIT, tag, owner, enable_streaming) \
+eeprom_serial_##_lowercase##_##_bits##bit_device::eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, eeprom_serial_streaming enable_streaming) : \
+	eeprom_serial_##_baseclass##_device(mconfig, EEPROM_##_uppercase##_##_bits##BIT, tag, owner, enable_streaming) \
 { \
 	size(_cells, _bits); \
 	set_address_bits(_addrbits); \
 } \
-eeprom_serial_##_lowercase##_##_bits##bit_device::eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) \
-	: eeprom_serial_##_baseclass##_device(mconfig, EEPROM_##_uppercase##_##_bits##BIT, tag, owner, eeprom_serial_streaming::DISABLE) \
+eeprom_serial_##_lowercase##_##_bits##bit_device::eeprom_serial_##_lowercase##_##_bits##bit_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) : \
+	eeprom_serial_##_baseclass##_device(mconfig, EEPROM_##_uppercase##_##_bits##BIT, tag, owner, eeprom_serial_streaming::DISABLE) \
 { \
 	size(_cells, _bits); \
 	set_address_bits(_addrbits); \

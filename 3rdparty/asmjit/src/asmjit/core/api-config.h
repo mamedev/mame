@@ -54,8 +54,6 @@
 // Build Options
 // =============
 
-#define ASMJIT_STATIC
-
 // NOTE: Doxygen cannot document macros that are not defined, that's why we have to define them and then undefine
 // them immediately, so it won't use the macros with its own preprocessor.
 #ifdef _DOXYGEN
@@ -234,7 +232,7 @@ namespace asmjit {
 #define ASMJIT_ARCH_BITS (ASMJIT_ARCH_X86 | ASMJIT_ARCH_ARM | ASMJIT_ARCH_MIPS | ASMJIT_ARCH_RISCV)
 #if ASMJIT_ARCH_BITS == 0
   #undef ASMJIT_ARCH_BITS
-  #if defined (__LP64__) || defined(_LP64)
+  #if defined(__LP64__) || defined(_LP64)
     #define ASMJIT_ARCH_BITS 64
   #else
     #define ASMJIT_ARCH_BITS 32

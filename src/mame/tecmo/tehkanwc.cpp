@@ -801,20 +801,20 @@ GFXDECODE_END
 void tehkanwc_state::tehkanwc(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 18432000/4);     /* 18.432000 / 4 */
+	Z80(config, m_maincpu, 18.432_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tehkanwc_state::main_mem);
 	m_maincpu->set_vblank_int("screen", FUNC(tehkanwc_state::irq0_line_hold));
 
-	Z80(config, m_subcpu, 18432000/4);
+	Z80(config, m_subcpu, 18.432_MHz_XTAL / 4);
 	m_subcpu->set_addrmap(AS_PROGRAM, &tehkanwc_state::sub_mem);
 	m_subcpu->set_vblank_int("screen", FUNC(tehkanwc_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, 18432000/4);
+	Z80(config, m_audiocpu, 18.432_MHz_XTAL / 4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &tehkanwc_state::sound_mem);
 	m_audiocpu->set_addrmap(AS_IO, &tehkanwc_state::sound_port);
 	m_audiocpu->set_vblank_int("screen", FUNC(tehkanwc_state::irq0_line_hold));
 
-	config.set_maximum_quantum(attotime::from_hz(600));  /* 10 CPU slices per frame - seems enough to keep the CPUs in sync */
+	config.set_maximum_quantum(attotime::from_hz(600)); // 10 CPU slices per frame - seems enough to keep the CPUs in sync
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -833,12 +833,12 @@ void tehkanwc_state::tehkanwc(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	ym2149_device &ay1(YM2149(config, "ay1", 18432000/12));
+	ym2149_device &ay1(YM2149(config, "ay1", 18.432_MHz_XTAL / 12));
 	ay1.port_a_write_callback().set(FUNC(tehkanwc_state::portA_w));
 	ay1.port_b_write_callback().set(FUNC(tehkanwc_state::portB_w));
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	ym2149_device &ay2(YM2149(config, "ay2", 18432000/12));
+	ym2149_device &ay2(YM2149(config, "ay2", 18.432_MHz_XTAL / 12));
 	ay2.port_a_read_callback().set(FUNC(tehkanwc_state::portA_r));
 	ay2.port_b_read_callback().set(FUNC(tehkanwc_state::portB_r));
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);
@@ -852,12 +852,12 @@ void tehkanwc_state::tehkanwc(machine_config &config)
 void tehkanwc_state::tehkanwcb(machine_config &config)
 {
 	tehkanwc(config);
-	ay8910_device &ay1(AY8910(config.replace(), "ay1", 18432000/12));
+	ay8910_device &ay1(AY8910(config.replace(), "ay1", 18.432_MHz_XTAL / 12));
 	ay1.port_a_write_callback().set(FUNC(tehkanwc_state::portA_w));
 	ay1.port_b_write_callback().set(FUNC(tehkanwc_state::portB_w));
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	ay8910_device &ay2(AY8910(config.replace(), "ay2", 18432000/12));
+	ay8910_device &ay2(AY8910(config.replace(), "ay2", 18.432_MHz_XTAL / 12));
 	ay2.port_a_read_callback().set(FUNC(tehkanwc_state::portA_r));
 	ay2.port_b_read_callback().set(FUNC(tehkanwc_state::portB_r));
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.25);

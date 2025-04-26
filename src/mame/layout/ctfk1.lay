@@ -1,0 +1,241 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+
+<mamelayout version="2">
+	<element name="bg"><rect><color red="0.75" green="0.75" blue="0.775" /></rect></element>
+	<element name="brown"><rect><color red="0.365" green="0.263" blue="0.17" /></rect></element>
+	<element name="line"><rect><color red="0.55" green="0.55" blue="0.575" /></rect></element>
+	<element name="line_white"><rect><color red="1" green="1" blue="0.95" /></rect></element>
+
+	<element name="button_back">
+		<rect><bounds x="0" y="0" width="1" height="20" /><color red="0.25" green="0.25" blue="0.275" /></rect>
+		<rect><bounds x="0" y="1" width="1" height="18" /><color red="0.3" green="0.3" blue="0.325" /></rect>
+	</element>
+	<element name="panel_back"><rect><color red="0.7" green="0.7" blue="0.725" /></rect></element>
+
+	<element name="top_back">
+		<disk><bounds x="0" y="0" width="10" height="10" /><color red="0.1" green="0.1" blue="0.1" /></disk>
+		<disk><bounds x="270" y="0" width="10" height="10" /><color red="0.1" green="0.1" blue="0.1" /></disk>
+		<disk><bounds x="0" y="35" width="10" height="10" /><color red="0.1" green="0.1" blue="0.1" /></disk>
+		<disk><bounds x="270" y="35" width="10" height="10" /><color red="0.1" green="0.1" blue="0.1" /></disk>
+		<rect><bounds x="5" y="0" width="270" height="45" /><color red="0.1" green="0.1" blue="0.1" /></rect>
+		<rect><bounds x="0" y="5" width="280" height="35" /><color red="0.1" green="0.1" blue="0.1" /></rect>
+	</element>
+
+	<!-- text elements -->
+	<element name="select"><text string="BASS SELECT"><color red="0" blue="0" green="0" /></text></element>
+	<element name="foot"><text string="FOOT" align="1"><color red="0" blue="0" green="0" /></text></element>
+	<element name="auto"><text string="AUTO" align="1"><color red="0" blue="0" green="0" /></text></element>
+	<element name="mode"><text string="MODE"><color red="0" blue="0" green="0" /></text></element>
+	<element name="set"><text string="SET" align="1"><color red="0" blue="0" green="0" /></text></element>
+	<element name="play"><text string="PLAY" align="1"><color red="0" blue="0" green="0" /></text></element>
+	<element name="sustain"><text string="SUSTAIN"><color red="0" blue="0" green="0" /></text></element>
+	<element name="on"><text string="ON" align="1"><color red="0" blue="0" green="0" /></text></element>
+	<element name="off"><text string="OFF" align="1"><color red="0" blue="0" green="0" /></text></element>
+	<element name="tune"><text string="TUNE" /></element>
+
+	<element name="tone1"><text string="ORGAN 1"><color red="0" blue="0" green="0" /></text></element>
+	<element name="tone2"><text string="ORGAN 4"><color red="0" blue="0" green="0" /></text></element>
+	<element name="tone3"><text string="ORGAN 2"><color red="0" blue="0" green="0" /></text></element>
+	<element name="tone4"><text string="TUBA 2"><color red="0" blue="0" green="0" /></text></element>
+	<element name="tone5"><text string="ORGAN 3"><color red="0" blue="0" green="0" /></text></element>
+	<element name="tone6"><text string="TUBA 1"><color red="0" blue="0" green="0" /></text></element>
+	<element name="tone7"><text string="BASSOON 2"><color red="0" blue="0" green="0" /></text></element>
+	<element name="tone8"><text string="BASSOON 1"><color red="0" blue="0" green="0" /></text></element>
+	<element name="tone9"><text string="WOOD BASS"><color red="0" blue="0" green="0" /></text></element>
+	<element name="tone9b"><text string="(ARCO 2)"><color red="0" blue="0" green="0" /></text></element>
+	<element name="tone10"><text string="WOOD BASS"><color red="0" blue="0" green="0" /></text></element>
+	<element name="tone10b"><text string="(ARCO 1)"><color red="0" blue="0" green="0" /></text></element>
+	<element name="tone11"><text string="WOOD BASS"><color red="0" blue="0" green="0" /></text></element>
+	<element name="tone11b"><text string="(PIZZ 2)"><color red="0" blue="0" green="0" /></text></element>
+	<element name="tone12"><text string="WOOD BASS"><color red="0" blue="0" green="0" /></text></element>
+	<element name="tone12b"><text string="(PIZZ 1)"><color red="0" blue="0" green="0" /></text></element>
+	<element name="tone13"><text string="ELEC. BASS 1"><color red="0" blue="0" green="0" /></text></element>
+	<element name="tone14"><text string="ELEC. BASS 2"><color red="0" blue="0" green="0" /></text></element>
+	<element name="tone15"><text string="HARPSICHORD 1"><color red="0" blue="0" green="0" /></text></element>
+	<element name="tone16"><text string="HARPSICHORD 2"><color red="0" blue="0" green="0" /></text></element>
+	<element name="tone17"><text string="PIANO"><color red="0" blue="0" green="0" /></text></element>
+	<element name="tone18"><text string="SYNTH CHIME"><color red="0" blue="0" green="0" /></text></element>
+
+	<!-- button primitives -->
+	<element name="button_down" defstate="0">
+		<rect><color red="0.1" green="0.1" blue="0.1" /><bounds x="0" y="0" width="5" height="10" /></rect>
+		<rect state="0"><color red="0.8" green="0.8" blue="0.8" /><bounds xc="2.5" yc="5" width="4" height="9" /></rect>
+		<rect state="1"><color red="0.5" green="0.5" blue="0.5" /><bounds xc="2.5" yc="5" width="4" height="9" /></rect>
+		<image>
+			<bounds xc="2.5" yc="5" width="2" height="5" />
+			<data><![CDATA[
+				<?xml version="1.0" standalone="no"?>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10" version="1.1">
+					<polygon points="2,2 5,8 8,2" fill="white" stroke="white" stroke-width="0.4" />
+				</svg>
+			]]></data>
+		</image>
+	</element>
+
+	<element name="button_up" defstate="0">
+		<rect><color red="0.1" green="0.1" blue="0.1" /><bounds x="0" y="0" width="5" height="10" /></rect>
+		<rect state="0"><color red="0.8" green="0.8" blue="0.8" /><bounds xc="2.5" yc="5" width="4" height="9" /></rect>
+		<rect state="1"><color red="0.5" green="0.5" blue="0.5" /><bounds xc="2.5" yc="5" width="4" height="9" /></rect>
+		<image>
+			<bounds xc="2.5" yc="5" width="2" height="5" />
+			<data><![CDATA[
+				<?xml version="1.0" standalone="no"?>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10" version="1.1">
+					<polygon points="2,8 5,2 8,8" fill="white" stroke="white" stroke-width="0.4" />
+				</svg>
+			]]></data>
+		</image>
+	</element>
+
+	<element name="button" defstate="0">
+		<disk><color red="0.1" green="0.1" blue="0.1" /><bounds x="0" y="0" width="20" height="20" /></disk>
+		<rect><color red="0.1" green="0.1" blue="0.1" /><bounds x="0" y="10" width="20" height="42" /></rect>
+		<disk state="0"><color red="0.3" green="0.3" blue="0.3" /><bounds xc="10" y="1" width="18" height="18" /></disk>
+		<rect state="0"><color red="0.3" green="0.3" blue="0.3" /><bounds xc="10" y="10" width="18" height="40" /></rect>
+		<disk state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds xc="10" y="1" width="18" height="18" /></disk>
+		<rect state="1"><color red="0.15" green="0.15" blue="0.15" /><bounds xc="10" y="10" width="18" height="40" /></rect>
+	</element>
+
+	<element name="button_icon_up">
+		<rect><color red="0.75" green="0.75" blue="0.775" /><bounds x="0" y="0" width="5" height="5" /></rect>
+
+		<rect><color red="0" green="0" blue="0" /><bounds xc="2.5" y="4" width="5" height="1" /></rect>
+		<rect><color red="0" green="0" blue="0" /><bounds xc="2.5" y="1" width="3.5" height="4" /></rect>
+	</element>
+
+	<element name="button_icon_down">
+		<rect><color red="0.75" green="0.75" blue="0.775" /><bounds x="0" y="0" width="5" height="5" /></rect>
+
+		<rect><color red="0" green="0" blue="0" /><bounds xc="2.5" y="4" width="5" height="1" /></rect>
+		<rect><color red="0" green="0" blue="0" /><bounds xc="2.5" y="3" width="3.5" height="2" /></rect>
+	</element>
+
+	<!-- keyboard primitives -->
+	<element name="keyfill"><rect><color red="0.08" green="0.08" blue="0.08" /></rect></element>
+	<element name="whitekey" defstate="0">
+		<rect><bounds xc="0" y="0" width="5" height="47.5" /><color red="0" green="0" blue="0" /></rect>
+		<disk><bounds xc="0" yc="47.5" width="5" height="5" /><color red="0" green="0" blue="0" /></disk>
+		<rect state="0"><bounds xc="0" y="0" width="4.25" height="47.5" /><color red="1" green="1" blue="1" /></rect>
+		<disk state="0"><bounds xc="0" yc="47.5" width="4.25" height="4.25" /><color red="1" green="1" blue="1" /></disk>
+		<rect state="1"><bounds xc="0" y="0" width="4.25" height="47.5" /><color red="0.8" green="0.8" blue="0.8" /></rect>
+		<disk state="1"><bounds xc="0" yc="47.5" width="4.25" height="4.25" /><color red="0.8" green="0.8" blue="0.8" /></disk>
+	</element>
+	<element name="blackkey" defstate="0">
+		<rect><bounds xc="0" y="0" width="5" height="25" /><color red="0" green="0" blue="0" /></rect>
+		<disk><bounds xc="0" yc="25" width="5" height="5" /><color red="0" green="0" blue="0" /></disk>
+		<rect state="0"><bounds xc="0" y="0" width="4.25" height="25" /><color red="0.25" green="0.25" blue="0.25" /></rect>
+		<disk state="0"><bounds xc="0" yc="25" width="4.25" height="4.25" /><color red="0.25" green="0.25" blue="0.25" /></disk>
+		<rect state="1"><bounds xc="0" y="0" width="4.25" height="25" /><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<disk state="1"><bounds xc="0" yc="25" width="4.25" height="4.25" /><color red="0.2" green="0.2" blue="0.2" /></disk>
+	</element>
+
+	<!-- button group -->
+	<group name="buttons">
+		<element ref="bg"><bounds x="0" y="0" width="660" height="180" /></element>
+		<element ref="top_back"><bounds x="25" y="25" width="280" height="45" /></element>
+		<element ref="tune"><bounds xc="270" y="30" width="40" height="9" /></element>
+		<element ref="button_down" inputtag="KC9" inputmask="0x04"><bounds xc="260" y="42" width="10" height="20" /></element>
+		<element ref="button_up" inputtag="KC9" inputmask="0x02"><bounds xc="280" y="42" width="10" height="20" /></element>
+
+		<element ref="select"><bounds xc="90" y="75" width="60" height="11" /></element>
+		<element ref="button_icon_down"><bounds x="73" y="87" width="9" height="9" /></element>
+		<element ref="foot"><bounds x="85" y="87" width="60" height="11" /></element>
+		<element ref="button_icon_up"><bounds x="73" y="99" width="9" height="9" /></element>
+		<element ref="auto"><bounds x="85" y="99" width="60" height="11" /></element>
+		<element ref="button" inputtag="KC9" inputmask="0x10"><bounds xc="90" y="115" width="20" height="52" /></element>
+
+		<element ref="mode"><bounds xc="180" y="75" width="60" height="11" /></element>
+		<element ref="button_icon_down"><bounds x="163" y="87" width="9" height="9" /></element>
+		<element ref="set"><bounds x="175" y="87" width="60" height="11" /></element>
+		<element ref="button_icon_up"><bounds x="163" y="99" width="9" height="9" /></element>
+		<element ref="play"><bounds x="175" y="99" width="60" height="11" /></element>
+		<element ref="button" inputtag="KCB" inputmask="0x10"><bounds xc="180" y="115" width="20" height="52" /></element>
+
+		<element ref="sustain"><bounds xc="270" y="75" width="60" height="11" /></element>
+		<element ref="button_icon_down"><bounds x="253" y="87" width="9" height="9" /></element>
+		<element ref="on"><bounds x="265" y="87" width="60" height="11" /></element>
+		<element ref="button_icon_up"><bounds x="253" y="99" width="9" height="9" /></element>
+		<element ref="off"><bounds x="265" y="99" width="60" height="11" /></element>
+		<element ref="button" inputtag="KCA" inputmask="0x01"><bounds xc="270" y="115" width="20" height="52" /></element>
+	</group>
+
+	<!-- keyboard group -->
+	<group name="keyboard">
+		<element ref="keyfill"><bounds x="0" y="0" width="660" height="300" /></element>
+
+		<element ref="button_back"><bounds x="0" y="100" width="660" height="30" /></element>
+		<element ref="button_back"><bounds x="0" y="200" width="660" height="30" /></element>
+
+		<element ref="whitekey" inputtag="KC0" inputmask="0x01"><bounds xc="30" y="0" width="25" height="245" /></element>
+		<element ref="blackkey" inputtag="KC0" inputmask="0x02"><bounds xc="60" y="0" width="25" height="125" /></element>
+		<element ref="whitekey" inputtag="KC0" inputmask="0x04"><bounds xc="90" y="0" width="25" height="245" /></element>
+		<element ref="blackkey" inputtag="KC0" inputmask="0x08"><bounds xc="120" y="0" width="25" height="125" /></element>
+		<element ref="whitekey" inputtag="KC0" inputmask="0x10"><bounds xc="150" y="0" width="25" height="245" /></element>
+
+		<element ref="whitekey" inputtag="KC0" inputmask="0x20"><bounds xc="210" y="0" width="25" height="245" /></element>
+		<element ref="blackkey" inputtag="KC1" inputmask="0x01"><bounds xc="240" y="0" width="25" height="125" /></element>
+		<element ref="whitekey" inputtag="KC1" inputmask="0x02"><bounds xc="270" y="0" width="25" height="245" /></element>
+		<element ref="blackkey" inputtag="KC1" inputmask="0x04"><bounds xc="300" y="0" width="25" height="125" /></element>
+		<element ref="whitekey" inputtag="KC1" inputmask="0x08"><bounds xc="330" y="0" width="25" height="245" /></element>
+		<element ref="blackkey" inputtag="KC1" inputmask="0x10"><bounds xc="360" y="0" width="25" height="125" /></element>
+		<element ref="whitekey" inputtag="KC1" inputmask="0x20"><bounds xc="390" y="0" width="25" height="245" /></element>
+
+		<element ref="whitekey" inputtag="KC2" inputmask="0x01"><bounds xc="450" y="0" width="25" height="245" /></element>
+		<element ref="blackkey" inputtag="KC2" inputmask="0x02"><bounds xc="480" y="0" width="25" height="125" /></element>
+		<element ref="whitekey" inputtag="KC2" inputmask="0x04"><bounds xc="510" y="0" width="25" height="245" /></element>
+		<element ref="blackkey" inputtag="KC2" inputmask="0x08"><bounds xc="540" y="0" width="25" height="125" /></element>
+		<element ref="whitekey" inputtag="KC2" inputmask="0x10"><bounds xc="570" y="0" width="25" height="245" /></element>
+
+		<element ref="whitekey" inputtag="KC2" inputmask="0x20"><bounds xc="630" y="0" width="25" height="245" /></element>
+	</group>
+
+	<group name="key_labels">
+		<bounds x="0" y="0" width="660" height="40" />
+
+		<element ref="tone2"><bounds xc="60" y="11" width="60" height="9" /></element>
+		<element ref="line_white"><bounds xc="60" y="20" width="1.5" height="20" /></element>
+		<element ref="tone4"><bounds xc="120" y="11" width="60" height="9" /></element>
+		<element ref="line_white"><bounds xc="120" y="20" width="1.5" height="20" /></element>
+		<element ref="tone7"><bounds xc="240" y="11" width="60" height="9" /></element>
+		<element ref="line_white"><bounds xc="240" y="20" width="1.5" height="20" /></element>
+		<element ref="tone9"><bounds xc="300" y="3" width="55" height="9" /></element>
+		<element ref="tone9b"><bounds xc="300" y="11" width="55" height="9" /></element>
+		<element ref="line_white"><bounds xc="300" y="20" width="1.5" height="20" /></element>
+		<element ref="tone11"><bounds xc="360" y="3" width="55" height="9" /></element>
+		<element ref="tone11b"><bounds xc="360" y="11" width="55" height="9" /></element>
+		<element ref="line_white"><bounds xc="360" y="20" width="1.5" height="20" /></element>
+
+		<element ref="tone1"><bounds xc="30" y="30" width="60" height="9" /></element>
+		<element ref="tone3"><bounds xc="90" y="30" width="60" height="9" /></element>
+		<element ref="tone5"><bounds xc="150" y="30" width="60" height="9" /></element>
+		<element ref="tone6"><bounds xc="210" y="30" width="60" height="9" /></element>
+		<element ref="tone8"><bounds xc="270" y="30" width="60" height="9" /></element>
+		<element ref="tone10"><bounds xc="330" y="22" width="55" height="9" /></element>
+		<element ref="tone10b"><bounds xc="330" y="30" width="55" height="9" /></element>
+		<element ref="tone12"><bounds xc="390" y="22" width="55" height="9" /></element>
+		<element ref="tone12b"><bounds xc="390" y="30" width="55" height="9" /></element>
+
+		<element ref="tone14"><bounds xc="480" y="11" width="60" height="9" /></element>
+		<element ref="line_white"><bounds xc="480" y="20" width="1.5" height="20" /></element>
+		<element ref="tone16"><bounds xc="540" y="11" width="60" height="9" /></element>
+		<element ref="line_white"><bounds xc="540" y="20" width="1.5" height="20" /></element>
+
+		<element ref="tone13"><bounds xc="450" y="30" width="60" height="9" /></element>
+		<element ref="tone15"><bounds xc="510" y="30" width="60" height="9" /></element>
+		<element ref="tone17"><bounds xc="570" y="30" width="60" height="9" /></element>
+		<element ref="tone18"><bounds xc="630" y="30" width="60" height="9" /></element>
+	</group>
+
+	<view name="Keyboard">
+		<element ref="brown"><bounds x="0" y="0" width="690" height="520" /></element>
+		<group ref="buttons"><bounds xc="345" y="0" width="660" height="180" /></group>
+		<element ref="panel_back"><bounds xc="345" y="180" width="660" height="40" /></element>
+		<element ref="line"><bounds xc="345" y="180" width="660" height="3" /></element>
+
+		<group ref="key_labels"><bounds xc="345" y="180" width="660" height="40" /></group>
+		<group ref="keyboard"><bounds xc="345" y="220" width="660" height="300" /></group>
+	</view>
+</mamelayout>

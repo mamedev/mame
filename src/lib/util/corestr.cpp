@@ -15,6 +15,7 @@
 #include <memory>
 
 #include <cctype>
+#include <cstdint>
 #include <cstdlib>
 
 

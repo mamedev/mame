@@ -102,7 +102,7 @@ private:
 void vl1_state::led_w(u16 data)
 {
 	u8 activated = (((~m_led) & data) >> 8) & 0xf;
-	if(activated && 0) {
+	if(activated && false) {
 		if(activated & 1)
 			logerror("led.0 %02x\n", data & 0xff);
 		if(activated & 2)

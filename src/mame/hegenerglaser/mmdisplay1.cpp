@@ -34,26 +34,13 @@ void mephisto_display1_device::device_start()
 	if (m_output_digit.isunset())
 		m_digits.resolve();
 
+	// initialize
+	m_strobe = 1;
+	m_digit_data = ~0;
+
 	// register for savestates
 	save_item(NAME(m_strobe));
-	save_item(NAME(m_digit_idx));
 	save_item(NAME(m_digit_data));
-}
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void mephisto_display1_device::device_reset()
-{
-	m_strobe = 0;
-	m_digit_idx = 0;
-
-	// clear display
-	for (int i = 0; i < 4; i++)
-		m_digit_data[i] = 0;
-	update_lcd();
 }
 
 
@@ -65,10 +52,12 @@ void mephisto_display1_device::update_lcd()
 {
 	for (int i = 0; i < 4; i++)
 	{
+		u8 digit = m_digit_data >> (i * 8) ^ (m_strobe ? 0 : 0xff);
+
 		if (m_output_digit.isunset())
-			m_digits[i] = m_digit_data[i];
+			m_digits[i] = digit;
 		else
-			m_output_digit(i, m_digit_data[i]);
+			m_output_digit(i, digit);
 	}
 }
 
@@ -78,13 +67,13 @@ void mephisto_display1_device::strobe_w(int state)
 
 	// update lcd on any edge
 	if (state != m_strobe)
+	{
+		m_strobe = state;
 		update_lcd();
-
-	m_strobe = state;
+	}
 }
 
 void mephisto_display1_device::data_w(u8 data)
 {
-	m_digit_data[m_digit_idx] = m_strobe ? ~data : data;
-	m_digit_idx = (m_digit_idx + 1) & 3;
+	m_digit_data = (m_digit_data >> 8) | (data << 24);
 }

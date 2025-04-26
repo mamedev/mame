@@ -620,4 +620,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1992, goal92, cupsoc, goal92, goal92, goal92_state, empty_init, ROT0, "bootleg", "Goal! '92", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1992, goal92, cupsoc, goal92, goal92, goal92_state, empty_init, ROT0, "bootleg (Electronic Devices)", "Goal! '92", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

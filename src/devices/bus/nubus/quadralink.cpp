@@ -39,11 +39,11 @@ DEFINE_DEVICE_TYPE(NUBUS_QUADRALINK, nubus_quadralink_device, "nb_qdlink", "Appl
 
 void nubus_quadralink_device::device_add_mconfig(machine_config &config)
 {
-	SCC8530N(config, m_scc1, 3.6864_MHz_XTAL);
+	SCC8530(config, m_scc1, 3.6864_MHz_XTAL);
 	m_scc1->out_txda_callback().set("serport0", FUNC(rs232_port_device::write_txd));
 	m_scc1->out_txdb_callback().set("serport1", FUNC(rs232_port_device::write_txd));
 
-	SCC8530N(config, m_scc2, 3.6864_MHz_XTAL);
+	SCC8530(config, m_scc2, 3.6864_MHz_XTAL);
 	m_scc2->out_txda_callback().set("serport2", FUNC(rs232_port_device::write_txd));
 	m_scc2->out_txdb_callback().set("serport3", FUNC(rs232_port_device::write_txd));
 

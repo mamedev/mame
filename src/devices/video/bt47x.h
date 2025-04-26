@@ -92,6 +92,12 @@ public:
 	bt471_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 };
 
+class bt473_device : public bt47x_device_base
+{
+public:
+	bt473_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+};
+
 class bt475_device : public bt475_device_base
 {
 public:
@@ -144,7 +150,7 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(BT471, bt471_device)
-//DECLARE_DEVICE_TYPE(BT473, bt473_device)
+DECLARE_DEVICE_TYPE(BT473, bt473_device)
 //DECLARE_DEVICE_TYPE(BT474, bt474_device)
 DECLARE_DEVICE_TYPE(BT475, bt475_device)
 DECLARE_DEVICE_TYPE(BT476, bt476_device)

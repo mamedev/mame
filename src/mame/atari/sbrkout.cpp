@@ -35,14 +35,17 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6502/m6502.h"
 #include "machine/74259.h"
 #include "machine/watchdog.h"
 #include "sound/dac.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
+
 #include "sbrkout.lh"
 
 
@@ -116,16 +119,6 @@ public:
 protected:
 	virtual uint8_t switches_r(offs_t offset) override;
 };
-
-
-/*************************************
- *
- *  Constants
- *
- *************************************/
-
-static constexpr XTAL MAIN_CLOCK    = 12.096_MHz_XTAL;
-#define TIME_4V                     attotime::from_hz(MAIN_CLOCK/2/256/2/4)
 
 
 /*************************************
@@ -495,7 +488,7 @@ static INPUT_PORTS_START( sbrkoutct )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 
 	PORT_MODIFY("SELECT")
-	PORT_CONFNAME(0x80, 0x00, "Game Select" )
+	PORT_CONFNAME( 0x80, 0x00, "Game Select" )
 	PORT_CONFSETTING( 0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING( 0x80, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -546,7 +539,7 @@ GFXDECODE_END
 void sbrkout_state::sbrkout(machine_config &config)
 {
 	/* basic machine hardware */
-	M6502(config, m_maincpu, MAIN_CLOCK/16); // 756KHz verified
+	M6502(config, m_maincpu, 12.096_MHz_XTAL/16); // 756KHz verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &sbrkout_state::main_map);
 
 	F9334(config, m_outlatch); // H8
@@ -566,7 +559,7 @@ void sbrkout_state::sbrkout(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sbrkout);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(MAIN_CLOCK/2, 384, 0, 256, 262, 0, 224);
+	m_screen->set_raw(12.096_MHz_XTAL/2, 384, 0, 256, 262, 0, 224);
 	m_screen->set_screen_update(FUNC(sbrkout_state::screen_update_sbrkout));
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
@@ -615,16 +608,16 @@ ROM_END
 
 ROM_START( sbrkout3 ) // rev 03; main cpu roms are on 1024x4bit (82s137 or equiv) proms, otherwise seems identical to rev 04
 	ROM_REGION( 0x4000, "maincpu", 0 )
-	ROM_LOAD_NIB_HIGH( "33442-01.kl0",    0x2C00, 0x0400, CRC(fb5cb68a) SHA1(301e8e47f6a82d6c2290a890bcd5c53d61d58ff7) )
-	ROM_LOAD_NIB_LOW( "33448-01.kl1",    0x2C00, 0x0400, CRC(b1d2b269) SHA1(46de71f1f9695f03465fd9b2289b5c5ffe19b3a2) )
-	ROM_LOAD_NIB_HIGH( "33443-01.l0",    0x3000, 0x0400, CRC(1e7d059f) SHA1(e1831febfd26cf2560351d45f37763a7498c029e) )
-	ROM_LOAD_NIB_LOW( "33449-01.l1",    0x3000, 0x0400, CRC(f936918d) SHA1(9d62fe75d39f95085a4380059c4980f3affe1bbf) )
-	ROM_LOAD_NIB_HIGH( "33444-01.m0",    0x3400, 0x0400, CRC(5b7e0e3b) SHA1(4dbd62b23249fbb05e1fffe50b89a5e280a2dde9) )
-	ROM_LOAD_NIB_LOW( "33450-01.m1",    0x3400, 0x0400, CRC(430cf9e8) SHA1(8e6075f12dbe0b973500d4e38e0090e40ee47260) )
-	ROM_LOAD_NIB_HIGH( "33445-01.n0",    0x3800, 0x0400, CRC(cdf19919) SHA1(13623bde69e7f352beaef33524f69d74c540e1cc) )
-	ROM_LOAD_NIB_LOW( "33451-01.n1",    0x3800, 0x0400, CRC(19f7c50d) SHA1(91ba9ef7ab4b200a55ae7b7979f4a01e617dd9ad) )
-	ROM_LOAD_NIB_HIGH( "33446-01.p0",    0x3C00, 0x0400, CRC(9553663c) SHA1(6c28b3a11b7ff0aa224bf262c664a62166dc9cdf) )
-	ROM_LOAD_NIB_LOW( "33452-01.p1",    0x3C00, 0x0400, CRC(6dc0439a) SHA1(9cc0b735935a610519eb1b53ed303223e69af0b7) )
+	ROM_LOAD_NIB_HIGH( "33442-01.kl0", 0x2c00, 0x0400, CRC(fb5cb68a) SHA1(301e8e47f6a82d6c2290a890bcd5c53d61d58ff7) )
+	ROM_LOAD_NIB_LOW(  "33448-01.kl1", 0x2c00, 0x0400, CRC(b1d2b269) SHA1(46de71f1f9695f03465fd9b2289b5c5ffe19b3a2) )
+	ROM_LOAD_NIB_HIGH( "33443-01.l0",  0x3000, 0x0400, CRC(1e7d059f) SHA1(e1831febfd26cf2560351d45f37763a7498c029e) )
+	ROM_LOAD_NIB_LOW(  "33449-01.l1",  0x3000, 0x0400, CRC(f936918d) SHA1(9d62fe75d39f95085a4380059c4980f3affe1bbf) )
+	ROM_LOAD_NIB_HIGH( "33444-01.m0",  0x3400, 0x0400, CRC(5b7e0e3b) SHA1(4dbd62b23249fbb05e1fffe50b89a5e280a2dde9) )
+	ROM_LOAD_NIB_LOW(  "33450-01.m1",  0x3400, 0x0400, CRC(430cf9e8) SHA1(8e6075f12dbe0b973500d4e38e0090e40ee47260) )
+	ROM_LOAD_NIB_HIGH( "33445-01.n0",  0x3800, 0x0400, CRC(cdf19919) SHA1(13623bde69e7f352beaef33524f69d74c540e1cc) )
+	ROM_LOAD_NIB_LOW(  "33451-01.n1",  0x3800, 0x0400, CRC(19f7c50d) SHA1(91ba9ef7ab4b200a55ae7b7979f4a01e617dd9ad) )
+	ROM_LOAD_NIB_HIGH( "33446-01.p0",  0x3c00, 0x0400, CRC(9553663c) SHA1(6c28b3a11b7ff0aa224bf262c664a62166dc9cdf) )
+	ROM_LOAD_NIB_LOW(  "33452-01.p1",  0x3c00, 0x0400, CRC(6dc0439a) SHA1(9cc0b735935a610519eb1b53ed303223e69af0b7) )
 
 	ROM_REGION( 0x0400, "gfx1", 0 )
 	ROM_LOAD( "033280.p4",    0x0000, 0x0200, CRC(5a69ce85) SHA1(ad9078d12495c350738bdb0b1e1b6120d9e01f60) )
@@ -661,8 +654,8 @@ ROM_START( sbrkoutct ) // built from original Atari source code
 	ROM_LOAD( "034557-01.ef1",  0x3800, 0x0800, CRC(b6b3b07b) SHA1(c4d2cdcca89c2944afd4a4ed0bb5003b3eca4c7e) )
 
 	ROM_REGION( 0x0400, "gfx1", 0 )
-	ROM_LOAD( "034559-01.r4",    0x0000, 0x0200, CRC(84368539) SHA1(50b2c3f443346e3a355492ed1f7ec0a8cc6364d4) )
-	ROM_LOAD( "034558-01.p4",    0x0200, 0x0200, CRC(cc0f81f2) SHA1(a2180280991c9cf43f4e941d9ba4fe5654d1af65) )
+	ROM_LOAD( "034559-01.r4",   0x0000, 0x0200, CRC(84368539) SHA1(50b2c3f443346e3a355492ed1f7ec0a8cc6364d4) )
+	ROM_LOAD( "034558-01.p4",   0x0200, 0x0200, CRC(cc0f81f2) SHA1(a2180280991c9cf43f4e941d9ba4fe5654d1af65) )
 
 	ROM_REGION( 0x0020, "gfx2", 0 )
 	ROM_LOAD( "033282.k6",    0x0000, 0x0020, CRC(6228736b) SHA1(bc176261dba11521df19d545ce604f8cc294287a) )

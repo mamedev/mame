@@ -145,7 +145,7 @@ u8 taito_cchip_device::asic_r(offs_t offset)
 {
 	if ((offset != 0x001) && (!machine().side_effects_disabled())) // prevent logerror spam for now
 		logerror("%s: asic_r %04x\n", machine().describe_context(), offset);
-	if (offset<0x200) // 400-5ff is asic 'ram'
+	if (offset < 0x200) // 400-5ff is asic 'ram'
 		return m_asic_ram[offset&3];
 	return 0x00; // 600-7ff is write-only(?) asic banking reg, may read as open bus or never assert /DTACK on read?
 }
@@ -218,8 +218,8 @@ void taito_cchip_device::device_start()
 	m_upd4464_bank68->configure_entries(0, m_sharedram.length() / 0x400, &m_sharedram[0], 0x400);
 	m_upd4464_bank68->set_entry(0);
 
-	save_item(NAME(m_asic_ram));
 	m_asic_ram[0] = m_asic_ram[1] = m_asic_ram[2] = m_asic_ram[3] = 0;
+	save_item(NAME(m_asic_ram));
 }
 
 const tiny_rom_entry *taito_cchip_device::device_rom_region() const

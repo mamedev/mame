@@ -360,8 +360,8 @@ ROM_START( quizpani )
 
 	ROM_REGION( 0x300, "proms", 0 )
 	ROM_LOAD( "qz6.88",  0x000, 0x100, CRC(19dbbad2) SHA1(ebf7950d1869ca3bc1e72228505fbc17d095746a) ) // unknown
-	ROM_LOAD( "qz7.99",  0x100, 0x100, CRC(1f802af1) SHA1(617bb7e5105ac202b5a8cf83c8c66178b91099e0) ) // unknown
-	ROM_LOAD( "qz8.121", 0x200, 0x100, CRC(b4c19741) SHA1(a6d3686bad6ef2336463b89bc2d249003d9b4bcc) ) // unknown
+	ROM_LOAD( "qz7.99",  0x100, 0x100, CRC(1f802af1) SHA1(617bb7e5105ac202b5a8cf83c8c66178b91099e0) ) // Horizontal video timing (unused in emulation for now)
+	ROM_LOAD( "qz8.121", 0x200, 0x100, CRC(b4c19741) SHA1(a6d3686bad6ef2336463b89bc2d249003d9b4bcc) ) // Vertical video timing (unused in emulation for now)
 ROM_END
 
 } // anonymous namespace

@@ -1751,7 +1751,7 @@ void namcos22_state::draw_sprites()
 	bool y_lowres = BIT(~m_spriteram[0], 18);
 
 	const int deltax = (m_spriteram[1] & 0xffff) + (m_spriteram[2] & 0xffff) + 0x2d;
-	const int deltay = (m_spriteram[3] >> 16) + (0x2a >> y_lowres);
+	const int deltay = (m_spriteram[3] >> 16) + (0x2a >> (y_lowres ? 1 : 0));
 
 	const int base = m_spriteram[0] & 0xffff; // alpines/alpinr2b
 	int num_sprites = ((m_spriteram[1] >> 16) - base) + 1;

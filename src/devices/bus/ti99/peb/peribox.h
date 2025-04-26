@@ -140,6 +140,18 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
+/*
+    Variation for ti99_4ev without EVPC inserted
+*/
+class peribox_ev1_device : public peribox_device
+{
+public:
+	peribox_ev1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+};
+
 
 /*
     Variation for Geneve.
@@ -266,6 +278,7 @@ private:
 
 DECLARE_DEVICE_TYPE_NS(TI99_PERIBOX,      bus::ti99::peb, peribox_device)
 DECLARE_DEVICE_TYPE_NS(TI99_PERIBOX_EV,   bus::ti99::peb, peribox_ev_device)
+DECLARE_DEVICE_TYPE_NS(TI99_PERIBOX_EV1,   bus::ti99::peb, peribox_ev1_device)
 DECLARE_DEVICE_TYPE_NS(TI99_PERIBOX_SLOT, bus::ti99::peb, peribox_slot_device)
 DECLARE_DEVICE_TYPE_NS(TI99_PERIBOX_SG,   bus::ti99::peb, peribox_sg_device)
 DECLARE_DEVICE_TYPE_NS(TI99_PERIBOX_GEN,  bus::ti99::peb, peribox_gen_device)

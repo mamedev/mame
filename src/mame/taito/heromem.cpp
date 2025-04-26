@@ -270,15 +270,15 @@ void heromem_state::heromem(machine_config &config)
 
 	ym2610b_device &ym_l(YM2610B(config, "ym_l", 16000000 / 2));
 	ym_l.irq_handler().set_inputline("audiocpu_l", 0);
-	ym_l.add_route(0, "lspeaker", 0.25);
-	ym_l.add_route(0, "lspeaker", 0.25);
+	ym_l.add_route(0, "lspeaker", 0.75);
+	ym_l.add_route(0, "lspeaker", 0.75);
 	ym_l.add_route(1, "lspeaker", 1.0);
 	ym_l.add_route(2, "lspeaker", 1.0);
 
 	ym2610b_device &ym_r(YM2610B(config, "ym_r", 16000000 / 2));
 	ym_r.irq_handler().set_inputline("audiocpu_r", 0);
-	ym_r.add_route(0, "rspeaker", 0.25);
-	ym_r.add_route(0, "rspeaker", 0.25);
+	ym_r.add_route(0, "rspeaker", 0.75);
+	ym_r.add_route(0, "rspeaker", 0.75);
 	ym_r.add_route(1, "rspeaker", 1.0);
 	ym_r.add_route(2, "rspeaker", 1.0);
 }

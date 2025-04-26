@@ -763,7 +763,7 @@ void rtpc_state::ibm6150(machine_config &config)
 	common(config);
 	m_iocc->set_addrmap(2, &rtpc_state::iocc_pio_map<true>);
 
-	SCC8530N(config, m_scc, 3'580'000);
+	SCC8530(config, m_scc, 3'580'000);
 	m_scc->configure_channels(3'072'000, 3'072'000, 3'072'000, 3'072'000);
 	m_scc->out_int_callback().set(m_pic[0], FUNC(pic8259_device::ir6_w));
 

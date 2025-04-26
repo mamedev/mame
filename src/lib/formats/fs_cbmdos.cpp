@@ -73,7 +73,7 @@ public:
 
 	private:
 		const impl &                    m_fs;
-		fsblk_t::block_t                m_block;
+		fsblk_t::block_t::ptr           m_block;
 		std::set<std::tuple<u8, u8>>    m_visited_set;
 		u8                              m_track;
 		u8                              m_sector;
@@ -85,11 +85,11 @@ public:
 	virtual ~impl() = default;
 
 	virtual meta_data volume_metadata() override;
-	virtual std::pair<err_t, meta_data> metadata(const std::vector<std::string> &path) override;
-	virtual std::pair<err_t, std::vector<dir_entry>> directory_contents(const std::vector<std::string> &path) override;
-	virtual std::pair<err_t, std::vector<u8>> file_read(const std::vector<std::string> &path) override;
-	virtual err_t file_create(const std::vector<std::string> &path, const meta_data &meta) override;
-	virtual err_t file_write(const std::vector<std::string> &path, const std::vector<u8> &data) override;
+	virtual std::pair<std::error_condition, meta_data> metadata(const std::vector<std::string> &path) override;
+	virtual std::pair<std::error_condition, std::vector<dir_entry>> directory_contents(const std::vector<std::string> &path) override;
+	virtual std::pair<std::error_condition, std::vector<u8>> file_read(const std::vector<std::string> &path) override;
+	virtual std::error_condition file_create(const std::vector<std::string> &path, const meta_data &meta) override;
+	virtual std::error_condition file_write(const std::vector<std::string> &path, const std::vector<u8> &data) override;
 
 private:
 	static constexpr u32 BLOCK_SIZE = 256;
@@ -124,15 +124,15 @@ private:
 	static const u8 s_data_track_order[MAX_TRACKS - 1];
 	u8 m_max_track;
 
-	fsblk_t::block_t read_sector(int track, int sector) const;
+	fsblk_t::block_t::ptr read_sector(int track, int sector) const;
 	std::optional<cbmdos_dirent> dirent_from_path(const std::vector<std::string> &path) const;
 	void iterate_directory_entries(const std::function<bool(u8 track, u8 sector, u8 file_index, const cbmdos_dirent &dirent)> &callback) const;
 	void iterate_all_directory_entries(const std::function<bool(u8 track, u8 sector, u8 file_index, const cbmdos_dirent &dirent)> &callback) const;
 	meta_data metadata_from_dirent(const cbmdos_dirent &dirent) const;
 	bool is_valid_filename(const std::string &filename) const;
-	std::pair<err_t, u8> claim_track_sector(u8 track) const;
-	std::tuple<err_t, u8, u8> claim_sector() const;
-	err_t free_sector(u8 track, u8 sector) const;
+	std::pair<std::error_condition, u8> claim_track_sector(u8 track) const;
+	std::tuple<std::error_condition, u8, u8> claim_sector() const;
+	std::error_condition free_sector(u8 track, u8 sector) const;
 	u8 determine_file_type(const std::vector<u8> &data) const;
 };
 
@@ -305,7 +305,7 @@ impl::impl(fsblk_t &blockdev)
 meta_data impl::volume_metadata()
 {
 	auto bam_block = read_sector(DIRECTORY_TRACK, BAM_SECTOR);
-	std::string_view disk_name = std::string_view((const char *) bam_block.rodata() + 0x90, 16);
+	std::string_view disk_name = bam_block->rstr(0x90, 16);
 
 	meta_data results;
 	results.set(meta_name::name, strtrimright_cbm(disk_name));
@@ -317,13 +317,13 @@ meta_data impl::volume_metadata()
 //  impl::metadata
 //-------------------------------------------------
 
-std::pair<err_t, meta_data> impl::metadata(const std::vector<std::string> &path)
+std::pair<std::error_condition, meta_data> impl::metadata(const std::vector<std::string> &path)
 {
 	std::optional<cbmdos_dirent> dirent = dirent_from_path(path);
 	if (!dirent)
-		return std::make_pair(ERR_NOT_FOUND, meta_data());
+		return std::make_pair(error::not_found, meta_data());
 
-	return std::make_pair(ERR_OK, metadata_from_dirent(*dirent));
+	return std::make_pair(std::error_condition(), metadata_from_dirent(*dirent));
 }
 
 
@@ -331,7 +331,7 @@ std::pair<err_t, meta_data> impl::metadata(const std::vector<std::string> &path)
 //  impl::directory_contents
 //-------------------------------------------------
 
-std::pair<err_t, std::vector<dir_entry>> impl::directory_contents(const std::vector<std::string> &path)
+std::pair<std::error_condition, std::vector<dir_entry>> impl::directory_contents(const std::vector<std::string> &path)
 {
 	std::vector<dir_entry> results;
 	auto callback = [this, &results](u8 track, u8 sector, u8 file_index, const cbmdos_dirent &ent)
@@ -340,7 +340,7 @@ std::pair<err_t, std::vector<dir_entry>> impl::directory_contents(const std::vec
 		return false;
 	};
 	iterate_directory_entries(callback);
-	return std::make_pair(ERR_OK, std::move(results));
+	return std::make_pair(std::error_condition(), std::move(results));
 }
 
 
@@ -348,12 +348,12 @@ std::pair<err_t, std::vector<dir_entry>> impl::directory_contents(const std::vec
 //  impl::file_read
 //-------------------------------------------------
 
-std::pair<err_t, std::vector<u8>> impl::file_read(const std::vector<std::string> &path)
+std::pair<std::error_condition, std::vector<u8>> impl::file_read(const std::vector<std::string> &path)
 {
 	// find the file
 	std::optional<cbmdos_dirent> dirent = dirent_from_path(path);
 	if (!dirent)
-		return std::make_pair(ERR_NOT_FOUND, std::vector<u8>());
+		return std::make_pair(error::not_found, std::vector<u8>());
 
 	// and get the data
 	std::vector<u8> result;
@@ -361,15 +361,15 @@ std::pair<err_t, std::vector<u8>> impl::file_read(const std::vector<std::string>
 	while (iter.next())
 		result.insert(result.end(), (const u8 *)iter.data(), (const u8 *)iter.data() + iter.size());
 
-	return std::make_pair(ERR_OK, std::move(result));
+	return std::make_pair(std::error_condition(), std::move(result));
 }
 
 
-err_t impl::file_create(const std::vector<std::string> &path, const meta_data &meta)
+std::error_condition impl::file_create(const std::vector<std::string> &path, const meta_data &meta)
 {
 	std::string filename = meta.get_string(meta_name::name, "");
 	if (!is_valid_filename(filename))
-		return ERR_INVALID;
+		return error::invalid_name;
 
 	std::optional<cbmdos_dirent> result;
 	u8 track = 0;
@@ -393,11 +393,11 @@ err_t impl::file_create(const std::vector<std::string> &path, const meta_data &m
 	{
 		// Claim a next directory sector
 		auto const [err, new_sector] = claim_track_sector(DIRECTORY_TRACK);
-		if (err != ERR_OK)
+		if (err)
 			return err;
 		auto new_block = read_sector(DIRECTORY_TRACK, new_sector);
 		for (int i = 2; i < BLOCK_SIZE; i++)
-			new_block.w8(i, 0);
+			new_block->w8(i, 0);
 		// Find last directory sector
 		u8 last_sector = 0;
 		block_iterator iter(*this, DIRECTORY_TRACK, FIRST_DIRECTORY_SECTOR);
@@ -405,38 +405,38 @@ err_t impl::file_create(const std::vector<std::string> &path, const meta_data &m
 			last_sector = iter.sector();
 		// Update chain on last directory sector
 		auto last_dir_block = read_sector(DIRECTORY_TRACK, last_sector);
-		last_dir_block.w8(OFFSET_CHAIN_TRACK, DIRECTORY_TRACK);
-		last_dir_block.w8(OFFSET_CHAIN_SECTOR, new_sector);
+		last_dir_block->w8(OFFSET_CHAIN_TRACK, DIRECTORY_TRACK);
+		last_dir_block->w8(OFFSET_CHAIN_SECTOR, new_sector);
 		track = DIRECTORY_TRACK;
 		sector = new_sector;
 	}
 
 	auto const [err, file_track, file_sector] = claim_sector();
-	if (err != ERR_OK)
+	if (err)
 		return err;
 
 	// Create the file
 	auto dirblk = read_sector(track, sector);
 	u32 offset = file_index * DIRECTORY_ENTRY_SIZE;
 	for (int i = 0; i < DIRECTORY_ENTRY_SIZE; i++)
-		dirblk.w8(offset + i, (i >= 5 && i < 5 + 16) ? 0xa0 : 0x00);
-	dirblk.w8(offset + OFFSET_FILE_TYPE, FILE_TYPE_PRG);
-	dirblk.w8(offset + OFFSET_FILE_FIRST_TRACK, file_track);
-	dirblk.w8(offset + OFFSET_FILE_FIRST_SECTOR, file_sector);
-	dirblk.wstr(offset + OFFSET_FILE_NAME, filename);
+		dirblk->w8(offset + i, (i >= 5 && i < 5 + 16) ? 0xa0 : 0x00);
+	dirblk->w8(offset + OFFSET_FILE_TYPE, FILE_TYPE_PRG);
+	dirblk->w8(offset + OFFSET_FILE_FIRST_TRACK, file_track);
+	dirblk->w8(offset + OFFSET_FILE_FIRST_SECTOR, file_sector);
+	dirblk->wstr(offset + OFFSET_FILE_NAME, filename);
 	// TODO set first side sector block track (rel file)
 	// TODO set first side sector block sector (rel file)
 	// TODO set rel file record length
 	// sector count will be set while writing the data
 
-	return ERR_OK;
+	return std::error_condition();
 }
 
 
-err_t impl::file_write(const std::vector<std::string> &path, const std::vector<u8> &data)
+std::error_condition impl::file_write(const std::vector<std::string> &path, const std::vector<u8> &data)
 {
 	if (path.size() != 1)
-		return ERR_NOT_FOUND;
+		return error::not_found;
 	std::string_view path_part = path[0];
 
 	std::optional<cbmdos_dirent> result;
@@ -458,7 +458,7 @@ err_t impl::file_write(const std::vector<std::string> &path, const std::vector<u
 	iterate_directory_entries(callback);
 
 	if (!result)
-		return ERR_NOT_FOUND;
+		return error::not_found;
 
 	u8 data_track = result->m_file_first_track;
 	u8 data_sector = result->m_file_first_sector;
@@ -470,18 +470,18 @@ err_t impl::file_write(const std::vector<std::string> &path, const std::vector<u
 	{
 		auto datablk = read_sector(data_track, data_sector);
 		u8 bytes = (data_length - offset) > SECTOR_DATA_BYTES ? SECTOR_DATA_BYTES : data_length - offset;
-		memcpy(datablk.data() + 2, data.data() + offset, bytes);
+		datablk->write(2, data.data() + offset, bytes);
 		offset += SECTOR_DATA_BYTES;
 		sector_count++;
-		if (datablk.r8(OFFSET_CHAIN_TRACK) == CHAIN_END)
+		if (datablk->r8(OFFSET_CHAIN_TRACK) == CHAIN_END)
 		{
 			if (offset < data_length)
 			{
 				auto [err, next_track, next_sector] = claim_sector();
-				if (err != ERR_OK)
+				if (err)
 					return err;
-				datablk.w8(OFFSET_CHAIN_TRACK, next_track);
-				datablk.w8(OFFSET_CHAIN_SECTOR, next_sector);
+				datablk->w8(OFFSET_CHAIN_TRACK, next_track);
+				datablk->w8(OFFSET_CHAIN_SECTOR, next_sector);
 				data_track = next_track;
 				data_sector = next_sector;
 			}
@@ -490,30 +490,30 @@ err_t impl::file_write(const std::vector<std::string> &path, const std::vector<u
 		{
 			if (offset < data_length)
 			{
-				data_track = datablk.r8(OFFSET_CHAIN_TRACK);
-				data_sector = datablk.r8(OFFSET_CHAIN_SECTOR);
+				data_track = datablk->r8(OFFSET_CHAIN_TRACK);
+				data_sector = datablk->r8(OFFSET_CHAIN_SECTOR);
 			}
 			else
 			{
 				// Free the rest of the chain
-				u8 track_to_free = datablk.r8(OFFSET_CHAIN_TRACK);
-				u8 sector_to_free = datablk.r8(OFFSET_CHAIN_SECTOR);
+				u8 track_to_free = datablk->r8(OFFSET_CHAIN_TRACK);
+				u8 sector_to_free = datablk->r8(OFFSET_CHAIN_SECTOR);
 
 				while (track_to_free != CHAIN_END)
 				{
-					err_t const err = free_sector(track_to_free, sector_to_free);
-					if (err != ERR_OK)
+					std::error_condition const err = free_sector(track_to_free, sector_to_free);
+					if (err)
 						return err;
 					datablk = read_sector(track_to_free, sector_to_free);
-					track_to_free = datablk.r8(OFFSET_CHAIN_TRACK);
-					sector_to_free = datablk.r8(OFFSET_CHAIN_SECTOR);
+					track_to_free = datablk->r8(OFFSET_CHAIN_TRACK);
+					sector_to_free = datablk->r8(OFFSET_CHAIN_SECTOR);
 				}
 			}
 		}
 		if (offset >= data_length)
 		{
-			datablk.w8(OFFSET_CHAIN_TRACK, CHAIN_END);
-			datablk.w8(OFFSET_CHAIN_SECTOR, bytes + 1);
+			datablk->w8(OFFSET_CHAIN_TRACK, CHAIN_END);
+			datablk->w8(OFFSET_CHAIN_SECTOR, bytes + 1);
 		}
 	}
 
@@ -523,19 +523,19 @@ err_t impl::file_write(const std::vector<std::string> &path, const std::vector<u
 	if (file_type == FILE_TYPE_DEL)
 	{
 		// Free sector, update first file sector to 00
-		u8 file_track = dirblk.r8(DIRECTORY_ENTRY_SIZE * dir_file_index + OFFSET_FILE_FIRST_TRACK);
-		u8 file_sector = dirblk.r8(DIRECTORY_ENTRY_SIZE * dir_file_index + OFFSET_FILE_FIRST_SECTOR);
-		err_t err = free_sector(file_track, file_sector);
-		if (err != ERR_OK)
+		u8 file_track = dirblk->r8(DIRECTORY_ENTRY_SIZE * dir_file_index + OFFSET_FILE_FIRST_TRACK);
+		u8 file_sector = dirblk->r8(DIRECTORY_ENTRY_SIZE * dir_file_index + OFFSET_FILE_FIRST_SECTOR);
+		std::error_condition err = free_sector(file_track, file_sector);
+		if (err)
 			return err;
-		dirblk.w8(DIRECTORY_ENTRY_SIZE * dir_file_index + OFFSET_FILE_FIRST_TRACK, 0);
-		dirblk.w8(DIRECTORY_ENTRY_SIZE * dir_file_index + OFFSET_FILE_FIRST_SECTOR, 0);
+		dirblk->w8(DIRECTORY_ENTRY_SIZE * dir_file_index + OFFSET_FILE_FIRST_TRACK, 0);
+		dirblk->w8(DIRECTORY_ENTRY_SIZE * dir_file_index + OFFSET_FILE_FIRST_SECTOR, 0);
 		sector_count = 0;
 	}
-	dirblk.w8(DIRECTORY_ENTRY_SIZE * dir_file_index + OFFSET_FILE_TYPE, file_type);
-	dirblk.w16l(DIRECTORY_ENTRY_SIZE * dir_file_index + OFFSET_SECTOR_COUNT, sector_count);
+	dirblk->w8(DIRECTORY_ENTRY_SIZE * dir_file_index + OFFSET_FILE_TYPE, file_type);
+	dirblk->w16l(DIRECTORY_ENTRY_SIZE * dir_file_index + OFFSET_SECTOR_COUNT, sector_count);
 
-	return ERR_OK;
+	return std::error_condition();
 }
 
 
@@ -557,19 +557,19 @@ bool impl::is_valid_filename(const std::string &filename) const
 }
 
 
-std::pair<err_t, u8> impl::claim_track_sector(u8 track) const
+std::pair<std::error_condition, u8> impl::claim_track_sector(u8 track) const
 {
 	if (track == 0 || track > m_max_track)
-		return std::make_pair(ERR_INVALID, 0);
+		return std::make_pair(error::invalid_block, 0);
 
 	u8 map_index;
 	for (map_index = 0; map_index < TRACK_VARIANTS && !(s_track_sector_map[map_index].first_track <= track && track <= s_track_sector_map[map_index].last_track) ; map_index++);
 	if (map_index >= TRACK_VARIANTS)
-		return std::make_pair(ERR_INVALID, 0);
+		return std::make_pair(error::invalid_block, 0);
 
 	auto bamblk = read_sector(DIRECTORY_TRACK, BAM_SECTOR);
-	u8 free_count = bamblk.r8(4 * track);
-	u32 free_bitmap = bamblk.r24l(4 * track + 1);
+	u8 free_count = bamblk->r8(4 * track);
+	u32 free_bitmap = bamblk->r24l(4 * track + 1);
 
 	for (int s = 0; s < MAX_SECTORS; s++)
 	{
@@ -578,46 +578,46 @@ std::pair<err_t, u8> impl::claim_track_sector(u8 track) const
 		{
 			free_bitmap &= ~(1 << sector);
 			free_count--;
-			bamblk.w8(4 * track, free_count);
-			bamblk.w24l(4 * track + 1, free_bitmap);
+			bamblk->w8(4 * track, free_count);
+			bamblk->w24l(4 * track + 1, free_bitmap);
 			// Write chain end marker in new sector
 			auto claimedlk = read_sector(track, sector);
-			claimedlk.w8(OFFSET_CHAIN_TRACK, CHAIN_END);
-			claimedlk.w8(OFFSET_CHAIN_SECTOR, 0xff);
-			return std::make_pair(ERR_OK, sector);
+			claimedlk->w8(OFFSET_CHAIN_TRACK, CHAIN_END);
+			claimedlk->w8(OFFSET_CHAIN_SECTOR, 0xff);
+			return std::make_pair(std::error_condition(), sector);
 		}
 	}
-	return std::make_pair(ERR_NO_SPACE, 0);
+	return std::make_pair(error::no_space, 0);
 }
 
 
-std::tuple<err_t, u8, u8> impl::claim_sector() const
+std::tuple<std::error_condition, u8, u8> impl::claim_sector() const
 {
 	for (int track = 0; track < m_max_track - 1; track++)
 	{
 		auto const [err, sector] = claim_track_sector(s_data_track_order[track]);
-		if (err == ERR_OK)
-			return std::make_tuple(ERR_OK, s_data_track_order[track], sector);
-		if (err != ERR_NO_SPACE)
+		if (!err)
+			return std::make_tuple(std::error_condition(), s_data_track_order[track], sector);
+		if (err != error::no_space)
 			return std::make_tuple(err, 0, 0);
 	}
-	return std::make_tuple(ERR_NO_SPACE, 0, 0);
+	return std::make_tuple(error::no_space, 0, 0);
 }
 
 
-err_t impl::free_sector(u8 track, u8 sector) const
+std::error_condition impl::free_sector(u8 track, u8 sector) const
 {
 	if (track == 0 || track > m_max_track)
-		return ERR_INVALID;
+		return error::invalid_block;
 
 	auto bamblk = read_sector(DIRECTORY_TRACK, BAM_SECTOR);
-	u8 free_count = bamblk.r8(4 * track);
-	u32 free_bitmap = bamblk.r24l(4 * track + 1);
+	u8 free_count = bamblk->r8(4 * track);
+	u32 free_bitmap = bamblk->r24l(4 * track + 1);
 	free_bitmap |= (1 << sector);
 	free_count++;
-	bamblk.w8(4 * track, free_count);
-	bamblk.w24l(4 * track + 1, free_bitmap);
-	return ERR_OK;
+	bamblk->w8(4 * track, free_count);
+	bamblk->w24l(4 * track + 1, free_bitmap);
+	return std::error_condition();
 }
 
 
@@ -625,7 +625,7 @@ err_t impl::free_sector(u8 track, u8 sector) const
 //  impl::read_sector
 //-------------------------------------------------
 
-fsblk_t::block_t impl::read_sector(int track, int sector) const
+fsblk_t::block_t::ptr impl::read_sector(int track, int sector) const
 {
 	// CBM thinks in terms of tracks/sectors, but we have a block device abstraction
 	u32 block = 0;
@@ -776,8 +776,8 @@ bool impl::block_iterator::next()
 
 		// with that out of the way, proceed
 		m_block = m_fs.read_sector(m_next_track, m_next_sector);
-		m_next_track = m_block.r8(OFFSET_CHAIN_TRACK);
-		m_next_sector = m_block.r8(OFFSET_CHAIN_SECTOR);
+		m_next_track = m_block->r8(OFFSET_CHAIN_TRACK);
+		m_next_sector = m_block->r8(OFFSET_CHAIN_SECTOR);
 		result = true;
 	}
 	else
@@ -795,7 +795,7 @@ bool impl::block_iterator::next()
 
 const void *impl::block_iterator::data() const
 {
-	return m_block.rodata() + 2;
+	return m_block->rodata() + 2;
 }
 
 
@@ -805,7 +805,7 @@ const void *impl::block_iterator::data() const
 
 const std::array<impl::cbmdos_dirent, impl::SECTOR_DIRECTORY_COUNT> &impl::block_iterator::dirent_data() const
 {
-	return *reinterpret_cast<const std::array<impl::cbmdos_dirent, SECTOR_DIRECTORY_COUNT> *>(m_block.rodata());
+	return *reinterpret_cast<const std::array<impl::cbmdos_dirent, SECTOR_DIRECTORY_COUNT> *>(m_block->rodata());
 }
 
 

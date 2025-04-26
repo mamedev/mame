@@ -20,14 +20,6 @@ protected:
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
 
 private:
-	// formatting helpers
-	static void format_n8(std::ostream &stream, u8 n8);
-	static void format_n16(std::ostream &stream, u16 n16);
-	static void format_fix8(std::ostream &stream, u8 n8);
-	static void format_off8(std::ostream &stream, u8 n8);
-	static void format_dir16(std::ostream &stream, u16 n16);
-	static void format_sfr8(std::ostream &stream, u8 n8, bool word);
-
 	offs_t dasm_composite(std::ostream &stream, offs_t pc, offs_t prefix, const data_buffer &opcodes, std::string obj, bool word) const;
 
 	const u16 &m_psw;

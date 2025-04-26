@@ -2,20 +2,24 @@
 // copyright-holders:Angelo Salese
 /**************************************************************************************************
 
-    C-bus slot interface for PC-98xx family
+C-bus slot interface for PC-98xx family
 
-    a.k.a. NEC version of the ISA bus.
-    C-bus -> Card Bus
+a.k.a. NEC version of the ISA bus.
+C-bus -> Compatible Bus
 
-    TODO:
-    - stub interface, checkout what actually belongs here.
-      Speculation is that C-bus has ROM / RAM slots always in the 0xc0000-0xdffff region,
-      and some opacity can be added if true.
-    - move pc9801_cbus_devices declaration from pc9801 driver in here;
-    - 8-bit I/O smearing should be handled here;
-    - INT# should be handled here too;
-    - Best way to inform user when it tries to install incompatible boards?
-    - Support for PCI bridging on later machines (cfr. pc9801cx3);
+References:
+- https://98epjunk.shakunage.net/sw/ext_card/ext_card.html
+- https://ja.wikipedia.org/wiki/C%E3%83%90%E3%82%B9
+- https://www.pc-9800.net/db2/db2_ga_index.htm
+- http://ookumaneko.s1005.xrea.com/pcibios.htm (PCI era mapping)
+
+TODO:
+- stub interface, checkout what actually belongs here
+- move pc9801_cbus_devices declaration from pc9801 driver in here;
+- 8-bit I/O smearing should be handled here;
+- INT# should be handled here too;
+- Best way to inform user when it tries to install incompatible boards?
+- Support for PCI bridging on later machines (cfr. pc9821cx3);
 
 **************************************************************************************************/
 

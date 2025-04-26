@@ -2005,8 +2005,8 @@ ROM_START( gratia )
 	ROM_LOAD32_WORD( "mr94019-06.3",  0x800002, 0x200000, CRC(01d52ef1) SHA1(1585c7eb3729bab78467f627b7b671d619451a74) )
 
 	ROM_REGION( 0x400000, "roztiles", 0 ) /* roz tiles */
-	ROM_LOAD( "mr94019-08.12", 0x000000, 0x200000, CRC(abd124e0) SHA1(2da1d818c909e4abbb79ed03f3dbf15d744439ce) )
-	ROM_LOAD( "mr94019-09.11", 0x200000, 0x200000, CRC(711ab08b) SHA1(185b80b965ac3aba4857b4f83637008c2c1cc6ff) )
+	ROM_LOAD( "mr94019-08.11", 0x000000, 0x200000, CRC(abd124e0) SHA1(2da1d818c909e4abbb79ed03f3dbf15d744439ce) )
+	ROM_LOAD( "mr94019-09.12", 0x200000, 0x200000, CRC(711ab08b) SHA1(185b80b965ac3aba4857b4f83637008c2c1cc6ff) )
 
 	ROM_REGION( 0x200000, "bgtiles", 0 ) /* bg tiles */
 	ROM_LOAD( "94019_2.07", 0x000000, 0x200000, CRC(043f969b) SHA1(ad10339e561c1a65451a2e9a8e79ceda3787674a) )
@@ -2041,8 +2041,8 @@ ROM_START( gratiaa )
 	ROM_LOAD32_WORD( "mr94019-06.3",  0x800002, 0x200000, CRC(01d52ef1) SHA1(1585c7eb3729bab78467f627b7b671d619451a74) )
 
 	ROM_REGION( 0x400000, "roztiles", 0 ) /* roz tiles */
-	ROM_LOAD( "mr94019-08.12", 0x000000, 0x200000, CRC(abd124e0) SHA1(2da1d818c909e4abbb79ed03f3dbf15d744439ce) )
-	ROM_LOAD( "mr94019-09.11", 0x200000, 0x200000, CRC(711ab08b) SHA1(185b80b965ac3aba4857b4f83637008c2c1cc6ff) )
+	ROM_LOAD( "mr94019-08.11", 0x000000, 0x200000, CRC(abd124e0) SHA1(2da1d818c909e4abbb79ed03f3dbf15d744439ce) )
+	ROM_LOAD( "mr94019-09.12", 0x200000, 0x200000, CRC(711ab08b) SHA1(185b80b965ac3aba4857b4f83637008c2c1cc6ff) )
 
 	ROM_REGION( 0x200000, "bgtiles", 0 ) /* bg tiles */
 	ROM_LOAD( "mr94019-07.10", 0x000000, 0x200000, CRC(561a786b) SHA1(23df08d50801bd6e4a2f12dd3bb50632ff77f0f2) )
@@ -2703,4 +2703,4 @@ GAME( 1997, bnstars,   bnstars1, ms32,              suchie2,  ms32_state,       
 GAME( 1996, wpksocv2,  0,        ms32_invert_lines, wpksocv2, ms32_state,               init_ss92046_01, ROT0,   "Jaleco",        "World PK Soccer V2 (ver 1.1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 /* these boot and show something */
-GAMEL( 1994, f1superb, 0,        f1superb,          f1superb, ms32_f1superbattle_state, init_f1superb,   ROT0,   "Jaleco",       "F-1 Super Battle", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_f1superb )
+GAMEL(1994, f1superb,  0,        f1superb,          f1superb, ms32_f1superbattle_state, init_f1superb,   ROT0,   "Jaleco",        "F-1 Super Battle", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE, layout_f1superb )

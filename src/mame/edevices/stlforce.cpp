@@ -92,7 +92,6 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_eeprom(*this, "eeprom"),
-		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")
 	{ }
 
@@ -106,7 +105,6 @@ public:
 
 private:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
 	void eeprom_w(uint8_t data);
@@ -130,8 +128,6 @@ private:
 
 	void oki_bank_w(uint8_t data);
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 	void program_map(address_map &map) ATTR_COLD;
 	void oki_map(address_map &map) ATTR_COLD;
 };
@@ -145,9 +141,9 @@ void twinbrat_state::machine_start()
 
 void stlforce_state::eeprom_w(uint8_t data)
 {
-	m_eeprom->di_write(data & 0x01);
-	m_eeprom->cs_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE );
-	m_eeprom->clk_write((data & 0x04) ? ASSERT_LINE : CLEAR_LINE );
+	m_eeprom->di_write(BIT(data, 0));
+	m_eeprom->cs_write(BIT(data, 1));
+	m_eeprom->clk_write(BIT(data, 2));
 }
 
 void twinbrat_state::oki_bank_w(uint8_t data)
@@ -230,45 +226,23 @@ static INPUT_PORTS_START( stlforce )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static const gfx_layout stlforce_bglayout =
-{
-	16,16,
-	RGN_FRAC(1,1),
-	4,
-	{0,1,2,3},
-	{12,8,4,0,28,24,20,16,16*32+12,16*32+8,16*32+4,16*32+0,16*32+28,16*32+24,16*32+20,16*32+16},
-	{STEP16(0, 32)},
-	32*32
-};
-
-static const gfx_layout stlforce_txlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{0,1,2,3},
-	{12,8,4,0,28,24,20,16},
-	{0*32,1*32,2*32,3*32,4*32,5*32,6*32,7*32 },
-	8*32
-};
-
 static const gfx_layout stlforce_splayout =
 {
 	16,16,
 	RGN_FRAC(1,4),
 	4,
-	{RGN_FRAC(3,4),RGN_FRAC(2,4),RGN_FRAC(1,4),RGN_FRAC(0,4)},
-	{16*8+7,16*8+6,16*8+5,16*8+4,16*8+3,16*8+2,16*8+1,16*8+0,7,6,5,4,3,2,1,0},
-	{0*8,1*8,2*8,3*8,4*8,5*8,6*8,7*8,8*8,9*8,10*8,11*8,12*8,13*8,14*8,15*8},
+	{ RGN_FRAC(3,4), RGN_FRAC(2,4), RGN_FRAC(1,4), RGN_FRAC(0,4) },
+	{ STEP8(16*8+7, -1), STEP8(7, -1) },
+	{ STEP16(0, 8) },
 	32*8
 };
 
 static GFXDECODE_START( gfx_stlforce )
-	GFXDECODE_ENTRY( "sprites",     0x000000, stlforce_splayout, 1024,  16 )
-	GFXDECODE_ENTRY( "txtile",      0x000000, stlforce_txlayout, 384,   8  )
-	GFXDECODE_ENTRY( "midhightile", 0x000000, stlforce_bglayout, 256,   8  )
-	GFXDECODE_ENTRY( "midlowtile",  0x000000, stlforce_bglayout, 128,   8  )
-	GFXDECODE_ENTRY( "bgtile",      0x000000, stlforce_bglayout, 0,     8  )
+	GFXDECODE_ENTRY( "sprites",     0x000000, stlforce_splayout,                  1024,  16 )
+	GFXDECODE_ENTRY( "txtile",      0x000000, gfx_8x8x4_packed_lsb,               384,   8  )
+	GFXDECODE_ENTRY( "midhightile", 0x000000, gfx_8x8x4_col_2x2_group_packed_lsb, 256,   8  )
+	GFXDECODE_ENTRY( "midlowtile",  0x000000, gfx_8x8x4_col_2x2_group_packed_lsb, 128,   8  )
+	GFXDECODE_ENTRY( "bgtile",      0x000000, gfx_8x8x4_col_2x2_group_packed_lsb, 0,     8  )
 GFXDECODE_END
 
 void stlforce_state::stlforce(machine_config &config)
@@ -289,10 +263,9 @@ void stlforce_state::stlforce(machine_config &config)
 	screen.set_screen_update("video", FUNC(edevices_sforce_device::draw));
 	screen.set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_stlforce);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x800);
 
-	edevices_sforce_device &video(EDEVICES_SFORCE_VID(config, "video", 0));
+	edevices_sforce_device &video(EDEVICES_SFORCE_VID(config, "video", 0, m_palette, gfx_stlforce));
 	video.set_bg_videoram_tag("bg_videoram");
 	video.set_mlow_videoram_tag("mlow_videoram");
 	video.set_mhigh_videoram_tag("mhigh_videoram");
@@ -302,8 +275,6 @@ void stlforce_state::stlforce(machine_config &config)
 	video.set_mhigh_scrollram_tag("mhigh_scrollram");
 	video.set_vidattrram_tag("vidattrram");
 	video.set_spriteram_tag("spriteram");
-	video.set_gfxdecode_tag("gfxdecode");
-	video.set_palette_tag("palette");
 	video.set_spritexoffset(7);
 
 	// sound hardware
@@ -344,10 +315,10 @@ ROM_START( stlforce )
 	ROM_LOAD16_BYTE( "stlforce.104", 0x00001, 0x20000, CRC(69b5f429) SHA1(5bd20fad91a22f4d62f85a5190d72dd824ee26a5) )
 
 	ROM_REGION( 0x200000, "tiles", 0 ) // 16x16 bg tiles & 8x8 tx tiles merged
-	ROM_LOAD16_BYTE( "stlforce.u27", 0x000001, 0x080000, CRC(c42ef365) SHA1(40e9ee29ea14b3bc2fbfa4e6acb7d680cf72f01a) )
-	ROM_LOAD16_BYTE( "stlforce.u28", 0x000000, 0x080000, CRC(6a4b7c98) SHA1(004d7f3c703c6abc79286fa58a4c6793d66fca39) )
-	ROM_LOAD16_BYTE( "stlforce.u29", 0x100001, 0x080000, CRC(30488f44) SHA1(af0d92d8952ce3cd893ab9569afdda12e17795e7) )
-	ROM_LOAD16_BYTE( "stlforce.u30", 0x100000, 0x080000, CRC(cf19d43a) SHA1(dc04930548ac5b7e2b74c6041325eac06e773ed5) )
+	ROM_LOAD16_BYTE( "stlforce.u27", 0x000000, 0x080000, CRC(c42ef365) SHA1(40e9ee29ea14b3bc2fbfa4e6acb7d680cf72f01a) )
+	ROM_LOAD16_BYTE( "stlforce.u28", 0x000001, 0x080000, CRC(6a4b7c98) SHA1(004d7f3c703c6abc79286fa58a4c6793d66fca39) )
+	ROM_LOAD16_BYTE( "stlforce.u29", 0x100000, 0x080000, CRC(30488f44) SHA1(af0d92d8952ce3cd893ab9569afdda12e17795e7) )
+	ROM_LOAD16_BYTE( "stlforce.u30", 0x100001, 0x080000, CRC(cf19d43a) SHA1(dc04930548ac5b7e2b74c6041325eac06e773ed5) )
 
 	ROM_REGION( 0x080000, "bgtile", 0 )
 	ROM_COPY( "tiles", 0x000000, 0x000000, 0x080000)
@@ -390,12 +361,12 @@ ROM_START( mortalr )
 
 	ROM_REGION( 0x300000, "tiles", ROMREGION_ERASE00 ) // 16x16 bg tiles
 	// 2 pairs of piggyback ROMs to give double usual capacity
-	ROM_LOAD16_BYTE( "8_bot.u27",  0x000001, 0x080000, CRC(042297f3) SHA1(08640cb7997d10baae776f377a605fa70499f6ef) )
-	ROM_LOAD16_BYTE( "9_bot.u28",  0x000000, 0x080000, CRC(ab330185) SHA1(6403d472499897395e47a05f73e3760ef632ab8a) )
-	ROM_LOAD16_BYTE( "12_top.u27", 0x100001, 0x080000, CRC(fa95773c) SHA1(849f3ab4950b34200e3043d849273622e4bdbfa3) )
-	ROM_LOAD16_BYTE( "13_top.u28", 0x100000, 0x080000, CRC(f2342348) SHA1(0f197e88a1911715d3b98af9e303fd1f137e5fe3) )
-	ROM_LOAD16_BYTE( "10.u29",     0x200001, 0x080000, CRC(fb39b032) SHA1(c2dfb24fccd4b588d92214addee2a9bbb6e45065) )
-	ROM_LOAD16_BYTE( "11.u30",     0x200000, 0x080000, CRC(a82f2421) SHA1(b0787decd1b668af5b2ed032947ca5c0ccc020e8) )
+	ROM_LOAD16_BYTE( "8_bot.u27",  0x000000, 0x080000, CRC(042297f3) SHA1(08640cb7997d10baae776f377a605fa70499f6ef) )
+	ROM_LOAD16_BYTE( "9_bot.u28",  0x000001, 0x080000, CRC(ab330185) SHA1(6403d472499897395e47a05f73e3760ef632ab8a) )
+	ROM_LOAD16_BYTE( "12_top.u27", 0x100000, 0x080000, CRC(fa95773c) SHA1(849f3ab4950b34200e3043d849273622e4bdbfa3) )
+	ROM_LOAD16_BYTE( "13_top.u28", 0x100001, 0x080000, CRC(f2342348) SHA1(0f197e88a1911715d3b98af9e303fd1f137e5fe3) )
+	ROM_LOAD16_BYTE( "10.u29",     0x200000, 0x080000, CRC(fb39b032) SHA1(c2dfb24fccd4b588d92214addee2a9bbb6e45065) )
+	ROM_LOAD16_BYTE( "11.u30",     0x200001, 0x080000, CRC(a82f2421) SHA1(b0787decd1b668af5b2ed032947ca5c0ccc020e8) )
 
 	ROM_REGION( 0x100000, "bgtile", 0 )
 	ROM_COPY( "tiles", 0x000000, 0x000000, 0x100000)
@@ -474,10 +445,10 @@ ROM_START( twinbrat )
 	ROM_LOAD16_BYTE( "13.u104", 0x00001, 0x20000, CRC(9805ba90) SHA1(cdc188fa38220d18c60c9f438520ee574e6ce0f7) ) // higher numbers are newer??
 
 	ROM_REGION( 0x200000, "tiles", 0 )
-	ROM_LOAD16_BYTE( "6.bin", 0x000000, 0x80000, CRC(af10ddfd) SHA1(e5e83044f20d6cbbc1b4ef1812ac57b6dc958a8a) )
-	ROM_LOAD16_BYTE( "7.bin", 0x000001, 0x80000, CRC(3696345a) SHA1(ea38be3586757527b2a1aad2e22b83937f8602da) )
-	ROM_LOAD16_BYTE( "4.bin", 0x100000, 0x80000, CRC(1ae8a751) SHA1(5f30306580c6ab4af0ddbdc4519eb4e0ab9bd23a) )
-	ROM_LOAD16_BYTE( "5.bin", 0x100001, 0x80000, CRC(cf235eeb) SHA1(d067e2dd4f28a8986dd76ec0eba90e1adbf5787c) )
+	ROM_LOAD16_BYTE( "6.bin", 0x000001, 0x80000, CRC(af10ddfd) SHA1(e5e83044f20d6cbbc1b4ef1812ac57b6dc958a8a) )
+	ROM_LOAD16_BYTE( "7.bin", 0x000000, 0x80000, CRC(3696345a) SHA1(ea38be3586757527b2a1aad2e22b83937f8602da) )
+	ROM_LOAD16_BYTE( "4.bin", 0x100001, 0x80000, CRC(1ae8a751) SHA1(5f30306580c6ab4af0ddbdc4519eb4e0ab9bd23a) )
+	ROM_LOAD16_BYTE( "5.bin", 0x100000, 0x80000, CRC(cf235eeb) SHA1(d067e2dd4f28a8986dd76ec0eba90e1adbf5787c) )
 
 	ROM_REGION( 0x080000, "bgtile", 0 )
 	ROM_COPY( "tiles", 0x000000, 0x000000, 0x080000)
@@ -510,10 +481,10 @@ ROM_START( twinbrata )
 	ROM_LOAD16_BYTE( "3.u104", 0x00001, 0x20000, CRC(b1186a67) SHA1(502074063101885874db76ae707db1082313efcf) )
 
 	ROM_REGION( 0x200000, "tiles", 0 )
-	ROM_LOAD16_BYTE( "6.bin", 0x000000, 0x80000, CRC(af10ddfd) SHA1(e5e83044f20d6cbbc1b4ef1812ac57b6dc958a8a) )
-	ROM_LOAD16_BYTE( "7.bin", 0x000001, 0x80000, CRC(3696345a) SHA1(ea38be3586757527b2a1aad2e22b83937f8602da) )
-	ROM_LOAD16_BYTE( "4.bin", 0x100000, 0x80000, CRC(1ae8a751) SHA1(5f30306580c6ab4af0ddbdc4519eb4e0ab9bd23a) )
-	ROM_LOAD16_BYTE( "5.bin", 0x100001, 0x80000, CRC(cf235eeb) SHA1(d067e2dd4f28a8986dd76ec0eba90e1adbf5787c) )
+	ROM_LOAD16_BYTE( "6.bin", 0x000001, 0x80000, CRC(af10ddfd) SHA1(e5e83044f20d6cbbc1b4ef1812ac57b6dc958a8a) )
+	ROM_LOAD16_BYTE( "7.bin", 0x000000, 0x80000, CRC(3696345a) SHA1(ea38be3586757527b2a1aad2e22b83937f8602da) )
+	ROM_LOAD16_BYTE( "4.bin", 0x100001, 0x80000, CRC(1ae8a751) SHA1(5f30306580c6ab4af0ddbdc4519eb4e0ab9bd23a) )
+	ROM_LOAD16_BYTE( "5.bin", 0x100000, 0x80000, CRC(cf235eeb) SHA1(d067e2dd4f28a8986dd76ec0eba90e1adbf5787c) )
 
 	ROM_REGION( 0x080000, "bgtile", 0 )
 	ROM_COPY( "tiles", 0x000000, 0x000000, 0x080000)
@@ -550,10 +521,10 @@ ROM_START( twinbratb )
 	ROM_LOAD16_BYTE( "3.bin", 0x00001, 0x20000, CRC(0e3fa9b0) SHA1(0148cc616eac84dc16415e1557ec6040d14392d4) )
 
 	ROM_REGION( 0x200000, "tiles", 0 )
-	ROM_LOAD16_BYTE( "6.bin", 0x000000, 0x80000, CRC(af10ddfd) SHA1(e5e83044f20d6cbbc1b4ef1812ac57b6dc958a8a) )
-	ROM_LOAD16_BYTE( "7.bin", 0x000001, 0x80000, CRC(3696345a) SHA1(ea38be3586757527b2a1aad2e22b83937f8602da) )
-	ROM_LOAD16_BYTE( "4.bin", 0x100000, 0x80000, CRC(1ae8a751) SHA1(5f30306580c6ab4af0ddbdc4519eb4e0ab9bd23a) )
-	ROM_LOAD16_BYTE( "5.bin", 0x100001, 0x80000, CRC(cf235eeb) SHA1(d067e2dd4f28a8986dd76ec0eba90e1adbf5787c) )
+	ROM_LOAD16_BYTE( "6.bin", 0x000001, 0x80000, CRC(af10ddfd) SHA1(e5e83044f20d6cbbc1b4ef1812ac57b6dc958a8a) )
+	ROM_LOAD16_BYTE( "7.bin", 0x000000, 0x80000, CRC(3696345a) SHA1(ea38be3586757527b2a1aad2e22b83937f8602da) )
+	ROM_LOAD16_BYTE( "4.bin", 0x100001, 0x80000, CRC(1ae8a751) SHA1(5f30306580c6ab4af0ddbdc4519eb4e0ab9bd23a) )
+	ROM_LOAD16_BYTE( "5.bin", 0x100000, 0x80000, CRC(cf235eeb) SHA1(d067e2dd4f28a8986dd76ec0eba90e1adbf5787c) )
 
 	ROM_REGION( 0x080000, "bgtile", 0 )
 	ROM_COPY( "tiles", 0x000000, 0x000000, 0x080000)

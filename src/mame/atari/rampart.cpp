@@ -120,7 +120,6 @@ const atari_motion_objects_config rampart_state::s_mob_config =
 	0,                  // maximum number of links to visit/scanline (0=all)
 
 	0x100,              // base palette entry
-	0x100,              // maximum number of colors
 	0,                  // transparent pen index
 
 	{{ 0x00ff,0,0,0 }}, // mask for the link
@@ -164,18 +163,25 @@ uint32_t rampart_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = m_mob->bitmap();
-	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->top(); y <= rect->bottom(); y++)
-		{
-			uint16_t const *const mo = &mobitmap.pix(y);
-			uint16_t *const pf = &bitmap.pix(y);
-			for (int x = rect->left(); x <= rect->right(); x++)
-				if (mo[x] != 0xffff)
+	m_mob->iterate_dirty_rects(
+			cliprect,
+			[&bitmap, &mobitmap] (rectangle const &rect)
+			{
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
-					// the PCB supports more complex priorities, but the PAL is not stuffed, so we get the default
-					pf[x] = mo[x];
+					uint16_t const *const mo = &mobitmap.pix(y);
+					uint16_t *const pf = &bitmap.pix(y);
+					for (int x = rect.left(); x <= rect.right(); x++)
+					{
+						if (mo[x] != 0xffff)
+						{
+							// the PCB supports more complex priorities, but the PAL is not stuffed, so we get the default
+							pf[x] = mo[x];
+						}
+					}
 				}
-		}
+			});
+
 	return 0;
 }
 
@@ -265,20 +271,20 @@ void rampart_state::latch_w(offs_t offset, u16 data, u16 mem_mask)
 	// upper byte being modified?
 	if (ACCESSING_BITS_8_15)
 	{
-		if (data & 0x1000)
+		if (BIT(data, 12))
 			LOGCOLBANK("Color bank set to 1!\n");
-		machine().bookkeeping().coin_counter_w(0, (data >> 9) & 1);
-		machine().bookkeeping().coin_counter_w(1, (data >> 8) & 1);
+		machine().bookkeeping().coin_counter_w(0, BIT(data, 9));
+		machine().bookkeeping().coin_counter_w(1, BIT(data, 8));
 	}
 
 	// lower byte being modified?
 	if (ACCESSING_BITS_0_7)
 	{
-		m_oki->set_output_gain(ALL_OUTPUTS, (data & 0x0020) ? 1.0f : 0.0f);
-		if (!(data & 0x0010))
+		m_oki->set_output_gain(ALL_OUTPUTS, BIT(data, 5) ? 1.0f : 0.0f);
+		if (BIT(~data, 4))
 			m_oki->reset();
 		m_ym2413->set_output_gain(ALL_OUTPUTS, ((data >> 1) & 7) / 7.0f);
-		if (!(data & 0x0001))
+		if (BIT(~data, 0))
 			m_ym2413->reset();
 	}
 }

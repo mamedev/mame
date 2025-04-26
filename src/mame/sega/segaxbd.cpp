@@ -558,7 +558,7 @@ void segaxbd_state::iocontrol_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 void segaxbd_state::loffire_sync0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_loffire_sync[offset]);
-	machine().scheduler().perfect_quantum(attotime::from_usec(10));
+	machine().scheduler().add_quantum(attotime::from_ticks(4, m_maincpu->clock()), attotime::from_usec(10));
 }
 
 
@@ -803,7 +803,7 @@ void segaxbd_state::update_main_irqs()
 	if (irq)
 	{
 		m_maincpu->set_input_line(irq, ASSERT_LINE);
-		machine().scheduler().perfect_quantum(attotime::from_usec(100));
+		machine().scheduler().add_quantum(attotime::from_ticks(4, m_maincpu->clock()), attotime::from_usec(100));
 	}
 }
 
@@ -816,7 +816,7 @@ void segaxbd_state::update_main_irqs()
 void segaxbd_state::m68k_reset_callback(int state)
 {
 	m_subcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-	machine().scheduler().perfect_quantum(attotime::from_usec(100));
+	machine().scheduler().add_quantum(attotime::from_ticks(4, m_maincpu->clock()), attotime::from_usec(100));
 }
 
 
@@ -1181,6 +1181,42 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( aburner2 )
 	PORT_INCLUDE( aburner )
+
+	PORT_MODIFY("mainpcb:IO1PORTC")
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SWA:1,2,3,4")
+	PORT_DIPSETTING(    0x0a, DEF_STR( 7C_1C ) )
+	PORT_DIPSETTING(    0x0b, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x09, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x05, "2 Coins/1 Credit, 3/2, 5/3, 6/4" )
+	PORT_DIPSETTING(    0x04, "2 Coins/1 Credit, 4/3" )
+	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x03, "1 Coin/1 Credit, 5/6" )
+	PORT_DIPSETTING(    0x02, "1 Coin/1 Credit, 4/5" )
+	PORT_DIPSETTING(    0x06, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x01, "1 Coin/1 Credit, 2/3" )
+	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x00, "Free Play (if Coin B too) or 1/1" )
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SWA:5,6,7,8")
+	PORT_DIPSETTING(    0xa0, DEF_STR( 7C_1C ) )
+	PORT_DIPSETTING(    0xb0, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x70, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x90, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x50, "2 Coins/1 Credit, 3/2, 5/3, 6/4" )
+	PORT_DIPSETTING(    0x40, "2 Coins/1 Credit, 4/3" )
+	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x30, "1 Coin/1 Credit, 5/6" )
+	PORT_DIPSETTING(    0x20, "1 Coin/1 Credit, 4/5" )
+	PORT_DIPSETTING(    0x60, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x10, "1 Coin/1 Credit, 2/3" )
+	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x00, "Free Play (if Coin A too) or 1/1" )
 
 	PORT_MODIFY("mainpcb:IO1PORTD")
 	PORT_DIPNAME( 0x03, 0x01, "Cabinet Type" ) PORT_DIPLOCATION("SWB:1,2")
@@ -4719,50 +4755,49 @@ void segaxbd_new_state_double::init_gprider_double()
 //  GAME DRIVERS
 //**************************************************************************
 
-//    YEAR, NAME,     PARENT,   MACHINE,             INPUT,    STATE,             INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1987, aburner2, 0,        sega_aburner2,       aburner2, segaxbd_new_state, init_aburner2, ROT0,"Sega", "After Burner II", 0 )
-GAME( 1987, aburner2g,aburner2, sega_aburner2,       aburner2, segaxbd_new_state, init_aburner2, ROT0,"Sega", "After Burner II (German)", 0 )
+//    YEAR, NAME,      PARENT,   MACHINE,             INPUT,    STATE,             INIT,          MONITOR,COMPANY,FULLNAME,FLAGS
+GAME( 1987, aburner,   0,        sega_aburner2,       aburner,  segaxbd_new_state, init_aburner2, ROT0, "Sega", "After Burner", 0 )
 
-GAME( 1987, aburner,  aburner2, sega_aburner2,       aburner,  segaxbd_new_state, init_aburner2, ROT0,"Sega", "After Burner", 0 )
+GAME( 1987, aburner2,  0,        sega_aburner2,       aburner2, segaxbd_new_state, init_aburner2, ROT0, "Sega", "After Burner II", 0 )
+GAME( 1987, aburner2g, aburner2, sega_aburner2,       aburner2, segaxbd_new_state, init_aburner2, ROT0, "Sega", "After Burner II (German)", 0 )
 
-GAME( 1987, thndrbld, 0,        sega_xboard_fd1094,  thndrbld, segaxbd_new_state, empty_init,   ROT0, "Sega", "Thunder Blade (upright) (FD1094 317-0056)", 0 )
-GAME( 1987, thndrbld1,thndrbld, sega_xboard,         thndrbd1, segaxbd_new_state, empty_init,   ROT0, "Sega", "Thunder Blade (deluxe/standing) (unprotected)", 0 )
+GAME( 1987, thndrbld,  0,        sega_xboard_fd1094,  thndrbld, segaxbd_new_state, empty_init,    ROT0, "Sega", "Thunder Blade (upright) (FD1094 317-0056)", 0 )
+GAME( 1987, thndrbld1, thndrbld, sega_xboard,         thndrbd1, segaxbd_new_state, empty_init,    ROT0, "Sega", "Thunder Blade (deluxe/standing) (unprotected)", 0 )
 
-GAME( 1989, lastsurv, 0,        sega_lastsurv_fd1094,lastsurv, segaxbd_new_state, empty_init,   ROT0, "Sega", "Last Survivor (Japan) (FD1094 317-0083)", MACHINE_NODEVICE_LAN )
+GAME( 1989, lastsurv,  0,        sega_lastsurv_fd1094,lastsurv, segaxbd_new_state, empty_init,    ROT0, "Sega", "Last Survivor (Japan) (FD1094 317-0083)", MACHINE_NODEVICE_LAN )
 
-GAME( 1989, loffire,  0,        sega_xboard_fd1094,  loffire,  segaxbd_new_state, init_loffire, ROT0, "Sega", "Line of Fire / Bakudan Yarou (World) (FD1094 317-0136)", 0 )
-GAME( 1989, loffireu, loffire,  sega_xboard_fd1094,  loffire,  segaxbd_new_state, init_loffire, ROT0, "Sega", "Line of Fire / Bakudan Yarou (US) (FD1094 317-0135)", 0 )
-GAME( 1989, loffirej, loffire,  sega_xboard_fd1094,  loffire,  segaxbd_new_state, init_loffire, ROT0, "Sega", "Line of Fire / Bakudan Yarou (Japan) (FD1094 317-0134)", 0 )
+GAME( 1989, loffire,   0,        sega_xboard_fd1094,  loffire,  segaxbd_new_state, init_loffire,  ROT0, "Sega", "Line of Fire / Bakudan Yarou (World) (FD1094 317-0136)", 0 )
+GAME( 1989, loffireu,  loffire,  sega_xboard_fd1094,  loffire,  segaxbd_new_state, init_loffire,  ROT0, "Sega", "Line of Fire / Bakudan Yarou (US) (FD1094 317-0135)", 0 )
+GAME( 1989, loffirej,  loffire,  sega_xboard_fd1094,  loffire,  segaxbd_new_state, init_loffire,  ROT0, "Sega", "Line of Fire / Bakudan Yarou (Japan) (FD1094 317-0134)", 0 )
 
-GAME( 1989, rachero,  0,        sega_xboard_fd1094,  rachero,  segaxbd_new_state, empty_init,   ROT0, "Sega", "Racing Hero (FD1094 317-0144)", 0 )
+GAME( 1989, rachero,   0,        sega_xboard_fd1094,  rachero,  segaxbd_new_state, empty_init,    ROT0, "Sega", "Racing Hero (FD1094 317-0144)", 0 )
 
-GAME( 1989, smgp,     0,        sega_smgp_fd1094,    smgp,     segaxbd_new_state, init_smgp,    ROT0, "Sega", "Super Monaco GP (World, Rev B) (FD1094 317-0126a)", MACHINE_NODEVICE_LAN )
-GAME( 1989, smgp6,    smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, init_smgp,    ROT0, "Sega", "Super Monaco GP (World, Rev A) (FD1094 317-0126a)", MACHINE_NODEVICE_LAN )
-GAME( 1989, smgp5,    smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, init_smgp,    ROT0, "Sega", "Super Monaco GP (World) (FD1094 317-0126)", MACHINE_NODEVICE_LAN )
-GAME( 1989, smgpu,    smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, init_smgp,    ROT0, "Sega", "Super Monaco GP (US, Rev C) (FD1094 317-0125a)", MACHINE_NODEVICE_LAN )
-GAME( 1989, smgpu1,   smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, init_smgp,    ROT0, "Sega", "Super Monaco GP (US, Rev B) (FD1094 317-0125a)", MACHINE_NODEVICE_LAN )
-GAME( 1989, smgpu2,   smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, init_smgp,    ROT0, "Sega", "Super Monaco GP (US, Rev A) (FD1094 317-0125a)", MACHINE_NODEVICE_LAN )
-GAME( 1989, smgpj,    smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, init_smgp,    ROT0, "Sega", "Super Monaco GP (Japan, Rev B) (FD1094 317-0124a)", MACHINE_NODEVICE_LAN )
-GAME( 1989, smgpja,   smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, init_smgp,    ROT0, "Sega", "Super Monaco GP (Japan, Rev A) (FD1094 317-0124a)", MACHINE_NODEVICE_LAN )
+GAME( 1989, smgp,      0,        sega_smgp_fd1094,    smgp,     segaxbd_new_state, init_smgp,     ROT0, "Sega", "Super Monaco GP (World, Rev B) (FD1094 317-0126a)", MACHINE_NODEVICE_LAN )
+GAME( 1989, smgp6,     smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, init_smgp,     ROT0, "Sega", "Super Monaco GP (World, Rev A) (FD1094 317-0126a)", MACHINE_NODEVICE_LAN )
+GAME( 1989, smgp5,     smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, init_smgp,     ROT0, "Sega", "Super Monaco GP (World) (FD1094 317-0126)", MACHINE_NODEVICE_LAN )
+GAME( 1989, smgpu,     smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, init_smgp,     ROT0, "Sega", "Super Monaco GP (US, Rev C) (FD1094 317-0125a)", MACHINE_NODEVICE_LAN )
+GAME( 1989, smgpu1,    smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, init_smgp,     ROT0, "Sega", "Super Monaco GP (US, Rev B) (FD1094 317-0125a)", MACHINE_NODEVICE_LAN )
+GAME( 1989, smgpu2,    smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, init_smgp,     ROT0, "Sega", "Super Monaco GP (US, Rev A) (FD1094 317-0125a)", MACHINE_NODEVICE_LAN )
+GAME( 1989, smgpj,     smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, init_smgp,     ROT0, "Sega", "Super Monaco GP (Japan, Rev B) (FD1094 317-0124a)", MACHINE_NODEVICE_LAN )
+GAME( 1989, smgpja,    smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, init_smgp,     ROT0, "Sega", "Super Monaco GP (Japan, Rev A) (FD1094 317-0124a)", MACHINE_NODEVICE_LAN )
 
-GAME( 1990, abcop,    0,        sega_xboard_fd1094,  abcop,    segaxbd_new_state, empty_init,   ROT0, "Sega", "A.B. Cop (World) (FD1094 317-0169b)", 0 )
-GAME( 1990, abcopj,   abcop,    sega_xboard_fd1094,  abcop,    segaxbd_new_state, empty_init,   ROT0, "Sega", "A.B. Cop (Japan) (FD1094 317-0169b)", 0 )
+GAME( 1990, abcop,     0,        sega_xboard_fd1094,  abcop,    segaxbd_new_state, empty_init,    ROT0, "Sega", "A.B. Cop (World) (FD1094 317-0169b)", 0 )
+GAME( 1990, abcopj,    abcop,    sega_xboard_fd1094,  abcop,    segaxbd_new_state, empty_init,    ROT0, "Sega", "A.B. Cop (Japan) (FD1094 317-0169b)", 0 )
 
 // wasn't officially available as a single PCB setup, but runs anyway albeit with messages suggesting you can compete against a nonexistent rival.
-GAME( 1990, gpriders, gprider,  sega_xboard_fd1094,  gprider,  segaxbd_new_state, init_gprider, ROT0, "Sega", "GP Rider (World, FD1094 317-0163)", 0 )
-GAME( 1990, gpriderus,gprider,  sega_xboard_fd1094,  gprider,  segaxbd_new_state, init_gprider, ROT0, "Sega", "GP Rider (US, FD1094 317-0162)", 0 )
-GAME( 1990, gpriderjs,gprider,  sega_xboard_fd1094,  gprider,  segaxbd_new_state, init_gprider, ROT0, "Sega", "GP Rider (Japan, FD1094 317-0161)", 0 )
+GAME( 1990, gpriders,  gprider,  sega_xboard_fd1094,  gprider,  segaxbd_new_state, init_gprider,  ROT0, "Sega", "GP Rider (World, FD1094 317-0163)", 0 )
+GAME( 1990, gpriderus, gprider,  sega_xboard_fd1094,  gprider,  segaxbd_new_state, init_gprider,  ROT0, "Sega", "GP Rider (US, FD1094 317-0162)", 0 )
+GAME( 1990, gpriderjs, gprider,  sega_xboard_fd1094,  gprider,  segaxbd_new_state, init_gprider,  ROT0, "Sega", "GP Rider (Japan, FD1094 317-0161)", 0 )
 
 // multi X-Board (2 stacks directly connected, shared RAM on bridge PCB - not networked)
-GAME( 1990, gprider, 0,        sega_xboard_fd1094_double, gprider_double, segaxbd_new_state_double, init_gprider_double, ROT0, "Sega", "GP Rider (World, FD1094 317-0163) (Twin setup)", 0 )
-GAME( 1990, gprideru,gprider,  sega_xboard_fd1094_double, gprider_double, segaxbd_new_state_double, init_gprider_double, ROT0, "Sega", "GP Rider (US, FD1094 317-0162) (Twin setup)", 0 )
-GAME( 1990, gpriderj,gprider,  sega_xboard_fd1094_double, gprider_double, segaxbd_new_state_double, init_gprider_double, ROT0, "Sega", "GP Rider (Japan, FD1094 317-0161) (Twin setup)", 0 )
+GAME( 1990, gprider,   0,        sega_xboard_fd1094_double, gprider_double, segaxbd_new_state_double, init_gprider_double, ROT0, "Sega", "GP Rider (World, FD1094 317-0163) (Twin setup)", 0 )
+GAME( 1990, gprideru,  gprider,  sega_xboard_fd1094_double, gprider_double, segaxbd_new_state_double, init_gprider_double, ROT0, "Sega", "GP Rider (US, FD1094 317-0162) (Twin setup)", 0 )
+GAME( 1990, gpriderj,  gprider,  sega_xboard_fd1094_double, gprider_double, segaxbd_new_state_double, init_gprider_double, ROT0, "Sega", "GP Rider (Japan, FD1094 317-0161) (Twin setup)", 0 )
 
 // X-Board + other boards?
 GAME( 1991, rascot,    0,        sega_rascot,  rascot,   segaxbd_new_state, empty_init,   ROT0,   "Sega", "Royal Ascot (Japan, terminal?)", MACHINE_NODEVICE_LAN | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 // decrypted bootlegs
-
 GAME( 1987, thndrbldd, thndrbld, sega_xboard,  thndrbld, segaxbd_new_state, empty_init,   ROT0,   "bootleg", "Thunder Blade (upright) (bootleg of FD1094 317-0056 set)", 0 )
 
 GAME( 1989, racherod,  rachero,  sega_xboard,  rachero,  segaxbd_new_state, empty_init,   ROT0,   "bootleg", "Racing Hero (bootleg of FD1094 317-0144 set)", 0 )

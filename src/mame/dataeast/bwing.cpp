@@ -69,7 +69,6 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
-	virtual void device_post_load() override;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -639,12 +638,6 @@ void bwing_state::machine_reset()
 
 	m_p3_nmimask = 0;
 	m_p3_u8f_d = 0;
-}
-
-void bwing_state::device_post_load()
-{
-	m_gfxdecode->gfx(2)->mark_all_dirty();
-	m_gfxdecode->gfx(3)->mark_all_dirty();
 }
 
 

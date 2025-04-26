@@ -44,7 +44,23 @@
  The MCU on the older PCBs can differ between 80C32 compatible models (found
  with a Winbond W78C32C-40 and with a TS80C32X2-MCA).
 
- "GANCHONEW" V1 PCB has a different layout.
+ "GANCHONEW" (V1) PCB has a different layout:
+              __________
+  ___________|         |__________________
+ |           |_________| |||||||||||||  .|
+ |:                ________   _______   :|
+ |:   ____        TD62703AP  HD74HC244P  |
+ |:   BUZ12        ________   _______   :|
+ |:               TD62083AP  74HCT273N  :|
+ |  ____________   ________   _______    |
+ | | ROM       |  HD74HC373P HD74HC244P :|
+ | |___________|   ________   _______    |
+ |                PALCE16V8H HD74HC273P :|
+ |  _______________    ____   _______   :|
+ | | TSC80C31-12CA|  24LC16B TD62083AP   |
+ | |______________|                     :|
+ |                   Xtal 12MHz         :|
+ |_______________________________________|
 
 ********************************************************************************/
 
@@ -65,6 +81,8 @@ public:
 	}
 
 	void ganchonew(machine_config &config);
+	void ganchonew_v1(machine_config &config);
+	void toyshop(machine_config &config);
 
 protected:
 	required_device<mcs51_cpu_device> m_maincpu;
@@ -75,10 +93,33 @@ INPUT_PORTS_END
 
 void compucranes_state::ganchonew(machine_config &config)
 {
-	I80C32(config, m_maincpu, 12_MHz_XTAL/2);
+	I80C32(config, m_maincpu, 12_MHz_XTAL);
 
 	SPEAKER(config, "mono").front_center();
 }
+
+void compucranes_state::ganchonew_v1(machine_config &config)
+{
+	I80C31(config, m_maincpu, 12_MHz_XTAL);
+
+	SPEAKER(config, "mono").front_center();
+}
+
+void compucranes_state::toyshop(machine_config &config)
+{
+	AT89S52(config, m_maincpu, 12_MHz_XTAL);
+
+	SPEAKER(config, "mono").front_center();
+}
+
+// "GANCHONEW" (V1) PCB. TSC80C31-12CA CPU.
+ROM_START(crsauruss)
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD("30.01.ic3",   0x00000, 0x20000, CRC(c735e024) SHA1(63dd3a71472bde7f9dead49a8dc889365fd024ef)) // 1xxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION(0x00117, "pld", 0)
+	ROM_LOAD("pal16v8.ic4", 0x00000, 0x00117, NO_DUMP) // AMD PALCE16V8H-25, may be different on V1
+ROM_END
 
 // "GANCHONEW V8" PCB with ATX PSU connector. TS80C32X2-MCA CPU.
 ROM_START(mastcrane)
@@ -117,8 +158,11 @@ ROM_START(octopussy)
 ROM_END
 
 /* Direct clone of the GANCHONEW PCB by OM Vending, silkcreened as "CPU GRUA V2  O. M. VENDING".
-   Atmel AT89AS52 as CPU, probably the internal ROM is not used, but should be confirmed. 12 MHz xtal. 24C16 SEEPROM. */
+   Atmel AT89S52 as CPU, probably the internal ROM is not used, but should be confirmed. 12 MHz xtal. 24C16 SEEPROM. */
 ROM_START(toyshop)
+	ROM_REGION(0x10000, "internal", 0)
+	ROM_LOAD("89s52.ic1",   0x00000, 0x10000, NO_DUMP) // 8 KBytes internal ROM
+
 	ROM_REGION(0x80000, "maincpu", 0)
 	ROM_LOAD("39sf040.ic3", 0x00000, 0x80000, CRC(0d9d157d) SHA1(e70f095d3524e3a4c8d5d07857bb2692b6260cc1))
 
@@ -128,9 +172,10 @@ ROM_END
 
 } // anonymous namespace
 
-//    YEAR  NAME        PARENT     MACHINE    INPUT      CLASS              INIT        ROT   COMPANY       FULLNAME                FLAGS
-GAME( 199?, mastcrane,  0,         ganchonew, ganchonew, compucranes_state, empty_init, ROT0, "Compumatic", "Master Crane (set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 199?, mastcranea, mastcrane, ganchonew, ganchonew, compucranes_state, empty_init, ROT0, "Compumatic", "Master Crane (set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 199?, mastcraneb, mastcrane, ganchonew, ganchonew, compucranes_state, empty_init, ROT0, "Compumatic", "Master Crane (set 3)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 2000, octopussy,  mastcrane, ganchonew, ganchonew, compucranes_state, empty_init, ROT0, "Covielsa",   "Octopussy",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 2012, toyshop,    0,         ganchonew, ganchonew, compucranes_state, empty_init, ROT0, "OM Vending", "Toy Shop",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+//    YEAR  NAME        PARENT     MACHINE       INPUT      CLASS              INIT        ROT   COMPANY               FULLNAME                FLAGS
+GAME( 199?, crsauruss,  0,         ganchonew_v1, ganchonew, compucranes_state, empty_init, ROT0, "Recreativos Presas", "Cranesaurus Single",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 199?, mastcrane,  0,         ganchonew,    ganchonew, compucranes_state, empty_init, ROT0, "Compumatic",         "Master Crane (set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 199?, mastcranea, mastcrane, ganchonew,    ganchonew, compucranes_state, empty_init, ROT0, "Compumatic",         "Master Crane (set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 199?, mastcraneb, mastcrane, ganchonew,    ganchonew, compucranes_state, empty_init, ROT0, "Compumatic",         "Master Crane (set 3)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 2000, octopussy,  mastcrane, ganchonew,    ganchonew, compucranes_state, empty_init, ROT0, "Covielsa",           "Octopussy",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 2012, toyshop,    0,         toyshop,      ganchonew, compucranes_state, empty_init, ROT0, "OM Vending",         "Toy Shop",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

@@ -11,14 +11,7 @@
     on cpu B and the needed parts are copied to RAM at run time.
 
     There's also something wrong in the way tile banks are implemented in
-    k052109.c. They don't seem to be used by this game.
-
-    2009-03:
-    Added dsw locations and verified factory setting based on Guru's notes
-
-    2015-05:
-    gradius3js set added, same as normal gradius3j set in content but with
-    some ROMs split and populated differently.
+    k052109.cpp. They don't seem to be used by this game.
 
 ***************************************************************************/
 
@@ -60,6 +53,11 @@ public:
 
 	void gradius3(machine_config &config);
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
 private:
 	/* memory pointers */
 	required_shared_ptr<uint16_t> m_gfxram;
@@ -87,9 +85,6 @@ private:
 	uint16_t gradius3_gfxrom_r(offs_t offset);
 	void gradius3_gfxram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void sound_bank_w(uint8_t data);
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
 	uint32_t screen_update_gradius3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(cpuA_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(gradius3_sub_scanline);
@@ -117,6 +112,7 @@ K052109_CB_MEMBER(gradius3_state::tile_callback)
 	*code |= ((*color & 0x01) << 8) | ((*color & 0x1c) << 7);
 	*color = layer_colorbase[layer] + ((*color & 0xe0) >> 5);
 }
+
 
 /***************************************************************************
 
@@ -151,6 +147,7 @@ K051960_CB_MEMBER(gradius3_state::sprite_callback)
 	*color = sprite_colorbase + ((*color & 0x1e) >> 1);
 }
 
+
 /***************************************************************************
 
   Start the video hardware emulation.
@@ -167,26 +164,6 @@ void gradius3_state::video_start()
 	machine().save().register_postload(save_prepost_delegate(FUNC(gradius3_state::gradius3_postload), this));
 }
 
-/***************************************************************************
-
-  Memory handlers
-
-***************************************************************************/
-
-uint16_t gradius3_state::gradius3_gfxrom_r(offs_t offset)
-{
-	return (m_gfxrom[2 * offset + 1] << 8) | m_gfxrom[2 * offset];
-}
-
-void gradius3_state::gradius3_gfxram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	int oldword = m_gfxram[offset];
-
-	COMBINE_DATA(&m_gfxram[offset]);
-
-	if (oldword != m_gfxram[offset])
-		m_k052109->gfx(0)->mark_dirty(offset / 16);
-}
 
 /***************************************************************************
 
@@ -221,6 +198,28 @@ uint32_t gradius3_state::screen_update_gradius3(screen_device &screen, bitmap_in
 }
 
 
+/***************************************************************************
+
+  Memory handlers
+
+***************************************************************************/
+
+uint16_t gradius3_state::gradius3_gfxrom_r(offs_t offset)
+{
+	return (m_gfxrom[2 * offset + 1] << 8) | m_gfxrom[2 * offset];
+}
+
+void gradius3_state::gradius3_gfxram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	int oldword = m_gfxram[offset];
+
+	COMBINE_DATA(&m_gfxram[offset]);
+
+	if (oldword != m_gfxram[offset])
+		m_k052109->gfx(0)->mark_dirty(offset / 16);
+}
+
+
 uint16_t gradius3_state::k052109_halfword_r(offs_t offset)
 {
 	return m_k052109->read(offset);
@@ -233,8 +232,10 @@ void gradius3_state::k052109_halfword_w(offs_t offset, uint16_t data, uint16_t m
 
 	/* is this a bug in the game or something else? */
 	if (!ACCESSING_BITS_0_7)
+	{
 		m_k052109->write(offset, (data >> 8) & 0xff);
-//      logerror("%s half %04x = %04x\n",machine().describe_context(),offset,data);
+		// logerror("%s half %04x = %04x\n",machine().describe_context(),offset,data);
+	}
 }
 
 void gradius3_state::cpuA_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -312,6 +313,11 @@ void gradius3_state::sound_bank_w(uint8_t data)
 }
 
 
+/***************************************************************************
+
+  Address maps
+
+***************************************************************************/
 
 void gradius3_state::gradius3_map(address_map &map)
 {
@@ -360,6 +366,11 @@ void gradius3_state::gradius3_s_map(address_map &map)
 }
 
 
+/***************************************************************************
+
+  Input ports
+
+***************************************************************************/
 
 static INPUT_PORTS_START( gradius3 )
 	PORT_START("SYSTEM")
@@ -417,6 +428,12 @@ static INPUT_PORTS_START( gradius3 )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+
+/***************************************************************************
+
+  Machine configuration
+
+***************************************************************************/
 
 void gradius3_state::volume_callback(uint8_t data)
 {
@@ -500,10 +517,9 @@ void gradius3_state::gradius3(machine_config &config)
 }
 
 
-
 /***************************************************************************
 
-  Game driver(s)
+  ROM definitions
 
 ***************************************************************************/
 
@@ -548,6 +564,45 @@ ROM_END
 
 ROM_START( gradius3j )
 	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "945_313.f15", 0x00000, 0x20000, CRC(706494e1) SHA1(f14fd1f01ee6a9cdcb441432608ba26dedd71b57) )
+	ROM_LOAD16_BYTE( "945_312.e15", 0x00001, 0x20000, CRC(6dcd00ab) SHA1(d0cffcb00f89ccaba5fda8a64d1cb6e4af8c2f27) )
+
+	ROM_REGION( 0x100000, "sub", 0 )
+	ROM_LOAD16_BYTE( "945_m09.r17",  0x000000, 0x20000, CRC(b4a6df25) SHA1(85533cf140d28f6f81c0b49b8061bda0924a613a) )
+	ROM_LOAD16_BYTE( "945_m08.n17",  0x000001, 0x20000, CRC(74e981d2) SHA1(e7b47a2da01ff73293d2100c48fdf00b33125af5) )
+	ROM_LOAD16_BYTE( "945_l06b.r11", 0x040000, 0x20000, CRC(83772304) SHA1(a90c75a3de670b6ec5e0fc201876d463b4a76766) )
+	ROM_LOAD16_BYTE( "945_l06a.n11", 0x040001, 0x20000, CRC(e1fd75b6) SHA1(6160d80a2f1bf550e85d6253cf521a96f5a644cc) )
+	ROM_LOAD16_BYTE( "945_l07c.r15", 0x080000, 0x20000, CRC(c1e399b6) SHA1(e95bd478dd3beea0175bf9ee4cededb111c4ace1) )
+	ROM_LOAD16_BYTE( "945_l07a.n15", 0x080001, 0x20000, CRC(96222d04) SHA1(b55700f683a556b0e73dbac9c7b4ce485420d21c) )
+	ROM_LOAD16_BYTE( "945_l07d.r13", 0x0c0000, 0x20000, CRC(4c16d4bd) SHA1(01dcf169b78a1e495214b10181401d1920b0c924) )
+	ROM_LOAD16_BYTE( "945_l07b.n13", 0x0c0001, 0x20000, CRC(5e209d01) SHA1(0efa1bbfdc7e2ba1e0bb96245e2bfe961258b446) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "945_m05.d9", 0x00000, 0x10000, CRC(c8c45365) SHA1(b9a7b736b52bca42c7b8c8ed64c8df73e0116158) )
+
+	ROM_REGION( 0x200000, "k051960", 0 )   /* graphics (addressable by the main CPU) */
+	ROM_LOAD32_WORD( "945_a02.l3",  0x000000, 0x80000, CRC(4dfffd74) SHA1(588210bac27448240ef08961f70b714b69cb3ffd) )
+	ROM_LOAD32_WORD( "945_a01.h3",  0x000002, 0x80000, CRC(339d6dd2) SHA1(6a52b826aba92c75fc6a5926184948735dc20812) )
+	ROM_LOAD32_BYTE( "945_l04a.k6", 0x100000, 0x20000, CRC(884e21ee) SHA1(ce86dd3a06775e5b1aa09db010dcb674e67828e7) )
+	ROM_LOAD32_BYTE( "945_l04c.m6", 0x100001, 0x20000, CRC(45bcd921) SHA1(e51a8a71362a6fb55124aa1dce74519c0a3c6e3f) )
+	ROM_LOAD32_BYTE( "945_l03a.e6", 0x100002, 0x20000, CRC(a67ef087) SHA1(fd63474f3bbde5dfc53ed4c1db25d6411a8b54d2) )
+	ROM_LOAD32_BYTE( "945_l03c.h6", 0x100003, 0x20000, CRC(a56be17a) SHA1(1d387736144c30fcb5de54235331ab1ff70c356e) )
+	ROM_LOAD32_BYTE( "945_l04b.k8", 0x180000, 0x20000, CRC(843bc67d) SHA1(cdf8421083f24ab27867ed5d08d8949da192b2b9) )
+	ROM_LOAD32_BYTE( "945_l04d.m8", 0x180001, 0x20000, CRC(0a98d08e) SHA1(1e0ca51a2d45c01fa3f11950ddd387f41ddae691) )
+	ROM_LOAD32_BYTE( "945_l03b.e8", 0x180002, 0x20000, CRC(933e68b9) SHA1(f3a39446ca77d17fdbd938bd5f718ae9d5570879) )
+	ROM_LOAD32_BYTE( "945_l03d.h8", 0x180003, 0x20000, CRC(f375e87b) SHA1(6427b966795c907c8e516244872fe52217da62c4) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "945l14.j28", 0x0000, 0x0100, CRC(c778c189) SHA1(847eaf379ba075c25911c6f83dd63ff390534f60) )  /* priority encoder (not used) */
+
+	ROM_REGION( 0x80000, "k007232", 0 ) /* 007232 samples */
+	ROM_LOAD( "945_a10.b15",  0x00000, 0x40000, CRC(1d083e10) SHA1(b116f133a7647ef7a6c373aff00e9622d9954b61) )
+	ROM_LOAD( "945_l11a.c18", 0x40000, 0x20000, CRC(6043f4eb) SHA1(1c2e9ace1cfdde504b7b6158e3c3f54dc5ae33d4) )
+	ROM_LOAD( "945_l11b.c20", 0x60000, 0x20000, CRC(89ea3baf) SHA1(8edcbaa7969185cfac48c02559826d1b8b081f3f) )
+ROM_END
+
+ROM_START( gradius3ja )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "945_s13.f15", 0x00000, 0x20000, CRC(70c240a2) SHA1(82dc391572e1f61b0182cb031654d71adcdd5f6e) )
 	ROM_LOAD16_BYTE( "945_s12.e15", 0x00001, 0x20000, CRC(bbc300d4) SHA1(e1ca98bc591575285d7bd2d4fefdf35fed10dcb6) )
 
@@ -585,7 +640,8 @@ ROM_START( gradius3j )
 	ROM_LOAD( "945_l11b.c20", 0x60000, 0x20000, CRC(89ea3baf) SHA1(8edcbaa7969185cfac48c02559826d1b8b081f3f) )
 ROM_END
 
-ROM_START( gradius3js )
+// Same as normal gradius3ja set in content but with some ROMs split and populated differently.
+ROM_START( gradius3jas )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "945_s13.f15", 0x00000, 0x20000, CRC(70c240a2) SHA1(82dc391572e1f61b0182cb031654d71adcdd5f6e) )
 	ROM_LOAD16_BYTE( "945_s12.e15", 0x00001, 0x20000, CRC(bbc300d4) SHA1(e1ca98bc591575285d7bd2d4fefdf35fed10dcb6) )
@@ -674,7 +730,8 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1989, gradius3,   0,        gradius3, gradius3, gradius3_state, empty_init, ROT0, "Konami", "Gradius III (World, program code R)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1989, gradius3j,  gradius3, gradius3, gradius3, gradius3_state, empty_init, ROT0, "Konami", "Gradius III (Japan, program code S)",        MACHINE_SUPPORTS_SAVE )
-GAME( 1989, gradius3js, gradius3, gradius3, gradius3, gradius3_state, empty_init, ROT0, "Konami", "Gradius III (Japan, program code S, split)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, gradius3a,  gradius3, gradius3, gradius3, gradius3_state, empty_init, ROT0, "Konami", "Gradius III (Asia)",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1989, gradius3,    0,        gradius3, gradius3, gradius3_state, empty_init, ROT0, "Konami", "Gradius III (World, version R)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, gradius3j,   gradius3, gradius3, gradius3, gradius3_state, empty_init, ROT0, "Konami", "Gradius III: Densetsu kara Shinwa e (Japan, version 3, newer)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, gradius3ja,  gradius3, gradius3, gradius3, gradius3_state, empty_init, ROT0, "Konami", "Gradius III: Densetsu kara Shinwa e (Japan, version S)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, gradius3jas, gradius3, gradius3, gradius3, gradius3_state, empty_init, ROT0, "Konami", "Gradius III: Densetsu kara Shinwa e (Japan, version S, split)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, gradius3a,   gradius3, gradius3, gradius3, gradius3_state, empty_init, ROT0, "Konami", "Gradius III (Asia)", MACHINE_SUPPORTS_SAVE )

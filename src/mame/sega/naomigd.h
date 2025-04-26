@@ -140,7 +140,7 @@ private:
 	enum { FILENAME_LENGTH=24 };
 	int work_mode; // set it different from 0 to enable the cpus and full dimm board emulation
 
-	required_device<sh4_device> m_maincpu;
+	required_device<sh7091_device> m_maincpu;
 	required_device<pic16c622_device> m_securitycpu;
 	required_device<i2cmem_device> m_i2c0;
 	required_device<i2cmem_device> m_i2c1;

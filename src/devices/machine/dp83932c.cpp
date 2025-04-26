@@ -165,6 +165,12 @@ int dp83932c_device::recv_start_cb(u8 *buf, int length)
 	for (unsigned i = 0; i < length; i++)
 		m_bus->write_byte(rba + i, buf[i]);
 
+	// Advance CRBA
+	offs_t const crba = rba + length;
+	m_reg[CRBA1] = (crba >> 16) & 0xffff;
+	m_reg[CRBA0] = crba & 0xffff;
+	LOG("recv_start_cb Next (C)RBA = 0x%x, CRBA1 = 0x%x, CRBA0 = 0x%x\n", crba, m_reg[CRBA1], m_reg[CRBA0]);
+
 	// update remaining buffer word count
 	u32 const rbwc = ((u32(m_reg[RBWC1]) << 16) | m_reg[RBWC0]) - (length + 1) / 2;
 	LOG("recv_start_cb length %d buffer %d remaining %d\n", length, ((u32(m_reg[RBWC1]) << 16) | m_reg[RBWC0]) * 2, rbwc * 2);
@@ -180,8 +186,8 @@ int dp83932c_device::recv_start_cb(u8 *buf, int length)
 	offs_t const rda = EA(m_reg[URDA], m_reg[CRDA]);
 	write_bus_word(rda + 0 * width, m_reg[RCR]);
 	write_bus_word(rda + 1 * width, length);
-	write_bus_word(rda + 2 * width, m_reg[CRBA0]);
-	write_bus_word(rda + 3 * width, m_reg[CRBA1]);
+	write_bus_word(rda + 2 * width, m_reg[TRBA0]);
+	write_bus_word(rda + 3 * width, m_reg[TRBA1]);
 	write_bus_word(rda + 4 * width, m_reg[RSC]);
 	m_reg[LLFA] = m_reg[CRDA] + 5 * width;
 	m_reg[CRDA] = read_bus_word(rda + 5 * width);

@@ -49,18 +49,18 @@ private:
 	required_shared_ptr<uint16_t> m_scrollram;
 	required_shared_ptr<uint16_t> m_ctrl;
 	/* framebuffer is a raw bitmap, remapped as a last step */
-	std::unique_ptr<bitmap_ind16> m_framebuffer[2];
+	bitmap_ind16 m_framebuffer[2];
 
-	tilemap_t      *m_tilemap[3];
+	tilemap_t    *m_tilemap[3]{};
 
-	uint16_t         m_bg_rambank[2], m_fg_rambank[2], m_tx_rambank;
-	uint8_t          m_framebuffer_page;
-	uint8_t          m_video_control;
+	uint16_t     m_bg_rambank[2], m_fg_rambank[2], m_tx_rambank;
+	uint8_t      m_framebuffer_page;
+	uint8_t      m_video_control;
 
-	int            m_fb_color_base;
-	int            m_bg_color_base;
-	int            m_fg_color_base;
-	int            m_tx_color_base;
+	int          m_fb_color_base;
+	int          m_bg_color_base;
+	int          m_fg_color_base;
+	int          m_tx_color_base;
 
 	static const gfx_layout charlayout, tilelayout;
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
@@ -73,7 +73,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 
-	void video_control( uint8_t data );
+	void video_control(uint8_t data);
 };
 
 DECLARE_DEVICE_TYPE(TC0180VCU, tc0180vcu_device)

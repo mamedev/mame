@@ -182,8 +182,9 @@ TILE_GET_INFO_MEMBER(pacman_state::pacman_get_tile_info)
 	int code = m_videoram[tile_index] | (m_charbank << 8);
 	int attr = (m_colorram[tile_index] & 0x1f) | (m_colortablebank << 5) | (m_palettebank << 6);
 
-	tileinfo.set(0,code,attr,0);
+	tileinfo.set(0, code, attr, 0);
 }
+
 
 /***************************************************************************
 
@@ -260,9 +261,103 @@ void mspactwin_state::flipscreen_w(int state)
 {
 	m_flipscreen = state;
 	m_bg_tilemap->set_flip(m_flipscreen * (TILEMAP_FLIPX + TILEMAP_FLIPY));
-//  logerror("Flip: %02x\n", state);
+	//logerror("Flip: %02x\n", state);
 }
 
+
+/*************************************************************************
+
+  Screen update
+
+**************************************************************************/
+
+void pacman_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	uint8_t *spriteram = m_spriteram;
+	uint8_t *spriteram_2 = m_spriteram2;
+
+	rectangle spriteclip(2*8, 34*8-1, 0*8, 28*8-1);
+	spriteclip &= cliprect;
+
+	/* Draw the sprites. Note that it is important to draw them exactly in this */
+	/* order, to have the correct priorities. */
+	for (int offs = m_spriteram.bytes() - 2; offs > 2*2; offs -= 2)
+	{
+		int color;
+		int sx,sy;
+		uint8_t fx,fy;
+
+		if (m_inv_spr)
+		{
+			sx = spriteram_2[offs + 1];
+			sy = 240 - (spriteram_2[offs]);
+		}
+		else
+		{
+			sx = 272 - spriteram_2[offs + 1];
+			sy = spriteram_2[offs] - 31;
+		}
+
+		fx = (spriteram[offs] & 1) ^ m_inv_spr;
+		fy = (spriteram[offs] & 2) ^ ((m_inv_spr) << 1);
+
+		color = (spriteram[offs + 1] & 0x1f) | (m_colortablebank << 5) | (m_palettebank << 6);
+
+		m_gfxdecode->gfx(1)->transmask(bitmap,spriteclip,
+				(spriteram[offs] >> 2) | (m_spritebank << 6),
+				color,
+				fx,fy,
+				sx,sy,
+				m_palette->transpen_mask(*m_gfxdecode->gfx(1), color & 0x3f, 0));
+
+		/* also plot the sprite with wraparound (tunnel in Crush Roller) */
+		m_gfxdecode->gfx(1)->transmask(bitmap,spriteclip,
+				(spriteram[offs] >> 2) | (m_spritebank << 6),
+				color,
+				fx,fy,
+				sx - 256,sy,
+				m_palette->transpen_mask(*m_gfxdecode->gfx(1), color & 0x3f, 0));
+	}
+
+	/* In the Pac Man based games (NOT Pengo) the first two sprites must be offset */
+	/* one pixel to the left to get a more correct placement */
+	for (int offs = 2*2; offs >= 0; offs -= 2)
+	{
+		int color;
+		int sx,sy;
+		uint8_t fx,fy;
+
+		if (m_inv_spr)
+		{
+			sx = spriteram_2[offs + 1];
+			sy = 240 - (spriteram_2[offs]);
+		}
+		else
+		{
+			sx = 272 - spriteram_2[offs + 1];
+			sy = spriteram_2[offs] - 31;
+		}
+		color = (spriteram[offs + 1] & 0x1f) | (m_colortablebank << 5) | (m_palettebank << 6);
+
+		fx = (spriteram[offs] & 1) ^ m_inv_spr;
+		fy = (spriteram[offs] & 2) ^ ((m_inv_spr) << 1);
+
+		m_gfxdecode->gfx(1)->transmask(bitmap,spriteclip,
+				(spriteram[offs] >> 2) | (m_spritebank << 6),
+				color,
+				fx,fy,
+				sx,sy + m_xoffsethack,
+				m_palette->transpen_mask(*m_gfxdecode->gfx(1), color & 0x3f, 0));
+
+		/* also plot the sprite with wraparound (tunnel in Crush Roller) */
+		m_gfxdecode->gfx(1)->transmask(bitmap,spriteclip,
+				(spriteram[offs] >> 2) | (m_spritebank << 6),
+				color,
+				fx,fy,
+				sx - 256,sy + m_xoffsethack,
+				m_palette->transpen_mask(*m_gfxdecode->gfx(1), color & 0x3f, 0));
+	}
+}
 
 uint32_t pacman_state::screen_update_pacman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -272,102 +367,79 @@ uint32_t pacman_state::screen_update_pacman(screen_device &screen, bitmap_ind16 
 		m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
 	if (m_spriteram != nullptr)
-	{
-		uint8_t *spriteram = m_spriteram;
-		uint8_t *spriteram_2 = m_spriteram2;
-		int offs;
-
-		rectangle spriteclip(2*8, 34*8-1, 0*8, 28*8-1);
-		spriteclip &= cliprect;
-
-		/* Draw the sprites. Note that it is important to draw them exactly in this */
-		/* order, to have the correct priorities. */
-		for (offs = m_spriteram.bytes() - 2; offs > 2*2; offs -= 2)
-		{
-			int color;
-			int sx,sy;
-			uint8_t fx,fy;
-
-			if(m_inv_spr)
-			{
-				sx = spriteram_2[offs + 1];
-				sy = 240 - (spriteram_2[offs]);
-			}
-			else
-			{
-				sx = 272 - spriteram_2[offs + 1];
-				sy = spriteram_2[offs] - 31;
-			}
-
-			fx = (spriteram[offs] & 1) ^ m_inv_spr;
-			fy = (spriteram[offs] & 2) ^ ((m_inv_spr) << 1);
-
-			color = (spriteram[offs + 1] & 0x1f) | (m_colortablebank << 5) | (m_palettebank << 6);
-
-			m_gfxdecode->gfx(1)->transmask(bitmap,spriteclip,
-					(spriteram[offs] >> 2) | (m_spritebank << 6),
-					color,
-					fx,fy,
-					sx,sy,
-					m_palette->transpen_mask(*m_gfxdecode->gfx(1), color & 0x3f, 0));
-
-			/* also plot the sprite with wraparound (tunnel in Crush Roller) */
-			m_gfxdecode->gfx(1)->transmask(bitmap,spriteclip,
-					(spriteram[offs] >> 2) | (m_spritebank << 6),
-					color,
-					fx,fy,
-					sx - 256,sy,
-					m_palette->transpen_mask(*m_gfxdecode->gfx(1), color & 0x3f, 0));
-		}
-		/* In the Pac Man based games (NOT Pengo) the first two sprites must be offset */
-		/* one pixel to the left to get a more correct placement */
-		for (offs = 2*2; offs >= 0; offs -= 2)
-		{
-			int color;
-			int sx,sy;
-			uint8_t fx,fy;
-
-			if(m_inv_spr)
-			{
-				sx = spriteram_2[offs + 1];
-				sy = 240 - (spriteram_2[offs]);
-			}
-			else
-			{
-				sx = 272 - spriteram_2[offs + 1];
-				sy = spriteram_2[offs] - 31;
-			}
-			color = (spriteram[offs + 1] & 0x1f) | (m_colortablebank << 5) | (m_palettebank << 6);
-
-			fx = (spriteram[offs] & 1) ^ m_inv_spr;
-			fy = (spriteram[offs] & 2) ^ ((m_inv_spr) << 1);
-
-			m_gfxdecode->gfx(1)->transmask(bitmap,spriteclip,
-					(spriteram[offs] >> 2) | (m_spritebank << 6),
-					color,
-					fx,fy,
-					sx,sy + m_xoffsethack,
-					m_palette->transpen_mask(*m_gfxdecode->gfx(1), color & 0x3f, 0));
-
-			/* also plot the sprite with wraparound (tunnel in Crush Roller) */
-			m_gfxdecode->gfx(1)->transmask(bitmap,spriteclip,
-					(spriteram[offs] >> 2) | (m_spritebank << 6),
-					color,
-					fx,fy,
-					sx - 256,sy + m_xoffsethack,
-					m_palette->transpen_mask(*m_gfxdecode->gfx(1), color & 0x3f, 0));
-		}
-	}
+		draw_sprites(screen, bitmap, cliprect);
 
 	if (m_bgpriority != 0)
 		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
 	return 0;
 }
 
 
 /*************************************************************************
 
-    Sega Pengo
+  Sega Ali Baba
+
+**************************************************************************/
+
+void alibaba_state::draw_clock(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// inactive half
+	if (m_mystery_clock <= 16)
+	{
+		int x = 120;
+		int y = 112;
+
+		if (m_flipscreen)
+		{
+			x = 264 - x;
+			y = 208 - y;
+		}
+
+		m_gfxdecode->gfx(2)->transpen(bitmap, cliprect, 0x1f, 1, 0, 0, x, y, 0);
+	}
+
+	// active half
+	int x = 120;
+	int y = 96 + (m_mystery_clock & 0x10);
+	int fx = 0, fy = 0;
+
+	if (m_flipscreen)
+	{
+		x = 264 - x;
+		y = 208 - y;
+		fx = !fx;
+		fy = !fy;
+	}
+
+	m_gfxdecode->gfx(2)->transpen(bitmap, cliprect, m_mystery_clock ^ 0x1f, 1, fx, fy, x, y, 0);
+}
+
+uint32_t alibaba_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
+
+	// sprites clipped area is larger than with pacman
+	rectangle spriteclip = cliprect;
+	if (m_flipscreen)
+		spriteclip.min_x = 6*8;
+	else
+		spriteclip.max_x = 30*8-1;
+
+	spriteclip &= cliprect;
+	draw_sprites(screen, bitmap, spriteclip);
+
+	// draw the mystery item clock
+	if (m_mystery_control & 2)
+		draw_clock(screen, bitmap, cliprect);
+
+	return 0;
+}
+
+
+/*************************************************************************
+
+  Sega Pengo
 
 **************************************************************************/
 
@@ -409,20 +481,17 @@ void pacman_state::pengo_gfxbank_w(int state)
 
 /*************************************************************************
 
-S2650 Games
+  S2650 Games
 
 **************************************************************************/
 
 TILE_GET_INFO_MEMBER(pacman_state::s2650_get_tile_info)
 {
-	int colbank, code, attr;
+	int colbank = m_s2650games_tileram[tile_index & 0x1f] & 0x3;
+	int code = m_videoram[tile_index] + (colbank << 8);
+	int attr = m_colorram[tile_index & 0x1f];
 
-	colbank = m_s2650games_tileram[tile_index & 0x1f] & 0x3;
-
-	code = m_videoram[tile_index] + (colbank << 8);
-	attr = m_colorram[tile_index & 0x1f];
-
-	tileinfo.set(0,code,attr & 0x1f,0);
+	tileinfo.set(0, code, attr & 0x1f, 0);
 }
 
 VIDEO_START_MEMBER(pacman_state,s2650games)
@@ -447,15 +516,13 @@ uint32_t pacman_state::screen_update_s2650games(screen_device &screen, bitmap_in
 {
 	uint8_t *spriteram = m_spriteram;
 	uint8_t *spriteram_2 = m_spriteram2;
-	int offs;
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 
-	for (offs = m_spriteram.bytes() - 2; offs > 2*2; offs -= 2)
+	for (int offs = m_spriteram.bytes() - 2; offs > 2*2; offs -= 2)
 	{
 		int color;
 		int sx,sy;
-
 
 		sx = 255 - spriteram_2[offs + 1];
 		sy = spriteram_2[offs] - 15;
@@ -469,13 +536,13 @@ uint32_t pacman_state::screen_update_s2650games(screen_device &screen, bitmap_in
 				sx,sy,
 				m_palette->transpen_mask(*m_gfxdecode->gfx(1), color & 0x3f, 0));
 	}
+
 	/* In the Pac Man based games (NOT Pengo) the first two sprites must be offset */
 	/* one pixel to the left to get a more correct placement */
-	for (offs = 2*2;offs >= 0;offs -= 2)
+	for (int offs = 2*2;offs >= 0;offs -= 2)
 	{
 		int color;
 		int sx,sy;
-
 
 		sx = 255 - spriteram_2[offs + 1];
 		sy = spriteram_2[offs] - 15;
@@ -489,6 +556,7 @@ uint32_t pacman_state::screen_update_s2650games(screen_device &screen, bitmap_in
 				sx,sy + m_xoffsethack,
 				m_palette->transpen_mask(*m_gfxdecode->gfx(1), color & 0x3f, 0));
 	}
+
 	return 0;
 }
 
@@ -500,9 +568,8 @@ void pacman_state::s2650games_videoram_w(offs_t offset, uint8_t data)
 
 void pacman_state::s2650games_colorram_w(offs_t offset, uint8_t data)
 {
-	int i;
 	m_colorram[offset & 0x1f] = data;
-	for (i = offset; i < 0x0400; i += 32)
+	for (int i = offset; i < 0x0400; i += 32)
 		m_bg_tilemap->mark_tile_dirty(i);
 }
 
@@ -520,7 +587,7 @@ void pacman_state::s2650games_tilesbank_w(offs_t offset, uint8_t data)
 
 /*************************************************************************
 
-Jr. Pac-Man
+  Jr. Pac-Man
 
 **************************************************************************/
 
@@ -554,7 +621,7 @@ TILEMAP_MAPPER_MEMBER(pacman_state::jrpacman_scan_rows)
 
 TILE_GET_INFO_MEMBER(pacman_state::jrpacman_get_tile_info)
 {
-	int color_index, code, attr;
+	int color_index;
 	if (tile_index < 1792)
 	{
 		color_index = tile_index & 0x1f;
@@ -564,10 +631,10 @@ TILE_GET_INFO_MEMBER(pacman_state::jrpacman_get_tile_info)
 		color_index = tile_index + 0x80;
 	}
 
-	code = m_videoram[tile_index] | (m_charbank << 8);
-	attr = (m_videoram[color_index] & 0x1f) | (m_colortablebank << 5) | (m_palettebank << 6);
+	int code = m_videoram[tile_index] | (m_charbank << 8);
+	int attr = (m_videoram[color_index] & 0x1f) | (m_colortablebank << 5) | (m_palettebank << 6);
 
-	tileinfo.set(0,code,attr,0);
+	tileinfo.set(0, code, attr, 0);
 }
 
 void pacman_state::jrpacman_mark_tile_dirty(int offset)

@@ -123,24 +123,7 @@ void psion_asic9_device::device_start()
 	m_ram_space = &space(AS_A9_RAM);
 	m_rom_space = &space(AS_A9_ROM);
 
-	switch (m_ram->size())
-	{
-	case 0x010000: case 0x020000:
-		m_ram_type = 0;
-		break;
-
-	case 0x040000: case 0x080000:
-		m_ram_type = 1;
-		break;
-
-	case 0x100000: case 0x200000:
-		m_ram_type = 2;
-		break;
-
-	case 0x400000: case 0x800000:
-		m_ram_type = 3;
-		break;
-	}
+	m_ram_type = get_ram_type(m_ram->size());
 
 	configure_ram(m_ram_type);
 	configure_rom();
@@ -177,6 +160,44 @@ void psion_asic9_device::device_start()
 	save_item(NAME(m_frc2_reload));
 	save_item(NAME(m_watchdog_count));
 	save_item(NAME(m_rtc));
+}
+
+uint8_t psion_asic9_device::get_ram_type(uint32_t ram_size)
+{
+	switch (ram_size)
+	{
+	case 0x010000: case 0x020000:
+		return 0;
+
+	case 0x040000: case 0x080000:
+		return 1;
+
+	case 0x100000: case 0x200000:
+		return 2;
+
+	case 0x400000: case 0x800000:
+		return 3;
+	}
+	return 0;
+}
+
+uint8_t psion_asic9mx_device::get_ram_type(uint32_t ram_size)
+{
+	switch (ram_size)
+	{
+	case 0x0080000: case 0x0100000:
+		return 0;
+
+	case 0x0200000: case 0x0400000:
+		return 1;
+
+	case 0x0800000: case 0x1000000:
+		return 2;
+
+	case 0x2000000: case 0x4000000:
+		return 3;
+	}
+	return 0;
 }
 
 //-------------------------------------------------
@@ -407,12 +428,28 @@ uint32_t psion_asic9_device::ram_device_size(uint8_t device_type)
 {
 	uint32_t size = 0;
 
+	// RAM is installed in pairs, ie. 256KBits = 2 x 32K
 	switch (device_type & 3)
 	{
 	case 0: size = 0x010000; break; // 256KBits
 	case 1: size = 0x040000; break; // 1MBits
 	case 2: size = 0x100000; break; // 4MBits
 	case 3: size = 0x400000; break; // 16MBits
+	}
+	return size;
+}
+
+uint32_t psion_asic9mx_device::ram_device_size(uint8_t device_type)
+{
+	uint32_t size = 0;
+
+	// TODO: unknown for A9MX but allow EPOC16 to correctly identify 2MB fitted to all MX machines.
+	switch (device_type & 3)
+	{
+	case 0: size = 0x0040000; break;
+	case 1: size = 0x0100000; break;
+	case 2: size = 0x0400000; break;
+	case 3: size = 0x1000000; break;
 	}
 	return size;
 }

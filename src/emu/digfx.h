@@ -72,7 +72,7 @@ const gfx_layout name = { width, height, RGN_FRAC(1,1), 8, { GFX_RAW }, { 0 }, {
 #define STEP2048(START,STEP)    STEP1024(START,STEP),STEP1024((START)+1024*(STEP),STEP)
 
 #define STEP2_INV(START,STEP)   (START)+(STEP),(START)
-#define STEP4_INV(START,STEP)    STEP2_INV(START+2*STEP,STEP),STEP2_INV(START,STEP)
+#define STEP4_INV(START,STEP)   STEP2_INV(START+2*STEP,STEP),STEP2_INV(START,STEP)
 
 //**************************************************************************
 //  GRAPHICS INFO MACROS
@@ -186,17 +186,18 @@ protected:
 	virtual void interface_validity_check(validity_checker &valid) const override;
 	virtual void interface_pre_start() override;
 	virtual void interface_post_start() override;
+	virtual void interface_post_load() override;
 
 private:
-	optional_device<device_palette_interface> m_palette; // configured tag for palette device
-	std::unique_ptr<gfx_element>  m_gfx[MAX_GFX_ELEMENTS];    // array of pointers to graphic sets
+	optional_device<device_palette_interface> m_palette;   // configured tag for palette device
+	std::unique_ptr<gfx_element>  m_gfx[MAX_GFX_ELEMENTS]; // array of pointers to graphic sets
 
 	// configuration
-	const gfx_decode_entry *    m_gfxdecodeinfo;        // pointer to array of gfx decode information
-	bool                        m_palette_is_disabled;  // no palette associated with this gfx decode
+	const gfx_decode_entry *    m_gfxdecodeinfo;           // pointer to array of gfx decode information
+	bool                        m_palette_is_disabled;     // no palette associated with this gfx decode
 
 	// internal state
-	bool                        m_decoded;                  // have we processed our decode info yet?
+	bool                        m_decoded;                 // have we processed our decode info yet?
 };
 
 // iterator

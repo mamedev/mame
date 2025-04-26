@@ -197,9 +197,9 @@ ioport_constructor idpart_video_device::device_input_ports() const
 
 ROM_START(idpart_video)
 	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "video.e34",  0x0000, 0x0800, CRC(67e2c351) SHA1(1ca86b1b35d9a213db0c3f291dc839fc3621269c))
+	ROM_LOAD( "18-052-044.e34",  0x0000, 0x0800, CRC(67e2c351) SHA1(1ca86b1b35d9a213db0c3f291dc839fc3621269c))
 	ROM_REGION( 0x0800, "chargen",0 )
-	ROM_LOAD( "video.e4",   0x0000, 0x0800, CRC(5fe52e0d) SHA1(c6067e3fdda84e673aaa74ae6561b535157a8281))
+	ROM_LOAD( "18-051-044.e4",   0x0000, 0x0800, CRC(5fe52e0d) SHA1(c6067e3fdda84e673aaa74ae6561b535157a8281))
 ROM_END
 
 const tiny_rom_entry *idpart_video_device::device_rom_region() const

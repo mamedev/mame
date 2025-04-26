@@ -358,9 +358,9 @@ void sprint8_state::program_map(address_map &map)
 	map(0x1c10, 0x1c1f).writeonly().share(m_pos_v_ram);
 	map(0x1c20, 0x1c2f).writeonly().share(m_pos_d_ram);
 	map(0x1c30, 0x1c37).w(FUNC(sprint8_state::lockout_w));
-	map(0x1d00, 0x1d07).w("latch", FUNC(f9334_device::write_d0));
-	map(0x1e00, 0x1e07).w("motor", FUNC(f9334_device::write_d0));
-	map(0x1f00, 0x1f00).nopw(); // probably a watchdog, disabled in service mode
+	map(0x1d00, 0x1d07).nopr().w("latch", FUNC(f9334_device::write_d0));
+	map(0x1e00, 0x1e07).nopr().w("motor", FUNC(f9334_device::write_d0));
+	map(0x1f00, 0x1f00).noprw(); // probably a watchdog, disabled in service mode
 	map(0x2000, 0x3fff).rom();
 	map(0xf800, 0xffff).rom();
 }

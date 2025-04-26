@@ -173,7 +173,7 @@ void pippin_state::pippin(machine_config &config)
 	ASPEN(config, m_aspen, 66000000, "maincpu").set_dev_offset(1);
 
 	cdrom_image_device &cdrom(CDROM(config, "cdrom", 0));
-	cdrom.set_interface("pippin_cdrom");
+	cdrom.set_interface("cdrom");
 	SOFTWARE_LIST(config, "cd_list").set_original("pippin");
 
 	RAM(config, m_ram);

@@ -854,6 +854,11 @@ void gdrom_device::signature()
 {
 	atapi_hle_device::signature();
 
+	// 0000 CD-DA
+	// 0001 CD-ROM
+	// 0010 CD-ROM XA, CD Extra
+	// 0011 CD-i
+	// 1000 GD-ROM
 	const u8 cd_type = m_image->is_gd() ? 0x80 : 0x00;
 
 	// naomi dimm board firmware needs the upper nibble to be 8 at the beginning

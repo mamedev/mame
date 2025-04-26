@@ -51,7 +51,7 @@ public:
 	void cougar(machine_config &config);
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<sh7751r_device> m_maincpu;
 
 	void program_map(address_map &map) ATTR_COLD;
 };
@@ -67,7 +67,7 @@ INPUT_PORTS_END
 
 void cougar_state::cougar(machine_config &config)
 {
-	SH4LE(config, m_maincpu, 20_MHz_XTAL);
+	SH7751R(config, m_maincpu, 20_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cougar_state::program_map);
 	m_maincpu->set_force_no_drc(true);
 

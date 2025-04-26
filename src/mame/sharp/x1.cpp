@@ -774,7 +774,7 @@ void x1_state::fdc_w(offs_t offset, uint8_t data)
 			{
 				floppy->ss_w(BIT(data, 4));
 				if(BIT(m_fdc_ctrl, 7) && !BIT(data, 7))
-					m_motor_timer->adjust(attotime::from_seconds(1.2));
+					m_motor_timer->adjust(attotime::from_msec(1200));
 				else if(BIT(data, 7))
 					floppy->mon_w(0);
 			}

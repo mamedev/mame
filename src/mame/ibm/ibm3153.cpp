@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Robbbert
+// copyright-holders: Robbbert
 /***************************************************************************
 
 IBM 3153 Terminal.

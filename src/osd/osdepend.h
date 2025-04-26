@@ -17,6 +17,7 @@
 
 #include "bitmap.h"
 #include "interface/midiport.h"
+#include "interface/nethandler.h"
 
 #include <cstdint>
 #include <memory>
@@ -99,6 +100,10 @@ public:
 	virtual std::unique_ptr<osd::midi_input_port> create_midi_input(std::string_view name) = 0;
 	virtual std::unique_ptr<osd::midi_output_port> create_midi_output(std::string_view name) = 0;
 	virtual std::vector<osd::midi_port_info> list_midi_ports() = 0;
+
+	// network interface
+	virtual std::unique_ptr<osd::network_device> open_network_device(int id, osd::network_handler &handler) = 0;
+	virtual std::vector<osd::network_device_info> list_network_devices() = 0;
 
 protected:
 	virtual ~osd_interface() { }

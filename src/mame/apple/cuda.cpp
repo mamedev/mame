@@ -86,6 +86,7 @@ void cuda_device::device_add_mconfig(machine_config &config)
 	m_maincpu->write_p<1>().set(FUNC(cuda_device::pb_w));
 	m_maincpu->write_p<2>().set(FUNC(cuda_device::pc_w));
 	m_maincpu->set_pullups<1>(0xc0); // pull-ups on port B bits 6 & 7 (DFAC/I2C SDA & SCL)
+	m_maincpu->set_pullups<2>(0x04); // pull-up on port C bit 2 (NMI)
 }
 
 const tiny_rom_entry *cuda_device::device_rom_region() const
@@ -101,6 +102,7 @@ cuda_device::cuda_device(const machine_config &mconfig, device_type type, const 
 	: device_t(mconfig, type, tag, owner, clock),
 	device_nvram_interface(mconfig, *this),
 	write_reset(*this),
+	write_nmi(*this),
 	write_linechange(*this),
 	write_via_clock(*this),
 	write_via_data(*this),
@@ -110,8 +112,8 @@ cuda_device::cuda_device(const machine_config &mconfig, device_type type, const 
 	m_maincpu(*this, "cudamcu"),
 	m_default_nvram(*this, "defaultnv"),
 	m_treq(0), m_byteack(0), m_tip(0), m_via_data(0), m_last_adb(0),
-	m_iic_sda(0), m_last_adb_time(0), m_cuda_controls_power(false), m_adb_in(false),
-	m_reset_line(0), m_adb_dtime(0), m_pram_loaded(false)
+	m_iic_sda(1), m_last_adb_time(0), m_cuda_controls_power(false), m_adb_in(false), m_adb_power(false),
+	m_reset_line(0), m_nmi_line(0), m_adb_dtime(0), m_pram_loaded(false)
 {
 	std::fill(std::begin(m_disk_pram), std::end(m_disk_pram), 0);
 }
@@ -124,6 +126,7 @@ void cuda_device::device_start()
 	save_item(NAME(m_via_data));
 	save_item(NAME(m_adb_in));
 	save_item(NAME(m_reset_line));
+	save_item(NAME(m_nmi_line));
 	save_item(NAME(m_adb_dtime));
 	save_item(NAME(m_pram_loaded));
 	save_item(NAME(m_disk_pram));
@@ -196,7 +199,7 @@ void cuda_device::pb_w(u8 data)
 
 void cuda_device::pc_w(u8 data)
 {
-	if ((data & 8) != m_reset_line)
+	if (BIT(data, 3) != m_reset_line)
 	{
 		LOGMASKED(LOG_HOSTCOMM, "680x0 reset: %d -> %d (PC=%x)\n", m_reset_line, BIT(data, 3), m_maincpu->pc());
 		// falling edge, should reset the machine too
@@ -246,6 +249,12 @@ void cuda_device::pc_w(u8 data)
 			}
 		}
 	}
+
+	if ((!BIT(data, 2)) != m_nmi_line)
+	{
+		m_nmi_line = !BIT(data, 2);
+		write_nmi(m_nmi_line);
+	}
 }
 
 u8 cuda_device::pa_r()
@@ -261,10 +270,8 @@ u8 cuda_device::pa_r()
 		rv = 0x02 | 0x01;   // pull-up + PFW
 	}
 
-	if (m_adb_in)
-	{
-		rv |= 0x40;
-	}
+	rv |= (m_adb_in) ? 0x40 : 0;
+	rv |= (m_adb_power) ? 0 : 0x04;
 
 	return rv;
 }

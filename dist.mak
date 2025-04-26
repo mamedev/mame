@@ -128,6 +128,6 @@ $(STAGEDIR)/docs/MAME.pdf: docs/build/latex/MAME.pdf | $(GEN_FOLDERS)
 	$(call COPY,$<,$@)
 
 docs/build/latex/MAME.pdf:
-	$(MAKE) -C docs latexpdf
+	$(MAKE) -C docs PAPER=a4 latexpdf
 
 .PHONY: all clean

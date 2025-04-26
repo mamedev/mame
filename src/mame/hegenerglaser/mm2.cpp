@@ -148,7 +148,7 @@ public:
 	void bup(machine_config &config);
 
 protected:
-	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD { m_maincpu->set_input_line(0, CLEAR_LINE); }
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -167,11 +167,11 @@ private:
 	u8 keys_r(offs_t offset);
 };
 
-void mm2_state::machine_reset()
-{
-	m_maincpu->set_input_line(0, CLEAR_LINE);
-	m_display->reset();
-}
+
+
+/*******************************************************************************
+    I/O
+*******************************************************************************/
 
 INPUT_CHANGED_MEMBER(mm2_state::reset_button)
 {
@@ -182,12 +182,6 @@ INPUT_CHANGED_MEMBER(mm2_state::reset_button)
 		machine_reset();
 	}
 }
-
-
-
-/*******************************************************************************
-    I/O
-*******************************************************************************/
 
 void mm2_state::lcd_irqack_w(u8 data)
 {

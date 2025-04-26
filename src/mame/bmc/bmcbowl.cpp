@@ -14,7 +14,7 @@ BMC Bowling (c) 1994.05 BMC, Ltd
  press START(1) OR BUTTON1 to start game , also START(1) or BUTTON1 to bowl / start
         ( 5 to insert coin(s) , B to bet , D to pay out (?)  etc...)
 
- press ANALIZER(0) during boot to enter test menu, then :
+ press ANALYZER(0) during boot to enter test menu, then :
             STOP1+STOP2 - sound test menu
         BIG(G) - cycle options ,
         DOUBLE(H) - play
@@ -39,6 +39,7 @@ TODO:
  - Crt
  - interrupts
  - missing gfx elements
+ - erratic music tempo
 
 ---
 
@@ -102,6 +103,7 @@ Main board:
 */
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/6522via.h"
 #include "machine/nvram.h"
@@ -109,6 +111,7 @@ Main board:
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"
 #include "video/ramdac.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -134,10 +137,11 @@ public:
 
 	void bmcbowl(machine_config &config);
 
-private:
+protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
+private:
 	uint8_t random_read();
 	uint16_t protection_r();
 	void scroll_w(uint16_t data);
@@ -172,40 +176,40 @@ uint32_t bmcbowl_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 	bitmap.fill(rgb_t::black(), cliprect);
 
-	int z=0;
-	for (int y=0; y<230; y++)
+	int z = 0;
+	for (int y = 0; y < 230; y++)
 	{
-		for (int x=0; x<280; x+=2)
+		for (int x = 0; x < 280; x += 2)
 		{
 			int pixdat;
 
-			pixdat = m_vid2[0x8000+z];
+			pixdat = m_vid2[0x8000 + z];
 
-			if(pixdat&0xff)
-				bitmap.pix(y, x+1) = m_palette->pen(pixdat&0xff);
-			if(pixdat>>8)
-				bitmap.pix(y, x) = m_palette->pen(pixdat>>8);
+			if (pixdat & 0xff)
+				bitmap.pix(y, x + 1) = m_palette->pen(pixdat & 0xff);
+			if (pixdat >> 8)
+				bitmap.pix(y, x) = m_palette->pen(pixdat >> 8);
 
 			pixdat = m_vid2[z];
 
-			if(pixdat&0xff)
-				bitmap.pix(y, x+1) = m_palette->pen(pixdat&0xff);
-			if(pixdat>>8)
-				bitmap.pix(y, x) = m_palette->pen(pixdat>>8);
+			if (pixdat & 0xff)
+				bitmap.pix(y, x + 1) = m_palette->pen(pixdat & 0xff);
+			if (pixdat >> 8)
+				bitmap.pix(y, x) = m_palette->pen(pixdat >> 8);
 
-			pixdat = m_vid1[0x8000+z];
+			pixdat = m_vid1[0x8000 + z];
 
-			if(pixdat&0xff)
-				bitmap.pix(y, x+1) = m_palette->pen(pixdat&0xff);
-			if(pixdat>>8)
-				bitmap.pix(y, x) = m_palette->pen(pixdat>>8);
+			if (pixdat & 0xff)
+				bitmap.pix(y, x + 1) = m_palette->pen(pixdat & 0xff);
+			if (pixdat >> 8)
+				bitmap.pix(y, x) = m_palette->pen(pixdat >> 8);
 
 			pixdat = m_vid1[z];
 
-			if(pixdat&0xff)
-				bitmap.pix(y, x+1) = m_palette->pen(pixdat&0xff);
-			if(pixdat>>8)
-				bitmap.pix(y, x) = m_palette->pen(pixdat>>8);
+			if (pixdat & 0xff)
+				bitmap.pix(y, x + 1) = m_palette->pen(pixdat & 0xff);
+			if (pixdat >> 8)
+				bitmap.pix(y, x) = m_palette->pen(pixdat >> 8);
 
 			z++;
 		}
@@ -220,14 +224,14 @@ uint8_t bmcbowl_state::random_read()
 
 uint16_t bmcbowl_state::protection_r()
 {
-	switch(m_maincpu->pcbase())
+	switch (m_maincpu->pcbase())
 	{
 		case 0xca68:
-			switch(m_maincpu->state_int(M68K_D2))
+			switch (m_maincpu->state_int(M68K_D2))
 			{
-				case 0:          return 0x37<<8;
+				case 0x0000: return 0x37<<8;
 				case 0x1013: return 0;
-				default:         return 0x46<<8;
+				default:     return 0x46<<8;
 			}
 	}
 	logerror("Protection read @ %X\n",m_maincpu->pcbase());
@@ -236,7 +240,7 @@ uint16_t bmcbowl_state::protection_r()
 
 void bmcbowl_state::scroll_w(uint16_t data)
 {
-	//TODO - scroll
+	// TODO - scroll
 }
 
 void bmcbowl_state::via_a_out(uint8_t data)
@@ -246,12 +250,12 @@ void bmcbowl_state::via_a_out(uint8_t data)
 
 void bmcbowl_state::via_b_out(uint8_t data)
 {
-	//used
+	// used
 }
 
 void bmcbowl_state::via_ca2_out(int state)
 {
-	//used
+	// used
 }
 
 
@@ -315,9 +319,9 @@ void bmcbowl_state::machine_reset()
 	for (int i = 0; i < m_stats_ram.bytes()/2; i++)
 		m_stats_ram[i] = 0xffff;
 
-	init_stats(bmc_nv1,std::size(bmc_nv1),0);
-	init_stats(bmc_nv2,std::size(bmc_nv2),0x3b0/2);
-	init_stats(bmc_nv3,std::size(bmc_nv3),0xfe2/2);
+	init_stats(bmc_nv1,std::size(bmc_nv1), 0);
+	init_stats(bmc_nv2,std::size(bmc_nv2), 0x3b0/2);
+	init_stats(bmc_nv3,std::size(bmc_nv3), 0xfe2/2);
 #endif
 }
 
@@ -333,7 +337,7 @@ void bmcbowl_state::main_mem(address_map &map)
 	map(0x091000, 0x091001).nopw();
 	map(0x091800, 0x091801).w(FUNC(bmcbowl_state::scroll_w));
 
-	map(0x092000, 0x09201f).m("via6522_0", FUNC(via6522_device::map)).umask16(0x00ff);
+	map(0x092000, 0x09201f).m("via6522", FUNC(via6522_device::map)).umask16(0x00ff);
 
 	map(0x093000, 0x093003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff);
 	map(0x092800, 0x092803).w("aysnd", FUNC(ay8910_device::data_address_w)).umask16(0xff00);
@@ -362,7 +366,7 @@ void bmcbowl_state::main_mem(address_map &map)
 static INPUT_PORTS_START( bmcbowl )
 	PORT_START("IN0")   /* DSW 1 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Note")
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Analizer")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Analyzer")
 
 	PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Pay") PORT_CODE(KEYCODE_M)
 	PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Stop") PORT_CODE(KEYCODE_Z)
@@ -439,12 +443,11 @@ static INPUT_PORTS_START( bmcbowl )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
-
 INPUT_PORTS_END
 
 uint8_t bmcbowl_state::dips1_r()
 {
-	switch(m_selected_input)
+	switch (m_selected_input)
 	{
 		case 0x00: return m_input[0]->read();
 		case 0x40: return m_input[1]->read();
@@ -466,7 +469,7 @@ void bmcbowl_state::ramdac_map(address_map &map)
 
 void bmcbowl_state::bmcbowl(machine_config &config)
 {
-	M68000(config, m_maincpu, XTAL(21'477'272) / 2);
+	M68000(config, m_maincpu, 21.477272_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &bmcbowl_state::main_mem);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -476,7 +479,7 @@ void bmcbowl_state::bmcbowl(machine_config &config)
 	screen.set_visarea(0*8, 35*8-1, 0*8, 29*8-1);
 	screen.set_screen_update(FUNC(bmcbowl_state::screen_update));
 	screen.screen_vblank().set_inputline(m_maincpu, M68K_IRQ_2, ASSERT_LINE); // probably not the source of this interrupt
-	screen.screen_vblank().append("via6522_0", FUNC(via6522_device::write_cb1));
+	screen.screen_vblank().append("via6522", FUNC(via6522_device::write_cb1));
 
 	PALETTE(config, m_palette).set_entries(256);
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
@@ -487,22 +490,22 @@ void bmcbowl_state::bmcbowl(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	ym2413_device &ymsnd(YM2413(config, "ymsnd", XTAL(3'579'545)));  // guessed chip type, clock not verified
+	ym2413_device &ymsnd(YM2413(config, "ymsnd", 3.579545_MHz_XTAL)); // guessed chip type
 	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
 	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", XTAL(3'579'545) / 2));
+	ay8910_device &aysnd(AY8910(config, "aysnd", 21.477272_MHz_XTAL / 16)); // matches PCB recording
 	aysnd.port_a_read_callback().set(FUNC(bmcbowl_state::dips1_r));
 	aysnd.port_b_write_callback().set(FUNC(bmcbowl_state::input_mux_w));
 	aysnd.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
 	aysnd.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
-	okim6295_device &oki(OKIM6295(config, "oki", 1122000, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	okim6295_device &oki(OKIM6295(config, "oki", 21.477272_MHz_XTAL / 16, okim6295_device::PIN7_LOW)); // matches PCB recording
 	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
 	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 
 	/* via */
-	via6522_device &via(MOS6522(config, "via6522_0", XTAL(3'579'545) / 4)); // clock not verified (controls music tempo)
+	via6522_device &via(MOS6522(config, "via6522", 13.3_MHz_XTAL / 16)); // clock not verified (controls music tempo)
 	via.readpb_handler().set_ioport("IN3");
 	via.writepa_handler().set(FUNC(bmcbowl_state::via_a_out));
 	via.writepb_handler().set(FUNC(bmcbowl_state::via_b_out));
@@ -516,9 +519,9 @@ ROM_START( bmcbowl )
 	ROM_LOAD16_BYTE( "bmc_7ex.bin", 0x000001, 0x10000, CRC(7726d47a) SHA1(8438c3345847c2913c640a29145ec8502f6b01e7) )
 
 	ROM_LOAD16_BYTE( "bmc_4.bin", 0x140000, 0x10000, CRC(f43880d6) SHA1(9e73a29baa84d417ff88026896d852567a38e714) )
-	ROM_RELOAD(0x160000,0x10000)
+	ROM_RELOAD(0x160000, 0x10000)
 	ROM_LOAD16_BYTE( "bmc_3.bin", 0x140001, 0x10000, CRC(d1af9410) SHA1(e66b3ddd9d9e3c567fdb140c4c8972c766f2b975) )
-	ROM_RELOAD(0x160001,0x10000)
+	ROM_RELOAD(0x160001, 0x10000)
 
 	ROM_LOAD16_BYTE( "bmc_6.bin", 0x180000, 0x20000, CRC(7b9e0d77) SHA1(1ec1c92c6d4c512f7292b77e9663518085684ba9) )
 	ROM_LOAD16_BYTE( "bmc_5.bin", 0x180001, 0x20000, CRC(708b6f8b) SHA1(4a910126d87c11fed99f44b61d51849067eddc02) )

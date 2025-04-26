@@ -135,7 +135,6 @@ u32 chessmachine_device::disable_bootrom_r()
 void chessmachine_device::main_map(address_map &map)
 {
 	map(0x00000000, 0x000fffff).ram();
-
 	map(0x00000000, 0x0000007f).view(m_boot_view);
 	m_boot_view[0](0x00000000, 0x0000007f).rom().region("bootrom", 0);
 

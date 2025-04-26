@@ -7,10 +7,12 @@ NEC SGP (スーパーグラフィックプロセッサ / Super Graphic Processor
 Unknown part number, used as GPU for PC88VA
 
 TODO:
-- timing details
-- specifics about what exactly happens in work area when either SGP runs or is idle.
+- timing details;
+- unemulated CLS, LINE, SCAN;
+- Uneven src/dst sizes or color depths (mostly for PATBLT);
+- specifics about what exactly happens in work area when either SGP runs or is idle;
 - famista: during gameplay it BITBLT same source to destination 0x00037076
-  with tp_mode = 3 and pitch = 0 (!?);
+  with tp_mode = 3, uneven color depths (src 1bpp, dst 4bpp) and pitch = 0, assume disabled;
 - rtype: during gameplay it does transfers with Pitch = 0xfff0, alias for negative draw?
 - basic fires a VABOT on loading;
 
@@ -19,10 +21,9 @@ TODO:
 #include "emu.h"
 #include "pc88va_sgp.h"
 
-#include <iostream>
-
-
 #define LOG_COMMAND     (1U << 1)
+
+//#include <iostream>
 
 #define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_STREAM std::cout
@@ -32,7 +33,7 @@ TODO:
 #define LOGCOMMAND(...)       LOGMASKED(LOG_COMMAND, __VA_ARGS__)
 
 // device type definition
-DEFINE_DEVICE_TYPE(PC88VA_SGP, pc88va_sgp_device, "pc88va_sgp", "NEC PC88VA Super Graphic Processor")
+DEFINE_DEVICE_TYPE(PC88VA_SGP, pc88va_sgp_device, "pc88va_sgp", "NEC PC-88VA Super Graphic Processor")
 
 pc88va_sgp_device::pc88va_sgp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, PC88VA_SGP, tag, owner, clock),
@@ -88,7 +89,7 @@ void pc88va_sgp_device::vdp_address_w(offs_t offset, u16 data, u16 mem_mask)
 void pc88va_sgp_device::control_w(u8 data)
 {
 	if (data)
-		popmessage("SGP warning write %02x", data);
+		popmessage("SGP: control_w write %02x", data);
 }
 
 /*
@@ -96,6 +97,11 @@ void pc88va_sgp_device::control_w(u8 data)
  */
 u8 pc88va_sgp_device::status_r()
 {
+// crude debug single-stepping
+//  if (machine().input().code_pressed(KEYCODE_S))
+//      return 0;
+//  if (!machine().input().code_pressed_once(KEYCODE_A))
+//      return 1;
 	return 0;
 }
 
@@ -183,11 +189,12 @@ void pc88va_sgp_device::start_exec()
 				ptr->pixel_mode = (param1 & 0x03);
 				ptr->hsize = m_data->read_word(vdp_pointer + 4) & 0x0fff;
 				ptr->vsize = m_data->read_word(vdp_pointer + 6) & 0x0fff;
-				ptr->fb_pitch = m_data->read_word(vdp_pointer + 8) & 0xfffc;
+				// NOTE: & 0xfffc causes pitch issues in boomer intro/title text, shinraba gameplay
+				ptr->fb_pitch = (s16)(m_data->read_word(vdp_pointer + 8) & 0xfffe);
 				ptr->address = (m_data->read_word(vdp_pointer + 10) & 0xfffe)
 					| (m_data->read_word(vdp_pointer + 12) << 16);
 
-				LOGCOMMAND("SGP: (PC=%08x) SET %s %02x|H %4u|V %4u|Pitch %5u| address %08x\n"
+				LOGCOMMAND("SGP: (PC=%08x) SET %s %02x|H %4u|V %4u|Pitch %5d| address %08x\n"
 					, vdp_pointer
 					, mode ? "DESTINATION" : "SOURCE     "
 					, param1
@@ -202,10 +209,10 @@ void pc88va_sgp_device::start_exec()
 			}
 			case 0x0006:
 			{
-				const u16 color_code = m_data->read_word(vdp_pointer + 2);
+				m_color_code = m_data->read_word(vdp_pointer + 2);
 				LOGCOMMAND("SGP: (PC=%08x) SET COLOR %04x\n"
 					, vdp_pointer
-					, color_code
+					, m_color_code
 				);
 				next_pc += 2;
 				break;
@@ -223,7 +230,7 @@ void pc88va_sgp_device::start_exec()
 					, cmd_mode ? "PATBLT" : "BITBLT"
 					, draw_mode
 				);
-				cmd_blit(draw_mode, cmd_mode);
+				execute_blit(draw_mode, cmd_mode);
 
 				next_pc += 2;
 				break;
@@ -239,7 +246,7 @@ void pc88va_sgp_device::start_exec()
 				// in pixels
 				const u16 h_size = m_data->read_word(vdp_pointer + 6);
 				const u16 v_size = m_data->read_word(vdp_pointer + 8);
-				const u16 fb_pitch = m_data->read_word(vdp_pointer + 10) & 0xfffc;
+				const s16 fb_pitch = m_data->read_word(vdp_pointer + 10) & 0xfffe;
 				const u32 src_address = (m_data->read_word(vdp_pointer + 12) & 0xfffe)
 					| (m_data->read_word(vdp_pointer + 14) << 16);
 
@@ -303,8 +310,58 @@ void pc88va_sgp_device::start_exec()
 }
 
 /****************************************
- * Commands
+ * Blitting
  ***************************************/
+
+const pc88va_sgp_device::rop_func pc88va_sgp_device::rop_table[16] =
+{
+	&pc88va_sgp_device::rop_0_fill_0,
+	&pc88va_sgp_device::rop_1_s_and_d,
+	&pc88va_sgp_device::rop_2_ns_and_d,
+	&pc88va_sgp_device::rop_3_d,
+	&pc88va_sgp_device::rop_4_s_and_nd,
+	&pc88va_sgp_device::rop_5_s,
+	&pc88va_sgp_device::rop_6_s_xor_d,
+	&pc88va_sgp_device::rop_7_s_or_d,
+	&pc88va_sgp_device::rop_8_ns_or_d,
+	&pc88va_sgp_device::rop_9_n_s_xor_d,
+	&pc88va_sgp_device::rop_A_n_s,
+	&pc88va_sgp_device::rop_B_n_s_or_d,
+	&pc88va_sgp_device::rop_C_nd,
+	&pc88va_sgp_device::rop_D_s_or_nd,
+	&pc88va_sgp_device::rop_E_n_s_and_d,
+	&pc88va_sgp_device::rop_F_fill_1,
+};
+
+u16 pc88va_sgp_device::rop_0_fill_0(u16 src, u16 dst) { return 0; }
+u16 pc88va_sgp_device::rop_1_s_and_d(u16 src, u16 dst) { return src & dst; }
+u16 pc88va_sgp_device::rop_2_ns_and_d(u16 src, u16 dst) { return (~src) & dst; }
+u16 pc88va_sgp_device::rop_3_d(u16 src, u16 dst) { return dst; }
+u16 pc88va_sgp_device::rop_4_s_and_nd(u16 src, u16 dst) { return src & (~dst); }
+u16 pc88va_sgp_device::rop_5_s(u16 src, u16 dst) { return src; }
+u16 pc88va_sgp_device::rop_6_s_xor_d(u16 src, u16 dst) { return src ^ dst; }
+u16 pc88va_sgp_device::rop_7_s_or_d(u16 src, u16 dst) { return src | dst; }
+u16 pc88va_sgp_device::rop_8_ns_or_d(u16 src, u16 dst) { return ~(src | dst); }
+u16 pc88va_sgp_device::rop_9_n_s_xor_d(u16 src, u16 dst) { return ~(src ^ dst); }
+u16 pc88va_sgp_device::rop_A_n_s(u16 src, u16 dst) { return ~src; }
+u16 pc88va_sgp_device::rop_B_n_s_or_d(u16 src, u16 dst) { return (~src) | dst; }
+u16 pc88va_sgp_device::rop_C_nd(u16 src, u16 dst) { return ~dst; }
+u16 pc88va_sgp_device::rop_D_s_or_nd(u16 src, u16 dst) { return src | (~dst); }
+u16 pc88va_sgp_device::rop_E_n_s_and_d(u16 src, u16 dst) { return ~(src & dst); }
+u16 pc88va_sgp_device::rop_F_fill_1(u16 src, u16 dst) { return 0xffff; }
+
+const pc88va_sgp_device::tpmod_func pc88va_sgp_device::tpmod_table[4] =
+{
+	&pc88va_sgp_device::tpmod_0_always,
+	&pc88va_sgp_device::tpmod_1_src,
+	&pc88va_sgp_device::tpmod_2_dst,
+	&pc88va_sgp_device::tpmod_3_never
+};
+
+bool pc88va_sgp_device::tpmod_0_always(u16 src, u16 dst) { return true; }
+bool pc88va_sgp_device::tpmod_1_src(u16 src, u16 dst) { return src != 0; }
+bool pc88va_sgp_device::tpmod_2_dst(u16 src, u16 dst) { return dst == 0; }
+bool pc88va_sgp_device::tpmod_3_never(u16 src, u16 dst) { return false; }
 
 
 /*
@@ -315,7 +372,7 @@ void pc88va_sgp_device::start_exec()
  * ---- --00 ---- ---- transfer source as-is
  * ---- --01 ---- ---- do not transfer if source is 0 (transparent pen)
  * ---- --10 ---- ---- transfer only if destination is 0
- * ---- --11 ---- ---- <undocumented>
+ * ---- --11 ---- ---- <undocumented, assume never>
  * ---- ---- ---- xxxx LOGICAL OP
  * ---- ---- ---- 0000 0
  * ---- ---- ---- 0001 Src AND Dst
@@ -323,8 +380,8 @@ void pc88va_sgp_device::start_exec()
  * ---- ---- ---- 0011 NOP
  * ---- ---- ---- 0100 Src AND /Dst
  * ---- ---- ---- 0101 Src
- * ---- ---- ---- 0110 Src XOR Dst
- * ---- ---- ---- 0111 Src OR Dst
+ * ---- ---- ---- 0110 Src XOR Dst (ballbrkr)
+ * ---- ---- ---- 0111 Src OR Dst (boomer)
  * ---- ---- ---- 1000 /(Src OR Dst)
  * ---- ---- ---- 1001 /(Src XOR Dst)
  * ---- ---- ---- 1010 /Src
@@ -337,40 +394,38 @@ void pc88va_sgp_device::start_exec()
  * PATBLT is identical to BITBLT except it repeats source copy
  * if it exceeds the clipping range.
  */
-void pc88va_sgp_device::cmd_blit(u16 draw_mode, bool is_patblt)
+void pc88va_sgp_device::execute_blit(u16 draw_mode, bool is_patblt)
 {
 	const u8 logical_op = draw_mode & 0xf;
 	const u8 tp_mod = (draw_mode >> 8) & 0x3;
+	const bool hd = !!BIT(draw_mode, 10);
+	// TODO: rtype gameplay enables VD
+	const bool vd = !!BIT(draw_mode, 11);
+	const bool sf = !!BIT(draw_mode, 12);
 
-	// TODO: boomer title screen
+	if (hd || vd || sf)
+	{
+		popmessage("SGP: Warning draw_mode = %04x (HD %d VD %d SF %d)", draw_mode, hd, vd, sf);
+	}
+
+	// boomer title screen just sets the same h/v size, irrelevant
 	if (is_patblt == true)
 	{
 		LOG("PATBLT\n");
 	//  return;
 	}
 
-	// ballbrkr: 6
-	if (logical_op != 5)
-	{
-		LOG("BITBLT logical_op == %d\n", logical_op);
-		return;
-	}
-
-	if (tp_mod > 1)
-	{
-		LOG("BITBLT tp_mod == %d\n", tp_mod);
-		return;
-	}
-
 	if (m_src.hsize != m_dst.hsize || m_src.vsize != m_dst.vsize)
 	{
-		LOG("BITBLT non-even sizes (%d x %d) x (%d x %d)\n", m_src.hsize, m_src.vsize, m_dst.hsize, m_dst.vsize);
+		LOG("SGP: Warning BITBLT non-even sizes (%d x %d) x (%d x %d)\n", m_src.hsize, m_src.vsize, m_dst.hsize, m_dst.vsize);
 		return;
 	}
 
-	if (m_src.pixel_mode == 0 || m_src.pixel_mode == 3 || m_src.pixel_mode != m_dst.pixel_mode)
+	if (m_src.pixel_mode != m_dst.pixel_mode && m_src.pixel_mode != 0 && m_dst.pixel_mode != 1)
 	{
-		LOG("BITBLT pixel mode %d x %d\n", m_src.pixel_mode, m_dst.pixel_mode);
+		static const char *const pixel_mode[] = { "1bpp", "4bpp", "8bpp", "rgb565" };
+
+		LOG("SGP: Warning BITBLT pixel mode src %s against dst %s\n", pixel_mode[m_src.pixel_mode], pixel_mode[m_dst.pixel_mode]);
 		return;
 	}
 
@@ -379,25 +434,115 @@ void pc88va_sgp_device::cmd_blit(u16 draw_mode, bool is_patblt)
 		u32 src_address = m_src.address + (yi * m_src.fb_pitch);
 		u32 dst_address = m_dst.address + (yi * m_dst.fb_pitch);
 
-		for (int xi = 0; xi < (m_src.hsize >> 2); xi ++)
+		// TODO: should fetch on demand, depending on m_dst.pixel_mode etc.
+		// m_src.start_dot is used by famista (pitcher throws)
+		for (int xi = 0; xi < m_src.hsize; xi ++)
 		{
-			// TODO: not very efficient, we need a cleaner per-pixel RMW phase
-			const u16 src_dot = m_data->read_word(src_address);
-			const u16 dst_dot = m_data->read_word(dst_address);
-			u16 result = 0;
-
-			for (int pixi = 0; pixi < 4; pixi ++)
+			switch(m_src.pixel_mode)
 			{
-				u8 cur_pixel = (src_dot & 0xf);
-				if (cur_pixel || tp_mod == 0)
-					result |= (src_dot & 0xf) << (pixi * 4);
-				else
-					result |= (dst_dot & 0xf) << (pixi * 4);
-			}
+				// 1bpp
+				case 0:
+				{
+					const u32 src_offset = src_address + ((xi + m_src.start_dot) >> 3);
+					const u8 src_nibble = ((xi + m_src.start_dot) ^ 7) & 7;
 
-			m_data->write_word(dst_address, result);
-			src_address += 2;
-			dst_address += 2;
+					// famista, before expanding (1bpp -> 1bpp)
+					if (m_dst.pixel_mode == 0)
+					{
+						const u32 dst_offset = dst_address + ((xi + m_dst.start_dot) >> 3);
+						const u8 dst_nibble = ((xi + m_dst.start_dot) ^ 7) & 7;
+
+						u8 src = (m_data->read_byte(src_offset) >> src_nibble) & 0x1;
+						u8 result = m_data->read_byte(dst_offset);
+						u8 dst = (result >> dst_nibble) & 0x1;
+
+						if ((this->*tpmod_table[tp_mod])(src, dst))
+						{
+							result &= ~(1 << dst_nibble);
+							result |= ((this->*rop_table[logical_op])(src, dst) & 1) << dst_nibble;
+							m_data->write_byte(dst_offset, result);
+						}
+					}
+					else if (m_dst.pixel_mode == 1) // famista and pceva2tb:SKYBD.BAT (1bpp -> 4bpp)
+					{
+						const u32 dst_offset = dst_address + ((xi + m_dst.start_dot) >> 1);
+						const u8 dst_nibble = (((xi + m_dst.start_dot) ^ 1) & 1) * 4;
+
+						u8 src = (m_data->read_byte(src_offset) >> src_nibble) & 0x1;
+						u8 result = m_data->read_byte(dst_offset);
+						u8 dst = (result >> dst_nibble) & 0xf;
+
+						if ((this->*tpmod_table[tp_mod])(src, dst))
+						{
+							result &= dst_nibble ? 0x0f : 0xf0;
+							result |= ((this->*rop_table[logical_op])(src, dst) ? m_color_code & 0xf : 0) << dst_nibble;
+							m_data->write_byte(dst_offset, result);
+						}
+					}
+
+					break;
+				}
+				// 4bpp (shinraba)
+				case 1:
+				{
+					const u32 src_offset = src_address + ((xi + m_src.start_dot) >> 1);
+					const u8 src_nibble = (((xi + m_src.start_dot) ^ 1) & 1) * 4;
+
+					const u32 dst_offset = dst_address + ((xi + m_dst.start_dot) >> 1);
+					const u8 dst_nibble = (((xi + m_dst.start_dot) ^ 1) & 1) * 4;
+
+					u8 src = (m_data->read_byte(src_offset) >> src_nibble) & 0xf;
+					u8 result = m_data->read_byte(dst_offset);
+					u8 dst = (result >> dst_nibble) & 0xf;
+
+					if ((this->*tpmod_table[tp_mod])(src, dst))
+					{
+						result &= dst_nibble ? 0x0f : 0xf0;
+						result |= (this->*rop_table[logical_op])(src, dst) << dst_nibble;
+						m_data->write_byte(dst_offset, result);
+					}
+
+					break;
+				}
+
+				// 8bpp (tetris)
+				case 2:
+				{
+					const u32 src_offset = src_address + (xi + m_src.start_dot);
+					const u32 dst_offset = dst_address + (xi + m_dst.start_dot);
+
+					u8 src = m_data->read_byte(src_offset) & 0xff;
+					u8 dst = m_data->read_byte(dst_offset) & 0xff;
+					u8 result = dst;
+
+					if ((this->*tpmod_table[tp_mod])(src, dst))
+					{
+						result = (this->*rop_table[logical_op])(src, dst);
+						m_data->write_byte(dst_offset, result);
+					}
+
+					break;
+				}
+
+				// RGB565 (ballbrkr title)
+				case 3:
+				{
+					const u32 src_offset = src_address + ((xi + m_src.start_dot) << 1);
+					const u32 dst_offset = dst_address + ((xi + m_dst.start_dot) << 1);
+
+					u16 src = m_data->read_word(src_offset) & 0xffff;
+					u16 dst = m_data->read_word(dst_offset) & 0xffff;
+					u16 result = dst;
+
+					if ((this->*tpmod_table[tp_mod])(src, dst))
+					{
+						result = (this->*rop_table[logical_op])(src, dst);
+						m_data->write_word(dst_offset, result);
+					}
+
+					break;
+				}
+			}
 		}
 	}
 }

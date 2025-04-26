@@ -5,10 +5,13 @@
 
 #pragma once
 
+#include "namco_cus4xtmap.h"
+
 #include "cpu/m6800/m6801.h"
 #include "machine/watchdog.h"
 #include "sound/n63701x.h"
 #include "sound/namco.h"
+
 #include "emupal.h"
 #include "tilemap.h"
 
@@ -24,21 +27,23 @@ public:
 		, m_cus30(*this, "namco")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
+		, m_tilegen(*this, "tilegen_%u", 0U)
 		, m_63701x(*this, "namco2")
-		, m_rthunder_videoram1(*this, "videoram1")
-		, m_rthunder_videoram2(*this, "videoram2")
-		, m_rthunder_spriteram(*this, "spriteram")
-		, m_user1_ptr(*this, "user1")
+		, m_spriteram(*this, "spriteram")
+		, m_bankeddata_ptr(*this, "bankeddata")
+		, m_mainbank(*this, "mainbank")
+		, m_subbank(*this, "subbank")
+		, m_io_dsw(*this, "DSW%c", 'A')
 		, m_leds(*this, "led%u", 0U)
 	{ }
 
-	void genpeitd(machine_config &config);
-	void wndrmomo(machine_config &config);
-	void roishtar(machine_config &config);
-	void rthunder(machine_config &config);
-	void hopmappy(machine_config &config);
+	void genpeitd(machine_config &config) ATTR_COLD;
+	void wndrmomo(machine_config &config) ATTR_COLD;
+	void roishtar(machine_config &config) ATTR_COLD;
+	void rthunder(machine_config &config) ATTR_COLD;
+	void hopmappy(machine_config &config) ATTR_COLD;
 
-	void init_namco86();
+	void init_namco86() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -52,32 +57,22 @@ private:
 	uint8_t dsw1_r();
 	void int_ack1_w(uint8_t data);
 	void int_ack2_w(uint8_t data);
-	void watchdog1_w(uint8_t data);
-	void watchdog2_w(uint8_t data);
+	template <unsigned Bit> void watchdog_w(uint8_t data);
 	void coin_w(uint8_t data);
 	void led_w(uint8_t data);
 	void cus115_w(offs_t offset, uint8_t data);
-	void videoram1_w(offs_t offset, uint8_t data);
-	void videoram2_w(offs_t offset, uint8_t data);
 	void tilebank_select_w(offs_t offset, uint8_t data);
-	void scroll0_w(offs_t offset, uint8_t data);
-	void scroll1_w(offs_t offset, uint8_t data);
-	void scroll2_w(offs_t offset, uint8_t data);
-	void scroll3_w(offs_t offset, uint8_t data);
 	void backcolor_w(uint8_t data);
 	void spriteram_w(offs_t offset, uint8_t data);
 
-	TILE_GET_INFO_MEMBER(get_tile_info0);
-	TILE_GET_INFO_MEMBER(get_tile_info1);
-	TILE_GET_INFO_MEMBER(get_tile_info2);
-	TILE_GET_INFO_MEMBER(get_tile_info3);
+	void tile_cb_0(u8 layer, u8 &gfxno, u32 &code);
+	void tile_cb_1(u8 layer, u8 &gfxno, u32 &code);
 
 	void namcos86_palette(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void scroll_w(offs_t offset, int data, int layer);
 
 	void common_mcu_map(address_map &map) ATTR_COLD;
 	void cpu1_map(address_map &map) ATTR_COLD;
@@ -99,25 +94,20 @@ private:
 	required_device<namco_cus30_device> m_cus30;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device_array<namco_cus4xtmap_device, 2> m_tilegen;
 	optional_device<namco_63701x_device> m_63701x;
-	required_shared_ptr<uint8_t> m_rthunder_videoram1;
-	required_shared_ptr<uint8_t> m_rthunder_videoram2;
-	required_shared_ptr<uint8_t> m_rthunder_spriteram;
-	optional_region_ptr<uint8_t> m_user1_ptr;
+	required_shared_ptr<uint8_t> m_spriteram;
+	optional_region_ptr<uint8_t> m_bankeddata_ptr;
+	required_memory_bank m_mainbank;
+	optional_memory_bank m_subbank;
+	optional_ioport_array<2> m_io_dsw;
 	output_finder<2> m_leds;
 
-	uint8_t *m_spriteram = nullptr;
-	int m_wdog = 0;
-	int m_tilebank = 0;
-	int m_xscroll[4];
-	int m_yscroll[4];
-	tilemap_t *m_bg_tilemap[4]{};
-	int m_backcolor = 0;
+	uint8_t m_wdog = 0;
+	uint32_t m_tilebank = 0;
+	uint16_t m_backcolor = 0;
 	const uint8_t *m_tile_address_prom = nullptr;
-	int m_copy_sprites = 0;
-
-	inline void get_tile_info(tile_data &tileinfo,int tile_index,int layer,uint8_t *vram);
-	void set_scroll(int layer);
+	bool m_copy_sprites = false;
 };
 
 #endif // MAME_NAMCO_NAMCOS86_H

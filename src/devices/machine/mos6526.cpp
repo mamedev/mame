@@ -926,7 +926,9 @@ uint8_t mos8520_device::read(offs_t offset)
 	switch (offset & 0x0f)
 	{
 	case TOD_MIN:
-		if (!m_tod_latched)
+		// tod is not latched when CRB_ALARM is set
+		// test case: amigaocs_flop:batman1
+		if (!m_tod_latched && !CRB_ALARM)
 		{
 			m_tod_latched = true;
 			m_tod_latch = m_tod;

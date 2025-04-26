@@ -1,97 +1,116 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
+copyright-holders: Roberto Fresca, Grull Osgo.
+
+  Baby Dado
+  control panel
+
 -->
 <mamelayout version="2">
-	<element name="L0" defstate="1">
-		<rect>
-			<color red="0.70" green="0.70" blue="0.0" />
-		</rect>
-		<text string="CRAPS" state="1">
+
+	<!-- define elements -->
+
+	<element name="L0" defstate="0">
+		<rect state="1"><color red="1.0" green="0.5" blue="0.0" /></rect>
+		<rect state="0"><color red="0.17" green="0.076" blue="0.0" /></rect>
+		<text string="CRAPS">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.25" width="1" height="0.5" />
+			<bounds x="0.1" y="0.30" width="0.8" height="0.4" />
 		</text>
 	</element>
 
-	<element name="L1" defstate="1">
-		<rect>
-			<color red="0.70" green="0.70" blue="0.0" />
-		</rect>
-		<text string="6 OR LESS" state="1">
+	<element name="L1" defstate="0">
+		<rect state="1"><color red="1.0" green="0.5" blue="0.0" /></rect>
+		<rect state="0"><color red="0.17" green="0.076" blue="0.0" /></rect>
+		<text string="6 OR">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.25" width="1" height="0.5" />
+			<bounds x="0.1" y="0.1" width="0.8" height="0.4" />
+		</text>
+		<text string="LESS">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.1" y="0.5" width="0.8" height="0.4" />
 		</text>
 	</element>
 
-	<element name="L2" defstate="1">
-		<rect>
-			<color red="0.70" green="0.0" blue=".0" />
-		</rect>
-		<text string="SEVEN" state="1">
+	<element name="L2" defstate="0">
+		<rect state="1"><color red="1.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><color red="0.25" green="0.0" blue="0.0" /></rect>
+		<text string="SEVEN">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.25" width="1" height="0.5" />
+			<bounds x="0.1" y="0.30" width="0.8" height="0.4" />
 		</text>
 	</element>
 
-	<element name="L3" defstate="1">
-		<rect>
-			<color red="0.70" green="0.0" blue="0.0" />
-		</rect>
-		<text string="8 OR MORE" state="1">
+	<element name="L3" defstate="0">
+		<rect state="1"><color red="1.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><color red="0.25" green="0.0" blue="0.0" /></rect>
+		<text string="8 OR">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.25" width="1" height="0.5" />
+			<bounds x="0.1" y="0.1" width="0.8" height="0.4" />
+		</text>
+		<text string="MORE">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.1" y="0.5" width="0.8" height="0.4" />
 		</text>
 	</element>
 
-	<element name="L4" defstate="1">
-		<rect>
-			<color red="0.70" green="0.0" blue="0.0" />
-		</rect>
-		<text string="FIELD" state="1">
+	<element name="L4" defstate="0">
+		<rect state="1"><color red="1.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><color red="0.25" green="0.0" blue="0.0" /></rect>
+		<text string="FIELD">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.25" width="1" height="0.5" />
+			<bounds x="0.1" y="0.30" width="0.8" height="0.4" />
 		</text>
 	</element>
 
-	<element name="L5" defstate="1">
-		<rect>
-			<color red="0.70" green="0.0" blue="0.0" />
-		</rect>
-		<text string="ELEVEN" state="1">
+	<element name="L5" defstate="0">
+		<rect state="1"><color red="1.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><color red="0.25" green="0.0" blue="0.0" /></rect>
+		<text string="ELEVEN">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.25" width="1" height="0.5" />
+			<bounds x="0.1" y="0.30" width="0.8" height="0.4" />
 		</text>
 	</element>
 
-	<element name="L6" defstate="1">
-		<rect>
-			<color red="0.70" green="0.0" blue="0.0" />
-		</rect>
-		<text string="TWELVE" state="1">
+	<element name="L6" defstate="0">
+		<rect state="1"><color red="1.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><color red="0.25" green="0.0" blue="0.0" /></rect>
+		<text string="TWELVE">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.25" width="1" height="0.5" />
+			<bounds x="0.1" y="0.30" width="0.8" height="0.4" />
 		</text>
 	</element>
 
-	<element name="L7" defstate="1">
-		<rect>
-			<color red="0.70" green="0.70" blue="0.0" />
-		</rect>
-		<text string="TAKE" state="1">
+	<element name="L7" defstate="0">
+		<rect state="1"><color red="1.0" green="0.5" blue="0.0" /></rect>
+		<rect state="0"><color red="0.17" green="0.076" blue="0.0" /></rect>
+		<text string="TAKE">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.25" width="1" height="0.5" />
+			<bounds x="0.1" y="0.30" width="0.8" height="0.4" />
 		</text>
 	</element>
 
-	<element name="L8" defstate="1">
-		<disk>
-			<color red="0.70" green="0.0" blue="0.0" />
-		</disk>
-		<text string="BET" state="1">
+	<element name="L8" defstate="0">
+		<rect state="1"><color red="1.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><color red="0.25" green="0.0" blue="0.0" /></rect>
+		<text string="BET">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.25" width="1" height="0.5" />
+			<bounds x="0.1" y="0.30" width="0.8" height="0.4" />
 		</text>
 	</element>
+
+
+	<element name="buttonedge_y" defstate="0">
+		<rect state="1"><color red="0.7" green="0.35" blue="0.0" /></rect>
+		<rect state="0"><color red="0.12" green="0.04" blue="0.0" /></rect>
+	</element>
+
+	<element name="buttonedge_r" defstate="0">
+		<rect state="1"><color red="0.7" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><color red="0.15" green="0.0" blue="0.0" /></rect>
+	</element>
+
 
 	<element name="L9" defstate="0">
 		<rect state="1">
@@ -111,6 +130,7 @@ license:CC0-1.0
 		</rect>
 	</element>
 
+
 	<element name="LX" defstate="1">
 		<rect>
 			<color red="0.00" green="0.0" blue="0.0" />
@@ -123,58 +143,106 @@ license:CC0-1.0
 		</led7seg>
 	</element>
 
+
+	<!-- define cpanel layout -->
+
 	<view name="Button Lamps">
 		<screen index="0">
 			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
 
-		<element name="lamp3" ref="L8">
+		<element ref="LX">
 			<bounds x="0.0" y="3.00" width="0.01" height="0.50" />
 		</element>
-		<element name="lamp3" ref="L8">
-			<bounds x="0.022" y="3.16" width="0.315" height="0.315" />
+
+
+	<!-- define button-lamps -->
+
+		<element name="lamp3" ref="buttonedge_r" inputtag="IN1" inputmask="0x08">
+			<bounds x="0.07" y="3.11" width="0.35" height="0.30" />
 		</element>
-		<element name="lamp2" ref="L0">
-			<bounds x="0.382" y="3.16" width="0.449" height="0.315" />
-		</element>
-		<element name="lamp0" ref="L1">
-			<bounds x="0.876" y="3.16" width="0.449" height="0.315" />
-		</element>
-		<element name="lamp1" ref="L2">
-			<bounds x="1.371" y="3.16" width="0.315" height="0.315" />
-		</element>
-		<element name="lamp1" ref="L3">
-			<bounds x="1.730" y="3.16" width="0.315" height="0.315" />
-		</element>
-		<element name="lamp1" ref="L4">
-			<bounds x="2.090" y="3.16" width="0.315" height="0.315" />
-		</element>
-		<element name="lamp1" ref="L5">
-			<bounds x="2.449" y="3.16" width="0.315" height="0.315" />
-		</element>
-		<element name="lamp1" ref="L6">
-			<bounds x="2.809" y="3.16" width="0.315" height="0.315" />
-		</element>
-		<element name="lamp3" ref="L7">
-			<bounds x="3.169" y="3.16" width="0.449" height="0.315" />
+		<element name="lamp3" ref="L8" inputtag="IN1" inputmask="0x08">
+			<bounds x="0.09" y="3.13" width="0.31" height="0.26" />
 		</element>
 
+		<element name="lamp2" ref="buttonedge_y" inputtag="IN0" inputmask="0x10">
+			<bounds x="0.45" y="3.11" width="0.35" height="0.30" />
+		</element>
+		<element name="lamp2" ref="L0" inputtag="IN0" inputmask="0x10">
+			<bounds x="0.47" y="3.13" width="0.31" height="0.26" />
+		</element>
+
+		<element name="lamp0" ref="buttonedge_y" inputtag="IN0" inputmask="0x20">
+			<bounds x="0.83" y="3.11" width="0.35" height="0.30" />
+		</element>
+		<element name="lamp0" ref="L1" inputtag="IN0" inputmask="0x20">
+			<bounds x="0.85" y="3.13" width="0.31" height="0.26" />
+		</element>
+
+		<element name="lamp1" ref="buttonedge_r" inputtag="IN0" inputmask="0x40">
+			<bounds x="1.25" y="3.11" width="0.35" height="0.30" />
+		</element>
+		<element name="lamp1" ref="L2" inputtag="IN0" inputmask="0x40">
+			<bounds x="1.27" y="3.13" width="0.31" height="0.26" />
+		</element>
+
+		<element name="lamp1" ref="buttonedge_r" inputtag="IN0" inputmask="0x80">
+			<bounds x="1.63" y="3.11" width="0.35" height="0.30" />
+		</element>
+		<element name="lamp1" ref="L3" inputtag="IN0" inputmask="0x80">
+			<bounds x="1.65" y="3.13" width="0.31" height="0.26" />
+		</element>
+
+		<element name="lamp1" ref="buttonedge_r" inputtag="IN1" inputmask="0x01">
+			<bounds x="2.01" y="3.11" width="0.35" height="0.30" />
+		</element>
+		<element name="lamp1" ref="L4" inputtag="IN1" inputmask="0x01">
+			<bounds x="2.03" y="3.13" width="0.31" height="0.26" />
+		</element>
+
+		<element name="lamp1" ref="buttonedge_r" inputtag="IN1" inputmask="0x02">
+			<bounds x="2.39" y="3.11" width="0.35" height="0.30" />
+		</element>
+		<element name="lamp1" ref="L5" inputtag="IN1" inputmask="0x02">
+			<bounds x="2.41" y="3.13" width="0.31" height="0.26" />
+		</element>
+
+		<element name="lamp1" ref="buttonedge_r" inputtag="IN1" inputmask="0x04">
+			<bounds x="2.77" y="3.11" width="0.35" height="0.30" />
+		</element>
+		<element name="lamp1" ref="L6" inputtag="IN1" inputmask="0x04">
+			<bounds x="2.79" y="3.13" width="0.31" height="0.26" />
+		</element>
+
+		<element name="lamp3" ref="buttonedge_y" inputtag="IN0" inputmask="0x08">
+			<bounds x="3.19" y="3.11" width="0.35" height="0.30" />
+		</element>
+		<element name="lamp3" ref="L7" inputtag="IN0" inputmask="0x08">
+			<bounds x="3.21" y="3.13" width="0.31" height="0.26" />
+		</element>
+
+
+	<!-- define top lamps -->
+
 		<element name="TOP_1" ref="L9">
-			<bounds x="1.75" y="3.01" width="0.5" height="0.04" />
+			<bounds x="3.9" y="3.01" width="0.05" height="0.02" />
 		</element>
 		<element name="TOP_2" ref="L10">
-			<bounds x="1.75" y="3.06" width="0.5" height="0.04" />
+			<bounds x="3.9" y="3.04" width="0.05" height="0.02" />
 		</element>
 		<element name="TOP_3" ref="L11">
-			<bounds x="1.75" y="3.11" width="0.5" height="0.04" />
+			<bounds x="3.9" y="3.07" width="0.05" height="0.02" />
 		</element>
+
+
+	<!-- define mech counters -->
 
 		<repeat count="4">
 			<param name="s" start="0" increment="7" />
-			<param name="y" start="3.16" increment="0.079" />
+			<param name="y" start="3.12" increment="0.079" />
 			<repeat count="7">
 				<param name="n" start="~s~" increment="1" />
-				<param name="x" start="3.933" increment="-0.045" />
+				<param name="x" start="3.9" increment="-0.045" />
 				<element name="digit~n~" ref="Dig1">
 					<bounds x="~x~" y="~y~" width="0.045" height="0.065625" />
 				</element>

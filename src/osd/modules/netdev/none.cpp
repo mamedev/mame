@@ -8,6 +8,9 @@
 
 #include "modules/osdmodule.h"
 
+#include <memory>
+#include <vector>
+
 
 namespace osd {
 
@@ -21,7 +24,21 @@ public:
 	}
 
 	virtual ~netdev_none() { }
-	virtual int init(osd_interface &osd, const osd_options &options) override { return 0; }
+
+	virtual int init(osd_interface &osd, const osd_options &options) override
+	{
+		return 0;
+	}
+
+	virtual std::unique_ptr<network_device> open_device(int id, network_handler &handler) override
+	{
+		return std::unique_ptr<network_device>();
+	}
+
+	virtual std::vector<network_device_info> list_devices() override
+	{
+		return std::vector<network_device_info>();
+	}
 };
 
 } // anonymous namespace

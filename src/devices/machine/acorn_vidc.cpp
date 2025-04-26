@@ -336,7 +336,7 @@ void acorn_vidc10_device::control_w(u32 data)
 	//m_composite_sync = BIT(data, 7);
 	//m_test_mode = (data & 0xc100) != 0xc100;
 
-	//todo: vga/svga modes sets 0x1000?
+	// TODO: vga/svga modes sets 0x1000?
 	m_crtc_regs[CRTC_HDSR] = convert_crtc_hdisplay(0);
 	m_crtc_regs[CRTC_HDER] = convert_crtc_hdisplay(1);
 	screen_vblank_line_update();
@@ -562,6 +562,8 @@ void arm_vidc20_device::regs_map(address_map &map)
 
 arm_vidc20_device::arm_vidc20_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: acorn_vidc10_device(mconfig, ARM_VIDC20, tag, owner, clock, 2)
+	, m_pixel_source(0)
+	, m_pixel_rate(0)
 	, m_dac32(*this, "serial_dac_%u", 0)
 {
 	m_space_config = address_space_config("regs_space", ENDIANNESS_LITTLE, 32, 8, -2, address_map_constructor(FUNC(arm_vidc20_device::regs_map), this));

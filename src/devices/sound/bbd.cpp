@@ -52,7 +52,8 @@ void bbd_device_base<Entries, Outputs>::device_start()
 template<int Entries, int Outputs>
 void bbd_device_base<Entries, Outputs>::device_clock_changed()
 {
-	m_stream->set_sample_rate(sample_rate());
+	if (m_cv_handler.isnull())
+		m_stream->set_sample_rate(sample_rate());
 }
 
 
@@ -161,5 +162,18 @@ DEFINE_DEVICE_TYPE(MN3204P, mn3204p_device, "mn3204p", "MN3204P BBD")
 
 mn3204p_device::mn3204p_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	bbd_device_base(mconfig, tag, owner, clock, MN3204P)
+{
+}
+
+
+//**************************************************************************
+//  MN3207P
+//**************************************************************************
+
+// device type definition
+DEFINE_DEVICE_TYPE(MN3207, mn3207_device, "mn3207", "MN3207 BBD")
+
+mn3207_device::mn3207_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	bbd_device_base(mconfig, tag, owner, clock, MN3207)
 {
 }

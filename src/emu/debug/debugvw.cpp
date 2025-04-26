@@ -14,6 +14,7 @@
 #include "debugcpu.h"
 #include "dvbpoints.h"
 #include "dvdisasm.h"
+#include "dvepoints.h"
 #include "dvmemory.h"
 #include "dvrpoints.h"
 #include "dvstate.h"
@@ -368,6 +369,9 @@ debug_view *debug_view_manager::alloc_view(debug_view_type type, debug_view_osd_
 
 		case DVT_REGISTER_POINTS:
 			return append(new debug_view_registerpoints(machine(), osdupdate, osdprivate));
+
+		case DVT_EXCEPTION_POINTS:
+			return append(new debug_view_exceptionpoints(machine(), osdupdate, osdprivate));
 
 		default:
 			fatalerror("Attempt to create invalid debug view type %d\n", type);

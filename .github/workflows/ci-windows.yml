@@ -23,34 +23,49 @@ permissions:
 
 jobs:
   build-windows:
-    runs-on: windows-latest
-    defaults:
-      run:
-        shell: msys2 {0}
     strategy:
       matrix:
-        compiler: [gcc, clang]
+        compiler: [gcc-x64, clang-x64, clang-arm64]
         include:
-          - compiler: gcc
+          - compiler: gcc-x64
+            os: windows-latest
+            msys: MINGW64
+            slug: mingw-w64-x86_64
             cc: gcc
             cxx: g++
             subtarget: mame
             executable: mame
-          - compiler: clang
+          - compiler: clang-x64
+            os: windows-latest
+            msys: MINGW64
+            slug: mingw-w64-x86_64
             cc: clang
             cxx: clang++
             subtarget: tiny
             executable: mametiny
+          - compiler: clang-arm64
+            os: windows-11-arm
+            msys: CLANGARM64
+            slug: mingw-w64-clang-aarch64
+            extrapkg: mingw-w64-clang-aarch64-gcc-compat
+            cc: clang
+            cxx: clang++
+            subtarget: mame
+            executable: mame
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: msys2 {0}
     steps:
     - uses: msys2/setup-msys2@v2
       with:
-        install: git make mingw-w64-x86_64-${{ matrix.compiler }} mingw-w64-x86_64-python mingw-w64-x86_64-lld mingw-w64-x86_64-llvm mingw-w64-x86_64-libc++
+        msystem: ${{ matrix.msys }}
+        install: git make ${{ matrix.slug }}-${{ matrix.cc }} ${{ matrix.slug }}-python ${{ matrix.slug }}-lld ${{ matrix.slug }}-llvm ${{ matrix.slug }}-libc++ ${{ matrix.extrapkg }}
     - uses: actions/checkout@main
       with:
         fetch-depth: 0
     - name: Build
       env:
-        MINGW64: "/mingw64"
         OVERRIDE_AR: "llvm-ar"
         OVERRIDE_CC: ${{ matrix.cc }}
         OVERRIDE_CXX: ${{ matrix.cxx }}

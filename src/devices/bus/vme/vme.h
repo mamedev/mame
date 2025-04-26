@@ -88,7 +88,7 @@ public:
 
 	// runtime
 	void berr_w(int state) { m_berr(state); }
-	int iackin_r() { return m_iack; }
+	int iackin_r() { return !m_iack; }
 	void iackout_w(int state) { m_iack = !state; }
 	template <unsigned I> void irq_w(int state);
 
@@ -107,7 +107,7 @@ private:
 
 	u32 read_iack(address_space &space, offs_t offset, u32 mem_mask);
 	u32 read_berr(address_space &space, offs_t offset, u32 mem_mask);
-	void write_berr(offs_t offset, u32 data, u32 mem_mask);
+	void write_berr(address_space &space, offs_t offset, u32 data, u32 mem_mask);
 
 	address_space_config const m_asc[64];
 
@@ -135,24 +135,12 @@ public:
 		set_fixed(fixed);
 	}
 
-	// configuration
-	template <unsigned I> auto irq() { return m_bus.lookup()->irq<I>(); }
-	auto berr() { return m_bus.lookup()->berr(); }
-
-	// runtime
-	void berr_w(int state) { m_bus->berr_w(state); }
-	int iackin_r() { return m_bus->iackin_r(); }
-	void iackout_w(int state) { m_bus->iackout_w(state); }
-	template <unsigned I> void irq_w(int state) { m_bus->irq_w<I>(state); }
-
-	address_space &space(vme::address_modifier am) const { return m_bus->space(am); }
-
 protected:
 	// device_t implementation
+	virtual void device_config_complete() override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 
 private:
-	required_device<vme_bus_device> m_bus;
 };
 
 class device_vme_card_interface : public device_interface
@@ -161,7 +149,7 @@ public:
 	template <vme::address_modifier AM, offs_t base = 0> u32 vme_read32(offs_t offset, u32 mem_mask)
 	{
 		m_master = true;
-		u32 const data = m_slot->space(AM).read_dword(base + (offset << 2), mem_mask);
+		u32 const data = m_bus->space(AM).read_dword(base + (offset << 2), mem_mask);
 		m_master = false;
 
 		return data;
@@ -169,7 +157,7 @@ public:
 	template <vme::address_modifier AM, offs_t base = 0> u16 vme_read16(offs_t offset, u16 mem_mask)
 	{
 		m_master = true;
-		u16 const data = m_slot->space(AM).read_word(base + (offset << 1), mem_mask);
+		u16 const data = m_bus->space(AM).read_word(base + (offset << 1), mem_mask);
 		m_master = false;
 
 		return data;
@@ -177,41 +165,44 @@ public:
 	template <vme::address_modifier AM, offs_t base = 0> void vme_write32(offs_t offset, u32 data, u32 mem_mask)
 	{
 		m_master = true;
-		m_slot->space(AM).write_dword(base + (offset << 2), data, mem_mask);
+		m_bus->space(AM).write_dword(base + (offset << 2), data, mem_mask);
 		m_master = false;
 	}
 	template <vme::address_modifier AM, offs_t base = 0> void vme_write16(offs_t offset, u16 data, u16 mem_mask)
 	{
 		m_master = true;
-		m_slot->space(AM).write_word(base + (offset << 1), data, mem_mask);
+		m_bus->space(AM).write_word(base + (offset << 1), data, mem_mask);
 		m_master = false;
 	}
 	u32 vme_iack_r(offs_t offset)
 	{
-		return m_slot->space(vme::IACK).read_dword(offset);
+		return m_bus->space(vme::IACK).read_dword(offset);
 	}
+
+	void set_bus(vme_bus_device &bus);
 
 protected:
 	device_vme_card_interface(machine_config const &mconfig, device_t &device);
 
-	// configuration
-	template <unsigned I> auto vme_irq() { return m_slot->irq<I>(); }
-	auto vme_berr() { return m_berr.bind(); }
-	auto vme_iack() { return m_iack.bind(); }
-
 	// device_interface implementation
-	virtual void interface_config_complete() override;
 	virtual void interface_post_start() override;
 
-	// runtime
-	template <unsigned I> void vme_irq_w(int state);
-	void vme_berr_w(int state) { m_slot->berr_w(state); }
+	// configuration
+	auto vme_berr() { return m_berr.bind(); }                               // receive a bus error
+	template <unsigned I> auto vme_irq() { return m_irq[I - 1].bind(); }    // receive a bus interrupt
+	auto vme_iack() { return m_iack.bind(); }                               // provide an interrupt acknowledge vector
 
-	address_space &vme_space(vme::address_modifier am) const { return m_slot->space(am); }
+	// runtime
+	void vme_berr_w(int state) { m_bus->berr_w(state); }                    // generate a bus error
+	template <unsigned I> void vme_irq_w(int state);                        // generate a bus interrupt
+
+	address_space &vme_space(vme::address_modifier am) const { return m_bus->space(am); }
 
 private:
-	vme_slot_device *m_slot;
+	vme_bus_device *m_bus;
+
 	devcb_write_line m_berr;
+	devcb_write_line::array<7> m_irq;
 	devcb_read32 m_iack;
 
 	u8 m_irq_active;

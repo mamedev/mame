@@ -87,7 +87,6 @@ void isbc8024_device::device_reset()
 		}
 
 		// TODO: what's exposed to the Multibus?
-		m_bus->int_callback<2>().set(m_pic, FUNC(pic8259_device::ir1_w));
 
 		m_installed = true;
 	}
@@ -115,6 +114,7 @@ void isbc8024_device::device_add_mconfig(machine_config &config)
 
 	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set_inputline(m_cpu, I8085_INTR_LINE);
+	int_callback<2>().set(m_pic, FUNC(pic8259_device::ir1_w));
 
 	RS232_PORT(config, m_j3, default_rs232_devices, nullptr);
 

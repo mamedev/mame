@@ -34,7 +34,7 @@
     KE4004-0 - Zenigata Ponta         - 銭形ポン太
     KF4004-0 - Rodeo King             - ロデオキング
     KG4004-0 - Dojokko Tsukami        - どじょっ子つかみ
-*** KH4004-0 - Katori Attack          - 蚊とりアタック
+    KH4004-0 - Katori Attack          - 蚊とりアタック
 *** KI4004-0 - ??? (maybe unreleased) - ???
     KJ4004-0 - Shippe Champion        - しっぺチャンピオン
 *** KK4004-0 - ??? (maybe unreleased) - ???
@@ -198,9 +198,11 @@
 #include "machine/ram.h"
 #include "machine/timer.h"
 #include "sound/okim9810.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
 
 namespace {
 
@@ -516,12 +518,24 @@ ROM_START( itazurac ) // HA9022-0
 	ROM_LOAD( "u3", 0x000000, 0x200000, CRC(76ce7b79) SHA1(749bc519cf66c0aec615881824e417719af78d2b) )
 ROM_END
 
+ROM_START( katori ) // HA9020-0
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD16_WORD_SWAP( "29f400.u1", 0x000000, 0x080000, CRC(34b03727) SHA1(16d18ff7d322f1c1b297de89de3737d407c5a27e) ) // 1xxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION(0x1000000, "oki", ROMREGION_ERASEFF )
+	ROM_LOAD( "29f016.u2", 0x000000, 0x200000, CRC(ee7f2bb6) SHA1(1638d5196499fd3669a97fc9e64adacf59bc6108) ) // 1xxxxxxxxxxxxxxxxxxxx = 0x00
+
+	ROM_REGION(0x200000, "gfx", 0 )
+	ROM_LOAD( "mx29lv160.u3", 0x000000, 0x200000, CRC(f57c33f6) SHA1(3d5dd858e94156c4c7b1f6b8934b0f7667fd66ad) ) // 1xxxxxxxxxxxxxxxxxxxx = 0x00
+ROM_END
+
 }   // anonymous namespace
 
 GAME( 2005, boobood,   0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Boo Boo Donpatchi (Japan, ver 1.01)",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2005, dojokkot,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Dojokko Tsukami (Japan, ver 1.02)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2005, fishbatl,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Fisherman Battle (Japan, ver 1.03)",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2005, hhunter,   0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Haunted Hunter (Japan, ver 1.00)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2005, katori,    0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Katori Attack (Japan, ver 1.03)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2005, rodeokng,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Rodeo King (Japan, ver 1.00)",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2005, wanpunch,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Wanikko Punch (Japan, ver 1.20)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2005, zenponta,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Zenigata Ponta (Japan, ver 1.02)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

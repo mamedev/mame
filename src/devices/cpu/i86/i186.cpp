@@ -846,7 +846,7 @@ void i80186_cpu_device::write_port_word(uint16_t port, uint16_t data)
 
 uint8_t i80186_cpu_device::read_byte(uint32_t addr)
 {
-	if ((m_reloc & 0x1000) && (addr >> 8) == (m_reloc & 0xfff))
+	if ((m_reloc & 0x1000) && ((addr >> 8) & 0xfff) == (m_reloc & 0xfff))
 	{
 		uint16_t ret = internal_port_r((addr >> 1) & 0x7f, (addr & 1) ? 0xff00 : 0x00ff);
 		return (addr & 1) ? (ret >> 8) : (ret & 0xff);
@@ -856,7 +856,7 @@ uint8_t i80186_cpu_device::read_byte(uint32_t addr)
 
 uint16_t i80186_cpu_device::read_word(uint32_t addr)
 {
-	if ((m_reloc & 0x1000) && (addr >> 8) == (m_reloc & 0xfff))
+	if ((m_reloc & 0x1000) && ((addr >> 8) & 0xfff) == (m_reloc & 0xfff))
 	{
 		// Unaligned reads from the internal bus are swapped rather than split
 		if (addr & 1)
@@ -869,7 +869,7 @@ uint16_t i80186_cpu_device::read_word(uint32_t addr)
 
 void i80186_cpu_device::write_byte(uint32_t addr, uint8_t data)
 {
-	if ((m_reloc & 0x1000) && (addr >> 8) == (m_reloc & 0xfff))
+	if ((m_reloc & 0x1000) && ((addr >> 8) & 0xfff) == (m_reloc & 0xfff))
 		internal_port_w((addr >> 1) & 0x7f, (addr & 1) ? (data << 8) : data);
 	else
 		m_program->write_byte(addr, data);
@@ -877,7 +877,7 @@ void i80186_cpu_device::write_byte(uint32_t addr, uint8_t data)
 
 void i80186_cpu_device::write_word(uint32_t addr, uint16_t data)
 {
-	if ((m_reloc & 0x1000) && (addr >> 8) == (m_reloc & 0xfff))
+	if ((m_reloc & 0x1000) && ((addr >> 8) & 0xfff) == (m_reloc & 0xfff))
 	{
 		// Unaligned writes from the internal bus are swapped rather than split
 		if (addr & 1)

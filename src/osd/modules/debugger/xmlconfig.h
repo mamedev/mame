@@ -33,6 +33,7 @@ extern char const *const NODE_WINDOW_HISTORY;
 extern char const *const NODE_HISTORY_ITEM;
 
 extern char const *const ATTR_DEBUGGER_SAVE_WINDOWS;
+extern char const *const ATTR_DEBUGGER_GROUP_WINDOWS;
 
 extern char const *const ATTR_WINDOW_TYPE;
 extern char const *const ATTR_WINDOW_POSITION_X;

@@ -221,7 +221,6 @@ TILE_GET_INFO_MEMBER(f1gp2_state::get_roz_tile_info)
 
 ***************************************************************************/
 
-
 void f1gp_state::video_start()
 {
 	m_roz_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(f1gp_state::get_roz_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
@@ -360,6 +359,7 @@ uint32_t f1gp2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	}
 	return 0;
 }
+
 
 /***************************************************************************
 
@@ -867,8 +867,8 @@ void f1gp_state::f1gp(machine_config &config)
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(8'000'000)));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
+	ymsnd.add_route(0, "lspeaker", 0.75);
+	ymsnd.add_route(0, "rspeaker", 0.75);
 	ymsnd.add_route(1, "lspeaker", 1.0);
 	ymsnd.add_route(2, "rspeaker", 1.0);
 }

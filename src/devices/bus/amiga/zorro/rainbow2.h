@@ -34,10 +34,10 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
 
 	// device_zorro2_card_interface overrides
 	virtual void cfgin_w(int state) override;
+	virtual void busrst_w(int state) override;
 
 	// amiga_autoconfig overrides
 	virtual void autoconfig_base_address(offs_t address) override;
@@ -62,7 +62,7 @@ public:
 } // namespace bus::amiga::zorro
 
 // device type declaration
-DECLARE_DEVICE_TYPE_NS(ZORRO_RAINBOW2, bus::amiga::zorro, rainbow2_device)
-DECLARE_DEVICE_TYPE_NS(ZORRO_FRAMEMASTER, bus::amiga::zorro, framemaster_device)
+DECLARE_DEVICE_TYPE_NS(AMIGA_RAINBOW2, bus::amiga::zorro, rainbow2_device)
+DECLARE_DEVICE_TYPE_NS(AMIGA_FRAMEMASTER, bus::amiga::zorro, framemaster_device)
 
 #endif // MAME_BUS_AMIGA_ZORRO_RAINBOW2_H

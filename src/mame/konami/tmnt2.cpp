@@ -1012,19 +1012,27 @@ uint16_t prmrsocr_state::prmrsocr_rom_r(offs_t offset)
 
 uint32_t tmnt2_state::screen_update_punkshot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	// update color info and refresh tilemaps
+	static const int K053251_CI[3] = { k053251_device::CI2, k053251_device::CI4, k053251_device::CI3 };
 	m_sprite_colorbase = m_k053251->get_palette_index(k053251_device::CI1);
-	m_layer_colorbase[0] = m_k053251->get_palette_index(k053251_device::CI2);
-	m_layer_colorbase[1] = m_k053251->get_palette_index(k053251_device::CI4);
-	m_layer_colorbase[2] = m_k053251->get_palette_index(k053251_device::CI3);
+
+	for (int i = 0; i < 3; i++)
+	{
+		int prev_colorbase = m_layer_colorbase[i];
+		m_layer_colorbase[i] = m_k053251->get_palette_index(K053251_CI[i]);
+
+		if (m_layer_colorbase[i] != prev_colorbase)
+			m_k052109->mark_tilemap_dirty(i);
+	}
 
 	m_k052109->tilemap_update();
 
-	m_sorted_layer[0] = 0;
-	m_layerpri[0] = m_k053251->get_priority(k053251_device::CI2);
-	m_sorted_layer[1] = 1;
-	m_layerpri[1] = m_k053251->get_priority(k053251_device::CI4);
-	m_sorted_layer[2] = 2;
-	m_layerpri[2] = m_k053251->get_priority(k053251_device::CI3);
+	// sort layers and draw
+	for (int i = 0; i < 3; i++)
+	{
+		m_sorted_layer[i] = i;
+		m_layerpri[i] = m_k053251->get_priority(K053251_CI[i]);
+	}
 
 	konami_sortlayers3(m_sorted_layer, m_layerpri);
 
@@ -1040,22 +1048,28 @@ uint32_t tmnt2_state::screen_update_punkshot(screen_device &screen, bitmap_ind16
 
 uint32_t tmnt2_state::screen_update_lgtnfght(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int bg_colorbase;
-
-	bg_colorbase = m_k053251->get_palette_index(k053251_device::CI0);
+	// update color info and refresh tilemaps
+	static const int K053251_CI[3] = { k053251_device::CI2, k053251_device::CI4, k053251_device::CI3 };
+	int bg_colorbase = m_k053251->get_palette_index(k053251_device::CI0);
 	m_sprite_colorbase = m_k053251->get_palette_index(k053251_device::CI1);
-	m_layer_colorbase[0] = m_k053251->get_palette_index(k053251_device::CI2);
-	m_layer_colorbase[1] = m_k053251->get_palette_index(k053251_device::CI4);
-	m_layer_colorbase[2] = m_k053251->get_palette_index(k053251_device::CI3);
+
+	for (int i = 0; i < 3; i++)
+	{
+		int prev_colorbase = m_layer_colorbase[i];
+		m_layer_colorbase[i] = m_k053251->get_palette_index(K053251_CI[i]);
+
+		if (m_layer_colorbase[i] != prev_colorbase)
+			m_k052109->mark_tilemap_dirty(i);
+	}
 
 	m_k052109->tilemap_update();
 
-	m_sorted_layer[0] = 0;
-	m_layerpri[0] = m_k053251->get_priority(k053251_device::CI2);
-	m_sorted_layer[1] = 1;
-	m_layerpri[1] = m_k053251->get_priority(k053251_device::CI4);
-	m_sorted_layer[2] = 2;
-	m_layerpri[2] = m_k053251->get_priority(k053251_device::CI3);
+	// sort layers and draw
+	for (int i = 0; i < 3; i++)
+	{
+		m_sorted_layer[i] = i;
+		m_layerpri[i] = m_k053251->get_priority(K053251_CI[i]);
+	}
 
 	konami_sortlayers3(m_sorted_layer, m_layerpri);
 
@@ -1073,9 +1087,9 @@ uint32_t tmnt2_state::screen_update_lgtnfght(screen_device &screen, bitmap_ind16
 uint16_t glfgreat_state::glfgreat_ball_r()
 {
 #ifdef MAME_DEBUG
-popmessage("%04x", m_glfgreat_pixel);
+	popmessage("%04x", m_glfgreat_pixel);
 #endif
-	/* if out of the ROZ layer palette range, it's in the water - return 0 */
+	// if out of the ROZ layer palette range, it's in the water - return 0
 	if (m_glfgreat_pixel < 0x400 || m_glfgreat_pixel >= 0x500)
 		return 0;
 	else
@@ -1084,27 +1098,33 @@ popmessage("%04x", m_glfgreat_pixel);
 
 uint32_t tmnt2_state::screen_update_glfgreat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int bg_colorbase;
-
-	bg_colorbase = m_k053251->get_palette_index(k053251_device::CI0);
+	// update color info and refresh tilemaps
+	static const int K053251_CI[3] = { k053251_device::CI2, k053251_device::CI3, k053251_device::CI4 };
+	int bg_colorbase = m_k053251->get_palette_index(k053251_device::CI0);
 	m_sprite_colorbase  = m_k053251->get_palette_index(k053251_device::CI1);
-	m_layer_colorbase[0] = m_k053251->get_palette_index(k053251_device::CI2);
-	m_layer_colorbase[1] = m_k053251->get_palette_index(k053251_device::CI3) + 8;   /* weird... */
-	m_layer_colorbase[2] = m_k053251->get_palette_index(k053251_device::CI4);
+
+	for (int i = 0; i < 3; i++)
+	{
+		int prev_colorbase = m_layer_colorbase[i];
+		m_layer_colorbase[i] = m_k053251->get_palette_index(K053251_CI[i]);
+		if (i == 1) m_layer_colorbase[i] += 8; // weird
+
+		if (m_layer_colorbase[i] != prev_colorbase)
+			m_k052109->mark_tilemap_dirty(i);
+	}
 
 	m_k052109->tilemap_update();
 
-	m_sorted_layer[0] = 0;
-	m_layerpri[0] = m_k053251->get_priority(k053251_device::CI2);
-	m_sorted_layer[1] = 1;
-	m_layerpri[1] = m_k053251->get_priority(k053251_device::CI3);
-	m_sorted_layer[2] = 2;
-	m_layerpri[2] = m_k053251->get_priority(k053251_device::CI4);
+	// sort layers and draw
+	for (int i = 0; i < 3; i++)
+	{
+		m_sorted_layer[i] = i;
+		m_layerpri[i] = m_k053251->get_priority(K053251_CI[i]);
+	}
 
 	konami_sortlayers3(m_sorted_layer, m_layerpri);
 
-	/* not sure about the 053936 priority, but it seems to work */
-
+	// not sure about the 053936 priority, but it seems to work
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(16 * bg_colorbase, cliprect);
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, m_sorted_layer[0], 0, 1);
@@ -1189,22 +1209,28 @@ uint32_t tmnt2_state::screen_update_tmnt2(screen_device &screen, bitmap_ind16 &b
 
 uint32_t tmnt2_state::screen_update_thndrx2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int bg_colorbase;
-
-	bg_colorbase = m_k053251->get_palette_index(k053251_device::CI0);
+	// update color info and refresh tilemaps
+	static const int K053251_CI[3] = { k053251_device::CI2, k053251_device::CI4, k053251_device::CI3 };
+	int bg_colorbase = m_k053251->get_palette_index(k053251_device::CI0);
 	m_sprite_colorbase = m_k053251->get_palette_index(k053251_device::CI1);
-	m_layer_colorbase[0] = m_k053251->get_palette_index(k053251_device::CI2);
-	m_layer_colorbase[1] = m_k053251->get_palette_index(k053251_device::CI4);
-	m_layer_colorbase[2] = m_k053251->get_palette_index(k053251_device::CI3);
+
+	for (int i = 0; i < 3; i++)
+	{
+		int prev_colorbase = m_layer_colorbase[i];
+		m_layer_colorbase[i] = m_k053251->get_palette_index(K053251_CI[i]);
+
+		if (m_layer_colorbase[i] != prev_colorbase)
+			m_k052109->mark_tilemap_dirty(i);
+	}
 
 	m_k052109->tilemap_update();
 
-	m_sorted_layer[0] = 0;
-	m_layerpri[0] = m_k053251->get_priority(k053251_device::CI2);
-	m_sorted_layer[1] = 1;
-	m_layerpri[1] = m_k053251->get_priority(k053251_device::CI4);
-	m_sorted_layer[2] = 2;
-	m_layerpri[2] = m_k053251->get_priority(k053251_device::CI3);
+	// sort layers and draw
+	for (int i = 0; i < 3; i++)
+	{
+		m_sorted_layer[i] = i;
+		m_layerpri[i] = m_k053251->get_priority(K053251_CI[i]);
+	}
 
 	konami_sortlayers3(m_sorted_layer, m_layerpri);
 

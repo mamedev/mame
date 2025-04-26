@@ -132,6 +132,9 @@ TODO:
 		<year>1993</year>
 		<publisher>Almathera</publisher>
 		<notes><![CDATA[
+cdrom1: Disks 1-1199 of 17 Bit PD Library
+cdrom2: Disks 1201-2301 of 17 Bit PD Library
+Requires stable [FDC] write
 cd32: black screen
 ]]></notes>
 		<info name="disc_matrix" value="SONOPRESS CD-ROM * G-9255 * C"/>
@@ -161,9 +164,12 @@ cd32: black screen
 		<year>1993</year>
 		<publisher>Almathera</publisher>
 		<notes><![CDATA[
+Disks 2303-2800 of 17 Bit PD Library, ASN01-141, AGN1-23, ARUG1-33, NZ1-29, Misc 17-Bit and LSD Catalogues
+Requires stable [FDC] write
 cd32: black screen
 ]]></notes>
 		<info name="disc_matrix" value="SONOPRESS CD-ROM * H-6083 * A DS2"/>
+		<info name="usage" value="Non-17 Bit entries are uncompressed Drawers" />
 		<part name="cdrom" interface="cdrom">
 			<!-- <category>Applications</category> -->
 			<!-- http://redump.org/disc/20859/ -->

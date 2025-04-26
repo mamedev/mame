@@ -20,7 +20,6 @@
 #ifdef DEBUG
 #include "stdio.h"
 #endif
-#undef UNICODE
 #include <windows.h>
 
 /* pm_exit is called when the program exits.
@@ -29,23 +28,21 @@
  */
 static void pm_exit(void) {
     pm_term();
-#ifdef DEBUG
-#define STRING_MAX 80
-    {
-        char line[STRING_MAX];
-        printf("Type ENTER...\n");
-        /* note, w/o this prompting, client console application can not see one
-           of its errors before closing. */
-        fgets(line, STRING_MAX, stdin);
-    }
-#endif
 }
 
+
+static BOOL WINAPI ctrl_c_handler(DWORD fdwCtrlType)
+{
+    exit(1);  /* invokes pm_exit() */
+    ExitProcess(1);  /* probably never called */
+    return TRUE;
+}
 
 /* pm_init is the windows-dependent initialization.*/
 void pm_init(void)
 {
     atexit(pm_exit);
+    SetConsoleCtrlHandler(ctrl_c_handler, TRUE);
 #ifdef DEBUG
     printf("registered pm_exit with atexit()\n");
 #endif
@@ -59,40 +56,41 @@ void pm_term(void) {
 }
 
 
-static PmDeviceID pm_get_default_device_id(int is_input, char *key) {
+static PmDeviceID pm_get_default_device_id(int is_input, const char *key) {
     HKEY hkey;
 #define PATTERN_MAX 256
     char pattern[PATTERN_MAX];
-    DWORD pattern_max = PATTERN_MAX;
+    long pattern_max = PATTERN_MAX;
     DWORD dwType;
     /* Find first input or device -- this is the default. */
     PmDeviceID id = pmNoDevice;
     int i, j;
     Pm_Initialize(); /* make sure descriptors exist! */
-    for (i = 0; i < pm_descriptor_index; i++) {
-        if (descriptors[i].pub.input == is_input) {
+    for (i = 0; i < pm_descriptor_len; i++) {
+        if (pm_descriptors[i].pub.input == is_input) {
             id = i;
             break;
         }
     }
     /* Look in registry for a default device name pattern. */
-    if (RegOpenKeyExA(HKEY_CURRENT_USER, "Software", 0, KEY_READ, &hkey) != 
+    if (RegOpenKeyEx(HKEY_CURRENT_USER, "Software", 0, KEY_READ, &hkey) != 
         ERROR_SUCCESS) {
         return id;
     }
-    if (RegOpenKeyExA(hkey, "JavaSoft", 0, KEY_READ, &hkey) !=
+    if (RegOpenKeyEx(hkey, "JavaSoft", 0, KEY_READ, &hkey) !=
         ERROR_SUCCESS) {
         return id;
     }
-    if (RegOpenKeyExA(hkey, "Prefs", 0, KEY_READ, &hkey) !=
+    if (RegOpenKeyEx(hkey, "Prefs", 0, KEY_READ, &hkey) !=
         ERROR_SUCCESS) {
         return id;
     }
-    if (RegOpenKeyExA(hkey, "/Port/Midi", 0, KEY_READ, &hkey) !=
+    if (RegOpenKeyEx(hkey, "/Port/Midi", 0, KEY_READ, &hkey) !=
         ERROR_SUCCESS) {
         return id;
     }
-    if (RegQueryValueExA(hkey, key, NULL, &dwType, (BYTE *)pattern, &pattern_max) != 
+    if (RegQueryValueEx(hkey, key, NULL, &dwType, (BYTE *) pattern, 
+                        (DWORD *) &pattern_max) != 
 	ERROR_SUCCESS) {
         return id;
     }
@@ -118,15 +116,15 @@ static PmDeviceID pm_get_default_device_id(int is_input, char *key) {
 }
 
 
-PmDeviceID Pm_GetDefaultInputDeviceID() {
+PmDeviceID Pm_GetDefaultInputDeviceID(void) {
     return pm_get_default_device_id(TRUE, 
-           (char *)"/P/M_/R/E/C/O/M/M/E/N/D/E/D_/I/N/P/U/T_/D/E/V/I/C/E");
+           "/P/M_/R/E/C/O/M/M/E/N/D/E/D_/I/N/P/U/T_/D/E/V/I/C/E");
 }
 
 
-PmDeviceID Pm_GetDefaultOutputDeviceID() {
+PmDeviceID Pm_GetDefaultOutputDeviceID(void) {
   return pm_get_default_device_id(FALSE,
-          (char *)"/P/M_/R/E/C/O/M/M/E/N/D/E/D_/O/U/T/P/U/T_/D/E/V/I/C/E");
+          "/P/M_/R/E/C/O/M/M/E/N/D/E/D_/O/U/T/P/U/T_/D/E/V/I/C/E");
 }
 
 

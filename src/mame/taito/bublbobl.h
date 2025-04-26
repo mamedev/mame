@@ -12,6 +12,7 @@
 #include "machine/gen_latch.h"
 #include "sound/ymopn.h"
 #include "sound/ymopl.h"
+
 #include "emupal.h"
 #include "screen.h"
 

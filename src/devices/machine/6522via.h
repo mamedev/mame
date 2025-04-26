@@ -130,12 +130,13 @@ protected:
 	TIMER_CALLBACK_MEMBER(t2_tick);
 	TIMER_CALLBACK_MEMBER(ca2_tick);
 
+	void set_int(int data);
+	void clear_int(int data);
+
 private:
 	uint16_t get_counter1_value();
 	void counter2_decrement();
 
-	void set_int(int data);
-	void clear_int(int data);
 	void shift_out();
 	void shift_in();
 	void set_pa_line(int line, int state);

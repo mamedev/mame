@@ -10975,7 +10975,8 @@ void cps2_state::init_cps2nc()
 
 	init_digital_volume();
 
-	m_maincpu->set_clock_scale(0.7375f); // RAM access waitstates etc. aren't emulated - slow the CPU to compensate
+	// HACK: RAM access waitstates etc. aren't emulated - slow the CPU to compensate
+	m_maincpu->set_clock_scale(0.7375);
 }
 
 void cps2_state::init_pzloop2()

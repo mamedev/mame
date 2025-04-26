@@ -835,6 +835,12 @@ static INPUT_PORTS_START( ultra19 )
 	PORT_DIPNAME( 0x80, 0x00, "Interlace Scan Mode")                         PORT_DIPLOCATION("SW402:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_MODIFY("CONFIG")
+	PORT_CONFNAME(0x10, 0x10, "Page 2 RAM present")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
+
 INPUT_PORTS_END
 
 
@@ -901,6 +907,49 @@ static INPUT_PORTS_START( gp19 )
 	PORT_DIPSETTING(    0x00, "After 10 mins")
 	PORT_DIPSETTING(    0x80, "Never")
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( igc_common )
+	PORT_START("joystick_p1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+
+	PORT_START("joystick_p2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(2)
+
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( igc )
+	PORT_INCLUDE( tlb )
+
+	PORT_INCLUDE( igc_common )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( igc_super19 )
+	PORT_INCLUDE( super19 )
+
+	PORT_INCLUDE( igc_common )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( igc_ultra )
+	PORT_INCLUDE( ultra19 )
+
+	PORT_INCLUDE( igc_common )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( igc_watz )
+	PORT_INCLUDE( watz19 )
+
+	PORT_INCLUDE( igc_common )
+INPUT_PORTS_END
+
+
 
 
 ROM_START( h19 )
@@ -1316,8 +1365,21 @@ ioport_constructor heath_watz_tlb_device::device_input_ports() const
  * Developed by William G. Parrott, III, sold by Software Wizardry, Inc.
  */
 heath_ultra_tlb_device::heath_ultra_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	heath_tlb_device(mconfig, HEATH_ULTRA, tag, owner, clock)
+	heath_tlb_device(mconfig, HEATH_ULTRA, tag, owner, clock),
+	m_maincpu_region(*this, "maincpu"),
+	m_page_2_ram(*this, "page2ram"),
+	m_mem_view(*this, "mem")
 {
+}
+
+void heath_ultra_tlb_device::device_reset()
+{
+	heath_tlb_device::device_reset();
+
+	ioport_value const cfg(m_config->read());
+
+	// Page 2 memory
+	m_mem_view.select(BIT(cfg, 4));
 }
 
 void heath_ultra_tlb_device::device_add_mconfig(machine_config &config)
@@ -1331,11 +1393,11 @@ void heath_ultra_tlb_device::mem_map(address_map &map)
 {
 	heath_tlb_device::mem_map(map);
 
-	// update rom mirror setting to allow page 2 memory
-	map(0x0000, 0x0fff).mirror(0x2000).rom();
+	map(0x0000, 0x3fff).view(m_mem_view);
 
-	// Page 2 memory
-	map(0x1000, 0x1fff).mirror(0x2000).ram();
+	m_mem_view[0](0x0000, 0x0fff).mirror(0x3000).rom().region(m_maincpu_region, 0x0000).unmapw();
+	m_mem_view[1](0x0000, 0x0fff).mirror(0x2000).rom().region(m_maincpu_region, 0x0000).unmapw();
+	m_mem_view[1](0x1000, 0x1fff).mirror(0x2000).ram().share(m_page_2_ram);
 }
 
 const tiny_rom_entry *heath_ultra_tlb_device::device_rom_region() const
@@ -1752,13 +1814,20 @@ void heath_imaginator_tlb_device::set_irq_line()
  *
  */
 heath_igc_tlb_device::heath_igc_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	heath_tlb_device(mconfig, HEATH_IGC, tag, owner, clock)
+	heath_igc_tlb_device(mconfig, HEATH_IGC, tag, owner, clock)
 {
 }
 
 heath_igc_tlb_device::heath_igc_tlb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
-	heath_tlb_device(mconfig, type, tag, owner, clock)
+	heath_tlb_device(mconfig, type, tag, owner, clock),
+	m_joystick1(*this, "joystick_p1"),
+	m_joystick2(*this, "joystick_p2")
 {
+}
+
+ioport_constructor heath_igc_tlb_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(igc);
 }
 
 void heath_igc_tlb_device::device_add_mconfig(machine_config &config)
@@ -1795,6 +1864,62 @@ void heath_igc_tlb_device::device_reset()
 	m_data_reg       = 0x00;
 	m_io_address     = 0x0000;
 	m_window_address = 0x0000;
+}
+
+void heath_igc_tlb_device::sigma_w(u8 offset, u8 data)
+{
+	switch (offset)
+	{
+	case 0:
+		sigma_video_mem_w(data);
+		break;
+	case 1:
+		sigma_io_lo_addr_w(data);
+		break;
+	case 2:
+		sigma_io_hi_addr_w(data);
+		break;
+	case 3:
+		sigma_window_lo_addr_w(data);
+		break;
+	case 4:
+		sigma_window_hi_addr_w(data);
+		break;
+	case 5:
+		sigma_ctrl_w(data);
+		break;
+	}
+}
+
+u8 heath_igc_tlb_device::sigma_r(u8 offset)
+{
+	u8 val = 0;
+
+	switch (offset)
+	{
+	case 0:
+		val = sigma_video_mem_r();
+		break;
+	case 1:
+		// TODO - Low pen address
+		break;
+	case 2:
+		// TODO - High pen address
+		break;
+	case 3:
+		// Left input device
+		val = m_joystick1->read();
+		break;
+	case 4:
+		// Right input device
+		val = m_joystick2->read();
+		break;
+	case 5:
+		val = sigma_ctrl_r();
+		break;
+	}
+
+	return val;
 }
 
 void heath_igc_tlb_device::sigma_ctrl_w(u8 data)
@@ -1945,7 +2070,7 @@ const tiny_rom_entry *heath_igc_super19_tlb_device::device_rom_region() const
 
 ioport_constructor heath_igc_super19_tlb_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME(super19);
+	return INPUT_PORTS_NAME(igc_super19);
 }
 
 
@@ -1954,13 +2079,26 @@ ioport_constructor heath_igc_super19_tlb_device::device_input_ports() const
  *
  */
 heath_igc_ultra_tlb_device::heath_igc_ultra_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	heath_igc_tlb_device(mconfig, HEATH_IGC_ULTRA, tag, owner, clock)
+	heath_igc_tlb_device(mconfig, HEATH_IGC_ULTRA, tag, owner, clock),
+	m_maincpu_region(*this, "maincpu"),
+	m_page_2_ram(*this, "page2ram"),
+	m_mem_view(*this, "mem")
 {
+}
+
+void heath_igc_ultra_tlb_device::device_reset()
+{
+	heath_igc_tlb_device::device_reset();
+
+	ioport_value const cfg(m_config->read());
+
+	// Page 2 memory
+	m_mem_view.select(BIT(cfg, 4));
 }
 
 void heath_igc_ultra_tlb_device::device_add_mconfig(machine_config &config)
 {
-	heath_tlb_device::device_add_mconfig(config);
+	heath_igc_tlb_device::device_add_mconfig(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &heath_igc_ultra_tlb_device::mem_map);
 }
@@ -1969,11 +2107,11 @@ void heath_igc_ultra_tlb_device::mem_map(address_map &map)
 {
 	heath_tlb_device::mem_map(map);
 
-	// update rom mirror setting to allow page 2 memory
-	map(0x0000, 0x0fff).mirror(0x2000).rom();
+	map(0x0000, 0x3fff).view(m_mem_view);
 
-	// Page 2 memory
-	map(0x1000, 0x1fff).mirror(0x2000).ram();
+	m_mem_view[0](0x0000, 0x0fff).mirror(0x3000).rom().region(m_maincpu_region, 0x0000).unmapw();
+	m_mem_view[1](0x0000, 0x0fff).mirror(0x2000).rom().region(m_maincpu_region, 0x0000).unmapw();
+	m_mem_view[1](0x1000, 0x1fff).mirror(0x2000).ram().share(m_page_2_ram);
 }
 
 const tiny_rom_entry *heath_igc_ultra_tlb_device::device_rom_region() const
@@ -1983,7 +2121,7 @@ const tiny_rom_entry *heath_igc_ultra_tlb_device::device_rom_region() const
 
 ioport_constructor heath_igc_ultra_tlb_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME(ultra19);
+	return INPUT_PORTS_NAME(igc_ultra);
 }
 
 
@@ -2003,7 +2141,7 @@ const tiny_rom_entry *heath_igc_watz_tlb_device::device_rom_region() const
 
 ioport_constructor heath_igc_watz_tlb_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME(watz19);
+	return INPUT_PORTS_NAME(igc_watz);
 }
 
 

@@ -772,18 +772,18 @@ static const gfx_layout charlayout_memory =
 
 
 static GFXDECODE_START( gfx_sasuke )
-	GFXDECODE_ENTRY( nullptr,           0x1000, swapcharlayout,      0, 4 )    /* the game dynamically modifies this */
-	GFXDECODE_ENTRY( "gfx1", 0x0000, swapcharlayout,    4*4, 4 )
+	GFXDECODE_RAM(   nullptr, 0x1000, swapcharlayout,      0, 4 )
+	GFXDECODE_ENTRY( "gfx1",  0x0000, swapcharlayout,    4*4, 4 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_satansat )
-	GFXDECODE_ENTRY( nullptr,           0x1000, charlayout_memory,   0, 4 )    /* the game dynamically modifies this */
-	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,        4*4, 4 )
+	GFXDECODE_RAM(   nullptr, 0x1000, charlayout_memory,   0, 4 )
+	GFXDECODE_ENTRY( "gfx1",  0x0000, charlayout,        4*4, 4 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_vanguard )
-	GFXDECODE_ENTRY( nullptr,           0x1000, charlayout_memory,   0, 8 )    /* the game dynamically modifies this */
-	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout,        8*4, 8 )
+	GFXDECODE_RAM(   nullptr, 0x1000, charlayout_memory,   0, 8 )
+	GFXDECODE_ENTRY( "gfx1",  0x0000, charlayout,        8*4, 8 )
 GFXDECODE_END
 
 
@@ -795,7 +795,7 @@ GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(snk6502_state::satansat_interrupt)
 {
-	if(m_irq_mask)
+	if (m_irq_mask)
 		device.execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE); /* one IRQ per frame */
 }
 
@@ -833,7 +833,6 @@ void snk6502_state::sasuke(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(snk6502_state,sasuke)
 
 	// video hardware
-
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz((MASTER_CLOCK / 16) / (45 * 32 * 8));
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -1048,9 +1047,6 @@ ROM_START( zarzon )
 	ROM_LOAD( "zarz133.53",   0x0000, 0x0800, CRC(b253cf78) SHA1(56a73b22ed2866222c407a3e9b51b8e0c92cf2aa) )
 	ROM_LOAD( "zarz134.54",   0x0800, 0x0800, CRC(580934d2) SHA1(c1c7eba56bca2a0ea6a68c0245b071a3308f92bd) )
 ROM_END
-
-
-
 
 ROM_START( satansatind )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1499,7 +1495,7 @@ ROM_START( nibblera ) /* revision 9 - alternate? */
 	ROM_LOAD( "2732.ic07", 0x4000, 0x1000, CRC(7f9d715c) SHA1(59fbdbb55dceaa86235911589395fa5243e44afe) )
 	ROM_LOAD( "2732.ic08", 0x5000, 0x1000, CRC(e46eb1c9) SHA1(b70a14085985096eb6650f3d06343a20d75e61b5) )
 	ROM_LOAD( "2732.ic09", 0x6000, 0x1000, CRC(a599df10) SHA1(68ee8b5199ec24409fcbb40c887a1eec44c68dcf) )
-	ROM_LOAD( "2732.ic10", 0x7000, 0x1000, BAD_DUMP CRC(746e94cd) SHA1(284696722857900760d35f1f8ef53290deddac20) )  // FIXED BITS (xxx1xxxx)
+	ROM_LOAD( "2732.ic10", 0x7000, 0x1000, CRC(746e94cd) SHA1(284696722857900760d35f1f8ef53290deddac20) )
 	ROM_LOAD( "2732.ic14", 0x8000, 0x1000, CRC(48ec4af0) SHA1(9b4b80c288d5ade998c0bbcfc3868c9dcd438707) )
 	ROM_RELOAD(                 0xf000, 0x1000 )    /* for the reset and interrupt vectors */
 	ROM_LOAD( "2732.ic15", 0x9000, 0x1000, CRC(7205fb8d) SHA1(bc341bc11a383aa8b8dd7b2be851907a3ec56f8b) )

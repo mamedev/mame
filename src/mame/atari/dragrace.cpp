@@ -271,8 +271,8 @@ void dragrace_state::main_map(address_map &map)
 	map(0x0928, 0x092f).w("latch_a5", FUNC(addressable_latch_device::clear));
 	map(0x0930, 0x0937).w("latch_h5", FUNC(addressable_latch_device::clear));
 	map(0x0938, 0x093f).w("latch_e5", FUNC(addressable_latch_device::clear));
-	map(0x0a00, 0x0aff).writeonly().share(m_playfield_ram);
-	map(0x0b00, 0x0bff).writeonly().share(m_position_ram);
+	map(0x0a00, 0x0aff).nopr().writeonly().share(m_playfield_ram);
+	map(0x0b00, 0x0bff).nopr().writeonly().share(m_position_ram);
 	map(0x0c00, 0x0c00).r(FUNC(dragrace_state::steering_r));
 	map(0x0d00, 0x0d00).r(FUNC(dragrace_state::scanline_r));
 	map(0x0e00, 0x0eff).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));

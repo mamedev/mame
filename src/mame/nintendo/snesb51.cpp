@@ -274,7 +274,7 @@ void snesb51_state::base(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	S_DSP(config, m_s_dsp, XTAL(24'576'000) / 12);
+	S_DSP(config, m_s_dsp, XTAL(24'576'000));
 	m_s_dsp->set_addrmap(0, &snesb51_state::spc_map);
 	m_s_dsp->add_route(0, "lspeaker", 1.00);
 	m_s_dsp->add_route(1, "rspeaker", 1.00);

@@ -1463,7 +1463,7 @@ void lua_engine::initialize()
 	machine_type["images"] = sol::property([] (running_machine &m) { return devenum<image_interface_enumerator>(m.root_device()); });
 	machine_type["slots"] = sol::property([](running_machine &m) { return devenum<slot_interface_enumerator>(m.root_device()); });
 	machine_type["phase"] = sol::property(
-			[](running_machine& m)
+			[] (running_machine const &m) -> char const *
 			{
 				switch (m.phase())
 				{
@@ -1472,9 +1472,10 @@ void lua_engine::initialize()
 				case machine_phase::RESET:      return "reset";
 				case machine_phase::RUNNING:    return "running";
 				case machine_phase::EXIT:       return "exit";
-				default:                        return "";
 				}
+				return nullptr;
 			});
+
 
 	auto game_driver_type = sol().registry().new_usertype<game_driver>("game_driver", sol::no_constructor);
 	game_driver_type["name"] = sol::property([] (game_driver const &driver) { return &driver.name[0]; });
@@ -2110,6 +2111,9 @@ void lua_engine::initialize()
 	ui_type["show_fps"] = sol::property(&mame_ui_manager::show_fps, &mame_ui_manager::set_show_fps);
 	ui_type["show_profiler"] = sol::property(&mame_ui_manager::show_profiler, &mame_ui_manager::set_show_profiler);
 	ui_type["image_display_enabled"] = sol::property(&mame_ui_manager::image_display_enabled, &mame_ui_manager::set_image_display_enabled);
+
+	// undocumented/unsupported
+	ui_type["show_menu"] = &mame_ui_manager::show_menu; // FIXME: this is dangerous - it doesn't give a proper chance for the current UI handler to clean up
 
 
 /* rom_entry library

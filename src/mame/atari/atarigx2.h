@@ -31,6 +31,8 @@ public:
 		, m_alpha_tilemap(*this, "alpha")
 		, m_rle(*this, "rle")
 		, m_adc(*this, "adc")
+		, m_io_service(*this, "SERVICE")
+		, m_io_special(*this, "SPECIAL")
 	{ }
 
 	void init_spclords();
@@ -54,15 +56,13 @@ protected:
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
 	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
 	TILEMAP_MAPPER_MEMBER(atarigx2_playfield_scan);
-	uint32_t screen_update_atarigx2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void atarigx2_mo_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	void atarigx2(machine_config &config);
 	void main_map(address_map &map) ATTR_COLD;
 
 private:
-	uint16_t          m_playfield_base = 0U;
-
 	required_device<atari_jsa_iiis_device> m_jsa;
 	optional_device<atari_xga_device> m_xga;
 
@@ -73,6 +73,11 @@ private:
 	required_device<atari_rle_objects_device> m_rle;
 
 	required_device<adc0808_device> m_adc;
+
+	optional_ioport m_io_service;
+	optional_ioport m_io_special;
+
+	uint16_t          m_playfield_base = 0U;
 
 	uint16_t          m_current_control = 0U;
 	uint8_t           m_playfield_tile_bank = 0U;

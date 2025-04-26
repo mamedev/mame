@@ -17,14 +17,14 @@
    plist files (user and system) open at once (due to a simple
    memory management scheme).
 */
-PmDeviceID find_default_device(char *path, int input, PmDeviceID id)
+PmDeviceID find_default_device(const char *path, int input, PmDeviceID id)
 /* path -- the name of the preference we are searching for
    input -- true iff this is an input device
    id -- current default device id
    returns matching device id if found, otherwise id
 */
 {
-    static char *pref_file = (char *)"com.apple.java.util.prefs.plist";
+    static char const *const pref_file = "com.apple.java.util.prefs.plist";
     char *pref_str = NULL;
     // read device preferences
     value_ptr prefs = bplist_read_user_pref(pref_file);

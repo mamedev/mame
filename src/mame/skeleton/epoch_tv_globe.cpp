@@ -16,6 +16,9 @@ LCT REV1.9
 Tiger-Main
 KTG-KZ003-08
 
+is this related to koto_zevio.cpp, Koto Laboratory is credited for the hardware
+development of both, and both are 3D capable Plug and Play SoCs
+
 *******************************************************************************/
 
 #include "emu.h"
@@ -71,7 +74,7 @@ INPUT_PORTS_END
 
 void epoch_tv_globe_state::arm_map(address_map &map)
 {
-	map(0x00000000, 0x0001ffff).rom().region("maincpu", 0);
+	map(0x00000000, 0x007fffff).rom().region("maincpu", 0);
 }
 
 
@@ -100,6 +103,14 @@ ROM_START( eptvglob )
 	ROM_LOAD( "k9f1g08u0b.ic8", 0x000000, 0x8400000, CRC(f1880c56) SHA1(c50f01f799b3296cda56d05a02a59aa78e0c8422) )
 ROM_END
 
+ROM_START( digixar )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "mr27t640.ic6", 0x000000, 0x800000, CRC(f593ac1b) SHA1(58cafab21d690de23b4781800c272bebf6b2b46f) )
+ROM_END
+
+
+
 } // anonymous namespace
 
 CONS( 201?, eptvglob,       0,              0,      epoch_tv_globe, epoch_tv_globe, epoch_tv_globe_state, empty_init, "Epoch", "TV Globe (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 201?, digixar,        0,              0,      epoch_tv_globe, epoch_tv_globe, epoch_tv_globe_state, empty_init, "Bandai / Koto", "Digimon X Arena (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

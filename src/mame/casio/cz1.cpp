@@ -910,7 +910,7 @@ void cz1_state::cz1(machine_config &config)
 	m_mcu->t0_in_cb().set(FUNC(cz1_state::sync49_r));
 	m_mcu->t1_in_cb().set([this] () { return BIT(m_main_port[2], 7); });
 
-	MSM6200(config, "kbd").irq_cb().set_inputline(m_mcu, MCS48_INPUT_IRQ);
+	MSM6200(config, "kbd", 2.47_MHz_XTAL).irq_cb().set_inputline(m_mcu, MCS48_INPUT_IRQ); // CSA2.47MG ceramic oscillator
 
 	config.set_default_layout(layout_cz1);
 }

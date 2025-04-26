@@ -131,15 +131,17 @@ namespace {
 class spacefb_state : public driver_device
 {
 public:
-	spacefb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	spacefb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_samples(*this, "samples"),
 		m_screen(*this, "screen"),
-		m_videoram(*this, "videoram") { }
+		m_videoram(*this, "videoram")
+	{ }
 
 	void spacefb(machine_config &config);
+	void spacedem(machine_config &config);
 	void spacefb_audio(machine_config &config);
 
 protected:
@@ -148,8 +150,8 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
-// SPACEFB_PIXEL_CLOCK clocks the star generator circuit.  The rest of the graphics
-// use a clock half of SPACEFB_PIXEL_CLOCK, thus creating double width pixels.
+	// SPACEFB_PIXEL_CLOCK clocks the star generator circuit.  The rest of the graphics
+	// use a clock half of SPACEFB_PIXEL_CLOCK, thus creating double width pixels.
 	static constexpr int SPACEFB_MASTER_CLOCK        = 20160000;
 	static constexpr int SPACEFB_MAIN_CPU_CLOCK      = 6000000 / 2;
 	static constexpr int SPACEFB_AUDIO_CPU_CLOCK     = 6000000;   // this goes to X2, pixel clock goes to X1
@@ -168,6 +170,7 @@ private:
 
 	void spacefb_main_map(address_map &map) ATTR_COLD;
 	void spacefb_main_io_map(address_map &map) ATTR_COLD;
+	void spacedem_main_io_map(address_map &map) ATTR_COLD;
 	void spacefb_audio_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
@@ -189,6 +192,7 @@ private:
 	void port_0_w(u8 data);
 	void port_1_w(u8 data);
 	void port_2_w(u8 data);
+	void spacedem_port_2_w(u8 data);
 	u8 audio_p2_r();
 	u8 audio_t0_r();
 	u8 audio_t1_r();
@@ -288,7 +292,6 @@ void spacefb_state::spacefb_audio(machine_config &config)
 
 void spacefb_state::port_0_w(u8 data)
 {
-//  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
 	m_port_0 = data;
 }
@@ -296,9 +299,18 @@ void spacefb_state::port_0_w(u8 data)
 
 void spacefb_state::port_2_w(u8 data)
 {
-//  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
 	m_port_2 = data;
+}
+
+
+void spacefb_state::spacedem_port_2_w(u8 data)
+{
+	// bit 4 enables Epson 7910E melody chip
+	// TODO
+
+	// rest is same as spacefb?
+	port_2_w(data & ~0x10);
 }
 
 
@@ -625,7 +637,6 @@ u32 spacefb_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
  *
  *************************************/
 
-
 TIMER_CALLBACK_MEMBER(spacefb_state::interrupt_callback)
 {
 	int next_vpos;
@@ -727,6 +738,12 @@ void spacefb_state::spacefb_main_io_map(address_map &map)
 	map(0x01, 0x01).mirror(0x04).w(FUNC(spacefb_state::port_1_w));
 	map(0x02, 0x02).mirror(0x04).w(FUNC(spacefb_state::port_2_w));
 	map(0x03, 0x03).mirror(0x04).nopw();
+}
+
+void spacefb_state::spacedem_main_io_map(address_map &map)
+{
+	spacefb_main_io_map(map);
+	map(0x02, 0x02).mirror(0x04).w(FUNC(spacefb_state::spacedem_port_2_w));
 }
 
 
@@ -840,6 +857,12 @@ void spacefb_state::spacefb(machine_config &config)
 	spacefb_audio(config);
 }
 
+void spacefb_state::spacedem(machine_config &config)
+{
+	spacefb(config);
+	m_maincpu->set_addrmap(AS_IO, &spacefb_state::spacedem_main_io_map);
+}
+
 
 
 /*************************************
@@ -951,7 +974,6 @@ ROM_START( spacefba )
 	ROM_LOAD( "mb7051-a.3n", 0x0000, 0x0020, CRC(465d07af) SHA1(25e246f7674c25d05e5f6e68db88c15aaa10cee1) )
 ROM_END
 
-
 ROM_START( spacefbg )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tst-c.5e",    0x0000, 0x0800, CRC(07949110) SHA1(b090e629203c54fc0937d82b0cfe355153a65d6b) )
@@ -1028,31 +1050,6 @@ ROM_START( spacefbb )
 	ROM_LOAD( "mb7051.3n",   0x0000, 0x0020, CRC(465d07af) SHA1(25e246f7674c25d05e5f6e68db88c15aaa10cee1) )
 ROM_END
 
-ROM_START( spacedem )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "sdm-c-5e",    0x0000, 0x0800, CRC(be4b9cbb) SHA1(345ea1e56754e0c8300148b53346dbec50b3608e) )
-	ROM_LOAD( "sdm-c-5f",    0x0800, 0x0800, CRC(0814f964) SHA1(0186d11ca98f4b2e4c2572db9d440456370275e7) )
-	ROM_LOAD( "sdm-c-5h",    0x1000, 0x0800, CRC(ebfff682) SHA1(e060627de302a9ce125d939d9890739d2154a507) )
-	ROM_LOAD( "sdm-c-5i",    0x1800, 0x0800, CRC(dd7e1378) SHA1(94a756036e7d03c42ee896b794cb1f8753a67b91) )
-	ROM_LOAD( "sdm-c-5j",    0x2000, 0x0800, CRC(98334fda) SHA1(9990bbfb2aa4d953e531bb49eab1c3a999b78b9c) )
-	ROM_LOAD( "sdm-c-5k",    0x2800, 0x0800, CRC(ba4933b2) SHA1(9e5003849185ea35b5929c9a8ae188a87bb522cc) )
-	ROM_LOAD( "sdm-c-5m",    0x3000, 0x0800, CRC(14d3c656) SHA1(55522df8c2e484b8d5d4a32bf7cfb2b30dcdab4a) )
-	ROM_LOAD( "sdm-c-5n",    0x3800, 0x0800, CRC(7e0e41b0) SHA1(e7dd509ab36e0f9be6350b5fa9de4694224477db) )
-
-	ROM_REGION( 0x1000, "audiocpu", 0 )
-	ROM_LOAD( "sdm-e-20",    0x0000, 0x0400, CRC(55f40a0b) SHA1(8dff27b636f7f1831f71816505e451cf97fc3f98) )
-
-	ROM_REGION( 0x1000, "sprites", 0 )
-	ROM_LOAD( "sdm-v-5k",    0x0000, 0x0800, CRC(55758e4d) SHA1(1338b45f76f5a31a5350c953eac36cc543fbe62e) )
-	ROM_LOAD( "sdm-v-6k",    0x0800, 0x0800, CRC(3fcbb20c) SHA1(674de509f7b6c5d7c41112881b0c3093b9b176a0) )
-
-	ROM_REGION( 0x0100, "bullets", 0 )
-	ROM_LOAD( "4i.vid",      0x0000, 0x0100, CRC(528e8533) SHA1(8e41eee1016c98a4f08acbd902daf8e32aa9d9ab) )
-
-	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "sdm-v-3n",    0x0000, 0x0020, CRC(6d8ad169) SHA1(6ccc931774183e14e28bb9b93223d366fd596f30) )
-ROM_END
-
 ROM_START( starwarr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sw51.5e",     0x0000, 0x0800, CRC(a0f5e690) SHA1(03b81d88ef6c3eaf2d23f1526f02d4ae5ba569a1) )
@@ -1104,7 +1101,33 @@ ROM_START( redbird )
 	ROM_LOAD( "6331.m3",     0x0000, 0x0020, CRC(465d07af) SHA1(25e246f7674c25d05e5f6e68db88c15aaa10cee1) )
 ROM_END
 
+ROM_START( spacedem )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sdm-c-5e",    0x0000, 0x0800, CRC(be4b9cbb) SHA1(345ea1e56754e0c8300148b53346dbec50b3608e) )
+	ROM_LOAD( "sdm-c-5f",    0x0800, 0x0800, CRC(0814f964) SHA1(0186d11ca98f4b2e4c2572db9d440456370275e7) )
+	ROM_LOAD( "sdm-c-5h",    0x1000, 0x0800, CRC(ebfff682) SHA1(e060627de302a9ce125d939d9890739d2154a507) )
+	ROM_LOAD( "sdm-c-5i",    0x1800, 0x0800, CRC(dd7e1378) SHA1(94a756036e7d03c42ee896b794cb1f8753a67b91) )
+	ROM_LOAD( "sdm-c-5j",    0x2000, 0x0800, CRC(98334fda) SHA1(9990bbfb2aa4d953e531bb49eab1c3a999b78b9c) )
+	ROM_LOAD( "sdm-c-5k",    0x2800, 0x0800, CRC(ba4933b2) SHA1(9e5003849185ea35b5929c9a8ae188a87bb522cc) )
+	ROM_LOAD( "sdm-c-5m",    0x3000, 0x0800, CRC(14d3c656) SHA1(55522df8c2e484b8d5d4a32bf7cfb2b30dcdab4a) )
+	ROM_LOAD( "sdm-c-5n",    0x3800, 0x0800, CRC(7e0e41b0) SHA1(e7dd509ab36e0f9be6350b5fa9de4694224477db) )
+
+	ROM_REGION( 0x1000, "audiocpu", 0 )
+	ROM_LOAD( "sdm-e-20",    0x0000, 0x0400, CRC(55f40a0b) SHA1(8dff27b636f7f1831f71816505e451cf97fc3f98) )
+
+	ROM_REGION( 0x1000, "sprites", 0 )
+	ROM_LOAD( "sdm-v-5k",    0x0000, 0x0800, CRC(55758e4d) SHA1(1338b45f76f5a31a5350c953eac36cc543fbe62e) )
+	ROM_LOAD( "sdm-v-6k",    0x0800, 0x0800, CRC(3fcbb20c) SHA1(674de509f7b6c5d7c41112881b0c3093b9b176a0) )
+
+	ROM_REGION( 0x0100, "bullets", 0 )
+	ROM_LOAD( "4i.vid",      0x0000, 0x0100, CRC(528e8533) SHA1(8e41eee1016c98a4f08acbd902daf8e32aa9d9ab) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "sdm-v-3n",    0x0000, 0x0020, CRC(6d8ad169) SHA1(6ccc931774183e14e28bb9b93223d366fd596f30) )
+ROM_END
+
 } // anonymouse namespace
+
 
 /*************************************
  *
@@ -1112,14 +1135,14 @@ ROM_END
  *
  *************************************/
 
-//    YEAR  NAME       PARENT   MACHINE  INPUT     CLASS          INIT        ROT     COMPANY                       FULLNAME                                FLAGS
-GAME( 1980, spacefb,   0,       spacefb, spacefb,  spacefb_state, empty_init, ROT270, "Nintendo",                   "Space Firebird (rev. 04-u)",           MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacefbe,  spacefb, spacefb, spacefb,  spacefb_state, empty_init, ROT270, "Nintendo",                   "Space Firebird (rev. 03-e set 1)",     MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacefbe2, spacefb, spacefb, spacefb,  spacefb_state, empty_init, ROT270, "Nintendo",                   "Space Firebird (rev. 03-e set 2)",     MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacefba,  spacefb, spacefb, spacefb,  spacefb_state, empty_init, ROT270, "Nintendo",                   "Space Firebird (rev. 02-a)",           MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacefbg,  spacefb, spacefb, spacefb,  spacefb_state, empty_init, ROT270, "Nintendo (Gremlin license)", "Space Firebird (Gremlin)",             MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacebrd,  spacefb, spacefb, spacefb,  spacefb_state, empty_init, ROT270, "bootleg (Karateco)",         "Space Bird (bootleg)",                 MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacefbb,  spacefb, spacefb, spacefb,  spacefb_state, empty_init, ROT270, "bootleg",                    "Space Firebird (bootleg)",             MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, spacedem,  spacefb, spacefb, spacedem, spacefb_state, empty_init, ROT270, "Nintendo (Fortrek license)", "Space Demon",                          MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, starwarr,  spacefb, spacefb, spacefb,  spacefb_state, empty_init, ROT270, "bootleg (Potomac Mortgage)", "Star Warrior",                         MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1980, redbird,   spacefb, spacefb, spacefb,  spacefb_state, empty_init, ROT270, "bootleg (Codematic)",        "Red Bird (bootleg of Space Firebird)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT   MACHINE   INPUT     CLASS          INIT        ROT     COMPANY                       FULLNAME                                FLAGS
+GAME( 1980, spacefb,   0,       spacefb,  spacefb,  spacefb_state, empty_init, ROT270, "Nintendo",                   "Space Firebird (rev. 04-u)",           MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacefbe,  spacefb, spacefb,  spacefb,  spacefb_state, empty_init, ROT270, "Nintendo",                   "Space Firebird (rev. 03-e set 1)",     MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacefbe2, spacefb, spacefb,  spacefb,  spacefb_state, empty_init, ROT270, "Nintendo",                   "Space Firebird (rev. 03-e set 2)",     MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacefba,  spacefb, spacefb,  spacefb,  spacefb_state, empty_init, ROT270, "Nintendo",                   "Space Firebird (rev. 02-a)",           MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacefbg,  spacefb, spacefb,  spacefb,  spacefb_state, empty_init, ROT270, "Nintendo (Gremlin license)", "Space Firebird (Gremlin)",             MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacebrd,  spacefb, spacefb,  spacefb,  spacefb_state, empty_init, ROT270, "bootleg (Karateco)",         "Space Bird (bootleg)",                 MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacefbb,  spacefb, spacefb,  spacefb,  spacefb_state, empty_init, ROT270, "bootleg",                    "Space Firebird (bootleg)",             MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, starwarr,  spacefb, spacefb,  spacefb,  spacefb_state, empty_init, ROT270, "bootleg (Potomac Mortgage)", "Star Warrior",                         MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, redbird,   spacefb, spacefb,  spacefb,  spacefb_state, empty_init, ROT270, "bootleg (Codematic)",        "Red Bird (bootleg of Space Firebird)", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, spacedem,  spacefb, spacedem, spacedem, spacefb_state, empty_init, ROT270, "Nintendo (Fortrek license)", "Space Demon",                          MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

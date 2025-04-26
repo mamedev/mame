@@ -271,7 +271,7 @@ static const gfx_layout charlayout_3_bit =
 
 static GFXDECODE_START( gfx_polyplay )
 	GFXDECODE_ENTRY( "gfx1",  0x0000, charlayout_1_bit, 0, 1 )
-	GFXDECODE_ENTRY( nullptr, 0xec00, charlayout_3_bit, 2, 1 )
+	GFXDECODE_RAM(   nullptr, 0xec00, charlayout_3_bit, 2, 1 )
 GFXDECODE_END
 
 

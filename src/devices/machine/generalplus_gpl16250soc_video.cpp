@@ -779,6 +779,11 @@ void gcm394_base_video_device::video_dma_size_trigger_w(address_space &space, ui
 
 	LOGMASKED(LOG_GCM394_VIDEO_DMA, "%s: doing sprite / video DMA source %04x dest %04x size %04x value of 707e (bank) %04x value of 707f %04x\n", machine().describe_context(), m_videodma_source, m_videodma_dest, m_videodma_size, m_707e_spritebank, m_707f );
 
+	// jak_spmm sets dest to 0 when it wants to write to spriteram, looks intentional?
+	// does something else force writes to go to spriteram or does 0 always just mean there?
+	if (m_videodma_dest == 0)
+		m_videodma_dest = 0x7400;
+
 	for (int i = 0; i <= m_videodma_size; i++)
 	{
 		uint16_t dat = space.read_word(m_videodma_source+i);

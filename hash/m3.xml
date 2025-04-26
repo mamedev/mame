@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- license:CC0-1.0 -->
+
+<softwarelist name="m3" description="LSI M-THREE disks">
+
+	<!-- bootable -->
+	<software name="m3utils">
+		<description>M3 Utilities (Release 3)</description>
+		<year>198?</year>
+		<publisher>LSI</publisher>
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="1617408">
+				<rom name="m3_utils_cpm22_8ssds.mfm" size="1617408" crc="da1072a2" sha1="fa17616c90efda3e2ceeb06012183bbba3631d34" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

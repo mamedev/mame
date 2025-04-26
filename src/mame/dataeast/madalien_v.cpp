@@ -353,7 +353,7 @@ static const gfx_layout tilelayout =
 
 
 static GFXDECODE_START( gfx_madalien )
-	GFXDECODE_ENTRY( nullptr,   0, charlayout,     0x20, 2 ) /* foreground characters, stored in RAM */
+	GFXDECODE_RAM( nullptr,  0, charlayout,     0x20, 2 ) /* foreground characters, stored in RAM */
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout,        0, 4 )
 	GFXDECODE_ENTRY( "gfx2", 0, headlightlayout,   0, 1 )
 GFXDECODE_END

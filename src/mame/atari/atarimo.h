@@ -24,20 +24,19 @@ struct atari_motion_objects_config
 	struct entry { uint16_t data[4]; };
 	struct dual_entry { uint16_t data_lower[4]; uint16_t data_upper[4]; };
 
-	uint8_t               m_gfxindex;           // index to which gfx system
-	uint8_t               m_bankcount;          // number of motion object banks
+	uint8_t             m_gfxindex;           // index to which gfx system
+	uint8_t             m_bankcount;          // number of motion object banks
 	bool                m_linked;             // are the entries linked?
 	bool                m_split;              // are the entries split?
 	bool                m_reverse;            // render in reverse order?
 	bool                m_swapxy;             // render in swapped X/Y order?
 	bool                m_nextneighbor;       // does the neighbor bit affect the next object?
-	uint16_t              m_slipheight;         // pixels per SLIP entry (0 for no-slip)
-	uint8_t               m_slipoffset;         // pixel offset for SLIPs
-	uint16_t              m_maxperline;         // maximum number of links to visit/scanline (0=all)
+	uint16_t            m_slipheight;         // pixels per SLIP entry (0 for no-slip)
+	uint8_t             m_slipoffset;         // pixel offset for SLIPs
+	uint16_t            m_maxperline;         // maximum number of links to visit/scanline (0=all)
 
-	uint16_t              m_palettebase;        // base palette entry
-	uint16_t              m_maxcolors;          // maximum number of colors (remove me)
-	uint8_t               m_transpen;           // transparent pen index
+	uint16_t            m_palettebase;        // base palette entry
+	uint8_t             m_transpen;           // transparent pen index
 
 	entry               m_link_entry;           // mask for the link
 	dual_entry          m_code_entry;           // mask for the code index
@@ -52,7 +51,7 @@ struct atari_motion_objects_config
 	entry               m_neighbor_entry;       // mask for the neighbor
 	entry               m_absolute_entry;       // mask for absolute coordinates
 	entry               m_special_entry;        // mask for the special value
-	uint16_t              m_specialvalue;         // resulting value to indicate "special"
+	uint16_t            m_specialvalue;         // resulting value to indicate "special"
 };
 
 
@@ -155,7 +154,7 @@ private:
 	private:
 		sprite_parameter    m_lower;            // lower parameter
 		sprite_parameter    m_upper;            // upper parameter
-		uint16_t              m_uppershift;       // upper shift
+		uint16_t            m_uppershift;       // upper shift
 	};
 
 	// parameter masks

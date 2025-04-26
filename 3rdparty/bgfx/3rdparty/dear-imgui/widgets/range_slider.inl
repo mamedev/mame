@@ -4,10 +4,6 @@
 namespace ImGui
 {
 
-extern float RoundScalarWithFormatFloat(const char* format, ImGuiDataType data_type, float v);
-
-extern float SliderCalcRatioFromValueFloat(ImGuiDataType data_type, float v, float v_min, float v_max, float power, float linear_zero_pos);
-
 // ~80% common code with ImGui::SliderBehavior
 bool RangeSliderBehavior(const ImRect& frame_bb, ImGuiID id, float* v1, float* v2, float v_min, float v_max, float power, int decimal_precision, ImGuiSliderFlags flags)
 {
@@ -91,7 +87,7 @@ bool RangeSliderBehavior(const ImRect& frame_bb, ImGuiID id, float* v1, float* v
             snprintf(fmt, 64, "%%.%df", decimal_precision);
 
             // Round past decimal precision
-            new_value = RoundScalarWithFormatFloat(fmt, ImGuiDataType_Float, new_value);
+            new_value = RoundScalarWithFormatT<float>(fmt, ImGuiDataType_Float, new_value);
             if (*v1 != new_value || *v2 != new_value)
             {
                 if (fabsf(*v1 - new_value) < fabsf(*v2 - new_value))
@@ -112,7 +108,7 @@ bool RangeSliderBehavior(const ImRect& frame_bb, ImGuiID id, float* v1, float* v
     }
 
     // Calculate slider grab positioning
-    float grab_t = SliderCalcRatioFromValueFloat(ImGuiDataType_Float, *v1, v_min, v_max, power, linear_zero_pos);
+    float grab_t = ScaleRatioFromValueT<float, float, float>(ImGuiDataType_Float, *v1, v_min, v_max, false, power, linear_zero_pos);
 
     // Draw
     if (!is_horizontal)
@@ -126,7 +122,7 @@ bool RangeSliderBehavior(const ImRect& frame_bb, ImGuiID id, float* v1, float* v
     window->DrawList->AddRectFilled(grab_bb1.Min, grab_bb1.Max, GetColorU32(g.ActiveId == id ? ImGuiCol_SliderGrabActive : ImGuiCol_SliderGrab), style.GrabRounding);
 
     // Calculate slider grab positioning
-    grab_t = SliderCalcRatioFromValueFloat(ImGuiDataType_Float, *v2, v_min, v_max, power, linear_zero_pos);
+    grab_t = ScaleRatioFromValueT<float, float, float>(ImGuiDataType_Float, *v2, v_min, v_max, false, power, linear_zero_pos);
 
     // Draw
     if (!is_horizontal)
@@ -173,7 +169,7 @@ bool RangeSliderFloat(const char* label, float* v1, float* v2, float v_min, floa
         return false;
     }
 
-    const bool hovered = ItemHoverable(frame_bb, id);
+    const bool hovered = ItemHoverable(frame_bb, id, g.LastItemData.ItemFlags);
     if (hovered)
         SetHoveredID(id);
 
@@ -183,13 +179,12 @@ bool RangeSliderFloat(const char* label, float* v1, float* v2, float v_min, floa
 
     // Tabbing or CTRL-clicking on Slider turns it into an input box
     bool start_text_input = false;
-    const bool tab_focus_requested = (GetItemStatusFlags() & ImGuiItemStatusFlags_FocusedByTabbing) != 0;
-    if (tab_focus_requested || (hovered && g.IO.MouseClicked[0]))
+    if (hovered && g.IO.MouseClicked[0])
     {
         SetActiveID(id, window);
         FocusWindow(window);
 
-        if (tab_focus_requested || g.IO.KeyCtrl)
+        if (g.IO.KeyCtrl)
         {
             start_text_input = true;
             g.TempInputId = 0;

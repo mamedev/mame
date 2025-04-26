@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Luca Elia, David Haywood
+// copyright-holders: Luca Elia, David Haywood
+
 /***************************************************************************
 
                           -= ESD 16 Bit Games =-
@@ -66,15 +67,298 @@ ToDo:
 ***************************************************************************/
 
 #include "emu.h"
-#include "esd16.h"
+
+#include "decospr.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/eepromser.h"
+#include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
+
+
+namespace {
+
+class esd16_state : public driver_device
+{
+public:
+	esd16_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_vram(*this, "vram_%u", 0U),
+		m_scroll(*this, "scroll_%u", 0U),
+		m_spriteram(*this, "spriteram"),
+		m_layersize(*this, "head_layersize"),
+		m_platform_x(*this, "platform_x"),
+		m_platform_y(*this, "platform_y"),
+		m_audiobank(*this, "audiobank"),
+		m_io_eepromout(*this, "EEPROMOUT"),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_sprgen(*this, "spritegen"),
+		m_eeprom(*this, "eeprom"),
+		m_soundlatch(*this, "soundlatch")
+	{ }
+
+	void esd16_nosound(machine_config &config) ATTR_COLD;
+	void esd16(machine_config &config) ATTR_COLD;
+	void jumppop(machine_config &config) ATTR_COLD;
+	void tangtang(machine_config &config) ATTR_COLD;
+	void mchampdx(machine_config &config) ATTR_COLD;
+	void hedpanio(machine_config &config) ATTR_COLD;
+	void hedpanic(machine_config &config) ATTR_COLD;
+	void fantstry(machine_config &config) ATTR_COLD;
+	void fantstrya(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
+private:
+	required_shared_ptr_array<u16, 2> m_vram;
+	required_shared_ptr_array<u16, 2> m_scroll;
+	required_shared_ptr<u16> m_spriteram;
+	required_shared_ptr<u16> m_layersize;
+	required_shared_ptr<u16> m_platform_x;
+	required_shared_ptr<u16> m_platform_y;
+
+	optional_memory_bank m_audiobank;
+	optional_ioport m_io_eepromout;
+
+	tilemap_t *m_tilemap_16x16[2]{};
+	tilemap_t *m_tilemap[2]{};
+	u32 m_tilemap_color[2]{};
+
+	required_device<cpu_device> m_maincpu;
+	optional_device<cpu_device> m_audiocpu;
+	required_device<gfxdecode_device> m_gfxdecode;
+	optional_device<decospr_device> m_sprgen;
+	optional_device<eeprom_serial_93cxx_device> m_eeprom;
+	optional_device<generic_latch_8_device> m_soundlatch;
+
+	void sound_command_w(u8 data);
+	void platform_w(u16 data);
+	u8 eeprom_r();
+	void eeprom_w(u8 data);
+	void sound_rombank_w(u8 data);
+	template<unsigned Layer> void vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void tilemap0_color_w(u16 data);
+	void tilemap0_color_jumppop_w(u16 data);
+	template<unsigned Layer> TILE_GET_INFO_MEMBER(get_tile_info);
+	template<unsigned Layer> TILE_GET_INFO_MEMBER(get_tile_info_16x16);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
+	void fantstrya_map(address_map &map) ATTR_COLD;
+	void hedpanic_map(address_map &map) ATTR_COLD;
+	void jumppop_map(address_map &map) ATTR_COLD;
+	void mchampdx_map(address_map &map) ATTR_COLD;
+	void multchmp_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void tangtang_map(address_map &map) ATTR_COLD;
+
+	void io_area_dsw(address_map &map, u32 base) ATTR_COLD;
+	void io_area_eeprom(address_map &map, u32 base) ATTR_COLD;
+	void palette_area(address_map &map, u32 base) ATTR_COLD;
+	void sprite_area(address_map &map, u32 base) ATTR_COLD;
+	void vid_attr_area(address_map &map, u32 base) ATTR_COLD;
+	void vram_area(address_map &map, u32 base) ATTR_COLD;
+};
+
+
+/***************************************************************************
+
+Note:   if MAME_DEBUG is defined, pressing Z with:
+
+        Q / W           Shows Layer 0 / 1
+        A               Shows Sprites
+
+        Keys can be used together!
+
+
+    [ 2 Scrolling Layers ]
+
+        Tile Size:              8 x 8 x 8
+        Color Codes:            1 per Layer (banked for Layer 0)
+        Layer Size (tiles) :    128 x 64
+        Layer Size (pixels):    1024 x 512
+
+    [ 256 Sprites ]
+
+        Sprites are made of 16 x 16 x 5 tiles. Size can vary from 1 to
+        8 tiles vertically, while their width is always 1 tile.
+
+    [ Priorities ]
+
+        The game only uses this scheme:
+
+        Back -> Front:  Layer 0, Layer 1, Sprites
+
+***************************************************************************/
+
+
+/***************************************************************************
+
+                                    Tilemaps
+
+    Offset:     Bits:                   Value:
+
+        0.w                             Code
+
+    Color code:  layer 0 (backmost) can bank at every 256 colors,
+                 layer 1 uses the first 256.
+
+***************************************************************************/
+
+template<unsigned Layer>
+TILE_GET_INFO_MEMBER(esd16_state::get_tile_info)
+{
+	const u16 code = m_vram[Layer][tile_index];
+	tileinfo.set(0,
+			code,
+			m_tilemap_color[Layer],
+			0);
+}
+
+template<unsigned Layer>
+TILE_GET_INFO_MEMBER(esd16_state::get_tile_info_16x16)
+{
+	const u16 code = m_vram[Layer][tile_index];
+	tileinfo.set(1,
+			code,
+			m_tilemap_color[Layer],
+			0);
+}
+
+
+void esd16_state::tilemap0_color_w(u16 data)
+{
+	m_tilemap_color[0] = data & 0x03;
+	m_tilemap[0]->mark_all_dirty();
+	m_tilemap_16x16[0]->mark_all_dirty();
+
+	bool const flip = BIT(data, 7);
+	flip_screen_set(flip);
+	m_sprgen->set_flip_screen(flip);
+}
+
+void esd16_state::tilemap0_color_jumppop_w(u16 data)
+{
+	// TODO
+	m_tilemap_color[0] = 2;
+	m_tilemap_color[1] = 1;
+
+	bool const flip = BIT(data, 7);
+	flip_screen_set(flip);
+	m_sprgen->set_flip_screen(flip);
+}
+
+
+/***************************************************************************
+
+
+                            Video Hardware Init
+
+
+***************************************************************************/
+
+
+void esd16_state::video_start()
+{
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(esd16_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 0x80, 0x40);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(esd16_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 0x80, 0x40);
+
+	// swatpolc changes tilemap 0 to 16x16 at various times
+	m_tilemap_16x16[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(esd16_state::get_tile_info_16x16<0>)), TILEMAP_SCAN_ROWS, 16,16, 0x40, 0x40);
+
+	// hedpanic changes tilemap 1 to 16x16 at various times
+	m_tilemap_16x16[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(esd16_state::get_tile_info_16x16<1>)), TILEMAP_SCAN_ROWS, 16,16, 0x40, 0x40);
+
+	m_tilemap[0]->set_scrolldx(-0x60 + 2, -0x60);
+	m_tilemap[1]->set_scrolldx(-0x60, -0x60 + 2);
+	m_tilemap_16x16[0]->set_scrolldx(-0x60 + 2, -0x60);
+	m_tilemap_16x16[1]->set_scrolldx(-0x60, -0x60 + 2);
+
+	m_tilemap[1]->set_transparent_pen(0x00);
+	m_tilemap_16x16[1]->set_transparent_pen(0x00);
+}
+
+
+/***************************************************************************
+
+
+                                Screen Drawing
+
+
+***************************************************************************/
+
+u32 esd16_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	int layers_ctrl = -1;
+
+	screen.priority().fill(0, cliprect);
+
+#ifdef MAME_DEBUG
+if (machine().input().code_pressed(KEYCODE_Z))
+{
+	int msk = 0;
+	if (machine().input().code_pressed(KEYCODE_Q))  msk |= 1;
+	if (machine().input().code_pressed(KEYCODE_W))  msk |= 2;
+	if (machine().input().code_pressed(KEYCODE_A))  msk |= 4;
+	if (msk != 0) layers_ctrl &= msk;
+}
+#endif
+
+	if (layers_ctrl & 1)
+	{
+		if (m_layersize[0] & 0x0001)
+		{
+			m_tilemap_16x16[0]->set_scrollx(0, m_scroll[0][0]);
+			m_tilemap_16x16[0]->set_scrolly(0, m_scroll[0][1]);
+			m_tilemap_16x16[0]->draw(screen, bitmap, cliprect, 0, 0);
+		}
+		else
+		{
+			m_tilemap[0]->set_scrollx(0, m_scroll[0][0]);
+			m_tilemap[0]->set_scrolly(0, m_scroll[0][1]);
+			m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
+		}
+	}
+	else
+	{
+		bitmap.fill(0, cliprect);
+	}
+
+
+	if (layers_ctrl & 2)
+	{
+		if (m_layersize[0] & 0x0002)
+		{
+			m_tilemap_16x16[1]->set_scrollx(0, m_scroll[1][0]);
+			m_tilemap_16x16[1]->set_scrolly(0, m_scroll[1][1]);
+			m_tilemap_16x16[1]->draw(screen, bitmap, cliprect, 0, 1);
+		}
+		else
+		{
+			m_tilemap[1]->set_scrollx(0, m_scroll[1][0]);
+			m_tilemap[1]->set_scrolly(0, m_scroll[1][1]);
+			m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 1);
+		}
+
+	}
+
+	if (layers_ctrl & 4) m_sprgen->draw_sprites(bitmap, cliprect, m_spriteram, 0x400);
+
+//  popmessage("%04x %04x %04x %04x %04x",head_unknown1[0],head_layersize[0],head_unknown3[0],head_unknown4[0],head_unknown5[0]);
+	return 0;
+}
 
 
 /***************************************************************************
@@ -687,8 +971,8 @@ void esd16_state::machine_start()
 {
 	if (m_audiobank)
 	{
-		u8* AUDIO = memregion("audiocpu")->base();
-		m_audiobank->configure_entries(0, 16, &AUDIO[0x0000], 0x4000);
+		u8 *const audiorom = memregion("audiocpu")->base();
+		m_audiobank->configure_entries(0, 16, &audiorom[0x0000], 0x4000);
 	}
 
 	save_item(NAME(m_tilemap_color));
@@ -730,7 +1014,7 @@ void esd16_state::esd16_nosound(machine_config &config)
 	m_sprgen->set_flipallx(1);
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_esd16);
-	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x1000/2);
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x1000 / 2);
 }
 
 void esd16_state::fantstry(machine_config& config)
@@ -759,19 +1043,19 @@ void esd16_state::esd16(machine_config& config)
 {
 	esd16_nosound(config);
 
-	Z80(config, m_audiocpu, XTAL(16'000'000)/4); // 4MHz
+	Z80(config, m_audiocpu, XTAL(16'000'000) / 4); // 4MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &esd16_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &esd16_state::sound_io_map);
-	m_audiocpu->set_periodic_int(FUNC(esd16_state::nmi_line_pulse), attotime::from_hz(32*60));    // IRQ By Main CPU
+	m_audiocpu->set_periodic_int(FUNC(esd16_state::nmi_line_pulse), attotime::from_hz(32 * 60));    // IRQ By Main CPU
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch).data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	YM3812(config, "ymsnd", XTAL(16'000'000)/4).add_route(ALL_OUTPUTS, "mono", 0.30);   // 4MHz
+	YM3812(config, "ymsnd", XTAL(16'000'000) / 4).add_route(ALL_OUTPUTS, "mono", 0.30);   // 4MHz
 
-	OKIM6295(config, "oki", XTAL(16'000'000)/16, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.60); // 1MHz
+	OKIM6295(config, "oki", XTAL(16'000'000) / 16, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.60); // 1MHz
 }
 
 void esd16_state::jumppop(machine_config &config)
@@ -782,14 +1066,14 @@ void esd16_state::jumppop(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &esd16_state::jumppop_map);
 
-	m_audiocpu->set_clock(XTAL(14'000'000)/4); // 3.5MHz - Verified
+	m_audiocpu->set_clock(XTAL(14'000'000) / 4); // 3.5MHz - Verified
 
 	m_sprgen->set_info(gfx_jumppop_spr);
 	m_gfxdecode->set_info(gfx_jumppop);
 
-	subdevice<ym3812_device>("ymsnd")->set_clock(XTAL(14'000'000)/4); // 3.5MHz - Verified
+	subdevice<ym3812_device>("ymsnd")->set_clock(XTAL(14'000'000) / 4); // 3.5MHz - Verified
 
-	subdevice<okim6295_device>("oki")->set_clock(XTAL(14'000'000)/16); // 875kHz - Verified
+	subdevice<okim6295_device>("oki")->set_clock(XTAL(14'000'000) / 16); // 875kHz - Verified
 }
 
 // The ESD 05-28-99 PCB adds an EEPROM
@@ -891,7 +1175,7 @@ MULTCHMP.U39 -/                    MX27C2000
 
 ***************************************************************************/
 
-ROM_START( multchmp )
+ROM_START( multchmp25 )
 	ROM_REGION( 0x080000, "maincpu", 0 )        // 68000 Code
 	ROM_LOAD16_BYTE( "esd2.cu02", 0x000000, 0x040000,  CRC(2d1b098a) SHA1(c2f3991f02c611c258219da2c61cad22c9a21f7d) )
 	ROM_LOAD16_BYTE( "esd1.cu03", 0x000001, 0x040000,  CRC(10974063) SHA1(854b38b4d4cb529e9928aae4212c86a220615e04) )
@@ -908,12 +1192,12 @@ ROM_START( multchmp )
 
 	ROM_REGION( 0x400000, "bgs", 0 )    // Layers, 16x16x8
 	ROM_LOAD32_BYTE( "esd9.fu28",  0x000000, 0x080000, CRC(6652c04a) SHA1(178e1d42847506d869ef79db2f7e10df05e9ef76) )
-	ROM_LOAD32_BYTE( "esd11.fu29", 0x000002, 0x080000, CRC(9bafd8ee) SHA1(db18be05431d4b6d4207e19fa4ed8701621aaa19) )
 	ROM_LOAD32_BYTE( "esd7.fu26",  0x000001, 0x080000, CRC(a783a003) SHA1(1ff61a049485c5b599c458a8bf7f48027d14f8e0) )
+	ROM_LOAD32_BYTE( "esd11.fu29", 0x000002, 0x080000, CRC(9bafd8ee) SHA1(db18be05431d4b6d4207e19fa4ed8701621aaa19) )
 	ROM_LOAD32_BYTE( "esd5.fu27",  0x000003, 0x080000, CRC(299f32c2) SHA1(274752444f6ddba16eeefc02c3e78525c079b3d8) )
 	ROM_LOAD32_BYTE( "esd10.fu31", 0x200000, 0x080000, CRC(d815974b) SHA1(3e528a5df79fa7dc0f38b0ee7f2f3a0ebc97a369) )
-	ROM_LOAD32_BYTE( "esd12.fu33", 0x200002, 0x080000, CRC(c6b86001) SHA1(11a63b56df30ab7b85ce4568d2a24e96a125735a) )
 	ROM_LOAD32_BYTE( "esd8.fu30",  0x200001, 0x080000, CRC(22861af2) SHA1(1e74e85517cb8fd5fb4bda6e9d9d54046e31f653) )
+	ROM_LOAD32_BYTE( "esd12.fu33", 0x200002, 0x080000, CRC(c6b86001) SHA1(11a63b56df30ab7b85ce4568d2a24e96a125735a) )
 	ROM_LOAD32_BYTE( "esd6.fu32",  0x200003, 0x080000, CRC(e2689bb2) SHA1(1da9b1f7335d5c2d1c2f8353fccf91c0109d2e9d) )
 
 	ROM_REGION( 0x40000, "oki", 0 ) // Samples
@@ -937,12 +1221,12 @@ ROM_START( multchmpk )
 
 	ROM_REGION( 0x400000, "bgs", 0 )    // Layers, 16x16x8
 	ROM_LOAD32_BYTE( "multchmp.u31", 0x000000, 0x080000, CRC(b1e4e9e3) SHA1(1a7393e9073b028b4170393b3788ad8cb86c0c78) )
-	ROM_LOAD32_BYTE( "multchmp.u33", 0x000002, 0x080000, CRC(e4c0ec96) SHA1(74152108e4d05f4aff9d38919f212fcb8c87cef3) )
 	ROM_LOAD32_BYTE( "multchmp.u29", 0x000001, 0x080000, CRC(01bd1399) SHA1(b717ccffe0af92a42a0879736d34d3ad71840233) )
+	ROM_LOAD32_BYTE( "multchmp.u33", 0x000002, 0x080000, CRC(e4c0ec96) SHA1(74152108e4d05f4aff9d38919f212fcb8c87cef3) )
 	ROM_LOAD32_BYTE( "multchmp.u27", 0x000003, 0x080000, CRC(dc42704e) SHA1(58a04a47ffc6d6ae0e4d49e466b1c58b37ad741a) )
 	ROM_LOAD32_BYTE( "multchmp.u32", 0x200000, 0x080000, CRC(f05cb5b4) SHA1(1b33e60942238e39d61ae59e9317b99e83595ab1) )
-	ROM_LOAD32_BYTE( "multchmp.u34", 0x200002, 0x080000, CRC(bffaaccc) SHA1(d9ab248e2c7c639666e3717cfc5d8c8468a1bde2) )
 	ROM_LOAD32_BYTE( "multchmp.u30", 0x200001, 0x080000, CRC(c6b4cc18) SHA1(d9097b85584272cfe4989a40d622ef1feeee6775) )
+	ROM_LOAD32_BYTE( "multchmp.u34", 0x200002, 0x080000, CRC(bffaaccc) SHA1(d9ab248e2c7c639666e3717cfc5d8c8468a1bde2) )
 	ROM_LOAD32_BYTE( "multchmp.u28", 0x200003, 0x080000, CRC(449991fa) SHA1(fd93e420a04cb8bea5421aa9cbe079bd3e7d4924) )
 
 	ROM_REGION( 0x40000, "oki", 0 ) // Samples
@@ -966,19 +1250,62 @@ ROM_START( multchmpa ) // Also found on a ESD 10-10-98 PCB which looks identical
 
 	ROM_REGION( 0x400000, "bgs", 0 )    // Layers, 16x16x8
 	ROM_LOAD32_BYTE( "esd9.fu28",  0x000000, 0x080000, CRC(a3cfe895) SHA1(a8dc0d5d9e64d4c5112177b8f20b5bdb86ca73af) )
-	ROM_LOAD32_BYTE( "esd11.fu29", 0x000002, 0x080000, CRC(d3c1855e) SHA1(bb547d4a45a745e9ae4a6727087cdf325105de90) )
 	ROM_LOAD32_BYTE( "esd7.fu26",  0x000001, 0x080000, CRC(042d59ff) SHA1(8e45a4757e07d8aaf50b151d8849c1a27424e64b) )
+	ROM_LOAD32_BYTE( "esd11.fu29", 0x000002, 0x080000, CRC(d3c1855e) SHA1(bb547d4a45a745e9ae4a6727087cdf325105de90) )
 	ROM_LOAD32_BYTE( "esd5.fu27",  0x000003, 0x080000, CRC(ed5b4e58) SHA1(82c3ee9e2525c0b370a29d5560c21ec6380d1a43) )
 	ROM_LOAD32_BYTE( "esd10.fu31", 0x200000, 0x080000, CRC(396d77b6) SHA1(f22449a7f9f50e172e36db4f399c14e527409884) )
-	ROM_LOAD32_BYTE( "esd12.fu33", 0x200002, 0x080000, CRC(a68848a8) SHA1(915239a961d76af6a1a567eb89b1569f158e714e) )
 	ROM_LOAD32_BYTE( "esd8.fu30",  0x200001, 0x080000, CRC(fa8cd2d3) SHA1(ddc1b98867e6d2eee458bf35a933e7cdc59f4c7e) )
+	ROM_LOAD32_BYTE( "esd12.fu33", 0x200002, 0x080000, CRC(a68848a8) SHA1(915239a961d76af6a1a567eb89b1569f158e714e) )
 	ROM_LOAD32_BYTE( "esd6.fu32",  0x200003, 0x080000, CRC(97fde7b1) SHA1(b3610f6fcc1367ff079dc01121c86bc1e1f4c7a2) )
 
 	ROM_REGION( 0x40000, "oki", 0 ) // Samples
 	ROM_LOAD( "esd4.su08", 0x00000, 0x20000, CRC(6e741fcd) SHA1(742e0952916c00f67dd9f8d01e721a9a538d2fc4) )
 ROM_END
 
+// this runs on a slightly newer PCB: ESD 05-17-99
+// there is a string about EEPROM write error but there isn't any on PCB
+ROM_START( multchmp )
+	ROM_REGION( 0x080000, "maincpu", 0 )        // 68000 Code
+	ROM_LOAD16_BYTE( "esd7.cu02", 0x000000, 0x040000, CRC(e25cbbfe) SHA1(fa142489a2171fb94b62d2635a1da5944ddde0cb) )
+	ROM_LOAD16_BYTE( "esd6.cu03", 0x000001, 0x040000, CRC(e7f837f9) SHA1(f31bf6c99b4f9be7bf9bb7ba04cf354ff070ad7f) )
 
+	ROM_REGION( 0x40000, "audiocpu", 0 )        // Z80 Code
+	ROM_LOAD( "esd3.su06", 0x00000, 0x20000, CRC(7c178bd7) SHA1(8754d3c70d9b2bf369a5ce0cce4cc0696ed22750) )
+
+	ROM_REGION( 0x180000, "spr", 0 )    // Sprites, 16x16x5
+	ROM_LOAD16_BYTE( "esd17.ju06", 0x000000, 0x040000, CRC(a69d4399) SHA1(06ae6c07cc6b7313e2e2aa3b994f7532d6994e1b) )
+	ROM_LOAD16_BYTE( "esd16.ju05", 0x000001, 0x040000, CRC(e670a6da) SHA1(47cbe45b6d5d0ca70d0c6787d589dde5d14fdba4) )
+	ROM_LOAD16_BYTE( "esd15.ju04", 0x080000, 0x040000, CRC(88b7a97c) SHA1(0a57ec8f6a44c8e3aa3ef35499a415d6a2b7eb16) )
+	ROM_LOAD16_BYTE( "esd14.ju03", 0x080001, 0x040000, CRC(a6122225) SHA1(cbcf2b31c4c011daba21f0ae5fd3be63c9a87c00) )
+	ROM_LOAD16_BYTE( "esd13.ju07", 0x100000, 0x040000, CRC(22071594) SHA1(c79102b250780d1da8c290d065d61fbbfa193366) )
+
+	ROM_REGION( 0x400000, "bgs", 0 )    // Layers, 16x16x8
+	ROM_LOAD( "mx29f1610ml.fu27_fu32", 0x000000, 0x200000, NO_DUMP ) // These 2 ROMs are soldered and weren't dumped. Using the ones from the other sets for now.
+	ROM_LOAD( "mx29f1610ml.fu28_fu31", 0x000000, 0x200000, NO_DUMP )
+	ROM_LOAD32_BYTE( "esd9.fu28",      0x000000, 0x080000, BAD_DUMP CRC(6652c04a) SHA1(178e1d42847506d869ef79db2f7e10df05e9ef76) )
+	ROM_LOAD32_BYTE( "esd7.fu26",      0x000001, 0x080000, BAD_DUMP CRC(a783a003) SHA1(1ff61a049485c5b599c458a8bf7f48027d14f8e0) )
+	ROM_LOAD32_BYTE( "esd11.fu29",     0x000002, 0x080000, BAD_DUMP CRC(9bafd8ee) SHA1(db18be05431d4b6d4207e19fa4ed8701621aaa19) )
+	ROM_LOAD32_BYTE( "esd5.fu27",      0x000003, 0x080000, BAD_DUMP CRC(299f32c2) SHA1(274752444f6ddba16eeefc02c3e78525c079b3d8) )
+	ROM_LOAD32_BYTE( "esd10.fu31",     0x200000, 0x080000, BAD_DUMP CRC(d815974b) SHA1(3e528a5df79fa7dc0f38b0ee7f2f3a0ebc97a369) )
+	ROM_LOAD32_BYTE( "esd8.fu30",      0x200001, 0x080000, BAD_DUMP CRC(22861af2) SHA1(1e74e85517cb8fd5fb4bda6e9d9d54046e31f653) )
+	ROM_LOAD32_BYTE( "esd12.fu33",     0x200002, 0x080000, BAD_DUMP CRC(c6b86001) SHA1(11a63b56df30ab7b85ce4568d2a24e96a125735a) )
+	ROM_LOAD32_BYTE( "esd6.fu32",      0x200003, 0x080000, BAD_DUMP CRC(e2689bb2) SHA1(1da9b1f7335d5c2d1c2f8353fccf91c0109d2e9d) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) // Samples
+	ROM_LOAD( "esd4.su10", 0x00000, 0x20000, CRC(6e741fcd) SHA1(742e0952916c00f67dd9f8d01e721a9a538d2fc4) )
+
+	ROM_REGION( 0x1800, "plds", ROMREGION_ERASE00 ) // all read-protected
+	ROM_LOAD( "palce22v10h-25pc-4.cu04", 0x0000, 0x02dd, NO_DUMP )
+	ROM_LOAD( "palce22v10h-25pc-4.cu05", 0x0300, 0x02dd, NO_DUMP )
+	ROM_LOAD( "palce22v10h-25pc-4.du05", 0x0600, 0x02dd, NO_DUMP )
+	ROM_LOAD( "palce22v10h-25pc-4.fu01", 0x0900, 0x02dd, NO_DUMP )
+	ROM_LOAD( "palce16v8h-25.du03",      0x0c00, 0x0117, NO_DUMP )
+	ROM_LOAD( "palce16v8h-25.ru27",      0x0e00, 0x0117, NO_DUMP )
+	ROM_LOAD( "palce16v8h-25.fu01",      0x1000, 0x0117, NO_DUMP )
+	ROM_LOAD( "palce16v8h-25.su07",      0x1200, 0x0117, NO_DUMP )
+	ROM_LOAD( "a40mx04-f-pl84.bu01",     0x1400, 0x0200, NO_DUMP ) // size wrong
+	ROM_LOAD( "a40mx04-f-pl84.du16",     0x1600, 0x0200, NO_DUMP ) // size wrong
+ROM_END
 
 /*
 
@@ -1040,10 +1367,10 @@ ROM_START( mchampdx )
 	ROM_REGION( 0x40000, "audiocpu", 0 )        // Z80 Code
 	ROM_LOAD( "esd3.su06", 0x00000, 0x40000, CRC(1b22568c) SHA1(5458e1a798357a6785f8ea1fe9da37768cd4761d) )
 
-	// this has additional copyright sprites in the flash roms for the (c)2000 message..
+	// this has additional copyright sprites in the flash ROMs for the (c)2000 message..
 	ROM_REGION( 0x600000, "spr", 0 )    // Sprites, 16x16x5
-	ROM_LOAD( "ver0106_ju01.bin", 0x200000, 0x200000, CRC(55841d90) SHA1(52ba3ee9393dcddf28e2d20a50151bc739faaaa4) )
-	ROM_LOAD( "ver0106_ju02.bin", 0x000000, 0x200000, CRC(b27a4977) SHA1(b7f94bb04d0046538b3938335e6b0cce330ad79c) )
+	ROM_LOAD( "ver0106_ju02.bin",         0x000000, 0x200000, CRC(b27a4977) SHA1(b7f94bb04d0046538b3938335e6b0cce330ad79c) )
+	ROM_LOAD( "ver0106_ju01.bin",         0x200000, 0x200000, CRC(55841d90) SHA1(52ba3ee9393dcddf28e2d20a50151bc739faaaa4) )
 	// expand this to take up 0x200000 bytes too so we can decode it
 	ROM_LOAD16_BYTE( "ver0106_esd5.ju07", 0x400000, 0x040000, CRC(7a3ac887) SHA1(3c759f9bed396bbaf6bd7298a8bd2bd76df3aa6f) )
 	ROM_FILL(                             0x500000, 0x100000, 0x00 )
@@ -1068,8 +1395,8 @@ ROM_START( mchampdxa )
 	ROM_LOAD( "esd3.su06", 0x00000, 0x40000, CRC(1b22568c) SHA1(5458e1a798357a6785f8ea1fe9da37768cd4761d) )
 
 	ROM_REGION( 0x600000, "spr", 0 )    // Sprites, 16x16x5
-	ROM_LOAD( "rom.ju01", 0x200000, 0x200000, CRC(1a749fc2) SHA1(feff4b26ee28244b4d092798a176e33e09d5df2c) )
-	ROM_LOAD( "rom.ju02", 0x000000, 0x200000, CRC(7e87e332) SHA1(f90aa00a64a940846d99053c7aa023e3fd5d070b) )
+	ROM_LOAD( "rom.ju02",         0x000000, 0x200000, CRC(7e87e332) SHA1(f90aa00a64a940846d99053c7aa023e3fd5d070b) )
+	ROM_LOAD( "rom.ju01",         0x200000, 0x200000, CRC(1a749fc2) SHA1(feff4b26ee28244b4d092798a176e33e09d5df2c) )
 	// expand this to take up 0x200000 bytes too so we can decode it
 	ROM_LOAD16_BYTE( "esd5.ju07", 0x400000, 0x080000, CRC(6cc871cc) SHA1(710b9695c864e4234686993b88d24590d60e1cb9) )
 	ROM_FILL(                     0x500000, 0x100000, 0x00 )
@@ -1094,8 +1421,8 @@ ROM_START( mchampdxb )
 	ROM_LOAD( "ver1114_esd3.su06", 0x00000, 0x40000, CRC(b87a1e85) SHA1(2fcdd7e8b301e3d20e6500a03dc293403b23b471) )
 
 	ROM_REGION( 0x600000, "spr", 0 )    // Sprites, 16x16x5
-	ROM_LOAD( "ver1114_ju01", 0x200000, 0x200000, CRC(0048e687) SHA1(5cc0a35b5f5f8d69b2dc3728ad6d0d505d9e16c5) )  // SMT Flash MX chips
-	ROM_LOAD( "ver1114_ju02", 0x000000, 0x200000, CRC(2f9ccff8) SHA1(176240cd247cc5d3efd58fe0630726a8633be2a4) )
+	ROM_LOAD( "ver1114_ju02",             0x000000, 0x200000, CRC(2f9ccff8) SHA1(176240cd247cc5d3efd58fe0630726a8633be2a4) )
+	ROM_LOAD( "ver1114_ju01",             0x200000, 0x200000, CRC(0048e687) SHA1(5cc0a35b5f5f8d69b2dc3728ad6d0d505d9e16c5) )  // SMT Flash MX chips
 	// expand this to take up 0x200000 bytes too so we can decode it
 	ROM_LOAD16_BYTE( "ver1114_esd5.ju07", 0x400000, 0x040000,  CRC(8175939f) SHA1(cd0132ae0d2e35dc656434989b1f0f255ad562ab) )
 	ROM_FILL(                             0x500000, 0x100000, 0x00 )
@@ -1205,11 +1532,11 @@ ROM_START( hedpanic ) // Story line & game instructions in English
 	ROM_LOAD16_BYTE( "esd1.cu02", 0x000001, 0x040000, CRC(42405e9d) SHA1(0fa088b8bd921e42cedcc4083dfe41bc9888dfd1) )
 
 	ROM_REGION( 0x40000, "audiocpu", 0 )        // Z80 Code
-	ROM_LOAD( "esd3.su06", 0x00000, 0x40000, CRC(a88d4424) SHA1(eefb5ac79632931a36f360713c482cd079891f91) ) // AT27C020 mask rom
+	ROM_LOAD( "esd3.su06", 0x00000, 0x40000, CRC(a88d4424) SHA1(eefb5ac79632931a36f360713c482cd079891f91) ) // AT27C020 mask ROM
 
 	ROM_REGION( 0x600000, "spr", 0 )    // Sprites, 16x16x5
-	ROM_LOAD( "esd6.ju01", 0x200000, 0x200000, CRC(5858372c) SHA1(dc96112587df681d53cf7449bd39477919978325) )
-	ROM_LOAD( "esd7.ju02", 0x000000, 0x200000, CRC(055d525f) SHA1(85ad474691f96e47311a1904015d1c92d3b2d607) )
+	ROM_LOAD( "esd7.ju02",        0x000000, 0x200000, CRC(055d525f) SHA1(85ad474691f96e47311a1904015d1c92d3b2d607) )
+	ROM_LOAD( "esd6.ju01",        0x200000, 0x200000, CRC(5858372c) SHA1(dc96112587df681d53cf7449bd39477919978325) )
 	// expand this to take up 0x200000 bytes too so we can decode it
 	ROM_LOAD16_BYTE( "esd5.ju07", 0x400000, 0x080000, CRC(bd785921) SHA1(c8bcb38d5aa6f5a27f0dedf7efd1d6737d59b4ca) )
 	ROM_FILL(                     0x500000, 0x100000, 0x00 )
@@ -1219,7 +1546,7 @@ ROM_START( hedpanic ) // Story line & game instructions in English
 	ROM_LOAD32_WORD( "esd9.fu34", 0x000002, 0x200000, CRC(76b46cd2) SHA1(679cbf50ae5935e8848868081ecef4ec66424f6c) )
 
 	ROM_REGION( 0x40000, "oki", 0 ) // Samples
-	ROM_LOAD( "esd4.su10", 0x000000, 0x020000, CRC(3c11c590) SHA1(cb33845c3dc0501fff8055c2d66f412881089df1) ) // AT27010 mask rom
+	ROM_LOAD( "esd4.su10", 0x000000, 0x020000, CRC(3c11c590) SHA1(cb33845c3dc0501fff8055c2d66f412881089df1) ) // AT27010 mask ROM
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "hedpanic.nv", 0x0000, 0x0080, CRC(e91f4038) SHA1(f492de71170900f87912a272ab4f4a3a37ba31fe) )
@@ -1232,11 +1559,11 @@ ROM_START( hedpanicf ) // Story line in Japanese, game instructions in English
 	ROM_LOAD16_BYTE( "esd1", 0x000001, 0x040000, CRC(d8574925) SHA1(bd4990778b90a49aa6b10f8cf6709ce2424f546a) ) // CU02
 
 	ROM_REGION( 0x40000, "audiocpu", 0 )        // Z80 Code
-	ROM_LOAD( "esd3.su06", 0x00000, 0x40000, CRC(a88d4424) SHA1(eefb5ac79632931a36f360713c482cd079891f91) ) // AT27C020 mask rom
+	ROM_LOAD( "esd3.su06", 0x00000, 0x40000, CRC(a88d4424) SHA1(eefb5ac79632931a36f360713c482cd079891f91) ) // AT27C020 mask ROM
 
 	ROM_REGION( 0x600000, "spr", 0 )    // Sprites, 16x16x5
-	ROM_LOAD( "esd6.ju01", 0x200000, 0x200000, CRC(5858372c) SHA1(dc96112587df681d53cf7449bd39477919978325) )
-	ROM_LOAD( "esd7.ju02", 0x000000, 0x200000, CRC(055d525f) SHA1(85ad474691f96e47311a1904015d1c92d3b2d607) )
+	ROM_LOAD( "esd7.ju02",        0x000000, 0x200000, CRC(055d525f) SHA1(85ad474691f96e47311a1904015d1c92d3b2d607) )
+	ROM_LOAD( "esd6.ju01",        0x200000, 0x200000, CRC(5858372c) SHA1(dc96112587df681d53cf7449bd39477919978325) )
 	// expand this to take up 0x200000 bytes too so we can decode it
 	ROM_LOAD16_BYTE( "esd5.ju07", 0x400000, 0x080000, CRC(bd785921) SHA1(c8bcb38d5aa6f5a27f0dedf7efd1d6737d59b4ca) )
 	ROM_FILL(                     0x500000, 0x100000, 0x00 )
@@ -1246,7 +1573,7 @@ ROM_START( hedpanicf ) // Story line in Japanese, game instructions in English
 	ROM_LOAD32_WORD( "esd9.fu34", 0x000002, 0x200000, CRC(76b46cd2) SHA1(679cbf50ae5935e8848868081ecef4ec66424f6c) )
 
 	ROM_REGION( 0x40000, "oki", 0 ) // Samples
-	ROM_LOAD( "esd4.su10", 0x000000, 0x020000, CRC(3c11c590) SHA1(cb33845c3dc0501fff8055c2d66f412881089df1) ) // AT27010 mask rom
+	ROM_LOAD( "esd4.su10", 0x000000, 0x020000, CRC(3c11c590) SHA1(cb33845c3dc0501fff8055c2d66f412881089df1) ) // AT27010 mask ROM
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "hedpanic.nv", 0x0000, 0x0080, CRC(e91f4038) SHA1(f492de71170900f87912a272ab4f4a3a37ba31fe) )
@@ -1259,11 +1586,11 @@ ROM_START( hedpanica ) // Story line & game instructions in English, copyright y
 	ROM_LOAD16_BYTE( "esd11.cu02", 0x000001, 0x040000, CRC(e1418f23) SHA1(39f14172d9b1a0d47edfe2456362fddc22f60066) ) // CU02
 
 	ROM_REGION( 0x40000, "audiocpu", 0 )        // Z80 Code
-	ROM_LOAD( "esd3.su06", 0x00000, 0x40000, CRC(a88d4424) SHA1(eefb5ac79632931a36f360713c482cd079891f91) ) // AT27C020 mask rom
+	ROM_LOAD( "esd3.su06", 0x00000, 0x40000, CRC(a88d4424) SHA1(eefb5ac79632931a36f360713c482cd079891f91) ) // AT27C020 mask ROM
 
 	ROM_REGION( 0x600000, "spr", 0 )    // Sprites, 16x16x5
-	ROM_LOAD( "ju04", 0x200000, 0x200000, CRC(4f3503d7) SHA1(4bed795c7328e0ebfa97688918eb8a908c29deb8) )
-	ROM_LOAD( "ju06", 0x000000, 0x200000, CRC(9f6f6193) SHA1(c7c7ae6898ab7177eefb0e525d827666e2af9f7e) )
+	ROM_LOAD( "ju06",            0x000000, 0x200000, CRC(9f6f6193) SHA1(c7c7ae6898ab7177eefb0e525d827666e2af9f7e) )
+	ROM_LOAD( "ju04",            0x200000, 0x200000, CRC(4f3503d7) SHA1(4bed795c7328e0ebfa97688918eb8a908c29deb8) )
 	// expand this to take up 0x200000 bytes too so we can decode it
 	ROM_LOAD16_BYTE( "esd5.bin", 0x400000, 0x080000, CRC(6968265a) SHA1(84b4f2d8b3bf6ea4117fa8281c76b58df778261d) ) // JU07
 	ROM_FILL(                    0x500000, 0x100000, 0x00 )
@@ -1286,11 +1613,11 @@ ROM_START( hedpanico ) // Story line & game instructions in English, copyright y
 	ROM_LOAD16_BYTE( "esd1.rom", 0x000001, 0x040000, CRC(4e0682c5) SHA1(f4117f31b6426d7bf126a6c62c489b9347885b42) ) // CU02
 
 	ROM_REGION( 0x40000, "audiocpu", 0 )        // Z80 Code
-	ROM_LOAD( "esd3.su06", 0x00000, 0x40000, CRC(a88d4424) SHA1(eefb5ac79632931a36f360713c482cd079891f91) ) // AT27C020 mask rom
+	ROM_LOAD( "esd3.su06", 0x00000, 0x40000, CRC(a88d4424) SHA1(eefb5ac79632931a36f360713c482cd079891f91) ) // AT27C020 mask ROM
 
 	ROM_REGION( 0x600000, "spr", 0 )    // Sprites, 16x16x5
-	ROM_LOAD( "sm1.ju01", 0x000000, 0x200000, CRC(8083813f) SHA1(9492e7e844e45d59f0506f69d40c338b27bd3ce3) )
-	ROM_LOAD( "sm2.ju02", 0x200000, 0x200000, CRC(7a9610e4) SHA1(21ae3ec3fbddfc66416c109b091bd885d5ba0558) )
+	ROM_LOAD( "sm1.ju01",        0x000000, 0x200000, CRC(8083813f) SHA1(9492e7e844e45d59f0506f69d40c338b27bd3ce3) )
+	ROM_LOAD( "sm2.ju02",        0x200000, 0x200000, CRC(7a9610e4) SHA1(21ae3ec3fbddfc66416c109b091bd885d5ba0558) )
 	// expand this to take up 0x200000 bytes too so we can decode it
 	ROM_LOAD16_BYTE( "esd5.rom", 0x400000, 0x080000, CRC(82c5727f) SHA1(017f1d0c94475c51d17f12e24895f47a273a2dbb) ) // JU07
 	ROM_FILL(                    0x500000, 0x100000, 0x00 )
@@ -1301,6 +1628,33 @@ ROM_START( hedpanico ) // Story line & game instructions in English, copyright y
 
 	ROM_REGION( 0x40000, "oki", 0 ) // Samples
 	ROM_LOAD( "esd4.rom", 0x000000, 0x020000, CRC(d7ca6806) SHA1(8ad668bfb5b7561cc0f3e36dfc3c936b136a4274) ) // SU10
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "hedpanic.nv", 0x0000, 0x0080, CRC(e91f4038) SHA1(f492de71170900f87912a272ab4f4a3a37ba31fe) )
+ROM_END
+
+
+ROM_START( hedpanic830 ) // Story line & game instructions in English
+	ROM_REGION( 0x080000, "maincpu", 0 )        // 68000 Code
+	ROM_LOAD16_BYTE( "esd2.cu03", 0x000000, 0x040000, CRC(955be87f) SHA1(835ec1c9a6d77d095bac7427e428ec25861d91dd) )
+	ROM_LOAD16_BYTE( "esd1.cu02", 0x000001, 0x040000, CRC(b56a4fe8) SHA1(dc64c81c1a04af8b248d3e46ddee73eca23c74fd) )
+
+	ROM_REGION( 0x40000, "audiocpu", 0 )  // couldn't read properly, but looking at the various reads it probably matches the other sets
+	ROM_LOAD( "esd3.su06", 0x00000, 0x40000, BAD_DUMP CRC(a88d4424) SHA1(eefb5ac79632931a36f360713c482cd079891f91) )
+
+	ROM_REGION( 0x600000, "spr", 0 )    // Sprites, 16x16x5
+	ROM_LOAD( "esd7.ju02",        0x000000, 0x200000, CRC(5554ba0f) SHA1(6d02fa6d0712aa820231a24ee7a8396cc575e788) )
+	ROM_LOAD( "esd6.ju01",        0x200000, 0x200000, CRC(ffa6eb26) SHA1(c2e3371925604db0f46991cbfd39d763518ed89c) )
+	// expand this to take up 0x200000 bytes too so we can decode it
+	ROM_LOAD16_BYTE( "esd5.ju07", 0x400000, 0x080000, CRC(95269b3c) SHA1(df106d9e8d4c1484ff86170adcb1932d4d02f265) )
+	ROM_FILL(                     0x500000, 0x100000, 0x00 )
+
+	ROM_REGION( 0x400000, "bgs", 0 )    // Layers, 16x16x8
+	ROM_LOAD32_WORD( "esd8.fu35", 0x000000, 0x200000, CRC(23aceb4f) SHA1(35d9ebc33b9e1515e47750cfcdfc0bf8bf44b71d) )
+	ROM_LOAD32_WORD( "esd9.fu34", 0x000002, 0x200000, CRC(76b46cd2) SHA1(679cbf50ae5935e8848868081ecef4ec66424f6c) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) // Samples
+	ROM_LOAD( "esd4.su10", 0x000000, 0x040000, CRC(5ba89bf1) SHA1(f3c5b588dc3fbd0dba3120aa60f76c08db4c6e08) ) // 1ST AND 2ND HALF IDENTICAL
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "hedpanic.nv", 0x0000, 0x0080, CRC(e91f4038) SHA1(f492de71170900f87912a272ab4f4a3a37ba31fe) )
@@ -1364,21 +1718,21 @@ ROM_START( deluxe5 ) // Deluxe 5
 	ROM_LOAD16_BYTE( "esd1.cu03", 0x000001, 0x040000,  CRC(15d6644f) SHA1(cfb8168167389855f906658511d1dc7460e13100) ) // M27C2001 EPROM
 
 	ROM_REGION( 0x40000, "audiocpu", 0 )        // Z80 Code
-	ROM_LOAD( "esd3.su06", 0x00000, 0x40000, CRC(31de379a) SHA1(a0c9a9cec7207cc4ba33abb68bef62d7eb8e75e9) ) // AM27C020 mask rom
+	ROM_LOAD( "esd3.su06", 0x00000, 0x40000, CRC(31de379a) SHA1(a0c9a9cec7207cc4ba33abb68bef62d7eb8e75e9) ) // AM27C020 mask ROM
 
 	ROM_REGION( 0x180000, "spr", 0 )    // Sprites, 16x16x5
-	ROM_LOAD16_BYTE( "am27c020.ju06", 0x000000, 0x040000, CRC(8b853bce) SHA1(fa6e654fc965d88bb426b76cdce3417f357b25f3) ) // AM27C020 mask roms with no label
+	ROM_LOAD16_BYTE( "am27c020.ju06", 0x000000, 0x040000, CRC(8b853bce) SHA1(fa6e654fc965d88bb426b76cdce3417f357b25f3) ) // AM27C020 mask ROMs with no label
 	ROM_LOAD16_BYTE( "am27c020.ju05", 0x000001, 0x040000, CRC(bbe81779) SHA1(750387fb4aaa04b7f4f1d3985896f5e11219e3ea) )
 	ROM_LOAD16_BYTE( "am27c020.ju04", 0x080000, 0x040000, CRC(40fa2c2f) SHA1(b9d9bfdc9343f00bad9749c76472f064c509cfce) )
 	ROM_LOAD16_BYTE( "am27c020.ju03", 0x080001, 0x040000, CRC(aa130fd3) SHA1(46a55d8ca59a52e610600fdba76d9729528d2871) )
 	ROM_LOAD16_BYTE( "am27c020.ju07", 0x100000, 0x040000, CRC(d414c3af) SHA1(9299b07a8c7a3e30a1bb6028204a049a7cb510f7) )
 
 	ROM_REGION( 0x400000, "bgs", 0 )    // Layers, 16x16x8
-	ROM_LOAD32_WORD( "fu35", 0x000000, 0x200000, CRC(ae10242a) SHA1(f3d18c0cb7951b5f7ee47aa2856b7554088328ed) ) // No labels on the flash roms
-	ROM_LOAD32_WORD( "fu34", 0x000002, 0x200000, CRC(248b8c05) SHA1(fe7bcc05ae0dd0a27c6ba4beb4ac155a8f3d7f7e) ) // No labels on the flash roms
+	ROM_LOAD32_WORD( "fu35", 0x000000, 0x200000, CRC(ae10242a) SHA1(f3d18c0cb7951b5f7ee47aa2856b7554088328ed) ) // No labels on the flash ROMs
+	ROM_LOAD32_WORD( "fu34", 0x000002, 0x200000, CRC(248b8c05) SHA1(fe7bcc05ae0dd0a27c6ba4beb4ac155a8f3d7f7e) ) // No labels on the flash ROMs
 
 	ROM_REGION( 0x40000, "oki", 0 ) // Samples
-	ROM_LOAD( "esd4.su10", 0x00000, 0x20000, CRC(23f2b7d9) SHA1(328c951d14674760df68486841c933bad0d59fe3) ) // AT27C010 mask rom
+	ROM_LOAD( "esd4.su10", 0x00000, 0x20000, CRC(23f2b7d9) SHA1(328c951d14674760df68486841c933bad0d59fe3) ) // AT27C010 mask ROM
 
 	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASE00 ) // factory default settings because game doesn't init them properly otherwise
 	ROM_LOAD16_WORD_SWAP( "eeprom", 0x0000, 0x0080, CRC(4539a8a0) SHA1(b882110b489e61ac5421fbe3551d9ee323b5d86b) )
@@ -1390,21 +1744,21 @@ ROM_START( deluxe5a ) // Deluxe 5
 	ROM_LOAD16_BYTE( "esd1.cu03", 0x000001, 0x040000,  CRC(24f4d7b9) SHA1(bb0eabdd72a475149d6df768d9d29b545f061e54) ) // sldh
 
 	ROM_REGION( 0x40000, "audiocpu", 0 )        // Z80 Code
-	ROM_LOAD( "esd3.su06", 0x00000, 0x40000, CRC(31de379a) SHA1(a0c9a9cec7207cc4ba33abb68bef62d7eb8e75e9) ) // AM27C020 mask rom
+	ROM_LOAD( "esd3.su06", 0x00000, 0x40000, CRC(31de379a) SHA1(a0c9a9cec7207cc4ba33abb68bef62d7eb8e75e9) ) // AM27C020 mask ROM
 
 	ROM_REGION( 0x180000, "spr", 0 )    // Sprites, 16x16x5
-	ROM_LOAD16_BYTE( "am27c020.ju06", 0x000000, 0x040000, CRC(8b853bce) SHA1(fa6e654fc965d88bb426b76cdce3417f357b25f3) ) // AM27C020 mask roms with no label
+	ROM_LOAD16_BYTE( "am27c020.ju06", 0x000000, 0x040000, CRC(8b853bce) SHA1(fa6e654fc965d88bb426b76cdce3417f357b25f3) ) // AM27C020 mask ROMs with no label
 	ROM_LOAD16_BYTE( "am27c020.ju05", 0x000001, 0x040000, CRC(bbe81779) SHA1(750387fb4aaa04b7f4f1d3985896f5e11219e3ea) )
 	ROM_LOAD16_BYTE( "am27c020.ju04", 0x080000, 0x040000, CRC(40fa2c2f) SHA1(b9d9bfdc9343f00bad9749c76472f064c509cfce) )
 	ROM_LOAD16_BYTE( "am27c020.ju03", 0x080001, 0x040000, CRC(aa130fd3) SHA1(46a55d8ca59a52e610600fdba76d9729528d2871) )
 	ROM_LOAD16_BYTE( "am27c020.ju07", 0x100000, 0x040000, CRC(d414c3af) SHA1(9299b07a8c7a3e30a1bb6028204a049a7cb510f7) )
 
 	ROM_REGION( 0x400000, "bgs", 0 )    // Layers, 16x16x8
-	ROM_LOAD32_WORD( "fu35", 0x000000, 0x200000, CRC(ae10242a) SHA1(f3d18c0cb7951b5f7ee47aa2856b7554088328ed) ) // No labels on the flash roms
-	ROM_LOAD32_WORD( "fu34", 0x000002, 0x200000, CRC(248b8c05) SHA1(fe7bcc05ae0dd0a27c6ba4beb4ac155a8f3d7f7e) ) // No labels on the flash roms
+	ROM_LOAD32_WORD( "fu35", 0x000000, 0x200000, CRC(ae10242a) SHA1(f3d18c0cb7951b5f7ee47aa2856b7554088328ed) ) // No labels on the flash ROMs
+	ROM_LOAD32_WORD( "fu34", 0x000002, 0x200000, CRC(248b8c05) SHA1(fe7bcc05ae0dd0a27c6ba4beb4ac155a8f3d7f7e) ) // No labels on the flash ROMs
 
 	ROM_REGION( 0x40000, "oki", 0 ) // Samples
-	ROM_LOAD( "esd4.su10", 0x00000, 0x20000, CRC(23f2b7d9) SHA1(328c951d14674760df68486841c933bad0d59fe3) ) // AT27C010 mask rom
+	ROM_LOAD( "esd4.su10", 0x00000, 0x20000, CRC(23f2b7d9) SHA1(328c951d14674760df68486841c933bad0d59fe3) ) // AT27C010 mask ROM
 
 	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASE00 ) // factory default settings because game doesn't init them properly otherwise
 	ROM_LOAD16_WORD_SWAP( "eeprom", 0x0000, 0x0080, CRC(4539a8a0) SHA1(b882110b489e61ac5421fbe3551d9ee323b5d86b) )
@@ -1416,21 +1770,21 @@ ROM_START( deluxe5b ) // Deluxe 5
 	ROM_LOAD16_BYTE( "esd1.cu03", 0x000001, 0x040000,  CRC(7cc119c8) SHA1(4d2d37e815ab3211ff88c2e6584b4eaee1cd202d) ) // sldh
 
 	ROM_REGION( 0x40000, "audiocpu", 0 )        // Z80 Code
-	ROM_LOAD( "esd3.su06", 0x00000, 0x40000, CRC(31de379a) SHA1(a0c9a9cec7207cc4ba33abb68bef62d7eb8e75e9) ) // AM27C020 mask rom
+	ROM_LOAD( "esd3.su06", 0x00000, 0x40000, CRC(31de379a) SHA1(a0c9a9cec7207cc4ba33abb68bef62d7eb8e75e9) ) // AM27C020 mask ROM
 
 	ROM_REGION( 0x180000, "spr", 0 )    // Sprites, 16x16x5
-	ROM_LOAD16_BYTE( "am27c020.ju06", 0x000000, 0x040000, CRC(8b853bce) SHA1(fa6e654fc965d88bb426b76cdce3417f357b25f3) ) // AM27C020 mask roms with no label
+	ROM_LOAD16_BYTE( "am27c020.ju06", 0x000000, 0x040000, CRC(8b853bce) SHA1(fa6e654fc965d88bb426b76cdce3417f357b25f3) ) // AM27C020 mask ROMs with no label
 	ROM_LOAD16_BYTE( "am27c020.ju05", 0x000001, 0x040000, CRC(bbe81779) SHA1(750387fb4aaa04b7f4f1d3985896f5e11219e3ea) )
 	ROM_LOAD16_BYTE( "am27c020.ju04", 0x080000, 0x040000, CRC(40fa2c2f) SHA1(b9d9bfdc9343f00bad9749c76472f064c509cfce) )
 	ROM_LOAD16_BYTE( "am27c020.ju03", 0x080001, 0x040000, CRC(aa130fd3) SHA1(46a55d8ca59a52e610600fdba76d9729528d2871) )
 	ROM_LOAD16_BYTE( "am27c020.ju07", 0x100000, 0x040000, CRC(d414c3af) SHA1(9299b07a8c7a3e30a1bb6028204a049a7cb510f7) )
 
 	ROM_REGION( 0x400000, "bgs", 0 )    // Layers, 16x16x8
-	ROM_LOAD32_WORD( "fu35", 0x000000, 0x200000, CRC(ae10242a) SHA1(f3d18c0cb7951b5f7ee47aa2856b7554088328ed) ) // No labels on the flash roms
-	ROM_LOAD32_WORD( "fu34", 0x000002, 0x200000, CRC(248b8c05) SHA1(fe7bcc05ae0dd0a27c6ba4beb4ac155a8f3d7f7e) ) // No labels on the flash roms
+	ROM_LOAD32_WORD( "fu35", 0x000000, 0x200000, CRC(ae10242a) SHA1(f3d18c0cb7951b5f7ee47aa2856b7554088328ed) ) // No labels on the flash ROMs
+	ROM_LOAD32_WORD( "fu34", 0x000002, 0x200000, CRC(248b8c05) SHA1(fe7bcc05ae0dd0a27c6ba4beb4ac155a8f3d7f7e) ) // No labels on the flash ROMs
 
 	ROM_REGION( 0x40000, "oki", 0 ) // Samples
-	ROM_LOAD( "esd4.su10", 0x00000, 0x20000, CRC(23f2b7d9) SHA1(328c951d14674760df68486841c933bad0d59fe3) ) // AT27C010 mask rom
+	ROM_LOAD( "esd4.su10", 0x00000, 0x20000, CRC(23f2b7d9) SHA1(328c951d14674760df68486841c933bad0d59fe3) ) // AT27C010 mask ROM
 
 	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASE00 ) // factory default settings because game doesn't init them properly otherwise
 	ROM_LOAD16_WORD_SWAP( "eeprom", 0x0000, 0x0080, CRC(4539a8a0) SHA1(b882110b489e61ac5421fbe3551d9ee323b5d86b) )
@@ -1443,21 +1797,21 @@ ROM_START( deluxe4u ) // Deluxe 4 U - Removes Blackjack game, but otherwise same
 	ROM_LOAD16_BYTE( "1.cu03", 0x000001, 0x040000,  CRC(fbf14d74) SHA1(5ff5bf4ff55609452d5b8a49d8658f878541ce60) )
 
 	ROM_REGION( 0x40000, "audiocpu", 0 )        // Z80 Code
-	ROM_LOAD( "esd3.su06", 0x00000, 0x40000, CRC(31de379a) SHA1(a0c9a9cec7207cc4ba33abb68bef62d7eb8e75e9) ) // AM27C020 mask rom
+	ROM_LOAD( "esd3.su06", 0x00000, 0x40000, CRC(31de379a) SHA1(a0c9a9cec7207cc4ba33abb68bef62d7eb8e75e9) ) // AM27C020 mask ROM
 
 	ROM_REGION( 0x180000, "spr", 0 )    // Sprites, 16x16x5
-	ROM_LOAD16_BYTE( "am27c020.ju06", 0x000000, 0x040000, CRC(8b853bce) SHA1(fa6e654fc965d88bb426b76cdce3417f357b25f3) ) // AM27C020 mask roms with no label
+	ROM_LOAD16_BYTE( "am27c020.ju06", 0x000000, 0x040000, CRC(8b853bce) SHA1(fa6e654fc965d88bb426b76cdce3417f357b25f3) ) // AM27C020 mask ROMs with no label
 	ROM_LOAD16_BYTE( "am27c020.ju05", 0x000001, 0x040000, CRC(bbe81779) SHA1(750387fb4aaa04b7f4f1d3985896f5e11219e3ea) )
 	ROM_LOAD16_BYTE( "am27c020.ju04", 0x080000, 0x040000, CRC(40fa2c2f) SHA1(b9d9bfdc9343f00bad9749c76472f064c509cfce) )
 	ROM_LOAD16_BYTE( "am27c020.ju03", 0x080001, 0x040000, CRC(aa130fd3) SHA1(46a55d8ca59a52e610600fdba76d9729528d2871) )
 	ROM_LOAD16_BYTE( "am27c020.ju07", 0x100000, 0x040000, CRC(d414c3af) SHA1(9299b07a8c7a3e30a1bb6028204a049a7cb510f7) )
 
 	ROM_REGION( 0x400000, "bgs", 0 )    // Layers, 16x16x8
-	ROM_LOAD32_WORD( "fu35", 0x000000, 0x200000, CRC(6df14570) SHA1(fa4fc64c984d6a94fe61ec809ec515e840388704) ) // Specific to Deluxe 4 U - No labels on the flash roms
-	ROM_LOAD32_WORD( "fu34", 0x000002, 0x200000, CRC(93175d6d) SHA1(691832134f43e17bb767dff080b2736288961414) ) // Specific to Deluxe 4 U - No labels on the flash roms
+	ROM_LOAD32_WORD( "fu35", 0x000000, 0x200000, CRC(6df14570) SHA1(fa4fc64c984d6a94fe61ec809ec515e840388704) ) // Specific to Deluxe 4 U - No labels on the flash ROMs
+	ROM_LOAD32_WORD( "fu34", 0x000002, 0x200000, CRC(93175d6d) SHA1(691832134f43e17bb767dff080b2736288961414) ) // Specific to Deluxe 4 U - No labels on the flash ROMs
 
 	ROM_REGION( 0x40000, "oki", 0 ) // Samples
-	ROM_LOAD( "esd4.su10", 0x00000, 0x20000, CRC(23f2b7d9) SHA1(328c951d14674760df68486841c933bad0d59fe3) ) // AT27C010 mask rom
+	ROM_LOAD( "esd4.su10", 0x00000, 0x20000, CRC(23f2b7d9) SHA1(328c951d14674760df68486841c933bad0d59fe3) ) // AT27C010 mask ROM
 
 	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASE00 ) // factory default settings because game doesn't init them properly otherwise
 	ROM_LOAD16_WORD_SWAP( "eeprom", 0x0000, 0x0080, CRC(4539a8a0) SHA1(b882110b489e61ac5421fbe3551d9ee323b5d86b) )
@@ -1599,7 +1953,7 @@ ROM_START( swatpolc ) // SWAT Police
 	ROM_LOAD16_BYTE( "esd.cu03", 0x000001, 0x040000,  CRC(1070208b) SHA1(1e058774c5aee1de15ffcd26d530b23592286db1) ) // ESD labels but not numbered
 
 	ROM_REGION( 0x40000, "audiocpu", 0 )        // Z80 Code
-	ROM_LOAD( "esd3.su06", 0x00000, 0x40000, CRC(80e97dbe) SHA1(d6fae689cd3737777f36c980b9a7d9e42b06a467) ) // 2 roms on PCB with an ESD3 label
+	ROM_LOAD( "esd3.su06", 0x00000, 0x40000, CRC(80e97dbe) SHA1(d6fae689cd3737777f36c980b9a7d9e42b06a467) ) // 2 ROMs on PCB with an ESD3 label
 
 	ROM_REGION( 0x300000, "spr", 0 )    // Sprites, 16x16x5
 	ROM_LOAD16_BYTE( "esd4.ju06", 0x000000, 0x080000, CRC(bde1b130) SHA1(e45a2257f8c4d107dfb7401b5ae1b79951052bc6) )
@@ -1609,11 +1963,11 @@ ROM_START( swatpolc ) // SWAT Police
 	ROM_LOAD16_BYTE( "esd5.ju07", 0x200000, 0x080000, CRC(d2c27f03) SHA1(7cbdf7f7ff17df16ca81823f69e82ae1cf96b714) )
 
 	ROM_REGION( 0x400000, "bgs", 0 )    // Layers, 16x16x8
-	ROM_LOAD32_WORD( "fu35", 0x000000, 0x200000, CRC(c55897c5) SHA1(f6e0ef1c2fcfe6a511fe787a3abeff4da16d1b54) ) // No labels on the flash roms
-	ROM_LOAD32_WORD( "fu34", 0x000002, 0x200000, CRC(7117a6a2) SHA1(17c0ab02698cffa0582ed2d2b7dbb7fed8cd9393) ) // No labels on the flash roms
+	ROM_LOAD32_WORD( "fu35", 0x000000, 0x200000, CRC(c55897c5) SHA1(f6e0ef1c2fcfe6a511fe787a3abeff4da16d1b54) ) // No labels on the flash ROMs
+	ROM_LOAD32_WORD( "fu34", 0x000002, 0x200000, CRC(7117a6a2) SHA1(17c0ab02698cffa0582ed2d2b7dbb7fed8cd9393) ) // No labels on the flash ROMs
 
 	ROM_REGION( 0x40000, "oki", 0 ) // Samples
-	ROM_LOAD( "at27c020.su10", 0x00000, 0x40000, CRC(c43efec2) SHA1(4ef328d8703b81328de09ecc4328763aba06e883) ) // AT27C020 mask rom with no label
+	ROM_LOAD( "at27c020.su10", 0x00000, 0x40000, CRC(c43efec2) SHA1(4ef328d8703b81328de09ecc4328763aba06e883) ) // AT27C020 mask ROM with no label
 ROM_END
 
 
@@ -1796,6 +2150,9 @@ ROM_START( fantstrya ) // PCB marked: PNXND-MULTI 2002 01 01 - Only EPROMs dumpe
 	ROM_LOAD16_BYTE( "graphics_rom_1", 0x200000, 0x080000, CRC(c8caa752) SHA1(cecc7a18a0bb59554316ed24ed0dc01d58d6ae53) ) // 1bpp, 27c040
 ROM_END
 
+} // anonymous namespace
+
+
 /***************************************************************************
 
 
@@ -1805,35 +2162,39 @@ ROM_END
 ***************************************************************************/
 
 // ESD 11-09-98
-GAME( 1999, multchmp,  0,        esd16,     multchmp, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ (World, ver. 2.5)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1998, multchmpk, multchmp, esd16,     multchmp, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ (Korea, older)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1998, multchmpa, multchmp, esd16,     multchmp, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ (World, older)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1999, multchmp25,  multchmp, esd16,     multchmp, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ (World, ver. 2.5)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1998, multchmpk,   multchmp, esd16,     multchmp, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ (Korea, older)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1998, multchmpa,   multchmp, esd16,     multchmp, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ (World, older)",                 MACHINE_SUPPORTS_SAVE )
 
-GAME( 2001, jumppop,   0,        jumppop,   jumppop,  esd16_state, empty_init, ROT0, "ESD",         "Jumping Pop (set 1)",                        MACHINE_SUPPORTS_SAVE )
-GAME( 2001, jumppope,  jumppop,  jumppop,   jumppop,  esd16_state, empty_init, ROT0, "Emag Soft",   "Jumping Pop (set 2)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 2001, jumppop,     0,        jumppop,   jumppop,  esd16_state, empty_init, ROT0, "ESD",         "Jumping Pop (set 1)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 2001, jumppope,    jumppop,  jumppop,   jumppop,  esd16_state, empty_init, ROT0, "Emag Soft",   "Jumping Pop (set 2)",                        MACHINE_SUPPORTS_SAVE )
+
+// ESD 05-17-99
+GAME( 1999, multchmp,    0,        esd16,     multchmp, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ (World, ver. 9.6)",              MACHINE_SUPPORTS_SAVE )
 
 // ESD 05-28-99
-GAME( 1999, hedpanico, hedpanic, hedpanio,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Head Panic (ver. 0615, 15/06/1999)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1999, hedpanico,   hedpanic, hedpanio,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Head Panic (ver. 0615, 15/06/1999)",         MACHINE_SUPPORTS_SAVE )
 
 // ESD 06-10-1999
-GAME( 1999, hedpanica, hedpanic, hedpanic,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Head Panic (ver. 0702, 02/07/1999)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1999, hedpanica,   hedpanic, hedpanic,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Head Panic (ver. 0702, 02/07/1999)",         MACHINE_SUPPORTS_SAVE )
 
 // ESD 08-26-1999
-GAME( 2000, mchampdx,  0,        mchampdx,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ Deluxe (ver. 0106, 06/01/2000)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, mchampdxa, mchampdx, mchampdx,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ Deluxe (ver. 1126, 26/11/1999)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, mchampdxb, mchampdx, mchampdx,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ Deluxe (ver. 1114, 14/11/1999)", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, hedpanic,  0,        hedpanic,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Head Panic (ver. 0117, 17/01/2000)",         MACHINE_SUPPORTS_SAVE )
-GAME( 2000, hedpanicf, hedpanic, hedpanic,  hedpanic, esd16_state, empty_init, ROT0, "ESD / Fuuki", "Head Panic (ver. 0315, 15/03/2000)",         MACHINE_SUPPORTS_SAVE )
+GAME( 2000, mchampdx,    0,        mchampdx,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ Deluxe (ver. 0106, 06/01/2000)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, mchampdxa,   mchampdx, mchampdx,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ Deluxe (ver. 1126, 26/11/1999)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, mchampdxb,   mchampdx, mchampdx,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Multi Champ Deluxe (ver. 1114, 14/11/1999)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, hedpanic830, hedpanic, hedpanic,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Head Panic (ver. 8.30)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 2000, hedpanic,    0,        hedpanic,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Head Panic (ver. 0117, 17/01/2000)",         MACHINE_SUPPORTS_SAVE )
+GAME( 2000, hedpanicf,   hedpanic, hedpanic,  hedpanic, esd16_state, empty_init, ROT0, "ESD / Fuuki", "Head Panic (ver. 0315, 15/03/2000)",         MACHINE_SUPPORTS_SAVE )
 
 // ESD - This PCB looks identical to the ESD 08-26-1999 PCB
-GAME( 2000, deluxe5,   0,        tangtang,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 1)",    MACHINE_SUPPORTS_SAVE ) // all 4 sets report the same version number?
-GAME( 2000, deluxe5a,  deluxe5,  tangtang,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 2)",    MACHINE_SUPPORTS_SAVE )
-GAME( 2000, deluxe5b,  deluxe5,  tangtang,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 3)",    MACHINE_SUPPORTS_SAVE )
-GAME( 2000, deluxe4u,  deluxe5,  tangtang,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Deluxe 4 U (ver. 0107, 07/01/2000)",         MACHINE_SUPPORTS_SAVE )
+GAME( 2000, deluxe5,     0,        tangtang,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 1)",    MACHINE_SUPPORTS_SAVE ) // all 4 sets report the same version number?
+GAME( 2000, deluxe5a,    deluxe5,  tangtang,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 2)",    MACHINE_SUPPORTS_SAVE )
+GAME( 2000, deluxe5b,    deluxe5,  tangtang,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 3)",    MACHINE_SUPPORTS_SAVE )
+GAME( 2000, deluxe4u,    deluxe5,  tangtang,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Deluxe 4 U (ver. 0107, 07/01/2000)",         MACHINE_SUPPORTS_SAVE )
 
-GAME( 2000, tangtang,  0,        tangtang,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Tang Tang (ver. 0526, 26/05/2000)",          MACHINE_SUPPORTS_SAVE )
-GAME( 2001, swatpolc,  0,        hedpanic,  swatpolc, esd16_state, empty_init, ROT0, "ESD",         "SWAT Police",                                MACHINE_SUPPORTS_SAVE )
+GAME( 2000, tangtang,    0,        tangtang,  hedpanic, esd16_state, empty_init, ROT0, "ESD",         "Tang Tang (ver. 0526, 26/05/2000)",          MACHINE_SUPPORTS_SAVE )
+GAME( 2001, swatpolc,    0,        hedpanic,  swatpolc, esd16_state, empty_init, ROT0, "ESD",         "SWAT Police",                                MACHINE_SUPPORTS_SAVE )
 
 // Z Soft PCB, uses PIC instead of Z80
-GAME( 2002, fantstry,  0,        fantstry,  fantstry, esd16_state, empty_init, ROT0, "Z Soft",      "Fantasy Story (set 1)",                      MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // playable, just no sound
-GAME( 2002, fantstrya, fantstry, fantstrya, fantstry, esd16_state, empty_init, ROT0, "Z Soft",      "Fantasy Story (set 2)",                      MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // same
+GAME( 2002, fantstry,    0,        fantstry,  fantstry, esd16_state, empty_init, ROT0, "Z Soft",      "Fantasy Story (set 1)",                      MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // playable, just no sound
+GAME( 2002, fantstrya,   fantstry, fantstrya, fantstry, esd16_state, empty_init, ROT0, "Z Soft",      "Fantasy Story (set 2)",                      MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // same

@@ -197,8 +197,14 @@ uint16_t siena_state::kbd_r()
 void siena_state::palette_init(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(190, 220, 190));
-	palette.set_pen_color(1, rgb_t(130, 130, 110));
-	palette.set_pen_color(2, rgb_t(190, 210, 180));
+
+	for (int i = 1; i < 3; i++)
+	{
+		const int r = (0x99 * i) / 2;
+		const int g = (0xaa * i) / 2;
+		const int b = (0x88 * i) / 2;
+		m_palette->set_pen_color(i, rgb_t(r, g, b));
+	}
 }
 
 
@@ -225,7 +231,7 @@ void siena_state::siena(machine_config &config)
 	RAM(config, m_ram).set_default_size("512K").set_extra_options("1M");
 	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
-	PSION_CONDOR(config, m_condor);
+	PSION_CONDOR(config, m_condor, 3'686'400); // FIXME: unknown clock source
 	m_condor->txd_handler().set(m_honda, FUNC(psion_honda_slot_device::write_txd));
 	m_condor->rts_handler().set(m_honda, FUNC(psion_honda_slot_device::write_rts));
 	m_condor->dtr_handler().set(m_honda, FUNC(psion_honda_slot_device::write_dtr));
@@ -242,6 +248,7 @@ void siena_state::siena(machine_config &config)
 	m_asic9->data_w<4>().set(m_honda, FUNC(psion_honda_slot_device::data_w));
 
 	SOFTWARE_LIST(config, "ssd_list").set_original("psion_ssd").set_filter("SIENA");
+	//SOFTWARE_LIST(config, "flop_list").set_original("psion_flop").set_filter("SIENA");
 }
 
 

@@ -64,6 +64,7 @@ public:
 		m_keyboard(*this, "kbd"),
 		m_rs232b(*this, "rs232b"),
 		m_drive_led(*this, "drive%u_led", 0U),
+		m_rom_view(*this, "rom_view"),
 		m_sasi_dma(false),
 		m_dma_map(0),
 		m_status0(0), m_status1(0), m_status2(0),
@@ -81,8 +82,6 @@ private:
 	void memory_w(offs_t offset, uint8_t data);
 	uint8_t io_r(offs_t offset);
 	void io_w(offs_t offset, uint8_t data);
-	uint8_t page0_r(offs_t offset);
-	uint8_t page1_r(offs_t offset);
 	uint8_t mapper_r(offs_t offset);
 	void mapper_w(offs_t offset, uint8_t data);
 	uint8_t sasi_ctrl_r();
@@ -137,6 +136,8 @@ private:
 	required_device<rs232_port_device> m_rs232b;
 	output_finder<2> m_drive_led;
 
+	memory_view m_rom_view;
+
 	std::unique_ptr<uint8_t[]> m_ram;
 	std::unique_ptr<uint16_t[]> m_vram; // 10-bit
 	std::unique_ptr<uint8_t[]> m_dummy_r, m_dummy_w;
@@ -157,22 +158,13 @@ private:
 
 void kdt6_state::psi98_mem(address_map &map)
 {
-	map(0x0000, 0x0fff).bankr("page0_r").bankw("page0_w");
-	map(0x1000, 0x1fff).bankr("page1_r").bankw("page1_w");
-	map(0x2000, 0x2fff).bankr("page2_r").bankw("page2_w");
-	map(0x3000, 0x3fff).bankr("page3_r").bankw("page3_w");
-	map(0x4000, 0x4fff).bankr("page4_r").bankw("page4_w");
-	map(0x5000, 0x5fff).bankr("page5_r").bankw("page5_w");
-	map(0x6000, 0x6fff).bankr("page6_r").bankw("page6_w");
-	map(0x7000, 0x7fff).bankr("page7_r").bankw("page7_w");
-	map(0x8000, 0x8fff).bankr("page8_r").bankw("page8_w");
-	map(0x9000, 0x9fff).bankr("page9_r").bankw("page9_w");
-	map(0xa000, 0xafff).bankr("pagea_r").bankw("pagea_w");
-	map(0xb000, 0xbfff).bankr("pageb_r").bankw("pageb_w");
-	map(0xc000, 0xcfff).bankr("pagec_r").bankw("pagec_w");
-	map(0xd000, 0xdfff).bankr("paged_r").bankw("paged_w");
-	map(0xe000, 0xefff).bankr("pagee_r").bankw("pagee_w");
-	map(0xf000, 0xffff).bankr("pagef_r").bankw("pagef_w");
+	for (int i = 0; i < 16; i++)
+	{
+		map((i << 12) + 0x0000, (i << 12) + 0x0fff).bankr(m_page_r[i]).bankw(m_page_w[i]);
+	}
+	// override the region 0x0000 to 0x1fff here to enable prom reading
+	map(0x0000, 0x1fff).view(m_rom_view);
+	m_rom_view[0](0x0000, 0x1fff).rom().region("boot", 0);
 }
 
 void kdt6_state::psi98_io(address_map &map)
@@ -306,23 +298,23 @@ MC6845_UPDATE_ROW( kdt6_state::crtc_update_row )
 		if (BIT(m_status1, 6))
 		{
 			// text mode
-			uint16_t code = m_vram[((m_status1 & 0x03) << 14) | (ma + i)];
-			uint8_t data = m_gfx[((code & 0xff) << 4) | ra];
+			uint16_t const code = m_vram[((m_status1 & 0x03) << 14) | (ma + i)];
+			uint8_t const data = m_gfx[((code & 0xff) << 4) | ra];
 
-			int inverse = BIT(code, 8) | BIT(m_status1, 5) | ((i == cursor_x) ? 1 : 0);
-			int blink = BIT(code, 9) & m_crtc->cursor_r();
+			int const inverse = BIT(code, 8) | BIT(m_status1, 5) | ((i == cursor_x) ? 1 : 0);
+			int const blink = BIT(code, 9) & m_crtc->cursor_r();
 
 			// draw 8 pixels of the character
 			for (int x = 0; x < 8; x++)
 			{
-				int color = BIT(data, 7 - x);
+				int const color = BIT(data, 7 - x);
 				bitmap.pix(y, x + i*8) = pen[blink ? 0 : (color ^ inverse)];
 			}
 		}
 		else
 		{
 			// gfx mode
-			uint8_t data = m_vram[(ma << 4) | (ra << 6) | i];
+			uint8_t const data = m_vram[(ma << 4) | (ra << 6) | i];
 
 			// draw 8 pixels of the cell
 			for (int x = 0; x < 8; x++)
@@ -406,22 +398,6 @@ void kdt6_state::io_w(offs_t offset, uint8_t data)
 	m_cpu->space(AS_IO).write_byte(offset, data);
 }
 
-uint8_t kdt6_state::page0_r(offs_t offset)
-{
-	if (BIT(m_status0, 5) == 0)
-		return m_boot->as_u8(offset);
-
-	return reinterpret_cast<uint8_t *>(m_page_r[0]->base())[offset];
-}
-
-uint8_t kdt6_state::page1_r(offs_t offset)
-{
-	if (BIT(m_status0, 5) == 0)
-		return m_boot->as_u8(0x1000 + offset);
-
-	return reinterpret_cast<uint8_t *>(m_page_r[1]->base())[offset];
-}
-
 uint8_t kdt6_state::sasi_ctrl_r()
 {
 	uint8_t data = 0;
@@ -463,7 +439,7 @@ void kdt6_state::mapper_w(offs_t offset, uint8_t data)
 
 	if (BIT(m_status1, 7) == 0)
 	{
-		offs_t addr = bitswap(m_mapper[offset], 8, 9, 10, 11, 7, 6, 5, 4, 0, 1, 2, 3) << 12;
+		offs_t const addr = bitswap(m_mapper[offset], 8, 9, 10, 11, 7, 6, 5, 4, 0, 1, 2, 3) << 12;
 
 		m_page_r[offset]->set_base(addr < 0x40000 ? &m_ram[addr] : &m_dummy_r[0]);
 		m_page_w[offset]->set_base(addr < 0x40000 ? &m_ram[addr] : &m_dummy_w[0]);
@@ -493,6 +469,11 @@ void kdt6_state::status0_w(uint8_t data)
 		m_beeper->set_state(1);
 		m_beep_timer->adjust(attotime::from_msec(250)); // timing unknown
 	}
+
+	if (BIT(data, 5))
+		m_rom_view.disable();
+	else
+		m_rom_view.select(0);
 
 	for (auto &floppy : m_floppy)
 		if (floppy->get_device())
@@ -569,10 +550,6 @@ void kdt6_state::machine_start()
 	m_vram = std::make_unique<uint16_t[]>(0x10000);
 	m_dummy_r = std::make_unique<uint8_t[]>(0x1000);
 	m_dummy_w = std::make_unique<uint8_t[]>(0x1000);
-
-	// override the region 0x0000 to 0x1fff here to enable prom reading
-	m_cpu->space(AS_PROGRAM).install_read_handler(0x0000, 0x0fff, read8sm_delegate(*this, FUNC(kdt6_state::page0_r)));
-	m_cpu->space(AS_PROGRAM).install_read_handler(0x1000, 0x1fff, read8sm_delegate(*this, FUNC(kdt6_state::page1_r)));
 
 	m_fdc->set_rate(250000);
 

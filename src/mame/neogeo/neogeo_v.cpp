@@ -14,8 +14,6 @@
 #define VERBOSE     (0)
 
 
-#define NUM_PENS    (0x1000)
-
 /*************************************
  *
  *  Palette handling
@@ -54,11 +52,11 @@ void neogeo_base_state::create_rgb_lookups()
 
 	for (int i = 0; i < 32; i++)
 	{
-		int i4 = (i >> 4) & 1;
-		int i3 = (i >> 3) & 1;
-		int i2 = (i >> 2) & 1;
-		int i1 = (i >> 1) & 1;
-		int i0 = (i >> 0) & 1;
+		int const i4 = BIT(i, 4);
+		int const i3 = BIT(i, 3);
+		int const i2 = BIT(i, 2);
+		int const i1 = BIT(i, 1);
+		int const i0 = BIT(i, 0);
 		m_palette_lookup[i][0] = combine_weights(weights_normal, i0, i1, i2, i3, i4);
 		m_palette_lookup[i][1] = combine_weights(weights_dark, i0, i1, i2, i3, i4);
 		m_palette_lookup[i][2] = combine_weights(weights_shadow, i0, i1, i2, i3, i4);
@@ -99,10 +97,10 @@ void neogeo_base_state::paletteram_w(offs_t offset, uint16_t data)
 	offset += m_palette_bank;
 	m_paletteram[offset] = data;
 
-	int dark = data >> 15;
-	int r = ((data >> 14) & 0x1) | ((data >> 7) & 0x1e);
-	int g = ((data >> 13) & 0x1) | ((data >> 3) & 0x1e);
-	int b = ((data >> 12) & 0x1) | ((data << 1) & 0x1e);
+	uint8_t const dark = data >> 15;
+	uint8_t const r = ((data >> 14) & 0x1) | ((data >> 7) & 0x1e);
+	uint8_t const g = ((data >> 13) & 0x1) | ((data >> 3) & 0x1e);
+	uint8_t const b = ((data >> 12) & 0x1) | ((data << 1) & 0x1e);
 
 	m_palette->set_pen_color(offset,
 								m_palette_lookup[r][dark],
@@ -128,7 +126,7 @@ void neogeo_base_state::video_start()
 
 	m_paletteram.resize(0x1000 * 2, 0);
 
-	m_screen_shadow = 0;
+	m_screen_shadow = false;
 	m_palette_bank = 0;
 
 	save_item(NAME(m_paletteram));
@@ -204,9 +202,13 @@ uint16_t neogeo_base_state::get_video_control()
 	if (v_counter >= 0x200)
 		v_counter = v_counter - NEOGEO_VTOTAL;
 
-	uint16_t ret = (v_counter << 7) | (m_sprgen->neogeo_get_auto_animation_counter() & 0x0007);
+	uint16_t const ret = (v_counter << 7) | (m_sprgen->get_auto_animation_counter() & 0x0007);
 
-	if (VERBOSE) logerror("%s: video_control read (%04x)\n", machine().describe_context(), ret);
+	if (!machine().side_effects_disabled())
+	{
+		if (VERBOSE)
+			logerror("%s: video_control read (%04x)\n", machine().describe_context(), ret);
+	}
 
 	return ret;
 }
@@ -217,7 +219,7 @@ void neogeo_base_state::set_video_control(uint16_t data)
 	if (VERBOSE) logerror("%s: video control write %04x\n", machine().describe_context(), data);
 
 	m_sprgen->set_auto_animation_speed(data >> 8);
-	m_sprgen->set_auto_animation_disabled(data & 0x0008);
+	m_sprgen->set_auto_animation_disabled(BIT(data, 3));
 
 	set_display_position_interrupt_control(data & 0x00f0);
 }

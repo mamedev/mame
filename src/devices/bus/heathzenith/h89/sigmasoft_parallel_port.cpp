@@ -32,192 +32,97 @@
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
-// TODO make this configurable with jumper config
-static constexpr u8 BASE_ADDR = 0x08;
 
-class sigmasoft_parallel_port : public device_t, public device_h89bus_left_card_interface
-{
-public:
-	sigmasoft_parallel_port(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+static constexpr u16 SELECT_ADDR_MASK = 0xF8;
 
-	virtual u8 read(u8 select_lines, u16 offset) override;
-	virtual void write(u8 select_lines, u16 offset, u8 data) override;
-
-	auto ctrl_r_cb() { return m_ctrl_r.bind(); }
-	auto video_mem_r_cb() { return m_video_mem_r.bind(); }
-
-	auto video_mem_cb() { return m_video_mem_w.bind(); }
-	auto io_lo_cb() { return m_io_lo_addr.bind(); }
-	auto io_hi_cb() { return m_io_hi_addr.bind(); }
-	auto window_lo_cb() { return m_window_lo_addr.bind(); }
-	auto window_hi_cb() { return m_window_hi_addr.bind(); }
-	auto ctrl_cb() { return m_ctrl_w.bind(); }
-
-protected:
-
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_add_mconfig(machine_config& config) override  ATTR_COLD;;
-
-	u8 video_mem_r();
-	void video_mem_w(u8 val);
-
-	void io_lo_addr_w(u8 val);
-	void io_hi_addr_w(u8 val);
-
-	void window_lo_addr_w(u8 val);
-	void window_hi_addr_w(u8 val);
-
-	void ctrl_w(u8 val);
-	u8 ctrl_r();
-
-private:
-
-	// Reads
-	devcb_read8  m_ctrl_r;
-	devcb_read8  m_video_mem_r;
-
-	// Writes
-	devcb_write8 m_video_mem_w;
-	devcb_write8 m_io_lo_addr;
-	devcb_write8 m_io_hi_addr;
-	devcb_write8 m_window_lo_addr;
-	devcb_write8 m_window_hi_addr;
-	devcb_write8 m_ctrl_w;
-};
-
-
+/**
+ * The SigmaSoft Parallel Port
+ */
 sigmasoft_parallel_port::sigmasoft_parallel_port(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
-	device_t(mconfig, H89BUS_SIGMASOFT_PARALLEL, tag, owner, clock),
+	sigmasoft_parallel_port(mconfig, H89BUS_SIGMASOFT_PARALLEL, tag, owner, clock)
+{
+}
+
+sigmasoft_parallel_port::sigmasoft_parallel_port(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock):
+	device_t(mconfig, type, tag, owner, clock),
 	device_h89bus_left_card_interface(mconfig, *this),
-	m_ctrl_r(*this, 0x00),
-	m_video_mem_r(*this, 0x00),
-	m_video_mem_w(*this),
-	m_io_lo_addr(*this),
-	m_io_hi_addr(*this),
-	m_window_lo_addr(*this),
-	m_window_hi_addr(*this),
-	m_ctrl_w(*this)
+	m_jumpers(*this, "JUMPERS")
 {
 }
 
-void sigmasoft_parallel_port::video_mem_w(u8 val)
+inline bool sigmasoft_parallel_port::card_selected(u8 select_lines, u16 offset)
 {
-	m_video_mem_w(val);
+	return m_enabled &&
+		(select_lines & h89bus_device::H89_IO) &&
+		((offset & SELECT_ADDR_MASK) == m_base_addr);
 }
 
-void sigmasoft_parallel_port::io_lo_addr_w(u8 val)
+void sigmasoft_parallel_port::igc_w(u8 offset, u8 val)
 {
-	m_io_lo_addr(val);
-}
-
-void sigmasoft_parallel_port::io_hi_addr_w(u8 val)
-{
-	m_io_hi_addr(val);
-}
-
-void sigmasoft_parallel_port::window_lo_addr_w(u8 val)
-{
-	m_window_lo_addr(val);
-}
-
-void sigmasoft_parallel_port::window_hi_addr_w(u8 val)
-{
-	m_window_hi_addr(val);
-}
-
-void sigmasoft_parallel_port::ctrl_w(u8 val)
-{
-	m_ctrl_w(val);
 }
 
 void sigmasoft_parallel_port::write(u8 select_lines, u16 offset, u8 data)
 {
-	offset -= BASE_ADDR;
-	if (!(select_lines & h89bus_device::H89_IO) || offset >= 8)
+	if (!card_selected(select_lines, offset))
 	{
 		return;
 	}
 
 	LOGFUNC("%s: reg: %d val: %d\n", FUNCNAME, offset, data);
 
+	offset &= 0x07;
+
 	switch (offset)
 	{
-	case 0:
-		video_mem_w(data);
-		break;
-	case 1:
-		io_lo_addr_w(data);
-		break;
-	case 2:
-		io_hi_addr_w(data);
-		break;
-	case 3:
-		window_lo_addr_w(data);
-		break;
-	case 4:
-		window_hi_addr_w(data);
-		break;
-	case 5:
-		ctrl_w(data);
-		break;
-	case 6:
-		// TODO - Centronics interface
-		break;
-	case 7:
-		// TODO - Centronics interface
-		break;
+		case 0:
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+		case 5:
+			igc_w(offset, data);
+			break;
+		case 6:
+			// TODO - Centronics interface
+			break;
+		case 7:
+			// TODO - Centronics interface
+			break;
 	}
 }
 
-u8 sigmasoft_parallel_port::video_mem_r()
+u8 sigmasoft_parallel_port::igc_r(u8 offset)
 {
-	// get video memory value from igc device
-	return m_video_mem_r();
-}
-
-u8 sigmasoft_parallel_port::ctrl_r()
-{
-	// get control register from igc device
-	return m_ctrl_r();
+	return 0;
 }
 
 u8 sigmasoft_parallel_port::read(u8 select_lines, u16 offset)
 {
-	offset -= BASE_ADDR;
-	u8 value = 0x00;
+	u8 value = 0;
 
-	if (!(select_lines & h89bus_device::H89_IO) || offset >= 8)
+	if (!card_selected(select_lines, offset))
 	{
 		return value;
 	}
 
+	offset &= 0x07;
+
 	switch (offset)
 	{
-	case 0:
-		value = video_mem_r();
-		break;
-	case 1:
-		// TODO - Light Pen Low address
-		break;
-	case 2:
-		// TODO - Light Pen High address
-		break;
-	case 3:
-		// TODO - Left input device
-		break;
-	case 4:
-		// TODO - Right input device
-		break;
-	case 5:
-		// Control Register
-		value = ctrl_r();
-		break;
-	case 6:
-		// TODO - Centronics interface
-		break;
-	case 7:
-		// TODO - Centronics interface
-		break;
+		case 0:
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+		case 5:
+			value = igc_r(offset);
+			break;
+		case 6:
+			// TODO - Centronics interface
+			break;
+		case 7:
+			// TODO - Centronics interface
+			break;
 	}
 
 	LOGFUNC("%s: reg: %d val: %d\n", FUNCNAME, offset, value);
@@ -229,17 +134,73 @@ void sigmasoft_parallel_port::device_start()
 {
 }
 
-void sigmasoft_parallel_port::device_add_mconfig(machine_config &config)
+void sigmasoft_parallel_port::device_reset()
 {
-	// connect callbacks to TLB
-	ctrl_r_cb().set("^^tlbc", FUNC(heath_tlb_connector::sigma_ctrl_r));
-	video_mem_r_cb().set("^^tlbc", FUNC(heath_tlb_connector::sigma_video_mem_r));
-	video_mem_cb().set("^^tlbc", FUNC(heath_tlb_connector::sigma_video_mem_w));
-	io_lo_cb().set("^^tlbc", FUNC(heath_tlb_connector::sigma_io_lo_addr_w));
-	io_hi_cb().set("^^tlbc", FUNC(heath_tlb_connector::sigma_io_hi_addr_w));
-	window_lo_cb().set("^^tlbc", FUNC(heath_tlb_connector::sigma_window_lo_addr_w));
-	window_hi_cb().set("^^tlbc", FUNC(heath_tlb_connector::sigma_window_hi_addr_w));
-	ctrl_cb().set("^^tlbc", FUNC(heath_tlb_connector::sigma_ctrl_w));
+	ioport_value const jumpers(m_jumpers->read());
+
+	m_enabled = bool(jumpers & 0x20);
+
+	m_base_addr = (jumpers & 0x1f) << 3;
 }
 
+static INPUT_PORTS_START( sigmasoft_parallel_port_device )
+	PORT_START("JUMPERS")
+	PORT_CONFNAME(0x01, 0x01, "Port Address Selection a3" )
+	PORT_CONFSETTING(   0x00, "0")
+	PORT_CONFSETTING(   0x01, "1")
+	PORT_CONFNAME(0x02, 0x00, "Port Address Selection a4" )
+	PORT_CONFSETTING(   0x00, "0")
+	PORT_CONFSETTING(   0x02, "1")
+	PORT_CONFNAME(0x04, 0x00, "Port Address Selection a5" )
+	PORT_CONFSETTING(   0x00, "0")
+	PORT_CONFSETTING(   0x04, "1")
+	PORT_CONFNAME(0x08, 0x00, "Port Address Selection a6" )
+	PORT_CONFSETTING(   0x00, "0")
+	PORT_CONFSETTING(   0x08, "1")
+	PORT_CONFNAME(0x10, 0x00, "Port Address Selection a7" )
+	PORT_CONFSETTING(   0x00, "0")
+	PORT_CONFSETTING(   0x10, "1")
+
+	PORT_CONFNAME(0x20, 0x20, "Enabled" )
+	PORT_CONFSETTING(   0x00, DEF_STR( No ))
+	PORT_CONFSETTING(   0x20, DEF_STR( Yes ))
+INPUT_PORTS_END
+
+ioport_constructor sigmasoft_parallel_port::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(sigmasoft_parallel_port_device);
+}
+
+
+/**
+ * The SigmaSoft Parallel Port connected to a SigmaSoft IGC board
+ */
+sigmasoft_parallel_port_igc::sigmasoft_parallel_port_igc(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
+	sigmasoft_parallel_port(mconfig, H89BUS_SIGMASOFT_PARALLEL_IGC, tag, owner, clock),
+	m_tlbc(*this, finder_base::DUMMY_TAG)
+{
+}
+
+void sigmasoft_parallel_port_igc::igc_w(u8 offset, u8 val)
+{
+	m_tlbc->sigma_w(offset, val);
+}
+
+u8 sigmasoft_parallel_port_igc::igc_r(u8 offset)
+{
+	return m_tlbc->sigma_r(offset);
+}
+
+void sigmasoft_parallel_port_igc::device_start()
+{
+	sigmasoft_parallel_port::device_start();
+}
+
+void sigmasoft_parallel_port_igc::device_reset()
+{
+	sigmasoft_parallel_port::device_reset();
+}
+
+
 DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_SIGMASOFT_PARALLEL, device_h89bus_left_card_interface, sigmasoft_parallel_port, "sigmasoft_parallel_port", "SigmaSoft Universal Parallel Board");
+DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_SIGMASOFT_PARALLEL_IGC, device_h89bus_left_card_interface, sigmasoft_parallel_port_igc, "sigmasoft_parallel_port_igc", "SigmaSoft Universal Parallel Board connected to SigmaSoft IGC");

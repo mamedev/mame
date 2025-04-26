@@ -373,6 +373,9 @@ public:
   //! Returns the target architecture's GP register size (4 or 8 bytes).
   ASMJIT_INLINE_NODEBUG uint32_t registerSize() const noexcept { return environment().registerSize(); }
 
+  //! Returns a signature of a native general purpose register (either 32-bit or 64-bit depending on the architecture).
+  ASMJIT_INLINE_NODEBUG OperandSignature gpSignature() const noexcept { return _gpSignature; }
+
   //! Returns instruction alignment.
   //!
   //! The following values are returned based on the target architecture:

@@ -85,7 +85,7 @@ public:
 		m_speaker->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 		CLOCK(config, m_ne555, 8589).signal_handler().set(FUNC(z80clock_state::ne555));
-		m_ne555->set_clock_scale(0.0f);
+		m_ne555->set_clock_scale(0.0);
 		m_ne555->set_duty_cycle(2/3.0f);
 
 		Z80CTC(config, m_ctc, 6_MHz_XTAL);
@@ -155,7 +155,7 @@ protected:
 	virtual void machine_reset() override
 	{
 		/// HACK: start the sio clock on first write for speed
-		m_sio_clock->set_clock_scale(0.0f);
+		m_sio_clock->set_clock_scale(0.0);
 	}
 
 private:
@@ -224,7 +224,7 @@ private:
 
 	void outputs_w(uint8_t data)
 	{
-		m_ne555->set_clock_scale(BIT(data, 7) ? 1.0f : 0.0f);
+		m_ne555->set_clock_scale(BIT(data, 7) ? 1.0 : 0.0);
 	}
 
 	void disp_data_w(uint8_t data)
@@ -304,7 +304,7 @@ private:
 	void sio_cd_ba_w(offs_t offset, uint8_t data)
 	{
 		/// HACK: start the sio clock on first write for speed
-		m_sio_clock->set_clock_scale(1.0f);
+		m_sio_clock->set_clock_scale(1.0);
 		m_sio->cd_ba_w(offset, data);
 	}
 

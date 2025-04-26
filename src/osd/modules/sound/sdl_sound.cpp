@@ -21,6 +21,7 @@
 #include <SDL2/SDL.h>
 
 #include <algorithm>
+#include <cmath>
 #include <fstream>
 #include <memory>
 

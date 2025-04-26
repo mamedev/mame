@@ -90,8 +90,6 @@ protected:
 	bool m_last_clock_state;
 	bool m_buffered_bit;
 	uint8_t m_shiftreg;
-	stream_buffer::sample_t m_curr_sample;
-	stream_buffer::sample_t m_next_sample;
 	uint32_t m_samples_generated;
 
 	// specific internal handler overrides, overridden by each chip
@@ -146,6 +144,7 @@ protected:
 	// internal state
 	int32_t m_sylfilter;
 	int32_t m_intfilter;
+	int16_t m_next_sample;
 	bool m_agc;
 	bool m_buffered_fzq;
 
@@ -189,8 +188,10 @@ protected:
 	const double m_leak;
 
 	// internal state
-	double m_sylfilter_d;
-	double m_intfilter_d;
+	double m_sylfilter;
+	double m_intfilter;
+	stream_buffer::sample_t m_curr_sample;
+	stream_buffer::sample_t m_next_sample;
 
 	// internal handlers
 	virtual void process_bit(bool bit, bool clock_state) override;

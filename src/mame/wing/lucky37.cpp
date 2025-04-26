@@ -311,11 +311,11 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 199?, lucky21,  0, lucky37, lucky37,  lucky37_state, empty_init, ROT0, "Wing Co., Ltd.", "Lucky 21",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1990, lucky21,  0, lucky37, lucky37,  lucky37_state, empty_init, ROT0, "Wing Co., Ltd.", "Lucky 21",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 199?, lucky21d, 0, lucky37, lucky37,  lucky37_state, empty_init, ROT0, "Wing Co., Ltd.", "Lucky 21-D", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 199?, lucky25,  0, lucky37, lucky37,  lucky37_state, empty_init, ROT0, "Wing Co., Ltd.", "Lucky 25",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 199?, lucky37,  0, lucky37, lucky37,  lucky37_state, empty_init, ROT0, "Wing Co., Ltd.", "Lucky 37",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 GAME( 199?, bingo75,  0, lucky37, lucky37,  lucky37_state, empty_init, ROT0, "Wing Co., Ltd.", "Bingo 75",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 199?, lucky75,  0, lucky37, lucky37,  lucky37_state, empty_init, ROT0, "Wing Co., Ltd.", "Lucky 75",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1991, lucky75,  0, lucky37, lucky37,  lucky37_state, empty_init, ROT0, "Wing Co., Ltd.", "Lucky 75",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 199?, luckystr, 0, lucky37, lucky37,  lucky37_state, empty_init, ROT0, "Wing Co., Ltd.", "Lucky Star", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

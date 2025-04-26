@@ -20,18 +20,20 @@ arcade-style controllers.
 
 Controller configuration files are an XML application, using the ``.cfg``
 filename extension.  MAME searches for controller configuration files in the
-directories specified using the ``ctrlrpath`` option.  A controller
-configuration file is selected by setting the ``ctrlr`` option to its filename,
-excluding the ``.cfg`` extension (e.g. set the ``ctrlr`` option to
-``scorpionxg`` to use **scorpionxg.cfg**).  It is an error if the specified
-controller configuration file does not exist, or if it contains no sections
-applicable to the emulated system.
+directories specified using the :ref:`ctrlrpath <mame-commandline-ctrlrpath>`
+option.  A controller configuration file is selected by setting the ``ctrlr``
+option to its filename, excluding the ``.cfg`` extension (e.g. set the ``ctrlr``
+option to ``scorpionxg`` to use **scorpionxg.cfg**).  It is an error if the
+specified controller configuration file does not exist, or if it contains no
+sections applicable to the emulated system.
 
 Controller configuration files use implementation-dependent input tokens.  The
 values available and their precise meanings depend on the exact version of MAME
 used, the input devices connected, the selected input provider modules
-(``keyboardprovider``, ``mouseprovider``, ``lightgunprovider`` and
-``joystickprovider`` options), and possibly other settings.
+(:ref:`keyboardprovider <mame-commandline-keyboardprovider>`,
+:ref:`mouseprovider <mame-commandline-mouseprovider>`, :ref:`lightgunprovider
+<mame-commandline-lightgunprovider>` and :ref:`joystickprovider
+<mame-commandline-joystickprovider>` options), and possibly other settings.
 
 
 .. _ctrlrcfg-structure:

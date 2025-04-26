@@ -365,7 +365,7 @@ license:CC0-1.0
 			</dataarea>
 			<dataarea name="mcu" size="0x2000">
 				<!-- dumped from a prototype with external ROM, not 100% confirmed as being the same on a final, or other games (lbowling, trally) -->
-				<rom offset="0x000000" size="0x02000" name="rhcom.bin" crc="e5cd6306" sha1="f6bbb8ae562804d67e137290c765c3589fa334c0" /> <!-- Hitachi HD6301V1 MCU -->
+				<rom offset="0x000000" size="0x02000" name="hd6301v1p_k78.com" crc="e5cd6306" sha1="f6bbb8ae562804d67e137290c765c3589fa334c0" /> <!-- Hitachi HD6301V1 MCU -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
 				<rom offset="0x000000" size="0x020000" name="006-s1.s1" crc="eb5189f0" sha1="0239c342ea62e73140a2306052f226226461a478" />   <!-- TC531000 -->
@@ -408,7 +408,7 @@ license:CC0-1.0
 			</dataarea>
 			<dataarea name="mcu" size="0x2000">
 				<!-- dumped from a prototype with external ROM, not 100% confirmed as being the same on a final, or other games (lbowling, trally) -->
-				<rom offset="0x000000" size="0x02000" name="rhcom.bin" crc="e5cd6306" sha1="f6bbb8ae562804d67e137290c765c3589fa334c0" /> <!-- Hitachi HD6301V1 MCU -->
+				<rom offset="0x000000" size="0x02000" name="hd6301v1p_k78.com" crc="e5cd6306" sha1="f6bbb8ae562804d67e137290c765c3589fa334c0" /> <!-- Hitachi HD6301V1 MCU -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
 				<rom offset="0x000000" size="0x020000" name="006-s1.s1" crc="eb5189f0" sha1="0239c342ea62e73140a2306052f226226461a478" />   <!-- TC531000 -->
@@ -1123,7 +1123,7 @@ license:CC0-1.0
 				<rom loadflag="load16_word_swap" name="019-p1.p1" offset="0x000000" size="0x080000" crc="a2de8445" sha1="893d7ae72b4644123469de143fa35fac1cbcd61e" />   <!-- TC534200 -->
 			</dataarea>
 			<dataarea name="mcu" size="0x1000">
-				<!-- <rom name="hd6301v1p.com" offset="0x0000" size="0x1000" crc="" sha1="" status="nodump" /> -->  <!-- Hitachi HD6301V1 MCU -->
+				<!-- <rom name="hd6301v1p_k78.com" offset="0x0000" size="0x1000" crc="" sha1="" status="nodump" /> -->  <!-- Hitachi HD6301V1 MCU -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
 				<rom offset="0x000000" size="0x020000" name="019-s1.s1" crc="5fcdc0ed" sha1="86415077e7adc3ba6153eeb4fb0c62cf36e903fa" />   <!-- TC531000 -->
@@ -2107,7 +2107,7 @@ license:CC0-1.0
 				<rom loadflag="load16_word_swap" name="038-p2.p2" offset="0x080000" size="0x080000" crc="a5193e2f" sha1="96803480439e90da23cdca70d59ff519ee85beeb" />   <!-- TC534200 -->
 			</dataarea>
 			<dataarea name="mcu" size="0x1000">
-				<!-- <rom name="hd6301v1p.hd8301v1" offset="0x0000" size="0x1000" crc="" sha1="" status="nodump" /> -->  <!-- Hitachi HD6301V1 MCU -->
+				<!-- <rom name="hd6301v1p_m58_neo-coma" offset="0x0000" size="0x1000" crc="" sha1="" status="nodump" /> -->  <!-- Hitachi HD6301V1 MCU -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
 				<rom offset="0x000000" size="0x020000" name="038-s1.s1" crc="fff62ae3" sha1="6510a762ea41557a8938cbfc0557cd5921306061" />   <!-- TC531000 -->
@@ -5803,7 +5803,47 @@ license:CC0-1.0
 			<dataarea name="maincpu" width="16" endianness="big" size="0x300000">
 				<rom loadflag="load16_word_swap" name="214-p1.p1" offset="0x000000" size="0x100000" crc="52755d74" sha1="4232d627f1d2e6ea9fc8cf01571d77d4d5b8a1bb" />   <!-- TC538200 -->
 				<rom loadflag="load16_word_swap" name="214-p2.sp2" offset="0x100000" size="0x200000" crc="002ccb73" sha1="3ae8df682c75027ca82db25491021eeba00a267e" />  <!-- TC5316200 -->
-				<!-- also found sets with EP1 / EP2 / EP3 / EP4 on eprom and P5 on TC5316200 with chip label 214-P5; correct chip labels for eproms is unknown -->
+			</dataarea>
+			<dataarea name="fixed" size="0x040000">
+				<rom offset="0x000000" size="0x020000" name="214-s1.s1" crc="1254cbdb" sha1="fce5cf42588298711a3633e9c9c1d4dcb723ac76" />   <!-- TC531000 -->
+			</dataarea>
+			<dataarea name="audiocpu" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="214-m1.m1" crc="dabc427c" sha1="b76722ed142ee7addceb4757424870dbd003e8b3" />   <!-- TC531001 -->
+			</dataarea>
+			<dataarea name="ymsnd:adpcma" size="0xa00000">
+				<rom name="214-v1.v1" offset="0x000000" size="0x400000" crc="63f7b045" sha1="1353715f1a8476dca6f8031d9e7a401eacab8159" />   <!-- TC5332204 -->
+				<rom name="214-v2.v2" offset="0x400000" size="0x400000" crc="25929059" sha1="6a721c4cb8f8dc772774023877d4a9f50d5a9e31" />   <!-- TC5332204 -->
+				<rom name="214-v3.v3" offset="0x800000" size="0x200000" crc="92a2257d" sha1="5064aec78fa0d104e5dd5869b95382aa170214ee" />   <!-- TC5316200 -->
+			</dataarea>
+			<dataarea name="sprites" size="0x2000000">
+				<rom loadflag="load16_byte" name="214-c1.c1" offset="0x000000" size="0x400000" crc="7ecf4aa2" sha1="f773c4c1f05d58dd37e7bb2ac1d1e0ec43998a71" />    <!-- TC5332205 -->
+				<rom loadflag="load16_byte" name="214-c2.c2" offset="0x000001" size="0x400000" crc="05b54f37" sha1="cc31653fe4cb05201fba234e080cb9c7a7592b1b" />    <!-- TC5332205 -->
+				<rom loadflag="load16_byte" name="214-c3.c3" offset="0x800000" size="0x400000" crc="64989a65" sha1="e6f3749d43be0afa9dad7b085cb782ba694252ca" />    <!-- TC5332205 -->
+				<rom loadflag="load16_byte" name="214-c4.c4" offset="0x800001" size="0x400000" crc="afbea515" sha1="ae875052728de33174827705646bd14cf3937b5c" />    <!-- TC5332205 -->
+				<rom loadflag="load16_byte" name="214-c5.c5" offset="0x1000000" size="0x400000" crc="2a3bbd26" sha1="7c1a7e50a10a1b082e0d0d515c34135ee9f995ac" />   <!-- TC5332205 -->
+				<rom loadflag="load16_byte" name="214-c6.c6" offset="0x1000001" size="0x400000" crc="44d30dc7" sha1="c8ae001e37224b55d9e4a4d99f6578b4f6eb055f" />   <!-- TC5332205 -->
+				<rom loadflag="load16_byte" name="214-c7.c7" offset="0x1800000" size="0x400000" crc="3687331b" sha1="2be95caab76d7af51674f93884330ba73a6053e4" />   <!-- TC5332205 -->
+				<rom loadflag="load16_byte" name="214-c8.c8" offset="0x1800001" size="0x400000" crc="fa1461ad" sha1="6c71a7f08e4044214223a6bf80984582ab5e0328" />   <!-- TC5332205 -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kof96a" cloneof="kof96">
+		<description>The King of Fighters '96 (bug fix revision)</description>
+		<year>1996</year>
+		<publisher>SNK</publisher>
+		<info name="serial" value="NGM-214"/>
+		<info name="release" value="19960730"/>
+		<info name="alt_title" value="ザ・キング・オブ・ファイターズ '96"/>
+		<sharedfeat name="release" value="MVS" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x300000">
+				<rom loadflag="load16_word_swap" name="blue.ep1"   offset="0x000000" size="0x080000" crc="a6101486" sha1="51357c216cc8e52fc4ecf5b2db4814e87d016132" />  <!-- 27C4096DC, no label -->
+				<rom loadflag="load16_word_swap" name="red.ep2"    offset="0x080000" size="0x080000" crc="6abc7ae5" sha1="1bcbed38ef1934a0701d1c95b30ffe63316f92a8" />  <!-- " -->
+				<rom loadflag="load16_word_swap" name="orange.ep3" offset="0x100000" size="0x080000" crc="a588dff4" sha1="32d30bdf9b7bc9201b3930f5a0f126c79af97f3d" />  <!-- " -->
+				<rom loadflag="load16_word_swap" name="yellow.ep4" offset="0x180000" size="0x080000" crc="6d6f17eb" sha1="51f61c9a4215584493cf1dc37c4e307e1216626c" />  <!-- " -->
+				<rom loadflag="load16_word_swap" name="214-p5.p5"  offset="0x200000" size="0x100000" crc="9f3c6bc9" sha1="90370a2ad42421a533182569e63ab81822e37878" />  <!-- TC5316200 -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
 				<rom offset="0x000000" size="0x020000" name="214-s1.s1" crc="1254cbdb" sha1="fce5cf42588298711a3633e9c9c1d4dcb723ac76" />   <!-- TC531000 -->
@@ -11377,6 +11417,90 @@ license:CC0-1.0
 
 	<!-- Unlicensed 3rd party -->
 
+	<software name="ddragon1">
+		<description>Double Dragon One (demo)</description>
+		<year>2025</year>
+		<publisher>OzzyOuzo</publisher>
+		<sharedfeat name="release" value="MVS,AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x500000">
+				<rom loadflag="load16_word_swap" name="doubledd-p1.bin" offset="0x000000" size="0x100000" crc="0dd47ea6" sha1="b792a538d7653f7cba53541e8bbe95c9e1db6ca0" />
+				<rom loadflag="load16_word_swap" name="doubledd-p2.bin" offset="0x100000" size="0x400000" crc="719b98e6" sha1="b0a95156c48e54ee7f51cbda3abb293a61f9b007" />
+			</dataarea>
+			<dataarea name="fixed" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="doubledd-s1.bin" crc="bbb20072" sha1="0197ba8d3a382f4d022f9573f3c6e6e4cf1fc25f" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x010000">
+				<rom offset="0x000000" size="0x010000" name="doubledd-m1.bin" crc="128a9f84" sha1="4bf52b9babaabf1f6d96b305732168b5b4d9d259" />
+			</dataarea>
+			<dataarea name="ymsnd:adpcma" size="0x1000000">
+				<rom name="doubledd-v1.bin" offset="0x000000" size="0x800000" crc="5018b7a9" sha1="86adce8b24e551d42a2594f39124cffd17364f6e" />
+				<rom name="doubledd-v2.bin" offset="0x800000" size="0x800000" crc="f5c8192f" sha1="dcef8c78bee1a8e88aa3f45ce9c8e5ab212d9238" />
+			</dataarea>
+			<dataarea name="sprites" size="0x2000000">
+				<rom loadflag="load16_byte" name="doubledd-c1.bin" offset="0x000000" size="0x1000000" crc="d4c50841" sha1="c806d0f01fe29984efa49e8c524c86f6e2de8b0e" />
+				<rom loadflag="load16_byte" name="doubledd-c2.bin" offset="0x000001" size="0x1000000" crc="728eb8ae" sha1="a2e9d020cb940ea4ebdb1946eb3ab136c643da17" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ddragon1_p2" cloneof="ddragon1">
+		<description>Double Dragon One (prototype 2)</description>
+		<year>2025</year>
+		<publisher>Case de Ruivo</publisher>
+		<sharedfeat name="release" value="MVS,AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x500000">
+				<rom loadflag="load16_word_swap" name="doubledp2-p1.bin" offset="0x000000" size="0x100000" crc="518ac649" sha1="e0052477cec58eef6506ea7c2d1ec5000a39ffdd" />
+				<rom loadflag="load16_word_swap" name="doubledp2-p2.bin" offset="0x100000" size="0x400000" crc="87cf345c" sha1="6c6997fc092fe8f8a45690344318be59955daa89" />
+			</dataarea>
+			<dataarea name="fixed" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="doubledp2-s1.bin" crc="9886a683" sha1="f079a61942321a0abdf6acd451e9ac7d84cb252b" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x010000">
+				<rom offset="0x000000" size="0x010000" name="doubledp1-m1.bin" crc="d20925ae" sha1="c0deac17eb9ef93896e93e7b2cbacb5214f0da1b" />
+			</dataarea>
+			<dataarea name="ymsnd:adpcma" size="0x1000000">
+				<rom name="doubledp1-v1.bin" offset="0x000000" size="0x800000" crc="197b6305" sha1="8ab6c573c5116fd7dedf9157c308dac4d45b2599" />
+				<rom name="doubledp1-v2.bin" offset="0x800000" size="0x800000" crc="8135d5a8" sha1="186a516ed0fbc1d39f96385513de2ad662511559" />
+			</dataarea>
+			<dataarea name="sprites" size="0x2000000">
+				<rom loadflag="load16_byte" name="doubledp2-c1.bin" offset="0x000000" size="0x1000000" crc="905b6f78" sha1="48caa05ee9aafc2c93c96c628e84f1feeaa52c98" />
+				<rom loadflag="load16_byte" name="doubledp2-c2.bin" offset="0x000001" size="0x1000000" crc="c677a62f" sha1="298d98391ffe5b66e95a6ee5c7e54731b10d6827" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ddragon1_p1" cloneof="ddragon1">
+		<description>Double Dragon One (prototype 1)</description>
+		<year>2024</year>
+		<publisher>Case de Ruivo</publisher>
+		<sharedfeat name="release" value="MVS,AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x500000">
+				<rom loadflag="load16_word_swap" name="doubledp1-p1.bin" offset="0x000000" size="0x100000" crc="1203e56d" sha1="c0ff7e5f14d172934ef0f64441d9776fe93b2b35" />
+				<rom loadflag="load16_word_swap" name="doubledp1-p2.bin" offset="0x100000" size="0x400000" crc="614c501e" sha1="665abb8f977a43aacd3cecdc8afcdab88d7bb9fb" />
+			</dataarea>
+			<dataarea name="fixed" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="doubledp1-s1.bin" crc="2882cffd" sha1="8d0c3dd888e82a1afdfae8a676d181283b4406d7" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x010000">
+				<rom offset="0x000000" size="0x010000" name="doubledp1-m1.bin" crc="d20925ae" sha1="c0deac17eb9ef93896e93e7b2cbacb5214f0da1b" />
+			</dataarea>
+			<dataarea name="ymsnd:adpcma" size="0x1000000">
+				<rom name="doubledp1-v1.bin" offset="0x000000" size="0x800000" crc="197b6305" sha1="8ab6c573c5116fd7dedf9157c308dac4d45b2599" />
+				<rom name="doubled-v2.bin" offset="0x800000" size="0x800000" crc="8135d5a8" sha1="186a516ed0fbc1d39f96385513de2ad662511559" />
+			</dataarea>
+			<dataarea name="sprites" size="0x2000000">
+				<rom loadflag="load16_byte" name="doubledp1-c1.bin" offset="0x000000" size="0x1000000" crc="db1d77da" sha1="98586100414d75dd794b62d4fedcdb626cf12612" />
+				<rom loadflag="load16_byte" name="doubledp1-c2.bin" offset="0x000001" size="0x1000000" crc="340f0428" sha1="e35c8dbd3cbdc39d63630e7bffcf14ca5238a265" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="etyphoon">
 		<description>The Eye of Typhoon (Tsunami Edition, beta 7)</description>
 		<year>2022</year>
@@ -11867,6 +11991,35 @@ Four player adapter not supported
 				<rom loadflag="load16_byte" name="202-c6.bin" offset="0x2000001" size="0x800000" crc="fa07ba1e" sha1="8c00be2c0c1402789011e2aa272e04e216fdac10" />
 				<rom loadflag="load16_byte" name="202-c7.bin" offset="0x3000000" size="0x800000" crc="aa469494" sha1="fd98b7445c85174ccb745c74cb9e852b08353324" />
 				<rom loadflag="load16_byte" name="202-c8.bin" offset="0x3000001" size="0x800000" crc="fa07ba1e" sha1="8c00be2c0c1402789011e2aa272e04e216fdac10" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xenocris">
+		<description>Xeno Crisis</description>
+		<year>2021</year>
+		<publisher>Bitmap Bureau</publisher>
+		<info name="serial" value="NGM-BB01 (MVS), NGH-BB01 (AES)"/>
+		<info name="release" value="20211011 (MVS), 20211011 (AES)"/>
+		<sharedfeat name="release" value="MVS,AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x200000">
+				<rom loadflag="load16_word_swap" name="BB01-p1.p1" offset="0x000000" size="0x100000" crc="637605a6" sha1="179ebcdeaac3e561fd7acb72022eda8c3c74cb8a" />
+				<rom loadflag="load16_word_swap" name="BB01-p2.p2" offset="0x100000" size="0x100000" crc="84838145" sha1="c1f48d333dfc85b9371f811dd449a42d8cdecf3f" />
+			</dataarea>
+			<dataarea name="fixed" size="0x040000">
+				<rom offset="0x000000" size="0x020000" name="BB01-s1.s1" crc="7537ea79" sha1="b7242a6dd7b2ad8ccf7a223c08d626abf013f366" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x010000">
+				<rom offset="0x000000" size="0x010000" name="BB01-m1.m1" crc="28c13ed9" sha1="a3c8cf36906293a24f1ed49376c9d561560d2730" />
+			</dataarea>
+			<dataarea name="ymsnd:adpcma" size="0x1000000">
+				<rom name="BB01-v1.v1" offset="0x000000" size="0x1000000" crc="60d57867" sha1="e1f3f759b4af4404f19dd5b75135e6968b6be3c5" />
+			</dataarea>
+			<dataarea name="sprites" size="0x400000">
+				<rom loadflag="load16_byte" name="BB01-c1.c1" offset="0x000000" size="0x200000" crc="ae51ef89" sha1="da82214263a99520364a2b7ab8140bdc68940f6d" />
+				<rom loadflag="load16_byte" name="BB01-c2.c2" offset="0x000001" size="0x200000" crc="a8610100" sha1="aded6eaa17a518a8f4af9c3779c41ef8dd32a316" />
 			</dataarea>
 		</part>
 	</software>

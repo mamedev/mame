@@ -133,7 +133,7 @@ MIG RAM page 2 $CE02 is the speaker/slot bitfield and $CE03 is the paddle/accele
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "machine/applefdintf.h"
-#include "machine/ds1315.h"
+#include "machine/ds1215.h"
 #include "machine/iwm.h"
 #include "machine/kb3600.h"
 #include "machine/mos6551.h"
@@ -294,7 +294,7 @@ public:
 	optional_device<mos6551_device> m_acia1, m_acia2;
 	optional_device<applefdintf_device> m_iwm;
 	optional_device_array<floppy_connector, 4> m_floppy;
-	required_device<ds1315_device> m_ds1315;
+	required_device<ds1216e_device> m_ds1315;
 	optional_device<centronics_device>      m_printer_conn;
 	optional_device<output_latch_device>    m_printer_out;
 
@@ -387,7 +387,6 @@ public:
 	void ay3600_ako_w(int state);
 	u8 memexp_r(offs_t offset);
 	void memexp_w(offs_t offset, u8 data);
-	u8 nsc_backing_r(offs_t offset);
 	u8 ace500_c0bx_r(offs_t offset);
 	void ace500_c0bx_w(offs_t offset, u8 data);
 
@@ -3070,10 +3069,14 @@ u8 apple2e_state::read_int_rom(int slotbias, int offset)
 		return m_rom_ptr[slotbias + offset];
 	}
 
-	return m_ds1315->read(slotbias + offset);
-}
+	// return data from SmartWatch if /CEO is negated
+	if (m_ds1315->ceo_r())
+		return m_ds1315->read(slotbias + offset);
+	else
+		m_ds1315->read(slotbias + offset);
 
-u8 apple2e_state::nsc_backing_r(offs_t offset) { return m_rom_ptr[offset]; }
+	return m_rom_ptr[slotbias + offset];
+}
 
 u8 apple2e_state::c100_r(offs_t offset)  { accel_slot(1 + ((offset >> 8) & 0x7)); return read_slot_rom(1, offset); }
 u8 apple2e_state::c100_int_r(offs_t offset)  { accel_slot(1 + ((offset >> 8) & 0x7)); return read_int_rom(0x100, offset); }
@@ -5117,7 +5120,7 @@ void apple2e_state::apple2e_common(machine_config &config, bool enhanced, bool r
 	SPEAKER_SOUND(config, A2_SPEAKER_TAG).add_route(ALL_OUTPUTS, "mono", 0.4);
 
 	/* DS1315 for no-slot clock */
-	DS1315(config, m_ds1315, 0).read_backing().set(FUNC(apple2e_state::nsc_backing_r));
+	DS1216E(config, m_ds1315);
 
 	/* RAM */
 	RAM(config, m_ram).set_default_size("64K").set_default_value(0x00);

@@ -351,7 +351,7 @@ void galgames_cart_device::set_pic_reset_line(int state)
 
 //  logerror("reset line = %x\n", state);
 
-	if (!m_pic->input_state(INPUT_LINE_RESET) && state)
+	if (!m_pic->input_line_state(INPUT_LINE_RESET) && state)
 		pic_comm_reset();
 
 	m_pic->set_input_line(INPUT_LINE_RESET, state);

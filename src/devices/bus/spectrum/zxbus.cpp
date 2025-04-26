@@ -41,6 +41,7 @@ zxbus_device::zxbus_device(const machine_config &mconfig, const char *tag, devic
 zxbus_device::zxbus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_iospace(*this, finder_base::DUMMY_TAG, -1)
+	, m_shadow_io_view(nullptr)
 {
 }
 
@@ -51,12 +52,22 @@ void zxbus_device::device_start()
 void zxbus_device::add_slot(zxbus_slot_device &slot)
 {
 	m_slot_list.push_front(&slot);
+	if (m_shadow_io_view)
+	{
+		device_zxbus_card_interface *dev = slot.get_card_device();
+		(*m_shadow_io_view).install_device(0x0000, 0xffff, *dev, &device_zxbus_card_interface::map_shadow_io);
+	}
 }
 
 device_zxbus_card_interface::device_zxbus_card_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "zxbus")
 	, m_zxbus(nullptr)
 {
+}
+
+void zxbus_device::install_shadow_io(memory_view::memory_view_entry &io_view)
+{
+	m_shadow_io_view = &io_view;
 }
 
 void device_zxbus_card_interface::interface_pre_start()
@@ -74,5 +85,10 @@ void zxbus_cards(device_slot_interface &device)
 {
 	device.option_add("nemoide", ZXBUS_NEMOIDE);
 	device.option_add("neogs", ZXBUS_NEOGS);
+}
+
+void zxbus_gmx_cards(device_slot_interface &device)
+{
+	zxbus_cards(device);
 	device.option_add("smuc", ZXBUS_SMUC);
 }

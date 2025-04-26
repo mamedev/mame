@@ -115,7 +115,8 @@ class jrpacman_state : public pacman_state
 {
 public:
 	jrpacman_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pacman_state(mconfig, type, tag) { }
+		: pacman_state(mconfig, type, tag)
+	{ }
 
 	void jrpacman(machine_config &config);
 
@@ -285,14 +286,14 @@ void jrpacman_state::jrpacman(machine_config &config)
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60.606060);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(36*8, 28*8);
-	screen.set_visarea(0*8, 36*8-1, 0*8, 28*8-1);
-	screen.set_screen_update(FUNC(jrpacman_state::screen_update_pacman));
-	screen.set_palette(m_palette);
-	screen.screen_vblank().set(FUNC(jrpacman_state::vblank_irq));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60.606060);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
+	m_screen->set_size(36*8, 28*8);
+	m_screen->set_visarea(0*8, 36*8-1, 0*8, 28*8-1);
+	m_screen->set_screen_update(FUNC(jrpacman_state::screen_update_pacman));
+	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(FUNC(jrpacman_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jrpacman);
 	PALETTE(config, m_palette, FUNC(jrpacman_state::pacman_palette), 128 * 4, 32);

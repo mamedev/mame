@@ -72,7 +72,7 @@ void it8705f_device::device_reset()
 	m_pc_fdc_irq_line = 6;
 	m_pc_fdc_drq_line = 2;
 //  m_pc_fdc_mode = ;
-	m_pc_fdc_address = 0x3f0;
+	m_pc_fdc_address = 0x03f0;
 
 	m_pc_lpt_address = 0x0378;
 	m_pc_lpt_irq_line = 7;

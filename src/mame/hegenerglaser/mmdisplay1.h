@@ -27,15 +27,13 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
 
 private:
 	output_finder<4> m_digits;
 	devcb_write8 m_output_digit;
 
 	int m_strobe;
-	u8 m_digit_idx;
-	u8 m_digit_data[4];
+	u32 m_digit_data;
 
 	void update_lcd();
 };

@@ -33,16 +33,14 @@
 
     The extra baud rates are implemented by an 'X' bit for each channel. The X
     bit chooses between two baud rate tables, in addition to the ACR[7] bit.
-    The X bit is changed by additional commands that are written to CRA and
-    CRB.
+    The X bit is changed by additional commands that are written to CRA and CRB.
 
     The MISR is a read only register that takes the place of the 'BRG Test'
     register on the MC68681.
 
     The low power standby mode is entered and left by a command written to CRA
     or CRB registers. Writing the commands to either register affects the whole
-    DUART, not just one channel. Resetting the DUART also leaves low power
-    mode.
+    DUART, not just one channel. Resetting the DUART also leaves low power mode.
 */
 
 #include "emu.h"
@@ -70,8 +68,8 @@ static const int baud_rate_ACR_0_X_1[] = { 75, 110, 134, 150, 3600, 14400, 28800
 static const int baud_rate_ACR_1[] =     { 75, 110, 134, 150, 300,  600,   1200,  2000,  2400,   4800, 1800, 9600, 19200, 0, 0, 0 }; /* xr68c681 X=0 */
 static const int baud_rate_ACR_1_X_1[] = { 50, 110, 134, 200, 3600, 14400, 28800, 57600, 115200, 4800, 7200, 9600, 38400, 0, 0, 0 };
 
-static const int baud_rate_ACR_0_340[] =     { 50, 110, 134, 200, 300,  600,   1200,  1050,  2400,   4800, 7200, 9600, 38400, 76800, 0, 0 }; /* xr68c681 ACR:7=0 */
-static const int baud_rate_ACR_1_340[] =     { 75, 110, 134, 150, 300,  600,   1200,  2000,  2400,   4800, 1800, 9600, 19200, 38400, 0, 0 }; /* xr68c681 ACR:7=1 */
+static const int baud_rate_ACR_0_340[] = { 50, 110, 134, 200, 300,  600,   1200,  1050,  2400,   4800, 7200, 9600, 38400, 76800, 0, 0 }; /* xr68c681 ACR:7=0 */
+static const int baud_rate_ACR_1_340[] = { 75, 110, 134, 150, 300,  600,   1200,  2000,  2400,   4800, 1800, 9600, 19200, 38400, 0, 0 }; /* xr68c681 ACR:7=1 */
 
 #define INT_INPUT_PORT_CHANGE       0x80
 #define INT_DELTA_BREAK_B           0x40
@@ -103,7 +101,7 @@ static const int baud_rate_ACR_1_340[] =     { 75, 110, 134, 150, 300,  600,   1
 DEFINE_DEVICE_TYPE(SCN2681, scn2681_device, "scn2681", "SCN2681 DUART")
 DEFINE_DEVICE_TYPE(MC68681, mc68681_device, "mc68681", "MC68681 DUART")
 DEFINE_DEVICE_TYPE(SC28C94, sc28c94_device, "sc28c94", "SC28C94 QUART")
-DEFINE_DEVICE_TYPE(MC68340_DUART, mc68340_duart_device, "mc68340duart", "MC68340 DUART Device")
+DEFINE_DEVICE_TYPE(MC68340_DUART, mc68340_duart_device, "mc68340duart", "MC68340 DUART")
 DEFINE_DEVICE_TYPE(XR68C681, xr68c681_device, "xr68c681", "XR68C681 DUART")
 DEFINE_DEVICE_TYPE(DUART_CHANNEL, duart_channel, "duart_channel", "DUART channel")
 
@@ -140,8 +138,8 @@ scn2681_device::scn2681_device(const machine_config &mconfig, const char *tag, d
 }
 
 mc68681_device::mc68681_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: duart_base_device(mconfig, type, tag, owner, clock),
-	m_read_vector(false)
+	: duart_base_device(mconfig, type, tag, owner, clock)
+	, m_read_vector(false)
 {
 }
 
@@ -173,11 +171,11 @@ mc68340_duart_device::mc68340_duart_device(const machine_config &mconfig, const 
 }
 
 xr68c681_device::xr68c681_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: mc68681_device(mconfig, XR68C681, tag, owner, clock),
-	m_XTXA(false),
-	m_XRXA(false),
-	m_XTXB(false),
-	m_XRXB(false)
+	: mc68681_device(mconfig, XR68C681, tag, owner, clock)
+	, m_XTXA(false)
+	, m_XRXA(false)
+	, m_XTXB(false)
+	, m_XRXB(false)
 {
 }
 
@@ -1300,8 +1298,10 @@ void duart_channel::tra_callback()
 		}
 	}
 	else
+	{
 		// loop back transmitted bit
 		rx_w(transmit_register_get_data_bit());
+	}
 
 	// TxRDY is not set until the end of start bit time
 	if (++m_bits_transmitted > 1 && !m_tx_data_in_buffer)
@@ -1453,7 +1453,7 @@ void duart_channel::write_chan_reg(int reg, uint8_t data)
 		CSR = data;
 		tx_baud_rate = m_uart->calc_baud(m_ch, false, data & 0xf);
 		rx_baud_rate = m_uart->calc_baud(m_ch, true, (data>>4) & 0xf);
-	//printf("%s ch %d CSR %02x Tx baud %d Rx baud %d\n", tag(), m_ch, data, tx_baud_rate, rx_baud_rate);
+		//printf("%s ch %d CSR %02x Tx baud %d Rx baud %d\n", tag(), m_ch, data, tx_baud_rate, rx_baud_rate);
 		set_rcv_rate(rx_baud_rate);
 		set_tra_rate(tx_baud_rate);
 		break;

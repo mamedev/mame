@@ -8,19 +8,60 @@
 
 **********************************************************************/
 
-
 #include "emu.h"
 #include "sidewndr.h"
 
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
+#include "bus/vcs_ctrl/ctrl.h"
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
 
-DEFINE_DEVICE_TYPE(ELECTRON_SIDEWNDR, electron_sidewndr_device, "electron_sidewndr", "Wizard Sidewinder Rom Expansion Board")
+namespace {
+
+class electron_sidewndr_device
+	: public device_t
+	, public device_electron_expansion_interface
+{
+public:
+	electron_sidewndr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, ELECTRON_SIDEWNDR, tag, owner, clock)
+		, device_electron_expansion_interface(mconfig, *this)
+		, m_exp(*this, "exp")
+		, m_exp_rom(*this, "exp_rom")
+		, m_rom(*this, "rom%u", 1)
+		, m_joy(*this, "joy")
+		, m_romsel(0)
+	{
+	}
+
+protected:
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD { }
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	virtual uint8_t expbus_r(offs_t offset) override;
+	virtual void expbus_w(offs_t offset, uint8_t data) override;
+
+private:
+	std::pair<std::error_condition, std::string> load_rom(device_image_interface &image, generic_slot_device *slot);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom1_load) { return load_rom(image, m_rom[0]); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom2_load) { return load_rom(image, m_rom[1]); }
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(rom3_load) { return load_rom(image, m_rom[2]); }
+
+	required_device<electron_expansion_slot_device> m_exp;
+	required_memory_region m_exp_rom;
+	required_device_array<generic_slot_device, 3> m_rom;
+	required_device<vcs_control_port_device> m_joy;
+
+	uint8_t m_romsel;
+};
+
 
 //-------------------------------------------------
-//  ROM( sidewndr )
+//  rom_region - device-specific ROM region
 //-------------------------------------------------
 
 ROM_START( sidewndr )
@@ -28,28 +69,11 @@ ROM_START( sidewndr )
 	ROM_LOAD("joyrom.rom", 0x0000, 0x2000, CRC(a7320cda) SHA1(771664dbf23bb14febeb414a0272762cd6091ead))
 ROM_END
 
-//-------------------------------------------------
-//  INPUT_PORTS( sidewndr )
-//-------------------------------------------------
-
-static INPUT_PORTS_START( sidewndr )
-	PORT_START("JOY")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_8WAY
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_8WAY
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_8WAY
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_8WAY
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Fire")
-	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
-INPUT_PORTS_END
-
-//-------------------------------------------------
-//  input_ports - device-specific input ports
-//-------------------------------------------------
-
-ioport_constructor electron_sidewndr_device::device_input_ports() const
+const tiny_rom_entry *electron_sidewndr_device::device_rom_region() const
 {
-	return INPUT_PORTS_NAME( sidewndr );
+	return ROM_NAME( sidewndr );
 }
+
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -57,7 +81,6 @@ ioport_constructor electron_sidewndr_device::device_input_ports() const
 
 void electron_sidewndr_device::device_add_mconfig(machine_config &config)
 {
-	/* rom sockets */
 	GENERIC_SOCKET(config, m_rom[0], generic_plain_slot, "electron_rom", "bin,rom"); // ROM SLOT 6
 	m_rom[0]->set_device_load(FUNC(electron_sidewndr_device::rom1_load));
 	GENERIC_SOCKET(config, m_rom[1], generic_plain_slot, "electron_rom", "bin,rom"); // ROM SLOT 7
@@ -65,43 +88,13 @@ void electron_sidewndr_device::device_add_mconfig(machine_config &config)
 	GENERIC_SOCKET(config, m_rom[2], generic_plain_slot, "electron_rom", "bin,rom"); // ROM SLOT 8
 	m_rom[2]->set_device_load(FUNC(electron_sidewndr_device::rom3_load));
 
-	/* pass-through */
+	VCS_CONTROL_PORT(config, m_joy, vcs_control_port_devices, "joy");
+
 	ELECTRON_EXPANSION_SLOT(config, m_exp, DERIVED_CLOCK(1, 1), electron_expansion_devices, nullptr);
 	m_exp->irq_handler().set(DEVICE_SELF_OWNER, FUNC(electron_expansion_slot_device::irq_w));
 	m_exp->nmi_handler().set(DEVICE_SELF_OWNER, FUNC(electron_expansion_slot_device::nmi_w));
 }
 
-const tiny_rom_entry *electron_sidewndr_device::device_rom_region() const
-{
-	return ROM_NAME( sidewndr );
-}
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  electron_sidewndr_device - constructor
-//-------------------------------------------------
-
-electron_sidewndr_device::electron_sidewndr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ELECTRON_SIDEWNDR, tag, owner, clock)
-	, device_electron_expansion_interface(mconfig, *this)
-	, m_exp(*this, "exp")
-	, m_exp_rom(*this, "exp_rom")
-	, m_rom(*this, "rom%u", 1)
-	, m_joy(*this, "JOY")
-	, m_romsel(0)
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void electron_sidewndr_device::device_start()
-{
-}
 
 //-------------------------------------------------
 //  expbus_r - expansion data read
@@ -133,7 +126,7 @@ uint8_t electron_sidewndr_device::expbus_r(offs_t offset)
 		case 0xfc:
 			if (offset == 0xfc05)
 			{
-				data = m_joy->read();
+				data = bitswap<8>(m_joy->read_joy(), 7, 6, 4, 5, 3, 2, 1, 0);
 			}
 			break;
 
@@ -185,3 +178,8 @@ std::pair<std::error_condition, std::string> electron_sidewndr_device::load_rom(
 
 	return std::make_pair(std::error_condition(), std::string());
 }
+
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(ELECTRON_SIDEWNDR, device_electron_expansion_interface, electron_sidewndr_device, "electron_sidewndr", "Wizard Sidewinder Rom Expansion Board")

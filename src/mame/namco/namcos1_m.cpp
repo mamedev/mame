@@ -132,7 +132,7 @@ CPU #0 PC e3d4: keychip read 0003     [AND #$37 = key no.]
 */
 u8 namcos1_state::key_type1_r(offs_t offset)
 {
-//  logerror("%s: keychip read %04x\n", machine().describe_context(), offset);
+	//logerror("%s: keychip read %04x\n", machine().describe_context(), offset);
 
 	if (offset < 3)
 	{
@@ -163,7 +163,7 @@ u8 namcos1_state::key_type1_r(offs_t offset)
 
 void namcos1_state::key_type1_w(offs_t offset, u8 data)
 {
-//  logerror("%s: keychip write %04x=%02x\n", machine().describe_context(), offset, data);
+	//logerror("%s: keychip write %04x=%02x\n", machine().describe_context(), offset, data);
 
 	if (offset < 4)
 		m_key[offset] = data;
@@ -315,7 +315,7 @@ CPU #0 PC e574: keychip read 0001
 
 u8 namcos1_state::key_type2_r(offs_t offset)
 {
-//  logerror("%s: keychip read %04x\n", machine().describe_context(), offset);
+	//logerror("%s: keychip read %04x\n", machine().describe_context(), offset);
 
 	m_key_numerator_high_word = 0;
 
@@ -334,7 +334,7 @@ u8 namcos1_state::key_type2_r(offs_t offset)
 
 void namcos1_state::key_type2_w(offs_t offset, u8 data)
 {
-//  logerror("%s: keychip write %04x=%02x\n", machine().describe_context(), offset, data);
+	//logerror("%s: keychip write %04x=%02x\n", machine().describe_context(), offset, data);
 
 	if (offset < 5)
 	{
@@ -356,7 +356,7 @@ void namcos1_state::key_type2_w(offs_t offset, u8 data)
 				m_key_reminder = 0x0000;
 			}
 
-//  logerror("calculating division: %08x / %04x = %04x, %04x\n", n, d, key_quotient, m_key_reminder);
+			//logerror("calculating division: %08x / %04x = %04x, %04x\n", n, d, key_quotient, m_key_reminder);
 
 			m_key_numerator_high_word = (m_key[2] << 8) | m_key[3];
 		}
@@ -441,7 +441,7 @@ CPU #0 PC e45a: keychip read 0030     [discarded]
 
 u8 namcos1_state::key_type3_r(offs_t offset)
 {
-//  logerror("%s: keychip read %04x\n", machine().describe_context(), offset);
+	//logerror("%s: keychip read %04x\n", machine().describe_context(), offset);
 
 	/* I need to handle blastoff's read from 0858. The game previously writes to 0858,
 	   using it as temporary storage, so maybe it expects to act as RAM, however
@@ -465,7 +465,7 @@ u8 namcos1_state::key_type3_r(offs_t offset)
 
 void namcos1_state::key_type3_w(offs_t offset, u8 data)
 {
-//  logerror("%s: keychip write %04x=%02x\n", machine().describe_context(), offset, data);
+	//logerror("%s: keychip write %04x=%02x\n", machine().describe_context(), offset, data);
 
 	m_key[(offset & 0x70) >> 4] = data;
 }
@@ -493,7 +493,8 @@ void namcos1_state::sound_bankswitch_w(u8 data)
 
 void namcos1_state::subres_w(int state)
 {
-//  logerror("reset control %s %02x\n",machine().describe_context(),data);
+	//logerror("reset control %s %02x\n",machine().describe_context(),data);
+
 	if (state != m_reset)
 	{
 		m_mcu_patch_data = 0;
@@ -593,6 +594,7 @@ void namcos1_state::mcu_bankswitch_w(u8 data)
 void namcos1_state::mcu_patch_w(u8 data)
 {
 	//logerror("mcu C000 write %s data=%02x\n",machine().describe_context(),data);
+
 	if (m_mcu_patch_data == 0xa6) return;
 	m_mcu_patch_data = data;
 	m_triram[0] = data;
@@ -608,7 +610,7 @@ void namcos1_state::mcu_patch_w(u8 data)
 void namcos1_state::driver_init()
 {
 	// bit 16 of the address is inverted for PRG7 (and bits 17,18 just not connected)
-	for (int i = 0x380000;i < 0x400000;i++)
+	for (int i = 0x380000; i < 0x400000; i++)
 	{
 		if ((i & 0x010000) == 0)
 		{

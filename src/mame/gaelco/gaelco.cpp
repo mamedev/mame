@@ -109,32 +109,24 @@ Year   Game                PCB                       NOTES
  *
  *************************************/
 
-void gaelco_state::coin1_lockout_w(int state)
+template <unsigned Which>
+void gaelco_state::coin_lockout_w(int state)
 {
-	machine().bookkeeping().coin_lockout_w(0, state);
+	machine().bookkeeping().coin_lockout_w(Which, state);
 }
 
-void gaelco_state::coin2_lockout_w(int state)
+template <unsigned Which>
+void gaelco_state::coin_counter_w(int state)
 {
-	machine().bookkeeping().coin_lockout_w(1, state);
+	machine().bookkeeping().coin_counter_w(Which, state);
 }
 
-void gaelco_state::coin1_counter_w(int state)
-{
-	machine().bookkeeping().coin_counter_w(0, state);
-}
-
-void gaelco_state::coin2_counter_w(int state)
-{
-	machine().bookkeeping().coin_counter_w(1, state);
-}
-
-void gaelco_state::oki_bankswitch_w(uint8_t data)
+void gaelco_state::oki_bankswitch_w(u8 data)
 {
 	m_okibank->set_entry(data & 0x0f);
 }
 
-void gaelco_state::irqack_w(uint16_t data)
+void gaelco_state::irqack_w(u16 data)
 {
 	// INT 6 ACK or Watchdog timer - written at the end of an IRQ
 	m_maincpu->set_input_line(6, CLEAR_LINE);
@@ -142,7 +134,7 @@ void gaelco_state::irqack_w(uint16_t data)
 
 /*********** Squash Encryption Related Code ******************/
 
-void gaelco_state::vram_encrypted_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void squash_state::vram_encrypted_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	// osd_printf_debug("vram_encrypted_w!!\n");
 	data = m_vramcrypt->gaelco_decrypt(*m_maincpu, offset, data);
@@ -150,7 +142,7 @@ void gaelco_state::vram_encrypted_w(offs_t offset, uint16_t data, uint16_t mem_m
 }
 
 
-void gaelco_state::encrypted_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void squash_state::encrypted_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	// osd_printf_debug("encrypted_w!!\n");
 	data = m_vramcrypt->gaelco_decrypt(*m_maincpu, offset, data);
@@ -163,15 +155,15 @@ void gaelco_state::encrypted_w(offs_t offset, uint16_t data, uint16_t mem_mask)
  *
  *************************************/
 
-void gaelco_state::bigkarnk_map(address_map &map)
+void bigkarnk_state::bigkarnk_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();                                                              // ROM
-	map(0x100000, 0x101fff).ram().w(FUNC(gaelco_state::vram_w)).share("videoram");              // Video RAM
+	map(0x100000, 0x101fff).ram().w(FUNC(bigkarnk_state::vram_w)).share(m_videoram);              // Video RAM
 	map(0x102000, 0x103fff).ram();                                                              // Screen RAM
-	map(0x108000, 0x108007).writeonly().share("vregs");                                         // Video Registers
-	map(0x10800c, 0x10800d).w(FUNC(gaelco_state::irqack_w));                                    // INT 6 ACK/Watchdog timer
+	map(0x108000, 0x108007).writeonly().share(m_vregs);                                         // Video Registers
+	map(0x10800c, 0x10800d).w(FUNC(bigkarnk_state::irqack_w));                                    // INT 6 ACK/Watchdog timer
 	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // Palette
-	map(0x440000, 0x440fff).ram().share("spriteram");                                           // Sprite RAM
+	map(0x440000, 0x440fff).ram().share(m_spriteram);                                           // Sprite RAM
 	map(0x700000, 0x700001).portr("DSW1");
 	map(0x700002, 0x700003).portr("DSW2");
 	map(0x700004, 0x700005).portr("P1");
@@ -182,7 +174,7 @@ void gaelco_state::bigkarnk_map(address_map &map)
 	map(0xff8000, 0xffffff).ram();                                                              // Work RAM
 }
 
-void gaelco_state::bigkarnk_snd_map(address_map &map)
+void bigkarnk_state::bigkarnk_snd_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram();                                                                // RAM
 	map(0x0800, 0x0801).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // OKI6295
@@ -195,12 +187,12 @@ void gaelco_state::bigkarnk_snd_map(address_map &map)
 void gaelco_state::maniacsq_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();                                                                // ROM
-	map(0x100000, 0x101fff).ram().w(FUNC(gaelco_state::vram_w)).share("videoram");                // Video RAM
+	map(0x100000, 0x101fff).ram().w(FUNC(gaelco_state::vram_w)).share(m_videoram);                // Video RAM
 	map(0x102000, 0x103fff).ram();                                                                // Screen RAM
-	map(0x108000, 0x108007).writeonly().share("vregs");                                           // Video Registers
+	map(0x108000, 0x108007).writeonly().share(m_vregs);                                           // Video Registers
 	map(0x10800c, 0x10800d).w(FUNC(gaelco_state::irqack_w));                                      // INT 6 ACK/Watchdog timer
 	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");   // Palette
-	map(0x440000, 0x440fff).ram().share("spriteram");                                             // Sprite RAM
+	map(0x440000, 0x440fff).ram().share(m_spriteram);                                             // Sprite RAM
 	map(0x700000, 0x700001).portr("DSW2");
 	map(0x700002, 0x700003).portr("DSW1");
 	map(0x700004, 0x700005).portr("P1");
@@ -210,40 +202,40 @@ void gaelco_state::maniacsq_map(address_map &map)
 	map(0xff0000, 0xffffff).ram();                                                                // Work RAM
 }
 
-void gaelco_state::squash_map(address_map &map)
+void squash_state::squash_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();                                                               // ROM
-	map(0x100000, 0x101fff).ram().w(FUNC(gaelco_state::vram_encrypted_w)).share("videoram");     // Video RAM
-	map(0x102000, 0x103fff).ram().w(FUNC(gaelco_state::encrypted_w)).share("screenram");         // Screen RAM
-	map(0x108000, 0x108007).writeonly().share("vregs");                                          // Video Registers
-	map(0x10800c, 0x10800d).w(FUNC(gaelco_state::irqack_w));                                     // INT 6 ACK/Watchdog timer
+	map(0x100000, 0x101fff).ram().w(FUNC(squash_state::vram_encrypted_w)).share(m_videoram);     // Video RAM
+	map(0x102000, 0x103fff).ram().w(FUNC(squash_state::encrypted_w)).share(m_screenram);         // Screen RAM
+	map(0x108000, 0x108007).writeonly().share(m_vregs);                                          // Video Registers
+	map(0x10800c, 0x10800d).w(FUNC(squash_state::irqack_w));                                     // INT 6 ACK/Watchdog timer
 	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");  // Palette
-	map(0x440000, 0x440fff).ram().share("spriteram");                                            // Sprite RAM
+	map(0x440000, 0x440fff).ram().share(m_spriteram);                                            // Sprite RAM
 	map(0x700000, 0x700001).portr("DSW2");
 	map(0x700002, 0x700003).portr("DSW1");
 	map(0x700004, 0x700005).portr("P1");
 	map(0x700006, 0x700007).portr("P2");
 	map(0x70000b, 0x70000b).select(0x000070).lw8(NAME([this] (offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 4, data); }));
-	map(0x70000d, 0x70000d).w(FUNC(gaelco_state::oki_bankswitch_w));
+	map(0x70000d, 0x70000d).w(FUNC(squash_state::oki_bankswitch_w));
 	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); // OKI6295 status register
 	map(0xff0000, 0xffffff).ram();                                                                // Work RAM
 }
 
-void gaelco_state::thoop_map(address_map &map)
+void squash_state::thoop_map(address_map &map)
 {
 	map(0x000000, 0x0fffff).rom();                                                                 // ROM
-	map(0x100000, 0x101fff).ram().w(FUNC(gaelco_state::vram_encrypted_w)).share("videoram"); // Video RAM
-	map(0x102000, 0x103fff).ram().w(FUNC(gaelco_state::encrypted_w)).share("screenram");     // Screen RAM
-	map(0x108000, 0x108007).writeonly().share("vregs");                                            // Video Registers
-	map(0x10800c, 0x10800d).w(FUNC(gaelco_state::irqack_w));                                       // INT 6 ACK/Watchdog timer
+	map(0x100000, 0x101fff).ram().w(FUNC(squash_state::vram_encrypted_w)).share(m_videoram); // Video RAM
+	map(0x102000, 0x103fff).ram().w(FUNC(squash_state::encrypted_w)).share(m_screenram);     // Screen RAM
+	map(0x108000, 0x108007).writeonly().share(m_vregs);                                            // Video Registers
+	map(0x10800c, 0x10800d).w(FUNC(squash_state::irqack_w));                                       // INT 6 ACK/Watchdog timer
 	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
-	map(0x440000, 0x440fff).ram().share("spriteram");                                              // Sprite RAM
+	map(0x440000, 0x440fff).ram().share(m_spriteram);                                              // Sprite RAM
 	map(0x700000, 0x700001).portr("DSW2");
 	map(0x700002, 0x700003).portr("DSW1");
 	map(0x700004, 0x700005).portr("P1");
 	map(0x700006, 0x700007).portr("P2");
 	map(0x70000b, 0x70000b).select(0x000070).lw8(NAME([this] (offs_t offset, u8 data) { m_outlatch->write_d0(offset >> 4, data); }));
-	map(0x70000d, 0x70000d).w(FUNC(gaelco_state::oki_bankswitch_w));
+	map(0x70000d, 0x70000d).w(FUNC(squash_state::oki_bankswitch_w));
 	map(0x70000f, 0x70000f).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));  // OKI6295 status register
 	map(0xff0000, 0xffffff).ram();                                                                 // Work RAM
 }
@@ -252,7 +244,7 @@ void gaelco_state::thoop_map(address_map &map)
 void gaelco_state::oki_map(address_map &map)
 {
 	map(0x00000, 0x2ffff).rom();
-	map(0x30000, 0x3ffff).bankr("okibank");
+	map(0x30000, 0x3ffff).bankr(m_okibank);
 }
 
 
@@ -678,8 +670,8 @@ static const gfx_layout tilelayout16 =
 };
 
 static GFXDECODE_START( gfx_gaelco )
-	GFXDECODE_ENTRY( "gfx1", 0x000000, tilelayout8,  0, 64 )
-	GFXDECODE_ENTRY( "gfx1", 0x000000, tilelayout16, 0, 64 )
+	GFXDECODE_ENTRY( "gfx", 0, tilelayout8,  0, 64 )
+	GFXDECODE_ENTRY( "gfx", 0, tilelayout16, 0, 64 )
 GFXDECODE_END
 
 
@@ -696,23 +688,23 @@ void gaelco_state::machine_start()
 }
 
 // TODO: verify all clocks (XTALs are 8.0MHz & 24.000 MHz) - One PCB reported to have 8867.23 kHz instead of 8MHz
-void gaelco_state::bigkarnk(machine_config &config)
+void bigkarnk_state::bigkarnk(machine_config &config)
 {
 	// Basic machine hardware
 	M68000(config, m_maincpu, XTAL(24'000'000)/2);   // MC68000P10, 12 MHz (verified)
-	m_maincpu->set_addrmap(AS_PROGRAM, &gaelco_state::bigkarnk_map);
-	m_maincpu->set_vblank_int("screen", FUNC(gaelco_state::irq6_line_assert));
+	m_maincpu->set_addrmap(AS_PROGRAM, &bigkarnk_state::bigkarnk_map);
+	m_maincpu->set_vblank_int("screen", FUNC(bigkarnk_state::irq6_line_assert));
 
 	MC6809E(config, m_audiocpu, XTAL(8'000'000)/4);  // 68B09EP, 2 MHz (verified)
-	m_audiocpu->set_addrmap(AS_PROGRAM, &gaelco_state::bigkarnk_snd_map);
+	m_audiocpu->set_addrmap(AS_PROGRAM, &bigkarnk_state::bigkarnk_snd_map);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
 	LS259(config, m_outlatch);
-	m_outlatch->q_out_cb<0>().set(FUNC(gaelco_state::coin1_lockout_w)).invert();
-	m_outlatch->q_out_cb<1>().set(FUNC(gaelco_state::coin2_lockout_w)).invert();
-	m_outlatch->q_out_cb<2>().set(FUNC(gaelco_state::coin1_counter_w));
-	m_outlatch->q_out_cb<3>().set(FUNC(gaelco_state::coin2_counter_w));
+	m_outlatch->q_out_cb<0>().set(FUNC(bigkarnk_state::coin_lockout_w<0>)).invert();
+	m_outlatch->q_out_cb<1>().set(FUNC(bigkarnk_state::coin_lockout_w<1>)).invert();
+	m_outlatch->q_out_cb<2>().set(FUNC(bigkarnk_state::coin_counter_w<0>));
+	m_outlatch->q_out_cb<3>().set(FUNC(bigkarnk_state::coin_counter_w<1>));
 
 	// Video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -720,13 +712,13 @@ void gaelco_state::bigkarnk(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(32*16, 32*16);
 	screen.set_visarea(0, 320-1, 16, 256-1);
-	screen.set_screen_update(FUNC(gaelco_state::screen_update_bigkarnk));
+	screen.set_screen_update(FUNC(bigkarnk_state::screen_update_bigkarnk));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 
-	MCFG_VIDEO_START_OVERRIDE(gaelco_state,bigkarnk)
+	MCFG_VIDEO_START_OVERRIDE(bigkarnk_state,bigkarnk)
 
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -768,12 +760,12 @@ void gaelco_state::maniacsq(machine_config &config)
 	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-void gaelco_state::squash(machine_config &config)
+void squash_state::squash(machine_config &config)
 {
 	// Basic machine hardware
 	M68000(config, m_maincpu, XTAL(20'000'000)/2); // Verified on PCB
-	m_maincpu->set_addrmap(AS_PROGRAM, &gaelco_state::squash_map);
-	m_maincpu->set_vblank_int("screen", FUNC(gaelco_state::irq6_line_assert));
+	m_maincpu->set_addrmap(AS_PROGRAM, &squash_state::squash_map);
+	m_maincpu->set_vblank_int("screen", FUNC(squash_state::irq6_line_assert));
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
@@ -781,10 +773,10 @@ void gaelco_state::squash(machine_config &config)
 	m_vramcrypt->set_params(0x0f, 0x4228);
 
 	LS259(config, m_outlatch); // B8
-	m_outlatch->q_out_cb<0>().set(FUNC(gaelco_state::coin1_lockout_w)).invert();
-	m_outlatch->q_out_cb<1>().set(FUNC(gaelco_state::coin2_lockout_w)).invert();
-	m_outlatch->q_out_cb<2>().set(FUNC(gaelco_state::coin1_counter_w));
-	m_outlatch->q_out_cb<3>().set(FUNC(gaelco_state::coin2_counter_w));
+	m_outlatch->q_out_cb<0>().set(FUNC(squash_state::coin_lockout_w<0>)).invert();
+	m_outlatch->q_out_cb<1>().set(FUNC(squash_state::coin_lockout_w<1>)).invert();
+	m_outlatch->q_out_cb<2>().set(FUNC(squash_state::coin_counter_w<0>));
+	m_outlatch->q_out_cb<3>().set(FUNC(squash_state::coin_counter_w<1>));
 	m_outlatch->q_out_cb<4>().set_nop(); // used
 
 	// Video hardware
@@ -793,28 +785,28 @@ void gaelco_state::squash(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(32*16, 32*16);
 	screen.set_visarea(0, 320-1, 16, 256-1);
-	screen.set_screen_update(FUNC(gaelco_state::screen_update_thoop));
+	screen.set_screen_update(FUNC(squash_state::screen_update_thoop));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 
-	MCFG_VIDEO_START_OVERRIDE(gaelco_state,squash)
+	MCFG_VIDEO_START_OVERRIDE(squash_state,squash)
 
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	okim6295_device &oki(OKIM6295(config, "oki", XTAL(1'000'000), okim6295_device::PIN7_HIGH)); /* verified on pcb */
-	oki.set_addrmap(0, &gaelco_state::oki_map);
+	oki.set_addrmap(0, &squash_state::oki_map);
 	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-void gaelco_state::thoop(machine_config &config)
+void squash_state::thoop(machine_config &config)
 {
 	// Basic machine hardware
 	M68000(config, m_maincpu, XTAL(24'000'000)/2); // Verified on PCB
-	m_maincpu->set_addrmap(AS_PROGRAM, &gaelco_state::thoop_map);
-	m_maincpu->set_vblank_int("screen", FUNC(gaelco_state::irq6_line_assert));
+	m_maincpu->set_addrmap(AS_PROGRAM, &squash_state::thoop_map);
+	m_maincpu->set_vblank_int("screen", FUNC(squash_state::irq6_line_assert));
 
 	config.set_maximum_quantum(attotime::from_hz(600));
 
@@ -822,10 +814,10 @@ void gaelco_state::thoop(machine_config &config)
 	m_vramcrypt->set_params(0x0e, 0x4228);
 
 	LS259(config, m_outlatch); // B8
-	m_outlatch->q_out_cb<0>().set(FUNC(gaelco_state::coin1_lockout_w)); // not inverted
-	m_outlatch->q_out_cb<1>().set(FUNC(gaelco_state::coin2_lockout_w)); // not inverted
-	m_outlatch->q_out_cb<2>().set(FUNC(gaelco_state::coin1_counter_w));
-	m_outlatch->q_out_cb<3>().set(FUNC(gaelco_state::coin2_counter_w));
+	m_outlatch->q_out_cb<0>().set(FUNC(squash_state::coin_lockout_w<0>)); // not inverted
+	m_outlatch->q_out_cb<1>().set(FUNC(squash_state::coin_lockout_w<1>)); // not inverted
+	m_outlatch->q_out_cb<2>().set(FUNC(squash_state::coin_counter_w<0>));
+	m_outlatch->q_out_cb<3>().set(FUNC(squash_state::coin_counter_w<1>));
 	m_outlatch->q_out_cb<4>().set_nop(); // used
 
 	// Video hardware
@@ -834,19 +826,19 @@ void gaelco_state::thoop(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(32*16, 32*16);
 	screen.set_visarea(0, 320-1, 16, 256-1);
-	screen.set_screen_update(FUNC(gaelco_state::screen_update_thoop));
+	screen.set_screen_update(FUNC(squash_state::screen_update_thoop));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gaelco);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 
-	MCFG_VIDEO_START_OVERRIDE(gaelco_state,bigkarnk)
+	MCFG_VIDEO_START_OVERRIDE(squash_state,bigkarnk)
 
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	okim6295_device &oki(OKIM6295(config, "oki", XTAL(1'000'000), okim6295_device::PIN7_HIGH)); // pin 7 not verified
-	oki.set_addrmap(0, &gaelco_state::oki_map);
+	oki.set_addrmap(0, &squash_state::oki_map);
 	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
@@ -862,10 +854,10 @@ ROM_START( bigkarnk ) // PCB silkscreened REF.901112
 	ROM_LOAD16_BYTE(    "d16",  0x000000, 0x040000, CRC(44fb9c73) SHA1(c33852b37afea15482f4a43cb045434660e7a056) )
 	ROM_LOAD16_BYTE(    "d19",  0x000001, 0x040000, CRC(ff79dfdd) SHA1(2bfa440299317967ba2018d3a148291ae0c144ae) )
 
-	ROM_REGION( 0x01e000, "audiocpu", 0 )   // 6809 code
+	ROM_REGION( 0x010000, "audiocpu", 0 )   // 6809 code
 	ROM_LOAD(   "d5",   0x000000, 0x010000, CRC(3b73b9c5) SHA1(1b1c5545609a695dab87d611bd53e0c3dd91e6b7) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "gfx", 0 )
 	ROM_LOAD( "h5", 0x000000, 0x080000, CRC(20e239ff) SHA1(685059340f0f3a8e3c98702bd760dae685a58ddb) )
 	ROM_LOAD( "h10",0x080000, 0x080000, CRC(ab442855) SHA1(bcd69d4908ff8dc1b2215d2c2d2e54b950e0c015) )
 	ROM_LOAD( "h8", 0x100000, 0x080000, CRC(83dce5a3) SHA1(b4f9473e93c96f4b86c446e89d13fd3ef2b03996) )
@@ -884,7 +876,7 @@ ROM_START( maniacsp ) // PCB - REF 922804/2
 	ROM_LOAD16_BYTE(    "d18",  0x000000, 0x020000, CRC(740ecab2) SHA1(8d8583364cc6aeea58ea2b9cb9a2aab2a43a44df) )
 	ROM_LOAD16_BYTE(    "d16",  0x000001, 0x020000, CRC(c6c42729) SHA1(1aac9f93d47a4eb57e06e206e9f50e349b1817da) )
 
-	ROM_REGION( 0x200000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x200000, "gfx", ROMREGION_ERASE00 )
 	ROM_LOAD( "f3", 0x000000, 0x040000, CRC(e7f6582b) SHA1(9e352edf2f71d0edecb54a11ab3fd0e3ec867d42) )
 	// 0x040000-0x07ffff empty
 	ROM_LOAD( "f2", 0x080000, 0x040000, CRC(ca43a5ae) SHA1(8d2ed537be1dee60096a58b68b735fb50cab3285) )
@@ -947,7 +939,7 @@ ROM_START( biomtoy ) // PCB - REF.922804/2
 	ROM_LOAD16_BYTE( "18.d18",  0x000000, 0x080000, CRC(4569ce64) SHA1(96557aca55779c23f7c2c11fddc618823c04ead0) ) // v1.0.1885
 	ROM_LOAD16_BYTE( "16.d16",  0x000001, 0x080000, CRC(739449bd) SHA1(711a8ea5081f15dea6067577516c9296239c4145) ) // v1.0.1885
 
-	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_REGION( 0x400000, "gfx", 0 )
 	// weird gfx ordering
 	ROM_LOAD( "h6",     0x040000, 0x040000, CRC(9416a729) SHA1(425149b3041554579791fc23c09fda6be054e89d) )
 	ROM_CONTINUE(       0x0c0000, 0x040000 )
@@ -978,7 +970,7 @@ ROM_START( biomtoya ) // PCB - REF.922804/2
 	ROM_LOAD16_BYTE( "18.d18", 0x000000, 0x080000, CRC(39b6cdbd) SHA1(3a22eb2e304d85ecafff677d83c3c4fca3f869d5) ) // v1.0.1884 - sldh
 	ROM_LOAD16_BYTE( "16.d16", 0x000001, 0x080000, CRC(ab340671) SHA1(83f708a535048e927fd1c7de85a65282e460f98a) ) // v1.0.1884 - sldh
 
-	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_REGION( 0x400000, "gfx", 0 )
 	// weird gfx ordering
 	ROM_LOAD( "h6",     0x040000, 0x040000, CRC(9416a729) SHA1(425149b3041554579791fc23c09fda6be054e89d) )
 	ROM_CONTINUE(       0x0c0000, 0x040000 )
@@ -1009,7 +1001,7 @@ ROM_START( biomtoyb ) // PCB - REF.922804/2
 	ROM_LOAD16_BYTE( "18.d18", 0x000000, 0x080000, CRC(2dfadee3) SHA1(55ab563a9a69da940ca015f292476068cf21b01c) ) // v1.0.1878 - sldh
 	ROM_LOAD16_BYTE( "16.d16", 0x000001, 0x080000, CRC(b35e3ca6) SHA1(b323fcca99d088e6fbf6a1d660ef860987af77e4) ) // v1.0.1878 - sldh
 
-	ROM_REGION( 0x400000, "gfx1", 0 ) // Graphics & Sound ROMs soldered in, not verified 100% correct for this set
+	ROM_REGION( 0x400000, "gfx", 0 ) // Graphics & Sound ROMs soldered in, not verified 100% correct for this set
 	// weird gfx ordering
 	ROM_LOAD( "h6",     0x040000, 0x040000, CRC(9416a729) SHA1(425149b3041554579791fc23c09fda6be054e89d) )
 	ROM_CONTINUE(       0x0c0000, 0x040000 )
@@ -1040,7 +1032,7 @@ ROM_START( biomtoyc ) // PCB - REF.922804/1 or REF.922804/2
 	ROM_LOAD16_BYTE( "program18.d18", 0x000000, 0x080000, CRC(05ad7d30) SHA1(4b2596d225bf9b314db5a150921d7d6c99096ddb) ) // v1.0.1870 - sldh
 	ROM_LOAD16_BYTE( "program16.d16", 0x000001, 0x080000, CRC(a288e73f) SHA1(13a53981e3fe6961494013e7466badae56481958) ) // v1.0.1870 - sldh
 
-	ROM_REGION( 0x400000, "gfx1", 0 ) // Graphics & Sound ROMs redumped from a REF.922804/1 PCB
+	ROM_REGION( 0x400000, "gfx", 0 ) // Graphics & Sound ROMs redumped from a REF.922804/1 PCB
 	// weird gfx ordering
 	ROM_LOAD( "gfx6.h6",              0x040000, 0x040000, CRC(ab19a1ce) SHA1(3cc896f8c20f692b02d43db8c30f410bd93fe3ca))
 	ROM_CONTINUE(                     0x0c0000, 0x040000 )
@@ -1070,7 +1062,7 @@ ROM_START( bioplayc ) // PCB - REF.922804/2?? - Spanish version
 	ROM_LOAD16_BYTE( "t.d18",  0x000000, 0x080000, CRC(ec518c6c) SHA1(8b96313582d252bebb4bcce8f2d993f751ad0a74) ) // v1.0.1823
 	ROM_LOAD16_BYTE( "t.d16",  0x000001, 0x080000, CRC(de4b031d) SHA1(d4bcdfedab1d48df0c48ffc775731a4981342c7a) ) // v1.0.1823
 
-	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_REGION( 0x400000, "gfx", 0 )
 	// weird gfx ordering
 	ROM_LOAD( "toy-high-3.h6",  0x040000, 0x040000, CRC(ab19a1ce) SHA1(3cc896f8c20f692b02d43db8c30f410bd93fe3ca))
 	ROM_CONTINUE(               0x0c0000, 0x040000 )
@@ -1101,7 +1093,7 @@ ROM_START( lastkm ) // PCB - REF 922804/2
 	ROM_LOAD16_BYTE(    "prog-bici-e-8.11.95.d18",  0x000000, 0x080000, CRC(1fc5fba0) SHA1(1f954fca9f25df7379eff4ea905810fa06fcebb0)) // 1.0.0275
 	ROM_LOAD16_BYTE(    "prog-bici-o-8.11.95.d16",  0x000001, 0x080000, CRC(b93e57e3) SHA1(df307191a214a32a26018ca2a9200742e39939d2)) // 1.0.0275
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "gfx", 0 )
 	ROM_LOAD( "bici-f3.h6",     0x000000, 0x080000, CRC(0bf9f213) SHA1(052abef60df419d32bf8a86c89d87e5bb281b4eb))
 	ROM_LOAD( "bici-f2.h7",     0x080000, 0x080000, CRC(c48d5376) SHA1(8e987839e7254e0fa631802733482726a289439c))
 	ROM_LOAD( "bici-f1.h9",     0x100000, 0x080000, CRC(e7958070) SHA1(7f065b429a500b714dfbf497b1353e90137abbd7))
@@ -1164,7 +1156,7 @@ ROM_START( squash ) // PCB - REF.922804/1 or REF.922804/2
 	ROM_LOAD16_BYTE( "squash.d18", 0x000000, 0x20000, CRC(ce7aae96) SHA1(4fe8666ae571bffc5a08fa68346c0623282989eb) )
 	ROM_LOAD16_BYTE( "squash.d16", 0x000001, 0x20000, CRC(8ffaedd7) SHA1(f4aada17ba67dd8b6c5a395e832bcbba2764c59d) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_REGION( 0x200000, "gfx", 0 )
 	ROM_LOAD( "squash.c09", 0x180000, 0x80000, CRC(0bb91c69) SHA1(8be945049ab411a4d49bd64bd3937542ec9ef9fb) ) // Encrypted video RAM
 	ROM_LOAD( "squash.c10", 0x100000, 0x80000, CRC(892a035c) SHA1(d0156ceb9aa6639a1124c17fb12389be319bb51f) ) // Encrypted video RAM
 	ROM_LOAD( "squash.c11", 0x080000, 0x80000, CRC(9e19694d) SHA1(1df4646f3147719fef516a37aa361ae26d9b23a2) ) // Encrypted video RAM
@@ -1202,7 +1194,7 @@ ROM_START( thoop ) // PCB - REF.922804/1
 	ROM_LOAD16_BYTE( "th18dea1.040", 0x000000, 0x80000, CRC(59bad625) SHA1(28e058b2290bc5f7130b801014d026432f9e7fd5) )
 	ROM_LOAD16_BYTE( "th161eb4.020", 0x000001, 0x40000, CRC(6add61ed) SHA1(0e789d9a0ac19b6143044fbc04ab2227735b2a8f) )
 
-	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "c09", 0x300000, 0x040000, CRC(06f0edbf) SHA1(3cf2e5c29cd00b43d49a106084076f2ac0dbad98) ) // Encrypted video RAM
 	ROM_CONTINUE(    0x380000, 0x040000 )
 	ROM_CONTINUE(    0x340000, 0x040000 )
@@ -1239,13 +1231,13 @@ ROM_END
  *
  *************************************/
 
-GAME( 1991, bigkarnk, 0,        bigkarnk, bigkarnk, gaelco_state, empty_init, ROT0, "Gaelco",        "Big Karnak (ver. 1.0, checksum 1e38c94)",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1995, biomtoy,  0,        maniacsq, biomtoy,  gaelco_state, empty_init, ROT0, "Gaelco / Zeus", "Biomechanical Toy (ver. 1.0.1885, checksum 69f5e032)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1995, biomtoya, biomtoy,  maniacsq, biomtoy,  gaelco_state, empty_init, ROT0, "Gaelco / Zeus", "Biomechanical Toy (ver. 1.0.1884, checksum 3f316c70)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1995, biomtoyb, biomtoy,  maniacsq, biomtoy,  gaelco_state, empty_init, ROT0, "Gaelco / Zeus", "Biomechanical Toy (ver. 1.0.1878, checksum d84b28ff)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1994, biomtoyc, biomtoy,  maniacsq, biomtoyc, gaelco_state, empty_init, ROT0, "Gaelco / Zeus", "Biomechanical Toy (ver. 1.0.1870, checksum ba682195)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1994, bioplayc, biomtoy,  maniacsq, bioplayc, gaelco_state, empty_init, ROT0, "Gaelco / Zeus", "Bioplaything Cop (ver. 1.0.1823, checksum cd960fc9, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // copyright based on Ver. 1.0.1870
-GAME( 1992, maniacsp, 0,        maniacsq, maniacsq, gaelco_state, empty_init, ROT0, "Gaelco",        "Maniac Square (ver 1.0, checksum b602, prototype)",              MACHINE_SUPPORTS_SAVE ) // The prototype version was an earlier project, said to be from 1992, game was rewritten in 1996
-GAME( 1995, lastkm,   0,        maniacsq, lastkm,   gaelco_state, empty_init, ROT0, "Gaelco / Zeus", "Last KM (ver 1.0.0275, checksum 13bff751, prototype)",           MACHINE_SUPPORTS_SAVE ) // Similar 'bike controller' idea to the Salter gym equipment Gaelco developed, but in game form
-GAME( 1992, squash,   0,        squash,   squash,   gaelco_state, empty_init, ROT0, "Gaelco",        "Squash (ver. 1.0, checksum 015aef61)",                           MACHINE_SUPPORTS_SAVE )
-GAME( 1992, thoop,    0,        thoop,    thoop,    gaelco_state, empty_init, ROT0, "Gaelco",        "Thunder Hoop (ver. 1, checksum 02a09f7d)",                       MACHINE_SUPPORTS_SAVE ) // could be other versions, still Ver. 1 but different checksum listed on boot
+GAME( 1991, bigkarnk, 0,        bigkarnk, bigkarnk, bigkarnk_state, empty_init, ROT0, "Gaelco",        "Big Karnak (ver. 1.0, checksum 1e38c94)",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1995, biomtoy,  0,        maniacsq, biomtoy,  gaelco_state,   empty_init, ROT0, "Gaelco / Zeus", "Biomechanical Toy (ver. 1.0.1885, checksum 69f5e032)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1995, biomtoya, biomtoy,  maniacsq, biomtoy,  gaelco_state,   empty_init, ROT0, "Gaelco / Zeus", "Biomechanical Toy (ver. 1.0.1884, checksum 3f316c70)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1995, biomtoyb, biomtoy,  maniacsq, biomtoy,  gaelco_state,   empty_init, ROT0, "Gaelco / Zeus", "Biomechanical Toy (ver. 1.0.1878, checksum d84b28ff)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1994, biomtoyc, biomtoy,  maniacsq, biomtoyc, gaelco_state,   empty_init, ROT0, "Gaelco / Zeus", "Biomechanical Toy (ver. 1.0.1870, checksum ba682195)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1994, bioplayc, biomtoy,  maniacsq, bioplayc, gaelco_state,   empty_init, ROT0, "Gaelco / Zeus", "Bioplaything Cop (ver. 1.0.1823, checksum cd960fc9, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // copyright based on Ver. 1.0.1870
+GAME( 1992, maniacsp, 0,        maniacsq, maniacsq, gaelco_state,   empty_init, ROT0, "Gaelco",        "Maniac Square (ver 1.0, checksum b602, prototype)",              MACHINE_SUPPORTS_SAVE ) // The prototype version was an earlier project, said to be from 1992, game was rewritten in 1996
+GAME( 1995, lastkm,   0,        maniacsq, lastkm,   gaelco_state,   empty_init, ROT0, "Gaelco / Zeus", "Last KM (ver 1.0.0275, checksum 13bff751, prototype)",           MACHINE_SUPPORTS_SAVE ) // Similar 'bike controller' idea to the Salter gym equipment Gaelco developed, but in game form
+GAME( 1992, squash,   0,        squash,   squash,   squash_state,   empty_init, ROT0, "Gaelco",        "Squash (ver. 1.0, checksum 015aef61)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1992, thoop,    0,        thoop,    thoop,    squash_state,   empty_init, ROT0, "Gaelco",        "Thunder Hoop (ver. 1, checksum 02a09f7d)",                       MACHINE_SUPPORTS_SAVE ) // could be other versions, still Ver. 1 but different checksum listed on boot

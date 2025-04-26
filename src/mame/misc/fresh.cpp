@@ -1,11 +1,11 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders: David Haywood
 
 /*
 
-fruit fresh by chain leisure electronic co., ltd.
+Fruit Fresh by Chain Leisure Electronic Co., LTD.
 
-cpu 68000 xtal 24Mhz
+CPU 68000 XTAL 24MHz
 
 4* 8 dipswitchs
 
@@ -13,18 +13,20 @@ cpu 68000 xtal 24Mhz
 
 SW1 for reset?
 
-2x Altera epm7064lc84
+2x Altera EPM7064lC84
 
-rom 5 and 6 are prg roms
+ROM 5 and 6 are prg ROMs
 
 */
 
 // notes : is the reel scrolling (division of the screen) done with raster interrupts?
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/timer.h"
 #include "sound/ymopl.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -38,46 +40,36 @@ class fresh_state : public driver_device
 public:
 	fresh_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_bg_videoram(*this, "bg_videoram"),
-		m_bg_2_videoram(*this, "bg_videoram_2"),
-		m_attr_videoram(*this, "attr_videoram"),
-		m_attr_2_videoram(*this, "attr_videoram_2"),
+		m_bg_videoram(*this, "bg_videoram%u", 0U),
+		m_attr_videoram(*this, "attr_videoram%u", 0U),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")
 	{ }
 
-	void fresh(machine_config &config);
+	void fresh(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	tilemap_t *m_bg_tilemap = nullptr;
-	tilemap_t *m_bg_2_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap[2]{};
 
-	required_shared_ptr<uint16_t> m_bg_videoram;
-	required_shared_ptr<uint16_t> m_bg_2_videoram;
-	required_shared_ptr<uint16_t> m_attr_videoram;
-	required_shared_ptr<uint16_t> m_attr_2_videoram;
+	required_shared_ptr_array<uint16_t, 2> m_bg_videoram;
+	required_shared_ptr_array<uint16_t, 2> m_attr_videoram;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	void fresh_bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void fresh_attr_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	TILE_GET_INFO_MEMBER(get_fresh_bg_tile_info);
-	void fresh_bg_2_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void fresh_attr_2_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	TILE_GET_INFO_MEMBER(get_fresh_bg_2_tile_info);
-
 	uint16_t m_d30000_value = 0;
 
-	void d30000_write(uint16_t data)
-	{
-		m_d30000_value = data;
-	}
+	template <uint8_t Which> void bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	template <uint8_t Which> void attr_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_bg_tile_info);
+
+
+	void d30000_write(uint16_t data) { m_d30000_value = data; }
 
 	void c71000_write(uint16_t data)
 	{
@@ -96,93 +88,65 @@ private:
 		logerror("c76000_write (scroll 3) %04x (m_d30000_value = %04x)\n", data, m_d30000_value);
 	}
 
-	uint16_t unk_r()
-	{
-		return machine().rand();
-	}
-	uint16_t unk2_r()
-	{
-		return 0x10;
-	}
+	uint16_t unk_r() { return machine().rand(); }
+	uint16_t unk2_r() { return 0x10; }
 
 	TIMER_DEVICE_CALLBACK_MEMBER(fake_scanline);
 
-	uint32_t screen_update_fresh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void fresh_map(address_map &map) ATTR_COLD;
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void program_map(address_map &map) ATTR_COLD;
 };
 
 
-TILE_GET_INFO_MEMBER(fresh_state::get_fresh_bg_tile_info)
+template <uint8_t Which>
+TILE_GET_INFO_MEMBER(fresh_state::get_bg_tile_info)
 {
-	int tileno, pal;
-	tileno = m_bg_videoram[tile_index];
-	pal = m_attr_videoram[tile_index];
-	tileinfo.set(1, tileno, pal, 0);
+	int const tileno = m_bg_videoram[Which][tile_index];
+	int const pal = m_attr_videoram[Which][tile_index];
+	tileinfo.set(Which ^ 1, tileno, pal, 0);
 }
 
 
-void fresh_state::fresh_bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+template <uint8_t Which>
+void fresh_state::bg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA(&m_bg_videoram[offset]);
-	m_bg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_bg_videoram[Which][offset]);
+	m_bg_tilemap[Which]->mark_tile_dirty(offset);
 }
 
-void fresh_state::fresh_attr_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+template <uint8_t Which>
+void fresh_state::attr_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA(&m_attr_videoram[offset]);
-	m_bg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_attr_videoram[Which][offset]);
+	m_bg_tilemap[Which]->mark_tile_dirty(offset);
 }
-
-
-TILE_GET_INFO_MEMBER(fresh_state::get_fresh_bg_2_tile_info)
-{
-	int tileno, pal;
-	tileno = m_bg_2_videoram[tile_index];
-	pal = m_attr_2_videoram[tile_index];
-	tileinfo.set(0, tileno, pal, 0);
-}
-
-
-void fresh_state::fresh_bg_2_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	COMBINE_DATA(&m_bg_2_videoram[offset]);
-	m_bg_2_tilemap->mark_tile_dirty(offset);
-}
-
-void fresh_state::fresh_attr_2_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	COMBINE_DATA(&m_attr_2_videoram[offset]);
-	m_bg_2_tilemap->mark_tile_dirty(offset);
-}
-
-
 
 
 void fresh_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(fresh_state::get_fresh_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8,  64, 512);
-	m_bg_2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(fresh_state::get_fresh_bg_2_tile_info)), TILEMAP_SCAN_ROWS, 8, 8,  64, 512);
+	m_bg_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(fresh_state::get_bg_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 512);
+	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(fresh_state::get_bg_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 512);
 
-	m_bg_tilemap->set_transparent_pen(255);
+	m_bg_tilemap[0]->set_transparent_pen(255);
 }
 
-uint32_t fresh_state::screen_update_fresh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t fresh_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg_2_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
 
 
-void fresh_state::fresh_map(address_map &map)
+void fresh_state::program_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 
-	map(0xc00000, 0xc0ffff).ram().w(FUNC(fresh_state::fresh_bg_2_videoram_w)).share("bg_videoram_2");
-	map(0xc10000, 0xc1ffff).ram().w(FUNC(fresh_state::fresh_attr_2_videoram_w)).share("attr_videoram_2");
-	map(0xc20000, 0xc2ffff).ram().w(FUNC(fresh_state::fresh_bg_videoram_w)).share("bg_videoram");
-	map(0xc30000, 0xc3ffff).ram().w(FUNC(fresh_state::fresh_attr_videoram_w)).share("attr_videoram");
+	map(0xc00000, 0xc0ffff).ram().w(FUNC(fresh_state::bg_videoram_w<1>)).share(m_bg_videoram[1]);
+	map(0xc10000, 0xc1ffff).ram().w(FUNC(fresh_state::attr_videoram_w<1>)).share(m_attr_videoram[1]);
+	map(0xc20000, 0xc2ffff).ram().w(FUNC(fresh_state::bg_videoram_w<0>)).share(m_bg_videoram[0]);
+	map(0xc30000, 0xc3ffff).ram().w(FUNC(fresh_state::attr_videoram_w<0>)).share(m_attr_videoram[0]);
 
 //  map(0xc70000, 0xc70001).ram();
 //  map(0xc70002, 0xc70003).ram();
@@ -220,8 +184,6 @@ void fresh_state::fresh_map(address_map &map)
 
 
 	map(0xf00000, 0xf0ffff).ram();
-
-
 }
 
 static INPUT_PORTS_START( fresh )
@@ -561,26 +523,26 @@ GFXDECODE_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(fresh_state::fake_scanline)
 {
-	int scanline = param;
+	int const scanline = param;
 
-	if(scanline == 0)
+	if (scanline == 0)
 	{
 		logerror("new frame\n");
 		m_maincpu->set_input_line(4, HOLD_LINE);
 
 	}
 
-//  if(scanline == 32)
+//  if (scanline == 32)
 //      m_maincpu->set_input_line(4, HOLD_LINE);
 
-	if(scanline == 64)
+	if (scanline == 64)
 		m_maincpu->set_input_line(5, HOLD_LINE);
 
-//  if(scanline == 96)
+//  if (scanline == 96)
 //      m_maincpu->set_input_line(5, HOLD_LINE);
 
 
-	if(scanline == 200) // vbl?
+	if (scanline == 200) // vbl?
 		m_maincpu->set_input_line(6, HOLD_LINE);
 
 }
@@ -588,38 +550,39 @@ TIMER_DEVICE_CALLBACK_MEMBER(fresh_state::fake_scanline)
 
 void fresh_state::fresh(machine_config &config)
 {
-	/* basic machine hardware */
-	M68000(config, m_maincpu, 24000000/2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &fresh_state::fresh_map);
+	// basic machine hardware
+	M68000(config, m_maincpu, 24_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fresh_state::program_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(fresh_state::fake_scanline), "screen", 0, 1);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea_full();
-	screen.set_screen_update(FUNC(fresh_state::screen_update_fresh));
+	screen.set_screen_update(FUNC(fresh_state::screen_update));
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 0x1000); // or 0xc00
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fresh);
 
-	/* sound hw? */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	YM2413(config, "ymsnd", 4000000).add_route(ALL_OUTPUTS, "mono", 1.0); // actual clock and type unknown
+	YM2413(config, "ymsnd", 4'000'000).add_route(ALL_OUTPUTS, "mono", 1.0); // actual clock and type unknown
 }
 
 
 ROM_START( fresh )
-	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68k */
-	ROM_LOAD16_BYTE( "fruit-fresh5.u44", 0x00001, 0x20000, CRC(cb37d3c5) SHA1(3b7797d475769d37ed1e9774df8d4b5899fb92a3) )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "fruit-fresh6.u59", 0x00000, 0x20000, CRC(fc0290be) SHA1(02e3b3563b15ae585684a8f510f48a8c90b248fa) )
+	ROM_LOAD16_BYTE( "fruit-fresh5.u44", 0x00001, 0x20000, CRC(cb37d3c5) SHA1(3b7797d475769d37ed1e9774df8d4b5899fb92a3) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "fruit-fresh1.u18", 0x00000, 0x80000, CRC(ee77cdcd) SHA1(8e162640d23bd1b5a2ed9305cc4b9df1cb0f3e80) )
 	ROM_LOAD( "fruit-fresh3.u19", 0x80000, 0x80000, CRC(80cc71b3) SHA1(89a2272266ccdbd01abbc85c1f8200fa9d8aa441) )
+
 	ROM_REGION( 0x100000, "gfx2", 0 )
 	ROM_LOAD( "fruit-fresh2.u45", 0x00000, 0x80000, CRC(8a06a1ab) SHA1(4bc020e4a031df995e6ebaf49d62989004092b60) )
 	ROM_LOAD( "fruit-fresh4.u46", 0x80000, 0x80000, CRC(9b6c7571) SHA1(649cf3c50e2cd8c02f0f730e5ded59cf0ea37c37) )

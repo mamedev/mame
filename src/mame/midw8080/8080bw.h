@@ -450,6 +450,7 @@ private:
 	void ozmawars_port04_w(uint8_t data);
 	void ozmawars_port05_w(uint8_t data);
 	void ozmawars_io_map(address_map &map) ATTR_COLD;
+
 	uint8_t m_port03 = 0;
 	uint8_t m_port05 = 0;
 	bool m_sound_enable = 0;
@@ -480,8 +481,8 @@ private:
 	void main_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
 
-	uint8_t m_port_1_last;
-	uint8_t m_port_2_last;
+	uint8_t m_port_1_last = 0;
+	uint8_t m_port_2_last = 0;
 };
 
 

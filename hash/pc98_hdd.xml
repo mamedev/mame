@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="pc98_hdd" description="NEC PC-98 hard disks">
+
+	<!-- Minimum requirements: 386 or better CPU, 1.6MB RAM, OPNA based sound card -->
+	<software name="yahdi" supported="partial">
+		<!-- 128MB version known to exist -->
+		<description>YAHDI (DOS 6.2, DOS 5.0, 542MB version)</description>
+		<year>2014</year>
+		<publisher>nfg.forums</publisher>
+		<notes><![CDATA[
+Entry level disk image, -chs 8162,8,17
+Games with ERCACHE support fails booting, as per menu note
+]]></notes>
+		<info name="usage" value="Press W at High Speed Boot error prompt the first time around" />
+		<part name="hdd" interface="ide_hdd">
+			<diskarea name="harddriv">
+				<disk name="pc98-542mb" sha1="f457979763490f0e05f08c7e54df20536ed15582" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

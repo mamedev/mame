@@ -6,7 +6,7 @@
  *   Portable Sharp PC1403 video emulator interface
  *   (Sharp pocket computers)
  *
- *   Copyright (c) 2001 Peter Trauner, all rights reserved.
+ *   Copyright (c) 2001 Peter Trauner
  *
  * Change Log:
  * 21.07.2001 Several changes listed below were made by Mario Konegger

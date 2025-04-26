@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "sk1100prn.h"
 // slot devices
-//#include "sp400.h"
+#include "sp400.h"
 #include "kblink.h"
 
 
@@ -120,6 +120,6 @@ int sk1100_printer_port_device::busy_r()
 
 void sk1100_printer_port_devices(device_slot_interface &device)
 {
-	//device.option_add("sp400", SP400_PRINTER); /* serial printer */
+	device.option_add("sp400", SP400_PRINTER); /* serial printer */
 	device.option_add("kblink", SK1100_LINK_CABLE);
 }

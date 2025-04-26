@@ -27,7 +27,6 @@ public:
 		m_samples(*this, "samples"),
 		m_discrete(*this, "discrete"),
 		m_coinstate_timer(*this, "coinstate"),
-		m_nsub_coinage_timer(*this, "nsub_coin"),
 		m_screen(*this, "screen"),
 		m_vicdual_sound(*this, "vicdual_sound"),
 		m_proms(*this, "proms"),
@@ -83,7 +82,6 @@ protected:
 	optional_device<samples_device> m_samples;
 	optional_device<discrete_sound_device> m_discrete;
 	required_device<timer_device> m_coinstate_timer;
-	optional_device<timer_device> m_nsub_coinage_timer;
 	required_device<screen_device> m_screen;
 	optional_device<vicdual_audio_device_base> m_vicdual_sound;
 	optional_memory_region m_proms;
@@ -234,31 +232,44 @@ public:
 	nsub_state(const machine_config &mconfig, device_type type, const char *tag) :
 		vicdual_state(mconfig, type, tag),
 		m_s97269pb(*this,"s97269pb"),
-		m_s97271p(*this,"s97271p")
+		m_s97271p(*this,"s97271p"),
+		m_nsub_coinage_timer(*this, "nsub_coin")
 	{ }
 
 	void nsub(machine_config &config);
+	void nsubc(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(nsub_coin_in);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<s97269pb_device> m_s97269pb;
 	required_device<s97271p_device> m_s97271p;
+	optional_device<timer_device> m_nsub_coinage_timer;
 
 	int m_nsub_coin_counter = 0;
 	int m_nsub_play_counter = 0;
+	uint8_t m_prot_value = 0;
 
 	uint8_t nsub_io_r(offs_t offset);
 	void nsub_io_w(offs_t offset, uint8_t data);
 
+	void nsubc_io_w(offs_t offset, uint8_t data);
+
+	void nsubc_prot_w(uint8_t data);
+
 	TIMER_DEVICE_CALLBACK_MEMBER(nsub_coin_pulse);
 
-	DECLARE_MACHINE_START(nsub);
-	DECLARE_MACHINE_RESET(nsub);
+	DECLARE_MACHINE_START(nsubc);
 
 	virtual pen_t choose_pen(uint8_t x, uint8_t y, pen_t back_pen) override;
 	void nsub_io_map(address_map &map) ATTR_COLD;
+	void nsubc_io_map(address_map &map) ATTR_COLD;
 	void nsub_map(address_map &map) ATTR_COLD;
+	void nsubc_map(address_map &map) ATTR_COLD;
 };
 
 class carnival_state : public vicdual_state

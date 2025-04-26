@@ -24,6 +24,7 @@ TODO:
 **************************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
 #include "video/mc6845.h"
@@ -45,8 +46,9 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_vram(*this, "vram%u", 0U)
 		, m_gfxdecode(*this, "gfxdecode")
+		, m_key_matrix(*this, "IN%u", 0U)
 		, m_lamps(*this, "lamp%u", 0U)
-		{ }
+	{ }
 
 	void chance32(machine_config &config);
 
@@ -79,6 +81,7 @@ private:
 	required_shared_ptr_array<uint8_t, 2> m_vram;
 
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_ioport_array<4> m_key_matrix;
 	output_finder<13> m_lamps;
 };
 
@@ -86,13 +89,12 @@ private:
 template <unsigned N> TILE_GET_INFO_MEMBER(chance32_state::get_tile_info)
 {
 	const u16 code = (m_vram[N][tile_index * 2 + 1] << 8) | m_vram[N][tile_index * 2];
-	const u8 flip = (~code >> 12) & 1;
+	const u8 flip = BIT(~code, 12);
 	tileinfo.set(
-		N,
-		code & 0x0fff,
-		code >> 13,
-		TILE_FLIPYX(flip << 1 | flip)
-	);
+			N,
+			code & 0x0fff,
+			code >> 13,
+			TILE_FLIPYX(flip << 1 | flip));
 }
 
 void chance32_state::video_start()
@@ -123,14 +125,11 @@ void chance32_state::key_matrix_w(uint8_t data)
 
 uint8_t chance32_state::key_matrix_r()
 {
-	uint8_t res,i;
-	const char *const portnames[4] = { "IN0", "IN1", "IN2", "IN3" };
-	res = 0;
-
-	for(i = 0; i < 4; i++)
+	uint8_t res = 0;
+	for (unsigned i = 0; i < 4; i++)
 	{
-		if(BIT(m_port_select, i))
-			res |= ioport(portnames[i])->read();
+		if (BIT(m_port_select, i))
+			res |= m_key_matrix[i]->read();
 	}
 
 	return res;
@@ -203,8 +202,8 @@ void chance32_state::main_map(address_map &map)
 	map(0x0000, 0xcfff).rom();
 	map(0xd800, 0xdfff).ram();
 	map(0xe000, 0xefff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
-	map(0xf000, 0xf7ff).ram().w(FUNC(chance32_state::vram_w<1>)).share("vram1");
-	map(0xf800, 0xffff).ram().w(FUNC(chance32_state::vram_w<0>)).share("vram0");
+	map(0xf000, 0xf7ff).ram().w(FUNC(chance32_state::vram_w<1>)).share(m_vram[1]);
+	map(0xf800, 0xffff).ram().w(FUNC(chance32_state::vram_w<0>)).share(m_vram[0]);
 }
 
 void chance32_state::main_io(address_map &map)

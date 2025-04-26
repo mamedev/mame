@@ -607,61 +607,35 @@ static INPUT_PORTS_START( mjuraden )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( koinomp )
+	// DIP switch settings from Koi no Magic Potion manual
+	// For koinomp, patimono and mkeibaou, turning off In-Game Music while Demo
+	// Sounds is on doesn't work - attract music will continue to play during
+	// gameplay.  Original game bug, or emulation issue?
+
 	PORT_INCLUDE( nbmjtype1 )
 
 	PORT_START("DSWA")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSWA:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSWA:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSWA:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSWA:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSWA:5")
-	PORT_DIPNAME(0x20, 0x00, DEF_STR( Flip_Screen )) PORT_DIPLOCATION("DSWA:6")
-	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(   0x20, DEF_STR( On ))
-	PORT_DIPNAME(0x40, 0x40, "Character Display Test") PORT_DIPLOCATION("DSWA:7")
-	PORT_DIPSETTING(   0x40, DEF_STR( Off ))
-	PORT_DIPSETTING(   0x00, DEF_STR( On ))
-	PORT_DIPNAME(0x80, 0x80, "Graphic ROM Test") PORT_DIPLOCATION("DSWA:8")
-	PORT_DIPSETTING(   0x80, DEF_STR( Off ))
-	PORT_DIPSETTING(   0x00, DEF_STR( On ))
-
-	PORT_START("DSWB")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSWB:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSWB:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSWB:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSWB:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSWB:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSWB:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSWB:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSWB:8")
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( patimono )
-	PORT_INCLUDE( nbmjtype1 )
-
-	PORT_START("DSWA")
-	PORT_DIPNAME(0x03, 0x03, DEF_STR( Difficulty )) PORT_DIPLOCATION("DSWA:1,2")
+	PORT_DIPNAME(0x03, 0x03, DEF_STR( Difficulty ))    PORT_DIPLOCATION("DSWA:1,2")   // ゲーム難易度（４が最強）
 	PORT_DIPSETTING(   0x03, "1")
 	PORT_DIPSETTING(   0x02, "2")
 	PORT_DIPSETTING(   0x01, "3")
 	PORT_DIPSETTING(   0x00, "4")
-	PORT_DIPNAME(0x04, 0x04, DEF_STR( Coinage )) PORT_DIPLOCATION("DSWA:3")
-	PORT_DIPSETTING(   0x04, DEF_STR( 1C_1C ))
-	PORT_DIPSETTING(   0x00, DEF_STR( 1C_2C ))
-	PORT_DIPNAME(0x08, 0x08, DEF_STR( Demo_Sounds )) PORT_DIPLOCATION("DSWA:4")
-	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(   0x08, DEF_STR( On ))
-	PORT_DIPNAME(0x10, 0x10, "Music") PORT_DIPLOCATION("DSWA:5")
-	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(   0x10, DEF_STR( On ))
-	PORT_DIPNAME(0x20, 0x00, DEF_STR( Flip_Screen )) PORT_DIPLOCATION("DSWA:6")
-	PORT_DIPSETTING(   0x00, DEF_STR( Off ))
-	PORT_DIPSETTING(   0x20, DEF_STR( On ))
-	PORT_DIPNAME(0x40, 0x40, "Character Display Test") PORT_DIPLOCATION("DSWA:7")
-	PORT_DIPSETTING(   0x40, DEF_STR( Off ))
-	PORT_DIPSETTING(   0x00, DEF_STR( On ))
-	// manual states switch DSWA:8 is always off/unused
-	PORT_DIPNAME(0x80, 0x80, "Graphic ROM Test") PORT_DIPLOCATION("DSWA:8")
+	PORT_DIPNAME(0x04, 0x04, DEF_STR( Coinage ))       PORT_DIPLOCATION("DSWA:3")     // プレイ料金（１コイン）
+	PORT_DIPSETTING(   0x04, DEF_STR( 1C_1C ))                                        // １プレイ
+	PORT_DIPSETTING(   0x00, DEF_STR( 1C_2C ))                                        // ２プレイ
+	PORT_DIPNAME(0x08, 0x08, DEF_STR( Demo_Sounds ))   PORT_DIPLOCATION("DSWA:4")     // デモサウンド
+	PORT_DIPSETTING(   0x00, DEF_STR( Off ))                                          // 無
+	PORT_DIPSETTING(   0x08, DEF_STR( On ))                                           // 有
+	PORT_DIPNAME(0x10, 0x10, "In-Game Music")          PORT_DIPLOCATION("DSWA:5")     // ゲームサウンド
+	PORT_DIPSETTING(   0x00, DEF_STR( Off ))                                          // 無
+	PORT_DIPSETTING(   0x10, DEF_STR( On ))                                           // 有
+	PORT_DIPNAME(0x20, 0x00, DEF_STR( Flip_Screen ))   PORT_DIPLOCATION("DSWA:6")     // 画面反転
+	PORT_DIPSETTING(   0x00, DEF_STR( Off ))                                          // 正
+	PORT_DIPSETTING(   0x20, DEF_STR( On ))                                           // 逆
+	PORT_DIPNAME(0x40, 0x40, "Character Display Test") PORT_DIPLOCATION("DSWA:7")     // テストモード
+	PORT_DIPSETTING(   0x40, DEF_STR( Off ))                                          // 通常ゲーム
+	PORT_DIPSETTING(   0x00, DEF_STR( On ))                                           // テストモード
+	PORT_DIPNAME(0x80, 0x80, "Graphic ROM Test")       PORT_DIPLOCATION("DSWA:8")     // 常時ＯＦＦ
 	PORT_DIPSETTING(   0x80, DEF_STR( Off ))
 	PORT_DIPSETTING(   0x00, DEF_STR( On ))
 
@@ -2562,36 +2536,36 @@ ROM_END
 
 
 //    YEAR, NAME,     PARENT,   MACHINE,  INPUT,    STATE,          INIT,       MONITOR, COMPANY, FULLNAME, FLAGS
-GAME( 1992, mjuraden, 0,        mjuraden, mjuraden, nbmj9195_state, empty_init, ROT0,    "Nichibutsu / Yubis", "Mahjong Uranai Densetsu (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, koinomp,  0,        koinomp,  koinomp,  nbmj9195_state, empty_init, ROT0,    "Nichibutsu", "Mahjong Koi no Magic Potion (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, patimono, 0,        patimono, patimono, nbmj9195_state, empty_init, ROT0,    "Nichibutsu", "Mahjong Pachinko Monogatari (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, janbari,  0,        janbari,  janbari,  nbmj9195_state, empty_init, ROT0,    "Nichibutsu / Yubis / AV Japan", "Mahjong Janjan Baribari (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mjanbari, janbari,  janbari,  pachiten, nbmj9195_state, empty_init, ROT0,    "Nichibutsu / Yubis / AV Japan", "Medal Mahjong Janjan Baribari (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mmehyou,  0,        mmehyou,  mmehyou,  nbmj9195_state, empty_init, ROT0,    "Nichibutsu / Kawakusu", "Medal Mahjong Circuit no Mehyou (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, ultramhm, 0,        ultramhm, ultramhm, nbmj9195_state, empty_init, ROT0,    "Apple", "Ultra Maru-hi Mahjong (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, gal10ren, 0,        gal10ren, gal10ren, nbmj9195_state, empty_init, ROT0,    "Fujic", "Mahjong Gal 10-renpatsu (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, renaiclb, 0,        renaiclb, renaiclb, nbmj9195_state, empty_init, ROT0,    "Fujic", "Mahjong Ren-ai Club (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, mjlaman,  0,        mjlaman,  mjlaman,  nbmj9195_state, empty_init, ROT0,    "Nichibutsu / AV Japan", "Mahjong La Man (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, mkeibaou, 0,        mkeibaou, patimono, nbmj9195_state, empty_init, ROT0,    "Nichibutsu", "Mahjong Keibaou (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mjuraden, 0,        mjuraden, mjuraden, nbmj9195_state, empty_init, ROT0,    "Nichibutsu / Yubis",                  "Mahjong Uranai Densetsu (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, koinomp,  0,        koinomp,  koinomp,  nbmj9195_state, empty_init, ROT0,    "Nichibutsu",                          "Mahjong Koi no Magic Potion (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, patimono, 0,        patimono, koinomp,  nbmj9195_state, empty_init, ROT0,    "Nichibutsu",                          "Mahjong Pachinko Monogatari (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, janbari,  0,        janbari,  janbari,  nbmj9195_state, empty_init, ROT0,    "Nichibutsu / Yubis / AV Japan",       "Mahjong Janjan Baribari (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mjanbari, janbari,  janbari,  pachiten, nbmj9195_state, empty_init, ROT0,    "Nichibutsu / Yubis / AV Japan",       "Medal Mahjong Janjan Baribari (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mmehyou,  0,        mmehyou,  mmehyou,  nbmj9195_state, empty_init, ROT0,    "Nichibutsu / Kawakusu",               "Medal Mahjong Circuit no Mehyou (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, ultramhm, 0,        ultramhm, ultramhm, nbmj9195_state, empty_init, ROT0,    "Apple",                               "Ultra Maru-hi Mahjong (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, gal10ren, 0,        gal10ren, gal10ren, nbmj9195_state, empty_init, ROT0,    "Fujic",                               "Mahjong Gal 10-renpatsu (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, renaiclb, 0,        renaiclb, renaiclb, nbmj9195_state, empty_init, ROT0,    "Fujic",                               "Mahjong Ren-ai Club (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mjlaman,  0,        mjlaman,  mjlaman,  nbmj9195_state, empty_init, ROT0,    "Nichibutsu / AV Japan",               "Mahjong La Man (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mkeibaou, 0,        mkeibaou, koinomp,  nbmj9195_state, empty_init, ROT0,    "Nichibutsu",                          "Mahjong Keibaou (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, pachiten, 0,        pachiten, pachiten, nbmj9195_state, empty_init, ROT0,    "Nichibutsu / AV Japan / Miki Syouji", "Medal Mahjong Pachi-Slot Tengoku (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, sailorws, 0,        sailorws, sailorws, nbmj9195_state, empty_init, ROT0,    "Nichibutsu", "Mahjong Sailor Wars (Japan set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, sailorwa, sailorws, sailorws, sailorws, nbmj9195_state, empty_init, ROT0,    "Nichibutsu", "Mahjong Sailor Wars (Japan set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, sailorwr, sailorws, sailorwr, sailorwr, nbmj9195_state, empty_init, ROT0,    "Nichibutsu", "Mahjong Sailor Wars-R (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, wcatcher, 0,        otatidai, wcatcher, nbmj9195_state, empty_init, ROT0,    "Nichibutsu", "Mahjong Wakuwaku Catcher (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, jituroku, 0,        jituroku, jituroku, nbmj9195_state, empty_init, ROT0,    "Windom", "Jitsuroku Maru-chi Mahjong (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, yosimoto, 0,        yosimoto, yosimoto, nbmj9195_state, empty_init, ROT0,    "Nichibutsu / Yoshimoto Kougyou", "Mahjong Yoshimoto Gekijou (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, yosimotm, yosimoto, yosimotm, yosimotm, nbmj9195_state, empty_init, ROT0,    "Nichibutsu / Yoshimoto Kougyou", "Mahjong Yoshimoto Gekijou (Japan, medal)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, psailor1, 0,        psailor1, psailor1, nbmj9195_state, empty_init, ROT0,    "Sphinx", "Bishoujo Janshi Pretty Sailor 18-kin (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, psailor2, 0,        psailor2, psailor2, nbmj9195_state, empty_init, ROT0,    "Sphinx", "Bishoujo Janshi Pretty Sailor 2 (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, otatidai, 0,        otatidai, otatidai, nbmj9195_state, empty_init, ROT0,    "Sphinx", "Disco Mahjong Otachidai no Okite (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, sailorws, 0,        sailorws, sailorws, nbmj9195_state, empty_init, ROT0,    "Nichibutsu",                          "Mahjong Sailor Wars (Japan set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, sailorwa, sailorws, sailorws, sailorws, nbmj9195_state, empty_init, ROT0,    "Nichibutsu",                          "Mahjong Sailor Wars (Japan set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, sailorwr, sailorws, sailorwr, sailorwr, nbmj9195_state, empty_init, ROT0,    "Nichibutsu",                          "Mahjong Sailor Wars-R (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, wcatcher, 0,        otatidai, wcatcher, nbmj9195_state, empty_init, ROT0,    "Nichibutsu",                          "Mahjong Wakuwaku Catcher (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, jituroku, 0,        jituroku, jituroku, nbmj9195_state, empty_init, ROT0,    "Windom",                              "Jitsuroku Maru-chi Mahjong (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, yosimoto, 0,        yosimoto, yosimoto, nbmj9195_state, empty_init, ROT0,    "Nichibutsu / Yoshimoto Kougyou",      "Mahjong Yoshimoto Gekijou (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, yosimotm, yosimoto, yosimotm, yosimotm, nbmj9195_state, empty_init, ROT0,    "Nichibutsu / Yoshimoto Kougyou",      "Mahjong Yoshimoto Gekijou (Japan, medal)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, psailor1, 0,        psailor1, psailor1, nbmj9195_state, empty_init, ROT0,    "Sphinx",                              "Bishoujo Janshi Pretty Sailor 18-kin (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, psailor2, 0,        psailor2, psailor2, nbmj9195_state, empty_init, ROT0,    "Sphinx",                              "Bishoujo Janshi Pretty Sailor 2 (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, otatidai, 0,        otatidai, otatidai, nbmj9195_state, empty_init, ROT0,    "Sphinx",                              "Disco Mahjong Otachidai no Okite (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, ngpgal,   0,        ngpgal,   ngpgal,   nbmj9195_state, empty_init, ROT0,    "Nichibutsu", "Nekketsu Grand-Prix Gal (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, mjgottsu, 0,        mjgottsu, mjgottsu, nbmj9195_state, empty_init, ROT0,    "Nichibutsu", "Mahjong Gottsu ee-kanji (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, bakuhatu, mjgottsu, bakuhatu, bakuhatu, nbmj9195_state, empty_init, ROT0,    "Nichibutsu", "Mahjong Bakuhatsu Junjouden (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, cmehyou,  0,        cmehyou,  cmehyou,  nbmj9195_state, empty_init, ROT0,    "Nichibutsu / Kawakusu", "Mahjong Circuit no Mehyou (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mjkoiura, 0,        mjkoiura, mjkoiura, nbmj9195_state, empty_init, ROT0,    "Nichibutsu", "Mahjong Koi Uranai (Japan set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mkoiuraa, mjkoiura, mkoiuraa, mjkoiura, nbmj9195_state, empty_init, ROT0,    "Nichibutsu", "Mahjong Koi Uranai (Japan set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, ngpgal,   0,        ngpgal,   ngpgal,   nbmj9195_state, empty_init, ROT0,    "Nichibutsu",                          "Nekketsu Grand-Prix Gal (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mjgottsu, 0,        mjgottsu, mjgottsu, nbmj9195_state, empty_init, ROT0,    "Nichibutsu",                          "Mahjong Gottsu ee-kanji (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, bakuhatu, mjgottsu, bakuhatu, bakuhatu, nbmj9195_state, empty_init, ROT0,    "Nichibutsu",                          "Mahjong Bakuhatsu Junjouden (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, cmehyou,  0,        cmehyou,  cmehyou,  nbmj9195_state, empty_init, ROT0,    "Nichibutsu / Kawakusu",               "Mahjong Circuit no Mehyou (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mjkoiura, 0,        mjkoiura, mjkoiura, nbmj9195_state, empty_init, ROT0,    "Nichibutsu",                          "Mahjong Koi Uranai (Japan set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, mkoiuraa, mjkoiura, mkoiuraa, mjkoiura, nbmj9195_state, empty_init, ROT0,    "Nichibutsu",                          "Mahjong Koi Uranai (Japan set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, mscoutm,  0,        mscoutm,  mscoutm,  nbmj9195_state, empty_init, ROT0,    "Sphinx / AV Japan", "Mahjong Scout Man (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, imekura,  0,        imekura,  imekura,  nbmj9195_state, empty_init, ROT0,    "Sphinx / AV Japan", "Imekura Mahjong (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mjegolf,  0,        mjegolf,  mjegolf,  nbmj9195_state, empty_init, ROT0,    "Fujic / AV Japan", "Mahjong Erotica Golf (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mscoutm,  0,        mscoutm,  mscoutm,  nbmj9195_state, empty_init, ROT0,    "Sphinx / AV Japan",                   "Mahjong Scout Man (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, imekura,  0,        imekura,  imekura,  nbmj9195_state, empty_init, ROT0,    "Sphinx / AV Japan",                   "Imekura Mahjong (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mjegolf,  0,        mjegolf,  mjegolf,  nbmj9195_state, empty_init, ROT0,    "Fujic / AV Japan",                    "Mahjong Erotica Golf (Japan)", MACHINE_SUPPORTS_SAVE )

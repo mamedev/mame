@@ -395,8 +395,8 @@ static const gfx_layout layout_6bpp_tile_hi = {
 };
 
 static GFXDECODE_START( gfx_taito_f3 )
-	GFXDECODE_ENTRY( nullptr,      0, charlayout,             0x0000, 0x0400>>4 ) /* Dynamically modified */
-	GFXDECODE_ENTRY( nullptr,      0, pivotlayout,            0x0000,  0x400>>4 ) /* Dynamically modified */
+	GFXDECODE_RAM(   nullptr,      0, charlayout,             0x0000, 0x0400>>4 ) // dynamically modified
+	GFXDECODE_RAM(   nullptr,      0, pivotlayout,            0x0000,  0x400>>4 ) // dynamically modified
 	GFXDECODE_ENTRY( "sprites",    0, gfx_16x16x4_packed_lsb, 0x1000, 0x1000>>4 ) // low 4bpp of 6bpp sprite data
 	GFXDECODE_ENTRY( "tilemap",    0, gfx_16x16x4_packed_lsb, 0x0000, 0x2000>>4 ) // low 4bpp of 6bpp tilemap data
 	GFXDECODE_ENTRY( "tilemap_hi", 0, layout_6bpp_tile_hi,    0x0000, 0x2000>>4 ) // hi 2bpp of 6bpp tilemap data
@@ -513,9 +513,9 @@ static const gfx_layout bubsympb_layout_5bpp_tile_hi = {
 
 
 static GFXDECODE_START( gfx_bubsympb )
-	GFXDECODE_ENTRY( nullptr,      0, charlayout,                   0,  64 ) /* Dynamically modified */
-	GFXDECODE_ENTRY( nullptr,      0, pivotlayout,                  0,  64 ) /* Dynamically modified */
-	GFXDECODE_ENTRY( "sprites",    0, bubsympb_sprite_layout,    4096, 256 ) /* Sprites area (6bpp planar) */
+	GFXDECODE_RAM(   nullptr,      0, charlayout,                   0,  64 ) // dynamically modified
+	GFXDECODE_RAM(   nullptr,      0, pivotlayout,                  0,  64 ) // dynamically modified
+	GFXDECODE_ENTRY( "sprites",    0, bubsympb_sprite_layout,    4096, 256 ) /* sprites area (6bpp planar) */
 	GFXDECODE_ENTRY( "tilemap",    0, gfx_16x16x4_packed_lsb,       0, 512 ) // low 4bpp of 5bpp tilemap data
 	GFXDECODE_ENTRY( "tilemap_hi", 0, bubsympb_layout_5bpp_tile_hi, 0, 512 ) // hi 1bpp of 5bpp tilemap data
 	GFXDECODE_ENTRY( "sprites",    0, bubsympb_sprite_layout,    4096, 256 ) // dummy gfx duplicate for avoid crash

@@ -25,7 +25,6 @@ protected:
 	virtual bool describe(opcode_desc &desc, const opcode_desc *prev) override;
 
 private:
-
 	mb86235_device *m_core;
 
 	void describe_alu(opcode_desc &desc, uint32_t aluop);

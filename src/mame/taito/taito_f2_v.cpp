@@ -28,16 +28,16 @@ enum
 
 /***********************************************************************************/
 
-TC0100SCN_CB_MEMBER(taitof2_state::mjnquest_tmap_cb)
+TC0100SCN_CB_MEMBER(mjnquest_state::tmap_cb)
 {
 	*code = (*code & 0x7fff) | (m_gfxbank << 15);
 }
 
-void taitof2_state::mjnquest_gfxbank_w(u8 data)
+void mjnquest_state::gfxbank_w(u8 data)
 {
-	if ((data ^ m_gfxbank) & 1)
+	if (BIT(data ^ m_gfxbank, 0))
 	{
-		m_gfxbank = data & 1;
+		m_gfxbank = BIT(data, 0);
 		m_tc0100scn[0]->tilemap_set_dirty();
 	}
 }
@@ -66,7 +66,7 @@ void taitof2_state::core_vh_start(int sprite_type, int hide, int flip_hide)
 	m_sprites_master_scrolly = 0;
 
 	m_spriteblendmode = 0;
-	m_prepare_sprites = 0;
+	m_prepare_sprites = false;
 
 	m_game = 0;  /* means NOT footchmp */
 
@@ -149,36 +149,20 @@ VIDEO_START_MEMBER(taitof2_state,thundfox)
 	core_vh_start(0, 3, -3);
 }
 
-VIDEO_START_MEMBER(taitof2_state,mjnquest)
+void mjnquest_state::video_start()
 {
 	core_vh_start(0, 0, 0);
+	save_item(NAME(m_gfxbank));
 }
 
-VIDEO_START_MEMBER(taitof2_state,footchmp)
+VIDEO_START_MEMBER(footchmp_state,footchmp)
 {
 	core_vh_start(0, 3, 3);
 
 	m_game = FOOTCHMP;
 }
 
-VIDEO_START_MEMBER(taitof2_state,hthero)
-{
-	core_vh_start(0, 3, 3);
-
-	m_game = FOOTCHMP;
-}
-
-VIDEO_START_MEMBER(taitof2_state,deadconx)
-{
-	core_vh_start(0, 3, 3);
-}
-
-VIDEO_START_MEMBER(taitof2_state,deadconxj)
-{
-	core_vh_start(0, 3, 3);
-}
-
-VIDEO_START_MEMBER(taitof2_state,metalb)
+VIDEO_START_MEMBER(footchmp_state,deadconx)/* deadconx, metalb */
 {
 	core_vh_start(0, 3, 3);
 }
@@ -198,21 +182,21 @@ VIDEO_START_MEMBER(taitof2_state,dinorex)
 	core_vh_start(3, 3, 3);
 }
 
-VIDEO_START_MEMBER(taitof2_state,dondokod)/* dondokod, cameltry */
+VIDEO_START_MEMBER(dondokod_state,dondokod)/* dondokod, cameltry */
 {
 	m_pivot_xdisp = -16;
 	m_pivot_ydisp = 0;
 	core_vh_start(0, 3, 3);
 }
 
-VIDEO_START_MEMBER(taitof2_state,pulirula)
+VIDEO_START_MEMBER(dondokod_state,pulirula)
 {
 	m_pivot_xdisp = -10;    /* alignment seems correct (see level 2, falling */
 	m_pivot_ydisp = 16; /* block of ice after armour man) */
 	core_vh_start(2, 3, 3);
 }
 
-VIDEO_START_MEMBER(taitof2_state,driftout)
+VIDEO_START_MEMBER(dondokod_state,driftout)
 {
 	m_pivot_xdisp = -16;
 	m_pivot_ydisp = 16;
@@ -365,19 +349,19 @@ void taitof2_state::taito_f2_tc360_spritemixdraw(screen_device &screen, bitmap_i
 					for (int x = sx; x < ex; x++)
 					{
 						const u8 c = source[x_index >> 16];
-						if (c && (pri[x] & 0x80) == 0)
+						if (c && BIT(~pri[x], 7))
 						{
-							u8 tilemap_priority = 0, sprite_priority = 0;
+							u8 tilemap_priority = 0;
 
 							// Get tilemap priority (0 - 0xf) for this destination pixel
-							if (pri[x] & 0x10) tilemap_priority = m_tilepri[4];
-							else if (pri[x] & 0x8) tilemap_priority = m_tilepri[3];
-							else if (pri[x] & 0x4) tilemap_priority = m_tilepri[2];
-							else if (pri[x] & 0x2) tilemap_priority = m_tilepri[1];
-							else if (pri[x] & 0x1) tilemap_priority = m_tilepri[0];
+							if (BIT(pri[x], 4)) tilemap_priority = m_tilepri[4];
+							else if (BIT(pri[x], 3)) tilemap_priority = m_tilepri[3];
+							else if (BIT(pri[x], 2)) tilemap_priority = m_tilepri[2];
+							else if (BIT(pri[x], 1)) tilemap_priority = m_tilepri[1];
+							else if (BIT(pri[x], 0)) tilemap_priority = m_tilepri[0];
 
 							// Get sprite priority (0 - 0xf) for this source pixel
-							sprite_priority = m_spritepri[primask & 0x03];
+							const u8 sprite_priority = m_spritepri[primask & 0x03];
 
 							// Blend mode 1 - Sprite under tilemap, use sprite palette with tilemap data
 							if ((m_spriteblendmode & 0xc0) == 0xc0 && sprite_priority == (tilemap_priority - 1))
@@ -427,7 +411,7 @@ void taitof2_state::taito_f2_tc360_spritemixdraw(screen_device &screen, bitmap_i
 					for (int x = sx; x < ex; x++)
 					{
 						const u8 c = source[x_index >> 16];
-						if (c && (pri[x] & 0x80) == 0)
+						if (c && BIT(~pri[x], 7))
 						{
 							if (((1 << (pri[x] & 0x3f)) & primask) == 0)
 								dest[x] = pal_base + c;
@@ -494,15 +478,15 @@ void taitof2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 	                           this bit clear is found
 	          --x------------- flip screen
 
-	    000b - 000f : unused
+	    000c - 000f : unused
 
 	DG comment: the sprite zoom code grafted on from Jarek's TaitoB
 	may mean I have pointlessly duplicated x,y latches in the zoom &
 	non zoom parts.
 
 	*/
-	int big_sprite = 0;
-	int y_no = 0, x_no = 0, xlatch = 0, ylatch = 0, last_continuation_tile = 0;   /* for zooms */
+	bool big_sprite = false, last_continuation_tile = false;
+	int y_no = 0, x_no = 0, xlatch = 0, ylatch = 0;   /* for zooms */
 	u32 zoomword, zoomx, zoomy, zx = 0, zy = 0, zoomxlatch = 0, zoomylatch = 0;   /* for zooms */
 	int scrollx = 0, scrolly = 0;
 
@@ -541,10 +525,10 @@ void taitof2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 		/* sprites_active_area may change during processing */
 		const int offs = off + area;
 
-		if (m_spriteram_buffered[(offs + 6) / 2] & 0x8000)
+		if (BIT(m_spriteram_buffered[(offs + 6) / 2], 15))
 		{
-			disabled = m_spriteram_buffered[(offs + 10) / 2] & 0x1000;
-			m_sprites_flipscreen = m_spriteram_buffered[(offs + 10) / 2] & 0x2000;
+			disabled = BIT(m_spriteram_buffered[(offs + 10) / 2], 12);
+			m_sprites_flipscreen = BIT(m_spriteram_buffered[(offs + 10) / 2], 13);
 
 			/* Get rid of 0-3 unwanted pixels on edge of screen. */
 			f2_x_offset = m_hide_pixels;
@@ -563,24 +547,14 @@ void taitof2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 		/* check for extra scroll offset */
 		if ((m_spriteram_buffered[(offs + 4) / 2] & 0xf000) == 0xa000)
 		{
-			master_scrollx = m_spriteram_buffered[(offs + 4) / 2] & 0xfff;
-			if (master_scrollx >= 0x800)
-				master_scrollx -= 0x1000;   /* signed value */
-
-			master_scrolly = m_spriteram_buffered[(offs + 6) / 2] & 0xfff;
-			if (master_scrolly >= 0x800)
-				master_scrolly -= 0x1000;   /* signed value */
+			master_scrollx = util::sext(m_spriteram_buffered[(offs + 4) / 2], 12);
+			master_scrolly = util::sext(m_spriteram_buffered[(offs + 6) / 2], 12);
 		}
 
 		if ((m_spriteram_buffered[(offs + 4) / 2] & 0xf000) == 0x5000)
 		{
-			scroll1x = m_spriteram_buffered[(offs + 4) / 2] & 0xfff;
-			if (scroll1x >= 0x800)
-				scroll1x -= 0x1000;   /* signed value */
-
-			scroll1y = m_spriteram_buffered[(offs + 6) / 2] & 0xfff;
-			if (scroll1y >= 0x800)
-				scroll1y -= 0x1000;   /* signed value */
+			scroll1x = util::sext(m_spriteram_buffered[(offs + 4) / 2], 12);
+			scroll1y = util::sext(m_spriteram_buffered[(offs + 6) / 2], 12);
 		}
 
 		if (disabled)
@@ -590,9 +564,9 @@ void taitof2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 
 		const u16 spritecont = (spritedata & 0xff00) >> 8;
 
-		if ((spritecont & 0x08) != 0)   /* sprite continuation flag set */
+		if (BIT(spritecont, 3))   /* sprite continuation flag set */
 		{
-			if (big_sprite == 0)   /* are we starting a big sprite ? */
+			if (!big_sprite)   /* are we starting a big sprite ? */
 			{
 				xlatch = m_spriteram_buffered[(offs + 4) / 2] & 0xfff;
 				ylatch = m_spriteram_buffered[(offs + 6) / 2] & 0xfff;
@@ -601,23 +575,23 @@ void taitof2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 				zoomword = m_spriteram_buffered[(offs + 2) / 2];
 				zoomylatch = (zoomword >> 8) & 0xff;
 				zoomxlatch = (zoomword >> 0) & 0xff;
-				big_sprite = 1;   /* we have started a new big sprite */
+				big_sprite = true;   /* we have started a new big sprite */
 			}
 		}
 		else if (big_sprite)
 		{
-			last_continuation_tile = 1;   /* don't clear big_sprite until last tile done */
+			last_continuation_tile = true;   /* don't clear big_sprite until last tile done */
 		}
 
 
-		if ((spritecont & 0x04) == 0)
+		if (BIT(~spritecont, 2))
 			color = spritedata & 0xff;
 
 
 // The bigsprite == 0 check fixes "tied-up" little sprites in Thunderfox
 // which (mostly?) have spritecont = 0x20 when they are not continuations
 // of anything.
-		if (big_sprite == 0 || (spritecont & 0xf0) == 0)
+		if (!big_sprite || !(spritecont & 0xf0))
 		{
 			x = m_spriteram_buffered[(offs + 4) / 2];
 
@@ -626,12 +600,12 @@ void taitof2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 // journey in MjnQuest). You will see they are 1 pixel too far to the right.
 // Where is this extra pixel offset coming from??
 
-			if (x & 0x8000)   /* absolute (koshien) */
+			if (BIT(x, 15))   /* absolute (koshien) */
 			{
 				scrollx = - f2_x_offset - 0x60;
 				scrolly = 0;
 			}
-			else if (x & 0x4000)   /* ignore extra scroll */
+			else if (BIT(x, 14))   /* ignore extra scroll */
 			{
 				scrollx = master_scrollx - f2_x_offset - 0x60;
 				scrolly = master_scrolly;
@@ -649,19 +623,19 @@ void taitof2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 		}
 		else
 		{
-			if ((spritecont & 0x10) == 0)
+			if (BIT(~spritecont, 4))
 				y = ycurrent;
-			else if ((spritecont & 0x20) != 0)
+			else if (BIT(spritecont, 5))
 			{
 				y += 16;
 				y_no++;   /* keep track of y tile for zooms */
 			}
-			if ((spritecont & 0x40) == 0)
+			if (BIT(~spritecont, 6))
 				x = xcurrent;
-			else if ((spritecont & 0x80) != 0)
+			else if (BIT(spritecont, 7))
 			{
 				x += 16;
-				y_no=0;
+				y_no = 0;
 				x_no++;   /* keep track of x tile for zooms */
 			}
 		}
@@ -703,8 +677,8 @@ void taitof2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 
 		if (last_continuation_tile)
 		{
-			big_sprite=0;
-			last_continuation_tile=0;
+			big_sprite = false;
+			last_continuation_tile = false;
 		}
 
 		u32 code = 0;
@@ -714,39 +688,36 @@ void taitof2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 
 		if (m_sprite_type == 0)
 		{
-			code = m_spriteram_buffered[(offs) / 2] & 0x1fff;
+			code = m_spriteram_buffered[offs / 2] & 0x1fff;
 			const u32 i = (code & 0x1c00) >> 10;
 			code = m_spritebank[i] + (code & 0x3ff);
 		}
 
 		if (m_sprite_type == 1)   /* Yuyugogo */
 		{
-			code = m_spriteram_buffered[(offs) / 2] & 0x3ff;
+			code = m_spriteram_buffered[offs / 2] & 0x3ff;
 			code |= (m_sprite_extension[(extoffs >> 4)] & 0x3f) << 10;
 		}
 
 		if (m_sprite_type == 2)   /* Pulirula */
 		{
-			code = m_spriteram_buffered[(offs) / 2] & 0xff;
+			code = m_spriteram_buffered[offs / 2] & 0xff;
 			code |= (m_sprite_extension[(extoffs >> 4)] & 0xff00);
 		}
 
 		if (m_sprite_type == 3)   /* Dinorex and a few quizzes */
 		{
-			code = m_spriteram_buffered[(offs) / 2] & 0xff;
+			code = m_spriteram_buffered[offs / 2] & 0xff;
 			code |= (m_sprite_extension[(extoffs >> 4)] & 0xff) << 8;
 		}
 
 		if (code == 0) continue;
 
-		int flipx = spritecont & 0x01;
-		int flipy = spritecont & 0x02;
+		int flipx = BIT(spritecont, 0);
+		int flipy = BIT(spritecont, 1);
 
-		int curx = (x + scrollx) & 0xfff;
-		if (curx >= 0x800)  curx -= 0x1000;   /* treat it as signed */
-
-		int cury = (y + scrolly) & 0xfff;
-		if (cury >= 0x800)  cury -= 0x1000;   /* treat it as signed */
+		int curx = util::sext(x + scrollx, 12);
+		int cury = util::sext(y + scrolly, 12);
 
 		if (m_sprites_flipscreen)
 		{
@@ -783,12 +754,13 @@ void taitof2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 			}
 			else
 			{
-				m_gfxdecode->gfx(0)->zoom_transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(0)->zoom_transpen(bitmap, cliprect,
 						sprite_ptr->code,
 						sprite_ptr->color,
-						sprite_ptr->flipx,sprite_ptr->flipy,
-						sprite_ptr->x,sprite_ptr->y,
-						sprite_ptr->zoomx,sprite_ptr->zoomy,0);
+						sprite_ptr->flipx, sprite_ptr->flipy,
+						sprite_ptr->x, sprite_ptr->y,
+						sprite_ptr->zoomx, sprite_ptr->zoomy,
+						0);
 			}
 		}
 	}
@@ -799,12 +771,15 @@ void taitof2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 	{
 		sprite_ptr--;
 
-		taito_f2_tc360_spritemixdraw(screen,bitmap,cliprect,m_gfxdecode->gfx(0),
+		taito_f2_tc360_spritemixdraw(screen, bitmap, cliprect,
+				m_gfxdecode->gfx(0),
 				sprite_ptr->code,
 				sprite_ptr->color,
-				sprite_ptr->flipx,sprite_ptr->flipy,
-				sprite_ptr->x,sprite_ptr->y,
-				sprite_ptr->zoomx,sprite_ptr->zoomy,sprite_ptr->primask,uses_tc360_mixer);
+				sprite_ptr->flipx, sprite_ptr->flipy,
+				sprite_ptr->x, sprite_ptr->y,
+				sprite_ptr->zoomx, sprite_ptr->zoomy,
+				sprite_ptr->primask,
+				uses_tc360_mixer);
 	}
 }
 
@@ -831,7 +806,7 @@ void taitof2_state::handle_sprite_buffering()
 	if (m_prepare_sprites)   /* no buffering */
 	{
 		memcpy(m_spriteram_buffered.get(), m_spriteram, m_spriteram.bytes());
-		m_prepare_sprites = 0;
+		m_prepare_sprites = false;
 	}
 }
 
@@ -853,9 +828,9 @@ void taitof2_state::update_sprites_active_area()
 		/* sprites_active_area may change during processing */
 		const int offs = off + m_sprites_active_area;
 
-		if (m_spriteram_buffered[(offs + 6) / 2] & 0x8000)
+		if (BIT(m_spriteram_buffered[(offs + 6) / 2], 15))
 		{
-			m_sprites_disabled = m_spriteram_buffered[(offs + 10) / 2] & 0x1000;
+			m_sprites_disabled = BIT(m_spriteram_buffered[(offs + 10) / 2], 12);
 			if (m_game == FOOTCHMP)
 				m_sprites_active_area = 0x8000 * (m_spriteram_buffered[(offs + 6) / 2] & 0x0001);
 			else
@@ -866,13 +841,8 @@ void taitof2_state::update_sprites_active_area()
 		/* check for extra scroll offset */
 		if ((m_spriteram_buffered[(offs + 4) / 2] & 0xf000) == 0xa000)
 		{
-			m_sprites_master_scrollx = m_spriteram_buffered[(offs + 4) / 2] & 0xfff;
-			if (m_sprites_master_scrollx >= 0x800)
-				m_sprites_master_scrollx -= 0x1000;   /* signed value */
-
-			m_sprites_master_scrolly = m_spriteram_buffered[(offs + 6) / 2] & 0xfff;
-			if (m_sprites_master_scrolly >= 0x800)
-				m_sprites_master_scrolly -= 0x1000;   /* signed value */
+			m_sprites_master_scrollx = util::sext(m_spriteram_buffered[(offs + 4) / 2], 12);
+			m_sprites_master_scrolly = util::sext(m_spriteram_buffered[(offs + 6) / 2], 12);
 		}
 	}
 }
@@ -885,7 +855,7 @@ void taitof2_state::screen_vblank_no_buffer(int state)
 	{
 		update_sprites_active_area();
 
-		m_prepare_sprites = 1;
+		m_prepare_sprites = true;
 	}
 }
 
@@ -896,7 +866,7 @@ void taitof2_state::screen_vblank_full_buffer_delayed(int state)
 	{
 		update_sprites_active_area();
 
-		m_prepare_sprites = 0;
+		m_prepare_sprites = false;
 		memcpy(m_spriteram_buffered.get(), m_spriteram_delayed.get(), m_spriteram.bytes());
 		for (int i = 0; i < m_spriteram.bytes() / 2; i++)
 			m_spriteram_buffered[i] = m_spriteram[i];
@@ -911,7 +881,7 @@ void taitof2_state::screen_vblank_partial_buffer_delayed(int state)
 	{
 		update_sprites_active_area();
 
-		m_prepare_sprites = 0;
+		m_prepare_sprites = false;
 		memcpy(m_spriteram_buffered.get(), m_spriteram_delayed.get(), m_spriteram.bytes());
 		for (int i = 0; i < m_spriteram.bytes() / 2; i += 4)
 			m_spriteram_buffered[i] = m_spriteram[i];
@@ -926,7 +896,7 @@ void taitof2_state::screen_vblank_partial_buffer_delayed_thundfox(int state)
 	{
 		update_sprites_active_area();
 
-		m_prepare_sprites = 0;
+		m_prepare_sprites = false;
 		memcpy(m_spriteram_buffered.get(), m_spriteram_delayed.get(), m_spriteram.bytes());
 		for (int i = 0; i < m_spriteram.bytes() / 2; i += 8)
 		{
@@ -948,7 +918,7 @@ void taitof2_state::screen_vblank_partial_buffer_delayed_qzchikyu(int state)
 
 		update_sprites_active_area();
 
-		m_prepare_sprites = 0;
+		m_prepare_sprites = false;
 		memcpy(m_spriteram_buffered.get(), m_spriteram_delayed.get(), m_spriteram.bytes());
 		for (int i = 0; i < m_spriteram.bytes() / 2; i += 8)
 		{
@@ -1045,16 +1015,16 @@ u32 taitof2_state::screen_update_pri(screen_device &screen, bitmap_ind16 &bitmap
 
 
 
-void taitof2_state::draw_roz_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u8 priority, u8 priority_mask)
+void dondokod_state::draw_roz_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, u8 priority, u8 priority_mask)
 {
 	if (m_tc0280grd != nullptr)
-		m_tc0280grd->tc0280grd_zoom_draw(screen, bitmap, cliprect, m_pivot_xdisp, m_pivot_ydisp, priority, priority_mask);
+		m_tc0280grd->zoom_draw(screen, bitmap, cliprect, m_pivot_xdisp, m_pivot_ydisp, priority, priority_mask);
 
 	if (m_tc0430grw != nullptr)
-		m_tc0430grw->tc0430grw_zoom_draw(screen, bitmap, cliprect, m_pivot_xdisp, m_pivot_ydisp, priority, priority_mask);
+		m_tc0430grw->zoom_draw(screen, bitmap, cliprect, m_pivot_xdisp, m_pivot_ydisp, priority, priority_mask);
 }
 
-u32 taitof2_state::screen_update_pri_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 dondokod_state::screen_update_pri_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int tilepri[3];
 	int layer[3];
@@ -1063,10 +1033,10 @@ u32 taitof2_state::screen_update_pri_roz(screen_device &screen, bitmap_ind16 &bi
 	handle_sprite_buffering();
 
 	if (m_tc0280grd != nullptr)
-		m_tc0280grd->tc0280grd_tilemap_update(roz_base_color);
+		m_tc0280grd->tilemap_update(roz_base_color);
 
 	if (m_tc0430grw != nullptr)
-		m_tc0430grw->tc0430grw_tilemap_update(roz_base_color);
+		m_tc0430grw->tilemap_update(roz_base_color);
 
 	m_tc0100scn[0]->tilemap_update();
 
@@ -1192,7 +1162,7 @@ u32 taitof2_state::screen_update_thundfox(screen_device &screen, bitmap_ind16 &b
 		if (spritepri[i] < tilepri[1][2]) primasks[i] |= 0xffffffff00000000U;
 	}
 
-	draw_sprites(screen, bitmap,cliprect,primasks,0);
+	draw_sprites(screen, bitmap, cliprect, primasks, 0);
 	return 0;
 }
 
@@ -1225,7 +1195,7 @@ and it changes these (and the sprite pri settings) a lot.
 
 ********************************************************************/
 
-u32 taitof2_state::screen_update_metalb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 footchmp_state::screen_update_metalb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	u8 layer[5], invlayer[4];
 
@@ -1274,7 +1244,7 @@ u32 taitof2_state::screen_update_metalb(screen_device &screen, bitmap_ind16 &bit
 
 
 /* Deadconx, Footchmp */
-u32 taitof2_state::screen_update_deadconx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 footchmp_state::screen_update_deadconx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	u8 layer[5];
 	u8 tilepri[5];

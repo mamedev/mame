@@ -3,8 +3,6 @@ LICENSE INFORMATION
 PmDefaults is a small program to set default MIDI input and output
 devices for other programs using the PortMidi library.
 
-Latest version available at: http://sourceforge.net/projects/portmedia
-
 Copyright (c) 1999-2000 Ross Bencina and Phil Burk
 Copyright (c) 2001-2009 Roger B. Dannenberg
 

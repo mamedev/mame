@@ -592,7 +592,7 @@ GFXDECODE_END
 
 static GFXDECODE_START( gfx_imago )
 	GFXDECODE_ENTRY( "gfx1",  0,      gfx_8x8x3_planar,    0, 32 )
-	GFXDECODE_ENTRY( nullptr, 0xb800, imago_spritelayout,  0, 32 )
+	GFXDECODE_RAM(   nullptr, 0xb800, imago_spritelayout,  0, 32 )
 	GFXDECODE_ENTRY( "gfx3",  0,      gfx_8x8x3_planar,    0, 32 )
 	GFXDECODE_ENTRY( "gfx4",  0,      gfx_8x8x1,       0x140,  1 )
 GFXDECODE_END

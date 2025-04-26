@@ -29,7 +29,7 @@
  JP5 = Video out (6 pins)
  JP6 = Buttons (15 pins)
 
- XATL = 32.000 MHz
+ XTAL = 32.000 MHz
 
  U7 = Oki
  U10 = Unpopulated socket for Max 202
@@ -55,9 +55,10 @@ class goldart_state : public driver_device
 public:
 	goldart_state(const machine_config& mconfig, device_type type, const char* tag) :
 		driver_device(mconfig, type, tag),
-		m_mcu(*this, "mcu"),
+		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
-		m_data(*this, "data")
+		m_data(*this, "data"),
+		m_io_in0(*this, "IN0")
 	{ }
 
 	void goldart(machine_config& config);
@@ -68,37 +69,38 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	required_device<ds5002fp_device> m_mcu;
+	required_device<ds5002fp_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_region_ptr<uint8_t> m_data;
+	required_ioport m_io_in0;
 
-	void mcu_port1_w(uint8_t data);
-	uint8_t mcu_port1_r();
+	void port1_w(uint8_t data);
+	uint8_t port1_r();
 
+	uint32_t screen_update(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect);
+	void main_prgmap(address_map &map) ATTR_COLD;
+	void main_datamap(address_map &map) ATTR_COLD;
 
-	uint32_t screen_update_goldart(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect);
-	void dallas_rom(address_map &map) ATTR_COLD;
-	void dallas_ram(address_map &map) ATTR_COLD;
-
-	uint8_t m_ram[0x10000];
-	uint8_t m_ram2[0x10000];
+	std::unique_ptr<uint8_t[]> m_ram;
+	std::unique_ptr<uint8_t[]> m_ram2;
 
 	uint8_t m_port1 = 0;
 
-	uint8_t hostmem_r(offs_t offset);
-	void hostmem_w(offs_t offset, uint8_t data);
+	uint8_t mem_r(offs_t offset);
+	void mem_w(offs_t offset, uint8_t data);
 };
 
-void goldart_state::mcu_port1_w(uint8_t data)
+void goldart_state::port1_w(uint8_t data)
 {
-	logerror("%s: mcu_port1_w %02x\n", machine().describe_context(), data);
+	logerror("%s: port1_w %02x\n", machine().describe_context(), data);
 	m_port1 = data;
 }
 
-uint8_t goldart_state::mcu_port1_r()
+uint8_t goldart_state::port1_r()
 {
-	uint8_t ret = m_port1;
-	logerror("%s: mcu_port1_r %02x\n", machine().describe_context(), ret);
+	uint8_t const ret = m_port1;
+	if (!machine().side_effects_disabled())
+		logerror("%s: port1_r %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
@@ -106,28 +108,28 @@ void goldart_state::video_start()
 {
 }
 
-uint32_t goldart_state::screen_update_goldart(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect)
+uint32_t goldart_state::screen_update(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect)
 {
-	int count = 0;
-	for (int y = 0; y < 288; y++)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		for (int x = 0; x < 192; x++)
+		int count = (y * 192) + (cliprect.min_x >> 1);
+		uint16_t *const dstptr_bitmap = &bitmap.pix(y);
+		for (int x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
 		{
-			uint16_t *const dstptr_bitmap = &bitmap.pix(y);
 			uint8_t const data = m_ram[count];
 			uint8_t const data2 = m_ram2[count];
 
 			count++;
 
-			dstptr_bitmap[x*2] = ((data&0xf0)>>4)  | (data2 & 0xf0);
-			dstptr_bitmap[(x*2)+1] = (data&0x0f) | ((data2 & 0x0f)<<4);
+			dstptr_bitmap[x] = ((data & 0xf0) >> 4)  | (data2 & 0xf0);
+			dstptr_bitmap[x + 1] = (data & 0x0f) | ((data2 & 0x0f) << 4);
 		}
 	}
 
 	return 0;
 }
 
-uint8_t goldart_state::hostmem_r(offs_t offset)
+uint8_t goldart_state::mem_r(offs_t offset)
 {
 	// must be some control bits (or DS5002FP memory access isn't correct) as registers map over ROM/RAM with no obvious way to select at the moment
 	// and we need to be able to access full range of each ROM bank at least
@@ -135,60 +137,61 @@ uint8_t goldart_state::hostmem_r(offs_t offset)
 	// sometimes bit 0x40 is set in port1, but it doesn't seem a simple RAM/ROM select
 	// also bit 0x20 has been seen set too
 
-	int bank = m_port1 & 0x07;
+	int const bank = m_port1 & 0x07;
 	uint8_t ret = 0x00;
 
 	ret = m_data[(bank * 0x10000) + offset];
-	logerror("%s: hostmem_r %02x:%04x: %02x (from ROM?)\n", machine().describe_context(), m_port1, offset, ret);
+	if (!machine().side_effects_disabled())
+		logerror("%s: mem_r %02x:%04x: %02x (from ROM?)\n", machine().describe_context(), m_port1, offset, ret);
 
 	if (offset == 0xfff3)
 	{
-	//  logerror("%s: hostmem_r %04x: %02x (from ROM?) %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02 bank %02xx\n", machine().describe_context(), offset, ret, m_ram[0xfff0], m_ram[0xfff1], m_ram[0xfff2], m_ram[0xfff3], m_ram[0xfff4], m_ram[0xfff5], m_ram[0xfff6], m_ram[0xfff7], m_ram[0xfff8], m_ram[0xfff9], m_ram[0xfffa], m_ram[0xfffb], m_ram[0xfffc], m_ram[0xfffd], m_ram[0xfffe], m_ram[0xffff], m_port1);
+	//  logerror("%s: mem_r %04x: %02x (from ROM?) %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02 bank %02xx\n", machine().describe_context(), offset, ret, m_ram[0xfff0], m_ram[0xfff1], m_ram[0xfff2], m_ram[0xfff3], m_ram[0xfff4], m_ram[0xfff5], m_ram[0xfff6], m_ram[0xfff7], m_ram[0xfff8], m_ram[0xfff9], m_ram[0xfffa], m_ram[0xfffb], m_ram[0xfffc], m_ram[0xfffd], m_ram[0xfffe], m_ram[0xffff], m_port1);
 		return machine().rand();
 	}
 
 	if (offset == 0xfff4)
 	{
-	//  logerror("%s: hostmem_r %04x: %02x (from ROM?) %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02 bank %02xx\n", machine().describe_context(), offset, ret, m_ram[0xfff0], m_ram[0xfff1], m_ram[0xfff2], m_ram[0xfff3], m_ram[0xfff4], m_ram[0xfff5], m_ram[0xfff6], m_ram[0xfff7], m_ram[0xfff8], m_ram[0xfff9], m_ram[0xfffa], m_ram[0xfffb], m_ram[0xfffc], m_ram[0xfffd], m_ram[0xfffe], m_ram[0xffff], m_port1);
+	//  logerror("%s: mem_r %04x: %02x (from ROM?) %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02 bank %02xx\n", machine().describe_context(), offset, ret, m_ram[0xfff0], m_ram[0xfff1], m_ram[0xfff2], m_ram[0xfff3], m_ram[0xfff4], m_ram[0xfff5], m_ram[0xfff6], m_ram[0xfff7], m_ram[0xfff8], m_ram[0xfff9], m_ram[0xfffa], m_ram[0xfffb], m_ram[0xfffc], m_ram[0xfffd], m_ram[0xfffe], m_ram[0xffff], m_port1);
 		return machine().rand();
 	}
 
 	if (offset == 0xfff8)
 	{
-	//  logerror("%s: hostmem_r %04x: %02x (from ROM?) %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02 bank %02xx\n", machine().describe_context(), offset, ret, m_ram[0xfff0], m_ram[0xfff1], m_ram[0xfff2], m_ram[0xfff3], m_ram[0xfff4], m_ram[0xfff5], m_ram[0xfff6], m_ram[0xfff7], m_ram[0xfff8], m_ram[0xfff9], m_ram[0xfffa], m_ram[0xfffb], m_ram[0xfffc], m_ram[0xfffd], m_ram[0xfffe], m_ram[0xffff], m_port1);
+	//  logerror("%s: mem_r %04x: %02x (from ROM?) %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02 bank %02xx\n", machine().describe_context(), offset, ret, m_ram[0xfff0], m_ram[0xfff1], m_ram[0xfff2], m_ram[0xfff3], m_ram[0xfff4], m_ram[0xfff5], m_ram[0xfff6], m_ram[0xfff7], m_ram[0xfff8], m_ram[0xfff9], m_ram[0xfffa], m_ram[0xfffb], m_ram[0xfffc], m_ram[0xfffd], m_ram[0xfffe], m_ram[0xffff], m_port1);
 		return machine().rand();
 	}
 
 	if (offset == 0xfffb)
 	{
-	//  logerror("%s: hostmem_r %04x: %02x (from ROM?) %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02 bank %02xx\n", machine().describe_context(), offset, ret, m_ram[0xfff0], m_ram[0xfff1], m_ram[0xfff2], m_ram[0xfff3], m_ram[0xfff4], m_ram[0xfff5], m_ram[0xfff6], m_ram[0xfff7], m_ram[0xfff8], m_ram[0xfff9], m_ram[0xfffa], m_ram[0xfffb], m_ram[0xfffc], m_ram[0xfffd], m_ram[0xfffe], m_ram[0xffff], m_port1);
+	//  logerror("%s: mem_r %04x: %02x (from ROM?) %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02 bank %02xx\n", machine().describe_context(), offset, ret, m_ram[0xfff0], m_ram[0xfff1], m_ram[0xfff2], m_ram[0xfff3], m_ram[0xfff4], m_ram[0xfff5], m_ram[0xfff6], m_ram[0xfff7], m_ram[0xfff8], m_ram[0xfff9], m_ram[0xfffa], m_ram[0xfffb], m_ram[0xfffc], m_ram[0xfffd], m_ram[0xfffe], m_ram[0xffff], m_port1);
 		return machine().rand();
 	}
 
 	if (offset == 0xfffc)
 	{
-	//  logerror("%s: hostmem_r %04x: %02x (from ROM?) %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02 bank %02xx\n", machine().describe_context(), offset, ret, m_ram[0xfff0], m_ram[0xfff1], m_ram[0xfff2], m_ram[0xfff3], m_ram[0xfff4], m_ram[0xfff5], m_ram[0xfff6], m_ram[0xfff7], m_ram[0xfff8], m_ram[0xfff9], m_ram[0xfffa], m_ram[0xfffb], m_ram[0xfffc], m_ram[0xfffd], m_ram[0xfffe], m_ram[0xffff], m_port1);
+	//  logerror("%s: mem_r %04x: %02x (from ROM?) %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02 bank %02xx\n", machine().describe_context(), offset, ret, m_ram[0xfff0], m_ram[0xfff1], m_ram[0xfff2], m_ram[0xfff3], m_ram[0xfff4], m_ram[0xfff5], m_ram[0xfff6], m_ram[0xfff7], m_ram[0xfff8], m_ram[0xfff9], m_ram[0xfffa], m_ram[0xfffb], m_ram[0xfffc], m_ram[0xfffd], m_ram[0xfffe], m_ram[0xffff], m_port1);
 		// oki?
 		return machine().rand();
 	}
 
 	if (offset == 0xfffd)
 	{
-	//  logerror("%s: hostmem_r %04x: %02x (from ROM?) %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02 bank %02xx\n", machine().describe_context(), offset, ret, m_ram[0xfff0], m_ram[0xfff1], m_ram[0xfff2], m_ram[0xfff3], m_ram[0xfff4], m_ram[0xfff5], m_ram[0xfff6], m_ram[0xfff7], m_ram[0xfff8], m_ram[0xfff9], m_ram[0xfffa], m_ram[0xfffb], m_ram[0xfffc], m_ram[0xfffd], m_ram[0xfffe], m_ram[0xffff], m_port1);
+	//  logerror("%s: mem_r %04x: %02x (from ROM?) %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02 bank %02xx\n", machine().describe_context(), offset, ret, m_ram[0xfff0], m_ram[0xfff1], m_ram[0xfff2], m_ram[0xfff3], m_ram[0xfff4], m_ram[0xfff5], m_ram[0xfff6], m_ram[0xfff7], m_ram[0xfff8], m_ram[0xfff9], m_ram[0xfffa], m_ram[0xfffb], m_ram[0xfffc], m_ram[0xfffd], m_ram[0xfffe], m_ram[0xffff], m_port1);
 		// oki?
 		return machine().rand();
 	}
 
 	if (offset == 0xfffe)
 	{
-	//  logerror("%s: hostmem_r %04x: %02x (from ROM?) %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02 bank %02xx\n", machine().describe_context(), offset, ret, m_ram[0xfff0], m_ram[0xfff1], m_ram[0xfff2], m_ram[0xfff3], m_ram[0xfff4], m_ram[0xfff5], m_ram[0xfff6], m_ram[0xfff7], m_ram[0xfff8], m_ram[0xfff9], m_ram[0xfffa], m_ram[0xfffb], m_ram[0xfffc], m_ram[0xfffd], m_ram[0xfffe], m_ram[0xffff], m_port1);
-		return ioport("IN0")->read();
+	//  logerror("%s: mem_r %04x: %02x (from ROM?) %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02 bank %02xx\n", machine().describe_context(), offset, ret, m_ram[0xfff0], m_ram[0xfff1], m_ram[0xfff2], m_ram[0xfff3], m_ram[0xfff4], m_ram[0xfff5], m_ram[0xfff6], m_ram[0xfff7], m_ram[0xfff8], m_ram[0xfff9], m_ram[0xfffa], m_ram[0xfffb], m_ram[0xfffc], m_ram[0xfffd], m_ram[0xfffe], m_ram[0xffff], m_port1);
+		return m_io_in0->read();
 	}
 
 	return ret;
 }
 
-void goldart_state::hostmem_w(offs_t offset, uint8_t data)
+void goldart_state::mem_w(offs_t offset, uint8_t data)
 {
 	// registers seem to control write modes? (palette select bits, overwrite / transparent drawing etc.)
 
@@ -230,11 +233,11 @@ void goldart_state::hostmem_w(offs_t offset, uint8_t data)
 		// fe00 - ffdf is the palette (15 palettes)
 		m_ram[offset] = data;
 
-		int index = (offset & 0x1fe)>>1;
+		int const index = (offset & 0x1fe) >> 1;
 
-		uint16_t pal = (m_ram[(offset&0xfffe)] << 8) | (m_ram[(offset&0xfffe)+1]);
+		uint16_t const pal = (m_ram[(offset & 0xfffe)] << 8) | (m_ram[(offset & 0xfffe) | 1]);
 
-		m_palette->set_pen_color(index, ((pal >> 10) & 0x1f)<<3, ((pal >> 5) & 0x1f)<<3, (pal & 0x1f)<<3);
+		m_palette->set_pen_color(index, ((pal >> 10) & 0x1f) << 3, ((pal >> 5) & 0x1f) << 3, (pal & 0x1f) << 3);
 	}
 	else
 	{
@@ -254,28 +257,26 @@ void goldart_state::hostmem_w(offs_t offset, uint8_t data)
 		// fffe :   xxxx ----   x = pen value to be copied to other ram area on pixel wirtes
 	}
 
-
 	if (offset<0xd800)
-		logerror("%s: hostmem_w %04x: %02x (to VRAM?) %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x bank %02x\n", machine().describe_context(), offset, data, m_ram[0xfff0], m_ram[0xfff1], m_ram[0xfff2], m_ram[0xfff3], m_ram[0xfff4], m_ram[0xfff5], m_ram[0xfff6], m_ram[0xfff7], m_ram[0xfff8], m_ram[0xfff9], m_ram[0xfffa], m_ram[0xfffb], m_ram[0xfffc], m_ram[0xfffd], m_ram[0xfffe], m_ram[0xffff], m_port1);
+		logerror("%s: mem_w %04x: %02x (to VRAM?) %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x bank %02x\n", machine().describe_context(), offset, data, m_ram[0xfff0], m_ram[0xfff1], m_ram[0xfff2], m_ram[0xfff3], m_ram[0xfff4], m_ram[0xfff5], m_ram[0xfff6], m_ram[0xfff7], m_ram[0xfff8], m_ram[0xfff9], m_ram[0xfffa], m_ram[0xfffb], m_ram[0xfffc], m_ram[0xfffd], m_ram[0xfffe], m_ram[0xffff], m_port1);
 	else if (offset<0xfe00)
-		logerror("%s: hostmem_w %04x: %02x (to non-screen VRAM?) %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x bank %02x\n", machine().describe_context(), offset, data, m_ram[0xfff0], m_ram[0xfff1], m_ram[0xfff2], m_ram[0xfff3], m_ram[0xfff4], m_ram[0xfff5], m_ram[0xfff6], m_ram[0xfff7], m_ram[0xfff8], m_ram[0xfff9], m_ram[0xfffa], m_ram[0xfffb], m_ram[0xfffc], m_ram[0xfffd], m_ram[0xfffe], m_ram[0xffff], m_port1);
+		logerror("%s: mem_w %04x: %02x (to non-screen VRAM?) %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x bank %02x\n", machine().describe_context(), offset, data, m_ram[0xfff0], m_ram[0xfff1], m_ram[0xfff2], m_ram[0xfff3], m_ram[0xfff4], m_ram[0xfff5], m_ram[0xfff6], m_ram[0xfff7], m_ram[0xfff8], m_ram[0xfff9], m_ram[0xfffa], m_ram[0xfffb], m_ram[0xfffc], m_ram[0xfffd], m_ram[0xfffe], m_ram[0xffff], m_port1);
 	else if (offset<0xffe0)
-		logerror("%s: hostmem_w %04x: %02x (to palette)\n", machine().describe_context(), offset, data);
+		logerror("%s: mem_w %04x: %02x (to palette)\n", machine().describe_context(), offset, data);
 	else
-		logerror("%s: hostmem_w %04x: %02x (to REGS?)\n", machine().describe_context(), offset, data);
-
+		logerror("%s: mem_w %04x: %02x (to REGS?)\n", machine().describe_context(), offset, data);
 
 }
 
 
-void goldart_state::dallas_rom(address_map &map)
+void goldart_state::main_prgmap(address_map &map)
 {
 	map(0x00000, 0x07fff).readonly().share("sram");
 }
 
-void goldart_state::dallas_ram(address_map &map)
+void goldart_state::main_datamap(address_map &map)
 {
-	map(0x00000, 0x0ffff).rw(FUNC(goldart_state::hostmem_r), FUNC(goldart_state::hostmem_w));
+	map(0x00000, 0x0ffff).rw(FUNC(goldart_state::mem_r), FUNC(goldart_state::mem_w));
 	map(0x10000, 0x17fff).ram().share("sram");
 }
 
@@ -306,13 +307,14 @@ INPUT_PORTS_END
 
 void goldart_state::machine_start()
 {
+	m_ram = make_unique_clear<uint8_t[]>(0x10000);
+	m_ram2 = make_unique_clear<uint8_t[]>(0x10000);
+
 	save_item(NAME(m_port1));
-	save_item(NAME(m_ram));
-	save_item(NAME(m_ram2));
+	save_pointer(NAME(m_ram), 0x10000);
+	save_pointer(NAME(m_ram2), 0x10000);
 
 	m_port1 = 0;
-	std::fill(std::begin(m_ram), std::end(m_ram), 0);
-	std::fill(std::begin(m_ram2), std::end(m_ram2), 0);
 }
 
 void goldart_state::machine_reset()
@@ -322,13 +324,13 @@ void goldart_state::machine_reset()
 void goldart_state::goldart(machine_config &config)
 {
 	/* basic machine hardware */
-	ds5002fp_device &mcu(DS5002FP(config, "mcu", 12000000));
-	mcu.set_addrmap(AS_PROGRAM, &goldart_state::dallas_rom);
-	mcu.set_addrmap(AS_IO, &goldart_state::dallas_ram);
-	mcu.set_vblank_int("screen", FUNC(goldart_state::irq0_line_hold));
+	ds5002fp_device &maincpu(DS5002FP(config, "maincpu", 32_MHz_XTAL / 2));
+	maincpu.set_addrmap(AS_PROGRAM, &goldart_state::main_prgmap);
+	maincpu.set_addrmap(AS_IO, &goldart_state::main_datamap);
+	maincpu.set_vblank_int("screen", FUNC(goldart_state::irq0_line_hold));
 	// only uses port 1?
-	mcu.port_out_cb<1>().set(FUNC(goldart_state::mcu_port1_w));
-	mcu.port_in_cb<1>().set(FUNC(goldart_state::mcu_port1_r));
+	maincpu.port_out_cb<1>().set(FUNC(goldart_state::port1_w));
+	maincpu.port_in_cb<1>().set(FUNC(goldart_state::port1_r));
 
 	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
 
@@ -338,7 +340,7 @@ void goldart_state::goldart(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(256*2, 512);
 	screen.set_visarea(0, (192*2)-1, 0, 288-1);
-	screen.set_screen_update(FUNC(goldart_state::screen_update_goldart));
+	screen.set_screen_update(FUNC(goldart_state::screen_update));
 	screen.set_palette("palette");
 
 	PALETTE(config, m_palette, palette_device::BLACK, 256);
@@ -346,7 +348,7 @@ void goldart_state::goldart(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
+	OKIM6295(config, "oki", 32_MHz_XTAL / 32, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
 }
 
 /* Different versions of the internal code exist (0x6000-0x6fff code is VERY different between them)
@@ -364,7 +366,7 @@ ROM_START( goldart )
 	ROM_REGION( 0x8000, "sram", 0 ) /* DS5002FP code */
 	ROM_LOAD( "ds5002fp_sram.bin", 0x00000, 0x8000, BAD_DUMP CRC(cd2bf151) SHA1(6f601cef86493fc2db181c93b17949b982149b0e) )
 
-	ROM_REGION( 0x100, "mcu:internal", ROMREGION_ERASE00 )
+	ROM_REGION( 0x100, "maincpu:internal", ROMREGION_ERASE00 )
 	DS5002FP_SET_MON( 0x79 )
 	DS5002FP_SET_RPCTL( 0x00 )
 	DS5002FP_SET_CRCR( 0x80 )
@@ -380,7 +382,7 @@ ROM_START( goldartp )
 	ROM_REGION( 0x8000, "sram", 0 ) /* DS5002FP code */
 	ROM_LOAD( "ds5002fp_sram.bin", 0x00000, 0x8000, BAD_DUMP CRC(cd2bf151) SHA1(6f601cef86493fc2db181c93b17949b982149b0e) )
 
-	ROM_REGION( 0x100, "mcu:internal", ROMREGION_ERASE00 )
+	ROM_REGION( 0x100, "maincpu:internal", ROMREGION_ERASE00 )
 	DS5002FP_SET_MON( 0x79 )
 	DS5002FP_SET_RPCTL( 0x00 )
 	DS5002FP_SET_CRCR( 0x80 )

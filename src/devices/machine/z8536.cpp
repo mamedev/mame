@@ -201,15 +201,22 @@ u8 cio_base_device::read_register(offs_t offset)
 	switch (offset)
 	{
 	case PORT_A_DATA:
-		data = m_read_pa(0);
+		// TODO: take data path polarity into account
+		data = m_output[PORT_A];
+		if (m_register[PORT_A_DATA_DIRECTION] != 0)
+			data = (data & ~m_register[PORT_A_DATA_DIRECTION]) | (m_read_pa() & m_register[PORT_A_DATA_DIRECTION]);
 		break;
 
 	case PORT_B_DATA:
-		data = m_read_pb(0);
+		// TODO: take data path polarity into account
+		data = m_output[PORT_B];
+		if (m_register[PORT_B_DATA_DIRECTION] != 0)
+			data = (data & ~m_register[PORT_B_DATA_DIRECTION]) | (m_read_pb() & m_register[PORT_B_DATA_DIRECTION]);
 		break;
 
 	case PORT_C_DATA:
-		data = 0xf0 | (m_read_pc(0) & 0x0f);
+		// TODO: take data path polarity into account
+		data = 0xf0 | (m_read_pc() & 0x0f);
 		break;
 
 	case COUNTER_TIMER_1_CURRENT_COUNT_MS_BYTE:
@@ -340,17 +347,17 @@ void cio_base_device::write_register(offs_t offset, u8 data)
 
 	case PORT_C_DATA_PATH_POLARITY:
 		LOG("%s CIO Port C Data Path Polarity: %02x\n", machine().describe_context(), data);
-		m_register[offset] = data;
+		m_register[offset] = data & 0x0f;
 		break;
 
 	case PORT_C_DATA_DIRECTION:
 		LOG("%s CIO Port C Data Direction: %02x\n", machine().describe_context(), data);
-		m_register[offset] = data;
+		m_register[offset] = data & 0x0f;
 		break;
 
 	case PORT_C_SPECIAL_IO_CONTROL:
 		LOG("%s CIO Port C Special I/O Control: %02x\n", machine().describe_context(), data);
-		m_register[offset] = data;
+		m_register[offset] = data & 0x0f;
 		break;
 
 	case PORT_A_COMMAND_AND_STATUS:
@@ -422,11 +429,15 @@ void cio_base_device::write_register(offs_t offset, u8 data)
 		break;
 
 	case PORT_A_DATA:
-		m_write_pa((offs_t)0, data);
+		// TODO: take data path polarity into account
+		m_output[PORT_A] = data;
+		m_write_pa(data);
 		break;
 
 	case PORT_B_DATA:
-		m_write_pb((offs_t)0, data);
+		// TODO: take data path polarity into account
+		m_output[PORT_B] = data;
+		m_write_pb(data);
 		break;
 
 	case PORT_C_DATA:
@@ -435,7 +446,8 @@ void cio_base_device::write_register(offs_t offset, u8 data)
 
 		m_output[PORT_C] = (m_output[PORT_C] & mask) | ((data & 0x0f) & (mask ^ 0xff));
 
-		m_write_pc((offs_t)0, m_output[PORT_C]);
+		// TODO: take data path polarity into account
+		m_write_pc(m_output[PORT_C]);
 		}
 		break;
 
@@ -862,6 +874,9 @@ void cio_base_device::device_reset()
 	m_register[PORT_A_COMMAND_AND_STATUS] = PCS_ORE;
 	m_register[PORT_B_COMMAND_AND_STATUS] = PCS_ORE;
 	m_register[CURRENT_VECTOR] = 0xff;
+	m_register[PORT_A_DATA_DIRECTION] = 0xff;
+	m_register[PORT_B_DATA_DIRECTION] = 0xff;
+	m_register[PORT_C_DATA_DIRECTION] = 0x0f;
 
 	check_interrupt();
 }

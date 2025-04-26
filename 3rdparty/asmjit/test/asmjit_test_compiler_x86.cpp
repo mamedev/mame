@@ -1047,643 +1047,6 @@ public:
   }
 };
 
-// x86::Compiler - X86Test_AllocImul1
-// ==================================
-
-class X86Test_AllocImul1 : public X86TestCase {
-public:
-  X86Test_AllocImul1() : X86TestCase("AllocImul1") {}
-
-  static void add(TestApp& app) {
-    app.add(new X86Test_AllocImul1());
-  }
-
-  virtual void compile(x86::Compiler& cc) {
-    x86::Gp dstHi = cc.newIntPtr("dstHi");
-    x86::Gp dstLo = cc.newIntPtr("dstLo");
-
-    x86::Gp vHi = cc.newInt32("vHi");
-    x86::Gp vLo = cc.newInt32("vLo");
-    x86::Gp src = cc.newInt32("src");
-
-    FuncNode* funcNode = cc.addFunc(FuncSignature::build<void, int*, int*, int, int>());
-    funcNode->setArg(0, dstHi);
-    funcNode->setArg(1, dstLo);
-    funcNode->setArg(2, vLo);
-    funcNode->setArg(3, src);
-
-    cc.imul(vHi, vLo, src);
-    cc.mov(x86::dword_ptr(dstHi), vHi);
-    cc.mov(x86::dword_ptr(dstLo), vLo);
-    cc.endFunc();
-  }
-
-  virtual bool run(void* _func, String& result, String& expect) {
-    typedef void (*Func)(int*, int*, int, int);
-    Func func = ptr_as_func<Func>(_func);
-
-    int v0 = 4;
-    int v1 = 4;
-
-    int resultHi = 0;
-    int resultLo = 0;
-
-    int expectHi = 0;
-    int expectLo = v0 * v1;
-
-    func(&resultHi, &resultLo, v0, v1);
-
-    result.assignFormat("hi=%d, lo=%d", resultHi, resultLo);
-    expect.assignFormat("hi=%d, lo=%d", expectHi, expectLo);
-
-    return resultHi == expectHi && resultLo == expectLo;
-  }
-};
-
-// x86::Compiler - X86Test_AllocImul2
-// ==================================
-
-class X86Test_AllocImul2 : public X86TestCase {
-public:
-  X86Test_AllocImul2() : X86TestCase("AllocImul2") {}
-
-  static void add(TestApp& app) {
-    app.add(new X86Test_AllocImul2());
-  }
-
-  virtual void compile(x86::Compiler& cc) {
-    x86::Gp dst = cc.newIntPtr("dst");
-    x86::Gp src = cc.newIntPtr("src");
-
-    FuncNode* funcNode = cc.addFunc(FuncSignature::build<void, int*, const int*>());
-    funcNode->setArg(0, dst);
-    funcNode->setArg(1, src);
-
-    for (unsigned int i = 0; i < 4; i++) {
-      x86::Gp x  = cc.newInt32("x");
-      x86::Gp y  = cc.newInt32("y");
-      x86::Gp hi = cc.newInt32("hi");
-
-      cc.mov(x, x86::dword_ptr(src, 0));
-      cc.mov(y, x86::dword_ptr(src, 4));
-
-      cc.imul(hi, x, y);
-      cc.add(x86::dword_ptr(dst, 0), hi);
-      cc.add(x86::dword_ptr(dst, 4), x);
-    }
-
-    cc.endFunc();
-  }
-
-  virtual bool run(void* _func, String& result, String& expect) {
-    typedef void (*Func)(int*, const int*);
-    Func func = ptr_as_func<Func>(_func);
-
-    int src[2] = { 4, 9 };
-    int resultRet[2] = { 0, 0 };
-    int expectRet[2] = { 0, (4 * 9) * 4 };
-
-    func(resultRet, src);
-
-    result.assignFormat("ret={%d, %d}", resultRet[0], resultRet[1]);
-    expect.assignFormat("ret={%d, %d}", expectRet[0], expectRet[1]);
-
-    return resultRet[0] == expectRet[0] && resultRet[1] == expectRet[1];
-  }
-};
-
-// x86::Compiler - X86Test_AllocIdiv1
-// ==================================
-
-class X86Test_AllocIdiv1 : public X86TestCase {
-public:
-  X86Test_AllocIdiv1() : X86TestCase("AllocIdiv1") {}
-
-  static void add(TestApp& app) {
-    app.add(new X86Test_AllocIdiv1());
-  }
-
-  virtual void compile(x86::Compiler& cc) {
-    x86::Gp a = cc.newInt32("a");
-    x86::Gp b = cc.newInt32("b");
-    x86::Gp dummy = cc.newInt32("dummy");
-
-    FuncNode* funcNode = cc.addFunc(FuncSignature::build<int, int, int>());
-    funcNode->setArg(0, a);
-    funcNode->setArg(1, b);
-
-    cc.xor_(dummy, dummy);
-    cc.idiv(dummy, a, b);
-
-    cc.ret(a);
-    cc.endFunc();
-  }
-
-  virtual bool run(void* _func, String& result, String& expect) {
-    typedef int (*Func)(int, int);
-    Func func = ptr_as_func<Func>(_func);
-
-    int v0 = 2999;
-    int v1 = 245;
-
-    int resultRet = func(v0, v1);
-    int expectRet = 2999 / 245;
-
-    result.assignFormat("result=%d", resultRet);
-    expect.assignFormat("result=%d", expectRet);
-
-    return result == expect;
-  }
-};
-
-// x86::Compiler - X86Test_AllocSetz
-// =================================
-
-class X86Test_AllocSetz : public X86TestCase {
-public:
-  X86Test_AllocSetz() : X86TestCase("AllocSetz") {}
-
-  static void add(TestApp& app) {
-    app.add(new X86Test_AllocSetz());
-  }
-
-  virtual void compile(x86::Compiler& cc) {
-    x86::Gp src0 = cc.newInt32("src0");
-    x86::Gp src1 = cc.newInt32("src1");
-    x86::Gp dst0 = cc.newIntPtr("dst0");
-
-    FuncNode* funcNode = cc.addFunc(FuncSignature::build<void, int, int, char*>());
-    funcNode->setArg(0, src0);
-    funcNode->setArg(1, src1);
-    funcNode->setArg(2, dst0);
-
-    cc.cmp(src0, src1);
-    cc.setz(x86::byte_ptr(dst0));
-
-    cc.endFunc();
-  }
-
-  virtual bool run(void* _func, String& result, String& expect) {
-    typedef void (*Func)(int, int, char*);
-    Func func = ptr_as_func<Func>(_func);
-
-    char resultBuf[4] {};
-    char expectBuf[4] = { 1, 0, 0, 1 };
-
-    func(0, 0, &resultBuf[0]); // We are expecting 1 (0 == 0).
-    func(0, 1, &resultBuf[1]); // We are expecting 0 (0 != 1).
-    func(1, 0, &resultBuf[2]); // We are expecting 0 (1 != 0).
-    func(1, 1, &resultBuf[3]); // We are expecting 1 (1 == 1).
-
-    result.assignFormat("out={%d, %d, %d, %d}", resultBuf[0], resultBuf[1], resultBuf[2], resultBuf[3]);
-    expect.assignFormat("out={%d, %d, %d, %d}", expectBuf[0], expectBuf[1], expectBuf[2], expectBuf[3]);
-
-    return resultBuf[0] == expectBuf[0] &&
-           resultBuf[1] == expectBuf[1] &&
-           resultBuf[2] == expectBuf[2] &&
-           resultBuf[3] == expectBuf[3] ;
-  }
-};
-
-// x86::Compiler - X86Test_AllocShlRor
-// ===================================
-
-class X86Test_AllocShlRor : public X86TestCase {
-public:
-  X86Test_AllocShlRor() : X86TestCase("AllocShlRor") {}
-
-  static void add(TestApp& app) {
-    app.add(new X86Test_AllocShlRor());
-  }
-
-  virtual void compile(x86::Compiler& cc) {
-    x86::Gp dst = cc.newIntPtr("dst");
-    x86::Gp var = cc.newInt32("var");
-    x86::Gp vShlParam = cc.newInt32("vShlParam");
-    x86::Gp vRorParam = cc.newInt32("vRorParam");
-
-    FuncNode* funcNode = cc.addFunc(FuncSignature::build<void, int*, int, int, int>());
-    funcNode->setArg(0, dst);
-    funcNode->setArg(1, var);
-    funcNode->setArg(2, vShlParam);
-    funcNode->setArg(3, vRorParam);
-
-    cc.shl(var, vShlParam);
-    cc.ror(var, vRorParam);
-    cc.mov(x86::dword_ptr(dst), var);
-    cc.endFunc();
-  }
-
-  virtual bool run(void* _func, String& result, String& expect) {
-    typedef void (*Func)(int*, int, int, int);
-    Func func = ptr_as_func<Func>(_func);
-
-    int v0 = 0x000000FF;
-
-    int resultRet = 0;
-    int expectRet = 0x0000FF00;
-
-    func(&resultRet, v0, 16, 8);
-
-    result.assignFormat("ret=%d", resultRet);
-    expect.assignFormat("ret=%d", expectRet);
-
-    return result == expect;
-  }
-};
-
-// x86::Compiler - X86Test_AllocGpbLo
-// ==================================
-
-class X86Test_AllocGpbLo1 : public X86TestCase {
-public:
-  X86Test_AllocGpbLo1() : X86TestCase("AllocGpbLo1") {}
-
-  enum : uint32_t { kCount = 32 };
-
-  static void add(TestApp& app) {
-    app.add(new X86Test_AllocGpbLo1());
-  }
-
-  virtual void compile(x86::Compiler& cc) {
-    x86::Gp rPtr = cc.newUIntPtr("rPtr");
-    x86::Gp rSum = cc.newUInt32("rSum");
-    x86::Gp x[kCount];
-
-    FuncNode* funcNode = cc.addFunc(FuncSignature::build<uint32_t, uint32_t*>());
-    funcNode->setArg(0, rPtr);
-
-    for (uint32_t i = 0; i < kCount; i++) {
-      x[i] = cc.newUInt32("x%u", i);
-    }
-
-    // Init pseudo-regs with values from our array.
-    for (uint32_t i = 0; i < kCount; i++) {
-      cc.mov(x[i], x86::dword_ptr(rPtr, int(i * 4)));
-    }
-
-    for (uint32_t i = 2; i < kCount; i++) {
-      // Add and truncate to 8 bit; no purpose, just mess with jit.
-      cc.add  (x[i  ], x[i-1]);
-      cc.movzx(x[i  ], x[i  ].r8());
-      cc.movzx(x[i-2], x[i-1].r8());
-      cc.movzx(x[i-1], x[i-2].r8());
-    }
-
-    // Sum up all computed values.
-    cc.mov(rSum, 0);
-    for (uint32_t i = 0; i < kCount; i++) {
-      cc.add(rSum, x[i]);
-    }
-
-    // Return the sum.
-    cc.ret(rSum);
-    cc.endFunc();
-  }
-
-  virtual bool run(void* _func, String& result, String& expect) {
-    typedef uint32_t (*Func)(uint32_t*);
-    Func func = ptr_as_func<Func>(_func);
-
-    uint32_t i;
-    uint32_t buf[kCount];
-    uint32_t resultRet = 0;
-    uint32_t expectRet = 0;
-
-    for (i = 0; i < kCount; i++) {
-      buf[i] = 1;
-    }
-
-    for (i = 2; i < kCount; i++) {
-      buf[i  ]+= buf[i-1];
-      buf[i  ] = buf[i  ] & 0xFF;
-      buf[i-2] = buf[i-1] & 0xFF;
-      buf[i-1] = buf[i-2] & 0xFF;
-    }
-
-    for (i = 0; i < kCount; i++) {
-      expectRet += buf[i];
-    }
-
-    for (i = 0; i < kCount; i++) {
-      buf[i] = 1;
-    }
-    resultRet = func(buf);
-
-    result.assignFormat("ret=%d", resultRet);
-    expect.assignFormat("ret=%d", expectRet);
-
-    return result == expect;
-  }
-};
-
-// x86::Compiler - X86Test_AllocGpbLo2
-// ===================================
-
-class X86Test_AllocGpbLo2 : public X86TestCase {
-public:
-  X86Test_AllocGpbLo2() : X86TestCase("AllocGpbLo2") {}
-
-  static void add(TestApp& app) {
-    app.add(new X86Test_AllocGpbLo2());
-  }
-
-  virtual void compile(x86::Compiler& cc) {
-    x86::Gp v = cc.newUInt32("v");
-
-    FuncNode* funcNode = cc.addFunc(FuncSignature::build<uint32_t, uint32_t>());
-    funcNode->setArg(0, v);
-
-    cc.mov(v.r8(), 0xFF);
-    cc.ret(v);
-    cc.endFunc();
-  }
-
-  virtual bool run(void* _func, String& result, String& expect) {
-    typedef uint32_t (*Func)(uint32_t);
-    Func func = ptr_as_func<Func>(_func);
-
-    uint32_t resultRet = func(0x12345678u);
-    uint32_t expectRet = 0x123456FFu;
-
-    result.assignFormat("ret=%d", resultRet);
-    expect.assignFormat("ret=%d", expectRet);
-
-    return result == expect;
-  }
-};
-
-// x86::Compiler - X86Test_AllocRepMovsb
-// =====================================
-
-class X86Test_AllocRepMovsb : public X86TestCase {
-public:
-  X86Test_AllocRepMovsb() : X86TestCase("AllocRepMovsb") {}
-
-  static void add(TestApp& app) {
-    app.add(new X86Test_AllocRepMovsb());
-  }
-
-  virtual void compile(x86::Compiler& cc) {
-    x86::Gp dst = cc.newIntPtr("dst");
-    x86::Gp src = cc.newIntPtr("src");
-    x86::Gp cnt = cc.newIntPtr("cnt");
-
-    FuncNode* funcNode = cc.addFunc(FuncSignature::build<void, void*, void*, size_t>());
-    funcNode->setArg(0, dst);
-    funcNode->setArg(1, src);
-    funcNode->setArg(2, cnt);
-
-    cc.rep(cnt).movs(x86::byte_ptr(dst), x86::byte_ptr(src));
-    cc.endFunc();
-  }
-
-  virtual bool run(void* _func, String& result, String& expect) {
-    typedef void (*Func)(void*, void*, size_t);
-    Func func = ptr_as_func<Func>(_func);
-
-    char dst[20] = { 0 };
-    char src[20] = "Hello AsmJit!";
-    func(dst, src, strlen(src) + 1);
-
-    result.assignFormat("ret=\"%s\"", dst);
-    expect.assignFormat("ret=\"%s\"", src);
-
-    return result == expect;
-  }
-};
-
-// x86::Compiler - X86Test_AllocIfElse1
-// ====================================
-
-class X86Test_AllocIfElse1 : public X86TestCase {
-public:
-  X86Test_AllocIfElse1() : X86TestCase("AllocIfElse1") {}
-
-  static void add(TestApp& app) {
-    app.add(new X86Test_AllocIfElse1());
-  }
-
-  virtual void compile(x86::Compiler& cc) {
-    x86::Gp v1 = cc.newInt32("v1");
-    x86::Gp v2 = cc.newInt32("v2");
-
-    Label L_1 = cc.newLabel();
-    Label L_2 = cc.newLabel();
-
-    FuncNode* funcNode = cc.addFunc(FuncSignature::build<int, int, int>());
-    funcNode->setArg(0, v1);
-    funcNode->setArg(1, v2);
-
-    cc.cmp(v1, v2);
-    cc.jg(L_1);
-
-    cc.mov(v1, 1);
-    cc.jmp(L_2);
-
-    cc.bind(L_1);
-    cc.mov(v1, 2);
-
-    cc.bind(L_2);
-    cc.ret(v1);
-    cc.endFunc();
-  }
-
-  virtual bool run(void* _func, String& result, String& expect) {
-    typedef int (*Func)(int, int);
-    Func func = ptr_as_func<Func>(_func);
-
-    int a = func(0, 1);
-    int b = func(1, 0);
-
-    result.appendFormat("ret={%d, %d}", a, b);
-    expect.appendFormat("ret={%d, %d}", 1, 2);
-
-    return result == expect;
-  }
-};
-
-// x86::Compiler - X86Test_AllocIfElse2
-// ====================================
-
-class X86Test_AllocIfElse2 : public X86TestCase {
-public:
-  X86Test_AllocIfElse2() : X86TestCase("AllocIfElse2") {}
-
-  static void add(TestApp& app) {
-    app.add(new X86Test_AllocIfElse2());
-  }
-
-  virtual void compile(x86::Compiler& cc) {
-    x86::Gp v1 = cc.newInt32("v1");
-    x86::Gp v2 = cc.newInt32("v2");
-
-    Label L_1 = cc.newLabel();
-    Label L_2 = cc.newLabel();
-    Label L_3 = cc.newLabel();
-    Label L_4 = cc.newLabel();
-
-    FuncNode* funcNode = cc.addFunc(FuncSignature::build<int, int, int>());
-    funcNode->setArg(0, v1);
-    funcNode->setArg(1, v2);
-
-    cc.jmp(L_1);
-    cc.bind(L_2);
-    cc.jmp(L_4);
-    cc.bind(L_1);
-
-    cc.cmp(v1, v2);
-    cc.jg(L_3);
-
-    cc.mov(v1, 1);
-    cc.jmp(L_2);
-
-    cc.bind(L_3);
-    cc.mov(v1, 2);
-    cc.jmp(L_2);
-
-    cc.bind(L_4);
-
-    cc.ret(v1);
-    cc.endFunc();
-  }
-
-  virtual bool run(void* _func, String& result, String& expect) {
-    typedef int (*Func)(int, int);
-    Func func = ptr_as_func<Func>(_func);
-
-    int a = func(0, 1);
-    int b = func(1, 0);
-
-    result.appendFormat("ret={%d, %d}", a, b);
-    expect.appendFormat("ret={%d, %d}", 1, 2);
-
-    return result == expect;
-  }
-};
-
-// x86::Compiler - X86Test_AllocIfElse3
-// ====================================
-
-class X86Test_AllocIfElse3 : public X86TestCase {
-public:
-  X86Test_AllocIfElse3() : X86TestCase("AllocIfElse3") {}
-
-  static void add(TestApp& app) {
-    app.add(new X86Test_AllocIfElse3());
-  }
-
-  virtual void compile(x86::Compiler& cc) {
-    x86::Gp v1 = cc.newInt32("v1");
-    x86::Gp v2 = cc.newInt32("v2");
-    x86::Gp counter = cc.newInt32("counter");
-
-    Label L_1 = cc.newLabel();
-    Label L_Loop = cc.newLabel();
-    Label L_Exit = cc.newLabel();
-
-    FuncNode* funcNode = cc.addFunc(FuncSignature::build<int, int, int>());
-    funcNode->setArg(0, v1);
-    funcNode->setArg(1, v2);
-
-    cc.cmp(v1, v2);
-    cc.jg(L_1);
-
-    cc.mov(counter, 0);
-
-    cc.bind(L_Loop);
-    cc.mov(v1, counter);
-
-    cc.inc(counter);
-    cc.cmp(counter, 1);
-    cc.jle(L_Loop);
-    cc.jmp(L_Exit);
-
-    cc.bind(L_1);
-    cc.mov(v1, 2);
-
-    cc.bind(L_Exit);
-    cc.ret(v1);
-    cc.endFunc();
-  }
-
-  virtual bool run(void* _func, String& result, String& expect) {
-    typedef int (*Func)(int, int);
-    Func func = ptr_as_func<Func>(_func);
-
-    int a = func(0, 1);
-    int b = func(1, 0);
-
-    result.appendFormat("ret={%d, %d}", a, b);
-    expect.appendFormat("ret={%d, %d}", 1, 2);
-
-    return result == expect;
-  }
-};
-
-// x86::Compiler - X86Test_AllocIfElse4
-// ====================================
-
-class X86Test_AllocIfElse4 : public X86TestCase {
-public:
-  X86Test_AllocIfElse4() : X86TestCase("AllocIfElse4") {}
-
-  static void add(TestApp& app) {
-    app.add(new X86Test_AllocIfElse4());
-  }
-
-  virtual void compile(x86::Compiler& cc) {
-    x86::Gp v1 = cc.newInt32("v1");
-    x86::Gp v2 = cc.newInt32("v2");
-    x86::Gp counter = cc.newInt32("counter");
-
-    Label L_1 = cc.newLabel();
-    Label L_Loop1 = cc.newLabel();
-    Label L_Loop2 = cc.newLabel();
-    Label L_Exit = cc.newLabel();
-
-    FuncNode* funcNode = cc.addFunc(FuncSignature::build<int, int, int>());
-    funcNode->setArg(0, v1);
-    funcNode->setArg(1, v2);
-
-    cc.mov(counter, 0);
-    cc.cmp(v1, v2);
-    cc.jg(L_1);
-
-    cc.bind(L_Loop1);
-    cc.mov(v1, counter);
-
-    cc.inc(counter);
-    cc.cmp(counter, 1);
-    cc.jle(L_Loop1);
-    cc.jmp(L_Exit);
-
-    cc.bind(L_1);
-    cc.bind(L_Loop2);
-    cc.mov(v1, counter);
-    cc.inc(counter);
-    cc.cmp(counter, 2);
-    cc.jle(L_Loop2);
-
-    cc.bind(L_Exit);
-    cc.ret(v1);
-    cc.endFunc();
-  }
-
-  virtual bool run(void* _func, String& result, String& expect) {
-    typedef int (*Func)(int, int);
-    Func func = ptr_as_func<Func>(_func);
-
-    int a = func(0, 1);
-    int b = func(1, 0);
-
-    result.appendFormat("ret={%d, %d}", a, b);
-    expect.appendFormat("ret={%d, %d}", 1, 2);
-
-    return result == expect;
-  }
-};
-
 // x86::Compiler - X86Test_AllocInt8
 // =================================
 
@@ -2185,17 +1548,654 @@ public:
   }
 };
 
-// x86::Compiler - X86Test_AllocMemcpy
-// ===================================
+// x86::Compiler - X86Test_Imul1
+// =============================
 
-class X86Test_AllocMemcpy : public X86TestCase {
+class X86Test_Imul1 : public X86TestCase {
 public:
-  X86Test_AllocMemcpy() : X86TestCase("AllocMemcpy") {}
+  X86Test_Imul1() : X86TestCase("Imul1") {}
+
+  static void add(TestApp& app) {
+    app.add(new X86Test_Imul1());
+  }
+
+  virtual void compile(x86::Compiler& cc) {
+    x86::Gp dstHi = cc.newIntPtr("dstHi");
+    x86::Gp dstLo = cc.newIntPtr("dstLo");
+
+    x86::Gp vHi = cc.newInt32("vHi");
+    x86::Gp vLo = cc.newInt32("vLo");
+    x86::Gp src = cc.newInt32("src");
+
+    FuncNode* funcNode = cc.addFunc(FuncSignature::build<void, int*, int*, int, int>());
+    funcNode->setArg(0, dstHi);
+    funcNode->setArg(1, dstLo);
+    funcNode->setArg(2, vLo);
+    funcNode->setArg(3, src);
+
+    cc.imul(vHi, vLo, src);
+    cc.mov(x86::dword_ptr(dstHi), vHi);
+    cc.mov(x86::dword_ptr(dstLo), vLo);
+    cc.endFunc();
+  }
+
+  virtual bool run(void* _func, String& result, String& expect) {
+    typedef void (*Func)(int*, int*, int, int);
+    Func func = ptr_as_func<Func>(_func);
+
+    int v0 = 4;
+    int v1 = 4;
+
+    int resultHi = 0;
+    int resultLo = 0;
+
+    int expectHi = 0;
+    int expectLo = v0 * v1;
+
+    func(&resultHi, &resultLo, v0, v1);
+
+    result.assignFormat("hi=%d, lo=%d", resultHi, resultLo);
+    expect.assignFormat("hi=%d, lo=%d", expectHi, expectLo);
+
+    return resultHi == expectHi && resultLo == expectLo;
+  }
+};
+
+// x86::Compiler - X86Test_Imul2
+// =============================
+
+class X86Test_Imul2 : public X86TestCase {
+public:
+  X86Test_Imul2() : X86TestCase("Imul2") {}
+
+  static void add(TestApp& app) {
+    app.add(new X86Test_Imul2());
+  }
+
+  virtual void compile(x86::Compiler& cc) {
+    x86::Gp dst = cc.newIntPtr("dst");
+    x86::Gp src = cc.newIntPtr("src");
+
+    FuncNode* funcNode = cc.addFunc(FuncSignature::build<void, int*, const int*>());
+    funcNode->setArg(0, dst);
+    funcNode->setArg(1, src);
+
+    for (unsigned int i = 0; i < 4; i++) {
+      x86::Gp x  = cc.newInt32("x");
+      x86::Gp y  = cc.newInt32("y");
+      x86::Gp hi = cc.newInt32("hi");
+
+      cc.mov(x, x86::dword_ptr(src, 0));
+      cc.mov(y, x86::dword_ptr(src, 4));
+
+      cc.imul(hi, x, y);
+      cc.add(x86::dword_ptr(dst, 0), hi);
+      cc.add(x86::dword_ptr(dst, 4), x);
+    }
+
+    cc.endFunc();
+  }
+
+  virtual bool run(void* _func, String& result, String& expect) {
+    typedef void (*Func)(int*, const int*);
+    Func func = ptr_as_func<Func>(_func);
+
+    int src[2] = { 4, 9 };
+    int resultRet[2] = { 0, 0 };
+    int expectRet[2] = { 0, (4 * 9) * 4 };
+
+    func(resultRet, src);
+
+    result.assignFormat("ret={%d, %d}", resultRet[0], resultRet[1]);
+    expect.assignFormat("ret={%d, %d}", expectRet[0], expectRet[1]);
+
+    return resultRet[0] == expectRet[0] && resultRet[1] == expectRet[1];
+  }
+};
+
+// x86::Compiler - X86Test_Idiv1
+// =============================
+
+class X86Test_Idiv1 : public X86TestCase {
+public:
+  X86Test_Idiv1() : X86TestCase("Idiv1") {}
+
+  static void add(TestApp& app) {
+    app.add(new X86Test_Idiv1());
+  }
+
+  virtual void compile(x86::Compiler& cc) {
+    x86::Gp a = cc.newInt32("a");
+    x86::Gp b = cc.newInt32("b");
+    x86::Gp dummy = cc.newInt32("dummy");
+
+    FuncNode* funcNode = cc.addFunc(FuncSignature::build<int, int, int>());
+    funcNode->setArg(0, a);
+    funcNode->setArg(1, b);
+
+    cc.xor_(dummy, dummy);
+    cc.idiv(dummy, a, b);
+
+    cc.ret(a);
+    cc.endFunc();
+  }
+
+  virtual bool run(void* _func, String& result, String& expect) {
+    typedef int (*Func)(int, int);
+    Func func = ptr_as_func<Func>(_func);
+
+    int v0 = 2999;
+    int v1 = 245;
+
+    int resultRet = func(v0, v1);
+    int expectRet = 2999 / 245;
+
+    result.assignFormat("result=%d", resultRet);
+    expect.assignFormat("result=%d", expectRet);
+
+    return result == expect;
+  }
+};
+
+// x86::Compiler - X86Test_Setz
+// ============================
+
+class X86Test_Setz : public X86TestCase {
+public:
+  X86Test_Setz() : X86TestCase("Setz") {}
+
+  static void add(TestApp& app) {
+    app.add(new X86Test_Setz());
+  }
+
+  virtual void compile(x86::Compiler& cc) {
+    x86::Gp src0 = cc.newInt32("src0");
+    x86::Gp src1 = cc.newInt32("src1");
+    x86::Gp dst0 = cc.newIntPtr("dst0");
+
+    FuncNode* funcNode = cc.addFunc(FuncSignature::build<void, int, int, char*>());
+    funcNode->setArg(0, src0);
+    funcNode->setArg(1, src1);
+    funcNode->setArg(2, dst0);
+
+    cc.cmp(src0, src1);
+    cc.setz(x86::byte_ptr(dst0));
+
+    cc.endFunc();
+  }
+
+  virtual bool run(void* _func, String& result, String& expect) {
+    typedef void (*Func)(int, int, char*);
+    Func func = ptr_as_func<Func>(_func);
+
+    char resultBuf[4] {};
+    char expectBuf[4] = { 1, 0, 0, 1 };
+
+    func(0, 0, &resultBuf[0]); // We are expecting 1 (0 == 0).
+    func(0, 1, &resultBuf[1]); // We are expecting 0 (0 != 1).
+    func(1, 0, &resultBuf[2]); // We are expecting 0 (1 != 0).
+    func(1, 1, &resultBuf[3]); // We are expecting 1 (1 == 1).
+
+    result.assignFormat("out={%d, %d, %d, %d}", resultBuf[0], resultBuf[1], resultBuf[2], resultBuf[3]);
+    expect.assignFormat("out={%d, %d, %d, %d}", expectBuf[0], expectBuf[1], expectBuf[2], expectBuf[3]);
+
+    return resultBuf[0] == expectBuf[0] &&
+           resultBuf[1] == expectBuf[1] &&
+           resultBuf[2] == expectBuf[2] &&
+           resultBuf[3] == expectBuf[3] ;
+  }
+};
+
+// x86::Compiler - X86Test_ShlRor
+// ==============================
+
+class X86Test_ShlRor : public X86TestCase {
+public:
+  X86Test_ShlRor() : X86TestCase("ShlRor") {}
+
+  static void add(TestApp& app) {
+    app.add(new X86Test_ShlRor());
+  }
+
+  virtual void compile(x86::Compiler& cc) {
+    x86::Gp dst = cc.newIntPtr("dst");
+    x86::Gp var = cc.newInt32("var");
+    x86::Gp vShlParam = cc.newInt32("vShlParam");
+    x86::Gp vRorParam = cc.newInt32("vRorParam");
+
+    FuncNode* funcNode = cc.addFunc(FuncSignature::build<void, int*, int, int, int>());
+    funcNode->setArg(0, dst);
+    funcNode->setArg(1, var);
+    funcNode->setArg(2, vShlParam);
+    funcNode->setArg(3, vRorParam);
+
+    cc.shl(var, vShlParam);
+    cc.ror(var, vRorParam);
+    cc.mov(x86::dword_ptr(dst), var);
+    cc.endFunc();
+  }
+
+  virtual bool run(void* _func, String& result, String& expect) {
+    typedef void (*Func)(int*, int, int, int);
+    Func func = ptr_as_func<Func>(_func);
+
+    int v0 = 0x000000FF;
+
+    int resultRet = 0;
+    int expectRet = 0x0000FF00;
+
+    func(&resultRet, v0, 16, 8);
+
+    result.assignFormat("ret=%d", resultRet);
+    expect.assignFormat("ret=%d", expectRet);
+
+    return result == expect;
+  }
+};
+
+// x86::Compiler - X86Test_GpbLo
+// =============================
+
+class X86Test_GpbLo1 : public X86TestCase {
+public:
+  X86Test_GpbLo1() : X86TestCase("GpbLo1") {}
+
+  enum : uint32_t { kCount = 32 };
+
+  static void add(TestApp& app) {
+    app.add(new X86Test_GpbLo1());
+  }
+
+  virtual void compile(x86::Compiler& cc) {
+    x86::Gp rPtr = cc.newUIntPtr("rPtr");
+    x86::Gp rSum = cc.newUInt32("rSum");
+    x86::Gp x[kCount];
+
+    FuncNode* funcNode = cc.addFunc(FuncSignature::build<uint32_t, uint32_t*>());
+    funcNode->setArg(0, rPtr);
+
+    for (uint32_t i = 0; i < kCount; i++) {
+      x[i] = cc.newUInt32("x%u", i);
+    }
+
+    // Init pseudo-regs with values from our array.
+    for (uint32_t i = 0; i < kCount; i++) {
+      cc.mov(x[i], x86::dword_ptr(rPtr, int(i * 4)));
+    }
+
+    for (uint32_t i = 2; i < kCount; i++) {
+      // Add and truncate to 8 bit; no purpose, just mess with jit.
+      cc.add  (x[i  ], x[i-1]);
+      cc.movzx(x[i  ], x[i  ].r8());
+      cc.movzx(x[i-2], x[i-1].r8());
+      cc.movzx(x[i-1], x[i-2].r8());
+    }
+
+    // Sum up all computed values.
+    cc.mov(rSum, 0);
+    for (uint32_t i = 0; i < kCount; i++) {
+      cc.add(rSum, x[i]);
+    }
+
+    // Return the sum.
+    cc.ret(rSum);
+    cc.endFunc();
+  }
+
+  virtual bool run(void* _func, String& result, String& expect) {
+    typedef uint32_t (*Func)(uint32_t*);
+    Func func = ptr_as_func<Func>(_func);
+
+    uint32_t i;
+    uint32_t buf[kCount];
+    uint32_t resultRet = 0;
+    uint32_t expectRet = 0;
+
+    for (i = 0; i < kCount; i++) {
+      buf[i] = 1;
+    }
+
+    for (i = 2; i < kCount; i++) {
+      buf[i  ]+= buf[i-1];
+      buf[i  ] = buf[i  ] & 0xFF;
+      buf[i-2] = buf[i-1] & 0xFF;
+      buf[i-1] = buf[i-2] & 0xFF;
+    }
+
+    for (i = 0; i < kCount; i++) {
+      expectRet += buf[i];
+    }
+
+    for (i = 0; i < kCount; i++) {
+      buf[i] = 1;
+    }
+    resultRet = func(buf);
+
+    result.assignFormat("ret=%d", resultRet);
+    expect.assignFormat("ret=%d", expectRet);
+
+    return result == expect;
+  }
+};
+
+// x86::Compiler - X86Test_GpbLo2
+// ==============================
+
+class X86Test_GpbLo2 : public X86TestCase {
+public:
+  X86Test_GpbLo2() : X86TestCase("GpbLo2") {}
+
+  static void add(TestApp& app) {
+    app.add(new X86Test_GpbLo2());
+  }
+
+  virtual void compile(x86::Compiler& cc) {
+    x86::Gp v = cc.newUInt32("v");
+
+    FuncNode* funcNode = cc.addFunc(FuncSignature::build<uint32_t, uint32_t>());
+    funcNode->setArg(0, v);
+
+    cc.mov(v.r8(), 0xFF);
+    cc.ret(v);
+    cc.endFunc();
+  }
+
+  virtual bool run(void* _func, String& result, String& expect) {
+    typedef uint32_t (*Func)(uint32_t);
+    Func func = ptr_as_func<Func>(_func);
+
+    uint32_t resultRet = func(0x12345678u);
+    uint32_t expectRet = 0x123456FFu;
+
+    result.assignFormat("ret=%d", resultRet);
+    expect.assignFormat("ret=%d", expectRet);
+
+    return result == expect;
+  }
+};
+
+// x86::Compiler - X86Test_RepMovsb
+// ================================
+
+class X86Test_RepMovsb : public X86TestCase {
+public:
+  X86Test_RepMovsb() : X86TestCase("RepMovsb") {}
+
+  static void add(TestApp& app) {
+    app.add(new X86Test_RepMovsb());
+  }
+
+  virtual void compile(x86::Compiler& cc) {
+    x86::Gp dst = cc.newIntPtr("dst");
+    x86::Gp src = cc.newIntPtr("src");
+    x86::Gp cnt = cc.newIntPtr("cnt");
+
+    FuncNode* funcNode = cc.addFunc(FuncSignature::build<void, void*, void*, size_t>());
+    funcNode->setArg(0, dst);
+    funcNode->setArg(1, src);
+    funcNode->setArg(2, cnt);
+
+    cc.rep(cnt).movs(x86::byte_ptr(dst), x86::byte_ptr(src));
+    cc.endFunc();
+  }
+
+  virtual bool run(void* _func, String& result, String& expect) {
+    typedef void (*Func)(void*, void*, size_t);
+    Func func = ptr_as_func<Func>(_func);
+
+    char dst[20] = { 0 };
+    char src[20] = "Hello AsmJit!";
+    func(dst, src, strlen(src) + 1);
+
+    result.assignFormat("ret=\"%s\"", dst);
+    expect.assignFormat("ret=\"%s\"", src);
+
+    return result == expect;
+  }
+};
+
+// x86::Compiler - X86Test_IfElse1
+// ===============================
+
+class X86Test_IfElse1 : public X86TestCase {
+public:
+  X86Test_IfElse1() : X86TestCase("IfElse1") {}
+
+  static void add(TestApp& app) {
+    app.add(new X86Test_IfElse1());
+  }
+
+  virtual void compile(x86::Compiler& cc) {
+    x86::Gp v1 = cc.newInt32("v1");
+    x86::Gp v2 = cc.newInt32("v2");
+
+    Label L_1 = cc.newLabel();
+    Label L_2 = cc.newLabel();
+
+    FuncNode* funcNode = cc.addFunc(FuncSignature::build<int, int, int>());
+    funcNode->setArg(0, v1);
+    funcNode->setArg(1, v2);
+
+    cc.cmp(v1, v2);
+    cc.jg(L_1);
+
+    cc.mov(v1, 1);
+    cc.jmp(L_2);
+
+    cc.bind(L_1);
+    cc.mov(v1, 2);
+
+    cc.bind(L_2);
+    cc.ret(v1);
+    cc.endFunc();
+  }
+
+  virtual bool run(void* _func, String& result, String& expect) {
+    typedef int (*Func)(int, int);
+    Func func = ptr_as_func<Func>(_func);
+
+    int a = func(0, 1);
+    int b = func(1, 0);
+
+    result.appendFormat("ret={%d, %d}", a, b);
+    expect.appendFormat("ret={%d, %d}", 1, 2);
+
+    return result == expect;
+  }
+};
+
+// x86::Compiler - X86Test_IfElse2
+// ===============================
+
+class X86Test_IfElse2 : public X86TestCase {
+public:
+  X86Test_IfElse2() : X86TestCase("IfElse2") {}
+
+  static void add(TestApp& app) {
+    app.add(new X86Test_IfElse2());
+  }
+
+  virtual void compile(x86::Compiler& cc) {
+    x86::Gp v1 = cc.newInt32("v1");
+    x86::Gp v2 = cc.newInt32("v2");
+
+    Label L_1 = cc.newLabel();
+    Label L_2 = cc.newLabel();
+    Label L_3 = cc.newLabel();
+    Label L_4 = cc.newLabel();
+
+    FuncNode* funcNode = cc.addFunc(FuncSignature::build<int, int, int>());
+    funcNode->setArg(0, v1);
+    funcNode->setArg(1, v2);
+
+    cc.jmp(L_1);
+    cc.bind(L_2);
+    cc.jmp(L_4);
+    cc.bind(L_1);
+
+    cc.cmp(v1, v2);
+    cc.jg(L_3);
+
+    cc.mov(v1, 1);
+    cc.jmp(L_2);
+
+    cc.bind(L_3);
+    cc.mov(v1, 2);
+    cc.jmp(L_2);
+
+    cc.bind(L_4);
+
+    cc.ret(v1);
+    cc.endFunc();
+  }
+
+  virtual bool run(void* _func, String& result, String& expect) {
+    typedef int (*Func)(int, int);
+    Func func = ptr_as_func<Func>(_func);
+
+    int a = func(0, 1);
+    int b = func(1, 0);
+
+    result.appendFormat("ret={%d, %d}", a, b);
+    expect.appendFormat("ret={%d, %d}", 1, 2);
+
+    return result == expect;
+  }
+};
+
+// x86::Compiler - X86Test_IfElse3
+// ===============================
+
+class X86Test_IfElse3 : public X86TestCase {
+public:
+  X86Test_IfElse3() : X86TestCase("IfElse3") {}
+
+  static void add(TestApp& app) {
+    app.add(new X86Test_IfElse3());
+  }
+
+  virtual void compile(x86::Compiler& cc) {
+    x86::Gp v1 = cc.newInt32("v1");
+    x86::Gp v2 = cc.newInt32("v2");
+    x86::Gp counter = cc.newInt32("counter");
+
+    Label L_1 = cc.newLabel();
+    Label L_Loop = cc.newLabel();
+    Label L_Exit = cc.newLabel();
+
+    FuncNode* funcNode = cc.addFunc(FuncSignature::build<int, int, int>());
+    funcNode->setArg(0, v1);
+    funcNode->setArg(1, v2);
+
+    cc.cmp(v1, v2);
+    cc.jg(L_1);
+
+    cc.mov(counter, 0);
+
+    cc.bind(L_Loop);
+    cc.mov(v1, counter);
+
+    cc.inc(counter);
+    cc.cmp(counter, 1);
+    cc.jle(L_Loop);
+    cc.jmp(L_Exit);
+
+    cc.bind(L_1);
+    cc.mov(v1, 2);
+
+    cc.bind(L_Exit);
+    cc.ret(v1);
+    cc.endFunc();
+  }
+
+  virtual bool run(void* _func, String& result, String& expect) {
+    typedef int (*Func)(int, int);
+    Func func = ptr_as_func<Func>(_func);
+
+    int a = func(0, 1);
+    int b = func(1, 0);
+
+    result.appendFormat("ret={%d, %d}", a, b);
+    expect.appendFormat("ret={%d, %d}", 1, 2);
+
+    return result == expect;
+  }
+};
+
+// x86::Compiler - X86Test_IfElse4
+// ===============================
+
+class X86Test_IfElse4 : public X86TestCase {
+public:
+  X86Test_IfElse4() : X86TestCase("IfElse4") {}
+
+  static void add(TestApp& app) {
+    app.add(new X86Test_IfElse4());
+  }
+
+  virtual void compile(x86::Compiler& cc) {
+    x86::Gp v1 = cc.newInt32("v1");
+    x86::Gp v2 = cc.newInt32("v2");
+    x86::Gp counter = cc.newInt32("counter");
+
+    Label L_1 = cc.newLabel();
+    Label L_Loop1 = cc.newLabel();
+    Label L_Loop2 = cc.newLabel();
+    Label L_Exit = cc.newLabel();
+
+    FuncNode* funcNode = cc.addFunc(FuncSignature::build<int, int, int>());
+    funcNode->setArg(0, v1);
+    funcNode->setArg(1, v2);
+
+    cc.mov(counter, 0);
+    cc.cmp(v1, v2);
+    cc.jg(L_1);
+
+    cc.bind(L_Loop1);
+    cc.mov(v1, counter);
+
+    cc.inc(counter);
+    cc.cmp(counter, 1);
+    cc.jle(L_Loop1);
+    cc.jmp(L_Exit);
+
+    cc.bind(L_1);
+    cc.bind(L_Loop2);
+    cc.mov(v1, counter);
+    cc.inc(counter);
+    cc.cmp(counter, 2);
+    cc.jle(L_Loop2);
+
+    cc.bind(L_Exit);
+    cc.ret(v1);
+    cc.endFunc();
+  }
+
+  virtual bool run(void* _func, String& result, String& expect) {
+    typedef int (*Func)(int, int);
+    Func func = ptr_as_func<Func>(_func);
+
+    int a = func(0, 1);
+    int b = func(1, 0);
+
+    result.appendFormat("ret={%d, %d}", a, b);
+    expect.appendFormat("ret={%d, %d}", 1, 2);
+
+    return result == expect;
+  }
+};
+
+// x86::Compiler - X86Test_Memcpy
+// ==============================
+
+class X86Test_Memcpy : public X86TestCase {
+public:
+  X86Test_Memcpy() : X86TestCase("Memcpy") {}
 
   enum { kCount = 32 };
 
   static void add(TestApp& app) {
-    app.add(new X86Test_AllocMemcpy());
+    app.add(new X86Test_Memcpy());
   }
 
   virtual void compile(x86::Compiler& cc) {
@@ -2266,15 +2266,15 @@ public:
   }
 };
 
-// x86::Compiler - X86Test_AllocExtraBlock
-// =======================================
+// x86::Compiler - X86Test_ExtraBlock
+// ==================================
 
-class X86Test_AllocExtraBlock : public X86TestCase {
+class X86Test_ExtraBlock : public X86TestCase {
 public:
-  X86Test_AllocExtraBlock() : X86TestCase("AllocExtraBlock") {}
+  X86Test_ExtraBlock() : X86TestCase("ExtraBlock") {}
 
   static void add(TestApp& app) {
-    app.add(new X86Test_AllocExtraBlock());
+    app.add(new X86Test_ExtraBlock());
   }
 
   virtual void compile(x86::Compiler& cc) {
@@ -2328,17 +2328,17 @@ public:
   }
 };
 
-// x86::Compiler - X86Test_AllocAlphaBlend
-// =======================================
+// x86::Compiler - X86Test_AlphaBlend
+// ==================================
 
-class X86Test_AllocAlphaBlend : public X86TestCase {
+class X86Test_AlphaBlend : public X86TestCase {
 public:
-  X86Test_AllocAlphaBlend() : X86TestCase("AllocAlphaBlend") {}
+  X86Test_AlphaBlend() : X86TestCase("AlphaBlend") {}
 
   enum { kCount = 17 };
 
   static void add(TestApp& app) {
-    app.add(new X86Test_AllocAlphaBlend());
+    app.add(new X86Test_AlphaBlend());
   }
 
   static uint32_t blendSrcOver(uint32_t d, uint32_t s) {
@@ -2397,6 +2397,117 @@ public:
 
       result.appendFormat("%08X", unsigned(dstBuffer[i]));
       expect.appendFormat("%08X", unsigned(expBuffer[i]));
+    }
+
+    result.append("}");
+    expect.append("}");
+
+    return result == expect;
+  }
+};
+
+// x86::Compiler - X86Test_AVX512_KK
+// =================================
+
+class X86Test_AVX512_KK : public X86TestCase {
+public:
+  X86Test_AVX512_KK() : X86TestCase("AVX512_KK") {}
+
+  static void add(TestApp& app) {
+    const CpuInfo& cpuInfo = CpuInfo::host();
+
+    if (cpuInfo.features().x86().hasAVX512_F()) {
+      app.add(new X86Test_AVX512_KK());
+    }
+  }
+
+  virtual void compile(x86::Compiler& cc) {
+    FuncNode* funcNode = cc.addFunc(FuncSignature::build<uint32_t, const void*, const void*, uint32_t>());
+
+    x86::Gp a = cc.newIntPtr("a");
+    x86::Gp b = cc.newIntPtr("b");
+    x86::Gp pred = cc.newInt32("pred");
+    x86::Gp result = cc.newInt32("result");
+
+    x86::Vec va = cc.newZmm("va");
+    x86::Vec vb = cc.newZmm("vb");
+    x86::KReg kIn = cc.newKd("k_in");
+    x86::KReg kOut = cc.newKd("k_out");
+
+    funcNode->setArg(0, a);
+    funcNode->setArg(1, b);
+    funcNode->setArg(2, pred);
+
+    cc.vmovdqu32(va, x86::ptr(a));
+    cc.vmovdqu32(vb, x86::ptr(b));
+    cc.kmovd(kIn, pred);
+    cc.k(kIn).vpcmpeqd(kOut, va, vb);
+    cc.kmovd(result, kOut);
+    cc.ret(result);
+    cc.endFunc();
+  }
+
+  virtual bool run(void* _func, String& result, String& expect) {
+    typedef uint32_t (*Func)(const void*, const void*, uint32_t prevK);
+    Func func = ptr_as_func<Func>(_func);
+
+    static const uint32_t srcA[16] = { 0, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1 };
+    static const uint32_t srcB[16] = { 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1 };
+
+    uint32_t ret = func(srcA, srcB, 0xF0F0);
+
+    result.assignFormat("0x%08X", ret);
+    expect.assignFormat("0x%08X", 0xA040u);
+
+    return result == expect;
+  }
+};
+
+// x86::Compiler - X86Test_AVX512_TernLog
+// ======================================
+
+class X86Test_AVX512_TernLog : public X86TestCase {
+public:
+  X86Test_AVX512_TernLog() : X86TestCase("AVX512_TernLog") {}
+
+  static void add(TestApp& app) {
+    const CpuInfo& cpuInfo = CpuInfo::host();
+
+    if (cpuInfo.features().x86().hasAVX512_F()) {
+      app.add(new X86Test_AVX512_TernLog());
+    }
+  }
+
+  virtual void compile(x86::Compiler& cc) {
+    FuncNode* funcNode = cc.addFunc(FuncSignature::build<void, void*>());
+
+    x86::Gp out = cc.newIntPtr("outPtr");
+    x86::Vec vec = cc.newZmm("vec");
+
+    funcNode->setArg(0, out);
+
+    cc.vpternlogd(vec, vec, vec, 0xFFu);
+    cc.vmovdqu8(x86::ptr(out), vec);
+    cc.endFunc();
+  }
+
+  virtual bool run(void* _func, String& result, String& expect) {
+    typedef void (*Func)(void*);
+    Func func = ptr_as_func<Func>(_func);
+
+    uint32_t out[16];
+    func(out);
+
+    result.assign("{");
+    expect.assign("{");
+
+    for (uint32_t i = 0; i < 16; i++) {
+      if (i) {
+        result.append(", ");
+        expect.append(", ");
+      }
+      result.appendFormat("0x%08X", out[i]);
+      expect.appendFormat("0x%08X", 0xFFFFFFFFu);
     }
 
     result.append("}");
@@ -4024,8 +4135,9 @@ public:
   static void add(TestApp& app) {
     const CpuInfo& cpuInfo = CpuInfo::host();
 
-    if (cpuInfo.features().x86().hasAVX2() && sizeof(void*) == 8)
+    if (cpuInfo.features().x86().hasAVX2() && sizeof(void*) == 8) {
       app.add(new X86Test_FuncCallAVXClobber());
+    }
   }
 
   virtual void compile(x86::Compiler& cc) {
@@ -4127,6 +4239,60 @@ public:
 
     result.append("}");
     expect.append("}");
+
+    return result == expect;
+  }
+};
+
+// x86::Compiler - X86Test_VecToScalar
+// ===================================
+
+class X86Test_VecToScalar : public X86TestCase {
+public:
+  static constexpr uint32_t kVecCount = 64;
+
+  X86Test_VecToScalar() : X86TestCase("VecToScalar") {}
+
+  static void add(TestApp& app) {
+    app.add(new X86Test_VecToScalar());
+  }
+
+  virtual void compile(x86::Compiler& cc) {
+    FuncNode* func = cc.addFunc(FuncSignature::build<uint32_t, uint32_t>());
+
+    x86::Gp x = cc.newInt32("x");
+    x86::Gp t = cc.newInt32("t");
+    x86::Xmm v[kVecCount];
+
+    func->setArg(0, x);
+
+    for (size_t i = 0; i < kVecCount; i++) {
+      v[i] = cc.newXmm("v%d", i);
+      if (i != 0)
+        cc.add(x, 1);
+      cc.movd(v[i], x);
+    }
+
+    cc.xor_(x, x);
+
+    for (size_t i = 0; i < kVecCount; i++) {
+      cc.movd(t, v[i]);
+      cc.add(x, t);
+    }
+
+    cc.ret(x);
+    cc.endFunc();
+  }
+
+  virtual bool run(void* _func, String& result, String& expect) {
+    typedef uint32_t (*Func)(uint32_t);
+    Func func = ptr_as_func<Func>(_func);
+
+    uint32_t resultRet = func(1);
+    uint32_t expectRet = 2080; // 1 + 2 + 3 + ... + 64
+
+    result.assignFormat("ret=%d", resultRet);
+    expect.assignFormat("ret=%d", expectRet);
 
     return result == expect;
   }
@@ -4445,22 +4611,10 @@ void compiler_add_x86_tests(TestApp& app) {
   app.addT<X86Test_JumpTable3>();
   app.addT<X86Test_JumpTable4>();
 
-  // Alloc tests.
+  // Alloc and instruction tests.
   app.addT<X86Test_AllocBase>();
   app.addT<X86Test_AllocMany1>();
   app.addT<X86Test_AllocMany2>();
-  app.addT<X86Test_AllocImul1>();
-  app.addT<X86Test_AllocImul2>();
-  app.addT<X86Test_AllocIdiv1>();
-  app.addT<X86Test_AllocSetz>();
-  app.addT<X86Test_AllocShlRor>();
-  app.addT<X86Test_AllocGpbLo1>();
-  app.addT<X86Test_AllocGpbLo2>();
-  app.addT<X86Test_AllocRepMovsb>();
-  app.addT<X86Test_AllocIfElse1>();
-  app.addT<X86Test_AllocIfElse2>();
-  app.addT<X86Test_AllocIfElse3>();
-  app.addT<X86Test_AllocIfElse4>();
   app.addT<X86Test_AllocInt8>();
   app.addT<X86Test_AllocUnhandledArg>();
   app.addT<X86Test_AllocArgsIntPtr>();
@@ -4474,9 +4628,23 @@ void compiler_add_x86_tests(TestApp& app) {
   app.addT<X86Test_AllocRetDouble1>();
   app.addT<X86Test_AllocRetDouble2>();
   app.addT<X86Test_AllocStack>();
-  app.addT<X86Test_AllocMemcpy>();
-  app.addT<X86Test_AllocExtraBlock>();
-  app.addT<X86Test_AllocAlphaBlend>();
+  app.addT<X86Test_Imul1>();
+  app.addT<X86Test_Imul2>();
+  app.addT<X86Test_Idiv1>();
+  app.addT<X86Test_Setz>();
+  app.addT<X86Test_ShlRor>();
+  app.addT<X86Test_GpbLo1>();
+  app.addT<X86Test_GpbLo2>();
+  app.addT<X86Test_RepMovsb>();
+  app.addT<X86Test_IfElse1>();
+  app.addT<X86Test_IfElse2>();
+  app.addT<X86Test_IfElse3>();
+  app.addT<X86Test_IfElse4>();
+  app.addT<X86Test_Memcpy>();
+  app.addT<X86Test_ExtraBlock>();
+  app.addT<X86Test_AlphaBlend>();
+  app.addT<X86Test_AVX512_KK>();
+  app.addT<X86Test_AVX512_TernLog>();
 
   // Function arguments handling tests.
   app.addT<X86Test_FuncArgInt8>();
@@ -4512,6 +4680,7 @@ void compiler_add_x86_tests(TestApp& app) {
   app.addT<X86Test_FuncCallAVXClobber>();
 
   // Miscellaneous tests.
+  app.addT<X86Test_VecToScalar>();
   app.addT<X86Test_MiscLocalConstPool>();
   app.addT<X86Test_MiscGlobalConstPool>();
   app.addT<X86Test_MiscMultiRet>();

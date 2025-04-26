@@ -12,7 +12,9 @@
 #include "a2232.h"
 
 #define LOG_DATA (1U << 1)
+
 //#define VERBOSE (LOG_GENERAL | LOG_DATA)
+
 #include "logmacro.h"
 
 
@@ -20,7 +22,7 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(ZORRO_A2232, bus::amiga::zorro::a2232_device, "zorro_a2232", "CBM A2232 Serial Card")
+DEFINE_DEVICE_TYPE(AMIGA_A2232, bus::amiga::zorro::a2232_device, "amiga_a2232", "Commodore A2232 Serial Card")
 
 
 namespace bus::amiga::zorro {
@@ -117,7 +119,7 @@ void a2232_device::device_add_mconfig(machine_config &config)
 //-------------------------------------------------
 
 a2232_device::a2232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ZORRO_A2232, tag, owner, clock),
+	device_t(mconfig, AMIGA_A2232, tag, owner, clock),
 	device_zorro2_card_interface(mconfig, *this),
 	m_iocpu(*this, "iocpu"),
 	m_ioirq(*this, "ioirq"),
@@ -160,7 +162,7 @@ void a2232_device::int2_w(uint8_t data)
 {
 	LOG("%s: int2_w %04x\n", shortname(), data);
 
-	m_slot->int2_w(1);
+	m_zorro->int2_w(1);
 }
 
 void a2232_device::irq_ack8_w(uint8_t data)
@@ -181,35 +183,35 @@ void a2232_device::autoconfig_base_address(offs_t address)
 	LOG("-> installing a2232\n");
 
 	// stop responding to default autoconfig
-	m_slot->space().unmap_readwrite(0xe80000, 0xe8007f);
+	m_zorro->space().unmap_readwrite(0xe80000, 0xe8007f);
 
-	m_slot->space().install_readwrite_handler(address, address + 0x3fff,
-			read16s_delegate(*this, FUNC(a2232_device::shared_ram_r)),
-			write16s_delegate(*this, FUNC(a2232_device::shared_ram_w)), 0xffff);
+	m_zorro->space().install_readwrite_handler(address, address + 0x3fff,
+		read16s_delegate(*this, FUNC(a2232_device::shared_ram_r)),
+		write16s_delegate(*this, FUNC(a2232_device::shared_ram_w)), 0xffff);
 
-	m_slot->space().install_readwrite_handler(address + 0x4000, address + 0x4001,
-			read16smo_delegate(*this, FUNC(a2232_device::irq_ack_r)),
-			write16smo_delegate(*this, FUNC(a2232_device::irq_ack_w)), 0xffff);
+	m_zorro->space().install_readwrite_handler(address + 0x4000, address + 0x4001,
+		read16smo_delegate(*this, FUNC(a2232_device::irq_ack_r)),
+		write16smo_delegate(*this, FUNC(a2232_device::irq_ack_w)), 0xffff);
 
-	m_slot->space().install_readwrite_handler(address + 0x8000, address + 0x8001,
-			read16smo_delegate(*this, FUNC(a2232_device::reset_low_r)),
-			write16smo_delegate(*this, FUNC(a2232_device::reset_low_w)), 0xffff);
+	m_zorro->space().install_readwrite_handler(address + 0x8000, address + 0x8001,
+		read16smo_delegate(*this, FUNC(a2232_device::reset_low_r)),
+		write16smo_delegate(*this, FUNC(a2232_device::reset_low_w)), 0xffff);
 
-	m_slot->space().install_readwrite_handler(address + 0xa000, address + 0xa001,
-			read16smo_delegate(*this, FUNC(a2232_device::irq_r)),
-			write16smo_delegate(*this, FUNC(a2232_device::irq_w)), 0xffff);
+	m_zorro->space().install_readwrite_handler(address + 0xa000, address + 0xa001,
+		read16smo_delegate(*this, FUNC(a2232_device::irq_r)),
+		write16smo_delegate(*this, FUNC(a2232_device::irq_w)), 0xffff);
 
-	m_slot->space().install_readwrite_handler(address + 0xc000, address + 0xc001,
-			read16s_delegate(*this, FUNC(a2232_device::reset_high_r)),
-			write16s_delegate(*this, FUNC(a2232_device::reset_high_w)), 0xffff);
+	m_zorro->space().install_readwrite_handler(address + 0xc000, address + 0xc001,
+		read16s_delegate(*this, FUNC(a2232_device::reset_high_r)),
+		write16s_delegate(*this, FUNC(a2232_device::reset_high_w)), 0xffff);
 
 	// we're done
-	m_slot->cfgout_w(0);
+	m_zorro->cfgout_w(0);
 }
 
 void a2232_device::cfgin_w(int state)
 {
-	LOG("%s: configin_w (%d)\n", shortname(), state);
+	LOG("%s: cfgin_w (%d)\n", shortname(), state);
 
 	if (state == 0)
 	{
@@ -228,9 +230,9 @@ void a2232_device::cfgin_w(int state)
 		autoconfig_can_shutup(true); // ?
 
 		// install autoconfig handler
-		m_slot->space().install_readwrite_handler(0xe80000, 0xe8007f,
-				read16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_read)),
-				write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffff);
+		m_zorro->space().install_readwrite_handler(0xe80000, 0xe8007f,
+			read16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_read)),
+			write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffff);
 	}
 }
 
@@ -271,14 +273,14 @@ void a2232_device::shared_ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint16_t a2232_device::irq_ack_r()
 {
-	m_slot->int2_w(0);
+	m_zorro->int2_w(0);
 
 	return 0xffff;
 }
 
 void a2232_device::irq_ack_w(uint16_t data)
 {
-	m_slot->int2_w(0);
+	m_zorro->int2_w(0);
 }
 
 uint16_t a2232_device::reset_low_r()

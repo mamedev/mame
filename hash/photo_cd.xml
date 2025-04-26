@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+http://redump.org/discs/system/photo-cd/
+-->
+<softwarelist name="photo_cd" description="Kodak Photo CD images (Beige Book)">
+
+	<software name="toilhana" supported="no">
+		<!-- http://redump.org/disc/103991/ -->
+		<description>Toilet no Hanako-san (Japan)</description>
+		<year>1995</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="トイレの花子さん" />
+		<info name="serial" value="PCD0924" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="toilet_no_hanako-san_(japan)" sha1="bb35be781dcf134f1225df7352f8bcac1ab11629"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="winsenna" supported="no">
+		<!-- http://redump.org/disc/103998/ -->
+		<description>Winning Run: Ayrton Senna: 20-nen no Kiseki (Japan)</description>
+		<year>1995</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="ＷＩＮＮＩＮＧ ＲＵＮ アイルトン・セナ ２０年の軌跡" />
+		<info name="barcode" value="T4934878151235" />
+		<info name="serial" value="PCD0806" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="winning_run_-_ayrton_senna_-_20-nen_no_kiseki_(japan)" sha1="0bf605a8e5713f5802f827424507f53e65f586e7"/>
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

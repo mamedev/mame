@@ -115,7 +115,7 @@ void palm_device::execute_run()
 			m_program_level(m_il > 0);
 
 			// notify the debugger
-			if (m_il && (machine().debug_flags & DEBUG_FLAG_ENABLED))
+			if (m_il && debugger_enabled())
 				debug()->interrupt_hook(m_il - 1, m_r[m_il][0] & ~1);
 		}
 

@@ -89,6 +89,6 @@ char const *const SUPER_SWANGI    = "super_swangi";
 char const *const SUPERLODERUNNER = "superloderunner";
 char const *const SYNTHESIZER     = "synthesizer";
 char const *const UCN01           = "ucn01";
-
+char const *const VIDEO80         = "video80";
 } // namespace bus::msx::cart::slotoptions
 

@@ -196,7 +196,8 @@ void namcona1_state::simulate_mcu()
 void namcona1_state::write_version_info()
 {
 	static const u16 source[0x8] =
-	{ /* "NSA-BIOS ver"... */
+	{
+		/* "NSA-BIOS ver"... */
 		0x534e,0x2d41,0x4942,0x534f,0x7620,0x7265,0x2e31,0x3133
 	};
 	for (int i = 0; i < 8; i++)
@@ -301,11 +302,11 @@ u16 namcona1_state::custom_key_r(offs_t offset)
 		return 0;
 	}
 	return machine().rand()&0xffff;
-} /* custom_key_r */
+}
 
 void namcona1_state::custom_key_w(u16 data)
 {
-} /* custom_key_w */
+}
 
 /***************************************************************/
 
@@ -357,12 +358,13 @@ int namcona1_state::transfer_dword(u32 dest, u32 source)
 		return -1;
 	}
 	return 0;
-} /* transfer_dword */
+}
 
 void namcona1_state::blit_setup(int format, int *bytes_per_row, int *pitch, int mode)
 {
 	if (mode == 3)
-	{ /* TILE DATA */
+	{
+		/* TILE DATA */
 		switch (format)
 		{
 		case 0x0001:
@@ -385,7 +387,8 @@ void namcona1_state::blit_setup(int format, int *bytes_per_row, int *pitch, int 
 		}
 	}
 	else
-	{ /* SHAPE DATA */
+	{
+		/* SHAPE DATA */
 		switch (format)
 		{
 		case 0x00bd: /* Numan Athletics */
@@ -428,7 +431,7 @@ void namcona1_state::blit_setup(int format, int *bytes_per_row, int *pitch, int 
 			break;
 		}
 	}
-} /* blit_setup */
+}
 
 void namcona1_state::blit()
 {
@@ -505,7 +508,7 @@ void namcona1_state::blit()
 			src_offset = 0;
 		}
 	}
-} /* blit */
+}
 
 void namcona1_state::vreg_w(offs_t offset, u16 data, u16 mem_mask)
 {
@@ -542,7 +545,7 @@ void namcona1_state::vreg_w(offs_t offset, u16 data, u16 mem_mask)
 		}
 		break;
 	}
-} /* vreg_w */
+}
 
 /***************************************************************/
 

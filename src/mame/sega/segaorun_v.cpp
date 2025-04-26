@@ -71,33 +71,37 @@ uint32_t segaorun_state::screen_update_shangon(screen_device &screen, bitmap_ind
 
 	// mix in sprites
 	bitmap_ind16 &sprites = m_sprites->bitmap();
-	for (const sparse_dirty_rect *rect = m_sprites->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->min_y; y <= rect->max_y; y++)
-		{
-			uint16_t *dest = &bitmap.pix(y);
-			uint16_t *src = &sprites.pix(y);
-			uint8_t *pri = &screen.priority().pix(y);
-			for (int x = rect->min_x; x <= rect->max_x; x++)
+	m_sprites->iterate_dirty_rects(
+			cliprect,
+			[this, &screen, &bitmap, &sprites] (rectangle const &rect)
 			{
-				// only process written pixels
-				uint16_t pix = src[x];
-				if (pix != 0xffff)
+				for (int y = rect.min_y; y <= rect.max_y; y++)
 				{
-					// compare sprite priority against tilemap priority
-					int priority = (pix >> 10) & 3;
-					if ((1 << priority) > pri[x])
+					uint16_t *const dest = &bitmap.pix(y);
+					uint16_t const *const src = &sprites.pix(y);
+					uint8_t const *const pri = &screen.priority().pix(y);
+					for (int x = rect.min_x; x <= rect.max_x; x++)
 					{
-						// if the color is set to maximum, shadow pixels underneath us
-						if ((pix & 0x03f0) == 0x03f0)
-							dest[x] += m_palette_entries;
+						// only process written pixels
+						uint16_t const pix = src[x];
+						if (pix != 0xffff)
+						{
+							// compare sprite priority against tilemap priority
+							int const priority = (pix >> 10) & 3;
+							if ((1 << priority) > pri[x])
+							{
+								// if the color is set to maximum, shadow pixels underneath us
+								if ((pix & 0x03f0) == 0x03f0)
+									dest[x] += m_palette_entries;
 
-						// otherwise, just add in sprite palette base
-						else
-							dest[x] = 0x400 | (pix & 0x3ff);
+								// otherwise, just add in sprite palette base
+								else
+									dest[x] = 0x400 | (pix & 0x3ff);
+							}
+						}
 					}
 				}
-			}
-		}
+			});
 
 	return 0;
 }
@@ -138,33 +142,37 @@ uint32_t segaorun_state::screen_update_outrun(screen_device &screen, bitmap_ind1
 
 	// mix in sprites
 	bitmap_ind16 &sprites = m_sprites->bitmap();
-	for (const sparse_dirty_rect *rect = m_sprites->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->min_y; y <= rect->max_y; y++)
-		{
-			uint16_t *dest = &bitmap.pix(y);
-			uint16_t *src = &sprites.pix(y);
-			uint8_t *pri = &screen.priority().pix(y);
-			for (int x = rect->min_x; x <= rect->max_x; x++)
+	m_sprites->iterate_dirty_rects(
+			cliprect,
+			[this, &screen, &bitmap, &sprites] (rectangle const &rect)
 			{
-				// only process written pixels
-				uint16_t pix = src[x];
-				if (pix != 0xffff)
+				for (int y = rect.min_y; y <= rect.max_y; y++)
 				{
-					// compare sprite priority against tilemap priority
-					int priority = (pix >> 12) & 3;
-					if ((1 << priority) > pri[x])
+					uint16_t *const dest = &bitmap.pix(y);
+					uint16_t const *const src = &sprites.pix(y);
+					uint8_t *const pri = &screen.priority().pix(y);
+					for (int x = rect.min_x; x <= rect.max_x; x++)
 					{
-						// if the shadow flag is set, this triggers shadow/hilight for pen 0xa
-						if ((pix & 0x400f) == 0x400a)
-							dest[x] += m_palette_entries;
+						// only process written pixels
+						uint16_t const pix = src[x];
+						if (pix != 0xffff)
+						{
+							// compare sprite priority against tilemap priority
+							int const priority = (pix >> 12) & 3;
+							if ((1 << priority) > pri[x])
+							{
+								// if the shadow flag is set, this triggers shadow/hilight for pen 0xa
+								if ((pix & 0x400f) == 0x400a)
+									dest[x] += m_palette_entries;
 
-						// otherwise, just add in sprite palette base
-						else
-							dest[x] = 0x800 | (pix & 0x7ff);
+								// otherwise, just add in sprite palette base
+								else
+									dest[x] = 0x800 | (pix & 0x7ff);
+							}
+						}
 					}
 				}
-			}
-		}
+			});
 
 	return 0;
 }

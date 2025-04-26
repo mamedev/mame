@@ -752,7 +752,7 @@ void tekigw_state_base::common_config(machine_config &config)
 	RAM(config, m_ram);
 	m_ram->set_default_size("1M");
 
-	SCC8530N(config, m_scc, 16_MHz_XTAL / 4);
+	SCC8530(config, m_scc, 16_MHz_XTAL / 4);
 	m_scc->out_int_callback().set(m_icu, FUNC(ns32202_device::ir_w<1>)).invert();
 	m_scc->configure_channels(2'457'600, 0, 2'457'600, 0);
 

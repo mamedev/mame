@@ -5957,6 +5957,19 @@ static INPUT_PORTS_START( lxts3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( icb )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( njp60in1 )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
@@ -6524,6 +6537,21 @@ ROM_START( lxts3 )
 ROM_END
 
 
+ROM_START( icb_ts )
+	ROM_REGION( 0x2000000, "mainrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "toystory.bin", 0x00000, 0x400000, CRC(396f8aff) SHA1(b149470306cd77558666b7ab90fa3fe4e95b6c60) )
+ROM_END
+
+ROM_START( icb_car )
+	ROM_REGION( 0x2000000, "mainrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "kh26lv320.u2", 0x00000, 0x400000, CRC(88132171) SHA1(55a9ac8c1f49dfc116565ac11149cbd4eef90938) )
+ROM_END
+
+ROM_START( icb_dp )
+	ROM_REGION( 0x2000000, "mainrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "princesscoloringbook.bin", 0x00000, 0x400000, CRC(253a0245) SHA1(1b902f179eed469cf749aaa9169fede290ce1031) )
+ROM_END
+
 ROM_START( gm235upc )
 	ROM_REGION( 0x2000000, "mainrom", ROMREGION_ERASE00 )
 	ROM_LOAD( "39vf3201.u3", 0x00000, 0x400000, CRC(182f8a2c) SHA1(7be56e1063cc8dbb78c419f5adc05b8cd65c8e2f))
@@ -6617,6 +6645,10 @@ CONS( 200?, unk1682,  0,  0,   vt1682_unk1682, lxts3, vt1682_lxts3_state, unk168
 
 CONS( 2010, lxts3,    0,  0,   vt1682_lxts3, lxts3, vt1682_lxts3_state, regular_init,  "Lexibook", "Toy Story 3 (Lexibook)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
+CONS( 200?, icb_ts,   0,  0,   vt1682_lxts3, icb,   vt1682_lxts3_state, regular_init,  "Techno Source", "Interactive Coloring Book: Disney / Pixar Toy Story", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, icb_car,  0,  0,   vt1682_lxts3, icb,   vt1682_lxts3_state, regular_init,  "Techno Source", "Interactive Coloring Book: Disney / Pixar Cars", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, icb_dp,   0,  0,   vt1682_lxts3, icb,   vt1682_lxts3_state, regular_init,  "Techno Source", "Interactive Coloring Book: Disney Princess", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
 // there are products on SunPlus type hardware with nearly identical shells 'Mi DiGi World' / 'Mi Digi Diary'
 // needs IO ports on sound CPU side, needs write access to space for RAM (inputs are 'mini-keyboard' style)
 CONS( 200?, gm235upc,  0,  0,  gm235upc, gm235upc, vt1682_dance_state, regular_init, "TimeTop", "Ultimate Pocket Console GM-235", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
@@ -6641,5 +6673,4 @@ CONS( 2007, cmpmx11,     0,        0,  mx10, mx10, vt1682_mx10_state, mx10_init,
 // this unit has a vertical screen, and the games are designed for that aspect
 // only Jungle Soft is shown on box for manufacturer details, 30-in-1 versions also exist
 // see https://bootleggames.fandom.com/wiki/Classic_Max_Pocket for other units with these games
-// how do you specify ROT270 with CONS? using GAME macro for now
-GAME( 2007, cmpmx10,     0,        mx10, mx10, vt1682_mx10_state, mx10_init, ROT270, "Jungle Soft",    "Classic Max Pocket Mx-10 - 12 in 1 (vertical)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2007, cmpmx10,     0,        0,  mx10, mx10, vt1682_mx10_state, mx10_init, "Jungle Soft",    "Classic Max Pocket Mx-10 - 12 in 1 (vertical)", ROT270 | MACHINE_IMPERFECT_GRAPHICS )

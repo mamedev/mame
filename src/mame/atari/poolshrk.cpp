@@ -237,9 +237,9 @@ void poolshrk_state::cpu_map(address_map &map)
 {
 	map.global_mask(0x7fff);
 	map(0x0000, 0x00ff).mirror(0x2300).ram();
-	map(0x0400, 0x07ff).mirror(0x2000).writeonly().share(m_playfield_ram);
-	map(0x0800, 0x080f).mirror(0x23f0).writeonly().share(m_hpos_ram);
-	map(0x0c00, 0x0c0f).mirror(0x23f0).writeonly().share(m_vpos_ram);
+	map(0x0400, 0x07ff).mirror(0x2000).nopr().writeonly().share(m_playfield_ram);
+	map(0x0800, 0x080f).mirror(0x23f0).nopr().writeonly().share(m_hpos_ram);
+	map(0x0c00, 0x0c0f).mirror(0x23f0).nopr().writeonly().share(m_vpos_ram);
 	map(0x1000, 0x13ff).mirror(0x2000).rw(FUNC(poolshrk_state::input_r), FUNC(poolshrk_state::watchdog_w));
 	map(0x1400, 0x17ff).mirror(0x2000).w(FUNC(poolshrk_state::scratch_sound_w));
 	map(0x1800, 0x1bff).mirror(0x2000).w(FUNC(poolshrk_state::score_sound_w));
@@ -351,9 +351,8 @@ void poolshrk_state::palette(palette_device &palette) const
 void poolshrk_state::poolshrk(machine_config &config)
 {
 	// basic machine hardware
-	M6800(config, m_maincpu, 11'055'000 / 8); // ?
+	M6800(config, m_maincpu, 11.055_MHz_XTAL / 8); // divider not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &poolshrk_state::cpu_map);
-	m_maincpu->set_vblank_int("screen", FUNC(poolshrk_state::irq0_line_assert));
 
 	WATCHDOG_TIMER(config, m_watchdog);
 
@@ -364,6 +363,7 @@ void poolshrk_state::poolshrk(machine_config &config)
 	screen.set_visarea(1, 255, 24, 255);
 	screen.set_screen_update(FUNC(poolshrk_state::screen_update));
 	screen.set_palette(m_palette);
+	screen.screen_vblank().set_inputline(m_maincpu, M6800_IRQ_LINE, ASSERT_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_poolshrk);
 	PALETTE(config, m_palette, FUNC(poolshrk_state::palette), 4);

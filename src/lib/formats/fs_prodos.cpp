@@ -26,22 +26,22 @@ public:
 	virtual ~prodos_impl() = default;
 
 	virtual meta_data volume_metadata() override;
-	virtual std::pair<err_t, meta_data> metadata(const std::vector<std::string> &path) override;
+	virtual std::pair<std::error_condition, meta_data> metadata(const std::vector<std::string> &path) override;
 
-	virtual std::pair<err_t, std::vector<dir_entry>> directory_contents(const std::vector<std::string> &path) override;
+	virtual std::pair<std::error_condition, std::vector<dir_entry>> directory_contents(const std::vector<std::string> &path) override;
 
-	virtual std::pair<err_t, std::vector<u8>> file_read(const std::vector<std::string> &path) override;
-	virtual std::pair<err_t, std::vector<u8>> file_rsrc_read(const std::vector<std::string> &path) override;
+	virtual std::pair<std::error_condition, std::vector<u8>> file_read(const std::vector<std::string> &path) override;
+	virtual std::pair<std::error_condition, std::vector<u8>> file_rsrc_read(const std::vector<std::string> &path) override;
 
-	virtual err_t format(const meta_data &meta) override;
+	virtual std::error_condition format(const meta_data &meta) override;
 
 private:
 	static const u8 boot[512];
 	static util::arbitrary_datetime prodos_to_dt(u32 date);
 
-	std::tuple<fsblk_t::block_t, u32> path_find_step(const std::string &name, u16 block);
-	std::tuple<fsblk_t::block_t, u32, bool> path_find(const std::vector<std::string> &path);
-	std::pair<err_t, std::vector<u8>> any_read(u8 type, u16 block, u32 length);
+	std::tuple<fsblk_t::block_t::ptr, u32> path_find_step(const std::string &name, u16 block);
+	std::tuple<fsblk_t::block_t::ptr, u32, bool> path_find(const std::vector<std::string> &path);
+	std::pair<std::error_condition, std::vector<u8>> any_read(u8 type, u16 block, u32 length);
 };
 }
 
@@ -210,7 +210,7 @@ std::vector<meta_description> prodos_image::directory_meta_description() const
 	return res;
 }
 
-err_t prodos_impl::format(const meta_data &meta)
+std::error_condition prodos_impl::format(const meta_data &meta)
 {
 	std::string volume_name = meta.get_string(meta_name::name, "UNTITLED");
 	u32 blocks = m_blockdev.block_count();
@@ -219,36 +219,36 @@ err_t prodos_impl::format(const meta_data &meta)
 	if(blocks >= 0x10000)
 		blocks = 0xffff;
 
-	m_blockdev.get(0).copy(0x000, boot, 0x200);               // Standard ProDOS boot sector as written by a 2gs
-	m_blockdev.get(1).fill(0x00);                             // No SOS boot sector
+	m_blockdev.get(0)->write(0x000, boot, 0x200);             // Standard ProDOS boot sector as written by a 2gs
+	m_blockdev.get(1)->fill(0x00);                            // No SOS boot sector
 
 	auto kblk1 = m_blockdev.get(2);                           // key block first block
 	auto kblk2 = m_blockdev.get(3);                           // key block second block
 	auto kblk3 = m_blockdev.get(4);                           // key block third block
 	auto kblk4 = m_blockdev.get(5);                           // key block fourth block
 
-	kblk1.w16l(0x00, 0x0000);                                 // Backwards key block pointer (null)
-	kblk1.w16l(0x02, 0x0003);                                 // Forwards key block pointer
-	kblk1.w8  (0x04, 0xf0 | volume_name.size());              // Block type (f, key block) and name size
-	kblk1.wstr(0x05, volume_name);                            // Volume name, up to 15 characters
-	kblk1.w32b(0x16, 0x642a250d);                             // ??? date & time
-	kblk1.w16b(0x1a, 0x80ff);                                 // ???
-	kblk1.w32b(0x1c, 0x642a250d);                             // Creation date & time
-	kblk1.w8  (0x20, 0x05);                                   // ProDOS version (2gs)
-	kblk1.w8  (0x21, 0x00);                                   // ProDOS minimum version
-	kblk1.w8  (0x22, 0xc3);                                   // Allowed access (destroy, rename, !backup, 3x0, write read)
-	kblk1.w8  (0x23, 0x27);                                   // Directory entry length (fixed)
-	kblk1.w8  (0x24, 0x0d);                                   // Entries per block (fixed)
-	kblk1.w16l(0x25, 0x0000);                                 // Number of file entries in the directory
-	kblk1.w16l(0x27, 0x0006);                                 // Bitmap block pointer
-	kblk1.w16l(0x29, blocks);                                 // Number of blocks
+	kblk1->w16l(0x00, 0x0000);                                // Backwards key block pointer (null)
+	kblk1->w16l(0x02, 0x0003);                                // Forwards key block pointer
+	kblk1->w8  (0x04, 0xf0 | volume_name.size());             // Block type (f, key block) and name size
+	kblk1->wstr(0x05, volume_name);                           // Volume name, up to 15 characters
+	kblk1->w32b(0x16, 0x642a250d);                            // ??? date & time
+	kblk1->w16b(0x1a, 0x80ff);                                // ???
+	kblk1->w32b(0x1c, 0x642a250d);                            // Creation date & time
+	kblk1->w8  (0x20, 0x05);                                  // ProDOS version (2gs)
+	kblk1->w8  (0x21, 0x00);                                  // ProDOS minimum version
+	kblk1->w8  (0x22, 0xc3);                                  // Allowed access (destroy, rename, !backup, 3x0, write read)
+	kblk1->w8  (0x23, 0x27);                                  // Directory entry length (fixed)
+	kblk1->w8  (0x24, 0x0d);                                  // Entries per block (fixed)
+	kblk1->w16l(0x25, 0x0000);                                // Number of file entries in the directory
+	kblk1->w16l(0x27, 0x0006);                                // Bitmap block pointer
+	kblk1->w16l(0x29, blocks);                                // Number of blocks
 
-	kblk2.w16l(0x00, 0x0002);                                 // Backwards block pointer of the second volume block
-	kblk2.w16l(0x02, 0x0004);                                 // Forwards block pointer of the second volume block
-	kblk3.w16l(0x00, 0x0003);                                 // Backwards block pointer of the third volume block
-	kblk3.w16l(0x02, 0x0005);                                 // Forwards block pointer of the third volume block
-	kblk4.w16l(0x00, 0x0004);                                 // Backwards block pointer of the fourth volume block
-	kblk4.w16l(0x02, 0x0000);                                 // Forwards block pointer of the fourth volume block (null)
+	kblk2->w16l(0x00, 0x0002);                                // Backwards block pointer of the second volume block
+	kblk2->w16l(0x02, 0x0004);                                // Forwards block pointer of the second volume block
+	kblk3->w16l(0x00, 0x0003);                                // Backwards block pointer of the third volume block
+	kblk3->w16l(0x02, 0x0005);                                // Forwards block pointer of the third volume block
+	kblk4->w16l(0x00, 0x0004);                                // Backwards block pointer of the fourth volume block
+	kblk4->w16l(0x02, 0x0000);                                // Forwards block pointer of the fourth volume block (null)
 
 	u32 fmap_block_count = (blocks + 4095) / 4096;
 	u32 first_free_block = 6 + fmap_block_count;
@@ -256,7 +256,7 @@ err_t prodos_impl::format(const meta_data &meta)
 	// Mark blocks from first_free_block to blocks-1 (the last one) as free
 	for(u32 i = 0; i != fmap_block_count; i++) {
 		auto fmap = m_blockdev.get(6 + i);
-		u8 *fdata = fmap.data();
+		u8 *fdata = fmap->data();
 		u32 start = i ? 0 : first_free_block;
 		u32 end = i != fmap_block_count - 1 ? 4095 : (blocks - 1) & 4095;
 		end += 1;
@@ -274,7 +274,7 @@ err_t prodos_impl::format(const meta_data &meta)
 				memset(fdata+sb, 0xff, eb-sb-1);
 		}
 	}
-	return ERR_OK;
+	return std::error_condition();
 }
 
 prodos_impl::prodos_impl(fsblk_t &blockdev) : filesystem_t(blockdev, 512)
@@ -300,16 +300,16 @@ meta_data prodos_impl::volume_metadata()
 {
 	meta_data res;
 	auto bdir = m_blockdev.get(2);
-	int len = bdir.r8(0x04) & 0xf;
-	res.set(meta_name::name, bdir.rstr(0x05, len));
-	res.set(meta_name::os_version, bdir.r8(0x20));
-	res.set(meta_name::os_minimum_version, bdir.r8(0x21));
-	res.set(meta_name::creation_date, prodos_to_dt(bdir.r32l(0x1c)));
-	res.set(meta_name::modification_date, prodos_to_dt(bdir.r32l(0x16)));
+	int len = bdir->r8(0x04) & 0xf;
+	res.set(meta_name::name, bdir->rstr(0x05, len));
+	res.set(meta_name::os_version, bdir->r8(0x20));
+	res.set(meta_name::os_minimum_version, bdir->r8(0x21));
+	res.set(meta_name::creation_date, prodos_to_dt(bdir->r32l(0x1c)));
+	res.set(meta_name::modification_date, prodos_to_dt(bdir->r32l(0x16)));
 	return res;
 }
 
-std::pair<err_t, std::vector<dir_entry>> prodos_impl::directory_contents(const std::vector<std::string> &path)
+std::pair<std::error_condition, std::vector<dir_entry>> prodos_impl::directory_contents(const std::vector<std::string> &path)
 {
 	u16 block;
 	if(path.empty())
@@ -318,8 +318,8 @@ std::pair<err_t, std::vector<dir_entry>> prodos_impl::directory_contents(const s
 	else {
 		auto [blk, off, dir] = path_find(path);
 		if(!off || !dir)
-			return std::make_pair(ERR_NOT_FOUND, std::vector<dir_entry>());
-		block = blk.r16l(off+0x11);
+			return std::make_pair(error::not_found, std::vector<dir_entry>());
+		block = blk->r16l(off+0x11);
 	}
 
 	std::vector<dir_entry> res;
@@ -327,57 +327,57 @@ std::pair<err_t, std::vector<dir_entry>> prodos_impl::directory_contents(const s
 	do {
 		auto blk = m_blockdev.get(block);
 		for(u32 off = 4; off < 511; off += 39) {
-			u8 type = blk.r8(off);
+			u8 type = blk->r8(off);
 			// skip inactive entries and subroutine/volume headers
 			if(type != 0 && type < 0xe0) {
 				meta_data meta;
-				meta.set(meta_name::name, blk.rstr(off+1, type & 0xf));
+				meta.set(meta_name::name, blk->rstr(off+1, type & 0xf));
 				type >>= 4;
 
 				if(type == 5) {
-					auto rootblk = m_blockdev.get(blk.r16l(off+0x11));
-					meta.set(meta_name::length, rootblk.r24l(0x005));
-					meta.set(meta_name::rsrc_length, rootblk.r24l(0x105));
+					auto rootblk = m_blockdev.get(blk->r16l(off+0x11));
+					meta.set(meta_name::length, rootblk->r24l(0x005));
+					meta.set(meta_name::rsrc_length, rootblk->r24l(0x105));
 
 				} else if(type >= 1 && type <= 3) {
-					meta.set(meta_name::length, blk.r24l(off + 0x15));
-					meta.set(meta_name::file_type, file_type_to_string(blk.r8(off + 0x10)));
+					meta.set(meta_name::length, blk->r24l(off + 0x15));
+					meta.set(meta_name::file_type, file_type_to_string(blk->r8(off + 0x10)));
 				}
 
-				meta.set(meta_name::os_version, blk.r8(off + 0x1c));
-				meta.set(meta_name::os_minimum_version, blk.r8(off + 0x1d));
-				meta.set(meta_name::creation_date, prodos_to_dt(blk.r32l(off + 0x18)));
-				meta.set(meta_name::modification_date, prodos_to_dt(blk.r32l(off + 0x21)));
+				meta.set(meta_name::os_version, blk->r8(off + 0x1c));
+				meta.set(meta_name::os_minimum_version, blk->r8(off + 0x1d));
+				meta.set(meta_name::creation_date, prodos_to_dt(blk->r32l(off + 0x18)));
+				meta.set(meta_name::modification_date, prodos_to_dt(blk->r32l(off + 0x21)));
 
 				res.emplace_back(dir_entry(type == 0xd ? dir_entry_type::dir : dir_entry_type::file, meta));
 			}
 		}
-		block = blk.r16l(2);
+		block = blk->r16l(2);
 		if(block >= m_blockdev.block_count())
 			break;
 	} while(block);
-	return std::make_pair(ERR_OK, res);
+	return std::make_pair(std::error_condition(), res);
 }
 
-std::tuple<fsblk_t::block_t, u32> prodos_impl::path_find_step(const std::string &name, u16 block)
+std::tuple<fsblk_t::block_t::ptr, u32> prodos_impl::path_find_step(const std::string &name, u16 block)
 {
 	for(;;) {
 		auto blk = m_blockdev.get(block);
 		for(u32 off = 4; off < 511; off += 39) {
-			u8 type = blk.r8(off);
-			if(type != 0 && type < 0xe0 && name == blk.rstr(off+1, type & 0xf))
+			u8 type = blk->r8(off);
+			if(type != 0 && type < 0xe0 && name == blk->rstr(off+1, type & 0xf))
 				return std::make_tuple(blk, off);
 		}
-		block = blk.r16l(2);
+		block = blk->r16l(2);
 		if(!block || block >= m_blockdev.block_count())
 			return std::make_tuple(blk, 0U);
 	}
 }
 
-std::tuple<fsblk_t::block_t, u32, bool> prodos_impl::path_find(const std::vector<std::string> &path)
+std::tuple<fsblk_t::block_t::ptr, u32, bool> prodos_impl::path_find(const std::vector<std::string> &path)
 {
 	if(path.size() == 0)
-		return std::tuple<fsblk_t::block_t, u32, bool>(fsblk_t::block_t(), 0, false);
+		return std::tuple<fsblk_t::block_t::ptr, u32, bool>(fsblk_t::block_t::ptr(), 0, false);
 
 	u16 block = 2;
 	for(u32 pathc = 0;; pathc++) {
@@ -386,27 +386,27 @@ std::tuple<fsblk_t::block_t, u32, bool> prodos_impl::path_find(const std::vector
 			return std::make_tuple(blk, off, false);
 
 		if(pathc + 1 == path.size())
-			return std::make_tuple(blk, off, (blk.r8(off) & 0xf0) == 0xd0);
+			return std::make_tuple(blk, off, (blk->r8(off) & 0xf0) == 0xd0);
 
-		if((blk.r8(off) & 0xf0) != 0xd0)
+		if((blk->r8(off) & 0xf0) != 0xd0)
 			return std::make_tuple(blk, 0U, false);
 
-		block = blk.r16l(off + 0x11);
+		block = blk->r16l(off + 0x11);
 	}
 }
 
 
-std::pair<err_t, meta_data> prodos_impl::metadata(const std::vector<std::string> &path)
+std::pair<std::error_condition, meta_data> prodos_impl::metadata(const std::vector<std::string> &path)
 {
 	if(path.size() == 0)
-		return std::make_pair(ERR_OK, meta_data());
+		return std::make_pair(std::error_condition(), meta_data());
 
 	auto [blk, off, dir] = path_find(path);
 
 	if(!off)
-		return std::make_pair(ERR_NOT_FOUND, meta_data());
+		return std::make_pair(error::not_found, meta_data());
 
-	const u8 *entry = blk.rodata() + off;
+	const u8 *entry = blk->rodata() + off;
 
 	meta_data res;
 	if(dir) {
@@ -420,23 +420,23 @@ std::pair<err_t, meta_data> prodos_impl::metadata(const std::vector<std::string>
 		res.set(meta_name::name, name);
 		if(type == 5) {
 			auto rootblk = m_blockdev.get(get_u16le(entry+0x11));
-			res.set(meta_name::length, rootblk.r24l(0x005));
-			res.set(meta_name::rsrc_length, rootblk.r24l(0x105));
+			res.set(meta_name::length, rootblk->r24l(0x005));
+			res.set(meta_name::rsrc_length, rootblk->r24l(0x105));
 
 		} else if(type >= 1 && type <= 3)
 			res.set(meta_name::length, get_u24le(entry + 0x15));
 
 		else
-			return std::make_pair(ERR_UNSUPPORTED, meta_data());
+			return std::make_pair(error::unsupported, meta_data());
 	}
 
-	return std::make_pair(ERR_OK, res);
+	return std::make_pair(std::error_condition(), res);
 }
 
-std::pair<err_t, std::vector<u8>> prodos_impl::any_read(u8 type, u16 block, u32 length)
+std::pair<std::error_condition, std::vector<u8>> prodos_impl::any_read(u8 type, u16 block, u32 length)
 {
-	std::pair<err_t, std::vector<u8>> data;
-	data.first = ERR_OK;
+	std::pair<std::error_condition, std::vector<u8>> data;
+	data.first = std::error_condition();
 	data.second.resize((length + 511) & ~511);
 	u32 nb = data.second.size()/512;
 	if(!nb)
@@ -446,15 +446,15 @@ std::pair<err_t, std::vector<u8>> prodos_impl::any_read(u8 type, u16 block, u32 
 	u8 *end = dst + data.second.size();
 	switch(type) {
 	case 1:
-		memcpy(dst, m_blockdev.get(block).rodata(), 512);
+		m_blockdev.get(block)->read(0, dst, 512);
 		dst += 512;
 		break;
 
 	case 2: {
 		auto iblk = m_blockdev.get(block);
 		for(u32 i=0; i != 256 && dst != end; i++) {
-			u16 blk = iblk.r8(i) | (iblk.r8(i | 0x100) << 8);
-			memcpy(dst, m_blockdev.get(blk).rodata(), 512);
+			u16 blk = iblk->r8(i) | (iblk->r8(i | 0x100) << 8);
+			m_blockdev.get(blk)->read(0, dst, 512);
 			dst += 512;
 		}
 		break;
@@ -464,10 +464,10 @@ std::pair<err_t, std::vector<u8>> prodos_impl::any_read(u8 type, u16 block, u32 
 		auto mblk = m_blockdev.get(block);
 		for(u32 j=0; dst != end; j += 256) {
 			u32 idx = j/256;
-			auto iblk = m_blockdev.get(mblk.r8(idx) | (mblk.r8(idx | 0x100) << 8));
+			auto iblk = m_blockdev.get(mblk->r8(idx) | (mblk->r8(idx | 0x100) << 8));
 			for(u32 i=0; i != 256 && dst != end; i++) {
-				u16 blk = iblk.r8(i) | (iblk.r8(i | 0x100) << 8);
-				memcpy(dst, m_blockdev.get(blk).rodata(), 512);
+				u16 blk = iblk->r8(i) | (iblk->r8(i | 0x100) << 8);
+				m_blockdev.get(blk)->read(0, dst, 512);
 				dst += 512;
 			}
 		}
@@ -475,7 +475,7 @@ std::pair<err_t, std::vector<u8>> prodos_impl::any_read(u8 type, u16 block, u32 
 	}
 
 	default:
-		data.first = ERR_UNSUPPORTED;
+		data.first = error::unsupported;
 		data.second.clear();
 		return data;
 	}
@@ -484,13 +484,13 @@ std::pair<err_t, std::vector<u8>> prodos_impl::any_read(u8 type, u16 block, u32 
 	return data;
 }
 
-std::pair<err_t, std::vector<u8>> prodos_impl::file_read(const std::vector<std::string> &path)
+std::pair<std::error_condition, std::vector<u8>> prodos_impl::file_read(const std::vector<std::string> &path)
 {
 	auto [blk, off, dir] = path_find(path);
 	if(!off || dir)
-		return std::make_pair(ERR_NOT_FOUND, std::vector<u8>());
+		return std::make_pair(error::not_found, std::vector<u8>());
 
-	const u8 *entry = blk.rodata() + off;
+	const u8 *entry = blk->rodata() + off;
 	u8 type = entry[0] >> 4;
 
 	if(type >= 1 && type <= 3)
@@ -498,25 +498,25 @@ std::pair<err_t, std::vector<u8>> prodos_impl::file_read(const std::vector<std::
 
 	else if(type == 5) {
 		auto kblk = m_blockdev.get(get_u16le(entry+0x11));
-		return any_read(kblk.r8(0x000), kblk.r16l(0x001), kblk.r24l(0x005));
+		return any_read(kblk->r8(0x000), kblk->r16l(0x001), kblk->r24l(0x005));
 
 	} else
-		return std::make_pair(ERR_UNSUPPORTED, std::vector<u8>());
+		return std::make_pair(error::unsupported, std::vector<u8>());
 }
 
-std::pair<err_t, std::vector<u8>> prodos_impl::file_rsrc_read(const std::vector<std::string> &path)
+std::pair<std::error_condition, std::vector<u8>> prodos_impl::file_rsrc_read(const std::vector<std::string> &path)
 {
 	auto [blk, off, dir] = path_find(path);
 	if(!off || dir)
-		return std::make_pair(ERR_NOT_FOUND, std::vector<u8>());
+		return std::make_pair(error::not_found, std::vector<u8>());
 
-	const u8 *entry = blk.rodata() + off;
+	const u8 *entry = blk->rodata() + off;
 	u8 type = entry[0] >> 4;
 
 	if(type == 5) {
 		auto kblk = m_blockdev.get(get_u16le(entry+0x11));
-		return any_read(kblk.r8(0x100), kblk.r16l(0x101), kblk.r24l(0x105));
+		return any_read(kblk->r8(0x100), kblk->r16l(0x101), kblk->r24l(0x105));
 
 	} else
-		return std::make_pair(ERR_UNSUPPORTED, std::vector<u8>());
+		return std::make_pair(error::unsupported, std::vector<u8>());
 }

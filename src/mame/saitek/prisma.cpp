@@ -10,8 +10,8 @@ NVRAM won't save properly. To force a cold boot, hold the PLAY button and trigge
 a power on/reset (F3).
 
 It's the 'sequel' to Simultano, and the first chess computer with a H8 CPU. Even
-though H8 is much faster than 6502, it plays weaker, probably due to less RAM.
-And/or it could also be due to the programmer(s) being unfamiliar with H8.
+though H8 is much faster than 6502, it plays weaker than Simultano, probably due to
+less RAM. And/or it could also be due to the programmer(s) unfamiliarity with H8.
 
 Hardware notes:
 - PCB label: ST9A-PE-001

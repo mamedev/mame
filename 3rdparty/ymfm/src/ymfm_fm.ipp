@@ -839,12 +839,12 @@ void fm_channel<RegisterType>::save_restore(ymfm_saved_state &state)
 template<class RegisterType>
 void fm_channel<RegisterType>::keyonoff(uint32_t states, keyon_type type, uint32_t chnum)
 {
-	for (uint32_t opnum = 0; opnum < array_size(m_op); opnum++)
+	for (uint32_t opnum = 0; opnum < m_op.size(); opnum++)
 		if (m_op[opnum] != nullptr)
 			m_op[opnum]->keyonoff(bitfield(states, opnum), type);
 
 	if (debug::LOG_KEYON_EVENTS && ((debug::GLOBAL_FM_CHANNEL_MASK >> chnum) & 1) != 0)
-		for (uint32_t opnum = 0; opnum < array_size(m_op); opnum++)
+		for (uint32_t opnum = 0; opnum < m_op.size(); opnum++)
 			if (m_op[opnum] != nullptr)
 				debug::log_keyon("%c%s\n", bitfield(states, opnum) ? '+' : '-', m_regs.log_keyon(m_choffs, m_op[opnum]->opoffs()).c_str());
 }
@@ -860,7 +860,7 @@ bool fm_channel<RegisterType>::prepare()
 	uint32_t active_mask = 0;
 
 	// prepare all operators and determine if they are active
-	for (uint32_t opnum = 0; opnum < array_size(m_op); opnum++)
+	for (uint32_t opnum = 0; opnum < m_op.size(); opnum++)
 		if (m_op[opnum] != nullptr)
 			if (m_op[opnum]->prepare())
 				active_mask |= 1 << opnum;
@@ -880,7 +880,7 @@ void fm_channel<RegisterType>::clock(uint32_t env_counter, int32_t lfo_raw_pm)
 	m_feedback[0] = m_feedback[1];
 	m_feedback[1] = m_feedback_in;
 
-	for (uint32_t opnum = 0; opnum < array_size(m_op); opnum++)
+	for (uint32_t opnum = 0; opnum < m_op.size(); opnum++)
 		if (m_op[opnum] != nullptr)
 			m_op[opnum]->clock(env_counter, lfo_raw_pm);
 
@@ -888,7 +888,7 @@ void fm_channel<RegisterType>::clock(uint32_t env_counter, int32_t lfo_raw_pm)
 useful temporary code for envelope debugging
 if (m_choffs == 0x101)
 {
-	for (uint32_t opnum = 0; opnum < array_size(m_op); opnum++)
+	for (uint32_t opnum = 0; opnum < m_op.size(); opnum++)
 	{
 		auto &op = *m_op[((opnum & 1) << 1) | ((opnum >> 1) & 1)];
 		printf(" %c%03X%c%c ",
@@ -1504,6 +1504,8 @@ void fm_engine_base<RegisterType>::update_timer(uint32_t tnum, uint32_t enable, 
 template<class RegisterType>
 void fm_engine_base<RegisterType>::engine_timer_expired(uint32_t tnum)
 {
+	assert(tnum == 0 || tnum == 1);
+
 	// update status
 	if (tnum == 0 && m_regs.enable_timer_a())
 		set_reset_status(STATUS_TIMERA, 0);
@@ -1515,7 +1517,7 @@ void fm_engine_base<RegisterType>::engine_timer_expired(uint32_t tnum)
 		for (uint32_t chnum = 0; chnum < CHANNELS; chnum++)
 			if (bitfield(RegisterType::CSM_TRIGGER_MASK, chnum))
 			{
-				m_channel[chnum]->keyonoff(1, KEYON_CSM, chnum);
+				m_channel[chnum]->keyonoff(0xf, KEYON_CSM, chnum);
 				m_modified_channels |= 1 << chnum;
 			}
 

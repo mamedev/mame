@@ -16,7 +16,7 @@ fetch
 		check_irq();
 	}
 	PPC = PC;
-	if(machine().debug_flags & DEBUG_FLAG_ENABLED)
+	if(debugger_enabled())
 		debugger_instruction_hook(PC);
 	OP1 = read_pc();
 	if(OP1 == 0xfe) {
@@ -27,7 +27,7 @@ fetch
 
 fetch_noirq
 	PPC = PC;
-	if(machine().debug_flags & DEBUG_FLAG_ENABLED)
+	if(debugger_enabled())
 		debugger_instruction_hook(PC);
 	OP1 = read_pc();
 	if(OP1 == 0xfe) {

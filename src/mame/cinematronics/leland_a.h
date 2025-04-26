@@ -2,7 +2,9 @@
 // copyright-holders:Aaron Giles
 /*************************************************************************
 
-    Cinemat/Leland driver
+    Cinematronics / Leland Cinemat System driver
+
+    Leland sound hardware
 
 *************************************************************************/
 #ifndef MAME_CINEMATRONICS_LELAND_A_H

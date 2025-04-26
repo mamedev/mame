@@ -1790,7 +1790,7 @@ void sega_segacd_device::device_reset()
 	// time.  Changing the CDHock timer to 50hz from 75hz also stops the hang, but then the video is
 	// too slow and has bad sound.  -- Investigate!
 	// Update: removed, otherwise megacdj and megacd2j will black screen with no cdrom inserted.
-	//m_scdcpu->set_clock_scale(1.5000f);
+	//m_scdcpu->set_clock_scale(1.5);
 
 
 	// initialize some stuff on reset

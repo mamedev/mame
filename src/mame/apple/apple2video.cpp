@@ -971,7 +971,7 @@ uint32_t a2_video_device::screen_update(screen_device &screen, bitmap_ind16 &bit
 
 		if (m_hires)
 		{
-			if ((Model == model::IIE || Model == model::IIGS) && m_dhires && m_80col)
+			if ((Model == model::IIE || Model == model::IIGS) && m_dhires && m_80col && m_aux_ptr)
 			{
 				dhgr_update(screen, bitmap, cliprect, 0, text_start_row - 1);
 			}
@@ -982,7 +982,7 @@ uint32_t a2_video_device::screen_update(screen_device &screen, bitmap_ind16 &bit
 		}
 		else    // lo-res
 		{
-			if ((Model == model::IIE || Model == model::IIGS) && m_dhires && m_80col)
+			if ((Model == model::IIE || Model == model::IIGS) && m_dhires && m_80col && m_aux_ptr)
 			{
 				lores_update<true>(screen, bitmap, cliprect, 0, text_start_row - 1);
 			}

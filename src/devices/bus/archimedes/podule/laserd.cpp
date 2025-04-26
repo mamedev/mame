@@ -82,7 +82,11 @@ void arc_laserd_device::memc_map(address_map &map)
 
 ROM_START( lbp4 )
 	ROM_REGION(0x8000, "podule_rom", 0)
-	ROM_LOAD("lbp-4.rom", 0x0000, 0x8000, CRC(f21b8089) SHA1(07503fa6d29d34cc4ceb972296c9bd178085e412))
+	ROM_SYSTEM_BIOS(0, "405", "4.50 (04 Mar 1992)")
+	ROMX_LOAD("lbp-4_4.50.rom", 0x0000, 0x8000, CRC(f21b8089) SHA1(07503fa6d29d34cc4ceb972296c9bd178085e412), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "201", "2.01 (25 Sep 1990)")
+	ROMX_LOAD("lbp-4_2.01.rom", 0x0000, 0x4000, CRC(cf40565b) SHA1(b70afed20340e62279742996da9b0ccef51f08e2), ROM_BIOS(1))
+	ROM_RELOAD(0x4000, 0x4000)
 ROM_END
 
 const tiny_rom_entry *arc_lbp4_device::device_rom_region() const

@@ -233,6 +233,11 @@ static INPUT_PORTS_START( poemspoo )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( ewalk )
+	PORT_START( "IN1" )
+	PORT_BIT( 0xffffffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+INPUT_PORTS_END
+
 void hudson_poems_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int spritebase = (m_spritelistbase & 0x0003ffff) / 4;
@@ -937,6 +942,10 @@ ROM_START(poemspoo)
 	// seeprom position not populated
 ROM_END
 
+ROM_START( ewalk2tv )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "poem.u2", 0x000000, 0x400000, CRC(933ed5fd) SHA1(d6c818cfb50be594969e712e394e1a372774ae98) ) // glob with TSOP pads
+ROM_END
 
 } // anonymous namespace
 
@@ -953,3 +962,6 @@ CONS( 2004, poemzet,      0,       0,      hudson_poems, poemzet,      hudson_po
 CONS( 2005, poemzet2,     0,       0,      hudson_poems, poemzet,      hudson_poems_state, init_marimba, "Konami", "Zettai Zetsumei Dangerous Jiisan Party ja! Zen-in Shuugou!!", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 
 CONS( 2005, poemspoo,     0,       0,      hudson_poems, poemspoo,     hudson_poems_state, init_marimba, "Konami", "Goo Choco Lantan Spoo Daisuki! Playmat", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)
+
+// Kenshinkeikaku TV (健身計画TV) - TV unit to analyze data from e-walkeylife2 pedometer
+CONS( 2006, ewalk2tv,     0,       0,      hudson_poems, ewalk,        hudson_poems_state, init_marimba, "Konami", "Kenshinkeikaku TV (for e-walkeylife2) (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND)

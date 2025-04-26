@@ -605,95 +605,48 @@ static inline void K053936GP_copyroz32clip( running_machine &machine,
 	cy = starty;
 	cx = startx;
 
-	if (blend > 0)
-	{
-		dst_ptr += dst_pitch;      // draw blended
-		starty += incyy;
-		startx += incyx;
+	dst_ptr += dst_pitch;
+	starty += incyy;
+	startx += incyx;
 
+	do {
 		do {
-			do {
-				int srcx = (cx >> 16) & 0x1fff;
-				int srcy = (cy >> 16) & 0x1fff;
-				int pixel;
-				uint32_t offs;
-				offs = srcy * src_pitch + srcx;
+			int srcx = (cx >> 16) & 0x1fff;
+			int srcy = (cy >> 16) & 0x1fff;
+			int pixel;
+			uint32_t offs;
+			offs = srcy * src_pitch + srcx;
 
-				cx += incxx;
-				cy += incxy;
+			cx += incxx;
+			cy += incxy;
 
-				if (offs>=src_size)
-					continue;
+			if (offs>=src_size)
+				continue;
 
-				if (srcx < src_minx || srcx > src_maxx || srcy < src_miny || srcy > src_maxy)
-					continue;
+			if (srcx < src_minx || srcx > src_maxx || srcy < src_miny || srcy > src_maxy)
+				continue;
 
-				pixel = src_base[offs];
-				if (!(pixel & cmask))
-					continue;
+			pixel = src_base[offs];
+			if (!(pixel & cmask))
+				continue;
 
-				if ((dst_ptr+ecx+dst_base2)<dst_size) dst_base[dst_ptr+ecx+dst_base2] = alpha_blend_r32(pal_base[pixel], dst_base[dst_ptr+ecx+dst_base2], alpha);
+			if ((dst_ptr+ecx+dst_base2)<dst_size)
+				dst_base[dst_ptr+ecx+dst_base2] = (blend > 0) ? alpha_blend_r32(dst_base[dst_ptr+ecx+dst_base2], pal_base[pixel], alpha) : pal_base[pixel];
 
-				if (pixeldouble_output)
-				{
-					ecx++;
-					if ((dst_ptr+ecx+dst_base2)<dst_size) dst_base[dst_ptr+ecx+dst_base2] = alpha_blend_r32(pal_base[pixel], dst_base[dst_ptr+ecx+dst_base2], alpha);
-				}
+			if (pixeldouble_output)
+			{
+				ecx++;
+				if ((dst_ptr+ecx+dst_base2)<dst_size)
+					dst_base[dst_ptr+ecx+dst_base2] = (blend > 0) ? alpha_blend_r32(dst_base[dst_ptr+ecx+dst_base2], pal_base[pixel], alpha) : pal_base[pixel];
 			}
-			while (++ecx < 0);
+		}
+		while (++ecx < 0);
 
-			ecx = tx;
-			dst_ptr += dst_pitch;
-			cy = starty; starty += incyy;
-			cx = startx; startx += incyx;
-		} while (--ty);
-	}
-	else    //  draw solid
-	{
+		ecx = tx;
 		dst_ptr += dst_pitch;
-		starty += incyy;
-		startx += incyx;
-
-		do {
-			do {
-				int srcx = (cx >> 16) & 0x1fff;
-				int srcy = (cy >> 16) & 0x1fff;
-				int pixel;
-				uint32_t offs;
-
-				offs = srcy * src_pitch + srcx;
-
-				cx += incxx;
-				cy += incxy;
-
-				if (offs>=src_size)
-					continue;
-
-				if (srcx < src_minx || srcx > src_maxx || srcy < src_miny || srcy > src_maxy)
-					continue;
-
-				pixel = src_base[offs];
-				if (!(pixel & cmask))
-					continue;
-
-
-
-				if ((dst_ptr+ecx+dst_base2)<dst_size) dst_base[dst_ptr+ecx+dst_base2] = pal_base[pixel];
-
-				if (pixeldouble_output)
-				{
-					ecx++;
-					if ((dst_ptr+ecx+dst_base2)<dst_size) dst_base[dst_ptr+ecx+dst_base2] = pal_base[pixel];
-				}
-			}
-			while (++ecx < 0);
-
-			ecx = tx;
-			dst_ptr += dst_pitch;
-			cy = starty; starty += incyy;
-			cx = startx; startx += incyx;
-		} while (--ty);
-	}
+		cy = starty; starty += incyy;
+		cx = startx; startx += incyx;
+	} while (--ty);
 }
 
 // adapted from generic K053936_zoom_draw()

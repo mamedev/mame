@@ -51,7 +51,7 @@ DEFINE_DEVICE_TYPE(CS8900A, cs8900a_device, "cs8900a", "CS8900A Crystal LAN 10Ba
     RW: RXTXDATA    = DE00/DE01
     RW: RXTXDATA2   = DE02/DE03 (for 32-bit-operation)
     -W: TXCMD       = DE04/DE05 (TxCMD, Transmit Command)   mapped to PP + 0144 (Reg. 9, Sec. 4.4, page 46)
-    -W: TXLENGTH    = DE06/DE07 (TxLenght, Transmit Length) mapped to PP + 0146
+    -W: TXLENGTH    = DE06/DE07 (TxLength, Transmit Length) mapped to PP + 0146
     R-: INTSTQUEUE  = DE08/DE09 (Interrupt Status Queue)    mapped to PP + 0120 (ISQ, Sec. 5.1, page 78)
     RW: PP_PTR      = DE0A/DE0B (PacketPage Pointer)        (see. page 75p: Read -011.---- ----.----)
     RW: PP_DATA0    = DE0C/DE0D (PacketPage Data (Port 0))

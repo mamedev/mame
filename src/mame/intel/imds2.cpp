@@ -188,8 +188,8 @@ imds2_state::imds2_state(const machine_config &mconfig, device_type type, const 
 	m_ipcctrl(*this, "ipcctrl"),
 	m_serial(*this, "serial%u", 0U),
 	m_ioc(*this, "ioc"),
-	m_bus(*this, "slot"),
-	m_slot(*this, "slot:1"),
+	m_bus(*this, "bus"),
+	m_slot(*this, "slot1"),
 	m_ram(*this, "ram"),
 	m_boot(*this, "boot")
 {

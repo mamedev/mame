@@ -731,7 +731,7 @@ atmega168_device::atmega168_device(const machine_config &mconfig, const char *ta
 //-------------------------------------------------
 
 atmega328_device::atmega328_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device<3>(mconfig, tag, owner, clock, ATMEGA328, 0x7fff, address_map_constructor(FUNC(atmega328_device::atmega328_internal_map), this))
+	: avr8_device<3>(mconfig, tag, owner, clock, ATMEGA328, 0x3fff, address_map_constructor(FUNC(atmega328_device::atmega328_internal_map), this))
 {
 }
 
@@ -740,7 +740,7 @@ atmega328_device::atmega328_device(const machine_config &mconfig, const char *ta
 //-------------------------------------------------
 
 atmega644_device::atmega644_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device<3>(mconfig, tag, owner, clock, ATMEGA644, 0xffff, address_map_constructor(FUNC(atmega644_device::atmega644_internal_map), this))
+	: avr8_device<3>(mconfig, tag, owner, clock, ATMEGA644, 0x7fff, address_map_constructor(FUNC(atmega644_device::atmega644_internal_map), this))
 {
 }
 
@@ -749,7 +749,7 @@ atmega644_device::atmega644_device(const machine_config &mconfig, const char *ta
 //-------------------------------------------------
 
 atmega1280_device::atmega1280_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device<6>(mconfig, tag, owner, clock, ATMEGA1280, 0x1ffff, address_map_constructor(FUNC(atmega1280_device::atmega1280_internal_map), this))
+	: avr8_device<6>(mconfig, tag, owner, clock, ATMEGA1280, 0xffff, address_map_constructor(FUNC(atmega1280_device::atmega1280_internal_map), this))
 {
 }
 
@@ -767,7 +767,7 @@ atmega2560_device::atmega2560_device(const machine_config &mconfig, const char *
 //-------------------------------------------------
 
 attiny15_device::attiny15_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: avr8_device<2>(mconfig, tag, owner, clock, ATTINY15, 0x03ff, address_map_constructor(FUNC(attiny15_device::attiny15_internal_map), this))
+	: avr8_device<2>(mconfig, tag, owner, clock, ATTINY15, 0x01ff, address_map_constructor(FUNC(attiny15_device::attiny15_internal_map), this))
 {
 }
 
@@ -1126,23 +1126,23 @@ void avr8_base_device::device_reset()
 	switch ((m_hfuses & (BOOTSZ1 | BOOTSZ0)) >> 1)
 	{
 	case 0:
-		if (m_addr_mask <= 0x1fff) { m_boot_size = 1024; }
-		else if (m_addr_mask <= 0xffff) { m_boot_size = 2048; }
+		if (m_addr_mask <= 0x3fff) { m_boot_size = 1024; }
+		else if (m_addr_mask <= 0x7fff) { m_boot_size = 2048; }
 		else { m_boot_size = 4096; }
 		break;
 	case 1:
-		if (m_addr_mask <= 0x1fff) { m_boot_size = 512; }
-		else if (m_addr_mask <= 0xffff) { m_boot_size = 1024; }
+		if (m_addr_mask <= 0x3fff) { m_boot_size = 512; }
+		else if (m_addr_mask <= 0x7fff) { m_boot_size = 1024; }
 		else { m_boot_size = 2048; }
 		break;
 	case 2:
-		if (m_addr_mask <= 0x1fff) { m_boot_size = 256; }
-		else if (m_addr_mask <= 0xffff) { m_boot_size = 512; }
+		if (m_addr_mask <= 0x3fff) { m_boot_size = 256; }
+		else if (m_addr_mask <= 0x7fff) { m_boot_size = 512; }
 		else { m_boot_size = 1024; }
 		break;
 	case 3:
-		if (m_addr_mask <= 0x1fff) { m_boot_size = 128; }
-		else if (m_addr_mask <= 0xffff) { m_boot_size = 256; }
+		if (m_addr_mask <= 0x3fff) { m_boot_size = 128; }
+		else if (m_addr_mask <= 0x7fff) { m_boot_size = 256; }
 		else { m_boot_size = 512; }
 		break;
 	default:
@@ -1220,7 +1220,7 @@ void avr8_base_device::state_string_export(const device_state_entry &entry, std:
 	case STATE_GENPC:
 	case STATE_GENPCBASE:
 	case AVR8_PC:
-		str = string_format("%05x", m_pc << 1);
+		str = string_format("%05x", m_pc >> 1);
 		break;
 	case STATE_GENFLAGS:
 		str = string_format("%c%c%c%c%c%c%c%c",

@@ -195,7 +195,7 @@ ROM_START( pc_h98s )
 	ROM_LOAD( "hcz7k_01.bin", 0x000000, 0x020000, CRC(e68834e8) SHA1(f57dfd67915715168e46907fd535277e30357742) )
 	ROM_LOAD( "hcz8k_01.bin", 0x020000, 0x020000, CRC(39f82b02) SHA1(52e950f10faa0bedca3d6ea2ba6caceaeff66fc9) )
 
-	// unconfirmed
+	// TODO: needs override around itf_43d_bank_w
 	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
 	ROM_COPY( "biosrom", 0x20000, 0x08000, 0x10000 )
 	ROM_COPY( "biosrom", 0x00000, 0x18000, 0x18000 )

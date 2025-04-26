@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders:m1macrophage
+-->
+<mamelayout version="2">
+	<element name="case">
+		<rect><color red="0.22" green="0.24" blue="0.25"/></rect>
+	</element>
+
+	<element name="button">
+		<rect>
+			<color red="0.12" green="0.14" blue="0.14"/>
+			<bounds x="0" y="0" width="115" height="115"/>
+		</rect>
+		<disk>
+			<color red="0.0" green="0.0" blue="0.0"/>
+			<bounds x="14" y="14" width="86" height="86"/>
+		</disk>
+		<disk state="0">
+			<color red="0.33" green="0.40" blue="0.40"/>
+			<bounds x="24" y="24" width="67" height="67"/>
+		</disk>
+		<disk state="1">
+			<color red="0.50" green="0.50" blue="0.50"/>
+			<bounds x="24" y="24" width="67" height="67"/>
+		</disk>
+	</element>
+
+	<element name="vfd_char">
+		<led14segsc><color red="0.02" green="0.99" blue="0.77"/></led14segsc>
+	</element>
+
+	<element name="vfd_background">
+		<rect><color red="0.13" green="0.57" blue="0.39"/></rect>
+	</element>
+
+	<group name="vfd">
+		<element ref="vfd_background">
+			<bounds x="0" y="0" width="1280" height="150"/>
+		</element>
+		<repeat count="40">
+			<param name="char_i" start="1" increment="1"/>
+			<param name="char_x" start="40" increment="30"/>
+			<element ref="vfd_char" name="vfd_~vfd_id~_char_~char_i~">
+				<bounds x="~char_x~" y="45" width="27" height="53"/>
+			</element>
+		</repeat>
+	</group>
+
+	<view name="Default Layout">
+		<bounds x="0" y="0" width="3200" height="1600"/>
+		<element ref="case"><bounds x="50" y="50" width="3100" height="1500"/></element>
+
+		<param name="vfd_id" value="1"/>
+		<group ref="vfd"><bounds x="160" y="550" width="1280" height="150"/></group>
+
+		<param name="vfd_id" value="2"/>
+		<group ref="vfd"><bounds x="1770" y="550" width="1280" height="150"/></group>
+
+		<param name="vfd_id" value="3"/>
+		<group ref="vfd"><bounds x="1770" y="980" width="1280" height="150"/></group>
+
+		<repeat count="6">
+			<param name="button_x" start="1830" increment="210"/>
+			<param name="input_mask" start="1" lshift="1"/>
+			<element ref="button" inputtag="switches_4" inputmask="~input_mask~">
+				<bounds x="~button_x~" y="1180" width="115" height="115"/>
+			</element>
+		</repeat>
+	</view>
+</mamelayout>
+

@@ -8,7 +8,6 @@
 G65C816 CPU Emulator V1.00
 
 Copyright Karl Stenerud
-All rights reserved.
 
 */
 /* ======================================================================== */

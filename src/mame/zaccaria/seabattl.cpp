@@ -54,9 +54,8 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_objram(*this, "objram"),
-		m_digits(*this, { "sc_thousand", "sc_hundred", "sc_half", "sc_unity", "tm_half", "tm_unity" }),
+		m_digits(*this, "digit%u", 0U),
 		m_s2636(*this, "s2636"),
-		m_7segs(*this, "digit%u", 0U),
 		m_lamp(*this, "lamp0"),
 		m_waveenable(false),
 		m_collision(0),
@@ -86,7 +85,6 @@ private:
 	void time_display_w(uint8_t data);
 	void score_display_w(uint8_t data);
 	void score2_display_w(uint8_t data);
-	template <unsigned N> void digit_w(uint8_t data) { m_7segs[N] = data; }
 
 	void seabattl_palette(palette_device &palette) const;
 	uint32_t screen_update_seabattl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -100,7 +98,6 @@ private:
 	required_shared_ptr<uint8_t> m_objram;
 	required_device_array<dm9368_device, 6> m_digits;
 	required_device<s2636_device> m_s2636;
-	output_finder<6> m_7segs;
 	output_finder<> m_lamp;
 
 	tilemap_t *m_bg_tilemap = nullptr;
@@ -240,7 +237,6 @@ uint32_t seabattl_state::screen_update_seabattl(screen_device &screen, bitmap_in
 
 void seabattl_state::video_start()
 {
-	m_7segs.resolve();
 	m_screen->register_screen_bitmap(m_collision_bg);
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(seabattl_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_transparent_pen(0);
@@ -496,12 +492,12 @@ void seabattl_state::seabattl(machine_config &config)
 	m_s2636->set_offsets(-13, -29);
 	m_s2636->add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	DM9368(config, m_digits[0], 0).update_cb().set(FUNC(seabattl_state::digit_w<0>));
-	DM9368(config, m_digits[1], 0).update_cb().set(FUNC(seabattl_state::digit_w<1>));
-	DM9368(config, m_digits[2], 0).update_cb().set(FUNC(seabattl_state::digit_w<2>));
-	DM9368(config, m_digits[3], 0).update_cb().set(FUNC(seabattl_state::digit_w<3>));
-	DM9368(config, m_digits[4], 0).update_cb().set(FUNC(seabattl_state::digit_w<4>));
-	DM9368(config, m_digits[5], 0).update_cb().set(FUNC(seabattl_state::digit_w<5>));
+	DM9368(config, m_digits[0]).update_cb().set_output("digit0");
+	DM9368(config, m_digits[1]).update_cb().set_output("digit1");
+	DM9368(config, m_digits[2]).update_cb().set_output("digit2");
+	DM9368(config, m_digits[3]).update_cb().set_output("digit3");
+	DM9368(config, m_digits[4]).update_cb().set_output("digit4");
+	DM9368(config, m_digits[5]).update_cb().set_output("digit5");
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

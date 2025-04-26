@@ -605,14 +605,14 @@ void sun3x_state::sun3_80(machine_config &config)
 
 	M48T02(config, TIMEKEEPER_TAG, 0);
 
-	SCC8530N(config, m_scc1, 4.9152_MHz_XTAL);
+	SCC8530(config, m_scc1, 4.9152_MHz_XTAL);
 	m_scc1->out_txda_callback().set(KEYBOARD_TAG, FUNC(sun_keyboard_port_device::write_txd));
 	m_scc1->out_txdb_callback().set(MOUSE_TAG, FUNC(sun_mouse_port_device::write_txd));
 
 	SUNKBD_PORT(config, KEYBOARD_TAG, default_sun_keyboard_devices, "type3hle").rxd_handler().set(m_scc1, FUNC(z80scc_device::rxa_w));
 	SUNMOUSE_PORT(config, MOUSE_TAG, default_sun_mouse_devices, "hle1200").rxd_handler().set(m_scc1, FUNC(z80scc_device::rxb_w));
 
-	SCC8530N(config, m_scc2, 4.9152_MHz_XTAL);
+	SCC8530(config, m_scc2, 4.9152_MHz_XTAL);
 	m_scc2->out_txda_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_txd));
 	m_scc2->out_txdb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_txd));
 
@@ -657,8 +657,8 @@ void sun3x_state::sun3_460(machine_config &config)
 
 	ICM7170(config, "rtc", 32768).irq().set_inputline(m_maincpu, M68K_IRQ_7);
 
-	SCC8530N(config, m_scc1, 4.9152_MHz_XTAL);
-	SCC8530N(config, m_scc2, 4.9152_MHz_XTAL);
+	SCC8530(config, m_scc1, 4.9152_MHz_XTAL);
+	SCC8530(config, m_scc2, 4.9152_MHz_XTAL);
 	m_scc2->out_txda_callback().set(RS232A_TAG, FUNC(rs232_port_device::write_txd));
 	m_scc2->out_txdb_callback().set(RS232B_TAG, FUNC(rs232_port_device::write_txd));
 

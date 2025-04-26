@@ -191,6 +191,15 @@ void tmp95c061_device::device_config_complete()
 }
 
 
+void tmp95c061_device::device_resolve_objects()
+{
+	m_nmi_state = CLEAR_LINE;
+	for( int i = 0; i < TLCS900_NUM_INPUTS; i++ )
+	{
+		m_level[i] = CLEAR_LINE;
+	}
+}
+
 
 void tmp95c061_device::device_start()
 {
@@ -239,7 +248,6 @@ void tmp95c061_device::device_reset()
 	m_to3 = 0;
 
 	m_ad_cycles_left = 0;
-	m_nmi_state = CLEAR_LINE;
 	m_timer_pre = 0;
 	m_timer_change[0] = 0;
 	m_timer_change[1] = 0;
@@ -289,11 +297,6 @@ void tmp95c061_device::device_reset()
 	std::fill_n(&m_mem_start_mask[0], 4, 0xff);
 	m_dram_refresh = 0x00;
 	m_dram_access = 0x80;
-
-	for (int i = 0; i < TLCS900_NUM_INPUTS; i++)
-	{
-		m_level[i] = CLEAR_LINE;
-	}
 }
 
 enum
@@ -492,11 +495,6 @@ void tmp95c061_device::tlcs900_check_hdma()
 
 void tmp95c061_device::tlcs900_check_irqs()
 {
-	int irq_vectors[9] = { -1, -1, -1, -1, -1, -1, -1, -1, -1 };
-	int level = 0;
-	int irq = -1;
-	int i;
-
 	/* Check for NMI */
 	if ( m_nmi_state == ASSERT_LINE )
 	{
@@ -516,7 +514,8 @@ void tmp95c061_device::tlcs900_check_irqs()
 	}
 
 	/* Check regular irqs */
-	for( i = 0; i < NUM_MASKABLE_IRQS; i++ )
+	int irq_vectors[9] = { -1, -1, -1, -1, -1, -1, -1, -1, -1 };
+	for( int i = 0; i < NUM_MASKABLE_IRQS; i++ )
 	{
 		if ( m_int_reg[tmp95c061_irq_vector_map[i].reg] & tmp95c061_irq_vector_map[i].iff )
 		{
@@ -533,7 +532,9 @@ void tmp95c061_device::tlcs900_check_irqs()
 	}
 
 	/* Check highest allowed priority irq */
-	for ( i = std::max( 1, ( ( m_sr.b.h & 0x70 ) >> 4 ) ); i < 7; i++ )
+	int irq = -1;
+	int level = 0;
+	for ( int i = std::max( 1, ( ( m_sr.b.h & 0x70 ) >> 4 ) ); i < 7; i++ )
 	{
 		if ( irq_vectors[i] >= 0 )
 		{
@@ -690,8 +691,8 @@ void tmp95c061_device::tlcs900_handle_timers()
 
 		for( ; m_timer_change[0] > 0; m_timer_change[0]-- )
 		{
-			m_timer[0] += 1;
-			if ( m_timer[0] == m_t8_reg[0] )
+			m_timer_8[0] += 1;
+			if ( m_timer_8[0] == m_t8_reg[0] )
 			{
 				if ( ( m_trun & 0x02 ) && ( m_t8_mode[0] & 0x0c ) == 0x00 )
 				{
@@ -701,7 +702,7 @@ void tmp95c061_device::tlcs900_handle_timers()
 				/* In 16bit timer mode the timer should not be reset */
 				if ( ( m_t8_mode[0] & 0xc0 ) != 0x40 )
 				{
-					m_timer[0] = 0;
+					m_timer_8[0] = 0;
 					m_int_reg[INTET10] |= 0x08;
 				}
 			}
@@ -728,10 +729,10 @@ void tmp95c061_device::tlcs900_handle_timers()
 
 		for( ; m_timer_change[1] > 0; m_timer_change[1]-- )
 		{
-			m_timer[1] += 1;
-			if ( m_timer[1] == m_t8_reg[1] )
+			m_timer_8[1] += 1;
+			if ( m_timer_8[1] == m_t8_reg[1] )
 			{
-				m_timer[1] = 0;
+				m_timer_8[1] = 0;
 				m_int_reg[INTET10] |= 0x80;
 
 				if ( m_t8_invert & 0x02 )
@@ -742,7 +743,7 @@ void tmp95c061_device::tlcs900_handle_timers()
 				/* In 16bit timer mode also reset timer 0 */
 				if ( ( m_t8_mode[0] & 0xc0 ) == 0x40 )
 				{
-					m_timer[0] = 0;
+					m_timer_8[0] = 0;
 				}
 			}
 		}
@@ -767,8 +768,8 @@ void tmp95c061_device::tlcs900_handle_timers()
 
 		for( ; m_timer_change[2] > 0; m_timer_change[2]-- )
 		{
-			m_timer[2] += 1;
-			if ( m_timer[2] == m_t8_reg[2] )
+			m_timer_8[2] += 1;
+			if ( m_timer_8[2] == m_t8_reg[2] )
 			{
 				if ( ( m_trun & 0x08 ) && ( m_t8_mode[1] & 0x0c ) == 0x00 )
 				{
@@ -778,7 +779,7 @@ void tmp95c061_device::tlcs900_handle_timers()
 				/* In 16bit timer mode the timer should not be reset */
 				if ( ( m_t8_mode[1] & 0xc0 ) != 0x40 )
 				{
-					m_timer[2] = 0;
+					m_timer_8[2] = 0;
 					m_int_reg[INTET32] |= 0x08;
 				}
 			}
@@ -805,10 +806,10 @@ void tmp95c061_device::tlcs900_handle_timers()
 
 		for( ; m_timer_change[3] > 0; m_timer_change[3]-- )
 		{
-			m_timer[3] += 1;
-			if ( m_timer[3] == m_t8_reg[3] )
+			m_timer_8[3] += 1;
+			if ( m_timer_8[3] == m_t8_reg[3] )
 			{
-				m_timer[3] = 0;
+				m_timer_8[3] = 0;
 				m_int_reg[INTET32] |= 0x80;
 
 				if ( m_t8_invert & 0x20 )
@@ -819,7 +820,7 @@ void tmp95c061_device::tlcs900_handle_timers()
 				/* In 16bit timer mode also reset timer 2 */
 				if ( ( m_t8_mode[1] & 0xc0 ) == 0x40 )
 				{
-					m_timer[2] = 0;
+					m_timer_8[2] = 0;
 				}
 			}
 		}
@@ -916,28 +917,28 @@ void tmp95c061_device::trun_w(uint8_t data)
 {
 	if ( ! ( data & 0x01 ) )
 	{
-		m_timer[0] = 0;
+		m_timer_8[0] = 0;
 		m_timer_change[0] = 0;
 	}
 	if ( ! ( data & 0x02 ) )
 	{
-		m_timer[1] = 0;
+		m_timer_8[1] = 0;
 		m_timer_change[1] = 0;
 	}
 	if ( ! ( data & 0x04 ) )
 	{
-		m_timer[2] = 0;
+		m_timer_8[2] = 0;
 		m_timer_change[2] = 0;
 	}
 	if ( ! ( data & 0x08 ) )
 	{
-		m_timer[3] = 0;
+		m_timer_8[3] = 0;
 		m_timer_change[3] = 0;
 	}
 	if ( ! ( data & 0x10 ) )
-		m_timer[4] = 0;
+		m_timer_8[4] = 0;
 	if ( ! ( data & 0x20 ) )
-		m_timer[5] = 0;
+		m_timer_8[5] = 0;
 
 	m_trun = data;
 }

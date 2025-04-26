@@ -8,6 +8,7 @@
 #include "taito68705.h"
 
 #include "emupal.h"
+#include "screen.h"
 #include "tilemap.h"
 
 /* This it the best way to allow game specific kludges until the system is fully understood */
@@ -33,6 +34,7 @@ public:
 		, m_muxports(*this, "P%u", 1)
 		, m_maincpu(*this, "maincpu")
 		, m_mcuintf(*this, "mcu")
+		, m_screen(*this, "screen")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 	{
@@ -51,7 +53,7 @@ public:
 	void init_arkbloc2();
 	void init_arkangc();
 	void init_brixian();
-	void arkanoid_bootleg_init(  );
+	void arkanoid_bootleg_init();
 
 	void bootleg(machine_config &config);
 	void p3mcuay(machine_config &config);
@@ -61,6 +63,7 @@ public:
 	void hexaa(machine_config &config);
 	void p3mcu(machine_config &config);
 	void arkanoid(machine_config &config);
+	void cruisin5(machine_config &config);
 
 private:
 	/* memory pointers */
@@ -88,6 +91,7 @@ private:
 	optional_ioport_array<2> m_muxports;
 	required_device<cpu_device> m_maincpu;
 	optional_device<arkanoid_mcu_device_base> m_mcuintf;
+	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 

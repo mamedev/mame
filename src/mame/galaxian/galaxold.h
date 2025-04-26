@@ -70,7 +70,7 @@ public:
 	output_finder<2> m_leds;
 
 	int m_irq_line = 0;
-	uint8_t m__4in1_bank = 0U;
+	uint8_t m_4in1_bank = 0U;
 	tilemap_t *m_bg_tilemap = nullptr;
 	int m_spriteram2_present = 0;
 	uint8_t m_gfxbank[5]{};

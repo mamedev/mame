@@ -234,7 +234,7 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	required_device<sh34_base_device> m_maincpu;
+	required_device<sh7709s_device> m_maincpu;
 	required_device<ep1c12_device> m_blitter;
 	required_device<samsung_k9f1g08u0m_device> m_nand;
 	required_device<rtc9701_device> m_eeprom;
@@ -466,7 +466,7 @@ void cv1k_state::machine_reset()
 void cv1k_state::cv1k(machine_config &config)
 {
 	/* basic machine hardware */
-	SH3BE(config, m_maincpu, 12.8_MHz_XTAL*8); // 102.4MHz
+	SH7709S(config, m_maincpu, 12.8_MHz_XTAL*8, ENDIANNESS_BIG); // 102.4MHz
 	m_maincpu->set_md(0, 0); // none of this is verified
 	m_maincpu->set_md(1, 0); // (the sh3 is different to the sh4 anyway, should be changed)
 	m_maincpu->set_md(2, 0);
@@ -506,7 +506,7 @@ void cv1k_state::cv1k_d(machine_config &config)
 	cv1k(config);
 
 	/* basic machine hardware */
-	SH3BE(config.replace(), m_maincpu, 12.8_MHz_XTAL*8); // 102.4MHz
+	SH7709S(config.replace(), m_maincpu, 12.8_MHz_XTAL*8, ENDIANNESS_BIG); // 102.4MHz
 	m_maincpu->set_md(0, 0); // none of this is verified
 	m_maincpu->set_md(1, 0); // (the sh3 is different to the sh4 anyway, should be changed)
 	m_maincpu->set_md(2, 0);

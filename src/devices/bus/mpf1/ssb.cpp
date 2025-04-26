@@ -14,7 +14,6 @@
 
 #include "emu.h"
 #include "ssb.h"
-#include "machine/spchrom.h"
 #include "sound/tms5220.h"
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"

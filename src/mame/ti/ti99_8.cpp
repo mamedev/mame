@@ -652,10 +652,6 @@ void ti99_8_state::clock_out(int state)
 
 void ti99_8_state::driver_start()
 {
-	// Need to configure the speech ROM for inverse bit order
-//  speechrom_device* mem = subdevice<speechrom_device>(TI998_SPEECHROM_REG);
-//  mem->set_reverse_bit_order(true);
-
 	save_item(NAME(m_keyboard_column));
 	save_item(NAME(m_ready_old));
 	save_item(NAME(m_int1));
@@ -743,13 +739,18 @@ void ti99_8_state::ti99_8(machine_config& config)
 
 	// Speech hardware
 	// Note: SPEECHROM uses its tag for referencing the region
-	SPEECHROM(config, TI998_SPEECHROM_REG, 0).set_reverse_bit_order(true);
 	SPEAKER(config, "speech_out").front_center();
 
 	cd2501ecd_device& vsp(CD2501ECD(config, TI998_SPEECHSYN_TAG, 640000L));
 	vsp.ready_cb().set(TI998_MAINBOARD_TAG, FUNC(mainboard8_device::speech_ready));
-	vsp.set_speechrom_tag(TI998_SPEECHROM_REG);
 	vsp.add_route(ALL_OUTPUTS, "speech_out", 0.50);
+
+	TMS6100(config, TI998_SPEECHROM_REG, 0);
+	vsp.m0_cb().set(TI998_SPEECHROM_REG, FUNC(tms6100_device::m0_w));
+	vsp.m1_cb().set(TI998_SPEECHROM_REG, FUNC(tms6100_device::m1_w));
+	vsp.addr_cb().set(TI998_SPEECHROM_REG, FUNC(tms6100_device::add_w));
+	vsp.data_cb().set(TI998_SPEECHROM_REG, FUNC(tms6100_device::data_line_r));
+	vsp.romclk_cb().set(TI998_SPEECHROM_REG, FUNC(tms6100_device::clk_w));
 
 	// Cassette drive
 	SPEAKER(config, "cass_out").front_center();

@@ -512,7 +512,7 @@ void hikaru_state::hikaru_map_slave(address_map &map)
 void hikaru_state::hikaru(machine_config &config)
 {
 	/* basic machine hardware */
-	SH4LE(config, m_maincpu, CPU_CLOCK);
+	SH4(config, m_maincpu, CPU_CLOCK);
 //  m_maincpu->set_md(0, 1);
 //  m_maincpu->set_md(1, 0);
 //  m_maincpu->set_md(2, 1);
@@ -528,7 +528,7 @@ void hikaru_state::hikaru(machine_config &config)
 	m_maincpu->set_force_no_drc(true);
 //  m_maincpu->set_vblank_int("screen", FUNC(hikaru_state::vblank));
 
-	SH4LE(config, m_slave, CPU_CLOCK);
+	SH4(config, m_slave, CPU_CLOCK);
 	m_slave->set_addrmap(AS_PROGRAM, &hikaru_state::hikaru_map_slave);
 	m_slave->set_force_no_drc(true);
 

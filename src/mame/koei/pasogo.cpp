@@ -285,11 +285,12 @@ uint8_t pasogo_state::vg230_io_r(offs_t offset)
 				break;
 
 			case 0x79:
-				/*rtc status*/
+				// rtc mode
 				log = false;
 				break;
 
 			case 0x7a:
+				// rtc status
 				data &= ~3;
 				if (m_vg230.rtc.alarm_interrupt_request)
 					data |= 1<<1;
@@ -363,7 +364,7 @@ void pasogo_state::vg230_io_w(offs_t offset, uint8_t data)
 				break;
 
 			case 0x78:
-				m_vg230.rtc.days = data & 0x1f;
+				m_vg230.rtc.alarm_days = data & 0x1f;
 				break;
 
 			case 0x79:

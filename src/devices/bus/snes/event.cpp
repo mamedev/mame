@@ -113,8 +113,10 @@ uint8_t sns_pfest94_device::chip_read(offs_t offset)
 	else
 	{
 		// DSP access
-		offset &= 0x1fff;
-		return m_upd7725->snesdsp_read(offset < 0x1000);
+		if (BIT(offset, 12))
+			return m_upd7725->status_r();
+		else
+			return m_upd7725->data_r();
 	}
 }
 
@@ -151,8 +153,10 @@ void sns_pfest94_device::chip_write(offs_t offset, uint8_t data)
 	else
 	{
 		// DSP access
-		offset &= 0x1fff;
-		m_upd7725->snesdsp_write(offset < 0x1000, data);
+		if (BIT(~offset, 12))
+			m_upd7725->data_w(data);
+		else
+			logerror("%s: Writing DSP status to %02x, ignored", machine().describe_context(), data);
 	}
 }
 

@@ -1016,6 +1016,22 @@ ROM_START(socrkinga)
 	ROM_LOAD("sound4.g", 0xc000, 0x1000, CRC(720593fb) SHA1(93aa9ae1be299548e17b4fe97a7fb4ddab76de40))
 ROM_END
 
+ROM_START(socrkingb)
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD ( "sk-02-1.bin", 0x0000, 0x0800, CRC(9c0802f0) SHA1(81f65920576f686a489529975e583aa8b82eca26))
+	ROM_CONTINUE(0x2000, 0x0800)
+	ROM_LOAD ( "sk-02-2.bin", 0x0800, 0x0800, CRC(23a6bb94) SHA1(55d042c6ccd56fbccf6c0e7e240b92e8f065368b))
+	ROM_CONTINUE(0x2800, 0x0800)
+	ROM_LOAD ( "sk-al-3.bin", 0x1000, 0x0800, CRC(f22a79d9) SHA1(6156d37e5693c617ba48bd9f22a8d415df790b12))
+	ROM_CONTINUE(0x3000, 0x0800)
+
+	ROM_REGION(0x10000, "cpu2", 0)
+	ROM_LOAD("sound1.c", 0xf000, 0x1000, CRC(3aa95018) SHA1(5347c3aefb642fc5cabd9d5e61fe6515a2dcb2aa))
+	ROM_LOAD("sound2.e", 0xe000, 0x1000, CRC(f9b57fd6) SHA1(50e42ed349680211eedf55ae639dbae899f3c6da))
+	ROM_LOAD("sound3.f", 0xd000, 0x1000, CRC(551566e6) SHA1(350432dbc0d6f55404cae970524a0dfda15d8aa0))
+	ROM_LOAD("sound4.g", 0xc000, 0x1000, CRC(720593fb) SHA1(93aa9ae1be299548e17b4fe97a7fb4ddab76de40))
+ROM_END
+
 ROM_START(socrkingi)
 	ROM_REGION(0x8000, "maincpu", 0)
 	ROM_LOAD ( "soccer.ic1", 0x0000, 0x0800, CRC(3fbd7c32) SHA1(2f56f67d1ad987638284000cca1e20ff17fcd4f9))
@@ -1294,6 +1310,7 @@ ROM_END
 // 1B1170 sound (IMDB), 1B1370 (schematics)
 GAME(1982,  socrking,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Soccer Kings",                            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 GAME(1982,  socrkinga,  socrking, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Soccer Kings (alternate set)",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1982,  socrkingb,  socrking, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Soccer Kings (alternate set 2)",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 GAME(1982,  socrkingi,  socrking, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Soccer Kings (Italian speech)",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 GAME(1982,  socrkingg,  socrking, zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Soccer Kings (German speech)",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 GAME(1983,  pinchamp,   0,        zac_2,  zac_2, zac_2_state, empty_init, ROT0, "Zaccaria",    "Pinball Champ",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

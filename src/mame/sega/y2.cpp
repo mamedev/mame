@@ -61,7 +61,7 @@ INPUT_PORTS_END
 void system_board_y2_state::system_board_y2(machine_config &config)
 {
 	/*
-	SH4LE(config, m_maincpu, 266666666);
+	SH4(config, m_maincpu, 266666666);
 	m_maincpu->set_md(0, 1);
 	m_maincpu->set_md(1, 0);
 	m_maincpu->set_md(2, 1);

@@ -164,22 +164,36 @@ void process_midi(PtTimestamp timestamp, void *userData)
 
 void exit_with_message(char *msg)
 {
-    char line[STRING_MAX];
     printf("%s\n", msg);
-    fgets(line, STRING_MAX, stdin);
+    while (getchar() != '\n') ;
     exit(1);
 }
 
-int main()
+int main(int argc, char *argv[])
 {
-    int id;
     int32_t n;
     const PmDeviceInfo *info;
     char line[STRING_MAX];
     int spin;
     int done = FALSE;
+    int i;
+    int input = -1, output = -1;
 
-    /* determine what type of test to run */
+    printf("Usage: midithread [-i input] [-o output]\n"
+           "where input and output are portmidi device numbers\n");
+    for (i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "-i") == 0) {
+            i++;
+            input = atoi(argv[i]);
+            printf("Input device number: %d\n", input);
+        } else if (strcmp(argv[i], "-o") == 0) {
+            i++;
+            output = atoi(argv[i]);
+            printf("Output device number: %d\n", output);
+        } else {
+            return -1;
+        }
+    }
     printf("begin PortMidi multithread test...\n");
 	
     /* note that it is safe to call PortMidi from the main thread for
@@ -221,32 +235,32 @@ int main()
     
 	Pm_Initialize();
 
-    id = Pm_GetDefaultOutputDeviceID();
-    info = Pm_GetDeviceInfo(id);
+    output = (output < 0 ? Pm_GetDefaultOutputDeviceID() : output);
+    info = Pm_GetDeviceInfo(output);
     if (info == NULL) {
-        printf("Could not open default output device (%d).", id);
+        printf("Could not open output device (%d).", output);
         exit_with_message("");
     }
     printf("Opening output device %s %s\n", info->interf, info->name);
 
     /* use zero latency because we want output to be immediate */
-    Pm_OpenOutput(&midi_out, 
-                  id, 
+    Pm_OpenOutput(&midi_out,
+                  output, 
                   DRIVER_INFO,
                   OUTPUT_BUFFER_SIZE,
                   TIME_PROC,
                   TIME_INFO,
                   LATENCY);
 
-    id = Pm_GetDefaultInputDeviceID();
-    info = Pm_GetDeviceInfo(id);
+    input = (input < 0 ? Pm_GetDefaultInputDeviceID() : input);
+    info = Pm_GetDeviceInfo(input);
     if (info == NULL) {
-        printf("Could not open default input device (%d).", id);
+        printf("Could not open default input device (%d).", input);
         exit_with_message("");
     }
     printf("Opening input device %s %s\n", info->interf, info->name);
     Pm_OpenInput(&midi_in, 
-                 id, 
+                 input, 
                  DRIVER_INFO,
                  INPUT_BUFFER_SIZE,
                  TIME_PROC,
@@ -257,18 +271,17 @@ int main()
                       this simple assignment is safe */
 
     printf("Enter midi input; it will be transformed as specified by...\n");
-    printf("%s\n%s\n%s\n",
-           "Type 'q' to quit, 'm' to monitor next pitch, t to toggle thru or",
-           "type a number to specify transposition.",
-		   "Must terminate with [ENTER]");
+    printf("Type 'q' to quit, 'm' to monitor next pitch, t to toggle thru or\n"
+           "type a number to specify transposition.\n"
+		   "Must terminate with [ENTER]\n");
 
     while (!done) {
         int32_t msg;
         int input;
         int len;
-        fgets(line, STRING_MAX, stdin);
+        if (!fgets(line, STRING_MAX, stdin)) break;  /* no stdin? */
         /* remove the newline: */
-        len = strlen(line);
+        len = (int) strlen(line);
         if (len > 0) line[len - 1] = 0; /* overwrite the newline char */
         if (strcmp(line, "q") == 0) {
             msg = QUIT_MSG;
@@ -323,7 +336,8 @@ int main()
     Pm_Close(midi_in);
     Pm_Close(midi_out);
     
-    printf("finished portMidi multithread test...enter any character to quit [RETURN]...");
-    fgets(line, STRING_MAX, stdin);
+    fputs("finished portMidi multithread test.\n"
+          "type ENTER to quit:", stdout);
+    while (getchar() != '\n') ;
     return 0;
 }

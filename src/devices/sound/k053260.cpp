@@ -61,7 +61,6 @@
 static constexpr int CLOCKS_PER_SAMPLE = 64;
 
 
-
 // device type definition
 DEFINE_DEVICE_TYPE(K053260, k053260_device, "k053260", "K053260 KDSC")
 

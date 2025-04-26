@@ -15,6 +15,7 @@ TODO:
 - score / credits display should stay above the sprites?
 
 ====================================================
+Current CT8052 PCB
 
 CPU: Ceramic potted module, Z80C
 Sound: AY-3-8912 (x2)

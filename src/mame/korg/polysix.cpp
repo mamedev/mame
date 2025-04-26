@@ -374,7 +374,7 @@ void polysix_sound_block::sound_stream_update(sound_stream &stream, std::vector<
 
 		//  Compute the threshold
 		float pw_thr = pw_threshold[m_pw_pwm];
-		if(BIT(m_control_low, 3) || 1)
+		if(BIT(m_control_low, 3))
 			// PWM mode, the modulation multiplies the threshold part over 0.5 with the phase wrapped between 0.2 and 1
 			pw_thr = 0.5 + (pw_thr - 0.5) * (0.2 + pwm_phase * 0.8);
 

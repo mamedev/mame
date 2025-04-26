@@ -13,154 +13,124 @@
 
 namespace fs {
 
-void refcounted_inner::ref()
-{
-	m_ref ++;
-}
-
-void refcounted_inner::ref_weak()
-{
-	m_weak_ref ++;
-}
-
-bool refcounted_inner::unref()
-{
-	m_ref --;
-	if(m_ref == 0) {
-		if(m_weak_ref)
-			drop_weak_references();
-		else
-			delete this;
-		return true;
-	}
-	return false;
-}
-
-bool refcounted_inner::unref_weak()
-{
-	m_weak_ref --;
-	if(m_weak_ref == 0 && m_ref == 0) {
-		delete this;
-		return true;
-	}
-	return false;
-}
-
-
-
 void fsblk_t::set_block_size(u32 block_size)
 {
 	m_block_size = block_size;
 }
 
-u8 *fsblk_t::iblock_t::offset(const char *function, u32 off, u32 size)
-{
-	if(off + size > m_size)
-		throw std::out_of_range(util::string_format("block_t::%s out-of-block access, offset=%d, size=%d, block size=%d", function, off, size, m_size));
-	return data() + off;
-}
-
-const u8 *fsblk_t::iblock_t::rooffset(const char *function, u32 off, u32 size)
+const u8 *fsblk_t::block_t::roffs(const char *function, u32 off, u32 size) const
 {
 	if(off + size > m_size)
 		throw std::out_of_range(util::string_format("block_t::%s out-of-block read access, offset=%d, size=%d, block size=%d", function, off, size, m_size));
 	return rodata() + off;
 }
 
-void fsblk_t::block_t::copy(u32 offset, const u8 *src, u32 size)
+u8 *fsblk_t::block_t::woffs(const char *function, u32 off, u32 size)
 {
-	memcpy(m_object->offset("copy", offset, size), src, size);
+	if(off + size > m_size)
+		throw std::out_of_range(util::string_format("block_t::%s out-of-block access, offset=%d, size=%d, block size=%d", function, off, size, m_size));
+	return data() + off;
+}
+
+void fsblk_t::block_t::write(u32 offset, const u8 *src, u32 size)
+{
+	memcpy(woffs("write", offset, size), src, size);
 }
 
 void fsblk_t::block_t::fill(u32 offset, u8 data, u32 size)
 {
-	memset(m_object->offset("fill", offset, size), data, size);
+	memset(woffs("fill", offset, size), data, size);
 }
 
 void fsblk_t::block_t::fill(u8 data)
 {
-	memset(m_object->data(), data, m_object->size());
+	memset(this->data(), data, size());
 }
 
 void fsblk_t::block_t::wstr(u32 offset, std::string_view str)
 {
-	memcpy(m_object->offset("wstr", offset, str.size()), str.data(), str.size());
+	memcpy(woffs("wstr", offset, str.size()), str.data(), str.size());
 }
 
 void fsblk_t::block_t::w8(u32 offset, u8 data)
 {
-	m_object->offset("w8", offset, 1)[0] = data;
+	woffs("w8", offset, 1)[0] = data;
 }
 
 void fsblk_t::block_t::w16b(u32 offset, u16 data)
 {
-	put_u16be(m_object->offset("w16b", offset, 2), data);
+	put_u16be(woffs("w16b", offset, 2), data);
 }
 
 void fsblk_t::block_t::w24b(u32 offset, u32 data)
 {
-	put_u24be(m_object->offset("w24b", offset, 3), data);
+	put_u24be(woffs("w24b", offset, 3), data);
 }
 
 void fsblk_t::block_t::w32b(u32 offset, u32 data)
 {
-	put_u32be(m_object->offset("w32b", offset, 4), data);
+	put_u32be(woffs("w32b", offset, 4), data);
 }
 
 void fsblk_t::block_t::w16l(u32 offset, u16 data)
 {
-	put_u16le(m_object->offset("w16l", offset, 2), data);
+	put_u16le(woffs("w16l", offset, 2), data);
 }
 
 void fsblk_t::block_t::w24l(u32 offset, u32 data)
 {
-	put_u24le(m_object->offset("w24l", offset, 3), data);
+	put_u24le(woffs("w24l", offset, 3), data);
 }
 
 void fsblk_t::block_t::w32l(u32 offset, u32 data)
 {
-	put_u32le(m_object->offset("w32l", offset, 4), data);
+	put_u32le(woffs("w32l", offset, 4), data);
+}
+
+void fsblk_t::block_t::read(u32 offset, u8 *dst, u32 size) const
+{
+	memcpy(dst, roffs("read", offset, size), size);
 }
 
 std::string_view fsblk_t::block_t::rstr(u32 offset, u32 size) const
 {
-	const u8 *d = m_object->rooffset("rstr", offset, size);
+	const u8 *d = roffs("rstr", offset, size);
 	return std::string_view(reinterpret_cast<const char *>(d), size);
 }
 
 u8 fsblk_t::block_t::r8(u32 offset) const
 {
-	return m_object->offset("r8", offset, 1)[0];
+	return roffs("r8", offset, 1)[0];
 }
 
 u16 fsblk_t::block_t::r16b(u32 offset) const
 {
-	return get_u16be(m_object->offset("r16b", offset, 2));
+	return get_u16be(roffs("r16b", offset, 2));
 }
 
 u32 fsblk_t::block_t::r24b(u32 offset) const
 {
-	return get_u24be(m_object->offset("r24b", offset, 3));
+	return get_u24be(roffs("r24b", offset, 3));
 }
 
 u32 fsblk_t::block_t::r32b(u32 offset) const
 {
-	return get_u32be(m_object->offset("r32b", offset, 4));
+	return get_u32be(roffs("r32b", offset, 4));
 }
 
 u16 fsblk_t::block_t::r16l(u32 offset) const
 {
-	return get_u16le(m_object->offset("r16l", offset, 2));
+	return get_u16le(roffs("r16l", offset, 2));
 }
 
 u32 fsblk_t::block_t::r24l(u32 offset) const
 {
-	return get_u24le(m_object->offset("r24l", offset, 3));
+	return get_u24le(roffs("r24l", offset, 3));
 }
 
 u32 fsblk_t::block_t::r32l(u32 offset) const
 {
-	return get_u32le(m_object->offset("r32l", offset, 4));
+	return get_u32le(roffs("r32l", offset, 4));
 }
 
 
@@ -186,69 +156,99 @@ meta_data filesystem_t::volume_metadata()
 	return meta_data();
 }
 
-err_t filesystem_t::volume_metadata_change(const meta_data &meta)
+std::error_condition filesystem_t::volume_metadata_change(const meta_data &meta)
 {
-	return ERR_UNSUPPORTED;
+	return error::unsupported;
 }
 
-std::pair<err_t, meta_data> filesystem_t::metadata(const std::vector<std::string> &path)
+std::pair<std::error_condition, meta_data> filesystem_t::metadata(const std::vector<std::string> &path)
 {
-	return std::make_pair(ERR_UNSUPPORTED, meta_data());
+	return std::make_pair(error::unsupported, meta_data());
 }
 
-err_t filesystem_t::metadata_change(const std::vector<std::string> &path, const meta_data &meta)
+std::error_condition filesystem_t::metadata_change(const std::vector<std::string> &path, const meta_data &meta)
 {
-	return ERR_UNSUPPORTED;
+	return error::unsupported;
 }
 
-std::pair<err_t, std::vector<dir_entry>> filesystem_t::directory_contents(const std::vector<std::string> &path)
+std::pair<std::error_condition, std::vector<dir_entry>> filesystem_t::directory_contents(const std::vector<std::string> &path)
 {
-	return std::make_pair(ERR_UNSUPPORTED, std::vector<dir_entry>());
+	return std::make_pair(error::unsupported, std::vector<dir_entry>());
 }
 
-err_t filesystem_t::rename(const std::vector<std::string> &opath, const std::vector<std::string> &npath)
+std::error_condition filesystem_t::rename(const std::vector<std::string> &opath, const std::vector<std::string> &npath)
 {
-	return ERR_UNSUPPORTED;
+	return error::unsupported;
 }
 
-err_t filesystem_t::remove(const std::vector<std::string> &path)
+std::error_condition filesystem_t::remove(const std::vector<std::string> &path)
 {
-	return ERR_UNSUPPORTED;
+	return error::unsupported;
 }
 
-err_t filesystem_t::dir_create(const std::vector<std::string> &path, const meta_data &meta)
+std::error_condition filesystem_t::dir_create(const std::vector<std::string> &path, const meta_data &meta)
 {
-	return ERR_UNSUPPORTED;
+	return error::unsupported;
 }
 
-err_t filesystem_t::file_create(const std::vector<std::string> &path, const meta_data &meta)
+std::error_condition filesystem_t::file_create(const std::vector<std::string> &path, const meta_data &meta)
 {
-	return ERR_UNSUPPORTED;
+	return error::unsupported;
 }
 
-std::pair<err_t, std::vector<u8>> filesystem_t::file_read(const std::vector<std::string> &path)
+std::pair<std::error_condition, std::vector<u8>> filesystem_t::file_read(const std::vector<std::string> &path)
 {
-	return std::make_pair(ERR_UNSUPPORTED, std::vector<u8>());
+	return std::make_pair(error::unsupported, std::vector<u8>());
 }
 
-err_t filesystem_t::file_write(const std::vector<std::string> &path, const std::vector<u8> &data)
+std::error_condition filesystem_t::file_write(const std::vector<std::string> &path, const std::vector<u8> &data)
 {
-	return ERR_UNSUPPORTED;
+	return error::unsupported;
 }
 
-std::pair<err_t, std::vector<u8>> filesystem_t::file_rsrc_read(const std::vector<std::string> &path)
+std::pair<std::error_condition, std::vector<u8>> filesystem_t::file_rsrc_read(const std::vector<std::string> &path)
 {
-	return std::make_pair(ERR_UNSUPPORTED, std::vector<u8>());
+	return std::make_pair(error::unsupported, std::vector<u8>());
 }
 
-err_t filesystem_t::file_rsrc_write(const std::vector<std::string> &path, const std::vector<u8> &data)
+std::error_condition filesystem_t::file_rsrc_write(const std::vector<std::string> &path, const std::vector<u8> &data)
 {
-	return ERR_UNSUPPORTED;
+	return error::unsupported;
 }
 
-err_t filesystem_t::format(const meta_data &meta)
+std::error_condition filesystem_t::format(const meta_data &meta)
 {
-	return ERR_UNSUPPORTED;
+	return error::unsupported;
+}
+
+std::error_category const &fs_category() noexcept
+{
+	class fs_category_impl : public std::error_category
+	{
+	public:
+		virtual char const *name() const noexcept override { return "fs"; }
+
+		virtual std::string message(int condition) const override
+		{
+			using namespace std::literals;
+			static std::string_view const s_messages[] = {
+					"No error"sv,
+					"Unsupported operation"sv,
+					"File or directory not found"sv,
+					"No space on volume"sv,
+					"Invalid block number"sv,
+					"Invalid filename or path"sv,
+					"Incorrect file size"sv,
+					"File already exists"sv,
+			};
+			if ((0 <= condition) && (std::size(s_messages) > condition))
+				return std::string(s_messages[condition]);
+			else
+				return "Unknown error"s;
+		}
+	};
+	static fs_category_impl const s_fs_category_instance;
+	return s_fs_category_instance;
 }
 
 } // namespace fs

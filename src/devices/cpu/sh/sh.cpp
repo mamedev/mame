@@ -2502,7 +2502,7 @@ void sh_common_execution::generate_sequence_instruction(drcuml_block &block, com
 	}
 
 	/* if we are debugging, call the debugger */
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if (debugger_enabled())
 	{
 		UML_MOV(block, mem(&m_sh2_state->pc), desc->pc);                                // mov     [pc],desc->pc
 		save_fast_iregs(block);

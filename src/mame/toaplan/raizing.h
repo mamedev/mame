@@ -52,7 +52,6 @@ public:
 
 protected:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	virtual void device_post_load() override ATTR_COLD;
 
 	// used by everything
 	void create_tx_tilemap(int dx = 0, int dx_flipped = 0);
@@ -61,7 +60,7 @@ protected:
 	void raizing_z80_bankswitch_w(u8 data);
 	void raizing_oki_bankswitch_w(offs_t offset, u8 data);
 	void install_raizing_okibank(int chip);
-	void common_bgaregga_reset();
+	void raizing_oki_reset();
 
 	void common_mem(address_map &map, offs_t rom_limit) ATTR_COLD;
 
@@ -101,7 +100,7 @@ protected:
 	optional_memory_bank_array<8> m_raizing_okibank[2];
 	optional_shared_ptr<u8> m_shared_ram; // 8 bit RAM shared between 68K and sound CPU
 	required_device<m68000_base_device> m_maincpu;
-	optional_device<cpu_device> m_audiocpu;
+	optional_device<z80_device> m_audiocpu;
 	required_device<gp9001vdp_device> m_vdp;
 	optional_device_array<okim6295_device, 2> m_oki;
 	optional_device<gfxdecode_device> m_gfxdecode;

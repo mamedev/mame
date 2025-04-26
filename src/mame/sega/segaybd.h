@@ -53,7 +53,7 @@ public:
 		, m_upright_wheel_motor(*this, "upright_wheel_motor")
 		, m_left_start_lamp(*this, "left_start_lamp")
 		, m_right_start_lamp(*this, "right_start_lamp")
-		, m_gun_recoil(*this, "P%_Gun_Recoil", 1U)
+		, m_gun_recoil(*this, "P%u_Gun_Recoil", 1U)
 	{
 	}
 
