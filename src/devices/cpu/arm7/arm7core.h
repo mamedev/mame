@@ -5,7 +5,7 @@
  *   arm7core.h
  *   Portable ARM7TDMI Core Emulator
  *
- *   Copyright Steve Ellenoff, all rights reserved.
+ *   Copyright Steve Ellenoff
  *
  *  This work is based on:
  *  #1) 'Atmel Corporation ARM7TDMI (Thumb) Datasheet - January 1999'
@@ -315,7 +315,7 @@ static const int sRegisterTable[ARM7_NUM_MODES][18] =
 #define T_IS_CLEAR(pc)  (!T_IS_SET(pc))
 
 /* Deconstructing an instruction */
-// todo: use these in all places (including dasm file)
+// TODO: use these in all places (including dasm file)
 #define INSN_COND           ((uint32_t)0xf0000000u)
 #define INSN_SDT_L          ((uint32_t)0x00100000u)
 #define INSN_SDT_W          ((uint32_t)0x00200000u)
@@ -514,10 +514,17 @@ enum arm7_cpu_device::arm_arch_flag : uint32_t
 
 enum arm7_cpu_device::arm_copro_id : uint32_t
 {
+	ARM9_COPRO_ID_STEP_SA1100_A = 0,
+	ARM9_COPRO_ID_STEP_SA1100_B = 1,
+	ARM9_COPRO_ID_STEP_SA1100_C = 2,
+	ARM9_COPRO_ID_STEP_SA1100_D = 8,
+	ARM9_COPRO_ID_STEP_SA1100_E = 9,
+	ARM9_COPRO_ID_STEP_SA1100_G = 11,
+
 	ARM9_COPRO_ID_STEP_SA1110_A0 = 0,
 	ARM9_COPRO_ID_STEP_SA1110_B0 = 4,
 	ARM9_COPRO_ID_STEP_SA1110_B1 = 5,
-	ARM9_COPRO_ID_STEP_SA1110_B2 = 8,
+	ARM9_COPRO_ID_STEP_SA1110_B2 = 6,
 	ARM9_COPRO_ID_STEP_SA1110_B4 = 8,
 
 	ARM9_COPRO_ID_STEP_PXA255_A0 = 6,
@@ -527,8 +534,9 @@ enum arm7_cpu_device::arm_copro_id : uint32_t
 	ARM9_COPRO_ID_STEP_ARM1176JZF_S_R0P0 = 0,
 	ARM9_COPRO_ID_STEP_ARM1176JZF_S_R0P7 = 7,
 
-	ARM9_COPRO_ID_PART_ARM1176JZF_S = 0xB76 << 4,
-	ARM9_COPRO_ID_PART_SA1110 = 0xB11 << 4,
+	ARM9_COPRO_ID_PART_ARM1176JZF_S = 0xb76 << 4,
+	ARM9_COPRO_ID_PART_SA1100 = 0xa11 << 4,
+	ARM9_COPRO_ID_PART_SA1110 = 0xb11 << 4,
 	ARM9_COPRO_ID_PART_ARM946 = 0x946 << 4,
 	ARM9_COPRO_ID_PART_ARM920 = 0x920 << 4,
 	ARM9_COPRO_ID_PART_ARM710 = 0x710 << 4,
@@ -546,7 +554,7 @@ enum arm7_cpu_device::arm_copro_id : uint32_t
 	ARM9_COPRO_ID_ARCH_V5TE   = 0x05 << 16,
 	ARM9_COPRO_ID_ARCH_V5TEJ  = 0x06 << 16,
 	ARM9_COPRO_ID_ARCH_V6     = 0x07 << 16,
-	ARM9_COPRO_ID_ARCH_CPUID  = 0x0F << 16,
+	ARM9_COPRO_ID_ARCH_CPUID  = 0x0f << 16,
 
 	ARM9_COPRO_ID_SPEC_REV0   = 0x00 << 20,
 	ARM9_COPRO_ID_SPEC_REV1   = 0x01 << 20,

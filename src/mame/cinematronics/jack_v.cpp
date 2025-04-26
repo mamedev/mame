@@ -111,9 +111,6 @@ uint32_t jack_state::screen_update_striv(screen_device &screen, bitmap_ind16 &bi
 
 
 
-
-
-
 /***************************************************************************
 
    Joinem has a bit different video hardware with proms based palette,

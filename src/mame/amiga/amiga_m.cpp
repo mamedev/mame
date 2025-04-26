@@ -136,16 +136,6 @@ const char *const amiga_state::s_custom_reg_names[0x100] =
 	"UNK1F8",       "UNK1FA",       "FMODE",        "UNK1FE"
 };
 
-constexpr XTAL amiga_state::CLK_28M_PAL;
-constexpr XTAL amiga_state::CLK_7M_PAL;
-constexpr XTAL amiga_state::CLK_C1_PAL;
-constexpr XTAL amiga_state::CLK_E_PAL;
-
-constexpr XTAL amiga_state::CLK_28M_NTSC;
-constexpr XTAL amiga_state::CLK_7M_NTSC;
-constexpr XTAL amiga_state::CLK_C1_NTSC;
-constexpr XTAL amiga_state::CLK_E_NTSC;
-
 /*************************************
  *
  *  Machine reset
@@ -1081,10 +1071,14 @@ uint8_t amiga_state::cia_1_port_a_read()
 	// bit 0 to 2, centronics
 	data |= m_centronics_busy << 0;
 	data |= m_centronics_perror << 1;
-	data |= m_centronics_select << 2;
+	// TODO: verify if this doesn't break Ring Indicator
+	// (amigajoy port 3 fire button won't work with previous behaviour)
+	// https://github.com/dirkwhoffmann/vAmiga/issues/49#issuecomment-502444017
+	// NOTE: RI is unavailable on a1000 anyway
+	data |= (m_centronics_select & m_rs232_ri) << 2;
 
 	// bit 2 to 7, serial line
-	data |= m_rs232_ri << 2;
+//  data |= m_rs232_ri << 2;
 	data |= m_rs232_dsr << 3;
 	data |= m_rs232_cts << 4;
 	data |= m_rs232_dcd << 5;
@@ -1201,7 +1195,17 @@ void amiga_state::ocs_map(address_map &map)
 	// Sprite section
 //  map(0x120, 0x17f).m(amiga_state::sprxpt_map));
 	// Color section
-//  map(0x180, 0x1bf).m(amiga_state::colorxx_map));
+	map(0x180, 0x1bf).lrw16(
+		NAME([this] (offs_t offset) {
+			return CUSTOM_REG(REG_COLOR00 + offset);
+		}),
+		NAME([this] (offs_t offset, u16 data) {
+			CUSTOM_REG(REG_COLOR00 + offset) = data;
+			data &= 0xfff;
+			// Extra Half-Brite
+			CUSTOM_REG(REG_COLOR00 + offset + 32) = (data >> 1) & 0x777;
+		})
+	);
 }
 
 void amiga_state::ecs_map(address_map &map)
@@ -1237,6 +1241,10 @@ void amiga_state::aga_map(address_map &map)
 
 	map(0x100, 0x101).w(FUNC(amiga_state::aga_bplcon0_w));
 
+	map(0x10e, 0x10f).w(FUNC(amiga_state::clxcon2_w));
+
+	map(0x180, 0x1bf).rw(FUNC(amiga_state::aga_palette_read), FUNC(amiga_state::aga_palette_write));
+
 	// UHRES regs
 	// TODO: may be shared with ECS?
 //  map(0x1e6, 0x1e7).w(FUNC(amiga_state::bplhmod_w));
@@ -1251,6 +1259,11 @@ void amiga_state::aga_map(address_map &map)
 
 void amiga_state::custom_chip_reset()
 {
+	// TODO: not entirely correct
+	// - OCS Denise returns open bus
+	// - ECS Denise should return 0xff << 8 | ID
+	// - AGA Lisa bits 15-10 are jumper selectable (at least on A4000), returns 0xfc << 8 | ID
+	// cfr. https://eab.abime.net/showpost.php?p=627136&postcount=59
 	CUSTOM_REG(REG_DENISEID) = m_denise_id;
 	CUSTOM_REG(REG_VPOSR) = m_agnus_id << 8;
 	CUSTOM_REG(REG_DDFSTRT) = 0x18;
@@ -1295,12 +1308,40 @@ void amiga_state::bplcon0_w(u16 data)
 	CUSTOM_REG(REG_BPLCON0) = data;
 }
 
+/*
+ * http://amiga-dev.wikidot.com/hardware:bplcon0
+ */
 void amiga_state::aga_bplcon0_w(u16 data)
 {
 	// just allow all (AGA surfninj title screen relies on this)
 	CUSTOM_REG(REG_BPLCON0) = data;
+	// TODO: planes > 8
+	// Should be easy to fix, this checks if anything violates the rule first.
+	if (BIT(data, 4) && data & 0x7000)
+		popmessage("BPLCON0 illegal BPU plane mask %04x", data);
+	// TODO: unsupported stuff
+	if (data & 0x00e0)
+	{
+		popmessage("BPLCON0 unsupported %04x %s%s%s",
+			data,
+			BIT(data, 7) ? "UHRES|" : "",
+			BIT(data, 6) ? "SHRES|" : "",
+			BIT(data, 5) ? "BYPASS" : ""
+		);
+	}
 }
 
+/*
+ * http://amiga-dev.wikidot.com/hardware:clxcon2
+ * ---- ---- xx-- ---- ENBPx enable bitplanes 8 and 7
+ * ---- ---- ---- --xx MVBPx match value for bitplanes 8 and 7
+ */
+void amiga_state::clxcon2_w(u16 data)
+{
+	m_aga_clxcon2 = data;
+}
+
+// TODO: progressively remove functions from here
 uint16_t amiga_state::custom_chip_r(offs_t offset)
 {
 	uint16_t temp;
@@ -1375,8 +1416,11 @@ uint16_t amiga_state::custom_chip_r(offs_t offset)
 
 		case REG_CLXDAT:
 			temp = CUSTOM_REG(REG_CLXDAT);
-			CUSTOM_REG(REG_CLXDAT) = 0;
-			return temp;
+			if (!machine().side_effects_disabled())
+				CUSTOM_REG(REG_CLXDAT) = 0;
+			// Undocumented bit 15 always high
+			// - "Barney [& Freddy] Mouse" will always detect a player-enemy hit out of iframe cycles otherwise
+			return temp | (1 << 15);
 
 		case REG_DENISEID:
 			return CUSTOM_REG(REG_DENISEID);
@@ -1573,7 +1617,8 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 
 		case REG_DDFSTOP:
 			/* impose hardware limits ( HRM, page 75 ) */
-			data &= (IS_AGA() || IS_ECS()) ? 0xfe : 0xfc;
+			// amigaaga_flop:aladdin writes 0x0100 here, expecting the HW limit to hit instead
+			data &= (IS_AGA() || IS_ECS()) ? 0xfffe : 0xfffc;
 			if (data > 0xd8)
 			{
 				logerror("%s: Attempt to overrun DDFSTOP with %04x\n", machine().describe_context(), data);
@@ -1589,10 +1634,21 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 			m_paula->dmacon_set(data);
 			m_copper->dmacon_set(data);
 
+			// TODO: unemulated BLTEN disable
+			// NOTE: Copper and 68k can in-flight pause a running blitter
+
 			/* if 'blitter-nasty' has been turned on and we have a blit pending, reschedule it */
 			if ( ( data & 0x400 ) && ( CUSTOM_REG(REG_DMACON) & 0x4000 ) )
 				m_blitter_timer->adjust(m_maincpu->cycles_to_attotime(BLITTER_NASTY_DELAY));
 
+			break;
+
+		case REG_CLXCON:
+			if (IS_AGA())
+			{
+				// reset to zero on CLXCON writes
+				m_aga_clxcon2 = 0;
+			}
 			break;
 
 		case REG_INTENA:
@@ -1659,26 +1715,6 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 			data &= ~1;
 			break;
 
-		case REG_COLOR00:   case REG_COLOR01:   case REG_COLOR02:   case REG_COLOR03:
-		case REG_COLOR04:   case REG_COLOR05:   case REG_COLOR06:   case REG_COLOR07:
-		case REG_COLOR08:   case REG_COLOR09:   case REG_COLOR10:   case REG_COLOR11:
-		case REG_COLOR12:   case REG_COLOR13:   case REG_COLOR14:   case REG_COLOR15:
-		case REG_COLOR16:   case REG_COLOR17:   case REG_COLOR18:   case REG_COLOR19:
-		case REG_COLOR20:   case REG_COLOR21:   case REG_COLOR22:   case REG_COLOR23:
-		case REG_COLOR24:   case REG_COLOR25:   case REG_COLOR26:   case REG_COLOR27:
-		case REG_COLOR28:   case REG_COLOR29:   case REG_COLOR30:   case REG_COLOR31:
-			if (IS_AGA())
-			{
-				aga_palette_write(offset - REG_COLOR00, data);
-			}
-			else
-			{
-				data &= 0xfff;
-				// Extra Half-Brite
-				CUSTOM_REG(offset + 32) = (data >> 1) & 0x777;
-			}
-			break;
-
 		// display window start/stop
 		case REG_DIWSTRT:
 		case REG_DIWSTOP:
@@ -1700,6 +1736,9 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 			{
 				CUSTOM_REG(REG_BEAMCON0) = data;
 				update_screenmode();
+				// TODO: variable beam counter, disables hard display stops, enables HTOTAL/VTOTAL programming
+				if (BIT(data, 7))
+					popmessage("BEAMCON0: VARBEAMEN enabled");
 			}
 			break;
 

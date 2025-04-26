@@ -80,20 +80,20 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
-	void igs_m036_tt(machine_config &config);
-	void igs_m036(machine_config &config);
+	void igs_m036_tt(machine_config &config) ATTR_COLD;
+	void igs_m036(machine_config &config) ATTR_COLD;
 
-	void init_igs_m036();
-	void init_cjdh2();
-	void init_cjddzsp();
-	void init_igsm312();
+	void init_igs_m036() ATTR_COLD;
+	void init_cjdh2() ATTR_COLD;
+	void init_cjddzsp() ATTR_COLD;
+	void init_igsm312() ATTR_COLD;
 
 private:
 	uint32_t screen_update_igs_m036(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<cpu_device> m_maincpu;
 
-	void pgm_create_dummy_internal_arm_region(void);
+	void pgm_create_dummy_internal_arm_region() ATTR_COLD;
 
 	void igs_m036_map(address_map &map) ATTR_COLD;
 };
@@ -188,6 +188,24 @@ ROM_START( cjdh2c )
 	ROM_REGION( 0x800100*2, "gfx", 0 )
 	ROM_LOAD( "cjdh2_cg1.u8",  0x000000, 0x800100, CRC(c14bf4b2) SHA1(32bdd7c498b75f3444bb6a6ccf0981d5dd46028c) )
 	ROM_LOAD( "cjdh2_cg2.u24", 0x800100, 0x800100, CRC(f9c747c3) SHA1(c4ff67e9da1322536841b8a9e9d9cfea6d7ebc4a) )
+ROM_END
+
+ROM_START( cjdh2d ) // PCB-0674-03-IK. IGS036 + M6295 compatible + Altera EPM3032ALC44-10N + 2 banks of 8 DIP switches
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS036 ARM based MCU
+	ROM_LOAD( "d7_igs036.u18", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "cjdh2_s311cn.u33", 0x000000, 0x200000, CRC(a6fb72f0) SHA1(1d9583eafaea21d5ec078b7f2e3dc426571a9550) )
+
+	ROM_REGION( 0x200000, "oki", 0 ) // samples
+	ROM_LOAD( "ik_sp_u20.u20", 0x000000, 0x200000, CRC(14a20112) SHA1(de49ecbc6ffd89e8d2e0a4cf1f4cba1a78810d42) )
+
+	ROM_REGION( 0x1400000, "gfx", 0 )
+	ROM_LOAD( "ik-cg_u5.u5",   0x0000000, 0x0800000, CRC(701b4197) SHA1(e84d9d79db5eb8641b196f95b260079abaf12572) )
+	ROM_LOAD( "ik-cg_u9.u9",   0x0800000, 0x0200000, CRC(ca402fa0) SHA1(058fc76dd712535e7c2f7851604b4c561cc5494b) )
+	ROM_LOAD( "ik-cg_u24.u24", 0x0a00000, 0x0800000, CRC(6699d712) SHA1(812a4aa43066a78c1691317005099ffc4526696b) )
+	ROM_LOAD( "ik-cg_u28.u28", 0x1200000, 0x0200000, CRC(53226179) SHA1(59cdb1762416c593dd00aa6ab9c3bbdbd80479f4) )
 ROM_END
 
 
@@ -443,6 +461,7 @@ ROM_START( super70s )
 ROM_END
 
 
+// 金花争霸 (Jīn Huā Zhēngbà)
 ROM_START( jhzb )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
@@ -463,6 +482,7 @@ ROM_START( jhzb )
 ROM_END
 
 
+// 吉祥如意 (Jíxiáng Rúyì)
 ROM_START( jxry )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
@@ -483,6 +503,7 @@ ROM_START( jxry )
 ROM_END
 
 
+// 双龙抢珠特别版 (Shuāng Lóng Qiǎng Zhū Tèbié Bǎn)
 ROM_START( slqzsp )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
@@ -503,6 +524,7 @@ ROM_START( slqzsp )
 ROM_END
 
 
+// 鲨鱼大亨 (Shāyú Dàhēng)
 ROM_START( sydh ) // PCB-0802-03-JL
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
@@ -523,6 +545,7 @@ ROM_START( sydh ) // PCB-0802-03-JL
 ROM_END
 
 
+// 逍遥斗地主 (Xiāoyáo Dòu Dìzhǔ)
 ROM_START( xyddz )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
@@ -543,7 +566,7 @@ ROM_START( xyddz )
 ROM_END
 
 
-void igs_m036_state::pgm_create_dummy_internal_arm_region(void)
+void igs_m036_state::pgm_create_dummy_internal_arm_region()
 {
 	uint16_t *temp16 = (uint16_t *)memregion("maincpu")->base();
 	for (int i = 0; i < 0x4000 / 2; i += 2)
@@ -661,6 +684,7 @@ GAME( 200?, cjdh2,    0,     igs_m036,    igs_m036, igs_m036_state, init_cjdh2, 
 GAME( 200?, cjdh2a,   cjdh2, igs_m036,    igs_m036, igs_m036_state, init_cjdh2,    ROT0, "IGS",           "Chao Ji Da Heng 2 (V311CNA)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 200?, cjdh2b,   cjdh2, igs_m036,    igs_m036, igs_m036_state, init_cjdh2,    ROT0, "IGS",           "Chao Ji Da Heng 2 (V311CNB)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 200?, cjdh2c,   cjdh2, igs_m036,    igs_m036, igs_m036_state, init_cjdh2,    ROT0, "IGS",           "Chao Ji Da Heng 2 (V215CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, cjdh2d,   cjdh2, igs_m036,    igs_m036, igs_m036_state, init_cjdh2,    ROT0, "IGS",           "Chao Ji Da Heng 2 (V311CN, alternate GFX ROMs)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 GAME( 200?, cjddzsp,  0,     igs_m036_tt, igs_m036, igs_m036_state, init_cjddzsp,  ROT0, "IGS",           "Super Dou Di Zhu Special (V122CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
@@ -674,15 +698,15 @@ GAME( 200?, igsm312,  0,     igs_m036_tt, igs_m036, igs_m036_state, init_igsm312
 
 GAME( 200?, super70s, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_igsm312,  ROT0, "IGS",           "Super 70's (V100US)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 200?, jhzb,     0,     igs_m036,    igs_m036, igs_m036_state, init_igs_m036, ROT0, "IGS",           "Jin Hua Zheng Ba (V113CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 金花争霸
+GAME( 200?, jhzb,     0,     igs_m036,    igs_m036, igs_m036_state, init_igs_m036, ROT0, "IGS",           "Jin Hua Zhengba (V113CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 200?, jxry,     0,     igs_m036,    igs_m036, igs_m036_state, init_igs_m036, ROT0, "IGS",           "Ji Xiang Ru Yi (V116CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 吉祥如意
+GAME( 200?, jxry,     0,     igs_m036,    igs_m036, igs_m036_state, init_igs_m036, ROT0, "IGS",           "Jixiang Ruyi (V116CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 200?, slqzsp,   0,     igs_m036_tt, igs_m036, igs_m036_state, init_igs_m036, ROT0, "IGS",           "Shuang Long Qiang Zhu Te Bie Ban (V104CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 双龙抢珠特别版
+GAME( 200?, slqzsp,   0,     igs_m036_tt, igs_m036, igs_m036_state, init_igs_m036, ROT0, "IGS",           "Shuang Long Qiang Zhu Tebie Ban (V104CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 200?, sydh,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_igs_m036, ROT0, "IGS",           "Sha Yu Da Heng (V104CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 鲨鱼大亨
+GAME( 200?, sydh,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_igs_m036, ROT0, "IGS",           "Shayu Daheng (V104CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 200?, xyddz,    0,     igs_m036_tt, igs_m036, igs_m036_state, init_igs_m036, ROT0, "IGS",           "Xiao Yao Dou Di Zhu", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 逍遥斗地主
+GAME( 200?, xyddz,    0,     igs_m036_tt, igs_m036, igs_m036_state, init_igs_m036, ROT0, "IGS",           "Xiaoyao Dou Dizhu", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 GAME( 2010, lhfy,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_igsm312,  ROT0, "IGS",           "Long Hu Feng Yun Gao Qing Ban (V206CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 

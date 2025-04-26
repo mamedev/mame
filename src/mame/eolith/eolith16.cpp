@@ -166,7 +166,7 @@ void eolith16_state::eolith16_palette(palette_device &palette) const
 
 void eolith16_state::eolith16(machine_config &config)
 {
-	E116T(config, m_maincpu, XTAL(60'000'000));        /* no internal multiplier */
+	E116(config, m_maincpu, 60_MHz_XTAL);        // E1-16T (TQFP), no internal multiplier
 	m_maincpu->set_addrmap(AS_PROGRAM, &eolith16_state::eolith16_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(eolith16_state::eolith_speedup), "screen", 0, 1);
 

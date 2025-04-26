@@ -4,7 +4,8 @@
 # macros
 ##########################################################
 macro   nomreq_addr
-	m_nomreq_cb(TADR, 0x00, 0xff);
+	if (nomemrq_en)
+		m_nomreq_cb(TADR, 0x00, 0xff);
 	+ 1
 
 macro   nomreq_ir   %cycles
@@ -46,7 +47,8 @@ macro   wm16_sp
 
 macro   rop
 	m_m1_cycles-2 !! TDAT8 = opcode_read();
-	m_refresh_cb((I << 8) | (R2 & 0x80) | (R & 0x7f), 0x00, 0xff);
+	if (refresh_en)
+		m_refresh_cb((I << 8) | (R2 & 0x80) | (R & 0x7f), 0x00, 0xff);
 	+ 2
 	PC++; R++; Q = QT; QT = YF | XF;
 
@@ -85,13 +87,27 @@ macro   push
 macro   jp
 	call arg16
 	PC = TDAT; WZ = PC;
-	m_branch_cb(true);
+
+macro   t6a84:jp
+	call arg16
+	PC = TDAT; WZ = PC;
+	paged_jump();
 
 macro   jp_cond
 	if (TDAT8) {
 		call arg16
 		PC = TDAT; WZ = PC;
-		m_branch_cb(true);
+	} else {
+		// implicit do PC += 2
+		call arg16
+		WZ = TDAT;
+	}
+
+macro   t6a84:jp_cond
+	if (TDAT8) {
+		call arg16
+		PC = TDAT; WZ = PC;
+		paged_jump();
 	} else {
 		// implicit do PC += 2
 		call arg16
@@ -103,7 +119,13 @@ macro   jr
 	TADR = PC-1;
 	5 * call nomreq_addr
 	PC += (s8)TDAT8; WZ = PC;
-	m_branch_cb(true);
+
+macro   t6a84:jr
+	call arg
+	TADR = PC-1;
+	5 * call nomreq_addr
+	PC += (s8)TDAT8; WZ = PC;
+	paged_jump();
 
 macro   r800:jr
 	call arg
@@ -167,7 +189,12 @@ macro   z80n:retn
 macro   reti
 	call pop
 	PC = TDAT; WZ = PC; m_iff1 = m_iff2;
-	m_reti_cb(true);
+	daisy_call_reti_device();
+
+macro   t6a84:reti
+	call pop
+	PC = TDAT; WZ = PC; m_iff1 = m_iff2;
+	paged_reti();
 	daisy_call_reti_device();
 
 macro   ld_r_a
@@ -506,11 +533,11 @@ macro   r800:otdr
 
 macro   jump	%opcode
 	m_ref = 0x%opcode00;
-	if (true) return;
+	goto process;
 
 macro   jump_prefixed   %prefix
 	m_ref = (%prefix << 16) | (TDAT8 << 8);
-	if (true) return;
+	goto process;
 
 macro   take_nmi
 	// Check if processor was halted
@@ -528,6 +555,23 @@ macro   take_nmi
 	WZ = PC;
 	m_nmi_pending = false;
 
+macro   irqfetch
+	{
+		// fetch the IRQ vector
+		device_z80daisy_interface *intf = daisy_get_irq_device();
+		m_tmp_irq_vector = (intf != nullptr) ? intf->z80daisy_irq_ack() : standard_irq_callback(0, m_pc.w);
+		LOGMASKED(LOG_INT, "single INT m_tmp_irq_vector $%02x\n", m_tmp_irq_vector);
+	}
+
+macro   t6a84:irqfetch
+	{
+		// fetch the IRQ vector
+		paged_irqfetch();
+		device_z80daisy_interface *intf = daisy_get_irq_device();
+		m_tmp_irq_vector = (intf != nullptr) ? intf->z80daisy_irq_ack() : standard_irq_callback(0, m_pc.w);
+		LOGMASKED(LOG_INT, "single INT m_tmp_irq_vector $%02x\n", m_tmp_irq_vector);
+	}
+
 macro   take_interrupt
 	// check if processor was halted
 	leave_halt();
@@ -535,15 +579,9 @@ macro   take_interrupt
 	m_iff1 = m_iff2 = 0;
 	// say hi
 	// Not precise in all cases. z80 must finish current instruction (NOP) to reach this state - in such case frame timings are shifter from cb event if calculated based on it.
-	m_irqack_cb(true);
+	m_irqack_cb(1);
 	m_r++;
-	{
-		// fetch the IRQ vector
-		m_irqfetch_cb(true);
-		device_z80daisy_interface *intf = daisy_get_irq_device();
-		m_tmp_irq_vector = (intf != nullptr) ? intf->z80daisy_irq_ack() : standard_irq_callback(0, m_pc.w);
-		LOGMASKED(LOG_INT, "single INT m_tmp_irq_vector $%02x\n", m_tmp_irq_vector);
-	}
+	call irqfetch
 	// 'interrupt latency' cycles
 	+ 2
 	// Interrupt mode 2. Call [i:databyte]
@@ -655,7 +693,7 @@ macro   nsc800_take_interrupt
 		if (m_after_ldair) F &= ~PF;
 	#endif
 
-macro   ncs800:check_interrupts
+macro   nsc800:check_interrupts
 	if (m_nmi_pending) {
 		call take_nmi
 	} else if ((m_nsc800_irq_state[0] != CLEAR_LINE || m_nsc800_irq_state[1] != CLEAR_LINE || m_nsc800_irq_state[2] != CLEAR_LINE) && m_iff1 && !m_after_ei) {
@@ -669,6 +707,8 @@ macro   ncs800:check_interrupts
 # ROP
 ##########################################################
 ffff
+	m_ref = 0xffff00;
+	if (m_icount <= 0) return;
 	if (m_busrq_state) {
 		if (!m_busack_state) {
 			m_busack_state = 1;
@@ -688,14 +728,13 @@ ffff
 		debugger_wait_hook();
 		call rop
 		PC--;
-		m_ref = 0xffff00;
-		return;
+		continue;
 	} else {
 		PRVPC = PC;
 		debugger_instruction_hook(PC);
 		call rop
 		m_ref = (0x00 << 16) | (TDAT8 << 8);
-		return;
+		goto process;
 	}
 
 
@@ -3566,10 +3605,10 @@ dd93	# DB   DD
 	call jump 0093
 
 dd94	# SUB  HX
-	sub(HX);
+	sub_a(HX);
 
 dd95	# SUB  LX
-	sub(LX);
+	sub_a(LX);
 
 dd96	# SUB  (IX+o)
 	call eax
@@ -3577,7 +3616,7 @@ dd96	# SUB  (IX+o)
 	5 * call nomreq_addr
 	TADR = m_ea;
 	call rm
-	sub(TDAT8);
+	sub_a(TDAT8);
 
 dd97	# DB   DD
 	illegal_1();
@@ -4654,10 +4693,10 @@ fd93	# DB   FD
 	call jump 0093
 
 fd94	# SUB  HY
-	sub(HY);
+	sub_a(HY);
 
 fd95	# SUB  LY
-	sub(LY);
+	sub_a(LY);
 
 fd96	# SUB  (IY+o)
 	call eay
@@ -4665,7 +4704,7 @@ fd96	# SUB  (IY+o)
 	5 * call nomreq_addr
 	TADR = m_ea;
 	call rm
-	sub(TDAT8);
+	sub_a(TDAT8);
 
 fd97	# DB   FD
 	illegal_1();
@@ -6451,30 +6490,30 @@ edff	# DB   ED
 	adc_a(A);
 
 0090	# SUB  B
-	sub(B);
+	sub_a(B);
 
 0091	# SUB  C
-	sub(C);
+	sub_a(C);
 
 0092	# SUB  D
-	sub(D);
+	sub_a(D);
 
 0093	# SUB  E
-	sub(E);
+	sub_a(E);
 
 0094	# SUB  H
-	sub(H);
+	sub_a(H);
 
 0095	# SUB  L
-	sub(L);
+	sub_a(L);
 
 0096	# SUB  (HL)
 	TADR = HL;
 	call rm
-	sub(TDAT8);
+	sub_a(TDAT8);
 
 0097	# SUB  A
-	sub(A);
+	sub_a(A);
 
 0098	# SBC  A,B
 	sbc_a(B);
@@ -6694,7 +6733,7 @@ edff	# DB   ED
 
 00d6	# SUB  n
 	call arg
-	sub(TDAT8);
+	sub_a(TDAT8);
 
 00d7	# RST  2
 	call rst 0x10

@@ -86,10 +86,11 @@ Microsoft Windows
 MAME for Windows is built using the MSYS2 environment.  You will need Windows 7
 or later and a reasonably up-to-date MSYS2 installation.  We strongly recommend
 building MAME on a 64-bit system.  Instructions may need to be adjusted for
-32-bit systems.
+32-bit systems.  Building for 64-bit ARM (AArch64) requires a 64-bit ARM system
+running Windows 11 or later.
 
 * A pre-packaged MSYS2 installation including the prerequisites for building
-  MAME can be downloaded from the `MAME Build Tools
+  MAME for 64-bit x86-64 can be downloaded from the `MAME Build Tools
   <http://mamedev.org/tools/>`_ page.
 * After initial installation, you can update the MSYS2 environment using the
   **pacman** (Arch package manage) command.
@@ -120,20 +121,7 @@ with MSYS2 and the **pacman** package manager.
   verification for this repository (``SigLevel = Never``).
 * Install packages necessary to build MAME.  At the very least, you’ll need
   ``bash``, ``git``, ``make``.
-* For 64-bit builds you’ll need ``mingw-w64-x86_64-gcc`` and
-  ``mingw-w64-x86_64-python``.
-* For 32-bit builds you’ll need ``mingw-w64-i686-gcc`` and
-  ``mingw-w64-i686-python``.
 * For debugging you may want to install ``gdb``.
-* To link using the LLVM linker (generally much faster than the GNU linker),
-  you’ll need ``mingw-w64-x86_64-lld`` and ``mingw-w64-x86_64-libc++`` for
-  64-bit builds, or ``mingw-w64-i686-lld`` and ``mingw-w64-i686-libc++`` for
-  32-bit builds.
-* To build against the portable SDL interfaces, you’ll need
-  ``mingw-w64-x86_64-SDL2`` and ``mingw-w64-x86_64-SDL2_ttf`` for 64-bit builds,
-  or ``mingw-w64-i686-SDL2`` and ``mingw-w64-i686-SDL2_ttf`` for 32-bit builds.
-* To build the Qt debugger, you’ll need ``mingw-w64-x86_64-qt5`` for 64-bit
-  builds, or ``mingw-w64-i686-qt5`` for 32-bit builds.
 * To build the HTML user/developer documentation, you’ll need
   ``mingw-w64-x86_64-librsvg``, ``mingw-w64-x86_64-python-sphinx``,
   ``mingw-w64-x86_64-python-sphinx_rtd_theme`` and
@@ -146,18 +134,53 @@ with MSYS2 and the **pacman** package manager.
   ``mingw-w64-x86_64-texlive-latex-extra`` and
   ``mingw-w64-x86_64-texlive-fonts-recommended`` (or
   ``mingw-w64-i686-texlive-latex-extra`` and
-  ``mingw-w64-i686-texlive-fonts-recommended`` for a 32-but MinGW environment).
+  ``mingw-w64-i686-texlive-fonts-recommended`` for a 32-bit MinGW environment).
 * To generate API documentation from source, you’ll need ``doxygen``.
 * If you plan to rebuild bgfx shaders and you want to rebuild the GLSL parser,
   you’ll need ``bison``.
-* For 64-bit builds, open **MSYS2 MinGW 64-bit** from the start menu, and set
-  up the environment variables ``MINGW64`` to ``/mingw64`` and ``MINGW32`` to an
-  empty string (e.g. using the command **export MINGW64=/mingw64 MINGW32=** in
-  the Bash shell).
-* For 32-bit builds, open **MSYS2 MinGW 32-bit** from the start menu, and set
-  up the environment variables ``MINGW32`` to ``/mingw32`` and ``MINGW64`` to an
-  empty string (e.g. using the command **export MINGW32=/mingw32 MINGW64=** in
-  the Bash shell).
+
+The additional packages you’ll need depend on the CPU architecture you’re
+building for.
+
+**64-bit x86-64**
+
+* You’ll need ``mingw-w64-x86_64-gcc`` and ``mingw-w64-x86_64-python``.
+* To link using the LLVM linker (generally much faster than the GNU linker),
+  you’ll need ``mingw-w64-x86_64-lld``, ``mingw-w64-x86_64-llvm`` and
+  ``mingw-w64-x86_64-libc++``.
+* To build against the portable SDL interfaces, you’ll need
+  ``mingw-w64-x86_64-SDL2`` and ``mingw-w64-x86_64-SDL2_ttf``.
+* To build the Qt debugger, you’ll need ``mingw-w64-x86_64-qt5``.
+* Open the **mingw64.exe** helper from the **msys64** installation folder or the
+  **MSYS2 MinGW 64-bit** shortcut from the start menu to start a Bash shell
+  configured with the correct paths and environment variables.
+
+**32-bit x86**
+
+* You’ll need ``mingw-w64-i686-gcc`` and ``mingw-w64-i686-python``.
+* To link using the LLVM linker (generally much faster than the GNU linker),
+  you’ll need ``mingw-w64-i686-lld``, ``mingw-w64-i686-llvm`` and
+  ``mingw-w64-i686-libc++``.
+* To build against the portable SDL interfaces, you’ll need
+  ``mingw-w64-i686-SDL2`` and ``mingw-w64-i686-SDL2_ttf``.
+* To build the Qt debugger, you’ll need ``mingw-w64-i686-qt5``.
+* Open the **mingw32.exe** helper from the **msys64** installation folder or the
+  **MSYS2 MinGW 32-bit** shortcut from the start menu to start a Bash shell
+  configured with the correct paths and environment variables.
+
+**64-bit ARM (AArch64)**
+
+* You’ll need ``mingw-w64-clang-aarch64-clang``,
+  ``mingw-w64-clang-aarch64-python`` and ``mingw-w64-clang-aarch64-gcc-compat``.
+* To link using the LLVM linker (generally much faster than the GNU linker),
+  you’ll need ``mingw-w64-clang-aarch64-lld``, ``mingw-w64-clang-aarch64-llvm``
+  and ``mingw-w64-clang-aarch64-libc++``.
+* To build against the portable SDL interfaces, you’ll need
+  ``mingw-w64-clang-aarch64-SDL2`` and ``mingw-w64-clang-aarch64-SDL2_ttf``.
+* To build the Qt debugger, you’ll need ``mingw-w64-clang-aarch64-qt5``.
+* Open the **clangarm64.exe** helper from the **msys64** installation folder to
+  start a Bash shell configured with the correct paths and environment
+  variables.
 
 For example you could use these commands to ensure you have the packages you
 need to compile MAME, omitting the ones for configurations you don’t plan to
@@ -166,12 +189,18 @@ once::
 
     pacman -Syu
     pacman -S curl git make
-    pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-libc++ mingw-w64-x86_64-lld mingw-w64-x86_64-python
+    pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-python
+    pacman -S mingw-w64-x86_64-llvm mingw-w64-x86_64-libc++ mingw-w64-x86_64-lld
     pacman -S mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_ttf
     pacman -S mingw-w64-x86_64-qt5
-    pacman -S mingw-w64-i686-gcc mingw-w64-i686-libc++ mingw-w64-i686-lld mingw-w64-i686-python
+    pacman -S mingw-w64-i686-gcc mingw-w64-i686-python
+    pacman -S mingw-w64-i686-llvm mingw-w64-i686-libc++ mingw-w64-i686-lld
     pacman -S mingw-w64-i686-SDL2 mingw-w64-i686-SDL2_ttf
     pacman -S mingw-w64-i686-qt5
+    pacman -S mingw-w64-clang-aarch64-clang mingw-w64-clang-aarch64-python mingw-w64-clang-aarch64-gcc-compat
+    pacman -S mingw-w64-clang-aarch64-lld mingw-w64-clang-aarch64-llvm mingw-w64-clang-aarch64-libc++
+    pacman -S mingw-w64-clang-aarch64-SDL2 mingw-w64-clang-aarch64-SDL2_ttf
+    pacman -S mingw-w64-clang-aarch64-qt5
 
 You could use these commands to install the current version of the
 mame-essentials package and add the MAME package repository to your pacman
@@ -210,10 +239,10 @@ with helpful information on using the pacman package management tool.
 The MSYS2 environment includes two kinds of tools: MSYS2 tools designed to work
 in a UNIX-like environment on top of Windows, and MinGW tools designed to work
 in a more Windows-like environment.  The MSYS2 tools are installed in
-``/usr/bin`` while the MinGW tools are installed in ``/ming64/bin`` and/or
-``/mingw32/bin`` (relative to the MSYS2 installation directory).  MSYS2 tools
-work best in an MSYS2 terminal, while MinGW tools work best in a Microsoft
-command prompt.
+``/usr/bin`` while the MinGW tools are installed in ``/ming64/bin``,
+``/mingw32/bin`` and/or ``/clangarm64/bin`` (relative to the MSYS2 installation
+directory).  MSYS2 tools work best in an MSYS2 terminal, while MinGW tools work
+best in a Microsoft command prompt.
 
 The most obvious symptom of this is that arrow keys don’t work in interactive
 programs if you run them in the wrong kind of terminal.  If you run MinGW gdb or
@@ -222,9 +251,9 @@ be possible to interrupt an attached program with gdb.  Similarly it may be very
 difficult to edit using MSYS2 vim in a Microsoft command prompt window.
 
 MAME is built using the MinGW compilers, so the MinGW directories are included
-earlier in the ``PATH`` for the build environments.  If you want to use an
-interactive MSYS2 program from an MSYS2 shell, you may need to type the absolute
-path to avoid using the MinGW equivalent instead.
+earlier in the ``PATH`` environment variable for the build environments.  If you
+want to use an interactive MSYS2 program from an MSYS2 shell, you may need to
+type the absolute path to avoid using the MinGW equivalent instead.
 
 MSYS2 gdb may have issues debugging MinGW programs like MAME.  You may get
 better results by installing the MinGW version of gdb and running it from a
@@ -233,16 +262,19 @@ Microsoft command prompt window to debug MAME.
 GNU make supports both POSIX-style shells (e.g. bash) and the Microsoft cmd.exe
 shell.  One issue to be aware of when using the cmd.exe shell is that the
 ``copy`` command doesn’t provide a useful exit status, so file copy tasks can
-fail silently.
+fail silently.  This may cause your build to appear to succeed while producing
+incorrect results.
 
 It is not possible to cross-compile a 32-bit version of MAME using 64-bit MinGW
 tools on Windows, the 32-bit MinGW tools must be used.  This causes issues due
-to the size of MAME.  It is not possible to link a full 32-bit MAME build
-including the SDL OS-dependent layer and the Qt debugger.  GNU ld and lld will
-both run out of memory, leaving an output file that doesn’t work.  It’s also
-impossible to make a 32-bit build with full local variable symbols.  GCC may run
-out of memory, and certain source files may exceed the limit of 32,768 sections
-imposed by the PE/COFF object file format.
+to the size of MAME.  It’s impossible to make a 32-bit build with full local
+variable symbols.  GCC may run out of memory, and certain source files may
+exceed the limit of 32,768 sections imposed by the PE/COFF object file format.
+
+A complete build of MAME including line number symbols exceeds the size limit
+imposed by the PE file format and cannot be run.  Workarounds include including
+only a subset of the systems supported by MAME or extracting symbols to a
+separate file and stripping excess symbols from the MAME executable.
 
 
 .. _compiling-fedora:
@@ -353,7 +385,7 @@ above in All Platforms.
 Emscripten Javascript and HTML
 ------------------------------
 
-First, download and install Emscripten 2.0.25 or later by following the
+First, download and install Emscripten 3.1.35 or later by following the
 instructions at the `official site <https://emscripten.org/docs/getting_started/downloads.html>`_.
 
 Once Emscripten has been installed, it should be possible to compile MAME

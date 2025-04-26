@@ -305,7 +305,7 @@ void necdsp_device::execute_run()
 	do
 	{
 		// call debugger hook if necessary
-		if (device_t::machine().debug_flags & DEBUG_FLAG_ENABLED)
+		if (debugger_enabled())
 		{
 			debugger_instruction_hook(regs.pc);
 		}
@@ -387,7 +387,7 @@ void necdsp_device::exec_op(uint32_t opcode) {
 	flag.ov1 = 0;
 
 	switch(pselect) {
-		case 0: p = dataRAM[regs.dp]; break;
+		case 0: p = dataRAM[regs.dp & 0x07ff]; break;
 		case 1: p = regs.idb; break;
 		case 2: p = regs.m; break;
 		case 3: p = regs.n; break;
@@ -569,38 +569,44 @@ void necdsp_device::exec_ld(uint32_t opcode) {
 	}
 }
 
-uint8_t necdsp_device::snesdsp_read(bool mode) {
-	if (!mode)
-	{
-		return regs.sr >> 8;
-	}
+uint8_t necdsp_device::status_r()
+{
+	return regs.sr >> 8;
+}
 
+
+uint8_t necdsp_device::data_r()
+{
 	if (regs.sr.drc == 0)
 	{
 		//16-bit
 		if(regs.sr.drs == 0)
 		{
-			regs.sr.drs = 1;
+			if (!machine().side_effects_disabled())
+				regs.sr.drs = 1;
 			return regs.dr >> 0;
 		}
 		else
 		{
-			regs.sr.rqm = 0;
-			regs.sr.drs = 0;
+			if (!machine().side_effects_disabled())
+			{
+				regs.sr.rqm = 0;
+				regs.sr.drs = 0;
+			}
 			return regs.dr >> 8;
 		}
 	}
 	else
 	{
 		//8-bit
-		regs.sr.rqm = 0;
+		if (!machine().side_effects_disabled())
+			regs.sr.rqm = 0;
 		return regs.dr >> 0;
 	}
 }
 
-void necdsp_device::snesdsp_write(bool mode, uint8_t data) {
-	if (!mode) return;
-
+void necdsp_device::data_w(uint8_t data)
+{
 	if (regs.sr.drc == 0)
 	{
 		//16-bit

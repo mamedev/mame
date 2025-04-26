@@ -141,8 +141,8 @@ private:
 	void ym2203_out_b(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_lockon_tile_info);
 	void lockon_palette(palette_device &palette) const;
-	uint32_t screen_update_lockon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_vblank_lockon(int state);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_vblank(int state);
 	TIMER_CALLBACK_MEMBER(cursor_callback);
 	TIMER_CALLBACK_MEMBER(bufend_callback);
 	void scene_draw();

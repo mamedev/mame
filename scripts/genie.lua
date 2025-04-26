@@ -158,16 +158,6 @@ newoption {
 }
 
 newoption {
-	trigger = "distro",
-	description = "Choose distribution",
-	allowed = {
-		{ "generic",           "generic"            },
-		{ "debian-stable",     "debian-stable"      },
-		{ "ubuntu-intrepid",   "ubuntu-intrepid"    },
-	},
-}
-
-newoption {
 	trigger = "target",
 	description = "Building target",
 }
@@ -570,20 +560,8 @@ configuration { "gmake or ninja" }
 
 dofile ("toolchain.lua")
 
-if _OPTIONS["targetos"]=="windows" then
-	configuration { "x64" }
-		defines {
-			"X64_WINDOWS_ABI",
-		}
-	configuration { }
-end
-
 -- Avoid error when invoking genie --help.
 if (_ACTION == nil) then return false end
-
--- define PTR64 if we are a 64-bit target
-configuration { "x64 or android-*64"}
-	defines { "PTR64=1" }
 
 -- define MAME_DEBUG if we are a debugging build
 configuration { "Debug" }
@@ -702,24 +680,22 @@ else
 	}
 end
 
-if _OPTIONS["NOASM"]=="1" then
+if _OPTIONS["NOASM"] == "1" then
 	defines {
 		"MAME_NOASM"
 	}
 end
 
-if not _OPTIONS["FORCE_DRC_C_BACKEND"] then
-	if _OPTIONS["BIGENDIAN"]~="1" then
-		configuration { "x64" }
-			defines {
-				"NATIVE_DRC=drcbe_x64",
-			}
-		configuration { "x32" }
-			defines {
-				"NATIVE_DRC=drcbe_x86",
-			}
-		configuration {  }
-	end
+if _OPTIONS["FORCE_DRC_C_BACKEND"] then
+	configuration { }
+		defines {
+			"NATIVE_DRC=drcbe_c",
+		}
+elseif (_OPTIONS["PLATFORM"] == "x86") or (_OPTIONS["PLATFORM"] == "arm64") then
+	configuration { }
+		defines {
+			"ASMJIT_STATIC",
+		}
 end
 
 	defines {
@@ -1081,9 +1057,6 @@ end
 				"-Wno-error=stringop-truncation", -- ImGui again
 				"-Wno-stringop-overflow", -- generates false positives when assigning an int rvalue to a u8 variable without an explicit cast
 			}
-			buildoptions_cpp {
-				"-Wno-error=class-memaccess", -- many instances in ImGui and BGFX
-			}
 			if version >= 110000 then
 				buildoptions {
 					"-Wno-nonnull",                 -- luaengine.cpp lambdas do not need "this" captured but GCC 11.1 erroneously insists
@@ -1104,12 +1077,6 @@ end
 		end
 	end
 
-if (_OPTIONS["PLATFORM"]=="alpha") then
-	defines {
-		"PTR64=1",
-	}
-end
-
 if (_OPTIONS["PLATFORM"]=="arm") then
 	buildoptions {
 		"-Wno-cast-align",
@@ -1119,21 +1086,6 @@ end
 if (_OPTIONS["PLATFORM"]=="arm64") then
 	buildoptions {
 		"-Wno-cast-align",
-	}
-	defines {
-		"PTR64=1",
-	}
-end
-
-if (_OPTIONS["PLATFORM"]=="riscv64") then
-	defines {
-		"PTR64=1",
-	}
-end
-
-if (_OPTIONS["PLATFORM"]=="mips64") then
-	defines {
-		"PTR64=1",
 	}
 end
 
@@ -1166,26 +1118,24 @@ configuration { "asmjs" }
 		"-O" .. _OPTIONS["OPTIMIZE"],
 		"-s USE_SDL=2",
 		"-s USE_SDL_TTF=2",
-		"--memory-init-file 0",
 		"-s DEFAULT_LIBRARY_FUNCS_TO_INCLUDE=\"['\\$$ERRNO_CODES']\"",
 		"-s EXPORTED_FUNCTIONS=\"['_main', '_malloc', '__ZN15running_machine30emscripten_get_running_machineEv', '__ZN15running_machine17emscripten_get_uiEv', '__ZN15running_machine20emscripten_get_soundEv', '__ZN15mame_ui_manager12set_show_fpsEb', '__ZNK15mame_ui_manager8show_fpsEv', '__ZN13sound_manager4muteEbh', '_SDL_PauseAudio', '_SDL_SendKeyboardKey', '__ZN15running_machine15emscripten_saveEPKc', '__ZN15running_machine15emscripten_loadEPKc', '__ZN15running_machine21emscripten_hard_resetEv', '__ZN15running_machine21emscripten_soft_resetEv', '__ZN15running_machine15emscripten_exitEv']\"",
 		"-s EXPORTED_RUNTIME_METHODS=\"['cwrap']\"",
 		"-s ERROR_ON_UNDEFINED_SYMBOLS=0",
-		"-s USE_WEBGL2=1",
-		"-s LEGACY_GL_EMULATION=1",
-		"-s GL_UNSAFE_OPTS=0",
+		"-s STACK_SIZE=5MB",
+		"-s MAX_WEBGL_VERSION=2",
 		"--pre-js " .. _MAKE.esc(MAME_DIR) .. "src/osd/modules/sound/js_sound.js",
 		"--post-js " .. _MAKE.esc(MAME_DIR) .. "scripts/resources/emscripten/emscripten_post.js",
 		"--embed-file " .. _MAKE.esc(MAME_DIR) .. "bgfx/chains@bgfx/chains",
 		"--embed-file " .. _MAKE.esc(MAME_DIR) .. "bgfx/effects@bgfx/effects",
 		"--embed-file " .. _MAKE.esc(MAME_DIR) .. "bgfx/shaders/essl@bgfx/shaders/essl",
 		"--embed-file " .. _MAKE.esc(MAME_DIR) .. "artwork/bgfx@artwork/bgfx",
+		"--embed-file " .. _MAKE.esc(MAME_DIR) .. "artwork/lut-default.png@artwork/lut-default.png",
 		"--embed-file " .. _MAKE.esc(MAME_DIR) .. "artwork/slot-mask.png@artwork/slot-mask.png",
 	}
 	if _OPTIONS["SYMBOLS"]~=nil and _OPTIONS["SYMBOLS"]~="0" then
 		linkoptions {
 			"-g" .. _OPTIONS["SYMLEVEL"],
-			"-s DEMANGLE_SUPPORT=1",
 		}
 	end
 	if _OPTIONS["WEBASSEMBLY"] then
@@ -1201,11 +1151,12 @@ configuration { "asmjs" }
 		-- define a fixed memory size because allowing memory growth disables asm.js optimizations
 		linkoptions {
 			"-s ALLOW_MEMORY_GROWTH=0",
-			"-s TOTAL_MEMORY=268435456",
+			"-s INITIAL_MEMORY=256MB",
 		}
 	else
 		linkoptions {
 			"-s ALLOW_MEMORY_GROWTH=1",
+			"-s INITIAL_MEMORY=24MB"
 		}
 	end
 	archivesplit_size "20"
@@ -1225,12 +1176,6 @@ configuration { "linux-*" }
 		flags {
 			"LinkSupportCircularDependencies",
 		}
-		if _OPTIONS["distro"]=="debian-stable" then
-			defines
-			{
-				"NO_AFFINITY_NP",
-			}
-		end
 
 
 configuration { "freebsd or netbsd" }

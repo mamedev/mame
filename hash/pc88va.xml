@@ -82,7 +82,7 @@ Operating Systems
 -->
 
 
-<!-- Demos and Utilities -->
+<!-- !Demos -->
 
 	<!-- These three demos all have the same sequences, mislabeled? -->
 	<software name="pc88vad" cloneof="88va2d" supported="no">
@@ -90,8 +90,8 @@ Operating Systems
 		<year>19??</year>
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
-1st sequence should [OFX/OFY] scroll, half height [gfx] layer
-3rd sequence has half height [gfx] layer
+1st sequence should [OFX/OFY] scroll
+3rd sequence looks slow, [SGP]?
 Transition fades out too late, sprite should supposedly fade out before reaching top of screen, requires [IDP] IBF flag
 Transition between 3rd and 4th sequences don't look right, [IDP]
 ]]></notes>
@@ -110,10 +110,7 @@ Transition between 3rd and 4th sequences don't look right, [IDP]
 		<year>19??</year>
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
-1st sequence should [OFX/OFY] scroll, half height [gfx] layer
-3rd sequence has half height [gfx] layer
-Transition fades out too late, sprite should supposedly fade out before reaching top of screen, requires [IDP] IBF flag
-Transition between 3rd and 4th sequences don't look right, [IDP]
+(same as pc88vad)
 ]]></notes>
 		<info name="alt_title" value="88VA1 店頭デモ" />
 		<part name="flop1" interface="floppy_5_25">
@@ -128,10 +125,7 @@ Transition between 3rd and 4th sequences don't look right, [IDP]
 		<year>19??</year>
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
-1st sequence should [OFX/OFY] scroll, half height [gfx] layer
-3rd sequence has half height [gfx] layer
-Transition fades out too late, sprite should supposedly fade out before reaching top of screen, requires [IDP] IBF flag
-Transition between 3rd and 4th sequences don't look right, [IDP]
+(same as pc88vad)
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1331888">
@@ -139,6 +133,8 @@ Transition between 3rd and 4th sequences don't look right, [IDP]
 			</dataarea>
 		</part>
 	</software>
+
+<!-- !Applications -->
 
 	<software name="animefrm" supported="no">
 		<!-- PS88-VA101-HMW subtitle on cover -->
@@ -149,6 +145,8 @@ Transition between 3rd and 4th sequences don't look right, [IDP]
 [gfx] status bar has wrong colors [OFX/OFY]
 ]]></notes>
 		<info name="alt_title" value="アニメフレーマー" />
+		<sharedfeat name="mouseport_default" value="mouse"/>
+
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Program Disk" />
 			<dataarea name="flop" size="1338960">
@@ -173,6 +171,7 @@ Transition between 3rd and 4th sequences don't look right, [IDP]
 		<notes><![CDATA[
 [gfx] status bar has wrong colors [OFX/OFY]
 ]]></notes>
+		<sharedfeat name="mouseport_default" value="mouse"/>
 		<!-- labels were swapped -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Program Disk" />
@@ -194,8 +193,8 @@ Transition between 3rd and 4th sequences don't look right, [IDP]
 		<year>1989</year>
 		<publisher>Music Network</publisher>
 		<notes><![CDATA[
-Very broken GFXs with extensive $510 [ROP] writes
-Has unsupported MIF-201 [MIDI] interface cfr. http://www.pc88.gr.jp/vafaq/view.php/article/88va/vafaq/71
+Uses opaque pen for [gfx] layer (white on black)
+Incomplete MIF-201 [MIDI] emulation
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1331888">
@@ -204,16 +203,22 @@ Has unsupported MIF-201 [MIDI] interface cfr. http://www.pc88.gr.jp/vafaq/view.p
 		</part>
 	</software>
 
+<!-- !Operating Systems -->
+
 	<software name="pceva2tb" supported="no">
 		<description>PC-Engine (VA2 Tenpu-ban)</description>
 		<year>1988</year>
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
 Has HDFORM.COM utility
-Unsupported features in batch files
-Untested directory NEC_SAMP (cannot type [keyboard] underscore char)
+JTERM.BAT is for connecting to a PC-VAN or ANSI [terminal]
+PCALC.BAT requires [keyboard] PC+V press to bring up
+SKYBD.BAT wants a radio cassette player and a PC-KD861 color monitor for audio sampling thru OPNA EOS
+VIDEO.BAT has various superimpose effects, requires dedicated board
 ]]></notes>
 		<info name="alt_title" value="PC-Engine(VA2添付版)" />
+		<sharedfeat name="mouseport_default" value="mouse"/>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1338960">
 				<rom name="pc-engine (va2 tenpu-ban).d88" size="1338960" crc="3c2cf3c5" sha1="e92694e060f46037fd2cdf11ad1f2d75c5121de2"/>
@@ -226,11 +231,11 @@ Untested directory NEC_SAMP (cannot type [keyboard] underscore char)
 		<year>1988</year>
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
-Has HDFORM.COM utility
-Unsupported features in batch files
-Untested directory NEC_SAMP (cannot type [keyboard] underscore char)
+(same as pceva2tb)
 ]]></notes>
-		<!-- baddump: NEC_SAMP directory edited in 2010 -->
+		<sharedfeat name="mouseport_default" value="mouse"/>
+
+		<!-- baddump: NEC_SAMP directory edited in 2010 (no active changes inside, remnants of a deleted file?) -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1331888">
 				<rom name="pc-engine 1.1 os.d88" size="1331888" crc="17d2e121" sha1="b88095cae4238a68833435ac0e3414081cb5a13b" status="baddump"/>
@@ -239,14 +244,14 @@ Untested directory NEC_SAMP (cannot type [keyboard] underscore char)
 	</software>
 
 
-<!-- Games -->
+<!-- !Games -->
 
 	<software name="famista" supported="no">
 		<description>Family Stadium</description>
 		<year>19??</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
 		<notes><![CDATA[
-[SGP] playfield artifacts
+[SGP] playfield artifacts (press button 2 from pitcher side in 2p play)
 Lists dual port 1/2 as a unsupported [DE-9] input method
 Winning newspaper screen has [OFX/OFY] bug
 How to exit from attract mode once you enter it?
@@ -281,12 +286,8 @@ How to exit from attract mode once you enter it?
 		<year>19??</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
 		<notes><![CDATA[
-[SGP] playfield artifacts
-Lists dual port 1/2 as a unsupported [DE-9] input method
-Winning newspaper screen has [OFX/OFY] bug
-How to exit from attract mode once you enter it?
+(same as famista)
 ]]></notes>
-
 		<info name="alt_title" value="ファミリースタジアム" />
 		<info name="usage" value="Menuing works with keyboard only until game prompts you to use a joystick"/>
 		<!--combined image-->
@@ -312,9 +313,8 @@ How to exit from attract mode once you enter it?
 		<year>19??</year>
 		<publisher>ゲームアーツ (Game Arts)</publisher>
 		<notes><![CDATA[
-[SGP] playfield artifacts
-Lists dual port 1/2 as a unsupported [DE-9] input method
-Winning newspaper screen has [OFX/OFY] bug
+(same as famista)
+Runs slow in gameplay
 ]]></notes>
 		<info name="alt_title" value="ファミリースタジアム'89ペナントレース編" />
 
@@ -345,7 +345,7 @@ Winning newspaper screen has [OFX/OFY] bug
 		<year>198?</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<notes><![CDATA[
-Main menu clearing artifacts [ROP]
+Needs [IDP] text display to go off for bottommost row (bumps strip 1 height from 384 to 400)
 ]]></notes>
 		<info name="alt_title" value="マイトアンドマジック" />
 		<info name="usage" value="Boot with Disk C in drive 1"/>
@@ -380,6 +380,8 @@ Main menu clearing artifacts [ROP]
 Burps on [FDC] access after disk swap with program and player disks, trying to scan chrn=(4, 0, 1, 256)
 ]]></notes>
 		<info name="alt_title" value="マイトアンドマジック2" />
+		<sharedfeat name="mouseport_default" value="mouse"/>
+
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Boot Disk" />
 			<dataarea name="flop" size="1296112">
@@ -414,10 +416,12 @@ Burps on [FDC] access after disk swap with program and player disks, trying to s
 		<year>1987</year>
 		<publisher>ウインキーソフト (Winky Soft)</publisher>
 		<notes><![CDATA[
-Map select uses [ROP]
-Needs graphic [OFX/OFY] scroll on gameplay
+Display off in places during intro
+[gfx] broken scroll bases for main menu
+[gfx] Requires fractional DOT scrolling (horizontal)
+[gfx] wrong draw mode for status bar in gameplay
+[gfx] needs cliprect at gameplay startup
 Unplayable with [keyboard]
-Gameplay start with [cliprect] mask effect
 ]]></notes>
 		<info name="alt_title" value="オルテウス" />
 		<info name="usage" value="Kana Lock on pauses the game"/>
@@ -456,10 +460,7 @@ Gameplay start with [cliprect] mask effect
 		<year>1987</year>
 		<publisher>ウインキーソフト (Winky Soft)</publisher>
 		<notes><![CDATA[
-Map select uses [ROP]
-Needs graphic [OFX/OFY] scroll on gameplay
-Unplayable with [keyboard]
-Gameplay start with [cliprect] mask effect
+(same as olteus)
 ]]></notes>
 		<info name="alt_title" value="オルテウス" />
 		<info name="usage" value="Kana Lock on pauses the game"/>
@@ -498,9 +499,9 @@ Gameplay start with [cliprect] mask effect
 		<year>1988</year>
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
-Various [SGP] issues during gameplay
-Intro uses [cliprect] effects
-Needs graphic [OFX/OFY] scroll
+[SGP] extensive VD usage in gameplay
+[gfx] intro uses cliprect
+[gfx] Requires fractional DOT scrolling (horizontal)
 ]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1296112">
@@ -523,6 +524,7 @@ Needs graphic [OFX/OFY] scroll
 Burps on [FDC] access after disk swap with program and player disks, trying to scan chrn=(38, 0, 1, 256)
 ]]></notes>
 		<info name="alt_title" value="ローグアライアンス" />
+		<sharedfeat name="mouseport_default" value="mouse"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Boot Disk" />
@@ -539,7 +541,7 @@ Burps on [FDC] access after disk swap with program and player disks, trying to s
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Play Disk" />
+			<feature name="part_id" value="Player Disk" />
 			<dataarea name="flop" size="1128880">
 				<rom name="rogue alliance(playdisk) (star craft).d88" size="1128880" crc="eefc9724" sha1="350ec250eb63a080322e79f2509eae7efd6a109b"/>
 			</dataarea>
@@ -552,12 +554,13 @@ Burps on [FDC] access after disk swap with program and player disks, trying to s
 		<publisher>システムソフト (System Soft)</publisher>
 		<notes><![CDATA[
 Needs [dac1bit] clicks on gameplay
-[mouse] is a requirement?
 May crash with disk error when entering winning animation (verify)
 Winning animation is glitchy [OFX/OFY]?, uses [IDP] text transpen with upper bits set (for flame effect?), press mouse left button to return to game
 [OPNA] seems to cut off shortly on intro and winning screen compared to VAEG
 ]]></notes>
 		<info name="alt_title" value="上海" />
+		<sharedfeat name="mouseport_default" value="mouse"/>
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1296112">
 				<rom name="shang-hai (system soft).d88" size="1296112" crc="b567190e" sha1="68ca3d14e0ea12637c5f7b1c2244f0370c3abc5e"/>
@@ -570,12 +573,15 @@ Winning animation is glitchy [OFX/OFY]?, uses [IDP] text transpen with upper bit
 		<year>1987</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<notes><![CDATA[
-Opening has a few weird places for [gfx] priority and half height [gfx]
-Has [SGP] and [ROP] artifacts
+[gfx] needs cliprect and primask pen during intro
+Runs at half speed
+[IDP] sprites wraparound on left edge
 Omake: if sound irqs don't run then needs to press key 0 pad to move on
 ]]></notes>
 		<info name="alt_title" value="神羅万象"/>
 		<info name="usage" value="Hold enter at boot to skip intro, press F2 on title screen to load a game, press F5 for sound test" />
+
+		<!-- baddump: non-factory save -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1331888">
@@ -586,7 +592,7 @@ Omake: if sound irqs don't run then needs to press key 0 pad to move on
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1296112">
-				<rom name="shinra bansho(diskb) (nihon telenet).d88" size="1296112" crc="1ee8acdf" sha1="4e0cab59ec6707f848b28b056040be835e2357ed"/>
+				<rom name="shinra bansho(diskb) (nihon telenet).d88" size="1296112" crc="1ee8acdf" sha1="4e0cab59ec6707f848b28b056040be835e2357ed" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -785,7 +791,6 @@ Enables [FDC] PIO mode, black screen
 		<year>1988</year>
 		<publisher>B·P·S (Bullet-Proof Software)</publisher>
 		<notes><![CDATA[
-Uses direct color layers, white screens with sound, bypass by changing m_video_pri_reg in debugger to ab89 0000
 Fails [floppy] copy protection, draws "TETRIS IS ONLY 6,800 YEN" on title screen with annoying SFX covering the BGM
 ]]></notes>
 		<info name="release" value="19881222"/>
@@ -805,8 +810,9 @@ Fails [floppy] copy protection, draws "TETRIS IS ONLY 6,800 YEN" on title screen
 		<year>1992</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
 		<notes><![CDATA[
-Heavy [ROP] artifacts on setup menu and opening, crashes with black screen at the end
-Crashes if directly selecting new game
+[IDP] doesn't disable PC-Engine OS function strip during intro (same as mightmag?)
+Runs too slow
+Black screen if directly selecting new game or after intro
 Has unemulated [MIDI] options
 ]]></notes>
 		<info name="release" value="199201xx"/>
@@ -867,27 +873,30 @@ Has unemulated [MIDI] options
 		<year>1990</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
 		<notes><![CDATA[
-Half height [gfx]s
-Heavy [ROP] artifacts during gameplay
+[IDP] doesn't disable PC-Engine OS function strip until after few moments in intro (same as mightmag?)
 Optionally wants kana lock enabled for entering a name for new game [keyboard] irq
+Not extensively tested
 ]]></notes>
 		<info name="release" value="19901102"/>
-		<info name="usage" value="Boot with disk 2 in drive A: for gameplay"/>
+		<info name="usage" value="Boot with disk 2 in drive A: for going straight in gameplay"/>
 
 		<!-- status: baddump for non-factory save 1 -->
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1281968">
 				<rom name="xak 2 (disk 1).d88" size="1281968" crc="cd855b7a" sha1="508e25ca306631be64e69e476d49116e7ac04bce" />
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1281968">
 				<rom name="xak 2 (disk 2).d88" size="1281968" crc="3927cdcf" sha1="555daba18a61ea2219b5685a850b512dea085cf2" status="baddump"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1281968">
 				<rom name="xak 2 (disk 3).d88" size="1281968" crc="42e25779" sha1="897b62c7fdb604f5bb729e0aeb183566e08c4e33" status="baddump"/>
 			</dataarea>
@@ -899,34 +908,37 @@ Optionally wants kana lock enabled for entering a name for new game [keyboard] i
 		<year>1991</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
 		<notes><![CDATA[
-Heavy [ROP] artifacts on intro
-Sprites don't draw properly during gameplay [ROP]
+Runs too slow, [SGP]?
 Ugly pitch for [OPNA] voice samples on intro
-[gfx]s have halved height
+Not extensively tested
 ]]></notes>
 		<info name="release" value="19911220"/>
 		<info name="alt_title" value="フレイ"/>
 		<info name="usage" value="Boot with disk 2 in drive A: for gameplay"/>
 
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1261568">
 				<rom name="fray - in magical adventure (disk 1).fdi" size="1261568" crc="3a88990a" sha1="252e2589bb8c12800cdd678508b0abd868d0ab83"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1261568">
 				<rom name="fray - in magical adventure (disk 2).fdi" size="1261568" crc="9cbfb7b4" sha1="b040e4ed4e3e516effb1f6997b0f766f4b376ab4"/>
 			</dataarea>
 		</part>
 
 		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3" />
 			<dataarea name="flop" size="1261568">
 				<rom name="fray - in magical adventure (disk 3).fdi" size="1261568" crc="9f79f4bb" sha1="2d3ebbaa844bd451190d899a7f53829b07b830eb"/>
 			</dataarea>
 		</part>
 
 		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4" />
 			<dataarea name="flop" size="1261568">
 				<rom name="fray - in magical adventure (disk 4).fdi" size="1261568" crc="c074800a" sha1="bf114221bdcc8e6545c4566ae58cea1af324aa9a"/>
 			</dataarea>
@@ -935,29 +947,26 @@ Ugly pitch for [OPNA] voice samples on intro
 
 <!-- Dual floppies, should work both on the PC88VA and on the X68000 (usually you just have to switch the first two disks depending on the system) -->
 	<!-- TODO: move to a shared SW list -->
-	<!-- TODO: all these .xdf entries wants Disk B as drive A: for 88VA -->
+	<!-- TODO: all these .xdf entries wants Disk B as drive A: for 88VA, annoyingly -->
 
-	<software name="abunaten" supported="no">
+	<software name="abunaten" supported="partial">
 		<description>Abunai Tengu Densetsu</description>
 		<year>1989</year>
 		<publisher>アリスソフト (Alicesoft)</publisher>
-		<notes><![CDATA[
-Loads N88 BASIC then jumps to lalaland [FDC]
-]]></notes>
 		<info name="release" value="198910xx"/>
 		<info name="alt_title" value="あぶない天狗伝説 (or あぶないてんぐ伝説 )"/>
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A" />
+			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261568">
-				<rom name="disk a.xdf" size="1261568" crc="7614c8af" sha1="eeea190cf882eb91b55965553cf3bac64f09dee0"/>
+				<rom name="disk b.xdf" size="1261568" crc="9e83829f" sha1="e171236054d08b78b30657a3f7132e179de9a0cf"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B" />
+			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="disk b.xdf" size="1261568" crc="9e83829f" sha1="e171236054d08b78b30657a3f7132e179de9a0cf"/>
+				<rom name="disk a.xdf" size="1261568" crc="7614c8af" sha1="eeea190cf882eb91b55965553cf3bac64f09dee0"/>
 			</dataarea>
 		</part>
 
@@ -969,27 +978,25 @@ Loads N88 BASIC then jumps to lalaland [FDC]
 		</part>
 	</software>
 
-	<software name="cresmoon" supported="no">
+	<software name="cresmoon" supported="partial">
 		<description>Crescent Moon Girl</description>
 		<year>1989</year>
 		<publisher>アリスソフト (Alicesoft)</publisher>
-		<notes><![CDATA[
-Loads N88 BASIC then jumps to lalaland [FDC]
-]]></notes>
 		<info name="release" value="198908xx"/>
 		<info name="alt_title" value="クレセントムーンがぁる"/>
+		<info name="usage" value="Mount Disk B in drive A to boot" />
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A" />
+			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261568">
-				<rom name="disk a.xdf" size="1261568" crc="ccebcb01" sha1="fc6c8913c9e0fc70b0983d0d2dc8837e441ae567"/>
+				<rom name="disk b.xdf" size="1261568" crc="702de57e" sha1="1d7bfbcb3a2543abfadec1a5d999386994763384"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B" />
+			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="disk b.xdf" size="1261568" crc="702de57e" sha1="1d7bfbcb3a2543abfadec1a5d999386994763384"/>
+				<rom name="disk a.xdf" size="1261568" crc="ccebcb01" sha1="fc6c8913c9e0fc70b0983d0d2dc8837e441ae567"/>
 			</dataarea>
 		</part>
 
@@ -1001,27 +1008,24 @@ Loads N88 BASIC then jumps to lalaland [FDC]
 		</part>
 	</software>
 
-	<software name="dps" supported="no">
+	<software name="dps" supported="partial">
 		<description>D.P.S - Dream Program System</description>
 		<year>1989</year>
 		<publisher>アリスソフト (Alicesoft)</publisher>
-		<notes><![CDATA[
-Loads N88 BASIC then jumps to lalaland [FDC]
-]]></notes>
 		<info name="release" value="198912xx"/>
 		<info name="alt_title" value="ディー・ピー・エス - ドリームプログラムシステム"/>
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A" />
+			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261568">
-				<rom name="disk a.xdf" size="1261568" crc="f6078845" sha1="f1695e9b313daba8a93ee2d74aefe833262078f4"/>
+				<rom name="disk b.xdf" size="1261568" crc="224d3faf" sha1="300cf05020e91069c0fd54d2d992e5b7acccd1c9"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B" />
+			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="disk b.xdf" size="1261568" crc="224d3faf" sha1="300cf05020e91069c0fd54d2d992e5b7acccd1c9"/>
+				<rom name="disk a.xdf" size="1261568" crc="f6078845" sha1="f1695e9b313daba8a93ee2d74aefe833262078f4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1142,22 +1146,22 @@ Loads N88 BASIC then jumps to lalaland [FDC]
 		<year>1989</year>
 		<publisher>アリスソフト (Alicesoft)</publisher>
 		<notes><![CDATA[
-Loads N88 BASIC then jumps to lalaland [FDC]
+Throws "ERR=7 8550, Break in 60050" after prologue
 ]]></notes>
 		<info name="release" value="198907xx"/>
 		<info name="alt_title" value="ランス 光を求めて"/>
 
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk A" />
+			<feature name="part_id" value="Disk B" />
 			<dataarea name="flop" size="1261568">
-				<rom name="disk a.xdf" size="1261568" crc="7512d4ff" sha1="a442213bf7330548ef012f3e0623b1df5fb2142e"/>
+				<rom name="disk b.xdf" size="1261568" crc="fa088a6f" sha1="7ddcace8d5e42a75b0ca30f262f71159844ee69d"/>
 			</dataarea>
 		</part>
 
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk B" />
+			<feature name="part_id" value="Disk A" />
 			<dataarea name="flop" size="1261568">
-				<rom name="disk b.xdf" size="1261568" crc="fa088a6f" sha1="7ddcace8d5e42a75b0ca30f262f71159844ee69d"/>
+				<rom name="disk a.xdf" size="1261568" crc="7512d4ff" sha1="a442213bf7330548ef012f3e0623b1df5fb2142e"/>
 			</dataarea>
 		</part>
 
@@ -1229,17 +1233,17 @@ All disks fail initial bootstrap [FDC]
 	</software>
 
 
-<!-- Doujin -->
+<!-- !Doujinshi -->
 
 	<software name="ballbrkr" supported="no">
 		<description>Balloon Breaker</description>
 		<year>1996</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<notes><![CDATA[
-Requires [ROP] for intro and title screen
-Has badly colored sprites on character select
-Doesn't draw background in gameplay, uses direct color layers
-Has unemulated [SGP] operand for shot 1
+[gfx] unhandled RGB565 transparency
+[gfx] Glitched screen right after selecting new game
+[gfx] Has badly colored sprites on character select, needs h/v scrolling for background
+[gfx] Requires fractional DOT scrolling (horizontal) starting from stage 2
 ]]></notes>
 		<info name="developer" value="Fredia" />
 		<info name="alt_title" value="ばる〜んぶ れ〜か〜" />
@@ -1255,8 +1259,7 @@ Has unemulated [SGP] operand for shot 1
 		<year>1996</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<notes><![CDATA[
-Title screen has [SGP] artifacts
-Needs graphic [OFX/OFY] scroll on gameplay
+[gfx] requires h/v scrolling for background and gameplay
 ]]></notes>
 		<info name="developer" value="Fredia" />
 		<part name="flop1" interface="floppy_5_25">
@@ -1272,8 +1275,9 @@ Needs graphic [OFX/OFY] scroll on gameplay
 		<year>2006</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<notes><![CDATA[
-Broken graphics [SGP] or [cliprect]
-15.7 kHz has doubled height [gfx]
+[gfx] uses various forms of cliprect mask
+[IDP] doesn't disable PC-Engine OS function strip (same as mightmag?)
+Runs too slow, no sound?
 ]]></notes>
 		<info name="developer" value="Shinra" />
 		<info name="alt_title" value="ハレ晴レユカイ" />
@@ -1296,8 +1300,10 @@ Broken graphics [SGP] or [cliprect]
 		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<notes><![CDATA[
-Title screen doesn't show text layer, [cliprect]? (verify)
-Needs [OFX/OFY] on gameplay
+[gfx] Title screen doesn't show text layer? (verify)
+[IDP] sprites wraparound on left edge
+Runs too slow
+Crashes after stage 1
 ]]></notes>
 		<info name="developer" value="LOKAPALA" />
 		<info name="alt_title" value="ハティの空で" />
@@ -1308,14 +1314,42 @@ Needs [OFX/OFY] on gameplay
 		</part>
 	</software>
 
+	<!-- NOTE: PACMAN.SPR has 1989 timestamp in both sets, outsourced from something else? -->
+	<software name="pacman" supported="partial">
+		<description>Pac-Man</description>
+		<year>2006?</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Shinra" />
+		<info name="usage" value="Boot a PC-Engine OS disk, then swap with this disk and type BASIC PACMAN.BAS to load" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1331888">
+				<rom name="pacman.d88" size="1331888" crc="9198eae1" sha1="2abf462b72c29e2ff56ea7c1401836f01b97dfe1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- autobootable version of above, with PC-Engine OS embedded -->
+	<software name="pacmana" cloneof="pacman" supported="partial">
+		<description>Pac-Man (auto-bootable)</description>
+		<year>2011?</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="developer" value="Shinra" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1281968">
+				<rom name="pacmana.d88" size="1281968" crc="14ecc6d5" sha1="a0d4b7fa7c68323a8542d3739782d216ffab85a6"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="upo" supported="no">
 		<description>Saishuu Heiki UPO (Pre-Release)</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<notes><![CDATA[
-Broken Upyolic logo [ROP]
+[gfx] Gameplay don't mask bullets on right side
+[gfx] background needs vertical scrolling
+Runs too slow
 Needs joystick in otherwise it loops on title screen
-Gameplay don't mask bullets on right side, [cliprect]
 ]]></notes>
 		<info name="developer" value="Upyolic Soft" />
 		<info name="alt_title" value="最終平気UPOプレリリース" />
@@ -1326,40 +1360,241 @@ Gameplay don't mask bullets on right side, [cliprect]
 		</part>
 	</software>
 
-	<software name="pacman" supported="no">
-		<description>Pac-Man</description>
-		<year>19??</year>
-		<publisher>&lt;doujin&gt;</publisher>
+<!-- !Inufuto -->
+
+	<software name="aerial" supported="no">
+		<description>Aerial</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
 		<notes><![CDATA[
-[SGP] and [ROP] issues on gameplay
+[gfx] Requires fractional DOT scrolling (horizontal)
+[gfx] Should require color primask for right panel score display
+[DE-9] keeps shooting when player press button first time around
+https://youtu.be/7ltdrUPz91w
 ]]></notes>
-		<info name="developer" value="Shinra" />
-		<info name="usage" value="Boot a PC Engine OS disk, then swap with this disk and type BASIC PACMAN.BAS to load" />
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1331888">
-				<rom name="pacman.d88" size="1331888" crc="9198eae1" sha1="2abf462b72c29e2ff56ea7c1401836f01b97dfe1"/>
+			<dataarea name="flop" size="761008">
+				<rom name="aerial.d88" size="761008" crc="e10f8f49" sha1="e02e56d202b1d99165ec6fc9958a28613a14af18"/>
 			</dataarea>
 		</part>
 	</software>
 
-	<!-- autobootable version of above, with PC Engine OS embedded -->
-	<software name="pacmana" cloneof="pacman" supported="no">
-		<description>Pac-Man (auto-bootable)</description>
-		<year>19??</year>
-		<publisher>&lt;doujin&gt;</publisher>
+	<software name="antiair" supported="partial">
+		<description>AntiAir</description>
+		<year>2024</year>
+		<publisher>Inufuto</publisher>
 		<notes><![CDATA[
-[SGP] and [ROP] issues on gameplay
+https://youtu.be/ygLhn4H-3Ao
 ]]></notes>
-		<info name="developer" value="Shinra" />
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1281968">
-				<rom name="pacmana.d88" size="1281968" crc="14ecc6d5" sha1="a0d4b7fa7c68323a8542d3739782d216ffab85a6"/>
+			<dataarea name="flop" size="761008">
+				<rom name="antiair.d88" size="761008" crc="9f95b94d" sha1="9f23858356ba48532a05b7b0c9ca648491fe8231"/>
 			</dataarea>
 		</part>
 	</software>
 
+	<software name="ascend" supported="partial">
+		<description>Ascend</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<notes><![CDATA[
+https://youtu.be/JyGXxxOpMos
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="761008">
+				<rom name="ascend.d88" size="761008" crc="1e1d4dda" sha1="0da760e99c22fdf3cdbeaed5810728db726ec2cb"/>
+			</dataarea>
+		</part>
+	</software>
 
-<!-- PC88 Images which have been patched to work on the VA? -->
+	<software name="battlot" supported="no">
+		<description>Battlot</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<notes><![CDATA[
+[DE-9] keeps shooting when player press button first time around
+https://youtu.be/STaoHIbmCFY
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="761008">
+				<rom name="Battlot.d88" size="761008" crc="2084f423" sha1="65e5bc5a778dbc2bcb30176906106c010d7aec86"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bootskell" supported="partial">
+		<description>Bootskell</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<notes><![CDATA[
+https://youtu.be/GHJy6X21B3I
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="761008">
+				<rom name="bootskell.d88" size="761008" crc="7fc74622" sha1="6230a3aadabb7340c1d460017547fddad4d5e320"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cacorm" supported="partial">
+		<description>Cacorm</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<notes><![CDATA[
+https://youtu.be/qRZHbiBbqwU
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="761008">
+				<rom name="cacorm.d88" size="761008" crc="52345a89" sha1="d2d6e557851532157dc866f7bf1be9b654a3b230"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavit" supported="partial">
+		<description>Cavit</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<notes><![CDATA[
+https://youtu.be/oDb9-Bbwe6Q
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="761008">
+				<rom name="cavit.d88" size="761008" crc="40a303d1" sha1="427da321340b012a1447c1e3b641453e18c667e4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cracky" supported="partial">
+		<description>Cracky</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<notes><![CDATA[
+https://youtu.be/oJEUR7FhVlU
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="761008">
+				<rom name="cracky.d88" size="761008" crc="8c4280aa" sha1="22ef6e02d38daca0f874aeec8fee3811e90afe76"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="guntus" supported="no">
+		<description>Guntus</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<notes><![CDATA[
+Randomly draws with the wrong [gfx] wrong palette bank, [FDC]?
+https://youtu.be/zMWhBRD8cdM
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="761008">
+				<rom name="guntus.d88" size="761008" crc="55e693e5" sha1="b889c511fa7cecfdb7002e284388d4b685d45dd5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hopman" supported="no">
+		<description>Hopman</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<notes><![CDATA[
+Runs too slow
+https://youtu.be/zxy8lTZ_w_k
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="761008">
+				<rom name="hopman.d88" size="761008" crc="4428efdf" sha1="3d7be02ca18ada3ac5cc619ea05a2962ee10b03a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="impetus" supported="no">
+		<description>Impetus</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<notes><![CDATA[
+Randomly draws with the wrong [gfx] wrong palette bank, [FDC]?
+https://youtu.be/JIK3ruhURG4
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="761008">
+				<rom name="impetus.d88" size="761008" crc="2d8297b7" sha1="964f3dc7da3ca9b1813c5b962b8d7af8b6aada45"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lift" supported="partial">
+		<description>Lift</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<notes><![CDATA[
+https://youtu.be/ggtnO4vv_l8
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="761008">
+				<rom name="lift.d88" size="761008" crc="10ff7af8" sha1="c33269e3aff36f3b7ed79e1298c9f722f43a8317"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="neuras" supported="partial">
+		<description>Neuras</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<notes><![CDATA[
+https://youtu.be/LnvQwy62YZ4
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="761008">
+				<rom name="neuras.d88" size="761008" crc="252d2e71" sha1="8c122404d2491ca2b8b591bea7faeec12fb16fd5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="osotos" supported="partial">
+		<description>Osotos</description>
+		<year>2024</year>
+		<publisher>Inufuto</publisher>
+		<notes><![CDATA[
+https://youtu.be/yLf945xs23Y
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="761008">
+				<rom name="osotos.d88" size="761008" crc="536eced5" sha1="06dd908b2f0b2ce8c288f33bfa4a0e7074b3d880"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ruptus" supported="no">
+		<description>Ruptus</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<notes><![CDATA[
+Randomly draws with the wrong [gfx] wrong palette bank, [FDC]?
+https://youtu.be/JtRkC5ffaYc
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="761008">
+				<rom name="ruptus.d88" size="761008" crc="5acfb8ab" sha1="cf65558877a76668fa3d4e0037b49a337e686d00"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yewdow" supported="partial">
+		<description>Yewdow</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<notes><![CDATA[
+https://youtu.be/HlUe7QijzaA
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="761008">
+				<rom name="yewdow.d88" size="761008" crc="0155838b" sha1="8b2cdf3a52312e2ee0aecb1d4f7c3a6c936127d8"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- !Hacked PC88 Images which have been patched to work on the VA? -->
 	<!-- is this legit? -->
 	<!-- TODO: None of the disks are bootable from V3 Mode, boots from pc8801ma by quick glance so likely belongs to pc8801_flop.xml, move once we have working V2 emulation mode -->
 	<software name="midgarts" supported="no">

@@ -3517,16 +3517,16 @@ void debugger_commands::execute_trace(const std::vector<std::string_view> &param
 	using namespace std::literals;
 	if (!util::streqlower(filename, "off"sv))
 	{
-		std::ios_base::openmode mode = std::ios_base::out;
+		std::ios_base::openmode mode;
 
 		// opening for append?
 		if ((filename[0] == '>') && (filename[1] == '>'))
 		{
-			mode |= std::ios_base::ate;
+			mode = std::ios_base::in | std::ios_base::out | std::ios_base::ate;
 			filename = filename.substr(2);
 		}
 		else
-			mode |= std::ios_base::trunc;
+			mode = std::ios_base::out | std::ios_base::trunc;
 
 		f = std::make_unique<std::ofstream>(filename.c_str(), mode);
 		if (f->fail())

@@ -329,6 +329,7 @@ void ncr53c90_device::step(bool timeout)
 		reset_disconnect();
 
 		if (!(config & 0x40)) {
+			LOG("SCSI reset interrupt\n");
 			istatus |= I_SCSI_RESET;
 			check_irq();
 		}
@@ -802,9 +803,7 @@ void ncr53c90_device::bus_complete()
 
 void ncr53c90_device::delay(int cycles)
 {
-	if(!clock_conv)
-		return;
-	cycles *= clock_conv;
+	cycles *= clock_conv ? clock_conv : 8;
 	tm->adjust(clocks_to_attotime(cycles));
 }
 

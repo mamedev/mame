@@ -408,7 +408,7 @@ void informer_213_state::informer_213(machine_config &config)
 	NVRAM(config, m_nvram[0], nvram_device::DEFAULT_ALL_0);
 	NVRAM(config, m_nvram[1], nvram_device::DEFAULT_ALL_0);
 
-	SCC8530N(config, m_scc, 18.432_MHz_XTAL / 5);
+	SCC8530(config, m_scc, 18.432_MHz_XTAL / 5);
 	m_scc->out_txda_callback().set("host", FUNC(rs232_port_device::write_txd));
 	m_scc->out_dtra_callback().set("host", FUNC(rs232_port_device::write_dtr));
 	m_scc->out_rtsa_callback().set("host", FUNC(rs232_port_device::write_rts));

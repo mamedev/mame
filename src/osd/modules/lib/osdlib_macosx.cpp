@@ -56,6 +56,7 @@ void osd_process_kill()
 	kill(getpid(), SIGKILL);
 }
 
+
 //============================================================
 //  osd_break_into_debugger
 //============================================================
@@ -78,6 +79,22 @@ void osd_break_into_debugger(const char *message)
 	{
 		printf("Ignoring MAME exception: %s\n", message);
 	}
+}
+
+
+//============================================================
+//  osd_get_cache_line_size
+//============================================================
+
+std::pair<std::error_condition, unsigned> osd_get_cache_line_size() noexcept
+{
+	size_t result = 0;
+	size_t resultsize = sizeof(result);
+	int const err = sysctlbyname("hw.cachelinesize", &result, &resultsize, 0, 0);
+	if (!err)
+		return std::make_pair(std::error_condition(), unsigned(result));
+	else
+		return std::make_pair(std::error_condition(err, std::generic_category()), 0U);
 }
 
 

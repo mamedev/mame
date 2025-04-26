@@ -39,12 +39,13 @@ Mach II has 2*64KB DRAM with a MB1422A DRAM controller @ 25MHz.
 Mach III has wire mods from U22/U23 to U8/U9(2*8KB + 2*32KB piggybacked).
 Mach IV has 2*256KB DRAM, and a daughterboard(510.1123B01) for the 68020 + 32KB RAM.
 
-I/O is via TTL, overall very similar to EAG.
+All of them have the same 510-1129A01 main PCB. I/O is via TTL, overall very
+similar to EAG.
 
 Holding NEW GAME does a quick self-test, on Mach III and Mach IV it will also
 display a ROM checksum.
 
-fex68km4 continuously tests RAM at boot and displays "512", this is normal.
+fex68km4a continuously tests RAM at boot and displays "512", this is normal.
 To start, hold New Game or Clear.
 
 ================================================================================
@@ -902,7 +903,7 @@ void premiere_state::premiere(machine_config &config)
     ROM Definitions
 *******************************************************************************/
 
-ROM_START( fex68k ) // model 6094, PCB label 510.1120B01
+ROM_START( fex68k ) // model 6094
 	ROM_REGION16_BE( 0x10000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("e3_yellow.u6", 0x00000, 0x08000, CRC(a8a27714) SHA1(bc42a561eb39dd389c7831f1a25ad260510085d8) ) // AT27C256-15
 	ROM_LOAD16_BYTE("o4_red.u7",    0x00001, 0x08000, CRC(560a14b7) SHA1(11f2375255bfa229314697f103e891ba1cf0c715) ) // "
@@ -920,37 +921,43 @@ ROM_START( fex68kb )
 	ROM_LOAD16_BYTE("o4_red.u7",    0x00001, 0x08000, CRC(3bf8b3d7) SHA1(6ce419c63159501d2349abfd1e142e38e5466fbc) )
 ROM_END
 
-ROM_START( fex68km2 ) // model 6097, PCB label 510.1120B01
+ROM_START( fex68km2 ) // model 6097
 	ROM_REGION16_BE( 0x10000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("e6_yellow.u6", 0x00000, 0x08000, CRC(2e65e7ad) SHA1(4f3aec12041c9014d5d700909bac66bae1f9eadf) ) // 27c256
 	ROM_LOAD16_BYTE("o7_red.u7",    0x00001, 0x08000, CRC(4c20334a) SHA1(2e575b88c41505cc89599d2fc13e1e84fe474469) ) // "
 ROM_END
 
-ROM_START( fex68km2a ) // model 6097, PCB label 510.1120B01
+ROM_START( fex68km2a ) // model 6097
 	ROM_REGION16_BE( 0x10000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("e7_yellow.u6", 0x00000, 0x08000, CRC(7c88f53b) SHA1(80fdeed90f1388053110c3bc385bc50c2884b11a) ) // 27c256
 	ROM_LOAD16_BYTE("o8_red.u7",    0x00001, 0x08000, CRC(26da3424) SHA1(e0cec467bf1249ce89a27c45f5013859e6581ecd) ) // "
 ROM_END
 
-ROM_START( fex68km3 ) // model 6098, PCB label 510.1120B01 - checksum DB53
+ROM_START( fex68km3 ) // model 6098 - checksum DB53
 	ROM_REGION16_BE( 0x10000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("me_white.u6",  0x00000, 0x08000, CRC(4b14cd9f) SHA1(4d41196900a71bf0699dae50f4726acc0ed3dced) ) // 27c256
 	ROM_LOAD16_BYTE("mo_yellow.u7", 0x00001, 0x08000, CRC(b96b0b5f) SHA1(281145be802efb38ed764aecb26b511dcd71cb87) ) // "
 ROM_END
 
-ROM_START( fex68km3a ) // model 6098, PCB label 510.1120B01 - checksum F806
+ROM_START( fex68km3a ) // model 6098 - checksum F806
 	ROM_REGION16_BE( 0x10000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("me_white.u6",  0x00000, 0x08000, CRC(434b68ec) SHA1(eaf6d2b1db3c0145adfd9d2c5d5d5ec65524b5de) ) // 27c256
 	ROM_LOAD16_BYTE("mo_yellow.u7", 0x00001, 0x08000, CRC(5e78ee99) SHA1(70e5e47b6daa35dc4d5675d4d1c6a4093fb47ea6) ) // "
 ROM_END
 
-ROM_START( fex68km3b ) // model 6098, PCB label 510.1120B01 - checksum E2DA
+ROM_START( fex68km3b ) // model 6098 - checksum E2DA
 	ROM_REGION16_BE( 0x10000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("me_white.u6",  0x00000, 0x08000, CRC(39e17293) SHA1(61d557f96ae2bb164108f53d7d48239f8f2a7f6b) ) // 27c256
 	ROM_LOAD16_BYTE("mo_yellow.u7", 0x00001, 0x08000, CRC(572b208a) SHA1(cd50982d8fa5bde9ac83472fddd14d56fa6ead3b) ) // "
 ROM_END
 
-ROM_START( fex68km4 ) // model 6110, PCB label 510.1120B01 - checksum FD96
+ROM_START( fex68km4 ) // model 6110, serial 9004000x or 9004009x - checksum 1185
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD16_BYTE("68020_mach_iv_v1.3a_even_11_30_88.u6", 0x00000, 0x08000, CRC(ea47a712) SHA1(bd853f74c83d760a4f4df0250248cbdba8f1f241) ) // also seen with "Mach 3" label, same SUM16
+	ROM_LOAD16_BYTE("68020_mach_iv_v1.3a_odd_11_30_88.u7",  0x00001, 0x08000, CRC(41b5860d) SHA1(935c43ef1ff511426f49e83e29014883c68e99b4) ) // "
+ROM_END
+
+ROM_START( fex68km4a ) // no model # on backplate, serial 0009999x but modified hardware - checksum FD9B
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("68020_even_master_2325.u6", 0x00000, 0x08000, CRC(13ea816c) SHA1(98d00fc382ddcbccb0a47c3f8d7fc73f30a15fbd) )
 	ROM_LOAD16_BYTE("68020_odd_master_2325.u7",  0x00001, 0x08000, CRC(d24c7b54) SHA1(3204fd600786792a618965715990c44890cc7119) )
@@ -1052,7 +1059,8 @@ SYST( 1988, fex68km2a, fex68k,  0,      fex68km2, excel68k, excel68k_state, empt
 SYST( 1988, fex68km3,  fex68k,  0,      fex68km3, excel68k, excel68k_state, empty_init, "Fidelity International", "Excel 68000 Mach III Master 2265 (set 1)", MACHINE_SUPPORTS_SAVE )
 SYST( 1988, fex68km3a, fex68k,  0,      fex68km3, excel68k, excel68k_state, empty_init, "Fidelity International", "Excel 68000 Mach III Master 2265 (set 2)", MACHINE_SUPPORTS_SAVE )
 SYST( 1988, fex68km3b, fex68k,  0,      fex68km3, excel68k, excel68k_state, empty_init, "Fidelity International", "Excel 68000 Mach III Master 2265 (set 3)", MACHINE_SUPPORTS_SAVE )
-SYST( 1989, fex68km4,  fex68k,  0,      fex68km4, excel68k, excel68k_state, empty_init, "Fidelity International", "Excel 68000 Mach IV 68020 Master 2325", MACHINE_SUPPORTS_SAVE )
+SYST( 1989, fex68km4,  fex68k,  0,      fex68km4, excel68k, excel68k_state, empty_init, "Fidelity International", "Excel 68000 Mach IV 68020 Master 2325 (set 1)", MACHINE_SUPPORTS_SAVE )
+SYST( 1989, fex68km4a, fex68k,  0,      fex68km4, excel68k, excel68k_state, empty_init, "Fidelity International", "Excel 68000 Mach IV 68020 Master 2325 (set 2)", MACHINE_SUPPORTS_SAVE )
 
 SYST( 1989, feagv4,    0,       0,      eagv4,    eag,      eag_state,      init_eag,   "Fidelity International", "Elite Avant Garde 2265 (model 6114-2/3/4, set 1)", MACHINE_SUPPORTS_SAVE )
 SYST( 1989, feagv4a,   feagv4,  0,      eagv4,    eag,      eag_state,      init_eag,   "Fidelity International", "Elite Avant Garde 2265 (model 6114-2/3/4, set 2)", MACHINE_SUPPORTS_SAVE )

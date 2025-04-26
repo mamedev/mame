@@ -6,6 +6,17 @@
 
 #if defined(OSD_NET_USE_TAPTUN)
 
+#include "netdev_common.h"
+
+#include "osdcore.h" // osd_printf_verbose
+#include "osdfile.h" // PATH_SEPARATOR
+
+#include "util/hashing.h" // crc32_creator
+#include "util/unicode.h"
+
+#include <memory>
+#include <vector>
+
 #if defined(_WIN32)
 #include <windows.h>
 #include <winioctl.h>
@@ -16,13 +27,6 @@
 #include <net/if.h>
 #include <cerrno>
 #endif
-
-#include "osdcore.h" // osd_printf_verbose
-#include "osdfile.h" // PATH_SEPARATOR
-#include "osdnet.h"
-#include "unicode.h"
-
-#include "util/hashing.h" // crc32_creator
 
 #ifdef __linux__
 #define IFF_TAP     0x0002
@@ -52,22 +56,33 @@ public:
 	}
 	virtual ~taptun_module() { }
 
-	virtual int init(osd_interface &osd, const osd_options &options);
-	virtual void exit();
+	virtual int init(osd_interface &osd, const osd_options &options) override;
+	virtual void exit() override;
 
-	virtual bool probe() { return true; }
+	virtual bool probe() override { return true; }
+
+	virtual std::unique_ptr<network_device> open_device(int id, network_handler &handler) override;
+	virtual std::vector<network_device_info> list_devices() override;
+
+private:
+	struct device_info
+	{
+		std::string name;
+		std::string description;
+	};
+
+	std::vector<device_info> m_devices;
 };
 
 
 
-class netdev_tap : public osd_network_device
+class netdev_tap : public network_device_base
 {
 public:
-	netdev_tap(const char *name, network_handler &ifdev);
+	netdev_tap(const char *name, network_handler &handler);
 	~netdev_tap();
 
-	int send(uint8_t *buf, int len) override;
-	void set_mac(const uint8_t *mac) override;
+	int send(void const *buf, int len) override;
 
 protected:
 	int recv_dev(uint8_t **buf) override;
@@ -81,12 +96,11 @@ private:
 	int m_fd = -1;
 	char m_ifname[10];
 #endif
-	char m_mac[6];
 	uint8_t m_buf[2048];
 };
 
-netdev_tap::netdev_tap(const char *name, network_handler &ifdev)
-	: osd_network_device(ifdev)
+netdev_tap::netdev_tap(const char *name, network_handler &handler)
+	: network_device_base(handler)
 {
 #if defined(__linux__)
 	m_fd = -1;
@@ -144,11 +158,6 @@ netdev_tap::~netdev_tap()
 #endif
 }
 
-void netdev_tap::set_mac(const uint8_t *mac)
-{
-	memcpy(m_mac, mac, 6);
-}
-
 static u32 finalise_frame(u8 buf[], u32 length)
 {
 	/*
@@ -180,7 +189,7 @@ static u32 finalise_frame(u8 buf[], u32 length)
 }
 
 #if defined(_WIN32)
-int netdev_tap::send(uint8_t *buf, int len)
+int netdev_tap::send(void const *buf, int len)
 {
 	OVERLAPPED overlapped = {};
 
@@ -244,7 +253,7 @@ static std::wstring safe_string(WCHAR value[], int length)
 }
 
 // find the friendly name for an adapter in the registry
-static std::wstring get_connection_name(std::wstring &id)
+static std::wstring get_connection_name(std::wstring const &id)
 {
 	std::wstring result;
 
@@ -326,7 +335,7 @@ static std::vector<std::wstring> get_tap_adapters()
 	return result;
 }
 #else
-int netdev_tap::send(uint8_t *buf, int len)
+int netdev_tap::send(void const *buf, int len)
 {
 	if(m_fd == -1) return 0;
 	len = write(m_fd, buf, len);
@@ -335,42 +344,52 @@ int netdev_tap::send(uint8_t *buf, int len)
 
 int netdev_tap::recv_dev(uint8_t **buf)
 {
-	int len;
-	if(m_fd == -1) return 0;
-	// exit if we didn't receive anything, got an error, got a broadcast or multicast packet,
-	// are in promiscuous mode or got a packet with our mac.
-	do {
-		len = read(m_fd, m_buf, sizeof(m_buf));
-	} while((len > 0) && memcmp(&get_mac()[0], m_buf, 6) && !get_promisc() && !(m_buf[0] & 1));
+	if (0 > m_fd)
+		return 0;
+
+	int len = read(m_fd, m_buf, sizeof(m_buf));
 
 	if (len > 0)
 		len = finalise_frame(m_buf, len);
 
 	*buf = m_buf;
-	return (len == -1)?0:len;
+	return (len == -1) ? 0 : len;
 }
 #endif
-
-static CREATE_NETDEV(create_tap)
-{
-	auto *dev = new netdev_tap(ifname, ifdev);
-	return dynamic_cast<osd_network_device *>(dev);
-}
 
 int taptun_module::init(osd_interface &osd, const osd_options &options)
 {
 #if defined(_WIN32)
-	for (std::wstring &id : get_tap_adapters())
-		add_netdev(utf8_from_wstring(id).c_str(), utf8_from_wstring(get_connection_name(id)).c_str(), create_tap);
+	auto const adapters = get_tap_adapters();
+	m_devices.reserve(adapters.size());
+	for (std::wstring const &id : adapters)
+		m_devices.emplace_back(device_info{ utf8_from_wstring(id), utf8_from_wstring(get_connection_name(id)) });
 #else
-	add_netdev("tap", "TAP/TUN Device", create_tap);
+	m_devices.emplace_back(device_info{ "tap", "TUN/TAP Device" });
 #endif
 	return 0;
 }
 
 void taptun_module::exit()
 {
-	clear_netdev();
+	m_devices.clear();
+}
+
+std::unique_ptr<network_device> taptun_module::open_device(int id, network_handler &handler)
+{
+	if ((0 > id) || (m_devices.size() <= id))
+		return nullptr;
+
+	return std::make_unique<netdev_tap>(m_devices[id].name.c_str(), handler);
+}
+
+std::vector<network_device_info> taptun_module::list_devices()
+{
+	std::vector<network_device_info> result;
+	result.reserve(m_devices.size());
+	for (int id = 0; m_devices.size() > id; ++id)
+		result.emplace_back(network_device_info{ id, m_devices[id].description });
+	return result;
 }
 
 } // anonymous namespace

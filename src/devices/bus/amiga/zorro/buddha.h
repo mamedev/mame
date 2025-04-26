@@ -81,6 +81,6 @@ private:
 } // namespace bus::amiga::zorro
 
 // device type declaration
-DECLARE_DEVICE_TYPE_NS(ZORRO_BUDDHA, bus::amiga::zorro, buddha_device)
+DECLARE_DEVICE_TYPE_NS(AMIGA_BUDDHA, bus::amiga::zorro, buddha_device)
 
 #endif // MAME_BUS_AMIGA_ZORRO_BUDDHA_H

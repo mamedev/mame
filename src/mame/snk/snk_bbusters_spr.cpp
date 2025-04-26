@@ -98,7 +98,7 @@ inline const uint8_t *snk_bbusters_spr_device::get_source_ptr(gfx_element *tileg
 		break;
 	}
 
-	return tilegfx->get_data((sprite + code) % tilegfx->elements()) + ((dy % 16) * tilegfx->rowbytes());
+	return tilegfx->get_data((sprite + code) % tilegfx->elements()) + ((dy & 0xf) * tilegfx->rowbytes());
 }
 
 void snk_bbusters_spr_device::draw_block(bitmap_ind16 &dest, const rectangle &cliprect, int x, int y, int size, int flipx, int flipy, uint32_t sprite, int color, int block)
@@ -106,10 +106,10 @@ void snk_bbusters_spr_device::draw_block(bitmap_ind16 &dest, const rectangle &cl
 	// TODO: respect cliprect
 
 	gfx_element *tilegfx = gfx(0);
-	pen_t pen_base = tilegfx->colorbase() + tilegfx->granularity() * (color % tilegfx->colors());
-	uint32_t xinc = (m_scale_line_count * 0x10000) / size;
+	pen_t const pen_base = tilegfx->colorbase() + tilegfx->granularity() * (color % tilegfx->colors());
+	uint32_t const xinc = (m_scale_line_count * 0x10000) / size;
 	int dy = y;
-	int ex = m_scale_line_count;
+	int const ex = m_scale_line_count;
 
 	while (m_scale_line_count)
 	{
@@ -130,11 +130,11 @@ void snk_bbusters_spr_device::draw_block(bitmap_ind16 &dest, const rectangle &cl
 
 			for (int sx = 0; sx < size; sx++)
 			{
-				if ((sx % 16) == 0)
+				if ((sx & 0xf) == 0)
 					srcptr = get_source_ptr(tilegfx, sprite, sx, srcline, block);
 
-				uint8_t pixel = *srcptr++;
-				if (pixel != 15)
+				uint8_t const pixel = *srcptr++;
+				if (pixel != 0xf)
 					destline[(x + (x_index >> 16)) & 0x1ff] = pen_base + pixel;
 
 				if (flipx)
@@ -184,14 +184,14 @@ void snk_bbusters_spr_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle
 		    Block type 3: 0x00 = no scale, 0x3f == half size - 128 pixel sprite
 
 		*/
+		int const block = (colour >> 8) & 0x3;
+		bool const fy = BIT(colour, 10);
+		bool const fx = BIT(colour, 11);
 		colour >>= 12;
-		int block = (sprram[offs + 0] >> 8) & 0x3;
-		int fy = sprram[offs + 0] & 0x400;
-		int fx = sprram[offs + 0] & 0x800;
 		sprite &= 0x3fff;
 
 		int scale;
-		switch ((sprram[offs + 0] >> 8) & 0x3)
+		switch (block)
 		{
 		case 0:
 			scale = sprram[offs + 0] & 0x7;

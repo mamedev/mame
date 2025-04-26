@@ -69,6 +69,7 @@ public:
 
 	void init_sprint1();
 	void init_sprint2();
+	void init_sprint2bl();
 	void init_dominos();
 	void init_dominos4();
 
@@ -301,10 +302,25 @@ void sprint2_state::init_sprint1()
 {
 	m_game = 1;
 }
+
 void sprint2_state::init_sprint2()
 {
 	m_game = 2;
 }
+
+void sprint2_state::init_sprint2bl()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+	int size = memregion("maincpu")->bytes();
+	std::vector<uint8_t> buffer(size);
+	memcpy(&buffer[0], rom, size);
+
+	for (int i = 0; i < size; i++)
+		rom[i] = buffer[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 6, 7, 8, 9, 5, 4, 3, 2, 1, 0)];
+
+	m_game = 2;
+}
+
 void sprint2_state::init_dominos()
 {
 	m_game = 3;
@@ -897,6 +913,31 @@ ROM_START( sprint2h )
 ROM_END
 
 
+ROM_START( sprint2bl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "s2_1.bin", 0x2000, 0x0400, CRC(149ae63d) SHA1(0502b1ef151e380319c1d40207f51a187d28516f) )
+	ROM_LOAD( "s2_2.bin", 0x2400, 0x0400, CRC(4ecb1cb1) SHA1(c59b1e1487d3b646cff20033c8bf9ce912bd3ee3) )
+	ROM_LOAD( "s2_3.bin", 0x2800, 0x0400, CRC(40c0e3d1) SHA1(841d438b81f0d8459b274fc8f974493db62d0138) )
+	ROM_LOAD( "s2_4.bin", 0x2c00, 0x0400, CRC(181bb070) SHA1(bf16647aac47039501aacfe71161862815b333fc) )
+	ROM_LOAD( "s2_5.bin", 0x3000, 0x0400, CRC(15343ea9) SHA1(f93519833a75bc0a578272689fc79f040d48d17e) )
+	ROM_LOAD( "s2_6.bin", 0x3400, 0x0400, CRC(4b3b1eeb) SHA1(2f30a748ce87bb600a2570fcd82071ddd1228a9e) )
+	ROM_LOAD( "s2_8.bin", 0x3800, 0x0400, CRC(efebe532) SHA1(a67067defbdd7932b3806ff65c9b0da87254de1c) )
+	ROM_LOAD( "s2_7.bin", 0x3c00, 0x0400, CRC(6c63dc81) SHA1(2eea1e88c5fd86cff515689dd20760851d36216d) )
+
+	ROM_REGION( 0x0200, "tiles", 0 )
+	ROM_LOAD_NIB_HIGH( "6396-01.p4", 0x0000, 0x0200, CRC(801b42dd) SHA1(1db58390d803f404253cbf36d562016441ca568d) )
+	ROM_LOAD_NIB_LOW ( "6397-01.r4", 0x0000, 0x0200, CRC(135ba1aa) SHA1(0465259440f73e1a2c8d8101f29e99b4885420e4) )
+
+	ROM_REGION( 0x0200, "sprites", 0 ) // cars
+	ROM_LOAD_NIB_HIGH( "6399-01.j6", 0x0000, 0x0200, CRC(63d685b2) SHA1(608746163e25dbc14cde43c17aecbb9a14fac875) )
+	ROM_LOAD_NIB_LOW ( "6398-01.k6", 0x0000, 0x0200, CRC(c9e1017e) SHA1(e7279a13e4a812d2e0218be0bc5162f2e56c6b66) )
+
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "6400-01.m2", 0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )  // SYNC
+	ROM_LOAD( "6401-01.e2", 0x0100, 0x0020, CRC(857df8db) SHA1(06313d5bde03220b2bc313d18e50e4bb1d0cfbbb) )  // address
+ROM_END
+
+
 ROM_START( dominos )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "7352-02.d1",   0x3000, 0x0800, CRC(738b4413) SHA1(3a90ab25bb5f65504692f97da43f03e21392dcd8) )
@@ -912,6 +953,7 @@ ROM_START( dominos )
 	ROM_LOAD( "6400-01.m2", 0x0000, 0x0100, CRC(b8094b4c) SHA1(82dc6799a19984f3b204ee3aeeb007e55afc8be3) )  // SYNC
 	ROM_LOAD( "6401-01.e2", 0x0100, 0x0020, CRC(857df8db) SHA1(06313d5bde03220b2bc313d18e50e4bb1d0cfbbb) )  // address
 ROM_END
+
 
 ROM_START( dominos4 ) // built from original Atari source code
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -938,9 +980,11 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1978, sprint1,  0,       sprint1, sprint1, sprint2_state, init_sprint1, ROT0, "Atari (Kee Games)", "Sprint 1",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1976, sprint2,  sprint1, sprint2, sprint2, sprint2_state, init_sprint2, ROT0, "Atari (Kee Games)", "Sprint 2 (set 1)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1976, sprint2a, sprint1, sprint2, sprint2, sprint2_state, init_sprint2, ROT0, "Atari (Kee Games)", "Sprint 2 (set 2)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1976, sprint2h, sprint1, sprint2, sprint2, sprint2_state, init_sprint2, ROT0, "hack",              "Sprint 2 (color kit, Italy)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // Italian hack, supposedly is color instead of b/w? how?
-GAME( 1977, dominos,  0,       dominos, dominos, sprint2_state, init_dominos, ROT0, "Atari",             "Dominos",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1977, dominos4, dominos, dominos4,dominos4,sprint2_state, init_dominos4,ROT0, "Atari",             "Dominos 4 (Cocktail)",        MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT   MACHINE   INPUT     CLASS          INIT            ROT   COMPANY              FULLNAME                       FLAGS
+GAME( 1978, sprint1,   0,       sprint1,  sprint1,  sprint2_state, init_sprint1,   ROT0, "Atari (Kee Games)", "Sprint 1",                    MACHINE_SUPPORTS_SAVE )
+GAME( 1976, sprint2,   sprint1, sprint2,  sprint2,  sprint2_state, init_sprint2,   ROT0, "Atari (Kee Games)", "Sprint 2 (set 1)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1976, sprint2a,  sprint1, sprint2,  sprint2,  sprint2_state, init_sprint2,   ROT0, "Atari (Kee Games)", "Sprint 2 (set 2)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1976, sprint2h,  sprint1, sprint2,  sprint2,  sprint2_state, init_sprint2,   ROT0, "hack",              "Sprint 2 (color kit, Italy)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // Italian hack, supposedly is color instead of b/w? how?
+GAME( 1976, sprint2bl, sprint1, sprint2,  sprint2,  sprint2_state, init_sprint2bl, ROT0, "bootleg",           "Sprint 2 (bootleg)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1977, dominos,   0,       dominos,  dominos,  sprint2_state, init_dominos,   ROT0, "Atari",             "Dominos",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1977, dominos4,  dominos, dominos4, dominos4, sprint2_state, init_dominos4,  ROT0, "Atari",             "Dominos 4 (Cocktail)",        MACHINE_SUPPORTS_SAVE )

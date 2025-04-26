@@ -343,6 +343,11 @@ ROM_START( lexizeus )
 	ROM_LOAD16_WORD_SWAP( "lexibook1g900us.bin", 0x0000, 0x800000, CRC(c2370806) SHA1(cbb599c29c09b62b6a9951c724cd9fc496309cf9))
 ROM_END
 
+ROM_START( arcade3d )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "arcade3d.u3", 0x0000, 0x800000, CRC(130843a5) SHA1(f6494a34d162e702121cf71d384a4e57e0113498) )
+ROM_END
+
 ROM_START( vsplus )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "vsplus.bin", 0x0000, 0x1000000, CRC(2b13d2cc) SHA1(accae7606d83a313b8ec0232d2d67b63c9c617af) )
@@ -422,6 +427,8 @@ ROM_END
 // these all have the same ROM scrambling
 
 CONS( 200?, lexizeus,    0,     0,        lexizeus,     lexizeus, spg2xx_lexizeus_game_state, init_zeus, "Lexibook / JungleTac", "Zeus IG900 20-in-1 (US?)",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // bad sound and some corrupt bg tilemap entries in Tiger Rescue, verify ROM data (same game runs in Zone 60 without issue)
+
+CONS( 200?, arcade3d,    0,     0,        lexizeus,     lexiseal, spg2xx_lexizeus_game_state, init_zeus, "Millennium 2000 GmbH / JungleTac", "Millennium Arcade 3D 15-in-1",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // bad sound and some corrupt bg tilemap entries in Tiger Rescue, verify ROM data (same game runs in Zone 60 without issue)
 
 CONS( 200?, vsplus,      0,     0,        vsplus,     vsplus, spg2xx_vsplus_game_state, init_vsplus, "<unknown> / JungleTac", "Vs Power Plus 30-in-1",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 

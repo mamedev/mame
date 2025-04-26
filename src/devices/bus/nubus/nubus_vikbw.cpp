@@ -14,8 +14,8 @@
 
   TODO: Actual raster parameters are unknown.  We've gone with the Apple 19"
   1024x768 monitor's htotal/vtotal but this used a custom monitor.  There are
-  no register writes other than the IRQ enable/ack so tracing, the CRTC is
-  pure TTL.
+  no register writes other than the IRQ enable/ack so the CRTC is a fixed
+  state machine.
 
 ***************************************************************************/
 

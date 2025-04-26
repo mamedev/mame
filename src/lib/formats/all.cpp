@@ -320,6 +320,10 @@
 #include "guab_dsk.h"
 #endif
 
+#ifdef HAS_FORMATS_H17D_DSK
+#include "h17disk.h"
+#endif
+
 #ifdef HAS_FORMATS_H8_CAS
 #include "h8_cas.h"
 #endif
@@ -1529,5 +1533,10 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.category("Canon");
 #ifdef HAS_FORMATS_X07_CAS
 	en.add(x07_cassette_formats); // x07_cas.h
+#endif
+
+	en.category("Heath");
+#ifdef HAS_FORMATS_H17D_DSK
+	en.add(FLOPPY_H17D_FORMAT); // h17disk.h
 #endif
 }

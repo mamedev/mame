@@ -31,7 +31,7 @@ public:
 	vax_disassembler();
 
 	static bool is_read_mode(mode m);
-	static const mode* get_operands(u8 op);
+	static const mode *get_operands(u8 op);
 
 protected:
 	// disassembler overrides

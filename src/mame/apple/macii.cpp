@@ -82,7 +82,6 @@ public:
 		m_rtc(*this, "rtc"),
 		m_vram(*this,"vram"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette"),
 		m_overlay(0),
 		m_via2_vbl(0),
 		m_se30_vbl_enable(0),
@@ -155,7 +154,7 @@ private:
 	void phases_w(u8 phases);
 	void devsel_w(u8 devsel);
 
-	u32 screen_update_macse30(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update_macse30(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	TIMER_CALLBACK_MEMBER(scanline_tick);
 	u8 via_in_a();
@@ -189,7 +188,6 @@ private:
 	required_device<rtc3430042_device> m_rtc;
 	optional_shared_ptr<u32> m_vram;
 	optional_device<screen_device> m_screen;
-	optional_device<palette_device> m_palette;
 
 	u32 m_overlay;
 	u32 m_via2_vbl;
@@ -213,21 +211,21 @@ private:
 	floppy_image_device *m_cur_floppy;
 };
 
-u32 macii_state::screen_update_macse30(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 macii_state::screen_update_macse30(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	u32 const video_base = (m_screen_buffer ? 0x8000 : 0) + (MAC_H_VIS / 8);
 	u16 const *const video_ram = (const u16 *)&m_vram[video_base / 4];
 
 	for (int y = 0; y < MAC_V_VIS; y++)
 	{
-		u16 *const line = &bitmap.pix(y);
+		u32 *const line = &bitmap.pix(y);
 
 		for (int x = 0; x < MAC_H_VIS; x += 16)
 		{
 			u16 const word = video_ram[((y * MAC_H_VIS) / 16) + ((x / 16) ^ 1)];
 			for (int b = 0; b < 16; b++)
 			{
-				line[x + b] = (word >> (15 - b)) & 0x0001;
+				line[x + b] = ((word >> (15 - b)) & 0x0001) ? 0 : 0xffffff;
 			}
 		}
 	}
@@ -984,7 +982,7 @@ void macii_state::macii(machine_config &config)
 	m_scsihelp->cpu_halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 	m_scsihelp->timeout_error_callback().set(FUNC(macii_state::scsi_berr_w));
 
-	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
+	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd").set_filter("MC68020");
 	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68020");
 
 	nubus_device &nubus(NUBUS(config, "nubus", 0));
@@ -1033,9 +1031,9 @@ void macii_state::macii(machine_config &config)
 	// This was fixed for the II FDHD/IIx/IIcx/SE30 ROM.
 	m_ram->set_extra_options("1M,4M,5M,8M");
 
-	SOFTWARE_LIST(config, "flop_mac35_orig").set_original("mac_flop_orig");
-	SOFTWARE_LIST(config, "flop_mac35_clean").set_original("mac_flop_clcracked");
-	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
+	SOFTWARE_LIST(config, "flop_mac35_orig").set_original("mac_flop_orig").set_filter("MC68020");
+	SOFTWARE_LIST(config, "flop_mac35_clean").set_original("mac_flop_clcracked").set_filter("MC68020");
+	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop").set_filter("MC68020");
 }
 
 void macii_state::maciihmu(machine_config &config)
@@ -1060,7 +1058,7 @@ void macii_state::maciihd(machine_config &config)
 
 	applefdintf_device::add_35_hd(config, m_floppy[0]);
 	applefdintf_device::add_35_hd(config, m_floppy[1]);
-	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
+	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop").set_filter("MC68020");
 
 	// The table of valid RAM sizes is at 0x4080366E in the 97221136 ROM (II FDHD, IIx, IIcx, SE/30).
 	// Shift each byte left by 20 bits to get the size in bytes.  0x01 => 0x00100000 (1 MiB) and so on.
@@ -1078,7 +1076,11 @@ void macii_state::maciix(machine_config &config)
 
 	m_via2->readpb_handler().set(FUNC(macii_state::iix_via2_in_b));
 
-	SOFTWARE_LIST(config.replace(), "cd_list").set_original("mac_cdrom").set_filter("MC68030");
+	subdevice<software_list_device>("hdd_list")->set_filter("MC68030");
+	subdevice<software_list_device>("cd_list")->set_filter("MC68030");
+	subdevice<software_list_device>("flop_mac35_orig")->set_filter("MC68030");
+	subdevice<software_list_device>("flop_mac35_clean")->set_filter("MC68030");
+	subdevice<software_list_device>("flop35_list")->set_filter("MC68030");
 }
 
 void macii_state::maciicx(machine_config &config)
@@ -1109,28 +1111,24 @@ void macii_state::macse30(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	m_screen->set_refresh_hz(60.15);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1260));
-	m_screen->set_size(MAC_H_TOTAL, MAC_V_TOTAL);
-	m_screen->set_visarea(0, MAC_H_VIS-1, 0, MAC_V_VIS-1);
+	m_screen->set_raw(15.6672_MHz_XTAL, MAC_H_TOTAL, 0, MAC_H_VIS, MAC_V_TOTAL, 0, MAC_V_VIS);
 	m_screen->set_screen_update(FUNC(macii_state::screen_update_macse30));
-	m_screen->set_palette(m_palette);
-
-	PALETTE(config, m_palette, palette_device::MONOCHROME_INVERTED);
 
 	config.device_remove("nb9");
 	config.device_remove("nba");
 	config.device_remove("nbb");
 	config.device_remove("nubus");
 
-	nubus_device &nubus(NUBUS(config, "pds", 0));
-	nubus.set_space(m_maincpu, AS_PROGRAM);
-	nubus.out_irq9_callback().set(FUNC(macii_state::nubus_irq_w<9>));
-	nubus.out_irqa_callback().set(FUNC(macii_state::nubus_irq_w<0xa>));
-	nubus.out_irqb_callback().set(FUNC(macii_state::nubus_irq_w<0xb>));
-	nubus.out_irqc_callback().set(FUNC(macii_state::nubus_irq_w<0xc>));
-	nubus.out_irqd_callback().set(FUNC(macii_state::nubus_irq_w<0xd>));
-	nubus.out_irqe_callback().set(FUNC(macii_state::nubus_irq_w<0xe>));
+	se30_pds_bus_device &se30bus(MACSE30_PDS_BUS(config, "pds", 0));
+	se30bus.set_space(m_maincpu, AS_PROGRAM);
+	se30bus.set_bus_mode(nubus_device::nubus_mode_t::SE30);
+	se30bus.set_screen_tag("screen");
+	se30bus.out_irq9_callback().set(FUNC(macii_state::nubus_irq_w<9>));
+	se30bus.out_irqa_callback().set(FUNC(macii_state::nubus_irq_w<0xa>));
+	se30bus.out_irqb_callback().set(FUNC(macii_state::nubus_irq_w<0xb>));
+	se30bus.out_irqc_callback().set(FUNC(macii_state::nubus_irq_w<0xc>));
+	se30bus.out_irqd_callback().set(FUNC(macii_state::nubus_irq_w<0xd>));
+	se30bus.out_irqe_callback().set(FUNC(macii_state::nubus_irq_w<0xe>));
 	NUBUS_SLOT(config, "pds030", "pds", mac_pds030_cards, nullptr);
 }
 

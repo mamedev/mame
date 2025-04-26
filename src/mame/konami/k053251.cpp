@@ -207,12 +207,12 @@ void k053251_device::write(offs_t offset, u8 data)
 	}
 }
 
-int k053251_device::get_priority( int ci )
+int k053251_device::get_priority(int ci)
 {
 	return m_ram[ci];
 }
 
-int k053251_device::get_palette_index( int ci )
+int k053251_device::get_palette_index(int ci)
 {
 	return m_palette_index[ci];
 }

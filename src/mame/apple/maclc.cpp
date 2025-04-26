@@ -404,6 +404,7 @@ void maclc_state::maclc_base(machine_config &config)
 	nubus_device &nubus(NUBUS(config, "pds", 0));
 	nubus.set_space(m_maincpu, AS_PROGRAM);
 	nubus.set_address_mask(0x80ffffff);
+	nubus.set_bus_mode(nubus_device::nubus_mode_t::LC_PDS);
 	// V8 supports interrupts for slots $C, $D, and $E, but the LC, LC II, and Color Classic
 	// only hook the slot $E IRQ up to the PDS slot.  ($C/$D/$E are 0/1/2 on the schematics).
 	nubus.out_irqe_callback().set(m_v8, FUNC(v8_device::slot2_irq_w));
@@ -601,6 +602,24 @@ ROM_START( macclas2 )
 	ROM_LOAD32_BYTE( "341-0866__5be9__=c=apple_91.rommh.27c010.u24", 0x000001, 0x020000, CRC(eae68c36) SHA1(e6ce79647dfe7e66590a012836d0b6e985ff672b) )
 	ROM_LOAD32_BYTE( "341-0865__821e__=c=apple_91.romml.27c010.u23", 0x000002, 0x020000, CRC(cb306c01) SHA1(4d6e409995fd9a4aa9afda0fd790a5b09b1c2aca) )
 	ROM_LOAD32_BYTE( "341-0864__6fc6__=c=apple_91.romll.27c010.u22", 0x000003, 0x020000, CRC(21a51e72) SHA1(bb513c1a5b8a41c7534d66aeacaeea47f58dae92) )
+
+	/*
+	    There is a genuine bug in this ROM where a JMP through a table uses an index past the size of the
+	    table and the processor ends up in the middle of another instruction.  On a real 68030, the resulting
+	    illegal instruction does some still-not-100%-understood things to the registers that cause things to
+	    work by accident.  While that is still being investigated, we can at least patch the ROM so that
+	    booting when the system is in 32-bit mode works properly.
+
+	    This first patch changes the bad table JMP to an RTS; the ROM in the IIvx and IIvi has the correct
+	    number of table entries for the Classic II's boxflag and shows that the desired result is to do
+	    nothing.
+	*/
+	ROM_FILL(0x43b6e, 1, 0x4e)
+	ROM_FILL(0x43b6f, 1, 0x75)
+
+	// This second patch fixes the ROM checksum to compensate for the patch we just made.
+	ROM_FILL(0x00002, 1, 0x66)
+	ROM_FILL(0x00003, 1, 0x88)
 ROM_END
 
 ROM_START(maccclas)

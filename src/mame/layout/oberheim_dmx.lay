@@ -20,6 +20,14 @@ copyright-holders:m1macrophage
 		<rect><color red="0.06" green="0.6" blue="0.84"/></rect>
 	</element>
 
+	<element name="invisible-rect">
+		<rect><color red="0" green="0" blue="0" alpha="0"/></rect>
+	</element>
+
+	<element name="black-rect">
+		<rect><color red="0.0" green="0.0" blue="0.0"/></rect>
+	</element>
+
 	<element name="display-background">
 		<rect><color red="0.08" green="0.0" blue="0.0"/></rect>
 	</element>
@@ -75,6 +83,28 @@ copyright-holders:m1macrophage
 		</rect>
 	</element>
 
+	<element name="trimmer-knob">
+		<rect><color red="0.65" green="0.65" blue="0.65"/></rect>
+	</element>
+
+	<element name="trimmer-rail">
+		<rect><color red="0.14" green="0.16" blue="0.15"/></rect>
+	</element>
+
+	<group name="trimmer">
+		<element ref="invisible-rect" id="trimmer_~trimmer_id~">
+			<bounds x="0" y="0" width="15" height="40"/>
+		</element>
+		<element ref="trimmer-rail">
+			<bounds x="5" y="0" width="5" height="40"/>
+		</element>
+		<element ref="trimmer-knob" id="trimmer_knob_~trimmer_id~">
+			<animate inputtag="pitch_adj_~trimmer_id~" inputmask="0x7f"/>
+			<bounds state="100" x="0" y="0" width="15" height="5"/>
+			<bounds state="0" x="0" y="35" width="15" height="5"/>
+		</element>
+	</group>
+
 	<element name="fader-knob">
 		<rect>
 			<bounds x="0" y="0" width="35" height="35"/>
@@ -86,18 +116,32 @@ copyright-holders:m1macrophage
 		</rect>
 	</element>
 
-	<element name="fader">
-		<rect>
-			<!-- Invisible fader knob, to ensure correct width. -->
-			<bounds x="0" y="0" width="35" height="35"/>
-			<color red="0" green="0" blue="0" alpha="0"/>
-		</rect>
-		<rect>
-			<bounds x="14" y="0" width="7" height="144"/>
-			<color red="0.0" green="0.0" blue="0.01"/>
-		</rect>
+	<group name="fader">
+		<element id="fader_~fader_id~" ref="invisible-rect">
+			<bounds x="15" y="0" width="35" height="162"/>
+		</element>
+		<element ref="black-rect">  <!-- slider rail -->
+			<bounds x="29" y="9" width="7" height="144"/>
+		</element>
+		<element id="fader_knob_~fader_id~" ref="fader-knob">
+			<animate inputtag="fader_p~fader_id~" inputmask="0x7f"/>
+			<bounds state="100" x="15" y="0" width="35" height="35"/>
+			<bounds state="0" x="15" y="127" width="35" height="35"/>
+		</element>
+		<element ref="fader-text-~fader_id~">
+			<bounds x="0" y="167" width="65" height="10"/>
+		</element>
+	</group>
+
+	<element name="script_warning" defstate="1">
+		<text state="1" string="To control sliders and knobs with a mouse, enable the layout plugin.">
+			<color red="0.65" green="0.65" blue="0.65"/>
+		</text>
 	</element>
 
+	<element name="text-tune">
+		<text string="TUNE:"><color red="0.8" green="0.8" blue="0.8"/></text>
+	</element>
 	<element name="fader-text-1">
 		<text string="BASS"><color red="0.94" green="0.94" blue="0.93"/></text>
 	</element>
@@ -125,13 +169,13 @@ copyright-holders:m1macrophage
 	<element name="fader-text-9">
 		<text string="METRONOME"><color red="0.94" green="0.94" blue="0.93"/></text>
 	</element>
+	<element name="fader-text-10">
+		<text string="VOLUME"><color red="0.94" green="0.94" blue="0.93"/></text>
+	</element>
 	<element name="fader-text-toms">
 		<text string="--------   TOMS   --------">
 			<color red="0.94" green="0.94" blue="0.93"/>
 		</text>
-	</element>
-	<element name="fader-text-volume">
-		<text string="VOLUME"><color red="0.94" green="0.94" blue="0.93"/></text>
 	</element>
 
 	<element name="num-text-1:1">
@@ -292,7 +336,7 @@ copyright-holders:m1macrophage
 	<view name="Default Layout">
 		<!-- Starting at 110 to allow modeling the top part of the instrument
 		     in the future -->
-		<bounds x="0" y="110" width="960" height="518"/>
+		<bounds x="0" y="85" width="960" height="550"/>
 
 		<!-- Case -->
 		<element ref="panel">
@@ -317,37 +361,39 @@ copyright-holders:m1macrophage
 			</element>
 		</repeat>
 
+		<!-- Tuning trimmers -->
+		<collection name="tuning">
+			<element ref="text-tune">
+				<bounds x="20" y="110" width="30" height="10"/>
+			</element>
+			<repeat count="8">
+				<param name="trimmer_x" start="77" increment="65"/>
+				<param name="trimmer_id" start="1" increment="1"/>
+				<group ref="trimmer">
+					<bounds x="~trimmer_x~" y="95" width="15" height="40"/>
+				</group>
+			</repeat>
+		</collection>
+		<collection name="script warning">
+			<element ref="script_warning" id="warning">
+				<bounds x="600" y="105" width="300" height="20"/>
+			</element>
+		</collection>
+
 		<!-- Mixer -->
 		<repeat count="9">
-			<param name="fader_x" start="67" increment="65"/>
-			<param name="text_x" start="52" increment="65"/>
-			<param name="text_i" start="1" increment="1"/>
-			<param name="pot_i" start="1" increment="1"/>
-			<element ref="fader" id="fader_p~pot_i~">
-				<bounds x="~fader_x~" y="222" width="35" height="144"/>
-			</element>
-			<element ref="fader-knob">
-				<animate inputtag="fader_p~pot_i~" inputmask="0x7f"/>
-				<bounds state="100" x="~fader_x~" y="213" width="35" height="35"/>
-				<bounds state="0" x="~fader_x~" y="340" width="35" height="35"/>
-			</element>
-			<element ref="fader-text-~text_i~">
-				<bounds x="~text_x~" y="380" width="65" height="10"/>
-			</element>
+			<param name="fader_x" start="52" increment="65"/>
+			<param name="fader_id" start="1" increment="1"/>
+			<group ref="fader">
+				<bounds x="~fader_x~" y="213" width="65" height="177"/>
+			</group>
 		</repeat>
+		<param name="fader_id" value="10"/>
+		<group ref="fader">
+			<bounds x="656" y="213" width="65" height="177"/>
+		</group>
 		<element ref="fader-text-toms">
 			<bounds x="262" y="380" width="100" height="10"/>
-		</element>
-		<element ref="fader" id="fader_p10">
-			<bounds x="669" y="222" width="35" height="144"/>
-		</element>
-		<element ref="fader-knob">
-			<animate inputtag="fader_p10" inputmask="0x7f"/>
-			<bounds state="100" x="669" y="213" width="35" height="35"/>
-			<bounds state="0" x="669" y="340" width="35" height="35"/>
-		</element>
-		<element ref="fader-text-volume">
-			<bounds x="656" y="380" width="60" height="10"/>
 		</element>
 
 		<!-- Display -->
@@ -506,84 +552,146 @@ copyright-holders:m1macrophage
 	<script><![CDATA[
 		file:set_resolve_tags_callback(
 			function()
-				-- These constants need to match the "fader" and "fader-knob"
-				-- element attributes in the "Mixer" section.
-				local fader_height <const> = 144
-				local knob_height <const> = 35
-				local knob_fader_delta_y <const> = 9  -- fader y - knob y
-
-				local fader_deadzone <const> = math.floor(knob_height / 2) - knob_fader_delta_y
-
-				-- Local state used by the pointer update handler.
-				local faders = {}
-				local fader_fields = {}
-				local selected = 0
-
-				-- Gather relevant elements and inputs into local state.
 				local view = file.views["Default Layout"]
-				for i = 1, #view.items do
-					local item = view.items:at(i)
-					if item.id ~= nil and string.find(item.id, "fader_") == 1 then
-						local port_tag = item.id
-						local port = file.device:ioport(port_tag)
-						local field = nil
-						if port ~= nil then
-							for k, val in pairs(port.fields) do
-								field = val
-								break
-							end
-							if field == nil then
-								print("DMX LAYOUT ERROR - Port does not have a field: " .. port_tag)
-							end
-						else
-							print("DMX LAYOUT ERROR - Port not found: " .. port_tag)
-						end
-						table.insert(faders, item)
-						table.insert(fader_fields, field)
-					end
+				install_slider_callbacks(view)
+
+				-- Configure volume faders.
+				for i = 1, 10 do
+					add_vertical_slider(view, "fader_" .. i, "fader_knob_" .. i, "fader_p" .. i)
 				end
 
-				view:set_pointer_updated_callback(
-					function(type, id, dev, x, y, btn, dn, up, cnt)
-						-- No button pressed. Reset state.
-						if btn & 1 == 0 then
-							selected = 0
-							return
-						end
+				-- Configure tuning trimmers.
+				for i = 1, 8 do
+					add_vertical_slider(view, "trimmer_" .. i, "trimmer_knob_" .. i, "pitch_adj_" .. i)
+				end
 
-						-- Button just pressed. Find affected fader.
-						if dn & 1 ~= 0 then
-							for i = 1, #faders do
-								if faders[i].bounds:includes(x, y) then
-									selected = i
-									break
-								end
-							end
-						end
-
-						-- No fader selected. Nothing to do.
-						if selected <= 0 then
-							return
-						end
-
-						-- A fader is selected. Update state and, indirectly,
-						-- fader knob position, based on the pointer's Y position.
-
-						-- It is assumed the attached IO field is an IPT_ADJUSTER
-						-- with a range of 0-100 (the default).
-
-						local bbox = faders[selected].bounds
-						local scale_factor = bbox.height / fader_height
-						local min_y = bbox.y0 + fader_deadzone * scale_factor
-						local max_y = bbox.y1 - fader_deadzone * scale_factor
-
-						local new_value = 100 - 100 * (y - min_y) / (max_y - min_y)
-						new_value = math.floor(new_value + 0.5)
-						if new_value < 0 then new_value = 0 end
-						if new_value > 100 then new_value = 100 end
-						fader_fields[selected].user_value = new_value
-					end)
+				view.items["warning"]:set_state(0)
 			end)
+
+		-----------------------------------------------------------------------
+		-- Slider library starts.
+		-- Can be copied as-is to other layouts.
+		-----------------------------------------------------------------------
+		local sliders = {}   -- Stores slider information.
+		local pointers = {}  -- Tracks pointer state.
+
+		-- The knob's Y position must be animated using <animate inputtag="{port_name}">.
+		-- The click area's vertical size must exactly span the range of the
+		-- knob's movement.
+		function add_vertical_slider(view, clickarea_id, knob_id, port_name)
+			local slider = {}
+
+			slider.clickarea = view.items[clickarea_id]
+			if slider.clickarea == nil then
+				emu.print_error("Slider element: '" .. clickarea_id .. "' not found.")
+				return
+			end
+
+			slider.knob = view.items[knob_id]
+			if slider.knob == nil then
+				emu.print_error("Slider knob element: '" .. knob_id .. "' not found.")
+				return
+			end
+
+			local port = file.device:ioport(port_name)
+			if port == nil then
+				emu.print_error("Port: '" .. port_name .. "' not found.")
+				return
+			end
+
+			slider.field = nil
+			for k, val in pairs(port.fields) do
+				slider.field = val
+				break
+			end
+			if slider.field == nil then
+				emu.print_error("Port: '" .. port_name .."' does not seem to be an IPT_ADJUSTER.")
+				return
+			end
+
+			table.insert(sliders, slider)
+		end
+
+		local function pointer_updated(type, id, dev, x, y, btn, dn, up, cnt)
+			-- If a button is not pressed, reset the state of the current pointer.
+			if btn & 1 == 0 then
+				pointers[id] = nil
+				return
+			end
+
+			-- If a button was just pressed, find the affected slider, if any.
+			if dn & 1 ~= 0 then
+				for i = 1, #sliders do
+					if sliders[i].knob.bounds:includes(x, y) then
+						pointers[id] = {
+							selected_slider = i,
+							relative = true,
+							start_y = y,
+							start_value = sliders[i].field.user_value }
+						break
+					elseif sliders[i].clickarea.bounds:includes(x, y) then
+						pointers[id] = {
+							selected_slider = i,
+							relative = false }
+						break
+					end
+				end
+			end
+
+			-- If there is no slider selected by the current pointer, we are done.
+			if pointers[id] == nil then
+				return
+			end
+
+			-- A slider is selected. Update state and, indirectly, slider knob position,
+			-- based on the pointer's Y position. It is assumed the attached IO field is
+			-- an IPT_ADJUSTER with a range of 0-100 (the default).
+
+			local pointer = pointers[id]
+			local slider = sliders[pointer.selected_slider]
+
+			local knob_half_height = slider.knob.bounds.height / 2
+			local min_y = slider.clickarea.bounds.y0 + knob_half_height
+			local max_y = slider.clickarea.bounds.y1 - knob_half_height
+
+			local new_value = 0
+			if pointer.relative then
+				-- User clicked on the knob. The new value will depend on how much the
+				-- knob was dragged.
+				new_value = pointer.start_value - 100 * (y - pointer.start_y) / (max_y - min_y)
+			else
+				-- User clicked elsewhere on the slider. The new value will depend on
+				-- the absolute position of the click.
+				new_value = 100 - 100 * (y - min_y) / (max_y - min_y)
+			end
+
+			new_value = math.floor(new_value + 0.5)
+			if new_value < 0 then new_value = 0 end
+			if new_value > 100 then new_value = 100 end
+			slider.field.user_value = new_value
+		end
+
+		local function pointer_left(type, id, dev, x, y, up, cnt)
+			pointers[id] = nil
+		end
+
+		local function pointer_aborted(type, id, dev, x, y, up, cnt)
+			pointers[id] = nil
+		end
+
+		local function forget_pointers()
+			pointers = {}
+		end
+
+		function install_slider_callbacks(view)
+			view:set_pointer_updated_callback(pointer_updated)
+			view:set_pointer_left_callback(pointer_left)
+			view:set_pointer_aborted_callback(pointer_aborted)
+			view:set_forget_pointers_callback(forget_pointers)
+		end
+		-----------------------------------------------------------------------
+		-- Slider library ends.
+		-----------------------------------------------------------------------
 	]]></script>
 </mamelayout>
 

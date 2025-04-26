@@ -57,6 +57,7 @@
 
 #include "bus/nscsi/hd.h"
 #include "bus/nscsi/cd.h"
+#include "bus/nscsi/tape.h"
 #include "bus/rs232/hlemouse.h"
 
 #include "kbd.h"
@@ -204,6 +205,7 @@ static void scsi_devices(device_slot_interface &device)
 			downcast<nscsi_cdrom_device &>(*device).set_block_size(512);
 		});
 	device.option_add("harddisk", NSCSI_HARDDISK);
+	device.option_add("tape", NSCSI_TAPE);
 }
 
 void sgi_ip4_device::device_add_mconfig(machine_config &config)
@@ -217,7 +219,7 @@ void sgi_ip4_device::device_add_mconfig(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // CXK5816PN-15L
 
-	PIT8254(config, m_pit);
+	PIT8253(config, m_pit);
 	m_pit->set_clk<2>(3.6864_MHz_XTAL);
 	m_pit->out_handler<0>().set([this](int state) { if (state) m_cpu->set_input_line(INPUT_LINE_IRQ2, 1); });
 	m_pit->out_handler<1>().set([this](int state) { if (state) m_cpu->set_input_line(INPUT_LINE_IRQ4, 1); });
@@ -239,7 +241,7 @@ void sgi_ip4_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:3", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:4", scsi_devices, "cdrom", false);
 	NSCSI_CONNECTOR(config, "scsi:5", scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, nullptr, false);
+	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, "tape", false);
 	NSCSI_CONNECTOR(config, "scsi:7", scsi_devices, nullptr, false);
 
 	// duart 0 (keyboard/mouse)

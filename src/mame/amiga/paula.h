@@ -1,5 +1,5 @@
 // license: BSD-3-Clause
-// copyright-holders: Aaron Giles, Dirk Best
+// copyright-holders: Aaron Giles, Dirk Best, Angelo Salese
 /***************************************************************************
 
     MOS Technology/Commodore 8364 "Paula"

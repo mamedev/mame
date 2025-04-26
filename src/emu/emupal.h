@@ -367,7 +367,9 @@ public:
 	void write16(offs_t offset, u16 data, u16 mem_mask = u16(~0));
 	void write16_ext(offs_t offset, u16 data, u16 mem_mask = u16(~0));
 	u32 read32(offs_t offset);
+	u32 read32_ext(offs_t offset);
 	void write32(offs_t offset, u32 data, u32 mem_mask = u32(~0));
+	void write32_ext(offs_t offset, u32 data, u32 mem_mask = u32(~0));
 
 	// helper to update palette when data changed
 	void update() { if (!m_init.isnull()) m_init(*this); }

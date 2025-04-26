@@ -9,6 +9,7 @@
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/devices.h"
 #include "bus/nubus/nubus.h"
+#include "bus/nubus/cards.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/powerpc/ppc.h"
 #include "machine/6522via.h"
@@ -120,9 +121,9 @@ private:
 	void sndi_err_irq(int state);
 
 	void vblank_irq(int state);
-	[[maybe_unused]] void slot2_irq(int state);
-	[[maybe_unused]] void slot1_irq(int state);
-	void slot0_irq(int state);
+	void slot2_irq_w(int state);
+	void slot1_irq_w(int state);
+	void slot0_irq_w(int state);
 
 	void fdc_irq(int state);
 	void fdc_drq(int state);
@@ -166,6 +167,8 @@ private:
 
 	uint8_t hmc_r(offs_t offset);
 	void hmc_w(offs_t offset, uint8_t data);
+
+	void ram_size();
 
 	uint32_t id_r();
 
@@ -247,6 +250,7 @@ macpdm_state::macpdm_state(const machine_config &mconfig, device_type type, cons
 void macpdm_state::driver_init()
 {
 	m_maincpu->space().install_ram(0, m_ram->mask(), 0, m_ram->pointer());
+
 	m_model_id = 0xa55a3011;
 	// 7100 = a55a3012
 	// 8100 = a55a3013
@@ -567,7 +571,9 @@ void macpdm_state::scsi_w(offs_t offset, uint8_t data)
 
 uint8_t macpdm_state::hmc_r(offs_t offset)
 {
-	return (m_hmc_reg >> m_hmc_bit) & 1 ? 0x80 : 0x00;
+	const uint8_t rv = (m_hmc_reg >> m_hmc_bit) & 1;
+	m_hmc_bit++;
+	return rv;
 }
 
 void macpdm_state::hmc_w(offs_t offset, uint8_t data)
@@ -575,14 +581,15 @@ void macpdm_state::hmc_w(offs_t offset, uint8_t data)
 	if(offset & 8)
 		m_hmc_bit = 0;
 	else {
-		if(data & 0x80)
+		if(data & 1)
 			m_hmc_buffer |= u64(1) << m_hmc_bit;
 		else
 			m_hmc_buffer &= ~(u64(1) << m_hmc_bit);
 		m_hmc_bit ++;
 		if(m_hmc_bit == 35) {
 			m_hmc_reg = m_hmc_buffer & ~3; // csiz is readonly, we pretend there isn't a l2 cache
-			m_video->set_vram_offset(m_hmc_reg & 0x200000000 ? 0x100000 : 0);
+			m_video->set_vram_offset(m_hmc_reg & 0x200000000 ? 0 : 0x100000);
+			ram_size();
 			logerror("HMC l2=%c%c%c%c%c vbase=%c%s mbram=%cM size=%x%s romd=%d refresh=%02x w=%c%c%c%c ras=%d%d%d%d\n",
 					 m_hmc_reg & 0x008000000 ? '+' : '-',      // l2_en
 					 m_hmc_reg & 0x400000000 ? '3' : '2',      // l2_init
@@ -592,19 +599,79 @@ void macpdm_state::hmc_w(offs_t offset, uint8_t data)
 					 m_hmc_reg & 0x200000000 ? '1' : '0',      // vbase
 					 m_hmc_reg & 0x100000000 ? " vtst" : "",   // vtst
 					 m_hmc_reg & 0x080000000 ? '8' : '4',      // mb_ram
-					 (m_hmc_reg >> 29) & 3,                    // size
+					 (uint32_t)((m_hmc_reg >> 29) & 3),        // size
 					 m_hmc_reg & 0x001000000 ? " nblrom" : "", // nblrom
-					 12 - 2*((m_hmc_reg >> 22) & 3),           // romd
-					 (m_hmc_reg >> 16) & 0x3f,                 // rfsh
+					 (uint32_t)(12 - 2*((m_hmc_reg >> 22) & 3)), // romd
+					 (uint32_t)((m_hmc_reg >> 16) & 0x3f),     // rfsh
 					 m_hmc_reg & 0x000000008 ? '3' : '2',      // winit
 					 m_hmc_reg & 0x000000004 ? '3' : '2',      // wbrst
 					 m_hmc_reg & 0x000008000 ? '1' : '2',      // wcasp
 					 m_hmc_reg & 0x000004000 ? '1' : '2',      // wcasd
-					 3 - ((m_hmc_reg >> 12) & 3),              // rdac
-					 6 - ((m_hmc_reg >> 8) & 3),               // rasd
-					 5 - ((m_hmc_reg >> 6) & 3),               // rasp
-					 4 - ((m_hmc_reg >> 4) & 3));              // rcasd
+					 (uint32_t)(3 - ((m_hmc_reg >> 12) & 3)),  // rdac
+					 (uint32_t)(6 - ((m_hmc_reg >> 8) & 3)),   // rasd
+					 (uint32_t)(5 - ((m_hmc_reg >> 6) & 3)),   // rasp
+					 (uint32_t)(4 - ((m_hmc_reg >> 4) & 3)));  // rcasd
 		}
+	}
+}
+
+/*
+    PDM uses a variant on the V8/Sonora style memory controller.
+    - Motherboard RAM can be 4 or 8 MiB
+    - The hardware officially limits SIMMs to 2, 8, or 32 MiB, and SIMMs must be installed in pairs
+    - In reality, 128 MiB SIMMs will also work.
+    - 6100 has only 2 SIMM slots, so valid sizes are 8MiB (no SIMMs), 12MiB (2 MiB SIMM x2),
+      24MiB (8 MiB SIMM x2), 72MiB (32 MiB SIMM x2), and 264MiB (128 MiB SIMM x2)
+    - 7100 has 4 SIMM slots, allowing RAM up to 520MiB (128 MiB SIMM x4)
+    - 8100 has 8 SIMM slots, which add valid sizes up to 264 MiB (32 MiB SIMM x8)
+*/
+void macpdm_state::ram_size(){
+	static const uint32_t sizes[4] = { 128*1024*1024, 2*1024*1024, 8*1024*1024, 32*1024*1024 };
+	const u8 config = (m_hmc_reg >> 29) & 3;        // 0 = 128MiB, 1 = 2MiB, 2 = 8MiB, 3 = 32MiB
+	const u8 mb_size = (m_hmc_reg & 0x00800000) ? 1 : 0;
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	const u32 total_ram = m_ram->size();
+	const u32 mb_ram_size = (mb_size ? 8*1024*1024 : 4*1024*1024);
+
+	// SIMMs must be in identical pairs, so any leftover RAM after the motherboard 8MiB is
+	// the number of slots times the SIMM size.
+	const u32 simm_size = (total_ram - mb_ram_size) / 2;
+
+	u8 *mb_ram = (u8 *)m_ram->pointer();
+	u8 *ram_a = mb_ram + mb_ram_size;
+	u8 *ram_b = ram_a + simm_size;
+
+	// unmap the first GB of address space (reserved for RAM)
+	space.unmap_readwrite(0x00000000, 0x3fffffff);
+
+	// map the motherboard 8MB
+	space.install_ram(0x00000000, 0x007fffff, 0, (void *)mb_ram);
+
+	// install RAM A
+	if (simm_size > 0)
+	{
+		if (simm_size <= 8*1024*1024)
+		{
+			space.install_ram(mb_ram_size, mb_ram_size + simm_size - 1, 0, (void *)ram_a);
+		}
+		else
+		{
+			space.install_ram(mb_ram_size, sizes[config] - 1, 0, (void *)(ram_a + mb_ram_size));
+		}
+
+		// install a complete image of RAM A in the slot above the top of memory (which is actually where the ROM code looks for it)
+		const u32 alias_base = (sizes[config] * 2);
+		space.install_ram(alias_base, alias_base + simm_size - 1, 0, (void *)ram_a);
+
+		// install RAM B
+		u32 b_base = sizes[config];
+
+		if (simm_size < (128*1024*1024))
+		{
+			b_base += mb_ram_size;
+		}
+
+		space.install_ram(b_base, b_base + simm_size - 1, 0, (void *)ram_b);
 	}
 }
 
@@ -680,14 +747,19 @@ void macpdm_state::vblank_irq(int state)
 	via2_irq_slot_set(0x40, state);
 }
 
-void macpdm_state::slot2_irq(int state)
+void macpdm_state::slot2_irq_w(int state)
 {
 	via2_irq_slot_set(0x20, state);
 }
 
-void macpdm_state::slot1_irq(int state)
+void macpdm_state::slot1_irq_w(int state)
 {
 	via2_irq_slot_set(0x10, state);
+}
+
+void macpdm_state::slot0_irq_w(int state)
+{
+	via2_irq_slot_set(0x08, state);
 }
 
 void macpdm_state::sndo_dma_irq(int state)
@@ -1190,7 +1262,16 @@ void macpdm_state::macpdm(machine_config &config)
 
 	RAM(config, m_ram);
 	m_ram->set_default_size("8M");
-	m_ram->set_extra_options("16M,32M,64M,128M");
+	m_ram->set_extra_options("12M,24M,72M,264M");
+
+	nubus_device &nubus(NUBUS(config, "nubus", 0));
+	nubus.set_space(m_maincpu, AS_PROGRAM);
+	nubus.out_irqc_callback().set(FUNC(macpdm_state::slot0_irq_w));
+	nubus.out_irqd_callback().set(FUNC(macpdm_state::slot1_irq_w));
+	nubus.out_irqe_callback().set(FUNC(macpdm_state::slot2_irq_w));
+
+	// 6100 with the NuBus adapter has one slot, slot $E
+	NUBUS_SLOT(config, "nbe", "nubus", powermac_nubus_cards, nullptr);
 
 	MACADB(config, m_macadb, IO_CLOCK/2);
 	CUDA_V2XX(config, m_cuda, XTAL(32'768));

@@ -37,8 +37,6 @@
 //#include "logmacro.h"
 
 
-
-
 DEFINE_DEVICE_TYPE(K054000, k054000_device, "k054000", "K054000 Protection")
 
 k054000_device::k054000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -52,6 +50,10 @@ k054000_device::k054000_device(const machine_config &mconfig, const char *tag, d
 
 void k054000_device::device_start()
 {
+	save_item(NAME(m_raw_Acx));
+	save_item(NAME(m_raw_Acy));
+	save_item(NAME(m_raw_Bcx));
+	save_item(NAME(m_raw_Bcy));
 	save_item(NAME(m_Acx));
 	save_item(NAME(m_Acy));
 	save_item(NAME(m_Aax));
@@ -60,10 +62,6 @@ void k054000_device::device_start()
 	save_item(NAME(m_Bcy));
 	save_item(NAME(m_Bax));
 	save_item(NAME(m_Bay));
-	save_pointer(NAME(m_raw_Acx), 4);
-	save_pointer(NAME(m_raw_Acy), 4);
-	save_pointer(NAME(m_raw_Bcx), 4);
-	save_pointer(NAME(m_raw_Bcy), 4);
 }
 
 //-------------------------------------------------

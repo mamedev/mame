@@ -641,7 +641,7 @@ CPUs to worry about.
 
 TIMER_CALLBACK_MEMBER(segas24_state::gground_hack_timer_callback)
 {
-	m_subcpu->set_clock_scale(1.0f);
+	m_subcpu->set_clock_scale(1.0);
 }
 
 
@@ -660,7 +660,7 @@ void segas24_state::cnt1(int state)
 			//machine().debug_break();
 			if (m_gground_hack_timer)
 			{
-				m_subcpu->set_clock_scale(0.7f); // reduce clock speed temporarily so a check passes, see notes above
+				m_subcpu->set_clock_scale(0.7); // reduce clock speed temporarily so a check passes, see notes above
 				m_gground_hack_timer->adjust(attotime::from_seconds(2));
 			}
 		}

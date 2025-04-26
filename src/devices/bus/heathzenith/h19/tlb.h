@@ -317,6 +317,7 @@ public:
 protected:
 	heath_igc_tlb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
 
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -351,6 +352,9 @@ protected:
 
 	u16                     m_io_address;
 	u16                     m_window_address;
+private:
+	required_ioport m_joystick1, m_joystick2;
+
 };
 
 /**

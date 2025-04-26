@@ -177,13 +177,13 @@ static void generateGpSequenceInternal(
   cc.cmn(wA, wB);
   cc.cmn(xA, xB);
   cc.cmn(wA, wB, uxtb(2));
-  cc.cmn(xA, xB, uxtb(2));
+  cc.cmn(xA, wB, uxtb(2));
   cc.cmp(wA, 33);
   cc.cmp(xA, 33);
   cc.cmp(wA, wB);
   cc.cmp(xA, xB);
   cc.cmp(wA, wB, uxtb(2));
-  cc.cmp(xA, xB, uxtb(2));
+  cc.cmp(xA, wB, uxtb(2));
   cc.crc32b(wA, wB, wC);
   cc.crc32b(wzr, wB, wC);
   cc.crc32b(wA, wzr, wC);

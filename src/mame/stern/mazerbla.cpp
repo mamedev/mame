@@ -22,7 +22,7 @@ ZPU-2000 - main cpu board (Zentral (sic) Processor Unit)
  - four 'test button' style switches
  - one 4Mhz xtal @A1
  - one PAL16R8? @7D (UNDUMPED, if present)
- - this same board is shared with cliff hanger (cliffhgr.c)
+ - this same board is shared with cliff hanger (stern/cliffhgr.cpp)
 
 CFB-1000 - video/subcpu board (Color Frame Board)
  - this board has a sub-cpu on it and four roms (six sockets for roms, two empty)
@@ -49,7 +49,7 @@ VSB-2000 - sound/speech/subcpu board (Voice and Sound Board)
    - PROMS: 82s123: @B8 @B9; 82s129: @G8 @G9 (all dumped)
 
 CRF-1001 - RF Filter board for video/audio output
- - this same board is shared with cliff hanger (cliffhgr.c)
+ - this same board is shared with cliff hanger (stern/cliffhgr.cpp)
 
 UIB-1000 - coin inputs, start/fire buttons and gun ADCs (Vin(-) and Vref/2 are calibrated by potentiometers)
 
@@ -113,9 +113,7 @@ video z80
 #include "machine/nvram.h"
 #include "machine/rescap.h"
 #include "sound/ay8910.h"
-#include "video/resnet.h"
 #include "video/mb_vcu.h"
-#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -123,8 +121,8 @@ video z80
 
 namespace {
 
-#define MASTER_CLOCK XTAL(4'000'000)
-#define SOUND_CLOCK XTAL(14'318'181)
+static constexpr XTAL MASTER_CLOCK = XTAL(4'000'000);
+static constexpr XTAL SOUND_CLOCK = XTAL(14'318'181);
 
 
 class mazerbla_state : public driver_device
@@ -134,11 +132,12 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_subcpu(*this, "sub")
-		, m_vcu(*this,"vcu")
+		, m_vcu(*this, "vcu")
 		, m_screen(*this, "screen")
 		, m_soundlatch(*this, "soundlatch")
 		, m_uib_adc(*this, "adc%u", 0U)
 		, m_digital_inputs(*this, { "ZPU", "DSW0", "DSW1", "DSW2", "DSW3", "BUTTONS" })
+		, m_gfx_bank(*this, "gfx_bank")
 		, m_leds(*this, "led%u", 0U)
 		, m_lamps(*this, "lamp%u", 0U)
 	{ }
@@ -149,14 +148,17 @@ public:
 	void init_mazerbla();
 	void init_greatgun();
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
 private:
 	void cfb_rom_bank_sel_w(uint8_t data);
 	void cfb_zpu_int_req_set_w(uint8_t data);
 	uint8_t cfb_zpu_int_req_clr();
-	uint8_t ls670_0_r(offs_t offset);
-	void ls670_0_w(offs_t offset, uint8_t data);
-	uint8_t ls670_1_r(offs_t offset);
-	void ls670_1_w(offs_t offset, uint8_t data);
+	template <unsigned Chip> uint8_t ls670_r(offs_t offset);
+	template <unsigned Chip> void ls670_w(offs_t offset, uint8_t data);
 	void zpu_bcd_decoder_w(uint8_t data);
 	uint8_t zpu_inputs_r();
 	void zpu_led_w(offs_t offset, uint8_t data);
@@ -166,12 +168,9 @@ private:
 	void vsb_ls273_audio_control_w(uint8_t data);
 	void sound_int_clear_w(uint8_t data);
 	void gg_led_ctrl_w(uint8_t data);
-	void mazerbla_palette(palette_device &palette);
-	uint32_t screen_update_mazerbla(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 	INTERRUPT_GEN_MEMBER(sound_interrupt);
-	TIMER_CALLBACK_MEMBER(deferred_ls670_0_w);
-	TIMER_CALLBACK_MEMBER(deferred_ls670_1_w);
+	TIMER_CALLBACK_MEMBER(deferred_ls670_w);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	void greatgun_cpu3_io_map(address_map &map) ATTR_COLD;
 	void greatgun_io_map(address_map &map) ATTR_COLD;
@@ -183,10 +182,6 @@ private:
 	void mazerbla_io_map(address_map &map) ATTR_COLD;
 	void mazerbla_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
-
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -195,19 +190,15 @@ private:
 	optional_device<generic_latch_8_device> m_soundlatch;
 	optional_device_array<adc0804_device, 4> m_uib_adc;
 	required_ioport_array<6> m_digital_inputs;
+	required_memory_bank m_gfx_bank;
 	output_finder<3> m_leds;
 	output_finder<2> m_lamps;
 
 	uint8_t m_port02_status = 0;
 	uint32_t m_gfx_rom_bank = 0;  /* graphics ROMs are banked */
 
-	double m_weights_r[2];
-	double m_weights_g[3];
-	double m_weights_b[3];
-
 	/* misc */
-	uint8_t m_ls670_0[4];
-	uint8_t m_ls670_1[4];
+	uint8_t m_ls670[2][4];
 
 	uint8_t m_zpu_int_vector = 0;
 
@@ -236,29 +227,11 @@ private:
 
 ***************************************************************************/
 
-void mazerbla_state::mazerbla_palette(palette_device &palette)
-{
-	static constexpr int resistances_r[2]  = { 4700, 2200 };
-	static constexpr int resistances_gb[3] = { 10000, 4700, 2200 };
-
-	// just to calculate coefficients for later use
-	compute_resistor_weights(0, 255,    -1.0,
-			3,  resistances_gb, m_weights_g,    3600,   0,
-			3,  resistances_gb, m_weights_b,    3600,   0,
-			2,  resistances_r,  m_weights_r,    3600,   0);
-}
-
 void mazerbla_state::video_start()
 {
 	// ...
 }
 
-
-uint32_t mazerbla_state::screen_update_mazerbla(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	m_vcu->screen_update(screen,bitmap,cliprect);
-	return 0;
-}
 
 void mazerbla_state::screen_vblank(int state)
 {
@@ -272,7 +245,7 @@ void mazerbla_state::cfb_rom_bank_sel_w(uint8_t data)
 {
 	m_gfx_rom_bank = data;
 
-	membank("bank1")->set_entry(m_gfx_rom_bank);
+	m_gfx_bank->set_entry(m_gfx_rom_bank);
 }
 
 /*************************************
@@ -290,55 +263,39 @@ void mazerbla_state::cfb_zpu_int_req_set_w(uint8_t data)
 
 uint8_t mazerbla_state::cfb_zpu_int_req_clr()
 {
-	// this clears all interrupts
-	m_zpu_int_vector = 0xff;
-	m_maincpu->set_input_line(0, CLEAR_LINE);
+	if (!machine().side_effects_disabled())
+	{
+		// this clears all interrupts
+		m_zpu_int_vector = 0xff;
+		m_maincpu->set_input_line(0, CLEAR_LINE);
+	}
 
 	return 0;
 }
 
-uint8_t mazerbla_state::ls670_0_r(offs_t offset)
+template <unsigned Chip>
+uint8_t mazerbla_state::ls670_r(offs_t offset)
 {
 	/* set a timer to force synchronization after the read */
 	machine().scheduler().synchronize();
 
-	return m_ls670_0[offset];
+	return m_ls670[Chip][offset];
 }
 
-TIMER_CALLBACK_MEMBER(mazerbla_state::deferred_ls670_0_w)
+TIMER_CALLBACK_MEMBER(mazerbla_state::deferred_ls670_w)
 {
-	int offset = (param >> 8) & 255;
-	int data = param & 255;
+	int const chip = (param >> 16) & 1;
+	int const offset = (param >> 8) & 3;
+	int const data = param & 255;
 
-	m_ls670_0[offset] = data;
+	m_ls670[chip][offset] = data;
 }
 
-void mazerbla_state::ls670_0_w(offs_t offset, uint8_t data)
-{
-	/* do this on a timer to let the CPUs synchronize */
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(mazerbla_state::deferred_ls670_0_w),this), (offset << 8) | data);
-}
-
-uint8_t mazerbla_state::ls670_1_r(offs_t offset)
-{
-	/* set a timer to force synchronization after the read */
-	machine().scheduler().synchronize();
-
-	return m_ls670_1[offset];
-}
-
-TIMER_CALLBACK_MEMBER(mazerbla_state::deferred_ls670_1_w)
-{
-	int offset = (param >> 8) & 255;
-	int data = param & 255;
-
-	m_ls670_1[offset] = data;
-}
-
-void mazerbla_state::ls670_1_w(offs_t offset, uint8_t data)
+template <unsigned Chip>
+void mazerbla_state::ls670_w(offs_t offset, uint8_t data)
 {
 	/* do this on a timer to let the CPUs synchronize */
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(mazerbla_state::deferred_ls670_1_w),this), (offset << 8) | data);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(mazerbla_state::deferred_ls670_w),this), (Chip << 16) | (offset << 8) | data);
 }
 
 
@@ -491,7 +448,7 @@ void mazerbla_state::mazerbla_map(address_map &map)
 void mazerbla_state::mazerbla_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x4c, 0x4f).rw(FUNC(mazerbla_state::ls670_1_r), FUNC(mazerbla_state::ls670_0_w));
+	map(0x4c, 0x4f).rw(FUNC(mazerbla_state::ls670_r<1>), FUNC(mazerbla_state::ls670_w<0>));
 	map(0x60, 0x60).w(FUNC(mazerbla_state::zpu_bcd_decoder_w)); // r(FUNC(mazerbla_state::) from protection pal, if populated
 	map(0x62, 0x62).r(FUNC(mazerbla_state::zpu_inputs_r));
 	// 64 is some sort of output latch, unpopulated?
@@ -515,14 +472,14 @@ void mazerbla_state::mazerbla_cpu2_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x00).w(FUNC(mazerbla_state::vsb_ls273_audio_control_w));
 	map(0x40, 0x41).nopw();
-	map(0x80, 0x83).rw(FUNC(mazerbla_state::ls670_0_r), FUNC(mazerbla_state::ls670_1_w));
+	map(0x80, 0x83).rw(FUNC(mazerbla_state::ls670_r<0>), FUNC(mazerbla_state::ls670_w<1>));
 }
 
 void mazerbla_state::mazerbla_cpu3_map(address_map &map)
 {
 	map(0x0000, 0x37ff).rom();
 	map(0x3800, 0x3fff).ram().share("share1");
-	map(0x4000, 0x5fff).bankr("bank1");                    /* GFX roms */
+	map(0x4000, 0x5fff).bankr(m_gfx_bank);                    /* GFX roms */
 	map(0x4000, 0x4003).w(m_vcu, FUNC(mb_vcu_device::write_vregs));
 	map(0x6000, 0x67ff).rw(m_vcu, FUNC(mb_vcu_device::read_ram), FUNC(mb_vcu_device::write_ram));
 	map(0xa000, 0xa7ff).r(m_vcu, FUNC(mb_vcu_device::load_params));
@@ -939,13 +896,12 @@ void mazerbla_state::machine_start()
 	m_leds.resolve();
 	m_lamps.resolve();
 
-	membank("bank1")->configure_entries(0, 256, memregion("sub2")->base() + 0x10000, 0x2000);
+	m_gfx_bank->configure_entries(0, 256, memregion("sub2")->base() + 0x10000, 0x2000);
 
 	save_item(NAME(m_port02_status));
 	save_item(NAME(m_gfx_rom_bank));
 
-	save_item(NAME(m_ls670_0));
-	save_item(NAME(m_ls670_1));
+	save_item(NAME(m_ls670));
 
 	save_item(NAME(m_zpu_int_vector));
 
@@ -972,8 +928,8 @@ void mazerbla_state::machine_reset()
 
 	for (int i = 0; i < 4; i++)
 	{
-		m_ls670_0[i] = 0;
-		m_ls670_1[i] = 0;
+		for (int j = 0; j < 2; j++)
+			m_ls670[j][i] = 0;
 	}
 
 	zpu_bcd_decoder_w(0);
@@ -1008,8 +964,8 @@ void mazerbla_state::mazerbla(machine_config &config)
 
 	/* synchronization forced on the fly */
 	MB_VCU(config, m_vcu, SOUND_CLOCK/4);
-	m_vcu->set_cpu_tag("sub2");
-	m_vcu->set_palette_tag("palette");
+	m_vcu->set_screen(m_screen);
+	m_vcu->set_host_space("sub2", AS_PROGRAM);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -1019,10 +975,8 @@ void mazerbla_state::mazerbla(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	m_screen->set_size(40*8, 32*8);
 	m_screen->set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
-	m_screen->set_screen_update(FUNC(mazerbla_state::screen_update_mazerbla));
+	m_screen->set_screen_update(m_vcu, FUNC(mb_vcu_device::screen_update));
 	m_screen->screen_vblank().set(FUNC(mazerbla_state::screen_vblank));
-
-	PALETTE(config, "palette", FUNC(mazerbla_state::mazerbla_palette), 256+1);
 
 	/* sound hardware */
 }
@@ -1057,8 +1011,8 @@ void mazerbla_state::greatgun(machine_config &config)
 	m_uib_adc[3]->vin_callback().set_ioport("STICK1_Y");
 
 	MB_VCU(config, m_vcu, SOUND_CLOCK/4);
-	m_vcu->set_cpu_tag("sub2");
-	m_vcu->set_palette_tag("palette");
+	m_vcu->set_screen(m_screen);
+	m_vcu->set_host_space("sub2", AS_PROGRAM);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -1068,10 +1022,8 @@ void mazerbla_state::greatgun(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	m_screen->set_size(40*8, 32*8);
 	m_screen->set_visarea(0*8, 32*8-1, 0*8, 28*8-1);
-	m_screen->set_screen_update(FUNC(mazerbla_state::screen_update_mazerbla));
+	m_screen->set_screen_update(m_vcu, FUNC(mb_vcu_device::screen_update));
 	m_screen->screen_vblank().set(FUNC(mazerbla_state::screen_vblank));
-
-	PALETTE(config, "palette", FUNC(mazerbla_state::mazerbla_palette), 256+1);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

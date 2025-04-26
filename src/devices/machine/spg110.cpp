@@ -73,12 +73,12 @@ void spg110_device::ffreq2_w(int state)
 }
 
 // notes about IRQ differences from 2xx
-// 
+//
 // TMB1 / TMB2 are IRQ7 (same as SPG2xx)
 // Key Change is IRQ4 (was 7 on SPG2xx)
 // LVD (Low Voltage Reset) is IRQ6 (doesn't exist on SPG2xx?)
 // ADC is IRQ1 (was 3 on SPG2xx)
-// 
+//
 // on SPG2xx 0x3D2E can redirect any other interrupt to the FIQ
 // on SPG110 FIQ is always from SPUIRQ (sound)
 //
@@ -162,13 +162,13 @@ void spg110_device::internal_map(address_map &map)
 	// 0x2038 // P_Effect_color (not the same as 2030)
 	map(0x002039, 0x002039).w(m_spg_video, FUNC(spg110_video_device::effect_control_2039_w)); // P_Effect_control
 	// 0x203a // P_Mix_offset
-	// 0x203b // P_Fan_effect_th 
+	// 0x203b // P_Fan_effect_th
 	map(0x00203c, 0x00203c).w(m_spg_video, FUNC(spg110_video_device::huereference_203c_w)); // P_203C_HueRefer (should be set based on PAL/NTSC)
-	map(0x00203d, 0x00203d).w(m_spg_video, FUNC(spg110_video_device::lum_adjust_203d_w)); // P_Lum_Adjust 
+	map(0x00203d, 0x00203d).w(m_spg_video, FUNC(spg110_video_device::lum_adjust_203d_w)); // P_Lum_Adjust
 	// 0x203e // P_LPVPosition
 	// 0x203f // P_LPHPosition
 
-	map(0x002042, 0x002042).rw(m_spg_video, FUNC(spg110_video_device::sp_control_2042_r),FUNC(spg110_video_device::sp_control_2042_w)); // P_Sp_control 
+	map(0x002042, 0x002042).rw(m_spg_video, FUNC(spg110_video_device::sp_control_2042_r),FUNC(spg110_video_device::sp_control_2042_w)); // P_Sp_control
 
 	map(0x002045, 0x002045).w(m_spg_video, FUNC(spg110_video_device::spg110_2045_w)); // not documented?
 
@@ -176,11 +176,11 @@ void spg110_device::internal_map(address_map &map)
 
 	map(0x002060, 0x002060).w(m_spg_video, FUNC(spg110_video_device::dma_dst_2060_w)); // P_DMA_Target_adr
 	map(0x002061, 0x002061).w(m_spg_video, FUNC(spg110_video_device::dma_dst_seg_2061_w)); // P_DMA_Target_seg
-	map(0x002062, 0x002062).rw(m_spg_video, FUNC(spg110_video_device::dma_len_status_2062_r),FUNC(spg110_video_device::dma_len_trigger_2062_w)); // P_DMA_numbr 
+	map(0x002062, 0x002062).rw(m_spg_video, FUNC(spg110_video_device::dma_len_status_2062_r),FUNC(spg110_video_device::dma_len_trigger_2062_w)); // P_DMA_numbr
 	map(0x002063, 0x002063).rw(m_spg_video, FUNC(spg110_video_device::spg110_2063_r),FUNC(spg110_video_device::spg110_2063_w)); // P_DMA_control - Video IRQ source / ack (3 different things checked here instead of 2 on spg2xx?)
 	map(0x002064, 0x002064).w(m_spg_video, FUNC(spg110_video_device::dma_dst_step_2064_w)); // P_DMA_Target_step
-	map(0x002065, 0x002065).rw(m_spg_video, FUNC(spg110_video_device::dma_manual_2065_r), FUNC(spg110_video_device::dma_manual_2065_w)); // P_DMA_data 
-	map(0x002066, 0x002066).w(m_spg_video, FUNC(spg110_video_device::dma_source_2066_w)); // P_DMA_Source_adr 
+	map(0x002065, 0x002065).rw(m_spg_video, FUNC(spg110_video_device::dma_manual_2065_r), FUNC(spg110_video_device::dma_manual_2065_w)); // P_DMA_data
+	map(0x002066, 0x002066).w(m_spg_video, FUNC(spg110_video_device::dma_source_2066_w)); // P_DMA_Source_adr
 	map(0x002067, 0x002067).w(m_spg_video, FUNC(spg110_video_device::dma_source_seg_2067_w)); // P_DMA_Source_seg
 	map(0x002068, 0x002068).rw(m_spg_video, FUNC(spg110_video_device::dma_src_step_2068_r), FUNC(spg110_video_device::dma_src_step_2068_w)); // P_DMA_Source_step
 

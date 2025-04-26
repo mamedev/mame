@@ -559,6 +559,45 @@
   The game needs ~25 seconds to check all the things to start.
 
 
+  * Roulette (ICP-1 PCB)
+
+  This game runs on ICP-1 platform, consisting of a 6502 CPU, two 6821 PIAs for I/O,
+  a 6845 CRTC for video, and discrete electronics for sound. The game features robust
+  protection through NVRAM registers and a password-like input sequence, which can be
+  configured and is requested upon each reboot. The password consists of 5 inputs,
+  with repetitions allowed. The password length is fixed.
+
+  Password Configuration and Booting Instructions...
+
+  - How to Set the Password:
+
+    1) Press and hold the PROGRAM key (key 9) while turning on or resetting the machine.
+        (The word 'TESTING' will be displayed on the screen)
+    2) Enter the first desired input of the password, then press DOWN to confirm the choice.
+    3) Enter the second desired input of the password, then press DOWN to confirm the choice.
+    4) Enter the third desired input of the password, then press DOWN to confirm the choice.
+    5) Enter the fourth desired input of the password, then press DOWN to confirm the choice.
+    6) Enter the fifth desired input of the password, then press DOWN to confirm the choice.
+
+    Note: Each input entered will be displayed on the screen.
+
+
+  - How to Boot with Password:
+
+    1) Press the CREDITS key (key 5) once.
+    2) Enter the first input of the password, then press DOWN to confirm the choice.
+    3) Enter the second input of the password, then press DOWN to confirm the choice.
+    4) Enter the third input of the password, then press DOWN to confirm the choice.
+    5) Enter the fourth input of the password, then press DOWN to confirm the choice.
+    6) Enter the fifth input of the password, then press DOWN to confirm the choice.
+
+
+  The default NVRAM has a pre-set password (all BUTTON1). To boot the game with the
+  default password, enter the following sequence:
+
+  5 -> CTRL -> DOWN -> CTRL -> DOWN -> CTRL -> DOWN -> CTRL -> DOWN -> CTRL -> DOWN
+
+
 ************************************************************************************
 
 
@@ -1159,7 +1198,7 @@ private:
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
-	optional_device<ticket_dispenser_device> m_hopper;	
+	optional_device<ticket_dispenser_device> m_hopper;
 	optional_device<ay8910_device> m_ay8910;
 	output_finder<9> m_lamps;
 
@@ -1938,6 +1977,7 @@ void goldnpkr_state::glfever_map(address_map &map)
 	map(0xf000, 0xffff).rom();  // extended rom space
 }
 
+
 void blitz_state::megadpkr_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram(); //.share("nvram");   // battery backed RAM
@@ -2038,7 +2078,7 @@ static INPUT_PORTS_START( jkrbonus )
 
 	PORT_MODIFY("IN0-3")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("Weight (Coupon In)") PORT_CODE(KEYCODE_H) PORT_TOGGLE
-	
+
 	PORT_MODIFY("SW1")
 	PORT_DIPNAME( 0x20, 0x20, "50hz/60hz" )         PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x20, "50hz" )
@@ -2177,7 +2217,7 @@ static INPUT_PORTS_START( pottnpkr )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME("Coupon (Note In)")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_NAME("Coin In") PORT_IMPULSE(3)
-//*	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )	
+//* PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("Weight (Coupon In)") PORT_CODE(KEYCODE_H) PORT_TOGGLE
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -6026,7 +6066,7 @@ ROM_END
   The second set is a hack of the first with unknown mods.
 
 */
-ROM_START( potnpkro ) // ICP-1 wires hack set. 
+ROM_START( potnpkro ) // ICP-1 wires hack set.
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "7.16a", 0x6000, 0x1000, CRC(2dc5e372) SHA1(70a251efe879bc1122baa78984251041a355c895) )
 	ROM_LOAD( "x.17a", 0x7000, 0x1000, CRC(1694a0d8) SHA1(bb1132d1e75347ad5156d2b3866aad255f7d53ca) )
@@ -6045,7 +6085,7 @@ ROM_START( potnpkro ) // ICP-1 wires hack set.
 	ROM_LOAD( "tbp24s10n_wh.bin", 0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END
 
-ROM_START( potnpkrp ) // ICP-1 PROM mod set. 
+ROM_START( potnpkrp ) // ICP-1 PROM mod set.
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "6.16a",            0x6000, 0x1000, CRC(2dc5e372) SHA1(70a251efe879bc1122baa78984251041a355c895) )
 	ROM_LOAD( "95_09_hn71_7.17a", 0x7000, 0x1000, CRC(2353317a) SHA1(18bf8cfe30aaa4b05207cc250ec1c024bc19ed56) )
@@ -12572,7 +12612,7 @@ ROM_END
   ICP-1 PCB.
 
   Obscure and rare roulette game with zillions of checks
-  and protected with password. See the notes above.
+  and protected with password. See the notes above...
 
 */
 ROM_START( icproul )
@@ -13304,6 +13344,7 @@ GAMEL( 198?, lespendu,  0,        lespendu, lespendu, goldnpkr_state, init_lespe
 GAMEL( 198?, lespenduj, 0,        lespendu, lespendu, goldnpkr_state, init_lespenduj,ROT0,   "Voyageur de L'Espace Inc.", "Le Super Pendu (V1, words set #2)",      0,                layout_lespendu )
 
 GAME(  198?, icproul,   0,        icproul,  icproul,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Roulette (ICP-1 PCB)",                    0 )  // password protected
+
 
 /*************************************** SETS W/IRQ0 ***************************************/
 

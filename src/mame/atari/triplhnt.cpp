@@ -5,8 +5,6 @@
 
 Atari Triple Hunt Driver
 
-  Calibrate controls in service mode the first time you run this game.
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -46,6 +44,7 @@ public:
 		m_hpos_ram(*this, "hpos_ram"),
 		m_orga_ram(*this, "orga_ram"),
 		m_code_ram(*this, "code_ram"),
+		m_cmos(*this, "nvram", 0x10, ENDIANNESS_BIG),
 		m_0c09(*this, "0C09"),
 		m_0c0b(*this, "0C0B"),
 		m_vblank(*this, "VBLANK"),
@@ -54,10 +53,7 @@ public:
 
 	void triplhnt(machine_config &config);
 
-	void init_triplhnt();
-
 protected:
-	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 private:
@@ -75,12 +71,12 @@ private:
 	required_shared_ptr<uint8_t> m_hpos_ram;
 	required_shared_ptr<uint8_t> m_orga_ram;
 	required_shared_ptr<uint8_t> m_code_ram;
+	memory_share_creator<uint8_t> m_cmos;
 	required_ioport m_0c09;
 	required_ioport m_0c0b;
 	required_ioport m_vblank;
 	required_ioport_array<2> m_stick;
 
-	uint8_t m_cmos[16]{};
 	uint8_t m_da_latch = 0;
 	uint8_t m_cmos_latch = 0;
 	uint8_t m_hit_code = 0;
@@ -112,7 +108,6 @@ private:
 TILE_GET_INFO_MEMBER(triplhnt_state::get_tile_info)
 {
 	int const code = m_playfield_ram[tile_index] & 0x3f;
-
 	tileinfo.set(2, code, code == 0x3f ? 1 : 0, 0);
 }
 
@@ -125,7 +120,6 @@ void triplhnt_state::video_start()
 
 	m_hit_timer = timer_alloc(FUNC(triplhnt_state::set_collision), this);
 
-	save_item(NAME(m_cmos));
 	save_item(NAME(m_da_latch));
 	save_item(NAME(m_cmos_latch));
 	save_item(NAME(m_hit_code));
@@ -146,7 +140,6 @@ void triplhnt_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		int const j = (m_orga_ram[i] & 15) ^ 15;
 
 		// software sorts sprites by x and stores order in orga RAM
-
 		int hpos = m_hpos_ram[j] ^ 255;
 		int vpos = m_vpos_ram[j] ^ 255;
 		int code = m_code_ram[j] ^ 255;
@@ -155,7 +148,6 @@ void triplhnt_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 			continue;
 
 		// sprite placement might be wrong
-
 		if (m_sprite_zoom)
 		{
 			rect.set(hpos - 16, hpos - 16 + 63, 196 - vpos, 196 - vpos + 63);
@@ -166,10 +158,9 @@ void triplhnt_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		}
 
 		// render sprite to auxiliary bitmap
-
 		m_gfxdecode->gfx(m_sprite_zoom)->opaque(m_helper, cliprect,
-			2 * code + m_sprite_bank, 0, code & 8, 0,
-			rect.left(), rect.top());
+				2 * code + m_sprite_bank, 0, code & 8, 0,
+				rect.left(), rect.top());
 
 		rect &= cliprect;
 
@@ -201,7 +192,6 @@ void triplhnt_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 uint32_t triplhnt_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->mark_all_dirty();
-
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	draw_sprites(bitmap, cliprect);
@@ -209,12 +199,6 @@ uint32_t triplhnt_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_discrete->write(TRIPLHNT_BEAR_ROAR_DATA, m_playfield_ram[0xfa] & 15);
 	m_discrete->write(TRIPLHNT_SHOT_DATA, m_playfield_ram[0xfc] & 15);
 	return 0;
-}
-
-
-void triplhnt_state::init_triplhnt()
-{
-	subdevice<nvram_device>("nvram")->set_base(m_cmos, sizeof(m_cmos));
 }
 
 
@@ -252,7 +236,8 @@ void triplhnt_state::tape_control_w(int state)
 
 uint8_t triplhnt_state::cmos_r(offs_t offset)
 {
-	m_cmos_latch = offset;
+	if (!machine().side_effects_disabled())
+		m_cmos_latch = offset;
 
 	return m_cmos[m_cmos_latch] ^ 15;
 }
@@ -260,34 +245,29 @@ uint8_t triplhnt_state::cmos_r(offs_t offset)
 
 uint8_t triplhnt_state::input_port_4_r()
 {
-	m_watchdog->watchdog_reset();
+	if (!machine().side_effects_disabled())
+		m_watchdog->watchdog_reset();
+
 	return m_0c0b->read();
 }
 
 
 uint8_t triplhnt_state::misc_r(offs_t offset)
 {
-	m_latch->write_a0(offset);
+	if (!machine().side_effects_disabled())
+		m_latch->write_a0(offset);
+
 	return m_vblank->read() | m_hit_code;
 }
 
 
 uint8_t triplhnt_state::da_latch_r(offs_t offset)
 {
-	int const cross_x = m_stick[0]->read();
-	int const cross_y = m_stick[1]->read();
-
-	m_da_latch = offset;
+	if (!machine().side_effects_disabled())
+		m_da_latch = offset;
 
 	// the following is a slight simplification
-
-	return (offset & 1) ? cross_x : cross_y;
-}
-
-
-void triplhnt_state::machine_start()
-{
-	m_hit_code = 0;
+	return m_stick[offset & 1]->read();
 }
 
 
@@ -348,21 +328,17 @@ static INPUT_PORTS_START( triplhnt )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN2 )
 
 	PORT_START("0C48")
-// default to service enabled to make users calibrate gun
-//  PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Service_Mode )) PORT_TOGGLE PORT_CODE(KEYCODE_F2)
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
 	PORT_START("VBLANK")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 
 	PORT_START("STICKX")
-	PORT_BIT( 0xfc, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0xfc)  PORT_CROSSHAIR(X, 62.0/64, 1.0/64, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15)
+	PORT_BIT( 0xfc, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0xfc)  PORT_CROSSHAIR(X, 62.0/64, 1.0/64, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(4)
 
 	PORT_START("STICKY")
-	PORT_BIT( 0xfc, 0x78, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0xec)  PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15)
+	PORT_BIT( 0xfc, 0x78, IPT_AD_STICK_Y ) PORT_MINMAX(0x00,0xec)  PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(4)
 
 	PORT_START("BEAR")  // 10
 	PORT_ADJUSTER( 35, "Bear Roar Frequency" )
@@ -374,8 +350,7 @@ static const gfx_layout triplhnt_small_sprite_layout =
 	32, 32,   // width, height
 	16,       // total
 	2,        // planes
-				// plane offsets
-	{ 0x0000, 0x4000 },
+	{ 0x0000, 0x4000 }, // plane offsets
 	{
 		0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
 		0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
@@ -474,7 +449,7 @@ void triplhnt_state::triplhnt(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &triplhnt_state::program_map);
 	m_maincpu->set_vblank_int("screen", FUNC(triplhnt_state::irq0_line_hold));
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // battery-backed 74C89 at J5
+	NVRAM(config, "nvram"); // battery-backed 74C89 at J5
 
 	F9334(config, m_latch); // J7
 	m_latch->q_out_cb<0>().set_nop(); // unused
@@ -492,6 +467,7 @@ void triplhnt_state::triplhnt(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	screen.set_refresh_hz(60);
 	screen.set_size(256, 262);
 	screen.set_visarea(0, 255, 0, 239);
@@ -525,16 +501,19 @@ ROM_START( triplhnt )
 	ROM_LOAD_NIB_HIGH( "8401.c1", 0x7C00, 0x400, CRC(7461b05e) SHA1(16573ae655c306a38ff0f29a3c3285d636907f38) )
 	ROM_LOAD_NIB_LOW ( "8405.c2", 0x7C00, 0x400, CRC(ba370b97) SHA1(5d799ce6ae56c315ff0abedea7ad9204bacc266b) )
 
+	ROM_REGION( 0x10, "nvram", 0 ) // calibrated gun
+	ROM_LOAD( "74c89.j5", 0x00, 0x10, CRC(1a1a3802) SHA1(e82a1aec083c9cba2f5870ba0c266dc5e8dda3d3) )
+
 	ROM_REGION( 0x1000, "sprites", 0 )
 	ROM_LOAD( "8423.n1", 0x0000, 0x800, CRC(9937d0da) SHA1(abb906c2d9869b09be5172cc7639bb9cda38831b) )
 	ROM_LOAD( "8422.r1", 0x0800, 0x800, CRC(803621dd) SHA1(ffbd7f87a86477e5eb94f12fc20a837128a02442) )
 
 	ROM_REGION( 0x200, "tiles", 0 )
-	ROM_LOAD_NIB_HIGH( "8409.l3", 0x0000, 0x200, CRC(ec304172) SHA1(ccbf7e117fef7fa4288e3bf68f1a150b3a492ce6) )
-	ROM_LOAD_NIB_LOW ( "8410.m3", 0x0000, 0x200, CRC(f75a1b08) SHA1(81b4733194462cd4cef7f4221ecb7abd1556b871) )
+	ROM_LOAD_NIB_HIGH( "8409.l3", 0x000, 0x200, CRC(ec304172) SHA1(ccbf7e117fef7fa4288e3bf68f1a150b3a492ce6) )
+	ROM_LOAD_NIB_LOW ( "8410.m3", 0x000, 0x200, CRC(f75a1b08) SHA1(81b4733194462cd4cef7f4221ecb7abd1556b871) )
 ROM_END
 
 } // anonymous namespace
 
 
-GAME( 1977, triplhnt, 0, triplhnt, triplhnt, triplhnt_state, init_triplhnt, 0, "Atari", "Triple Hunt", MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME( 1977, triplhnt, 0, triplhnt, triplhnt, triplhnt_state, empty_init, 0, "Atari", "Triple Hunt", MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

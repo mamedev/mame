@@ -301,10 +301,18 @@ G)ame Connector, dual row 50 pins
 #define LOG_TLCS_TO_PPC_COMMANDS (1U << 1)
 #define LOG_PPC_TO_TLCS_COMMANDS (1U << 2)
 #define LOG_DISPLAY_LIST         (1U << 3)
+#define LOG_VIDEO                (1U << 4)
+#define LOG_IO                   (1U << 5)
+#define LOG_DSP                  (1U << 6)
+#define LOG_SOUND                (1U << 7)
 
 #define VERBOSE (0)
 #include "logmacro.h"
 
+#define LOGVIDEO(...)  LOGMASKED(LOG_VIDEO, __VA_ARGS__)
+#define LOGIO(...)     LOGMASKED(LOG_IO, __VA_ARGS__)
+#define LOGDSP(...)    LOGMASKED(LOG_DSP, __VA_ARGS__)
+#define LOGSOUND(...)  LOGMASKED(LOG_SOUND, __VA_ARGS__)
 
 namespace {
 
@@ -314,16 +322,20 @@ class taitopjc_state : public driver_device
 {
 public:
 	taitopjc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_iocpu(*this, "iocpu"),
-		m_soundcpu(*this, "mn10200"),
-		m_dsp(*this, "dsp"),
-		m_tc0780fpa(*this, "tc0780fpa"),
-		m_palette(*this, "palette"),
-		m_polyrom(*this, "poly"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_main_ram(*this, "main_ram")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_iocpu(*this, "iocpu")
+		, m_soundcpu(*this, "mn10200")
+		, m_dsp(*this, "dsp")
+		, m_tc0780fpa(*this, "tc0780fpa")
+		, m_palette(*this, "palette")
+		, m_polyrom(*this, "poly")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_main_ram(*this, "main_ram")
+		, m_dsp_ram(*this, "dsp_ram")
+		, m_io_share_ram(*this, "io_share_ram", 0x2000, ENDIANNESS_LITTLE) // or ENDIANNESS_BIG?
+		, m_screen_ram(*this, "screen_ram", 0x40000*4, ENDIANNESS_BIG)
+		, m_paletteram(*this, "paletteram", 0x8000*4, ENDIANNESS_BIG)
 	{ }
 
 	void taitopjc(machine_config &config);
@@ -345,6 +357,10 @@ private:
 	required_memory_region m_polyrom;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint64_t> m_main_ram;
+	required_shared_ptr<uint16_t> m_dsp_ram;
+	memory_share_creator<uint16_t> m_io_share_ram;
+	memory_share_creator<uint32_t> m_screen_ram;
+	memory_share_creator<uint32_t> m_paletteram;
 
 	uint64_t video_r(offs_t offset, uint64_t mem_mask = ~0);
 	void video_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
@@ -357,34 +373,25 @@ private:
 	uint8_t tlcs_sound_r(offs_t offset);
 	void tlcs_sound_w(offs_t offset, uint8_t data);
 	void tlcs_unk_w(offs_t offset, uint16_t data);
-	uint16_t tms_dspshare_r(offs_t offset);
 	void tms_dspshare_w(offs_t offset, uint16_t data);
 	uint16_t dsp_rom_r();
 	void dsp_roml_w(uint16_t data);
 	void dsp_romh_w(uint16_t data);
-	uint32_t screen_update_taitopjc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(taitopjc_vbi);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(vbi);
 	uint32_t videochip_r(offs_t address);
 	void videochip_w(offs_t address, uint32_t data);
 	void video_exit();
 	[[maybe_unused]] void print_display_list();
-	TILE_GET_INFO_MEMBER(tile_get_info);
-	TILEMAP_MAPPER_MEMBER(tile_scan_layer0);
-	TILEMAP_MAPPER_MEMBER(tile_scan_layer1);
-
-	uint16_t m_dsp_ram[0x1000]{};
-	uint16_t m_io_share_ram[0x2000]{};
-
-	std::unique_ptr<uint32_t[]> m_screen_ram;
-	std::unique_ptr<uint32_t[]> m_pal_ram;
+	template <unsigned Offset> TILE_GET_INFO_MEMBER(get_tile_info);
 
 	tilemap_t *m_tilemap[2]{};
 
 	uint32_t m_video_address = 0;
 
 	uint32_t m_dsp_rom_address = 0;
-	int m_scroll_x = 0;
-	int m_scroll_y = 0;
+	uint16_t m_scroll_x = 0;
+	uint16_t m_scroll_y = 0;
 
 	uint32_t m_tlcs_sound_ptr = 0;
 
@@ -424,30 +431,18 @@ void taitopjc_state::video_exit()
 #endif
 }
 
-TILE_GET_INFO_MEMBER(taitopjc_state::tile_get_info)
+template <unsigned Offset>
+TILE_GET_INFO_MEMBER(taitopjc_state::get_tile_info)
 {
-	uint32_t val = m_screen_ram[0x3f000 + (tile_index/2)];
+	uint32_t val = m_screen_ram[Offset + (tile_index >> 1)];
 
-	if (!(tile_index & 1))
+	if (BIT(~tile_index, 0))
 		val >>= 16;
 
-	int color = (val >> 12) & 0xf;
-	int tile = (val & 0xfff);
-	int flags = 0;
+	int const color = (val >> 12) & 0xf;
+	int const tile = (val & 0xfff);
 
-	tileinfo.set(0, tile, color, flags);
-}
-
-TILEMAP_MAPPER_MEMBER(taitopjc_state::tile_scan_layer0)
-{
-	/* logical (col,row) -> memory offset */
-	return (row * 64) + col;
-}
-
-TILEMAP_MAPPER_MEMBER(taitopjc_state::tile_scan_layer1)
-{
-	/* logical (col,row) -> memory offset */
-	return (row * 64) + col + 4096;
+	tileinfo.set(0, tile, color, 0);
 }
 
 void taitopjc_state::video_start()
@@ -455,7 +450,7 @@ void taitopjc_state::video_start()
 	static const gfx_layout char_layout =
 	{
 		16, 16,
-		4032,
+		4096,
 		8,
 		{ 0,1,2,3,4,5,6,7 },
 		{ 3*8, 2*8, 1*8, 0*8, 7*8, 6*8, 5*8, 4*8, 11*8, 10*8, 9*8, 8*8, 15*8, 14*8, 13*8, 12*8 },
@@ -463,25 +458,25 @@ void taitopjc_state::video_start()
 		8*256
 	};
 
-	m_screen_ram = std::make_unique<uint32_t[]>(0x40000);
-	m_pal_ram = std::make_unique<uint32_t[]>(0x8000);
-
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taitopjc_state::tile_get_info)), tilemap_mapper_delegate(*this, FUNC(taitopjc_state::tile_scan_layer0)), 16, 16, 64, 64);
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taitopjc_state::tile_get_info)), tilemap_mapper_delegate(*this, FUNC(taitopjc_state::tile_scan_layer1)), 16, 16, 64, 64);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taitopjc_state::get_tile_info<0x3f000>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(taitopjc_state::get_tile_info<0x3f800>)), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
 	m_tilemap[0]->set_transparent_pen(0);
 	m_tilemap[1]->set_transparent_pen(0);
 
-	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(m_palette, char_layout, (uint8_t*)m_screen_ram.get(), 0, m_palette->entries() / 256, 0));
+	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(m_palette, char_layout, (uint8_t*)&m_screen_ram[0], 0, m_palette->entries() / 256, 0));
 
-	save_pointer(NAME(m_screen_ram), 0x40000);
-	save_pointer(NAME(m_pal_ram), 0x8000);
+	m_palette->basemem().set(m_paletteram, m_paletteram.bytes(), 32, ENDIANNESS_BIG, 4);
+
+	save_item(NAME(m_video_address));
+	save_item(NAME(m_scroll_x));
+	save_item(NAME(m_scroll_y));
 
 	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&taitopjc_state::video_exit, this));
 }
 
-uint32_t taitopjc_state::screen_update_taitopjc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t taitopjc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(0x000000, cliprect);
+	bitmap.fill(0, cliprect);
 
 	m_tc0780fpa->draw(bitmap, cliprect);
 
@@ -510,34 +505,20 @@ void taitopjc_state::videochip_w(offs_t address, uint32_t data)
 {
 	if (address >= 0x20000000 && address < 0x20008000)
 	{
-		m_pal_ram[address - 0x20000000] = data;
-
-		int b = (data >> 16) & 0xff;
-		int g = (data >>  8) & 0xff;
-		int r = (data >>  0) & 0xff;
-		m_palette->set_pen_color(address - 0x20000000, rgb_t(r, g, b));
+		m_palette->write32(address - 0x20000000, data);
 	}
 	else if (address >= 0x10000000 && address < 0x10040000)
 	{
-		uint32_t addr = address - 0x10000000;
+		uint32_t const addr = address - 0x10000000;
 		m_screen_ram[addr] = data;
 
-		if (address >= 0x1003f000 && address < 0x1003f800)
+		if (address >= 0x1003f000 && address < 0x10040000)
 		{
-			uint32_t a = address - 0x1003f000;
-			m_tilemap[0]->mark_tile_dirty((a * 2));
-			m_tilemap[0]->mark_tile_dirty((a * 2) + 1);
+			uint32_t const a = address & 0x7ff;
+			m_tilemap[BIT(address, 11)]->mark_tile_dirty((a * 2) + 0);
+			m_tilemap[BIT(address, 11)]->mark_tile_dirty((a * 2) + 1);
 		}
-		else if (address >= 0x1003f800 && address < 0x10040000)
-		{
-			uint32_t a = address - 0x1003f000;
-			m_tilemap[1]->mark_tile_dirty((a * 2));
-			m_tilemap[1]->mark_tile_dirty((a * 2) + 1);
-		}
-		else
-		{
-			m_gfxdecode->gfx(0)->mark_dirty(addr / 64);
-		}
+		m_gfxdecode->gfx(0)->mark_dirty(addr / 64);
 	}
 	else if (address == 0x00000006)
 	{
@@ -546,7 +527,7 @@ void taitopjc_state::videochip_w(offs_t address, uint32_t data)
 	}
 	else
 	{
-		printf("Address %08X = %08X\n", address, data);
+		LOGVIDEO("Video Address %08X = %08X\n", address, data);
 	}
 }
 
@@ -571,7 +552,7 @@ void taitopjc_state::video_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 	{
 		if (ACCESSING_BITS_32_63)
 		{
-			//printf("Address %08X = %08X\n", video_address, (uint32_t)(data >> 32));
+			LOGVIDEO("Video Address %08X = %08X\n", m_video_address, (uint32_t)(data >> 32));
 			videochip_w(m_video_address, (uint32_t)(data >> 32));
 		}
 	}
@@ -587,19 +568,18 @@ void taitopjc_state::video_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 uint64_t taitopjc_state::ppc_common_r(offs_t offset, uint64_t mem_mask)
 {
 	uint64_t r = 0;
-	uint32_t address;
 
-	//logerror("ppc_common_r: %08X, %08X%08X\n", offset, (uint32_t)(mem_mask >> 32), (uint32_t)(mem_mask));
+	LOGIO("ppc_common_r: %08X, %016X\n", offset, mem_mask);
 
-	address = offset * 2;
+	uint32_t const address = offset * 2;
 
 	if (ACCESSING_BITS_48_63)
 	{
-		r |= (uint64_t)(m_io_share_ram[address]) << 48;
+		r |= uint64_t(m_io_share_ram[address]) << 48;
 	}
 	if (ACCESSING_BITS_16_31)
 	{
-		r |= (uint64_t)(m_io_share_ram[address+1]) << 16;
+		r |= uint64_t(m_io_share_ram[address + 1]) << 16;
 	}
 
 	return r;
@@ -607,9 +587,9 @@ uint64_t taitopjc_state::ppc_common_r(offs_t offset, uint64_t mem_mask)
 
 void taitopjc_state::ppc_common_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
-	uint32_t address = offset * 2;
+	uint32_t const address = offset * 2;
 
-//  logerror("ppc_common_w: %08X, %X, %X\n", offset, data, mem_mask);
+	LOGIO("ppc_common_w: %08X, %X, %X\n", offset, data, mem_mask);
 
 	if (ACCESSING_BITS_48_63)
 	{
@@ -617,7 +597,7 @@ void taitopjc_state::ppc_common_w(offs_t offset, uint64_t data, uint64_t mem_mas
 	}
 	if (ACCESSING_BITS_16_31)
 	{
-		m_io_share_ram[address+1] = (uint16_t)(data >> 16);
+		m_io_share_ram[address + 1] = (uint16_t)(data >> 16);
 	}
 
 	if (offset == 0x7ff && ACCESSING_BITS_48_63)
@@ -640,13 +620,13 @@ uint64_t taitopjc_state::dsp_r(offs_t offset, uint64_t mem_mask)
 
 	if (ACCESSING_BITS_48_63)
 	{
-		int addr = offset * 2;
-		r |= (uint64_t)(m_dsp_ram[addr+0]) << 48;
+		int const addr = offset * 2;
+		r |= (uint64_t)(m_dsp_ram[addr + 0]) << 48;
 	}
 	if (ACCESSING_BITS_16_31)
 	{
-		int addr = offset * 2;
-		r |= (uint64_t)(m_dsp_ram[addr+1]) << 16;
+		int const addr = offset * 2;
+		r |= (uint64_t)(m_dsp_ram[addr + 1]) << 16;
 	}
 
 	return r;
@@ -656,21 +636,21 @@ void taitopjc_state::print_display_list()
 {
 	int ptr = 0;
 
-	uint16_t cmd = m_dsp_ram[0xffe];
+	uint16_t const cmd = m_dsp_ram[0xffe];
 	if (cmd == 0x5245)
 	{
 		logerror("DSP command RE\n");
 		bool end = false;
 		do
 		{
-			uint16_t w = m_dsp_ram[ptr++];
-			if (w & 0x8000)
+			uint16_t const w = m_dsp_ram[ptr++];
+			if (BIT(w, 15))
 			{
-				int count = (w & 0x7fff) + 1;
+				int const count = (w & 0x7fff) + 1;
 				uint16_t d = m_dsp_ram[ptr++];
-				for (int i=0; i < count; i++)
+				for (int i = 0; i < count; i++)
 				{
-					uint16_t s = m_dsp_ram[ptr++];
+					uint16_t const s = m_dsp_ram[ptr++];
 					logerror("   %04X -> [%04X]\n", s, d);
 					d++;
 				}
@@ -706,7 +686,7 @@ void taitopjc_state::print_display_list()
 					default:
 					{
 						logerror("Unknown call %04X\n", w);
-						for (int i=0; i < 10; i++)
+						for (int i = 0; i < 10; i++)
 						{
 							logerror("%04X\n", m_dsp_ram[ptr++]);
 						}
@@ -728,15 +708,14 @@ void taitopjc_state::print_display_list()
 
 void taitopjc_state::dsp_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
-	//logerror("dsp_w: %08X, %08X%08X, %08X%08X at %08X\n", offset, (uint32_t)(data >> 32), (uint32_t)(data), (uint32_t)(mem_mask >> 32), (uint32_t)(mem_mask), m_maincpu->pc());
+	LOGDSP("dsp_w: %08X, %08X%08X, %08X%08X at %08X\n", offset, (uint32_t)(data >> 32), (uint32_t)(data), (uint32_t)(mem_mask >> 32), (uint32_t)(mem_mask), m_maincpu->pc());
 
 	if (offset == 0x7fe)
 	{
 		#if 0
 		{
-			int i;
 			FILE *f = fopen("dspram.bin", "wb");
-			for (i=0; i < 0x1000; i++)
+			for (int i = 0; i < 0x1000; i++)
 			{
 				fputc((dsp_ram[i] >> 0) & 0xff, f);
 				fputc((dsp_ram[i] >> 8) & 0xff, f);
@@ -752,13 +731,13 @@ void taitopjc_state::dsp_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 
 	if (ACCESSING_BITS_48_63)
 	{
-		int addr = offset * 2;
-		m_dsp_ram[addr+0] = (data >> 48) & 0xffff;
+		int const addr = offset * 2;
+		m_dsp_ram[addr + 0] = (data >> 48) & 0xffff;
 	}
 	if (ACCESSING_BITS_16_31)
 	{
-		int addr = offset * 2;
-		m_dsp_ram[addr+1] = (data >> 16) & 0xffff;
+		int const addr = offset * 2;
+		m_dsp_ram[addr + 1] = (data >> 16) & 0xffff;
 	}
 }
 
@@ -778,8 +757,8 @@ void taitopjc_state::ppc603e_mem(address_map &map)
 	map(0x40000000, 0x4000000f).rw(FUNC(taitopjc_state::video_r), FUNC(taitopjc_state::video_w));
 	map(0x80000000, 0x80003fff).rw(FUNC(taitopjc_state::dsp_r), FUNC(taitopjc_state::dsp_w));
 	map(0xc0000000, 0xc0003fff).rw(FUNC(taitopjc_state::ppc_common_r), FUNC(taitopjc_state::ppc_common_w));
-	map(0xfe800000, 0xff7fffff).rom().region("gfx1", 0);
-	map(0xffe00000, 0xffffffff).rom().region("user1", 0);
+	map(0xfe800000, 0xff7fffff).rom().region("maingfx", 0);
+	map(0xffe00000, 0xffffffff).rom().region("maindata", 0);
 }
 
 
@@ -787,7 +766,7 @@ void taitopjc_state::ppc603e_mem(address_map &map)
 
 uint8_t taitopjc_state::tlcs_common_r(offs_t offset)
 {
-	if (offset & 1)
+	if (BIT(offset, 0))
 	{
 		return (uint8_t)(m_io_share_ram[offset / 2] >> 8);
 	}
@@ -799,7 +778,7 @@ uint8_t taitopjc_state::tlcs_common_r(offs_t offset)
 
 void taitopjc_state::tlcs_common_w(offs_t offset, uint8_t data)
 {
-	if (offset & 1)
+	if (BIT(offset, 0))
 	{
 		m_io_share_ram[offset / 2] &= 0x00ff;
 		m_io_share_ram[offset / 2] |= (uint16_t)(data) << 8;
@@ -847,7 +826,8 @@ uint8_t taitopjc_state::tlcs_sound_r(offs_t offset)
 	}
 	else if (offset >= 0x80 && offset < 0x100)
 	{
-		m_tlcs_sound_ptr++;
+		if (!machine().side_effects_disabled())
+			m_tlcs_sound_ptr++;
 	}
 
 	return 0;
@@ -855,15 +835,14 @@ uint8_t taitopjc_state::tlcs_sound_r(offs_t offset)
 
 void taitopjc_state::tlcs_sound_w(offs_t offset, uint8_t data)
 {
-//  printf("tlcs_sound_w: %08X, %02X\n", offset, data);
+	LOGSOUND("tlcs_sound_w: %08X, %02X\n", offset, data);
 }
 
 void taitopjc_state::tlcs_unk_w(offs_t offset, uint16_t data)
 {
 	if (offset == 0xc/2)
 	{
-		int reset = (data & 0x4) ? ASSERT_LINE : CLEAR_LINE;
-		m_maincpu->set_input_line(INPUT_LINE_RESET, reset);
+		m_maincpu->set_input_line(INPUT_LINE_RESET, BIT(data, 2));
 	}
 }
 
@@ -901,11 +880,6 @@ void taitopjc_state::mn10200_map(address_map &map)
 
 
 
-uint16_t taitopjc_state::tms_dspshare_r(offs_t offset)
-{
-	return m_dsp_ram[offset];
-}
-
 void taitopjc_state::tms_dspshare_w(offs_t offset, uint16_t data)
 {
 	if (offset == 0xffc)
@@ -919,8 +893,9 @@ uint16_t taitopjc_state::dsp_rom_r()
 {
 	assert(m_dsp_rom_address < 0x800000);
 
-	uint16_t data = ((uint16_t*)m_polyrom->base())[m_dsp_rom_address];
-	m_dsp_rom_address++;
+	uint16_t const data = ((uint16_t*)m_polyrom->base())[m_dsp_rom_address];
+	if (!machine().side_effects_disabled())
+		m_dsp_rom_address++;
 	return data;
 }
 
@@ -947,7 +922,7 @@ void taitopjc_state::tms_data_map(address_map &map)
 {
 	map(0x4000, 0x6fff).rom().region("dspdata", 0x8000);
 	map(0x7000, 0xefff).ram();
-	map(0xf000, 0xffff).rw(FUNC(taitopjc_state::tms_dspshare_r), FUNC(taitopjc_state::tms_dspshare_w));
+	map(0xf000, 0xffff).ram().w(FUNC(taitopjc_state::tms_dspshare_w)).share(m_dsp_ram);
 }
 
 void taitopjc_state::tms_io_map(address_map &map)
@@ -1012,6 +987,9 @@ void taitopjc_state::machine_start()
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
 	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x003fffff, false, m_main_ram);
+
+	save_item(NAME(m_dsp_rom_address));
+	save_item(NAME(m_tlcs_sound_ptr));
 }
 
 void taitopjc_state::machine_reset()
@@ -1025,7 +1003,7 @@ void taitopjc_state::machine_reset()
 }
 
 
-INTERRUPT_GEN_MEMBER(taitopjc_state::taitopjc_vbi)
+INTERRUPT_GEN_MEMBER(taitopjc_state::vbi)
 {
 	m_iocpu->set_input_line(TLCS900_INT1, ASSERT_LINE);
 }
@@ -1047,7 +1025,7 @@ void taitopjc_state::taitopjc(machine_config &config)
 	m_iocpu->an_read<2>().set_ioport("ANALOG3");
 	m_iocpu->an_read<3>().set_ioport("ANALOG4");
 	m_iocpu->set_addrmap(AS_PROGRAM, &taitopjc_state::tlcs900h_mem);
-	m_iocpu->set_vblank_int("screen", FUNC(taitopjc_state::taitopjc_vbi));
+	m_iocpu->set_vblank_int("screen", FUNC(taitopjc_state::vbi));
 
 	// TMS320C53 DSP
 	TMS32053(config, m_dsp, 40_MHz_XTAL); // 80MHz rated part, should be 40.0000MHz x 2?
@@ -1068,10 +1046,10 @@ void taitopjc_state::taitopjc(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(480, 384);
 	screen.set_visarea(0, 479, 0, 383);
-	screen.set_screen_update(FUNC(taitopjc_state::screen_update_taitopjc));
+	screen.set_screen_update(FUNC(taitopjc_state::screen_update));
 	screen.set_palette(m_palette);
 
-	PALETTE(config, m_palette).set_entries(32768);
+	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 32768);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 
 	TC0780FPA(config, m_tc0780fpa, 0);
@@ -1087,7 +1065,7 @@ void taitopjc_state::init_optiger()
 	rom[BYTE_XOR_LE(0x218)] = 0x00;
 
 #if 0
-	uint32_t *mr = (uint32_t*)memregion("user1")->base();
+	uint32_t *mr = (uint32_t*)memregion("maindata")->base();
 	//mr[(0x23a5c^4)/4] = 0x60000000;
 	mr[((0x513b0-0x40000)^4)/4] = 0x38600001;
 #endif
@@ -1095,7 +1073,7 @@ void taitopjc_state::init_optiger()
 
 
 ROM_START( optiger ) // Ver 2.14 O
-	ROM_REGION64_BE( 0x200000, "user1", 0 )
+	ROM_REGION64_BE( 0x200000, "maindata", 0 )
 	ROM_LOAD32_BYTE( "e63_33-1.ic23", 0x000000, 0x080000, CRC(5ab176e2) SHA1(a0a5b7c0e91928d0a49987f88f6ae647f5cb3e34) ) // PCB silkscreened IC23 (P-HH)
 	ROM_LOAD32_BYTE( "e63_32-1.ic22", 0x000001, 0x080000, CRC(cca8bacc) SHA1(e5a081f5c12a52601745f5b67fe3412033581b00) ) // PCB silkscreened IC22 (P-HL)
 	ROM_LOAD32_BYTE( "e63_31-1.ic8",  0x000002, 0x080000, CRC(ad69e649) SHA1(9fc853d2cb6e7cac87dc06bad91048f191b799c5) ) // PCB silkscreened IC8 (P-LH)
@@ -1116,7 +1094,7 @@ ROM_START( optiger ) // Ver 2.14 O
 	ROM_LOAD16_BYTE( "e63_17-1.ic18", 0x000000, 0x040000, CRC(2a063d5b) SHA1(a2b2fe4d8bad1aef7d9dcc0be607cc4e5bc4f0eb) ) // PCB silkscreened IC18 (S-L)    27C2001
 	ROM_LOAD16_BYTE( "e63_18-1.ic19", 0x000001, 0x040000, CRC(2f590881) SHA1(7fb827a676f45b24380558b0068b76cb858314f6) ) // PCB silkscreened IC19 (S-H)    27C2001
 
-	ROM_REGION64_BE( 0x1000000, "gfx1", 0 ) // mask ROMs
+	ROM_REGION64_BE( 0x1000000, "maingfx", 0 ) // mask ROMs
 	ROM_LOAD32_WORD_SWAP( "e63-21.ic24", 0x000000, 0x400000, CRC(c818b211) SHA1(dce07bfe71a9ba11c3f028a640226c6e59c6aece) ) // PCB silkscreened IC24 (C-H)    23C32000
 	ROM_LOAD32_WORD_SWAP( "e63-15.ic9",  0x000002, 0x400000, CRC(4ec6a2d7) SHA1(2ee6270cff7ea2459121961a29d42e000cee2921) ) // PCB silkscreened IC9 (C-L)    23C32000
 	ROM_LOAD32_WORD_SWAP( "e63-22.ic25", 0x800000, 0x400000, CRC(6d895eb6) SHA1(473795da42fd29841a926f18a93e5992f4feb27c) ) // PCB silkscreened IC25 (M-H)    23C32000
@@ -1144,7 +1122,7 @@ ROM_START( optiger ) // Ver 2.14 O
 ROM_END
 
 ROM_START( optigera ) // Ver 2.10 O
-	ROM_REGION64_BE( 0x200000, "user1", 0 )
+	ROM_REGION64_BE( 0x200000, "maindata", 0 )
 	ROM_LOAD32_BYTE( "e63_33.ic23", 0x000000, 0x080000, CRC(414a7c77) SHA1(d4bbaa13244f1e5f4d418354f40303b9bcc00411) ) // PCB silkscreened IC23 (P-HH)
 	ROM_LOAD32_BYTE( "e63_32.ic22", 0x000001, 0x080000, CRC(8fec33e8) SHA1(1eb0c5613937cd63dc2f54efa33c98920c55f251) ) // PCB silkscreened IC22 (P-HL)
 	ROM_LOAD32_BYTE( "e63_31.ic8",  0x000002, 0x080000, CRC(672f9d4f) SHA1(7eb79963a5d4fb504ffbcf3f51c9bdf659ae053b) ) // PCB silkscreened IC8 (P-LH)
@@ -1165,7 +1143,7 @@ ROM_START( optigera ) // Ver 2.10 O
 	ROM_LOAD16_BYTE( "e63_17.ic18", 0x000000, 0x040000, CRC(daac9e43) SHA1(9ef779a9a5e991ffcfcf30e94ef75329c1030fc2) ) // PCB silkscreened IC18 (S-L)    27C2001
 	ROM_LOAD16_BYTE( "e63_18.ic19", 0x000001, 0x040000, CRC(69c97004) SHA1(65dc3dee0eb7faa1422c38947510abaeb23da7e3) ) // PCB silkscreened IC19 (S-H)    27C2001
 
-	ROM_REGION64_BE( 0x1000000, "gfx1", 0 ) // mask ROMs
+	ROM_REGION64_BE( 0x1000000, "maingfx", 0 ) // mask ROMs
 	ROM_LOAD32_WORD_SWAP( "e63-21.ic24", 0x000000, 0x400000, CRC(c818b211) SHA1(dce07bfe71a9ba11c3f028a640226c6e59c6aece) ) // PCB silkscreened IC24 (C-H)    23C32000
 	ROM_LOAD32_WORD_SWAP( "e63-15.ic9",  0x000002, 0x400000, CRC(4ec6a2d7) SHA1(2ee6270cff7ea2459121961a29d42e000cee2921) ) // PCB silkscreened IC9 (C-L)    23C32000
 	ROM_LOAD32_WORD_SWAP( "e63-22.ic25", 0x800000, 0x400000, CRC(6d895eb6) SHA1(473795da42fd29841a926f18a93e5992f4feb27c) ) // PCB silkscreened IC25 (M-H)    23C32000
@@ -1193,7 +1171,7 @@ ROM_START( optigera ) // Ver 2.10 O
 ROM_END
 
 ROM_START( optigerj ) // ver 2.09 J
-	ROM_REGION64_BE( 0x200000, "user1", 0 )
+	ROM_REGION64_BE( 0x200000, "maindata", 0 )
 	ROM_LOAD32_BYTE( "e63_20.ic23", 0x000000, 0x080000, CRC(04b9820b) SHA1(7a5bd7fd7003948b57d862dc1ecd38ddd25a4ca2) ) // PCB silkscreened IC23 (P-HH)
 	ROM_LOAD32_BYTE( "e63_19.ic22", 0x000001, 0x080000, CRC(a25ff024) SHA1(46e8023a028a384609177d00a47cdfdbbda100be) ) // PCB silkscreened IC22 (P-HL)
 	ROM_LOAD32_BYTE( "e63_14.ic8",  0x000002, 0x080000, CRC(2e68fc12) SHA1(a8ee3e51ad8eb1477db8f67380261cee1dada104) ) // PCB silkscreened IC8 (P-LH)
@@ -1214,7 +1192,7 @@ ROM_START( optigerj ) // ver 2.09 J
 	ROM_LOAD16_BYTE( "e63_17.ic18", 0x000000, 0x040000, CRC(daac9e43) SHA1(9ef779a9a5e991ffcfcf30e94ef75329c1030fc2) ) // PCB silkscreened IC18 (S-L)    27C2001
 	ROM_LOAD16_BYTE( "e63_18.ic19", 0x000001, 0x040000, CRC(69c97004) SHA1(65dc3dee0eb7faa1422c38947510abaeb23da7e3) ) // PCB silkscreened IC19 (S-H)    27C2001
 
-	ROM_REGION64_BE( 0x1000000, "gfx1", 0 ) // mask ROMs
+	ROM_REGION64_BE( 0x1000000, "maingfx", 0 ) // mask ROMs
 	ROM_LOAD32_WORD_SWAP( "e63-21.ic24", 0x000000, 0x400000, CRC(c818b211) SHA1(dce07bfe71a9ba11c3f028a640226c6e59c6aece) ) // PCB silkscreened IC24 (C-H)    23C32000
 	ROM_LOAD32_WORD_SWAP( "e63-15.ic9",  0x000002, 0x400000, CRC(4ec6a2d7) SHA1(2ee6270cff7ea2459121961a29d42e000cee2921) ) // PCB silkscreened IC9 (C-L)    23C32000
 	ROM_LOAD32_WORD_SWAP( "e63-22.ic25", 0x800000, 0x400000, CRC(6d895eb6) SHA1(473795da42fd29841a926f18a93e5992f4feb27c) ) // PCB silkscreened IC25 (M-H)    23C32000
@@ -1242,7 +1220,7 @@ ROM_START( optigerj ) // ver 2.09 J
 ROM_END
 
 ROM_START( optigersm ) // Second Mission ver 2.02 J (build date shows 1999 but still (c) 1998)
-	ROM_REGION64_BE( 0x200000, "user1", 0 )
+	ROM_REGION64_BE( 0x200000, "maindata", 0 )
 	ROM_LOAD32_BYTE( "e63_37.ic23", 0x000000, 0x080000, CRC(16692400) SHA1(0d9d6e90c763de66c2a99790cfe22e11c5d7ec42) ) // PCB silkscreened IC23 (P-HH)
 	ROM_LOAD32_BYTE( "e63_36.ic22", 0x000001, 0x080000, CRC(99d6eed1) SHA1(96d7cff9fe5bedf79d3eaef0f19a4c69d0d233bf) ) // PCB silkscreened IC22 (P-HL)
 	ROM_LOAD32_BYTE( "e63_35.ic8",  0x000002, 0x080000, CRC(85468b85) SHA1(7b24fb6eca29afbfe3ad0e6943145782d8d3b103) ) // PCB silkscreened IC8 (P-LH)
@@ -1263,7 +1241,7 @@ ROM_START( optigersm ) // Second Mission ver 2.02 J (build date shows 1999 but s
 	ROM_LOAD16_BYTE( "e63_17-1.ic18", 0x000000, 0x040000, CRC(2a063d5b) SHA1(a2b2fe4d8bad1aef7d9dcc0be607cc4e5bc4f0eb) ) // PCB silkscreened IC18 (S-L)    27C2001
 	ROM_LOAD16_BYTE( "e63_18-1.ic19", 0x000001, 0x040000, CRC(2f590881) SHA1(7fb827a676f45b24380558b0068b76cb858314f6) ) // PCB silkscreened IC19 (S-H)    27C2001
 
-	ROM_REGION64_BE( 0x1000000, "gfx1", 0 ) // mask ROMs
+	ROM_REGION64_BE( 0x1000000, "maingfx", 0 ) // mask ROMs
 	ROM_LOAD32_WORD_SWAP( "e63-21.ic24", 0x000000, 0x400000, CRC(c818b211) SHA1(dce07bfe71a9ba11c3f028a640226c6e59c6aece) ) // PCB silkscreened IC24 (C-H)    23C32000
 	ROM_LOAD32_WORD_SWAP( "e63-15.ic9",  0x000002, 0x400000, CRC(4ec6a2d7) SHA1(2ee6270cff7ea2459121961a29d42e000cee2921) ) // PCB silkscreened IC9 (C-L)    23C32000
 	ROM_LOAD32_WORD_SWAP( "e63-22.ic25", 0x800000, 0x400000, CRC(6d895eb6) SHA1(473795da42fd29841a926f18a93e5992f4feb27c) ) // PCB silkscreened IC25 (M-H)    23C32000

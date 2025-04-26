@@ -410,6 +410,30 @@ ROM_START( sshot )
 	ROM_REGION( 0x0800, "gfx", 0 )
 	ROM_LOAD( "ss_a.b9",   0x0000, 0x0400, CRC(ad3413e0) SHA1(ea4c2728755fe52a00fdceddca0b641965045005) )
 	ROM_LOAD( "ss_b.b10",  0x0400, 0x0400, CRC(ba70e619) SHA1(df39512de881df26ccc7fa74f6bae82d92cd9008) )
+
+	ROM_REGION( 0x0120, "proms", 0 ) // PROMs on the sound board
+	ROM_LOAD( "74s387_cs229_45.5a",     0x0000, 0x0100, CRC(f36cd927) SHA1(e2720d53c785df4ce03c4ecc3332c3f0a0bbe1ad) )
+	ROM_LOAD( "mmi-6331-1_cs229_46.2b", 0x0100, 0x0020, CRC(f4fa91d4) SHA1(0e0903532c8609c2d42491c2013647a42d13749a) )
+ROM_END
+
+ROM_START( sshota )
+	ROM_REGION( 0x2000, "maincpu", 0 )
+	ROM_LOAD( "ss_1.a6",  0x0000, 0x0400, CRC(ec1cbcd0) SHA1(6e4bcc7e83b1237a25f830b96c0bcb76b876ace4) )
+	ROM_LOAD( "ss_2.a7",  0x0400, 0x0400, CRC(2d63c338) SHA1(3b082ddd8dc42d68805c0a5d24e1eca3ad808f5c) )
+	ROM_LOAD( "ss_3.a9",  0x0800, 0x0400, CRC(79aae3e3) SHA1(7d9132b1a5663e118587bcebe9b467badaf51be5) )
+	ROM_LOAD( "ss_4.a10", 0x0c00, 0x0400, CRC(3d4fbcbf) SHA1(a7d05fa2c65ce2f4f2d732f562f3b8b0effc6de7) )
+	ROM_LOAD( "ss_5.a11", 0x1000, 0x0400, CRC(d4f71cd9) SHA1(aab7e33c51e180c2486c59758105359d15e73a1e) )
+	ROM_LOAD( "ss_6.a12", 0x1400, 0x0400, CRC(9d2f087e) SHA1(9c64d6a872395f6097db740199a30bcbc803ac16) )
+	ROM_LOAD( "ss_7.a13", 0x1800, 0x0400, CRC(20185164) SHA1(b7ada6150a05539e9a788e6e28786a9a6832744a) )
+	ROM_LOAD( "ss_8.a15", 0x1c00, 0x0400, CRC(95a01a0e) SHA1(72c233bb94a45780fa061c603eedde9cd7df3998) )
+
+	ROM_REGION( 0x0800, "gfx", 0 )
+	ROM_LOAD( "ss_a.b9",   0x0000, 0x0400, CRC(ad3413e0) SHA1(ea4c2728755fe52a00fdceddca0b641965045005) )
+	ROM_LOAD( "ss_b.b10",  0x0400, 0x0400, CRC(ba70e619) SHA1(df39512de881df26ccc7fa74f6bae82d92cd9008) )
+
+	ROM_REGION( 0x0120, "proms", 0 ) // PROMs on the sound board, not dumped for this set
+	ROM_LOAD( "74s387_cs229_45.5a",     0x0000, 0x0100, BAD_DUMP CRC(f36cd927) SHA1(e2720d53c785df4ce03c4ecc3332c3f0a0bbe1ad) )
+	ROM_LOAD( "mmi-6331-1_cs229_46.2b", 0x0100, 0x0020, BAD_DUMP CRC(f4fa91d4) SHA1(0e0903532c8609c2d42491c2013647a42d13749a) )
 ROM_END
 
 ROM_START( gunchamps )
@@ -426,7 +450,7 @@ ROM_START( gunchamps )
 	ROM_LOAD( "gc-a.b9",   0x0000, 0x0400, CRC(c07f290e) SHA1(760ce12f4f5cadbd846d361c615f5026356a6fe2) )
 	ROM_LOAD( "gc-b.b10",  0x0400, 0x0400, CRC(10ce709b) SHA1(e6f194aa26cd0e01ba0de3909948cc8595031d4d) )
 
-	ROM_REGION( 0x0120, "proms", 0 ) // proms on the sound board
+	ROM_REGION( 0x0120, "proms", 0 ) // PROMs on the sound board
 	ROM_LOAD( "snd82s129.a5",  0x0000, 0x0100, CRC(1d74dc30) SHA1(b956d8c6564cc3cc1b5f5f55b05ad4aa13f247e6) )
 	ROM_LOAD( "snd82s23.b7",   0x0100, 0x0020, CRC(f4fa91d4) SHA1(0e0903532c8609c2d42491c2013647a42d13749a) )
 ROM_END
@@ -434,5 +458,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1979, sshot,     0,        sshot, sshot,    sshot_state, empty_init, ROT0, "Model Racing", "Super Shot",                             MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, sshot,     0,        sshot, sshot,    sshot_state, empty_init, ROT0, "Model Racing", "Super Shot (set 1)",                     MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, sshota,    sshot,    sshot, sshot,    sshot_state, empty_init, ROT0, "Model Racing", "Super Shot (set 2)",                     MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAMEL(1980, gunchamps, gunchamp, sshot, gunchamp, sshot_state, empty_init, ROT0, "Model Racing", "Gun Champ (newer, Super Shot hardware)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_gunchamps )

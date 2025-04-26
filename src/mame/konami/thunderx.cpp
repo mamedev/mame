@@ -780,6 +780,13 @@ void thunderx_state_base::machine_start()
 	m_palette->set_shadow_factor(7.0/8.0);
 }
 
+void thunderx_state::machine_start()
+{
+	thunderx_state_base::machine_start();
+
+	m_thunderx_firq_timer = timer_alloc(FUNC(thunderx_state::thunderx_firq_cb), this);
+}
+
 void thunderx_state_base::machine_reset()
 {
 	m_rombank->set_entry(0);
@@ -827,27 +834,8 @@ void thunderx_state_base::common(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "mono", 1.0).add_route(1, "mono", 1.0);  /* verified on pcb */
-}
-
-void scontra_state::scontra(machine_config &config)
-{
-	common(config);
-
-	m_audiocpu->set_addrmap(AS_PROGRAM, &scontra_state::scontra_sound_map);
-
-	K007232(config, m_k007232, XTAL(3'579'545)); // verified on PCB
-	m_k007232->port_write().set(FUNC(scontra_state::volume_callback));
-	m_k007232->add_route(0, "mono", 0.20);
-	m_k007232->add_route(1, "mono", 0.20);
-}
-
-
-void thunderx_state::machine_start()
-{
-	thunderx_state_base::machine_start();
-
-	m_thunderx_firq_timer = timer_alloc(FUNC(thunderx_state::thunderx_firq_cb), this);
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545))); /* verified on pcb */
+	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
 void thunderx_state::thunderx(machine_config &config)
@@ -860,6 +848,17 @@ void thunderx_state::thunderx(machine_config &config)
 	m_maincpu->line().set_membank(m_rombank).mask(0x0f);
 
 	m_k052109->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
+}
+
+void scontra_state::scontra(machine_config &config)
+{
+	common(config);
+
+	m_audiocpu->set_addrmap(AS_PROGRAM, &scontra_state::scontra_sound_map);
+
+	K007232(config, m_k007232, XTAL(3'579'545)); // verified on PCB
+	m_k007232->port_write().set(FUNC(scontra_state::volume_callback));
+	m_k007232->add_route(ALL_OUTPUTS, "mono", 0.1);
 }
 
 void scontra_state::gbusters(machine_config &config)

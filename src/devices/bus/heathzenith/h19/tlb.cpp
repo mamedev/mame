@@ -908,6 +908,49 @@ static INPUT_PORTS_START( gp19 )
 	PORT_DIPSETTING(    0x80, "Never")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( igc_common )
+	PORT_START("joystick_p1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+
+	PORT_START("joystick_p2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(2)
+
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( igc )
+	PORT_INCLUDE( tlb )
+
+	PORT_INCLUDE( igc_common )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( igc_super19 )
+	PORT_INCLUDE( super19 )
+
+	PORT_INCLUDE( igc_common )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( igc_ultra )
+	PORT_INCLUDE( ultra19 )
+
+	PORT_INCLUDE( igc_common )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( igc_watz )
+	PORT_INCLUDE( watz19 )
+
+	PORT_INCLUDE( igc_common )
+INPUT_PORTS_END
+
+
+
 
 ROM_START( h19 )
 	// Original terminal code
@@ -1771,13 +1814,20 @@ void heath_imaginator_tlb_device::set_irq_line()
  *
  */
 heath_igc_tlb_device::heath_igc_tlb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	heath_tlb_device(mconfig, HEATH_IGC, tag, owner, clock)
+	heath_igc_tlb_device(mconfig, HEATH_IGC, tag, owner, clock)
 {
 }
 
 heath_igc_tlb_device::heath_igc_tlb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
-	heath_tlb_device(mconfig, type, tag, owner, clock)
+	heath_tlb_device(mconfig, type, tag, owner, clock),
+	m_joystick1(*this, "joystick_p1"),
+	m_joystick2(*this, "joystick_p2")
 {
+}
+
+ioport_constructor heath_igc_tlb_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(igc);
 }
 
 void heath_igc_tlb_device::device_add_mconfig(machine_config &config)
@@ -1857,10 +1907,12 @@ u8 heath_igc_tlb_device::sigma_r(u8 offset)
 		// TODO - High pen address
 		break;
 	case 3:
-		// TODO - Left input device
+		// Left input device
+		val = m_joystick1->read();
 		break;
 	case 4:
-		// TODO - Right input device
+		// Right input device
+		val = m_joystick2->read();
 		break;
 	case 5:
 		val = sigma_ctrl_r();
@@ -2018,7 +2070,7 @@ const tiny_rom_entry *heath_igc_super19_tlb_device::device_rom_region() const
 
 ioport_constructor heath_igc_super19_tlb_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME(super19);
+	return INPUT_PORTS_NAME(igc_super19);
 }
 
 
@@ -2069,7 +2121,7 @@ const tiny_rom_entry *heath_igc_ultra_tlb_device::device_rom_region() const
 
 ioport_constructor heath_igc_ultra_tlb_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME(ultra19);
+	return INPUT_PORTS_NAME(igc_ultra);
 }
 
 
@@ -2089,7 +2141,7 @@ const tiny_rom_entry *heath_igc_watz_tlb_device::device_rom_region() const
 
 ioport_constructor heath_igc_watz_tlb_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME(watz19);
+	return INPUT_PORTS_NAME(igc_watz);
 }
 
 

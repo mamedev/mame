@@ -679,7 +679,7 @@ void dspp_device::execute_run()
 		return;
 	}
 
-	bool check_debugger = ((device_t::machine().debug_flags & DEBUG_FLAG_ENABLED) != 0);
+	const bool check_debugger = debugger_enabled();
 
 	do
 	{

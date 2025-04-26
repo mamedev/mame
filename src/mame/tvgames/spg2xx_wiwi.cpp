@@ -156,7 +156,7 @@ void spg2xx_game_marc250_state::machine_start()
 	m_pulse_timer2->adjust(attotime::never);
 
 	// hack, makes x-racer3 and some others more stable, TODO: find out what is really wrong
-	m_maincpu->set_clock_scale(2.0000f);
+	m_maincpu->set_clock_scale(2.0);
 
 }
 

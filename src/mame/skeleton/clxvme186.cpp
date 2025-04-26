@@ -103,7 +103,7 @@ void clxvme186_state::clxvme186(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &clxvme186_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &clxvme186_state::io_map);
 
-	SCC8530N(config, "scc", 3.6864_MHz_XTAL);
+	SCC8530(config, "scc", 3.6864_MHz_XTAL);
 
 	M3000(config, "rtc", 32.768_kHz_XTAL);
 

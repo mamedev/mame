@@ -33,6 +33,14 @@ m68000_device::m68000_device(const machine_config &mconfig, device_type type, co
 {
 }
 
+void m68000_device::set_current_mmu(mmu *mmu)
+{
+	m_mmu = mmu;
+
+	if(m_mmu)
+		m_mmu->set_super(m_sr & SR_S);
+}
+
 void m68000_device::abort_access(u32 reason)
 {
 	m_post_run = reason;
@@ -116,7 +124,7 @@ void m68000_device::execute_run()
 				m_ipc = m_pc - 2;
 				m_irdi = m_ird;
 
-				if(machine().debug_flags & DEBUG_FLAG_ENABLED)
+				if(debugger_enabled())
 					debugger_instruction_hook(m_ipc);
 			}
 			(this->*(m_handlers_f[m_inst_state]))();

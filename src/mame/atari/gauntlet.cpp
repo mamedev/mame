@@ -385,28 +385,36 @@ uint32_t gauntlet_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = m_mob->bitmap();
-	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->top(); y <= rect->bottom(); y++)
-		{
-			uint16_t const *const mo = &mobitmap.pix(y);
-			uint16_t *const pf = &bitmap.pix(y);
-			for (int x = rect->left(); x <= rect->right(); x++)
-				if (mo[x] != 0xffff)
+	m_mob->iterate_dirty_rects(
+			cliprect,
+			[this, &bitmap, &mobitmap] (rectangle const &rect)
+			{
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
-					/* verified via schematics:
-
-					    MO pen 1 clears PF color bit 0x80
-					*/
-					if ((mo[x] & 0x0f) == 1)
+					uint16_t const *const mo = &mobitmap.pix(y);
+					uint16_t *const pf = &bitmap.pix(y);
+					for (int x = rect.left(); x <= rect.right(); x++)
 					{
-						// Vindicators Part II has extra logic here for the bases
-						if (!m_vindctr2_screen_refresh || (mo[x] & 0xf0) != 0)
-							pf[x] ^= 0x80;
+						if (mo[x] != 0xffff)
+						{
+							/* verified via schematics:
+
+							    MO pen 1 clears PF color bit 0x80
+							*/
+							if ((mo[x] & 0x0f) == 1)
+							{
+								// Vindicators Part II has extra logic here for the bases
+								if (!m_vindctr2_screen_refresh || (mo[x] & 0xf0) != 0)
+									pf[x] ^= 0x80;
+							}
+							else
+							{
+								pf[x] = mo[x];
+							}
+						}
 					}
-					else
-						pf[x] = mo[x];
 				}
-		}
+			});
 
 	// add the alpha on top
 	m_alpha_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -781,7 +789,7 @@ void gauntlet_state::base(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, m6502_device::NMI_LINE);
-	m_soundlatch->data_pending_callback().append([this](int state) { if (state) machine().scheduler().perfect_quantum(attotime::from_usec(100)); });
+	m_soundlatch->data_pending_callback().append([this] (int state) { if (state) machine().scheduler().perfect_quantum(attotime::from_usec(100)); });
 
 	GENERIC_LATCH_8(config, m_mainlatch);
 	m_mainlatch->data_pending_callback().set_inputline(m_maincpu, M68K_IRQ_6);

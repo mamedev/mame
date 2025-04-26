@@ -6,7 +6,12 @@
 #                      \___/_/\_\ .__/ \__,_|\__|
 #                               |_| XML parser
 #
-# Copyright (c) 2017 Expat development team
+# Copyright (c) 2017-2023 Sebastian Pipping <sebastian@pipping.org>
+# Copyright (c) 2018      KangLin <kl222@126.com>
+# Copyright (c) 2022      Johnny Jazeix <jazeix@gmail.com>
+# Copyright (c) 2023      Sony Corporation / Snild Dolkow <snild@sony.com>
+# Copyright (c) 2024      Alexander Bluhm <alexander.bluhm@gmx.net>
+# Copyright (c) 2024      Dag-Erling Smørgrav <des@des.dev>
 # Licensed under the MIT license:
 #
 # Permission is  hereby granted,  free of charge,  to any  person obtaining
@@ -53,20 +58,36 @@ pkgconfig_DATA = expat.pc
 pkgconfigdir = $(libdir)/pkgconfig
 
 
+dist_cmake_DATA = \
+    cmake/autotools/expat.cmake
+
+nodist_cmake_DATA = \
+    cmake/autotools/expat-config-version.cmake \
+    cmake/autotools/expat-noconfig.cmake \
+    cmake/expat-config.cmake
+
+cmakedir = $(libdir)/cmake/expat-@PACKAGE_VERSION@
+
+
 _EXTRA_DIST_CMAKE = \
-    cmake/expat-config.cmake.in \
+    cmake/autotools/expat-noconfig__linux.cmake.in \
+    cmake/autotools/expat-noconfig__macos.cmake.in \
+    cmake/autotools/expat-noconfig__windows.cmake.in \
+    cmake/autotools/expat-package-init.cmake \
     cmake/mingw-toolchain.cmake \
     \
     CMakeLists.txt \
     CMake.README \
     ConfigureChecks.cmake \
+    expat.pc.cmake \
     expat_config.h.cmake
 
 _EXTRA_DIST_WINDOWS = \
     win32/build_expat_iss.bat \
     win32/expat.iss \
     win32/MANIFEST.txt \
-    win32/README.txt
+    win32/README.txt \
+    win32/version.rc.cmake
 
 EXTRA_DIST = \
     $(_EXTRA_DIST_CMAKE) \
@@ -74,11 +95,14 @@ EXTRA_DIST = \
     \
     conftools/expat.m4 \
     conftools/get-version.sh \
-    conftools/PrintPath \
+    \
+    fuzz/xml_parsebuffer_fuzzer.c \
+    fuzz/xml_parse_fuzzer.c \
     \
     xmlwf/xmlwf_helpgen.py \
     xmlwf/xmlwf_helpgen.sh \
     \
+    buildconf.sh \
     Changes \
     README.md \
     \
@@ -92,10 +116,10 @@ buildlib:
 	@echo 'ERROR: is no longer supported.  INSTEAD please:' >&2
 	@echo 'ERROR:' >&2
 	@echo 'ERROR:  * Mass-patch Makefile.am, e.g.' >&2
-	@echo 'ERROR:    # find -name Makefile.am -exec sed \' >&2
+	@echo 'ERROR:    # find . -name Makefile.am -exec sed \' >&2
 	@echo 'ERROR:          -e "s,libexpat\.la,libexpatw.la," \' >&2
 	@echo 'ERROR:          -e "s,libexpat_la,libexpatw_la," \' >&2
-	@echo 'ERROR:          -i {} +' >&2
+	@echo 'ERROR:          -i.bak {} +' >&2
 	@echo 'ERROR:' >&2
 	@echo 'ERROR:  * Run automake to re-generate Makefile.in files' >&2
 	@echo 'ERROR:' >&2
@@ -110,6 +134,11 @@ buildlib:
 run-benchmark:
 	$(MAKE) -C tests/benchmark
 	./run.sh tests/benchmark/benchmark@EXEEXT@ -n $(top_srcdir)/../testdata/largefiles/recset.xml 65535 3
+	./run.sh tests/benchmark/benchmark@EXEEXT@ -n $(top_srcdir)/../testdata/largefiles/aaaaaa_attr.xml 4096 3
+	./run.sh tests/benchmark/benchmark@EXEEXT@ -n $(top_srcdir)/../testdata/largefiles/aaaaaa_cdata.xml 4096 3
+	./run.sh tests/benchmark/benchmark@EXEEXT@ -n $(top_srcdir)/../testdata/largefiles/aaaaaa_comment.xml 4096 3
+	./run.sh tests/benchmark/benchmark@EXEEXT@ -n $(top_srcdir)/../testdata/largefiles/aaaaaa_tag.xml 4096 3
+	./run.sh tests/benchmark/benchmark@EXEEXT@ -n $(top_srcdir)/../testdata/largefiles/aaaaaa_text.xml 4096 3
 
 .PHONY: download-xmlts-zip
 download-xmlts-zip:

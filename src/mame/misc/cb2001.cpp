@@ -7,7 +7,7 @@ This driver covers Dyna games running on the DYNA CPU91A-011 custom CPU.
 It is an encrypted NEC V25 or V35.
 It has been seen on the following PCBs:
 D9203
-D9205 (sub PCB)
+D9205 or D9205B (sub PCB)
 D9304
 D9401
 D9701 (sub PCB)
@@ -1597,12 +1597,26 @@ ROM_END
 
 ROM_START( cb4 ) // Wing W4 board + DYNA D9205 subboard; DYNA CB4 V5.0 in bookkeeping screen.
 	ROM_REGION16_LE( 0x040000, "boot_prg", 0 )
-	ROM_LOAD16_WORD( "5mk.2g", 0x020000, 0x10000, CRC(ecc6f80e) SHA1(b6de63cd5231ef9481ee79d841a6ea591add7e4d) )
+	ROM_LOAD16_WORD( "5mk.2g",  0x20000, 0x10000, CRC(ecc6f80e) SHA1(b6de63cd5231ef9481ee79d841a6ea591add7e4d) )
 	ROM_RELOAD(                 0x30000, 0x10000)
 
 	ROM_REGION( 0x100000, "gfx", 0 )
 	ROM_LOAD16_BYTE( "cb4.4i", 0x000000, 0x040000, CRC(c1799150) SHA1(50e80607b93f6ee35e3e8ff5d854dc83afe76505) )
 	ROM_LOAD16_BYTE( "cb4.4j", 0x000001, 0x040000, CRC(3a12cf69) SHA1(232eeca78cdabcd952825aba0ad397e3dde79747) )
+
+	ROM_REGION( 0x400, "proms", 0 ) // not dumped yet
+	ROM_LOAD( "82s147.9b",  0x000, 0x200, BAD_DUMP CRC(dcf976d2) SHA1(73a08e4587f3516d694a8060b79470cf71df3925) )
+	ROM_LOAD( "82s147.11b", 0x200, 0x200, BAD_DUMP CRC(a67e7a63) SHA1(b23e0eb9af13e57bbc8602ddc7fb381ba5c8267e) )
+ROM_END
+
+ROM_START( cb4a ) // DYNA D9300 + DYNA D9205 subboard; DYNA CB4T V1.2 in bookkeeping screen.
+	ROM_REGION16_LE( 0x040000, "boot_prg", 0 )
+	ROM_LOAD16_WORD( "12fb.2g", 0x20000, 0x10000, CRC(2d0e519a) SHA1(a538e3003d8a008dd45ea9fd10b249744b87f3a6) )
+	ROM_RELOAD(                 0x30000, 0x10000)
+
+	ROM_REGION( 0x100000, "gfx", 0 ) // not dumped for this set
+	ROM_LOAD16_BYTE( "cb4.4i", 0x000000, 0x040000, BAD_DUMP CRC(c1799150) SHA1(50e80607b93f6ee35e3e8ff5d854dc83afe76505) )
+	ROM_LOAD16_BYTE( "cb4.4j", 0x000001, 0x040000, BAD_DUMP CRC(3a12cf69) SHA1(232eeca78cdabcd952825aba0ad397e3dde79747) )
 
 	ROM_REGION( 0x400, "proms", 0 ) // not dumped yet
 	ROM_LOAD( "82s147.9b",  0x000, 0x200, BAD_DUMP CRC(dcf976d2) SHA1(73a08e4587f3516d694a8060b79470cf71df3925) )
@@ -1767,6 +1781,7 @@ GAME( 1993, scherrym12 ,  scherrym,  scherrym,  cb2001,    cb2001_state, init_sm
 GAME( 1997, scherrymp,    0,         scherrymp, scherrymp, cb2001_state, init_smaller_proms, ROT0, "Dyna",  "Super Cherry Master Plus (V1.6)",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1997, scherrymp10u, scherrymp, scherrymp, scherrymp, cb2001_state, empty_init,         ROT0, "Dyna",  "Super Cherry Master Plus (V1.0U)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1993, cb4,          0,         cb5,       cb5,       cb2001_state, empty_init,         ROT0, "Dyna",  "Cherry Bonus IV (V5.0)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, cb4a,         cb4,       cb5,       cb5,       cb2001_state, empty_init,         ROT0, "Dyna",  "Cherry Bonus IV (V1.2)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1997, cb5,          0,         cb5,       cb5,       cb2001_state, init_smaller_proms, ROT0, "Dyna",  "Cherry Bonus V Five (V1.3)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1997, cb5_11,       cb5,       cb5,       cb5,       cb2001_state, init_smaller_proms, ROT0, "Dyna",  "Cherry Bonus V Five (V1.1)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1998, mystjb,       0,         scherrymp, scherrymp, cb2001_state, init_smaller_proms, ROT0, "Dyna",  "Mystery J & B (V1.3G)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

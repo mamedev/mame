@@ -655,7 +655,7 @@ void md_cons_cd_state::genesis_scd(machine_config &config)
 	md_ctrl_ports(config);
 	md_exp_port(config);
 
-	CDROM(config, "cdrom").set_interface("scd_cdrom");
+	CDROM(config, "cdrom").set_interface("cdrom");
 
 	SOFTWARE_LIST(config, "cd_list").set_original("megacd").set_filter("NTSC-U");
 }
@@ -675,7 +675,7 @@ void md_cons_cd_state::genesis2_scd(machine_config &config)
 
 	md_ctrl_ports(config);
 
-	CDROM(config, "cdrom").set_interface("scd_cdrom");
+	CDROM(config, "cdrom").set_interface("cdrom");
 
 	SOFTWARE_LIST(config, "cd_list").set_original("megacd").set_filter("NTSC-U");
 }
@@ -696,7 +696,7 @@ void md_cons_cd_state::md_scd(machine_config &config)
 	md_ctrl_ports(config);
 	md_exp_port(config);
 
-	CDROM(config, "cdrom").set_interface("scd_cdrom");
+	CDROM(config, "cdrom").set_interface("cdrom");
 
 	SOFTWARE_LIST(config, "cd_list").set_original("megacd").set_filter("PAL");
 }
@@ -716,7 +716,7 @@ void md_cons_cd_state::md2_scd(machine_config &config)
 
 	md_ctrl_ports(config);
 
-	CDROM(config, "cdrom").set_interface("scd_cdrom");
+	CDROM(config, "cdrom").set_interface("cdrom");
 
 	SOFTWARE_LIST(config, "cd_list").set_original("megacd").set_filter("PAL");
 }
@@ -737,7 +737,7 @@ void md_cons_cd_state::mdj_scd(machine_config &config)
 	md_ctrl_ports(config);
 	md_exp_port(config);
 
-	CDROM(config, "cdrom").set_interface("scd_cdrom");
+	CDROM(config, "cdrom").set_interface("cdrom");
 
 	SOFTWARE_LIST(config, "cd_list").set_original("megacd").set_filter("NTSC-J");
 }
@@ -757,7 +757,7 @@ void md_cons_cd_state::md2j_scd(machine_config &config)
 
 	md_ctrl_ports(config);
 
-	CDROM(config, "cdrom").set_interface("scd_cdrom");
+	CDROM(config, "cdrom").set_interface("cdrom");
 
 	SOFTWARE_LIST(config, "cd_list").set_original("megacd").set_filter("NTSC-J");
 }
@@ -775,7 +775,7 @@ void md_cons_cd_state::genesis_32x_scd(machine_config &config)
 
 	config.set_perfect_quantum("segacd:segacd_68k"); // perfect sync to the fastest cpu
 
-	CDROM(config, "cdrom").set_interface("scd_cdrom");
+	CDROM(config, "cdrom").set_interface("cdrom");
 
 	config.device_remove("cartslot");
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "_32x_cart", "32x,bin").set_device_load(FUNC(md_cons_cd_state::_32x_cart));
@@ -795,7 +795,7 @@ void md_cons_cd_state::md_32x_scd(machine_config &config)
 
 	config.set_perfect_quantum("segacd:segacd_68k"); // perfect sync to the fastest cpu
 
-	CDROM(config, "cdrom").set_interface("scd_cdrom");
+	CDROM(config, "cdrom").set_interface("cdrom");
 
 	config.device_remove("cartslot");
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "_32x_cart", "32x,bin").set_device_load(FUNC(md_cons_cd_state::_32x_cart));
@@ -815,7 +815,7 @@ void md_cons_cd_state::mdj_32x_scd(machine_config &config)
 
 	config.set_perfect_quantum("segacd:segacd_68k"); // perfect sync to the fastest cpu
 
-	CDROM(config, "cdrom").set_interface("scd_cdrom");
+	CDROM(config, "cdrom").set_interface("cdrom");
 
 	config.device_remove("cartslot");
 	GENERIC_CARTSLOT(config, "cartslot", generic_plain_slot, "_32x_cart", "32x,bin").set_device_load(FUNC(md_cons_cd_state::_32x_cart));

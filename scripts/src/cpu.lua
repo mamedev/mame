@@ -41,21 +41,15 @@ if (CPU_INCLUDE_DRC) then
 		MAME_DIR .. "src/devices/cpu/x86log.h",
 		MAME_DIR .. "src/devices/cpu/drcumlsh.h",
 	}
-	if not _OPTIONS["FORCE_DRC_C_BACKEND"] then
+	if (not _OPTIONS["FORCE_DRC_C_BACKEND"]) and ((_OPTIONS["PLATFORM"] == "x86") or (_OPTIONS["PLATFORM"] == "arm64")) then
 		files {
+			MAME_DIR .. "src/devices/cpu/drcbearm64.cpp",
+			MAME_DIR .. "src/devices/cpu/drcbearm64.h",
 			MAME_DIR .. "src/devices/cpu/drcbex64.cpp",
 			MAME_DIR .. "src/devices/cpu/drcbex64.h",
 			MAME_DIR .. "src/devices/cpu/drcbex86.cpp",
 			MAME_DIR .. "src/devices/cpu/drcbex86.h",
 		}
-	end
-
-	if _OPTIONS["targetos"]=="macosx" and _OPTIONS["gcc"]~=nil then
-		if string.find(_OPTIONS["gcc"], "clang") and (str_to_version(_OPTIONS["gcc_version"]) < 80000) then
-			defines {
-				"TARGET_OS_OSX=1",
-			}
-		end
 	end
 end
 
@@ -2010,6 +2004,8 @@ if CPUS["M6805"] then
 		MAME_DIR .. "src/devices/cpu/m6805/m68hc05.h",
 		MAME_DIR .. "src/devices/cpu/m6805/m68hc05e1.cpp",
 		MAME_DIR .. "src/devices/cpu/m6805/m68hc05e1.h",
+		MAME_DIR .. "src/devices/cpu/m6805/m68hc05pge.cpp",
+		MAME_DIR .. "src/devices/cpu/m6805/m68hc05pge.h",
 	}
 end
 
@@ -2978,6 +2974,8 @@ if CPUS["TLCS900"] then
 		MAME_DIR .. "src/devices/cpu/tlcs900/tlcs900.h",
 		MAME_DIR .. "src/devices/cpu/tlcs900/900tbl.hxx",
 		MAME_DIR .. "src/devices/cpu/tlcs900/900htbl.hxx",
+		MAME_DIR .. "src/devices/cpu/tlcs900/tmp94c241.cpp",
+		MAME_DIR .. "src/devices/cpu/tlcs900/tmp94c241.h",
 		MAME_DIR .. "src/devices/cpu/tlcs900/tmp95c061.cpp",
 		MAME_DIR .. "src/devices/cpu/tlcs900/tmp95c061.h",
 		MAME_DIR .. "src/devices/cpu/tlcs900/tmp95c063.cpp",
@@ -3025,9 +3023,10 @@ end
 --@src/devices/cpu/z80/kl5c80a12.h,CPUS["KC80"] = true
 --@src/devices/cpu/z80/kl5c80a16.h,CPUS["KC80"] = true
 --@src/devices/cpu/z80/ky80.h,CPUS["KC80"] = true
+--@src/devices/cpu/z80/t6a84.h,CPUS["T6A84"] = true
 --------------------------------------------------
 
-if CPUS["Z80"] or CPUS["KC80"] or CPUS["Z80N"] then
+if CPUS["Z80"] or CPUS["KC80"] or CPUS["Z80N"] or CPUS["T6A84"] then
 	files {
 		MAME_DIR .. "src/devices/cpu/z80/z80.cpp",
 		MAME_DIR .. "src/devices/cpu/z80/z80.h",
@@ -3052,15 +3051,17 @@ if CPUS["Z80"] or CPUS["KC80"] or CPUS["Z80N"] then
 	}
 
 	dependency {
-		{ MAME_DIR .. "src/devices/cpu/z80/z80.cpp", GEN_DIR .. "emu/cpu/z80/z80.hxx" },
-		{ MAME_DIR .. "src/devices/cpu/z80/nsc800.cpp", GEN_DIR .. "emu/cpu/z80/ncs800.hxx" },
-		{ MAME_DIR .. "src/devices/cpu/z80/r800.cpp", GEN_DIR .. "emu/cpu/z80/r800.hxx" },
+		{ MAME_DIR .. "src/devices/cpu/z80/z80.cpp",    GEN_DIR .. "emu/cpu/z80/z80.hxx" },
+		{ MAME_DIR .. "src/devices/cpu/z80/nsc800.cpp", GEN_DIR .. "emu/cpu/z80/nsc800.hxx" },
+		{ MAME_DIR .. "src/devices/cpu/z80/r800.cpp",   GEN_DIR .. "emu/cpu/z80/r800.hxx" },
+		{ MAME_DIR .. "src/devices/cpu/z80/t6a84.cpp",  GEN_DIR .. "emu/cpu/z80/t6a84.hxx" },
 	}
 
 	custombuildtask {
-		{ MAME_DIR .. "src/devices/cpu/z80/z80.lst", GEN_DIR .. "emu/cpu/z80/z80.hxx", { MAME_DIR .. "src/devices/cpu/z80/z80make.py" }, { "@echo Generating Z80 source file...",   PYTHON .. "  $(1) $(<) $(@)" } },
-		{ MAME_DIR .. "src/devices/cpu/z80/z80.lst", GEN_DIR .. "emu/cpu/z80/ncs800.hxx", { MAME_DIR .. "src/devices/cpu/z80/z80make.py" }, { "@echo Generating NSC800 source file...",   PYTHON .. " $(1) ncs800 $(<) $(@)" } },
-		{ MAME_DIR .. "src/devices/cpu/z80/z80.lst", GEN_DIR .. "emu/cpu/z80/r800.hxx", { MAME_DIR .. "src/devices/cpu/z80/z80make.py" }, { "@echo Generating R800 source file...",   PYTHON .. "  $(1) r800 $(<) $(@)" } },
+		{ MAME_DIR .. "src/devices/cpu/z80/z80.lst", GEN_DIR .. "emu/cpu/z80/z80.hxx",    { MAME_DIR .. "src/devices/cpu/z80/z80make.py" }, { "@echo Generating Z80 source file...",    PYTHON .. " $(1) $(<) $(@)" } },
+		{ MAME_DIR .. "src/devices/cpu/z80/z80.lst", GEN_DIR .. "emu/cpu/z80/nsc800.hxx", { MAME_DIR .. "src/devices/cpu/z80/z80make.py" }, { "@echo Generating NSC800 source file...", PYTHON .. " $(1) nsc800 $(<) $(@)" } },
+		{ MAME_DIR .. "src/devices/cpu/z80/z80.lst", GEN_DIR .. "emu/cpu/z80/r800.hxx",   { MAME_DIR .. "src/devices/cpu/z80/z80make.py" }, { "@echo Generating R800 source file...",   PYTHON .. " $(1) r800 $(<) $(@)" } },
+		{ MAME_DIR .. "src/devices/cpu/z80/z80.lst", GEN_DIR .. "emu/cpu/z80/t6a84.hxx",  { MAME_DIR .. "src/devices/cpu/z80/z80make.py" }, { "@echo Generating T6A84 source file...",  PYTHON .. " $(1) t6a84 $(<) $(@)" } },
 	}
 end
 
@@ -3516,6 +3517,16 @@ if opt_tool(CPUS, "SIGMA2") then
 end
 
 --------------------------------------------------
+-- Control Data Corporation 160 (disassembler only)
+--@src/devices/cpu/cdc160/cdc160.h,CPUS["CDC160"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "CDC160") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/cdc160/cdc160d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/cdc160/cdc160d.h")
+end
+
+--------------------------------------------------
 -- Control Data Corporation 1700 (disassembler only)
 --@src/devices/cpu/cdc1700/cdc1700.h,CPUS["CDC1700"] = true
 --------------------------------------------------
@@ -3726,9 +3737,16 @@ if opt_tool(CPUS, "DSP56000") then
 end
 
 --------------------------------------------------
--- DEC VAX, disassembler only
+-- DEC VAX
 --@src/devices/cpu/vax/vax.h,CPUS["VAX"] = true
 --------------------------------------------------
+
+if CPUS["VAX"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/vax/vax.cpp",
+		MAME_DIR .. "src/devices/cpu/vax/vax.h",
+	}
+end
 
 if opt_tool(CPUS, "VAX") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/vax/vaxdasm.cpp")
@@ -4216,4 +4234,14 @@ end
 if opt_tool(CPUS, "OLMS66K") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/olms66k/nx8dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/olms66k/nx8dasm.h")
+end
+
+--------------------------------------------------
+-- Panasonic MN10300, disassembler only
+--@src/devices/cpu/mn10300/mn10300.h,CPUS["MN10300"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "MN10300") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mn10300/mn103dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mn10300/mn103dasm.h")
 end

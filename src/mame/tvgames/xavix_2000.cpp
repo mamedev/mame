@@ -182,8 +182,8 @@ static INPUT_PORTS_START( ttv_lotr )
 	PORT_INCLUDE(xavix)
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_i2c_lotr_state::camera_r))
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_i2c_lotr_state::camera_r))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_i2c_lotr_state::unknown_random_r))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_i2c_lotr_state::unknown_random_r))
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::read_sda))
 INPUT_PORTS_END
 
@@ -191,8 +191,8 @@ static INPUT_PORTS_START( epo_hamc )
 	PORT_INCLUDE(xavix)
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_epo_hamc_state::camera_r))
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_epo_hamc_state::camera_r))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_epo_hamc_state::unknown_random_r))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_epo_hamc_state::unknown_random_r))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ttv_mx )
@@ -384,11 +384,6 @@ ROM_START( epo_es2j ) // ES2J MAIN-01  2005 date on PCB, 2006 ingame
 	ROM_LOAD("es2j.u3", 0x000000, 0x400000, CRC(840aecb1) SHA1(ad52449ffc13af5f4c67b2c3cf438e7ecd80b9fb) )
 ROM_END
 
-void xavix_i2c_lotr_state::init_epo_mini()
-{
-	init_xavix();
-	m_disable_timer_irq_hack = true;
-}
 
 
 // doesn't use extra opcodes?
@@ -401,14 +396,14 @@ CONS( 2002, epo_bowl, 0, 0, xavix2000_i2c_24c04_2mb, epo_bowl,    xavix_i2c_stat
 
 // スーパーショット！ エキサイトゴルフ
 // needs timer irq hack to boot, fails to draw main menu properly (buggy xavix2000 opcodes?)  (2002 date on PCB, 2003 ingame)
-CONS( 2003, epo_golf, 0,       0, xavix2000_i2c_24c04_4mb, ttv_lotr,   xavix_i2c_lotr_state, init_epo_mini, "Epoch / SSD Company LTD",       "Super Shot! Excite Golf (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003, epo_golf, 0,       0, xavix2000_i2c_24c04_4mb, ttv_lotr,   xavix_i2c_lotr_state, init_no_timer, "Epoch / SSD Company LTD",       "Super Shot! Excite Golf (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // とっとこハム太郎 ハムハム大サーカス！
 CONS( 2002, epo_hamc,  0,      0, xavix2000_4mb,       epo_hamc,   xavix_epo_hamc_state, init_xavix,    "Epoch / SSD Company LTD",       "Tottoko Hamtaro - Ham Ham Dai Circus! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // ミニモニ。パーティ！リズムでぴょん！
 // needs timer irq hack to boot
-CONS( 2003, epo_mini, 0,       0, xavix2000_i2c_24c08_4mb, ttv_lotr,   xavix_i2c_lotr_state, init_epo_mini, "Epoch / SSD Company LTD",        "mini-moni Party! Rhythm de Pyon! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003, epo_mini, 0,       0, xavix2000_i2c_24c08_4mb, ttv_lotr,   xavix_i2c_lotr_state, init_no_timer, "Epoch / SSD Company LTD",        "mini-moni Party! Rhythm de Pyon! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // カードスキャン!　エキサイトステージ サッカー日本代表チーム
 CONS( 2006, epo_es2j,   0,     0,  xavix2000_4mb,      xavix,      xavix_state,          init_xavix,    "Epoch / SSD Company LTD",        "Card Scan! Excite Stage Soccer Nippon Daihyou Team (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
@@ -425,7 +420,7 @@ CONS( 2004, epo_sdb,  0, 0, xavix2000_nv_sdb,    epo_sdb,     xavix_2000_nv_sdb_
 
 CONS( 2005, ttv_sw,   0,      0, xavix2000_i2c_24c02, ttv_lotr,    xavix_i2c_lotr_state,    init_xavix, "Tiger / SSD Company LTD",       "Star Wars Saga Edition - Lightsaber Battle Game", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS( 2005, ttv_swj,  ttv_sw, 0, xavix2000_i2c_24c02, ttv_lotr,    xavix_i2c_lotr_state,    init_xavix, "Tomy / SSD Company LTD",        "Star Wars Saga Edition - Lightsaber Battle Game (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS( 2005, ttv_lotr, 0,      0, xavix2000_i2c_24c02, ttv_lotr,    xavix_i2c_lotr_state,    init_xavix, "Tiger / SSD Company LTD",       "Lord Of The Rings - Warrior of Middle-Earth", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, ttv_lotr, 0,      0, xavix2000_i2c_24c02, ttv_lotr,    xavix_i2c_lotr_state,    init_xavix, "Tiger / SSD Company LTD",       "Lord of the Rings - Warrior of Middle-Earth", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS( 2005, ttv_mx,   0,      0, xavix2000_i2c_24c04, ttv_mx,      xavix_i2c_state,         init_xavix, "Tiger / SSD Company LTD",       "MX Dirt Rebel", MACHINE_IMPERFECT_SOUND )
 
 // テレビで遊び隊　韋駄天翔 激走 韋駄天バトル  - seems to be based on the same engine at ttv_mx and has an almost identical controller, but not exactly the same game
@@ -440,11 +435,11 @@ CONS( 2003, tak_chq,  0,      0, xavix2000_i2c_24c04_4mb, xavix_i2c,   xavix_i2c
 
 // hangs after starting a game, check why
 // Let’s！TV プレイ　体感格闘ワンピースパンチバトル 　～海賊王にキミがなる！～
-CONS( 2004, ban_onep, 0, 0, xavix2000_i2c_24c04, ttv_lotr,    xavix_i2c_lotr_state, init_xavix, "Bandai / SSD Company LTD",         "Let's! TV Play One Piece Punch Battle (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2004, ban_onep, 0, 0, xavix2000_i2c_24c04, ttv_lotr,    xavix_i2c_lotr_state, init_xavix, "Bandai / SSD Company LTD",         "Let's! TV Play Taikan Kakutou One Piece Punch Battle - Kaizoku Ou ni Kimi ga Naru (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // Let’s！TV プレイ　闘印奥義　 陰陽大戦記～目指せ最強闘神士～
 // stalls unless timers are disabled like epo_mini / epo_golf, 2004 date on PCB, 2005 ingame
-CONS( 2005, ban_omt,  0, 0, xavix2000_i2c_24c04_4mb, ttv_lotr,    xavix_i2c_lotr_state, init_epo_mini, "Bandai / SSD Company LTD",         "Let's! TV Play Touin Ougi Onmyou Taisenki: Mezase Saikyou Toushinshi (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, ban_omt,  0, 0, xavix2000_i2c_24c04_4mb, ttv_lotr,    xavix_i2c_lotr_state, init_no_timer, "Bandai / SSD Company LTD",         "Let's! TV Play Touin Ougi Onmyou Taisenki: Mezase Saikyou Toushinshi (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // ディズニープリンセス　キラキラ魔法のレッスン
 CONS( 2004, tom_dpgm, 0, 0, xavix2000_i2c_24c08_4mb, ttv_lotr,    xavix_i2c_lotr_state, init_xavix, "Tomy / SSD Company LTD",         "Disney Princess Kirakira Mahou no Lesson (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

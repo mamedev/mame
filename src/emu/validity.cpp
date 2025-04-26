@@ -175,13 +175,6 @@ void validate_integer_semantics()
 	if (a32 >> 1 != -2) osd_printf_error("s32 right shift must be arithmetic\n");
 	if (a64 >> 1 != -2) osd_printf_error("s64 right shift must be arithmetic\n");
 
-	// check pointer size
-#ifdef PTR64
-	static_assert(sizeof(void *) == 8, "PTR64 flag enabled, but was compiled for 32-bit target\n");
-#else
-	static_assert(sizeof(void *) == 4, "PTR64 flag not enabled, but was compiled for 64-bit target\n");
-#endif
-
 	// TODO: check if this is actually working
 	// check endianness definition
 	u16 lsbtest = 0;

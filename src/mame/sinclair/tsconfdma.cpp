@@ -35,18 +35,18 @@ void tsconfdma_device::device_start()
 	save_item(NAME(m_address_d));
 	save_item(NAME(m_block_len));
 	save_item(NAME(m_block_num));
-	save_item(NAME(m_align_s));
-	save_item(NAME(m_align_d));
-	save_item(NAME(m_align));
-	save_item(NAME(m_m1));
-	save_item(NAME(m_m2));
-	save_item(NAME(m_asz));
-	save_item(NAME(m_task));
 	save_item(NAME(m_tx_s_addr));
 	save_item(NAME(m_tx_d_addr));
 	save_item(NAME(m_tx_data));
 	save_item(NAME(m_tx_block_num));
 	save_item(NAME(m_tx_block));
+	save_item(NAME(m_task));
+	save_item(NAME(m_align_s));
+	save_item(NAME(m_align_d));
+	save_item(NAME(m_asz));
+	save_item(NAME(m_align));
+	save_item(NAME(m_m1));
+	save_item(NAME(m_m2));
 }
 
 void tsconfdma_device::device_reset()

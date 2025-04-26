@@ -6,6 +6,8 @@
 
 #include <algorithm>
 
+#include "logmacro.h"
+
 
 DEFINE_DEVICE_TYPE(SPG110_VIDEO, spg110_video_device, "spg110_video", "SPG110 System-on-a-Chip (Video)")
 
@@ -337,7 +339,7 @@ device_memory_interface::space_config_vector spg110_video_device::memory_space_c
 }
 
 
-/* 0x2063 P_DMA_control 
+/* 0x2063 P_DMA_control
 despite the name this address is more IRQ control than DMA, although there are some DMA flags in here
 
 bit15     bit14     bit13     bit12     bit11     bit10     bit9    bit8    bit7    bit6      bit5          bit4        bit3          bit2        bit1          bit0
@@ -434,20 +436,20 @@ void spg110_video_device::update_video_irqs()
 
 
 
-void spg110_video_device::vcomp_val_201c_w(uint16_t data) { logerror("%s: vcomp_val_201c_w: %04x\n", machine().describe_context(), data); } // during startup text only
-void spg110_video_device::segment_202x_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_tilebase[offset]); logerror("%s: segment/tilebase write: %02x %04x\n", machine().describe_context(), offset, data); } // confirmed as tile base, seems to apply to both layers and sprites, unlike spg2xx which has separate registers
+void spg110_video_device::vcomp_val_201c_w(uint16_t data) { LOG("%s: vcomp_val_201c_w: %04x\n", machine().describe_context(), data); } // during startup text only
+void spg110_video_device::segment_202x_w(offs_t offset, uint16_t data, uint16_t mem_mask) { COMBINE_DATA(&m_tilebase[offset]); LOG("%s: segment/tilebase write: %02x %04x\n", machine().describe_context(), offset, data); } // confirmed as tile base, seems to apply to both layers and sprites, unlike spg2xx which has separate registers
 
-void spg110_video_device::adr_mode_2028_w(uint16_t data) { logerror("%s: adr_mode_2028_w: %04x\n", machine().describe_context(), data); } // startup
+void spg110_video_device::adr_mode_2028_w(uint16_t data) { LOG("%s: adr_mode_2028_w: %04x\n", machine().describe_context(), data); } // startup
 uint16_t spg110_video_device::adr_mode_2028_r() { return 0x0000; }
 
-void spg110_video_device::ext_bus_2029_w(uint16_t data) { logerror("%s: ext_bus_2029_w: %04x\n", machine().describe_context(), data); } // 0006, 0008 on startup
+void spg110_video_device::ext_bus_2029_w(uint16_t data) { LOG("%s: ext_bus_2029_w: %04x\n", machine().describe_context(), data); } // 0006, 0008 on startup
 uint16_t spg110_video_device::ext_bus_2029_r() { return 0x0000; }
 
-void spg110_video_device::win_mask_1_2031_w(uint16_t data) { logerror("%s: win_mask_1_2031_w: %04x\n", machine().describe_context(), data); } // 014a or 0000 when ball is in trap
-void spg110_video_device::win_mask_2_2032_w(uint16_t data) { logerror("%s: win_mask_2_2032_w: %04x\n", machine().describe_context(), data); } // 014a most of the time, 0000 very rarely
-void spg110_video_device::win_attribute_w(uint16_t data) { logerror("%s: win_attribute_w: %04x\n", machine().describe_context(), data); } // changes, situational, eg when pausing
-void spg110_video_device::win_mask_3_2034_w(uint16_t data) { logerror("%s: win_mask_3_2034_w: %04x\n", machine().describe_context(), data); } // 0141 on every scene transition
-void spg110_video_device::win_mask_4_2035_w(uint16_t data) { logerror("%s: win_mask_4_2035_w: %04x\n", machine().describe_context(), data); } // 0141 on every scene transition
+void spg110_video_device::win_mask_1_2031_w(uint16_t data) { LOG("%s: win_mask_1_2031_w: %04x\n", machine().describe_context(), data); } // 014a or 0000 when ball is in trap
+void spg110_video_device::win_mask_2_2032_w(uint16_t data) { LOG("%s: win_mask_2_2032_w: %04x\n", machine().describe_context(), data); } // 014a most of the time, 0000 very rarely
+void spg110_video_device::win_attribute_w(uint16_t data) { LOG("%s: win_attribute_w: %04x\n", machine().describe_context(), data); } // changes, situational, eg when pausing
+void spg110_video_device::win_mask_3_2034_w(uint16_t data) { LOG("%s: win_mask_3_2034_w: %04x\n", machine().describe_context(), data); } // 0141 on every scene transition
+void spg110_video_device::win_mask_4_2035_w(uint16_t data) { LOG("%s: win_mask_4_2035_w: %04x\n", machine().describe_context(), data); } // 0141 on every scene transition
 
 void spg110_video_device::irq_tm_v_2036_w(uint16_t data)
 {
@@ -461,7 +463,7 @@ uint16_t spg110_video_device::irq_tm_h_2037_r()
 	// added to value from the PRNG for some random number generation cases
 	// should this return the *current* horizontal position? or the register value written?
 	return m_screen->hpos();
-} 
+}
 
 void spg110_video_device::irq_tm_h_2037_w(uint16_t data)
 {
@@ -473,19 +475,19 @@ void spg110_video_device::irq_tm_h_2037_w(uint16_t data)
 void spg110_video_device::effect_control_2039_w(uint16_t data)
 {
 	// 0803 on every scene transition
-	logerror("%s: effect_control_2039_w: %04x\n", machine().describe_context(), data);
-} 
+	LOG("%s: effect_control_2039_w: %04x\n", machine().describe_context(), data);
+}
 
 void spg110_video_device::huereference_203c_w(uint16_t data)
 {
 	// 0006 on startup, twice
-	logerror("%s: huereference_203c_w: %04x\n", machine().describe_context(), data);
-} 
+	LOG("%s: huereference_203c_w: %04x\n", machine().describe_context(), data);
+}
 
 void spg110_video_device::lum_adjust_203d_w(uint16_t data)
 {
 	// changes, usually between scenes (brightness)
-	logerror("%s: lum_adjust_203d_w: %04x\n", machine().describe_context(), data);
+	LOG("%s: lum_adjust_203d_w: %04x\n", machine().describe_context(), data);
 }
 
 uint16_t spg110_video_device::sp_control_2042_r()
@@ -496,13 +498,13 @@ uint16_t spg110_video_device::sp_control_2042_r()
 void spg110_video_device::sp_control_2042_w(uint16_t data)
 {
 	// sets bit 0x0004, masks with 0xfffb etc.
-	logerror("%s: sp_control_2042_w: %04x\n", machine().describe_context(), data);
-} 
+	LOG("%s: sp_control_2042_w: %04x\n", machine().describe_context(), data);
+}
 
 void spg110_video_device::spg110_2045_w(uint16_t data)
 {
 	// 0006 on startup, once
-	logerror("%s: spg110_2045_w: %04x\n", machine().describe_context(), data);
+	LOG("%s: spg110_2045_w: %04x\n", machine().describe_context(), data);
 }
 
 void spg110_video_device::transparent_color_205x_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -527,12 +529,12 @@ void spg110_video_device::dma_len_trigger_2062_w(uint16_t data)
 	update_video_irqs();
 
 	// this is presumably a counter that underflows to 0x1fff, because that's what the wait loop waits for?
-	logerror("%s: (trigger len) %04x with values (dstseg) %04x (dststep) %04x (srchigh) %04x (src step) %04x | (dst) %04x (src) %04x\n", machine().describe_context(), data, m_dma_dst_seg, m_dma_dst_step, m_dma_src_seg, m_dma_src_step, m_dma_dst, m_dma_src);
+	LOG("%s: (trigger len) %04x with values (dstseg) %04x (dststep) %04x (srchigh) %04x (src step) %04x | (dst) %04x (src) %04x\n", machine().describe_context(), data, m_dma_dst_seg, m_dma_dst_step, m_dma_src_seg, m_dma_src_step, m_dma_dst, m_dma_src);
 
 	/*
 	if (m_dma_dst_seg != 0x0000)
 	{
-	    logerror("unknown DMA params are not zero!\n");
+	    LOG("unknown DMA params are not zero!\n");
 	}
 	*/
 
@@ -592,34 +594,34 @@ void spg110_video_device::tilemap_write_regs(int which, uint16_t* regs, int regn
 	switch (regno)
 	{
 	case 0x0: // Page X scroll
-		logerror("video_w: Page %d X Scroll = %04x\n", which, data & 0x01ff);
+		LOG("video_w: Page %d X Scroll = %04x\n", which, data & 0x01ff);
 		regs[regno] = data & 0x01ff;
 		break;
 
 	case 0x1: // Page Y scroll
-		logerror("video_w: Page %d Y Scroll = %04x\n", which, data & 0x00ff);
+		LOG("video_w: Page %d Y Scroll = %04x\n", which, data & 0x00ff);
 		regs[regno] = data & 0x00ff;
 		break;
 
 	case 0x2: // Page Attributes
-		logerror("video_w: Page %d Attributes = %04x (Priority:%d, Palette:%d, VSize:%d, HSize:%d, FlipY:%d, FlipX:%d, BPP:%d)\n", which, data
+		LOG("video_w: Page %d Attributes = %04x (Priority:%d, Palette:%d, VSize:%d, HSize:%d, FlipY:%d, FlipX:%d, BPP:%d)\n", which, data
 			, (data >> 12) & 3, (data >> 8) & 15, 8 << ((data >> 6) & 3), 8 << ((data >> 4) & 3), BIT(data, 3), BIT(data, 2), 2 * ((data & 3) + 1));
 		regs[regno] = data;
 		break;
 
 	case 0x3: // Page Control
-		logerror("video_w: Page %d Control = %04x (Blend:%d, HiColor:%d, RowScroll:%d, Enable:%d, Wallpaper:%d, RegSet:%d, Bitmap:%d)\n", which, data
+		LOG("video_w: Page %d Control = %04x (Blend:%d, HiColor:%d, RowScroll:%d, Enable:%d, Wallpaper:%d, RegSet:%d, Bitmap:%d)\n", which, data
 			, BIT(data, 8), BIT(data, 7), BIT(data, 4), BIT(data, 3), BIT(data, 2), BIT(data, 1), BIT(data, 0));
 		regs[regno] = data;
 		break;
 
 	case 0x4: // Page Tile Address
-		logerror("video_w: Page %d Tile Address = %04x\n", which, data);
+		LOG("video_w: Page %d Tile Address = %04x\n", which, data);
 		regs[regno] = data;
 		break;
 
 	case 0x5: // Page Attribute Address
-		logerror("video_w: Page %d Attribute Address = %04x\n", which, data);
+		LOG("video_w: Page %d Attribute Address = %04x\n", which, data);
 		regs[regno] = data;
 		break;
 	}

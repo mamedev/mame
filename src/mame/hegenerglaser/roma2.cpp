@@ -72,21 +72,18 @@ private:
 	u8 input_r();
 };
 
-INPUT_CHANGED_MEMBER(roma2_state::reset_button)
-{
-	// RES buttons in serial tied to CPU RESET
-	if (m_reset->read() == 3)
-	{
-		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-		m_display->reset();
-	}
-}
-
 
 
 /*******************************************************************************
     I/O
 *******************************************************************************/
+
+INPUT_CHANGED_MEMBER(roma2_state::reset_button)
+{
+	// RES buttons in serial tied to CPU RESET
+	if (m_reset->read() == 3)
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+}
 
 u8 roma2_state::input_r()
 {

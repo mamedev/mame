@@ -382,8 +382,8 @@ struct IBUTTON
 /*****************************************************************************/
 static void firebeat_ata_devices(device_slot_interface &device)
 {
-	device.option_add("cdrom", ATAPI_FIXED_CDROM);
-	device.option_add("dvdrom", ATAPI_FIXED_DVDROM);
+	device.option_add("cdrom", ATAPI_CDROM);
+	device.option_add("dvdrom", ATAPI_DVDROM);
 	device.option_add("hdd", IDE_HARDDISK);
 }
 

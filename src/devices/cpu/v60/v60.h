@@ -776,7 +776,6 @@ private:
 	[[noreturn]] uint32_t opUNHANDLED();
 	void v60_do_irq(int vector);
 	void v60_try_irq();
-
 };
 
 
