@@ -124,8 +124,8 @@ public:
 	multibus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = DERIVED_CLOCK(1, 1));
 
 	template <typename T, typename U>
-	multibus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&bus_tag, U &&slot_options, char const *default_option, bool const fixed)
-		: multibus_slot_device(mconfig, tag, owner, DERIVED_CLOCK(1,1))
+	multibus_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&bus_tag, U &&slot_options, char const *default_option, bool const fixed, u32 clock = DERIVED_CLOCK(1, 1))
+		: multibus_slot_device(mconfig, tag, owner, clock)
 	{
 		m_bus.set_tag(std::forward<T>(bus_tag));
 
