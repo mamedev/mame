@@ -87,9 +87,6 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
-	// 2.048 MHz
-	static constexpr XTAL H8_CLOCK = XTAL(18'432'000) / 9;
-
 	void h8_status_callback(u8 data);
 	void h8_inte_callback(int state);
 
@@ -169,7 +166,8 @@ void h_8_cpu_8080_device::int7_w(int state)
 
 void h_8_cpu_8080_device::p201_reset_w(int state)
 {
-	if (state){
+	if (state)
+	{
 		m_maincpu->reset();
 	}
 
@@ -247,10 +245,14 @@ const tiny_rom_entry *h_8_cpu_8080_device::device_rom_region() const
 void h_8_cpu_8080_device::device_start()
 {
 	save_item(NAME(m_m1_state));
+
+	h8bus().set_clock(m_maincpu->clock());
 }
 
 void h_8_cpu_8080_device::device_add_mconfig(machine_config &config)
 {
+	constexpr XTAL H8_CLOCK = XTAL(18'432'000) / 9;  // 2.048 MHz
+
 	I8080(config, m_maincpu, H8_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &h_8_cpu_8080_device::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &h_8_cpu_8080_device::io_map);

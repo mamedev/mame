@@ -13,6 +13,8 @@
 
 #include "h8bus.h"
 
+#include <cstring>
+
 device_h8bus_card_interface::device_h8bus_card_interface(const machine_config &mconfig, device_t &device) :
 	device_interface(device, "h8bus"),
 	m_h8bus(nullptr)
@@ -27,7 +29,7 @@ void device_h8bus_card_interface::interface_pre_start()
 {
 	if (!m_h8bus)
 	{
-		fatalerror("Can't find H-8 bus device\n");
+		throw device_missing_dependencies();
 	}
 }
 
@@ -91,7 +93,7 @@ h8bus_device::h8bus_device(const machine_config &mconfig, device_type type, cons
 	device_t(mconfig, type, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	m_mem_config("mem", ENDIANNESS_LITTLE, 16, 16, 0, address_map_constructor(FUNC(h8bus_device::mem_map), this)),
-	m_io_config("pio", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(h8bus_device::io_map), this)),
+	m_io_config("io", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(h8bus_device::io_map), this)),
 	m_p1_card(nullptr),
 	m_p2_card(nullptr)
 {
@@ -99,21 +101,6 @@ h8bus_device::h8bus_device(const machine_config &mconfig, device_type type, cons
 
 h8bus_device::~h8bus_device()
 {
-}
-
-void h8bus_device::interface_pre_start()
-{
-	// Verify required cards are installed.
-	if (!m_p1_card)
-	{
-		fatalerror("Can't find H-8 P1 - Front panel card\n");
-	}
-
-	if (!m_p2_card)
-	{
-		fatalerror("Can't find H-8 P2 - CPU card\n");
-	}
-
 }
 
 void h8bus_device::device_start()
@@ -153,39 +140,61 @@ void h8bus_device::add_h8bus_card(device_h8bus_card_interface &card)
 	}
 }
 
+// TODO properly handle multiple cards sharing the same interrupt line.
 void h8bus_device::set_int1_line(int state)
 {
-	m_p2_card->int1_w(state);
+	for (device_h8bus_card_interface &entry : m_device_list)
+	{
+		entry.int1_w(state);
+	}
 }
 
 void h8bus_device::set_int2_line(int state)
 {
-	m_p2_card->int2_w(state);
+	for (device_h8bus_card_interface &entry : m_device_list)
+	{
+		entry.int2_w(state);
+	}
 }
 
 void h8bus_device::set_int3_line(int state)
 {
-	m_p2_card->int3_w(state);
+	for (device_h8bus_card_interface &entry : m_device_list)
+	{
+		entry.int3_w(state);
+	}
 }
 
 void h8bus_device::set_int4_line(int state)
 {
-	m_p2_card->int4_w(state);
+	for (device_h8bus_card_interface &entry : m_device_list)
+	{
+		entry.int4_w(state);
+	}
 }
 
 void h8bus_device::set_int5_line(int state)
 {
-	m_p2_card->int5_w(state);
+	for (device_h8bus_card_interface &entry : m_device_list)
+	{
+		entry.int5_w(state);
+	}
 }
 
 void h8bus_device::set_int6_line(int state)
 {
-	m_p2_card->int6_w(state);
+	for (device_h8bus_card_interface &entry : m_device_list)
+	{
+		entry.int6_w(state);
+	}
 }
 
 void h8bus_device::set_int7_line(int state)
 {
-	m_p2_card->int7_w(state);
+	for (device_h8bus_card_interface &entry : m_device_list)
+	{
+		entry.int7_w(state);
+	}
 }
 
 void h8bus_device::set_reset_line(int state)
@@ -231,7 +240,6 @@ void h8bus_device::set_p201_int2(int state)
 {
 	m_p2_card->p201_int2_w(state);
 }
-
 
 void h8bus_device::set_disable_rom_line(int state)
 {

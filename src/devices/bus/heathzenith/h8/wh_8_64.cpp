@@ -26,11 +26,10 @@ protected:
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	bool m_installed;
 
-	required_device_array<ram_device, 8> m_ram;
+	memory_share_array_creator<u8, 8> m_ram;
 };
 
 class wh_8_64_48k_device : public wh_8_64_device
@@ -63,7 +62,7 @@ wh_8_64_device::wh_8_64_device(const machine_config &mconfig, const char *tag, d
 wh_8_64_device::wh_8_64_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock):
 	device_t(mconfig, type, tag, owner, 0),
 	device_h8bus_card_interface(mconfig, *this),
-	m_ram(*this, "rambank%u", 0U)
+	m_ram(*this, "rambank%u", 0U, 0x2000U, ENDIANNESS_LITTLE)
 {
 }
 
@@ -78,33 +77,19 @@ void wh_8_64_device::device_reset()
 {
 	if (!m_installed)
 	{
-		h8bus().space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3fff,
-			read8sm_delegate(m_ram[0], FUNC(ram_device::read)),
-			write8sm_delegate(m_ram[0], FUNC(ram_device::write)));
+		h8bus().space(AS_PROGRAM).install_ram(0x2000, 0x3fff, m_ram[0]);
 
-		h8bus().space(AS_PROGRAM).install_readwrite_handler(0x4000, 0x5fff,
-			read8sm_delegate(m_ram[1], FUNC(ram_device::read)),
-			write8sm_delegate(m_ram[1], FUNC(ram_device::write)));
+		h8bus().space(AS_PROGRAM).install_ram(0x4000, 0x5fff, m_ram[1]);
 
-		h8bus().space(AS_PROGRAM).install_readwrite_handler(0x6000, 0x7fff,
-			read8sm_delegate(m_ram[2], FUNC(ram_device::read)),
-			write8sm_delegate(m_ram[2], FUNC(ram_device::write)));
+		h8bus().space(AS_PROGRAM).install_ram(0x6000, 0x7fff, m_ram[2]);
 
-		h8bus().space(AS_PROGRAM).install_readwrite_handler(0x8000, 0x9fff,
-			read8sm_delegate(m_ram[3], FUNC(ram_device::read)),
-			write8sm_delegate(m_ram[3], FUNC(ram_device::write)));
+		h8bus().space(AS_PROGRAM).install_ram(0x8000, 0x9fff, m_ram[3]);
 
-		h8bus().space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff,
-			read8sm_delegate(m_ram[4], FUNC(ram_device::read)),
-			write8sm_delegate(m_ram[4], FUNC(ram_device::write)));
+		h8bus().space(AS_PROGRAM).install_ram(0xa000, 0xbfff, m_ram[4]);
 
-		h8bus().space(AS_PROGRAM).install_readwrite_handler(0xc000, 0xdfff,
-			read8sm_delegate(m_ram[5], FUNC(ram_device::read)),
-			write8sm_delegate(m_ram[5], FUNC(ram_device::write)));
+		h8bus().space(AS_PROGRAM).install_ram(0xc000, 0xdfff, m_ram[5]);
 
-		h8bus().space(AS_PROGRAM).install_readwrite_handler(0xe000, 0xffff,
-			read8sm_delegate(m_ram[6], FUNC(ram_device::read)),
-			write8sm_delegate(m_ram[6], FUNC(ram_device::write)));
+		h8bus().space(AS_PROGRAM).install_ram(0xe000, 0xffff, m_ram[6]);
 
 // TODO: Properly map the last 8k, needs an HA-8-6 Z80 CPU or HA-8-8 Extended
 // Configuration board to handle the ROM/RAM swap
@@ -116,18 +101,6 @@ void wh_8_64_device::device_reset()
 
 		m_installed = true;
 	}
-}
-
-void wh_8_64_device::device_add_mconfig(machine_config &config)
-{
-	RAM(config, m_ram[0]).set_default_size("8K");
-	RAM(config, m_ram[1]).set_default_size("8K");
-	RAM(config, m_ram[2]).set_default_size("8K");
-	RAM(config, m_ram[3]).set_default_size("8K");
-	RAM(config, m_ram[4]).set_default_size("8K");
-	RAM(config, m_ram[5]).set_default_size("8K");
-	RAM(config, m_ram[6]).set_default_size("8K");
-	RAM(config, m_ram[7]).set_default_size("8K");
 }
 
 // TODO - Add support for setting memory map based on switch settings
@@ -249,29 +222,17 @@ void wh_8_64_48k_device::device_reset()
 {
 	if (!m_installed)
 	{
-		h8bus().space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3fff,
-			read8sm_delegate(m_ram[0], FUNC(ram_device::read)),
-			write8sm_delegate(m_ram[0], FUNC(ram_device::write)));
+		h8bus().space(AS_PROGRAM).install_ram(0x2000, 0x3fff, m_ram[0]);
 
-		h8bus().space(AS_PROGRAM).install_readwrite_handler(0x4000, 0x5fff,
-			read8sm_delegate(m_ram[1], FUNC(ram_device::read)),
-			write8sm_delegate(m_ram[1], FUNC(ram_device::write)));
+		h8bus().space(AS_PROGRAM).install_ram(0x4000, 0x5fff, m_ram[1]);
 
-		h8bus().space(AS_PROGRAM).install_readwrite_handler(0x6000, 0x7fff,
-			read8sm_delegate(m_ram[2], FUNC(ram_device::read)),
-			write8sm_delegate(m_ram[2], FUNC(ram_device::write)));
+		h8bus().space(AS_PROGRAM).install_ram(0x6000, 0x7fff, m_ram[2]);
 
-		h8bus().space(AS_PROGRAM).install_readwrite_handler(0x8000, 0x9fff,
-			read8sm_delegate(m_ram[3], FUNC(ram_device::read)),
-			write8sm_delegate(m_ram[3], FUNC(ram_device::write)));
+		h8bus().space(AS_PROGRAM).install_ram(0x8000, 0x9fff, m_ram[3]);
 
-		h8bus().space(AS_PROGRAM).install_readwrite_handler(0xa000, 0xbfff,
-			read8sm_delegate(m_ram[4], FUNC(ram_device::read)),
-			write8sm_delegate(m_ram[4], FUNC(ram_device::write)));
+		h8bus().space(AS_PROGRAM).install_ram(0xa000, 0xbfff, m_ram[4]);
 
-		h8bus().space(AS_PROGRAM).install_readwrite_handler(0xc000, 0xdfff,
-			read8sm_delegate(m_ram[5], FUNC(ram_device::read)),
-			write8sm_delegate(m_ram[5], FUNC(ram_device::write)));
+		h8bus().space(AS_PROGRAM).install_ram(0xc000, 0xdfff, m_ram[5]);
 
 		m_installed = true;
 	}
@@ -287,22 +248,13 @@ void wh_8_64_32k_device::device_reset()
 {
 	if (!m_installed)
 	{
-		h8bus().space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3fff,
-			read8sm_delegate(m_ram[0], FUNC(ram_device::read)),
-			write8sm_delegate(m_ram[0], FUNC(ram_device::write)));
+		h8bus().space(AS_PROGRAM).install_ram(0x2000, 0x3fff, m_ram[0]);
 
-		h8bus().space(AS_PROGRAM).install_readwrite_handler(0x4000, 0x5fff,
-			read8sm_delegate(m_ram[1], FUNC(ram_device::read)),
-			write8sm_delegate(m_ram[1], FUNC(ram_device::write)));
+		h8bus().space(AS_PROGRAM).install_ram(0x4000, 0x5fff, m_ram[1]);
 
-		h8bus().space(AS_PROGRAM).install_readwrite_handler(0x6000, 0x7fff,
-			read8sm_delegate(m_ram[2], FUNC(ram_device::read)),
-			write8sm_delegate(m_ram[2], FUNC(ram_device::write)));
+		h8bus().space(AS_PROGRAM).install_ram(0x6000, 0x7fff, m_ram[2]);
 
-		h8bus().space(AS_PROGRAM).install_readwrite_handler(0x8000, 0x9fff,
-			read8sm_delegate(m_ram[3], FUNC(ram_device::read)),
-			write8sm_delegate(m_ram[3], FUNC(ram_device::write)));
-
+		h8bus().space(AS_PROGRAM).install_ram(0x8000, 0x9fff, m_ram[3]);
 		m_installed = true;
 	}
 }

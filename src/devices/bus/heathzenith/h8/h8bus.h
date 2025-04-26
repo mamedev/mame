@@ -141,11 +141,9 @@
 #define MAME_BUS_HEATHZENITH_H8_H8BUS_H
 
 #pragma once
-#include "emu.h"
 #include <functional>
 #include <utility>
 #include <vector>
-#include <string.h>
 
 
 class h8bus_device;
@@ -156,6 +154,15 @@ class device_h8bus_card_interface : public device_interface
 	friend class h8bus_device;
 public:
 	virtual ~device_h8bus_card_interface();
+
+	// signals from the Bus
+	virtual void int1_w(int state) {}
+	virtual void int2_w(int state) {}
+	virtual void int3_w(int state) {}
+	virtual void int4_w(int state) {}
+	virtual void int5_w(int state) {}
+	virtual void int6_w(int state) {}
+	virtual void int7_w(int state) {}
 
 	virtual void m1_w(int state) {}
 	virtual void reset_w(int state) {}
@@ -280,7 +287,6 @@ public:
 protected:
 	h8bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void interface_pre_start() override;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -295,14 +301,15 @@ protected:
 	void set_int5_line(int state);
 	void set_int6_line(int state);
 	void set_int7_line(int state);
-	void set_p201_inte(int state);
-	void set_p201_reset(int state);
-	void set_p201_int1(int state);
-	void set_p201_int2(int state);
 	void set_reset_line(int state);
 	void set_hold_line(int state);
 	void set_disable_rom_line(int state);
 	void set_m1_line(int state);
+
+	void set_p201_inte(int state);
+	void set_p201_reset(int state);
+	void set_p201_int1(int state);
+	void set_p201_int2(int state);
 
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
