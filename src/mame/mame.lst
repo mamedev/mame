@@ -20466,9 +20466,6 @@ skill98
 skillch
 skillcha
 srmagic
-ss2000
-ss2000a
-ss2001
 star100
 super7
 super9
@@ -32571,6 +32568,11 @@ vcarn
 @source:misc/sprcros2.cpp
 sprcros2
 sprcros2a
+
+@source:misc/sshanghai.cpp
+ssh2000
+ssh2000a
+ssh2000wf
 
 @source:misc/startouch.cpp
 europl01
