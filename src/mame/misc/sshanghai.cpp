@@ -10,9 +10,7 @@
 
 
   3-reel 5-liner with an extra reel.
-  Rare video slots machine platform.
-  based on a Z80 CPU and a AY-3-8910 for sound.
-
+  Rare video slots machine platform based on a Z80 CPU and a AY-3-8910 for sound.
   5 DIP switchs banks.
 
   Unknown manufacturer.
@@ -49,19 +47,14 @@ public:
 		m_bg_atrram(*this, "bg_atrram"),
 		m_fg_vidram(*this, "fg_vidram"),
 		m_fg_atrram(*this, "fg_atrram"),
-		
-		m_bgcolor(0),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"),
-		m_lamps(*this, "lamp%u", 0U)
+		m_palette(*this, "palette")
 	{ }
 
 	void ssh2000(machine_config &config);
 
 protected:
-	virtual void machine_start() override { m_lamps.resolve(); }
-
 	void ssh2000_map(address_map &map) ATTR_COLD;
 	void ssh2000_portmap(address_map &map) ATTR_COLD;	
 
@@ -83,15 +76,12 @@ protected:
 	required_shared_ptr<uint8_t> m_fg_vidram;
 	required_shared_ptr<uint8_t> m_fg_atrram;
 
-	uint8_t m_bgcolor = 0;
 	tilemap_t *m_bg_tilemap = nullptr;
 	tilemap_t *m_fg_tilemap = nullptr;
-	uint8_t m_tile_bank = 0U;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	output_finder<16> m_lamps;
 };
 
 
@@ -148,7 +138,7 @@ TILE_GET_INFO_MEMBER(ssh2000_state::get_fg_tile_info)
 {
 	int const code = m_fg_vidram[tile_index];
 	int const attr = m_fg_atrram[tile_index];
-	int tilepos = code | (attr & 0x1f) << 8 | m_tile_bank << 12;
+	int tilepos = code | (attr & 0x1f) << 8;
 	uint8_t color = (attr & 0xe0) >> 5;
 	uint8_t bank = 0;
 
@@ -159,7 +149,7 @@ TILE_GET_INFO_MEMBER(ssh2000_state::get_bg_tile_info)
 {
 	int const code = m_bg_vidram[tile_index];
 	int const attr = m_bg_atrram[tile_index];
-	int tilepos = code | (attr & 0x1f) << 8 | m_tile_bank << 12;
+	int tilepos = code | (attr & 0x1f) << 8;
 	uint8_t color = (attr & 0xe0) >> 5;
 	uint8_t bank = 1;
 
@@ -277,7 +267,7 @@ static INPUT_PORTS_START( ssh2000 )
 	PORT_DIPSETTING(    0x01, "75%" )
 	PORT_DIPSETTING(    0x02, "70%" )
 	PORT_DIPSETTING(    0x03, "65%" )
-	PORT_DIPNAME( 0x04, 0x00, "Sprites" )               PORT_DIPLOCATION("DSWA:6")
+	PORT_DIPNAME( 0x04, 0x04, "Sprites" )               PORT_DIPLOCATION("DSWA:6")
 	PORT_DIPSETTING(    0x04, "Fruits")
 	PORT_DIPSETTING(    0x00, "Tiles")
 	PORT_DIPNAME( 0x08, 0x00, "Game Name" )             PORT_DIPLOCATION("DSWA:5")
@@ -421,6 +411,17 @@ static INPUT_PORTS_START( ssh2000 )
 	PORT_DIPSETTING(    0x40, "2000" )
 	PORT_DIPSETTING(    0x80, "3000" )
 	PORT_DIPSETTING(    0xc0, "6000" )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( ssh2000a )
+	PORT_INCLUDE( ssh2000 )
+
+	// alt gfx (easter and fish themes)
+	PORT_MODIFY("DSWA")
+	PORT_DIPNAME( 0x04, 0x00, "Sprites" )               PORT_DIPLOCATION("DSWA:6")
+	PORT_DIPSETTING(    0x04, "Fruits")
+	PORT_DIPSETTING(    0x00, "Tiles")
 INPUT_PORTS_END
 
 
@@ -585,7 +586,7 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-//    YEAR  NAME       PARENT   MACHINE  INPUT    STATE          INIT        ROT   COMPANY    FULLNAME                                                       FLAGS
-GAME( 2001, ssh2000,   0,       ssh2000, ssh2000, ssh2000_state, empty_init, ROT0, "bootleg", "Super Shanghai 2000 (set 1, green board)",                    0 )
-GAME( 2000, ssh2000a,  ssh2000, ssh2000, ssh2000, ssh2000_state, empty_init, ROT0, "bootleg", "Super Shanghai 2000 (set 2, green board)",                    0 )
-GAME( 2000, ssh2000wf, 0,       ssh2000, ssh2000, ssh2000_state, empty_init, ROT0, "bootleg", "Super Shanghai 2000 - Wrestle Fiesta (30% bonus, red board)", 0 )
+//    YEAR  NAME       PARENT   MACHINE  INPUT     STATE          INIT        ROT   COMPANY    FULLNAME                                                       FLAGS
+GAME( 2001, ssh2000,   0,       ssh2000, ssh2000,  ssh2000_state, empty_init, ROT0, "bootleg", "Super Shanghai 2000 (set 1, green board)",                    0 )
+GAME( 2000, ssh2000a,  ssh2000, ssh2000, ssh2000a, ssh2000_state, empty_init, ROT0, "bootleg", "Super Shanghai 2000 (set 2, green board)",                    0 )
+GAME( 2000, ssh2000wf, 0,       ssh2000, ssh2000a, ssh2000_state, empty_init, ROT0, "bootleg", "Super Shanghai 2000 - Wrestle Fiesta (30% bonus, red board)", 0 )
