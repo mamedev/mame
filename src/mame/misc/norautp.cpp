@@ -35,7 +35,7 @@
    * Credit Poker (ver.30b, 7 & 9 bonus),           1999,  CGI.
    * Credit Poker (ver.23b, 7 & 9 bonus),           1998,  CGI.
    * Double Joker Poker (CGI),                      19??,  CGI.
-   * Kimble Double HI-LO (z80 version),             198?,  Kimble Ireland.
+   * Kimble Double HI-LO (Z80 version),             198?,  Kimble Ireland.
    * Poker / Black Jack (Model 7521),               198?,  M. Kramer Manufacturing.
    * Draw Poker (Joker Poker V.01),                 1984,  Coinmaster.
 
@@ -6511,8 +6511,8 @@ GAMEL( 1999, cgip30cs,  0,        norautx4, norautkl, norautp_state, empty_init,
 GAMEL( 1999, cgip30b,   cgip30cs, norautx4, norautkl, norautp_state, empty_init, ROT0, "CGI",                      "Credit Poker (ver.30b, 7 & 9 bonus)",          0,                             layout_noraut12 )  // CGI - Credit Poker, VERSION 30B, 7 &9 BONUS, 21/12/99 BY V.S. for CGI
 GAMEL( 1998, cgip23b,   cgip30cs, norautx4, norautkl, norautp_state, empty_init, ROT0, "CGI",                      "Credit Poker (ver.23b, 7 & 9 bonus)",          0,                             layout_noraut12 )  // CGI - Credit Poker, VERSION 23B, 7 &9 BONUS, 31.03.98. BY V.S.
 GAMEL( 198?, cgidjp,    0,        cgidjp,   mainline, norautp_state, empty_init, ROT0, "CGI",                      "Double Joker Poker (CGI)",                     0,                             layout_noraut12 )  // very similar to df_djpkr
-GAME(  198?, kimblz80,  0,        kimble,   norautp,  norautp_state, empty_init, ROT0, "Kimble Ireland",           "Kimble Double HI-LO (z80 version, encrypted)",   MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME(  198?, hilokimb,  0,        kimble,   norautp,  norautp_state, empty_init, ROT0, "Kimble Ireland",           "Kimble Double HI-LO (z80 version, unencrypted)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME(  198?, kimblz80,  0,        kimble,   norautp,  norautp_state, empty_init, ROT0, "Kimble Ireland",           "Kimble Double HI-LO (Z80 version, encrypted)",   MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME(  198?, hilokimb,  0,        kimble,   norautp,  norautp_state, empty_init, ROT0, "Kimble Ireland",           "Kimble Double HI-LO (Z80 version, unencrypted)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAME(  198?, bjpoker,   0,        norautxp, norautrh, norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",  "Poker / Black Jack (Model 7521)",              MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )  // starts ok, but after the jump to $180 goes to hell
 GAMEL( 1984, cdrawpkr,  0,        cdrawpkr, cdrawpkr, norautp_state, empty_init, ROT0, "Coinmaster",               "Draw Poker (Joker Poker V.01)",                0,                             layout_noraut11 )
 
@@ -6541,7 +6541,7 @@ GAMEL( 1983, dphljp,    0,        dphl,      dphl,      norautp_state, empty_ini
 GAMEL( 198?, newhilop,  0,        dphl,      newhilop,  norautp_state, empty_init, ROT0, "Song Won?",                   "New Hi-Low Poker",                  0,                          layout_noraut10 )
 GAMEL( 198?, pkii_dm,   0,        dphl,      newhilop,  norautp_state, empty_init, ROT0, "<unknown>",                   "Draw Poker HI-LO (PKII/DM)",        0,                          layout_noraut10 )
 GAMEL( 1983, krampcb2,  0,        dphl,      dphla,     norautp_state, empty_init, ROT0, "bootleg",                     "Draw Poker HI-LO (bootleg, set 1)", 0,                          layout_noraut10 )
-GAMEL( 198?, krampcb5,  0,        dphl,      dphl,      norautp_state, empty_init, ROT0, "bootleg",                     "Draw Poker HI-LO (bootleg, set 2)", 0,                          layout_noraut10 )
+GAMEL( 198?, krampcb5,  krampcb2, dphl,      dphl,      norautp_state, empty_init, ROT0, "bootleg",                     "Draw Poker HI-LO (bootleg, set 2)", 0,                          layout_noraut10 )
 GAMEL( 1983, pma,       0,        dphl,      newhilop,  norautp_state, empty_init, ROT0, "PMA",                         "PMA Poker",                         0,                          layout_noraut10 )
 GAME(  198?, kimbldhl,  0,        kimbldhl,  norautp,   norautp_state, empty_init, ROT0, "Kimble Ireland",              "Kimble Double HI-LO",               MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 GAMEL( 1983, gtipoker,  0,        dphl,      gtipoker,  norautp_state, empty_init, ROT0, "Game Technology Inc.",        "GTI Double or Nothing Draw Poker",  0,                          layout_noraut10 )
