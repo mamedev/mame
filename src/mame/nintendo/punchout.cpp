@@ -660,8 +660,8 @@ void punchout_state::punchout(machine_config &config)
 
 	VLM5030(config, m_vlm, RP2A03_NTSC_XTAL/6);
 	m_vlm->set_addrmap(0, &punchout_state::punchout_vlm_map);
-	m_vlm->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	m_audiocpu->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
+	m_vlm->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
 }
 
 
@@ -930,7 +930,7 @@ ROM_END
 
 /* Italian bootleg set from an original board found in Italy,
    uses new program roms, 2 new gfx roms, and a mix of PunchOut and Super PunchOut graphic roms
-   Service mode is diaabled
+   Service mode is disabled
 */
 
 ROM_START( punchita )
