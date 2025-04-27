@@ -660,7 +660,7 @@ macro   take_interrupt
 macro   check_interrupts
 	if (get_service_attention<SA_NMI_PENDING>()) {
 		call take_nmi
-	} else if (m_irq_state != CLEAR_LINE && m_iff1 && !get_service_attention<SA_AFTER_EI>()) {
+	} else if (m_irq_state != CLEAR_LINE && m_iff1 && !get_service_attention<SA_AFTER_EI>()) { // SA_IRQ_ON
 		call take_interrupt
 	}
 
@@ -710,7 +710,7 @@ macro   nsc800:check_interrupts
 		call take_nmi
 	} else if (get_service_attention<SA_NSC800_IRQ_ON>() && m_iff1 && !get_service_attention<SA_AFTER_EI>()) {
 		call nsc800_take_interrupt
-	} else if (m_irq_state != CLEAR_LINE && m_iff1 && !get_service_attention<SA_AFTER_EI>()) {
+	} else if (m_irq_state != CLEAR_LINE && m_iff1 && !get_service_attention<SA_AFTER_EI>()) { // SA_IRQ_ON
 		call take_interrupt
 	}
 
@@ -724,7 +724,7 @@ ffff
 		return;
 	}
 	if (m_service_attention) {
-		if (m_busrq_state) {
+		if (m_busrq_state) { // SA_BUSRQ
 			if (!m_busack_state) {
 				m_busack_state = 1;
 				set_service_attention<SA_BUSACK, 1>();
@@ -734,17 +734,17 @@ ffff
 				m_icount = 0;
 			m_ref = 0xffff00;
 			return;
-		} else if (m_busack_state) {
+		} else if (m_busack_state) { // SA_BUSACK
 			m_busack_state = 0;
 			set_service_attention<SA_BUSACK, 0>();
 			m_busack_cb(0);
 		}
 		call check_interrupts
-		set_service_attention<SA_AFTER_EI, 0>();
+		set_service_attention<SA_AFTER_EI, 0>(); // SA_AFTER_EI
 		#if HAS_LDAIR_QUIRK
-			set_service_attention<SA_AFTER_LDAIR, 0>();
+			set_service_attention<SA_AFTER_LDAIR, 0>(); // SA_AFTER_LDAIR
 		#endif
-		if (m_halt) {
+		if (m_halt) { // SA_HALT
 			debugger_wait_hook();
 			call rop
 			PC--;
