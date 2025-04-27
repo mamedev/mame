@@ -1498,10 +1498,9 @@ void spg2xx_game_state::spg2xx_base(machine_config &config)
 	m_screen->set_screen_update("maincpu", FUNC(spg2xx_device::screen_update));
 	m_screen->screen_vblank().set(m_maincpu, FUNC(spg2xx_device::vblank));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	m_maincpu->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_maincpu->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	SPEAKER(config, "speaker", 2).front();
+	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
+	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
 }
 
 void spg2xx_game_state::non_spg_base(machine_config &config)

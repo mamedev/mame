@@ -1050,26 +1050,25 @@ void discrete_device::process(int samples)
 //  our sound stream
 //-------------------------------------------------
 
-void discrete_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void discrete_sound_device::sound_stream_update(sound_stream &stream)
 {
 	int outputnum = 0;
 
 	/* Setup any output streams */
 	for (discrete_sound_output_interface *node : m_output_list)
 	{
-		node->set_output_ptr(outputs[outputnum]);
+		node->set_output_ptr(stream, outputnum);
 		outputnum++;
 	}
 
 	/* Setup any input streams */
 	for (discrete_dss_input_stream_node *node : m_input_stream_list)
 	{
-		node->m_inview = &inputs[node->m_stream_in_number];
 		node->m_inview_sample = 0;
 	}
 
 	/* just process it */
-	process(outputs[0].samples());
+	process(stream.samples());
 }
 
 //-------------------------------------------------

@@ -119,8 +119,8 @@ void generalplus_gpspi_direct_game_state::generalplus_gpspi_direct(machine_confi
 	m_maincpu->space_read_callback().set(FUNC(generalplus_gpspi_direct_game_state::read_external_space));
 	m_maincpu->space_write_callback().set(FUNC(generalplus_gpspi_direct_game_state::write_external_space));
 	m_maincpu->set_irq_acknowledge_callback(m_maincpu, FUNC(sunplus_gcm394_base_device::irq_vector_cb));
-	m_maincpu->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_maincpu->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
+	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
 	m_maincpu->set_bootmode(0);
 	m_maincpu->set_cs_config_callback(FUNC(gcm394_game_state::cs_callback));
 
@@ -134,8 +134,7 @@ void generalplus_gpspi_direct_game_state::generalplus_gpspi_direct(machine_confi
 	m_screen->set_screen_update("maincpu", FUNC(sunplus_gcm394_device::screen_update));
 	m_screen->screen_vblank().set(m_maincpu, FUNC(sunplus_gcm394_device::vblank));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 }
 
 // Is there an internal ROM that gets mapped out or can this type really execute directly from scrambled SPI?

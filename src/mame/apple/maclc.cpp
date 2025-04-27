@@ -346,8 +346,8 @@ void maclc_state::maclc_base(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
 		[](device_t *device)
 		{
-			device->subdevice<cdda_device>("cdda")->add_route(0, "^^lspeaker", 1.0);
-			device->subdevice<cdda_device>("cdda")->add_route(1, "^^rspeaker", 1.0);
+			device->subdevice<cdda_device>("cdda")->add_route(0, "^^speaker", 1.0, 0);
+			device->subdevice<cdda_device>("cdda")->add_route(1, "^^speaker", 1.0, 1);
 		});
 	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
@@ -386,12 +386,11 @@ void maclc_state::maclc_base(machine_config &config)
 	rs232b.dcd_handler().set(m_scc, FUNC(z80scc_device::dcdb_w));
 	rs232b.cts_handler().set(m_scc, FUNC(z80scc_device::ctsb_w));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	APPLE_DFAC(config, m_dfac, 22257);
-	m_dfac->add_route(0, "lspeaker", 1.0);
-	m_dfac->add_route(1, "rspeaker", 1.0);
+	m_dfac->add_route(0, "speaker", 1.0, 0);
+	m_dfac->add_route(1, "speaker", 1.0, 1);
 
 	V8(config, m_v8, C15M);
 	m_v8->set_maincpu_tag("maincpu");
@@ -494,8 +493,8 @@ void maclc_state::maccclas(machine_config &config)
 	m_v8->pb4_callback().set(m_cuda, FUNC(cuda_device::set_byteack));
 	m_v8->pb5_callback().set(m_cuda, FUNC(cuda_device::set_tip));
 	m_v8->cb2_callback().set(m_cuda, FUNC(cuda_device::set_via_data));
-	m_v8->add_route(0, "lspeaker", 1.0);
-	m_v8->add_route(1, "rspeaker", 1.0);
+	m_v8->add_route(0, "speaker", 1.0, 0);
+	m_v8->add_route(1, "speaker", 1.0, 1);
 
 	config.device_remove("dfac");
 
@@ -539,8 +538,8 @@ void maclc_state::mactv(machine_config &config)
 	m_v8->pb4_callback().set(m_cuda, FUNC(cuda_device::set_byteack));
 	m_v8->pb5_callback().set(m_cuda, FUNC(cuda_device::set_tip));
 	m_v8->cb2_callback().set(m_cuda, FUNC(cuda_device::set_via_data));
-	m_v8->add_route(0, "lspeaker", 1.0);
-	m_v8->add_route(1, "rspeaker", 1.0);
+	m_v8->add_route(0, "speaker", 1.0, 0);
+	m_v8->add_route(1, "speaker", 1.0, 1);
 
 	config.device_remove("dfac");
 

@@ -2969,7 +2969,7 @@ Core Sound Options
 **-volume** / **-vol** *<value>*
 
     Sets the initial sound volume.  It can be changed later with the user
-    interface (see Keys section).  The volume is an attenuation in decibels:
+    interface (see Keys section).  The volume is in decibels:
     e.g. "**-volume -12**" will start with -12 dB attenuation.  Note that if the
     volume is changed in the user interface it will be saved to the
     configuration file for the system.  The value from the configuration file

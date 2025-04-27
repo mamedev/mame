@@ -54,7 +54,7 @@ protected:
 	virtual uint32_t palette_entries() const noexcept override { return 16; }
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
@@ -70,7 +70,7 @@ private:
 	bool m_sound_enable;                      // enable beep
 	uint32_t m_sound_freq;                    // set frequency
 	int32_t m_sound_incr;                     // initial wave state
-	stream_buffer::sample_t m_sound_signal;   // current signal
+	sound_stream::sample_t m_sound_signal;   // current signal
 
 	casin_delegate m_cas_in_cb;
 	casout_delegate m_cas_out_cb;

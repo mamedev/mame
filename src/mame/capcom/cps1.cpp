@@ -3984,8 +3984,7 @@ void cps_state::qsound(machine_config &config)
 
 	/* sound hardware */
 	config.device_remove("mono");
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	config.device_remove("soundlatch");
 	config.device_remove("soundlatch2");
@@ -3993,8 +3992,8 @@ void cps_state::qsound(machine_config &config)
 	config.device_remove("oki");
 
 	qsound_device &qsound(QSOUND(config, "qsound"));
-	qsound.add_route(0, "lspeaker", 1.0);
-	qsound.add_route(1, "rspeaker", 1.0);
+	qsound.add_route(0, "speaker", 1.0, 0);
+	qsound.add_route(1, "speaker", 1.0, 1);
 }
 
 void cps_state::wofhfh(machine_config &config)

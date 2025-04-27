@@ -9,10 +9,9 @@
 #include "stvideo.h"
 
 #include "bus/centronics/ctronics.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
 #include "bus/midi/midi.h"
 #include "bus/rs232/rs232.h"
+#include "bus/st/stcart.h"
 #include "cpu/m68000/m68000.h"
 #include "imagedev/floppy.h"
 #include "machine/6850acia.h"
@@ -138,7 +137,7 @@ protected:
 	required_device<mc68901_device> m_mfp;
 	required_device_array<acia6850_device, 2> m_acia;
 	required_device<centronics_device> m_centronics;
-	required_device<generic_slot_device> m_cart;
+	required_device<stcart_connector> m_cart;
 	required_device<ram_device> m_ramcfg;
 	required_device<rs232_port_device> m_rs232;
 	required_device<ym2149_device> m_ymsnd;
@@ -808,7 +807,6 @@ void st_state::st_super_map(address_map &map)
 	map(0x000000, 0x000007).rom().region(M68000_TAG, 0);
 	map(0x000000, 0x000007).before_delay(NAME([](offs_t) { return 64; })).w(m_maincpu, FUNC(m68000_device::berr_w));
 	map(0x400000, 0xf9ffff).before_delay(NAME([](offs_t) { return 64; })).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
-	map(0xfa0000, 0xfbffff).noprw();      // mapped by the cartslot
 	map(0xfc0000, 0xfeffff).rom().region(M68000_TAG, 0);
 	map(0xfc0000, 0xfeffff).before_delay(NAME([](offs_t) { return 64; })).w(m_maincpu, FUNC(m68000_device::berr_w));
 
@@ -840,7 +838,6 @@ void st_state::st_user_map(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x0007ff).before_delay(NAME([](offs_t) { return 64; })).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
 	map(0x400000, 0xf9ffff).before_delay(NAME([](offs_t) { return 64; })).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
-	map(0xfa0000, 0xfbffff).noprw();      // mapped by the cartslot
 	map(0xfc0000, 0xfeffff).rom().region(M68000_TAG, 0).w(m_maincpu, FUNC(m68000_device::berr_w));
 	map(0xfc0000, 0xfeffff).before_delay(NAME([](offs_t) { return 64; })).w(m_maincpu, FUNC(m68000_device::berr_w));
 	map(0xff0000, 0xffffff).before_delay(NAME([](offs_t) { return 64; })).rw(m_maincpu, FUNC(m68000_device::berr_r), FUNC(m68000_device::berr_w));
@@ -1220,10 +1217,8 @@ void st_state::machine_start()
 {
 	m_mmu->set_ram_size(m_ramcfg->size());
 
-	if (m_cart->exists()) {
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfa0000, 0xfbffff, read16s_delegate(*m_cart, FUNC(generic_slot_device::read16_rom)));
-		m_maincpu->space(m68000_device::AS_USER_PROGRAM).install_read_handler(0xfa0000, 0xfbffff, read16s_delegate(*m_cart, FUNC(generic_slot_device::read16_rom)));
-	}
+	m_cart->map(m_maincpu->space(AS_PROGRAM));
+	m_cart->map(m_maincpu->space(m68000_device::AS_USER_PROGRAM));
 
 	/// TODO: get callbacks to trigger these.
 	m_mfp->i0_w(1);
@@ -1263,8 +1258,8 @@ void ste_state::machine_start()
 {
 	m_mmu->set_ram_size(m_ramcfg->size());
 
-	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfa0000, 0xfbffff, read16s_delegate(*m_cart, FUNC(generic_slot_device::read16_rom)));
+	m_cart->map(m_maincpu->space(AS_PROGRAM));
+	m_cart->map(m_maincpu->space(m68000_device::AS_USER_PROGRAM));
 
 	/* allocate timers */
 	m_dmasound_timer = timer_alloc(FUNC(ste_state::dmasound_tick), this);
@@ -1309,8 +1304,8 @@ void stbook_state::machine_start()
 		break;
 	}
 
-	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0xfa0000, 0xfbffff, read16s_delegate(*m_cart, FUNC(generic_slot_device::read16_rom)));
+	m_cart->map(m_maincpu->space(AS_PROGRAM));
+	m_cart->map(m_maincpu->space(m68000_device::AS_USER_PROGRAM));
 
 	/* register for state saving */
 	ste_state::state_save();
@@ -1415,9 +1410,8 @@ void st_state::common(machine_config &config)
 	acia_clock.signal_handler().append(m_acia[1], FUNC(acia6850_device::write_rxc));
 
 	// cartridge
-	GENERIC_CARTSLOT(config, m_cart, generic_linear_slot, "st_cart", "bin,rom");
-	m_cart->set_width(GENERIC_ROM16_WIDTH);
-	m_cart->set_endian(ENDIANNESS_BIG);
+	
+	STCART_CONNECTOR(config, m_cart, stcart_intf, nullptr);
 
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("st_flop");
@@ -1525,14 +1519,13 @@ void ste_state::ste(machine_config &config)
 	m_videox->de_callback().set(m_mfp, FUNC(mc68901_device::tbi_w));
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	m_ymsnd->add_route(0, "lspeaker", 0.50);
-	m_ymsnd->add_route(0, "rspeaker", 0.50);
+	SPEAKER(config, "speaker", 2).front();
+	m_ymsnd->add_route(0, "speaker", 0.50, 0);
+	m_ymsnd->add_route(0, "speaker", 0.50, 1);
 /*
     custom_device &custom_dac(CUSTOM(config, "custom", 0)); // DAC
-    custom_dac.add_route(0, "rspeaker", 0.50);
-    custom_dac.add_route(1, "lspeaker", 0.50);
+    custom_dac.add_route(0, "speaker", 0.50);
+    custom_dac.add_route(1, "speaker", 0.50);
 */
 	LMC1992(config, LMC1992_TAG);
 

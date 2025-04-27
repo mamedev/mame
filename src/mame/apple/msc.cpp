@@ -160,13 +160,10 @@ void msc_device::device_reset()
 	space.install_rom(0x00000000, memory_end & ~memory_mirror, memory_mirror, m_rom_ptr);
 }
 
-void msc_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void msc_device::sound_stream_update(sound_stream &stream)
 {
-	for (int i = 0; i < inputs[0].samples(); i++)
-	{
-		outputs[0].put(i, inputs[0].get(i));
-		outputs[1].put(i, inputs[1].get(i));
-	}
+	stream.copy(0, 0);
+	stream.copy(1, 1);
 }
 
 u32 msc_device::rom_switch_r(offs_t offset)

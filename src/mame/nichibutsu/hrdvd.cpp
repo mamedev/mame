@@ -79,8 +79,7 @@ public:
 		m_mpega(*this, "mpeg_audio"),
 		m_pll(*this, "pll"),
 		m_nichisnd(*this, "nichisnd"),
-		m_lspeaker(*this, "lspeaker"),
-		m_rspeaker(*this, "rspeaker"),
+		m_speaker(*this, "speaker"),
 		m_screen(*this, "screen"),
 		m_key(*this, "KEY.%u", 0),
 		m_region_maincpu(*this, "maincpu")
@@ -94,8 +93,7 @@ public:
 	required_device<nn71003f_device> m_mpega;
 	required_device<tc9223_device> m_pll;
 	required_device<nichisnd_device> m_nichisnd;
-	required_device<speaker_device> m_lspeaker;
-	required_device<speaker_device> m_rspeaker;
+	required_device<speaker_device> m_speaker;
 	required_device<screen_device> m_screen;
 	required_ioport_array<5> m_key;
 	required_memory_region m_region_maincpu;
@@ -516,16 +514,15 @@ void hrdvd_state::hrdvd(machine_config &config)
 	m_mpeg->drq_w().set(FUNC(hrdvd_state::mpeg_dreq_w));
 
 	NN71003F(config, m_mpega, 0);
-	m_mpega->add_route(0, m_lspeaker, 1.0);
-	m_mpega->add_route(1, m_rspeaker, 1.0);
+	m_mpega->add_route(0, m_speaker, 1.0, 0);
+	m_mpega->add_route(1, m_speaker, 1.0, 1);
 	m_mpeg->sp2_frm_w().set(m_mpega, FUNC(nn71003f_device::frm_w));
 	m_mpeg->sp2_clk_w().set(m_mpega, FUNC(nn71003f_device::clk_w));
 	m_mpeg->sp2_dat_w().set(m_mpega, FUNC(nn71003f_device::dat_w));
 
 	NICHISND(config, m_nichisnd, 0);
 
-	SPEAKER(config, m_lspeaker).front_left();
-	SPEAKER(config, m_rspeaker).front_right();
+	SPEAKER(config, m_speaker, 2).front();
 }
 
 

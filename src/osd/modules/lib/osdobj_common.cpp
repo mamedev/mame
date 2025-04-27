@@ -271,6 +271,9 @@ void osd_common_t::register_options()
 #ifndef NO_USE_PULSEAUDIO
 	REGISTER_MODULE(m_mod_man, SOUND_PULSEAUDIO);
 #endif
+#ifndef NO_USE_PIPEWIRE
+	REGISTER_MODULE(m_mod_man, SOUND_PIPEWIRE);
+#endif
 	REGISTER_MODULE(m_mod_man, SOUND_NONE);
 
 	REGISTER_MODULE(m_mod_man, MONITOR_SDL);
@@ -506,38 +509,57 @@ void osd_common_t::debugger_update()
 }
 
 
-//-------------------------------------------------
-//  update_audio_stream - update the stereo audio
-//  stream
-//-------------------------------------------------
-
-void osd_common_t::update_audio_stream(const int16_t *buffer, int samples_this_frame)
+bool osd_common_t::sound_external_per_channel_volume()
 {
-	//
-	// This method is called whenever the system has new audio data to stream.
-	// It provides an array of stereo samples in L-R order which should be
-	// output at the configured sample_rate.
-	//
-	m_sound->update_audio_stream(m_machine->video().throttled(), buffer,samples_this_frame);
+	return m_sound->external_per_channel_volume();
+}
+
+bool osd_common_t::sound_split_streams_per_source()
+{
+	return m_sound->split_streams_per_source();
+}
+
+uint32_t osd_common_t::sound_get_generation()
+{
+	return m_sound->get_generation();
+}
+
+osd::audio_info osd_common_t::sound_get_information()
+{
+	return m_sound->get_information();
+}
+
+uint32_t osd_common_t::sound_stream_sink_open(uint32_t node, std::string name, uint32_t rate)
+{
+	return m_sound->stream_sink_open(node, name, rate);
+}
+
+uint32_t osd_common_t::sound_stream_source_open(uint32_t node, std::string name, uint32_t rate)
+{
+	return m_sound->stream_source_open(node, name, rate);
+}
+
+void osd_common_t::sound_stream_set_volumes(uint32_t id, const std::vector<float> &db)
+{
+	m_sound->stream_set_volumes(id, db);
+}
+
+void osd_common_t::sound_stream_close(uint32_t id)
+{
+	m_sound->stream_close(id);
+}
+
+void osd_common_t::sound_stream_sink_update(uint32_t id, const int16_t *buffer, int samples_this_frame)
+{
+	m_sound->stream_sink_update(id, buffer, samples_this_frame);
+}
+
+void osd_common_t::sound_stream_source_update(uint32_t id, int16_t *buffer, int samples_this_frame)
+{
+	m_sound->stream_source_update(id, buffer, samples_this_frame);
 }
 
 
-//-------------------------------------------------
-//  set_mastervolume - set the system volume
-//-------------------------------------------------
-
-void osd_common_t::set_mastervolume(int attenuation)
-{
-	//
-	// Attenuation is the attenuation in dB (a negative number).
-	// To convert from dB to a linear volume scale do the following:
-	//    volume = MAX_VOLUME;
-	//    while (attenuation++ < 0)
-	//       volume /= 1.122018454;      //  = (10 ^ (1/20)) = 1dB
-	//
-	if (m_sound != nullptr)
-		m_sound->set_mastervolume(attenuation);
-}
 
 
 //-------------------------------------------------

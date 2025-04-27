@@ -45,7 +45,7 @@ void wave_device::device_start()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void wave_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void wave_device::sound_stream_update(sound_stream &stream)
 {
 	cassette_state state = m_cass->get_state() & (CASSETTE_MASK_UISTATE | CASSETTE_MASK_MOTOR | CASSETTE_MASK_SPEAKER);
 
@@ -53,21 +53,16 @@ void wave_device::sound_stream_update(sound_stream &stream, std::vector<read_str
 	{
 		cassette_image *cassette = m_cass->get_image();
 		double time_index = m_cass->get_position();
-		double duration = double(outputs[0].samples()) / outputs[0].sample_rate();
+		double duration = double(stream.samples()) / stream.sample_rate();
 
-		if (m_sample_buf.size() < outputs[0].samples())
-			m_sample_buf.resize(outputs[0].samples());
+		if (m_sample_buf.size() < stream.samples())
+			m_sample_buf.resize(stream.samples());
 
 		for (int ch = 0; ch < 2; ch++)
 		{
-			cassette->get_samples(ch, time_index, duration, outputs[ch].samples(), 2, &m_sample_buf[0], cassette_image::WAVEFORM_16BIT);
-			for (int sampindex = 0; sampindex < outputs[0].samples(); sampindex++)
-				outputs[ch].put_int(sampindex, m_sample_buf[sampindex], 32768);
+			cassette->get_samples(ch, time_index, duration, stream.samples(), 2, &m_sample_buf[0], cassette_image::WAVEFORM_16BIT);
+			for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
+				stream.put_int(ch, sampindex, m_sample_buf[sampindex], 32768);
 		}
-	}
-	else
-	{
-		outputs[0].fill(0);
-		outputs[1].fill(0);
 	}
 }

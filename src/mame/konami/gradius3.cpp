@@ -501,19 +501,18 @@ void gradius3_state::gradius3(machine_config &config)
 	m_k051960->set_plane_order(K051960_PLANEORDER_GRADIUS3);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	YM2151(config, "ymsnd", 3579545).add_route(0, "lspeaker", 1.0).add_route(0, "rspeaker", 1.0);
+	YM2151(config, "ymsnd", 3579545).add_route(0, "speaker", 1.0, 0).add_route(0, "speaker", 1.0, 1);
 
 	K007232(config, m_k007232, 3579545);
 	m_k007232->port_write().set(FUNC(gradius3_state::volume_callback));
-	m_k007232->add_route(0, "lspeaker", 0.20);
-	m_k007232->add_route(0, "rspeaker", 0.20);
-	m_k007232->add_route(1, "lspeaker", 0.20);
-	m_k007232->add_route(1, "rspeaker", 0.20);
+	m_k007232->add_route(0, "speaker", 0.20, 0);
+	m_k007232->add_route(0, "speaker", 0.20, 1);
+	m_k007232->add_route(1, "speaker", 0.20, 0);
+	m_k007232->add_route(1, "speaker", 0.20, 1);
 }
 
 

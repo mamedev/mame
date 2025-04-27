@@ -1903,12 +1903,11 @@ void cps2_state::cps2(machine_config &config)
 	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0xc00);
 
 	// Sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	QSOUND(config, m_qsound);
-	m_qsound->add_route(0, "lspeaker", 1.0);
-	m_qsound->add_route(1, "rspeaker", 1.0);
+	m_qsound->add_route(0, "speaker", 1.0, 0);
+	m_qsound->add_route(1, "speaker", 1.0, 1);
 }
 
 void cps2_state::cps2comm(machine_config &config)
@@ -1945,8 +1944,8 @@ void cps2_state::gigaman2(machine_config &config)
 	config.device_remove("qsound");
 
 	OKIM6295(config, m_oki, XTAL(32'000'000)/32, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
-	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 0.47);
-	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 0.47);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.47, 0);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.47, 1);
 }
 
 /*************************************

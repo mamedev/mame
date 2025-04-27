@@ -821,24 +821,23 @@ void segahang_state::sound_board_2203(machine_config &config)
 	m_soundcpu->set_addrmap(AS_IO, &segahang_state::sound_portmap_2203);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2203_device &ymsnd(YM2203(config, "ymsnd", MASTER_CLOCK_8MHz/2));
 	ymsnd.irq_handler().set_inputline("soundcpu", 0);
-	ymsnd.add_route(0, "lspeaker",  0.13);
-	ymsnd.add_route(0, "rspeaker", 0.13);
-	ymsnd.add_route(1, "lspeaker",  0.13);
-	ymsnd.add_route(1, "rspeaker", 0.13);
-	ymsnd.add_route(2, "lspeaker",  0.13);
-	ymsnd.add_route(2, "rspeaker", 0.13);
-	ymsnd.add_route(3, "lspeaker",  0.37);
-	ymsnd.add_route(3, "rspeaker", 0.37);
+	ymsnd.add_route(0, "speaker",  0.13, 0);
+	ymsnd.add_route(0, "speaker", 0.13, 1);
+	ymsnd.add_route(1, "speaker",  0.13, 0);
+	ymsnd.add_route(1, "speaker", 0.13, 1);
+	ymsnd.add_route(2, "speaker",  0.13, 0);
+	ymsnd.add_route(2, "speaker", 0.13, 1);
+	ymsnd.add_route(3, "speaker",  0.37, 0);
+	ymsnd.add_route(3, "speaker", 0.37, 1);
 
 	segapcm_device &pcm(SEGAPCM(config, "pcm", MASTER_CLOCK_8MHz));
 	pcm.set_bank(segapcm_device::BANK_512);
-	pcm.add_route(0, "lspeaker", 1.0);
-	pcm.add_route(1, "rspeaker", 1.0);
+	pcm.add_route(0, "speaker", 1.0, 0);
+	pcm.add_route(1, "speaker", 1.0, 1);
 }
 
 void segahang_state::sound_board_2203x2(machine_config &config)
@@ -849,34 +848,33 @@ void segahang_state::sound_board_2203x2(machine_config &config)
 	m_soundcpu->set_addrmap(AS_IO, &segahang_state::sound_portmap_2203x2);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2203_device &ym1(YM2203(config, "ym1", MASTER_CLOCK_8MHz/2));
 	ym1.irq_handler().set_inputline("soundcpu", 0);
-	ym1.add_route(0, "lspeaker",  0.13);
-	ym1.add_route(0, "rspeaker", 0.13);
-	ym1.add_route(1, "lspeaker",  0.13);
-	ym1.add_route(1, "rspeaker", 0.13);
-	ym1.add_route(2, "lspeaker",  0.13);
-	ym1.add_route(2, "rspeaker", 0.13);
-	ym1.add_route(3, "lspeaker",  0.37);
-	ym1.add_route(3, "rspeaker", 0.37);
+	ym1.add_route(0, "speaker",  0.13, 0);
+	ym1.add_route(0, "speaker", 0.13, 1);
+	ym1.add_route(1, "speaker",  0.13, 0);
+	ym1.add_route(1, "speaker", 0.13, 1);
+	ym1.add_route(2, "speaker",  0.13, 0);
+	ym1.add_route(2, "speaker", 0.13, 1);
+	ym1.add_route(3, "speaker",  0.37, 0);
+	ym1.add_route(3, "speaker", 0.37, 1);
 
 	ym2203_device &ym2(YM2203(config, "ym2", MASTER_CLOCK_8MHz/2));
-	ym2.add_route(0, "lspeaker",  0.13);
-	ym2.add_route(0, "rspeaker", 0.13);
-	ym2.add_route(1, "lspeaker",  0.13);
-	ym2.add_route(1, "rspeaker", 0.13);
-	ym2.add_route(2, "lspeaker",  0.13);
-	ym2.add_route(2, "rspeaker", 0.13);
-	ym2.add_route(3, "lspeaker",  0.37);
-	ym2.add_route(3, "rspeaker", 0.37);
+	ym2.add_route(0, "speaker",  0.13, 0);
+	ym2.add_route(0, "speaker", 0.13, 1);
+	ym2.add_route(1, "speaker",  0.13, 0);
+	ym2.add_route(1, "speaker", 0.13, 1);
+	ym2.add_route(2, "speaker",  0.13, 0);
+	ym2.add_route(2, "speaker", 0.13, 1);
+	ym2.add_route(3, "speaker",  0.37, 0);
+	ym2.add_route(3, "speaker", 0.37, 1);
 
 	segapcm_device &pcm(SEGAPCM(config, "pcm", MASTER_CLOCK_8MHz/2));
 	pcm.set_bank(segapcm_device::BANK_512);
-	pcm.add_route(0, "lspeaker", 1.0);
-	pcm.add_route(1, "rspeaker", 1.0);
+	pcm.add_route(0, "speaker", 1.0, 0);
+	pcm.add_route(1, "speaker", 1.0, 1);
 }
 
 void segahang_state::sound_board_2151(machine_config &config)
@@ -887,18 +885,17 @@ void segahang_state::sound_board_2151(machine_config &config)
 	m_soundcpu->set_addrmap(AS_IO, &segahang_state::sound_portmap_2151);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", MASTER_CLOCK_8MHz/2));
 	ymsnd.irq_handler().set_inputline(m_soundcpu, 0);
-	ymsnd.add_route(0, "lspeaker", 0.43);
-	ymsnd.add_route(1, "rspeaker", 0.43);
+	ymsnd.add_route(0, "speaker", 0.43, 0);
+	ymsnd.add_route(1, "speaker", 0.43, 1);
 
 	segapcm_device &pcm(SEGAPCM(config, "pcm", MASTER_CLOCK_8MHz/2));
 	pcm.set_bank(segapcm_device::BANK_512);
-	pcm.add_route(0, "lspeaker", 1.0);
-	pcm.add_route(1, "rspeaker", 1.0);
+	pcm.add_route(0, "speaker", 1.0, 0);
+	pcm.add_route(1, "speaker", 1.0, 1);
 }
 
 

@@ -99,23 +99,22 @@ void va_rc_eg_device::device_start()
 	save_item(NAME(m_t_end_approx));
 }
 
-void va_rc_eg_device::sound_stream_update(sound_stream &stream, const std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
+void va_rc_eg_device::sound_stream_update(sound_stream &stream)
 {
 	assert(inputs.size() == 0 && outputs.size() == 1);
-	write_stream_view &out = outputs[0];
-	attotime t = out.start_time();
+	attotime t = stream.start_time();
 
 	if (t >= m_t_end_approx)
 	{
 		// Avoid expensive get_v() calls if the envelope stage has completed.
-		out.fill(m_v_end);
+		stream.fill(0, m_v_end);
 		return;
 	}
 
-	const int n = out.samples();
-	const attotime dt = out.sample_period();
+	const int n = stream.samples();
+	const attotime dt = stream.sample_period();
 	for (int i = 0; i < n; ++i, t += dt)
-		out.put(i, get_v(t));
+		stream.put(0, i, get_v(t));
 }
 
 void va_rc_eg_device::snapshot()

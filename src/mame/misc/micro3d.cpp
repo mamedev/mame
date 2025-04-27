@@ -381,24 +381,23 @@ void micro3d_state::micro3d(machine_config &config)
 	m_adc->ch1_callback().set_ioport("THROTTLE");
 	m_adc->ch2_callback().set(FUNC(micro3d_state::adc_volume_r));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	UPD7759(config, m_upd7759);
-	m_upd7759->add_route(ALL_OUTPUTS, "lspeaker", 0.35);
-	m_upd7759->add_route(ALL_OUTPUTS, "rspeaker", 0.35);
+	m_upd7759->add_route(ALL_OUTPUTS, "speaker", 0.35, 0);
+	m_upd7759->add_route(ALL_OUTPUTS, "speaker", 0.35, 1);
 
 	ym2151_device &ym2151(YM2151(config, "ym2151", 3.579545_MHz_XTAL));
-	ym2151.add_route(0, "lspeaker", 0.35);
-	ym2151.add_route(1, "rspeaker", 0.35);
+	ym2151.add_route(0, "speaker", 0.35, 0);
+	ym2151.add_route(1, "speaker", 0.35, 1);
 
 	MICRO3D_SOUND(config, m_noise[0]);
-	m_noise[0]->add_route(0, "lspeaker", 1.0);
-	m_noise[0]->add_route(1, "rspeaker", 1.0);
+	m_noise[0]->add_route(0, "speaker", 1.0, 0);
+	m_noise[0]->add_route(1, "speaker", 1.0, 1);
 
 	MICRO3D_SOUND(config, m_noise[1]);
-	m_noise[1]->add_route(0, "lspeaker", 1.0);
-	m_noise[1]->add_route(1, "rspeaker", 1.0);
+	m_noise[1]->add_route(0, "speaker", 1.0, 0);
+	m_noise[1]->add_route(1, "speaker", 1.0, 1);
 }
 
 void micro3d_state::botss11(machine_config &config)

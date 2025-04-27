@@ -49,16 +49,14 @@ void specimx_sound_device::device_start()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void specimx_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void specimx_sound_device::sound_stream_update(sound_stream &stream)
 {
-	auto &sample_left = outputs[0];
+	sound_stream::sample_t channel_0_signal = m_specimx_input[0] ? 0.1 : -0.1;
+	sound_stream::sample_t channel_1_signal = m_specimx_input[1] ? 0.1 : -0.1;
+	sound_stream::sample_t channel_2_signal = m_specimx_input[2] ? 0.1 : -0.1;
+	sound_stream::sample_t sum = channel_0_signal + channel_1_signal + channel_2_signal;
 
-	stream_buffer::sample_t channel_0_signal = m_specimx_input[0] ? 0.1 : -0.1;
-	stream_buffer::sample_t channel_1_signal = m_specimx_input[1] ? 0.1 : -0.1;
-	stream_buffer::sample_t channel_2_signal = m_specimx_input[2] ? 0.1 : -0.1;
-	stream_buffer::sample_t sum = channel_0_signal + channel_1_signal + channel_2_signal;
-
-	sample_left.fill(sum);
+	stream.fill(0, sum);
 }
 
 

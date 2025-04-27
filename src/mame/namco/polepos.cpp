@@ -932,24 +932,23 @@ void polepos_state::polepos(machine_config &config)
 	config.set_default_layout(layout_polepos);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	NAMCO(config, m_namco_sound, MASTER_CLOCK/512);
 	m_namco_sound->set_voices(8);
 	m_namco_sound->set_stereo(true);
-	m_namco_sound->add_route(0, "lspeaker", 0.80);
-	m_namco_sound->add_route(1, "rspeaker", 0.80);
+	m_namco_sound->add_route(0, "speaker", 0.80, 0);
+	m_namco_sound->add_route(1, "speaker", 0.80, 1);
 
 	/* discrete circuit on the 54XX outputs */
 	discrete_sound_device &discrete(DISCRETE(config, "discrete", polepos_discrete));
-	discrete.add_route(ALL_OUTPUTS, "lspeaker", 0.90);
-	discrete.add_route(ALL_OUTPUTS, "rspeaker", 0.90);
+	discrete.add_route(ALL_OUTPUTS, "speaker", 0.90, 0);
+	discrete.add_route(ALL_OUTPUTS, "speaker", 0.90, 1);
 
 	/* engine sound */
 	polepos_sound_device &polepos(POLEPOS_SOUND(config, "polepos", MASTER_CLOCK/8));
-	polepos.add_route(ALL_OUTPUTS, "lspeaker", 0.90 * 0.77);
-	polepos.add_route(ALL_OUTPUTS, "rspeaker", 0.90 * 0.77);
+	polepos.add_route(ALL_OUTPUTS, "speaker", 0.90 * 0.77, 0);
+	polepos.add_route(ALL_OUTPUTS, "speaker", 0.90 * 0.77, 1);
 }
 
 void polepos_state::bootleg_soundlatch_w(uint8_t data)
@@ -1040,23 +1039,22 @@ void polepos_state::topracern(machine_config &config)
 	config.set_default_layout(layout_topracer);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	NAMCO(config, m_namco_sound, MASTER_CLOCK/512);
 	m_namco_sound->set_voices(8);
 	m_namco_sound->set_stereo(true);
-	m_namco_sound->add_route(0, "lspeaker", 0.80);
-	m_namco_sound->add_route(1, "rspeaker", 0.80);
+	m_namco_sound->add_route(0, "speaker", 0.80, 0);
+	m_namco_sound->add_route(1, "speaker", 0.80, 1);
 
 	/* engine sound */
 	polepos_sound_device &polepos(POLEPOS_SOUND(config, "polepos", 0));
-	polepos.add_route(ALL_OUTPUTS, "lspeaker", 0.90 * 0.77);
-	polepos.add_route(ALL_OUTPUTS, "rspeaker", 0.90 * 0.77);
+	polepos.add_route(ALL_OUTPUTS, "speaker", 0.90 * 0.77, 0);
+	polepos.add_route(ALL_OUTPUTS, "speaker", 0.90 * 0.77, 1);
 
 	dac_4bit_r2r_device &dac(DAC_4BIT_R2R(config, "dac", 0)); // unknown resistor configuration
-	dac.add_route(ALL_OUTPUTS, "lspeaker", 0.12);
-	dac.add_route(ALL_OUTPUTS, "rspeaker", 0.12);
+	dac.add_route(ALL_OUTPUTS, "speaker", 0.12, 0);
+	dac.add_route(ALL_OUTPUTS, "speaker", 0.12, 1);
 }
 
 void polepos_state::polepos2bi(machine_config &config)
@@ -1072,8 +1070,8 @@ void polepos_state::polepos2bi(machine_config &config)
 	m_soundlatch->set_separate_acknowledge(true);
 
 	TMS5220(config, "tms", 600000) /* ? Mhz */
-			.add_route(ALL_OUTPUTS, "lspeaker", 0.80)
-			.add_route(ALL_OUTPUTS, "rspeaker", 0.80);
+			.add_route(ALL_OUTPUTS, "speaker", 0.80, 0)
+			.add_route(ALL_OUTPUTS, "speaker", 0.80, 1);
 }
 
 

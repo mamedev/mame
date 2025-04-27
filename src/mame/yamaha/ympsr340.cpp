@@ -219,8 +219,8 @@ void psr340_state::psr340(machine_config &config)
 	m_maincpu->read_pad().set(FUNC(psr340_state::pad_r));
 	m_maincpu->write_txd().set(FUNC(psr340_state::txd_w));
 
-	m_maincpu->add_route(0, "lspeaker", 1.0);
-	m_maincpu->add_route(1, "rspeaker", 1.0);
+	m_maincpu->add_route(0, "speaker", 1.0, 0);
+	m_maincpu->add_route(1, "speaker", 1.0, 1);
 
 	// mks3 is connected to sclki, sync comms on sci1
 	// something generates 500K for sci0, probably internal to the swx00
@@ -248,8 +248,7 @@ void psr340_state::psr340(machine_config &config)
 	auto &mdout(MIDI_PORT(config, "mdout", midiout_slot, "midiout"));
 	m_maincpu->write_sci_tx<0>().set(mdout, FUNC(midi_port_device::write_txd));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 }
 
 ROM_START( psr340 )

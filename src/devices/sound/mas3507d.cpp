@@ -449,19 +449,19 @@ void mas3507d_device::fill_buffer()
 	cb_demand(mp3data_count < mp3data.size());
 }
 
-void mas3507d_device::append_buffer(std::vector<write_stream_view> &outputs, int &pos, int scount)
+void mas3507d_device::append_buffer(sound_stream &stream, int &pos, int scount)
 {
 	const int bytes_per_sample = std::min(frame_channels, 2); // More than 2 channels is unsupported here
 	const int s1 = std::min(scount - pos, sample_count);
-	const stream_buffer::sample_t sample_scale = 1.0 / 32768.0;
-	const stream_buffer::sample_t mute_scale = is_muted ? 0.0 : 1.0;
+	const sound_stream::sample_t sample_scale = 1.0 / 32768.0;
+	const sound_stream::sample_t mute_scale = is_muted ? 0.0 : 1.0;
 
 	for(int i = 0; i < s1; i++) {
-		const stream_buffer::sample_t lsamp_mixed = stream_buffer::sample_t(samples[samples_idx * bytes_per_sample]) * sample_scale * mute_scale * gain_ll;
-		const stream_buffer::sample_t rsamp_mixed = stream_buffer::sample_t(samples[samples_idx * bytes_per_sample + (bytes_per_sample >> 1)]) * sample_scale * mute_scale * gain_rr;
+		const sound_stream::sample_t lsamp_mixed = sound_stream::sample_t(samples[samples_idx * bytes_per_sample]) * sample_scale * mute_scale * gain_ll;
+		const sound_stream::sample_t rsamp_mixed = sound_stream::sample_t(samples[samples_idx * bytes_per_sample + (bytes_per_sample >> 1)]) * sample_scale * mute_scale * gain_rr;
 
-		outputs[0].put(pos, lsamp_mixed);
-		outputs[1].put(pos, rsamp_mixed);
+		stream.put(0, pos, lsamp_mixed);
+		stream.put(1, pos, rsamp_mixed);
 
 		samples_idx++;
 		pos++;
@@ -485,21 +485,18 @@ void mas3507d_device::reset_playback()
 	samples_idx = 0;
 }
 
-void mas3507d_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void mas3507d_device::sound_stream_update(sound_stream &stream)
 {
-	int csamples = outputs[0].samples();
+	int csamples = stream.samples();
 	int pos = 0;
 
 	while(pos < csamples) {
 		if(sample_count == 0)
 			fill_buffer();
 
-		if(sample_count <= 0) {
-			outputs[0].fill(0, pos);
-			outputs[1].fill(0, pos);
+		if(sample_count <= 0)
 			return;
-		}
 
-		append_buffer(outputs, pos, csamples);
+		append_buffer(stream, pos, csamples);
 	}
 }

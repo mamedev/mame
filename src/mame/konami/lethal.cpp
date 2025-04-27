@@ -691,15 +691,14 @@ void lethal_state::lethalen(machine_config &config)
 	K054000(config, "k054000", 0);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	K054321(config, m_k054321, "lspeaker", "rspeaker");
+	K054321(config, m_k054321, "speaker");
 
 	k054539_device &k054539(K054539(config, "k054539", SOUND_CLOCK));
 	k054539.timer_handler().set_inputline("soundcpu", INPUT_LINE_NMI);
-	k054539.add_route(0, "rspeaker", 1.0);
-	k054539.add_route(1, "lspeaker", 1.0);
+	k054539.add_route(0, "speaker", 1.0, 0);
+	k054539.add_route(1, "speaker", 1.0, 1);
 }
 
 void lethal_state::lethalej(machine_config &config)

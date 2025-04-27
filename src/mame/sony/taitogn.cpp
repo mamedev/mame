@@ -435,13 +435,13 @@ protected:
 		ADDRESS_MAP_BANK(config, m_flashbank).set_map(&taitogn_state::flashbank_map).set_options(ENDIANNESS_LITTLE, 16, 32, 0x8000000);
 
 		m_spu->reset_routes();
-		m_spu->add_route(0, "lspeaker", 0.3);
-		m_spu->add_route(1, "rspeaker", 0.3);
+		m_spu->add_route(0, "speaker", 0.3);
+		m_spu->add_route(1, "speaker", 0.3);
 
 		TAITO_ZOOM(config, m_zoom);
 		m_zoom->set_use_flash();
-		m_zoom->add_route(0, "lspeaker", 1.0);
-		m_zoom->add_route(1, "rspeaker", 1.0);
+		m_zoom->add_route(0, "speaker", 1.0);
+		m_zoom->add_route(1, "speaker", 1.0);
 
 		m_zoom->subdevice<zsg2_device>("zsg2")->ext_read().set(FUNC(taitogn_state::zsg2_ext_r));
 	}

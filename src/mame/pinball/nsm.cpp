@@ -433,13 +433,12 @@ void nsm_state::nsm(machine_config &config)
 
 	/* Sound */
 	genpin_audio(config);
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	ay8912_device &ay1(AY8912(config, "ay1", 11052000/8));
-	ay1.add_route(ALL_OUTPUTS, "lspeaker", 0.75);
+	ay1.add_route(ALL_OUTPUTS, "speaker", 0.75, 0);
 	ay1.port_a_write_callback().set(FUNC(nsm_state::ay1a_w));
 	ay8912_device &ay2(AY8912(config, "ay2", 11052000/8));
-	ay2.add_route(ALL_OUTPUTS, "rspeaker", 0.75);
+	ay2.add_route(ALL_OUTPUTS, "speaker", 0.75, 1);
 	ay2.port_a_write_callback().set(FUNC(nsm_state::ay2a_w));
 }
 

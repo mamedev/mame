@@ -784,8 +784,7 @@ void gauntlet_state::base(machine_config &config)
 	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_4, ASSERT_LINE);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, m6502_device::NMI_LINE);
@@ -795,16 +794,16 @@ void gauntlet_state::base(machine_config &config)
 	m_mainlatch->data_pending_callback().set_inputline(m_maincpu, M68K_IRQ_6);
 
 	YM2151(config, m_ym2151, 14.318181_MHz_XTAL / 4);
-	m_ym2151->add_route(1, "lspeaker", 0.48);
-	m_ym2151->add_route(0, "rspeaker", 0.48);
+	m_ym2151->add_route(1, "speaker", 0.48, 0);
+	m_ym2151->add_route(0, "speaker", 0.48, 1);
 
 	POKEY(config, m_pokey, 14.318181_MHz_XTAL / 8);
-	m_pokey->add_route(ALL_OUTPUTS, "lspeaker", 0.32);
-	m_pokey->add_route(ALL_OUTPUTS, "rspeaker", 0.32);
+	m_pokey->add_route(ALL_OUTPUTS, "speaker", 0.32, 0);
+	m_pokey->add_route(ALL_OUTPUTS, "speaker", 0.32, 1);
 
 	TMS5220C(config, m_tms5220, 14.318181_MHz_XTAL / 2 / 11); // potentially 14.318181_MHz_XTAL / 2 / 9 as well
-	m_tms5220->add_route(ALL_OUTPUTS, "lspeaker", 0.80);
-	m_tms5220->add_route(ALL_OUTPUTS, "rspeaker", 0.80);
+	m_tms5220->add_route(ALL_OUTPUTS, "speaker", 0.80, 0);
+	m_tms5220->add_route(ALL_OUTPUTS, "speaker", 0.80, 1);
 
 	LS259(config, m_soundctl); // 16T/U
 	m_soundctl->q_out_cb<0>().set(m_ym2151, FUNC(ym2151_device::reset_w)); // music reset, low reset

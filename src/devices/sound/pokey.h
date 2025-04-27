@@ -182,7 +182,7 @@ protected:
 	virtual void device_clock_changed() override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	virtual void execute_run() override;
 
@@ -302,7 +302,7 @@ private:
 	uint32_t m_poly5[0x1f];
 	uint32_t m_poly9[0x1ff];
 	uint32_t m_poly17[0x1ffff];
-	stream_buffer::sample_t m_voltab[0x10000];
+	sound_stream::sample_t m_voltab[0x10000];
 
 	output_type m_output_type;
 	double m_r_pullup;

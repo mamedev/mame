@@ -626,12 +626,11 @@ void contra_state::contra(machine_config &config)
 	K007121(config, m_k007121[1], 0, m_palette, gfx_contra_2);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 0.60).add_route(1, "rspeaker", 0.60);
+	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "speaker", 0.60, 0).add_route(1, "speaker", 0.60, 1);
 }
 
 

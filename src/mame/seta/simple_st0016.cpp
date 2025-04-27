@@ -578,11 +578,10 @@ void st0016_state::st0016(machine_config &config)
 	m_screen->set_palette("maincpu:palette");
 
 	// TODO: Mono?
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	m_maincpu->add_route(0, "lspeaker", 1.0);
-	m_maincpu->add_route(1, "rspeaker", 1.0);
+	m_maincpu->add_route(0, "speaker", 1.0, 0);
+	m_maincpu->add_route(1, "speaker", 1.0, 1);
 }
 
 void st0016_state::mayjinsn(machine_config &config)

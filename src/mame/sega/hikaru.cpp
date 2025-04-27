@@ -544,14 +544,13 @@ void hikaru_state::hikaru(machine_config &config)
 
 	PALETTE(config, "palette").set_entries(0x1000);
 
-//  SPEAKER(config, "lspeaker").front_left();
-//  SPEAKER(config, "rspeaker").front_right();
+//  SPEAKER(config, "speaker").front();
 
 //  67.7376MHz(2*33.8688MHz), div 3 for audio block
-//  AICA(config, "aica", (XTAL(33'868'800)*2)/3).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
+//  AICA(config, "aica", (XTAL(33'868'800)*2)/3).add_route(0, "speaker", 1.0).add_route(1, "speaker", 1.0);
 
 //  33.8688MHz on Board
-//  AICA(config, "aica_pcb", (XTAL(33'868'800)*2)/3).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0); // AICA PCB
+//  AICA(config, "aica_pcb", (XTAL(33'868'800)*2)/3).add_route(0, "speaker", 1.0).add_route(1, "speaker", 1.0); // AICA PCB
 }
 
 

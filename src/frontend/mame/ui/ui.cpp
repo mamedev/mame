@@ -882,20 +882,6 @@ bool mame_ui_manager::update_and_render(render_container &container)
 			container.add_rect(0.0f, 0.0f, 1.0f, 1.0f, rgb_t(alpha,0x00,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 	}
 
-	// show red if overdriving sound
-	if (machine().options().speaker_report() != 0 && machine().phase() == machine_phase::RUNNING)
-	{
-		auto compressor = machine().sound().compressor_scale();
-		if (compressor < 1.0)
-		{
-			float width = 0.05f + std::min(0.15f, (1.0f - compressor) * 0.4f);
-			container.add_rect(0.0f, 0.0f, 1.0f, width, rgb_t(0xc0,0xff,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-			container.add_rect(0.0f, 1.0f - width, 1.0f, 1.0f, rgb_t(0xc0,0xff,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-			container.add_rect(0.0f, width, width, 1.0f - width, rgb_t(0xc0,0xff,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-			container.add_rect(1.0f - width, width, 1.0f, 1.0f - width, rgb_t(0xc0,0xff,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-		}
-	}
-
 	// render any cheat stuff at the bottom
 	if (machine().phase() >= machine_phase::RESET)
 		mame_machine_manager::instance()->cheat().render_text(*this, container);
@@ -1874,22 +1860,19 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 	m_sliders.clear();
 
 	// add overall volume
-	slider_alloc(_("Master Volume"), -32, 0, 0, 1, std::bind(&mame_ui_manager::slider_volume, this, _1, _2));
+	slider_alloc(_("Master Volume"), -48, osd::linear_to_db(0), 6, 1, std::bind(&mame_ui_manager::slider_volume, this, _1, _2));
 
-	// add per-channel volume
-	mixer_input info;
-	for (int item = 0; machine.sound().indexed_mixer_input(item, info); item++)
+	// add per-sound device and per-sound device channel volume
+	for (device_sound_interface &snd : sound_interface_enumerator(machine.root_device()))
 	{
-		std::string str = string_format(_("%1$s Volume"), info.stream->input(info.inputnum).name());
-		slider_alloc(std::move(str), 0, 1000, 4000, 20, std::bind(&mame_ui_manager::slider_mixervol, this, item, _1, _2));
-	}
+		// Don't add microphones, speakers or devices without outputs
+		if (dynamic_cast<sound_io_device *>(&snd) || !snd.outputs())
+			continue;
 
-	// add speaker panning
-	for (speaker_device &speaker : speaker_device_enumerator(machine.root_device()))
-	{
-		int defpan = floorf(speaker.defpan() * 1000.0f + 0.5f);
-		std::string str = string_format(_("%s '%s' Panning"), speaker.name(), speaker.tag());
-		slider_alloc(std::move(str), -1000, defpan, 1000, 20, std::bind(&mame_ui_manager::slider_panning, this, std::ref(speaker), _1, _2));
+		slider_alloc(util::string_format(_("%1$s volume"), snd.device().tag()), -48, osd::linear_to_db_int(snd.user_output_gain()), 6, 1, std::bind(&mame_ui_manager::slider_devvol, this, &snd, _1, _2));
+		if (snd.outputs() != 1)
+			for (int channel = 0; channel != snd.outputs(); channel ++)
+				slider_alloc(util::string_format(_("%1$s channel %d volume"), snd.device().tag(), channel), -48, osd::linear_to_db_int(snd.user_output_gain(channel)), 6, 1, std::bind(&mame_ui_manager::slider_devvol_chan, this, &snd, channel, _1, _2));
 	}
 
 	// add analog adjusters
@@ -2032,82 +2015,66 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 int32_t mame_ui_manager::slider_volume(std::string *str, int32_t newval)
 {
 	if (newval != SLIDER_NOCHANGE)
-		machine().sound().set_attenuation(newval);
+		machine().sound().set_master_gain(newval == -48 ? 0 : osd::db_to_linear(newval));
 
-	int32_t curval = machine().sound().attenuation();
+	int curval = machine().sound().master_gain() == 0 ? -48 : osd::linear_to_db_int(machine().sound().master_gain());
+
 	if (str)
-		*str = string_format(_(u8"%1$3d\u00a0dB"), curval);
-
+	{
+		if (curval == -48)
+			*str = _("Mute");
+		else
+			*str = string_format(_(u8"%1$3d\u00a0dB"), curval);
+	}
 	return curval;
 }
 
 
 //-------------------------------------------------
-//  slider_mixervol - single channel volume
+//  slider_devvol - device volume
 //  slider callback
 //-------------------------------------------------
 
-int32_t mame_ui_manager::slider_mixervol(int item, std::string *str, int32_t newval)
+int32_t mame_ui_manager::slider_devvol(device_sound_interface *snd, std::string *str, int32_t newval)
 {
-	mixer_input info;
-	if (!machine().sound().indexed_mixer_input(item, info))
-		return 0;
-
 	if (newval != SLIDER_NOCHANGE)
-		info.stream->input(info.inputnum).set_user_gain(float(newval) * 0.001f);
+		snd->set_user_output_gain(newval == -48 ? 0 : osd::db_to_linear(newval));
 
-	int32_t curval = floorf(info.stream->input(info.inputnum).user_gain() * 1000.0f + 0.5f);
+	int curval = snd->user_output_gain() == 0 ? -48 : osd::linear_to_db_int(snd->user_output_gain());
+
 	if (str)
 	{
-		if (curval == 0)
+		if (curval == -48)
 			*str = _("Mute");
-		else if (curval % 10)
-			*str = string_format(_("%1$.1f%%"), float(curval) * 0.1f);
 		else
-			*str = string_format(_("%1$3d%%"), curval / 10);
+			*str = string_format(_(u8"%1$3d\u00a0dB"), curval);
 	}
-
 	return curval;
 }
 
 
 //-------------------------------------------------
-//  slider_panning - speaker panning slider
-//  callback
+//  slider_devvol_chan - device channel volume
+//  slider callback
 //-------------------------------------------------
 
-int32_t mame_ui_manager::slider_panning(speaker_device &speaker, std::string *str, int32_t newval)
+int32_t mame_ui_manager::slider_devvol_chan(device_sound_interface *snd, int channel, std::string *str, int32_t newval)
 {
 	if (newval != SLIDER_NOCHANGE)
-		speaker.set_pan(float(newval) * 0.001f);
+		snd->set_user_output_gain(channel, newval == -48 ? 0 : osd::db_to_linear(newval));
 
-	int32_t curval = floorf(speaker.pan() * 1000.0f + 0.5f);
+	int curval = snd->user_output_gain(channel) == 0 ? -48 : osd::linear_to_db_int(snd->user_output_gain(channel));
+
 	if (str)
 	{
-		switch (curval)
-		{
-			// preset strings for exact center/left/right
-			case 0:
-				*str = _("Center");
-				break;
-
-			case -1000:
-				*str = _("Left");
-				break;
-
-			case 1000:
-				*str = _("Right");
-				break;
-
-			// otherwise show as floating point
-			default:
-				*str = string_format(_("%1$.3f"), float(curval) * 0.001f);
-				break;
-		}
+		if (curval == -48)
+			*str = _("Mute");
+		else
+			*str = string_format(_(u8"%1$3d\u00a0dB"), curval);
 	}
-
 	return curval;
 }
+
 
 
 //-------------------------------------------------

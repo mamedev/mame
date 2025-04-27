@@ -283,9 +283,9 @@ void zsg2_device::filter_samples(zchan *ch)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void zsg2_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void zsg2_device::sound_stream_update(sound_stream &stream)
 {
-	for (int i = 0; i < outputs[0].samples(); i++)
+	for (int i = 0; i < stream.samples(); i++)
 	{
 		int32_t mix[4] = {};
 
@@ -355,7 +355,7 @@ void zsg2_device::sound_stream_update(sound_stream &stream, std::vector<read_str
 		}
 
 		for (int output = 0; output < 4; output++)
-			outputs[output].put_int_clamp(i, mix[output], 32768);
+			stream.put_int_clamp(output, i, mix[output], 32768);
 	}
 	m_sample_count++;
 }

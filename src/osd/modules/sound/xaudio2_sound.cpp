@@ -214,8 +214,7 @@ public:
 	void exit() override;
 
 	// sound_module
-	void update_audio_stream(bool is_throttled, int16_t const *buffer, int samples_this_frame) override;
-	void set_mastervolume(int attenuation) override;
+	void stream_sink_update(uint32_t, int16_t const *buffer, int samples_this_frame) override;
 
 private:
 	// Xaudio callbacks
@@ -376,11 +375,11 @@ void sound_xaudio2::exit()
 }
 
 //============================================================
-//  update_audio_stream
+//  stream_sink_update
 //============================================================
 
-void sound_xaudio2::update_audio_stream(
-	bool is_throttled,
+void sound_xaudio2::stream_sink_update(
+	uint32_t,
 	int16_t const *buffer,
 	int samples_this_frame)
 {
@@ -411,32 +410,6 @@ void sound_xaudio2::update_audio_stream(
 
 	// Signal data available
 	SetEvent(m_hEventDataAvailable);
-}
-
-//============================================================
-//  set_mastervolume
-//============================================================
-
-void sound_xaudio2::set_mastervolume(int attenuation)
-{
-	if (!m_initialized)
-		return;
-
-	assert(m_sourceVoice);
-
-	HRESULT result;
-
-	// clamp the attenuation to 0-32 range
-	attenuation = std::clamp(attenuation, -32, 0);
-
-	// Ranges from 1.0 to XAUDIO2_MAX_VOLUME_LEVEL indicate additional gain
-	// Ranges from 0 to 1.0 indicate a reduced volume level
-	// 0 indicates silence
-	// We only support a reduction from 1.0, so we generate values in the range 0.0 to 1.0
-	float scaledVolume = (32.0f + attenuation) / 32.0f;
-
-	// set the master volume
-	HR_RETV(m_sourceVoice->SetVolume(scaledVolume));
 }
 
 //============================================================

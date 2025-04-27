@@ -484,8 +484,8 @@ void deco_ld_state::rblaster(machine_config &config)
 	SONY_LDP1000(config, m_laserdisc, 0);
 	m_laserdisc->set_overlay(256, 256, FUNC(deco_ld_state::screen_update));
 	//m_laserdisc->set_overlay_clip(0, 256-1, 8, 240-1);
-	m_laserdisc->add_route(0, "lspeaker", 1.0);
-	m_laserdisc->add_route(1, "rspeaker", 1.0);
+	m_laserdisc->add_route(0, "speaker", 1.0, 0);
+	m_laserdisc->add_route(1, "speaker", 1.0, 1);
 
 	/* video hardware */
 	m_laserdisc->add_ntsc_screen(config, "screen");
@@ -498,17 +498,16 @@ void deco_ld_state::rblaster(machine_config &config)
 
 	/* sound hardware */
 	// TODO: mixing with laserdisc
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	GENERIC_LATCH_8(config, m_soundlatch2);
 
-	AY8910(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "lspeaker", 0.25).add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	AY8910(config, "ay1", 1500000).add_route(ALL_OUTPUTS, "speaker", 0.25, 0).add_route(ALL_OUTPUTS, "speaker", 0.25, 1);
 
-	AY8910(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "lspeaker", 0.25).add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	AY8910(config, "ay2", 1500000).add_route(ALL_OUTPUTS, "speaker", 0.25, 0).add_route(ALL_OUTPUTS, "speaker", 0.25, 1);
 }
 
 /***************************************************************************

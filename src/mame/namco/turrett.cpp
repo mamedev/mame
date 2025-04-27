@@ -372,13 +372,12 @@ void turrett_state::turrett(machine_config &config)
 	PALETTE(config, "palette", palette_device::RGB_555);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	turrett_device &ttsound(TURRETT(config, "ttsound", R3041_CLOCK)); // ?
 	ttsound.set_addrmap(0, &turrett_state::turrett_sound_map);
-	ttsound.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	ttsound.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	ttsound.add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	ttsound.add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 }
 
 

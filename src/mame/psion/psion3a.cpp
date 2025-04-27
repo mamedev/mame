@@ -39,7 +39,7 @@ public:
 
 protected:
 	void device_start() override ATTR_COLD;
-	void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	void sound_stream_update(sound_stream &stream) override;
 
 private:
 	sound_stream *m_stream;
@@ -61,9 +61,9 @@ void psion3a_codec_device::device_start()
 	m_stream = stream_alloc(0, 1, 8000);
 }
 
-void psion3a_codec_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void psion3a_codec_device::sound_stream_update(sound_stream &stream)
 {
-	outputs[0].fill(stream_buffer::sample_t(m_audio_out) * (1.0 / 4096.0));
+	stream.fill(0, sound_stream::sample_t(m_audio_out) * (1.0 / 4096.0));
 }
 
 void psion3a_codec_device::pcm_in(uint8_t data)

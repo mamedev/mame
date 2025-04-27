@@ -365,13 +365,10 @@ static inline void update_engine(int eng[4])
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void tx1_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void tx1_sound_device::sound_stream_update(sound_stream &stream)
 {
 	uint32_t step_0, step_1, step_2;
 	double /*gain_0, gain_1,*/ gain_2, gain_3;
-
-	auto &fl = outputs[0];
-	auto &fr = outputs[1];
 
 	/* 8253 outputs for the player/opponent engine sounds. */
 	step_0 = m_pit8253.counts[0].val ? (TX1_PIT_CLOCK / m_pit8253.counts[0].val * m_freq_to_step) : 0;
@@ -383,7 +380,7 @@ void tx1_sound_device::sound_stream_update(sound_stream &stream, std::vector<rea
 	gain_2 = tx1_engine_gains[m_ay_outputb & 0xf];
 	gain_3 = BIT(m_ay_outputb, 5) ? 1.0f : 1.5f;
 
-	for (int sampindex = 0; sampindex < fl.samples(); sampindex++)
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 	{
 		if (m_step0 & ((1 << TX1_FRAC)))
 		{
@@ -406,8 +403,8 @@ void tx1_sound_device::sound_stream_update(sound_stream &stream, std::vector<rea
 			m_step2 &= ((1 << TX1_FRAC) - 1);
 		}
 
-		fl.put_int(sampindex, (m_pit0 + m_pit1)*gain_3 + 2*m_pit2*gain_2, 32768);
-		fr.put_int(sampindex, (m_pit0 + m_pit1)*gain_3 + 2*m_pit2*gain_2, 32768);
+		stream.put_int(0, sampindex, (m_pit0 + m_pit1)*gain_3 + 2*m_pit2*gain_2, 32768);
+		stream.put_int(1, sampindex, (m_pit0 + m_pit1)*gain_3 + 2*m_pit2*gain_2, 32768);
 
 		m_step0 += step_0;
 		m_step1 += step_1;
@@ -761,16 +758,13 @@ void buggyboyjr_sound_device::ym2_b_w(uint8_t data)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void buggyboy_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void buggyboy_sound_device::sound_stream_update(sound_stream &stream)
 {
 	/* This is admittedly a bit of a hack job... */
 
 	uint32_t step_0, step_1;
 	int n1_en, n2_en;
 	double gain0, gain1_l, gain1_r;
-
-	auto &fl = outputs[0];
-	auto &fr = outputs[1];
 
 	/* 8253 outputs for the player/opponent buggy engine sounds. */
 	step_0 = m_pit8253.counts[0].val ? (BUGGYBOY_PIT_CLOCK / m_pit8253.counts[0].val * m_freq_to_step) : 0;
@@ -787,7 +781,7 @@ void buggyboy_sound_device::sound_stream_update(sound_stream &stream, std::vecto
 	gain1_l = bb_engine_gains[m_ym2_outputa >> 4] * 5;
 	gain1_r = bb_engine_gains[m_ym2_outputa & 0xf] * 5;
 
-	for (int sampindex = 0; sampindex < fl.samples(); sampindex++)
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 	{
 		s32 pit0, pit1, n1, n2;
 		pit0 = m_eng_voltages[(m_step0 >> 24) & 0xf];
@@ -829,8 +823,8 @@ void buggyboy_sound_device::sound_stream_update(sound_stream &stream, std::vecto
 		else
 			n2 = 8192;
 
-		fl.put_int(sampindex, n1 + n2 + (pit0 * gain0) + (pit1 * gain1_l), 32768);
-		fr.put_int(sampindex, n1 + n2 + (pit0 * gain0) + (pit1 * gain1_r), 32768);
+		stream.put_int(0, sampindex, n1 + n2 + (pit0 * gain0) + (pit1 * gain1_l), 32768);
+		stream.put_int(1, sampindex, n1 + n2 + (pit0 * gain0) + (pit1 * gain1_r), 32768);
 
 		m_step0 += step_0;
 		m_step1 += step_1;

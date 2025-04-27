@@ -724,10 +724,8 @@ void pokey_device::step_one_clock()
 //  our sound stream
 //-------------------------------------------------
 
-void pokey_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void pokey_device::sound_stream_update(sound_stream &stream)
 {
-	auto &buffer = outputs[0];
-
 	if (m_output_type == LEGACY_LINEAR)
 	{
 		int32_t out = 0;
@@ -735,8 +733,8 @@ void pokey_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 			out += ((m_out_raw >> (4*i)) & 0x0f);
 		out *= POKEY_DEFAULT_GAIN;
 		out = (out > 0x7fff) ? 0x7fff : out;
-		stream_buffer::sample_t outsamp = out * stream_buffer::sample_t(1.0 / 32768.0);
-		buffer.fill(outsamp);
+		sound_stream::sample_t outsamp = out * sound_stream::sample_t(1.0 / 32768.0);
+		stream.fill(0, outsamp);
 	}
 	else if (m_output_type == RC_LOWPASS)
 	{
@@ -745,11 +743,11 @@ void pokey_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 		double V0 = rTot / (rTot+m_r_pullup) * m_v_ref / 5.0;
 		double mult = (m_cap == 0.0) ? 1.0 : 1.0 - exp(-(rTot + m_r_pullup) / (m_cap * m_r_pullup * rTot) * m_clock_period.as_double());
 
-		for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
+		for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 		{
 			/* store sum of output signals into the buffer */
 			m_out_filter += (V0 - m_out_filter) * mult;
-			buffer.put(sampindex, m_out_filter);
+			stream.put(0, sampindex, m_out_filter);
 		}
 	}
 	else if (m_output_type == OPAMP_C_TO_GROUND)
@@ -765,7 +763,7 @@ void pokey_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 		 */
 
 		double V0 = ((rTot+m_r_pullup) / rTot - 1.0) * m_v_ref  / 5.0;
-		buffer.fill(V0);
+		stream.fill(0, V0);
 	}
 	else if (m_output_type == OPAMP_LOW_PASS)
 	{
@@ -777,16 +775,16 @@ void pokey_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 		double V0 = (m_r_pullup / rTot) * m_v_ref  / 5.0;
 		double mult = (m_cap == 0.0) ? 1.0 : 1.0 - exp(-1.0 / (m_cap * m_r_pullup) * m_clock_period.as_double());
 
-		for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
+		for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 		{
 			/* store sum of output signals into the buffer */
 			m_out_filter += (V0 - m_out_filter) * mult;
-			buffer.put(sampindex, m_out_filter);
+			stream.put(0, sampindex, m_out_filter);
 		}
 	}
 	else if (m_output_type == DISCRETE_VAR_R)
 	{
-		buffer.fill(m_voltab[m_out_raw]);
+		stream.fill(0, m_voltab[m_out_raw]);
 	}
 }
 

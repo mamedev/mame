@@ -501,10 +501,9 @@ void subs_state::subs(machine_config &config)
 
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	DISCRETE(config, m_discrete, subs_discrete).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
+	DISCRETE(config, m_discrete, subs_discrete).add_route(0, "speaker", 1.0, 0).add_route(1, "speaker", 1.0, 1);
 
 	ls259_device &latch(LS259(config, "latch")); // C9
 	latch.q_out_cb<0>().set_output("led0").invert(); // START LAMP 1

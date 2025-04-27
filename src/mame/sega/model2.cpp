@@ -2508,14 +2508,13 @@ void model2_state::model2_scsp(machine_config &config)
 	M68000(config, m_audiocpu, 45.1584_MHz_XTAL / 4); // SCSP Clock / 2
 	m_audiocpu->set_addrmap(AS_PROGRAM, &model2_state::model2_snd);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	SCSP(config, m_scsp, 45.1584_MHz_XTAL / 2); // 45.158MHz XTAL at Video board(Model 2A-CRX)
 	m_scsp->set_addrmap(0, &model2_state::scsp_map);
 	m_scsp->irq_cb().set(FUNC(model2_state::scsp_irq));
-	m_scsp->add_route(0, "lspeaker", 1.0);
-	m_scsp->add_route(1, "rspeaker", 1.0);
+	m_scsp->add_route(0, "speaker", 1.0, 0);
+	m_scsp->add_route(1, "speaker", 1.0, 1);
 
 	I8251(config, m_uart, 8000000); // uPD71051C, clock unknown
 //  m_uart->rxrdy_handler().set(FUNC(model2_state::sound_ready_w));
@@ -3004,8 +3003,8 @@ void model2c_state::stcc(machine_config &config)
 	io.an_port_callback<2>().set_ioport("BRAKE");
 
 	DSBZ80(config, m_dsbz80, 0);
-	m_dsbz80->add_route(0, "lspeaker", 1.0);
-	m_dsbz80->add_route(1, "rspeaker", 1.0);
+	m_dsbz80->add_route(0, "speaker", 1.0, 0);
+	m_dsbz80->add_route(1, "speaker", 1.0, 1);
 
 	m_uart->txd_handler().set(m_dsbz80, FUNC(dsbz80_device::write_txd));
 }

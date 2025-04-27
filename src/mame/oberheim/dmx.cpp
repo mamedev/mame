@@ -184,7 +184,7 @@ protected:
 	void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	void device_start() override ATTR_COLD;
 	void device_reset() override ATTR_COLD;
-	void sound_stream_update(sound_stream &stream, const std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs) override;
+	void sound_stream_update(sound_stream &stream) override;
 
 private:
 	void reset_counter();
@@ -339,9 +339,9 @@ void dmx_voice_card_device::device_reset()
 		m_eg->set_instant_v(0);
 }
 
-void dmx_voice_card_device::sound_stream_update(sound_stream &stream, const std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
+void dmx_voice_card_device::sound_stream_update(sound_stream &stream)
 {
-	outputs[0].copy(inputs[0]);
+	stream.copy(0, 0);
 }
 
 void dmx_voice_card_device::reset_counter()
@@ -786,8 +786,8 @@ public:
 		, m_voice_rc(*this, "voice_rc_filter_%d", 0)
 		, m_left_mixer(*this, "left_mixer")
 		, m_right_mixer(*this, "right_mixer")
-		, m_left_speaker(*this, "lspeaker")
-		, m_right_speaker(*this, "rspeaker")
+		, m_mono_mixer(*this, "mono_mixer")
+		, m_speaker(*this, "speaker")
 		, m_samples(*this, "sample_%d", 0)
 	{
 	}
@@ -852,8 +852,8 @@ private:
 	required_device_array<filter_rc_device, 9> m_voice_rc;
 	required_device<mixer_device> m_left_mixer;
 	required_device<mixer_device> m_right_mixer;
-	required_device<speaker_device> m_left_speaker;
-	required_device<speaker_device> m_right_speaker;
+	required_device<mixer_device> m_mono_mixer;
+	required_device<speaker_device> m_speaker;
 	required_memory_region_array<8> m_samples;
 
 	// 40103 timer (U11 in Processor Board)
@@ -1177,10 +1177,10 @@ template<int GROUP> void dmx_state::gen_trigger_w(u8 data)
 void dmx_state::update_output()
 {
 	const float stereo_gain = (m_output_select->read() & 0x01) ? 1 : 0;
-	m_left_speaker->set_input_gain(0, stereo_gain); // left
-	m_left_speaker->set_input_gain(1, 1 - stereo_gain);  // mono
-	m_right_speaker->set_input_gain(0, stereo_gain);  // right
-	m_right_speaker->set_input_gain(1, 1 - stereo_gain);  // mono
+	m_left_mixer ->set_route_gain(0, m_speaker, 0, stereo_gain);
+	m_mono_mixer ->set_route_gain(0, m_speaker, 0, 1 - stereo_gain);
+	m_right_mixer->set_route_gain(0, m_speaker, 1, stereo_gain);
+	m_mono_mixer ->set_route_gain(0, m_speaker, 1, 1 - stereo_gain);
 	LOGMASKED(LOG_FADERS, "Output changed to: %d\n", m_output_select->read());
 }
 
@@ -1364,20 +1364,18 @@ void dmx_state::dmx(machine_config &config)
 	m_voice_rc[METRONOME_INDEX]->add_route(ALL_OUTPUTS, m_right_mixer, 1.0);
 
 	// Passive mixer using 1K resistors (R33 and R34).
-	mixer_device &mono_mixer = MIXER(config, "mono_mixer");
-	m_left_mixer->add_route(ALL_OUTPUTS, mono_mixer, 0.5);
-	m_right_mixer->add_route(ALL_OUTPUTS, mono_mixer, 0.5);
+	MIXER(config, m_mono_mixer);
+	m_left_mixer->add_route(ALL_OUTPUTS, m_mono_mixer, 0.5);
+	m_right_mixer->add_route(ALL_OUTPUTS, m_mono_mixer, 0.5);
 
 	// Only one of the left (right) or mono will be active for each speaker at
 	// runtime. Controlled by a config setting (see update_output()).
 
-	SPEAKER(config, m_left_speaker).front_left();
-	m_left_mixer->add_route(ALL_OUTPUTS, m_left_speaker, 1.0);
-	mono_mixer.add_route(ALL_OUTPUTS, m_left_speaker, 1.0);
-
-	SPEAKER(config, m_right_speaker).front_right();
-	m_right_mixer->add_route(ALL_OUTPUTS, m_right_speaker, 1.0);
-	mono_mixer.add_route(ALL_OUTPUTS, m_right_speaker, 1.0);
+	SPEAKER(config, m_speaker, 2).front();
+	m_left_mixer->add_route(ALL_OUTPUTS, m_speaker, 1.0, 0);
+	m_mono_mixer->add_route(ALL_OUTPUTS, m_speaker, 1.0, 0);
+	m_right_mixer->add_route(ALL_OUTPUTS, m_speaker, 1.0, 1);
+	m_mono_mixer->add_route(ALL_OUTPUTS, m_speaker, 1.0, 1);
 }
 
 DECLARE_INPUT_CHANGED_MEMBER(dmx_state::clk_in_changed)

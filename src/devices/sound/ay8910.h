@@ -140,7 +140,7 @@ protected:
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	void ay8910_write_ym(int addr, u8 data);
 	u8 ay8910_read_ym();
@@ -294,7 +294,7 @@ private:
 
 	// internal helpers
 	void set_type(psg_type_t psg_type);
-	inline stream_buffer::sample_t mix_3D();
+	inline sound_stream::sample_t mix_3D();
 	void ay8910_write_reg(int r, int v);
 	void build_mixer_table();
 	void ay8910_statesave();
@@ -324,9 +324,9 @@ private:
 	u8 m_vol_enabled[NUM_CHANNELS];
 	const ay_ym_param *m_par;
 	const ay_ym_param *m_par_env;
-	stream_buffer::sample_t m_vol_table[NUM_CHANNELS][16];
-	stream_buffer::sample_t m_env_table[NUM_CHANNELS][32];
-	std::unique_ptr<stream_buffer::sample_t[]> m_vol3d_table;
+	sound_stream::sample_t m_vol_table[NUM_CHANNELS][16];
+	sound_stream::sample_t m_env_table[NUM_CHANNELS][32];
+	std::unique_ptr<sound_stream::sample_t[]> m_vol3d_table;
 	int m_flags;          // Flags
 	int m_feature;        // Chip specific features
 	int m_res_load[3];    // Load on channel in ohms

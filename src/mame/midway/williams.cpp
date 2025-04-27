@@ -1704,7 +1704,7 @@ void williams_state::sinistar_cockpit(machine_config &config)
 
 	// additional sound hardware
 	SPEAKER(config, "rspeaker").rear_center();
-	MC1408(config, "rdac").add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
+	MC1408(config, "rdac").add_route(ALL_OUTPUTS, "rspeaker", 0.25, 1); // unknown DAC
 
 	// pia
 	INPUT_MERGER_ANY_HIGH(config, "soundirq_b").output_handler().set_inputline("soundcpu_b", M6808_IRQ_LINE);
@@ -1814,10 +1814,9 @@ void blaster_state::blaster(machine_config &config)
 	config.device_remove("speaker");
 	config.device_remove("dac");
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	MC1408(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 0.25); // unknown DAC
-	MC1408(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
+	SPEAKER(config, "speaker", 2).front();
+	MC1408(config, "ldac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25, 0); // unknown DAC
+	MC1408(config, "rdac", 0).add_route(ALL_OUTPUTS, "speaker", 0.25, 1); // unknown DAC
 }
 
 
