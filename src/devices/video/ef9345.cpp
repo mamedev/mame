@@ -352,25 +352,25 @@ uint8_t ef9345_device::get_dial(uint8_t x, uint8_t attrib)
 void ef9345_device::zoom(uint8_t *pix, uint16_t n)
 {
 	uint8_t i, j;
-	if ((n & 0x0a) == 0)
-		for(i = 0; i < 80; i += 8) // 1, 4, 5
+	if ((n & 0x0a) == 0) // n = 1, 4, 5 (left side)
+		for(i = 0; i < 80; i += 8)
 			for(j = 7; j > 0; j--)
 				pix[i + j] = pix[i + j / 2];
 
-	if ((n & 0x05) == 0)
-		for(i = 0; i < 80; i += 8) // 2, 8, 10
+	if ((n & 0x05) == 0) // n = 2, 8, 10 (right side)
+		for(i = 0; i < 80; i += 8)
 			for(j =0 ; j < 7; j++)
 				pix[i + j] = pix[i + 4 + j / 2];
 
-	if ((n & 0x0c) == 0)
-		for(i = 0; i < 8; i++) // 1, 2, 3
+	if ((n & 0x0c) == 0) // n = 1, 2, 3 (top side)
+		for(i = 0; i < 8; i++)
 			for(j = 9; j > 0; j--)
-				pix[i + 8 * j] = pix[i + 8 * (j / 2)];
+				pix[i + 8 * j] = pix[i + 8 * ((j-1) / 2)];
 
-	if ((n & 0x03) == 0)
-		for(i = 0; i < 8; i++) // 4, 8, 12
+	if ((n & 0x03) == 0) // n = 4, 8, 12 (bottom side)
+		for(i = 0; i < 8; i++)
 			for(j = 0; j < 9; j++)
-				pix[i + 8 * j] = pix[i + 40 + 8 * (j / 2)];
+				pix[i + 8 * j] = pix[i + 32 + 8 * ((j+1) / 2)];
 }
 
 
