@@ -112,7 +112,8 @@ void ns32081_device_base::state_add(device_state_interface &parent, int &index)
 
 template <typename T> T ns32081_device_base::read()
 {
-	if (m_state == RESULT && m_op[2].issued < m_op[2].expected)
+	LOG("read: state(%d) issue(%d) expected(%d)\n", m_state, m_op[2].issued, m_op[2].expected);
+	if ((m_state == STATUS || m_state == RESULT) && m_op[2].issued < m_op[2].expected)
 	{
 		T const data = m_op[2].value >> (m_op[2].issued * 8);
 
@@ -130,7 +131,7 @@ template <typename T> T ns32081_device_base::read()
 		return data;
 	}
 
-	logerror("read protocol error (%s)\n", machine().describe_context());
+	logerror("read protocol error state(%d) issue(%d) expected(%d) (%s)\n", m_state, m_op[2].issued, m_op[2].expected, machine().describe_context());
 	return 0;
 }
 
@@ -149,7 +150,7 @@ template <typename T> void ns32081_device_base::write(T data)
 		}
 		else
 		{
-			LOG("write idbyte 0x%04x (%s)\n", data, machine().describe_context());
+			LOG("write idbyte 0x%02x (%s)\n", data, machine().describe_context());
 			if ((data == FORMAT_9) || (data == FORMAT_11) || (type() == NS32381 && data == FORMAT_12))
 			{
 				// record idbyte
@@ -633,9 +634,9 @@ void ns32081_device_base::execute()
 		}
 
 		if (m_status & SLAVE_Q)
-			LOG("execute %s 0x%x,0x%x exception\n", operation, m_op[0].value, m_op[1].value);
+			LOG("execute %s 0x%8.8x,0x%8.8x exception\n", operation, m_op[0].value, m_op[1].value);
 		else
-			LOG("execute %s 0x%x,0x%x result 0x%x\n", operation, m_op[0].value, m_op[1].value, m_op[2].value);
+			LOG("execute %s 0x%8.8x,0x%8.8x result 0x%x\n", operation, m_op[0].value, m_op[1].value, m_op[2].value);
 	}
 
 	// write-back floating point register results
@@ -656,7 +657,7 @@ void ns32081_device_base::execute()
 	if (!m_out_spc.isunset())
 		m_complete->adjust(attotime::from_ticks(m_tcy, clock()));
 
-	m_state = STATUS;
+	m_state = m_op[2].expected ? STATUS : IDLE;
 }
 
 u16 ns32081_device_base::status(int *icount)
