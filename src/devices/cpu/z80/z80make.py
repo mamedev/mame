@@ -31,6 +31,10 @@ class IndStr:
     def has_indent(self):
         return self.indent != ''
 
+    def strip_indent(self, n):
+        if self.indent != '':
+            self.indent = self.indent[n:]
+
     def replace(self, new):
         self.str = new
 
@@ -77,7 +81,7 @@ class Opcode:
         for i in range(0, len(self.source)):
             il = self.source[i]
             if not has_steps or not step_switch:
-                il.indent = ""
+                il.strip_indent(1)
             line = il.line()
             tokens = line.split()
             last_line = i + 1 == len(self.source)
@@ -240,7 +244,7 @@ class OpcodeList:
                 name = line_toc[1]
                 arg = None
                 if len(line_toc) > 2:
-                    arg = line_toc[2]
+                    arg = " ".join(line_toc[2:])
                 if name in self.macros:
                     macro = self.macros[name]
                     ([out.extend(self.pre_process(il)) for il in macro.apply(arg)])
@@ -260,21 +264,22 @@ class OpcodeList:
 
         for prefix in sorted(prefixes):
             is_rop = prefix == 'ff'
+            opc_switch = not is_rop
             if prefix_switch:
                 print("case 0x%s:" % (prefix), file=f)
                 print("{", file=f)
-            if not is_rop:
+            if opc_switch:
                 print("\tswitch (u8(m_ref >> 8)) // opcode", file=f)
                 print("\t{", file=f)
             for opc in self.opcode_info[prefix]:
                 # reenter loop only process steps > 0
                 if not reenter or opc.with_steps():
-                    if not is_rop:
+                    if opc_switch:
                         print("\tcase 0x%s:" % (opc.code), file=f)
                     opc.save_dasm(step_switch=reenter, f=f)
                     print("\t\tcontinue;", file=f)
                     print("", file=f)
-            if not is_rop:
+            if opc_switch:
                 print("\t}", file=f)
 
             if prefix_switch:
@@ -295,6 +300,7 @@ class OpcodeList:
         print("", file=f)
         print("bool interrupted = true;", file=f)
         print("while (u8(m_ref) != 0x00) {", file=f)
+        print("// slow re-enter", file=f)
         print("\t// workaround to simulate main loop behavior where continue statement relays on having it set after", file=f)
         print("\tif (!interrupted) {", file=f)
         print("\t\tm_ref = 0xffff00;", file=f)
@@ -305,19 +311,17 @@ class OpcodeList:
         self.switch_prefix(self.opcode_info.keys(), reenter=True, f=f)
         print("", file=f)
         print('assert((void("switch statement above must cover all possible cases!"), false));', file=f)
-        print("}", file=f)
-        print("", file=f)
+        print("} // end: slow", file=f)
         print("if (m_ref != 0xffff00) goto process;", file=f)
         print("", file=f)
-        print("while (true) {", file=f)
-        print("", file=f)
-        print("\t\t// unwrapped ff prefix", file=f)
+        print("while (true) { // fast process", file=f)
+        print("\t\t// rop: unwrapped ff prefix", file=f)
         self.switch_prefix(['ff'], reenter=False, f=f)
         print("", file=f)
         print("process:", file=f)
         self.switch_prefix(self.opcode_info.keys() - ['ff'], reenter=False, f=f)
-        print("", file=f)
-        print("} // while (true)", file=f)
+        print("} // end: fast", file=f)
+        print('assert((void("unreachable!"), false));', file=f)
 
 def main(argv):
     if len(argv) != 3 and len(argv) != 4:
