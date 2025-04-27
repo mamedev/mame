@@ -2,7 +2,7 @@
 // copyright-holders:Mark Garlanger
 /***************************************************************************
 
-  Heathkit H-8-5 Serial/Cassette Card
+  Heathkit H-8-5 Serial I/O and Cassette Interface
 
 ****************************************************************************/
 

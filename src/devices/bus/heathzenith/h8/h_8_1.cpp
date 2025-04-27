@@ -106,4 +106,4 @@ ioport_constructor h_8_1_device::device_input_ports() const
 
 } // anonymous namespace
 
-DEFINE_DEVICE_TYPE_PRIVATE(H8BUS_H_8_1,    device_h8bus_card_interface, h_8_1_device,    "h8_h_8_1",    "Heath H-8-1 8k Static RAM");
+DEFINE_DEVICE_TYPE_PRIVATE(H8BUS_H_8_1, device_h8bus_card_interface, h_8_1_device, "h8_h_8_1", "Heath H-8-1 8k Static RAM");

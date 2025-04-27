@@ -90,13 +90,13 @@ void front_panel_device::m1_w(int state)
 	// a int20 (output of 2nd flipflop) will occur after 4 M1 steps, to pause the running program.
 	// But, all of this can only occur if bit 4 of port F0 is low.
 
-	bool c, a = BIT(m_irq_ctl, 7);
+	bool a = BIT(m_irq_ctl, 7);
 
 	if (BIT(m_irq_ctl, 1))
 	{
 		if (state) // rising pulse to push data through flipflops
 		{
-			c = !m_ff_b; // from /Q of 2nd flipflop
+			bool c = !m_ff_b; // from /Q of 2nd flipflop
 			m_ff_b = a; // from Q of 1st flipflop
 			if (c)
 			{
@@ -107,7 +107,6 @@ void front_panel_device::m1_w(int state)
 	else
 	{
 		// flipflops are 'set'
-		c = false;
 		m_ff_b = true;
 	}
 

@@ -82,7 +82,7 @@ void wh_8_64_device::device_reset()
 {
 	if (!m_installed)
 	{
-		u8 config = m_config->read();
+		ioport_value const config(m_config->read());
 
 		if (BIT(config, 0))
 		{
@@ -111,22 +111,24 @@ std::vector<int> wh_8_64_device::get_addr(u8 sw)
 
 	u8 sw_value = m_sw[sw]->read();
 
-    for (int i = 0; i < 8; i++) {
+	for (int i = 0; i < 8; i++) {
 		if (BIT(sw_value, i))
 		{
 			result.push_back(i * 0x2000);
-		} 
-    }
+		}
+	}
 
-    return result;
+	return result;
 }
 
 void wh_8_64_device::install_mem_bank(u8 bank)
 {
 	std::vector<int> addresses = get_addr(3 - bank);
 
-	// each switch defines where to start one 8k block, ensure
-	// setting a max of 2 blocks.
+	// each switch defines where to start each 8k block of the
+	// 16k bank. Per manual only 2 should be set. Ensure setting
+	// a max of 2 blocks are defined even if it is just selecting
+	// the first 2.
 	int num_addresses = std::min((int) addresses.size(), 2);
 	int block = bank << 1;
 
@@ -140,7 +142,7 @@ void wh_8_64_device::install_mem_bank(u8 bank)
 	}
 }
 
-static INPUT_PORTS_START( wh_8_64_jumpers )
+static INPUT_PORTS_START( wh_8_64 )
 	PORT_START("SW1")
 	// TODO: Properly map the last 8k, needs an HA-8-6 Z80 CPU or HA-8-8 Extended
 	// Configuration board to handle the ROM/RAM swap. Only one switch is set to 1
@@ -157,7 +159,7 @@ static INPUT_PORTS_START( wh_8_64_jumpers )
 	PORT_DIPNAME( 0x08, 0x00, "Bank 3 - Address Block 24k - 32k")  PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Bank 3 - Address Block 32k - 40k")  PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x10, 0x00, "Bank 3 - Address Block 32k - 40k")  PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x00, "Bank 3 - Address Block 40k - 48k")  PORT_DIPLOCATION("SW1:6")
@@ -171,80 +173,80 @@ static INPUT_PORTS_START( wh_8_64_jumpers )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("SW2")
-	PORT_DIPNAME( 0x01, 0x00, "Bank 2 - Address Block 0k - 8k")    PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x00, "Bank 2 - Address Block 0k - 8k")    PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "Bank 2 - Address Block 8k - 16k")   PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x02, 0x00, "Bank 2 - Address Block 8k - 16k")   PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "Bank 2 - Address Block 16k - 24k")  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x04, 0x00, "Bank 2 - Address Block 16k - 24k")  PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Bank 2 - Address Block 24k - 32k")  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08, 0x00, "Bank 2 - Address Block 24k - 32k")  PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "Bank 2 - Address Block 32k - 40k")  PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x10, 0x00, "Bank 2 - Address Block 32k - 40k")  PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Bank 2 - Address Block 40k - 48k")  PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x20, 0x20, "Bank 2 - Address Block 40k - 48k")  PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Bank 2 - Address Block 48k - 56k")  PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x40, "Bank 2 - Address Block 48k - 56k")  PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Bank 2 - Address Block 56k - 64k")  PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x00, "Bank 2 - Address Block 56k - 64k")  PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("SW3")
-	PORT_DIPNAME( 0x01, 0x00, "Bank 1 - Address Block 0k - 8k")    PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x00, "Bank 1 - Address Block 0k - 8k")    PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "Bank 1 - Address Block 8k - 16k")   PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x02, 0x00, "Bank 1 - Address Block 8k - 16k")   PORT_DIPLOCATION("SW3:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "Bank 1 - Address Block 16k - 24k")  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x04, 0x00, "Bank 1 - Address Block 16k - 24k")  PORT_DIPLOCATION("SW3:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Bank 1 - Address Block 24k - 32k")  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08, 0x08, "Bank 1 - Address Block 24k - 32k")  PORT_DIPLOCATION("SW3:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Bank 1 - Address Block 32k - 40k")  PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x10, 0x10, "Bank 1 - Address Block 32k - 40k")  PORT_DIPLOCATION("SW3:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Bank 1 - Address Block 40k - 48k")  PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x20, 0x00, "Bank 1 - Address Block 40k - 48k")  PORT_DIPLOCATION("SW3:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Bank 1 - Address Block 48k - 56k")  PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x00, "Bank 1 - Address Block 48k - 56k")  PORT_DIPLOCATION("SW3:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Bank 1 - Address Block 56k - 64k")  PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x00, "Bank 1 - Address Block 56k - 64k")  PORT_DIPLOCATION("SW3:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("SW4")
-	PORT_DIPNAME( 0x01, 0x00, "Bank 0 - Address Block 0k - 8k")    PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x01, 0x00, "Bank 0 - Address Block 0k - 8k")    PORT_DIPLOCATION("SW4:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Bank 0 - Address Block 8k - 16k")   PORT_DIPLOCATION("SW1:2")
+	PORT_DIPNAME( 0x02, 0x02, "Bank 0 - Address Block 8k - 16k")   PORT_DIPLOCATION("SW4:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Bank 0 - Address Block 16k - 24k")  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x04, 0x04, "Bank 0 - Address Block 16k - 24k")  PORT_DIPLOCATION("SW4:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Bank 0 - Address Block 24k - 32k")  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08, 0x00, "Bank 0 - Address Block 24k - 32k")  PORT_DIPLOCATION("SW4:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "Bank 0 - Address Block 32k - 40k")  PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x10, 0x00, "Bank 0 - Address Block 32k - 40k")  PORT_DIPLOCATION("SW4:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Bank 0 - Address Block 40k - 48k")  PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x20, 0x00, "Bank 0 - Address Block 40k - 48k")  PORT_DIPLOCATION("SW4:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Bank 0 - Address Block 48k - 56k")  PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x40, 0x00, "Bank 0 - Address Block 48k - 56k")  PORT_DIPLOCATION("SW4:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Bank 0 - Address Block 56k - 64k")  PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x00, "Bank 0 - Address Block 56k - 64k")  PORT_DIPLOCATION("SW4:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -266,9 +268,9 @@ INPUT_PORTS_END
 
 ioport_constructor wh_8_64_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME(wh_8_64_jumpers);
+	return INPUT_PORTS_NAME(wh_8_64);
 }
 
 } // anonymous namespace
 
-DEFINE_DEVICE_TYPE_PRIVATE(H8BUS_WH_8_64,     device_h8bus_card_interface, wh_8_64_device,     "wh8_h_8_64",     "Heath WH-8-64 64k Dynamic RAM");
+DEFINE_DEVICE_TYPE_PRIVATE(H8BUS_WH_8_64, device_h8bus_card_interface, wh_8_64_device, "wh8_h_8_64", "Heath WH-8-64 64k Dynamic RAM");

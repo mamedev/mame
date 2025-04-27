@@ -14,6 +14,22 @@
 #include "h8bus.h"
 
 #include <cstring>
+#include <cstdlib>
+
+#define LOG_INIT (1U << 1)    // Shows register setup
+
+//#define VERBOSE (LOG_INIT)
+
+#include "logmacro.h"
+
+#define LOGINIT(...)        LOGMASKED(LOG_INIT, __VA_ARGS__)
+
+#ifdef _MSC_VER
+#define FUNCNAME __func__
+#else
+#define FUNCNAME __PRETTY_FUNCTION__
+#endif
+
 
 device_h8bus_card_interface::device_h8bus_card_interface(const machine_config &mconfig, device_t &device) :
 	device_interface(device, "h8bus"),
@@ -77,7 +93,8 @@ void h8bus_slot_device::device_resolve_objects()
 	if (dev)
 	{
 		dev->set_h8bus_tag(m_h8bus.target(), m_h8bus_slottag);
-		m_h8bus->add_h8bus_card(*dev);
+		unsigned slot_num = m_h8bus->add_h8bus_card(*dev);
+		dev->set_slot_num(slot_num);
 	}
 }
 
@@ -109,6 +126,16 @@ void h8bus_device::device_start()
 
 void h8bus_device::device_reset()
 {
+	m_int1_slot_states = 0;
+	m_int2_slot_states = 0;
+	m_int3_slot_states = 0;
+	m_int4_slot_states = 0;
+	m_int5_slot_states = 0;
+	m_int6_slot_states = 0;
+	m_int7_slot_states = 0;
+	m_reset_slot_states = 0;
+	m_hold_slot_states = 0;
+	m_m1_slot_states = 0;
 }
 
 void h8bus_device::mem_map(address_map &map)
@@ -127,9 +154,21 @@ device_memory_interface::space_config_vector h8bus_device::memory_space_config()
 	return space_config_vector { std::make_pair(AS_PROGRAM, &m_mem_config), std::make_pair(AS_IO, &m_io_config) };
 }
 
-void h8bus_device::add_h8bus_card(device_h8bus_card_interface &card)
+u8 h8bus_device::add_h8bus_card(device_h8bus_card_interface &card)
 {
 	m_device_list.emplace_back(card);
+	char* endptr;
+	long slot_num = strtol(&card.m_h8bus_slottag[1], &endptr, 10) - 1;
+
+	if (slot_num < 0 || slot_num >= 31)
+	{
+		// if unable to determine slot number based on tag, set it to 31,
+		// so it will be in range.
+		slot_num = 31;
+	}
+
+	LOGINIT("%s: added card to slot %d, tag: %s\n", FUNCNAME, slot_num, card.m_h8bus_slottag);
+
 	if (strcmp(card.m_h8bus_slottag, "p1") == 0)
 	{
 		m_p1_card = (device_h8bus_p1_card_interface*) &card;
@@ -138,86 +177,178 @@ void h8bus_device::add_h8bus_card(device_h8bus_card_interface &card)
 	{
 		m_p2_card = (device_h8bus_p2_card_interface*) &card;
 	}
+
+	return slot_num;
 }
 
-// TODO properly handle multiple cards sharing the same interrupt line.
-void h8bus_device::set_int1_line(int state)
+bool h8bus_device::update_line_states(u32 &states, unsigned index, int state)
 {
-	for (device_h8bus_card_interface &entry : m_device_list)
+	bool const changed(bool(state) != !BIT(states, index));
+
+	if (changed)
 	{
-		entry.int1_w(state);
+		int old_state = states ? 1 : 0;
+
+		if (state)
+		{
+			states |= (1 << index);
+		}
+		else
+		{
+			states &= ~(1 << index);
+		}
+
+		int new_state = states ? 1 : 0;
+
+		if (old_state != new_state)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+void h8bus_device::set_int1_line(unsigned index, int state)
+{
+	bool const changed = update_line_states(m_int1_slot_states, index, state);
+
+	if (changed)
+	{
+		for (device_h8bus_card_interface &entry : m_device_list)
+		{
+			entry.int1_w(m_int1_slot_states ? 1 : 0);
+		}
 	}
 }
 
-void h8bus_device::set_int2_line(int state)
+void h8bus_device::set_int2_line(unsigned index, int state)
 {
-	for (device_h8bus_card_interface &entry : m_device_list)
+	bool const changed = update_line_states(m_int2_slot_states, index, state);
+
+	if (changed)
 	{
-		entry.int2_w(state);
+		for (device_h8bus_card_interface &entry : m_device_list)
+		{
+			entry.int2_w(m_int2_slot_states ? 1 : 0);
+		}
 	}
 }
 
-void h8bus_device::set_int3_line(int state)
+void h8bus_device::set_int3_line(unsigned index, int state)
 {
-	for (device_h8bus_card_interface &entry : m_device_list)
+	bool const changed = update_line_states(m_int3_slot_states, index, state);
+
+	if (changed)
 	{
-		entry.int3_w(state);
+		for (device_h8bus_card_interface &entry : m_device_list)
+		{
+			entry.int3_w(m_int3_slot_states ? 1 : 0);
+		}
 	}
 }
 
-void h8bus_device::set_int4_line(int state)
+void h8bus_device::set_int4_line(unsigned index, int state)
 {
-	for (device_h8bus_card_interface &entry : m_device_list)
+	bool const changed = update_line_states(m_int4_slot_states, index, state);
+
+	if (changed)
 	{
-		entry.int4_w(state);
+		for (device_h8bus_card_interface &entry : m_device_list)
+		{
+			entry.int4_w(m_int4_slot_states ? 1 : 0);
+		}
 	}
 }
 
-void h8bus_device::set_int5_line(int state)
+void h8bus_device::set_int5_line(unsigned index, int state)
 {
-	for (device_h8bus_card_interface &entry : m_device_list)
+	bool const changed = update_line_states(m_int5_slot_states, index, state);
+
+	if (changed)
 	{
-		entry.int5_w(state);
+		for (device_h8bus_card_interface &entry : m_device_list)
+		{
+			entry.int5_w(m_int5_slot_states ? 1 : 0);
+		}
 	}
 }
 
-void h8bus_device::set_int6_line(int state)
+void h8bus_device::set_int6_line(unsigned index, int state)
 {
-	for (device_h8bus_card_interface &entry : m_device_list)
+	bool const changed = update_line_states(m_int6_slot_states, index, state);
+
+	if (changed)
 	{
-		entry.int6_w(state);
+		for (device_h8bus_card_interface &entry : m_device_list)
+		{
+			entry.int6_w(m_int6_slot_states ? 1 : 0);
+		}
 	}
 }
 
-void h8bus_device::set_int7_line(int state)
+void h8bus_device::set_int7_line(unsigned index, int state)
 {
-	for (device_h8bus_card_interface &entry : m_device_list)
+	bool const changed = update_line_states(m_int7_slot_states, index, state);
+
+	if (changed)
 	{
-		entry.int7_w(state);
+		for (device_h8bus_card_interface &entry : m_device_list)
+		{
+			entry.int7_w(m_int7_slot_states ? 1 : 0);
+		}
 	}
 }
 
-void h8bus_device::set_reset_line(int state)
+void h8bus_device::set_reset_line(unsigned index, int state)
 {
-	for (device_h8bus_card_interface &entry : m_device_list)
+	bool const changed = update_line_states(m_reset_slot_states, index, state);
+
+	if (changed)
 	{
-		entry.reset_w(state);
+		for (device_h8bus_card_interface &entry : m_device_list)
+		{
+			entry.reset_w(m_reset_slot_states ? 1 : 0);
+		}
 	}
 }
 
-void h8bus_device::set_hold_line(int state)
+void h8bus_device::set_hold_line(unsigned index, int state)
 {
-	for (device_h8bus_card_interface &entry : m_device_list)
+	bool const changed = update_line_states(m_hold_slot_states, index, state);
+
+	if (changed)
 	{
-		entry.hold_w(state);
+		for (device_h8bus_card_interface &entry : m_device_list)
+		{
+			entry.hold_w(m_hold_slot_states ? 1 : 0);
+		}
 	}
 }
 
-void h8bus_device::set_m1_line(int state)
+void h8bus_device::set_m1_line(unsigned index, int state)
 {
-	for (device_h8bus_card_interface &entry : m_device_list)
+	bool const changed = update_line_states(m_m1_slot_states, index, state);
+
+	if (changed)
 	{
-		entry.m1_w(state);
+		for (device_h8bus_card_interface &entry : m_device_list)
+		{
+			entry.m1_w(m_m1_slot_states ? 1 : 0);
+		}
+	}
+}
+
+void h8bus_device::set_disable_rom_line(unsigned index, int state)
+{
+	bool const changed = update_line_states(m_disable_rom_slot_states, index, state);
+
+	if (changed)
+	{
+		for (device_h8bus_card_interface &entry : m_device_list)
+		{
+			entry.rom_disable_w(m_disable_rom_slot_states ? 1 : 0);
+		}
 	}
 }
 
@@ -239,12 +370,4 @@ void h8bus_device::set_p201_int1(int state)
 void h8bus_device::set_p201_int2(int state)
 {
 	m_p2_card->p201_int2_w(state);
-}
-
-void h8bus_device::set_disable_rom_line(int state)
-{
-	for (device_h8bus_card_interface &entry : m_device_list)
-	{
-		entry.rom_disable_w(state);
-	}
 }

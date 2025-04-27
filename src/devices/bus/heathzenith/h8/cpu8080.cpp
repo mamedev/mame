@@ -8,48 +8,48 @@
 
 
 
-  Onboard Jumpers (none are configurable yet)
+  Onboard Jumpers
 
-  Label    Default     Description (if jumper is closed)
+  Label    Default  Emulated   Description (if jumper is closed)
   -------------------------------------------------------------------------
-  B1-B2     Open       Allow /INT1 (INT 10) from the BH Bus (pin 8).
+  B1-B2     Open      Yes      Allow /INT1 (INT 10) from the BH Bus (pin 8).
 
-  C1-C2     Open       Allow /INT2 (Int 20) from the BH Bus (pin 9).
+  C1-C2     Open      Yes      Allow /INT2 (Int 20) from the BH Bus (pin 9).
 
-  E1-E2     Close      Allow inverted signal from J jumper to HOLD/HLDA on BH Bus (pin 25)
+  E1-E2     Close     No       Allow inverted signal from J jumper to HOLD/HLDA on BH Bus (pin 25)
 
-  F1-F2     Close      Allow /HOLD from the BH Bus (pin 27) to CPU Hold line.
+  F1-F2     Close     No       Allow /HOLD from the BH Bus (pin 27) to CPU Hold line.
 
-  H1-H3     Open       Tie Ready-in from IC212 Generator to CPU Wait line
-  H2-H3     Close      Tie Ready-in from IC212 Generator to CPU Ready line
+  H1-H3     Open      No       Tie Ready-in from IC212 Generator to CPU Wait line
+  H2-H3     Close     No       Tie Ready-in from IC212 Generator to CPU Ready line
 
-  J1-J2     Close      CPU HLDA out through flip-flop, use /Q output to E jumper
-  J2-J3     Open       CPU HLDA out through flip-flop, use Q output to E jumper
+  J1-J2     Close     No       CPU HLDA out through flip-flop, use /Q output to E jumper
+  J2-J3     Open      No       CPU HLDA out through flip-flop, use Q output to E jumper
 
-  K1-K2     Close      Affects Data-in/out buffers enabled signals based on /MEMR & /IOR signals
-  K1-K3     Open       Affects Data-in/out buffers enabled signals based on /MEMR & /IOR signals
+  K1-K2     Close     No       Affects Data-in/out buffers enabled signals based on /MEMR & /IOR signals
+  K1-K3     Open      No       Affects Data-in/out buffers enabled signals based on /MEMR & /IOR signals
 
-  L1-L2     Close      Tie CPU /INTA to interrupt buffer
-  L2-L3     Open       Tie CPU /INTA to +12V
+  L1-L2     Close     No       Tie CPU /INTA to interrupt buffer
+  L2-L3     Open      No       Tie CPU /INTA to +12V
 
-  P1-P2     Open       A10 to pin 19 of IC204 ROM
-  P2-P3     Close      R jumper to pin 19 of IC204 ROM
+  P1-P2     Open      No       A10 to pin 19 of IC204 ROM
+  P2-P3     Close     No       R jumper to pin 19 of IC204 ROM
 
-  R1-R2     Close      +12V selected
-  R2-R3     Open       S jumper selection selected
+  R1-R2     Close     No       +12V selected
+  R2-R3     Open      No       S jumper selection selected
 
-  S1-S2     Open       +5V selected
-  S2-S3     Close      GND selected
+  S1-S2     Open      No       +5V selected
+  S2-S3     Close     No       GND selected
 
-  T1-T2     Close      -5V to pin 21 of IC204 ROM
-  T2-T3     Open       +5V to pin 21 of IC204 ROM
+  T1-T2     Close     No       -5V to pin 21 of IC204 ROM
+  T2-T3     Open      No       +5V to pin 21 of IC204 ROM
 
-  X1-X2     Open       Allow /ROM_Disable from BH bus (pin 46) to disable ROM
+  X1-X2     Open      No       Allow /ROM_Disable from BH bus (pin 46) to disable ROM
 
-  Z1-Z2     Close      Tie /A10 to ROM decoder select line
-  Z2-Z3     Open       Tie +5V to ROM decoder select line
+  Z1-Z2     Close     No       Tie /A10 to ROM decoder select line
+  Z2-Z3     Open      No       Tie +5V to ROM decoder select line
 
-  RDYIN     Close      Allow RDYIN from BH Bus (pin 20) to IC212 Generator
+  RDYIN     Close     No       Allow RDYIN from BH Bus (pin 20) to IC212 Generator
 
 ****************************************************************************/
 
@@ -83,7 +83,9 @@ public:
 protected:
 
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
@@ -98,17 +100,21 @@ private:
 	void bus_io_w(offs_t offset, u8 data) { h8bus().space(AS_IO).write_byte(offset, data); }
 	u8 bus_io_r(offs_t offset) { return h8bus().space(AS_IO).read_byte(offset); }
 
-	required_device<i8080_cpu_device> m_maincpu;
+	required_device<i8080_cpu_device>  m_maincpu;
 	required_device<heath_intr_socket> m_intr_socket;
+	required_ioport                    m_config;
 
 	bool m_m1_state;
+	bool m_allow_int1;
+	bool m_allow_int2;
 };
 
 h_8_cpu_8080_device::h_8_cpu_8080_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
 	device_t(mconfig, H8BUS_CPU_8080, tag, owner, 0),
 	device_h8bus_p2_card_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),
-	m_intr_socket(*this, "intr_socket")
+	m_intr_socket(*this, "intr_socket"),
+	m_config(*this, "CONFIG")
 {
 }
 
@@ -131,12 +137,18 @@ void h_8_cpu_8080_device::h8_status_callback(u8 data)
 
 void h_8_cpu_8080_device::int1_w(int state)
 {
-	m_intr_socket->set_irq_level(1, state);
+	if (m_allow_int1)
+	{
+		m_intr_socket->set_irq_level(1, state);
+	}
 }
 
 void h_8_cpu_8080_device::int2_w(int state)
 {
-	m_intr_socket->set_irq_level(2, state);
+	if (m_allow_int2)
+	{
+		m_intr_socket->set_irq_level(2, state);
+	}
 }
 
 void h_8_cpu_8080_device::int3_w(int state)
@@ -236,6 +248,22 @@ ROM_START( h8 )
 	ROMX_LOAD( "2732_444-140_pam37.rom", 0x0000, 0x1000, CRC(53a540db) SHA1(90082d02ffb1d27e8172b11fff465bd24343486e), ROM_BIOS(4) )
 ROM_END
 
+static INPUT_PORTS_START( cpu_8080_jumpers )
+
+	PORT_START("CONFIG")
+	PORT_CONFNAME(0x01, 0x00, "Allow INT1 signal on BH Bus - Jumper B1-B2")
+	PORT_CONFSETTING(   0x00, DEF_STR( No ))
+	PORT_CONFSETTING(   0x01, DEF_STR( Yes ))
+	PORT_CONFNAME(0x02, 0x00, "Allow INT2 signal on BH Bus - Jumper C1-C2")
+	PORT_CONFSETTING(   0x00, DEF_STR( No ))
+	PORT_CONFSETTING(   0x02, DEF_STR( Yes ))
+
+INPUT_PORTS_END
+
+ioport_constructor h_8_cpu_8080_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(cpu_8080_jumpers);
+}
 
 const tiny_rom_entry *h_8_cpu_8080_device::device_rom_region() const
 {
@@ -247,6 +275,16 @@ void h_8_cpu_8080_device::device_start()
 	save_item(NAME(m_m1_state));
 
 	h8bus().set_clock(m_maincpu->clock());
+}
+
+void h_8_cpu_8080_device::device_reset()
+{
+	m_m1_state = 0;
+
+	ioport_value const config(m_config->read());
+
+	m_allow_int1 = bool(BIT(config, 0));
+	m_allow_int2 = bool(BIT(config, 1));
 }
 
 void h_8_cpu_8080_device::device_add_mconfig(machine_config &config)

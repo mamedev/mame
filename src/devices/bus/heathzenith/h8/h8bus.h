@@ -170,6 +170,7 @@ public:
 	virtual void rom_disable_w(int state) {}
 
 	void set_h8bus_tag(h8bus_device *h8bus, const char *slottag) { m_h8bus = h8bus; m_h8bus_slottag = slottag; }
+	void set_slot_num(u8 slot_num) { m_slot_num = slot_num; }
 
 protected:
 	device_h8bus_card_interface(const machine_config &mconfig, device_t &device);
@@ -190,6 +191,7 @@ protected:
 	h8bus_device &h8bus() { assert(m_h8bus); return *m_h8bus; }
 
 	const char *m_h8bus_slottag;
+	u8 m_slot_num;
 
 private:
 	h8bus_device *m_h8bus;
@@ -225,7 +227,6 @@ protected:
 	device_h8bus_p2_card_interface(const machine_config &mconfig, device_t &device);
 
 	void set_p201_inte(int state);
-
 };
 
 
@@ -284,28 +285,42 @@ protected:
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 
-	void add_h8bus_card(device_h8bus_card_interface &card);
-	void set_int1_line(int state);
-	void set_int2_line(int state);
-	void set_int3_line(int state);
-	void set_int4_line(int state);
-	void set_int5_line(int state);
-	void set_int6_line(int state);
-	void set_int7_line(int state);
-	void set_reset_line(int state);
-	void set_hold_line(int state);
-	void set_disable_rom_line(int state);
-	void set_m1_line(int state);
+	u8 add_h8bus_card(device_h8bus_card_interface &card);
+	void set_int1_line(unsigned index, int state);
+	void set_int2_line(unsigned index, int state);
+	void set_int3_line(unsigned index, int state);
+	void set_int4_line(unsigned index, int state);
+	void set_int5_line(unsigned index, int state);
+	void set_int6_line(unsigned index, int state);
+	void set_int7_line(unsigned index, int state);
+	void set_reset_line(unsigned index, int state);
+	void set_hold_line(unsigned index, int state);
+	void set_disable_rom_line(unsigned index, int state);
+	void set_m1_line(unsigned index, int state);
 
 	void set_p201_inte(int state);
 	void set_p201_reset(int state);
 	void set_p201_int1(int state);
 	void set_p201_int2(int state);
 
+	bool update_line_states(u32 &states, unsigned index, int state);
+
 	void mem_map(address_map &map);
 	void io_map(address_map &map);
 
 private:
+	u32 m_int1_slot_states;
+	u32 m_int2_slot_states;
+	u32 m_int3_slot_states;
+	u32 m_int4_slot_states;
+	u32 m_int5_slot_states;
+	u32 m_int6_slot_states;
+	u32 m_int7_slot_states;
+	u32 m_reset_slot_states;
+	u32 m_hold_slot_states;
+	u32 m_disable_rom_slot_states;
+	u32 m_m1_slot_states;
+
 	address_space_config const m_mem_config;
 	address_space_config const m_io_config;
 
@@ -318,57 +333,57 @@ private:
 
 inline void device_h8bus_card_interface::set_slot_int1(int state)
 {
-	h8bus().set_int1_line(state);
+	h8bus().set_int1_line(m_slot_num, state);
 }
 
 inline void device_h8bus_card_interface::set_slot_int2(int state)
 {
-	h8bus().set_int2_line(state);
+	h8bus().set_int2_line(m_slot_num, state);
 }
 
 inline void device_h8bus_card_interface::set_slot_int3(int state)
 {
-	h8bus().set_int3_line(state);
+	h8bus().set_int3_line(m_slot_num, state);
 }
 
 inline void device_h8bus_card_interface::set_slot_int4(int state)
 {
-	h8bus().set_int4_line(state);
+	h8bus().set_int4_line(m_slot_num, state);
 }
 
 inline void device_h8bus_card_interface::set_slot_int5(int state)
 {
-	h8bus().set_int5_line(state);
+	h8bus().set_int5_line(m_slot_num, state);
 }
 
 inline void device_h8bus_card_interface::set_slot_int6(int state)
 {
-	h8bus().set_int6_line(state);
+	h8bus().set_int6_line(m_slot_num, state);
 }
 
 inline void device_h8bus_card_interface::set_slot_int7(int state)
 {
-	h8bus().set_int7_line(state);
+	h8bus().set_int7_line(m_slot_num, state);
 }
 
 inline void device_h8bus_card_interface::set_slot_m1(int state)
 {
-	h8bus().set_m1_line(state);
+	h8bus().set_m1_line(m_slot_num, state);
 }
 
 inline void device_h8bus_card_interface::set_slot_reset(int state)
 {
-	h8bus().set_reset_line(state);
+	h8bus().set_reset_line(m_slot_num, state);
 }
 
 inline void device_h8bus_card_interface::set_slot_hold(int state)
 {
-	h8bus().set_hold_line(state);
+	h8bus().set_hold_line(m_slot_num, state);
 }
 
 inline void device_h8bus_card_interface::set_slot_rom_disable(int state)
 {
-	h8bus().set_disable_rom_line(state);
+	h8bus().set_disable_rom_line(m_slot_num, state);
 }
 
 inline void device_h8bus_p1_card_interface::set_p201_reset(int state)
