@@ -382,8 +382,8 @@ void sega_ybdcomm_device::device_start()
 	save_item(NAME(m_z80_stat));
 
 #ifdef YBDCOMM_SIMULATION
-	m_tick_timer = timer_alloc(FUNC(sega_ybdcomm_device::tick_timer), this);
-	m_tick_timer->adjust(attotime::from_hz(600), 0, attotime::from_hz(600));
+	m_tick_timer = timer_alloc(FUNC(sega_ybdcomm_device::tick_timer_callback), this);
+	m_tick_timer->adjust(attotime::never);
 
 	auto ctx = std::make_unique<context>();
 	m_context = std::move(ctx);
@@ -417,13 +417,18 @@ void sega_ybdcomm_device::device_reset()
 	m_linkalive = 0;
 	m_linkid = 0;
 	m_linkcount = 0;
+
+	m_tick_timer->adjust(attotime::from_hz(600), 0, attotime::from_hz(600));
 #endif
 }
 
 void sega_ybdcomm_device::device_stop()
 {
-#ifdef M1COMM_SIMULATION
-	comm_stop();
+#ifdef YBDCOMM_SIMULATION
+	m_tick_timer->adjust(attotime::never);
+
+	m_context->stop();
+	m_context.reset();
 #endif
 }
 
@@ -572,7 +577,7 @@ void sega_ybdcomm_device::z80_stat_w(uint8_t data)
 
 
 #ifdef YBDCOMM_SIMULATION
-TIMER_CALLBACK_MEMBER(sega_ybdcomm_device::tick_timer)
+TIMER_CALLBACK_MEMBER(sega_ybdcomm_device::tick_timer_callback)
 {
 	comm_tick();
 }
@@ -817,7 +822,7 @@ unsigned sega_ybdcomm_device::read_frame(unsigned data_size)
 	{
 		if (m_linkalive == 0x01)
 		{
-			LOG("M1COMM: link lost\n");
+			LOG("YBDCOMM: link lost\n");
 			m_linkalive = 0x02;
 			m_linktimer = 0x00;
 			m_z80_stat = 0xff;
@@ -844,7 +849,7 @@ void sega_ybdcomm_device::send_frame(unsigned data_size)
 	{
 		if (m_linkalive == 0x01)
 		{
-			LOG("M1COMM: link lost\n");
+			LOG("YBDCOMM: link lost\n");
 			m_linkalive = 0x02;
 			m_linktimer = 0x00;
 			m_z80_stat = 0xff;

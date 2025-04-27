@@ -402,6 +402,8 @@ void namco_c139_device::device_reset()
 
 void namco_c139_device::device_stop()
 {
+	m_tick_timer->adjust(attotime::never);
+
 	m_context->stop();
 	m_context.reset();
 }

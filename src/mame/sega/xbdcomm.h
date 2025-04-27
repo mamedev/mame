@@ -61,6 +61,8 @@ private:
 	void z80_debug_w(uint8_t data);
 
 #ifdef XBDCOMM_SIMULATION
+	emu_timer *m_tick_timer;
+
 	class context;
 	std::unique_ptr<context> m_context;
 
@@ -71,6 +73,8 @@ private:
 	uint8_t m_linkalive;
 	uint8_t m_linkid;
 	uint8_t m_linkcount;
+
+	TIMER_CALLBACK_MEMBER(tick_timer_callback);
 
 	void comm_tick();
 	unsigned read_frame(unsigned data_size);

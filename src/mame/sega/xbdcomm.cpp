@@ -351,6 +351,9 @@ void sega_xbdcomm_device::device_start()
 	save_item(NAME(m_z80_stat));
 
 #ifdef XBDCOMM_SIMULATION
+	m_tick_timer = timer_alloc(FUNC(sega_xbdcomm_device::tick_timer_callback), this);
+	m_tick_timer->adjust(attotime::never);
+
 	auto ctx = std::make_unique<context>();
 	m_context = std::move(ctx);
 
@@ -384,12 +387,16 @@ void sega_xbdcomm_device::device_reset()
 	m_linkalive = 0;
 	m_linkid = 0;
 	m_linkcount = 0;
+
+	m_tick_timer->adjust(attotime::from_hz(600), 0, attotime::from_hz(600));
 #endif
 }
 
 void sega_xbdcomm_device::device_stop()
 {
 #ifdef XBDCOMM_SIMULATION
+	m_tick_timer->adjust(attotime::never);
+
 	m_context->stop();
 	m_context.reset();
 #endif
@@ -423,9 +430,6 @@ uint8_t sega_xbdcomm_device::ex_r(offs_t offset)
 			// status register?
 			if (!machine().side_effects_disabled())
 				LOG("xbdcomm-ex_r: %02x %02x\n", offset, m_z80_stat);
-#ifdef XBDCOMM_SIMULATION
-			comm_tick();
-#endif
 			return m_z80_stat;
 
 		default:
@@ -497,7 +501,6 @@ void sega_xbdcomm_device::ex_w(offs_t offset, uint8_t data)
 					m_linkenable = 0x00;
 				}
 			}
-			comm_tick();
 #endif
 			break;
 
@@ -559,6 +562,11 @@ void sega_xbdcomm_device::z80_debug_w(uint8_t data)
 
 
 #ifdef XBDCOMM_SIMULATION
+TIMER_CALLBACK_MEMBER(sega_xbdcomm_device::tick_timer_callback)
+{
+	comm_tick();
+}
+
 void sega_xbdcomm_device::comm_tick()
 {
 	m_context->check_sockets();

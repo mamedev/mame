@@ -75,7 +75,7 @@ private:
 	uint8_t m_linkid;
 	uint8_t m_linkcount;
 
-	TIMER_CALLBACK_MEMBER(tick_timer);
+	TIMER_CALLBACK_MEMBER(tick_timer_callback);
 
 	unsigned comm_frame_offset(uint8_t cab_index);
 	unsigned comm_frame_size(uint8_t cab_index);

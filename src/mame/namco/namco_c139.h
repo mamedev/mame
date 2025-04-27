@@ -60,7 +60,7 @@ private:
 	std::string m_remotehost;
 	std::string m_remoteport;
 
-	emu_timer *m_tick_timer = nullptr;
+	emu_timer *m_tick_timer;
 
 	class context;
 	std::unique_ptr<context> m_context;
