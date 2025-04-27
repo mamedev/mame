@@ -686,7 +686,7 @@ ROM_START( jxzh )
 	ROM_LOAD( "bmc_mj9601-9.u21", 0x00000, 0x40000, CRC(0ffcae13) SHA1(f8501c7c8a8bebf5da95aa3b275dd514f1014971) )
 ROM_END
 
-// 開門胡 (Kāi Mén Hú) - a program swap of jxzh (or vice versa)
+// 開門胡 (Kāimén Hú) - a program swap of jxzh (or vice versa)
 // same PCB as jxzh, but with a File KB89C67 in place of the 3567 (both are YM2413 clones) and a Music TR9C1710-80PCA RAMDAC instead of the HM86171-80
 ROM_START( kaimenhu )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // 68000 Code
@@ -746,4 +746,4 @@ void koftball_state::init_koftball()
 
 GAME( 1995, koftball, 0,    koftball, koftball, koftball_state, init_koftball, ROT0, "BMC", "King of Football",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, jxzh,     0,    jxzh,     jxzh,     koftball_state, empty_init,    ROT0, "BMC", "Jinxiu Zhonghua",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, kaimenhu, jxzh, kaimenhu, jxzh,     koftball_state, empty_init,    ROT0, "BMC", "Kai Men Hu",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, kaimenhu, jxzh, kaimenhu, jxzh,     koftball_state, empty_init,    ROT0, "BMC", "Kaimen Hu",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

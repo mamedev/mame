@@ -548,6 +548,7 @@ ROM_START( jzst )
 	ROM_REGION( 0x0100, "pic_data", ROMREGION_ERASEFF )
 ROM_END
 
+// 疯狂斗地主II (Fēngkuáng Dòu Dìzhǔ II)
 // PCB is very similar to the one documented at the top, but with HY03 instead of HY04 and standard ROMs instead of flash
 ROM_START( fkddz2 )
 	ROM_REGION32_LE( 0x1000000, "flash", ROMREGION_ERASEFF )
@@ -564,6 +565,7 @@ ROM_START( fkddz2 )
 	ROM_REGION( 0x0100, "pic_data", ROMREGION_ERASEFF )
 ROM_END
 
+// 极品斗地主 (Jípǐn Dòu Dìzhǔ)
 // Sealy 2005.7 PCB
 // PCB is very similar to the one documented at the top, but with KEY02 instead of HY04 and standard ROMs instead of flash
 ROM_START( jpddz )
@@ -617,7 +619,7 @@ ROM_END
 GAME( 2004?, menghong,  0,        menghong, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Meng Hong Lou",            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2004?, menghonga, menghong, menghong, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Meng Hong Lou (earlier)",  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 2006,  jzst,      fkddz2,   crzyddz2, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Jue Zhan Shanghai Tan",    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2006,  fkddz2,    0,        crzyddz2, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Feng Kuang Dou Di Zhu II", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2005,  jpddz,     0,        crzyddz2, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Jipin Dou Di Zhu (set 1)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // this one boots
-GAME( 2005,  jpddza,    jpddz,    crzyddz2, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Jipin Dou Di Zhu (set 2)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // this one doesn't
+GAME( 2006,  fkddz2,    0,        crzyddz2, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Fengkuang Dou Dizhu II",   MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2005,  jpddz,     0,        crzyddz2, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Jipin Dou Dizhu (set 1)",  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // this one boots
+GAME( 2005,  jpddza,    jpddz,    crzyddz2, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Jipin Dou Dizhu (set 2)",  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // this one doesn't
 GAME( 2005,  sandayi,   0,        crzyddz2, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "San Da Yi",                MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )

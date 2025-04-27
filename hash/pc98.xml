@@ -1464,7 +1464,7 @@ Not extensively tested, running game start will moan about missing files
 	</software>
 
 	<software name="ldb_advm" supported="no">
-		<description>LOGiN Disk &amp; Book Series - Adventure Tsukuuru 98 (5.25&quot; Disks)</description>
+		<description>LOGiN Disk &amp; Book Series - Adventure Tsukuuru 98 (5.25&quot; disks)</description>
 		<year>1992</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1482,7 +1482,7 @@ Not extensively tested, running game start will moan about missing files
 	</software>
 
 	<software name="ldb_advm35" cloneof="ldb_advm" supported="no">
-		<description>LOGiN Disk &amp; Book Series - Adventure Tsukuuru 98 (3.5&quot; Disks)</description>
+		<description>LOGiN Disk &amp; Book Series - Adventure Tsukuuru 98 (3.5&quot; disks)</description>
 		<year>1992</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1500,7 +1500,7 @@ Not extensively tested, running game start will moan about missing files
 	</software>
 
 	<software name="ldb_char" supported="no">
-		<description>LOGiN Disk &amp; Book Series - Character Tsukuuru 98 (5.25&quot; Disks)</description>
+		<description>LOGiN Disk &amp; Book Series - Character Tsukuuru 98 (5.25&quot; disks)</description>
 		<year>1992</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1518,7 +1518,7 @@ Not extensively tested, running game start will moan about missing files
 	</software>
 
 	<software name="ldb_char35" cloneof="ldb_char" supported="no">
-		<description>LOGiN Disk &amp; Book Series - Character Tsukuuru 98 (3.5&quot; Disks)</description>
+		<description>LOGiN Disk &amp; Book Series - Character Tsukuuru 98 (3.5&quot; disks)</description>
 		<year>1994</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1751,7 +1751,7 @@ Not extensively tested, running game start will moan about missing files
 	</software>
 
 	<software name="ldb_draw" supported="no">
-		<description>LOGiN Disk &amp; Book Series - Drawing Tool (5.25&quot; Disk)</description>
+		<description>LOGiN Disk &amp; Book Series - Drawing Tool (5.25&quot; disk)</description>
 		<year>1992</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1763,7 +1763,7 @@ Not extensively tested, running game start will moan about missing files
 
 
 	<software name="ldb_draw35" cloneof="ldb_draw" supported="no">
-		<description>LOGiN Disk &amp; Book Series - Drawing Tool (3.5&quot; Disk)</description>
+		<description>LOGiN Disk &amp; Book Series - Drawing Tool (3.5&quot; disk)</description>
 		<year>1992</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1775,7 +1775,7 @@ Not extensively tested, running game start will moan about missing files
 
 	<!-- TODO: isbn supposedly 978-4756108562, which should be different depending on if they really released as separate formats -->
 	<software name="ldb_polm">
-		<description>LOGiN Disk &amp; Book Series - Polygon Modeling Tsukuuru (5.25&quot; Disk)</description>
+		<description>LOGiN Disk &amp; Book Series - Polygon Modeling Tsukuuru (5.25&quot; disk)</description>
 		<year>1992</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="ポリゴンモデリングツクール" />
@@ -1788,7 +1788,7 @@ Not extensively tested, running game start will moan about missing files
 
 	<!-- TODO: despite filename this doesn't look 3.5" -->
 	<software name="ldb_polm35" cloneof="ldb_polm">
-		<description>LOGiN Disk &amp; Book Series - Polygon Modeling Tsukuuru (5.25&quot; Disk, alt)</description>
+		<description>LOGiN Disk &amp; Book Series - Polygon Modeling Tsukuuru (5.25&quot; disk, alt)</description>
 		<year>1992</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="ポリゴンモデリングツクール" />
@@ -1800,7 +1800,7 @@ Not extensively tested, running game start will moan about missing files
 	</software>
 
 	<software name="ldb_poly" supported="no">
-		<description>LOGiN Disk &amp; Book Series - Polygon Shooting Tsukuuru (5.25&quot; Disk)</description>
+		<description>LOGiN Disk &amp; Book Series - Polygon Shooting Tsukuuru (5.25&quot; disk)</description>
 		<year>1993?</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1813,7 +1813,7 @@ Not extensively tested, running game start will moan about missing files
 
 	<!-- TODO: again filename hints as a 3.5" version when it's not, cfr. ldb_polm -->
 	<software name="ldb_poly35" cloneof="ldb_poly" supported="no">
-		<description>LOGiN Disk &amp; Book Series - Polygon Shooting Tsukuuru (5.25&quot; Disk, alt)</description>
+		<description>LOGiN Disk &amp; Book Series - Polygon Shooting Tsukuuru (5.25&quot; disk, alt)</description>
 		<year>1993?</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop2" interface="floppy_5_25">
@@ -27938,7 +27938,7 @@ Hangs after Game Arts logo, expects buffer at $27a50 to be 0
 	</software>
 
 	<software name="uranai" supported="no">
-		<description>Ketsuekigata-boshi Uranai (5.25&quot; Disk)</description>
+		<description>Ketsuekigata-boshi Uranai (5.25&quot; disk)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -27949,7 +27949,7 @@ Hangs after Game Arts logo, expects buffer at $27a50 to be 0
 	</software>
 
 	<software name="uranai35" cloneof="uranai" supported="no">
-		<description>Ketsuekigata-boshi Uranai (3.5&quot; Disks)</description>
+		<description>Ketsuekigata-boshi Uranai (3.5&quot; disks)</description>
 		<year>19??</year>
 		<publisher>Kogaku System</publisher>
 		<notes><![CDATA[
@@ -30857,7 +30857,7 @@ Has optional [RS-MIDI] sound support
 	</software>
 
 	<software name="ldb_sima">
-		<description>LOGiN Disk &amp; Book Series - SimAnt (5.25&quot; Disks)</description>
+		<description>LOGiN Disk &amp; Book Series - SimAnt (5.25&quot; disks)</description>
 		<year>1993</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="ＬＯＧｉＮ ＤＩＳＫ＆ＢＯＯＫシリーズ - シムアント" />
@@ -30870,7 +30870,7 @@ Has optional [RS-MIDI] sound support
 	</software>
 
 	<software name="ldb_sima35" cloneof="ldb_sima" supported="no">
-		<description>LOGiN Disk &amp; Book Series - SimAnt (3.5&quot; Disks)</description>
+		<description>LOGiN Disk &amp; Book Series - SimAnt (3.5&quot; disks)</description>
 		<year>1993</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="ＬＯＧｉＮ ＤＩＳＫ＆ＢＯＯＫシリーズ - シムアント" />
@@ -30883,7 +30883,7 @@ Has optional [RS-MIDI] sound support
 	</software>
 
 	<software name="ldb_simaa" cloneof="ldb_sima">
-		<description>LOGiN Disk &amp; Book Series - SimAnt (5.25&quot; Disks, alt)</description>
+		<description>LOGiN Disk &amp; Book Series - SimAnt (5.25&quot; disks, alt)</description>
 		<year>1993</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="ＬＯＧｉＮ ＤＩＳＫ＆ＢＯＯＫシリーズ シムアント" />
@@ -54602,7 +54602,7 @@ Doesn't boot on vanilla class (verify), notes use VM class
 <!-- !Doujinshi Game and Software Packs / Collections -->
 
 	<software name="doujins1">
-		<description>Doujin Soft Shuusaku Game Collection Vol. 1 (5.25&quot; Disks)</description>
+		<description>Doujin Soft Shuusaku Game Collection Vol. 1 (5.25&quot; disks)</description>
 		<year>19??</year>
 		<publisher>Shuwa System Trading</publisher>
 		<info name="alt_title" value="同人ソフト秀作ゲームコレクションＶｏｌ１" />
@@ -54640,7 +54640,7 @@ Doesn't boot on vanilla class (verify), notes use VM class
 	</software>
 
 	<software name="doujins135" cloneof="doujins1" supported="no">
-		<description>Doujin Soft Shuusaku Game Collection Vol. 1 (3.5&quot; Disks)</description>
+		<description>Doujin Soft Shuusaku Game Collection Vol. 1 (3.5&quot; disks)</description>
 		<year>19??</year>
 		<publisher>Shuwa System Trading</publisher>
 		<info name="alt_title" value="同人ソフト秀作ゲームコレクションＶｏｌ１" />
@@ -54738,7 +54738,7 @@ Doesn't boot on vanilla class (verify), notes use VM class
 	</software>
 
 	<software name="gc30" supported="no">
-		<description>Game Collection 30 (5.25&quot; Disk)</description>
+		<description>Game Collection 30 (5.25&quot; disk)</description>
 		<year>19??</year>
 		<publisher>Shuwa System Trading</publisher>
 		<info name="alt_title" value="ゲームコレクション 30" />
@@ -54750,7 +54750,7 @@ Doesn't boot on vanilla class (verify), notes use VM class
 	</software>
 
 	<software name="gc3035" cloneof="gc30" supported="no">
-		<description>Game Collection 30 (3.5&quot; Disk)</description>
+		<description>Game Collection 30 (3.5&quot; disk)</description>
 		<year>19??</year>
 		<publisher>Shuwa System Trading</publisher>
 		<notes><![CDATA[
@@ -54834,7 +54834,7 @@ Doesn't boot on vanilla class (verify), notes use VM class
 	</software>
 
 	<software name="100best" supported="no">
-		<description>100 Best Freeware Programs Set 1 (5.25&quot; Disks)</description>
+		<description>100 Best Freeware Programs Set 1 (5.25&quot; disks)</description>
 		<year>1992</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -54894,7 +54894,7 @@ Doesn't boot on vanilla class (verify), notes use VM class
 	</software>
 
 	<software name="100best35" cloneof="100best" supported="no">
-		<description>100 Best Freeware Programs Set 1 (3.5&quot; Disks)</description>
+		<description>100 Best Freeware Programs Set 1 (3.5&quot; disks)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<notes><![CDATA[
@@ -64465,7 +64465,7 @@ Cutoff [kanji] LR right side (verify, should be fixed)
 
 	<!-- TODO: is cgtsuku a non-coverdisc version of these? -->
 	<software name="ldb_cg3d" supported="no">
-		<description>LOGiN Disk &amp; Book Series - CG Tsukuuru 3D (5.25&quot; Disks)</description>
+		<description>LOGiN Disk &amp; Book Series - CG Tsukuuru 3D (5.25&quot; disks)</description>
 		<year>1992</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -64483,7 +64483,7 @@ Cutoff [kanji] LR right side (verify, should be fixed)
 	</software>
 
 	<software name="ldb_cg3d35" cloneof="ldb_cg3d" supported="no">
-		<description>LOGiN Disk &amp; Book Series - CG Tsukuuru 3D (3.5&quot; Disks)</description>
+		<description>LOGiN Disk &amp; Book Series - CG Tsukuuru 3D (3.5&quot; disks)</description>
 		<year>1992</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -64567,7 +64567,7 @@ Cutoff [kanji] LR right side (verify, should be fixed)
 	</software>
 
 	<software name="ldb_rivh" supported="no">
-		<description>LOGiN Disk &amp; Book Series - Riverhill Mystery Selection (5.25&quot; Disks)</description>
+		<description>LOGiN Disk &amp; Book Series - Riverhill Mystery Selection (5.25&quot; disks)</description>
 		<year>1993</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -64585,7 +64585,7 @@ Cutoff [kanji] LR right side (verify, should be fixed)
 	</software>
 
 	<software name="ldb_rivh35" cloneof="ldb_rivh" supported="no">
-		<description>LOGiN Disk &amp; Book Series - Riverhill Mystery Selection (3.5&quot; Disks)</description>
+		<description>LOGiN Disk &amp; Book Series - Riverhill Mystery Selection (3.5&quot; disks)</description>
 		<year>1993</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -65912,7 +65912,7 @@ TODO: understand how to play this
 
 	<software name="goggle2" supported="yes">
 		<!-- "The Ptolemaic Game" -->
-		<description>Goggle-II (5.25&quot; Disk)</description>
+		<description>Goggle-II (5.25&quot; disk)</description>
 		<year>1992</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -65923,7 +65923,7 @@ TODO: understand how to play this
 	</software>
 
 	<software name="goggle2a" cloneof="goggle2" supported="yes">
-		<description>Goggle-II (3.5&quot; Disk)</description>
+		<description>Goggle-II (3.5&quot; disk)</description>
 		<year>1992</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -66721,7 +66721,7 @@ Crashes with a BASIC error when accessing house near starting point, incomplete 
 	</software>
 
 	<software name="volley2" supported="yes">
-		<description>Volleyball 2 on 2 (3.5&quot; Disk)</description>
+		<description>Volleyball 2 on 2 (3.5&quot; disk)</description>
 		<year>1994</year>
 		<publisher>&lt;unofficial&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -66732,7 +66732,7 @@ Crashes with a BASIC error when accessing house near starting point, incomplete 
 	</software>
 
 	<software name="volley2a" cloneof="volley2" supported="yes">
-		<description>Volleyball 2 on 2 (5.25&quot; Disk)</description>
+		<description>Volleyball 2 on 2 (5.25&quot; disk)</description>
 		<year>19??</year>
 		<publisher>&lt;unofficial&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -67310,7 +67310,7 @@ Throws non-fatal LOAD98 "KAMISHIBAI ENGINE ERROR REPORT" at line 32
 	</software>
 
 	<software name="destruct" supported="no">
-		<description>Destructor (5.25&quot; Disk)</description>
+		<description>Destructor (5.25&quot; disk)</description>
 		<year>1993?</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<notes><![CDATA[
@@ -67325,7 +67325,7 @@ Uses raster effects which tanks performance during gameplay
 	</software>
 
 	<software name="destructa" cloneof="destruct" supported="no">
-		<description>Destructor (3.5&quot; Disk)</description>
+		<description>Destructor (3.5&quot; disk)</description>
 		<year>1993?</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<notes><![CDATA[
@@ -70205,7 +70205,7 @@ Japanese version of ibm5170:iomega
 	</software>
 
 	<software name="elecom">
-		<description>Ele Command (5.25&quot; Disk)</description>
+		<description>Ele Command (5.25&quot; disk)</description>
 		<!-- 1992/07/17 -->
 		<year>1992</year>
 		<publisher>Elecom</publisher>
@@ -70218,7 +70218,7 @@ Japanese version of ibm5170:iomega
 	</software>
 
 	<software name="elecom35" cloneof="elecom" supported="no">
-		<description>Ele Command (3.5&quot; Disk)</description>
+		<description>Ele Command (3.5&quot; disk)</description>
 		<!-- 1992/07/17 -->
 		<year>1992</year>
 		<publisher>Elecom</publisher>
