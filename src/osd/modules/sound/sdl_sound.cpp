@@ -97,13 +97,18 @@ int sound_sdl::init(osd_interface &osd, const osd_options &options)
 	// Capture is not implemented in SDL2, and the enumeration
 	// interface is different in SDL3
 	int dev_count = SDL_GetNumAudioDevices(0);
+#if 0
 	for(int i=0; i != dev_count; i++) {
+#else
+	for(int i=dev_count-1; i != -1; i--) {
+#endif
 		SDL_AudioSpec spec;
 		const char *name = SDL_GetAudioDeviceName(i, 0);
 		int err = SDL_GetAudioDeviceSpec(i, 0, &spec);
 		if(!err)
 			m_devices.emplace_back(name, spec.freq, spec.channels);
 	}
+#if SDL_MAJOR_VERSION > 2 || SDL_MINOR_VERSION >= 24
 	char *def_name;
 	SDL_AudioSpec def_spec;
 	if(!SDL_GetDefaultAudioInfo(&def_name, &def_spec, 0)) {
@@ -115,6 +120,9 @@ int sound_sdl::init(osd_interface &osd, const osd_options &options)
 		SDL_free(def_name);
 	} else
 		m_default_sink = 0;
+#else
+	m_default_sink = 0;
+#endif
 	return 0;
 }
 
@@ -190,6 +198,7 @@ uint32_t sound_sdl::stream_sink_open(uint32_t node, std::string name, uint32_t r
 	dspec.callback = sink_callback;
 	dspec.userdata = stream.get();
 
+	osd_printf_verbose("Audio: Opening device %s\n", dev.m_name);
 	stream->m_sdl_id = SDL_OpenAudioDevice(dev.m_name.c_str(), 0, &dspec, &ospec, 0);
 	if(!stream->m_sdl_id)
 		return 0;
