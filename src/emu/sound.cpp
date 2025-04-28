@@ -36,7 +36,7 @@
 #define LOG_OSD_STREAMS (1U << 3)
 #define LOG_ORDER       (1U << 4)
 
-#define VERBOSE -1
+#define VERBOSE 0
 
 #include "logmacro.h"
 
