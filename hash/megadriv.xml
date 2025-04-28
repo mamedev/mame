@@ -10067,7 +10067,7 @@ https://tcrf.net/World_Championship_Soccer_(Genesis)
 		<info name="serial" value="T-119146-00" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<rom name="7500-00030a.ic1 " size="2097152" crc="23f603f5" sha1="d6d9733a619ba6be0dd76591d8dec621e4fdc17e" />
+				<rom name="7500-00030a.ic1" size="2097152" crc="23f603f5" sha1="d6d9733a619ba6be0dd76591d8dec621e4fdc17e" />
 			</dataarea>
 		</part>
 	</software>
@@ -10109,7 +10109,7 @@ https://tcrf.net/World_Championship_Soccer_(Genesis)
 		<info name="serial" value="T-119146-00" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
-				<rom name="Zero Tolerance (Germany) (En).bin " size="2097152" crc="6fb49ff8" sha1="c2ea98f595cb477495a9d326ff25d91f3dbfa90b" />
+				<rom name="Zero Tolerance (Germany) (En).bin" size="2097152" crc="6fb49ff8" sha1="c2ea98f595cb477495a9d326ff25d91f3dbfa90b" />
 			</dataarea>
 		</part>
 	</software>

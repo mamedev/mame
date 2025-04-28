@@ -866,4 +866,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                     FULLNAME       FLAGS
-COMP( 1982, victor9k, 0,      0,      victor9k, victor9k, victor9k_state, empty_init, "Victor Business Products", "Victor 9000", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+COMP( 1982, victor9k, 0,      0,      victor9k, victor9k, victor9k_state, empty_init, "Victor Business Products", "Victor 9000", MACHINE_IMPERFECT_COLORS )
