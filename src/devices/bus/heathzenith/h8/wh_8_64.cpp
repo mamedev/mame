@@ -17,7 +17,7 @@
 
 #define LOG_SW (1U << 1)    // Shows register setup
 
-#define VERBOSE (LOG_SW)
+//#define VERBOSE (LOG_SW)
 
 #include "logmacro.h"
 
