@@ -99,17 +99,6 @@
 #include "emu.h"
 #include "konamigx.h"
 
-#include "cpu/m68000/m68000.h"
-#include "cpu/m68000/m68020.h"
-#include "cpu/tms57002/tms57002.h"
-#include "cpu/z80/z80.h"
-#include "machine/eepromser.h"
-#include "sound/k054539.h"
-//#include "machine/k056230.h"
-#include "sound/k056800.h"
-#include "sound/okim6295.h"
-#include "speaker.h"
-
 #include "layout/generic.h"
 
 
@@ -1085,8 +1074,8 @@ void konamigx_state::gx_type1_map(address_map &map)
 void konamigx_state::racinfrc_map(address_map &map)
 {
 	gx_type1_map(map);
-	map(0xdc0000, 0xdc1fff).ram();         // 056230 RAM?
-	map(0xdd0000, 0xdd00ff).nopr().nopw(); // 056230 regs?
+	map(0xdc0000, 0xdc1fff).rw(m_k056230, FUNC(k056230_device::ram_r), FUNC(k056230_device::ram_w));
+	map(0xdd0000, 0xdd00ff).m(m_k056230, FUNC(k056230_device::regs_map));
 }
 
 void konamigx_state::gx_type2_map(address_map &map)
@@ -1917,6 +1906,9 @@ void konamigx_state::racinfrc(machine_config &config)
 
 	adc0834_device &adc(ADC0834(config, "adc0834", 0));
 	adc.set_input_callback(FUNC(konamigx_state::adc0834_callback));
+
+	K056230(config, m_k056230, 0U);
+	m_k056230->irq_cb().set_inputline(m_maincpu, M68K_IRQ_5);
 }
 
 void konamigx_state::gxtype3(machine_config &config)

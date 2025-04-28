@@ -35,8 +35,6 @@ Data Link Controller
 
 #pragma once
 
-#include "osdfile.h"
-
 
 class mb89374_device : public device_t,
 					   public device_execute_interface
@@ -65,6 +63,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void execute_run() override;
 
@@ -129,19 +128,21 @@ private:
 	uint8_t  m_tx_buffer[0x200];
 	uint16_t m_tx_offset;
 
-	void    rxReset();
-	uint8_t rxRead();
+	class context;
+	std::unique_ptr<context> m_context;
 
-	void txReset();
-	void txWrite(uint8_t data);
-	void txComplete();
-
-	osd_file::ptr m_line_rx;
-	osd_file::ptr m_line_tx;
-	char m_localhost[256];
-	char m_remotehost[256];
 	uint8_t m_socket_buffer[0x200];
-	void checkSockets();
+
+	void    rx_reset();
+	uint8_t rx_read();
+
+	void tx_reset();
+	void tx_write(uint8_t data);
+	void tx_complete();
+
+	void comm_tick();
+	unsigned read_frame();
+	void send_frame(unsigned data_size);
 };
 
 

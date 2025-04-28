@@ -1091,11 +1091,7 @@ Notes:
 #include "emu.h"
 #include "namcos22.h"
 
-#include "namco_dsp.h"
 
-#include "cpu/m68000/m68020.h"
-#include "cpu/tms32025/tms32025.h"
-#include "speaker.h"
 
 // 51.2MHz XTAL on video board, pixel clock of 12.8MHz (doubled in MAME because of unemulated interlacing)
 // HSync - 15.7248 kHz -> htotal = 814.001
@@ -1120,47 +1116,16 @@ Notes:
 
 // Main CPU
 
-/* SCI, preliminary!
+// SCI
 
-20020000  2 R/W RX Status
-            0x01 : Frame Error
-            0x02 : Frame Received
-            0x04 : ?
-
-20020002  2 R/W Status/Control Flags
-            0x01 :
-            0x02 : RX flag? (cleared every vsync)
-            0x04 : RX flag? (cleared every vsync)
-            0x08 :
-
-20020004  2 W   FIFO Control Register
-            0x01 : sync bit enable?
-            0x02 : TX FIFO sync bit (bit-8)
-
-20020006  2 W   TX Control Register
-            0x01 : TX start/stop
-            0x02 : ?
-            0x10 : ?
-
-20020008  2 W   -
-2002000a  2 W   TX Frame Size
-2002000c  2 R/W RX FIFO Pointer (0x0000 - 0x0fff)
-2002000e  2 W   TX FIFO Pointer (0x0000 - 0x1fff)
-*/
-u16 namcos22_state::namcos22_sci_r(offs_t offset)
+void namcos22_state::sci_int_w(int state)
 {
-	switch (offset)
+	int line = 0x04;
+	if (m_irq_enabled & line)
 	{
-		case 0x0:
-			return 0x0004;
-
-		default:
-			return 0;
+		m_irq_state |= line;
+		m_maincpu->set_input_line(m_syscontrol[2] & 7, state ? ASSERT_LINE : CLEAR_LINE); // SCI IRQ
 	}
-}
-
-void namcos22_state::namcos22_sci_w(offs_t offset, u16 data)
-{
 }
 
 
@@ -1691,7 +1656,7 @@ void namcos22_state::namcos22_am(address_map &map)
 	 *     20010000 - 20011fff  TX Buffer
 	 *     20012000 - 20013fff  RX FIFO Buffer (also used for TX Buffer)
 	 */
-	map(0x20010000, 0x20013fff).ram();
+	map(0x20010000, 0x20013fff).m(m_sci, FUNC(namco_c139_device::data_map));
 
 	/**
 	 * C139 SCI Register
@@ -1722,7 +1687,7 @@ void namcos22_state::namcos22_am(address_map &map)
 	 *     2002000c  2  R/W RX FIFO Pointer (0x0000 - 0x0fff)
 	 *     2002000e  2  W   TX FIFO Pointer (0x0000 - 0x1fff)
 	 */
-	map(0x20020000, 0x2002000f).rw(FUNC(namcos22_state::namcos22_sci_r), FUNC(namcos22_state::namcos22_sci_w));
+	map(0x20020000, 0x2002000f).m(m_sci, FUNC(namco_c139_device::regs_map));
 
 	/**
 	 * System Controller: Interrupt Control, Peripheral Control
@@ -1863,8 +1828,8 @@ void namcos22s_state::namcos22s_am(address_map &map)
 {
 	map(0x000000, 0x3fffff).rom();
 	map(0x400000, 0x40001f).rw(FUNC(namcos22s_state::namcos22_keycus_r), FUNC(namcos22s_state::namcos22_keycus_w));
-	map(0x410000, 0x413fff).ram(); // C139 SCI buffer
-	map(0x420000, 0x42000f).rw(FUNC(namcos22s_state::namcos22_sci_r), FUNC(namcos22s_state::namcos22_sci_w)); // C139 SCI registers
+	map(0x410000, 0x413fff).m(m_sci, FUNC(namco_c139_device::data_map));
+	map(0x420000, 0x42000f).m(m_sci, FUNC(namco_c139_device::regs_map));
 	map(0x430000, 0x430003).w(FUNC(namcos22s_state::namcos22_cpuleds_w));
 	map(0x440000, 0x440003).portr("DSW");
 	map(0x450008, 0x45000b).rw(FUNC(namcos22s_state::namcos22_portbit_r), FUNC(namcos22s_state::namcos22_portbit_w));
@@ -2816,6 +2781,7 @@ void namcos22_state::handle_driving_io()
 		m_shareram[0x034/2] = gas;
 		m_shareram[0x036/2] = brake;
 		handle_coinage(flags);
+		handle_output_io();
 	}
 }
 
@@ -2831,9 +2797,18 @@ void namcos22_state::handle_cybrcomm_io()
 		m_shareram[0x036/2] = m_adc_ports[2]->read() * 0x10;
 		m_shareram[0x038/2] = m_adc_ports[3]->read() * 0x10;
 		handle_coinage(flags);
+		handle_output_io();
 	}
 }
 
+/* TODO: REMOVE (THIS IS HANDLED BY "IOMCU") */
+void namcos22_state::handle_output_io()
+{
+	// outputs
+	m_mcu_out[0] = m_shareram[0x20/2] & 0xff; // lamps, coin counters
+	m_mcu_out[1] = m_shareram[0x40/2] & 0xff; // drive commands (raverace, acedrive, victlap)
+	m_mcu_out[2] = m_shareram[0x42/2] & 0xff; // led outputs (acedrive, victlap)
+}
 
 // Alpine skiing games
 
@@ -3765,6 +3740,9 @@ void namcos22_state::namcos22(machine_config &config)
 	slave.hold_ack_out_cb().set(FUNC(namcos22_state::dsp_hold_ack_w));
 	slave.xf_out_cb().set(FUNC(namcos22_state::dsp_xf_output_w));
 	slave.dx_out_cb().set(FUNC(namcos22_state::slave_serial_io_w));
+
+	NAMCO_C139(config, m_sci, 0U);
+	m_sci->irq_cb().set(FUNC(namcos22_state::sci_int_w));
 
 	NAMCO_C74(config, m_mcu, 49.152_MHz_XTAL/3); // C74 on the CPU board has no periodic interrupts, it runs entirely off Timer A0
 	m_mcu->set_addrmap(AS_PROGRAM, &namcos22_state::mcu_s22_program);

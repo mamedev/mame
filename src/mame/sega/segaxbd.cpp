@@ -10,8 +10,7 @@
 
     Known bugs:
         * gprider has a hack to make it work
-        * smgp network and motor boards not hooked up
-            +lastsurv uses the same network board as smgp
+        * smgp motor board not hooked up
         * rachero doesn't like IC17/IC108 (divide chips) in self-test
           due to testing an out-of-bounds value
         * abcop doesn't like IC41/IC108 (divide chips) in self-test
@@ -298,6 +297,7 @@ segaxbd_state::segaxbd_state(const machine_config &mconfig, device_type type, co
 	, m_segaic16vid(*this, "segaic16vid")
 	, m_segaic16road(*this, "segaic16road")
 	, m_subram0(*this, "subram0")
+	, m_xbdcomm(*this, "xbdcomm")
 	, m_road_priority(1)
 	, m_scanline_timer(nullptr)
 	, m_timer_irq_state(0)
@@ -570,7 +570,7 @@ void segaxbd_state::loffire_sync0_w(offs_t offset, uint16_t data, uint16_t mem_m
 uint16_t segaxbd_state::smgp_excs_r(offs_t offset)
 {
 	//logerror("%06X:smgp_excs_r(%04X)\n", m_maincpu->pc(), offset*2);
-	return 0xffff;
+	return 0xff00 | m_xbdcomm->ex_r(offset % 0x20);
 }
 
 
@@ -582,6 +582,7 @@ uint16_t segaxbd_state::smgp_excs_r(offs_t offset)
 void segaxbd_state::smgp_excs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	//logerror("%06X:smgp_excs_w(%04X) = %04X & %04X\n", m_maincpu->pc(), offset*2, data, mem_mask);
+	m_xbdcomm->ex_w(offset % 0x20, data & 0xff);
 }
 
 
@@ -1038,27 +1039,6 @@ void segaxbd_state::smgp_airdrive_portmap(address_map &map)
 	map.global_mask(0xff);
 	map(0x01, 0x01).nopr();
 	map(0x02, 0x03).noprw();
-}
-
-
-
-//**************************************************************************
-//  SUPER MONACO GP LINK BOARD CPU ADDRESS MAPS
-//**************************************************************************
-
-// Link Board, not yet emulated
-void segaxbd_state::smgp_comm_map(address_map &map)
-{
-	map.unmap_value_high();
-	map(0x0000, 0x1fff).rom();
-	map(0x2000, 0x3fff).ram();
-	map(0x4000, 0x47ff).ram(); // MB8421 Dual-Port SRAM
-}
-
-void segaxbd_state::smgp_comm_portmap(address_map &map)
-{
-	map.unmap_value_high();
-	map.global_mask(0xff);
 }
 
 
@@ -1858,7 +1838,7 @@ void segaxbd_lastsurv_fd1094_state::device_add_mconfig(machine_config &config)
 	m_maincpu->reset_cb().set(FUNC(segaxbd_lastsurv_fd1094_state::m68k_reset_callback));
 
 	// basic machine hardware
-	// TODO: network board
+	SEGA_XBOARD_COMM(config, m_xbdcomm, 0U);
 
 	m_iochip[0]->out_portd_cb().set(FUNC(segaxbd_state::lastsurv_muxer_w));
 	m_iochip[1]->in_portb_cb().set(FUNC(segaxbd_state::lastsurv_port_r));
@@ -1887,7 +1867,7 @@ void segaxbd_lastsurv_state::device_add_mconfig(machine_config &config)
 	segaxbd_state::xboard_base_mconfig(config);
 
 	// basic machine hardware
-	// TODO: network board
+	SEGA_XBOARD_COMM(config, m_xbdcomm, 0U);
 
 	m_iochip[0]->out_portd_cb().set(FUNC(segaxbd_state::lastsurv_muxer_w));
 	m_iochip[1]->in_portb_cb().set(FUNC(segaxbd_state::lastsurv_port_r));
@@ -1925,9 +1905,7 @@ void segaxbd_smgp_fd1094_state::device_add_mconfig(machine_config &config)
 	m_soundcpu2->set_addrmap(AS_PROGRAM, &segaxbd_smgp_fd1094_state::smgp_sound2_map);
 	m_soundcpu2->set_addrmap(AS_IO, &segaxbd_smgp_fd1094_state::smgp_sound2_portmap);
 
-	z80_device &commcpu(Z80(config, "commcpu", XTAL(16'000'000)/2)); // Z80E
-	commcpu.set_addrmap(AS_PROGRAM, &segaxbd_smgp_fd1094_state::smgp_comm_map);
-	commcpu.set_addrmap(AS_IO, &segaxbd_smgp_fd1094_state::smgp_comm_portmap);
+	SEGA_XBOARD_COMM(config, m_xbdcomm, 0U);
 
 	z80_device &motorcpu(Z80(config, "motorcpu", XTAL(16'000'000)/2)); // not verified
 	motorcpu.set_addrmap(AS_PROGRAM, &segaxbd_smgp_fd1094_state::smgp_airdrive_map);
@@ -1970,9 +1948,7 @@ void segaxbd_smgp_state::device_add_mconfig(machine_config &config)
 	m_soundcpu2->set_addrmap(AS_PROGRAM, &segaxbd_smgp_state::smgp_sound2_map);
 	m_soundcpu2->set_addrmap(AS_IO, &segaxbd_smgp_state::smgp_sound2_portmap);
 
-	z80_device &commcpu(Z80(config, "commcpu", XTAL(16'000'000)/2)); // Z80E
-	commcpu.set_addrmap(AS_PROGRAM, &segaxbd_smgp_state::smgp_comm_map);
-	commcpu.set_addrmap(AS_IO, &segaxbd_smgp_state::smgp_comm_portmap);
+	SEGA_XBOARD_COMM(config, m_xbdcomm, 0U);
 
 	z80_device &motorcpu(Z80(config, "motorcpu", XTAL(16'000'000)/2)); // not verified
 	motorcpu.set_addrmap(AS_PROGRAM, &segaxbd_smgp_state::smgp_airdrive_map);
@@ -4708,6 +4684,8 @@ void segaxbd_state::install_smgp(void)
 	// map /EXCS space
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x2f0000, 0x2f3fff, read16sm_delegate(*this, FUNC(segaxbd_state::smgp_excs_r)));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x2f0000, 0x2f3fff, write16s_delegate(*this, FUNC(segaxbd_state::smgp_excs_w)));
+	m_subcpu->space(AS_PROGRAM).install_read_handler(0x0f0000, 0x0f3fff, read16sm_delegate(*this, FUNC(segaxbd_state::smgp_excs_r)));
+	m_subcpu->space(AS_PROGRAM).install_write_handler(0x0f0000, 0x0f3fff, write16s_delegate(*this, FUNC(segaxbd_state::smgp_excs_w)));
 }
 
 void segaxbd_new_state::init_smgp()
@@ -4762,7 +4740,7 @@ GAME( 1987, aburner2g, aburner2, sega_aburner2,       aburner2, segaxbd_new_stat
 GAME( 1987, thndrbld,  0,        sega_xboard_fd1094,  thndrbld, segaxbd_new_state, empty_init,    ROT0, "Sega", "Thunder Blade (upright) (FD1094 317-0056)", 0 )
 GAME( 1987, thndrbld1, thndrbld, sega_xboard,         thndrbd1, segaxbd_new_state, empty_init,    ROT0, "Sega", "Thunder Blade (deluxe/standing) (unprotected)", 0 )
 
-GAME( 1989, lastsurv,  0,        sega_lastsurv_fd1094,lastsurv, segaxbd_new_state, empty_init,    ROT0, "Sega", "Last Survivor (Japan) (FD1094 317-0083)", MACHINE_NODEVICE_LAN )
+GAME( 1989, lastsurv,  0,        sega_lastsurv_fd1094,lastsurv, segaxbd_new_state, init_smgp,     ROT0, "Sega", "Last Survivor (Japan) (FD1094 317-0083)", 0 )
 
 GAME( 1989, loffire,   0,        sega_xboard_fd1094,  loffire,  segaxbd_new_state, init_loffire,  ROT0, "Sega", "Line of Fire / Bakudan Yarou (World) (FD1094 317-0136)", 0 )
 GAME( 1989, loffireu,  loffire,  sega_xboard_fd1094,  loffire,  segaxbd_new_state, init_loffire,  ROT0, "Sega", "Line of Fire / Bakudan Yarou (US) (FD1094 317-0135)", 0 )
@@ -4770,14 +4748,14 @@ GAME( 1989, loffirej,  loffire,  sega_xboard_fd1094,  loffire,  segaxbd_new_stat
 
 GAME( 1989, rachero,   0,        sega_xboard_fd1094,  rachero,  segaxbd_new_state, empty_init,    ROT0, "Sega", "Racing Hero (FD1094 317-0144)", 0 )
 
-GAME( 1989, smgp,      0,        sega_smgp_fd1094,    smgp,     segaxbd_new_state, init_smgp,     ROT0, "Sega", "Super Monaco GP (World, Rev B) (FD1094 317-0126a)", MACHINE_NODEVICE_LAN )
-GAME( 1989, smgp6,     smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, init_smgp,     ROT0, "Sega", "Super Monaco GP (World, Rev A) (FD1094 317-0126a)", MACHINE_NODEVICE_LAN )
-GAME( 1989, smgp5,     smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, init_smgp,     ROT0, "Sega", "Super Monaco GP (World) (FD1094 317-0126)", MACHINE_NODEVICE_LAN )
-GAME( 1989, smgpu,     smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, init_smgp,     ROT0, "Sega", "Super Monaco GP (US, Rev C) (FD1094 317-0125a)", MACHINE_NODEVICE_LAN )
-GAME( 1989, smgpu1,    smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, init_smgp,     ROT0, "Sega", "Super Monaco GP (US, Rev B) (FD1094 317-0125a)", MACHINE_NODEVICE_LAN )
-GAME( 1989, smgpu2,    smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, init_smgp,     ROT0, "Sega", "Super Monaco GP (US, Rev A) (FD1094 317-0125a)", MACHINE_NODEVICE_LAN )
-GAME( 1989, smgpj,     smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, init_smgp,     ROT0, "Sega", "Super Monaco GP (Japan, Rev B) (FD1094 317-0124a)", MACHINE_NODEVICE_LAN )
-GAME( 1989, smgpja,    smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, init_smgp,     ROT0, "Sega", "Super Monaco GP (Japan, Rev A) (FD1094 317-0124a)", MACHINE_NODEVICE_LAN )
+GAME( 1989, smgp,      0,        sega_smgp_fd1094,    smgp,     segaxbd_new_state, init_smgp,     ROT0, "Sega", "Super Monaco GP (World, Rev B) (FD1094 317-0126a)", 0 )
+GAME( 1989, smgp6,     smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, init_smgp,     ROT0, "Sega", "Super Monaco GP (World, Rev A) (FD1094 317-0126a)", 0 )
+GAME( 1989, smgp5,     smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, init_smgp,     ROT0, "Sega", "Super Monaco GP (World) (FD1094 317-0126)", 0 )
+GAME( 1989, smgpu,     smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, init_smgp,     ROT0, "Sega", "Super Monaco GP (US, Rev C) (FD1094 317-0125a)", 0 )
+GAME( 1989, smgpu1,    smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, init_smgp,     ROT0, "Sega", "Super Monaco GP (US, Rev B) (FD1094 317-0125a)", 0 )
+GAME( 1989, smgpu2,    smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, init_smgp,     ROT0, "Sega", "Super Monaco GP (US, Rev A) (FD1094 317-0125a)", 0 )
+GAME( 1989, smgpj,     smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, init_smgp,     ROT0, "Sega", "Super Monaco GP (Japan, Rev B) (FD1094 317-0124a)", 0 )
+GAME( 1989, smgpja,    smgp,     sega_smgp_fd1094,    smgp,     segaxbd_new_state, init_smgp,     ROT0, "Sega", "Super Monaco GP (Japan, Rev A) (FD1094 317-0124a)", 0 )
 
 GAME( 1990, abcop,     0,        sega_xboard_fd1094,  abcop,    segaxbd_new_state, empty_init,    ROT0, "Sega", "A.B. Cop (World) (FD1094 317-0169b)", 0 )
 GAME( 1990, abcopj,    abcop,    sega_xboard_fd1094,  abcop,    segaxbd_new_state, empty_init,    ROT0, "Sega", "A.B. Cop (Japan) (FD1094 317-0169b)", 0 )
@@ -4800,15 +4778,15 @@ GAME( 1987, thndrbldd, thndrbld, sega_xboard,  thndrbld, segaxbd_new_state, empt
 
 GAME( 1989, racherod,  rachero,  sega_xboard,  rachero,  segaxbd_new_state, empty_init,   ROT0,   "bootleg", "Racing Hero (bootleg of FD1094 317-0144 set)", 0 )
 
-GAME( 1989, smgpd,     smgp,     sega_smgp,    smgp,     segaxbd_new_state, init_smgp,    ROT0,   "bootleg", "Super Monaco GP (World, Rev B) (bootleg of FD1094 317-0126a set)", MACHINE_NODEVICE_LAN )
-GAME( 1989, smgp6d,    smgp,     sega_smgp,    smgp,     segaxbd_new_state, init_smgp,    ROT0,   "bootleg", "Super Monaco GP (World, Rev A) (bootleg of FD1094 317-0126a set)", MACHINE_NODEVICE_LAN )
-GAME( 1989, smgp5d,    smgp,     sega_smgp,    smgp,     segaxbd_new_state, init_smgp,    ROT0,   "bootleg", "Super Monaco GP (World) (bootleg of FD1094 317-0126 set)", MACHINE_NODEVICE_LAN )
-GAME( 1989, smgpud,    smgp,     sega_smgp,    smgp,     segaxbd_new_state, init_smgp,    ROT0,   "bootleg", "Super Monaco GP (US, Rev C) (bootleg of FD1094 317-0125a set)", MACHINE_NODEVICE_LAN )
-GAME( 1989, smgpu1d,   smgp,     sega_smgp,    smgp,     segaxbd_new_state, init_smgp,    ROT0,   "bootleg", "Super Monaco GP (US, Rev B) (bootleg of FD1094 317-0125a set)", MACHINE_NODEVICE_LAN )
-GAME( 1989, smgpu2d,   smgp,     sega_smgp,    smgp,     segaxbd_new_state, init_smgp,    ROT0,   "bootleg", "Super Monaco GP (US, Rev A) (bootleg of FD1094 317-0125a set)", MACHINE_NODEVICE_LAN )
-GAME( 1989, smgpjd,    smgp,     sega_smgp,    smgp,     segaxbd_new_state, init_smgp,    ROT0,   "bootleg", "Super Monaco GP (Japan, Rev B) (bootleg of FD1094 317-0124a set)", MACHINE_NODEVICE_LAN )
+GAME( 1989, smgpd,     smgp,     sega_smgp,    smgp,     segaxbd_new_state, init_smgp,    ROT0,   "bootleg", "Super Monaco GP (World, Rev B) (bootleg of FD1094 317-0126a set)", 0 )
+GAME( 1989, smgp6d,    smgp,     sega_smgp,    smgp,     segaxbd_new_state, init_smgp,    ROT0,   "bootleg", "Super Monaco GP (World, Rev A) (bootleg of FD1094 317-0126a set)", 0 )
+GAME( 1989, smgp5d,    smgp,     sega_smgp,    smgp,     segaxbd_new_state, init_smgp,    ROT0,   "bootleg", "Super Monaco GP (World) (bootleg of FD1094 317-0126 set)", 0 )
+GAME( 1989, smgpud,    smgp,     sega_smgp,    smgp,     segaxbd_new_state, init_smgp,    ROT0,   "bootleg", "Super Monaco GP (US, Rev C) (bootleg of FD1094 317-0125a set)", 0 )
+GAME( 1989, smgpu1d,   smgp,     sega_smgp,    smgp,     segaxbd_new_state, init_smgp,    ROT0,   "bootleg", "Super Monaco GP (US, Rev B) (bootleg of FD1094 317-0125a set)", 0 )
+GAME( 1989, smgpu2d,   smgp,     sega_smgp,    smgp,     segaxbd_new_state, init_smgp,    ROT0,   "bootleg", "Super Monaco GP (US, Rev A) (bootleg of FD1094 317-0125a set)", 0 )
+GAME( 1989, smgpjd,    smgp,     sega_smgp,    smgp,     segaxbd_new_state, init_smgp,    ROT0,   "bootleg", "Super Monaco GP (Japan, Rev B) (bootleg of FD1094 317-0124a set)", 0 )
 
-GAME( 1989, lastsurvd, lastsurv, sega_lastsurv,lastsurv, segaxbd_new_state, empty_init,   ROT0,   "bootleg", "Last Survivor (Japan) (bootleg of FD1094 317-0083 set)", MACHINE_NODEVICE_LAN )
+GAME( 1989, lastsurvd, lastsurv, sega_lastsurv,lastsurv, segaxbd_new_state, empty_init,   ROT0,   "bootleg", "Last Survivor (Japan) (bootleg of FD1094 317-0083 set)", 0 )
 
 GAME( 1990, abcopd,    abcop,    sega_xboard,  abcop,    segaxbd_new_state, empty_init,   ROT0,   "bootleg", "A.B. Cop (World) (bootleg of FD1094 317-0169b set)", 0 )
 GAME( 1990, abcopjd,   abcop,    sega_xboard,  abcop,    segaxbd_new_state, empty_init,   ROT0,   "bootleg", "A.B. Cop (Japan) (bootleg of FD1094 317-0169b set)", 0 )

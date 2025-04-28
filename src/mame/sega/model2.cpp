@@ -1131,9 +1131,9 @@ void model2_state::model2_base_mem(address_map &map)
 	map(0x01800000, 0x01803fff).rw(FUNC(model2_state::palette_r), FUNC(model2_state::palette_w)).flags(i960_cpu_device::BURST);
 	map(0x01810000, 0x0181bfff).rw(FUNC(model2_state::colorxlat_r), FUNC(model2_state::colorxlat_w)).flags(i960_cpu_device::BURST);
 	map(0x0181c000, 0x0181c003).w(FUNC(model2_state::model2_3d_zclip_w));
-	map(0x01a00000, 0x01a03fff).rw(m_m2comm, FUNC(m2comm_device::share_r), FUNC(m2comm_device::share_w)).mirror(0x10000).flags(i960_cpu_device::BURST); // Power Sled access comm.board at 0x01A0XXXX, not sure if really a mirror, or slightly different comm.device
-	map(0x01a04000, 0x01a04000).rw(m_m2comm, FUNC(m2comm_device::cn_r), FUNC(m2comm_device::cn_w)).mirror(0x10000);
-	map(0x01a04002, 0x01a04002).rw(m_m2comm, FUNC(m2comm_device::fg_r), FUNC(m2comm_device::fg_w)).mirror(0x10000);
+	map(0x01a00000, 0x01a03fff).rw(m_m2comm, FUNC(sega_m2comm_device::share_r), FUNC(sega_m2comm_device::share_w)).mirror(0x10000).flags(i960_cpu_device::BURST); // Power Sled access comm.board at 0x01A0XXXX, not sure if really a mirror, or slightly different comm.device
+	map(0x01a04000, 0x01a04000).rw(m_m2comm, FUNC(sega_m2comm_device::cn_r), FUNC(sega_m2comm_device::cn_w)).mirror(0x10000);
+	map(0x01a04002, 0x01a04002).rw(m_m2comm, FUNC(sega_m2comm_device::fg_r), FUNC(sega_m2comm_device::fg_w)).mirror(0x10000);
 	map(0x01d00000, 0x01d03fff).ram().share("backup1").flags(i960_cpu_device::BURST); // Backup sram
 	map(0x02000000, 0x03ffffff).rom().region("main_data", 0).flags(i960_cpu_device::BURST);
 
@@ -2567,7 +2567,7 @@ void model2o_state::model2o(machine_config &config)
 	uart_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
 	uart_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
 
-	M2COMM(config, "m2comm", 0);
+	SEGA_MODEL2_COMM(config, m_m2comm, 0U);
 }
 
 u8 model2_state::driveio_portg_r()
@@ -2707,7 +2707,7 @@ void model2a_state::model2a(machine_config &config)
 	model2_screen(config);
 	model2_scsp(config);
 
-	M2COMM(config, "m2comm", 0);
+	SEGA_MODEL2_COMM(config, m_m2comm, 0U);
 
 	SEGA_BILLBOARD(config, m_billboard, 0);
 
@@ -2832,7 +2832,7 @@ void model2b_state::model2b(machine_config &config)
 	model2_screen(config);
 	model2_scsp(config);
 
-	M2COMM(config, "m2comm", 0);
+	SEGA_MODEL2_COMM(config, m_m2comm, 0U);
 
 	SEGA_BILLBOARD(config, m_billboard, 0);
 
@@ -2891,7 +2891,7 @@ void model2b_state::powsled(machine_config &config)
 	io.an_port_callback<7>().set_ioport("P2_L");
 	// 0 and 2 is Motion AD
 
-	subdevice<m2comm_device>("m2comm")->set_frameoffset(0x180);
+	m_m2comm->set_frameoffset(0x180);
 }
 
 
@@ -2981,7 +2981,7 @@ void model2c_state::model2c(machine_config &config)
 	model2_screen(config);
 	model2_scsp(config);
 
-	M2COMM(config, "m2comm", 0);
+	SEGA_MODEL2_COMM(config, "m2comm", 0U);
 }
 
 void model2c_state::skisuprg(machine_config &config)

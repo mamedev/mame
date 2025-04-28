@@ -14,17 +14,6 @@ Driver's Eyes works,
     (probably wants angle sent by main board?)
 
     -On demo screen, should fog effects be turned off?
-
-    NOTES:
-
-    Driver's Eyes
-        not yet working
-
-    TODO:
-
-    Driver's Eyes
-        add communications for Left and Right screen (linked C139 or something else?)
-
 */
 
 #include "emu.h"
@@ -61,6 +50,7 @@ public:
 	namco_de_pcbstack_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void configure_c148_standard(machine_config &config);
+	void sci_de_hack(uint8_t data);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -111,6 +101,7 @@ private:
 	std::unique_ptr<uint8_t[]> m_eeprom;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(screen_scanline);
+	void sci_int_w(int state);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -176,7 +167,8 @@ void namco_de_pcbstack_device::device_add_mconfig(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	configure_c148_standard(config);
-	NAMCO_C139(config, m_sci, 0);
+	NAMCO_C139(config, m_sci, 0U);
+	m_sci->irq_cb().set(FUNC(namco_de_pcbstack_device::sci_int_w));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// TODO: basic parameters to get 60.606060 Hz, x2 is for interlace
@@ -353,7 +345,7 @@ void namco_de_pcbstack_device::driveyes_common_map(address_map &map)
 	map(0x800000, 0x8fffff).rom().region("data", 0);
 	map(0x900000, 0x90ffff).ram().share("sharedram");
 	map(0xa00000, 0xa00fff).rw(FUNC(namco_de_pcbstack_device::dpram_word_r), FUNC(namco_de_pcbstack_device::dpram_word_w));
-	map(0xb00000, 0xb03fff).rw(m_sci, FUNC(namco_c139_device::ram_r), FUNC(namco_c139_device::ram_w));
+	map(0xb00000, 0xb03fff).m(m_sci, FUNC(namco_c139_device::data_map));
 	map(0xb80000, 0xb8000f).m(m_sci, FUNC(namco_c139_device::regs_map));
 }
 
@@ -440,6 +432,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(namco_de_pcbstack_device::screen_scanline)
 	}
 }
 
+void namco_de_pcbstack_device::sci_int_w(int state)
+{
+	m_master_intc->sci_irq_trigger();
+	m_slave_intc->sci_irq_trigger();
+}
+
+void namco_de_pcbstack_device::sci_de_hack(uint8_t data)
+{
+	m_sci->sci_de_hack(data);
+}
+
 void namco_de_pcbstack_device::configure_c148_standard(machine_config &config)
 {
 	NAMCO_C148(config, m_master_intc, 0, m_maincpu, true);
@@ -485,6 +488,7 @@ public:
 	{ }
 
 	void driveyes(machine_config &config);
+	void init_driveyes();
 
 private:
 	required_device_array<namco_de_pcbstack_device, 3> m_pcb;
@@ -827,9 +831,15 @@ ROM_START( driveyes )
 	ROM_LOAD( "nvram", 0x0000, 0x2000, CRC(fa6623e9) SHA1(8c313f136724eb6c829261b223a2ac1fc08d00c2) )
 ROM_END
 
+void namcos21_de_state::init_driveyes()
+{
+	m_pcb[0]->sci_de_hack(0);
+	m_pcb[1]->sci_de_hack(1);
+	m_pcb[2]->sci_de_hack(2);
+}
 
 /*    YEAR  NAME       PARENT    MACHINE   INPUT       CLASS           INIT           MONITOR  COMPANY  FULLNAME                                 FLAGS */
 
 // 3 PCB stacks in a single cage (3x 4 PCBs) linked for 3 screen panorama, boards look similar to original Namco System 21 (not 21B) including TMS320C25 DSP, but use C68 I/O MCU and sprite chip instead of "68000 'GPU'" ?
-GAME( 1992, driveyes,  0,        driveyes, driveyes,   namcos21_de_state, empty_init,    ROT0,    "Namco", "Driver's Eyes (Japan) (1992/01/10, Main Ver 2.1, Sub Ver 1.1)",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN)
+GAME( 1992, driveyes,  0,        driveyes, driveyes,   namcos21_de_state, init_driveyes, ROT0,    "Namco", "Driver's Eyes (Japan) (1992/01/10, Main Ver 2.1, Sub Ver 1.1)",                 MACHINE_IMPERFECT_GRAPHICS)
 
