@@ -1046,6 +1046,11 @@ uint8_t sh3_base_device::scssr_r(offs_t offset, uint8_t mem_mask)
 void sh3_base_device::scssr_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_scssr = (m_scssr | (data & 1)) & (data | 6);
+	if (!(m_scssr & 0x80))
+	{
+		//printf("%c", m_sctdr);
+		m_scssr |= 0x80;
+	}
 	logerror("'%s' (%08x): SCI unmapped internal write %02x & %02x (SCSSR)\n", tag(), m_sh2_state->pc, data, mem_mask);
 }
 
