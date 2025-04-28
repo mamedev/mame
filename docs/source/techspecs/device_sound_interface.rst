@@ -32,19 +32,19 @@ input and output channels, the sample rate and optionally flags.
 
 The sample rate can be SAMPLE_RATE_INPUT_ADAPTIVE,
 SAMPLE_RATE_OUTPUT_ADAPTIVE or SAMPLE_RATE_ADAPTIVE.  In that case the
-chosen sample rate is the highest one amongs the inputs, outputs or
+chosen sample rate is the highest one among the inputs, outputs or
 both respectively.  In case of loop, the chosen sample rate is the
 configured global sample rate.
 
 The only available non-default flag is STREAM_SYNCHRONOUS.  When set,
 the sound generation method will be called for every sample
-individually.  It's necessary for dsps that run a program on every
+individually.  It's necessary for DSPs that run a program on every
 sample. but on the other hand it's expensive, so only to be used when
 required.
 
-Devices can create multiple streams.  It's rare though.  Some yamaha
+Devices can create multiple streams.  It's rare though.  Some Yamaha
 chips should but don't.  Inputs and outputs are numbered from 0 and
-collate all streams in the order they are created.
+arrange all streams in the order they are created.
 
 
 2.2 Sound input/output
@@ -140,7 +140,7 @@ a given source device.
     u64 get_sound_requested_outputs_mask() const;
 
 Those methods are useful for devices which want to behave differently
-depending on what routes are setup on them.  You get either the max
+depending on what routes are set up on them.  You get either the max
 number of requested channel plus one (which is the number of channels
 when all channels are routed, but is more useful when there are gaps)
 or a mask of use for channels 0-63.  Note that ``ALL_OUTPUTS`` does
@@ -158,7 +158,7 @@ Streams are endpoints associated with devices and, when connected
 together, ensure the transmission of audio data between them.  A
 stream has a number of inputs (which can be zero) and outputs (same)
 and one sample rate which is common to all inputs and outputs.  The
-connections are setup at the machine configuration level and the sound
+connections are set up at the machine configuration level and the sound
 system ensures mixing and resampling is done transparently.
 
 Samples in streams are encoded as sample_t.  In the current
@@ -226,7 +226,7 @@ does it with an integer ``sample`` but pre-divides it by ``max``.
 what's there instead of replacing.  ``get_output`` gets the currently
 stored output value.
 
-``fill`` sets a range of the an output channel to a given ``value``.
+``fill`` sets a range of an output channel to a given ``value``.
 ``start`` tells where to start (default index 0), ``count`` how many
 (default up to the end of the buffer).
 

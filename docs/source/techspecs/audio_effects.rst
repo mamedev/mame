@@ -25,7 +25,7 @@ Adding an effect requires working on four parts:
 
 The audio_effect class in the aeffect sources provides three things:
 
-* an enum value to designate the effect type and which much match its
+* an enum value to designate the effect type and which must match its
   position in the chain (iow, the effect chain follows the enum order),
   in the .h
 * the effect name in the audio_effect::effect_names array in the .cpp
@@ -36,7 +36,7 @@ The audio_effect class in the aeffect sources provides three things:
 3. audio_effects/youreffect.*
 -----------------------------
 
-This is where you implement the effect.  It takes the shape of a
+This is where you implement the effect.  It takes the shape of an
 audio_effect_youreffect class which derives from audio_effect.
 
 The methods to implement are:
@@ -61,7 +61,7 @@ allows to tell how many samples should still be available of the
 previous input frame.  Note that this number must not depend on the
 parameters and only on the sample rate.
 
-An effect have a number of parameters that can come from three sources:
+An effect has a number of parameters that can come from three sources:
 
 * fixed default value
 * equivalent effect object from the default effect chain
@@ -72,7 +72,7 @@ gets the value of ``def`` in the constructor.  When it's nullptr, the
 value to use when not set by the user is the fixed one, otherwise it's
 the one in ``m_default``.
 
-At a minimum an effect should have a parameter allowing to bypass it.
+At minimum an effect should have a parameter allowing to bypass it.
 
 Managing a parameter uses four methods:
 
@@ -131,7 +131,7 @@ than the parameter setting calls are made from.
 4. frontend/mame/ui/audioeffects.cpp
 ------------------------------------
 
-There it suffices to add a creation of the menu
+Here it suffices to add a creation of the menu
 menu_audio_effect_youreffect in menu_audio_effects::handle.  The menu
 effect will pick the effect names from audio_effect (in aeffect.*).
 

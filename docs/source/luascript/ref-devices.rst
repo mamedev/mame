@@ -633,7 +633,7 @@ Sound device interface
 ---------------------
 
 Wraps MAME’s ``device_sound_interface`` class which is a mix-in implemented by
-devices that inputs and/or ouputs sound.
+devices that input and/or output sound.
 
 Instantiation
 ~~~~~~~~~~~~~
@@ -659,11 +659,11 @@ sound.speaker (read-only)
 
 sound.io_positions[] (read-only)
     Non-empty only for microphones and speakers, indicates the positions of
-    the inputs or outputs as (x, y, z) coordinates (f.i. [-0.2, 0.0, 1.0])
+    the inputs or outputs as (x, y, z) coordinates (e.g. [-0.2, 0.0, 1.0])
 
 sound.io_names[] (read-only)
     Non-empty only for microphones and speakers, indicates the positions of
-    the inputs or outputs as strings (f.i. Front Left)
+    the inputs or outputs as strings (e.g. Front Left)
     
 sound.hook
     A boolean indicating whether to tap the output samples of this device in

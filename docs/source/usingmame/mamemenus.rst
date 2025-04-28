@@ -317,7 +317,7 @@ stereo system output.
 A channel mapping maps between one channel of speaker or a microphone
 and one channel of a system input or output.  It can be a little
 tedious, but it allows for instance to take two mono speakers and turn
-it into the left and right channels of a system output, whcih is
+it into the left and right channels of a system output, which is
 useful for some cabinets.
 
 Every mapping has a configurable volume associated.
@@ -355,6 +355,7 @@ parameters of the Default chain are fixed.  The default chain allows
 to create a global setup that one likes and have it applied everywhere
 by default.
 
+
 Filter effect
 ~~~~~~~~~~~~~
 
@@ -365,7 +366,7 @@ low-pass filter (defaulting to off) allows to reproduce how muffled
 the sound of a number of cabinets and TVs were.
 
 The Q factor defines how sharp the transition is, the higher the
-sharper.  Over 0.7 the filter starts amplifying the frequencies arount
+sharper.  Over 0.7 the filter starts amplifying the frequencies around
 the cutoff though, which can be surprising.
 
 
@@ -384,7 +385,7 @@ Not implemented yet.
 EQ effect
 ~~~~~~~~~
 
-The 5-band parametric equalizer allows to amplify or reduce certains
+The 5-band parametric equalizer allows to amplify or reduce certain
 bands of frequency in the spectrum.  The three middle filters, and
 also the extreme ones if configured as "Peak", change frequencies
 around the cutoff.  The Q factor selects the sharpness of the peak,
