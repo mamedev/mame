@@ -515,6 +515,7 @@ void sound_stream::update()
 		stream->update_nodeps();
 
 	do_update();
+	m_samples_to_update = 0;
 	m_in_update = false;
 }
 
@@ -533,6 +534,7 @@ void sound_stream::update_nodeps()
 
 	// If there's anything to do, well, do it
 	do_update();
+	m_samples_to_update = 0;
 	m_in_update = false;
 }
 
