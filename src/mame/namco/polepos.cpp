@@ -430,8 +430,8 @@ void polepos_state::z80_map(address_map &map)
 	map(0xa000, 0xa000).mirror(0x0cff).r(FUNC(polepos_state::ready_r));                 /* READY */
 	map(0xa000, 0xa007).mirror(0x0cf8).w(m_latch, FUNC(ls259_device::write_d0));
 	map(0xa100, 0xa100).mirror(0x0cff).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0xa200, 0xa200).mirror(0x0cff).w("polepos", FUNC(polepos_sound_device::polepos_engine_sound_lsb_w));    /* Car Sound ( Lower Nibble ) */
-	map(0xa300, 0xa300).mirror(0x0cff).w("polepos", FUNC(polepos_sound_device::polepos_engine_sound_msb_w));    /* Car Sound ( Upper Nibble ) */
+	map(0xa200, 0xa200).mirror(0x0cff).w("engine", FUNC(polepos_sound_device::polepos_engine_sound_lsb_w));    /* Car Sound ( Lower Nibble ) */
+	map(0xa300, 0xa300).mirror(0x0cff).w("engine", FUNC(polepos_sound_device::polepos_engine_sound_msb_w));    /* Car Sound ( Upper Nibble ) */
 }
 
 void polepos_state::z80_io(address_map &map)
@@ -909,7 +909,7 @@ void polepos_state::polepos(machine_config &config)
 	m_latch->q_out_cb<1>().append("53xx", FUNC(namco_53xx_device::reset));
 	m_latch->q_out_cb<1>().append("54xx", FUNC(namco_54xx_device::reset));
 	m_latch->q_out_cb<2>().set(m_namco_sound, FUNC(namco_device::sound_enable_w));
-	m_latch->q_out_cb<2>().append("polepos", FUNC(polepos_sound_device::clson_w));
+	m_latch->q_out_cb<2>().append("engine", FUNC(polepos_sound_device::clson_w));
 	m_latch->q_out_cb<3>().set(FUNC(polepos_state::gasel_w));
 	m_latch->q_out_cb<4>().set_inputline(m_subcpu, INPUT_LINE_RESET).invert();
 	m_latch->q_out_cb<5>().set_inputline(m_subcpu2, INPUT_LINE_RESET).invert();
@@ -946,7 +946,7 @@ void polepos_state::polepos(machine_config &config)
 	discrete.add_route(ALL_OUTPUTS, "speaker", 0.90, 1);
 
 	/* engine sound */
-	polepos_sound_device &polepos(POLEPOS_SOUND(config, "polepos", MASTER_CLOCK/8));
+	polepos_sound_device &polepos(POLEPOS_SOUND(config, "engine", MASTER_CLOCK/8));
 	polepos.add_route(ALL_OUTPUTS, "speaker", 0.90 * 0.77, 0);
 	polepos.add_route(ALL_OUTPUTS, "speaker", 0.90 * 0.77, 1);
 }
@@ -1016,7 +1016,7 @@ void polepos_state::topracern(machine_config &config)
 	LS259(config, m_latch);
 	m_latch->q_out_cb<0>().set_inputline(m_maincpu, 0, CLEAR_LINE).invert();
 	m_latch->q_out_cb<2>().set(m_namco_sound, FUNC(namco_device::sound_enable_w));
-	m_latch->q_out_cb<2>().append("polepos", FUNC(polepos_sound_device::clson_w));
+	m_latch->q_out_cb<2>().append("engine", FUNC(polepos_sound_device::clson_w));
 	m_latch->q_out_cb<3>().set(FUNC(polepos_state::gasel_w));
 	m_latch->q_out_cb<4>().set_inputline(m_subcpu, INPUT_LINE_RESET).invert();
 	m_latch->q_out_cb<5>().set_inputline(m_subcpu2, INPUT_LINE_RESET).invert();
@@ -1048,7 +1048,7 @@ void polepos_state::topracern(machine_config &config)
 	m_namco_sound->add_route(1, "speaker", 0.80, 1);
 
 	/* engine sound */
-	polepos_sound_device &polepos(POLEPOS_SOUND(config, "polepos", 0));
+	polepos_sound_device &polepos(POLEPOS_SOUND(config, "engine", 0));
 	polepos.add_route(ALL_OUTPUTS, "speaker", 0.90 * 0.77, 0);
 	polepos.add_route(ALL_OUTPUTS, "speaker", 0.90 * 0.77, 1);
 
