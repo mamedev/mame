@@ -220,7 +220,7 @@ template<typename S> void emu::detail::output_buffer_flat<S>::resample(u32 previ
 	}
 
 	auto [ppos, pdec] = cv(next_rate, previous_rate, nbase);
-	if(ppos < pbase || ppos >= pbase + m_write_position)
+	if(ppos < pbase || ppos > pbase + m_write_position)
 		fatalerror("Something went very wrong, ppos=%d, pbase=%d, pbase+wp=%d\n", ppos, pbase, pbase + m_write_position);
 
 	double step = double(previous_rate) / double(next_rate);

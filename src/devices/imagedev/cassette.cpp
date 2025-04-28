@@ -243,6 +243,12 @@ void cassette_image_device::device_start()
 	m_value = 0;
 
 	stream_alloc(0, m_stereo? 2:1, machine().sample_rate());
+
+	save_item(NAME(m_position));
+	save_item(NAME(m_position_time));
+	save_item(NAME(m_value));
+	save_item(NAME(m_channel));
+	save_item(NAME(m_direction));
 }
 
 const software_list_loader &cassette_image_device::get_software_list_loader() const
