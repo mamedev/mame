@@ -182,8 +182,9 @@ Super Pacman (2008)
 Wasp (2009)
 
 Notes:
-The Atari 7800, like many early consoles, had cartridges with more than 1 chip on board.  This list currently shows the older (all-in-1)
-type of ROM dumps.  Effort will be made at a later date to split them and document the chips/labels/markings on them.
+Most games contain only one ROM and only a small number contain more than one ROM,
+generally limited to early 32k games (2x 16k) and the 48k games (1x 16k + 1x 32k).
+Efforts are being made to document the chips/labels/markings on them.
 
 -->
 
@@ -2031,7 +2032,7 @@ almost nothing like the prototype.
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_act" />
 			<dataarea name="rom" size="0x20000">
-				<rom name="rampage.bin" size="0x20000" crc="d2876ee2" sha1="17401f85fe8b453a6b43b3d0035d993b90568efc"/>
+				<rom name="dei-364nr-rmpgda1_(c)_ncr_a8928_609-2936005.u1" size="0x20000" crc="d2876ee2" sha1="17401f85fe8b453a6b43b3d0035d993b90568efc"/>
 			</dataarea>
 		</part>
 	</software>

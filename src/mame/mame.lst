@@ -20542,7 +20542,8 @@ mgcsb
 mgdh
 mgdha
 sdmg2
-sdmg2a
+sdmg2754ca
+sdmg2754cb
 sdmg2p
 slqz2
 slqz2a
@@ -42618,6 +42619,9 @@ bert
 
 @source:skeleton/biorhythm.cpp
 biorhthm
+
+@source:skeleton/biorhythm_fp.cpp
+biortmfp
 
 @source:skeleton/bitgraph.cpp
 bitgrpha
