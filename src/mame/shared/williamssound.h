@@ -223,7 +223,7 @@ private:
 	void williams_s4_map(address_map &map) ATTR_COLD;
 	required_device<m6808_cpu_device> m_cpu;
 	required_device<pia6821_device> m_pia;
-	u8 m_dummy = 0;   // needed for save-state support
+	bool m_dummy_save = false; // needed for save-state support
 };
 
 
@@ -254,7 +254,7 @@ private:
 	required_device<m6802_cpu_device> m_cpu;
 	required_device<pia6821_device> m_pia;
 	required_device<hc55516_device> m_hc;
-	u8 m_dummy = 0;   // needed for save-state support
+	bool m_dummy_save = false; // needed for save-state support
 };
 
 
@@ -285,7 +285,7 @@ private:
 	required_device<m6802_cpu_device> m_cpu;
 	required_device<pia6821_device> m_pia;
 	required_device<hc55516_device> m_hc;
-	u8 m_dummy = 0;   // needed for save-state support
+	bool m_dummy_save = false; // needed for save-state support
 };
 
 
@@ -317,7 +317,7 @@ private:
 	required_device<m6802_cpu_device> m_cpu;
 	required_device<pia6821_device> m_pia;
 	required_device<hc55516_device> m_hc;
-	u8 m_dummy = 0;   // needed for save-state support
+	bool m_dummy_save = false; // needed for save-state support
 };
 
 #endif // MAME_SHARED_WILLIAMSSOUND_H

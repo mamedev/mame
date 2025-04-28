@@ -71,7 +71,7 @@ protected:
 	required_device<mos6530_device> m_r6530;
 
 private:
-	u8 m_dummy; // needed for save-state support
+	bool m_dummy_save = false; // needed for save-state support
 };
 
 
@@ -129,7 +129,7 @@ protected:
 	required_device<mos6532_device> m_riot;
 
 private:
-	u8 m_dummy; // needed for save-state support
+	bool m_dummy_save = false; // needed for save-state support
 };
 
 

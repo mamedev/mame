@@ -24,7 +24,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 
 private:
-	u8 m_dummy = 0; // needed for save-state support
+	bool m_dummy_save = false; // needed for save-state support
 };
 
 #endif // MAME_SOUND_MIXER_H

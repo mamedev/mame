@@ -19,7 +19,7 @@ plg1x0_connector::plg1x0_connector(const machine_config &mconfig, const char *ta
 
 void plg1x0_connector::device_start()
 {
-	save_item(NAME(m_state_system_is_annoying));
+	save_item(NAME(m_dummy_save));
 }
 
 void plg1x0_connector::midi_rx(int state)

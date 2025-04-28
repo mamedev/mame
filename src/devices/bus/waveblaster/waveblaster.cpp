@@ -22,7 +22,7 @@ waveblaster_connector::waveblaster_connector(const machine_config &mconfig, cons
 
 void waveblaster_connector::device_start()
 {
-	save_item(NAME(m_state_system_is_annoying));
+	save_item(NAME(m_dummy_save));
 }
 
 void waveblaster_connector::midi_rx(int state)

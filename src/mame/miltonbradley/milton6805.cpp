@@ -91,6 +91,7 @@ protected:
 private:
 	sound_stream *m_stream = nullptr;
 	output_finder<> m_led_out;
+	bool m_dummy_save = false; // needed for save-state support
 };
 
 DEFINE_DEVICE_TYPE(MILTON_LED_FILTER, milton_filter_device, "milton_led_filter", "Milton LED Filter")
@@ -106,6 +107,7 @@ void milton_filter_device::device_start()
 {
 	m_stream = stream_alloc(1, 1, machine().sample_rate());
 	m_led_out.resolve();
+	save_item(NAME(m_dummy_save));
 }
 
 void milton_filter_device::sound_stream_update(sound_stream &stream)
