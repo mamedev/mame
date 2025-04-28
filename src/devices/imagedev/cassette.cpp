@@ -72,7 +72,7 @@ void cassette_image_device::device_config_complete()
 {
 	m_extension_list[0] = '\0';
 	for (int i = 0; m_formats[i]; i++ )
-		image_specify_extension( m_extension_list, 256, m_formats[i]->extensions );
+		image_specify_extension(m_extension_list, 256, m_formats[i]->extensions);
 }
 
 
@@ -86,9 +86,9 @@ void cassette_image_device::update()
 
 	if (!is_stopped() && motor_on())
 	{
-		double new_position = m_position + (cur_time - m_position_time)*m_speed*m_direction;
+		double new_position = m_position + (cur_time - m_position_time) * m_speed * m_direction;
 
-		switch (int(m_state & CASSETTE_MASK_UISTATE)) // cast to int to suppress unhandled enum value warning
+		switch (m_state & CASSETTE_MASK_UISTATE) // cast to int to suppress unhandled enum value warning
 		{
 		case CASSETTE_RECORD:
 			m_cassette->put_sample(m_channel, m_position, new_position - m_position, m_value);
@@ -111,6 +111,9 @@ void cassette_image_device::update()
 					new_position = 0;
 				}
 			}
+			break;
+
+		default:
 			break;
 		}
 		m_position = new_position;
@@ -167,7 +170,7 @@ double cassette_image_device::get_position()
 	double position = m_position;
 
 	if (!is_stopped() && motor_on())
-		position += (machine().time().as_double() - m_position_time)*m_speed*m_direction;
+		position += (machine().time().as_double() - m_position_time) * m_speed * m_direction;
 	return position;
 }
 
@@ -235,6 +238,9 @@ void cassette_image_device::seek(double time, int origin)
     cassette device init/load/unload/specify
 *********************************************************************/
 
+// allow save_item on a non-fundamental type
+ALLOW_SAVE_TYPE(cassette_state);
+
 void cassette_image_device::device_start()
 {
 	/* set to default state */
@@ -242,12 +248,14 @@ void cassette_image_device::device_start()
 	m_state = m_default_state;
 	m_value = 0;
 
-	stream_alloc(0, m_stereo? 2:1, machine().sample_rate());
+	stream_alloc(0, m_stereo ? 2 : 1, machine().sample_rate());
 
+	save_item(NAME(m_state));
 	save_item(NAME(m_position));
 	save_item(NAME(m_position_time));
 	save_item(NAME(m_value));
 	save_item(NAME(m_channel));
+	save_item(NAME(m_speed));
 	save_item(NAME(m_direction));
 }
 
