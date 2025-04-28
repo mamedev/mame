@@ -312,7 +312,7 @@ void DISCRETE_CLASS_NAME(dss_input_stream)::stream_start(void)
 		discrete_sound_device *snd_device = downcast<discrete_sound_device *>(m_device);
 		//assert(DSS_INPUT_STREAM__STREAM < snd_device->m_input_stream_list.count());
 
-		m_buffer_stream = m_device->machine().sound().stream_alloc(*snd_device, 0, 1, this->sample_rate(), stream_update_delegate(&discrete_dss_input_stream_node::stream_generate,this), STREAM_DEFAULT_FLAGS);
+		m_buffer_stream = m_device->machine().sound().stream_alloc(*snd_device, 1, 1, this->sample_rate(), stream_update_delegate(&discrete_dss_input_stream_node::stream_generate,this), STREAM_DEFAULT_FLAGS);
 
 		// WTF?
 		//		snd_device->get_stream()->set_input(m_stream_in_number, m_buffer_stream);

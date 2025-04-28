@@ -197,6 +197,8 @@ bool avi_movie_recording::initialize(running_machine &machine, std::unique_ptr<e
 	info.audio_samplebits = 16;
 	info.audio_samplerate = machine.sample_rate();
 
+	m_channels = info.audio_channels;
+
 	// compute the frame time
 	set_frame_period(attotime::from_ticks(info.video_sampletime, info.video_timescale));
 
