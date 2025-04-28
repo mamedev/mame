@@ -1860,7 +1860,7 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 	m_sliders.clear();
 
 	// add overall volume
-	slider_alloc(_("Master Volume"), -96, 0, 12, 1, std::bind(&mame_ui_manager::slider_volume, this, _1, _2));
+	slider_alloc(_("Master Volume"), -960, 0, 120, 10, std::bind(&mame_ui_manager::slider_volume, this, _1, _2));
 
 	// add per-sound device and per-sound device channel volume
 	for (device_sound_interface &snd : sound_interface_enumerator(machine.root_device()))
@@ -1869,10 +1869,10 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 		if (dynamic_cast<sound_io_device *>(&snd) || !snd.outputs())
 			continue;
 
-		slider_alloc(util::string_format(_("%1$s volume"), snd.device().tag()), -96, 0, 12, 1, std::bind(&mame_ui_manager::slider_devvol, this, &snd, _1, _2));
+		slider_alloc(util::string_format(_("%1$s volume"), snd.device().tag()), -960, 0, 120, 10, std::bind(&mame_ui_manager::slider_devvol, this, &snd, _1, _2));
 		if (snd.outputs() != 1)
 			for (int channel = 0; channel != snd.outputs(); channel ++)
-				slider_alloc(util::string_format(_("%1$s channel %d volume"), snd.device().tag(), channel), -96, 0, 12, 1, std::bind(&mame_ui_manager::slider_devvol_chan, this, &snd, channel, _1, _2));
+				slider_alloc(util::string_format(_("%1$s channel %d volume"), snd.device().tag(), channel), -960, 0, 120, 10, std::bind(&mame_ui_manager::slider_devvol_chan, this, &snd, channel, _1, _2));
 	}
 
 	// add analog adjusters
@@ -2015,16 +2015,18 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 int32_t mame_ui_manager::slider_volume(std::string *str, int32_t newval)
 {
 	if (newval != SLIDER_NOCHANGE)
-		machine().sound().set_master_gain(newval == -96 ? 0 : osd::db_to_linear(newval));
+		machine().sound().set_master_gain(newval == -960 ? 0 : osd::db_to_linear(newval * 0.1f));
 
-	int curval = machine().sound().master_gain() == 0 ? -96 : osd::linear_to_db_int(machine().sound().master_gain());
+	int curval = machine().sound().master_gain() == 0 ? -960 : floorf(osd::linear_to_db(machine().sound().master_gain()) * 10.0f + 0.5f);
 
 	if (str)
 	{
-		if (curval == -96)
+		if (curval == -960)
 			*str = _("Mute");
+		else if (curval % 10)
+			*str = string_format(_(u8"%1$5.1f\u00a0dB"), float(curval) * 0.1f);
 		else
-			*str = string_format(_(u8"%1$3d\u00a0dB"), curval);
+			*str = string_format(_(u8"%1$3d\u00a0dB"), curval / 10);
 	}
 	return curval;
 }
@@ -2038,16 +2040,18 @@ int32_t mame_ui_manager::slider_volume(std::string *str, int32_t newval)
 int32_t mame_ui_manager::slider_devvol(device_sound_interface *snd, std::string *str, int32_t newval)
 {
 	if (newval != SLIDER_NOCHANGE)
-		snd->set_user_output_gain(newval == -96 ? 0 : osd::db_to_linear(newval));
+		snd->set_user_output_gain(newval == -960 ? 0 : osd::db_to_linear(newval * 0.1f));
 
-	int curval = snd->user_output_gain() == 0 ? -96 : osd::linear_to_db_int(snd->user_output_gain());
+	int curval = snd->user_output_gain() == 0 ? -96 : floorf(osd::linear_to_db(snd->user_output_gain()) * 10.0f + 0.5f);
 
 	if (str)
 	{
-		if (curval == -96)
+		if (curval == -960)
 			*str = _("Mute");
+		else if (curval % 10)
+			*str = string_format(_(u8"%1$5.1f\u00a0dB"), float(curval) * 0.1f);
 		else
-			*str = string_format(_(u8"%1$3d\u00a0dB"), curval);
+			*str = string_format(_(u8"%1$3d\u00a0dB"), curval / 10);
 	}
 	return curval;
 }
@@ -2061,16 +2065,18 @@ int32_t mame_ui_manager::slider_devvol(device_sound_interface *snd, std::string 
 int32_t mame_ui_manager::slider_devvol_chan(device_sound_interface *snd, int channel, std::string *str, int32_t newval)
 {
 	if (newval != SLIDER_NOCHANGE)
-		snd->set_user_output_gain(channel, newval == -96 ? 0 : osd::db_to_linear(newval));
+		snd->set_user_output_gain(channel, newval == -960 ? 0 : osd::db_to_linear(newval * 0.1f));
 
-	int curval = snd->user_output_gain(channel) == 0 ? -96 : osd::linear_to_db_int(snd->user_output_gain(channel));
+	int curval = snd->user_output_gain(channel) == 0 ? -960 : floorf(osd::linear_to_db(snd->user_output_gain(channel)) * 10.0f + 0.5f);
 
 	if (str)
 	{
-		if (curval == -96)
+		if (curval == -960)
 			*str = _("Mute");
+		else if (curval % 10)
+			*str = string_format(_(u8"%1$5.1f\u00a0dB"), float(curval) * 0.1f);
 		else
-			*str = string_format(_(u8"%1$3d\u00a0dB"), curval);
+			*str = string_format(_(u8"%1$3d\u00a0dB"), curval / 10);
 	}
 	return curval;
 }

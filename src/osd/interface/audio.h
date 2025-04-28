@@ -47,7 +47,6 @@ struct audio_info {
 
 static inline float db_to_linear(float db) { return db <= -96 ? 0.0 : pow(10, db/20); }
 static inline float linear_to_db(float linear) { return linear <= 1/65536.0 ? -96 : 20*log10(linear); }
-static inline int linear_to_db_int(float linear) { return linear <= 1/65536.0 ? -96 : int(floor(20*log10(linear) + 0.5)); }
 }
 
 #endif
