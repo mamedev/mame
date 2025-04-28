@@ -2042,7 +2042,7 @@ int32_t mame_ui_manager::slider_devvol(device_sound_interface *snd, std::string 
 	if (newval != SLIDER_NOCHANGE)
 		snd->set_user_output_gain(newval == -960 ? 0 : osd::db_to_linear(newval * 0.1f));
 
-	int curval = snd->user_output_gain() == 0 ? -96 : floorf(osd::linear_to_db(snd->user_output_gain()) * 10.0f + 0.5f);
+	int curval = snd->user_output_gain() == 0 ? -960 : floorf(osd::linear_to_db(snd->user_output_gain()) * 10.0f + 0.5f);
 
 	if (str)
 	{
