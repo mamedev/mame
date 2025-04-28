@@ -117,7 +117,7 @@ void dac76_device::sound_stream_update(sound_stream &stream)
 
 	if (m_voltage_output)
 	{
-		static constexpr const float FULL_SCALE_MULT = 3.8F;  // From datasheet.
+		constexpr float FULL_SCALE_MULT = 3.8F;  // From datasheet.
 		y *= ((y >= 0) ? m_r_pos : m_r_neg) * FULL_SCALE_MULT;
 	}
 
