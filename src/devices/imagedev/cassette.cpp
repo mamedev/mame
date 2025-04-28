@@ -40,8 +40,8 @@ cassette_image_device::cassette_image_device(const machine_config &mconfig, cons
 	device_sound_interface(mconfig, *this),
 	m_cassette(nullptr),
 	m_state(CASSETTE_STOPPED),
-	m_position(0),
-	m_position_time(0),
+	m_position(0.0),
+	m_position_time(0.0),
 	m_value(0),
 	m_channel(0),
 	m_speed(0),
@@ -71,7 +71,7 @@ cassette_image_device::~cassette_image_device()
 void cassette_image_device::device_config_complete()
 {
 	m_extension_list[0] = '\0';
-	for (int i = 0; m_formats[i]; i++ )
+	for (int i = 0; m_formats[i]; i++)
 		image_specify_extension(m_extension_list, 256, m_formats[i]->extensions);
 }
 
@@ -88,7 +88,7 @@ void cassette_image_device::update()
 	{
 		double new_position = m_position + (cur_time - m_position_time) * m_speed * m_direction;
 
-		switch (m_state & CASSETTE_MASK_UISTATE) // cast to int to suppress unhandled enum value warning
+		switch (m_state & CASSETTE_MASK_UISTATE)
 		{
 		case CASSETTE_RECORD:
 			m_cassette->put_sample(m_channel, m_position, new_position - m_position, m_value);
@@ -105,10 +105,10 @@ void cassette_image_device::update()
 					m_state = (m_state & ~CASSETTE_MASK_UISTATE) | CASSETTE_STOPPED;
 					new_position = length;
 				}
-				else if (new_position < 0)
+				else if (new_position < 0.0)
 				{
 					m_state = (m_state & ~CASSETTE_MASK_UISTATE) | CASSETTE_STOPPED;
-					new_position = 0;
+					new_position = 0.0;
 				}
 			}
 			break;
@@ -141,12 +141,11 @@ void cassette_image_device::change_state(cassette_state state, cassette_state ma
 double cassette_image_device::input()
 {
 	update();
-	int32_t sample = m_value;
-	double double_value = sample / (double(0x7FFFFFFF));
+	double value = m_value / (double(0x7fffffff));
 
-	LOGMASKED(LOG_DETAIL, "cassette_input(): time_index=%g value=%g\n", m_position, double_value);
+	LOGMASKED(LOG_DETAIL, "cassette_input(): time_index=%g value=%g\n", m_position, value);
 
-	return double_value;
+	return value;
 }
 
 
@@ -157,10 +156,8 @@ void cassette_image_device::output(double value)
 	{
 		update();
 
-		value = std::min(value, 1.0);
-		value = std::max(value, -1.0);
-
-		m_value = int32_t(value * 0x7FFFFFFF);
+		value = std::clamp(value, -1.0, 1.0);
+		m_value = int32_t(value * 0x7fffffff);
 	}
 }
 
@@ -209,7 +206,8 @@ void cassette_image_device::seek(double time, int origin)
 
 	double length = get_length();
 
-	switch(origin) {
+	switch (origin)
+	{
 	case SEEK_SET:
 		break;
 
@@ -222,14 +220,8 @@ void cassette_image_device::seek(double time, int origin)
 		break;
 	}
 
-	/* clip position into legal bounds */
-	if (time < 0)
-		time = 0;
-	else
-	if (time > length)
-		time = length;
-
-	m_position = time;
+	// clip position into legal bounds
+	m_position = std::clamp(time, 0.0, length);
 }
 
 
@@ -243,7 +235,7 @@ ALLOW_SAVE_TYPE(cassette_state);
 
 void cassette_image_device::device_start()
 {
-	/* set to default state */
+	// set to default state
 	m_cassette = nullptr;
 	m_state = m_default_state;
 	m_value = 0;
@@ -281,6 +273,7 @@ bool cassette_image_device::has_any_extension(std::string_view candidate_extensi
 	for (std::string extension; std::getline(extension_stream, extension, separator);)
 		if (is_filetype(extension))
 			return true;
+
 	return false;
 }
 
@@ -291,7 +284,7 @@ std::error_condition cassette_image_device::internal_load(bool is_create)
 	interface(image);
 
 	check_for_file();
-	if (is_create || (length()==0)) // empty existing images are fine to write over.
+	if (is_create || (length() == 0)) // empty existing images are fine to write over.
 	{
 		auto io = util::random_read_write_fill(image_core_file(), 0x00);
 		if (io)
@@ -343,19 +336,19 @@ std::error_condition cassette_image_device::internal_load(bool is_create)
 				retry = true;
 			}
 		}
-		while(retry);
+		while (retry);
 	}
 
 	if (err == cassette_image::error::SUCCESS)
 	{
-		/* set to default state, but only change the UI state */
+		// set to default state, but only change the UI state
 		change_state(m_default_state, CASSETTE_MASK_UISTATE);
 
-		/* reset the position */
+		// reset the position
 		m_position = 0.0;
 		m_position_time = machine().time().as_double();
 
-		/* default channel to 0, speed multiplier to 1 */
+		// default channel to 0, speed multiplier to 1
 		m_channel = 0;
 		m_speed = 1;
 		m_direction = 1;
@@ -391,14 +384,14 @@ std::error_condition cassette_image_device::internal_load(bool is_create)
 
 void cassette_image_device::call_unload()
 {
-	/* if we are recording, write the value to the image */
+	// if we are recording, write the value to the image
 	if ((m_state & CASSETTE_MASK_UISTATE) == CASSETTE_RECORD)
 		update();
 
-	/* close out the cassette */
+	// close out the cassette
 	m_cassette.reset();
 
-	/* set to default state, but only change the UI state */
+	// set to default state, but only change the UI state
 	change_state(CASSETTE_STOPPED, CASSETTE_MASK_UISTATE);
 }
 
@@ -429,8 +422,8 @@ std::string cassette_image_device::call_display()
 
 		// play or record
 		const char *status_icon = (uistate == CASSETTE_PLAY)
-			? u8"\u25BA"
-			: u8"\u25CF";
+			? u8"\u25ba"
+			: u8"\u25cf";
 
 		// create information string
 		result = string_format("%s %s %02d:%02d (%04d) [%02d:%02d (%04d)]",

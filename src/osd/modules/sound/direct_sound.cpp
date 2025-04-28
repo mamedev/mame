@@ -310,7 +310,7 @@ void sound_direct_sound::stream_sink_update(
 	if (DS_OK != result)
 		return;
 
-//DWORD orig_write = write_position;
+	//DWORD orig_write = write_position;
 	// normalize the write position so it is always after the play position
 	if (write_position < play_position)
 		write_position += m_stream_buffer.size();
@@ -326,7 +326,7 @@ void sound_direct_sound::stream_sink_update(
 	// if we're between play and write positions, then bump forward, but only in full chunks
 	while (stream_in < write_position)
 	{
-//printf("Underflow: PP=%d  WP=%d(%d)  SI=%d(%d)  BTF=%d\n", (int)play_position, (int)write_position, (int)orig_write, (int)stream_in, (int)m_stream_buffer_in, (int)bytes_this_frame);
+		//printf("Underflow: PP=%d  WP=%d(%d)  SI=%d(%d)  BTF=%d\n", (int)play_position, (int)write_position, (int)orig_write, (int)stream_in, (int)m_stream_buffer_in, (int)bytes_this_frame);
 		m_buffer_underflows++;
 		stream_in += bytes_this_frame;
 	}
@@ -334,7 +334,7 @@ void sound_direct_sound::stream_sink_update(
 	// if we're going to overlap the play position, just skip this chunk
 	if ((stream_in + bytes_this_frame) > (play_position + m_stream_buffer.size()))
 	{
-//printf("Overflow: PP=%d  WP=%d(%d)  SI=%d(%d)  BTF=%d\n", (int)play_position, (int)write_position, (int)orig_write, (int)stream_in, (int)m_stream_buffer_in, (int)bytes_this_frame);
+		//printf("Overflow: PP=%d  WP=%d(%d)  SI=%d(%d)  BTF=%d\n", (int)play_position, (int)write_position, (int)orig_write, (int)stream_in, (int)m_stream_buffer_in, (int)bytes_this_frame);
 		m_buffer_overflows++;
 		return;
 	}
