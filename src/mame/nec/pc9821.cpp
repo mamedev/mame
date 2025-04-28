@@ -533,8 +533,10 @@ void pc9821_state::pc9821_io(address_map &map)
  * 98MATE A overrides
  */
 // TODO: SDIP extended access for 9821Ap, As, Ae
-// It never r/w the conventional ports, at least on POST.
+// Undocumented, it never r/w the conventional ports, at least on POST.
 // I also suspect a few ports here not being direct RAM r/w but actual regs instead.
+// 0xf834f: checks against aa55, throws "ROM SUM ERROR" if bypassed
+// 0xf8363: sum8 contents of [0x02], 10 times (???)
 u8 pc9821_mate_a_state::ext_sdip_data_r(offs_t offset)
 {
 	logerror("%s: EXT SDIP access read %02x %02x\n", machine().describe_context(), m_ext_sdip_addr, m_ext_sdip[m_ext_sdip_addr]);
@@ -543,6 +545,8 @@ u8 pc9821_mate_a_state::ext_sdip_data_r(offs_t offset)
 
 void pc9821_mate_a_state::ext_sdip_data_w(offs_t offset, u8 data)
 {
+	logerror("%s: EXT SDIP access write [%02x] -> %02x\n", machine().describe_context(), m_ext_sdip_addr, data);
+
 	m_ext_sdip[m_ext_sdip_addr] = data;
 }
 
@@ -589,6 +593,9 @@ void pc9821_mate_a_state::pc9821as_map(address_map &map)
 	pc9821_map(map);
 	map(0x000f8000, 0x000fffff).view(m_bios_view);
 	// TODO: remaining settings
+	// pc9821as uses this
+	m_bios_view[4](0x000f8000, 0x000fffff).rom().region("biosrom", 0x10000);
+	// setup mode
 	m_bios_view[6](0x000f8000, 0x000fffff).rom().region("biosrom", 0x18000);
 }
 
@@ -1069,9 +1076,16 @@ ROM_START( pc9821as )
 	ROM_LOAD( "mvs0100-1.bin", 0x00000, 0x80000, CRC(ca37b631) SHA1(8c481dd0608d6c27235bc88bd77e345628dc28a1) )
 
 	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
-	// backported from pc9821ap2
+	// 0x00000-0x04fff KBCRT X47 891105
+	// 0x0c000-0x0ffff sound BIOS
+	// 0x10000-0x13fff ^ mirror
+	// 0x14000-0x16fff <unknown>
+	// 0x17000-0x17fff SCSI disk BIOS?
+	// 0x18000-0x19fff <unknown>
+	// 0x1a000-0x1ffff setup menu
 	ROM_COPY( "biosrom", 0x20000, 0x10000, 0x08000 ) // ITF
 	ROM_COPY( "biosrom", 0x28000, 0x18000, 0x18000 ) // BIOS
+	// 0x50000-0x57fff ? (copies stuff from $e4000, jumps there)
 
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font_as.rom",     0x000000, 0x046800, BAD_DUMP CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff) )
@@ -1104,7 +1118,7 @@ ROM_START( pc9821ap2 )
 	// 0x10000-0x13fff ^ mirror of above?
 	// 0x14000-0x14ff0 <unknown>
 	// 0x16000-0x19fff contains refs to 765 and HDDs "Conner Peripherals", IDE BIOS?
-	// 0x1c000-0x1ffff contains refs to SDIP setup
+	// 0x1a000-0x1ffff setup menu
 	ROM_COPY( "biosrom", 0x20000, 0x10000, 0x08000 ) // ITF
 	ROM_COPY( "biosrom", 0x28000, 0x18000, 0x18000 ) // BIOS
 	// 0x40000-0x4ffff empty
@@ -1117,7 +1131,9 @@ ROM_START( pc9821ap2 )
 	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
 
 	LOAD_KANJI_ROMS
-	LOAD_IDE_ROM
+
+	ROM_REGION( 0x4000, "ide", ROMREGION_ERASEVAL(0xcb) )
+	ROM_COPY( "biosrom", 0x18000, 0x00000, 0x02000 )
 ROM_END
 
 
@@ -1178,7 +1194,9 @@ ROM_START( pc9821cx3 )
 	// 0x40000: IDE BIOS (NEC D3766 / Caviar CP30344 / WDC AC2340H)
 	// 0x42000: setup menu
 	ROM_COPY( "biosrom", 0x78000, 0x10000, 0x08000 ) // ITF
-	ROM_COPY( "biosrom", 0x60000, 0x18000, 0x18000 ) // BIOS, probably wrong (reset vector at 0x67ff0)
+	ROM_COPY( "biosrom", 0x70000, 0x18000, 0x08000 ) // BIOS, probably wrong (reset vector at 0x67ff0)
+	ROM_COPY( "biosrom", 0x68000, 0x20000, 0x08000 )
+	ROM_COPY( "biosrom", 0x60000, 0x28000, 0x08000 )
 
 	// "microcode" memory dump, probably identical to above but shuffled
 	// left for consultation
@@ -1242,7 +1260,9 @@ ROM_START( pc9821xa16 )
 	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
 	// TODO: all of the 256k space seems valid
 	ROM_COPY( "biosrom", 0x28000, 0x00000, 0x18000 )
-	ROM_COPY( "biosrom", 0x00000, 0x18000, 0x18000 )
+	ROM_COPY( "biosrom", 0x20000, 0x28000, 0x08000 )
+	ROM_COPY( "biosrom", 0x18000, 0x20000, 0x08000 )
+	ROM_COPY( "biosrom", 0x10000, 0x18000, 0x08000 )
 
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )

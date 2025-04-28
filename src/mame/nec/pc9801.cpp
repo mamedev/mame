@@ -1246,7 +1246,7 @@ void pc9801us_state::pc9801us_io(address_map &map)
 		NAME([this] (offs_t offset) { return m_sdip->read((offset >> 8) + 4); }),
 		NAME([this] (offs_t offset, u8 data) { m_sdip->write((offset >> 8) + 4, data); })
 	);
-//  map(0x8f1f, 0x8f1f).w(m_sdip, FUNC(pc98_sdip_device::bank_w));
+//	map(0x8f1f, 0x8f1f).w(m_sdip, FUNC(pc98_sdip_device::bank_w));
 }
 
 void pc9801bx_state::pc9801bx2_map(address_map &map)
@@ -2640,8 +2640,8 @@ void pc9801us_state::pc9801fs(machine_config &config)
 
 	pit_clock_config(config, xtal / 4);
 
-//  PC98_119_KBD(config.replace(), m_keyb, 0);
-//  m_keyb->rxd_callback().set("sio_kbd", FUNC(i8251_device::write_rxd));
+//	PC98_119_KBD(config.replace(), m_keyb, 0);
+//	m_keyb->rxd_callback().set("sio_kbd", FUNC(i8251_device::write_rxd));
 
 	PC98_SDIP(config, "sdip", 0);
 }
@@ -2945,6 +2945,11 @@ ROM_START( pc9801fs )
 	ROM_LOAD16_BYTE( "kqx02_00.bin",  0x000001, 0x020000, CRC(f55e42d6) SHA1(2ab0ae817e9abed984544c920182689127550ce3) )
 
 	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+	// 0x0c000-0x0ffff sound ROM BIOS
+	// 0x10000-0x13fff ^ mirror
+	// 0x14000-0x16fff <unknown>
+	// 0x17000-0x17fff SCSI disk BIOS?
+	// 0x18000-0x1ffff <empty>
 	ROM_COPY( "biosrom", 0x20000, 0x10000, 0x08000 )  //ITF ROM
 	ROM_COPY( "biosrom", 0x28000, 0x18000, 0x08000 )  //BIOS ROM
 	ROM_COPY( "biosrom", 0x30000, 0x20000, 0x08000 )
