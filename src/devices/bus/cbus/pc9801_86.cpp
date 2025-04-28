@@ -104,10 +104,11 @@ void pc9801_86_device::pc9801_86_config(machine_config &config)
 	m_opna->add_route(1, "speaker", 1.00, 0);
 	m_opna->add_route(2, "speaker", 1.00, 1);
 
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // burr brown pcm61p
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // burr brown pcm61p
+	// 2x burr brown pcm61p
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
-	// NOTE: 1 DE-9 port only
+	// NOTE: 1x DE-9 port only
 	MSX_GENERAL_PURPOSE_PORT(config, m_joy, msx_general_purpose_port_devices, "joystick");
 }
 
