@@ -1961,6 +1961,7 @@ ROM_START( touchgona )
 	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "v_us_56_f546_14-11.ic56", 0x000000, 0x080000, CRC(3bfe2010) SHA1(bd1584e89c6201dd0e88be3f7c19e5820c43bfee) )
 	ROM_LOAD16_BYTE( "v_us_57_d888_14-11.ic57", 0x000001, 0x080000, CRC(c8a9e7bd) SHA1(4d84c34713f63789b51fdee17ca0d77c0e259740) )
+	ROM_FILL( 0x1, 1, 0xfe ) // initial stack pointer in u57 points to ROM not RAM, but checksum matched label?!
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) // DS5002FP code
 	ROM_LOAD( "touchgo_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(6a238adb) SHA1(4ac5ff8e3d90454f764477146a0b8dc8c8062420) )
@@ -2843,7 +2844,7 @@ GAME( 1994, aligatorp,   aligator,  alighunt_d5002fp, alighunt, gaelco2_state,  
 
 GAME( 1996, touchgo,     0,         touchgo_d5002fp,  touchgo,  gaelco2_state,  init_touchgo,   ROT0, "Gaelco", "Touch and Go (World, 05/Feb/1996, checksum 059D0235)",             0 )
 GAME( 1995, touchgoa,    touchgo,   touchgo_d5002fp,  touchgo,  gaelco2_state,  init_touchgo,   ROT0, "Gaelco", "Touch and Go (World, 11/Dec/1995, checksum 05A0C7FB)",             0 )
-GAME( 1995, touchgona,   touchgo,   touchgo_d5002fp,  touchgo,  gaelco2_state,  init_touchgo,   ROT0, "Gaelco", "Touch and Go (North America, 14/Nov/1995)",                        MACHINE_NOT_WORKING )
+GAME( 1995, touchgona,   touchgo,   touchgo_d5002fp,  touchgo,  gaelco2_state,  init_touchgo,   ROT0, "Gaelco", "Touch and Go (North America, 14/Nov/1995, checksum 05737572)",     0 )
 GAME( 1995, touchgonna,  touchgo,   touchgo_d5002fp,  touchgo,  gaelco2_state,  init_touchgo,   ROT0, "Gaelco", "Touch and Go (non North America, 16/Nov/1995, checksum 056533F0)", 0 )
 GAME( 1995, touchgonnaa, touchgo,   touchgo_d5002fp,  touchgo,  gaelco2_state,  init_touchgo,   ROT0, "Gaelco", "Touch and Go (non North America, 15/Nov/1995, checksum 056C2336)", 0 )
 GAME( 1995, touchgonnab, touchgo,   touchgo_d5002fp,  touchgo,  gaelco2_state,  init_touchgo,   ROT0, "Gaelco", "Touch and Go (non North America, 15/Nov/1995, checksum 056C138F)", 0 )
