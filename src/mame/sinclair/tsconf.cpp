@@ -305,10 +305,6 @@ void tsconf_state::tsconf(machine_config &config)
 	m_beta->out_dos_callback().set(FUNC(tsconf_state::update_io));
 	m_beta->out_vdos_m1_callback().set([this](int state) { m_update_on_m1 = true; });
 
-	SPI_SDCARD(config, m_sdcard, 0);
-	m_sdcard->set_prefer_sdhc();
-	m_sdcard->spi_miso_callback().set(FUNC(tsconf_state::tsconf_spi_miso_w));
-
 	SPEAKER(config, "speakers", 2).front();
 
 	config.device_remove("ay8912");
