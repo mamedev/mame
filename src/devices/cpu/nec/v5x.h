@@ -36,12 +36,7 @@ public:
 
 	// SCU
 	auto txd_handler_cb() { return m_scu.lookup()->txd_handler(); }
-	auto dtr_handler_cb() { return m_scu.lookup()->dtr_handler(); }
-	auto rts_handler_cb() { return m_scu.lookup()->rts_handler(); }
-	auto rxrdy_handler_cb() { return m_scu.lookup()->rxrdy_handler(); }
-	auto txrdy_handler_cb() { return m_scu.lookup()->txrdy_handler(); }
-	auto txempty_handler_cb() { return m_scu.lookup()->txempty_handler(); }
-	auto syndet_handler_cb() { return m_scu.lookup()->syndet_handler(); }
+	void rxd_w(int state) { m_scu->write_rxd(state); }
 
 protected:
 	device_v5x_interface(const machine_config &mconfig, nec_common_device &device, bool is_16bit);
@@ -190,14 +185,16 @@ protected:
 
 private:
 	void tout1_w(int state);
+	void sint_w(int state);
 
 	devcb_write_line m_tout1_callback;
 	devcb_read8 m_icu_slave_ack;
 
 	u8 m_OPCN;
-	bool m_tout1;
-	bool m_intp1;
-	bool m_intp2;
+	u8 m_tout1;
+	u8 m_sint;
+	u8 m_intp1;
+	u8 m_intp2;
 };
 
 class v40_device : public v50_base_device
@@ -238,6 +235,14 @@ public:
 	void hack_w(int state);
 
 	template <unsigned Timer> auto tout_handler() { return m_tcu.lookup()->out_handler<Timer>(); }
+
+	// SCU
+	auto dtr_handler_cb() { return m_scu.lookup()->dtr_handler(); }
+	auto rts_handler_cb() { return m_scu.lookup()->rts_handler(); }
+	auto rxrdy_handler_cb() { return m_scu.lookup()->rxrdy_handler(); }
+	auto txrdy_handler_cb() { return m_scu.lookup()->txrdy_handler(); }
+	auto txempty_handler_cb() { return m_scu.lookup()->txempty_handler(); }
+	auto syndet_handler_cb() { return m_scu.lookup()->syndet_handler(); }
 
 protected:
 	v53_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
