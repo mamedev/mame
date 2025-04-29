@@ -798,8 +798,8 @@ void macpbmsc_state::macpd210(machine_config &config)
 	m_msc->set_pmu_tag("pge");
 	m_msc->set_rom_tag("bootrom");
 	m_msc->set_cpu_clock(25_MHz_XTAL);
-	m_msc->add_route(0, m_dfac, 1.0);
-	m_msc->add_route(1, m_dfac, 1.0);
+	m_msc->add_route(0, m_dfac, 1.0, 0);
+	m_msc->add_route(1, m_dfac, 1.0, 1);
 	m_msc->cb2_callback().set(m_pmu, FUNC(m68hc05pge_device::spi_miso_w));
 	m_msc->vbl_callback().set(FUNC(macpbmsc_state::vbl_w));
 

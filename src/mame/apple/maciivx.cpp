@@ -370,8 +370,8 @@ void maciivx_state::maciiv_base(machine_config &config)
 	m_vasp->set_maincpu_tag("maincpu");
 	m_vasp->set_rom_tag("bootrom");
 	m_vasp->hdsel_callback().set(FUNC(maciivx_state::hdsel_w));
-	m_vasp->add_route(0, m_dfac, 1.0);
-	m_vasp->add_route(1, m_dfac, 1.0);
+	m_vasp->add_route(0, m_dfac, 1.0, 0);
+	m_vasp->add_route(1, m_dfac, 1.0, 1);
 
 	MACADB(config, m_macadb, C15M);
 

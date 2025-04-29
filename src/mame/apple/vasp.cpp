@@ -91,8 +91,8 @@ void vasp_device::device_add_mconfig(machine_config &config)
 	m_pseudovia->irq_callback().set(FUNC(vasp_device::via2_irq));
 
 	ASC(config, m_asc, C15M, asc_device::asc_type::VASP);
-	m_asc->add_route(0, tag(), 1.0);
-	m_asc->add_route(1, tag(), 1.0);
+	m_asc->add_route(0, tag(), 1.0, 0);
+	m_asc->add_route(1, tag(), 1.0, 1);
 	m_asc->irqf_callback().set(m_pseudovia, FUNC(pseudovia_device::asc_irq_w));
 }
 
@@ -129,7 +129,7 @@ void vasp_device::device_start()
 {
 	m_vram = std::make_unique<u32[]>(0x100000 / sizeof(u32));
 
-	m_stream = stream_alloc(8, 2, m_asc->clock(), STREAM_SYNCHRONOUS);
+	m_stream = stream_alloc(8, 2, 22257, STREAM_SYNCHRONOUS);
 
 	m_6015_timer = timer_alloc(FUNC(vasp_device::mac_6015_tick), this);
 	m_6015_timer->adjust(attotime::never);
