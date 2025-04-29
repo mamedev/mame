@@ -47,6 +47,10 @@ bool menu_audio_mixer::handle(event const *ev)
 		return false;
 	}
 
+	bool const alt_pressed = machine().input().code_pressed(KEYCODE_LALT) || machine().input().code_pressed(KEYCODE_RALT);
+	bool const ctrl_pressed = machine().input().code_pressed(KEYCODE_LCONTROL) || machine().input().code_pressed(KEYCODE_RCONTROL);
+	bool const shift_pressed = machine().input().code_pressed(KEYCODE_LSHIFT) || machine().input().code_pressed(KEYCODE_RSHIFT);
+
 	switch(ev->iptkey) {
 	case IPT_UI_MIXER_ADD_FULL:
 		if(m_current_selection.m_maptype == MT_INTERNAL)
@@ -264,18 +268,32 @@ bool menu_audio_mixer::handle(event const *ev)
 		}
 
 		case GRP_DB: {
-			double db = dec_db(m_current_selection.m_db);
-			m_current_selection.m_db = db;
+			if(shift_pressed)
+				m_current_selection.m_db -= 0.1f;
+			else if(ctrl_pressed)
+				m_current_selection.m_db -= 10.0f;
+			else if(alt_pressed) {
+				if(m_current_selection.m_db > 0.0f)
+					m_current_selection.m_db = 0.0f;
+				else
+					m_current_selection.m_db = -96.0f;
+			}
+			else
+				m_current_selection.m_db -= 1.0f;
+
+			m_current_selection.m_db = floorf(m_current_selection.m_db * 10.0f) / 10.0f;
+			m_current_selection.m_db = std::clamp(m_current_selection.m_db, -96.0f, 12.0f);
+
 			if(m_current_selection.m_maptype == MT_FULL) {
 				if(m_current_selection.m_node == 0)
-					machine().sound().config_set_volume_sound_io_connection_default(m_current_selection.m_dev, db);
+					machine().sound().config_set_volume_sound_io_connection_default(m_current_selection.m_dev, m_current_selection.m_db);
 				else
-					machine().sound().config_set_volume_sound_io_connection_node(m_current_selection.m_dev, find_node_name(m_current_selection.m_node), db);
+					machine().sound().config_set_volume_sound_io_connection_node(m_current_selection.m_dev, find_node_name(m_current_selection.m_node), m_current_selection.m_db);
 			} else {
 				if(m_current_selection.m_node == 0)
-					machine().sound().config_set_volume_sound_io_channel_connection_default(m_current_selection.m_dev, m_current_selection.m_guest_channel, m_current_selection.m_node_channel, db);
+					machine().sound().config_set_volume_sound_io_channel_connection_default(m_current_selection.m_dev, m_current_selection.m_guest_channel, m_current_selection.m_node_channel, m_current_selection.m_db);
 				else
-					machine().sound().config_set_volume_sound_io_channel_connection_node(m_current_selection.m_dev, m_current_selection.m_guest_channel, find_node_name(m_current_selection.m_node), m_current_selection.m_node_channel, db);
+					machine().sound().config_set_volume_sound_io_channel_connection_node(m_current_selection.m_dev, m_current_selection.m_guest_channel, find_node_name(m_current_selection.m_node), m_current_selection.m_node_channel, m_current_selection.m_db);
 			}
 			m_generation --;
 			return true;
@@ -391,18 +409,32 @@ bool menu_audio_mixer::handle(event const *ev)
 		}
 
 		case GRP_DB: {
-			double db = inc_db(m_current_selection.m_db);
-			m_current_selection.m_db = db;
+			if(shift_pressed)
+				m_current_selection.m_db += 0.1f;
+			else if(ctrl_pressed)
+				m_current_selection.m_db += 10.0f;
+			else if(alt_pressed) {
+				if(m_current_selection.m_db < 0.0f)
+					m_current_selection.m_db = 0.0f;
+				else
+					m_current_selection.m_db = 12.0f;
+			}
+			else
+				m_current_selection.m_db += 1.0f;
+
+			m_current_selection.m_db = floorf(m_current_selection.m_db * 10.0f) / 10.0f;
+			m_current_selection.m_db = std::clamp(m_current_selection.m_db, -96.0f, 12.0f);
+
 			if(m_current_selection.m_maptype == MT_FULL) {
 				if(m_current_selection.m_node == 0)
-					machine().sound().config_set_volume_sound_io_connection_default(m_current_selection.m_dev, db);
+					machine().sound().config_set_volume_sound_io_connection_default(m_current_selection.m_dev, m_current_selection.m_db);
 				else
-					machine().sound().config_set_volume_sound_io_connection_node(m_current_selection.m_dev, find_node_name(m_current_selection.m_node), db);
+					machine().sound().config_set_volume_sound_io_connection_node(m_current_selection.m_dev, find_node_name(m_current_selection.m_node), m_current_selection.m_db);
 			} else {
 				if(m_current_selection.m_node == 0)
-					machine().sound().config_set_volume_sound_io_channel_connection_default(m_current_selection.m_dev, m_current_selection.m_guest_channel, m_current_selection.m_node_channel, db);
+					machine().sound().config_set_volume_sound_io_channel_connection_default(m_current_selection.m_dev, m_current_selection.m_guest_channel, m_current_selection.m_node_channel, m_current_selection.m_db);
 				else
-					machine().sound().config_set_volume_sound_io_channel_connection_node(m_current_selection.m_dev, m_current_selection.m_guest_channel, find_node_name(m_current_selection.m_node), m_current_selection.m_node_channel, db);
+					machine().sound().config_set_volume_sound_io_channel_connection_node(m_current_selection.m_dev, m_current_selection.m_guest_channel, find_node_name(m_current_selection.m_node), m_current_selection.m_node_channel, m_current_selection.m_db);
 			}
 			m_generation --;
 			return true;
@@ -1015,53 +1047,6 @@ uint32_t menu_audio_mixer::find_previous_available_channel_node(sound_io_device 
 			index = find_previous_source_node_index(index);
 		return index == 0xffffffff ? 0xffffffff : info.m_nodes[index].m_id;
 	}
-}
-
-float menu_audio_mixer::quantize_db(float db)
-{
-	if(db >= 12.0)
-		return 12.0;
-	if(db >= -12.0)
-		return floor(db*2 + 0.5) / 2;
-	if(db >= -24.0)
-		return floor(db + 0.5);
-	if(db >= -48.0)
-		return floor(db/2 + 0.5) * 2;
-	if(db >= -96.0)
-		return floor(db/4 + 0.5) * 4;
-	return -96.0;
-}
-
-float menu_audio_mixer::inc_db(float db)
-{
-	db = quantize_db(db);
-	if(db >= 12)
-		return 12.0;
-	if(db >= -12.0)
-		return db + 0.5;
-	if(db >= -24.0)
-		return db + 1;
-	if(db >= -48.0)
-		return db + 2;
-	if(db >= -96.0 + 4)
-		return db + 4;
-	return -96.0 + 4;
-}
-
-float menu_audio_mixer::dec_db(float db)
-{
-	db = quantize_db(db);
-	if(db >= 12.5)
-		return 11.5;
-	if(db > -12.0)
-		return db - 0.5;
-	if(db > -24.0)
-		return db - 1;
-	if(db > -48.0)
-		return db - 2;
-	if(db >= -92.0)
-		return db - 4;
-	return -96.0;
 }
 
 } // namespace ui

@@ -63,7 +63,7 @@ private:
 	select_entry m_current_selection;
 	uint32_t m_current_group;
 	std::vector<select_entry> m_selections;
-	
+
 	virtual void populate() override;
 	virtual bool handle(event const *ev) override;
 
@@ -88,10 +88,6 @@ private:
 	uint32_t find_previous_available_node(sound_io_device *dev, uint32_t node) const;
 	uint32_t find_next_available_channel_node(sound_io_device *dev, uint32_t guest_channel, uint32_t node, uint32_t node_channel) const;
 	uint32_t find_previous_available_channel_node(sound_io_device *dev, uint32_t guest_channel, uint32_t node, uint32_t node_channel) const;
-
-	static float quantize_db(float db);
-	static float inc_db(float db);
-	static float dec_db(float db);
 };
 
 } // namespace ui
