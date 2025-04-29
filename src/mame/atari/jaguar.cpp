@@ -40,7 +40,7 @@
     Components:
     sdt79r3041-20j
     Atari Jaguar CPU V1.0 6sc880hf106
-    Atari Jaguar DSP V1.0 sc414201ft (has Motorolla logo)
+    Atari Jaguar DSP V1.0 sc414201ft (has Motorola logo)
     Altera epm7128elc84-15 marked A-21652
     VIA vt83c461 IDE controller
     Actel a1010b marked A-22096 near IDE and gun inputs
@@ -1760,7 +1760,7 @@ void jaguar_state::video_config(machine_config &config, const XTAL clock)
 void jaguar_state::cojagr3k(machine_config &config)
 {
 	/* basic machine hardware */
-	R3041(config, m_maincpu, R3000_CLOCK).set_endianness(ENDIANNESS_BIG);
+	R3041(config, m_maincpu, R3000_CLOCK / 2).set_endianness(ENDIANNESS_BIG); // divider not verified, but chip is rated for 20 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &jaguar_state::r3000_map);
 
 	video_config(config, COJAG_CLOCK/2);
