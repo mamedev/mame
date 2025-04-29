@@ -241,7 +241,7 @@ bool menu_audio_mixer::handle(event const *ev)
 					else
 						machine().sound().config_add_sound_io_connection_default(m_current_selection.m_dev, m_current_selection.m_db);
 					m_generation --;
-					return true;			
+					return true;
 				}
 			} else if(m_current_selection.m_maptype == MT_CHANNEL) {
 				uint32_t prev_node = m_current_selection.m_node;
@@ -257,7 +257,7 @@ bool menu_audio_mixer::handle(event const *ev)
 					else
 						machine().sound().config_add_sound_io_channel_connection_default(m_current_selection.m_dev, m_current_selection.m_guest_channel, m_current_selection.m_node_channel, m_current_selection.m_db);
 					m_generation --;
-					return true;			
+					return true;
 				}
 			}
 			break;
@@ -368,7 +368,7 @@ bool menu_audio_mixer::handle(event const *ev)
 					else
 						machine().sound().config_add_sound_io_connection_default(m_current_selection.m_dev, m_current_selection.m_db);
 					m_generation --;
-					return true;			
+					return true;
 				}
 			} else if(m_current_selection.m_maptype == MT_CHANNEL) {
 				uint32_t prev_node = m_current_selection.m_node;
@@ -384,7 +384,7 @@ bool menu_audio_mixer::handle(event const *ev)
 					else
 						machine().sound().config_add_sound_io_channel_connection_default(m_current_selection.m_dev, m_current_selection.m_guest_channel, m_current_selection.m_node_channel, m_current_selection.m_db);
 					m_generation --;
-					return true;			
+					return true;
 				}
 			}
 			break;
@@ -470,7 +470,7 @@ bool menu_audio_mixer::handle(event const *ev)
 			break;
 		}
 		}
-		break;		
+		break;
 	}
 	}
 
@@ -555,14 +555,14 @@ void menu_audio_mixer::populate()
 			if(!omap.m_dev->is_output() && node->m_sinks)
 				lnode = util::string_format("Monitor of %s", lnode);
 			if(curline == cursel_line && m_current_group == GRP_NODE)
-				lnode = "\xe2\x86\x90" + lnode + "\xe2\x86\x92";
+				lnode = u8"\u25c4" + lnode + u8"\u25ba";
 
 			std::string line = (omap.m_dev->is_output() ? "> " : "< ") + lnode;
 
 			std::string db = util::string_format("%g dB", nmap.m_db);
 			if(curline == cursel_line && m_current_group == GRP_DB)
-				db = "\xe2\x86\x90" + db + "\xe2\x86\x92";
-			
+				db = u8"\u25c4" + db + u8"\u25ba";
+
 			item_append(line, db, 0, m_selections.data() + curline);
 			curline ++;
 		}
@@ -570,24 +570,24 @@ void menu_audio_mixer::populate()
 			const auto &node = find_node(cmap.m_node);
 			std::string guest_channel = omap.m_dev->get_position_name(cmap.m_guest_channel);
 			if(curline == cursel_line && m_current_group == GRP_GUEST_CHANNEL)
-				guest_channel = "\xe2\x86\x90" + guest_channel + "\xe2\x86\x92";
+				guest_channel = u8"\u25c4" + guest_channel + u8"\u25ba";
 
 			std::string lnode = cmap.m_is_system_default || node->m_name == "" ? "[default]" : node->m_name;
 			if(!omap.m_dev->is_output() && node->m_sinks)
 				lnode = util::string_format("Monitor of %s", lnode);
 			if(curline == cursel_line && m_current_group == GRP_NODE)
-				lnode = "\xe2\x86\x90" + lnode + "\xe2\x86\x92";
+				lnode = u8"\u25c4" + lnode + u8"\u25ba";
 
 			std::string lnode_channel = node->m_port_names[cmap.m_node_channel];
 			if(curline == cursel_line && m_current_group == GRP_NODE_CHANNEL)
-				lnode_channel = "\xe2\x86\x90" + lnode_channel + "\xe2\x86\x92";
+				lnode_channel = u8"\u25c4" + lnode_channel + u8"\u25ba";
 
 			std::string line = guest_channel + " > " + lnode + ":" + lnode_channel;
 
 			std::string db = util::string_format("%g dB", cmap.m_db);
 			if(curline == cursel_line && m_current_group == GRP_DB)
-				db = "\xe2\x86\x90" + db + "\xe2\x86\x92";
-			
+				db = u8"\u25c4" + db + u8"\u25ba";
+
 			item_append(line, db, 0, m_selections.data() + curline);
 			curline ++;
 		}
@@ -864,17 +864,17 @@ uint32_t menu_audio_mixer::find_previous_available_node(sound_io_device *dev, ui
 				index = find_previous_sink_node_index(index);
 			return index == 0xffffffff ? 0xffffffff : info.m_nodes[index].m_id;
 		}
-		   
+
 		uint32_t index = find_node_index(node);
 		while(index != 0xffffffff) {
 			index = find_previous_sink_node_index(index);
 			if(index != 0xffffffff && full_mapping_available(dev, info.m_nodes[index].m_id))
 				return info.m_nodes[index].m_id;
 		}
-		   
+
 		if(info.m_default_sink != 0 && full_mapping_available(dev, 0))
 			return 0;
-		   
+
 		index = find_last_sink_node_index();
 		while(index != 0xffffffff && !full_mapping_available(dev, info.m_nodes[index].m_id))
 			index = find_previous_sink_node_index(index);
@@ -887,17 +887,17 @@ uint32_t menu_audio_mixer::find_previous_available_node(sound_io_device *dev, ui
 				index = find_previous_source_node_index(index);
 			return index == 0xffffffff ? 0xffffffff : info.m_nodes[index].m_id;
 		}
-		   
+
 		uint32_t index = find_node_index(node);
 		while(index != 0xffffffff) {
 			index = find_previous_source_node_index(index);
 			if(index != 0xffffffff && full_mapping_available(dev, info.m_nodes[index].m_id))
 				return info.m_nodes[index].m_id;
 		}
-		   
+
 		if(info.m_default_source != 0 && full_mapping_available(dev, 0))
 			return 0;
-		   
+
 		index = find_last_source_node_index();
 		while(index != 0xffffffff && !full_mapping_available(dev, info.m_nodes[index].m_id))
 			index = find_previous_source_node_index(index);
@@ -1046,7 +1046,6 @@ float menu_audio_mixer::inc_db(float db)
 	if(db >= -96.0 + 4)
 		return db + 4;
 	return -96.0 + 4;
-	
 }
 
 float menu_audio_mixer::dec_db(float db)
@@ -1062,7 +1061,7 @@ float menu_audio_mixer::dec_db(float db)
 		return db - 2;
 	if(db >= -92.0)
 		return db - 4;
-	return -96.0;	
+	return -96.0;
 }
 
 } // namespace ui
