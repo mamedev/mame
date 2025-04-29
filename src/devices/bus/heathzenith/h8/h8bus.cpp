@@ -183,7 +183,7 @@ u8 h8bus_device::add_h8bus_card(device_h8bus_card_interface &card)
 
 bool h8bus_device::update_line_states(u32 &states, unsigned index, int state)
 {
-	bool const changed(bool(state) != !BIT(states, index));
+	bool const changed(bool(state) != bool(BIT(states, index)));
 
 	if (changed)
 	{
@@ -200,10 +200,7 @@ bool h8bus_device::update_line_states(u32 &states, unsigned index, int state)
 
 		int new_state = states ? 1 : 0;
 
-		if (old_state != new_state)
-		{
-			return true;
-		}
+		return (old_state != new_state);
 	}
 
 	return false;

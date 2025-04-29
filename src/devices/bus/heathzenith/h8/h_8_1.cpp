@@ -22,8 +22,6 @@ public:
 
 protected:
 
-	h_8_1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
-
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
@@ -37,12 +35,7 @@ protected:
 };
 
 h_8_1_device::h_8_1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
-	h_8_1_device(mconfig, H8BUS_H_8_1, tag, owner, 0)
-{
-}
-
-h_8_1_device::h_8_1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock):
-	device_t(mconfig, type, tag, owner, 0),
+	device_t(mconfig, H8BUS_H_8_1, tag, owner, 0),
 	device_h8bus_card_interface(mconfig, *this),
 	m_ram(*this, "mem"),
 	m_jumpers(*this, "JUMPERS"),
