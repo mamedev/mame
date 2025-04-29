@@ -170,7 +170,7 @@ template<typename S> void emu::detail::output_buffer_flat<S>::set_history(u32 hi
 	m_history = history;
 	if(m_sync_position < m_history) {
 		u32 delta = m_history - m_sync_position;
-		if(m_write_position)			
+		if(m_write_position)
 			for(u32 channel = 0; channel != m_channels; channel++) {
 				std::copy_backward(m_buffer[channel].begin(), m_buffer[channel].begin() + m_write_position, m_buffer[channel].begin() + m_write_position + delta);
 				std::fill(m_buffer[channel].begin() + 1, m_buffer[channel].begin() + delta, m_buffer[channel][0]);
@@ -190,7 +190,7 @@ template<typename S> void emu::detail::output_buffer_flat<S>::resample(u32 previ
 		return;
 
 	auto si = [](attotime time, u32 rate) -> s64 {
-		return time.m_seconds * rate + ((time.m_attoseconds / 100000000) * rate) / 10000000000;
+		return time.m_seconds * rate + ((time.m_attoseconds / 100'000'000) * rate) / 10'000'000'000LL;
 	};
 
 	auto cv = [](u32 source_rate, u32 dest_rate, s64 time) -> std::pair<s64, double> {
@@ -492,7 +492,7 @@ void sound_stream::init()
 u64 sound_stream::get_current_sample_index() const
 {
 	attotime now = m_device.machine().time();
-	return now.m_seconds * m_sample_rate + ((now.m_attoseconds / 1000000000) * m_sample_rate) / 1000000000;
+	return now.m_seconds * m_sample_rate + ((now.m_attoseconds / 1'000'000'000) * m_sample_rate) / 1'000'000'000;
 }
 
 void sound_stream::update()
@@ -503,18 +503,18 @@ void sound_stream::update()
 	// Find out where we are and how much we have to do
 	u64 idx = get_current_sample_index();
 	m_samples_to_update = idx - m_output_buffer.write_sample();
-	if(m_samples_to_update <= 0)
-		return;
 
-	m_in_update = true;
+	if(m_samples_to_update > 0) {
+		m_in_update = true;
 
-	// If there's anything to do, well, do it, starting with the dependencies
-	for(auto &stream : m_dependant_streams)
-		stream->update_nodeps();
+		// If there's anything to do, well, do it, starting with the dependencies
+		for(auto &stream : m_dependant_streams)
+			stream->update_nodeps();
 
-	do_update();
+		do_update();
+		m_in_update = false;
+	}
 	m_samples_to_update = 0;
-	m_in_update = false;
 }
 
 void sound_stream::update_nodeps()
@@ -525,15 +525,15 @@ void sound_stream::update_nodeps()
 	// Find out where we are and how much we have to do
 	u64 idx = get_current_sample_index();
 	m_samples_to_update = idx - m_output_buffer.write_sample();
-	if(m_samples_to_update <= 0)
-		return;
 
-	m_in_update = true;
+	if(m_samples_to_update > 0) {
+		m_in_update = true;
 
-	// If there's anything to do, well, do it
-	do_update();
+		// If there's anything to do, well, do it
+		do_update();
+		m_in_update = false;
+	}
 	m_samples_to_update = 0;
-	m_in_update = false;
 }
 
 void sound_stream::create_resamplers()
@@ -633,7 +633,7 @@ void sound_stream::reprime_sync_timer()
 {
 	if(!is_active())
 		return;
-		
+
 	u64 next_sample = m_output_buffer.write_sample() + 1;
 	attotime next_time = sample_to_time(next_sample);
 	next_time.m_attoseconds += 1000000000; // Go to the next nanosecond
@@ -737,7 +737,7 @@ void sound_manager::after_devices_init()
 			if(!stream->frequency_is_solved() && stream->try_solving_frequency())
 				need_to_solve --;
 		if(need_to_solve == prev_need_to_solve)
-			break;		
+			break;
 	}
 
 	if(need_to_solve) {
@@ -774,7 +774,7 @@ void sound_manager::after_devices_init()
 			if(!--depcounts[target])
 				//   when the depcount is zero, a stream is ready to be updated
 				ready_streams.push_back(target);
-	}			
+	}
 
 	//  If not all streams ended up in the sorted list, we have a loop
 	if(m_ordered_streams.size() != m_stream_list.size()) {
@@ -794,7 +794,7 @@ void sound_manager::after_devices_init()
 			for(sound_stream *source : stream->sources())
 				if(!--inverted_depcounts[source])
 					ready_streams.push_back(source);
-		}		
+		}
 		std::string stream_names;
 		for(auto &dpc : inverted_depcounts)
 			if(dpc.second)
@@ -819,7 +819,7 @@ void sound_manager::after_devices_init()
 	// Create the default effect chain
 	for(u32 effect = 0; effect != audio_effect::COUNT; effect++)
 		m_default_effects.emplace_back(audio_effect::create(effect, machine().sample_rate(), nullptr));
-	
+
 	// Inventory speakers and microphones
 	m_outputs_count = 0;
 	for(speaker_device &dev : speaker_device_enumerator(machine().root_device())) {
@@ -1122,7 +1122,7 @@ void sound_manager::config_load(config_type cfg_type, config_level cfg_level, ut
 			std::string type = ef_node->get_attribute_string("type", "");
 			if(id >= 1 && id <= m_default_effects.size() && audio_effect::effect_names[m_default_effects[id-1]->type()] == type)
 				m_default_effects[id-1]->config_load(ef_node);
-		}		
+		}
 		break;
 	}
 
@@ -1176,7 +1176,7 @@ void sound_manager::config_load(config_type cfg_type, config_level cfg_level, ut
 			for(util::xml::data_node const *cmap = node->get_child("channel_mapping"); cmap != nullptr; cmap = cmap->get_next_sibling("channel_mapping"))
 				config.m_channel_mappings.emplace_back(std::tuple<u32, std::string, u32, float>(cmap->get_attribute_int("guest_channel", 0),
 																								cmap->get_attribute_string("node", ""),
-																								cmap->get_attribute_int("node_channel", 0), 
+																								cmap->get_attribute_int("node_channel", 0),
 																								cmap->get_attribute_float("db", 0)));
 		}
 		break;
@@ -1275,7 +1275,7 @@ void sound_manager::config_save(config_type cfg_type, util::xml::data_node *pare
 					return;
 				}
 		};
-		
+
 		for(auto &spk : m_speakers)
 			output_one(spk.m_dev);
 		for(auto &mic : m_microphones)
@@ -1528,7 +1528,7 @@ void sound_manager::startup_cleanups()
 					if(std::get<1>(cmap) == "")
 						std::get<1>(cmap) = first_sink_name;
 			}
-	}	
+	}
 
 
 	// If there's no default source replace all the default source config
@@ -1550,7 +1550,7 @@ void sound_manager::startup_cleanups()
 					if(std::get<1>(cmap) == "")
 						std::get<1>(cmap) = first_source_name;
 			}
-	}	
+	}
 }
 
 template<bool is_output, typename S> void sound_manager::apply_osd_changes(std::vector<S> &streams)
@@ -1815,7 +1815,7 @@ std::vector<u32> sound_manager::find_channel_mapping(const std::array<double, 3>
 			} else if(best_dist == dist)
 				result.push_back(port);
 		}
-	return result;		
+	return result;
 }
 
 
@@ -1960,7 +1960,7 @@ void sound_manager::update_osd_streams()
 					if(osd.sound_external_per_channel_volume()) {
 						stream.m_volumes.clear();
 						stream.m_volumes.resize(stream.m_channels, nm.m_db);
-						
+
 					} else
 						linear_volume = osd::db_to_linear(nm.m_db);
 
@@ -2024,7 +2024,7 @@ void sound_manager::update_osd_streams()
 					if(osd.sound_external_per_channel_volume()) {
 						stream.m_volumes.clear();
 						stream.m_volumes.resize(stream.m_channels, nm.m_db);
-						
+
 					} else
 						linear_volume = osd::db_to_linear(nm.m_db);
 
@@ -2053,7 +2053,7 @@ void sound_manager::update_osd_streams()
 					u32 osd_index = get_input_stream_for_node_and_channel(node, cm.m_node_channel, omap.m_dev, cm.m_is_system_default);
 					auto &stream = m_osd_input_streams[osd_index];
 					float linear_volume = 1.0;
-					
+
 					if(osd.sound_external_per_channel_volume()) {
 						if(stream.m_volumes.empty())
 							stream.m_volumes.resize(stream.m_channels, -96);
@@ -2088,7 +2088,7 @@ void sound_manager::update_osd_streams()
 		auto get_input_stream_for_node = [this, &current_input_streams, &stream_per_node] (const osd::audio_info::node_info *node, bool is_system_default) -> u32 {
 			// Pick up the existing stream if there's one
 			auto si = stream_per_node.find(node->m_id);
-			if(si != stream_per_node.end())				
+			if(si != stream_per_node.end())
 				return si->second;
 
 			// Create the default unused mask
@@ -2124,7 +2124,7 @@ void sound_manager::update_osd_streams()
 		auto get_output_stream_for_node = [this, &current_output_streams, &stream_per_node] (const osd::audio_info::node_info *node, bool is_system_default) -> u32 {
 			// Pick up the existing stream if there's one
 			auto si = stream_per_node.find(node->m_id);
-			if(si != stream_per_node.end())				
+			if(si != stream_per_node.end())
 				return si->second;
 
 			// Create the default unused mask
@@ -2438,7 +2438,7 @@ void sound_manager::streams_update()
 					for(int channel = 0; channel != sound.outputs(); channel++) {
 						std::pair<sound_stream *, int> info = sound.output_to_stream_output(channel);
 						const emu::detail::output_buffer_flat<sample_t> &buffer = info.first->m_output_buffer;
-						buffers.emplace_back(std::make_pair(buffer.ptrs(info.second, 0), buffer.available_samples()));						
+						buffers.emplace_back(std::make_pair(buffer.ptrs(info.second, 0), buffer.available_samples()));
 					}
 				}
 				sound_data.emplace(sound.device().tag(), std::move(buffers));
