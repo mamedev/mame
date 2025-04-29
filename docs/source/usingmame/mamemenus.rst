@@ -320,7 +320,8 @@ tedious, but it allows for instance to take two mono speakers and turn
 it into the left and right channels of a system output, which is
 useful for some cabinets.
 
-Every mapping has a configurable volume associated.
+Every mapping has a configurable volume associated.  When changing the
+volume, optionally hold shift/ctrl/alt keys to adjust the step amount.
 
 The mapping configuration is saved in the system cfg file.
 
