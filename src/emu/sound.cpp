@@ -45,8 +45,6 @@
 const attotime sound_manager::STREAMS_UPDATE_ATTOTIME = attotime::from_hz(STREAMS_UPDATE_FREQUENCY);
 
 
-
-
 //**// Output buffer management
 
 // Output buffers store samples produced every system-wide update.
@@ -619,13 +617,6 @@ void sound_stream::sync(attotime now)
 
 
 
-
-
-
-
-
-
-
 attotime sound_stream::sample_to_time(u64 index) const
 {
 	attotime res = attotime::zero;
@@ -1016,12 +1007,6 @@ void sound_manager::default_effect_changed(u32 entry)
 			if(e.m_effect->type() == type)
 				e.m_effect->default_changed();
 }
-
-
-
-
-
-
 
 
 
@@ -1716,7 +1701,6 @@ void sound_manager::osd_information_update()
 		apply_osd_changes<false, osd_input_stream >(m_osd_input_streams );
 		apply_osd_changes<false, osd_output_stream>(m_osd_output_streams);
 	}
-
 }
 
 void sound_manager::generate_mapping()
@@ -2476,7 +2460,6 @@ void sound_manager::streams_update()
 		util::wav_add_data_16(*m_wavfile, m_record_buffer.data(), m_record_samples);
 
 	m_effects_condition.notify_all();
-	
 }
 
 //**// Resampler management
@@ -2491,4 +2474,3 @@ const audio_resampler *sound_manager::get_resampler(u32 fs, u32 ft)
 	m_resamplers[key].reset(res);
 	return res;
 }
-
