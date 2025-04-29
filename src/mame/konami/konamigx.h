@@ -5,21 +5,24 @@
 
 #pragma once
 
+#include "k053246_k053247_k055673.h"
+#include "k053250.h"
+#include "k054156_k054157_k056832.h"
+#include "k054338.h"
+#include "k055555.h"
+
 #include "cpu/tms57002/tms57002.h"
 #include "machine/adc083x.h"
 #include "machine/k053252.h"
 #include "machine/timer.h"
-#include "sound/k056800.h"
 #include "sound/k054539.h"
-#include "k053246_k053247_k055673.h"
-#include "k053250.h"
+#include "sound/k056800.h"
 #include "video/k053936.h"
-#include "k054156_k054157_k056832.h"
-#include "k054338.h"
-#include "k055555.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
+
 
 class konamigx_state : public driver_device
 {
@@ -341,7 +344,7 @@ protected:
     ----FFEEDDCCBBAA---------------- (layer A-F mix codes in forced blending)
     ---x---------------------------- (disable shadows)
     --x----------------------------- (disable z-buffering)
-	yy------------------------------ (last encountered tile mix code)
+    yy------------------------------ (last encountered tile mix code)
 */
 #define GXMIX_BLEND_AUTO    0           // emulate all blend effects
 #define GXMIX_BLEND_NONE    1           // disable all blend effects

@@ -72,12 +72,8 @@ void segapcm_device::rom_bank_pre_change()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void segapcm_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void segapcm_device::sound_stream_update(sound_stream &stream)
 {
-	/* clear the buffers */
-	outputs[0].fill(0);
-	outputs[1].fill(0);
-
 	// reg      function
 	// ------------------------------------------------
 	// 0x00     ?
@@ -114,7 +110,7 @@ void segapcm_device::sound_stream_update(sound_stream &stream, std::vector<read_
 			int i;
 
 			/* loop over samples on this channel */
-			for (i = 0; i < outputs[0].samples(); i++)
+			for (i = 0; i < stream.samples(); i++)
 			{
 				int8_t v;
 
@@ -133,8 +129,8 @@ void segapcm_device::sound_stream_update(sound_stream &stream, std::vector<read_
 				v = read_byte(offset + (addr >> 8)) - 0x80;
 
 				/* apply panning and advance */
-				outputs[0].add_int(i, v * (regs[2] & 0x7f), 32768);
-				outputs[1].add_int(i, v * (regs[3] & 0x7f), 32768);
+				stream.add_int(0, i, v * (regs[2] & 0x7f), 32768);
+				stream.add_int(1, i, v * (regs[3] & 0x7f), 32768);
 				addr = (addr + regs[7]) & 0xffffff;
 			}
 

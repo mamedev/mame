@@ -514,43 +514,43 @@ static INPUT_PORTS_START( contra )
 	KONAMI8_B12_UNK(2)
 
 	PORT_START("DSW1")
-	KONAMI_COINAGE_LOC(DEF_STR( Free_Play ), "No Coin B", SW1)
+	KONAMI_COINAGE_LOC(DEF_STR(Free_Play), "No Coin B", SW1)
 	// "No Coin B" = coins produce sound, but no effect on coin counter
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR(Lives) )         PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "7" )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:4,5")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR(Unused) )        PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x04, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR(Bonus_Life) )    PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(    0x18, "30000 70000" )
 	PORT_DIPSETTING(    0x10, "40000 80000" )
 	PORT_DIPSETTING(    0x08, "40000" )
 	PORT_DIPSETTING(    0x00, "50000" )
-	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:6,7")
-	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR(Difficulty) )    PORT_DIPLOCATION("SW2:6,7")
+	PORT_DIPSETTING(    0x60, DEF_STR(Easy) )
+	PORT_DIPSETTING(    0x40, DEF_STR(Normal) )
+	PORT_DIPSETTING(    0x20, DEF_STR(Hard) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Hardest) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR(Demo_Sounds) )   PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW3:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW3:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR(Flip_Screen) )   PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x01, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR(Unused) )        PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x02, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
 	PORT_SERVICE_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW3:3" )
-	PORT_DIPNAME( 0x08, 0x08, "Sound" ) PORT_DIPLOCATION("SW3:4")
-	PORT_DIPSETTING(    0x00, DEF_STR( Mono ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Stereo ) )
+	PORT_DIPNAME( 0x08, 0x08, "Sound" )                PORT_DIPLOCATION("SW3:4")
+	PORT_DIPSETTING(    0x00, DEF_STR(Mono) )
+	PORT_DIPSETTING(    0x08, DEF_STR(Stereo) )
 INPUT_PORTS_END
 
 
@@ -559,14 +559,14 @@ static INPUT_PORTS_START( gryzor )
 	PORT_INCLUDE( contra )
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:3")    // Not Used according to manual, used in gryzor sets
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR(Cabinet) )       PORT_DIPLOCATION("SW2:3")    // Not Used according to manual, used in gryzor sets
+	PORT_DIPSETTING(    0x00, DEF_STR(Upright) )
+	PORT_DIPSETTING(    0x04, DEF_STR(Cocktail) )
 
 	PORT_MODIFY("DSW3")
-	PORT_DIPNAME( 0x02, 0x02, "Upright Controls" ) PORT_DIPLOCATION("SW3:2")    // Not Used according to manual, used in gryzor sets
-	PORT_DIPSETTING(    0x02, DEF_STR( Single ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
+	PORT_DIPNAME( 0x02, 0x02, "Upright Controls" )     PORT_DIPLOCATION("SW3:2")    // Not Used according to manual, used in gryzor sets
+	PORT_DIPSETTING(    0x02, DEF_STR(Single) )
+	PORT_DIPSETTING(    0x00, DEF_STR(Dual) )
 INPUT_PORTS_END
 
 
@@ -626,12 +626,11 @@ void contra_state::contra(machine_config &config)
 	K007121(config, m_k007121[1], 0, m_palette, gfx_contra_2);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 0.60).add_route(1, "rspeaker", 0.60);
+	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "speaker", 0.60, 0).add_route(1, "speaker", 0.60, 1);
 }
 
 

@@ -2945,6 +2945,11 @@ ROM_START( pc9801fs )
 	ROM_LOAD16_BYTE( "kqx02_00.bin",  0x000001, 0x020000, CRC(f55e42d6) SHA1(2ab0ae817e9abed984544c920182689127550ce3) )
 
 	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
+	// 0x0c000-0x0ffff sound ROM BIOS
+	// 0x10000-0x13fff ^ mirror
+	// 0x14000-0x16fff <unknown>
+	// 0x17000-0x17fff SCSI disk BIOS?
+	// 0x18000-0x1ffff <empty>
 	ROM_COPY( "biosrom", 0x20000, 0x10000, 0x08000 )  //ITF ROM
 	ROM_COPY( "biosrom", 0x28000, 0x18000, 0x08000 )  //BIOS ROM
 	ROM_COPY( "biosrom", 0x30000, 0x20000, 0x08000 )

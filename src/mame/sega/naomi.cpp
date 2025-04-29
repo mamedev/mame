@@ -2444,15 +2444,14 @@ void dc_state::naomi_aw_base(machine_config &config)
 	POWERVR2(config, m_powervr2, 0);
 	m_powervr2->irq_callback().set(FUNC(dc_state::pvr_irq));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	AICA(config, m_aica, (XTAL(33'868'800)*2)/3); // 67.7376MHz(2*33.8688MHz), div 3 for audio block
 	m_aica->irq().set(FUNC(dc_state::aica_irq));
 	m_aica->main_irq().set(FUNC(dc_state::sh4_aica_irq));
 	m_aica->set_addrmap(0, &dc_state::aica_map);
-	m_aica->add_route(0, "lspeaker", 1.0);
-	m_aica->add_route(1, "rspeaker", 1.0);
+	m_aica->add_route(0, "speaker", 1.0, 0);
+	m_aica->add_route(1, "speaker", 1.0, 1);
 
 	AICARTC(config, "aicartc", XTAL(32'768));
 }

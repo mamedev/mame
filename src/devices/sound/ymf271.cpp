@@ -566,7 +566,7 @@ void ymf271_device::set_feedback(int slotnum, int64_t inp)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void ymf271_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void ymf271_device::sound_stream_update(sound_stream &stream)
 {
 	int i, j;
 	int op;
@@ -599,7 +599,7 @@ void ymf271_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 
 				if (m_slots[slot1].active)
 				{
-					for (i = 0; i < outputs[0].samples(); i++)
+					for (i = 0; i < stream.samples(); i++)
 					{
 						int64_t output1 = 0, output2 = 0, output3 = 0, output4 = 0;
 						int64_t phase_mod1, phase_mod2, phase_mod3;
@@ -833,7 +833,7 @@ void ymf271_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 					mixp = &m_mix_buffer[0];
 					if (m_slots[slot1].active)
 					{
-						for (i = 0; i < outputs[0].samples(); i++)
+						for (i = 0; i < stream.samples(); i++)
 						{
 							int64_t output1 = 0, output3 = 0;
 							int64_t phase_mod1, phase_mod3;
@@ -900,7 +900,7 @@ void ymf271_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 
 				if (m_slots[slot1].active)
 				{
-					for (i = 0; i < outputs[0].samples(); i++)
+					for (i = 0; i < stream.samples(); i++)
 					{
 						int64_t output1 = 0, output2 = 0, output3 = 0;
 						int64_t phase_mod1, phase_mod3;
@@ -1006,29 +1006,29 @@ void ymf271_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 				}
 
 				mixp = &m_mix_buffer[0];
-				update_pcm(j + (3*12), mixp, outputs[0].samples());
+				update_pcm(j + (3*12), mixp, stream.samples());
 				break;
 			}
 
 			// PCM
 			case 3:
 			{
-				update_pcm(j + (0*12), mixp, outputs[0].samples());
-				update_pcm(j + (1*12), mixp, outputs[0].samples());
-				update_pcm(j + (2*12), mixp, outputs[0].samples());
-				update_pcm(j + (3*12), mixp, outputs[0].samples());
+				update_pcm(j + (0*12), mixp, stream.samples());
+				update_pcm(j + (1*12), mixp, stream.samples());
+				update_pcm(j + (2*12), mixp, stream.samples());
+				update_pcm(j + (3*12), mixp, stream.samples());
 				break;
 			}
 		}
 	}
 
 	mixp = &m_mix_buffer[0];
-	for (i = 0; i < outputs[0].samples(); i++)
+	for (i = 0; i < stream.samples(); i++)
 	{
-		outputs[0].put_int(i, *mixp++, 32768 << 2);
-		outputs[1].put_int(i, *mixp++, 32768 << 2);
-		outputs[2].put_int(i, *mixp++, 32768 << 2);
-		outputs[3].put_int(i, *mixp++, 32768 << 2);
+		stream.put_int(0, i, *mixp++, 32768 << 2);
+		stream.put_int(1, i, *mixp++, 32768 << 2);
+		stream.put_int(2, i, *mixp++, 32768 << 2);
+		stream.put_int(3, i, *mixp++, 32768 << 2);
 	}
 }
 

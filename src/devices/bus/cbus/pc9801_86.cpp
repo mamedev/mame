@@ -84,8 +84,7 @@ void pc9801_86_device::pc9801_86_config(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set([this](int state) { m_bus->int_w<5>(state); });
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	YM2608(config, m_opna, 7.987_MHz_XTAL); // actually YM2608B
 	// shouldn't have one
 //  m_opna->set_addrmap(0, &pc9801_86_device::opna_map);
@@ -100,15 +99,16 @@ void pc9801_86_device::pc9801_86_config(machine_config &config)
 		m_joy_sel = data;
 	});
 	// TODO: confirm mixing
-	m_opna->add_route(0, "lspeaker", 0.75);
-	m_opna->add_route(0, "rspeaker", 0.75);
-	m_opna->add_route(1, "lspeaker", 1.00);
-	m_opna->add_route(2, "rspeaker", 1.00);
+	m_opna->add_route(0, "speaker", 0.75, 0);
+	m_opna->add_route(0, "speaker", 0.75, 1);
+	m_opna->add_route(1, "speaker", 1.00, 0);
+	m_opna->add_route(2, "speaker", 1.00, 1);
 
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // burr brown pcm61p
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // burr brown pcm61p
+	// 2x burr brown pcm61p
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
-	// NOTE: 1 DE-9 port only
+	// NOTE: 1x DE-9 port only
 	MSX_GENERAL_PURPOSE_PORT(config, m_joy, msx_general_purpose_port_devices, "joystick");
 }
 
@@ -121,10 +121,10 @@ void pc9801_86_device::device_add_mconfig(machine_config &config)
 void pc9801_86_device::opna_reset_routes_config(machine_config &config)
 {
 	m_opna->reset_routes();
-	m_opna->add_route(0, "lspeaker", 0.125);
-	m_opna->add_route(0, "rspeaker", 0.125);
-	m_opna->add_route(1, "lspeaker", 0.50);
-	m_opna->add_route(2, "rspeaker", 0.50);
+	m_opna->add_route(0, "speaker", 0.125, 0);
+	m_opna->add_route(0, "speaker", 0.125, 1);
+	m_opna->add_route(1, "speaker", 0.50, 0);
+	m_opna->add_route(2, "speaker", 0.50, 1);
 }
 
 // to load a different bios for slots:
@@ -448,7 +448,10 @@ u8 pc9801_86_device::queue_pop()
 {
 	u8 ret = m_queue[m_tail++];
 	m_tail %= QUEUE_SIZE;
-	m_count = (m_count - 1) % QUEUE_SIZE; // dangel resets the fifo after filling it completely so maybe it expects an underflow
+	// TODO: dangel resets the fifo after filling it completely so maybe it expects an underflow
+	// this breaks win95, that expects FIFO empty flags to stay consistant
+	//m_count = (m_count - 1) % QUEUE_SIZE;
+	m_count = std::max(m_count - 1, 0);
 	return ret;
 }
 
@@ -503,7 +506,8 @@ TIMER_CALLBACK_MEMBER(pc9801_86_device::dac_tick)
 	{
 		//LOGDAC("\tIRQ set\n");
 		m_pcmirq = true;
-		//m_bus->int_w<5>(ASSERT_LINE);
+		// win95 expects edge triggers
+		m_irqs->in_w<1>(CLEAR_LINE);
 		m_irqs->in_w<1>(ASSERT_LINE);
 	}
 }
@@ -540,10 +544,10 @@ void pc9801_speakboard_device::device_add_mconfig(machine_config &config)
 
 	YM2608(config, m_opna_slave, 7.987_MHz_XTAL);
 	m_opna_slave->set_addrmap(0, &pc9801_speakboard_device::opna_map);
-	m_opna_slave->add_route(0, "lspeaker", 0.50);
-	m_opna_slave->add_route(0, "rspeaker", 0.50);
-	m_opna_slave->add_route(1, "lspeaker", 0.50);
-	m_opna_slave->add_route(2, "rspeaker", 0.50);
+	m_opna_slave->add_route(0, "speaker", 0.50, 0);
+	m_opna_slave->add_route(0, "speaker", 0.50, 1);
+	m_opna_slave->add_route(1, "speaker", 0.50, 0);
+	m_opna_slave->add_route(2, "speaker", 0.50, 1);
 }
 
 void pc9801_speakboard_device::device_start()
@@ -609,8 +613,8 @@ void otomichan_kai_device::device_add_mconfig(machine_config &config)
 	m_opna->set_addrmap(0, &otomichan_kai_device::opna_map);
 
 	YM3438(config, m_opn2c, 7.987_MHz_XTAL);
-	m_opn2c->add_route(0, "lspeaker", 0.50);
-	m_opn2c->add_route(1, "rspeaker", 0.50);
+	m_opn2c->add_route(0, "speaker", 0.50, 0);
+	m_opn2c->add_route(1, "speaker", 0.50, 1);
 }
 
 u8 otomichan_kai_device::id_r()

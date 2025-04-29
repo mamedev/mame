@@ -163,12 +163,11 @@ void dinoking_state::dinoking(machine_config &config)
 
 	PALETTE(config, m_palette, palette_device::RGB_555);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	okim9810_device &oki(OKIM9810(config, "oki", XTAL(4'096'000)));
-	oki.add_route(0, "lspeaker", 0.80);
-	oki.add_route(1, "rspeaker", 0.80);
+	oki.add_route(0, "speaker", 0.80, 0);
+	oki.add_route(1, "speaker", 0.80, 1);
 }
 
 

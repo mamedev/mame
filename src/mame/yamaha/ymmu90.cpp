@@ -213,13 +213,12 @@ void mu90_state::mu90b(machine_config &config)
 	m_maincpu->read_portb().set(FUNC(mu90_state::pb_r));
 	m_maincpu->write_portb().set(FUNC(mu90_state::pb_w));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	SWP30(config, m_swp30);
 	m_swp30->set_addrmap(AS_DATA, &mu90_state::swp30_map);
-	m_swp30->add_route(0, "lspeaker", 1.0);
-	m_swp30->add_route(1, "rspeaker", 1.0);
+	m_swp30->add_route(0, "speaker", 1.0, 0);
+	m_swp30->add_route(1, "speaker", 1.0, 1);
 
 	auto &mdin_a(MIDI_PORT(config, "mdin_a"));
 	midiin_slot(mdin_a);

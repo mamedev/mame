@@ -2411,16 +2411,15 @@ void supracan_state::supracan(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_supracan);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	// TODO: derive and verify from U13_CLOCK
 	UMC6619_SOUND(config, m_sound, XTAL(3'579'545));
 	m_sound->ram_read().set(FUNC(supracan_state::sound_ram_read));
 	m_sound->timer_irq_handler().set(FUNC(supracan_state::sound_timer_irq));
 	m_sound->dma_irq_handler().set(FUNC(supracan_state::sound_dma_irq));
-	m_sound->add_route(0, "lspeaker", 1.0);
-	m_sound->add_route(1, "rspeaker", 1.0);
+	m_sound->add_route(0, "speaker", 1.0, 0);
+	m_sound->add_route(1, "speaker", 1.0, 1);
 
 	// TODO: clock for cart is (again) unconfirmed
 	SUPERACAN_CART_SLOT(config, m_cart, U13_CLOCK / 6, superacan_cart_types, nullptr).set_must_be_loaded(true);

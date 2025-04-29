@@ -86,11 +86,12 @@ public:
 
 protected:
 	virtual void device_start() override ATTR_COLD;
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	sound_stream *m_stream = nullptr;
 	output_finder<> m_led_out;
+	bool m_dummy_save = false; // needed for save-state support
 };
 
 DEFINE_DEVICE_TYPE(MILTON_LED_FILTER, milton_filter_device, "milton_led_filter", "Milton LED Filter")
@@ -106,22 +107,23 @@ void milton_filter_device::device_start()
 {
 	m_stream = stream_alloc(1, 1, machine().sample_rate());
 	m_led_out.resolve();
+	save_item(NAME(m_dummy_save));
 }
 
-void milton_filter_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void milton_filter_device::sound_stream_update(sound_stream &stream)
 {
-	stream_buffer::sample_t level = 0;
+	sound_stream::sample_t level = 0;
 
-	for (int i = 0; i < outputs[0].samples(); i++)
-		level += fabsf(inputs[0].get(i));
+	for (int i = 0; i < stream.samples(); i++)
+		level += fabsf(stream.get(0, i));
 
-	outputs[0] = inputs[0];
+	stream.copy(0, 0);
 
-	if (outputs[0].samples() > 0)
-		level /= outputs[0].samples();
+	if (stream.samples() > 0)
+		level /= stream.samples();
 
 	// 2 leds connected to the audio circuit
-	const stream_buffer::sample_t threshold = 1500.0 / 32768.0;
+	const sound_stream::sample_t threshold = 1500.0 / 32768.0;
 	m_led_out = (level > threshold) ? 1 : 0;
 }
 

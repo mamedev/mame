@@ -915,7 +915,7 @@ void williams_s4_sound_device::device_add_mconfig(machine_config &config)
 void williams_s4_sound_device::device_start()
 {
 	// register for save states
-	save_item(NAME(m_dummy));
+	save_item(NAME(m_dummy_save));
 }
 
 //-------------------------------------------------
@@ -1032,7 +1032,7 @@ void williams_s6_sound_device::device_add_mconfig(machine_config &config)
 void williams_s6_sound_device::device_start()
 {
 	// register for save states
-	save_item(NAME(m_dummy));
+	save_item(NAME(m_dummy_save));
 }
 
 //-------------------------------------------------
@@ -1143,7 +1143,7 @@ void williams_s9_sound_device::device_add_mconfig(machine_config &config)
 void williams_s9_sound_device::device_start()
 {
 	// register for save states
-	save_item(NAME(m_dummy));
+	save_item(NAME(m_dummy_save));
 }
 
 //-------------------------------------------------
@@ -1262,7 +1262,7 @@ void williams_s11_sound_device::device_start()
 	membank("bank1")->configure_entries(0, 2, &ROM[0x8000], 0x4000);
 
 	// register for save states
-	save_item(NAME(m_dummy));
+	save_item(NAME(m_dummy_save));
 }
 
 //-------------------------------------------------

@@ -95,6 +95,7 @@ protected:
 	void ct8000_io_map(address_map &map) ATTR_COLD;
 
 	virtual void driver_start() override ATTR_COLD;
+	virtual void driver_reset() override ATTR_COLD;
 
 	void p1_w(u8 data);
 	u8 p1_r();
@@ -118,8 +119,6 @@ protected:
 	void pll_w(offs_t offset, u8 data);
 	virtual void update_clocks();
 
-	attoseconds_t chorus_cv(attotime const &curtime);
-
 	required_device<i8049_device> m_maincpu;
 	required_device_array<i8243_device, 2> m_io;
 
@@ -135,6 +134,11 @@ protected:
 	required_memory_bank m_bank;
 
 	optional_ioport_array<13> m_inputs;
+
+	TIMER_CALLBACK_MEMBER(bbd_tick);
+	void bbd_setup_next_tick();
+	
+	emu_timer *m_bbd_timer;
 
 	u16 m_key_select;
 	u8 m_key_enable;
@@ -200,12 +204,11 @@ void ct8000_state::ctmb1(machine_config &config)
 {
 	config_base(config);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	MIXER(config, m_mixer);
-	m_mixer->add_route(0, "lspeaker", 1.0);
-	m_mixer->add_route(0, "rspeaker", 1.0);
+	m_mixer->add_route(0, "speaker", 1.0, 0);
+	m_mixer->add_route(0, "speaker", 1.0, 1);
 
 	// 931 A - sub (consonant) waveform
 	UPD931(config, m_931a, m_maincpu->clock());
@@ -240,13 +243,13 @@ void ct8000_state::ctmb1(machine_config &config)
 
 	FILTER_RC(config, "filter_ac1").set_ac().add_route(0, m_mixer, 1.0);
 
-	MN3207(config, m_bbd).set_cv_handler(FUNC(ct8000_state::chorus_cv));
+	MN3207(config, m_bbd);
 	m_mixer->add_route(0, m_bbd, 1.0);
 	m_bbd->add_route(ALL_OUTPUTS, "chorus", 0.5);
 
 	auto &bbd_mixer = MIXER(config, "chorus");
-	bbd_mixer.add_route(0, "lspeaker", 0.4);
-	bbd_mixer.add_route(0, "rspeaker", -0.4);
+	bbd_mixer.add_route(0, "speaker", 0.4, 0);
+	bbd_mixer.add_route(0, "speaker", -0.4, 1);
 }
 
 //**************************************************************************
@@ -284,6 +287,8 @@ void ct8000_state::ctfk1(machine_config &config)
 //**************************************************************************
 void ct8000_state::driver_start()
 {
+	m_bbd_timer = timer_alloc(FUNC(ct8000_state::bbd_tick), this);
+
 	m_bank->configure_entries(0, 2, memregion("bankrom")->base(), 0x800);
 
 	m_key_select = 0xffff;
@@ -304,6 +309,11 @@ void ct8000_state::driver_start()
 
 	save_item(NAME(m_clock_select));
 	save_item(NAME(m_clock_div));
+}
+
+void ct8000_state::driver_reset()
+{
+	bbd_setup_next_tick();	
 }
 
 //**************************************************************************
@@ -632,15 +642,21 @@ void ct8000_state::update_clocks()
 }
 
 //**************************************************************************
-attoseconds_t ct8000_state::chorus_cv(attotime const &cvtime)
+TIMER_CALLBACK_MEMBER(ct8000_state::bbd_tick)
+{
+	m_bbd->tick();
+	bbd_setup_next_tick();
+}
+
+void ct8000_state::bbd_setup_next_tick()
 {
 	// 62.5 to 80 kHz, varies at 0.6666... Hz
-	double pos = cvtime.as_double() / 1.5;
+	double pos = machine().time().as_double() / 1.5;
 	pos -= std::floor(pos);
 	pos = (pos < 0.5) ? (2 * pos) : 2 * (1.0 - pos);
 	const double bbd_freq = 62500 + (80000 - 62500) * pos;
 
-	return HZ_TO_ATTOSECONDS(bbd_freq);
+	m_bbd_timer->adjust(attotime::from_ticks(1, bbd_freq));
 }
 
 

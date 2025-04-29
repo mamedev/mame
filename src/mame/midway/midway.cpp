@@ -45,7 +45,7 @@ DEFINE_DEVICE_TYPE(MIDWAY_TURBO_CHEAP_SQUEAK, midway_turbo_cheap_squeak_device, 
 
 midway_ssio_device::midway_ssio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MIDWAY_SSIO, tag, owner, clock)
-	, device_mixer_interface(mconfig, *this, 2)
+	, device_mixer_interface(mconfig, *this)
 	, m_cpu(*this, "cpu")
 	, m_ay0(*this, "ay0")
 	, m_ay1(*this, "ay1")
@@ -410,12 +410,12 @@ void midway_ssio_device::device_add_mconfig(machine_config &config)
 	AY8910(config, m_ay0, DERIVED_CLOCK(1, 2*4));
 	m_ay0->port_a_write_callback().set(FUNC(midway_ssio_device::porta0_w));
 	m_ay0->port_b_write_callback().set(FUNC(midway_ssio_device::portb0_w));
-	m_ay0->add_route(ALL_OUTPUTS, *this, 0.33, AUTO_ALLOC_INPUT, 0);
+	m_ay0->add_route(ALL_OUTPUTS, *this, 0.33, 0);
 
 	AY8910(config, m_ay1, DERIVED_CLOCK(1, 2*4));
 	m_ay1->port_a_write_callback().set(FUNC(midway_ssio_device::porta1_w));
 	m_ay1->port_b_write_callback().set(FUNC(midway_ssio_device::portb1_w));
-	m_ay1->add_route(ALL_OUTPUTS, *this, 0.33, AUTO_ALLOC_INPUT, 1);
+	m_ay1->add_route(ALL_OUTPUTS, *this, 0.33, 1);
 }
 
 

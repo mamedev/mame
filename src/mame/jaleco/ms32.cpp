@@ -1749,18 +1749,17 @@ void ms32_state::ms32(machine_config &config)
 	m_sprite->set_color_entries(16);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	YMF271(config, m_ymf, XTAL(16'934'400)); // 16.9344MHz
-	m_ymf->add_route(0, "lspeaker", 1.0);
-	m_ymf->add_route(1, "rspeaker", 1.0);
+	m_ymf->add_route(0, "speaker", 1.0, 0);
+	m_ymf->add_route(1, "speaker", 1.0, 1);
 // Output 2/3 not used?
-//  m_ymf->add_route(2, "lspeaker", 1.0);
-//  m_ymf->add_route(3, "rspeaker", 1.0);
+//  m_ymf->add_route(2, "speaker", 1.0);
+//  m_ymf->add_route(3, "speaker", 1.0);
 }
 
 void ms32_state::ms32_invert_lines(machine_config &config)

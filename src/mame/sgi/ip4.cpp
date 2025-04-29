@@ -323,12 +323,11 @@ void sgi_ip4_device::device_add_mconfig(machine_config &config)
 	m_serial[3]->dcd_handler().set(m_duart[2], FUNC(scn2681_device::ip2_w));
 
 	// TODO: move speakers to host
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	SAA1099(config, m_saa, 8_MHz_XTAL);
-	m_saa->add_route(0, "lspeaker", 0.5);
-	m_saa->add_route(1, "rspeaker", 0.5);
+	m_saa->add_route(0, "speaker", 0.5, 0);
+	m_saa->add_route(1, "speaker", 0.5, 1);
 
 	// TODO: ACFAIL -> vme_irq<0>
 	device_vme_card_interface::vme_irq<1>().set(*this, FUNC(sgi_ip4_device::vme_irq<1>));

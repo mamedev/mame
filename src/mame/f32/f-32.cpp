@@ -262,16 +262,15 @@ void mosaicf2_state::mosaicf2(machine_config &config)
 	PALETTE(config, "palette", palette_device::RGB_555);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(14'318'181)/4)); /* 3.579545 MHz */
-	ymsnd.add_route(0, "lspeaker", 1.0);
-	ymsnd.add_route(1, "rspeaker", 1.0);
+	ymsnd.add_route(0, "speaker", 1.0, 0);
+	ymsnd.add_route(1, "speaker", 1.0, 1);
 
 	okim6295_device &oki(OKIM6295(config, "oki", XTAL(14'318'181)/8, okim6295_device::PIN7_HIGH)); /* 1.7897725 MHz */
-	oki.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	oki.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	oki.add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	oki.add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 }
 
 
@@ -484,17 +483,16 @@ void royalpk2_state::royalpk2(machine_config &config)
 	PALETTE(config, "palette", palette_device::RGB_555);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 //  ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(14'318'181)/4)); /* 3.579545 MHz */
-//  ymsnd.add_route(0, "lspeaker", 1.0);
-//  ymsnd.add_route(1, "rspeaker", 1.0);
+//  ymsnd.add_route(0, "speaker", 1.0);
+//  ymsnd.add_route(1, "speaker", 1.0);
 
 	okim6295_device &oki(OKIM6295(config, "oki", XTAL(14'318'181)/8, okim6295_device::PIN7_HIGH)); /* 1.7897725 MHz */
 	oki.set_addrmap(0, &royalpk2_state::oki_map);
-	oki.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	oki.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	oki.add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	oki.add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 	// there is a 16c550 for communication
 }

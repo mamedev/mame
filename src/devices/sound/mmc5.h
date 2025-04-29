@@ -47,7 +47,7 @@ protected:
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	/* GLOBAL CONSTANTS */
@@ -58,7 +58,7 @@ private:
 	u32          m_samps_per_sync;        /* Number of samples per vsync */
 	u32          m_vbl_times[SYNCS_MAX1];   /* VBL durations in samples */
 	u32          m_sync_times1[SYNCS_MAX1]; /* Samples per sync table */
-	stream_buffer::sample_t m_square_lut[31];       // Non-linear Square wave output LUT
+	sound_stream::sample_t m_square_lut[31];       // Non-linear Square wave output LUT
 
 	sound_stream *m_stream;
 	devcb_write_line m_irq_handler;

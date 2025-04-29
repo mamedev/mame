@@ -84,11 +84,10 @@ void iosb_base::device_add_mconfig(machine_config &config)
 	m_via2->writepb_handler().set(FUNC(iosb_base::via2_out_b));
 	m_via2->irq_handler().set(FUNC(iosb_base::via2_irq));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	ASC(config, m_asc, C15M, asc_device::asc_type::SONORA);
-	m_asc->add_route(0, "lspeaker", 1.0);
-	m_asc->add_route(1, "rspeaker", 1.0);
+	m_asc->add_route(0, "speaker", 1.0, 0);
+	m_asc->add_route(1, "speaker", 1.0, 1);
 	m_asc->irqf_callback().set(FUNC(iosb_base::asc_irq));
 
 	SWIM2(config, m_fdc, C15M);

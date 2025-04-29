@@ -320,13 +320,13 @@ float dac3350a_device::calculate_volume(int val)
 	return powf(10.0, db / 20.0);
 }
 
-void dac3350a_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void dac3350a_device::sound_stream_update(sound_stream &stream)
 {
-	const stream_buffer::sample_t enable_scale = m_dac_enable ? 1.0 : 0.0;
+	const sound_stream::sample_t enable_scale = m_dac_enable ? 1.0 : 0.0;
 
-	for (int channel = 0; channel < 2 && channel < outputs.size(); channel++)
+	for (int channel = 0; channel < 2 && channel < stream.output_count(); channel++)
 	{
-		for (int sampindex = 0; sampindex < outputs[channel].samples(); sampindex++)
-			outputs[channel].put(sampindex, inputs[channel].get(sampindex) * enable_scale * m_volume[channel]);
+		for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
+			stream.put(channel, sampindex, stream.get(channel, sampindex) * enable_scale * m_volume[channel]);
 	}
 }

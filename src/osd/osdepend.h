@@ -16,6 +16,7 @@
 #include "emufwd.h"
 
 #include "bitmap.h"
+#include "interface/audio.h"
 #include "interface/midiport.h"
 #include "interface/nethandler.h"
 
@@ -24,7 +25,7 @@
 #include <string>
 #include <string_view>
 #include <vector>
-
+#include <array>
 
 // forward references
 class input_type_entry;
@@ -65,7 +66,6 @@ public:
 class osd_interface
 {
 public:
-
 	// general overridables
 	virtual void init(running_machine &machine) = 0;
 	virtual void update(bool skip_redraw) = 0;
@@ -78,9 +78,17 @@ public:
 	virtual void wait_for_debugger(device_t &device, bool firststop) = 0;
 
 	// audio overridables
-	virtual void update_audio_stream(const int16_t *buffer, int samples_this_frame) = 0;
-	virtual void set_mastervolume(int attenuation) = 0;
 	virtual bool no_sound() = 0;
+	virtual bool sound_external_per_channel_volume() = 0;
+	virtual bool sound_split_streams_per_source() = 0;
+	virtual uint32_t sound_get_generation() = 0;
+	virtual osd::audio_info sound_get_information() = 0;
+	virtual uint32_t sound_stream_sink_open(uint32_t node, std::string name, uint32_t rate) = 0;
+	virtual uint32_t sound_stream_source_open(uint32_t node, std::string name, uint32_t rate) = 0;
+	virtual void sound_stream_close(uint32_t id) = 0;
+	virtual void sound_stream_sink_update(uint32_t id, const int16_t *buffer, int samples_this_frame) = 0;
+	virtual void sound_stream_source_update(uint32_t id, int16_t *buffer, int samples_this_frame) = 0;
+	virtual void sound_stream_set_volumes(uint32_t id, const std::vector<float> &db) = 0;
 
 	// input overridables
 	virtual void customize_input_type_list(std::vector<input_type_entry> &typelist) = 0;

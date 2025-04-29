@@ -2140,20 +2140,19 @@ int tms5220_device::intq_r()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void tms5220_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void tms5220_device::sound_stream_update(sound_stream &stream)
 {
 	int16_t sample_data[MAX_SAMPLE_CHUNK];
-	auto &output = outputs[0];
 
 	/* loop while we still have samples to generate */
-	for (int sampindex = 0; sampindex < output.samples(); )
+	for (int sampindex = 0; sampindex < stream.samples(); )
 	{
-		int length = (output.samples() > MAX_SAMPLE_CHUNK) ? MAX_SAMPLE_CHUNK : output.samples();
+		int length = (stream.samples() > MAX_SAMPLE_CHUNK) ? MAX_SAMPLE_CHUNK : stream.samples();
 
 		/* generate the samples and copy to the target buffer */
 		process(sample_data, length);
 		for (int index = 0; index < length; index++)
-			output.put_int(sampindex++, sample_data[index], 32768);
+			stream.put_int(0, sampindex++, sample_data[index], 32768);
 	}
 }
 

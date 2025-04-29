@@ -1498,10 +1498,9 @@ void spg2xx_game_state::spg2xx_base(machine_config &config)
 	m_screen->set_screen_update("maincpu", FUNC(spg2xx_device::screen_update));
 	m_screen->screen_vblank().set(m_maincpu, FUNC(spg2xx_device::vblank));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	m_maincpu->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_maincpu->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	SPEAKER(config, "speaker", 2).front();
+	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
+	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
 }
 
 void spg2xx_game_state::non_spg_base(machine_config &config)
@@ -2470,6 +2469,11 @@ ROM_START( doraglob )
 	ROM_LOAD16_WORD_SWAP( "doraglobe.bin", 0x000000, 0x800000, CRC(6f454c50) SHA1(201e2de3d90abe017a8dc141613cbf6383423d13) )
 ROM_END
 
+ROM_START( doraglobuk )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "doraglobeuk.u4", 0x000000, 0x800000, CRC(b20a22b8) SHA1(f7e42a86479e68092b27068535cff90ca686f361) )
+ROM_END
+
 ROM_START( doraglobf )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "doraglobefrance.bin", 0x000000, 0x800000, CRC(7124edc1) SHA1(b144fc1f13a28299ef14f1d01f7acd2677e4ebb9) )
@@ -2557,6 +2561,13 @@ ROM_START( ban_krkk )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "quiz.bin", 0x000000, 0x400000, CRC(6f51180a) SHA1(38017ecaae4eead38482aeb04c90b5a5eeebd6ca) )
 ROM_END
+
+ROM_START( ban_tam2 )
+	// has "#12175 TV Game Tamagotchi 2" on PCB
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "tvgametamagotchi2.bin", 0x000000, 0x800000, CRC(cc4322fa) SHA1(7ba0d3e8b9012dfa631a921cc2c7da9a21e535bd) )
+ROM_END
+
 
 ROM_START( epo_tetr )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
@@ -2709,7 +2720,8 @@ CONS( 2006, doraphonf,  doraphon, 0, doraphonep,doraphonep,spg2xx_game_doraphone
 // This was from a 'cost reduced' unit with the 'non-TV' mode switch and internal speaker removed, however it looks like the code was not disabled or removed as the mode is fully functional.
 // The ZC-Infinity video for this on YouTube shows the map scrolling to center the continent, there doesn't appear to be an input for this, different revision?
 // a Dutch localized version also exists, which again must be different code
-CONS( 2007, doraglob,   0,        0, doraphone, doraglobe, spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora the Explorer - Dora TV Adventure Globe",                           MACHINE_IMPERFECT_SOUND )
+CONS( 2007, doraglob,   0,        0, doraphone, doraglobe, spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora the Explorer - Dora TV Adventure Globe (US)",                      MACHINE_IMPERFECT_SOUND )
+CONS( 2007, doraglobuk, doraglob, 0, doraphone, doraglobe, spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora the Explorer - Dora TV Adventure Globe (UK)",                      MACHINE_IMPERFECT_SOUND )
 CONS( 2007, doraglobf,  doraglob, 0, doraphone, doraglobe, spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora the Explorer - Dora TV Globe-Trotter (France)",                    MACHINE_IMPERFECT_SOUND )
 CONS( 2007, doraglobg,  doraglob, 0, doraphone, doraglobe, spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora the Explorer - Doras Abenteuer-Globus (Germany)",                  MACHINE_IMPERFECT_SOUND )
 
@@ -2778,6 +2790,9 @@ CONS( 2006, dmbtjunc,   0,        0, spg2xx,    dmbtjunc,  spg2xx_game_state,   
 
 // Let's!TVプレイ 脳と体を鍛える 体感頭脳ファミリーマットレ  - Let's! TV Play branding appears on the box
 CONS( 2006, ban_krkk,   0,        0, spg2xx,    ban_krkk,  spg2xx_game_state,          init_crc,      "Bandai",                                                "Let's! TV Play Nou to Karada o Kitaeru Taikan Zunou Family Mattore (Japan)", MACHINE_IMPERFECT_SOUND )
+
+// Let's!TVプレイ チームたいこー! カードでパワーUP! たまごっちスクール選手権 - has IR for optional connectivity with external Tamagotchi device, and a card scanner used for gameplay
+CONS( 2007, ban_tam2,   0,        0, spg2xx,    spg2xx,    spg2xx_game_state,          init_crc,      "Bandai",                                                "Let's! TV Play Team Taikou! Card de Power Up! Tamagotchi School Senshuken (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 CONS( 2007, epo_tetr,   0,        0, epo_tetr,  epo_tetr,  epo_tetr_game_state,          empty_init,    "Epoch",                                                "Minna no Tetris (Japan)", MACHINE_IMPERFECT_SOUND )
 

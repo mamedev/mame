@@ -162,13 +162,13 @@ void qsound_hle_device::device_reset()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void qsound_hle_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void qsound_hle_device::sound_stream_update(sound_stream &stream)
 {
-	for (int i = 0; i < outputs[0].samples(); i ++)
+	for (int i = 0; i < stream.samples(); i ++)
 	{
 		update_sample();
-		outputs[0].put_int(i, m_out[0], 32768);
-		outputs[1].put_int(i, m_out[1], 32768);
+		stream.put_int(0, i, m_out[0], 32768);
+		stream.put_int(1, i, m_out[1], 32768);
 	}
 }
 

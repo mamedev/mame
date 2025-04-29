@@ -55,17 +55,17 @@ void va_vca_device::device_start()
 	save_item(NAME(m_fixed_gain));
 }
 
-void va_vca_device::sound_stream_update(sound_stream &stream, const std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
+void va_vca_device::sound_stream_update(sound_stream &stream)
 {
 	if (m_has_cv_stream)
 	{
-		for (int i = 0; i < outputs[0].samples(); i++)
-			outputs[0].put(i, inputs[0].get(i) * cv_to_gain(inputs[1].get(i)));
+		for (int i = 0; i < stream.samples(); i++)
+			stream.put(0, i, stream.get(0, i) * cv_to_gain(stream.get(1, i)));
 	}
 	else
 	{
-		for (int i = 0; i < outputs[0].samples(); i++)
-			outputs[0].put(i, inputs[0].get(i) * m_fixed_gain);
+		for (int i = 0; i < stream.samples(); i++)
+			stream.put(0, i, stream.get(0, i) * m_fixed_gain);
 	}
 }
 

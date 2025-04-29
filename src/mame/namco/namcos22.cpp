@@ -3787,12 +3787,11 @@ void namcos22_state::namcos22(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_namcos22);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	C352(config, m_c352, 49.152_MHz_XTAL/2, 288);
-	m_c352->add_route(0, "lspeaker", 1.0);
-	m_c352->add_route(1, "rspeaker", 1.0);
+	m_c352->add_route(0, "speaker", 1.0, 0);
+	m_c352->add_route(1, "speaker", 1.0, 1);
 }
 
 void namcos22_state::cybrcomm(machine_config &config)

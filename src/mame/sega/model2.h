@@ -768,7 +768,7 @@ struct model2_state::triangle
 	u8              luma = 0;
 	int16_t         viewport[4] = { 0, 0, 0, 0 };
 	int16_t         center[2] = { 0, 0 };
-	u8				window = 0;
+	u8              window = 0;
 };
 
 struct model2_state::quad_m2
@@ -823,8 +823,8 @@ struct model2_state::raster_state
 	u16             max_z = 0;                      // Maximum sortable Z value
 	u16             texture_ram[0x10000];           // Texture RAM pointer
 	u8              log_ram[0x40000];               // Log RAM pointer
-	u8				cur_window = 0;					// Current window
-	plane			clip_plane[4][4];				// Polygon clipping planes
+	u8              cur_window = 0;                 // Current window
+	plane           clip_plane[4][4];               // Polygon clipping planes
 };
 
 /*******************************************

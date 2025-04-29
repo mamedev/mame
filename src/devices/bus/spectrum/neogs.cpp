@@ -426,11 +426,10 @@ void neogs_device::device_add_mconfig(machine_config &config)
 	m_sdcard->set_prefer_sdhc();
 	m_sdcard->spi_miso_callback().set([this](int state) { m_spi_data_in_latch <<= 1; m_spi_data_in_latch |= state; });
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[0], 0).add_route(ALL_OUTPUTS, "lspeaker", 0.75); // TDA1543
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[1], 0).add_route(ALL_OUTPUTS, "rspeaker", 0.75);
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[0], 0).add_route(ALL_OUTPUTS, "speaker", 0.75, 0); // TDA1543
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[1], 0).add_route(ALL_OUTPUTS, "speaker", 0.75, 1);
 }
 
 const tiny_rom_entry *neogs_device::device_rom_region() const

@@ -20466,9 +20466,6 @@ skill98
 skillch
 skillcha
 srmagic
-ss2000
-ss2000a
-ss2001
 star100
 super7
 super9
@@ -20545,7 +20542,8 @@ mgcsb
 mgdh
 mgdha
 sdmg2
-sdmg2a
+sdmg2754ca
+sdmg2754cb
 sdmg2p
 slqz2
 slqz2a
@@ -29531,6 +29529,7 @@ cas21iwc
 comg074
 comg076
 comg079
+comg079b
 comg080
 comg094
 comg107
@@ -32571,6 +32570,11 @@ vcarn
 @source:misc/sprcros2.cpp
 sprcros2
 sprcros2a
+
+@source:misc/sshanghai.cpp
+ssh2000
+ssh2000a
+ssh2000wf
 
 @source:misc/startouch.cpp
 europl01
@@ -39170,6 +39174,7 @@ mcword_de
 @source:psion/psion.cpp
 psion1
 psioncm
+psioncmm
 psionla
 psionlam
 psionlz
@@ -39209,6 +39214,7 @@ psionhc120
 
 @source:psion/siena.cpp
 siena
+siena_fr
 
 @source:psion/workabout.cpp
 psionwa
@@ -42613,6 +42619,9 @@ bert
 
 @source:skeleton/biorhythm.cpp
 biorhthm
+
+@source:skeleton/biorhythm_fp.cpp
+biortmfp
 
 @source:skeleton/bitgraph.cpp
 bitgrpha
@@ -46385,6 +46394,7 @@ ablkickb
 abltenni
 anpantv
 ban_krkk
+ban_tam2
 comil
 ddr33v
 decathln
@@ -46393,6 +46403,7 @@ dmbtjunc
 doraglob
 doraglobf
 doraglobg
+doraglobuk
 doraphon
 doraphonf
 doyousud

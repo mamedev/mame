@@ -417,14 +417,13 @@ void asterix_state::asterix(machine_config &config)
 	K053251(config, m_k053251, 0);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	YM2151(config, "ymsnd", XTAL(32'000'000)/8).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0); // 4MHz
+	YM2151(config, "ymsnd", XTAL(32'000'000)/8).add_route(0, "speaker", 1.0, 0).add_route(1, "speaker", 1.0, 1); // 4MHz
 
 	k053260_device &k053260(K053260(config, "k053260", XTAL(32'000'000)/8)); // 4MHz
-	k053260.add_route(0, "lspeaker", 0.75);
-	k053260.add_route(1, "rspeaker", 0.75);
+	k053260.add_route(0, "speaker", 0.75, 0);
+	k053260.add_route(1, "speaker", 0.75, 1);
 	k053260.sh1_cb().set(FUNC(asterix_state::z80_nmi_w));
 }
 

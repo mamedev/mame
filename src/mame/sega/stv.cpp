@@ -1160,15 +1160,14 @@ void stv_state::stv(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(stv_state,stv_vdp2)
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	SCSP(config, m_scsp, 22579200); // TODO : Unknown clock, divider
 	m_scsp->set_addrmap(0, &stv_state::scsp_mem);
 	m_scsp->irq_cb().set(FUNC(saturn_state::scsp_irq));
 	m_scsp->main_irq_cb().set(m_scu, FUNC(sega_scu_device::sound_req_w));
-	m_scsp->add_route(0, "lspeaker", 1.0);
-	m_scsp->add_route(1, "rspeaker", 1.0);
+	m_scsp->add_route(0, "speaker", 1.0, 0);
+	m_scsp->add_route(1, "speaker", 1.0, 1);
 
 	SEGA_BILLBOARD(config, m_billboard, 0);
 
@@ -1253,8 +1252,8 @@ void stv_state::batmanfr(machine_config &config)
 	stv(config);
 	ACCLAIM_RAX(config, m_rax, 0);
 	// TODO: RAX output connected to SCSP?
-	m_rax->add_route(0, "lspeaker", 1.0);
-	m_rax->add_route(1, "rspeaker", 1.0);
+	m_rax->add_route(0, "speaker", 1.0, 0);
+	m_rax->add_route(1, "speaker", 1.0, 1);
 }
 
 void stv_state::shienryu(machine_config &config)

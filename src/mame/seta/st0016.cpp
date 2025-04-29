@@ -48,7 +48,7 @@ st0016_cpu_device::st0016_cpu_device(const machine_config &mconfig, const char *
 	: z80_device(mconfig, ST0016_CPU, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, nullptr, "palette")
 	, device_video_interface(mconfig, *this, false)
-	, device_mixer_interface(mconfig, *this, 2)
+	, device_mixer_interface(mconfig, *this)
 	, m_io_space_config("io", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(st0016_cpu_device::cpu_internal_io_map), this))
 	, m_space_config("regs", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(st0016_cpu_device::cpu_internal_map), this))
 	, m_charam_space_config("charam", ENDIANNESS_LITTLE, 8, 21, 0, address_map_constructor(FUNC(st0016_cpu_device::charam_map), this))
@@ -150,8 +150,8 @@ void st0016_cpu_device::device_add_mconfig(machine_config &config)
 
 	st0016_device &stsnd(ST0016(config, "stsnd", DERIVED_CLOCK(1,1)));
 	stsnd.set_addrmap(0, &st0016_cpu_device::charam_map);
-	stsnd.add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
-	stsnd.add_route(1, *this, 1.0, AUTO_ALLOC_INPUT, 1);
+	stsnd.add_route(0, *this, 1.0, 0);
+	stsnd.add_route(1, *this, 1.0, 1);
 }
 
 

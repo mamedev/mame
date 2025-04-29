@@ -120,13 +120,6 @@ public:
 		assert(m_buffer);
 		return m_buffer->Stop();
 	}
-	HRESULT set_volume(LONG volume) const
-	{
-		assert(m_buffer);
-		return m_buffer->SetVolume(volume);
-	}
-	HRESULT set_min_volume() { return set_volume(DSBVOLUME_MIN); }
-
 	HRESULT get_current_positions(DWORD &play_pos, DWORD &write_pos) const
 	{
 		assert(m_buffer);
@@ -225,8 +218,7 @@ public:
 	virtual void exit() override;
 
 	// sound_module
-	virtual void update_audio_stream(bool is_throttled, int16_t const *buffer, int samples_this_frame) override;
-	virtual void set_mastervolume(int attenuation) override;
+	virtual void stream_sink_update(uint32_t, int16_t const *buffer, int samples_this_frame) override;
 
 private:
 	HRESULT         dsound_init();
@@ -297,11 +289,11 @@ void sound_direct_sound::exit()
 
 
 //============================================================
-//  update_audio_stream
+//  stream_sink_update
 //============================================================
 
-void sound_direct_sound::update_audio_stream(
-		bool is_throttled,
+void sound_direct_sound::stream_sink_update(
+		uint32_t,
 		int16_t const *buffer,
 		int samples_this_frame)
 {
@@ -318,7 +310,7 @@ void sound_direct_sound::update_audio_stream(
 	if (DS_OK != result)
 		return;
 
-//DWORD orig_write = write_position;
+	//DWORD orig_write = write_position;
 	// normalize the write position so it is always after the play position
 	if (write_position < play_position)
 		write_position += m_stream_buffer.size();
@@ -334,7 +326,7 @@ void sound_direct_sound::update_audio_stream(
 	// if we're between play and write positions, then bump forward, but only in full chunks
 	while (stream_in < write_position)
 	{
-//printf("Underflow: PP=%d  WP=%d(%d)  SI=%d(%d)  BTF=%d\n", (int)play_position, (int)write_position, (int)orig_write, (int)stream_in, (int)m_stream_buffer_in, (int)bytes_this_frame);
+		//printf("Underflow: PP=%d  WP=%d(%d)  SI=%d(%d)  BTF=%d\n", (int)play_position, (int)write_position, (int)orig_write, (int)stream_in, (int)m_stream_buffer_in, (int)bytes_this_frame);
 		m_buffer_underflows++;
 		stream_in += bytes_this_frame;
 	}
@@ -342,7 +334,7 @@ void sound_direct_sound::update_audio_stream(
 	// if we're going to overlap the play position, just skip this chunk
 	if ((stream_in + bytes_this_frame) > (play_position + m_stream_buffer.size()))
 	{
-//printf("Overflow: PP=%d  WP=%d(%d)  SI=%d(%d)  BTF=%d\n", (int)play_position, (int)write_position, (int)orig_write, (int)stream_in, (int)m_stream_buffer_in, (int)bytes_this_frame);
+		//printf("Overflow: PP=%d  WP=%d(%d)  SI=%d(%d)  BTF=%d\n", (int)play_position, (int)write_position, (int)orig_write, (int)stream_in, (int)m_stream_buffer_in, (int)bytes_this_frame);
 		m_buffer_overflows++;
 		return;
 	}
@@ -360,26 +352,6 @@ void sound_direct_sound::update_audio_stream(
 
 	// adjust the input pointer
 	m_stream_buffer_in = (m_stream_buffer_in + bytes_this_frame) % m_stream_buffer.size();
-}
-
-
-//============================================================
-//  set_mastervolume
-//============================================================
-
-void sound_direct_sound::set_mastervolume(int attenuation)
-{
-	// clamp the attenuation to 0-32 range
-	attenuation = std::clamp(attenuation, -32, 0);
-
-	// set the master volume
-	if (m_stream_buffer)
-	{
-		if (-32 == attenuation)
-			m_stream_buffer.set_min_volume();
-		else
-			m_stream_buffer.set_volume(100 * attenuation);
-	}
 }
 
 

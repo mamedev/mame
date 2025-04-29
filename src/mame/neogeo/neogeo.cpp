@@ -1968,13 +1968,12 @@ void neogeo_base_state::neogeo_base(machine_config &config)
 
 void neogeo_base_state::neogeo_stereo(machine_config &config)
 {
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	m_ym->add_route(0, "lspeaker", 0.84);
-	m_ym->add_route(0, "rspeaker", 0.84);
-	m_ym->add_route(1, "lspeaker", 0.98);
-	m_ym->add_route(2, "rspeaker", 0.98);
+	m_ym->add_route(0, "speaker", 0.84, 0);
+	m_ym->add_route(0, "speaker", 0.84, 1);
+	m_ym->add_route(1, "speaker", 0.98, 0);
+	m_ym->add_route(2, "speaker", 0.98, 1);
 }
 
 

@@ -1099,8 +1099,7 @@ void mcr3_state::mcrmono(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1127,8 +1126,8 @@ void mcr3_state::mono_tcs(machine_config &config)
 
 	/* basic machine hardware */
 	MIDWAY_TURBO_CHEAP_SQUEAK(config, m_turbo_cheap_squeak);
-	m_turbo_cheap_squeak->add_route(ALL_OUTPUTS, "lspeaker", 0.8);
-	m_turbo_cheap_squeak->add_route(ALL_OUTPUTS, "rspeaker", 0.8);
+	m_turbo_cheap_squeak->add_route(ALL_OUTPUTS, "speaker", 0.8, 0);
+	m_turbo_cheap_squeak->add_route(ALL_OUTPUTS, "speaker", 0.8, 1);
 }
 
 void maxrpm_state::maxrpm(machine_config &config)
@@ -1150,8 +1149,8 @@ void mcr3_state::mono_sg(machine_config &config)
 
 	/* basic machine hardware */
 	MIDWAY_SOUNDS_GOOD(config, m_sounds_good);
-	m_sounds_good->add_route(ALL_OUTPUTS, "lspeaker", 0.75);
-	m_sounds_good->add_route(ALL_OUTPUTS, "rspeaker", 0.75);
+	m_sounds_good->add_route(ALL_OUTPUTS, "speaker", 0.75, 0);
+	m_sounds_good->add_route(ALL_OUTPUTS, "speaker", 0.75, 1);
 }
 
 
@@ -1165,8 +1164,8 @@ void mcr3_state::mcrscroll(machine_config &config)
 
 	/* basic machine hardware */
 	MIDWAY_SSIO(config, m_ssio);
-	m_ssio->add_route(0, "lspeaker", 1.0);
-	m_ssio->add_route(1, "rspeaker", 1.0);
+	m_ssio->add_route(0, "speaker", 1.0, 0);
+	m_ssio->add_route(1, "speaker", 1.0, 1);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &mcr3_state::spyhunt_map);
 	m_maincpu->set_addrmap(AS_IO, &mcr3_state::spyhunt_portmap);
@@ -1189,8 +1188,8 @@ void mcrsc_csd_state::mcrsc_csd(machine_config &config)
 
 	/* basic machine hardware */
 	MIDWAY_CHEAP_SQUEAK_DELUXE(config, m_cheap_squeak_deluxe);
-	m_cheap_squeak_deluxe->add_route(ALL_OUTPUTS, "lspeaker", 0.8);
-	m_cheap_squeak_deluxe->add_route(ALL_OUTPUTS, "rspeaker", 0.8);
+	m_cheap_squeak_deluxe->add_route(ALL_OUTPUTS, "speaker", 0.8, 0);
+	m_cheap_squeak_deluxe->add_route(ALL_OUTPUTS, "speaker", 0.8, 1);
 
 	CD4099(config, m_lamplatch); // U1 on Lamp Driver Board
 	m_lamplatch->q_out_cb<0>().set_output("lamp0");

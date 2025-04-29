@@ -320,8 +320,8 @@ void maciivx_state::maciiv_base(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
 		[](device_t *device)
 		{
-			device->subdevice<cdda_device>("cdda")->add_route(0, "^^lspeaker", 1.0);
-			device->subdevice<cdda_device>("cdda")->add_route(1, "^^rspeaker", 1.0);
+			device->subdevice<cdda_device>("cdda")->add_route(0, "^^speaker", 1.0, 0);
+			device->subdevice<cdda_device>("cdda")->add_route(1, "^^speaker", 1.0, 1);
 		});
 	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
@@ -360,12 +360,11 @@ void maciivx_state::maciiv_base(machine_config &config)
 	rs232b.dcd_handler().set(m_scc, FUNC(z80scc_device::dcdb_w));
 	rs232b.cts_handler().set(m_scc, FUNC(z80scc_device::ctsb_w));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	APPLE_DFAC(config, m_dfac, 22257);
-	m_dfac->add_route(0, "lspeaker", 1.0);
-	m_dfac->add_route(1, "rspeaker", 1.0);
+	m_dfac->add_route(0, "speaker", 1.0, 0);
+	m_dfac->add_route(1, "speaker", 1.0, 1);
 
 	VASP(config, m_vasp, C15M);
 	m_vasp->set_maincpu_tag("maincpu");

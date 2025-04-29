@@ -1152,11 +1152,10 @@ DEFINE_DEVICE_TYPE(ISA16_SOUND_BLASTER_16, isa16_sblaster16_device, "isa_sblaste
 
 void sb_device::common(machine_config &config)
 {
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5); // unknown DAC
-	DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5); // unknown DAC
+	DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5, 0); // unknown DAC
+	DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5, 1); // unknown DAC
 
 	PC_JOY(config, m_joy);
 
@@ -1169,16 +1168,16 @@ void isa8_sblaster1_0_device::device_add_mconfig(machine_config &config)
 	common(config);
 
 	YM3812(config, m_ym3812, ym3812_StdClock);
-	m_ym3812->add_route(ALL_OUTPUTS, "lspeaker", 3.0);
-	m_ym3812->add_route(ALL_OUTPUTS, "rspeaker", 3.0);
+	m_ym3812->add_route(ALL_OUTPUTS, "speaker", 3.0, 0);
+	m_ym3812->add_route(ALL_OUTPUTS, "speaker", 3.0, 1);
 
 	SAA1099(config, m_saa1099_1, XTAL(14'318'181) / 2); // or CMS-301, from OSC pin in ISA bus
-	m_saa1099_1->add_route(0, "lspeaker", 0.5);
-	m_saa1099_1->add_route(1, "rspeaker", 0.5);
+	m_saa1099_1->add_route(0, "speaker", 0.5, 0);
+	m_saa1099_1->add_route(1, "speaker", 0.5, 1);
 
 	SAA1099(config, m_saa1099_2, XTAL(14'318'181) / 2); // or CMS-301, from OSC pin in ISA bus
-	m_saa1099_2->add_route(0, "lspeaker", 0.5);
-	m_saa1099_2->add_route(1, "rspeaker", 0.5);
+	m_saa1099_2->add_route(0, "speaker", 0.5, 0);
+	m_saa1099_2->add_route(1, "speaker", 0.5, 1);
 }
 
 void isa8_sblaster1_5_device::device_add_mconfig(machine_config &config)
@@ -1186,8 +1185,8 @@ void isa8_sblaster1_5_device::device_add_mconfig(machine_config &config)
 	common(config);
 
 	YM3812(config, m_ym3812, ym3812_StdClock);
-	m_ym3812->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_ym3812->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_ym3812->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	m_ym3812->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 	/* no CM/S support (empty sockets) */
 }
 
@@ -1196,10 +1195,10 @@ void isa16_sblaster16_device::device_add_mconfig(machine_config &config)
 	common(config);
 
 	ymf262_device &ymf262(YMF262(config, "ymf262", ymf262_StdClock));
-	ymf262.add_route(0, "lspeaker", 1.0);
-	ymf262.add_route(1, "rspeaker", 1.0);
-	ymf262.add_route(2, "lspeaker", 1.0);
-	ymf262.add_route(3, "rspeaker", 1.0);
+	ymf262.add_route(0, "speaker", 1.0, 0);
+	ymf262.add_route(1, "speaker", 1.0, 1);
+	ymf262.add_route(2, "speaker", 1.0, 0);
+	ymf262.add_route(3, "speaker", 1.0, 1);
 }
 
 //**************************************************************************

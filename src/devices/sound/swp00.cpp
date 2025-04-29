@@ -1259,13 +1259,13 @@ double v2f2(s32 value)
 	return (1.0 - (value & 0xffffff) / 33554432.0) / (1 << (value >> 24));
 }
 
-void swp00_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void swp00_device::sound_stream_update(sound_stream &stream)
 {
 	const delay_block brev(this, m_rev_buffer);
 	const delay_block bcho(this, m_cho_buffer);
 	const delay_block bvar(this, m_var_buffer);
 
-	for(int i=0; i != outputs[0].samples(); i++) {
+	for(int i=0; i != stream.samples(); i++) {
 		s32 dry_l = 0, dry_r = 0;
 		s32 rev   = 0;
 		s32 cho_l = 0, cho_r = 0;
@@ -1838,8 +1838,8 @@ void swp00_device::sound_stream_update(sound_stream &stream, std::vector<read_st
 		dry_l += m9v(rev_out_l, m_rev_vol) + m9v(m9(cho_out_l, 0x17), m_cho_vol) + m9v(m9(var_out_l, 0x18), m_var_vol);
 		dry_r += m9v(rev_out_r, m_rev_vol) + m9v(m9(cho_out_r, 0x0e), m_cho_vol) + m9v(m9(var_out_r, 0x0f), m_var_vol);
 
-		outputs[0].put_int(i, dry_l, 32768);
-		outputs[1].put_int(i, dry_r, 32768);
+		stream.put_int(0, i, dry_l, 32768);
+		stream.put_int(1, i, dry_r, 32768);
 
 		m_buffer_offset --;
 	}

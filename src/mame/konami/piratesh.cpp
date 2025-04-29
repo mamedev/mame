@@ -648,13 +648,12 @@ void piratesh_state::piratesh(machine_config &config)
 	K054338(config, "k054338", 0, m_k055555).set_alpha_invert(1);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	K054539(config, m_k054539, XTAL(18'432'000));
 	m_k054539->timer_handler().set(FUNC(piratesh_state::k054539_nmi_gen));
-	m_k054539->add_route(0, "lspeaker", 0.2);
-	m_k054539->add_route(1, "rspeaker", 0.2);
+	m_k054539->add_route(0, "speaker", 0.2, 0);
+	m_k054539->add_route(1, "speaker", 0.2, 1);
 }
 
 

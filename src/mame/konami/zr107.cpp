@@ -780,19 +780,18 @@ void zr107_state::zr107(machine_config &config)
 	K056800(config, m_k056800, XTAL(18'432'000));
 	m_k056800->int_callback().set_inputline(m_audiocpu, M68K_IRQ_1);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	k054539_device &k054539_1(K054539(config, "k054539_1", XTAL(18'432'000)));
 	k054539_1.set_device_rom_tag("k054539");
 	k054539_1.timer_handler().set(FUNC(zr107_state::k054539_irq_gen));
-	k054539_1.add_route(0, "lspeaker", 0.75);
-	k054539_1.add_route(1, "rspeaker", 0.75);
+	k054539_1.add_route(0, "speaker", 0.75, 0);
+	k054539_1.add_route(1, "speaker", 0.75, 1);
 
 	k054539_device &k054539_2(K054539(config, "k054539_2", XTAL(18'432'000)));
 	k054539_2.set_device_rom_tag("k054539");
-	k054539_2.add_route(0, "lspeaker", 0.75);
-	k054539_2.add_route(1, "rspeaker", 0.75);
+	k054539_2.add_route(0, "speaker", 0.75, 0);
+	k054539_2.add_route(1, "speaker", 0.75, 1);
 
 	adc0838_device &adc(ADC0838(config, "adc0838"));
 	adc.set_input_callback(FUNC(zr107_state::adc0838_callback));

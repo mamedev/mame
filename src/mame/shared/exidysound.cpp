@@ -277,16 +277,15 @@ void exidy_sound_device::device_reset()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void exidy_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void exidy_sound_device::sound_stream_update(sound_stream &stream)
 {
 	sh6840_timer_channel *sh6840_timer = m_sh6840_timer;
 
 	// hack to skip the expensive lfsr noise generation unless at least one of the 3 channels actually depends on it being generated
 	bool noisy = ((sh6840_timer[0].cr & sh6840_timer[1].cr & sh6840_timer[2].cr & 0x02) == 0);
-	auto &buffer = outputs[0];
 
 	// loop over samples
-	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 	{
 		sh6840_timer_channel *t;
 		int clocks;
@@ -346,7 +345,7 @@ void exidy_sound_device::sound_stream_update(sound_stream &stream, std::vector<r
 		sample += generate_music_sample();
 
 		// stash
-		buffer.put_int(sampindex, sample, 32768);
+		stream.put_int(0, sampindex, sample, 32768);
 	}
 }
 

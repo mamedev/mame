@@ -179,8 +179,7 @@ void gaminator_state::gaminator(machine_config &config)
 	vga.set_screen("screen");
 	vga.set_vram_size(0x100000);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	/* unknown sound */
 }
 

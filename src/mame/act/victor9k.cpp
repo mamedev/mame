@@ -23,28 +23,32 @@
 */
 
 #include "emu.h"
+
+#include "victor9k_fdc.h"
+#include "victor9k_kb.h"
+
 #include "bus/centronics/ctronics.h"
 #include "bus/ieee488/ieee488.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
-#include "formats/victor9k_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/6522via.h"
 #include "machine/mc6852.h"
-#include "machine/pit8253.h"
 #include "machine/pic8259.h"
+#include "machine/pit8253.h"
 #include "machine/ram.h"
 #include "machine/rescap.h"
-#include "victor9k_kb.h"
-#include "victor9k_fdc.h"
 #include "machine/z80sio.h"
-#include "sound/hc55516.h"
 #include "sound/flt_biquad.h"
+#include "sound/hc55516.h"
 #include "video/mc6845.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
+
+#include "formats/victor9k_dsk.h"
 
 #include <iostream>
 
@@ -398,11 +402,11 @@ void victor9k_state::ssda_sm_dtr_w(int state)
 	m_ssda->cts_w(state);
 	m_ssda->dcd_w(!state);
 
-    /*                           ___
-     * We're supposed to set the ENC/DEC input of the HC55516 to !state,
-     * but only playback/decode is currently supported, and that input
-     * is not implemenented.
-     */
+	/*
+	 * We're supposed to set the _ENC/DEC input of the HC55516 to !state,
+	 * but only playback/decode is currently supported, and that input
+	 * is not implemenented.
+	 */
 }
 
 
@@ -866,4 +870,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                     FULLNAME       FLAGS
-COMP( 1982, victor9k, 0,      0,      victor9k, victor9k, victor9k_state, empty_init, "Victor Business Products", "Victor 9000", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+COMP( 1982, victor9k, 0,      0,      victor9k, victor9k, victor9k_state, empty_init, "Victor Business Products", "Victor 9000", MACHINE_IMPERFECT_COLORS )

@@ -979,17 +979,17 @@ void s_dsp_device::state_register()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void s_dsp_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void s_dsp_device::sound_stream_update(sound_stream &stream)
 {
 	s16 mix[2];
 
-	for (int i = 0; i < outputs[0].samples(); i++)
+	for (int i = 0; i < stream.samples(); i++)
 	{
 		mix[0] = mix[1] = 0;
 		dsp_update(mix);
 
 		/* Update the buffers */
-		outputs[0].put_int_clamp(i, (s32)mix[0], 32768);
-		outputs[1].put_int_clamp(i, (s32)mix[1], 32768);
+		stream.put_int(0, i, (s32)mix[0], 32768);
+		stream.put_int(1, i, (s32)mix[1], 32768);
 	}
 }

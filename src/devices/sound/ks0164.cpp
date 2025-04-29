@@ -474,9 +474,9 @@ void ks0164_device::cpu_map(address_map &map)
 	map(0xe000, 0xffff).ram();
 }
 
-void ks0164_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void ks0164_device::sound_stream_update(sound_stream &stream)
 {
-	for(int sample = 0; sample != outputs[0].samples(); sample++) {
+	for(int sample = 0; sample != stream.samples(); sample++) {
 		s32 suml = 0, sumr = 0;
 		for(int voice = 0; voice < 0x20; voice++) {
 			u16 *regs = m_sregs[voice];
@@ -537,7 +537,7 @@ void ks0164_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 				}
 			}
 		}
-		outputs[0].put_int(sample, suml, 32768 * 32);
-		outputs[1].put_int(sample, sumr, 32768 * 32);
+		stream.put_int(0, sample, suml, 32768 * 32);
+		stream.put_int(1, sample, sumr, 32768 * 32);
 	}
 }

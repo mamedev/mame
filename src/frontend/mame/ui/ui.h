@@ -349,8 +349,8 @@ private:
 
 	// slider controls
 	int32_t slider_volume(std::string *str, int32_t newval);
-	int32_t slider_mixervol(int item, std::string *str, int32_t newval);
-	int32_t slider_panning(speaker_device &speaker, std::string *str, int32_t newval);
+	int32_t slider_devvol(device_sound_interface *snd, std::string *str, int32_t newval);
+	int32_t slider_devvol_chan(device_sound_interface *snd, int channel, std::string *str, int32_t newval);
 	int32_t slider_adjuster(ioport_field &field, std::string *str, int32_t newval);
 	int32_t slider_overclock(device_t &device, std::string *str, int32_t newval);
 	int32_t slider_refresh(screen_device &screen, std::string *str, int32_t newval);

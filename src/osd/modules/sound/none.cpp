@@ -27,11 +27,6 @@ public:
 
 	virtual int init(osd_interface &osd, const osd_options &options) override { return 0; }
 	virtual void exit() override { }
-
-	// sound_module
-
-	virtual void update_audio_stream(bool is_throttled, const int16_t *buffer, int samples_this_frame) override { }
-	virtual void set_mastervolume(int attenuation) override { }
 };
 
 } // anonymous namespace

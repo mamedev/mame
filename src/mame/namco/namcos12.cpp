@@ -1191,14 +1191,13 @@ public:
 		AT28C16(config, "at28c16", 0);
 
 		/* sound hardware */
-		SPEAKER(config, "lspeaker").front_left();
-		SPEAKER(config, "rspeaker").front_right();
+		SPEAKER(config, "speaker", 2).front();
 
 		c352_device &c352(C352(config, "c352", 25401600, 288));
-		c352.add_route(0, "lspeaker", 1.00);
-		c352.add_route(1, "rspeaker", 1.00);
-		//c352.add_route(2, "lspeaker", 1.00); // Second DAC not present.
-		//c352.add_route(3, "rspeaker", 1.00);
+		c352.add_route(0, "speaker", 1.00, 0);
+		c352.add_route(1, "speaker", 1.00, 1);
+		//c352.add_route(2, "speaker", 1.00); // Second DAC not present.
+		//c352.add_route(3, "speaker", 1.00);
 	}
 
 	void aplarail(machine_config &config) ATTR_COLD
@@ -1558,8 +1557,8 @@ public:
 		coh700b(config);
 
 		NAMCOS12_CDXA(config, m_cdxa_pcb, XTAL(14'745'600));
-		m_cdxa_pcb->add_route(0, "lspeaker", 0.30); // roughly matched the volume of speaking lines between the CDXA audio vs non-CDXA audio
-		m_cdxa_pcb->add_route(1, "rspeaker", 0.30);
+		m_cdxa_pcb->add_route(0, "speaker", 0.30, 0); // roughly matched the volume of speaking lines between the CDXA audio vs non-CDXA audio
+		m_cdxa_pcb->add_route(1, "speaker", 0.30, 1);
 		m_cdxa_pcb->psx_int10_callback().set("maincpu:irq", FUNC(psxirq_device::intin10));
 	}
 

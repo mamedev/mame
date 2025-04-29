@@ -149,7 +149,7 @@ protected:
 	// device_config_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 
-	virtual u32 palette_entries() const noexcept override { return 0x40 * 8; } 
+	virtual u32 palette_entries() const noexcept override { return 0x40 * 8; }
 
 	TIMER_CALLBACK_MEMBER(hblank_tick);
 	TIMER_CALLBACK_MEMBER(nmi_tick);
@@ -309,7 +309,7 @@ public:
 protected:
 	virtual void device_start() override ATTR_COLD;
 
-	virtual u32 palette_entries() const noexcept override { return 0x40 * 2; } 
+	virtual u32 palette_entries() const noexcept override { return 0x40 * 2; }
 
 	virtual void draw_background(u8 *line_priority) override;
 	virtual void draw_sprite_pixel(int sprite_xpos, int color, int pixel, u8 pixel_data, bitmap_rgb32 &bitmap) override;

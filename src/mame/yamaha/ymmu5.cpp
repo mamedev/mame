@@ -204,13 +204,12 @@ void mu5_state::mu5(machine_config &config)
 
 	MU5LCD(config, m_lcd);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	MULTIPCM(config, m_ymw258, 9.4_MHz_XTAL); // clock verified by schematics
 	m_ymw258->set_addrmap(0, &mu5_state::ymw258_map);
-	m_ymw258->add_route(0, "lspeaker", 1.0);
-	m_ymw258->add_route(1, "rspeaker", 1.0);
+	m_ymw258->add_route(0, "speaker", 1.0, 0);
+	m_ymw258->add_route(1, "speaker", 1.0, 1);
 
 	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(m_maincpu, FUNC(h83002_device::sci_rx_w<1>));
 

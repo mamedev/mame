@@ -593,7 +593,7 @@ be induced by cutoff currents from the 15 FETs.
 
 #define ENABLE_REGISTER_TEST        (0)     // Enable preprogrammed registers
 
-static constexpr stream_buffer::sample_t MAX_OUTPUT = 1.0;
+static constexpr sound_stream::sample_t MAX_OUTPUT = 1.0;
 
 
 /*************************************
@@ -758,7 +758,7 @@ static const ay8910_device::mosfet_param ay8910_mosfet_param =
  *
  *************************************/
 
-static inline void build_3D_table(double rl, const ay8910_device::ay_ym_param *par, const ay8910_device::ay_ym_param *par_env, int normalize, double factor, int zero_is_off, stream_buffer::sample_t *tab)
+static inline void build_3D_table(double rl, const ay8910_device::ay_ym_param *par, const ay8910_device::ay_ym_param *par_env, int normalize, double factor, int zero_is_off, sound_stream::sample_t *tab)
 {
 	double min = 10.0,  max = 0.0;
 
@@ -817,7 +817,7 @@ static inline void build_3D_table(double rl, const ay8910_device::ay_ym_param *p
 	// for (e = 0;e<16;e++) printf("%d %d\n",e << 10, tab[e << 10]);
 }
 
-static inline void build_single_table(double rl, const ay8910_device::ay_ym_param *par, int normalize, stream_buffer::sample_t *tab, int zero_is_off)
+static inline void build_single_table(double rl, const ay8910_device::ay_ym_param *par, int normalize, sound_stream::sample_t *tab, int zero_is_off)
 {
 	double rt;
 	double rw;
@@ -855,7 +855,7 @@ static inline void build_single_table(double rl, const ay8910_device::ay_ym_para
 
 }
 
-static inline void build_mosfet_resistor_table(const ay8910_device::mosfet_param &par, const double rd, stream_buffer::sample_t *tab)
+static inline void build_mosfet_resistor_table(const ay8910_device::mosfet_param &par, const double rd, sound_stream::sample_t *tab)
 {
 	for (int j = 0; j < par.m_count; j++)
 	{
@@ -873,7 +873,7 @@ static inline void build_mosfet_resistor_table(const ay8910_device::mosfet_param
 }
 
 
-stream_buffer::sample_t ay8910_device::mix_3D()
+sound_stream::sample_t ay8910_device::mix_3D()
 {
 	int indx = 0;
 
@@ -1055,19 +1055,10 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void ay8910_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void ay8910_device::sound_stream_update(sound_stream &stream)
 {
 	tone_t *tone;
 	envelope_t *envelope;
-
-	int samples = outputs[0].samples();
-
-	// hack to prevent us from hanging when starting filtered outputs
-	if (!m_ready)
-	{
-		for (int chan = 0; chan < m_streams; chan++)
-			outputs[chan].fill(0);
-	}
 
 	// The 8910 has three outputs, each output is the mix of one of the three
 	// tone generators and of the (single) noise generator. The two are mixed
@@ -1077,7 +1068,7 @@ void ay8910_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 	// is 1, not 0, and can be modulated changing the volume.
 
 	// buffering loop
-	for (int sampindex = 0; sampindex < samples; sampindex++)
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 	{
 		for (int chan = 0; chan < NUM_CHANNELS; chan++)
 		{
@@ -1172,38 +1163,38 @@ void ay8910_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 						{
 							env_volume >>= 1;
 							if (m_feature & PSG_EXTENDED_ENVELOPE) // AY8914 Has a two bit tone_envelope field
-								outputs[chan].put(sampindex, m_vol_table[chan][m_vol_enabled[chan] ? env_volume >> (3-tone_envelope(tone)) : 0]);
+								stream.put(chan, sampindex, m_vol_table[chan][m_vol_enabled[chan] ? env_volume >> (3-tone_envelope(tone)) : 0]);
 							else
-								outputs[chan].put(sampindex, m_vol_table[chan][m_vol_enabled[chan] ? env_volume : 0]);
+								stream.put(chan, sampindex, m_vol_table[chan][m_vol_enabled[chan] ? env_volume : 0]);
 						}
 						else
 						{
 							if (m_feature & PSG_EXTENDED_ENVELOPE) // AY8914 Has a two bit tone_envelope field
-								outputs[chan].put(sampindex, m_env_table[chan][m_vol_enabled[chan] ? env_volume >> (3-tone_envelope(tone)) : 0]);
+								stream.put(chan, sampindex, m_env_table[chan][m_vol_enabled[chan] ? env_volume >> (3-tone_envelope(tone)) : 0]);
 							else
-								outputs[chan].put(sampindex, m_env_table[chan][m_vol_enabled[chan] ? env_volume : 0]);
+								stream.put(chan, sampindex, m_env_table[chan][m_vol_enabled[chan] ? env_volume : 0]);
 						}
 					}
 					else
 					{
 						if (m_feature & PSG_EXTENDED_ENVELOPE) // AY8914 Has a two bit tone_envelope field
-							outputs[chan].put(sampindex, m_env_table[chan][m_vol_enabled[chan] ? env_volume >> (3-tone_envelope(tone)) : 0]);
+							stream.put(chan, sampindex, m_env_table[chan][m_vol_enabled[chan] ? env_volume >> (3-tone_envelope(tone)) : 0]);
 						else
-							outputs[chan].put(sampindex, m_env_table[chan][m_vol_enabled[chan] ? env_volume : 0]);
+							stream.put(chan, sampindex, m_env_table[chan][m_vol_enabled[chan] ? env_volume : 0]);
 					}
 				}
 				else
 				{
 					if (is_expanded_mode())
-						outputs[chan].put(sampindex, m_env_table[chan][m_vol_enabled[chan] ? tone_volume(tone) : 0]);
+						stream.put(chan, sampindex, m_env_table[chan][m_vol_enabled[chan] ? tone_volume(tone) : 0]);
 					else
-						outputs[chan].put(sampindex, m_vol_table[chan][m_vol_enabled[chan] ? tone_volume(tone) : 0]);
+						stream.put(chan, sampindex, m_vol_table[chan][m_vol_enabled[chan] ? tone_volume(tone) : 0]);
 				}
 			}
 		}
 		else
 		{
-			outputs[0].put(sampindex, mix_3D());
+			stream.put(0, sampindex, mix_3D());
 		}
 	}
 }
@@ -1298,7 +1289,7 @@ void ay8910_device::device_start()
 		m_streams = 1;
 	}
 
-	m_vol3d_table = make_unique_clear<stream_buffer::sample_t[]>(8*32*32*32);
+	m_vol3d_table = make_unique_clear<sound_stream::sample_t[]>(8*32*32*32);
 
 	build_mixer_table();
 

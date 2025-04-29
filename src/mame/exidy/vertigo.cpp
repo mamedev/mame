@@ -119,12 +119,11 @@ void vertigo_state::vertigo(machine_config &config)
 	m_adc->in_callback<2>().set_ioport("PADDLE");
 	// IN3-IN7 tied to Vss
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	EXIDY440(config, m_custom, EXIDY440_MC3418_CLOCK);
-	m_custom->add_route(0, "lspeaker", 1.0);
-	m_custom->add_route(1, "rspeaker", 1.0);
+	m_custom->add_route(0, "speaker", 1.0, 0);
+	m_custom->add_route(1, "speaker", 1.0, 1);
 
 	pit8254_device &pit(PIT8254(config, "pit", 0));
 	pit.set_clk<0>(24_MHz_XTAL / 100);

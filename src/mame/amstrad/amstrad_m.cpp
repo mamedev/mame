@@ -2760,11 +2760,11 @@ IRQ_CALLBACK_MEMBER(amstrad_state::amstrad_cpu_acknowledge_int)
 		{
 			static uint8_t prev_x,prev_y;
 			uint8_t data_x, data_y;
-	
+
 			m_amx_mouse_data = 0x0f;
 			data_x = m_io_mouse[0].read_safe(0);
 			data_y = m_io_mouse[1].read_safe(0);
-	
+
 			if(data_x > prev_x)
 				m_amx_mouse_data &= ~0x08;
 			if(data_x < prev_x)
@@ -2776,7 +2776,7 @@ IRQ_CALLBACK_MEMBER(amstrad_state::amstrad_cpu_acknowledge_int)
 			m_amx_mouse_data |= (m_io_mouse[2].read_safe(0) << 4);
 			prev_x = data_x;
 			prev_y = data_y;
-	
+
 			m_amx_mouse_data |= (m_io_kbrow[9].read_safe(0) & 0x80);  // DEL key
 		}
 	}

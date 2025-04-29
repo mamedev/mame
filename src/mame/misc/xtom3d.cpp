@@ -365,12 +365,11 @@ void isa16_xtom3d_io_sound::device_add_mconfig(machine_config &config)
 	// explicitly wants 16, cfr. pumpit1 eeprom test
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	YMZ280B(config, m_ymz, XTAL(16'934'400));
-	m_ymz->add_route(0, "lspeaker", 0.5);
-	m_ymz->add_route(1, "rspeaker", 0.5);
+	m_ymz->add_route(0, "speaker", 0.5, 0);
+	m_ymz->add_route(1, "speaker", 0.5, 1);
 }
 
 static INPUT_PORTS_START(xtom3d)

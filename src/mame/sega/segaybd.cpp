@@ -1487,20 +1487,19 @@ void segaybd_state::yboard(machine_config &config)
 	PALETTE(config, m_palette).set_entries(8192*2);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", SOUND_CLOCK/8));
 	ymsnd.irq_handler().set_inputline(m_soundcpu, 0);
-	ymsnd.add_route(0, "lspeaker", 0.43);
-	ymsnd.add_route(1, "rspeaker", 0.43);
+	ymsnd.add_route(0, "speaker", 0.43, 0);
+	ymsnd.add_route(1, "speaker", 0.43, 1);
 
 	segapcm_device &pcm(SEGAPCM(config, "pcm", SOUND_CLOCK/8));
 	pcm.set_bank(segapcm_device::BANK_12M | segapcm_device::BANK_MASKF8);
-	pcm.add_route(0, "lspeaker", 1.0);
-	pcm.add_route(1, "rspeaker", 1.0);
+	pcm.add_route(0, "speaker", 1.0, 0);
+	pcm.add_route(1, "speaker", 1.0, 1);
 }
 
 

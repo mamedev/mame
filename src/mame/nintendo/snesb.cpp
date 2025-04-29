@@ -1016,13 +1016,12 @@ void snesb_state::base(machine_config &config)
 	m_ppu->set_screen("screen");
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	S_DSP(config, m_s_dsp, XTAL(24'576'000));
 	m_s_dsp->set_addrmap(0, &snesb_state::spc_map);
-	m_s_dsp->add_route(0, "lspeaker", 1.00);
-	m_s_dsp->add_route(1, "rspeaker", 1.00);
+	m_s_dsp->add_route(0, "speaker", 1.00, 0);
+	m_s_dsp->add_route(1, "speaker", 1.00, 1);
 }
 
 void snesb_state::extrainp(machine_config &config)

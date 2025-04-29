@@ -560,12 +560,11 @@ void deco_mlc_state::avengrgs(machine_config &config)
 	m_palette->set_membits(16);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	YMZ280B(config, m_ymz, 42000000 / 3);
-	m_ymz->add_route(0, "lspeaker", 1.0);
-	m_ymz->add_route(1, "rspeaker", 1.0);
+	m_ymz->add_route(0, "speaker", 1.0, 0);
+	m_ymz->add_route(1, "speaker", 1.0, 1);
 }
 
 void deco_mlc_state::mlc(machine_config &config)
@@ -592,12 +591,11 @@ void deco_mlc_state::mlc(machine_config &config)
 	m_palette->set_membits(16);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	YMZ280B(config, m_ymz, 42000000 / 3);
-	m_ymz->add_route(0, "lspeaker", 1.0);
-	m_ymz->add_route(1, "rspeaker", 1.0);
+	m_ymz->add_route(0, "speaker", 1.0, 0);
+	m_ymz->add_route(1, "speaker", 1.0, 1);
 }
 
 void deco_mlc_state::mlc_6bpp(machine_config &config)
@@ -614,8 +612,8 @@ void deco_mlc_state::mlc_5bpp(machine_config &config)
 	m_gfxdecode->set_info(gfx_5bpp);
 
 	// TODO: mono? ch.0 doesn't output any sound in-game
-	m_ymz->add_route(1, "lspeaker", 1.0);
-	m_ymz->add_route(0, "rspeaker", 1.0);
+	m_ymz->add_route(1, "speaker", 1.0, 0);
+	m_ymz->add_route(0, "speaker", 1.0, 1);
 }
 
 void deco_mlc_state::stadhr96(machine_config &config)

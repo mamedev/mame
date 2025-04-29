@@ -95,7 +95,7 @@ INPUT_PORTS_END
 //-------------------------------------------------
 
 atari_sac_device::atari_sac_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: atari_jsa_base_device(mconfig, ATARI_SAC, tag, owner, clock, 2)
+	: atari_jsa_base_device(mconfig, ATARI_SAC, tag, owner, clock)
 	, m_daccpu(*this, "dac")
 	, m_datin(*this, "datin")
 	, m_datout(*this, "datout")
@@ -265,12 +265,12 @@ void atari_sac_device::device_add_mconfig(machine_config &config)
 	YM2151(config, m_ym2151, 14.318181_MHz_XTAL/4);
 	m_ym2151->irq_handler().set(FUNC(atari_sac_device::ym2151_irq_gen));
 	m_ym2151->port_write_handler().set(FUNC(atari_sac_device::ym2151_port_w));
-	m_ym2151->add_route(0, *this, 0.60, AUTO_ALLOC_INPUT, 0);
-	m_ym2151->add_route(1, *this, 0.60, AUTO_ALLOC_INPUT, 1);
+	m_ym2151->add_route(0, *this, 0.60, 0);
+	m_ym2151->add_route(1, *this, 0.60, 1);
 
 	// FIXME: there is actually only one DAC (plus some analog switches)
-	AM6012(config, m_rdac).add_route(ALL_OUTPUTS, *this, 0.5, AUTO_ALLOC_INPUT, 1); // AM6012.6j
-	AM6012(config, m_ldac).add_route(ALL_OUTPUTS, *this, 0.5, AUTO_ALLOC_INPUT, 0); // AM6012.6j
+	AM6012(config, m_rdac).add_route(ALL_OUTPUTS, *this, 0.5, 1); // AM6012.6j
+	AM6012(config, m_ldac).add_route(ALL_OUTPUTS, *this, 0.5, 0); // AM6012.6j
 }
 
 

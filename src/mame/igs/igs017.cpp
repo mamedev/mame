@@ -698,7 +698,8 @@ public:
 	void init_mgdh() ATTR_COLD;
 	void init_mgdha() ATTR_COLD;
 	void init_sdmg2() ATTR_COLD;
-	void init_sdmg2a() ATTR_COLD;
+	void init_sdmg2754ca() ATTR_COLD;
+	void init_sdmg2754cb() ATTR_COLD;
 	void init_sdmg2p() ATTR_COLD;
 	void init_slqz2() ATTR_COLD;
 	void init_spkrform() ATTR_COLD;
@@ -1533,7 +1534,7 @@ void igs017_state::init_cpoker2()
 
 // sdmg2
 
-void igs017_state::init_sdmg2()
+void igs017_state::init_sdmg2754ca()
 {
 	const int rom_size = memregion("maincpu")->bytes();
 	u16 * const rom = (u16 *)memregion("maincpu")->base();
@@ -1584,7 +1585,7 @@ void igs017_state::init_sdmg2()
 }
 
 //
-void igs017_state::init_sdmg2a()
+void igs017_state::init_sdmg2754cb()
 {
 	const int rom_size = memregion("maincpu")->bytes();
 	u16 * const rom = (u16 *)memregion("maincpu")->base();
@@ -1629,6 +1630,37 @@ void igs017_state::init_sdmg2a()
 		{
 			x ^= 0x1000;
 		}
+
+		rom[i] = x;
+	}
+}
+
+void igs017_state::init_sdmg2()
+{
+	const int rom_size = memregion("maincpu")->bytes();
+	u16 * const rom = (u16 *)memregion("maincpu")->base();
+
+	for (int i = 0; i < rom_size / 2; i++)
+	{
+		u16 x = rom[i];
+
+		// bit 0 xor layer
+		if (i & 0x20 / 2)
+			if (i & 0x02 / 2)
+				x ^= 0x0001;
+
+		if (!(i & 0x4000 / 2))
+			if (!(i & 0x300 / 2))
+				x ^= 0x0001;
+
+		// bit 9 xor layer
+		if (!(i & 0x20000 / 2))
+			if (i & 0x400 / 2)
+				x ^= 0x0200;
+
+		// bit 12 xor layer
+		if (i & 0x20000 / 2)
+			x ^= 0x1000;
 
 		rom[i] = x;
 	}
@@ -5284,9 +5316,9 @@ Notes:
 
 ***************************************************************************/
 
-ROM_START( sdmg2 )
+ROM_START( sdmg2754ca )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "p0900.u25", 0x00000, 0x80000,CRC(43366f51) SHA1(48dd965dceff7de15b43c2140226a8b17a792dbc) )
+	ROM_LOAD16_WORD_SWAP( "p0900.u25", 0x00000, 0x80000, CRC(43366f51) SHA1(48dd965dceff7de15b43c2140226a8b17a792dbc) )
 
 	ROM_REGION( 0x280000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "m0901.u5", 0x000000, 0x200000, CRC(9699db24) SHA1(50fc2f173c20b48d10595f01f1e9545f1b13a61b) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
@@ -5299,9 +5331,9 @@ ROM_START( sdmg2 )
 	ROM_LOAD( "s0903.u15", 0x00000, 0x80000, CRC(ae5a441c) SHA1(923774ef73ab0f70e0db1738a4292dcbd70d2384) )
 ROM_END
 
-ROM_START( sdmg2a ) // supposedly earlier / easier, but reports same version as the other set
+ROM_START( sdmg2754cb ) // supposedly earlier / easier, but reports same version as sdmg2754ca
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "p0900.u25", 0x00000, 0x80000,CRC(1afc95d8) SHA1(924e198437359beec2abe6ee42a985f63d70b7e3) ) // SLDH
+	ROM_LOAD16_WORD_SWAP( "p0900.u25", 0x00000, 0x80000, CRC(1afc95d8) SHA1(924e198437359beec2abe6ee42a985f63d70b7e3) ) // SLDH
 
 	ROM_REGION( 0x280000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "m0901.u5", 0x000000, 0x200000, CRC(9699db24) SHA1(50fc2f173c20b48d10595f01f1e9545f1b13a61b) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
@@ -5312,6 +5344,21 @@ ROM_START( sdmg2a ) // supposedly earlier / easier, but reports same version as 
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "s0903.u15", 0x00000, 0x80000, CRC(ae5a441c) SHA1(923774ef73ab0f70e0db1738a4292dcbd70d2384) )
+ROM_END
+
+ROM_START( sdmg2 ) // C5220P001 PCB
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "rom.u16", 0x00000, 0x80000, CRC(362800e8) SHA1(00d93002272b1f3171ca84e67822eb31f760191f) )
+
+	ROM_REGION( 0x280000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "m0205.u6", 0x000000, 0x200000, BAD_DUMP CRC(9699db24) SHA1(50fc2f173c20b48d10595f01f1e9545f1b13a61b) ) // ROM didn't read correctly, taken from other sets
+	ROM_LOAD( "rom.u5",   0x200000, 0x080000, CRC(3298b13b) SHA1(13b21ddeed368b7f4fea1408c8fc511244342faf) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
+
+	ROM_REGION( 0x20000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "text.u7", 0x000000, 0x020000, CRC(cb34cbc0) SHA1(ceedbdda085fd1acc9a575502bdf7cf998f54f05) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "s0206.u3", 0x00000, 0x80000, CRC(ae5a441c) SHA1(923774ef73ab0f70e0db1738a4292dcbd70d2384) )
 ROM_END
 
 /***************************************************************************
@@ -6140,8 +6187,9 @@ GAME ( 1996,  iqblocka,    iqblock,  iqblocka,   iqblocka,    igs017_state, init
 GAME ( 1997,  iqblockf,    iqblock,  iqblockf,   iqblockf,    igs017_state, init_iqblocka,   ROT0, "IGS", "IQ Block (V113FR, gambling)",                                        0 )
 GAME ( 1997,  mgdh,        0,        mgdh,       mgdh,        igs017_state, init_mgdh,       ROT0, "IGS", "Manguan Daheng (Taiwan, V125T1)",                                    MACHINE_IMPERFECT_COLORS | MACHINE_UNEMULATED_PROTECTION) // 滿貫大亨, wrong colors in betting screen, game id check (patched out)
 GAME ( 1997,  mgdha,       mgdh,     mgdha,      mgdh,        igs017_state, init_mgdha,      ROT0, "IGS", "Manguan Daheng (Taiwan, V123T1)",                                    0 ) // 滿貫大亨
-GAME ( 1997,  sdmg2,       0,        sdmg2,      sdmg2,       igs017_state, init_sdmg2,      ROT0, "IGS", "Chaoji Da Manguan II (China, V754C, set 1)",                         0 ) // 超級大滿貫II
-GAME ( 1997,  sdmg2a,      sdmg2,    sdmg2,      sdmg2,       igs017_state, init_sdmg2a,     ROT0, "IGS", "Chaoji Da Manguan II (China, V754C, set 2)",                         0 ) // 超級大滿貫II
+GAME ( 1997,  sdmg2,       0,        sdmg2,      sdmg2,       igs017_state, init_sdmg2,      ROT0, "IGS", "Chaoji Da Manguan II (China, V765C)",                                0 ) // 超級大滿貫II
+GAME ( 1997,  sdmg2754ca,  sdmg2,    sdmg2,      sdmg2,       igs017_state, init_sdmg2754ca, ROT0, "IGS", "Chaoji Da Manguan II (China, V754C, set 1)",                         0 ) // 超級大滿貫II
+GAME ( 1997,  sdmg2754cb,  sdmg2,    sdmg2,      sdmg2,       igs017_state, init_sdmg2754cb, ROT0, "IGS", "Chaoji Da Manguan II (China, V754C, set 2)",                         0 ) // 超級大滿貫II
 GAME ( 1997,  tjsb,        0,        tjsb,       tjsb,        igs017_state, init_tjsb,       ROT0, "IGS", "Tian Jiang Shen Bing (China, V137C)",                                MACHINE_UNEMULATED_PROTECTION ) // 天將神兵, fails the bonus round protection check (if enabled via DSW), see e.g. demo mode
 GAME ( 1998,  genius6,     0,        genius6,    genius6,     igs017_state, init_iqblocka,   ROT0, "IGS", "Genius 6 (V110F)",                                                   0 ) // shows Chinese text in puzzle game
 GAME ( 1997,  genius6a,    genius6,  genius6,    genius6,     igs017_state, init_iqblocka,   ROT0, "IGS", "Genius 6 (V133F)",                                                   0 ) // clone because it has older copyright year

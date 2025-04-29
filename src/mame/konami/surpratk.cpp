@@ -336,13 +336,12 @@ void surpratk_state::surpratk(machine_config &config)
 	K053251(config, m_k053251, 0);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545)));
 	ymsnd.irq_handler().set_inputline(m_maincpu, KONAMI_FIRQ_LINE);
-	ymsnd.add_route(0, "lspeaker", 1.0);
-	ymsnd.add_route(1, "rspeaker", 1.0);
+	ymsnd.add_route(0, "speaker", 1.0, 0);
+	ymsnd.add_route(1, "speaker", 1.0, 1);
 }
 
 

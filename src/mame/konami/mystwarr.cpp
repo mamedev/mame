@@ -996,21 +996,20 @@ void mystwarr_state::mystwarr(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(mystwarr_state, mystwarr)
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	K054321(config, m_k054321, "lspeaker", "rspeaker");
+	K054321(config, m_k054321, "speaker");
 
 	K054539(config, m_k054539_1, XTAL(18'432'000));
 	m_k054539_1->set_device_rom_tag("k054539");
 	m_k054539_1->timer_handler().set(FUNC(mystwarr_state::k054539_nmi_gen));
-	m_k054539_1->add_route(0, "rspeaker", 1.0);    /* stereo channels are inverted */
-	m_k054539_1->add_route(1, "lspeaker", 1.0);
+	m_k054539_1->add_route(0, "speaker", 1.0, 1);    /* stereo channels are inverted */
+	m_k054539_1->add_route(1, "speaker", 1.0, 0);
 
 	K054539(config, m_k054539_2, XTAL(18'432'000));
 	m_k054539_2->set_device_rom_tag("k054539");
-	m_k054539_2->add_route(0, "rspeaker", 1.0);    /* stereo channels are inverted */
-	m_k054539_2->add_route(1, "lspeaker", 1.0);
+	m_k054539_2->add_route(0, "speaker", 1.0, 1);    /* stereo channels are inverted */
+	m_k054539_2->add_route(1, "speaker", 1.0, 0);
 }
 
 void mystwarr_state::viostorm(machine_config &config)
@@ -1057,8 +1056,8 @@ void mystwarr_state::viostormbl(machine_config &config)
 
 	okim6295_device &oki(OKIM6295(config, "oki", 1'056'000, okim6295_device::PIN7_HIGH)); // frequency and pin 7 unverified
 	oki.set_addrmap(0, &mystwarr_state::oki_map);
-	oki.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	oki.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	oki.add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	oki.add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 }
 
 void mystwarr_state::metamrph(machine_config &config)

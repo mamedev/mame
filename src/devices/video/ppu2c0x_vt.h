@@ -53,7 +53,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	virtual u32 palette_entries() const noexcept override { return (0x40 * 8) + (0x1000 * 8); } 
+	virtual u32 palette_entries() const noexcept override { return (0x40 * 8) + (0x1000 * 8); }
 
 	virtual void read_tile_plane_data(int address, int color) override;
 	virtual void shift_tile_plane_data(uint8_t &pix) override;

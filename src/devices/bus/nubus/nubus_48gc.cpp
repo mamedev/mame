@@ -89,7 +89,7 @@ class jmfb_device :
 {
 protected:
 	// construction/destruction
-	jmfb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	jmfb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
@@ -97,7 +97,10 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_palette_interface implementation
-	uint32_t palette_entries() const noexcept override;
+	u32 palette_entries() const noexcept override;
+
+	// memory map
+	void card_map(address_map &map);
 
 private:
 	static constexpr offs_t VRAM_MAX = 0x10'0000 / 4; // chip supports 2M but card can only use 1M
@@ -105,23 +108,23 @@ private:
 	TIMER_CALLBACK_MEMBER(vbl_start);
 	void set_vbl_timer();
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	template <uint8_t Mode>
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	template <u8 Mode>
 	void update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	template <uint8_t Mode, bool Convolution, bool Mono>
+	template <u8 Mode, bool Convolution, bool Mono>
 	void update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void update_crtc();
 
-	uint32_t jmfb_r(offs_t offset);
-	uint32_t crtc_r(offs_t offset);
-	uint32_t ramdac_r(offs_t offset);
-	void jmfb_w(offs_t offset, uint32_t data);
-	void crtc_w(offs_t offset, uint32_t data);
-	void ramdac_w(offs_t offset, uint32_t data);
-	void clkgen_w(offs_t offset, uint32_t data);
+	u32 jmfb_r(offs_t offset);
+	u32 crtc_r(offs_t offset);
+	u32 ramdac_r(offs_t offset);
+	void jmfb_w(offs_t offset, u32 data);
+	void crtc_w(offs_t offset, u32 data);
+	void ramdac_w(offs_t offset, u32 data);
+	void clkgen_w(offs_t offset, u32 data);
 
-	uint32_t rgb_unpack(offs_t offset, uint32_t mem_mask = ~0);
-	void rgb_pack(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	u32 rgb_unpack(offs_t offset, u32 mem_mask = ~0);
+	void rgb_pack(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	bool ctrl_sense2() const { return BIT(m_control, 11); }
 	bool ctrl_sense1() const { return BIT(m_control, 10); }
@@ -137,30 +140,30 @@ private:
 
 	bool m_configured;
 	bool m_clut_addr_read;
-	uint8_t m_monitor_type;
+	u8 m_monitor_type;
 
-	std::unique_ptr<uint32_t []> m_vram;
-	uint16_t m_control;
-	uint16_t m_preload;
-	uint32_t m_base, m_stride;
+	std::unique_ptr<u32 []> m_vram;
+	u16 m_control;
+	u16 m_preload;
+	u32 m_base, m_stride;
 
-	uint8_t m_colors[3], m_clutcnt, m_clutoffs;
-	uint8_t m_ramdac_mode, m_ramdac_conv;
+	u8 m_colors[3], m_clutcnt, m_clutoffs;
+	u8 m_ramdac_mode, m_ramdac_conv;
 
-	uint16_t m_hhalf, m_hactive, m_hbporch, m_hsync, m_hfporch;
-	uint16_t m_vactive, m_vbporch, m_vsync, m_vfporch;
-	uint32_t m_vbl_disable;
-	uint16_t m_halfline_pixels;
+	u16 m_hhalf, m_hactive, m_hbporch, m_hsync, m_hfporch;
+	u16 m_vactive, m_vbporch, m_vsync, m_vfporch;
+	u32 m_vbl_disable;
+	u16 m_halfline_pixels;
 
-	uint16_t m_multiplier;
-	uint16_t m_modulus;
-	uint8_t m_pdiv;
+	u16 m_multiplier;
+	u16 m_modulus;
+	u8 m_pdiv;
 };
 
 class nubus_48gc_device : public jmfb_device
 {
 public:
-	nubus_48gc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nubus_48gc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	// optional information overrides
@@ -168,13 +171,13 @@ protected:
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
-	void mac_48gc_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void mac_48gc_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 };
 
 class nubus_824gc_device : public jmfb_device
 {
 public:
-	nubus_824gc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nubus_824gc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
 	// optional information overrides
@@ -307,7 +310,7 @@ ioport_constructor nubus_824gc_device::device_input_ports() const
 //  palette_entries - entries in color palette
 //-------------------------------------------------
 
-uint32_t jmfb_device::palette_entries() const noexcept
+u32 jmfb_device::palette_entries() const noexcept
 {
 	return 256;
 }
@@ -321,7 +324,7 @@ uint32_t jmfb_device::palette_entries() const noexcept
 //  jmfb_device - constructor
 //-------------------------------------------------
 
-jmfb_device::jmfb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+jmfb_device::jmfb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_nubus_card_interface(mconfig, *this),
 	device_video_interface(mconfig, *this),
@@ -333,14 +336,22 @@ jmfb_device::jmfb_device(const machine_config &mconfig, device_type type, const 
 	set_screen(*this, GC48_SCREEN_NAME);
 }
 
-nubus_48gc_device::nubus_48gc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+nubus_48gc_device::nubus_48gc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	jmfb_device(mconfig, NUBUS_MDC48, tag, owner, clock)
 {
 }
 
-nubus_824gc_device::nubus_824gc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+nubus_824gc_device::nubus_824gc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	jmfb_device(mconfig, NUBUS_MDC824, tag, owner, clock)
 {
+}
+
+void jmfb_device::card_map(address_map &map)
+{
+	map(0x20'0000, 0x20'000f).rw(FUNC(jmfb_device::jmfb_r), FUNC(jmfb_device::jmfb_w));
+	map(0x20'0100, 0x20'01ff).rw(FUNC(jmfb_device::crtc_r), FUNC(jmfb_device::crtc_w));
+	map(0x20'0200, 0x20'020f).rw(FUNC(jmfb_device::ramdac_r), FUNC(jmfb_device::ramdac_w));
+	map(0x20'0300, 0x20'033f).w(FUNC(jmfb_device::clkgen_w));
 }
 
 //-------------------------------------------------
@@ -351,25 +362,14 @@ void jmfb_device::device_start()
 {
 	install_declaration_rom(GC48_ROM_REGION);
 
-	uint32_t const slotspace = get_slotspace();
+	u32 const slotspace = get_slotspace();
 
 	LOG("[JMFB %p] slotspace = %x\n", this, slotspace);
 
-	m_vram = std::make_unique<uint32_t []>(VRAM_MAX);
+	m_vram = std::make_unique<u32 []>(VRAM_MAX);
 	install_view(slotspace, slotspace + 0x1f'ffff, m_vram_view);
 
-	nubus().install_device(
-			slotspace + 0x20'0000, slotspace + 0x20'000f,
-			read32sm_delegate(*this, FUNC(jmfb_device::jmfb_r)), write32sm_delegate(*this, FUNC(jmfb_device::jmfb_w)));
-	nubus().install_device(
-			slotspace + 0x20'0100, slotspace + 0x20'01ff,
-			read32sm_delegate(*this, FUNC(jmfb_device::crtc_r)), write32sm_delegate(*this, FUNC(jmfb_device::crtc_w)));
-	nubus().install_device(
-			slotspace + 0x200200, slotspace + 0x20020f,
-			read32sm_delegate(*this, FUNC(jmfb_device::ramdac_r)), write32sm_delegate(*this, FUNC(jmfb_device::ramdac_w)));
-	nubus().install_writeonly_device(
-			slotspace + 0x200300, slotspace + 0x20033f,
-			write32sm_delegate(*this, FUNC(jmfb_device::clkgen_w)));
+	nubus().install_map(*this, &jmfb_device::card_map);
 
 	m_timer = timer_alloc(FUNC(jmfb_device::vbl_start), this);
 
@@ -423,8 +423,8 @@ void jmfb_device::device_reset()
 			throw emu_fatalerror("%s: Invalid monitor selection %d\n", tag(), m_monitor_type);
 		}
 
-		uint32_t const slotspace = get_slotspace();
-		uint32_t const vramsize = VRAM_MAX * 4 / (BIT(config, 4) ? 1 : 2);
+		u32 const slotspace = get_slotspace();
+		u32 const vramsize = VRAM_MAX * 4 / (BIT(config, 4) ? 1 : 2);
 		m_vram_view[0].install_ram(slotspace, slotspace + vramsize - 1, &m_vram[0]);
 		m_vram_view[1].install_readwrite_handler(
 				slotspace, slotspace + (vramsize / 3 * 4) - 1,
@@ -438,18 +438,18 @@ void jmfb_device::device_reset()
 					slotspace + (vramsize / 3 * 4), slotspace + (vramsize / 3 * 4) + 3,
 					read32s_delegate(
 						*this,
-						NAME(([this, vramsize] (offs_t offset, uint32_t mem_mask) -> uint32_t
+						NAME(([this, vramsize] (offs_t offset, u32 mem_mask) -> u32
 						{
-							auto const color = util::big_endian_cast<uint8_t const>(&m_vram[0]) + (vramsize - 1);
-							return uint32_t(color[0]) << 16;
+							auto const color = util::big_endian_cast<u8 const>(&m_vram[0]) + (vramsize - 1);
+							return u32(color[0]) << 16;
 						}))),
 					write32s_delegate(
 						*this,
-						NAME(([this, vramsize] (offs_t offset, uint32_t data, uint32_t mem_mask)
+						NAME(([this, vramsize] (offs_t offset, u32 data, u32 mem_mask)
 						{
-							auto const color = util::big_endian_cast<uint8_t>(&m_vram[0]) + (vramsize - 1);
+							auto const color = util::big_endian_cast<u8>(&m_vram[0]) + (vramsize - 1);
 							if (ACCESSING_BITS_16_23)
-								color[0] = uint8_t(data >> 16);
+								color[0] = u8(data >> 16);
 						}))));
 			break;
 		case 2:
@@ -457,20 +457,20 @@ void jmfb_device::device_reset()
 					slotspace + (vramsize / 3 * 4), slotspace + (vramsize / 3 * 4) + 3,
 					read32s_delegate(
 						*this,
-						NAME(([this, vramsize] (offs_t offset, uint32_t mem_mask) -> uint32_t
+						NAME(([this, vramsize] (offs_t offset, u32 mem_mask) -> u32
 						{
-							auto const color = util::big_endian_cast<uint8_t const>(&m_vram[0]) + (vramsize - 2);
-							return (uint32_t(color[0]) << 16) | (uint32_t(color[1]) << 8);
+							auto const color = util::big_endian_cast<u8 const>(&m_vram[0]) + (vramsize - 2);
+							return (u32(color[0]) << 16) | (u32(color[1]) << 8);
 						}))),
 					write32s_delegate(
 						*this,
-						NAME(([this, vramsize] (offs_t offset, uint32_t data, uint32_t mem_mask)
+						NAME(([this, vramsize] (offs_t offset, u32 data, u32 mem_mask)
 						{
-							auto const color = util::big_endian_cast<uint8_t>(&m_vram[0]) + (vramsize - 2);
+							auto const color = util::big_endian_cast<u8>(&m_vram[0]) + (vramsize - 2);
 							if (ACCESSING_BITS_16_23)
-								color[0] = uint8_t(data >> 16);
+								color[0] = u8(data >> 16);
 							if (ACCESSING_BITS_8_15)
-								color[1] = uint8_t(data >> 8);
+								color[1] = u8(data >> 8);
 						}))));
 			break;
 		}
@@ -538,7 +538,7 @@ void jmfb_device::set_vbl_timer()
 	}
 }
 
-uint32_t jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (!ctrl_transfer())
 	{
@@ -575,7 +575,7 @@ uint32_t jmfb_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	return 0;
 }
 
-template <uint8_t Mode>
+template <u8 Mode>
 void jmfb_device::update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (!ctrl_convolution())
@@ -594,12 +594,12 @@ void jmfb_device::update_screen(screen_device &screen, bitmap_rgb32 &bitmap, con
 	}
 }
 
-template <uint8_t Mode, bool Convolution, bool Mono>
+template <u8 Mode, bool Convolution, bool Mono>
 void jmfb_device::update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// TODO: interlaced mode
 	auto const baseoffset = m_base << (((0xd == Mode) ? 6 : 5) + (Convolution ? 1 : 0));
-	auto const screenbase = util::big_endian_cast<uint8_t const>(&m_vram[0]) + baseoffset;
+	auto const screenbase = util::big_endian_cast<u8 const>(&m_vram[0]) + baseoffset;
 	auto const stride = m_stride << ((0xd == Mode) ? 3 : 2);
 
 	auto const trans =
@@ -632,7 +632,7 @@ void jmfb_device::update_screen(screen_device &screen, bitmap_rgb32 &bitmap, con
 	while ((y <= cliprect.bottom()) && (y <= visarea.bottom()))
 	{
 		auto source = screenbase + ((y - visarea.top()) * stride);
-		uint32_t *scanline = &bitmap.pix(y, xstart);
+		u32 *scanline = &bitmap.pix(y, xstart);
 		y++;
 		for (int x = 0; x <= xres; x++)
 		{
@@ -646,7 +646,7 @@ void jmfb_device::update_screen(screen_device &screen, bitmap_rgb32 &bitmap, con
 			}
 			else if (!Convolution)
 			{
-				uint8_t const pixels = *source++;
+				u8 const pixels = *source++;
 
 				if (0x0 == Mode) // 1bpp
 				{
@@ -678,9 +678,9 @@ void jmfb_device::update_screen(screen_device &screen, bitmap_rgb32 &bitmap, con
 			}
 			else
 			{
-				uint8_t const pixabove = source[0 * stride];
-				uint8_t const pixels = source[1 * stride];
-				uint8_t const pixbelow = source[2 * stride];
+				u8 const pixabove = source[0 * stride];
+				u8 const pixels = source[1 * stride];
+				u8 const pixbelow = source[2 * stride];
 				source++;
 
 				if (0x0 == Mode) // 1bpp
@@ -692,9 +692,9 @@ void jmfb_device::update_screen(screen_device &screen, bitmap_rgb32 &bitmap, con
 						rgb_t const c = pen_color(BIT(pixbelow, p));
 						*scanline++ = trans(
 								rgb_t(
-									(a.r() + (uint16_t(b.r()) << 1) + c.r() + 2) >> 2,
-									(a.g() + (uint16_t(b.g()) << 1) + c.g() + 2) >> 2,
-									(a.b() + (uint16_t(b.b()) << 1) + c.b() + 2) >> 2));
+									(a.r() + (u16(b.r()) << 1) + c.r() + 2) >> 2,
+									(a.g() + (u16(b.g()) << 1) + c.g() + 2) >> 2,
+									(a.b() + (u16(b.b()) << 1) + c.b() + 2) >> 2));
 					}
 				}
 				else if (0x4 == Mode) // 2bpp
@@ -706,9 +706,9 @@ void jmfb_device::update_screen(screen_device &screen, bitmap_rgb32 &bitmap, con
 						rgb_t const c = pen_color(BIT(pixbelow, p, 2));
 						*scanline++ = trans(
 								rgb_t(
-									(a.r() + (uint16_t(b.r()) << 1) + c.r() + 2) >> 2,
-									(a.g() + (uint16_t(b.g()) << 1) + c.g() + 2) >> 2,
-									(a.b() + (uint16_t(b.b()) << 1) + c.b() + 2) >> 2));
+									(a.r() + (u16(b.r()) << 1) + c.r() + 2) >> 2,
+									(a.g() + (u16(b.g()) << 1) + c.g() + 2) >> 2,
+									(a.b() + (u16(b.b()) << 1) + c.b() + 2) >> 2));
 					}
 				}
 				else if (0x8 == Mode) // 4bpp
@@ -720,9 +720,9 @@ void jmfb_device::update_screen(screen_device &screen, bitmap_rgb32 &bitmap, con
 						rgb_t const c = pen_color(BIT(pixbelow, p, 4));
 						*scanline++ = trans(
 								rgb_t(
-									(a.r() + (uint16_t(b.r()) << 1) + c.r() + 2) >> 2,
-									(a.g() + (uint16_t(b.g()) << 1) + c.g() + 2) >> 2,
-									(a.b() + (uint16_t(b.b()) << 1) + c.b() + 2) >> 2));
+									(a.r() + (u16(b.r()) << 1) + c.r() + 2) >> 2,
+									(a.g() + (u16(b.g()) << 1) + c.g() + 2) >> 2,
+									(a.b() + (u16(b.b()) << 1) + c.b() + 2) >> 2));
 					}
 				}
 				else if (0xc == Mode) // 8bpp
@@ -732,9 +732,9 @@ void jmfb_device::update_screen(screen_device &screen, bitmap_rgb32 &bitmap, con
 					rgb_t const c = pen_color(pixbelow);
 					*scanline++ = trans(
 							rgb_t(
-								(a.r() + (uint16_t(b.r()) << 1) + c.r() + 2) >> 2,
-								(a.g() + (uint16_t(b.g()) << 1) + c.g() + 2) >> 2,
-								(a.b() + (uint16_t(b.b()) << 1) + c.b() + 2) >> 2));
+								(a.r() + (u16(b.r()) << 1) + c.r() + 2) >> 2,
+								(a.g() + (u16(b.g()) << 1) + c.g() + 2) >> 2,
+								(a.b() + (u16(b.b()) << 1) + c.b() + 2) >> 2));
 				}
 			}
 		}
@@ -810,13 +810,13 @@ void jmfb_device::update_crtc()
 	}
 }
 
-uint32_t jmfb_device::jmfb_r(offs_t offset)
+u32 jmfb_device::jmfb_r(offs_t offset)
 {
 	switch (offset)
 	{
 	case 0x00/4:
 		{
-			uint16_t sense = f_monitors[m_monitor_type].sense[0];
+			u16 sense = f_monitors[m_monitor_type].sense[0];
 			if (ctrl_sense2())
 				sense &= f_monitors[m_monitor_type].sense[1];
 			if (ctrl_sense1())
@@ -836,7 +836,7 @@ uint32_t jmfb_device::jmfb_r(offs_t offset)
 	}
 }
 
-uint32_t jmfb_device::crtc_r(offs_t offset)
+u32 jmfb_device::crtc_r(offs_t offset)
 {
 //  printf("%s crtc_r: @ %x, mask %08x\n", machine().describe_context().c_str(), offset, mem_mask);
 
@@ -861,7 +861,7 @@ uint32_t jmfb_device::crtc_r(offs_t offset)
 			int const hpos = screen().hpos();
 			int const hsplit = visarea.left() + m_halfline_pixels;
 			int const vtotal = m_vactive + m_vbporch + m_vsync + m_vfporch;
-			uint8_t result = 0x0f;
+			u8 result = 0x0f;
 
 			int halfline;
 			int truehpos;
@@ -944,7 +944,7 @@ uint32_t jmfb_device::crtc_r(offs_t offset)
 	}
 }
 
-uint32_t jmfb_device::ramdac_r(offs_t offset)
+u32 jmfb_device::ramdac_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -959,7 +959,7 @@ uint32_t jmfb_device::ramdac_r(offs_t offset)
 	}
 }
 
-void jmfb_device::jmfb_w(offs_t offset, uint32_t data)
+void jmfb_device::jmfb_w(offs_t offset, u32 data)
 {
 	data &= 0xffff; // 16 bits wide, but lane select is ignored and firmware relies on smearing
 	switch (offset)
@@ -998,7 +998,7 @@ void jmfb_device::jmfb_w(offs_t offset, uint32_t data)
 	}
 }
 
-void jmfb_device::crtc_w(offs_t offset, uint32_t data)
+void jmfb_device::crtc_w(offs_t offset, u32 data)
 {
 	data &= 0xffff; // 16 bits wide, but lane select is ignored and firmware relies on smearing
 	switch (offset)
@@ -1070,7 +1070,7 @@ void jmfb_device::crtc_w(offs_t offset, uint32_t data)
 	}
 }
 
-void jmfb_device::ramdac_w(offs_t offset, uint32_t data)
+void jmfb_device::ramdac_w(offs_t offset, u32 data)
 {
 	data &= 0xff; // 8 bits wide, but lane select is ignored and firmware relies on smearing
 	switch (offset)
@@ -1105,7 +1105,7 @@ void jmfb_device::ramdac_w(offs_t offset, uint32_t data)
 	}
 }
 
-void jmfb_device::clkgen_w(offs_t offset, uint32_t data)
+void jmfb_device::clkgen_w(offs_t offset, u32 data)
 {
 	data &= 0x0f; // four bits wide, but lane select is ignored and firmware relies on smearing
 	switch (offset)
@@ -1140,21 +1140,21 @@ void jmfb_device::clkgen_w(offs_t offset, uint32_t data)
 	}
 }
 
-uint32_t jmfb_device::rgb_unpack(offs_t offset, uint32_t mem_mask)
+u32 jmfb_device::rgb_unpack(offs_t offset, u32 mem_mask)
 {
-	auto const color = util::big_endian_cast<uint8_t const>(&m_vram[0]) + (offset * 3);
-	return (uint32_t(color[0]) << 16) | (uint32_t(color[1]) << 8) | uint32_t(color[2]);
+	auto const color = util::big_endian_cast<u8 const>(&m_vram[0]) + (offset * 3);
+	return (u32(color[0]) << 16) | (u32(color[1]) << 8) | u32(color[2]);
 }
 
-void jmfb_device::rgb_pack(offs_t offset, uint32_t data, uint32_t mem_mask)
+void jmfb_device::rgb_pack(offs_t offset, u32 data, u32 mem_mask)
 {
-	auto const color = util::big_endian_cast<uint8_t>(&m_vram[0]) + (offset * 3);
+	auto const color = util::big_endian_cast<u8>(&m_vram[0]) + (offset * 3);
 	if (ACCESSING_BITS_16_23)
-		color[0] = uint8_t(data >> 16);
+		color[0] = u8(data >> 16);
 	if (ACCESSING_BITS_8_15)
-		color[1] = uint8_t(data >> 8);
+		color[1] = u8(data >> 8);
 	if (ACCESSING_BITS_0_7)
-		color[2] = uint8_t(data);
+		color[2] = u8(data);
 }
 
 } // anonymous namespace

@@ -309,20 +309,19 @@ void tsconf_state::tsconf(machine_config &config)
 	m_sdcard->set_prefer_sdhc();
 	m_sdcard->spi_miso_callback().set(FUNC(tsconf_state::tsconf_spi_miso_w));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speakers", 2).front();
 
 	config.device_remove("ay8912");
 	YM2149(config, m_ay[0], 14_MHz_XTAL / 8)
-		.add_route(0, "lspeaker", 0.50)
-		.add_route(1, "lspeaker", 0.25)
-		.add_route(1, "rspeaker", 0.25)
-		.add_route(2, "rspeaker", 0.50);
+		.add_route(0, "speakers", 0.50, 0)
+		.add_route(1, "speakers", 0.25, 0)
+		.add_route(1, "speakers", 0.25, 1)
+		.add_route(2, "speakers", 0.50, 1);
 	YM2149(config, m_ay[1], 14_MHz_XTAL / 8)
-		.add_route(0, "lspeaker", 0.50)
-		.add_route(1, "lspeaker", 0.25)
-		.add_route(1, "rspeaker", 0.25)
-		.add_route(2, "rspeaker", 0.50);
+		.add_route(0, "speakers", 0.50, 0)
+		.add_route(1, "speakers", 0.25, 0)
+		.add_route(1, "speakers", 0.25, 1)
+		.add_route(2, "speakers", 0.50, 1);
 
 	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.75);;
 
