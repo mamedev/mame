@@ -1222,8 +1222,8 @@ void dmx_state::update_mix_level(int voice)
 	const float rc_c = (voice == METRONOME_INDEX) ? PB_C24 : VC_C10;
 
 	m_voice_rc[voice]->filter_rc_set_RC(filter_rc_device::HIGHPASS, rc_r, 0, 0, rc_c);
-	m_left_mixer->set_input_gain(voice, gain_left);
-	m_right_mixer->set_input_gain(voice, gain_right);
+	m_voice_rc[voice]->set_route_gain(0, m_left_mixer, 0, gain_left);
+	m_voice_rc[voice]->set_route_gain(0, m_right_mixer, 0, gain_right);
 
 	LOGMASKED(LOG_FADERS, "Voice %d volume changed to: %d (gain L:%f, R:%f), HPF cutoff: %.2f Hz\n",
 			voice, pot_percent, gain_left, gain_right, 1.0F / (2 * float(M_PI) * r_gnd * rc_c));
