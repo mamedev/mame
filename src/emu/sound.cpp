@@ -122,7 +122,6 @@ template<typename S> void emu::detail::output_buffer_flat<S>::register_save_stat
 	save.save_item(&device, id1, id2, 0, NAME(m_write_position));
 	save.save_item(&device, id1, id2, 0, NAME(m_sync_position));
 	save.save_item(&device, id1, id2, 0, NAME(m_history));
-
 }
 
 template<typename S> void emu::detail::output_buffer_flat<S>::set_buffer_size(u32 buffer_size)
@@ -300,7 +299,6 @@ sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 sample
 	m_output_channel_gain.resize(m_output_count, 1.0);
 	m_user_output_channel_gain.resize(m_output_count, 1.0);
 	m_user_output_gain = 1.0;
-
 }
 
 sound_stream::~sound_stream()
@@ -361,6 +359,7 @@ void sound_stream::register_state()
 	m_state_tag = string_format("%d", m_device.machine().sound().unique_id());
 	auto &save = m_device.machine().save();
 
+	save.save_item(&m_device, "stream.sound_stream", m_state_tag.c_str(), 0, NAME(m_sync_time));
 	save.save_item(&m_device, "stream.sound_stream", m_state_tag.c_str(), 0, NAME(m_sample_rate));
 	if(m_input_count)
 		save.save_item(&m_device, "stream.sound_stream", m_state_tag.c_str(), 0, NAME(m_input_channel_gain));
@@ -622,7 +621,7 @@ attotime sound_stream::sample_to_time(u64 index) const
 	attotime res = attotime::zero;
 	res.m_seconds = index / m_sample_rate;
 	u64 remain = index % m_sample_rate;
-	res.m_attoseconds = ((remain * 1000000000) / m_sample_rate) * 1000000000;
+	res.m_attoseconds = ((remain * 1'000'000'000) / m_sample_rate) * 1'000'000'000;
 	return res;
 }
 
@@ -636,7 +635,7 @@ void sound_stream::reprime_sync_timer()
 
 	u64 next_sample = m_output_buffer.write_sample() + 1;
 	attotime next_time = sample_to_time(next_sample);
-	next_time.m_attoseconds += 1000000000; // Go to the next nanosecond
+	next_time.m_attoseconds += 1'000'000'000; // Go to the next nanosecond
 	m_sync_timer->adjust(next_time - m_device.machine().time());
 }
 
@@ -671,7 +670,7 @@ sound_manager::sound_manager(running_machine &machine) :
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&sound_manager::stop_recording, this));
 
 	// register global states
-	//	machine.save().save_item(NAME(m_last_update));
+	machine.save().save_item(NAME(m_last_sync_time));
 
 	// start the periodic update flushing timer
 	m_update_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(sound_manager::update), this));
@@ -2391,7 +2390,7 @@ void sound_manager::mapping_update()
 
 u64 sound_manager::rate_and_time_to_index(attotime time, u32 sample_rate) const
 {
-	return time.m_seconds * sample_rate + ((time.m_attoseconds / 100000000) * sample_rate) / 10000000000;
+	return time.m_seconds * sample_rate + ((time.m_attoseconds / 100'000'000) * sample_rate) / 10'000'000'000LL;
 }
 
 void sound_manager::update(s32)
