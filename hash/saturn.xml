@@ -10242,22 +10242,6 @@ Sega logo animation draws offset [VDP2]
 		</part>
 	</software>
 
-	<!-- Identifying Dark Seed (JAP) (DW0616)... -->
-	<software name="darkseed" supported="no">
-		<description>Darkseed (Japan)</description>
-		<year>1995</year>
-		<publisher>GAGA Communications</publisher>
-		<info name="serial" value="T-18501G"/>
-		<info name="release" value="19950707"/>
-		<info name="alt_title" value="ダークシード"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="dark seed (jpn) (dw0616)" sha1="f1164902b9d582a00ee8176d22bd103c177d8e7c" />
-			</diskarea>
-		</part>
-	</software>
-
 	<!-- Hangs at now loading screen, [SH2] $60ffc13 comms -->
 	<software name="darksed2" supported="no">
 		<description>Darkseed II (Japan)</description>
@@ -16257,22 +16241,6 @@ Sega logo animation draws offset [VDP2]
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="dark hunter jou ijigen gakuen (t-7631g)" sha1="6b312988d9871c216b37f6d04ed951dab38b9c89" />
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Identifying Dark Savior (T-22101G)... -->
-	<software name="darksavjb" cloneof="darksav" supported="no">
-		<description>Dark Savior (Japan, alt 2)</description>
-		<year>1996</year>
-		<publisher>Climax</publisher>
-		<info name="serial" value="T-22101G"/>
-		<info name="release" value="19960830"/>
-		<info name="alt_title" value="ダークセイバー"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="dark savior (t-22101g)" sha1="aa5f58ad5264af1ae5bd63b8532fd20650eacaf8" />
 			</diskarea>
 		</part>
 	</software>
@@ -28673,22 +28641,6 @@ Sega logo animation draws offset [VDP2]
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="darkhuntergeyoumanomori" sha1="5f8f949c996db43e4af1230abfa611ef58cd5e56" />
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Identifying DarkSavior... -->
-	<software name="darksavjc" cloneof="darksav" supported="no">
-		<description>Dark Savior (Japan, alt 3)</description>
-		<year>1996</year>
-		<publisher>Climax</publisher>
-		<info name="serial" value="T-22101G"/>
-		<info name="release" value="19960830"/>
-		<info name="alt_title" value="ダークセイバー"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="darksaviorjapan" sha1="684c805c932ead19543b613d4bed5f2b0fa5614a" />
 			</diskarea>
 		</part>
 	</software>
