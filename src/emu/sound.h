@@ -144,7 +144,6 @@ namespace emu::detail {
 	};
 
 	template<typename S> class output_buffer_flat {
-		friend class sound_stream; // To make state saving easier
 	public:
 		output_buffer_flat(u32 buffer_size, u32 channels);
 
@@ -474,7 +473,7 @@ private:
 	};
 
 	struct mixing_step {
-		enum { CLEAR, COPY, ADD };
+		enum : u32 { CLEAR, COPY, ADD };
 		u32 m_mode;
 		u32 m_osd_index;
 		u32 m_osd_channel;
