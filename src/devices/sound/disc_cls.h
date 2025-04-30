@@ -236,14 +236,10 @@ public:
 	uint32_t              m_stream_in_number = 0;
 	uint32_t              m_inview_sample = 0;
 private:
-	void stream_generate(sound_stream &stream);
-
 	double      m_gain = 0.0;       /* node gain */
 	double      m_offset = 0.0;     /* node offset */
 	uint8_t     m_data = 0;         /* data written */
 	uint8_t     m_is_buffered = 0;
-	/* the buffer stream */
-	sound_stream        *m_buffer_stream = nullptr;
 };
 
 class DISCRETE_CLASS_NAME(dss_input_buffer): public DISCRETE_CLASS_NAME(dss_input_stream)
