@@ -850,9 +850,6 @@ discrete_device::~discrete_device()
 
 void discrete_device::device_start()
 {
-	// create the stream
-	//m_stream = stream_alloc(0, 2, 22257);
-
 	const discrete_block *intf_start = m_intf;
 
 	/* If a clock is specified we will use it, otherwise run at the audio sample rate. */
@@ -861,7 +858,7 @@ void discrete_device::device_start()
 	else
 		m_sample_rate = this->machine().sample_rate();
 	m_sample_time = 1.0 / m_sample_rate;
-	m_neg_sample_time = - m_sample_time;
+	m_neg_sample_time = -m_sample_time;
 
 	m_total_samples = 0;
 	m_total_stream_updates = 0;
@@ -984,8 +981,6 @@ void discrete_sound_device::device_start()
 	{
 		node->stream_start();
 	}
-
-
 }
 
 //-------------------------------------------------
