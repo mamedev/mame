@@ -155,6 +155,7 @@ public:
 	void mgzz(machine_config &config) ATTR_COLD;
 	void oceanpar(machine_config &config) ATTR_COLD;
 	void tripslot(machine_config &config) ATTR_COLD;
+	void ccly(machine_config &config) ATTR_COLD;
 	void extradrw(machine_config &config) ATTR_COLD;
 	void chessc2(machine_config &config) ATTR_COLD;
 
@@ -1446,6 +1447,108 @@ INPUT_PORTS_START( tripslot )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW3:8" )
 INPUT_PORTS_END
 
+INPUT_PORTS_START( ccly )
+	// preliminary - game seems to lack an input test
+	// To access sound test, hold Service Mode and reset, then press Service Mode and Book-Keeping simultaneously
+
+	PORT_START("PORTB")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )       PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )      PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )         PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )       PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )         PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )      PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )    PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )    PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )       PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)  PORT_NAME("Small / Half Gamble / Show Odds")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )      PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)  PORT_NAME("Big")
+
+	PORT_START("PORTC")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )          PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BET )       PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)  PORT_NAME("Bet / Double Up")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )      PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)  PORT_NAME("Big")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )           PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)  PORT_NAME("Start / Take Score")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM )           PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)  PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )    PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )          PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )    PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )           PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)  PORT_NAME("Start / Take Score")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )          PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM )           PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)  PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
+	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )    PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )            PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
+
+	PORT_START("PLAYER")
+	PORT_BIT( 0x00001, IP_ACTIVE_LOW, IPT_UNKNOWN )       PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x00002, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )    PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x00004, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )    PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x00038, IP_ACTIVE_LOW, IPT_UNKNOWN )       PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x00001, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )    PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x00002, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )    PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x00004, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )    PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x00008, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )    PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)  PORT_NAME("Small / Half Gamble / Show Odds")
+	PORT_BIT( 0x00010, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )   PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x00020, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )   PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x000c0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00100, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // must be low or most inputs are ignored
+	PORT_BIT( 0xffe00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("CLEARMEM")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) PORT_TOGGLE
+
+	PORT_START("PPIB")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01) PORT_WRITE_LINE_MEMBER(FUNC(igs_m027_state::counter_w<4>)) // key-out
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01) PORT_WRITE_LINE_MEMBER(FUNC(igs_m027_state::counter_w<0>)) // coin
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01) PORT_WRITE_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::motor_w))
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01) PORT_WRITE_LINE_MEMBER(FUNC(igs_m027_state::counter_w<3>)) // payout
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01) PORT_WRITE_LINE_MEMBER(FUNC(igs_m027_state::counter_w<2>)) // key-in
+
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00) PORT_WRITE_LINE_MEMBER(FUNC(igs_m027_state::counter_w<0>)) // coin 1
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00) PORT_WRITE_LINE_MEMBER(FUNC(igs_m027_state::counter_w<2>)) // key-in
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00) PORT_WRITE_LINE_MEMBER(FUNC(igs_m027_state::counter_w<1>)) // coin 2
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00) PORT_WRITE_LINE_MEMBER(FUNC(igs_m027_state::counter_w<3>)) // payout
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00) PORT_WRITE_LINE_MEMBER(FUNC(igs_m027_state::counter_w<4>)) // key-out
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00) PORT_WRITE_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::motor_w))
+
+	PORT_START("DSW1")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW1:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW1:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW1:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW1:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW1:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW1:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "Operation Mode" )           PORT_DIPLOCATION("SW2:1")          // 操作模式
+	PORT_DIPSETTING(    0x01, "Amusement" )                                                   // 娱乐配线
+	PORT_DIPSETTING(    0x00, "Fruit Machine" )                                               // 水果配线
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR(Demo_Sounds) )       PORT_DIPLOCATION("SW2:2")          // 示范音乐
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                  // 无
+	PORT_DIPSETTING(    0x02, DEF_STR(On) )                                                   // 有
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW2:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW2:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW2:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW2:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW2:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )
+
+	PORT_START("DSW3")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW3:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW3:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW3:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW3:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW3:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW3:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW3:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW3:8" )
+INPUT_PORTS_END
+
 INPUT_PORTS_START( chessc2 )
 	// preliminary - game seems to lack an input test and settings are locked out with password
 
@@ -1639,28 +1742,28 @@ template <unsigned Start>
 void igs_m027_state::lamps_w(u8 data)
 {
 	// active high outputs
-	// +------+-------------------------------+-------------------------------+---------------+
-	// | lamp | jking02                       | tripslot                      | oceanpar      |
-	// |      +---------------+---------------+---------------+---------------+               |
-	// |      | 36+10         | 28-Pin        | 36+10         | 28-Pin        |               |
-	// +------+---------------+---------------+---------------+---------------+---------------+
-	// |  1   | stop 4/start  |               | start         |               | start         |
-	// |  2   | stop 3/small  |               | stop 3/small  |               | stop 2/small  |
-	// |  3   | bet           |               | stop 5/bet    |               | bet           |
-	// |  4   | stop 1/take   |               | stop 4/take   |               | stop 3/take   |
-	// |  5   | stop 2/double |               | stop 2/double |               | stop 1/double |
-	// |  6   | stop all/big  |               | stop 1/big    |               | stop all/big  |
-	// |  7   |               |               |               |               |               |
-	// |  8   |               |               |               |               |               |
-	// |  9   |               | bet           |               | stop 5/bet    |               |
-	// | 10   |               | start         |               | start         |               |
-	// | 11   |               |               |               |               |               |
-	// | 12   |               | stop 1/take   |               | stop 1/big    |               |
-	// | 13   |               | stop 2/big    |               | stop 2/double |               |
-	// | 14   |               | stop 4/double |               | stop 4/take   |               |
-	// | 15   |               | stop 3/small  |               | stop 3/small  |               |
-	// | 16   |               |               |               |               |               |
-	// +------+---------------+---------------+---------------+---------------+---------------+
+	// +------+-------------------------------+-------------------------------+---------------+--------+
+	// | lamp | jking02                       | tripslot                      | oceanpar      | ccly   |
+	// |      +---------------+---------------+---------------+---------------+               +--------+
+	// |      | 36+10         | 28-Pin        | 36+10         | 28-Pin        |               | Fruit  |
+	// +------+---------------+---------------+---------------+---------------+---------------+--------|
+	// |  1   | stop 4/start  |               | start         |               | start         | start  |
+	// |  2   | stop 3/small  |               | stop 3/small  |               | stop 2/small  | small  |
+	// |  3   | bet           |               | stop 5/bet    |               | bet           | bet    |
+	// |  4   | stop 1/take   |               | stop 4/take   |               | stop 3/take   | take   |
+	// |  5   | stop 2/double |               | stop 2/double |               | stop 1/double | double |
+	// |  6   | stop all/big  |               | stop 1/big    |               | stop all/big  | big    |
+	// |  7   |               |               |               |               |               |        |
+	// |  8   |               |               |               |               |               |        |
+	// |  9   |               | bet           |               | stop 5/bet    |               |        |
+	// | 10   |               | start         |               | start         |               |        |
+	// | 11   |               |               |               |               |               |        |
+	// | 12   |               | stop 1/take   |               | stop 1/big    |               |        |
+	// | 13   |               | stop 2/big    |               | stop 2/double |               |        |
+	// | 14   |               | stop 4/double |               | stop 4/take   |               |        |
+	// | 15   |               | stop 3/small  |               | stop 3/small  |               |        |
+	// | 16   |               |               |               |               |               |        |
+	// +------+---------------+---------------+---------------+---------------+---------------+--------+
 	for (unsigned i = 0; 8 > i; ++i)
 		m_out_lamps[Start + i] = BIT(data, i);
 }
@@ -1771,7 +1874,7 @@ void igs_m027_state::counter_w(int state)
 template <bool Xor>
 void igs_m027_state::m027_noppi(machine_config &config)
 {
-	IGS027A(config, m_maincpu, 22'000'000); // Jungle King 2002 has a 22Mhz Xtal, what about the others?
+	IGS027A(config, m_maincpu, 22'000'000); // Jungle King 2002 has a 22MHz Xtal, what about the others?
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::m027_noppi_map<Xor>);
 	m_maincpu->out_port().set(FUNC(igs_m027_state::io_select_w<1>));
 
@@ -2020,6 +2123,18 @@ void igs_m027_state::tripslot(machine_config &config)
 	m_maincpu->out_port().append(FUNC(igs_m027_state::tripslot_okibank_low_w)).rshift(3);
 
 	m_ppi[0]->out_pa_callback().set(FUNC(igs_m027_state::lamps_w<8>));
+	m_ppi[0]->out_pb_callback().set_ioport("PPIB");
+	m_ppi[0]->out_pc_callback().set(FUNC(igs_m027_state::lamps_w<0>));
+
+	HOPPER(config, m_hopper, attotime::from_msec(50));
+}
+
+void igs_m027_state::ccly(machine_config &config)
+{
+	m027_1ppi<true>(config);
+
+	m_maincpu->in_port().set_ioport("PLAYER");
+
 	m_ppi[0]->out_pb_callback().set_ioport("PPIB");
 	m_ppi[0]->out_pc_callback().set(FUNC(igs_m027_state::lamps_w<0>));
 
@@ -2313,7 +2428,7 @@ U17 is a ATF16V8B-15P labeled ( FG-1 ) (read protected)
 U10 is a IGS 003c Dip 40 pin ( Maybe 8255 ? )
 U24 is a IGS031 QFP with 208 pin
 U32 is a IGS027a QFP with 120 pin ( Encrypted ARM, internal code, stamped P9 A/K II )
-Crystal Frequency = 22.000 Mhz
+Crystal Frequency = 22.000 MHz
 Sound Processor ( U6295 )
 */
 
@@ -3711,7 +3826,7 @@ GAME(  2005, cjddzlf,       0,        cjddz,        cjddz,         igs_m027_stat
 GAME(  2005, cjtljp,        0,        xypdk,        lhzb4,         igs_m027_state, init_cjtljp,   ROT0, "IGS", "Chaoji Tuolaji Jiaqiang Ban (V206CN)", 0 ) // 2005 date in internal ROM
 GAME(  2005, xypdk,         0,        xypdk,        lhzb4,         igs_m027_state, init_xypdk,    ROT0, "IGS", "Xingyun Pao De Kuai (V106CN)", 0 )
 GAMEL( 2007, tripslot,      0,        tripslot,     tripslot,      igs_m027_state, init_tripslot, ROT0, "IGS", "Triple Slot (V200VE)", 0, layout_tripslot ) // 2007 date in internal ROM at least, could be later, default settings password is all 'start 1'
-GAME(  2005, ccly,          crzybugs, m027_1ppi<true>, base,       igs_m027_state, init_ccly,     ROT0, "IGS", "Chong Chong Leyuan (V100CN)", MACHINE_NOT_WORKING )
+GAME(  2005, ccly,          crzybugs, ccly,         ccly,          igs_m027_state, init_ccly,     ROT0, "IGS", "Chong Chong Leyuan (V100CN)", MACHINE_NOT_WORKING )
 // this has a 2nd 8255
 GAME(  2001, extradrw,      0,        extradrw,     base,          igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw (V100VE)", MACHINE_NOT_WORKING )
 // these have an IGS025 protection device instead of the 8255

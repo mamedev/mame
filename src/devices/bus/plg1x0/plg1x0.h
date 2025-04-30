@@ -53,7 +53,6 @@ public:
 	void do_midi_tx(int state) { m_midi_tx(state); }
 
 protected:
-	bool m_dummy_save = false; // needed for save-state support
 	devcb_write_line m_midi_tx;
 
 	virtual void device_start() override ATTR_COLD;

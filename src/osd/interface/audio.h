@@ -6,10 +6,11 @@
 
 #pragma once
 
-#include <string>
 #include <array>
+#include <cmath>
+#include <string>
 #include <vector>
-#include <math.h>
+
 
 namespace osd {
 
@@ -25,7 +26,7 @@ struct audio_info {
 		uint32_t m_id;
 		audio_rate_range m_rate;
 		std::vector<std::string> m_port_names;
-		std::vector<std::array<double, 3>> m_port_positions;
+		std::vector<std::array<double, 3> > m_port_positions;
 		uint32_t m_sinks;
 		uint32_t m_sources;
 
@@ -45,8 +46,9 @@ struct audio_info {
 	std::vector<stream_info> m_streams;
 };
 
-static inline float db_to_linear(float db) { return db <= -96 ? 0.0 : pow(10, db/20); }
-static inline float linear_to_db(float linear) { return linear <= 1/65536.0 ? -96 : 20*log10(linear); }
-}
+inline float db_to_linear(float db) { return (db <= -96.0F) ? 0.0F : std::pow(10.0F, db / 20.0F); }
+inline float linear_to_db(float linear) { return (linear <= (1.0F / 65536.0F)) ? -96.0F : (20.0F * std::log10(linear)); }
 
-#endif
+} // namespace osd
+
+#endif // MAME_OSD_INTERFACE_AUDIO_H

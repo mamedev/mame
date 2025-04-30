@@ -58,9 +58,6 @@ void svi_expander_device::device_start()
 {
 	// get inserted module
 	m_module = get_card_device();
-
-	// register for save states
-	save_item(NAME(m_dummy_save));
 }
 
 //-------------------------------------------------

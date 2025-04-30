@@ -270,7 +270,6 @@ mame_ui_manager::mame_ui_manager(running_machine &machine)
 	, m_mouse_arrow_texture(nullptr)
 	, m_pointers_changed(false)
 	, m_target_font_height(0)
-	, m_has_warnings(false)
 	, m_unthrottle_mute(false)
 	, m_image_display_enabled(true)
 	, m_machine_info()
@@ -697,12 +696,10 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 			break;
 
 		case 1:
-			warning_text = machine_info().warnings_string();
-			m_has_warnings = !warning_text.empty();
 			if (show_warnings)
 			{
-				bool need_warning = m_has_warnings;
-				if (machine_info().has_severe_warnings() || !m_has_warnings)
+				bool need_warning = machine_info().has_warnings();
+				if (machine_info().has_severe_warnings() || !machine_info().has_warnings())
 				{
 					// critical warnings - no need to persist stuff
 					m_unemulated_features.clear();
@@ -717,6 +714,8 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 					for (device_t &device : device_enumerator(machine().root_device()))
 					{
 						device_t::feature_type unemulated = device.type().unemulated_features();
+						if ((&device != &machine().root_device()) && (device.type().emulation_flags() & device_t::flags::NOT_WORKING))
+							unemulated_features.emplace(device.type().shortname(), "functionality");
 						for (std::underlying_type_t<device_t::feature_type> feature = 1U; unemulated; feature <<= 1)
 						{
 							if (unemulated & feature)
@@ -764,6 +763,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 				}
 				if (need_warning)
 				{
+					warning_text = machine_info().warnings_string();
 					warning_text.append(_("\n\nPress any key to continue"));
 					set_handler(ui_callback_type::MODAL, handler_callback_func(handler_messagebox_anykey));
 					warning_color = machine_info().warnings_color();
@@ -815,7 +815,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 	}
 
 	// update last launch time if this was a run that was eligible for emulation warnings
-	if (m_has_warnings && show_warnings && !machine().scheduled_event_pending())
+	if (machine_info().has_warnings() && show_warnings && !machine().scheduled_event_pending())
 		m_last_launch_time = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 
 	// if we're the empty driver, force the menus on

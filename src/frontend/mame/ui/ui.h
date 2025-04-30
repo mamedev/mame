@@ -204,7 +204,6 @@ public:
 	void show_menu();
 	virtual bool is_menu_active() override;
 	bool can_paste();
-	bool found_machine_warnings() const { return m_has_warnings; }
 	void image_handler_ingame();
 	void request_quit();
 	void set_pointer_activity_timeout(int target, std::chrono::steady_clock::duration timeout) noexcept;
@@ -314,7 +313,6 @@ private:
 	ui_options              m_ui_options;
 	ui_colors               m_ui_colors;
 	float                   m_target_font_height;
-	bool                    m_has_warnings;
 	bool                    m_unthrottle_mute;
 	bool                    m_image_display_enabled;
 

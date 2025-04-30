@@ -2144,6 +2144,49 @@ void validity_checker::validate_driver(device_t &root)
 		osd_printf_error("Driver cannot have features that are both unemulated and imperfect (0x%08X)\n", util::underlying_value(unemulated & imperfect));
 	if ((m_current_driver->flags & machine_flags::NO_SOUND_HW) && ((unemulated | imperfect) & device_t::feature::SOUND))
 		osd_printf_error("Machine without sound hardware cannot have unemulated/imperfect sound\n");
+
+	// catch systems marked as supporting save states that contain devices that don't support save states
+	if (!(m_current_driver->type.emulation_flags() & device_t::flags::SAVE_UNSUPPORTED))
+	{
+		std::set<std::add_pointer_t<device_type> > nosave;
+		device_enumerator iter(root);
+		std::string_view cardtag;
+		for (auto &device : iter)
+		{
+			// ignore any children of a slot card
+			if (!cardtag.empty())
+			{
+				std::string_view tag(device.tag());
+				if ((tag.length() > cardtag.length()) && (tag.substr(0, cardtag.length()) == cardtag) && tag[cardtag.length()] == ':')
+					continue;
+				else
+					cardtag = std::string_view();
+			}
+
+			// check to see if this is a slot card
+			device_t *const parent(device.owner());
+			if (parent)
+			{
+				device_slot_interface *slot;
+				parent->interface(slot);
+				if (slot && (slot->get_card_device() == &device))
+				{
+					cardtag = device.tag();
+					continue;
+				}
+			}
+
+			if (device.type().emulation_flags() & device_t::flags::SAVE_UNSUPPORTED)
+				nosave.emplace(&device.type());
+		}
+		if (!nosave.empty())
+		{
+			std::ostringstream buf;
+			for (auto const &devtype : nosave)
+				util::stream_format(buf, "%s(%s) %s\n", core_filename_extract_base(devtype->source()), devtype->shortname(), devtype->fullname());
+			osd_printf_error("Machine is marked as supporting save states but uses devices that lack save state support:\n%s", std::move(buf).str());
+		}
+	}
 }
 
 

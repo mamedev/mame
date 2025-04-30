@@ -126,7 +126,7 @@ void menu_main::populate()
 
 	item_append(_("menu-main", "System Information"), 0, (void *)GAME_INFO);
 
-	if (ui().found_machine_warnings())
+	if (ui().machine_info().has_warnings())
 		item_append(_("menu-main", "Warning Information"), 0, (void *)WARN_INFO);
 
 	for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
