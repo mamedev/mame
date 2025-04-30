@@ -334,11 +334,11 @@ void k056230_device::regs_map(address_map &map)
 		NAME([this] (offs_t offset) {
 			/*
 			status register bits:
-				2,1,0 = TID, transmit status
-				3     = RXD
-				4     = INTST-, 0 when INT
-				5     = RUNST, 1 when comms active
-				7,6   = unused
+			    2,1,0 = TID, transmit status
+			    3     = RXD
+			    4     = INTST-, 0 when INT
+			    5     = RUNST, 1 when comms active
+			    7,6   = unused
 			*/
 			u8 data = 0x08 | m_status;
 			if (!machine().side_effects_disabled())
@@ -348,11 +348,11 @@ void k056230_device::regs_map(address_map &map)
 		NAME([this] (offs_t offset, u8 data) {
 			/*
 			mode register bits:
-				2,1,0 = ID  - 0 to 7
-				4,3   = IDM - 0, 1, 3 valid, 2 invalid
-				5     = M/S - 1 means MASTER
-				6     = TXD
-				7     = TXM - 1 means TX line will be whatever TXD is set to. (not implemented)
+			    2,1,0 = ID  - 0 to 7
+			    4,3   = IDM - 0, 1, 3 valid, 2 invalid
+			    5     = M/S - 1 means MASTER
+			    6     = TXD
+			    7     = TXM - 1 means TX line will be whatever TXD is set to. (not implemented)
 			*/
 			LOGMASKED(LOG_REG_WRITES, "%s: Mode Register write %02x\n", machine().describe_context(), data);
 			set_mode(data);
@@ -362,7 +362,7 @@ void k056230_device::regs_map(address_map &map)
 		NAME([this] (offs_t offset) {
 			/*
 			crc error register bits:
-				each bit signals a receive error from the corrosponding main-id (bit 0 = id 0 etc.)
+			    each bit signals a receive error from the corrosponding main-id (bit 0 = id 0 etc.)
 			*/
 			const u8 res = 0x00;
 			if (!machine().side_effects_disabled())
@@ -372,13 +372,13 @@ void k056230_device::regs_map(address_map &map)
 		NAME([this] (offs_t offset, u8 data) {
 			/*
 			control register bits:
-				0   = START
-				1   = INTPR - 1 enables int
-				2   = CRCR - 1 enables crc error register
-				4,3 = SIZE - 0 32byte, 1 64 byte, 2 128 byte, 3, 256 byte
-				5   = SLEEP- - 0 means disabled, 1 means enabled?
-				6   = H/S - comm speed - 0 = clk / 16, 1 = clk / 8
-				7   = unused
+			    0   = START
+			    1   = INTPR - 1 enables int
+			    2   = CRCR - 1 enables crc error register
+			    4,3 = SIZE - 0 32byte, 1 64 byte, 2 128 byte, 3, 256 byte
+			    5   = SLEEP- - 0 means disabled, 1 means enabled?
+			    6   = H/S - comm speed - 0 = clk / 16, 1 = clk / 8
+			    7   = unused
 			*/
 			LOGMASKED(LOG_REG_WRITES, "%s: Control Register write %02x\n", machine().describe_context(), data);
 			set_ctrl(data);
@@ -388,9 +388,9 @@ void k056230_device::regs_map(address_map &map)
 		NAME([this] (offs_t offset, u8 data) {
 			/*
 			sub-id register bits:
-				1,0     = SID, sub-id
-				3,2     = MSID, master sub-id
-				7,6,5,4 = unused
+			    1,0     = SID, sub-id
+			    3,2     = MSID, master sub-id
+			    7,6,5,4 = unused
 			*/
 			LOGMASKED(LOG_REG_WRITES, "%s: regs_w: Sub ID Register = %02x\n", machine().describe_context(), data);
 		})
