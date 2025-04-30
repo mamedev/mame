@@ -366,7 +366,7 @@ void device_mixer_interface::interface_pre_start()
 	u32 no = get_sound_requested_outputs();
 	u32 nc = ni > no ? ni : no;
 	for(u32 i = 0; i != nc; i++)
-		stream_alloc(1, 1, SAMPLE_RATE_ADAPTIVE);
+		stream_alloc(1, 1, device().machine().sample_rate());
 }
 
 void device_mixer_interface::sound_stream_update(sound_stream &stream)
