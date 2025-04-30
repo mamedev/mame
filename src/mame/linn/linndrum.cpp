@@ -577,8 +577,8 @@ void linndrum_audio_device::device_add_mconfig(machine_config &config)
 	TIMER(config, m_hat_trigger_timer).configure_generic(FUNC(linndrum_audio_device::hat_trigger_timer_tick));  // LM556 (U37B).
 	VA_RC_EG(config, m_hat_eg).set_c(HAT_C22);
 	VA_VCA(config, m_hat_vca).configure_streaming_cv(true).configure_cem3360_linear_cv();
-	m_mux_volume[MV_HAT]->add_route(0, m_hat_vca, 1.0);
-	m_hat_eg->add_route(0, m_hat_vca, HAT_EG2CV_SCALER);
+	m_mux_volume[MV_HAT]->add_route(0, m_hat_vca, 1.0, 0);
+	m_hat_eg->add_route(0, m_hat_vca, HAT_EG2CV_SCALER, 1);
 
 	// *** Snare / sidestick section.
 
@@ -899,9 +899,15 @@ void linndrum_audio_device::update_volume_and_pan(int channel)
 		gain_left = v_input_left * MIXER_R_FEEDBACK / R4;
 	}
 
+	device_sound_interface *mixer_input = nullptr;
+	if (channel == MIX_CLICK)
+		mixer_input = m_click_bpf;
+	else
+		mixer_input = m_voice_hpf[channel];
+
 	// Using -gain_*, because the summing op-amps are inverting.
-	m_left_mixer->set_input_gain(channel, -gain_left);
-	m_right_mixer->set_input_gain(channel, -gain_right);
+	mixer_input->set_route_gain(0, m_left_mixer, 0, -gain_left);
+	mixer_input->set_route_gain(0, m_right_mixer, 0, -gain_right);
 
 	if (channel == MIX_CLICK)
 	{
