@@ -10226,18 +10226,18 @@ Sega logo animation draws offset [VDP2]
 		</part>
 	</software>
 
-	<!-- Identifying Dark Savior (JAP) (DW0579)... -->
-	<software name="darksavja" cloneof="darksav" supported="no">
-		<description>Dark Savior (Japan, alt)</description>
-		<year>1996</year>
-		<publisher>Climax</publisher>
-		<info name="serial" value="T-22101G"/>
-		<info name="release" value="19960830"/>
-		<info name="alt_title" value="ダークセイバー"/>
+	<!-- Identifying Dark Seed (JAP) (DW0616)... -->
+	<software name="darkseed" supported="no">
+		<description>Darkseed (Japan)</description>
+		<year>1995</year>
+		<publisher>GAGA Communications</publisher>
+		<info name="serial" value="T-18501G"/>
+		<info name="release" value="19950707"/>
+		<info name="alt_title" value="ダークシード"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="dark savior (jpn) (dw0579)" sha1="8a40bd99c76dbebcc232072b8649eb1ef106ea62" />
+				<disk name="dark seed (jpn) (dw0616)" sha1="f1164902b9d582a00ee8176d22bd103c177d8e7c" />
 			</diskarea>
 		</part>
 	</software>
