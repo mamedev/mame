@@ -41,18 +41,26 @@ protected:
 	u8 m_status;
 
 private:
+	emu_timer *m_tick_timer;
+
 	class context;
 	std::unique_ptr<context> m_context;
 
-	u8 m_buffer[0x401];
-	u8 m_linkenable;
+	u8 m_buffer[0x101];
+	bool m_linkenable;
+	bool m_linkmaster;
 	u8 m_linkid;
-	u16 m_linksize;
+	u8 m_linkidm;
+	u8 m_linksize;
 	u8 m_txmode;
 
+	TIMER_CALLBACK_MEMBER(tick_timer_callback);
+
+	void set_irq(int state);
 	void set_mode(u8 data);
 	void set_ctrl(u8 data);
 	void comm_tick();
+	void comm_send(u8 idx, unsigned frame_size, unsigned data_size);
 	unsigned read_frame(unsigned data_size);
 	void send_frame(unsigned data_size);
 };

@@ -13,7 +13,6 @@ Device Notes:
 -HYC2485S RS485 transceiver
 
 TODO:
-- interupts (racinfrc lan check shows debug info while holding F2)
 - "manual" TX/RX mode
 - LANC part name for konami/viper.cpp
 
@@ -278,15 +277,21 @@ k056230_device::k056230_device(const machine_config &mconfig, const char *tag, d
 
 void k056230_device::device_start()
 {
+	m_tick_timer = timer_alloc(FUNC(k056230_device::tick_timer_callback), this);
+	m_tick_timer->adjust(attotime::never);
+
 	auto ctx = std::make_unique<context>();
 	m_context = std::move(ctx);
 
 	// state saving
+	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_status));
 
 	save_item(NAME(m_linkenable));
+	save_item(NAME(m_linkmaster));
 	save_item(NAME(m_linkid));
+	save_item(NAME(m_linkidm));
 	save_item(NAME(m_linksize));
 	save_item(NAME(m_txmode));
 }
@@ -304,14 +309,21 @@ void k056230_device::device_reset()
 	auto const &opts = mconfig().options();
 	m_context->start(opts.comm_localhost(), opts.comm_localport(), opts.comm_remotehost(), opts.comm_remoteport());
 
-	m_linkenable = 0;
+	m_linkenable = false;
+	m_linkmaster = false;
 	m_linkid = 0;
-	m_linksize = 0x0100;
+	m_linkidm = 0;
+	m_linksize = 0;
 	m_txmode = 0;
+
+	m_tick_timer->adjust(attotime::from_hz(800), 0, attotime::from_hz(800));
 }
+
 
 void k056230_device::device_stop()
 {
+	m_tick_timer->adjust(attotime::never);
+
 	m_context->stop();
 	m_context.reset();
 }
@@ -370,23 +382,6 @@ void k056230_device::regs_map(address_map &map)
 			*/
 			LOGMASKED(LOG_REG_WRITES, "%s: Control Register write %02x\n", machine().describe_context(), data);
 			set_ctrl(data);
-			// TODO: This is a literal translation of the previous device behaviour, and is incorrect.
-			// Namely it can't possibly ping irq state on the fly, needs some transaction from the receiver.
-			const int old_state = m_irq_state;
-			if (BIT(data, 5))
-			{
-				LOGMASKED(LOG_REG_WRITES, "%s: regs_w: Asserting IRQ\n", machine().describe_context());
-				m_irq_state = ASSERT_LINE;
-			}
-			if (!BIT(data, 0))
-			{
-				LOGMASKED(LOG_REG_WRITES, "%s: regs_w: Clearing IRQ\n", machine().describe_context());
-				m_irq_state = CLEAR_LINE;
-			}
-			if (old_state != m_irq_state)
-			{
-				m_irq_cb(m_irq_state);
-			}
 		})
 	);
 	map(0x02, 0x02).lw8(
@@ -418,88 +413,98 @@ void k056230_device::ram_w(offs_t offset, u32 data, u32 mem_mask)
 	COMBINE_DATA(&lanc_ram[offset & 0x7ff]);
 }
 
+void k056230_device::set_irq(int state)
+{
+	if (state != m_irq_state)
+	{
+		if (state == CLEAR_LINE)
+			m_status |= 0x10;
+		else
+			m_status &= 0xef;
+
+		m_irq_state = state;
+
+		if (m_irq_enable)
+			m_irq_cb(m_irq_state);
+	}
+}
 
 void k056230_device::set_mode(u8 data)
 {
 	m_linkid = data & 0x07;
-	switch ((data & 0x18) >> 3)
-	{
-		case 0:
-			// 8 cabinet mode
-			m_linksize = 0x0100;
-			break;
-		case 1:
-			// 4 cabinet mode
-			m_linksize = 0x0200;
-			break;
-		case 3:
-			// 2 cabinet mode
-			m_linksize = 0x0400;
-			break;
-		case 2:
-			// invalid
-		default:
-			m_linksize = 0x0100;
-			logerror("set_mode: %02x invalid IDM selected\n", data);
-			break;
-	}
+	m_linkidm = (data & 0x18) >> 3;
+	if (m_linkidm == 2)
+		logerror("set_mode: %02x invalid IDM selected\n", data);
+	m_linkmaster = bool(BIT(data, 5));
+	// ignore bit 6 (TXD) for now
 	if (data & 0x80)
-	{
 		logerror("set_mode: %02x manual tx/rx mode NOT implemented\n", data);
-	}
 }
 
 void k056230_device::set_ctrl(u8 data)
 {
-	m_linkenable = (data & 0x20) ? 0x01 : 0x00;
-	switch (data)
+	bool start = bool(BIT(data, 0));
+	if (!bool(BIT(data, 1)))
 	{
-		case 0x10:
-		case 0x18:
-			// prepare for rx?
-			break;
-
-		case 0x14:
-		case 0x1c:
-			// prepare for tx? - clear bit5
-			m_status = 0x00;
-			break;
-
-		case 0x36:
-		case 0x3e:
-			// plygonet, polynetw, gticlub = 36, midnrun 3e
-			// rx mode?
-			m_txmode = 0x00;
-			comm_tick();
-			break;
-
-		case 0x37:
-		case 0x3f:
-			// tx mode? - set bit 5
-			// plygonet, polynetw, gticlub = 37, midnrun 3f
-			m_status = 0x20;
-			m_txmode = 0x01;
-			comm_tick();
-			break;
-
-		default:
-			logerror("k056230-set_ctrl: %02x\n", data);
-			break;
+		set_irq(CLEAR_LINE);
 	}
+	m_irq_enable = bool(BIT(data, 1));
+	// ignore bit 2 (CRCR) for now
+	m_linksize = (data & 0x18) >> 3;
+	m_linkenable = bool(BIT(data, 5));
+	// ignore bit 6 (H/S) for now
+	// ignore bit 7 (unused)
+
+	if (m_linkenable)
+	{
+		if (m_linkid == 0x00)
+		{
+			if (start)
+			{
+				// master (start)
+				m_txmode = 0x01;
+				m_status |= 0x20;
+			}
+			else
+			{
+				// master (stop)
+				m_txmode = 0x02;
+				m_status &= 0xdf;
+			}
+		}
+		else
+		{
+			// slave
+			m_txmode = 0x03;
+			m_status |= 0x20;
+		}
+	} else {
+		// (disabled)
+		m_status &= 0xdf;
+		m_txmode = 0x00;
+	}
+}
+
+TIMER_CALLBACK_MEMBER(k056230_device::tick_timer_callback)
+{
+	comm_tick();
 }
 
 void k056230_device::comm_tick()
 {
 	m_context->check_sockets();
 
-	if (m_linkenable == 0x01)
+	if (m_linkenable)
 	{
 		// if both sockets are there check ring
 		if (m_context->connected())
 		{
-			unsigned data_size = m_linksize + 1;
+			unsigned frame_size = 1 << (5 + m_linksize);
+			unsigned data_size = frame_size + 1;
 
-			if (m_txmode == 0x00)
+			bool raise_irq = (m_irq_state == ASSERT_LINE);
+
+			if (m_txmode >= 0x00)
 			{
 				// try to read one message
 				unsigned recv = read_frame(data_size);
@@ -507,13 +512,14 @@ void k056230_device::comm_tick()
 				{
 					// check if valid id
 					u8 idx = m_buffer[0];
-					if (idx <= 0x0e)
+
+					if (idx <= 0x07)
 					{
-						if (idx != m_linkid)
+						// if not own message
+						if ((idx | m_linkidm) != (m_linkid | m_linkidm))
 						{
 							// save message to ram
 							unsigned frame_start = idx * 0x0100;
-							unsigned frame_size = m_linksize;
 							unsigned frame_offset = 0;
 							u32 frame_data = 0;
 
@@ -527,34 +533,55 @@ void k056230_device::comm_tick()
 							// forward message to other nodes
 							send_frame(data_size);
 						}
+
+						if (idx == 0)
+							m_txmode &= 0xfd;
 					}
 
 					// try to read another message
 					recv = read_frame(data_size);
 				}
 			}
-			else if (m_txmode == 0x01)
+
+			if (m_txmode == 0x01)
 			{
-				// send local data to network (once)
-				unsigned frame_start = m_linkid * 0x100;
-				unsigned frame_size = m_linksize;
-
-				unsigned frame_offset = 0;
-				u32 frame_data = 0;
-
-				m_buffer[0] = m_linkid;
-				for (unsigned i = 0; i < frame_size; i += 4)
+				// send local data to network
+				for (unsigned j = 0; j <= m_linkidm; j++)
 				{
-					frame_offset = (frame_start + i) / 4;
-					frame_data = ram_r(frame_offset, 0xffffffff);
-					put_u32be(&m_buffer[i + 1], frame_data);
+					comm_send(m_linkid + j, frame_size, data_size);
 				}
 
-				send_frame(data_size);
+				// disable transmission
 				m_txmode = 0x02;
+
+				raise_irq = true;
+			}
+
+			// raise irq
+			if (raise_irq)
+			{
+				set_irq(ASSERT_LINE);
 			}
 		}
 	}
+}
+
+void k056230_device::comm_send(u8 idx, unsigned frame_size, unsigned data_size)
+{
+	unsigned frame_start = idx * 0x100;
+
+	unsigned frame_offset = 0;
+	u32 frame_data = 0;
+
+	m_buffer[0] = idx;
+	for (unsigned i = 0; i < frame_size; i += 4)
+	{
+		frame_offset = (frame_start + i) / 4;
+		frame_data = ram_r(frame_offset, 0xffffffff);
+		put_u32be(&m_buffer[i + 1], frame_data);
+	}
+
+	send_frame(data_size);
 }
 
 unsigned k056230_device::read_frame(unsigned data_size)
