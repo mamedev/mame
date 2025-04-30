@@ -1230,9 +1230,11 @@ configuration { "vs20*" }
 if _OPTIONS["vs"]==nil then
 		buildoptions {
 			"/bigobj",
-			"/Zc:preprocessor",
-			"/utf-8",
 			"/permissive-",
+			"/utf-8",
+			"/Zc:enumTypes",
+			"/Zc:preprocessor",
+			"/Zc:templateScope",
 		}
 
 		buildoptions {
