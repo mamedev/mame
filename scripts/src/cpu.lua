@@ -21,9 +21,10 @@ for i, v in ipairs(DRC_CPUS) do
 		break
 	end
 end
+CPU_INCLUDE_DRC_NATIVE = CPU_INCLUDE_DRC and (not _OPTIONS["FORCE_DRC_C_BACKEND"]) and ((_OPTIONS["PLATFORM"] == "x86") or (_OPTIONS["PLATFORM"] == "arm64"))
 
 
-if (CPU_INCLUDE_DRC) then
+if CPU_INCLUDE_DRC then
 	files {
 		MAME_DIR .. "src/devices/cpu/drcbec.cpp",
 		MAME_DIR .. "src/devices/cpu/drcbec.h",
@@ -41,16 +42,16 @@ if (CPU_INCLUDE_DRC) then
 		MAME_DIR .. "src/devices/cpu/x86log.h",
 		MAME_DIR .. "src/devices/cpu/drcumlsh.h",
 	}
-	if (not _OPTIONS["FORCE_DRC_C_BACKEND"]) and ((_OPTIONS["PLATFORM"] == "x86") or (_OPTIONS["PLATFORM"] == "arm64")) then
-		files {
-			MAME_DIR .. "src/devices/cpu/drcbearm64.cpp",
-			MAME_DIR .. "src/devices/cpu/drcbearm64.h",
-			MAME_DIR .. "src/devices/cpu/drcbex64.cpp",
-			MAME_DIR .. "src/devices/cpu/drcbex64.h",
-			MAME_DIR .. "src/devices/cpu/drcbex86.cpp",
-			MAME_DIR .. "src/devices/cpu/drcbex86.h",
-		}
-	end
+end
+if CPU_INCLUDE_DRC_NATIVE then
+	files {
+		MAME_DIR .. "src/devices/cpu/drcbearm64.cpp",
+		MAME_DIR .. "src/devices/cpu/drcbearm64.h",
+		MAME_DIR .. "src/devices/cpu/drcbex64.cpp",
+		MAME_DIR .. "src/devices/cpu/drcbex64.h",
+		MAME_DIR .. "src/devices/cpu/drcbex86.cpp",
+		MAME_DIR .. "src/devices/cpu/drcbex86.h",
+	}
 end
 
 --------------------------------------------------
@@ -1295,7 +1296,7 @@ end
 -- Beware that opt_tool can set the value, so we want both to be executed always
 local want_disasm_i86  = opt_tool(CPUS, "I86")
 local want_disasm_i386 = opt_tool(CPUS, "I386")
-if want_disasm_i86 or want_disasm_i386 or CPU_INCLUDE_DRC then
+if want_disasm_i86 or want_disasm_i386 or CPU_INCLUDE_DRC_NATIVE then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/i386/i386dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/i386/i386dasm.h")
 end
