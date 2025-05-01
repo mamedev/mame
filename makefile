@@ -396,6 +396,18 @@ ifeq ($(findstring aarch64,$(UNAME)),aarch64)
 ARCHITECTURE :=
 endif
 
+ifneq (,$(findstring ppc,$(UNAME)))
+ifndef FORCE_DRC_C_BACKEND
+	FORCE_DRC_C_BACKEND := 1
+endif
+endif
+
+ifneq (,$(findstring s390x,$(UNAME)))
+ifndef NOASM
+	NOASM := 1
+endif
+endif
+
 # Autodetect BIGENDIAN
 # MacOSX
 ifndef BIGENDIAN
