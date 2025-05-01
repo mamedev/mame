@@ -80,7 +80,7 @@
  * Communication for games that support linked mode
  * IGS025 protection for Chess Challenge II
  * Emulate necessary peripherals for Extra Draw (might not belong here)
- * I/O for remaining games
+ * I/O for remaining games (klxyj102cn, klxyj104cn)
 */
 
 #include "emu.h"
@@ -180,7 +180,6 @@ public:
 	void init_mgzz() ATTR_COLD;
 	void init_mgcs3() ATTR_COLD;
 	void init_jking02() ATTR_COLD;
-	void init_lthyp() ATTR_COLD;
 	void init_luckycrs() ATTR_COLD;
 	void init_olympic5() ATTR_COLD;
 	void init_tripslot() ATTR_COLD;
@@ -2531,10 +2530,10 @@ ROM_START( sdwx )
 	ROM_LOAD( "sp.u2", 0x00000, 0x80000, CRC(216b5418) SHA1(b7bc24ced0ccb5476c974420aa506c13b971fc9f) )
 ROM_END
 
-ROM_START( klxyj )
+ROM_START( klxyj104cn )
 	ROM_REGION( 0x04000, "maincpu", 0 )
-	// Internal ROM of IGS027A ARM based MCU
-	ROM_LOAD( "klxyj_igs027a", 0x00000, 0x4000, NO_DUMP ) // unknown sticker
+	// Internal ROM of IGS027A ARM based MCU. Not dumped for this set, but it works.
+	ROM_LOAD( "klxyj_igs027a", 0x00000, 0x4000, CRC(19505c43) SHA1(a5141b5fa91e0061359d1159dadf236b255aabbc) ) // unknown sticker
 
 	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "klxyj_104.u16", 0x000000, 0x80000, CRC(8cb9bdc2) SHA1(5a13d0ff6488a938617a9ea89e7cf607539a1f49) )
@@ -2547,6 +2546,24 @@ ROM_START( klxyj )
 
 	ROM_REGION( 0x200000, "oki", 0 )
 	ROM_LOAD( "w4201.u2", 0x00000, 0x100000, CRC(464f11ab) SHA1(56e45bd31f667fc30387fcd4c940a94819b7ef0f) )
+ROM_END
+
+ROM_START( klxyj102cn ) // IGS PCB-0351-05-FM. 1 82C55, 3 banks of 8 DIP switches
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS027A ARM based MCU
+	ROM_LOAD( "igs027a.u28", 0x00000, 0x4000, CRC(19505c43) SHA1(a5141b5fa91e0061359d1159dadf236b255aabbc) ) // unknown sticker
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "u16", 0x000000, 0x80000, CRC(82699cd9) SHA1(b9b6d4b87063ccdd0504178854dc13324af131bb) ) // no sticker
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD16_WORD_SWAP( "u24", 0x000000, 0x80000, CRC(22dcebd0) SHA1(0383f017135230d020d12c8c6cc3aeb136fe9106) ) // no sticker
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "igs_a4202_acg_v100.u25", 0x000000, 0x400000, CRC(97a68f85) SHA1(177c8c23fd0d585b24a71359ede005ac9a2e4d4d) )
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "igs_w4201_speech_v100.u2", 0x00000, 0x100000, CRC(b0fc9d5d) SHA1(18020bfd12f1f1a6a3a39c0ba2dd3b2161a64ada) )
 ROM_END
 
 
@@ -3568,9 +3585,9 @@ void igs_m027_state::init_sdwx()
 
 void igs_m027_state::init_klxyj()
 {
-	klxyj_decrypt(machine());
-	//m_igs017_igs031->sdwx_gfx_decrypt();
-	pgm_create_dummy_internal_arm_region();
+	slqz3_decrypt(machine());
+	m_igs017_igs031->sdwx_gfx_decrypt();
+	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
 }
 
 void igs_m027_state::init_lhzb4()
@@ -3713,16 +3730,10 @@ void igs_m027_state::init_mgcs3()
 
 void igs_m027_state::init_jking02()
 {
-	jking02_decrypt(machine());
+	zhongguo_decrypt(machine());
 	m_igs017_igs031->sdwx_gfx_decrypt();
 	m_igs017_igs031->tarzan_decrypt_sprites(0x400000, 0x400000);
 	// the sprite ROM at 0x400000 doesn't require decryption
-}
-
-void igs_m027_state::init_lthyp()
-{
-	lthyp_decrypt(machine());
-	m_igs017_igs031->set_text_reverse_bits(false);
 }
 
 void igs_m027_state::init_luckycrs()
@@ -3807,9 +3818,11 @@ GAME(  1999, lhzb3106c5m,   lhzb3,    lhzb3106c5m,  lhzb3,         igs_m027_stat
 GAME(  1999, lhzb3sjb,      0,        lhzb3sjb,     lhzb3sjb,      igs_m027_state, init_slqz3,    ROT0, "IGS", "Long Hu Zhengba III Shengji Ban (V300C5)", 0 )
 GAME(  2004, lhzb4,         0,        lhzb4,        lhzb4,         igs_m027_state, init_lhzb4,    ROT0, "IGS", "Long Hu Zhengba 4 (V104CN)", 0 )
 GAME(  2004, lhzb4dhb,      0,        lhzb4,        lhzb4,         igs_m027_state, init_lhzb4,    ROT0, "IGS", "Long Hu Zhengba 4 Dui Hua Ban (V203CN)", 0 )
-GAME(  1999, lthyp,         0,        lthyp,        lthyp,         igs_m027_state, init_lthyp,    ROT0, "IGS", "Long Teng Hu Yao Duizhan Jiaqiang Ban (S104CN)", MACHINE_NODEVICE_LAN )
+GAME(  1999, lthyp,         0,        lthyp,        lthyp,         igs_m027_state, init_slqz3,    ROT0, "IGS", "Long Teng Hu Yao Duizhan Jiaqiang Ban (S104CN)", MACHINE_NODEVICE_LAN )
 GAME(  2000, zhongguo,      0,        zhongguo,     zhongguo,      igs_m027_state, init_zhongguo, ROT0, "IGS", "Zhongguo Chu Da D (V102C)", 0 )
 GAMEL( 2001, jking02,       0,        jking02,      jking02,       igs_m027_state, init_jking02,  ROT0, "IGS", "Jungle King 2002 (V209US)", MACHINE_NODEVICE_LAN, layout_jking02 ) // shows V212US in bookkeeping menu
+GAME(  2001, klxyj104cn,    jking02,  m027_1ppi<true>, base,       igs_m027_state, init_klxyj,    ROT0, "IGS", "Kuai Le Xi You Ji (V104CN)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
+GAME(  2001, klxyj102cn,    jking02,  m027_1ppi<true>, base,       igs_m027_state, init_klxyj,    ROT0, "IGS", "Kuai Le Xi You Ji (V102CN)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
 GAME(  2003, tct2p,         0,        tct2p,        tct2p,         igs_m027_state, init_tct2p,    ROT0, "IGS", "Tarzan Chuang Tianguan 2 Jiaqiang Ban (V306CN)", 0 )
 GAME(  2003, mgzz,          0,        mgzz,         mgzz101cn,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Manguan Zhizun (V101CN)", 0 )
 GAME(  2003, mgzz100cn,     mgzz,     mgzz,         mgzz100cn,     igs_m027_state, init_mgzz,     ROT0, "IGS", "Manguan Zhizun (V100CN)", 0 )
@@ -3846,7 +3859,6 @@ GAME(  2003, olympic5107us, olympic5, m027_1ppi<false>, base,     igs_m027_state
 GAME(  200?, luckycrs,      0,        m027_1ppi<false>, base,     igs_m027_state, init_luckycrs, ROT0, "IGS", "Lucky Cross (V106SA)", MACHINE_NOT_WORKING )
 GAME(  2003, amazoni2,      0,        m027_1ppi<false>, base,     igs_m027_state, init_amazoni2, ROT0, "IGS", "Amazonia King II (V202BR)", MACHINE_NOT_WORKING )
 GAME(  2002, sdwx,          0,        m027_1ppi<false>, base,     igs_m027_state, init_sdwx,     ROT0, "IGS", "Sheng Dan Wu Xian", MACHINE_NOT_WORKING ) // aka Christmas 5 Line? (or Amazonia King II, shares roms at least?)
-GAME(  200?, klxyj,         0,        m027_1ppi<false>, base,     igs_m027_state, init_klxyj,    ROT0, "IGS", "Kuai Le Xi You Ji", MACHINE_NOT_WORKING )
 GAME(  2001, cjdh6th,       0,        m027_1ppi<false>, base,     igs_m027_state, init_extradrw, ROT0, "IGS", "Chaoji Daheng 6th", MACHINE_NOT_WORKING )
 // these have an IGS025 protection device instead of the 8255
 GAME(  200?, gonefsh2,      0,        m027_noppi<false>,base,     igs_m027_state, init_gonefsh2, ROT0, "IGS", "Gone Fishing 2", MACHINE_NOT_WORKING )
