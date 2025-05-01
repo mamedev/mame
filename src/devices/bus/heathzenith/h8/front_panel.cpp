@@ -17,12 +17,15 @@
 
 #define LOG_PORT_W   (1U << 1)
 #define LOG_PORT_R   (1U << 2)
-//#define VERBOSE      (0xf)
+#define LOG_SS       (1U << 3)
+
+//#define VERBOSE      (LOG_SS)
 
 #include "logmacro.h"
 
 #define LOGPORTW(...)      LOGMASKED(LOG_PORT_W, __VA_ARGS__)
 #define LOGPORTR(...)      LOGMASKED(LOG_PORT_R, __VA_ARGS__)
+#define LOGSS(...)         LOGMASKED(LOG_SS, __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -57,8 +60,11 @@ protected:
 
 	u8   m_digit;
 	u8   m_segment;
-	u8   m_irq_ctl;
-	bool m_ff_b;
+	u8   m_int_en;
+	bool m_ic108a;
+	bool m_ic108b;
+	bool m_allow_int1;
+	bool m_allow_int2;
 
 	required_device<beep_device> m_beep;
 	required_ioport_array<2>     m_io_keyboard;
@@ -85,39 +91,36 @@ front_panel_device::front_panel_device(const machine_config &mconfig, const char
 
 void front_panel_device::m1_w(int state)
 {
-	// This is rather messy, but basically there are 2 D flipflops, one drives the other,
-	// the data is /INTE while the clock is /M1. If the system is in Single Instruction mode,
-	// a int20 (output of 2nd flipflop) will occur after 4 M1 steps, to pause the running program.
-	// But, all of this can only occur if bit 4 of port F0 is low.
+	// operate the RUN LED
+	m_run_led = !state;
 
-	bool a = BIT(m_irq_ctl, 7);
-
-	if (BIT(m_irq_ctl, 1))
+	// For Single Instruction(SI) mode, there are 2 D flipflops, ic108a and ic108b.  Both are held in
+	// set mode while not in SI mode.  The data for ic108a is /INTE and ic108a Q is connected to data on
+	// ic108b. Both use /M1 for the clock. When the system is in SI mode, an int20 will trigger after 
+	// after 2 M1 cycles, to pause the running program.
+	if (m_allow_int2)
 	{
-		if (state) // rising pulse to push data through flipflops
+		LOGSS("%s: m_int_en: %d, state: %d\n", FUNCNAME, m_int_en, state);
+
+		if (state)
 		{
-			bool c = !m_ff_b; // from /Q of 2nd flipflop
-			m_ff_b = a; // from Q of 1st flipflop
-			if (c)
+			m_ic108b = !m_ic108a;
+			m_ic108a = !m_int_en;
+
+			if (m_ic108b)
 			{
 				set_p201_int2(ASSERT_LINE);
 			}
 		}
 	}
-	else
-	{
-		// flipflops are 'set'
-		m_ff_b = true;
-	}
-
-	// operate the RUN LED
-	m_run_led = !state;
 }
 
 void front_panel_device::p201_inte(int state)
 {
+	// Operate the ION LED
 	m_ion_led = !state;
-	m_irq_ctl &= 0x7f | ((state) ? 0 : 0x80);
+
+	m_int_en = bool(state);
 }
 
 u8 front_panel_device::portf0_r()
@@ -125,13 +128,13 @@ u8 front_panel_device::portf0_r()
 	u8 data = 0xff;
 
 	// reads the keyboard
-	u8 keyin = m_io_keyboard[0]->read();
+	u8 keyin = m_io_keyboard[0]->read() ^ 0xff;
 
-	if (keyin != 0xff)
+	if (keyin)
 	{
 		for (int i = 1; i < 8; i++)
 		{
-			if (!BIT(keyin, i))
+			if (BIT(keyin, i))
 			{
 				data &= ~(i << 1);
 			}
@@ -140,13 +143,13 @@ u8 front_panel_device::portf0_r()
 		data &= 0xfe;
 	}
 
-	keyin = m_io_keyboard[1]->read();
+	keyin = m_io_keyboard[1]->read() ^ 0xff;
 
-	if (keyin != 0xff)
+	if (keyin)
 	{
 		for (int i = 1; i < 8; i++)
 		{
-			if (!BIT(keyin, i))
+			if (BIT(keyin, i))
 			{
 				data &= ~(i << 5);
 			}
@@ -165,7 +168,7 @@ void front_panel_device::portf0_w(u8 data)
 	//  bit     description
 	// ----------------------
 	// d0-d3    digit selected
-	//  d4      allow int20
+	//  d4      inhibit int20
 	//  d5      mon led
 	//  d6      allow int10
 	//  d7      beeper on
@@ -184,15 +187,23 @@ void front_panel_device::portf0_w(u8 data)
 	m_mon_led = !BIT(data, 5);
 	m_beep->set_state(!BIT(data, 7));
 
-	m_irq_ctl &= 0xf0;
+	m_allow_int1 = BIT(data, 6);
 
-	if (BIT(data, 6))
+	// Setup Single Instruction interrupt
+	bool old_allow_int2 = m_allow_int2;
+
+	m_allow_int2 = bool(!BIT(data, 4));
+
+	if (old_allow_int2 != m_allow_int2)
 	{
-		m_irq_ctl |= 1;
-	}
-	if (!BIT(data, 4))
-	{
-		m_irq_ctl |= 2;
+		LOGSS("%s: value changed: oldval: %d, allow_int2: %d\n", FUNCNAME, old_allow_int2, m_allow_int2);
+
+		if (!m_allow_int2)
+		{
+			m_ic108a = true;
+			m_ic108b = false;
+			set_p201_int2(CLEAR_LINE);
+		}
 	}
 }
 
@@ -272,24 +283,30 @@ void front_panel_device::device_start()
 	m_ion_led.resolve();
 	m_run_led.resolve();
 
-	m_installed = false;
-	m_digit     = 0;
-	m_segment   = 0;
-	m_irq_ctl   = 0;
+	m_installed  = false;
+	m_digit      = 0;
+	m_segment    = 0;
 
 	save_item(NAME(m_installed));
 	save_item(NAME(m_digit));
 	save_item(NAME(m_segment));
-	save_item(NAME(m_irq_ctl));
-	save_item(NAME(m_ff_b));
+	save_item(NAME(m_ic108a));
+	save_item(NAME(m_ic108b));
+	save_item(NAME(m_int_en));
+	save_item(NAME(m_allow_int1));
+	save_item(NAME(m_allow_int2));
 }
 
 void front_panel_device::device_reset()
 {
-	m_irq_ctl = 1;
-	m_pwr_led = 0;
-	m_ff_b    = false;
+	m_allow_int1 = true;
+	m_allow_int2 = false;
+	m_int_en     = false;
+	m_ic108a     = true;
+	m_ic108b     = false;
 
+	// Note: 0 means on and 1 means off
+	m_pwr_led = 0;
 	m_run_led = 1;
 	m_ion_led = 1;
 	m_mon_led = 1;
@@ -324,7 +341,7 @@ ioport_constructor front_panel_device::device_input_ports() const
 
 TIMER_DEVICE_CALLBACK_MEMBER(front_panel_device::h8_irq_pulse)
 {
-	if (BIT(m_irq_ctl, 0))
+	if (m_allow_int1)
 	{
 		set_p201_int1(ASSERT_LINE);
 	}
