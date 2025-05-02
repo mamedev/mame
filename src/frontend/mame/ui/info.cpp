@@ -182,7 +182,7 @@ void get_system_warnings(
 		std::set<std::add_pointer_t<device_type> > seen;
 		for (device_t &device : device_enumerator(machine.root_device()))
 		{
-			if ((device.type().emulation_flags() & device_t::flags::NOT_WORKING) && seen.insert(&device.type()).second)
+			if ((&machine.root_device() != &device) && (device.type().emulation_flags() & device_t::flags::NOT_WORKING) && seen.insert(&device.type()).second)
 			{
 				util::stream_format(buf, first ? _("%s") : _(", %s"), device.type().fullname());
 				first = false;
@@ -281,7 +281,8 @@ machine_static_info::machine_static_info(const ui_options &options, machine_conf
 		m_emulation_flags |= device.type().emulation_flags() & ~device_t::flags::NOT_WORKING;
 		m_unemulated_features |= device.type().unemulated_features();
 		m_imperfect_features |= device.type().imperfect_features();
-		m_has_nonworking_devices = m_has_nonworking_devices || (device.type().emulation_flags() & device_t::flags::NOT_WORKING);
+		if (&config.root_device() != &device)
+			m_has_nonworking_devices = m_has_nonworking_devices || (device.type().emulation_flags() & device_t::flags::NOT_WORKING);
 
 		// look for BIOS options
 		device_t const *const parent(device.owner());
