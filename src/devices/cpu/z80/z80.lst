@@ -38,11 +38,11 @@ macro   wm16   %addr
 	TDAT8 = TDAT_H;
 	call wm %addr+1
 
-macro   wm16_sp
+macro   wm16_sp %d16
 	SP--;
-	m_memrq_cycles !! stack_write(SP, TDAT_H);
+	m_memrq_cycles !! stack_write(SP, (%d16) >> 8);
 	SP--;
-	m_memrq_cycles !! stack_write(SP, TDAT_L);
+	m_memrq_cycles !! stack_write(SP, %d16);
 
 macro   rop
 	m_m1_cycles-2 !! TDAT8 = opcode_read();
@@ -79,9 +79,9 @@ macro   pop
 	m_memrq_cycles !! TDAT_H = stack_read(SP);
 	SP++;
 
-macro   push
+macro   push   %d16
 	call nomreq_ir 1
-	call wm16_sp
+	call wm16_sp %d16
 
 macro   jp
 	call arg16
@@ -140,16 +140,16 @@ macro   arg16_call
 	call arg16
 	m_ea = TDAT;
 	call nomreq_addr PC-1
-	WZ = m_ea; TDAT = PC;
-	call wm16_sp
+	WZ = m_ea;
+	call wm16_sp PC
 	PC = m_ea;
 
 macro   r800:arg16_call
 	call arg16
 	m_ea = TDAT;
 	call nomreq_addr PC-1
-	WZ = m_ea; TDAT = PC;
-	call wm16_sp
+	WZ = m_ea;
+	call wm16_sp PC
 	PC = m_ea;
 
 macro   call_cond
@@ -230,8 +230,7 @@ macro   r800:ld_a_i
 		set_service_attention<SA_AFTER_LDAIR, 1>();
 
 macro   rst	 addr
-	TDAT = PC;
-	call push
+	call push PC
 	PC = addr; WZ = PC;
 
 macro   rrd
@@ -250,14 +249,13 @@ macro   rld
 	call wm HL
 	A = (A & 0xf0) | (TDAT_H >> 4); set_f((F & CF) | SZP[A]);
 
-macro   ex_sp
-	TDAT2 = TDAT;
+macro   ex_sp   %d16
 	call pop
 	call nomreq_addr SP-1
-	using std::swap; std::swap(TDAT, TDAT2);
-	call wm16_sp
+	call wm16_sp %d16
+	%d16 = TDAT;
 	2 * call nomreq_addr SP
-	using std::swap; std::swap(TDAT, TDAT2); WZ = TDAT;
+	WZ = TDAT;
 
 macro   add16
 	call nomreq_ir 7
@@ -518,8 +516,7 @@ macro   take_nmi
 	m_iff1 = 0;
 	m_r++;
 	+ 5
-	TDAT = PC;
-	call wm16_sp
+	call wm16_sp PC
 	PC = 0x0066;
 	WZ = PC;
 	set_service_attention<SA_NMI_PENDING, 0>();
@@ -560,8 +557,7 @@ macro   take_interrupt
 		// even, and all 8 bits will be used; even $FF is handled normally.
 		// CALL opcode timing
 		+ 5
-		TDAT = PC;
-		call wm16_sp
+		call wm16_sp PC
 		m_tmp_irq_vector = (m_tmp_irq_vector & 0xff) | (m_i << 8);
 		call rm16 m_tmp_irq_vector
 		PC = TDAT;
@@ -571,8 +567,7 @@ macro   take_interrupt
 		LOGMASKED(LOG_INT, "'%s' IM1 $0038\n", tag());
 		// RST $38
 		+ 5
-		TDAT = PC;
-		call wm16_sp
+		call wm16_sp PC
 		PC = 0x0038;
 	} else {
 		/* Interrupt mode 0. We check for CALL and JP instructions,
@@ -585,8 +580,7 @@ macro   take_interrupt
 			if ((m_tmp_irq_vector & 0xff0000) == 0xcd0000) {
 				// CALL $xxxx cycles
 				+ 11
-				TDAT = PC;
-				call wm16_sp
+				call wm16_sp PC
 				PC = m_tmp_irq_vector & 0xffff;
 			} else if ((m_tmp_irq_vector & 0xff0000) == 0xc30000) {
 				// JP $xxxx cycles
@@ -595,8 +589,7 @@ macro   take_interrupt
 			} else if ((m_tmp_irq_vector & 0xc7) == 0xc7) {
 				// RST $xx cycles
 				+ 5
-				TDAT = PC;
-				call wm16_sp
+				call wm16_sp PC
 				PC = m_tmp_irq_vector & 0x0038;
 			} else if (m_tmp_irq_vector == 0xfb) {
 				// EI cycles
@@ -639,16 +632,13 @@ macro   nsc800_take_interrupt
 	// 'interrupt latency' cycles
 	+ 7
 	if (m_nsc800_irq_state[0]) {
-		TDAT = PC;
-		call wm16_sp
+		call wm16_sp PC
 		PC = 0x003c;
 	} else if (m_nsc800_irq_state[1]) {
-		TDAT = PC;
-		call wm16_sp
+		call wm16_sp  PC
 		PC = 0x0034;
 	} else if (m_nsc800_irq_state[2]) {
-		TDAT = PC;
-		call wm16_sp
+		call wm16_sp PC
 		PC = 0x002c;
 	} else {
 		+ 2 * m_memrq_cycles
@@ -3633,17 +3623,14 @@ dde2	# DB   DD
 	call jump 00e2
 
 dde3	# EX   (SP),IX
-	TDAT = IX;
-	call ex_sp
-	IX = TDAT;
+	call ex_sp IX
 
 dde4	# DB   DD
 	illegal_1();
 	call jump 00e4
 
 dde5	# PUSH IX
-	TDAT = IX;
-	call push
+	call push IX
 
 dde6	# DB   DD
 	illegal_1();
@@ -4677,17 +4664,14 @@ fde2	# DB   FD
 	call jump 00e2
 
 fde3	# EX   (SP),IY
-	TDAT = IY;
-	call ex_sp
-	IY = TDAT;
+	call ex_sp IY
 
 fde4	# DB   FD
 	illegal_1();
 	call jump 00e4
 
 fde5	# PUSH IY
-	TDAT = IY;
-	call push
+	call push IY
 
 fde6	# DB   FD
 	illegal_1();
@@ -6290,8 +6274,7 @@ edff	# DB   ED
 	call call_cond
 
 00c5	# PUSH BC
-	TDAT = BC;
-	call push
+	call push BC
 
 00c6	# ADD  A,n
 	call arg
@@ -6354,8 +6337,7 @@ edff	# DB   ED
 	call call_cond
 
 00d5	# PUSH DE
-	TDAT = DE;
-	call push
+	call push DE
 
 00d6	# SUB  n
 	call arg
@@ -6408,17 +6390,14 @@ edff	# DB   ED
 	call jp_cond
 
 00e3	# EX   HL,(SP)
-	TDAT = HL;
-	call ex_sp
-	HL = TDAT;
+	call ex_sp HL
 
 00e4	# CALL PO,a
 	TDAT8 = !(F & PF);
 	call call_cond
 
 00e5	# PUSH HL
-	TDAT = HL;
-	call push
+	call push HL
 
 00e6	# AND  n
 	call arg
@@ -6476,8 +6455,7 @@ edff	# DB   ED
 	call call_cond
 
 00f5	# PUSH AF
-	TDAT = AF;
-	call push
+	call push AF
 
 00f6	# OR   n
 	call arg
@@ -8425,9 +8403,10 @@ z80n:ed36	# add bc,**
 	BC += TDAT;
 
 z80n:ed8a	# push **
-	call arg16
-	using std::swap; swap(TDAT_H, TDAT_L);
-	call push
+	call arg
+	TDAT_H = TDAT_L;
+	call arg
+	call push TDAT
 
 z80n:ed90	# outinb
 	call rm HL
