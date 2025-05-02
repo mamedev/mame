@@ -78,8 +78,8 @@ protected:
 	void illegal_1();
 	void illegal_2();
 	u8 flags_szyxc(u16 value);
-	template <u8 Bit, bool state> void set_service_attention() { static_assert(Bit < 8, "unknown"); if constexpr(state) m_service_attention |= (1 << Bit); else m_service_attention &= ~(1 << Bit); };
-	template <u8 Bit> bool get_service_attention() { static_assert(Bit < 8, "unknown"); return m_service_attention & (1 << Bit); };
+	template <u8 Bit, bool State> void set_service_attention() { static_assert(Bit < 8, "out of range bit index"); if (State) m_service_attention |= (1 << Bit); else m_service_attention &= ~(1 << Bit); };
+	template <u8 Bit> bool get_service_attention() { static_assert(Bit < 8, "out of range bit index"); return m_service_attention & (1 << Bit); };
 
 	void halt();
 	void leave_halt();

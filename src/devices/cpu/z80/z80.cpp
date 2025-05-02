@@ -735,9 +735,8 @@ void z80_device::state_import(const device_state_entry &entry)
 		m_prvpc = m_pc;
 		m_ref = 0xffff00;
 		set_service_attention<SA_AFTER_EI, 0>();
-		#if HAS_LDAIR_QUIRK
+		if (HAS_LDAIR_QUIRK)
 			set_service_attention<SA_AFTER_LDAIR, 0>();
-		#endif
 		break;
 
 	case Z80_R:
