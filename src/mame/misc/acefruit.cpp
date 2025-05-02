@@ -321,9 +321,7 @@ void acefruit_state::main_map(address_map &map)
 	map(0xa000, 0xa001).w(FUNC(acefruit_state::lamp_w));
 	map(0xa002, 0xa003).w(FUNC(acefruit_state::coin_w));
 	map(0xa004, 0xa004).w(FUNC(acefruit_state::solenoid_w));
-	map(0xa005, 0xa005).w("sn1", FUNC(sn76496_device::write));
-	map(0x2806, 0xa006).w("sn2", FUNC(sn76496_device::write));
-//	map(0xa005, 0xa006).w(FUNC(acefruit_state::sound_w));
+	map(0xa005, 0xa006).w(FUNC(acefruit_state::sound_w));
 	map(0xc000, 0xc000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xe000, 0xffff).rom();
 }
@@ -625,10 +623,6 @@ void acefruit_state::acefruit(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-
-	SN76489A(config, "sn1", 2500000).add_route(ALL_OUTPUTS, "mono", 0.50);
-	SN76489A(config, "sn2", 2500000).add_route(ALL_OUTPUTS, "mono", 0.50);
 
 }
 
