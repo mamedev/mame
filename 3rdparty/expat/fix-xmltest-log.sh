@@ -7,7 +7,7 @@
 #                               |_| XML parser
 #
 # Copyright (c) 2019-2022 Sebastian Pipping <sebastian@pipping.org>
-# Copyright (c) 2024      Dag-Erling Smørgrav <des@des.dev>
+# Copyright (c) 2024      Dag-Erling SmÃ¸rgrav <des@des.dev>
 # Licensed under the MIT license:
 #
 # Permission is  hereby granted,  free of charge,  to any  person obtaining
