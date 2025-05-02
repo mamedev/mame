@@ -252,7 +252,18 @@ void acefruit_state::coin_w(uint8_t data)
 
 void acefruit_state::sound_w(uint8_t data)
 {
-	/* TODO: ? */
+	/* TODO:
+	PCB pictures suggest that the sound hardware has the part numbers scraped off. 
+	There's a 14 pin package that looks involved.
+
+	Pin 36 10V on P2 seems to go to possibly a low voltage reset circuit (mentioned in the manual) at the top left of the board H 13.
+
+	Pin 35 (sound output) seems to go to the transistor TIP120 at position F2 on the board. The emitter is connected to ground, and the collector goes to pin 35 of P2. The base is connected to the 1K resistor just above the transistor, and then it goes to pin 8 of the 14 pin IC located at H 3 on the board near the crystal.
+
+	7048 maybe?
+
+	*/
+
 }
 
 void acefruit_state::lamp_w(offs_t offset, uint8_t data)
@@ -264,7 +275,9 @@ void acefruit_state::lamp_w(offs_t offset, uint8_t data)
 void acefruit_state::solenoid_w(uint8_t data)
 {
 	for (int i = 0; i < 8; i++)
+	{
 		m_solenoids[i] = BIT(data, i);
+	}
 }
 
 void acefruit_state::palette_init(palette_device &palette) const
@@ -283,11 +296,11 @@ void acefruit_state::palette_init(palette_device &palette) const
 	palette.set_pen_color( 8, rgb_t(0x00, 0x00, 0x00) );
 	palette.set_pen_color( 9, rgb_t(0xff, 0xff, 0xff) );
 	palette.set_pen_color( 10, rgb_t(0x00, 0x00, 0x00) );
-	palette.set_pen_color( 11, rgb_t(0x00, 0x00, 0xff) );
+	palette.set_pen_color( 11, rgb_t(0xff, 0x00, 0x00) );
 	palette.set_pen_color( 12, rgb_t(0x00, 0x00, 0x00) );
 	palette.set_pen_color( 13, rgb_t(0x00, 0xff, 0x00) );
 	palette.set_pen_color( 14, rgb_t(0x00, 0x00, 0x00) );
-	palette.set_pen_color( 15, rgb_t(0xff, 0x00, 0x00) );
+	palette.set_pen_color( 15, rgb_t(0x00, 0x00, 0xff) );
 }
 
 void acefruit_state::main_map(address_map &map)
@@ -308,7 +321,9 @@ void acefruit_state::main_map(address_map &map)
 	map(0xa000, 0xa001).w(FUNC(acefruit_state::lamp_w));
 	map(0xa002, 0xa003).w(FUNC(acefruit_state::coin_w));
 	map(0xa004, 0xa004).w(FUNC(acefruit_state::solenoid_w));
-	map(0xa005, 0xa006).w(FUNC(acefruit_state::sound_w));
+	map(0xa005, 0xa005).w("sn1", FUNC(sn76496_device::write));
+	map(0x2806, 0xa006).w("sn2", FUNC(sn76496_device::write));
+//	map(0xa005, 0xa006).w(FUNC(acefruit_state::sound_w));
 	map(0xc000, 0xc000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xe000, 0xffff).rom();
 }
@@ -331,14 +346,14 @@ static INPUT_PORTS_START( sidewndr )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME( "Sidewind" )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Collect" )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )              /* "Cash in" */
-	PORT_DIPNAME( 0x08, 0x00, "Accountacy System Texts" )
+	PORT_DIPNAME( 0x08, 0x00, "Accountancy System Texts" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")   // 2
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME( "Cancel/Clear" )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME( "Refill" ) PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME( "Refill" ) PORT_CODE(KEYCODE_R) PORT_TOGGLE
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )              /* "Token in" - also "Refill" when "Refill" mode ON */
 	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(acefruit_state::sidewndr_payout_r<0x00>))
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -394,6 +409,7 @@ static INPUT_PORTS_START( sidewndr )
 	PORT_DIPSETTING(    0x01, "82%" )
 	PORT_DIPSETTING(    0x03, "86%" )
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( spellbnd )
 	PORT_INCLUDE(sidewndr)
@@ -609,6 +625,11 @@ void acefruit_state::acefruit(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+
+	SN76489A(config, "sn1", 2500000).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SN76489A(config, "sn2", 2500000).add_route(ALL_OUTPUTS, "mono", 0.50);
+
 }
 
 void acefruit_state::init_sidewndr()
@@ -624,6 +645,20 @@ void acefruit_state::init_sidewndr()
   Game driver(s)
 
 ***************************************************************************/
+
+ROM_START( flshback )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "h9.bin",    	0x000000, 0x000800, CRC(158717a1) SHA1(8dd498853e5e74aafb52bb1dd3fcf07a387c3fb3) )
+	ROM_LOAD( "h10.bin",    0x000800, 0x000800, CRC(1f35df6e) SHA1(b371b6bc34d082a4740af34b2f285a2f3c6fd5e6) )
+	ROM_LOAD( "h11.bin",    0x001000, 0x000800, CRC(7db05abe) SHA1(81d01569050b4145f9f30075b0f7164873734b23) )
+	ROM_LOAD( "h12.bin",    0x001800, 0x000800, CRC(5506468a) SHA1(00c0188f227e9be109bf512295798f0059f73216) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 ) /* 8k for graphics */
+	ROM_LOAD( "h5.bin",    0x000000, 0x000800, CRC(198da32c) SHA1(bf6c4ddcda0503095d310e08057dd88154952ef4) )
+	ROM_LOAD( "h6.bin",    0x000800, 0x000800, CRC(e777130f) SHA1(3421c6f399e5ec749f1908f6b4ebff7761c6c5d9) )
+	ROM_LOAD( "h7.bin",    0x001000, 0x000800, CRC(bfed5b8f) SHA1(f95074e8809297eec67da9d7e33ae1dd1c5eabc0) )
+	ROM_LOAD( "h8.bin",    0x001800, 0x000800, CRC(562079ab) SHA1(4f1ee028d43b831d2d43352e2a0f2ddc6c212f69) )
+ROM_END
 
 ROM_START( sidewndr )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -753,6 +788,7 @@ ROM_END
 
 GAMEL( 1981?, sidewndr, 0, acefruit, sidewndr, acefruit_state, init_sidewndr, ROT270, "ACE", "Sidewinder", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND, layout_sidewndr )
 GAMEL( 1981?, spellbnd, 0, acefruit, spellbnd, acefruit_state, empty_init,    ROT270, "ACE", "Spellbound", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND, layout_sidewndr )
+GAME(  1982?, flshback, 0, acefruit, spellbnd, acefruit_state, empty_init,    ROT270, "ACE", "Flashback",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME(  1982?, starspnr, 0, acefruit, starspnr, acefruit_state, empty_init,    ROT270, "ACE", "Starspinner (Dutch/Nederlands)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME(  1982?, acefruit, 0, acefruit, spellbnd, acefruit_state, empty_init,    ROT270, "ACE", "Silhouette", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // inputs and video in bonus game need fixing on this one
 // not dumped: Magnum?
