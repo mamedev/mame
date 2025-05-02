@@ -93,8 +93,6 @@ public:
 	auto sp_reg_w() { return m_sp_reg_w_func.bind(); }
 	auto status_set() { return m_sp_set_status_func.bind(); }
 
-	static constexpr flags_type emulation_flags() { return flags::SAVE_UNSUPPORTED; }
-
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;

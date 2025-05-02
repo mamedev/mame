@@ -260,7 +260,7 @@ void rsp_device::device_start()
 	for (int regIdx = 0; regIdx < 32; regIdx++)
 		m_r[regIdx] = 0;
 
-	for(auto & elem : m_v)
+	for (auto & elem : m_v)
 	{
 		elem.d[0] = 0;
 		elem.d[1] = 0;
@@ -279,7 +279,7 @@ void rsp_device::device_start()
 	m_vector_busy = false;
 	m_paired_busy = false;
 
-	for(auto & elem : m_accum)
+	for (auto & elem : m_accum)
 	{
 		elem.q = 0;
 	}
@@ -303,13 +303,15 @@ void rsp_device::device_start()
 	save_item(NAME(m_nextpc));
 
 	save_item(NAME(m_vres));
-	//save_item(NAME(m_v)); // TODO
 	save_item(NAME(m_accum));
 	save_item(NAME(m_vcarry));
 	save_item(NAME(m_vcompare));
 	save_item(NAME(m_vclip1));
 	save_item(NAME(m_vzero));
 	save_item(NAME(m_vclip2));
+
+    for (int i = 0; i < std::size(m_v); i++)
+		save_item(NAME(m_v[i].d), i);
 
 	save_item(NAME(m_reciprocal_res));
 	save_item(NAME(m_reciprocal_high));
