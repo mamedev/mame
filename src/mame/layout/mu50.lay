@@ -1,15 +1,19 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
-authors:hap
+authors:hap, Felipe Sanches
 -->
 <mamelayout version="2">
 
 <!-- define elements -->
 
 	<element name="led" defstate="0">
-		<disk state="0"><color red="0.07" green="0.1" blue="0.02" /></disk>
-		<disk state="1"><color red="0.7" green="1.0" blue="0.2" /></disk>
+		<disk state="0"><color red="0.2" green="0.25" blue="0.2" /></disk>
+		<disk state="1"><color red="0.43" green="1.00" blue="0.29" /></disk>
+	</element>
+
+	<element name="round_button">
+		<disk><color red="0.25" green="0.25" blue="0.25" /></disk>	
 	</element>
 
 	<element name="lcda" defstate="0">
@@ -21,21 +25,122 @@ authors:hap
 
 	<element name="lcdm"><rect><color red="0.7" green="1.0" blue="0.2" /></rect></element>
 
+	<element name="yamaha_text"><text string="YAMAHA"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="tone_generator_text"><text string="TONE GENERATOR"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="mu50_text"><text string="MU50"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+
+	<element name="input_text"><text string="INPUT"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="phones_text"><text string="PHONES"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="power_vol_text"><text string="POWER/VOL"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="push_on_off_text"><text string="PUSH ON/OFF"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+
+	<element name="part_lcd_text"><text string="PART"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="midi_text"><text string="MIDI"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="bank_pgm_text"><text string="BANK/PGM#"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="vol_text"><text string="VOL"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="exp_text"><text string="EXP"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="pan_text"><text string="PAN"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="rev_text"><text string="REV"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="cho_text"><text string="CHO"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="var_text"><text string="VAR"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="key_text"><text string="KEY"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+
+	<element name="xg_text"><text string="XG"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="tg300b_text"><text string="TG300B"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="c_m_text"><text string="C/M"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="doc_text"><text string="DOC"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="perform_text"><text string="PERFORM"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+
+	<element name="play_text"><text string="PLAY"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="edit_text"><text string="EDIT"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="util_text"><text string="UTIL"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="effect_text"><text string="EFFECT"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="mode_text"><text string="MODE"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+
+	<element name="part_text"><text string="PART"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="all_text"><text string="ALL"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="mute_text"><text string="MUTE/"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="solo_text"><text string="SOLO"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="enter_text"><text string="ENTER"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="select_text"><text string="SELECT"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="exit_text"><text string="EXIT"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="value_text"><text string="VALUE"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	
+	<element name="vector_art">
+		<image><data><![CDATA[
+<svg width="1640" height="390" viewBox="0 0 433.91666 103.1875"><g transform="translate(81.557198,-105.50975)"><path style="fill:none;fill-opacity:1;stroke:#666666;stroke-width:0.529167;stroke-linecap:square;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1" d="m 213.10809,178.54068 5.30998,0.0999" /><path style="fill:none;fill-opacity:1;stroke:#666666;stroke-width:0.529167;stroke-linecap:square;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1" d="m 318.14753,130.66652 h 3.00998 c 0.77,0 1.38999,0.60955 1.38999,1.37897 m -14.91992,-1.37897 h -3.00998 c -0.77,0 -1.38999,0.60955 -1.38999,1.37897 m -307.8947031,55.32167 -1.7330978,-0.42192 -1.2322912,1.28586 -1.3363875,-1.1854 -1.6914394,0.5726 -0.633412,-1.66758 -1.76271,-0.28128 0.214818,-1.76803 -1.430447,-1.07489 1.013861,-1.46667 -0.769932,-1.60731 1.580015,-0.83379 0.07027,-1.77809 h 1.784794 l 0.887279,-1.54703 1.5806173,0.82375 1.5055314,-0.95434 1.0143617,1.46667 1.7786712,-0.15069 0.2156208,1.76804 1.6442596,0.69315 -0.6324075,1.67763 1.133214,1.37625 -1.3356849,1.18539 0.3625804,1.74795 -1.732897,0.42193 z m 0.4712942,0.80366 -1.7556838,0.24109 -1.613643,0.73334 -1.6694555,-0.59269 -1.7700388,-0.10043 -1.200571,-1.30594 -1.521794,-0.90411 -0.457742,-1.71781 -0.923515,-1.50685 0.39149,-1.72786 -0.11544,-1.77808 1.15038,-1.34612 0.720743,-1.61736 1.645264,-0.66302 1.3905946,-1.09497 1.7639151,0.18081 1.7425337,-0.3315 1.4782275,0.97444 1.6950529,0.52237 0.8538505,1.55708 1.2592941,1.24566 0.03413,1.77809 0.57646446,1.68767 -0.83514926,1.58722 -0.3118874,1.7379 -1.4395804,1.03471 z m 5.717767,-6.32878 a 9.3928579,9.3913029 0 0 1 -9.3928578,9.39271 9.3928579,9.3913029 0 0 1 -9.3925583,-9.39271 9.3928579,9.3913029 0 0 1 9.3925583,-9.39271 9.3928579,9.3913029 0 0 1 9.3928578,9.39271 z m -6.1890612,-28.07696 -1.7330978,-0.43196 -1.2322912,1.2959 -1.3363875,-1.1854 -1.6914394,0.57261 -0.633412,-1.66758 -1.76271,-0.28128 0.214818,-1.77809 -1.430447,-1.06484 1.013861,-1.46667 -0.769932,-1.60731 1.580015,-0.83379 0.07027,-1.78813 h 1.784794 l 0.887279,-1.54703 1.5806173,0.83379 1.5055314,-0.96439 1.0143617,1.47672 1.7786712,-0.15069 0.2156208,1.76804 1.6442596,0.69315 -0.6324075,1.66759 1.133214,1.3863 -1.3356849,1.17534 0.3625804,1.74795 -1.732897,0.43196 z m 0.4712942,0.79361 -1.7556838,0.25114 -1.613643,0.73334 -1.6694555,-0.59269 -1.7700388,-0.10044 -1.200571,-1.30593 -1.521794,-0.91415 -0.457742,-1.70777 -0.923515,-1.51689 0.39149,-1.72787 -0.11544,-1.76803 1.15038,-1.34612 0.720743,-1.61736 1.645264,-0.66301 1.3905946,-1.10503 1.7639151,0.18082 1.7425337,-0.32146 1.4782275,0.97444 1.6950529,0.52237 0.8538505,1.55708 1.2592941,1.24566 0.03413,1.76804 0.57646446,1.68767 -0.83514926,1.58722 -0.3118874,1.74795 -1.4395804,1.03471 z m 5.717767,-6.31873 a 9.3928579,9.3913029 0 0 1 -9.3928578,9.39271 9.3928579,9.3913029 0 0 1 -9.3925583,-9.39271 9.3928579,9.3913029 0 0 1 9.3925583,-9.39271 9.3928579,9.3913029 0 0 1 9.3928578,9.39271 z m -36.2434521,-0.12782 15.33708,0.25583 m -27.512878,26.99178 a 6.8793655,6.8796674 0 0 0 -6.878663,6.87414 6.8793655,6.8796674 0 0 0 6.878663,6.88419 6.8793655,6.8796674 0 0 0 6.879667,-6.88419 6.8793655,6.8796674 0 0 0 -6.879667,-6.87414 z m 0,2.08033 a 4.7935775,4.7938081 0 0 1 4.79428,4.79381 4.7935775,4.7938081 0 0 1 -4.79428,4.79381 4.7935775,4.7938081 0 0 1 -4.793276,-4.79381 4.7935775,4.7938081 0 0 1 4.793276,-4.79381 z M -69.194383,116.8868 H 340.7874 c 1.85999,0 3.36999,1.49888 3.36999,3.35749 v 74.44431 c 0,1.85861 -1.51,3.35749 -3.36999,3.35749 H -69.194383 c -1.86599,0 -3.366982,-1.49888 -3.366982,-3.35749 v -74.44431 c 0,-1.85861 1.500992,-3.35749 3.366982,-3.35749 z m 22.032514,21.1667 c -5.552954,0 -10.053664,4.50096 -10.053664,10.0592 0,5.54817 4.50071,10.04913 10.053664,10.04913 5.552954,0 10.05467,-4.50096 10.05467,-10.04913 0,-5.55824 -4.501716,-10.0592 -10.05467,-10.0592 z m 0,4.27945 c 3.191943,0 5.779298,2.5878 5.779298,5.77975 0,3.19196 -2.587355,5.77976 -5.779298,5.77976 -3.191943,0 -5.779297,-2.5878 -5.779297,-5.77976 0,-3.19195 2.587354,-5.77975 5.779297,-5.77975 z m 7.244996,5.80996 a 7.1232733,7.1236035 0 0 1 -7.123274,7.11897 7.1232733,7.1236035 0 0 1 -7.123274,-7.11897 7.1232733,7.1236035 0 0 1 7.123274,-7.12904 7.1232733,7.1236035 0 0 1 7.123274,7.12904 z m 252.904973,25.84115 5.31997,0.0999 v 11.92109 m 64.25965,12.19088 0.62,2.24832 c 0.16999,0.59955 0.49999,1.10917 1.10999,1.10917 h 16.35991 c 0.62,0 0.91,-0.52961 1.10999,-1.10917 l 0.78,-2.24832 M -30.167,198.45 l 0.622,2.26 c 0.164,0.59 0.495,1.11 1.11,1.11 h 16.36 c 0.615,0 0.91,-0.53 1.11,-1.11 l 0.774,-2.26 m 29.36683,-77.859 h 245.95036 c 1.8602,0 3.36036,1.50783 3.36036,3.36515 v 67.8822 c 0,1.86731 -1.50016,3.36515 -3.36036,3.36515 H 19.17583 c -1.8652,0 -3.366361,-1.49784 -3.366361,-3.36515 v -67.8822 c 0,-1.85732 1.501161,-3.36515 3.366361,-3.36515 z" /><path style="fill:#666666;fill-opacity:1;stroke:none;stroke-width:0.264583;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none" d="m 303.59614,172.44973 a 6.27,6.3496043 0 0 0 -6.27,6.3496 6.27,6.3496043 0 0 0 6.27,6.34961 6.27,6.3496043 0 0 0 0.13,0 v 0 h 18.94 v 0 a 6.27,6.3496043 0 0 0 0.14,0 6.27,6.3496043 0 0 0 6.27,-6.34961 6.27,6.3496043 0 0 0 -6.27,-6.3496 6.27,6.3496043 0 0 0 -0.14,0 v 0 h -18.94 v 0 a 6.27,6.3496043 0 0 0 -0.13,0 z m 0,-19.57917 a 6.2699999,6.3484044 0 0 0 -6.27,6.3496 6.2699999,6.3484044 0 0 0 6.27,6.34961 6.2699999,6.3484044 0 0 0 0.13,0 v 0 h 18.94 v 0 a 6.2699999,6.3484044 0 0 0 0.14,0 6.2699999,6.3484044 0 0 0 6.27,-6.34961 6.2699999,6.3484044 0 0 0 -6.27,-6.3496 6.2699999,6.3484044 0 0 0 -0.14,0 v 0 h -18.94 v 0 a 6.2699999,6.3484044 0 0 0 -0.13,0 z m 0,-19.05 a 6.27,6.3496043 0 0 0 -6.27,6.3496 6.27,6.3496043 0 0 0 6.27,6.34961 6.27,6.3496043 0 0 0 0.13,0 v 0 h 18.94 v 0 a 6.27,6.3496043 0 0 0 0.14,0 6.27,6.3496043 0 0 0 6.27,-6.34961 6.27,6.3496043 0 0 0 -6.27,-6.3496 6.27,6.3496043 0 0 0 -0.14,0 v 0 h -18.94 v 0 a 6.27,6.3496043 0 0 0 -0.13,0 z m 22.29994,14.02252 a 2.1187859,2.1134392 0 0 1 2.12172,2.11667 2.1187859,2.1134392 0 0 1 -2.12172,2.11666 2.1187859,2.1134392 0 0 1 -2.11161,-2.11666 2.1187859,2.1134392 0 0 1 2.11161,-2.11667 z m -0.77796,0.79627 v 2.64079 l 1.13158,-0.65515 1.16189,-0.67532 -1.17199,-0.67532 z M 323.25529,123.766 a 2.1137411,2.1134392 0 0 0 -2.11666,2.11666 2.1137411,2.1134392 0 0 0 2.11666,2.11666 2.1137411,2.1134392 0 0 0 2.11667,-2.11666 2.1137411,2.1134392 0 0 0 -2.11667,-2.11666 z m -0.36285,0.79626 h 0.72571 v 1.00794 h 1.1692 v 0.62492 h -1.1692 v 1.00794 h -0.72571 v -1.00794 h -1.17929 v -0.62492 h 1.17929 z m 1.42118,42.85999 a 2.1137411,2.1184832 0 0 0 -2.11666,2.11161 2.1137411,2.1184832 0 0 0 2.11666,2.12172 2.1137411,2.1184832 0 0 0 2.11667,-2.12172 2.1137411,2.1184832 0 0 0 -2.11667,-2.11161 z m -0.36285,0.79817 h 0.72571 v 1.00024 h 1.17928 v 0.63651 h -1.17928 v 1.00024 h -0.72571 v -1.00024 h -1.16921 v -0.63651 h 1.16921 z m -24.2434,-20.37734 a 2.1137411,2.1134392 0 0 0 -2.11666,2.11667 2.1137411,2.1134392 0 0 0 2.11666,2.11666 2.1137411,2.1134392 0 0 0 2.11667,-2.11666 2.1137411,2.1134392 0 0 0 -2.11667,-2.11667 z m 0.77611,0.79627 v 2.64079 l -1.12888,-0.65515 -1.15913,-0.67532 1.16921,-0.67532 z m 3.41051,-23.06914 v 0.62492 h -3.08148 v -0.62492 z M 302.3482,123.766 c -1.17198,0 -2.12168,0.94746 -2.11158,2.11667 0,1.1692 0.9396,2.11666 2.11158,2.11666 1.17197,0 2.12168,-0.94746 2.12168,-2.11666 0,-1.16921 -0.94971,-2.11667 -2.12168,-2.11667 z m -0.78368,43.65625 c -1.17199,0 -2.12172,0.94972 -2.12172,2.11162 0,1.17199 0.94973,2.12172 2.12172,2.12172 1.1619,0 2.11162,-0.94973 2.11162,-2.12172 0,-1.1619 -0.94972,-2.11162 -2.11162,-2.11162 z m 1.53572,1.79841 v 0.63652 h -3.08154 v -0.63652 z m -12.38869,-29.05049 a 6.35,6.35 0 0 1 -6.35,6.35 6.35,6.35 0 0 1 -6.35,-6.35 6.35,6.35 0 0 1 6.35,-6.35 6.35,6.35 0 0 1 6.35,6.35 z m 0,19.05 a 6.35,6.35 0 0 1 -6.35,6.35 6.35,6.35 0 0 1 -6.35,-6.35 6.35,6.35 0 0 1 6.35,-6.35 6.35,6.35 0 0 1 6.35,6.35 z m 0,19.57916 a 6.35,6.35 0 0 1 -6.35,6.35 6.35,6.35 0 0 1 -6.35,-6.35 6.35,6.35 0 0 1 6.35,-6.35 6.35,6.35 0 0 1 6.35,6.35 z" /></g></svg>
+		]]></data></image>
+	</element>
+
 
 <!-- build screen -->
 
 	<view name="Internal Layout">
-		<bounds x="0" y="0" width="121" height="30.21" />
+		<bounds x="0" y="0" width="1640" height="390" />
+		<element ref="vector_art"><bounds left="0" right="1640" top="0" bottom="390"/></element>
 
-		<screen index="0"><bounds x="0" y="0" width="100" height="30.21" /></screen>
-		<element name="contrast" ref="lcda" blend="add"><bounds x="0" y="0" width="100" height="30.21" /></element>
-		<element ref="lcdm" blend="multiply"><bounds x="0" y="0" width="100" height="30.21" /></element>
+		<screen index="0"><bounds x="425" y="103" width="640" height="193" /></screen>
+		<element name="contrast" ref="lcda" blend="add"><bounds x="425" y="103" width="640" height="193" /></element>
+		<element ref="lcdm" blend="multiply"><bounds x="425" y="103" width="640" height="193" /></element>
 
-		<element name="LED0" ref="led"><bounds x="104" y="2" width="4" height="4" /></element>
-		<element name="LED1" ref="led"><bounds x="113" y="2" width="4" height="4" /></element>
-		<element name="LED2" ref="led"><bounds x="104" y="13" width="4" height="4" /></element>
-		<element name="LED3" ref="led"><bounds x="113" y="13" width="4" height="4" /></element>
-		<element name="LED4" ref="led"><bounds x="104" y="24" width="4" height="4" /></element>
+		<element name="LED0" ref="led" inputtag="O0" inputmask="0x04"><!-- PLAY --><bounds x="1182" y="117" width="34" height="34" /></element>
+		<element name="LED1" ref="led" inputtag="O0" inputmask="0x08"><!-- EDIT --><bounds x="1252" y="117" width="34" height="34" /></element>
+		<element name="LED2" ref="led" inputtag="O1" inputmask="0x04"><!-- UTIL --><bounds x="1182" y="189" width="34" height="34" /></element>
+		<element name="LED3" ref="led" inputtag="O1" inputmask="0x08"><!-- EFFECT --><bounds x="1252" y="189" width="34" height="34" /></element>
+		<element name="LED4" ref="led" inputtag="O2" inputmask="0x04"><!-- MODE --><bounds x="1182" y="262" width="34" height="34" /></element>
+
+		<element ref="round_button" inputtag="O0" inputmask="0x10"><!-- MUTE/SOLO --><bounds x="1361" y="109" width="44" height="44"/></element>
+		<element ref="round_button" inputtag="O0" inputmask="0x20"><!-- PART - --><bounds x="1434" y="109" width="44" height="44"/></element>
+		<element ref="round_button" inputtag="O0" inputmask="0x40"><!-- PART + --><bounds x="1506" y="109" width="44" height="44"/></element>
+
+		<element ref="round_button" inputtag="O1" inputmask="0x10"><!-- ENTER --><bounds x="1361" y="181" width="44" height="44"/></element>
+		<element ref="round_button" inputtag="O1" inputmask="0x20"><!-- SELECT < --><bounds x="1434" y="181" width="44" height="44"/></element>
+		<element ref="round_button" inputtag="O1" inputmask="0x40"><!-- SELECT > --><bounds x="1506" y="181" width="44" height="44"/></element>
+
+		<element ref="round_button" inputtag="O2" inputmask="0x10"><!-- EXIT --><bounds x="1361" y="255" width="44" height="44"/></element>
+		<element ref="round_button" inputtag="O2" inputmask="0x20"><!-- VALUE - --><bounds x="1434" y="255" width="44" height="44"/></element>
+		<element ref="round_button" inputtag="O2" inputmask="0x40"><!-- VALUE + --><bounds x="1506" y="255" width="44" height="44"/></element>
+
+		<element ref="yamaha_text"><bounds x="60" y="50" width="150" height="38"/></element>
+		<element ref="tone_generator_text"><bounds x="410" y="80" width="197" height="20"/></element>
+		<element ref="mu50_text"><bounds x="586" y="63" width="182" height="38"/></element>
+
+		<element ref="input_text"><bounds x="179" y="131" width="57" height="20"/></element>
+		<element ref="phones_text"><bounds x="91" y="232" width="79" height="20"/></element>
+		<element ref="power_vol_text"><bounds x="220" y="232" width="122" height="20"/></element>
+		<element ref="push_on_off_text"><bounds x="223" y="331" width="110" height="13"/></element>
+
+		<element ref="part_lcd_text"><bounds x="446" y="307" width="45" height="15"/></element>
+		<element ref="midi_text"><bounds x="551" y="307" width="39" height="15"/></element>
+		<element ref="bank_pgm_text"><bounds x="616" y="307" width="89" height="15"/></element>
+		<element ref="vol_text"><bounds x="718" y="307" width="35" height="15"/></element>
+		<element ref="exp_text"><bounds x="766" y="307" width="34" height="15"/></element>
+		<element ref="pan_text"><bounds x="813" y="307" width="34" height="15"/></element>
+		<element ref="rev_text"><bounds x="860" y="307" width="36" height="15"/></element>
+		<element ref="cho_text"><bounds x="903" y="307" width="40" height="15"/></element>
+		<element ref="var_text"><bounds x="951" y="307" width="37" height="15"/></element>
+		<element ref="key_text"><bounds x="1004" y="307" width="34" height="15"/></element>
+
+		<element ref="xg_text"><bounds x="1076" y="221" width="21" height="15"/></element>
+		<element ref="tg300b_text"><bounds x="1072" y="237" width="61" height="15"/></element>
+		<element ref="c_m_text"><bounds x="1074" y="254" width="29" height="15"/></element>
+		<element ref="doc_text"><bounds x="1074" y="270" width="34" height="15"/></element>
+		<element ref="perform_text"><bounds x="1075" y="308" width="72" height="15"/></element>
+
+		<element ref="play_text"><bounds x="1178" y="91" width="46" height="17"/></element>
+		<element ref="edit_text"><bounds x="1250" y="91" width="45" height="17"/></element>
+		<element ref="util_text"><bounds x="1180" y="163" width="42" height="17"/></element>
+		<element ref="effect_text"><bounds x="1236" y="163" width="73" height="17"/></element>
+		<element ref="mode_text"><bounds x="1172" y="235" width="57" height="17"/></element>
+
+		<element ref="mute_text"><bounds x="1348" y="69" width="65" height="17"/></element>
+		<element ref="solo_text"><bounds x="1356" y="87" width="52" height="17"/></element>
+		<element ref="part_text"><bounds x="1467" y="70" width="49" height="17"/></element>
+		<element ref="all_text"><bounds x="1476" y="90" width="28" height="15"/></element>
+		<element ref="enter_text"><bounds x="1351" y="161" width="63" height="17"/></element>
+		<element ref="select_text"><bounds x="1454" y="161" width="74" height="17"/></element>
+		<element ref="exit_text"><bounds x="1362" y="234" width="42" height="17"/></element>
+		<element ref="value_text"><bounds x="1459" y="234" width="62" height="17"/></element>
 
 	</view>
 
