@@ -78,6 +78,8 @@ protected:
 	void illegal_1();
 	void illegal_2();
 	u8 flags_szyxc(u16 value);
+	template <u8 Bit, bool State> void set_service_attention() { static_assert(Bit < 8, "out of range bit index"); if (State) m_service_attention |= (1 << Bit); else m_service_attention &= ~(1 << Bit); };
+	template <u8 Bit> bool get_service_attention() { static_assert(Bit < 8, "out of range bit index"); return m_service_attention & (1 << Bit); };
 
 	void halt();
 	void leave_halt();
@@ -137,6 +139,16 @@ protected:
 	devcb_write_line m_halt_cb;
 	devcb_write_line m_busack_cb;
 
+	static constexpr u8 SA_BUSRQ         = 0;
+	static constexpr u8 SA_BUSACK        = 1;
+	static constexpr u8 SA_NMI_PENDING   = 2;
+	static constexpr u8 SA_IRQ_ON        = 3;
+	static constexpr u8 SA_HALT          = 4;
+	static constexpr u8 SA_AFTER_EI      = 5;
+	static constexpr u8 SA_AFTER_LDAIR   = 6;
+	static constexpr u8 SA_NSC800_IRQ_ON = 7;
+	u8 m_service_attention; // bitmap for required handling in service step
+
 	PAIR16       m_prvpc;
 	PAIR16       m_pc;
 	PAIR16       m_sp;
@@ -161,13 +173,10 @@ protected:
 	u8           m_im;
 	u8           m_i;
 	u8           m_nmi_state;          // nmi pin state
-	bool         m_nmi_pending;        // nmi pending
 	u8           m_irq_state;          // irq pin state
 	int          m_wait_state;         // wait pin state
 	int          m_busrq_state;        // bus request pin state
 	u8           m_busack_state;       // bus acknowledge pin state
-	bool         m_after_ei;           // are we in the EI shadow?
-	bool         m_after_ldair;        // same, but for LD A,I or LD A,R
 	u16          m_ea;
 
 	int          m_icount;

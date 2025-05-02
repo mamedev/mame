@@ -50,6 +50,7 @@ void z80_device::halt()
 	if (!m_halt)
 	{
 		m_halt = 1;
+		set_service_attention<SA_HALT, 1>();
 		m_halt_cb(1);
 	}
 }
@@ -62,6 +63,7 @@ void z80_device::leave_halt()
 	if (m_halt)
 	{
 		m_halt = 0;
+		set_service_attention<SA_HALT, 0>();
 		m_halt_cb(0);
 	}
 }
@@ -468,7 +470,7 @@ void z80_device::block_io_interrupted_flags()
 void z80_device::ei()
 {
 	m_iff1 = m_iff2 = 1;
-	m_after_ei = true;
+	set_service_attention<SA_AFTER_EI, 1>();
 }
 
 void z80_device::set_f(u8 f)
@@ -562,14 +564,12 @@ void z80_device::device_start()
 	save_item(NAME(m_im));
 	save_item(NAME(m_i));
 	save_item(NAME(m_nmi_state));
-	save_item(NAME(m_nmi_pending));
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_wait_state));
 	save_item(NAME(m_busrq_state));
 	save_item(NAME(m_busack_state));
-	save_item(NAME(m_after_ei));
-	save_item(NAME(m_after_ldair));
 	save_item(NAME(m_ea));
+	save_item(NAME(m_service_attention));
 	save_item(NAME(m_tmp_irq_vector));
 	save_item(NAME(m_shared_addr.w));
 	save_item(NAME(m_shared_data.w));
@@ -602,14 +602,12 @@ void z80_device::device_start()
 	m_im = 0;
 	m_i = 0;
 	m_nmi_state = 0;
-	m_nmi_pending = false;
 	m_irq_state = 0;
 	m_wait_state = 0;
 	m_busrq_state = 0;
 	m_busack_state = 0;
-	m_after_ei = false;
-	m_after_ldair = false;
 	m_ea = 0;
+	m_service_attention = 0;
 	m_rtemp = 0;
 
 	space(AS_PROGRAM).cache(m_args);
@@ -667,11 +665,9 @@ void z80_device::device_reset()
 	m_i = 0;
 	m_r = 0;
 	m_r2 = 0;
-	m_nmi_pending = false;
-	m_after_ei = false;
-	m_after_ldair = false;
 	m_iff1 = 0;
 	m_iff2 = 0;
+	m_service_attention = 0;
 }
 
 /****************************************************************************
@@ -688,12 +684,18 @@ void z80_device::execute_set_input(int inputnum, int state)
 	{
 	case Z80_INPUT_LINE_BUSRQ:
 		m_busrq_state = state;
+		if (state != CLEAR_LINE)
+			set_service_attention<SA_BUSRQ, 1>();
+		else
+			set_service_attention<SA_BUSRQ, 0>();
 		break;
 
 	case INPUT_LINE_NMI:
 		// mark an NMI pending on the rising edge
 		if (m_nmi_state == CLEAR_LINE && state != CLEAR_LINE)
-			m_nmi_pending = true;
+		{
+			set_service_attention<SA_NMI_PENDING, 1>();
+		}
 		m_nmi_state = state;
 		break;
 
@@ -702,6 +704,10 @@ void z80_device::execute_set_input(int inputnum, int state)
 		m_irq_state = state;
 		if (daisy_chain_present())
 			m_irq_state = (daisy_update_irq_state() == ASSERT_LINE) ? ASSERT_LINE : m_irq_state;
+		if (state != CLEAR_LINE)
+			set_service_attention<SA_IRQ_ON, 1>();
+		else
+			set_service_attention<SA_IRQ_ON, 0>();
 
 		// the main execute loop will take the interrupt
 		break;
@@ -728,8 +734,9 @@ void z80_device::state_import(const device_state_entry &entry)
 	case STATE_GENPC:
 		m_prvpc = m_pc;
 		m_ref = 0xffff00;
-		m_after_ei = false;
-		m_after_ldair = false;
+		set_service_attention<SA_AFTER_EI, 0>();
+		if (HAS_LDAIR_QUIRK)
+			set_service_attention<SA_AFTER_LDAIR, 0>();
 		break;
 
 	case Z80_R:
