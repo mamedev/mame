@@ -592,17 +592,14 @@ void igs011_state::igs011_blit_flags_w(offs_t offset, u16 data, u16 mem_mask)
 		clear_pen = m_blitter.pen;
 	}
 
-	const int xstart = (m_blitter.x & 0x1ff) - (m_blitter.x & 0x200);
-	const int ystart = (m_blitter.y & 0x0ff) - (m_blitter.y & 0x100);
-
-	int xend, xinc;
-	int yend, yinc;
-
-	if (flipx)  { xend = xstart - (m_blitter.w & 0x1ff) - 1;  xinc = -1; }
-	else        { xend = xstart + (m_blitter.w & 0x1ff) + 1;  xinc =  1; }
-
-	if (flipy)  { yend = ystart - (m_blitter.h & 0x0ff) - 1;  yinc = -1; }
-	else        { yend = ystart + (m_blitter.h & 0x0ff) + 1;  yinc =  1; }
+	const int xstart = util::sext(m_blitter.x, 10);
+	const int ystart = util::sext(m_blitter.y, 9);
+	const int xsize = (m_blitter.w & 0x1ff) + 1;
+	const int ysize = (m_blitter.h & 0x0ff) + 1;
+	const int xend = flipx ? (xstart - xsize) : (xstart + xsize);
+	const int yend = flipy ? (ystart - ysize) : (ystart + ysize);
+	const int xinc = flipx ? -1 : 1;
+	const int yinc = flipy ? -1 : 1;
 
 	for (int y = ystart; y != yend; y += yinc)
 	{
@@ -3397,7 +3394,7 @@ static INPUT_PORTS_START( lhb2 )
 	PORT_DIPSETTING(    0x02, "70%" )
 	PORT_DIPSETTING(    0x01, "74%" )
 	PORT_DIPSETTING(    0x00, "78%" )
-	PORT_DIPNAME( 0x08, 0x00, "Odds Rate" )             PORT_DIPLOCATION("SW1:4")     // 倍數?
+	PORT_DIPNAME( 0x08, 0x00, "Odds Rate" )             PORT_DIPLOCATION("SW1:4")     // 倍數表
 	PORT_DIPSETTING(    0x00, "1,2,3,4,5,6,7,8" )
 	PORT_DIPSETTING(    0x08, "1,2,3,5,8,15,30,50" )
 	PORT_DIPNAME( 0x10, 0x00, "Maximum Bet" )           PORT_DIPLOCATION("SW1:5")     // 最大押注
@@ -3408,9 +3405,9 @@ static INPUT_PORTS_START( lhb2 )
 	PORT_DIPSETTING(    0x40, "2" )
 	PORT_DIPSETTING(    0x20, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x80, 0x80, "Credit Timer" )          PORT_DIPLOCATION("SW1:8")     // ??清除    (clears credits after timeout if you don't start a game)
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )                                        // ?
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )                                         // ?
+	PORT_DIPNAME( 0x80, 0x80, "Credit Timer" )          PORT_DIPLOCATION("SW1:8")     // 自動清除  (clears credits after timeout if you don't start a game)
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )                                          // ?
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                           // ?
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW2:1,2")   // 投幣比率
@@ -3430,13 +3427,15 @@ static INPUT_PORTS_START( lhb2 )
 	PORT_DIPNAME( 0x20, 0x20, "Payout Mode" )           PORT_DIPLOCATION("SW2:6")     // 退分方式
 	PORT_DIPSETTING(    0x20, "Key-Out" )                                             // 洗分
 	PORT_DIPSETTING(    0x00, "Return Coins" )                                        // 退幣      (doesn't seem to work properly)
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW2:7" )                                     // ????
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:8")     // ??音?
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )                                        // ?
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )                                         // ?
+	PORT_DIPNAME( 0x40, 0x40, "Auto Reach" )            PORT_DIPLOCATION("SW2:7")     // 自動摸打  (automatically draws and discards tiles after reach)
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                          // ?
+	PORT_DIPSETTING(    0x40, DEF_STR(On) )                                           // ?
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Demo_Sounds) )    PORT_DIPLOCATION("SW2:8")     // 示範音樂
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                          // ?
+	PORT_DIPSETTING(    0x80, DEF_STR(On) )                                           // ?
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW3:1,2")   // ??限?
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW3:1,2")   // 破台限制
 	PORT_DIPSETTING(    0x03, "500" )
 	PORT_DIPSETTING(    0x02, "1000" )
 	PORT_DIPSETTING(    0x01, "2000" )
@@ -3582,37 +3581,39 @@ INPUT_PORTS_END
 // basically same game as lhb2 and nkishusp but with joystick controls
 static INPUT_PORTS_START( tygn )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x07, 0x07, "Pay Out (%)" ) PORT_DIPLOCATION("DSW1:1,2,3")
-	PORT_DIPSETTING(    0x07, "50" )
-	PORT_DIPSETTING(    0x06, "54" )
-	PORT_DIPSETTING(    0x05, "58" )
-	PORT_DIPSETTING(    0x04, "62" )
-	PORT_DIPSETTING(    0x03, "66" )
-	PORT_DIPSETTING(    0x02, "70" )
-	PORT_DIPSETTING(    0x01, "74" )
-	PORT_DIPSETTING(    0x00, "78" )
-	PORT_DIPNAME( 0x08, 0x08, "Minimum Bet" ) PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPNAME( 0x07, 0x02, "Payout Rate" )           PORT_DIPLOCATION("SW1:1,2,3")  // 機率調整
+	PORT_DIPSETTING(    0x07, "50%" )
+	PORT_DIPSETTING(    0x06, "54%" )
+	PORT_DIPSETTING(    0x05, "58%" )
+	PORT_DIPSETTING(    0x04, "62%" )
+	PORT_DIPSETTING(    0x03, "66%" )
+	PORT_DIPSETTING(    0x02, "70%" )
+	PORT_DIPSETTING(    0x01, "74%" )
+	PORT_DIPSETTING(    0x00, "78%" )
+	PORT_DIPNAME( 0x08, 0x08, "Minimum Bet" )           PORT_DIPLOCATION("SW1:4")      // 最小押注
 	PORT_DIPSETTING(    0x08, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coinage ) ) PORT_DIPLOCATION("DSW1:5,6")
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DSW1:7")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPUNKNOWN( 0x80, 0x80 ) PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR(Coinage) )        PORT_DIPLOCATION("SW1:5,6")    // 投幣比率
+	PORT_DIPSETTING(    0x00, DEF_STR(2C_1C) )
+	PORT_DIPSETTING(    0x30, DEF_STR(1C_1C) )
+	PORT_DIPSETTING(    0x20, DEF_STR(1C_2C) )
+	PORT_DIPSETTING(    0x10, DEF_STR(1C_3C) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR(Demo_Sounds) )    PORT_DIPLOCATION("SW1:7")      // 示範音樂
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                           // ?
+	PORT_DIPSETTING(    0x40, DEF_STR(On) )                                            // ?
+	PORT_DIPNAME( 0x80, 0x80, "Credit Timer" )          PORT_DIPLOCATION("SW1:8")      // 自動清除  (clears credits after timeout if you don't start a game)
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )                                           // ?
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                            // ?
 
 	PORT_START("DSW2") // not shown in test mode
-	PORT_DIPUNKNOWN( 0x01, 0x01 ) PORT_DIPLOCATION("DSW2:1")
-	PORT_DIPUNKNOWN( 0x02, 0x02 ) PORT_DIPLOCATION("DSW2:2")
-	PORT_DIPUNKNOWN( 0x04, 0x04 ) PORT_DIPLOCATION("DSW2:3")
-	PORT_DIPUNKNOWN( 0x08, 0x08 ) PORT_DIPLOCATION("DSW2:4")
-	PORT_DIPUNKNOWN( 0x10, 0x10 ) PORT_DIPLOCATION("DSW2:5")
-	PORT_DIPUNKNOWN( 0x20, 0x20 ) PORT_DIPLOCATION("DSW2:6")
-	PORT_DIPUNKNOWN( 0x40, 0x40 ) PORT_DIPLOCATION("DSW2:7")
-	PORT_DIPUNKNOWN( 0x80, 0x80 ) PORT_DIPLOCATION("DSW2:8")
+	PORT_DIPUNKNOWN( 0x01, 0x01 ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPUNKNOWN( 0x02, 0x02 ) PORT_DIPLOCATION("SW2:2")
+	PORT_DIPUNKNOWN( 0x04, 0x04 ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPUNKNOWN( 0x08, 0x08 ) PORT_DIPLOCATION("SW2:4")
+	PORT_DIPUNKNOWN( 0x10, 0x10 ) PORT_DIPLOCATION("SW2:5")
+	PORT_DIPUNKNOWN( 0x20, 0x20 ) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPUNKNOWN( 0x40, 0x40 ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPUNKNOWN( 0x80, 0x80 ) PORT_DIPLOCATION("SW2:8")
 
 	PORT_START("DSW3") // only 2 out of 4 DIP banks phisically present
 	PORT_DIPNAME( 0xff, 0xff, DEF_STR( Unused ) )
@@ -5108,7 +5109,7 @@ GAME( 1995, dbc,           lhb,      lhb,             lhb,       igs011_state, i
 GAME( 1995, ryukobou,      lhb,      lhb,             lhb,       igs011_state, init_ryukobou,     ROT0, "IGS / Alta",              "Mahjong Ryukobou (Japan, V030J)",                  MACHINE_SUPPORTS_SAVE )
 GAME( 1996, lhb2,          0,        lhb2,            lhb2,      igs011_state, init_lhb2,         ROT0, "IGS",                     "Lung Fu Bong II (Hong Kong, V185H)",               MACHINE_SUPPORTS_SAVE )
 GAME( 1996, tygn,          lhb2,     tygn,            tygn,      igs011_state, init_tygn,         ROT0, "IGS",                     "Te Yi Gong Neng (China, V632C)",                   MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ROM patches
-GAME( 1996, lhb3,          lhb2,     nkishusp,        nkishusp,  igs011_state, init_lhb3,         ROT0, "IGS",                     "Long Hu Bang III: Cuo Pai Gaoshou (China, V242C)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ROM patches
+GAME( 1996, lhb3,          lhb2,     nkishusp,        lhb2,      igs011_state, init_lhb3,         ROT0, "IGS",                     "Long Hu Bang III: Cuo Pai Gaoshou (China, V242C)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ROM patches
 GAME( 1996, xymg,          0,        xymg,            xymg,      igs011_state, init_xymg,         ROT0, "IGS",                     "Xingyun Manguan (China, V651C, set 1)",            MACHINE_SUPPORTS_SAVE )
 GAME( 1996, xymga,         xymg,     xymga,           xymg,      igs011_state, init_xymga,        ROT0, "IGS",                     "Xingyun Manguan (China, V651C, set 2)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // different encryption and without IGS003
 GAME( 1996, wlcc,          xymg,     wlcc,            wlcc,      igs011_state, init_wlcc,         ROT0, "IGS",                     "Wanli Changcheng (China, V638C)",                  MACHINE_SUPPORTS_SAVE )
