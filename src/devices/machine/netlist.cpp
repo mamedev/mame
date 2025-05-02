@@ -33,7 +33,6 @@
 #define LOG_TIMING      (1U << 3)
 
 //#define LOG_MASK (LOG_GENERAL | LOG_DEV_CALLS | LOG_DEBUG)
-//#define LOG_MASK        (LOG_TIMING)
 #define LOG_MASK        (0)
 
 #define LOGDEVCALLS(...) LOGMASKED(LOG_DEV_CALLS, __VA_ARGS__)
@@ -815,11 +814,15 @@ void netlist_mame_stream_output_device::device_reset()
 
 void netlist_mame_stream_output_device::sound_update_fill(sound_stream &stream, int output)
 {
-	if (stream.samples() < m_buffer.size())
-		osd_printf_warning("sound %s: samples %d less bufsize %d\n", name(), stream.samples(), m_buffer.size());
+	int samples = m_buffer.size();
+	if (stream.samples() < samples)
+	{
+		osd_printf_warning("sound %s: samples %d less bufsize %d\n", name(), stream.samples(), samples);
+		samples = stream.samples();
+	}
 
 	int sampindex;
-	for (sampindex = 0; sampindex < m_buffer.size(); sampindex++)
+	for (sampindex = 0; sampindex < samples; sampindex++)
 		stream.put(output, sampindex, m_buffer[sampindex]);
 	if (sampindex < stream.samples())
 		stream.fill(output, m_cur, sampindex);
@@ -858,7 +861,7 @@ void netlist_mame_stream_output_device::process(netlist::netlist_time_ext tim, n
 	int pos = (tim - m_last_buffer_time) / m_sample_time;
 	//if (pos > m_bufsize)
 	//  throw emu_fatalerror("sound %s: pos %d exceeded bufsize %d\n", name().c_str(), pos, m_bufsize);
-	while (m_buffer.size() < pos )
+	while (m_buffer.size() < pos)
 	{
 		m_buffer.push_back(static_cast<sound_stream::sample_t>(m_cur));
 	}
