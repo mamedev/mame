@@ -6,14 +6,37 @@
   Super Shanghai 2000.
   Super Shanghai 2000 - Wrestle Fiesta.
 
+  3-reel 5-liner with an extra reel, plus a front game to hide the slots game.
+
+  Rare stealth video slots machine platform based on a Z80 CPU and a AY-3-8910 for sound.
+  5 DIP switches banks.
+  
   Driver by Roberto Fresca & Grull Osgo.
 
 
-  3-reel 5-liner with an extra reel.
-  Rare video slots machine platform based on a Z80 CPU and a AY-3-8910 for sound.
-  5 DIP switchs banks.
+*********************************************************************************************
 
-  Unknown manufacturer.
+  Notes:
+
+  This platform hosts various slot games featuring different themes,
+  including classic fruit symbols (7s, bells, plums, oranges, grapes, etc.),
+  Easter-themed graphics (eggs, rabbits), and fish-themed designs.
+
+  To comply with local gambling restrictions, these games are concealed behind
+  a front-game interface. The system initially boots into a Pairs-style front-game.
+  Hidden input sequences allow switching between the slots game and the front-game.
+  Some machines further protect this mechanism with a 4-digit password, which can 
+  be entered using the joystick or directional buttons and confirmed with the action button.
+ 
+  The platform support games with three operational modes:
+
+   * Pairs Mode (front-game only)
+   * Stealth Mode (hides the slots game)
+   * Direct Slots Mode (boots directly into the slots game)
+
+
+  If a set request password, use Right, Left, Up, Down, to change the code digits in order.
+  Action button to validate and switch to slots mode.
 
 
 ********************************************************************************************/
@@ -246,10 +269,10 @@ static INPUT_PORTS_START( ssh2000 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_9) PORT_NAME("Clear/Reset")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_CODE(KEYCODE_Z) PORT_NAME("Fire 1")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_CODE(KEYCODE_Z) PORT_NAME("Action")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_0) PORT_NAME("Port Test")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_CODE(KEYCODE_X) PORT_NAME("Fire 2")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_CODE(KEYCODE_C) PORT_NAME("Fire 3")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_CODE(KEYCODE_X) PORT_NAME("Switch to Slots (gambling game)")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_CODE(KEYCODE_C) PORT_NAME("Switch to Pairs (front Game)")
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
@@ -258,108 +281,109 @@ static INPUT_PORTS_START( ssh2000 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S) PORT_NAME("Test 2")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2) PORT_NAME("Coin A")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) PORT_NAME("Coin B")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start (Automatic)")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start (Automatic Mode)")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Bet / Stop / Up")
 
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x03, 0x00, "Percentage" )            PORT_DIPLOCATION("DSWA:8,7")
+	PORT_DIPNAME( 0x03, 0x00, "Percentage" )        PORT_DIPLOCATION("DSWA:8,7")
 	PORT_DIPSETTING(    0x00, "80%" )
 	PORT_DIPSETTING(    0x01, "75%" )
 	PORT_DIPSETTING(    0x02, "70%" )
 	PORT_DIPSETTING(    0x03, "65%" )
-	PORT_DIPNAME( 0x04, 0x04, "Sprites" )               PORT_DIPLOCATION("DSWA:6")
+	PORT_DIPNAME( 0x04, 0x04, "Sprites" )           PORT_DIPLOCATION("DSWA:6")
 	PORT_DIPSETTING(    0x04, "Fruits")
 	PORT_DIPSETTING(    0x00, "Tiles")
-	PORT_DIPNAME( 0x08, 0x00, "Game Name" )             PORT_DIPLOCATION("DSWA:5")
+	PORT_DIPNAME( 0x08, 0x00, "Game Name" )         PORT_DIPLOCATION("DSWA:5")
 	PORT_DIPSETTING(    0x08, "NAME 2")
 	PORT_DIPSETTING(    0x00, "NAME 1")
-	PORT_DIPNAME( 0x10, 0x00, "Extra Take")             PORT_DIPLOCATION("DSWA:4")
+	PORT_DIPNAME( 0x10, 0x00, "Extra Take")         PORT_DIPLOCATION("DSWA:4")
 	PORT_DIPSETTING(    0x10, "OFF:  NO" )
 	PORT_DIPSETTING(    0x00, "ON:  YES" )	
-	PORT_DIPNAME( 0x20, 0x00, "Demo Sound" )            PORT_DIPLOCATION("DSWA:3")
+	PORT_DIPNAME( 0x20, 0x00, "Demo Sound" )        PORT_DIPLOCATION("DSWA:3")
 	PORT_DIPSETTING(    0x20, "OFF:  NO" )
 	PORT_DIPSETTING(    0x00, "ON:  YES" )	
-	PORT_DIPNAME( 0x40, 0x00, "Max. BET" )              PORT_DIPLOCATION("DSWA:2")
+	PORT_DIPNAME( 0x40, 0x00, "Max. BET" )          PORT_DIPLOCATION("DSWA:2")
 	PORT_DIPSETTING(    0x40, "OFF: 9" )
 	PORT_DIPSETTING(    0x00, "ON:  5" )
-	PORT_DIPNAME( 0x80, 0x00, "Demostration")           PORT_DIPLOCATION("DSWA:1")
+	PORT_DIPNAME( 0x80, 0x00, "Demostration")       PORT_DIPLOCATION("DSWA:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSWB")
-	PORT_DIPNAME( 0x0f, 0x0f, "Coinage A")              PORT_DIPLOCATION("DSWB:8,7,6,5")
+	PORT_DIPNAME( 0x0f, 0x00, "Coinage A")          PORT_DIPLOCATION("DSWB:8,7,6,5")
 	PORT_DIPSETTING(    0x00, "1" )
-	PORT_DIPSETTING(    0x1, "2" )
-	PORT_DIPSETTING(    0x2, "5" )
-	PORT_DIPSETTING(    0x3, "10" )
-	PORT_DIPSETTING(    0x4, "20" )
-	PORT_DIPSETTING(    0x5, "50" )
-	PORT_DIPSETTING(    0x6, "100" )
-	PORT_DIPSETTING(    0x7, "500" )
-	PORT_DIPSETTING(    0x8, "1000" )          
-	PORT_DIPSETTING(    0x9, "4" )
-	PORT_DIPSETTING(    0xa, "8" )
-	PORT_DIPSETTING(    0xb, "20" )
-	PORT_DIPSETTING(    0xc, "40" )
-	PORT_DIPSETTING(    0xd, "200" )
-	PORT_DIPSETTING(    0xe, "400" )
-	PORT_DIPSETTING(    0xf, "10" )	
-	PORT_DIPNAME( 0xf0, 0xf0, "Coinage B")              PORT_DIPLOCATION("DSWB:4,3,2,1")
+	PORT_DIPSETTING(    0x01, "2" )
+	PORT_DIPSETTING(    0x09, "4" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x0a, "8" )
+	PORT_DIPSETTING(    0x03, "10" )
+	PORT_DIPSETTING(    0x0f, "10" )
+	PORT_DIPSETTING(    0x04, "20" )
+	PORT_DIPSETTING(    0x0b, "20" )
+	PORT_DIPSETTING(    0x0c, "40" )
+	PORT_DIPSETTING(    0x05, "50" )
+	PORT_DIPSETTING(    0x06, "100" )
+	PORT_DIPSETTING(    0x0d, "200" )
+	PORT_DIPSETTING(    0x0e, "400" )
+	PORT_DIPSETTING(    0x07, "500" )
+	PORT_DIPSETTING(    0x08, "1000" )
+	PORT_DIPNAME( 0xf0, 0x00, "Coinage B")          PORT_DIPLOCATION("DSWB:4,3,2,1")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x10, "2" )
-	PORT_DIPSETTING(    0x20, "5" )
-	PORT_DIPSETTING(    0x30, "10" )
-	PORT_DIPSETTING(    0x40, "20" )
-	PORT_DIPSETTING(    0x50, "50" )
-	PORT_DIPSETTING(    0x60, "100" )
-	PORT_DIPSETTING(    0x70, "500" )
-	PORT_DIPSETTING(    0x80, "1000" )          
 	PORT_DIPSETTING(    0x90, "4" )
+	PORT_DIPSETTING(    0x20, "5" )
 	PORT_DIPSETTING(    0xa0, "8" )
+	PORT_DIPSETTING(    0x30, "10" )
+	PORT_DIPSETTING(    0xf0, "10" )		
+	PORT_DIPSETTING(    0x40, "20" )
 	PORT_DIPSETTING(    0xb0, "20" )
 	PORT_DIPSETTING(    0xc0, "40" )
+	PORT_DIPSETTING(    0x50, "50" )
+	PORT_DIPSETTING(    0x60, "100" )
 	PORT_DIPSETTING(    0xd0, "200" )
 	PORT_DIPSETTING(    0xe0, "400" )
-	PORT_DIPSETTING(    0xf0, "10" )		
+	PORT_DIPSETTING(    0x70, "500" )
+	PORT_DIPSETTING(    0x80, "1000" )
 
 	PORT_START("DSWC")
-	PORT_DIPNAME( 0x01, 0x01, "Found")                  PORT_DIPLOCATION("DSWC:8")
+	PORT_DIPNAME( 0x01, 0x00, "Found")              PORT_DIPLOCATION("DSWC:8")
 	PORT_DIPSETTING(    0x01, "Auto" )
 	PORT_DIPSETTING(    0x00, "Hand" )
-	PORT_DIPNAME( 0x02, 0x02, "Found Pay" )             PORT_DIPLOCATION("DSWC:7")
+	PORT_DIPNAME( 0x02, 0x00, "Found Pay" )         PORT_DIPLOCATION("DSWC:7")
 	PORT_DIPSETTING(    0x02, "By One" )
 	PORT_DIPSETTING(    0x00, "All" )
-	PORT_DIPNAME( 0x04, 0x04, "Papas Pay" )             PORT_DIPLOCATION("DSWC:6")
+	PORT_DIPNAME( 0x04, 0x00, "Papas Pay" )         PORT_DIPLOCATION("DSWC:6")
 	PORT_DIPSETTING(    0x04, "By One" )
 	PORT_DIPSETTING(    0x00, "All" )
-	PORT_DIPNAME( 0x08, 0x08, "Flip Type" )             PORT_DIPLOCATION("DSWC:5")
+	PORT_DIPNAME( 0x08, 0x00, "Flip Type" )         PORT_DIPLOCATION("DSWC:5")
 	PORT_DIPSETTING(    0x08, "on Tape" )
 	PORT_DIPSETTING(    0x00, "on Kare" )
-	PORT_DIPNAME( 0xf0, 0xf0, "Coinage C")              PORT_DIPLOCATION("DSWC:4,3,2,1")
+	PORT_DIPNAME( 0xf0, 0x00, "Coinage C")          PORT_DIPLOCATION("DSWC:4,3,2,1")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x10, "2" )
-	PORT_DIPSETTING(    0x20, "5" )
-	PORT_DIPSETTING(    0x30, "10" )
-	PORT_DIPSETTING(    0x40, "20" )
-	PORT_DIPSETTING(    0x50, "50" )
-	PORT_DIPSETTING(    0x60, "100" )
-	PORT_DIPSETTING(    0x70, "500" )
-	PORT_DIPSETTING(    0x80, "1000" )          
 	PORT_DIPSETTING(    0x90, "4" )
+	PORT_DIPSETTING(    0x20, "5" )
 	PORT_DIPSETTING(    0xa0, "8" )
+	PORT_DIPSETTING(    0x30, "10" )
+	PORT_DIPSETTING(    0xf0, "10" )
+	PORT_DIPSETTING(    0x40, "20" )
 	PORT_DIPSETTING(    0xb0, "20" )
 	PORT_DIPSETTING(    0xc0, "40" )
+	PORT_DIPSETTING(    0x50, "50" )
+	PORT_DIPSETTING(    0x60, "100" )
 	PORT_DIPSETTING(    0xd0, "200" )
 	PORT_DIPSETTING(    0xe0, "400" )
-	PORT_DIPSETTING(    0xf0, "10" )		
+	PORT_DIPSETTING(    0x70, "500" )
+	PORT_DIPSETTING(    0x80, "1000" )
 
 	PORT_START("DSWD")
-	PORT_DIPNAME( 0x0f, 0x0f, "Credit Limit")           PORT_DIPLOCATION("DSWD:8,7,6,5")
+	PORT_DIPNAME( 0x0f, 0x00, "Credit Limit")           PORT_DIPLOCATION("DSWD:8,7,6,5")
 	PORT_DIPSETTING(    0x00, " 5000" )
 	PORT_DIPSETTING(    0x01, " 7500" )
 	PORT_DIPSETTING(    0x02, "10000" )
 	PORT_DIPSETTING(    0x03, "15000" )
 	PORT_DIPSETTING(    0x04, "20000" )
+	PORT_DIPSETTING(    0x0f, "20000" )
 	PORT_DIPSETTING(    0x05, "25000" )
 	PORT_DIPSETTING(    0x06, "30000" )
 	PORT_DIPSETTING(    0x07, "35000" )
@@ -370,21 +394,20 @@ static INPUT_PORTS_START( ssh2000 )
 	PORT_DIPSETTING(    0x0c, "70000" )
 	PORT_DIPSETTING(    0x0d, "80000" )
 	PORT_DIPSETTING(    0x0e, "90000" )
-	PORT_DIPSETTING(    0x0f, "20000" )
-	PORT_DIPNAME( 0x10, 0x10, "Swap Code" )             PORT_DIPLOCATION("DSWD:4")
+	PORT_DIPNAME( 0x10, 0x00, "Swap Code" )             PORT_DIPLOCATION("DSWD:4")
 	PORT_DIPSETTING(    0x10, "Code 2" )
 	PORT_DIPSETTING(    0x00, "Code 1" )
-	PORT_DIPNAME( 0x20, 0x20, "Return In" )             PORT_DIPLOCATION("DSWD:3")
+	PORT_DIPNAME( 0x20, 0x00, "Return In" )             PORT_DIPLOCATION("DSWD:3")
 	PORT_DIPSETTING(    0x20, "Main" )
 	PORT_DIPSETTING(    0x00, "Amusement" )
-	PORT_DIPNAME( 0x40, 0x40, "Must be Off" )           PORT_DIPLOCATION("DSWD:2")
+	PORT_DIPNAME( 0x40, 0x00, "Must be Off" )           PORT_DIPLOCATION("DSWD:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x80, 0x80, "Amusement" )             PORT_DIPLOCATION("DSWD:1")
+	PORT_DIPNAME( 0x80, 0x00, "Amusement" )             PORT_DIPLOCATION("DSWD:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSWE")
-	PORT_DIPNAME( 0x0f, 0x0f, "CoinIn Limit")           PORT_DIPLOCATION("DSWE:8,7,6,5")
+	PORT_DIPNAME( 0x0f, 0x00, "CoinIn Limit")           PORT_DIPLOCATION("DSWE:8,7,6,5")
 	PORT_DIPSETTING(    0x00, " 1000" )
 	PORT_DIPSETTING(    0x01, " 2000" )
 	PORT_DIPSETTING(    0x02, " 3000" )
@@ -401,12 +424,12 @@ static INPUT_PORTS_START( ssh2000 )
 	PORT_DIPSETTING(    0x0d, "40000" )
 	PORT_DIPSETTING(    0x0e, "50000" )
 	PORT_DIPSETTING(    0x0f, " 5000" )	
-	PORT_DIPNAME( 0x30, 0x30, "Preset BONUS" )         PORT_DIPLOCATION("DSWE:4,3")
+	PORT_DIPNAME( 0x30, 0x00, "Preset BONUS" )         PORT_DIPLOCATION("DSWE:4,3")
 	PORT_DIPSETTING(    0x00, "1000" )
 	PORT_DIPSETTING(    0x10, "2000" )
 	PORT_DIPSETTING(    0x20, "3000" )
 	PORT_DIPSETTING(    0x30, "4000" )
-	PORT_DIPNAME( 0xc0, 0xc0, "Preset LEFT" )          PORT_DIPLOCATION("DSWE:2,1")
+	PORT_DIPNAME( 0xc0, 0x00, "Preset LEFT" )          PORT_DIPLOCATION("DSWE:2,1")
 	PORT_DIPSETTING(    0x00, "1000" )
 	PORT_DIPSETTING(    0x40, "2000" )
 	PORT_DIPSETTING(    0x80, "3000" )
@@ -466,6 +489,7 @@ void ssh2000_state::ssh2000(machine_config &config)
 
 /*
   Super Shanghai 2000 (set 1)
+  No code to enter the game.
   
   type:  SHG-47 
   version: 2000
@@ -510,6 +534,7 @@ ROM_END
 
 /*
   Super Shanghai 2000 (set 2)
+  Code 1234 to enter the game.
 
   type:  SHG-47 
   version: 2000
@@ -545,6 +570,7 @@ ROM_END
   Super Shanghai 2000
   Wrestle Fiesta.
   Main program 30% bonus by Vegas (red board)
+  No code to enter the game.
 
   type:  SHG-47 
   version: 2000
