@@ -6,7 +6,7 @@
     Has NAND + RAM configuration, also has an SPI flash (don't know what it is for)
     Nor NAND, nor SPI flash have appropriate headings, so bootstrap is likely custom
     Interestingly, NAND has a bunch of "GPspispisp" headings, though it shouldn't have.
-    NAND has also some kind of proprietary filesystem.
+    NAND has also FAT32 filesystem, so this may indicate, why the data is so strange.
 
     --GeneralPlus GPL162004A-- --EtronTech EM639165TS-7G-- --Toshiba TC58BVG0S3HTA00-- --GeneralPlus GPR25L081B--
 */
