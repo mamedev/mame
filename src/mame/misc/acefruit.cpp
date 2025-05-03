@@ -253,12 +253,16 @@ void acefruit_state::coin_w(uint8_t data)
 void acefruit_state::sound_w(uint8_t data)
 {
 	/* TODO:
-	PCB pictures suggest that the sound hardware has the part numbers scraped off. 
-	There's a 14 pin package that looks involved.
+	PCB pictures suggest that the sound hardware has the part numbers scraped
+ 	off.  There's a 14 pin package that looks involved.
 
-	Pin 36 10V on P2 seems to go to possibly a low voltage reset circuit (mentioned in the manual) at the top left of the board H 13.
+	Pin 36 10V on P2 seems to go to possibly a low voltage reset circuit
+ 	(mentioned in the manual) at the top left of the board H 13.
 
-	Pin 35 (sound output) seems to go to the transistor TIP120 at position F2 on the board. The emitter is connected to ground, and the collector goes to pin 35 of P2. The base is connected to the 1K resistor just above the transistor, and then it goes to pin 8 of the 14 pin IC located at H 3 on the board near the crystal.
+	Pin 35 (sound output) seems to go to the TIP120 transistor at position F2 on
+ 	the board.  The emitter is connected to ground, and the collector goes to
+  	pin 35 of P2. The base is connected to pin 8 of the 14 pin IC located at H3
+   	on the board near the crystal via the 1K resistor just above the transistor.
 
 	7048 maybe?
 
