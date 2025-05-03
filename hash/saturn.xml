@@ -2536,8 +2536,8 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="alt_title" value="アドヴァンスド ヴァリアブル・ジオ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
 			<feature name="cd_matrix" value="T-32501GP-01392   A"/>
+			<diskarea name="cdrom">
 				<disk name="Advanced V.G. (Japan)" sha1="b803811f945b9eee1cc342cf0dc142cbfcb6edc4" />
 			</diskarea>
 		</part>
@@ -2552,8 +2552,8 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="alt_title" value="AI将棋"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
 			<feature name="cd_matrix" value="T-18602GP-00413-P1K   V"/>
+			<diskarea name="cdrom">
 				<disk name="ai shougi (japan)" sha1="307542ffe38bc51517930eda0159d5a501c9807e" />
 			</diskarea>
 		</part>
@@ -2569,8 +2569,8 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="alt_title" value="AI将棋 2"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
 			<feature name="cd_matrix" value="T-17602GP-02272   A"/>
+			<diskarea name="cdrom">
 				<disk name="ai shougi 2 (japan)" sha1="6c42d91ce7ace93baeccabf4aac80c39a93c4d21" />
 			</diskarea>
 		</part>
@@ -2682,8 +2682,8 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="alt_title" value="エイナス ファンタジー・ストーリーズ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
 			<feature name="cd_matrix" value="T-27801GP-01400-P1K   V"/>
+			<diskarea name="cdrom">
 				<disk name="anearth fantasy stories - the first volume (japan)" sha1="680b884abf635c7c5dc1ff2b76ffc5b6d2d00145" />
 			</diskarea>
 		</part>
@@ -2810,8 +2810,8 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="alt_title" value="あすか120%リミテッド"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
 			<feature name="cd_matrix" value="T-16708GP-01840-P2K   V"/>
+			<diskarea name="cdrom">
 				<disk name="asuka 120 limited - burning fest. limited (japan)" sha1="1f9454dca643bb3af39180b01cbcc0be0780c48c" />
 			</diskarea>
 		</part>
@@ -2925,8 +2925,8 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="alt_title" value="ボールディランド"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
 			<feature name="cd_matrix" value="T-20608GP-02396-P1K   V"/>
+			<diskarea name="cdrom">
 				<disk name="baldy land (japan)" sha1="5781903e2b4a169e5970687ea783a9010a7de3b7" />
 			</diskarea>
 		</part>
@@ -3056,8 +3056,8 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="alt_title" value="ボンバーマンウォーズ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
 			<feature name="cd_matrix" value="T-14320GP-02126-P1K   V"/>
+			<diskarea name="cdrom">
 				<disk name="bomberman wars (japan)" sha1="5cfa7f329929ae13b1d169ccfb2ab013b105037d" />
 			</diskarea>
 		</part>
@@ -3535,8 +3535,8 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="release" value="19950707"/>
 		<info name="alt_title" value="ダークシード"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<feature name="cd_matrix" value="T-18501GP-00350-P1K   V"/>
 		<part name="cdrom" interface="cdrom">
+		<feature name="cd_matrix" value="T-18501GP-00350-P1K   V"/>
 			<diskarea name="cdrom">
 				<disk name="dark seed (japan)" sha1="27cf985cb49263ce14adf56b4ab8c208eac9ded2" />
 			</diskarea>
@@ -3552,8 +3552,8 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="release" value="19970829"/>
 		<info name="alt_title" value="ダークシードⅡ"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<feature name="cd_matrix" value="T-36101GP-01731   A"/>
 		<part name="cdrom" interface="cdrom">
+		<feature name="cd_matrix" value="T-36101GP-01731   A"/>
 			<diskarea name="cdrom">
 				<disk name="dark seed ii (japan)" sha1="0213aac2e9086fd7fab2913a3fffe24674d0fae8" />
 			</diskarea>
