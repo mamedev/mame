@@ -637,7 +637,7 @@ void sound_stream::reprime_sync_timer()
 
 	u64 next_sample = m_output_buffer.write_sample() + 1;
 	attotime next_time = sample_to_time(next_sample);
-	next_time.m_attoseconds += 1'000'000'000; // Go to the next nanosecond
+	next_time.m_attoseconds += 1'000'000'000; // Go to the next nanosecond '
 	m_sync_timer->adjust(next_time - m_device.machine().time());
 }
 
@@ -1122,11 +1122,22 @@ void sound_manager::config_load(config_type cfg_type, config_level cfg_level, ut
 		// In the global config, get the default effect chain configuration
 
 		util::xml::data_node const *efl_node = parentnode->get_child("default_audio_effects");
-		for(util::xml::data_node const *ef_node = efl_node->get_child("effect"); ef_node != nullptr; ef_node = ef_node->get_next_sibling("effect")) {
-			unsigned int id = ef_node->get_attribute_int("step", 0);
-			std::string type = ef_node->get_attribute_string("type", "");
-			if(id >= 1 && id <= m_default_effects.size() && audio_effect::effect_names[m_default_effects[id-1]->type()] == type)
-				m_default_effects[id-1]->config_load(ef_node);
+		if(efl_node) {
+			for(util::xml::data_node const *ef_node = efl_node->get_child("effect"); ef_node != nullptr; ef_node = ef_node->get_next_sibling("effect")) {
+				unsigned int id = ef_node->get_attribute_int("step", 0);
+				std::string type = ef_node->get_attribute_string("type", "");
+				if(id >= 1 && id <= m_default_effects.size() && audio_effect::effect_names[m_default_effects[id-1]->type()] == type)
+					m_default_effects[id-1]->config_load(ef_node);
+			}
+		}
+
+		// and the resampler configuration
+		util::xml::data_node const *rs_node = parentnode->get_child("resampler");
+		if(rs_node) {
+			m_resampler_type = rs_node->get_attribute_int("type", RESAMPLER_LOFI);
+			m_resampler_hq_latency = rs_node->get_attribute_float("hq_latency", 0.0050);
+			m_resampler_hq_length = rs_node->get_attribute_int("hq_length", 400);
+			m_resampler_hq_phases = rs_node->get_attribute_int("hq_phases", 200);				
 		}
 		break;
 	}
@@ -1217,6 +1228,12 @@ void sound_manager::config_save(config_type cfg_type, util::xml::data_node *pare
 			ef_node->set_attribute("type", audio_effect::effect_names[e->type()]);
 			e->config_save(ef_node);
 		}
+
+		util::xml::data_node *const rs_node = parentnode->add_child("resampler", nullptr);
+		rs_node->set_attribute_int("type", m_resampler_type);
+		rs_node->set_attribute_float("hq_latency", m_resampler_hq_latency);
+		rs_node->set_attribute_int("hq_length", m_resampler_hq_length);
+		rs_node->set_attribute_int("hq_phases", m_resampler_hq_phases);
 		break;
 	}
 
