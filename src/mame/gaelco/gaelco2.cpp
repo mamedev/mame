@@ -1903,11 +1903,10 @@ NOTE: It's unknown if Player 1 & Player 2 controls are connected through the JAM
 Wires run to male JAMMA board with corresponding JP1, JP2, JP3 & JP4 connectors for cabinet 2 JAMMA harness
 */
 
-
-ROM_START( touchgo ) // REF: 950906
+ROM_START( touchgo ) // REF: 950510-1
 	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
-	ROM_LOAD16_BYTE( "tg_56.ic56", 0x000000, 0x080000, CRC(8ab065f3) SHA1(7664abd7e5f66ffca4a2865bba56ac36bd04f4e9) )
-	ROM_LOAD16_BYTE( "tg_57.ic57", 0x000001, 0x080000, CRC(0dfd3f65) SHA1(afb2ce8988c84f211ac71b84928ce4c421de7fee) )
+	ROM_LOAD16_BYTE( "tg_873d_56_5-2.ic56", 0x000000, 0x080000, CRC(6d0f5c65) SHA1(00db7a7da3ec1676169aa78fe4f08a7746c3accf) ) // IC63 for REF: 950510-1, IC56 for REF: 950906
+	ROM_LOAD16_BYTE( "tg_cee8_57_5-2.ic57", 0x000001, 0x080000, CRC(845787b5) SHA1(27c9910cd9f38328326ecb5cd093dfeb6d4f6244) ) // IC64 for REF: 950510-1, IC57 for REF: 950906
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) // DS5002FP code
 	ROM_LOAD( "touchgo_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(6a238adb) SHA1(4ac5ff8e3d90454f764477146a0b8dc8c8062420) )
@@ -1931,7 +1930,143 @@ ROM_START( touchgo ) // REF: 950906
 	ROM_LOAD( "tg_ic67.ic67",  0x0800000, 0x0400000, CRC(c0a2ce5b) SHA1(94b024373c7c546c0f4fe9737639f02e9c7ebbdb) ) // GFX only
 ROM_END
 
-ROM_START( touchgon ) // REF 950906, no plug-in daughterboard, Non North America Notice, also found on REF: 950510-1 with daughterboard
+ROM_START( touchgoa ) // REF: 950906
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "tg_be51_5.6_11-12.ic56", 0x000000, 0x080000, CRC(8ab065f3) SHA1(7664abd7e5f66ffca4a2865bba56ac36bd04f4e9) )
+	ROM_LOAD16_BYTE( "tg_6701_5.7_11-12.ic57", 0x000001, 0x080000, CRC(0dfd3f65) SHA1(afb2ce8988c84f211ac71b84928ce4c421de7fee) )
+
+	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) // DS5002FP code
+	ROM_LOAD( "touchgo_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(6a238adb) SHA1(4ac5ff8e3d90454f764477146a0b8dc8c8062420) )
+
+	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
+	// touchgo requires some values in scratchram to be initialized or it won't copy the high score table when it boots
+	ROM_LOAD( "touchgo_scratch", 0x00, 0x80, CRC(f9ca54ff) SHA1(416f7bd89442dc1f736efe457b0f9a7f4f9f0bd5) )
+	// these are the default states stored in NVRAM
+	DS5002FP_SET_MON( 0x19 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
+
+	ROM_REGION( 0x1400000, "gfx", 0 ) // GFX + Sound
+	// 0x0000000-0x0ffffff filled in in the DRIVER_INIT
+	ROM_LOAD( "tg_ic69.ic69",  0x1000000, 0x0200000, CRC(18bb12d4) SHA1(ee6e7a63b86c56d71e62db0ae5892ab3ab94b0a0) ) // GFX only
+
+	ROM_REGION( 0x0c00000, "gfx_temp", 0 ) // Temporary storage
+	ROM_LOAD( "tg_ic65.ic65",  0x0000000, 0x0400000, CRC(91b89c7c) SHA1(1c24b494b56845b0f21be40ab737f251d7683c7d) ) // GFX only
+	ROM_LOAD( "tg_ic66.ic66",  0x0400000, 0x0200000, CRC(52682953) SHA1(82cde061bdd827ed4a47a9a4256cd0e887ebc29d) ) // Sound only
+	ROM_FILL(                  0x0600000, 0x0200000, 0x00 )          // Empty
+	ROM_LOAD( "tg_ic67.ic67",  0x0800000, 0x0400000, CRC(c0a2ce5b) SHA1(94b024373c7c546c0f4fe9737639f02e9c7ebbdb) ) // GFX only
+ROM_END
+
+ROM_START( touchgona )
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "v_us_56_f546_14-11.ic56", 0x000000, 0x080000, CRC(3bfe2010) SHA1(bd1584e89c6201dd0e88be3f7c19e5820c43bfee) )
+	ROM_LOAD16_BYTE( "v_us_57_d888_14-11.ic57", 0x000001, 0x080000, CRC(c8a9e7bd) SHA1(4d84c34713f63789b51fdee17ca0d77c0e259740) )
+	ROM_FILL( 0x1, 1, 0xfe ) // initial stack pointer in u57 points to ROM not RAM, but checksum matched label?!
+
+	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) // DS5002FP code
+	ROM_LOAD( "touchgo_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(6a238adb) SHA1(4ac5ff8e3d90454f764477146a0b8dc8c8062420) )
+
+	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
+	// touchgo requires some values in scratchram to be initialized or it won't copy the high score table when it boots
+	ROM_LOAD( "touchgo_scratch", 0x00, 0x80, CRC(f9ca54ff) SHA1(416f7bd89442dc1f736efe457b0f9a7f4f9f0bd5) )
+	// these are the default states stored in NVRAM
+	DS5002FP_SET_MON( 0x19 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
+
+	ROM_REGION( 0x1400000, "gfx", 0 ) // GFX + Sound
+	// 0x0000000-0x0ffffff filled in in the DRIVER_INIT
+	ROM_LOAD( "tg_ic69.ic69",  0x1000000, 0x0200000, CRC(18bb12d4) SHA1(ee6e7a63b86c56d71e62db0ae5892ab3ab94b0a0) ) // GFX only
+
+	ROM_REGION( 0x0c00000, "gfx_temp", 0 ) // Temporary storage
+	ROM_LOAD( "tg_ic65.ic65",  0x0000000, 0x0400000, CRC(91b89c7c) SHA1(1c24b494b56845b0f21be40ab737f251d7683c7d) ) // GFX only
+	ROM_LOAD( "tg_ic66.ic66",  0x0400000, 0x0200000, CRC(52682953) SHA1(82cde061bdd827ed4a47a9a4256cd0e887ebc29d) ) // Sound only
+	ROM_FILL(                  0x0600000, 0x0200000, 0x00 )          // Empty
+	ROM_LOAD( "tg_ic67.ic67",  0x0800000, 0x0400000, CRC(c0a2ce5b) SHA1(94b024373c7c546c0f4fe9737639f02e9c7ebbdb) ) // GFX only
+ROM_END
+
+ROM_START( touchgonna )
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "v_e_56_ef33_16-11.ic56", 0x000000, 0x080000, CRC(c2715874) SHA1(3df2c19a2ce74fa3c6eccea7938004a03c0381ff) )
+	ROM_LOAD16_BYTE( "v_o_57_9c10_16-11.ic57", 0x000001, 0x080000, CRC(3acefb06) SHA1(0fc67855cd7e310a9c06d11feb260b463657a6a7) )
+
+	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) // DS5002FP code
+	ROM_LOAD( "touchgo_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(6a238adb) SHA1(4ac5ff8e3d90454f764477146a0b8dc8c8062420) )
+
+	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
+	// touchgo requires some values in scratchram to be initialized or it won't copy the high score table when it boots
+	ROM_LOAD( "touchgo_scratch", 0x00, 0x80, CRC(f9ca54ff) SHA1(416f7bd89442dc1f736efe457b0f9a7f4f9f0bd5) )
+	// these are the default states stored in NVRAM
+	DS5002FP_SET_MON( 0x19 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
+
+	ROM_REGION( 0x1400000, "gfx", 0 ) // GFX + Sound
+	// 0x0000000-0x0ffffff filled in in the DRIVER_INIT
+	ROM_LOAD( "tg_ic69.ic69",  0x1000000, 0x0200000, CRC(18bb12d4) SHA1(ee6e7a63b86c56d71e62db0ae5892ab3ab94b0a0) ) // GFX only
+
+	ROM_REGION( 0x0c00000, "gfx_temp", 0 ) // Temporary storage
+	ROM_LOAD( "tg_ic65.ic65",  0x0000000, 0x0400000, CRC(91b89c7c) SHA1(1c24b494b56845b0f21be40ab737f251d7683c7d) ) // GFX only
+	ROM_LOAD( "tg_ic66.ic66",  0x0400000, 0x0200000, CRC(52682953) SHA1(82cde061bdd827ed4a47a9a4256cd0e887ebc29d) ) // Sound only
+	ROM_FILL(                  0x0600000, 0x0200000, 0x00 )          // Empty
+	ROM_LOAD( "tg_ic67.ic67",  0x0800000, 0x0400000, CRC(c0a2ce5b) SHA1(94b024373c7c546c0f4fe9737639f02e9c7ebbdb) ) // GFX only
+ROM_END
+
+ROM_START( touchgonnaa )
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "v_e_c79b_56_15-11.ic56", 0x000000, 0x080000, CRC(d92bb02a) SHA1(06ba060b00b6dcc734eaac9771dcecf508be1aff) )
+	ROM_LOAD16_BYTE( "v_e_b34a_57_15-11.ic57", 0x000001, 0x080000, CRC(0711c8ba) SHA1(b4d2d20421ec2f6ef9ee0259cf2be85641272359) )
+
+	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) // DS5002FP code
+	ROM_LOAD( "touchgo_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(6a238adb) SHA1(4ac5ff8e3d90454f764477146a0b8dc8c8062420) )
+
+	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
+	// touchgo requires some values in scratchram to be initialized or it won't copy the high score table when it boots
+	ROM_LOAD( "touchgo_scratch", 0x00, 0x80, CRC(f9ca54ff) SHA1(416f7bd89442dc1f736efe457b0f9a7f4f9f0bd5) )
+	// these are the default states stored in NVRAM
+	DS5002FP_SET_MON( 0x19 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
+
+	ROM_REGION( 0x1400000, "gfx", 0 ) // GFX + Sound
+	// 0x0000000-0x0ffffff filled in in the DRIVER_INIT
+	ROM_LOAD( "tg_ic69.ic69",  0x1000000, 0x0200000, CRC(18bb12d4) SHA1(ee6e7a63b86c56d71e62db0ae5892ab3ab94b0a0) ) // GFX only
+
+	ROM_REGION( 0x0c00000, "gfx_temp", 0 ) // Temporary storage
+	ROM_LOAD( "tg_ic65.ic65",  0x0000000, 0x0400000, CRC(91b89c7c) SHA1(1c24b494b56845b0f21be40ab737f251d7683c7d) ) // GFX only
+	ROM_LOAD( "tg_ic66.ic66",  0x0400000, 0x0200000, CRC(52682953) SHA1(82cde061bdd827ed4a47a9a4256cd0e887ebc29d) ) // Sound only
+	ROM_FILL(                  0x0600000, 0x0200000, 0x00 )          // Empty
+	ROM_LOAD( "tg_ic67.ic67",  0x0800000, 0x0400000, CRC(c0a2ce5b) SHA1(94b024373c7c546c0f4fe9737639f02e9c7ebbdb) ) // GFX only
+ROM_END
+
+ROM_START( touchgonnab )
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "v_alt_e_56_15-11.ic56", 0x000000, 0x080000, CRC(64b83556) SHA1(917c30f391c5bc2ce3ab3687c35ce3c429033cf1) )
+	ROM_LOAD16_BYTE( "v_alt_o_57_15-11.ic57", 0x000001, 0x080000, CRC(e9ceb77a) SHA1(aaeb5d51b6df4273a5ae2b0c160aa26d33f89c1d) )
+
+	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) // DS5002FP code
+	ROM_LOAD( "touchgo_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(6a238adb) SHA1(4ac5ff8e3d90454f764477146a0b8dc8c8062420) )
+
+	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
+	// touchgo requires some values in scratchram to be initialized or it won't copy the high score table when it boots
+	ROM_LOAD( "touchgo_scratch", 0x00, 0x80, CRC(f9ca54ff) SHA1(416f7bd89442dc1f736efe457b0f9a7f4f9f0bd5) )
+	// these are the default states stored in NVRAM
+	DS5002FP_SET_MON( 0x19 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
+
+	ROM_REGION( 0x1400000, "gfx", 0 ) // GFX + Sound
+	// 0x0000000-0x0ffffff filled in in the DRIVER_INIT
+	ROM_LOAD( "tg_ic69.ic69",  0x1000000, 0x0200000, CRC(18bb12d4) SHA1(ee6e7a63b86c56d71e62db0ae5892ab3ab94b0a0) ) // GFX only
+
+	ROM_REGION( 0x0c00000, "gfx_temp", 0 ) // Temporary storage
+	ROM_LOAD( "tg_ic65.ic65",  0x0000000, 0x0400000, CRC(91b89c7c) SHA1(1c24b494b56845b0f21be40ab737f251d7683c7d) ) // GFX only
+	ROM_LOAD( "tg_ic66.ic66",  0x0400000, 0x0200000, CRC(52682953) SHA1(82cde061bdd827ed4a47a9a4256cd0e887ebc29d) ) // Sound only
+	ROM_FILL(                  0x0600000, 0x0200000, 0x00 )          // Empty
+	ROM_LOAD( "tg_ic67.ic67",  0x0800000, 0x0400000, CRC(c0a2ce5b) SHA1(94b024373c7c546c0f4fe9737639f02e9c7ebbdb) ) // GFX only
+ROM_END
+
+ROM_START( touchgonnac ) // REF 950906, no plug-in daughterboard, non North America notice, also found on REF: 950510-1 with daughterboard
 	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "1.ic63", 0x000000, 0x080000, CRC(fd3b4642) SHA1(3cab42aecad5ee641711763c6047b56784c2bcf3) ) // IC63 for REF: 950510-1, IC56 for REF: 950906
 	ROM_LOAD16_BYTE( "2.ic64", 0x000001, 0x080000, CRC(ee891835) SHA1(9f8c60e5e3696b70f756c3521e10313005053cc7) ) // IC64 for REF: 950510-1, IC57 for REF: 950906
@@ -1958,21 +2093,10 @@ ROM_START( touchgon ) // REF 950906, no plug-in daughterboard, Non North America
 	ROM_LOAD( "tg_ic67.ic67",  0x0800000, 0x0400000, CRC(c0a2ce5b) SHA1(94b024373c7c546c0f4fe9737639f02e9c7ebbdb) ) // GFX only
 ROM_END
 
-ROM_START( touchgoe ) // REF: 950510-1
+ROM_START( touchgoun ) // REF: 950510-1 - ds5002fp unpopulated, game is unprotected
 	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
-	ROM_LOAD16_BYTE( "tg56.ic63", 0x000000, 0x080000, CRC(6d0f5c65) SHA1(00db7a7da3ec1676169aa78fe4f08a7746c3accf) ) // IC63 for REF: 950510-1, IC56 for REF: 950906
-	ROM_LOAD16_BYTE( "tg57.ic64", 0x000001, 0x080000, CRC(845787b5) SHA1(27c9910cd9f38328326ecb5cd093dfeb6d4f6244) ) // IC64 for REF: 950510-1, IC57 for REF: 950906
-
-	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) // DS5002FP code
-	ROM_LOAD( "touchgo_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(6a238adb) SHA1(4ac5ff8e3d90454f764477146a0b8dc8c8062420) )
-
-	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
-	// touchgo requires some values in scratchram to be initialized or it won't copy the high score table when it boots
-	ROM_LOAD( "touchgo_scratch", 0x00, 0x80, CRC(f9ca54ff) SHA1(416f7bd89442dc1f736efe457b0f9a7f4f9f0bd5) )
-	// these are the default states stored in NVRAM
-	DS5002FP_SET_MON( 0x19 )
-	DS5002FP_SET_RPCTL( 0x00 )
-	DS5002FP_SET_CRCR( 0x80 )
+	ROM_LOAD16_BYTE( "tg_d_56_1e4b_no_dallas.ic56", 0x000000, 0x080000, CRC(cbb87505) SHA1(f19832af60fb6273c3263ebdd93bb7705ab61e20) ) // IC63 for REF: 950510-1, IC56 for REF: 950906
+	ROM_LOAD16_BYTE( "tg_d_57_060d_no_dallas.ic57", 0x000001, 0x080000, CRC(36bcc7e7) SHA1(2fff881ba0a99ebcfe3c03fdc61f4bf40e152c7f) ) // IC64 for REF: 950510-1, IC57 for REF: 950906
 
 	ROM_REGION( 0x1400000, "gfx", 0 ) // GFX + Sound
 	// 0x0000000-0x0ffffff filled in in the DRIVER_INIT
@@ -1985,21 +2109,6 @@ ROM_START( touchgoe ) // REF: 950510-1
 	ROM_LOAD( "tg_ic67.ic67",  0x0800000, 0x0400000, CRC(c0a2ce5b) SHA1(94b024373c7c546c0f4fe9737639f02e9c7ebbdb) ) // GFX only
 ROM_END
 
-ROM_START( touchgok ) // REF: 950510-1 - ds5002fp unpopulated, game is unprotected
-	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
-	ROM_LOAD16_BYTE( "56.ic56", 0x000000, 0x080000, CRC(cbb87505) SHA1(f19832af60fb6273c3263ebdd93bb7705ab61e20) ) // IC63 for REF: 950510-1, IC56 for REF: 950906
-	ROM_LOAD16_BYTE( "57.ic57", 0x000001, 0x080000, CRC(36bcc7e7) SHA1(2fff881ba0a99ebcfe3c03fdc61f4bf40e152c7f) ) // IC64 for REF: 950510-1, IC57 for REF: 950906
-
-	ROM_REGION( 0x1400000, "gfx", 0 ) // GFX + Sound
-	// 0x0000000-0x0ffffff filled in in the DRIVER_INIT
-	ROM_LOAD( "tg_ic69.ic69",  0x1000000, 0x0200000, CRC(18bb12d4) SHA1(ee6e7a63b86c56d71e62db0ae5892ab3ab94b0a0) ) // GFX only
-
-	ROM_REGION( 0x0c00000, "gfx_temp", 0 ) // Temporary storage
-	ROM_LOAD( "tg_ic65.ic65",  0x0000000, 0x0400000, CRC(91b89c7c) SHA1(1c24b494b56845b0f21be40ab737f251d7683c7d) ) // GFX only
-	ROM_LOAD( "tg_ic66.ic66",  0x0400000, 0x0200000, CRC(52682953) SHA1(82cde061bdd827ed4a47a9a4256cd0e887ebc29d) ) // Sound only
-	ROM_FILL(                  0x0600000, 0x0200000, 0x00 )          // Empty
-	ROM_LOAD( "tg_ic67.ic67",  0x0800000, 0x0400000, CRC(c0a2ce5b) SHA1(94b024373c7c546c0f4fe9737639f02e9c7ebbdb) ) // GFX only
-ROM_END
 
 /*============================================================================
                             SNOW BOARD
@@ -2733,32 +2842,36 @@ GAME( 1994, aligatorun,  aligator,  alighunt,         alighunt, gaelco2_state,  
 GAME( 1994, aligatoruna, aligator,  alighunt,         alighunt, gaelco2_state,  init_alighunt,  ROT0, "Gaelco", "Alligator Hunt (unprotected, set 2)", 0 ) // strange version, starts on space stages, but clearly a recompile not a trivial hack of the above, show version maybe?
 GAME( 1994, aligatorp,   aligator,  alighunt_d5002fp, alighunt, gaelco2_state,  empty_init,     ROT0, "Gaelco", "Alligator Hunt (protected, prototype?)", MACHINE_NOT_WORKING ) // requires different protection program / data
 
-GAME( 1995, touchgo,     0,         touchgo_d5002fp,  touchgo,  gaelco2_state,  init_touchgo,   ROT0, "Gaelco", "Touch and Go (World)", 0 )
-GAME( 1995, touchgon,    touchgo,   touchgo_d5002fp,  touchgo,  gaelco2_state,  init_touchgo,   ROT0, "Gaelco", "Touch and Go (Non North America)", 0 )
-GAME( 1995, touchgoe,    touchgo,   touchgo_d5002fp,  touchgo,  gaelco2_state,  init_touchgo,   ROT0, "Gaelco", "Touch and Go (earlier revision)",  0 )
-GAME( 1995, touchgok,    touchgo,   touchgo,          touchgo,  gaelco2_state,  init_touchgo,   ROT0, "Gaelco", "Touch and Go (Korea, unprotected)", 0 ) // doesn't say 'Korea' but was sourced there, shows 2 copyright lines like the 'earlier revision'
+GAME( 1996, touchgo,     0,         touchgo_d5002fp,  touchgo,  gaelco2_state,  init_touchgo,   ROT0, "Gaelco", "Touch and Go (World, 05/Feb/1996, checksum 059D0235)",             0 )
+GAME( 1995, touchgoa,    touchgo,   touchgo_d5002fp,  touchgo,  gaelco2_state,  init_touchgo,   ROT0, "Gaelco", "Touch and Go (World, 11/Dec/1995, checksum 05A0C7FB)",             0 )
+GAME( 1995, touchgona,   touchgo,   touchgo_d5002fp,  touchgo,  gaelco2_state,  init_touchgo,   ROT0, "Gaelco", "Touch and Go (North America, 14/Nov/1995, checksum 05737572)",     0 )
+GAME( 1995, touchgonna,  touchgo,   touchgo_d5002fp,  touchgo,  gaelco2_state,  init_touchgo,   ROT0, "Gaelco", "Touch and Go (non North America, 16/Nov/1995, checksum 056533F0)", 0 )
+GAME( 1995, touchgonnaa, touchgo,   touchgo_d5002fp,  touchgo,  gaelco2_state,  init_touchgo,   ROT0, "Gaelco", "Touch and Go (non North America, 15/Nov/1995, checksum 056C2336)", 0 )
+GAME( 1995, touchgonnab, touchgo,   touchgo_d5002fp,  touchgo,  gaelco2_state,  init_touchgo,   ROT0, "Gaelco", "Touch and Go (non North America, 15/Nov/1995, checksum 056C138F)", 0 )
+GAME( 1995, touchgonnac, touchgo,   touchgo_d5002fp,  touchgo,  gaelco2_state,  init_touchgo,   ROT0, "Gaelco", "Touch and Go (non North America, 11/Nov/2005, checksum 056AA304)", 0 )
+GAME( 1995, touchgoun,   touchgo,   touchgo,          touchgo,  gaelco2_state,  init_touchgo,   ROT0, "Gaelco", "Touch and Go (unprotected, checksum 059CC336)",                    0 )
 
 GAME( 1995, wrally2,     0,         wrally2,          wrally2,  wrally2_state,  init_wrally2,   ROT0, "Gaelco", "World Rally 2: Twin Racing (mask ROM version)", 0 )
 GAME( 1995, wrally2a,    wrally2,   wrally2,          wrally2,  wrally2_state,  empty_init,     ROT0, "Gaelco", "World Rally 2: Twin Racing (EPROM version)", 0 )
 
 // All sets identify as Version 1.0, but are clearly different revisions
-GAME( 1996, maniacsq,    0,         maniacsq_d5002fp, maniacsq, gaelco2_state,  empty_init,     ROT0, "Gaelco", "Maniac Square (protected, Version 1.0, Checksum DEEE)", 0 )
-GAME( 1996, maniacsqa,   maniacsq,  maniacsq_d5002fp, maniacsq, gaelco2_state,  empty_init,     ROT0, "Gaelco", "Maniac Square (protected, Version 1.0, Checksum CF2D)", 0 )
-GAME( 1996, maniacsqu,   maniacsq,  maniacsq,         maniacsq, gaelco2_state,  empty_init,     ROT0, "Gaelco", "Maniac Square (unprotected, Version 1.0, Checksum BB73)", 0 )
-GAME( 1996, maniacsqs,   maniacsq,  maniacsqs,        snowboar, snowboar_state, empty_init,     ROT0, "Gaelco", "Maniac Square (unprotected, Version 1.0, Checksum 66B1, 960419/1 PCB)", 0 ) // Official version on Snow Board Championship PCB, doesn't use the protection
+GAME( 1996, maniacsq,    0,         maniacsq_d5002fp, maniacsq, gaelco2_state,  empty_init,     ROT0, "Gaelco", "Maniac Square (protected, version 1.0, checksum DEEE)", 0 )
+GAME( 1996, maniacsqa,   maniacsq,  maniacsq_d5002fp, maniacsq, gaelco2_state,  empty_init,     ROT0, "Gaelco", "Maniac Square (protected, version 1.0, checksum CF2D)", 0 )
+GAME( 1996, maniacsqu,   maniacsq,  maniacsq,         maniacsq, gaelco2_state,  empty_init,     ROT0, "Gaelco", "Maniac Square (unprotected, version 1.0, checksum BB73)", 0 )
+GAME( 1996, maniacsqs,   maniacsq,  maniacsqs,        snowboar, snowboar_state, empty_init,     ROT0, "Gaelco", "Maniac Square (unprotected, version 1.0, checksum 66B1, 960419/1 PCB)", 0 ) // Official version on Snow Board Championship PCB, doesn't use the protection
 
-GAME( 1997, snowboar,    0,         snowboar,         snowboar, snowboar_state, empty_init,     ROT0, "Gaelco / OMK", "Snow Board Championship (Version 2.1)", 0 )
-GAME( 1996, snowboara,   snowboar,  snowboar,         snowboar, snowboar_state, init_snowboara, ROT0, "Gaelco / OMK", "Snow Board Championship (Version 2.0)", 0 )
+GAME( 1997, snowboar,    0,         snowboar,         snowboar, snowboar_state, empty_init,     ROT0, "Gaelco / OMK", "Snow Board Championship (version 2.1)", 0 )
+GAME( 1996, snowboara,   snowboar,  snowboar,         snowboar, snowboar_state, init_snowboara, ROT0, "Gaelco / OMK", "Snow Board Championship (version 2.0)", 0 )
 
-GAME( 1998, bang,        0,         bang,             bang,     bang_state,     empty_init,     ROT0, "Gaelco / Bit Managers", "Bang!", 0 )
+GAME( 1998, bang,        0,         bang,             bang,     bang_state,     empty_init,     ROT0, "Gaelco / Bit Managers",                    "Bang!", 0 )
 GAME( 1999, bangj,       bang,      bang,             bang,     bang_state,     empty_init,     ROT0, "Gaelco / Bit Managers (GM Shoji license)", "Gun Gabacho (Japan)", 0 )
 
 // Hardware manufactured by Gaelco for Nova Desitec but without any Gaelco branding.
 
 // 2-in-1 gambling game, these are Italian versions, English versions also exist
-GAME( 1999, play2000,    0,         play2000,         play2000, gaelco2_state,  init_play2000,  ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v7.0i) (Italy)",  0 )
-GAME( 1999, play2000_50i,play2000,  play2000,         play2000, gaelco2_state,  empty_init,     ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v5.0i) (Italy)",  MACHINE_NOT_WORKING ) // bad dump
-GAME( 1999, play2000_40i,play2000,  play2000,         play2000, gaelco2_state,  init_play2000,  ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v4.0i) (Italy)",  0 )
+GAME( 1999, play2000,    0,         play2000,         play2000, gaelco2_state,  init_play2000,  ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v7.0i) (Italy)", 0 )
+GAME( 1999, play2000_50i,play2000,  play2000,         play2000, gaelco2_state,  empty_init,     ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v5.0i) (Italy)", MACHINE_NOT_WORKING ) // bad dump
+GAME( 1999, play2000_40i,play2000,  play2000,         play2000, gaelco2_state,  init_play2000,  ROT0, "Nova Desitec", "Play 2000 (Super Slot & Gran Tesoro) (v4.0i) (Italy)", 0 )
 
 GAME( 1998, srollnd,     0,         srollnd,          play2000, gaelco2_state,  init_play2000,  ROT0, "Nova Desitec", "Super Roller (v7.0)",  MACHINE_NOT_WORKING ) // missing ds5002fp dump
 
@@ -2767,6 +2880,6 @@ GAME( 1999, chmppool,    0,         srollnd,          play2000, gaelco2_state,  
 GAME( 1999, jungleani,   0,         srollnd,          play2000, gaelco2_state,  init_play2000,  ROT0, "New Impeuropex Corp. / New Chitarrina", "Jungle's Animals (v3.0)", MACHINE_NOT_WORKING ) // Developed by Nova Desitec, missing ds5002fp dump
 
 // Gym equipment
-GAME( 1997, sltpcycl,   0,          saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter Fitness Bike V.1.0, Checksum 02AB)", 0 ) // Same board and ROM as Pro Reclimber
-GAME( 1997, sltpstep,   0,          saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter Fitness Stepper V.1.0, Checksum F208)", 0 )
+GAME( 1997, sltpcycl,   0,          saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, V.1.0, checksum 02AB)", 0 ) // Same board and ROM as Pro Reclimber
+GAME( 1997, sltpstep,   0,          saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, V.1.0, checksum F208)", 0 )
 // there are other devices in Cardioline series but they don't use displays and aren't on Gaelco hardware
