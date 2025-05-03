@@ -25,11 +25,10 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
-	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	bool m_installed;
 
-	required_device<ram_device> m_ram;
+	memory_share_creator<u8>    m_ram;
 	required_ioport             m_jumpers;
 	required_ioport             m_config;
 };
@@ -37,7 +36,7 @@ protected:
 h_8_1_device::h_8_1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
 	device_t(mconfig, H8BUS_H_8_1, tag, owner, 0),
 	device_h8bus_card_interface(mconfig, *this),
-	m_ram(*this, "mem"),
+	m_ram(*this, "ram", 0x2000U, ENDIANNESS_LITTLE),
 	m_jumpers(*this, "JUMPERS"),
 	m_config(*this, "CONFIG")
 {
@@ -60,17 +59,10 @@ void h_8_1_device::device_reset()
 		u16 base_addr = (jumpers & 0x07) << 13;
 		u16 top_addr = base_addr + (BIT(config, 0) ? 0x1fff : 0x0fff);
 
-		h8bus().space(AS_PROGRAM).install_readwrite_handler(base_addr, top_addr,
-			read8sm_delegate(m_ram, FUNC(ram_device::read)),
-			write8sm_delegate(m_ram, FUNC(ram_device::write)));
+		h8bus().space(AS_PROGRAM).install_ram(base_addr, top_addr, m_ram);
 
 		m_installed = true;
 	}
-}
-
-void h_8_1_device::device_add_mconfig(machine_config &config)
-{
-	RAM(config, m_ram).set_default_size("8K").set_default_value(0x00);
 }
 
 static INPUT_PORTS_START( h_8_1_jumpers )
