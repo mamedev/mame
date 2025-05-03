@@ -571,7 +571,6 @@ void z80_device::device_start()
 	save_item(NAME(m_ea));
 	save_item(NAME(m_service_attention));
 	save_item(NAME(m_tmp_irq_vector));
-	save_item(NAME(m_shared_addr.w));
 	save_item(NAME(m_shared_data.w));
 	save_item(NAME(m_shared_data2.w));
 	save_item(NAME(m_rtemp));
