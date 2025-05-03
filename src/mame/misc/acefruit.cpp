@@ -41,9 +41,9 @@ public:
 		m_refresh_timer(nullptr)
 	{ }
 
-	void acefruit(machine_config &config);
+	void acefruit(machine_config &config) ATTR_COLD;
 
-	void init_sidewndr();
+	void init_sidewndr() ATTR_COLD;
 
 	template <int Mask> int sidewndr_payout_r();
 	template <int Mask> int starspnr_coinage_r();
@@ -88,14 +88,14 @@ private:
 
 void acefruit_state::update_irq(int vpos)
 {
-	int row = vpos / 8;
+	const int row = vpos / 8;
 
-	for( int col = 0; col < 32; col++ )
+	for (int col = 0; col < 32; col++)
 	{
-		int tile_index = ( col * 32 ) + row;
-		int color = m_colorram[ tile_index ];
+		const int tile_index = (col * 32) + row;
+		const int color = m_colorram[tile_index];
 
-		switch( color )
+		switch (color)
 		{
 		case 0x0c:
 			m_maincpu->set_input_line(0, HOLD_LINE);
@@ -106,7 +106,7 @@ void acefruit_state::update_irq(int vpos)
 
 TIMER_CALLBACK_MEMBER(acefruit_state::refresh_tick)
 {
-	int vpos = m_screen->vpos();
+	const int vpos = m_screen->vpos();
 
 	m_screen->update_partial(vpos);
 	update_irq(vpos);
@@ -135,40 +135,40 @@ INTERRUPT_GEN_MEMBER(acefruit_state::vblank)
 
 uint32_t acefruit_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int startrow = cliprect.min_y / 8;
-	int endrow = cliprect.max_y / 8;
+	const int startrow = cliprect.min_y / 8;
+	const int endrow = cliprect.max_y / 8;
 
-	for( int row = startrow; row <= endrow; row++ )
+	for (int row = startrow; row <= endrow; row++)
 	{
 		int spriterow = 0;
 		int spriteindex = 0;
 		int spriteparameter = 0;
 
-		for( int col = 0; col < 32; col++ )
+		for (int col = 0; col < 32; col++)
 		{
-			int tile_index = ( col * 32 ) + row;
-			int code = m_videoram[ tile_index ];
-			int color = m_colorram[ tile_index ];
+			const int tile_index = (col * 32) + row;
+			const int code = m_videoram[tile_index];
+			const int color = m_colorram[tile_index];
 
-			if( color < 0x4 )
+			if (color < 0x4)
 			{
 				m_gfxdecode->gfx(1)->opaque(bitmap,cliprect, code, color, 0, 0, col * 16, row * 8 );
 			}
-			else if( color >= 0x5 && color <= 0x7 )
+			else if (color >= 0x5 && color <= 0x7)
 			{
-				static const int spriteskip[] = { 1, 2, 4 };
-				int spritesize = spriteskip[ color - 5 ];
-				gfx_element *gfx =  m_gfxdecode->gfx(0);
+				constexpr int spriteskip[] = { 1, 2, 4 };
+				const int spritesize = spriteskip[color - 5];
+				gfx_element &gfx = *m_gfxdecode->gfx(0);
 
-				for( int x = 0; x < 16; x++ )
+				for (int x = 0; x < 16; x++)
 				{
-					int sprite = ( m_spriteram[ ( spriteindex / 64 ) % 6 ] & 0xf ) ^ 0xf;
-					const uint8_t *gfxdata = gfx->get_data(sprite);
+					const int sprite = (m_spriteram[(spriteindex / 64) % 6] & 0xf) ^ 0xf;
+					uint8_t const *const gfxdata = gfx.get_data(sprite);
 
-					for( int y = 0; y < 8; y++ )
+					for (int y = 0; y < 8; y++)
 					{
-						uint16_t *dst = &bitmap.pix(y + ( row * 8 ), x + ( col * 16 ) );
-						*( dst ) = *( gfxdata + ( ( spriterow + y ) * gfx->rowbytes() ) + ( ( spriteindex % 64 ) >> 1 ) );
+						uint16_t &dst = bitmap.pix(y + (row * 8), x + (col * 16));
+						dst = gfxdata[((spriterow + y) * gfx.rowbytes()) + ((spriteindex % 64) >> 1)];
 					}
 
 					spriteindex += spritesize;
@@ -176,30 +176,30 @@ uint32_t acefruit_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			}
 			else
 			{
-				for( int x = 0; x < 16; x++ )
+				for (int x = 0; x < 16; x++)
 				{
-					for( int y = 0; y < 8; y++ )
+					for (int y = 0; y < 8; y++)
 					{
-						uint16_t *dst = &bitmap.pix(y + ( row * 8 ), x + ( col * 16 ) );
-						*( dst ) = 0;
+						uint16_t &dst = bitmap.pix(y + (row * 8), x + (col * 16));
+						dst = 0;
 					}
 				}
 
-				if( color == 0x8 )
+				if (color == 0x8)
 				{
-					if( spriteparameter == 0 )
+					if (spriteparameter == 0)
 					{
 						spriteindex = code & 0xf;
 					}
 					else
 					{
-						spriterow = ( ( code >> 0 ) & 0x3 ) * 8;
-						spriteindex += ( ( code >> 2 ) & 0x1 ) * 16;
+						spriterow = ((code >> 0) & 0x3 ) * 8;
+						spriteindex += ((code >> 2) & 0x1) * 16;
 					}
 
 					spriteparameter = !spriteparameter;
 				}
-				else if( color == 0xc )
+				else if (color == 0xc)
 				{
 					/* irq generated in update_irq() */
 				}
@@ -242,7 +242,7 @@ int acefruit_state::starspnr_payout_r()
 
 void acefruit_state::colorram_w(offs_t offset, uint8_t data)
 {
-	m_colorram[ offset ] = data & 0xf;
+	m_colorram[offset] = data & 0xf;
 }
 
 void acefruit_state::coin_w(uint8_t data)
@@ -351,7 +351,7 @@ static INPUT_PORTS_START( sidewndr )
 
 	PORT_START("IN2")   // 2
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME( "Cancel/Clear" )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME( "Refill" ) PORT_CODE(KEYCODE_R) PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME( "Refill" ) PORT_TOGGLE
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )              /* "Token in" - also "Refill" when "Refill" mode ON */
 	PORT_BIT( 0x08, 0x00, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(acefruit_state::sidewndr_payout_r<0x00>))
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -427,7 +427,7 @@ static INPUT_PORTS_START( spellbnd )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME( "Cancel" )          /* see IN4 bit 0 in "Accountancy System" mode */
 
 	PORT_MODIFY("IN4")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME( "Clear Data" )     /* in "Accountancy System" mode */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) PORT_NAME( "Clear Data" )     /* in "Accountancy System" mode */
 	/* Similar to 'sidewndr' but different addresses */
 	PORT_DIPNAME( 0x04, 0x04, "Lamp 11 always ON" )         /* code at 0x072a - write lamp status at 0x00ff */
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
