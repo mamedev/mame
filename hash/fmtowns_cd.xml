@@ -18618,7 +18618,7 @@ User/save disks that can be created from the game itself are not included.
 			</diskarea>
 		</part>
 		<part name="cdrom3" interface="cdrom">
-			<feature name="part_id" value="道元禅師著　正法眼蔵 /　Dougen Zenji-cho - Shoubou Genzou"/>
+			<feature name="part_id" value="道元禅師著　正法眼蔵 / Dougen Zenji-cho - Shoubou Genzou"/>
 			<diskarea name="cdrom">
 				<disk name="moko - dougen zenji 750-kai daionki kinen (japan) (dougen zenji-cho - shoubou genzou)" sha1="26581b3bd70a996ec02b5e9b20e171b15c8be81c" />
 			</diskarea>
