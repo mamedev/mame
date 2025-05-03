@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:O. Galibert, Aaron Giles
 /***************************************************************************
 
     sound.cpp
@@ -23,6 +23,8 @@
 
 #include "osdepend.h"
 
+#include "util/language.h"
+
 #include <algorithm>
 
 //**************************************************************************
@@ -36,7 +38,7 @@
 #define LOG_OSD_STREAMS (1U << 3)
 #define LOG_ORDER       (1U << 4)
 
-#define VERBOSE 0
+#define VERBOSE -1
 
 #include "logmacro.h"
 
@@ -189,7 +191,7 @@ template<typename S> void emu::detail::output_buffer_flat<S>::resample(u32 previ
 		return;
 
 	auto si = [](attotime time, u32 rate) -> s64 {
-		return time.m_seconds * rate + ((time.m_attoseconds / 100'000'000) * rate) / 10'000'000'000LL;
+		return time.m_seconds * rate + ((time.m_attoseconds / 100000000) * rate) / 10000000000LL;
 	};
 
 	auto cv = [](u32 source_rate, u32 dest_rate, s64 time) -> std::pair<s64, double> {
@@ -657,7 +659,11 @@ sound_manager::sound_manager(running_machine &machine) :
 	m_muted(0),
 	m_nosound_mode(machine.osd().no_sound()),
 	m_unique_id(0),
-	m_wavfile()
+	m_wavfile(),
+	m_resampler_type(RESAMPLER_LOFI),
+	m_resampler_hq_latency(0.005),
+	m_resampler_hq_length(400),
+	m_resampler_hq_phases(200)
 {
 	// register callbacks
 	machine.configuration().config_register(
@@ -2462,14 +2468,62 @@ void sound_manager::streams_update()
 }
 
 //**// Resampler management
-
 const audio_resampler *sound_manager::get_resampler(u32 fs, u32 ft)
 {
 	auto key = std::make_pair(fs, ft);
 	auto i = m_resamplers.find(key);
 	if(i != m_resamplers.end())
 		return i->second.get();
-	auto *res = new audio_resampler(fs, ft);
+	audio_resampler *res;
+	if(m_resampler_type == RESAMPLER_HQ)
+		res = new audio_resampler_hq(fs, ft, m_resampler_hq_latency, m_resampler_hq_length, m_resampler_hq_phases);
+	else
+		res = new audio_resampler_lofi(fs, ft);
 	m_resamplers[key].reset(res);
 	return res;
+}
+
+void sound_manager::rebuild_all_resamplers()
+{
+	m_resamplers.clear();
+
+	for(auto &stream : m_stream_list)
+		stream->create_resamplers();
+
+	for(auto &stream : m_stream_list)
+		stream->lookup_history_sizes();	
+}
+
+void sound_manager::set_resampler_type(u32 type)
+{
+	m_resampler_type = type;
+	rebuild_all_resamplers();
+}
+
+void sound_manager::set_resampler_hq_latency(double latency)
+{
+	m_resampler_hq_latency = latency;
+	rebuild_all_resamplers();
+}
+
+void sound_manager::set_resampler_hq_length(u32 length)
+{
+	m_resampler_hq_length = length;
+	rebuild_all_resamplers();
+}
+
+void sound_manager::set_resampler_hq_phases(u32 phases)
+{
+	m_resampler_hq_phases = phases;
+	rebuild_all_resamplers();
+}
+
+const char *sound_manager::resampler_type_names(u32 type) const
+{
+	using util::lang_translate;
+
+	if(type == RESAMPLER_HQ)
+		return _("HQ");
+	else
+		return _("LoFi");
 }

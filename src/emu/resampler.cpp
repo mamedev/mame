@@ -149,7 +149,7 @@
 // Having the sum of coefficients being 1 ensures that.
 
 
-audio_resampler::audio_resampler(u32 fs, u32 ft)
+audio_resampler_hq::audio_resampler_hq(u32 fs, u32 ft, float latency, u32 max_order_per_lane, u32 max_lanes)
 {
 	m_ft = ft;
 	m_fs = fs;
@@ -160,13 +160,13 @@ audio_resampler::audio_resampler(u32 fs, u32 ft)
 	m_fsm = ft / gcd;
 
 	// Compute the per-phase filter length to limit the latency to 5ms and capping it
-	m_order_per_lane = u32(fs * 0.005 * 2);
-	if(m_order_per_lane > 400)
-		m_order_per_lane = 400;
+	m_order_per_lane = u32(fs * latency * 2);
+	if(m_order_per_lane > max_order_per_lane)
+		m_order_per_lane = max_order_per_lane;
 
-	// Reduce the number of phases to be less than 200
+	// Reduce the number of phases to be less than max_lanes
 	m_phase_shift = 0;
-	while(((m_fsm - 1) >> m_phase_shift) >= 200)
+	while(((m_fsm - 1) >> m_phase_shift) >= max_lanes)
 		m_phase_shift ++;
 
 	m_phases = ((m_fsm - 1) >> m_phase_shift) + 1;
@@ -217,7 +217,7 @@ audio_resampler::audio_resampler(u32 fs, u32 ft)
 	m_skip  = m_ftm / m_fsm;
 }
 
-u32 audio_resampler::compute_gcd(u32 fs, u32 ft)
+u32 audio_resampler_hq::compute_gcd(u32 fs, u32 ft)
 {
 	u32 v1 = fs > ft ? fs : ft;
 	u32 v2 = fs > ft ? ft : fs;
@@ -229,7 +229,12 @@ u32 audio_resampler::compute_gcd(u32 fs, u32 ft)
 	return v1;
 }
 
-void audio_resampler::apply(const emu::detail::output_buffer_flat<sample_t> &src, std::vector<sample_t> &dest, u64 dest_sample, u32 srcc, float gain, u32 samples) const
+u32 audio_resampler_hq::history_size() const
+{
+	return m_order_per_lane;
+}
+
+void audio_resampler_hq::apply(const emu::detail::output_buffer_flat<sample_t> &src, std::vector<sample_t> &dest, u64 dest_sample, u32 srcc, float gain, u32 samples) const
 {
 	u32 seconds = dest_sample / m_ft;
 	u32 dsamp = dest_sample % m_ft;
@@ -255,7 +260,7 @@ void audio_resampler::apply(const emu::detail::output_buffer_flat<sample_t> &src
 	}
 }
 
-void audio_resampler::apply(const emu::detail::output_buffer_interleaved<s16> &src, std::vector<sample_t> &dest, u64 dest_sample, u32 srcc, float gain, u32 samples) const
+void audio_resampler_hq::apply(const emu::detail::output_buffer_interleaved<s16> &src, std::vector<sample_t> &dest, u64 dest_sample, u32 srcc, float gain, u32 samples) const
 {
 	u32 seconds = dest_sample / m_ft;
 	u32 dsamp = dest_sample % m_ft;
@@ -287,7 +292,7 @@ void audio_resampler::apply(const emu::detail::output_buffer_interleaved<s16> &s
 }
 
 
-void audio_resampler::apply(const emu::detail::output_buffer_flat<sample_t> &src, std::vector<s16> &dest, u32 destc, int dchannels, u64 dest_sample, u32 srcc, float gain, u32 samples) const
+void audio_resampler_hq::apply(const emu::detail::output_buffer_flat<sample_t> &src, std::vector<s16> &dest, u32 destc, int dchannels, u64 dest_sample, u32 srcc, float gain, u32 samples) const
 {
 	u32 seconds = dest_sample / m_ft;
 	u32 dsamp = dest_sample % m_ft;
@@ -314,4 +319,121 @@ void audio_resampler::apply(const emu::detail::output_buffer_flat<sample_t> &src
 			s ++;
 		}
 	}
+}
+
+
+// Now for the lo-fi version
+//
+// We mostly forget about filtering, and just try to do a decent
+// interpolation.  There's a nice 4-point formula used in yamaha
+// devices from around 2000:
+//   f0(t) = (t - t**3)/6
+//   f1(t) = t + (t**2 - t**3)/2
+//
+// The polynoms are used with the decimal part 'p' (as in phase) of
+// the sample position.  The computation from the four samples s0..s3
+// is:
+//   s = - s0 * f0(1-p) + s1 * f1(1-p) + s2 * f1(p) - s3 * f0(p)
+//
+// The target sample must be between s1 and s2.
+//
+// When upsampling, that's enough.  When downsampling, it feels like a
+// good idea to filter a little with a moving average, dividing the
+// source frequency by an integer just big enough to make the final
+// source frequency lower.
+
+// Sample interpolation functions f0 and f1
+
+const std::array<std::array<float, 0x1001>, 2> audio_resampler_lofi::interpolation_table = []() {
+	std::array<std::array<float, 0x1001>, 2> result;
+
+	// The exact way of doing the computations replicate the values
+	// actually used by the chip (which are very probably a rom, of
+	// course).
+
+	for(u32 i=1; i != 4096; i++) {
+		float p = i / 4096.0;
+		result[0][i] = (p - p*p*p) / 6;
+	}
+	for(u32 i=1; i != 2049; i++) {
+		float p = i / 4096.0;
+		result[1][i] = p + (p*p - p*p*p) / 2;
+	}
+	for(u32 i=2049; i != 4096; i++)
+		// When interpolating, f1 is added and f0 is subtracted, and the total must be 1
+		result[1][i] = 1.0 + result[0][i] + result[0][4096-i] - result[1][4096-i];
+
+	result[0][     0] = 0.0;
+	result[0][0x1000] = 0.0;
+	result[1][     0] = 0.0;
+	result[1][0x1000] = 1.0;
+	return result;
+}();
+
+audio_resampler_lofi::audio_resampler_lofi(u32 fs, u32 ft)
+{
+	m_fs = fs;
+	m_ft = ft;
+
+	m_source_divide = fs <= ft ? 1 : 1+fs/ft;
+	m_step = u64(fs) * 0x1000 / ft / m_source_divide;
+}
+
+
+u32 audio_resampler_lofi::history_size() const
+{
+	return 5 * m_source_divide;
+}
+
+void audio_resampler_lofi::apply(const emu::detail::output_buffer_flat<sample_t> &src, std::vector<sample_t> &dest, u64 dest_sample, u32 srcc, float gain, u32 samples) const
+{
+	u32 seconds = dest_sample / m_ft;
+	u32 dsamp = dest_sample % m_ft;
+	u64 ssamp = (u64(dsamp) * m_fs * 0x1000) / m_ft;
+	u64 ssample = (ssamp >> 12) + u64(m_fs) * seconds;
+	u32 phase = ssamp & 0xfff;
+	if(m_source_divide > 1) {
+		u32 delta = ssample % m_source_divide;
+		phase = (phase | (delta << 12)) / m_source_divide;
+		ssample -= delta;
+	}
+
+	// We're getting 2 samples latency, which is small enough
+
+	ssample -= 4*m_source_divide;
+
+	const sample_t *s = src.ptrs(srcc, ssample - src.sync_sample());
+
+	std::function<sample_t()> reader;
+	if(m_source_divide == 1)
+		reader = [s]() mutable -> sample_t { return *s++; };
+	else
+		reader = [s, count = m_source_divide]() mutable -> sample_t { sample_t sm = 0; for(u32 i=0; i != count; i++) { sm += *s++; } return sm / count; };
+
+	sample_t s0 = reader();
+	sample_t s1 = reader();
+	sample_t s2 = reader();
+	sample_t s3 = reader();
+
+	sample_t *d = dest.data();
+	for(u32 sample = 0; sample != samples; sample++) {
+		*d++ = gain * (- s0 * interpolation_table[0][0x1000-phase] + s1 * interpolation_table[1][0x1000-phase] + s2 * interpolation_table[1][phase] - s3 * interpolation_table[0][phase]);
+
+		phase += m_step;
+		if(phase & 0x1000) {
+			phase &= 0xfff;
+			s0 = s1;
+			s1 = s2;
+			s2 = s3;
+			s3 = reader();
+		}
+	}
+}
+
+void audio_resampler_lofi::apply(const emu::detail::output_buffer_interleaved<s16> &src, std::vector<sample_t> &dest, u64 dest_sample, u32 srcc, float gain, u32 samples) const
+{
+}
+
+void audio_resampler_lofi::apply(const emu::detail::output_buffer_flat<sample_t> &src, std::vector<s16> &dest, u32 destc, int dchannels, u64 dest_sample, u32 srcc, float gain, u32 samples) const
+{
 }
