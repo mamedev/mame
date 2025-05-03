@@ -272,7 +272,7 @@ multiplies the current gain by the given value.
 The method ``set_sample_rate`` allows to change the sample rate of the
 stream.  The method ``update`` triggers a call of
 ``sound_stream_update`` on the stream and the ones it depends on to
-compute all samples up to and including the one spanning the current time.
+compute all samples whose ``sample_time()`` is smaller than the update time.
 
 
 4. Devices using device_mixer_interface
