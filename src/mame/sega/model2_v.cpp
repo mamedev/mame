@@ -2563,9 +2563,10 @@ void model2_state::geo_parse( void )
 	u32  address = (m_geo_read_start_address & 0x1ffff)/4;
 	u32 *input = &m_bufferram[address];
 	u32  opcode;
+	u32  op_count = 0;
 	bool end_code = false;
 
-	while( end_code == false && (input - m_bufferram) < 0x20000/4  )
+	while( end_code == false && (input - m_bufferram) < 0x20000/4 && op_count++ < 0x8000 )
 	{
 		/* read in the opcode */
 		opcode = *input++;
