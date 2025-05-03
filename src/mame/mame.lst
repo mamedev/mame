@@ -43174,8 +43174,15 @@ minifram
 @source:skeleton/minihock.cpp
 minihockey
 
-@source:skeleton/miuchiz.cpp
+@source:misc/miuchiz.cpp
 miuchiz
+mcb_cloe
+mcb_yasmin
+mcm_creeper
+mcm_inferno
+mcm_roc
+mcp_dash
+mcp_spike
 
 @source:skeleton/ml20.cpp
 ml20
