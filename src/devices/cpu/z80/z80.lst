@@ -6359,8 +6359,9 @@ edff	# DB   ED
 
 00db	# IN   A,(n)
 	call arg
-	call in TDAT8 | (A << 8)
-	A = TDAT8; WZ = (TDAT8 | (A << 8)) + 1; // Check!
+	TDAT2 = TDAT8 | (A << 8);
+	call in TDAT2
+	A = TDAT8; WZ = (TDAT2 | (A << 8)) + 1;
 
 00dc	# CALL C,a
 	TDAT8 = F & CF;
