@@ -35,6 +35,30 @@ ft5_v6_c2.u60 | Graphics
 ft5_v6_c3.u61 |
 ft5_v6_c4.u58 /
 
+
+koftball has a full set of soft settings accessible from the bookeeping menu:
+
+English translation         Default  Chinese
+
+odds adjustment                      機率調整
+five of a kind boost            0    五梅加强
+royal flush boost               0    同花大順加强
+straight flush boost            0    同花順加强
+four of a kind boost            0    四梅加强
+                                0    小牌加强
+odds                           98.5  機率
+double up odds                 98    比倍
+
+system settings                      系統設定
+minimum bet to win jackpot     30    中彩金最小押分
+payout unit                   100    退分單位
+maximum bet                   100    押分上限
+bet unit                        2    押分單位
+minimum bet                    20    最小押分
+key-in unit                   200    上分單位
+key-in limit                 5000    上分上限
+credit limit                50000    得分上限
+
 */
 
 #include "emu.h"
@@ -111,7 +135,8 @@ private:
 	u8 m_pixpal = 0;
 
 	void irq_ack_w(u8 data);
-	void outputs_w(u8 data);
+	void koftball_outputs_w(u8 data);
+	void kaimenhu_outputs_w(u8 data);
 	u16 random_number_r();
 	u16 prot_r();
 	u16 kaimenhu_prot_r();
@@ -125,9 +150,10 @@ private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+
+	void koftball_mem(address_map &map) ATTR_COLD;
 	void jxzh_mem(address_map &map) ATTR_COLD;
 	void kaimenhu_mem(address_map &map) ATTR_COLD;
-	void koftball_mem(address_map &map) ATTR_COLD;
 	void ramdac_map(address_map &map) ATTR_COLD;
 };
 
@@ -300,7 +326,15 @@ void koftball_state::irq_ack_w(u8 data)
 			m_maincpu->set_input_line(i, CLEAR_LINE);
 }
 
-void koftball_state::outputs_w(u8 data)
+void koftball_state::koftball_outputs_w(u8 data)
+{
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 0)); // credits paid out by key-out
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 1)); // credits in
+	// bit 3 always set?
+	// bit 7 always set?
+}
+
+void koftball_state::kaimenhu_outputs_w(u8 data)
 {
 	m_hopper->motor_w(BIT(data, 0));
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 1)); // credits in
@@ -339,7 +373,7 @@ void koftball_state::koftball_mem(address_map &map)
 
 	map(0x2dc000, 0x2dc000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x2f0000, 0x2f0003).portr("INPUTS");
-	map(0x300000, 0x300001).nopw();
+	map(0x300001, 0x300001).w(FUNC(koftball_state::koftball_outputs_w));
 	map(0x320000, 0x320000).lw8(NAME([this] (u8 data) { m_gfx_ctrl = data; LOGGFX("GFX ctrl $320000 (layer enable) %02x\n", data); }));
 	map(0x340000, 0x340001).r(FUNC(koftball_state::prot_r));
 	map(0x360000, 0x360001).w(FUNC(koftball_state::prot_w));
@@ -375,7 +409,7 @@ void koftball_state::jxzh_mem(address_map &map)
 
 	map(0x2dc000, 0x2dc000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x2f0000, 0x2f0001).portr("INPUTS");
-	map(0x300001, 0x300001).w(FUNC(koftball_state::outputs_w));
+	map(0x300001, 0x300001).w(FUNC(koftball_state::kaimenhu_outputs_w));
 	map(0x320000, 0x320000).lw8(NAME([this] (u8 data) { m_gfx_ctrl = data; LOGGFX("GFX ctrl $320000 (layer enable) %02x\n", data); }));
 	map(0x340000, 0x340001).r(FUNC(koftball_state::prot_r));
 	map(0x360000, 0x360001).w(FUNC(koftball_state::prot_w));
@@ -399,71 +433,71 @@ static INPUT_PORTS_START( koftball )
 	PORT_START("INPUTS")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) // also decrease in sound test
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) // also increase in sound test
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) // Decrease in settings menus
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) // Down in settings menus
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) // Up in settings menus
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) // Increase in settings menus
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
 
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) // Default in settings menus
 	PORT_SERVICE_NO_TOGGLE( 0x1000, IP_ACTIVE_LOW ) // test mode enter
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
 
 	PORT_START("DSW")
-	PORT_DIPNAME(    0x0001, 0x0001, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:!8")
-	PORT_DIPSETTING(         0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(         0x0000, DEF_STR( On ) )
-	PORT_DIPNAME(    0x0002, 0x0002, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:!7")
-	PORT_DIPSETTING(         0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(         0x0000, DEF_STR( On ) )
-	PORT_DIPNAME(    0x0004, 0x0004, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:!6")
-	PORT_DIPSETTING(         0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(         0x0000, DEF_STR( On ) )
-	PORT_DIPNAME(    0x0008, 0x0008, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:!5")
-	PORT_DIPSETTING(         0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(         0x0000, DEF_STR( On ) )
-	PORT_DIPNAME(    0x0010, 0x0010, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:!4")
-	PORT_DIPSETTING(         0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(         0x0000, DEF_STR( On ) )
-	PORT_DIPNAME(    0x0020, 0x0020, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:!3")
-	PORT_DIPSETTING(         0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(         0x0000, DEF_STR( On ) )
-	PORT_DIPNAME(    0x0040, 0x0040, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:!2")
-	PORT_DIPSETTING(         0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(         0x0000, DEF_STR( On ) )
-	PORT_DIPNAME(    0x0080, 0x0080, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:!1")
-	PORT_DIPSETTING(         0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(         0x0000, DEF_STR( On ) )
-	PORT_DIPNAME(    0x0100, 0x0100, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:!8")
-	PORT_DIPSETTING(         0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(         0x0000, DEF_STR( On ) )
-	PORT_DIPNAME(    0x0200, 0x0200, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:!7")
-	PORT_DIPSETTING(         0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(         0x0000, DEF_STR( On ) )
-	PORT_DIPNAME(    0x0400, 0x0400, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:!6")
-	PORT_DIPSETTING(         0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(         0x0000, DEF_STR( On ) )
-	PORT_DIPNAME(    0x0800, 0x0800, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:!5")
-	PORT_DIPSETTING(         0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(         0x0000, DEF_STR( On ) )
-	PORT_DIPNAME(    0x1000, 0x1000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:!4")
-	PORT_DIPSETTING(         0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(         0x0000, DEF_STR( On ) )
-	PORT_DIPNAME(    0x2000, 0x2000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:!3")
-	PORT_DIPSETTING(         0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(         0x0000, DEF_STR( On ) )
-	PORT_DIPNAME(    0x4000, 0x4000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:!2")
-	PORT_DIPSETTING(         0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(         0x0000, DEF_STR( On ) )
-	PORT_DIPNAME(    0x8000, 0x0000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:!1")
-	PORT_DIPSETTING(         0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(         0x0000, DEF_STR( On ) )
+	PORT_DIPNAME(    0x0001, 0x0001, DEF_STR(Unknown) )     PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(         0x0001, DEF_STR(Off) )
+	PORT_DIPSETTING(         0x0000, DEF_STR(On) )
+	PORT_DIPNAME(    0x0002, 0x0002, DEF_STR(Unknown) )     PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(         0x0002, DEF_STR(Off) )
+	PORT_DIPSETTING(         0x0000, DEF_STR(On) )
+	PORT_DIPNAME(    0x0004, 0x0004, DEF_STR(Unknown) )     PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(         0x0004, DEF_STR(Off) )
+	PORT_DIPSETTING(         0x0000, DEF_STR(On) )
+	PORT_DIPNAME(    0x0008, 0x0008, DEF_STR(Unknown) )     PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(         0x0008, DEF_STR(Off) )
+	PORT_DIPSETTING(         0x0000, DEF_STR(On) )
+	PORT_DIPNAME(    0x0010, 0x0010, DEF_STR(Unknown) )     PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(         0x0010, DEF_STR(Off) )
+	PORT_DIPSETTING(         0x0000, DEF_STR(On) )
+	PORT_DIPNAME(    0x0020, 0x0020, "Show Spend" )         PORT_DIPLOCATION("SW1:3") // shows the amount you've spent as well above current credits when on
+	PORT_DIPSETTING(         0x0020, DEF_STR(Off) )
+	PORT_DIPSETTING(         0x0000, DEF_STR(On) )
+	PORT_DIPNAME(    0x0040, 0x0040, DEF_STR(Unknown) )     PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(         0x0040, DEF_STR(Off) )
+	PORT_DIPSETTING(         0x0000, DEF_STR(On) )
+	PORT_DIPNAME(    0x0080, 0x0080, DEF_STR(Unknown) )     PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(         0x0080, DEF_STR(Off) )
+	PORT_DIPSETTING(         0x0000, DEF_STR(On) )
+	PORT_DIPNAME(    0x0100, 0x0100, DEF_STR(Unknown) )     PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(         0x0100, DEF_STR(Off) )
+	PORT_DIPSETTING(         0x0000, DEF_STR(On) )
+	PORT_DIPNAME(    0x0200, 0x0200, DEF_STR(Unknown) )     PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(         0x0200, DEF_STR(Off) )
+	PORT_DIPSETTING(         0x0000, DEF_STR(On) )
+	PORT_DIPNAME(    0x0400, 0x0400, DEF_STR(Unknown) )     PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(         0x0400, DEF_STR(Off) )
+	PORT_DIPSETTING(         0x0000, DEF_STR(On) )
+	PORT_DIPNAME(    0x0800, 0x0800, DEF_STR(Unknown) )     PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(         0x0800, DEF_STR(Off) )
+	PORT_DIPSETTING(         0x0000, DEF_STR(On) )
+	PORT_DIPNAME(    0x1000, 0x1000, DEF_STR(Unknown) )     PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(         0x1000, DEF_STR(Off) )
+	PORT_DIPSETTING(         0x0000, DEF_STR(On) )
+	PORT_DIPNAME(    0x2000, 0x2000, DEF_STR(Unknown) )     PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(         0x2000, DEF_STR(Off) )
+	PORT_DIPSETTING(         0x0000, DEF_STR(On) )
+	PORT_DIPNAME(    0x4000, 0x4000, DEF_STR(Unknown) )     PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(         0x4000, DEF_STR(Off) )
+	PORT_DIPSETTING(         0x0000, DEF_STR(On) )
+	PORT_DIPNAME(    0x8000, 0x0000, DEF_STR(Demo_Sounds) ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(         0x8000, DEF_STR(Off) )
+	PORT_DIPSETTING(         0x0000, DEF_STR(On) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( kaimenhu )
@@ -632,6 +666,7 @@ void koftball_state::kaimenhu(machine_config &config)
 }
 
 
+// 足球王 (Zúqiú Wáng), BMC 1995
 ROM_START( koftball )
 	ROM_REGION( 0x20000, "maincpu", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "ft5_v16_c6.u15", 0x00000, 0x10000, CRC(5e1784a5) SHA1(5690d315500fb533b12b598cb0a51bd1eadd0505) )
@@ -769,6 +804,6 @@ void koftball_state::init_koftball()
 } // anonymous namespace
 
 
-GAME( 1995, koftball, 0,    koftball, koftball, koftball_state, init_koftball, ROT0, "BMC", "King of Football",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, jxzh,     0,    jxzh,     jxzh,     koftball_state, empty_init,    ROT0, "BMC", "Jinxiu Zhonghua",   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, kaimenhu, jxzh, kaimenhu, kaimenhu, koftball_state, empty_init,    ROT0, "BMC", "Kaimen Hu",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, koftball, 0,    koftball, koftball, koftball_state, init_koftball, ROT0, "BMC", "Zuqiu Wang - King of Football",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, jxzh,     0,    jxzh,     jxzh,     koftball_state, empty_init,    ROT0, "BMC", "Jinxiu Zhonghua",                MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, kaimenhu, jxzh, kaimenhu, kaimenhu, koftball_state, empty_init,    ROT0, "BMC", "Kaimen Hu",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
