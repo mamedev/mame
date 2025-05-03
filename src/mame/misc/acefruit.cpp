@@ -129,8 +129,8 @@ void acefruit_state::video_start()
 
 INTERRUPT_GEN_MEMBER(acefruit_state::vblank)
 {
-	device.execute().set_input_line(0, HOLD_LINE );
-	m_refresh_timer->adjust( attotime::zero );
+	device.execute().set_input_line(0, HOLD_LINE);
+	m_refresh_timer->adjust(attotime::zero);
 }
 
 uint32_t acefruit_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -193,7 +193,7 @@ uint32_t acefruit_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 					}
 					else
 					{
-						spriterow = ((code >> 0) & 0x3 ) * 8;
+						spriterow = ((code >> 0) & 0x3) * 8;
 						spriteindex += ((code >> 2) & 0x1) * 16;
 					}
 
@@ -287,24 +287,24 @@ void acefruit_state::solenoid_w(uint8_t data)
 void acefruit_state::palette_init(palette_device &palette) const
 {
 	/* sprites */
-	palette.set_pen_color( 0, rgb_t(0x00, 0x00, 0x00) );
-	palette.set_pen_color( 1, rgb_t(0x00, 0x00, 0xff) );
-	palette.set_pen_color( 2, rgb_t(0x00, 0xff, 0x00) );
-	palette.set_pen_color( 3, rgb_t(0xff, 0x7f, 0x00) );
-	palette.set_pen_color( 4, rgb_t(0xff, 0x00, 0x00) );
-	palette.set_pen_color( 5, rgb_t(0xff, 0xff, 0x00) );
-	palette.set_pen_color( 6, rgb_t(0xff, 0xff, 0xff) );
-	palette.set_pen_color( 7, rgb_t(0x7f, 0x3f, 0x1f) );
+	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00));
+	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0xff));
+	palette.set_pen_color(2, rgb_t(0x00, 0xff, 0x00));
+	palette.set_pen_color(3, rgb_t(0xff, 0x7f, 0x00));
+	palette.set_pen_color(4, rgb_t(0xff, 0x00, 0x00));
+	palette.set_pen_color(5, rgb_t(0xff, 0xff, 0x00));
+	palette.set_pen_color(6, rgb_t(0xff, 0xff, 0xff));
+	palette.set_pen_color(7, rgb_t(0x7f, 0x3f, 0x1f));
 
 	/* tiles */
-	palette.set_pen_color( 8, rgb_t(0x00, 0x00, 0x00) );
-	palette.set_pen_color( 9, rgb_t(0xff, 0xff, 0xff) );
-	palette.set_pen_color( 10, rgb_t(0x00, 0x00, 0x00) );
-	palette.set_pen_color( 11, rgb_t(0xff, 0x00, 0x00) );
-	palette.set_pen_color( 12, rgb_t(0x00, 0x00, 0x00) );
-	palette.set_pen_color( 13, rgb_t(0x00, 0xff, 0x00) );
-	palette.set_pen_color( 14, rgb_t(0x00, 0x00, 0x00) );
-	palette.set_pen_color( 15, rgb_t(0x00, 0x00, 0xff) );
+	palette.set_pen_color(8, rgb_t(0x00, 0x00, 0x00) );
+	palette.set_pen_color(9, rgb_t(0xff, 0xff, 0xff) );
+	palette.set_pen_color(10, rgb_t(0x00, 0x00, 0x00) );
+	palette.set_pen_color(11, rgb_t(0xff, 0x00, 0x00) );
+	palette.set_pen_color(12, rgb_t(0x00, 0x00, 0x00) );
+	palette.set_pen_color(13, rgb_t(0x00, 0xff, 0x00) );
+	palette.set_pen_color(14, rgb_t(0x00, 0x00, 0x00) );
+	palette.set_pen_color(15, rgb_t(0x00, 0x00, 0xff) );
 }
 
 void acefruit_state::main_map(address_map &map)
@@ -633,7 +633,7 @@ void acefruit_state::acefruit(machine_config &config)
 void acefruit_state::init_sidewndr()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
-	/* replace "ret nc" ( 0xd0 ) with "di" */
+	/* replace "ret nc" (0xd0) with "di" */
 	ROM[0] = 0xf3;
 	/* this is either a bad dump or the cpu core should set the carry flag on reset */
 }
