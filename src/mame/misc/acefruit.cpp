@@ -111,9 +111,9 @@ TIMER_CALLBACK_MEMBER(acefruit_state::refresh_tick)
 	m_screen->update_partial(vpos);
 	update_irq(vpos);
 
-	vpos = ((vpos / 8) + 1) * 8;
+	const int next_vpos = ((vpos / 8) + 1) * 8;
 
-	m_refresh_timer->adjust(m_screen->time_until_pos(vpos));
+	m_refresh_timer->adjust(m_screen->time_until_pos(next_vpos));
 }
 
 void acefruit_state::machine_start()
