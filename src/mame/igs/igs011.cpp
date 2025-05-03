@@ -60,7 +60,7 @@ To do:
   Also the background palette is wrong since the fade routine is called with wrong
   parameters, but in this case the PCB does the same.
 
-- lhb3: DIP definitions
+- lhb3: emulated game crashes with an illegal instruction error on bookkeeping menu
 
 - xymga: stop during attract mode with 'RECORD ERROR 3'
 
@@ -151,11 +151,11 @@ public:
 protected:
 	struct blitter_t
 	{
-		u16  x, y, w, h,
-			gfx_lo, gfx_hi,
-			depth,
-			pen,
-			flags;
+		u16  x = 0, y = 0, w = 0, h = 0,
+			gfx_lo = 0, gfx_hi = 0,
+			depth = 0,
+			pen = 0,
+			flags = 0;
 	};
 
 	/* devices */
@@ -179,29 +179,29 @@ protected:
 	optional_ioport m_io_coin;
 
 	std::unique_ptr<u8[]> m_layer[8];
-	u16 m_priority;
-	u8 m_blitter_pen_hi;
-	u16 m_dips_sel;
-	u16 m_input_sel;
-	u16 m_hopper_bit;
-	u8 m_prot1;
-	u8 m_prot1_swap;
-	u32 m_prot1_addr;
-	u8 m_prot2;
-	u8 m_igs012_prot;
-	u8 m_igs012_prot_swap;
-	u8 m_igs012_prot_mode;
-	u16 m_igs003_reg;
-	u16 m_lhb_irq_enable;
+	u16 m_priority = 0;
+	u8 m_blitter_pen_hi = 0;
+	u16 m_dips_sel = 0;
+	u16 m_input_sel = 0;
+	u16 m_hopper_bit = 0;
+	u8 m_prot1 = 0;
+	u8 m_prot1_swap = 0;
+	u32 m_prot1_addr = 0;
+	u8 m_prot2 = 0;
+	u8 m_igs012_prot = 0;
+	u8 m_igs012_prot_swap = 0;
+	u8 m_igs012_prot_mode = 0;
+	u16 m_igs003_reg = 0;
+	u16 m_lhb_irq_enable = 0;
 
 	blitter_t m_blitter;
 
-	u16 m_igs003_prot_hold;
-	u8 m_igs003_prot_x;
-	u8 m_igs003_prot_y;
-	u8 m_igs003_prot_z;
-	u8 m_igs003_prot_h1;
-	u8 m_igs003_prot_h2;
+	u16 m_igs003_prot_hold = 0;
+	u8 m_igs003_prot_x = 0;
+	u8 m_igs003_prot_y = 0;
+	u8 m_igs003_prot_z = 0;
+	u8 m_igs003_prot_h1 = 0;
+	u8 m_igs003_prot_h2 = 0;
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
@@ -2907,7 +2907,7 @@ void igs011_state::lhb2_mem(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 
 //  lhb2: IGS011 protection dynamically mapped at 1ff8x
-//  map(0x01ff80, 0x01ff87).w(FUNC(igs011_state::igs011_prot1_w)).umask16(0xff00);
+//  map(0x01ff80, 0x01ff87).umask16(0xff00).w(FUNC(igs011_state::igs011_prot1_w));
 //  map(0x01ff88, 0x01ff89).r(FUNC(igs011_state::igs011_prot1_r));
 
 	map(0x020000, 0x0201ff).w(FUNC(igs011_state::igs011_prot2_inc_w));   // inc   (55)
@@ -2917,12 +2917,12 @@ void igs011_state::lhb2_mem(address_map &map)
 
 	map(0x100000, 0x103fff).ram().share("nvram");
 	map(0x200001, 0x200001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x204000, 0x204003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff);
+	map(0x204000, 0x204003).umask16(0x00ff).w("ymsnd", FUNC(ym2413_device::write));
 	map(0x208000, 0x208001).nopr().w(FUNC(igs011_state::igs003_w));
 	map(0x208002, 0x208003).rw(FUNC(igs011_state::lhb2_igs003_r), FUNC(igs011_state::lhb2_igs003_w));
 	map(0x20c000, 0x20cfff).ram().share(m_priority_ram);
-	map(0x210000, 0x210fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
-	map(0x211000, 0x211fff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).umask16(0x00ff).share("palette_ext");
+	map(0x210000, 0x210fff).umask16(0x00ff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).share("palette");
+	map(0x211000, 0x211fff).umask16(0x00ff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0x214000, 0x214001).portr("COIN");
 	map(0x300000, 0x3fffff).rw(FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
 	map(0xa20000, 0xa20001).w(FUNC(igs011_state::igs011_priority_w));
@@ -3406,7 +3406,7 @@ static INPUT_PORTS_START( lhb2 )
 	PORT_DIPSETTING(    0x20, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPNAME( 0x80, 0x80, "Credit Timer" )          PORT_DIPLOCATION("SW1:8")     // 自動清除  (clears credits after timeout if you don't start a game)
-	PORT_DIPSETTING(    0x80, DEF_STR(Off) )                                          // ?
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )                                          // 無
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                           // ?
 
 	PORT_START("DSW2")
@@ -3429,10 +3429,10 @@ static INPUT_PORTS_START( lhb2 )
 	PORT_DIPSETTING(    0x00, "Return Coins" )                                        // 退幣      (doesn't seem to work properly)
 	PORT_DIPNAME( 0x40, 0x40, "Auto Reach" )            PORT_DIPLOCATION("SW2:7")     // 自動摸打  (automatically draws and discards tiles after reach)
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                          // ?
-	PORT_DIPSETTING(    0x40, DEF_STR(On) )                                           // ?
+	PORT_DIPSETTING(    0x40, DEF_STR(On) )                                           // 有
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Demo_Sounds) )    PORT_DIPLOCATION("SW2:8")     // 示範音樂
-	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                          // ?
-	PORT_DIPSETTING(    0x80, DEF_STR(On) )                                           // ?
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                          // 無
+	PORT_DIPSETTING(    0x80, DEF_STR(On) )                                           // 有
 
 	PORT_START("DSW3")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW3:1,2")   // 破台限制
@@ -3441,10 +3441,10 @@ static INPUT_PORTS_START( lhb2 )
 	PORT_DIPSETTING(    0x01, "2000" )
 	PORT_DIPSETTING(    0x00, "?" )                                                   // ?限?
 	PORT_DIPNAME( 0x0c, 0x0c, "Gals" )                  PORT_DIPLOCATION("SW3:3,4")   // 美女
-	PORT_DIPSETTING(    0x0c, "0?" )                                                  // ?美女
-	PORT_DIPSETTING(    0x08, "1?" )                                                  // ?美女
-	PORT_DIPSETTING(    0x04, "2?" )                                                  // ?開女
-	PORT_DIPSETTING(    0x00, "3?" )                                                  // ?開女
+	PORT_DIPSETTING(    0x0c, DEF_STR(Off) )                                          // 無美女
+	PORT_DIPSETTING(    0x08, "1?" )                                                  // ??
+	PORT_DIPSETTING(    0x04, "2?" )                                                  // 開?
+	PORT_DIPSETTING(    0x00, "3?" )                                                  // 開?
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW3:5" )                                     // (not shown in settings display)
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW3:6" )                                     // (not shown in settings display)
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW3:7" )                                     // (not shown in settings display)
@@ -3600,7 +3600,7 @@ static INPUT_PORTS_START( tygn )
 	PORT_DIPSETTING(    0x10, DEF_STR(1C_3C) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR(Demo_Sounds) )    PORT_DIPLOCATION("SW1:7")      // 示範音樂
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                           // ?
-	PORT_DIPSETTING(    0x40, DEF_STR(On) )                                            // ?
+	PORT_DIPSETTING(    0x40, DEF_STR(On) )                                            // 有
 	PORT_DIPNAME( 0x80, 0x80, "Credit Timer" )          PORT_DIPLOCATION("SW1:8")      // 自動清除  (clears credits after timeout if you don't start a game)
 	PORT_DIPSETTING(    0x80, DEF_STR(Off) )                                           // ?
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                            // ?
@@ -3660,60 +3660,53 @@ static INPUT_PORTS_START( tygn )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( wlcc )
+static INPUT_PORTS_START( xymg )
 	PORT_START("DSW1")
-	PORT_DIPUNKNOWN( 0x01, 0x01 )
-	PORT_DIPUNKNOWN( 0x02, 0x02 )
-	PORT_DIPUNKNOWN( 0x04, 0x04 )
-	PORT_DIPUNKNOWN( 0x08, 0x08 )
-	PORT_DIPUNKNOWN( 0x10, 0x10 )
-	PORT_DIPUNKNOWN( 0x20, 0x20 )
-	PORT_DIPUNKNOWN( 0x40, 0x40 )
-	PORT_DIPUNKNOWN( 0x80, 0x80 )
-
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x03, "1000" )
-	PORT_DIPSETTING(    0x02, "1500" )
-	PORT_DIPSETTING(    0x01, "2000" )
-	PORT_DIPSETTING(    0x00, "3000" )
-	PORT_DIPNAME( 0x0c, 0x0c, "Min Bet" )
-	PORT_DIPSETTING(    0x0c, "1" )
-	PORT_DIPSETTING(    0x08, "2" )
-	PORT_DIPSETTING(    0x04, "3" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPUNKNOWN( 0x10, 0x10 )       // shown in test mode
-	PORT_DIPUNKNOWN( 0x20, 0x20 )
-	PORT_DIPNAME( 0x40, 0x40, "Hide Title" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPUNKNOWN( 0x80, 0x80 )
-
-	PORT_START("DSW3")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, "Credits Per Note" )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR(Coinage) )        PORT_DIPLOCATION("SW1:1,2")   // 投幣比率
+	PORT_DIPSETTING(    0x03, DEF_STR(1C_1C) )
+	PORT_DIPSETTING(    0x02, DEF_STR(1C_2C) )
+	PORT_DIPSETTING(    0x01, DEF_STR(1C_3C) )
+	PORT_DIPSETTING(    0x00, DEF_STR(1C_4C) )
+	PORT_DIPNAME( 0x0c, 0x0c, "Key-in Rate" )           PORT_DIPLOCATION("SW1:3,4")   // 開分比率
 	PORT_DIPSETTING(    0x0c, "10" )
 	PORT_DIPSETTING(    0x08, "20" )
 	PORT_DIPSETTING(    0x04, "50" )
 	PORT_DIPSETTING(    0x00, "100" )
-	PORT_DIPNAME( 0x10, 0x10, "Max Note Credits" )
+	PORT_DIPNAME( 0x10, 0x10, "Credit Limit" )          PORT_DIPLOCATION("SW1:5")     // 進分上限
 	PORT_DIPSETTING(    0x10, "500" )
-	PORT_DIPSETTING(    0x00, "9999" )
-	PORT_DIPNAME( 0x20, 0x20, "Money Type" )
-	PORT_DIPSETTING(    0x20, "Coins" ) // use bits 0-1
-	PORT_DIPSETTING(    0x00, "Notes" ) // use bits 2-3
-	PORT_DIPNAME( 0x40, 0x00, "Pay Out Type" )
-	PORT_DIPSETTING(    0x00, "Coins" )
-	PORT_DIPSETTING(    0x40, "Notes" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, "Unlimited" )                                           // 無限制     (if you have 10,000 or more credits, further credits will be rejected)
+	PORT_DIPNAME( 0x20, 0x20, "Credit Mode" )           PORT_DIPLOCATION("SW1:6")     // 進分方式
+	PORT_DIPSETTING(    0x20, "Coin Acceptor" )                                       // 投幣
+	PORT_DIPSETTING(    0x00, "Key-In" )                                              // 開分
+	PORT_DIPNAME( 0x40, 0x40, "Payout Mode" )           PORT_DIPLOCATION("SW1:7")     // 退分方式
+	PORT_DIPSETTING(    0x40, "Return Coins" )                                        // 退幣
+	PORT_DIPSETTING(    0x00, "Key-Out" )                                             // 洗分
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Demo_Sounds) )  PORT_DIPLOCATION("SW1:8")       // 示範音樂
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                          // 無
+	PORT_DIPSETTING(    0x80, DEF_STR(On) )                                           // 有
 
-	PORT_START("DSW4")
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x03, 0x03, "Double Up Jackpot" )     PORT_DIPLOCATION("SW2:1,2")   // 比倍爆機
+	PORT_DIPSETTING(    0x03, "1000" )
+	PORT_DIPSETTING(    0x02, "1500" )
+	PORT_DIPSETTING(    0x01, "2000" )
+	PORT_DIPSETTING(    0x00, "3000" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Minimum Bet" )           PORT_DIPLOCATION("SW2:3,4")   // 最小押注
+	PORT_DIPSETTING(    0x0c, "1" )
+	PORT_DIPSETTING(    0x08, "2" )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x10, 0x10, "Double Up Game" )        PORT_DIPLOCATION("SW2:5")     // 比倍遊戲
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                          // 無
+	PORT_DIPSETTING(    0x10, DEF_STR(On) )                                           // 有
+	PORT_DIPNAME( 0x20, 0x20, "Title Screen" )          PORT_DIPLOCATION("SW2:6" )    // (not shown in settings display)
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                          // (shows disclaimer and copyright message over black background)
+	PORT_DIPSETTING(    0x20, DEF_STR(On) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW2:7" )                                     // (not shown in settings display)
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )                                     // (not shown in settings display)
+
+	// FIXME: SW3 doesn't respond in input test - are these hooked up correctly?
+	PORT_START("DSW3")
 	PORT_DIPUNKNOWN( 0x01, 0x01 )
 	PORT_DIPUNKNOWN( 0x02, 0x02 )
 	PORT_DIPUNKNOWN( 0x04, 0x04 )
@@ -3723,25 +3716,113 @@ static INPUT_PORTS_START( wlcc )
 	PORT_DIPUNKNOWN( 0x40, 0x40 )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
+	// TODO: hook up SW4 shown in input test but not settings display
+	// TODO: hook up SW5 shown in input test but not settings display
+
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1     )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2     )
-	PORT_SERVICE_NO_TOGGLE( 0x04,   IP_ACTIVE_LOW ) // keep pressed while booting
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SERVICE1  )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_SERVICE2  ) // shown in test mode
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN   )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_OTHER     ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O)   // clear coin
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM   ) PORT_READ_LINE_MEMBER(FUNC(igs011_state::igs_hopper_r))   // hopper switch
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(igs011_state::igs_hopper_r)) // hopper switch
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )      // keep pressed while booting
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )   // stats
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )          PORT_CONDITION("DSW1", 0x20, EQUALS, 0x20)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )   PORT_CONDITION("DSW1", 0x20, EQUALS, 0x00)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_INCLUDE(igs_mahjong_matrix)
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( wlcc )
+	PORT_START("DSW1")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW3:1" )                                     // (not shown in settings display)
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW3:2" )                                     // (not shown in settings display)
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW3:3" )                                     // (not shown in settings display)
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW3:4" )                                     // (not shown in settings display)
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW3:5" )                                     // (not shown in settings display)
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW3:6" )                                     // (not shown in settings display)
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW3:7" )                                     // (not shown in settings display)
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW3:8" )                                     // (not shown in settings display)
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x03, 0x03, "Double Up Jackpot" )     PORT_DIPLOCATION("SW2:1,2")   // 比倍爆機
+	PORT_DIPSETTING(    0x03, "1000" )
+	PORT_DIPSETTING(    0x02, "1500" )
+	PORT_DIPSETTING(    0x01, "2000" )
+	PORT_DIPSETTING(    0x00, "3000" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Minimum Bet" )           PORT_DIPLOCATION("SW2:3,4")   // 最小押注
+	PORT_DIPSETTING(    0x0c, "1" )
+	PORT_DIPSETTING(    0x08, "2" )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x10, 0x10, "Double Up Game" )        PORT_DIPLOCATION("SW2:5")     // 比倍遊戲
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                          // 無
+	PORT_DIPSETTING(    0x10, DEF_STR(On) )                                           // 有
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW2:6" )                                     // (not shown in settings display)
+	PORT_DIPNAME( 0x40, 0x40, "Title Screen" )          PORT_DIPLOCATION("SW2:7" )    // (not shown in settings display)
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                          // (shows disclaimer and copyright message over black background)
+	PORT_DIPSETTING(    0x40, DEF_STR(On) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )                                     // (not shown in settings display)
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR(Coinage) )        PORT_DIPLOCATION("SW1:1,2")   // 投幣比率
+	PORT_DIPSETTING(    0x03, DEF_STR(1C_1C) )
+	PORT_DIPSETTING(    0x02, DEF_STR(1C_2C) )
+	PORT_DIPSETTING(    0x01, DEF_STR(1C_3C) )
+	PORT_DIPSETTING(    0x00, DEF_STR(1C_4C) )
+	PORT_DIPNAME( 0x0c, 0x0c, "Key-in Rate" )           PORT_DIPLOCATION("SW1:3,4")   // 開分比率
+	PORT_DIPSETTING(    0x0c, "10" )
+	PORT_DIPSETTING(    0x08, "20" )
+	PORT_DIPSETTING(    0x04, "50" )
+	PORT_DIPSETTING(    0x00, "100" )
+	PORT_DIPNAME( 0x10, 0x10, "Credit Limit" )          PORT_DIPLOCATION("SW1:5")     // 進分上限
+	PORT_DIPSETTING(    0x10, "500" )
+	PORT_DIPSETTING(    0x00, "Unlimited" )                                           // 無限制     (if you have 10,000 or more credits, further credits will be rejected)
+	PORT_DIPNAME( 0x20, 0x20, "Credit Mode" )           PORT_DIPLOCATION("SW1:6")     // 進分方式
+	PORT_DIPSETTING(    0x20, "Coin Acceptor" )                                       // 投幣
+	PORT_DIPSETTING(    0x00, "Key-In" )                                              // 開分
+	PORT_DIPNAME( 0x40, 0x40, "Payout Mode" )           PORT_DIPLOCATION("SW1:7")     // 退分方式
+	PORT_DIPSETTING(    0x40, "Return Coins" )                                        // 退幣
+	PORT_DIPSETTING(    0x00, "Key-Out" )                                             // 洗分
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Demo_Sounds) )    PORT_DIPLOCATION("SW1:8")     // 示範音樂
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                          // 無
+	PORT_DIPSETTING(    0x80, DEF_STR(On) )                                           // 有
+
+	PORT_START("DSW4")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW4:1" )                                     // (not shown in settings display)
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW4:2" )                                     // (not shown in settings display)
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW4:3" )                                     // (not shown in settings display)
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW4:4" )                                     // (not shown in settings display)
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW4:5" )                                     // (not shown in settings display)
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW4:6" )                                     // (not shown in settings display)
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW4:7" )                                     // (not shown in settings display)
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW4:8" )                                     // (not shown in settings display)
+
+	// TODO: hook up SW5 shown in input test but not settings display
+
+	PORT_START("COIN")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )          PORT_CONDITION("DSW3", 0x20, EQUALS, 0x20)  // 投幣
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )   PORT_CONDITION("DSW3", 0x20, EQUALS, 0x00)  // 投幣
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )                                                   // 測試
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                // 査帳
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET )                                               // 清除
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  PORT_CONDITION("DSW3", 0x40, EQUALS, 0x40)  // 退幣
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  PORT_CONDITION("DSW3", 0x40, EQUALS, 0x00)  // 退幣
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(igs011_state::igs_hopper_r)) // hopper switch
 
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )                                                     // 開始/得分
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )    // bet
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )                                                    // 摸/捨 大/雙比倍
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )                                                    // 押注 全比倍
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )                                                    // 功能 小/半比倍
 INPUT_PORTS_END
 
 
@@ -4019,76 +4100,6 @@ static INPUT_PORTS_START( vbowlj )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( xymg )
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:1,2")   // 投幣比率
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, "Key-in Rate" )           PORT_DIPLOCATION("SW1:3,4")   // 開分比率
-	PORT_DIPSETTING(    0x0c, "10" )
-	PORT_DIPSETTING(    0x08, "20" )
-	PORT_DIPSETTING(    0x04, "50" )
-	PORT_DIPSETTING(    0x00, "100" )
-	PORT_DIPNAME( 0x10, 0x10, "Credit Limit" )          PORT_DIPLOCATION("SW1:5")     // 進分上限
-	PORT_DIPSETTING(    0x10, "500" )
-	PORT_DIPSETTING(    0x00, "Unlimited" )                                           // 無限制     (if you have 10,000 or more credits, further credits will be rejected)
-	PORT_DIPNAME( 0x20, 0x20, "Credit Mode" )           PORT_DIPLOCATION("SW1:6")     // 進分方式
-	PORT_DIPSETTING(    0x20, "Coin Acceptor" )                                       // 投幣
-	PORT_DIPSETTING(    0x00, "Key-In" )                                              // 開分
-	PORT_DIPNAME( 0x40, 0x40, "Payout Mode" )           PORT_DIPLOCATION("SW1:7")     // 退分方式
-	PORT_DIPSETTING(    0x40, "Return Coins" )                                        // 退幣
-	PORT_DIPSETTING(    0x00, "Key-Out" )                                             // 洗分
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:8")     // 示範音樂
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )                                        // 無
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )                                         // 有
-
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, "Double Up Jackpot" )     PORT_DIPLOCATION("SW2:1,2")   // 比倍爆機
-	PORT_DIPSETTING(    0x03, "1000" )
-	PORT_DIPSETTING(    0x02, "1500" )
-	PORT_DIPSETTING(    0x01, "2000" )
-	PORT_DIPSETTING(    0x00, "3000" )
-	PORT_DIPNAME( 0x0c, 0x0c, "Minimum Bet" )           PORT_DIPLOCATION("SW2:3,4")   // 最小押注
-	PORT_DIPSETTING(    0x0c, "1" )
-	PORT_DIPSETTING(    0x08, "2" )
-	PORT_DIPSETTING(    0x04, "3" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x10, 0x10, "Double Up Game" )        PORT_DIPLOCATION("SW2:5")     // 比倍遊戲
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )                                        // 無
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )                                         // 有
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW2:6" )                                     // (not shown in settings display)
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW2:7" )                                     // (not shown in settings display)
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )                                     // (not shown in settings display)
-
-	// FIXME: SW3 doesn't respond in input test - are these hooked up correctly?
-	PORT_START("DSW3")
-	PORT_DIPUNKNOWN( 0x01, 0x01 )
-	PORT_DIPUNKNOWN( 0x02, 0x02 )
-	PORT_DIPUNKNOWN( 0x04, 0x04 )
-	PORT_DIPUNKNOWN( 0x08, 0x08 )
-	PORT_DIPUNKNOWN( 0x10, 0x10 )
-	PORT_DIPUNKNOWN( 0x20, 0x20 )
-	PORT_DIPUNKNOWN( 0x40, 0x40 )
-	PORT_DIPUNKNOWN( 0x80, 0x80 )
-
-	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(igs011_state::igs_hopper_r)) // hopper switch
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )      // keep pressed while booting
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )   // stats
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )          PORT_CONDITION("DSW1", 0x20, EQUALS, 0x20)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )   PORT_CONDITION("DSW1", 0x20, EQUALS, 0x00)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  PORT_CONDITION("DSW1", 0x40, EQUALS, 0x00)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_INCLUDE(igs_mahjong_matrix)
-INPUT_PORTS_END
-
-
 /***************************************************************************
 
     Machine Drivers
@@ -4142,7 +4153,8 @@ void igs011_state::igs011_base(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x2000/4);
 	m_palette->set_membits(8);
-//  GFXDECODE(config, "gfxdecode", m_palette, gfx_igs011);
+
+	//GFXDECODE(config, "gfxdecode", m_palette, gfx_igs011);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -4159,8 +4171,10 @@ TIMER_DEVICE_CALLBACK_MEMBER( igs011_state::timer_irq_cb )
 void igs011_state::drgnwrld(machine_config &config)
 {
 	igs011_base(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::drgnwrld_mem);
 	m_maincpu->set_vblank_int("screen", FUNC(igs011_state::irq6_line_hold));
+
 	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::timer_irq_cb<5>), attotime::from_hz(240)); // lev5 frequency drives the music tempo
 
 	YM3812(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 2.0);
@@ -4169,6 +4183,7 @@ void igs011_state::drgnwrld(machine_config &config)
 void igs011_state::drgnwrld_igs012(machine_config &config)
 {
 	drgnwrld(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::drgnwrld_igs012_mem);
 }
 
@@ -4192,8 +4207,10 @@ TIMER_DEVICE_CALLBACK_MEMBER( igs011_state::lhb_timer_irq_cb )
 void igs011_state::lhb(machine_config &config)
 {
 	igs011_base(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::lhb_mem);
 	m_maincpu->set_vblank_int("screen", FUNC(igs011_state::lhb_vblank_irq));
+
 	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::lhb_timer_irq_cb), attotime::from_hz(240)); // lev5 frequency drives the music tempo
 	// irq 3 points to an apparently unneeded routine
 }
@@ -4201,8 +4218,10 @@ void igs011_state::lhb(machine_config &config)
 void igs011_state::wlcc(machine_config &config)
 {
 	igs011_base(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::wlcc_mem);
 	m_maincpu->set_vblank_int("screen", FUNC(igs011_state::irq6_line_hold));
+
 	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::timer_irq_cb<3>), attotime::from_hz(240)); // lev3 frequency drives the music tempo
 }
 
@@ -4210,8 +4229,10 @@ void igs011_state::wlcc(machine_config &config)
 void igs011_state::xymg(machine_config &config)
 {
 	igs011_base(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::xymg_mem);
 	m_maincpu->set_vblank_int("screen", FUNC(igs011_state::irq6_line_hold));
+
 	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::timer_irq_cb<3>), attotime::from_hz(240)); // lev3 frequency drives the music tempo
 }
 
@@ -4219,6 +4240,7 @@ void igs011_state::xymg(machine_config &config)
 void igs011_state::xymga(machine_config &config)
 {
 	xymg(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::xymga_mem);
 }
 
@@ -4226,11 +4248,13 @@ void igs011_state::xymga(machine_config &config)
 void igs011_state::lhb2(machine_config &config)
 {
 	igs011_base(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::lhb2_mem);
 	m_maincpu->set_vblank_int("screen", FUNC(igs011_state::irq6_line_hold));
+
 	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::timer_irq_cb<5>), attotime::from_hz(240)); // lev5 frequency drives the music tempo
 
-//  GFXDECODE(config, "gfxdecode", m_palette, gfx_igs011_hi);
+	//GFXDECODE(config, "gfxdecode", m_palette, gfx_igs011_hi);
 
 	YM2413(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 2.0);
 }
@@ -4239,13 +4263,15 @@ void igs011_state::lhb2(machine_config &config)
 void igs011_state::nkishusp(machine_config &config)
 {
 	igs011_base(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::nkishusp_mem);
 	m_maincpu->set_vblank_int("screen", FUNC(igs011_state::irq6_line_hold));
+
 	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::timer_irq_cb<3>), attotime::from_hz(240)); // lev3 frequency drives the music tempo
 
 	// VSync 60.0052Hz, HSync 15.620kHz
 
-//  GFXDECODE(config, "gfxdecode", m_palette, gfx_igs011_hi);
+	//GFXDECODE(config, "gfxdecode", m_palette, gfx_igs011_hi);
 
 	YM2413(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 2.0);
 }
@@ -4254,28 +4280,32 @@ void igs011_state::nkishusp(machine_config &config)
 void igs011_state::tygn(machine_config &config)
 {
 	nkishusp(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::tygn_mem);
 }
 
 
 void vbowl_state::sound_irq(int state)
 {
-//   m_maincpu->set_input_line(3, state);
+	//m_maincpu->set_input_line(3, state);
 }
 
 void vbowl_state::vbowl(machine_config &config)
 {
 	igs011_base(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &vbowl_state::vbowl_mem);
 	m_maincpu->set_vblank_int("screen", FUNC(vbowl_state::irq6_line_hold));
+
 	TIMER(config, "timer_irq").configure_periodic(FUNC(vbowl_state::timer_irq_cb<3>), attotime::from_hz(240)); // lev3 frequency drives the music tempo
 	// irq 5 points to a debug function (all routines are clearly patched out)
 	// irq 4 points to an apparently unneeded routine
 
 	m_screen->screen_vblank().set(FUNC(vbowl_state::screen_vblank));
-//  GFXDECODE(config, "gfxdecode", m_palette, gfx_igs011_hi);
+	//GFXDECODE(config, "gfxdecode", m_palette, gfx_igs011_hi);
 
 	config.device_remove("oki");
+
 	ICS2115(config, m_ics, 33.8688_MHz_XTAL);
 	m_ics->irq().set(FUNC(vbowl_state::sound_irq));
 	m_ics->add_route(ALL_OUTPUTS, "mono", 5.0);
@@ -4284,6 +4314,7 @@ void vbowl_state::vbowl(machine_config &config)
 void vbowl_state::vbowlhk(machine_config &config)
 {
 	vbowl(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &vbowl_state::vbowlhk_mem);
 }
 
@@ -4593,7 +4624,7 @@ ROM_END
 
 /***************************************************************************
 
-    龙虎榜/Lóng hǔ bǎng (V035C)
+    龙虎榜/Lóng Hǔ Bǎng (V035C)
 
     Other files in the zip:
 
