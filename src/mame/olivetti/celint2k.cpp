@@ -12,7 +12,7 @@ Main PCB:
    |   POWER SUPPLY           |   BATT   |  GM76C256L-85  | |SN74HC245N| |_SN74HC74_|  |
    |                          |          |________________|               ___________  |
    |                          |           Xtal                           |M74HC00B1_|  |
-   |__________________________|        4.4334 MHz         ____________                |
+   |__________________________|        4.4334 MHz         ____________                 |
    |                                                      |           |                |
    |                                     Xtal 32.768 kHz  | OKI M6255 |                |
    |                 ___________          ___________     |___________|                |
@@ -129,11 +129,11 @@ void celint2k_state::celint2k(machine_config &config)
 
 	PCF8573(config, m_rtc, 32.768_kHz_XTAL);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD)); // TECDIS CA25001. Unknown resolution
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD)); // TECDIS C425901 backlight 320x240 gLCD
 	screen.set_refresh_hz(60); // Guess
 	screen.set_screen_update("msm6255", FUNC(msm6255_device::screen_update));
-	screen.set_size(640, 200); // Unknown resolution
-	screen.set_visarea(0, 640-1, 0, 200-1); // Unknown resolution
+	screen.set_size(320, 240);
+	screen.set_visarea(0, 320-1, 0, 240-1);
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(celint2k_state::celint2k_palette), 2);
