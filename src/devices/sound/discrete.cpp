@@ -1056,10 +1056,13 @@ void discrete_sound_device::sound_stream_update(sound_stream &stream)
 		outputnum++;
 	}
 
+	int inputnum = 0;
+
 	/* Setup any input streams */
 	for (discrete_dss_input_stream_node *node : m_input_stream_list)
 	{
-		node->m_inview_sample = 0;
+		node->set_input_ptr(stream, inputnum);
+		inputnum++;
 	}
 
 	/* just process it */
