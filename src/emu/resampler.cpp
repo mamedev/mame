@@ -417,7 +417,7 @@ void audio_resampler_lofi::apply(const emu::detail::output_buffer_flat<sample_t>
 
 	sample_t *d = dest.data();
 	for(u32 sample = 0; sample != samples; sample++) {
-		*d++ = gain * (- s0 * interpolation_table[0][0x1000-phase] + s1 * interpolation_table[1][0x1000-phase] + s2 * interpolation_table[1][phase] - s3 * interpolation_table[0][phase]);
+		*d++ += gain * (- s0 * interpolation_table[0][0x1000-phase] + s1 * interpolation_table[1][0x1000-phase] + s2 * interpolation_table[1][phase] - s3 * interpolation_table[0][phase]);
 
 		phase += m_step;
 		if(phase & 0x1000) {
