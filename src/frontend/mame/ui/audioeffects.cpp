@@ -105,6 +105,31 @@ bool menu_audio_effects::handle(event const *ev)
 		return true;
 	}
 
+	case IPT_UI_CLEAR: {
+		switch(uintptr_t(ev->itemref)) {
+		case RS_TYPE:
+			machine().sound().set_resampler_type(sound_manager::RESAMPLER_LOFI);
+			reset(reset_options::REMEMBER_POSITION);
+			return true;
+
+		case RS_LATENCY:
+			machine().sound().set_resampler_hq_latency(0.005);
+			reset(reset_options::REMEMBER_POSITION);
+			return true;
+
+		case RS_LENGTH:
+			machine().sound().set_resampler_hq_length(400);
+			reset(reset_options::REMEMBER_POSITION);
+			return true;
+
+		case RS_PHASES:
+			machine().sound().set_resampler_hq_phases(200);
+			reset(reset_options::REMEMBER_POSITION);
+			return true;
+		}
+		break;
+	}
+
 	case IPT_UI_LEFT: {
 		switch(uintptr_t(ev->itemref)) {
 		case RS_TYPE:
