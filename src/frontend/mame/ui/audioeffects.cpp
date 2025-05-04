@@ -214,6 +214,8 @@ u32 menu_audio_effects::flag_lat() const
 		flag |= FLAG_LEFT_ARROW;
 	if(latency < 0.0500)
 		flag |= FLAG_RIGHT_ARROW;
+	if(machine().sound().resampler_type() != sound_manager::RESAMPLER_HQ)
+		flag |= FLAG_INVERT | FLAG_DISABLE;
 	return flag;
 }
 
@@ -225,6 +227,8 @@ u32 menu_audio_effects::flag_length() const
 		flag |= FLAG_LEFT_ARROW;
 	if(latency < 500)
 		flag |= FLAG_RIGHT_ARROW;
+	if(machine().sound().resampler_type() != sound_manager::RESAMPLER_HQ)
+		flag |= FLAG_INVERT | FLAG_DISABLE;
 	return flag;
 }
 
@@ -236,6 +240,8 @@ u32 menu_audio_effects::flag_phases() const
 		flag |= FLAG_LEFT_ARROW;
 	if(latency < 1000)
 		flag |= FLAG_RIGHT_ARROW;
+	if(machine().sound().resampler_type() != sound_manager::RESAMPLER_HQ)
+		flag |= FLAG_INVERT | FLAG_DISABLE;
 	return flag;
 }
 
@@ -253,6 +259,7 @@ void menu_audio_effects::populate()
 	auto eff = sound.default_effect_chain();
 	for(u32 e = 0; e != eff.size(); e++)
 		item_append(_(audio_effect::effect_names[eff[e]->type()]), 0, (void *)intptr_t((0xffff << 16) | e));
+
 	item_append(_("Resampler"), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
 	item_append(_("Type"), sound.resampler_type_names(sound.resampler_type()), flag_type(), (void *)RS_TYPE);
 	item_append(_("HQ latency"), format_lat(sound.resampler_hq_latency()), flag_lat(), (void *)RS_LATENCY);
