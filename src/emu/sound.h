@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:O. Galibert, Aaron Giles
 /***************************************************************************
 
     sound.h
@@ -379,6 +379,11 @@ class sound_manager
 public:
 	using sample_t = sound_stream::sample_t;
 
+	enum {
+		RESAMPLER_LOFI,
+		RESAMPLER_HQ
+	};
+
 	struct mapping {
 		struct node_mapping {
 			u32 m_node;
@@ -464,6 +469,18 @@ public:
 	void default_effect_changed(u32 entry);
 
 	void mapping_update();
+
+	const char *resampler_type_names(u32 type) const;
+
+	u32 resampler_type() const { return m_resampler_type; }
+	double resampler_hq_latency() const { return m_resampler_hq_latency; }
+	u32 resampler_hq_length() const { return m_resampler_hq_length; }
+	u32 resampler_hq_phases() const { return m_resampler_hq_phases; }
+
+	void set_resampler_type(u32 type);
+	void set_resampler_hq_latency(double latency);
+	void set_resampler_hq_length(u32 length);
+	void set_resampler_hq_phases(u32 phases);
 
 private:
 	struct effect_step {
@@ -583,7 +600,7 @@ private:
 	void update_osd_streams();
 	void update_osd_input();
 	void speakers_update(attotime endtime);
-
+	void rebuild_all_resamplers();
 	void run_effects();
 
 	u64 rate_and_time_to_index(attotime time, u32 sample_rate) const;
@@ -642,6 +659,11 @@ private:
 	std::vector<std::unique_ptr<sound_stream>> m_stream_list; // list of streams
 	std::vector<sound_stream *> m_ordered_streams;  // Streams in update order
 	u32 m_outputs_count;
+
+	// resampler data
+	u32 m_resampler_type;
+	double m_resampler_hq_latency;
+	u32 m_resampler_hq_length, m_resampler_hq_phases;
 };
 
 

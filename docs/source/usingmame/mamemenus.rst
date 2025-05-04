@@ -356,6 +356,16 @@ parameters of the Default chain are fixed.  The default chain allows
 to create a global setup that one likes and have it applied everywhere
 by default.
 
+In addition, this menu allows to choose the resampler to use when
+converting sample rates between emulated devices.  The type allows to
+choose between a fast, lower quality one, "LoFi", and a slow, high
+quality one "HQ".  The HQ resampler is configurable.  The latency
+indicates the max latency of the resampler, which allows better
+quality when higher, the filter length balances quality and speed
+where a high value is highest quality but slowest speed, and phases
+balances quality and resampler creation time, with one again higher
+means better but slower.
+
 
 Filter effect
 ~~~~~~~~~~~~~
