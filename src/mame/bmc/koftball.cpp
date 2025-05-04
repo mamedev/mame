@@ -15,11 +15,9 @@ TODO:
 - jxzh and kaimenhu bookkeeping menus do not clear the background.
 - jxzh stops responding to inputs properly after winning a hand if
   stripping sequences are enabled.
-- jxzh last chance tiles are not visible.
-- kaimenhu will not let you play a hand.
+- jxzh last chance type A tiles are not visible.
 - Better understanding of the koftball protection.
 
---
 
 MC68000P10
 M28 (OKI 6295, next to ROM C9)
@@ -27,7 +25,7 @@ BMC ADB40817(80 Pin PQFP - Google hits, but no datasheet or description)
 RAMDAC TRC1710-80PCA (Monolithic 256-word by 18bit Look-up Table & Triple Video DAC with 6-bit DACs)
 File 89C67 (Clone of YM2413. Next to 3.57954MHz OSC)
 OSC: 21.47727MHz & 3.57954MHz
-2 8-way dipswitches
+2 8-way DIP switches
 part # scratched 64 pin PLCC (soccer ball sticker over this chip ;-)
 
 ft5_v16_c5.u14 \
@@ -65,17 +63,20 @@ key-in limit                 5000    上分上限
 credit limit                50000    得分上限
 
 
-jxzh and kaimenhu use an unusual control scheme:
+jxzh uses an unusual control scheme:
 * use Start to draw a tile
 * use Big (left) and Small (right) to select a tile to discard
 * use Start to discard the selected tile
+* Kan, Pon, Chi, Reach, Ron, Flip Flop and Bet function as expected in the main game
 * use Big (left) and Small (right) to select a tile to exchange during "first chance"
-* use Flip Flop to exchange a tile during "first chance"
+* use Flip Flop to exchange the selected tile during "first chance"
 * use Start to end "first chance"
 * use Start to select a tile during "last chance"
 * use Flip Flop to stake winnings on the double up game
 * use Ron to take winnings
-* kan, pon, chi, reach and ron function as expected
+
+kaimenhu appears to be just the first chance and double up games from
+jxzh (i.e. like a draw poker game but with mahjong tiles and hands).
 
 
 jxzh/kaimenhu test menu:
@@ -85,8 +86,12 @@ kan    graphics test    槓:圖型測試
 reach  sound test       聽:音樂測試
 ron    memory test      胡:記憶體測試
 chi    DIP switch test  吃:DIP 測試
-big    last hand test   大:前手牌
+big    last hand test   大:前手牌測試
 test   exit             離開　按《測試》
+
+
+kaimenhu has a full set of soft settings accessible from the bookeeping menu
+(default password is Start eight times)
 
 */
 
@@ -567,7 +572,7 @@ static INPUT_PORTS_START( kaimenhu )
 	PORT_DIPNAME(    0x0040, 0x0040, DEF_STR(Unknown) )        PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(         0x0040, DEF_STR(Off) )
 	PORT_DIPSETTING(         0x0000, DEF_STR(On) )
-	PORT_DIPNAME(    0x0080, 0x0080, DEF_STR(Unknown) )        PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME(    0x0080, 0x0080, "Double Up Game" )        PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(         0x0080, DEF_STR(Off) )
 	PORT_DIPSETTING(         0x0000, DEF_STR(On) )
 	PORT_DIPNAME(    0x0100, 0x0100, DEF_STR(Service_Mode) )   PORT_DIPLOCATION("SW2:8")
@@ -607,10 +612,13 @@ static INPUT_PORTS_START( jxzh )
 	PORT_DIPSETTING(         0x0000, "1 2 3 5 10 25 50 100" )
 	PORT_DIPNAME(    0x0040, 0x0040, "Last Chance Type" )      PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(         0x0040, "A" )                     // choose three of ten tiles
-	PORT_DIPSETTING(         0x0000, "B" )                     // deal ten tiles
-	PORT_DIPNAME(    0x0080, 0x0080, "Double Up Game" )        PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(         0x0080, DEF_STR(Off) )
-	PORT_DIPSETTING(         0x0000, DEF_STR(On) )             // also seems to enable stripping sequences
+	PORT_DIPSETTING(         0x0000, "B" )                     // draw ten tiles
+	PORT_DIPNAME(    0x0400, 0x0400, "Nudity" )                PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(         0x0400, DEF_STR(Off) )
+	PORT_DIPSETTING(         0x0000, DEF_STR(On) )
+	PORT_DIPNAME(    0x0800, 0x0800, "Auto Last Chance B" )    PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(         0x0800, DEF_STR(Off) )
+	PORT_DIPSETTING(         0x0000, DEF_STR(On) )             // automatically draws tiles for last chance type B
 	PORT_DIPNAME(    0x2000, 0x0000, "Gal Voice" )             PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(         0x2000, DEF_STR(Off) )
 	PORT_DIPSETTING(         0x0000, DEF_STR(On) )             // calls discarded tiles
@@ -838,6 +846,6 @@ void koftball_state::init_koftball()
 } // anonymous namespace
 
 
-GAME( 1995, koftball, 0,    koftball, koftball, koftball_state, init_koftball, ROT0, "BMC", "Zuqiu Wang - King of Football",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, jxzh,     0,    jxzh,     jxzh,     koftball_state, empty_init,    ROT0, "BMC", "Jinxiu Zhonghua",                MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, kaimenhu, jxzh, kaimenhu, kaimenhu, koftball_state, empty_init,    ROT0, "BMC", "Kaimen Hu",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, koftball, 0, koftball, koftball, koftball_state, init_koftball, ROT0, "BMC", "Zuqiu Wang - King of Football",  MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, jxzh,     0, jxzh,     jxzh,     koftball_state, empty_init,    ROT0, "BMC", "Jinxiu Zhonghua",                MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1996, kaimenhu, 0, kaimenhu, kaimenhu, koftball_state, empty_init,    ROT0, "BMC", "Kaimen Hu",                      MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
