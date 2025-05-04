@@ -844,7 +844,8 @@ void sound_manager::after_devices_init()
 	m_record_buffer.resize(m_outputs_count * machine().sample_rate(), 0);
 	m_record_samples = 0;
 
-	// Resamplers will be created at config load time
+	// Create resamplers and setup history
+	rebuild_all_resamplers();
 
 	m_effects_done = false;
 
