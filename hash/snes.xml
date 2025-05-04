@@ -2576,9 +2576,9 @@ Beyond that last category are the roms waiting to be classified.
             <feature name="enhancement" value="DSP1" />
             <feature name="pcb" value="SHVC-2Q0N-X1" />
             <feature name="u1" value="U1 EPROM" />
-            <feature name="u2" value="U2 EPROM" /> <!- - emtpy slot - ->
+            <feature name="u2" value="U2 EPROM" /> <!- - empty slot - ->
             <feature name="u3" value="U3" /> <!- - EPL16P8B - ->
-            <feature name="u4" value="U4 DRAM" /> <!- - emtpy slot - ->
+            <feature name="u4" value="U4 DRAM" /> <!- - empty slot - ->
             <feature name="u5" value="U5" /> <!- - 2/10/2 FLY DSP (D77P25D) - ->
             <feature name="u6" value="U6" /> <!- - 74HCU04 - ->
             <feature name="u7" value="U7" /> <!- - CIC - ->
@@ -14166,6 +14166,7 @@ more investigation needed...
 		<description>Flashback (Europe, English / French / German)</description>
 		<year>1994</year>
 		<publisher>U.S. Gold</publisher>
+		<info name="language" value="English/French/German" />
 		<info name="serial" value="SNSP-5F-NOE" />
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-2J0N-01" />
@@ -14188,6 +14189,7 @@ more investigation needed...
 		<description>Flashback (Japan)</description>
 		<year>1993</year>
 		<publisher>Sunsoft</publisher>
+		<info name="language" value="Japanese" />
 		<info name="serial" value="SHVC-LQ" />
 		<info name="release" value="19931222" />
 		<info name="alt_title" value="フラッシュバック" />
@@ -14212,6 +14214,7 @@ more investigation needed...
 		<description>Flashback - The Quest for Identity (USA)</description>
 		<year>1994</year>
 		<publisher>U.S. Gold</publisher>
+		<info name="language" value="English/French/German" />
 		<info name="serial" value="SNS-5F-USA" />
 		<info name="release" value="199402xx" />
 		<part name="cart" interface="snes_cart">
@@ -29935,6 +29938,7 @@ Alternate board (XL-1)
 		<description>Super Turrican 2 (USA)</description>
 		<year>1995</year>
 		<publisher>Ocean</publisher>
+		<info name="developer" value="Factor 5" />
 		<info name="serial" value="M/SNS-A2TE-USA" />
 		<info name="release" value="199511xx" />
 		<part name="cart" interface="snes_cart">
@@ -31852,10 +31856,11 @@ Alternate board (XL-1)
 		</part>
 	</software>
 
-	<software name="undercop">
+	<software name="undercop_jp" cloneof="undercop">
 		<description>Undercover Cops (Japan)</description>
 		<year>1995</year>
 		<publisher>Varie</publisher>
+		<info name="developer" value="Irem" />
 		<info name="serial" value="SHVC-AUCJ-JPN" />
 		<info name="release" value="19950303" />
 		<info name="alt_title" value="アンダーカバーコップス" />
@@ -33403,6 +33408,7 @@ Alternate board (XL-1)
 		<description>Zero the Kamikaze Squirrel (USA)</description>
 		<year>1994</year>
 		<publisher>Sunsoft</publisher>
+		<info name="developer" value="Iguana Entertainment" />
 		<info name="serial" value="SNS-AZKE-USA" />
 		<info name="release" value="199411xx" />
 		<part name="cart" interface="snes_cart">
@@ -38283,6 +38289,7 @@ List of unclassified roms
 		<description>Corn Buster</description>
 		<year>2015</year>
 		<publisher>Piko Interactive</publisher>
+		<info name="developer" value="Engine Software" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">
@@ -39352,6 +39359,7 @@ List of unclassified roms
 		<description>Dorke &amp; Ymp</description>
 		<year>2015</year>
 		<publisher>Piko Interactive</publisher>
+		<info name="developer" value="Norse" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="4194304">
@@ -39362,7 +39370,7 @@ List of unclassified roms
 
 <!-- binary built from source -->
 	<software name="dorque1" cloneof="dorkeymp">
-		<description>Dorque &amp; Imp (Europe, prototype World 1)</description>
+		<description>Dorque &amp; Imp (Europe, prototype world 1 level)</description>
 		<year>199?</year>
 		<publisher>Norse</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -39375,7 +39383,7 @@ List of unclassified roms
 
 <!-- binary built from source -->
 	<software name="dorque2" cloneof="dorkeymp">
-		<description>Dorque &amp; Imp (Europe, prototype World 2)</description>
+		<description>Dorque &amp; Imp (Europe, prototype world 2 level)</description>
 		<year>199?</year>
 		<publisher>Norse</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -39388,7 +39396,7 @@ List of unclassified roms
 
 <!-- binary built from source -->
 	<software name="dorque3" cloneof="dorkeymp">
-		<description>Dorque &amp; Imp (Europe, prototype World 3)</description>
+		<description>Dorque &amp; Imp (Europe, prototype world 3 level)</description>
 		<year>199?</year>
 		<publisher>Norse</publisher> <!-- cancelled -->
 		<part name="cart" interface="snes_cart">
@@ -39432,9 +39440,12 @@ List of unclassified roms
 		<year>1994</year>
 		<publisher>Tradewest</publisher>
 		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1J0N-10" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="2097152">
-				<rom name="double dragon v - the shadow falls (europe).sfc" size="2097152" crc="e80f6b65" sha1="09847567edd0b09c6f401d830107a60e26ac8fb5" offset="0x000000" />
+				<rom name="spal-5e-0.u1" size="2097152" crc="e80f6b65" sha1="09847567edd0b09c6f401d830107a60e26ac8fb5" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -39474,7 +39485,7 @@ List of unclassified roms
 	</software>
 
 	<software name="downwrldd" cloneof="downwrld">
-		<description>Down the World - Mervil's Ambition (Japan, Rolling Demo)</description>
+		<description>Down the World - Mervil's Ambition (Japan, rolling demo)</description>
 		<year>1994</year>
 		<publisher>ASCII Entertainment</publisher>
 		<part name="cart" interface="snes_cart">
@@ -39743,6 +39754,45 @@ List of unclassified roms
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">
 				<rom name="dragon view (usa).sfc" size="2097152" crc="ab893412" sha1="b6c1bf197ac5b85b6a691f5942783e6bfccfeb48" offset="0x000000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dview_lrg" cloneof="dview">
+		<description>Dragon View (USA, Limited Run Games)</description>
+		<year>2022</year>
+		<publisher>Limited Run Games</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SNES-LROM-RAM-V03 RB INNEX-C01" />
+			<feature name="u0" value="U0 EPROM [29F160TE-70PFTN 1021 F36 E1]" />
+			<feature name="u1" value="U1 EPROM [29F160TE-70PFTN 1021 F24 E1]" />
+			<feature name="u2" value="U2 EPROM [74HC139 AiPR7AG137]" />
+			<feature name="u3" value="U3 CIC" />
+			<feature name="u4" value="U4 256K SRAM [92512R M5M5256BFP 10L]" />
+			<feature name="u5" value="U5 EPROM" /> <!-- empty socket -->
+			<feature name="u7" value="U7 EPROM [SN74HC00]" />
+			<feature name="lockout" value="ATMELU TINY13A 220BKYK" />
+			<feature name="bt1" value="BATTERY CR2032 3V" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="4194304">
+				<rom name="29f160te-70pftn 1021 f36 e1.u0" size="2097152" crc="67663cc1" sha1="8fc8db30d60bbc98fd1f30c49928c25baa2d3301" offset="0x000000" />
+				<rom name="29f160te-70pftn 1021 f24 e1.u1" size="2097152" crc="b0f00d3b" sha1="cee01aaa18c5ef7ea2232c144b62ebe39cedb960" offset="0x200000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dview_p" cloneof="dview">
+		<description>Dragon View (USA, prototype)</description>
+		<year>1994</year>
+		<publisher>Kemco</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="Dragon View (USA) (prototype).sfc" size="2097152" crc="dfd01aab" sha1="26625a6e54b02591f0d468c24964ba6b286c427a" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -40579,9 +40629,52 @@ List of unclassified roms
 	</software>
 
 	<software name="eyra">
+		<description>Eyra - The Crow Maiden (USA)</description>
+		<year>2022</year>
+		<publisher>Second Dimension</publisher>
+		<info name="developer" value="Second Dimension" />
+		<info name="release" value="20221207" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="Eyra - The Crow Maiden (USA).sfc" size="2097152" crc="54f0ae67" sha1="9aec04c843a49b54e4e9fa92d2e6a52e12deb443" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eyra_dg" cloneof="eyra">
+		<description>Eyra - The Crow Maiden (digital)</description>
+		<year>2022</year>
+		<publisher>Second Dimension</publisher>
+		<info name="developer" value="Second Dimension" />
+		<info name="release" value="20221207" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="Eyra - The Crow Maiden (World) (Digital) (Aftermarket) (Unl).sfc" size="2097152" crc="891c5bad" sha1="6328822d95f64e6cbf129d5e7b1ae4610c332805" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eyra_dm1" cloneof="eyra">
+		<description>Eyra - The Crow Maiden (demo 20210910)</description>
+		<year>2021</year>
+		<publisher>Second Dimension</publisher>
+		<info name="developer" value="Second Dimension" />
+		<info name="version" value="demo 20220607" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="eyra210910_demo_ntsc.sfc" size="2097152" crc="c207c7d4" sha1="3ddb3d73d9bcd52b1667fbbc3803a013e68b482b" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eyra_dm2" cloneof="eyra">
 		<description>Eyra - The Crow Maiden (demo 20220607)</description>
 		<year>2022</year>
 		<publisher>Second Dimension</publisher>
+		<info name="developer" value="Second Dimension" />
 		<info name="version" value="demo 20220607" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
@@ -41443,6 +41536,7 @@ List of unclassified roms
 		<description>Flashback (Europe, English / French)</description>
 		<year>1994</year>
 		<publisher>U.S. Gold</publisher>
+		<info name="language" value="English/French" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="2097152">
@@ -41514,6 +41608,21 @@ List of unclassified roms
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
 				<rom name="flying hero - bugyuru no daibouken (japan).sfc" size="1048576" crc="1a19fc3a" sha1="89a10f5cb9b19dcaabb1c26e884c102a49105f0c" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fparkers">
+		<description>Fork Parker's Crunch Out</description>
+		<year>2019</year>
+		<publisher>Mega Cat Studios</publisher>
+		<info name="developer" value="Devolver Digital" />
+		<info name="release" value="20221207" />
+		<part name="cart" interface="snes_cart">
+			<feature name="lockout" value="12F629" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="m27c160-50f1 58s4c 0339l.sfc" size="2097152" crc="1ccccc6e" sha1="d0865f699598c438cde2cd54d5fb8971888e0c99" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -42402,6 +42511,27 @@ List of unclassified roms
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
 				<rom name="ghoul patrol (usa).sfc" size="1048576" crc="ea16b5a2" sha1="bea0a40772574ae5e3896699d94f161339329c59" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ghoulptr_lrg" cloneof="ghoulptr">
+		<description>Ghoul Patrol (USA, Limited Run Games)</description>
+		<year>2021</year>
+		<publisher>Limited Run Games</publisher>
+		<info name="developer" value="LucasArts / Motion Pixel / Realtime Associates" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SNES-LROM-RAM-V03 RB INNEX-C01" />
+			<feature name="u0" value="U0 EPROM [HY29F800BT-70 0041A]" />
+			<feature name="u1" value="U1 EPROM" /> <!-- empty socket -->
+			<feature name="u2" value="U2 EPROM" /> <!-- empty socket -->
+			<feature name="u3" value="U3 CIC [2211DH2]" />
+			<feature name="u5" value="U5 EPROM" /> <!-- empty socket -->
+			<feature name="u7" value="U7 EPROM [74HC00D H803AK]" />
+			<feature name="lockout" value="ATMELU TINY13A 2211DH2" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="hy29f800bt-70 0041a.u0" size="1048576" crc="220e09fa" sha1="aab83b790ee440758962450720cc85cd1c988661" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -44736,10 +44866,19 @@ List of unclassified roms
 	</software>
 
 	<software name="ironcomm">
-		<description>Iron Commando</description>
+		<description>Iron Commando (Europe)</description>
 		<year>2017</year>
 		<publisher>Piko Interactive</publisher>
+		<info name="developer" value="Arcade Zone" />
 		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3B-13" />
+			<feature name="u1" value="U1 EPROM [T BAC49 0025A]" />
+			<feature name="u2" value="U2 EPROM [A29L160HUV-70 0346T 32615]" />
+			<feature name="u3" value="U3 EPROM" /> <!-- empty slot -->
+			<feature name="u5" value="U5 CIC" />
+			<feature name="u5_1" value="U5_1" /> <!-- empty slot -->
+			<feature name="u6" value="U6" />
+			<feature name="lockout" value="12F629 SN1705" />
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">
 				<rom name="iron commando (world) (unl).sfc" size="2097152" crc="b82e8499" sha1="21a56379dc2c4718dc407d14df47cd9bc8f6d292" offset="0x000000" />
@@ -45318,6 +45457,24 @@ List of unclassified roms
 	</software>
 
 	<software name="jimpower">
+		<description>Jim Power - The Lost Dimension in 3D (enhanced version)</description>
+		<year>2020</year>
+		<publisher>Piko Interactive</publisher>
+		<info name="developer" value="Loriciel" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SFC_SINGLE_V04 20201114" />
+			<feature name="u1" value="U1 CIC" /> <!-- empty socket -->
+			<feature name="u2" value="U2 EPROM" /> <!-- empty socket -->
+			<feature name="u3" value="U3 EPROM [29F160TE-70PFTN 0522 F34]" /> <!-- empty socket -->
+			<feature name="lockout" value="" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="29f160te-70pftn 0522 f34.u3" size="2097152" crc="48164725" sha1="07e9ef42cd5b1e1fd903aba6282d7b3b29378633" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jimpower_p" cloneof="jimpower">
 		<description>Jim Power - The Lost Dimension in 3D (Europe, prototype)</description>
 		<year>1993</year>
 		<publisher>Electro Brain</publisher>
@@ -45343,15 +45500,15 @@ List of unclassified roms
 		</part>
 	</software>
 
-	<software name="jimpowere">
-		<description>Jim Power - The Lost Dimension in 3D (enhanced version)</description>
+	<software name="jimpower_a" cloneof="jimpower">
+		<description>Jim Power - The Lost Dimension in 3D</description>
 		<year>2015</year>
 		<publisher>Piko Interactive</publisher>
 		<info name="developer" value="Loriciel" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="2097152">
-				<rom name="Jim Power - The Lost Dimension in 3D (World) (Aftermarket) (Enhanced) (Unl).sfc" size="2097152" crc="d2a2aea0" sha1="916bf6e3e7b884a91802d9238f469776e986c791" offset="0x000000" />
+			<dataarea name="rom" size="1048576">
+				<rom name="Jim Power - The Lost Dimension in 3D (World) (Piko Interactive).sfc" size="1048576" crc="929d8d10" sha1="e9e87b1459d63a78fb4865685835dc0ca8c74a53" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -45683,9 +45840,15 @@ List of unclassified roms
 		<publisher>Retro-Bit</publisher>
 		<notes>The game freezes after selecting one of the three games available in the menu</notes>
 		<part name="cart" interface="snes_cart">
+			<feature name="u1" value="U1 EPROM [EPM7032AE TC44-7 S BBB77 0401A]" />
+			<feature name="u2" value="U2 EPROM [29LV320DTTI-70G]" />
+			<feature name="u4" value="U4 EPROM" /> <!-- empty socket -->
+			<feature name="u5" value="U5 CIC" />
+			<feature name="u6" value="U6 EPROM" />
+			<feature name="lockout" value="12F629" />
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="4194304">
-				<rom name="Joe &amp; Mac - Ultimate Caveman Collection (Europe) (Aftermarket) (Unl).sfc" size="4194304" crc="184312f8" sha1="640d022605156c55eab3155ad08093b62f3da531" offset="0x000000" />
+				<rom name="29lv320dtti-70g.u2" size="4194304" crc="184312f8" sha1="640d022605156c55eab3155ad08093b62f3da531" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -47737,9 +47900,10 @@ List of unclassified roms
 	</software>
 
 	<software name="legendpi" cloneof="legend">
-		<description>Legend (Piko reissue)</description>
+		<description>Legend (Piko)</description>
 		<year>2017</year>
 		<publisher>Piko Interactive</publisher>
+		<info name="developer" value="Arcade Zone" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
@@ -48063,7 +48227,7 @@ List of unclassified roms
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">
-				<rom name="Little Medusa (World) (Aftermarket) (Unl).sfc" size="2097152" crc="cc295189" sha1="731d5f7e2f6fa554e0c56290715b2c0bfdfbbd87" offset="0x000000" />
+				<rom name="Little Medusa (World).sfc" size="2097152" crc="6aaaf617" sha1="b25eb4071a63da1cdf373491db8875e2009007ce" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -48439,9 +48603,25 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="cotton">
+		<description>Märchen Adventure Cotton 100% (USA)</description>
+		<year>2021</year>
+		<publisher>Strictly Limited Games</publisher>
+		<info name="developer" value="Success" />
+		<info name="language" value="English" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="Maerchen Adventure Cotton 100 (USA) (Strictly Limited Games).sfc" size="2097152" crc="c232ad18" sha1="8755565d48d457d046a7eb8d7588677e5443814d" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cotton_jp" cloneof="cotton">
 		<description>Märchen Adventure Cotton 100% (Japan)</description>
 		<year>1994</year>
 		<publisher>Datam Polystar</publisher>
+		<info name="developer" value="Success" />
+		<info name="language" value="Japanese" />
 		<info name="serial" value="SHVC-C9" />
 		<info name="release" value="19940422" />
 		<info name="alt_title" value="MARCHEN ADVENTURE コットン100%" />
@@ -49393,6 +49573,30 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 				<rom name="mecarobot golf (usa).sfc" size="1048576" crc="82ceee3a" sha1="7fc213cf74189df1ada9633852a3843e082ee677" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mechand2">
+		<description>Mechanoids II - The Final Conflict (prototype)</description>
+		<year>1992</year>
+		<publisher>Enigma Variation</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="524288">
+				<rom name="mech.smc" size="524288" crc="7e006aac" sha1="e9b1b93b4dbef04af0bc93c5920bda647e645096" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mechand2_p1" cloneof="mechand2">
+		<description>Mechanoids II - The Final Conflict (non-playable prototype)</description>
+		<year>1992</year>
+		<publisher>Enigma Variation</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="524288">
+				<rom name="mechdemo.smc" size="524288" crc="8d9c1036" sha1="998ce8714fc272f3d988dcc987ff5c0bb74bff19" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -50474,6 +50678,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<description>Mr. Bloopy Saves the World</description>
 		<year>2014</year>
 		<publisher>Piko Interactive</publisher>
+		<info name="developer" value="Compedia" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">
@@ -51769,7 +51974,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">
-				<rom name="Nightmare Busters (USA) (Unl).sfc" size="2097152" crc="abaaff79" sha1="65d156bcc43149d4828289bc78b2565a674f58be" offset="0x000000" />
+				<rom name="e28f320.sfc" size="2097152" crc="abaaff79" sha1="65d156bcc43149d4828289bc78b2565a674f58be" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -53635,10 +53840,19 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<description>Pinkie</description>
 		<year>2018</year>
 		<publisher>Piko Interactive</publisher>
+		<info name="developer" value="Data Design" />
 		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A3M-20" />
+			<feature name="u1" value="U1 EPROM [EPM7032AE]" />
+			<feature name="u2" value="U2 EPROM [S29AL016D70TFI02]" />
+			<feature name="u3" value="U3 EPROM [M5M5256DVP]" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="u5_1" value="U5_1 EPROM" /> <!-- empty slot -->
+			<feature name="u6" value="U6 EPROM" /> <!-- empty slot -->
+			<feature name="lockout" value="12F629" />
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="pinkie (world) (aftermarket) (unl).sfc" size="1048576" crc="d2aa58d3" sha1="6e6eb5051b0edcd245e2279ed926d81e6f498471" offset="0x000000" />
+				<rom name="s29al016d70tfi02.u2" size="1048576" crc="5dd1ccd1" sha1="3021aa8ba80e56632550e62137d19b1611550b42" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -53647,6 +53861,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<description>Pinkie (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>Data Design</publisher>
+		<info name="developer" value="Data Design" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
@@ -55152,6 +55367,19 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">
 				<rom name="rendering ranger r2 (japan).sfc" size="2097152" crc="8fb5ac86" sha1="f40ac25a6cdff1e8384723cad0290ba42fd50bda" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rrr2_us" cloneof="rrr2" supported="no">
+		<description>Rendering Ranger R2 (USA)</description>
+		<year>2022</year>
+		<publisher>Limited Run Games</publisher>
+		<info name="developer" value="Rainbow Arts" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="Rendering Ranger R2 (USA) (Limited Run Games).sfc" size="2097152" crc="25ad68bf" sha1="437f2fb7b7309a5cb994b8071b78d7e418fa096a" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -57500,6 +57728,23 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1572864">
 				<rom name="soccer shootout (europe).sfc" size="1572864" crc="bbcd16f4" sha1="4ad0793c4b1c598ad5611670a9eaf5bf8e7eb148" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="socks">
+		<description>Socks the Cat Rocks the Hill</description>
+		<year>2018</year>
+		<publisher>Second Dimension</publisher>
+		<info name="developer" value="Realtime Associates" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="DxS-1A0N-02" />
+			<feature name="u1" value="U1 EPROM [M27C160-100F1 588AY 0038K]" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="12F629" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="m27c160-100f1 588ay 0038k.sfc" size="1048576" crc="cac6521f" sha1="dfd2856dcf975aed784546d1b452eb3fec3f3a90" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -61992,6 +62237,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<description>Super Turrican 2 (Europe)</description>
 		<year>1995</year>
 		<publisher>Ocean</publisher>
+		<info name="developer" value="Factor 5" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">
@@ -62000,10 +62246,24 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
+	<software name="sturric2_slg" cloneof="sturric2">
+		<description>Super Turrican 2 (USA, Strictly Limited Games)</description>
+		<year>2022</year>
+		<publisher>Strictly Limited Games</publisher>
+		<info name="developer" value="Factor 5" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="3145728">
+				<rom name="Super Turrican 2 (USA) (Strictly Limited Games).sfc" size="3145728" crc="8902ad85" sha1="172635cd4a49ae3deddc1f3396af18d4e50be28e" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sturric2upa" cloneof="sturric2">
 		<description>Super Turrican 2 (USA, prototype, alt)</description>
 		<year>1995</year>
 		<publisher>Ocean</publisher>
+		<info name="developer" value="Factor 5" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">
@@ -62016,10 +62276,25 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<description>Super Turrican 2 (USA, prototype)</description>
 		<year>1995</year>
 		<publisher>Ocean</publisher>
+		<info name="developer" value="Factor 5" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
 				<rom name="super turrican 2 (usa) (beta).sfc" size="1048576" crc="691314bb" sha1="8f3e589fc7d8a24088a32cbe1b56847d5fd7a962" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sturriccol">
+		<description>Super Turrican Collection (USA)</description>
+		<year>2022</year>
+		<publisher>Strictly Limited Games</publisher>
+		<info name="developer" value="Factor 5" />
+		<part name="cart" interface="snes_cart">
+			<feature name="lockout" value="12F629" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="4194304">
+				<rom name="en29lv320cb-70tip.sfc" size="4194304" crc="02ef410d" sha1="9950e9cf4a9dd826aec8684c84bd14babecb181b" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -62385,13 +62660,25 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="sydneyht">
+		<description>Sydney Hunter and the Caverns of Death (Europe)</description>
+		<year>2017</year>
+		<publisher>CollectorVision Games</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="2097152">
+				<rom name="Sydney Hunter and the Caverns of Death (Europe).sfc" size="2097152" crc="f11997a7" sha1="3ad1a3641bcbe6f7029fe86d22e07d1f23534bdd" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sydneyht_us" cloneof="sydneyht">
 		<description>Sydney Hunter and the Caverns of Death (USA)</description>
 		<year>2017</year>
 		<publisher>CollectorVision Games</publisher>
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">
-				<rom name="Sydney Hunter and the Caverns of Death (USA) (Aftermarket) (Unl).sfc" size="2097152" crc="ce88163a" sha1="cc66cfbfe9baf3c6115acf70f82ab3b80f4b2a51" offset="0x000000" />
+				<rom name="Sydney Hunter and the Caverns of Death (USA).sfc" size="2097152" crc="ce88163a" sha1="cc66cfbfe9baf3c6115acf70f82ab3b80f4b2a51" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -64986,9 +65273,9 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
-	<software name="undercopu" cloneof="undercop">
+	<software name="undercop">
 		<description>Undercover Cops (USA)</description>
-		<year>2020</year>
+		<year>2021</year>
 		<publisher>Retro-Bit</publisher>
 		<info name="developer" value="Irem" />
 		<part name="cart" interface="snes_cart">
@@ -65000,19 +65287,39 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 	</software>
 
 	<software name="unholyni">
+		<description>Unholy Night: The Darkness Hunter (Europe)</description>
+		<year>2017</year>
+		<publisher>PixelHeart</publisher>
+		<info name="developer" value="Foxbat Corporation / Nu-Gaia" />
+		<part name="cart" interface="snes_cart">
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="4194304">
+				<rom name="Unholy Night - The Darkness Hunter (Europe).sfc" size="4194304" crc="14d3ec90" sha1="e7ec734449d281b9d57f892431e4b264895f4ce0" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="unholyni_us" cloneof="unholyni">
 		<description>Unholy Night: The Darkness Hunter (USA)</description>
 		<year>2017</year>
 		<publisher>Retroism</publisher>
 		<info name="developer" value="Foxbat Corporation / Nu-Gaia" />
 		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="090-UNHOLY-04" />
+			<feature name="u1" value="U1 EPROM [XC9572XL VQG64AWN1 713 F5379514A]" />
+			<feature name="u2" value="U2 EPROM" /> <!-- empty socket -->
+			<feature name="u3" value="U3 EPROM  [LD1117AG 33AOTMUD]" />
+			<feature name="u4" value="U4 EPROM  [M29W320ET 70N6 H]" />
+			<feature name="u6" value="U6 CIC" />
+			<feature name="lockout" value="12F629" />
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="4194304">
-				<rom name="Unholy Night - The Darkness Hunter (USA) (Unl).sfc" size="4194304" crc="5735b605" sha1="24ae0cb9710f1ab013694fe7f9029d8cc0086e71" offset="0x000000" />
+				<rom name="m29w320et.u2" size="4194304" crc="5735b605" sha1="24ae0cb9710f1ab013694fe7f9029d8cc0086e71" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="unholynij" cloneof="unholyni">
+	<software name="unholyni_jp" cloneof="unholyni">
 		<description>Unholy Night: The Darkness Hunter (Japan)</description>
 		<year>2017</year>
 		<publisher>BlazePro</publisher>
@@ -66065,9 +66372,13 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<info name="release" value="199403xx" />
 		<sharedfeat name="compatibility" value="NTSC" />
 		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1JON-10" />
+			<feature name="u1" value="U1 MASKROM [SNS-6W-0 LH538C0A 9407 D]" />
+			<feature name="u2" value="U2 CIC [D411A]" />
+			<feature name="lockout" value="D411A" />
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="wolfenstein 3d (usa).sfc" size="1048576" crc="6582a8f5" sha1="88fe872eb984af84f8ca7633ef5bd3904a2baeb4" offset="0x000000" />
+				<rom name="sns-6w-0.u1" size="1048576" crc="6582a8f5" sha1="88fe872eb984af84f8ca7633ef5bd3904a2baeb4" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -67183,6 +67494,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<description>Zero the Kamikaze Squirrel (Europe, rev. A)</description>
 		<year>1994</year>
 		<publisher>Sunsoft</publisher>
+		<info name="developer" value="Iguana Entertainment" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">
@@ -67195,6 +67507,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<description>Zero the Kamikaze Squirrel (Europe)</description>
 		<year>1994</year>
 		<publisher>Sunsoft</publisher>
+		<info name="developer" value="Iguana Entertainment" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="2097152">
@@ -67239,6 +67552,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<description>Zombies (Europe, prototype)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
+		<info name="developer" value="LucasFilms Games" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
@@ -67251,6 +67565,7 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<description>Zombies (Europe)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
+		<info name="developer" value="LucasFilms Games" />
 		<sharedfeat name="compatibility" value="PAL" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
@@ -67264,12 +67579,35 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		<description>Zombies Ate My Neighbors (USA)</description>
 		<year>1993</year>
 		<publisher>Konami</publisher>
+		<info name="developer" value="LucasFilms Games" />
 		<info name="release" value="199309xx" />
 		<sharedfeat name="compatibility" value="NTSC" />
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
 				<rom name="zombies ate my neighbors (usa).sfc" size="1048576" crc="7cfc0c7c" sha1="1be79496d7a38b293d6a5d9fba0e16f3cb37d5ff" offset="0x000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zombies_lrg" cloneof="zombies">
+		<description>Zombies Ate My Neighbors (USA, Limited Run Games)</description>
+		<year>2021</year>
+		<publisher>Limited Run Games</publisher>
+		<info name="developer" value="LucasFilms Games" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SNES-LROM-RAM-V04 RB INNEX-C01" />
+			<feature name="u0" value="U0 EPROM [HY29F800BT-70 0041A]" />
+			<feature name="u1" value="U1 EPROM" /> <!-- empty socket -->
+			<feature name="u2" value="U2 EPROM" /> <!-- empty socket -->
+			<feature name="u3" value="U3 CIC [ATMELU TINY13A 2211DH2]" />
+			<feature name="u4" value="U4 EPROM" /> <!-- empty socket -->
+			<feature name="u5" value="U5 EPROM" /> <!-- empty socket -->
+			<feature name="u7" value="U7 EPROM [74HC00D H803AK]" />
+			<feature name="lockout" value="ATMELU TINY13A 22402KT" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="hy29f800bt-70 0041a.u0" size="1048576" crc="b57c9228" sha1="701cb7610b465eafa59b6c814b5cc5b0d315841c" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
