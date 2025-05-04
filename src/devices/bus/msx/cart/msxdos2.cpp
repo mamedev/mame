@@ -39,7 +39,7 @@ protected:
 
 	void bank_w(u8 data);
 
-	static inline constexpr unsigned PAGE_SIZE = 0x4000;
+	static inline constexpr unsigned DEVICE_PAGE_SIZE = 0x4000;
 
 	memory_bank_creator m_rombank;
 	u16 m_bank_address;
@@ -77,7 +77,7 @@ std::error_condition msx_cart_msxdos2_base_device::initialize_cartridge(std::str
 		return image_error::BADSOFTWARE;
 	}
 
-	m_rombank->configure_entries(0, 4, cart_rom_region()->base(), PAGE_SIZE);
+	m_rombank->configure_entries(0, 4, cart_rom_region()->base(), DEVICE_PAGE_SIZE);
 
 	return std::error_condition();
 }
@@ -130,7 +130,7 @@ std::error_condition msx_cart_msxdos2j_device::initialize_cartridge(std::string 
 		return result;
 
 	u32 ram_size = cart_ram_region() ? cart_ram_region()->bytes() : 0;
-	if (ram_size > 256 * PAGE_SIZE || (ram_size & (PAGE_SIZE - 1)) != 0)
+	if (ram_size > 256 * DEVICE_PAGE_SIZE || (ram_size & (DEVICE_PAGE_SIZE - 1)) != 0)
 	{
 		message = "msx_cart_msxdos2: Region 'ram' size must be a multiple of 0x4000 and at most 0x400000.";
 		return image_error::BADSOFTWARE;
@@ -158,11 +158,11 @@ std::error_condition msx_cart_msxdos2j_device::initialize_cartridge(std::string 
 	if (ram_size)
 	{
 		m_bank_mask = device_generic_cart_interface::map_non_power_of_two(
-			unsigned(ram_size / PAGE_SIZE),
+			unsigned(ram_size / DEVICE_PAGE_SIZE),
 			[this] (unsigned entry, unsigned page)
 			{
 				for (int i = 0; i < 4; i++)
-					m_rambank[i]->configure_entry(entry, cart_ram_region()->base() + PAGE_SIZE * page);
+					m_rambank[i]->configure_entry(entry, cart_ram_region()->base() + DEVICE_PAGE_SIZE * page);
 			}
 		);
 
