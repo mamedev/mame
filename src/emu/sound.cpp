@@ -1114,7 +1114,6 @@ void sound_manager::config_load(config_type cfg_type, config_level cfg_level, ut
 		break;
 
 	case config_type::DEFAULT: {
-		fprintf(stderr, "loading resampler config\n");
 		// In the global config, get the default effect chain configuration
 
 		util::xml::data_node const *efl_node = parentnode->get_child("default_audio_effects");
@@ -1134,8 +1133,8 @@ void sound_manager::config_load(config_type cfg_type, config_level cfg_level, ut
 			m_resampler_hq_latency = rs_node->get_attribute_float("hq_latency", 0.0050);
 			m_resampler_hq_length = rs_node->get_attribute_int("hq_length", 400);
 			m_resampler_hq_phases = rs_node->get_attribute_int("hq_phases", 200);				
-			rebuild_all_resamplers();
 		}
+		rebuild_all_resamplers();
 		break;
 	}
 
@@ -1216,8 +1215,6 @@ void sound_manager::config_save(config_type cfg_type, util::xml::data_node *pare
 		break;
 
 	case config_type::DEFAULT: {
-		fprintf(stderr, "saving resampler config\n");
-
 		// In the global config, save the default effect chain configuration
 		util::xml::data_node *const efl_node = parentnode->add_child("default_audio_effects", nullptr);
 		for(u32 ei = 0; ei != m_default_effects.size(); ei++) {
@@ -2490,7 +2487,7 @@ const audio_resampler *sound_manager::get_resampler(u32 fs, u32 ft)
 	auto i = m_resamplers.find(key);
 	if(i != m_resamplers.end())
 		return i->second.get();
-	fprintf(stderr, "creating %d %d (%d)\n", fs, ft, m_resampler_type);
+
 	audio_resampler *res;
 	if(m_resampler_type == RESAMPLER_HQ)
 		res = new audio_resampler_hq(fs, ft, m_resampler_hq_latency, m_resampler_hq_length, m_resampler_hq_phases);
