@@ -859,7 +859,7 @@ void sound_manager::after_devices_init()
 void sound_manager::input_get(int id, sound_stream &stream)
 {
 	u32 samples = stream.samples();
-	u64 end_pos = stream.sample_index();
+	u64 end_pos = stream.end_index();
 	u32 skip = stream.output_count();
 
 	for(const auto &step : m_microphones[id].m_input_mixing_steps) {
