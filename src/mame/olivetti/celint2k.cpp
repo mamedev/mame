@@ -4,6 +4,8 @@
 /********************************************************************************************
 
 Skeleton driver for Olivetti Celint 2000 phone with Videotext terminal.
+In Spain, Banco Santander distributed it as the Superfono Santander (with a custom ROM) as 
+part of a "bank at home" pilot program.
 
 Main PCB:
     ____________________________________________________________________________________
@@ -55,13 +57,13 @@ Main PCB:
 |LINE|                                                                                 |
 |____|                                                                                 |
   _|_                                                                    SPEAKER       |
- | CD/MF switch                                                                          |
+ | CD/MF switch                                                                        |
  |___|                                                           _______               |
    |                                           _____            |LS1240A               |
    |__________________________________________|    |___________________________________|
                                               |____|
 
-Video screen is driven by 9 Hitahi HD61105A chips (separate PCB).
+Video screen is driven by 9 Hitachi HD61105A chips (separate PCB).
 
 ********************************************************************************************/
 
@@ -154,5 +156,4 @@ ROM_END
 
 } // anonymous namespace
 
-// The Superfono Santader edition was distributed by the Spanish bank Banco Santander as a "bank at home" pilot program.
 COMP( 1995, celint2kss, 0, 0, celint2k, celint2k, celint2k_state, empty_init, "Olivetti", "Celint 2000 (Superfono Santander edition)", MACHINE_NOT_WORKING ) // Labeled as model "MULTIMEDIA - T"
