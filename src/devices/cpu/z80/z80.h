@@ -181,7 +181,6 @@ protected:
 
 	int          m_icount;
 	int          m_tmp_irq_vector;
-	PAIR16       m_shared_addr;
 	PAIR16       m_shared_data;
 	PAIR16       m_shared_data2;
 	u8           m_rtemp;
