@@ -1130,12 +1130,13 @@ void sound_manager::config_load(config_type cfg_type, config_level cfg_level, ut
 		// and the resampler configuration
 		util::xml::data_node const *rs_node = parentnode->get_child("resampler");
 		if(rs_node) {
-			m_resampler_type = rs_node->get_attribute_int("type", RESAMPLER_LOFI);
 			m_resampler_hq_latency = rs_node->get_attribute_float("hq_latency", 0.0050);
 			m_resampler_hq_length = rs_node->get_attribute_int("hq_length", 400);
-			m_resampler_hq_phases = rs_node->get_attribute_int("hq_phases", 200);				
+			m_resampler_hq_phases = rs_node->get_attribute_int("hq_phases", 200);
+
+			// this also applies the hq settings if resampler is hq
+			set_resampler_type(rs_node->get_attribute_int("type", RESAMPLER_LOFI));
 		}
-		rebuild_all_resamplers();
 		break;
 	}
 
@@ -2506,31 +2507,39 @@ void sound_manager::rebuild_all_resamplers()
 		stream->create_resamplers();
 
 	for(auto &stream : m_stream_list)
-		stream->lookup_history_sizes();	
+		stream->lookup_history_sizes();
 }
 
 void sound_manager::set_resampler_type(u32 type)
 {
-	m_resampler_type = type;
-	rebuild_all_resamplers();
+	if(type != m_resampler_type) {
+		m_resampler_type = type;
+		rebuild_all_resamplers();
+	}
 }
 
 void sound_manager::set_resampler_hq_latency(double latency)
 {
-	m_resampler_hq_latency = latency;
-	rebuild_all_resamplers();
+	if(latency != m_resampler_hq_latency) {
+		m_resampler_hq_latency = latency;
+		rebuild_all_resamplers();
+	}
 }
 
 void sound_manager::set_resampler_hq_length(u32 length)
 {
-	m_resampler_hq_length = length;
-	rebuild_all_resamplers();
+	if(length != m_resampler_hq_length) {
+		m_resampler_hq_length = length;
+		rebuild_all_resamplers();
+	}
 }
 
 void sound_manager::set_resampler_hq_phases(u32 phases)
 {
-	m_resampler_hq_phases = phases;
-	rebuild_all_resamplers();
+	if(phases != m_resampler_hq_phases) {
+		m_resampler_hq_phases = phases;
+		rebuild_all_resamplers();
+	}
 }
 
 const char *sound_manager::resampler_type_names(u32 type) const
