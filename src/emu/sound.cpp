@@ -917,6 +917,7 @@ void sound_manager::output_push(int id, sound_stream &stream)
 			*outb1 = std::clamp(int(*inb++ * 32768), -32768, 32767);
 			outb1 += m_outputs_count;
 		}
+		outb++;
 	}
 }
 
@@ -2413,7 +2414,7 @@ void sound_manager::mapping_update()
 
 u64 sound_manager::rate_and_time_to_index(attotime time, u32 sample_rate) const
 {
-	return time.m_seconds * sample_rate + ((time.m_attoseconds / 100'000'000) * sample_rate) / 10'000'000'000LL;
+	return time.m_seconds * sample_rate + ((time.m_attoseconds / 100'000'000) * sample_rate) / 10'000'000'000LL; //'
 }
 
 void sound_manager::update(s32)
@@ -2479,7 +2480,7 @@ void sound_manager::streams_update()
 	machine().osd().add_audio_to_recording(m_record_buffer.data(), m_record_samples);
 	machine().video().add_sound_to_recording(m_record_buffer.data(), m_record_samples);
 	if(m_wavfile)
-		util::wav_add_data_16(*m_wavfile, m_record_buffer.data(), m_record_samples);
+		util::wav_add_data_16(*m_wavfile, m_record_buffer.data(), m_record_samples * m_outputs_count);
 
 	m_effects_condition.notify_all();
 }
