@@ -25,19 +25,15 @@ macro   rm_reg   %addr
 	@nomreq_addr %addr
 
 macro   rm16   %addr
-	@rm %addr
-	TDAT_H = TDAT_L;
-	@rm %addr+1
-	using std::swap;
-	swap(TDAT_H, TDAT_L);
+	m_memrq_cycles !! TDAT_L = data_read(%addr);
+	m_memrq_cycles !! TDAT_H = data_read(%addr+1);
 
 macro   wm   %addr
 	m_memrq_cycles !! data_write(%addr, TDAT8);
 
 macro   wm16   %addr
-	@wm %addr
-	TDAT8 = TDAT_H;
-	@wm %addr+1
+	m_memrq_cycles !! data_write(%addr, TDAT_L);
+	m_memrq_cycles !! data_write(%addr+1, TDAT_H);
 
 macro   wm16_sp %d16
 	SP--;
@@ -67,11 +63,10 @@ macro   arg
 	PC++;
 
 macro   arg16
-	@arg
-	TDAT_H = TDAT_L;
-	@arg
-	using std::swap;
-	swap(TDAT_H, TDAT_L);
+	m_memrq_cycles !! TDAT_L = arg_read();
+	PC++;
+	m_memrq_cycles !! TDAT_H = arg_read();
+	PC++;
 
 macro   eax
 	@arg
