@@ -413,6 +413,7 @@ macro   inir
 macro   r800:inir
 	if (B == 1) {
 		+ 1
+		;
 	}
 	@ini
 	if (B != 0) {
@@ -431,6 +432,7 @@ macro   otir
 macro   r800:otir
 	if (B == 1) {
 		+ 1
+		;
 	}
 	@outi
 	if (B != 0) {
@@ -478,6 +480,7 @@ macro   indr
 macro   r800:indr
 	if (B == 1) {
 		+ 1
+		;
 	}
 	@ind
 	if (B != 0) {
@@ -496,6 +499,7 @@ macro   otdr
 macro   r800:otdr
 	if (B == 1) {
 		+ 1
+		;
 	}
 	@outd
 	if (B != 0) {
