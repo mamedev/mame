@@ -794,7 +794,7 @@ static INPUT_PORTS_START( mjmaglmp )
 	PORT_DIPNAME( 0x10, 0x10, "Game Hint" )                 PORT_DIPLOCATION("DIP1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x20, "Direct Double" )             PORT_DIPLOCATION("DIP1:6")
+	PORT_DIPNAME( 0x20, 0x20, "Direct Double Up" )          PORT_DIPLOCATION("DIP1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x40, 0x40, "Coin Acceptor" )             PORT_DIPLOCATION("DIP1:7")
@@ -971,7 +971,7 @@ static INPUT_PORTS_START( fengyunh )
 	PORT_DIPNAME( 0x10, 0x10, "Game Hint" )                   PORT_DIPLOCATION("DIP1:5")     // 吃碰提示
 	PORT_DIPSETTING(    0x10, DEF_STR( No ) )                                                // 無
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )                                               // 有
-	PORT_DIPNAME( 0x20, 0x20, "Direct Double" )               PORT_DIPLOCATION("DIP1:6")     // 直接比倍
+	PORT_DIPNAME( 0x20, 0x20, "Direct Double Up" )            PORT_DIPLOCATION("DIP1:6")     // 直接比倍
 	PORT_DIPSETTING(    0x20, DEF_STR( No ) )                                                // 無
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )                                               // 有
 	PORT_DIPNAME( 0x40, 0x40, "Coin Acceptor" )               PORT_DIPLOCATION("DIP1:7")     // 投幣器
@@ -1076,7 +1076,7 @@ static INPUT_PORTS_START( shendeng )
 	PORT_DIPNAME( 0x10, 0x10, "Game Hint" )                   PORT_DIPLOCATION("DIP1:5")     // 吃碰提示
 	PORT_DIPSETTING(    0x10, DEF_STR( No ) )                                                // 無
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )                                               // 有
-	PORT_DIPNAME( 0x20, 0x20, "Direct Double" )               PORT_DIPLOCATION("DIP1:6")     // 直接比倍
+	PORT_DIPNAME( 0x20, 0x20, "Direct Double Up" )            PORT_DIPLOCATION("DIP1:6")     // 直接比倍
 	PORT_DIPSETTING(    0x20, DEF_STR( No ) )                                                // 無
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )                                               // 有
 	PORT_DIPNAME( 0x40, 0x40, "Coin Acceptor" )               PORT_DIPLOCATION("DIP1:7")     // 投幣器
