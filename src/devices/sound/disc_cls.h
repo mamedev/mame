@@ -120,14 +120,14 @@ public:
 		/* Add gain to the output and put into the buffers */
 		/* Clipping will be handled by the main sound system */
 		double val = DISCRETE_INPUT(0) * DISCRETE_INPUT(1);
-		m_stream->put(m_stream_output, m_outview_sample++, val * (1.0 / 32768.0));
+		m_stream->put(m_stream_output, m_stream_sample++, val * (1.0 / 32768.0));
 	}
 	virtual int max_output() override { return 0; }
-	virtual void set_output_ptr(sound_stream &stream, int output) override { m_stream = &stream; m_stream_output = output; m_outview_sample = 0; }
+	virtual void set_output_ptr(sound_stream &stream, int output) override { m_stream = &stream; m_stream_output = output; m_stream_sample = 0; }
 private:
 	sound_stream *m_stream  = nullptr;
 	int m_stream_output     = 0;
-	u32 m_outview_sample    = 0U;
+	u32 m_stream_sample     = 0U;
 };
 
 DISCRETE_CLASS(dso_csvlog, 0,
@@ -228,13 +228,15 @@ public:
 	virtual void start() override;
 	virtual void input_write(int sub_node, uint8_t data ) override;
 	virtual bool is_buffered() { return false; }
+	void set_input_ptr(sound_stream &stream, int input) { m_stream = &stream; m_stream_input = input; m_stream_sample = 0; }
 
 	/* This is called by discrete_sound_device */
 	void stream_start();
 
-//protected:
-	uint32_t              m_stream_in_number = 0;
-	uint32_t              m_inview_sample = 0;
+protected:
+	sound_stream         *m_stream = nullptr;
+	uint32_t              m_stream_input = 0;
+	uint32_t              m_stream_sample = 0;
 private:
 	double      m_gain = 0.0;       /* node gain */
 	double      m_offset = 0.0;     /* node offset */

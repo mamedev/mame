@@ -12893,17 +12893,17 @@ GAME( 2000, mmatrixj,   mmatrix,  cps2, cps2_2p1b, cps2_state, init_cps2,     RO
 
 // Games released on CPS-2 hardware by Mitchell
 
-GAME( 2000, mpang,      0,        cps2, cps2_2p1b, cps2_state, init_cps2,     ROT0,   "Mitchell (Capcom license)", "Mighty! Pang (Europe 001010)",         MACHINE_SUPPORTS_SAVE )
-GAME( 2000, mpangr1,    mpang,    cps2, cps2_2p1b, cps2_state, init_cps2,     ROT0,   "Mitchell (Capcom license)", "Mighty! Pang (Europe 000925)",         MACHINE_SUPPORTS_SAVE )
-GAME( 2000, mpangu,     mpang,    cps2, cps2_2p1b, cps2_state, init_cps2,     ROT0,   "Mitchell (Capcom license)", "Mighty! Pang (USA 001010)",            MACHINE_SUPPORTS_SAVE )
-GAME( 2000, mpangj,     mpang,    cps2, cps2_2p1b, cps2_state, init_cps2,     ROT0,   "Mitchell (Capcom license)", "Mighty! Pang (Japan 001011)",          MACHINE_SUPPORTS_SAVE )
-GAME( 2000, mpanga,     mpang,    cps2, cps2_2p1b, cps2_state, init_cps2,     ROT0,   "Mitchell (Capcom license)", "Mighty! Pang (Asia 001010)",           MACHINE_SUPPORTS_SAVE )
-GAME( 2001, pzloop2,    0,        cps2, pzloop2,   cps2_state, init_pzloop2,  ROT0,   "Mitchell (Capcom license)", "Puzz Loop 2 (Europe 010302)",          MACHINE_SUPPORTS_SAVE )
-GAME( 2001, pzloop2j,   pzloop2,  cps2, pzloop2,   cps2_state, init_pzloop2,  ROT0,   "Mitchell (Capcom license)", "Puzz Loop 2 (Japan 010226)",           MACHINE_SUPPORTS_SAVE )
-GAME( 2001, pzloop2jr1, pzloop2,  cps2, pzloop2,   cps2_state, init_pzloop2,  ROT0,   "Mitchell (Capcom license)", "Puzz Loop 2 (Japan 010205)",           MACHINE_SUPPORTS_SAVE )
-GAME( 2001, pzloop2jp,  pzloop2,  dead_cps2, pzloop2,cps2_state, init_pzloop2,ROT0,   "Mitchell (Capcom license)", "Puzz Loop 2 (Japan 010201 Publicity)",    MACHINE_SUPPORTS_SAVE )
-GAME( 2001, choko,      0,        cps2, choko,     cps2_state, init_cps2,     ROT0,   "Mitchell (Capcom license)", "Janpai Puzzle Choukou (Japan 010820)", MACHINE_SUPPORTS_SAVE )
-GAME( 2001, chokop,     0,        dead_cps2, choko,cps2_state, init_cps2,     ROT0,   "Mitchell (Capcom license)", "Janpai Puzzle Choukou (Japan 010820 Publicity)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, mpang,      0,       cps2,      cps2_2p1b, cps2_state, init_cps2,    ROT0,   "Mitchell (Capcom license)", "Mighty! Pang (Europe 001010)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 2000, mpangr1,    mpang,   cps2,      cps2_2p1b, cps2_state, init_cps2,    ROT0,   "Mitchell (Capcom license)", "Mighty! Pang (Europe 000925)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 2000, mpangu,     mpang,   cps2,      cps2_2p1b, cps2_state, init_cps2,    ROT0,   "Mitchell (Capcom license)", "Mighty! Pang (USA 001010)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 2000, mpangj,     mpang,   cps2,      cps2_2p1b, cps2_state, init_cps2,    ROT0,   "Mitchell (Capcom license)", "Mighty! Pang (Japan 001011)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 2000, mpanga,     mpang,   cps2,      cps2_2p1b, cps2_state, init_cps2,    ROT0,   "Mitchell (Capcom license)", "Mighty! Pang (Asia 001010)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 2001, pzloop2,    0,       cps2,      pzloop2,   cps2_state, init_pzloop2, ROT0,   "Mitchell (Capcom license)", "Puzz Loop 2 (Europe 010302)",                    MACHINE_SUPPORTS_SAVE )
+GAME( 2001, pzloop2j,   pzloop2, cps2,      pzloop2,   cps2_state, init_pzloop2, ROT0,   "Mitchell (Capcom license)", "Puzz Loop 2 (Japan 010226)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 2001, pzloop2jr1, pzloop2, cps2,      pzloop2,   cps2_state, init_pzloop2, ROT0,   "Mitchell (Capcom license)", "Puzz Loop 2 (Japan 010205)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 2001, pzloop2jp,  pzloop2, dead_cps2, pzloop2,   cps2_state, init_pzloop2, ROT0,   "Mitchell (Capcom license)", "Puzz Loop 2 (Japan 010201 Publicity)",           MACHINE_SUPPORTS_SAVE )
+GAME( 2001, choko,      0,       cps2,      choko,     cps2_state, init_cps2,    ROT0,   "Mitchell (Capcom license)", "Janpai Puzzle Choukou (Japan 010820)",           MACHINE_SUPPORTS_SAVE )
+GAME( 2001, chokop,     choko,   dead_cps2, choko,     cps2_state, init_cps2,    ROT0,   "Mitchell (Capcom license)", "Janpai Puzzle Choukou (Japan 010820 Publicity)", MACHINE_SUPPORTS_SAVE )
 
 // Games released on CPS-2 hardware by Eighting/Raizing
 

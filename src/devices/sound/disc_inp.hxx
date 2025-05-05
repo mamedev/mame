@@ -246,12 +246,9 @@ DISCRETE_STEP(dss_input_stream)
 {
 	/* the context pointer is set to point to the current input stream data in discrete_stream_update */
 	if (m_is_buffered)
-	{
 		set_output(0,  m_data * m_gain + m_offset);
-		m_inview_sample++;
-	}
 	else
-		set_output(0,  0);
+		set_output(0,  m_stream->get(m_stream_input, m_stream_sample ++) * 32768.0 * m_gain + m_offset);
 }
 
 DISCRETE_RESET(dss_input_stream)
@@ -282,8 +279,6 @@ DISCRETE_START(dss_input_stream)
 {
 	discrete_base_node::start();
 
-	/* Stream out number is set during start */
-	m_stream_in_number = DSS_INPUT_STREAM__STREAM;
 	m_gain = DSS_INPUT_STREAM__GAIN;
 	m_offset = DSS_INPUT_STREAM__OFFSET;
 
