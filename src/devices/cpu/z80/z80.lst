@@ -28,7 +28,8 @@ macro   rm16   %addr
 	@rm %addr
 	TDAT_H = TDAT_L;
 	@rm %addr+1
-	using std::swap; std::swap(TDAT_H, TDAT_L);
+	using std::swap;
+	std::swap(TDAT_H, TDAT_L);
 
 macro   wm   %addr
 	m_memrq_cycles !! data_write(%addr, TDAT8);
@@ -49,11 +50,17 @@ macro   rop
 	if (refresh_en)
 		m_refresh_cb((I << 8) | (R2 & 0x80) | (R & 0x7f), 0x00, 0xff);
 	+ 2
-	PC++; R++; Q = QT; QT = YF | XF;
+	PC++;
+	R++;
+	Q = QT;
+	QT = YF | XF;
 
 macro   r800:rop
 	m_m1_cycles !! TDAT8 = opcode_read();
-	PC++; R++; Q = QT; QT = YF | XF;
+	PC++;
+	R++;
+	Q = QT;
+	QT = YF | XF;
 
 macro   arg
 	m_memrq_cycles !! TDAT8 = arg_read();
@@ -63,15 +70,18 @@ macro   arg16
 	@arg
 	TDAT_H = TDAT_L;
 	@arg
-	using std::swap; swap(TDAT_H, TDAT_L);
+	using std::swap;
+	swap(TDAT_H, TDAT_L);
 
 macro   eax
 	@arg
-	m_ea = (u16)(IX + (s8)TDAT8); WZ = m_ea;
+	m_ea = (u16)(IX + (s8)TDAT8);
+	WZ = m_ea;
 
 macro   eay
 	@arg
-	m_ea = (u16)(IY + (s8)TDAT8); WZ = m_ea;
+	m_ea = (u16)(IY + (s8)TDAT8);
+	WZ = m_ea;
 
 macro   pop
 	m_memrq_cycles !! TDAT_L = stack_read(SP);
@@ -85,17 +95,20 @@ macro   push   %d16
 
 macro   jp
 	@arg16
-	PC = TDAT; WZ = PC;
+	PC = TDAT;
+	WZ = PC;
 
 macro   t6a84:jp
 	@arg16
-	PC = TDAT; WZ = PC;
+	PC = TDAT;
+	WZ = PC;
 	paged_jump();
 
 macro   jp_cond
 	if (TDAT8) {
 		@arg16
-		PC = TDAT; WZ = PC;
+		PC = TDAT;
+		WZ = PC;
 	} else {
 		// implicit do PC += 2
 		@arg16
@@ -105,7 +118,8 @@ macro   jp_cond
 macro   t6a84:jp_cond
 	if (TDAT8) {
 		@arg16
-		PC = TDAT; WZ = PC;
+		PC = TDAT;
+		WZ = PC;
 		paged_jump();
 	} else {
 		// implicit do PC += 2
@@ -116,18 +130,21 @@ macro   t6a84:jp_cond
 macro   jr
 	@arg
 	5 * @nomreq_addr PC-1
-	PC += (s8)TDAT8; WZ = PC;
+	PC += (s8)TDAT8;
+	WZ = PC;
 
 macro   t6a84:jr
 	@arg
 	5 * @nomreq_addr PC-1
-	PC += (s8)TDAT8; WZ = PC;
+	PC += (s8)TDAT8;
+	WZ = PC;
 	paged_jump();
 
 macro   r800:jr
 	@arg
 	+ 1
-	PC += (s8)TDAT8; WZ = PC;
+	PC += (s8)TDAT8;
+	WZ = PC;
 
 macro   jr_cond
 	if (TDAT8) {
@@ -164,12 +181,16 @@ macro   ret_cond
 	@nomreq_ir 1
 	if (TDAT8) {
 		@pop
-		PC = TDAT; WZ = PC;
+		PC = TDAT;
+		WZ = PC;
 	}
 
 macro   retn
 	@pop
-	PC = TDAT; LOGMASKED(LOG_INT, "RETN m_iff1:%d m_iff2:%d\n", m_iff1, m_iff2); WZ = PC; m_iff1 = m_iff2;
+	PC = TDAT;
+	LOGMASKED(LOG_INT, "RETN m_iff1:%d m_iff2:%d\n", m_iff1, m_iff2);
+	WZ = PC;
+	m_iff1 = m_iff2;
 
 macro   z80n:retn
 	m_out_retn_seen_cb(0);
@@ -180,34 +201,44 @@ macro   z80n:retn
 	} else {
 		PC = TDAT;
 	}
-	LOGMASKED(LOG_INT, "RETN m_iff1:%d m_iff2:%d\n", m_iff1, m_iff2); WZ = PC; m_iff1 = m_iff2;
+	LOGMASKED(LOG_INT, "RETN m_iff1:%d m_iff2:%d\n", m_iff1, m_iff2);
+	WZ = PC;
+	m_iff1 = m_iff2;
 
 macro   reti
 	@pop
-	PC = TDAT; WZ = PC; m_iff1 = m_iff2;
+	PC = TDAT;
+	WZ = PC;
+	m_iff1 = m_iff2;
 	daisy_call_reti_device();
 
 macro   t6a84:reti
 	@pop
-	PC = TDAT; WZ = PC; m_iff1 = m_iff2;
+	PC = TDAT;
+	WZ = PC;
+	m_iff1 = m_iff2;
 	paged_reti();
 	daisy_call_reti_device();
 
 macro   ld_r_a
 	@nomreq_ir 1
-	m_r = A; m_r2 = A & 0x80; // keep bit 7 of r
+	m_r = A;
+	m_r2 = A & 0x80; // keep bit 7 of r
 
 macro   r800:ld_r_a
-	m_r = A; m_r2 = A & 0x80; // keep bit 7 of r
+	m_r = A;
+	m_r2 = A & 0x80; // keep bit 7 of r
 
 macro   ld_a_r
 	@nomreq_ir 1
-	A = (m_r & 0x7f) | m_r2; set_f((F & CF) | SZ[A] | (m_iff2 << 2));
+	A = (m_r & 0x7f) | m_r2;
+	set_f((F & CF) | SZ[A] | (m_iff2 << 2));
 	if (HAS_LDAIR_QUIRK)
 		set_service_attention<SA_AFTER_LDAIR, 1>();
 
 macro   r800:ld_a_r
-	A = (m_r & 0x7f) | m_r2; set_f((F & CF) | SZ[A] | (m_iff2 << 2));
+	A = (m_r & 0x7f) | m_r2;
+	set_f((F & CF) | SZ[A] | (m_iff2 << 2));
 	if (HAS_LDAIR_QUIRK)
 		set_service_attention<SA_AFTER_LDAIR, 1>();
 
@@ -220,34 +251,41 @@ macro   r800:ld_i_a
 
 macro   ld_a_i
 	@nomreq_ir 1
-	A = m_i; set_f((F & CF) | SZ[A] | (m_iff2 << 2));
+	A = m_i;
+	set_f((F & CF) | SZ[A] | (m_iff2 << 2));
 	if (HAS_LDAIR_QUIRK)
 		set_service_attention<SA_AFTER_LDAIR, 1>();
 
 macro   r800:ld_a_i
-	A = m_i; set_f((F & CF) | SZ[A] | (m_iff2 << 2));
+	A = m_i;
+	set_f((F & CF) | SZ[A] | (m_iff2 << 2));
 	if (HAS_LDAIR_QUIRK)
 		set_service_attention<SA_AFTER_LDAIR, 1>();
 
 macro   rst	 addr
 	@push PC
-	PC = addr; WZ = PC;
+	PC = addr;
+	WZ = PC;
 
 macro   rrd
 	@rm HL
 	WZ = HL+1;
 	4 * @nomreq_addr HL
-	TDAT_H = TDAT8; TDAT8 = (TDAT8 >> 4) | (A << 4);
+	TDAT_H = TDAT8;
+	TDAT8 = (TDAT8 >> 4) | (A << 4);
 	@wm HL
-	A = (A & 0xf0) | (TDAT_H & 0x0f); set_f((F & CF) | SZP[A]);
+	A = (A & 0xf0) | (TDAT_H & 0x0f);
+	set_f((F & CF) | SZP[A]);
 
 macro   rld
 	@rm HL
 	WZ = HL+1;
 	4 * @nomreq_addr HL
-	TDAT_H = TDAT8; TDAT8 = (TDAT8 << 4) | (A & 0x0f);
+	TDAT_H = TDAT8;
+	TDAT8 = (TDAT8 << 4) | (A & 0x0f);
 	@wm HL
-	A = (A & 0xf0) | (TDAT_H >> 4); set_f((F & CF) | SZP[A]);
+	A = (A & 0xf0) | (TDAT_H >> 4);
+	set_f((F & CF) | SZP[A]);
 
 macro   ex_sp   %d16
 	@pop
@@ -258,148 +296,366 @@ macro   ex_sp   %d16
 	WZ = TDAT;
 
 macro   add16
+{
 	@nomreq_ir 7
-	{ u32 res = TDAT + TDAT2; WZ = TDAT + 1; set_f((F & (SF | ZF | VF)) | (((TDAT ^ res ^ TDAT2) >> 8) & HF) | ((res >> 16) & CF) | ((res >> 8) & (YF | XF))); TDAT = (u16)res; }
+	u32 res = TDAT + TDAT2;
+	WZ = TDAT + 1;
+	set_f((F & (SF | ZF | VF)) | (((TDAT ^ res ^ TDAT2) >> 8) & HF) | ((res >> 16) & CF) | ((res >> 8) & (YF | XF)));
+	TDAT = (u16)res;
+}
 
 macro   r800:add16
-	{ u32 res = TDAT + TDAT2; WZ = TDAT + 1; set_f((F & (SF | ZF | VF)) | (((TDAT ^ res ^ TDAT2) >> 8) & HF) | ((res >> 16) & CF) | ((res >> 8) & (YF | XF))); TDAT = (u16)res; }
+{
+	u32 res = TDAT + TDAT2;
+	WZ = TDAT + 1;
+	set_f((F & (SF | ZF | VF)) | (((TDAT ^ res ^ TDAT2) >> 8) & HF) | ((res >> 16) & CF) | ((res >> 8) & (YF | XF)));
+	TDAT = (u16)res;
+}
 
 macro   adc_hl
+{
 	@nomreq_ir 7
-	{ u32 res = HL + TDAT + (F & CF); WZ = HL + 1; set_f((((HL ^ res ^ TDAT) >> 8) & HF) | ((res >> 16) & CF) | ((res >> 8) & (SF | YF | XF)) | ((res & 0xffff) ? 0 : ZF) | (((TDAT ^ HL ^ 0x8000) & (TDAT ^ res) & 0x8000) >> 13)); HL = (u16)res; }
+	u32 res = HL + TDAT + (F & CF);
+	WZ = HL + 1;
+	set_f((((HL ^ res ^ TDAT) >> 8) & HF) | ((res >> 16) & CF) | ((res >> 8) & (SF | YF | XF)) | ((res & 0xffff) ? 0 : ZF) | (((TDAT ^ HL ^ 0x8000) & (TDAT ^ res) & 0x8000) >> 13));
+	HL = (u16)res;
+}
 
 macro   r800:adc_hl
-	{ u32 res = HL + TDAT + (F & CF); WZ = HL + 1; set_f((((HL ^ res ^ TDAT) >> 8) & HF) | ((res >> 16) & CF) | ((res >> 8) & (SF | YF | XF)) | ((res & 0xffff) ? 0 : ZF) | (((TDAT ^ HL ^ 0x8000) & (TDAT ^ res) & 0x8000) >> 13)); HL = (u16)res; }
+{
+	u32 res = HL + TDAT + (F & CF);
+	WZ = HL + 1;
+	set_f((((HL ^ res ^ TDAT) >> 8) & HF) | ((res >> 16) & CF) | ((res >> 8) & (SF | YF | XF)) | ((res & 0xffff) ? 0 : ZF) | (((TDAT ^ HL ^ 0x8000) & (TDAT ^ res) & 0x8000) >> 13));
+	HL = (u16)res;
+}
 
 macro   sbc_hl
+{
 	@nomreq_ir 7
-	{ u32 res = HL - TDAT - (F & CF); WZ = HL + 1; set_f((((HL ^ res ^ TDAT) >> 8) & HF) | NF | ((res >> 16) & CF) | ((res >> 8) & (SF | YF | XF)) | ((res & 0xffff) ? 0 : ZF) | (((TDAT ^ HL) & (HL ^ res) &0x8000) >> 13)); HL = (u16)res; }
+	u32 res = HL - TDAT - (F & CF);
+	WZ = HL + 1;
+	set_f((((HL ^ res ^ TDAT) >> 8) & HF) | NF | ((res >> 16) & CF) | ((res >> 8) & (SF | YF | XF)) | ((res & 0xffff) ? 0 : ZF) | (((TDAT ^ HL) & (HL ^ res) &0x8000) >> 13));
+	HL = (u16)res;
+}
 
 macro   r800:sbc_hl
-	{ u32 res = HL - TDAT - (F & CF); WZ = HL + 1; set_f((((HL ^ res ^ TDAT) >> 8) & HF) | NF | ((res >> 16) & CF) | ((res >> 8) & (SF | YF | XF)) | ((res & 0xffff) ? 0 : ZF) | (((TDAT ^ HL) & (HL ^ res) &0x8000) >> 13)); HL = (u16)res; }
+{
+	u32 res = HL - TDAT - (F & CF);
+	WZ = HL + 1;
+	set_f((((HL ^ res ^ TDAT) >> 8) & HF) | NF | ((res >> 16) & CF) | ((res >> 8) & (SF | YF | XF)) | ((res & 0xffff) ? 0 : ZF) | (((TDAT ^ HL) & (HL ^ res) & 0x8000) >> 13));
+	HL = (u16)res;
+}
 
 macro   ldi
 	@rm HL
 	@wm DE
 	2 * @nomreq_addr DE
-	set_f(F & (SF | ZF | CF)); if ((A + TDAT8) & 0x02) F |= YF;  if ((A + TDAT8) & 0x08) F |= XF; HL++; DE++; BC--; if(BC) F |= VF;
+	set_f(F & (SF | ZF | CF));
+	if ((A + TDAT8) & 0x02)
+		F |= YF;
+	if ((A + TDAT8) & 0x08)
+		F |= XF;
+	HL++;
+	DE++;
+	BC--;
+	if (BC)
+		F |= VF;
 
 macro   r800:ldi
 	@rm HL
 	@wm DE
 	@nomreq_addr DE
-	set_f(F & (SF | ZF | CF)); if ((A + TDAT8) & 0x02) F |= YF;  if ((A + TDAT8) & 0x08) F |= XF; HL++; DE++; BC--; if(BC) F |= VF;
+	set_f(F & (SF | ZF | CF));
+	if ((A + TDAT8) & 0x02)
+		F |= YF;
+	if ((A + TDAT8) & 0x08)
+		F |= XF;
+	HL++;
+	DE++;
+	BC--;
+	if (BC)
+		F |= VF;
 
 macro   cpi
+{
 	@rm HL
 	5 * @nomreq_addr HL
-	{ u8 res = A - TDAT8; WZ++; HL++; BC--; set_f((F & CF) | (SZ[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF); if (F & HF) res -= 1; if (res & 0x02) F |= YF; if (res & 0x08) F |= XF; if (BC) F |= VF; }
+	u8 res = A - TDAT8;
+	WZ++;
+	HL++;
+	BC--;
+	set_f((F & CF) | (SZ[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF);
+	if (F & HF)
+		res -= 1;
+	if (res & 0x02)
+		F |= YF;
+	if (res & 0x08)
+		F |= XF;
+	if (BC)
+		F |= VF;
+}
 
 macro   r800:cpi
+{
 	@rm HL
 	@nomreq_addr HL
-	{ u8 res = A - TDAT8; WZ++; HL++; BC--; set_f((F & CF) | (SZ[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF); if (F & HF) res -= 1; if (res & 0x02) F |= YF; if (res & 0x08) F |= XF; if (BC) F |= VF; }
+	u8 res = A - TDAT8;
+	WZ++;
+	HL++;
+	BC--;
+	set_f((F & CF) | (SZ[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF);
+	if (F & HF)
+		res -= 1;
+	if (res & 0x02)
+		F |= YF;
+	if (res & 0x08)
+		F |= XF;
+	if (BC)
+		F |= VF;
+}
 
 macro   ini
+{
 	@nomreq_ir 1
 	@in BC
-	WZ = BC + 1; B--;
+	WZ = BC + 1;
+	B--;
 	@wm HL
-	{ HL++; set_f(SZ[B]); unsigned t = (unsigned)((C + 1) & 0xff) + (unsigned)TDAT8; if (TDAT8 & SF) F |= NF; if (t & 0x100) F |= HF | CF; F |= SZP[(u8)(t & 0x07) ^ B] & PF; }
+	HL++;
+	set_f(SZ[B]);
+	unsigned t = (unsigned)((C + 1) & 0xff) + (unsigned)TDAT8;
+	if (TDAT8 & SF)
+		F |= NF;
+	if (t & 0x100)
+		F |= HF | CF;
+	F |= SZP[(u8)(t & 0x07) ^ B] & PF;
+}
 
 macro   r800:ini
+{
 	@in BC
-	WZ = BC + 1; B--;
+	WZ = BC + 1;
+	B--;
 	@wm HL
-	{ HL++; set_f(SZ[B]); unsigned t = (unsigned)((C + 1) & 0xff) + (unsigned)TDAT8; if (TDAT8 & SF) F |= NF; if (t & 0x100) F |= HF | CF; F |= SZP[(u8)(t & 0x07) ^ B] & PF; }
+	HL++;
+	set_f(SZ[B]);
+	unsigned t = (unsigned)((C + 1) & 0xff) + (unsigned)TDAT8;
+	if (TDAT8 & SF)
+		F |= NF;
+	if (t & 0x100)
+		F |= HF | CF;
+	F |= SZP[(u8)(t & 0x07) ^ B] & PF;
+}
 
 macro   outi
+{
 	@nomreq_ir 1
 	@rm HL
-	B--; WZ = BC + 1;
+	B--;
+	WZ = BC + 1;
 	@out BC
-	{ HL++; set_f(SZ[B]); unsigned t = (unsigned)L + (unsigned)TDAT8; if (TDAT8 & SF) F |= NF; if (t & 0x100) F |= HF | CF; F |= SZP[(u8)(t & 0x07) ^ B] & PF; }
+	HL++;
+	set_f(SZ[B]);
+	unsigned t = (unsigned)L + (unsigned)TDAT8;
+	if (TDAT8 & SF)
+		F |= NF;
+	if (t & 0x100)
+		F |= HF | CF;
+	F |= SZP[(u8)(t & 0x07) ^ B] & PF;
+}
 
 macro   r800:outi
+{
 	@rm HL
-	B--; WZ = BC + 1;
+	B--;
+	WZ = BC + 1;
 	@out BC
-	{ HL++; set_f(SZ[B]); unsigned t = (unsigned)L + (unsigned)TDAT8; if (TDAT8 & SF) F |= NF; if (t & 0x100) F |= HF | CF; F |= SZP[(u8)(t & 0x07) ^ B] & PF; }
+	HL++;
+	set_f(SZ[B]);
+	unsigned t = (unsigned)L + (unsigned)TDAT8;
+	if (TDAT8 & SF)
+		F |= NF;
+	if (t & 0x100)
+		F |= HF | CF;
+	F |= SZP[(u8)(t & 0x07) ^ B] & PF;
+}
 
 macro   ldd
+{
 	@rm HL
 	@wm DE
 	2 * @nomreq_addr DE
-	{ set_f(F & (SF | ZF | CF)); if ((A + TDAT8) & 0x02) F |= YF;  if ((A + TDAT8) & 0x08) F |= XF; HL--; DE--; BC--; if (BC) F |= VF; }
+	set_f(F & (SF | ZF | CF));
+	if ((A + TDAT8) & 0x02)
+		F |= YF;
+	if ((A + TDAT8) & 0x08)
+		F |= XF;
+	HL--;
+	DE--;
+	BC--;
+	if (BC)
+		F |= VF;
+}
 
 macro   r800:ldd
+{
 	@rm HL
 	@wm DE
 	@nomreq_addr DE
-	{ set_f(F & (SF | ZF | CF)); if ((A + TDAT8) & 0x02) F |= YF;  if ((A + TDAT8) & 0x08) F |= XF; HL--; DE--; BC--; if (BC) F |= VF; }
+	set_f(F & (SF | ZF | CF));
+	if ((A + TDAT8) & 0x02)
+		F |= YF;
+	if ((A + TDAT8) & 0x08)
+		F |= XF;
+	HL--;
+	DE--;
+	BC--;
+	if (BC)
+		F |= VF;
+}
 
 macro   cpd
+{
 	@rm HL
 	5 * @nomreq_addr HL
-	{ u8 res = A - TDAT8; WZ--; HL--; BC--; set_f((F & CF) | (SZ[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF); if (F & HF) res -= 1; if (res & 0x02) F |= YF; if (res & 0x08) F |= XF; if (BC) F |= VF; }
+	u8 res = A - TDAT8;
+	WZ--;
+	HL--;
+	BC--;
+	set_f((F & CF) | (SZ[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF);
+	if (F & HF)
+		res -= 1;
+	if (res & 0x02)
+		F |= YF;
+	if (res & 0x08)
+		F |= XF;
+	if (BC)
+		F |= VF;
+}
 
 macro   r800:cpd
+{
 	@rm HL
 	@nomreq_addr HL
-	{ u8 res = A - TDAT8; WZ--; HL--; BC--; set_f((F & CF) | (SZ[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF); if (F & HF) res -= 1; if (res & 0x02) F |= YF; if (res & 0x08) F |= XF; if (BC) F |= VF; }
+	u8 res = A - TDAT8;
+	WZ--;
+	HL--;
+	BC--;
+	set_f((F & CF) | (SZ[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF);
+	if (F & HF)
+		res -= 1;
+	if (res & 0x02)
+		F |= YF;
+	if (res & 0x08)
+		F |= XF;
+	if (BC)
+		F |= VF;
+}
 
 macro   ind
+{
 	@nomreq_ir 1
 	@in BC
-	WZ = BC - 1; B--;
+	WZ = BC - 1;
+	B--;
 	@wm HL
-	{ HL--; set_f(SZ[B]); unsigned t = ((unsigned)(C - 1) & 0xff) + (unsigned)TDAT8; if (TDAT8 & SF) F |= NF; if (t & 0x100) F |= HF | CF; F |= SZP[(u8)(t & 0x07) ^ B] & PF; }
+	HL--;
+	set_f(SZ[B]);
+	unsigned t = ((unsigned)(C - 1) & 0xff) + (unsigned)TDAT8;
+	if (TDAT8 & SF)
+		F |= NF;
+	if (t & 0x100)
+		F |= HF | CF;
+	F |= SZP[(u8)(t & 0x07) ^ B] & PF;
+}
 
 macro   r800:ind
+{
 	@in BC
-	WZ = BC - 1; B--;
+	WZ = BC - 1;
+	B--;
 	@wm HL
-	{ HL--; set_f(SZ[B]); unsigned t = ((unsigned)(C - 1) & 0xff) + (unsigned)TDAT8; if (TDAT8 & SF) F |= NF; if (t & 0x100) F |= HF | CF; F |= SZP[(u8)(t & 0x07) ^ B] & PF; }
+	HL--;
+	set_f(SZ[B]);
+	unsigned t = ((unsigned)(C - 1) & 0xff) + (unsigned)TDAT8;
+	if (TDAT8 & SF)
+		F |= NF;
+	if (t & 0x100)
+		F |= HF | CF;
+	F |= SZP[(u8)(t & 0x07) ^ B] & PF;
+}
 
 macro   outd
+{
 	@nomreq_ir 1
 	@rm HL
-	B--; WZ = BC - 1;
+	B--;
+	WZ = BC - 1;
 	@out BC
-	{ HL--; set_f(SZ[B]); unsigned t = (unsigned)L + (unsigned)TDAT8; if (TDAT8 & SF) F |= NF; if (t & 0x100) F |= HF | CF; F |= SZP[(u8)(t & 0x07) ^ B] & PF; }
+	HL--;
+	set_f(SZ[B]);
+	unsigned t = (unsigned)L + (unsigned)TDAT8;
+	if (TDAT8 & SF)
+		F |= NF;
+	if (t & 0x100)
+		F |= HF | CF;
+	F |= SZP[(u8)(t & 0x07) ^ B] & PF;
+}
 
 macro   r800:outd
+{
 	@rm HL
-	B--; WZ = BC - 1;
+	B--;
+	WZ = BC - 1;
 	@out BC
-	{ HL--; set_f(SZ[B]); unsigned t = (unsigned)L + (unsigned)TDAT8; if (TDAT8 & SF) F |= NF; if (t & 0x100) F |= HF | CF; F |= SZP[(u8)(t & 0x07) ^ B] & PF; }
+	HL--;
+	set_f(SZ[B]);
+	unsigned t = (unsigned)L + (unsigned)TDAT8;
+	if (TDAT8 & SF)
+		F |= NF;
+	if (t & 0x100)
+		F |= HF | CF;
+	F |= SZP[(u8)(t & 0x07) ^ B] & PF;
+}
 
 macro   ldir
 	@ldi
 	if (BC != 0) {
 		5 * @nomreq_addr DE
-		PC -= 2; WZ = PC + 1; F &= ~(YF | XF); F |= (PC >> 8) & (YF | XF);
+		PC -= 2;
+		WZ = PC + 1;
+		F &= ~(YF | XF);
+		F |= (PC >> 8) & (YF | XF);
 	}
 
 macro   r800:ldir
 	@ldi
 	if (BC != 0) {
 		@nomreq_addr DE
-		PC -= 2; WZ = PC + 1; F &= ~(YF | XF); F |= (PC >> 8) & (YF | XF);
+		PC -= 2;
+		WZ = PC + 1;
+		F &= ~(YF | XF);
+		F |= (PC >> 8) & (YF | XF);
 	}
 
 macro   cpir
 	@cpi
 	if (BC != 0 && !(F & ZF)) {
 		5 * @nomreq_addr HL
-		PC -= 2; WZ = PC + 1; F &= ~(YF | XF); F |= (PC >> 8) & (YF | XF);
+		PC -= 2;
+		WZ = PC + 1;
+		F &= ~(YF | XF);
+		F |= (PC >> 8) & (YF | XF);
 	}
 
 macro   r800:cpir
 	@cpi
 	@nomreq_addr HL
 	if (BC != 0 && !(F & ZF)) {
-		PC -= 2; WZ = PC + 1; F &= ~(YF | XF); F |= (PC >> 8) & (YF | XF);
+		PC -= 2;
+		WZ = PC + 1;
+		F &= ~(YF | XF);
+		F |= (PC >> 8) & (YF | XF);
 	}
 
 macro   inir
@@ -445,28 +701,40 @@ macro   lddr
 	@ldd
 	if (BC != 0) {
 		5 * @nomreq_addr DE
-		PC -= 2; WZ = PC + 1; F &= ~(YF | XF); F |= (PC >> 8) & (YF | XF);
+		PC -= 2;
+		WZ = PC + 1;
+		F &= ~(YF | XF);
+		F |= (PC >> 8) & (YF | XF);
 	}
 
 macro   r800:lddr
 	@ldd
 	if (BC != 0) {
 		@nomreq_addr DE
-		PC -= 2; WZ = PC + 1; F &= ~(YF | XF); F |= (PC >> 8) & (YF | XF);
+		PC -= 2;
+		WZ = PC + 1;
+		F &= ~(YF | XF);
+		F |= (PC >> 8) & (YF | XF);
 	}
 
 macro   cpdr
 	@cpd
 	if (BC != 0 && !(F & ZF)) {
 		5 * @nomreq_addr HL
-		PC -= 2; WZ = PC + 1; F &= ~(YF | XF); F |= (PC >> 8) & (YF | XF);
+		PC -= 2;
+		WZ = PC + 1;
+		F &= ~(YF | XF);
+		F |= (PC >> 8) & (YF | XF);
 	}
 
 macro   r800:cpdr
 	@cpd
 	@nomreq_addr HL /* suspected wrong. must be inside if? */
 	if (BC != 0 && !(F & ZF)) {
-		PC -= 2; WZ = PC + 1; F &= ~(YF | XF); F |= (PC >> 8) & (YF | XF);
+		PC -= 2;
+		WZ = PC + 1;
+		F &= ~(YF | XF);
+		F |= (PC >> 8) & (YF | XF);
 	}
 
 macro   indr
@@ -530,21 +798,21 @@ macro   take_nmi
 	set_service_attention<SA_NMI_PENDING, 0>();
 
 macro   irqfetch
-	{
-		// fetch the IRQ vector
-		device_z80daisy_interface *intf = daisy_get_irq_device();
-		m_tmp_irq_vector = (intf != nullptr) ? intf->z80daisy_irq_ack() : standard_irq_callback(0, m_pc.w);
-		LOGMASKED(LOG_INT, "single INT m_tmp_irq_vector $%02x\n", m_tmp_irq_vector);
-	}
+{
+	// fetch the IRQ vector
+	device_z80daisy_interface *intf = daisy_get_irq_device();
+	m_tmp_irq_vector = (intf != nullptr) ? intf->z80daisy_irq_ack() : standard_irq_callback(0, m_pc.w);
+	LOGMASKED(LOG_INT, "single INT m_tmp_irq_vector $%02x\n", m_tmp_irq_vector);
+}
 
 macro   t6a84:irqfetch
-	{
-		// fetch the IRQ vector
-		paged_irqfetch();
-		device_z80daisy_interface *intf = daisy_get_irq_device();
-		m_tmp_irq_vector = (intf != nullptr) ? intf->z80daisy_irq_ack() : standard_irq_callback(0, m_pc.w);
-		LOGMASKED(LOG_INT, "single INT m_tmp_irq_vector $%02x\n", m_tmp_irq_vector);
-	}
+{
+	// fetch the IRQ vector
+	paged_irqfetch();
+	device_z80daisy_interface *intf = daisy_get_irq_device();
+	m_tmp_irq_vector = (intf != nullptr) ? intf->z80daisy_irq_ack() : standard_irq_callback(0, m_pc.w);
+	LOGMASKED(LOG_INT, "single INT m_tmp_irq_vector $%02x\n", m_tmp_irq_vector);
+}
 
 macro   take_interrupt
 	// check if processor was halted
@@ -692,9 +960,9 @@ ffff
 			m_busack_cb(0);
 		}
 		@check_interrupts
-		set_service_attention<SA_AFTER_EI, 0>(); // SA_AFTER_EI
+		set_service_attention<SA_AFTER_EI, 0>();
 		if (HAS_LDAIR_QUIRK)
-			set_service_attention<SA_AFTER_LDAIR, 0>(); // SA_AFTER_LDAIR
+			set_service_attention<SA_AFTER_LDAIR, 0>();
 		if (m_halt) { // SA_HALT
 			debugger_wait_hook();
 			@rop
@@ -1544,32 +1812,38 @@ cbff	# SET  7,A
 ##########################################################
 fe00	# RLC  B = (XY+o)
 	@rm_reg m_ea
-	B = rlc(TDAT8); TDAT8 = B;
+	B = rlc(TDAT8);
+	TDAT8 = B;
 	@wm m_ea
 
 fe01	# RLC  C = (XY+o)
 	@rm_reg m_ea
-	C = rlc(TDAT8); TDAT8 = C;
+	C = rlc(TDAT8);
+	TDAT8 = C;
 	@wm m_ea
 
 fe02	# RLC  D = (XY+o)
 	@rm_reg m_ea
-	D = rlc(TDAT8); TDAT8 = D;
+	D = rlc(TDAT8);
+	TDAT8 = D;
 	@wm m_ea
 
 fe03	# RLC  E = (XY+o)
 	@rm_reg m_ea
-	E = rlc(TDAT8); TDAT8 = E;
+	E = rlc(TDAT8);
+	TDAT8 = E;
 	@wm m_ea
 
 fe04	# RLC  H = (XY+o)
 	@rm_reg m_ea
-	H = rlc(TDAT8); TDAT8 = H;
+	H = rlc(TDAT8);
+	TDAT8 = H;
 	@wm m_ea
 
 fe05	# RLC  L = (XY+o)
 	@rm_reg m_ea
-	L = rlc(TDAT8); TDAT8 = L;
+	L = rlc(TDAT8);
+	TDAT8 = L;
 	@wm m_ea
 
 fe06	# RLC  (XY+o)
@@ -1579,37 +1853,44 @@ fe06	# RLC  (XY+o)
 
 fe07	# RLC  A = (XY+o)
 	@rm_reg m_ea
-	A = rlc(TDAT8); TDAT8 = A;
+	A = rlc(TDAT8);
+	TDAT8 = A;
 	@wm m_ea
 
 fe08	# RRC  B = (XY+o)
 	@rm_reg m_ea
-	B = rrc(TDAT8); TDAT8 = B;
+	B = rrc(TDAT8);
+	TDAT8 = B;
 	@wm m_ea
 
 fe09	# RRC  C = (XY+o)
 	@rm_reg m_ea
-	C = rrc(TDAT8); TDAT8 = C;
+	C = rrc(TDAT8);
+	TDAT8 = C;
 	@wm m_ea
 
 fe0a	# RRC  D = (XY+o)
 	@rm_reg m_ea
-	D = rrc(TDAT8); TDAT8 = D;
+	D = rrc(TDAT8);
+	TDAT8 = D;
 	@wm m_ea
 
 fe0b	# RRC  E = (XY+o)
 	@rm_reg m_ea
-	E = rrc(TDAT8); TDAT8 = E;
+	E = rrc(TDAT8);
+	TDAT8 = E;
 	@wm m_ea
 
 fe0c	# RRC  H = (XY+o)
 	@rm_reg m_ea
-	H = rrc(TDAT8); TDAT8 = H;
+	H = rrc(TDAT8);
+	TDAT8 = H;
 	@wm m_ea
 
 fe0d	# RRC  L = (XY+o)
 	@rm_reg m_ea
-	L = rrc(TDAT8); TDAT8 = L;
+	L = rrc(TDAT8);
+	TDAT8 = L;
 	@wm m_ea
 
 fe0e	# RRC  (XY+o)
@@ -1619,37 +1900,44 @@ fe0e	# RRC  (XY+o)
 
 fe0f	# RRC  A = (XY+o)
 	@rm_reg m_ea
-	A = rrc(TDAT8); TDAT8 = A;
+	A = rrc(TDAT8);
+	TDAT8 = A;
 	@wm m_ea
 
 fe10	# RL   B = (XY+o)
 	@rm_reg m_ea
-	B = rl(TDAT8); TDAT8 = B;
+	B = rl(TDAT8);
+	TDAT8 = B;
 	@wm m_ea
 
 fe11	# RL   C = (XY+o)
 	@rm_reg m_ea
-	C = rl(TDAT8); TDAT8 = C;
+	C = rl(TDAT8);
+	TDAT8 = C;
 	@wm m_ea
 
 fe12	# RL   D = (XY+o)
 	@rm_reg m_ea
-	D = rl(TDAT8); TDAT8 = D;
+	D = rl(TDAT8);
+	TDAT8 = D;
 	@wm m_ea
 
 fe13	# RL   E = (XY+o)
 	@rm_reg m_ea
-	E = rl(TDAT8); TDAT8 = E;
+	E = rl(TDAT8);
+	TDAT8 = E;
 	@wm m_ea
 
 fe14	# RL   H = (XY+o)
 	@rm_reg m_ea
-	H = rl(TDAT8); TDAT8 = H;
+	H = rl(TDAT8);
+	TDAT8 = H;
 	@wm m_ea
 
 fe15	# RL   L = (XY+o)
 	@rm_reg m_ea
-	L = rl(TDAT8); TDAT8 = L;
+	L = rl(TDAT8);
+	TDAT8 = L;
 	@wm m_ea
 
 fe16	# RL   (XY+o)
@@ -1659,37 +1947,44 @@ fe16	# RL   (XY+o)
 
 fe17	# RL   A = (XY+o)
 	@rm_reg m_ea
-	A = rl(TDAT8); TDAT8 = A;
+	A = rl(TDAT8);
+	TDAT8 = A;
 	@wm m_ea
 
 fe18	# RR   B = (XY+o)
 	@rm_reg m_ea
-	B = rr(TDAT8); TDAT8 = B;
+	B = rr(TDAT8);
+	TDAT8 = B;
 	@wm m_ea
 
 fe19	# RR   C = (XY+o)
 	@rm_reg m_ea
-	C = rr(TDAT8); TDAT8 = C;
+	C = rr(TDAT8);
+	TDAT8 = C;
 	@wm m_ea
 
 fe1a	# RR   D = (XY+o)
 	@rm_reg m_ea
-	D = rr(TDAT8); TDAT8 = D;
+	D = rr(TDAT8);
+	TDAT8 = D;
 	@wm m_ea
 
 fe1b	# RR   E = (XY+o)
 	@rm_reg m_ea
-	E = rr(TDAT8); TDAT8 = E;
+	E = rr(TDAT8);
+	TDAT8 = E;
 	@wm m_ea
 
 fe1c	# RR   H = (XY+o)
 	@rm_reg m_ea
-	H = rr(TDAT8); TDAT8 = H;
+	H = rr(TDAT8);
+	TDAT8 = H;
 	@wm m_ea
 
 fe1d	# RR   L = (XY+o)
 	@rm_reg m_ea
-	L = rr(TDAT8); TDAT8 = L;
+	L = rr(TDAT8);
+	TDAT8 = L;
 	@wm m_ea
 
 fe1e	# RR   (XY+o)
@@ -1699,37 +1994,44 @@ fe1e	# RR   (XY+o)
 
 fe1f	# RR   A = (XY+o)
 	@rm_reg m_ea
-	A = rr(TDAT8); TDAT8 = A;
+	A = rr(TDAT8);
+	TDAT8 = A;
 	@wm m_ea
 
 fe20	# SLA  B = (XY+o)
 	@rm_reg m_ea
-	B = sla(TDAT8); TDAT8 = B;
+	B = sla(TDAT8);
+	TDAT8 = B;
 	@wm m_ea
 
 fe21	# SLA  C = (XY+o)
 	@rm_reg m_ea
-	C = sla(TDAT8); TDAT8 = C;
+	C = sla(TDAT8);
+	TDAT8 = C;
 	@wm m_ea
 
 fe22	# SLA  D = (XY+o)
 	@rm_reg m_ea
-	D = sla(TDAT8); TDAT8 = D;
+	D = sla(TDAT8);
+	TDAT8 = D;
 	@wm m_ea
 
 fe23	# SLA  E = (XY+o)
 	@rm_reg m_ea
-	E = sla(TDAT8); TDAT8 = E;
+	E = sla(TDAT8);
+	TDAT8 = E;
 	@wm m_ea
 
 fe24	# SLA  H = (XY+o)
 	@rm_reg m_ea
-	H = sla(TDAT8); TDAT8 = H;
+	H = sla(TDAT8);
+	TDAT8 = H;
 	@wm m_ea
 
 fe25	# SLA  L = (XY+o)
 	@rm_reg m_ea
-	L = sla(TDAT8); TDAT8 = L;
+	L = sla(TDAT8);
+	TDAT8 = L;
 	@wm m_ea
 
 fe26	# SLA  (XY+o)
@@ -1739,37 +2041,44 @@ fe26	# SLA  (XY+o)
 
 fe27	# SLA  A = (XY+o)
 	@rm_reg m_ea
-	A = sla(TDAT8); TDAT8 = A;
+	A = sla(TDAT8);
+	TDAT8 = A;
 	@wm m_ea
 
 fe28	# SRA  B = (XY+o)
 	@rm_reg m_ea
-	B = sra(TDAT8); TDAT8 = B;
+	B = sra(TDAT8);
+	TDAT8 = B;
 	@wm m_ea
 
 fe29	# SRA  C = (XY+o)
 	@rm_reg m_ea
-	C = sra(TDAT8); TDAT8 = C;
+	C = sra(TDAT8);
+	TDAT8 = C;
 	@wm m_ea
 
 fe2a	# SRA  D = (XY+o)
 	@rm_reg m_ea
-	D = sra(TDAT8); TDAT8 = D;
+	D = sra(TDAT8);
+	TDAT8 = D;
 	@wm m_ea
 
 fe2b	# SRA  E = (XY+o)
 	@rm_reg m_ea
-	E = sra(TDAT8); TDAT8 = E;
+	E = sra(TDAT8);
+	TDAT8 = E;
 	@wm m_ea
 
 fe2c	# SRA  H = (XY+o)
 	@rm_reg m_ea
-	H = sra(TDAT8); TDAT8 = H;
+	H = sra(TDAT8);
+	TDAT8 = H;
 	@wm m_ea
 
 fe2d	# SRA  L = (XY+o)
 	@rm_reg m_ea
-	L = sra(TDAT8); TDAT8 = L;
+	L = sra(TDAT8);
+	TDAT8 = L;
 	@wm m_ea
 
 fe2e	# SRA  (XY+o)
@@ -1779,37 +2088,44 @@ fe2e	# SRA  (XY+o)
 
 fe2f	# SRA  A = (XY+o)
 	@rm_reg m_ea
-	A = sra(TDAT8); TDAT8 = A;
+	A = sra(TDAT8);
+	TDAT8 = A;
 	@wm m_ea
 
 fe30	# SLL  B = (XY+o)
 	@rm_reg m_ea
-	B = sll(TDAT8); TDAT8 = B;
+	B = sll(TDAT8);
+	TDAT8 = B;
 	@wm m_ea
 
 fe31	# SLL  C = (XY+o)
 	@rm_reg m_ea
-	C = sll(TDAT8); TDAT8 = C;
+	C = sll(TDAT8);
+	TDAT8 = C;
 	@wm m_ea
 
 fe32	# SLL  D = (XY+o)
 	@rm_reg m_ea
-	D = sll(TDAT8); TDAT8 = D;
+	D = sll(TDAT8);
+	TDAT8 = D;
 	@wm m_ea
 
 fe33	# SLL  E = (XY+o)
 	@rm_reg m_ea
-	E = sll(TDAT8); TDAT8 = E;
+	E = sll(TDAT8);
+	TDAT8 = E;
 	@wm m_ea
 
 fe34	# SLL  H = (XY+o)
 	@rm_reg m_ea
-	H = sll(TDAT8); TDAT8 = H;
+	H = sll(TDAT8);
+	TDAT8 = H;
 	@wm m_ea
 
 fe35	# SLL  L = (XY+o)
 	@rm_reg m_ea
-	L = sll(TDAT8); TDAT8 = L;
+	L = sll(TDAT8);
+	TDAT8 = L;
 	@wm m_ea
 
 fe36	# SLL  (XY+o)
@@ -1819,37 +2135,44 @@ fe36	# SLL  (XY+o)
 
 fe37	# SLL  A = (XY+o)
 	@rm_reg m_ea
-	A = sll(TDAT8); TDAT8 = A;
+	A = sll(TDAT8);
+	TDAT8 = A;
 	@wm m_ea
 
 fe38	# SRL  B = (XY+o)
 	@rm_reg m_ea
-	B = srl(TDAT8); TDAT8 = B;
+	B = srl(TDAT8);
+	TDAT8 = B;
 	@wm m_ea
 
 fe39	# SRL  C = (XY+o)
 	@rm_reg m_ea
-	C = srl(TDAT8); TDAT8 = C;
+	C = srl(TDAT8);
+	TDAT8 = C;
 	@wm m_ea
 
 fe3a	# SRL  D = (XY+o)
 	@rm_reg m_ea
-	D = srl(TDAT8); TDAT8 = D;
+	D = srl(TDAT8);
+	TDAT8 = D;
 	@wm m_ea
 
 fe3b	# SRL  E = (XY+o)
 	@rm_reg m_ea
-	E = srl(TDAT8); TDAT8 = E;
+	E = srl(TDAT8);
+	TDAT8 = E;
 	@wm m_ea
 
 fe3c	# SRL  H = (XY+o)
 	@rm_reg m_ea
-	H = srl(TDAT8); TDAT8 = H;
+	H = srl(TDAT8);
+	TDAT8 = H;
 	@wm m_ea
 
 fe3d	# SRL  L = (XY+o)
 	@rm_reg m_ea
-	L = srl(TDAT8); TDAT8 = L;
+	L = srl(TDAT8);
+	TDAT8 = L;
 	@wm m_ea
 
 fe3e	# SRL  (XY+o)
@@ -1859,7 +2182,8 @@ fe3e	# SRL  (XY+o)
 
 fe3f	# SRL  A = (XY+o)
 	@rm_reg m_ea
-	A = srl(TDAT8); TDAT8 = A;
+	A = srl(TDAT8);
+	TDAT8 = A;
 	@wm m_ea
 
 fe40	# BIT  0,(XY+o)
@@ -2064,32 +2388,38 @@ fe7f	# BIT  7,(XY+o)
 
 fe80	# RES  0,B = (XY+o)
 	@rm_reg m_ea
-	B = res(0, TDAT8); TDAT8 = B;
+	B = res(0, TDAT8);
+	TDAT8 = B;
 	@wm m_ea
 
 fe81	# RES  0,C = (XY+o)
 	@rm_reg m_ea
-	C = res(0, TDAT8); TDAT8 = C;
+	C = res(0, TDAT8);
+	TDAT8 = C;
 	@wm m_ea
 
 fe82	# RES  0,D = (XY+o)
 	@rm_reg m_ea
-	D = res(0, TDAT8); TDAT8 = D;
+	D = res(0, TDAT8);
+	TDAT8 = D;
 	@wm m_ea
 
 fe83	# RES  0,E = (XY+o)
 	@rm_reg m_ea
-	E = res(0, TDAT8); TDAT8 = E;
+	E = res(0, TDAT8);
+	TDAT8 = E;
 	@wm m_ea
 
 fe84	# RES  0,H = (XY+o)
 	@rm_reg m_ea
-	H = res(0, TDAT8); TDAT8 = H;
+	H = res(0, TDAT8);
+	TDAT8 = H;
 	@wm m_ea
 
 fe85	# RES  0,L = (XY+o)
 	@rm_reg m_ea
-	L = res(0, TDAT8); TDAT8 = L;
+	L = res(0, TDAT8);
+	TDAT8 = L;
 	@wm m_ea
 
 fe86	# RES  0,(XY+o)
@@ -2099,37 +2429,44 @@ fe86	# RES  0,(XY+o)
 
 fe87	# RES  0,A = (XY+o)
 	@rm_reg m_ea
-	A = res(0, TDAT8); TDAT8 = A;
+	A = res(0, TDAT8);
+	TDAT8 = A;
 	@wm m_ea
 
 fe88	# RES  1,B = (XY+o)
 	@rm_reg m_ea
-	B = res(1, TDAT8); TDAT8 = B;
+	B = res(1, TDAT8);
+	TDAT8 = B;
 	@wm m_ea
 
 fe89	# RES  1,C = (XY+o)
 	@rm_reg m_ea
-	C = res(1, TDAT8); TDAT8 = C;
+	C = res(1, TDAT8);
+	TDAT8 = C;
 	@wm m_ea
 
 fe8a	# RES  1,D = (XY+o)
 	@rm_reg m_ea
-	D = res(1, TDAT8); TDAT8 = D;
+	D = res(1, TDAT8);
+	TDAT8 = D;
 	@wm m_ea
 
 fe8b	# RES  1,E = (XY+o)
 	@rm_reg m_ea
-	E = res(1, TDAT8); TDAT8 = E;
+	E = res(1, TDAT8);
+	TDAT8 = E;
 	@wm m_ea
 
 fe8c	# RES  1,H = (XY+o)
 	@rm_reg m_ea
-	H = res(1, TDAT8); TDAT8 = H;
+	H = res(1, TDAT8);
+	TDAT8 = H;
 	@wm m_ea
 
 fe8d	# RES  1,L = (XY+o)
 	@rm_reg m_ea
-	L = res(1, TDAT8); TDAT8 = L;
+	L = res(1, TDAT8);
+	TDAT8 = L;
 	@wm m_ea
 
 fe8e	# RES  1,(XY+o)
@@ -2139,37 +2476,44 @@ fe8e	# RES  1,(XY+o)
 
 fe8f	# RES  1,A = (XY+o)
 	@rm_reg m_ea
-	A = res(1, TDAT8); TDAT8 = A;
+	A = res(1, TDAT8);
+	TDAT8 = A;
 	@wm m_ea
 
 fe90	# RES  2,B = (XY+o)
 	@rm_reg m_ea
-	B = res(2, TDAT8); TDAT8 = B;
+	B = res(2, TDAT8);
+	TDAT8 = B;
 	@wm m_ea
 
 fe91	# RES  2,C = (XY+o)
 	@rm_reg m_ea
-	C = res(2, TDAT8); TDAT8 = C;
+	C = res(2, TDAT8);
+	TDAT8 = C;
 	@wm m_ea
 
 fe92	# RES  2,D = (XY+o)
 	@rm_reg m_ea
-	D = res(2, TDAT8); TDAT8 = D;
+	D = res(2, TDAT8);
+	TDAT8 = D;
 	@wm m_ea
 
 fe93	# RES  2,E = (XY+o)
 	@rm_reg m_ea
-	E = res(2, TDAT8); TDAT8 = E;
+	E = res(2, TDAT8);
+	TDAT8 = E;
 	@wm m_ea
 
 fe94	# RES  2,H = (XY+o)
 	@rm_reg m_ea
-	H = res(2, TDAT8); TDAT8 = H;
+	H = res(2, TDAT8);
+	TDAT8 = H;
 	@wm m_ea
 
 fe95	# RES  2,L = (XY+o)
 	@rm_reg m_ea
-	L = res(2, TDAT8); TDAT8 = L;
+	L = res(2, TDAT8);
+	TDAT8 = L;
 	@wm m_ea
 
 fe96	# RES  2,(XY+o)
@@ -2179,37 +2523,44 @@ fe96	# RES  2,(XY+o)
 
 fe97	# RES  2,A = (XY+o)
 	@rm_reg m_ea
-	A = res(2, TDAT8); TDAT8 = A;
+	A = res(2, TDAT8);
+	TDAT8 = A;
 	@wm m_ea
 
 fe98	# RES  3,B = (XY+o)
 	@rm_reg m_ea
-	B = res(3, TDAT8); TDAT8 = B;
+	B = res(3, TDAT8);
+	TDAT8 = B;
 	@wm m_ea
 
 fe99	# RES  3,C = (XY+o)
 	@rm_reg m_ea
-	C = res(3, TDAT8); TDAT8 = C;
+	C = res(3, TDAT8);
+	TDAT8 = C;
 	@wm m_ea
 
 fe9a	# RES  3,D = (XY+o)
 	@rm_reg m_ea
-	D = res(3, TDAT8); TDAT8 = D;
+	D = res(3, TDAT8);
+	TDAT8 = D;
 	@wm m_ea
 
 fe9b	# RES  3,E = (XY+o)
 	@rm_reg m_ea
-	E = res(3, TDAT8); TDAT8 = E;
+	E = res(3, TDAT8);
+	TDAT8 = E;
 	@wm m_ea
 
 fe9c	# RES  3,H = (XY+o)
 	@rm_reg m_ea
-	H = res(3, TDAT8); TDAT8 = H;
+	H = res(3, TDAT8);
+	TDAT8 = H;
 	@wm m_ea
 
 fe9d	# RES  3,L = (XY+o)
 	@rm_reg m_ea
-	L = res(3, TDAT8); TDAT8 = L;
+	L = res(3, TDAT8);
+	TDAT8 = L;
 	@wm m_ea
 
 fe9e	# RES  3,(XY+o)
@@ -2219,37 +2570,44 @@ fe9e	# RES  3,(XY+o)
 
 fe9f	# RES  3,A = (XY+o)
 	@rm_reg m_ea
-	A = res(3, TDAT8); TDAT8 = A;
+	A = res(3, TDAT8);
+	TDAT8 = A;
 	@wm m_ea
 
 fea0	# RES  4,B = (XY+o)
 	@rm_reg m_ea
-	B = res(4, TDAT8); TDAT8 = B;
+	B = res(4, TDAT8);
+	TDAT8 = B;
 	@wm m_ea
 
 fea1	# RES  4,C = (XY+o)
 	@rm_reg m_ea
-	C = res(4, TDAT8); TDAT8 = C;
+	C = res(4, TDAT8);
+	TDAT8 = C;
 	@wm m_ea
 
 fea2	# RES  4,D = (XY+o)
 	@rm_reg m_ea
-	D = res(4, TDAT8); TDAT8 = D;
+	D = res(4, TDAT8);
+	TDAT8 = D;
 	@wm m_ea
 
 fea3	# RES  4,E = (XY+o)
 	@rm_reg m_ea
-	E = res(4, TDAT8); TDAT8 = E;
+	E = res(4, TDAT8);
+	TDAT8 = E;
 	@wm m_ea
 
 fea4	# RES  4,H = (XY+o)
 	@rm_reg m_ea
-	H = res(4, TDAT8); TDAT8 = H;
+	H = res(4, TDAT8);
+	TDAT8 = H;
 	@wm m_ea
 
 fea5	# RES  4,L = (XY+o)
 	@rm_reg m_ea
-	L = res(4, TDAT8); TDAT8 = L;
+	L = res(4, TDAT8);
+	TDAT8 = L;
 	@wm m_ea
 
 fea6	# RES  4,(XY+o)
@@ -2259,37 +2617,44 @@ fea6	# RES  4,(XY+o)
 
 fea7	# RES  4,A = (XY+o)
 	@rm_reg m_ea
-	A = res(4, TDAT8); TDAT8 = A;
+	A = res(4, TDAT8);
+	TDAT8 = A;
 	@wm m_ea
 
 fea8	# RES  5,B = (XY+o)
 	@rm_reg m_ea
-	B = res(5, TDAT8); TDAT8 = B;
+	B = res(5, TDAT8);
+	TDAT8 = B;
 	@wm m_ea
 
 fea9	# RES  5,C = (XY+o)
 	@rm_reg m_ea
-	C = res(5, TDAT8); TDAT8 = C;
+	C = res(5, TDAT8);
+	TDAT8 = C;
 	@wm m_ea
 
 feaa	# RES  5,D = (XY+o)
 	@rm_reg m_ea
-	D = res(5, TDAT8); TDAT8 = D;
+	D = res(5, TDAT8);
+	TDAT8 = D;
 	@wm m_ea
 
 feab	# RES  5,E = (XY+o)
 	@rm_reg m_ea
-	E = res(5, TDAT8); TDAT8 = E;
+	E = res(5, TDAT8);
+	TDAT8 = E;
 	@wm m_ea
 
 feac	# RES  5,H = (XY+o)
 	@rm_reg m_ea
-	H = res(5, TDAT8); TDAT8 = H;
+	H = res(5, TDAT8);
+	TDAT8 = H;
 	@wm m_ea
 
 fead	# RES  5,L = (XY+o)
 	@rm_reg m_ea
-	L = res(5, TDAT8); TDAT8 = L;
+	L = res(5, TDAT8);
+	TDAT8 = L;
 	@wm m_ea
 
 feae	# RES  5,(XY+o)
@@ -2299,37 +2664,44 @@ feae	# RES  5,(XY+o)
 
 feaf	# RES  5,A = (XY+o)
 	@rm_reg m_ea
-	A = res(5, TDAT8); TDAT8 = A;
+	A = res(5, TDAT8);
+	TDAT8 = A;
 	@wm m_ea
 
 feb0	# RES  6,B = (XY+o)
 	@rm_reg m_ea
-	B = res(6, TDAT8); TDAT8 = B;
+	B = res(6, TDAT8);
+	TDAT8 = B;
 	@wm m_ea
 
 feb1	# RES  6,C = (XY+o)
 	@rm_reg m_ea
-	C = res(6, TDAT8); TDAT8 = C;
+	C = res(6, TDAT8);
+	TDAT8 = C;
 	@wm m_ea
 
 feb2	# RES  6,D = (XY+o)
 	@rm_reg m_ea
-	D = res(6, TDAT8); TDAT8 = D;
+	D = res(6, TDAT8);
+	TDAT8 = D;
 	@wm m_ea
 
 feb3	# RES  6,E = (XY+o)
 	@rm_reg m_ea
-	E = res(6, TDAT8); TDAT8 = E;
+	E = res(6, TDAT8);
+	TDAT8 = E;
 	@wm m_ea
 
 feb4	# RES  6,H = (XY+o)
 	@rm_reg m_ea
-	H = res(6, TDAT8); TDAT8 = H;
+	H = res(6, TDAT8);
+	TDAT8 = H;
 	@wm m_ea
 
 feb5	# RES  6,L = (XY+o)
 	@rm_reg m_ea
-	L = res(6, TDAT8); TDAT8 = L;
+	L = res(6, TDAT8);
+	TDAT8 = L;
 	@wm m_ea
 
 feb6	# RES  6,(XY+o)
@@ -2339,37 +2711,44 @@ feb6	# RES  6,(XY+o)
 
 feb7	# RES  6,A = (XY+o)
 	@rm_reg m_ea
-	A = res(6, TDAT8); TDAT8 = A;
+	A = res(6, TDAT8);
+	TDAT8 = A;
 	@wm m_ea
 
 feb8	# RES  7,B = (XY+o)
 	@rm_reg m_ea
-	B = res(7, TDAT8); TDAT8 = B;
+	B = res(7, TDAT8);
+	TDAT8 = B;
 	@wm m_ea
 
 feb9	# RES  7,C = (XY+o)
 	@rm_reg m_ea
-	C = res(7, TDAT8); TDAT8 = C;
+	C = res(7, TDAT8);
+	TDAT8 = C;
 	@wm m_ea
 
 feba	# RES  7,D = (XY+o)
 	@rm_reg m_ea
-	D = res(7, TDAT8); TDAT8 = D;
+	D = res(7, TDAT8);
+	TDAT8 = D;
 	@wm m_ea
 
 febb	# RES  7,E = (XY+o)
 	@rm_reg m_ea
-	E = res(7, TDAT8); TDAT8 = E;
+	E = res(7, TDAT8);
+	TDAT8 = E;
 	@wm m_ea
 
 febc	# RES  7,H = (XY+o)
 	@rm_reg m_ea
-	H = res(7, TDAT8); TDAT8 = H;
+	H = res(7, TDAT8);
+	TDAT8 = H;
 	@wm m_ea
 
 febd	# RES  7,L = (XY+o)
 	@rm_reg m_ea
-	L = res(7, TDAT8); TDAT8 = L;
+	L = res(7, TDAT8);
+	TDAT8 = L;
 	@wm m_ea
 
 febe	# RES  7,(XY+o)
@@ -2379,37 +2758,44 @@ febe	# RES  7,(XY+o)
 
 febf	# RES  7,A = (XY+o)
 	@rm_reg m_ea
-	A = res(7, TDAT8); TDAT8 = A;
+	A = res(7, TDAT8);
+	TDAT8 = A;
 	@wm m_ea
 
 fec0	# SET  0,B = (XY+o)
 	@rm_reg m_ea
-	B = set(0, TDAT8); TDAT8 = B;
+	B = set(0, TDAT8);
+	TDAT8 = B;
 	@wm m_ea
 
 fec1	# SET  0,C = (XY+o)
 	@rm_reg m_ea
-	C = set(0, TDAT8); TDAT8 = C;
+	C = set(0, TDAT8);
+	TDAT8 = C;
 	@wm m_ea
 
 fec2	# SET  0,D = (XY+o)
 	@rm_reg m_ea
-	D = set(0, TDAT8); TDAT8 = D;
+	D = set(0, TDAT8);
+	TDAT8 = D;
 	@wm m_ea
 
 fec3	# SET  0,E = (XY+o)
 	@rm_reg m_ea
-	E = set(0, TDAT8); TDAT8 = E;
+	E = set(0, TDAT8);
+	TDAT8 = E;
 	@wm m_ea
 
 fec4	# SET  0,H = (XY+o)
 	@rm_reg m_ea
-	H = set(0, TDAT8); TDAT8 = H;
+	H = set(0, TDAT8);
+	TDAT8 = H;
 	@wm m_ea
 
 fec5	# SET  0,L = (XY+o)
 	@rm_reg m_ea
-	L = set(0, TDAT8); TDAT8 = L;
+	L = set(0, TDAT8);
+	TDAT8 = L;
 	@wm m_ea
 
 fec6	# SET  0,(XY+o)
@@ -2419,37 +2805,44 @@ fec6	# SET  0,(XY+o)
 
 fec7	# SET  0,A = (XY+o)
 	@rm_reg m_ea
-	A = set(0, TDAT8); TDAT8 = A;
+	A = set(0, TDAT8);
+	TDAT8 = A;
 	@wm m_ea
 
 fec8	# SET  1,B = (XY+o)
 	@rm_reg m_ea
-	B = set(1, TDAT8); TDAT8 = B;
+	B = set(1, TDAT8);
+	TDAT8 = B;
 	@wm m_ea
 
 fec9	# SET  1,C = (XY+o)
 	@rm_reg m_ea
-	C = set(1, TDAT8); TDAT8 = C;
+	C = set(1, TDAT8);
+	TDAT8 = C;
 	@wm m_ea
 
 feca	# SET  1,D = (XY+o)
 	@rm_reg m_ea
-	D = set(1, TDAT8); TDAT8 = D;
+	D = set(1, TDAT8);
+	TDAT8 = D;
 	@wm m_ea
 
 fecb	# SET  1,E = (XY+o)
 	@rm_reg m_ea
-	E = set(1, TDAT8); TDAT8 = E;
+	E = set(1, TDAT8);
+	TDAT8 = E;
 	@wm m_ea
 
 fecc	# SET  1,H = (XY+o)
 	@rm_reg m_ea
-	H = set(1, TDAT8); TDAT8 = H;
+	H = set(1, TDAT8);
+	TDAT8 = H;
 	@wm m_ea
 
 fecd	# SET  1,L = (XY+o)
 	@rm_reg m_ea
-	L = set(1, TDAT8); TDAT8 = L;
+	L = set(1, TDAT8);
+	TDAT8 = L;
 	@wm m_ea
 
 fece	# SET  1,(XY+o)
@@ -2459,37 +2852,44 @@ fece	# SET  1,(XY+o)
 
 fecf	# SET  1,A = (XY+o)
 	@rm_reg m_ea
-	A = set(1, TDAT8); TDAT8 = A;
+	A = set(1, TDAT8);
+	TDAT8 = A;
 	@wm m_ea
 
 fed0	# SET  2,B = (XY+o)
 	@rm_reg m_ea
-	B = set(2, TDAT8); TDAT8 = B;
+	B = set(2, TDAT8);
+	TDAT8 = B;
 	@wm m_ea
 
 fed1	# SET  2,C = (XY+o)
 	@rm_reg m_ea
-	C = set(2, TDAT8); TDAT8 = C;
+	C = set(2, TDAT8);
+	TDAT8 = C;
 	@wm m_ea
 
 fed2	# SET  2,D = (XY+o)
 	@rm_reg m_ea
-	D = set(2, TDAT8); TDAT8 = D;
+	D = set(2, TDAT8);
+	TDAT8 = D;
 	@wm m_ea
 
 fed3	# SET  2,E = (XY+o)
 	@rm_reg m_ea
-	E = set(2, TDAT8); TDAT8 = E;
+	E = set(2, TDAT8);
+	TDAT8 = E;
 	@wm m_ea
 
 fed4	# SET  2,H = (XY+o)
 	@rm_reg m_ea
-	H = set(2, TDAT8); TDAT8 = H;
+	H = set(2, TDAT8);
+	TDAT8 = H;
 	@wm m_ea
 
 fed5	# SET  2,L = (XY+o)
 	@rm_reg m_ea
-	L = set(2, TDAT8); TDAT8 = L;
+	L = set(2, TDAT8);
+	TDAT8 = L;
 	@wm m_ea
 
 fed6	# SET  2,(XY+o)
@@ -2499,37 +2899,44 @@ fed6	# SET  2,(XY+o)
 
 fed7	# SET  2,A = (XY+o)
 	@rm_reg m_ea
-	A = set(2, TDAT8); TDAT8 = A;
+	A = set(2, TDAT8);
+	TDAT8 = A;
 	@wm m_ea
 
 fed8	# SET  3,B = (XY+o)
 	@rm_reg m_ea
-	B = set(3, TDAT8); TDAT8 = B;
+	B = set(3, TDAT8);
+	TDAT8 = B;
 	@wm m_ea
 
 fed9	# SET  3,C = (XY+o)
 	@rm_reg m_ea
-	C = set(3, TDAT8); TDAT8 = C;
+	C = set(3, TDAT8);
+	TDAT8 = C;
 	@wm m_ea
 
 feda	# SET  3,D = (XY+o)
 	@rm_reg m_ea
-	D = set(3, TDAT8); TDAT8 = D;
+	D = set(3, TDAT8);
+	TDAT8 = D;
 	@wm m_ea
 
 fedb	# SET  3,E = (XY+o)
 	@rm_reg m_ea
-	E = set(3, TDAT8); TDAT8 = E;
+	E = set(3, TDAT8);
+	TDAT8 = E;
 	@wm m_ea
 
 fedc	# SET  3,H = (XY+o)
 	@rm_reg m_ea
-	H = set(3, TDAT8); TDAT8 = H;
+	H = set(3, TDAT8);
+	TDAT8 = H;
 	@wm m_ea
 
 fedd	# SET  3,L = (XY+o)
 	@rm_reg m_ea
-	L = set(3, TDAT8); TDAT8 = L;
+	L = set(3, TDAT8);
+	TDAT8 = L;
 	@wm m_ea
 
 fede	# SET  3,(XY+o)
@@ -2539,37 +2946,44 @@ fede	# SET  3,(XY+o)
 
 fedf	# SET  3,A = (XY+o)
 	@rm_reg m_ea
-	A = set(3, TDAT8); TDAT8 = A;
+	A = set(3, TDAT8);
+	TDAT8 = A;
 	@wm m_ea
 
 fee0	# SET  4,B = (XY+o)
 	@rm_reg m_ea
-	B = set(4, TDAT8); TDAT8 = B;
+	B = set(4, TDAT8);
+	TDAT8 = B;
 	@wm m_ea
 
 fee1	# SET  4,C = (XY+o)
 	@rm_reg m_ea
-	C = set(4, TDAT8); TDAT8 = C;
+	C = set(4, TDAT8);
+	TDAT8 = C;
 	@wm m_ea
 
 fee2	# SET  4,D = (XY+o)
 	@rm_reg m_ea
-	D = set(4, TDAT8); TDAT8 = D;
+	D = set(4, TDAT8);
+	TDAT8 = D;
 	@wm m_ea
 
 fee3	# SET  4,E = (XY+o)
 	@rm_reg m_ea
-	E = set(4, TDAT8); TDAT8 = E;
+	E = set(4, TDAT8);
+	TDAT8 = E;
 	@wm m_ea
 
 fee4	# SET  4,H = (XY+o)
 	@rm_reg m_ea
-	H = set(4, TDAT8); TDAT8 = H;
+	H = set(4, TDAT8);
+	TDAT8 = H;
 	@wm m_ea
 
 fee5	# SET  4,L = (XY+o)
 	@rm_reg m_ea
-	L = set(4, TDAT8); TDAT8 = L;
+	L = set(4, TDAT8);
+	TDAT8 = L;
 	@wm m_ea
 
 fee6	# SET  4,(XY+o)
@@ -2579,37 +2993,44 @@ fee6	# SET  4,(XY+o)
 
 fee7	# SET  4,A = (XY+o)
 	@rm_reg m_ea
-	A = set(4, TDAT8); TDAT8 = A;
+	A = set(4, TDAT8);
+	TDAT8 = A;
 	@wm m_ea
 
 fee8	# SET  5,B = (XY+o)
 	@rm_reg m_ea
-	B = set(5, TDAT8); TDAT8 = B;
+	B = set(5, TDAT8);
+	TDAT8 = B;
 	@wm m_ea
 
 fee9	# SET  5,C = (XY+o)
 	@rm_reg m_ea
-	C = set(5, TDAT8); TDAT8 = C;
+	C = set(5, TDAT8);
+	TDAT8 = C;
 	@wm m_ea
 
 feea	# SET  5,D = (XY+o)
 	@rm_reg m_ea
-	D = set(5, TDAT8); TDAT8 = D;
+	D = set(5, TDAT8);
+	TDAT8 = D;
 	@wm m_ea
 
 feeb	# SET  5,E = (XY+o)
 	@rm_reg m_ea
-	E = set(5, TDAT8); TDAT8 = E;
+	E = set(5, TDAT8);
+	TDAT8 = E;
 	@wm m_ea
 
 feec	# SET  5,H = (XY+o)
 	@rm_reg m_ea
-	H = set(5, TDAT8); TDAT8 = H;
+	H = set(5, TDAT8);
+	TDAT8 = H;
 	@wm m_ea
 
 feed	# SET  5,L = (XY+o)
 	@rm_reg m_ea
-	L = set(5, TDAT8); TDAT8 = L;
+	L = set(5, TDAT8);
+	TDAT8 = L;
 	@wm m_ea
 
 feee	# SET  5,(XY+o)
@@ -2619,37 +3040,44 @@ feee	# SET  5,(XY+o)
 
 feef	# SET  5,A = (XY+o)
 	@rm_reg m_ea
-	A = set(5, TDAT8); TDAT8 = A;
+	A = set(5, TDAT8);
+	TDAT8 = A;
 	@wm m_ea
 
 fef0	# SET  6,B = (XY+o)
 	@rm_reg m_ea
-	B = set(6, TDAT8); TDAT8 = B;
+	B = set(6, TDAT8);
+	TDAT8 = B;
 	@wm m_ea
 
 fef1	# SET  6,C = (XY+o)
 	@rm_reg m_ea
-	C = set(6, TDAT8); TDAT8 = C;
+	C = set(6, TDAT8);
+	TDAT8 = C;
 	@wm m_ea
 
 fef2	# SET  6,D = (XY+o)
 	@rm_reg m_ea
-	D = set(6, TDAT8); TDAT8 = D;
+	D = set(6, TDAT8);
+	TDAT8 = D;
 	@wm m_ea
 
 fef3	# SET  6,E = (XY+o)
 	@rm_reg m_ea
-	E = set(6, TDAT8); TDAT8 = E;
+	E = set(6, TDAT8);
+	TDAT8 = E;
 	@wm m_ea
 
 fef4	# SET  6,H = (XY+o)
 	@rm_reg m_ea
-	H = set(6, TDAT8); TDAT8 = H;
+	H = set(6, TDAT8);
+	TDAT8 = H;
 	@wm m_ea
 
 fef5	# SET  6,L = (XY+o)
 	@rm_reg m_ea
-	L = set(6, TDAT8); TDAT8 = L;
+	L = set(6, TDAT8);
+	TDAT8 = L;
 	@wm m_ea
 
 fef6	# SET  6,(XY+o)
@@ -2659,37 +3087,44 @@ fef6	# SET  6,(XY+o)
 
 fef7	# SET  6,A = (XY+o)
 	@rm_reg m_ea
-	A = set(6, TDAT8); TDAT8 = A;
+	A = set(6, TDAT8);
+	TDAT8 = A;
 	@wm m_ea
 
 fef8	# SET  7,B = (XY+o)
 	@rm_reg m_ea
-	B = set(7, TDAT8); TDAT8 = B;
+	B = set(7, TDAT8);
+	TDAT8 = B;
 	@wm m_ea
 
 fef9	# SET  7,C = (XY+o)
 	@rm_reg m_ea
-	C = set(7, TDAT8); TDAT8 = C;
+	C = set(7, TDAT8);
+	TDAT8 = C;
 	@wm m_ea
 
 fefa	# SET  7,D = (XY+o)
 	@rm_reg m_ea
-	D = set(7, TDAT8); TDAT8 = D;
+	D = set(7, TDAT8);
+	TDAT8 = D;
 	@wm m_ea
 
 fefb	# SET  7,E = (XY+o)
 	@rm_reg m_ea
-	E = set(7, TDAT8); TDAT8 = E;
+	E = set(7, TDAT8);
+	TDAT8 = E;
 	@wm m_ea
 
 fefc	# SET  7,H = (XY+o)
 	@rm_reg m_ea
-	H = set(7, TDAT8); TDAT8 = H;
+	H = set(7, TDAT8);
+	TDAT8 = H;
 	@wm m_ea
 
 fefd	# SET  7,L = (XY+o)
 	@rm_reg m_ea
-	L = set(7, TDAT8); TDAT8 = L;
+	L = set(7, TDAT8);
+	TDAT8 = L;
 	@wm m_ea
 
 fefe	# SET  7,(XY+o)
@@ -2699,7 +3134,8 @@ fefe	# SET  7,(XY+o)
 
 feff	# SET  7,A = (XY+o)
 	@rm_reg m_ea
-	A = set(7, TDAT8); TDAT8 = A;
+	A = set(7, TDAT8);
+	TDAT8 = A;
 	@wm m_ea
 
 
@@ -2743,7 +3179,8 @@ dd08	# DB   DD
 	@jump 0008
 
 dd09	# ADD  IX,BC
-	TDAT = IX; TDAT2 = BC;
+	TDAT = IX;
+	TDAT2 = BC;
 	@add16
 	IX = TDAT;
 
@@ -2808,7 +3245,8 @@ dd18	# DB   DD
 	@jump 0018
 
 dd19	# ADD  IX,DE
-	TDAT = IX; TDAT2 = DE;
+	TDAT = IX;
+	TDAT2 = DE;
 	@add16
 	IX = TDAT;
 
@@ -2846,7 +3284,8 @@ dd21	# LD   IX,w
 
 dd22	# LD   (w),IX
 	@arg16
-	m_ea = TDAT; TDAT = IX;
+	m_ea = TDAT;
+	TDAT = IX;
 	@wm16 m_ea
 	WZ = m_ea + 1;
 
@@ -2873,7 +3312,8 @@ dd28	# DB   DD
 	@jump 0028
 
 dd29	# ADD  IX,IX
-	TDAT = IX; TDAT2 = IX;
+	TDAT = IX;
+	TDAT2 = IX;
 	@add16
 	IX = TDAT;
 
@@ -2881,7 +3321,8 @@ dd2a	# LD   IX,(w)
 	@arg16
 	m_ea = TDAT;
 	@rm16 m_ea
-	IX = TDAT; WZ = m_ea + 1;
+	IX = TDAT;
+	WZ = m_ea + 1;
 
 dd2b	# DEC  IX
 	@nomreq_ir 2
@@ -2946,7 +3387,8 @@ dd38	# DB   DD
 	@jump 0038
 
 dd39	# ADD  IX,SP
-	TDAT = IX; TDAT2 = SP;
+	TDAT = IX;
+	TDAT2 = SP;
 	@add16
 	IX = TDAT;
 
@@ -3784,7 +4226,8 @@ fd08	# DB   FD
 	@jump 0008
 
 fd09	# ADD  IY,BC
-	TDAT = IY; TDAT2 = BC;
+	TDAT = IY;
+	TDAT2 = BC;
 	@add16
 	IY = TDAT;
 
@@ -3849,7 +4292,8 @@ fd18	# DB   FD
 	@jump 0018
 
 fd19	# ADD  IY,DE
-	TDAT = IY; TDAT2 = DE;
+	TDAT = IY;
+	TDAT2 = DE;
 	@add16
 	IY = TDAT;
 
@@ -3887,7 +4331,8 @@ fd21	# LD   IY,w
 
 fd22	# LD   (w),IY
 	@arg16
-	m_ea = TDAT; TDAT = IY;
+	m_ea = TDAT;
+	TDAT = IY;
 	@wm16 m_ea
 	WZ = m_ea + 1;
 
@@ -3914,7 +4359,8 @@ fd28	# DB   FD
 	@jump 0028
 
 fd29	# ADD  IY,IY
-	TDAT = IY; TDAT2 = IY;
+	TDAT = IY;
+	TDAT2 = IY;
 	@add16
 	IY = TDAT;
 
@@ -3922,7 +4368,8 @@ fd2a	# LD   IY,(w)
 	@arg16
 	m_ea = TDAT;
 	@rm16 m_ea
-	IY = TDAT; WZ = m_ea + 1;
+	IY = TDAT;
+	WZ = m_ea + 1;
 
 fd2b	# DEC  IY
 	@nomreq_ir 2
@@ -3987,7 +4434,8 @@ fd38	# DB   FD
 	@jump 0038
 
 fd39	# ADD  IY,SP
-	TDAT = IY; TDAT2 = SP;
+	TDAT = IY;
+	TDAT2 = SP;
 	@add16
 	IY = TDAT;
 
@@ -4982,7 +5430,9 @@ ed3f	# DB   ED
 
 ed40	# IN   B,(C)
 	@in BC
-	B = TDAT8; set_f((F & CF) | SZP[B]); WZ = BC + 1;
+	B = TDAT8;
+	set_f((F & CF) | SZP[B]);
+	WZ = BC + 1;
 
 ed41	# OUT  (C),B
 	TDAT8 = B;
@@ -4995,7 +5445,8 @@ ed42	# SBC  HL,BC
 
 ed43	# LD   (w),BC
 	@arg16
-	m_ea = TDAT; TDAT = BC;
+	m_ea = TDAT;
+	TDAT = BC;
 	@wm16 m_ea
 	WZ = m_ea + 1;
 
@@ -5013,7 +5464,9 @@ ed47	# LD   i,A
 
 ed48	# IN   C,(C)
 	@in BC
-	C = TDAT8; set_f((F & CF) | SZP[C]); WZ = BC + 1;
+	C = TDAT8;
+	set_f((F & CF) | SZP[C]);
+	WZ = BC + 1;
 
 ed49	# OUT  (C),C
 	TDAT8 = C;
@@ -5028,7 +5481,8 @@ ed4b	# LD   BC,(w)
 	@arg16
 	m_ea = TDAT;
 	@rm16 m_ea
-	BC = TDAT; WZ = m_ea + 1;
+	BC = TDAT;
+	WZ = m_ea + 1;
 
 ed4c	# NEG
 	neg();
@@ -5044,7 +5498,9 @@ ed4f	# LD   r,A
 
 ed50	# IN   D,(C)
 	@in BC
-	D = TDAT8; set_f((F & CF) | SZP[D]); WZ = BC + 1;
+	D = TDAT8;
+	set_f((F & CF) | SZP[D]);
+	WZ = BC + 1;
 
 ed51	# OUT  (C),D
 	TDAT8 = D;
@@ -5057,7 +5513,8 @@ ed52	# SBC  HL,DE
 
 ed53	# LD   (w),DE
 	@arg16
-	m_ea = TDAT; TDAT = DE;
+	m_ea = TDAT;
+	TDAT = DE;
 	@wm16 m_ea
 	WZ = m_ea + 1;
 
@@ -5075,7 +5532,9 @@ ed57	# LD   A,i
 
 ed58	# IN   E,(C)
 	@in BC
-	E = TDAT8; set_f((F & CF) | SZP[E]); WZ = BC + 1;
+	E = TDAT8;
+	set_f((F & CF) | SZP[E]);
+	WZ = BC + 1;
 
 ed59	# OUT  (C),E
 	TDAT8 = E;
@@ -5090,7 +5549,8 @@ ed5b	# LD   DE,(w)
 	@arg16
 	m_ea = TDAT;
 	@rm16 m_ea
-	DE = TDAT; WZ = m_ea + 1;
+	DE = TDAT;
+	WZ = m_ea + 1;
 
 ed5c	# NEG
 	neg();
@@ -5106,7 +5566,9 @@ ed5f	# LD   A,r
 
 ed60	# IN   H,(C)
 	@in BC
-	H = TDAT8; set_f((F & CF) | SZP[H]); WZ = BC + 1;
+	H = TDAT8;
+	set_f((F & CF) | SZP[H]);
+	WZ = BC + 1;
 
 ed61	# OUT  (C),H
 	TDAT8 = H;
@@ -5119,7 +5581,8 @@ ed62	# SBC  HL,HL
 
 ed63	# LD   (w),HL
 	@arg16
-	m_ea = TDAT; TDAT = HL;
+	m_ea = TDAT;
+	TDAT = HL;
 	@wm16 m_ea
 	WZ = m_ea + 1;
 
@@ -5137,7 +5600,9 @@ ed67	# RRD  (HL)
 
 ed68	# IN   L,(C)
 	@in BC
-	L = TDAT8; set_f((F & CF) | SZP[L]); WZ = BC + 1;
+	L = TDAT8;
+	set_f((F & CF) | SZP[L]);
+	WZ = BC + 1;
 
 ed69	# OUT  (C),L
 	TDAT8 = L;
@@ -5152,7 +5617,8 @@ ed6b	# LD   HL,(w)
 	@arg16
 	m_ea = TDAT;
 	@rm16 m_ea
-	HL = TDAT; WZ = m_ea + 1;
+	HL = TDAT;
+	WZ = m_ea + 1;
 
 ed6c	# NEG
 	neg();
@@ -5168,7 +5634,8 @@ ed6f	# RLD  (HL)
 
 ed70	# IN   0,(C)
 	@in BC
-	set_f((F & CF) | SZP[TDAT8]); WZ = BC + 1;
+	set_f((F & CF) | SZP[TDAT8]);
+	WZ = BC + 1;
 
 ed71	# OUT  (C),0
 	TDAT8 = 0;
@@ -5181,7 +5648,8 @@ ed72	# SBC  HL,SP
 
 ed73	# LD   (w),SP
 	@arg16
-	m_ea = TDAT; TDAT = SP;
+	m_ea = TDAT;
+	TDAT = SP;
 	@wm16 m_ea
 	WZ = m_ea + 1;
 
@@ -5199,7 +5667,9 @@ ed77	# DB   ED,77
 
 ed78	# IN   A,(C)
 	@in BC
-	A = TDAT8; set_f((F & CF) | SZP[A]); WZ = BC + 1;
+	A = TDAT8;
+	set_f((F & CF) | SZP[A]);
+	WZ = BC + 1;
 
 ed79	# OUT  (C),A
 	TDAT8 = A;
@@ -5214,7 +5684,8 @@ ed7b	# LD   SP,(w)
 	@arg16
 	m_ea = TDAT;
 	@rm16 m_ea
-	SP = TDAT; WZ = m_ea + 1;
+	SP = TDAT;
+	WZ = m_ea + 1;
 
 ed7c	# NEG
 	neg();
@@ -5625,7 +6096,8 @@ edff	# DB   ED
 0002	# LD (BC),A
 	TDAT8 = A;
 	@wm BC
-	WZ_L = (BC + 1) & 0xFF;  WZ_H = A;
+	WZ_L = (BC + 1) & 0xFF;
+	WZ_H = A;
 
 0003	# INC  BC
 	@nomreq_ir 2
@@ -5645,16 +6117,19 @@ edff	# DB   ED
 	rlca();
 
 0008	# EX   AF,AF'
-	using std::swap; swap(m_af, m_af2);
+	using std::swap;
+	swap(m_af, m_af2);
 
 0009	# ADD  HL,BC
-	TDAT = HL; TDAT2 = BC;
+	TDAT = HL;
+	TDAT2 = BC;
 	@add16
 	HL = TDAT;
 
 000a	# LD   A,(BC)
 	@rm BC
-	A = TDAT8;  WZ = BC+1;
+	A = TDAT8;
+	WZ = BC+1;
 
 000b	# DEC  BC
 	@nomreq_ir 2
@@ -5685,7 +6160,8 @@ edff	# DB   ED
 0012	# LD (DE),A
 	TDAT8 = A;
 	@wm DE
-	WZ_L = (DE + 1) & 0xFF;  WZ_H = A;
+	WZ_L = (DE + 1) & 0xFF;
+	WZ_H = A;
 
 0013	# INC  DE
 	@nomreq_ir 2
@@ -5708,13 +6184,15 @@ edff	# DB   ED
 	@jr
 
 0019	# ADD  HL,DE
-	TDAT = HL; TDAT2 = DE;
+	TDAT = HL;
+	TDAT2 = DE;
 	@add16
 	HL = TDAT;
 
 001a	# LD   A,(DE)
 	@rm DE
-	A = TDAT8; WZ = DE + 1;
+	A = TDAT8;
+	WZ = DE + 1;
 
 001b	# DEC  DE
 	@nomreq_ir 2
@@ -5743,7 +6221,8 @@ edff	# DB   ED
 
 0022	# LD   (w),HL
 	@arg16
-	m_ea = TDAT; TDAT = HL;
+	m_ea = TDAT;
+	TDAT = HL;
 	@wm16 m_ea
 	WZ = m_ea + 1;
 
@@ -5769,7 +6248,8 @@ edff	# DB   ED
 	@jr_cond
 
 0029	# ADD  HL,HL
-	TDAT = HL; TDAT2 = HL;
+	TDAT = HL;
+	TDAT2 = HL;
 	@add16
 	HL = TDAT;
 
@@ -5777,7 +6257,8 @@ edff	# DB   ED
 	@arg16
 	m_ea = TDAT;
 	@rm16 m_ea
-	HL = TDAT; WZ = m_ea + 1;
+	HL = TDAT;
+	WZ = m_ea + 1;
 
 002b	# DEC  HL
 	@nomreq_ir 2
@@ -5794,7 +6275,8 @@ edff	# DB   ED
 	L = TDAT8;
 
 002f	# CPL
-	A ^= 0xff; set_f((F & (SF | ZF | PF | CF)) | HF | NF | (A & (YF | XF)));
+	A ^= 0xff;
+	set_f((F & (SF | ZF | PF | CF)) | HF | NF | (A & (YF | XF)));
 
 0030	# JR   NC,o
 	TDAT8 = !(F & CF);
@@ -5806,9 +6288,11 @@ edff	# DB   ED
 
 0032	# LD   (w),A
 	@arg16
-	m_ea = TDAT; TDAT8 = A;
+	m_ea = TDAT;
+	TDAT8 = A;
 	@wm m_ea
-	WZ_L = (m_ea + 1) & 0xFF; WZ_H = A;
+	WZ_L = (m_ea + 1) & 0xFF;
+	WZ_H = A;
 
 0033	# INC  SP
 	@nomreq_ir 2
@@ -5836,7 +6320,8 @@ edff	# DB   ED
 	@jr_cond
 
 0039	# ADD  HL,SP
-	TDAT = HL; TDAT2 = SP;
+	TDAT = HL;
+	TDAT2 = SP;
 	@add16
 	HL = TDAT;
 
@@ -5844,7 +6329,8 @@ edff	# DB   ED
 	@arg16
 	m_ea = TDAT;
 	@rm m_ea
-	A = TDAT8; WZ = m_ea + 1;
+	A = TDAT8;
+	WZ = m_ea + 1;
 
 003b	# DEC  SP
 	@nomreq_ir 2
@@ -6297,7 +6783,8 @@ edff	# DB   ED
 
 00c9	# RET
 	@pop
-	PC = TDAT; WZ = PC;
+	PC = TDAT;
+	WZ = PC;
 
 00ca	# JP   Z,a
 	TDAT8 = F & ZF;
@@ -6338,7 +6825,8 @@ edff	# DB   ED
 	TDAT2 = TDAT8 | (A << 8);
 	TDAT = A;
 	@out TDAT2
-	WZ_L = ((TDAT2 & 0xff) + 1) & 0xff;  WZ_H = A;
+	WZ_L = ((TDAT2 & 0xff) + 1) & 0xff;
+	WZ_H = A;
 
 00d4	# CALL NC,a
 	TDAT8 = !(F & CF);
@@ -6369,7 +6857,8 @@ edff	# DB   ED
 	@arg
 	TDAT2 = TDAT8 | (A << 8);
 	@in TDAT2
-	A = TDAT8; WZ = TDAT2 + 1;
+	A = TDAT8;
+	WZ = TDAT2 + 1;
 
 00dc	# CALL C,a
 	TDAT8 = F & CF;
@@ -6427,7 +6916,8 @@ edff	# DB   ED
 	@jp_cond
 
 00eb	# EX   DE,HL
-	using std::swap; swap(DE, HL);
+	using std::swap;
+	swap(DE, HL);
 
 00ec	# CALL PE,a
 	TDAT8 = F & PF;
@@ -8349,28 +8839,28 @@ r800:00f3      # DI
 # Z80N
 ##########################################################
 macro   ldix
-	{
-		@rm HL
-		if (TDAT8 != A) {
-			@wm DE
-			;
-		}
-		HL++;
-		DE++;
-		BC--;
+{
+	@rm HL
+	if (TDAT8 != A) {
+		@wm DE
+		;
 	}
+	HL++;
+	DE++;
+	BC--;
+}
 
 macro   lddx
-	{
-		@rm HL
-		if (TDAT8 != A) {
-			@wm DE
-			;
-		}
-		DE++;
-		HL--;
-		BC--;
+{
+	@rm HL
+	if (TDAT8 != A) {
+		@wm DE
+		;
 	}
+	DE++;
+	HL--;
+	BC--;
+}
 
 z80n:ed23	# swapnib
 	A = (A << 4) | (A >> 4);
@@ -8388,10 +8878,10 @@ z80n:ed28	# bsla de,b
 	DE <<= std::min(B & 31, 16);
 
 z80n:ed29	# bsra de,b
-	{
-		const u16 fill = (DE & 0x8000) ? ~u16(0) : u16(0);
-		DE = (DE >> std::min(B & 31, 16)) | (fill << (16 - std::min(B & 31, 16)));
-	}
+{
+	const u16 fill = (DE & 0x8000) ? ~u16(0) : u16(0);
+	DE = (DE >> std::min(B & 31, 16)) | (fill << (16 - std::min(B & 31, 16)));
+}
 
 z80n:ed2a	# bsrl de,b
 	DE >>= std::min(B & 31, 16);

@@ -29,7 +29,7 @@ class IndStr:
         return not self.str
 
     def has_indent(self):
-        return self.indent != ''
+        return self.indent != '' or self.str[0] == "{" or self.str[0] == "}"
 
     def strip_indent(self, n):
         if self.indent != '':
