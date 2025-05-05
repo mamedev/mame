@@ -92,6 +92,7 @@ protected:
 		CURCNT_COF           = 0b111 << CURCNT_COF_SHIFT,    // Cursor off time
 		CURCNT_CON_SHIFT     = 19,
 		CURCNT_CON           = 0b111 << CURCNT_CON_SHIFT,    // Cursor on time
+		CURCNT_BLKC_SHIFT    = 22,
 		CURCNT_BLKC          = 0x400000,    // Blink type
 		CURCNT_EN            = 0x800000,    // Cursor enable
 

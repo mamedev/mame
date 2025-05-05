@@ -772,9 +772,9 @@ void mcd212_device::draw_cursor(uint32_t *scanline)
 		{
 			if (m_cursor_pattern[y] & (1 << (15 - x)))
 			{
-				uint32_t index = cursor_x + x * resolution
-				for (uint32_t j = 0; j < resolution; j++, index++)
+				for (uint32_t j = 0; j < resolution; j++)
 				{
+					uint32_t index = cursor_x + x * resolution + j;
 					if (index < width)
 					{
 						scanline[index] = color;
