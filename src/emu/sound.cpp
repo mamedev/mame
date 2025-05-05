@@ -38,7 +38,7 @@
 #define LOG_OSD_STREAMS (1U << 3)
 #define LOG_ORDER       (1U << 4)
 
-#define VERBOSE -1
+#define VERBOSE 0
 
 #include "logmacro.h"
 
@@ -498,12 +498,11 @@ u64 sound_stream::get_current_sample_index() const
 
 void sound_stream::update()
 {
-	if(!is_active() || m_in_update)
+	if(!is_active() || m_in_update || m_device.machine().phase() <= machine_phase::INIT)
 		return;
 
 	// Find out where we are and how much we have to do
 	u64 idx = get_current_sample_index();
-	//   if idx==0 we're probably still initializing, avoid updating anything
 	m_samples_to_update = !idx ? 0 : idx - m_output_buffer.write_sample() + 1; // We want to include the current sample, hence the +1
 
 	if(m_samples_to_update > 0) {
@@ -521,12 +520,11 @@ void sound_stream::update()
 
 void sound_stream::update_nodeps()
 {
-	if(!is_active() || m_in_update)
+	if(!is_active() || m_in_update || m_device.machine().phase() <= machine_phase::INIT)
 		return;
 
 	// Find out where we are and how much we have to do
 	u64 idx = get_current_sample_index();
-	//   if idx==0 we're probably still initializing, avoid updating anything
 	m_samples_to_update = !idx ? 0 : idx - m_output_buffer.write_sample() + 1; // We want to include the current sample, hence the +1
 
 	if(m_samples_to_update > 0) {
