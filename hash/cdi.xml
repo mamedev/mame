@@ -2800,6 +2800,23 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="sharaku">
+		<!--
+		Origin: Redump
+		<rom name="Cyber Soldier Sharaku (Japan).bin" size="569595600" crc="95d087c9" md5="79788bb0e526740938cf9b4fcfefb02e"/>
+		<rom name="Cyber Soldier Sharaku (Japan).cue" size="93" crc="f5a72d70" md5="f18d676b8be03569c4c51e436dea4199"/>
+		-->
+		<description>Cyber Soldier Sharaku (Japan)</description>
+		<year>1993</year>
+		<publisher>Japan Interactive Media</publisher>
+		<info name="alt_title" value="サイバーソルジャー写楽" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cyber soldier sharaku (japan)" sha1="dca45b2bdf527026adf367afc3d319d355bd8c00"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="spaceace" supported="no">
 		<!--
 		Origin: TOSEC
