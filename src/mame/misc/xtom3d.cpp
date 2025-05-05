@@ -661,8 +661,8 @@ void xtom3d_state::romdisk_config(device_t *device)
 void xtom3d_state::piu10_config(device_t *device)
 {
 	isa16_piu10 &piu10 = *downcast<isa16_piu10 *>(device);
-	piu10.add_route(0, ":lmicrophone", 0.25);
-	piu10.add_route(1, ":rmicrophone", 0.25);
+	piu10.add_route(0, ":microphone", 0.25, 0);
+	piu10.add_route(1, ":microphone", 0.25, 1);
 }
 
 // TODO: unverified PCI config space
@@ -728,16 +728,15 @@ void xtom3d_state::xtom3d(machine_config &config)
 // TODO: stub for drive options (speed/drive type etc.)
 static void cdrom_config(device_t *device)
 {
-	device->subdevice<cdda_device>("cdda")->add_route(0, ":lmicrophone", 0.25);
-	device->subdevice<cdda_device>("cdda")->add_route(1, ":rmicrophone", 0.25);
+	device->subdevice<cdda_device>("cdda")->add_route(0, ":microphone", 0.25, 0);
+	device->subdevice<cdda_device>("cdda")->add_route(1, ":microphone", 0.25, 1);
 }
 
 void xtom3d_state::pumpitup(machine_config &config)
 {
 	xtom3d(config);
 
-	SPEAKER(config, "lmicrophone").front_left();
-	SPEAKER(config, "rmicrophone").front_right();
+	SPEAKER(config, "microphone", 2).front();
 
 	m_pci_ide->subdevice<bus_master_ide_controller_device>("ide1")->slot(0).set_default_option("cdrom");
 	m_pci_ide->subdevice<bus_master_ide_controller_device>("ide1")->slot(0).set_option_machine_config("cdrom", cdrom_config);

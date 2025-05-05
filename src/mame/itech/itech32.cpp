@@ -1867,12 +1867,13 @@ void drivedge_state::drivedge(machine_config &config)
 
 	m_screen->screen_vblank().set_nop(); // interrupt not used?
 
-	SPEAKER(config, "left_back").front_left();   // Sound PCB has hook-ups & AMPs for 5 channels
-	SPEAKER(config, "right_back").front_right(); // As per Sound Tests Menu: Left Front, Right Front, Left Rear, Right Rear, Under Seat
+	// Sound PCB has hook-ups & AMPs for 5 channels
+	// As per Sound Tests Menu: Left Front, Right Front, Left Rear, Right Rear, Under Seat
+	SPEAKER(config, "back", 2).rear();
 
 	m_ensoniq->set_channels(2);
-	m_ensoniq->add_route(2, "right_back", 0.1);  // swapped stereo
-	m_ensoniq->add_route(3, "left_back", 0.1);
+	m_ensoniq->add_route(2, "back", 0.1, 1);  // swapped stereo
+	m_ensoniq->add_route(3, "back", 0.1, 0);
 }
 
 void shoottv_state::shoottv(machine_config &config)
