@@ -49,6 +49,11 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 
 @implementation MAMEDebugView
+{
+	// workaround for the bug that prevents the console view from scrolling
+	// to the bottom when the console window is not full yet
+	BOOL ignoreNextFrameUpdate;
+}
 
 + (void)initialize {
 	// 10.15 and better get full adaptive Dark Mode support
@@ -311,6 +316,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 				content.height += (fontHeight * 2) - 1;
 			[self setFrameSize:NSMakeSize(ceil(std::max(clip.width, content.width)),
 										  ceil(std::max(clip.height, content.height)))];
+			ignoreNextFrameUpdate = YES;
 			[scroller reflectScrolledClipView:[scroller contentView]];
 		}
 		totalWidth = newSize.x;
@@ -476,6 +482,12 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 
 - (void)viewFrameDidChange:(NSNotification *)notification {
+	if (ignoreNextFrameUpdate) {
+		ignoreNextFrameUpdate = NO;
+		return;
+	}
+	ignoreNextFrameUpdate = NO;
+
 	NSView *const changed = [notification object];
 	if (changed == [[self enclosingScrollView] contentView])
 		[self adjustSizeAndRecomputeVisible];
