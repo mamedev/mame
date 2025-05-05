@@ -411,8 +411,9 @@ macro   inir
 	}
 
 macro   r800:inir
-	if (B == 1)
+	if (B == 1) {
 		+ 1
+	}
 	@ini
 	if (B != 0) {
 		PC -= 2;
@@ -428,8 +429,9 @@ macro   otir
 	}
 
 macro   r800:otir
-	if (B == 1)
+	if (B == 1) {
 		+ 1
+	}
 	@outi
 	if (B != 0) {
 		5 * @nomreq_addr BC
@@ -474,8 +476,9 @@ macro   indr
 	}
 
 macro   r800:indr
-	if (B == 1)
+	if (B == 1) {
 		+ 1
+	}
 	@ind
 	if (B != 0) {
 		PC -= 2;
@@ -491,8 +494,9 @@ macro   otdr
 	}
 
 macro   r800:otdr
-	if (B == 1)
+	if (B == 1) {
 		+ 1
+	}
 	@outd
 	if (B != 0) {
 		PC -= 2;
@@ -8220,7 +8224,8 @@ r800:fdff    # illegal
 	illegal_1();
 
 r800:ed46    # IM   0
-	m_im = 0; + 1
+	m_im = 0;
+	+ 1
 
 r800:ed4c    # illegal
 	illegal_2();
