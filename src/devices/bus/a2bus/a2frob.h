@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Golden Child
+// copyright-holders:
 /***********************************************************************
 
   Apple 2 Frob Card by Frobco

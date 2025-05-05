@@ -22,23 +22,23 @@
 #include "emu.h"
 
 #include "a2bus.h"
+#include "a2frobtia.h"
+#include "a2frob.h"
+
 #include "bus/vcs/rom.h"
 #include "bus/vcs/vcs_slot.h"
 #include "bus/vcs_ctrl/ctrl.h"
 #include "cpu/m6502/m6507.h"
+#include "machine/mos6530.h"
+#include "sound/tiaintf.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
-#include "sound/tiaintf.h"
 #include "speaker.h"
-#include "../../mame/atari/tia.h"
-
-#include "machine/mos6530.h"
 
 //#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
-
-#include "a2frob.h"
 
 
 namespace {
@@ -88,22 +88,26 @@ protected:
 
 	virtual bool take_c800() override { return false; }
 
-	u8 m_frob_mem[0x1000] = { 0 };  // 4k frob memory
 
 	u8 read_frob_mem(offs_t offset) { return !m_frob_apple_control ? 0 : m_frob_mem[offset & 0xfff]; }
 
 	void write_frob_mem(offs_t offset, u8 data) { m_frob_mem[offset & 0xfff] = data; }
 
-public:
+
 	void a2600_write_fff0(offs_t offset, u8 data)
 	{
 		m_byte_for_apple = data;
-		m_byte_waiting_flag_apple = 1;
+		machine().scheduler().synchronize(
+			timer_expired_delegate(FUNC(a2600_frob_base_device::sync_write_byte_waiting_flag_apple), this), 1);
 	}
 
 	u8 a2600_read_fff2(offs_t offset)
 	{
-		if (!machine().side_effects_disabled()) m_byte_waiting_flag_vcs = 0;
+		if (!machine().side_effects_disabled())
+		{
+			machine().scheduler().synchronize(
+				timer_expired_delegate(FUNC(a2600_frob_base_device::sync_write_byte_waiting_flag_vcs), this), 0);
+		}
 		return m_byte_for_vcs;
 	}
 
@@ -111,8 +115,6 @@ public:
 	{
 		return (m_byte_waiting_flag_apple ? 0 : 1) << 7 | (m_byte_waiting_flag_vcs << 6);
 	}
-
-protected:
 
 	void switch_A_w(uint8_t data);
 	uint8_t switch_A_r();
@@ -122,14 +124,18 @@ protected:
 	uint8_t a2600_get_databus_contents(offs_t offset);
 	void a2600_tia_vsync_callback(uint16_t data);
 
+	TIMER_CALLBACK_MEMBER(sync_write_byte_waiting_flag_vcs) { m_byte_waiting_flag_vcs = (u8) param; };
+	TIMER_CALLBACK_MEMBER(sync_write_byte_waiting_flag_apple) { m_byte_waiting_flag_apple = (u8) param;};
+
 	required_shared_ptr<uint8_t> m_riot_ram;
-	required_device<tia_video_device> m_tia;
+	required_device<a2frobtia_video_device> m_tia;
 	required_device<m6507_device> m_maincpu;
 	required_device<mos6532_device> m_riot;
 	required_device<vcs_control_port_device> m_joy1;
 	required_device<vcs_control_port_device> m_joy2;
 	required_device<screen_device> m_screen;
 
+	u8 m_frob_mem[0x1000] = { 0 };  // 4k frob memory
 	u8 m_frob_apple_control = 0;  // 0 means that it's under apple control
 	u8 m_byte_waiting_flag_apple = 0;
 	u8 m_byte_waiting_flag_vcs = 0;
@@ -163,7 +169,8 @@ u8 a2600_frob_base_device::read_c0nx(u8 offset)
 		case 1:
 			if (!machine().side_effects_disabled())
 			{
-				m_byte_waiting_flag_apple = 0; // clear byte waiting for apple
+				machine().scheduler().synchronize(
+					timer_expired_delegate(FUNC(a2600_frob_base_device::sync_write_byte_waiting_flag_apple), this), 0);
 			}
 			return m_byte_for_apple;
 		default:
@@ -182,10 +189,11 @@ void a2600_frob_base_device::write_c0nx(u8 offset, u8 data)
 			m_frob_apple_control = BIT(data, 4);
 			m_bidirectional_active = BIT(data, 5);
 			m_frob_page = BIT(data, 0, 4);
-//          printf("m_frob_apple_control = %x  m_frob_page = %x\n",m_frob_apple_control, m_frob_page);
+			LOG("m_frob_apple_control = %x  m_frob_page = %x\n",m_frob_apple_control, m_frob_page);
 			break;
 		case 1:
-			m_byte_waiting_flag_vcs = 1;
+			machine().scheduler().synchronize(
+				timer_expired_delegate(FUNC(a2600_frob_base_device::sync_write_byte_waiting_flag_vcs), this), 1);
 			m_byte_for_vcs = data;
 			break;
 		default:
@@ -195,7 +203,7 @@ void a2600_frob_base_device::write_c0nx(u8 offset, u8 data)
 
 void a2600_frob_base_device::a2600_mem(address_map &map) // 6507 has 13-bit address space, 0x0000 - 0x1fff
 {
-	map(0x0000, 0x007f).mirror(0x0f00).rw(m_tia, FUNC(tia_video_device::read), FUNC(tia_video_device::write));
+	map(0x0000, 0x007f).mirror(0x0f00).rw(m_tia, FUNC(a2frobtia_video_device::read), FUNC(a2frobtia_video_device::write));
 	map(0x0080, 0x00ff).mirror(0x0d00).ram().share("riot_ram");
 	map(0x0280, 0x029f).mirror(0x0d00).m("riot", FUNC(mos6532_device::io_map));
 	map(0x1000, 0x1fff).r(FUNC(a2600_frob_base_device::read_frob_mem));
@@ -207,10 +215,10 @@ void a2600_frob_base_device::a2600_mem(address_map &map) // 6507 has 13-bit addr
 void a2600_frob_base_device::switch_A_w(uint8_t data)
 {
 	/* Left controller port */
-	m_joy1->joy_w( data >> 4 );
+	m_joy1->joy_w(data >> 4);
 
 	/* Right controller port */
-	m_joy2->joy_w( data & 0x0f );
+	m_joy2->joy_w(data & 0x0f);
 }
 
 uint8_t a2600_frob_base_device::switch_A_r()
@@ -384,10 +392,10 @@ void a2600_frob_base_device::device_add_mconfig(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(m_xtal, 228, 26, 26 + 160 + 16, 262, 24 , 24 + 192 + 31);
-	m_screen->set_screen_update("tia_video", FUNC(tia_video_device::screen_update));
+	m_screen->set_screen_update("tia_video", FUNC(a2frobtia_video_device::screen_update));
 
 	/* video hardware */
-	TIA_NTSC_VIDEO(config, m_tia, 0, "tia");
+	A2FROBTIA_NTSC_VIDEO(config, m_tia, 0, "tia");
 	m_tia->read_input_port_callback().set(FUNC(a2600_frob_base_device::a2600_read_input_port));
 	m_tia->databus_contents_callback().set(FUNC(a2600_frob_base_device::a2600_get_databus_contents));
 	m_tia->vsync_callback().set(FUNC(a2600_frob_base_device::a2600_tia_vsync_callback));
