@@ -240,11 +240,11 @@ class OpcodeList:
             line_toc = line_toc[2:]
             line = " ".join(line_toc)
         for i in range(times):
-            if line_toc[0] == 'call':
-                name = line_toc[1]
+            if line_toc[0].startswith('@'):
+                name = line_toc[0][1:]
                 arg = None
-                if len(line_toc) > 2:
-                    arg = " ".join(line_toc[2:])
+                if len(line_toc) > 1:
+                    arg = " ".join(line_toc[1:])
                 if name in self.macros:
                     macro = self.macros[name]
                     ([out.extend(self.pre_process(il)) for il in macro.apply(arg)])
