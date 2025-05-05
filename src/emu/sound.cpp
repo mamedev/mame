@@ -503,7 +503,8 @@ void sound_stream::update()
 
 	// Find out where we are and how much we have to do
 	u64 idx = get_current_sample_index();
-	m_samples_to_update = idx - m_output_buffer.write_sample() + 1; // We want to include the current sample, hence the +1
+	//   if idx==0 we're probably still initializing, avoid updating anything
+	m_samples_to_update = !idx ? 0 : idx - m_output_buffer.write_sample() + 1; // We want to include the current sample, hence the +1
 
 	if(m_samples_to_update > 0) {
 		m_in_update = true;
@@ -525,7 +526,8 @@ void sound_stream::update_nodeps()
 
 	// Find out where we are and how much we have to do
 	u64 idx = get_current_sample_index();
-	m_samples_to_update = idx - m_output_buffer.write_sample() + 1; // We want to include the current sample, hence the +1
+	//   if idx==0 we're probably still initializing, avoid updating anything
+	m_samples_to_update = !idx ? 0 : idx - m_output_buffer.write_sample() + 1; // We want to include the current sample, hence the +1
 
 	if(m_samples_to_update > 0) {
 		m_in_update = true;
