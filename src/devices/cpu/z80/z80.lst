@@ -29,7 +29,7 @@ macro   rm16   %addr
 	TDAT_H = TDAT_L;
 	@rm %addr+1
 	using std::swap;
-	std::swap(TDAT_H, TDAT_L);
+	swap(TDAT_H, TDAT_L);
 
 macro   wm   %addr
 	m_memrq_cycles !! data_write(%addr, TDAT8);
@@ -334,7 +334,7 @@ macro   sbc_hl
 	@nomreq_ir 7
 	u32 res = HL - TDAT - (F & CF);
 	WZ = HL + 1;
-	set_f((((HL ^ res ^ TDAT) >> 8) & HF) | NF | ((res >> 16) & CF) | ((res >> 8) & (SF | YF | XF)) | ((res & 0xffff) ? 0 : ZF) | (((TDAT ^ HL) & (HL ^ res) &0x8000) >> 13));
+	set_f((((HL ^ res ^ TDAT) >> 8) & HF) | NF | ((res >> 16) & CF) | ((res >> 8) & (SF | YF | XF)) | ((res & 0xffff) ? 0 : ZF) | (((TDAT ^ HL) & (HL ^ res) & 0x8000) >> 13));
 	HL = (u16)res;
 }
 
