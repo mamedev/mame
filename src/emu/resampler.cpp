@@ -231,7 +231,7 @@ u32 audio_resampler_hq::compute_gcd(u32 fs, u32 ft)
 
 u32 audio_resampler_hq::history_size() const
 {
-	return m_order_per_lane;
+	return m_order_per_lane + m_skip + 1;
 }
 
 void audio_resampler_hq::apply(const emu::detail::output_buffer_flat<sample_t> &src, std::vector<sample_t> &dest, u64 dest_sample, u32 srcc, float gain, u32 samples) const
@@ -382,7 +382,7 @@ audio_resampler_lofi::audio_resampler_lofi(u32 fs, u32 ft)
 
 u32 audio_resampler_lofi::history_size() const
 {
-	return 5 * m_source_divide;
+	return 5 * m_source_divide + m_fs / m_ft + 1;
 }
 
 void audio_resampler_lofi::apply(const emu::detail::output_buffer_flat<sample_t> &src, std::vector<sample_t> &dest, u64 dest_sample, u32 srcc, float gain, u32 samples) const
