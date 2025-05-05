@@ -363,7 +363,7 @@ a2frobtia_video_device::a2frobtia_video_device(const machine_config &mconfig, de
 }
 
 // device type definition
-DEFINE_DEVICE_TYPE(A2FROBTIA_PAL_VIDEO, a2frobtia_pal_video_device, "a2frobtia_pal_video", "TIA Video (PAL)")
+DEFINE_DEVICE_TYPE(A2FROBTIA_PAL_VIDEO, a2frobtia_pal_video_device, "a2frobtia_pal_video", "A2Frob TIA Video (PAL)")
 
 //-------------------------------------------------
 //  a2frobtia_pal_video_device - constructor
@@ -375,7 +375,7 @@ a2frobtia_pal_video_device::a2frobtia_pal_video_device(const machine_config &mco
 }
 
 // device type definition
-DEFINE_DEVICE_TYPE(A2FROBTIA_NTSC_VIDEO, a2frobtia_ntsc_video_device, "a2frobtia_ntsc_video", "TIA Video (NTSC)")
+DEFINE_DEVICE_TYPE(A2FROBTIA_NTSC_VIDEO, a2frobtia_ntsc_video_device, "a2frobtia_ntsc_video", "A2Frob TIA Video (NTSC)")
 
 //-------------------------------------------------
 //  a2frobtia_ntsc_video_device - constructor
