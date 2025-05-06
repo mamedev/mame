@@ -338,6 +338,26 @@ ROM_START( mastboyoc ) // PCB marked 'MMV-1 FABRICADO POR GAELCO'
 	ROM_LOAD( "l_82s129.ic40", 0x000, 0x100, CRC(4d061216) SHA1(1abf9320da75a3fd23c6bdbcc4088d18e133c4e5) )
 ROM_END
 
+// The distributor text is empty on this set
+ROM_START( mastboyod )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "mb_p1.ic14", 0x0000, 0x4000, CRC(9ff8d386) SHA1(4bf0df6d5cb605f2a4c9ef3cf0ece229ce8cbb40) )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "fij_6_27128.bin", 0x0000, 0x4000, CRC(66ebd96b) SHA1(efd836cae7428131d653aa218c28d73b0afc020c) )
+
+	ROM_REGION( 0x80000, "questions", ROMREGION_ERASEFF )
+	ROM_LOAD( "mb_3-4_27c512.bin", 0x60000, 0x10000, CRC(b2819e38) SHA1(e4dd036747221926d0f9f86e00e28f578decc942) )
+	ROM_LOAD( "mb_1-2_27c512.bin", 0x70000, 0x10000, CRC(98fd79d2) SHA1(7a12d57abe7738d6ba0d0cdfe367544990c8bc6a) )
+
+	ROM_REGION( 0x100, "proms", 0 ) // timing or memory mapping?
+	ROM_LOAD( "d_82s129.ic23", 0x000, 0x100, CRC(d5fd2dfd) SHA1(66e3afa9e73507db0647d125c0be992b27d08adc) )
+
+	ROM_REGION( 0x200, "palette", 0 )
+	ROM_LOAD( "h_82s129.ic39", 0x100, 0x100, CRC(8e965fc3) SHA1(b52c8e505438937c7a5d3e1393d54f0ad0425e78) )
+	ROM_LOAD( "l_82s129.ic40", 0x000, 0x100, CRC(4d061216) SHA1(1abf9320da75a3fd23c6bdbcc4088d18e133c4e5) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -345,3 +365,4 @@ GAME( 1987, mastboyo,  0,        mastboyo, mastboyo, mastboyo_state, empty_init,
 GAME( 1987, mastboyoa, mastboyo, mastboyo, mastboyo, mastboyo_state, empty_init, ROT0, "Gaelco (Covielsa license)",    "Master Boy (1987, Z80 hardware, Covielsa, set 2)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1987, mastboyob, mastboyo, mastboyo, mastboyo, mastboyo_state, empty_init, ROT0, "Gaelco (Ichi-Funtel license)", "Master Boy (1987, Z80 hardware, Ichi-Funtel, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, mastboyoc, mastboyo, mastboyo, mastboyo, mastboyo_state, empty_init, ROT0, "Gaelco (Ichi-Funtel license)", "Master Boy (1987, Z80 hardware, Ichi-Funtel, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mastboyod, mastboyo, mastboyo, mastboyo, mastboyo_state, empty_init, ROT0, "Gaelco",                       "Master Boy (1987, Z80 hardware)",                     MACHINE_SUPPORTS_SAVE )
