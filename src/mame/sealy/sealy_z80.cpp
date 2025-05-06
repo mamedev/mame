@@ -15,11 +15,11 @@ U6295 (Oki M6295 clone)
 
 TODO:
 - program ROMs are encrypted
-- GFX ROMs seem encrypted
 */
 
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
@@ -90,7 +90,21 @@ static INPUT_PORTS_START( djddz ) // TODO
 INPUT_PORTS_END
 
 
-static GFXDECODE_START( gfx ) // TODO
+static const gfx_layout gfxlayout_8x8x16 =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	8,
+	{ STEP8(0, 2) },
+	{ STEP8(0, 8*2) },
+	{ STEP8(0, 8*8*2) },
+	8*8*16
+};
+
+
+static GFXDECODE_START( gfx ) // TODO: not 100% correct, but enough to see some stuff
+	GFXDECODE_ENTRY( "gfx1", 0, gfxlayout_8x8x16, 0, 1 )
+	GFXDECODE_ENTRY( "gfx2", 0, gfxlayout_8x8x16, 0, 1 )
 GFXDECODE_END
 
 
@@ -250,6 +264,6 @@ void sealy_z80_state::init_djddz() // TODO: not enough
 } // anonymous namespace
 
 
-GAME( 200?, bbddz, 0, sealy, djddz, sealy_z80_state, init_djddz, ROT0, "Sealy", "Bai Bian Dou Dizhu", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2005, bbddz, 0, sealy, djddz, sealy_z80_state, init_djddz, ROT0, "Sealy", "Bai Bian Dou Dizhu", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 200?, ddz2,  0, sealy, djddz, sealy_z80_state, empty_init, ROT0, "Sealy", "Dou Dizhu II",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 200?, djddz, 0, sealy, djddz, sealy_z80_state, init_djddz, ROT0, "Sealy", "Dingji Dou Dizhu",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

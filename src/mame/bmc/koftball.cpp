@@ -10,12 +10,11 @@ TODO:
 - Lots of unknown writes/reads.
 - One of the customs could contain a VIA6522-like core. bmc/bmcbowl.cpp
   uses the VIA6522 and the accesses are similar.
+- Better understanding / implementation of the video registers.
 - jxzh and kaimenhu show a full mahjong keyboard in their key tests - is
   this actually supported or is it vestigial?
-- jxzh and kaimenhu bookkeeping menus do not clear the background.
 - jxzh stops responding to inputs properly after winning a hand if
   stripping sequences are enabled.
-- jxzh last chance type A tiles are not visible.
 - Better understanding of the koftball protection.
 
 
@@ -280,29 +279,38 @@ u32 koftball_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	tile race                   over        under       prev screen prev screen 0x17        0x98
 	                                                                            0x00        0x00
 	girl select after coin up   prev screen prev screen over        under       0x13        0x3a
+
+	During game:
+	last chance                 over        under       on top      prev screen 0x17        0x9a
+
+	bookkeeping                 prev screen prev screen prev screen prev screen 0x14        0x98 (pixmap on top)
 	*/
 
-	m_pixbitmap.fill(0, cliprect);
+	m_pixbitmap.fill(m_backpen, cliprect);
 	draw_pixlayer(m_pixbitmap, cliprect);
 
 	bitmap.fill(m_backpen, cliprect);
 
-	if (BIT(m_priority, 3))
+	// TODO: this drawing routine seems too special-cased. Correct it when more evidence becomes available
+	if (BIT(m_gfx_ctrl, 7) && BIT(m_priority, 3))
 		copyscrollbitmap_trans(bitmap, m_pixbitmap, 0, 0, 0, 0, cliprect, 0);
 
-	// TODO: or bit 1?
-	if (BIT(m_gfx_ctrl, 5))
+	if (BIT(m_gfx_ctrl, 5) && BIT(m_gfx_ctrl, 1))
 	{
 		m_tilemap[3]->draw(screen, bitmap, cliprect, 0, 0);
 		m_tilemap[2]->draw(screen, bitmap, cliprect, 0, 0);
 	}
-	else
+	if (!BIT(m_gfx_ctrl, 5))
 	{
 		m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 		m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
 	}
+	if (!BIT(m_gfx_ctrl, 5) && BIT(m_gfx_ctrl, 1))
+	{
+		m_tilemap[2]->draw(screen, bitmap, cliprect, 0, 0);
+	}
 
-	if (!BIT(m_priority, 3))
+	if (BIT(m_gfx_ctrl, 7) && !BIT(m_priority, 3))
 		copyscrollbitmap_trans(bitmap, m_pixbitmap, 0, 0, 0, 0, cliprect, 0);
 
 	return 0;

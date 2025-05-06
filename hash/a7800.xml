@@ -248,11 +248,12 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1988</year>
 		<publisher>Atari / NOVA Game Design. Inc.</publisher>
 		<info name="serial" value="CX7846"/>
+		<info name="pcb" value="C300595 REV A"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="0x20000">
-				<rom name="aceofaeu.bin" size="0x20000" crc="20c5db80" sha1="c43249ba2d38441461e5ffe07ad2e0b46ab1c6df"/>
+				<rom name="c300712-046a_(c)atari_1989_wr269212-20_8927.u1" size="0x20000" crc="20c5db80" sha1="c43249ba2d38441461e5ffe07ad2e0b46ab1c6df"/>
 			</dataarea>
 		</part>
 	</software>
