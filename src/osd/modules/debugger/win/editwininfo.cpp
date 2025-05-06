@@ -32,9 +32,10 @@ constexpr int   HISTORY_LENGTH      = 100;
 } // anonymous namespace
 
 
-editwin_info::editwin_info(debugger_windows_interface &debugger, bool is_main_console, LPCSTR title, WNDPROC handler) :
+editwin_info::editwin_info(debugger_windows_interface &debugger, bool is_main_console, int viewidx, LPCSTR title, WNDPROC handler) :
 	debugwin_info(debugger, is_main_console, title, handler),
 	m_editwnd(nullptr),
+	m_viewidx(viewidx),
 	m_edit_defstr(),
 	m_original_editproc(nullptr),
 	m_history(),
@@ -185,13 +186,13 @@ LRESULT editwin_info::edit_proc(UINT message, WPARAM wparam, LPARAM lparam)
 			break;
 
 		case VK_PRIOR:
-			if (m_views[0] != nullptr)
-				m_views[0]->send_pageup();
+			if (m_views[m_viewidx] != nullptr)
+				m_views[m_viewidx]->send_pageup();
 			break;
 
 		case VK_NEXT:
-			if (m_views[0] != nullptr)
-				m_views[0]->send_pagedown();
+			if (m_views[m_viewidx] != nullptr)
+				m_views[m_viewidx]->send_pagedown();
 			break;
 
 		case VK_TAB:
