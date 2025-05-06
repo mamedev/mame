@@ -2571,7 +2571,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<part name="cdrom" interface="cdrom">
 			<feature name="cd_matrix" value="T-17602GP-02272   A"/>
 			<diskarea name="cdrom">
-				<disk name="ai shougi 2 (japan)" sha1="6c42d91ce7ace93baeccabf4aac80c39a93c4d21" />
+				<disk name="ai shougi 2 (japan)" sha1="6c42d91ce7ace93baeccabf4aac80c39a93c4d21" status="baddump" />
 			</diskarea>
 		</part>
 	</software>
@@ -3457,7 +3457,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<part name="cdrom" interface="cdrom">
 			<feature name="cd_matrix" value="MK-81304P-01319   A   12345"/>
 			<diskarea name="cdrom">
-				<disk name="dark savior (europe)" sha1="8bbb624a8f1f6b452ed5325ee58bc5a86dae7bca" />
+				<disk name="dark savior (europe)" sha1="8bbb624a8f1f6b452ed5325ee58bc5a86dae7bca" status="baddump" />
 			</diskarea>
 		</part>
 	</software>
@@ -3474,7 +3474,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<part name="cdrom" interface="cdrom">
 			<feature name="cd_matrix" value="T-22101GP-01013-P1K   V"/>
 			<diskarea name="cdrom">
-				<disk name="dark savior (japan)" sha1="7d31a47530efd9071ad1ff3e70347f9479ae7e0f" />
+				<disk name="dark savior (japan)" sha1="7d31a47530efd9071ad1ff3e70347f9479ae7e0f" status="baddump" />
 			</diskarea>
 		</part>
 	</software>
@@ -3490,7 +3490,7 @@ Olympic Soccer (Fra) T-7904H-09
 		<part name="cdrom" interface="cdrom">
 			<feature name="cd_matrix" value="*3S*   # 1008681304"/>
 			<diskarea name="cdrom">
-				<disk name="dark savior (usa)" sha1="4c331f8360bd23a4117f14ace761aeac51c00f2c" />
+				<disk name="dark savior (usa)" sha1="4c331f8360bd23a4117f14ace761aeac51c00f2c" status="baddump" />
 			</diskarea>
 		</part>
 	</software>
