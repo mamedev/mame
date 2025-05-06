@@ -39734,6 +39734,11 @@ qczl
 @source:sealy/sealy_fr.cpp
 snowbwar
 
+@source:sealy/sealy_z80.cpp
+bbddz
+ddz2
+djddz
+
 @source:sega/angelkds.cpp
 angelkds
 spcpostn
