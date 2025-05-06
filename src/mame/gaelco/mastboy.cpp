@@ -1165,6 +1165,7 @@ ROM_START( mastboyib )
 	ROM_LOAD( "gal16v8-25.ic84", 0x000, 0x117, NO_DUMP )
 ROM_END
 
+// No internal ROM on the MCU, all the code is on the EPROM.
 ROM_START( mastboyic )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "mboy_italia_programa_tablas_27-oct-92_27c512.bin", 0x0000, 0x8000, CRC(1d14ea03) SHA1(c521d3a640db72e350452ab293e04c56271825de) ) // data (1ST AND 2ND HALF IDENTICAL)
@@ -1313,14 +1314,15 @@ ROM_START( mastboyitst )
 	ROM_LOAD( "gal16v8-25.ic84", 0x000, 0x117, NO_DUMP )
 ROM_END
 
-// PCB dated 03/02/92
+/* Gaelco had an internal version of this set with no internal ROM for the MCU, having the first 0x4000 bytes of the EPROM with actual code, and this hash:
+   CRC(06465aa5) SHA1(c2958197cf5d0f36efb1654d9d0f7c660768f4d1) */
 ROM_START( mastboyiv2 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "hd647180_it_v2.bin", 0x0000, 0x4000, CRC(55a499cc) SHA1(3bd7a175de00f7b102b990bb09b040adf08520f6) ) // game code is internal to the CPU!
-	ROM_LOAD( "13_mem-a.ic77",      0x4000, 0x4000, CRC(06465aa5) SHA1(c2958197cf5d0f36efb1654d9d0f7c660768f4d1) ) // sound data? (+ 1 piece of) 1ST AND 2ND HALF IDENTICAL
-	ROM_CONTINUE(                   0x4000, 0x4000 )
-	ROM_CONTINUE(                   0x4000, 0x4000 )
-	ROM_CONTINUE(                   0x4000, 0x4000 ) // only the last 16kb matters
+	ROM_LOAD( "hd647180_it_v2.bin",                        0x0000, 0x4000, CRC(55a499cc) SHA1(3bd7a175de00f7b102b990bb09b040adf08520f6) ) // game code is internal to the CPU!
+	ROM_LOAD( "mboy_3_italia_tablas_27-oct-92_27c512.bin", 0x4000, 0x4000, CRC(5fa0f502) SHA1(05d7464b2fec2705bc38b80b09e58ee5d08ee974) ) // sound data? (+ 1 piece of) 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(                                          0x4000, 0x4000 )
+	ROM_CONTINUE(                                          0x4000, 0x4000 )
+	ROM_CONTINUE(                                          0x4000, 0x4000 ) // only the last 16kb matters
 
 	ROM_REGION( 0x10000, "vrom", ROMREGION_INVERT ) // ROM accessed by the video chip
 	ROM_LOAD( "14.ic91", 0x00000, 0x10000, CRC(388beade) SHA1(2161ac884d5537293e2dd9786b3556bbc8ebdce6) )
@@ -1365,15 +1367,14 @@ ROM_START( mastboyiv2 )
 	ROM_LOAD( "gal16v8-25.ic84", 0x000, 0x117, NO_DUMP )
 ROM_END
 
-/* Gaelco had an internal version of this set with no internal ROM for the MCU, having the first 0x4000 bytes of the EPROM with actual code, and this hash:
-   CRC(06465aa5) SHA1(c2958197cf5d0f36efb1654d9d0f7c660768f4d1) */
-ROM_START( mastboyiv2a )
+// PCB dated 03/02/92
+ROM_START( mastboyiv2a)
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "hd647180_it_v2.bin",                        0x0000, 0x4000, CRC(55a499cc) SHA1(3bd7a175de00f7b102b990bb09b040adf08520f6) ) // game code is internal to the CPU!
-	ROM_LOAD( "mboy_3_italia_tablas_27-oct-92_27c512.bin", 0x4000, 0x4000, CRC(5fa0f502) SHA1(05d7464b2fec2705bc38b80b09e58ee5d08ee974) ) // sound data? (+ 1 piece of) 1ST AND 2ND HALF IDENTICAL
-	ROM_CONTINUE(                                          0x4000, 0x4000 )
-	ROM_CONTINUE(                                          0x4000, 0x4000 )
-	ROM_CONTINUE(                                          0x4000, 0x4000 ) // only the last 16kb matters
+	ROM_LOAD( "hd647180_it_v2.bin", 0x0000, 0x4000, CRC(55a499cc) SHA1(3bd7a175de00f7b102b990bb09b040adf08520f6) ) // game code is internal to the CPU!
+	ROM_LOAD( "13_mem-a.ic77",      0x4000, 0x4000, CRC(06465aa5) SHA1(c2958197cf5d0f36efb1654d9d0f7c660768f4d1) ) // sound data? (+ 1 piece of) 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(                   0x4000, 0x4000 )
+	ROM_CONTINUE(                   0x4000, 0x4000 )
+	ROM_CONTINUE(                   0x4000, 0x4000 ) // only the last 16kb matters
 
 	ROM_REGION( 0x10000, "vrom", ROMREGION_INVERT ) // ROM accessed by the video chip
 	ROM_LOAD( "14.ic91", 0x00000, 0x10000, CRC(388beade) SHA1(2161ac884d5537293e2dd9786b3556bbc8ebdce6) )
@@ -1441,10 +1442,9 @@ GAME( 1991, mastboyia,   mastboy, mastboy, mastboy, mastboy_state, empty_init, R
 GAME( 1991, mastboyib,   mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco (Playmark license)", "Master Boy (Italy, set 3, checksum 6918)", MACHINE_SUPPORTS_SAVE ) // 27-Oct-1992
 GAME( 1991, mastboyic,   mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco (Playmark license)", "Master Boy (Italy, set 4, checksum 680C)", MACHINE_SUPPORTS_SAVE ) // 27-Oct-1992
 
-GAME( 1991, mastboyiol,  mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco (Playmark license)", "Master Boy Olympic (Italy, set 1, checksum 77A8)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mastboyiol,  mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco (Playmark license)", "Master Boy Olympic (Italy, set 1, checksum 77A8)", MACHINE_SUPPORTS_SAVE ) // 18-Oct-1992
 
 GAME( 1991, mastboyitst, mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco", "Master Boy (Italy, test version)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1992, mastboyiv2,  mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco (Playmark license)", "Master Boy Version II (Italy, set 1, checksum 629B)", MACHINE_SUPPORTS_SAVE ) // 27-Oct-1992. No text on license box at boot
-GAME( 1992, mastboyiv2a, mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco (Playmark license)", "Master Boy Version II (Italy, set 2, checksum 618F)", MACHINE_SUPPORTS_SAVE ) // 27-Oct-1992
-
+GAME( 1992, mastboyiv2,  mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco (Playmark license)", "Master Boy Version II (Italy, set 1, checksum 618F)", MACHINE_SUPPORTS_SAVE ) // 27-Oct-1992
+GAME( 1992, mastboyiv2a, mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco (Playmark license)", "Master Boy Version II (Italy, set 2, checksum 629B)", MACHINE_SUPPORTS_SAVE ) // 27-Oct-1992. No text on license box at boot
