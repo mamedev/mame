@@ -169,6 +169,19 @@ static INPUT_PORTS_START( base )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( dressmtv )
+	PORT_INCLUDE( base )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( jak_spmm )
 	PORT_INCLUDE( base )
 
@@ -393,6 +406,14 @@ ROM_START( gameu108 )
 	ROM_LOAD16_WORD_SWAP( "s29gl256.u5", 0x000000, 0x2000000, CRC(48e727a4) SHA1(7338f8e46f794ae148adb84146cd2eddf4eba98d) )
 ROM_END
 
+ROM_START( dressmtv )
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
+	// pinout seems correct, so upper lines are probably being swapped somewhere else
+	ROM_LOAD16_WORD_SWAP("dressmaniatv.bin", 0x000000, 0x200000, CRC(66702103) SHA1(1b55e2555b53251962e5246984339ea5718800c4) )
+	ROM_CONTINUE(0x400000,0x200000)
+	ROM_CONTINUE(0x200000,0x200000)
+	ROM_CONTINUE(0x600000,0x200000)
+ROM_END
 
 
 void tkmag220_game_state::tkmag220(machine_config &config)
@@ -683,6 +704,9 @@ CONS(2009, smartfpf,  smartfp, 0, base, smartfp,  gcm394_game_state, empty_init,
 // skip the call at 6d47a to get it to show something
 CONS(2008, fpsport,   0,       0, base, base,     gcm394_game_state, empty_init, "Fisher-Price", "3-in-1 Smart Sports! (US)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
+// uses a barcode card scanner device with custom cards
+CONS(200?, dressmtv,  0,       0, base_alt_irq, dressmtv, gormiti_game_state, empty_init, "Tomy Takara", "Disney Princess Dress Mania TV (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
 // These are ports of the 'Family Sport' games to GPL16250 type hardware, but they don't seem to use many unSP 2.0 instructions.
 // The menu style is close to 'm505neo' but the game selection is closer to 'dnv200fs' (but without the Sports titles removed, and with a few other extras not found on that unit)
 CONS(201?, tkmag220,  0,       0, tkmag220, tkmag220, tkmag220_game_state,  empty_init,      "TaiKee / Senca",         "Mini Arcade Games Console (Family Sport 220-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
@@ -701,8 +725,6 @@ CONS(201?, bornkidh,    0,       0, beijuehh, beijuehh, beijuehh_game_state,  em
 
 // die on this one is 'GCM420'
 CONS(2013, gormiti,   0, 0, base, gormiti,  gormiti_game_state, empty_init, "Giochi Preziosi", "Gormiti Game Arena (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-
-// Fun 2 Learn 3-in-1 SMART SPORTS  ?
 
 // unit looks a bit like a knock-off Wii-U tablet, but much smaller
 // was also available under other names, with different designs (PSP style)
