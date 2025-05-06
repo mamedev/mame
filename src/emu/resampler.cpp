@@ -376,7 +376,7 @@ audio_resampler_lofi::audio_resampler_lofi(u32 fs, u32 ft)
 	m_ft = ft;
 
 	m_source_divide = fs <= ft ? 1 : 1+fs/ft;
-	m_step = u64(fs) * 0x1000 / ft / m_source_divide;
+	m_step = u64(fs) * 0x1000000 / ft / m_source_divide;
 }
 
 
@@ -410,6 +410,8 @@ void audio_resampler_lofi::apply(const emu::detail::output_buffer_flat<sample_t>
 	else
 		reader = [s, count = m_source_divide]() mutable -> sample_t { sample_t sm = 0; for(u32 i=0; i != count; i++) { sm += *s++; } return sm / count; };
 
+	phase <<= 12;
+
 	sample_t s0 = reader();
 	sample_t s1 = reader();
 	sample_t s2 = reader();
@@ -417,11 +419,12 @@ void audio_resampler_lofi::apply(const emu::detail::output_buffer_flat<sample_t>
 
 	sample_t *d = dest.data();
 	for(u32 sample = 0; sample != samples; sample++) {
-		*d++ += gain * (- s0 * interpolation_table[0][0x1000-phase] + s1 * interpolation_table[1][0x1000-phase] + s2 * interpolation_table[1][phase] - s3 * interpolation_table[0][phase]);
+		u32 cphase = phase >> 12;
+		*d++ += gain * (- s0 * interpolation_table[0][0x1000-cphase] + s1 * interpolation_table[1][0x1000-cphase] + s2 * interpolation_table[1][cphase] - s3 * interpolation_table[0][cphase]);
 
 		phase += m_step;
-		if(phase & 0x1000) {
-			phase &= 0xfff;
+		if(phase & 0x1000000) {
+			phase &= 0xffffff;
 			s0 = s1;
 			s1 = s2;
 			s2 = s3;
