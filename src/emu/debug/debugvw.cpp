@@ -511,7 +511,19 @@ bool debug_view_expression::recompute()
 		}
 		catch (expression_error &)
 		{
-			m_parsed.parse(oldstring);
+			try
+			{
+				// If we got here because the user typed in a new expression,
+				// then going back to the previous expression should work
+				m_parsed.parse(oldstring);
+			}
+			catch (expression_error &)
+			{
+				// If that didn't work, perhaps the user switched sources
+				// and the previous expression doesn't evaluate with the
+				// new symbol table.  Try "0" as last resort
+				m_parsed.parse("0");
+			}
 		}
 	}
 
