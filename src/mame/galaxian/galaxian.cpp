@@ -11824,7 +11824,7 @@ ROM_START( ladybugg2 )
 	ROM_LOAD( "prom.bin", 0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
 
 	ROM_REGION( 0x0117, "pld", 0 )
-	ROM_LOAD( "pal16l8.bin", 0x0000, 0x0117, NO_DUMP ) // On the program ROMs PCB
+	ROM_LOAD( "pal16l8.bin", 0x0000, 0x0117, BAD_DUMP CRC(13ca9897) SHA1(de8dcea2a2a17aa65ac02e389322113320f8d26b) ) // On the program ROMs PCB. Bruteforced (compiled for a GAL16V8), but not verified
 ROM_END
 
 ROM_START( atlantisb ) // Artic Multi-System
