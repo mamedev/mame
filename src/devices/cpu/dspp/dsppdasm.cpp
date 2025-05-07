@@ -18,7 +18,7 @@
 
 uint32_t dspp_disassembler::opcode_alignment() const
 {
-	return 2;
+	return 1;
 }
 
 offs_t dspp_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
@@ -120,5 +120,5 @@ offs_t dspp_disassembler::disassemble(std::ostream &stream, offs_t pc, const dat
 
 	sprintf(buffer, "????");
 #endif
-	return 4 | 2 | SUPPORTED;
+	return 1 | SUPPORTED;
 }
