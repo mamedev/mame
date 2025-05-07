@@ -17,6 +17,14 @@ on 0211 PCB: 2x 8-DIP banks
 on 0300 III PCB: 4x 8-DIP banks
 
 Some PCBs have been seen mixing different sets of GFX ROMs with the same program ROM.
+
+TODO:
+- black screen after first attract cycle (interrupts?)
+- colors
+- inputs
+- outputs
+- decryption for tpkborama
+- are the tpkg2 GFX ROMs correct for that set?
 */
 
 
@@ -48,7 +56,7 @@ public:
 
 	void pk(machine_config &config) ATTR_COLD;
 
-	void init_tpkborama();
+	void init_tpkborama() ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -60,7 +68,14 @@ private:
 	required_shared_ptr<uint8_t> m_char_ram;
 	required_shared_ptr<uint8_t> m_tile_ram;
 
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void charram_w(offs_t offset, uint8_t data);
+	void tileram_w(offs_t offset, uint8_t data);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
 	void program_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
@@ -69,11 +84,46 @@ private:
 
 void boramz80_state::video_start()
 {
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(boramz80_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(boramz80_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
+
+	m_fg_tilemap->set_transparent_pen(0);
+}
+
+TILE_GET_INFO_MEMBER(boramz80_state::get_bg_tile_info)
+{
+	int const tile = m_tile_ram[2 * tile_index] | (m_tile_ram[2 * tile_index + 1] << 8);
+	//int const color =; // TODO
+
+	tileinfo.set(1, tile, 0, 0);
+}
+
+TILE_GET_INFO_MEMBER(boramz80_state::get_fg_tile_info)
+{
+	int const tile = m_char_ram[2 * tile_index] | ((m_char_ram[2 * tile_index + 1] & 0x03) << 8);
+	//int const color =; // TODO
+
+	tileinfo.set(0, tile, 2, 0);
+}
+
+void boramz80_state::charram_w(offs_t offset, uint8_t data)
+{
+	m_char_ram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset / 2);
+}
+
+void boramz80_state::tileram_w(offs_t offset, uint8_t data)
+{
+	m_tile_ram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 uint32_t boramz80_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(rgb_t::black(), cliprect);
+
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -83,8 +133,8 @@ void boramz80_state::program_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x8fff).ram(); // TODO: only 0x800 for pkboram
-	map(0xa000, 0xa7ff).ram().share(m_char_ram);
-	map(0xc000, 0xc7ff).ram().share(m_tile_ram);
+	map(0xa000, 0xa7ff).ram().w(FUNC(boramz80_state::charram_w)).share(m_char_ram);
+	map(0xc000, 0xc7ff).ram().w(FUNC(boramz80_state::tileram_w)).share(m_tile_ram);
 	map(0xe000, 0xe3ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 	map(0xf000, 0xf3ff).ram().w("palette", FUNC(palette_device::write8_ext)).share("palette_ext");
 }
@@ -182,9 +232,9 @@ static INPUT_PORTS_START( tpkboram )
 INPUT_PORTS_END
 
 
-static GFXDECODE_START( gfx_boram )
-	GFXDECODE_ENTRY( "chars", 0, gfx_8x8x2_planar,  0, 16 )
-	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x4_planar,  0, 16 ) // probably wrong
+static GFXDECODE_START( gfx_boram ) // TODO
+	GFXDECODE_ENTRY( "chars", 0, gfx_8x8x2_planar,  0x000, 8 )
+	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x4_planar,  0x200, 8 )
 GFXDECODE_END
 
 
@@ -194,7 +244,6 @@ void boramz80_state::pk(machine_config &config)
 	Z80(config, m_maincpu, 4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &boramz80_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &boramz80_state::io_map);
-	//m_maincpu->set_vblank_int("screen", FUNC(boramz80_state::irq0_line_hold));
 
 	i8255_device &ppi(I8255A(config, "ppi"));
 	ppi.in_pa_callback().set([this] () { logerror("%s: PPI port A read\n", machine().describe_context()); return ioport("IN0")->read(); });
@@ -205,7 +254,7 @@ void boramz80_state::pk(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: everything
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
+	screen.set_size(40*8, 25*8);
 	screen.set_visarea_full();
 	screen.set_screen_update(FUNC(boramz80_state::screen_update));
 
@@ -213,15 +262,16 @@ void boramz80_state::pk(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, 0);
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_boram);
-	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x400); // TODO: verify once it works
+	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x400); // TODO: wrong format
 
 	SPEAKER(config, "mono").front_center();
 
 	ay8910_device &aysnd(AY8910(config, "aysnd", 4_MHz_XTAL / 4)); // not sure, could derive from 13 MHz XTAL
-	aysnd.port_a_read_callback().set_ioport("DSW1"); // TODO: verify once it works
-	aysnd.port_b_read_callback().set_ioport("DSW2"); // TODO: verify once it works
+	aysnd.port_a_read_callback().set([this] () { logerror("%s: AY port A read\n", machine().describe_context()); return 0; });
+	aysnd.port_b_read_callback().set([this] () { logerror("%s: AY port B read\n", machine().describe_context()); return 0; });
 	aysnd.port_a_write_callback().set([this] (uint8_t data) { logerror("%s: AY port A write %02x\n", machine().describe_context(), data); });
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
@@ -332,7 +382,7 @@ ROM_START( tpkg2 ) // ATPK-BORAM PK-0500 PCB, same GFX as pkrboram
 	ROM_LOAD( "10.pg8", 0x70000, 0x10000, CRC(2c810312) SHA1(df055c7828da2b49bcbd22721309011b7d2143f9) )
 ROM_END
 
-ROM_START( unkboram ) // ATPK-BORAM PK-0500 PCB
+ROM_START( pkts ) // ATPK-BORAM PK-0500 PCB
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "11.rom", 0x0000, 0x8000, CRC(822af541) SHA1(621c88bdc2ddca90127eb7ab10ca4ef6ec0cded0) )
 
@@ -366,9 +416,9 @@ void boramz80_state::init_tpkborama()
 } // anonymous namespace
 
 
-GAME( 1987, pkboram,   0,        pk, pkboram,  boramz80_state, empty_init,     ROT0, "Boram", "PK - New Exciting Poker!",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // PK-BORAM 0211 aug.04.1987. BORAM CORP
-GAME( 1988, tpkboram,  0,        pk, tpkboram, boramz80_state, empty_init,     ROT0, "Boram", "PK Turbo",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // PK-TURBO jan.29.1988. BORAM CORP.
-GAME( 1998, tpkborama, tpkboram, pk, tpkboram, boramz80_state, init_tpkborama, ROT0, "Boram", "PK Turbo (Ver 2.3B2, encrypted)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // dep inctype-23B1998 0519Ver 2.3B2
-GAME( 1990, pkrboram,  0,        pk, tpkboram, boramz80_state, empty_init,     ROT0, "Boram", "PK Rainbow (v 1.5)",              MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // PK RAINBOW v1.5 BORAM Corp. 1990.11.06�
-GAME( 1992, tpkg2,     0,        pk, tpkboram, boramz80_state, empty_init,     ROT0, "Boram", "PK Turbo Great 2",                MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // PK TURBO GREAT2 1992.06.04 BORAM CORP.
-GAME( 19??, unkboram,  0,        pk, tpkboram, boramz80_state, empty_init,     ROT0, "Boram", "unknown Boram poker game",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // PKS v100 BORAM CORP
+GAME( 1987, pkboram,   0,        pk, pkboram,  boramz80_state, empty_init,     ROT0, "Boram", "PK - New Exciting Poker!",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // PK-BORAM 0211 aug.04.1987. BORAM CORP
+GAME( 1988, tpkboram,  0,        pk, tpkboram, boramz80_state, empty_init,     ROT0, "Boram", "PK Turbo",                        MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // PK-TURBO jan.29.1988. BORAM CORP.
+GAME( 1998, tpkborama, tpkboram, pk, tpkboram, boramz80_state, init_tpkborama, ROT0, "Boram", "PK Turbo (Ver 2.3B2, encrypted)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // dep inctype-23B1998 0519Ver 2.3B2
+GAME( 1990, pkrboram,  0,        pk, tpkboram, boramz80_state, empty_init,     ROT0, "Boram", "PK Rainbow (v 1.5)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // PK RAINBOW v1.5 BORAM Corp. 1990.11.06�
+GAME( 1992, tpkg2,     0,        pk, tpkboram, boramz80_state, empty_init,     ROT0, "Boram", "PK Turbo Great 2",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // PK TURBO GREAT2 1992.06.04 BORAM CORP.
+GAME( 19??, pkts,      0,        pk, tpkboram, boramz80_state, empty_init,     ROT0, "Boram", "PK Turbo Special",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // PKS v100 BORAM CORP

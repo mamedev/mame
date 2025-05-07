@@ -25075,6 +25075,7 @@ ropeman
 
 @source:konami/rollerg.cpp
 rollerg
+rollerga
 rollergj
 
 @source:konami/rungun.cpp
@@ -42659,10 +42660,10 @@ boo1000
 @source:skeleton/boramz80.cpp
 pkboram
 pkrboram
+pkts
 tpkboram
 tpkborama
 tpkg2
-unkboram
 
 @source:skeleton/bpmmicro.cpp
 bp1200
