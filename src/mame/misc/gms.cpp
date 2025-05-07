@@ -1415,38 +1415,38 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( jinpaish )
 	// Mahjong keyboard controls:
-	// A                           Select Opponent
-	// B                           Select Opponent
-	// C                           Select Opponent
-	// Start       Start           Select Opponent
-	// Bet         Bet             Select Opponent
-	// Kan         Bet             Select Opponent
-	// Pon         Start           Select Opponent
-	// Chi         Select/Confirm  Select Opponent
-	// Reach       Down            Select Opponent
-	// Ron         View Hole Card  Select Opponent
-	// Take Score  Select          Select Opponent
-	// Double Up   Down            Select Opponent
-	// Big         View Card       Select Opponent
-	// Small                       Select Opponent
+	// A                                              Select Opponent
+	// B                                              Select Opponent
+	// C                                              Select Opponent
+	// Start       Start           Take Score         Select Opponent
+	// Bet         Bet                                Select Opponent
+	// Kan         Bet                                Select Opponent
+	// Pon         Start           Take Score         Select Opponent
+	// Chi         Select/Confirm  Take Score  Big    Select Opponent
+	// Reach       Down            Double Up          Select Opponent
+	// Ron         View Hole Card              Small  Select Opponent
+	// Take Score  Select          Take Score         Select Opponent
+	// Double Up   Down            Double Up          Select Opponent
+	// Big         View Hole Card              Small  Select Opponent
+	// Small                       Take Score         Select Opponent
 	// Seems to be no Up control in mahjong keyboard mode.
 	GMS_MAHJONG_KEYBOARD("DSW1", 0x80, 0x80)
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )                                        PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 )                                         PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)  // 開始鍵
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )                                    PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )                                  PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )                                  PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )                                 PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_BET )                                     PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)  // 押分鍵
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 )         PORT_NAME("Select / Confirm")  PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)  // 選擇鍵 / 確認鍵
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON2 )         PORT_NAME("View Hole Card")    PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)  // 看牌鍵
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )                                        PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )                                        PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )                                        PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )                                        PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )                                        PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )                                              PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 )          PORT_NAME("Start / Take Score")      PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)  // 開始鍵
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )     PORT_NAME("Up")                      PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )   PORT_NAME("Down / Double Up")        PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )                                               PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)  // (would be left, seems to be unused)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )                                               PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)  // (would be right, seems to be unused)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_BET )                                           PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)  // 押分鍵
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 )         PORT_NAME("Select / Confirm / Big")  PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)  // 選擇鍵 / 確認鍵
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON2 )         PORT_NAME("View Hole Card / Small")  PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)  // 看牌鍵
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )                                              PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )                                              PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )                                              PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )                                              PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )                                              PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)
 
 	PORT_MODIFY("IN2")
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
