@@ -343,7 +343,7 @@ machine_static_info::machine_static_info(const ui_options &options, machine_conf
 bool machine_static_info::has_warnings() const noexcept
 {
 	return
-			(machine_flags() & (MACHINE_ERRORS | MACHINE_WARNINGS)) ||
+			(machine_flags() & (MACHINE_ERRORS | MACHINE_WARNINGS | MACHINE_BTANB)) ||
 			(emulation_flags() & DEVICE_ERRORS) ||
 			unemulated_features() ||
 			imperfect_features() ||
