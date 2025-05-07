@@ -113,6 +113,9 @@ void audio_effect_filter::config_load(util::xml::data_node const *ef_node)
 		m_isset_qh = true;
 	} else
 		reset_qh();
+
+	build_highpass();
+	build_lowpass();
 }
 
 void audio_effect_filter::config_save(util::xml::data_node *ef_node) const

@@ -10,12 +10,11 @@ TODO:
 - Lots of unknown writes/reads.
 - One of the customs could contain a VIA6522-like core. bmc/bmcbowl.cpp
   uses the VIA6522 and the accesses are similar.
+- Better understanding / implementation of the video registers.
 - jxzh and kaimenhu show a full mahjong keyboard in their key tests - is
   this actually supported or is it vestigial?
-- jxzh and kaimenhu bookkeeping menus do not clear the background.
 - jxzh stops responding to inputs properly after winning a hand if
   stripping sequences are enabled.
-- jxzh last chance type A tiles are not visible.
 - Better understanding of the koftball protection.
 
 
@@ -225,9 +224,8 @@ void koftball_state::video_start()
 	m_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(koftball_state::get_tile_info<3>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_tilemap[0]->set_transparent_pen(0);
-	m_tilemap[2]->set_transparent_pen(0);
-
 	m_tilemap[1]->set_transparent_pen(0);
+	m_tilemap[2]->set_transparent_pen(0);
 	m_tilemap[3]->set_transparent_pen(0);
 
 	m_pixbitmap.allocate(512, 256);
@@ -240,15 +238,15 @@ void koftball_state::draw_pixlayer(bitmap_ind16 &bitmap, const rectangle &clipre
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const u16 pitch = y * 0x80;
-		for (int x = cliprect.min_x; x <= cliprect.max_x >> 2; x++)
+		const u16 pitch = y << 7;
+		for (int x = cliprect.min_x >> 2; x <= cliprect.max_x >> 2; x++)
 		{
 			const u16 tile_data = m_pixram[(pitch + x) & 0xffff];
 			for (int xi = 0; xi < 4; xi++)
 			{
-				const u8 nibble = (tile_data >> ((3 - xi) * 4)) & 0xf;
+				const u8 nibble = (tile_data >> ((3 - xi) << 2)) & 0xf;
 				if (nibble)
-					bitmap.pix(y, (x << 2) + xi) = pix_bank | nibble;
+					bitmap.pix(y, (x << 2) | xi) = pix_bank | nibble;
 			}
 		}
 	}
@@ -262,39 +260,50 @@ u32 koftball_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	Bit 1 and 5 of 0x320000 are the only ones that give correct layer results (see table below).
 	What is the meaning of the others? More games running on this hw would help.
 
-	The following table describes the attract mode sequence for jxzh. koftball is relatively simpler as it almost
-	only uses the first 2 layers (only noted use of the 3rd layer is for the bookkeeping screen).
+	The following table describes the attract mode sequence for jxzh. koftball is relatively simpler as
+	it mostly uses the first 2 layers (only noted use of the 3rd layer is for the bookkeeping screen).
 
 	                            layer0      layer 1     layer 2     layer 3     0x2a000f    0x320000
 	title screen                over        under       off         off         0x13        0x98
 	girl with scrolling tiles   prev screen prev screen over        under       0x1b        0xba
 	                                                                            0x00        0x00
-	demon                       over        under       prev screen prev screen 0x1f        0x98
+	odds                        over        under       prev screen prev screen 0x1f        0x98
 	                                                                            0x00        0x00
-	slot with road signs        prev screen prev screen over        under       0x17        0xba
+	roulette with road signs    prev screen prev screen over        under       0x17        0xba
 	Chinese lanterns            prev screen prev screen over        under       0x17        0xba
-	slot with numbers           prev screen prev screen over        under       0x17        0xba
+	slots with numbers          prev screen prev screen over        under       0x17        0xba
 	                                                                            0x00        0x00
 	pirates                     over        under       prev screen prev screen 0x17        0x98
 	                                                                            0x00        0x00
 	tile race                   over        under       prev screen prev screen 0x17        0x98
 	                                                                            0x00        0x00
 	girl select after coin up   prev screen prev screen over        under       0x13        0x3a
+
+	During game:
+	last chance                 over        under       on top      prev screen 0x17        0x9a
+	double up                   over        under       prev screen prev screen 0x1f        0x98
+
+	bookkeeping                 prev screen prev screen prev screen prev screen 0x14        0x98 (pixmap on top)
 	*/
 
-	m_pixbitmap.fill(0, cliprect);
-	draw_pixlayer(m_pixbitmap, cliprect);
+	const bool tmap2_enable = BIT(m_gfx_ctrl, 1);
+	const bool tmap3_enable = BIT(m_gfx_ctrl, 5);
+	const bool bitmap_enable = BIT(m_gfx_ctrl, 7);
+
+	if (bitmap_enable)
+	{
+		m_pixbitmap.fill(m_backpen, cliprect);
+		draw_pixlayer(m_pixbitmap, cliprect);
+	}
 
 	bitmap.fill(m_backpen, cliprect);
 
-	if (BIT(m_priority, 3))
+	if (bitmap_enable && BIT(m_priority, 3))
 		copyscrollbitmap_trans(bitmap, m_pixbitmap, 0, 0, 0, 0, cliprect, 0);
 
-	// TODO: or bit 1?
-	if (BIT(m_gfx_ctrl, 5))
+	if (tmap3_enable)
 	{
 		m_tilemap[3]->draw(screen, bitmap, cliprect, 0, 0);
-		m_tilemap[2]->draw(screen, bitmap, cliprect, 0, 0);
 	}
 	else
 	{
@@ -302,7 +311,10 @@ u32 koftball_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 		m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
 	}
 
-	if (!BIT(m_priority, 3))
+	if (tmap2_enable)
+		m_tilemap[2]->draw(screen, bitmap, cliprect, 0, 0);
+
+	if (bitmap_enable && !BIT(m_priority, 3))
 		copyscrollbitmap_trans(bitmap, m_pixbitmap, 0, 0, 0, 0, cliprect, 0);
 
 	return 0;

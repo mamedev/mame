@@ -1593,7 +1593,7 @@ uint32_t mame_ui_manager::handler_ingame(render_container &container)
 	}
 
 	// if the on-screen display isn't up and the user has toggled it, turn it on
-	if (!(machine().debug_flags & DEBUG_FLAG_ENABLED) && machine().ui_input().pressed(IPT_UI_ON_SCREEN_DISPLAY))
+	if (!get_slider_list().empty() && !(machine().debug_flags & DEBUG_FLAG_ENABLED) && machine().ui_input().pressed(IPT_UI_ON_SCREEN_DISPLAY))
 	{
 		ui::menu::stack_push<ui::menu_sliders>(*this, machine().render().ui_container(), true);
 		show_menu();
@@ -1859,15 +1859,16 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 
 	m_sliders.clear();
 
-	// add overall volume
-	slider_alloc(_("Master Volume"), -960, 0, 120, 10, std::bind(&mame_ui_manager::slider_volume, this, _1, _2));
-
 	// add per-sound device and per-sound device channel volume
 	for (device_sound_interface &snd : sound_interface_enumerator(machine.root_device()))
 	{
-		// Don't add microphones, speakers or devices without outputs
+		// don't add microphones, speakers or devices without outputs
 		if (dynamic_cast<sound_io_device *>(&snd) || !snd.outputs())
 			continue;
+
+		// add overall volume first
+		if (m_sliders.empty())
+			slider_alloc(_("Master Volume"), -960, 0, 120, 10, std::bind(&mame_ui_manager::slider_volume, this, _1, _2));
 
 		slider_alloc(util::string_format(_("%1$s volume"), snd.device().tag()), -960, 0, 120, 10, std::bind(&mame_ui_manager::slider_devvol, this, &snd, _1, _2));
 		if (snd.outputs() != 1)

@@ -255,14 +255,18 @@ private:
 class netlist_mame_sound_input_buffer
 {
 public:
-	sound_stream *m_stream = nullptr;
-	int m_stream_input = 0;
+	std::vector<sound_stream::sample_t> m_buffer;
 
 	netlist_mame_sound_input_buffer() {}
 
-	netlist_mame_sound_input_buffer(sound_stream &stream, int input) : m_stream(&stream), m_stream_input(input) { }
+	netlist_mame_sound_input_buffer(sound_stream &stream) {
+		int samples = stream.samples();
+		m_buffer.resize(samples);
+		for (int i=0; i != samples; i++)
+			m_buffer[i] = stream.get(0, i);
+	}
 
-	sound_stream::sample_t operator[](std::size_t index) { return m_stream->get(m_stream_input, index); }
+	sound_stream::sample_t operator[](std::size_t index) { return m_buffer[index]; }
 };
 
 // ----------------------------------------------------------------------------------------
