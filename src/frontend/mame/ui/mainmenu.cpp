@@ -165,7 +165,8 @@ void menu_main::populate()
 
 	item_append(_("menu-main", "Audio Effects"), 0, (void *)AUDIO_EFFECTS);
 
-	item_append(_("menu-main", "Slider Controls"), 0, (void *)SLIDERS);
+	if (!ui().get_slider_list().empty())
+		item_append(_("menu-main", "Slider Controls"), 0, (void *)SLIDERS);
 
 	item_append(_("menu-main", "Video Options"), 0, (void *)VIDEO_TARGETS);
 
