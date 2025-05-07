@@ -72,7 +72,7 @@ void nes_vt369_soc_device::device_add_mconfig(machine_config& config)
 
 	VT_VT1682_ALU(config, m_alu, 0);
 
-	M6502(config, m_soundcpu, RP2A03_NTSC_XTAL);
+	VT3XX_SPU(config, m_soundcpu, RP2A03_NTSC_XTAL);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &nes_vt369_soc_device::vt369_sound_map);
 }
 
