@@ -1785,6 +1785,12 @@ void pisces_state::pisces_map(address_map &map)
 	map(0x6002, 0x6002).mirror(0x07f8).w(FUNC(galaxian_state::galaxian_gfxbank_w)); // coin lockout replaced by graphics bank
 }
 
+void pisces_state::ladybugg2_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x0fff).rom().region("maincpu", 0x4000);
+	map(0x1000, 0x3fff).rom().region("maincpu", 0x1000);
+}
+
 void galaxian_state::frogg_map(address_map &map)
 {
 	galaxian_map(map);
@@ -7668,6 +7674,12 @@ void pisces_state::pisces(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pisces_state::pisces_map);
 }
 
+void pisces_state::ladybugg2(machine_config &config)
+{
+	pisces(config);
+	m_maincpu->set_addrmap(AS_OPCODES, &pisces_state::ladybugg2_opcodes_map);
+}
+
 void galaxian_state::victoryc(machine_config &config)
 {
 	galaxian(config);
@@ -8676,10 +8688,9 @@ void galaxian_state::decode_dingoe()
 void galaxian_state::decode_frogger_sound()
 {
 	uint8_t *rombase = memregion("audiocpu")->base();
-	uint32_t offs;
 
 	// the first ROM of the sound CPU has data lines D0 and D1 swapped
-	for (offs = 0; offs < 0x800; offs++)
+	for (uint32_t offs = 0; offs < 0x800; offs++)
 		rombase[offs] = bitswap<8>(rombase[offs], 7,6,5,4,3,2,0,1);
 }
 
@@ -8687,10 +8698,9 @@ void galaxian_state::decode_frogger_sound()
 void galaxian_state::decode_froggermc_sound()
 {
 	uint8_t *rombase = memregion("audiocpu")->base();
-	uint32_t offs;
 
 	// the first ROM of the sound CPU has data lines D0 and D1 swapped
-	for (offs = 0; offs < 0x1000; offs++)
+	for (uint32_t offs = 0; offs < 0x1000; offs++)
 		rombase[offs] = bitswap<8>(rombase[offs], 7,6,5,4,3,2,0,1);
 }
 
@@ -8698,10 +8708,9 @@ void galaxian_state::decode_froggermc_sound()
 void galaxian_state::decode_frogger_gfx()
 {
 	uint8_t *rombase = memregion("gfx1")->base();
-	uint32_t offs;
 
 	// the 2nd gfx ROM has data lines D0 and D1 swapped
-	for (offs = 0x0800; offs < 0x1000; offs++)
+	for (uint32_t offs = 0x0800; offs < 0x1000; offs++)
 		rombase[offs] = bitswap<8>(rombase[offs], 7,6,5,4,3,2,0,1);
 }
 
@@ -8929,6 +8938,20 @@ void galaxian_state::init_batman2()
 	common_init(&galaxian_state::galaxian_draw_bullet, &galaxian_state::galaxian_draw_background, &galaxian_state::batman2_extend_tile_info, &galaxian_state::upper_extend_sprite_info);
 }
 
+void galaxian_state::init_ladybugg2()
+{
+	init_batman2();
+
+	uint8_t *romdata = memregion("maincpu")->base();
+
+	// descramble the content of each 0x100 block
+	for (int i = 0; i < 0x10000; i += 0x100)
+	{
+		using std::swap;
+		for (int j = 0; j < (0x100 / 2); j++)
+			swap(romdata[i | j], romdata[i | (j ^ 0xff)]);
+	}
+}
 
 void galaxian_state::init_frogg()
 {
@@ -11779,6 +11802,29 @@ ROM_START( ladybugg ) // Arctic Multi-System?
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "lbuggx.clr", 0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
+ROM_END
+
+/* Standard Galaxian bootleg PCB with a small sub-board with the five program ROMs, a PAL16L8, a 74540 and two more ICs
+   with their surfaces scratched-out (and five empty ROM sockets). */
+ROM_START( ladybugg2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "5", 0x0000, 0x1000, CRC(78264eab) SHA1(0e59fa4b4c0340d083b13603bde70aa3a4144829) ) // data for first 0x1000
+	ROM_LOAD( "2", 0x1000, 0x1000, CRC(eb359d27) SHA1(3109eddf1d1532362fb4862a471ac14323cdbe52) )
+	ROM_LOAD( "3", 0x2000, 0x1000, CRC(72eef4f2) SHA1(e04d6b422df232881455a658c0a9e54bc316b435) )
+	ROM_LOAD( "4", 0x3000, 0x1000, CRC(887c95dd) SHA1(2109c455a91ccc022d8dfd90393a83d7a24b4460) )
+	ROM_LOAD( "1", 0x4000, 0x1000, CRC(e5b777ca) SHA1(6c833e696bc672829aa4bf6a1dd1860a45db8648) ) // opcodes for first 0x1000
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "lbuggx.a", 0x0800, 0x0800, CRC(7efb9dc5) SHA1(5e02ea8cd1a1c8efa6708a8615cc2dc9da65a455) )
+	ROM_CONTINUE(         0x0000, 0x0800 )
+	ROM_LOAD( "lbuggx.b", 0x1800, 0x0800, CRC(351d4ddc) SHA1(048e8a60e57c6eb0a4d7c2175ddd46c4273756c5) )
+	ROM_CONTINUE(         0x1000, 0x0800 )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "prom.bin", 0x0000, 0x0020, CRC(4e3caeab) SHA1(a25083c3e36d28afdefe4af6e6d4f3155e303625) )
+
+	ROM_REGION( 0x0117, "pld", 0 )
+	ROM_LOAD( "pal16l8.bin", 0x0000, 0x0117, NO_DUMP ) // On the program ROMs PCB
 ROM_END
 
 ROM_START( atlantisb ) // Artic Multi-System
@@ -16759,7 +16805,8 @@ GAME( 1982, crazym,      puckman,  galaxian,   pacmanblb,  galaxian_state, init_
 GAME( 1981, ghostmun,    puckman,  pacmanbl,   streakng,   galaxian_state, init_ghostmun,   ROT90,  "bootleg (Leisure and Allied)", "Ghost Muncher",                                                     MACHINE_SUPPORTS_SAVE )
 GAME( 1981, phoenxp2,    phoenix,  pisces,     phoenxp2,   pisces_state,   init_batman2,    ROT270, "bootleg",                      "Phoenix Part 2",                                                    MACHINE_SUPPORTS_SAVE )
 GAME( 1981, batman2,     phoenix,  pisces,     batman2,    pisces_state,   init_batman2,    ROT270, "bootleg",                      "Batman Part 2",                                                     MACHINE_SUPPORTS_SAVE ) // Similar to pisces, but with different video banking characteristics
-GAME( 1983, ladybugg,    ladybug,  pisces,     ladybugg,   pisces_state,   init_batman2,    ROT270, "bootleg",                      "Lady Bug (bootleg on Galaxian hardware)",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ladybugg,    ladybug,  pisces,     ladybugg,   pisces_state,   init_batman2,    ROT270, "bootleg",                      "Lady Bug (bootleg on Galaxian hardware, unencrypted)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1983, ladybugg2,   ladybug,  ladybugg2,  ladybugg,   pisces_state,   init_ladybugg2,  ROT270, "bootleg (TAI / DLI)",          "Lady Bug (bootleg on Galaxian hardware, encrypted)",                MACHINE_SUPPORTS_SAVE )
 GAME( 1981, atlantisb,   atlantis, galaxian,   atlantib,   galaxian_state, init_galaxian,   ROT270, "bootleg",                      "Battle of Atlantis (bootleg)",                                      MACHINE_SUPPORTS_SAVE ) // I don't know if this should have a starfield...
 GAME( 1982, tenspot,     0,        tenspot,    tenspot,    tenspot_state,  init_tenspot,    ROT270, "Thomas Automatics",            "Ten Spot",                                                          MACHINE_NOT_WORKING ) // Work out how menu works
 
