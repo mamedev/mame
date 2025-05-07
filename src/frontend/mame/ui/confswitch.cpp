@@ -368,7 +368,7 @@ void menu_settings_dip_switches::custom_render(uint32_t flags, void *selectedref
 			maxnamewidth = (std::max)(get_string_width(group.name), maxnamewidth);
 		}
 	}
-	float const width((std::min)((std::max)(maxnamewidth + (m_single_width * maxswitches) + separation, width), maxwidth));
+	float const width((std::min)(maxnamewidth + (m_single_width * maxswitches) + separation, maxwidth));
 
 	// draw extra menu area
 	float const boxwidth((std::max)(width + (lr_border() * 2.0f), origx2 - origx1));
