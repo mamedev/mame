@@ -27,7 +27,6 @@ namespace {
 		{}
 	
 		void furby_connect(machine_config &config);
-		void nand_fc2016();
 
 	private:
 		//void map(address_map &map) ATTR_COLD;
@@ -53,7 +52,7 @@ namespace {
 		//m_maincpu->set_addrmap(AS_PROGRAM, &furby_connect_state::map);
 		FULL_MEMORY(config, m_memory).set_map(&generalplus_gpac800_game_state::cs_map_base);
 	
-		SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+		SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 		m_screen->set_refresh_hz(60);
 		m_screen->set_size(128, 128);
 		m_screen->set_visarea(0, (128)-1, 0, (128)-1);
@@ -86,12 +85,6 @@ namespace {
 		ROM_LOAD( "nand.bin", 0x0000, 0x8400000, CRC(2470f146)) // Toshiba TC58BVG0S3HTA00
 	ROM_END
 		
-	void furby_connect_state::nand_fc2016()
-	{
-		nand_init840();
-		m_maincpu->set_romtype(1);
-	}
-		
 	} // anonymous namespace
 
- CONS( 2016, furby_connect, 0,      0, furby_connect,  mobigo, furby_connect_state, nand_fc2016, "Hasbro", "Furby Connect", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+ CONS( 2016, furby_connect, 0,      0, furby_connect, mobigo, furby_connect_state, nand_fc2016, "Hasbro", "Furby Connect", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

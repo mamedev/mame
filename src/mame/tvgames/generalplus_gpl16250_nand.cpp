@@ -904,6 +904,13 @@ void generalplus_gpac800_game_state::nand_beambox()
 	m_vectorbase = 0x2fe0;
 }
 
+void generalplus_gpac800_game_state::nand_fc2016()
+{
+	nand_init840();
+	m_initial_copy_words = 0x500000;
+	m_maincpu->set_romtype(1);
+}
+
 // NAND dumps w/ internal bootstrap (and u'nSP 2.0 extended opcodes)  (have gpnandnand strings)
 // the JAKKS ones seem to be known as 'Generalplus GPAC800' hardware
 CONS(2010, wlsair60,   0, 0, generalplus_gpac800,       jak_car2, generalplus_gpac800_game_state,       nand_wlsair60,      "Jungle Soft / Kids Station Toys Inc",      "Wireless Air 60",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // some of th games seem to be based on ones found in the 'Millennium Arcade' multigames (WinFun related) so might have the same external timer check

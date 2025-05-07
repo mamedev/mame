@@ -34,9 +34,9 @@ public:
 	void nand_wlsair60();
 	void nand_vbaby();
 	void nand_tsm();
+	void nand_fc2016();
 	void nand_beambox();
 	void nand_kiugames();
-
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
