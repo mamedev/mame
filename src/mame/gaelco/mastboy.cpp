@@ -1281,32 +1281,26 @@ ROM_START( mastboyitst )
 	ROM_LOAD( "2-mem-b.ic76", 0x40000, 0x20000, CRC(87015c18) SHA1(a16bf2707ce847da0923662796195b75719a6d77) ) // data
 	ROM_RELOAD(               0x60000, 0x20000 ) // 128kb ROMs are mirrored
 
-/* SPORT - GENERALE       011092 7515 1329 */
-	ROM_LOAD( "5a_i_preg_ita_0_18-oct-92.bin", 0x080000, 0x020000, CRC(45dd77e3) SHA1(856fbd1b7f888e1768abceb2465d5bb97a685332) )
-	ROM_RELOAD(                                0x0a0000, 0x020000 ) // 128kb ROMs are mirrored
+/*  TEMPO LIBERO - HOBBY GIOCHI 011091 5457 0300
+    SCIENZA - NATURA            011091 5657 0400
+    SPORT - MONDIALI-90         011091 5999 0212
+    MUSICA - AUTORI CANZONI     011091 5496 0314 */
+	ROM_LOAD( "5-rom.ic95",   0x080000, 0x020000, CRC(adc07f12) SHA1(2e0b46ac5884ad459bc354f56ff384ff1932f147) )
+	ROM_RELOAD(               0x0a0000, 0x020000 ) // 128kb ROMs are mirrored
 
-/* SCIENZA - STORIA       011092 6361 0808
-   MUSICA - GENERALE      011092 6875 0719 */
-	ROM_LOAD( "6a_i_preg_ita_1_18-oct-92.bin", 0x0c0000, 0x020000, CRC(31ececb2) SHA1(a62b1ecdedf8c587afefef4a7d5cdc9746abb093) )
-	ROM_RELOAD(                                0x0e0000, 0x020000 ) // 128kb ROMs are mirrored
+/*  SPORT- GENERALE             011091 5294 0713
+    SPETTACOLO - CINE-TV        011091 5657 0400 */
+	ROM_LOAD( "6-rom.ic96",   0x0c0000, 0x020000, CRC(2c52cb1e) SHA1(d58f21c09bd3983497f74ab6c5a37977d9e30f0c) )
+	ROM_RELOAD(               0x0e0000, 0x020000 ) // 128kb ROMs are mirrored
 
-/* SCIENZA - GEOGRAFIA    011092 6756 0565
-   SPETTACOLOS - CINE-TV  011092 6171 0918 */
-	ROM_LOAD( "7a_i_preg_ita_2_18-oct-92.bin", 0x100000, 0x020000, CRC(bdce54df) SHA1(b30a3adcdeba26f91f7de8e174f54a158d173dba) )
-	ROM_RELOAD(                                0x120000, 0x020000 ) // 128kb ROMs are mirrored
+/*  SCIENZA - STORIA            011091 5430 0375
+    SCIENZA - GEOGRAFIA         011091 5010 0565 */
+	ROM_LOAD( "7-rom.ic97",   0x100000, 0x020000, CRC(7818408f) SHA1(2a69688b6cda5baf2a45966dd86f10b2fcd54b66) )
+	ROM_RELOAD(               0x120000, 0x020000 ) // 128kb ROMs are mirrored
 
-/* TEMPO LIBERO - CULTURA 011092 6913 0424
-   SCIENZA - NATURA       011092 6969 0400
-   TEMPO LIBERO - HOBBY   011092 6569 0300
-   SPORT - WC_90          011092 6072 0212
-   SCIENZA - SESSUOLOGIA  011092 6098 0276 */
-	ROM_LOAD( "8a_i_preg_ita_3_18-oct-92.bin", 0x140000, 0x020000, CRC(3ea4dd86) SHA1(6db92010ab6d6adbdf6bea9b257423bb7607c7f2) )
-	ROM_RELOAD(                                0x160000, 0x020000 ) // 128kb ROMs are mirrored
-
-/* SPETTACOLOS - FUMETTI  011092 6938 0496
-   TEMPO LIBERO - PAROLE  011092 6075 0219 */
-	ROM_LOAD( "9a_i_preg_ita_4_18-oct-92.bin", 0x180000, 0x020000, CRC(146c46f9) SHA1(a6b09ffb98146ed2eb67a9d43465abc076758d60) )
-	ROM_RELOAD(                                0x1a0000, 0x020000 ) // 128kb ROMs are mirrored
+	//                  0x140000 to 0x17ffff EMPTY
+	//                  0x180000 to 0x1bffff EMPTY
+	//                  0x1c0000 to 0x1fffff EMPTY
 
 	ROM_REGION( 0x117, "plds", 0 )
 	ROM_LOAD( "gal16v8-25.ic32", 0x000, 0x117, NO_DUMP )
@@ -1444,7 +1438,7 @@ GAME( 1991, mastboyic,   mastboy, mastboy, mastboy, mastboy_state, empty_init, R
 
 GAME( 1991, mastboyiol,  mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco (Playmark license)", "Master Boy Olympic (Italy, set 1, checksum 77A8)", MACHINE_SUPPORTS_SAVE ) // 18-Oct-1992
 
-GAME( 1991, mastboyitst, mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco", "Master Boy (Italy, test version)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mastboyitst, mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco", "Master Boy (Italy, test version)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1992, mastboyiv2,  mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco (Playmark license)", "Master Boy Version II (Italy, set 1, checksum 618F)", MACHINE_SUPPORTS_SAVE ) // 27-Oct-1992
 GAME( 1992, mastboyiv2a, mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco (Playmark license)", "Master Boy Version II (Italy, set 2, checksum 629B)", MACHINE_SUPPORTS_SAVE ) // 27-Oct-1992. No text on license box at boot
