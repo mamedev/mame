@@ -39722,9 +39722,6 @@ st1707
 st1708
 st1714
 
-@source:sealy/sealy.cpp
-crzyddz
-
 @source:sealy/sealy_8031.cpp
 jinsanse
 
@@ -39733,6 +39730,18 @@ qczl
 
 @source:sealy/sealy_fr.cpp
 snowbwar
+
+@source:sealy/sealy_m16c.cpp
+crzyddz
+fdjqb
+fkddz
+gbsf
+sandaha
+
+@source:sealy/sealy_z80.cpp
+bbddz
+ddz2
+djddz
 
 @source:sega/angelkds.cpp
 angelkds

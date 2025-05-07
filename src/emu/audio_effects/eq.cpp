@@ -120,6 +120,9 @@ void audio_effect_eq::config_load(util::xml::data_node const *ef_node)
 		} else
 			reset_db(band);
 	}
+
+	for(u32 i = 0; i != BANDS; i++)
+		build_filter(i);		
 }
 
 void audio_effect_eq::config_save(util::xml::data_node *ef_node) const

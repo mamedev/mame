@@ -35,14 +35,14 @@ interactive layout, and is intended as an educational tool.
 
 #include "emu.h"
 
+#include "nl_source.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/netlist.h"
 #include "machine/nvram.h"
 #include "machine/rescap.h"
 #include "machine/timer.h"
 #include "sound/va_eg.h"
-
-#include "netlist/nl_setup.h"
 
 #include "moog_source.lh"
 
@@ -59,8 +59,6 @@ interactive layout, and is intended as an educational tool.
 //#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
-
-NETLIST_EXTERNAL(moogsource)  // In nl_source.cpp.
 
 namespace {
 

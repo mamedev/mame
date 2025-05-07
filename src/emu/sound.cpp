@@ -38,7 +38,7 @@
 #define LOG_OSD_STREAMS (1U << 3)
 #define LOG_ORDER       (1U << 4)
 
-#define VERBOSE -1
+#define VERBOSE 0
 
 #include "logmacro.h"
 
@@ -498,12 +498,12 @@ u64 sound_stream::get_current_sample_index() const
 
 void sound_stream::update()
 {
-	if(!is_active() || m_in_update)
+	if(!is_active() || m_in_update || m_device.machine().phase() <= machine_phase::RESET)
 		return;
 
 	// Find out where we are and how much we have to do
 	u64 idx = get_current_sample_index();
-	m_samples_to_update = idx - m_output_buffer.write_sample();
+	m_samples_to_update = idx - m_output_buffer.write_sample() + 1; // We want to include the current sample, hence the +1
 
 	if(m_samples_to_update > 0) {
 		m_in_update = true;
@@ -520,12 +520,12 @@ void sound_stream::update()
 
 void sound_stream::update_nodeps()
 {
-	if(!is_active() || m_in_update)
+	if(!is_active() || m_in_update || m_device.machine().phase() <= machine_phase::RESET)
 		return;
 
 	// Find out where we are and how much we have to do
 	u64 idx = get_current_sample_index();
-	m_samples_to_update = idx - m_output_buffer.write_sample();
+	m_samples_to_update = idx - m_output_buffer.write_sample() + 1; // We want to include the current sample, hence the +1
 
 	if(m_samples_to_update > 0) {
 		m_in_update = true;
@@ -844,13 +844,8 @@ void sound_manager::after_devices_init()
 	m_record_buffer.resize(m_outputs_count * machine().sample_rate(), 0);
 	m_record_samples = 0;
 
-	// Have all streams create their initial resamplers
-	for(auto &stream : m_stream_list)
-		stream->create_resamplers();
-
-	// Then get the initial history sizes
-	for(auto &stream : m_stream_list)
-		stream->lookup_history_sizes();
+	// Create resamplers and setup history
+	rebuild_all_resamplers();
 
 	m_effects_done = false;
 
@@ -864,7 +859,7 @@ void sound_manager::after_devices_init()
 void sound_manager::input_get(int id, sound_stream &stream)
 {
 	u32 samples = stream.samples();
-	u64 end_pos = stream.sample_index();
+	u64 end_pos = stream.end_index();
 	u32 skip = stream.output_count();
 
 	for(const auto &step : m_microphones[id].m_input_mixing_steps) {
@@ -917,6 +912,7 @@ void sound_manager::output_push(int id, sound_stream &stream)
 			*outb1 = std::clamp(int(*inb++ * 32768), -32768, 32767);
 			outb1 += m_outputs_count;
 		}
+		outb++;
 	}
 }
 
@@ -1134,10 +1130,12 @@ void sound_manager::config_load(config_type cfg_type, config_level cfg_level, ut
 		// and the resampler configuration
 		util::xml::data_node const *rs_node = parentnode->get_child("resampler");
 		if(rs_node) {
-			m_resampler_type = rs_node->get_attribute_int("type", RESAMPLER_LOFI);
 			m_resampler_hq_latency = rs_node->get_attribute_float("hq_latency", 0.0050);
 			m_resampler_hq_length = rs_node->get_attribute_int("hq_length", 400);
-			m_resampler_hq_phases = rs_node->get_attribute_int("hq_phases", 200);				
+			m_resampler_hq_phases = rs_node->get_attribute_int("hq_phases", 200);
+
+			// this also applies the hq settings if resampler is hq
+			set_resampler_type(rs_node->get_attribute_int("type", RESAMPLER_LOFI));
 		}
 		break;
 	}
@@ -2413,7 +2411,7 @@ void sound_manager::mapping_update()
 
 u64 sound_manager::rate_and_time_to_index(attotime time, u32 sample_rate) const
 {
-	return time.m_seconds * sample_rate + ((time.m_attoseconds / 100'000'000) * sample_rate) / 10'000'000'000LL;
+	return time.m_seconds * sample_rate + ((time.m_attoseconds / 100'000'000) * sample_rate) / 10'000'000'000LL; //'
 }
 
 void sound_manager::update(s32)
@@ -2479,7 +2477,7 @@ void sound_manager::streams_update()
 	machine().osd().add_audio_to_recording(m_record_buffer.data(), m_record_samples);
 	machine().video().add_sound_to_recording(m_record_buffer.data(), m_record_samples);
 	if(m_wavfile)
-		util::wav_add_data_16(*m_wavfile, m_record_buffer.data(), m_record_samples);
+		util::wav_add_data_16(*m_wavfile, m_record_buffer.data(), m_record_samples * m_outputs_count);
 
 	m_effects_condition.notify_all();
 }
@@ -2491,6 +2489,7 @@ const audio_resampler *sound_manager::get_resampler(u32 fs, u32 ft)
 	auto i = m_resamplers.find(key);
 	if(i != m_resamplers.end())
 		return i->second.get();
+
 	audio_resampler *res;
 	if(m_resampler_type == RESAMPLER_HQ)
 		res = new audio_resampler_hq(fs, ft, m_resampler_hq_latency, m_resampler_hq_length, m_resampler_hq_phases);
@@ -2508,31 +2507,39 @@ void sound_manager::rebuild_all_resamplers()
 		stream->create_resamplers();
 
 	for(auto &stream : m_stream_list)
-		stream->lookup_history_sizes();	
+		stream->lookup_history_sizes();
 }
 
 void sound_manager::set_resampler_type(u32 type)
 {
-	m_resampler_type = type;
-	rebuild_all_resamplers();
+	if(type != m_resampler_type) {
+		m_resampler_type = type;
+		rebuild_all_resamplers();
+	}
 }
 
 void sound_manager::set_resampler_hq_latency(double latency)
 {
-	m_resampler_hq_latency = latency;
-	rebuild_all_resamplers();
+	if(latency != m_resampler_hq_latency) {
+		m_resampler_hq_latency = latency;
+		rebuild_all_resamplers();
+	}
 }
 
 void sound_manager::set_resampler_hq_length(u32 length)
 {
-	m_resampler_hq_length = length;
-	rebuild_all_resamplers();
+	if(length != m_resampler_hq_length) {
+		m_resampler_hq_length = length;
+		rebuild_all_resamplers();
+	}
 }
 
 void sound_manager::set_resampler_hq_phases(u32 phases)
 {
-	m_resampler_hq_phases = phases;
-	rebuild_all_resamplers();
+	if(phases != m_resampler_hq_phases) {
+		m_resampler_hq_phases = phases;
+		rebuild_all_resamplers();
+	}
 }
 
 const char *sound_manager::resampler_type_names(u32 type) const

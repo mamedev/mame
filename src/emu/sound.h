@@ -35,7 +35,7 @@
     For example, if you have a 10Hz clock, and call stream.update() at
     t=0.91, it will compute 10 samples (for clock edges 0.0, 0.1, 0.2,
     ..., 0.7, 0.8, and 0.9). And then if you ask the stream what its
-    current end time is (via stream.sample_time()), it will say t=1.0,
+    current end time is (via stream.end_time()), it will say t=1.0,
     which is in the future, because it knows it will hold that last
     sample until 1.0s.
 
@@ -210,11 +210,9 @@ public:
 
 	// sample id and timing of the first and last sample of the current update block, and first of the next sample block
 	u64 start_index() const      { return m_output_buffer.write_sample(); }
-	u64 end_index() const        { return m_output_buffer.write_sample() + samples() - 1; }
-	u64 sample_index() const     { return m_output_buffer.write_sample() + samples(); }
+	u64 end_index() const        { return m_output_buffer.write_sample() + samples(); }
 	attotime start_time() const  { return sample_to_time(start_index()); }
 	attotime end_time() const    { return sample_to_time(end_index()); }
-	attotime sample_time() const { return sample_to_time(sample_index()); }
 
 	// convert from absolute sample index to time
 	attotime sample_to_time(u64 index) const;

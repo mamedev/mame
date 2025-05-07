@@ -268,7 +268,7 @@ void speaker_sound_device::level_w(int new_level)
 	/* This is redundant because time update has to be done within sound_stream_update() anyway,
 	 * however this ensures synchronization between the speaker and stream timing:
 	 */
-	m_channel_last_sample_time = m_channel->sample_time();
+	m_channel_last_sample_time = m_channel->end_time();
 
 	/* sample_time() may be ahead of us */
 	if (m_channel_last_sample_time > time)

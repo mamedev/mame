@@ -7,14 +7,16 @@ King Of Football (c)1995 BMC
 preliminary driver by Tomasz Slanina
 
 TODO:
-- lots of unknown writes / reads;
-- one of the customs could contain a VIA6522-like core. bmc/bmcbowl.cpp uses the VIA6522 and the
-  accesses are similar;
-- probably jxzh also supports the mahjong keyboard. Check if one of the dips enable it and where it
-  is read;
-- better understanding of the koftball protection.
+- Lots of unknown writes/reads.
+- One of the customs could contain a VIA6522-like core. bmc/bmcbowl.cpp
+  uses the VIA6522 and the accesses are similar.
+- Better understanding / implementation of the video registers.
+- jxzh and kaimenhu show a full mahjong keyboard in their key tests - is
+  this actually supported or is it vestigial?
+- jxzh stops responding to inputs properly after winning a hand if
+  stripping sequences are enabled.
+- Better understanding of the koftball protection.
 
---
 
 MC68000P10
 M28 (OKI 6295, next to ROM C9)
@@ -22,7 +24,7 @@ BMC ADB40817(80 Pin PQFP - Google hits, but no datasheet or description)
 RAMDAC TRC1710-80PCA (Monolithic 256-word by 18bit Look-up Table & Triple Video DAC with 6-bit DACs)
 File 89C67 (Clone of YM2413. Next to 3.57954MHz OSC)
 OSC: 21.47727MHz & 3.57954MHz
-2 8-way dipswitches
+2 8-way DIP switches
 part # scratched 64 pin PLCC (soccer ball sticker over this chip ;-)
 
 ft5_v16_c5.u14 \
@@ -58,6 +60,37 @@ minimum bet                    20    最小押分
 key-in unit                   200    上分單位
 key-in limit                 5000    上分上限
 credit limit                50000    得分上限
+
+
+jxzh uses an unusual control scheme:
+* use Start to draw a tile
+* use Big (left) and Small (right) to select a tile to discard
+* use Start to discard the selected tile
+* Kan, Pon, Chi, Reach, Ron, Flip Flop and Bet function as expected in the main game
+* use Big (left) and Small (right) to select a tile to exchange during "first chance"
+* use Flip Flop to exchange the selected tile during "first chance"
+* use Start to end "first chance"
+* use Start to select a tile during "last chance"
+* use Flip Flop to stake winnings on the double up game
+* use Ron to take winnings
+
+kaimenhu appears to be just the first chance and double up games from
+jxzh (i.e. like a draw poker game but with mahjong tiles and hands).
+
+
+jxzh/kaimenhu test menu:
+
+pon    input test       碰:按鍵測試
+kan    graphics test    槓:圖型測試
+reach  sound test       聽:音樂測試
+ron    memory test      胡:記憶體測試
+chi    DIP switch test  吃:DIP 測試
+big    last hand test   大:前手牌測試
+test   exit             離開　按《測試》
+
+
+kaimenhu has a full set of soft settings accessible from the bookeeping menu
+(default password is Start eight times)
 
 */
 
@@ -131,7 +164,7 @@ private:
 	u8 m_gfx_ctrl = 0;
 	u8 m_priority = 0;
 	u8 m_backpen = 0;
-	std::unique_ptr<bitmap_ind16> m_pixbitmap;
+	bitmap_ind16 m_pixbitmap;
 	u8 m_pixpal = 0;
 
 	void irq_ack_w(u8 data);
@@ -151,6 +184,7 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
+	void common_mem(address_map &map) ATTR_COLD;
 	void koftball_mem(address_map &map) ATTR_COLD;
 	void jxzh_mem(address_map &map) ATTR_COLD;
 	void kaimenhu_mem(address_map &map) ATTR_COLD;
@@ -190,12 +224,11 @@ void koftball_state::video_start()
 	m_tilemap[3] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(koftball_state::get_tile_info<3>)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_tilemap[0]->set_transparent_pen(0);
-	m_tilemap[2]->set_transparent_pen(0);
-
 	m_tilemap[1]->set_transparent_pen(0);
+	m_tilemap[2]->set_transparent_pen(0);
 	m_tilemap[3]->set_transparent_pen(0);
 
-	m_pixbitmap = std::make_unique<bitmap_ind16>(512, 256);
+	m_pixbitmap.allocate(512, 256);
 }
 
 // linear 512x256x4bpp
@@ -205,15 +238,15 @@ void koftball_state::draw_pixlayer(bitmap_ind16 &bitmap, const rectangle &clipre
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		const u16 pitch = y * 0x80;
-		for (int x = cliprect.min_x; x <= cliprect.max_x >> 2; x++)
+		const u16 pitch = y << 7;
+		for (int x = cliprect.min_x >> 2; x <= cliprect.max_x >> 2; x++)
 		{
 			const u16 tile_data = m_pixram[(pitch + x) & 0xffff];
 			for (int xi = 0; xi < 4; xi++)
 			{
-				const u8 nibble = (tile_data >> ((3 - xi) * 4)) & 0xf;
+				const u8 nibble = (tile_data >> ((3 - xi) << 2)) & 0xf;
 				if (nibble)
-					bitmap.pix(y, (x << 2) + xi) = pix_bank | nibble;
+					bitmap.pix(y, (x << 2) | xi) = pix_bank | nibble;
 			}
 		}
 	}
@@ -227,39 +260,50 @@ u32 koftball_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	Bit 1 and 5 of 0x320000 are the only ones that give correct layer results (see table below).
 	What is the meaning of the others? More games running on this hw would help.
 
-	The following table describes the attract mode sequence for jxzh. koftball is relatively simpler as it almost
-	only uses the first 2 layers (only noted use of the 3rd layer is for the bookkeeping screen).
+	The following table describes the attract mode sequence for jxzh. koftball is relatively simpler as
+	it mostly uses the first 2 layers (only noted use of the 3rd layer is for the bookkeeping screen).
 
 	                            layer0      layer 1     layer 2     layer 3     0x2a000f    0x320000
 	title screen                over        under       off         off         0x13        0x98
 	girl with scrolling tiles   prev screen prev screen over        under       0x1b        0xba
 	                                                                            0x00        0x00
-	demon                       over        under       prev screen prev screen 0x1f        0x98
+	odds                        over        under       prev screen prev screen 0x1f        0x98
 	                                                                            0x00        0x00
-	slot with road signs        prev screen prev screen over        under       0x17        0xba
+	roulette with road signs    prev screen prev screen over        under       0x17        0xba
 	Chinese lanterns            prev screen prev screen over        under       0x17        0xba
-	slot with numbers           prev screen prev screen over        under       0x17        0xba
+	slots with numbers          prev screen prev screen over        under       0x17        0xba
 	                                                                            0x00        0x00
 	pirates                     over        under       prev screen prev screen 0x17        0x98
 	                                                                            0x00        0x00
 	tile race                   over        under       prev screen prev screen 0x17        0x98
 	                                                                            0x00        0x00
 	girl select after coin up   prev screen prev screen over        under       0x13        0x3a
+
+	During game:
+	last chance                 over        under       on top      prev screen 0x17        0x9a
+	double up                   over        under       prev screen prev screen 0x1f        0x98
+
+	bookkeeping                 prev screen prev screen prev screen prev screen 0x14        0x98 (pixmap on top)
 	*/
 
-	m_pixbitmap->fill(0, cliprect);
-	draw_pixlayer(*m_pixbitmap, cliprect);
+	const bool tmap2_enable = BIT(m_gfx_ctrl, 1);
+	const bool tmap3_enable = BIT(m_gfx_ctrl, 5);
+	const bool bitmap_enable = BIT(m_gfx_ctrl, 7);
+
+	if (bitmap_enable)
+	{
+		m_pixbitmap.fill(m_backpen, cliprect);
+		draw_pixlayer(m_pixbitmap, cliprect);
+	}
 
 	bitmap.fill(m_backpen, cliprect);
 
-	if (BIT(m_priority, 3))
-		copyscrollbitmap_trans(bitmap, *m_pixbitmap, 0, 0, 0, 0, cliprect, 0);
+	if (bitmap_enable && BIT(m_priority, 3))
+		copyscrollbitmap_trans(bitmap, m_pixbitmap, 0, 0, 0, 0, cliprect, 0);
 
-	// TODO: or bit 1?
-	if (BIT(m_gfx_ctrl, 5))
+	if (tmap3_enable)
 	{
 		m_tilemap[3]->draw(screen, bitmap, cliprect, 0, 0);
-		m_tilemap[2]->draw(screen, bitmap, cliprect, 0, 0);
 	}
 	else
 	{
@@ -267,8 +311,11 @@ u32 koftball_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 		m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
 	}
 
-	if (!BIT(m_priority, 3))
-		copyscrollbitmap_trans(bitmap, *m_pixbitmap, 0, 0, 0, 0, cliprect, 0);
+	if (tmap2_enable)
+		m_tilemap[2]->draw(screen, bitmap, cliprect, 0, 0);
+
+	if (bitmap_enable && !BIT(m_priority, 3))
+		copyscrollbitmap_trans(bitmap, m_pixbitmap, 0, 0, 0, 0, cliprect, 0);
 
 	return 0;
 }
@@ -342,28 +389,25 @@ void koftball_state::kaimenhu_outputs_w(u8 data)
 	// bit 7 always set?
 }
 
-// FIXME: merge video maps
-void koftball_state::koftball_mem(address_map &map)
+void koftball_state::common_mem(address_map &map)
 {
-	map(0x000000, 0x01ffff).rom();
-	map(0x220000, 0x22ffff).ram().share(m_main_ram);
-
 	map(0x260000, 0x260fff).ram().w(FUNC(koftball_state::videoram_w<0>)).share(m_videoram[0]);
 	map(0x261000, 0x261fff).ram().w(FUNC(koftball_state::videoram_w<1>)).share(m_videoram[1]);
 	map(0x262000, 0x262fff).ram().w(FUNC(koftball_state::videoram_w<2>)).share(m_videoram[2]);
 	map(0x263000, 0x263fff).ram().w(FUNC(koftball_state::videoram_w<3>)).share(m_videoram[3]);
+
 	map(0x268000, 0x26ffff).ram();
 
 	map(0x280000, 0x29ffff).ram().share(m_pixram);
+
 	map(0x2a0007, 0x2a0007).w(FUNC(koftball_state::irq_ack_w));
 	map(0x2a0009, 0x2a0009).lw8(NAME([this] (u8 data) { m_irq_enable = data; }));
 	map(0x2a000f, 0x2a000f).lw8(NAME([this] (u8 data) { m_priority = data; LOGGFX("GFX ctrl $2a000f (priority) %02x\n", data); }));
 	map(0x2a0017, 0x2a0017).w(FUNC(koftball_state::pixpal_w));
 	map(0x2a0019, 0x2a0019).lw8(NAME([this] (u8 data) { m_backpen = data; LOGGFX("GFX ctrl $2a0019 (backpen) %02x\n", data); }));
-	map(0x2a001a, 0x2a001b).nopw();
-	map(0x2a0000, 0x2a001f).r(FUNC(koftball_state::random_number_r));
+
 	map(0x2b0000, 0x2b0001).portr("DSW");
-	map(0x2d8000, 0x2d8001).r(FUNC(koftball_state::random_number_r));
+
 	map(0x2da000, 0x2da003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0xff00);
 
 	map(0x2db001, 0x2db001).w("ramdac", FUNC(ramdac_device::index_w));
@@ -372,45 +416,43 @@ void koftball_state::koftball_mem(address_map &map)
 	map(0x2db005, 0x2db005).w("ramdac", FUNC(ramdac_device::mask_w));
 
 	map(0x2dc000, 0x2dc000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x2f0000, 0x2f0003).portr("INPUTS");
-	map(0x300001, 0x300001).w(FUNC(koftball_state::koftball_outputs_w));
+
+	map(0x2f0000, 0x2f0001).portr("INPUTS");
+
 	map(0x320000, 0x320000).lw8(NAME([this] (u8 data) { m_gfx_ctrl = data; LOGGFX("GFX ctrl $320000 (layer enable) %02x\n", data); }));
+}
+
+void koftball_state::koftball_mem(address_map &map)
+{
+	common_mem(map);
+
+	map(0x000000, 0x01ffff).rom();
+	map(0x220000, 0x22ffff).ram().share(m_main_ram);
+
+	map(0x2a001a, 0x2a001b).nopw();
+	map(0x2a0000, 0x2a001f).r(FUNC(koftball_state::random_number_r));
+	map(0x2d8000, 0x2d8001).r(FUNC(koftball_state::random_number_r));
+
+	map(0x300001, 0x300001).w(FUNC(koftball_state::koftball_outputs_w));
+
 	map(0x340000, 0x340001).r(FUNC(koftball_state::prot_r));
 	map(0x360000, 0x360001).w(FUNC(koftball_state::prot_w));
 }
 
 void koftball_state::jxzh_mem(address_map &map)
 {
+	common_mem(map);
+
 	map(0x000000, 0x03ffff).rom();
 	map(0x200000, 0x200fff).ram().share("nvram");
 
-	map(0x260000, 0x260fff).ram().w(FUNC(koftball_state::videoram_w<0>)).share(m_videoram[0]);
-	map(0x261000, 0x261fff).ram().w(FUNC(koftball_state::videoram_w<1>)).share(m_videoram[1]);
-	map(0x262000, 0x262fff).ram().w(FUNC(koftball_state::videoram_w<2>)).share(m_videoram[2]);
-	map(0x263000, 0x263fff).ram().w(FUNC(koftball_state::videoram_w<3>)).share(m_videoram[3]);
 	map(0x264b00, 0x264dff).ram(); // TODO: writes here at least at girl selection after coin up. Some kind of effect?
-	map(0x268000, 0x26ffff).ram();
 
-	map(0x280000, 0x29ffff).ram().share(m_pixram);
-	map(0x2a0007, 0x2a0007).w(FUNC(koftball_state::irq_ack_w));
-	map(0x2a0009, 0x2a0009).lw8(NAME([this] (u8 data) { m_irq_enable = data; }));
-	map(0x2a000f, 0x2a000f).lw8(NAME([this] (u8 data) { m_priority = data; LOGGFX("GFX ctrl $2a000f (priority) %02x\n", data); }));
-	map(0x2a0017, 0x2a0017).w(FUNC(koftball_state::pixpal_w));
-	map(0x2a0019, 0x2a0019).lw8(NAME([this] (u8 data) { m_backpen = data; LOGGFX("GFX ctrl $2a0019 (backpen) %02x\n", data); }));
 	map(0x2a001a, 0x2a001d).nopw();
 	map(0x2a0000, 0x2a001f).r(FUNC(koftball_state::random_number_r));
-	map(0x2b0000, 0x2b0001).portr("DSW");
-	map(0x2da000, 0x2da003).umask16(0xff00).w("ymsnd", FUNC(ym2413_device::write));
 
-	map(0x2db001, 0x2db001).w("ramdac", FUNC(ramdac_device::index_w));
-	map(0x2db002, 0x2db003).nopr(); // reads here during some scene changes
-	map(0x2db003, 0x2db003).w("ramdac", FUNC(ramdac_device::pal_w));
-	map(0x2db005, 0x2db005).w("ramdac", FUNC(ramdac_device::mask_w));
-
-	map(0x2dc000, 0x2dc000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x2f0000, 0x2f0001).portr("INPUTS");
 	map(0x300001, 0x300001).w(FUNC(koftball_state::kaimenhu_outputs_w));
-	map(0x320000, 0x320000).lw8(NAME([this] (u8 data) { m_gfx_ctrl = data; LOGGFX("GFX ctrl $320000 (layer enable) %02x\n", data); }));
+
 	map(0x340000, 0x340001).r(FUNC(koftball_state::prot_r));
 	map(0x360000, 0x360001).w(FUNC(koftball_state::prot_w));
 	map(0x380000, 0x380001).w(FUNC(koftball_state::prot_w));
@@ -509,16 +551,16 @@ static INPUT_PORTS_START( kaimenhu )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_MAHJONG_RON )        PORT_NAME("%p Mahjong Ron / Take Score" ) // called take score (得分) in key test
 
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_CUSTOM )           PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_CUSTOM )             PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 	PORT_SERVICE_NO_TOGGLE( 0x1000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )    PORT_NAME("%p Mahjong Small / Right")
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )      PORT_NAME("%p Mahjong Big / Left")
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP) PORT_NAME("%p Mahjong Double Up / Change Tile")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )      PORT_NAME("%p Mahjong Small / Right")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )        PORT_NAME("%p Mahjong Big / Left")
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )  PORT_NAME("%p Mahjong Flip Flop / Double Up" ) // called double up (比倍) in key test
 
 	PORT_START("DSW")
 	PORT_DIPNAME(    0x0001, 0x0001, DEF_STR(Unknown) )        PORT_DIPLOCATION("SW1:8")
@@ -542,7 +584,7 @@ static INPUT_PORTS_START( kaimenhu )
 	PORT_DIPNAME(    0x0040, 0x0040, DEF_STR(Unknown) )        PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(         0x0040, DEF_STR(Off) )
 	PORT_DIPSETTING(         0x0000, DEF_STR(On) )
-	PORT_DIPNAME(    0x0080, 0x0080, DEF_STR(Unknown) )        PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME(    0x0080, 0x0080, "Double Up Game" )        PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(         0x0080, DEF_STR(Off) )
 	PORT_DIPSETTING(         0x0000, DEF_STR(On) )
 	PORT_DIPNAME(    0x0100, 0x0100, DEF_STR(Service_Mode) )   PORT_DIPLOCATION("SW2:8")
@@ -580,6 +622,18 @@ static INPUT_PORTS_START( jxzh )
 	PORT_DIPSETTING(         0x0002, "1 2 4 8 12 16 24 32" )
 	PORT_DIPSETTING(         0x0001, "1 2 3 5 8 15 30 50" )
 	PORT_DIPSETTING(         0x0000, "1 2 3 5 10 25 50 100" )
+	PORT_DIPNAME(    0x0040, 0x0040, "Last Chance Type" )      PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(         0x0040, "A" )                     // choose three of ten tiles
+	PORT_DIPSETTING(         0x0000, "B" )                     // draw ten tiles
+	PORT_DIPNAME(    0x0400, 0x0400, "Nudity" )                PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(         0x0400, DEF_STR(Off) )
+	PORT_DIPSETTING(         0x0000, DEF_STR(On) )
+	PORT_DIPNAME(    0x0800, 0x0800, "Auto Last Chance B" )    PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(         0x0800, DEF_STR(Off) )
+	PORT_DIPSETTING(         0x0000, DEF_STR(On) )             // automatically draws tiles for last chance type B
+	PORT_DIPNAME(    0x2000, 0x0000, "Gal Voice" )             PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(         0x2000, DEF_STR(Off) )
+	PORT_DIPSETTING(         0x0000, DEF_STR(On) )             // calls discarded tiles
 INPUT_PORTS_END
 
 
@@ -804,6 +858,6 @@ void koftball_state::init_koftball()
 } // anonymous namespace
 
 
-GAME( 1995, koftball, 0,    koftball, koftball, koftball_state, init_koftball, ROT0, "BMC", "Zuqiu Wang - King of Football",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, jxzh,     0,    jxzh,     jxzh,     koftball_state, empty_init,    ROT0, "BMC", "Jinxiu Zhonghua",                MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, kaimenhu, jxzh, kaimenhu, kaimenhu, koftball_state, empty_init,    ROT0, "BMC", "Kaimen Hu",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, koftball, 0, koftball, koftball, koftball_state, init_koftball, ROT0, "BMC", "Zuqiu Wang - King of Football",  MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, jxzh,     0, jxzh,     jxzh,     koftball_state, empty_init,    ROT0, "BMC", "Jinxiu Zhonghua",                MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1996, kaimenhu, 0, kaimenhu, kaimenhu, koftball_state, empty_init,    ROT0, "BMC", "Kaimen Hu",                      MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

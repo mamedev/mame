@@ -312,8 +312,7 @@ void cps2000_state::cps2000(machine_config &config)
 	MSM6200(config, m_kbd, 4.9468_MHz_XTAL);
 	m_kbd->irq_cb().set_inputline(m_maincpu, UPD7810_INTF1);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	// UPD932(config, "upd932a", 4.9468_MHz_XTAL);
 	// UPD932(config, "upd932b", 4.9468_MHz_XTAL);
@@ -326,17 +325,17 @@ void cps2000_state::cps2000(machine_config &config)
 
 	FILTER_RC(config, "bass_rc1").set_lowpass(RES_K(47), CAP_N(47)).add_route(0, "bass_rc2", 1.0);
 	FILTER_RC(config, "bass_rc2").set_lowpass(RES_K(22), CAP_N(47))
-		.add_route(0, "lspeaker", 0.25).add_route(0, "rspeaker", 0.25);
+		.add_route(0, "speaker", 0.25, 0).add_route(0, "speaker", 0.25, 1);
 
 	UPD934G(config, m_pcm, 4.9468_MHz_XTAL / 4);
-	m_pcm->add_route(0, "lspeaker", 0.25);
-	m_pcm->add_route(0, "rspeaker", 0.125);
-	m_pcm->add_route(1, "lspeaker", 0.25);
-	m_pcm->add_route(1, "rspeaker", 0.125);
-	m_pcm->add_route(2, "lspeaker", 0.125);
-	m_pcm->add_route(2, "rspeaker", 0.25);
-	m_pcm->add_route(3, "lspeaker", 0.125);
-	m_pcm->add_route(3, "rspeaker", 0.25);
+	m_pcm->add_route(0, "speaker", 0.25,  0);
+	m_pcm->add_route(0, "speaker", 0.125, 1);
+	m_pcm->add_route(1, "speaker", 0.25,  0);
+	m_pcm->add_route(1, "speaker", 0.125, 1);
+	m_pcm->add_route(2, "speaker", 0.125, 0);
+	m_pcm->add_route(2, "speaker", 0.25,  1);
+	m_pcm->add_route(3, "speaker", 0.125, 0);
+	m_pcm->add_route(3, "speaker", 0.25,  1);
 }
 
 /**************************************************************************/
