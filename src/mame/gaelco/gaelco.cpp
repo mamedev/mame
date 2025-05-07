@@ -1217,10 +1217,10 @@ ROM_START( thoop ) // PCB - REF.922804/1
 	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
 
 	ROM_REGION( 0x4dc, "plds", 0)
-	ROM_LOAD ( "thunderhoop_gal16v8.f2",  0x000, 0x117, BAD_DUMP CRC(d5ed5985) SHA1(a4e9c8e3a7774e2a02fbca3ddf8175cf251825ba) ) // Bruteforced but verified
-	ROM_LOAD ( "thunderhoop_gal16v8.j16", 0x117, 0x117, BAD_DUMP CRC(fe78b903) SHA1(c806e63ce56a77f631043c184a42bf77ebda8a09) ) // Bruteforced but verified
-	ROM_LOAD ( "thunderhoop_gal20v8.d21", 0x22e, 0x157, BAD_DUMP CRC(a715e392) SHA1(31ebc78b084d49cc2f6479cbd42738e6bfbfb46a) ) // Bruteforced but verified
-	ROM_LOAD ( "thunderhoop_gal20v8.h11", 0x385, 0x157, BAD_DUMP CRC(51e34bc2) SHA1(381a898b3afb709e7d8e0f87df106f23aec2ccbe) ) // Bruteforced but verified
+	ROM_LOAD ( "mu_mu-1_6541_gal16v8as.f2",  0x000, 0x117, CRC(d5ed5985) SHA1(a4e9c8e3a7774e2a02fbca3ddf8175cf251825ba) )
+	ROM_LOAD ( "mu_mu-4_664c_gal16v8as.j16", 0x117, 0x117, CRC(fe78b903) SHA1(c806e63ce56a77f631043c184a42bf77ebda8a09) )
+	ROM_LOAD ( "thunderhoop_gal20v8.d21",    0x22e, 0x157, BAD_DUMP CRC(a715e392) SHA1(31ebc78b084d49cc2f6479cbd42738e6bfbfb46a) ) // Bruteforced but verified
+	ROM_LOAD ( "mu_mu-3_gal20v8as.h11",      0x385, 0x157, CRC(51e34bc2) SHA1(381a898b3afb709e7d8e0f87df106f23aec2ccbe) )
 ROM_END
 
 
