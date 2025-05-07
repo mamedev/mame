@@ -15,7 +15,7 @@ wlzb debug Breakpoint:
 5 F5 or F12 (starts running)
 ===================================================================================================
 
-Wu Lin Zhengba, Huang Yeh, 1999?
+Wu Lin Zhengba, Huang Yeh, 1999
 Hardware Info by Guru
 ---------------------
 
