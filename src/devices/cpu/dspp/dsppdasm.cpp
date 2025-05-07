@@ -398,7 +398,10 @@ offs_t dspp_disassembler::dasm_arithmetic(std::ostream &stream, offs_t pc, const
 			++opidx;
 	}
 
-	stream << "LOAD ";
+	if (alu_op < 8)
+		stream << "TRA ";
+	else
+		stream << "TRL ";
 
 	if (alu_op != 1)
 	{
@@ -440,7 +443,7 @@ offs_t dspp_disassembler::dasm_arithmetic(std::ostream &stream, offs_t pc, const
 		}
 		case 1: // _NEG
 		{
-			stream << "NEG ";
+			stream << "-";
 			break;
 		}
 		case 2: // _+
