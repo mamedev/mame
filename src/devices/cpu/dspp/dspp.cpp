@@ -449,7 +449,7 @@ void dspp_device::parse_operands(uint32_t numops)
 				else
 				{
 					// Sign extend if right justified
-					val = util::sext(operand, 13);
+					val = uint16_t(util::sext(operand, 13));
 				}
 				m_core->m_operands[opidx++].value = val;
 			}
@@ -1191,7 +1191,7 @@ inline void dspp_device::exec_arithmetic()
 		}
 		else
 		{
-			m_core->m_acc = util::sext(alu_res, 20) << shift;
+			m_core->m_acc = util::sext(alu_res << shift, 20);
 		}
 	}
 
