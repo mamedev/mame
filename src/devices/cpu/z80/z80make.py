@@ -141,14 +141,17 @@ class Opcode:
             print("\t\t}", file=f)
 
 class Macro:
-    def __init__(self, name, arg_name = None):
+    def __init__(self, name, arg_names = None):
         self.name = name
         self.source = []
-        self.arg_name = arg_name
+        self.arg_names = arg_names
 
-    def apply(self, arg):
-        if self.arg_name is not None:
-            return [ r.replace(self.arg_name, arg) for r in self.source ]
+    def apply(self, args):
+        if self.arg_names is not None:
+            src = self.source
+            for i, arg in enumerate(args.split(",")):
+                src = [ r.replace(self.arg_names[i], arg) for r in src ]
+            return src
         else:
             return self.source
 
@@ -184,16 +187,16 @@ class OpcodeList:
                 # New opcode
                 tokens = line.split()
                 if tokens[0] == "macro":
-                    arg_name = None
+                    arg_names = None
                     if len(tokens) > 2:
-                        arg_name = tokens[2]
+                        arg_names = tokens[2:]
                     nnames = tokens[1].split(":")
                     if len(nnames) == 2:
-                        inf = Macro(nnames[1], arg_name)
+                        inf = Macro(nnames[1], arg_names)
                         if nnames[0] == self.gen:
                             self.macros[nnames[1]] = inf
                     else:
-                        inf = Macro(nnames[0], arg_name)
+                        inf = Macro(nnames[0], arg_names)
                         if None == self.gen:
                             if nnames[0] in self.macros:
                                 sys.stderr.write("Replacing macro: %s\n" % nnames[0])
@@ -242,12 +245,12 @@ class OpcodeList:
         for i in range(times):
             if line_toc[0].startswith('@'):
                 name = line_toc[0][1:]
-                arg = None
+                args = None
                 if len(line_toc) > 1:
-                    arg = " ".join(line_toc[1:])
+                    args = " ".join(line_toc[1:])
                 if name in self.macros:
                     macro = self.macros[name]
-                    ([out.extend(self.pre_process(il)) for il in macro.apply(arg)])
+                    ([out.extend(self.pre_process(il)) for il in macro.apply(args)])
                 else:
                     sys.stderr.write("Macro not found %s\n" % name)
                     out.append(iline.with_str("... %s" % name))
