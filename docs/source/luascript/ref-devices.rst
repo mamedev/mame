@@ -630,7 +630,7 @@ image.device (read-only)
 .. _luascript-ref-disound:
 
 Sound device interface
----------------------
+----------------------
 
 Wraps MAME’s ``device_sound_interface`` class which is a mix-in implemented by
 devices that input and/or output sound.
@@ -664,7 +664,7 @@ sound.io_positions[] (read-only)
 sound.io_names[] (read-only)
     Non-empty only for microphones and speakers, indicates the positions of
     the inputs or outputs as strings (e.g. Front Left)
-    
+
 sound.hook
     A boolean indicating whether to tap the output samples of this device in
     the global sound hook.
