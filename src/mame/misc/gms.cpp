@@ -64,22 +64,22 @@ Notes:
         B1/M1 - 26C1000 / 27C1001 (PRG/data for 89C51?)
            S1 - 27C2000 / 232000 mask ROM (OKI samples)
 
-Hold test (F2) and reset (F3) to enter service mode.
-
-The default assignments for Mahjong I and Payout are identical.  This can
-cause the games to ignore Payout if they see Mahjong I first (in mahjong
-keyboard mode).  You can work around this by reassigning Payout.
+Hold test (F2) and press reset (F3) to enter service mode.
 
 TODO:
 - work out how Flip Flop input is read in mahjong games in mahjong keyboard mode
-- correct EEPROM hookup for all games (this would get rid of a lot of ROM patches)
+- in baile, Payout key doesn't work in mahjong keyboard mode (input test
+  recognises it as both Payout and Flip Flop)
+- correct EEPROM hookup for all games (this would get rid of a lot of ROM
+  patches)
 - hookup MCU and YM2151 / YM3812 sound for the mahjong games
 - hookup PIC16F84 for rbspm
 - emulate protection devices correctly instead of patching
 - hookup lamps and do layouts
-- use real values for reel tilemaps offsets instead of hardcoded ones (would fix magslot)
-- game logic seems broken in mahjong games (reach permitted when it shouldn't be, chi not
-  permitted when it should be, other issues)
+- use real values for reel tilemaps offsets instead of hardcoded ones (would fix
+  magslot)
+- game logic seems broken in mahjong games (Reach permitted when it shouldn't
+  be, Chi not permitted when it should be, other issues)
 - broken title GFX in yyhm (transparent pen problem?)
 - the newer games seem to use range 0x9e1000-0x9e1fff during gameplay
 
@@ -198,7 +198,7 @@ private:
 	void ssanguoj_mem(address_map &map) ATTR_COLD;
 
 	uint16_t unk_r();
-	uint16_t input_matrix_r();
+	uint16_t dipsw_matrix_r();
 	void input_matrix_w(uint16_t data);
 	void tilebank_w(uint16_t data);
 	void reels_toggle_w(uint16_t data);
@@ -260,16 +260,18 @@ uint16_t gms_2layers_state::unk_r()
 	return machine().rand();
 }
 
-uint16_t gms_2layers_state::input_matrix_r()
+uint16_t gms_2layers_state::dipsw_matrix_r()
 {
-	uint16_t res = 0xffff;
+	uint16_t result = 0xffff;
 
-	// TODO: & 0x00ff are the inputs for keyboard mode in rbmk
-	if (m_input_matrix & 0x1000) res &= m_dsw[0]->read();
-	if (m_input_matrix & 0x2000) res &= m_dsw[1].read_safe(0xffff);
-	if (m_input_matrix & 0x4000) res &= m_dsw[2].read_safe(0xffff);
+	if (m_input_matrix & 0x1000)
+		result &= m_dsw[0]->read();
+	if (m_input_matrix & 0x2000)
+		result &= m_dsw[1].read_safe(0xffff);
+	if (m_input_matrix & 0x4000)
+		result &= m_dsw[2].read_safe(0xffff);
 
-	return res;
+	return result;
 }
 
 void gms_2layers_state::tilebank_w(uint16_t data)
@@ -352,7 +354,7 @@ void gms_2layers_state::rbmk_mem(address_map &map)
 	map(0x980380, 0x9803ff).ram().share(m_scrolly[3]);
 	map(0x9c0000, 0x9c0fff).ram().w(FUNC(gms_2layers_state::vram_w<0>)).share(m_vidram[0]);
 	map(0xb00000, 0xb00001).w(FUNC(gms_2layers_state::eeprom_w));
-	map(0xc00000, 0xc00001).rw(FUNC(gms_2layers_state::input_matrix_r), FUNC(gms_2layers_state::input_matrix_w));
+	map(0xc00000, 0xc00001).rw(FUNC(gms_2layers_state::dipsw_matrix_r), FUNC(gms_2layers_state::input_matrix_w));
 	map(0xc08000, 0xc08001).portr("IN1").w(FUNC(gms_2layers_state::tilebank_w));
 	map(0xc10000, 0xc10001).portr("IN2");
 	map(0xc18080, 0xc18081).r(FUNC(gms_2layers_state::unk_r));  // TODO: from MCU?
@@ -365,7 +367,7 @@ void gms_2layers_state::rbspm_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x200000, 0x200001).w(FUNC(gms_2layers_state::reels_toggle_w));
-	map(0x300000, 0x300001).rw(FUNC(gms_2layers_state::input_matrix_r), FUNC(gms_2layers_state::input_matrix_w));
+	map(0x300000, 0x300001).rw(FUNC(gms_2layers_state::dipsw_matrix_r), FUNC(gms_2layers_state::input_matrix_w));
 	map(0x308000, 0x308001).portr("IN1").w(FUNC(gms_2layers_state::tilebank_w)); // ok
 	map(0x310000, 0x310001).portr("IN2");
 	map(0x318080, 0x318081).r(FUNC(gms_2layers_state::unk_r));
@@ -403,7 +405,7 @@ void gms_2layers_state::ssanguoj_mem(address_map &map)
 	map(0x980300, 0x98037f).ram().share(m_scrolly[2]);
 	map(0x980380, 0x9803ff).ram().share(m_scrolly[3]);
 	map(0x9c0000, 0x9c0fff).ram().w(FUNC(gms_2layers_state::vram_w<0>)).share(m_vidram[0]);
-	map(0xa00000, 0xa00001).rw(FUNC(gms_2layers_state::input_matrix_r), FUNC(gms_2layers_state::input_matrix_w));
+	map(0xa00000, 0xa00001).rw(FUNC(gms_2layers_state::dipsw_matrix_r), FUNC(gms_2layers_state::input_matrix_w));
 	map(0xa08000, 0xa08001).portr("IN1").w(FUNC(gms_2layers_state::tilebank_w));
 	map(0xa10000, 0xa10001).portr("IN2");
 	map(0xa18080, 0xa18081).r(FUNC(gms_2layers_state::unk_r));  // TODO: from MCU?
@@ -418,7 +420,7 @@ void gms_2layers_state::super555_mem(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x10ffff).ram();
 	map(0x300000, 0x300001).w(FUNC(gms_2layers_state::reels_toggle_w));
-	map(0x600000, 0x600001).rw(FUNC(gms_2layers_state::input_matrix_r), FUNC(gms_2layers_state::input_matrix_w));
+	map(0x600000, 0x600001).rw(FUNC(gms_2layers_state::dipsw_matrix_r), FUNC(gms_2layers_state::input_matrix_w));
 	map(0x608000, 0x608001).portr("IN1").w(FUNC(gms_2layers_state::tilebank_w)); // ok
 	map(0x610000, 0x610001).portr("IN2");
 	map(0x618080, 0x618081).nopr();//.lr16(NAME([this] () -> uint16_t { return m_prot_data; })); // reads something here from below, if these are hooked up booting stops with '0x09 U64 ERROR', like it's failing some checksum test
@@ -1079,11 +1081,11 @@ static INPUT_PORTS_START( super555 )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE(0x02, IP_ACTIVE_LOW)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME( "Start / Take" )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_POKER_HOLD2 ) PORT_NAME( "Hold 2 / Double Up" )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Paytable" )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_POKER_HOLD1 ) PORT_NAME( "Hold 1 / Double Up / Big" )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) PORT_NAME( "Hold 3 / Double Up / Small" )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start / Take Score")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )    PORT_NAME(u8"Hold 2 / Double Up × 1")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   PORT_NAME("Show Odds")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )    PORT_NAME(u8"Hold 1 / Double Up × 2 / Big")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )    PORT_NAME(u8"Hold 3 / Double Up × ½ / Small")
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
@@ -1096,17 +1098,17 @@ static INPUT_PORTS_START( super555 )
 	PORT_START("IN2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BILL1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_CUSTOM )         PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1215,20 +1217,20 @@ static INPUT_PORTS_START( sscs )
 	GMS_MAHJONG_KEYBOARD("DSW2", 0x80, 0x80)
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )                                                   PORT_CONDITION("DSW2", 0x80, NOTEQUALS, 0x80)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 )   PORT_NAME("Showdown / Take Score")               PORT_CONDITION("DSW2", 0x80, NOTEQUALS, 0x80)  // 開牌鍵
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 )  PORT_NAME("Raise × 5 / Double Up × 1")           PORT_CONDITION("DSW2", 0x80, NOTEQUALS, 0x80)  // ×5       (up in bookkeeping, up in test mode)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON7 )                                                   PORT_CONDITION("DSW2", 0x80, NOTEQUALS, 0x80)  //          (down in test mode)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON4 )  PORT_NAME("Raise × 1 / Double Up × 2 / Big")     PORT_CONDITION("DSW2", 0x80, NOTEQUALS, 0x80)  // ×1       (down in bookkeeping)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON6 )  PORT_NAME("Raise × 10 / Double Up × ½ / Small")  PORT_CONDITION("DSW2", 0x80, NOTEQUALS, 0x80)  // 加押
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 )  PORT_NAME("Call / Bet / Take Score")             PORT_CONDITION("DSW2", 0x80, NOTEQUALS, 0x80)  // 跟/押鍵
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 )  PORT_NAME("Fold")                                PORT_CONDITION("DSW2", 0x80, NOTEQUALS, 0x80)  // 放棄
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON3 )  PORT_NAME("View Hole Card")                      PORT_CONDITION("DSW2", 0x80, NOTEQUALS, 0x80)  // 看牌     (select in test mode)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )                                                   PORT_CONDITION("DSW2", 0x80, NOTEQUALS, 0x80)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )                                                   PORT_CONDITION("DSW2", 0x80, NOTEQUALS, 0x80)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )                                                   PORT_CONDITION("DSW2", 0x80, NOTEQUALS, 0x80)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )                                                   PORT_CONDITION("DSW2", 0x80, NOTEQUALS, 0x80)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )                                                   PORT_CONDITION("DSW2", 0x80, NOTEQUALS, 0x80)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )                                                     PORT_CONDITION("DSW2", 0x80, NOTEQUALS, 0x80)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 )   PORT_NAME("Showdown / Take Score")                 PORT_CONDITION("DSW2", 0x80, NOTEQUALS, 0x80)  // 開牌鍵
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 )  PORT_NAME(u8"Raise × 5 / Double Up × 1")           PORT_CONDITION("DSW2", 0x80, NOTEQUALS, 0x80)  // ×5       (up in bookkeeping, up in test mode)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON7 )                                                     PORT_CONDITION("DSW2", 0x80, NOTEQUALS, 0x80)  //          (down in test mode)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON4 )  PORT_NAME(u8"Raise × 1 / Double Up × 2 / Big")     PORT_CONDITION("DSW2", 0x80, NOTEQUALS, 0x80)  // ×1       (down in bookkeeping)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON6 )  PORT_NAME(u8"Raise × 10 / Double Up × ½ / Small")  PORT_CONDITION("DSW2", 0x80, NOTEQUALS, 0x80)  // 加押
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 )  PORT_NAME("Call / Bet / Take Score")               PORT_CONDITION("DSW2", 0x80, NOTEQUALS, 0x80)  // 跟/押鍵
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 )  PORT_NAME("Fold")                                  PORT_CONDITION("DSW2", 0x80, NOTEQUALS, 0x80)  // 放棄
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON3 )  PORT_NAME("View Hole Card")                        PORT_CONDITION("DSW2", 0x80, NOTEQUALS, 0x80)  // 看牌     (select in test mode)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )                                                     PORT_CONDITION("DSW2", 0x80, NOTEQUALS, 0x80)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )                                                     PORT_CONDITION("DSW2", 0x80, NOTEQUALS, 0x80)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )                                                     PORT_CONDITION("DSW2", 0x80, NOTEQUALS, 0x80)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )                                                     PORT_CONDITION("DSW2", 0x80, NOTEQUALS, 0x80)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )                                                     PORT_CONDITION("DSW2", 0x80, NOTEQUALS, 0x80)
 
 	PORT_MODIFY("IN2")
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1490,12 +1492,12 @@ static INPUT_PORTS_START( baile )
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )                                               PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 )        PORT_NAME("Start / Draw / Take Score")  PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 )       PORT_NAME("Bet on Tie")                 PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )   PORT_NAME("Bet on Tie")                 PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )                                           PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 )       PORT_NAME("Bet on Player / Big")        PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON3 )       PORT_NAME("Bet on Banker / Small")      PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON4 )       PORT_NAME("Bet Multiplier")             PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON5 )       PORT_NAME("Peek at Card / Show Odds")   PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )   PORT_NAME("Bet on Player / Big")        PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )   PORT_NAME("Bet on Banker / Small")      PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_BET )    PORT_NAME("Bet Multiplier")             PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )   PORT_NAME("Peek at Card / Show Odds")   PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_POKER_CANCEL )  PORT_NAME("Cancel Bets")                PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )                                               PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )                                               PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)

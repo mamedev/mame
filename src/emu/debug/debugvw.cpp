@@ -509,7 +509,7 @@ bool debug_view_expression::recompute()
 		{
 			m_parsed.parse(m_string);
 		}
-		catch (expression_error &)
+		catch (expression_error const &)
 		{
 			try
 			{
@@ -517,7 +517,7 @@ bool debug_view_expression::recompute()
 				// then going back to the previous expression should work
 				m_parsed.parse(oldstring);
 			}
-			catch (expression_error &)
+			catch (expression_error const &)
 			{
 				// If that didn't work, perhaps the user switched sources
 				// and the previous expression doesn't evaluate with the
@@ -540,7 +540,7 @@ bool debug_view_expression::recompute()
 				changed = true;
 			}
 		}
-		catch (expression_error &)
+		catch (expression_error const &)
 		{
 		}
 	}
