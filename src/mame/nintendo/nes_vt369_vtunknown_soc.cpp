@@ -151,7 +151,6 @@ void vt3xx_soc_base_device::nes_vt369_map(address_map &map)
 
 	map(0x41b0, 0x41bf).r(FUNC(vt3xx_soc_base_device::vt369_41bx_r)).w(FUNC(vt3xx_soc_base_device::vt369_41bx_w));
 
-//  map(0x48a0, 0x48af).r(FUNC(vt3xx_soc_base_device::vt369_48ax_r)).w(FUNC(vt3xx_soc_base_device::vt369_48ax_w));
 	map(0x4800, 0x4fff).ram().share("soundram"); // sound program for 2nd CPU is uploaded here, but some sets aren't uploading anything, do they rely on an internal ROM? other DMA? possibility to map ROM?
 
 	map(0x6000, 0x7fff).r(FUNC(vt3xx_soc_base_device::vt369_6000_r)).w(FUNC(vt3xx_soc_base_device::vt369_6000_w));
@@ -273,25 +272,6 @@ uint8_t vt3xx_soc_base_device::vt369_415c_r()
 	return 0xff;
 }
 
-
-void vt3xx_soc_base_device::vt369_48ax_w(offs_t offset, uint8_t data)
-{
-	logerror("vt369_48ax_w %02x %02x\n", offset, data);
-}
-
-uint8_t vt3xx_soc_base_device::vt369_48ax_r(offs_t offset)
-{
-	switch (offset)
-	{
-	case 0x04:
-		return 0x01;
-	case 0x05:
-		return 0x01;
-	default:
-		return 0x00;
-	}
-}
-
 /***********************************************************************************************************************************************************/
 /* this might just be the same as vt369 but with the games not using all features */
 /***********************************************************************************************************************************************************/
@@ -333,7 +313,7 @@ uint8_t vt369_soc_introm_noswap_device::extra_rom_r()
 
 void vt369_soc_introm_noswap_device::nes_vt369_introm_map(address_map &map)
 {
-	nes_vt02_vt03_soc_device::nes_vt_map(map);
+	vt3xx_soc_base_device::nes_vt369_map(map);
 
 	map(0x0000, 0x0fff).ram();
 	map(0x1000, 0x1fff).rom().region("internal", 0);
@@ -409,9 +389,7 @@ void vt3xx_soc_unk_dg_device::vt03_411c_w(uint8_t data)
 
 void vt3xx_soc_unk_dg_device::nes_vt_dg_map(address_map &map)
 {
-	nes_vt02_vt03_soc_device::nes_vt_map(map);
-
-	map(0x0000, 0x1fff).ram();
+	vt3xx_soc_base_device::nes_vt369_map(map);
 	map(0x411c, 0x411c).w(FUNC(vt3xx_soc_unk_dg_device::vt03_411c_w));
 }
 
@@ -427,7 +405,7 @@ void vt3xx_soc_unk_bt_device::device_add_mconfig(machine_config& config)
 
 void vt3xx_soc_unk_bt_device::nes_vt_bt_map(address_map &map)
 {
-	nes_vt_4k_ram_map(map);
+	vt3xx_soc_base_device::nes_vt369_map(map);
 	map(0x412c, 0x412c).w(FUNC(vt3xx_soc_unk_bt_device::vt03_412c_extbank_w));
 }
 
@@ -466,8 +444,7 @@ void vt3xx_soc_unk_fa_device::vtfp_4242_w(uint8_t data)
 
 void vt3xx_soc_unk_fa_device::nes_vt_fa_map(address_map &map)
 {
-	vt3xx_soc_unk_dg_device::nes_vt_dg_map(map);
-
+	vt3xx_soc_base_device::nes_vt369_map(map);
 	map(0x412c, 0x412c).r(FUNC(vt3xx_soc_unk_fa_device::vtfa_412c_r)).w(FUNC(vt3xx_soc_unk_fa_device::vtfa_412c_extbank_w));
 	map(0x4242, 0x4242).w(FUNC(vt3xx_soc_unk_fa_device::vtfp_4242_w));
 }

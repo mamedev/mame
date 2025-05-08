@@ -35,9 +35,6 @@ protected:
 	uint8_t vt369_414f_r();
 	uint8_t vt369_415c_r();
 
-	void vt369_48ax_w(offs_t offset, uint8_t data);
-	uint8_t vt369_48ax_r(offs_t offset);
-
 	uint8_t vt369_6000_r(offs_t offset);
 	void vt369_6000_w(offs_t offset, uint8_t data);
 
