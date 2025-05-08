@@ -396,7 +396,7 @@ void nes_vt369_vtunknown_cy_state::nes_vt369_vtunknown_cy(machine_config &config
 {
 	nes_vt369_vtunknown_4k_ram(config);
 
-	NES_VTUNKNOWN_SOC_CY(config.replace(), m_soc, NTSC_APU_CLOCK);
+	VT3XX_SOC(config.replace(), m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 }
 
@@ -410,7 +410,7 @@ void nes_vt369_vtunknown_cy_state::nes_vt369_vtunknown_bt(machine_config &config
 {
 	nes_vt369_vtunknown_4k_ram(config);
 
-	NES_VTUNKNOWN_SOC_BT(config.replace(), m_soc, NTSC_APU_CLOCK);
+	VT3XX_SOC_UNK_BT(config.replace(), m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 }
 
@@ -433,7 +433,7 @@ void nes_vt369_vtunknown_unk_state::nes_vt369_vtunknown_unk(machine_config &conf
 {
 	nes_vt369_vtunknown_4k_ram(config);
 
-	NES_VTUNKNOWN_SOC_DG(config.replace(), m_soc, NTSC_APU_CLOCK);
+	VT3XX_SOC_UNK_DG(config.replace(), m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 	m_soc->force_bad_dma();
 }
@@ -469,7 +469,7 @@ void nes_vt369_vtunknown_unk_state::nes_vt369_vtunknown_hh(machine_config &confi
 {
 	nes_vt369_vtunknown_4k_ram(config);
 
-	NES_VT369_SOC(config.replace(), m_soc, NTSC_APU_CLOCK);
+	VT369_SOC_INTROM_NOSWAP(config.replace(), m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 
 	m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB);
@@ -480,7 +480,7 @@ void nes_vt369_vtunknown_unk_state::nes_vt369_vtunknown_hh_swap_8mb(machine_conf
 {
 	nes_vt369_vtunknown_4k_ram(config);
 
-	NES_VT369_SOC_SWAP(config.replace(), m_soc, NTSC_APU_CLOCK);
+	VT369_SOC_INTROM_SWAP(config.replace(), m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 
 	m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB);
@@ -584,7 +584,7 @@ void nes_vt369_vtunknown_dg_fapocket_state::nes_vt369_vtunknown_fa_4x16mb(machin
 {
 	nes_vt369_vtunknown_4k_ram(config);
 
-	NES_VTUNKNOWN_SOC_FA(config.replace(), m_soc, NTSC_APU_CLOCK);
+	VT3XX_SOC_UNK_FA(config.replace(), m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt369_vtunknown_dg_fapocket_state::vt_external_space_map_fapocket_4x16mbyte);

@@ -15,12 +15,14 @@
 #include "screen.h"
 #include "speaker.h"
 
-class nes_vt369_soc_device : public nes_vt09_soc_device
+class vt3xx_soc_base_device : public nes_vt09_soc_device
 {
 public:
-	nes_vt369_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	vt3xx_soc_base_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 
 protected:
+	vt3xx_soc_base_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
+
 	virtual void device_add_mconfig(machine_config& config) override;
 	void device_start() override ATTR_COLD;
 	void device_reset() override ATTR_COLD;
@@ -58,10 +60,10 @@ private:
 	uint8_t m_bank6000_enable = 0;
 };
 
-class nes_vtunknown_soc_bt_device : public nes_vt09_soc_device
+class vt3xx_soc_unk_bt_device : public vt3xx_soc_base_device
 {
 public:
-	nes_vtunknown_soc_bt_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	vt3xx_soc_unk_bt_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config& config) override;
@@ -71,13 +73,13 @@ protected:
 	void vt03_412c_extbank_w(uint8_t data);
 };
 
-class nes_vt369_alt_soc_device : public nes_vt09_soc_device
+class vt369_soc_introm_noswap_device : public vt3xx_soc_base_device
 {
 public:
-	nes_vt369_alt_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	vt369_soc_introm_noswap_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 
 protected:
-	nes_vt369_alt_soc_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
+	vt369_soc_introm_noswap_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
 
 	virtual void device_add_mconfig(machine_config& config) override;
 
@@ -88,10 +90,10 @@ protected:
 	void vtfp_411d_w(uint8_t data);
 };
 
-class nes_vt369_alt_swap_d5_d6_soc_device : public nes_vt369_alt_soc_device
+class vt369_soc_introm_swap_device : public vt369_soc_introm_noswap_device
 {
 public:
-	nes_vt369_alt_swap_d5_d6_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	vt369_soc_introm_swap_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 
 	virtual void device_add_mconfig(machine_config& config) override;
 
@@ -101,13 +103,13 @@ private:
 };
 
 
-class nes_vtunknown_soc_dg_device : public nes_vt09_soc_device
+class vt3xx_soc_unk_dg_device : public vt3xx_soc_base_device
 {
 public:
-	nes_vtunknown_soc_dg_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	vt3xx_soc_unk_dg_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 
 protected:
-	nes_vtunknown_soc_dg_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
+	vt3xx_soc_unk_dg_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
 
 	virtual void device_add_mconfig(machine_config& config) override;
 
@@ -116,10 +118,10 @@ protected:
 	void vt03_411c_w(uint8_t data);
 };
 
-class nes_vtunknown_soc_fa_device : public nes_vtunknown_soc_dg_device
+class vt3xx_soc_unk_fa_device : public vt3xx_soc_unk_dg_device
 {
 public:
-	nes_vtunknown_soc_fa_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	vt3xx_soc_unk_fa_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 
 protected:
 
@@ -133,12 +135,14 @@ protected:
 };
 
 
-DECLARE_DEVICE_TYPE(NES_VTUNKNOWN_SOC_CY, nes_vt369_soc_device)
-DECLARE_DEVICE_TYPE(NES_VTUNKNOWN_SOC_BT, nes_vtunknown_soc_bt_device)
-DECLARE_DEVICE_TYPE(NES_VT369_SOC, nes_vt369_alt_soc_device)
-DECLARE_DEVICE_TYPE(NES_VT369_SOC_SWAP, nes_vt369_alt_swap_d5_d6_soc_device)
+DECLARE_DEVICE_TYPE(VT3XX_SOC, vt3xx_soc_base_device)
 
-DECLARE_DEVICE_TYPE(NES_VTUNKNOWN_SOC_DG, nes_vtunknown_soc_dg_device)
-DECLARE_DEVICE_TYPE(NES_VTUNKNOWN_SOC_FA, nes_vtunknown_soc_fa_device)
+DECLARE_DEVICE_TYPE(VT369_SOC_INTROM_NOSWAP, vt369_soc_introm_noswap_device)
+DECLARE_DEVICE_TYPE(VT369_SOC_INTROM_SWAP,   vt369_soc_introm_swap_device)
+
+DECLARE_DEVICE_TYPE(VT3XX_SOC_UNK_BT, vt3xx_soc_unk_bt_device)
+
+DECLARE_DEVICE_TYPE(VT3XX_SOC_UNK_DG, vt3xx_soc_unk_dg_device)
+DECLARE_DEVICE_TYPE(VT3XX_SOC_UNK_FA, vt3xx_soc_unk_fa_device)
 
 #endif // MAME_NINTENDO_NES_VT369_VTUNKNOWN_SOC_H
