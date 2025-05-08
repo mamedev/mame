@@ -49,12 +49,10 @@ vtldabank_abx
 	set_nz(A);
 	prefetch();
 
-vtldabank2_abx
-	TMP = read_pc(); // this is currently the same as vtldabank_abx, it probably shouldn't be, maybe reads with highest exbus bit set to give 25 bits?
+vtldabank2_zpy
+	TMP = read_pc();
 	PC++;
-	TMP2 = read_pc();
-	PC++;
-	A = m_extdata_space->read_byte(((m_databank << 16) | (TMP2 << 8) | TMP) + X);
+	A = m_extdata_space->read_byte(read(uint8_t(TMP+Y)));
 	set_nz(A);
 	prefetch();
 
