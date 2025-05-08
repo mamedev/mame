@@ -27,11 +27,12 @@ public:
 	O(plx_vt_imp);
 	O(ply_vt_imp);
 
-	O(setdbk_vt_imp);
-	O(getdbk_vt_imp);
+	O(vtsetdbk_imp);
+	O(vtgetdbk_imp);
 
-	O(readdbk_vt_abx);	
-	O(readdbk2_vt_abx);
+	O(vtldabank_abx);	
+	O(vtldabank2_abx);
+	O(vtadcx_aba);
 
 #undef O
 

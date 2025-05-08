@@ -30,17 +30,17 @@ ply_vt_imp
 	set_nz(Y);
 	prefetch();
 
-getdbk_vt_imp
+vtgetdbk_imp
 	read_pc();
 	A = m_databank;
 	prefetch();
 
-setdbk_vt_imp
+vtsetdbk_imp
 	read_pc();
 	m_databank = A;
 	prefetch();
 
-readdbk_vt_abx
+vtldabank_abx
 	TMP = read_pc();
 	PC++;
 	TMP2 = read_pc();
@@ -49,11 +49,20 @@ readdbk_vt_abx
 	set_nz(A);
 	prefetch();
 
-readdbk2_vt_abx
-	TMP = read_pc(); // this is currently the same as readdbk_vt_abx, it probably shouldn't be, maybe reads with highest exbus bit set to give 25 bits?
+vtldabank2_abx
+	TMP = read_pc(); // this is currently the same as vtldabank_abx, it probably shouldn't be, maybe reads with highest exbus bit set to give 25 bits?
 	PC++;
 	TMP2 = read_pc();
 	PC++;
 	A = m_extdata_space->read_byte(((m_databank << 16) | (TMP2 << 8) | TMP) + X);
 	set_nz(A);
+	prefetch();
+
+vtadcx_aba
+	TMP = read_pc();
+	PC++;
+	TMP2 = read_pc();
+	PC++;
+	A = m_extdata_space->read_byte((TMP2 << 8) | TMP) + X;
+	set_nz(A); // other flags?
 	prefetch();
