@@ -29,10 +29,10 @@
 
 namespace {
 
-class nes_vt369_vtunknown_base_state : public driver_device
+class vt369_vtunknown_base_state : public driver_device
 {
 public:
-	nes_vt369_vtunknown_base_state(const machine_config& mconfig, device_type type, const char* tag) :
+	vt369_vtunknown_base_state(const machine_config& mconfig, device_type type, const char* tag) :
 		driver_device(mconfig, type, tag),
 		m_io0(*this, "IO0"),
 		m_io1(*this, "IO1"),
@@ -49,7 +49,7 @@ protected:
 	virtual uint8_t in1_r();
 	virtual void in0_w(uint8_t data);
 
-	void nes_vt369_vtunknown_map(address_map &map) ATTR_COLD;
+	void vt369_vtunknown_map(address_map &map) ATTR_COLD;
 
 	optional_ioport m_io0;
 	optional_ioport m_io1;
@@ -83,16 +83,16 @@ private:
 	template <uint8_t NUM> uint8_t extrain_r();
 };
 
-class nes_vt369_vtunknown_state : public nes_vt369_vtunknown_base_state
+class vt369_vtunknown_state : public vt369_vtunknown_base_state
 {
 public:
-	nes_vt369_vtunknown_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt369_vtunknown_base_state(mconfig, type, tag),
+	vt369_vtunknown_state(const machine_config& mconfig, device_type type, const char* tag) :
+		vt369_vtunknown_base_state(mconfig, type, tag),
 		m_soc(*this, "soc")
 	{ }
 
-	void nes_vt369_vtunknown_4k_ram(machine_config& config);
-	void nes_vt369_vtunknown_4k_ram_16mb(machine_config& config);
+	void vt369_vtunknown_4k_ram(machine_config& config);
+	void vt369_vtunknown_4k_ram_16mb(machine_config& config);
 
 	void vt_external_space_map_32mbyte(address_map &map) ATTR_COLD;
 	void vt_external_space_map_16mbyte(address_map &map) ATTR_COLD;
@@ -108,17 +108,17 @@ protected:
 	required_device<nes_vt02_vt03_soc_device> m_soc;
 };
 
-class nes_vt369_vtunknown_cy_state : public nes_vt369_vtunknown_state
+class vt369_vtunknown_cy_state : public vt369_vtunknown_state
 {
 public:
-	nes_vt369_vtunknown_cy_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt369_vtunknown_state(mconfig, type, tag)
+	vt369_vtunknown_cy_state(const machine_config& mconfig, device_type type, const char* tag) :
+		vt369_vtunknown_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt369_vtunknown_cy(machine_config& config);
-	void nes_vt369_vtunknown_cy_bigger(machine_config& config);
-	void nes_vt369_vtunknown_bt(machine_config& config);
-	void nes_vt369_vtunknown_bt_2x16mb(machine_config& config);
+	void vt369_vtunknown_cy(machine_config& config);
+	void vt369_vtunknown_cy_bigger(machine_config& config);
+	void vt369_vtunknown_bt(machine_config& config);
+	void vt369_vtunknown_bt_2x16mb(machine_config& config);
 
 	void vt_external_space_map_bitboy_2x16mbyte(address_map &map) ATTR_COLD;
 
@@ -131,14 +131,14 @@ private:
 
 
 
-class nes_vt369_vtunknown_dg_fapocket_state : public nes_vt369_vtunknown_state
+class vt369_vtunknown_dg_fapocket_state : public vt369_vtunknown_state
 {
 public:
-	nes_vt369_vtunknown_dg_fapocket_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt369_vtunknown_state(mconfig, type, tag)
+	vt369_vtunknown_dg_fapocket_state(const machine_config& mconfig, device_type type, const char* tag) :
+		vt369_vtunknown_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt369_vtunknown_fa_4x16mb(machine_config& config);
+	void vt369_vtunknown_fa_4x16mb(machine_config& config);
 
 protected:
 	virtual void machine_reset() override ATTR_COLD;
@@ -153,115 +153,115 @@ private:
 };
 
 
-class nes_vt369_vtunknown_unk_state : public nes_vt369_vtunknown_state
+class vt369_vtunknown_unk_state : public vt369_vtunknown_state
 {
 public:
-	nes_vt369_vtunknown_unk_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt369_vtunknown_state(mconfig, type, tag)
+	vt369_vtunknown_unk_state(const machine_config& mconfig, device_type type, const char* tag) :
+		vt369_vtunknown_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt369_vtunknown_hh(machine_config& config);
-	void nes_vt369_vtunknown_hh_1mb(machine_config& config);
-	void nes_vt369_vtunknown_hh_4mb(machine_config& config);
-	void nes_vt369_vtunknown_hh_8mb(machine_config& config);
-	void nes_vt369_vtunknown_hh_16mb(machine_config& config);
+	void vt369_vtunknown_hh(machine_config& config);
+	void vt369_vtunknown_hh_1mb(machine_config& config);
+	void vt369_vtunknown_hh_4mb(machine_config& config);
+	void vt369_vtunknown_hh_8mb(machine_config& config);
+	void vt369_vtunknown_hh_16mb(machine_config& config);
 
-	void nes_vt369_vtunknown_hh_swap_8mb(machine_config& config);
+	void vt369_vtunknown_hh_swap_8mb(machine_config& config);
 
-	void nes_vt369_vtunknown_unk(machine_config& config);
-	void nes_vt369_vtunknown_unk_1mb(machine_config& config);
-	void nes_vt369_vtunknown_unk_2mb(machine_config& config);
-	void nes_vt369_vtunknown_unk_4mb(machine_config& config);
-	void nes_vt369_vtunknown_unk_16mb(machine_config& config);
+	void vt369_vtunknown_unk(machine_config& config);
+	void vt369_vtunknown_unk_1mb(machine_config& config);
+	void vt369_vtunknown_unk_2mb(machine_config& config);
+	void vt369_vtunknown_unk_4mb(machine_config& config);
+	void vt369_vtunknown_unk_16mb(machine_config& config);
 
-	void nes_vt369_vtunknown_fp(machine_config& config);
-	void nes_vt369_vtunknown_fp_16mb(machine_config& config);
+	void vt369_vtunknown_fp(machine_config& config);
+	void vt369_vtunknown_fp_16mb(machine_config& config);
 
 private:
 	uint8_t vt_rom_banked_r(offs_t offset);
 	[[maybe_unused]] void vt_external_space_map_fp_2x32mbyte(address_map &map) ATTR_COLD;
 };
 
-uint8_t nes_vt369_vtunknown_base_state::vt_rom_r(offs_t offset)
+uint8_t vt369_vtunknown_base_state::vt_rom_r(offs_t offset)
 {
 	return m_prgrom[offset];
 }
 
-void nes_vt369_vtunknown_base_state::vtspace_w(offs_t offset, uint8_t data)
+void vt369_vtunknown_base_state::vtspace_w(offs_t offset, uint8_t data)
 {
 	logerror("%s: vtspace_w %08x : %02x", machine().describe_context(), offset, data);
 }
 
 // VTxx can address 25-bit address space (32MB of ROM) so use maps with mirroring in depending on ROM size
-void nes_vt369_vtunknown_state::vt_external_space_map_32mbyte(address_map &map)
+void vt369_vtunknown_state::vt_external_space_map_32mbyte(address_map &map)
 {
-	map(0x0000000, 0x1ffffff).r(FUNC(nes_vt369_vtunknown_state::vt_rom_r));
+	map(0x0000000, 0x1ffffff).r(FUNC(vt369_vtunknown_state::vt_rom_r));
 }
 
-void nes_vt369_vtunknown_state::vt_external_space_map_16mbyte(address_map &map)
+void vt369_vtunknown_state::vt_external_space_map_16mbyte(address_map &map)
 {
-	map(0x0000000, 0x0ffffff).mirror(0x1000000).r(FUNC(nes_vt369_vtunknown_state::vt_rom_r));
+	map(0x0000000, 0x0ffffff).mirror(0x1000000).r(FUNC(vt369_vtunknown_state::vt_rom_r));
 }
 
-void nes_vt369_vtunknown_state::vt_external_space_map_8mbyte(address_map &map)
+void vt369_vtunknown_state::vt_external_space_map_8mbyte(address_map &map)
 {
-	map(0x0000000, 0x07fffff).mirror(0x1800000).r(FUNC(nes_vt369_vtunknown_state::vt_rom_r));
+	map(0x0000000, 0x07fffff).mirror(0x1800000).r(FUNC(vt369_vtunknown_state::vt_rom_r));
 }
 
-void nes_vt369_vtunknown_state::vt_external_space_map_4mbyte(address_map &map)
+void vt369_vtunknown_state::vt_external_space_map_4mbyte(address_map &map)
 {
-	map(0x0000000, 0x03fffff).mirror(0x1c00000).r(FUNC(nes_vt369_vtunknown_state::vt_rom_r));
+	map(0x0000000, 0x03fffff).mirror(0x1c00000).r(FUNC(vt369_vtunknown_state::vt_rom_r));
 }
 
-void nes_vt369_vtunknown_state::vt_external_space_map_2mbyte(address_map &map)
+void vt369_vtunknown_state::vt_external_space_map_2mbyte(address_map &map)
 {
-	map(0x0000000, 0x01fffff).mirror(0x1e00000).r(FUNC(nes_vt369_vtunknown_state::vt_rom_r));
+	map(0x0000000, 0x01fffff).mirror(0x1e00000).r(FUNC(vt369_vtunknown_state::vt_rom_r));
 }
 
-void nes_vt369_vtunknown_state::vt_external_space_map_1mbyte(address_map &map)
+void vt369_vtunknown_state::vt_external_space_map_1mbyte(address_map &map)
 {
-	map(0x0000000, 0x00fffff).mirror(0x1f00000).r(FUNC(nes_vt369_vtunknown_state::vt_rom_r));
+	map(0x0000000, 0x00fffff).mirror(0x1f00000).r(FUNC(vt369_vtunknown_state::vt_rom_r));
 }
 
-void nes_vt369_vtunknown_state::vt_external_space_map_512kbyte(address_map &map)
+void vt369_vtunknown_state::vt_external_space_map_512kbyte(address_map &map)
 {
-	map(0x0000000, 0x007ffff).mirror(0x1f80000).r(FUNC(nes_vt369_vtunknown_state::vt_rom_r));
+	map(0x0000000, 0x007ffff).mirror(0x1f80000).r(FUNC(vt369_vtunknown_state::vt_rom_r));
 }
 
 // bitboy is 2 16Mbyte banks
-uint8_t nes_vt369_vtunknown_cy_state::vt_rom_banked_r(offs_t offset)
+uint8_t vt369_vtunknown_cy_state::vt_rom_banked_r(offs_t offset)
 {
 	return m_prgrom[m_ahigh | offset];
 }
 
-void nes_vt369_vtunknown_cy_state::vt_external_space_map_bitboy_2x16mbyte(address_map &map)
+void vt369_vtunknown_cy_state::vt_external_space_map_bitboy_2x16mbyte(address_map &map)
 {
-	map(0x0000000, 0x0ffffff).mirror(0x1000000).r(FUNC(nes_vt369_vtunknown_cy_state::vt_rom_banked_r));
+	map(0x0000000, 0x0ffffff).mirror(0x1000000).r(FUNC(vt369_vtunknown_cy_state::vt_rom_banked_r));
 }
 
 // fapocket is 4 16Mbyte banks
-uint8_t nes_vt369_vtunknown_dg_fapocket_state::vt_rom_banked_r(offs_t offset)
+uint8_t vt369_vtunknown_dg_fapocket_state::vt_rom_banked_r(offs_t offset)
 {
 	return m_prgrom[m_ahigh | offset];
 }
 
-void nes_vt369_vtunknown_dg_fapocket_state::vt_external_space_map_fapocket_4x16mbyte(address_map &map)
+void vt369_vtunknown_dg_fapocket_state::vt_external_space_map_fapocket_4x16mbyte(address_map &map)
 {
-	map(0x0000000, 0x0ffffff).mirror(0x1000000).r(FUNC(nes_vt369_vtunknown_dg_fapocket_state::vt_rom_banked_r));
+	map(0x0000000, 0x0ffffff).mirror(0x1000000).r(FUNC(vt369_vtunknown_dg_fapocket_state::vt_rom_banked_r));
 }
 
-uint8_t nes_vt369_vtunknown_unk_state::vt_rom_banked_r(offs_t offset)
+uint8_t vt369_vtunknown_unk_state::vt_rom_banked_r(offs_t offset)
 {
 	return m_prgrom[m_ahigh | offset];
 }
 
-void nes_vt369_vtunknown_unk_state::vt_external_space_map_fp_2x32mbyte(address_map &map)
+void vt369_vtunknown_unk_state::vt_external_space_map_fp_2x32mbyte(address_map &map)
 {
-	map(0x0000000, 0x1ffffff).r(FUNC(nes_vt369_vtunknown_unk_state::vt_rom_banked_r));
+	map(0x0000000, 0x1ffffff).r(FUNC(vt369_vtunknown_unk_state::vt_rom_banked_r));
 }
 
 
-template <uint8_t NUM> uint8_t nes_vt369_vtunknown_base_state::extrain_r()
+template <uint8_t NUM> uint8_t vt369_vtunknown_base_state::extrain_r()
 {
 	if (m_exin[NUM])
 		return m_exin[NUM]->read();
@@ -275,7 +275,7 @@ template <uint8_t NUM> uint8_t nes_vt369_vtunknown_base_state::extrain_r()
 
 /* Standard I/O handlers (NES Controller clone) */
 
-uint8_t nes_vt369_vtunknown_base_state::in0_r()
+uint8_t vt369_vtunknown_base_state::in0_r()
 {
 	//logerror("%s: in0_r\n", machine().describe_context());
 	uint8_t ret = 0x40;
@@ -284,7 +284,7 @@ uint8_t nes_vt369_vtunknown_base_state::in0_r()
 	return ret;
 }
 
-uint8_t nes_vt369_vtunknown_base_state::in1_r()
+uint8_t vt369_vtunknown_base_state::in1_r()
 {
 	//logerror("%s: in1_r\n", machine().describe_context());
 	uint8_t ret = 0x40;
@@ -293,7 +293,7 @@ uint8_t nes_vt369_vtunknown_base_state::in1_r()
 	return ret;
 }
 
-void nes_vt369_vtunknown_base_state::in0_w(uint8_t data)
+void vt369_vtunknown_base_state::in0_w(uint8_t data)
 {
 	//logerror("%s: in0_w %02x\n", machine().describe_context(), data);
 	if ((data & 0x01) != (m_previous_port0 & 0x01))
@@ -309,7 +309,7 @@ void nes_vt369_vtunknown_base_state::in0_w(uint8_t data)
 }
 
 
-void nes_vt369_vtunknown_base_state::machine_start()
+void vt369_vtunknown_base_state::machine_start()
 {
 	m_latch0 = 0;
 	m_latch1 = 0;
@@ -330,14 +330,14 @@ void nes_vt369_vtunknown_base_state::machine_start()
 	save_item(NAME(m_411d));
 }
 
-void nes_vt369_vtunknown_base_state::machine_reset()
+void vt369_vtunknown_base_state::machine_reset()
 {
 
 }
 
-void nes_vt369_vtunknown_dg_fapocket_state::machine_reset()
+void vt369_vtunknown_dg_fapocket_state::machine_reset()
 {
-	nes_vt369_vtunknown_base_state::machine_reset();
+	vt369_vtunknown_base_state::machine_reset();
 
 	// fapocket needs this, fcpocket instead reads the switch in software?
 	if (m_cartsel)
@@ -345,129 +345,129 @@ void nes_vt369_vtunknown_dg_fapocket_state::machine_reset()
 	else
 		m_ahigh = 0;
 }
-void nes_vt369_vtunknown_base_state::configure_soc(nes_vt02_vt03_soc_device* soc)
+void vt369_vtunknown_base_state::configure_soc(nes_vt02_vt03_soc_device* soc)
 {
-	soc->set_addrmap(AS_PROGRAM, &nes_vt369_vtunknown_state::vt_external_space_map_32mbyte);
-	soc->read_0_callback().set(FUNC(nes_vt369_vtunknown_base_state::in0_r));
-	soc->read_1_callback().set(FUNC(nes_vt369_vtunknown_base_state::in1_r));
-	soc->write_0_callback().set(FUNC(nes_vt369_vtunknown_base_state::in0_w));
+	soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_state::vt_external_space_map_32mbyte);
+	soc->read_0_callback().set(FUNC(vt369_vtunknown_base_state::in0_r));
+	soc->read_1_callback().set(FUNC(vt369_vtunknown_base_state::in1_r));
+	soc->write_0_callback().set(FUNC(vt369_vtunknown_base_state::in0_w));
 
-	soc->extra_read_0_callback().set(FUNC(nes_vt369_vtunknown_base_state::extrain_r<0>));
-	soc->extra_read_1_callback().set(FUNC(nes_vt369_vtunknown_base_state::extrain_r<1>));
-	soc->extra_read_2_callback().set(FUNC(nes_vt369_vtunknown_base_state::extrain_r<2>));
-	soc->extra_read_3_callback().set(FUNC(nes_vt369_vtunknown_base_state::extrain_r<3>));
+	soc->extra_read_0_callback().set(FUNC(vt369_vtunknown_base_state::extrain_r<0>));
+	soc->extra_read_1_callback().set(FUNC(vt369_vtunknown_base_state::extrain_r<1>));
+	soc->extra_read_2_callback().set(FUNC(vt369_vtunknown_base_state::extrain_r<2>));
+	soc->extra_read_3_callback().set(FUNC(vt369_vtunknown_base_state::extrain_r<3>));
 }
 
-uint8_t nes_vt369_vtunknown_base_state::upper_412c_r()
+uint8_t vt369_vtunknown_base_state::upper_412c_r()
 {
 	logerror("%s: upper_412c_r\n", machine().describe_context());
 	return 0x00;
 }
 
-uint8_t nes_vt369_vtunknown_base_state::upper_412d_r()
+uint8_t vt369_vtunknown_base_state::upper_412d_r()
 {
 	logerror("%s: upper_412d_r\n", machine().describe_context());
 	return 0x00;
 }
 
-void nes_vt369_vtunknown_base_state::upper_412c_w(uint8_t data)
+void vt369_vtunknown_base_state::upper_412c_w(uint8_t data)
 {
 	logerror("%s: upper_412c_w %02x\n", machine().describe_context(), data);
 }
 
-void nes_vt369_vtunknown_state::nes_vt369_vtunknown_4k_ram(machine_config &config)
+void vt369_vtunknown_state::vt369_vtunknown_4k_ram(machine_config &config)
 {
 	/* basic machine hardware */
 	NES_VT09_SOC(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 
-	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_read_412c_callback().set(FUNC(nes_vt369_vtunknown_state::upper_412c_r));
-	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_read_412d_callback().set(FUNC(nes_vt369_vtunknown_state::upper_412d_r));
-	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_write_412c_callback().set(FUNC(nes_vt369_vtunknown_state::upper_412c_w));
+	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_read_412c_callback().set(FUNC(vt369_vtunknown_state::upper_412c_r));
+	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_read_412d_callback().set(FUNC(vt369_vtunknown_state::upper_412d_r));
+	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_write_412c_callback().set(FUNC(vt369_vtunknown_state::upper_412c_w));
 }
 
-void nes_vt369_vtunknown_state::nes_vt369_vtunknown_4k_ram_16mb(machine_config &config)
+void vt369_vtunknown_state::vt369_vtunknown_4k_ram_16mb(machine_config &config)
 {
-	nes_vt369_vtunknown_4k_ram(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt369_vtunknown_state::vt_external_space_map_16mbyte);
+	vt369_vtunknown_4k_ram(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_state::vt_external_space_map_16mbyte);
 }
 
-void nes_vt369_vtunknown_cy_state::nes_vt369_vtunknown_cy(machine_config &config)
+void vt369_vtunknown_cy_state::vt369_vtunknown_cy(machine_config &config)
 {
-	nes_vt369_vtunknown_4k_ram(config);
+	vt369_vtunknown_4k_ram(config);
 
 	VT3XX_SOC(config.replace(), m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 }
 
-void nes_vt369_vtunknown_cy_state::nes_vt369_vtunknown_cy_bigger(machine_config &config)
+void vt369_vtunknown_cy_state::vt369_vtunknown_cy_bigger(machine_config &config)
 {
-	nes_vt369_vtunknown_cy(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt369_vtunknown_cy_state::vt_external_space_map_32mbyte); // must be some banking of this kind of VT can address over 32mb
+	vt369_vtunknown_cy(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_cy_state::vt_external_space_map_32mbyte); // must be some banking of this kind of VT can address over 32mb
 }
 
-void nes_vt369_vtunknown_cy_state::nes_vt369_vtunknown_bt(machine_config &config)
+void vt369_vtunknown_cy_state::vt369_vtunknown_bt(machine_config &config)
 {
-	nes_vt369_vtunknown_4k_ram(config);
+	vt369_vtunknown_4k_ram(config);
 
 	VT3XX_SOC_UNK_BT(config.replace(), m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 }
 
-void nes_vt369_vtunknown_cy_state::bittboy_412c_w(uint8_t data)
+void vt369_vtunknown_cy_state::bittboy_412c_w(uint8_t data)
 {
 	// bittboy (ok)
 	logerror("%s: vt03_412c_extbank_w %02x\n", machine().describe_context(),  data);
 	m_ahigh = (data & 0x04) ? (1 << 24) : 0x0;
 }
 
-void nes_vt369_vtunknown_cy_state::nes_vt369_vtunknown_bt_2x16mb(machine_config& config)
+void vt369_vtunknown_cy_state::vt369_vtunknown_bt_2x16mb(machine_config& config)
 {
-	nes_vt369_vtunknown_bt(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt369_vtunknown_cy_state::vt_external_space_map_bitboy_2x16mbyte);
+	vt369_vtunknown_bt(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_cy_state::vt_external_space_map_bitboy_2x16mbyte);
 
-	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_write_412c_callback().set(FUNC(nes_vt369_vtunknown_cy_state::bittboy_412c_w));
+	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_write_412c_callback().set(FUNC(vt369_vtunknown_cy_state::bittboy_412c_w));
 }
 
-void nes_vt369_vtunknown_unk_state::nes_vt369_vtunknown_unk(machine_config &config)
+void vt369_vtunknown_unk_state::vt369_vtunknown_unk(machine_config &config)
 {
-	nes_vt369_vtunknown_4k_ram(config);
+	vt369_vtunknown_4k_ram(config);
 
 	VT3XX_SOC_UNK_DG(config.replace(), m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 	m_soc->force_bad_dma();
 }
 
-void nes_vt369_vtunknown_unk_state::nes_vt369_vtunknown_unk_16mb(machine_config& config)
+void vt369_vtunknown_unk_state::vt369_vtunknown_unk_16mb(machine_config& config)
 {
-	nes_vt369_vtunknown_unk(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt369_vtunknown_unk_state::vt_external_space_map_16mbyte);
+	vt369_vtunknown_unk(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_unk_state::vt_external_space_map_16mbyte);
 }
 
-void nes_vt369_vtunknown_unk_state::nes_vt369_vtunknown_unk_1mb(machine_config& config)
+void vt369_vtunknown_unk_state::vt369_vtunknown_unk_1mb(machine_config& config)
 {
-	nes_vt369_vtunknown_unk(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt369_vtunknown_unk_state::vt_external_space_map_1mbyte);
+	vt369_vtunknown_unk(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_unk_state::vt_external_space_map_1mbyte);
 }
 
-void nes_vt369_vtunknown_unk_state::nes_vt369_vtunknown_unk_2mb(machine_config& config)
+void vt369_vtunknown_unk_state::vt369_vtunknown_unk_2mb(machine_config& config)
 {
-	nes_vt369_vtunknown_unk(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt369_vtunknown_unk_state::vt_external_space_map_2mbyte);
+	vt369_vtunknown_unk(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_unk_state::vt_external_space_map_2mbyte);
 }
 
-void nes_vt369_vtunknown_unk_state::nes_vt369_vtunknown_unk_4mb(machine_config& config)
+void vt369_vtunknown_unk_state::vt369_vtunknown_unk_4mb(machine_config& config)
 {
-	nes_vt369_vtunknown_unk(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt369_vtunknown_unk_state::vt_external_space_map_4mbyte);
+	vt369_vtunknown_unk(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_unk_state::vt_external_space_map_4mbyte);
 }
 
 
 
 // New mystery handheld architecture, VTxx derived
-void nes_vt369_vtunknown_unk_state::nes_vt369_vtunknown_hh(machine_config &config)
+void vt369_vtunknown_unk_state::vt369_vtunknown_hh(machine_config &config)
 {
-	nes_vt369_vtunknown_4k_ram(config);
+	vt369_vtunknown_4k_ram(config);
 
 	VT369_SOC_INTROM_NOSWAP(config.replace(), m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
@@ -476,46 +476,46 @@ void nes_vt369_vtunknown_unk_state::nes_vt369_vtunknown_hh(machine_config &confi
 	m_soc->force_bad_dma();
 }
 
-void nes_vt369_vtunknown_unk_state::nes_vt369_vtunknown_hh_swap_8mb(machine_config &config)
+void vt369_vtunknown_unk_state::vt369_vtunknown_hh_swap_8mb(machine_config &config)
 {
-	nes_vt369_vtunknown_4k_ram(config);
+	vt369_vtunknown_4k_ram(config);
 
 	VT369_SOC_INTROM_SWAP(config.replace(), m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 
 	m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB);
 	m_soc->force_bad_dma();
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt369_vtunknown_unk_state::vt_external_space_map_8mbyte);
+	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_unk_state::vt_external_space_map_8mbyte);
 }
 
-void nes_vt369_vtunknown_unk_state::nes_vt369_vtunknown_hh_1mb(machine_config& config)
+void vt369_vtunknown_unk_state::vt369_vtunknown_hh_1mb(machine_config& config)
 {
-	nes_vt369_vtunknown_hh(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt369_vtunknown_unk_state::vt_external_space_map_1mbyte);
+	vt369_vtunknown_hh(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_unk_state::vt_external_space_map_1mbyte);
 }
 
-void nes_vt369_vtunknown_unk_state::nes_vt369_vtunknown_hh_4mb(machine_config& config)
+void vt369_vtunknown_unk_state::vt369_vtunknown_hh_4mb(machine_config& config)
 {
-	nes_vt369_vtunknown_hh(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt369_vtunknown_unk_state::vt_external_space_map_4mbyte);
+	vt369_vtunknown_hh(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_unk_state::vt_external_space_map_4mbyte);
 }
 
-void nes_vt369_vtunknown_unk_state::nes_vt369_vtunknown_hh_8mb(machine_config& config)
+void vt369_vtunknown_unk_state::vt369_vtunknown_hh_8mb(machine_config& config)
 {
-	nes_vt369_vtunknown_hh(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt369_vtunknown_unk_state::vt_external_space_map_8mbyte);
+	vt369_vtunknown_hh(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_unk_state::vt_external_space_map_8mbyte);
 }
 
-void nes_vt369_vtunknown_unk_state::nes_vt369_vtunknown_hh_16mb(machine_config& config)
+void vt369_vtunknown_unk_state::vt369_vtunknown_hh_16mb(machine_config& config)
 {
-	nes_vt369_vtunknown_hh(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt369_vtunknown_unk_state::vt_external_space_map_16mbyte);
+	vt369_vtunknown_hh(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_unk_state::vt_external_space_map_16mbyte);
 }
 
 
 
 
-static INPUT_PORTS_START( nes_vt369_vtunknown )
+static INPUT_PORTS_START( vt369_vtunknown )
 	PORT_START("IO0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("A")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("B")
@@ -538,9 +538,9 @@ static INPUT_PORTS_START( nes_vt369_vtunknown )
 INPUT_PORTS_END
 
 
-void nes_vt369_vtunknown_unk_state::nes_vt369_vtunknown_fp(machine_config &config)
+void vt369_vtunknown_unk_state::vt369_vtunknown_fp(machine_config &config)
 {
-	nes_vt369_vtunknown_4k_ram(config);
+	vt369_vtunknown_4k_ram(config);
 
 	NES_VT32_SOC(config.replace(), m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
@@ -550,16 +550,16 @@ void nes_vt369_vtunknown_unk_state::nes_vt369_vtunknown_fp(machine_config &confi
 }
 
 
-void nes_vt369_vtunknown_unk_state::nes_vt369_vtunknown_fp_16mb(machine_config& config)
+void vt369_vtunknown_unk_state::vt369_vtunknown_fp_16mb(machine_config& config)
 {
-	nes_vt369_vtunknown_fp(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt369_vtunknown_unk_state::vt_external_space_map_16mbyte);
+	vt369_vtunknown_fp(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_unk_state::vt_external_space_map_16mbyte);
 }
 
 
 
 
-uint8_t nes_vt369_vtunknown_dg_fapocket_state::fapocket_412c_r()
+uint8_t vt369_vtunknown_dg_fapocket_state::fapocket_412c_r()
 {
 	if (m_cartsel)
 		return m_cartsel->read();
@@ -567,7 +567,7 @@ uint8_t nes_vt369_vtunknown_dg_fapocket_state::fapocket_412c_r()
 		return 0;
 }
 
-void nes_vt369_vtunknown_dg_fapocket_state::fapocket_412c_w(uint8_t data)
+void vt369_vtunknown_dg_fapocket_state::fapocket_412c_w(uint8_t data)
 {
 	// fapocket (ok?) (also uses bank from config switch for fake cartridge slot)
 	logerror("%s: vtfa_412c_extbank_w %02x\n", machine().describe_context(), data);
@@ -580,21 +580,21 @@ void nes_vt369_vtunknown_dg_fapocket_state::fapocket_412c_w(uint8_t data)
 
 
 
-void nes_vt369_vtunknown_dg_fapocket_state::nes_vt369_vtunknown_fa_4x16mb(machine_config& config) // fapocket
+void vt369_vtunknown_dg_fapocket_state::vt369_vtunknown_fa_4x16mb(machine_config& config) // fapocket
 {
-	nes_vt369_vtunknown_4k_ram(config);
+	vt369_vtunknown_4k_ram(config);
 
 	VT3XX_SOC_UNK_FA(config.replace(), m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt369_vtunknown_dg_fapocket_state::vt_external_space_map_fapocket_4x16mbyte);
+	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_dg_fapocket_state::vt_external_space_map_fapocket_4x16mbyte);
 
-	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_read_412c_callback().set(FUNC(nes_vt369_vtunknown_dg_fapocket_state::fapocket_412c_r));
-	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_write_412c_callback().set(FUNC(nes_vt369_vtunknown_dg_fapocket_state::fapocket_412c_w));
+	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_read_412c_callback().set(FUNC(vt369_vtunknown_dg_fapocket_state::fapocket_412c_r));
+	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_write_412c_callback().set(FUNC(vt369_vtunknown_dg_fapocket_state::fapocket_412c_w));
 }
 
-static INPUT_PORTS_START( nes_vt369_vtunknown_fa )
-	PORT_INCLUDE(nes_vt369_vtunknown)
+static INPUT_PORTS_START( vt369_vtunknown_fa )
+	PORT_INCLUDE(vt369_vtunknown)
 
 	PORT_START("CARTSEL")
 	PORT_DIPNAME( 0x01, 0x00, "Cartridge Select" ) PORT_CODE(KEYCODE_3) PORT_TOGGLE
@@ -789,7 +789,7 @@ ROM_START( lpgm240 )
 	ROM_REGION( 0x800000, "mainrom", 0 )
 	ROM_LOAD( "w25q64jv.u1", 0x00000, 0x800000, CRC(b973e65b) SHA1(36ff137068ea56b4679c2db386ac0067de0a9eaf) )
 
-	ROM_REGION( 0x1000, "soc:maincpu:internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
+	ROM_REGION( 0x1000, "internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
 	ROM_LOAD( "internal.bin", 0x0000, 0x1000, CRC(57c9cea9) SHA1(4f338e5ef87a66601014ad726cfefefbc20dc4be) )
 ROM_END
 
@@ -797,7 +797,7 @@ ROM_START( tup240 )
 	ROM_REGION( 0x800000, "mainrom", 0 )
 	ROM_LOAD( "mini_arcade240.bin", 0x00000, 0x800000, CRC(d4b4bf6c) SHA1(9cf4557e27bc8659079c62abdd22a311e1843047) )
 
-	ROM_REGION( 0x1000, "soc:maincpu:internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
+	ROM_REGION( 0x1000, "internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
 	ROM_LOAD( "internal.bin", 0x0000, 0x1000, CRC(57c9cea9) SHA1(4f338e5ef87a66601014ad726cfefefbc20dc4be) )
 ROM_END
 
@@ -867,7 +867,7 @@ ROM_START( hkb502a )
 	ROM_REGION( 0x400000, "mainrom", 0 )
 	ROM_LOAD( "hkb-502.bin", 0x00000, 0x400000, CRC(970f54d2) SHA1(b45df00d85a2e29fe9418563927584a048db94b3) )
 
-	ROM_REGION( 0x1000, "soc:maincpu:internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
+	ROM_REGION( 0x1000, "internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
 	ROM_LOAD( "internal.bin", 0x0000, 0x1000, CRC(da5850f0) SHA1(39d674d965818922aad5993e9499170d3ebc43bf) )
 ROM_END
 
@@ -875,7 +875,7 @@ ROM_START( lxcap )
 	ROM_REGION( 0x800000, "mainrom", 0 )
 	ROM_LOAD( "lexibook_cyber_arcade_pocket.bin", 0x00000, 0x800000, CRC(245d0cd3) SHA1(d91cca2d0f99a6ca202fa9ba6d03587ea8af0cd9) )
 
-	ROM_REGION( 0x1000, "soc:maincpu:internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
+	ROM_REGION( 0x1000, "internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
 	ROM_LOAD( "internal.bin", 0x0000, 0x1000, CRC(da5850f0) SHA1(39d674d965818922aad5993e9499170d3ebc43bf) )
 
 	ROM_REGION( 0x100, "extra", 0 ) // data from additional 8-pin chip for protection
@@ -957,7 +957,7 @@ ROM_START( nesvt270 )
 ROM_END
 
 
-void nes_vt369_vtunknown_state::init_lxcmcypp()
+void vt369_vtunknown_state::init_lxcmcypp()
 {
 	int size = memregion("mainrom")->bytes()/2;
 	uint16_t* ROM = (uint16_t*)memregion("mainrom")->base();
@@ -972,18 +972,18 @@ void nes_vt369_vtunknown_state::init_lxcmcypp()
 
 
 // Runs well, only issues in SMB3 which crashes
-CONS( 2017, bittboy,    0,        0,  nes_vt369_vtunknown_bt_2x16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init, "BittBoy",   "BittBoy Mini FC 300 in 1", MACHINE_IMPERFECT_GRAPHICS ) // has external banking (2x 16mbyte banks)
+CONS( 2017, bittboy,    0,        0,  vt369_vtunknown_bt_2x16mb, vt369_vtunknown, vt369_vtunknown_cy_state, empty_init, "BittBoy",   "BittBoy Mini FC 300 in 1", MACHINE_IMPERFECT_GRAPHICS ) // has external banking (2x 16mbyte banks)
 // No title screen, but press start and menu and games run fine. Makes odd
 // memory accesses which probably explain broken title screen
-CONS( 201?, mc_hh210,   0,        0,  nes_vt369_vtunknown_4k_ram_16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_state, empty_init, "<unknown>", "Handheld 210 in 1", MACHINE_NOT_WORKING )
+CONS( 201?, mc_hh210,   0,        0,  vt369_vtunknown_4k_ram_16mb, vt369_vtunknown, vt369_vtunknown_state, empty_init, "<unknown>", "Handheld 210 in 1", MACHINE_NOT_WORKING )
 // First half of games don't work, probably bad dump
-CONS( 201?, dvnimbus,   0,        0,  nes_vt369_vtunknown_unk_16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "DVTech Nimbus 176 in 1", MACHINE_NOT_WORKING )
+CONS( 201?, dvnimbus,   0,        0,  vt369_vtunknown_unk_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "<unknown>", "DVTech Nimbus 176 in 1", MACHINE_NOT_WORKING )
 
 
 // is this vt09 or vt32?
 // Use DIP switch to select console or cartridge, as cartridge is fake and just toggles a ROM high address bit
 // (which can also be overriden by GPIO)
-CONS( 2017, fapocket,   0,        0,  nes_vt369_vtunknown_fa_4x16mb, nes_vt369_vtunknown_fa, nes_vt369_vtunknown_dg_fapocket_state, empty_init, "<unknown>",   "Family Pocket 638 in 1", MACHINE_IMPERFECT_GRAPHICS ) // has external banking (4x 16mbyte banks)
+CONS( 2017, fapocket,   0,        0,  vt369_vtunknown_fa_4x16mb, vt369_vtunknown_fa, vt369_vtunknown_dg_fapocket_state, empty_init, "<unknown>",   "Family Pocket 638 in 1", MACHINE_IMPERFECT_GRAPHICS ) // has external banking (4x 16mbyte banks)
 
 
 /****************************************************************************************************************
@@ -998,33 +998,33 @@ CONS( 2017, fapocket,   0,        0,  nes_vt369_vtunknown_fa_4x16mb, nes_vt369_v
 
 ****************************************************************************************************************/
 
-CONS( 2012, lexi30,  0,0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Lexibook", "Arcade Center (JL1800_01)", MACHINE_NOT_WORKING )
+CONS( 2012, lexi30,  0,0,  vt369_vtunknown_hh_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "Lexibook", "Arcade Center (JL1800_01)", MACHINE_NOT_WORKING )
 
 // don't even get to menu. very enhanced chipset, VT368/9?
-CONS( 2012, dgun2561,  0,  0,  nes_vt369_vtunknown_hh_16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "dreamGEAR", "My Arcade Portable Gaming System with 140 Games (DGUN-2561)", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
+CONS( 2012, dgun2561,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "dreamGEAR", "My Arcade Portable Gaming System with 140 Games (DGUN-2561)", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
 
-CONS( 2012, lxccatv,   0,  0,  nes_vt369_vtunknown_hh_16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade TV - 120 in 1 (JL2370)", MACHINE_NOT_WORKING ) // 32MByte ROM, 2011 on case, 2012 on PCB
+CONS( 2012, lxccatv,   0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade TV - 120 in 1 (JL2370)", MACHINE_NOT_WORKING ) // 32MByte ROM, 2011 on case, 2012 on PCB
 // All Lexibook units below have 64Mbyte ROMs, must be externally banked, or different addressing scheme
-CONS( 200?, lxcmcy,    0,  0,  nes_vt369_vtunknown_hh_16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade", MACHINE_NOT_WORKING )
-CONS( 200?, lxcmc250,  0,  0,  nes_vt369_vtunknown_hh_16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - 250-in-1 (JL2375)", MACHINE_NOT_WORKING )
-CONS( 200?, lxcmcysw,  0,  0,  nes_vt369_vtunknown_hh_16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Star Wars Rebels", MACHINE_NOT_WORKING )
-CONS( 200?, lxcmcyfz,  0,  0,  nes_vt369_vtunknown_hh_16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Frozen", MACHINE_NOT_WORKING )
-CONS( 200?, lxcmcydp,  0,  0,  nes_vt369_vtunknown_hh_16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Disney Princess", MACHINE_NOT_WORKING )
-CONS( 200?, lxcmcysp,  0,  0,  nes_vt369_vtunknown_hh_16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Marvel Ultimate Spider-Man", MACHINE_NOT_WORKING ) // is this the low-resolution pocket version? ROM structure is quite different
-CONS( 200?, lxcmcycr,  0,  0,  nes_vt369_vtunknown_hh_16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Cars", MACHINE_NOT_WORKING )
-CONS( 200?, lxcmcypj,  0,  0,  nes_vt369_vtunknown_hh_16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - PJ Masks", MACHINE_NOT_WORKING )
-CONS( 200?, lxcmcyba,  0,  0,  nes_vt369_vtunknown_hh_16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Barbie (JL2365BB)", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmcy,    0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmc250,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - 250-in-1 (JL2375)", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmcysw,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Star Wars Rebels", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmcyfz,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Frozen", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmcydp,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Disney Princess", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmcysp,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Marvel Ultimate Spider-Man", MACHINE_NOT_WORKING ) // is this the low-resolution pocket version? ROM structure is quite different
+CONS( 200?, lxcmcycr,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Cars", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmcypj,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - PJ Masks", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmcyba,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Barbie (JL2365BB)", MACHINE_NOT_WORKING )
 // the data order is swapped for this one, maybe other internal differences?
-CONS( 200?, lxcmcypp,  0,  0,  nes_vt369_vtunknown_hh_16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Paw Patrol", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmcypp,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Paw Patrol", MACHINE_NOT_WORKING )
 
-CONS( 200?, lxccminn,  0,  0,  nes_vt369_vtunknown_hh_16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Console Colour - Minnie Mouse", MACHINE_NOT_WORKING )
-CONS( 200?, lxccplan,  0,  0,  nes_vt369_vtunknown_hh_16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Console Colour - Disney's Planes", MACHINE_NOT_WORKING )
+CONS( 200?, lxccminn,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Console Colour - Minnie Mouse", MACHINE_NOT_WORKING )
+CONS( 200?, lxccplan,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Console Colour - Disney's Planes", MACHINE_NOT_WORKING )
 
-CONS( 2020, lxpcsp,    0,  0,  nes_vt369_vtunknown_hh_16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Power Console - Marvel Spider-Man", MACHINE_NOT_WORKING )
+CONS( 2020, lxpcsp,    0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Power Console - Marvel Spider-Man", MACHINE_NOT_WORKING )
 
 // GB-NO13-Main-VT389-2 on PCBs
-CONS( 2016, rtvgc300,  0,  0,  nes_vt369_vtunknown_hh_16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Retro TV Game Console - 300 Games", MACHINE_NOT_WORKING )
-CONS( 2017, rtvgc300fz,0,  0,  nes_vt369_vtunknown_hh_16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Retro TV Game Console - Frozen - 300 Games", MACHINE_NOT_WORKING )
+CONS( 2016, rtvgc300,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Retro TV Game Console - 300 Games", MACHINE_NOT_WORKING )
+CONS( 2017, rtvgc300fz,0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Retro TV Game Console - Frozen - 300 Games", MACHINE_NOT_WORKING )
 
 
 /* The following are also confirmed to be NES/VT derived units, most having a standard set of games with a handful of lazy graphic mods thrown in to fit the unit theme
@@ -1064,25 +1064,25 @@ CONS( 2017, rtvgc300fz,0,  0,  nes_vt369_vtunknown_hh_16mb, nes_vt369_vtunknown,
 */
 
 // uncertain, NOT SPI ROM
-CONS( 200?, zonefusn,  0,         0,  nes_vt369_vtunknown_fp_16mb,     nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Ultimate Products / Jungle's Soft", "Zone Fusion",  MACHINE_NOT_WORKING )
+CONS( 200?, zonefusn,  0,         0,  vt369_vtunknown_fp_16mb,     vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "Ultimate Products / Jungle's Soft", "Zone Fusion",  MACHINE_NOT_WORKING )
 // same as above but without Jungle's Soft boot logo? model number taken from cover of manual
-CONS( 200?, sealvt,    zonefusn,  0,  nes_vt369_vtunknown_fp_16mb,     nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Lexibook / Sit Up Limited / Jungle's Soft", "Seal 30-in-1 (VT based, Model FN098134)",  MACHINE_NOT_WORKING )
+CONS( 200?, sealvt,    zonefusn,  0,  vt369_vtunknown_fp_16mb,     vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "Lexibook / Sit Up Limited / Jungle's Soft", "Seal 30-in-1 (VT based, Model FN098134)",  MACHINE_NOT_WORKING )
 
 // NOT SPI roms, code start with '6a' (possibly encrypted opcode after jump from an internal bootstrap ROM?)
 
 // Uncertain, intial code isn't valid? scrambled?
-CONS( 201?, red5mam,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init, "Red5", "Mini Arcade Machine (Red5, 'Xtra Game')", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
+CONS( 201?, red5mam,  0,  0,  vt369_vtunknown_cy_bigger, vt369_vtunknown, vt369_vtunknown_cy_state, empty_init, "Red5", "Mini Arcade Machine (Red5, 'Xtra Game')", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
 // Uncertain, very similar to red5mam
-CONS( 2016, dgun2593,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init, "dreamGEAR", "My Arcade Retro Arcade Machine - 300 Handheld Video Games (DGUN-2593)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
+CONS( 2016, dgun2593,  0,  0,  vt369_vtunknown_cy_bigger, vt369_vtunknown, vt369_vtunknown_cy_state, empty_init, "dreamGEAR", "My Arcade Retro Arcade Machine - 300 Handheld Video Games (DGUN-2593)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
 // Similar, starts with a '6a' ror a opcode which is presumably encrypted / extended, then normal looking code, then unknown instructions
-CONS( 200?, gcs2mgp,   0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init, "Jungle's Soft", "Mini Game Player 48-in-1",  MACHINE_NOT_WORKING )
+CONS( 200?, gcs2mgp,   0,  0,  vt369_vtunknown_cy_bigger, vt369_vtunknown, vt369_vtunknown_cy_state, empty_init, "Jungle's Soft", "Mini Game Player 48-in-1",  MACHINE_NOT_WORKING )
 // Not the same as the other 240-in-1 machine from Thumbs Up below (tup240) This one makes greater use of newer VT features with most games having sampled music, not APU sound.
 // Several of the games contained in here are buggy / broken on real hardware (see https://www.youtube.com/watch?v=-mgGNaDQ1HE )
-CONS( 201?, 240in1ar,  0,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init, "Thumbs Up", "Mini Arcade Machine (Thumbs Up, 240IN1ARC)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
+CONS( 201?, 240in1ar,  0,  0,  vt369_vtunknown_cy_bigger, vt369_vtunknown, vt369_vtunknown_cy_state, empty_init, "Thumbs Up", "Mini Arcade Machine (Thumbs Up, 240IN1ARC)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
 
 // is one of these bad? where do they fit? the former boots, but banking is wrong (incorrect games selected, gfx corruption) the 2nd looks encrypted or bad
-CONS( 2019, unk2019hh,  0,        0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "unknown VTxx based GameBoy style handheld (2019 PCB)", MACHINE_NOT_WORKING )
-CONS( 2020, unk2020hh,  unk2019hh,0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "unknown VTxx based GameBoy style handheld (2020 PCB)", MACHINE_NOT_WORKING )
+CONS( 2019, unk2019hh,  0,        0,  vt369_vtunknown_hh_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "<unknown>", "unknown VTxx based GameBoy style handheld (2019 PCB)", MACHINE_NOT_WORKING )
+CONS( 2020, unk2020hh,  unk2019hh,0,  vt369_vtunknown_hh_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "<unknown>", "unknown VTxx based GameBoy style handheld (2020 PCB)", MACHINE_NOT_WORKING )
 
 
 /*****************************************************************************
@@ -1090,80 +1090,80 @@ CONS( 2020, unk2020hh,  unk2019hh,0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtun
 *****************************************************************************/
 
 // portable fan + famiclone combo handheld
-CONS( 2020, nubsupmf,   0,      0,  nes_vt369_vtunknown_hh_4mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "NubSup Mini Game Fan", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2020, nubsupmf,   0,      0,  vt369_vtunknown_hh_4mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "<unknown>", "NubSup Mini Game Fan", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // unknown tech level, might be scrambled as default codebank/boot vectors don't seem valid
-CONS( 201?, hhgc319,  0,        0,  nes_vt369_vtunknown_hh_16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "Handheld Game Console 319-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, hhgc319,  0,        0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "<unknown>", "Handheld Game Console 319-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // unknown tech, probably from 2021, probably VT369, ROM wouldn't read consistently
-CONS( 202?, vibes240, 0,        0,  nes_vt369_vtunknown_unk_16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "Vibes Retro Pocket Gamer 240-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 202?, vibes240, 0,        0,  vt369_vtunknown_unk_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "<unknown>", "Vibes Retro Pocket Gamer 240-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 /*****************************************************************************
 * below are VT369 games that use BGA on sub
 *****************************************************************************/
 
 // doesn't use most features, M705-128A6 sub-board with BGA
-CONS( 201?, retro400,  0,        0,  nes_vt369_vtunknown_hh_16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "Retro FC 400-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, retro400,  0,        0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "<unknown>", "Retro FC 400-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 /*****************************************************************************
 * below are VT369 games that use SQI / SPI ROM
 *****************************************************************************/
 
 // doesn't boot
-CONS( 201?, q5_500in1,  0,        0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "Q5 500 in 1 Handheld", MACHINE_NOT_WORKING )
+CONS( 201?, q5_500in1,  0,        0,  vt369_vtunknown_hh_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "<unknown>", "Q5 500 in 1 Handheld", MACHINE_NOT_WORKING )
 
 // Runs well, minor GFX issues in intro
-CONS( 2017, sy889,      0,        0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "SY Corp",   "SY-889 300 in 1 Handheld", MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2016, sy888b,     0,        0,  nes_vt369_vtunknown_hh_4mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "SY Corp",   "SY-888B 288 in 1 Handheld", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2017, sy889,      0,        0,  vt369_vtunknown_hh_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "SY Corp",   "SY-889 300 in 1 Handheld", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2016, sy888b,     0,        0,  vt369_vtunknown_hh_4mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "SY Corp",   "SY-888B 288 in 1 Handheld", MACHINE_IMPERFECT_GRAPHICS )
 
 // Same hardware as SY-889
-CONS( 201?, mc_cb280,   0,        0,  nes_vt369_vtunknown_hh_4mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "CoolBoy",   "Coolboy RS-18 (280 in 1)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, mc_cb280,   0,        0,  vt369_vtunknown_hh_4mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "CoolBoy",   "Coolboy RS-18 (280 in 1)", MACHINE_IMPERFECT_GRAPHICS )
 
 // Plays intro music but then crashes. same hardware as SY-88x but uses more features
-CONS( 2016, mog_m320,   0,        0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "MOGIS",    "MOGIS M320 246 in 1 Handheld", MACHINE_NOT_WORKING )
+CONS( 2016, mog_m320,   0,        0,  vt369_vtunknown_hh_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "MOGIS",    "MOGIS M320 246 in 1 Handheld", MACHINE_NOT_WORKING )
 
 // VT369, but doesn't use most features
-CONS( 200?, lpgm240,    0,        0,  nes_vt369_vtunknown_hh_swap_8mb,        nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "Let's Play! Game Machine 240 in 1", MACHINE_NOT_WORKING ) // mini 'retro-arcade' style cabinet
-CONS( 200?, tup240,     lpgm240,  0,  nes_vt369_vtunknown_hh_swap_8mb,        nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Thumbs Up", "Thumbs Up 240-in-1 Mini Arcade Machine", MACHINE_NOT_WORKING )
+CONS( 200?, lpgm240,    0,        0,  vt369_vtunknown_hh_swap_8mb,        vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "<unknown>", "Let's Play! Game Machine 240 in 1", MACHINE_NOT_WORKING ) // mini 'retro-arcade' style cabinet
+CONS( 200?, tup240,     lpgm240,  0,  vt369_vtunknown_hh_swap_8mb,        vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "Thumbs Up", "Thumbs Up 240-in-1 Mini Arcade Machine", MACHINE_NOT_WORKING )
 
 // VT369, but doesn't use most features
-CONS( 201?, unkra200,   mc_tv200, 0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>",    "200 in 1 Retro Arcade", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 201?, dgun2577,   mc_tv200, 0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "DreamGear",    "My Arcade Retro Machine 200-in-1 (DGUN-2577)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 201?, lxcyber,    mc_tv200, 0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Lexibook",     "Cyber Arcade 200-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, unkra200,   mc_tv200, 0,  vt369_vtunknown_hh_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "<unknown>",    "200 in 1 Retro Arcade", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, dgun2577,   mc_tv200, 0,  vt369_vtunknown_hh_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "DreamGear",    "My Arcade Retro Machine 200-in-1 (DGUN-2577)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, lxcyber,    mc_tv200, 0,  vt369_vtunknown_hh_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "Lexibook",     "Cyber Arcade 200-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
  // menu is protected with code from extra ROM
-CONS( 201?, gtct885,    mc_tv200, 0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Gaming Tech",  "Gaming Tech CT-885", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, gtct885,    mc_tv200, 0,  vt369_vtunknown_hh_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "Gaming Tech",  "Gaming Tech CT-885", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
  // similar to above, but with 40 extra games, menu is protected with code from extra ROM (although RTS opcodes seem to work)
-CONS( 201?, rd5_240,    0,        0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Red5",         "Mini Arcade Machine 240-in-1 (Red5)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, rd5_240,    0,        0,  vt369_vtunknown_hh_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "Red5",         "Mini Arcade Machine 240-in-1 (Red5)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 201?, hkb502,   0,      0,  nes_vt369_vtunknown_hh_4mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "HKB-502 268-in-1 (set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 201?, hkb502a,  hkb502, 0,  nes_vt369_vtunknown_hh_4mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "HKB-502 268-in-1 (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, hkb502,   0,      0,  vt369_vtunknown_hh_4mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "<unknown>", "HKB-502 268-in-1 (set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, hkb502a,  hkb502, 0,  vt369_vtunknown_hh_4mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "<unknown>", "HKB-502 268-in-1 (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 // similar to above, fewer games in menu
-CONS( 2021, unk128vt, 0,      0,  nes_vt369_vtunknown_unk_4mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "unknown VT369 based 128-in-1 (GC31-369-20210702-V2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2021, unk128vt, 0,      0,  vt369_vtunknown_unk_4mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "<unknown>", "unknown VT369 based 128-in-1 (GC31-369-20210702-V2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // uses a LCD with resolution of 160x128 (image scaled to fit for some games, others run natively at 160x128)
 // contains a protection chip, command 80 XX returns a byte
-CONS( 201?, lxcap,    0,      0,  nes_vt369_vtunknown_hh_8mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Lexibook", "Cyber Arcade Pocket (JL1895)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, lxcap,    0,      0,  vt369_vtunknown_hh_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "Lexibook", "Cyber Arcade Pocket (JL1895)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // 2022 date on 'BL-867 PCB03' PCB
-CONS( 2022, nesvt270,    0,  0,  nes_vt369_vtunknown_hh_16mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "<unknown>", "unknown VT3xx based 270-in-1 (BL-867 PCB03)", MACHINE_NOT_WORKING )
+CONS( 2022, nesvt270,    0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "<unknown>", "unknown VT3xx based 270-in-1 (BL-867 PCB03)", MACHINE_NOT_WORKING )
 
 // VT369, but doesn't use most features
-CONS( 201?, myarccn,   0, 0,  nes_vt369_vtunknown_hh_1mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "DreamGear", "My Arcade Caveman Ninja", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, myarccn,   0, 0,  vt369_vtunknown_hh_1mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "DreamGear", "My Arcade Caveman Ninja", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // confirmed VT369, uses more features (including sound CPU)
-CONS( 201?, denv150,   0,        0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init, "Denver", "Denver Game Console GMP-240C 150-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 201?, egame150,  denv150,  0,  nes_vt369_vtunknown_cy_bigger, nes_vt369_vtunknown, nes_vt369_vtunknown_cy_state, empty_init, "<unknown>", "E-Game! 150-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, denv150,   0,        0,  vt369_vtunknown_cy_bigger, vt369_vtunknown, vt369_vtunknown_cy_state, empty_init, "Denver", "Denver Game Console GMP-240C 150-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, egame150,  denv150,  0,  vt369_vtunknown_cy_bigger, vt369_vtunknown, vt369_vtunknown_cy_state, empty_init, "<unknown>", "E-Game! 150-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // uncertain, uses SPI ROM so probably VT369
-CONS( 2017, otrail,     0,        0,  nes_vt369_vtunknown_unk_1mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Basic Fun", "The Oregon Trail", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2017, otrail,     0,        0,  vt369_vtunknown_unk_1mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "Basic Fun", "The Oregon Trail", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // seems to be running the NES version of Pac-Man with some extra splash screens
-CONS( 2021, pactin,     0,        0,  nes_vt369_vtunknown_unk_1mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Fizz Creations", "Pac-Man Arcade in a Tin", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2021, pactin,     0,        0,  vt369_vtunknown_unk_1mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "Fizz Creations", "Pac-Man Arcade in a Tin", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2021, tetrtin,    0,        0,  nes_vt369_vtunknown_unk_1mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "Fizz Creations", "Tetris Arcade in a Tin", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2021, tetrtin,    0,        0,  vt369_vtunknown_unk_1mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "Fizz Creations", "Tetris Arcade in a Tin", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // uses a low res display like the above
-CONS( 2021, matet10,   0,        0,  nes_vt369_vtunknown_unk_2mb, nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "dreamGEAR", "My Arcade Tetris (DGUNL-7083, Pixel Pocket, with 10 bonus games)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2021, matet10,   0,        0,  vt369_vtunknown_unk_2mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "dreamGEAR", "My Arcade Tetris (DGUNL-7083, Pixel Pocket, with 10 bonus games)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // unknown tech level, scrambled opcodes
-CONS( 2021, matet100,  0,        0,  nes_vt369_vtunknown_hh_8mb,  nes_vt369_vtunknown, nes_vt369_vtunknown_unk_state, empty_init, "dreamGEAR", "My Arcade Tetris (DGUNL-7027, Pico Player, with 100+ bonus games)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // box says 100+ bonus games
+CONS( 2021, matet100,  0,        0,  vt369_vtunknown_hh_8mb,  vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "dreamGEAR", "My Arcade Tetris (DGUNL-7027, Pico Player, with 100+ bonus games)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // box says 100+ bonus games

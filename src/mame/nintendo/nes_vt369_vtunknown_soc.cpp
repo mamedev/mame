@@ -6,15 +6,15 @@
 
 
 // this has a new RGB555 mode
-DEFINE_DEVICE_TYPE(VT369_SOC_INTROM_NOSWAP, vt369_soc_introm_noswap_device, "nes_vt369_soc", "VT369 series System on a Chip")
-DEFINE_DEVICE_TYPE(VT369_SOC_INTROM_SWAP,   vt369_soc_introm_swap_device,   "nes_vt369_soc_swap", "VT369 series System on a Chip (with opcode swapping)")
+DEFINE_DEVICE_TYPE(VT369_SOC_INTROM_NOSWAP, vt369_soc_introm_noswap_device, "vt369_soc", "VT369 series System on a Chip")
+DEFINE_DEVICE_TYPE(VT369_SOC_INTROM_SWAP,   vt369_soc_introm_swap_device,   "vt369_soc_swap", "VT369 series System on a Chip (with opcode swapping)")
 
 // uncertain
-DEFINE_DEVICE_TYPE(VT3XX_SOC, vt3xx_soc_base_device,          "nes_vtunknown_soc_cy", "VT3xx series System on a Chip (CY)")
-DEFINE_DEVICE_TYPE(VT3XX_SOC_UNK_BT, vt3xx_soc_unk_bt_device, "nes_vtunknown_soc_bt", "VT3xx series System on a Chip (BT)")
+DEFINE_DEVICE_TYPE(VT3XX_SOC, vt3xx_soc_base_device,          "vt3xx_unknown_soc_cy", "VT3xx series System on a Chip (CY)")
+DEFINE_DEVICE_TYPE(VT3XX_SOC_UNK_BT, vt3xx_soc_unk_bt_device, "vt3xx_unknown_soc_bt", "VT3xx series System on a Chip (BT)")
 
-DEFINE_DEVICE_TYPE(VT3XX_SOC_UNK_DG, vt3xx_soc_unk_dg_device, "nes_vtunknown_soc_dg", "VT3xx series System on a Chip (DG)")
-DEFINE_DEVICE_TYPE(VT3XX_SOC_UNK_FA, vt3xx_soc_unk_fa_device, "nes_vtunknown_soc_fa", "VT3xx series System on a Chip (Family Pocket)")
+DEFINE_DEVICE_TYPE(VT3XX_SOC_UNK_DG, vt3xx_soc_unk_dg_device, "vt3xx_unknown_soc_dg", "VT3xx series System on a Chip (DG)")
+DEFINE_DEVICE_TYPE(VT3XX_SOC_UNK_FA, vt3xx_soc_unk_fa_device, "vt3xx_unknown_soc_fa", "VT3xx series System on a Chip (Family Pocket)")
 
 
 vt3xx_soc_base_device::vt3xx_soc_base_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
@@ -74,7 +74,7 @@ vt3xx_soc_unk_fa_device::vt3xx_soc_unk_fa_device(const machine_config& mconfig, 
 void vt3xx_soc_base_device::device_add_mconfig(machine_config& config)
 {
 	nes_vt02_vt03_soc_device::device_add_mconfig(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &vt3xx_soc_base_device::nes_vt369_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vt3xx_soc_base_device::vt369_map);
 
 	VT_VT1682_ALU(config, m_alu, 0);
 
@@ -100,7 +100,7 @@ void vt3xx_soc_base_device::vt369_relative_w(offs_t offset, uint8_t data)
 }
 
 
-void vt3xx_soc_base_device::nes_vt369_map(address_map &map)
+void vt3xx_soc_base_device::vt369_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram(); // 8k RAM?
 
@@ -282,7 +282,7 @@ void vt369_soc_introm_noswap_device::device_add_mconfig(machine_config& config)
 	vt3xx_soc_base_device::device_add_mconfig(config);
 
 	RP2A03_CORE_SWAP_OP_D5_D6(config.replace(), m_maincpu, NTSC_APU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &vt369_soc_introm_noswap_device::nes_vt369_introm_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vt369_soc_introm_noswap_device::vt369_introm_map);
 }
 
 void vt369_soc_introm_noswap_device::device_start()
@@ -323,9 +323,9 @@ uint8_t vt369_soc_introm_noswap_device::read_internal(offs_t offset)
 	return m_internal_rom[offset];
 }
 
-void vt369_soc_introm_noswap_device::nes_vt369_introm_map(address_map &map)
+void vt369_soc_introm_noswap_device::vt369_introm_map(address_map &map)
 {
-	vt3xx_soc_base_device::nes_vt369_map(map);
+	vt3xx_soc_base_device::vt369_map(map);
 
 	map(0x0000, 0x0fff).ram();
 	map(0x1000, 0x1fff).r(FUNC(vt369_soc_introm_noswap_device::read_internal));
@@ -386,7 +386,7 @@ void vt3xx_soc_unk_dg_device::vt03_411c_w(uint8_t data)
 
 void vt3xx_soc_unk_dg_device::nes_vt_dg_map(address_map &map)
 {
-	vt3xx_soc_base_device::nes_vt369_map(map);
+	vt3xx_soc_base_device::vt369_map(map);
 	map(0x411c, 0x411c).w(FUNC(vt3xx_soc_unk_dg_device::vt03_411c_w));
 }
 
@@ -402,7 +402,7 @@ void vt3xx_soc_unk_bt_device::device_add_mconfig(machine_config& config)
 
 void vt3xx_soc_unk_bt_device::nes_vt_bt_map(address_map &map)
 {
-	vt3xx_soc_base_device::nes_vt369_map(map);
+	vt3xx_soc_base_device::vt369_map(map);
 	map(0x412c, 0x412c).w(FUNC(vt3xx_soc_unk_bt_device::vt03_412c_extbank_w));
 }
 
@@ -441,7 +441,7 @@ void vt3xx_soc_unk_fa_device::vtfp_4242_w(uint8_t data)
 
 void vt3xx_soc_unk_fa_device::nes_vt_fa_map(address_map &map)
 {
-	vt3xx_soc_base_device::nes_vt369_map(map);
+	vt3xx_soc_base_device::vt369_map(map);
 	map(0x412c, 0x412c).r(FUNC(vt3xx_soc_unk_fa_device::vtfa_412c_r)).w(FUNC(vt3xx_soc_unk_fa_device::vtfa_412c_extbank_w));
 	map(0x4242, 0x4242).w(FUNC(vt3xx_soc_unk_fa_device::vtfp_4242_w));
 }

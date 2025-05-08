@@ -27,7 +27,7 @@ protected:
 	void device_start() override ATTR_COLD;
 	void device_reset() override ATTR_COLD;
 
-	void nes_vt369_map(address_map &map) ATTR_COLD;
+	void vt369_map(address_map &map) ATTR_COLD;
 
 	uint8_t vt369_41bx_r(offs_t offset);
 	void vt369_41bx_w(offs_t offset, uint8_t data);
@@ -81,7 +81,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config& config) override;
 
-	void nes_vt369_introm_map(address_map &map) ATTR_COLD;
+	void vt369_introm_map(address_map &map) ATTR_COLD;
 
 	uint8_t extra_rom_r();
 	uint8_t vthh_414a_r();
