@@ -262,4 +262,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1999, wlzb, 0, wlzb, wlzb, huangyeh_m68k_state, empty_init, ROT0, "Huang Yeh", "Wu Lin Zhengba", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, wlzb, 0, wlzb, wlzb, huangyeh_m68k_state, empty_init, ROT0, "Huang Yeh", "Wu Lin Zhengba", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
