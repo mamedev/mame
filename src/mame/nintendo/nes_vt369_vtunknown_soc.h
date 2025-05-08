@@ -89,6 +89,9 @@ protected:
 	uint8_t extra_rom_r();
 	uint8_t vthh_414a_r();
 	void vtfp_411d_w(uint8_t data);
+	void encryption_4169_w(uint8_t data);
+
+	bool m_encryption_allowed;
 };
 
 class vt369_soc_introm_swap_device : public vt369_soc_introm_noswap_device
@@ -96,11 +99,8 @@ class vt369_soc_introm_swap_device : public vt369_soc_introm_noswap_device
 public:
 	vt369_soc_introm_swap_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 
-	virtual void device_add_mconfig(machine_config& config) override;
-
-private:
-	void encryption_4169_w(uint8_t data);
-	void nes_vt_hh_swap_map(address_map &map) ATTR_COLD;
+protected:
+	virtual void device_start() override;
 };
 
 

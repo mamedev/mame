@@ -308,6 +308,13 @@ void vt369_soc_introm_noswap_device::device_start()
 {
 	vt3xx_soc_base_device::device_start();
 	downcast<rp2a03_core_swap_op_d5_d6 &>(*m_maincpu).disable_encryption_on_reset();
+	m_encryption_allowed = false;
+}
+
+void vt369_soc_introm_swap_device::device_start()
+{
+	vt3xx_soc_base_device::device_start();
+	m_encryption_allowed = true;
 }
 
 void vt369_soc_introm_noswap_device::vtfp_411d_w(uint8_t data)
@@ -340,34 +347,26 @@ void vt369_soc_introm_noswap_device::nes_vt_hh_map(address_map &map)
 	map(0x411d, 0x411d).w(FUNC(vt369_soc_introm_noswap_device::vtfp_411d_w));
 
 	map(0x4153, 0x4153).r(FUNC(vt369_soc_introm_noswap_device::extra_rom_r)); // extra SPI? / SEEPROM port?
+
+	map(0x4169, 0x4169).w(FUNC(vt369_soc_introm_noswap_device::encryption_4169_w));
 }
 
 
-void vt369_soc_introm_swap_device::encryption_4169_w(uint8_t data)
+void vt369_soc_introm_noswap_device::encryption_4169_w(uint8_t data)
 {
-	if (data == 0x01)
-		downcast<rp2a03_core_swap_op_d5_d6 &>(*m_maincpu).set_encryption_state(false);
-	else if (data == 0x00)
-		downcast<rp2a03_core_swap_op_d5_d6 &>(*m_maincpu).set_encryption_state(true);
+	if (m_encryption_allowed)
+	{
+		if (data == 0x01)
+			downcast<rp2a03_core_swap_op_d5_d6&>(*m_maincpu).set_encryption_state(false);
+		else if (data == 0x00)
+			downcast<rp2a03_core_swap_op_d5_d6&>(*m_maincpu).set_encryption_state(true);
+		else
+			logerror("%s: encryption_4169_w %02x\n", machine().describe_context(), data);
+	}
 	else
-		logerror("%s: encryption_4169_w %02x\n", machine().describe_context(), data);
-}
-
-void vt369_soc_introm_swap_device::nes_vt_hh_swap_map(address_map &map)
-{
-	vt369_soc_introm_noswap_device::nes_vt_hh_map(map);
-
-	map(0x4169, 0x4169).w(FUNC(vt369_soc_introm_swap_device::encryption_4169_w));
-}
-
-
-
-void vt369_soc_introm_swap_device::device_add_mconfig(machine_config& config)
-{
-	vt3xx_soc_base_device::device_add_mconfig(config);
-
-	RP2A03_CORE_SWAP_OP_D5_D6(config.replace(), m_maincpu, NTSC_APU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &vt369_soc_introm_swap_device::nes_vt_hh_swap_map);
+	{
+		logerror("%s: encryption_4169_w %02x on SoC with no support (check!)\n", machine().describe_context(), data);
+	}
 }
 
 /***********************************************************************************************************************************************************/
