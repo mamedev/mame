@@ -419,7 +419,7 @@ ROM_START( maniacsqs ) // REF 960419/1
 	ROM_FILL(            0x01a0000, 0x0060000, 0x00 )         // Empty
 	ROM_FILL(            0x0200000, 0x0080000, 0x00 )         // to decode GFX as 5bpp
 
-	// Unconfirmed if it uses the regular Maniac Square PLDs or the Snow Boardr Championship ones
+	// Unconfirmed if it uses the regular Maniac Square PLDs or the Snow Board Championship ones
 	ROM_REGION( 0x117, "plds", 0 )
 	ROM_LOAD( "mu.6_4769_pal16l8.bin",   0x000, 0x104, BAD_DUMP CRC(00aedab5) SHA1(497555962e1d85ffb4fd37cff778772abd1bbe32) )
 	ROM_LOAD( "mu.6_585b_palce16v8.bin", 0x000, 0x117, BAD_DUMP CRC(6ba240e3) SHA1(8ecdb5623d2a8e2e305e2467403e034451e86a4d) )
