@@ -58,7 +58,8 @@ private:
 		std::string m_name;
 		int m_freq;
 		uint8_t m_channels;
-		device_info(const char *name, int freq, uint8_t channels) : m_name(name), m_freq(freq), m_channels(channels) {}
+		bool m_def;
+		device_info(const char *name, int freq, uint8_t channels, bool def = false) : m_name(name), m_freq(freq), m_channels(channels), m_def(def) {}
 	};
 
 	struct stream_info {
@@ -100,6 +101,7 @@ int sound_sdl::init(osd_interface &osd, const osd_options &options)
 	for(int i=0; i != dev_count; i++) {
 		SDL_AudioSpec spec;
 		const char *name = SDL_GetAudioDeviceName(i, 0);
+		fprintf(stderr, "Device name %s\n", name);
 		int err = SDL_GetAudioDeviceSpec(i, 0, &spec);
 		if(!err)
 			m_devices.emplace_back(name, spec.freq, spec.channels);
@@ -107,10 +109,11 @@ int sound_sdl::init(osd_interface &osd, const osd_options &options)
 	char *def_name;
 	SDL_AudioSpec def_spec;
 	if(!SDL_GetDefaultAudioInfo(&def_name, &def_spec, 0)) {
+		fprintf(stderr, "Default name %s\n", def_name);
 		uint32_t idx;
 		for(idx = 0; idx != m_devices.size() && m_devices[idx].m_name != def_name; idx++);
 		if(idx == m_devices.size())
-			m_devices.emplace_back(def_name, def_spec.freq, def_spec.channels);
+			m_devices.emplace_back(def_name, def_spec.freq, def_spec.channels, true);
 		m_default_sink = idx+1;
 		SDL_free(def_name);
 	} else
@@ -190,7 +193,7 @@ uint32_t sound_sdl::stream_sink_open(uint32_t node, std::string name, uint32_t r
 	dspec.callback = sink_callback;
 	dspec.userdata = stream.get();
 
-	stream->m_sdl_id = SDL_OpenAudioDevice(dev.m_name.c_str(), 0, &dspec, &ospec, 0);
+	stream->m_sdl_id = SDL_OpenAudioDevice(dev.m_def ? nullptr : dev.m_name.c_str(), 0, &dspec, &ospec, 0);
 	if(!stream->m_sdl_id)
 		return 0;
 	SDL_PauseAudioDevice(stream->m_sdl_id, 0);
