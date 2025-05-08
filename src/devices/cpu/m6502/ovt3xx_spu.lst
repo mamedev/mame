@@ -43,17 +43,17 @@ setdbk_vt_imp
 readdbk_vt_abx
 	TMP = read_pc();
 	PC++;
-	TMP = set_h(TMP, read_pc());
+	TMP2 = read_pc();
 	PC++;
-	A = m_extdata_space->read_byte((m_databank << 16) | set_l(TMP, TMP+X));
+	A = m_extdata_space->read_byte(((m_databank << 16) | (TMP2 << 8) | TMP) + X);
 	set_nz(A);
 	prefetch();
 
 readdbk2_vt_abx
-	TMP = read_pc(); // this is currently the same as readdbk_vt_abx, it probably shouldn't be
+	TMP = read_pc(); // this is currently the same as readdbk_vt_abx, it probably shouldn't be, maybe reads with highest exbus bit set to give 25 bits?
 	PC++;
-	TMP = set_h(TMP, read_pc());
+	TMP2 = read_pc();
 	PC++;
-	A = m_extdata_space->read_byte((m_databank << 16) | set_l(TMP, TMP+X));
+	A = m_extdata_space->read_byte(((m_databank << 16) | (TMP2 << 8) | TMP) + X);
 	set_nz(A);
 	prefetch();
