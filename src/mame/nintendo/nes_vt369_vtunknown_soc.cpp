@@ -74,6 +74,7 @@ void nes_vt369_soc_device::device_add_mconfig(machine_config& config)
 
 	VT3XX_SPU(config, m_soundcpu, RP2A03_NTSC_XTAL);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &nes_vt369_soc_device::vt369_sound_map);
+	m_soundcpu->set_addrmap(5, &nes_vt369_soc_device::vt369_sound_external_map);	
 }
 
 void nes_vt369_soc_device::vt369_soundcpu_control_w(offs_t offset, uint8_t data)
@@ -163,6 +164,10 @@ void nes_vt369_soc_device::vt369_sound_map(address_map &map)
 	map(0xf800, 0xffff).ram().share("soundram"); // doesn't actually map here, the CPU fetches vectors from lower addressse
 }
 
+void nes_vt369_soc_device::vt369_sound_external_map(address_map &map)
+{
+	map(0x000000, 0xffffff).r(FUNC(sound_read_external));
+}
 
 
 void nes_vt369_soc_device::vt369_411c_bank6000_enable_w(offs_t offset, uint8_t data)

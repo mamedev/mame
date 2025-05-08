@@ -46,6 +46,9 @@ protected:
 
 private:
 	void vt369_sound_map(address_map &map) ATTR_COLD;
+	void vt369_sound_external_map(address_map& map) ATTR_COLD;
+
+	uint8_t sound_read_external(offs_t offset) { return space(AS_PROGRAM).read_byte(offset); }
 
 	required_device<vrt_vt1682_alu_device> m_alu;
 	required_device<cpu_device> m_soundcpu;
