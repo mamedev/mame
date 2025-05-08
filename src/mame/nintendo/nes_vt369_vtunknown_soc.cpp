@@ -37,7 +37,7 @@ vt3xx_soc_unk_bt_device::vt3xx_soc_unk_bt_device(const machine_config& mconfig, 
 
 vt369_soc_introm_noswap_device::vt369_soc_introm_noswap_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock) :
 	vt3xx_soc_base_device(mconfig, type, tag, owner, clock),
-	m_internal_rom(*this, ":internal")
+	m_internal_rom(*this, "maincpu:internal")
 {
 }
 

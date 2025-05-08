@@ -789,7 +789,7 @@ ROM_START( lpgm240 )
 	ROM_REGION( 0x800000, "mainrom", 0 )
 	ROM_LOAD( "w25q64jv.u1", 0x00000, 0x800000, CRC(b973e65b) SHA1(36ff137068ea56b4679c2db386ac0067de0a9eaf) )
 
-	ROM_REGION( 0x1000, "internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
+	ROM_REGION( 0x1000, "soc:maincpu:internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
 	ROM_LOAD( "internal.bin", 0x0000, 0x1000, CRC(57c9cea9) SHA1(4f338e5ef87a66601014ad726cfefefbc20dc4be) )
 ROM_END
 
@@ -797,7 +797,7 @@ ROM_START( tup240 )
 	ROM_REGION( 0x800000, "mainrom", 0 )
 	ROM_LOAD( "mini_arcade240.bin", 0x00000, 0x800000, CRC(d4b4bf6c) SHA1(9cf4557e27bc8659079c62abdd22a311e1843047) )
 
-	ROM_REGION( 0x1000, "internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
+	ROM_REGION( 0x1000, "soc:maincpu:internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
 	ROM_LOAD( "internal.bin", 0x0000, 0x1000, CRC(57c9cea9) SHA1(4f338e5ef87a66601014ad726cfefefbc20dc4be) )
 ROM_END
 
@@ -851,7 +851,7 @@ ROM_START( myarccn )
 	ROM_REGION( 0x100000, "mainrom", 0 )
 	ROM_LOAD( "my_arcade_caveman_ninja.bin", 0x00000, 0x100000, CRC(dcc5590c) SHA1(a734cb9c81e58346ff5fa934347d7cb24a32cb39) )
 
-	ROM_REGION( 0x1000, "internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
+	ROM_REGION( 0x1000, "soc:maincpu:internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
 	ROM_LOAD( "internal.bin", 0x0000, 0x1000, CRC(da5850f0) SHA1(39d674d965818922aad5993e9499170d3ebc43bf) )
 ROM_END
 
@@ -859,7 +859,7 @@ ROM_START( hkb502 )
 	ROM_REGION( 0x400000, "mainrom", 0 )
 	ROM_LOAD( "red console.bin", 0x00000, 0x400000, CRC(e4766383) SHA1(64b0c20592f38928b3a639fa42b468ff09664808) )
 
-	ROM_REGION( 0x1000, "internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
+	ROM_REGION( 0x1000, "soc:maincpu:internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
 	ROM_LOAD( "internal.bin", 0x0000, 0x1000, CRC(da5850f0) SHA1(39d674d965818922aad5993e9499170d3ebc43bf) )
 ROM_END
 
@@ -867,7 +867,7 @@ ROM_START( hkb502a )
 	ROM_REGION( 0x400000, "mainrom", 0 )
 	ROM_LOAD( "hkb-502.bin", 0x00000, 0x400000, CRC(970f54d2) SHA1(b45df00d85a2e29fe9418563927584a048db94b3) )
 
-	ROM_REGION( 0x1000, "internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
+	ROM_REGION( 0x1000, "soc:maincpu:internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
 	ROM_LOAD( "internal.bin", 0x0000, 0x1000, CRC(da5850f0) SHA1(39d674d965818922aad5993e9499170d3ebc43bf) )
 ROM_END
 
@@ -875,7 +875,7 @@ ROM_START( lxcap )
 	ROM_REGION( 0x800000, "mainrom", 0 )
 	ROM_LOAD( "lexibook_cyber_arcade_pocket.bin", 0x00000, 0x800000, CRC(245d0cd3) SHA1(d91cca2d0f99a6ca202fa9ba6d03587ea8af0cd9) )
 
-	ROM_REGION( 0x1000, "internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
+	ROM_REGION( 0x1000, "soc:maincpu:internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
 	ROM_LOAD( "internal.bin", 0x0000, 0x1000, CRC(da5850f0) SHA1(39d674d965818922aad5993e9499170d3ebc43bf) )
 
 	ROM_REGION( 0x100, "extra", 0 ) // data from additional 8-pin chip for protection
