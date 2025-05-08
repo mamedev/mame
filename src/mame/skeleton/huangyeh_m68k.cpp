@@ -7,12 +7,6 @@ TODO:
 - OKI bank (standard 0/0x40000 layout);
 - I/Os;
 
-wlzb debug Breakpoint: 
-1 Open a debugger session
-2 focus maincpu 
-3 next
-4 bp 3c9d2,1,{curpc+=2;g} (patches main CPU to skip ACRTC tight loop with FIFO status)
-5 F5 or F12 (starts running)
 ===================================================================================================
 
 Wu Lin Zhengba, Huang Yeh, 1999
