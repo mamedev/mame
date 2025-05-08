@@ -64,6 +64,8 @@ To do:
 
 - xymga: stop during attract mode with 'RECORD ERROR 3'
 
+- lhb2cpgs: decryption and protection simulation
+
 Notes:
 
 - In most games, keep test button pressed during boot for another test mode
@@ -4871,6 +4873,20 @@ ROM_START( lhb2 )
 	ROM_LOAD( "igss0503.u38", 0x00000, 0x80000, CRC(c9609c9c) SHA1(f036e682b792033409966e84292a69275eaa05e5) )  // 2 banks
 ROM_END
 
+ROM_START( lhb2cpgs )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "v127c.u29", 0x00000, 0x80000, CRC(c9609c9c) SHA1(f036e682b792033409966e84292a69275eaa05e5) )
+
+	ROM_REGION( 0x200000, "blitter", 0 )
+	ROM_LOAD( "igsm0501.u7", 0x00000, 0x200000, CRC(1c952bd6) SHA1(a6b6f1cdfb29647e81c032ffe59c94f1a10ceaf8) )
+
+	ROM_REGION( 0x80000, "blitter_hi", 0 )
+	ROM_LOAD( "igsm0502.u4", 0x00000, 0x80000, CRC(5d73ae99) SHA1(7283aa3d6b15ceb95db80756892be46eb997ef15) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "igss0503.u38", 0x00000, 0x80000, CRC(c9609c9c) SHA1(f036e682b792033409966e84292a69275eaa05e5) )  // 2 banks
+ROM_END
+
 ROM_START( lhb3 ) // 龍虎榜III 搓牌高手 (Lóng Hǔ Bǎng III Cuō Pái Gāoshǒu) very similar to lhb2's, but not original?
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "rom.u29", 0x00000, 0x80000, CRC(c5985452) SHA1(f1f0c2b1b8c509b2a0a72a4f3387eccb0f25008a) )
@@ -5139,6 +5155,7 @@ GAME( 1995, lhbv33c,       lhb,      lhb,             lhb,       igs011_state, i
 GAME( 1995, dbc,           lhb,      lhb,             lhb,       igs011_state, init_dbc,          ROT0, "IGS",                     "Daai Baan Sing (Hong Kong, V027H)",                MACHINE_SUPPORTS_SAVE )
 GAME( 1995, ryukobou,      lhb,      lhb,             lhb,       igs011_state, init_ryukobou,     ROT0, "IGS / Alta",              "Mahjong Ryukobou (Japan, V030J)",                  MACHINE_SUPPORTS_SAVE )
 GAME( 1996, lhb2,          0,        lhb2,            lhb2,      igs011_state, init_lhb2,         ROT0, "IGS",                     "Lung Fu Bong II (Hong Kong, V185H)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1996, lhb2cpgs,      lhb2,     lhb2,            lhb2,      igs011_state, empty_init,        ROT0, "IGS",                     "Long Hu Bang II: Cuo Pai Gaoshou (China, V127C)",  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // missing decryption / protection simulation
 GAME( 1996, tygn,          lhb2,     tygn,            tygn,      igs011_state, init_tygn,         ROT0, "IGS",                     "Te Yi Gong Neng (China, V632C)",                   MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ROM patches
 GAME( 1996, lhb3,          lhb2,     nkishusp,        lhb2,      igs011_state, init_lhb3,         ROT0, "IGS",                     "Long Hu Bang III: Cuo Pai Gaoshou (China, V242C)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ROM patches
 GAME( 1996, xymg,          0,        xymg,            xymg,      igs011_state, init_xymg,         ROT0, "IGS",                     "Xingyun Manguan (China, V651C, set 1)",            MACHINE_SUPPORTS_SAVE )
