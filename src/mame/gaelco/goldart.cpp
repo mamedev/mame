@@ -323,7 +323,7 @@ void goldart_state::machine_reset()
 
 void goldart_state::goldart(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	ds5002fp_device &maincpu(DS5002FP(config, "maincpu", 32_MHz_XTAL / 2));
 	maincpu.set_addrmap(AS_PROGRAM, &goldart_state::main_prgmap);
 	maincpu.set_addrmap(AS_IO, &goldart_state::main_datamap);
@@ -334,7 +334,7 @@ void goldart_state::goldart(machine_config &config)
 
 	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -345,7 +345,7 @@ void goldart_state::goldart(machine_config &config)
 
 	PALETTE(config, m_palette, palette_device::BLACK, 256);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	OKIM6295(config, "oki", 32_MHz_XTAL / 32, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
@@ -363,7 +363,7 @@ void goldart_state::goldart(machine_config &config)
 
 
 ROM_START( goldart )
-	ROM_REGION( 0x8000, "sram", 0 ) /* DS5002FP code */
+	ROM_REGION( 0x8000, "sram", 0 ) // DS5002FP code
 	ROM_LOAD( "ds5002fp_sram.bin", 0x00000, 0x8000, BAD_DUMP CRC(cd2bf151) SHA1(6f601cef86493fc2db181c93b17949b982149b0e) )
 
 	ROM_REGION( 0x100, "maincpu:internal", ROMREGION_ERASE00 )
@@ -372,14 +372,46 @@ ROM_START( goldart )
 	DS5002FP_SET_CRCR( 0x80 )
 
 	ROM_REGION( 0x80000, "data", 0 )
-	ROM_LOAD( "u11_e_262.bin", 0x00000, 0x80000, CRC(325551e0) SHA1(4fe8d71d448de3f8a9b5751bad6e90d2e556cb8f) )
+	ROM_LOAD( "u11_e_262.u11", 0x00000, 0x80000, CRC(325551e0) SHA1(4fe8d71d448de3f8a9b5751bad6e90d2e556cb8f) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
-	ROM_LOAD( "u6_e.bin", 0x00000, 0x80000, CRC(dd9dc689) SHA1(11871ba815372c06f8b1367d2897c37953db7bdd) )
+	ROM_LOAD( "u6_e.u6", 0x00000, 0x80000, CRC(dd9dc689) SHA1(11871ba815372c06f8b1367d2897c37953db7bdd) )
 ROM_END
 
-ROM_START( goldartp )
-	ROM_REGION( 0x8000, "sram", 0 ) /* DS5002FP code */
+ROM_START( goldartfr )
+	ROM_REGION( 0x8000, "sram", 0 ) // DS5002FP code
+	ROM_LOAD( "ds5002fp_sram.bin", 0x00000, 0x8000, BAD_DUMP CRC(cd2bf151) SHA1(6f601cef86493fc2db181c93b17949b982149b0e) )
+
+	ROM_REGION( 0x100, "maincpu:internal", ROMREGION_ERASE00 )
+	DS5002FP_SET_MON( 0x79 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
+
+	ROM_REGION( 0x80000, "data", 0 )
+	ROM_LOAD( "francia_dianas_794c_26-2-96_27c040.u11", 0x00000, 0x80000, CRC(0d9c7d2c) SHA1(616652d5d07454293d00807a94c072f059528ed7) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "dianas_so_fra_27c040.u6", 0x00000, 0x80000, CRC(727ce7b7) SHA1(533290aa97e33124a7697d72a9a108f0ab503ac5) )
+ROM_END
+
+ROM_START( goldartgr )
+	ROM_REGION( 0x8000, "sram", 0 ) // DS5002FP code
+	ROM_LOAD( "ds5002fp_sram.bin", 0x00000, 0x8000, BAD_DUMP CRC(cd2bf151) SHA1(6f601cef86493fc2db181c93b17949b982149b0e) )
+
+	ROM_REGION( 0x100, "maincpu:internal", ROMREGION_ERASE00 )
+	DS5002FP_SET_MON( 0x79 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
+
+	ROM_REGION( 0x80000, "data", 0 )
+	ROM_LOAD( "alema_diana_26-2-96_27c040.u11", 0x00000, 0x80000, CRC(f0119b2b) SHA1(f60c77e9352fdb8e6c00fd347d6af634da6f5ae3) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "dianas_son_aleman_15-2-95_27c4001.u6", 0x00000, 0x80000, CRC(fd494229) SHA1(41c2f9f185987510863116a95dc4f7cd6b6bb17c) )
+ROM_END
+
+ROM_START( goldartpt )
+	ROM_REGION( 0x8000, "sram", 0 ) // DS5002FP code
 	ROM_LOAD( "ds5002fp_sram.bin", 0x00000, 0x8000, BAD_DUMP CRC(cd2bf151) SHA1(6f601cef86493fc2db181c93b17949b982149b0e) )
 
 	ROM_REGION( 0x100, "maincpu:internal", ROMREGION_ERASE00 )
@@ -394,8 +426,27 @@ ROM_START( goldartp )
 	ROM_LOAD( "p-262.u6", 0x00000, 0x80000, CRC(4177e78b) SHA1(1099568b97a08c33a7da1bf46fc106f25af15e90) )
 ROM_END
 
+ROM_START( goldartuk )
+	ROM_REGION( 0x8000, "sram", 0 ) // DS5002FP code
+	ROM_LOAD( "ds5002fp_sram.bin", 0x00000, 0x8000, BAD_DUMP CRC(cd2bf151) SHA1(6f601cef86493fc2db181c93b17949b982149b0e) )
+
+	ROM_REGION( 0x100, "maincpu:internal", ROMREGION_ERASE00 )
+	DS5002FP_SET_MON( 0x79 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
+
+	ROM_REGION( 0x80000, "data", 0 )
+	ROM_LOAD( "g.b_diana_5017_26-2-96_27c040.u11", 0x00000, 0x80000, CRC(efd8bfc1) SHA1(d4d01a5d6d618ed2ecabc959a88eb14b1bbf6241) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "diana_so_uk_257a_26-7_27c040.u6", 0x00000, 0x80000, CRC(a93afb8b) SHA1(c7a5fc4e74a0743ffc729ec3214f318141a82cc0) )
+ROM_END
+
 } // Anonymous namespace
 
 
-GAME( 1994, goldart,       0,        goldart,     goldart,      goldart_state, empty_init, ROT0, "Covielsa / Gaelco",   "Goldart (Spain)",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1994, goldartp,      goldart,  goldart,     goldart,      goldart_state, empty_init, ROT0, "Covielsa / Gaelco",   "Goldart (Portugal)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1994, goldart,   0,       goldart, goldart, goldart_state, empty_init, ROT0, "Gaelco / Covielsa", "Goldart (Spain)",                    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1994, goldartfr, goldart, goldart, goldart, goldart_state, empty_init, ROT0, "Gaelco / Jeutel",   "Goldart (France, Covielsa license)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1994, goldartgr, goldart, goldart, goldart, goldart_state, empty_init, ROT0, "Gaelco / Covielsa", "Goldart (Germany)",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1994, goldartpt, goldart, goldart, goldart, goldart_state, empty_init, ROT0, "Gaelco / Covielsa", "Goldart (Portugal)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1994, goldartuk, goldart, goldart, goldart, goldart_state, empty_init, ROT0, "Gaelco / Covielsa", "Goldart (United Kingdom)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
