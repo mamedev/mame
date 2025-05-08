@@ -166,7 +166,7 @@ void nes_vt369_soc_device::vt369_sound_map(address_map &map)
 
 void nes_vt369_soc_device::vt369_sound_external_map(address_map &map)
 {
-	map(0x000000, 0xffffff).r(FUNC(sound_read_external));
+	map(0x000000, 0xffffff).r(FUNC(nes_vt369_soc_device::sound_read_external));
 }
 
 
