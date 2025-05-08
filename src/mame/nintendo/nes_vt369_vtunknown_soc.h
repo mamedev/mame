@@ -80,7 +80,6 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config& config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	void nes_vt369_introm_map(address_map &map) ATTR_COLD;
 
@@ -88,7 +87,9 @@ protected:
 	uint8_t vthh_414a_r();
 	void vtfp_411d_w(uint8_t data);
 	void encryption_4169_w(uint8_t data);
+	uint8_t read_internal(offs_t offset);
 
+	optional_region_ptr<uint8_t> m_internal_rom;
 	bool m_encryption_allowed;
 };
 
@@ -99,7 +100,6 @@ public:
 
 protected:
 	virtual void device_start() override;
-	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 

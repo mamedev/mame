@@ -36,7 +36,8 @@ vt3xx_soc_unk_bt_device::vt3xx_soc_unk_bt_device(const machine_config& mconfig, 
 
 
 vt369_soc_introm_noswap_device::vt369_soc_introm_noswap_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock) :
-	vt3xx_soc_base_device(mconfig, type, tag, owner, clock)
+	vt3xx_soc_base_device(mconfig, type, tag, owner, clock),
+	m_internal_rom(*this, ":internal")
 {
 }
 
@@ -310,13 +311,24 @@ uint8_t vt369_soc_introm_noswap_device::extra_rom_r()
 	return machine().rand();
 }
 
+uint8_t vt369_soc_introm_noswap_device::read_internal(offs_t offset)
+{
+	if (!m_internal_rom)
+	{
+		if (!machine().side_effects_disabled())
+			logerror("%s: read from internal ROM (offset %04x), but no internal ROM loaded\n", machine().describe_context(), offset);
+		return 0x00;
+	}
+
+	return m_internal_rom[offset];
+}
 
 void vt369_soc_introm_noswap_device::nes_vt369_introm_map(address_map &map)
 {
 	vt3xx_soc_base_device::nes_vt369_map(map);
 
 	map(0x0000, 0x0fff).ram();
-	map(0x1000, 0x1fff).rom().region("internal", 0);
+	map(0x1000, 0x1fff).r(FUNC(vt369_soc_introm_noswap_device::read_internal));
 
 	map(0x414a, 0x414a).r(FUNC(vt369_soc_introm_noswap_device::vthh_414a_r));
 	map(0x411d, 0x411d).w(FUNC(vt369_soc_introm_noswap_device::vtfp_411d_w));
@@ -344,31 +356,16 @@ void vt369_soc_introm_noswap_device::encryption_4169_w(uint8_t data)
 	}
 }
 
-ROM_START( vt3xx_noswap )
-	ROM_REGION( 0x1000, "internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
-	ROM_LOAD( "internal.bin", 0x0000, 0x1000, CRC(da5850f0) SHA1(39d674d965818922aad5993e9499170d3ebc43bf) )
-ROM_END
-
-const tiny_rom_entry *vt369_soc_introm_noswap_device::device_rom_region() const
-{
-	return ROM_NAME( vt3xx_noswap );
-}
-
 void vt369_soc_introm_swap_device::device_start()
 {
 	vt3xx_soc_base_device::device_start();
 	m_encryption_allowed = true;
 }
 
-ROM_START( vt3xx_swap )
-	ROM_REGION( 0x1000, "internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
-	ROM_LOAD( "internal.bin", 0x0000, 0x1000, CRC(57c9cea9) SHA1(4f338e5ef87a66601014ad726cfefefbc20dc4be) )
-ROM_END
 
-const tiny_rom_entry *vt369_soc_introm_swap_device::device_rom_region() const
-{
-	return ROM_NAME( vt3xx_swap );
-}
+
+
+
 
 /***********************************************************************************************************************************************************/
 /* this might also just be the same as vt369 but with the games not using all features */
