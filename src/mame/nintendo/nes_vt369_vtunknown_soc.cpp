@@ -160,7 +160,13 @@ void nes_vt369_soc_device::vt369_sound_map(address_map &map)
 {
 	map(0x0000, 0x17ff).ram();
 	map(0x1800, 0x1fff).ram().share("soundram");
-
+	//map(0x2100, 0x2103) // Timer Control (w)
+	//map(0x2205, 0x2206) // Adder Data(RAM) Address (w)
+	//map(0x2210, 0x2211) // Adder Result (r)
+	//map(0x2400, 0x2401) // Multiplier Data(RAM) Address (w)
+	//map(0x2402, 0x2403) // Multiplier Result (r)
+	//map(0x2404, 0x2404) // Multiplier Status (r) 
+	//map(0x2800, 0x2803) // DAC (w)
 	map(0xf800, 0xffff).ram().share("soundram"); // doesn't actually map here, the CPU fetches vectors from lower addressse
 }
 
