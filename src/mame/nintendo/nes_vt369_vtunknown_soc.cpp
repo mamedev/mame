@@ -299,7 +299,15 @@ uint8_t vt3xx_soc_base_device::vt369_48ax_r(offs_t offset)
 void vt369_soc_introm_noswap_device::device_add_mconfig(machine_config& config)
 {
 	vt3xx_soc_base_device::device_add_mconfig(config);
+
+	RP2A03_CORE_SWAP_OP_D5_D6(config.replace(), m_maincpu, NTSC_APU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt369_soc_introm_noswap_device::nes_vt_hh_map);
+}
+
+void vt369_soc_introm_noswap_device::device_start()
+{
+	vt3xx_soc_base_device::device_start();
+	downcast<rp2a03_core_swap_op_d5_d6 &>(*m_maincpu).disable_encryption_on_reset();
 }
 
 void vt369_soc_introm_noswap_device::vtfp_411d_w(uint8_t data)

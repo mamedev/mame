@@ -52,6 +52,8 @@ class rp2a03_core_swap_op_d5_d6 : public rp2a03_core_device {
 public:
 	rp2a03_core_swap_op_d5_d6(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void disable_encryption_on_reset() { m_encryption_enabled_on_reset = false; }
+
 	void set_encryption_state(bool state);
 protected:
 	class mi_decrypt : public mi_default {
@@ -78,6 +80,9 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+private:
+	bool m_encryption_enabled_on_reset;
 };
 
 

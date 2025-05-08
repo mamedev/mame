@@ -81,6 +81,7 @@ public:
 protected:
 	vt369_soc_introm_noswap_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
 
+	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config& config) override;
 
 	void nes_vt_hh_map(address_map &map) ATTR_COLD;
