@@ -301,7 +301,7 @@ void vt369_soc_introm_noswap_device::device_add_mconfig(machine_config& config)
 	vt3xx_soc_base_device::device_add_mconfig(config);
 
 	RP2A03_CORE_SWAP_OP_D5_D6(config.replace(), m_maincpu, NTSC_APU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &vt369_soc_introm_noswap_device::nes_vt_hh_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vt369_soc_introm_noswap_device::nes_vt369_introm_map);
 }
 
 void vt369_soc_introm_noswap_device::device_start()
@@ -309,12 +309,6 @@ void vt369_soc_introm_noswap_device::device_start()
 	vt3xx_soc_base_device::device_start();
 	downcast<rp2a03_core_swap_op_d5_d6 &>(*m_maincpu).disable_encryption_on_reset();
 	m_encryption_allowed = false;
-}
-
-void vt369_soc_introm_swap_device::device_start()
-{
-	vt3xx_soc_base_device::device_start();
-	m_encryption_allowed = true;
 }
 
 void vt369_soc_introm_noswap_device::vtfp_411d_w(uint8_t data)
@@ -337,11 +331,12 @@ uint8_t vt369_soc_introm_noswap_device::extra_rom_r()
 }
 
 
-void vt369_soc_introm_noswap_device::nes_vt_hh_map(address_map &map)
+void vt369_soc_introm_noswap_device::nes_vt369_introm_map(address_map &map)
 {
 	nes_vt02_vt03_soc_device::nes_vt_map(map);
 
-	map(0x0000, 0x1fff).mask(0x0fff).ram();
+	map(0x0000, 0x0fff).ram();
+	map(0x1000, 0x1fff).rom().region("internal", 0);
 
 	map(0x414a, 0x414a).r(FUNC(vt369_soc_introm_noswap_device::vthh_414a_r));
 	map(0x411d, 0x411d).w(FUNC(vt369_soc_introm_noswap_device::vtfp_411d_w));
@@ -367,6 +362,32 @@ void vt369_soc_introm_noswap_device::encryption_4169_w(uint8_t data)
 	{
 		logerror("%s: encryption_4169_w %02x on SoC with no support (check!)\n", machine().describe_context(), data);
 	}
+}
+
+ROM_START( vt3xx_noswap )
+	ROM_REGION( 0x1000, "internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
+	ROM_LOAD( "internal.bin", 0x0000, 0x1000, CRC(da5850f0) SHA1(39d674d965818922aad5993e9499170d3ebc43bf) )
+ROM_END
+
+const tiny_rom_entry *vt369_soc_introm_noswap_device::device_rom_region() const
+{
+	return ROM_NAME( vt3xx_noswap );
+}
+
+void vt369_soc_introm_swap_device::device_start()
+{
+	vt3xx_soc_base_device::device_start();
+	m_encryption_allowed = true;
+}
+
+ROM_START( vt3xx_swap )
+	ROM_REGION( 0x1000, "internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
+	ROM_LOAD( "internal.bin", 0x0000, 0x1000, CRC(57c9cea9) SHA1(4f338e5ef87a66601014ad726cfefefbc20dc4be) )
+ROM_END
+
+const tiny_rom_entry *vt369_soc_introm_swap_device::device_rom_region() const
+{
+	return ROM_NAME( vt3xx_swap );
 }
 
 /***********************************************************************************************************************************************************/

@@ -83,8 +83,9 @@ protected:
 
 	virtual void device_start() override;
 	virtual void device_add_mconfig(machine_config& config) override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
-	void nes_vt_hh_map(address_map &map) ATTR_COLD;
+	void nes_vt369_introm_map(address_map &map) ATTR_COLD;
 
 	uint8_t extra_rom_r();
 	uint8_t vthh_414a_r();
@@ -101,6 +102,7 @@ public:
 
 protected:
 	virtual void device_start() override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 
