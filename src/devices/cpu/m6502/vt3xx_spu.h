@@ -22,6 +22,16 @@ public:
 
 #define O(o) void o ## _full(); void o ## _partial()
 
+	O(phx_vt_imp);
+	O(phy_vt_imp);
+	O(plx_vt_imp);
+	O(ply_vt_imp);
+
+	O(setdbk_vt_imp);
+	O(getdbk_vt_imp);
+
+	O(readdbk_vt_abx);	
+	O(readdbk2_vt_abx);
 
 #undef O
 
@@ -38,8 +48,8 @@ protected:
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 
-	address_space_config m_lowbus_config;
-	address_space *m_lowbus_space;
+	address_space_config m_extdata_config;
+	address_space *m_extdata_space;
 
 protected:
 	void set_databank(uint8_t bank);

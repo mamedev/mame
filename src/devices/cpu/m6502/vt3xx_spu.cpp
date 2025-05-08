@@ -4,7 +4,14 @@
 
     vt3xx_spu.cpp
 
-    Sound CPU for VT3xx series chips
+    6502 derived sound/sub CPU for VT3xx series chips
+
+	has some additional opcodes for reading/writing the 24-bit 'onebus'
+	with an extra register to store the upper 8-bits of the access address
+
+	- should this instead derive from the rp2a03 as is the case for the
+	  main CPUs on many of the VT chips, or is using the m6502 as a base
+	  correct in this case?
 
 ***************************************************************************/
 
@@ -21,15 +28,8 @@ vt3xx_spu_device::vt3xx_spu_device(const machine_config &mconfig, const char *ta
 
 vt3xx_spu_device::vt3xx_spu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	m6502_device(mconfig, type, tag, owner, clock),
-	m_lowbus_config("lowbus", ENDIANNESS_LITTLE, 8, 15)
+	m_extdata_config("extdata", ENDIANNESS_LITTLE, 8, 24)
 {
-	program_config.m_addr_width = 24;
-	program_config.m_logaddr_width = 24;
-	sprogram_config.m_addr_width = 24;
-	sprogram_config.m_logaddr_width = 24;
-	// XaviX specific spaces
-	m_lowbus_config.m_addr_width = 15;
-	m_lowbus_config.m_logaddr_width = 15;
 }
 
 
@@ -42,9 +42,11 @@ void vt3xx_spu_device::device_start()
 {
 	m6502_device::device_start();
 
-	m_lowbus_space = &space(5);
+	m_extdata_space = &space(5);
 
 	state_add(VT3XX_SPU_DATABANK, "DATBNK", m_databank).callimport().formatstr("%2s");
+
+	save_item(NAME(m_databank));
 }
 
 void vt3xx_spu_device::device_reset()
@@ -70,12 +72,12 @@ device_memory_interface::space_config_vector vt3xx_spu_device::memory_space_conf
 		return space_config_vector {
 			std::make_pair(AS_PROGRAM, &program_config),
 			std::make_pair(AS_OPCODES, &sprogram_config),
-			std::make_pair(5, &m_lowbus_config),
+			std::make_pair(5, &m_extdata_config),
 		};
 	else
 		return space_config_vector {
 			std::make_pair(AS_PROGRAM, &program_config),
-			std::make_pair(5, &m_lowbus_config),
+			std::make_pair(5, &m_extdata_config),
 		};
 }
 
