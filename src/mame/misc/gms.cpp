@@ -80,7 +80,6 @@ TODO:
 - emulate protection devices correctly instead of patching
 - work out remaining magslot lamps
 - work out remaining sball2k1 I/O
-- complete inputs and work out lamps for ballch and cots
 - do layouts
 - use real values for reel tilemaps offsets instead of hardcoded ones (would fix
   magslot)
@@ -341,18 +340,18 @@ void gms_2layers_state::input_matrix_w(uint16_t data)
 void gms_2layers_state::lamps_w(uint16_t data)
 {
 	// There seem to be eight lamps on the low eight bits (active high):
-	// +------+----------------------+----------+------------------+
-	// | lamp | sball2k1             | sc2in1   | magslot          |
-	// +------+----------------------+----------+------------------+
-	// | 1    | Start                | Start    | Start            |
-	// | 2    | Hold 2               | Hold 2   | ?                |
-	// | 3    | Hold 4               | Hold 4   | ?                |
-	// | 4    | Hold 1               | Hold 1   | ?                |
-	// | 5    | Hold 3               | Hold 3   | ?                |
-	// | 6    | Hold 5               | Hold 5   | Stop Reel 3      |
-	// | 7    | used in attract mode | credited | ?                |
-	// | 8    |                      | Bet      | ?                |
-	// +------+----------------------+----------+------------------+
+	// +------+----------------------+----------+------------------+-------------+-------------+
+	// | lamp | sball2k1             | sc2in1   | magslot          | ballch      | cots        |
+	// +------+----------------------+----------+------------------+-------------+-------------+
+	// | 1    | Start                | Start    | Start            | Start?      |             |
+	// | 2    | Hold 2               | Hold 2   | ?                | Bet         |             |
+	// | 3    | Hold 4               | Hold 4   | ?                | Start?      | Stop Reel 3 |
+	// | 4    | Hold 1               | Hold 1   | ?                | Stop Reel 1 | Stop Reel 2 |
+	// | 5    | Hold 3               | Hold 3   | ?                | Stop Reel 2 | Stop Reel 1 |
+	// | 6    | Hold 5               | Hold 5   | Stop Reel 3      | Stop Reel 3 | Stop Reel 4 |
+	// | 7    | used in attract mode | credited | ?                |             | Bet         |
+	// | 8    |                      | Bet      | ?                |             | Start       |
+	// +------+----------------------+----------+------------------+-------------+-------------+
 	// sball2k1 attract mode "chase" is 4, 2, 5, 3, 6, 7
 	// magslot lamp 2 is Stop Reel 4, Stop Reel 5, Bet or Bet Max
 	// magslot lamp 3 is Stop Reel 4, Stop Reel 5, Bet or Bet Max
@@ -360,6 +359,7 @@ void gms_2layers_state::lamps_w(uint16_t data)
 	// magslot lamp 5 is Stop Reel 1 or Stop Reel 2
 	// magslot lamp 7 is Stop Reel 1 or Stop Reel 2
 	// magslot lamp 8 is Stop Reel 4, Stop Reel 5, Bet or Bet Max
+	// ballch seems to always turn lamp 1 and lamp 3 on and off simultaneously
 	for (unsigned i = 0; 8 > i; ++i)
 		m_lamps[i] = BIT(data, i);
 }
@@ -996,7 +996,7 @@ static INPUT_PORTS_START( magslot )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 )        PORT_NAME("Start / Stop All / Take Score")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 )        PORT_NAME("Start / Stop All Reels / Take Score")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SLOT_STOP_ALL ) PORT_NAME("Bet Max")                              // seems to be used to bet the allowed maximum
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 )       PORT_NAME("Show Odds")
@@ -1652,19 +1652,19 @@ static INPUT_PORTS_START( ballch )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_OUTPUT )  PORT_WRITE_LINE_MEMBER(FUNC(gms_2layers_state::counter_w<2>)) // coin out
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )       // seems to be an alternate Payout input?
 	PORT_SERVICE_NO_TOGGLE(0x02, IP_ACTIVE_LOW)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME( "Start / Stop" )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 )        PORT_NAME( "Start / Stop All Reels" )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) // play in test mode
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_GAMBLE_BET )    PORT_NAME("Play")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) // button A in test mode
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON3 ) // button B in test mode
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )       // seems to be an alternate Start input?
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )    PORT_NAME("Stop Reel 2 / Take Score")
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON4 ) // button C in test mode
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1672,34 +1672,33 @@ static INPUT_PORTS_START( ballch )
 	PORT_START("IN2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_CUSTOM )         PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	//PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)) // TODO: verify
 
-
 	// There are 3 8-DIP banks on PCB. Dips' effects as per test mode.
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0007, 0x0000, "Main Game Rate" ) PORT_DIPLOCATION("SW1:1,2,3")
-	PORT_DIPSETTING(      0x0001, "91" )
-	PORT_DIPSETTING(      0x0002, "92" )
-	PORT_DIPSETTING(      0x0003, "93" )
-	PORT_DIPSETTING(      0x0004, "94" )
-	PORT_DIPSETTING(      0x0005, "95" )
-	PORT_DIPSETTING(      0x0000, "96" )
-	PORT_DIPSETTING(      0x0006, "97" )
-	PORT_DIPSETTING(      0x0007, "98" )
+	PORT_DIPNAME( 0x0007, 0x0000, "Main Game Payout Rate" ) PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPSETTING(      0x0001, "91%" )
+	PORT_DIPSETTING(      0x0002, "92%" )
+	PORT_DIPSETTING(      0x0003, "93%" )
+	PORT_DIPSETTING(      0x0004, "94%" )
+	PORT_DIPSETTING(      0x0005, "95%" )
+	PORT_DIPSETTING(      0x0000, "96%" )
+	PORT_DIPSETTING(      0x0006, "97%" )
+	PORT_DIPSETTING(      0x0007, "98%" )
 	PORT_DIPNAME( 0x0008, 0x0000, "Lamp Speed" ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( High ) )
@@ -1709,7 +1708,7 @@ static INPUT_PORTS_START( ballch )
 	PORT_DIPNAME( 0x0020, 0x0000, "Play Score" ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0000, "Title" ) PORT_DIPLOCATION("SW1:7") // enables / disables the title screen, if disabled attract is always running
+	PORT_DIPNAME( 0x0040, 0x0000, "Title Screen" ) PORT_DIPLOCATION("SW1:7") // enables / disables the title screen, if disabled attract is always running
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:8") // not shown in test mode
@@ -1717,16 +1716,16 @@ static INPUT_PORTS_START( ballch )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x0007, 0x0000, "Coin Rate" ) PORT_DIPLOCATION("SW2:1,2,3")
-	PORT_DIPSETTING(      0x0000, "1" )
-	PORT_DIPSETTING(      0x0001, "5" )
-	PORT_DIPSETTING(      0x0002, "10" )
-	PORT_DIPSETTING(      0x0003, "25" )
-	PORT_DIPSETTING(      0x0004, "50" )
-	PORT_DIPSETTING(      0x0005, "75" )
-	PORT_DIPSETTING(      0x0006, "100" )
-	PORT_DIPSETTING(      0x0007, "500" )
-	PORT_DIPNAME( 0x0038, 0x0000, "Key In Rate" ) PORT_DIPLOCATION("SW2:4,5,6")
+	PORT_DIPNAME( 0x0007, 0x0000, DEF_STR(Coinage) ) PORT_DIPLOCATION("SW2:1,2,3")
+	PORT_DIPSETTING(      0x0000, DEF_STR(1C_1C) )
+	PORT_DIPSETTING(      0x0001, DEF_STR(1C_5C) )
+	PORT_DIPSETTING(      0x0002, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(      0x0003, "1 Coin/25 Credits" )
+	PORT_DIPSETTING(      0x0004, "1 Coin/50 Credits" )
+	PORT_DIPSETTING(      0x0005, "1 Coin/75 Credits" )
+	PORT_DIPSETTING(      0x0006, "1 Coin/100 Credits" )
+	PORT_DIPSETTING(      0x0007, "1 Coin/500 Credits" )
+	PORT_DIPNAME( 0x0038, 0x0000, "Key-In Rate" ) PORT_DIPLOCATION("SW2:4,5,6")
 	PORT_DIPSETTING(      0x0000, "1" )
 	PORT_DIPSETTING(      0x0008, "5" )
 	PORT_DIPSETTING(      0x0010, "10" )
@@ -1743,12 +1742,12 @@ static INPUT_PORTS_START( ballch )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x0003, 0x0000, "Min. Bet" ) PORT_DIPLOCATION("SW3:1,2")
+	PORT_DIPNAME( 0x0003, 0x0000, "Minimum Bet" ) PORT_DIPLOCATION("SW3:1,2")
 	PORT_DIPSETTING(      0x0001, "1" )
 	PORT_DIPSETTING(      0x0000, "4" )
 	PORT_DIPSETTING(      0x0002, "8" )
 	PORT_DIPSETTING(      0x0003, "16" )
-	PORT_DIPNAME( 0x000c, 0x0000, "Max. Bet" ) PORT_DIPLOCATION("SW3:3,4")
+	PORT_DIPNAME( 0x000c, 0x0000, "Maximum Bet" ) PORT_DIPLOCATION("SW3:3,4")
 	PORT_DIPSETTING(      0x0000, "16" )
 	PORT_DIPSETTING(      0x0004, "32" )
 	PORT_DIPSETTING(      0x0008, "64" )
@@ -1773,22 +1772,22 @@ static INPUT_PORTS_START( cots )
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT )  PORT_WRITE_LINE_MEMBER(FUNC(gms_2layers_state::counter_w<0>)) // coin in
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_OUTPUT )  PORT_WRITE_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::motor_w))
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_OUTPUT )  PORT_WRITE_LINE_MEMBER(FUNC(gms_2layers_state::counter_w<3>)) // key-out
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_OUTPUT )  PORT_WRITE_LINE_MEMBER(FUNC(gms_2layers_state::counter_w<2>)) // coin out
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_OUTPUT )  PORT_WRITE_LINE_MEMBER(FUNC(gms_2layers_state::counter_w<2>)) // credit out
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )       // seems to be an alternate Payout input?
 	PORT_SERVICE_NO_TOGGLE(0x02, IP_ACTIVE_LOW)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 )        PORT_NAME("Start / Stop All Reels / Take Score")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_GAMBLE_BET )    PORT_NAME("Play")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_SLOT_STOP4 )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_SLOT_STOP4 )    PORT_NAME("Stop Reel 4 / Big")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )    PORT_NAME("Stop Reel 1 / Double Up")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )    PORT_NAME("Stop Reel 2 / Small")
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )    PORT_NAME("Stop Reel 3 / Take Score")
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1796,24 +1795,23 @@ static INPUT_PORTS_START( cots )
 	PORT_START("IN2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_CUSTOM )         PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	//PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)) // TODO: verify
 
-
-	// There are 3 8-DIP banks on PCB, but settings seem to be selected via test mode?
+	// There are 3 8-switch banks on PCB, but settings seem to be selected via test mode
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
