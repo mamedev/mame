@@ -172,9 +172,58 @@ void vt3xx_soc_base_device::vt369_map(address_map &map)
 	map(0x8000, 0xffff).rw(FUNC(vt3xx_soc_base_device::external_space_read), FUNC(vt3xx_soc_base_device::external_space_write));
 }
 
+void vt3xx_soc_base_device::update_timer()
+{
+	if (m_timercontrol & 0x01)
+	{
+		// TODO: use m_timerperiod
+		m_sound_timer->adjust(attotime::from_hz(400), 0);
+	}
+	else
+	{
+		m_sound_timer->adjust(attotime::never);
+	}
+}
+
+TIMER_CALLBACK_MEMBER(vt3xx_soc_base_device::sound_timer_expired)
+{
+	if (m_timercontrol & 0x02)
+	{
+		m_soundcpu->set_input_line(M6502_IRQ_LINE, HOLD_LINE);
+	}
+	update_timer();
+}
+
 void vt3xx_soc_base_device::vt369_soundcpu_timer_w(offs_t offset, uint8_t data)
 {
-	logerror("%s: vt369_soundcpu_timer_w %02x %02x\n", machine().describe_context(), offset, data);
+	switch (offset)
+	{
+	case 0x00:
+		m_timerperiod = (m_timerperiod & 0xff00) | data;
+		logerror("%s: vt369_soundcpu_timer_w %02x %02x (period low byte)\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x01:
+		m_timerperiod = (m_timerperiod & 0x00ff) | data << 8;
+		logerror("%s: vt369_soundcpu_timer_w %02x %02x (period high byte)\n", machine().describe_context(), offset, data);
+		break;
+
+	case 0x02:
+		// 0x01 - enable timer
+		// 0x02 - enable timer IRQ
+		logerror("%s: vt369_soundcpu_timer_w %02x %02x (control)\n", machine().describe_context(), offset, data);
+		m_timercontrol = data;
+		update_timer();
+		break;
+
+	case 0x03:
+		logerror("%s: vt369_soundcpu_timer_w %02x %02x (clear IRQ)\n", machine().describe_context(), offset, data);
+		break;
+
+	default:
+		logerror("%s: vt369_soundcpu_timer_w %02x %02x\n", machine().describe_context(), offset, data);
+		break;
+	}
 }
 
 void vt3xx_soc_base_device::vt369_soundcpu_adder_data_address_w(offs_t offset, uint8_t data)
@@ -288,11 +337,6 @@ void vt3xx_soc_base_device::vt369_6000_w(offs_t offset, uint8_t data)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(vt3xx_soc_base_device::sound_timer_expired)
-{
-
-}
-
 void vt3xx_soc_base_device::device_start()
 {
 	nes_vt02_vt03_soc_device::device_start();
@@ -304,6 +348,8 @@ void vt3xx_soc_base_device::device_start()
 
 	m_sound_timer = timer_alloc(FUNC(vt3xx_soc_base_device::sound_timer_expired), this);
 
+	save_item(NAME(m_timerperiod));
+	save_item(NAME(m_timercontrol));
 	save_item(NAME(m_6000_ram));
 	save_item(NAME(m_bank6000));
 	save_item(NAME(m_bank6000_enable));
@@ -314,7 +360,13 @@ void vt3xx_soc_base_device::device_reset()
 {
 	nes_vt02_vt03_soc_device::device_reset();
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+
+	m_timerperiod = 0;
+	m_timercontrol = 0;
+	m_sound_timer->adjust(attotime::never);
 }
+
+
 
 
 uint8_t vt3xx_soc_base_device::vt369_41bx_r(offs_t offset)

@@ -62,6 +62,7 @@ private:
 	uint8_t vt369_soundcpu_vectors_r(offs_t offset);
 
 	TIMER_CALLBACK_MEMBER(sound_timer_expired);
+	void update_timer();
 
 	required_device<vrt_vt1682_alu_device> m_alu;
 	required_device<cpu_device> m_soundcpu;
@@ -69,6 +70,9 @@ private:
 	std::vector<u8> m_6000_ram;
 	uint8_t m_bank6000 = 0;
 	uint8_t m_bank6000_enable = 0;
+
+	uint16_t m_timerperiod;
+	uint8_t m_timercontrol;
 
 	emu_timer *m_sound_timer;
 
