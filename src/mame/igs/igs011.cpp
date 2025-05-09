@@ -3435,7 +3435,7 @@ static INPUT_PORTS_START( lhb2 )
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPNAME( 0x80, 0x80, "Credit Timer" )          PORT_DIPLOCATION("SW1:8")     // 自動清除  (clears credits after timeout if you don't start a game)
 	PORT_DIPSETTING(    0x80, DEF_STR(Off) )                                          // 無
-	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                           // ?
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                           // 有
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW2:1,2")   // 投幣比率
@@ -3456,18 +3456,18 @@ static INPUT_PORTS_START( lhb2 )
 	PORT_DIPSETTING(    0x20, "Key-Out" )                                             // 洗分
 	PORT_DIPSETTING(    0x00, "Return Coins" )                                        // 退幣      (doesn't seem to work properly)
 	PORT_DIPNAME( 0x40, 0x40, "Auto Reach" )            PORT_DIPLOCATION("SW2:7")     // 自動摸打  (automatically draws and discards tiles after reach)
-	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                          // ?
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                          // 無
 	PORT_DIPSETTING(    0x40, DEF_STR(On) )                                           // 有
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Demo_Sounds) )    PORT_DIPLOCATION("SW2:8")     // 示範音樂
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                          // 無
 	PORT_DIPSETTING(    0x80, DEF_STR(On) )                                           // 有
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW3:1,2")   // 破台限制
+	PORT_DIPNAME( 0x03, 0x03, "Jackpot Limit" )         PORT_DIPLOCATION("SW3:1,2")   // 破台限制
 	PORT_DIPSETTING(    0x03, "500" )
 	PORT_DIPSETTING(    0x02, "1000" )
 	PORT_DIPSETTING(    0x01, "2000" )
-	PORT_DIPSETTING(    0x00, "?" )                                                   // ?限?
+	PORT_DIPSETTING(    0x00, "Unlimited" )                                           // 無限制
 	PORT_DIPNAME( 0x0c, 0x0c, "Gals" )                  PORT_DIPLOCATION("SW3:3,4")   // 美女
 	PORT_DIPSETTING(    0x0c, DEF_STR(Off) )                                          // 無美女
 	PORT_DIPSETTING(    0x08, "1?" )                                                  // ??
