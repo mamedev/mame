@@ -937,20 +937,15 @@ ROM_START( lexi30 )
 ROM_END
 
 ROM_START( matet10 )
-	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_REGION( 0x200000, "mainrom", 0 )
 	ROM_LOAD( "tetriskeychain_p25q16sh_856015.bin", 0x00000, 0x200000, CRC(7a7251ea) SHA1(7ace8482a54f6b06982a90328779c21266d864fa) )
 	ROM_IGNORE(0x300)
 ROM_END
 
 ROM_START( matetsl )
-	ROM_REGION( 0x800000, "mainrom", 0 )
-	ROM_LOAD( "slurpeetetris_p25q40sh_856013.bin", 0x00000, 0x80300, CRC(d3b68de8) SHA1(97bcdfcd31bc536b626f9a369afe18de60a399da) )
-ROM_END
-
-ROM_START( matet100 )
-	ROM_REGION( 0x2000000, "mainrom", 0 )
-	ROM_LOAD( "picotetris_s29gl064n90tfi04_0001227e.bin", 0x00000, 0x800000, CRC(7d9296f2) SHA1(0db5883028d14783d0abff1f7672e59534b0e513) )
-	ROM_IGNORE(0x100)
+	ROM_REGION( 0x80000, "mainrom", 0 )
+	ROM_LOAD( "slurpeetetris_p25q40sh_856013.bin", 0x00000, 0x80000, CRC(d3b68de8) SHA1(97bcdfcd31bc536b626f9a369afe18de60a399da) )
+	ROM_IGNORE(0x300)
 ROM_END
 
 ROM_START( nesvt270 )
@@ -1167,6 +1162,3 @@ CONS( 2021, tetrtin,    0,        0,  vt369_vtunknown_unk_1mb, vt369_vtunknown, 
 // uses a low res display (so vt3xx?)
 CONS( 2021, matet10,   0,        0,  vt369_vtunknown_hh_swap_2mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "dreamGEAR", "My Arcade Tetris (DGUNL-7083, Pixel Pocket, with 10 bonus games)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2021, matetsl,   0,        0,  vt369_vtunknown_hh_swap_512kb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "dreamGEAR", "My Arcade Tetris (Slurpee)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // no bonus games on this model
-
-// unknown tech level, uses vt32 style scramble and palette, but seems to expect vt369 features?
-CONS( 2021, matet100,  0,        0,  vt369_vtunknown_hh_8mb,  vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "dreamGEAR", "My Arcade Tetris (DGUNL-7027, Pico Player, with 100+ bonus games)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // box says 100+ bonus games
