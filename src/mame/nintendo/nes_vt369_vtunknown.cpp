@@ -175,9 +175,6 @@ public:
 	void vt369_vtunknown_unk_4mb(machine_config& config);
 	void vt369_vtunknown_unk_16mb(machine_config& config);
 
-	void vt369_vtunknown_fp(machine_config& config);
-	void vt369_vtunknown_fp_16mb(machine_config& config);
-
 private:
 	uint8_t vt_rom_banked_r(offs_t offset);
 	[[maybe_unused]] void vt_external_space_map_fp_2x32mbyte(address_map &map) ATTR_COLD;
@@ -542,27 +539,6 @@ static INPUT_PORTS_START( vt369_vtunknown )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY
 INPUT_PORTS_END
-
-
-void vt369_vtunknown_unk_state::vt369_vtunknown_fp(machine_config &config)
-{
-	vt369_vtunknown_4k_ram(config);
-
-	NES_VT32_SOC(config.replace(), m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-
-	m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB12);
-	m_soc->force_bad_dma();
-}
-
-
-void vt369_vtunknown_unk_state::vt369_vtunknown_fp_16mb(machine_config& config)
-{
-	vt369_vtunknown_fp(config);
-	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_unk_state::vt_external_space_map_16mbyte);
-}
-
-
 
 
 uint8_t vt369_vtunknown_dg_fapocket_state::fapocket_412c_r()
@@ -1079,9 +1055,9 @@ CONS( 2017, rtvgc300fz,0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_v
 */
 
 // uncertain, NOT SPI ROM
-CONS( 200?, zonefusn,  0,         0,  vt369_vtunknown_fp_16mb,     vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "Ultimate Products / Jungle's Soft", "Zone Fusion",  MACHINE_NOT_WORKING )
+CONS( 200?, zonefusn,  0,         0,  vt369_vtunknown_hh_16mb,     vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "Ultimate Products / Jungle's Soft", "Zone Fusion",  MACHINE_NOT_WORKING )
 // same as above but without Jungle's Soft boot logo? model number taken from cover of manual
-CONS( 200?, sealvt,    zonefusn,  0,  vt369_vtunknown_fp_16mb,     vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "Lexibook / Sit Up Limited / Jungle's Soft", "Seal 30-in-1 (VT based, Model FN098134)",  MACHINE_NOT_WORKING )
+CONS( 200?, sealvt,    zonefusn,  0,  vt369_vtunknown_hh_16mb,     vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "Lexibook / Sit Up Limited / Jungle's Soft", "Seal 30-in-1 (VT based, Model FN098134)",  MACHINE_NOT_WORKING )
 
 // NOT SPI roms, code start with '6a' (possibly encrypted opcode after jump from an internal bootstrap ROM?)
 
@@ -1181,5 +1157,5 @@ CONS( 2021, tetrtin,    0,        0,  vt369_vtunknown_unk_1mb, vt369_vtunknown, 
 CONS( 2021, matet10,   0,        0,  vt369_vtunknown_hh_swap_2mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "dreamGEAR", "My Arcade Tetris (DGUNL-7083, Pixel Pocket, with 10 bonus games)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2021, matetsl,   0,        0,  vt369_vtunknown_hh_swap_512kb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "dreamGEAR", "My Arcade Tetris (Slurpee)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // no bonus games on this model
 
-// unknown tech level, scrambled opcodes
+// unknown tech level, uses vt32 style scramble and palette, but seems to expect vt369 features?
 CONS( 2021, matet100,  0,        0,  vt369_vtunknown_hh_8mb,  vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "dreamGEAR", "My Arcade Tetris (DGUNL-7027, Pico Player, with 100+ bonus games)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // box says 100+ bonus games
