@@ -682,8 +682,8 @@ sound_manager::sound_manager(running_machine &machine) :
 	m_update_timer = machine.scheduler().timer_alloc(timer_expired_delegate(FUNC(sound_manager::update), this));
 	m_update_timer->adjust(STREAMS_UPDATE_ATTOTIME, 0, STREAMS_UPDATE_ATTOTIME);
 
-	// mark the generation as "just starting"
-	m_osd_info.m_generation = 0xffffffff;
+	// mark the generation as "just starting, waiting for config loading"
+	m_osd_info.m_generation = 0xfffffffe;
 }
 
 sound_manager::~sound_manager()
@@ -1104,8 +1104,14 @@ void sound_manager::resume()
 void sound_manager::config_load(config_type cfg_type, config_level cfg_level, util::xml::data_node const *parentnode)
 {
 	// If no config file, ignore
-	if(!parentnode)
+	if(!parentnode) {
+		if(cfg_type == config_type::SYSTEM) {
+			// Note that the per-system config is loaded
+			m_osd_info.m_generation = 0xffffffff;
+		}
+
 		return;
+	}
 
 	switch(cfg_type) {
 	case config_type::INIT:
@@ -1193,6 +1199,9 @@ void sound_manager::config_load(config_type cfg_type, config_level cfg_level, ut
 																								cmap->get_attribute_int("node_channel", 0),
 																								cmap->get_attribute_float("db", 0)));
 		}
+
+		// Note that the per-system config is loaded
+		m_osd_info.m_generation = 0xffffffff;
 		break;
 	}
 
@@ -2306,6 +2315,13 @@ void sound_manager::update_osd_streams()
 
 void sound_manager::mapping_update()
 {
+	// fffffffe means the config is not loaded yet, so too early
+	// ffffffff means the config is loaded but the defaults are not setup yet
+	if(m_osd_info.m_generation == 0xfffffffe)
+		return;
+	if(m_osd_info.m_generation == 0xffffffff)
+		startup_cleanups();
+
 	auto &osd = machine().osd();
 	while(m_osd_info.m_generation != osd.sound_get_generation()) {
 		osd_information_update();
@@ -2417,9 +2433,6 @@ u64 sound_manager::rate_and_time_to_index(attotime time, u32 sample_rate) const
 void sound_manager::update(s32)
 {
 	auto profile = g_profiler.start(PROFILER_SOUND);
-
-	if(m_osd_info.m_generation == 0xffffffff)
-		startup_cleanups();
 
 	mapping_update();
 	streams_update();

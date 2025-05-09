@@ -101,7 +101,6 @@ int sound_sdl::init(osd_interface &osd, const osd_options &options)
 	for(int i=0; i != dev_count; i++) {
 		SDL_AudioSpec spec;
 		const char *name = SDL_GetAudioDeviceName(i, 0);
-		fprintf(stderr, "Device name %s\n", name);
 		int err = SDL_GetAudioDeviceSpec(i, 0, &spec);
 		if(!err)
 			m_devices.emplace_back(name, spec.freq, spec.channels);
@@ -109,7 +108,6 @@ int sound_sdl::init(osd_interface &osd, const osd_options &options)
 	char *def_name;
 	SDL_AudioSpec def_spec;
 	if(!SDL_GetDefaultAudioInfo(&def_name, &def_spec, 0)) {
-		fprintf(stderr, "Default name %s\n", def_name);
 		uint32_t idx;
 		for(idx = 0; idx != m_devices.size() && m_devices[idx].m_name != def_name; idx++);
 		if(idx == m_devices.size())
