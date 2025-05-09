@@ -26,7 +26,9 @@ vt3xx_soc_base_device::vt3xx_soc_base_device(const machine_config& mconfig, devi
 	nes_vt09_soc_device(mconfig, type, tag, owner, clock),
 	m_alu(*this, "alu"),
 	m_soundcpu(*this, "soundcpu"),
-	m_internal_rom(*this, "internal")
+	m_sound_timer(nullptr),
+	m_internal_rom(*this, "internal"),
+	m_soundram(*this, "soundram")
 {
 }
 
@@ -209,6 +211,15 @@ void vt3xx_soc_base_device::vt369_soundcpu_dac_w(offs_t offset, uint8_t data)
 	logerror("%s: vt369_soundcpu_dac_w %02x %02x\n", machine().describe_context(), offset, data);
 }
 
+uint8_t vt3xx_soc_base_device::vt369_soundcpu_vectors_r(offs_t offset)
+{
+	// timer IRQ (others are currently unused, point to rti, not clear what they're for or how they're enabled)
+	if ((offset == 0x04) || (offset == 0x05))
+		return m_soundram[0x7f8 + (offset & 1)];
+
+	return m_soundram[0x7fa + offset];
+}
+
 void vt3xx_soc_base_device::vt369_sound_map(address_map &map)
 {
 	map(0x0000, 0x17ff).ram();
@@ -226,7 +237,7 @@ void vt3xx_soc_base_device::vt369_sound_map(address_map &map)
 
 	map(0x4000, 0x4fff).r(FUNC(vt369_soc_introm_noswap_device::read_internal)); // some lexibook sets suggest the internal ROM can also appear here?
 
-	map(0xf800, 0xffff).ram().share("soundram"); // doesn't actually map here, the CPU fetches vectors from lower addressse
+	map(0xfffa, 0xffff).r(FUNC(vt3xx_soc_base_device::vt369_soundcpu_vectors_r));
 }
 
 void vt3xx_soc_base_device::vt369_sound_external_map(address_map &map)
@@ -277,6 +288,10 @@ void vt3xx_soc_base_device::vt369_6000_w(offs_t offset, uint8_t data)
 	}
 }
 
+TIMER_CALLBACK_MEMBER(vt3xx_soc_base_device::sound_timer_expired)
+{
+
+}
 
 void vt3xx_soc_base_device::device_start()
 {
@@ -286,6 +301,8 @@ void vt3xx_soc_base_device::device_start()
 	m_bank6000 = 0;
 	m_bank6000_enable = 0;
 	m_relative[0] = m_relative[1] = 0x00;
+
+	m_sound_timer = timer_alloc(FUNC(vt3xx_soc_base_device::sound_timer_expired), this);
 
 	save_item(NAME(m_6000_ram));
 	save_item(NAME(m_bank6000));

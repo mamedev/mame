@@ -59,6 +59,9 @@ private:
 	uint8_t vt369_soundcpu_mult_result_r(offs_t offset);
 	uint8_t vt369_soundcpu_mult_status_r();
 	void vt369_soundcpu_dac_w(offs_t offset, uint8_t data);
+	uint8_t vt369_soundcpu_vectors_r(offs_t offset);
+
+	TIMER_CALLBACK_MEMBER(sound_timer_expired);
 
 	required_device<vrt_vt1682_alu_device> m_alu;
 	required_device<cpu_device> m_soundcpu;
@@ -67,7 +70,10 @@ private:
 	uint8_t m_bank6000 = 0;
 	uint8_t m_bank6000_enable = 0;
 
+	emu_timer *m_sound_timer;
+
 	optional_region_ptr<uint8_t> m_internal_rom;
+	required_shared_ptr<uint8_t> m_soundram;
 };
 
 class vt3xx_soc_unk_bt_device : public vt3xx_soc_base_device
