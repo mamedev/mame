@@ -363,7 +363,7 @@ quality one "HQ".  The HQ resampler is configurable.  The latency
 indicates the max latency of the resampler, which allows better
 quality when higher, the filter length balances quality and speed
 where a high value is highest quality but slowest speed, and phases
-balances quality and resampler creation time, with one again higher
+balances quality and resampler creation time, with once again higher
 means better but slower.
 
 
