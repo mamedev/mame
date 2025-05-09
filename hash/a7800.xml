@@ -234,6 +234,7 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1988</year>
 		<publisher>Atari / NOVA Game Design. Inc.</publisher>
 		<info name="serial" value="CX7846"/>
+		<info name="pcb" value="C300595 REV A"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
@@ -264,11 +265,12 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1989</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7855"/>
+		<info name="pcb" value="C100339 REV. 7800 SUPERCART"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg9" />
 			<feature name="peripheral" value="lightgun" />
-			<dataarea name="rom" size="0x24000">
+			<dataarea name="rom" size="0x24000"> <!-- Actually two ROMs, 128kB and 16kB -->
 				<rom name="alienbrg.bin" size="0x24000" crc="c8849d36" sha1="a8629fac962cc20b263a60bb2d2386d605713387"/>
 			</dataarea>
 		</part>
@@ -280,11 +282,12 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1989</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7855"/>
+		<info name="pcb" value="C100339 REV. 7800 SUPERCART"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg9" />
 			<feature name="peripheral" value="lightgun" />
-			<dataarea name="rom" size="0x24000">
+			<dataarea name="rom" size="0x24000"> <!-- Actually two ROMs, 128kB and 16kB -->
 				<rom name="alienbeu.bin" size="0x24000" crc="6a19f0fe" sha1="990711ae451d901a960af8ad9ae70813f16257b1"/>
 			</dataarea>
 		</part>
@@ -311,6 +314,7 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1986</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7802"/>
+		<info name="pcb" value="CO24926-001 REV"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
@@ -416,12 +420,13 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7859"/>
+		<info name="pcb" value="C300565"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
 			<feature name="peripheral" value="lightgun" />
 			<dataarea name="rom" size="0x20000">
-				<rom name="barnyard.bin" size="0x20000" crc="ed0a587d" sha1="cbcde3d85c8778dea402394568677884cd781de3"/>
+				<rom name="c300051-059a.u1" size="0x20000" crc="ed0a587d" sha1="cbcde3d85c8778dea402394568677884cd781de3"/>
 			</dataarea>
 		</part>
 	</software>
@@ -431,6 +436,7 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7859"/>
+		<info name="pcb" value="C300565"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
@@ -503,6 +509,7 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7880"/>
+		<info name="pcb" value="C300595 REV A"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
@@ -517,6 +524,7 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7880"/>
+		<info name="pcb" value="C300595 REV A"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
@@ -531,11 +539,12 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1986</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7801"/>
+		<info name="pcb" value="CO24926-001 REV"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="0x4000">
-				<rom name="centpede.bin" size="0x4000" crc="020efe25" sha1="c8377ad7fb6afec5c88c14a23a68e2ecebba4e5a"/>
+				<rom name="c300048-001a.u1" size="0x4000" crc="020efe25" sha1="c8377ad7fb6afec5c88c14a23a68e2ecebba4e5a"/>
 			</dataarea>
 		</part>
 	</software>
@@ -545,6 +554,7 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1986?</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7801"/>
+		<info name="pcb" value="CO24926-001 REV"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
@@ -559,6 +569,7 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1987</year>
 		<publisher>Atari / Brøderbund</publisher>
 		<info name="serial" value="CX7821"/>
+		<info name="pcb" value="CO24926-001 REV"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
@@ -573,10 +584,11 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1987</year>
 		<publisher>Atari / Brøderbund</publisher>
 		<info name="serial" value="CX7821"/>
+		<info name="pcb" value="C026445-001 7800 48K ROM REV A"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
-			<dataarea name="rom" size="0xc000">
+			<dataarea name="rom" size="0xc000"> <!-- Actually two ROMs, 32kB and 16kB -->
 				<rom name="choplieu.bin" size="0xc000" crc="12efeb07" sha1="f2fe1c82e5b333f4c59f76a28a9d379228596d89"/>
 			</dataarea>
 		</part>
@@ -617,11 +629,12 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1987</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7836"/>
+		<info name="pcb" value="C300565"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="0x20000">
-				<rom name="cracked.bin" size="0x20000" crc="e645fd1f" sha1="664d267d1245d5698cbf6ff0622ee0d629da3a11"/>
+				<rom name="c300051-036a.u1" size="0x20000" crc="e645fd1f" sha1="664d267d1245d5698cbf6ff0622ee0d629da3a11"/>
 			</dataarea>
 		</part>
 	</software>
@@ -631,6 +644,7 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1987</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7836"/>
+		<info name="pcb" value="C300565"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
@@ -674,12 +688,14 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1988</year>
 		<publisher>Atari / Exidy</publisher>
 		<info name="serial" value="CX7844"/>
+		<info name="pcb" value="C100339 REV. 7800 SUPERCART"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg9" />
 			<feature name="peripheral" value="lightgun" />
 			<dataarea name="rom" size="0x24000">
-				<rom name="crossbow.bin" size="0x24000" crc="d2ea5686" sha1="d5e47da88e232cd9ea059e133e7c0f13d921a04c"/>
+				<rom name="c300051-044b.u1" size="0x20000" crc="00c7cd49" sha1="9fcb4672d8c43d7c744afa5f7b0f058b6ded07f7" offset="0"/>
+				<rom name="c300048-044a.u4" size="0x4000"  crc="03471364" sha1="a129cda5cafbc66d85dd8b46312494a7e6c03d44" offset="0x20000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -690,11 +706,12 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1988</year>
 		<publisher>Atari / Exidy</publisher>
 		<info name="serial" value="CX7844"/>
+		<info name="pcb" value="C100339 REV. 7800 SUPERCART"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg9" />
 			<feature name="peripheral" value="lightgun" />
-			<dataarea name="rom" size="0x24000">
+			<dataarea name="rom" size="0x24000"> <!-- Actually two ROMs, 128kB and 16kB -->
 				<rom name="crossbeu.bin" size="0x24000" crc="e93d8894" sha1="f26d292210a91a714b4b87712ff53b8e49da611e"/>
 			</dataarea>
 		</part>
@@ -705,11 +722,12 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7837"/>
+		<info name="pcb" value="C300565"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="0x20000">
-				<rom name="darkchmb.bin" size="0x20000" crc="366777f1" sha1="848077f15114fec31f8290be2583566f4486fe65"/>
+				<rom name="c300051-037b.u1" size="0x20000" crc="366777f1" sha1="848077f15114fec31f8290be2583566f4486fe65"/>
 			</dataarea>
 		</part>
 	</software>
@@ -719,6 +737,7 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7837"/>
+		<info name="pcb" value="C300565"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
@@ -737,10 +756,11 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1987</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7811"/>
+		<info name="pcb" value="C026445-001 7800 48K ROM REV A"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
-			<dataarea name="rom" size="0xc000">
+			<dataarea name="rom" size="0xc000"> <!-- Actually two ROMs, 32kB and 16kB -->
 				<rom name="dsrtflcn.bin" size="0xc000" crc="a1dc0899" sha1="725f893f9a98926c627ef37eacc3f241620c3ffc"/>
 			</dataarea>
 		</part>
@@ -751,10 +771,11 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1987</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7811"/>
+		<info name="pcb" value="C026445-001 7800 48K ROM REV A"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
-			<dataarea name="rom" size="0xc000">
+			<dataarea name="rom" size="0xc000"> <!-- Actually two ROMs, 32kB and 16kB -->
 				<rom name="dsrtflcp.bin" size="0xc000" crc="53e277f6" sha1="bbb8aa88879f2ec6039673ccdbbebebc565346bc"/>
 			</dataarea>
 		</part>
@@ -765,10 +786,11 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1987</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7811"/>
+		<info name="pcb" value="C026445-001 7800 48K ROM REV A"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
-			<dataarea name="rom" size="0xc000">
+			<dataarea name="rom" size="0xc000"> <!-- Actually two ROMs, 32kB and 16kB -->
 				<rom name="dsrtfleu.bin" size="0xc000" crc="33991ee8" sha1="185d104614e23699e074e850d5ab8c36a159071c"/>
 			</dataarea>
 		</part>
@@ -782,11 +804,12 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1986</year>
 		<publisher>Atari / Namco</publisher>
 		<info name="serial" value="CX7803"/>
+		<info name="pcb" value="CO24926-001 REV"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="0x4000">
-				<rom name="digdugp.bin" size="0x4000" crc="50cb13f3" sha1="19cee8dc40fabd7022bedc27e4896c09e3cadfdd"/>
+				<rom name="c300048-003a.u1" size="0x4000" crc="50cb13f3" sha1="19cee8dc40fabd7022bedc27e4896c09e3cadfdd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -796,6 +819,7 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1986?</year>
 		<publisher>Atari / Namco</publisher>
 		<info name="serial" value="CX7803"/>
+		<info name="pcb" value="CO24926-001 REV"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
@@ -810,11 +834,12 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1988</year>
 		<publisher>Atari / Nintendo</publisher>
 		<info name="serial" value="CX7848"/>
+		<info name="pcb" value="C100339 REV. 7800 SUPERCART"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="0xc000">
-				<rom name="dnkykong.bin" size="0xc000" crc="065e063f" sha1="820c852caa7957179bf7d6faf2e6922dde5a1a8e"/>
+				<rom name="c300050-048a.u1" size="0xc000" crc="065e063f" sha1="820c852caa7957179bf7d6faf2e6922dde5a1a8e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -824,6 +849,7 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1988</year>
 		<publisher>Atari / Nintendo</publisher>
 		<info name="serial" value="CX7848"/>
+		<info name="pcb" value="C100339 REV. 7800 SUPERCART"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
@@ -838,11 +864,12 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1988</year>
 		<publisher>Atari / Nintendo</publisher>
 		<info name="serial" value="CX7849"/>
+		<info name="pcb" value="C100339 REV. 7800 SUPERCART"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="0xc000">
-				<rom name="dnkykgjr.bin" size="0xc000" crc="1c5a1082" sha1="e9392259fff682fcc3476009771a3cfd7d5bdb6d"/>
+				<rom name="c300050-049a.u1" size="0xc000" crc="1c5a1082" sha1="e9392259fff682fcc3476009771a3cfd7d5bdb6d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -852,6 +879,7 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1988</year>
 		<publisher>Atari / Nintendo</publisher>
 		<info name="serial" value="CX7849"/>
+		<info name="pcb" value="C100339 REV. 7800 SUPERCART"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
@@ -950,6 +978,7 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7854"/>
+		<info name="pcb" value="C300595 REV A"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
@@ -964,6 +993,7 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7854"/>
+		<info name="pcb" value="C300595 REV A"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
@@ -978,6 +1008,7 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1988</year>
 		<publisher>Atari / Accolade</publisher>
 		<info name="serial" value="CX7851"/>
+		<info name="pcb" value="C300595 REV A"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
@@ -992,6 +1023,7 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1988</year>
 		<publisher>Atari / Accolade</publisher>
 		<info name="serial" value="CX7851"/>
+		<info name="pcb" value="C300595 REV A"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
@@ -1001,12 +1033,15 @@ Efforts are being made to document the chips/labels/markings on them.
 		</part>
 	</software>
 
+	<!-- Food Fight (NTSC) with mask ROM marking 'C028404-38' on PCB 'CA024927 - REV'. Possibly earlier release?
+	-->
+
 	<software name="foodfu" cloneof="foodf">
 		<description>Food Fight (NTSC)</description>
 		<year>1986</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7804"/>
-		<info name="pcb" value="C024926-001 REV.B"/>
+		<info name="pcb" value="CO24926-001 REV.B"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
@@ -1036,11 +1071,11 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1986?</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7804"/>
-		<info name="pcb" value="C024926-001 REV.B"/>
+		<info name="pcb" value="C026445-001 7800 48K ROM REV A"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
-			<dataarea name="rom" size="0xc000">
+			<dataarea name="rom" size="0xc000"> <!-- Actually two ROMs, 32kB and 16kB -->
 				<rom name="foodfgeu.bin" size="0xc000" crc="c64549ec" sha1="40b8e5eeb9e9ad7239963ed79dc085092ccbec4c"/>
 			</dataarea>
 		</part>
@@ -1064,6 +1099,7 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1986</year>
 		<publisher>Atari / Namco</publisher>
 		<info name="serial" value="CX7805"/>
+		<info name="pcb" value="CO24926-001 REV.B"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
@@ -1078,10 +1114,11 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1986?</year>
 		<publisher>Atari / Namco</publisher>
 		<info name="serial" value="CX7805"/>
+		<info name="pcb" value="C026445-001 7800 48K ROM REV A"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
-			<dataarea name="rom" size="0xc000">
+			<dataarea name="rom" size="0xc000"> <!-- Actually two ROMs, 32kB and 16kB -->
 				<rom name="galagaeu.bin" size="0xc000" crc="5990a9f8" sha1="f1ae5df03cf90041380d77c1b49c94611443330b"/>
 			</dataarea>
 		</part>
@@ -1223,11 +1260,12 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1987</year>
 		<publisher>Atari / Bally Sente</publisher>
 		<info name="serial" value="CX7829"/>
+		<info name="pcb" value="C100339 REV. 7800 SUPERCART"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
-			<dataarea name="rom" size="0xc000">
-				<rom name="hattrick.bin" size="0xc000" crc="cf6f4a6c" sha1="14c0cfd01df1c725f399c23810e4854a639fce52"/>
+			<dataarea name="rom" size="0xc000"> <!-- This was trimmed or under-dumped. Actually a 64kB or 128kB ROM -->
+				<rom name="c300050-029a.u1" size="0xc000" crc="cf6f4a6c" sha1="14c0cfd01df1c725f399c23810e4854a639fce52"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1237,10 +1275,11 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1987</year>
 		<publisher>Atari / Bally Sente</publisher>
 		<info name="serial" value="CX7829"/>
+		<info name="pcb" value="C100339 REV. 7800 SUPERCART"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
-			<dataarea name="rom" size="0xc000">
+			<dataarea name="rom" size="0xc000"> <!-- This was trimmed or under-dumped. Actually a 64kB or 128kB ROM -->
 				<rom name="hattrieu.bin" size="0xc000" crc="057d9c3c" sha1="0e9fa678bb4aedc7bb7cf5d38fe27556c4c2bbbd"/>
 			</dataarea>
 		</part>
@@ -1251,6 +1290,7 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1990</year>
 		<publisher>Atari / SNK</publisher>
 		<info name="serial" value="CX7862"/>
+		<info name="pcb" value="C300595 REV A"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
@@ -1265,6 +1305,7 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7862"/>
+		<info name="pcb" value="C300595 REV A"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
@@ -1279,6 +1320,7 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1987</year>
 		<publisher>Atari / Epyx</publisher>
 		<info name="serial" value="CX7832"/>
+		<info name="pcb" value="C300565"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg_ram" />
@@ -1295,6 +1337,7 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1987</year>
 		<publisher>Atari / Epyx</publisher>
 		<info name="serial" value="CX7832"/>
+		<info name="pcb" value="C300565"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg_ram" />
@@ -1311,11 +1354,12 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1989</year>
 		<publisher>Atari / Softgold</publisher>
 		<info name="serial" value="CX7857"/>
+		<info name="pcb" value="C300565"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg_ram" />
 			<dataarea name="rom" size="0x20000">
-				<rom name="jinks.bin" size="0x20000" crc="0818d8cd" sha1="472bc12c437b015a9e317bac092529f3295033b8"/>
+				<rom name="c300051-057a.u1" size="0x20000" crc="0818d8cd" sha1="472bc12c437b015a9e317bac092529f3295033b8"/>
 			</dataarea>
 			<dataarea name="ram" size="0x4000">
 			</dataarea>
@@ -1327,6 +1371,7 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1989</year>
 		<publisher>Atari / Softgold</publisher>
 		<info name="serial" value="CX7857"/>
+		<info name="pcb" value="C300565"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg_ram" />
@@ -1357,11 +1402,12 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1986</year>
 		<publisher>Atari / Williams</publisher>
 		<info name="serial" value="CX7806"/>
+		<info name="pcb" value="CO24926-001 REV.B"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="0x8000">
-				<rom name="joust.bin" size="0x8000" crc="2c430bce" sha1="1ccd7c232bcfd5a65d26b9decfe4eceadcbe314c"/>
+				<rom name="c300049-006a.u1" size="0x8000" crc="2c430bce" sha1="1ccd7c232bcfd5a65d26b9decfe4eceadcbe314c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1371,10 +1417,11 @@ Efforts are being made to document the chips/labels/markings on them.
 		<year>1986?</year>
 		<publisher>Atari / Williams</publisher>
 		<info name="serial" value="CX7806"/>
+		<info name="pcb" value="C026445-001 7800 48K ROM REV A"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
-			<dataarea name="rom" size="0xc000">
+			<dataarea name="rom" size="0xc000"> <!-- Actually two ROMs, 32kB and 16kB -->
 				<rom name="jousteu.bin" size="0xc000" crc="9b3be616" sha1="aae5b9ee00c39d577858aba9d1fd791194be2c0c"/>
 			</dataarea>
 		</part>
@@ -1421,7 +1468,7 @@ the buttons not work in emulators.
 		<year>1987</year>
 		<publisher>Atari / Brøderbund</publisher>
 		<info name="serial" value="CX7822"/>
-		<info name="pcb" value="C026445-001 7800 48K ROM REV A"/>
+		<info name="pcb" value="C300595 REV A"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
@@ -1485,11 +1532,12 @@ Saarna for debugging the problem)
 		<year>1988</year>
 		<publisher>Atari / Nintendo</publisher>
 		<info name="serial" value="CX7850"/>
+		<info name="pcb" value="C100339 REV. 7800 SUPERCART"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="0xc000">
-				<rom name="mariobro.bin" size="0xc000" crc="8021a13b" sha1="12e04b67094af622641c536379c69ecad2ee98ed"/>
+				<rom name="c300050-050a.u1" size="0xc000" crc="8021a13b" sha1="12e04b67094af622641c536379c69ecad2ee98ed"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1499,6 +1547,7 @@ Saarna for debugging the problem)
 		<year>1988</year>
 		<publisher>Atari / Nintendo</publisher>
 		<info name="serial" value="CX7850"/>
+		<info name="pcb" value="C100339 REV. 7800 SUPERCART"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
@@ -1513,11 +1562,12 @@ Saarna for debugging the problem)
 		<year>1989</year>
 		<publisher>Atari / Technos</publisher>
 		<info name="serial" value="CX7863"/>
+		<info name="pcb" value="C300595 REV A"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="0x20000">
-				<rom name="matmania.bin" size="0x20000" crc="aba91829" sha1="bb849b603cf1091e4f032936b209ff33fc3b714e"/>
+				<rom name="c300051-063a.u1" size="0x20000" crc="aba91829" sha1="bb849b603cf1091e4f032936b209ff33fc3b714e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1527,6 +1577,7 @@ Saarna for debugging the problem)
 		<year>1989</year>
 		<publisher>Atari / Technos</publisher>
 		<info name="serial" value="CX7863"/>
+		<info name="pcb" value="C300595 REV A"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
@@ -1541,6 +1592,7 @@ Saarna for debugging the problem)
 		<year>1989</year>
 		<publisher>Atari / Accolade</publisher>
 		<info name="serial" value="CX7847"/>
+		<info name="pcb" value="C300595 REV A"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
@@ -1555,6 +1607,7 @@ Saarna for debugging the problem)
 		<year>1989</year>
 		<publisher>Atari / Accolade</publisher>
 		<info name="serial" value="CX7847"/>
+		<info name="pcb" value="C300595 REV A"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
@@ -1569,6 +1622,7 @@ Saarna for debugging the problem)
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7875"/>
+		<info name="pcb" value="C300595 REV A"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
@@ -1584,6 +1638,7 @@ Saarna for debugging the problem)
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7875"/>
+		<info name="pcb" value="C300595 REV A"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
@@ -1641,6 +1696,7 @@ Saarna for debugging the problem)
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7879"/>
+		<info name="pcb" value="C300595 REV A"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
@@ -1655,6 +1711,7 @@ Saarna for debugging the problem)
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7879"/>
+		<info name="pcb" value="C300595 REV A"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
@@ -1706,11 +1763,12 @@ almost nothing like the prototype.
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7852"/>
+		<info name="pcb" value="C300595 REV A"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="0x20000">
-				<rom name="mtrpsych.bin" size="0x20000" crc="1e219482" sha1="b9381f4d0413b6c48e27f26ed94c7a9eb1a49624"/>
+				<rom name="c300051-052a.u1" size="0x20000" crc="1e219482" sha1="b9381f4d0413b6c48e27f26ed94c7a9eb1a49624"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1720,6 +1778,7 @@ almost nothing like the prototype.
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7852"/>
+		<info name="pcb" value="C300595 REV A"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
@@ -1748,11 +1807,12 @@ almost nothing like the prototype.
 		<year>1986</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7807"/>
+		<info name="pcb" value="CO24926-001 REV B"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="0x4000">
-				<rom name="mspacman.bin" size="0x4000" crc="e42fc700" sha1="ff22e21fc953a288453c40eb6fc5378d42b871f6"/>
+				<rom name="c300048-007a.u1" size="0x4000" crc="e42fc700" sha1="ff22e21fc953a288453c40eb6fc5378d42b871f6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1762,6 +1822,7 @@ almost nothing like the prototype.
 		<year>1986?</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7807"/>
+		<info name="pcb" value="CO24926-001 REV B"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
@@ -1776,11 +1837,12 @@ almost nothing like the prototype.
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7870"/>
+		<info name="pcb" value="C300595 REV A"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="0x20000">
-				<rom name="ninjaglf.bin" size="0x20000" crc="cb48e8dc" sha1="96d0e59e703770eea8d8d9c2c4e5a87ce6f2de76"/>
+				<rom name="c300051-070a.u1" size="0x20000" crc="cb48e8dc" sha1="96d0e59e703770eea8d8d9c2c4e5a87ce6f2de76"/>
 			</dataarea>
 		</part>
 	</software>
@@ -1790,6 +1852,7 @@ almost nothing like the prototype.
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7870"/>
+		<info name="pcb" value="C300595 REV A"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
@@ -1804,10 +1867,11 @@ almost nothing like the prototype.
 		<year>1987</year>
 		<publisher>Atari / Electronic Arts</publisher>
 		<info name="serial" value="CX7824"/>
+		<info name="pcb" value="C026445-001 7800 48K ROM REV A"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
-			<dataarea name="rom" size="0xc000">
+			<dataarea name="rom" size="0xc000"> <!-- Actually two ROMs, 32kB and 16kB -->
 				<rom name="oneonone.bin" size="0xc000" crc="7d9370fb" sha1="5173f892a8d70aeca6c324c138c56208e0db2b98"/>
 			</dataarea>
 		</part>
@@ -1818,10 +1882,11 @@ almost nothing like the prototype.
 		<year>1987</year>
 		<publisher>Atari / Electronic Arts</publisher>
 		<info name="serial" value="CX7824"/>
+		<info name="pcb" value="C026445-001 7800 48K ROM REV A"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
-			<dataarea name="rom" size="0xc000">
+			<dataarea name="rom" size="0xc000"> <!-- Actually two ROMs, 32kB and 16kB -->
 				<rom name="oneonoeu.bin" size="0xc000" crc="7a628295" sha1="01dfc5e4e615cf20ee4f07245285f85684ee445d"/>
 			</dataarea>
 		</part>
@@ -1943,6 +2008,7 @@ almost nothing like the prototype.
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7868"/>
+		<info name="pcb" value="C300595 REV A"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
@@ -1957,6 +2023,7 @@ almost nothing like the prototype.
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7868"/>
+		<info name="pcb" value="C300595 REV A"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
@@ -1980,12 +2047,15 @@ almost nothing like the prototype.
 		</part>
 	</software>
 
+	<!-- Pole Position II (NTSC) seen with mask ROM marking 'C028408-01'. Possibly earlier release?
+	-->
+
 	<software name="polepos2u" cloneof="polepos2">
 		<description>Pole Position II (NTSC)</description>
 		<year>1986</year>
 		<publisher>Atari / Namco</publisher>
 		<info name="serial" value="CX7808"/>
-		<info name="pcb" value="C024926-001 REV.B"/>
+		<info name="pcb" value="CO24926-001 REV.B"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
@@ -2000,7 +2070,7 @@ almost nothing like the prototype.
 		<year>1987</year>
 		<publisher>Atari / Namco</publisher>
 		<info name="serial" value="CX7808"/>
-		<info name="pcb" value="C024926-001 REV.B"/>
+		<info name="pcb" value="CO24926-001 REV.B"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
@@ -2010,7 +2080,15 @@ almost nothing like the prototype.
 		</part>
 	</software>
 
-<!-- This allegedly is a 7800 BIOS that ended up on a cartridge. As a cartridge it doesn't run on real hardware? -->
+<!-- This allegedly is a 7800 BIOS that ended up on a cartridge. As a cartridge it doesn't run on real hardware?
+     In reality this is more likely to be similar to the early 32kB release using 2x 16kB ROMs documented here...
+     https://www.atari7800.org/museum/7800NTSCsoftwarelist.htm
+     "CO28108 LO.U1" checksum 3C77
+     "CO28208 HI.U2" checksum 35B4
+     Perhaps dumped incorrectly? Or intended to be the built-in game in the BIOS?
+     When loaded U1+U2 it matches more than 55% of the common Pole Position 2 single 32kB ROM version.
+     It still doesn't run but regardless, this is currently being loaded in the wrong order.
+-->
 	<software name="polepos2p" cloneof="polepos2" supported="no">
 		<description>Pole Position II (prototype)</description>
 		<year>198?</year>
@@ -2102,11 +2180,12 @@ almost nothing like the prototype.
 		<year>1986</year>
 		<publisher>Atari / Williams</publisher>
 		<info name="serial" value="CX7809"/>
+		<info name="pcb" value="CO24926-001 REV.B"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="0x8000">
-				<rom name="robotron.bin" size="0x8000" crc="cb22305d" sha1="ccc9753cdcbd2a2f8cb7966b8227801ba0bfd41d"/>
+				<rom name="c300049-009a-01.u1" size="0x8000" crc="cb22305d" sha1="ccc9753cdcbd2a2f8cb7966b8227801ba0bfd41d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2116,11 +2195,12 @@ almost nothing like the prototype.
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7834"/>
+		<info name="pcb" value="C100339 REV. 7800 SUPERCART"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="0x10000">
-				<rom name="rsbsebll.bin" size="0x10000" crc="b1508030" sha1="9a9f60251d049630099f56d2d3efb013828b8a2c"/>
+				<rom name="c300514-034a.u1" size="0x10000" crc="b1508030" sha1="9a9f60251d049630099f56d2d3efb013828b8a2c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2158,11 +2238,12 @@ almost nothing like the prototype.
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7879"/>
+		<info name="pcb" value="C300595 REV A"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="0x20000">
-				<rom name="scrpyard.bin" size="0x20000" crc="5cc8c34f" sha1="f2249321d0cc296b9f9e516bbc5ecc9aab56ca22"/>
+				<rom name="c300051-079a.u1" size="0x20000" crc="5cc8c34f" sha1="f2249321d0cc296b9f9e516bbc5ecc9aab56ca22"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2172,6 +2253,7 @@ almost nothing like the prototype.
 		<year>1990</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7879"/>
+		<info name="pcb" value="C300595 REV A"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
@@ -2186,6 +2268,7 @@ almost nothing like the prototype.
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7869"/>
+		<info name="pcb" value="C300595 REV A"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
@@ -2201,6 +2284,7 @@ almost nothing like the prototype.
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7869"/>
+		<info name="pcb" value="C300595 REV A"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
@@ -2313,6 +2397,7 @@ almost nothing like the prototype.
 		<year>1987</year>
 		<publisher>Atari / Epyx</publisher>
 		<info name="serial" value="CX7826"/>
+		<info name="pcb" value="C300565"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg_ram" />
@@ -2329,10 +2414,11 @@ almost nothing like the prototype.
 		<year>1989</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7828"/>
+		<info name="pcb" value="C026445-001 7800 48K ROM REV A"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
-			<dataarea name="rom" size="0xc000">
+			<dataarea name="rom" size="0xc000"> <!-- Actually two ROMs, 32kB and 16kB -->
 				<rom name="suprhuey.bin" size="0xc000" crc="71846500" sha1="29aea9e90c446942001fd08d3c4c929f4ce048d7"/>
 			</dataarea>
 		</part>
@@ -2343,10 +2429,11 @@ almost nothing like the prototype.
 		<year>1989</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7828"/>
+		<info name="pcb" value="C026445-001 7800 48K ROM REV A"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
-			<dataarea name="rom" size="0xc000">
+			<dataarea name="rom" size="0xc000"> <!-- Actually two ROMs, 32kB and 16kB -->
 				<rom name="suprhueu.bin" size="0xc000" crc="6b27ea2c" sha1="469e03ee1e22ef0978c8095a38d662d34a413723"/>
 			</dataarea>
 		</part>
@@ -2483,6 +2570,7 @@ almost nothing like the prototype.
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7823"/>
+		<info name="pcb" value="C300595 REV A"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
 			<dataarea name="rom" size="0x20000">
@@ -2496,11 +2584,12 @@ almost nothing like the prototype.
 		<year>1988</year>
 		<publisher>Atari / U.S. Gold</publisher>
 		<info name="serial" value="CX7856"/>
+		<info name="pcb" value="C300565"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg_ram" />
 			<dataarea name="rom" size="0x10000">
-				<rom name="twrtpllr.bin" size="0x10000" crc="4407ba04" sha1="53976013986e0ad3694ab9c021420b8172465de7"/>
+				<rom name="c300050-056a.u1" size="0x10000" crc="4407ba04" sha1="53976013986e0ad3694ab9c021420b8172465de7"/>
 			</dataarea>
 			<dataarea name="ram" size="0x4000">
 			</dataarea>
@@ -2512,6 +2601,7 @@ almost nothing like the prototype.
 		<year>1988</year>
 		<publisher>Atari / U.S. Gold</publisher>
 		<info name="serial" value="CX7856"/>
+		<info name="pcb" value="C300565"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg_ram" />
@@ -2556,11 +2646,12 @@ almost nothing like the prototype.
 		<year>1987</year>
 		<publisher>Atari / Epyx</publisher>
 		<info name="serial" value="CX7831"/>
+		<info name="pcb" value="C300565"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg_ram" />
 			<dataarea name="rom" size="0x20000">
-				<rom name="wingames.bin" size="0x20000" crc="8981b531" sha1="b3725d6f0834c68ac62ce13eb9eb0d01d1124e5e"/>
+				<rom name="c300051-031a.u1" size="0x20000" crc="8981b531" sha1="b3725d6f0834c68ac62ce13eb9eb0d01d1124e5e"/>
 			</dataarea>
 			<dataarea name="ram" size="0x4000">
 			</dataarea>
@@ -2568,15 +2659,16 @@ almost nothing like the prototype.
 	</software>
 
 <!-- This version features a lot *LESS* sounds than the newer version:
-     e.g. no sound in bobsled ans ski jump games!
-     Dump is confirmed from multiple carts, and it was probably used in
-     some earlier production run, until they found out the mistake and
+     e.g. no sound in bobsled and ski jump games!
+     Dump is confirmed from multiple carts. It was probably used in
+     an earlier production run until they found out the mistake and
      replaced it with the complete version -->
 	<software name="wingameso" cloneof="wingames">
 		<description>Winter Games (NTSC, older?)</description>
 		<year>1987</year>
 		<publisher>Atari / Epyx</publisher>
 		<info name="serial" value="CX7831"/>
+		<info name="pcb" value="C300565"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg_ram" />
@@ -2606,6 +2698,7 @@ almost nothing like the prototype.
 		<year>1987</year>
 		<publisher>Atari / Bally Midway Mfg. Co.</publisher>
 		<info name="serial" value="CX7858"/>
+		<info name="pcb" value="C300595 REV A"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
@@ -2620,6 +2713,7 @@ almost nothing like the prototype.
 		<year>1987</year>
 		<publisher>Atari / Bally Midway Mfg. Co.</publisher>
 		<info name="serial" value="CX7858"/>
+		<info name="pcb" value="C300595 REV A"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
@@ -2634,11 +2728,12 @@ almost nothing like the prototype.
 		<year>1986</year>
 		<publisher>Atari / Namco</publisher>
 		<info name="serial" value="CX7810"/>
+		<info name="pcb" value="CO24926-001 REV.B"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
 			<dataarea name="rom" size="0x8000">
-				<rom name="xevious.bin" size="0x8000" crc="75fc124f" sha1="1d4f0335b152239553534fcbbacdca273802e3bd"/>
+				<rom name="c028410a-38.u1" size="0x8000" crc="75fc124f" sha1="1d4f0335b152239553534fcbbacdca273802e3bd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2662,10 +2757,11 @@ almost nothing like the prototype.
 		<year>1986?</year>
 		<publisher>Atari / Namco</publisher>
 		<info name="serial" value="CX7810"/>
+		<info name="pcb" value="C026445-001 7800 48K ROM REV A"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
-			<dataarea name="rom" size="0xc000">
+			<dataarea name="rom" size="0xc000"> <!-- Actually two ROMs, 32kB and 16kB -->
 				<rom name="xevioeu.bin" size="0xc000" crc="d5ac738b" sha1="81647c8ce432f891328631b57dd3268dd315f8e8"/>
 			</dataarea>
 		</part>
