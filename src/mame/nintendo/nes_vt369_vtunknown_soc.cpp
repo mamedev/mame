@@ -163,6 +163,8 @@ void vt3xx_soc_base_device::vt369_map(address_map &map)
 	map(0x4160, 0x4161).w(FUNC(vt3xx_soc_base_device::vt369_relative_w));
 	map(0x4162, 0x4162).w(FUNC(vt3xx_soc_base_device::vt369_soundcpu_control_w));
 
+	map(0x418a, 0x418a).r(FUNC(vt3xx_soc_base_device::vt369_418a_r));
+
 	map(0x41b0, 0x41bf).r(FUNC(vt3xx_soc_base_device::vt369_41bx_r)).w(FUNC(vt3xx_soc_base_device::vt369_41bx_w));
 
 	map(0x4800, 0x4fff).ram().share("soundram"); // sound program for 2nd CPU is uploaded here, but some sets aren't uploading anything, do they rely on an internal ROM? other DMA? possibility to map ROM?
@@ -396,6 +398,12 @@ uint8_t vt3xx_soc_base_device::vt369_415c_r()
 	return 0xff;
 }
 
+uint8_t vt3xx_soc_base_device::vt369_418a_r()
+{
+	logerror("%s: vt369_418a_r\n", machine().describe_context());
+	return machine().rand();
+}
+
 /***********************************************************************************************************************************************************/
 /* this might just be the same as vt369 but with the games not using all features */
 /***********************************************************************************************************************************************************/
@@ -430,6 +438,7 @@ uint8_t vt369_soc_introm_noswap_device::vthh_414a_r()
 
 uint8_t vt369_soc_introm_noswap_device::extra_rom_r()
 {
+	logerror("%s: extra_rom_r (protection?)\n", machine().describe_context());
 	// this reads from the 'extra ROM' area (serial style protocol) and code is copied on gtct885 to e00 in RAM, jumps to it at EDF9: jsr $0e1c
 	return machine().rand();
 }

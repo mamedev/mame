@@ -584,6 +584,21 @@ static INPUT_PORTS_START( vt369_vtunknown_fa )
 	PORT_DIPSETTING(    0x01, "130-in-1" )
 INPUT_PORTS_END
 
+// internal ROMs - these seem to be generic, but that isn't yet verified, if they are move them to device
+// 
+// maps at 0x1000-0x1fff on main CPU, and can boot using vectors in 1ffx area
+// can also be mapped at 0x4000-0x4fff on the sound CPU, typically when this is
+// done the main CPU fetch the vectors from 0x4000 and writes them to the RAM
+// shared with the sound CPU vector area before enabling the sound CPU
+
+#define VT3XX_INTERNAL_NO_SWAP \
+	ROM_REGION( 0x1000, "soc:internal", 0 ) \
+	ROM_LOAD( "internal.bin", 0x0000, 0x1000, CRC(da5850f0) SHA1(39d674d965818922aad5993e9499170d3ebc43bf) )
+
+#define VT3XX_INTERNAL_OPCODE_SWAP \
+	ROM_REGION( 0x1000, "soc:internal", 0 ) \
+	ROM_LOAD( "internal.bin", 0x0000, 0x1000, CRC(57c9cea9) SHA1(4f338e5ef87a66601014ad726cfefefbc20dc4be) )
+
 // below use Flash ROMs
 
 ROM_START( dgun2561 )
@@ -665,9 +680,7 @@ ROM_START( lxcmcyba )
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	ROM_LOAD( "barbie.bin", 0x00000, 0x4000000, CRC(e38af9d0) SHA1(a978a4da61f007c152c70233e9628dbebb427743) )
 
-	ROM_REGION( 0x1000, "soc:internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
-	// not verified for this set, used for testing, seems to also map in sound CPU space at 0x4000 in this case, main CPU copies vectors from start of ROM?
-	ROM_LOAD( "internal.bin", 0x0000, 0x1000, BAD_DUMP CRC(da5850f0) SHA1(39d674d965818922aad5993e9499170d3ebc43bf) )
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
 ROM_START( lxcmcypp )
@@ -750,11 +763,15 @@ ROM_END
 ROM_START( zonefusn )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
 	ROM_LOAD( "fusion.bin", 0x00000, 0x1000000, CRC(240bf970) SHA1(1b82d95a252c08e52fb8da6320276574a30b60db) )
+
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
 ROM_START( sealvt )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
 	ROM_LOAD( "l157-44 v02.u1", 0x00000, 0x1000000, CRC(0fabced0) SHA1(3f8cd85b12b125b01c831c9f2f2937e29c1b6205) )
+
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
 ROM_START( gcs2mgp )
@@ -775,16 +792,14 @@ ROM_START( lpgm240 )
 	ROM_REGION( 0x800000, "mainrom", 0 )
 	ROM_LOAD( "w25q64jv.u1", 0x00000, 0x800000, CRC(b973e65b) SHA1(36ff137068ea56b4679c2db386ac0067de0a9eaf) )
 
-	ROM_REGION( 0x1000, "soc:internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
-	ROM_LOAD( "internal.bin", 0x0000, 0x1000, CRC(57c9cea9) SHA1(4f338e5ef87a66601014ad726cfefefbc20dc4be) )
+	VT3XX_INTERNAL_OPCODE_SWAP
 ROM_END
 
 ROM_START( tup240 )
 	ROM_REGION( 0x800000, "mainrom", 0 )
 	ROM_LOAD( "mini_arcade240.bin", 0x00000, 0x800000, CRC(d4b4bf6c) SHA1(9cf4557e27bc8659079c62abdd22a311e1843047) )
 
-	ROM_REGION( 0x1000, "soc:internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
-	ROM_LOAD( "internal.bin", 0x0000, 0x1000, CRC(57c9cea9) SHA1(4f338e5ef87a66601014ad726cfefefbc20dc4be) )
+	VT3XX_INTERNAL_OPCODE_SWAP
 ROM_END
 
 ROM_START( sy889 )
@@ -837,32 +852,28 @@ ROM_START( myarccn )
 	ROM_REGION( 0x100000, "mainrom", 0 )
 	ROM_LOAD( "my_arcade_caveman_ninja.bin", 0x00000, 0x100000, CRC(dcc5590c) SHA1(a734cb9c81e58346ff5fa934347d7cb24a32cb39) )
 
-	ROM_REGION( 0x1000, "soc:internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
-	ROM_LOAD( "internal.bin", 0x0000, 0x1000, CRC(da5850f0) SHA1(39d674d965818922aad5993e9499170d3ebc43bf) )
+	VT3XX_INTERNAL_NO_SWAP // verified for this set
 ROM_END
 
 ROM_START( hkb502 )
 	ROM_REGION( 0x400000, "mainrom", 0 )
 	ROM_LOAD( "red console.bin", 0x00000, 0x400000, CRC(e4766383) SHA1(64b0c20592f38928b3a639fa42b468ff09664808) )
 
-	ROM_REGION( 0x1000, "soc:internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
-	ROM_LOAD( "internal.bin", 0x0000, 0x1000, CRC(da5850f0) SHA1(39d674d965818922aad5993e9499170d3ebc43bf) )
+	VT3XX_INTERNAL_NO_SWAP // verified for this set
 ROM_END
 
 ROM_START( hkb502a )
 	ROM_REGION( 0x400000, "mainrom", 0 )
 	ROM_LOAD( "hkb-502.bin", 0x00000, 0x400000, CRC(970f54d2) SHA1(b45df00d85a2e29fe9418563927584a048db94b3) )
 
-	ROM_REGION( 0x1000, "soc:internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
-	ROM_LOAD( "internal.bin", 0x0000, 0x1000, CRC(da5850f0) SHA1(39d674d965818922aad5993e9499170d3ebc43bf) )
+	VT3XX_INTERNAL_NO_SWAP // verified for this set
 ROM_END
 
 ROM_START( lxcap )
 	ROM_REGION( 0x800000, "mainrom", 0 )
 	ROM_LOAD( "lexibook_cyber_arcade_pocket.bin", 0x00000, 0x800000, CRC(245d0cd3) SHA1(d91cca2d0f99a6ca202fa9ba6d03587ea8af0cd9) )
 
-	ROM_REGION( 0x1000, "soc:internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
-	ROM_LOAD( "internal.bin", 0x0000, 0x1000, CRC(da5850f0) SHA1(39d674d965818922aad5993e9499170d3ebc43bf) )
+	VT3XX_INTERNAL_NO_SWAP // verified for this set
 
 	ROM_REGION( 0x100, "extra", 0 ) // data from additional 8-pin chip for protection
 	ROM_LOAD( "mystery chip.bin", 0x00000, 0x100, CRC(491d206b) SHA1(a5411a7afe3b4df93b1b22e5533f5010bd3aaa93) )
