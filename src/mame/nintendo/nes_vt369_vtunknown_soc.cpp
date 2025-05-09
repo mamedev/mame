@@ -25,7 +25,8 @@ vt3xx_soc_base_device::vt3xx_soc_base_device(const machine_config& mconfig, cons
 vt3xx_soc_base_device::vt3xx_soc_base_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock) :
 	nes_vt09_soc_device(mconfig, type, tag, owner, clock),
 	m_alu(*this, "alu"),
-	m_soundcpu(*this, "soundcpu")
+	m_soundcpu(*this, "soundcpu"),
+	m_internal_rom(*this, "internal")
 {
 }
 
@@ -36,8 +37,7 @@ vt3xx_soc_unk_bt_device::vt3xx_soc_unk_bt_device(const machine_config& mconfig, 
 
 
 vt369_soc_introm_noswap_device::vt369_soc_introm_noswap_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock) :
-	vt3xx_soc_base_device(mconfig, type, tag, owner, clock),
-	m_internal_rom(*this, "maincpu:internal")
+	vt3xx_soc_base_device(mconfig, type, tag, owner, clock)
 {
 }
 
@@ -99,6 +99,17 @@ void vt3xx_soc_base_device::vt369_relative_w(offs_t offset, uint8_t data)
 	m_relative[offset] = data;
 }
 
+uint8_t vt3xx_soc_base_device::read_internal(offs_t offset)
+{
+	if (!m_internal_rom)
+	{
+		if (!machine().side_effects_disabled())
+			logerror("%s: read from internal ROM (offset %04x), but no internal ROM loaded\n", machine().describe_context(), offset);
+		return 0x00;
+	}
+
+	return m_internal_rom[offset];
+}
 
 void vt3xx_soc_base_device::vt369_map(address_map &map)
 {
@@ -172,6 +183,9 @@ void vt3xx_soc_base_device::vt369_sound_map(address_map &map)
 	//map(0x2402, 0x2403) // Multiplier Result (r)
 	//map(0x2404, 0x2404) // Multiplier Status (r) 
 	//map(0x2800, 0x2803) // DAC (w)
+
+	map(0x4000, 0x4fff).r(FUNC(vt369_soc_introm_noswap_device::read_internal)); // some lexibook sets suggest the internal ROM can also appear here?
+
 	map(0xf800, 0xffff).ram().share("soundram"); // doesn't actually map here, the CPU fetches vectors from lower addressse
 }
 
@@ -309,18 +323,6 @@ uint8_t vt369_soc_introm_noswap_device::extra_rom_r()
 {
 	// this reads from the 'extra ROM' area (serial style protocol) and code is copied on gtct885 to e00 in RAM, jumps to it at EDF9: jsr $0e1c
 	return machine().rand();
-}
-
-uint8_t vt369_soc_introm_noswap_device::read_internal(offs_t offset)
-{
-	if (!m_internal_rom)
-	{
-		if (!machine().side_effects_disabled())
-			logerror("%s: read from internal ROM (offset %04x), but no internal ROM loaded\n", machine().describe_context(), offset);
-		return 0x00;
-	}
-
-	return m_internal_rom[offset];
 }
 
 void vt369_soc_introm_noswap_device::vt369_introm_map(address_map &map)

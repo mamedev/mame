@@ -100,7 +100,7 @@ public:
 	void vt_external_space_map_4mbyte(address_map &map) ATTR_COLD;
 	[[maybe_unused]] void vt_external_space_map_2mbyte(address_map &map) ATTR_COLD;
 	void vt_external_space_map_1mbyte(address_map &map) ATTR_COLD;
-	[[maybe_unused]] void vt_external_space_map_512kbyte(address_map &map) ATTR_COLD;
+	void vt_external_space_map_512kbyte(address_map &map) ATTR_COLD;
 
 	void init_lxcmcypp();
 
@@ -167,10 +167,11 @@ public:
 	void vt369_vtunknown_hh_16mb(machine_config& config);
 
 	void vt369_vtunknown_hh_swap_8mb(machine_config& config);
+	void vt369_vtunknown_hh_swap_2mb(machine_config& config);
+	void vt369_vtunknown_hh_swap_512kb(machine_config& config);
 
 	void vt369_vtunknown_unk(machine_config& config);
 	void vt369_vtunknown_unk_1mb(machine_config& config);
-	void vt369_vtunknown_unk_2mb(machine_config& config);
 	void vt369_vtunknown_unk_4mb(machine_config& config);
 	void vt369_vtunknown_unk_16mb(machine_config& config);
 
@@ -450,12 +451,6 @@ void vt369_vtunknown_unk_state::vt369_vtunknown_unk_1mb(machine_config& config)
 	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_unk_state::vt_external_space_map_1mbyte);
 }
 
-void vt369_vtunknown_unk_state::vt369_vtunknown_unk_2mb(machine_config& config)
-{
-	vt369_vtunknown_unk(config);
-	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_unk_state::vt_external_space_map_2mbyte);
-}
-
 void vt369_vtunknown_unk_state::vt369_vtunknown_unk_4mb(machine_config& config)
 {
 	vt369_vtunknown_unk(config);
@@ -488,6 +483,17 @@ void vt369_vtunknown_unk_state::vt369_vtunknown_hh_swap_8mb(machine_config &conf
 	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_unk_state::vt_external_space_map_8mbyte);
 }
 
+void vt369_vtunknown_unk_state::vt369_vtunknown_hh_swap_2mb(machine_config &config)
+{
+	vt369_vtunknown_hh_swap_8mb(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_unk_state::vt_external_space_map_2mbyte);
+}
+
+void vt369_vtunknown_unk_state::vt369_vtunknown_hh_swap_512kb(machine_config &config)
+{
+	vt369_vtunknown_hh_swap_8mb(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_unk_state::vt_external_space_map_512kbyte);
+}
 void vt369_vtunknown_unk_state::vt369_vtunknown_hh_1mb(machine_config& config)
 {
 	vt369_vtunknown_hh(config);
@@ -682,6 +688,10 @@ ROM_END
 ROM_START( lxcmcyba )
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	ROM_LOAD( "barbie.bin", 0x00000, 0x4000000, CRC(e38af9d0) SHA1(a978a4da61f007c152c70233e9628dbebb427743) )
+
+	ROM_REGION( 0x1000, "soc:internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
+	// not verified for this set, used for testing, seems to also map in sound CPU space at 0x4000 in this case, main CPU copies vectors from start of ROM?
+	ROM_LOAD( "internal.bin", 0x0000, 0x1000, BAD_DUMP CRC(da5850f0) SHA1(39d674d965818922aad5993e9499170d3ebc43bf) )
 ROM_END
 
 ROM_START( lxcmcypp )
@@ -789,7 +799,7 @@ ROM_START( lpgm240 )
 	ROM_REGION( 0x800000, "mainrom", 0 )
 	ROM_LOAD( "w25q64jv.u1", 0x00000, 0x800000, CRC(b973e65b) SHA1(36ff137068ea56b4679c2db386ac0067de0a9eaf) )
 
-	ROM_REGION( 0x1000, "soc:maincpu:internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
+	ROM_REGION( 0x1000, "soc:internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
 	ROM_LOAD( "internal.bin", 0x0000, 0x1000, CRC(57c9cea9) SHA1(4f338e5ef87a66601014ad726cfefefbc20dc4be) )
 ROM_END
 
@@ -797,7 +807,7 @@ ROM_START( tup240 )
 	ROM_REGION( 0x800000, "mainrom", 0 )
 	ROM_LOAD( "mini_arcade240.bin", 0x00000, 0x800000, CRC(d4b4bf6c) SHA1(9cf4557e27bc8659079c62abdd22a311e1843047) )
 
-	ROM_REGION( 0x1000, "soc:maincpu:internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
+	ROM_REGION( 0x1000, "soc:internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
 	ROM_LOAD( "internal.bin", 0x0000, 0x1000, CRC(57c9cea9) SHA1(4f338e5ef87a66601014ad726cfefefbc20dc4be) )
 ROM_END
 
@@ -851,7 +861,7 @@ ROM_START( myarccn )
 	ROM_REGION( 0x100000, "mainrom", 0 )
 	ROM_LOAD( "my_arcade_caveman_ninja.bin", 0x00000, 0x100000, CRC(dcc5590c) SHA1(a734cb9c81e58346ff5fa934347d7cb24a32cb39) )
 
-	ROM_REGION( 0x1000, "soc:maincpu:internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
+	ROM_REGION( 0x1000, "soc:internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
 	ROM_LOAD( "internal.bin", 0x0000, 0x1000, CRC(da5850f0) SHA1(39d674d965818922aad5993e9499170d3ebc43bf) )
 ROM_END
 
@@ -859,7 +869,7 @@ ROM_START( hkb502 )
 	ROM_REGION( 0x400000, "mainrom", 0 )
 	ROM_LOAD( "red console.bin", 0x00000, 0x400000, CRC(e4766383) SHA1(64b0c20592f38928b3a639fa42b468ff09664808) )
 
-	ROM_REGION( 0x1000, "soc:maincpu:internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
+	ROM_REGION( 0x1000, "soc:internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
 	ROM_LOAD( "internal.bin", 0x0000, 0x1000, CRC(da5850f0) SHA1(39d674d965818922aad5993e9499170d3ebc43bf) )
 ROM_END
 
@@ -867,7 +877,7 @@ ROM_START( hkb502a )
 	ROM_REGION( 0x400000, "mainrom", 0 )
 	ROM_LOAD( "hkb-502.bin", 0x00000, 0x400000, CRC(970f54d2) SHA1(b45df00d85a2e29fe9418563927584a048db94b3) )
 
-	ROM_REGION( 0x1000, "soc:maincpu:internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
+	ROM_REGION( 0x1000, "soc:internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
 	ROM_LOAD( "internal.bin", 0x0000, 0x1000, CRC(da5850f0) SHA1(39d674d965818922aad5993e9499170d3ebc43bf) )
 ROM_END
 
@@ -875,7 +885,7 @@ ROM_START( lxcap )
 	ROM_REGION( 0x800000, "mainrom", 0 )
 	ROM_LOAD( "lexibook_cyber_arcade_pocket.bin", 0x00000, 0x800000, CRC(245d0cd3) SHA1(d91cca2d0f99a6ca202fa9ba6d03587ea8af0cd9) )
 
-	ROM_REGION( 0x1000, "soc:maincpu:internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
+	ROM_REGION( 0x1000, "soc:internal", 0 ) // maps at 1000-1fff on main CPU, and it boots using vectors in 1ffx area
 	ROM_LOAD( "internal.bin", 0x0000, 0x1000, CRC(da5850f0) SHA1(39d674d965818922aad5993e9499170d3ebc43bf) )
 
 	ROM_REGION( 0x100, "extra", 0 ) // data from additional 8-pin chip for protection
@@ -940,9 +950,14 @@ ROM_START( lexi30 )
 ROM_END
 
 ROM_START( matet10 )
-	ROM_REGION( 0x200000, "mainrom", 0 )
+	ROM_REGION( 0x800000, "mainrom", 0 )
 	ROM_LOAD( "tetriskeychain_p25q16sh_856015.bin", 0x00000, 0x200000, CRC(7a7251ea) SHA1(7ace8482a54f6b06982a90328779c21266d864fa) )
 	ROM_IGNORE(0x300)
+ROM_END
+
+ROM_START( matetsl )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "slurpeetetris_p25q40sh_856013.bin", 0x00000, 0x80300, CRC(d3b68de8) SHA1(97bcdfcd31bc536b626f9a369afe18de60a399da) )
 ROM_END
 
 ROM_START( matet100 )
@@ -1162,8 +1177,9 @@ CONS( 2021, pactin,     0,        0,  vt369_vtunknown_unk_1mb, vt369_vtunknown, 
 
 CONS( 2021, tetrtin,    0,        0,  vt369_vtunknown_unk_1mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "Fizz Creations", "Tetris Arcade in a Tin", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
-// uses a low res display like the above
-CONS( 2021, matet10,   0,        0,  vt369_vtunknown_unk_2mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "dreamGEAR", "My Arcade Tetris (DGUNL-7083, Pixel Pocket, with 10 bonus games)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+// uses a low res display (so vt3xx?)
+CONS( 2021, matet10,   0,        0,  vt369_vtunknown_hh_swap_2mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "dreamGEAR", "My Arcade Tetris (DGUNL-7083, Pixel Pocket, with 10 bonus games)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2021, matetsl,   0,        0,  vt369_vtunknown_hh_swap_512kb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "dreamGEAR", "My Arcade Tetris (Slurpee)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // no bonus games on this model
 
 // unknown tech level, scrambled opcodes
 CONS( 2021, matet100,  0,        0,  vt369_vtunknown_hh_8mb,  vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "dreamGEAR", "My Arcade Tetris (DGUNL-7027, Pico Player, with 100+ bonus games)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // box says 100+ bonus games

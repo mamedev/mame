@@ -43,6 +43,8 @@ protected:
 	void vt369_411c_bank6000_enable_w(offs_t offset, uint8_t data);
 	void vt369_relative_w(offs_t offset, uint8_t data);
 
+	uint8_t read_internal(offs_t offset);
+
 private:
 	void vt369_sound_map(address_map &map) ATTR_COLD;
 	void vt369_sound_external_map(address_map& map) ATTR_COLD;
@@ -55,6 +57,8 @@ private:
 	std::vector<u8> m_6000_ram;
 	uint8_t m_bank6000 = 0;
 	uint8_t m_bank6000_enable = 0;
+
+	optional_region_ptr<uint8_t> m_internal_rom;
 };
 
 class vt3xx_soc_unk_bt_device : public vt3xx_soc_base_device
@@ -87,9 +91,7 @@ protected:
 	uint8_t vthh_414a_r();
 	void vtfp_411d_w(uint8_t data);
 	void encryption_4169_w(uint8_t data);
-	uint8_t read_internal(offs_t offset);
 
-	optional_region_ptr<uint8_t> m_internal_rom;
 	bool m_encryption_allowed;
 };
 
