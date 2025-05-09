@@ -3,13 +3,22 @@
 license:CC0-1.0
 copyright-holders:Vas Crabb
 
-Crazy Bugs control panel
+Jinpai Suoha - Show Hand control panel
 May or may not match arrangement/colour of real control panel
 -->
 <mamelayout version="2">
 
 	<element name="blank">
 		<rect />
+	</element>
+
+	<element name="warning">
+		<rect>
+			<color red="0" green="0" blue="0" />
+		</rect>
+		<text string="Please set the view to match the Controls DIP switch setting">
+			<bounds x="0.01" y="0.05" width="0.98" height="0.9" />
+		</text>
 	</element>
 
 	<element name="bet" defstate="0">
@@ -19,7 +28,7 @@ May or may not match arrangement/colour of real control panel
 		<rect state="0">
 			<color red="0.0" green="0.15" blue="0.15" />
 		</rect>
-		<text string="PLAY">
+		<text string="BET">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.3" width="1" height="0.4" />
 		</text>
@@ -36,60 +45,22 @@ May or may not match arrangement/colour of real control panel
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.4" />
 		</text>
-		<text string="STOP ALL">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.5" width="1" height="0.4" />
-		</text>
-	</element>
-
-	<element name="stop1" defstate="0">
-		<rect state="1">
-			<color red="1.0" green="0.0" blue="0.0" />
-		</rect>
-		<rect state="0">
-			<color red="0.15" green="0.0" blue="0.0" />
-		</rect>
-		<text string="STOP 1">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.4" />
-		</text>
-		<text string="DOUBLE">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.5" width="1" height="0.4" />
-		</text>
-	</element>
-
-	<element name="stop2" defstate="0">
-		<rect state="1">
-			<color red="1.0" green="0.0" blue="0.0" />
-		</rect>
-		<rect state="0">
-			<color red="0.15" green="0.0" blue="0.0" />
-		</rect>
-		<text string="STOP 2">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.4" />
-		</text>
-		<text string="SMALL">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.5" width="1" height="0.4" />
-		</text>
-	</element>
-
-	<element name="stop3" defstate="0">
-		<rect state="1">
-			<color red="1.0" green="0.0" blue="0.0" />
-		</rect>
-		<rect state="0">
-			<color red="0.15" green="0.0" blue="0.0" />
-		</rect>
-		<text string="STOP 3">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.4" />
-		</text>
 		<text string="TAKE">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="up" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.15" green="0.0" blue="0.0" />
+		</rect>
+		<text string="UP">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.3" width="1" height="0.4" />
 		</text>
 	</element>
 
@@ -100,9 +71,64 @@ May or may not match arrangement/colour of real control panel
 		<rect state="0">
 			<color red="0.15" green="0.0" blue="0.0" />
 		</rect>
+		<text string="CONFIRM">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
 		<text string="BIG">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.3" width="1" height="0.4" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="down" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.15" green="0.0" blue="0.0" />
+		</rect>
+		<text string="DOWN">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="DOUBLE">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="select" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.15" green="0.0" blue="0.0" />
+		</rect>
+		<text string="SELECT">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="DOUBLE">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
+		</text>
+	</element>
+
+	<element name="small" defstate="0">
+		<rect state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.15" green="0.0" blue="0.0" />
+		</rect>
+		<text string="SEE CARD">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.1" width="1" height="0.4" />
+		</text>
+		<text string="SMALL">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0" y="0.5" width="1" height="0.4" />
 		</text>
 	</element>
 
@@ -124,7 +150,7 @@ May or may not match arrangement/colour of real control panel
 		</rect>
 	</element>
 
-	<element name="stop_b" defstate="0">
+	<element name="hold_b">
 		<rect state="1">
 			<color red="0.7" green="0.0" blue="0.0" />
 		</rect>
@@ -133,9 +159,9 @@ May or may not match arrangement/colour of real control panel
 		</rect>
 	</element>
 
-	<view name="Button Lamps">
+	<group name="cpanel">
 		<screen index="0">
-			<bounds left="0" right="4" top="0" bottom="3" />
+			<bounds left="0" top="0" right="4" bottom="3" />
 		</screen>
 
 		<element ref="blank">
@@ -162,47 +188,104 @@ May or may not match arrangement/colour of real control panel
 			<bounds left="0" right="4" top="3.05" bottom="3.35" />
 			<color red="0.0" green="0.0" blue="0.0" />
 		</element>
+	</group>
 
-		<element ref="bet_b" name="lamp3" inputtag="TEST0" inputmask="0x02">
+	<view name="Joystick">
+		<group ref="cpanel" />
+
+		<element ref="bet_b" name="lamp6" inputtag="IN1" inputmask="0x0100">
 			<bounds x="0.10" y="3.08" width="0.50" height="0.24" />
 		</element>
-		<element ref="bet" name="lamp3" inputtag="TEST0" inputmask="0x02">
+		<element ref="bet" name="lamp6" inputtag="IN1" inputmask="0x0100">
 			<bounds x="0.12" y="3.10" width="0.46" height="0.20" />
 		</element>
 
-		<element ref="stop_b" name="lamp5" inputtag="TEST2" inputmask="0x00020">
+		<element ref="hold_b" name="lamp8" inputtag="IN1" inputmask="0x0010">
 			<bounds x="0.85" y="3.08" width="0.50" height="0.24" />
 		</element>
-		<element ref="stop1" name="lamp5" inputtag="TEST2" inputmask="0x00020">
+		<element ref="up" name="lamp8" inputtag="IN1" inputmask="0x0010">
 			<bounds x="0.87" y="3.10" width="0.46" height="0.20" />
 		</element>
 
-		<element ref="stop_b" name="lamp2" inputtag="TEST2" inputmask="0x00008">
+		<element ref="hold_b" name="lamp7" inputtag="IN1" inputmask="0x0200">
 			<bounds x="1.45" y="3.08" width="0.50" height="0.24" />
 		</element>
-		<element ref="stop2" name="lamp2" inputtag="TEST2" inputmask="0x00008">
+		<element ref="big" name="lamp7" inputtag="IN1" inputmask="0x0200">
 			<bounds x="1.47" y="3.10" width="0.46" height="0.20" />
 		</element>
 
-		<element ref="stop_b" name="lamp4" inputtag="TEST2" inputmask="0x00010">
+		<element ref="hold_b" name="lamp3" inputtag="IN1" inputmask="0x0020">
 			<bounds x="2.05" y="3.08" width="0.50" height="0.24" />
 		</element>
-		<element ref="stop3" name="lamp4" inputtag="TEST2" inputmask="0x00010">
+		<element ref="down" name="lamp3" inputtag="IN1" inputmask="0x0020">
 			<bounds x="2.07" y="3.10" width="0.46" height="0.20" />
 		</element>
 
-		<element ref="stop_b" name="lamp6" inputtag="TEST0" inputmask="0x80">
+		<element ref="hold_b" name="lamp2" inputtag="IN1" inputmask="0x0400">
 			<bounds x="2.65" y="3.08" width="0.50" height="0.24" />
 		</element>
-		<element ref="big" name="lamp6" inputtag="TEST0" inputmask="0x80">
+		<element ref="small" name="lamp2" inputtag="IN1" inputmask="0x0400">
 			<bounds x="2.67" y="3.10" width="0.46" height="0.20" />
 		</element>
 
-		<element ref="start_b" name="lamp1" inputtag="TEST1" inputmask="0x04">
+		<element ref="start_b" name="lamp1" inputtag="IN1" inputmask="0x0008">
 			<bounds x="3.40" y="3.08" width="0.50" height="0.24" />
 		</element>
-		<element ref="start" name="lamp1" inputtag="TEST1" inputmask="0x04">
+		<element ref="start" name="lamp1" inputtag="IN1" inputmask="0x0008">
 			<bounds x="3.42" y="3.10" width="0.46" height="0.20" />
+		</element>
+
+		<element ref="warning">
+			<bounds left="0" right="4" top="3.05" bottom="3.35" />
+			<animate inputtag="DSW1" mask="0x0080" />
+			<color state="0" alpha="0" />
+			<color state="1" alpha="1" />
+		</element>
+	</view>
+
+	<view name="Mahjong">
+		<group ref="cpanel" />
+
+		<element ref="bet_b" name="lamp6" inputtag="KEY0" inputmask="0x04">
+			<bounds x="0.10" y="3.08" width="0.60" height="0.24" />
+		</element>
+		<element ref="bet" name="lamp6" inputtag="KEY0" inputmask="0x04">
+			<bounds x="0.12" y="3.10" width="0.56" height="0.20" />
+		</element>
+
+		<element ref="hold_b" name="lamp7" inputtag="KEY2" inputmask="0x08">
+			<bounds x="0.95" y="3.08" width="0.60" height="0.24" />
+		</element>
+		<element ref="big" name="lamp7" inputtag="KEY2" inputmask="0x08">
+			<bounds x="0.97" y="3.10" width="0.56" height="0.20" />
+		</element>
+
+		<element ref="hold_b" name="lamp3" inputtag="KEY1" inputmask="0x04">
+			<bounds x="1.70" y="3.08" width="0.60" height="0.24" />
+		</element>
+		<element ref="select" name="lamp3" inputtag="KEY1" inputmask="0x04">
+			<bounds x="1.72" y="3.10" width="0.56" height="0.20" />
+		</element>
+
+		<element ref="hold_b" name="lamp2" inputtag="KEY2" inputmask="0x04">
+			<bounds x="2.45" y="3.08" width="0.60" height="0.24" />
+		</element>
+		<element ref="small" name="lamp2" inputtag="KEY2" inputmask="0x04">
+			<bounds x="2.47" y="3.10" width="0.56" height="0.20" />
+		</element>
+
+		<element ref="start_b" name="lamp1" inputtag="KEY0" inputmask="0x02">
+			<bounds x="3.30" y="3.08" width="0.60" height="0.24" />
+		</element>
+		<element ref="start" name="lamp1" inputtag="KEY0" inputmask="0x02">
+			<bounds x="3.32" y="3.10" width="0.56" height="0.20" />
+		</element>
+
+		<element ref="warning">
+			<bounds left="0" right="4" top="3.05" bottom="3.35" />
+			<animate inputtag="DSW1" mask="0x0080" />
+			<color state="0" alpha="1" />
+			<color state="1" alpha="0" />
 		</element>
 	</view>
 </mamelayout>

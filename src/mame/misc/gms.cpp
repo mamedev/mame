@@ -78,17 +78,17 @@ TODO:
 - hookup MCU and YM2151 / YM3812 sound for the mahjong games
 - hookup PIC16F84 for rbspm
 - emulate protection devices correctly instead of patching
-- work out remaining magslot lamps
-- work out remaining sball2k1 I/O
-- do layouts
+- work out remaining magslot lamps and add layout
+- work out remaining jinpaish lamps and update layout
+- work out remaining sball2k1 I/O and update layout
 - use real values for reel tilemaps offsets instead of hardcoded ones (would fix
   magslot)
 - game logic seems broken in mahjong games (Reach permitted when it shouldn't
   be, Chi not permitted when it should be, other issues)
+- jinpaish move timer runs way too slowly
+- jinpaish seems to play the wrong sound samples?
 - broken title GFX in yyhm (transparent pen problem?)
 - the newer games seem to use range 0x9e1000-0x9e1fff during gameplay
-- if sball2k1 "Comma" DIP switch is set to "No. 6", the game will give a hopper
-  error on start - probably expects hopper on a different bit
 
 Video references:
 rbspm: https://www.youtube.com/watch?v=pPk-6N1wXoE
@@ -121,6 +121,13 @@ super555: https://www.youtube.com/watch?v=CCUKdbQ5O-U
 #include "logmacro.h"
 
 #define LOGTILEATTR(...) LOGMASKED(LOG_TILEATTR, __VA_ARGS__)
+
+
+#include "ballch.lh"
+#include "cots.lh"
+#include "jinpaish.lh"
+#include "sball2k1.lh"
+#include "sc2in1.lh"
 
 
 namespace {
@@ -340,19 +347,20 @@ void gms_2layers_state::input_matrix_w(uint16_t data)
 void gms_2layers_state::lamps_w(uint16_t data)
 {
 	// There seem to be eight lamps on the low eight bits (active high):
-	// +------+----------------------+----------+------------------+-------------+-------------+
-	// | lamp | sball2k1             | sc2in1   | magslot          | ballch      | cots        |
-	// +------+----------------------+----------+------------------+-------------+-------------+
-	// | 1    | Start                | Start    | Start            | Start?      |             |
-	// | 2    | Hold 2               | Hold 2   | ?                | Bet         |             |
-	// | 3    | Hold 4               | Hold 4   | ?                | Start?      | Stop Reel 3 |
-	// | 4    | Hold 1               | Hold 1   | ?                | Stop Reel 1 | Stop Reel 2 |
-	// | 5    | Hold 3               | Hold 3   | ?                | Stop Reel 2 | Stop Reel 1 |
-	// | 6    | Hold 5               | Hold 5   | Stop Reel 3      | Stop Reel 3 | Stop Reel 4 |
-	// | 7    | used in attract mode | credited | ?                |             | Bet         |
-	// | 8    |                      | Bet      | ?                |             | Start       |
-	// +------+----------------------+----------+------------------+-------------+-------------+
-	// sball2k1 attract mode "chase" is 4, 2, 5, 3, 6, 7
+	// +------+----------------------+----------+-----------+------------------+-------------+-------------+
+	// | lamp | sball2k1             | sc2in1   | jinpaish  | magslot          | ballch      | cots        |
+	// +------+----------------------+----------+-----------+------------------+-------------+-------------+
+	// | 1    | Start                | Start    | Start     | Start            | Start?      |             |
+	// | 2    | Hold 2               | Hold 2   | ?         | ?                | Bet         |             |
+	// | 3    | Hold 4               | Hold 4   | Down      | ?                | Start?      | Stop Reel 3 |
+	// | 4    | Hold 1               | Hold 1   |           | ?                | Stop Reel 1 | Stop Reel 2 |
+	// | 5    | Hold 3               | Hold 3   |           | ?                | Stop Reel 2 | Stop Reel 1 |
+	// | 6    | Hold 5               | Hold 5   | Bet       | Stop Reel 3      | Stop Reel 3 | Stop Reel 4 |
+	// | 7    | used in attract mode | credited | ?         | ?                |             | Bet         |
+	// | 8    |                      | Bet      | Up        | ?                |             | Start       |
+	// +------+----------------------+----------+-----------+------------------+-------------+-------------+
+	// sball2k1 attract mode "chase" is 4, 2, 5, 3, 6, 7, 6, 3, 5, 2, 4, 1
+	// jinpaish lamps 2 and 7 are Confirm and View Hole Card, but they seem to always be used simultaneously
 	// magslot lamp 2 is Stop Reel 4, Stop Reel 5, Bet or Bet Max
 	// magslot lamp 3 is Stop Reel 4, Stop Reel 5, Bet or Bet Max
 	// magslot lamp 4 is Stop Reel 4, Stop Reel 5, Bet or Bet Max
@@ -1428,7 +1436,7 @@ static INPUT_PORTS_START( sc2in1 )
 	// Bet        Bet                        Bet
 	// Hold 1     Exit                       Exit   Hold 1
 	// Hold 2            Up                         Hold 2                Up
-	// Hold 3            Select/Confirm             Hold 3                Big
+	// Hold 3            Confirm                    Hold 3                Big
 	// Hold 4            Down                       Hold 4  Double Up     Down
 	// Hold 5            View Hole Card             Hold 5  Draw Again    Small
 	PORT_START("COUNTERS")
@@ -1446,7 +1454,7 @@ static INPUT_PORTS_START( sc2in1 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )  PORT_NAME("Hold 2 / Up" )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )  PORT_NAME("Hold 4 / Down / Double Up")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )  PORT_NAME("Hold 1 / Exit" )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )  PORT_NAME("Hold 3 / Select / Big" )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )  PORT_NAME("Hold 3 / Confirm / Big" )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )  PORT_NAME("Hold 5 / View Hole Card / Draw Again / Small")
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
@@ -1503,11 +1511,11 @@ static INPUT_PORTS_START( jinpaish )
 	// Bet         Bet                                Select Opponent
 	// Kan         Bet                                Select Opponent
 	// Pon         Start           Take Score         Select Opponent
-	// Chi         Select/Confirm  Take Score  Big    Select Opponent
-	// Reach       Down            Double Up          Select Opponent
+	// Chi         Confirm         Take Score  Big    Select Opponent
+	// Reach       Select (Down)   Double Up          Select Opponent
 	// Ron         View Hole Card              Small  Select Opponent
-	// Take Score  Select          Take Score         Select Opponent
-	// Double Up   Down            Double Up          Select Opponent
+	// Take Score  Confirm         Take Score         Select Opponent
+	// Double Up   Select (Down)   Double Up          Select Opponent
 	// Big         View Hole Card              Small  Select Opponent
 	// Small                       Take Score         Select Opponent
 	// There seems to be no Up control in mahjong keyboard mode.
@@ -1521,7 +1529,7 @@ static INPUT_PORTS_START( jinpaish )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )                                               PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)  // (would be left, seems to be unused)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )                                               PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)  // (would be right, seems to be unused)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_GAMBLE_BET )                                           PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)  // 押分鍵
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 )         PORT_NAME("Select / Confirm / Big")  PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)  // 選擇鍵 / 確認鍵
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 )         PORT_NAME("Confirm / Big")           PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)  // 選擇鍵 / 確認鍵
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON2 )         PORT_NAME("View Hole Card / Small")  PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)  // 看牌鍵
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )                                              PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )                                              PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)
@@ -1655,7 +1663,7 @@ static INPUT_PORTS_START( ballch )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )       // seems to be an alternate Payout input?
 	PORT_SERVICE_NO_TOGGLE(0x02, IP_ACTIVE_LOW)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 )        PORT_NAME( "Start / Stop All Reels" )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 )        PORT_NAME("Start / Stop All Reels / Take Score")  // need to tap very briefly to take score or it will spin again
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_GAMBLE_BET )    PORT_NAME("Play")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -3214,17 +3222,17 @@ GAME( 1999, cjdlz,    0, super555, cjdlz,    gms_2layers_state, init_cjdlz,    R
 GAME( 2005, yyhm,     0, magslot,  yyhm,     gms_3layers_state, init_yyhm,     ROT0,  "GMS", "Yuanyang Hudie Meng (Version 8.8A 2005-09-25)",         MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Also needs EEPROM support.
 
 // card games
-GAME( 1999, super555, 0, super555, super555, gms_2layers_state, init_super555, ROT0,  "GMS", "Super 555 (English version V1.5)",                      MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Also needs EEPROM support.
-GAME( 1999, sscs,     0, super555, sscs,     gms_2layers_state, init_sscs,     ROT0,  "GMS", "San Se Caishen (Version 0502)",                         MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Also needs EEPROM support.
-GAME( 2001, sball2k1, 0, super555, sball2k1, gms_2layers_state, init_sball2k1, ROT0,  "GMS", "Super Ball 2001 (Italy version 5.23)",                  MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Also needs EEPROM support.
-GAME( 2001, sc2in1,   0, magslot,  sc2in1,   gms_3layers_state, init_sc2in1,   ROT0,  "GMS", "Super Card 2 in 1 (English version 03.23)",             MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Also needs EEPROM support.
-GAME( 2004, jinpaish, 0, magslot,  jinpaish, gms_3layers_state, init_jinpaish, ROT0,  "GMS", "Jinpai Suoha - Show Hand (Chinese version 2004-09-22)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Also needs EEPROM support. Also needs correct controls.
-GAME( 2005, baile,    0, magslot,  baile,    gms_3layers_state, init_baile,    ROT0,  "GMS", "Baile 2005 (V3.2 2005-01-12)",                          MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Also needs EEPROM support.
+GAME( 1999, super555, 0, super555, super555, gms_2layers_state, init_super555, ROT0,  "GMS", "Super 555 (English version V1.5)",                      MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                  // stops during boot, patched for now. Also needs EEPROM support.
+GAME( 1999, sscs,     0, super555, sscs,     gms_2layers_state, init_sscs,     ROT0,  "GMS", "San Se Caishen (Version 0502)",                         MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                  // stops during boot, patched for now. Also needs EEPROM support.
+GAMEL(2001, sball2k1, 0, super555, sball2k1, gms_2layers_state, init_sball2k1, ROT0,  "GMS", "Super Ball 2001 (Italy version 5.23)",                  MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_sball2k1 ) // stops during boot, patched for now. Also needs EEPROM support.
+GAMEL(2001, sc2in1,   0, magslot,  sc2in1,   gms_3layers_state, init_sc2in1,   ROT0,  "GMS", "Super Card 2 in 1 (English version 03.23)",             MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_sc2in1 )   // stops during boot, patched for now. Also needs EEPROM support.
+GAMEL(2004, jinpaish, 0, magslot,  jinpaish, gms_3layers_state, init_jinpaish, ROT0,  "GMS", "Jinpai Suoha - Show Hand (Chinese version 2004-09-22)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_jinpaish ) // stops during boot, patched for now. Also needs EEPROM support.
+GAME( 2005, baile,    0, magslot,  baile,    gms_3layers_state, init_baile,    ROT0,  "GMS", "Baile 2005 (V3.2 2005-01-12)",                          MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                  // stops during boot, patched for now. Also needs EEPROM support.
 
 // slots
 GAME( 2003, magslot,  0, magslot,  magslot,  gms_3layers_state, empty_init,    ROT0,  "GMS", "Magic Slot (normal 1.0C)",                              MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // reel / tilemaps priorities are wrong, inputs to be verified. Also needs EEPROM support.
 
 // train games
-GAME( 1999, hgly,     0, super555, hgly,     gms_2layers_state, init_hgly,     ROT0,  "GMS", "Huangguan Leyuan (990726 CRG1.1)",                      MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Also needs EEPROM support.
-GAME( 2002, ballch,   0, super555, ballch,   gms_2layers_state, init_ballch,   ROT0,  "TVE", "Ball Challenge (20020607 1.0 OVERSEA)",                 MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Also needs EEPROM support.
-GAME( 2005, cots,     0, super555, cots,     gms_2layers_state, init_cots,     ROT0,  "ECM", "Creatures of the Sea (20050328 USA 6.3)",               MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Also needs EEPROM support.
+GAME( 1999, hgly,     0, super555, hgly,     gms_2layers_state, init_hgly,     ROT0,  "GMS", "Huangguan Leyuan (990726 CRG1.1)",                      MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                // stops during boot, patched for now. Also needs EEPROM support.
+GAMEL(2002, ballch,   0, super555, ballch,   gms_2layers_state, init_ballch,   ROT0,  "TVE", "Ball Challenge (20020607 1.0 OVERSEA)",                 MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_ballch ) // stops during boot, patched for now. Also needs EEPROM support.
+GAMEL(2005, cots,     0, super555, cots,     gms_2layers_state, init_cots,     ROT0,  "ECM", "Creatures of the Sea (20050328 USA 6.3)",               MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_cots )   // stops during boot, patched for now. Also needs EEPROM support.

@@ -3,7 +3,7 @@
 license:CC0-1.0
 copyright-holders:Vas Crabb
 
-Crazy Bugs control panel
+Ball Challenge control panel
 May or may not match arrangement/colour of real control panel
 -->
 <mamelayout version="2">
@@ -36,7 +36,7 @@ May or may not match arrangement/colour of real control panel
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.4" />
 		</text>
-		<text string="STOP ALL">
+		<text string="TAKE">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.5" width="1" height="0.4" />
 		</text>
@@ -49,13 +49,9 @@ May or may not match arrangement/colour of real control panel
 		<rect state="0">
 			<color red="0.15" green="0.0" blue="0.0" />
 		</rect>
-		<text string="STOP 1">
+		<text string="STOP A">
 			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.4" />
-		</text>
-		<text string="DOUBLE">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.5" width="1" height="0.4" />
+			<bounds x="0" y="0.3" width="1" height="0.4" />
 		</text>
 	</element>
 
@@ -66,11 +62,11 @@ May or may not match arrangement/colour of real control panel
 		<rect state="0">
 			<color red="0.15" green="0.0" blue="0.0" />
 		</rect>
-		<text string="STOP 2">
+		<text string="STOP B">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.4" />
 		</text>
-		<text string="SMALL">
+		<text string="TAKE">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.5" width="1" height="0.4" />
 		</text>
@@ -83,24 +79,7 @@ May or may not match arrangement/colour of real control panel
 		<rect state="0">
 			<color red="0.15" green="0.0" blue="0.0" />
 		</rect>
-		<text string="STOP 3">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.1" width="1" height="0.4" />
-		</text>
-		<text string="TAKE">
-			<color red="0.0" green="0.0" blue="0.0" />
-			<bounds x="0" y="0.5" width="1" height="0.4" />
-		</text>
-	</element>
-
-	<element name="big" defstate="0">
-		<rect state="1">
-			<color red="1.0" green="0.0" blue="0.0" />
-		</rect>
-		<rect state="0">
-			<color red="0.15" green="0.0" blue="0.0" />
-		</rect>
-		<text string="BIG">
+		<text string="STOP C">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.3" width="1" height="0.4" />
 		</text>
@@ -163,46 +142,39 @@ May or may not match arrangement/colour of real control panel
 			<color red="0.0" green="0.0" blue="0.0" />
 		</element>
 
-		<element ref="bet_b" name="lamp3" inputtag="TEST0" inputmask="0x02">
-			<bounds x="0.10" y="3.08" width="0.50" height="0.24" />
+		<element ref="bet_b" name="lamp2" inputtag="IN1" inputmask="0x0020">
+			<bounds x="0.10" y="3.08" width="0.60" height="0.24" />
 		</element>
-		<element ref="bet" name="lamp3" inputtag="TEST0" inputmask="0x02">
-			<bounds x="0.12" y="3.10" width="0.46" height="0.20" />
-		</element>
-
-		<element ref="stop_b" name="lamp5" inputtag="TEST2" inputmask="0x00020">
-			<bounds x="0.85" y="3.08" width="0.50" height="0.24" />
-		</element>
-		<element ref="stop1" name="lamp5" inputtag="TEST2" inputmask="0x00020">
-			<bounds x="0.87" y="3.10" width="0.46" height="0.20" />
+		<element ref="bet" name="lamp2" inputtag="IN1" inputmask="0x0020">
+			<bounds x="0.12" y="3.10" width="0.56" height="0.20" />
 		</element>
 
-		<element ref="stop_b" name="lamp2" inputtag="TEST2" inputmask="0x00008">
-			<bounds x="1.45" y="3.08" width="0.50" height="0.24" />
+		<element ref="stop_b" name="lamp4" inputtag="IN1" inputmask="0x0200">
+			<bounds x="0.95" y="3.08" width="0.60" height="0.24" />
 		</element>
-		<element ref="stop2" name="lamp2" inputtag="TEST2" inputmask="0x00008">
-			<bounds x="1.47" y="3.10" width="0.46" height="0.20" />
-		</element>
-
-		<element ref="stop_b" name="lamp4" inputtag="TEST2" inputmask="0x00010">
-			<bounds x="2.05" y="3.08" width="0.50" height="0.24" />
-		</element>
-		<element ref="stop3" name="lamp4" inputtag="TEST2" inputmask="0x00010">
-			<bounds x="2.07" y="3.10" width="0.46" height="0.20" />
+		<element ref="stop1" name="lamp4" inputtag="IN1" inputmask="0x0200">
+			<bounds x="0.97" y="3.10" width="0.56" height="0.20" />
 		</element>
 
-		<element ref="stop_b" name="lamp6" inputtag="TEST0" inputmask="0x80">
-			<bounds x="2.65" y="3.08" width="0.50" height="0.24" />
+		<element ref="stop_b" name="lamp5" inputtag="IN1" inputmask="0x0400">
+			<bounds x="1.70" y="3.08" width="0.60" height="0.24" />
 		</element>
-		<element ref="big" name="lamp6" inputtag="TEST0" inputmask="0x80">
-			<bounds x="2.67" y="3.10" width="0.46" height="0.20" />
+		<element ref="stop2" name="lamp5" inputtag="IN1" inputmask="0x0400">
+			<bounds x="1.72" y="3.10" width="0.56" height="0.20" />
 		</element>
 
-		<element ref="start_b" name="lamp1" inputtag="TEST1" inputmask="0x04">
-			<bounds x="3.40" y="3.08" width="0.50" height="0.24" />
+		<element ref="stop_b" name="lamp6" inputtag="IN1" inputmask="0x1000">
+			<bounds x="2.45" y="3.08" width="0.60" height="0.24" />
 		</element>
-		<element ref="start" name="lamp1" inputtag="TEST1" inputmask="0x04">
-			<bounds x="3.42" y="3.10" width="0.46" height="0.20" />
+		<element ref="stop3" name="lamp6" inputtag="IN1" inputmask="0x1000">
+			<bounds x="2.47" y="3.10" width="0.56" height="0.20" />
+		</element>
+
+		<element ref="start_b" name="lamp3" inputtag="IN1" inputmask="0x0008">
+			<bounds x="3.30" y="3.08" width="0.60" height="0.24" />
+		</element>
+		<element ref="start" name="lamp3" inputtag="IN1" inputmask="0x0008">
+			<bounds x="3.32" y="3.10" width="0.56" height="0.20" />
 		</element>
 	</view>
 </mamelayout>
