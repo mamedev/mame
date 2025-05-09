@@ -51,6 +51,15 @@ private:
 
 	uint8_t sound_read_external(offs_t offset) { return space(AS_PROGRAM).read_byte(offset); }
 
+
+	void vt369_soundcpu_timer_w(offs_t offset, uint8_t data);
+	void vt369_soundcpu_adder_data_address_w(offs_t offset, uint8_t data);
+	uint8_t vt369_soundcpu_adder_result_r(offs_t offset);
+	void vt369_soundcpu_mult_data_address_w(offs_t offset, uint8_t data);
+	uint8_t vt369_soundcpu_mult_result_r(offs_t offset);
+	uint8_t vt369_soundcpu_mult_status_r();
+	void vt369_soundcpu_dac_w(offs_t offset, uint8_t data);
+
 	required_device<vrt_vt1682_alu_device> m_alu;
 	required_device<cpu_device> m_soundcpu;
 	uint8_t m_relative[2];

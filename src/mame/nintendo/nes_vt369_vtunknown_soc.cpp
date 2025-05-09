@@ -168,21 +168,61 @@ void vt3xx_soc_base_device::vt369_map(address_map &map)
 	map(0x6000, 0x7fff).r(FUNC(vt3xx_soc_base_device::vt369_6000_r)).w(FUNC(vt3xx_soc_base_device::vt369_6000_w));
 
 	map(0x8000, 0xffff).rw(FUNC(vt3xx_soc_base_device::external_space_read), FUNC(vt3xx_soc_base_device::external_space_write));
-
 }
 
+void vt3xx_soc_base_device::vt369_soundcpu_timer_w(offs_t offset, uint8_t data)
+{
+	logerror("%s: vt369_soundcpu_timer_w %02x %02x\n", machine().describe_context(), offset, data);
+}
+
+void vt3xx_soc_base_device::vt369_soundcpu_adder_data_address_w(offs_t offset, uint8_t data)
+{
+	logerror("%s: vt369_soundcpu_adder_data_address_w %02x %02x\n", machine().describe_context(), offset, data);
+}
+
+uint8_t vt3xx_soc_base_device::vt369_soundcpu_adder_result_r(offs_t offset)
+{
+	logerror("%s: vt369_soundcpu_adder_result_r %02x\n", machine().describe_context(), offset);
+	return 0x00;
+}
+
+void vt3xx_soc_base_device::vt369_soundcpu_mult_data_address_w(offs_t offset, uint8_t data)
+{
+	logerror("%s: vt369_soundcpu_mult_data_address_w %02x %02x\n", machine().describe_context(), offset, data);
+}
+
+uint8_t vt3xx_soc_base_device::vt369_soundcpu_mult_result_r(offs_t offset)
+{
+	logerror("%s: vt369_soundcpu_mult_result_r %02x\n", machine().describe_context(), offset);
+	return 0x00;
+}
+
+uint8_t vt3xx_soc_base_device::vt369_soundcpu_mult_status_r()
+{
+	logerror("%s: vt369_soundcpu_mult_status_r\n", machine().describe_context());
+	return 0x00;
+}
+
+void vt3xx_soc_base_device::vt369_soundcpu_dac_w(offs_t offset, uint8_t data)
+{
+	// 2 16-bit channels?
+	logerror("%s: vt369_soundcpu_dac_w %02x %02x\n", machine().describe_context(), offset, data);
+}
 
 void vt3xx_soc_base_device::vt369_sound_map(address_map &map)
 {
 	map(0x0000, 0x17ff).ram();
 	map(0x1800, 0x1fff).ram().share("soundram");
-	//map(0x2100, 0x2103) // Timer Control (w)
-	//map(0x2205, 0x2206) // Adder Data(RAM) Address (w)
-	//map(0x2210, 0x2211) // Adder Result (r)
-	//map(0x2400, 0x2401) // Multiplier Data(RAM) Address (w)
-	//map(0x2402, 0x2403) // Multiplier Result (r)
-	//map(0x2404, 0x2404) // Multiplier Status (r) 
-	//map(0x2800, 0x2803) // DAC (w)
+
+	map(0x2100, 0x2103).w(FUNC(vt3xx_soc_base_device::vt369_soundcpu_timer_w));
+	// 0x2204
+	map(0x2205, 0x2206).w(FUNC(vt3xx_soc_base_device::vt369_soundcpu_adder_data_address_w));
+	// 0x2207
+	map(0x2210, 0x2211).r(FUNC(vt3xx_soc_base_device::vt369_soundcpu_adder_result_r));
+	map(0x2400, 0x2401).w(FUNC(vt3xx_soc_base_device::vt369_soundcpu_mult_data_address_w));
+	map(0x2402, 0x2403).r(FUNC(vt3xx_soc_base_device::vt369_soundcpu_mult_result_r));
+	map(0x2404, 0x2404).r(FUNC(vt3xx_soc_base_device::vt369_soundcpu_mult_status_r));
+	map(0x2800, 0x2803).w(FUNC(vt3xx_soc_base_device::vt369_soundcpu_dac_w));
 
 	map(0x4000, 0x4fff).r(FUNC(vt369_soc_introm_noswap_device::read_internal)); // some lexibook sets suggest the internal ROM can also appear here?
 
