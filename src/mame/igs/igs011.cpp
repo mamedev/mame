@@ -44,7 +44,8 @@ Year + Game                   PCB        Sound         Chips
 To do:
 
 - Implement the I/O part of IGS003 as an 8255
-- IGS003 parametric bitswap protection in lhb3, nkishusp, tygn (instead of patching the ROMs)
+- IGS003 parametric bitswap protection in lhb2cpgs, lhb3, nkishusp, tygn
+  (instead of patching the ROMs)
 - Interrupt controller at 838000 or a38000 (there's a preliminary implementation for lhb)
 - A few graphical bugs
 
@@ -63,8 +64,6 @@ To do:
 - lhb3: emulated game crashes with an illegal instruction error on bookkeeping menu
 
 - xymga: stop during attract mode with 'RECORD ERROR 3'
-
-- lhb2cpgs: decryption and protection simulation
 
 Notes:
 
@@ -131,6 +130,7 @@ public:
 	void init_drgnwrldv30() ATTR_COLD;
 	void init_drgnwrldv11h() ATTR_COLD;
 	void init_lhb2() ATTR_COLD;
+	void init_lhb2cpgs() ATTR_COLD;
 	void init_lhb3() ATTR_COLD;
 	void init_xymg() ATTR_COLD;
 	void init_xymga() ATTR_COLD;
@@ -269,19 +269,20 @@ protected:
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(lhb_vblank_irq);
-	void wlcc_decrypt();
-	void lhb_decrypt();
-	void drgnwrld_type3_decrypt();
-	void drgnwrld_type2_decrypt();
-	void drgnwrld_type1_decrypt();
-	void drgnwrldv40k_decrypt();
-	void lhb2_decrypt();
-	void nkishusp_decrypt();
-	void dbc_decrypt();
-	void ryukobou_decrypt();
-	void tygn_decrypt();
-	void lhb2_gfx_decrypt();
-	void drgnwrld_gfx_decrypt();
+	void wlcc_decrypt() ATTR_COLD;
+	void lhb_decrypt() ATTR_COLD;
+	void drgnwrld_type3_decrypt() ATTR_COLD;
+	void drgnwrld_type2_decrypt() ATTR_COLD;
+	void drgnwrld_type1_decrypt() ATTR_COLD;
+	void drgnwrldv40k_decrypt() ATTR_COLD;
+	void lhb2_decrypt() ATTR_COLD;
+	void lhb3_decrypt() ATTR_COLD;
+	void nkishusp_decrypt() ATTR_COLD;
+	void dbc_decrypt() ATTR_COLD;
+	void ryukobou_decrypt() ATTR_COLD;
+	void tygn_decrypt() ATTR_COLD;
+	void lhb2_gfx_decrypt() ATTR_COLD;
+	void drgnwrld_gfx_decrypt() ATTR_COLD;
 	void prot_mem_range_set();
 
 	void drgnwrld_mem(address_map &map) ATTR_COLD;
@@ -911,6 +912,34 @@ void igs011_state::lhb2_decrypt()
 	}
 
 	memcpy(src,&result_data[0],rom_size);
+}
+
+void igs011_state::lhb3_decrypt()
+{
+	const int rom_size = 0x80000;
+	u16 *src = (u16 *) (m_maincpu_region->base());
+	std::vector<u16> result_data(rom_size / 2);
+
+	for (int i = 0; i < rom_size / 2; i++)
+	{
+		u16 x = src[i];
+
+		// lhb2 address scrambling
+		const int j = bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 8, 11, 10, 9, 2, 7, 6, 5, 4, 3, 12, 1, 0);
+
+		if ((j & 0x0100) || (j & 0x0040) || ((j & 0x0010)&&(j & 0x0002)))
+			x ^= 0x00004;
+
+		if ((j & 0x5000) == 0x1000)
+			x ^= 0x0008;
+
+		if (!(j & 0x0004) || !(j & 0x2000) || (!(j & 0x0080) && !(j & 0x0010)))
+			x ^= 0x0020;
+
+		result_data[j] = x;
+	}
+
+	memcpy(src, &result_data[0], rom_size);
 }
 
 
@@ -2527,52 +2556,49 @@ void igs011_state::init_lhb2()
 */
 }
 
+void igs011_state::init_lhb2cpgs()
+{
+	lhb3_decrypt();
+	lhb2_gfx_decrypt();
+
+	// PROTECTION CHECKS (possibly incomplete)
+
+	u16 *rom = (u16 *) m_maincpu_region->base();
+
+	rom[0x2807a / 2] = 0x6036;
+	rom[0x2cd98 / 2] = 0x6036;
+	rom[0x31444 / 2] = 0x6036;
+	rom[0x32b7e / 2] = 0x6036;
+	rom[0x34e88 / 2] = 0x6036;
+	rom[0x3f144 / 2] = 0x6036;
+}
+
 void igs011_state::init_lhb3()
 {
-	const int rom_size = 0x80000;
-	u16 *src = (u16 *) (m_maincpu_region->base());
-	std::vector<u16> result_data(rom_size / 2);
-
-	for (int i = 0; i < rom_size / 2; i++)
-	{
-		u16 x = src[i];
-
-		// lhb2 address scrambling
-		const int j = bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 8, 11, 10, 9, 2, 7, 6, 5, 4, 3, 12, 1, 0);
-
-		if ((j & 0x0100) || (j & 0x0040) || ((j & 0x0010)&&(j & 0x0002)))
-			x ^= 0x00004;
-
-		if ((j & 0x5000) == 0x1000)
-			x ^= 0x0008;
-
-		if (!(j & 0x0004) || !(j & 0x2000) || (!(j & 0x0080) && !(j & 0x0010)))
-			x ^= 0x0020;
-
-		result_data[j] = x;
-	}
-
-	memcpy(src, &result_data[0], rom_size);
-
-	src[0x034a6 / 2] = 0x6042;
-	src[0x1a236 / 2] = 0x6034;
-	src[0x2534a / 2] = 0x6036;
-	src[0x283c8 / 2] = 0x6038;
-	src[0x2a8d6 / 2] = 0x6036;
-	src[0x2f076 / 2] = 0x6036;
-	src[0x3093e / 2] = 0x6036;
-	src[0x3321e / 2] = 0x6036;
-	src[0x33b68 / 2] = 0x6038;
-	src[0x3e608 / 2] = 0x6034;
-	src[0x3fb66 / 2] = 0x6036;
-	src[0x42bee / 2] = 0x6034;
-	src[0x45724 / 2] = 0x6034;
-	src[0x465e0 / 2] = 0x6036;
-	src[0x48e26 / 2] = 0x6000;
-	src[0x49496 / 2] = 0x6036;
-	src[0x4b85a / 2] = 0x6038;
-
+	lhb3_decrypt();
 	lhb2_gfx_decrypt();
+
+	// PROTECTION CHECKS (possibly incomplete)
+
+	u16 *rom = (u16 *) m_maincpu_region->base();
+
+	rom[0x034a6 / 2] = 0x6042;
+	rom[0x1a236 / 2] = 0x6034;
+	rom[0x2534a / 2] = 0x6036;
+	rom[0x283c8 / 2] = 0x6038;
+	rom[0x2a8d6 / 2] = 0x6036;
+	rom[0x2f076 / 2] = 0x6036;
+	rom[0x3093e / 2] = 0x6036;
+	rom[0x3321e / 2] = 0x6036;
+	rom[0x33b68 / 2] = 0x6038;
+	rom[0x3e608 / 2] = 0x6034;
+	rom[0x3fb66 / 2] = 0x6036;
+	rom[0x42bee / 2] = 0x6034;
+	rom[0x45724 / 2] = 0x6034;
+	rom[0x465e0 / 2] = 0x6036;
+	rom[0x48e26 / 2] = 0x6000;
+	rom[0x49496 / 2] = 0x6036;
+	rom[0x4b85a / 2] = 0x6038;
 }
 
 void igs011_state::init_tygn()
@@ -4875,7 +4901,7 @@ ROM_END
 
 ROM_START( lhb2cpgs )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "v127c.u29", 0x00000, 0x80000, CRC(c9609c9c) SHA1(f036e682b792033409966e84292a69275eaa05e5) )
+	ROM_LOAD16_WORD_SWAP( "v127c.u29", 0x00000, 0x80000, CRC(d6025580) SHA1(1aa4e248380d1e70ef18d81073b5ab578d848f89) )
 
 	ROM_REGION( 0x200000, "blitter", 0 )
 	ROM_LOAD( "igsm0501.u7", 0x00000, 0x200000, CRC(1c952bd6) SHA1(a6b6f1cdfb29647e81c032ffe59c94f1a10ceaf8) )
@@ -5155,7 +5181,7 @@ GAME( 1995, lhbv33c,       lhb,      lhb,             lhb,       igs011_state, i
 GAME( 1995, dbc,           lhb,      lhb,             lhb,       igs011_state, init_dbc,          ROT0, "IGS",                     "Daai Baan Sing (Hong Kong, V027H)",                MACHINE_SUPPORTS_SAVE )
 GAME( 1995, ryukobou,      lhb,      lhb,             lhb,       igs011_state, init_ryukobou,     ROT0, "IGS / Alta",              "Mahjong Ryukobou (Japan, V030J)",                  MACHINE_SUPPORTS_SAVE )
 GAME( 1996, lhb2,          0,        lhb2,            lhb2,      igs011_state, init_lhb2,         ROT0, "IGS",                     "Lung Fu Bong II (Hong Kong, V185H)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1996, lhb2cpgs,      lhb2,     lhb2,            lhb2,      igs011_state, empty_init,        ROT0, "IGS",                     "Long Hu Bang II: Cuo Pai Gaoshou (China, V127C)",  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // missing decryption / protection simulation
+GAME( 1996, lhb2cpgs,      lhb2,     lhb2,            lhb2,      igs011_state, init_lhb2cpgs,     ROT0, "IGS",                     "Long Hu Bang II: Cuo Pai Gaoshou (China, V127C)",  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ROM patches
 GAME( 1996, tygn,          lhb2,     tygn,            tygn,      igs011_state, init_tygn,         ROT0, "IGS",                     "Te Yi Gong Neng (China, V632C)",                   MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ROM patches
 GAME( 1996, lhb3,          lhb2,     nkishusp,        lhb2,      igs011_state, init_lhb3,         ROT0, "IGS",                     "Long Hu Bang III: Cuo Pai Gaoshou (China, V242C)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ROM patches
 GAME( 1996, xymg,          0,        xymg,            xymg,      igs011_state, init_xymg,         ROT0, "IGS",                     "Xingyun Manguan (China, V651C, set 1)",            MACHINE_SUPPORTS_SAVE )
