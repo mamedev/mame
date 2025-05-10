@@ -33,12 +33,12 @@ protected:
 	required_ioport             m_config;
 };
 
-h_8_1_device::h_8_1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
-	device_t(mconfig, H8BUS_H_8_1, tag, owner, 0),
-	device_h8bus_card_interface(mconfig, *this),
-	m_ram(*this, "ram", 0x2000U, ENDIANNESS_LITTLE),
-	m_jumpers(*this, "JUMPERS"),
-	m_config(*this, "CONFIG")
+h_8_1_device::h_8_1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, H8BUS_H_8_1, tag, owner, 0)
+	, device_h8bus_card_interface(mconfig, *this)
+	, m_ram(*this, "ram", 0x2000U, ENDIANNESS_LITTLE)
+	, m_jumpers(*this, "JUMPERS")
+	, m_config(*this, "CONFIG")
 {
 }
 

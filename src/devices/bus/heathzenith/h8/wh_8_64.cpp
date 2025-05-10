@@ -55,12 +55,12 @@ protected:
 };
 
 
-wh_8_64_device::wh_8_64_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
-	device_t(mconfig, H8BUS_WH_8_64, tag, owner, 0),
-	device_h8bus_card_interface(mconfig, *this),
-	m_ram(*this, "rambank%u", 0U, 0x2000U, ENDIANNESS_LITTLE),
-	m_sw(*this, "SW%u", 1U),
-	m_config(*this, "CONFIG")
+wh_8_64_device::wh_8_64_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, H8BUS_WH_8_64, tag, owner, 0)
+	, device_h8bus_card_interface(mconfig, *this)
+	, m_ram(*this, "rambank%u", 0U, 0x2000U, ENDIANNESS_LITTLE)
+	, m_sw(*this, "SW%u", 1U)
+	, m_config(*this, "CONFIG")
 {
 }
 

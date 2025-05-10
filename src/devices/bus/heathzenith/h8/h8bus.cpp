@@ -69,16 +69,16 @@ device_h8bus_p2_card_interface::~device_h8bus_p2_card_interface()
 
 DEFINE_DEVICE_TYPE(H8BUS_SLOT, h8bus_slot_device, "h8bus_slot", "Heath H-8 slot")
 
-h8bus_slot_device::h8bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	h8bus_slot_device(mconfig, H8BUS_SLOT, tag, owner, clock)
+h8bus_slot_device::h8bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: h8bus_slot_device(mconfig, H8BUS_SLOT, tag, owner, clock)
 {
 }
 
-h8bus_slot_device::h8bus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, type, tag, owner, clock),
-	device_single_card_slot_interface(mconfig, *this),
-	m_h8bus(*this, finder_base::DUMMY_TAG),
-	m_h8bus_slottag(nullptr)
+h8bus_slot_device::h8bus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_single_card_slot_interface(mconfig, *this)
+	, m_h8bus(*this, finder_base::DUMMY_TAG)
+	, m_h8bus_slottag(nullptr)
 {
 }
 
@@ -101,18 +101,18 @@ void h8bus_slot_device::device_resolve_objects()
 
 DEFINE_DEVICE_TYPE(H8BUS, h8bus_device, "h8bus", "Heathkit H8 bus (Benton Harbor Bus)")
 
-h8bus_device::h8bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	h8bus_device(mconfig, H8BUS, tag, owner, clock)
+h8bus_device::h8bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: h8bus_device(mconfig, H8BUS, tag, owner, clock)
 {
 }
 
-h8bus_device::h8bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, type, tag, owner, clock),
-	device_memory_interface(mconfig, *this),
-	m_mem_config("mem", ENDIANNESS_LITTLE, 16, 16, 0, address_map_constructor(FUNC(h8bus_device::mem_map), this)),
-	m_io_config("io", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(h8bus_device::io_map), this)),
-	m_p1_card(nullptr),
-	m_p2_card(nullptr)
+h8bus_device::h8bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_memory_interface(mconfig, *this)
+	, m_mem_config("mem", ENDIANNESS_LITTLE, 16, 16, 0, address_map_constructor(FUNC(h8bus_device::mem_map), this))
+	, m_io_config("io", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(h8bus_device::io_map), this))
+	, m_p1_card(nullptr)
+	, m_p2_card(nullptr)
 {
 }
 

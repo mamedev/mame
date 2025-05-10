@@ -76,16 +76,16 @@ protected:
 };
 
 
-front_panel_device::front_panel_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
-	device_t(mconfig, H8BUS_FRONT_PANEL, tag, owner, 0),
-	device_h8bus_p1_card_interface(mconfig, *this),
-	m_beep(*this, "beeper"),
-	m_io_keyboard(*this, "X%u", 0U),
-	m_digits(*this, "digit%u", 0U),
-	m_mon_led(*this, "mon_led"),
-	m_pwr_led(*this, "pwr_led"),
-	m_ion_led(*this, "ion_led"),
-	m_run_led(*this, "run_led")
+front_panel_device::front_panel_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, H8BUS_FRONT_PANEL, tag, owner, 0)
+	, device_h8bus_p1_card_interface(mconfig, *this)
+	, m_beep(*this, "beeper")
+	, m_io_keyboard(*this, "X%u", 0U)
+	, m_digits(*this, "digit%u", 0U)
+	, m_mon_led(*this, "mon_led")
+	, m_pwr_led(*this, "pwr_led")
+	, m_ion_led(*this, "ion_led")
+	, m_run_led(*this, "run_led")
 {
 }
 

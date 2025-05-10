@@ -88,6 +88,9 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
+	void handle_int1();
+	void handle_int2();
+
 private:
 	void h8_status_callback(u8 data);
 	void h8_inte_callback(int state);
@@ -105,16 +108,20 @@ private:
 	required_ioport                    m_config;
 
 	bool m_m1_state;
-	bool m_allow_int1;
-	bool m_allow_int2;
+	bool m_allow_bus_int1;
+	bool m_allow_bus_int2;
+	bool m_p201_int1;
+	bool m_p201_int2;
+	bool m_bus_int1;
+	bool m_bus_int2;
 };
 
-h_8_cpu_8080_device::h_8_cpu_8080_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
-	device_t(mconfig, H8BUS_CPU_8080, tag, owner, 0),
-	device_h8bus_p2_card_interface(mconfig, *this),
-	m_maincpu(*this, "maincpu"),
-	m_intr_socket(*this, "intr_socket"),
-	m_config(*this, "CONFIG")
+h_8_cpu_8080_device::h_8_cpu_8080_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, H8BUS_CPU_8080, tag, owner, 0)
+	, device_h8bus_p2_card_interface(mconfig, *this)
+	, m_maincpu(*this, "maincpu")
+	, m_intr_socket(*this, "intr_socket")
+	, m_config(*this, "CONFIG")
 {
 }
 
@@ -137,17 +144,21 @@ void h_8_cpu_8080_device::h8_status_callback(u8 data)
 
 void h_8_cpu_8080_device::int1_w(int state)
 {
-	if (m_allow_int1)
+	if (m_allow_bus_int1)
 	{
-		m_intr_socket->set_irq_level(1, state);
+		m_bus_int1 = bool(state);
+
+		handle_int1();
 	}
 }
 
 void h_8_cpu_8080_device::int2_w(int state)
 {
-	if (m_allow_int2)
+	if (m_allow_bus_int2)
 	{
-		m_intr_socket->set_irq_level(2, state);
+		m_bus_int2 = bool(state);
+
+		handle_int2();
 	}
 }
 
@@ -188,13 +199,29 @@ void h_8_cpu_8080_device::p201_reset_w(int state)
 
 void h_8_cpu_8080_device::p201_int1_w(int state)
 {
-	m_intr_socket->set_irq_level(1, state);
+	m_p201_int1 = bool(state);
+
+	handle_int1();
 }
 
 void h_8_cpu_8080_device::p201_int2_w(int state)
 {
-	m_intr_socket->set_irq_level(2, state);
+	m_p201_int2 = bool(state);
+
+	handle_int2();
 }
+
+void h_8_cpu_8080_device::handle_int1()
+{
+	m_intr_socket->set_irq_level(1, (m_p201_int1 || m_bus_int1) ? ASSERT_LINE : CLEAR_LINE);
+
+}
+
+void h_8_cpu_8080_device::handle_int2()
+{
+	m_intr_socket->set_irq_level(2, (m_p201_int2 || m_bus_int2) ? ASSERT_LINE : CLEAR_LINE);
+}
+
 
 static void intr_ctrl_options(device_slot_interface &device)
 {
@@ -273,18 +300,26 @@ const tiny_rom_entry *h_8_cpu_8080_device::device_rom_region() const
 void h_8_cpu_8080_device::device_start()
 {
 	save_item(NAME(m_m1_state));
+	save_item(NAME(m_p201_int1));
+	save_item(NAME(m_p201_int2));
+	save_item(NAME(m_bus_int1));
+	save_item(NAME(m_bus_int2));
 
 	h8bus().set_clock(m_maincpu->clock());
 }
 
 void h_8_cpu_8080_device::device_reset()
 {
-	m_m1_state = 0;
+	m_m1_state  = false;
+	m_p201_int1 = false;
+	m_p201_int2 = false;
+	m_bus_int1  = false;
+	m_bus_int2  = false;
 
 	ioport_value const config(m_config->read());
 
-	m_allow_int1 = bool(BIT(config, 0));
-	m_allow_int2 = bool(BIT(config, 1));
+	m_allow_bus_int1 = bool(BIT(config, 0));
+	m_allow_bus_int2 = bool(BIT(config, 1));
 }
 
 void h_8_cpu_8080_device::device_add_mconfig(machine_config &config)

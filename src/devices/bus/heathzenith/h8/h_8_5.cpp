@@ -69,16 +69,15 @@ protected:
 	bool m_cassold;
 };
 
-h_8_5_device::h_8_5_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
-	device_t(mconfig, H8BUS_H_8_5, tag, owner, 0),
-	device_h8bus_card_interface(mconfig, *this),
-	m_uart(*this, "uart"),
-	m_console(*this, "console"),
-	m_cass_player(*this, "cassette_player"),
-	m_cass_recorder(*this, "cassette_recorder")
+h_8_5_device::h_8_5_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, H8BUS_H_8_5, tag, owner, 0)
+	, device_h8bus_card_interface(mconfig, *this)
+	, m_uart(*this, "uart")
+	, m_console(*this, "console")
+	, m_cass_player(*this, "cassette_player")
+	, m_cass_recorder(*this, "cassette_recorder")
 {
 }
-
 
 TIMER_DEVICE_CALLBACK_MEMBER(h_8_5_device::kansas_w)
 {
