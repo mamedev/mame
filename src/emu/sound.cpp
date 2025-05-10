@@ -1124,15 +1124,13 @@ void sound_manager::resume()
 
 void sound_manager::config_load(config_type cfg_type, config_level cfg_level, util::xml::data_node const *parentnode)
 {
-	// If no config file, ignore
-	if(!parentnode) {
-		if(cfg_type == config_type::SYSTEM) {
-			// Note that the per-system config is loaded
-			m_osd_info.m_generation = 0xffffffff;
-		}
+	if(cfg_type == config_type::FINAL)
+		// Note that the config is loaded
+		m_osd_info.m_generation = 0xffffffff;
 
+	// If no config file, ignore
+	if(!parentnode)
 		return;
-	}
 
 	switch(cfg_type) {
 	case config_type::INIT:
@@ -1220,9 +1218,6 @@ void sound_manager::config_load(config_type cfg_type, config_level cfg_level, ut
 																								cmap->get_attribute_int("node_channel", 0),
 																								cmap->get_attribute_float("db", 0)));
 		}
-
-		// Note that the per-system config is loaded
-		m_osd_info.m_generation = 0xffffffff;
 		break;
 	}
 
