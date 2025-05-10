@@ -100,6 +100,7 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/input/input_xinput.h",
 		MAME_DIR .. "src/osd/modules/lib/osdobj_common.cpp",
 		MAME_DIR .. "src/osd/modules/lib/osdobj_common.h",
+		MAME_DIR .. "src/osd/modules/lib/osdlib.h",
 		MAME_DIR .. "src/osd/modules/midi/midi_module.h",
 		MAME_DIR .. "src/osd/modules/midi/none.cpp",
 		MAME_DIR .. "src/osd/modules/midi/portmidi.cpp",
@@ -120,6 +121,7 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/output/network.cpp",
 		MAME_DIR .. "src/osd/modules/output/none.cpp",
 		MAME_DIR .. "src/osd/modules/output/output_module.h",
+		MAME_DIR .. "src/osd/modules/output/serial.cpp",
 		MAME_DIR .. "src/osd/modules/output/win32_output.cpp",
 		MAME_DIR .. "src/osd/modules/output/win32_output.h",
 		MAME_DIR .. "src/osd/modules/render/blit13.ipp",
@@ -140,10 +142,12 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/sound/sound_module.cpp",
 		MAME_DIR .. "src/osd/modules/sound/sound_module.h",
 		MAME_DIR .. "src/osd/modules/sound/xaudio2_sound.cpp",
+		MAME_DIR .. "3rdparty/serial/src/serial.cc",
 	}
 	includedirs {
 		MAME_DIR .. "src/osd",
 		ext_includedir("asio"),
+		MAME_DIR .. "3rdparty/serial/include",
 	}
 
 	if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") then
@@ -162,7 +166,37 @@ function osdmodulesbuild()
 		includedirs {
 			MAME_DIR .. "3rdparty/compat/winsdk-override",
 		}
+
+		files {
+			MAME_DIR .. "3rdparty/serial/src/impl/win.cc",
+			MAME_DIR .. "3rdparty/serial/src/impl/list_ports/list_ports_win.cc",
+		}
+	else
+		files {
+			MAME_DIR .. "3rdparty/serial/src/impl/unix.cc",
+			MAME_DIR .. "3rdparty/serial/src/impl/list_ports/list_ports_linux.cc",
+		}
+		if _OPTIONS["targetos"]=="macosx" then
+			files {
+				MAME_DIR .. "3rdparty/serial/src/impl/list_ports/list_ports_osx.cc",
+			}
+		end
 	end
+
+	-- Disable warnings for third-party serial library
+	configuration { "3rdparty/serial/**" }
+		buildoptions {
+			"-Wno-error",
+			"-Wno-unused-parameter",
+			"-Wno-redefine",
+			"-Wno-macro-redefined",
+			"-Wno-redundant-decls",
+		}
+		defines {
+			"__STDC_WANT_LIB_EXT1__=1",
+			"NOMINMAX",  -- Prevent Windows min/max macro definitions
+		}
+	configuration { }
 
 	if _OPTIONS["NO_OPENGL"]=="1" then
 		defines {

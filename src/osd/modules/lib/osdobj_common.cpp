@@ -46,6 +46,10 @@ const options_entry osd_options::s_option_entries[] =
 	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "OSD OUTPUT OPTIONS" },
 	{ OSD_OUTPUT_PROVIDER,                       OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "provider for output notifications: " },
 
+	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "OSD SERIAL OPTIONS" },
+	{ OSDOPTION_SERIAL_PORT,                     "COM1",           core_options::option_type::STRING,    "serial port path (e.g. COM1 on Windows or /dev/ttyS0 on Linux)" },
+	{ OSDOPTION_SERIAL_BAUDRATE,                 "9600",           core_options::option_type::INTEGER,   "serial port baud rate (default: 9600)" },
+
 	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "OSD INPUT OPTIONS" },
 	{ OSD_KEYBOARDINPUT_PROVIDER,                OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "provider for keyboard input: " },
 	{ OSD_MOUSEINPUT_PROVIDER,                   OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "provider for mouse input: " },
@@ -330,6 +334,7 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, OUTPUT_CONSOLE);
 	REGISTER_MODULE(m_mod_man, OUTPUT_NETWORK);
 	REGISTER_MODULE(m_mod_man, OUTPUT_WIN32);
+	REGISTER_MODULE(m_mod_man, OUTPUT_SERIAL);
 
 
 	// after initialization we know which modules are supported
