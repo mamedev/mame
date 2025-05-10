@@ -68,11 +68,19 @@
 
 // Single Step
 #define LOG_SS    (1U << 1)
+#define LOG_SETUP (1U << 2)
 
-#define VERBOSE (0)
+#define VERBOSE (LOG_SETUP)
 #include "logmacro.h"
 
 #define LOGSS(...)    LOGMASKED(LOG_SS,    __VA_ARGS__)
+#define LOGSETUP(...) LOGMASKED(LOG_SETUP, __VA_ARGS__)
+
+#ifdef _MSC_VER
+#define FUNCNAME __func__
+#else
+#define FUNCNAME __PRETTY_FUNCTION__
+#endif
 
 
 namespace {
@@ -83,19 +91,19 @@ namespace {
 class h89_base_state : public driver_device
 {
 protected:
-	h89_base_state(const machine_config &mconfig, device_type type, const char *tag):
-		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_maincpu_region(*this, "maincpu"),
-		m_mem_view(*this, "rom_bank"),
-		m_ram(*this, RAM_TAG),
-		m_floppy_ram(*this, "floppyram"),
-		m_tlbc(*this, "tlbc"),
-		m_intr_socket(*this, "intr_socket"),
-		m_h89bus(*this, "h89bus"),
-		m_console(*this, "console"),
-		m_config(*this, "CONFIG"),
-		m_sw501(*this, "SW501")
+	h89_base_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_maincpu_region(*this, "maincpu")
+		, m_mem_view(*this, "rom_bank")
+		, m_ram(*this, RAM_TAG)
+		, m_floppy_ram(*this, "floppyram")
+		, m_tlbc(*this, "tlbc")
+		, m_intr_socket(*this, "intr_socket")
+		, m_h89bus(*this, "h89bus")
+		, m_console(*this, "console")
+		, m_config(*this, "CONFIG")
+		, m_sw501(*this, "SW501")
 	{
 	}
 
@@ -177,15 +185,15 @@ protected:
 
 /**
  * Heathkit H88
- *  - BIOS MTR-88
+ *  - ROM MTR-88
  *  - H-88-5 Cassette Interface Board
  *
  */
 class h88_state : public h89_base_state
 {
 public:
-	h88_state(const machine_config &mconfig, device_type type, const char *tag):
-		h89_base_state(mconfig, type, tag)
+	h88_state(const machine_config &mconfig, device_type type, const char *tag)
+		: h89_base_state(mconfig, type, tag)
 	{
 	}
 
@@ -201,8 +209,8 @@ public:
 class h89_state : public h89_base_state
 {
 public:
-	h89_state(const machine_config &mconfig, device_type type, const char *tag):
-		h89_base_state(mconfig, type, tag)
+	h89_state(const machine_config &mconfig, device_type type, const char *tag)
+		: h89_base_state(mconfig, type, tag)
 	{
 	}
 
@@ -212,8 +220,8 @@ public:
 class h89_cdr_state : public h89_base_state
 {
 public:
-	h89_cdr_state(const machine_config &mconfig, device_type type, const char *tag):
-		h89_base_state(mconfig, type, tag)
+	h89_cdr_state(const machine_config &mconfig, device_type type, const char *tag)
+		: h89_base_state(mconfig, type, tag)
 	{
 	}
 
@@ -243,8 +251,8 @@ public:
 class h89_mms_state : public h89_base_state
 {
 public:
-	h89_mms_state(const machine_config &mconfig, device_type type, const char *tag):
-		h89_base_state(mconfig, type, tag)
+	h89_mms_state(const machine_config &mconfig, device_type type, const char *tag)
+		: h89_base_state(mconfig, type, tag)
 	{
 	}
 
@@ -700,18 +708,42 @@ void h89_base_state::machine_reset()
 {
 	if (!m_installed)
 	{
-		m_h89bus->install_io_device(0xe8, 0xef,
-			read8sm_delegate(*m_console, FUNC(ins8250_device::ins8250_r)),
-			write8sm_delegate(*m_console, FUNC(ins8250_device::ins8250_w)));
-		m_h89bus->install_io_device(0xf0, 0xf1,
-			read8smo_delegate(*this, FUNC(h89_base_state::raise_NMI_r)),
-			write8smo_delegate(*this, FUNC(h89_base_state::raise_NMI_w)));
-		m_h89bus->install_io_device(0xf2, 0xf2,
-			read8smo_delegate(*this, FUNC(h89_base_state::read_sw)),
-			write8smo_delegate(*this, FUNC(h89_base_state::port_f2_w)));
-		m_h89bus->install_io_device(0xfa, 0xfb,
-			read8smo_delegate(*this, FUNC(h89_base_state::raise_NMI_r)),
-			write8smo_delegate(*this, FUNC(h89_base_state::raise_NMI_w)));
+		// Console/Terminal address
+		h89bus::addr_ranges term_ranges = m_h89bus->get_address_ranges(h89bus::IO_TERM);
+		if (term_ranges.size() == 1)
+		{
+			h89bus::addr_range range = term_ranges.front();
+
+			m_h89bus->install_io_device(range.first, range.second,
+				read8sm_delegate(*m_console, FUNC(ins8250_device::ins8250_r)),
+				write8sm_delegate(*m_console, FUNC(ins8250_device::ins8250_w)));
+		}
+
+		h89bus::addr_ranges nmi_ranges = m_h89bus->get_address_ranges(h89bus::IO_NMI);
+
+		// Multiple ranges cause a NMI interrupt to occur, loop through all.
+		for (h89bus::addr_range range : nmi_ranges)
+		{
+			m_h89bus->install_io_device(range.first, range.second,
+				read8smo_delegate(*this, FUNC(h89_base_state::raise_NMI_r)),
+				write8smo_delegate(*this, FUNC(h89_base_state::raise_NMI_w)));
+		}
+
+		h89bus::addr_ranges gpp_ranges = m_h89bus->get_address_ranges(h89bus::IO_GPP);
+
+		for (h89bus::addr_range range : gpp_ranges)
+		{
+			// check for the first single address, MMS piggy-backed on this select
+			// line, the proper one for the CPU board GPP port is a single address
+			if (range.first == range.second)
+			{
+				m_h89bus->install_io_device(range.first, range.second,
+					read8smo_delegate(*this, FUNC(h89_base_state::read_sw)),
+					write8smo_delegate(*this, FUNC(h89_base_state::port_f2_w)));
+
+				break;
+			}
+		}
 
 		m_installed = true;
 	}
@@ -949,10 +981,10 @@ void h89_base_state::h89_right_p506_cards(device_slot_interface &device)
 
 static void io_decoder_options(device_slot_interface &device)
 {
-	device.option_add("h88",   H89BUS_IO_DECODE_444_43);
-	device.option_add("heath", H89BUS_IO_DECODE_444_61);
-	device.option_add("mms",   H89BUS_IO_DECODE_MMS_61C);
-	device.option_add("cdr",   H89BUS_IO_DECODE_CDR_86);
+	device.option_add("444_43",  H89BUS_IO_DECODER_444_43);
+	device.option_add("444_61",  H89BUS_IO_DECODER_444_61);
+	device.option_add("mms_61c", H89BUS_IO_DECODER_MMS_61C);
+	device.option_add("cdr86",   H89BUS_IO_DECODER_CDR_86);
 }
 
 void h89_base_state::h89_base(machine_config &config)
@@ -1014,7 +1046,8 @@ void h88_state::h88(machine_config &config)
 
 	H89BUS_RIGHT_SLOT(config.replace(), "p504", "h89bus", [this](device_slot_interface &device) { h89_right_cards(device); }, "h_88_5");
 
-	H89BUS_IO_DECODE_SOCKET(config, "h89bus:io_decoder", io_decoder_options, "h88");
+	LOGSETUP("%s: about to call set_io_prom_tag\n", FUNCNAME);
+	H89BUS_IO_DECODER_SOCKET(config, "h89bus:io_decoder", io_decoder_options, "444_43");
 }
 
 void h89_state::h89(machine_config &config)
@@ -1026,7 +1059,8 @@ void h89_state::h89(machine_config &config)
 
 	H89BUS_RIGHT_SLOT(config.replace(), "p504", "h89bus", [this](device_slot_interface &device) { h89_right_cards(device); }, "z37fdc");
 
-	H89BUS_IO_DECODE_SOCKET(config, "h89bus:io_decoder", io_decoder_options, "heath");
+	LOGSETUP("%s: about to call set_io_prom_tag\n", FUNCNAME);
+	H89BUS_IO_DECODER_SOCKET(config, "h89bus:io_decoder", io_decoder_options, "444_61");
 }
 
 void h89_cdr_state::h89_cdr(machine_config &config)
@@ -1038,7 +1072,8 @@ void h89_cdr_state::h89_cdr(machine_config &config)
 
 	H89BUS_RIGHT_SLOT(config.replace(), "p504", "h89bus", [this](device_slot_interface &device) { h89_right_cards(device); }, "cdr_fdc");
 
-	H89BUS_IO_DECODE_SOCKET(config, "h89bus:io_decoder", io_decoder_options, "cdr");
+	LOGSETUP("%s: about to call set_io_prom_tag\n", FUNCNAME);
+	H89BUS_IO_DECODER_SOCKET(config, "h89bus:io_decoder", io_decoder_options, "cdr86");
 }
 
 void h89_mms_state::h89_mms(machine_config &config)
@@ -1052,7 +1087,8 @@ void h89_mms_state::h89_mms(machine_config &config)
 	m_intr_socket->set_default_option("mms");
 	m_intr_socket->set_fixed(true);
 
-	H89BUS_IO_DECODE_SOCKET(config, "h89bus:io_decoder", io_decoder_options, "mms");
+	LOGSETUP("%s: about to call set_io_prom_tag\n", FUNCNAME);
+	H89BUS_IO_DECODER_SOCKET(config, "h89bus:io_decoder", io_decoder_options, "mms_61c");
 }
 
 #define ROM_H17 \

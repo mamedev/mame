@@ -24,7 +24,7 @@
 #define LOG_DATA  (1U << 7)    // data read/writes
 #define LOG_SETUP (1U << 8)    // setup
 
-#define VERBOSE (0xff)
+#define VERBOSE (0)
 
 #include "logmacro.h"
 
@@ -85,24 +85,24 @@ private:
 	required_device<fd1797_device>             m_fdc;
 	required_device_array<floppy_connector, 4> m_floppies;
 
-	bool                                       m_installed;
-	bool                                       m_irq_allowed;
+	bool m_installed;
+	bool m_irq_allowed;
 
-	bool                                       m_irq;
-	bool                                       m_drq;
+	bool m_irq;
+	bool m_drq;
 
-	bool                                       m_double_density;
-	bool                                       m_five_in_drive;
-	bool                                       m_mode_operate;
-	s8                                         m_drive;
+	bool m_double_density;
+	bool m_five_in_drive;
+	bool m_mode_operate;
+	s8   m_drive;
 };
 
 
-cdr_fdc_880h_device::cdr_fdc_880h_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
-	device_t(mconfig, H89BUS_CDR_FDC_880H, tag, owner, 0),
-	device_h89bus_right_card_interface(mconfig, *this),
-	m_fdc(*this, "cdr_fdc_880h"),
-	m_floppies(*this, "cdr_fdc_880h:%u", 0U)
+cdr_fdc_880h_device::cdr_fdc_880h_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, H89BUS_CDR_FDC_880H, tag, owner, 0)
+	, device_h89bus_right_card_interface(mconfig, *this)
+	, m_fdc(*this, "cdr_fdc_880h")
+	, m_floppies(*this, "cdr_fdc_880h:%u", 0U)
 {
 }
 
@@ -183,27 +183,27 @@ void cdr_fdc_880h_device::write(offs_t offset, u8 data)
 
 	switch (offset)
 	{
-	case 0:
-	case 1:
-	case 2:
-		// read not supported on these addresses
-		LOGERR("%s: Unexpected port read reg: %d\n", FUNCNAME, offset);
-		break;
-	case 3: // Select Port
-		cmd_w(data);
-		break;
-	case 4: // Command Port
-		m_fdc->cmd_w(data);
-		break;
-	case 5: // Track Port
-		m_fdc->track_w(data);
-		break;
-	case 6: // Sector Port
-		m_fdc->sector_w(data);
-		break;
-	case 7: // Data Port
-		data_w(data);
-		break;
+		case 0:
+		case 1:
+		case 2:
+			// read not supported on these addresses
+			LOGERR("%s: Unexpected port read reg: %d\n", FUNCNAME, offset);
+			break;
+		case 3: // Select Port
+			cmd_w(data);
+			break;
+		case 4: // Command Port
+			m_fdc->cmd_w(data);
+			break;
+		case 5: // Track Port
+			m_fdc->track_w(data);
+			break;
+		case 6: // Sector Port
+			m_fdc->sector_w(data);
+			break;
+		case 7: // Data Port
+			data_w(data);
+			break;
 	}
 }
 
@@ -211,24 +211,24 @@ u8 cdr_fdc_880h_device::status_r()
 {
 	u8 data = 0;
 
-	switch(m_drive)
+	switch (m_drive)
 	{
-	case 0:
-		data |= 0x0e;
-		break;
-	case 1:
-		data |= 0x0d;
-		break;
-	case 2:
-		data |= 0x0b;
-		break;
-	case 3:
-		data |= 0x07;
-		break;
-	case -1:
-	default:
-		data |= 0x0f;
-		break;
+		case 0:
+			data |= 0x0e;
+			break;
+		case 1:
+			data |= 0x0d;
+			break;
+		case 2:
+			data |= 0x0b;
+			break;
+		case 3:
+			data |= 0x07;
+			break;
+		case -1:
+		default:
+			data |= 0x0f;
+			break;
 	}
 	data |= m_mode_operate ? 0x10 : 0;
 	data |= m_five_in_drive ? 0 : 0x20;
@@ -267,27 +267,27 @@ u8 cdr_fdc_880h_device::read(offs_t offset)
 
 	switch (offset)
 	{
-	case 0:
-	case 1:
-	case 2:
-		// read not supported on these addresses
-		LOGERR("%s: Unexpected port read reg: %d\n", FUNCNAME, offset);
-		break;
-	case 3: // ??
-		value = status_r();
-		break;
-	case 4: // Drive Status Port
-		value = m_fdc->status_r();
-		break;
-	case 5: // Track Port
-		value = m_fdc->track_r();
-		break;
-	case 6: // Sector Port
-		value = m_fdc->sector_r();
-		break;
-	case 7: // Data Port
-		value = data_r();
-		break;
+		case 0:
+		case 1:
+		case 2:
+			// read not supported on these addresses
+			LOGERR("%s: Unexpected port read reg: %d\n", FUNCNAME, offset);
+			break;
+		case 3: // ??
+			value = status_r();
+			break;
+		case 4: // Drive Status Port
+			value = m_fdc->status_r();
+			break;
+		case 5: // Track Port
+			value = m_fdc->track_r();
+			break;
+		case 6: // Sector Port
+			value = m_fdc->sector_r();
+			break;
+		case 7: // Data Port
+			value = data_r();
+			break;
 	}
 
 	LOGREG("%s: reg: %d val: 0x%02x\n", FUNCNAME, offset, value);
@@ -309,20 +309,19 @@ void cdr_fdc_880h_device::device_reset()
 {
 	if (!m_installed)
 	{
-		std::pair<u8, u8>  addr = h89bus().get_address_range(h89bus::IO_CASS);
+		h89bus::addr_ranges  addr_ranges = h89bus().get_address_ranges(h89bus::IO_CASS);
 
-		// only install if non-zero address
-		if (addr.first)
+		if (addr_ranges.size() == 1)
 		{
-			LOGSETUP("%s: Address start: 0x%02x, end: 0x%02x\n", addr.first, addr.second);
+			h89bus::addr_range range = addr_ranges.front();
 
-			h89bus().install_io_device(addr.first, addr.second,
+			h89bus().install_io_device(range.first, range.second,
 				read8sm_delegate(*this, FUNC(cdr_fdc_880h_device::read)),
 				write8sm_delegate(*this, FUNC(cdr_fdc_880h_device::write)));
 		}
 		else
 		{
-			LOGSETUP("%s: No address specified - Address start: 0x%02x, end: 0x%02x\n", addr.first, addr.second);
+			LOGSETUP("%s: No address specified\n", FUNCNAME);
 		}
 
 		m_installed = true;

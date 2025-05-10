@@ -21,6 +21,7 @@
 #define LOG_ERR   (1U << 5)    // log errors
 #define LOG_BURST (1U << 6)    // burst mode
 #define LOG_DATA  (1U << 7)    // data read/writes
+#define LOG_SETUP (1U << 8)
 
 #define VERBOSE (0)
 
@@ -33,6 +34,7 @@
 #define LOGERR(...)        LOGMASKED(LOG_ERR, __VA_ARGS__)
 #define LOGBURST(...)      LOGMASKED(LOG_BURST, __VA_ARGS__)
 #define LOGDATA(...)       LOGMASKED(LOG_DATA, __VA_ARGS__)
+#define LOGSETUP(...)      LOGMASKED(LOG_SETUP, __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -41,12 +43,12 @@
 #endif
 
 
-mms77316_fdc_device::mms77316_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
-	device_t(mconfig, H89BUS_MMS77316, tag, owner, 0),
-	device_h89bus_right_card_interface(mconfig, *this),
-	m_fdc(*this, "mms_fdc"),
-	m_floppies(*this, "mms_fdc:%u", 0U),
-	m_intr_cntrl(*this, finder_base::DUMMY_TAG)
+mms77316_fdc_device::mms77316_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, H89BUS_MMS77316, tag, owner, 0)
+	, device_h89bus_right_card_interface(mconfig, *this)
+	, m_fdc(*this, "mms_fdc")
+	, m_floppies(*this, "mms_fdc:%u", 0U)
+	, m_intr_cntrl(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -118,26 +120,26 @@ void mms77316_fdc_device::write(offs_t reg, u8 val)
 
 	switch (reg)
 	{
-	case 0:
-		ctrl_w(val);
-		break;
-	case 1:
-	case 2:
-	case 3:
-		LOGERR("%s: Unexpected port write reg: %d val: 0x%02x\n", FUNCNAME, reg, val);
-		break;
-	case 4:
-		m_fdc->cmd_w(val);
-		break;
-	case 5:
-		m_fdc->track_w(val);
-		break;
-	case 6:
-		m_fdc->sector_w(val);
-		break;
-	case 7:
-		data_w(val);
-		break;
+		case 0:
+			ctrl_w(val);
+			break;
+		case 1:
+		case 2:
+		case 3:
+			LOGERR("%s: Unexpected port write reg: %d val: 0x%02x\n", FUNCNAME, reg, val);
+			break;
+		case 4:
+			m_fdc->cmd_w(val);
+			break;
+		case 5:
+			m_fdc->track_w(val);
+			break;
+		case 6:
+			m_fdc->sector_w(val);
+			break;
+		case 7:
+			data_w(val);
+			break;
 	}
 }
 
@@ -171,25 +173,25 @@ u8 mms77316_fdc_device::read(offs_t reg)
 
 	switch (reg)
 	{
-	case 0:
-	case 1:
-	case 2:
-	case 3:
-		// read not supported on these addresses
-		LOGERR("%s: Unexpected port read reg: %d\n", FUNCNAME, reg);
-		break;
-	case 4:
-		value = m_fdc->status_r();
-		break;
-	case 5:
-		value = m_fdc->track_r();
-		break;
-	case 6:
-		value = m_fdc->sector_r();
-		break;
-	case 7:
-		value = data_r();
-		break;
+		case 0:
+		case 1:
+		case 2:
+		case 3:
+			// read not supported on these addresses
+			LOGERR("%s: Unexpected port read reg: %d\n", FUNCNAME, reg);
+			break;
+		case 4:
+			value = m_fdc->status_r();
+			break;
+		case 5:
+			value = m_fdc->track_r();
+			break;
+		case 6:
+			value = m_fdc->sector_r();
+			break;
+		case 7:
+			value = data_r();
+			break;
 	}
 
 	LOGREG("%s: reg: %d val: 0x%02x\n", FUNCNAME, reg, value);
@@ -213,14 +215,25 @@ void mms77316_fdc_device::device_reset()
 {
 	if (!m_installed)
 	{
-		std::pair<u8, u8>  addr = h89bus().get_address_range(h89bus::IO_GPP);
+		h89bus::addr_ranges  addr_ranges = h89bus().get_address_ranges(h89bus::IO_GPP);
 
-		// only install if non-zero address
-		if (addr.first)
+		LOGSETUP("%s: num ranges: %d\n", FUNCNAME, addr_ranges.size());
+
+		// There should be two ranges, the one with is single address should be for the real
+		// GPP, the one with a range, is for this device.
+		for (h89bus::addr_range range : addr_ranges)
 		{
-			h89bus().install_io_device(addr.first, addr.second,
-				read8sm_delegate(*this, FUNC(mms77316_fdc_device::read)),
-				write8sm_delegate(*this, FUNC(mms77316_fdc_device::write)));
+			// find the range with more than one port address.
+			if (range.first != range.second)
+			{
+				LOGSETUP("%s: range found: 0x%02x-0x%02x\n", FUNCNAME, range.first, range.second);
+
+				h89bus().install_io_device(range.first, range.second,
+					read8sm_delegate(*this, FUNC(mms77316_fdc_device::read)),
+					write8sm_delegate(*this, FUNC(mms77316_fdc_device::write)));
+
+				break;
+			}
 		}
 
 		m_installed = true;

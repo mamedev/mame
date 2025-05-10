@@ -109,14 +109,14 @@ protected:
 };
 
 
-heath_h17_fdc_device::heath_h17_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
-	device_t(mconfig, H89BUS_H_17_FDC, tag, owner, 0),
-	device_h89bus_right_card_interface(mconfig, *this),
-	m_floppy_ram_wp(*this),
-	m_s2350(*this, "s2350"),
-	m_floppies(*this, "floppy%u", 0U),
-	m_tx_timer(*this, "tx_timer"),
-	m_floppy(nullptr)
+heath_h17_fdc_device::heath_h17_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, H89BUS_H_17_FDC, tag, owner, 0)
+	, device_h89bus_right_card_interface(mconfig, *this)
+	, m_floppy_ram_wp(*this)
+	, m_s2350(*this, "s2350")
+	, m_floppies(*this, "floppy%u", 0U)
+	, m_tx_timer(*this, "tx_timer")
+	, m_floppy(nullptr)
 {
 }
 
@@ -126,18 +126,18 @@ void heath_h17_fdc_device::write(offs_t offset, u8 data)
 
 	switch (offset)
 	{
-	case 0: // data port
-		m_s2350->transmitter_holding_reg_w(data);
-		break;
-	case 1: // fill character
-		m_s2350->transmit_fill_reg_w(data);
-		break;
-	case 2: // sync port
-		m_s2350->receiver_sync_reg_w(data);
-		break;
-	case 3: // control port
-		ctrl_w(data);
-		break;
+		case 0: // data port
+			m_s2350->transmitter_holding_reg_w(data);
+			break;
+		case 1: // fill character
+			m_s2350->transmit_fill_reg_w(data);
+			break;
+		case 2: // sync port
+			m_s2350->receiver_sync_reg_w(data);
+			break;
+		case 3: // control port
+			ctrl_w(data);
+			break;
 	}
 }
 
@@ -253,18 +253,18 @@ u8 heath_h17_fdc_device::read(offs_t offset)
 
 	switch (offset)
 	{
-	case 0: // data port
-		val = m_s2350->receiver_output_reg_r();
-		break;
-	case 1: // status port
-		val = m_s2350->status_word_r();
-		break;
-	case 2: // sync port
-		val = m_s2350->receiver_sync_search();
-		break;
-	case 3: // floppy status port
-		val = floppy_status_r();
-		break;
+		case 0: // data port
+			val = m_s2350->receiver_output_reg_r();
+			break;
+		case 1: // status port
+			val = m_s2350->status_word_r();
+			break;
+		case 2: // sync port
+			val = m_s2350->receiver_sync_search();
+			break;
+		case 3: // floppy status port
+			val = floppy_status_r();
+			break;
 	}
 
 	LOGREG("%s: reg: %d val: 0x%02x\n", FUNCNAME, offset, val);
@@ -317,14 +317,13 @@ void heath_h17_fdc_device::device_reset()
 {
 	if (!m_installed)
 	{
-		std::pair<u8, u8>  addr = h89bus().get_address_range(h89bus::IO_FLPY);
+		h89bus::addr_ranges  addr_ranges = h89bus().get_address_ranges(h89bus::IO_FLPY);
 
-		// only install if non-zero address
-		if (addr.first)
+		if (addr_ranges.size() == 1)
 		{
-			LOGSETUP("%s: Address start: 0x%02x, end: 0x%02x\n", addr.first, addr.second);
+			h89bus::addr_range range = addr_ranges.front();
 
-			h89bus().install_io_device(addr.first, addr.second,
+			h89bus().install_io_device(range.first, range.second,
 				read8sm_delegate(*this, FUNC(heath_h17_fdc_device::read)),
 				write8sm_delegate(*this, FUNC(heath_h17_fdc_device::write)));
 		}

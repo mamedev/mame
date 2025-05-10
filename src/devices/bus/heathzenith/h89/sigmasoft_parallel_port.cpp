@@ -4,6 +4,8 @@
 
   SigmaSoft Universal Parallel Interface Board
 
+  TODO
+    - add support for hard/floppy drive controller
 
 ****************************************************************************/
 
@@ -38,15 +40,15 @@ static constexpr u16 SELECT_ADDR_MASK = 0xf8;
 /**
  * The SigmaSoft Parallel Port
  */
-sigmasoft_parallel_port::sigmasoft_parallel_port(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
-	sigmasoft_parallel_port(mconfig, H89BUS_SIGMASOFT_PARALLEL, tag, owner, clock)
+sigmasoft_parallel_port::sigmasoft_parallel_port(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: sigmasoft_parallel_port(mconfig, H89BUS_SIGMASOFT_PARALLEL, tag, owner, clock)
 {
 }
 
-sigmasoft_parallel_port::sigmasoft_parallel_port(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock):
-	device_t(mconfig, type, tag, owner, clock),
-	device_h89bus_left_card_interface(mconfig, *this),
-	m_jumpers(*this, "JUMPERS")
+sigmasoft_parallel_port::sigmasoft_parallel_port(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_h89bus_left_card_interface(mconfig, *this)
+	, m_jumpers(*this, "JUMPERS")
 {
 }
 

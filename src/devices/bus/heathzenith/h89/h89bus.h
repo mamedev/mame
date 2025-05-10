@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont
+// copyright-holders:R. Belmont, Mark Garlanger
 /***************************************************************************
 
   h89.h - Heath/Zenith H-89/Z-90 bus
@@ -88,7 +88,6 @@
 #include <functional>
 #include <utility>
 #include <vector>
-#include <string.h>
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -96,11 +95,16 @@
 
 namespace h89bus
 {
+	typedef std::pair<u8, u8> addr_range;
+	typedef std::vector<addr_range> addr_ranges;
+
 	enum io_select_lines : u8
 	{
-		// GPP/SW501 (all PROMs define this at 0xf2, MMS PROM also uses it for the 77316 double density controller)
+		// GPP/SW501 (all PROMs define this at 0xf2, MMS PROM also uses it for
+		// the 77316 double density controller)
 		IO_GPP  = 0x01,
-		// For addresses defined on H8 but not on H89 cause a NMI to be triggered (Directly on CPU board and all PROMs define this as 0xf0 - 0xf1 & 0xfa - 0xfb)
+		// For addresses defined on H8 but not on H89 cause a NMI to be triggered
+		// (Directly on CPU board and all PROMs define this as 0xf0 - 0xf1 & 0xfa - 0xfb)
 		IO_NMI  = 0x02,
 		// Console (Directly on CPU board and all PROMs define this at 0xe8 - 0xef)
 		IO_TERM = 0x04,
@@ -115,7 +119,15 @@ namespace h89bus
 		// Select signal on P506 right slot
 		IO_FLPY = 0x80,
 	};
+
+	enum mem_select_lines : u8
+	{
+		MEM_RD5 = 0x01,
+		MEM_RD6 = 0x02,
+		MEM_RD7 = 0x04,
+	};
 }
+
 
 class h89bus_device;
 
@@ -272,12 +284,14 @@ DECLARE_DEVICE_TYPE(H89BUS_RIGHT_SLOT, h89bus_right_slot_device)
 class device_heath_io_decoder_interface : public device_interface
 {
 public:
-	virtual std::pair<u8, u8> get_address_range(u8 select_bits, bool p506_signals = false) = 0;
+	virtual h89bus::addr_ranges get_address_ranges(u8 select_bits, bool p506_signals = false) = 0;
 
 protected:
 	device_heath_io_decoder_interface(const machine_config &mconfig, device_t &device);
 
 	void update_slot_select_bits(u8 &select_bits, bool p506_signals);
+
+	h89bus::addr_ranges scan_io_decoder_rom(u8 select_bits, u8 *rom) ATTR_COLD;
 };
 
 class heath_io_decoder_444_43 : public device_t,
@@ -285,10 +299,13 @@ class heath_io_decoder_444_43 : public device_t,
 {
 public:
 	heath_io_decoder_444_43(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual std::pair<u8, u8> get_address_range(u8 select_bits, bool p506_signals = false) override;
+	virtual h89bus::addr_ranges get_address_ranges(u8 select_bits, bool p506_signals = false) override ATTR_COLD;
 
 protected:
 	virtual void device_start() override ATTR_COLD  {}
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	required_region_ptr<uint8_t> m_decode_prom;
 };
 
 class heath_io_decoder_444_61 : public device_t,
@@ -296,10 +313,13 @@ class heath_io_decoder_444_61 : public device_t,
 {
 public:
 	heath_io_decoder_444_61(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual std::pair<u8, u8> get_address_range(u8 select_bits, bool p506_signals = false) override;
+	virtual h89bus::addr_ranges get_address_ranges(u8 select_bits, bool p506_signals = false) override ATTR_COLD;
 
 protected:
 	virtual void device_start() override ATTR_COLD {}
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	required_region_ptr<uint8_t> m_decode_prom;
 };
 
 class heath_io_decoder_mms_61c : public device_t,
@@ -307,26 +327,33 @@ class heath_io_decoder_mms_61c : public device_t,
 {
 public:
 	heath_io_decoder_mms_61c(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual std::pair<u8, u8> get_address_range(u8 select_bits, bool p506_signals = false) override;
+	virtual h89bus::addr_ranges get_address_ranges(u8 select_bits, bool p506_signals = false) override ATTR_COLD;
 
 protected:
 	virtual void device_start() override ATTR_COLD {}
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	required_region_ptr<uint8_t> m_decode_prom;
 };
 class heath_io_decoder_cdr86: public device_t,
 							public device_heath_io_decoder_interface
 {
 public:
 	heath_io_decoder_cdr86(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual std::pair<u8, u8> get_address_range(u8 select_bits, bool p506_signals = false) override;
+	virtual h89bus::addr_ranges get_address_ranges(u8 select_bits, bool p506_signals = false) override ATTR_COLD;
 
 protected:
 	virtual void device_start() override ATTR_COLD {}
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	required_region_ptr<uint8_t> m_decode_prom;
 };
 
-DECLARE_DEVICE_TYPE(H89BUS_IO_DECODE_444_43,  heath_io_decoder_444_43)
-DECLARE_DEVICE_TYPE(H89BUS_IO_DECODE_444_61,  heath_io_decoder_444_61)
-DECLARE_DEVICE_TYPE(H89BUS_IO_DECODE_MMS_61C, heath_io_decoder_mms_61c)
-DECLARE_DEVICE_TYPE(H89BUS_IO_DECODE_CDR_86,  heath_io_decoder_cdr86)
+DECLARE_DEVICE_TYPE(H89BUS_IO_DECODER_444_43,  heath_io_decoder_444_43)
+DECLARE_DEVICE_TYPE(H89BUS_IO_DECODER_444_61,  heath_io_decoder_444_61)
+DECLARE_DEVICE_TYPE(H89BUS_IO_DECODER_MMS_61C, heath_io_decoder_mms_61c)
+DECLARE_DEVICE_TYPE(H89BUS_IO_DECODER_CDR_86,  heath_io_decoder_cdr86)
+
 
 class heath_io_decoder_socket : public device_t,
 								public device_single_card_slot_interface<device_heath_io_decoder_interface>
@@ -344,7 +371,7 @@ public:
 
 	heath_io_decoder_socket(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	std::pair<u8, u8> get_address_range(u8 select_bits, bool p506_signals = false);
+	h89bus::addr_ranges get_address_ranges(u8 select_bits, bool p506_signals = false);
 
 protected:
 	device_heath_io_decoder_interface *m_decoder;
@@ -352,7 +379,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 };
 
-DECLARE_DEVICE_TYPE(H89BUS_IO_DECODE_SOCKET,  heath_io_decoder_socket)
+DECLARE_DEVICE_TYPE(H89BUS_IO_DECODER_SOCKET,  heath_io_decoder_socket)
 
 
 // ======================> h89bus_device
@@ -364,18 +391,13 @@ class h89bus_device : public device_t
 	friend class device_h89bus_right_card_interface;
 
 public:
-	// left card select lines
-	static constexpr u8 H89_RD5         = 0x01;
-	static constexpr u8 H89_RD6         = 0x02;
-	static constexpr u8 H89_RD7         = 0x04;
-
 	// construction/destruction
 	h89bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~h89bus_device();
 
-	void install_io_device(offs_t start, offs_t end, read8sm_delegate rhandler, write8sm_delegate whandler);
-	void install_io_device(offs_t start, offs_t end, read8smo_delegate rhandler, write8smo_delegate whandler);
-	std::pair<u8, u8> get_address_range(u8 select_bits, bool p506_signals = false) { return m_io_decoder_socket->get_address_range(select_bits, p506_signals); }
+	void install_io_device(offs_t start, offs_t end, read8sm_delegate rhandler, write8sm_delegate whandler) ATTR_COLD;
+	void install_io_device(offs_t start, offs_t end, read8smo_delegate rhandler, write8smo_delegate whandler) ATTR_COLD;
+	h89bus::addr_ranges get_address_ranges(u8 select_bits, bool p506_signals = false) ATTR_COLD;
 
 	void set_io0(int state);
 	void set_io1(int state);
@@ -413,6 +435,7 @@ protected:
 	// internal state
 	required_address_space m_program_space, m_io_space;
 	required_device<heath_io_decoder_socket> m_io_decoder_socket;
+
 	int m_io0, m_io1, m_mem0, m_mem1;
 
 private:

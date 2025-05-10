@@ -27,6 +27,7 @@
 #define LOG_CASS  (1U << 3)
 #define LOG_FUNC  (1U << 4)
 #define LOG_SETUP (1U << 5)
+
 #define VERBOSE (0)
 
 #include "logmacro.h"
@@ -73,12 +74,12 @@ protected:
 	bool m_cassold;
 };
 
-h_88_5_device::h_88_5_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
-	device_t(mconfig, H89BUS_H_88_5, tag, owner, 0),
-	device_h89bus_right_card_interface(mconfig, *this),
-	m_uart(*this, "uart"),
-	m_cass_player(*this, "cassette_player"),
-	m_cass_recorder(*this, "cassette_recorder")
+h_88_5_device::h_88_5_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, H89BUS_H_88_5, tag, owner, 0)
+	, device_h89bus_right_card_interface(mconfig, *this)
+	, m_uart(*this, "uart")
+	, m_cass_player(*this, "cassette_player")
+	, m_cass_recorder(*this, "cassette_recorder")
 {
 }
 
@@ -146,14 +147,13 @@ void h_88_5_device::device_reset()
 {
 	if (!m_installed)
 	{
-		std::pair<u8, u8>  addr = h89bus().get_address_range(h89bus::IO_CASS);
+		h89bus::addr_ranges  addr_ranges = h89bus().get_address_ranges(h89bus::IO_CASS);
 
-		// only install if non-zero address
-		if (addr.first)
+		if (addr_ranges.size() == 1)
 		{
-			LOGSETUP("%s: Address start: 0x%02x, end: 0x%02x\n", addr.first, addr.second);
+			h89bus::addr_range range = addr_ranges.front();
 
-			h89bus().install_io_device(addr.first, addr.second,
+			h89bus().install_io_device(range.first, range.second,
 				read8sm_delegate(m_uart, FUNC(i8251_device::read)),
 				write8sm_delegate(m_uart, FUNC(i8251_device::write)));
 		}

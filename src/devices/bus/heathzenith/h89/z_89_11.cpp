@@ -58,18 +58,18 @@ protected:
 };
 
 
-z_89_11_device::z_89_11_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
-	device_t(mconfig, H89BUS_Z_89_11, tag, owner, clock),
-	device_h89bus_right_card_interface(mconfig, *this),
-	m_lp(*this, "lp"),
-	m_aux(*this, "aux"),
-	m_modem(*this, "modem"),
-	m_cfg_lp(*this, "CFG_LP"),
-	m_cfg_aux(*this, "CFG_AUX"),
-	m_cfg_modem(*this, "CFG_MODEM"),
-	m_lp_intr(0),
-	m_aux_intr(0),
-	m_modem_intr(0)
+z_89_11_device::z_89_11_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, H89BUS_Z_89_11, tag, owner, clock)
+	, device_h89bus_right_card_interface(mconfig, *this)
+	, m_lp(*this, "lp")
+	, m_aux(*this, "aux")
+	, m_modem(*this, "modem")
+	, m_cfg_lp(*this, "CFG_LP")
+	, m_cfg_aux(*this, "CFG_AUX")
+	, m_cfg_modem(*this, "CFG_MODEM")
+	, m_lp_intr(0)
+	, m_aux_intr(0)
+	, m_modem_intr(0)
 {
 }
 
@@ -98,7 +98,7 @@ void z_89_11_device::update_intr(u8 level)
 		data |= m_modem_intr;
 	}
 
-	switch(level)
+	switch (level)
 	{
 		case 1:
 			set_slot_int3(data);
@@ -157,25 +157,27 @@ void z_89_11_device::device_reset()
 	{
 		if (m_lp_enabled)
 		{
-			std::pair<u8, u8>  addr = h89bus().get_address_range(h89bus::IO_LP);
+			h89bus::addr_ranges  addr_ranges = h89bus().get_address_ranges(h89bus::IO_LP);
 
-			// only install if non-zero address
-			if (addr.first)
+			if (addr_ranges.size() == 1)
 			{
-				h89bus().install_io_device(addr.first, addr.second,
-					read8sm_delegate(m_lp, FUNC(i8255_device::read)),
-					write8sm_delegate(m_lp, FUNC(i8255_device::write)));
+				h89bus::addr_range range = addr_ranges.front();
+
+				h89bus().install_io_device(range.first, range.second,
+				read8sm_delegate(m_lp, FUNC(i8255_device::read)),
+				write8sm_delegate(m_lp, FUNC(i8255_device::write)));
 			}
 		}
 
 		if (m_aux_enabled)
 		{
-			std::pair<u8, u8>  addr = h89bus().get_address_range(h89bus::IO_SER0);
+			h89bus::addr_ranges  addr_ranges = h89bus().get_address_ranges(h89bus::IO_SER0);
 
-			// only install if non-zero address
-			if (addr.first)
+			if (addr_ranges.size() == 1)
 			{
-				h89bus().install_io_device(addr.first, addr.second,
+				h89bus::addr_range range = addr_ranges.front();
+
+				h89bus().install_io_device(range.first, range.second,
 					read8sm_delegate(m_aux, FUNC(ins8250_uart_device::ins8250_r)),
 					write8sm_delegate(m_aux, FUNC(ins8250_uart_device::ins8250_w)));
 			}
@@ -183,12 +185,13 @@ void z_89_11_device::device_reset()
 
 		if (m_modem_enabled)
 		{
-			std::pair<u8, u8>  addr = h89bus().get_address_range(h89bus::IO_SER1);
+			h89bus::addr_ranges  addr_ranges = h89bus().get_address_ranges(h89bus::IO_SER1);
 
-			// only install if non-zero address
-			if (addr.first)
+			if (addr_ranges.size() == 1)
 			{
-				h89bus().install_io_device(addr.first, addr.second,
+				h89bus::addr_range range = addr_ranges.front();
+
+				h89bus().install_io_device(range.first, range.second,
 					read8sm_delegate(m_modem, FUNC(scn_pci_device::read)),
 					write8sm_delegate(m_modem, FUNC(scn_pci_device::write)));
 			}
