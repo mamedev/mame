@@ -504,6 +504,7 @@ private:
 		u32 m_first_output;
 
 		emu::detail::output_buffer_flat<sample_t> m_buffer;
+		emu::detail::output_buffer_flat<sample_t> m_effects_buffer;
 		
 		std::vector<effect_step> m_effects;
 
@@ -553,12 +554,10 @@ private:
 	};
 
 	struct osd_output_stream : public osd_stream {
-		u64 m_last_sync;
 		u32 m_samples;
 		std::vector<s16> m_buffer;
 		osd_output_stream(u32 node, std::string node_name, u32 channels, u32 rate, bool is_system_default, sound_io_device *dev) :
 			osd_stream(node, node_name, channels, rate, is_system_default, dev),
-			m_last_sync(0),
 			m_samples(0),
 			m_buffer(channels*rate, 0)
 		{ }
@@ -639,10 +638,12 @@ private:
 	std::vector<config_mapping> m_configs; // mapping user configuration
 
 	std::mutex                      m_effects_mutex;
+	std::mutex                      m_effects_data_mutex;
 	std::condition_variable         m_effects_condition;
 	std::unique_ptr<std::thread>    m_effects_thread;
 	std::vector<std::unique_ptr<audio_effect>> m_default_effects;
 	bool m_effects_done;
+	attotime m_effects_prev_time, m_effects_cur_time;
 
 	float m_master_gain;
 

@@ -716,12 +716,6 @@ void sound_manager::before_devices_init()
 
 void sound_manager::postload()
 {
-	std::unique_lock<std::mutex> lock(m_effects_mutex);
-	attotime now = machine().time();
-	for(osd_output_stream &stream : m_osd_output_streams) {
-		stream.m_last_sync = rate_and_time_to_index(now, stream.m_rate);
-		stream.m_samples = 0;
-	}
 }
 
 void sound_manager::after_devices_init()
@@ -918,16 +912,40 @@ void sound_manager::output_push(int id, sound_stream &stream)
 
 void sound_manager::run_effects()
 {
-	std::unique_lock<std::mutex> lock(m_effects_mutex);
+	std::unique_lock<std::mutex> dlock(m_effects_data_mutex);
 	for(;;) {
-		m_effects_condition.wait(lock);
+		m_effects_condition.wait(dlock);
 		if(m_effects_done)
 			return;
+
+		std::unique_lock<std::mutex> lock(m_effects_mutex);
+
+		for(auto &si : m_speakers) {
+			int samples = si.m_buffer.available_samples();
+			int channels = si.m_buffer.channels();
+			auto &eb = si.m_effects_buffer;
+			eb.prepare_space(samples);
+			if(m_muted)
+				for(int channel = 0; channel != channels; channel ++)
+					std::fill(si.m_effects_buffer.ptrw(channel, 0), si.m_effects_buffer.ptrw(channel, samples), 0);
+			else
+				for(int channel = 0; channel != channels; channel ++)
+					std::copy(si.m_buffer.ptrs(channel, 0), si.m_buffer.ptrs(channel, samples), si.m_effects_buffer.ptrw(channel, 0));
+			eb.commit(samples);
+		}
+
+		for(osd_output_stream &stream : m_osd_output_streams) {
+			u64 prev_sync = rate_and_time_to_index(m_effects_prev_time, stream.m_rate);
+			u64 next_sync = rate_and_time_to_index(m_effects_cur_time, stream.m_rate);
+			stream.m_samples = next_sync - prev_sync;
+		}
+
+		dlock.unlock();
 
 		// Apply the effects
 		for(auto &si : m_speakers)
 			for(u32 i=0; i != si.m_effects.size(); i++) {
-				auto &source = i ? si.m_effects[i-1].m_buffer : si.m_buffer;
+				auto &source = i ? si.m_effects[i-1].m_buffer : si.m_effects_buffer;
 				si.m_effects[i].m_effect->apply(source, si.m_effects[i].m_buffer);
 				source.sync();
 			}
@@ -976,6 +994,8 @@ void sound_manager::run_effects()
 		for(auto &stream : m_osd_output_streams)
 			if(stream.m_samples)
 				machine().osd().sound_stream_sink_update(stream.m_id, stream.m_buffer.data(), stream.m_samples);
+
+		dlock.lock();
 	}
 }
 
@@ -1049,6 +1069,7 @@ void sound_manager::stop_recording()
 
 void sound_manager::mute(bool mute, u8 reason)
 {
+	std::unique_lock<std::mutex> lock(m_effects_mutex);
 	if(mute)
 		m_muted |= reason;
 	else
@@ -1060,7 +1081,7 @@ void sound_manager::mute(bool mute, u8 reason)
 //  reset - reset all sound chips
 //-------------------------------------------------
 
-sound_manager::speaker_info::speaker_info(speaker_device &dev, u32 rate, u32 first_output) : m_dev(dev), m_first_output(first_output), m_buffer(rate, dev.inputs())
+sound_manager::speaker_info::speaker_info(speaker_device &dev, u32 rate, u32 first_output) : m_dev(dev), m_first_output(first_output), m_buffer(rate, dev.inputs()), m_effects_buffer(rate, dev.inputs())
 {
 	m_channels = dev.inputs();
 	m_stream = dev.stream();
@@ -1943,7 +1964,6 @@ void sound_manager::update_osd_streams()
 			osd_output_stream &nos = m_osd_output_streams.back();
 			nos.m_id = machine().osd().sound_stream_sink_open(node->m_id, dev->tag(), rate);
 			nos.m_is_channel_mapping = is_channel_mapping;
-			nos.m_last_sync = rate_and_last_sync_to_index(rate);
 			return sid;
 		};
 
@@ -2181,7 +2201,6 @@ void sound_manager::update_osd_streams()
 			m_osd_output_streams.emplace_back(osd_output_stream(node->m_id, is_system_default ? "" : node->m_name, channels, rate, is_system_default, nullptr));
 			osd_output_stream &stream = m_osd_output_streams.back();
 			stream.m_id = machine().osd().sound_stream_sink_open(node->m_id, machine().system().name, rate);
-			stream.m_last_sync = rate_and_last_sync_to_index(rate);
 			stream_per_node[node->m_id] = sid;
 			return sid;
 		};
@@ -2444,16 +2463,18 @@ void sound_manager::streams_update()
 {
 	attotime now = machine().time();
 	{
-		std::unique_lock<std::mutex> lock(m_effects_mutex);
-		for(osd_output_stream &stream : m_osd_output_streams) {
-			u64 next_sync = rate_and_time_to_index(now, stream.m_rate);
-			stream.m_samples = next_sync - stream.m_last_sync;
-			stream.m_last_sync = next_sync;
-		}
+		std::unique_lock<std::mutex> dlock(m_effects_data_mutex);
+		for(auto &si : m_speakers)
+			si.m_buffer.sync();
+
+		m_effects_prev_time = m_effects_cur_time;
+		m_effects_cur_time = now;
 
 		for(sound_stream *stream : m_ordered_streams)
 			stream->update_nodeps();
+		m_effects_condition.notify_all();
 	}
+
 
 	// Send the hooked samples to lua
 	{
@@ -2486,13 +2507,11 @@ void sound_manager::streams_update()
 
 	for(osd_input_stream &stream : m_osd_input_streams)
 		stream.m_buffer.sync();
-
+	
 	machine().osd().add_audio_to_recording(m_record_buffer.data(), m_record_samples);
 	machine().video().add_sound_to_recording(m_record_buffer.data(), m_record_samples);
 	if(m_wavfile)
 		util::wav_add_data_16(*m_wavfile, m_record_buffer.data(), m_record_samples * m_outputs_count);
-
-	m_effects_condition.notify_all();
 }
 
 //**// Resampler management
