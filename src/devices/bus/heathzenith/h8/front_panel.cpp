@@ -96,7 +96,7 @@ void front_panel_device::m1_w(int state)
 
 	// For Single Instruction(SI) mode, there are 2 D flipflops, ic108a and ic108b.  Both are held in
 	// set mode while not in SI mode.  The data for ic108a is /INTE and ic108a Q is connected to data on
-	// ic108b. Both use /M1 for the clock. When the system is in SI mode, an int20 will trigger after 
+	// ic108b. Both use /M1 for the clock. When the system is in SI mode, an int20 will trigger after
 	// after 2 M1 cycles, to pause the running program.
 	if (m_allow_int2)
 	{
