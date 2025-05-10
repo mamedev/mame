@@ -65,7 +65,7 @@ private:
 		}
 	};
 
-	u32 m_mode;
+	u32 m_mode, m_band_mask;
 	float m_q[BANDS], m_f[BANDS], m_db[BANDS];
 	bool m_low_shelf, m_high_shelf;
 	std::array<filter, BANDS> m_filter;
