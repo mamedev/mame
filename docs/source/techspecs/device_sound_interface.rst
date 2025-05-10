@@ -242,6 +242,7 @@ can be avoided later in the chain.
 ~~~~~~~~~~
 
 .. code-block:: C++
+
     u32 sample_rate() const;
     attotime sample_period() const;
 
