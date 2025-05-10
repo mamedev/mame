@@ -395,7 +395,6 @@ void audio_effect_compressor::apply(const emu::detail::output_buffer_flat<sample
 
 			m_input_samples[channel] = input_db;
 
-			fprintf(stderr, "%f/%f vs. %f\n", input_db, slewed_signal, m_threshold);
 			double gain_reduction;
 			if(slewed_signal > m_threshold) {
 				double target = m_threshold + (slewed_signal - m_threshold) / m_ratio;
