@@ -18,7 +18,7 @@
 #include "m6502_swap_op_d5_d6.h"
 
 DEFINE_DEVICE_TYPE(M6502_SWAP_OP_D5_D6, m6502_swap_op_d5_d6, "m6502_swap_op_d5_d6", "M6502 swapped D5/D6")
-DEFINE_DEVICE_TYPE(RP2A03_CORE_SWAP_OP_D5_D6, rp2a03_core_swap_op_d5_d6, "rp2a03_core_swap_op_d5_d6", "RP2A03 core with swapped D5/D6")
+DEFINE_DEVICE_TYPE(RP2A03_CORE_SWAP_OP_D5_D6, rp2a03_core_swap_op_d5_d6, "rp2a03_core_swap_op_d5_d6", "RP2A03 core with optional swapped D5/D6")
 
 m6502_swap_op_d5_d6::m6502_swap_op_d5_d6(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m6502_device(mconfig, M6502_SWAP_OP_D5_D6, tag, owner, clock)
@@ -83,7 +83,8 @@ u8 m6502_swap_op_d5_d6::disassembler::decrypt8(u8 value, offs_t pc, bool opcode)
 
 
 rp2a03_core_swap_op_d5_d6::rp2a03_core_swap_op_d5_d6(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	rp2a03_core_device(mconfig, RP2A03_CORE_SWAP_OP_D5_D6, tag, owner, clock)
+	rp2a03_core_device(mconfig, RP2A03_CORE_SWAP_OP_D5_D6, tag, owner, clock),
+	m_encryption_enabled_on_reset(true)
 {
 }
 
@@ -95,7 +96,7 @@ void rp2a03_core_swap_op_d5_d6::device_start()
 
 void rp2a03_core_swap_op_d5_d6::device_reset()
 {
-	downcast<mi_decrypt &>(*mintf).m_encryption_enabled = true;
+	downcast<mi_decrypt &>(*mintf).m_encryption_enabled = m_encryption_enabled_on_reset;
 	rp2a03_core_device::device_reset();
 }
 
