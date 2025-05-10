@@ -1052,6 +1052,11 @@ ROM_START( speedup ) // Version 2.20 - REF. 960717 ROM board
 
 	ROM_REGION( 0x2000, "coin", 0 ) // Credit distribution PCB
 	ROM_LOAD( "2x1c_pic16c54.u1", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "a1_a_4426_pal16l8.bin", 0x000, 0x104, CRC(94e4f59c) SHA1(3bc0c77c77ef763400372d3aabdb15d46da2bc29) )
+	ROM_LOAD( "m.b_48f6_pal16l8.bin",  0x000, 0x104, CRC(4c298505) SHA1(5a4f57e3d3cd5e329426d6d469b0fdd614812b25) )
+	ROM_LOAD( "m1_c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )
 ROM_END
 
 ROM_START( speedup12 ) // Version 1.20 - REF. 960717 ROM board
@@ -1081,6 +1086,11 @@ ROM_START( speedup12 ) // Version 1.20 - REF. 960717 ROM board
 
 	ROM_REGION( 0x2000, "coin", 0 ) // Credit distribution PCB
 	ROM_LOAD( "2x1c_pic16c54.u1", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "a1_a_4426_pal16l8.bin", 0x000, 0x104, CRC(94e4f59c) SHA1(3bc0c77c77ef763400372d3aabdb15d46da2bc29) )
+	ROM_LOAD( "m.b_48f6_pal16l8.bin",  0x000, 0x104, CRC(4c298505) SHA1(5a4f57e3d3cd5e329426d6d469b0fdd614812b25) )
+	ROM_LOAD( "m1_c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )
 ROM_END
 
 ROM_START( speedup10 ) // Version 1.00 - REF. 960717 ROM board
@@ -1110,6 +1120,11 @@ ROM_START( speedup10 ) // Version 1.00 - REF. 960717 ROM board
 
 	ROM_REGION( 0x2000, "coin", 0 ) // Credit distribution PCB
 	ROM_LOAD( "2x1c_pic16c54.u1", 0x0000, 0x2000, NO_DUMP )
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "a1_a_4426_pal16l8.bin", 0x000, 0x104, CRC(94e4f59c) SHA1(3bc0c77c77ef763400372d3aabdb15d46da2bc29) )
+	ROM_LOAD( "m.b_48f6_pal16l8.bin",  0x000, 0x104, CRC(4c298505) SHA1(5a4f57e3d3cd5e329426d6d469b0fdd614812b25) )
+	ROM_LOAD( "m1_c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )
 ROM_END
 
 
@@ -1143,6 +1158,11 @@ ROM_START( surfplnt ) // Version 4.1 - REF. 971223 ROM board
 //  ROM_LOAD( "pls_20.ic28", 0x0020000, 0x020000, CRC(fb293318) SHA1(d255fe3db1b91ec7cc744b0158e70503bca5ceab) ) // labeled PLS 20 in IC28 on the PCB
 //  ROM_LOAD( "pls_21.ic29", 0x0040000, 0x020000, CRC(b80611fb) SHA1(70d6767ddfb04e94cf2796e3f7090f89fd36fe8c) ) // labeled PLS 21 in IC29 on the PCB
 //  ROM_LOAD( "pls_22.ic30", 0x0060000, 0x020000, CRC(ccf88f7e) SHA1(c6a3bb9d6cf14a93a36ed20a47b7c068ccd630aa) ) // labeled PLS 22 in IC30 on the PCB
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "a_m_b2_4914_pal16l8.bin", 0x000, 0x104, CRC(0702ddc2) SHA1(8f68eda2f3bfbaae1ce382683f6126e47a205693) )
+	ROM_LOAD( "c_deco_-i_pal16l8.bin",   0x000, 0x104, CRC(4c298505) SHA1(5a4f57e3d3cd5e329426d6d469b0fdd614812b25) )
+	ROM_LOAD( "c_m.b1_4936_pal16l8.bin", 0x000, 0x104, CRC(28ad6ecb) SHA1(994c6701d8675fa7ff10da588eff4d4228a15aef) )
 ROM_END
 
 ROM_START( surfplnt40 ) // Version 4.0 - REF. 970514 ROM board
@@ -1175,6 +1195,11 @@ ROM_START( surfplnt40 ) // Version 4.0 - REF. 970514 ROM board
 //  ROM_LOAD( "pls_20.ic28", 0x0020000, 0x020000, CRC(fb293318) SHA1(d255fe3db1b91ec7cc744b0158e70503bca5ceab) ) // labeled PLS 20 in IC28 on the PCB
 //  ROM_LOAD( "pls_21.ic29", 0x0040000, 0x020000, CRC(b80611fb) SHA1(70d6767ddfb04e94cf2796e3f7090f89fd36fe8c) ) // labeled PLS 21 in IC29 on the PCB
 //  ROM_LOAD( "pls_22.ic30", 0x0060000, 0x020000, CRC(ccf88f7e) SHA1(c6a3bb9d6cf14a93a36ed20a47b7c068ccd630aa) ) // labeled PLS 22 in IC30 on the PCB
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "a_m_b2_4914_pal16l8.bin", 0x000, 0x104, CRC(0702ddc2) SHA1(8f68eda2f3bfbaae1ce382683f6126e47a205693) )
+	ROM_LOAD( "c_deco_-i_pal16l8.bin",   0x000, 0x104, CRC(4c298505) SHA1(5a4f57e3d3cd5e329426d6d469b0fdd614812b25) )
+	ROM_LOAD( "c_m.b1_4936_pal16l8.bin", 0x000, 0x104, CRC(28ad6ecb) SHA1(994c6701d8675fa7ff10da588eff4d4228a15aef) )
 ROM_END
 
 ROM_START( surfplnt30 ) // Version 3.0 - REF. 970514 ROM board
@@ -1207,6 +1232,11 @@ ROM_START( surfplnt30 ) // Version 3.0 - REF. 970514 ROM board
 //  ROM_LOAD( "pls_20.ic28", 0x0020000, 0x020000, CRC(fb293318) SHA1(d255fe3db1b91ec7cc744b0158e70503bca5ceab) ) // labeled PLS 20 in IC28 on the PCB
 //  ROM_LOAD( "pls_21.ic29", 0x0040000, 0x020000, CRC(b80611fb) SHA1(70d6767ddfb04e94cf2796e3f7090f89fd36fe8c) ) // labeled PLS 21 in IC29 on the PCB
 //  ROM_LOAD( "pls_22.ic30", 0x0060000, 0x020000, CRC(ccf88f7e) SHA1(c6a3bb9d6cf14a93a36ed20a47b7c068ccd630aa) ) // labeled PLS 22 in IC30 on the PCB
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "a_m_b2_4914_pal16l8.bin", 0x000, 0x104, CRC(0702ddc2) SHA1(8f68eda2f3bfbaae1ce382683f6126e47a205693) )
+	ROM_LOAD( "c_deco_-i_pal16l8.bin",   0x000, 0x104, CRC(4c298505) SHA1(5a4f57e3d3cd5e329426d6d469b0fdd614812b25) )
+	ROM_LOAD( "c_m.b1_4936_pal16l8.bin", 0x000, 0x104, CRC(28ad6ecb) SHA1(994c6701d8675fa7ff10da588eff4d4228a15aef) )
 ROM_END
 
 ROM_START( surfplnt20 ) // Version 2.0 - REF. 970514 ROM board
@@ -1239,6 +1269,11 @@ ROM_START( surfplnt20 ) // Version 2.0 - REF. 970514 ROM board
 //  ROM_LOAD( "pls_20.ic28", 0x0020000, 0x020000, CRC(fb293318) SHA1(d255fe3db1b91ec7cc744b0158e70503bca5ceab) ) // labeled PLS 20 in IC28 on the PCB
 //  ROM_LOAD( "pls_21.ic29", 0x0040000, 0x020000, CRC(b80611fb) SHA1(70d6767ddfb04e94cf2796e3f7090f89fd36fe8c) ) // labeled PLS 21 in IC29 on the PCB
 //  ROM_LOAD( "pls_22.ic30", 0x0060000, 0x020000, CRC(ccf88f7e) SHA1(c6a3bb9d6cf14a93a36ed20a47b7c068ccd630aa) ) // labeled PLS 22 in IC30 on the PCB
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "a_m_b2_4914_pal16l8.bin", 0x000, 0x104, CRC(0702ddc2) SHA1(8f68eda2f3bfbaae1ce382683f6126e47a205693) )
+	ROM_LOAD( "c_deco_-i_pal16l8.bin",   0x000, 0x104, CRC(4c298505) SHA1(5a4f57e3d3cd5e329426d6d469b0fdd614812b25) )
+	ROM_LOAD( "c_m.b1_4936_pal16l8.bin", 0x000, 0x104, CRC(28ad6ecb) SHA1(994c6701d8675fa7ff10da588eff4d4228a15aef) )
 ROM_END
 
 
@@ -1277,6 +1312,11 @@ ROM_START( radikalb ) // Version 2.02 - REF. 980311 ROM board
 //  ROM_LOAD( "rab_25.ic33", 0x0020000, 0x020000, CRC(777758e3) SHA1(bd334b1ba46189ac8509eee3a4ab295c121400fd) ) // labeled RAB 25 in IC33 on the PCB
 //  ROM_LOAD( "rab_26.ic34", 0x0040000, 0x020000, CRC(bd9c1b54) SHA1(c9ef679cf7eca9ed315ea62a7ada452bc85f7a6a) ) // labeled RAB 26 in IC34 on the PCB
 //  ROM_LOAD( "rab_27.ic35", 0x0060000, 0x020000, CRC(bbcf6977) SHA1(0282c8ba79c35ed1240711d5812bfb590d151738) ) // labeled RAB 27 in IC35 on the PCB
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "m.1c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )
+	ROM_LOAD( "m.6a_3f91_pal16l8.bin", 0x000, 0x104, CRC(d4486738) SHA1(d5d632379c182427c7a7cf969e545ad4fccb1882) )
+	ROM_LOAD( "m.a_4426_pal16l8.bin",  0x000, 0x104, CRC(94e4f59c) SHA1(3bc0c77c77ef763400372d3aabdb15d46da2bc29) )
 ROM_END
 
 ROM_START( radikalba ) // Version 2.02, Atari license - REF. 980311 ROM board
@@ -1314,6 +1354,11 @@ ROM_START( radikalba ) // Version 2.02, Atari license - REF. 980311 ROM board
 //  ROM_LOAD( "rab_25.ic33", 0x0020000, 0x020000, CRC(777758e3) SHA1(bd334b1ba46189ac8509eee3a4ab295c121400fd) ) // labeled RAB 25 in IC33 on the PCB
 //  ROM_LOAD( "rab_26.ic34", 0x0040000, 0x020000, CRC(bd9c1b54) SHA1(c9ef679cf7eca9ed315ea62a7ada452bc85f7a6a) ) // labeled RAB 26 in IC34 on the PCB
 //  ROM_LOAD( "rab_27.ic35", 0x0060000, 0x020000, CRC(bbcf6977) SHA1(0282c8ba79c35ed1240711d5812bfb590d151738) ) // labeled RAB 27 in IC35 on the PCB
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "m.1c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )
+	ROM_LOAD( "m.6a_3f91_pal16l8.bin", 0x000, 0x104, CRC(d4486738) SHA1(d5d632379c182427c7a7cf969e545ad4fccb1882) )
+	ROM_LOAD( "m.a_4426_pal16l8.bin",  0x000, 0x104, CRC(94e4f59c) SHA1(3bc0c77c77ef763400372d3aabdb15d46da2bc29) )
 ROM_END
 
 /*
@@ -1367,8 +1412,13 @@ ROM_START( footbpow ) // Version 1.2 - REF. 000208 ROM board
 //  ROM_LOAD( "fop_26.ic36", 0x0040000, 0x020000, CRC(b5877b68) SHA1(6f6f00da84d6d84895691266c2022fd4cd92f228) ) // labeled FOP 26 in IC36 on the PCB
 //  ROM_LOAD( "fop_27.ic37", 0x0060000, 0x020000, CRC(58309912) SHA1(eb62ccfd75fc168338d30bc30214e6f9f62e5e70) ) // labeled FOP 27 in IC37 on the PCB
 
-	ROM_REGION( 0x2000, "io", ROMREGION_ERASEFF)
+	ROM_REGION( 0x2000, "io", ROMREGION_ERASEFF )
 	ROM_LOAD("ball_pic16c710.u1", 0x0000, 0x2000, NO_DUMP ) // I/O for the ball controller
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "m.1c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )
+	ROM_LOAD( "m.6a_3f91_pal16l8.bin", 0x000, 0x104, CRC(d4486738) SHA1(d5d632379c182427c7a7cf969e545ad4fccb1882) )
+	ROM_LOAD( "m.a_4426_pal16l8.bin",  0x000, 0x104, CRC(94e4f59c) SHA1(3bc0c77c77ef763400372d3aabdb15d46da2bc29) )
 ROM_END
 
 ROM_START( footbpow11 ) // Version 1.1 - REF. 000208 ROM board
@@ -1402,8 +1452,13 @@ ROM_START( footbpow11 ) // Version 1.1 - REF. 000208 ROM board
 //  ROM_LOAD( "fop_26.ic36", 0x0040000, 0x020000, CRC(b5877b68) SHA1(6f6f00da84d6d84895691266c2022fd4cd92f228) ) // labeled FOP 26 in IC36 on the PCB
 //  ROM_LOAD( "fop_27.ic37", 0x0060000, 0x020000, CRC(58309912) SHA1(eb62ccfd75fc168338d30bc30214e6f9f62e5e70) ) // labeled FOP 27 in IC37 on the PCB
 
-	ROM_REGION( 0x2000, "io", ROMREGION_ERASEFF)
+	ROM_REGION( 0x2000, "io", ROMREGION_ERASEFF )
 	ROM_LOAD("ball_pic16c710.u1", 0x0000, 0x2000, NO_DUMP ) // I/O for the ball controller
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "m.1c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )
+	ROM_LOAD( "m.6a_3f91_pal16l8.bin", 0x000, 0x104, CRC(d4486738) SHA1(d5d632379c182427c7a7cf969e545ad4fccb1882) )
+	ROM_LOAD( "m.a_4426_pal16l8.bin",  0x000, 0x104, CRC(94e4f59c) SHA1(3bc0c77c77ef763400372d3aabdb15d46da2bc29) )
 ROM_END
 
 
