@@ -112,8 +112,7 @@ void ns32081_device_base::state_add(device_state_interface &parent, int &index)
 
 template <typename T> T ns32081_device_base::read()
 {
-	LOG("read: state(%d) issue(%d) expected(%d)\n", m_state, m_op[2].issued, m_op[2].expected);
-	if ((m_state == STATUS || m_state == RESULT) && m_op[2].issued < m_op[2].expected)
+	if (m_state == RESULT && m_op[2].issued < m_op[2].expected)
 	{
 		T const data = m_op[2].value >> (m_op[2].issued * 8);
 
@@ -657,7 +656,7 @@ void ns32081_device_base::execute()
 	if (!m_out_spc.isunset())
 		m_complete->adjust(attotime::from_ticks(m_tcy, clock()));
 
-	m_state = m_op[2].expected ? STATUS : IDLE;
+	m_state = STATUS;
 }
 
 u16 ns32081_device_base::status(int *icount)
