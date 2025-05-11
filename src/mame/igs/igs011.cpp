@@ -47,19 +47,8 @@ To do:
 - IGS003 parametric bitswap protection in lhb2cpgs, lhb3, nkishusp, tygn
   (instead of patching the ROMs)
 - Interrupt controller at 838000 or a38000 (there's a preliminary implementation for lhb)
-- A few graphical bugs
 
 - vbowl, vbowlj: trackball support.
-  Wrong colors in "Game Over" screen.
-
-- lhb: in the copyright screen the '5' in '1995' is drawn by the cpu on layer 5,
-  but with wrong colors (since the top nibble of the affected pixels is left to 0xf)
-  (drgnwrld is like this too, maybe hacked, or a cheap year replacement by IGS)
-
-- dbc: in the title screen the '5' in '1995' is drawn by the cpu with wrong colors.
-  (see above comment)
-  Also the background palette is wrong since the fade routine is called with wrong
-  parameters, but in this case the PCB does the same.
 
 - lhb3: emulated game crashes with an illegal instruction error on bookkeeping menu
 
@@ -67,7 +56,8 @@ To do:
 
 Notes:
 
-- In most games, keep test button pressed during boot for another test mode
+- In most games, keep test button pressed during boot to access the input test and
+  sound test.
 
 ***************************************************************************/
 
@@ -105,6 +95,7 @@ public:
 		, m_oki(*this, "oki")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
+		, m_layer_ram(*this, "layer%u_ram", 0U, 512U * 256U, ENDIANNESS_LITTLE)
 		, m_priority_ram(*this, "priority_ram")
 		, m_maincpu_region(*this, "maincpu")
 		, m_gfx(*this, "blitter")
@@ -167,6 +158,7 @@ protected:
 	required_device<palette_device> m_palette;
 
 	/* memory pointers */
+	memory_share_array_creator<u8, 4> m_layer_ram;
 	required_shared_ptr<u16> m_priority_ram;
 
 	/* memory regions */
@@ -180,7 +172,6 @@ protected:
 	optional_ioport_array<5> m_io_dsw;
 	optional_ioport m_io_coin;
 
-	std::unique_ptr<u8[]> m_layer[8];
 	u16 m_priority = 0;
 	u8 m_blitter_pen_hi = 0;
 	u16 m_dips_sel = 0;
@@ -211,8 +202,8 @@ protected:
 	void igs011_base(machine_config &config) ATTR_COLD;
 
 	void igs011_priority_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	u16 igs011_layers_r(offs_t offset);
-	void igs011_layers_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u8 igs011_layers_r(offs_t offset);
+	void igs011_layers_w(offs_t offset, u8 data);
 	void igs011_blit_x_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void igs011_blit_y_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void igs011_blit_gfx_lo_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -378,12 +369,6 @@ void igs011_state::igs011_priority_w(offs_t offset, u16 data, u16 mem_mask)
 
 void igs011_state::video_start()
 {
-	for (int i = 0; i < 8; i++)
-	{
-		m_layer[i] = std::make_unique<u8[]>(512 * 256);
-		save_pointer(NAME(m_layer[i]), 512 * 256, i);
-	}
-
 	m_blitter_pen_hi = 0;
 
 	save_item(NAME(m_priority));
@@ -422,33 +407,56 @@ u32 igs011_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 #endif
 
 	u16 const *const pri_ram = &m_priority_ram[(m_priority & 7) * 512/2];
+	unsigned const hibpplayers = 4 - (m_blitter.depth & 0x07);
 
+	u8 layerpix[8] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			const int scr_addr = x + y * 512;
+			const int scr_addr = (y << 9) | x;
 			int pri_addr = 0xff;
 
-			int l;
-			for (l = 0; l < 8; l++)
+			int l = 0;
+			for (unsigned i = 0; std::size(m_layer_ram) > i; ++i)
 			{
-				if ((m_layer[l][scr_addr] != 0xff)
+				u8 const pixdata = m_layer_ram[i][scr_addr];
+				if (i < hibpplayers)
+				{
+					layerpix[l] = pixdata;
+					if (layerpix[l] != 0xff)
 #ifdef MAME_DEBUG
-						&& (layer_enable & (1 << l))
+						if (layer_enable & (1 << l))
 #endif
-					)
-					pri_addr &= ~(1 << l);
+							pri_addr &= ~(1 << l);
+					++l;
+				}
+				else
+				{
+					layerpix[l] = pixdata & 0x0f;
+					if (layerpix[l] != 0x0f)
+#ifdef MAME_DEBUG
+						if (layer_enable & (1 << l))
+#endif
+							pri_addr &= ~(1 << l);
+					++l;
+					layerpix[l] = (pixdata >> 4) & 0x0f;
+					if (layerpix[l] != 0x0f)
+#ifdef MAME_DEBUG
+						if (layer_enable & (1 << l))
+#endif
+							pri_addr &= ~(1 << l);
+					++l;
+				}
 			}
 
-			l = pri_ram[pri_addr] & 7;
-
+			u16 const pri = pri_ram[pri_addr] & 7;
 #ifdef MAME_DEBUG
 			if ((layer_enable != -1) && (pri_addr == 0xff))
 				bitmap.pix(y, x) = m_palette->black_pen();
 			else
 #endif
-				bitmap.pix(y, x) = m_layer[l][scr_addr] | (l << 8);
+				bitmap.pix(y, x) = layerpix[pri] | (pri << 8);
 		}
 	}
 	return 0;
@@ -456,49 +464,36 @@ u32 igs011_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 
 /***************************************************************************
 
-    In addition to the blitter, the CPU can also read from and write to
-    the framebuffers for the 8 layers, seen as 0x100000 bytes in memory.
-    The first half contains layers 0-3. Layers 4-7 are in the other half.
+    In addition to the blitter, the CPU can directly access video memory
+    directly.  There are four buffers of 128 KiB each, organised as 256
+    rows by 512 columns.  Each buffer can be treated as a single 8-bit
+    layer, or two 4-bit layers.  The most and least significant bits of
+    the offset select the buffer, and the remaining bits address a byte
+    within the buffer.
 
-    The layers are interleaved:
-
-    - bytes 0x00000-0x00003 contain the 1st pixel of layer 0,1,2,3
-    - bytes 0x00004-0x00007 contain the 2nd pixel of layer 0,1,2,3
-    ...
-    - bytes 0x80000-0x80003 contain the 1st pixel of layer 4,5,6,7
-    - bytes 0x80004-0x80007 contain the 2nd pixel of layer 4,5,6,7
-
-    and so on.
+    - Buffer 0 is accessed at 0x300000, 0x300004, 0x300008, etc.
+      (offset 0x00000, 0x00002, 0x00004, etc.)
+    - Buffer 1 is accessed at 0x300002, 0x300006, 0x30000a, etc.
+      (offset 0x00001, 0x00003, 0x00005, etc.)
+    - Buffer 2 is accessed at 0x380000, 0x380004, 0x380008, etc.
+      (offset 0x40000, 0x40002, 0x40004, etc.)
+    - Buffer 3 is accessed at 0x380002, 0x380006, 0x38000a, etc.
+      (offset 0x40001, 0x40003, 0x40005, etc.)
 
 ***************************************************************************/
 
-u16 igs011_state::igs011_layers_r(offs_t offset)
+u8 igs011_state::igs011_layers_r(offs_t offset)
 {
-	const int layer0 = bitswap<2>(offset ^ 1, 18, 0) << 1;
-
-	u8 const *const l0 = m_layer[layer0].get();
-	u8 const *const l1 = m_layer[layer0 + 1].get();
-
-	offset >>= 1;
-	offset &= 0x1ffff;
-
-	return (l0[offset] << 8) | l1[offset];
+	unsigned const layer = bitswap<2>(offset, 18, 0);
+	offs_t const byteoffset = (offset >> 1) & 0x1ffff;
+	return m_layer_ram[layer][byteoffset];
 }
 
-void igs011_state::igs011_layers_w(offs_t offset, u16 data, u16 mem_mask)
+void igs011_state::igs011_layers_w(offs_t offset, u8 data)
 {
-	const int layer0 = bitswap<2>(offset ^ 1, 18, 0) << 1;
-
-	u8 *const l0 = m_layer[layer0].get();
-	u8 *const l1 = m_layer[layer0 + 1].get();
-
-	offset >>= 1;
-	offset &= 0x1ffff;
-
-	u16 word = (l0[offset] << 8) | l1[offset];
-	COMBINE_DATA(&word);
-	l0[offset] = word >> 8;
-	l1[offset] = word;
+	unsigned const layer = bitswap<2>(offset, 18, 0);
+	offs_t const byteoffset = (offset >> 1) & 0x1ffff;
+	m_layer_ram[layer][byteoffset] = data;
 }
 
 /***************************************************************************
@@ -551,35 +546,40 @@ void igs011_state::igs011_blit_pen_w(offs_t offset, u16 data, u16 mem_mask)
 
 void igs011_state::igs011_blit_flags_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	const rectangle &clip = m_screen->visible_area();
+	rectangle const &clip = m_screen->visible_area();
 
 	COMBINE_DATA(&m_blitter.flags);
 
 	LOGMASKED(LOG_BLITTER, "%06x: blit x %03x, y %03x, w %03x, h %03x, gfx %03x%04x, depth %02x, pen %02x, flags %03x\n", m_maincpu->pc(),
 		m_blitter.x,m_blitter.y,m_blitter.w,m_blitter.h,m_blitter.gfx_hi,m_blitter.gfx_lo,m_blitter.depth,m_blitter.pen,m_blitter.flags);
 
-	u8 *const dest = m_layer[m_blitter.flags & 0x0007].get();
-	const bool opaque = BIT(~m_blitter.flags, 3);
-	const bool clear  = BIT( m_blitter.flags, 4);
-	const bool flipx  = BIT( m_blitter.flags, 5);
-	const bool flipy  = BIT( m_blitter.flags, 6);
-	if                 (BIT(~m_blitter.flags, 10))
+	unsigned const layer  = m_blitter.flags & 0x0007;
+	bool     const opaque = BIT(~m_blitter.flags,  3);
+	bool     const clear  = BIT( m_blitter.flags,  4);
+	bool     const flipx  = BIT( m_blitter.flags,  5);
+	bool     const flipy  = BIT( m_blitter.flags,  6);
+	bool     const blit   = BIT( m_blitter.flags, 10);
+
+	if (!blit)
 		return;
 
-	const u8 pen_hi = (m_blitter_pen_hi & 0x07) << 5;
+	u8 const pen_hi = (m_blitter_pen_hi & 0x07) << 5;
+	unsigned const hibpplayers = 4 - (m_blitter.depth & 0x07);
+	bool const dst4 = layer >= hibpplayers;
+	unsigned const shift = dst4 ? (((layer - hibpplayers) & 0x01) << 2) : 0;
+	u8 const mask = dst4 ? (0xf0 >> shift) : 0xff;
+	auto &dest = m_layer_ram[dst4 ? (hibpplayers + ((layer - hibpplayers) >> 1)) : layer];
 
-	// pixel address
-	u32 z = m_blitter.gfx_lo + (m_blitter.gfx_hi << 16);
+	// pixel source address
+	u32 z = m_blitter.gfx_lo | (u32(m_blitter.gfx_hi) << 16);
 
-	// what were they smoking???
-	const bool depth4 = !((m_blitter.flags & 0x7) < (4 - (m_blitter.depth & 0x7))) ||
-				(z & 0x800000);     // see lhb2
+	bool const src4 = dst4 || (z & 0x800000); // see lhb2
 
 	z &= 0x7fffff;
 
 	u8 trans_pen, clear_pen;
 
-	if (depth4)
+	if (src4)
 	{
 		z <<= 1;
 		if (m_gfx_hi && (m_blitter.gfx_hi & 0x80)) trans_pen = 0x1f;   // lhb2
@@ -609,26 +609,28 @@ void igs011_state::igs011_blit_flags_w(offs_t offset, u16 data, u16 mem_mask)
 		for (int x = xstart; x != xend; x += xinc)
 		{
 			u8 pen = 0;
+
 			// fetch the pixel
 			if (!clear)
 			{
-				if (depth4) pen = (m_gfx[(z >> 1) % m_gfx.length()] >> (BIT(z, 0) << 2)) & 0x0f;
-				else        pen = m_gfx[z % m_gfx.length()];
+				if (src4)
+					pen = (m_gfx[(z >> 1) % m_gfx.length()] >> (BIT(z, 0) << 2)) & 0x0f;
+				else
+					pen = m_gfx[z % m_gfx.length()];
 
 				if (m_gfx_hi)
-				{
-					pen &= 0x0f;
-					if (BIT(m_gfx_hi[(z >> 3) % m_gfx_hi.length()], z & 7))
-						pen |= 0x10;
-				}
+					pen = (pen & 0x0f) | (BIT(m_gfx_hi[(z >> 3) % m_gfx_hi.length()], z & 7) << 4);
 			}
 
 			// plot it
-			if (clip.contains(x, y))
+			if (clip.contains(x, y) && (clear || (pen != trans_pen) || opaque))
 			{
-				if      (clear)            dest[x + y * 512] = clear_pen;
-				else if (pen != trans_pen) dest[x + y * 512] = pen | pen_hi;
-				else if (opaque)           dest[x + y * 512] = 0xff;
+				u8 const val = clear ? clear_pen : (pen != trans_pen) ? (pen | pen_hi) : 0xff;
+				u8 &destbyte = dest[(y << 9) | x];
+				if (dst4)
+					destbyte = (destbyte & mask) | ((val & 0x0f) << shift);
+				else
+					destbyte = val;
 			}
 
 			z++;
@@ -2807,9 +2809,9 @@ void igs011_state::lhb_mem(address_map &map)
 
 	map(0x100000, 0x103fff).ram().share("nvram");
 	map(0x200000, 0x200fff).ram().share(m_priority_ram);
-	map(0x300000, 0x3fffff).rw(FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
-	map(0x400000, 0x400fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
-	map(0x401000, 0x401fff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).umask16(0x00ff).share("palette_ext");
+	map(0x300000, 0x3fffff).umask16(0x00ff).rw(FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
+	map(0x400000, 0x400fff).umask16(0x00ff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).share("palette");
+	map(0x401000, 0x401fff).umask16(0x00ff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0x600001, 0x600001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x700000, 0x700001).portr("COIN");
 	map(0x700002, 0x700005).r(FUNC(igs011_state::lhb_inputs_r));
@@ -2851,9 +2853,9 @@ void igs011_state::xymg_base_mem(address_map &map)
 	map(0x100000, 0x103fff).ram();
 	map(0x1f0000, 0x1f3fff).ram().share("nvram"); // extra ram
 	map(0x200000, 0x200fff).ram().share(m_priority_ram);
-	map(0x300000, 0x3fffff).rw(FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
-	map(0x400000, 0x400fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
-	map(0x401000, 0x401fff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).umask16(0x00ff).share("palette_ext");
+	map(0x300000, 0x3fffff).umask16(0x00ff).rw(FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
+	map(0x400000, 0x400fff).umask16(0x00ff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).share("palette");
+	map(0x401000, 0x401fff).umask16(0x00ff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0x600001, 0x600001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x820000, 0x820001).w(FUNC(igs011_state::igs011_priority_w));
 	map(0x840000, 0x840001).w(FUNC(igs011_state::dips_w));
@@ -2904,9 +2906,9 @@ void igs011_state::wlcc_mem(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x103fff).ram().share("nvram");
 	map(0x200000, 0x200fff).ram().share(m_priority_ram);
-	map(0x300000, 0x3fffff).rw(FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
-	map(0x400000, 0x400fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
-	map(0x401000, 0x401fff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).umask16(0x00ff).share("palette_ext");
+	map(0x300000, 0x3fffff).umask16(0x00ff).rw(FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
+	map(0x400000, 0x400fff).umask16(0x00ff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).share("palette");
+	map(0x401000, 0x401fff).umask16(0x00ff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0x520000, 0x520001).portr("COIN");
 	map(0x600001, 0x600001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x800000, 0x800001).w(FUNC(igs011_state::igs003_w));
@@ -2952,7 +2954,7 @@ void igs011_state::lhb2_mem(address_map &map)
 	map(0x210000, 0x210fff).umask16(0x00ff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).share("palette");
 	map(0x211000, 0x211fff).umask16(0x00ff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0x214000, 0x214001).portr("COIN");
-	map(0x300000, 0x3fffff).rw(FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
+	map(0x300000, 0x3fffff).umask16(0x00ff).rw(FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
 	map(0xa20000, 0xa20001).w(FUNC(igs011_state::igs011_priority_w));
 	map(0xa40000, 0xa40001).w(FUNC(igs011_state::dips_w));
 
@@ -2992,10 +2994,10 @@ void igs011_state::nkishusp_mem(address_map &map)
 	map(0x208000, 0x208001).nopr().w(FUNC(igs011_state::igs003_w));
 	map(0x208002, 0x208003).rw(FUNC(igs011_state::lhb2_igs003_r), FUNC(igs011_state::lhb2_igs003_w));
 	map(0x20c000, 0x20cfff).ram().share(m_priority_ram);
-	map(0x210000, 0x210fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
-	map(0x211000, 0x211fff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).umask16(0x00ff).share("palette_ext");
+	map(0x210000, 0x210fff).umask16(0x00ff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).share("palette");
+	map(0x211000, 0x211fff).umask16(0x00ff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0x214000, 0x214001).portr("COIN");
-	map(0x300000, 0x3fffff).rw(FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
+	map(0x300000, 0x3fffff).umask16(0x00ff).rw(FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
 	map(0xa20000, 0xa20001).w(FUNC(igs011_state::igs011_priority_w));
 	map(0xa38000, 0xa38001).w(FUNC(igs011_state::lhb_irq_enable_w));
 	map(0xa40000, 0xa40001).w(FUNC(igs011_state::dips_w));
@@ -3085,9 +3087,9 @@ void vbowl_state::vbowl_mem(address_map &map)
 
 	map(0x100000, 0x103fff).ram().share("nvram");
 	map(0x200000, 0x200fff).ram().share(m_priority_ram);
-	map(0x300000, 0x3fffff).rw(FUNC(vbowl_state::igs011_layers_r), FUNC(vbowl_state::igs011_layers_w));
-	map(0x400000, 0x400fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
-	map(0x401000, 0x401fff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).umask16(0x00ff).share("palette_ext");
+	map(0x300000, 0x3fffff).umask16(0x00ff).rw(FUNC(vbowl_state::igs011_layers_r), FUNC(vbowl_state::igs011_layers_w));
+	map(0x400000, 0x400fff).umask16(0x00ff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).share("palette");
+	map(0x401000, 0x401fff).umask16(0x00ff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0x520000, 0x520001).portr("COIN");
 	map(0x600000, 0x600007).rw(m_ics, FUNC(ics2115_device::word_r), FUNC(ics2115_device::word_w));
 	map(0x700000, 0x700003).ram().share(m_vbowl_trackball);
@@ -3470,9 +3472,9 @@ static INPUT_PORTS_START( lhb2 )
 	PORT_DIPSETTING(    0x00, "Unlimited" )                                           // 無限制
 	PORT_DIPNAME( 0x0c, 0x0c, "Gals" )                  PORT_DIPLOCATION("SW3:3,4")   // 美女
 	PORT_DIPSETTING(    0x0c, DEF_STR(Off) )                                          // 無美女
-	PORT_DIPSETTING(    0x08, "1?" )                                                  // ??
-	PORT_DIPSETTING(    0x04, "2?" )                                                  // 開?
-	PORT_DIPSETTING(    0x00, "3?" )                                                  // 開?
+	PORT_DIPSETTING(    0x08, "Clothed" )                                             // 保守
+	PORT_DIPSETTING(    0x04, "Nudity" )                                              // 開放
+	PORT_DIPSETTING(    0x00, "Nudity" )                                              // 開放
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW3:5" )                                     // (not shown in settings display)
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW3:6" )                                     // (not shown in settings display)
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW3:7" )                                     // (not shown in settings display)
