@@ -277,7 +277,7 @@ void audio_effect_compressor::reset_input_gain()
 {
 	audio_effect_compressor *d = static_cast<audio_effect_compressor *>(m_default);
 	m_isset_input_gain = false;
-	m_input_gain = d ? d->input_gain() : 12;
+	m_input_gain = d ? d->input_gain() : 0;
 }
 
 void audio_effect_compressor::reset_output_gain()
