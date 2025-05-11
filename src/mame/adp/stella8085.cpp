@@ -49,6 +49,7 @@ public:
 	{ }
 
 	void dicemstr(machine_config &config);
+	void kniffi(machine_config &config);
 	void doppelpot(machine_config &config);
 
 private:
@@ -56,7 +57,9 @@ private:
 	required_device<i8279_device> m_kdc;
 
 	void program_map(address_map &map) ATTR_COLD;
-	void io_map(address_map &map) ATTR_COLD;
+	void large_program_map(address_map &map) ATTR_COLD;
+	void rtc62421_io_map(address_map &map) ATTR_COLD;
+	void mc146818_io_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -67,8 +70,23 @@ void stella8085_state::program_map(address_map &map)
 	map(0xc000, 0xc7ff).ram(); // ICC6
 }
 
-void stella8085_state::io_map(address_map &map)
+void stella8085_state::large_program_map(address_map &map)
 {
+	map(0x0000, 0x7fff).rom(); // ICE6
+	map(0x8000, 0x9fff).ram(); // ICC6
+	map(0xa000, 0xffff).rom(); // ICD6
+}
+
+void stella8085_state::rtc62421_io_map(address_map &map)
+{
+	map(0x00, 0x0f).rw("rtc", FUNC(rtc62421_device::read), FUNC(rtc62421_device::write));
+	map(0x50, 0x51).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
+	//map(0x60, 0x6f).rw("muart", FUNC(i8256_device::read8), FUNC(i8256_device::write8));
+}
+
+void stella8085_state::mc146818_io_map(address_map &map)
+{
+	// TODO
 }
 
 
@@ -120,27 +138,33 @@ INPUT_PORTS_END
 void stella8085_state::dicemstr(machine_config &config)
 {
 	I8085A(config, m_maincpu, 10.240_MHz_XTAL / 2); // divider not verified
-	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::program_map);
-	m_maincpu->set_addrmap(AS_IO, &stella8085_state::io_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::large_program_map);
+	m_maincpu->set_addrmap(AS_IO, &stella8085_state::rtc62421_io_map);
 
-	//I8256(config, "muart1", 10.240_MHz_XTAL / 2); // divider not verified
+	//I8256(config, "muart", 10.240_MHz_XTAL / 2); // divider not verified
 
-	I8279(config, m_kdc, 10.240_MHz_XTAL / 2); // divider not verified
+	I8279(config, m_kdc, 10.240_MHz_XTAL / 4); // divider not verified
 
 	RTC62421(config, "rtc", 32.768_kHz_XTAL);
 
 	SPEAKER(config, "mono").front_center();
 }
 
+void stella8085_state::kniffi(machine_config &config)
+{
+	dicemstr(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::program_map);
+}
+
 void stella8085_state::doppelpot(machine_config &config)
 {
 	I8085A(config, m_maincpu, 6.144_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::program_map);
-	m_maincpu->set_addrmap(AS_IO, &stella8085_state::io_map);
+	m_maincpu->set_addrmap(AS_IO, &stella8085_state::mc146818_io_map);
 
-	//I8256(config, "muart1", 6.144_MHz_XTAL);
+	//I8256(config, "muart", 6.144_MHz_XTAL);
 
-	I8279(config, m_kdc, 6.144_MHz_XTAL);
+	I8279(config, m_kdc, 6.144_MHz_XTAL / 2);
 
 	MC146818(config, "rtc", 32.768_kHz_XTAL);
 
@@ -233,9 +257,9 @@ GAME( 1987, disc2001, doppelpot, doppelpot, dicemstr, stella8085_state, empty_in
 GAME( 1989, disc3000, doppelpot, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "ADP", "Disc 3000", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 GAME( 1986, doppelpot, 0, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "Nova", "Doppelpot", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 GAME( 1986, elitedisc, doppelpot, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "ADP", "Elite Disc", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 1988, extrablatt, kniffi, dicemstr, dicemstr, stella8085_state, empty_init, ROT0, "ADP", "Extrablatt", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1988, extrablatt, kniffi, kniffi, dicemstr, stella8085_state, empty_init, ROT0, "ADP", "Extrablatt", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 GAME( 1982, excellent, 0, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "ADP", "Excellent", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 1998, glucksstern, kniffi, dicemstr, dicemstr, stella8085_state, empty_init, ROT0, "ADP", "Glücks-Stern", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 1988, juwel, kniffi, dicemstr, dicemstr, stella8085_state, empty_init, ROT0, "ADP", "Juwel", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 1992, karoas, kniffi, dicemstr, dicemstr, stella8085_state, empty_init, ROT0, "ADP", "Karo As", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 1987, kniffi, 0, dicemstr, dicemstr, stella8085_state, empty_init, ROT0, "Nova", "Kniffi", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1998, glucksstern, kniffi, kniffi, dicemstr, stella8085_state, empty_init, ROT0, "ADP", "Glücks-Stern", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1988, juwel, kniffi, kniffi, dicemstr, stella8085_state, empty_init, ROT0, "ADP", "Juwel", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1992, karoas, kniffi, kniffi, dicemstr, stella8085_state, empty_init, ROT0, "ADP", "Karo As", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1987, kniffi, 0, kniffi, dicemstr, stella8085_state, empty_init, ROT0, "Nova", "Kniffi", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
