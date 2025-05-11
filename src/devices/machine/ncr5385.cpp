@@ -213,7 +213,7 @@ void ncr5385_device::scsi_ctrl_changed()
 				ctrl & S_REQ ? " REQ" : "", ctrl & S_ACK ? " ACK" : "");
 
 		if (m_state != IDLE)
-			m_state_timer->adjust(attotime::from_usec(80));
+			m_state_timer->adjust(attotime::from_usec(1000));
 	}
 	else
 	{
