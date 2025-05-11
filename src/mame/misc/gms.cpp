@@ -73,8 +73,7 @@ TODO:
   recognises it as both Payout and Flip Flop)
 - sc2in1 recognises the Payout key in the input test but it appears to have no
   effect in the game
-- correct EEPROM hookup for all games (this would get rid of a lot of ROM
-  patches)
+- figure out the remaining weirdness in the multiplexed EEPROM interface
 - hookup MCU and YM2151 / YM3812 sound for the mahjong games
 - hookup PIC16F84 for rbspm
 - emulate protection devices correctly instead of patching
@@ -115,8 +114,9 @@ super555: https://www.youtube.com/watch?v=CCUKdbQ5O-U
 
 // configurable logging
 #define LOG_TILEATTR (1U << 1)
+#define LOG_EEPROM (1U << 2)
 
-// #define VERBOSE (LOG_GENERAL | LOG_TILEATTR)
+// #define VERBOSE (LOG_GENERAL | LOG_TILEATTR | LOG_EEPROM)
 
 #include "logmacro.h"
 
@@ -159,6 +159,7 @@ public:
 	void ssanguoj(machine_config &config) ATTR_COLD;
 
 	void super555(machine_config &config) ATTR_COLD;
+	void hgly(machine_config &config) ATTR_COLD;
 
 	void init_ballch() ATTR_COLD;
 	void init_cjdlz() ATTR_COLD;
@@ -200,6 +201,11 @@ protected:
 	tilemap_t *m_reel_tilemap[4];
 	tilemap_t *m_tilemap[2]{};
 
+	bool m_eeprom_mux_interface = false;
+	uint8_t m_eeprom_command = 0;
+	uint8_t m_eeprom_sequence = 0;
+	uint8_t m_eeprom_data[4] = {0, 0, 0, 0};
+
 	void super555_mem(address_map &map) ATTR_COLD;
 
 	void lamps_w(uint16_t data);
@@ -215,6 +221,7 @@ private:
 	void rbmk_mem(address_map &map) ATTR_COLD;
 	void rbspm_mem(address_map &map) ATTR_COLD;
 	void ssanguoj_mem(address_map &map) ATTR_COLD;
+	void hgly_mem(address_map &map) ATTR_COLD;
 
 	uint16_t unk_r();
 	uint16_t dipsw_matrix_r();
@@ -224,7 +231,9 @@ private:
 	uint8_t mcu_io_r(offs_t offset);
 	void mcu_io_w(offs_t offset, uint8_t data);
 	void mcu_io_mux_w(uint8_t data);
-	void eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t eeprom_r();
+	void eeprom_w(uint16_t data);
+	void hgly_eeprom_w(uint16_t data);
 
 	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_reel_tile_info);
 	TILE_GET_INFO_MEMBER(get_tile0_info);
@@ -372,14 +381,98 @@ void gms_2layers_state::lamps_w(uint16_t data)
 		m_lamps[i] = BIT(data, i);
 }
 
-void gms_2layers_state::eeprom_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+uint16_t gms_2layers_state::eeprom_r()
 {
-	if (ACCESSING_BITS_0_7)
+	assert(m_eeprom_mux_interface);
+	LOGMASKED(LOG_EEPROM, "%s: Reading %02X from EEPROM byte %d\n", machine().describe_context(), m_eeprom_data[BIT(m_eeprom_command, 2, 2)], BIT(m_eeprom_command, 2, 2));
+	return m_eeprom_data[BIT(m_eeprom_command, 2, 2)];
+}
+
+void gms_2layers_state::eeprom_w(uint16_t data)
+{
+	if (m_eeprom_mux_interface && (m_eeprom_command & 0xffc0) == 0x0080)
 	{
-		m_eeprom->cs_write(BIT(data, 0));
-		m_eeprom->clk_write(BIT(data, 1));
-		m_eeprom->di_write(BIT(data, 2));
+		LOGMASKED(LOG_EEPROM, "%s: Writing %02X to EEPROM byte %d\n", machine().describe_context(), data & 0xff, BIT(m_eeprom_command, 2, 2));
+		m_eeprom_data[BIT(m_eeprom_command, 2, 2)] = data & 0xff;
+		m_eeprom_command |= 0x40;
+		return;
 	}
+
+	m_eeprom->cs_write(BIT(data, 0));
+	m_eeprom->clk_write(BIT(data, 1));
+
+	if (m_eeprom_mux_interface)
+	{
+		if ((data & 0xff80) == 0x0080)
+		{
+			if (BIT(data, 4))
+			{
+				if (!BIT(data, 1) && BIT(m_eeprom_command, 1))
+				{
+					if (m_eeprom->do_read())
+						m_eeprom_data[BIT(m_eeprom_sequence, 3, 2)] |= 1 << BIT(~m_eeprom_sequence, 0, 3);
+					else
+						m_eeprom_data[BIT(m_eeprom_sequence, 3, 2)] &= ~(1 << BIT(~m_eeprom_sequence, 0, 3));
+					m_eeprom_sequence++;
+					if (m_eeprom_sequence == 0xff)
+						m_eeprom->di_write(1);
+					else
+						m_eeprom->di_write(BIT(m_eeprom_data[BIT(m_eeprom_sequence, 3, 2)], BIT(~m_eeprom_sequence, 0, 3)));
+				}
+			}
+			else
+			{
+				m_eeprom->di_write(0);
+				m_eeprom_sequence = 0xfe;
+			}
+			m_eeprom_command = data;
+		}
+		else
+			logerror("%s: Unknown EEPROM command %02X\n", machine().describe_context(), data);
+	}
+	else
+		m_eeprom->di_write(BIT(data, 2));
+}
+
+void gms_2layers_state::hgly_eeprom_w(uint16_t data)
+{
+	if (m_eeprom_mux_interface && (m_eeprom_command & 0xffc0) == 0x0080)
+	{
+		LOGMASKED(LOG_EEPROM, "%s: Writing %02X to EEPROM byte %d\n", machine().describe_context(), data & 0xff, BIT(m_eeprom_command, 2, 2));
+		m_eeprom_data[BIT(m_eeprom_command, 2, 2)] = data & 0xff;
+		m_eeprom_command |= 0x40;
+		return;
+	}
+
+	m_eeprom->cs_write(BIT(data, 4));
+	m_eeprom->clk_write(BIT(data, 1));
+
+	if ((data & 0xfb80) == 0x0080)
+	{
+		if (BIT(data, 0) || BIT(data, 10))
+		{
+			if (!BIT(data, 1) && BIT(m_eeprom_command, 1))
+			{
+				if (m_eeprom->do_read())
+					m_eeprom_data[BIT(m_eeprom_sequence, 3, 2)] |= 1 << BIT(~m_eeprom_sequence, 0, 3);
+				else
+					m_eeprom_data[BIT(m_eeprom_sequence, 3, 2)] &= ~(1 << BIT(~m_eeprom_sequence, 0, 3));
+				m_eeprom_sequence++;
+				if (m_eeprom_sequence == 0xff)
+					m_eeprom->di_write(1);
+				else
+					m_eeprom->di_write(BIT(m_eeprom_data[BIT(m_eeprom_sequence, 3, 2)], BIT(~m_eeprom_sequence, 0, 3)));
+			}
+		}
+		else
+		{
+			m_eeprom->di_write(0);
+			m_eeprom_sequence = 0xfe;
+		}
+		m_eeprom_command = data & 0xff;
+	}
+	else
+		logerror("%s: Unknown EEPROM command %04X\n", machine().describe_context(), data);
 }
 
 
@@ -486,7 +579,7 @@ void gms_2layers_state::super555_mem(address_map &map)
 	map(0x980300, 0x98037f).ram().share(m_scrolly[2]);
 	map(0x980380, 0x9803ff).ram().share(m_scrolly[3]);
 	map(0x9c0000, 0x9c0fff).ram().w(FUNC(gms_2layers_state::vram_w<0>)).share(m_vidram[0]);
-	//map(0xf00000, 0xf00001).w(FUNC(gms_2layers_state::eeprom_w)); // wrong?
+	map(0xf00000, 0xf00001).rw(FUNC(gms_2layers_state::eeprom_r), FUNC(gms_2layers_state::eeprom_w));
 }
 
 void gms_3layers_state::magslot_mem(address_map &map)
@@ -494,6 +587,13 @@ void gms_3layers_state::magslot_mem(address_map &map)
 	super555_mem(map);
 
 	map(0x9e0000, 0x9e0fff).ram().w(FUNC(gms_3layers_state::vram_w<1>)).share(m_vidram[1]);
+}
+
+void gms_2layers_state::hgly_mem(address_map &map)
+{
+	super555_mem(map);
+
+	map(0xf00000, 0xf00001).w(FUNC(gms_2layers_state::hgly_eeprom_w));
 }
 
 uint8_t gms_2layers_state::mcu_io_r(offs_t offset)
@@ -1034,7 +1134,7 @@ static INPUT_PORTS_START( magslot )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_CUSTOM )         PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // but recognized for password entering
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // but recognized for password entering
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)) // TODO: verify
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)) // for ready polling only
 
 	// 3 8-switch banks on PCB
 	PORT_START("DSW1") // Game setup is password protected, needs reverse engineering of the password
@@ -1159,8 +1259,7 @@ static INPUT_PORTS_START( super555 )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_CUSTOM )         PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	//PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)) // TODO: verify
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)) // for ready polling only
 
 	// There are 4 banks of 8 DIP switches on the PCB but only 3 are shown in test mode.
 	// DIP switch settings as per test mode.
@@ -1313,8 +1412,7 @@ static INPUT_PORTS_START( sscs )
 	PORT_BIT( 0x00f8, IP_ACTIVE_LOW, IPT_UNKNOWN )                                                     PORT_CONDITION("DSW2", 0x80, NOTEQUALS, 0x80)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	//PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)) // TODO: verify
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)) // for ready polling only
 
 	// There are 4 banks of 8 DIP switches on PCB, but only 3 are shown in test mode.
 	// DIP switch settings as per test mode. 'Secret' test mode shows all 4 banks.
@@ -1480,9 +1578,7 @@ static INPUT_PORTS_START( sc2in1 )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_CUSTOM )         PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	//PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)) // TODO: verify
-
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)) // for ready polling only
 
 	// Only 1 8-DIP bank on PCB. Dips' effects as per test mode.
 	PORT_START("DSW1")
@@ -1541,8 +1637,7 @@ static INPUT_PORTS_START( jinpaish )
 	PORT_BIT( 0x00f8, IP_ACTIVE_LOW, IPT_UNKNOWN )                                              PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	//PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)) // TODO: verify
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)) // for ready polling only
 
 	// Only 1 8-DIP bank on PCB. DIPs' effects as per test mode.
 	PORT_START("DSW1")
@@ -1597,8 +1692,7 @@ static INPUT_PORTS_START( baile )
 	PORT_BIT( 0x00f8, IP_ACTIVE_LOW, IPT_UNKNOWN )                                               PORT_CONDITION("DSW1", 0x80, NOTEQUALS, 0x80)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	//PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)) // TODO: verify
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)) // for ready polling only
 
 	// Only 1 8-DIP bank on PCB. Most options appear to be soft settings.
 	PORT_START("DSW1")
@@ -1626,8 +1720,8 @@ static INPUT_PORTS_START( yyhm )
 	PORT_BIT( 0xf800, IP_ACTIVE_LOW, IPT_UNKNOWN )            PORT_CONDITION("DSW1", 0x0080, EQUALS, 0x0000)
 
 	PORT_MODIFY("IN2")
-	PORT_BIT( 0xe000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	//PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)) // TODO: verify
+	PORT_BIT( 0x6000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)) // for ready polling only
 
 	// Only 1 8-DIP bank on PCB. DIPs' effects as per test mode.
 	PORT_START("DSW1")
@@ -1693,8 +1787,7 @@ static INPUT_PORTS_START( ballch )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_CUSTOM )         PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	//PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)) // TODO: verify
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)) // for ready polling only
 
 	// There are 3 8-DIP banks on PCB. Dips' effects as per test mode.
 	PORT_START("DSW1")
@@ -1816,8 +1909,7 @@ static INPUT_PORTS_START( cots )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_CUSTOM )         PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	//PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)) // TODO: verify
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)) // for ready polling only
 
 	// There are 3 8-switch banks on PCB, but settings seem to be selected via test mode
 	PORT_START("DSW1")
@@ -1947,8 +2039,7 @@ static INPUT_PORTS_START( sball2k1 )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	//PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)) // TODO: verify
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)) // for ready polling only
 
 	// There are 4 banks of 8 DIP switches on the PCB but only 1 is shown in test mode.
 	// DIP switch settings as per test mode. Other settings seem to be determined by software.
@@ -2164,10 +2255,9 @@ static INPUT_PORTS_START( hgly )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )                                              PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )    PORT_NAME(u8"Double Up × 2 / Big")    PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )     PORT_NAME(u8"Double Up × ½ / Small")  PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )                                              PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )                                              PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )                                              PORT_CONDITION("DSW3", 0x0040, NOTEQUALS, 0x0040)
-	//PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)) // TODO: verify
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)) // for ready polling only
 
 	// Only 4 DIP banks are actually populated on PCBs but test mode reads all 6.
 	PORT_START("DSW1")   // 16bit, in test mode first 8 are recognized as DSW1, second 8 as DSW4.
@@ -2359,6 +2449,13 @@ void gms_2layers_state::machine_start()
 	save_item(NAME(m_tilebank));
 	save_item(NAME(m_mux_data));
 	save_item(NAME(m_input_matrix));
+
+	if (m_eeprom_mux_interface)
+	{
+		save_item(NAME(m_eeprom_command));
+		save_item(NAME(m_eeprom_sequence));
+		save_item(NAME(m_eeprom_data));
+	}
 }
 
 void gms_2layers_state::video_start()
@@ -2500,7 +2597,7 @@ void gms_2layers_state::rbmk(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x800);
 
-	EEPROM_93C46_16BIT(config, m_eeprom);
+	EEPROM_93C46_16BIT(config, m_eeprom).set_do_tristate(0);
 
 	HOPPER(config, "hopper", attotime::from_msec(50));
 
@@ -2542,6 +2639,7 @@ void gms_2layers_state::super555(machine_config &config)
 	rbmk(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &gms_2layers_state::super555_mem);
+	m_eeprom_mux_interface = true;
 
 	config.device_remove("mcu");
 	config.device_remove("ymsnd");
@@ -2554,6 +2652,13 @@ void gms_3layers_state::magslot(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &gms_3layers_state::magslot_mem);
 
 	m_gfxdecode->set_info(gfx_magslot);
+}
+
+void gms_2layers_state::hgly(machine_config &config)
+{
+	super555(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &gms_2layers_state::hgly_mem);
 }
 
 
@@ -3077,10 +3182,6 @@ void gms_3layers_state::init_baile()
 	rom[0xb494 / 2] = 0x6000;
 	rom[0xb4a6 / 2] = 0x4e71;
 	rom[0xb4a8 / 2] = 0x4e71;
-
-	// U136 ERROR
-	rom[0xb4ba / 2] = 0x6000;
-	rom[0xb530 / 2] = 0x6000;
 	rom[0xb542 / 2] = 0x4e71;
 	rom[0xb544 / 2] = 0x4e71;
 }
@@ -3095,10 +3196,6 @@ void gms_3layers_state::init_jinpaish()
 	rom[0x31a0a / 2] = 0x6000;
 	rom[0x31a1a / 2] = 0x4e71;
 	rom[0x31a1c / 2] = 0x4e71;
-
-	// U136 ERROR
-	rom[0x31a4a / 2] = 0x6000;
-	rom[0x31f38 / 2] = 0x6000;
 	rom[0x31f4a / 2] = 0x4e71;
 	rom[0x31f4c / 2] = 0x4e71;
 
@@ -3118,16 +3215,9 @@ void gms_3layers_state::init_sc2in1()
 	rom[0x46818 / 2] = 0x4e71;
 	rom[0x4681a / 2] = 0x4e71;
 
-	rom[0x45f60 / 2] = 0x6000;
-
-	// loops endlessly
+	// U181 ERROR
 	rom[0x45f70 / 2] = 0x4e71;
 	rom[0x45f72 / 2] = 0x4e71;
-
-	// U136 ERROR
-	rom[0x45f9e / 2] = 0x6000;
-
-	// U181 ERROR
 	rom[0x46842 / 2] = 0x4e71;
 	rom[0x46844 / 2] = 0x4e71;
 }
@@ -3151,7 +3241,6 @@ void gms_2layers_state::init_super555()
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	rom[0x46f54 / 2] = 0x6000; // loops endlessly after ROM / RAM test
-	rom[0x474b4 / 2] = 0x4e71; // 0x09 U64 ERROR
 	rom[0x4782e / 2] = 0x6000; // 0x0A U135 ERROR
 }
 
@@ -3159,17 +3248,20 @@ void gms_2layers_state::init_ballch()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
-	rom[0x12f0c / 2] = 0x4e71; // U135 ERROR
-	rom[0x13212 / 2] = 0x4e71; // U64 U136 ERROR
+	rom[0x1225e / 2] = 0x6000; // U64 U136 ERROR
+	rom[0x122b4 / 2] = 0x6000; // "
+	rom[0x12ee6 / 2] = 0x6026; // U135 ERROR
 }
 
 void gms_2layers_state::init_cots()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
-	rom[0x186c8 / 2] = 0x6000; // U64 U136 ERROR
+	rom[0x1868e / 2] = 0x6000; // U64 U136 ERROR
 	rom[0x198f6 / 2] = 0x62fe; // "
 	rom[0x19566 / 2] = 0x62fe; // A88 ERROR U135 ERROR
+	rom[0x1ab9a / 2] = 0x6030; // divide by zero
+	rom[0x1abfe / 2] = 0x600a; // divide by zero
 
 	// the password to enter test mode is all Start
 }
@@ -3178,11 +3270,12 @@ void gms_2layers_state::init_sscs()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
+	rom[0x1c06 / 2] = 0x6008; // loops endlessly later on
 	rom[0x32b2 / 2] = 0x6000; // loops endlessly after ROM / RAM test
 	rom[0xcc1c / 2] = 0x6000; // U135 ERROR
 	rom[0xcc2e / 2] = 0x4e71; // U135 ERROR
 	rom[0xcc30 / 2] = 0x4e71; // U135 ERROR
-	rom[0xcc5e / 2] = 0x6000; // U136 ERROR
+	rom[0xccaa / 2] = 0x6000; // U136 ERROR
 	rom[0xce2a / 2] = 0x6000; // U136 ERROR
 	rom[0xce3c / 2] = 0x4e71; // U136 ERROR
 	rom[0xce3e / 2] = 0x4e71; // U136 ERROR
@@ -3197,7 +3290,8 @@ void gms_2layers_state::init_cjdlz()
 	rom[0x0c628 / 2] = 0x6000; // 0x99 REPAIR
 	rom[0x0c8e6 / 2] = 0x4e71; // loop
 	rom[0x0ca00 / 2] = 0x6000; // 0xA REPAIR
-	rom[0x0ca24 / 2] = 0x4e71; // 0xE REPAIR
+	rom[0x0ca24 / 2] = 0x4e71; // 0xC REPAIR
+	rom[0x0ca86 / 2] = 0x6000; // 0xB REPAIR
 	rom[0x38664 / 2] = 0x6000; // 0xD REPAIR
 	rom[0x38980 / 2] = 0x6000; // 0xD REPAIR
 }
@@ -3209,6 +3303,7 @@ void gms_2layers_state::init_hgly()
 	rom[0x0feda / 2] = 0x6004; // U35 ERROR
 	rom[0x10128 / 2] = 0x6004; // U36 ERROR
 	rom[0x1393e / 2] = 0x6000; // U64 ERROR
+	rom[0x13994 / 2] = 0x6000; // U64 ERROR
 }
 
 } // anonymous namespace
@@ -3218,21 +3313,21 @@ void gms_2layers_state::init_hgly()
 GAME( 1998, rbmk,     0, rbmk,     rbmk,     gms_2layers_state, empty_init,    ROT0,  "GMS", "Shizhan Majiang Wang (Version 8.8)",                    MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // misses YM2151 hookup
 GAME( 1998, rbspm,    0, rbspm,    rbspm,    gms_2layers_state, init_rbspm,    ROT0,  "GMS", "Shizhan Ding Huang Maque (Version 4.1)",                MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Misses YM2151 hookup
 GAME( 1998, ssanguoj, 0, ssanguoj, ssanguoj, gms_2layers_state, init_ssanguoj, ROT0,  "GMS", "Shizhan Sanguo Ji Jiaqiang Ban (Version 8.9 980413)",   MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now. YM3812 isn't hooked up (goes through undumped MCU).
-GAME( 1999, cjdlz,    0, super555, cjdlz,    gms_2layers_state, init_cjdlz,    ROT0,  "GMS", "Chaoji Da Lianzhuang (Version 1.1)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Also needs EEPROM support.
-GAME( 2005, yyhm,     0, magslot,  yyhm,     gms_3layers_state, init_yyhm,     ROT0,  "GMS", "Yuanyang Hudie Meng (Version 8.8A 2005-09-25)",         MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Also needs EEPROM support.
+GAME( 1999, cjdlz,    0, super555, cjdlz,    gms_2layers_state, init_cjdlz,    ROT0,  "GMS", "Chaoji Da Lianzhuang (Version 1.1)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // stops during boot, patched for now. EEPROM interface doesn't quite work.
+GAME( 2005, yyhm,     0, magslot,  yyhm,     gms_3layers_state, init_yyhm,     ROT0,  "GMS", "Yuanyang Hudie Meng (Version 8.8A 2005-09-25)",         MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now.
 
 // card games
-GAME( 1999, super555, 0, super555, super555, gms_2layers_state, init_super555, ROT0,  "GMS", "Super 555 (English version V1.5)",                      MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                  // stops during boot, patched for now. Also needs EEPROM support.
-GAME( 1999, sscs,     0, super555, sscs,     gms_2layers_state, init_sscs,     ROT0,  "GMS", "San Se Caishen (Version 0502)",                         MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                  // stops during boot, patched for now. Also needs EEPROM support.
-GAMEL(2001, sball2k1, 0, super555, sball2k1, gms_2layers_state, init_sball2k1, ROT0,  "GMS", "Super Ball 2001 (Italy version 5.23)",                  MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_sball2k1 ) // stops during boot, patched for now. Also needs EEPROM support.
-GAMEL(2001, sc2in1,   0, magslot,  sc2in1,   gms_3layers_state, init_sc2in1,   ROT0,  "GMS", "Super Card 2 in 1 (English version 03.23)",             MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_sc2in1 )   // stops during boot, patched for now. Also needs EEPROM support.
-GAMEL(2004, jinpaish, 0, magslot,  jinpaish, gms_3layers_state, init_jinpaish, ROT0,  "GMS", "Jinpai Suoha - Show Hand (Chinese version 2004-09-22)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_jinpaish ) // stops during boot, patched for now. Also needs EEPROM support.
-GAME( 2005, baile,    0, magslot,  baile,    gms_3layers_state, init_baile,    ROT0,  "GMS", "Baile 2005 (V3.2 2005-01-12)",                          MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                  // stops during boot, patched for now. Also needs EEPROM support.
+GAME( 1999, super555, 0, super555, super555, gms_2layers_state, init_super555, ROT0,  "GMS", "Super 555 (English version V1.5)",                      MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                  // stops during boot, patched for now.
+GAME( 1999, sscs,     0, super555, sscs,     gms_2layers_state, init_sscs,     ROT0,  "GMS", "San Se Caishen (Version 0502)",                         MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                  // stops during boot, patched for now. EEPROM interface isn't fully understood.
+GAMEL(2001, sball2k1, 0, super555, sball2k1, gms_2layers_state, init_sball2k1, ROT0,  "GMS", "Super Ball 2001 (Italy version 5.23)",                  MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_sball2k1 ) // stops during boot, patched for now.
+GAMEL(2001, sc2in1,   0, magslot,  sc2in1,   gms_3layers_state, init_sc2in1,   ROT0,  "GMS", "Super Card 2 in 1 (English version 03.23)",             MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_sc2in1 )   // stops during boot, patched for now.
+GAMEL(2004, jinpaish, 0, magslot,  jinpaish, gms_3layers_state, init_jinpaish, ROT0,  "GMS", "Jinpai Suoha - Show Hand (Chinese version 2004-09-22)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_jinpaish ) // stops during boot, patched for now. EEPROM interface isn't fully understood.
+GAME( 2005, baile,    0, magslot,  baile,    gms_3layers_state, init_baile,    ROT0,  "GMS", "Baile 2005 (V3.2 2005-01-12)",                          MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                  // stops during boot, patched for now.
 
 // slots
-GAME( 2003, magslot,  0, magslot,  magslot,  gms_3layers_state, empty_init,    ROT0,  "GMS", "Magic Slot (normal 1.0C)",                              MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // reel / tilemaps priorities are wrong, inputs to be verified. Also needs EEPROM support.
+GAME( 2003, magslot,  0, magslot,  magslot,  gms_3layers_state, empty_init,    ROT0,  "GMS", "Magic Slot (normal 1.0C)",                              MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // reel / tilemaps priorities are wrong, inputs to be verified.
 
 // train games
-GAME( 1999, hgly,     0, super555, hgly,     gms_2layers_state, init_hgly,     ROT0,  "GMS", "Huangguan Leyuan (990726 CRG1.1)",                      MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                // stops during boot, patched for now. Also needs EEPROM support.
-GAMEL(2002, ballch,   0, super555, ballch,   gms_2layers_state, init_ballch,   ROT0,  "TVE", "Ball Challenge (20020607 1.0 OVERSEA)",                 MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_ballch ) // stops during boot, patched for now. Also needs EEPROM support.
-GAMEL(2005, cots,     0, super555, cots,     gms_2layers_state, init_cots,     ROT0,  "ECM", "Creatures of the Sea (20050328 USA 6.3)",               MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_cots )   // stops during boot, patched for now. Also needs EEPROM support.
+GAME( 1999, hgly,     0, hgly,     hgly,     gms_2layers_state, init_hgly,     ROT0,  "GMS", "Huangguan Leyuan (990726 CRG1.1)",                      MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                // stops during boot, patched for now. EEPROM interface isn't fully understood.
+GAMEL(2002, ballch,   0, super555, ballch,   gms_2layers_state, init_ballch,   ROT0,  "TVE", "Ball Challenge (20020607 1.0 OVERSEA)",                 MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_ballch ) // stops during boot, patched for now.
+GAMEL(2005, cots,     0, hgly,     cots,     gms_2layers_state, init_cots,     ROT0,  "ECM", "Creatures of the Sea (20050328 USA 6.3)",               MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_cots )   // stops during boot, patched for now. EEPROM interface isn't fully understood.
