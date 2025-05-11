@@ -24,7 +24,7 @@ public:
 	void al8800b(machine_config &config);
 
 private:
-	required_device<i8080a_device> m_maincpu;
+	required_device<i8080a_cpu_device> m_maincpu;
 };
 
 static INPUT_PORTS_START(al8800b)
