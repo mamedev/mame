@@ -13,25 +13,6 @@
 #include "speaker.h"
 
 
-uint8_t isa8_adlib_device::ym3812_16_r(offs_t offset)
-{
-	uint8_t retVal = 0xff;
-	switch(offset)
-	{
-		case 0: retVal = m_ym3812->status_r(); break;
-	}
-	return retVal;
-}
-
-void isa8_adlib_device::ym3812_16_w(offs_t offset, uint8_t data)
-{
-	switch(offset)
-	{
-		case 0: m_ym3812->address_w(data); break;
-		case 1: m_ym3812->data_w(data); break;
-	}
-}
-
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -71,7 +52,7 @@ isa8_adlib_device::isa8_adlib_device(const machine_config &mconfig, const char *
 void isa8_adlib_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x0388, 0x0389, read8sm_delegate(*this, FUNC(isa8_adlib_device::ym3812_16_r)), write8sm_delegate(*this, FUNC(isa8_adlib_device::ym3812_16_w)));
+	m_isa->install_device(0x0388, 0x0389, read8sm_delegate(*m_ym3812, FUNC(ym3812_device::read)), write8sm_delegate(*m_ym3812, FUNC(ym3812_device::write)));
 }
 
 //-------------------------------------------------
