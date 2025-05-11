@@ -9,10 +9,10 @@ Lots of lamps and 4 7-segment LEDs
 
 Main components:
 Siemens SAB 8085AH-2-P (CPU)
-Sharp LH5164D-10L (SRAM)
+Sharp LH5164D-10L or Sony CXK5816PN-12L (SRAM)
 Siemens SAB 8256 A 2 P (MUART)
 NEC D8279C-2 (keyboard & display interface)
-Sound S50240
+AMI or Micrel S50240 (sound)
 
 3 Different boards:
 4040-000-101 (6 ROM slots, TC5514 RAM) Parent is excellent
