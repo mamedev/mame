@@ -25,6 +25,7 @@
 #define ADPCM2      0x08
 #define ADPCM3      0x10
 #define ADPCM4      0x20
+#define SILENCE     0xff
 
 #define IRQ_DMA8    0x01
 #define IRQ_DMA16   0x02
@@ -64,7 +65,7 @@ static const int m_cmd_fifo_length[256] =
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 5x */
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 6x */
 	-1, -1, -1, -1,  3,  3,  3,  3, -1, -1, -1, -1, -1,  1, -1,  1, /* 7x */
-	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 8x */
+	3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 8x */
 	1,  1,  -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 9x */
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* Ax */
 		4, -1,  4, -1,  4, -1,  4, -1,  4, -1, -1,  -1, -1, -1,  4, -1, /* Bx */
@@ -432,6 +433,12 @@ void sb_device::process_fifo(uint8_t cmd)
 				m_dsp.dma_throttled = false;
 				drq_w(1);
 				m_dsp.flags = ADPCM3;
+				break;
+
+			case 0x80:  // Play silence
+				m_dsp.flags = SILENCE;
+				m_dsp.play_length = m_dsp.fifo[1] + (m_dsp.fifo[2]<<8) + 1;
+				m_timer->adjust(attotime::from_hz((double)m_dsp.frequency), 0, attotime::from_hz((double)m_dsp.frequency));
 				break;
 
 			case 0xd0:  // halt 8-bit DMA
@@ -1699,6 +1706,14 @@ TIMER_CALLBACK_MEMBER(sb_device::timer_tick)
 					break;
 			}
 			break;
+		case SILENCE:
+			m_dsp.play_length--;
+			if(!m_dsp.play_length)
+			{
+				m_timer->adjust(attotime::never, 0);
+				irq_w(1, IRQ_DMA8);
+			}
+			return;
 		default:
 			logerror("SB: unimplemented sample type %x\n", m_dsp.flags);
 	}
