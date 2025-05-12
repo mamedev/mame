@@ -191,7 +191,7 @@ template<typename S> void emu::detail::output_buffer_flat<S>::resample(u32 previ
 		return;
 
 	auto si = [](attotime time, u32 rate) -> s64 {
-		return time.m_seconds * rate + ((time.m_attoseconds / 100000000) * rate) / 10000000000LL;
+		return time.m_seconds * rate + ((time.m_attoseconds / 1000000000) * rate) / 1000000000;
 	};
 
 	auto cv = [](u32 source_rate, u32 dest_rate, s64 time) -> std::pair<s64, double> {
@@ -404,6 +404,9 @@ void sound_stream::set_sample_rate(u32 new_rate)
 
 void sound_stream::internal_set_sample_rate(u32 new_rate)
 {
+	if(new_rate == m_sample_rate)
+		return;
+
 	if(m_started) {
 		update();
 		m_output_buffer.resample(m_sample_rate, new_rate, m_sync_time, m_device.machine().time());
