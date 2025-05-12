@@ -11,7 +11,9 @@ Based on an Innocore / Advantech "E105MB/B" PCB (specific for embedded gaming sy
 -Intel NH82801GBM chipset, RTL8111CP Ethernet controller, IT8718F-S EC - LPC I/O, GL826/MX2AE12G12 USB 2.0 card reader controller.
 -PIC16F54 near a 4MHz xtal, Lattice ispMACH LC4256V near a 40MHz xtal, PIC16LF747, Lattice ispMACH LC4384V, CY62157EV3 SRAM.
 
-Lunux-based operating system called "LudOS".
+The machine has two anti-tamper switches directly connected to the PCB.
+
+Linux-based operating system called "LudOS".
 
 ***********************************************************************************************************************************/
 
