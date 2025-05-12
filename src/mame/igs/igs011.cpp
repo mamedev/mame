@@ -41,7 +41,7 @@ Year + Game                   PCB        Sound         Chips
 98 Mj Nenrikishu SP V250J     NO-0115-5  M6295 YM2413  IGS011 8255
 ---------------------------------------------------------------------------
 
-To do:
+TODO:
 
 - Implement the I/O part of IGS003 as an 8255
 - IGS003 parametric bitswap protection in lhb2cpgs, lhb3, nkishusp, tygn
@@ -53,6 +53,9 @@ To do:
 - lhb3: emulated game crashes with an illegal instruction error on bookkeeping menu
 
 - xymga: stop during attract mode with 'RECORD ERROR 3'
+
+- tygn: crashes to how to play screen during gameplay, payout and clear inputs shown in
+  input test don't work, joystick left/right show incorrect names in input test
 
 Notes:
 
@@ -69,6 +72,7 @@ Notes:
 
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
+#include "machine/ticket.h"
 #include "machine/timer.h"
 #include "sound/ics2115.h"
 #include "sound/okim6295.h"
@@ -95,6 +99,7 @@ public:
 		, m_oki(*this, "oki")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
+		, m_hopper(*this, "hopper")
 		, m_layer_ram(*this, "layer%u_ram", 0U, 512U * 256U, ENDIANNESS_BIG)
 		, m_priority_ram(*this, "priority_ram")
 		, m_maincpu_region(*this, "maincpu")
@@ -107,8 +112,6 @@ public:
 		, m_io_coin(*this, "COIN")
 	{
 	}
-
-	int igs_hopper_r();
 
 	void init_lhbv33c() ATTR_COLD;
 	void init_drgnwrldv21j() ATTR_COLD;
@@ -132,14 +135,14 @@ public:
 	void init_tygn() ATTR_COLD;
 
 	void drgnwrld(machine_config &config) ATTR_COLD;
-	void nkishusp(machine_config &config) ATTR_COLD;
-	void tygn(machine_config &config) ATTR_COLD;
+	void drgnwrld_igs012(machine_config &config) ATTR_COLD;
+	void lhb(machine_config &config) ATTR_COLD;
 	void wlcc(machine_config &config) ATTR_COLD;
 	void xymg(machine_config &config) ATTR_COLD;
 	void xymga(machine_config &config) ATTR_COLD;
 	void lhb2(machine_config &config) ATTR_COLD;
-	void lhb(machine_config &config) ATTR_COLD;
-	void drgnwrld_igs012(machine_config &config) ATTR_COLD;
+	void nkishusp(machine_config &config) ATTR_COLD;
+	void tygn(machine_config &config) ATTR_COLD;
 
 protected:
 	struct blitter_t
@@ -156,6 +159,7 @@ protected:
 	optional_device<okim6295_device> m_oki;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	optional_device<hopper_device> m_hopper;
 
 	/* memory pointers */
 	memory_share_array_creator<u8, 4> m_layer_ram;
@@ -176,7 +180,6 @@ protected:
 	u8 m_blitter_pen_hi = 0;
 	u16 m_dips_sel = 0;
 	u16 m_input_sel = 0;
-	u16 m_hopper_bit = 0;
 	u8 m_prot1 = 0;
 	u8 m_prot1_swap = 0;
 	u32 m_prot1_addr = 0;
@@ -666,7 +669,6 @@ void igs011_state::machine_start()
 
 	save_item(NAME(m_dips_sel));
 	save_item(NAME(m_input_sel));
-	save_item(NAME(m_hopper_bit));
 	save_item(NAME(m_prot1));
 	save_item(NAME(m_prot1_swap));
 	save_item(NAME(m_prot1_addr));
@@ -699,11 +701,6 @@ u16 igs011_state::key_matrix_r()
 	return ret;
 }
 
-int igs011_state::igs_hopper_r()
-{
-	return (m_hopper_bit && ((m_screen->frame_number() / 5) & 1)) ? 0x0000 : 0x0001;
-}
-
 void igs011_state::dips_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_dips_sel);
@@ -712,8 +709,9 @@ void igs011_state::dips_w(offs_t offset, u16 data, u16 mem_mask)
 template<unsigned Num>
 u16 igs011_state::dips_r()
 {
-	u16 ret = 0xff;
+	// Games have 2 to 5 banks of DIP switches
 
+	u16 ret = 0xff;
 	for (int i = 0; i < Num; i++)
 		if (BIT(~m_dips_sel, i))
 			ret &= m_io_dsw[i]->read();
@@ -721,8 +719,6 @@ u16 igs011_state::dips_r()
 	// 0x0100 is blitter busy
 	return  (ret & 0xff) | 0x0000;
 }
-
-// Games have 3 to 5 dips
 
 /***************************************************************************
 
@@ -1723,16 +1719,17 @@ void igs011_state::lhb_inputs_w(offs_t offset, u16 data, u16 mem_mask)
 
 	if (ACCESSING_BITS_0_7)
 	{
-		machine().bookkeeping().coin_counter_w(0, BIT(data, 5));
-		//  coin out        BIT(data, 6)
-		m_hopper_bit = BIT(data, 7);
+		machine().bookkeeping().coin_counter_w(0, BIT(data, 5)); // coin in
+		machine().bookkeeping().coin_counter_w(1, BIT(data, 6)); // coin out
+		m_hopper->motor_w(BIT(data, 7));
 	}
 
 	if (m_input_sel & (~0xff))
 		logerror("%06x: warning, unknown bits written in input_sel = %02x\n", m_maincpu->pc(), m_input_sel);
 
-//  popmessage("sel2 %02x",m_input_sel&~0x1f);
+	//popmessage("sel2 %02x",m_input_sel&~0x1f);
 }
+
 u16 igs011_state::lhb_inputs_r(offs_t offset)
 {
 	switch (offset)
@@ -1753,9 +1750,9 @@ void igs011_state::lhb2_igs003_w(offs_t offset, u16 data, u16 mem_mask)
 
 			if (ACCESSING_BITS_0_7)
 			{
-				machine().bookkeeping().coin_counter_w(0, BIT(data, 5));
-				//  coin out        BIT(data, 6)
-				m_hopper_bit        = BIT(data, 7);
+				machine().bookkeeping().coin_counter_w(0, BIT(data, 5)); // coin in
+				machine().bookkeeping().coin_counter_w(1, BIT(data, 6)); // coin out
+				m_hopper->motor_w(BIT(data, 7));
 			}
 
 			if (m_input_sel & ~0x7f)
@@ -1892,23 +1889,24 @@ void igs011_state::wlcc_igs003_w(offs_t offset, u16 data, u16 mem_mask)
 		case 0x02:
 			if (ACCESSING_BITS_0_7)
 			{
-				machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
-				//  coin out BIT(data, 1)
+				machine().bookkeeping().coin_counter_w(0, BIT(data, 0)); // coin in
+				machine().bookkeeping().coin_counter_w(1, BIT(data, 1)); // coin out
 
 				m_oki->set_rom_bank(BIT(data, 4));
-				m_hopper_bit = BIT(data, 5);
+				m_hopper->motor_w(BIT(data, 5));
 			}
 
 			if (data & ~0x33)
 				logerror("%06x: warning, unknown bits written in coin counter = %02x\n", m_maincpu->pc(), data);
 
-//          popmessage("coin %02x",data);
+			//popmessage("coin %02x",data);
 			break;
 
 		default:
 			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", m_maincpu->pc(), m_igs003_reg, data);
 	}
 }
+
 u16 igs011_state::wlcc_igs003_r()
 {
 	switch (m_igs003_reg)
@@ -1955,9 +1953,9 @@ void igs011_state::xymg_igs003_w(offs_t offset, u16 data, u16 mem_mask)
 
 			if (ACCESSING_BITS_0_7)
 			{
-				machine().bookkeeping().coin_counter_w(0, BIT(data, 5));
-				//  coin out        BIT(data, 6)
-				m_hopper_bit        = BIT(data, 7);
+				machine().bookkeeping().coin_counter_w(0, BIT(data, 5)); // coin in
+				machine().bookkeeping().coin_counter_w(1, BIT(data, 6)); // coin out
+				m_hopper->motor_w(BIT(data, 7));
 			}
 
 			if (m_input_sel & 0x40)
@@ -3445,11 +3443,11 @@ static INPUT_PORTS_START( lhb2 )
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                           // 有
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW2:1,2")   // 投幣比率
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR(Coinage) )        PORT_DIPLOCATION("SW2:1,2")   // 投幣比率
+	PORT_DIPSETTING(    0x00, DEF_STR(2C_1C) )
+	PORT_DIPSETTING(    0x03, DEF_STR(1C_1C) )
+	PORT_DIPSETTING(    0x02, DEF_STR(1C_2C) )
+	PORT_DIPSETTING(    0x01, DEF_STR(1C_3C) )
 	PORT_DIPNAME( 0x04, 0x04, "Key-in Rate" )           PORT_DIPLOCATION("SW2:3")     // 開分比率
 	PORT_DIPSETTING(    0x04, "10" )
 	PORT_DIPSETTING(    0x00, "100" )
@@ -3486,14 +3484,14 @@ static INPUT_PORTS_START( lhb2 )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW3:8" )                                     // (not shown in settings display)
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )          PORT_CONDITION("DSW2", 0x10, EQUALS, 0x10) // 投幣
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )   PORT_CONDITION("DSW2", 0x10, EQUALS, 0x00) // 投幣
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )                                              // 清除
-	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )                                                  // 測試      (hold on start for input test)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(igs011_state::igs_hopper_r)) // 哈巴
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                               // 查帳
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  PORT_CONDITION("DSW2", 0x20, EQUALS, 0x20) // 洗分
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  PORT_CONDITION("DSW2", 0x20, EQUALS, 0x00) // 洗分
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )          PORT_CONDITION("DSW2", 0x10, EQUALS, 0x10)                  // 投幣
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )   PORT_CONDITION("DSW2", 0x10, EQUALS, 0x00)                  // 投幣
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )                                                               // 清除
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )                                                                   // 測試      (hold on start for input test)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // 哈巴
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                                // 查帳
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  PORT_CONDITION("DSW2", 0x20, EQUALS, 0x20)                  // 洗分
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  PORT_CONDITION("DSW2", 0x20, EQUALS, 0x00)                  // 洗分
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 
@@ -3581,13 +3579,13 @@ static INPUT_PORTS_START( nkishusp )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW3:8" )                                     // (not shown in settings display)
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )          PORT_CONDITION("DSW2", 0x08, EQUALS, 0x08) // 投幣
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )   PORT_CONDITION("DSW2", 0x08, EQUALS, 0x00) // 投幣
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )                                              // 清除
-	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )                                                  // 測試      (hold on start for input test)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(igs011_state::igs_hopper_r)) // 哈巴
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                               // 查帳
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )                                             // 洗分
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )          PORT_CONDITION("DSW2", 0x08, EQUALS, 0x08)                  // 投幣
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )   PORT_CONDITION("DSW2", 0x08, EQUALS, 0x00)                  // 投幣
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )                                                               // 清除
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )                                                                   // 測試      (hold on start for input test)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // 哈巴
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                                // 查帳
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )                                                              // 洗分
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 
@@ -3634,11 +3632,11 @@ static INPUT_PORTS_START( tygn )
 	PORT_DIPSETTING(    0x20, DEF_STR(1C_2C) )
 	PORT_DIPSETTING(    0x10, DEF_STR(1C_3C) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR(Demo_Sounds) )    PORT_DIPLOCATION("SW1:7")      // 示範音樂
-	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                           // ?
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                           // 無
 	PORT_DIPSETTING(    0x40, DEF_STR(On) )                                            // 有
 	PORT_DIPNAME( 0x80, 0x80, "Credit Timer" )          PORT_DIPLOCATION("SW1:8")      // 自動清除  (clears credits after timeout if you don't start a game)
-	PORT_DIPSETTING(    0x80, DEF_STR(Off) )                                           // ?
-	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                            // ?
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )                                           // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                            // 有
 
 	PORT_START("DSW2") // not shown in test mode
 	PORT_DIPUNKNOWN( 0x01, 0x01 ) PORT_DIPLOCATION("SW2:1")
@@ -3650,28 +3648,28 @@ static INPUT_PORTS_START( tygn )
 	PORT_DIPUNKNOWN( 0x40, 0x40 ) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPUNKNOWN( 0x80, 0x80 ) PORT_DIPLOCATION("SW2:8")
 
-	PORT_START("DSW3") // only 2 out of 4 DIP banks phisically present
+	PORT_START("DSW3") // only 2 out of 4 DIP switch banks physically present
 	PORT_DIPNAME( 0xff, 0xff, DEF_STR( Unused ) )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )                                                                      // 投幣
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW ) // keep pressed while booting
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 ) // stats
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )                                                                   // 測試   (hold on start for test mode)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                                // 查帳   (stats)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // 哈巴
 
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) // ok
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) // ok
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) // ok
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) // ok
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) // ok
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) // selects input test in test mode
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) // selects image test in test mode
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) // selects audio test in test mode
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )                                                                     // 開始
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )                                                                // 上
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )                                                              // 下
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )                                                              // 捨     (name in input test looks wrong - caused by patches?)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )                                                             // 注     (name in input test looks wrong - caused by patches?)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )                                                                    // 摸/動  (selects input test in test mode)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )                                                                    // 押注   (selects graphics test in test mode)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )                                                                    // 遊戲   (selects audio test in test mode)
 
 	PORT_START("IN1") // probably unused
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -3755,7 +3753,7 @@ static INPUT_PORTS_START( xymg )
 	// TODO: hook up SW5 shown in input test but not settings display
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(igs011_state::igs_hopper_r)) // hopper switch
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // hopper switch
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )      // keep pressed while booting
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )   // stats
@@ -3847,7 +3845,7 @@ static INPUT_PORTS_START( wlcc )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  PORT_CONDITION("DSW3", 0x40, EQUALS, 0x40)  // 退幣
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  PORT_CONDITION("DSW3", 0x40, EQUALS, 0x00)  // 退幣
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(igs011_state::igs_hopper_r)) // hopper switch
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // hopper switch
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )                                                     // 開始/得分
@@ -3863,41 +3861,41 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( lhb )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0f, 0x07, "Pay Out (%)" )
-	PORT_DIPSETTING(    0x0f, "96" )
-	PORT_DIPSETTING(    0x0e, "93" )
-	PORT_DIPSETTING(    0x0d, "90" )
-	PORT_DIPSETTING(    0x0c, "87" )
-	PORT_DIPSETTING(    0x0b, "84" )
-	PORT_DIPSETTING(    0x0a, "81" )
-	PORT_DIPSETTING(    0x09, "78" )
-	PORT_DIPSETTING(    0x08, "75" )
-	PORT_DIPSETTING(    0x07, "71" )
-	PORT_DIPSETTING(    0x06, "68" )
-	PORT_DIPSETTING(    0x05, "65" )
-	PORT_DIPSETTING(    0x04, "62" )
-	PORT_DIPSETTING(    0x03, "59" )
-	PORT_DIPSETTING(    0x02, "56" )
-	PORT_DIPSETTING(    0x01, "53" )
-	PORT_DIPSETTING(    0x00, "50" )
+	PORT_DIPNAME( 0x0f, 0x02, "Payout Rate" )           // 機率調整
+	PORT_DIPSETTING(    0x00, "50%" )
+	PORT_DIPSETTING(    0x01, "53%" )
+	PORT_DIPSETTING(    0x02, "56%" )
+	PORT_DIPSETTING(    0x03, "59%" )
+	PORT_DIPSETTING(    0x04, "62%" )
+	PORT_DIPSETTING(    0x05, "65%" )
+	PORT_DIPSETTING(    0x06, "68%" )
+	PORT_DIPSETTING(    0x07, "71%" )
+	PORT_DIPSETTING(    0x08, "75%" )
+	PORT_DIPSETTING(    0x09, "78%" )
+	PORT_DIPSETTING(    0x0a, "81%" )
+	PORT_DIPSETTING(    0x0b, "84%" )
+	PORT_DIPSETTING(    0x0c, "87%" )
+	PORT_DIPSETTING(    0x0d, "90%" )
+	PORT_DIPSETTING(    0x0e, "93%" )
+	PORT_DIPSETTING(    0x0f, "96%" )
 	PORT_DIPNAME( 0x30, 0x30, "YAKUMAN Point" )
 	PORT_DIPSETTING(    0x30, "1" )
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x10, "3" )
 	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPNAME( 0xc0, 0x80, "Max Bet" )
+	PORT_DIPNAME( 0xc0, 0x80, "Maximum Bet" )           // 最大押注
 	PORT_DIPSETTING(    0xc0, "1" )
 	PORT_DIPSETTING(    0x80, "5" )
 	PORT_DIPSETTING(    0x40, "10" )
 	PORT_DIPSETTING(    0x00, "20" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, "Min Bet" )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR(Coinage) )        // 投幣比率
+	PORT_DIPSETTING(    0x00, DEF_STR(2C_1C) )
+	PORT_DIPSETTING(    0x03, DEF_STR(1C_1C) )
+	PORT_DIPSETTING(    0x02, DEF_STR(1C_2C) )
+	PORT_DIPSETTING(    0x01, DEF_STR(1C_3C) )
+	PORT_DIPNAME( 0x0c, 0x0c, "Minimum Bet" )           // 最小押注
 	PORT_DIPSETTING(    0x0c, "1" )
 	PORT_DIPSETTING(    0x08, "2" )
 	PORT_DIPSETTING(    0x04, "3" )
@@ -3916,49 +3914,49 @@ static INPUT_PORTS_START( lhb )
 //  PORT_DIPSETTING(    0x00, "2" )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x03, 0x03, "Max Credit" )
+	PORT_DIPNAME( 0x03, 0x03, "Score Limit" )           // 得分上限
 	PORT_DIPSETTING(    0x03, "1000" )
 	PORT_DIPSETTING(    0x02, "2000" )
 	PORT_DIPSETTING(    0x01, "5000" )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPNAME( 0x0c, 0x0c, "Max Note" )
+	PORT_DIPSETTING(    0x00, "Unlimited" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Credit Limit" )          // 進分上限
 	PORT_DIPSETTING(    0x0c, "1000" )
 	PORT_DIPSETTING(    0x08, "2000" )
 	PORT_DIPSETTING(    0x04, "5000" )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, "Unlimited" )
 	PORT_DIPNAME( 0x10, 0x10, "CPU Strength" )
 	PORT_DIPSETTING(    0x10, "Strong" )
 	PORT_DIPSETTING(    0x00, "Weak" )
 	PORT_DIPNAME( 0x20, 0x20, "Money Type" )
 	PORT_DIPSETTING(    0x20, "Coins" )
 	PORT_DIPSETTING(    0x00, "Notes" )
-	PORT_DIPNAME( 0xc0, 0xc0, "DONDEN Times" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Don Den Times" )         // 交換牌次數
 	PORT_DIPSETTING(    0xc0, "0" )
 	PORT_DIPSETTING(    0x80, "3" )
 	PORT_DIPSETTING(    0x40, "5" )
 	PORT_DIPSETTING(    0x00, "8" )
 
 	PORT_START("DSW4")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "In Game Music" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR(Demo_Sounds) )
+	PORT_DIPSETTING(    0x01, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x02, 0x00, "In-Game Music" )
+	PORT_DIPSETTING(    0x02, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
 	PORT_DIPNAME( 0x0c, 0x00, "Girls" )
 	PORT_DIPSETTING(    0x0c, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x08, "Dressed" )
 	PORT_DIPSETTING(    0x04, "Underwear" )
 	PORT_DIPSETTING(    0x00, "Nude" )
-	PORT_DIPNAME( 0x10, 0x10, "Note Rate" )
+	PORT_DIPNAME( 0x10, 0x10, "Key-In Rate" )           // 開分比率
 	PORT_DIPSETTING(    0x10, "5" )
 	PORT_DIPSETTING(    0x00, "10" )
-	PORT_DIPNAME( 0x20, 0x20, "Pay Out" )
-	PORT_DIPSETTING(    0x20, "Score" )
-	PORT_DIPSETTING(    0x00, "Coin" )
-	PORT_DIPNAME( 0x40, 0x40, "Coin In" )
-	PORT_DIPSETTING(    0x40, "Credit" )
-	PORT_DIPSETTING(    0x00, "Score" )
+	PORT_DIPNAME( 0x20, 0x20, "Payout Mode" )
+	PORT_DIPSETTING(    0x20, "Key-Out" )
+	PORT_DIPSETTING(    0x00, "Return Coins" )
+	PORT_DIPNAME( 0x40, 0x40, "Credit Mode" )
+	PORT_DIPSETTING(    0x40, "Coin Acceptor" )
+	PORT_DIPSETTING(    0x00, "Key-In" )
 	PORT_DIPNAME( 0x80, 0x80, "Last Chance" )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
@@ -3976,12 +3974,14 @@ static INPUT_PORTS_START( lhb )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(igs011_state::igs_hopper_r)) // hopper switch
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )       // system reset
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // hopper switch
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // system reset
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )       // keep pressed while booting
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )    // stats
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O) // clear coins
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )          PORT_CONDITION("DSW4", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )   PORT_CONDITION("DSW4", 0x40, EQUALS, 0x00)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  PORT_CONDITION("DSW4", 0x20, EQUALS, 0x20)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  PORT_CONDITION("DSW4", 0x20, EQUALS, 0x00)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )        // shows garbage in test mode
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -4248,6 +4248,8 @@ void igs011_state::lhb(machine_config &config)
 
 	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::lhb_timer_irq_cb), attotime::from_hz(240)); // lev5 frequency drives the music tempo
 	// irq 3 points to an apparently unneeded routine
+
+	HOPPER(config, m_hopper, attotime::from_msec(50));
 }
 
 void igs011_state::wlcc(machine_config &config)
@@ -4258,6 +4260,8 @@ void igs011_state::wlcc(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(igs011_state::irq6_line_hold));
 
 	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::timer_irq_cb<3>), attotime::from_hz(240)); // lev3 frequency drives the music tempo
+
+	HOPPER(config, m_hopper, attotime::from_msec(50));
 }
 
 
@@ -4269,6 +4273,8 @@ void igs011_state::xymg(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(igs011_state::irq6_line_hold));
 
 	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::timer_irq_cb<3>), attotime::from_hz(240)); // lev3 frequency drives the music tempo
+
+	HOPPER(config, m_hopper, attotime::from_msec(50));
 }
 
 
@@ -4291,6 +4297,8 @@ void igs011_state::lhb2(machine_config &config)
 
 	//GFXDECODE(config, "gfxdecode", m_palette, gfx_igs011_hi);
 
+	HOPPER(config, m_hopper, attotime::from_msec(50));
+
 	YM2413(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 2.0);
 }
 
@@ -4307,6 +4315,8 @@ void igs011_state::nkishusp(machine_config &config)
 	// VSync 60.0052Hz, HSync 15.620kHz
 
 	//GFXDECODE(config, "gfxdecode", m_palette, gfx_igs011_hi);
+
+	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	YM2413(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 2.0);
 }
