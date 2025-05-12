@@ -589,7 +589,7 @@ void spg110_game_state::init_crc()
 	// several games have a byte sum checksum listed at the start of ROM, this little helper function logs what it should match.
 	const int length = memregion("maincpu")->bytes();
 	const uint8_t* rom = memregion("maincpu")->base();
-	int checksum_start = 0x10; // start at 0x40 because the 'checksum' text itself should not be checksummed
+	int checksum_start = 0x10; // start at 0x10 because the 'checksum' text itself should not be checksummed
 	uint32_t checksum = 0x00000000;
 	for (int i = checksum_start; i < length; i++)
 	{
