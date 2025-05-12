@@ -34936,6 +34936,9 @@ starsldr
 twrshaft
 vivdolls
 
+@source:nintendo/blockfvr.cpp
+blockfvr
+
 @source:nintendo/cham24.cpp
 cham24
 
