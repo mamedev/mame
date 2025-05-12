@@ -716,6 +716,8 @@ void sound_manager::before_devices_init()
 
 void sound_manager::postload()
 {
+	std::unique_lock<std::mutex> dlock(m_effects_data_mutex);
+	m_effects_prev_time = m_effects_cur_time = machine().time();
 }
 
 void sound_manager::after_devices_init()
