@@ -10918,15 +10918,15 @@ ROM_END
 
 ROM_START( fntspcian )
 	ROM_REGION( 0x4000, "maincpu", 0 )
-    ROM_LOAD( "fs-3_7d.bin",  0x0000, 0x0800, CRC(e8f3aa67) SHA1(a0e9576784dbe602dd9780e667f01f31defd7c00) )
-    ROM_LOAD( "fs-4_7e.bin",  0x0800, 0x0800, CRC(f58283e3) SHA1(edc6e72516c50fd3402281d9936574d276581ce9) )
-    ROM_LOAD( "fs-5_7j.bin",  0x1000, 0x0800, CRC(ddeabdae) SHA1(daa5109a32c7c9a80bdb212dc3e4e3e3c104a731) )
-    ROM_LOAD( "fs-6_7n.bin",  0x1800, 0x0800, CRC(9463f753) SHA1(d9cb35c19aafec43d08b048bbe2337a790f6ba9d) )
-    ROM_LOAD( "fs-7_7p.bin",  0x2000, 0x0800, CRC(6a8715fd) SHA1(54f0613aeae5eb5491da50c37fe2f180e4a3cc06) )
+	ROM_LOAD( "fs-3_7d.bin",  0x0000, 0x0800, CRC(e8f3aa67) SHA1(a0e9576784dbe602dd9780e667f01f31defd7c00) )
+	ROM_LOAD( "fs-4_7e.bin",  0x0800, 0x0800, CRC(f58283e3) SHA1(edc6e72516c50fd3402281d9936574d276581ce9) )
+	ROM_LOAD( "fs-5_7j.bin",  0x1000, 0x0800, CRC(ddeabdae) SHA1(daa5109a32c7c9a80bdb212dc3e4e3e3c104a731) )
+	ROM_LOAD( "fs-6_7n.bin",  0x1800, 0x0800, CRC(9463f753) SHA1(d9cb35c19aafec43d08b048bbe2337a790f6ba9d) )
+	ROM_LOAD( "fs-7_7p.bin",  0x2000, 0x0800, CRC(6a8715fd) SHA1(54f0613aeae5eb5491da50c37fe2f180e4a3cc06) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
-    ROM_LOAD( "fs-1_1k.bin",  0x0000, 0x0800, CRC(977e37cf) SHA1(88ff1e4edadf5cfc83413a1fe999aecf4ba72232) )
-    ROM_LOAD( "fs-2_1h.bin",  0x0800, 0x0800, CRC(d0ba22c9) SHA1(678b22d10e1ae7dcea068da838bf6bd648e9ee28) )
+	ROM_LOAD( "fs-1_1k.bin",  0x0000, 0x0800, CRC(977e37cf) SHA1(88ff1e4edadf5cfc83413a1fe999aecf4ba72232) )
+	ROM_LOAD( "fs-2_1h.bin",  0x0800, 0x0800, CRC(d0ba22c9) SHA1(678b22d10e1ae7dcea068da838bf6bd648e9ee28) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "6l.bpr",       0x0000, 0x0020, CRC(c3ac9467) SHA1(f382ad5a34d282056c78a5ec00c30ec43772bae2) )

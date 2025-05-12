@@ -51,7 +51,7 @@ CPU Board TBF-CPU
   78                          Texas Instruments SN74LS03N
   P1                          Power Supply Unit
   P2                          Game Counter
-  P3                          
+  P3
   P4                          Coin Switch
   P5                          TV/Speaker
   P6                          Sub Switch Unit
@@ -280,7 +280,7 @@ ROM_START( blockfvr )
 
 	ROM_REGION( 0x800, "tiles", 0 )
 	ROM_LOAD( "mr005.9",  0x000000, 0x000200, CRC(0b2f27a5) SHA1(65c7f943898df65330b8e6dce866ed86507a62d8) )
-	ROM_LOAD( "mr006.20", 0x000200, 0x000200, CRC(eadec4c5) SHA1(2ce6e6216163216097e57295f6dc54ff221382c0) ) 
+	ROM_LOAD( "mr006.20", 0x000200, 0x000200, CRC(eadec4c5) SHA1(2ce6e6216163216097e57295f6dc54ff221382c0) )
 	ROM_FILL( 0x400, 0x200, 0xff ) // unpopulated position 21
 	ROM_FILL( 0x600, 0x200, 0xff )
 ROM_END

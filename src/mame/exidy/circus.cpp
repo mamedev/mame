@@ -565,9 +565,9 @@ ROM_START( trapeze ) // loose roms labelled with pencil
 	ROM_LOAD( "9011.9a",    0x1e00, 0x0200, CRC(325a2b38) SHA1(fb4cd885f7202a23ac5d8119b91eaf2c80af5e17) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 ) // character set
-    ROM_LOAD( "9003.4c",    0x0000, 0x0200, CRC(e46eae6c) SHA1(0da9e92ef63c793792c0ec2801475fd860f86cec) )
-    ROM_LOAD( "9002.3c",    0x0200, 0x0200, CRC(5f139f8c) SHA1(9f860503ab0dd2fe69975cb13ce7bf0506d67cdb) )
-    ROM_LOAD( "9001.2c",    0x0400, 0x0200, CRC(0ddc4b45) SHA1(37081a2d0563e6fd58ce41f3bfe0b3c08dcd6653) )
+	ROM_LOAD( "9003.4c",    0x0000, 0x0200, CRC(e46eae6c) SHA1(0da9e92ef63c793792c0ec2801475fd860f86cec) )
+	ROM_LOAD( "9002.3c",    0x0200, 0x0200, CRC(5f139f8c) SHA1(9f860503ab0dd2fe69975cb13ce7bf0506d67cdb) )
+	ROM_LOAD( "9001.2c",    0x0400, 0x0200, CRC(0ddc4b45) SHA1(37081a2d0563e6fd58ce41f3bfe0b3c08dcd6653) )
 	ROM_LOAD( "9000.1c",    0x0600, 0x0200, CRC(0ddc4b45) SHA1(37081a2d0563e6fd58ce41f3bfe0b3c08dcd6653) )
 
 	ROM_REGION( 0x0200, "gfx2", 0 ) // clown sprite
