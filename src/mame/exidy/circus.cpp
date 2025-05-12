@@ -118,7 +118,7 @@ void circus_state::main_map(address_map &map)
 {
 	// 5M0-1
 	map(0x0000, 0x01ff).mirror(0x1e00).ram().share(m_ram);
-	map(0x1000, 0x1fff).rom();-
+	map(0x1000, 0x1fff).rom();
 	// 5MLS
 	map(0x2000, 0x2000).mirror(0x0fff).w(FUNC(circus_state::clown_x_w));
 	map(0x3000, 0x3000).mirror(0x0fff).w(FUNC(circus_state::clown_y_w));
