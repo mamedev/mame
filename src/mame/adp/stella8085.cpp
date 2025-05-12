@@ -49,8 +49,8 @@ public:
 	{ }
 
 	void dicemstr(machine_config &config);
-	void kniffi(machine_config &config);
 	void doppelpot(machine_config &config);
+	void excellent(machine_config &config);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -58,6 +58,7 @@ private:
 
 	void program_map(address_map &map) ATTR_COLD;
 	void large_program_map(address_map &map) ATTR_COLD;
+	void excellent_program_map(address_map &map) ATTR_COLD;
 	void rtc62421_io_map(address_map &map) ATTR_COLD;
 	void mc146818_io_map(address_map &map) ATTR_COLD;
 };
@@ -65,8 +66,7 @@ private:
 
 void stella8085_state::program_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rom(); // ICE6
-	map(0x4000, 0x7fff).rom(); // ICD6
+	map(0x0000, 0x8fff).rom(); // ICE6, ICD6, ICC5
 	map(0xc000, 0xc7ff).ram(); // ICC6
 }
 
@@ -75,6 +75,11 @@ void stella8085_state::large_program_map(address_map &map)
 	map(0x0000, 0x7fff).rom(); // ICE6
 	map(0x8000, 0x9fff).ram(); // ICC6
 	map(0xa000, 0xffff).rom(); // ICD6
+}
+
+void stella8085_state::excellent_program_map(address_map &map)
+{
+	map(0x0000, 0x4fff).rom();
 }
 
 void stella8085_state::rtc62421_io_map(address_map &map)
@@ -86,7 +91,9 @@ void stella8085_state::rtc62421_io_map(address_map &map)
 
 void stella8085_state::mc146818_io_map(address_map &map)
 {
-	// TODO
+	// TODO: map RTC
+	map(0x50, 0x51).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
+	//map(0x60, 0x6f).rw("muart", FUNC(i8256_device::read8), FUNC(i8256_device::write8));
 }
 
 
@@ -150,12 +157,6 @@ void stella8085_state::dicemstr(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 }
 
-void stella8085_state::kniffi(machine_config &config)
-{
-	dicemstr(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::program_map);
-}
-
 void stella8085_state::doppelpot(machine_config &config)
 {
 	I8085A(config, m_maincpu, 6.144_MHz_XTAL);
@@ -169,6 +170,12 @@ void stella8085_state::doppelpot(machine_config &config)
 	MC146818(config, "rtc", 32.768_kHz_XTAL);
 
 	SPEAKER(config, "mono").front_center();
+}
+
+void stella8085_state::excellent(machine_config &config)
+{
+	doppelpot(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::excellent_program_map);
 }
 
 
@@ -186,36 +193,36 @@ ROM_START( doppelpot )
 ROM_END
 
 ROM_START( disc2000 )
-	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_REGION( 0x9000, "maincpu", 0 )
 	ROM_LOAD( "disc2000.ice6", 0x0000, 0x4000, CRC(53a66005) SHA1(a5bb63abe8eb631a0fb09496ef6e0ee6c713985c) )
 	ROM_LOAD( "disc2000.icd6", 0x4000, 0x4000, CRC(787b6708) SHA1(be990f95b6d04cbe0b9832603204f2a81b0ace3f) )
 ROM_END
 
 ROM_START( disc2001 )
-	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_REGION( 0x9000, "maincpu", 0 )
 	ROM_LOAD( "disc2001.ice6", 0x0000, 0x4000, CRC(4d128fe1) SHA1(2b9b0a1296ff77b281173fb0fcf667ed3e3ece2b) )
 	ROM_LOAD( "disc2001.icd6", 0x4000, 0x4000, CRC(72f6560a) SHA1(3fdc3aaafcc2c185a19a27ccd511d8522fbe0c2e) )
 ROM_END
 
 ROM_START( disc3000 )
-	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_REGION( 0x9000, "maincpu", 0 )
 	ROM_LOAD( "disc3000.ice6", 0x0000, 0x4000, CRC(6e024e72) SHA1(7198c0cd844d4bc080b2d8654d32d53a04ce8bb4) )
 	ROM_LOAD( "disc3000.icd6", 0x4000, 0x4000, CRC(ad88715a) SHA1(660f4044e8f24ad59767ce025966475f9fd56885) )
 ROM_END
 
 ROM_START( elitedisc )
-	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_REGION( 0x9000, "maincpu", 0 )
 	ROM_LOAD( "elitedisc.ice6", 0x0000, 0x4000, CRC(7f7a2f30) SHA1(01e3ce5fce2c9d51d3f4b8aab7dd67ed4b26d8f4) )
 	ROM_LOAD( "elitedisc.icd6", 0x4000, 0x4000, CRC(e56f2360) SHA1(691a6762578daca6ce4581418761dcc07c291fab) )
 ROM_END
 
 ROM_START( excellent )
-	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "excellent.ice5", 0x0000, 0x0800, CRC(b4c573b5) SHA1(5b01b68b8abd48bd293bc9aa507c3285a6e7550f) )
-	ROM_LOAD( "excellent.ice6", 0x0800, 0x0800, CRC(f1d53581) SHA1(7aef66149f3427b287d3e9d86cc198dc1ed40d7c) )
-	ROM_LOAD( "excellent.icd5", 0x1000, 0x0800, CRC(912a5f59) SHA1(3df3ca7eaef8de8e13e93f6a1e6975f8da7ed7a1) )
-	ROM_LOAD( "excellent.icd6", 0x1800, 0x0800, CRC(5a2b95b4) SHA1(b0d17b327664e8680b163c872109769c4ae42039) )
-	ROM_LOAD( "excellent.icc5", 0x2000, 0x0800, CRC(ae424805) SHA1(14e12ceebd9fbf6eba96c168e8e7b797b34f7ca5) )
+	ROM_REGION( 0x5000, "maincpu", 0 )
+	ROM_LOAD( "excellent.ice5", 0x0800, 0x0800, CRC(b4c573b5) SHA1(5b01b68b8abd48bd293bc9aa507c3285a6e7550f) BAD_DUMP ) // underdumped
+	ROM_LOAD( "excellent.ice6", 0x1800, 0x0800, CRC(f1d53581) SHA1(7aef66149f3427b287d3e9d86cc198dc1ed40d7c) BAD_DUMP ) // underdumped
+	ROM_LOAD( "excellent.icd5", 0x2800, 0x0800, CRC(912a5f59) SHA1(3df3ca7eaef8de8e13e93f6a1e6975f8da7ed7a1) BAD_DUMP ) // underdumped
+	ROM_LOAD( "excellent.icd6", 0x3800, 0x0800, CRC(5a2b95b4) SHA1(b0d17b327664e8680b163c872109769c4ae42039) BAD_DUMP ) // underdumped
+	ROM_LOAD( "excellent.icc5", 0x4800, 0x0800, CRC(ae424805) SHA1(14e12ceebd9fbf6eba96c168e8e7b797b34f7ca5) BAD_DUMP ) // underdumped
 ROM_END
 
 ROM_START( extrablatt )
@@ -258,9 +265,9 @@ GAME( 1987, disc2000,    doppelpot, doppelpot, dicemstr, stella8085_state, empty
 GAME( 1987, disc2001,    doppelpot, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Disc 2001",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 GAME( 1989, disc3000,    doppelpot, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Disc 3000",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 GAME( 1986, elitedisc,   doppelpot, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Elite Disc",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 1982, excellent,   0,         doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Excellent",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 1987, kniffi,      0,         kniffi,    dicemstr, stella8085_state, empty_init, ROT0, "Nova",   "Kniffi",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 1988, extrablatt,  kniffi,    kniffi,    dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Extrablatt",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 1998, glucksstern, kniffi,    kniffi,    dicemstr, stella8085_state, empty_init, ROT0, "ADP",    u8"Glücks-Stern", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 1988, juwel,       kniffi,    kniffi,    dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Juwel",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 1992, karoas,      kniffi,    kniffi,    dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Karo As",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1982, excellent,   0,         excellent, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Excellent",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1987, kniffi,      0,         dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "Nova",   "Kniffi",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1988, extrablatt,  kniffi,    dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Extrablatt",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1998, glucksstern, kniffi,    dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "ADP",    u8"Glücks-Stern", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1988, juwel,       kniffi,    dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Juwel",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1992, karoas,      kniffi,    dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Karo As",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
