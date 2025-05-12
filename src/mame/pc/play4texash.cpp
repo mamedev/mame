@@ -72,9 +72,9 @@ ROM_START(play4texash)
 	ROM_REGION32_LE(0x080, "eeprom", 0)
 	ROM_LOAD("at93c46.u16", 0x000, 0x080, CRC(379af802) SHA1(60dc137ad06815feb3e9de3f59a3e486e16dd5f1)) // For storing BIOS settings?
 
-	ROM_REGION(0x40000, "pics", 0)
-	ROM_LOAD("56.21_pic16lf747.u13", 0x00000, 0x40000, NO_DUMP)
-	ROM_LOAD("a5_pic16f54.u28",      0x00000, 0x40000, NO_DUMP)
+	ROM_REGION(0x1000, "pics", 0)
+	ROM_LOAD("56.21_pic16lf747.u13", 0x1000, 0x40000, NO_DUMP)
+	ROM_LOAD("a5_pic16f54.u28",      0x0200, 0x40000, NO_DUMP)
 
 	ROM_REGION(0x30000, "plds", 0)
 	ROM_LOAD("15-02_lc4256v.u4.jed", 0x00000, 0x2d182, CRC(954e2812) SHA1(573b17d85058512ace9a50cfee510580e6bf7d23)) // Lattice ispMACH LC4256V. Not converted to BIN because jedutil does not support it
