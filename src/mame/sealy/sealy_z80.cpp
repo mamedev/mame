@@ -167,6 +167,7 @@ ROM_START( ddz2 )
 ROM_END
 
 // 顶级斗地主 (Dǐngjí Dòu Dìzhǔ). All labels prepend 顶级斗地主 to what's below
+// same data was also found in ROMs with 顶级100分 (Dǐngjí 100 Fēn) labels
 ROM_START( djddz )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "3.u11", 0x00000, 0x20000, CRC(54abc7a0) SHA1(25494e0862aa6b03398270efe2a3659180be38ec) ) // 27c010
@@ -178,7 +179,25 @@ ROM_START( djddz )
 	ROM_LOAD( "2.u21", 0x000000, 0x200000, CRC(74997b0f) SHA1(1c2b0aeaf71fa000856b8aa405d7853f8e652257) ) // 27c4096
 
 	ROM_REGION( 0x80000, "oki", 0 )
-	ROM_LOAD( "4.u23", 0x00000, 0x80000, CRC(249b1a34) SHA1(94af1a9c64fb7d06a7510d527c176b2fa6845885) ) // 27c020
+	ROM_LOAD( "4.u23", 0x00000, 0x80000, CRC(249b1a34) SHA1(94af1a9c64fb7d06a7510d527c176b2fa6845885) ) // 27c040
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // this dump comes from the PCB with 顶级100分 labels
+	ROM_LOAD( "93c46", 0x00, 0x80, CRC(bed2d363) SHA1(7e0c0d4c47274a87024e3e5cd74bc883b7d46415) )
+ROM_END
+
+// 漂亮金花 (Piàoliang Jīnhuā). All labels prepend 漂亮金花 to what's below
+ROM_START( pljh )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "3.u11", 0x00000, 0x20000, CRC(18b6d64d) SHA1(a17e298098a44a4ffd19c008c45eef09aa35b110) ) // 27c010, 1xxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD( "1.u18", 0x000000, 0x200000, CRC(8e4cbc34) SHA1(2dcc9ff890f90a440da210742b6564894a627c3b) ) // 27c4096
+
+	ROM_REGION( 0x200000, "gfx2", 0 )
+	ROM_LOAD( "2.u21", 0x000000, 0x200000, CRC(0b774cdd) SHA1(f9b192a67538596d295550ad6316d3fe1e5f7f6a) ) // 27c4096
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "4.u23", 0x00000, 0x40000, CRC(8cbb5623) SHA1(90169df14264c1e53040bc43106fd8b86b4f1d59) ) // 27c020
 
 	ROM_REGION( 0x80, "eeprom", ROMREGION_ERASE00 )
 	ROM_LOAD( "93c46", 0x00, 0x80, NO_DUMP )
@@ -264,6 +283,7 @@ void sealy_z80_state::init_djddz() // TODO: not enough
 } // anonymous namespace
 
 
-GAME( 2005, bbddz, 0, sealy, djddz, sealy_z80_state, init_djddz, ROT0, "Sealy", "Bai Bian Dou Dizhu", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 200?, ddz2,  0, sealy, djddz, sealy_z80_state, empty_init, ROT0, "Sealy", "Dou Dizhu II",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 200?, djddz, 0, sealy, djddz, sealy_z80_state, init_djddz, ROT0, "Sealy", "Dingji Dou Dizhu",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2005, bbddz,    0, sealy, djddz, sealy_z80_state, init_djddz, ROT0, "Sealy", "Bai Bian Dou Dizhu", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, ddz2,     0, sealy, djddz, sealy_z80_state, empty_init, ROT0, "Sealy", "Dou Dizhu II",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, djddz,    0, sealy, djddz, sealy_z80_state, init_djddz, ROT0, "Sealy", "Dingji Dou Dizhu",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2000, pljh,     0, sealy, djddz, sealy_z80_state, empty_init, ROT0, "Sealy", "Piaoliang Jinhua",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

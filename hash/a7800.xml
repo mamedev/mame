@@ -182,9 +182,44 @@ Super Pacman (2008)
 Wasp (2009)
 
 Notes:
-Most games contain only one ROM and only a small number contain more than one ROM,
-generally limited to early 32k games (2x 16k) and the 48k games (1x 16k + 1x 32k).
-Efforts are being made to document the chips/labels/markings on them.
+- Most games contain only one ROM and only a small number contain more than one ROM,
+  generally limited to early 32kB games (2x 16kB), the 48kB games (1x 16kB + 1x 32kB) and
+  a few later releases that use one or two 64kB or 128kB ROMs.
+
+- Many carts have part of the ROM number printed on the cart end label so a lot of them are
+  almost known even without seeing the actual ROM. The game# is often paired with C300050 or C300051.
+  Earlier games used C300048 and C300049. For general mask ROM identification of actual chips these
+  numbers could be helpful and have been added as a comment next to games where the real ROM marking is unknown.
+  Examples of known label and ROMs....
+      Barnyard Blaster Cart Label  = CA400065-059
+      Barnyard Blaster ROM Marking =  C300051-059A
+      Mario Bros. Cart Label       = CA400065-050
+      Mario Bros. ROM Marking      =  C300050-050A
+
+- The size of the ROM (in bytes) and number of ROM chips present is defined and restricted by the
+  type of cart PCB used. There were only a few different types of cart PCBs used for Atari 7800 games.
+  Unlike Atari 2600 custom game ROMs which contained bankswitching logic, Atari 7800 carts uses normal
+  (JEDEC) mask ROMs with the only difference being an active-high OE (vs active-low OE on regular EPROMs)
+  and all bankswitching is done with external logic. Therefore it is relatively easy to guess if a ROM
+  is hacked for emulators, merged to one file or cut/underdumped just by checking the PCB type because
+  the PCB only supports specific size ROMs.
+
+- A7800 random ROM dumps found on the net containing plain text in the first 128 bytes is a header hacked
+  onto the beginning of the image for use with early emulators. All of these dumps are bad and do not work
+  on real hardware. However they can be manually fixed by deleting the header which is the first 128 bytes.
+  The size of the resulting file will be a correct power-of-2 file size that fits fully into an EPROM.
+  The images in this list are correct and (with the exception of a few) all work in emulation and on real hardware.
+
+  ROMs and PCB seen but game unknown
+
+  PCB Type "C026445-001 7800 48K ROM REV A"
+  C300048-024A.U1 (16kB) and C028424-001.U2 (32kB), both (C)1987 - Possibly Desert Falcon (NTSC) or One On One (NTSC)
+
+  PCB Type "C025474-001"
+  C028108_LO.U1 and C028208_HI.U2 - Pole Position early 16kB or 32kB ROM version
+
+  PCB Type "C300703"
+  C300711-022A.U5 (64kB ROM) and U1 LO not populated
 
 -->
 
@@ -238,7 +273,7 @@ Efforts are being made to document the chips/labels/markings on them.
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
-			<dataarea name="rom" size="0x20000">
+			<dataarea name="rom" size="0x20000"> <!-- possibly c300051-046a.u1 -->
 				<rom name="aceoface.bin" size="0x20000" crc="05a2b94c" sha1="efd20bd321a81d67fb6430d9ba93d23fb90d8029"/>
 			</dataarea>
 		</part>
@@ -270,7 +305,7 @@ Efforts are being made to document the chips/labels/markings on them.
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg9" />
 			<feature name="peripheral" value="lightgun" />
-			<dataarea name="rom" size="0x24000"> <!-- Actually two ROMs, 128kB and 16kB -->
+			<dataarea name="rom" size="0x24000"> <!-- Actually two ROMs, 128kB and 16kB. ROM possibly c300051-055a.u1 -->
 				<rom name="alienbrg.bin" size="0x24000" crc="c8849d36" sha1="a8629fac962cc20b263a60bb2d2386d605713387"/>
 			</dataarea>
 		</part>
@@ -513,7 +548,7 @@ Efforts are being made to document the chips/labels/markings on them.
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
-			<dataarea name="rom" size="0x20000">
+			<dataarea name="rom" size="0x20000"> <!-- possibly c300051-080a.u1 -->
 				<rom name="bsktbrwl.bin" size="0x20000" crc="c8b9d7b5" sha1="39877a4c88498bf6656451e3d1acaf7e8638bdfd"/>
 			</dataarea>
 		</part>
@@ -982,7 +1017,7 @@ Efforts are being made to document the chips/labels/markings on them.
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
-			<dataarea name="rom" size="0x20000">
+			<dataarea name="rom" size="0x20000"> <!-- possibly c300051-054a.u1 -->
 				<rom name="fatalrun.bin" size="0x20000" crc="a44df354" sha1="69aab1e6ef332c6844c693ac41965e4c33ff822a"/>
 			</dataarea>
 		</part>
@@ -1012,7 +1047,7 @@ Efforts are being made to document the chips/labels/markings on them.
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
-			<dataarea name="rom" size="0x20000">
+			<dataarea name="rom" size="0x20000"> <!-- possibly c300051-051a.u1 -->
 				<rom name="fghtnght.bin" size="0x20000" crc="720ebc74" sha1="1e8a8704a77b15e70cbc72b0ae9bc25fb91d7c21"/>
 			</dataarea>
 		</part>
@@ -1294,7 +1329,7 @@ Efforts are being made to document the chips/labels/markings on them.
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
-			<dataarea name="rom" size="0x20000">
+			<dataarea name="rom" size="0x20000"> <!-- possibly c300051-062a.u1 -->
 				<rom name="ikariwar.bin" size="0x20000" crc="8a6c1f15" sha1="e368c6c7ffca5ffac314dec1effea4e2c809519a"/>
 			</dataarea>
 		</part>
@@ -1324,7 +1359,7 @@ Efforts are being made to document the chips/labels/markings on them.
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg_ram" />
-			<dataarea name="rom" size="0x20000">
+			<dataarea name="rom" size="0x20000"> <!-- possibly c300051-032a.u1 -->
 				<rom name="impssble.bin" size="0x20000" crc="3b1f2f47" sha1="5437c0efb63a349953ec047efe6ec24144ed6914"/>
 			</dataarea>
 			<dataarea name="ram" size="0x4000">
@@ -1596,7 +1631,7 @@ Saarna for debugging the problem)
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
-			<dataarea name="rom" size="0x20000">
+			<dataarea name="rom" size="0x20000"> <!-- possibly c300051-047a.u1 -->
 				<rom name="mean18.bin" size="0x20000" crc="cf21d9ac" sha1="a3e50c0e56c9675ffb1b6439f40789bc64c606b2"/>
 			</dataarea>
 		</part>
@@ -1627,7 +1662,7 @@ Saarna for debugging the problem)
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
 			<feature name="peripheral" value="lightgun" />
-			<dataarea name="rom" size="0x20000">
+			<dataarea name="rom" size="0x20000"> <!-- possibly c300051-075a.u1 -->
 				<rom name="meltdown.bin" size="0x20000" crc="4a8f2171" sha1="e601c45aaa1cc25f01493867664c8b9fefeca70e"/>
 			</dataarea>
 		</part>
@@ -2012,7 +2047,7 @@ almost nothing like the prototype.
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
-			<dataarea name="rom" size="0x20000">
+			<dataarea name="rom" size="0x20000"> <!-- possibly c300051-068a.u1 -->
 				<rom name="planetsm.bin" size="0x20000" crc="4e3b9e64" sha1="503b975fc1f8edc16110ac2c5b884c4e8b2b6efb"/>
 			</dataarea>
 		</part>
@@ -2264,17 +2299,19 @@ almost nothing like the prototype.
 	</software>
 
 	<software name="sentinelu" cloneof="sentinel" supported="no">
-		<description>Sentinel (NTSC, prototype)</description>
+		<description>Sentinel (NTSC)</description>
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7869"/>
-		<info name="pcb" value="C300595 REV A"/>
+		<info name="pcb" value="C300703"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
 			<feature name="peripheral" value="lightgun" />
-			<dataarea name="rom" size="0x20000">
-				<rom name="sentinel.bin" size="0x20000" crc="2fddad78" sha1="bd7de03a28b168c992bcaa96539c2310f3bfe30c"/>
+			<dataarea name="rom" size="0x20000"> <!-- note / in date (on rom stickers) replaced with . and 8 in date may be 0? -->
+                 <!-- There is one other game on this same cart type with one 64kB ROM at U5 with number c300711-022a but the game name is not documented. -->
+                <rom name="sentinel_c300051-069a_7800_ntsc_#1_11.21.8_59f1.u1" size="0x10000" crc="60339c1e" sha1="8e3a2547c389394fd2626c9cbb85927ee6a8d48c" offset="0"/>
+                <rom name="sentinel_c300051-069a_7800_ntsc_#2_11.21.8_0ece.u5" size="0x10000" crc="a6274fa8" sha1="28e3835e9d4cf31c60ce01dbcdd14ee8b16ed2f8" offset="0x10000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2284,12 +2321,12 @@ almost nothing like the prototype.
 		<year>1991</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7869"/>
-		<info name="pcb" value="C300595 REV A"/>
+		<info name="pcb" value="C300703"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
 			<feature name="peripheral" value="lightgun" />
-			<dataarea name="rom" size="0x20000">
+			<dataarea name="rom" size="0x20000"> <!-- Actually two 64kB ROMs -->
 				<rom name="sentineu.bin" size="0x20000" crc="47340df9" sha1="6d85a73a56d2f02ff439736eace86691aa613444"/>
 			</dataarea>
 		</part>
@@ -2418,7 +2455,7 @@ almost nothing like the prototype.
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
-			<dataarea name="rom" size="0xc000"> <!-- Actually two ROMs, 32kB and 16kB -->
+			<dataarea name="rom" size="0xc000"> <!-- Actually two ROMs, 32kB and 16kB. Possibly c300051-028a & b -->
 				<rom name="suprhuey.bin" size="0xc000" crc="71846500" sha1="29aea9e90c446942001fd08d3c4c929f4ce048d7"/>
 			</dataarea>
 		</part>
@@ -2566,14 +2603,15 @@ almost nothing like the prototype.
 	</software>
 
 	<software name="tdown">
-		<description>Touchdown Football</description>
+		<description>Touchdown Football (NTSC)</description>
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX7823"/>
 		<info name="pcb" value="C300595 REV A"/>
+		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
-			<dataarea name="rom" size="0x20000">
+			<dataarea name="rom" size="0x20000"> <!-- possibly c300051-023a.u1 -->
 				<rom name="tchdown.bin" size="0x20000" crc="aae12695" sha1="364bf0fef8a67f7e66761c76a3a6a0dd186f04aa"/>
 			</dataarea>
 		</part>
@@ -2702,7 +2740,7 @@ almost nothing like the prototype.
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
-			<dataarea name="rom" size="0x20000">
+			<dataarea name="rom" size="0x20000"> <!-- possibly c300051-058a.u1 -->
 				<rom name="xnophobe.bin" size="0x20000" crc="5fd9a141" sha1="867adbfd7539ff81e68726ed6f5ff7326409539f"/>
 			</dataarea>
 		</part>

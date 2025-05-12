@@ -335,7 +335,7 @@ static INPUT_PORTS_START( pkboram )
 INPUT_PORTS_END
 
 
-const gfx_layout gfx_8x8x4_planar =
+const gfx_layout gfx_8x8x8_planar =
 {
 	8,8,
 	RGN_FRAC(1,8),
@@ -349,7 +349,7 @@ const gfx_layout gfx_8x8x4_planar =
 
 static GFXDECODE_START( gfx_boram ) // TODO
 	GFXDECODE_ENTRY( "chars", 0, gfx_8x8x2_planar,  0x000, 16 )
-	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x4_planar,  0x200, 16 )
+	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x8_planar,  0x200, 16 )
 GFXDECODE_END
 
 

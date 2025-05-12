@@ -20591,6 +20591,7 @@ sdmg2754cb
 sdmg2p
 slqz2
 slqz2a
+slqz2b
 spkrform
 starzan
 tarzan
@@ -31462,6 +31463,7 @@ jpddza
 jzst
 menghong
 menghonga
+pljh2
 sandayi
 
 @source:misc/meyc8080.cpp
@@ -32107,6 +32109,9 @@ unkpmc
 
 @source:misc/pntnpuzl.cpp
 pntnpuzl
+
+@source:misc/pntnpuzls.cpp
+pntnpuzls
 
 @source:misc/poker72.cpp
 poker72
@@ -34766,6 +34771,7 @@ vipclub
 @source:nichibutsu/nbmj8891.cpp
 abunai
 avmjts
+avmjyk
 bananadr
 chinmoku
 club90s
@@ -39782,6 +39788,7 @@ sandaha
 bbddz
 ddz2
 djddz
+pljh
 
 @source:sega/angelkds.cpp
 angelkds
