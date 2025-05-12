@@ -99,10 +99,12 @@ void pntnpuzls_state::io_map(address_map &map)
 
 	map(0x0310, 0x0310).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x0312, 0x0312).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x0314, 0x0317).rw("pic", FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 
 	map(0x0320, 0x0320).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x0322, 0x0322).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x0324, 0x0324).w("ramdac", FUNC(ramdac_device::mask_w));
+	map(0x0328, 0x032f).rw("pit", FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask16(0x00ff);
 
 	map(0x0340, 0x034f).rw("uart", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w)).umask16(0x00ff);
 }
@@ -149,12 +151,20 @@ void pntnpuzls_state::pntnpuzls(machine_config &config)
 	I80286(config, m_maincpu, 27'500'000 / 2); // clock / divider not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &pntnpuzls_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &pntnpuzls_state::io_map);
+	m_maincpu->set_irq_acknowledge_callback("pic", FUNC(pic8259_device::inta_cb));
 
-	PIC8259(config, "pic");
+	pic8259_device &pic(PIC8259(config, "pic"));
+	pic.out_int_callback().set_inputline(m_maincpu, 0);
 
-	PIT8254(config, "pit");
+	pit8254_device &pit(PIT8254(config, "pit"));
+	pit.set_clk<0>(XTAL(3'579'545)); // clocks?
+	pit.out_handler<0>().set("pic", FUNC(pic8259_device::ir2_w));
+	pit.set_clk<1>(XTAL(3'579'545));
+	pit.set_clk<2>(XTAL(3'579'545));
 
-	INS8250(config, "uart", 1.8432_MHz_XTAL);
+
+	ins8250_device &uart(INS8250(config, "uart", 1.8432_MHz_XTAL));
+	uart.out_int_callback().set("pic", FUNC(pic8259_device::ir4_w));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: everything
 	screen.set_refresh_hz(60);
