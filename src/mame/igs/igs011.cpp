@@ -95,7 +95,7 @@ public:
 		, m_oki(*this, "oki")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
-		, m_layer_ram(*this, "layer%u_ram", 0U, 512U * 256U, ENDIANNESS_LITTLE)
+		, m_layer_ram(*this, "layer%u_ram", 0U, 512U * 256U, ENDIANNESS_BIG)
 		, m_priority_ram(*this, "priority_ram")
 		, m_maincpu_region(*this, "maincpu")
 		, m_gfx(*this, "blitter")
@@ -407,7 +407,7 @@ u32 igs011_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 #endif
 
 	u16 const *const pri_ram = &m_priority_ram[(m_priority & 7) * 512/2];
-	unsigned const hibpplayers = 4 - (m_blitter.depth & 0x07);
+	unsigned const hibpp_layers = 4 - (m_blitter.depth & 0x07);
 
 	u8 layerpix[8] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -421,7 +421,7 @@ u32 igs011_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 			for (unsigned i = 0; std::size(m_layer_ram) > i; ++i)
 			{
 				u8 const pixdata = m_layer_ram[i][scr_addr];
-				if (i < hibpplayers)
+				if (i < hibpp_layers)
 				{
 					layerpix[l] = pixdata;
 					if (layerpix[l] != 0xff)
@@ -546,12 +546,15 @@ void igs011_state::igs011_blit_pen_w(offs_t offset, u16 data, u16 mem_mask)
 
 void igs011_state::igs011_blit_flags_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	rectangle const &clip = m_screen->visible_area();
+	rectangle const clip(0, 512 - 1, 0, 256 - 1);
 
 	COMBINE_DATA(&m_blitter.flags);
 
-	LOGMASKED(LOG_BLITTER, "%06x: blit x %03x, y %03x, w %03x, h %03x, gfx %03x%04x, depth %02x, pen %02x, flags %03x\n", m_maincpu->pc(),
-		m_blitter.x,m_blitter.y,m_blitter.w,m_blitter.h,m_blitter.gfx_hi,m_blitter.gfx_lo,m_blitter.depth,m_blitter.pen,m_blitter.flags);
+	LOGMASKED(LOG_BLITTER, "%s: blit x %03x, y %03x, w %03x, h %03x, gfx %03x%04x, depth %02x, pen %02x, flags %03x\n",
+			machine().describe_context(),
+			m_blitter.x, m_blitter.y, m_blitter.w, m_blitter.h,
+			m_blitter.gfx_hi, m_blitter.gfx_lo,
+			m_blitter.depth, m_blitter.pen, m_blitter.flags);
 
 	unsigned const layer  = m_blitter.flags & 0x0007;
 	bool     const opaque = BIT(~m_blitter.flags,  3);
@@ -564,35 +567,37 @@ void igs011_state::igs011_blit_flags_w(offs_t offset, u16 data, u16 mem_mask)
 		return;
 
 	u8 const pen_hi = (m_blitter_pen_hi & 0x07) << 5;
-	unsigned const hibpplayers = 4 - (m_blitter.depth & 0x07);
-	bool const dst4 = layer >= hibpplayers;
-	unsigned const shift = dst4 ? (((layer - hibpplayers) & 0x01) << 2) : 0;
+	unsigned const hibpp_layers = 4 - (m_blitter.depth & 0x07);
+	bool const dst4 = layer >= hibpp_layers;
+	bool const src4 = dst4 || (m_blitter.gfx_hi & 0x80); // see lhb2
+	unsigned const shift = dst4 ? (((layer - hibpp_layers) & 0x01) << 2) : 0;
 	u8 const mask = dst4 ? (0xf0 >> shift) : 0xff;
-	auto &dest = m_layer_ram[dst4 ? (hibpplayers + ((layer - hibpplayers) >> 1)) : layer];
+	unsigned const buffer = dst4 ? (hibpp_layers + ((layer - hibpp_layers) >> 1)) : layer;
+
+	if (std::size(m_layer_ram) <= buffer)
+	{
+		logerror("%s: layer %u out of range depth %02x (%u 8-bit layers)\n", machine().describe_context(), layer, m_blitter.depth, hibpp_layers);
+		return;
+	}
+
+	auto &dest = m_layer_ram[buffer];
 
 	// pixel source address
-	u32 z = m_blitter.gfx_lo | (u32(m_blitter.gfx_hi) << 16);
+	u32 z = (u32(m_blitter.gfx_hi & 0x7f) << 16) | m_blitter.gfx_lo;
 
-	bool const src4 = dst4 || (z & 0x800000); // see lhb2
+	u8 const clear_pen = src4 ? (m_blitter.pen | 0xf0) : m_blitter.pen;
 
-	z &= 0x7fffff;
-
-	u8 trans_pen, clear_pen;
-
+	u8 trans_pen;
 	if (src4)
 	{
 		z <<= 1;
 		if (m_gfx_hi && (m_blitter.gfx_hi & 0x80)) trans_pen = 0x1f;   // lhb2
 		else                                       trans_pen = 0x0f;
-
-		clear_pen = m_blitter.pen | 0xf0;
 	}
 	else
 	{
 		if (m_gfx_hi) trans_pen = 0x1f;   // vbowl
 		else          trans_pen = 0xff;
-
-		clear_pen = m_blitter.pen;
 	}
 
 	const int xstart = util::sext(m_blitter.x, 10);
@@ -4175,8 +4180,8 @@ void igs011_state::igs011_base(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(512, 256);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1282));
+	m_screen->set_size(512, 260);
 	m_screen->set_visarea(0, 512-1, 0, 240-1);
 	m_screen->set_screen_update(FUNC(igs011_state::screen_update));
 	m_screen->set_palette(m_palette);
