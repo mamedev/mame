@@ -635,7 +635,7 @@ void sound_stream::reprime_sync_timer()
 	if(!is_active())
 		return;
 
-	u64 next_sample = m_output_buffer.write_sample() + 1;
+	u64 next_sample = m_output_buffer.write_sample();
 	attotime next_time = sample_to_time(next_sample);
 	next_time.m_attoseconds += 1'000'000'000; // Go to the next nanosecond '
 	m_sync_timer->adjust(next_time - m_device.machine().time());
