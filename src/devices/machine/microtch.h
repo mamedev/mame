@@ -43,7 +43,7 @@ private:
 	void send_format_decimal_packet(int x, int y);
 	void send_format_hex_packet(int x, int y);
 	void send_touch_packet();
-	char ntoc(int n) { return n < 10 ?  n + '0' : n + 'A'; }
+	char ntoc(int n) { return n < 10 ?  n + '0' : n - 10 + 'A'; }
 
 	enum
 	{
