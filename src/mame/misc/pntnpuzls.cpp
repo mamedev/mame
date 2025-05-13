@@ -44,8 +44,10 @@ RGB O/P connector
 #include "machine/microtch.h"
 #include "video/mc6845.h"
 #include "video/ramdac.h"
+#include "sound/dac.h"
 
 #include "screen.h"
+#include "speaker.h"
 
 
 namespace {
@@ -76,12 +78,16 @@ private:
 	required_device<palette_device> m_palette;
 
 	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void program_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
 	void ramdac_map(address_map &map) ATTR_COLD;
+
+	void nmi(int s) { if(BIT(m_port304, 0)) m_maincpu->set_input_line(INPUT_LINE_NMI, s); }
+	u8 m_port304;
 };
 
 
@@ -122,7 +128,7 @@ void pntnpuzls_state::io_map(address_map &map)
 {
 	map(0x0300, 0x0301).portr("IN0");
 	map(0x0302, 0x0303).portr("IN1");
-	map(0x0304, 0x0305).nopw(); // coin counter?
+	map(0x0304, 0x0305).lw8(NAME([this] (u8 data){ m_port304 = data; })).umask16(0x00ff);
 	map(0x0308, 0x0308).lw8(
 		NAME([this] (offs_t offset, u8 data) {
 			// TODO: may view select on bits 7-3
@@ -132,6 +138,7 @@ void pntnpuzls_state::io_map(address_map &map)
 		})
 	);
 	map(0x030c, 0x030d).portr("IN2");
+	map(0x030e, 0x030f).w("dac", FUNC(dac_8bit_r2r_device::write));
 
 	map(0x0310, 0x0310).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x0312, 0x0312).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
@@ -213,6 +220,11 @@ void pntnpuzls_state::machine_start()
 	m_font_bank->configure_entries(0, 8, m_font->base(), 0x10000);
 }
 
+void pntnpuzls_state::machine_reset()
+{
+	m_port304 = 0;
+}
+
 void pntnpuzls_state::ramdac_map(address_map &map)
 {
 	map(0x000, 0x2ff).rw(m_ramdac, FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
@@ -230,9 +242,10 @@ void pntnpuzls_state::pntnpuzls(machine_config &config)
 	pic.out_int_callback().set_inputline(m_maincpu, 0);
 
 	pit8254_device &pit(PIT8254(config, "pit"));
-	pit.set_clk<0>(XTAL(3'579'545)); // clocks?
-	pit.set_clk<1>(XTAL(3'579'545));
-	pit.set_clk<2>(XTAL(3'579'545));
+	pit.set_clk<0>(XTAL(27'500'000)); // clocks?
+	pit.set_clk<1>(XTAL(27'500'000));
+	pit.set_clk<2>(XTAL(27'500'000));
+	pit.out_handler<2>().set(FUNC(pntnpuzls_state::nmi));
 
 	ins8250_device &uart(INS8250(config, "uart", 1.8432_MHz_XTAL));
 	uart.out_tx_callback().set("microtouch", FUNC(microtouch_device::rx));
@@ -259,7 +272,8 @@ void pntnpuzls_state::pntnpuzls(machine_config &config)
 	crtc.set_screen("screen");
 	crtc.out_vsync_callback().set("pic", FUNC(pic8259_device::ir0_w));
 
-	// TODO: sound? missing chip at u11?
+	SPEAKER(config, "speaker").front_center();
+	DAC_8BIT_R2R(config, "dac").add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 ROM_START( pntnpuzls )
@@ -275,4 +289,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1994, pntnpuzls, 0, pntnpuzls, pntnpuzls, pntnpuzls_state, empty_init, ROT90, "Century Vending / Green Concepts International", "Paint 'N Puzzle Super", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1994, pntnpuzls, 0, pntnpuzls, pntnpuzls, pntnpuzls_state, empty_init, ROT90, "Century Vending / Green Concepts International", "Paint 'N Puzzle Super", MACHINE_NOT_WORKING )
