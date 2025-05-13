@@ -69,12 +69,12 @@ void ppu_vt03_device::palette_write(offs_t offset, uint8_t data)
 
 uint8_t ppu_vt03_device::read_2010(offs_t offset) { return m_extended_modes_enable; }
 uint8_t ppu_vt03_device::read_2011(offs_t offset) { return m_201x_regs[0x1]; }
-uint8_t ppu_vt03_device::videobank0_0_r(offs_t offset) { return m_201x_regs[0x2]; }
-uint8_t ppu_vt03_device::videobank0_1_r(offs_t offset) { return m_201x_regs[0x3]; }
-uint8_t ppu_vt03_device::videobank0_2_r(offs_t offset) { return m_201x_regs[0x4]; }
-uint8_t ppu_vt03_device::videobank0_3_r(offs_t offset) { return m_201x_regs[0x5]; }
-uint8_t ppu_vt03_device::videobank0_4_r(offs_t offset) { return m_201x_regs[0x6]; }
-uint8_t ppu_vt03_device::videobank0_5_r(offs_t offset) { return m_201x_regs[0x7]; }
+uint8_t ppu_vt03_device::videobank0_0_r(offs_t offset) { return m_videobank0[0x0]; }
+uint8_t ppu_vt03_device::videobank0_1_r(offs_t offset) { return m_videobank0[0x1]; }
+uint8_t ppu_vt03_device::videobank0_2_r(offs_t offset) { return m_videobank0[0x2]; }
+uint8_t ppu_vt03_device::videobank0_3_r(offs_t offset) { return m_videobank0[0x3]; }
+uint8_t ppu_vt03_device::videobank0_4_r(offs_t offset) { return m_videobank0[0x4]; }
+uint8_t ppu_vt03_device::videobank0_5_r(offs_t offset) { return m_videobank0[0x5]; }
 uint8_t ppu_vt03_device::read_2018(offs_t offset) { return m_201x_regs[0x8]; }
 uint8_t ppu_vt03_device::read_2019(offs_t offset) { return 0x00; }
 uint8_t ppu_vt03_device::read_201a(offs_t offset) { return m_201x_regs[0xa]; }
@@ -209,6 +209,7 @@ void ppu_vt03_device::device_start()
 	save_item(NAME(m_extplanebuf));
 	save_item(NAME(m_extra_sprite_bits));
 	save_item(NAME(m_201x_regs));
+	save_item(NAME(m_videobank0));
 	save_item(NAME(m_extended_modes_enable));
 
 	init_vt03_palette_tables(0);
@@ -240,6 +241,9 @@ void ppu_vt03_device::device_reset()
 		set_201x_reg(i, 0x00);
 
 	m_extended_modes_enable = 0x00;
+
+	for (int i = 0; i < 6; i++)
+		m_videobank0[i] = 0;
 
 	m_read_bg4_bg3 = 0;
 	m_va34 = false;
@@ -517,12 +521,12 @@ void ppu_vt03_device::write_2010(offs_t offset, uint8_t data)
 }
 
 void ppu_vt03_device::write_2011(offs_t offset, uint8_t data) { m_201x_regs[0x1] = data; }
-void ppu_vt03_device::videobank0_0_w(offs_t offset, uint8_t data) { m_201x_regs[0x2] = data; }
-void ppu_vt03_device::videobank0_1_w(offs_t offset, uint8_t data) { m_201x_regs[0x3] = data; }
-void ppu_vt03_device::videobank0_2_w(offs_t offset, uint8_t data) { m_201x_regs[0x4] = data; }
-void ppu_vt03_device::videobank0_3_w(offs_t offset, uint8_t data) { m_201x_regs[0x5] = data; }
-void ppu_vt03_device::videobank0_4_w(offs_t offset, uint8_t data) { m_201x_regs[0x6] = data; }
-void ppu_vt03_device::videobank0_5_w(offs_t offset, uint8_t data) { m_201x_regs[0x7] = data; }
+void ppu_vt03_device::videobank0_0_w(offs_t offset, uint8_t data) { m_videobank0[0x0] = data; }
+void ppu_vt03_device::videobank0_1_w(offs_t offset, uint8_t data) { m_videobank0[0x1] = data; }
+void ppu_vt03_device::videobank0_2_w(offs_t offset, uint8_t data) { m_videobank0[0x2] = data; }
+void ppu_vt03_device::videobank0_3_w(offs_t offset, uint8_t data) { m_videobank0[0x3] = data; }
+void ppu_vt03_device::videobank0_4_w(offs_t offset, uint8_t data) { m_videobank0[0x4] = data; }
+void ppu_vt03_device::videobank0_5_w(offs_t offset, uint8_t data) { m_videobank0[0x5] = data; }
 void ppu_vt03_device::write_2018(offs_t offset, uint8_t data) { m_201x_regs[0x8] = data; }
 void ppu_vt03_device::write_2019(offs_t offset, uint8_t data) { logerror("%s: write_2019 %02x (gun reset?)\n", machine().describe_context(), data); }
 void ppu_vt03_device::write_201a(offs_t offset, uint8_t data) { m_201x_regs[0xa] = data; }

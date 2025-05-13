@@ -611,7 +611,7 @@ void nes_vt_waixing_alt_state::nes_vt_waixing_alt_4mb(machine_config &config)
 	NES_VT02_VT03_SOC_WAIXING(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_waixing_state::vt_external_space_map_4mbyte);
-	m_soc->set_8000_scramble(0x5, 0x4, 0x3, 0x2, 0x7, 0x6, 0x7, 0x8);
+	m_soc->set_8000_scramble(0x3, 0x2, 0x1, 0x0, 0x5, 0x4,    0x7, 0x8);
 }
 
 void nes_vt_waixing_alt_state::nes_vt_waixing_alt_pal_8mb(machine_config &config)
@@ -619,7 +619,7 @@ void nes_vt_waixing_alt_state::nes_vt_waixing_alt_pal_8mb(machine_config &config
 	NES_VT02_VT03_SOC_WAIXING_PAL(config, m_soc, PAL_APU_CLOCK);
 	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_waixing_alt_state::vt_external_space_map_8mbyte);
-	m_soc->set_8000_scramble(0x5, 0x4, 0x3, 0x2, 0x7, 0x6, 0x7, 0x8);
+	m_soc->set_8000_scramble(0x3, 0x2, 0x1, 0x0, 0x5, 0x4,    0x7, 0x8);
 }
 
 void nes_vt_waixing_alt_sporzpp_state::nes_vt_waixing_alt_4mb_sporzpp(machine_config& config)
@@ -628,7 +628,7 @@ void nes_vt_waixing_alt_sporzpp_state::nes_vt_waixing_alt_4mb_sporzpp(machine_co
 	configure_soc(m_soc);
 
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_ablping_state::vt_external_space_map_4mbyte);
-	m_soc->set_8000_scramble(0x5, 0x4, 0x3, 0x2, 0x7, 0x6, 0x7, 0x8);
+	m_soc->set_8000_scramble(0x3, 0x2, 0x1, 0x0, 0x5, 0x4,    0x7, 0x8);
 }
 
 void nes_vt_waixing_alt_sporzpp_state::nes_vt_pal_4mb_sporzbxa(machine_config& config)
@@ -643,7 +643,7 @@ void nes_vt_hum_state::nes_vt_hummer_2mb(machine_config& config)
 	NES_VT02_VT03_SOC_HUMMER(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_sp69_state::vt_external_space_map_2mbyte);
-	m_soc->set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8);
+	m_soc->set_8000_scramble(0x4, 0x5, 0x0, 0x1, 0x2, 0x3,    0x7, 0x8);
 }
 
 void nes_vt_hum_state::nes_vt_hummer_4mb(machine_config& config)
@@ -657,7 +657,7 @@ void nes_vt_pjoy_state::nes_vt_pjoy_4mb(machine_config &config)
 	NES_VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_sp69_state::vt_external_space_map_4mbyte);
-	m_soc->set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x8, 0x7);
+	m_soc->set_8000_scramble(0x4, 0x5, 0x0, 0x1, 0x2, 0x3,    0x8, 0x7);
 	m_soc->set_410x_scramble(0x8, 0x7);
 }
 
@@ -667,7 +667,7 @@ void nes_vt_sp69_state::nes_vt_4mb_sp69(machine_config& config)
 	NES_VT02_VT03_SOC_SPORTS(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_sp69_state::vt_external_space_map_4mbyte);
-	m_soc->set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8);
+	m_soc->set_8000_scramble(0x4, 0x5, 0x0, 0x1, 0x2, 0x3,    0x7, 0x8);
 }
 
 void nes_vt_ablping_state::nes_vt_2mb_ablping(machine_config &config)
@@ -675,7 +675,7 @@ void nes_vt_ablping_state::nes_vt_2mb_ablping(machine_config &config)
 	NES_VT02_VT03_SOC_SPORTS_PAL(config, m_soc, PAL_APU_CLOCK);
 	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_ablping_state::vt_external_space_map_2mbyte);
-	m_soc->set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8);
+	m_soc->set_8000_scramble(0x4, 0x5, 0x0, 0x1, 0x2, 0x3,    0x7, 0x8);
 
 	m_soc->extra_read_2_callback().set(FUNC(nes_vt_ablping_state::ablping_extraio_r));
 	m_soc->extra_read_3_callback().set(FUNC(nes_vt_ablping_state::ablping_extraio_r));

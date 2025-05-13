@@ -99,12 +99,14 @@ nes_vt02_vt03_soc_device::nes_vt02_vt03_soc_device(const machine_config& mconfig
 	m_extra_read_3_callback(*this, 0xff)
 {
 	// 'no scramble' configuration
-	m_8000_scramble[0x0] = 0x6;
-	m_8000_scramble[0x1] = 0x7;
-	m_8000_scramble[0x2] = 0x2;
-	m_8000_scramble[0x3] = 0x3;
-	m_8000_scramble[0x4] = 0x4;
-	m_8000_scramble[0x5] = 0x5;
+	m_8000_scramble[0x0] = 0x4;
+	m_8000_scramble[0x1] = 0x5;
+	m_8000_scramble[0x2] = 0x0;
+	m_8000_scramble[0x3] = 0x1;
+	m_8000_scramble[0x4] = 0x2;
+	m_8000_scramble[0x5] = 0x3;
+
+	// not for PPU?
 	m_8000_scramble[0x6] = 0x7;
 	m_8000_scramble[0x7] = 0x8;
 
@@ -742,12 +744,12 @@ void nes_vt02_vt03_soc_device::scrambled_8000_w(uint16_t offset, uint8_t data)
 	{
 		//CNROM compat
 		logerror("%s: vtxx_cnrom_8000_w real address: (%04x) translated address: (%04x) %02x\n", machine().describe_context(), addr, offset + 0x8000, data);
-		m_ppu->set_201x_reg(0x6, data * 8);
-		m_ppu->set_201x_reg(0x7, data * 8 + 2);
-		m_ppu->set_201x_reg(0x2, data * 8 + 4);
-		m_ppu->set_201x_reg(0x3, data * 8 + 5);
-		m_ppu->set_201x_reg(0x4, data * 8 + 6);
-		m_ppu->set_201x_reg(0x5, data * 8 + 7);
+		m_ppu->set_videobank0_reg(0x4, data * 8);
+		m_ppu->set_videobank0_reg(0x5, data * 8 + 2);
+		m_ppu->set_videobank0_reg(0x0, data * 8 + 4);
+		m_ppu->set_videobank0_reg(0x1, data * 8 + 5);
+		m_ppu->set_videobank0_reg(0x2, data * 8 + 6);
+		m_ppu->set_videobank0_reg(0x3, data * 8 + 7);
 
 	}
 	else if ((m_411d & 0x03) == 0x01) // (VT32 only, not VT03/09, split)
@@ -786,28 +788,29 @@ void nes_vt02_vt03_soc_device::scrambled_8000_w(uint16_t offset, uint8_t data)
 			switch (m_410x[0x05] & 0x07)
 			{
 			case 0x00:
-				m_ppu->set_201x_reg(m_8000_scramble[0], data);
+				m_ppu->set_videobank0_reg(m_8000_scramble[0], data);
 				break;
 
 			case 0x01:
-				m_ppu->set_201x_reg(m_8000_scramble[1], data);
+				m_ppu->set_videobank0_reg(m_8000_scramble[1], data);
 				break;
 
 			case 0x02: // hand?
-				m_ppu->set_201x_reg(m_8000_scramble[2], data);
+				m_ppu->set_videobank0_reg(m_8000_scramble[2], data);
 				break;
 
 			case 0x03: // dog?
-				m_ppu->set_201x_reg(m_8000_scramble[3], data);
+				m_ppu->set_videobank0_reg(m_8000_scramble[3], data);
 				break;
 
 			case 0x04: // ball thrown
-				m_ppu->set_201x_reg(m_8000_scramble[4], data);
+				m_ppu->set_videobank0_reg(m_8000_scramble[4], data);
 				break;
 
 			case 0x05: // ball thrown
-				m_ppu->set_201x_reg(m_8000_scramble[5], data);
+				m_ppu->set_videobank0_reg(m_8000_scramble[5], data);
 				break;
+
 			case 0x06:
 				m_410x[m_8000_scramble[6]] = data;
 				//m_410x[0x9] = data;
@@ -867,6 +870,8 @@ void nes_vt02_vt03_soc_device::set_8000_scramble(uint8_t reg0, uint8_t reg1, uin
 	m_8000_scramble[3] = reg3;
 	m_8000_scramble[4] = reg4;
 	m_8000_scramble[5] = reg5;
+
+	// not for PPU?
 	m_8000_scramble[6] = reg6;
 	m_8000_scramble[7] = reg7;
 }

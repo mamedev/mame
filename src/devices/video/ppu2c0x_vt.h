@@ -68,7 +68,8 @@ public:
 
 	void set_201x_reg(int reg, uint8_t data);
 	uint8_t get_201x_reg(int reg);
-	uint8_t get_videobank0_reg(int reg) { return m_201x_regs[reg + 2]; }
+	uint8_t get_videobank0_reg(int reg) { return m_videobank0[reg]; }
+	void set_videobank0_reg(int reg, uint8_t data) { m_videobank0[reg] = data; }
 
 	uint8_t get_va34();
 	uint8_t get_m_read_bg4_bg3();
@@ -101,6 +102,7 @@ protected:
 	uint32_t m_vtpens_rgb444[0x1000*8];
 
 	uint8_t m_201x_regs[0x20];
+	uint8_t m_videobank0[6];
 	uint8_t m_extended_modes_enable;
 
 private:
