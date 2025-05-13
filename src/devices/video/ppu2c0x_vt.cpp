@@ -549,9 +549,9 @@ void ppu_vt3xx_device::device_reset()
 	m_newvid_1e = 0x00;
 }
 
-uint8_t ppu_vt3xx_device::gun_x_r_newvid(offs_t offset) { return m_newvid_1c; }
-uint8_t ppu_vt3xx_device::gun_y_r_newvid(offs_t offset) { return m_newvid_1d; }
-uint8_t ppu_vt3xx_device::gun2_x_r_newvid(offs_t offset) { return m_newvid_1e; }
+uint8_t ppu_vt3xx_device::read_201c_newvid(offs_t offset) { return m_newvid_1c; }
+uint8_t ppu_vt3xx_device::read_201d_newvid(offs_t offset) { return m_newvid_1d; }
+uint8_t ppu_vt3xx_device::read_201e_newvid(offs_t offset) { return m_newvid_1e; }
 
 void ppu_vt3xx_device::write_201c_newvid(offs_t offset, uint8_t data) { m_newvid_1c = data; logerror("%s: write_201c_newvid %02x\n", machine().describe_context(), data); }
 void ppu_vt3xx_device::write_201d_newvid(offs_t offset, uint8_t data) { m_newvid_1d = data; logerror("%s: write_201d_newvid %02x\n", machine().describe_context(), data); }
@@ -565,4 +565,53 @@ void ppu_vt3xx_device::write_201e_newvid(offs_t offset, uint8_t data)
 	*/
 	m_newvid_1e = data;
 	logerror("%s: write_201e_newvid %02x\n", machine().describe_context(), data);
+}
+
+void ppu_vt3xx_device::read_tile_plane_data(int address, int color)
+{
+	if (!m_newvid_1e)
+	{
+		ppu_vt03_device::read_tile_plane_data(address, color);
+	}
+	else
+	{
+		popmessage("extended mode %02x %02x %02x?\n", m_newvid_1c, m_newvid_1d, m_newvid_1e);
+	}
+}
+
+void ppu_vt3xx_device::draw_tile_pixel(uint8_t pix, int color, uint32_t back_pen, uint32_t*& dest)
+{
+	if (!m_newvid_1e)
+	{
+		ppu_vt03_device::draw_tile_pixel(pix, color, back_pen, dest);
+	}
+	else
+	{
+		// extended modes
+	}
+}
+
+void ppu_vt3xx_device::shift_tile_plane_data(uint8_t& pix)
+{
+	if (!m_newvid_1e)
+	{
+		ppu_vt03_device::shift_tile_plane_data(pix);
+	}
+	else
+	{
+		// extended modes
+	}
+}
+
+
+void ppu_vt3xx_device::draw_back_pen(uint32_t* dst, int back_pen)
+{
+	if (!m_newvid_1e)
+	{
+		ppu_vt03_device::draw_back_pen(dst, back_pen);
+	}
+	else
+	{
+		// extended modes
+	}
 }

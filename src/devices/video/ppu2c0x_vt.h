@@ -135,9 +135,9 @@ class ppu_vt3xx_device : public ppu_vt03_device {
 public:
 	ppu_vt3xx_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 
-	uint8_t gun_x_r_newvid(offs_t offset);
-	uint8_t gun_y_r_newvid(offs_t offset);
-	uint8_t gun2_x_r_newvid(offs_t offset);
+	uint8_t read_201c_newvid(offs_t offset);
+	uint8_t read_201d_newvid(offs_t offset);
+	uint8_t read_201e_newvid(offs_t offset);
 
 	void write_201c_newvid(offs_t offset, uint8_t data);
 	void write_201d_newvid(offs_t offset, uint8_t data);
@@ -148,6 +148,11 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
+	virtual void read_tile_plane_data(int address, int color) override;
+	virtual void draw_tile_pixel(uint8_t pix, int color, uint32_t back_pen, uint32_t*& dest) override;
+	virtual void shift_tile_plane_data(uint8_t& pix) override;
+	virtual void draw_back_pen(uint32_t* dst, int back_pen) override;
+
 	uint8_t m_newvid_1c;
 	uint8_t m_newvid_1d;
 	uint8_t m_newvid_1e;
