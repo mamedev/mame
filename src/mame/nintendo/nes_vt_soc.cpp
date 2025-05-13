@@ -66,7 +66,7 @@ DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_WAIXING_PAL,  nes_vt02_vt03_soc_waixing_pal
 DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_HUMMER,       nes_vt02_vt03_soc_hummer_device,       "nes_vt02_vt03_soc_hummer",      "VT02/03 series System on a Chip (Hummer, NTSC)")
 
 DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_SPORTS,       nes_vt02_vt03_soc_sports_device,       "nes_vt02_vt03_soc_sports",      "VT02/03 series System on a Chip (Sports, NTSC)")
-DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_SPORTS_PAL,   nes_vt02_vt03_soc_sports_pal_device,   "nes_vt02_vt03_soc_sports",      "VT02/03 series System on a Chip (Sports, PAL)")
+DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_SPORTS_PAL,   nes_vt02_vt03_soc_sports_pal_device,   "nes_vt02_vt03_soc_sports_pal",  "VT02/03 series System on a Chip (Sports, PAL)")
 
 DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_SCRAMBLE,     nes_vt02_vt03_soc_scramble_device,     "nes_vt02_vt03_soc_scram",       "VT02/03 series System on a Chip (NTSC, with simple Opcode scrambling)")
 DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_SCRAMBLE_PAL, nes_vt02_vt03_soc_scramble_pal_device, "nes_vt02_vt03_soc_pal_scram",   "VT02/03 series System on a Chip (PAL, with simple Opcode scrambling)")
