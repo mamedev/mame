@@ -318,7 +318,6 @@ void tx1_sound_device::ay8910_b_w(uint8_t data)
 	interface(sound);
 	sound->set_output_gain(0, gain);
 	sound->set_output_gain(1, gain);
-	sound->set_output_gain(2, gain);
 }
 
 /***************************************************************************

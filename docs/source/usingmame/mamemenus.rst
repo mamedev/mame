@@ -363,7 +363,7 @@ quality one "HQ".  The HQ resampler is configurable.  The latency
 indicates the max latency of the resampler, which allows better
 quality when higher, the filter length balances quality and speed
 where a high value is highest quality but slowest speed, and phases
-balances quality and resampler creation time, with one again higher
+balances quality and resampler creation time, with once again higher
 means better but slower.
 
 
@@ -384,7 +384,42 @@ the cutoff though, which can be surprising.
 Compression effect
 ~~~~~~~~~~~~~~~~~~
 
-Not implemented yet.
+This effect implements a somewhat complex compressor which is a
+reimplementation of the Versatile Compressor by Alain Paul.  The
+general effect of a compressor is to amplify sounds under a volume
+threshold while keeping the louder sounds as-is.  It's particularly
+useful when one is not in a very quiet environment and softer sounds
+are just lost otherwise.
+
+The parameters are:
+
+* Attack: reaction time to loud sounds to reduce the amplification.
+
+* Release: reaction time to allow the amplification to go back up.
+
+* Ratio: maximum amplification.
+
+* Input gain: amplification level at the input.
+
+* Output gain: amplification level at the output.
+
+* Convexity: shape of the relationship between distance to the
+  threshold and ratio value.  Steeper the high it is.
+
+* Threshold: level at which the amplification fully stops.
+
+* Channel link: at 100 all channels of the same speaker are amplified
+  identically, at 0 they are fully independant, intermediate values
+  have intermediate behaviour.
+
+* Feedback: allows to loop back some of the output to the input.
+
+* Inertia: makes the ratio move slower.
+
+* Inertia decay: tweaks the impact of the inertia.
+
+* Ceiling: maximum allowed level at exit, just before the output
+  amplification.  Does soft-clipping at that level.
 
 
 Reverb effect

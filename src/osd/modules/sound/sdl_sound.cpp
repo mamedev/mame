@@ -58,7 +58,8 @@ private:
 		std::string m_name;
 		int m_freq;
 		uint8_t m_channels;
-		device_info(const char *name, int freq, uint8_t channels) : m_name(name), m_freq(freq), m_channels(channels) {}
+		bool m_def;
+		device_info(const char *name, int freq, uint8_t channels, bool def = false) : m_name(name), m_freq(freq), m_channels(channels), m_def(def) {}
 	};
 
 	struct stream_info {
@@ -110,7 +111,7 @@ int sound_sdl::init(osd_interface &osd, const osd_options &options)
 		uint32_t idx;
 		for(idx = 0; idx != m_devices.size() && m_devices[idx].m_name != def_name; idx++);
 		if(idx == m_devices.size())
-			m_devices.emplace_back(def_name, def_spec.freq, def_spec.channels);
+			m_devices.emplace_back(def_name, def_spec.freq, def_spec.channels, true);
 		m_default_sink = idx+1;
 		SDL_free(def_name);
 	} else
@@ -131,10 +132,10 @@ uint32_t sound_sdl::get_generation()
 
 osd::audio_info sound_sdl::get_information()
 {
-	enum { FL, FR, FC, LFE, BL, BR, BC, SL, SR };
-	static const char *const posname[9] = { "FL", "FR", "FC", "LFE", "BL", "BR", "BC", "SL", "SR" };
+	enum { FL, FR, FC, LFE, BL, BR, BC, SL, SR, AUX };
+	static const char *const posname[10] = { "FL", "FR", "FC", "LFE", "BL", "BR", "BC", "SL", "SR", "AUX" };
 
-	static std::array<double, 3> pos3d[9] = {
+	static std::array<double, 3> pos3d[10] = {
 		{ -0.2,  0.0,  1.0 },
 		{  0.2,  0.0,  1.0 },
 		{  0.0,  0.0,  1.0 },
@@ -144,9 +145,10 @@ osd::audio_info sound_sdl::get_information()
 		{  0.0,  0.0, -0.5 },
 		{ -0.2,  0.0,  0.0 },
 		{  0.2,  0.0,  0.0 },
+		{  0.0,  0.0, -1.0 },
 	};		
 
-	static const uint32_t positions[8][8] = {
+	static const uint32_t positions[8][9] = {
 		{ FC },
 		{ FL, FR },
 		{ FL, FR, LFE },
@@ -154,7 +156,7 @@ osd::audio_info sound_sdl::get_information()
 		{ FL, FR, LFE, BL, BR },
 		{ FL, FR, FC, LFE, BL, BR },
 		{ FL, FR, FC, LFE, BC, SL, SR },
-		{ FL, FR, FC, LFE, BL, BR, SL, SR }
+		{ FL, FR, FC, LFE, BL, BR, SL, SR, AUX }
 	};
 
 	osd::audio_info result;
@@ -168,8 +170,10 @@ osd::audio_info sound_sdl::get_information()
 		uint32_t freq = m_devices[node].m_freq;
 		result.m_nodes[node].m_rate = audio_rate_range{ freq, freq, freq };
 		result.m_nodes[node].m_sinks = m_devices[node].m_channels;
-		for(uint32_t port = 0; port != m_devices[node].m_channels; port++) {
-			uint32_t pos = positions[m_devices[node].m_channels-1][port];
+		int channels = m_devices[node].m_channels;
+		int index = std::min(channels, 8) - 1;
+		for(uint32_t port = 0; port != channels; port++) {
+			uint32_t pos = positions[index][std::min(8U, port)];
 			result.m_nodes[node].m_port_names.push_back(posname[pos]);
 			result.m_nodes[node].m_port_positions.push_back(pos3d[pos]);
 		}
@@ -190,7 +194,7 @@ uint32_t sound_sdl::stream_sink_open(uint32_t node, std::string name, uint32_t r
 	dspec.callback = sink_callback;
 	dspec.userdata = stream.get();
 
-	stream->m_sdl_id = SDL_OpenAudioDevice(dev.m_name.c_str(), 0, &dspec, &ospec, 0);
+	stream->m_sdl_id = SDL_OpenAudioDevice(dev.m_def ? nullptr : dev.m_name.c_str(), 0, &dspec, &ospec, 0);
 	if(!stream->m_sdl_id)
 		return 0;
 	SDL_PauseAudioDevice(stream->m_sdl_id, 0);

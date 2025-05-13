@@ -47,6 +47,7 @@ sunplus_gcm394_base_device::sunplus_gcm394_base_device(const machine_config& mco
 	m_romtype(0),
 	m_space_read_cb(*this, 0),
 	m_space_write_cb(*this),
+	m_alt_periodic_irq(false),
 	m_boot_mode(0),
 	m_cs_callback(*this, DEVICE_SELF, FUNC(sunplus_gcm394_base_device::default_cs_callback))
 {
@@ -808,12 +809,26 @@ uint16_t sunplus_gcm394_base_device::unkarea_78b2_r()
 void sunplus_gcm394_base_device::unkarea_78b2_w(uint16_t data) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_78b2_w %04x\n", machine().describe_context(), data); m_78b2 = data; }
 
 void sunplus_gcm394_base_device::unkarea_78b8_w(uint16_t data) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_78b8_w %04x\n", machine().describe_context(), data); m_78b8 = data; }
+
+
+uint16_t sunplus_gcm394_base_device::unkarea_78f0_r()
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_78f0_r\n", machine().describe_context());
+	return 0xffff;
+}
+
 void sunplus_gcm394_base_device::unkarea_78f0_w(uint16_t data) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_78f0_w %04x\n", machine().describe_context(), data); m_78f0 = data; }
 
 uint16_t sunplus_gcm394_base_device::unkarea_78c0_r()
 {
 	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_78c0_r\n", machine().describe_context());
 	return machine().rand();
+}
+
+uint16_t sunplus_gcm394_base_device::unkarea_78c8_r()
+{
+	LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_78c8_r\n", machine().describe_context());
+	return 0xffff;
 }
 
 uint16_t sunplus_gcm394_base_device::unkarea_78d0_r()
@@ -891,9 +906,11 @@ void sunplus_gcm394_base_device::spi_7942_txdata_w(uint16_t data)
 
 void sunplus_gcm394_base_device::unkarea_7960_w(uint16_t data) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7960_w %04x\n", machine().describe_context(), data); m_7960 = data; }
 
-uint16_t sunplus_gcm394_base_device::unkarea_7961_r() { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7961_r\n", machine().describe_context()); return m_7961; }
+// 7961 and 7962 are used by dressmtv when detecting battery status, adc?
+uint16_t sunplus_gcm394_base_device::unkarea_7961_r() { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7961_r\n", machine().describe_context()); return 0xffff; /* return m_7961; */ }
 void sunplus_gcm394_base_device::unkarea_7961_w(uint16_t data) { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7961_w %04x\n", machine().describe_context(), data); m_7961 = data; }
 
+uint16_t sunplus_gcm394_base_device::unkarea_7962_r() { LOGMASKED(LOG_GCM394, "%s:sunplus_gcm394_base_device::unkarea_7962_r\n", machine().describe_context()); return 0xffff; }
 
 // **************************************** fallthrough logger etc. *************************************************
 
@@ -1116,6 +1133,8 @@ void sunplus_gcm394_base_device::base_internal_map(address_map &map)
 
 	map(0x0078c0, 0x0078c0).r(FUNC(sunplus_gcm394_base_device::unkarea_78c0_r)); // beijuehh
 
+	map(0x0078c8, 0x0078c8).r(FUNC(sunplus_gcm394_base_device::unkarea_78c8_r)); // dressmtv
+
 	map(0x0078d0, 0x0078d0).r(FUNC(sunplus_gcm394_base_device::unkarea_78d0_r)); // jak_s500
 	map(0x0078d8, 0x0078d8).r(FUNC(sunplus_gcm394_base_device::unkarea_78d8_r)); // jak_tsh
 
@@ -1124,7 +1143,7 @@ void sunplus_gcm394_base_device::base_internal_map(address_map &map)
 	// 78fx - unknown
 	// ######################################################################################################################################################################################
 
-	map(0x0078f0, 0x0078f0).w(FUNC(sunplus_gcm394_base_device::unkarea_78f0_w));
+	map(0x0078f0, 0x0078f0).rw(FUNC(sunplus_gcm394_base_device::unkarea_78f0_r), FUNC(sunplus_gcm394_base_device::unkarea_78f0_w));
 
 	map(0x0078fb, 0x0078fb).r(FUNC(sunplus_gcm394_base_device::unkarea_78fb_status_r));
 
@@ -1157,6 +1176,7 @@ void sunplus_gcm394_base_device::base_internal_map(address_map &map)
 	// possible adc?
 	map(0x007960, 0x007960).w(FUNC(sunplus_gcm394_base_device::unkarea_7960_w));
 	map(0x007961, 0x007961).rw(FUNC(sunplus_gcm394_base_device::unkarea_7961_r), FUNC(sunplus_gcm394_base_device::unkarea_7961_w));
+	map(0x007962, 0x007962).r(FUNC(sunplus_gcm394_base_device::unkarea_7962_r));
 
 	// ######################################################################################################################################################################################
 	// 7axx region = system (including dma)
@@ -1789,8 +1809,11 @@ void sunplus_gcm394_base_device::checkirq6()
 TIMER_CALLBACK_MEMBER(sunplus_gcm394_base_device::unknown_tick)
 {
 	m_7935 |= 0x0100;
-	set_state_unsynced(UNSP_IRQ6_LINE, ASSERT_LINE);
-	//set_state_unsynced(UNSP_IRQ4_LINE, ASSERT_LINE);
+
+	if (m_alt_periodic_irq)
+		set_state_unsynced(UNSP_IRQ4_LINE, ASSERT_LINE);
+	else
+		set_state_unsynced(UNSP_IRQ6_LINE, ASSERT_LINE);
 
 	//  checkirq6();
 }

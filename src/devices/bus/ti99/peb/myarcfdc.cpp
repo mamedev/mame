@@ -24,6 +24,7 @@
 #include "emu.h"
 #include "myarcfdc.h"
 #include "formats/ti99_dsk.h"
+#include "formats/hxchfe_dsk.h"
 
 // ----------------------------------
 // Flags for debugging
@@ -380,6 +381,7 @@ void myarc_fdc_device::floppy_formats(format_registration &fr)
 	fr.add_mfm_containers();
 	fr.add(FLOPPY_TI99_SDF_FORMAT);
 	fr.add(FLOPPY_TI99_TDF_FORMAT);
+	fr.add(FLOPPY_HFE_FORMAT);
 }
 
 static void myarc_ddcc_floppies(device_slot_interface &device)

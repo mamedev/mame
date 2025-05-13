@@ -88,8 +88,19 @@ private:
 	required_shared_ptr<uint16_t> m_layerctrl;
 	required_shared_ptr<uint16_t> m_backpen;
 
-	// Protection
+	required_ioport_array<4> m_dsw;
+	optional_ioport_array<5> m_key;
+	required_ioport m_inputs;
+
+	tilemap_t *m_tilemap[2]{};
+	bitmap_ind16 m_pixbitmap;
+
 	uint16_t m_prot_val = 0;
+	uint8_t m_mux = 0;
+	uint8_t m_irq_enable = 0;
+	uint8_t m_pixpal = 0;
+
+	// Protection
 	uint16_t bmcpokr_prot_r();
 	uint16_t fengyunh_prot_r();
 	uint16_t shendeng_prot_r();
@@ -98,10 +109,6 @@ private:
 	uint16_t unk_r();
 
 	// I/O
-	uint8_t m_mux = 0;
-	required_ioport_array<4> m_dsw;
-	optional_ioport_array<5> m_key;
-	required_ioport m_inputs;
 	void mux_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
 	uint16_t mahjong_key_r();
 	uint16_t dsw_r();
@@ -109,19 +116,15 @@ private:
 	uint16_t xyddzhh_dsw_r();
 
 	// Interrupts
-	uint8_t m_irq_enable = 0;
 	void irq_enable_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
 	void irq_ack_w(uint8_t data);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
 	// Video
-	tilemap_t *m_tilemap[2]{};
 	template<unsigned N> TILE_GET_INFO_MEMBER(get_tile_info);
 	template<unsigned N> void videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	std::unique_ptr<bitmap_ind16> m_pixbitmap;
 	void pixbitmap_redraw();
-	uint8_t m_pixpal = 0;
 	void pixram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void pixpal_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
 
@@ -169,7 +172,7 @@ void bmcpokr_state::video_start()
 	m_tilemap[0]->set_scroll_cols(1);
 	m_tilemap[1]->set_scroll_cols(1);
 
-	m_pixbitmap  = std::make_unique<bitmap_ind16>(0x400, 0x200);
+	m_pixbitmap.allocate(0x400, 0x200);
 }
 
 // 1024 x 512 bitmap. 4 bits per pixel (every byte encodes 2 pixels) + palette register
@@ -186,13 +189,13 @@ void bmcpokr_state::pixram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	uint16_t pen;
 	if (ACCESSING_BITS_8_15)
 	{
-		pen = (data >> 12) & 0xf; m_pixbitmap->pix(y, x + 0) = pen ? pixpal + pen : 0;
-		pen = (data >>  8) & 0xf; m_pixbitmap->pix(y, x + 1) = pen ? pixpal + pen : 0;
+		pen = (data >> 12) & 0xf; m_pixbitmap.pix(y, x + 0) = pen ? (pixpal + pen) : 0;
+		pen = (data >>  8) & 0xf; m_pixbitmap.pix(y, x + 1) = pen ? (pixpal + pen) : 0;
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		pen = (data >>  4) & 0xf; m_pixbitmap->pix(y, x + 2) = pen ? pixpal + pen : 0;
-		pen = (data >>  0) & 0xf; m_pixbitmap->pix(y, x + 3) = pen ? pixpal + pen : 0;
+		pen = (data >>  4) & 0xf; m_pixbitmap.pix(y, x + 2) = pen ? (pixpal + pen) : 0;
+		pen = (data >>  0) & 0xf; m_pixbitmap.pix(y, x + 3) = pen ? (pixpal + pen) : 0;
 	}
 }
 
@@ -206,10 +209,10 @@ void bmcpokr_state::pixbitmap_redraw()
 		{
 			uint16_t const data = m_pixram[offset++];
 			uint16_t pen;
-			pen = (data >> 12) & 0xf; m_pixbitmap->pix(y, x + 0) = pen ? pixpal + pen : 0;
-			pen = (data >>  8) & 0xf; m_pixbitmap->pix(y, x + 1) = pen ? pixpal + pen : 0;
-			pen = (data >>  4) & 0xf; m_pixbitmap->pix(y, x + 2) = pen ? pixpal + pen : 0;
-			pen = (data >>  0) & 0xf; m_pixbitmap->pix(y, x + 3) = pen ? pixpal + pen : 0;
+			pen = (data >> 12) & 0xf; m_pixbitmap.pix(y, x + 0) = pen ? (pixpal + pen) : 0;
+			pen = (data >>  8) & 0xf; m_pixbitmap.pix(y, x + 1) = pen ? (pixpal + pen) : 0;
+			pen = (data >>  4) & 0xf; m_pixbitmap.pix(y, x + 2) = pen ? (pixpal + pen) : 0;
+			pen = (data >>  0) & 0xf; m_pixbitmap.pix(y, x + 3) = pen ? (pixpal + pen) : 0;
 		}
 	}
 }
@@ -270,7 +273,7 @@ void bmcpokr_state::draw_layer(screen_device &screen, bitmap_ind16 &bitmap, cons
 		{
 			sx = -sx;
 			sy = -sy;
-			copyscrollbitmap_trans(bitmap, *m_pixbitmap, 1, &sx, 1, &sy, cliprect, 0);
+			copyscrollbitmap_trans(bitmap, m_pixbitmap, 1, &sx, 1, &sy, cliprect, 0);
 		}
 
 		if (!linescroll)

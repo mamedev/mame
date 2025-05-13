@@ -12,6 +12,7 @@
 #include "ui/audioeffects.h"
 #include "audio_effects/aeffect.h"
 
+#include "audio_effect_compressor.h"
 #include "audio_effect_eq.h"
 #include "audio_effect_filter.h"
 
@@ -94,12 +95,16 @@ bool menu_audio_effects::handle(event const *ev)
 		u16 entry = (uintptr_t(ev->itemref)) & 0xffff;
 		audio_effect *eff = chain == 0xffff ? machine().sound().default_effect_chain()[entry] : machine().sound().effect_chain(chain)[entry];
 		switch(eff->type()) {
-		case audio_effect::FILTER:
-			menu::stack_push<menu_audio_effect_filter>(ui(), container(), chain, entry, eff);
+		case audio_effect::COMPRESSOR:
+			menu::stack_push<menu_audio_effect_compressor>(ui(), container(), chain, entry, eff);
 			break;
 
 		case audio_effect::EQ:
 			menu::stack_push<menu_audio_effect_eq>(ui(), container(), chain, entry, eff);
+			break;
+
+		case audio_effect::FILTER:
+			menu::stack_push<menu_audio_effect_filter>(ui(), container(), chain, entry, eff);
 			break;
 		}
 		return true;

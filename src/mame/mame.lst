@@ -448,6 +448,17 @@ manohman
 
 @source:adp/stella8085.cpp
 dicemstr
+disc2000
+disc2001
+disc3000
+doppelpot
+elitedisc
+extrablatt
+excellent
+glucksstern
+juwel
+karoas
+kniffi
 
 @source:adp/stellafr.cpp
 st_ohla
@@ -16856,9 +16867,9 @@ ragtimea
 
 @source:dataeast/brkthru.cpp
 brkthru
-brkthrubl
 brkthruj
 brkthrut
+brkthruu
 darwin
 forcebrk
 
@@ -18065,6 +18076,7 @@ dream9
 
 @source:excellent/es9501.cpp
 d9flower
+d9flowera
 specd9
 
 @source:excellent/gcpinbal.cpp
@@ -18098,6 +18110,7 @@ ripcord
 robotbwl
 smash
 springbd
+trapeze
 
 @source:exidy/exidy.cpp
 fax
@@ -18685,20 +18698,35 @@ glasskr
 
 @source:gaelco/goldart.cpp
 goldart
-goldartp
+goldartfr
+goldartgr
+goldartpt
+goldartuk
 
 @source:gaelco/mastboy.cpp
 mastboy
 mastboya
+mastboyb
+mastboyc
 mastboyi
 mastboyia
+mastboyib
+mastboyic
+mastboyiol
+mastboyitst
 mastboyiv2
+mastboyiv2a
+mastboyol
+mastboyola
+mastboyv2
+mastboyv2a
 
 @source:gaelco/mastboyo.cpp
 mastboyo
 mastboyoa
 mastboyob
 mastboyoc
+mastboyod
 
 @source:gaelco/radikaldarts.cpp
 radikaldrt
@@ -18823,6 +18851,7 @@ fantastc
 fantazia
 floritas
 floritasm
+fntspcian
 frogf
 frogg
 froggeg
@@ -18889,6 +18918,7 @@ kingballj
 komemokos
 kong
 ladybugg
+ladybugg2
 levers
 losttomb
 losttombh
@@ -18925,6 +18955,7 @@ mooncrsb
 mooncrsl
 mooncrst
 mooncrstg
+mooncrsts
 mooncrstso
 mooncrsto
 mooncrstu
@@ -20521,6 +20552,7 @@ drgnwrldv30
 drgnwrldv40k
 lhb
 lhb2
+lhb2cpgs
 lhb3
 lhbv33c
 nkishusp
@@ -20559,6 +20591,7 @@ sdmg2754cb
 sdmg2p
 slqz2
 slqz2a
+slqz2b
 spkrform
 starzan
 tarzan
@@ -25075,6 +25108,7 @@ ropeman
 
 @source:konami/rollerg.cpp
 rollerg
+rollerga
 rollergj
 
 @source:konami/rungun.cpp
@@ -31429,6 +31463,7 @@ jpddza
 jzst
 menghong
 menghonga
+pljh2
 sandayi
 
 @source:misc/meyc8080.cpp
@@ -32074,6 +32109,9 @@ unkpmc
 
 @source:misc/pntnpuzl.cpp
 pntnpuzl
+
+@source:misc/pntnpuzls.cpp
+pntnpuzls
 
 @source:misc/poker72.cpp
 poker72
@@ -32750,6 +32788,7 @@ twinbskt
 saiyukip
 umipoker
 umipokera
+vparadis
 
 @source:misc/unkgolf.cpp
 unkgolf
@@ -32942,6 +32981,9 @@ z80netf
 tx0_64kw
 tx0_8kwo
 tx0_8kw
+
+@source:mits/al8800b.cpp
+al8800b
 
 @source:mits/altair.cpp
 al8800bt
@@ -34729,6 +34771,7 @@ vipclub
 @source:nichibutsu/nbmj8891.cpp
 abunai
 avmjts
+avmjyk
 bananadr
 chinmoku
 club90s
@@ -34900,6 +34943,9 @@ srmvsa
 starsldr
 twrshaft
 vivdolls
+
+@source:nintendo/blockfvr.cpp
+blockfvr
 
 @source:nintendo/cham24.cpp
 cham24
@@ -39742,6 +39788,7 @@ sandaha
 bbddz
 ddz2
 djddz
+pljh
 
 @source:sega/angelkds.cpp
 angelkds
@@ -40676,6 +40723,7 @@ m5001
 
 @source:sega/segag80r.cpp
 005
+005a
 astrob
 astrob1
 astrob2
@@ -41221,6 +41269,7 @@ gforce2j
 gforce2ja
 gforce2sd
 gloc
+glocj
 glocr360
 glocr360j
 glocu
@@ -41228,6 +41277,7 @@ pdrift
 pdrifta
 pdrifte
 pdriftj
+pdriftjb
 pdriftl
 rchase
 rchasej
@@ -42659,10 +42709,10 @@ boo1000
 @source:skeleton/boramz80.cpp
 pkboram
 pkrboram
+pkts
 tpkboram
 tpkborama
 tpkg2
-unkboram
 
 @source:skeleton/bpmmicro.cpp
 bp1200
@@ -43611,6 +43661,7 @@ nibblerp
 pballoon
 pballoonr
 sasuke
+sasukea
 satansat
 satansata
 satansatind
@@ -46296,6 +46347,7 @@ furby_connect
 @source:tvgames/generalplus_gpl16250_rom.cpp
 beijuehh
 bornkidh
+dressmtv
 fpsport
 gameu50
 gameu90
@@ -46832,6 +46884,7 @@ xavaero
 xavbaseb
 xavbassf
 xavbowl
+xavbowlj
 xavbox
 xavjmat
 xavmusic
@@ -47605,6 +47658,7 @@ wicat
 7smash
 luckgrln
 luckstrn
+luckstrna
 
 @source:wing/lucky37.cpp
 bingo75

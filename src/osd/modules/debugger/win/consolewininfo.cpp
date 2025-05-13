@@ -214,15 +214,15 @@ consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
 	m_current_cpu(nullptr),
 	m_devices_menu(nullptr)
 {
-	if (!window() || !m_views[0])
+	if (!window() || !m_views[VIEW_IDX_DISASM])
 		goto cleanup;
 
 	// create the views
-	m_views[1].reset(new debugview_info(debugger, *this, window(), DVT_STATE));
-	if (!m_views[1]->is_valid())
+	m_views[VIEW_IDX_STATE].reset(new debugview_info(debugger, *this, window(), DVT_STATE));
+	if (!m_views[VIEW_IDX_STATE]->is_valid())
 		goto cleanup;
-	m_views[2].reset(new debugview_info(debugger, *this, window(), DVT_CONSOLE));
-	if (!m_views[2]->is_valid())
+	m_views[VIEW_IDX_CONSOLE].reset(new debugview_info(debugger, *this, window(), DVT_CONSOLE));
+	if (!m_views[VIEW_IDX_CONSOLE]->is_valid())
 		goto cleanup;
 
 	{
@@ -257,12 +257,20 @@ consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
 
 		// adjust the min/max sizes for the window style
 		bounds.top = bounds.left = 0;
-		bounds.right = bounds.bottom = EDGE_WIDTH + m_views[1]->maxwidth() + (2 * EDGE_WIDTH) + 100 + EDGE_WIDTH;
+		bounds.right = bounds.bottom =
+			EDGE_WIDTH + m_views[VIEW_IDX_STATE]->maxwidth() +
+			(2 * EDGE_WIDTH) + 100 + EDGE_WIDTH;
 		AdjustWindowRectEx(&bounds, DEBUG_WINDOW_STYLE, FALSE, DEBUG_WINDOW_STYLE_EX);
 		set_minwidth(bounds.right - bounds.left);
 
 		bounds.top = bounds.left = 0;
-		bounds.right = bounds.bottom = EDGE_WIDTH + m_views[1]->maxwidth() + (2 * EDGE_WIDTH) + std::max(m_views[0]->maxwidth(), m_views[2]->maxwidth()) + EDGE_WIDTH;
+		bounds.right = bounds.bottom =
+			EDGE_WIDTH + m_views[VIEW_IDX_STATE]->maxwidth() +
+			(2 * EDGE_WIDTH) +
+			std::max(
+				m_views[VIEW_IDX_DISASM]->maxwidth(),
+				m_views[VIEW_IDX_CONSOLE]->maxwidth()) +
+			EDGE_WIDTH;
 		AdjustWindowRectEx(&bounds, DEBUG_WINDOW_STYLE, FALSE, DEBUG_WINDOW_STYLE_EX);
 		set_maxwidth(bounds.right - bounds.left);
 
@@ -283,9 +291,9 @@ consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
 	return;
 
 cleanup:
-	m_views[2].reset();
-	m_views[1].reset();
-	m_views[0].reset();
+	m_views[VIEW_IDX_CONSOLE].reset();
+	m_views[VIEW_IDX_STATE].reset();
+	m_views[VIEW_IDX_DISASM].reset();
 }
 
 
@@ -301,8 +309,8 @@ void consolewin_info::set_cpu(device_t &device)
 		m_current_cpu = &device;
 
 		// first set all the views to the new cpu number
-		m_views[0]->set_source_for_device(device);
-		m_views[1]->set_source_for_device(device);
+		m_views[VIEW_IDX_DISASM]->set_source_for_device(device);
+		m_views[VIEW_IDX_STATE]->set_source_for_device(device);
 
 		// then update the caption
 		std::string title = string_format("Debug: %s - %s '%s'", device.machine().system().name, device.name(), device.tag());
@@ -327,7 +335,7 @@ void consolewin_info::recompute_children()
 	regrect.top = parent.top + EDGE_WIDTH;
 	regrect.bottom = parent.bottom - EDGE_WIDTH;
 	regrect.left = parent.left + EDGE_WIDTH;
-	regrect.right = regrect.left + m_views[1]->maxwidth();
+	regrect.right = regrect.left + m_views[VIEW_IDX_STATE]->maxwidth();
 
 	// edit box goes at the bottom of the remaining area
 	RECT editrect;
@@ -350,9 +358,9 @@ void consolewin_info::recompute_children()
 	conrect.right = parent.right - EDGE_WIDTH;
 
 	// set the bounds of things
-	m_views[0]->set_bounds(disrect);
-	m_views[1]->set_bounds(regrect);
-	m_views[2]->set_bounds(conrect);
+	m_views[VIEW_IDX_DISASM]->set_bounds(disrect);
+	m_views[VIEW_IDX_STATE]->set_bounds(regrect);
+	m_views[VIEW_IDX_CONSOLE]->set_bounds(conrect);
 	set_editwnd_bounds(editrect);
 }
 

@@ -1293,6 +1293,36 @@ ROM_START( 005 )
 	ROM_LOAD( "6331.sound-u8",     0x0000, 0x0020, BAD_DUMP CRC(1d298cb0) SHA1(bb0bb62365402543e3154b9a77be9c75010e6abc) )  /* missing sound PROM! */
 ROM_END
 
+ROM_START( 005a )
+	ROM_REGION( 0xc000, "maincpu", 0 )
+	ROM_LOAD( "1346b.cpu-u25",       0x0000, 0x0800, BAD_DUMP CRC(8e68533e) SHA1(a257c556d31691068ed5c991f1fb2b51da4826db) ) // Not dumped
+	ROM_LOAD( "5092.prom-u1.bin",    0x0800, 0x0800, CRC(85e3f7b0) SHA1(ecad939305aaa214ba176cbde63f75d0f50f8105) )
+	ROM_LOAD( "5093.prom-u2.bin",    0x1000, 0x0800, CRC(494b1a75) SHA1(e4978f6907f9cffc1791b448efdc5428aea42d32) )
+	ROM_LOAD( "5094.prom-u3.bin",    0x1800, 0x0800, CRC(1dc90882) SHA1(2c9844a8d8b0af80620ec3abda9ecd4d9cf584a7) ) 
+	ROM_LOAD( "5095.prom-u4.bin",    0x2000, 0x0800, CRC(69c4e639) SHA1(aed8643258a1715786a42d89280af3552c43dfa0) )
+	ROM_LOAD( "5096.prom-u5.bin",    0x2800, 0x0800, CRC(635247ab) SHA1(caf7957bd7cdc8a1bd0b8b3b675d1bd43f6008c0) )
+	ROM_LOAD( "5097.prom-u6.bin",    0x3000, 0x0800, CRC(02dc5126) SHA1(907dde34e08de43dfc44f25eb2feda6e9efcdc78) )
+	ROM_LOAD( "5098.prom-u7.bin",    0x3800, 0x0800, CRC(dd07a7be) SHA1(860bd3c2c7567419103beb9b0665c1e261c06268) )
+	ROM_LOAD( "5099.prom-u8.bin",    0x4000, 0x0800, CRC(8ce68fef) SHA1(e8a7873353dece415f4f401046db3b89fdce8b15) )
+	ROM_LOAD( "5100.prom-u9.bin",    0x4800, 0x0800, CRC(ca52d905) SHA1(d05f3392b8e7bbfadec00f85ec2e705f459a5649) )
+	ROM_LOAD( "5101.prom-u10.bin",   0x5000, 0x0800, CRC(ad03fc04) SHA1(b2440bf262222a29c811c6c9ccf1ed855568a322) )
+	ROM_LOAD( "5102.prom-u11.bin",   0x5800, 0x0800, CRC(00b4c810) SHA1(77a284a0f1d5371a39e8ea64cdc39d89c858d70e) )
+	ROM_LOAD( "5103.prom-u12.bin",   0x6000, 0x0800, CRC(8f613070) SHA1(259827ec659f3386289b93554a01953a5f89bd67) )
+	ROM_LOAD( "5104.prom-u13.bin",   0x6800, 0x0800, CRC(cf2764a2) SHA1(d102776fd1140d134a54e3579499e72b53dbee7c) ) 
+	ROM_LOAD( "5105.prom-u14.bin",   0x7000, 0x0800, CRC(2fccfbe2) SHA1(b31a353512a1eef2b96230d4c9d99a0511658ae9) )
+	ROM_LOAD( "5106.prom-u15.bin",   0x7800, 0x0800, CRC(c6b0aca1) SHA1(b6394d42c889eb74f8bdcd385612894ba49cbabc) ) 
+	ROM_LOAD( "5107.prom-u16.bin",   0x8000, 0x0800, CRC(d5b4e12d) SHA1(8322a1edb30f9adb146b692c358a654d94875c7b) )
+	ROM_LOAD( "5108.prom-u17.bin",   0x8800, 0x0800, CRC(02d6f0e6) SHA1(4dfad2b5d07c2193db25e8f8663aa53795650cdb) )
+	ROM_LOAD( "5109.prom-u18.bin",   0x9000, 0x0800, CRC(37104272) SHA1(fc4d23bc5db6abf2c05a7d1de724d61b20512ea1) )
+	ROM_LOAD( "5110.prom-u19.bin",   0x9800, 0x0800, CRC(ea0a2104) SHA1(91562f0985f86c54fe0b993d95429752ecb4daad) )
+	ROM_LOAD( "5111.prom-u20.bin",   0xa000, 0x0800, CRC(126a9280) SHA1(14ad8c94d9ccf19a1f8360f4f292ea736108c590) ) 
+
+	ROM_REGION( 0x0800, "005", 0 )
+	ROM_LOAD( "epr-1286.sound-16", 0x0000, 0x0800, BAD_DUMP CRC(fbe0d501) SHA1(bfa277689790f835d8a43be4beee0581e1096bcc) ) // Not dumped
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "6331.sound-u8",     0x0000, 0x0020, BAD_DUMP CRC(1d298cb0) SHA1(bb0bb62365402543e3154b9a77be9c75010e6abc) )  /* missing sound PROM! */
+ROM_END
 
 ROM_START( spaceod )
 	ROM_REGION( 0xc000, "maincpu", 0 )
@@ -1798,6 +1828,7 @@ GAME( 1981, astrob1,   astrob,   astrob,   astrob,   segag80r_state, init_astrob
 GAME( 1981, astrobf,   astrob,   astrob,   astrob,   segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (French)",        0 )
 GAME( 1981, astrobg,   astrob,   astrob,   astrob,   segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (German)",        0 )
 GAME( 1981, 005,       0,        sega005,  005,      segag80r_state, init_005,      ROT270, "Sega", "005",                           MACHINE_IMPERFECT_SOUND )
+GAME( 1981, 005a,      005,      sega005,  005,      segag80r_state, init_005,      ROT270, "Sega", "005 (Earlier version?)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // basic G-80 system with individual background boards
 GAME( 1981, spaceod,   0,        spaceod,  spaceod,  segag80r_state, init_spaceod,  ROT270, "Sega", "Space Odyssey (version 2)", MACHINE_IMPERFECT_SOUND )

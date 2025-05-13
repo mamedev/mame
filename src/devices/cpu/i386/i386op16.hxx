@@ -3751,6 +3751,7 @@ bool i386_device::i386_load_far_pointer16(int s)
 {
 	uint8_t modrm = FETCH();
 	uint16_t selector;
+	bool fault = false;
 
 	if( modrm >= 0xc0 ) {
 		//LOGMASKED(LOG_PM_EVENTS, "i386: load_far_pointer16 NYI\n"); // don't log, NT will use this a lot
@@ -3758,11 +3759,13 @@ bool i386_device::i386_load_far_pointer16(int s)
 		return false;
 	} else {
 		uint32_t ea = GetEA(modrm,0);
-		STORE_REG16(modrm, READ16(ea + 0));
+		uint16_t val = READ16(ea + 0);
 		selector = READ16(ea + 2);
-		i386_sreg_load(selector,s,nullptr);
+		i386_sreg_load(selector,s,&fault);
+		if(!fault)
+			STORE_REG16(modrm, val);
 	}
-	return true;
+	return !fault;
 }
 
 void i386_device::i386_lds16()             // Opcode 0xc5

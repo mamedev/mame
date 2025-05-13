@@ -3,6 +3,7 @@
 
 /*
 Excellent System's ES-9501 PCB
+Also seen as ES9901 with same components / locations
 
 Main components:
 TMP68HC000-P16 CPU
@@ -173,8 +174,7 @@ void es9501_state::es9501(machine_config &config)
 	ymz.add_route(1, "speaker", 1.0, 1);
 
 	ymz284_device & ymz284(YMZ284(config, "ymz284", 28.636363_MHz_XTAL / 8)); // divider not verified
-	ymz284.add_route(0, "speaker", 1.0, 0);
-	ymz284.add_route(1, "speaker", 1.0, 1);
+	ymz284.add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 
@@ -195,6 +195,25 @@ ROM_START( d9flower ) // Dream 9 Flower string, but images seem more Flower 9 Dr
 
 	ROM_REGION( 0x117, "plds", 0 )
 	ROM_LOAD( "3.u37", 0x000, 0x117, BAD_DUMP CRC(bea4cb24) SHA1(09987e6b903cc3bd202a9d933474b36bdbb99d9a) ) // not dumped for this set, but marked same
+ROM_END
+
+ROM_START( d9flowera ) // same GFX / sound ROMs as d9flower, updated program (but version string unchanged)
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "2.u33", 0x00000, 0x40000, CRC(803efc2d) SHA1(1e9c6b4c8adb2c8c837fe36f8c9c7c2aa3e675d8) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD16_BYTE( "1.u31", 0x00001, 0x40000, CRC(37186597) SHA1(b67c9fd057b7cc115866f73ecfdd57bb8dd09d7b) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x200000, "gfx", ROMREGION_ERASE00 )
+	ROM_LOAD( "j3.u50", 0x000000, 0x080000, CRC(0f1f8b61) SHA1(d33d73dcdbf06a84e6be28ac1c3273dd21d0ad17) )
+	ROM_LOAD( "j4.u51", 0x080000, 0x080000, CRC(c2a06ed5) SHA1(ffb07982f9ad91ce28bf3eacb8deedcc957bbbc1) )
+
+	ROM_REGION( 0x200000, "ymz", ROMREGION_ERASE00 )
+	ROM_LOAD( "j5.u23", 0x000000, 0x080000, CRC(b6ad2e58) SHA1(84c0cdc155f641d4e5d8ae99acbfa5b297762418) )
+
+	ROM_REGION16_BE( 0x100, "eeprom", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "93c56.u12", 0x000, 0x100, NO_DUMP )
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "003.u37", 0x000, 0x117, BAD_DUMP CRC(bea4cb24) SHA1(09987e6b903cc3bd202a9d933474b36bdbb99d9a) ) // not dumped for this set, but probably same
 ROM_END
 
 ROM_START( specd9 )
@@ -219,5 +238,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1998, d9flower, 0, es9501, specd9, es9501_state, empty_init, ROT0, "Cadence Technology", "Dream 9 Flower (v1.00c)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1997, specd9,   0, es9501, specd9, es9501_state, empty_init, ROT0, "Excellent System",   "Special Dream 9 (v1.0.5G)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1998, d9flower,  0,        es9501, specd9, es9501_state, empty_init, ROT0, "Cadence Technology", "Dream 9 Flower (v1.00c, set 1)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1998, d9flowera, d9flower, es9501, specd9, es9501_state, empty_init, ROT0, "Cadence Technology", "Dream 9 Flower (v1.00c, set 2)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1997, specd9,    0,        es9501, specd9, es9501_state, empty_init, ROT0, "Excellent System",   "Special Dream 9 (v1.0.5G)",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

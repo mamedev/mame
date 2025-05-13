@@ -23,15 +23,15 @@
 namespace osd::debugger::win {
 
 disasmbasewin_info::disasmbasewin_info(debugger_windows_interface &debugger, bool is_main_console, LPCSTR title, WNDPROC handler) :
-	editwin_info(debugger, is_main_console, title, handler)
+	editwin_info(debugger, is_main_console, VIEW_IDX_DISASM, title, handler)
 {
 	if (!window())
 		return;
 
-	m_views[0].reset(new disasmview_info(debugger, *this, window()));
-	if (!m_views[0] || !m_views[0]->is_valid())
+	m_views[VIEW_IDX_DISASM].reset(new disasmview_info(debugger, *this, window()));
+	if (!m_views[VIEW_IDX_DISASM] || !m_views[VIEW_IDX_DISASM]->is_valid())
 	{
-		m_views[0].reset();
+		m_views[VIEW_IDX_DISASM].reset();
 		return;
 	}
 
@@ -47,8 +47,8 @@ disasmbasewin_info::disasmbasewin_info(debugger_windows_interface &debugger, boo
 	AppendMenu(GetMenu(window()), MF_ENABLED | MF_POPUP, (UINT_PTR)optionsmenu, TEXT("Options"));
 
 	// set up the view to track the initial expression
-	downcast<disasmview_info *>(m_views[0].get())->set_expression("curpc");
-	m_views[0]->set_source_for_visible_cpu();
+	downcast<disasmview_info *>(m_views[VIEW_IDX_DISASM].get())->set_expression("curpc");
+	m_views[VIEW_IDX_DISASM]->set_source_for_visible_cpu();
 }
 
 
@@ -92,7 +92,7 @@ bool disasmbasewin_info::handle_key(WPARAM wparam, LPARAM lparam)
 		return true;
 
 	case VK_RETURN:
-		if (m_views[0]->cursor_visible() && m_views[0]->source_is_visible_cpu())
+		if (m_views[VIEW_IDX_DISASM]->cursor_visible() && m_views[VIEW_IDX_DISASM]->source_is_visible_cpu())
 		{
 			SendMessage(window(), WM_COMMAND, ID_STEP, 0);
 			return true;
@@ -108,7 +108,7 @@ void disasmbasewin_info::update_menu()
 {
 	editwin_info::update_menu();
 
-	auto *const dasmview = downcast<disasmview_info *>(m_views[0].get());
+	auto *const dasmview = downcast<disasmview_info *>(m_views[VIEW_IDX_DISASM].get());
 	HMENU const menu = GetMenu(window());
 
 	bool const disasm_cursor_visible = dasmview->cursor_visible();
@@ -154,7 +154,7 @@ void disasmbasewin_info::update_menu()
 
 bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 {
-	auto *const dasmview = downcast<disasmview_info *>(m_views[0].get());
+	auto *const dasmview = downcast<disasmview_info *>(m_views[VIEW_IDX_DISASM].get());
 
 	switch (HIWORD(wparam))
 	{
@@ -270,14 +270,14 @@ bool disasmbasewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 void disasmbasewin_info::restore_configuration_from_node(util::xml::data_node const &node)
 {
 	editwin_info::restore_configuration_from_node(node);
-	m_views[0]->restore_configuration_from_node(node);
+	m_views[VIEW_IDX_DISASM]->restore_configuration_from_node(node);
 }
 
 
 void disasmbasewin_info::save_configuration_to_node(util::xml::data_node &node)
 {
 	editwin_info::save_configuration_to_node(node);
-	m_views[0]->save_configuration_to_node(node);
+	m_views[VIEW_IDX_DISASM]->save_configuration_to_node(node);
 }
 
 } // namespace osd::debugger::win

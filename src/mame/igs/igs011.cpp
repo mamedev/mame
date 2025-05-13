@@ -41,32 +41,26 @@ Year + Game                   PCB        Sound         Chips
 98 Mj Nenrikishu SP V250J     NO-0115-5  M6295 YM2413  IGS011 8255
 ---------------------------------------------------------------------------
 
-To do:
+TODO:
 
 - Implement the I/O part of IGS003 as an 8255
-- IGS003 parametric bitswap protection in lhb3, nkishusp, tygn (instead of patching the ROMs)
+- IGS003 parametric bitswap protection in lhb2cpgs, lhb3, nkishusp, tygn
+  (instead of patching the ROMs)
 - Interrupt controller at 838000 or a38000 (there's a preliminary implementation for lhb)
-- A few graphical bugs
 
 - vbowl, vbowlj: trackball support.
-  Wrong colors in "Game Over" screen.
-
-- lhb: in the copyright screen the '5' in '1995' is drawn by the cpu on layer 5,
-  but with wrong colors (since the top nibble of the affected pixels is left to 0xf)
-  (drgnwrld is like this too, maybe hacked, or a cheap year replacement by IGS)
-
-- dbc: in the title screen the '5' in '1995' is drawn by the cpu with wrong colors.
-  (see above comment)
-  Also the background palette is wrong since the fade routine is called with wrong
-  parameters, but in this case the PCB does the same.
 
 - lhb3: emulated game crashes with an illegal instruction error on bookkeeping menu
 
 - xymga: stop during attract mode with 'RECORD ERROR 3'
 
+- tygn: crashes to how to play screen during gameplay, payout and clear inputs shown in
+  input test don't work, joystick left/right show incorrect names in input test
+
 Notes:
 
-- In most games, keep test button pressed during boot for another test mode
+- In most games, keep test button pressed during boot to access the input test and
+  sound test.
 
 ***************************************************************************/
 
@@ -78,6 +72,7 @@ Notes:
 
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
+#include "machine/ticket.h"
 #include "machine/timer.h"
 #include "sound/ics2115.h"
 #include "sound/okim6295.h"
@@ -104,6 +99,8 @@ public:
 		, m_oki(*this, "oki")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
+		, m_hopper(*this, "hopper")
+		, m_layer_ram(*this, "layer%u_ram", 0U, 512U * 256U, ENDIANNESS_BIG)
 		, m_priority_ram(*this, "priority_ram")
 		, m_maincpu_region(*this, "maincpu")
 		, m_gfx(*this, "blitter")
@@ -116,8 +113,6 @@ public:
 	{
 	}
 
-	int igs_hopper_r();
-
 	void init_lhbv33c() ATTR_COLD;
 	void init_drgnwrldv21j() ATTR_COLD;
 	void init_wlcc() ATTR_COLD;
@@ -129,6 +124,7 @@ public:
 	void init_drgnwrldv30() ATTR_COLD;
 	void init_drgnwrldv11h() ATTR_COLD;
 	void init_lhb2() ATTR_COLD;
+	void init_lhb2cpgs() ATTR_COLD;
 	void init_lhb3() ATTR_COLD;
 	void init_xymg() ATTR_COLD;
 	void init_xymga() ATTR_COLD;
@@ -139,14 +135,14 @@ public:
 	void init_tygn() ATTR_COLD;
 
 	void drgnwrld(machine_config &config) ATTR_COLD;
-	void nkishusp(machine_config &config) ATTR_COLD;
-	void tygn(machine_config &config) ATTR_COLD;
+	void drgnwrld_igs012(machine_config &config) ATTR_COLD;
+	void lhb(machine_config &config) ATTR_COLD;
 	void wlcc(machine_config &config) ATTR_COLD;
 	void xymg(machine_config &config) ATTR_COLD;
 	void xymga(machine_config &config) ATTR_COLD;
 	void lhb2(machine_config &config) ATTR_COLD;
-	void lhb(machine_config &config) ATTR_COLD;
-	void drgnwrld_igs012(machine_config &config) ATTR_COLD;
+	void nkishusp(machine_config &config) ATTR_COLD;
+	void tygn(machine_config &config) ATTR_COLD;
 
 protected:
 	struct blitter_t
@@ -163,8 +159,10 @@ protected:
 	optional_device<okim6295_device> m_oki;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	optional_device<hopper_device> m_hopper;
 
 	/* memory pointers */
+	memory_share_array_creator<u8, 4> m_layer_ram;
 	required_shared_ptr<u16> m_priority_ram;
 
 	/* memory regions */
@@ -178,12 +176,10 @@ protected:
 	optional_ioport_array<5> m_io_dsw;
 	optional_ioport m_io_coin;
 
-	std::unique_ptr<u8[]> m_layer[8];
 	u16 m_priority = 0;
 	u8 m_blitter_pen_hi = 0;
 	u16 m_dips_sel = 0;
 	u16 m_input_sel = 0;
-	u16 m_hopper_bit = 0;
 	u8 m_prot1 = 0;
 	u8 m_prot1_swap = 0;
 	u32 m_prot1_addr = 0;
@@ -209,8 +205,8 @@ protected:
 	void igs011_base(machine_config &config) ATTR_COLD;
 
 	void igs011_priority_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	u16 igs011_layers_r(offs_t offset);
-	void igs011_layers_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u8 igs011_layers_r(offs_t offset);
+	void igs011_layers_w(offs_t offset, u8 data);
 	void igs011_blit_x_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void igs011_blit_y_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void igs011_blit_gfx_lo_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -267,19 +263,20 @@ protected:
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(lhb_vblank_irq);
-	void wlcc_decrypt();
-	void lhb_decrypt();
-	void drgnwrld_type3_decrypt();
-	void drgnwrld_type2_decrypt();
-	void drgnwrld_type1_decrypt();
-	void drgnwrldv40k_decrypt();
-	void lhb2_decrypt();
-	void nkishusp_decrypt();
-	void dbc_decrypt();
-	void ryukobou_decrypt();
-	void tygn_decrypt();
-	void lhb2_gfx_decrypt();
-	void drgnwrld_gfx_decrypt();
+	void wlcc_decrypt() ATTR_COLD;
+	void lhb_decrypt() ATTR_COLD;
+	void drgnwrld_type3_decrypt() ATTR_COLD;
+	void drgnwrld_type2_decrypt() ATTR_COLD;
+	void drgnwrld_type1_decrypt() ATTR_COLD;
+	void drgnwrldv40k_decrypt() ATTR_COLD;
+	void lhb2_decrypt() ATTR_COLD;
+	void lhb3_decrypt() ATTR_COLD;
+	void nkishusp_decrypt() ATTR_COLD;
+	void dbc_decrypt() ATTR_COLD;
+	void ryukobou_decrypt() ATTR_COLD;
+	void tygn_decrypt() ATTR_COLD;
+	void lhb2_gfx_decrypt() ATTR_COLD;
+	void drgnwrld_gfx_decrypt() ATTR_COLD;
 	void prot_mem_range_set();
 
 	void drgnwrld_mem(address_map &map) ATTR_COLD;
@@ -375,12 +372,6 @@ void igs011_state::igs011_priority_w(offs_t offset, u16 data, u16 mem_mask)
 
 void igs011_state::video_start()
 {
-	for (int i = 0; i < 8; i++)
-	{
-		m_layer[i] = std::make_unique<u8[]>(512 * 256);
-		save_pointer(NAME(m_layer[i]), 512 * 256, i);
-	}
-
 	m_blitter_pen_hi = 0;
 
 	save_item(NAME(m_priority));
@@ -419,33 +410,56 @@ u32 igs011_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 #endif
 
 	u16 const *const pri_ram = &m_priority_ram[(m_priority & 7) * 512/2];
+	unsigned const hibpp_layers = 4 - (m_blitter.depth & 0x07);
 
+	u8 layerpix[8] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			const int scr_addr = x + y * 512;
+			const int scr_addr = (y << 9) | x;
 			int pri_addr = 0xff;
 
-			int l;
-			for (l = 0; l < 8; l++)
+			int l = 0;
+			for (unsigned i = 0; std::size(m_layer_ram) > i; ++i)
 			{
-				if ((m_layer[l][scr_addr] != 0xff)
+				u8 const pixdata = m_layer_ram[i][scr_addr];
+				if (i < hibpp_layers)
+				{
+					layerpix[l] = pixdata;
+					if (layerpix[l] != 0xff)
 #ifdef MAME_DEBUG
-						&& (layer_enable & (1 << l))
+						if (layer_enable & (1 << l))
 #endif
-					)
-					pri_addr &= ~(1 << l);
+							pri_addr &= ~(1 << l);
+					++l;
+				}
+				else
+				{
+					layerpix[l] = pixdata & 0x0f;
+					if (layerpix[l] != 0x0f)
+#ifdef MAME_DEBUG
+						if (layer_enable & (1 << l))
+#endif
+							pri_addr &= ~(1 << l);
+					++l;
+					layerpix[l] = (pixdata >> 4) & 0x0f;
+					if (layerpix[l] != 0x0f)
+#ifdef MAME_DEBUG
+						if (layer_enable & (1 << l))
+#endif
+							pri_addr &= ~(1 << l);
+					++l;
+				}
 			}
 
-			l = pri_ram[pri_addr] & 7;
-
+			u16 const pri = pri_ram[pri_addr] & 7;
 #ifdef MAME_DEBUG
 			if ((layer_enable != -1) && (pri_addr == 0xff))
 				bitmap.pix(y, x) = m_palette->black_pen();
 			else
 #endif
-				bitmap.pix(y, x) = m_layer[l][scr_addr] | (l << 8);
+				bitmap.pix(y, x) = layerpix[pri] | (pri << 8);
 		}
 	}
 	return 0;
@@ -453,49 +467,36 @@ u32 igs011_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 
 /***************************************************************************
 
-    In addition to the blitter, the CPU can also read from and write to
-    the framebuffers for the 8 layers, seen as 0x100000 bytes in memory.
-    The first half contains layers 0-3. Layers 4-7 are in the other half.
+    In addition to the blitter, the CPU can directly access video memory
+    directly.  There are four buffers of 128 KiB each, organised as 256
+    rows by 512 columns.  Each buffer can be treated as a single 8-bit
+    layer, or two 4-bit layers.  The most and least significant bits of
+    the offset select the buffer, and the remaining bits address a byte
+    within the buffer.
 
-    The layers are interleaved:
-
-    - bytes 0x00000-0x00003 contain the 1st pixel of layer 0,1,2,3
-    - bytes 0x00004-0x00007 contain the 2nd pixel of layer 0,1,2,3
-    ...
-    - bytes 0x80000-0x80003 contain the 1st pixel of layer 4,5,6,7
-    - bytes 0x80004-0x80007 contain the 2nd pixel of layer 4,5,6,7
-
-    and so on.
+    - Buffer 0 is accessed at 0x300000, 0x300004, 0x300008, etc.
+      (offset 0x00000, 0x00002, 0x00004, etc.)
+    - Buffer 1 is accessed at 0x300002, 0x300006, 0x30000a, etc.
+      (offset 0x00001, 0x00003, 0x00005, etc.)
+    - Buffer 2 is accessed at 0x380000, 0x380004, 0x380008, etc.
+      (offset 0x40000, 0x40002, 0x40004, etc.)
+    - Buffer 3 is accessed at 0x380002, 0x380006, 0x38000a, etc.
+      (offset 0x40001, 0x40003, 0x40005, etc.)
 
 ***************************************************************************/
 
-u16 igs011_state::igs011_layers_r(offs_t offset)
+u8 igs011_state::igs011_layers_r(offs_t offset)
 {
-	const int layer0 = bitswap<2>(offset ^ 1, 18, 0) << 1;
-
-	u8 const *const l0 = m_layer[layer0].get();
-	u8 const *const l1 = m_layer[layer0 + 1].get();
-
-	offset >>= 1;
-	offset &= 0x1ffff;
-
-	return (l0[offset] << 8) | l1[offset];
+	unsigned const layer = bitswap<2>(offset, 18, 0);
+	offs_t const byteoffset = (offset >> 1) & 0x1ffff;
+	return m_layer_ram[layer][byteoffset];
 }
 
-void igs011_state::igs011_layers_w(offs_t offset, u16 data, u16 mem_mask)
+void igs011_state::igs011_layers_w(offs_t offset, u8 data)
 {
-	const int layer0 = bitswap<2>(offset ^ 1, 18, 0) << 1;
-
-	u8 *const l0 = m_layer[layer0].get();
-	u8 *const l1 = m_layer[layer0 + 1].get();
-
-	offset >>= 1;
-	offset &= 0x1ffff;
-
-	u16 word = (l0[offset] << 8) | l1[offset];
-	COMBINE_DATA(&word);
-	l0[offset] = word >> 8;
-	l1[offset] = word;
+	unsigned const layer = bitswap<2>(offset, 18, 0);
+	offs_t const byteoffset = (offset >> 1) & 0x1ffff;
+	m_layer_ram[layer][byteoffset] = data;
 }
 
 /***************************************************************************
@@ -548,48 +549,58 @@ void igs011_state::igs011_blit_pen_w(offs_t offset, u16 data, u16 mem_mask)
 
 void igs011_state::igs011_blit_flags_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	const rectangle &clip = m_screen->visible_area();
+	rectangle const clip(0, 512 - 1, 0, 256 - 1);
 
 	COMBINE_DATA(&m_blitter.flags);
 
-	LOGMASKED(LOG_BLITTER, "%06x: blit x %03x, y %03x, w %03x, h %03x, gfx %03x%04x, depth %02x, pen %02x, flags %03x\n", m_maincpu->pc(),
-		m_blitter.x,m_blitter.y,m_blitter.w,m_blitter.h,m_blitter.gfx_hi,m_blitter.gfx_lo,m_blitter.depth,m_blitter.pen,m_blitter.flags);
+	LOGMASKED(LOG_BLITTER, "%s: blit x %03x, y %03x, w %03x, h %03x, gfx %03x%04x, depth %02x, pen %02x, flags %03x\n",
+			machine().describe_context(),
+			m_blitter.x, m_blitter.y, m_blitter.w, m_blitter.h,
+			m_blitter.gfx_hi, m_blitter.gfx_lo,
+			m_blitter.depth, m_blitter.pen, m_blitter.flags);
 
-	u8 *const dest = m_layer[m_blitter.flags & 0x0007].get();
-	const bool opaque = BIT(~m_blitter.flags, 3);
-	const bool clear  = BIT( m_blitter.flags, 4);
-	const bool flipx  = BIT( m_blitter.flags, 5);
-	const bool flipy  = BIT( m_blitter.flags, 6);
-	if                 (BIT(~m_blitter.flags, 10))
+	unsigned const layer  = m_blitter.flags & 0x0007;
+	bool     const opaque = BIT(~m_blitter.flags,  3);
+	bool     const clear  = BIT( m_blitter.flags,  4);
+	bool     const flipx  = BIT( m_blitter.flags,  5);
+	bool     const flipy  = BIT( m_blitter.flags,  6);
+	bool     const blit   = BIT( m_blitter.flags, 10);
+
+	if (!blit)
 		return;
 
-	const u8 pen_hi = (m_blitter_pen_hi & 0x07) << 5;
+	u8 const pen_hi = (m_blitter_pen_hi & 0x07) << 5;
+	unsigned const hibpp_layers = 4 - (m_blitter.depth & 0x07);
+	bool const dst4 = layer >= hibpp_layers;
+	bool const src4 = dst4 || (m_blitter.gfx_hi & 0x80); // see lhb2
+	unsigned const shift = dst4 ? (((layer - hibpp_layers) & 0x01) << 2) : 0;
+	u8 const mask = dst4 ? (0xf0 >> shift) : 0xff;
+	unsigned const buffer = dst4 ? (hibpp_layers + ((layer - hibpp_layers) >> 1)) : layer;
 
-	// pixel address
-	u32 z = m_blitter.gfx_lo + (m_blitter.gfx_hi << 16);
+	if (std::size(m_layer_ram) <= buffer)
+	{
+		logerror("%s: layer %u out of range depth %02x (%u 8-bit layers)\n", machine().describe_context(), layer, m_blitter.depth, hibpp_layers);
+		return;
+	}
 
-	// what were they smoking???
-	const bool depth4 = !((m_blitter.flags & 0x7) < (4 - (m_blitter.depth & 0x7))) ||
-				(z & 0x800000);     // see lhb2
+	auto &dest = m_layer_ram[buffer];
 
-	z &= 0x7fffff;
+	// pixel source address
+	u32 z = (u32(m_blitter.gfx_hi & 0x7f) << 16) | m_blitter.gfx_lo;
 
-	u8 trans_pen, clear_pen;
+	u8 const clear_pen = src4 ? (m_blitter.pen | 0xf0) : m_blitter.pen;
 
-	if (depth4)
+	u8 trans_pen;
+	if (src4)
 	{
 		z <<= 1;
 		if (m_gfx_hi && (m_blitter.gfx_hi & 0x80)) trans_pen = 0x1f;   // lhb2
 		else                                       trans_pen = 0x0f;
-
-		clear_pen = m_blitter.pen | 0xf0;
 	}
 	else
 	{
 		if (m_gfx_hi) trans_pen = 0x1f;   // vbowl
 		else          trans_pen = 0xff;
-
-		clear_pen = m_blitter.pen;
 	}
 
 	const int xstart = util::sext(m_blitter.x, 10);
@@ -606,26 +617,28 @@ void igs011_state::igs011_blit_flags_w(offs_t offset, u16 data, u16 mem_mask)
 		for (int x = xstart; x != xend; x += xinc)
 		{
 			u8 pen = 0;
+
 			// fetch the pixel
 			if (!clear)
 			{
-				if (depth4) pen = (m_gfx[(z >> 1) % m_gfx.length()] >> (BIT(z, 0) << 2)) & 0x0f;
-				else        pen = m_gfx[z % m_gfx.length()];
+				if (src4)
+					pen = (m_gfx[(z >> 1) % m_gfx.length()] >> (BIT(z, 0) << 2)) & 0x0f;
+				else
+					pen = m_gfx[z % m_gfx.length()];
 
 				if (m_gfx_hi)
-				{
-					pen &= 0x0f;
-					if (BIT(m_gfx_hi[(z >> 3) % m_gfx_hi.length()], z & 7))
-						pen |= 0x10;
-				}
+					pen = (pen & 0x0f) | (BIT(m_gfx_hi[(z >> 3) % m_gfx_hi.length()], z & 7) << 4);
 			}
 
 			// plot it
-			if (clip.contains(x, y))
+			if (clip.contains(x, y) && (clear || (pen != trans_pen) || opaque))
 			{
-				if      (clear)            dest[x + y * 512] = clear_pen;
-				else if (pen != trans_pen) dest[x + y * 512] = pen | pen_hi;
-				else if (opaque)           dest[x + y * 512] = 0xff;
+				u8 const val = clear ? clear_pen : (pen != trans_pen) ? (pen | pen_hi) : 0xff;
+				u8 &destbyte = dest[(y << 9) | x];
+				if (dst4)
+					destbyte = (destbyte & mask) | ((val & 0x0f) << shift);
+				else
+					destbyte = val;
 			}
 
 			z++;
@@ -656,7 +669,6 @@ void igs011_state::machine_start()
 
 	save_item(NAME(m_dips_sel));
 	save_item(NAME(m_input_sel));
-	save_item(NAME(m_hopper_bit));
 	save_item(NAME(m_prot1));
 	save_item(NAME(m_prot1_swap));
 	save_item(NAME(m_prot1_addr));
@@ -689,11 +701,6 @@ u16 igs011_state::key_matrix_r()
 	return ret;
 }
 
-int igs011_state::igs_hopper_r()
-{
-	return (m_hopper_bit && ((m_screen->frame_number() / 5) & 1)) ? 0x0000 : 0x0001;
-}
-
 void igs011_state::dips_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_dips_sel);
@@ -702,8 +709,9 @@ void igs011_state::dips_w(offs_t offset, u16 data, u16 mem_mask)
 template<unsigned Num>
 u16 igs011_state::dips_r()
 {
-	u16 ret = 0xff;
+	// Games have 2 to 5 banks of DIP switches
 
+	u16 ret = 0xff;
 	for (int i = 0; i < Num; i++)
 		if (BIT(~m_dips_sel, i))
 			ret &= m_io_dsw[i]->read();
@@ -711,8 +719,6 @@ u16 igs011_state::dips_r()
 	// 0x0100 is blitter busy
 	return  (ret & 0xff) | 0x0000;
 }
-
-// Games have 3 to 5 dips
 
 /***************************************************************************
 
@@ -909,6 +915,34 @@ void igs011_state::lhb2_decrypt()
 	}
 
 	memcpy(src,&result_data[0],rom_size);
+}
+
+void igs011_state::lhb3_decrypt()
+{
+	const int rom_size = 0x80000;
+	u16 *src = (u16 *) (m_maincpu_region->base());
+	std::vector<u16> result_data(rom_size / 2);
+
+	for (int i = 0; i < rom_size / 2; i++)
+	{
+		u16 x = src[i];
+
+		// lhb2 address scrambling
+		const int j = bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 8, 11, 10, 9, 2, 7, 6, 5, 4, 3, 12, 1, 0);
+
+		if ((j & 0x0100) || (j & 0x0040) || ((j & 0x0010)&&(j & 0x0002)))
+			x ^= 0x00004;
+
+		if ((j & 0x5000) == 0x1000)
+			x ^= 0x0008;
+
+		if (!(j & 0x0004) || !(j & 0x2000) || (!(j & 0x0080) && !(j & 0x0010)))
+			x ^= 0x0020;
+
+		result_data[j] = x;
+	}
+
+	memcpy(src, &result_data[0], rom_size);
 }
 
 
@@ -1685,16 +1719,17 @@ void igs011_state::lhb_inputs_w(offs_t offset, u16 data, u16 mem_mask)
 
 	if (ACCESSING_BITS_0_7)
 	{
-		machine().bookkeeping().coin_counter_w(0, BIT(data, 5));
-		//  coin out        BIT(data, 6)
-		m_hopper_bit = BIT(data, 7);
+		machine().bookkeeping().coin_counter_w(0, BIT(data, 5)); // coin in
+		machine().bookkeeping().coin_counter_w(1, BIT(data, 6)); // coin out
+		m_hopper->motor_w(BIT(data, 7));
 	}
 
 	if (m_input_sel & (~0xff))
 		logerror("%06x: warning, unknown bits written in input_sel = %02x\n", m_maincpu->pc(), m_input_sel);
 
-//  popmessage("sel2 %02x",m_input_sel&~0x1f);
+	//popmessage("sel2 %02x",m_input_sel&~0x1f);
 }
+
 u16 igs011_state::lhb_inputs_r(offs_t offset)
 {
 	switch (offset)
@@ -1715,9 +1750,9 @@ void igs011_state::lhb2_igs003_w(offs_t offset, u16 data, u16 mem_mask)
 
 			if (ACCESSING_BITS_0_7)
 			{
-				machine().bookkeeping().coin_counter_w(0, BIT(data, 5));
-				//  coin out        BIT(data, 6)
-				m_hopper_bit        = BIT(data, 7);
+				machine().bookkeeping().coin_counter_w(0, BIT(data, 5)); // coin in
+				machine().bookkeeping().coin_counter_w(1, BIT(data, 6)); // coin out
+				m_hopper->motor_w(BIT(data, 7));
 			}
 
 			if (m_input_sel & ~0x7f)
@@ -1854,23 +1889,24 @@ void igs011_state::wlcc_igs003_w(offs_t offset, u16 data, u16 mem_mask)
 		case 0x02:
 			if (ACCESSING_BITS_0_7)
 			{
-				machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
-				//  coin out BIT(data, 1)
+				machine().bookkeeping().coin_counter_w(0, BIT(data, 0)); // coin in
+				machine().bookkeeping().coin_counter_w(1, BIT(data, 1)); // coin out
 
 				m_oki->set_rom_bank(BIT(data, 4));
-				m_hopper_bit = BIT(data, 5);
+				m_hopper->motor_w(BIT(data, 5));
 			}
 
 			if (data & ~0x33)
 				logerror("%06x: warning, unknown bits written in coin counter = %02x\n", m_maincpu->pc(), data);
 
-//          popmessage("coin %02x",data);
+			//popmessage("coin %02x",data);
 			break;
 
 		default:
 			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", m_maincpu->pc(), m_igs003_reg, data);
 	}
 }
+
 u16 igs011_state::wlcc_igs003_r()
 {
 	switch (m_igs003_reg)
@@ -1917,9 +1953,9 @@ void igs011_state::xymg_igs003_w(offs_t offset, u16 data, u16 mem_mask)
 
 			if (ACCESSING_BITS_0_7)
 			{
-				machine().bookkeeping().coin_counter_w(0, BIT(data, 5));
-				//  coin out        BIT(data, 6)
-				m_hopper_bit        = BIT(data, 7);
+				machine().bookkeeping().coin_counter_w(0, BIT(data, 5)); // coin in
+				machine().bookkeeping().coin_counter_w(1, BIT(data, 6)); // coin out
+				m_hopper->motor_w(BIT(data, 7));
 			}
 
 			if (m_input_sel & 0x40)
@@ -2525,52 +2561,49 @@ void igs011_state::init_lhb2()
 */
 }
 
+void igs011_state::init_lhb2cpgs()
+{
+	lhb3_decrypt();
+	lhb2_gfx_decrypt();
+
+	// PROTECTION CHECKS (possibly incomplete)
+
+	u16 *rom = (u16 *) m_maincpu_region->base();
+
+	rom[0x2807a / 2] = 0x6036;
+	rom[0x2cd98 / 2] = 0x6036;
+	rom[0x31444 / 2] = 0x6036;
+	rom[0x32b7e / 2] = 0x6036;
+	rom[0x34e88 / 2] = 0x6036;
+	rom[0x3f144 / 2] = 0x6036;
+}
+
 void igs011_state::init_lhb3()
 {
-	const int rom_size = 0x80000;
-	u16 *src = (u16 *) (m_maincpu_region->base());
-	std::vector<u16> result_data(rom_size / 2);
-
-	for (int i = 0; i < rom_size / 2; i++)
-	{
-		u16 x = src[i];
-
-		// lhb2 address scrambling
-		const int j = bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 8, 11, 10, 9, 2, 7, 6, 5, 4, 3, 12, 1, 0);
-
-		if ((j & 0x0100) || (j & 0x0040) || ((j & 0x0010)&&(j & 0x0002)))
-			x ^= 0x00004;
-
-		if ((j & 0x5000) == 0x1000)
-			x ^= 0x0008;
-
-		if (!(j & 0x0004) || !(j & 0x2000) || (!(j & 0x0080) && !(j & 0x0010)))
-			x ^= 0x0020;
-
-		result_data[j] = x;
-	}
-
-	memcpy(src, &result_data[0], rom_size);
-
-	src[0x034a6 / 2] = 0x6042;
-	src[0x1a236 / 2] = 0x6034;
-	src[0x2534a / 2] = 0x6036;
-	src[0x283c8 / 2] = 0x6038;
-	src[0x2a8d6 / 2] = 0x6036;
-	src[0x2f076 / 2] = 0x6036;
-	src[0x3093e / 2] = 0x6036;
-	src[0x3321e / 2] = 0x6036;
-	src[0x33b68 / 2] = 0x6038;
-	src[0x3e608 / 2] = 0x6034;
-	src[0x3fb66 / 2] = 0x6036;
-	src[0x42bee / 2] = 0x6034;
-	src[0x45724 / 2] = 0x6034;
-	src[0x465e0 / 2] = 0x6036;
-	src[0x48e26 / 2] = 0x6000;
-	src[0x49496 / 2] = 0x6036;
-	src[0x4b85a / 2] = 0x6038;
-
+	lhb3_decrypt();
 	lhb2_gfx_decrypt();
+
+	// PROTECTION CHECKS (possibly incomplete)
+
+	u16 *rom = (u16 *) m_maincpu_region->base();
+
+	rom[0x034a6 / 2] = 0x6042;
+	rom[0x1a236 / 2] = 0x6034;
+	rom[0x2534a / 2] = 0x6036;
+	rom[0x283c8 / 2] = 0x6038;
+	rom[0x2a8d6 / 2] = 0x6036;
+	rom[0x2f076 / 2] = 0x6036;
+	rom[0x3093e / 2] = 0x6036;
+	rom[0x3321e / 2] = 0x6036;
+	rom[0x33b68 / 2] = 0x6038;
+	rom[0x3e608 / 2] = 0x6034;
+	rom[0x3fb66 / 2] = 0x6036;
+	rom[0x42bee / 2] = 0x6034;
+	rom[0x45724 / 2] = 0x6034;
+	rom[0x465e0 / 2] = 0x6036;
+	rom[0x48e26 / 2] = 0x6000;
+	rom[0x49496 / 2] = 0x6036;
+	rom[0x4b85a / 2] = 0x6038;
 }
 
 void igs011_state::init_tygn()
@@ -2779,9 +2812,9 @@ void igs011_state::lhb_mem(address_map &map)
 
 	map(0x100000, 0x103fff).ram().share("nvram");
 	map(0x200000, 0x200fff).ram().share(m_priority_ram);
-	map(0x300000, 0x3fffff).rw(FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
-	map(0x400000, 0x400fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
-	map(0x401000, 0x401fff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).umask16(0x00ff).share("palette_ext");
+	map(0x300000, 0x3fffff).umask16(0x00ff).rw(FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
+	map(0x400000, 0x400fff).umask16(0x00ff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).share("palette");
+	map(0x401000, 0x401fff).umask16(0x00ff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0x600001, 0x600001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x700000, 0x700001).portr("COIN");
 	map(0x700002, 0x700005).r(FUNC(igs011_state::lhb_inputs_r));
@@ -2823,9 +2856,9 @@ void igs011_state::xymg_base_mem(address_map &map)
 	map(0x100000, 0x103fff).ram();
 	map(0x1f0000, 0x1f3fff).ram().share("nvram"); // extra ram
 	map(0x200000, 0x200fff).ram().share(m_priority_ram);
-	map(0x300000, 0x3fffff).rw(FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
-	map(0x400000, 0x400fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
-	map(0x401000, 0x401fff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).umask16(0x00ff).share("palette_ext");
+	map(0x300000, 0x3fffff).umask16(0x00ff).rw(FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
+	map(0x400000, 0x400fff).umask16(0x00ff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).share("palette");
+	map(0x401000, 0x401fff).umask16(0x00ff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0x600001, 0x600001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x820000, 0x820001).w(FUNC(igs011_state::igs011_priority_w));
 	map(0x840000, 0x840001).w(FUNC(igs011_state::dips_w));
@@ -2876,9 +2909,9 @@ void igs011_state::wlcc_mem(address_map &map)
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x103fff).ram().share("nvram");
 	map(0x200000, 0x200fff).ram().share(m_priority_ram);
-	map(0x300000, 0x3fffff).rw(FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
-	map(0x400000, 0x400fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
-	map(0x401000, 0x401fff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).umask16(0x00ff).share("palette_ext");
+	map(0x300000, 0x3fffff).umask16(0x00ff).rw(FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
+	map(0x400000, 0x400fff).umask16(0x00ff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).share("palette");
+	map(0x401000, 0x401fff).umask16(0x00ff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0x520000, 0x520001).portr("COIN");
 	map(0x600001, 0x600001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x800000, 0x800001).w(FUNC(igs011_state::igs003_w));
@@ -2924,7 +2957,7 @@ void igs011_state::lhb2_mem(address_map &map)
 	map(0x210000, 0x210fff).umask16(0x00ff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).share("palette");
 	map(0x211000, 0x211fff).umask16(0x00ff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0x214000, 0x214001).portr("COIN");
-	map(0x300000, 0x3fffff).rw(FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
+	map(0x300000, 0x3fffff).umask16(0x00ff).rw(FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
 	map(0xa20000, 0xa20001).w(FUNC(igs011_state::igs011_priority_w));
 	map(0xa40000, 0xa40001).w(FUNC(igs011_state::dips_w));
 
@@ -2964,10 +2997,10 @@ void igs011_state::nkishusp_mem(address_map &map)
 	map(0x208000, 0x208001).nopr().w(FUNC(igs011_state::igs003_w));
 	map(0x208002, 0x208003).rw(FUNC(igs011_state::lhb2_igs003_r), FUNC(igs011_state::lhb2_igs003_w));
 	map(0x20c000, 0x20cfff).ram().share(m_priority_ram);
-	map(0x210000, 0x210fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
-	map(0x211000, 0x211fff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).umask16(0x00ff).share("palette_ext");
+	map(0x210000, 0x210fff).umask16(0x00ff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).share("palette");
+	map(0x211000, 0x211fff).umask16(0x00ff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0x214000, 0x214001).portr("COIN");
-	map(0x300000, 0x3fffff).rw(FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
+	map(0x300000, 0x3fffff).umask16(0x00ff).rw(FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
 	map(0xa20000, 0xa20001).w(FUNC(igs011_state::igs011_priority_w));
 	map(0xa38000, 0xa38001).w(FUNC(igs011_state::lhb_irq_enable_w));
 	map(0xa40000, 0xa40001).w(FUNC(igs011_state::dips_w));
@@ -3057,9 +3090,9 @@ void vbowl_state::vbowl_mem(address_map &map)
 
 	map(0x100000, 0x103fff).ram().share("nvram");
 	map(0x200000, 0x200fff).ram().share(m_priority_ram);
-	map(0x300000, 0x3fffff).rw(FUNC(vbowl_state::igs011_layers_r), FUNC(vbowl_state::igs011_layers_w));
-	map(0x400000, 0x400fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
-	map(0x401000, 0x401fff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).umask16(0x00ff).share("palette_ext");
+	map(0x300000, 0x3fffff).umask16(0x00ff).rw(FUNC(vbowl_state::igs011_layers_r), FUNC(vbowl_state::igs011_layers_w));
+	map(0x400000, 0x400fff).umask16(0x00ff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).share("palette");
+	map(0x401000, 0x401fff).umask16(0x00ff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0x520000, 0x520001).portr("COIN");
 	map(0x600000, 0x600007).rw(m_ics, FUNC(ics2115_device::word_r), FUNC(ics2115_device::word_w));
 	map(0x700000, 0x700003).ram().share(m_vbowl_trackball);
@@ -3407,14 +3440,14 @@ static INPUT_PORTS_START( lhb2 )
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPNAME( 0x80, 0x80, "Credit Timer" )          PORT_DIPLOCATION("SW1:8")     // 自動清除  (clears credits after timeout if you don't start a game)
 	PORT_DIPSETTING(    0x80, DEF_STR(Off) )                                          // 無
-	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                           // ?
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                           // 有
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW2:1,2")   // 投幣比率
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR(Coinage) )        PORT_DIPLOCATION("SW2:1,2")   // 投幣比率
+	PORT_DIPSETTING(    0x00, DEF_STR(2C_1C) )
+	PORT_DIPSETTING(    0x03, DEF_STR(1C_1C) )
+	PORT_DIPSETTING(    0x02, DEF_STR(1C_2C) )
+	PORT_DIPSETTING(    0x01, DEF_STR(1C_3C) )
 	PORT_DIPNAME( 0x04, 0x04, "Key-in Rate" )           PORT_DIPLOCATION("SW2:3")     // 開分比率
 	PORT_DIPSETTING(    0x04, "10" )
 	PORT_DIPSETTING(    0x00, "100" )
@@ -3428,37 +3461,37 @@ static INPUT_PORTS_START( lhb2 )
 	PORT_DIPSETTING(    0x20, "Key-Out" )                                             // 洗分
 	PORT_DIPSETTING(    0x00, "Return Coins" )                                        // 退幣      (doesn't seem to work properly)
 	PORT_DIPNAME( 0x40, 0x40, "Auto Reach" )            PORT_DIPLOCATION("SW2:7")     // 自動摸打  (automatically draws and discards tiles after reach)
-	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                          // ?
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                          // 無
 	PORT_DIPSETTING(    0x40, DEF_STR(On) )                                           // 有
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Demo_Sounds) )    PORT_DIPLOCATION("SW2:8")     // 示範音樂
 	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                          // 無
 	PORT_DIPSETTING(    0x80, DEF_STR(On) )                                           // 有
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW3:1,2")   // 破台限制
+	PORT_DIPNAME( 0x03, 0x03, "Jackpot Limit" )         PORT_DIPLOCATION("SW3:1,2")   // 破台限制
 	PORT_DIPSETTING(    0x03, "500" )
 	PORT_DIPSETTING(    0x02, "1000" )
 	PORT_DIPSETTING(    0x01, "2000" )
-	PORT_DIPSETTING(    0x00, "?" )                                                   // ?限?
+	PORT_DIPSETTING(    0x00, "Unlimited" )                                           // 無限制
 	PORT_DIPNAME( 0x0c, 0x0c, "Gals" )                  PORT_DIPLOCATION("SW3:3,4")   // 美女
 	PORT_DIPSETTING(    0x0c, DEF_STR(Off) )                                          // 無美女
-	PORT_DIPSETTING(    0x08, "1?" )                                                  // ??
-	PORT_DIPSETTING(    0x04, "2?" )                                                  // 開?
-	PORT_DIPSETTING(    0x00, "3?" )                                                  // 開?
+	PORT_DIPSETTING(    0x08, "Clothed" )                                             // 保守
+	PORT_DIPSETTING(    0x04, "Nudity" )                                              // 開放
+	PORT_DIPSETTING(    0x00, "Nudity" )                                              // 開放
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW3:5" )                                     // (not shown in settings display)
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW3:6" )                                     // (not shown in settings display)
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW3:7" )                                     // (not shown in settings display)
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW3:8" )                                     // (not shown in settings display)
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )          PORT_CONDITION("DSW2", 0x10, EQUALS, 0x10) // 投幣
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )   PORT_CONDITION("DSW2", 0x10, EQUALS, 0x00) // 投幣
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )                                              // 清除
-	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )                                                  // 測試      (hold on start for input test)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(igs011_state::igs_hopper_r)) // 哈巴
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                               // 查帳
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  PORT_CONDITION("DSW2", 0x20, EQUALS, 0x20) // 洗分
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  PORT_CONDITION("DSW2", 0x20, EQUALS, 0x00) // 洗分
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )          PORT_CONDITION("DSW2", 0x10, EQUALS, 0x10)                  // 投幣
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )   PORT_CONDITION("DSW2", 0x10, EQUALS, 0x00)                  // 投幣
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )                                                               // 清除
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )                                                                   // 測試      (hold on start for input test)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // 哈巴
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                                // 查帳
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  PORT_CONDITION("DSW2", 0x20, EQUALS, 0x20)                  // 洗分
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  PORT_CONDITION("DSW2", 0x20, EQUALS, 0x00)                  // 洗分
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 
@@ -3546,13 +3579,13 @@ static INPUT_PORTS_START( nkishusp )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW3:8" )                                     // (not shown in settings display)
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )          PORT_CONDITION("DSW2", 0x08, EQUALS, 0x08) // 投幣
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )   PORT_CONDITION("DSW2", 0x08, EQUALS, 0x00) // 投幣
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )                                              // 清除
-	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )                                                  // 測試      (hold on start for input test)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(igs011_state::igs_hopper_r)) // 哈巴
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                               // 查帳
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )                                             // 洗分
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )          PORT_CONDITION("DSW2", 0x08, EQUALS, 0x08)                  // 投幣
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )   PORT_CONDITION("DSW2", 0x08, EQUALS, 0x00)                  // 投幣
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )                                                               // 清除
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )                                                                   // 測試      (hold on start for input test)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // 哈巴
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                                // 查帳
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )                                                              // 洗分
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 
@@ -3599,11 +3632,11 @@ static INPUT_PORTS_START( tygn )
 	PORT_DIPSETTING(    0x20, DEF_STR(1C_2C) )
 	PORT_DIPSETTING(    0x10, DEF_STR(1C_3C) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR(Demo_Sounds) )    PORT_DIPLOCATION("SW1:7")      // 示範音樂
-	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                           // ?
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                           // 無
 	PORT_DIPSETTING(    0x40, DEF_STR(On) )                                            // 有
 	PORT_DIPNAME( 0x80, 0x80, "Credit Timer" )          PORT_DIPLOCATION("SW1:8")      // 自動清除  (clears credits after timeout if you don't start a game)
-	PORT_DIPSETTING(    0x80, DEF_STR(Off) )                                           // ?
-	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                            // ?
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )                                           // 無
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                            // 有
 
 	PORT_START("DSW2") // not shown in test mode
 	PORT_DIPUNKNOWN( 0x01, 0x01 ) PORT_DIPLOCATION("SW2:1")
@@ -3615,28 +3648,28 @@ static INPUT_PORTS_START( tygn )
 	PORT_DIPUNKNOWN( 0x40, 0x40 ) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPUNKNOWN( 0x80, 0x80 ) PORT_DIPLOCATION("SW2:8")
 
-	PORT_START("DSW3") // only 2 out of 4 DIP banks phisically present
+	PORT_START("DSW3") // only 2 out of 4 DIP switch banks physically present
 	PORT_DIPNAME( 0xff, 0xff, DEF_STR( Unused ) )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )                                                                      // 投幣
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW ) // keep pressed while booting
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 ) // stats
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )                                                                   // 測試   (hold on start for test mode)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                                // 查帳   (stats)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // 哈巴
 
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) // ok
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) // ok
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) // ok
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) // ok
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) // ok
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) // selects input test in test mode
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) // selects image test in test mode
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) // selects audio test in test mode
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )                                                                     // 開始
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )                                                                // 上
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )                                                              // 下
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )                                                              // 捨     (name in input test looks wrong - caused by patches?)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )                                                             // 注     (name in input test looks wrong - caused by patches?)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )                                                                    // 摸/動  (selects input test in test mode)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )                                                                    // 押注   (selects graphics test in test mode)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )                                                                    // 遊戲   (selects audio test in test mode)
 
 	PORT_START("IN1") // probably unused
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -3720,7 +3753,7 @@ static INPUT_PORTS_START( xymg )
 	// TODO: hook up SW5 shown in input test but not settings display
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(igs011_state::igs_hopper_r)) // hopper switch
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // hopper switch
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )      // keep pressed while booting
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )   // stats
@@ -3812,7 +3845,7 @@ static INPUT_PORTS_START( wlcc )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  PORT_CONDITION("DSW3", 0x40, EQUALS, 0x40)  // 退幣
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  PORT_CONDITION("DSW3", 0x40, EQUALS, 0x00)  // 退幣
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(igs011_state::igs_hopper_r)) // hopper switch
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // hopper switch
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )                                                     // 開始/得分
@@ -3828,41 +3861,41 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( lhb )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0f, 0x07, "Pay Out (%)" )
-	PORT_DIPSETTING(    0x0f, "96" )
-	PORT_DIPSETTING(    0x0e, "93" )
-	PORT_DIPSETTING(    0x0d, "90" )
-	PORT_DIPSETTING(    0x0c, "87" )
-	PORT_DIPSETTING(    0x0b, "84" )
-	PORT_DIPSETTING(    0x0a, "81" )
-	PORT_DIPSETTING(    0x09, "78" )
-	PORT_DIPSETTING(    0x08, "75" )
-	PORT_DIPSETTING(    0x07, "71" )
-	PORT_DIPSETTING(    0x06, "68" )
-	PORT_DIPSETTING(    0x05, "65" )
-	PORT_DIPSETTING(    0x04, "62" )
-	PORT_DIPSETTING(    0x03, "59" )
-	PORT_DIPSETTING(    0x02, "56" )
-	PORT_DIPSETTING(    0x01, "53" )
-	PORT_DIPSETTING(    0x00, "50" )
+	PORT_DIPNAME( 0x0f, 0x02, "Payout Rate" )           // 機率調整
+	PORT_DIPSETTING(    0x00, "50%" )
+	PORT_DIPSETTING(    0x01, "53%" )
+	PORT_DIPSETTING(    0x02, "56%" )
+	PORT_DIPSETTING(    0x03, "59%" )
+	PORT_DIPSETTING(    0x04, "62%" )
+	PORT_DIPSETTING(    0x05, "65%" )
+	PORT_DIPSETTING(    0x06, "68%" )
+	PORT_DIPSETTING(    0x07, "71%" )
+	PORT_DIPSETTING(    0x08, "75%" )
+	PORT_DIPSETTING(    0x09, "78%" )
+	PORT_DIPSETTING(    0x0a, "81%" )
+	PORT_DIPSETTING(    0x0b, "84%" )
+	PORT_DIPSETTING(    0x0c, "87%" )
+	PORT_DIPSETTING(    0x0d, "90%" )
+	PORT_DIPSETTING(    0x0e, "93%" )
+	PORT_DIPSETTING(    0x0f, "96%" )
 	PORT_DIPNAME( 0x30, 0x30, "YAKUMAN Point" )
 	PORT_DIPSETTING(    0x30, "1" )
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x10, "3" )
 	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPNAME( 0xc0, 0x80, "Max Bet" )
+	PORT_DIPNAME( 0xc0, 0x80, "Maximum Bet" )           // 最大押注
 	PORT_DIPSETTING(    0xc0, "1" )
 	PORT_DIPSETTING(    0x80, "5" )
 	PORT_DIPSETTING(    0x40, "10" )
 	PORT_DIPSETTING(    0x00, "20" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x0c, 0x0c, "Min Bet" )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR(Coinage) )        // 投幣比率
+	PORT_DIPSETTING(    0x00, DEF_STR(2C_1C) )
+	PORT_DIPSETTING(    0x03, DEF_STR(1C_1C) )
+	PORT_DIPSETTING(    0x02, DEF_STR(1C_2C) )
+	PORT_DIPSETTING(    0x01, DEF_STR(1C_3C) )
+	PORT_DIPNAME( 0x0c, 0x0c, "Minimum Bet" )           // 最小押注
 	PORT_DIPSETTING(    0x0c, "1" )
 	PORT_DIPSETTING(    0x08, "2" )
 	PORT_DIPSETTING(    0x04, "3" )
@@ -3881,49 +3914,49 @@ static INPUT_PORTS_START( lhb )
 //  PORT_DIPSETTING(    0x00, "2" )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x03, 0x03, "Max Credit" )
+	PORT_DIPNAME( 0x03, 0x03, "Score Limit" )           // 得分上限
 	PORT_DIPSETTING(    0x03, "1000" )
 	PORT_DIPSETTING(    0x02, "2000" )
 	PORT_DIPSETTING(    0x01, "5000" )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPNAME( 0x0c, 0x0c, "Max Note" )
+	PORT_DIPSETTING(    0x00, "Unlimited" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Credit Limit" )          // 進分上限
 	PORT_DIPSETTING(    0x0c, "1000" )
 	PORT_DIPSETTING(    0x08, "2000" )
 	PORT_DIPSETTING(    0x04, "5000" )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, "Unlimited" )
 	PORT_DIPNAME( 0x10, 0x10, "CPU Strength" )
 	PORT_DIPSETTING(    0x10, "Strong" )
 	PORT_DIPSETTING(    0x00, "Weak" )
 	PORT_DIPNAME( 0x20, 0x20, "Money Type" )
 	PORT_DIPSETTING(    0x20, "Coins" )
 	PORT_DIPSETTING(    0x00, "Notes" )
-	PORT_DIPNAME( 0xc0, 0xc0, "DONDEN Times" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Don Den Times" )         // 交換牌次數
 	PORT_DIPSETTING(    0xc0, "0" )
 	PORT_DIPSETTING(    0x80, "3" )
 	PORT_DIPSETTING(    0x40, "5" )
 	PORT_DIPSETTING(    0x00, "8" )
 
 	PORT_START("DSW4")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "In Game Music" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR(Demo_Sounds) )
+	PORT_DIPSETTING(    0x01, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x02, 0x00, "In-Game Music" )
+	PORT_DIPSETTING(    0x02, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
 	PORT_DIPNAME( 0x0c, 0x00, "Girls" )
 	PORT_DIPSETTING(    0x0c, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x08, "Dressed" )
 	PORT_DIPSETTING(    0x04, "Underwear" )
 	PORT_DIPSETTING(    0x00, "Nude" )
-	PORT_DIPNAME( 0x10, 0x10, "Note Rate" )
+	PORT_DIPNAME( 0x10, 0x10, "Key-In Rate" )           // 開分比率
 	PORT_DIPSETTING(    0x10, "5" )
 	PORT_DIPSETTING(    0x00, "10" )
-	PORT_DIPNAME( 0x20, 0x20, "Pay Out" )
-	PORT_DIPSETTING(    0x20, "Score" )
-	PORT_DIPSETTING(    0x00, "Coin" )
-	PORT_DIPNAME( 0x40, 0x40, "Coin In" )
-	PORT_DIPSETTING(    0x40, "Credit" )
-	PORT_DIPSETTING(    0x00, "Score" )
+	PORT_DIPNAME( 0x20, 0x20, "Payout Mode" )
+	PORT_DIPSETTING(    0x20, "Key-Out" )
+	PORT_DIPSETTING(    0x00, "Return Coins" )
+	PORT_DIPNAME( 0x40, 0x40, "Credit Mode" )
+	PORT_DIPSETTING(    0x40, "Coin Acceptor" )
+	PORT_DIPSETTING(    0x00, "Key-In" )
 	PORT_DIPNAME( 0x80, 0x80, "Last Chance" )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
@@ -3941,12 +3974,14 @@ static INPUT_PORTS_START( lhb )
 	PORT_DIPUNKNOWN( 0x80, 0x80 )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(igs011_state::igs_hopper_r)) // hopper switch
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )       // system reset
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // hopper switch
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // system reset
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )       // keep pressed while booting
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )    // stats
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Pay Out") PORT_CODE(KEYCODE_O) // clear coins
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )          PORT_CONDITION("DSW4", 0x40, EQUALS, 0x40)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )   PORT_CONDITION("DSW4", 0x40, EQUALS, 0x00)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  PORT_CONDITION("DSW4", 0x20, EQUALS, 0x20)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  PORT_CONDITION("DSW4", 0x20, EQUALS, 0x00)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )        // shows garbage in test mode
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -4145,8 +4180,8 @@ void igs011_state::igs011_base(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(512, 256);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1282));
+	m_screen->set_size(512, 260);
 	m_screen->set_visarea(0, 512-1, 0, 240-1);
 	m_screen->set_screen_update(FUNC(igs011_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -4175,7 +4210,7 @@ void igs011_state::drgnwrld(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::drgnwrld_mem);
 	m_maincpu->set_vblank_int("screen", FUNC(igs011_state::irq6_line_hold));
 
-	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::timer_irq_cb<5>), attotime::from_hz(240)); // lev5 frequency drives the music tempo
+	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::timer_irq_cb<5>), attotime::from_hz(240));
 
 	YM3812(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 2.0);
 }
@@ -4211,8 +4246,10 @@ void igs011_state::lhb(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::lhb_mem);
 	m_maincpu->set_vblank_int("screen", FUNC(igs011_state::lhb_vblank_irq));
 
-	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::lhb_timer_irq_cb), attotime::from_hz(240)); // lev5 frequency drives the music tempo
+	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::lhb_timer_irq_cb), attotime::from_hz(120));
 	// irq 3 points to an apparently unneeded routine
+
+	HOPPER(config, m_hopper, attotime::from_msec(50));
 }
 
 void igs011_state::wlcc(machine_config &config)
@@ -4222,7 +4259,9 @@ void igs011_state::wlcc(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::wlcc_mem);
 	m_maincpu->set_vblank_int("screen", FUNC(igs011_state::irq6_line_hold));
 
-	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::timer_irq_cb<3>), attotime::from_hz(240)); // lev3 frequency drives the music tempo
+	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::timer_irq_cb<3>), attotime::from_hz(60));
+
+	HOPPER(config, m_hopper, attotime::from_msec(50));
 }
 
 
@@ -4233,7 +4272,9 @@ void igs011_state::xymg(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::xymg_mem);
 	m_maincpu->set_vblank_int("screen", FUNC(igs011_state::irq6_line_hold));
 
-	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::timer_irq_cb<3>), attotime::from_hz(240)); // lev3 frequency drives the music tempo
+	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::timer_irq_cb<3>), attotime::from_hz(60));
+
+	HOPPER(config, m_hopper, attotime::from_msec(50));
 }
 
 
@@ -4256,6 +4297,8 @@ void igs011_state::lhb2(machine_config &config)
 
 	//GFXDECODE(config, "gfxdecode", m_palette, gfx_igs011_hi);
 
+	HOPPER(config, m_hopper, attotime::from_msec(50));
+
 	YM2413(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 2.0);
 }
 
@@ -4272,6 +4315,8 @@ void igs011_state::nkishusp(machine_config &config)
 	// VSync 60.0052Hz, HSync 15.620kHz
 
 	//GFXDECODE(config, "gfxdecode", m_palette, gfx_igs011_hi);
+
+	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	YM2413(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 2.0);
 }
@@ -4871,6 +4916,20 @@ ROM_START( lhb2 )
 	ROM_LOAD( "igss0503.u38", 0x00000, 0x80000, CRC(c9609c9c) SHA1(f036e682b792033409966e84292a69275eaa05e5) )  // 2 banks
 ROM_END
 
+ROM_START( lhb2cpgs )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "v127c.u29", 0x00000, 0x80000, CRC(d6025580) SHA1(1aa4e248380d1e70ef18d81073b5ab578d848f89) )
+
+	ROM_REGION( 0x200000, "blitter", 0 )
+	ROM_LOAD( "igsm0501.u7", 0x00000, 0x200000, CRC(1c952bd6) SHA1(a6b6f1cdfb29647e81c032ffe59c94f1a10ceaf8) )
+
+	ROM_REGION( 0x80000, "blitter_hi", 0 )
+	ROM_LOAD( "igsm0502.u4", 0x00000, 0x80000, CRC(5d73ae99) SHA1(7283aa3d6b15ceb95db80756892be46eb997ef15) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "igss0503.u38", 0x00000, 0x80000, CRC(c9609c9c) SHA1(f036e682b792033409966e84292a69275eaa05e5) )  // 2 banks
+ROM_END
+
 ROM_START( lhb3 ) // 龍虎榜III 搓牌高手 (Lóng Hǔ Bǎng III Cuō Pái Gāoshǒu) very similar to lhb2's, but not original?
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "rom.u29", 0x00000, 0x80000, CRC(c5985452) SHA1(f1f0c2b1b8c509b2a0a72a4f3387eccb0f25008a) )
@@ -5139,6 +5198,7 @@ GAME( 1995, lhbv33c,       lhb,      lhb,             lhb,       igs011_state, i
 GAME( 1995, dbc,           lhb,      lhb,             lhb,       igs011_state, init_dbc,          ROT0, "IGS",                     "Daai Baan Sing (Hong Kong, V027H)",                MACHINE_SUPPORTS_SAVE )
 GAME( 1995, ryukobou,      lhb,      lhb,             lhb,       igs011_state, init_ryukobou,     ROT0, "IGS / Alta",              "Mahjong Ryukobou (Japan, V030J)",                  MACHINE_SUPPORTS_SAVE )
 GAME( 1996, lhb2,          0,        lhb2,            lhb2,      igs011_state, init_lhb2,         ROT0, "IGS",                     "Lung Fu Bong II (Hong Kong, V185H)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1996, lhb2cpgs,      lhb2,     lhb2,            lhb2,      igs011_state, init_lhb2cpgs,     ROT0, "IGS",                     "Long Hu Bang II: Cuo Pai Gaoshou (China, V127C)",  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ROM patches
 GAME( 1996, tygn,          lhb2,     tygn,            tygn,      igs011_state, init_tygn,         ROT0, "IGS",                     "Te Yi Gong Neng (China, V632C)",                   MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ROM patches
 GAME( 1996, lhb3,          lhb2,     nkishusp,        lhb2,      igs011_state, init_lhb3,         ROT0, "IGS",                     "Long Hu Bang III: Cuo Pai Gaoshou (China, V242C)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ROM patches
 GAME( 1996, xymg,          0,        xymg,            xymg,      igs011_state, init_xymg,         ROT0, "IGS",                     "Xingyun Manguan (China, V651C, set 1)",            MACHINE_SUPPORTS_SAVE )
