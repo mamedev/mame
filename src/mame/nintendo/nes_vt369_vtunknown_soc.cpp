@@ -127,22 +127,22 @@ void vt3xx_soc_base_device::vt369_map(address_map &map)
 	// ddrdismx relies on the mirroring, later SoCs have different mirroring?
 	map(0x2000, 0x2007).rw(m_ppu, FUNC(ppu_vt3xx_device::read), FUNC(ppu_vt3xx_device::write));  // standard PPU registers
 
-	map(0x2010, 0x2010).rw(m_ppu, FUNC(ppu_vt3xx_device::read_2010), FUNC(ppu_vt3xx_device::write_2010));
-	map(0x2011, 0x2011).rw(m_ppu, FUNC(ppu_vt3xx_device::read_2011), FUNC(ppu_vt3xx_device::write_2011));
+	map(0x2010, 0x2010).rw(m_ppu, FUNC(ppu_vt3xx_device::extended_modes_enable_r), FUNC(ppu_vt3xx_device::extended_modes_enable_w));
+	map(0x2011, 0x2011).rw(m_ppu, FUNC(ppu_vt3xx_device::extended_modes2_enable_r), FUNC(ppu_vt3xx_device::extended_modes2_enable_w));
 	map(0x2012, 0x2012).rw(m_ppu, FUNC(ppu_vt3xx_device::videobank0_0_r), FUNC(ppu_vt3xx_device::videobank0_0_w));
 	map(0x2013, 0x2013).rw(m_ppu, FUNC(ppu_vt3xx_device::videobank0_1_r), FUNC(ppu_vt3xx_device::videobank0_1_w));
 	map(0x2014, 0x2014).rw(m_ppu, FUNC(ppu_vt3xx_device::videobank0_2_r), FUNC(ppu_vt3xx_device::videobank0_2_w));
 	map(0x2015, 0x2015).rw(m_ppu, FUNC(ppu_vt3xx_device::videobank0_3_r), FUNC(ppu_vt3xx_device::videobank0_3_w));
 	map(0x2016, 0x2016).rw(m_ppu, FUNC(ppu_vt3xx_device::videobank0_4_r), FUNC(ppu_vt3xx_device::videobank0_4_w));
 	map(0x2017, 0x2017).rw(m_ppu, FUNC(ppu_vt3xx_device::videobank0_5_r), FUNC(ppu_vt3xx_device::videobank0_5_w));
-	map(0x2018, 0x2018).rw(m_ppu, FUNC(ppu_vt3xx_device::read_2018), FUNC(ppu_vt3xx_device::write_2018));
-	map(0x2019, 0x2019).rw(m_ppu, FUNC(ppu_vt3xx_device::read_2019), FUNC(ppu_vt3xx_device::write_2019));
-	map(0x201a, 0x201a).rw(m_ppu, FUNC(ppu_vt3xx_device::read_201a), FUNC(ppu_vt3xx_device::write_201a));
+	map(0x2018, 0x2018).rw(m_ppu, FUNC(ppu_vt3xx_device::videobank1_r), FUNC(ppu_vt3xx_device::videobank1_w));
+	map(0x2019, 0x2019).rw(m_ppu, FUNC(ppu_vt3xx_device::read_2019), FUNC(ppu_vt3xx_device::gun_reset_w));
+	map(0x201a, 0x201a).rw(m_ppu, FUNC(ppu_vt3xx_device::videobank0_extra_r), FUNC(ppu_vt3xx_device::videobank0_extra_w));
 	map(0x201b, 0x201b).r(m_ppu, FUNC(ppu_vt3xx_device::read_201b));
-	map(0x201c, 0x201c).rw(m_ppu, FUNC(ppu_vt3xx_device::read_201c_newvid), FUNC(ppu_vt3xx_device::write_201c_newvid));
-	map(0x201d, 0x201d).rw(m_ppu, FUNC(ppu_vt3xx_device::read_201d_newvid), FUNC(ppu_vt3xx_device::write_201d_newvid));
-	map(0x201e, 0x201e).rw(m_ppu, FUNC(ppu_vt3xx_device::read_201e_newvid), FUNC(ppu_vt3xx_device::write_201e_newvid));
-	map(0x201f, 0x201f).r(m_ppu, FUNC(ppu_vt3xx_device::read_201f));
+	map(0x201c, 0x201c).rw(m_ppu, FUNC(ppu_vt3xx_device::gun_x_r_newvid), FUNC(ppu_vt3xx_device::write_201c_newvid));
+	map(0x201d, 0x201d).rw(m_ppu, FUNC(ppu_vt3xx_device::gun_y_r_newvid), FUNC(ppu_vt3xx_device::write_201d_newvid));
+	map(0x201e, 0x201e).rw(m_ppu, FUNC(ppu_vt3xx_device::gun2_x_r_newvid), FUNC(ppu_vt3xx_device::write_201e_newvid));
+	map(0x201f, 0x201f).r(m_ppu, FUNC(ppu_vt3xx_device::gun2_y_r));
 
 	map(0x4000, 0x4017).w(m_apu, FUNC(nes_apu_vt_device::write));
 

@@ -638,17 +638,17 @@ int nes_vt02_vt03_soc_device::calculate_real_video_address(int addr, int extende
 
 	int va17_va10 = 0;
 
-	int swit = m_ppu->get_201x_reg(0xa);
+	int swit = m_ppu->get_videobank0_extra();
 
 	switch (swit & 0x07)
 	{
 	case 0x0: va17_va10 = vbank_tva17_tva10; break;
-	case 0x1: va17_va10 = (vbank_tva17_tva10 & 0x7f) | (m_ppu->get_201x_reg(0xa) & 0x80); break;
-	case 0x2: va17_va10 = (vbank_tva17_tva10 & 0x3f) | (m_ppu->get_201x_reg(0xa) & 0xc0); break;
+	case 0x1: va17_va10 = (vbank_tva17_tva10 & 0x7f) | (m_ppu->get_videobank0_extra() & 0x80); break;
+	case 0x2: va17_va10 = (vbank_tva17_tva10 & 0x3f) | (m_ppu->get_videobank0_extra() & 0xc0); break;
 	case 0x3: return -1;
-	case 0x4: va17_va10 = (vbank_tva17_tva10 & 0x1f) | (m_ppu->get_201x_reg(0xa) & 0xe0); break;
-	case 0x5: va17_va10 = (vbank_tva17_tva10 & 0x0f) | (m_ppu->get_201x_reg(0xa) & 0xf0); break;
-	case 0x6: va17_va10 = (vbank_tva17_tva10 & 0x07) | (m_ppu->get_201x_reg(0xa) & 0xf8); break;
+	case 0x4: va17_va10 = (vbank_tva17_tva10 & 0x1f) | (m_ppu->get_videobank0_extra() & 0xe0); break;
+	case 0x5: va17_va10 = (vbank_tva17_tva10 & 0x0f) | (m_ppu->get_videobank0_extra() & 0xf0); break;
+	case 0x6: va17_va10 = (vbank_tva17_tva10 & 0x07) | (m_ppu->get_videobank0_extra() & 0xf8); break;
 	case 0x7: return -1;
 	}
 
@@ -660,7 +660,7 @@ int nes_vt02_vt03_soc_device::calculate_real_video_address(int addr, int extende
 		if (readtype == 0) is4bpp = m_ppu->get_extended_modes_enable() & 0x02;
 		else if (readtype == 1) is4bpp = m_ppu->get_extended_modes_enable() & 0x04;
 
-		int va20_va18 = (m_ppu->get_201x_reg(0x8) & 0x70) >> 4;
+		int va20_va18 = (m_ppu->get_videobank1() & 0x70) >> 4;
 
 		finaladdr = ((m_410x[0x0] & 0x0F) << 21) | (va20_va18 << 18) | (va17_va10 << 10) | (addr & 0x03ff);
 
@@ -688,13 +688,13 @@ int nes_vt02_vt03_soc_device::calculate_real_video_address(int addr, int extende
 
 			eva2_eva0 |= m_ppu->get_m_read_bg4_bg3();
 
-			if (m_ppu->get_201x_reg(0x1) & 0x02)
+			if (m_ppu->get_extended_modes2_enable() & 0x02)
 			{
 				if (m_410x[0x6] & 0x1) eva2_eva0 |= 0x4;
 			}
 			else
 			{
-				if (m_ppu->get_201x_reg(0x8) & 0x08) eva2_eva0 |= 0x4;
+				if (m_ppu->get_videobank1() & 0x08) eva2_eva0 |= 0x4;
 			}
 			break;
 
@@ -927,7 +927,7 @@ void nes_vt02_vt03_soc_device::do_dma(uint8_t data, bool has_ntsc_bug)
 		logerror("vdma dest %04x\n", m_ppu->get_vram_dest());
 	}
 
-	if (has_ntsc_bug && (dma_mode == 1) && ((m_ppu->get_vram_dest() & 0xFF00) == 0x3F00) && !(m_ppu->get_201x_reg(0x1) & 0x80))
+	if (has_ntsc_bug && (dma_mode == 1) && ((m_ppu->get_vram_dest() & 0xFF00) == 0x3F00) && !(m_ppu->get_extended_modes2_enable() & 0x80))
 	{
 		length -= 1;
 		src_addr += 1;
@@ -1082,17 +1082,17 @@ void nes_vt02_vt03_soc_device::nes_vt_map(address_map &map)
 	map(0x2000, 0x2007).mirror(0x00e0).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));                      // standard PPU registers
 
 	// 2010 - 201f are extended regs, and can differ between VT models
-	map(0x2010, 0x2010).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2010), FUNC(ppu_vt03_device::write_2010));
-	map(0x2011, 0x2011).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2011), FUNC(ppu_vt03_device::write_2011));
+	map(0x2010, 0x2010).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::extended_modes_enable_r), FUNC(ppu_vt03_device::extended_modes_enable_w));
+	map(0x2011, 0x2011).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::extended_modes2_enable_r), FUNC(ppu_vt03_device::extended_modes2_enable_w));
 	nes_vt_2012_to_2017_regs(map);// 2012 - 2017 map differently on some SoC types (re-ordered)
-	map(0x2018, 0x2018).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2018), FUNC(ppu_vt03_device::write_2018));
-	map(0x2019, 0x2019).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2019), FUNC(ppu_vt03_device::write_2019));
-	map(0x201a, 0x201a).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_201a), FUNC(ppu_vt03_device::write_201a));
+	map(0x2018, 0x2018).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank1_r), FUNC(ppu_vt03_device::videobank1_w));
+	map(0x2019, 0x2019).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2019), FUNC(ppu_vt03_device::gun_reset_w));
+	map(0x201a, 0x201a).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_extra_r), FUNC(ppu_vt03_device::videobank0_extra_w));
 	map(0x201b, 0x201b).mirror(0x00e0).r(m_ppu, FUNC(ppu_vt03_device::read_201b));
-	map(0x201c, 0x201c).mirror(0x00e0).r(m_ppu, FUNC(ppu_vt03_device::read_201c));
-	map(0x201d, 0x201d).mirror(0x00e0).r(m_ppu, FUNC(ppu_vt03_device::read_201d));
-	map(0x201e, 0x201e).mirror(0x00e0).r(m_ppu, FUNC(ppu_vt03_device::read_201e));
-	map(0x201f, 0x201f).mirror(0x00e0).r(m_ppu, FUNC(ppu_vt03_device::read_201f));
+	map(0x201c, 0x201c).mirror(0x00e0).r(m_ppu, FUNC(ppu_vt03_device::gun_x_r));
+	map(0x201d, 0x201d).mirror(0x00e0).r(m_ppu, FUNC(ppu_vt03_device::gun_y_r));
+	map(0x201e, 0x201e).mirror(0x00e0).r(m_ppu, FUNC(ppu_vt03_device::gun2_x_r));
+	map(0x201f, 0x201f).mirror(0x00e0).r(m_ppu, FUNC(ppu_vt03_device::gun2_y_r));
 
 	map(0x4000, 0x4017).w(m_apu, FUNC(nes_apu_vt_device::write));
 	map(0x4014, 0x4014).w(FUNC(nes_vt02_vt03_soc_device::vt_dma_w));

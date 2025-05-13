@@ -32,44 +32,44 @@ public:
 
 	void set_palette_mode(vtxx_pal_mode pmode) { m_pal_mode = pmode; }
 
-	uint8_t read_2010(offs_t offset);
-	uint8_t read_2011(offs_t offset);
+	uint8_t extended_modes_enable_r(offs_t offset);
+	uint8_t extended_modes2_enable_r(offs_t offset);
 	uint8_t videobank0_0_r(offs_t offset);
 	uint8_t videobank0_1_r(offs_t offset);
 	uint8_t videobank0_2_r(offs_t offset);
 	uint8_t videobank0_3_r(offs_t offset);
 	uint8_t videobank0_4_r(offs_t offset);
 	uint8_t videobank0_5_r(offs_t offset);
-	uint8_t read_2018(offs_t offset);
+	uint8_t videobank1_r(offs_t offset);
 	uint8_t read_2019(offs_t offset);
-	uint8_t read_201a(offs_t offset);
+	uint8_t videobank0_extra_r(offs_t offset);
 	uint8_t read_201b(offs_t offset);
-	uint8_t read_201c(offs_t offset);
-	uint8_t read_201d(offs_t offset);
-	uint8_t read_201e(offs_t offset);
-	uint8_t read_201f(offs_t offset);
+	uint8_t gun_x_r(offs_t offset);
+	uint8_t gun_y_r(offs_t offset);
+	uint8_t gun2_x_r(offs_t offset);
+	uint8_t gun2_y_r(offs_t offset);
 
-	void write_2010(offs_t offset, uint8_t data);
-	void write_2011(offs_t offset, uint8_t data);
+	void extended_modes_enable_w(offs_t offset, uint8_t data);
+	void extended_modes2_enable_w(offs_t offset, uint8_t data);
 	void videobank0_0_w(offs_t offset, uint8_t data);
 	void videobank0_1_w(offs_t offset, uint8_t data);
 	void videobank0_2_w(offs_t offset, uint8_t data);
 	void videobank0_3_w(offs_t offset, uint8_t data);
 	void videobank0_4_w(offs_t offset, uint8_t data);
 	void videobank0_5_w(offs_t offset, uint8_t data);
-	void write_2018(offs_t offset, uint8_t data);
-	void write_2019(offs_t offset, uint8_t data);
-	void write_201a(offs_t offset, uint8_t data);
+	void videobank1_w(offs_t offset, uint8_t data);
+	void gun_reset_w(offs_t offset, uint8_t data);
+	void videobank0_extra_w(offs_t offset, uint8_t data);
 
 	virtual uint8_t palette_read(offs_t offset) override;
 	virtual void palette_write(offs_t offset, uint8_t data) override;
 
-	uint8_t get_extended_modes_enable() { return m_extended_modes_enable; }
-
-	void set_201x_reg(int reg, uint8_t data);
-	uint8_t get_201x_reg(int reg);
 	uint8_t get_videobank0_reg(int reg) { return m_videobank0[reg]; }
 	void set_videobank0_reg(int reg, uint8_t data) { m_videobank0[reg] = data; }
+	uint8_t get_videobank1() { return m_videobank1; }
+	uint8_t get_videobank0_extra() { return m_videobank0_extra; }
+	uint8_t get_extended_modes_enable() { return m_extended_modes_enable; }
+	uint8_t get_extended_modes2_enable() { return m_extended_modes2_enable; }
 
 	uint8_t get_va34();
 	uint8_t get_m_read_bg4_bg3();
@@ -101,9 +101,11 @@ protected:
 	uint32_t m_vtpens_rgb555[0x8000*8];
 	uint32_t m_vtpens_rgb444[0x1000*8];
 
-	uint8_t m_201x_regs[0x20];
 	uint8_t m_videobank0[6];
+	uint8_t m_videobank0_extra;
+	uint8_t m_videobank1;
 	uint8_t m_extended_modes_enable;
+	uint8_t m_extended_modes2_enable;
 
 private:
 	devcb_read8 m_read_bg;
@@ -133,9 +135,9 @@ class ppu_vt3xx_device : public ppu_vt03_device {
 public:
 	ppu_vt3xx_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 
-	uint8_t read_201c_newvid(offs_t offset);
-	uint8_t read_201d_newvid(offs_t offset);
-	uint8_t read_201e_newvid(offs_t offset);
+	uint8_t gun_x_r_newvid(offs_t offset);
+	uint8_t gun_y_r_newvid(offs_t offset);
+	uint8_t gun2_x_r_newvid(offs_t offset);
 
 	void write_201c_newvid(offs_t offset, uint8_t data);
 	void write_201d_newvid(offs_t offset, uint8_t data);

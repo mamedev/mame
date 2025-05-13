@@ -67,22 +67,22 @@ void ppu_vt03_device::palette_write(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t ppu_vt03_device::read_2010(offs_t offset) { return m_extended_modes_enable; }
-uint8_t ppu_vt03_device::read_2011(offs_t offset) { return m_201x_regs[0x1]; }
+uint8_t ppu_vt03_device::extended_modes_enable_r(offs_t offset) { return m_extended_modes_enable; }
+uint8_t ppu_vt03_device::extended_modes2_enable_r(offs_t offset) { return m_extended_modes2_enable; }
 uint8_t ppu_vt03_device::videobank0_0_r(offs_t offset) { return m_videobank0[0x0]; }
 uint8_t ppu_vt03_device::videobank0_1_r(offs_t offset) { return m_videobank0[0x1]; }
 uint8_t ppu_vt03_device::videobank0_2_r(offs_t offset) { return m_videobank0[0x2]; }
 uint8_t ppu_vt03_device::videobank0_3_r(offs_t offset) { return m_videobank0[0x3]; }
 uint8_t ppu_vt03_device::videobank0_4_r(offs_t offset) { return m_videobank0[0x4]; }
 uint8_t ppu_vt03_device::videobank0_5_r(offs_t offset) { return m_videobank0[0x5]; }
-uint8_t ppu_vt03_device::read_2018(offs_t offset) { return m_201x_regs[0x8]; }
-uint8_t ppu_vt03_device::read_2019(offs_t offset) { return 0x00; }
-uint8_t ppu_vt03_device::read_201a(offs_t offset) { return m_201x_regs[0xa]; }
-uint8_t ppu_vt03_device::read_201b(offs_t offset) { return 0x00; }
-uint8_t ppu_vt03_device::read_201c(offs_t offset) { return 0x00; }
-uint8_t ppu_vt03_device::read_201d(offs_t offset) { return 0x00; }
-uint8_t ppu_vt03_device::read_201e(offs_t offset) { return 0x00; }
-uint8_t ppu_vt03_device::read_201f(offs_t offset) { return 0x00; }
+uint8_t ppu_vt03_device::videobank1_r(offs_t offset) { return m_videobank1; }
+uint8_t ppu_vt03_device::read_2019(offs_t offset) { return 0x00; } // unused?
+uint8_t ppu_vt03_device::videobank0_extra_r(offs_t offset) { return m_videobank0_extra; }
+uint8_t ppu_vt03_device::read_201b(offs_t offset) { return 0x00; } // unused?
+uint8_t ppu_vt03_device::gun_x_r(offs_t offset) { return 0x00; }
+uint8_t ppu_vt03_device::gun_y_r(offs_t offset) { return 0x00; }
+uint8_t ppu_vt03_device::gun2_x_r(offs_t offset) { return 0x00; }
+uint8_t ppu_vt03_device::gun2_y_r(offs_t offset) { return 0x00; }
 
 
 void ppu_vt03_device::init_vtxx_rgb555_palette_tables()
@@ -208,25 +208,15 @@ void ppu_vt03_device::device_start()
 	save_item(NAME(m_va34));
 	save_item(NAME(m_extplanebuf));
 	save_item(NAME(m_extra_sprite_bits));
-	save_item(NAME(m_201x_regs));
 	save_item(NAME(m_videobank0));
+	save_item(NAME(m_videobank1));
 	save_item(NAME(m_extended_modes_enable));
+	save_item(NAME(m_extended_modes2_enable));
+	save_item(NAME(m_videobank0_extra));
 
 	init_vt03_palette_tables(0);
 	init_vtxx_rgb555_palette_tables();
 	init_vtxx_rgb444_palette_tables();
-}
-
-uint8_t ppu_vt03_device::get_201x_reg(int reg)
-{
-	//logerror(" getting reg %d is %02x ", reg, m_201x_regs[reg]);
-
-	return m_201x_regs[reg];
-}
-
-void ppu_vt03_device::set_201x_reg(int reg, uint8_t data)
-{
-	m_201x_regs[reg] = data;
 }
 
 void ppu_vt03_device::device_reset()
@@ -237,13 +227,14 @@ void ppu_vt03_device::device_reset()
 		m_palette_ram[i] = 0x0;
 
 	// todo: what are the actual defaults for these?
-	for (int i = 0; i < 0x20; i++)
-		set_201x_reg(i, 0x00);
-
 	m_extended_modes_enable = 0x00;
+	m_extended_modes2_enable = 0x00;
 
 	for (int i = 0; i < 6; i++)
 		m_videobank0[i] = 0;
+
+	m_videobank0_extra = 0;
+	m_videobank1 = 0;
 
 	m_read_bg4_bg3 = 0;
 	m_va34 = false;
@@ -506,7 +497,7 @@ uint8_t ppu_vt03_device::get_speva2_speva0()
 }
 
 
-void ppu_vt03_device::write_2010(offs_t offset, uint8_t data)
+void ppu_vt03_device::extended_modes_enable_w(offs_t offset, uint8_t data)
 {
 	/*  7   : COLCOMP
 	    6   : UNUSED (8bpp enable on VT09?)
@@ -520,16 +511,16 @@ void ppu_vt03_device::write_2010(offs_t offset, uint8_t data)
 	m_extended_modes_enable = data;
 }
 
-void ppu_vt03_device::write_2011(offs_t offset, uint8_t data) { m_201x_regs[0x1] = data; }
+void ppu_vt03_device::extended_modes2_enable_w(offs_t offset, uint8_t data) { m_extended_modes2_enable = data; }
 void ppu_vt03_device::videobank0_0_w(offs_t offset, uint8_t data) { m_videobank0[0x0] = data; }
 void ppu_vt03_device::videobank0_1_w(offs_t offset, uint8_t data) { m_videobank0[0x1] = data; }
 void ppu_vt03_device::videobank0_2_w(offs_t offset, uint8_t data) { m_videobank0[0x2] = data; }
 void ppu_vt03_device::videobank0_3_w(offs_t offset, uint8_t data) { m_videobank0[0x3] = data; }
 void ppu_vt03_device::videobank0_4_w(offs_t offset, uint8_t data) { m_videobank0[0x4] = data; }
 void ppu_vt03_device::videobank0_5_w(offs_t offset, uint8_t data) { m_videobank0[0x5] = data; }
-void ppu_vt03_device::write_2018(offs_t offset, uint8_t data) { m_201x_regs[0x8] = data; }
-void ppu_vt03_device::write_2019(offs_t offset, uint8_t data) { logerror("%s: write_2019 %02x (gun reset?)\n", machine().describe_context(), data); }
-void ppu_vt03_device::write_201a(offs_t offset, uint8_t data) { m_201x_regs[0xa] = data; }
+void ppu_vt03_device::videobank1_w(offs_t offset, uint8_t data) { m_videobank1 = data; }
+void ppu_vt03_device::gun_reset_w(offs_t offset, uint8_t data) { logerror("%s: gun_reset_w %02x\n", machine().describe_context(), data); }
+void ppu_vt03_device::videobank0_extra_w(offs_t offset, uint8_t data) { m_videobank0_extra = data; }
 /* 201b unused */
 /* 201c read gun read x (older VT chipsets) */
 /* 201d read gun read y (older VT chipsets) */
@@ -558,9 +549,9 @@ void ppu_vt3xx_device::device_reset()
 	m_newvid_1e = 0x00;
 }
 
-uint8_t ppu_vt3xx_device::read_201c_newvid(offs_t offset) { return m_newvid_1c; }
-uint8_t ppu_vt3xx_device::read_201d_newvid(offs_t offset) { return m_newvid_1d; }
-uint8_t ppu_vt3xx_device::read_201e_newvid(offs_t offset) { return m_newvid_1e; }
+uint8_t ppu_vt3xx_device::gun_x_r_newvid(offs_t offset) { return m_newvid_1c; }
+uint8_t ppu_vt3xx_device::gun_y_r_newvid(offs_t offset) { return m_newvid_1d; }
+uint8_t ppu_vt3xx_device::gun2_x_r_newvid(offs_t offset) { return m_newvid_1e; }
 
 void ppu_vt3xx_device::write_201c_newvid(offs_t offset, uint8_t data) { m_newvid_1c = data; logerror("%s: write_201c_newvid %02x\n", machine().describe_context(), data); }
 void ppu_vt3xx_device::write_201d_newvid(offs_t offset, uint8_t data) { m_newvid_1d = data; logerror("%s: write_201d_newvid %02x\n", machine().describe_context(), data); }
