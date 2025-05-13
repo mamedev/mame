@@ -37,16 +37,6 @@ public:
 	auto extra_write_2_callback() { return m_extra_write_2_callback.bind(); }
 	auto extra_write_3_callback() { return m_extra_write_3_callback.bind(); }
 
-	void set_201x_descramble(uint8_t reg0, uint8_t reg1, uint8_t reg2, uint8_t reg3, uint8_t reg4, uint8_t reg5)
-	{
-		m_2012_2017_descramble[0] = reg0; // TOOD: name regs
-		m_2012_2017_descramble[1] = reg1;
-		m_2012_2017_descramble[2] = reg2;
-		m_2012_2017_descramble[3] = reg3;
-		m_2012_2017_descramble[4] = reg4;
-		m_2012_2017_descramble[5] = reg5;
-	};
-
 	void set_8000_scramble(uint8_t reg0, uint8_t reg1, uint8_t reg2, uint8_t reg3, uint8_t reg4, uint8_t reg5, uint8_t reg6, uint8_t reg7);
 	void set_410x_scramble(uint8_t reg0, uint8_t reg1);
 	void force_bad_dma() { m_force_baddma = true; }
@@ -69,6 +59,7 @@ protected:
 	required_device<nes_apu_vt_device> m_apu;
 
 	void nes_vt_map(address_map &map) ATTR_COLD;
+	virtual void nes_vt_2012_to_2017_regs(address_map &map);
 
 	uint32_t get_banks(uint8_t bnk);
 	void update_banks();
@@ -152,7 +143,6 @@ private:
 	devcb_read8 m_extra_read_2_callback;
 	devcb_read8 m_extra_read_3_callback;
 
-	uint8_t m_2012_2017_descramble[0x6]; // passed to PPU in reset
 	vtxx_pal_mode m_default_palette_mode;
 	bool m_force_baddma = false;
 	bool m_use_raster_timing_hack = false;
@@ -165,6 +155,45 @@ public:
 
 protected:
 	virtual void device_add_mconfig(machine_config& config) override;
+};
+
+
+class nes_vt02_vt03_soc_waixing_device : public nes_vt02_vt03_soc_device
+{
+public:
+	nes_vt02_vt03_soc_waixing_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+
+protected:
+	nes_vt02_vt03_soc_waixing_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void nes_vt_2012_to_2017_regs(address_map &map) override;
+};
+
+class nes_vt02_vt03_soc_waixing_pal_device : public nes_vt02_vt03_soc_waixing_device
+{
+public:
+	nes_vt02_vt03_soc_waixing_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+
+protected:
+	virtual void device_add_mconfig(machine_config& config) override;
+};
+
+class nes_vt02_vt03_soc_hummer_device : public nes_vt02_vt03_soc_device
+{
+public:
+	nes_vt02_vt03_soc_hummer_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+
+protected:
+	virtual void nes_vt_2012_to_2017_regs(address_map &map) override;
+};
+
+class nes_vt02_vt03_soc_sports_device : public nes_vt02_vt03_soc_device
+{
+public:
+	nes_vt02_vt03_soc_sports_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+
+protected:
+	virtual void nes_vt_2012_to_2017_regs(address_map &map) override;
 };
 
 class nes_vt02_vt03_soc_scramble_device : public nes_vt02_vt03_soc_device
@@ -187,6 +216,14 @@ protected:
 
 DECLARE_DEVICE_TYPE(NES_VT02_VT03_SOC, nes_vt02_vt03_soc_device)
 DECLARE_DEVICE_TYPE(NES_VT02_VT03_SOC_PAL, nes_vt02_vt03_soc_pal_device)
+
+DECLARE_DEVICE_TYPE(NES_VT02_VT03_SOC_WAIXING,     nes_vt02_vt03_soc_waixing_device)
+DECLARE_DEVICE_TYPE(NES_VT02_VT03_SOC_WAIXING_PAL, nes_vt02_vt03_soc_waixing_pal_device)
+
+DECLARE_DEVICE_TYPE(NES_VT02_VT03_SOC_HUMMER, nes_vt02_vt03_soc_hummer_device)
+DECLARE_DEVICE_TYPE(NES_VT02_VT03_SOC_SPORTS, nes_vt02_vt03_soc_sports_device)
+
+
 DECLARE_DEVICE_TYPE(NES_VT02_VT03_SOC_SCRAMBLE, nes_vt02_vt03_soc_scramble_device)
 DECLARE_DEVICE_TYPE(NES_VT02_VT03_SOC_SCRAMBLE_PAL, nes_vt02_vt03_soc_scramble_pal_device)
 

@@ -31,7 +31,6 @@ public:
 	auto read_sp() { return m_read_sp.bind(); }
 
 	void set_palette_mode(vtxx_pal_mode pmode) { m_pal_mode = pmode; }
-	void set_201x_descramble(uint8_t reg0, uint8_t reg1, uint8_t reg2, uint8_t reg3, uint8_t reg4, uint8_t reg5);
 
 	uint8_t read_2010(offs_t offset);
 	uint8_t read_2011(offs_t offset);
@@ -109,9 +108,6 @@ private:
 
 	uint8_t m_extplanebuf[2];
 	uint8_t m_extra_sprite_bits;
-
-
-	uint8_t m_2012_2017_descramble[0x6];
 
 	vtxx_pal_mode m_pal_mode = PAL_MODE_VT0x;
 

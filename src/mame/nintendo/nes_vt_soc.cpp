@@ -59,6 +59,13 @@
 
 DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC,              nes_vt02_vt03_soc_device,          "nes_vt02_vt03_soc",       "VT02/03 series System on a Chip (NTSC)")
 DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_PAL,          nes_vt02_vt03_soc_pal_device,      "nes_vt02_vt03_soc_pal",   "VT02/03 series System on a Chip (PAL)")
+
+DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_WAIXING,      nes_vt02_vt03_soc_waixing_device,    "nes_vt02_vt03_soc_waixing",     "VT02/03 series System on a Chip (Waixing, NTSC)")
+DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_WAIXING_PAL,  nes_vt02_vt03_soc_waixing_pal_device,"nes_vt02_vt03_soc_waixing_pal", "VT02/03 series System on a Chip (Waixing, PAL)")
+
+DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_HUMMER,       nes_vt02_vt03_soc_hummer_device,   "nes_vt02_vt03_soc_hummer",    "VT02/03 series System on a Chip (Hummer, NTSC)")
+DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_SPORTS,       nes_vt02_vt03_soc_sports_device,   "nes_vt02_vt03_soc_sports",    "VT02/03 series System on a Chip (Sports, NTSC)")
+
 DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_SCRAMBLE,     nes_vt02_vt03_soc_scramble_device, "nes_vt02_vt03_soc_scram", "VT02/03 series System on a Chip (NTSC, with simple Opcode scrambling)")
 DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_SCRAMBLE_PAL, nes_vt02_vt03_soc_scramble_pal_device, "nes_vt02_vt03_soc_pal_scram", "VT02/03 series System on a Chip (PAL, with simple Opcode scrambling)")
 
@@ -90,10 +97,6 @@ nes_vt02_vt03_soc_device::nes_vt02_vt03_soc_device(const machine_config& mconfig
 	m_extra_read_3_callback(*this, 0xff)
 {
 	// 'no scramble' configuration
-	for (int i = 0; i < 6; i++)
-		m_2012_2017_descramble[i] = 2 + i;
-
-	// 'no scramble' configuration
 	m_8000_scramble[0x0] = 0x6;
 	m_8000_scramble[0x1] = 0x7;
 	m_8000_scramble[0x2] = 0x2;
@@ -119,6 +122,34 @@ nes_vt02_vt03_soc_device::nes_vt02_vt03_soc_device(const machine_config& mconfig
 
 nes_vt02_vt03_soc_pal_device::nes_vt02_vt03_soc_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
 	nes_vt02_vt03_soc_device(mconfig, NES_VT02_VT03_SOC_PAL, tag, owner, clock)
+{
+}
+
+
+
+nes_vt02_vt03_soc_waixing_device::nes_vt02_vt03_soc_waixing_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock) :
+	nes_vt02_vt03_soc_device(mconfig, type, tag, owner, clock)
+{
+}
+
+nes_vt02_vt03_soc_waixing_device::nes_vt02_vt03_soc_waixing_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+	nes_vt02_vt03_soc_waixing_device(mconfig, NES_VT02_VT03_SOC_WAIXING, tag, owner, clock)
+{
+}
+
+nes_vt02_vt03_soc_waixing_pal_device::nes_vt02_vt03_soc_waixing_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+	nes_vt02_vt03_soc_waixing_device(mconfig, NES_VT02_VT03_SOC_WAIXING_PAL, tag, owner, clock)
+{
+}
+
+
+nes_vt02_vt03_soc_hummer_device::nes_vt02_vt03_soc_hummer_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+	nes_vt02_vt03_soc_device(mconfig, NES_VT02_VT03_SOC_HUMMER, tag, owner, clock)
+{
+}
+
+nes_vt02_vt03_soc_sports_device::nes_vt02_vt03_soc_sports_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+	nes_vt02_vt03_soc_device(mconfig, NES_VT02_VT03_SOC_SPORTS, tag, owner, clock)
 {
 }
 
@@ -189,7 +220,6 @@ void nes_vt02_vt03_soc_device::device_reset()
 
 	update_banks();
 
-	m_ppu->set_201x_descramble(m_2012_2017_descramble[0], m_2012_2017_descramble[1], m_2012_2017_descramble[2], m_2012_2017_descramble[3], m_2012_2017_descramble[4], m_2012_2017_descramble[5]);
 	m_ppu->set_palette_mode(m_default_palette_mode);
 
 }
@@ -1037,12 +1067,7 @@ void nes_vt02_vt03_soc_device::nes_vt_map(address_map &map)
 	// 2010 - 201f are extended regs, and can differ between VT models
 	map(0x2010, 0x2010).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2010), FUNC(ppu_vt03_device::write_2010));
 	map(0x2011, 0x2011).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2011), FUNC(ppu_vt03_device::write_2011));
-	map(0x2012, 0x2012).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2012), FUNC(ppu_vt03_device::write_2012));
-	map(0x2013, 0x2013).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2013), FUNC(ppu_vt03_device::write_2013));
-	map(0x2014, 0x2014).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2014), FUNC(ppu_vt03_device::write_2014));
-	map(0x2015, 0x2015).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2015), FUNC(ppu_vt03_device::write_2015));
-	map(0x2016, 0x2016).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2016), FUNC(ppu_vt03_device::write_2016));
-	map(0x2017, 0x2017).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2017), FUNC(ppu_vt03_device::write_2017));
+	nes_vt_2012_to_2017_regs(map);// 2012 - 2017 map differently on some SoC types (re-ordered)
 	map(0x2018, 0x2018).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2018), FUNC(ppu_vt03_device::write_2018));
 	map(0x2019, 0x2019).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2019), FUNC(ppu_vt03_device::write_2019));
 	map(0x201a, 0x201a).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_201a), FUNC(ppu_vt03_device::write_201a));
@@ -1077,6 +1102,46 @@ void nes_vt02_vt03_soc_device::nes_vt_map(address_map &map)
 
 	map(0x8000, 0xffff).rw(FUNC(nes_vt02_vt03_soc_device::external_space_read), FUNC(nes_vt02_vt03_soc_device::external_space_write));
 	map(0x6000, 0x7fff).ram();
+}
+
+void nes_vt02_vt03_soc_device::nes_vt_2012_to_2017_regs(address_map &map)
+{
+	map(0x2012, 0x2012).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2012), FUNC(ppu_vt03_device::write_2012));
+	map(0x2013, 0x2013).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2013), FUNC(ppu_vt03_device::write_2013));
+	map(0x2014, 0x2014).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2014), FUNC(ppu_vt03_device::write_2014));
+	map(0x2015, 0x2015).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2015), FUNC(ppu_vt03_device::write_2015));
+	map(0x2016, 0x2016).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2016), FUNC(ppu_vt03_device::write_2016));
+	map(0x2017, 0x2017).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2017), FUNC(ppu_vt03_device::write_2017));
+}
+
+void nes_vt02_vt03_soc_waixing_device::nes_vt_2012_to_2017_regs(address_map& map)
+{
+	map(0x2012, 0x2012).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2013), FUNC(ppu_vt03_device::write_2013));
+	map(0x2013, 0x2013).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2012), FUNC(ppu_vt03_device::write_2012));
+	map(0x2014, 0x2014).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2017), FUNC(ppu_vt03_device::write_2017));
+	map(0x2015, 0x2015).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2016), FUNC(ppu_vt03_device::write_2016));
+	map(0x2016, 0x2016).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2015), FUNC(ppu_vt03_device::write_2015));
+	map(0x2017, 0x2017).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2014), FUNC(ppu_vt03_device::write_2014));
+}
+
+void nes_vt02_vt03_soc_hummer_device::nes_vt_2012_to_2017_regs(address_map& map)
+{
+	map(0x2012, 0x2012).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2017), FUNC(ppu_vt03_device::write_2017));
+	map(0x2013, 0x2013).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2016), FUNC(ppu_vt03_device::write_2016));
+	map(0x2014, 0x2014).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2015), FUNC(ppu_vt03_device::write_2015));
+	map(0x2015, 0x2015).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2014), FUNC(ppu_vt03_device::write_2014));
+	map(0x2016, 0x2016).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2012), FUNC(ppu_vt03_device::write_2012));
+	map(0x2017, 0x2017).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2013), FUNC(ppu_vt03_device::write_2013));
+}
+
+void nes_vt02_vt03_soc_sports_device::nes_vt_2012_to_2017_regs(address_map& map)
+{
+	map(0x2012, 0x2012).rw(m_ppu, FUNC(ppu_vt03_device::read_2014), FUNC(ppu_vt03_device::write_2014));
+	map(0x2013, 0x2013).rw(m_ppu, FUNC(ppu_vt03_device::read_2017), FUNC(ppu_vt03_device::write_2017));
+	map(0x2014, 0x2014).rw(m_ppu, FUNC(ppu_vt03_device::read_2012), FUNC(ppu_vt03_device::write_2012));
+	map(0x2015, 0x2015).rw(m_ppu, FUNC(ppu_vt03_device::read_2016), FUNC(ppu_vt03_device::write_2016));
+	map(0x2016, 0x2016).rw(m_ppu, FUNC(ppu_vt03_device::read_2015), FUNC(ppu_vt03_device::write_2015));
+	map(0x2017, 0x2017).rw(m_ppu, FUNC(ppu_vt03_device::read_2013), FUNC(ppu_vt03_device::write_2013));
 }
 
 
@@ -1159,6 +1224,14 @@ void nes_vt02_vt03_soc_pal_device::device_add_mconfig(machine_config& config)
 	nes_vt02_vt03_soc_device::device_add_mconfig(config);
 	do_pal_timings_and_ppu_replacement(config);
 }
+
+
+void nes_vt02_vt03_soc_waixing_pal_device::device_add_mconfig(machine_config& config)
+{
+	nes_vt02_vt03_soc_waixing_device::device_add_mconfig(config);
+	do_pal_timings_and_ppu_replacement(config);
+}
+
 
 
 /***********************************************************************************************************************************************************/
