@@ -41,6 +41,7 @@ RGB O/P connector
 #include "machine/ins8250.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
+#include "machine/microtch.h"
 #include "video/mc6845.h"
 #include "video/ramdac.h"
 
@@ -234,17 +235,10 @@ void pntnpuzls_state::pntnpuzls(machine_config &config)
 	pit.set_clk<2>(XTAL(3'579'545));
 
 	ins8250_device &uart(INS8250(config, "uart", 1.8432_MHz_XTAL));
+	uart.out_tx_callback().set("microtouch", FUNC(microtouch_device::rx));
 	uart.out_int_callback().set("pic", FUNC(pic8259_device::ir4_w));
-	uart.out_tx_callback().set("comm", FUNC(rs232_port_device::write_txd));
-	uart.out_dtr_callback().set("comm", FUNC(rs232_port_device::write_dtr));
-	uart.out_rts_callback().set("comm", FUNC(rs232_port_device::write_rts));
 
-	rs232_port_device &comm(RS232_PORT(config, "comm", default_rs232_devices, nullptr));
-	comm.rxd_handler().set("uart", FUNC(ins8250_device::rx_w));
-	comm.dsr_handler().set("uart", FUNC(ins8250_device::dsr_w));
-	comm.dcd_handler().set("uart", FUNC(ins8250_device::dcd_w));
-	comm.cts_handler().set("uart", FUNC(ins8250_device::cts_w));
-	comm.ri_handler().set("uart", FUNC(ins8250_device::ri_w));
+	MICROTOUCH(config, "microtouch", 9600).stx().set("uart", FUNC(ins8250_uart_device::rx_w));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
