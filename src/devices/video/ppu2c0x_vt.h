@@ -33,8 +33,34 @@ public:
 	void set_palette_mode(vtxx_pal_mode pmode) { m_pal_mode = pmode; }
 	void set_201x_descramble(uint8_t reg0, uint8_t reg1, uint8_t reg2, uint8_t reg3, uint8_t reg4, uint8_t reg5);
 
-	uint8_t read_extended(offs_t offset);
-	void write_extended(offs_t offset, uint8_t data);
+	uint8_t read_2010(offs_t offset);
+	uint8_t read_2011(offs_t offset);
+	uint8_t read_2012(offs_t offset);
+	uint8_t read_2013(offs_t offset);
+	uint8_t read_2014(offs_t offset);
+	uint8_t read_2015(offs_t offset);
+	uint8_t read_2016(offs_t offset);
+	uint8_t read_2017(offs_t offset);
+	uint8_t read_2018(offs_t offset);
+	uint8_t read_2019(offs_t offset);
+	uint8_t read_201a(offs_t offset);
+	uint8_t read_201b(offs_t offset);
+	uint8_t read_201c(offs_t offset);
+	uint8_t read_201d(offs_t offset);
+	uint8_t read_201e(offs_t offset);
+	uint8_t read_201f(offs_t offset);
+
+	void write_2010(offs_t offset, uint8_t data);
+	void write_2011(offs_t offset, uint8_t data);
+	void write_2012(offs_t offset, uint8_t data);
+	void write_2013(offs_t offset, uint8_t data);
+	void write_2014(offs_t offset, uint8_t data);
+	void write_2015(offs_t offset, uint8_t data);
+	void write_2016(offs_t offset, uint8_t data);
+	void write_2017(offs_t offset, uint8_t data);
+	void write_2018(offs_t offset, uint8_t data);
+	void write_2019(offs_t offset, uint8_t data);
+	void write_201a(offs_t offset, uint8_t data);
 
 	virtual uint8_t palette_read(offs_t offset) override;
 	virtual void palette_write(offs_t offset, uint8_t data) override;
@@ -72,6 +98,8 @@ protected:
 	uint32_t m_vtpens_rgb555[0x8000*8];
 	uint32_t m_vtpens_rgb444[0x1000*8];
 
+	uint8_t m_201x_regs[0x20];
+
 private:
 	devcb_read8 m_read_bg;
 	devcb_read8 m_read_sp;
@@ -82,7 +110,6 @@ private:
 	uint8_t m_extplanebuf[2];
 	uint8_t m_extra_sprite_bits;
 
-	uint8_t m_201x_regs[0x20];
 
 	uint8_t m_2012_2017_descramble[0x6];
 
@@ -101,7 +128,33 @@ public:
 	ppu_vt03pal_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 };
 
+class ppu_vt3xx_device : public ppu_vt03_device {
+public:
+	ppu_vt3xx_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+
+	uint8_t read_201c_newvid(offs_t offset);
+	uint8_t read_201d_newvid(offs_t offset);
+	uint8_t read_201e_newvid(offs_t offset);
+
+	void write_201c_newvid(offs_t offset, uint8_t data);
+	void write_201d_newvid(offs_t offset, uint8_t data);
+	void write_201e_newvid(offs_t offset, uint8_t data);
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+private:
+	uint8_t m_newvid_1c;
+	uint8_t m_newvid_1d;
+	uint8_t m_newvid_1e;
+};
+
+
 DECLARE_DEVICE_TYPE(PPU_VT03,    ppu_vt03_device)
 DECLARE_DEVICE_TYPE(PPU_VT03PAL, ppu_vt03pal_device)
+
+DECLARE_DEVICE_TYPE(PPU_VT3XX,    ppu_vt3xx_device)
+
 
 #endif // MAME_VIDEO_PPU2C0X_VT_H

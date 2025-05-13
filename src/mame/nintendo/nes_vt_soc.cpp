@@ -1033,7 +1033,24 @@ void nes_vt02_vt03_soc_device::nes_vt_map(address_map &map)
 
 	// ddrdismx relies on the mirroring
 	map(0x2000, 0x2007).mirror(0x00e0).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));                      // standard PPU registers
-	map(0x2010, 0x201f).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_extended), FUNC(ppu_vt03_device::write_extended));  //  extra VT PPU registers
+
+	// 2010 - 201f are extended regs, and can differ between VT models
+	map(0x2010, 0x2010).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2010), FUNC(ppu_vt03_device::write_2010));
+	map(0x2011, 0x2011).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2011), FUNC(ppu_vt03_device::write_2011));
+	map(0x2012, 0x2012).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2012), FUNC(ppu_vt03_device::write_2012));
+	map(0x2013, 0x2013).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2013), FUNC(ppu_vt03_device::write_2013));
+	map(0x2014, 0x2014).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2014), FUNC(ppu_vt03_device::write_2014));
+	map(0x2015, 0x2015).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2015), FUNC(ppu_vt03_device::write_2015));
+	map(0x2016, 0x2016).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2016), FUNC(ppu_vt03_device::write_2016));
+	map(0x2017, 0x2017).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2017), FUNC(ppu_vt03_device::write_2017));
+	map(0x2018, 0x2018).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2018), FUNC(ppu_vt03_device::write_2018));
+	map(0x2019, 0x2019).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2019), FUNC(ppu_vt03_device::write_2019));
+	map(0x201a, 0x201a).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_201a), FUNC(ppu_vt03_device::write_201a));
+	map(0x201b, 0x201b).mirror(0x00e0).r(m_ppu, FUNC(ppu_vt03_device::read_201b));
+	map(0x201c, 0x201c).mirror(0x00e0).r(m_ppu, FUNC(ppu_vt03_device::read_201c));
+	map(0x201d, 0x201d).mirror(0x00e0).r(m_ppu, FUNC(ppu_vt03_device::read_201d));
+	map(0x201e, 0x201e).mirror(0x00e0).r(m_ppu, FUNC(ppu_vt03_device::read_201e));
+	map(0x201f, 0x201f).mirror(0x00e0).r(m_ppu, FUNC(ppu_vt03_device::read_201f));
 
 	map(0x4000, 0x4017).w(m_apu, FUNC(nes_apu_vt_device::write));
 	map(0x4014, 0x4014).w(FUNC(nes_vt02_vt03_soc_device::vt_dma_w));

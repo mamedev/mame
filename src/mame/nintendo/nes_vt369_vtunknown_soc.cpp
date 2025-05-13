@@ -78,6 +78,13 @@ void vt3xx_soc_base_device::device_add_mconfig(machine_config& config)
 	nes_vt02_vt03_soc_device::device_add_mconfig(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt3xx_soc_base_device::vt369_map);
 
+	PPU_VT3XX(config.replace(), m_ppu, RP2A03_NTSC_XTAL);
+	m_ppu->set_cpu_tag(m_maincpu);
+	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_ppu->read_bg().set(FUNC(vt3xx_soc_base_device::chr_r));
+	m_ppu->read_sp().set(FUNC(vt3xx_soc_base_device::spr_r));
+	m_ppu->set_screen(m_screen);
+
 	VT_VT1682_ALU(config, m_alu, 0);
 
 	VT3XX_SPU(config, m_soundcpu, RP2A03_NTSC_XTAL);
@@ -118,8 +125,24 @@ void vt3xx_soc_base_device::vt369_map(address_map &map)
 	map(0x0000, 0x1fff).ram(); // 8k RAM?
 
 	// ddrdismx relies on the mirroring, later SoCs have different mirroring?
-	map(0x2000, 0x2007).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write));                      // standard PPU registers
-	map(0x2010, 0x201f).rw(m_ppu, FUNC(ppu_vt03_device::read_extended), FUNC(ppu_vt03_device::write_extended));  //  extra VT PPU registers
+	map(0x2000, 0x2007).rw(m_ppu, FUNC(ppu_vt3xx_device::read), FUNC(ppu_vt3xx_device::write));  // standard PPU registers
+
+	map(0x2010, 0x2010).rw(m_ppu, FUNC(ppu_vt3xx_device::read_2010), FUNC(ppu_vt3xx_device::write_2010));
+	map(0x2011, 0x2011).rw(m_ppu, FUNC(ppu_vt3xx_device::read_2011), FUNC(ppu_vt3xx_device::write_2011));
+	map(0x2012, 0x2012).rw(m_ppu, FUNC(ppu_vt3xx_device::read_2012), FUNC(ppu_vt3xx_device::write_2012));
+	map(0x2013, 0x2013).rw(m_ppu, FUNC(ppu_vt3xx_device::read_2013), FUNC(ppu_vt3xx_device::write_2013));
+	map(0x2014, 0x2014).rw(m_ppu, FUNC(ppu_vt3xx_device::read_2014), FUNC(ppu_vt3xx_device::write_2014));
+	map(0x2015, 0x2015).rw(m_ppu, FUNC(ppu_vt3xx_device::read_2015), FUNC(ppu_vt3xx_device::write_2015));
+	map(0x2016, 0x2016).rw(m_ppu, FUNC(ppu_vt3xx_device::read_2016), FUNC(ppu_vt3xx_device::write_2016));
+	map(0x2017, 0x2017).rw(m_ppu, FUNC(ppu_vt3xx_device::read_2017), FUNC(ppu_vt3xx_device::write_2017));
+	map(0x2018, 0x2018).rw(m_ppu, FUNC(ppu_vt3xx_device::read_2018), FUNC(ppu_vt3xx_device::write_2018));
+	map(0x2019, 0x2019).rw(m_ppu, FUNC(ppu_vt3xx_device::read_2019), FUNC(ppu_vt3xx_device::write_2019));
+	map(0x201a, 0x201a).rw(m_ppu, FUNC(ppu_vt3xx_device::read_201a), FUNC(ppu_vt3xx_device::write_201a));
+	map(0x201b, 0x201b).r(m_ppu, FUNC(ppu_vt3xx_device::read_201b));
+	map(0x201c, 0x201c).rw(m_ppu, FUNC(ppu_vt3xx_device::read_201c_newvid), FUNC(ppu_vt3xx_device::write_201c_newvid));
+	map(0x201d, 0x201d).rw(m_ppu, FUNC(ppu_vt3xx_device::read_201d_newvid), FUNC(ppu_vt3xx_device::write_201d_newvid));
+	map(0x201e, 0x201e).rw(m_ppu, FUNC(ppu_vt3xx_device::read_201e_newvid), FUNC(ppu_vt3xx_device::write_201e_newvid));
+	map(0x201f, 0x201f).r(m_ppu, FUNC(ppu_vt3xx_device::read_201f));
 
 	map(0x4000, 0x4017).w(m_apu, FUNC(nes_apu_vt_device::write));
 
@@ -299,6 +322,8 @@ void vt3xx_soc_base_device::vt369_sound_external_map(address_map &map)
 
 void vt3xx_soc_base_device::vt369_411c_bank6000_enable_w(offs_t offset, uint8_t data)
 {
+	// and CPU clock scaling on bit 0x80?
+
 	logerror("enable bank at 0x6000 (%02x)\n", data);
 	m_bank6000_enable = data;
 }

@@ -20,6 +20,8 @@
 DEFINE_DEVICE_TYPE(PPU_VT03, ppu_vt03_device, "ppu_vt03", "VT03 PPU (NTSC)")
 DEFINE_DEVICE_TYPE(PPU_VT03PAL, ppu_vt03pal_device, "ppu_vt03pal", "VT03 PPU (PAL)")
 
+DEFINE_DEVICE_TYPE(PPU_VT3XX, ppu_vt3xx_device, "ppu_vt3xx", "VT3XX PPU (NTSC)")
+
 ppu_vt03_device::ppu_vt03_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock) :
 	ppu2c0x_device(mconfig, type, tag, owner, clock),
 	m_is_pal(false),
@@ -77,66 +79,22 @@ void ppu_vt03_device::palette_write(offs_t offset, uint8_t data)
 	}
 }
 
-
-uint8_t ppu_vt03_device::read_extended(offs_t offset)
-{
-	offset += 0x10;
-	logerror("%s: read from extended PPU reg %02x\n", machine().describe_context(), offset);
-
-	switch (offset)
-	{
-	case 0x10:
-		return m_201x_regs[0x0];
-
-	case 0x11:
-		return m_201x_regs[0x1];
-
-	case 0x12:
-		return m_201x_regs[m_2012_2017_descramble[0]];
-
-	case 0x13:
-		return m_201x_regs[m_2012_2017_descramble[1]];
-
-	case 0x14:
-		return m_201x_regs[m_2012_2017_descramble[2]];
-
-	case 0x15:
-		return m_201x_regs[m_2012_2017_descramble[3]];
-
-	case 0x16:
-		return m_201x_regs[m_2012_2017_descramble[4]];
-
-	case 0x17:
-		return m_201x_regs[m_2012_2017_descramble[5]];
-
-	case 0x18:
-		return m_201x_regs[0x8];
-
-	case 0x19:
-		return 0x00;
-
-	case 0x1a:
-		return m_201x_regs[0xa];
-
-	case 0x1b:
-		return 0x00;
-
-	case 0x1c:
-		return 0x00;
-
-	case 0x1d:
-		return 0x00;
-
-	case 0x1e:
-		return 0x00;
-
-	case 0x1f:
-		return 0x00;
-	}
-
-	return 0x00;
-}
-
+uint8_t ppu_vt03_device::read_2010(offs_t offset) { return m_201x_regs[0x0]; }
+uint8_t ppu_vt03_device::read_2011(offs_t offset) { return m_201x_regs[0x1]; }
+uint8_t ppu_vt03_device::read_2012(offs_t offset) { return m_201x_regs[m_2012_2017_descramble[0]]; }
+uint8_t ppu_vt03_device::read_2013(offs_t offset) { return m_201x_regs[m_2012_2017_descramble[1]]; }
+uint8_t ppu_vt03_device::read_2014(offs_t offset) { return m_201x_regs[m_2012_2017_descramble[2]]; }
+uint8_t ppu_vt03_device::read_2015(offs_t offset) { return m_201x_regs[m_2012_2017_descramble[3]]; }
+uint8_t ppu_vt03_device::read_2016(offs_t offset) { return m_201x_regs[m_2012_2017_descramble[4]]; }
+uint8_t ppu_vt03_device::read_2017(offs_t offset) { return m_201x_regs[m_2012_2017_descramble[5]]; }
+uint8_t ppu_vt03_device::read_2018(offs_t offset) { return m_201x_regs[0x8]; }
+uint8_t ppu_vt03_device::read_2019(offs_t offset) { return 0x00; }
+uint8_t ppu_vt03_device::read_201a(offs_t offset) { return m_201x_regs[0xa]; }
+uint8_t ppu_vt03_device::read_201b(offs_t offset) { return 0x00; }
+uint8_t ppu_vt03_device::read_201c(offs_t offset) { return 0x00; }
+uint8_t ppu_vt03_device::read_201d(offs_t offset) { return 0x00; }
+uint8_t ppu_vt03_device::read_201e(offs_t offset) { return 0x00; }
+uint8_t ppu_vt03_device::read_201f(offs_t offset) { return 0x00; }
 
 
 void ppu_vt03_device::init_vtxx_rgb555_palette_tables()
@@ -554,6 +512,11 @@ uint8_t ppu_vt03_device::get_speva2_speva0()
 
 void ppu_vt03_device::set_2010_reg(uint8_t data)
 {
+
+}
+
+void ppu_vt03_device::write_2010(offs_t offset, uint8_t data)
+{
 	/*  7   : COLCOMP
 	    6   : UNUSED (8bpp enable on VT09?)
 	    5   : UNUSED
@@ -566,78 +529,58 @@ void ppu_vt03_device::set_2010_reg(uint8_t data)
 	m_201x_regs[0x0] = data;
 }
 
-void ppu_vt03_device::write_extended(offs_t offset, uint8_t data)
+void ppu_vt03_device::write_2011(offs_t offset, uint8_t data) { m_201x_regs[0x1] = data; }
+void ppu_vt03_device::write_2012(offs_t offset, uint8_t data) { m_201x_regs[m_2012_2017_descramble[0]] = data; }
+void ppu_vt03_device::write_2013(offs_t offset, uint8_t data) { m_201x_regs[m_2012_2017_descramble[1]] = data; }
+void ppu_vt03_device::write_2014(offs_t offset, uint8_t data) { m_201x_regs[m_2012_2017_descramble[2]] = data; }
+void ppu_vt03_device::write_2015(offs_t offset, uint8_t data) { m_201x_regs[m_2012_2017_descramble[3]] = data; }
+void ppu_vt03_device::write_2016(offs_t offset, uint8_t data) { m_201x_regs[m_2012_2017_descramble[4]] = data; }
+void ppu_vt03_device::write_2017(offs_t offset, uint8_t data) { m_201x_regs[m_2012_2017_descramble[5]] = data; }
+void ppu_vt03_device::write_2018(offs_t offset, uint8_t data) { m_201x_regs[0x8] = data; }
+void ppu_vt03_device::write_2019(offs_t offset, uint8_t data) { logerror("%s: write_2019 %02x (gun reset?)\n", machine().describe_context(), data); }
+void ppu_vt03_device::write_201a(offs_t offset, uint8_t data) { m_201x_regs[0xa] = data; }
+/* 201b unused */
+/* 201c read gun read x (older VT chipsets) */
+/* 201d read gun read y (older VT chipsets) */
+/* 201e read gun 2 read x (older VT chipsets) */
+/* 201f read gun 2 read y (older VT chipsets) */
+
+
+ppu_vt3xx_device::ppu_vt3xx_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+	ppu_vt03_device(mconfig, PPU_VT3XX, tag, owner, clock)
 {
-	offset += 0x10;
-	logerror("%s: write to extended PPU reg 0x20%02x %02x\n", machine().describe_context(), offset, data);
-	switch (offset)
-	{
-	case 0x10:
-		set_2010_reg(data);
-		break;
-
-	case 0x11:
-		m_201x_regs[0x1] = data;
-		break;
-
-	case 0x12:
-		m_201x_regs[m_2012_2017_descramble[0]] = data;
-		break;
-
-	case 0x13:
-		m_201x_regs[m_2012_2017_descramble[1]] = data;
-		break;
-
-	case 0x14:
-		m_201x_regs[m_2012_2017_descramble[2]] = data;
-		break;
-
-	case 0x15:
-		m_201x_regs[m_2012_2017_descramble[3]] = data;
-		break;
-
-	case 0x16:
-		m_201x_regs[m_2012_2017_descramble[4]] = data;
-		break;
-
-	case 0x17:
-		logerror("set reg 7 %02x\n", data);
-		m_201x_regs[m_2012_2017_descramble[5]] = data;
-		break;
-
-	case 0x18:
-		logerror("set reg 8 %02x\n", data);
-		m_201x_regs[0x8] = data;
-		break;
-
-	case 0x19:
-		// reset gun port (value doesn't matter)
-		break;
-
-	case 0x1a:
-		m_201x_regs[0xa] = data;
-		break;
-
-	case 0x1b:
-		// unused
-		break;
-
-	case 0x1c:
-		// (READ) x-coordinate of gun
-		break;
-
-	case 0x1d:
-		// (READ) y-coordinate of gun
-		break;
-
-	case 0x1e:
-		// (READ) x-coordinate of gun 2
-		break;
-
-	case 0x1f:
-		// (READ) y-coordinate of gun 2
-		break;
-	}
 }
 
+void ppu_vt3xx_device::device_start()
+{
+	ppu_vt03_device::device_start();
+	save_item(NAME(m_newvid_1c));
+	save_item(NAME(m_newvid_1d));
+	save_item(NAME(m_newvid_1e));
+}
 
+void ppu_vt3xx_device::device_reset()
+{
+	ppu_vt03_device::device_reset();
+	m_newvid_1c = 0x00;
+	m_newvid_1d = 0x00;
+	m_newvid_1e = 0x00;
+}
+
+uint8_t ppu_vt3xx_device::read_201c_newvid(offs_t offset) { return m_newvid_1c; }
+uint8_t ppu_vt3xx_device::read_201d_newvid(offs_t offset) { return m_newvid_1d; }
+uint8_t ppu_vt3xx_device::read_201e_newvid(offs_t offset) { return m_newvid_1e; }
+
+void ppu_vt3xx_device::write_201c_newvid(offs_t offset, uint8_t data) { m_newvid_1c = data; logerror("%s: write_201c_newvid %02x\n", machine().describe_context(), data); }
+void ppu_vt3xx_device::write_201d_newvid(offs_t offset, uint8_t data) { m_newvid_1d = data; logerror("%s: write_201d_newvid %02x\n", machine().describe_context(), data); }
+
+void ppu_vt3xx_device::write_201e_newvid(offs_t offset, uint8_t data)
+{
+	/*
+	 extended mode feature enables
+	 ---- -s--
+	 s = old/new sprite mode
+	*/
+	m_newvid_1e = data;
+	logerror("%s: write_201e_newvid %02x\n", machine().describe_context(), data);
+}

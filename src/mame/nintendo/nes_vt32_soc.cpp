@@ -115,7 +115,7 @@ void nes_vt32_soc_device::vtfp_411d_w(uint8_t data)
 
 uint8_t nes_vt32_soc_device::vthh_414a_r()
 {
-	return 0x80;
+	return machine().rand();
 }
 
 
@@ -123,7 +123,7 @@ void nes_vt32_soc_device::nes_vt_fp_map(address_map &map)
 {
 	nes_vt02_vt03_soc_device::nes_vt_map(map);
 
-	map(0x0000, 0x1fff).mask(0x0fff).ram();
+	map(0x0000, 0x1fff);// .mask(0x0fff).ram();
 
 	map(0x414a, 0x414a).r(FUNC(nes_vt32_soc_device::vthh_414a_r));
 	map(0x411d, 0x411d).w(FUNC(nes_vt32_soc_device::vtfp_411d_w));
