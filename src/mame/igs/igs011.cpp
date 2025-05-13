@@ -46,21 +46,28 @@ TODO:
 - Implement the I/O part of IGS003 as an 8255
 - IGS003 parametric bitswap protection in lhb2cpgs, lhb3, nkishusp, tygn
   (instead of patching the ROMs)
-- Interrupt controller at 838000 or a38000 (there's a preliminary implementation for lhb)
+- Interrupt controller at 838000 or a38000 (there's a preliminary
+  implementation for lhb)
 
-- vbowl, vbowlj: trackball support.
+- vbowl, vbowlj: trackball support
 
-- lhb3: emulated game crashes with an illegal instruction error on bookkeeping menu
+- lhb3: emulated game crashes with an illegal instruction error on the
+  bookkeeping menu
 
 - xymga: stop during attract mode with 'RECORD ERROR 3'
 
-- tygn: crashes to how to play screen during gameplay, payout and clear inputs shown in
-  input test don't work, joystick left/right show incorrect names in input test
+- tygn: crashes to how to play screen during gameplay, payout and clear
+  inputs shown in input test don't work, joystick left/right show
+  incorrect names in input test
 
 Notes:
 
-- In most games, keep test button pressed during boot to access the input test and
-  sound test.
+- In most games, keep test button pressed during boot to access the
+  input test and sound test.
+
+- dbc: The title screen background palette is wrong since the fade
+  routine is called with incorrect argument values, but the PCB does the
+  same thing.
 
 ***************************************************************************/
 
@@ -84,32 +91,139 @@ Notes:
 
 #define LOG_BLITTER (1U << 1)
 
-#define VERBOSE (0)
+//#define VERBOSE (LOG_GENERAL | LOG_BLITTER)
 #include "logmacro.h"
 
 
 namespace {
 
-class igs011_state : public driver_device
+class igs011_state_base : public driver_device
 {
 public:
-	igs011_state(const machine_config &mconfig, device_type type, const char *tag)
+	igs011_state_base(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_oki(*this, "oki")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
-		, m_hopper(*this, "hopper")
 		, m_layer_ram(*this, "layer%u_ram", 0U, 512U * 256U, ENDIANNESS_BIG)
 		, m_priority_ram(*this, "priority_ram")
 		, m_maincpu_region(*this, "maincpu")
 		, m_gfx(*this, "blitter")
 		, m_gfx_hi(*this, "blitter_hi")
 		, m_io_in(*this, "IN%u", 0U)
-		, m_io_key(*this, "KEY%u", 0U)
-		, m_io_an(*this, "AN%u", 0U)
 		, m_io_dsw(*this, "DSW%u", 1U)
 		, m_io_coin(*this, "COIN")
+	{
+	}
+
+protected:
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+
+	/* memory pointers */
+	memory_share_array_creator<u8, 4> m_layer_ram;
+	required_shared_ptr<u16> m_priority_ram;
+
+	/* memory regions */
+	required_memory_region m_maincpu_region;
+	required_region_ptr<u8> m_gfx;
+	optional_region_ptr<u8> m_gfx_hi;
+
+	optional_ioport_array<3> m_io_in;
+	optional_ioport_array<5> m_io_dsw;
+	optional_ioport m_io_coin;
+
+	u16 m_priority = 0;
+	u8 m_blitter_pen_hi = 0;
+	u16 m_dips_sel = 0;
+	u8 m_prot1 = 0;
+	u8 m_prot1_swap = 0;
+	u32 m_prot1_addr = 0;
+	u8 m_prot2 = 0;
+	u8 m_igs012_prot = 0;
+	u8 m_igs012_prot_swap = 0;
+	u8 m_igs012_prot_mode = 0;
+	u16 m_igs003_reg = 0;
+
+	u16 m_igs003_prot_hold = 0;
+	u8 m_igs003_prot_x = 0;
+	u8 m_igs003_prot_y = 0;
+	u8 m_igs003_prot_z = 0;
+	u8 m_igs003_prot_h1 = 0;
+	u8 m_igs003_prot_h2 = 0;
+
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
+	void igs011_base(machine_config &config) ATTR_COLD;
+
+	void igs011_priority_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u8 igs011_layers_r(offs_t offset);
+	void igs011_layers_w(offs_t offset, u8 data);
+	void dips_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	template<unsigned Num> u16 dips_r();
+	void igs011_prot1_w(offs_t offset, u8 data);
+	u16 igs011_prot1_r();
+	void igs011_prot_addr_w(u16 data);
+	void igs011_prot2_reset_w(u8 data);
+	u16 igs011_prot2_reset_r();
+	void igs011_prot2_inc_w(u8 data);
+	void igs011_prot2_dec_w(u8 data);
+	void drgnwrld_igs011_prot2_swap_w(u8 data);
+	u16 drgnwrldv40k_igs011_prot2_r();
+	u16 drgnwrldv21_igs011_prot2_r();
+	u16 drgnwrldv20j_igs011_prot2_r();
+	void igs012_prot_reset_w(u16 data);
+	void igs012_prot_mode_w(offs_t offset, u8 data);
+	void igs012_prot_inc_w(offs_t offset, u8 data);
+	void igs012_prot_dec_inc_w(offs_t offset, u8 data);
+	void igs012_prot_dec_copy_w(offs_t offset, u8 data);
+	void igs012_prot_copy_w(offs_t offset, u8 data);
+	void igs012_prot_swap_w(offs_t offset, u8 data);
+	u16 igs012_prot_r();
+	void igs003_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void sound_irq(int state);
+	template <uint8_t Irq> TIMER_DEVICE_CALLBACK_MEMBER(timer_irq_cb);
+
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void prot_mem_range_set();
+
+	void blitter_ctrl(address_map &map) ATTR_COLD;
+
+private:
+	struct blitter_t
+	{
+		u16  x = 0, y = 0, w = 0, h = 0,
+			gfx_lo = 0, gfx_hi = 0,
+			depth = 0,
+			pen = 0,
+			flags = 0;
+	};
+
+	blitter_t m_blitter;
+
+	void igs011_blit_x_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void igs011_blit_y_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void igs011_blit_gfx_lo_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void igs011_blit_gfx_hi_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void igs011_blit_w_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void igs011_blit_h_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void igs011_blit_depth_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void igs011_blit_pen_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void igs011_blit_flags_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+};
+
+// With Oki MSM6295 sound
+class igs011_oki_state : public igs011_state_base
+{
+public:
+	igs011_oki_state(const machine_config &mconfig, device_type type, const char *tag)
+		: igs011_state_base(mconfig, type, tag)
+		, m_oki(*this, "oki")
+		, m_hopper(*this, "hopper")
+		, m_io_key(*this, "KEY%u", 0U)
 	{
 	}
 
@@ -144,107 +258,27 @@ public:
 	void nkishusp(machine_config &config) ATTR_COLD;
 	void tygn(machine_config &config) ATTR_COLD;
 
-protected:
-	struct blitter_t
-	{
-		u16  x = 0, y = 0, w = 0, h = 0,
-			gfx_lo = 0, gfx_hi = 0,
-			depth = 0,
-			pen = 0,
-			flags = 0;
-	};
-
-	/* devices */
-	required_device<cpu_device> m_maincpu;
-	optional_device<okim6295_device> m_oki;
-	required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
+private:
+	required_device<okim6295_device> m_oki;
 	optional_device<hopper_device> m_hopper;
-
-	/* memory pointers */
-	memory_share_array_creator<u8, 4> m_layer_ram;
-	required_shared_ptr<u16> m_priority_ram;
-
-	/* memory regions */
-	required_memory_region m_maincpu_region;
-	required_region_ptr<u8> m_gfx;
-	optional_region_ptr<u8> m_gfx_hi;
-
-	optional_ioport_array<3> m_io_in;
 	optional_ioport_array<5> m_io_key;
-	optional_ioport_array<2> m_io_an;
-	optional_ioport_array<5> m_io_dsw;
-	optional_ioport m_io_coin;
 
-	u16 m_priority = 0;
-	u8 m_blitter_pen_hi = 0;
-	u16 m_dips_sel = 0;
 	u16 m_input_sel = 0;
-	u8 m_prot1 = 0;
-	u8 m_prot1_swap = 0;
-	u32 m_prot1_addr = 0;
-	u8 m_prot2 = 0;
-	u8 m_igs012_prot = 0;
-	u8 m_igs012_prot_swap = 0;
-	u8 m_igs012_prot_mode = 0;
-	u16 m_igs003_reg = 0;
 	u16 m_lhb_irq_enable = 0;
 
-	blitter_t m_blitter;
-
-	u16 m_igs003_prot_hold = 0;
-	u8 m_igs003_prot_x = 0;
-	u8 m_igs003_prot_y = 0;
-	u8 m_igs003_prot_z = 0;
-	u8 m_igs003_prot_h1 = 0;
-	u8 m_igs003_prot_h2 = 0;
-
 	virtual void machine_start() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
 
-	void igs011_base(machine_config &config) ATTR_COLD;
+	void igs011_oki_base(machine_config &config) ATTR_COLD;
+	void igs011_oki_opll_base(machine_config &config) ATTR_COLD;
 
-	void igs011_priority_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	u8 igs011_layers_r(offs_t offset);
-	void igs011_layers_w(offs_t offset, u8 data);
-	void igs011_blit_x_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void igs011_blit_y_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void igs011_blit_gfx_lo_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void igs011_blit_gfx_hi_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void igs011_blit_w_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void igs011_blit_h_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void igs011_blit_depth_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void igs011_blit_pen_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void igs011_blit_flags_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void dips_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 key_matrix_r();
-	template<unsigned Num> u16 dips_r();
-	void igs011_prot1_w(offs_t offset, u8 data);
-	u16 igs011_prot1_r();
-	void igs011_prot_addr_w(u16 data);
-	void igs011_prot2_reset_w(u8 data);
-	u16 igs011_prot2_reset_r();
-	void igs011_prot2_inc_w(u8 data);
-	void igs011_prot2_dec_w(u8 data);
-	void drgnwrld_igs011_prot2_swap_w(u8 data);
+
 	void lhb_igs011_prot2_swap_w(u8 data);
 	void wlcc_igs011_prot2_swap_w(u8 data);
-	u16 drgnwrldv40k_igs011_prot2_r();
-	u16 drgnwrldv21_igs011_prot2_r();
-	u16 drgnwrldv20j_igs011_prot2_r();
 	u16 lhb_igs011_prot2_r();
 	u16 dbc_igs011_prot2_r();
 	u16 ryukobou_igs011_prot2_r();
 	u16 lhb2_igs011_prot2_r();
-	void igs012_prot_reset_w(u16 data);
-	void igs012_prot_mode_w(offs_t offset, u8 data);
-	void igs012_prot_inc_w(offs_t offset, u8 data);
-	void igs012_prot_dec_inc_w(offs_t offset, u8 data);
-	void igs012_prot_dec_copy_w(offs_t offset, u8 data);
-	void igs012_prot_copy_w(offs_t offset, u8 data);
-	void igs012_prot_swap_w(offs_t offset, u8 data);
-	u16 igs012_prot_r();
-	void igs003_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void drgnwrld_igs003_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 drgnwrld_igs003_r();
 	void lhb_inputs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -257,12 +291,11 @@ protected:
 	u16 xymg_igs003_r();
 	void lhb_irq_enable_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void lhb_okibank_w(u8 data);
-	void sound_irq(int state);
-	template <uint8_t Irq> TIMER_DEVICE_CALLBACK_MEMBER(timer_irq_cb);
+
 	TIMER_DEVICE_CALLBACK_MEMBER(lhb_timer_irq_cb);
 
-	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(lhb_vblank_irq);
+
 	void wlcc_decrypt() ATTR_COLD;
 	void lhb_decrypt() ATTR_COLD;
 	void drgnwrld_type3_decrypt() ATTR_COLD;
@@ -277,7 +310,6 @@ protected:
 	void tygn_decrypt() ATTR_COLD;
 	void lhb2_gfx_decrypt() ATTR_COLD;
 	void drgnwrld_gfx_decrypt() ATTR_COLD;
-	void prot_mem_range_set();
 
 	void drgnwrld_mem(address_map &map) ATTR_COLD;
 	void drgnwrld_igs012_mem(address_map &map) ATTR_COLD;
@@ -291,12 +323,12 @@ protected:
 	void xymga_mem(address_map &map) ATTR_COLD;
 };
 
-// With trackball inputs
-class vbowl_state : public igs011_state
+// With ICS2115 sound and trackball inputs
+class vbowl_state : public igs011_state_base
 {
 public:
 	vbowl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: igs011_state(mconfig, type, tag)
+		: igs011_state_base(mconfig, type, tag)
 		, m_ics(*this, "ics")
 		, m_vbowl_trackball(*this, "vbowl_trackball")
 		, m_io_an(*this, "AN%u", 0U)
@@ -311,12 +343,8 @@ public:
 	void vbowlhk(machine_config &config) ATTR_COLD;
 
 private:
-	/* devices */
 	required_device<ics2115_device> m_ics;
-
-	/* memory pointers */
 	required_shared_ptr<u16> m_vbowl_trackball;
-
 	required_ioport_array<2> m_io_an;
 
 	void vbowl_igs011_prot2_swap_w(u8 data);
@@ -359,7 +387,7 @@ private:
 ***************************************************************************/
 
 
-void igs011_state::igs011_priority_w(offs_t offset, u16 data, u16 mem_mask)
+void igs011_state_base::igs011_priority_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_priority);
 
@@ -370,7 +398,7 @@ void igs011_state::igs011_priority_w(offs_t offset, u16 data, u16 mem_mask)
 }
 
 
-void igs011_state::video_start()
+void igs011_state_base::video_start()
 {
 	m_blitter_pen_hi = 0;
 
@@ -387,7 +415,7 @@ void igs011_state::video_start()
 	save_item(NAME(m_blitter.flags));
 }
 
-u32 igs011_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 igs011_state_base::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 #ifdef MAME_DEBUG
 	int layer_enable = -1;
@@ -410,7 +438,14 @@ u32 igs011_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 #endif
 
 	u16 const *const pri_ram = &m_priority_ram[(m_priority & 7) * 512/2];
-	unsigned const hibpp_layers = 4 - (m_blitter.depth & 0x07);
+	unsigned const hibpp_layers = std::min<unsigned>(4 - (m_blitter.depth & 0x07), std::size(m_layer_ram));
+
+	if (BIT(m_blitter.depth, 4))
+	{
+		u16 const pri = pri_ram[0xff] & 7;
+		bitmap.fill((pri << 8) | 0xff, cliprect);
+		return 0;
+	}
 
 	u8 layerpix[8] = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -421,36 +456,34 @@ u32 igs011_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 			int pri_addr = 0xff;
 
 			int l = 0;
-			for (unsigned i = 0; std::size(m_layer_ram) > i; ++i)
+			unsigned i = 0;
+			while (hibpp_layers > i)
 			{
-				u8 const pixdata = m_layer_ram[i][scr_addr];
-				if (i < hibpp_layers)
-				{
-					layerpix[l] = pixdata;
-					if (layerpix[l] != 0xff)
+				layerpix[l] = m_layer_ram[i++][scr_addr];
+				if (layerpix[l] != 0xff)
 #ifdef MAME_DEBUG
-						if (layer_enable & (1 << l))
+					if (layer_enable & (1 << l))
 #endif
-							pri_addr &= ~(1 << l);
-					++l;
-				}
-				else
-				{
-					layerpix[l] = pixdata & 0x0f;
-					if (layerpix[l] != 0x0f)
+						pri_addr &= ~(1 << l);
+				++l;
+			}
+			while (std::size(m_layer_ram) > i)
+			{
+				u8 const pixdata = m_layer_ram[i++][scr_addr];
+				layerpix[l] = pixdata & 0x0f;
+				if (layerpix[l] != 0x0f)
 #ifdef MAME_DEBUG
-						if (layer_enable & (1 << l))
+					if (layer_enable & (1 << l))
 #endif
-							pri_addr &= ~(1 << l);
-					++l;
-					layerpix[l] = (pixdata >> 4) & 0x0f;
-					if (layerpix[l] != 0x0f)
+						pri_addr &= ~(1 << l);
+				++l;
+				layerpix[l] = (pixdata >> 4) & 0x0f;
+				if (layerpix[l] != 0x0f)
 #ifdef MAME_DEBUG
-						if (layer_enable & (1 << l))
+					if (layer_enable & (1 << l))
 #endif
-							pri_addr &= ~(1 << l);
-					++l;
-				}
+						pri_addr &= ~(1 << l);
+				++l;
 			}
 
 			u16 const pri = pri_ram[pri_addr] & 7;
@@ -467,12 +500,12 @@ u32 igs011_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 
 /***************************************************************************
 
-    In addition to the blitter, the CPU can directly access video memory
-    directly.  There are four buffers of 128 KiB each, organised as 256
-    rows by 512 columns.  Each buffer can be treated as a single 8-bit
-    layer, or two 4-bit layers.  The most and least significant bits of
-    the offset select the buffer, and the remaining bits address a byte
-    within the buffer.
+    In addition to the blitter, the CPU can directly access video RAM.
+    There are four buffers of 128 KiB each, organised as 256 rows by 512
+    columns.  Each buffer can be treated as a single 8-bit layer or two
+    4-bit layers.  The most and least significant bits of the offset
+    select the buffer, and the remaining bits address a byte within the
+    buffer.
 
     - Buffer 0 is accessed at 0x300000, 0x300004, 0x300008, etc.
       (offset 0x00000, 0x00002, 0x00004, etc.)
@@ -485,14 +518,14 @@ u32 igs011_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 
 ***************************************************************************/
 
-u8 igs011_state::igs011_layers_r(offs_t offset)
+u8 igs011_state_base::igs011_layers_r(offs_t offset)
 {
 	unsigned const layer = bitswap<2>(offset, 18, 0);
 	offs_t const byteoffset = (offset >> 1) & 0x1ffff;
 	return m_layer_ram[layer][byteoffset];
 }
 
-void igs011_state::igs011_layers_w(offs_t offset, u8 data)
+void igs011_state_base::igs011_layers_w(offs_t offset, u8 data)
 {
 	unsigned const layer = bitswap<2>(offset, 18, 0);
 	offs_t const byteoffset = (offset >> 1) & 0x1ffff;
@@ -506,51 +539,49 @@ void igs011_state::igs011_layers_w(offs_t offset, u8 data)
 ***************************************************************************/
 
 
-void igs011_state::igs011_blit_x_w(offs_t offset, u16 data, u16 mem_mask)
+void igs011_state_base::igs011_blit_x_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_blitter.x);
 }
 
-void igs011_state::igs011_blit_y_w(offs_t offset, u16 data, u16 mem_mask)
+void igs011_state_base::igs011_blit_y_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_blitter.y);
 }
 
-void igs011_state::igs011_blit_gfx_lo_w(offs_t offset, u16 data, u16 mem_mask)
+void igs011_state_base::igs011_blit_gfx_lo_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_blitter.gfx_lo);
 }
 
-void igs011_state::igs011_blit_gfx_hi_w(offs_t offset, u16 data, u16 mem_mask)
+void igs011_state_base::igs011_blit_gfx_hi_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_blitter.gfx_hi);
 }
 
-void igs011_state::igs011_blit_w_w(offs_t offset, u16 data, u16 mem_mask)
+void igs011_state_base::igs011_blit_w_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_blitter.w);
 }
 
-void igs011_state::igs011_blit_h_w(offs_t offset, u16 data, u16 mem_mask)
+void igs011_state_base::igs011_blit_h_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_blitter.h);
 }
 
-void igs011_state::igs011_blit_depth_w(offs_t offset, u16 data, u16 mem_mask)
+void igs011_state_base::igs011_blit_depth_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_blitter.depth);
 }
 
-void igs011_state::igs011_blit_pen_w(offs_t offset, u16 data, u16 mem_mask)
+void igs011_state_base::igs011_blit_pen_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_blitter.pen);
 }
 
 
-void igs011_state::igs011_blit_flags_w(offs_t offset, u16 data, u16 mem_mask)
+void igs011_state_base::igs011_blit_flags_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	rectangle const clip(0, 512 - 1, 0, 256 - 1);
-
 	COMBINE_DATA(&m_blitter.flags);
 
 	LOGMASKED(LOG_BLITTER, "%s: blit x %03x, y %03x, w %03x, h %03x, gfx %03x%04x, depth %02x, pen %02x, flags %03x\n",
@@ -574,7 +605,7 @@ void igs011_state::igs011_blit_flags_w(offs_t offset, u16 data, u16 mem_mask)
 	bool const dst4 = layer >= hibpp_layers;
 	bool const src4 = dst4 || (m_blitter.gfx_hi & 0x80); // see lhb2
 	unsigned const shift = dst4 ? (((layer - hibpp_layers) & 0x01) << 2) : 0;
-	u8 const mask = dst4 ? (0xf0 >> shift) : 0xff;
+	u8 const mask = dst4 ? (0xf0 >> shift) : 0x00;
 	unsigned const buffer = dst4 ? (hibpp_layers + ((layer - hibpp_layers) >> 1)) : layer;
 
 	if (std::size(m_layer_ram) <= buffer)
@@ -603,57 +634,49 @@ void igs011_state::igs011_blit_flags_w(offs_t offset, u16 data, u16 mem_mask)
 		else          trans_pen = 0xff;
 	}
 
-	const int xstart = util::sext(m_blitter.x, 10);
-	const int ystart = util::sext(m_blitter.y, 9);
-	const int xsize = (m_blitter.w & 0x1ff) + 1;
-	const int ysize = (m_blitter.h & 0x0ff) + 1;
-	const int xend = flipx ? (xstart - xsize) : (xstart + xsize);
-	const int yend = flipy ? (ystart - ysize) : (ystart + ysize);
-	const int xinc = flipx ? -1 : 1;
-	const int yinc = flipy ? -1 : 1;
+	int const xstart = util::sext(m_blitter.x, 10);
+	int const ystart = util::sext(m_blitter.y, 9);
+	int const xsize = (m_blitter.w & 0x1ff) + 1;
+	int const ysize = (m_blitter.h & 0x0ff) + 1;
+	int const xend = flipx ? (xstart - xsize) : (xstart + xsize);
+	int const yend = flipy ? (ystart - ysize) : (ystart + ysize);
+	int const xinc = flipx ? -1 : 1;
+	int const yinc = flipy ? -1 : 1;
 
+	rectangle const clip(0, 512 - 1, 0, 256 - 1);
 	for (int y = ystart; y != yend; y += yinc)
 	{
 		for (int x = xstart; x != xend; x += xinc)
 		{
-			u8 pen = 0;
-
-			// fetch the pixel
-			if (!clear)
+			if (clip.contains(x, y))
 			{
-				if (src4)
-					pen = (m_gfx[(z >> 1) % m_gfx.length()] >> (BIT(z, 0) << 2)) & 0x0f;
-				else
-					pen = m_gfx[z % m_gfx.length()];
+				// fetch the pixel
+				u8 pen = 0;
+				if (!clear)
+				{
+					if (src4)
+						pen = (m_gfx[(z >> 1) % m_gfx.length()] >> (BIT(z, 0) << 2)) & 0x0f;
+					else
+						pen = m_gfx[z % m_gfx.length()];
 
-				if (m_gfx_hi)
-					pen = (pen & 0x0f) | (BIT(m_gfx_hi[(z >> 3) % m_gfx_hi.length()], z & 7) << 4);
+					if (m_gfx_hi)
+						pen = (pen & 0x0f) | (BIT(m_gfx_hi[(z >> 3) % m_gfx_hi.length()], z & 0x07) << 4);
+				}
+
+				// plot it
+				if (clear || (pen != trans_pen) || opaque)
+				{
+					u8 const val = clear ? clear_pen : (pen != trans_pen) ? (pen | pen_hi) : 0xff;
+					u8 &destbyte = dest[(y << 9) | x];
+					if (dst4)
+						destbyte = (destbyte & mask) | ((val & 0x0f) << shift);
+					else
+						destbyte = val;
+				}
 			}
-
-			// plot it
-			if (clip.contains(x, y) && (clear || (pen != trans_pen) || opaque))
-			{
-				u8 const val = clear ? clear_pen : (pen != trans_pen) ? (pen | pen_hi) : 0xff;
-				u8 &destbyte = dest[(y << 9) | x];
-				if (dst4)
-					destbyte = (destbyte & mask) | ((val & 0x0f) << shift);
-				else
-					destbyte = val;
-			}
-
-			z++;
+			++z;
 		}
 	}
-
-	#ifdef MAME_DEBUG
-#if 1
-	if (machine().input().code_pressed(KEYCODE_Z))
-	{   char buf[20];
-		sprintf(buf, "%02X%02X",m_blitter.depth,m_blitter.flags&0xff);
-//      ui_draw_text(buf, m_blitter.x, m_blitter.y);    // crashes mame!
-	}
-#endif
-	#endif
 }
 
 /***************************************************************************
@@ -662,13 +685,11 @@ void igs011_state::igs011_blit_flags_w(offs_t offset, u16 data, u16 mem_mask)
 
 ***************************************************************************/
 
-void igs011_state::machine_start()
+void igs011_state_base::machine_start()
 {
 	m_prot1_addr = 0;
-	m_lhb_irq_enable = 0;
 
 	save_item(NAME(m_dips_sel));
-	save_item(NAME(m_input_sel));
 	save_item(NAME(m_prot1));
 	save_item(NAME(m_prot1_swap));
 	save_item(NAME(m_prot1_addr));
@@ -677,7 +698,6 @@ void igs011_state::machine_start()
 	save_item(NAME(m_igs012_prot_swap));
 	save_item(NAME(m_igs012_prot_mode));
 	save_item(NAME(m_igs003_reg));
-	save_item(NAME(m_lhb_irq_enable));
 	save_item(NAME(m_igs003_prot_hold));
 	save_item(NAME(m_igs003_prot_x));
 	save_item(NAME(m_igs003_prot_y));
@@ -686,9 +706,19 @@ void igs011_state::machine_start()
 	save_item(NAME(m_igs003_prot_h2));
 }
 
+void igs011_oki_state::machine_start()
+{
+	igs011_state_base::machine_start();
+
+	m_lhb_irq_enable = 0;
+
+	save_item(NAME(m_input_sel));
+	save_item(NAME(m_lhb_irq_enable));
+}
+
 // Inputs
 
-u16 igs011_state::key_matrix_r()
+u16 igs011_oki_state::key_matrix_r()
 {
 	u16 ret = 0xffff;
 
@@ -701,13 +731,13 @@ u16 igs011_state::key_matrix_r()
 	return ret;
 }
 
-void igs011_state::dips_w(offs_t offset, u16 data, u16 mem_mask)
+void igs011_state_base::dips_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_dips_sel);
 }
 
 template<unsigned Num>
-u16 igs011_state::dips_r()
+u16 igs011_state_base::dips_r()
 {
 	// Games have 2 to 5 banks of DIP switches
 
@@ -726,9 +756,9 @@ u16 igs011_state::dips_r()
 
 ***************************************************************************/
 
-void igs011_state::wlcc_decrypt()
+void igs011_oki_state::wlcc_decrypt()
 {
-	u16 *src = (u16 *) (m_maincpu_region->base());
+	u16 *src = (u16 *)m_maincpu_region->base();
 
 	const int rom_size = 0x80000;
 
@@ -749,9 +779,9 @@ void igs011_state::wlcc_decrypt()
 }
 
 
-void igs011_state::lhb_decrypt()
+void igs011_oki_state::lhb_decrypt()
 {
-	u16 *src = (u16 *) (m_maincpu_region->base());
+	u16 *src = (u16 *)m_maincpu_region->base();
 
 	const int rom_size = 0x80000;
 
@@ -773,9 +803,9 @@ void igs011_state::lhb_decrypt()
 }
 
 
-void igs011_state::drgnwrld_type3_decrypt()
+void igs011_oki_state::drgnwrld_type3_decrypt()
 {
-	u16 *src = (u16 *) (m_maincpu_region->base());
+	u16 *src = (u16 *)m_maincpu_region->base();
 
 	const int rom_size = 0x80000;
 
@@ -800,9 +830,9 @@ void igs011_state::drgnwrld_type3_decrypt()
 	}
 }
 
-void igs011_state::drgnwrld_type2_decrypt()
+void igs011_oki_state::drgnwrld_type2_decrypt()
 {
-	u16 *src = (u16 *) (m_maincpu_region->base());
+	u16 *src = (u16 *)m_maincpu_region->base();
 
 	const int rom_size = 0x80000;
 
@@ -832,9 +862,9 @@ void igs011_state::drgnwrld_type2_decrypt()
 	}
 }
 
-void igs011_state::drgnwrld_type1_decrypt()
+void igs011_oki_state::drgnwrld_type1_decrypt()
 {
-	u16 *src = (u16 *) (m_maincpu_region->base());
+	u16 *src = (u16 *)m_maincpu_region->base();
 
 	const int rom_size = 0x80000;
 
@@ -859,11 +889,11 @@ void igs011_state::drgnwrld_type1_decrypt()
 	}
 }
 
-void igs011_state::drgnwrldv40k_decrypt()
+void igs011_oki_state::drgnwrldv40k_decrypt()
 {
 	drgnwrld_type1_decrypt();
 
-	u16 *src = (u16 *) (m_maincpu_region->base());
+	u16 *src = (u16 *)m_maincpu_region->base();
 
 	const int rom_size = 0x80000;
 
@@ -890,11 +920,11 @@ void igs011_state::drgnwrldv40k_decrypt()
 	}
 }
 
-void igs011_state::lhb2_decrypt()
+void igs011_oki_state::lhb2_decrypt()
 {
 	const int rom_size = 0x80000;
-	u16 *src = (u16 *) (m_maincpu_region->base());
-	std::vector<u16> result_data(rom_size/2);
+	u16 *src = (u16 *)m_maincpu_region->base();
+	std::unique_ptr<u16 []> result_data(new u16[rom_size / 2]);
 
 	for (int i=0; i<rom_size/2; i++)
 	{
@@ -917,11 +947,11 @@ void igs011_state::lhb2_decrypt()
 	memcpy(src,&result_data[0],rom_size);
 }
 
-void igs011_state::lhb3_decrypt()
+void igs011_oki_state::lhb3_decrypt()
 {
 	const int rom_size = 0x80000;
-	u16 *src = (u16 *) (m_maincpu_region->base());
-	std::vector<u16> result_data(rom_size / 2);
+	u16 *src = (u16 *)m_maincpu_region->base();
+	std::unique_ptr<u16 []> result_data(new u16[rom_size / 2]);
 
 	for (int i = 0; i < rom_size / 2; i++)
 	{
@@ -947,11 +977,11 @@ void igs011_state::lhb3_decrypt()
 
 
 // xor similar to ryukobou (both sets are Japan), address scrambling from lhb2
-void igs011_state::nkishusp_decrypt()
+void igs011_oki_state::nkishusp_decrypt()
 {
 	const int rom_size = 0x80000;
-	u16 *src = (u16 *) (m_maincpu_region->base());
-	std::vector<u16> result_data(rom_size/2);
+	u16 *src = (u16 *)m_maincpu_region->base();
+	std::unique_ptr<u16 []> result_data(new u16[rom_size / 2]);
 
 	for (int i=0; i<rom_size/2; i++)
 	{
@@ -983,11 +1013,11 @@ void igs011_state::nkishusp_decrypt()
 }
 
 
-void igs011_state::tygn_decrypt()
+void igs011_oki_state::tygn_decrypt()
 {
 	const int rom_size = 0x80000;
-	u16 *src = (u16 *) (m_maincpu_region->base());
-	std::vector<u16> result_data(rom_size / 2);
+	u16 *src = (u16 *)m_maincpu_region->base();
+	std::unique_ptr<u16 []> result_data(new u16[rom_size / 2]);
 
 	for (int i = 0; i < rom_size / 2; i++)
 	{
@@ -1018,7 +1048,7 @@ void igs011_state::tygn_decrypt()
 
 void vbowl_state::vbowl_decrypt()
 {
-	u16 *src = (u16 *) (m_maincpu_region->base());
+	u16 *src = (u16 *)m_maincpu_region->base();
 
 	const int rom_size = 0x80000;
 
@@ -1053,7 +1083,7 @@ void vbowl_state::vbowlhk_decrypt()
 {
 	vbowl_decrypt();
 
-	u16 *src = (u16 *) (m_maincpu_region->base());
+	u16 *src = (u16 *)m_maincpu_region->base();
 
 	const int rom_size = 0x80000;
 
@@ -1098,9 +1128,9 @@ void vbowl_state::vbowlhk_decrypt()
 }
 
 
-void igs011_state::dbc_decrypt()
+void igs011_oki_state::dbc_decrypt()
 {
-	u16 *src = (u16 *) (m_maincpu_region->base());
+	u16 *src = (u16 *)m_maincpu_region->base();
 
 	const int rom_size = 0x80000;
 
@@ -1147,9 +1177,9 @@ void igs011_state::dbc_decrypt()
 }
 
 
-void igs011_state::ryukobou_decrypt()
+void igs011_oki_state::ryukobou_decrypt()
 {
-	u16 *src = (u16 *) m_maincpu_region->base();
+	u16 *src = (u16 *)m_maincpu_region->base();
 	const int rom_size = 0x80000;
 
 	for (int i=0; i<rom_size/2; i++)
@@ -1177,11 +1207,11 @@ void igs011_state::ryukobou_decrypt()
 ***************************************************************************/
 
 
-void igs011_state::lhb2_gfx_decrypt()
+void igs011_oki_state::lhb2_gfx_decrypt()
 {
 	const unsigned rom_size = 0x200000;
-	u8 *src = (u8 *) (memregion("blitter")->base());
-	std::vector<u8> result_data(rom_size);
+	u8 *src = (u8 *)memregion("blitter")->base();
+	std::unique_ptr<u8 []> result_data(new u8[rom_size]);
 
 	for (int i=0; i<rom_size; i++)
 		result_data[i] = src[bitswap<24>(i, 23,22,21,20, 19, 17,16,15, 13,12, 10,9,8,7,6,5,4, 2,1, 3, 11, 14, 18, 0)];
@@ -1189,11 +1219,11 @@ void igs011_state::lhb2_gfx_decrypt()
 	memcpy(src,&result_data[0],rom_size);
 }
 
-void igs011_state::drgnwrld_gfx_decrypt()
+void igs011_oki_state::drgnwrld_gfx_decrypt()
 {
 	const unsigned rom_size = 0x400000;
-	u8 *src = (u8 *) (memregion("blitter")->base());
-	std::vector<u8> result_data(rom_size);
+	u8 *src = (u8 *)memregion("blitter")->base();
+	std::unique_ptr<u8 []> result_data(new u8[rom_size]);
 
 	for (int i=0; i<rom_size; i++)
 		result_data[i] = src[bitswap<24>(i, 23,22,21,20,19,18,17,16,15, 12, 13, 14, 11,10,9,8,7,6,5,4,3,2,1,0)];
@@ -1252,7 +1282,7 @@ void vbowl_state::vbowl_gfx_unpack()
 ***************************************************************************/
 
 
-void igs011_state::igs011_prot1_w(offs_t offset, u8 data)
+void igs011_state_base::igs011_prot1_w(offs_t offset, u8 data)
 {
 	offset *= 2;
 
@@ -1295,7 +1325,7 @@ void igs011_state::igs011_prot1_w(offs_t offset, u8 data)
 
 	logerror("%s: warning, unknown igs011_prot1_w( %04x, %02x )\n", machine().describe_context(), offset, data);
 }
-u16 igs011_state::igs011_prot1_r()
+u16 igs011_state_base::igs011_prot1_r()
 {
 	// !(b1&b2) . 0 . 0 . (b0^b3) . 0 . 0
 	u8 x = m_prot1;
@@ -1303,7 +1333,7 @@ u16 igs011_state::igs011_prot1_r()
 }
 
 
-void igs011_state::igs011_prot_addr_w(u16 data)
+void igs011_state_base::igs011_prot_addr_w(u16 data)
 {
 	m_prot1 = 0x00;
 	m_prot1_swap = 0x00;
@@ -1321,16 +1351,16 @@ void igs011_state::igs011_prot_addr_w(u16 data)
 	prot_mem_range_set();
 }
 
-void igs011_state::prot_mem_range_set()
+void igs011_state_base::prot_mem_range_set()
 {
 	address_space &sp = m_maincpu->space(AS_PROGRAM);
 
 	// Add protection memory range
-	sp.install_write_handler(m_prot1_addr + 0, m_prot1_addr + 7, write8sm_delegate(*this, FUNC(igs011_state::igs011_prot1_w)), 0xff00);
-	sp.install_read_handler (m_prot1_addr + 8, m_prot1_addr + 9, read16smo_delegate(*this, FUNC(igs011_state::igs011_prot1_r)));
+	sp.install_write_handler(m_prot1_addr + 0, m_prot1_addr + 7, write8sm_delegate(*this, FUNC(igs011_state_base::igs011_prot1_w)), 0xff00);
+	sp.install_read_handler (m_prot1_addr + 8, m_prot1_addr + 9, read16smo_delegate(*this, FUNC(igs011_state_base::igs011_prot1_r)));
 }
 /*
-u16 igs011_state::igs011_prot_fake_r(offs_t offset)
+u16 igs011_state_base::igs011_prot_fake_r(offs_t offset)
 {
     switch (offset)
     {
@@ -1346,13 +1376,13 @@ u16 igs011_state::igs011_prot_fake_r(offs_t offset)
 // Prot2
 
 // drgnwrld (33)
-void igs011_state::igs011_prot2_reset_w(u8 data)
+void igs011_state_base::igs011_prot2_reset_w(u8 data)
 {
 	m_prot2 = 0x00;
 }
 
 // wlcc
-u16 igs011_state::igs011_prot2_reset_r()
+u16 igs011_state_base::igs011_prot2_reset_r()
 {
 	if (!machine().side_effects_disabled())
 		m_prot2 = 0x00;
@@ -1362,7 +1392,7 @@ u16 igs011_state::igs011_prot2_reset_r()
 
 
 // lhb2 (55), lhb/dbc/ryukobou (33)
-void igs011_state::igs011_prot2_inc_w(u8 data)
+void igs011_state_base::igs011_prot2_inc_w(u8 data)
 {
 //  if ((data & 0xff) == 0x55)
 	{
@@ -1373,7 +1403,7 @@ void igs011_state::igs011_prot2_inc_w(u8 data)
 }
 
 // vbowl (33)
-void igs011_state::igs011_prot2_dec_w(u8 data)
+void igs011_state_base::igs011_prot2_dec_w(u8 data)
 {
 //  if ((data & 0xff) == 0x33)
 	{
@@ -1384,7 +1414,7 @@ void igs011_state::igs011_prot2_dec_w(u8 data)
 }
 
 
-void igs011_state::drgnwrld_igs011_prot2_swap_w(u8 data)
+void igs011_state_base::drgnwrld_igs011_prot2_swap_w(u8 data)
 {
 //  if ((data & 0xff) == 0x33)
 	{
@@ -1397,7 +1427,7 @@ void igs011_state::drgnwrld_igs011_prot2_swap_w(u8 data)
 }
 
 // lhb, xymg, lhb2
-void igs011_state::lhb_igs011_prot2_swap_w(u8 data)
+void igs011_oki_state::lhb_igs011_prot2_swap_w(u8 data)
 {
 //  if ((data & 0xff) == 0x33)
 	{
@@ -1410,7 +1440,7 @@ void igs011_state::lhb_igs011_prot2_swap_w(u8 data)
 }
 
 // wlcc
-void igs011_state::wlcc_igs011_prot2_swap_w(u8 data)
+void igs011_oki_state::wlcc_igs011_prot2_swap_w(u8 data)
 {
 //  if ((data & 0xff) == 0x33)
 	{
@@ -1437,7 +1467,7 @@ void vbowl_state::vbowl_igs011_prot2_swap_w(u8 data)
 
 
 // drgnwrld
-u16 igs011_state::drgnwrldv40k_igs011_prot2_r()
+u16 igs011_state_base::drgnwrldv40k_igs011_prot2_r()
 {
 	// b9 = (!b4 & !b0) | ((b3 & !b2) & !(b1 ^ b0)
 	u8 x = m_prot2;
@@ -1445,14 +1475,14 @@ u16 igs011_state::drgnwrldv40k_igs011_prot2_r()
 	return (b9 << 9);
 }
 
-u16 igs011_state::drgnwrldv21_igs011_prot2_r()
+u16 igs011_state_base::drgnwrldv21_igs011_prot2_r()
 {
 	// b9 = (!b4) | (!b0 & b2) | (!(b3 ^ b1) & !(!(b4 & b0) | b2))
 	u8 x = m_prot2;
 	u8 b9 = (BIT(x,4)^1) | ((BIT(x,0)^1) & BIT(x,2)) | ((BIT(x,3)^BIT(x,1)^1) & ((((BIT(x,4)^1) & BIT(x,0)) | BIT(x,2))^1) );
 	return (b9 << 9);
 }
-u16 igs011_state::drgnwrldv20j_igs011_prot2_r()
+u16 igs011_state_base::drgnwrldv20j_igs011_prot2_r()
 {
 	// b9 = (!b4 | !b0) | !(b3 | b1) | !(b2 & b0)
 	u8 x = m_prot2;
@@ -1461,7 +1491,7 @@ u16 igs011_state::drgnwrldv20j_igs011_prot2_r()
 }
 
 // lhb, xymg
-u16 igs011_state::lhb_igs011_prot2_r()
+u16 igs011_oki_state::lhb_igs011_prot2_r()
 {
 	// b9 = !b2 | (b1 & b0)
 	u8 x = m_prot2;
@@ -1470,7 +1500,7 @@ u16 igs011_state::lhb_igs011_prot2_r()
 }
 
 // dbc
-u16 igs011_state::dbc_igs011_prot2_r()
+u16 igs011_oki_state::dbc_igs011_prot2_r()
 {
 	// b9 = !b1 | (!b0 & b2)
 	u8 x = m_prot2;
@@ -1479,7 +1509,7 @@ u16 igs011_state::dbc_igs011_prot2_r()
 }
 
 // ryukobou
-u16 igs011_state::ryukobou_igs011_prot2_r()
+u16 igs011_oki_state::ryukobou_igs011_prot2_r()
 {
 	// b9 = (!b1 | b2) & b0
 	u8 x = m_prot2;
@@ -1488,7 +1518,7 @@ u16 igs011_state::ryukobou_igs011_prot2_r()
 }
 
 // lhb2
-u16 igs011_state::lhb2_igs011_prot2_r()
+u16 igs011_oki_state::lhb2_igs011_prot2_r()
 {
 	// b3 = !b2 | !b1 | b0
 	u8 x = m_prot2;
@@ -1536,7 +1566,7 @@ u16 vbowl_state::vbowlhk_igs011_prot2_r()
 ***************************************************************************/
 
 
-void igs011_state::igs012_prot_reset_w(u16 data)
+void igs011_state_base::igs012_prot_reset_w(u16 data)
 {
 	m_igs012_prot = 0x00;
 	m_igs012_prot_swap = 0x00;
@@ -1544,7 +1574,7 @@ void igs011_state::igs012_prot_reset_w(u16 data)
 	m_igs012_prot_mode = 0;
 }
 /*
-u16 igs011_state::igs012_prot_fake_r(offs_t offset)
+u16 igs011_state_base::igs012_prot_fake_r(offs_t offset)
 {
     switch (offset)
     {
@@ -1559,7 +1589,7 @@ u16 igs011_state::igs012_prot_fake_r(offs_t offset)
 // Macro that checks whether the current mode and data byte written match the arguments
 #define MODE_AND_DATA(_MODE,_DATA)  (m_igs012_prot_mode == (_MODE) && ((data & 0xff) == (_DATA)) )
 
-void igs011_state::igs012_prot_mode_w(offs_t offset, u8 data)
+void igs011_state_base::igs012_prot_mode_w(offs_t offset, u8 data)
 {
 	if (MODE_AND_DATA(0, 0xcc) || MODE_AND_DATA(1, 0xcc) || MODE_AND_DATA(0, 0xdd) || MODE_AND_DATA(1, 0xdd))
 	{
@@ -1569,7 +1599,7 @@ void igs011_state::igs012_prot_mode_w(offs_t offset, u8 data)
 		logerror("%s: warning, unknown igs012_prot_mode_w( %04x, %04x ), mode %x\n", machine().describe_context(), offset, data, m_igs012_prot_mode);
 }
 
-void igs011_state::igs012_prot_inc_w(offs_t offset, u8 data)
+void igs011_state_base::igs012_prot_inc_w(offs_t offset, u8 data)
 {
 	if (MODE_AND_DATA(0, 0xff) )
 	{
@@ -1579,7 +1609,7 @@ void igs011_state::igs012_prot_inc_w(offs_t offset, u8 data)
 		logerror("%s: warning, unknown igs012_prot_inc_w( %04x, %04x ), mode %x\n", machine().describe_context(), offset, data, m_igs012_prot_mode);
 }
 
-void igs011_state::igs012_prot_dec_inc_w(offs_t offset, u8 data)
+void igs011_state_base::igs012_prot_dec_inc_w(offs_t offset, u8 data)
 {
 	if (MODE_AND_DATA(0, 0xaa) )
 	{
@@ -1593,7 +1623,7 @@ void igs011_state::igs012_prot_dec_inc_w(offs_t offset, u8 data)
 		logerror("%s: warning, unknown igs012_prot_dec_inc_w( %04x, %04x ), mode %x\n", machine().describe_context(), offset, data, m_igs012_prot_mode);
 }
 
-void igs011_state::igs012_prot_dec_copy_w(offs_t offset, u8 data)
+void igs011_state_base::igs012_prot_dec_copy_w(offs_t offset, u8 data)
 {
 	if (MODE_AND_DATA(0, 0x33) )
 	{
@@ -1607,7 +1637,7 @@ void igs011_state::igs012_prot_dec_copy_w(offs_t offset, u8 data)
 		logerror("%s: warning, unknown igs012_prot_dec_copy_w( %04x, %04x ), mode %x\n", machine().describe_context(), offset, data, m_igs012_prot_mode);
 }
 
-void igs011_state::igs012_prot_copy_w(offs_t offset, u8 data)
+void igs011_state_base::igs012_prot_copy_w(offs_t offset, u8 data)
 {
 	if (MODE_AND_DATA(1, 0x22) )
 	{
@@ -1617,7 +1647,7 @@ void igs011_state::igs012_prot_copy_w(offs_t offset, u8 data)
 		logerror("%s: warning, unknown igs012_prot_copy_w( %04x, %04x ), mode %x\n", machine().describe_context(), offset, data, m_igs012_prot_mode);
 }
 
-void igs011_state::igs012_prot_swap_w(offs_t offset, u8 data)
+void igs011_state_base::igs012_prot_swap_w(offs_t offset, u8 data)
 {
 	if (MODE_AND_DATA(0, 0x55) || MODE_AND_DATA(1, 0xa5) )
 	{
@@ -1629,7 +1659,7 @@ void igs011_state::igs012_prot_swap_w(offs_t offset, u8 data)
 		logerror("%s: warning, unknown igs012_prot_swap_w( %04x, %04x ), mode %x\n", machine().describe_context(), offset, data, m_igs012_prot_mode);
 }
 
-u16 igs011_state::igs012_prot_r()
+u16 igs011_state_base::igs012_prot_r()
 {
 	// FIXME: mode 0 and mode 1 are mapped to different memory ranges
 	u8 x = m_igs012_prot;
@@ -1646,12 +1676,12 @@ u16 igs011_state::igs012_prot_r()
 
 ***************************************************************************/
 
-void igs011_state::igs003_w(offs_t offset, u16 data, u16 mem_mask)
+void igs011_state_base::igs003_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_igs003_reg);
 }
 
-void igs011_state::drgnwrld_igs003_w(offs_t offset, u16 data, u16 mem_mask)
+void igs011_oki_state::drgnwrld_igs003_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	switch (m_igs003_reg)
 	{
@@ -1676,7 +1706,8 @@ void igs011_state::drgnwrld_igs003_w(offs_t offset, u16 data, u16 mem_mask)
 			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", m_maincpu->pc(), m_igs003_reg, data);
 	}
 }
-u16 igs011_state::drgnwrld_igs003_r()
+
+u16 igs011_oki_state::drgnwrld_igs003_r()
 {
 	switch (m_igs003_reg)
 	{
@@ -1713,7 +1744,7 @@ u16 igs011_state::drgnwrld_igs003_r()
 	return 0;
 }
 
-void igs011_state::lhb_inputs_w(offs_t offset, u16 data, u16 mem_mask)
+void igs011_oki_state::lhb_inputs_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_input_sel);
 
@@ -1727,10 +1758,10 @@ void igs011_state::lhb_inputs_w(offs_t offset, u16 data, u16 mem_mask)
 	if (m_input_sel & (~0xff))
 		logerror("%06x: warning, unknown bits written in input_sel = %02x\n", m_maincpu->pc(), m_input_sel);
 
-	//popmessage("sel2 %02x",m_input_sel&~0x1f);
+	//popmessage("sel2 %02x", m_input_sel & ~0x1f);
 }
 
-u16 igs011_state::lhb_inputs_r(offs_t offset)
+u16 igs011_oki_state::lhb_inputs_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -1741,7 +1772,7 @@ u16 igs011_state::lhb_inputs_r(offs_t offset)
 }
 
 
-void igs011_state::lhb2_igs003_w(offs_t offset, u16 data, u16 mem_mask)
+void igs011_oki_state::lhb2_igs003_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	switch (m_igs003_reg)
 	{
@@ -1758,7 +1789,7 @@ void igs011_state::lhb2_igs003_w(offs_t offset, u16 data, u16 mem_mask)
 			if (m_input_sel & ~0x7f)
 				logerror("%06x: warning, unknown bits written in input_sel = %02x\n", m_maincpu->pc(), m_input_sel);
 
-//          popmessage("sel2 %02x",m_input_sel&~0x1f);
+			//popmessage("sel2 %02x", m_input_sel & ~0x1f);
 			break;
 
 		case 0x02:
@@ -1772,7 +1803,7 @@ void igs011_state::lhb2_igs003_w(offs_t offset, u16 data, u16 mem_mask)
 			if (m_blitter_pen_hi & ~0xf)
 				logerror("%06x: warning, unknown bits written in blitter_pen_hi = %02x\n", m_maincpu->pc(), m_blitter_pen_hi);
 
-//          popmessage("oki %02x",m_blitter_pen_hi & 0x08);
+			//popmessage("oki %02x", m_blitter_pen_hi & 0x08);
 			break;
 
 		case 0x40:
@@ -1833,11 +1864,11 @@ void igs011_state::lhb2_igs003_w(offs_t offset, u16 data, u16 mem_mask)
 			break;
 
 		default:
-//          popmessage("igs003 %x <- %04x",m_igs003_reg,data);
+			//popmessage("igs003 %x <- %04x",m_igs003_reg,data);
 			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", m_maincpu->pc(), m_igs003_reg, data);
 	}
 }
-u16 igs011_state::lhb2_igs003_r()
+u16 igs011_oki_state::lhb2_igs003_r()
 {
 	switch (m_igs003_reg)
 	{
@@ -1882,7 +1913,7 @@ u16 igs011_state::lhb2_igs003_r()
 }
 
 
-void igs011_state::wlcc_igs003_w(offs_t offset, u16 data, u16 mem_mask)
+void igs011_oki_state::wlcc_igs003_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	switch (m_igs003_reg)
 	{
@@ -1907,7 +1938,7 @@ void igs011_state::wlcc_igs003_w(offs_t offset, u16 data, u16 mem_mask)
 	}
 }
 
-u16 igs011_state::wlcc_igs003_r()
+u16 igs011_oki_state::wlcc_igs003_r()
 {
 	switch (m_igs003_reg)
 	{
@@ -1944,7 +1975,7 @@ u16 igs011_state::wlcc_igs003_r()
 }
 
 
-void igs011_state::xymg_igs003_w(offs_t offset, u16 data, u16 mem_mask)
+void igs011_oki_state::xymg_igs003_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	switch (m_igs003_reg)
 	{
@@ -1968,7 +1999,7 @@ void igs011_state::xymg_igs003_w(offs_t offset, u16 data, u16 mem_mask)
 			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", m_maincpu->pc(), m_igs003_reg, data);
 	}
 }
-u16 igs011_state::xymg_igs003_r()
+u16 igs011_oki_state::xymg_igs003_r()
 {
 	switch (m_igs003_reg)
 	{
@@ -2216,9 +2247,9 @@ void vbowl_state::vbowlhk_igs003_w(offs_t offset, u16 data, u16 mem_mask)
 ***************************************************************************/
 
 // V0400O
-void igs011_state::init_drgnwrld()
+void igs011_oki_state::init_drgnwrld()
 {
-//  u16 *rom = (u16 *) m_maincpu_region->base();
+//  u16 *rom = (u16 *)m_maincpu_region->base();
 
 	drgnwrld_type1_decrypt();
 	drgnwrld_gfx_decrypt();
@@ -2242,9 +2273,9 @@ void igs011_state::init_drgnwrld()
 */
 }
 
-void igs011_state::init_drgnwrldv30()
+void igs011_oki_state::init_drgnwrldv30()
 {
-//  u16 *rom = (u16 *) m_maincpu_region->base();
+//  u16 *rom = (u16 *)m_maincpu_region->base();
 
 	drgnwrld_type1_decrypt();
 	drgnwrld_gfx_decrypt();
@@ -2267,13 +2298,13 @@ void igs011_state::init_drgnwrldv30()
 */
 }
 
-void igs011_state::init_drgnwrldv21()
+void igs011_oki_state::init_drgnwrldv21()
 {
-//  u16 *rom = (u16 *) m_maincpu_region->base();
+//  u16 *rom = (u16 *)m_maincpu_region->base();
 
 	drgnwrld_type2_decrypt();
 	drgnwrld_gfx_decrypt();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd4c0, 0xd4ff, read16smo_delegate(*this, FUNC(igs011_state::drgnwrldv21_igs011_prot2_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd4c0, 0xd4ff, read16smo_delegate(*this, FUNC(igs011_oki_state::drgnwrldv21_igs011_prot2_r)));
 /*
     // PROTECTION CHECKS
     // bp 32ee; bp 11ca8; bp 23d5e; bp 23fd0; bp 24170; bp 24348; bp 2454e; bp 246cc; bp 24922; bp 24b66; bp 24de2; bp 2502a; bp 25556; bp 269de; bp 2766a; bp 2a830
@@ -2296,9 +2327,9 @@ void igs011_state::init_drgnwrldv21()
 */
 }
 
-void igs011_state::init_drgnwrldv21j()
+void igs011_oki_state::init_drgnwrldv21j()
 {
-//  u16 *rom = (u16 *) m_maincpu_region->base();
+//  u16 *rom = (u16 *)m_maincpu_region->base();
 
 	drgnwrld_type3_decrypt();
 	drgnwrld_gfx_decrypt();
@@ -2323,9 +2354,9 @@ void igs011_state::init_drgnwrldv21j()
 */
 }
 
-void igs011_state::init_drgnwrldv20j()
+void igs011_oki_state::init_drgnwrldv20j()
 {
-//  u16 *rom = (u16 *) m_maincpu_region->base();
+//  u16 *rom = (u16 *)m_maincpu_region->base();
 
 	drgnwrld_type3_decrypt();
 	drgnwrld_gfx_decrypt();
@@ -2352,15 +2383,15 @@ void igs011_state::init_drgnwrldv20j()
 */
 }
 
-void igs011_state::init_drgnwrldv40k()
+void igs011_oki_state::init_drgnwrldv40k()
 {
 	drgnwrldv40k_decrypt();
 	drgnwrld_gfx_decrypt();
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd4c0, 0xd4ff, read16smo_delegate(*this, FUNC(igs011_state::drgnwrldv40k_igs011_prot2_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xd4c0, 0xd4ff, read16smo_delegate(*this, FUNC(igs011_oki_state::drgnwrldv40k_igs011_prot2_r)));
 }
 
-void igs011_state::init_drgnwrldv11h()
+void igs011_oki_state::init_drgnwrldv11h()
 {
 	drgnwrld_type1_decrypt();
 	drgnwrld_gfx_decrypt();
@@ -2369,9 +2400,9 @@ void igs011_state::init_drgnwrldv11h()
 	// the protection checks are already patched out like we do!
 }
 
-void igs011_state::init_drgnwrldv10c()
+void igs011_oki_state::init_drgnwrldv10c()
 {
-//  u16 *rom = (u16 *) m_maincpu_region->base();
+//  u16 *rom = (u16 *)m_maincpu_region->base();
 
 	drgnwrld_type1_decrypt();
 	drgnwrld_gfx_decrypt();
@@ -2395,9 +2426,9 @@ void igs011_state::init_drgnwrldv10c()
 }
 
 
-void igs011_state::init_lhb()
+void igs011_oki_state::init_lhb()
 {
-//  u16 *rom = (u16 *) m_maincpu_region->base();
+//  u16 *rom = (u16 *)m_maincpu_region->base();
 
 	lhb_decrypt();
 
@@ -2405,9 +2436,9 @@ void igs011_state::init_lhb()
 //  rom[0x2eef6/2]  =   0x4e75;     // 02EEF6: 4E56 FE00    link A6, #-$200  (fills palette with pink otherwise)
 }
 
-void igs011_state::init_lhbv33c()
+void igs011_oki_state::init_lhbv33c()
 {
-//  u16 *rom = (u16 *) m_maincpu_region->base();
+//  u16 *rom = (u16 *)m_maincpu_region->base();
 
 	lhb_decrypt();
 
@@ -2415,13 +2446,13 @@ void igs011_state::init_lhbv33c()
 //  rom[0x2e988/2]  =   0x4e75;     // 02E988: 4E56 FE00    link A6, #-$200  (fills palette with pink otherwise)
 }
 
-void igs011_state::init_dbc()
+void igs011_oki_state::init_dbc()
 {
-//  u16 *rom = (u16 *) m_maincpu_region->base();
+//  u16 *rom = (u16 *)m_maincpu_region->base();
 
 	dbc_decrypt();
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x10600, 0x107ff, read16smo_delegate(*this, FUNC(igs011_state::dbc_igs011_prot2_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x10600, 0x107ff, read16smo_delegate(*this, FUNC(igs011_oki_state::dbc_igs011_prot2_r)));
 /*
     // PROTECTION CHECKS
     rom[0x04c42/2]  =   0x602e;     // 004C42: 6604         bne 4c48  (rom test error otherwise)
@@ -2445,22 +2476,22 @@ void igs011_state::init_dbc()
 //  rom[0x19E90/2]  =   0x00ff;
 }
 
-void igs011_state::init_ryukobou()
+void igs011_oki_state::init_ryukobou()
 {
-//  u16 *rom = (u16 *) m_maincpu_region->base();
+//  u16 *rom = (u16 *)m_maincpu_region->base();
 
 	ryukobou_decrypt();
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x10600, 0x107ff, read16smo_delegate(*this, FUNC(igs011_state::ryukobou_igs011_prot2_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x10600, 0x107ff, read16smo_delegate(*this, FUNC(igs011_oki_state::ryukobou_igs011_prot2_r)));
 
 	// PROTECTION CHECKS
 //  rom[0x2df68/2]  =   0x4e75;     // 02DF68: 4E56 FE00    link A6, #-$200  (fills palette with pink otherwise)
 }
 
 
-void igs011_state::init_xymg()
+void igs011_oki_state::init_xymg()
 {
-//  u16 *rom = (u16 *) m_maincpu_region->base();
+//  u16 *rom = (u16 *)m_maincpu_region->base();
 
 	lhb_decrypt();
 /*
@@ -2492,9 +2523,9 @@ void igs011_state::init_xymg()
 */
 }
 
-void igs011_state::init_xymga()
+void igs011_oki_state::init_xymga()
 {
-	u16 *src = (u16 *) m_maincpu_region->base();
+	u16 *src = (u16 *)m_maincpu_region->base();
 	const int rom_size = 0x80000;
 
 	for (int i = 0; i < rom_size / 2; i++)
@@ -2514,9 +2545,9 @@ void igs011_state::init_xymga()
 	}
 }
 
-void igs011_state::init_wlcc()
+void igs011_oki_state::init_wlcc()
 {
-//  u16 *rom = (u16 *) m_maincpu_region->base();
+//  u16 *rom = (u16 *)m_maincpu_region->base();
 
 	wlcc_decrypt();
 /*
@@ -2538,9 +2569,9 @@ void igs011_state::init_wlcc()
 }
 
 
-void igs011_state::init_lhb2()
+void igs011_oki_state::init_lhb2()
 {
-//  u16 *rom = (u16 *) m_maincpu_region->base();
+//  u16 *rom = (u16 *)m_maincpu_region->base();
 
 	lhb2_decrypt();
 	lhb2_gfx_decrypt();
@@ -2561,14 +2592,14 @@ void igs011_state::init_lhb2()
 */
 }
 
-void igs011_state::init_lhb2cpgs()
+void igs011_oki_state::init_lhb2cpgs()
 {
 	lhb3_decrypt();
 	lhb2_gfx_decrypt();
 
 	// PROTECTION CHECKS (possibly incomplete)
 
-	u16 *rom = (u16 *) m_maincpu_region->base();
+	u16 *rom = (u16 *)m_maincpu_region->base();
 
 	rom[0x2807a / 2] = 0x6036;
 	rom[0x2cd98 / 2] = 0x6036;
@@ -2578,14 +2609,14 @@ void igs011_state::init_lhb2cpgs()
 	rom[0x3f144 / 2] = 0x6036;
 }
 
-void igs011_state::init_lhb3()
+void igs011_oki_state::init_lhb3()
 {
 	lhb3_decrypt();
 	lhb2_gfx_decrypt();
 
 	// PROTECTION CHECKS (possibly incomplete)
 
-	u16 *rom = (u16 *) m_maincpu_region->base();
+	u16 *rom = (u16 *)m_maincpu_region->base();
 
 	rom[0x034a6 / 2] = 0x6042;
 	rom[0x1a236 / 2] = 0x6034;
@@ -2606,7 +2637,7 @@ void igs011_state::init_lhb3()
 	rom[0x4b85a / 2] = 0x6038;
 }
 
-void igs011_state::init_tygn()
+void igs011_oki_state::init_tygn()
 {
 	tygn_decrypt();
 
@@ -2614,7 +2645,7 @@ void igs011_state::init_tygn()
 
 	// PROTECTION CHECKS (similar to nkishusp)
 
-	u16 *rom = (u16 *) m_maincpu_region->base();
+	u16 *rom = (u16 *)m_maincpu_region->base();
 
 	rom[0x036d8 / 2]  =   0x6042;     // 0036d8: 660E      bne     $36e8 (ROM test)
 
@@ -2638,7 +2669,7 @@ void igs011_state::init_tygn()
 
 void vbowl_state::init_vbowl()
 {
-	u16 *rom = (u16 *) m_maincpu_region->base();
+	u16 *rom = (u16 *)m_maincpu_region->base();
 
 	vbowl_decrypt();
 	vbowl_gfx_unpack();
@@ -2658,7 +2689,7 @@ void vbowl_state::init_vbowl()
 
 void vbowl_state::init_vbowlj()
 {
-//  u16 *rom = (u16 *) m_maincpu_region->base();
+//  u16 *rom = (u16 *)m_maincpu_region->base();
 
 	vbowl_decrypt();
 	vbowl_gfx_unpack();
@@ -2683,9 +2714,9 @@ void vbowl_state::init_vbowlhk()
 }
 
 
-void igs011_state::init_nkishusp()
+void igs011_oki_state::init_nkishusp()
 {
-	u16 *rom = (u16 *) m_maincpu_region->base();
+	u16 *rom = (u16 *)m_maincpu_region->base();
 
 	nkishusp_decrypt();
 	lhb2_gfx_decrypt();
@@ -2719,73 +2750,79 @@ void igs011_state::init_nkishusp()
 
 ***************************************************************************/
 
-void igs011_state::drgnwrld_mem(address_map &map)
+void igs011_state_base::blitter_ctrl(address_map &map)
+{
+	// mapped at 0x858000 or 0xa58000
+	map(0x000000, 0x000001).w(FUNC(igs011_oki_state::igs011_blit_x_w));
+	map(0x000800, 0x000801).w(FUNC(igs011_oki_state::igs011_blit_y_w));
+	map(0x001000, 0x001001).w(FUNC(igs011_oki_state::igs011_blit_w_w));
+	map(0x001800, 0x001801).w(FUNC(igs011_oki_state::igs011_blit_h_w));
+	map(0x002000, 0x002001).w(FUNC(igs011_oki_state::igs011_blit_gfx_lo_w));
+	map(0x002800, 0x002801).w(FUNC(igs011_oki_state::igs011_blit_gfx_hi_w));
+	map(0x003000, 0x003001).w(FUNC(igs011_oki_state::igs011_blit_flags_w));
+	map(0x003800, 0x003801).w(FUNC(igs011_oki_state::igs011_blit_pen_w));
+	map(0x004000, 0x004001).w(FUNC(igs011_oki_state::igs011_blit_depth_w));
+}
+
+void igs011_oki_state::drgnwrld_mem(address_map &map)
 {
 //  drgnwrld: IGS011 protection dynamically mapped at 1dd7x
-//  map(0x01dd70, 0x01dd77).w(FUNC(igs011_state::igs011_prot1_w)).umask16(0xff00);
-//  map(0x01dd78, 0x01dd79).r(FUNC(igs011_state::igs011_prot1_r));
+//  map(0x01dd70, 0x01dd77).w(FUNC(igs011_oki_state::igs011_prot1_w)).umask16(0xff00);
+//  map(0x01dd78, 0x01dd79).r(FUNC(igs011_oki_state::igs011_prot1_r));
 
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x103fff).ram().share("nvram");
 	map(0x200000, 0x200fff).ram().share(m_priority_ram);
-	map(0x400000, 0x400fff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).umask16(0x00ff).share("palette");
-	map(0x401000, 0x401fff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).umask16(0x00ff).share("palette_ext");
+	map(0x400000, 0x400fff).umask16(0x00ff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).share("palette");
+	map(0x401000, 0x401fff).umask16(0x00ff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0x500000, 0x500001).portr("COIN");
 	map(0x600001, 0x600001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x700000, 0x700003).w("ymsnd", FUNC(ym3812_device::write)).umask16(0x00ff);
+	map(0x700000, 0x700003).umask16(0x00ff).w("ymsnd", FUNC(ym3812_device::write));
 
-	map(0x800000, 0x800001).w(FUNC(igs011_state::igs003_w));
-	map(0x800002, 0x800003).rw(FUNC(igs011_state::drgnwrld_igs003_r), FUNC(igs011_state::drgnwrld_igs003_w));
+	map(0x800000, 0x800001).w(FUNC(igs011_oki_state::igs003_w));
+	map(0x800002, 0x800003).rw(FUNC(igs011_oki_state::drgnwrld_igs003_r), FUNC(igs011_oki_state::drgnwrld_igs003_w));
 
-	map(0xa20000, 0xa20001).w(FUNC(igs011_state::igs011_priority_w));
-	map(0xa40000, 0xa40001).w(FUNC(igs011_state::dips_w));
+	map(0xa20000, 0xa20001).w(FUNC(igs011_oki_state::igs011_priority_w));
+	map(0xa40000, 0xa40001).w(FUNC(igs011_oki_state::dips_w));
 
-	map(0xa50000, 0xa50001).w(FUNC(igs011_state::igs011_prot_addr_w));
-//  map(0xa50000, 0xa50005).r(FUNC(igs011_state::igs011_prot_fake_r));
+	map(0xa50000, 0xa50001).w(FUNC(igs011_oki_state::igs011_prot_addr_w));
+//  map(0xa50000, 0xa50005).r(FUNC(igs011_oki_state::igs011_prot_fake_r));
 
-	map(0xa58000, 0xa58001).w(FUNC(igs011_state::igs011_blit_x_w));
-	map(0xa58800, 0xa58801).w(FUNC(igs011_state::igs011_blit_y_w));
-	map(0xa59000, 0xa59001).w(FUNC(igs011_state::igs011_blit_w_w));
-	map(0xa59800, 0xa59801).w(FUNC(igs011_state::igs011_blit_h_w));
-	map(0xa5a000, 0xa5a001).w(FUNC(igs011_state::igs011_blit_gfx_lo_w));
-	map(0xa5a800, 0xa5a801).w(FUNC(igs011_state::igs011_blit_gfx_hi_w));
-	map(0xa5b000, 0xa5b001).w(FUNC(igs011_state::igs011_blit_flags_w));
-	map(0xa5b800, 0xa5b801).w(FUNC(igs011_state::igs011_blit_pen_w));
-	map(0xa5c000, 0xa5c001).w(FUNC(igs011_state::igs011_blit_depth_w));
-	map(0xa88000, 0xa88001).r(FUNC(igs011_state::dips_r<3>));
+	map(0xa58000, 0xa5cfff).m(*this, FUNC(igs011_oki_state::blitter_ctrl));
+	map(0xa88000, 0xa88001).r(FUNC(igs011_oki_state::dips_r<3>));
 }
 
-void igs011_state::drgnwrld_igs012_mem(address_map &map)
+void igs011_oki_state::drgnwrld_igs012_mem(address_map &map)
 {
 	drgnwrld_mem(map);
 
 	// IGS012
-	map(0x001600, 0x00160f).w(FUNC(igs011_state::igs012_prot_swap_w)).mirror(0x01c000); // swap (a5 / 55)
-	map(0x001610, 0x00161f).r(FUNC(igs011_state::igs012_prot_r)).mirror(0x01c000); // read (mode 0)
-	map(0x001620, 0x00162f).w(FUNC(igs011_state::igs012_prot_dec_inc_w)).mirror(0x01c000); // dec  (aa), inc  (fa)
-	map(0x001630, 0x00163f).w(FUNC(igs011_state::igs012_prot_inc_w)).mirror(0x01c000); // inc  (ff)
-	map(0x001640, 0x00164f).w(FUNC(igs011_state::igs012_prot_copy_w)).mirror(0x01c000); // copy (22)
-	map(0x001650, 0x00165f).w(FUNC(igs011_state::igs012_prot_dec_copy_w)).mirror(0x01c000); // dec  (5a), copy (33)
-	map(0x001660, 0x00166f).r(FUNC(igs011_state::igs012_prot_r)).mirror(0x01c000); // read (mode 1)
-	map(0x001670, 0x00167f).w(FUNC(igs011_state::igs012_prot_mode_w)).mirror(0x01c000); // mode (cc / dd)
+	map(0x001600, 0x00160f).mirror(0x01c000).w(FUNC(igs011_oki_state::igs012_prot_swap_w)); // swap (a5 / 55)
+	map(0x001610, 0x00161f).mirror(0x01c000).r(FUNC(igs011_oki_state::igs012_prot_r)); // read (mode 0)
+	map(0x001620, 0x00162f).mirror(0x01c000).w(FUNC(igs011_oki_state::igs012_prot_dec_inc_w)); // dec  (aa), inc  (fa)
+	map(0x001630, 0x00163f).mirror(0x01c000).w(FUNC(igs011_oki_state::igs012_prot_inc_w)); // inc  (ff)
+	map(0x001640, 0x00164f).mirror(0x01c000).w(FUNC(igs011_oki_state::igs012_prot_copy_w)); // copy (22)
+	map(0x001650, 0x00165f).mirror(0x01c000).w(FUNC(igs011_oki_state::igs012_prot_dec_copy_w)); // dec  (5a), copy (33)
+	map(0x001660, 0x00166f).mirror(0x01c000).r(FUNC(igs011_oki_state::igs012_prot_r)); // read (mode 1)
+	map(0x001670, 0x00167f).mirror(0x01c000).w(FUNC(igs011_oki_state::igs012_prot_mode_w)); // mode (cc / dd)
 
-	map(0x00d400, 0x00d43f).w(FUNC(igs011_state::igs011_prot2_dec_w));   // dec   (33)
-	map(0x00d440, 0x00d47f).w(FUNC(igs011_state::drgnwrld_igs011_prot2_swap_w));   // swap  (33)
-	map(0x00d480, 0x00d4bf).w(FUNC(igs011_state::igs011_prot2_reset_w));   // reset (33)
-	map(0x00d4c0, 0x00d4ff).r(FUNC(igs011_state::drgnwrldv20j_igs011_prot2_r));   // read
+	map(0x00d400, 0x00d43f).w(FUNC(igs011_oki_state::igs011_prot2_dec_w));   // dec   (33)
+	map(0x00d440, 0x00d47f).w(FUNC(igs011_oki_state::drgnwrld_igs011_prot2_swap_w));   // swap  (33)
+	map(0x00d480, 0x00d4bf).w(FUNC(igs011_oki_state::igs011_prot2_reset_w));   // reset (33)
+	map(0x00d4c0, 0x00d4ff).r(FUNC(igs011_oki_state::drgnwrldv20j_igs011_prot2_r));   // read
 
-	map(0x902000, 0x902fff).w(FUNC(igs011_state::igs012_prot_reset_w));   // reset?
-//  map(0x902000, 0x902005).w(FUNC(igs011_state::igs012_prot_fake_r));
+	map(0x902000, 0x902fff).w(FUNC(igs011_oki_state::igs012_prot_reset_w));   // reset?
+//  map(0x902000, 0x902005).w(FUNC(igs011_oki_state::igs012_prot_fake_r));
 }
 
 
 // Only values 0 and 7 are written (1 bit per irq source?)
-void igs011_state::lhb_irq_enable_w(offs_t offset, u16 data, u16 mem_mask)
+void igs011_oki_state::lhb_irq_enable_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_lhb_irq_enable);
 }
 
-void igs011_state::lhb_okibank_w(u8 data)
+void igs011_oki_state::lhb_okibank_w(u8 data)
 {
 	m_oki->set_rom_bank(BIT(data, 1));
 
@@ -2795,237 +2832,197 @@ void igs011_state::lhb_okibank_w(u8 data)
 //  popmessage("oki %04x",data);
 }
 
-void igs011_state::lhb_mem(address_map &map)
+void igs011_oki_state::lhb_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 
 //  lhb: IGS011 protection dynamically mapped at 834x
-//  map(0x008340, 0x008347).w(FUNC(igs011_state::igs011_prot1_w)).umask16(0xff00);
-//  map(0x008348, 0x008349).r(FUNC(igs011_state::igs011_prot1_r));
+//  map(0x008340, 0x008347).w(FUNC(igs011_oki_state::igs011_prot1_w)).umask16(0xff00);
+//  map(0x008348, 0x008349).r(FUNC(igs011_oki_state::igs011_prot1_r));
 
-	map(0x010000, 0x010000).w(FUNC(igs011_state::lhb_okibank_w));
+	map(0x010000, 0x010000).w(FUNC(igs011_oki_state::lhb_okibank_w));
 
-	map(0x010200, 0x0103ff).w(FUNC(igs011_state::igs011_prot2_inc_w));
-	map(0x010400, 0x0105ff).w(FUNC(igs011_state::lhb_igs011_prot2_swap_w));
-	map(0x010600, 0x0107ff).r(FUNC(igs011_state::lhb_igs011_prot2_r));
+	map(0x010200, 0x0103ff).w(FUNC(igs011_oki_state::igs011_prot2_inc_w));
+	map(0x010400, 0x0105ff).w(FUNC(igs011_oki_state::lhb_igs011_prot2_swap_w));
+	map(0x010600, 0x0107ff).r(FUNC(igs011_oki_state::lhb_igs011_prot2_r));
 	// no reset
 
 	map(0x100000, 0x103fff).ram().share("nvram");
 	map(0x200000, 0x200fff).ram().share(m_priority_ram);
-	map(0x300000, 0x3fffff).umask16(0x00ff).rw(FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
+	map(0x300000, 0x3fffff).umask16(0x00ff).rw(FUNC(igs011_oki_state::igs011_layers_r), FUNC(igs011_oki_state::igs011_layers_w));
 	map(0x400000, 0x400fff).umask16(0x00ff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).share("palette");
 	map(0x401000, 0x401fff).umask16(0x00ff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0x600001, 0x600001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x700000, 0x700001).portr("COIN");
-	map(0x700002, 0x700005).r(FUNC(igs011_state::lhb_inputs_r));
-	map(0x700002, 0x700003).w(FUNC(igs011_state::lhb_inputs_w));
-	map(0x820000, 0x820001).w(FUNC(igs011_state::igs011_priority_w));
-	map(0x838000, 0x838001).w(FUNC(igs011_state::lhb_irq_enable_w));
-	map(0x840000, 0x840001).w(FUNC(igs011_state::dips_w));
+	map(0x700002, 0x700005).r(FUNC(igs011_oki_state::lhb_inputs_r));
+	map(0x700002, 0x700003).w(FUNC(igs011_oki_state::lhb_inputs_w));
+	map(0x820000, 0x820001).w(FUNC(igs011_oki_state::igs011_priority_w));
+	map(0x838000, 0x838001).w(FUNC(igs011_oki_state::lhb_irq_enable_w));
+	map(0x840000, 0x840001).w(FUNC(igs011_oki_state::dips_w));
 
-	map(0x850000, 0x850001).w(FUNC(igs011_state::igs011_prot_addr_w));
-//  map(0x850000, 0x850005).w(FUNC(igs011_state::igs011_prot_fake_r));
+	map(0x850000, 0x850001).w(FUNC(igs011_oki_state::igs011_prot_addr_w));
+//  map(0x850000, 0x850005).w(FUNC(igs011_oki_state::igs011_prot_fake_r));
 
-	map(0x858000, 0x858001).w(FUNC(igs011_state::igs011_blit_x_w));
-	map(0x858800, 0x858801).w(FUNC(igs011_state::igs011_blit_y_w));
-	map(0x859000, 0x859001).w(FUNC(igs011_state::igs011_blit_w_w));
-	map(0x859800, 0x859801).w(FUNC(igs011_state::igs011_blit_h_w));
-	map(0x85a000, 0x85a001).w(FUNC(igs011_state::igs011_blit_gfx_lo_w));
-	map(0x85a800, 0x85a801).w(FUNC(igs011_state::igs011_blit_gfx_hi_w));
-	map(0x85b000, 0x85b001).w(FUNC(igs011_state::igs011_blit_flags_w));
-	map(0x85b800, 0x85b801).w(FUNC(igs011_state::igs011_blit_pen_w));
-	map(0x85c000, 0x85c001).w(FUNC(igs011_state::igs011_blit_depth_w));
-	map(0x888000, 0x888001).r(FUNC(igs011_state::dips_r<5>));
+	map(0x858000, 0x85cfff).m(*this, FUNC(igs011_oki_state::blitter_ctrl));
+	map(0x888000, 0x888001).r(FUNC(igs011_oki_state::dips_r<5>));
 }
 
-void igs011_state::xymg_base_mem(address_map &map)
+void igs011_oki_state::xymg_base_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 
 //  xymg: IGS011 protection dynamically mapped at 834x
-//  map(0x008340, 0x008347).w(FUNC(igs011_state::igs011_prot1_w)).umask16(0xff00);
-//  map(0x008348, 0x008349).r(FUNC(igs011_state::igs011_prot1_r));
+//  map(0x008340, 0x008347).w(FUNC(igs011_oki_state::igs011_prot1_w)).umask16(0xff00);
+//  map(0x008348, 0x008349).r(FUNC(igs011_oki_state::igs011_prot1_r));
 
-	map(0x010000, 0x010000).w(FUNC(igs011_state::lhb_okibank_w));
+	map(0x010000, 0x010000).w(FUNC(igs011_oki_state::lhb_okibank_w));
 
-	map(0x010200, 0x0103ff).w(FUNC(igs011_state::igs011_prot2_inc_w));   // inc  (33)
-	map(0x010400, 0x0105ff).w(FUNC(igs011_state::lhb_igs011_prot2_swap_w));   // swap (33)
-	map(0x010600, 0x0107ff).r(FUNC(igs011_state::lhb_igs011_prot2_r));   // read
+	map(0x010200, 0x0103ff).w(FUNC(igs011_oki_state::igs011_prot2_inc_w));   // inc  (33)
+	map(0x010400, 0x0105ff).w(FUNC(igs011_oki_state::lhb_igs011_prot2_swap_w));   // swap (33)
+	map(0x010600, 0x0107ff).r(FUNC(igs011_oki_state::lhb_igs011_prot2_r));   // read
 	// no reset
 
 	map(0x100000, 0x103fff).ram();
 	map(0x1f0000, 0x1f3fff).ram().share("nvram"); // extra ram
 	map(0x200000, 0x200fff).ram().share(m_priority_ram);
-	map(0x300000, 0x3fffff).umask16(0x00ff).rw(FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
+	map(0x300000, 0x3fffff).umask16(0x00ff).rw(FUNC(igs011_oki_state::igs011_layers_r), FUNC(igs011_oki_state::igs011_layers_w));
 	map(0x400000, 0x400fff).umask16(0x00ff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).share("palette");
 	map(0x401000, 0x401fff).umask16(0x00ff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0x600001, 0x600001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x820000, 0x820001).w(FUNC(igs011_state::igs011_priority_w));
-	map(0x840000, 0x840001).w(FUNC(igs011_state::dips_w));
+	map(0x820000, 0x820001).w(FUNC(igs011_oki_state::igs011_priority_w));
+	map(0x840000, 0x840001).w(FUNC(igs011_oki_state::dips_w));
 
-	map(0x850000, 0x850001).w(FUNC(igs011_state::igs011_prot_addr_w));
-//  map(0x850000, 0x850005).w(FUNC(igs011_state::igs011_prot_fake_r));
+	map(0x850000, 0x850001).w(FUNC(igs011_oki_state::igs011_prot_addr_w));
+//  map(0x850000, 0x850005).w(FUNC(igs011_oki_state::igs011_prot_fake_r));
 
-	map(0x858000, 0x858001).w(FUNC(igs011_state::igs011_blit_x_w));
-	map(0x858800, 0x858801).w(FUNC(igs011_state::igs011_blit_y_w));
-	map(0x859000, 0x859001).w(FUNC(igs011_state::igs011_blit_w_w));
-	map(0x859800, 0x859801).w(FUNC(igs011_state::igs011_blit_h_w));
-	map(0x85a000, 0x85a001).w(FUNC(igs011_state::igs011_blit_gfx_lo_w));
-	map(0x85a800, 0x85a801).w(FUNC(igs011_state::igs011_blit_gfx_hi_w));
-	map(0x85b000, 0x85b001).w(FUNC(igs011_state::igs011_blit_flags_w));
-	map(0x85b800, 0x85b801).w(FUNC(igs011_state::igs011_blit_pen_w));
-	map(0x85c000, 0x85c001).w(FUNC(igs011_state::igs011_blit_depth_w));
-	map(0x888000, 0x888001).r(FUNC(igs011_state::dips_r<3>));
+	map(0x858000, 0x85cfff).m(*this, FUNC(igs011_oki_state::blitter_ctrl));
+	map(0x888000, 0x888001).r(FUNC(igs011_oki_state::dips_r<3>));
 }
 
-void igs011_state::xymg_mem(address_map &map)
+void igs011_oki_state::xymg_mem(address_map &map)
 {
 	xymg_base_mem(map);
 
-	map(0x700000, 0x700001).w(FUNC(igs011_state::igs003_w));
-	map(0x700002, 0x700003).rw(FUNC(igs011_state::xymg_igs003_r), FUNC(igs011_state::xymg_igs003_w));
+	map(0x700000, 0x700001).w(FUNC(igs011_oki_state::igs003_w));
+	map(0x700002, 0x700003).rw(FUNC(igs011_oki_state::xymg_igs003_r), FUNC(igs011_oki_state::xymg_igs003_w));
 }
 
-void igs011_state::xymga_mem(address_map &map)
+void igs011_oki_state::xymga_mem(address_map &map)
 {
 	xymg_base_mem(map);
 
 	map(0x700000, 0x700001).portr("COIN");
-	map(0x700002, 0x700005).r(FUNC(igs011_state::lhb_inputs_r));
-	map(0x700002, 0x700003).w(FUNC(igs011_state::lhb_inputs_w));
+	map(0x700002, 0x700005).r(FUNC(igs011_oki_state::lhb_inputs_r));
+	map(0x700002, 0x700003).w(FUNC(igs011_oki_state::lhb_inputs_w));
 }
 
-void igs011_state::wlcc_mem(address_map &map)
+void igs011_oki_state::wlcc_mem(address_map &map)
 {
 //  wlcc: IGS011 protection dynamically mapped at 834x
-//  map(0x008340, 0x008347).w(FUNC(igs011_state::igs011_prot1_w)).umask16(0xff00);
-//  map(0x008348, 0x008349).r(FUNC(igs011_state::igs011_prot1_r));
+//  map(0x008340, 0x008347).w(FUNC(igs011_oki_state::igs011_prot1_w)).umask16(0xff00);
+//  map(0x008348, 0x008349).r(FUNC(igs011_oki_state::igs011_prot1_r));
 
-	map(0x518000, 0x5181ff).w(FUNC(igs011_state::igs011_prot2_inc_w));   // inc   (33)
-	map(0x518200, 0x5183ff).w(FUNC(igs011_state::wlcc_igs011_prot2_swap_w));   // swap  (33)
-	map(0x518800, 0x5189ff).r(FUNC(igs011_state::igs011_prot2_reset_r));   // reset
-	map(0x519000, 0x5195ff).r(FUNC(igs011_state::lhb_igs011_prot2_r));   // read
+	map(0x518000, 0x5181ff).w(FUNC(igs011_oki_state::igs011_prot2_inc_w));   // inc   (33)
+	map(0x518200, 0x5183ff).w(FUNC(igs011_oki_state::wlcc_igs011_prot2_swap_w));   // swap  (33)
+	map(0x518800, 0x5189ff).r(FUNC(igs011_oki_state::igs011_prot2_reset_r));   // reset
+	map(0x519000, 0x5195ff).r(FUNC(igs011_oki_state::lhb_igs011_prot2_r));   // read
 
 	map(0x000000, 0x07ffff).rom();
 	map(0x100000, 0x103fff).ram().share("nvram");
 	map(0x200000, 0x200fff).ram().share(m_priority_ram);
-	map(0x300000, 0x3fffff).umask16(0x00ff).rw(FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
+	map(0x300000, 0x3fffff).umask16(0x00ff).rw(FUNC(igs011_oki_state::igs011_layers_r), FUNC(igs011_oki_state::igs011_layers_w));
 	map(0x400000, 0x400fff).umask16(0x00ff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).share("palette");
 	map(0x401000, 0x401fff).umask16(0x00ff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0x520000, 0x520001).portr("COIN");
 	map(0x600001, 0x600001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x800000, 0x800001).w(FUNC(igs011_state::igs003_w));
-	map(0x800002, 0x800003).rw(FUNC(igs011_state::wlcc_igs003_r), FUNC(igs011_state::wlcc_igs003_w));
-	map(0xa20000, 0xa20001).w(FUNC(igs011_state::igs011_priority_w));
-	map(0xa40000, 0xa40001).w(FUNC(igs011_state::dips_w));
+	map(0x800000, 0x800001).w(FUNC(igs011_oki_state::igs003_w));
+	map(0x800002, 0x800003).rw(FUNC(igs011_oki_state::wlcc_igs003_r), FUNC(igs011_oki_state::wlcc_igs003_w));
+	map(0xa20000, 0xa20001).w(FUNC(igs011_oki_state::igs011_priority_w));
+	map(0xa40000, 0xa40001).w(FUNC(igs011_oki_state::dips_w));
 
-	map(0xa50000, 0xa50001).w(FUNC(igs011_state::igs011_prot_addr_w));
-//  map(0xa50000, 0xa50005).r(FUNC(igs011_state::igs011_prot_fake_r));
+	map(0xa50000, 0xa50001).w(FUNC(igs011_oki_state::igs011_prot_addr_w));
+//  map(0xa50000, 0xa50005).r(FUNC(igs011_oki_state::igs011_prot_fake_r));
 
-	map(0xa58000, 0xa58001).w(FUNC(igs011_state::igs011_blit_x_w));
-	map(0xa58800, 0xa58801).w(FUNC(igs011_state::igs011_blit_y_w));
-	map(0xa59000, 0xa59001).w(FUNC(igs011_state::igs011_blit_w_w));
-	map(0xa59800, 0xa59801).w(FUNC(igs011_state::igs011_blit_h_w));
-	map(0xa5a000, 0xa5a001).w(FUNC(igs011_state::igs011_blit_gfx_lo_w));
-	map(0xa5a800, 0xa5a801).w(FUNC(igs011_state::igs011_blit_gfx_hi_w));
-	map(0xa5b000, 0xa5b001).w(FUNC(igs011_state::igs011_blit_flags_w));
-	map(0xa5b800, 0xa5b801).w(FUNC(igs011_state::igs011_blit_pen_w));
-	map(0xa5c000, 0xa5c001).w(FUNC(igs011_state::igs011_blit_depth_w));
-	map(0xa88000, 0xa88001).r(FUNC(igs011_state::dips_r<4>));
+	map(0xa58000, 0xa5cfff).m(*this, FUNC(igs011_oki_state::blitter_ctrl));
+	map(0xa88000, 0xa88001).r(FUNC(igs011_oki_state::dips_r<4>));
 }
 
 
-void igs011_state::lhb2_mem(address_map &map)
+void igs011_oki_state::lhb2_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 
 //  lhb2: IGS011 protection dynamically mapped at 1ff8x
-//  map(0x01ff80, 0x01ff87).umask16(0xff00).w(FUNC(igs011_state::igs011_prot1_w));
-//  map(0x01ff88, 0x01ff89).r(FUNC(igs011_state::igs011_prot1_r));
+//  map(0x01ff80, 0x01ff87).umask16(0xff00).w(FUNC(igs011_oki_state::igs011_prot1_w));
+//  map(0x01ff88, 0x01ff89).r(FUNC(igs011_oki_state::igs011_prot1_r));
 
-	map(0x020000, 0x0201ff).w(FUNC(igs011_state::igs011_prot2_inc_w));   // inc   (55)
-	map(0x020200, 0x0203ff).w(FUNC(igs011_state::lhb_igs011_prot2_swap_w));   // swap  (33)
-	map(0x020400, 0x0205ff).r(FUNC(igs011_state::lhb2_igs011_prot2_r));   // read
-	map(0x020600, 0x0207ff).w(FUNC(igs011_state::igs011_prot2_reset_w));   // reset (55)
+	map(0x020000, 0x0201ff).w(FUNC(igs011_oki_state::igs011_prot2_inc_w));   // inc   (55)
+	map(0x020200, 0x0203ff).w(FUNC(igs011_oki_state::lhb_igs011_prot2_swap_w));   // swap  (33)
+	map(0x020400, 0x0205ff).r(FUNC(igs011_oki_state::lhb2_igs011_prot2_r));   // read
+	map(0x020600, 0x0207ff).w(FUNC(igs011_oki_state::igs011_prot2_reset_w));   // reset (55)
 
 	map(0x100000, 0x103fff).ram().share("nvram");
 	map(0x200001, 0x200001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x204000, 0x204003).umask16(0x00ff).w("ymsnd", FUNC(ym2413_device::write));
-	map(0x208000, 0x208001).nopr().w(FUNC(igs011_state::igs003_w));
-	map(0x208002, 0x208003).rw(FUNC(igs011_state::lhb2_igs003_r), FUNC(igs011_state::lhb2_igs003_w));
+	map(0x208000, 0x208001).nopr().w(FUNC(igs011_oki_state::igs003_w));
+	map(0x208002, 0x208003).rw(FUNC(igs011_oki_state::lhb2_igs003_r), FUNC(igs011_oki_state::lhb2_igs003_w));
 	map(0x20c000, 0x20cfff).ram().share(m_priority_ram);
 	map(0x210000, 0x210fff).umask16(0x00ff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).share("palette");
 	map(0x211000, 0x211fff).umask16(0x00ff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0x214000, 0x214001).portr("COIN");
-	map(0x300000, 0x3fffff).umask16(0x00ff).rw(FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
-	map(0xa20000, 0xa20001).w(FUNC(igs011_state::igs011_priority_w));
-	map(0xa40000, 0xa40001).w(FUNC(igs011_state::dips_w));
+	map(0x300000, 0x3fffff).umask16(0x00ff).rw(FUNC(igs011_oki_state::igs011_layers_r), FUNC(igs011_oki_state::igs011_layers_w));
+	map(0xa20000, 0xa20001).w(FUNC(igs011_oki_state::igs011_priority_w));
+	map(0xa40000, 0xa40001).w(FUNC(igs011_oki_state::dips_w));
 
-	map(0xa50000, 0xa50001).w(FUNC(igs011_state::igs011_prot_addr_w));
-//  map(0xa50000, 0xa50005).r(FUNC(igs011_state::igs011_prot_fake_r));
+	map(0xa50000, 0xa50001).w(FUNC(igs011_oki_state::igs011_prot_addr_w));
+//  map(0xa50000, 0xa50005).r(FUNC(igs011_oki_state::igs011_prot_fake_r));
 
-	map(0xa58000, 0xa58001).w(FUNC(igs011_state::igs011_blit_x_w));
-	map(0xa58800, 0xa58801).w(FUNC(igs011_state::igs011_blit_y_w));
-	map(0xa59000, 0xa59001).w(FUNC(igs011_state::igs011_blit_w_w));
-	map(0xa59800, 0xa59801).w(FUNC(igs011_state::igs011_blit_h_w));
-	map(0xa5a000, 0xa5a001).w(FUNC(igs011_state::igs011_blit_gfx_lo_w));
-	map(0xa5a800, 0xa5a801).w(FUNC(igs011_state::igs011_blit_gfx_hi_w));
-	map(0xa5b000, 0xa5b001).w(FUNC(igs011_state::igs011_blit_flags_w));
-	map(0xa5b800, 0xa5b801).w(FUNC(igs011_state::igs011_blit_pen_w));
-	map(0xa5c000, 0xa5c001).w(FUNC(igs011_state::igs011_blit_depth_w));
-	map(0xa88000, 0xa88001).r(FUNC(igs011_state::dips_r<3>));
+	map(0xa58000, 0xa5cfff).m(*this, FUNC(igs011_oki_state::blitter_ctrl));
+	map(0xa88000, 0xa88001).r(FUNC(igs011_oki_state::dips_r<3>));
 }
 
 
-void igs011_state::nkishusp_mem(address_map &map)
+void igs011_oki_state::nkishusp_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 
 //  nkishusp: IGS011 protection dynamically mapped at 1ff8x
-//  map(0x01ff80, 0x01ff87).w(FUNC(igs011_state::igs011_prot1_w)).umask16(0xff00);
-//  map(0x01ff88, 0x01ff89).r(FUNC(igs011_state::igs011_prot1_r));
+//  map(0x01ff80, 0x01ff87).w(FUNC(igs011_oki_state::igs011_prot1_w)).umask16(0xff00);
+//  map(0x01ff88, 0x01ff89).r(FUNC(igs011_oki_state::igs011_prot1_r));
 
 	// to be done:
-	map(0x023000, 0x0231ff).w(FUNC(igs011_state::igs011_prot2_inc_w));   // inc   (55)
-	map(0x023200, 0x0233ff).w(FUNC(igs011_state::lhb_igs011_prot2_swap_w));   // swap  (33)
-	map(0x023400, 0x0235ff).r(FUNC(igs011_state::lhb2_igs011_prot2_r));   // read
-	map(0x023600, 0x0237ff).w(FUNC(igs011_state::igs011_prot2_reset_w));   // reset (55)
+	map(0x023000, 0x0231ff).w(FUNC(igs011_oki_state::igs011_prot2_inc_w));   // inc   (55)
+	map(0x023200, 0x0233ff).w(FUNC(igs011_oki_state::lhb_igs011_prot2_swap_w));   // swap  (33)
+	map(0x023400, 0x0235ff).r(FUNC(igs011_oki_state::lhb2_igs011_prot2_r));   // read
+	map(0x023600, 0x0237ff).w(FUNC(igs011_oki_state::igs011_prot2_reset_w));   // reset (55)
 
 	map(0x100000, 0x103fff).ram().share("nvram");
 	map(0x200001, 0x200001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x204000, 0x204003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff);
-	map(0x208000, 0x208001).nopr().w(FUNC(igs011_state::igs003_w));
-	map(0x208002, 0x208003).rw(FUNC(igs011_state::lhb2_igs003_r), FUNC(igs011_state::lhb2_igs003_w));
+	map(0x208000, 0x208001).nopr().w(FUNC(igs011_oki_state::igs003_w));
+	map(0x208002, 0x208003).rw(FUNC(igs011_oki_state::lhb2_igs003_r), FUNC(igs011_oki_state::lhb2_igs003_w));
 	map(0x20c000, 0x20cfff).ram().share(m_priority_ram);
 	map(0x210000, 0x210fff).umask16(0x00ff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).share("palette");
 	map(0x211000, 0x211fff).umask16(0x00ff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0x214000, 0x214001).portr("COIN");
-	map(0x300000, 0x3fffff).umask16(0x00ff).rw(FUNC(igs011_state::igs011_layers_r), FUNC(igs011_state::igs011_layers_w));
-	map(0xa20000, 0xa20001).w(FUNC(igs011_state::igs011_priority_w));
-	map(0xa38000, 0xa38001).w(FUNC(igs011_state::lhb_irq_enable_w));
-	map(0xa40000, 0xa40001).w(FUNC(igs011_state::dips_w));
+	map(0x300000, 0x3fffff).umask16(0x00ff).rw(FUNC(igs011_oki_state::igs011_layers_r), FUNC(igs011_oki_state::igs011_layers_w));
+	map(0xa20000, 0xa20001).w(FUNC(igs011_oki_state::igs011_priority_w));
+	map(0xa38000, 0xa38001).w(FUNC(igs011_oki_state::lhb_irq_enable_w));
+	map(0xa40000, 0xa40001).w(FUNC(igs011_oki_state::dips_w));
 
-	map(0xa50000, 0xa50001).w(FUNC(igs011_state::igs011_prot_addr_w));
-//  map(0xa50000, 0xa50005).r(FUNC(igs011_state::igs011_prot_fake_r));
+	map(0xa50000, 0xa50001).w(FUNC(igs011_oki_state::igs011_prot_addr_w));
+//  map(0xa50000, 0xa50005).r(FUNC(igs011_oki_state::igs011_prot_fake_r));
 
-	map(0xa58000, 0xa58001).w(FUNC(igs011_state::igs011_blit_x_w));
-	map(0xa58800, 0xa58801).w(FUNC(igs011_state::igs011_blit_y_w));
-	map(0xa59000, 0xa59001).w(FUNC(igs011_state::igs011_blit_w_w));
-	map(0xa59800, 0xa59801).w(FUNC(igs011_state::igs011_blit_h_w));
-	map(0xa5a000, 0xa5a001).w(FUNC(igs011_state::igs011_blit_gfx_lo_w));
-	map(0xa5a800, 0xa5a801).w(FUNC(igs011_state::igs011_blit_gfx_hi_w));
-	map(0xa5b000, 0xa5b001).w(FUNC(igs011_state::igs011_blit_flags_w));
-	map(0xa5b800, 0xa5b801).w(FUNC(igs011_state::igs011_blit_pen_w));
-	map(0xa5c000, 0xa5c001).w(FUNC(igs011_state::igs011_blit_depth_w));
-	map(0xa88000, 0xa88001).r(FUNC(igs011_state::dips_r<3>));
+	map(0xa58000, 0xa5cfff).m(*this, FUNC(igs011_oki_state::blitter_ctrl));
+	map(0xa88000, 0xa88001).r(FUNC(igs011_oki_state::dips_r<3>));
 }
 
-void igs011_state::tygn_mem(address_map &map)
+void igs011_oki_state::tygn_mem(address_map &map)
 {
 	nkishusp_mem(map);
 
 	map(0x208000, 0x208001).nopr(); // TODO
-	map(0x208002, 0x208003).rw(FUNC(igs011_state::drgnwrld_igs003_r), FUNC(igs011_state::lhb2_igs003_w));
+	map(0x208002, 0x208003).rw(FUNC(igs011_oki_state::drgnwrld_igs003_r), FUNC(igs011_oki_state::lhb2_igs003_w));
 }
 
 
@@ -3112,15 +3109,7 @@ void vbowl_state::vbowl_mem(address_map &map)
 	map(0xa48000, 0xa48001).w(FUNC(vbowl_state::igs011_prot_addr_w));
 //  map(0xa48000, 0xa48005).w(FUNC(vbowl_state::igs011_prot_fake_r));
 
-	map(0xa58000, 0xa58001).w(FUNC(vbowl_state::igs011_blit_x_w));
-	map(0xa58800, 0xa58801).w(FUNC(vbowl_state::igs011_blit_y_w));
-	map(0xa59000, 0xa59001).w(FUNC(vbowl_state::igs011_blit_w_w));
-	map(0xa59800, 0xa59801).w(FUNC(vbowl_state::igs011_blit_h_w));
-	map(0xa5a000, 0xa5a001).w(FUNC(vbowl_state::igs011_blit_gfx_lo_w));
-	map(0xa5a800, 0xa5a801).w(FUNC(vbowl_state::igs011_blit_gfx_hi_w));
-	map(0xa5b000, 0xa5b001).w(FUNC(vbowl_state::igs011_blit_flags_w));
-	map(0xa5b800, 0xa5b801).w(FUNC(vbowl_state::igs011_blit_pen_w));
-	map(0xa5c000, 0xa5c001).w(FUNC(vbowl_state::igs011_blit_depth_w));
+	map(0xa58000, 0xa5cfff).m(*this, FUNC(vbowl_state::blitter_ctrl));
 
 	map(0xa80000, 0xa80001).r(FUNC(vbowl_state::vbowl_unk_r)); // comm
 	map(0xa88000, 0xa88001).r(FUNC(vbowl_state::dips_r<4>));
@@ -3132,6 +3121,7 @@ void vbowl_state::vbowl_mem(address_map &map)
 void vbowl_state::vbowlhk_mem(address_map &map)
 {
 	vbowl_mem(map);
+
 	map(0x800002, 0x800003).w(FUNC(vbowl_state::vbowlhk_igs003_w));
 	map(0x50f600, 0x50f7ff).r(FUNC(vbowl_state::vbowlhk_igs011_prot2_r));   // read
 }
@@ -3958,8 +3948,8 @@ static INPUT_PORTS_START( lhb )
 	PORT_DIPSETTING(    0x40, "Coin Acceptor" )
 	PORT_DIPSETTING(    0x00, "Key-In" )
 	PORT_DIPNAME( 0x80, 0x80, "Last Chance" )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
 
 	PORT_START("DSW5")
 	PORT_DIPNAME( 0x01, 0x01, "In-Game Bet" )
@@ -4171,7 +4161,7 @@ static GFXDECODE_START( gfx_igs011_hi )
 GFXDECODE_END
 #endif
 
-void igs011_state::igs011_base(machine_config &config)
+void igs011_state_base::igs011_base(machine_config &config)
 {
 	M68000(config, m_maincpu, XTAL(22'000'000)/3);
 
@@ -4183,7 +4173,7 @@ void igs011_state::igs011_base(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1282));
 	m_screen->set_size(512, 260);
 	m_screen->set_visarea(0, 512-1, 0, 240-1);
-	m_screen->set_screen_update(FUNC(igs011_state::screen_update));
+	m_screen->set_screen_update(FUNC(igs011_state_base::screen_update));
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x2000/4);
@@ -4193,37 +4183,58 @@ void igs011_state::igs011_base(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
+}
+
+void igs011_oki_state::igs011_oki_base(machine_config &config)
+{
+	igs011_base(config);
+
 	OKIM6295(config, m_oki, XTAL(22'000'000)/21, okim6295_device::PIN7_HIGH);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
+void igs011_oki_state::igs011_oki_opll_base(machine_config &config)
+{
+	igs011_base(config);
+
+	m_maincpu->set_vblank_int("screen", FUNC(igs011_state_base::irq6_line_hold));
+
+	OKIM6295(config, m_oki, XTAL(22'000'000)/21, okim6295_device::PIN7_HIGH);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.95);
+
+	YM2413(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.9);
+}
+
 template <uint8_t Irq>
-TIMER_DEVICE_CALLBACK_MEMBER( igs011_state::timer_irq_cb )
+TIMER_DEVICE_CALLBACK_MEMBER( igs011_state_base::timer_irq_cb )
 {
 	m_maincpu->set_input_line(Irq, HOLD_LINE);
 }
 
-void igs011_state::drgnwrld(machine_config &config)
+void igs011_oki_state::drgnwrld(machine_config &config)
 {
 	igs011_base(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::drgnwrld_mem);
-	m_maincpu->set_vblank_int("screen", FUNC(igs011_state::irq6_line_hold));
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_oki_state::drgnwrld_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(igs011_state_base::irq6_line_hold));
 
-	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::timer_irq_cb<5>), attotime::from_hz(240));
+	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_oki_state::timer_irq_cb<5>), attotime::from_hz(240));
 
-	YM3812(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 2.0);
+	OKIM6295(config, m_oki, XTAL(22'000'000)/21, okim6295_device::PIN7_HIGH);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.95);
+
+	YM3812(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 1.9);
 }
 
-void igs011_state::drgnwrld_igs012(machine_config &config)
+void igs011_oki_state::drgnwrld_igs012(machine_config &config)
 {
 	drgnwrld(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::drgnwrld_igs012_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_oki_state::drgnwrld_igs012_mem);
 }
 
 
-INTERRUPT_GEN_MEMBER(igs011_state::lhb_vblank_irq)
+INTERRUPT_GEN_MEMBER(igs011_oki_state::lhb_vblank_irq)
 {
 	if (!m_lhb_irq_enable)
 		return;
@@ -4231,7 +4242,7 @@ INTERRUPT_GEN_MEMBER(igs011_state::lhb_vblank_irq)
 	m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( igs011_state::lhb_timer_irq_cb )
+TIMER_DEVICE_CALLBACK_MEMBER( igs011_oki_state::lhb_timer_irq_cb )
 {
 	if (!m_lhb_irq_enable)
 		return;
@@ -4239,94 +4250,88 @@ TIMER_DEVICE_CALLBACK_MEMBER( igs011_state::lhb_timer_irq_cb )
 	m_maincpu->set_input_line(5, HOLD_LINE);
 }
 
-void igs011_state::lhb(machine_config &config)
+void igs011_oki_state::lhb(machine_config &config)
 {
-	igs011_base(config);
+	igs011_oki_base(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::lhb_mem);
-	m_maincpu->set_vblank_int("screen", FUNC(igs011_state::lhb_vblank_irq));
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_oki_state::lhb_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(igs011_oki_state::lhb_vblank_irq));
 
-	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::lhb_timer_irq_cb), attotime::from_hz(120));
+	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_oki_state::lhb_timer_irq_cb), attotime::from_hz(120));
 	// irq 3 points to an apparently unneeded routine
 
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 }
 
-void igs011_state::wlcc(machine_config &config)
+void igs011_oki_state::wlcc(machine_config &config)
 {
-	igs011_base(config);
+	igs011_oki_base(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::wlcc_mem);
-	m_maincpu->set_vblank_int("screen", FUNC(igs011_state::irq6_line_hold));
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_oki_state::wlcc_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(igs011_oki_state::irq6_line_hold));
 
-	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::timer_irq_cb<3>), attotime::from_hz(60));
+	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_oki_state::timer_irq_cb<3>), attotime::from_hz(60));
 
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 }
 
 
-void igs011_state::xymg(machine_config &config)
+void igs011_oki_state::xymg(machine_config &config)
 {
-	igs011_base(config);
+	igs011_oki_base(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::xymg_mem);
-	m_maincpu->set_vblank_int("screen", FUNC(igs011_state::irq6_line_hold));
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_oki_state::xymg_mem);
+	m_maincpu->set_vblank_int("screen", FUNC(igs011_oki_state::irq6_line_hold));
 
-	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::timer_irq_cb<3>), attotime::from_hz(60));
+	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_oki_state::timer_irq_cb<3>), attotime::from_hz(60));
 
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 }
 
 
-void igs011_state::xymga(machine_config &config)
+void igs011_oki_state::xymga(machine_config &config)
 {
 	xymg(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::xymga_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_oki_state::xymga_mem);
 }
 
 
-void igs011_state::lhb2(machine_config &config)
+void igs011_oki_state::lhb2(machine_config &config)
 {
-	igs011_base(config);
+	igs011_oki_opll_base(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::lhb2_mem);
-	m_maincpu->set_vblank_int("screen", FUNC(igs011_state::irq6_line_hold));
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_oki_state::lhb2_mem);
 
-	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::timer_irq_cb<5>), attotime::from_hz(240)); // lev5 frequency drives the music tempo
+	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_oki_state::timer_irq_cb<5>), attotime::from_hz(240)); // lev5 frequency drives the music tempo
 
 	//GFXDECODE(config, "gfxdecode", m_palette, gfx_igs011_hi);
 
 	HOPPER(config, m_hopper, attotime::from_msec(50));
-
-	YM2413(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 2.0);
 }
 
 
-void igs011_state::nkishusp(machine_config &config)
+void igs011_oki_state::nkishusp(machine_config &config)
 {
-	igs011_base(config);
+	igs011_oki_opll_base(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::nkishusp_mem);
-	m_maincpu->set_vblank_int("screen", FUNC(igs011_state::irq6_line_hold));
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_oki_state::nkishusp_mem);
 
-	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::timer_irq_cb<3>), attotime::from_hz(240)); // lev3 frequency drives the music tempo
+	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_oki_state::timer_irq_cb<3>), attotime::from_hz(240)); // lev3 frequency drives the music tempo
 
 	// VSync 60.0052Hz, HSync 15.620kHz
 
 	//GFXDECODE(config, "gfxdecode", m_palette, gfx_igs011_hi);
 
 	HOPPER(config, m_hopper, attotime::from_msec(50));
-
-	YM2413(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 2.0);
 }
 
 
-void igs011_state::tygn(machine_config &config)
+void igs011_oki_state::tygn(machine_config &config)
 {
 	nkishusp(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::tygn_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_oki_state::tygn_mem);
 }
 
 
@@ -4349,11 +4354,9 @@ void vbowl_state::vbowl(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(vbowl_state::screen_vblank));
 	//GFXDECODE(config, "gfxdecode", m_palette, gfx_igs011_hi);
 
-	config.device_remove("oki");
-
 	ICS2115(config, m_ics, 33.8688_MHz_XTAL);
 	m_ics->irq().set(FUNC(vbowl_state::sound_irq));
-	m_ics->add_route(ALL_OUTPUTS, "mono", 5.0);
+	m_ics->add_route(ALL_OUTPUTS, "mono", 3.75);
 }
 
 void vbowl_state::vbowlhk(machine_config &config)
@@ -4908,7 +4911,7 @@ ROM_START( lhb2 )
 	ROM_LOAD( "igsm0501.u7", 0x00000, 0x200000, CRC(1c952bd6) SHA1(a6b6f1cdfb29647e81c032ffe59c94f1a10ceaf8) )
 
 	ROM_REGION( 0x80000, "blitter_hi", 0 ) // high order bit of graphics (5th bit)
-	/* these are identical ..seems ok as igs number is same, only ic changed */
+	/* these are identical ..seems OK as igs number is same, only ic changed */
 	ROM_LOAD( "igsm0502.u4", 0x00000, 0x80000, CRC(5d73ae99) SHA1(7283aa3d6b15ceb95db80756892be46eb997ef15) )
 	ROM_LOAD( "igsm0502.u5", 0x00000, 0x80000, CRC(5d73ae99) SHA1(7283aa3d6b15ceb95db80756892be46eb997ef15) )
 
@@ -5184,27 +5187,27 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1997, drgnwrld,      0,        drgnwrld,        drgnwrld,  igs011_state, init_drgnwrld,     ROT0, "IGS",                     "Dragon World (World, V040O)",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv40k,  drgnwrld, drgnwrld_igs012, drgnwrldc, igs011_state, init_drgnwrldv40k, ROT0, "IGS",                     "Dongbang Jiju (Korea, V040K)",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv30,   drgnwrld, drgnwrld,        drgnwrld,  igs011_state, init_drgnwrldv30,  ROT0, "IGS",                     "Dragon World (World, V030O)",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv21,   drgnwrld, drgnwrld_igs012, drgnwrld,  igs011_state, init_drgnwrldv21,  ROT0, "IGS",                     "Dragon World (World, V021O)",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv21j,  drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, init_drgnwrldv21j, ROT0, "IGS / Alta",              "Chuugokuryuu (Japan, V021J)",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv20j,  drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_state, init_drgnwrldv20j, ROT0, "IGS / Alta",              "Chuugokuryuu (Japan, V020J)",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv11h,  drgnwrld, drgnwrld,        drgnwrldc, igs011_state, init_drgnwrldv11h, ROT0, "IGS",                     "Dung Fong Zi Zyu (Hong Kong, V011H, set 1)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1995, drgnwrldv11ha, drgnwrld, drgnwrld_igs012, drgnwrldc, igs011_state, init_drgnwrldv40k, ROT0, "IGS",                     "Dung Fong Zi Zyu (Hong Kong, V011H, set 2)",       MACHINE_SUPPORTS_SAVE ) // different encryption and with IGS012
-GAME( 1995, drgnwrldv10c,  drgnwrld, drgnwrld,        drgnwrldc, igs011_state, init_drgnwrldv10c, ROT0, "IGS",                     "Zhongguo Long (China, V010C)",                     MACHINE_SUPPORTS_SAVE )
-GAME( 1995, lhb,           0,        lhb,             lhb,       igs011_state, init_lhb,          ROT0, "IGS",                     "Long Hu Bang (China, V035C)",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1995, lhbv33c,       lhb,      lhb,             lhb,       igs011_state, init_lhbv33c,      ROT0, "IGS",                     "Long Hu Bang (China, V033C)",                      MACHINE_SUPPORTS_SAVE )
-GAME( 1995, dbc,           lhb,      lhb,             lhb,       igs011_state, init_dbc,          ROT0, "IGS",                     "Daai Baan Sing (Hong Kong, V027H)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1995, ryukobou,      lhb,      lhb,             lhb,       igs011_state, init_ryukobou,     ROT0, "IGS / Alta",              "Mahjong Ryukobou (Japan, V030J)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1996, lhb2,          0,        lhb2,            lhb2,      igs011_state, init_lhb2,         ROT0, "IGS",                     "Lung Fu Bong II (Hong Kong, V185H)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1996, lhb2cpgs,      lhb2,     lhb2,            lhb2,      igs011_state, init_lhb2cpgs,     ROT0, "IGS",                     "Long Hu Bang II: Cuo Pai Gaoshou (China, V127C)",  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ROM patches
-GAME( 1996, tygn,          lhb2,     tygn,            tygn,      igs011_state, init_tygn,         ROT0, "IGS",                     "Te Yi Gong Neng (China, V632C)",                   MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ROM patches
-GAME( 1996, lhb3,          lhb2,     nkishusp,        lhb2,      igs011_state, init_lhb3,         ROT0, "IGS",                     "Long Hu Bang III: Cuo Pai Gaoshou (China, V242C)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ROM patches
-GAME( 1996, xymg,          0,        xymg,            xymg,      igs011_state, init_xymg,         ROT0, "IGS",                     "Xingyun Manguan (China, V651C, set 1)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1996, xymga,         xymg,     xymga,           xymg,      igs011_state, init_xymga,        ROT0, "IGS",                     "Xingyun Manguan (China, V651C, set 2)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // different encryption and without IGS003
-GAME( 1996, wlcc,          xymg,     wlcc,            wlcc,      igs011_state, init_wlcc,         ROT0, "IGS",                     "Wanli Changcheng (China, V638C)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1996, vbowl,         0,        vbowl,           vbowl,     vbowl_state,  init_vbowl,        ROT0, "IGS",                     "Virtua Bowling (World, V101XCM)",                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, vbowlj,        vbowl,    vbowl,           vbowlj,    vbowl_state,  init_vbowlj,       ROT0, "IGS / Alta",              "Virtua Bowling (Japan, V100JCM)",                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, vbowlhk,       vbowl,    vbowlhk,         vbowlhk,   vbowl_state,  init_vbowlhk,      ROT0, "IGS / Tai Tin Amusement", "Virtua Bowling (Hong Kong, V101HJS)",              MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, nkishusp,      lhb2,     nkishusp,        nkishusp,  igs011_state, init_nkishusp,     ROT0, "IGS / Alta",              "Mahjong Nenrikishu SP (Japan, V250J)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1997, drgnwrld,      0,        drgnwrld,        drgnwrld,  igs011_oki_state, init_drgnwrld,     ROT0, "IGS",                     "Dragon World (World, V040O)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv40k,  drgnwrld, drgnwrld_igs012, drgnwrldc, igs011_oki_state, init_drgnwrldv40k, ROT0, "IGS",                     "Dongbang Jiju (Korea, V040K)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv30,   drgnwrld, drgnwrld,        drgnwrld,  igs011_oki_state, init_drgnwrldv30,  ROT0, "IGS",                     "Dragon World (World, V030O)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv21,   drgnwrld, drgnwrld_igs012, drgnwrld,  igs011_oki_state, init_drgnwrldv21,  ROT0, "IGS",                     "Dragon World (World, V021O)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv21j,  drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_oki_state, init_drgnwrldv21j, ROT0, "IGS / Alta",              "Chuugokuryuu (Japan, V021J)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv20j,  drgnwrld, drgnwrld_igs012, drgnwrldj, igs011_oki_state, init_drgnwrldv20j, ROT0, "IGS / Alta",              "Chuugokuryuu (Japan, V020J)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv11h,  drgnwrld, drgnwrld,        drgnwrldc, igs011_oki_state, init_drgnwrldv11h, ROT0, "IGS",                     "Dung Fong Zi Zyu (Hong Kong, V011H, set 1)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1995, drgnwrldv11ha, drgnwrld, drgnwrld_igs012, drgnwrldc, igs011_oki_state, init_drgnwrldv40k, ROT0, "IGS",                     "Dung Fong Zi Zyu (Hong Kong, V011H, set 2)",       MACHINE_SUPPORTS_SAVE ) // different encryption and with IGS012
+GAME( 1995, drgnwrldv10c,  drgnwrld, drgnwrld,        drgnwrldc, igs011_oki_state, init_drgnwrldv10c, ROT0, "IGS",                     "Zhongguo Long (China, V010C)",                     MACHINE_SUPPORTS_SAVE )
+GAME( 1995, lhb,           0,        lhb,             lhb,       igs011_oki_state, init_lhb,          ROT0, "IGS",                     "Long Hu Bang (China, V035C)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1995, lhbv33c,       lhb,      lhb,             lhb,       igs011_oki_state, init_lhbv33c,      ROT0, "IGS",                     "Long Hu Bang (China, V033C)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1995, dbc,           lhb,      lhb,             lhb,       igs011_oki_state, init_dbc,          ROT0, "IGS",                     "Daai Baan Sing (Hong Kong, V027H)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1995, ryukobou,      lhb,      lhb,             lhb,       igs011_oki_state, init_ryukobou,     ROT0, "IGS / Alta",              "Mahjong Ryukobou (Japan, V030J)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1996, lhb2,          0,        lhb2,            lhb2,      igs011_oki_state, init_lhb2,         ROT0, "IGS",                     "Lung Fu Bong II (Hong Kong, V185H)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1996, lhb2cpgs,      lhb2,     lhb2,            lhb2,      igs011_oki_state, init_lhb2cpgs,     ROT0, "IGS",                     "Long Hu Bang II: Cuo Pai Gaoshou (China, V127C)",  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ROM patches
+GAME( 1996, tygn,          lhb2,     tygn,            tygn,      igs011_oki_state, init_tygn,         ROT0, "IGS",                     "Te Yi Gong Neng (China, V632C)",                   MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ROM patches
+GAME( 1996, lhb3,          lhb2,     nkishusp,        lhb2,      igs011_oki_state, init_lhb3,         ROT0, "IGS",                     "Long Hu Bang III: Cuo Pai Gaoshou (China, V242C)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ROM patches
+GAME( 1996, xymg,          0,        xymg,            xymg,      igs011_oki_state, init_xymg,         ROT0, "IGS",                     "Xingyun Manguan (China, V651C, set 1)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1996, xymga,         xymg,     xymga,           xymg,      igs011_oki_state, init_xymga,        ROT0, "IGS",                     "Xingyun Manguan (China, V651C, set 2)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // different encryption and without IGS003
+GAME( 1996, wlcc,          xymg,     wlcc,            wlcc,      igs011_oki_state, init_wlcc,         ROT0, "IGS",                     "Wanli Changcheng (China, V638C)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1996, vbowl,         0,        vbowl,           vbowl,     vbowl_state,      init_vbowl,        ROT0, "IGS",                     "Virtua Bowling (World, V101XCM)",                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, vbowlj,        vbowl,    vbowl,           vbowlj,    vbowl_state,      init_vbowlj,       ROT0, "IGS / Alta",              "Virtua Bowling (Japan, V100JCM)",                  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, vbowlhk,       vbowl,    vbowlhk,         vbowlhk,   vbowl_state,      init_vbowlhk,      ROT0, "IGS / Tai Tin Amusement", "Virtua Bowling (Hong Kong, V101HJS)",              MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, nkishusp,      lhb2,     nkishusp,        nkishusp,  igs011_oki_state, init_nkishusp,     ROT0, "IGS / Alta",              "Mahjong Nenrikishu SP (Japan, V250J)",             MACHINE_SUPPORTS_SAVE )
