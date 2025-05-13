@@ -57,17 +57,19 @@
 #include "nes_vt_soc.h"
 
 
-DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC,              nes_vt02_vt03_soc_device,          "nes_vt02_vt03_soc",       "VT02/03 series System on a Chip (NTSC)")
-DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_PAL,          nes_vt02_vt03_soc_pal_device,      "nes_vt02_vt03_soc_pal",   "VT02/03 series System on a Chip (PAL)")
+DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC,              nes_vt02_vt03_soc_device,              "nes_vt02_vt03_soc",             "VT02/03 series System on a Chip (NTSC)")
+DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_PAL,          nes_vt02_vt03_soc_pal_device,          "nes_vt02_vt03_soc_pal",         "VT02/03 series System on a Chip (PAL)")
 
-DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_WAIXING,      nes_vt02_vt03_soc_waixing_device,    "nes_vt02_vt03_soc_waixing",     "VT02/03 series System on a Chip (Waixing, NTSC)")
-DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_WAIXING_PAL,  nes_vt02_vt03_soc_waixing_pal_device,"nes_vt02_vt03_soc_waixing_pal", "VT02/03 series System on a Chip (Waixing, PAL)")
+DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_WAIXING,      nes_vt02_vt03_soc_waixing_device,      "nes_vt02_vt03_soc_waixing",     "VT02/03 series System on a Chip (Waixing, NTSC)")
+DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_WAIXING_PAL,  nes_vt02_vt03_soc_waixing_pal_device,  "nes_vt02_vt03_soc_waixing_pal", "VT02/03 series System on a Chip (Waixing, PAL)")
 
-DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_HUMMER,       nes_vt02_vt03_soc_hummer_device,   "nes_vt02_vt03_soc_hummer",    "VT02/03 series System on a Chip (Hummer, NTSC)")
-DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_SPORTS,       nes_vt02_vt03_soc_sports_device,   "nes_vt02_vt03_soc_sports",    "VT02/03 series System on a Chip (Sports, NTSC)")
+DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_HUMMER,       nes_vt02_vt03_soc_hummer_device,       "nes_vt02_vt03_soc_hummer",      "VT02/03 series System on a Chip (Hummer, NTSC)")
 
-DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_SCRAMBLE,     nes_vt02_vt03_soc_scramble_device, "nes_vt02_vt03_soc_scram", "VT02/03 series System on a Chip (NTSC, with simple Opcode scrambling)")
-DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_SCRAMBLE_PAL, nes_vt02_vt03_soc_scramble_pal_device, "nes_vt02_vt03_soc_pal_scram", "VT02/03 series System on a Chip (PAL, with simple Opcode scrambling)")
+DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_SPORTS,       nes_vt02_vt03_soc_sports_device,       "nes_vt02_vt03_soc_sports",      "VT02/03 series System on a Chip (Sports, NTSC)")
+DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_SPORTS_PAL,   nes_vt02_vt03_soc_sports_pal_device,   "nes_vt02_vt03_soc_sports",      "VT02/03 series System on a Chip (Sports, PAL)")
+
+DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_SCRAMBLE,     nes_vt02_vt03_soc_scramble_device,     "nes_vt02_vt03_soc_scram",       "VT02/03 series System on a Chip (NTSC, with simple Opcode scrambling)")
+DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_SCRAMBLE_PAL, nes_vt02_vt03_soc_scramble_pal_device, "nes_vt02_vt03_soc_pal_scram",   "VT02/03 series System on a Chip (PAL, with simple Opcode scrambling)")
 
 void nes_vt02_vt03_soc_device::program_map(address_map &map)
 {
@@ -148,8 +150,18 @@ nes_vt02_vt03_soc_hummer_device::nes_vt02_vt03_soc_hummer_device(const machine_c
 {
 }
 
+nes_vt02_vt03_soc_sports_device::nes_vt02_vt03_soc_sports_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock) :
+	nes_vt02_vt03_soc_device(mconfig, type, tag, owner, clock)
+{
+}
+
 nes_vt02_vt03_soc_sports_device::nes_vt02_vt03_soc_sports_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
-	nes_vt02_vt03_soc_device(mconfig, NES_VT02_VT03_SOC_SPORTS, tag, owner, clock)
+	nes_vt02_vt03_soc_sports_device(mconfig, NES_VT02_VT03_SOC_SPORTS, tag, owner, clock)
+{
+}
+
+nes_vt02_vt03_soc_sports_pal_device::nes_vt02_vt03_soc_sports_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+	nes_vt02_vt03_soc_sports_device(mconfig, NES_VT02_VT03_SOC_SPORTS_PAL, tag, owner, clock)
 {
 }
 
@@ -1099,7 +1111,6 @@ void nes_vt02_vt03_soc_device::nes_vt_map(address_map &map)
 	// 0x411a RS232 TX data
 	// 0x411b RS232 RX data
 
-
 	map(0x8000, 0xffff).rw(FUNC(nes_vt02_vt03_soc_device::external_space_read), FUNC(nes_vt02_vt03_soc_device::external_space_write));
 	map(0x6000, 0x7fff).ram();
 }
@@ -1136,12 +1147,12 @@ void nes_vt02_vt03_soc_hummer_device::nes_vt_2012_to_2017_regs(address_map& map)
 
 void nes_vt02_vt03_soc_sports_device::nes_vt_2012_to_2017_regs(address_map& map)
 {
-	map(0x2012, 0x2012).rw(m_ppu, FUNC(ppu_vt03_device::read_2014), FUNC(ppu_vt03_device::write_2014));
-	map(0x2013, 0x2013).rw(m_ppu, FUNC(ppu_vt03_device::read_2017), FUNC(ppu_vt03_device::write_2017));
-	map(0x2014, 0x2014).rw(m_ppu, FUNC(ppu_vt03_device::read_2012), FUNC(ppu_vt03_device::write_2012));
-	map(0x2015, 0x2015).rw(m_ppu, FUNC(ppu_vt03_device::read_2016), FUNC(ppu_vt03_device::write_2016));
-	map(0x2016, 0x2016).rw(m_ppu, FUNC(ppu_vt03_device::read_2015), FUNC(ppu_vt03_device::write_2015));
-	map(0x2017, 0x2017).rw(m_ppu, FUNC(ppu_vt03_device::read_2013), FUNC(ppu_vt03_device::write_2013));
+	map(0x2012, 0x2012).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2014), FUNC(ppu_vt03_device::write_2014));
+	map(0x2013, 0x2013).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2017), FUNC(ppu_vt03_device::write_2017));
+	map(0x2014, 0x2014).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2012), FUNC(ppu_vt03_device::write_2012));
+	map(0x2015, 0x2015).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2016), FUNC(ppu_vt03_device::write_2016));
+	map(0x2016, 0x2016).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2015), FUNC(ppu_vt03_device::write_2015));
+	map(0x2017, 0x2017).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2013), FUNC(ppu_vt03_device::write_2013));
 }
 
 
@@ -1232,7 +1243,11 @@ void nes_vt02_vt03_soc_waixing_pal_device::device_add_mconfig(machine_config& co
 	do_pal_timings_and_ppu_replacement(config);
 }
 
-
+void nes_vt02_vt03_soc_sports_pal_device::device_add_mconfig(machine_config& config)
+{
+	nes_vt02_vt03_soc_sports_device::device_add_mconfig(config);
+	do_pal_timings_and_ppu_replacement(config);
+}
 
 /***********************************************************************************************************************************************************/
 /* 'Scramble' specifics */

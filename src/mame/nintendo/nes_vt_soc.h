@@ -193,7 +193,19 @@ public:
 	nes_vt02_vt03_soc_sports_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 
 protected:
+	nes_vt02_vt03_soc_sports_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
 	virtual void nes_vt_2012_to_2017_regs(address_map &map) override;
+};
+
+class nes_vt02_vt03_soc_sports_pal_device : public nes_vt02_vt03_soc_sports_device
+{
+public:
+	nes_vt02_vt03_soc_sports_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+
+protected:
+	virtual void device_add_mconfig(machine_config& config) override;
 };
 
 class nes_vt02_vt03_soc_scramble_device : public nes_vt02_vt03_soc_device
@@ -221,8 +233,9 @@ DECLARE_DEVICE_TYPE(NES_VT02_VT03_SOC_WAIXING,     nes_vt02_vt03_soc_waixing_dev
 DECLARE_DEVICE_TYPE(NES_VT02_VT03_SOC_WAIXING_PAL, nes_vt02_vt03_soc_waixing_pal_device)
 
 DECLARE_DEVICE_TYPE(NES_VT02_VT03_SOC_HUMMER, nes_vt02_vt03_soc_hummer_device)
-DECLARE_DEVICE_TYPE(NES_VT02_VT03_SOC_SPORTS, nes_vt02_vt03_soc_sports_device)
 
+DECLARE_DEVICE_TYPE(NES_VT02_VT03_SOC_SPORTS, nes_vt02_vt03_soc_sports_device)
+DECLARE_DEVICE_TYPE(NES_VT02_VT03_SOC_SPORTS_PAL, nes_vt02_vt03_soc_sports_pal_device)
 
 DECLARE_DEVICE_TYPE(NES_VT02_VT03_SOC_SCRAMBLE, nes_vt02_vt03_soc_scramble_device)
 DECLARE_DEVICE_TYPE(NES_VT02_VT03_SOC_SCRAMBLE_PAL, nes_vt02_vt03_soc_scramble_pal_device)

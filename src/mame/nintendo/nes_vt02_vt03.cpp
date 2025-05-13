@@ -672,7 +672,7 @@ void nes_vt_sp69_state::nes_vt_4mb_sp69(machine_config& config)
 
 void nes_vt_ablping_state::nes_vt_2mb_ablping(machine_config &config)
 {
-	NES_VT02_VT03_SOC_SPORTS(config, m_soc, PAL_APU_CLOCK); // TODO: PAL
+	NES_VT02_VT03_SOC_SPORTS_PAL(config, m_soc, PAL_APU_CLOCK);
 	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_ablping_state::vt_external_space_map_2mbyte);
 	m_soc->set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8);
