@@ -220,6 +220,10 @@ static INPUT_PORTS_START( pntnpuzls )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
+	PORT_START("COIN")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1) PORT_WRITE_LINE_DEVICE_MEMBER("pic", FUNC(pic8259_device::ir2_w))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1) PORT_WRITE_LINE_DEVICE_MEMBER("pic", FUNC(pic8259_device::ir3_w))
+
 	// TODO: touchscreen
 INPUT_PORTS_END
 
@@ -246,7 +250,6 @@ void pntnpuzls_state::pntnpuzls(machine_config &config)
 
 	pit8254_device &pit(PIT8254(config, "pit"));
 	pit.set_clk<0>(XTAL(3'579'545)); // clocks?
-	pit.out_handler<0>().set("pic", FUNC(pic8259_device::ir2_w));
 	pit.set_clk<1>(XTAL(3'579'545));
 	pit.set_clk<2>(XTAL(3'579'545));
 
