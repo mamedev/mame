@@ -1,8 +1,19 @@
 // license:BSD-3-Clause
 // copyright-holders:
+/**************************************************************************************************
 
-/*
 Paint 'N Puzzle Super (or Super Paint 'N Puzzle)
+
+TODO:
+- coin stuck (cfr. service mode counting up), makes input test non-functional;
+- device for RS-232 touchscreen;
+- complete I/O;
+- NVRAM;
+- sound (missing from board?);
+- Is "RGB O/P" connector just for touchscreen control?
+
+===================================================================================================
+
 VIDEO PUZZLE V1.0 PCB
 (C) 1994 Green Concepts International
 
@@ -19,10 +30,13 @@ W86C450 UART
 1.8432 MHz XTAL (near UART)
 Card connector
 Ticket connector
-*/
+RGB O/P connector
+
+**************************************************************************************************/
 
 #include "emu.h"
 
+#include "bus/rs232/rs232.h"
 #include "cpu/i86/i286.h"
 #include "machine/ins8250.h"
 #include "machine/pic8259.h"
@@ -105,13 +119,18 @@ void pntnpuzls_state::program_map(address_map &map)
 
 void pntnpuzls_state::io_map(address_map &map)
 {
+	map(0x0300, 0x0301).portr("IN0");
+	map(0x0302, 0x0303).portr("IN1");
+	map(0x0304, 0x0305).nopw(); // coin counter?
 	map(0x0308, 0x0308).lw8(
 		NAME([this] (offs_t offset, u8 data) {
 			// TODO: may view select on bits 7-3
-			logerror("$308 %02x\n", data);
+			if ((data & 0x18) != 0x18)
+				logerror("$308 %02x\n", data);
 			m_font_bank->set_entry(data & 7);
 		})
 	);
+	map(0x030c, 0x030d).portr("IN2");
 
 	map(0x0310, 0x0310).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x0312, 0x0312).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
@@ -127,25 +146,79 @@ void pntnpuzls_state::io_map(address_map &map)
 
 // no DIP switches on PCB
 static INPUT_PORTS_START( pntnpuzls )
+	// TODO: remaining buttons
+//	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("White")
+//	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Yellow")
+//	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Green")
+//	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Light Blue")
+//	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Light Green")
+
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x02, 0x02, "IN0" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("Tan")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Brown")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Pink")
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x01, 0x01, "IN1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Red")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Blue")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	// TODO: to card and ticket connectors
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x01, 0x01, "IN2" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	// TODO: touchscreen
 INPUT_PORTS_END
@@ -177,13 +250,23 @@ void pntnpuzls_state::pntnpuzls(machine_config &config)
 	pit.set_clk<1>(XTAL(3'579'545));
 	pit.set_clk<2>(XTAL(3'579'545));
 
-
 	ins8250_device &uart(INS8250(config, "uart", 1.8432_MHz_XTAL));
 	uart.out_int_callback().set("pic", FUNC(pic8259_device::ir4_w));
+	uart.out_tx_callback().set("comm", FUNC(rs232_port_device::write_txd));
+	uart.out_dtr_callback().set("comm", FUNC(rs232_port_device::write_dtr));
+	uart.out_rts_callback().set("comm", FUNC(rs232_port_device::write_rts));
+
+	rs232_port_device &comm(RS232_PORT(config, "comm", default_rs232_devices, nullptr));
+	comm.rxd_handler().set("uart", FUNC(ins8250_device::rx_w));
+	comm.dsr_handler().set("uart", FUNC(ins8250_device::dsr_w));
+	comm.dcd_handler().set("uart", FUNC(ins8250_device::dcd_w));
+	comm.cts_handler().set("uart", FUNC(ins8250_device::cts_w));
+	comm.ri_handler().set("uart", FUNC(ins8250_device::ri_w));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	// TODO: convert to set_raw. Affects out_vsync timing (currently at vline=203).
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(320, 200);
 	screen.set_screen_update(FUNC(pntnpuzls_state::screen_update));
 
@@ -197,6 +280,7 @@ void pntnpuzls_state::pntnpuzls(machine_config &config)
 	crtc.set_char_width(8);
 	crtc.set_show_border_area(false);
 	crtc.set_screen("screen");
+	crtc.out_vsync_callback().set("pic", FUNC(pic8259_device::ir0_w));
 
 	// TODO: sound? missing chip at u11?
 }
