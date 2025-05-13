@@ -454,7 +454,7 @@ void hfe_format::generate_track_from_hfe_bitstream(int cyl, int head, int sample
 	// As explained above, we arrange for the flux change to occur in the last
 	// quarter of a cell
 
-	long cyltime = (long)(1000000000L * 60 / m_rpm);  // one rotation in nanosec
+	long cyltime = (long)(1000000000LL * 60 / m_rpm);  // one rotation in nanosec
 
 	while (timepos < cyltime)
 	{
@@ -595,7 +595,7 @@ bool hfe_format::save(util::random_read_write &io, const std::vector<uint32_t> &
 
 	// Calculate the buffer length for the cylinder
 
-	long cyltime = (long)(1000000000L * 60 / m_rpm);
+	long cyltime = (long)(1000000000LL * 60 / m_rpm);
 	int size1track = (cyltime / samplelength) / 8;
 
 	// Round up the length of one side to a 0x100 multiple (padding)
