@@ -521,11 +521,11 @@ void nes_vt02_vt03_soc_device::nt_w(offs_t offset, uint8_t data)
 int nes_vt02_vt03_soc_device::calculate_real_video_address(int addr, int extended, int readtype)
 {
 	// might be a VT09 only feature (alt 4bpp mode?)
-	int alt_order = m_ppu->get_201x_reg(0x0) & 0x40;
+	int alt_order = m_ppu->get_extended_modes_enable() & 0x40;
 
 	if (readtype == 0)
 	{
-		if (m_ppu->get_201x_reg(0x0) & 0x10)
+		if (m_ppu->get_extended_modes_enable() & 0x10)
 		{
 			extended = 1;
 		}
@@ -536,7 +536,7 @@ int nes_vt02_vt03_soc_device::calculate_real_video_address(int addr, int extende
 	}
 	else if (readtype == 1)
 	{
-		if (m_ppu->get_201x_reg(0x0) & 0x08)
+		if (m_ppu->get_extended_modes_enable() & 0x08)
 		{
 			extended = 1;
 		}
@@ -581,34 +581,34 @@ int nes_vt02_vt03_soc_device::calculate_real_video_address(int addr, int extende
 	case 0x1:
 	case 0xc:
 	case 0xd:
-		vbank_tva17_tva10 = (m_ppu->get_201x_reg(0x6) & 0xfe) | ((addr & 0x0400) ? 1 : 0);
+		vbank_tva17_tva10 = (m_ppu->get_videobank0_reg(0x4) & 0xfe) | ((addr & 0x0400) ? 1 : 0);
 		break;
 
 	case 0x2:
 	case 0x3:
 	case 0xe:
 	case 0xf:
-		vbank_tva17_tva10 = (m_ppu->get_201x_reg(0x7) & 0xfe) | ((addr & 0x0400) ? 1 : 0);
+		vbank_tva17_tva10 = (m_ppu->get_videobank0_reg(0x5) & 0xfe) | ((addr & 0x0400) ? 1 : 0);
 		break;
 
 	case 0x4:
 	case 0x8:
-		vbank_tva17_tva10 = m_ppu->get_201x_reg(0x2);
+		vbank_tva17_tva10 = m_ppu->get_videobank0_reg(0x0);
 		break;
 
 	case 0x5:
 	case 0x9:
-		vbank_tva17_tva10 = m_ppu->get_201x_reg(0x3);
+		vbank_tva17_tva10 = m_ppu->get_videobank0_reg(0x1);
 		break;
 
 	case 0x6:
 	case 0xa:
-		vbank_tva17_tva10 = m_ppu->get_201x_reg(0x4);
+		vbank_tva17_tva10 = m_ppu->get_videobank0_reg(0x2);
 		break;
 
 	case 0x7:
 	case 0xb:
-		vbank_tva17_tva10 = m_ppu->get_201x_reg(0x5);
+		vbank_tva17_tva10 = m_ppu->get_videobank0_reg(0x3);
 		break;
 
 	}
@@ -655,8 +655,8 @@ int nes_vt02_vt03_soc_device::calculate_real_video_address(int addr, int extende
 	if (!extended)
 	{
 		int is4bpp = 0;
-		if (readtype == 0) is4bpp = m_ppu->get_201x_reg(0x0) & 0x02;
-		else if (readtype == 1) is4bpp = m_ppu->get_201x_reg(0x0) & 0x04;
+		if (readtype == 0) is4bpp = m_ppu->get_extended_modes_enable() & 0x02;
+		else if (readtype == 1) is4bpp = m_ppu->get_extended_modes_enable() & 0x04;
 
 		int va20_va18 = (m_ppu->get_201x_reg(0x8) & 0x70) >> 4;
 
@@ -682,7 +682,7 @@ int nes_vt02_vt03_soc_device::calculate_real_video_address(int addr, int extende
 		switch (readtype)
 		{
 		case 0: // background display
-			is4bpp = m_ppu->get_201x_reg(0x0) & 0x02;
+			is4bpp = m_ppu->get_extended_modes_enable() & 0x02;
 
 			eva2_eva0 |= m_ppu->get_m_read_bg4_bg3();
 
@@ -697,7 +697,7 @@ int nes_vt02_vt03_soc_device::calculate_real_video_address(int addr, int extende
 			break;
 
 		case 1: // sprite display
-			is4bpp = m_ppu->get_201x_reg(0x0) & 0x04; // 16 colors or 16-pixel wide (both adjust the read)
+			is4bpp = m_ppu->get_extended_modes_enable() & 0x04; // 16 colors or 16-pixel wide (both adjust the read)
 
 			eva2_eva0 |= m_ppu->get_speva2_speva0();
 
@@ -1079,7 +1079,7 @@ void nes_vt02_vt03_soc_device::nes_vt_map(address_map &map)
 	// 2010 - 201f are extended regs, and can differ between VT models
 	map(0x2010, 0x2010).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2010), FUNC(ppu_vt03_device::write_2010));
 	map(0x2011, 0x2011).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2011), FUNC(ppu_vt03_device::write_2011));
-	nes_vt_2012_to_2017_videobank0_regs(map);// 2012 - 2017 map differently on some SoC types (re-ordered)
+	nes_vt_2012_to_2017_regs(map);// 2012 - 2017 map differently on some SoC types (re-ordered)
 	map(0x2018, 0x2018).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2018), FUNC(ppu_vt03_device::write_2018));
 	map(0x2019, 0x2019).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2019), FUNC(ppu_vt03_device::write_2019));
 	map(0x201a, 0x201a).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_201a), FUNC(ppu_vt03_device::write_201a));
@@ -1115,7 +1115,7 @@ void nes_vt02_vt03_soc_device::nes_vt_map(address_map &map)
 	map(0x6000, 0x7fff).ram();
 }
 
-void nes_vt02_vt03_soc_device::nes_vt_2012_to_2017_videobank0_regs(address_map &map)
+void nes_vt02_vt03_soc_device::nes_vt_2012_to_2017_regs(address_map &map)
 {
 	map(0x2012, 0x2012).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_0_r), FUNC(ppu_vt03_device::videobank0_0_w));
 	map(0x2013, 0x2013).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_1_r), FUNC(ppu_vt03_device::videobank0_1_w));
@@ -1125,7 +1125,7 @@ void nes_vt02_vt03_soc_device::nes_vt_2012_to_2017_videobank0_regs(address_map &
 	map(0x2017, 0x2017).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_5_r), FUNC(ppu_vt03_device::videobank0_5_w));
 }
 
-void nes_vt02_vt03_soc_waixing_device::nes_vt_2012_to_2017_videobank0_regs(address_map& map)
+void nes_vt02_vt03_soc_waixing_device::nes_vt_2012_to_2017_regs(address_map& map)
 {
 	map(0x2012, 0x2012).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_1_r), FUNC(ppu_vt03_device::videobank0_1_w));
 	map(0x2013, 0x2013).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_0_r), FUNC(ppu_vt03_device::videobank0_0_w));
@@ -1135,7 +1135,7 @@ void nes_vt02_vt03_soc_waixing_device::nes_vt_2012_to_2017_videobank0_regs(addre
 	map(0x2017, 0x2017).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_2_r), FUNC(ppu_vt03_device::videobank0_2_w));
 }
 
-void nes_vt02_vt03_soc_hummer_device::nes_vt_2012_to_2017_videobank0_regs(address_map& map)
+void nes_vt02_vt03_soc_hummer_device::nes_vt_2012_to_2017_regs(address_map& map)
 {
 	map(0x2012, 0x2012).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_5_r), FUNC(ppu_vt03_device::videobank0_5_w));
 	map(0x2013, 0x2013).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_4_r), FUNC(ppu_vt03_device::videobank0_4_w));
@@ -1145,7 +1145,7 @@ void nes_vt02_vt03_soc_hummer_device::nes_vt_2012_to_2017_videobank0_regs(addres
 	map(0x2017, 0x2017).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_1_r), FUNC(ppu_vt03_device::videobank0_1_w));
 }
 
-void nes_vt02_vt03_soc_sports_device::nes_vt_2012_to_2017_videobank0_regs(address_map& map)
+void nes_vt02_vt03_soc_sports_device::nes_vt_2012_to_2017_regs(address_map& map)
 {
 	map(0x2012, 0x2012).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_2_r), FUNC(ppu_vt03_device::videobank0_2_w));
 	map(0x2013, 0x2013).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_5_r), FUNC(ppu_vt03_device::videobank0_5_w));

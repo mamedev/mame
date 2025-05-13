@@ -64,8 +64,11 @@ public:
 	virtual uint8_t palette_read(offs_t offset) override;
 	virtual void palette_write(offs_t offset, uint8_t data) override;
 
+	uint8_t get_extended_modes_enable() { return m_extended_modes_enable; }
+
 	void set_201x_reg(int reg, uint8_t data);
 	uint8_t get_201x_reg(int reg);
+	uint8_t get_videobank0_reg(int reg) { return m_201x_regs[reg + 2]; }
 
 	uint8_t get_va34();
 	uint8_t get_m_read_bg4_bg3();
@@ -98,6 +101,7 @@ protected:
 	uint32_t m_vtpens_rgb444[0x1000*8];
 
 	uint8_t m_201x_regs[0x20];
+	uint8_t m_extended_modes_enable;
 
 private:
 	devcb_read8 m_read_bg;
@@ -111,7 +115,6 @@ private:
 
 	vtxx_pal_mode m_pal_mode = PAL_MODE_VT0x;
 
-	void set_2010_reg(uint8_t data);
 	void init_vt03_palette_tables(int palmode);
 	void init_vtxx_rgb555_palette_tables();
 	void init_vtxx_rgb444_palette_tables();

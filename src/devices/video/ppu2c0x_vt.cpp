@@ -67,7 +67,7 @@ void ppu_vt03_device::palette_write(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t ppu_vt03_device::read_2010(offs_t offset) { return m_201x_regs[0x0]; }
+uint8_t ppu_vt03_device::read_2010(offs_t offset) { return m_extended_modes_enable; }
 uint8_t ppu_vt03_device::read_2011(offs_t offset) { return m_201x_regs[0x1]; }
 uint8_t ppu_vt03_device::videobank0_0_r(offs_t offset) { return m_201x_regs[0x2]; }
 uint8_t ppu_vt03_device::videobank0_1_r(offs_t offset) { return m_201x_regs[0x3]; }
@@ -209,6 +209,7 @@ void ppu_vt03_device::device_start()
 	save_item(NAME(m_extplanebuf));
 	save_item(NAME(m_extra_sprite_bits));
 	save_item(NAME(m_201x_regs));
+	save_item(NAME(m_extended_modes_enable));
 
 	init_vt03_palette_tables(0);
 	init_vtxx_rgb555_palette_tables();
@@ -238,6 +239,8 @@ void ppu_vt03_device::device_reset()
 	for (int i = 0; i < 0x20; i++)
 		set_201x_reg(i, 0x00);
 
+	m_extended_modes_enable = 0x00;
+
 	m_read_bg4_bg3 = 0;
 	m_va34 = false;
 }
@@ -260,7 +263,7 @@ void ppu_vt03_device::read_sprite_plane_data(int address)
 	m_planebuf[0] = m_read_sp((address + 0) & 0x1fff);
 	m_planebuf[1] = m_read_sp((address + 8) & 0x1fff);
 
-	const bool is4bpp = BIT(get_201x_reg(0x0), 2);
+	const bool is4bpp = BIT(m_extended_modes_enable, 2);
 
 	if (is4bpp)
 	{
@@ -274,8 +277,8 @@ void ppu_vt03_device::make_sprite_pixel_data(uint8_t& pixel_data, bool flipx)
 {
 	ppu2c0x_device::make_sprite_pixel_data(pixel_data, flipx);
 
-	const bool is4bpp = BIT(get_201x_reg(0x0), 2);
-	const bool is16pix = BIT(get_201x_reg(0x0), 0);
+	const bool is4bpp = BIT(m_extended_modes_enable, 2);
+	const bool is16pix = BIT(m_extended_modes_enable, 0);
 
 	if (is4bpp)
 	{
@@ -304,8 +307,8 @@ void ppu_vt03_device::make_sprite_pixel_data(uint8_t& pixel_data, bool flipx)
 
 void ppu_vt03_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_rgb32& bitmap)
 {
-	const bool is4bpp = BIT(get_201x_reg(0x0), 2);
-	const bool is16pix = BIT(get_201x_reg(0x0), 0);
+	const bool is4bpp = BIT(m_extended_modes_enable, 2);
+	const bool is16pix = BIT(m_extended_modes_enable, 0);
 
 	if (is4bpp)
 	{
@@ -342,9 +345,9 @@ void ppu_vt03_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, u
 
 void ppu_vt03_device::read_tile_plane_data(int address, int color)
 {
-	const bool is4bpp = BIT(get_201x_reg(0x0), 1);
+	const bool is4bpp = BIT(m_extended_modes_enable, 1);
 
-	if (m_201x_regs[0] & 0x10) // extended mode
+	if (m_extended_modes_enable & 0x10) // extended mode
 		m_read_bg4_bg3 = color;
 	else
 		m_read_bg4_bg3 = 0;
@@ -368,7 +371,7 @@ void ppu_vt03_device::read_tile_plane_data(int address, int color)
 
 void ppu_vt03_device::shift_tile_plane_data(uint8_t& pix)
 {
-	const bool is4bpp = BIT(get_201x_reg(0x0), 1);
+	const bool is4bpp = BIT(m_extended_modes_enable, 1);
 
 	ppu2c0x_device::shift_tile_plane_data(pix);
 
@@ -383,7 +386,7 @@ void ppu_vt03_device::shift_tile_plane_data(uint8_t& pix)
 
 void ppu_vt03_device::draw_back_pen(uint32_t* dst, int back_pen)
 {
-	if (m_201x_regs[0] & 0x80)
+	if (m_extended_modes_enable & 0x80)
 	{
 		// is the back_pen always just pen 0 in VT modes? (using last data written to a transparent pen as per NES logic doesn't work as writes are split across 2 bytes)
 		draw_tile_pixel_inner(0, dst);
@@ -398,7 +401,7 @@ void ppu_vt03_device::draw_back_pen(uint32_t* dst, int back_pen)
 
 void ppu_vt03_device::draw_tile_pixel_inner(uint8_t pen, uint32_t *dest)
 {
-	if (BIT(m_201x_regs[0], 7))
+	if (BIT(m_extended_modes_enable, 7))
 	{
 		if (m_pal_mode == PAL_MODE_NEW_RGB) // unknown newer VT mode
 		{
@@ -455,7 +458,7 @@ void ppu_vt03_device::draw_tile_pixel_inner(uint8_t pen, uint32_t *dest)
 }
 void ppu_vt03_device::draw_tile_pixel(uint8_t pix, int color, uint32_t back_pen, uint32_t*& dest)
 {
-	const bool is4bpp = BIT(get_201x_reg(0x0), 1);
+	const bool is4bpp = BIT(m_extended_modes_enable, 1);
 
 	if (!is4bpp)
 	{
@@ -466,7 +469,7 @@ void ppu_vt03_device::draw_tile_pixel(uint8_t pix, int color, uint32_t back_pen,
 		int basepen;
 		int pen;
 
-		if (m_201x_regs[0] & 0x10) // extended mode
+		if (m_extended_modes_enable & 0x10) // extended mode
 		{
 			basepen = 0;
 		}
@@ -498,10 +501,6 @@ uint8_t ppu_vt03_device::get_speva2_speva0()
 	return m_extra_sprite_bits;
 }
 
-void ppu_vt03_device::set_2010_reg(uint8_t data)
-{
-
-}
 
 void ppu_vt03_device::write_2010(offs_t offset, uint8_t data)
 {
@@ -514,7 +513,7 @@ void ppu_vt03_device::write_2010(offs_t offset, uint8_t data)
 	    1   : BK16EN
 	    0   : PIX16EN */
 
-	m_201x_regs[0x0] = data;
+	m_extended_modes_enable = data;
 }
 
 void ppu_vt03_device::write_2011(offs_t offset, uint8_t data) { m_201x_regs[0x1] = data; }
