@@ -73,6 +73,22 @@ private:
 uint32_t pntnpuzls_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(rgb_t::black(), cliprect);
+	const int pitch = 320;
+
+	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		const u16 y_bank = (y & 0xf) * 0x2000;
+		for(int x = cliprect.min_x; x <= cliprect.max_x; x+=2)
+		{
+			const u16 gfx_data = m_vram[(x + (y >> 3) * pitch + y_bank) / 2];
+
+			for(int xi = 0; xi < 2; xi++)
+			{
+				const u8 color = (gfx_data >> (xi * 8)) & 0xff;
+				bitmap.pix(y, x + xi) = m_palette->pen(color);
+			}
+		}
+	}
 
 	return 0;
 }
@@ -141,7 +157,6 @@ void pntnpuzls_state::machine_start()
 
 void pntnpuzls_state::ramdac_map(address_map &map)
 {
-	// TODO: writes to upper bits 7-6 but decodes better as 666
 	map(0x000, 0x2ff).rw(m_ramdac, FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
 }
 
@@ -166,19 +181,19 @@ void pntnpuzls_state::pntnpuzls(machine_config &config)
 	ins8250_device &uart(INS8250(config, "uart", 1.8432_MHz_XTAL));
 	uart.out_int_callback().set("pic", FUNC(pic8259_device::ir4_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: everything
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(512, 256);
-	screen.set_visarea_full();
+	screen.set_size(320, 200);
 	screen.set_screen_update(FUNC(pntnpuzls_state::screen_update));
 
-	PALETTE(config, "palette").set_entries(0x100); // TODO
+	PALETTE(config, "palette").set_entries(0x100);
 
+	// HM86171-80
 	RAMDAC(config, m_ramdac, 0, "palette");
 	m_ramdac->set_addrmap(0, &pntnpuzls_state::ramdac_map);
 
-	mc6845_device &crtc(MC6845(config, "crtc", 27'500'000 / 30)); // clock / divider not verified
+	mc6845_device &crtc(MC6845(config, "crtc", 27'500'000 / 32)); // clock / divider not verified
 	crtc.set_char_width(8);
 	crtc.set_show_border_area(false);
 	crtc.set_screen("screen");
