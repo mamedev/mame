@@ -129,12 +129,12 @@ void vt3xx_soc_base_device::vt369_map(address_map &map)
 
 	map(0x2010, 0x2010).rw(m_ppu, FUNC(ppu_vt3xx_device::read_2010), FUNC(ppu_vt3xx_device::write_2010));
 	map(0x2011, 0x2011).rw(m_ppu, FUNC(ppu_vt3xx_device::read_2011), FUNC(ppu_vt3xx_device::write_2011));
-	map(0x2012, 0x2012).rw(m_ppu, FUNC(ppu_vt3xx_device::read_2012), FUNC(ppu_vt3xx_device::write_2012));
-	map(0x2013, 0x2013).rw(m_ppu, FUNC(ppu_vt3xx_device::read_2013), FUNC(ppu_vt3xx_device::write_2013));
-	map(0x2014, 0x2014).rw(m_ppu, FUNC(ppu_vt3xx_device::read_2014), FUNC(ppu_vt3xx_device::write_2014));
-	map(0x2015, 0x2015).rw(m_ppu, FUNC(ppu_vt3xx_device::read_2015), FUNC(ppu_vt3xx_device::write_2015));
-	map(0x2016, 0x2016).rw(m_ppu, FUNC(ppu_vt3xx_device::read_2016), FUNC(ppu_vt3xx_device::write_2016));
-	map(0x2017, 0x2017).rw(m_ppu, FUNC(ppu_vt3xx_device::read_2017), FUNC(ppu_vt3xx_device::write_2017));
+	map(0x2012, 0x2012).rw(m_ppu, FUNC(ppu_vt3xx_device::videobank0_0_r), FUNC(ppu_vt3xx_device::videobank0_0_w));
+	map(0x2013, 0x2013).rw(m_ppu, FUNC(ppu_vt3xx_device::videobank0_1_r), FUNC(ppu_vt3xx_device::videobank0_1_w));
+	map(0x2014, 0x2014).rw(m_ppu, FUNC(ppu_vt3xx_device::videobank0_2_r), FUNC(ppu_vt3xx_device::videobank0_2_w));
+	map(0x2015, 0x2015).rw(m_ppu, FUNC(ppu_vt3xx_device::videobank0_3_r), FUNC(ppu_vt3xx_device::videobank0_3_w));
+	map(0x2016, 0x2016).rw(m_ppu, FUNC(ppu_vt3xx_device::videobank0_4_r), FUNC(ppu_vt3xx_device::videobank0_4_w));
+	map(0x2017, 0x2017).rw(m_ppu, FUNC(ppu_vt3xx_device::videobank0_5_r), FUNC(ppu_vt3xx_device::videobank0_5_w));
 	map(0x2018, 0x2018).rw(m_ppu, FUNC(ppu_vt3xx_device::read_2018), FUNC(ppu_vt3xx_device::write_2018));
 	map(0x2019, 0x2019).rw(m_ppu, FUNC(ppu_vt3xx_device::read_2019), FUNC(ppu_vt3xx_device::write_2019));
 	map(0x201a, 0x201a).rw(m_ppu, FUNC(ppu_vt3xx_device::read_201a), FUNC(ppu_vt3xx_device::write_201a));

@@ -34,12 +34,12 @@ public:
 
 	uint8_t read_2010(offs_t offset);
 	uint8_t read_2011(offs_t offset);
-	uint8_t read_2012(offs_t offset);
-	uint8_t read_2013(offs_t offset);
-	uint8_t read_2014(offs_t offset);
-	uint8_t read_2015(offs_t offset);
-	uint8_t read_2016(offs_t offset);
-	uint8_t read_2017(offs_t offset);
+	uint8_t videobank0_0_r(offs_t offset);
+	uint8_t videobank0_1_r(offs_t offset);
+	uint8_t videobank0_2_r(offs_t offset);
+	uint8_t videobank0_3_r(offs_t offset);
+	uint8_t videobank0_4_r(offs_t offset);
+	uint8_t videobank0_5_r(offs_t offset);
 	uint8_t read_2018(offs_t offset);
 	uint8_t read_2019(offs_t offset);
 	uint8_t read_201a(offs_t offset);
@@ -51,12 +51,12 @@ public:
 
 	void write_2010(offs_t offset, uint8_t data);
 	void write_2011(offs_t offset, uint8_t data);
-	void write_2012(offs_t offset, uint8_t data);
-	void write_2013(offs_t offset, uint8_t data);
-	void write_2014(offs_t offset, uint8_t data);
-	void write_2015(offs_t offset, uint8_t data);
-	void write_2016(offs_t offset, uint8_t data);
-	void write_2017(offs_t offset, uint8_t data);
+	void videobank0_0_w(offs_t offset, uint8_t data);
+	void videobank0_1_w(offs_t offset, uint8_t data);
+	void videobank0_2_w(offs_t offset, uint8_t data);
+	void videobank0_3_w(offs_t offset, uint8_t data);
+	void videobank0_4_w(offs_t offset, uint8_t data);
+	void videobank0_5_w(offs_t offset, uint8_t data);
 	void write_2018(offs_t offset, uint8_t data);
 	void write_2019(offs_t offset, uint8_t data);
 	void write_201a(offs_t offset, uint8_t data);

@@ -59,7 +59,7 @@ protected:
 	required_device<nes_apu_vt_device> m_apu;
 
 	void nes_vt_map(address_map &map) ATTR_COLD;
-	virtual void nes_vt_2012_to_2017_regs(address_map &map);
+	virtual void nes_vt_2012_to_2017_videobank0_regs(address_map &map);
 
 	uint32_t get_banks(uint8_t bnk);
 	void update_banks();
@@ -166,7 +166,7 @@ public:
 protected:
 	nes_vt02_vt03_soc_waixing_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void nes_vt_2012_to_2017_regs(address_map &map) override;
+	virtual void nes_vt_2012_to_2017_videobank0_regs(address_map &map) override;
 };
 
 class nes_vt02_vt03_soc_waixing_pal_device : public nes_vt02_vt03_soc_waixing_device
@@ -184,7 +184,7 @@ public:
 	nes_vt02_vt03_soc_hummer_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 
 protected:
-	virtual void nes_vt_2012_to_2017_regs(address_map &map) override;
+	virtual void nes_vt_2012_to_2017_videobank0_regs(address_map &map) override;
 };
 
 class nes_vt02_vt03_soc_sports_device : public nes_vt02_vt03_soc_device
@@ -196,7 +196,7 @@ protected:
 	nes_vt02_vt03_soc_sports_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void nes_vt_2012_to_2017_regs(address_map &map) override;
+	virtual void nes_vt_2012_to_2017_videobank0_regs(address_map &map) override;
 };
 
 class nes_vt02_vt03_soc_sports_pal_device : public nes_vt02_vt03_soc_sports_device

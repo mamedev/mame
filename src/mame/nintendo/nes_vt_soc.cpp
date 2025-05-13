@@ -1079,7 +1079,7 @@ void nes_vt02_vt03_soc_device::nes_vt_map(address_map &map)
 	// 2010 - 201f are extended regs, and can differ between VT models
 	map(0x2010, 0x2010).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2010), FUNC(ppu_vt03_device::write_2010));
 	map(0x2011, 0x2011).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2011), FUNC(ppu_vt03_device::write_2011));
-	nes_vt_2012_to_2017_regs(map);// 2012 - 2017 map differently on some SoC types (re-ordered)
+	nes_vt_2012_to_2017_videobank0_regs(map);// 2012 - 2017 map differently on some SoC types (re-ordered)
 	map(0x2018, 0x2018).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2018), FUNC(ppu_vt03_device::write_2018));
 	map(0x2019, 0x2019).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2019), FUNC(ppu_vt03_device::write_2019));
 	map(0x201a, 0x201a).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_201a), FUNC(ppu_vt03_device::write_201a));
@@ -1115,44 +1115,44 @@ void nes_vt02_vt03_soc_device::nes_vt_map(address_map &map)
 	map(0x6000, 0x7fff).ram();
 }
 
-void nes_vt02_vt03_soc_device::nes_vt_2012_to_2017_regs(address_map &map)
+void nes_vt02_vt03_soc_device::nes_vt_2012_to_2017_videobank0_regs(address_map &map)
 {
-	map(0x2012, 0x2012).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2012), FUNC(ppu_vt03_device::write_2012));
-	map(0x2013, 0x2013).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2013), FUNC(ppu_vt03_device::write_2013));
-	map(0x2014, 0x2014).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2014), FUNC(ppu_vt03_device::write_2014));
-	map(0x2015, 0x2015).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2015), FUNC(ppu_vt03_device::write_2015));
-	map(0x2016, 0x2016).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2016), FUNC(ppu_vt03_device::write_2016));
-	map(0x2017, 0x2017).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2017), FUNC(ppu_vt03_device::write_2017));
+	map(0x2012, 0x2012).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_0_r), FUNC(ppu_vt03_device::videobank0_0_w));
+	map(0x2013, 0x2013).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_1_r), FUNC(ppu_vt03_device::videobank0_1_w));
+	map(0x2014, 0x2014).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_2_r), FUNC(ppu_vt03_device::videobank0_2_w));
+	map(0x2015, 0x2015).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_3_r), FUNC(ppu_vt03_device::videobank0_3_w));
+	map(0x2016, 0x2016).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_4_r), FUNC(ppu_vt03_device::videobank0_4_w));
+	map(0x2017, 0x2017).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_5_r), FUNC(ppu_vt03_device::videobank0_5_w));
 }
 
-void nes_vt02_vt03_soc_waixing_device::nes_vt_2012_to_2017_regs(address_map& map)
+void nes_vt02_vt03_soc_waixing_device::nes_vt_2012_to_2017_videobank0_regs(address_map& map)
 {
-	map(0x2012, 0x2012).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2013), FUNC(ppu_vt03_device::write_2013));
-	map(0x2013, 0x2013).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2012), FUNC(ppu_vt03_device::write_2012));
-	map(0x2014, 0x2014).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2017), FUNC(ppu_vt03_device::write_2017));
-	map(0x2015, 0x2015).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2016), FUNC(ppu_vt03_device::write_2016));
-	map(0x2016, 0x2016).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2015), FUNC(ppu_vt03_device::write_2015));
-	map(0x2017, 0x2017).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2014), FUNC(ppu_vt03_device::write_2014));
+	map(0x2012, 0x2012).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_1_r), FUNC(ppu_vt03_device::videobank0_1_w));
+	map(0x2013, 0x2013).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_0_r), FUNC(ppu_vt03_device::videobank0_0_w));
+	map(0x2014, 0x2014).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_5_r), FUNC(ppu_vt03_device::videobank0_5_w));
+	map(0x2015, 0x2015).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_4_r), FUNC(ppu_vt03_device::videobank0_4_w));
+	map(0x2016, 0x2016).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_3_r), FUNC(ppu_vt03_device::videobank0_3_w));
+	map(0x2017, 0x2017).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_2_r), FUNC(ppu_vt03_device::videobank0_2_w));
 }
 
-void nes_vt02_vt03_soc_hummer_device::nes_vt_2012_to_2017_regs(address_map& map)
+void nes_vt02_vt03_soc_hummer_device::nes_vt_2012_to_2017_videobank0_regs(address_map& map)
 {
-	map(0x2012, 0x2012).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2017), FUNC(ppu_vt03_device::write_2017));
-	map(0x2013, 0x2013).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2016), FUNC(ppu_vt03_device::write_2016));
-	map(0x2014, 0x2014).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2015), FUNC(ppu_vt03_device::write_2015));
-	map(0x2015, 0x2015).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2014), FUNC(ppu_vt03_device::write_2014));
-	map(0x2016, 0x2016).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2012), FUNC(ppu_vt03_device::write_2012));
-	map(0x2017, 0x2017).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2013), FUNC(ppu_vt03_device::write_2013));
+	map(0x2012, 0x2012).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_5_r), FUNC(ppu_vt03_device::videobank0_5_w));
+	map(0x2013, 0x2013).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_4_r), FUNC(ppu_vt03_device::videobank0_4_w));
+	map(0x2014, 0x2014).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_3_r), FUNC(ppu_vt03_device::videobank0_3_w));
+	map(0x2015, 0x2015).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_2_r), FUNC(ppu_vt03_device::videobank0_2_w));
+	map(0x2016, 0x2016).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_0_r), FUNC(ppu_vt03_device::videobank0_0_w));
+	map(0x2017, 0x2017).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_1_r), FUNC(ppu_vt03_device::videobank0_1_w));
 }
 
-void nes_vt02_vt03_soc_sports_device::nes_vt_2012_to_2017_regs(address_map& map)
+void nes_vt02_vt03_soc_sports_device::nes_vt_2012_to_2017_videobank0_regs(address_map& map)
 {
-	map(0x2012, 0x2012).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2014), FUNC(ppu_vt03_device::write_2014));
-	map(0x2013, 0x2013).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2017), FUNC(ppu_vt03_device::write_2017));
-	map(0x2014, 0x2014).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2012), FUNC(ppu_vt03_device::write_2012));
-	map(0x2015, 0x2015).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2016), FUNC(ppu_vt03_device::write_2016));
-	map(0x2016, 0x2016).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2015), FUNC(ppu_vt03_device::write_2015));
-	map(0x2017, 0x2017).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2013), FUNC(ppu_vt03_device::write_2013));
+	map(0x2012, 0x2012).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_2_r), FUNC(ppu_vt03_device::videobank0_2_w));
+	map(0x2013, 0x2013).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_5_r), FUNC(ppu_vt03_device::videobank0_5_w));
+	map(0x2014, 0x2014).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_0_r), FUNC(ppu_vt03_device::videobank0_0_w));
+	map(0x2015, 0x2015).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_4_r), FUNC(ppu_vt03_device::videobank0_4_w));
+	map(0x2016, 0x2016).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_3_r), FUNC(ppu_vt03_device::videobank0_3_w));
+	map(0x2017, 0x2017).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_1_r), FUNC(ppu_vt03_device::videobank0_1_w));
 }
 
 
