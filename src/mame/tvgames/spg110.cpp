@@ -674,8 +674,10 @@ CONS( 2004, jak_capb,  0,        0, spg110_base, jak_capb,  spg110_game_state, e
 CONS( 2004, jak_spdmo, jak_spdm, 0, spg110_base, jak_spdmo, spg110_game_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse", "Spider-Man (JAKKS Pacific TV Game) (older hardware, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // this is the smaller more 'square' style joystick that was originally released before the GameKey slot was added.
 CONS( 2004, jak_spdmoa,jak_spdm, 0, spg110_base, jak_spdmo, spg110_game_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse", "Spider-Man (JAKKS Pacific TV Game) (older hardware, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // this is the resdesigned stick, but before the GameKey release
 
-// ROM bytesum is off by 0x3e, but no visible issues
-CONS( 2004, jak_sbdd,  0,        0, spg110_base, jak_spdmo, spg110_game_state, init_crc, "JAKKS Pacific Inc", "SpongeBob SquarePants Dilly Dabbler (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+// ROM bytesum is off by 0x3e, so likely a bad byte
+// sound doesn't work properly after a few initial sounds (expected, SPG110 issues)
+// fill position in the 'Color Me Spongy' mini-game is completely wrong, maybe dump issue, maybe SPG110/unSP issue.
+CONS( 2004, jak_sbdd,  0,        0, spg110_base, jak_spdmo, spg110_game_state, init_crc, "JAKKS Pacific Inc", "SpongeBob SquarePants Dilly Dabbler (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // has Game-Key strings in test mode even if there were no SPG110 Game-Key units at all
 CONS( 2006, jak_bobb,  0,        0, spg110_base, jak_bobb,  spg110_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Bob the Builder - Project: Build It (JAKKS Pacific TV Game) (JUN 2 2006 14:42:01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
