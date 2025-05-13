@@ -37,7 +37,8 @@ public:
 	auto extra_write_2_callback() { return m_extra_write_2_callback.bind(); }
 	auto extra_write_3_callback() { return m_extra_write_3_callback.bind(); }
 
-	void set_8000_scramble(uint8_t reg0, uint8_t reg1, uint8_t reg2, uint8_t reg3, uint8_t reg4, uint8_t reg5, uint8_t reg6, uint8_t reg7);
+	void set_8000_scramble(uint8_t reg0, uint8_t reg1, uint8_t reg2, uint8_t reg3, uint8_t reg4, uint8_t reg5);
+	void set_8006_scramble(uint8_t reg6, uint8_t reg7);
 	void set_410x_scramble(uint8_t reg0, uint8_t reg1);
 	void force_bad_dma() { m_force_baddma = true; }
 	void force_raster_timing_hack() { m_use_raster_timing_hack = true; }
@@ -101,8 +102,9 @@ protected:
 	int m_timer_running = 0;
 	int m_timer_val = 0;
 
-	uint8_t m_8000_scramble[8]{};
-	uint8_t m_410x_scramble[2]{};
+	uint8_t m_8000_scramble[6];
+	uint8_t m_8006_scramble[2];
+	uint8_t m_410x_scramble[2];
 
 	uint8_t m_8000_addr_latch = 0;
 

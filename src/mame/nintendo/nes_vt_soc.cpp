@@ -107,8 +107,8 @@ nes_vt02_vt03_soc_device::nes_vt02_vt03_soc_device(const machine_config& mconfig
 	m_8000_scramble[0x5] = 0x3;
 
 	// not for PPU?
-	m_8000_scramble[0x6] = 0x7;
-	m_8000_scramble[0x7] = 0x8;
+	m_8006_scramble[0] = 0x7;
+	m_8006_scramble[1] = 0x8;
 
 	// 'no scramble' configuration
 	m_410x_scramble[0x0] = 0x7;
@@ -812,13 +812,13 @@ void nes_vt02_vt03_soc_device::scrambled_8000_w(uint16_t offset, uint8_t data)
 				break;
 
 			case 0x06:
-				m_410x[m_8000_scramble[6]] = data;
+				m_410x[m_8006_scramble[0]] = data;
 				//m_410x[0x9] = data;
 				update_banks();
 				break;
 
 			case 0x07:
-				m_410x[m_8000_scramble[7]] = data;
+				m_410x[m_8006_scramble[1]] = data;
 				update_banks();
 				break;
 			}
@@ -862,7 +862,7 @@ void nes_vt02_vt03_soc_device::scrambled_8000_w(uint16_t offset, uint8_t data)
 
 // MMC3 compatibility mode
 
-void nes_vt02_vt03_soc_device::set_8000_scramble(uint8_t reg0, uint8_t reg1, uint8_t reg2, uint8_t reg3, uint8_t reg4, uint8_t reg5, uint8_t reg6, uint8_t reg7)
+void nes_vt02_vt03_soc_device::set_8000_scramble(uint8_t reg0, uint8_t reg1, uint8_t reg2, uint8_t reg3, uint8_t reg4, uint8_t reg5)
 {
 	m_8000_scramble[0] = reg0; // TODO: name the regs
 	m_8000_scramble[1] = reg1;
@@ -871,10 +871,15 @@ void nes_vt02_vt03_soc_device::set_8000_scramble(uint8_t reg0, uint8_t reg1, uin
 	m_8000_scramble[4] = reg4;
 	m_8000_scramble[5] = reg5;
 
-	// not for PPU?
-	m_8000_scramble[6] = reg6;
-	m_8000_scramble[7] = reg7;
 }
+
+void nes_vt02_vt03_soc_device::set_8006_scramble(uint8_t reg6, uint8_t reg7)
+{
+	// not for PPU?
+	m_8006_scramble[0] = reg6;
+	m_8006_scramble[1] = reg7;
+}
+
 
 void nes_vt02_vt03_soc_device::set_410x_scramble(uint8_t reg0, uint8_t reg1)
 {
