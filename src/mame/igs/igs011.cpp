@@ -4210,7 +4210,7 @@ void igs011_state::drgnwrld(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::drgnwrld_mem);
 	m_maincpu->set_vblank_int("screen", FUNC(igs011_state::irq6_line_hold));
 
-	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::timer_irq_cb<5>), attotime::from_hz(240)); // lev5 frequency drives the music tempo
+	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::timer_irq_cb<5>), attotime::from_hz(240));
 
 	YM3812(config, "ymsnd", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 2.0);
 }
@@ -4246,7 +4246,7 @@ void igs011_state::lhb(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::lhb_mem);
 	m_maincpu->set_vblank_int("screen", FUNC(igs011_state::lhb_vblank_irq));
 
-	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::lhb_timer_irq_cb), attotime::from_hz(240)); // lev5 frequency drives the music tempo
+	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::lhb_timer_irq_cb), attotime::from_hz(120));
 	// irq 3 points to an apparently unneeded routine
 
 	HOPPER(config, m_hopper, attotime::from_msec(50));
@@ -4259,7 +4259,7 @@ void igs011_state::wlcc(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::wlcc_mem);
 	m_maincpu->set_vblank_int("screen", FUNC(igs011_state::irq6_line_hold));
 
-	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::timer_irq_cb<3>), attotime::from_hz(240)); // lev3 frequency drives the music tempo
+	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::timer_irq_cb<3>), attotime::from_hz(60));
 
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 }
@@ -4272,7 +4272,7 @@ void igs011_state::xymg(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_state::xymg_mem);
 	m_maincpu->set_vblank_int("screen", FUNC(igs011_state::irq6_line_hold));
 
-	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::timer_irq_cb<3>), attotime::from_hz(240)); // lev3 frequency drives the music tempo
+	TIMER(config, "timer_irq").configure_periodic(FUNC(igs011_state::timer_irq_cb<3>), attotime::from_hz(60));
 
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 }
