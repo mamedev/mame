@@ -332,14 +332,6 @@ void ppu_vt03_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, u
 
 void ppu_vt03_device::read_tile_plane_data(int address, int color)
 {
-	// format is no longer planar
-
-	// old format 8 bits (1 byte) = 8 pixels of 1 plane (one line) of tile
-	// +8 bytes = next tile
-
-	// new format
-	// one byte = 4 planes, 2 pixels
-
 	const bool is4bpp = BIT(m_extended_modes_enable, 1);
 	m_whichpixel = 0;
 
@@ -597,6 +589,16 @@ void ppu_vt3xx_device::read_tile_plane_data(int address, int color)
 	}
 	else
 	{
+		// format is no longer planar
+
+		// old format 8 bits (1 byte) = 8 pixels of 1 plane (one line) of tile
+		// +1 bytes = next row
+		// +8 bytes = next plane
+		// +16 byte = next tile (or +32 bytes in ROM in 4bpp mode, but we signal this by setting 0x2000)
+
+		// new format
+		// one byte = 4 planes, 2 pixels
+
 		m_whichpixel = 0;
 		m_planebuf[0] = m_read_bg((address & 0x1fff));
 		m_planebuf[1] = m_read_bg((address + 8) & 0x1fff);
