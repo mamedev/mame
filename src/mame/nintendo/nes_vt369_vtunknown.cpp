@@ -1022,7 +1022,7 @@ CONS( 2017, fapocket,   0,        0,  vt369_vtunknown_fa_4x16mb, vt369_vtunknown
 
 ****************************************************************************************************************/
 
-CONS( 2012, lexi30,  0,0,  vt369_vtunknown_hh_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "Lexibook", "Arcade Center (JL1800_01)", MACHINE_NOT_WORKING )
+CONS( 2012, lexi30,  0,0,  vt369_vtunknown_hh_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "Lexibook", "Arcade Center (JL1800_01)", MACHINE_NOT_WORKING | ROT270 )
 
 // don't even get to menu. very enhanced chipset, VT368/9?
 CONS( 2012, dgun2561,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "dreamGEAR", "My Arcade Portable Gaming System with 140 Games (DGUN-2561)", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
