@@ -632,6 +632,8 @@ ROM_END
 ROM_START( lxccatv )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
 	ROM_LOAD( "120n1.bin", 0x00000, 0x2000000, CRC(6b9cf537) SHA1(44276c3ef928c76a3ecf404d2e531cd3ce5561af) )
+
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
 // The maximum address space a VT chip can see is 32MB, so these 64MB roms are actually 2 programs (there are vectors in the first half and the 2nd half)

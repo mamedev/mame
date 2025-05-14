@@ -544,9 +544,10 @@ int nes_vt02_vt03_soc_device::calculate_real_video_address(int addr, int readtyp
 		int finaladdr = 0x180000; // denv150 boot screen
 		//int finaladdr = 0xb0000; // lxcmcyba, lxcmcysw boot screen 
 		//int finaladdr = 0x90000; // lxcmcypj boot screen (or 80000 first?)
-		//int finaladdr = 0x82000; // lxcmcycr, lxcmcyfz boot screen
+		//int finaladdr = 0x82000; // lxcmcycr, lxcmcyfz, lxcmcypp boot screen
 		//int finaladdr = 0x152000; // lxcmcydp boot screen
 		//int finaladdr = 0x80000; // lxcmcysp boot screen (vertical?!)
+		//int finaladdr = 0x20000; // lxcmc250? (shows 2 screens)
 
 		int tileline = addr & 0x0007;
 		int tileplane = addr & 0x0008;
