@@ -44,7 +44,7 @@ namespace {
 		m_maincpu->set_irq_acknowledge_callback(m_maincpu, FUNC(sunplus_gcm394_base_device::irq_vector_cb));
 		m_maincpu->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
 		m_maincpu->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
-		m_maincpu->set_bootmode(0); // boot from internal ROM (NAND bootstrap)
+		m_maincpu->set_bootmode(0);
 		m_maincpu->set_cs_config_callback(FUNC(furby_connect_state::cs_callback));
 	
 		m_maincpu->nand_read_callback().set(FUNC(furby_connect_state::read_nand));
@@ -76,13 +76,13 @@ namespace {
 	
 	ROM_START( furby_connect )
 		ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-		ROM_LOAD16_WORD_SWAP( "intflash.bin", 0x0000, 0x40000, NO_DUMP)
+		ROM_LOAD16_WORD_SWAP( "intflash.bin", 0x0000, 0x40000, CRC(e20eea22))
 
 		ROM_REGION16_BE( 0x100000, "maincpu", ROMREGION_ERASE00 )
 		ROM_LOAD16_WORD_SWAP( "spi.bin", 0x0000, 0x100000, CRC(cb819c04))
 	
 	 	ROM_REGION( 0x8400000, "nandrom", ROMREGION_ERASE00 )
-		ROM_LOAD( "nand.bin", 0x0000, 0x8400000, CRC(2470f146)) // Toshiba TC58BVG0S3HTA00
+		ROM_LOAD( "nand.bin", 0x0000, 0x8400000, CRC(b64b6db3)) // Toshiba TC58BVG0S3HTA00
 	ROM_END
 		
 	} // anonymous namespace

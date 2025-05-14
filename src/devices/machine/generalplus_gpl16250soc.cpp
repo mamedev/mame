@@ -1257,6 +1257,18 @@ uint16_t sunplus_gcm394_base_device::internalrom_lower32_r(offs_t offset)
 	}
 }
 
+void sunplus_gcm394_base_device::internalrom_lower32_w(offs_t offset, uint16_t data)
+{
+	if (m_boot_mode == 0)
+	{
+		//logerror("Whoopsie. CPU tried to write into internal ROM. Reseting.\n");
+		//sunplus_gcm394_base_device::device_reset();
+		
+		uint16_t* introm = (uint16_t*)m_internalrom->base();
+		introm[offset] = data;
+	}
+}
+
 
 // GPR27P512A   = C2 76
 // HY27UF081G2A = AD F1 80 1D
@@ -1556,7 +1568,7 @@ void generalplus_gpac800_device::gpac800_internal_map(address_map& map)
 
 	// 128kwords internal ROM
 	//map(0x08000, 0x0ffff).rom().region("internal", 0); // lower 32kwords of internal ROM is visible / shadowed depending on boot pins and register
-	map(0x08000, 0x0ffff).r(FUNC(generalplus_gpac800_device::internalrom_lower32_r)).nopw();
+	map(0x08000, 0x0ffff).rw(FUNC(generalplus_gpac800_device::internalrom_lower32_r), FUNC(generalplus_gpac800_device::internalrom_lower32_w));
 	map(0x10000, 0x27fff).rom().region("internal", 0x10000); // upper 96kwords of internal ROM is always visible
 	map(0x28000, 0x2ffff).noprw(); // reserved
 	// 0x30000+ is CS access

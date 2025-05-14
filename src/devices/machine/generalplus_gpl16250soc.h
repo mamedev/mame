@@ -172,6 +172,7 @@ protected:
 	uint32_t m_csbase;
 
 	uint16_t internalrom_lower32_r(offs_t offset);
+	void internalrom_lower32_w(offs_t offset, uint16_t data);
 
 	address_space* m_cs_space;
 
