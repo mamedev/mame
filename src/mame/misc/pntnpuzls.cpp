@@ -1,16 +1,20 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders:Angelo Salese,Carl
 /**************************************************************************************************
 
 Paint 'N Puzzle Super (or Super Paint 'N Puzzle)
 
+References:
+- https://youtu.be/P7xeh2sG-VM
+
 TODO:
-- coin stuck (cfr. service mode counting up), makes input test non-functional;
-- device for RS-232 touchscreen;
-- complete I/O;
+- complete I/O (ticket, pinpoint card dispenser);
 - NVRAM;
-- sound (missing from board?);
 - Is "RGB O/P" connector just for touchscreen control?
+- POST should beep and output BRG strips (bottom-to-top, columns in native monitor orientation);
+
+Notes:
+- To clear "CALL HELP" errors: hold coin 1 and soft reset.
 
 ===================================================================================================
 
@@ -56,14 +60,16 @@ class pntnpuzls_state : public driver_device
 {
 public:
 	pntnpuzls_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu"),
-		m_font(*this, "font"),
-		m_font_bank(*this, "font_bank"),
-		m_vram(*this, "vram"),
-		m_crtc(*this, "crtc"),
-		m_ramdac(*this, "ramdac"),
-		m_palette(*this, "palette")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this,"maincpu")
+		, m_font(*this, "font")
+		, m_font_bank(*this, "font_bank")
+		, m_vram(*this, "vram")
+		, m_crtc(*this, "crtc")
+		, m_ramdac(*this, "ramdac")
+		, m_palette(*this, "palette")
+		, m_dac(*this, "dac")
+		, m_in(*this, { "IN0", "IN1", "IN2" })
 	{ }
 
 	void pntnpuzls(machine_config &config) ATTR_COLD;
@@ -76,6 +82,8 @@ private:
 	required_device<mc6845_device> m_crtc;
 	required_device<ramdac_device> m_ramdac;
 	required_device<palette_device> m_palette;
+	required_device<dac_8bit_r2r_device> m_dac;
+	required_ioport_array<3> m_in;
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
@@ -86,8 +94,8 @@ private:
 	void io_map(address_map &map) ATTR_COLD;
 	void ramdac_map(address_map &map) ATTR_COLD;
 
-	void nmi(int s) { if(BIT(m_port304, 0)) m_maincpu->set_input_line(INPUT_LINE_NMI, s); }
-	u8 m_port304;
+	void nmi_cb(int s) { if(m_nmi_enable) m_maincpu->set_input_line(INPUT_LINE_NMI, s); }
+	bool m_nmi_enable;
 };
 
 
@@ -118,7 +126,7 @@ uint32_t pntnpuzls_state::screen_update(screen_device &screen, bitmap_rgb32 &bit
 void pntnpuzls_state::program_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).ram();
-	map(0x0d0000, 0x0dffff).ram().share("vram"); // TODO: banked?
+	map(0x0d0000, 0x0dffff).ram().share("vram");
 	map(0x0e0000, 0x0effff).bankr("font_bank");
 	map(0x0f0000, 0x0fffff).rom().region("bios", 0);
 	map(0xff0000, 0xffffff).rom().region("bios", 0);
@@ -126,9 +134,19 @@ void pntnpuzls_state::program_map(address_map &map)
 
 void pntnpuzls_state::io_map(address_map &map)
 {
-	map(0x0300, 0x0301).portr("IN0");
-	map(0x0302, 0x0303).portr("IN1");
-	map(0x0304, 0x0305).lw8(NAME([this] (u8 data){ m_port304 = data; })).umask16(0x00ff);
+	map(0x0300, 0x0300).lr8(NAME([this] () { return m_in[0]->read(); }));
+	map(0x0302, 0x0302).lr8(NAME([this] () { return m_in[1]->read(); }));
+	map(0x0304, 0x0304).lw8(
+		NAME([this] (u8 data) {
+			// TODO: several unknowns
+			// bit 1 enabled during POST, bit 2 always on,
+			// bit 3 high on game to service mode transitions
+			if (data & 0xfa || !BIT(data, 2))
+				logerror("$304 %02x\n", data);
+			m_nmi_enable = !!BIT(data, 0);
+		})
+	);
+//  map(0x0306, 0x0306) ticket dispenser (writes 0x12 when fired)
 	map(0x0308, 0x0308).lw8(
 		NAME([this] (offs_t offset, u8 data) {
 			// TODO: may view select on bits 7-3
@@ -137,8 +155,8 @@ void pntnpuzls_state::io_map(address_map &map)
 			m_font_bank->set_entry(data & 7);
 		})
 	);
-	map(0x030c, 0x030d).portr("IN2");
-	map(0x030e, 0x030f).w("dac", FUNC(dac_8bit_r2r_device::write));
+	map(0x030c, 0x030c).lr8(NAME([this] () { return m_in[2]->read(); }));
+	map(0x030e, 0x030e).lw8(NAME([this] (offs_t offset, u8 data) { m_dac->write(data); }));
 
 	map(0x0310, 0x0310).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x0312, 0x0312).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
@@ -162,11 +180,11 @@ static INPUT_PORTS_START( pntnpuzls )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("Tan")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Brown")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Light Green")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Light Blue")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Pink")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Tan")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Brown")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Light Green")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Light Blue")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Pink")
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1) PORT_WRITE_LINE_DEVICE_MEMBER("pic", FUNC(pic8259_device::ir2_w))
@@ -176,13 +194,13 @@ static INPUT_PORTS_START( pntnpuzls )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Red")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Blue")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Green")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Yellow")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("White")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Red")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Blue")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Green")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Yellow")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("White")
 
-	// TODO: to card and ticket connectors
+	// TODO: to ticket connector at least (bits 3 and 4?)
 	PORT_START("IN2")
 	PORT_DIPNAME( 0x01, 0x01, "IN2" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -211,25 +229,24 @@ static INPUT_PORTS_START( pntnpuzls )
 
 	PORT_START("COIN")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1) PORT_WRITE_LINE_DEVICE_MEMBER("pic", FUNC(pic8259_device::ir3_w))
-
-	// TODO: touchscreen
 INPUT_PORTS_END
-
-void pntnpuzls_state::machine_start()
-{
-	m_font_bank->configure_entries(0, 8, m_font->base(), 0x10000);
-}
-
-void pntnpuzls_state::machine_reset()
-{
-	m_port304 = 0;
-}
 
 void pntnpuzls_state::ramdac_map(address_map &map)
 {
 	map(0x000, 0x2ff).rw(m_ramdac, FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
 }
 
+void pntnpuzls_state::machine_start()
+{
+	m_font_bank->configure_entries(0, 8, m_font->base(), 0x10000);
+
+	save_item(NAME(m_nmi_enable));
+}
+
+void pntnpuzls_state::machine_reset()
+{
+	m_nmi_enable = false;
+}
 
 void pntnpuzls_state::pntnpuzls(machine_config &config)
 {
@@ -245,7 +262,7 @@ void pntnpuzls_state::pntnpuzls(machine_config &config)
 	pit.set_clk<0>(XTAL(27'500'000)); // clocks?
 	pit.set_clk<1>(XTAL(27'500'000));
 	pit.set_clk<2>(XTAL(27'500'000));
-	pit.out_handler<2>().set(FUNC(pntnpuzls_state::nmi));
+	pit.out_handler<2>().set(FUNC(pntnpuzls_state::nmi_cb));
 
 	ins8250_device &uart(INS8250(config, "uart", 1.8432_MHz_XTAL));
 	uart.out_tx_callback().set("microtouch", FUNC(microtouch_device::rx));
@@ -254,10 +271,8 @@ void pntnpuzls_state::pntnpuzls(machine_config &config)
 	MICROTOUCH(config, "microtouch", 9600).stx().set("uart", FUNC(ins8250_uart_device::rx_w));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	// TODO: convert to set_raw. Affects out_vsync timing (currently at vline=203).
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	screen.set_size(320, 200);
+	// HTOTAL: 440  VTOTAL: 260  MAX_X: 319  MAX_Y: 199  HSYNC: 360-391  VSYNC: 224-239  Freq: 60.096154fps
+	screen.set_raw(27'500'000 / 32, 440, 0, 320, 260, 0, 200);
 	screen.set_screen_update(FUNC(pntnpuzls_state::screen_update));
 
 	PALETTE(config, "palette").set_entries(0x100);
