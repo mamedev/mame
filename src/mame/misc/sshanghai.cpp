@@ -663,9 +663,6 @@ void ssh2000_state::init_2001()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
-	//rom[0x0201] = 0;
-	//rom[0x0202] = 0;
-
 	rom[0x63ba] = 0xc9;
 	rom[0x0202] = 0x08;  // skip amusement game
 	rom[0x0213] = 0x00;  // signature
