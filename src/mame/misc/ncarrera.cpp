@@ -65,7 +65,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_tileram(*this, "tileram"),
 		m_maincpu(*this, "maincpu"),
-		m_nvram(*this, "nvram"),		
+		m_nvram(*this, "nvram"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_screen(*this, "screen"),
@@ -90,7 +90,7 @@ private:
 
 	required_shared_ptr<uint8_t> m_tileram;
 	required_device<cpu_device> m_maincpu;
-	required_device<nvram_device> m_nvram;	
+	required_device<nvram_device> m_nvram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
@@ -98,25 +98,19 @@ private:
 	required_ioport m_in1;
 	std::unique_ptr<uint8_t[]> m_nvram8;
 
-	uint16_t const reel_base = 0x2910; 
+	uint16_t const reel_base = 0x2910;
 	//uint16_t const reel2_base = 0x292b;
 	//uint16_t const reel3_base = 0x2946;
-	
+
 	uint8_t m_vp = 0;
 	uint8_t m_frame = 0;
 	int m_sublin = 2;
-	
-	int m_step1 = 0;
-	int m_step2 = 0;
-	int m_step3 = 0;
-	
+
 	int m_delay = 0;
-	int m_delay1 = 0;
-	int m_delay2 = 0;
 	int m_buffin0 = 0;
 	int m_buffin1 = 0;
-	
-	
+
+
 };
 
 
@@ -129,7 +123,7 @@ void ncarrera_state::machine_start()
 	m_nvram8 = std::make_unique<uint8_t[]>(0x800);
 	m_nvram->set_base(m_nvram8.get(), 0x800);
 	save_item(NAME(m_frame));
-}	
+}
 
 
 /*************************************************
@@ -160,15 +154,15 @@ void ncarrera_state::io_map(address_map &map)
 
 uint8_t ncarrera_state::unknown_r()
 {
-//	popmessage("portB_read:%02x");
-//	logerror("portB_read:%02x\n");
+//  popmessage("portB_read:%02x");
+//  logerror("portB_read:%02x\n");
 	return machine().rand();
 }
 
 void ncarrera_state::porta_w(uint8_t data)
 {
-//	if(data != 0)
-//		popmessage("porta:%02x", data);
+//  if(data != 0)
+//      popmessage("porta:%02x", data);
 }
 
 uint16_t ncarrera_state::inc_idx(uint16_t& index, uint8_t i)
@@ -182,46 +176,46 @@ uint16_t ncarrera_state::inc_idx(uint16_t& index, uint8_t i)
 
 void ncarrera_state::print_reels(uint8_t data)
 {
-    // constants and config
-    static constexpr uint16_t TILE_OFFSET = 0x18;
-    static constexpr uint16_t ROW_STRIDE = 64;
-    static constexpr uint16_t TILE_SIZE = 8;
-    static constexpr uint16_t ATTR_OFFSET = 0x800;
-    static constexpr uint8_t  BRICK = 0x10;
-    static constexpr uint8_t  FRUIT = 0x18;
+	// constants and config
+	static constexpr uint16_t TILE_OFFSET = 0x18;
+	static constexpr uint16_t ROW_STRIDE = 64;
+	static constexpr uint16_t TILE_SIZE = 8;
+	static constexpr uint16_t ATTR_OFFSET = 0x800;
+	static constexpr uint8_t  BRICK = 0x10;
+	static constexpr uint8_t  FRUIT = 0x18;
 
-    // local var
-    uint8_t *rom = memregion("maincpu")->base();
-    uint16_t destinations[3] = {0x2c7, 0x2d1, 0x2db};
-    bool reels_active[3] = {false};
-    uint8_t attr;
-	
+	// local var
+	uint8_t *rom = memregion("maincpu")->base();
+	uint16_t destinations[3] = {0x2c7, 0x2d1, 0x2db};
+	bool reels_active[3] = {false};
+	uint8_t attr;
+
 	// follow dip sw setting
 	if(m_nvram8[0x00e] == 0)
 		attr = FRUIT;
 	else
 		attr = BRICK;
-	
-    // reels status init
-    reels_active[0] = (m_nvram8[0x16f] == 0x0e) || (m_nvram8[0x16f] == 0x13) || (m_nvram8[0x16f] == 0x14);
-    reels_active[1] = (m_nvram8[0x16f] == 0x0e) || (m_nvram8[0x16f] == 0x13) || (m_nvram8[0x16f] == 0x14) || (m_nvram8[0x16f] == 0x10);
-    reels_active[2] = (m_nvram8[0x16f] == 0x0e) || (m_nvram8[0x16f] == 0x13) || (m_nvram8[0x16f] == 0x14) || (m_nvram8[0x16f] == 0x11);
 
-    // index config
-     auto setup_indices = [&](uint8_t reel_id) -> uint16_t
+	// reels status init
+	reels_active[0] = (m_nvram8[0x16f] == 0x0e) || (m_nvram8[0x16f] == 0x13) || (m_nvram8[0x16f] == 0x14);
+	reels_active[1] = (m_nvram8[0x16f] == 0x0e) || (m_nvram8[0x16f] == 0x13) || (m_nvram8[0x16f] == 0x14) || (m_nvram8[0x16f] == 0x10);
+	reels_active[2] = (m_nvram8[0x16f] == 0x0e) || (m_nvram8[0x16f] == 0x13) || (m_nvram8[0x16f] == 0x14) || (m_nvram8[0x16f] == 0x11);
+
+	// index config
+	 auto setup_indices = [&](uint8_t reel_id) -> uint16_t
 	 {
-        int16_t step = (m_nvram8[0x156 + reel_id] + (data / 3) - 1) % 0x1b;
-        return static_cast<uint16_t>((step < 0) ? 0x1a : step);
+		int16_t step = (m_nvram8[0x156 + reel_id] + (data / 3) - 1) % 0x1b;
+		return static_cast<uint16_t>((step < 0) ? 0x1a : step);
 	};
 
-	uint16_t indices[3] = 
+	uint16_t indices[3] =
 	{
 		static_cast<uint16_t>(reel_base + 0x00 + setup_indices(0)),  // 0x2910 + offset
 		static_cast<uint16_t>(reel_base + 0x1B + setup_indices(1)),  // 0x2910 + 27 = 0x292B
 		static_cast<uint16_t>(reel_base + 0x36 + setup_indices(2))   // 0x2910 + 54 = 0x2946
 	};
 
-    // update tiles function
+	// update tiles function
 	auto update_tile = [&](uint16_t dest, uint16_t index, bool condition)
 	{
 		if(condition)
@@ -231,67 +225,67 @@ void ncarrera_state::print_reels(uint8_t data)
 		}
 	};
 
-    // generic process of symbols
-    auto process_figure = [&](int rows, bool use_sublin_offset = false)
+	// generic process of symbols
+	auto process_figure = [&](int rows, bool use_sublin_offset = false)
 	{
-        uint8_t tiles[3];
-        
-        // getting tiles for each reel
-        for(int i = 0; i < 3; ++i)
-		{
-            tiles[i] = 9 - rom[inc_idx(indices[i], i + 1)];
-        }
+		uint8_t tiles[3];
 
-        // processing each reel
-        for(int reel = 0; reel < 3; ++reel)
+		// getting tiles for each reel
+		for(int i = 0; i < 3; ++i)
 		{
-            uint16_t base_index = tiles[reel] * TILE_OFFSET;
-            
-            if(use_sublin_offset)
-			{
-                base_index += m_sublin * TILE_SIZE;
-            }
+			tiles[i] = 9 - rom[inc_idx(indices[i], i + 1)];
+		}
 
-            for(int i = 0; i < rows; ++i)
+		// processing each reel
+		for(int reel = 0; reel < 3; ++reel)
+		{
+			uint16_t base_index = tiles[reel] * TILE_OFFSET;
+
+			if(use_sublin_offset)
 			{
-                for(int j = 0; j < TILE_SIZE; ++j)
+				base_index += m_sublin * TILE_SIZE;
+			}
+
+			for(int i = 0; i < rows; ++i)
+			{
+				for(int j = 0; j < TILE_SIZE; ++j)
 				{
-                    const uint16_t offset = j + (i * ROW_STRIDE);
-                    update_tile(destinations[reel] + offset, 
-                               base_index + (i * TILE_SIZE) + j, 
-                               reels_active[reel]);
-                }
-            }
-            
-            destinations[reel] += rows * ROW_STRIDE;
-        }
-    };
+					const uint16_t offset = j + (i * ROW_STRIDE);
+					update_tile(destinations[reel] + offset,
+							   base_index + (i * TILE_SIZE) + j,
+							   reels_active[reel]);
+				}
+			}
 
-	
-    // principal process
-    switch(m_sublin)
+			destinations[reel] += rows * ROW_STRIDE;
+		}
+	};
+
+
+	// principal process
+	switch(m_sublin)
 	{
-        case 1: process_figure(2, true); break;
-        case 2: process_figure(1, true); break;
-        default: break;
-    }
+		case 1: process_figure(2, true); break;
+		case 2: process_figure(1, true); break;
+		default: break;
+	}
 
-    // process symbols 2-4
-    for(int i = 0; i < 3; ++i)
+	// process symbols 2-4
+	for(int i = 0; i < 3; ++i)
 	{
-        process_figure(3);
-    }
+		process_figure(3);
+	}
 
-    // process final symbol
-    switch(m_sublin)
+	// process final symbol
+	switch(m_sublin)
 	{
-        case 0: process_figure(2); break;
-        case 2: process_figure(1); break;
-        default: break;
-    }
+		case 0: process_figure(2); break;
+		case 2: process_figure(1); break;
+		default: break;
+	}
 
-    // subline status update
-    m_sublin = (m_sublin - 1 + 3) % 3;
+	// subline status update
+	m_sublin = (m_sublin - 1 + 3) % 3;
 }
 
 
@@ -305,14 +299,14 @@ uint8_t ncarrera_state::nvram_r(offs_t offset)
 
 	// mcu -> vblank timers
 	if((vp==0) && (m_vp == 0xff))
-	{	
+	{
 		m_frame++;
-		
+
 		// mcu -> vblank timers
 		if(offset == 0)
 			if(m_nvram8[0] > 0)
 				m_nvram8[0] -= 1;
-		
+
 		if(offset == 3)
 			if(m_nvram8[3] > 0)
 				m_nvram8[3] -= 1;
@@ -320,16 +314,16 @@ uint8_t ncarrera_state::nvram_r(offs_t offset)
 		if(offset == 4)
 			if(m_nvram8[4] > 0)
 				m_nvram8[4] -= 1;
-			
+
 		if(offset == 7)
 			if(m_nvram8[7] > 0)
-				m_nvram8[7] -= 1;	
-	}	
+				m_nvram8[7] -= 1;
+	}
 
 	if(offset == 2)
 		if(m_nvram8[2] > 0)
 		{
-			m_nvram8[2] -= 1;			
+			m_nvram8[2] -= 1;
 		}
 
 	if( (m_frame & 0x07) == 1)
@@ -359,7 +353,7 @@ uint8_t ncarrera_state::nvram_r(offs_t offset)
 	m_nvram8[0x47] = BIT(m_nvram8[0x0c], 0);
 	m_nvram8[0x48] = BIT(m_nvram8[0x0c], 1);
 
-	m_vp = vp;	
+	m_vp = vp;
 	return m_nvram8[offset];
 }
 
@@ -372,14 +366,14 @@ void ncarrera_state::nvram_w(offs_t offset, uint8_t data)
 	{
 		switch(data)
 		{
-			case 0x0d: 
+			case 0x0d:
 			case 0x0e: print_reels(m_nvram8[0x15f]); break;
 			case 0x10: print_reels(m_nvram8[0x15f]); break;
 			case 0x11: print_reels(m_nvram8[0x15f]); break;
 			case 0x12: break;
 			case 0x13: { m_sublin = 2; print_reels(0);} break;
 			case 0x14: { m_sublin = 2; print_reels(0);} break;
-		}	
+		}
 	}
 }
 
@@ -497,7 +491,7 @@ void ncarrera_state::ncarrera(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &ncarrera_state::io_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
-	
+
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -552,7 +546,7 @@ ROM_START( ncarrera )
 
 	ROM_REGION( 0x800, "nvram", 0 )
 	ROM_LOAD( "nvram", 0x00, 0x800, CRC(de0bde20) SHA1(559c6129894173f75ec0e197fc5edfd93a8f6913) )
-	
+
 	ROM_REGION( 0x20, "proms", 0 )
 	ROM_LOAD( "am27s19.ic39", 0x00, 0x20, CRC(af16359f) SHA1(1ff5c9d7807e52be09c0ded56fb68a47e41b3fcf) )
 ROM_END
