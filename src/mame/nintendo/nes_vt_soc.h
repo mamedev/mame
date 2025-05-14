@@ -76,7 +76,7 @@ protected:
 	void video_irq(bool hblank, int scanline, bool vblank, bool blanked);
 	uint8_t nt_r(offs_t offset);
 	void nt_w(offs_t offset, uint8_t data);
-	int calculate_real_video_address(int addr, int extended, int readtype);
+	int calculate_real_video_address(int addr, int readtype);
 	void scrambled_8000_w(uint16_t offset, uint8_t data);
 	void vt_dma_w(uint8_t data);
 	void do_dma(uint8_t data, bool has_ntsc_bug);

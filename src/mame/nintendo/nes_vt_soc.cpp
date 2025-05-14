@@ -422,7 +422,7 @@ uint8_t nes_vt02_vt03_soc_device::spr_r(offs_t offset)
 	}
 	else
 	{
-		int realaddr = calculate_real_video_address(offset, 0, 1);
+		int realaddr = calculate_real_video_address(offset, 1);
 
 		address_space& spc = this->space(AS_PROGRAM);
 		return spc.read_byte(realaddr);
@@ -437,7 +437,7 @@ uint8_t nes_vt02_vt03_soc_device::chr_r(offs_t offset)
 	}
 	else
 	{
-		int realaddr = calculate_real_video_address(offset, 1, 0);
+		int realaddr = calculate_real_video_address(offset, 0);
 
 		address_space& spc = this->space(AS_PROGRAM);
 		return spc.read_byte(realaddr);
@@ -454,7 +454,7 @@ void nes_vt02_vt03_soc_device::chr_w(offs_t offset, uint8_t data)
 	}
 	else
 	{
-		int realaddr = calculate_real_video_address(offset, 1, 0);
+		int realaddr = calculate_real_video_address(offset, 0);
 
 		address_space& spc = this->space(AS_PROGRAM);
 		return spc.write_byte(realaddr, data);
@@ -520,35 +520,37 @@ void nes_vt02_vt03_soc_device::nt_w(offs_t offset, uint8_t data)
 
 
 
-int nes_vt02_vt03_soc_device::calculate_real_video_address(int addr, int extended, int readtype)
+int nes_vt02_vt03_soc_device::calculate_real_video_address(int addr, int readtype)
 {
-	int va34 = (addr & 0x2000) >> 13;
+	// this is what gets passed in
+	//      00Pb bbtt tttt plll
+	//  P = plane3/4 select (4bpp modes)
+	//  p = plane0/1 select
+	//  l = tile line
+	//  b = tile number bits passed into banking
+	//  t = tile number (0x1ff tile number bits total)
+	int va34 = (addr & 0x6000) >> 13;
 	addr &= 0x1fff;
 
-	// might be a VT09 only feature (alt 4bpp mode?)
-	int alt_order = m_ppu->get_extended_modes_enable() & 0x40;
+	// bit of a hack to start getting the tile data we want for denv150 title screen which is 8bpp(!)
+	if (m_ppu->is_v3xx_extended_mode())
+	{
+		// denv150 ROM size is 0x1000000  ROM size  0x40000 tiles (each tile is 0x40 bytes)
+		// 8x8x8(?) tiles are tiles 0x6000+ (so at 0x180000 in ROM)
 
-	if (readtype == 0)
-	{
-		if (m_ppu->get_extended_modes_enable() & 0x10)
-		{
-			extended = 1;
-		}
-		else
-		{
-			extended = 0;
-		}
-	}
-	else if (readtype == 1)
-	{
-		if (m_ppu->get_extended_modes_enable() & 0x08)
-		{
-			extended = 1;
-		}
-		else
-		{
-			extended = 0;
-		}
+		// ROM format, each byte is 1 pixel (8-bits)
+		// each line is 8 bytes (8 pixels x 8-bits)
+		// each tile is 64 bytes (8 bytes x 8 lines)
+		int finaladdr = 0x180000;
+
+		int tileline = addr & 0x0007;
+		int tileplane = addr & 0x0008;
+		int tilenum = addr & 0x1ff0;
+
+		int offset = (tileline << 3) | (tileplane >> 1) | va34;
+		offset |= tilenum << 2;
+
+		return (finaladdr + offset) & 0x1fffff;
 	}
 
 	/*
@@ -655,6 +657,25 @@ int nes_vt02_vt03_soc_device::calculate_real_video_address(int addr, int extende
 	case 0x7: return -1;
 	}
 
+	// Adjust where we actually read from for special modes
+
+	// might be a VT09 only feature (alt 4bpp mode?)
+	int alt_order = m_ppu->get_extended_modes_enable() & 0x40;
+	int extended = 0;
+	if (readtype == 0) // character
+	{
+		if (m_ppu->get_extended_modes_enable() & 0x10)
+		{
+			extended = 1;
+		}
+	}
+	else // sprite
+	{
+		if (m_ppu->get_extended_modes_enable() & 0x08)
+		{
+			extended = 1;
+		}
+	}
 
 	if (!extended)
 	{
@@ -670,11 +691,11 @@ int nes_vt02_vt03_soc_device::calculate_real_video_address(int addr, int extende
 		{
 			if (!alt_order)
 			{
-				finaladdr = ((finaladdr & ~0xf) << 1) | (va34 << 4) | (finaladdr & 0xf);
+				finaladdr = ((finaladdr & ~0xf) << 1) | ((va34 & 1) << 4) | (finaladdr & 0xf);
 			}
 			else
 			{
-				finaladdr = (finaladdr << 1) | va34;
+				finaladdr = (finaladdr << 1) | (va34 & 1);
 			}
 		}
 	}
@@ -719,11 +740,11 @@ int nes_vt02_vt03_soc_device::calculate_real_video_address(int addr, int extende
 		{
 			if (!alt_order)
 			{
-				finaladdr = ((finaladdr & ~0xf) << 1) | (va34 << 4) | (finaladdr & 0xf);
+				finaladdr = ((finaladdr & ~0xf) << 1) | ((va34 & 1) << 4) | (finaladdr & 0xf);
 			}
 			else
 			{
-				finaladdr = (finaladdr << 1) | va34;
+				finaladdr = (finaladdr << 1) | (va34 & 1);
 			}
 
 		}

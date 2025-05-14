@@ -71,7 +71,8 @@ public:
 	uint8_t get_extended_modes_enable() { return m_extended_modes_enable; }
 	uint8_t get_extended_modes2_enable() { return m_extended_modes2_enable; }
 
-	uint8_t get_va34();
+	bool is_v3xx_extended_mode() { return (m_newvid_1e == 0x00) ? false : true; }
+
 	uint8_t get_m_read_bg4_bg3();
 	uint8_t get_speva2_speva0();
 
@@ -113,8 +114,15 @@ protected:
 	int32_t m_read_bg4_bg3;
 
 	uint8_t m_extplanebuf[2];
+	uint8_t m_extplanebuf_vt3xx_0[2];
+	uint8_t m_extplanebuf_vt3xx_1[2];
+
 	uint32_t m_tiledata;
 	int m_whichpixel;
+
+	uint8_t m_newvid_1c;
+	uint8_t m_newvid_1d;
+	uint8_t m_newvid_1e;
 
 private:
 
@@ -156,10 +164,6 @@ private:
 	virtual void draw_tile_pixel(uint8_t pix, int color, uint32_t back_pen, uint32_t*& dest) override;
 	virtual void shift_tile_plane_data(uint8_t& pix) override;
 	virtual void draw_back_pen(uint32_t* dst, int back_pen) override;
-
-	uint8_t m_newvid_1c;
-	uint8_t m_newvid_1d;
-	uint8_t m_newvid_1e;
 };
 
 

@@ -216,6 +216,11 @@ void ppu_vt03_device::device_start()
 	init_vt03_palette_tables(0);
 	init_vtxx_rgb555_palette_tables();
 	init_vtxx_rgb444_palette_tables();
+
+	// for VT3xx
+	save_item(NAME(m_newvid_1c));
+	save_item(NAME(m_newvid_1d));
+	save_item(NAME(m_newvid_1e));
 }
 
 void ppu_vt03_device::device_reset()
@@ -236,6 +241,11 @@ void ppu_vt03_device::device_reset()
 	m_videobank1 = 0;
 
 	m_read_bg4_bg3 = 0;
+
+	// for VT3xx
+	m_newvid_1c = 0x00;
+	m_newvid_1d = 0x00;
+	m_newvid_1e = 0x00;
 }
 
 
@@ -550,17 +560,13 @@ ppu_vt3xx_device::ppu_vt3xx_device(const machine_config& mconfig, const char* ta
 void ppu_vt3xx_device::device_start()
 {
 	ppu_vt03_device::device_start();
-	save_item(NAME(m_newvid_1c));
-	save_item(NAME(m_newvid_1d));
-	save_item(NAME(m_newvid_1e));
+	// TODO: move VT3xx specifics here
 }
 
 void ppu_vt3xx_device::device_reset()
 {
 	ppu_vt03_device::device_reset();
-	m_newvid_1c = 0x00;
-	m_newvid_1d = 0x00;
-	m_newvid_1e = 0x00;
+	// TODO: move VT3xx specifics here
 }
 
 uint8_t ppu_vt3xx_device::read_201c_newvid(offs_t offset) { return m_newvid_1c; }
@@ -604,6 +610,10 @@ void ppu_vt3xx_device::read_tile_plane_data(int address, int color)
 		m_planebuf[1] = m_read_bg((address + 8) & 0x1fff);
 		m_extplanebuf[0] = m_read_bg( ((address + 0) & 0x1fff) | 0x2000 );
 		m_extplanebuf[1] = m_read_bg( ((address + 8) & 0x1fff) | 0x2000 );
+		m_extplanebuf_vt3xx_0[0] = m_read_bg( ((address + 0) & 0x1fff) | 0x4000 );
+		m_extplanebuf_vt3xx_0[1] = m_read_bg( ((address + 8) & 0x1fff) | 0x4000 );
+		m_extplanebuf_vt3xx_1[0] = m_read_bg( ((address + 0) & 0x1fff) | 0x6000 );
+		m_extplanebuf_vt3xx_1[1] = m_read_bg( ((address + 8) & 0x1fff) | 0x6000 );
 	}
 }
 
@@ -629,16 +639,31 @@ void ppu_vt3xx_device::shift_tile_plane_data(uint8_t& pix)
 	else
 	{
 		// extended modes
+		// 8x8x4 non-planar mode
+		/*
 		switch (m_whichpixel)
 		{
-		case 0: pix = (BIT(m_planebuf[0], 7) << 0) | (BIT(m_planebuf[0], 6) << 1) | (BIT(m_planebuf[0], 5) << 5) | (BIT(m_planebuf[0], 4) << 6); break;
-		case 1: pix = (BIT(m_planebuf[0], 3) << 0) | (BIT(m_planebuf[0], 2) << 1) | (BIT(m_planebuf[0], 1) << 5) | (BIT(m_planebuf[0], 0) << 6); break;
-		case 2: pix = (BIT(m_planebuf[1], 7) << 0) | (BIT(m_planebuf[1], 6) << 1) | (BIT(m_planebuf[1], 5) << 5) | (BIT(m_planebuf[1], 4) << 6); break;
-		case 3: pix = (BIT(m_planebuf[1], 3) << 0) | (BIT(m_planebuf[1], 2) << 1) | (BIT(m_planebuf[1], 1) << 5) | (BIT(m_planebuf[1], 0) << 6); break;
-		case 4: pix = (BIT(m_extplanebuf[0], 7) << 0) | (BIT(m_extplanebuf[0], 6) << 1) | (BIT(m_extplanebuf[0], 5) << 5) | (BIT(m_extplanebuf[0], 4) << 6); break;
-		case 5: pix = (BIT(m_extplanebuf[0], 3) << 0) | (BIT(m_extplanebuf[0], 2) << 1) | (BIT(m_extplanebuf[0], 1) << 5) | (BIT(m_extplanebuf[0], 0) << 6); break;
-		case 6: pix = (BIT(m_extplanebuf[1], 7) << 0) | (BIT(m_extplanebuf[1], 6) << 1) | (BIT(m_extplanebuf[1], 5) << 5) | (BIT(m_extplanebuf[1], 4) << 6); break;
-		case 7: pix = (BIT(m_extplanebuf[1], 3) << 0) | (BIT(m_extplanebuf[1], 2) << 1) | (BIT(m_extplanebuf[1], 1) << 5) | (BIT(m_extplanebuf[1], 0) << 6); break;
+		case 0: pix = (m_planebuf[0] >> 0) & 0xf; break;
+		case 1: pix = (m_planebuf[0] >> 4) & 0xf; break;
+		case 2: pix = (m_planebuf[1] >> 0) & 0xf; break;
+		case 3: pix = (m_planebuf[1] >> 4) & 0xf; break;
+		case 4: pix = (m_extplanebuf[0] >> 0) & 0xf; break;
+		case 5: pix = (m_extplanebuf[0] >> 4) & 0xf; break;
+		case 6: pix = (m_extplanebuf[1] >> 0) & 0xf; break;
+		case 7: pix = (m_extplanebuf[1] >> 4) & 0xf; break;
+		}
+		*/
+		// 8x8x8 non-planar mode
+		switch (m_whichpixel)
+		{
+		case 0: pix = m_planebuf[0] & 0xf; break;
+		case 4: pix = m_planebuf[1] & 0xf; break;
+		case 1: pix = m_extplanebuf[0] & 0xf; break;
+		case 5: pix = m_extplanebuf[1] & 0xf; break;
+		case 2: pix = m_extplanebuf_vt3xx_0[0] & 0xf; break;
+		case 6: pix = m_extplanebuf_vt3xx_0[1] & 0xf; break;
+		case 3: pix =m_extplanebuf_vt3xx_1[0] & 0xf; break;
+		case 7: pix =m_extplanebuf_vt3xx_1[1] & 0xf; break;
 		}
 
 		m_whichpixel++;
