@@ -221,6 +221,7 @@ void ppu_vt03_device::device_start()
 	save_item(NAME(m_newvid_1c));
 	save_item(NAME(m_newvid_1d));
 	save_item(NAME(m_newvid_1e));
+	save_item(NAME(m_newvid_2x));
 }
 
 void ppu_vt03_device::device_reset()
@@ -246,6 +247,8 @@ void ppu_vt03_device::device_reset()
 	m_newvid_1c = 0x00;
 	m_newvid_1d = 0x00;
 	m_newvid_1e = 0x00;
+
+	m_newvid_2x[0] = m_newvid_2x[1] = m_newvid_2x[2] = m_newvid_2x[3] = 0x00;
 }
 
 
@@ -594,6 +597,7 @@ void ppu_vt3xx_device::device_reset()
 uint8_t ppu_vt3xx_device::read_201c_newvid(offs_t offset) { return m_newvid_1c; }
 uint8_t ppu_vt3xx_device::read_201d_newvid(offs_t offset) { return m_newvid_1d; }
 uint8_t ppu_vt3xx_device::read_201e_newvid(offs_t offset) { return m_newvid_1e; }
+uint8_t ppu_vt3xx_device::read_202x_newvid(offs_t offset) { return m_newvid_2x[offset]; }
 
 void ppu_vt3xx_device::write_201c_newvid(offs_t offset, uint8_t data) { m_newvid_1c = data; logerror("%s: write_201c_newvid %02x\n", machine().describe_context(), data); }
 void ppu_vt3xx_device::write_201d_newvid(offs_t offset, uint8_t data) { m_newvid_1d = data; logerror("%s: write_201d_newvid %02x\n", machine().describe_context(), data); }
@@ -607,6 +611,14 @@ void ppu_vt3xx_device::write_201e_newvid(offs_t offset, uint8_t data)
 	*/
 	m_newvid_1e = data;
 	logerror("%s: write_201e_newvid %02x\n", machine().describe_context(), data);
+}
+
+void ppu_vt3xx_device::write_202x_newvid(offs_t offset, uint8_t data)
+{
+	if (data != m_newvid_2x[offset])
+		logerror("%s: NEW VALUE write_202x_newvid %d %02x\n", machine().describe_context(), offset, data);
+
+	m_newvid_2x[offset] = data;
 }
 
 void ppu_vt3xx_device::read_tile_plane_data(int address, int color)

@@ -1033,13 +1033,13 @@ CONS( 200?, lxcmcy,    0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_v
 CONS( 200?, lxcmc250,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - 250-in-1 (JL2375)", MACHINE_NOT_WORKING )
 CONS( 200?, lxcmcysw,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Star Wars Rebels", MACHINE_NOT_WORKING )
 CONS( 200?, lxcmcyfz,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Frozen", MACHINE_NOT_WORKING )
-CONS( 200?, lxcmcydp,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Disney Princess", MACHINE_NOT_WORKING )
-CONS( 200?, lxcmcysp,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Marvel Ultimate Spider-Man", MACHINE_NOT_WORKING ) // is this the low-resolution pocket version? ROM structure is quite different
-CONS( 200?, lxcmcycr,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Cars", MACHINE_NOT_WORKING )
-CONS( 200?, lxcmcypj,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - PJ Masks", MACHINE_NOT_WORKING )
-CONS( 200?, lxcmcyba,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Barbie (JL2365BB)", MACHINE_NOT_WORKING )
+CONS( 2012, lxcmcydp,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Disney Princess", MACHINE_NOT_WORKING )
+CONS( 2012, lxcmcysp,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Marvel Ultimate Spider-Man (120-in-1)", MACHINE_NOT_WORKING | ROT270) // renders vertically, but screen stretches it to horizontal
+CONS( 2014, lxcmcycr,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Cars", MACHINE_NOT_WORKING )
+CONS( 2018, lxcmcypj,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - PJ Masks", MACHINE_NOT_WORKING )
+CONS( 2014, lxcmcyba,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Barbie (JL2365BB)", MACHINE_NOT_WORKING )
 // the data order is swapped for this one, maybe other internal differences?
-CONS( 200?, lxcmcypp,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Paw Patrol", MACHINE_NOT_WORKING )
+CONS( 2018, lxcmcypp,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Paw Patrol", MACHINE_NOT_WORKING )
 
 CONS( 200?, lxccminn,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Console Colour - Minnie Mouse", MACHINE_NOT_WORKING )
 CONS( 200?, lxccplan,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Console Colour - Disney's Planes", MACHINE_NOT_WORKING )

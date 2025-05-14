@@ -144,6 +144,8 @@ void vt3xx_soc_base_device::vt369_map(address_map &map)
 	map(0x201e, 0x201e).rw(m_ppu, FUNC(ppu_vt3xx_device::read_201e_newvid), FUNC(ppu_vt3xx_device::write_201e_newvid));
 	map(0x201f, 0x201f).r(m_ppu, FUNC(ppu_vt3xx_device::gun2_y_r));
 
+	map(0x2020, 0x2023).rw(m_ppu, FUNC(ppu_vt3xx_device::read_202x_newvid), FUNC(ppu_vt3xx_device::write_202x_newvid));
+
 	map(0x4000, 0x4017).w(m_apu, FUNC(nes_apu_vt_device::write));
 
 	map(0x4014, 0x4014).w(FUNC(vt3xx_soc_base_device::vt_dma_w));

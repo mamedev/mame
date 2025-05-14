@@ -72,6 +72,7 @@ public:
 	uint8_t get_extended_modes2_enable() { return m_extended_modes2_enable; }
 
 	bool is_v3xx_extended_mode() { return (m_newvid_1e == 0x00) ? false : true; }
+	uint8_t get_newmode_tilebase() { return m_newvid_2x[0]; }
 
 	uint8_t get_m_read_bg4_bg3();
 	uint8_t get_speva2_speva0();
@@ -123,7 +124,7 @@ protected:
 	uint8_t m_newvid_1c;
 	uint8_t m_newvid_1d;
 	uint8_t m_newvid_1e;
-
+	uint8_t m_newvid_2x[4];
 private:
 
 
@@ -150,10 +151,12 @@ public:
 	uint8_t read_201c_newvid(offs_t offset);
 	uint8_t read_201d_newvid(offs_t offset);
 	uint8_t read_201e_newvid(offs_t offset);
+	uint8_t read_202x_newvid(offs_t offset);
 
 	void write_201c_newvid(offs_t offset, uint8_t data);
 	void write_201d_newvid(offs_t offset, uint8_t data);
 	void write_201e_newvid(offs_t offset, uint8_t data);
+	void write_202x_newvid(offs_t offset, uint8_t data);
 
 protected:
 	virtual void device_start() override ATTR_COLD;
