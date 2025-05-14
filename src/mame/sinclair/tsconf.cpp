@@ -313,7 +313,7 @@ void tsconf_state::tsconf(machine_config &config)
 		.add_route(1, "speakers", 0.25, 1)
 		.add_route(2, "speakers", 0.50, 1);
 
-	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.75);;
+	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.75);
 
 	PALETTE(config, "palette", palette_device::BLACK, 256);
 	m_screen->set_raw(14_MHz_XTAL / 2, 448, with_hblank(0), 448, 320, with_vblank(0), 320);

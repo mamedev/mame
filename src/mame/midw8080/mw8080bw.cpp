@@ -2745,6 +2745,13 @@ void invaders_state::invnomb(machine_config &config)
 	config.device_remove("mb14241");
 }
 
+void invaders_state::cosmicbat(machine_config &config)
+{
+	invaders(config);
+
+	m_maincpu->set_clock(20_MHz_XTAL / 10);
+}
+
 
 
 /*************************************

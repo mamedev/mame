@@ -1600,6 +1600,13 @@ void defender_state::defender(machine_config &config)
 	m_screen->set_visarea(12, 304-1, 7, 247-1);
 }
 
+void defender_state::nextcent(machine_config &config)
+{
+	defender(config);
+
+	m_soundcpu->set_clock(3.12_MHz_XTAL);
+}
+
 void defender_state::defender_6802snd(machine_config &config)
 {
 	defender(config);
@@ -3931,7 +3938,7 @@ GAME( 1980, zero2,      defender, defender,         defender, defender_state,  i
 GAME( 1981, defenderom, defender, defender_6802snd, defender, defender_state,  empty_init,    ROT0,   "bootleg (Operamatic)",                 "Operacion Defender (bootleg of Defender)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, defcmnd,    defender, defender,         defender, defender_state,  empty_init,    ROT0,   "bootleg",                              "Defense Command (bootleg of Defender)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1981, defence,    defender, defender,         defender, defender_state,  empty_init,    ROT0,   "bootleg (Outer Limits)",               "Defence Command (bootleg of Defender)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1981, nextcent,   defender, defender,         defender, defender_state,  empty_init,    ROT0,   "bootleg (Petaco)",                     "Next Century (bootleg of Defender)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1981, nextcent,   defender, nextcent,         defender, defender_state,  empty_init,    ROT0,   "bootleg (Petaco)",                     "Next Century (bootleg of Defender)",       MACHINE_SUPPORTS_SAVE )
 GAME( 198?, defenseb,   defender, defender,         defender, defender_state,  empty_init,    ROT0,   "bootleg",                              "Defense (bootleg of Defender)",            MACHINE_SUPPORTS_SAVE )
 GAME( 1981, startrkd,   defender, defender,         defender, defender_state,  empty_init,    ROT0,   "bootleg",                              "Star Trek (bootleg of Defender)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1980, attackf,    defender, defender,         defender, defender_state,  empty_init,    ROT0,   "bootleg (Famaresa)",                   "Attack (bootleg of Defender)",             MACHINE_SUPPORTS_SAVE )
