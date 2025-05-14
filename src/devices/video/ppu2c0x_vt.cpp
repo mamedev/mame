@@ -205,7 +205,6 @@ void ppu_vt03_device::device_start()
 
 	save_item(NAME(m_palette_ram));
 	save_item(NAME(m_read_bg4_bg3));
-	save_item(NAME(m_va34));
 	save_item(NAME(m_extplanebuf));
 	save_item(NAME(m_extra_sprite_bits));
 	save_item(NAME(m_videobank0));
@@ -237,7 +236,6 @@ void ppu_vt03_device::device_reset()
 	m_videobank1 = 0;
 
 	m_read_bg4_bg3 = 0;
-	m_va34 = false;
 }
 
 
@@ -246,15 +244,10 @@ uint8_t ppu_vt03_device::get_m_read_bg4_bg3()
 	return m_read_bg4_bg3;
 }
 
-uint8_t ppu_vt03_device::get_va34()
-{
-	return m_va34;
-}
 
 
 void ppu_vt03_device::read_sprite_plane_data(int address)
 {
-	m_va34 = false;
 	m_planebuf[0] = m_read_sp((address + 0) & 0x1fff);
 	m_planebuf[1] = m_read_sp((address + 8) & 0x1fff);
 
@@ -262,9 +255,8 @@ void ppu_vt03_device::read_sprite_plane_data(int address)
 
 	if (is4bpp)
 	{
-		m_va34 = true;
-		m_extplanebuf[0] = m_read_sp((address + 0) & 0x1fff);
-		m_extplanebuf[1] = m_read_sp((address + 8) & 0x1fff);
+		m_extplanebuf[0] = m_read_sp(((address + 0) & 0x1fff)|0x2000);
+		m_extplanebuf[1] = m_read_sp(((address + 8) & 0x1fff)|0x2000);
 	}
 }
 
@@ -340,7 +332,16 @@ void ppu_vt03_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, u
 
 void ppu_vt03_device::read_tile_plane_data(int address, int color)
 {
+	// format is no longer planar
+
+	// old format 8 bits (1 byte) = 8 pixels of 1 plane (one line) of tile
+	// +8 bytes = next tile
+
+	// new format
+	// one byte = 4 planes, 2 pixels
+
 	const bool is4bpp = BIT(m_extended_modes_enable, 1);
+	m_whichpixel = 0;
 
 	if (m_extended_modes_enable & 0x10) // extended mode
 		m_read_bg4_bg3 = color;
@@ -349,16 +350,13 @@ void ppu_vt03_device::read_tile_plane_data(int address, int color)
 
 	if (is4bpp)
 	{
-		m_va34 = false;
-		m_planebuf[0] = m_read_bg((address & 0x1fff));
-		m_planebuf[1] = m_read_bg((address + 8) & 0x1fff);
-		m_va34 = true;
-		m_extplanebuf[0] = m_read_bg((address & 0x1fff));
-		m_extplanebuf[1] = m_read_bg((address + 8) & 0x1fff);
+		m_planebuf[0] = m_read_bg( (address + 0) & 0x1fff );
+		m_planebuf[1] = m_read_bg( (address + 8) & 0x1fff );
+		m_extplanebuf[0] = m_read_bg( ((address + 0) & 0x1fff) | 0x2000 );
+		m_extplanebuf[1] = m_read_bg( ((address + 8) & 0x1fff) | 0x2000 );
 	}
 	else
 	{
-		m_va34 = false;
 		m_planebuf[0] = m_read_bg((address & 0x1fff));
 		m_planebuf[1] = m_read_bg((address + 8) & 0x1fff);
 	}
@@ -368,14 +366,38 @@ void ppu_vt03_device::shift_tile_plane_data(uint8_t& pix)
 {
 	const bool is4bpp = BIT(m_extended_modes_enable, 1);
 
-	ppu2c0x_device::shift_tile_plane_data(pix);
+	pix = 0;
 
 	if (is4bpp)
 	{
-		pix |= (((m_extplanebuf[0] >> 7) & 1) << 5) | (((m_extplanebuf[1] >> 7) & 1) << 6); // yes, shift by 5 and 6 because of the way the palette is arranged in RAM
-		m_extplanebuf[0] = m_extplanebuf[0] << 1;
-		m_extplanebuf[1] = m_extplanebuf[1] << 1;
+		switch (m_whichpixel)
+		{
+		case 0: pix = (BIT(m_planebuf[0], 7) << 0) | (BIT(m_planebuf[1], 7) << 1) | (BIT(m_extplanebuf[0], 7) << 5) | (BIT(m_extplanebuf[1], 7) << 6); break;
+		case 1: pix = (BIT(m_planebuf[0], 6) << 0) | (BIT(m_planebuf[1], 6) << 1) | (BIT(m_extplanebuf[0], 6) << 5) | (BIT(m_extplanebuf[1], 6) << 6); break;
+		case 2: pix = (BIT(m_planebuf[0], 5) << 0) | (BIT(m_planebuf[1], 5) << 1) | (BIT(m_extplanebuf[0], 5) << 5) | (BIT(m_extplanebuf[1], 5) << 6); break;
+		case 3: pix = (BIT(m_planebuf[0], 4) << 0) | (BIT(m_planebuf[1], 4) << 1) | (BIT(m_extplanebuf[0], 4) << 5) | (BIT(m_extplanebuf[1], 4) << 6); break;
+		case 4: pix = (BIT(m_planebuf[0], 3) << 0) | (BIT(m_planebuf[1], 3) << 1) | (BIT(m_extplanebuf[0], 3) << 5) | (BIT(m_extplanebuf[1], 3) << 6); break;;
+		case 5: pix = (BIT(m_planebuf[0], 2) << 0) | (BIT(m_planebuf[1], 2) << 1) | (BIT(m_extplanebuf[0], 2) << 5) | (BIT(m_extplanebuf[1], 2) << 6); break;
+		case 6: pix = (BIT(m_planebuf[0], 1) << 0) | (BIT(m_planebuf[1], 1) << 1) | (BIT(m_extplanebuf[0], 1) << 5) | (BIT(m_extplanebuf[1], 1) << 6); break;
+		case 7: pix = (BIT(m_planebuf[0], 0) << 0) | (BIT(m_planebuf[1], 0) << 1) | (BIT(m_extplanebuf[0], 0) << 5) | (BIT(m_extplanebuf[1], 0) << 6); break;
+		}
 	}
+	else
+	{
+		switch (m_whichpixel)
+		{
+		case 0: pix = (BIT(m_planebuf[0], 7) << 0) | (BIT(m_planebuf[1], 7) << 1); break;
+		case 1: pix = (BIT(m_planebuf[0], 6) << 0) | (BIT(m_planebuf[1], 6) << 1); break;
+		case 2: pix = (BIT(m_planebuf[0], 5) << 0) | (BIT(m_planebuf[1], 5) << 1); break;
+		case 3: pix = (BIT(m_planebuf[0], 4) << 0) | (BIT(m_planebuf[1], 4) << 1); break;
+		case 4: pix = (BIT(m_planebuf[0], 3) << 0) | (BIT(m_planebuf[1], 3) << 1); break;
+		case 5: pix = (BIT(m_planebuf[0], 2) << 0) | (BIT(m_planebuf[1], 2) << 1); break;
+		case 6: pix = (BIT(m_planebuf[0], 1) << 0) | (BIT(m_planebuf[1], 1) << 1); break;
+		case 7: pix = (BIT(m_planebuf[0], 0) << 0) | (BIT(m_planebuf[1], 0) << 1); break;
+		}
+	}
+
+	m_whichpixel++;
 }
 
 
@@ -575,7 +597,11 @@ void ppu_vt3xx_device::read_tile_plane_data(int address, int color)
 	}
 	else
 	{
-		popmessage("extended mode %02x %02x %02x?\n", m_newvid_1c, m_newvid_1d, m_newvid_1e);
+		m_whichpixel = 0;
+		m_planebuf[0] = m_read_bg((address & 0x1fff));
+		m_planebuf[1] = m_read_bg((address + 8) & 0x1fff);
+		m_extplanebuf[0] = m_read_bg( ((address + 0) & 0x1fff) | 0x2000 );
+		m_extplanebuf[1] = m_read_bg( ((address + 8) & 0x1fff) | 0x2000 );
 	}
 }
 
@@ -588,6 +614,7 @@ void ppu_vt3xx_device::draw_tile_pixel(uint8_t pix, int color, uint32_t back_pen
 	else
 	{
 		// extended modes
+		ppu_vt03_device::draw_tile_pixel(pix, color, back_pen, dest);
 	}
 }
 
@@ -600,6 +627,19 @@ void ppu_vt3xx_device::shift_tile_plane_data(uint8_t& pix)
 	else
 	{
 		// extended modes
+		switch (m_whichpixel)
+		{
+		case 0: pix = (BIT(m_planebuf[0], 7) << 0) | (BIT(m_planebuf[0], 6) << 1) | (BIT(m_planebuf[0], 5) << 5) | (BIT(m_planebuf[0], 4) << 6); break;
+		case 1: pix = (BIT(m_planebuf[0], 3) << 0) | (BIT(m_planebuf[0], 2) << 1) | (BIT(m_planebuf[0], 1) << 5) | (BIT(m_planebuf[0], 0) << 6); break;
+		case 2: pix = (BIT(m_planebuf[1], 7) << 0) | (BIT(m_planebuf[1], 6) << 1) | (BIT(m_planebuf[1], 5) << 5) | (BIT(m_planebuf[1], 4) << 6); break;
+		case 3: pix = (BIT(m_planebuf[1], 3) << 0) | (BIT(m_planebuf[1], 2) << 1) | (BIT(m_planebuf[1], 1) << 5) | (BIT(m_planebuf[1], 0) << 6); break;
+		case 4: pix = (BIT(m_extplanebuf[0], 7) << 0) | (BIT(m_extplanebuf[0], 6) << 1) | (BIT(m_extplanebuf[0], 5) << 5) | (BIT(m_extplanebuf[0], 4) << 6); break;
+		case 5: pix = (BIT(m_extplanebuf[0], 3) << 0) | (BIT(m_extplanebuf[0], 2) << 1) | (BIT(m_extplanebuf[0], 1) << 5) | (BIT(m_extplanebuf[0], 0) << 6); break;
+		case 6: pix = (BIT(m_extplanebuf[1], 7) << 0) | (BIT(m_extplanebuf[1], 6) << 1) | (BIT(m_extplanebuf[1], 5) << 5) | (BIT(m_extplanebuf[1], 4) << 6); break;
+		case 7: pix = (BIT(m_extplanebuf[1], 3) << 0) | (BIT(m_extplanebuf[1], 2) << 1) | (BIT(m_extplanebuf[1], 1) << 5) | (BIT(m_extplanebuf[1], 0) << 6); break;
+		}
+
+		m_whichpixel++;
 	}
 }
 
@@ -613,5 +653,6 @@ void ppu_vt3xx_device::draw_back_pen(uint32_t* dst, int back_pen)
 	else
 	{
 		// extended modes
+		ppu_vt03_device::draw_back_pen(dst, back_pen);
 	}
 }

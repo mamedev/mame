@@ -107,14 +107,18 @@ protected:
 	uint8_t m_extended_modes_enable;
 	uint8_t m_extended_modes2_enable;
 
-private:
 	devcb_read8 m_read_bg;
 	devcb_read8 m_read_sp;
 
 	int32_t m_read_bg4_bg3;
-	bool m_va34;
 
 	uint8_t m_extplanebuf[2];
+	uint32_t m_tiledata;
+	int m_whichpixel;
+
+private:
+
+
 	uint8_t m_extra_sprite_bits;
 
 	vtxx_pal_mode m_pal_mode = PAL_MODE_VT0x;

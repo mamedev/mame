@@ -418,7 +418,7 @@ uint8_t nes_vt02_vt03_soc_device::spr_r(offs_t offset)
 {
 	if (m_4242 & 0x1 || m_411d & 0x04)
 	{
-		return m_chrram[offset];
+		return m_chrram[offset & 0x1fff];
 	}
 	else
 	{
@@ -433,7 +433,7 @@ uint8_t nes_vt02_vt03_soc_device::chr_r(offs_t offset)
 {
 	if (m_4242 & 0x1 || m_411d & 0x04) // newer VT platforms only (not VT03/09), split out
 	{
-		return m_chrram[offset];
+		return m_chrram[offset & 0x1fff];
 	}
 	else
 	{
@@ -522,6 +522,9 @@ void nes_vt02_vt03_soc_device::nt_w(offs_t offset, uint8_t data)
 
 int nes_vt02_vt03_soc_device::calculate_real_video_address(int addr, int extended, int readtype)
 {
+	int va34 = (addr & 0x2000) >> 13;
+	addr &= 0x1fff;
+
 	// might be a VT09 only feature (alt 4bpp mode?)
 	int alt_order = m_ppu->get_extended_modes_enable() & 0x40;
 
@@ -652,7 +655,6 @@ int nes_vt02_vt03_soc_device::calculate_real_video_address(int addr, int extende
 	case 0x7: return -1;
 	}
 
-	int va34 = m_ppu->get_va34();
 
 	if (!extended)
 	{
@@ -711,6 +713,7 @@ int nes_vt02_vt03_soc_device::calculate_real_video_address(int addr, int extende
 		}
 
 		finaladdr = ((m_410x[0x0] & 0x0f) << 21) | (va17_va10 << 13) | (eva2_eva0 << 10) | (addr & 0x03ff);
+
 
 		if (is4bpp)
 		{
