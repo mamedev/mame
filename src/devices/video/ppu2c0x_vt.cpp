@@ -422,15 +422,15 @@ void ppu_vt03_device::draw_tile_pixel_inner(uint8_t pen, uint32_t *dest)
 {
 	if (is_v3xx_extended_mode())
 	{
-		// palette in this mode is at 0x2400 in vram?
-	//	uint8_t palr = readbyte(((pen & 0xff)*3)+0x2400);
-	//	uint8_t palg = readbyte(((pen & 0xff)*3)+0x2401);
-	//	uint8_t palb = readbyte(((pen & 0xff)*3)+0x2402);
-		uint8_t palr = readbyte((pen & 0xff)+0x2400);
-		uint8_t palg = readbyte((pen & 0xff)+0x2500);
-		uint8_t palb = readbyte((pen & 0xff)+0x2600);
+		// correct for lxcmcysp, lxcmc250
+		uint16_t pal0 = readbyte(((pen & 0xff)*2)+0x2400);
+		         pal0 |= readbyte(((pen & 0xff)*2)+0x2401) << 8;
 
-		*dest = rgb_t(palr, palg, palb);
+		int palb = (pal0 >> 0) & 0x1f;
+		int palg = (pal0 >> 5) & 0x1f;
+		int palr = (pal0 >> 10) & 0x1f;
+
+		*dest = rgb_t(palr<<3, palg<<3, palb<<3);
 	}
 	else
 	{
