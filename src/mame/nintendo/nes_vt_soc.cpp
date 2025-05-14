@@ -541,7 +541,8 @@ int nes_vt02_vt03_soc_device::calculate_real_video_address(int addr, int readtyp
 		// ROM format, each byte is 1 pixel (8-bits)
 		// each line is 8 bytes (8 pixels x 8-bits)
 		// each tile is 64 bytes (8 bytes x 8 lines)
-		int finaladdr = 0x180000;
+		int finaladdr = 0x180000; // denv150 boot screen
+		//int finaladdr = 0xb0000; // lxcmcyba boot screen
 
 		int tileline = addr & 0x0007;
 		int tileplane = addr & 0x0008;
