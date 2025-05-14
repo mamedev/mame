@@ -215,6 +215,26 @@ void nbmj8891_state::init_pairsten()
 	}
 }
 
+void nbmj8891_state::init_avmjyk()
+{
+	uint8_t *prot = memregion("protection")->base();
+	uint8_t *ram = memregion("maincpu")->base() + 0xf800;
+
+	/* need to clear RAM otherwise it doesn't boot... */
+	for (int i = 0; i < 0x800; i++) ram[i] = 0x00;
+
+	/* this is one possible way to rearrange the protection ROM data to get the
+	   expected 0x7362 checksum. It's probably completely wrong! But since the
+	   game doesn't do anything else with that ROM, this is more than enough. I
+	   could just fill this are with fake data, the only thing that matters is
+	   the checksum. */
+	for (int i = 0; i < 0x20000; i++)
+	{
+		prot[i] = bitswap<8>(prot[i + 0x20000],2,7,1,6,5,3,0,4);
+	}
+}
+
+
 void nbmj8891_state::gionbana_map(address_map &map)
 {
 	map(0x0000, 0xefff).rom();
@@ -3136,7 +3156,31 @@ ROM_START( avmjts ) // GH1701 PCB + VCR tape controller PCB
 	// 8k socketed but no ROM, everything else not populated
 
 	ROM_REGION( 0x40000, "protection", 0 )
-	ROM_LOAD( "mask.f2", 0x00000, 0x40000, CRC(2199e3e9) SHA1(965af4a29db4ff909dbeeebab1b828eb4f23f57e) )
+	ROM_LOAD( "mask.2f", 0x00000, 0x40000, CRC(2199e3e9) SHA1(965af4a29db4ff909dbeeebab1b828eb4f23f57e) )
+
+	DISK_REGION( "vhs" ) /* Video Home System tape */
+	DISK_IMAGE_READONLY( "avmjts", 0, NO_DUMP )
+ROM_END
+
+ROM_START( avmjyk )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "13.3h",    0x00000, 0x10000, CRC(b8557fd1) SHA1(09f229f6f116149276769ec21091140b1acf04df) )
+
+	ROM_REGION( 0x20000, "voice", 0 )
+	ROM_LOAD( "12.2k",    0x00000, 0x10000, CRC(a57e449e) SHA1(11cfbcf28813253ad3c51867539195c86e7c51b4) )
+	// 2j not populated
+
+	ROM_REGION( 0xf0000, "gfx1", 0 )
+	ROM_LOAD( "14.8c",    0x00000, 0x10000, CRC(8d76f6fc) SHA1(d3fdd9ce16dda6ec5b476aa510e55cba9e10800c) )
+	ROM_LOAD( "15.8d",    0x10000, 0x10000, CRC(a0b7a063) SHA1(830ba4f025b5c5ea6360d0b06e254cdee7263550) )
+	ROM_LOAD( "16.8e",    0x20000, 0x10000, CRC(5796f351) SHA1(b1d3f0858d287eafa853a85df9f98d0a0e4ca7ff) )
+	ROM_LOAD( "17.8f",    0x30000, 0x10000, CRC(6980ec9e) SHA1(b42d1103cf157f250c5ed8e20b976045216762b4) )
+	ROM_LOAD( "18.8h",    0x40000, 0x10000, CRC(9f60fe0d) SHA1(d368b3dd91e79cb2274e01819aa72e42cb3ddda5) )
+	ROM_LOAD( "19.8k",    0x50000, 0x10000, CRC(509cc684) SHA1(5ec0327ddb5cc3e532effbfa1cd3f8550e532922) )
+	// everything else not populated
+
+	ROM_REGION( 0x40000, "protection", 0 )
+	ROM_LOAD( "mask.2f", 0x00000, 0x40000, CRC(2199e3e9) SHA1(965af4a29db4ff909dbeeebab1b828eb4f23f57e) )
 
 	DISK_REGION( "vhs" ) /* Video Home System tape */
 	DISK_IMAGE_READONLY( "avmjts", 0, NO_DUMP )
@@ -3574,6 +3618,7 @@ GAME( 1990, chinmoku,  0,        chinmoku, chinmoku, nbmj8891_state, empty_init,
 GAME( 1990, maiko,     0,        maiko,    maiko,    nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Maikobana (Japan 900802)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, mmaiko,    0,        mmaiko,   mmaiko,   nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Maikobana (Japan 900911, medal)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, avmjts,    0,        mjfocus,  mjfocus,  nbmj8891_state, init_mjfocus,  ROT0,   "Nichibutsu", "AV-Mahjong Two Shot (Japan Ver 1.00 1990/05/21)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, avmjyk,    0,        mjfocus,  mjfocus,  nbmj8891_state, init_avmjyk,   ROT0,   "Nichibutsu", "AV-Mahjong Yanchana Koneko (Japan Ver 1.01 1990/08/23)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, hnxmasev,  0,        hnxmasev, maiko,    nbmj8891_state, empty_init,    ROT180, "Nichibutsu / AV Japan", "AV Hanafuda Hana no Christmas Eve (Japan 901204)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, hnageman,  0,        hnageman, maiko,    nbmj8891_state, empty_init,    ROT180, "Nichibutsu / AV Japan", "AV Hanafuda Hana no Ageman (Japan 900716)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, club90s,   0,        club90s,  club90s,  nbmj8891_state, empty_init,    ROT0,   "Nichibutsu", "Mahjong CLUB 90's (set 1) (Japan 900919)", MACHINE_SUPPORTS_SAVE )

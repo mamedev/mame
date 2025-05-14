@@ -161,8 +161,11 @@ void gcm394_game_state::base(machine_config &config)
 	SPEAKER(config, "speaker", 2).front();
 }
 
-
-
+void gcm394_game_state::base_alt_irq(machine_config &config)
+{
+	gcm394_game_state::base(config);
+	m_maincpu->set_alt_periodic_irq(true);
+}
 
 void gcm394_game_state::machine_start()
 {

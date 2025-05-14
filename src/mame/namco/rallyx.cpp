@@ -1085,7 +1085,7 @@ ROM_START( rallyxeg )
 	ROM_LOAD( "r4_82s129.2m", 0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )
 ROM_END
 
-ROM_START( dngrtrck ) // PROMs weren't dumped for this PCB, supposed to match
+ROM_START( dngrtrck )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1b-2716.bin",  0x0000, 0x0800, CRC(b6180a12) SHA1(f442fe81f7fac6e915944640c763d7016a6577f6) )
 	ROM_LOAD( "1c-2716.bin",  0x0800, 0x0800, CRC(7cbeb656) SHA1(ff6e669f7d3e91c1cc835106cccefcd81aa28bb8) )
@@ -1104,14 +1104,14 @@ ROM_START( dngrtrck ) // PROMs weren't dumped for this PCB, supposed to match
 	ROM_LOAD( "rx1-6.8m",     0x0000, 0x0100, CRC(3c16f62c) SHA1(7a3800be410e306cf85753b9953ffc5575afbcd6) )  // PROM type: IM5623    - dots
 
 	ROM_REGION( 0x0160, "proms", 0 )
-	ROM_LOAD( "rx1-1.11n",    0x0000, 0x0020, CRC(c7865434) SHA1(70c1c9610ba6f1ead77f347e7132958958bccb31) )  // PROM type: M3-7603-5 - palette
-	ROM_LOAD( "rx1-7.8p",     0x0020, 0x0100, CRC(834d4fda) SHA1(617864d3df0917a513e8255ad8d96ae7a04da5a1) )  // PROM type: IM5623    - lookup table
-	ROM_LOAD( "rx1-2.4n",     0x0120, 0x0020, CRC(8f574815) SHA1(4f84162db9d58b64742c67dc689eb665b9862fb3) )  // PROM type: N82S123N  - video layout (not used)
-	ROM_LOAD( "rx1-3.7k",     0x0140, 0x0020, CRC(b8861096) SHA1(26fad384ed7a1a1e0ba719b5578e2dbb09334a25) )  // PROM type: M3-7603-5 - video timing (not used)
+	ROM_LOAD( "rx1-1.11n",    0x0000, 0x0020, CRC(c7865434) SHA1(70c1c9610ba6f1ead77f347e7132958958bccb31) )  // PROM type: 82S123 - palette
+	ROM_LOAD( "rx1-7.8p",     0x0020, 0x0100, CRC(834d4fda) SHA1(617864d3df0917a513e8255ad8d96ae7a04da5a1) )  // PROM type: 82S129 - lookup table
+	ROM_LOAD( "rx1-2.4n",     0x0120, 0x0020, CRC(8f574815) SHA1(4f84162db9d58b64742c67dc689eb665b9862fb3) )  // PROM type: 82S123 - video layout (not used)
+	ROM_LOAD( "rx1-3.7k",     0x0140, 0x0020, CRC(b8861096) SHA1(26fad384ed7a1a1e0ba719b5578e2dbb09334a25) )  // PROM type: 82S123 - video timing (not used)
 
 	ROM_REGION( 0x0200, "namco", 0 ) // sound PROMs
-	ROM_LOAD( "rx1-5.3p",     0x0000, 0x0100, CRC(4bad7017) SHA1(3e6da9d798f5e07fa18d6ce7d0b148be98c766d5) )  // PROM type: IM5623
-	ROM_LOAD( "rx1-4.2m",     0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )  // PROM type: IM5623 - not used
+	ROM_LOAD( "rx1-5.3p",     0x0000, 0x0100, CRC(4bad7017) SHA1(3e6da9d798f5e07fa18d6ce7d0b148be98c766d5) )  // PROM type: 82S129
+	ROM_LOAD( "rx1-4.2m",     0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )  // PROM type: 82S129 - not used
 ROM_END
 
 ROM_START( nrallyx )

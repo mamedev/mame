@@ -99,11 +99,13 @@
      Carrera (Version 6.7) / Bomberman (Version 6.6)
   - Added technical and game notes.
 
+  - Traspased the game ncarrera to a new driver, since the MCU draws
+    the graphics and animate the reels.
+
 
   TODO:
 
   - Analyze the carrera/bomberman sets and rename them accordingly.
-  - ncarrera has an undumped AT90S8515 MCU (8 bit AVR RISC core)
 
 
 ***********************************************************************/
@@ -534,26 +536,6 @@ ROM_START( drkseal )
 	ROM_LOAD( "82s123.ic39", 0x00, 0x20, CRC(03aadf73) SHA1(e5baf8c5e7276eb207357e4cbb694c75e8caab6a) )
 ROM_END
 
-// this set uses a newer 'TYPE C-2000' board with a 'Rania Original 2000 Type 8515' riser board
-//  (the Z80 and MC6845 have been moved here along with a AT90S8515 MCU)
-ROM_START( ncarrera )
-	ROM_REGION( 0x10000, "maincpu", 0 )  // has 2001, Mpampis and Avraam strings
-	ROM_LOAD( "27512.ic22", 0x00000, 0x10000, CRC(3ec2dbca) SHA1(896fbccaf844c1fa5861b176c09e4a3707b3524f) )  // 1xxxxxxxxxxxxxxx = 0xFF
-
-	ROM_REGION( 0x2200, "mcu", 0 )
-	ROM_LOAD( "internal_eeprom", 0x0000, 0x0200, NO_DUMP )
-	ROM_LOAD( "internal_flash",  0x0200, 0x2000, NO_DUMP )
-
-	ROM_REGION( 0x50000, "tiles", 0 )  // has both New Carrera and New Bomberman GFX
-	ROM_LOAD( "27512.ic1", 0x00000, 0x10000, CRC(dbec54c7) SHA1(ca7e54c198ca8abeffba1b323a514678384c35f9) )
-	ROM_LOAD( "27512.ic2", 0x10000, 0x10000, CRC(8e8c2b6d) SHA1(001121e0b91d8e0efdc3f5f99c43e1751b4be758) )
-	ROM_LOAD( "27512.ic3", 0x20000, 0x10000, CRC(ac66cda8) SHA1(65fae21de9f9727c5d8198ff57b27d703a7518fc) )
-	ROM_LOAD( "27512.ic4", 0x30000, 0x10000, CRC(c337a9b8) SHA1(0c4f86e1c7c94c492b09e3571e213308e9fa7c47) )
-	ROM_LOAD( "27512.ic5", 0x40000, 0x10000, CRC(d8494f96) SHA1(11bc5d73f030361de8e6d6434ccbeac02c61a9eb) )
-
-	ROM_REGION( 0x20, "proms", 0 )
-	ROM_LOAD( "am27s19.ic39", 0x00, 0x20, CRC(af16359f) SHA1(1ff5c9d7807e52be09c0ded56fb68a47e41b3fcf) )
-ROM_END
 
 } // anonymous namespace
 
@@ -569,4 +551,3 @@ GAME( 1999, bsebmanbl,  carrera, carrera, carrera, carrera_state, empty_init, RO
 GAME( 1999, bsebmanbl2, carrera, carrera, carrera, carrera_state, empty_init, ROT0, "bootleg (J.T.)",             "Bomberman (Version 6.6, J.T. bootleg)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1999, alantin,    0,       carrera, carrera, carrera_state, empty_init, ROT0, "bootleg (Robert / Avraam)",  "Alantin - Aladdin's Magic Lamp",                  MACHINE_SUPPORTS_SAVE )
 GAME( 1999, drkseal,    0,       carrera, carrera, carrera_state, empty_init, ROT0, "bootleg (Vegas)",            "Dark Seal (8-liner)",                             MACHINE_SUPPORTS_SAVE )
-GAME( 2001, ncarrera,   0,       carrera, carrera, carrera_state, empty_init, ROT0, "bootleg (J.T.)",             "New Carrera - Version 2000",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // needs MCU dump
