@@ -604,6 +604,8 @@ INPUT_PORTS_END
 ROM_START( dgun2561 )
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	ROM_LOAD( "dgun2561.bin", 0x00000, 0x4000000, CRC(a6e627b4) SHA1(2667d2feb02de349387f9dcfa5418e7ed3afeef6) )
+
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
 ROM_START( dgun2593 )
@@ -957,6 +959,8 @@ ROM_END
 ROM_START( lexi30 )
 	ROM_REGION( 0x800000, "mainrom", 0 )
 	ROM_LOAD( "lexi30.u3", 0x00000, 0x800000, CRC(0d4307ea) SHA1(0d7cf492f796b0bb871deebaca38a3ff3b2ed1e6) )
+
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
 ROM_START( matet10 )
