@@ -420,93 +420,115 @@ void ppu_vt03_device::draw_back_pen(uint32_t* dst, int back_pen)
 
 void ppu_vt03_device::draw_tile_pixel_inner(uint8_t pen, uint32_t *dest)
 {
-	if (BIT(m_extended_modes_enable, 7))
+	if (is_v3xx_extended_mode())
 	{
-		if (m_pal_mode == PAL_MODE_NEW_RGB) // unknown newer VT mode
-		{
-			uint32_t palval = (m_palette_ram[pen & 0x7f] & 0xff) | ((m_palette_ram[(pen & 0x7f) + 0x80] & 0x7f) << 8);
+		// palette in this mode is at 0x2400 in vram?
+	//	uint8_t palr = readbyte(((pen & 0xff)*3)+0x2400);
+	//	uint8_t palg = readbyte(((pen & 0xff)*3)+0x2401);
+	//	uint8_t palb = readbyte(((pen & 0xff)*3)+0x2402);
+		uint8_t palr = readbyte((pen & 0xff)+0x2400);
+		uint8_t palg = readbyte((pen & 0xff)+0x2500);
+		uint8_t palb = readbyte((pen & 0xff)+0x2600);
 
-			// does grayscale mode exist here? (we haven't calculated any colours for it)
-			//if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
-			//  palval &= 0x30;
-
-			// apply colour emphasis (does it really exist here?) (we haven't calculated any colours for it, so ths has no effect)
-			palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 10);
-
-			*dest = m_vtpens_rgb555[palval & 0x3ffff];
-		}
-		else if (m_pal_mode == PAL_MODE_NEW_RGB12) // unknown newer VT mode
-		{
-			uint32_t palval = (m_palette_ram[pen & 0x7f] & 0x3f) | ((m_palette_ram[(pen & 0x7f) + 0x80] & 0x3f) << 6);
-
-			// does grayscale mode exist here? (we haven't calculated any colours for it)
-			//if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
-			//  palval &= 0x30;
-
-			// apply colour emphasis (does it really exist here?) (we haven't calculated any colours for it, so ths has no effect)
-			palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 7);
-
-			*dest = m_vtpens_rgb444[palval & 0x7fff];
-		}
-		else // VT03 mode
-		{
-			uint32_t palval = (m_palette_ram[pen & 0x7f] & 0x3f) | ((m_palette_ram[(pen & 0x7f) + 0x80] & 0x3f) << 6);
-
-			// does grayscale mode exist here? (we haven't calculated any colours for it)
-			//if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
-			//  palval &= 0x30;
-
-			// apply colour emphasis (does it really exist here?) (we calculate values for it when building the palette lookup)
-			palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 7);
-
-			*dest = pen_color(YUV444_COLOR + (palval & 0x7fff));
-		}
+		*dest = rgb_t(palr, palg, palb);
 	}
-	else // old colour compatible mode
+	else
 	{
-		uint16_t palval = (m_palette_ram[pen & 0x7f] & 0x3f);
+		if (BIT(m_extended_modes_enable, 7))
+		{
+			if (m_pal_mode == PAL_MODE_NEW_RGB) // unknown newer VT mode
+			{
+				uint32_t palval = (m_palette_ram[pen & 0x7f] & 0xff) | ((m_palette_ram[(pen & 0x7f) + 0x80] & 0x7f) << 8);
 
-		if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
-			palval &= 0x30;
+				// does grayscale mode exist here? (we haven't calculated any colours for it)
+				//if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
+				//  palval &= 0x30;
 
-		// apply colour emphasis
-		palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 1);
+				// apply colour emphasis (does it really exist here?) (we haven't calculated any colours for it, so ths has no effect)
+				palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 10);
 
-		*dest = pen_color(palval & 0x1ff);
+				*dest = m_vtpens_rgb555[palval & 0x3ffff];
+			}
+			else if (m_pal_mode == PAL_MODE_NEW_RGB12) // unknown newer VT mode
+			{
+				uint32_t palval = (m_palette_ram[pen & 0x7f] & 0x3f) | ((m_palette_ram[(pen & 0x7f) + 0x80] & 0x3f) << 6);
+
+				// does grayscale mode exist here? (we haven't calculated any colours for it)
+				//if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
+				//  palval &= 0x30;
+
+				// apply colour emphasis (does it really exist here?) (we haven't calculated any colours for it, so ths has no effect)
+				palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 7);
+
+				*dest = m_vtpens_rgb444[palval & 0x7fff];
+			}
+			else // VT03 mode
+			{
+				uint32_t palval = (m_palette_ram[pen & 0x7f] & 0x3f) | ((m_palette_ram[(pen & 0x7f) + 0x80] & 0x3f) << 6);
+
+				// does grayscale mode exist here? (we haven't calculated any colours for it)
+				//if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
+				//  palval &= 0x30;
+
+				// apply colour emphasis (does it really exist here?) (we calculate values for it when building the palette lookup)
+				palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 7);
+
+				*dest = pen_color(YUV444_COLOR + (palval & 0x7fff));
+			}
+		}
+		else // old colour compatible mode
+		{
+			uint16_t palval = (m_palette_ram[pen & 0x7f] & 0x3f);
+
+			if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
+				palval &= 0x30;
+
+			// apply colour emphasis
+			palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 1);
+
+			*dest = pen_color(palval & 0x1ff);
+		}
 	}
 }
 void ppu_vt03_device::draw_tile_pixel(uint8_t pix, int color, uint32_t back_pen, uint32_t*& dest)
 {
-	const bool is4bpp = BIT(m_extended_modes_enable, 1);
-
-	if (!is4bpp)
+	if (is_v3xx_extended_mode())
 	{
-		ppu2c0x_device::draw_tile_pixel(pix, color, back_pen, dest);
+		draw_tile_pixel_inner(pix, dest);
 	}
 	else
 	{
-		int basepen;
-		int pen;
+		const bool is4bpp = BIT(m_extended_modes_enable, 1);
 
-		if (m_extended_modes_enable & 0x10) // extended mode
+		if (!is4bpp)
 		{
-			basepen = 0;
+			ppu2c0x_device::draw_tile_pixel(pix, color, back_pen, dest);
 		}
 		else
 		{
-			basepen = 4 * color; // for use in the palette decoding
-		}
+			int basepen;
+			int pen;
 
-		if (pix)
-		{
-			pen = pix + basepen;
-		}
-		else
-		{
-			pen = 0; // back_pen; // fixme backpen logic probably differs on vt03 due to extra colours
-		}
+			if (m_extended_modes_enable & 0x10) // extended mode
+			{
+				basepen = 0;
+			}
+			else
+			{
+				basepen = 4 * color; // for use in the palette decoding
+			}
 
-		draw_tile_pixel_inner(pen, dest);
+			if (pix)
+			{
+				pen = pix + basepen;
+			}
+			else
+			{
+				pen = 0; // back_pen; // fixme backpen logic probably differs on vt03 due to extra colours
+			}
+
+			draw_tile_pixel_inner(pen, dest);
+		}
 	}
 }
 
@@ -605,6 +627,8 @@ void ppu_vt3xx_device::read_tile_plane_data(int address, int color)
 		// new format
 		// one byte = 4 planes, 2 pixels
 
+		m_read_bg4_bg3 = color;
+
 		m_whichpixel = 0;
 		m_planebuf[0] = m_read_bg((address & 0x1fff));
 		m_planebuf[1] = m_read_bg((address + 8) & 0x1fff);
@@ -656,15 +680,16 @@ void ppu_vt3xx_device::shift_tile_plane_data(uint8_t& pix)
 		// 8x8x8 non-planar mode
 		switch (m_whichpixel)
 		{
-		case 0: pix = m_planebuf[0] & 0xf; break;
-		case 4: pix = m_planebuf[1] & 0xf; break;
-		case 1: pix = m_extplanebuf[0] & 0xf; break;
-		case 5: pix = m_extplanebuf[1] & 0xf; break;
-		case 2: pix = m_extplanebuf_vt3xx_0[0] & 0xf; break;
-		case 6: pix = m_extplanebuf_vt3xx_0[1] & 0xf; break;
-		case 3: pix =m_extplanebuf_vt3xx_1[0] & 0xf; break;
-		case 7: pix =m_extplanebuf_vt3xx_1[1] & 0xf; break;
+		case 0: pix = m_planebuf[0]; break;
+		case 4: pix = m_planebuf[1]; break;
+		case 1: pix = m_extplanebuf[0]; break;
+		case 5: pix = m_extplanebuf[1]; break;
+		case 2: pix = m_extplanebuf_vt3xx_0[0]; break;
+		case 6: pix = m_extplanebuf_vt3xx_0[1]; break;
+		case 3: pix = m_extplanebuf_vt3xx_1[0]; break;
+		case 7: pix = m_extplanebuf_vt3xx_1[1]; break;
 		}
+		//pix = bitswap<8>(pix,  3, 2, 5, 4, 1,0, 7, 6);
 
 		m_whichpixel++;
 	}

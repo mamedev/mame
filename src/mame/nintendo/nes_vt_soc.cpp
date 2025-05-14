@@ -545,12 +545,16 @@ int nes_vt02_vt03_soc_device::calculate_real_video_address(int addr, int readtyp
 
 		int tileline = addr & 0x0007;
 		int tileplane = addr & 0x0008;
-		int tilenum = addr & 0x1ff0;
+		int tilenum = addr & 0x0ff0;
 
 		int offset = (tileline << 3) | (tileplane >> 1) | va34;
 		offset |= tilenum << 2;
 
-		return (finaladdr + offset) & 0x1fffff;
+		int colorbits = m_ppu->get_m_read_bg4_bg3();
+
+		offset += colorbits * 0x4000;
+
+		return (finaladdr + offset + 0x0000) & 0x1fffff;
 	}
 
 	/*
