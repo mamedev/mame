@@ -51,14 +51,10 @@ TODO:
 
 - vbowl, vbowlj: trackball support
 
-- lhb3: emulated game crashes with an illegal instruction error on the
-  bookkeeping menu
-
 - xymga: stop during attract mode with 'RECORD ERROR 3'
 
-- tygn: crashes to how to play screen during gameplay, payout and clear
-  inputs shown in input test don't work, joystick left/right show
-  incorrect names in input test
+- tygn: payout and clear inputs shown in input test don't work,
+  joystick left/right show incorrect names in input test
 
 Notes:
 
@@ -255,6 +251,8 @@ public:
 	void xymg(machine_config &config) ATTR_COLD;
 	void xymga(machine_config &config) ATTR_COLD;
 	void lhb2(machine_config &config) ATTR_COLD;
+	void lhb2cpgs(machine_config &config) ATTR_COLD;
+	void lhb3(machine_config &config) ATTR_COLD;
 	void nkishusp(machine_config &config) ATTR_COLD;
 	void tygn(machine_config &config) ATTR_COLD;
 
@@ -315,6 +313,7 @@ private:
 	void drgnwrld_igs012_mem(address_map &map) ATTR_COLD;
 	void lhb_mem(address_map &map) ATTR_COLD;
 	void lhb2_mem(address_map &map) ATTR_COLD;
+	void lhb3_mem(address_map &map) ATTR_COLD;
 	void nkishusp_mem(address_map &map) ATTR_COLD;
 	void tygn_mem(address_map &map) ATTR_COLD;
 	void wlcc_mem(address_map &map) ATTR_COLD;
@@ -2982,6 +2981,37 @@ void igs011_oki_state::lhb2_mem(address_map &map)
 }
 
 
+void igs011_oki_state::lhb3_mem(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+
+	map(0x021000, 0x0211ff).w(FUNC(igs011_oki_state::igs011_prot2_inc_w));   // inc   (55)
+	map(0x021200, 0x0213ff).w(FUNC(igs011_oki_state::lhb_igs011_prot2_swap_w));   // swap  (33)
+	map(0x021400, 0x0215ff).r(FUNC(igs011_oki_state::lhb2_igs011_prot2_r));   // read
+	map(0x021600, 0x0217ff).w(FUNC(igs011_oki_state::igs011_prot2_reset_w));   // reset (55)
+
+	map(0x100000, 0x103fff).ram().share("nvram");
+	map(0x200001, 0x200001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x204000, 0x204003).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff);
+	map(0x208000, 0x208001).nopr().w(FUNC(igs011_oki_state::igs003_w));
+	map(0x208002, 0x208003).rw(FUNC(igs011_oki_state::lhb2_igs003_r), FUNC(igs011_oki_state::lhb2_igs003_w));
+	map(0x20c000, 0x20cfff).ram().share(m_priority_ram);
+	map(0x210000, 0x210fff).umask16(0x00ff).rw(m_palette, FUNC(palette_device::read8), FUNC(palette_device::write8)).share("palette");
+	map(0x211000, 0x211fff).umask16(0x00ff).rw(m_palette, FUNC(palette_device::read8_ext), FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0x214000, 0x214001).portr("COIN");
+	map(0x300000, 0x3fffff).umask16(0x00ff).rw(FUNC(igs011_oki_state::igs011_layers_r), FUNC(igs011_oki_state::igs011_layers_w));
+	map(0xa20000, 0xa20001).w(FUNC(igs011_oki_state::igs011_priority_w));
+	map(0xa38000, 0xa38001).w(FUNC(igs011_oki_state::lhb_irq_enable_w));
+	map(0xa40000, 0xa40001).w(FUNC(igs011_oki_state::dips_w));
+
+	map(0xa50000, 0xa50001).w(FUNC(igs011_oki_state::igs011_prot_addr_w));
+//  map(0xa50000, 0xa50005).r(FUNC(igs011_oki_state::igs011_prot_fake_r));
+
+	map(0xa58000, 0xa5cfff).m(*this, FUNC(igs011_oki_state::blitter_ctrl));
+	map(0xa88000, 0xa88001).r(FUNC(igs011_oki_state::dips_r<3>));
+}
+
+
 void igs011_oki_state::nkishusp_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
@@ -3019,7 +3049,7 @@ void igs011_oki_state::nkishusp_mem(address_map &map)
 
 void igs011_oki_state::tygn_mem(address_map &map)
 {
-	nkishusp_mem(map);
+	lhb3_mem(map);
 
 	map(0x208000, 0x208001).nopr(); // TODO
 	map(0x208002, 0x208003).rw(FUNC(igs011_oki_state::drgnwrld_igs003_r), FUNC(igs011_oki_state::lhb2_igs003_w));
@@ -4327,6 +4357,20 @@ void igs011_oki_state::nkishusp(machine_config &config)
 }
 
 
+void igs011_oki_state::lhb2cpgs(machine_config &config)
+{
+	lhb2(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_oki_state::lhb3_mem);
+}
+
+void igs011_oki_state::lhb3(machine_config &config)
+{
+	nkishusp(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs011_oki_state::lhb3_mem);
+}
+
 void igs011_oki_state::tygn(machine_config &config)
 {
 	nkishusp(config);
@@ -5201,9 +5245,9 @@ GAME( 1995, lhbv33c,       lhb,      lhb,             lhb,       igs011_oki_stat
 GAME( 1995, dbc,           lhb,      lhb,             lhb,       igs011_oki_state, init_dbc,          ROT0, "IGS",                     "Daai Baan Sing (Hong Kong, V027H)",                MACHINE_SUPPORTS_SAVE )
 GAME( 1995, ryukobou,      lhb,      lhb,             lhb,       igs011_oki_state, init_ryukobou,     ROT0, "IGS / Alta",              "Mahjong Ryukobou (Japan, V030J)",                  MACHINE_SUPPORTS_SAVE )
 GAME( 1996, lhb2,          0,        lhb2,            lhb2,      igs011_oki_state, init_lhb2,         ROT0, "IGS",                     "Lung Fu Bong II (Hong Kong, V185H)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1996, lhb2cpgs,      lhb2,     lhb2,            lhb2,      igs011_oki_state, init_lhb2cpgs,     ROT0, "IGS",                     "Long Hu Bang II: Cuo Pai Gaoshou (China, V127C)",  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ROM patches
+GAME( 1996, lhb2cpgs,      lhb2,     lhb2cpgs,        lhb2,      igs011_oki_state, init_lhb2cpgs,     ROT0, "IGS",                     "Long Hu Bang II: Cuo Pai Gaoshou (China, V127C)",  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ROM patches
 GAME( 1996, tygn,          lhb2,     tygn,            tygn,      igs011_oki_state, init_tygn,         ROT0, "IGS",                     "Te Yi Gong Neng (China, V632C)",                   MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ROM patches
-GAME( 1996, lhb3,          lhb2,     nkishusp,        lhb2,      igs011_oki_state, init_lhb3,         ROT0, "IGS",                     "Long Hu Bang III: Cuo Pai Gaoshou (China, V242C)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ROM patches
+GAME( 1996, lhb3,          lhb2,     lhb3,            lhb2,      igs011_oki_state, init_lhb3,         ROT0, "IGS",                     "Long Hu Bang III: Cuo Pai Gaoshou (China, V242C)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ROM patches
 GAME( 1996, xymg,          0,        xymg,            xymg,      igs011_oki_state, init_xymg,         ROT0, "IGS",                     "Xingyun Manguan (China, V651C, set 1)",            MACHINE_SUPPORTS_SAVE )
 GAME( 1996, xymga,         xymg,     xymga,           xymg,      igs011_oki_state, init_xymga,        ROT0, "IGS",                     "Xingyun Manguan (China, V651C, set 2)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // different encryption and without IGS003
 GAME( 1996, wlcc,          xymg,     wlcc,            wlcc,      igs011_oki_state, init_wlcc,         ROT0, "IGS",                     "Wanli Changcheng (China, V638C)",                  MACHINE_SUPPORTS_SAVE )
