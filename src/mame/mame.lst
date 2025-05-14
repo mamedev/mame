@@ -29638,7 +29638,6 @@ bsebmanbl
 bsebmanbl2
 carrera
 drkseal
-ncarrera
 
 @source:misc/castle.cpp
 castfpt
@@ -31926,6 +31925,9 @@ musclem
 
 @source:misc/nabupc.cpp
 nabupc
+
+@source:misc/ncarrera.cpp
+ncarrera
 
 @source:misc/neomania.cpp
 neomania
