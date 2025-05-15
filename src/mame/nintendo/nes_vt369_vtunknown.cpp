@@ -1136,7 +1136,7 @@ CONS( 2020, unk2020hh,  unk2019hh,0,  vt369_vtunknown_hh_8mb, vt369_vtunknown, v
 *****************************************************************************/
 
 // portable fan + famiclone combo handheld
-CONS( 2020, nubsupmf,   0,      0,  vt369_vtunknown_hh_4mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "<unknown>", "NubSup Mini Game Fan", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2020, nubsupmf,   0,      0,  vt369_vtunknown_hh_altswap_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "<unknown>", "NubSup Mini Game Fan", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // unknown tech level, might be scrambled as default codebank/boot vectors don't seem valid
 CONS( 201?, hhgc319,  0,        0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "<unknown>", "Handheld Game Console 319-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
