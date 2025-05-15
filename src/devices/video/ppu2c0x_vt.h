@@ -73,6 +73,8 @@ public:
 
 	bool is_v3xx_extended_mode() { return (m_newvid_1e == 0x00) ? false : true; }
 	uint8_t get_newmode_tilebase() { return m_newvid_2x[0]; }
+	uint8_t vt3xx_extended_palette_r(offs_t offset) { return m_vt3xx_palette[offset]; }
+	void vt3xx_extended_palette_w(offs_t offset, uint8_t data) { m_vt3xx_palette[offset] = data; }
 
 	uint8_t get_m_read_bg4_bg3();
 	uint8_t get_speva2_speva0();
@@ -125,6 +127,8 @@ protected:
 	uint8_t m_newvid_1d;
 	uint8_t m_newvid_1e;
 	uint8_t m_newvid_2x[4];
+
+	uint8_t m_vt3xx_palette[0x400];
 private:
 
 
@@ -167,6 +171,9 @@ private:
 	virtual void draw_tile_pixel(uint8_t pix, int color, uint32_t back_pen, uint32_t*& dest) override;
 	virtual void shift_tile_plane_data(uint8_t& pix) override;
 	virtual void draw_back_pen(uint32_t* dst, int back_pen) override;
+
+	uint8_t vt3xx_palette_r(offs_t offset);
+	void vt3xx_palette_w(offs_t offset, uint8_t da0ta);
 };
 
 

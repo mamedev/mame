@@ -212,6 +212,7 @@ void ppu_vt03_device::device_start()
 	save_item(NAME(m_extended_modes_enable));
 	save_item(NAME(m_extended_modes2_enable));
 	save_item(NAME(m_videobank0_extra));
+	save_item(NAME(m_vt3xx_palette));
 
 	init_vt03_palette_tables(0);
 	init_vtxx_rgb555_palette_tables();
@@ -230,6 +231,9 @@ void ppu_vt03_device::device_reset()
 
 	for (int i = 0; i < 0xff; i++)
 		m_palette_ram[i] = 0x0;
+
+	for (int i = 0; i < 0x400; i++)
+		m_vt3xx_palette[i] = 0x00;
 
 	// todo: what are the actual defaults for these?
 	m_extended_modes_enable = 0x00;
@@ -426,8 +430,8 @@ void ppu_vt03_device::draw_tile_pixel_inner(uint8_t pen, uint32_t *dest)
 	if (is_v3xx_extended_mode())
 	{
 		// correct for lxcmcysp, lxcmc250
-		uint16_t pal0 = readbyte(((pen & 0xff)*2)+0x2400);
-		         pal0 |= readbyte(((pen & 0xff)*2)+0x2401) << 8;
+		uint16_t pal0 = readbyte(((pen & 0xff)*2)+0x3c00);
+		         pal0 |= readbyte(((pen & 0xff)*2)+0x3c01) << 8;
 
 		int palb = (pal0 >> 0) & 0x1f;
 		int palg = (pal0 >> 5) & 0x1f;
@@ -581,6 +585,7 @@ ppu_vt3xx_device::ppu_vt3xx_device(const machine_config& mconfig, const char* ta
 	ppu_vt03_device(mconfig, PPU_VT3XX, tag, owner, clock)
 {
 }
+
 
 void ppu_vt3xx_device::device_start()
 {

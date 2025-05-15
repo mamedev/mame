@@ -402,6 +402,46 @@ void vt3xx_soc_base_device::vt369_6000_w(offs_t offset, uint8_t data)
 	}
 }
 
+
+// vt3xx has a bigger palette, starting at 3c00, it seems unaffected the fallthrough / mirroring
+uint8_t vt3xx_soc_base_device::vt3xx_palette_r(offs_t offset)
+{
+	if (m_ppu->is_v3xx_extended_mode()) // or maybe if in 'fast' CPU mode (m_bank6000_enable &0x80)
+	{
+		return m_ppu->vt3xx_extended_palette_r(offset);
+	}
+	else
+	{
+		if (offset < 0x300)
+		{
+			return nt_r(offset + 0x3c00);
+		}
+		else
+		{
+			return m_ppu->palette_read(offset - 0x300);
+		}
+	}
+}
+
+void vt3xx_soc_base_device::vt3xx_palette_w(offs_t offset, uint8_t data)
+{
+	if (m_ppu->is_v3xx_extended_mode()) // or maybe if in 'fast' CPU mode
+	{
+		m_ppu->vt3xx_extended_palette_w(offset,data);
+	}
+	else
+	{
+		if (offset < 0x300)
+		{
+			nt_w(offset + 0x3c00, data);
+		}
+		else
+		{
+			m_ppu->palette_write(offset - 0x300, data);
+		}
+	}
+}
+
 void vt3xx_soc_base_device::device_start()
 {
 	nes_vt02_vt03_soc_device::device_start();
@@ -419,6 +459,8 @@ void vt3xx_soc_base_device::device_start()
 	save_item(NAME(m_bank6000));
 	save_item(NAME(m_bank6000_enable));
 	save_item(NAME(m_relative));
+
+	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x3c00, 0x3fff, read8sm_delegate(*this, FUNC(vt3xx_soc_base_device::vt3xx_palette_r)), write8sm_delegate(*this, FUNC(vt3xx_soc_base_device::vt3xx_palette_w)));
 }
 
 void vt3xx_soc_base_device::device_reset()

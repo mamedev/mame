@@ -70,6 +70,9 @@ private:
 	void vt369_soundcpu_dac_w(offs_t offset, uint8_t data);
 	uint8_t vt369_soundcpu_vectors_r(offs_t offset);
 
+	uint8_t vt3xx_palette_r(offs_t offset);
+	void vt3xx_palette_w(offs_t offset, uint8_t data);
+
 	TIMER_CALLBACK_MEMBER(sound_timer_expired);
 	void update_timer();
 
