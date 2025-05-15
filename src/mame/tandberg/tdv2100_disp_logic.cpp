@@ -182,7 +182,7 @@ void tandberg_tdv2100_disp_logic_device::device_reset()
 	m_uart->write_xr(0);
 	clear_key_handler();
 
-	bool force_on_line = BIT(m_dsw_u39->read(), 5);
+	bool force_on_line = !BIT(m_dsw_u39->read(), 5);
 	set_uart_state_from_switches();
 	if(force_on_line)
 	{
@@ -515,7 +515,7 @@ uint32_t tandberg_tdv2100_disp_logic_device::screen_update(screen_device &screen
 	int u61 = m_dsw_u61->read();
 	bool extend_dot7 = ((u61&0x003) == 0x001);
 	bool underline_mode = BIT(u61, 3);
-	bool blinking_cursor = ((u61&0x030) == 0x010);
+	bool blinking_cursor = ((u61&0x030) == 0x020);
 	bool blank_attr_chars = !BIT(u61, 6);
 	bool blank_ctrl_chars = !BIT(u61, 8);
 	bool block_cursor = BIT(u61, 9);
@@ -648,7 +648,7 @@ uint32_t tandberg_tdv2100_disp_logic_device::screen_update(screen_device &screen
 void tandberg_tdv2100_disp_logic_device::update_rs232_lamps()
 {
 	m_write_waitl_cb(m_data_terminal_ready && !m_rx_handshake);
-	bool need_tx_for_on_line_led = ((m_dsw_u39->read()&0x0c0) == 0x080);
+	bool need_tx_for_on_line_led = ((m_dsw_u39->read()&0x0c0) == 0x040);
 	m_write_onlil_cb(m_data_terminal_ready && m_rx_handshake && (m_tx_handshake || !need_tx_for_on_line_led));
 }
 
@@ -809,7 +809,7 @@ void tandberg_tdv2100_disp_logic_device::set_uart_state_from_switches()
 // Resolves Rx flow-control logic
 void tandberg_tdv2100_disp_logic_device::clock_on_line_flip_flop()
 {
-	bool force_on_line = BIT(m_dsw_u39->read(), 5);
+	bool force_on_line = !BIT(m_dsw_u39->read(), 5);
 	if(force_on_line)
 	{
 		m_data_terminal_ready = true;
@@ -837,7 +837,7 @@ void tandberg_tdv2100_disp_logic_device::clock_on_line_flip_flop()
 	update_all_rs232_signal_paths();
 	update_rs232_lamps();
 
-	bool hold_line_key_for_rts = ((m_dsw_u73->read()&0x3) == 0x1);
+	bool hold_line_key_for_rts = ((m_dsw_u73->read()&0x3) == 0x2);
 	if(hold_line_key_for_rts && m_data_terminal_ready && m_line_key_held && !m_trans_key_held)
 	{
 		clock_transmit_flip_flop();
@@ -847,7 +847,7 @@ void tandberg_tdv2100_disp_logic_device::clock_on_line_flip_flop()
 // Resolves Tx flow-control logic
 void tandberg_tdv2100_disp_logic_device::clock_transmit_flip_flop()
 {
-	bool force_on_line = BIT(m_dsw_u39->read(), 5);
+	bool force_on_line = !BIT(m_dsw_u39->read(), 5);
 	if(force_on_line)
 	{
 		m_request_to_send = true;
@@ -876,7 +876,7 @@ void tandberg_tdv2100_disp_logic_device::clock_transmit_flip_flop()
 
 INPUT_CHANGED_MEMBER(tandberg_tdv2100_disp_logic_device::rs232_lock_changed)
 {
-	bool force_on_line = BIT(m_dsw_u39->read(), 5);
+	bool force_on_line = !BIT(m_dsw_u39->read(), 5);
 	if(force_on_line)
 	{
 		// Use conditional catch to force lines active
@@ -1015,7 +1015,7 @@ static INPUT_PORTS_START( tdv2115l )
 		PORT_CONFNAME(0x08, 0x08, "RS-232 Internal local echo when on-line (for half duplex)")  PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tandberg_tdv2100_disp_logic_device::rs232_changed), 0)  // EXT. ECHO [YES/NO]
 			PORT_CONFSETTING(0x08, DEF_STR( Off ))
 			PORT_CONFSETTING(0x00, DEF_STR( On ))
-		PORT_CONFNAME(0x10, 0x00, "RS-232 Automatic RTS with CTS")                              PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tandberg_tdv2100_disp_logic_device::rs232_changed), 0)  // AUTO RFS [NO/YES]
+		PORT_CONFNAME(0x10, 0x00, "RS-232 Automatic CTS with RTS")                              PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tandberg_tdv2100_disp_logic_device::rs232_changed), 0)  // AUTO RFS [NO/YES]
 			PORT_CONFSETTING(0x00, DEF_STR( No ))
 			PORT_CONFSETTING(0x10, DEF_STR( Yes ))
 		PORT_CONFNAME(0x20, 0x00, "RS-232 Automatic DSR with DTR")                              PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tandberg_tdv2100_disp_logic_device::rs232_changed), 0)  // AUTO DSR [NO/YES]
@@ -1033,11 +1033,11 @@ static INPUT_PORTS_START( tdv2115l )
 			PORT_DIPSETTING(0x010, "TTY mode (no CPU)")                         // 5: OFF
 			PORT_DIPSETTING(0x000, "CPU mode (CPU module required)")            // 5: ON
 		PORT_DIPNAME(0x020, 0x020, "DTR/RTS signals")                                           PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tandberg_tdv2100_disp_logic_device::rs232_lock_changed), 0)
-			PORT_DIPSETTING(0x020, "Permanently asserted")                      // 6: OFF
-			PORT_DIPSETTING(0x000, "Affected by LINE/TRANS keys")               // 6: ON
-		PORT_DIPNAME(0x0c0, 0x040, "Require RTS + CTS for ON LINE lamp")                        PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tandberg_tdv2100_disp_logic_device::rs232_changed), 0)
-			PORT_DIPSETTING(0x040, DEF_STR( Off ))                              // 7: OFF 8: ON
-			PORT_DIPSETTING(0x080, DEF_STR( On ))                               // 7: ON  8: OFF
+			PORT_DIPSETTING(0x020, "Affected by LINE/TRANS keys")               // 6: OFF
+			PORT_DIPSETTING(0x000, "Permanently asserted")                      // 6: ON
+		PORT_DIPNAME(0x0c0, 0x040, "ON LINE lamp lit when")                                     PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tandberg_tdv2100_disp_logic_device::rs232_changed), 0)
+			PORT_DIPSETTING(0x040, "Only if both RTS and CTS")                  // 7: OFF 8: ON
+			PORT_DIPSETTING(0x080, "RTS regardless of CTS")                     // 7: ON  8: OFF
 		PORT_DIPNAME(0x100, 0x000, "Automatic page-roll after end of page")
 			PORT_DIPSETTING(0x100, DEF_STR( Off ))                              // 9: OFF
 			PORT_DIPSETTING(0x000, DEF_STR( On ))                               // 9: ON
@@ -1047,8 +1047,8 @@ static INPUT_PORTS_START( tdv2115l )
 
 	PORT_START("dsw_u73")
 		PORT_DIPNAME(0x3, 0x1, "Automatic RTS with DTR")
-			PORT_DIPSETTING(0x2, DEF_STR( Off ))                                // 1: ON  2: OFF
-			PORT_DIPSETTING(0x1, DEF_STR( On ))                                 // 1: OFF 2: ON
+			PORT_DIPSETTING(0x1, DEF_STR( Off ))                                // 1: OFF 2: ON
+			PORT_DIPSETTING(0x2, DEF_STR( On ))                                 // 1: ON  2: OFF
 		PORT_DIPNAME(0xc, 0x8, "Current-Loop RxD line (Unused)")
 			PORT_DIPSETTING(0x4, "10V zener-diode in series")                   // 3: OFF 4: ON
 			PORT_DIPSETTING(0x8, "47 Ohm series resistor")                      // 3: ON  4: OFF
@@ -1064,8 +1064,8 @@ static INPUT_PORTS_START( tdv2115l )
 			PORT_DIPSETTING(0x008, "Undeline mode")                             // 4: OFF
 			PORT_DIPSETTING(0x000, "Attribute mode")                            // 4: ON
 		PORT_DIPNAME(0x030, 0x020, "Cursor blinking")
-			PORT_DIPSETTING(0x020, DEF_STR( Off ))                              // 5: ON  6: OFF
-			PORT_DIPSETTING(0x010, DEF_STR( On ))                               // 5: OFF 6: ON
+			PORT_DIPSETTING(0x010, DEF_STR( Off ))                              // 5: OFF 6: ON
+			PORT_DIPSETTING(0x020, DEF_STR( On ))                               // 5: ON  6: OFF
 		PORT_DIPNAME(0x040, 0x000, "Hide Attribute-changes or Underlined chars")
 			PORT_DIPSETTING(0x040, DEF_STR( Off ))                              // 7: OFF
 			PORT_DIPSETTING(0x000, DEF_STR( On ))                               // 7: ON
@@ -1075,7 +1075,8 @@ static INPUT_PORTS_START( tdv2115l )
 		PORT_DIPNAME(0x100, 0x000, "Hide ASCII control characters")
 			PORT_DIPSETTING(0x100, DEF_STR( Off ))                              // 9: OFF
 			PORT_DIPSETTING(0x000, DEF_STR( On ))                               // 9: ON
-			// NOTE: CPU module needed to write these to display RAM, as well as a ROM set with a 4th font ROM
+			// NOTE: These characters can only be written to display memory by the CPU module.
+			//       Then to display these characters, a 4th font ROM will also be needed.
 		PORT_DIPNAME(0x200, 0x000, "Cursor shape")
 			PORT_DIPSETTING(0x200, "Block")                                     // 10: OFF
 			PORT_DIPSETTING(0x000, "Line")                                      // 10: ON
