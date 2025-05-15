@@ -166,9 +166,9 @@ void vt3xx_soc_base_device::vt369_map(address_map &map)
 	map(0x4016, 0x4016).rw(FUNC(vt3xx_soc_base_device::in0_r), FUNC(vt3xx_soc_base_device::in0_w));
 	map(0x4017, 0x4017).r(FUNC(vt3xx_soc_base_device::in1_r));
 
-	map(0x4024, 0x4024).w(FUNC(vt3xx_soc_base_device::vt03_4024_new_dma_middle_w));
+	map(0x4024, 0x4024).w(FUNC(vt3xx_soc_base_device::vt3xx_4024_new_dma_middle_w));
 
-	map(0x4034, 0x4034).w(FUNC(vt3xx_soc_base_device::vt03_4034_w));  // secondary DMA
+	map(0x4034, 0x4034).w(FUNC(vt3xx_soc_base_device::vt3xx_4034_new_dma_upper_w));
 
 	map(0x4100, 0x410b).r(FUNC(vt3xx_soc_base_device::vt03_410x_r)).w(FUNC(vt3xx_soc_base_device::vt03_410x_w));
 	// 0x410c unused
@@ -229,6 +229,39 @@ void vt3xx_soc_base_device::vt369_map(address_map &map)
 	map(0x6000, 0x7fff).r(FUNC(vt3xx_soc_base_device::vt369_6000_r)).w(FUNC(vt3xx_soc_base_device::vt369_6000_w));
 
 	map(0x8000, 0xffff).rw(FUNC(vt3xx_soc_base_device::external_space_read), FUNC(vt3xx_soc_base_device::external_space_write));
+}
+
+void vt3xx_soc_base_device::vt_dma_w(uint8_t data)
+{
+	const bool ALLOW_NEW_DMA = false; // helps red5mam, dgun2593, in1ar but makes other things worse at the moment
+
+	if ((m_bank6000_enable & 0x80) && ALLOW_NEW_DMA)
+	{
+		uint16_t src_addr = (m_4024_newdma) | data << 8;
+
+		int length = (m_4034_newdma >> 1) & 7;
+		if (length == 0) length = 8;
+		length = 1 << length;
+
+		logerror("%s: attempting to do NEW style dma src %04x length %04x dest type %d\n", machine().describe_context(), src_addr, length, m_4034_newdma & 1);
+
+		for (int i = 0; i < length; i++)
+		{
+			uint8_t read_data = m_maincpu->space(AS_PROGRAM).read_byte(src_addr + i);
+			if (m_4034_newdma & 1)
+			{
+				m_maincpu->space(AS_PROGRAM).write_byte(0x2007, read_data);
+			}
+			else
+			{
+				m_maincpu->space(AS_PROGRAM).write_byte(0x2004, read_data);
+			}
+		}
+	}
+	else
+	{
+		nes_vt09_soc_device::vt_dma_w(data);
+	}
 }
 
 // this reads from the 'extra ROM' area (serial style protocol) and code is copied on gtct885 to e00 in RAM, jumps to it at EDF9: jsr $0e1c

@@ -73,6 +73,8 @@ private:
 	uint8_t vt3xx_palette_r(offs_t offset);
 	void vt3xx_palette_w(offs_t offset, uint8_t data);
 
+	virtual void vt_dma_w(uint8_t data) override;
+
 	TIMER_CALLBACK_MEMBER(sound_timer_expired);
 	void update_timer();
 

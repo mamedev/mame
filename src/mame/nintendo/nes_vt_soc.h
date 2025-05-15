@@ -78,10 +78,11 @@ protected:
 	void nt_w(offs_t offset, uint8_t data);
 	int calculate_real_video_address(int addr, int readtype);
 	void scrambled_8000_w(uint16_t offset, uint8_t data);
-	void vt_dma_w(uint8_t data);
+	virtual void vt_dma_w(uint8_t data);
 	void do_dma(uint8_t data, bool has_ntsc_bug);
 	void vt03_4034_w(uint8_t data);
-	void vt03_4024_new_dma_middle_w(uint8_t data);
+	void vt3xx_4024_new_dma_middle_w(uint8_t data);
+	void vt3xx_4034_new_dma_upper_w(uint8_t data);
 
 	uint8_t in0_r();
 	uint8_t in1_r();
@@ -108,6 +109,9 @@ protected:
 	uint8_t m_410x_scramble[2];
 
 	uint8_t m_8000_addr_latch = 0;
+
+	uint8_t m_4024_newdma;
+	uint8_t m_4034_newdma;
 
 	uint8_t m_4242 = 0;
 	uint8_t m_411c = 0;

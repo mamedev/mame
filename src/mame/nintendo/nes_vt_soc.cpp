@@ -186,6 +186,9 @@ void nes_vt02_vt03_soc_device::device_start()
 	save_item(NAME(m_411d));
 	save_item(NAME(m_4242));
 
+	save_item(NAME(m_4024_newdma));
+	save_item(NAME(m_4034_newdma));
+
 	save_item(NAME(m_8000_addr_latch));
 
 	save_item(NAME(m_timer_irq_enabled));
@@ -226,6 +229,9 @@ void nes_vt02_vt03_soc_device::device_reset()
 	m_411c = 0x00;
 	m_411d = 0x00;
 	m_4242 = 0x00;
+
+	m_4024_newdma = 0;
+	m_4034_newdma = 0;
 
 	m_timer_irq_enabled = 0;
 	m_timer_running = 0;
@@ -992,9 +998,17 @@ void nes_vt02_vt03_soc_device::do_dma(uint8_t data, bool has_ntsc_bug)
 }
 
 // probably VT3xx only, not earlier?
-void nes_vt02_vt03_soc_device::vt03_4024_new_dma_middle_w(uint8_t data)
+void nes_vt02_vt03_soc_device::vt3xx_4024_new_dma_middle_w(uint8_t data)
 {
-	logerror("%s: vt03_4024_new_dma_middle_w %02x (VT3xx newer DMA middle bits?)\n", machine().describe_context(), data);
+	logerror("%s: vt3xx_4024_new_dma_middle_w %02x (VT3xx newer DMA middle bits?)\n", machine().describe_context(), data);
+	m_4024_newdma = data;
+}
+
+void nes_vt02_vt03_soc_device::vt3xx_4034_new_dma_upper_w(uint8_t data)
+{
+	logerror("%s: vt3xx_4034_new_dma_upper_w %02x (VT3xx newer DMA upper/control bits?)\n", machine().describe_context(), data);
+	m_4034_newdma = data;
+
 }
 
 void nes_vt02_vt03_soc_device::vt03_4034_w(uint8_t data)
