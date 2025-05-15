@@ -191,8 +191,8 @@ private:
 
 	u8 bootstrap_r(offs_t offset);
 	void bootstrap_w(offs_t offset, u8 data);
-	u8 ram_r(offs_t offset);
-	void ram_w(offs_t offset, u8 data);
+	template<u8 Bank> u8 ram_r(offs_t offset);
+	template<u8 Bank> void ram_w(offs_t offset, u8 data);
 	void vram_w(offs_t offset, u8 data);
 	void update_int(bool recalculate);
 	u8 isa_r(offs_t offset);
@@ -1146,25 +1146,26 @@ void sprinter_state::bootstrap_w(offs_t offset, u8 data)
 	}
 }
 
-u8 sprinter_state::ram_r(offs_t offset)
+template<u8 Bank> u8 sprinter_state::ram_r(offs_t offset)
 {
-	const u8 bank = BIT(offset, 14, 2);
-	return ((m_pages[bank] & 0xf0) == 0x50)
+	static_assert(Bank < 4, "unexpected bank number");
+	return ((m_pages[Bank] & 0xf0) == 0x50)
 		? m_ram->pointer()[(0x50 << 14) + m_port_y * 1024 + (offset & 0x3ff)]
-		: reinterpret_cast<u8 *>(m_bank_ram[bank]->base())[offset & 0x3fff];
+		: reinterpret_cast<u8 *>(m_bank_ram[Bank]->base())[offset & 0x3fff];
 }
 
-void sprinter_state::ram_w(offs_t offset, u8 data)
+template<u8 Bank> void sprinter_state::ram_w(offs_t offset, u8 data)
 {
+	static_assert(Bank < 4, "unexpected bank number");
 	if (m_skip_write)
 	{
 		m_skip_write = false;
 		return;
 	}
 
-	const u8 bank = BIT(offset, 14, 2);
-	const u8 page = m_pages[bank] & 0xff;
-	if ((bank == 3) && (m_sc == 0x10) && (m_pages[3] == (BANK_RAM_MASK | 0xa0)))
+	offset = (Bank << 14) | (offset & 0x3fff);
+	const u8 page = m_pages[Bank] & 0xff;
+	if ((Bank == 3) && (m_sc == 0x10) && (m_pages[3] == (BANK_RAM_MASK | 0xa0)))
 		machine().schedule_soft_reset();
 
 	if ((page & 0xf0) == 0x50)
@@ -1189,7 +1190,7 @@ void sprinter_state::ram_w(offs_t offset, u8 data)
 				vram_w(vxa, data);
 			}
 		}
-		reinterpret_cast<u8 *>(m_bank_ram[bank]->base())[offset & 0x3fff] = data;
+		reinterpret_cast<u8 *>(m_bank_ram[Bank]->base())[offset & 0x3fff] = data;
 	}
 }
 
@@ -1366,13 +1367,17 @@ void sprinter_state::map_fetch(address_map &map)
 void sprinter_state::map_mem(address_map &map)
 {
 	map(0x00000, 0x3ffff).rw(FUNC(sprinter_state::bootstrap_r), FUNC(sprinter_state::bootstrap_w));  // bootstrap
-	map(0x10000, 0x1ffff).rw(FUNC(sprinter_state::ram_r), FUNC(sprinter_state::ram_w));
 
+	map(0x10000, 0x13fff).rw(FUNC(sprinter_state::ram_r<0>), FUNC(sprinter_state::ram_w<0>));
 	map(0x10000, 0x13fff).view(m_bank_view0);
 	m_bank_view0[0](0x10000, 0x13fff).nopw(); // RAM RO
 	m_bank_view0[1](0x10000, 0x13fff).nopw().bankr(m_bank_rom[0]);
 	m_bank_view0[2](0x10000, 0x13fff).bankrw(m_bank0_fastram);
 
+	map(0x14000, 0x17fff).rw(FUNC(sprinter_state::ram_r<1>), FUNC(sprinter_state::ram_w<1>));
+	map(0x18000, 0x1bfff).rw(FUNC(sprinter_state::ram_r<2>), FUNC(sprinter_state::ram_w<2>));
+
+	map(0x1c000, 0x1ffff).rw(FUNC(sprinter_state::ram_r<3>), FUNC(sprinter_state::ram_w<3>));
 	map(0x1c000, 0x1ffff).view(m_bank_view3);
 	m_bank_view3[0](0x1c000, 0x1ffff).rw(FUNC(sprinter_state::isa_r), FUNC(sprinter_state::isa_w)); // ISA
 }
