@@ -1,0 +1,66 @@
+# license:BSD-3-Clause
+# copyright-holders:David Haywood
+# vt3xx_spu opcodes
+
+phy_vt_imp
+	read_pc();
+	write(SP, Y);
+	dec_SP();
+	prefetch();
+
+phx_vt_imp
+	read_pc();
+	write(SP, X);
+	dec_SP();
+	prefetch();
+
+plx_vt_imp
+	read_pc();
+	read(SP);
+	inc_SP();
+	X = read(SP);
+	set_nz(X);
+	prefetch();
+
+ply_vt_imp
+	read_pc();
+	read(SP);
+	inc_SP();
+	Y = read(SP);
+	set_nz(Y);
+	prefetch();
+
+vtgetdbk_imp
+	read_pc();
+	A = m_databank;
+	prefetch();
+
+vtsetdbk_imp
+	read_pc();
+	m_databank = A;
+	prefetch();
+
+vtldabank_abx
+	TMP = read_pc();
+	PC++;
+	TMP2 = read_pc();
+	PC++;
+	A = m_extdata_space->read_byte(((m_databank << 16) | (TMP2 << 8) | TMP) + X);
+	set_nz(A);
+	prefetch();
+
+vtldabank2_zpy
+	TMP = read_pc();
+	PC++;
+	A = m_extdata_space->read_byte(read(uint8_t(TMP+Y)));
+	set_nz(A);
+	prefetch();
+
+vtadcx_aba
+	TMP = read_pc();
+	PC++;
+	TMP2 = read_pc();
+	PC++;
+	A = m_extdata_space->read_byte((TMP2 << 8) | TMP) + X;
+	set_nz(A); // other flags?
+	prefetch();
