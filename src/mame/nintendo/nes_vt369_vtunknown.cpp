@@ -171,6 +171,7 @@ public:
 	void vt369_vtunknown_hh_swap_512kb(machine_config& config);
 
 	void vt369_vtunknown_hh_altswap_8mb(machine_config& config);
+	void vt369_vtunknown_hh_vibesswap_8mb(machine_config& config);
 
 	void vt369_vtunknown_unk(machine_config& config);
 	void vt369_vtunknown_unk_1mb(machine_config& config);
@@ -486,6 +487,17 @@ void vt369_vtunknown_unk_state::vt369_vtunknown_hh_altswap_8mb(machine_config &c
 	vt369_vtunknown_hh_swap_8mb(config);
 
 	VT369_SOC_INTROM_ALTSWAP(config.replace(), m_soc, NTSC_APU_CLOCK);
+	configure_soc(m_soc);
+	m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB);
+	m_soc->force_bad_dma();
+	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_unk_state::vt_external_space_map_8mbyte);
+}
+
+void vt369_vtunknown_unk_state::vt369_vtunknown_hh_vibesswap_8mb(machine_config &config)
+{
+	vt369_vtunknown_hh_swap_8mb(config);
+
+	VT369_SOC_INTROM_VIBESSWAP(config.replace(), m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 	m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB);
 	m_soc->force_bad_dma();
@@ -1130,7 +1142,7 @@ CONS( 2020, nubsupmf,   0,      0,  vt369_vtunknown_hh_4mb, vt369_vtunknown, vt3
 CONS( 201?, hhgc319,  0,        0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "<unknown>", "Handheld Game Console 319-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // unknown tech, probably from 2021, probably VT369, ROM wouldn't read consistently
-CONS( 202?, vibes240, 0,        0,  vt369_vtunknown_unk_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "<unknown>", "Vibes Retro Pocket Gamer 240-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 202?, vibes240, 0,        0,  vt369_vtunknown_hh_vibesswap_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "<unknown>", "Vibes Retro Pocket Gamer 240-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 /*****************************************************************************
 * below are VT369 games that use BGA on sub

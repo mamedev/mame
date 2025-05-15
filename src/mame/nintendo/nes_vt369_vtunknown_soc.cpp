@@ -9,6 +9,7 @@
 DEFINE_DEVICE_TYPE(VT369_SOC_INTROM_NOSWAP, vt369_soc_introm_noswap_device, "vt369_soc", "VT369 series System on a Chip")
 DEFINE_DEVICE_TYPE(VT369_SOC_INTROM_SWAP,   vt369_soc_introm_swap_device,   "vt369_soc_swap",    "VT369 series System on a Chip (with D5/D6 opcode swapping)")
 DEFINE_DEVICE_TYPE(VT369_SOC_INTROM_ALTSWAP,vt369_soc_introm_altswap_device,"vt369_soc_altswap", "VT369 series System on a Chip (with D1/D4 opcode swapping)")
+DEFINE_DEVICE_TYPE(VT369_SOC_INTROM_VIBESSWAP,vt369_soc_introm_vibesswap_device,"vt369_soc_vibesswap", "VT369 series System on a Chip (with D4/D5 opcode swapping)")
 
 // uncertain
 DEFINE_DEVICE_TYPE(VT3XX_SOC, vt3xx_soc_base_device,          "vt3xx_unknown_soc_cy", "VT3xx series System on a Chip (CY)")
@@ -56,6 +57,11 @@ vt369_soc_introm_swap_device::vt369_soc_introm_swap_device(const machine_config&
 
 vt369_soc_introm_altswap_device::vt369_soc_introm_altswap_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
 	vt369_soc_introm_noswap_device(mconfig, VT369_SOC_INTROM_ALTSWAP, tag, owner, clock)
+{
+}
+
+vt369_soc_introm_vibesswap_device::vt369_soc_introm_vibesswap_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+	vt369_soc_introm_noswap_device(mconfig, VT369_SOC_INTROM_VIBESSWAP, tag, owner, clock)
 {
 }
 
@@ -542,6 +548,13 @@ void vt369_soc_introm_altswap_device::device_start()
 {
 	vt3xx_soc_base_device::device_start();
 	downcast<rp2a03_core_swap_op_d5_d6 &>(*m_maincpu).set_which_crypt(1);
+	m_encryption_allowed = true;
+}
+
+void vt369_soc_introm_vibesswap_device::device_start()
+{
+	vt3xx_soc_base_device::device_start();
+	downcast<rp2a03_core_swap_op_d5_d6 &>(*m_maincpu).set_which_crypt(2);
 	m_encryption_allowed = true;
 }
 

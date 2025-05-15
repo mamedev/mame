@@ -140,6 +140,15 @@ protected:
 	virtual void device_start() override;
 };
 
+class vt369_soc_introm_vibesswap_device : public vt369_soc_introm_noswap_device
+{
+public:
+	vt369_soc_introm_vibesswap_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+
+protected:
+	virtual void device_start() override;
+};
+
 class vt3xx_soc_unk_dg_device : public vt3xx_soc_base_device
 {
 public:
@@ -177,6 +186,7 @@ DECLARE_DEVICE_TYPE(VT3XX_SOC, vt3xx_soc_base_device)
 DECLARE_DEVICE_TYPE(VT369_SOC_INTROM_NOSWAP, vt369_soc_introm_noswap_device)
 DECLARE_DEVICE_TYPE(VT369_SOC_INTROM_SWAP,   vt369_soc_introm_swap_device)
 DECLARE_DEVICE_TYPE(VT369_SOC_INTROM_ALTSWAP,   vt369_soc_introm_altswap_device)
+DECLARE_DEVICE_TYPE(VT369_SOC_INTROM_VIBESSWAP,   vt369_soc_introm_vibesswap_device)
 
 DECLARE_DEVICE_TYPE(VT3XX_SOC_UNK_BT, vt3xx_soc_unk_bt_device)
 
