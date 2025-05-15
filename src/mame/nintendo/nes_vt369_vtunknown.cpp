@@ -780,7 +780,7 @@ ROM_END
 
 ROM_START( q5_500in1 )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
-	ROM_LOAD( "s29gl128.u1", 0x00000, 0x1000000, CRC(de779dd7) SHA1(ac6d3fa6f18ceb795532ba9e85edffc040d74347) )
+	ROM_LOAD( "s29gl128.u1", 0x00000, 0x1000000, BAD_DUMP CRC(de779dd7) SHA1(ac6d3fa6f18ceb795532ba9e85edffc040d74347) )
 ROM_END
 
 ROM_START( nubsupmf )
@@ -1138,7 +1138,7 @@ CONS( 2020, unk2020hh,  unk2019hh,0,  vt369_vtunknown_hh_8mb, vt369_vtunknown, v
 // portable fan + famiclone combo handheld
 CONS( 2020, nubsupmf,   0,      0,  vt369_vtunknown_hh_altswap_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "<unknown>", "NubSup Mini Game Fan", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
-// unknown tech level, might be scrambled as default codebank/boot vectors don't seem valid
+// unknown tech level, might be scrambled as default codebank/boot vectors don't seem valid, maybe bad dump
 CONS( 201?, hhgc319,  0,        0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "<unknown>", "Handheld Game Console 319-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // unknown tech, probably from 2021, probably VT369, ROM wouldn't read consistently
@@ -1155,7 +1155,7 @@ CONS( 201?, retro400,  0,        0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, v
 * below are VT369 games that use SQI / SPI ROM
 *****************************************************************************/
 
-// doesn't boot
+// doesn't boot, alpha-numeric characters in ROM appear corrupt, bad dump?
 CONS( 201?, q5_500in1,  0,        0,  vt369_vtunknown_hh_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "<unknown>", "Q5 500 in 1 Handheld", MACHINE_NOT_WORKING )
 
 // Runs well, minor GFX issues in intro
