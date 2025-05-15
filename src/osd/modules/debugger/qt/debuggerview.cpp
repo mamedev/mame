@@ -132,7 +132,13 @@ void DebuggerView::paintEvent(QPaintEvent *event)
 				bgColor.setRgb(palette.color(QPalette::Highlight).rgb());
 
 			if ((textAttr & DCA_SELECTED) && (textAttr & DCA_CURRENT))
-				bgColor.setRgb(palette.color(QPalette::Accent).rgb());
+			{
+				#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+					bgColor.setRgb(palette.color(QPalette::Accent).rgb());
+				#else
+					bgColor.setRgb(0xff,0xc0,0x80);
+				#endif
+			}
 
 			if (textAttr & DCA_CHANGED)
 				fgColor.setRgb(0xff, 0x00, 0x00);
