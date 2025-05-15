@@ -9,15 +9,18 @@
 #include "video/poly.h"
 #include "bus/scsi/scsi.h"
 #include "machine/53c810.h"
-#include "dsbz80.h"
 #include "machine/eepromser.h"
 #include "machine/i8251.h"
 #include "sound/scsp.h"
-#include "315_5649.h"
-#include "315-5881_crypt.h"
-#include "segabill.h"
 #include "machine/msm6242.h"
 #include "machine/timer.h"
+
+#include "315_5649.h"
+#include "315-5881_crypt.h"
+#include "dsb2.h"
+#include "dsbz80.h"
+#include "segabill.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -124,6 +127,7 @@ public:
 		m_bank_crom(*this, "bank_crom"),
 		m_paletteram64(*this, "paletteram64"),
 		m_dsbz80(*this, "dsbz80"),
+		m_dsb2(*this, "dsb2"),
 		m_uart(*this, "uart"),
 		m_soundram(*this, "soundram"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -154,6 +158,11 @@ public:
 	void getbass(machine_config &config);
 	void scud(machine_config &config);
 	void lostwsga(machine_config &config);
+	void daytona2(machine_config &config);
+	void srally2(machine_config &config);
+	void spikeout(machine_config &config);
+	void swtrilgy(machine_config &config);
+	void swtrilgyp(machine_config &config);
 
 	void init_lemans24();
 	void init_vs298();
@@ -172,7 +181,7 @@ public:
 	void init_scud();
 	void init_harley();
 	void init_swtrilga();
-	void init_swtrilgp();
+	void init_swtrilgyp();
 	void init_vs29815();
 	void init_model3_10();
 	void init_vs215();
@@ -191,6 +200,7 @@ public:
 
 protected:
 	virtual void video_start() override ATTR_COLD;
+	void dsb2_config(machine_config &config);
 
 private:
 	required_device<ppc_device> m_maincpu;
@@ -206,6 +216,7 @@ private:
 	memory_bank_creator m_bank_crom;
 	required_shared_ptr<uint64_t> m_paletteram64;
 	optional_device<dsbz80_device> m_dsbz80;    // Z80-based MPEG Digital Sound Board
+	optional_device<dsb2_device> m_dsb2;        // 68k-based MPEG Digital Sound Board
 	optional_device<i8251_device> m_uart;
 	required_shared_ptr<uint16_t> m_soundram;
 
