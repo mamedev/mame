@@ -21,12 +21,13 @@ to be the same or at least same from different manufacturers.
 "ASIC 1" is probably a KL5C80A12 CPU, though its on-chip peripherals are mostly unused.
 
 TODO:
-- fruitcat currently runs off the rails due to seemingly missing code, fortuitously recovers,
+- arthurkn uploads NVRAM contents if missing, fruitcat seemingly needs them pre-populated,
+  thus currently runs off the rails when calling to NVRAM, seems to fortuitously recover,
   but never populates tile RAM
 - fruitcat will need Oki banking once it works
 - arthurkn runs correctly and needs the following:
-  - reels' scrolling / positioning
-  - NVRAM
+  - reels' scrolling implementation is weird (hacky?)
+  - NVRAM doesn't save state, only uploaded code?
   - outputs (lamps / meters)
   - hopper (off by default)
   - visible area is probably not 100% correct
@@ -37,6 +38,7 @@ TODO:
 
 #include "cpu/z80/kl5c80a12.h"
 #include "machine/nvram.h"
+#include "machine/ticket.h"
 #include "sound/okim6295.h"
 #include "video/ramdac.h"
 
@@ -126,8 +128,11 @@ void lgtz80_state::machine_reset()
 
 u32 lgtz80_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	for (int i = 0; i < 0x04; i++)
-		for (int j = 0; j < 0x80; j++)
+	for (int j = 0; j < 0x40; j++)
+		m_reel_tilemap[0]->set_scrolly(j, m_reel_scroll_ram[0][j + 0x40]);
+
+	for (int i = 1; i < 0x04; i++)
+		for (int j = 0; j < 0x40; j++)
 			m_reel_tilemap[i]->set_scrolly(j, m_reel_scroll_ram[i][j]);
 
 	m_reel_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
@@ -220,8 +225,13 @@ void lgtz80_state::control_w(u8 data)
 	if (!BIT(data, 7))
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
-	if (data & 0x7f)
-		logerror("%s: control_w(%02X)\n", machine().describe_context(), data);
+	// Bit 6 always set?
+
+	if (!BIT(data, 6))
+		logerror("%s: control_w bit 6 unset (%02X)\n", machine().describe_context(), data);
+
+	if (data & 0x3f)
+		logerror("%s: control_w bits 0-5 (%02X)\n", machine().describe_context(), data);
 }
 
 u8 lgtz80_state::e0_r()
@@ -240,8 +250,8 @@ void lgtz80_state::vblank_nmi_w(int state)
 void lgtz80_state::program_map(address_map &map)
 {
 	map(0x00000, 0x1ffff).rom();
-	map(0x28000, 0x29fff).ram().share("nvram");
-	map(0x2a000, 0x2bfff).ram(); // arthurkn needs to copy code to RAM here, but fruitcat doesn't initialize it!
+	map(0x28000, 0x29fff).ram();
+	map(0x2a000, 0x2bfff).ram().share("nvram"); // arthurkn needs to copy code to RAM here, but fruitcat doesn't initialize it!
 	map(0x4c000, 0x4c1ff).ram().w(FUNC(lgtz80_state::reel_attr_ram_w<0>)).share(m_reel_attr_ram[0]);
 	map(0x4c200, 0x4c3ff).ram().w(FUNC(lgtz80_state::reel_attr_ram_w<1>)).share(m_reel_attr_ram[1]);
 	map(0x4c400, 0x4c5ff).ram().w(FUNC(lgtz80_state::reel_attr_ram_w<2>)).share(m_reel_attr_ram[2]);
@@ -294,7 +304,7 @@ static INPUT_PORTS_START( arthurkn )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) //  also works as down in system configuration
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 ) // also works for exiting system configuration
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE ) // TODO: "Get" in test mode, is it take? also works as up in system configuration
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) // "Small" in test mode. Also works as change setting down in system configuration
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Low / Show Odds") // "Small" in test mode. Also works as change setting down in system configuration
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) // "Coin out" in test mode
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) // "Stop A" in test mode
 
@@ -308,15 +318,15 @@ static INPUT_PORTS_START( arthurkn )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) // TODO: hopper
 
-	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(4)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(4)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(4)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(4)
+	PORT_START("IN3") // not shown in key test mode
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) // ??
 
 // no DSW on PCB
 INPUT_PORTS_END
@@ -338,9 +348,9 @@ void lgtz80_state::fruitcat(machine_config &config)
 	m_maincpu->out_p0_callback().set(FUNC(lgtz80_state::p0_w));
 	m_maincpu->in_p1_callback().set_ioport("IN1");
 	m_maincpu->in_p2_callback().set_ioport("IN2");
-	m_maincpu->in_p3_callback().set_ioport("IN3"); // TODO: are these really inputs?
+	m_maincpu->in_p3_callback().set_ioport("IN3");
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO
 	screen.set_refresh_hz(60);
@@ -636,5 +646,5 @@ void lgtz80_state::init_arthurkn()
 } // anonymous namespace
 
 
-GAME( 2003?, fruitcat, 0, fruitcat, arthurkn, lgtz80_state, init_fruitcat, ROT0, "LGT", "Fruit Cat (v2.00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-GAME( 200?,  arthurkn, 0, arthurkn, arthurkn, lgtz80_state, init_arthurkn, ROT0, "LGT", "Arthur's Knights",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2003?, fruitcat, 0, fruitcat, arthurkn, lgtz80_state, init_fruitcat, ROT0, "LGT", "Fruit Cat (v2.00)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 200?,  arthurkn, 0, arthurkn, arthurkn, lgtz80_state, init_arthurkn, ROT0, "LGT", "Arthur's Knights",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

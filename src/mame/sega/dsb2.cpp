@@ -49,7 +49,7 @@ void dsb2_device::dsb2_map(address_map &map)
 //	map(0xe00001) acknowledge FIFO writes?
 //	map(0xe00003) MPEG FIFO writes
 	// MPEG status
-	map(0xe80001, 0xe80001).lr8(NAME([this] () { return 0x01; }));
+	map(0xe80001, 0xe80001).lr8(NAME([] () { return 0x01; }));
 	map(0xf00000, 0xf1ffff).ram();
 }
 
