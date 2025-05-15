@@ -21,7 +21,7 @@ public:
 	void base_config(machine_config& config);
 	void spg2xx_jakks(machine_config& config);
 	void mk(machine_config& config);
-
+	void spg2xx_dpma(machine_config& config);
 	void jakks_mpac(machine_config& config);
 
 private:
@@ -122,6 +122,27 @@ static INPUT_PORTS_START( spg2xx_spdv )
 	PORT_BIT( 0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( spg2xx_dpma )
+	PORT_START("P1")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_NAME("Joypad Up")
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_NAME("Joypad Down")
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_NAME("Joypad Left")
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_NAME("Joypad Right")
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(1) PORT_NAME("A Button")
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNUSED )         PORT_PLAYER(1) PORT_NAME("B Button")
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Menu / Pause")
+	PORT_BIT( 0x000f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P3")
+	PORT_BIT( 0x0007, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PAL/NTSC flag, set to NTSC (unverified here)
+	PORT_BIT( 0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( mk )
 	PORT_START("P1")
 	PORT_BIT( 0x001f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -187,6 +208,18 @@ void jakks_state::spg2xx_jakks(machine_config &config)
 	base_config(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jakks_state::mem_map_2m);
 }
+
+void jakks_state::spg2xx_dpma(machine_config& config)
+{
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	spg2xx_base(config);
+
+	m_maincpu->porta_in().set(FUNC(jakks_state::base_porta_r));
+	m_maincpu->portc_in().set_ioport("P3");
+	m_maincpu->portc_out().set(FUNC(jakks_state::portc_w));
+	m_maincpu->set_addrmap(AS_PROGRAM, &jakks_state::mem_map_2m);
+}
+
 
 void jakks_state::mem_map_2m_mkram(address_map &map)
 {
@@ -282,6 +315,11 @@ ROM_START( jak_spdv )
 	ROM_LOAD16_WORD_SWAP( "jakkspiderweb.u2", 0x000000, 0x200000, CRC(408c94bc) SHA1(350f7b84abf3d0d56f081647b3a228505751ff70) )
 ROM_END
 
+ROM_START( jak_dpma )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakks_magicaladventures.u2", 0x000000, 0x200000, CRC(3c3fdf54) SHA1(9847412a0ee21819cc714ca1a2dd519edb892c95) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -324,4 +362,6 @@ CONS( 2005, jak_powr, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_ini
 CONS( 2006, jak_pix,  0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Disney Pixar Classics (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
 
 // menu sounds don't work until you go into a game (work after a reset, bad default initializations?)
-CONS( 2006, jak_shrk, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Dreamworks Shrek / Over The Hedge (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
+CONS( 2006, jak_shrk , 0, 0, spg2xx_jakks, spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Dreamworks Shrek / Over The Hedge (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2006, jak_dpma,  0, 0, spg2xx_dpma,  spg2xx_dpma,   jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Disney Princess Magical Adventures (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
