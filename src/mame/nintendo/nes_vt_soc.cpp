@@ -561,7 +561,7 @@ int nes_vt02_vt03_soc_device::calculate_real_video_address(int addr, int readtyp
 
 		offset += colorbits * 0x4000;
 
-		return (finaladdr + offset + 0x0000) & 0x1fffff;
+		return (finaladdr + offset + 0x0000);
 	}
 
 	/*

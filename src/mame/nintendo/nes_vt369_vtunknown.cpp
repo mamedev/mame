@@ -115,8 +115,6 @@ public:
 		vt369_vtunknown_state(mconfig, type, tag)
 	{ }
 
-	void vt369_vtunknown_cy(machine_config& config);
-	void vt369_vtunknown_cy_bigger(machine_config& config);
 	void vt369_vtunknown_bt(machine_config& config);
 	void vt369_vtunknown_bt_2x16mb(machine_config& config);
 
@@ -393,19 +391,8 @@ void vt369_vtunknown_state::vt369_vtunknown_4k_ram_16mb(machine_config &config)
 	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_state::vt_external_space_map_16mbyte);
 }
 
-void vt369_vtunknown_cy_state::vt369_vtunknown_cy(machine_config &config)
-{
-	vt369_vtunknown_4k_ram(config);
 
-	VT3XX_SOC(config.replace(), m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-}
 
-void vt369_vtunknown_cy_state::vt369_vtunknown_cy_bigger(machine_config &config)
-{
-	vt369_vtunknown_cy(config);
-	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_cy_state::vt_external_space_map_32mbyte); // must be some banking of this kind of VT can address over 32mb
-}
 
 void vt369_vtunknown_cy_state::vt369_vtunknown_bt(machine_config &config)
 {
@@ -929,8 +916,9 @@ ROM_START( lxcap )
 ROM_END
 
 ROM_START( denv150 )
-	ROM_REGION( 0x1000000, "mainrom", 0 )
-	ROM_LOAD( "denver150in1.bin", 0x00000, 0x1000000, CRC(6b3819d7) SHA1(b0039945ce44a52ea224ab736d5f3c6980409b5d) ) // 2nd half is blank
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "denver150in1.bin", 0x00000, 0x800000, CRC(6b3819d7) SHA1(b0039945ce44a52ea224ab736d5f3c6980409b5d) ) // 2nd half is blank
+	ROM_IGNORE(0x800000) // 2nd half is unused
 ROM_END
 
 ROM_START( egame150 )
@@ -1197,8 +1185,8 @@ CONS( 2022, nesvt270,    0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369
 CONS( 201?, myarccn,   0, 0,  vt369_vtunknown_hh_1mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "DreamGear", "My Arcade Caveman Ninja", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // confirmed VT369, uses more features (including sound CPU)
-CONS( 201?, denv150,   0,        0,  vt369_vtunknown_cy_bigger, vt369_vtunknown, vt369_vtunknown_cy_state, empty_init, "Denver", "Denver Game Console GMP-240C 150-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 201?, egame150,  denv150,  0,  vt369_vtunknown_cy_bigger, vt369_vtunknown, vt369_vtunknown_cy_state, empty_init, "<unknown>", "E-Game! 150-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, denv150,   0,        0,  vt369_vtunknown_hh_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "Denver", "Denver Game Console GMP-240C 150-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, egame150,  denv150,  0,  vt369_vtunknown_hh_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "<unknown>", "E-Game! 150-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // uncertain, uses SPI ROM so probably VT369
 CONS( 2017, otrail,     0,        0,  vt369_vtunknown_unk_1mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "Basic Fun", "The Oregon Trail", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
