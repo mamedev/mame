@@ -960,7 +960,7 @@ void nes_vt02_vt03_soc_device::do_dma(uint8_t data, bool has_ntsc_bug)
 	}
 
 	uint16_t src_addr = (data << 8) | (src_nib_74 << 4);
-	logerror("vthh dma start ctrl=%02x addr=%04x\n", m_vdma_ctrl, src_addr);
+	logerror("%s: vthh dma start ctrl=%02x addr=%04x\n", machine().describe_context(), m_vdma_ctrl, src_addr);
 
 	if (dma_mode == 1)
 	{
@@ -991,10 +991,15 @@ void nes_vt02_vt03_soc_device::do_dma(uint8_t data, bool has_ntsc_bug)
 	//((device_t*)m_maincpu)->execute().adjust_icount(-(length * 4 - 1));
 }
 
+// probably VT3xx only, not earlier?
+void nes_vt02_vt03_soc_device::vt03_4024_new_dma_middle_w(uint8_t data)
+{
+	logerror("%s: vt03_4024_new_dma_middle_w %02x (VT3xx newer DMA middle bits?)\n", machine().describe_context(), data);
+}
 
 void nes_vt02_vt03_soc_device::vt03_4034_w(uint8_t data)
 {
-	logerror("vt03_4034_w %02x (2nd APU DMA)\n", data);
+	logerror("%s: vt03_4034_w %02x (2nd APU DMA)\n", machine().describe_context(), data);
 	m_vdma_ctrl = data;
 }
 

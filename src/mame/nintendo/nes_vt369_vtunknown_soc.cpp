@@ -157,12 +157,16 @@ void vt3xx_soc_base_device::vt369_map(address_map &map)
 
 	map(0x2020, 0x2023).rw(m_ppu, FUNC(ppu_vt3xx_device::read_202x_newvid), FUNC(ppu_vt3xx_device::write_202x_newvid));
 
+	map(0x3000, 0x3fff).ram(); // 240in1ar clears this region (does it only exist on some SoCs?)
+
 	map(0x4000, 0x4017).w(m_apu, FUNC(nes_apu_vt_device::write));
 
 	map(0x4014, 0x4014).w(FUNC(vt3xx_soc_base_device::vt_dma_w));
 	map(0x4015, 0x4015).r(m_apu, FUNC(nes_apu_vt_device::status_r)); // PSG status / first control register
 	map(0x4016, 0x4016).rw(FUNC(vt3xx_soc_base_device::in0_r), FUNC(vt3xx_soc_base_device::in0_w));
 	map(0x4017, 0x4017).r(FUNC(vt3xx_soc_base_device::in1_r));
+
+	map(0x4024, 0x4024).w(FUNC(vt3xx_soc_base_device::vt03_4024_new_dma_middle_w));
 
 	map(0x4034, 0x4034).w(FUNC(vt3xx_soc_base_device::vt03_4034_w));  // secondary DMA
 

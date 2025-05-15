@@ -81,6 +81,7 @@ protected:
 	void vt_dma_w(uint8_t data);
 	void do_dma(uint8_t data, bool has_ntsc_bug);
 	void vt03_4034_w(uint8_t data);
+	void vt03_4024_new_dma_middle_w(uint8_t data);
 
 	uint8_t in0_r();
 	uint8_t in1_r();
