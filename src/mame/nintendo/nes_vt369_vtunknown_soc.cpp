@@ -182,15 +182,30 @@ void vt3xx_soc_base_device::vt369_map(address_map &map)
 	map(0x4136, 0x4136).w(m_alu, FUNC(vrt_vt1682_alu_device::alu_oprand_5_div_w));
 	map(0x4137, 0x4137).w(m_alu, FUNC(vrt_vt1682_alu_device::alu_oprand_6_div_w));
 
+	// 4144
+	// 4147
+
 	map(0x414f, 0x414f).r(FUNC(vt3xx_soc_base_device::vt369_414f_r));
-	map(0x415c, 0x415c).r(FUNC(vt3xx_soc_base_device::vt369_415c_r));
+
+	// several games use these addresses for what seem to be extra protection data
+	map(0x4150, 0x4150).rw(FUNC(vt3xx_soc_base_device::extra_rom_prot_4150_r), FUNC(vt3xx_soc_base_device::extra_rom_prot_4150_w));
+	// 4151 also sometimes written
+	map(0x4152, 0x4152).rw(FUNC(vt3xx_soc_base_device::extra_rom_prot_4152_r), FUNC(vt3xx_soc_base_device::extra_rom_prot_4152_w));
+	map(0x4153, 0x4153).r(FUNC(vt3xx_soc_base_device::extra_rom_prot_4153_r)); // extra SPI? / SEEPROM port?
+	// 0x4158 is written before the above
+
+	map(0x415c, 0x415c).r(FUNC(vt3xx_soc_base_device::vt369_415c_r)); // related to getting into menus in some games
 
 	map(0x4160, 0x4161).w(FUNC(vt3xx_soc_base_device::vt369_relative_w));
 	map(0x4162, 0x4162).w(FUNC(vt3xx_soc_base_device::vt369_soundcpu_control_w));
 
+	// 4175
+
 	map(0x418a, 0x418a).r(FUNC(vt3xx_soc_base_device::vt369_418a_r));
 
 	map(0x41b0, 0x41bf).r(FUNC(vt3xx_soc_base_device::vt369_41bx_r)).w(FUNC(vt3xx_soc_base_device::vt369_41bx_w));
+
+	// 4304
 
 	map(0x4800, 0x4fff).ram().share("soundram"); // sound program for 2nd CPU is uploaded here, but some sets aren't uploading anything, do they rely on an internal ROM? other DMA? possibility to map ROM?
 
@@ -198,6 +213,14 @@ void vt3xx_soc_base_device::vt369_map(address_map &map)
 
 	map(0x8000, 0xffff).rw(FUNC(vt3xx_soc_base_device::external_space_read), FUNC(vt3xx_soc_base_device::external_space_write));
 }
+
+// this reads from the 'extra ROM' area (serial style protocol) and code is copied on gtct885 to e00 in RAM, jumps to it at EDF9: jsr $0e1c
+uint8_t vt3xx_soc_base_device::extra_rom_prot_4153_r() { logerror("%s: extra_rom_prot_4153_r (protection? / extra SPI device?)\n", machine().describe_context()); return machine().rand(); }
+// pactin and tetrtin use these for something similar, seems to want code/data for jumps?
+uint8_t vt3xx_soc_base_device::extra_rom_prot_4150_r() { logerror("%s: extra_rom_prot_4150_r (protection? / extra SPI device?)\n", machine().describe_context()); return machine().rand(); }
+uint8_t vt3xx_soc_base_device::extra_rom_prot_4152_r() { logerror("%s: extra_rom_prot_4152_r (protection? / extra SPI device?)\n", machine().describe_context()); return machine().rand(); }
+void vt3xx_soc_base_device::extra_rom_prot_4152_w(uint8_t data) { logerror("%s: extra_rom_prot_4152_w %02x (protection? / extra SPI device?)\n", data); }
+void vt3xx_soc_base_device::extra_rom_prot_4150_w(uint8_t data) { logerror("%s: extra_rom_prot_4150_w %02x (protection? / extra SPI device?)\n", data); }
 
 void vt3xx_soc_base_device::update_timer()
 {
@@ -469,12 +492,6 @@ uint8_t vt369_soc_introm_noswap_device::vthh_414a_r()
 	return 0x80;
 }
 
-uint8_t vt369_soc_introm_noswap_device::extra_rom_r()
-{
-	logerror("%s: extra_rom_r (protection?)\n", machine().describe_context());
-	// this reads from the 'extra ROM' area (serial style protocol) and code is copied on gtct885 to e00 in RAM, jumps to it at EDF9: jsr $0e1c
-	return machine().rand();
-}
 
 void vt369_soc_introm_noswap_device::vt369_introm_map(address_map &map)
 {
@@ -486,7 +503,6 @@ void vt369_soc_introm_noswap_device::vt369_introm_map(address_map &map)
 	map(0x414a, 0x414a).r(FUNC(vt369_soc_introm_noswap_device::vthh_414a_r));
 	map(0x411d, 0x411d).w(FUNC(vt369_soc_introm_noswap_device::vtfp_411d_w));
 
-	map(0x4153, 0x4153).r(FUNC(vt369_soc_introm_noswap_device::extra_rom_r)); // extra SPI? / SEEPROM port?
 
 	map(0x4169, 0x4169).w(FUNC(vt369_soc_introm_noswap_device::encryption_4169_w));
 }

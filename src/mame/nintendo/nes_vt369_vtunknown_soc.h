@@ -33,6 +33,13 @@ protected:
 	void vt369_41bx_w(offs_t offset, uint8_t data);
 
 	uint8_t vt369_414f_r();
+
+	uint8_t extra_rom_prot_4150_r();
+	uint8_t extra_rom_prot_4152_r();
+	uint8_t extra_rom_prot_4153_r();
+	void extra_rom_prot_4150_w(uint8_t data);
+	void extra_rom_prot_4152_w(uint8_t data);
+
 	uint8_t vt369_415c_r();
 
 	uint8_t vt369_418a_r();
@@ -108,7 +115,6 @@ protected:
 
 	void vt369_introm_map(address_map &map) ATTR_COLD;
 
-	uint8_t extra_rom_r();
 	uint8_t vthh_414a_r();
 	void vtfp_411d_w(uint8_t data);
 	void encryption_4169_w(uint8_t data);
