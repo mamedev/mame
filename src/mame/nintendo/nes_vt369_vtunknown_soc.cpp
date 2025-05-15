@@ -400,6 +400,8 @@ void vt3xx_soc_base_device::device_reset()
 
 uint8_t vt3xx_soc_base_device::vt369_41bx_r(offs_t offset)
 {
+	logerror("%s: vt369_41bx_r %02x (unknown)\n", machine().describe_context(), offset);
+
 	switch (offset)
 	{
 	case 0x07:
@@ -411,23 +413,27 @@ uint8_t vt3xx_soc_base_device::vt369_41bx_r(offs_t offset)
 
 void vt3xx_soc_base_device::vt369_41bx_w(offs_t offset, uint8_t data)
 {
-	logerror("vt369_41bx_w %02x %02x\n", offset, data);
+	logerror("%s: vt369_41bx_w %02x %02x (unknown)\n", machine().describe_context(), offset, data);
 }
 
 
 uint8_t vt3xx_soc_base_device::vt369_414f_r()
 {
+	logerror("%s: vt369_414f_r (unknown)\n", machine().describe_context());
 	return 0xff;
 }
 
 uint8_t vt3xx_soc_base_device::vt369_415c_r()
 {
-	return 0xff;
+	logerror("%s: vt369_415c_r (unknown - important)\n", machine().describe_context());
+	// returning 0x00 allows zonefusn and lexi30 (and many other lexibook sets) to show menus, but stops sealvt from showing anything
+	// returning 0xff allows sealvt to show the boot screen
+	return 0x00; 
 }
 
 uint8_t vt3xx_soc_base_device::vt369_418a_r()
 {
-	logerror("%s: vt369_418a_r\n", machine().describe_context());
+	logerror("%s: vt369_418a_r (unknown)\n", machine().describe_context());
 	return machine().rand();
 }
 
