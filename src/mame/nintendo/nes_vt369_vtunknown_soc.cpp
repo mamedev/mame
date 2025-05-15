@@ -173,6 +173,8 @@ void vt3xx_soc_base_device::vt369_map(address_map &map)
 	// 0x411b RS232 RX data
 	map(0x411c, 0x411c).w(FUNC(vt3xx_soc_base_device::vt369_411c_bank6000_enable_w));
 
+	// 412d
+
 	map(0x4130, 0x4130).rw(m_alu, FUNC(vrt_vt1682_alu_device::alu_out_1_r), FUNC(vrt_vt1682_alu_device::alu_oprand_1_w));
 	map(0x4131, 0x4131).rw(m_alu, FUNC(vrt_vt1682_alu_device::alu_out_2_r), FUNC(vrt_vt1682_alu_device::alu_oprand_2_w));
 	map(0x4132, 0x4132).rw(m_alu, FUNC(vrt_vt1682_alu_device::alu_out_3_r), FUNC(vrt_vt1682_alu_device::alu_oprand_3_w));
@@ -219,8 +221,8 @@ uint8_t vt3xx_soc_base_device::extra_rom_prot_4153_r() { logerror("%s: extra_rom
 // pactin and tetrtin use these for something similar, seems to want code/data for jumps?
 uint8_t vt3xx_soc_base_device::extra_rom_prot_4150_r() { logerror("%s: extra_rom_prot_4150_r (protection? / extra SPI device?)\n", machine().describe_context()); return machine().rand(); }
 uint8_t vt3xx_soc_base_device::extra_rom_prot_4152_r() { logerror("%s: extra_rom_prot_4152_r (protection? / extra SPI device?)\n", machine().describe_context()); return machine().rand(); }
-void vt3xx_soc_base_device::extra_rom_prot_4152_w(uint8_t data) { logerror("%s: extra_rom_prot_4152_w %02x (protection? / extra SPI device?)\n", data); }
-void vt3xx_soc_base_device::extra_rom_prot_4150_w(uint8_t data) { logerror("%s: extra_rom_prot_4150_w %02x (protection? / extra SPI device?)\n", data); }
+void vt3xx_soc_base_device::extra_rom_prot_4152_w(uint8_t data) { logerror("%s: extra_rom_prot_4152_w %02x (protection? / extra SPI device?)\n", machine().describe_context(), data); }
+void vt3xx_soc_base_device::extra_rom_prot_4150_w(uint8_t data) { logerror("%s: extra_rom_prot_4150_w %02x (protection? / extra SPI device?)\n", machine().describe_context(), data); }
 
 void vt3xx_soc_base_device::update_timer()
 {
