@@ -55,11 +55,14 @@ public:
 	void disable_encryption_on_reset() { m_encryption_enabled_on_reset = false; }
 
 	void set_encryption_state(bool state);
+	void set_which_crypt(int crypt) { m_cryptconfig = crypt; }
+
 protected:
 	class mi_decrypt : public mi_default {
 	public:
 
 		bool m_encryption_enabled;
+		int m_whichcrypt;
 
 		virtual ~mi_decrypt() {}
 		virtual uint8_t read_sync(uint16_t adr) override;
@@ -83,6 +86,7 @@ protected:
 
 private:
 	bool m_encryption_enabled_on_reset;
+	int m_cryptconfig;
 };
 
 
