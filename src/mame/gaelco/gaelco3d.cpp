@@ -1412,8 +1412,13 @@ ROM_START( footbpow ) // Version 4.6
 //  ROM_LOAD( "fop_26.ic36", 0x0040000, 0x020000, CRC(b5877b68) SHA1(6f6f00da84d6d84895691266c2022fd4cd92f228) )
 //  ROM_LOAD( "fop_27.ic37", 0x0060000, 0x020000, CRC(58309912) SHA1(eb62ccfd75fc168338d30bc30214e6f9f62e5e70) )
 
-	ROM_REGION( 0x2000, "io", ROMREGION_ERASEFF )
-	ROM_LOAD("ball_pic16c710.u1", 0x0000, 0x2000, NO_DUMP ) // I/O for the ball controller
+	ROM_REGION( 0x4000, "io", ROMREGION_ERASEFF )
+	/* ID = 0x3FFF, 0x3FFF, 0x3FFF, 0x3FFF
+           Oscillator =  High Speed
+           Watchdog Timer = Enabled
+           Power-Up Timer = Disabled
+           Brown Out = Enabled */
+	ROM_LOAD("fop_621_pic16c710.u1", 0x0000, 0x4000, CRC(4e5d0dc5) SHA1(3029cb6830b059bd410c8fbe2d1c42e7b996582e) ) // I/O for the ball controller
 
 	ROM_REGION( 0x104, "plds", 0 )
 	ROM_LOAD( "m.1c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )
@@ -1452,8 +1457,13 @@ ROM_START( footbpow14 ) // Version 1.4
 //  ROM_LOAD( "fop_26.ic36", 0x0040000, 0x020000, CRC(b5877b68) SHA1(6f6f00da84d6d84895691266c2022fd4cd92f228) )
 //  ROM_LOAD( "fop_27.ic37", 0x0060000, 0x020000, CRC(58309912) SHA1(eb62ccfd75fc168338d30bc30214e6f9f62e5e70) )
 
-	ROM_REGION( 0x2000, "io", ROMREGION_ERASEFF )
-	ROM_LOAD("ball_pic16c710.u1", 0x0000, 0x2000, NO_DUMP ) // I/O for the ball controller
+	ROM_REGION( 0x4000, "io", ROMREGION_ERASEFF )
+	/* ID = 0x3FFF, 0x3FFF, 0x3FFF, 0x3FFF
+           Oscillator =  High Speed
+           Watchdog Timer = Enabled
+           Power-Up Timer = Disabled
+           Brown Out = Enabled */
+	ROM_LOAD("fop_621_pic16c710.u1", 0x0000, 0x4000, CRC(4e5d0dc5) SHA1(3029cb6830b059bd410c8fbe2d1c42e7b996582e) ) // I/O for the ball controller
 
 	ROM_REGION( 0x104, "plds", 0 )
 	ROM_LOAD( "m.1c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )
@@ -1492,8 +1502,13 @@ ROM_START( footbpow12 ) // Version 1.2 - REF. 000208 ROM board
 //  ROM_LOAD( "fop_26.ic36", 0x0040000, 0x020000, CRC(b5877b68) SHA1(6f6f00da84d6d84895691266c2022fd4cd92f228) ) // labeled FOP 26 in IC36 on the PCB
 //  ROM_LOAD( "fop_27.ic37", 0x0060000, 0x020000, CRC(58309912) SHA1(eb62ccfd75fc168338d30bc30214e6f9f62e5e70) ) // labeled FOP 27 in IC37 on the PCB
 
-	ROM_REGION( 0x2000, "io", ROMREGION_ERASEFF )
-	ROM_LOAD("ball_pic16c710.u1", 0x0000, 0x2000, NO_DUMP ) // I/O for the ball controller
+	ROM_REGION( 0x4000, "io", ROMREGION_ERASEFF )
+	/* ID = 0x3FFF, 0x3FFF, 0x3FFF, 0x3FFF
+           Oscillator =  High Speed
+           Watchdog Timer = Enabled
+           Power-Up Timer = Disabled
+           Brown Out = Enabled */
+	ROM_LOAD("fop_621_pic16c710.u1", 0x0000, 0x4000, CRC(4e5d0dc5) SHA1(3029cb6830b059bd410c8fbe2d1c42e7b996582e) ) // I/O for the ball controller
 
 	ROM_REGION( 0x104, "plds", 0 )
 	ROM_LOAD( "m.1c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )
@@ -1532,8 +1547,13 @@ ROM_START( footbpow11 ) // Version 1.1 - REF. 000208 ROM board
 //  ROM_LOAD( "fop_26.ic36", 0x0040000, 0x020000, CRC(b5877b68) SHA1(6f6f00da84d6d84895691266c2022fd4cd92f228) ) // labeled FOP 26 in IC36 on the PCB
 //  ROM_LOAD( "fop_27.ic37", 0x0060000, 0x020000, CRC(58309912) SHA1(eb62ccfd75fc168338d30bc30214e6f9f62e5e70) ) // labeled FOP 27 in IC37 on the PCB
 
-	ROM_REGION( 0x2000, "io", ROMREGION_ERASEFF )
-	ROM_LOAD("ball_pic16c710.u1", 0x0000, 0x2000, NO_DUMP ) // I/O for the ball controller
+	ROM_REGION( 0x4000, "io", ROMREGION_ERASEFF )
+	/* ID = 0x3FFF, 0x3FFF, 0x3FFF, 0x3FFF
+           Oscillator =  High Speed
+           Watchdog Timer = Enabled
+           Power-Up Timer = Disabled
+           Brown Out = Enabled */
+	ROM_LOAD("fop_621_pic16c710.u1", 0x0000, 0x4000, CRC(4e5d0dc5) SHA1(3029cb6830b059bd410c8fbe2d1c42e7b996582e) ) // I/O for the ball controller
 
 	ROM_REGION( 0x104, "plds", 0 )
 	ROM_LOAD( "m.1c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )
