@@ -19,6 +19,16 @@
 
 #include "speaker.h"
 
+#define LOG_CMD    (1U << 1)
+
+#define VERBOSE (LOG_GENERAL)
+//#define LOG_OUTPUT_FUNC osd_printf_info
+
+#include "logmacro.h"
+
+#define LOGCMD(...)     LOGMASKED(LOG_CMD,  __VA_ARGS__)
+
+
 #define SIXTEENBIT  0x01
 #define STEREO      0x02
 #define SIGNED      0x04
@@ -316,13 +326,13 @@ void sb_device::process_fifo(uint8_t cmd)
 {
 	if (m_cmd_fifo_length[cmd] == -1)
 	{
-		logerror("SB: unemulated or undefined fifo command %02x\n",cmd);
+		LOG("SB: unemulated or undefined fifo command %02x\n", cmd);
 		m_dsp.fifo_ptr = 0;
 	}
 	else if(m_dsp.fifo_ptr == m_cmd_fifo_length[cmd])
 	{
 		/* get FIFO params */
-//        printf("SB FIFO command: %02x\n", cmd);
+		LOGCMD("SB FIFO command: %02x\n", cmd);
 		switch(cmd)
 		{
 			case 0x10:  // Direct DAC
