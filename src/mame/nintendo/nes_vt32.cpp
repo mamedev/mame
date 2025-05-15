@@ -393,7 +393,6 @@ ROM_START( matet100 )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
 	ROM_LOAD( "picotetris_s29gl064n90tfi04_0001227e.bin", 0x00000, 0x800000, CRC(7d9296f2) SHA1(0db5883028d14783d0abff1f7672e59534b0e513) )
 	ROM_IGNORE(0x100)
-	ROM_FILL( 0x7f222, 3, 0x4b ) // prevent a jump to 6100
 ROM_END
 
 } // anonymous namespace
@@ -421,8 +420,7 @@ CONS( 2021, matet300,  0,         0,  nes_vt32_32mb,     nes_vt32, nes_vt32_unk_
 // some games (eg F22) are scrambled like in myaass
 CONS( 2021, matet220,  0,         0,  nes_vt32_32mb,     nes_vt32, nes_vt32_unk_state, empty_init, "dreamGEAR", "My Arcade Tetris (DGUNL-7030, Gamer V, with 220 bonus games)", MACHINE_NOT_WORKING )
 
-// unknown tech level, uses vt32 style opcode scramble and palette, but seems to expect vt369 features?
-// jumps to 6100 (ROM window on vt3xx?)
+// unknown tech level, uses vt32 style opcode scramble and palette, lots of unmapped accesses though
 CONS( 2021, matet100,  0,        0,  nes_vt32_32mb,      nes_vt32, nes_vt32_unk_state, empty_init, "dreamGEAR", "My Arcade Tetris (DGUNL-7027, Pico Player, with 100+ bonus games)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // box says 100+ bonus games
 
 // Use DIP switch to select console or cartridge, as cartridge is fake and just toggles a GPIO
