@@ -233,7 +233,7 @@ void vt3xx_soc_base_device::vt369_map(address_map &map)
 
 void vt3xx_soc_base_device::vt_dma_w(uint8_t data)
 {
-	const bool ALLOW_NEW_DMA = false; // helps red5mam, dgun2593, in1ar but makes other things worse at the moment
+	const bool ALLOW_NEW_DMA = true; // seems OK for cases we have at the moment
 
 	if ((m_bank6000_enable & 0x80) && ALLOW_NEW_DMA)
 	{

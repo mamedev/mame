@@ -1058,7 +1058,7 @@ CONS( 200?, lxccplan,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_v
 
 CONS( 2020, lxpcsp,    0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Power Console - Marvel Spider-Man", MACHINE_NOT_WORKING )
 
-// GB-NO13-Main-VT389-2 on PCBs
+// GB-NO13-Main-VT389-2 on PCBs - uses higher resolution mode (twice usual h-res?)
 CONS( 2016, rtvgc300,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Retro TV Game Console - 300 Games", MACHINE_NOT_WORKING )
 CONS( 2017, rtvgc300fz,0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Retro TV Game Console - Frozen - 300 Games", MACHINE_NOT_WORKING )
 

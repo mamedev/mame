@@ -1000,6 +1000,7 @@ void nes_vt02_vt03_soc_device::do_dma(uint8_t data, bool has_ntsc_bug)
 void nes_vt02_vt03_soc_device::vt3xx_4024_new_dma_middle_w(uint8_t data)
 {
 	logerror("%s: vt3xx_4024_new_dma_middle_w %02x (VT3xx newer DMA middle bits?)\n", machine().describe_context(), data);
+	// can set all 8-bits of the lower address using this register
 	m_4024_newdma = data;
 }
 
@@ -1007,6 +1008,15 @@ void nes_vt02_vt03_soc_device::vt03_4034_w(uint8_t data)
 {
 	logerror("%s: vt03_4034_w %02x (2nd APU DMA / new DMA)\n", machine().describe_context(), data);
 	m_vdma_ctrl = data;
+
+	// this also sets the lower DMA address under certain conditions, but only 4 bits of it? - needed to stop denv150 corrupting
+	// note, for regular DMA these bits are used (src_nib_74)
+	// should we have a separate m_dmaaddress set by both this and 4024 and store the value written here as-is?
+	// maybe this newvid_1d check could be moved to the DMA function to check which bits to use instead - check
+	if ((m_ppu->get_newvid_1d() & 0x01) == 0x00)
+	{
+		m_4024_newdma = data & 0xf0;
+	}
 }
 
 uint8_t nes_vt02_vt03_soc_device::in0_r()
