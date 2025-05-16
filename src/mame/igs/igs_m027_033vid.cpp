@@ -70,6 +70,7 @@ public:
 	{ }
 
 	void m027_033vid(machine_config &config) ATTR_COLD;
+	void huahuas5(machine_config &config) ATTR_COLD;
 
 	void init_huahuas5() ATTR_COLD;
 	void init_qiji6() ATTR_COLD;
@@ -177,9 +178,7 @@ void igs_m027_033vid_state::out_port_w(u8 data)
 
 	m_video_enable = BIT(data, 0);
 
-	// TODO: bit 1 seems to be always set by huahuas5
-
-	m_oki->set_rom_bank(BIT(data, 2));
+	m_oki->set_rom_bank(bitswap<2>(data, 1, 2)); // TODO: fishy, verify when more games are dumped
 
 	m_tilebank = BIT(data, 4);
 
@@ -411,6 +410,13 @@ void igs_m027_033vid_state::m027_033vid(machine_config &config)
 	OKIM6295(config, m_oki, 24_MHz_XTAL / 24, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5); // divider and pin 7 not verified
 }
 
+void igs_m027_033vid_state::huahuas5(machine_config &config)
+{
+	m027_033vid(config);
+
+	m_oki->set_clock(24_MHz_XTAL / 12); // divider and pin 7 not verified
+}
+
 
 /***************************************************************************
 
@@ -478,4 +484,4 @@ void igs_m027_033vid_state::init_huahuas5()
 // internal ROM date is 2002, external software revision could be later
 GAME( 2002, qiji6,    0, m027_033vid, qiji6,    igs_m027_033vid_state, init_qiji6,    ROT0, "IGS", "Qiji 6 (V118CN)",                           MACHINE_NOT_WORKING ) // lacks hopper support
 // internal ROM date is 2004, external software revision could be later
-GAME( 2004, huahuas5, 0, m027_033vid, huahuas5, igs_m027_033vid_state, init_huahuas5, ROT0, "IGS", "Huahua Shijie 5 / Feixing Shijie (V107CN)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // lacks hopper support, Oki banking
+GAME( 2004, huahuas5, 0, huahuas5,    huahuas5, igs_m027_033vid_state, init_huahuas5, ROT0, "IGS", "Huahua Shijie 5 / Feixing Shijie (V107CN)", MACHINE_NOT_WORKING ) // lacks hopper support
