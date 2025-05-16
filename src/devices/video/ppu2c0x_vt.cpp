@@ -585,6 +585,7 @@ void ppu_vt03_device::videobank0_extra_w(offs_t offset, uint8_t data) { m_videob
 ppu_vt3xx_device::ppu_vt3xx_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
 	ppu_vt03_device(mconfig, PPU_VT3XX, tag, owner, clock)
 {
+	m_spriteramsize = 0x200;
 }
 
 
@@ -796,6 +797,42 @@ void ppu_vt3xx_device::shift_tile_plane_data(uint8_t& pix)
 	}
 }
 
+void ppu_vt3xx_device::draw_sprites(u8 *line_priority)
+{
+	if (!m_newvid_1e)
+	{
+		ppu_vt03_device::draw_sprites(line_priority);
+	}
+	else
+	{
+		// new style sprites
+		for (int spritenum = 0x00; spritenum < 0x80; spritenum++)
+		{
+			int ypos = m_spriteram[0x000 + spritenum];
+			int xpos = m_spriteram[0x180 + spritenum];
+			int tilenum = m_spriteram[0x080 + spritenum];
+			tilenum |= (m_spriteram[0x100 + spritenum] & 0x18) << 6;
+
+			if (m_scanline == 128)
+				logerror("new sprite (%02x) ypos %d xpos %d tilenum %04x\n", spritenum, ypos, xpos, tilenum);
+
+		}
+
+	}
+}
+
+void ppu_vt3xx_device::write_to_spriteram_with_increment(uint8_t data)
+{
+	if (!m_newvid_1e) // might be the CPU speed control bit instead
+	{
+		ppu_vt03_device::write_to_spriteram_with_increment(data);
+	}
+	else
+	{
+		m_spriteram[m_regs[PPU_SPRITE_ADDRESS]] = data;
+		m_regs[PPU_SPRITE_ADDRESS] = (m_regs[PPU_SPRITE_ADDRESS] + 1) & 0xff;
+	}
+}
 
 void ppu_vt3xx_device::draw_back_pen(uint32_t* dst, int back_pen)
 {

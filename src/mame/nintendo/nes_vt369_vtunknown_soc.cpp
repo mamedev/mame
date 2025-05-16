@@ -137,7 +137,7 @@ void vt3xx_soc_base_device::vt369_map(address_map &map)
 
 	// ddrdismx relies on the mirroring, later SoCs have different mirroring?
 	map(0x2000, 0x2007).rw(m_ppu, FUNC(ppu_vt3xx_device::read), FUNC(ppu_vt3xx_device::write));  // standard PPU registers
-
+	map(0x2008, 0x2008).rw(m_ppu, FUNC(ppu_vt3xx_device::read_spritehigh), FUNC(ppu_vt3xx_device::write_spritehigh));  // standard PPU registers
 	map(0x2010, 0x2010).rw(m_ppu, FUNC(ppu_vt3xx_device::extended_modes_enable_r), FUNC(ppu_vt3xx_device::extended_modes_enable_w));
 	map(0x2011, 0x2011).rw(m_ppu, FUNC(ppu_vt3xx_device::extended_modes2_enable_r), FUNC(ppu_vt3xx_device::extended_modes2_enable_w));
 	map(0x2012, 0x2012).rw(m_ppu, FUNC(ppu_vt3xx_device::videobank0_0_r), FUNC(ppu_vt3xx_device::videobank0_0_w));

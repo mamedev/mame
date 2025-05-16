@@ -75,6 +75,7 @@ public:
 	bool get_newvid_1d() { return m_newvid_1d; }
 
 	uint16_t get_newmode_tilebase() { return m_newvid_2x[0] | (m_newvid_2x[1] << 8); }
+	uint16_t get_newmode_spritebase() { return m_newvid_2x[2] | (m_newvid_2x[3] << 8); }
 	uint8_t vt3xx_extended_palette_r(offs_t offset) { return m_vt3xx_palette[offset]; }
 	void vt3xx_extended_palette_w(offs_t offset, uint8_t data) { logerror("%s: extended palette write %04x %02x\n", machine().describe_context(), offset, data); m_vt3xx_palette[offset] = data; }
 
@@ -165,6 +166,9 @@ public:
 	void write_202x_newvid(offs_t offset, uint8_t data);
 	void write_204x_screenregs(offs_t offset, uint8_t data);
 
+	uint8_t read_spritehigh() { return m_2008_spritehigh; }
+	void write_spritehigh(uint8_t data) { m_2008_spritehigh = data; logerror("%s: write_spritehigh %02x\n", machine().describe_context(), data); }
+ 
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -174,11 +178,13 @@ private:
 	virtual void draw_tile_pixel(uint8_t pix, int color, uint32_t back_pen, uint32_t*& dest) override;
 	virtual void shift_tile_plane_data(uint8_t& pix) override;
 	virtual void draw_back_pen(uint32_t* dst, int back_pen) override;
-
+	virtual void draw_sprites(u8 *line_priority) override;
 	uint8_t vt3xx_palette_r(offs_t offset);
 	void vt3xx_palette_w(offs_t offset, uint8_t da0ta);
+	virtual void write_to_spriteram_with_increment(uint8_t data) override;
 
 	uint8_t m_204x_screenregs[0xa];
+	uint8_t m_2008_spritehigh;
 };
 
 

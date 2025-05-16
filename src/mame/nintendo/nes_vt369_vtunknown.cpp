@@ -931,7 +931,7 @@ ROM_END
 
 ROM_START( denv150 )
 	ROM_REGION( 0x800000, "mainrom", 0 )
-	ROM_LOAD( "denver150in1.bin", 0x00000, 0x800000, CRC(6b3819d7) SHA1(b0039945ce44a52ea224ab736d5f3c6980409b5d) ) // 2nd half is blank
+	ROM_LOAD( "denver150in1.bin", 0x00000, 0x800000, CRC(6b3819d7) SHA1(b0039945ce44a52ea224ab736d5f3c6980409b5d) )
 	ROM_IGNORE(0x800000) // 2nd half is unused
 ROM_END
 
