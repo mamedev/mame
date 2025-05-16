@@ -163,6 +163,7 @@ public:
 	void write_201d_newvid(offs_t offset, uint8_t data);
 	void write_201e_newvid(offs_t offset, uint8_t data);
 	void write_202x_newvid(offs_t offset, uint8_t data);
+	void write_204x_screenregs(offs_t offset, uint8_t data);
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -176,6 +177,8 @@ private:
 
 	uint8_t vt3xx_palette_r(offs_t offset);
 	void vt3xx_palette_w(offs_t offset, uint8_t da0ta);
+
+	uint8_t m_204x_screenregs[0xa];
 };
 
 

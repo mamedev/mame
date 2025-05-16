@@ -12,6 +12,7 @@
 #include "emu.h"
 #include "ppu2c0x_vt.h"
 
+#include "screen.h"
 
 /* constant definitions */
 #define VISIBLE_SCREEN_WIDTH         (32*8) /* Visible screen width */
@@ -590,13 +591,16 @@ ppu_vt3xx_device::ppu_vt3xx_device(const machine_config& mconfig, const char* ta
 void ppu_vt3xx_device::device_start()
 {
 	ppu_vt03_device::device_start();
-	// TODO: move VT3xx specifics here
+
+	save_item(NAME(m_204x_screenregs));
 }
 
 void ppu_vt3xx_device::device_reset()
 {
 	ppu_vt03_device::device_reset();
-	// TODO: move VT3xx specifics here
+
+	for (int i = 0; i < 0xa; i++)
+		m_204x_screenregs[i] = 0x00;
 }
 
 uint8_t ppu_vt3xx_device::read_201c_newvid(offs_t offset) { return m_newvid_1c; }
@@ -624,6 +628,85 @@ void ppu_vt3xx_device::write_202x_newvid(offs_t offset, uint8_t data)
 		logerror("%s: NEW VALUE write_202x_newvid %d %02x\n", machine().describe_context(), offset, data);
 
 	m_newvid_2x[offset] = data;
+}
+
+void ppu_vt3xx_device::write_204x_screenregs(offs_t offset, uint8_t data)
+{
+	// these seem somehow related to the screen dimensions, but could
+	// be specific to the type of LCD being used (scale against the actual screen)
+	// so for now we just use a table lookup
+	//
+	// of note lxcmcysp (which has a vertical screen squashed to horizontal) writes different
+	// config values here compared to the natively horizontal versions
+	// 
+	// the real devices scale the higher res images to the lower LCD, dropping pixels
+	logerror("%s: ppu_vt3xx_device::write_204x_screenregs %d %02x\n", machine().describe_context(), offset, data);
+	m_204x_screenregs[offset] = data;
+
+	struct vid_mode
+	{
+		int min_x;
+		int max_x;
+		int min_y;
+		int max_y;
+		uint8_t regvals[0xa];
+	};
+
+	static const vid_mode mode_table[] = {
+		// configurations used for lower resolution output
+		0, 159, 0, 127, { 0xa0, 0xff, 0x00, 0x40, 0xff, 0x04, 0x00, 0xa8, 0x04, 0x0f },
+		0, 199, 0, 199, { 0xdc, 0xff, 0x00, 0x58, 0xff, 0x04, 0x10, 0xa8, 0x04, 0x00 }, // hkb502 menu, uncertain dimensions
+		0, 127, 0, 159, { 0x80, 0x80, 0x00, 0x50, 0xff, 0x04, 0x00, 0xaa, 0x08, 0x00 }, // lexi30 menu
+		0, 127, 0, 159, { 0x80, 0x3f, 0x00, 0x50, 0xff, 0x69, 0x00, 0x54, 0x08, 0x00 }, // gcs2mgp
+
+		// configurations used for 'regular' output
+		0, 255, 0, 239, { 0xa0, 0x57, 0x09, 0x40, 0x93, 0x04, 0x00, 0x83, 0x08, 0x00 }, // full mode for the 0, 159, 0, 127 config
+
+		0, 255, 0, 239, { 0x40, 0xa1, 0x00, 0x78, 0xff, 0x69, 0x0a, 0x69, 0x26, 0x00 }, // denv150
+		0, 255, 0, 239, { 0x40, 0xa1, 0x00, 0x78, 0xff, 0x04, 0x0a, 0xd4, 0x0a, 0x00 }, // myarccn
+		0, 255, 0, 239, { 0xdc, 0xe1, 0x00, 0x58, 0xbf, 0x04, 0x10, 0x93, 0x04, 0x00 }, // hkb502 normal games
+
+		-1 
+	};
+
+	if (offset == 0x09)
+	{
+		// default to these (standard resolution) if no entry is found
+		int new_min_x = 0;
+		int new_max_x = 255;
+		int new_min_y = 0;
+		int new_max_y = 239;
+
+		rectangle curvisarea = screen().visible_area();
+		logerror("current screen dimensions are %d %d %d %d\n", curvisarea.min_x, curvisarea.max_x, curvisarea.min_y, curvisarea.max_y);
+
+		int tablenum = 0;
+		do
+		{
+			bool found = true;
+			for (int entry = 0; entry < 0xa; entry++)
+			{
+				if (mode_table[tablenum].regvals[entry] != m_204x_screenregs[entry])
+					found = false;
+			}
+
+			if (found)
+			{
+				new_min_x = mode_table[tablenum].min_x;
+				new_max_x = mode_table[tablenum].max_x;
+				new_min_y = mode_table[tablenum].min_y;
+				new_max_y = mode_table[tablenum].max_y;
+
+				logerror("new screen dimensions are %d %d %d %d\n", new_min_x, new_max_x, new_min_y, new_max_y);
+
+			}
+
+			tablenum++;
+		} while (mode_table[tablenum].min_x != -1);
+
+		screen().set_visible_area(new_min_x, new_max_x, new_min_y, new_max_y);
+
+	}
 }
 
 void ppu_vt3xx_device::read_tile_plane_data(int address, int color)

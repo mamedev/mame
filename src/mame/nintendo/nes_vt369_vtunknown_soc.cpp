@@ -157,6 +157,8 @@ void vt3xx_soc_base_device::vt369_map(address_map &map)
 
 	map(0x2020, 0x2023).rw(m_ppu, FUNC(ppu_vt3xx_device::read_202x_newvid), FUNC(ppu_vt3xx_device::write_202x_newvid));
 
+	map(0x2040, 0x2049).w(m_ppu, FUNC(ppu_vt3xx_device::write_204x_screenregs));
+
 	map(0x3000, 0x3fff).ram(); // 240in1ar clears this region (does it only exist on some SoCs?)
 
 	map(0x4000, 0x4017).w(m_apu, FUNC(nes_apu_vt_device::write));
@@ -190,6 +192,7 @@ void vt3xx_soc_base_device::vt369_map(address_map &map)
 
 	// 412d
 
+	// is the ALU really compatible with the 1682 one?
 	map(0x4130, 0x4130).rw(m_alu, FUNC(vrt_vt1682_alu_device::alu_out_1_r), FUNC(vrt_vt1682_alu_device::alu_oprand_1_w));
 	map(0x4131, 0x4131).rw(m_alu, FUNC(vrt_vt1682_alu_device::alu_out_2_r), FUNC(vrt_vt1682_alu_device::alu_oprand_2_w));
 	map(0x4132, 0x4132).rw(m_alu, FUNC(vrt_vt1682_alu_device::alu_out_3_r), FUNC(vrt_vt1682_alu_device::alu_oprand_3_w));

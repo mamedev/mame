@@ -222,24 +222,10 @@ void nes_vt32_base_state::configure_soc(nes_vt02_vt03_soc_device* soc)
 	soc->extra_read_3_callback().set(FUNC(nes_vt32_base_state::extrain_r<3>));
 }
 
-uint8_t nes_vt32_base_state::upper_412c_r()
-{
-	logerror("%s: upper_412c_r\n", machine().describe_context());
-	return 0x00;
-}
-
-uint8_t nes_vt32_base_state::upper_412d_r()
-{
-	logerror("%s: upper_412d_r\n", machine().describe_context());
-	return 0x00;
-}
-
-void nes_vt32_base_state::upper_412c_w(uint8_t data)
-{
-	logerror("%s: upper_412c_w %02x\n", machine().describe_context(), data);
-}
-
-
+// TODO: these should be in the SoC devices - upper_412d_r gets read, compared against, and another register written based on the result (maybe detecting SoC type?)
+uint8_t nes_vt32_base_state::upper_412c_r() { logerror("%s: nes_vt32_base_state:upper_412c_r\n", machine().describe_context());	return 0x00; }
+uint8_t nes_vt32_base_state::upper_412d_r() { logerror("%s: nes_vt32_base_state:upper_412d_r\n", machine().describe_context());	return 0x00; }
+void nes_vt32_base_state::upper_412c_w(uint8_t data) { logerror("%s: nes_vt32_base_state:upper_412c_w %02x\n", machine().describe_context(), data); }
 
 
 static INPUT_PORTS_START( nes_vt32 )
@@ -415,10 +401,12 @@ CONS( 201?, dgunl3202, 0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empt
 CONS( 201?, myaass,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init, "dreamGEAR", "My Arcade All Star Stadium - Pocket Player (307-in-1)", MACHINE_NOT_WORKING )
 CONS( 201?, myaasa,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init, "dreamGEAR", "My Arcade All Star Arena - Pocket Player (307-in-1)", MACHINE_NOT_WORKING )
 
-CONS( 2021, matet300,  0,         0,  nes_vt32_32mb,     nes_vt32, nes_vt32_unk_state, empty_init, "dreamGEAR", "My Arcade Tetris (DGUNL-7029, Go Gamer, with 300 bonus games)", MACHINE_NOT_WORKING )
 
-// some games (eg F22) are scrambled like in myaass
+// Some games (eg F22) are scrambled like in myaass
+// These use a 16x16x8bpp packed tile mode for the main menu which seems more like a VT3xx feature, but VT3xx extended video regs not written?
+// also access 3e00 (not 3f00) for palette on said screens?
 CONS( 2021, matet220,  0,         0,  nes_vt32_32mb,     nes_vt32, nes_vt32_unk_state, empty_init, "dreamGEAR", "My Arcade Tetris (DGUNL-7030, Gamer V, with 220 bonus games)", MACHINE_NOT_WORKING )
+CONS( 2021, matet300,  0,         0,  nes_vt32_32mb,     nes_vt32, nes_vt32_unk_state, empty_init, "dreamGEAR", "My Arcade Tetris (DGUNL-7029, Go Gamer, with 300 bonus games)", MACHINE_NOT_WORKING )
 
 // unknown tech level, uses vt32 style opcode scramble and palette, lots of unmapped accesses though
 CONS( 2021, matet100,  0,        0,  nes_vt32_32mb,      nes_vt32, nes_vt32_unk_state, empty_init, "dreamGEAR", "My Arcade Tetris (DGUNL-7027, Pico Player, with 100+ bonus games)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // box says 100+ bonus games
