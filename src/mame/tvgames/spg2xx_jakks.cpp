@@ -190,6 +190,28 @@ static INPUT_PORTS_START( jak_mpac )
 	PORT_BIT(0x03ff, 0x0000, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0x03ff)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( spg2xx_pacg )
+	PORT_START("P1")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_NAME("Joypad Up")
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_NAME("Joypad Down")
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_NAME("Joypad Left")
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_NAME("Joypad Right")
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(1) PORT_NAME("A Button")
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Menu / Pause")
+	PORT_BIT( 0x000f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P3")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::read_sda))
+	PORT_BIT( 0x0006, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PAL/NTSC flag, set to NTSC (unverified here)
+	PORT_BIT( 0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
 void jakks_state::base_config(machine_config& config)
 {
 	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
@@ -290,6 +312,11 @@ ROM_START( jak_mpacw )
 	ROM_LOAD16_WORD_SWAP( "wirelessnamco.bin", 0x000000, 0x200000, CRC(78a318ca) SHA1(3c2601cbb023edb6a1f3d4bce686e0be1ef63eee) )
 ROM_END
 
+ROM_START( jak_pacg )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakkspacmangold.u2", 0x000000, 0x200000, CRC(59904862) SHA1(f86a8847742fa918bdfa0fa927ec6e1f573ce31c) )
+ROM_END
+
 ROM_START( jak_spd3 )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "spiderman3.u4", 0x000000, 0x200000, CRC(87019271) SHA1(80d126af970236a1cecf7ade49f916caf8f67ceb) )
@@ -354,6 +381,8 @@ CONS( 2007, jak_potc, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_ini
 CONS( 2006, jak_supm, 0, 0, spg2xx_jakks,  jak_supm,      jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "Superman in Super Villain Showdown (JAKKS Pacific TV Game) (26 Jan 2006 A)", MACHINE_IMPERFECT_SOUND ) // has AT24C04
 
 CONS( 2006, jak_spdv, 0, 0, spg2xx_jakks,  spg2xx_spdv,   jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "The Amazing Spider-Man in Villain Round-Up (JAKKS Pacific TV Game) (24 Apr 2006 A)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2007, jak_pacg, 0, 0, spg2xx_jakks,  spg2xx_pacg,   jakks_state, empty_init, "JAKKS Pacific Inc / Namco / HotGen Ltd", "Arcade Gold featuring Pac-Man (20 APR 2007 A SKU O)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 2007, jak_spd3, 0, 0, spg2xx_jakks,  jak_spd3,      jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Spider-Man 3 (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
 
