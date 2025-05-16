@@ -352,6 +352,12 @@ ROM_START( jak_dpma )
 	ROM_LOAD16_WORD_SWAP( "jakks_magicaladventures.u2", 0x000000, 0x200000, CRC(3c3fdf54) SHA1(9847412a0ee21819cc714ca1a2dd519edb892c95) )
 ROM_END
 
+ROM_START( jak_hsm )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakkshighschoolmusical.u3", 0x000000, 0x400000, CRC(ad83549a) SHA1(1d198209055e418402c9f3f389bccde156ca5a43) )
+ROM_END
+
+
 } // anonymous namespace
 
 
@@ -396,6 +402,8 @@ CONS( 2007, jak_cind, 0, 0, spg2xx_jakks,  spg2xx_pacg,   jakks_state, empty_ini
 CONS( 2005, jak_powr, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Power Rangers S.P.D. (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2006, jak_pix,  0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Disney Pixar Classics (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2007, jak_hsm,  0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "High School Musical (JAKKS Pacific TV Game) (Dec 19 2007 17:08:20)", MACHINE_IMPERFECT_SOUND )
 
 // menu sounds don't work until you go into a game (work after a reset, bad default initializations?)
 CONS( 2006, jak_shrk , 0, 0, spg2xx_jakks, spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Dreamworks Shrek / Over The Hedge (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
