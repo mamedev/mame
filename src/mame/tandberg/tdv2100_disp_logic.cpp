@@ -489,15 +489,14 @@ void tandberg_tdv2100_disp_logic_device::update_attribute(int at_row, int at_col
 				{
 					m_attribute = 0;
 				}
+				if(char_row == at_row && char_col == at_col)
+				{
+					return;
+				}
 				int const vram_data = m_vram[get_ram_addr(char_row, char_col)];
 				if(vram_data&0x80)
 				{
 					m_attribute = (vram_data&0x70)>>4;
-				}
-
-				if(char_row == at_row && char_col == at_col)
-				{
-					return;
 				}
 			}
 			if(first_round)
@@ -546,6 +545,18 @@ uint32_t tandberg_tdv2100_disp_logic_device::screen_update(screen_device &screen
 			int const vram_address = get_ram_addr(char_row_nr, in_line_char_nr);
 			bool const is_cursor = (m_cursor_col == in_line_char_nr && m_cursor_row == char_row_nr);
 
+			// Character-clock events
+			uint8_t vram_data = 0x00;
+			uint8_t const latched_attribute = m_attribute;
+			if(in_line_char_nr >= 0 && in_line_char_nr < 80)
+			{
+				vram_data = m_vram[vram_address];
+				if(vram_data&0x80)
+				{
+					m_attribute = (vram_data&0x70)>>4;
+				}
+			}
+
 			for(int line = 0; line < 14; line++)
 			{
 				// This is at the start of a 9-dot raster-line segment in a single character
@@ -555,7 +566,6 @@ uint32_t tandberg_tdv2100_disp_logic_device::screen_update(screen_device &screen
 				if(in_line_char_nr >= 0 && in_line_char_nr < 80)
 				{
 					bool const draw_cursor = (is_cursor && (line == 12 || block_cursor) && (!blinking_cursor || cursor_blink_strobe));
-					int const vram_data = m_vram[vram_address];
 
 					// Pattern generator & character blanking
 					if(m_video_enable && (vram_data&0x60 || !blank_ctrl_chars) && !(vram_data&0x80 && blank_attr_chars))
@@ -577,43 +587,36 @@ uint32_t tandberg_tdv2100_disp_logic_device::screen_update(screen_device &screen
 							dot_nr8 = 0x01;
 						}
 					}
-					else if(m_video_enable) // attribute mode
+					else if(m_video_enable && !(vram_data&0x80)) // attribute mode
 					{
-						if(vram_data&0x80)
+						if(latched_attribute == 2)
 						{
-							m_attribute = (vram_data&0x70)>>4;
+							// Low intensity
+							extra_intensity = 0;
 						}
-						else
+						else if(latched_attribute == 3 && blink_strobe && !draw_cursor)
 						{
-							if(m_attribute == 2)
-							{
-								// Low intensity
-								extra_intensity = 0;
-							}
-							else if(m_attribute == 3 && blink_strobe && !draw_cursor)
-							{
-								// Blink
-								data = 0x00;
-								dot_nr8 = 0x00;
-							}
-							else if(m_attribute == 4)
-							{
-								// Inverse
-								data = ~data;
-								dot_nr8 = ~dot_nr8;
-							}
-							else if(m_attribute == 5 && line == 13)
-							{
-								// Underline
-								data = 0xff;
-								dot_nr8 = 0x01;
-							}
-							else if(m_attribute == 6)
-							{
-								// Invissible
-								data = 0x00;
-								dot_nr8 = 0x00;
-							}
+							// Blink
+							data = 0x00;
+							dot_nr8 = 0x00;
+						}
+						else if(latched_attribute == 4)
+						{
+							// Inverse
+							data = ~data;
+							dot_nr8 = ~dot_nr8;
+						}
+						else if(latched_attribute == 5 && line == 13)
+						{
+							// Underline
+							data = 0xff;
+							dot_nr8 = 0x01;
+						}
+						else if(latched_attribute == 6)
+						{
+							// Invisible
+							data = 0x00;
+							dot_nr8 = 0x00;
 						}
 					}
 
