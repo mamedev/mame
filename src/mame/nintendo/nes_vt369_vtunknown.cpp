@@ -168,7 +168,10 @@ public:
 	void vt369_vtunknown_hh_swap_2mb(machine_config& config);
 	void vt369_vtunknown_hh_swap_512kb(machine_config& config);
 
+	void vt369_vtunknown_hh_altswap(machine_config& config);
 	void vt369_vtunknown_hh_altswap_8mb(machine_config& config);
+	void vt369_vtunknown_hh_altswap_16mb(machine_config& config);
+
 	void vt369_vtunknown_hh_vibesswap_8mb(machine_config& config);
 
 	void vt369_vtunknown_unk(machine_config& config);
@@ -469,7 +472,7 @@ void vt369_vtunknown_unk_state::vt369_vtunknown_hh_swap_8mb(machine_config &conf
 	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_unk_state::vt_external_space_map_8mbyte);
 }
 
-void vt369_vtunknown_unk_state::vt369_vtunknown_hh_altswap_8mb(machine_config &config)
+void vt369_vtunknown_unk_state::vt369_vtunknown_hh_altswap(machine_config &config)
 {
 	vt369_vtunknown_hh_swap_8mb(config);
 
@@ -477,7 +480,18 @@ void vt369_vtunknown_unk_state::vt369_vtunknown_hh_altswap_8mb(machine_config &c
 	configure_soc(m_soc);
 	m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB);
 	m_soc->force_bad_dma();
+}
+
+void vt369_vtunknown_unk_state::vt369_vtunknown_hh_altswap_8mb(machine_config &config)
+{
+	vt369_vtunknown_hh_altswap(config);
 	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_unk_state::vt_external_space_map_8mbyte);
+}
+
+void vt369_vtunknown_unk_state::vt369_vtunknown_hh_altswap_16mb(machine_config& config)
+{
+	vt369_vtunknown_hh_altswap(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_unk_state::vt_external_space_map_16mbyte);
 }
 
 void vt369_vtunknown_unk_state::vt369_vtunknown_hh_vibesswap_8mb(machine_config &config)
@@ -1109,7 +1123,7 @@ CONS( 200?, sealvt,    zonefusn,  0,  vt369_vtunknown_hh_16mb,     vt369_vtunkno
 // these 4 sets use a different opcode scramble at least
 CONS( 201?, red5mam,  0,  0,  vt369_vtunknown_hh_altswap_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "Red5", "Mini Arcade Machine (Red5, 'Xtra Game')", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
 CONS( 2016, dgun2593,  0,  0,  vt369_vtunknown_hh_altswap_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "dreamGEAR", "My Arcade Retro Arcade Machine - 300 Handheld Video Games (DGUN-2593)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
-CONS( 200?, gcs2mgp,   0,  0,  vt369_vtunknown_hh_altswap_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "Jungle's Soft", "Mini Game Player 48-in-1",  MACHINE_NOT_WORKING )
+CONS( 200?, gcs2mgp,   0,  0,  vt369_vtunknown_hh_altswap_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "Jungle's Soft", "Mini Game Player 48-in-1",  MACHINE_NOT_WORKING | ROT270 )
 // Not the same as the other 240-in-1 machine from Thumbs Up below (tup240) This one makes greater use of newer VT features with most games having sampled music, not APU sound.
 // Several of the games contained in here are buggy / broken on real hardware (see https://www.youtube.com/watch?v=-mgGNaDQ1HE )
 CONS( 201?, 240in1ar,  0,  0,  vt369_vtunknown_hh_altswap_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "Thumbs Up", "Mini Arcade Machine (Thumbs Up, 240IN1ARC)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
