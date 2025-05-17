@@ -265,7 +265,8 @@ bool hfe_format::eval_header(header_info& header, uint8_t* headerbytes, int driv
 	if (header.track_encoding > EMU_FM_ENCODING)
 	{
 		osd_printf_error("hxchfe: Unsupported track encoding 0x%02x.\n", header.track_encoding);
-		return false;
+		// Don't exit on a property that currently has only documentary value
+		// return false;
 	}
 
 	header.sample_rate = get_u16le(&headerbytes[12]);

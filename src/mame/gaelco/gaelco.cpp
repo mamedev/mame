@@ -1059,12 +1059,12 @@ ROM_END
 
 ROM_START( bioplayc ) // PCB - REF.922804/2?? - Spanish version
 	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
-	ROM_LOAD16_BYTE( "t.d18",  0x000000, 0x080000, CRC(ec518c6c) SHA1(8b96313582d252bebb4bcce8f2d993f751ad0a74) ) // v1.0.1823
-	ROM_LOAD16_BYTE( "t.d16",  0x000001, 0x080000, CRC(de4b031d) SHA1(d4bcdfedab1d48df0c48ffc775731a4981342c7a) ) // v1.0.1823
+	ROM_LOAD16_BYTE( "t.d18",   0x000000, 0x080000, CRC(ec518c6c) SHA1(8b96313582d252bebb4bcce8f2d993f751ad0a74) ) // v1.0.1823
+	ROM_LOAD16_BYTE( "t.d16",   0x000001, 0x080000, CRC(de4b031d) SHA1(d4bcdfedab1d48df0c48ffc775731a4981342c7a) ) // v1.0.1823
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	// weird gfx ordering
-	ROM_LOAD( "toy-high-3.h6",  0x040000, 0x040000, CRC(ab19a1ce) SHA1(3cc896f8c20f692b02d43db8c30f410bd93fe3ca))
+	ROM_LOAD( "toy-high-3.h6",  0x040000, 0x040000, CRC(ab19a1ce) SHA1(3cc896f8c20f692b02d43db8c30f410bd93fe3ca) )
 	ROM_CONTINUE(               0x0c0000, 0x040000 )
 	ROM_LOAD( "toy-low-3.j6",   0x000000, 0x040000, CRC(927f5cd7) SHA1(ad5e75091146ca7935a18e5dd045410e28d8b170) )
 	ROM_CONTINUE(               0x080000, 0x040000 )
@@ -1082,7 +1082,7 @@ ROM_START( bioplayc ) // PCB - REF.922804/2?? - Spanish version
 	ROM_CONTINUE(               0x380000, 0x040000 )
 
 	ROM_REGION( 0x100000, "oki", 0 )    // ADPCM samples - sound chip is OKIM6295
-	// Missing the audio rom, the board didn't have it populated. The programmer said it was not there because the audio was ripped from other games.
+	// Missing the audio ROM, the board didn't have it populated. The programmer said it was not there because the audio was ripped from other games.
 	ROM_LOAD( "c1", 0x000000, 0x080000, BAD_DUMP CRC(edf77532) SHA1(cf198b14c25e1b242a65af8ce23538404cd2b12d) ) // sldh
 	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
 	ROM_LOAD( "c3", 0x080000, 0x080000, BAD_DUMP CRC(c3aea660) SHA1(639d4195391e2608e94759e8a4385b518872263a) ) // sldh
@@ -1090,17 +1090,32 @@ ROM_END
 
 ROM_START( lastkm ) // PCB - REF 922804/2
 	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
-	ROM_LOAD16_BYTE(    "prog-bici-e-8.11.95.d18",  0x000000, 0x080000, CRC(1fc5fba0) SHA1(1f954fca9f25df7379eff4ea905810fa06fcebb0)) // 1.0.0275
-	ROM_LOAD16_BYTE(    "prog-bici-o-8.11.95.d16",  0x000001, 0x080000, CRC(b93e57e3) SHA1(df307191a214a32a26018ca2a9200742e39939d2)) // 1.0.0275
+	ROM_LOAD16_BYTE( "prog-bici-e-8.11.95.d18", 0x000000, 0x080000, CRC(1fc5fba0) SHA1(1f954fca9f25df7379eff4ea905810fa06fcebb0) ) // 1.0.0275
+	ROM_LOAD16_BYTE( "prog-bici-o-8.11.95.d16", 0x000001, 0x080000, CRC(b93e57e3) SHA1(df307191a214a32a26018ca2a9200742e39939d2) ) // 1.0.0275
 
 	ROM_REGION( 0x200000, "gfx", 0 )
-	ROM_LOAD( "bici-f3.h6",     0x000000, 0x080000, CRC(0bf9f213) SHA1(052abef60df419d32bf8a86c89d87e5bb281b4eb))
-	ROM_LOAD( "bici-f2.h7",     0x080000, 0x080000, CRC(c48d5376) SHA1(8e987839e7254e0fa631802733482726a289439c))
-	ROM_LOAD( "bici-f1.h9",     0x100000, 0x080000, CRC(e7958070) SHA1(7f065b429a500b714dfbf497b1353e90137abbd7))
-	ROM_LOAD( "bici-f0.h10",    0x180000, 0x080000, CRC(73d4b29f) SHA1(e2563562cb5fbaba7e0517ec9811645aca56f374))
+	ROM_LOAD( "bici-f3.h6",  0x000000, 0x080000, CRC(0bf9f213) SHA1(052abef60df419d32bf8a86c89d87e5bb281b4eb) )
+	ROM_LOAD( "bici-f2.h7",  0x080000, 0x080000, CRC(c48d5376) SHA1(8e987839e7254e0fa631802733482726a289439c) )
+	ROM_LOAD( "bici-f1.h9",  0x100000, 0x080000, CRC(e7958070) SHA1(7f065b429a500b714dfbf497b1353e90137abbd7) )
+	ROM_LOAD( "bici-f0.h10", 0x180000, 0x080000, CRC(73d4b29f) SHA1(e2563562cb5fbaba7e0517ec9811645aca56f374) )
 
 	ROM_REGION( 0x80000, "oki", 0 )    // ADPCM samples - sound chip is OKIM6295
-	ROM_LOAD( "sonido-bici-0-8.11.95.c1", 0x000000, 0x080000, CRC(7380c963) SHA1(d1d90912f986b944cd95bd773c9f5502d837ce3e))
+	ROM_LOAD( "sonido-bici-0-8.11.95.c1", 0x000000, 0x080000, CRC(7380c963) SHA1(d1d90912f986b944cd95bd773c9f5502d837ce3e) )
+ROM_END
+
+ROM_START( lastkma )
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "bici_zeus_0_20-2_27c040.bin", 0x000000, 0x080000, CRC(6a4a982c) SHA1(d7804b0100445740001d2938f6536fc5e857691c) )
+	ROM_LOAD16_BYTE( "bici_zeus_1_20-2_27c040.bin", 0x000001, 0x080000, CRC(b63eb33e) SHA1(64bda2bd14b2ff27ed291a6367ad82c2b781c4e6) )
+
+	ROM_REGION( 0x200000, "gfx", 0 )
+	ROM_LOAD( "bici-f3.h6",  0x000000, 0x080000, CRC(0bf9f213) SHA1(052abef60df419d32bf8a86c89d87e5bb281b4eb) )
+	ROM_LOAD( "bici-f2.h7",  0x080000, 0x080000, CRC(c48d5376) SHA1(8e987839e7254e0fa631802733482726a289439c) )
+	ROM_LOAD( "bici-f1.h9",  0x100000, 0x080000, CRC(e7958070) SHA1(7f065b429a500b714dfbf497b1353e90137abbd7) )
+	ROM_LOAD( "bici-f0.h10", 0x180000, 0x080000, CRC(73d4b29f) SHA1(e2563562cb5fbaba7e0517ec9811645aca56f374) )
+
+	ROM_REGION( 0x80000, "oki", 0 )    // ADPCM samples - sound chip is OKIM6295
+	ROM_LOAD( "sonido-bici-0-8.11.95.c1", 0x000000, 0x080000, CRC(7380c963) SHA1(d1d90912f986b944cd95bd773c9f5502d837ce3e) )
 ROM_END
 
 /*
@@ -1239,5 +1254,6 @@ GAME( 1994, biomtoyc, biomtoy,  maniacsq, biomtoyc, gaelco_state,   empty_init, 
 GAME( 1994, bioplayc, biomtoy,  maniacsq, bioplayc, gaelco_state,   empty_init, ROT0, "Gaelco / Zeus", "Bioplaything Cop (ver. 1.0.1823, checksum cd960fc9, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // copyright based on Ver. 1.0.1870
 GAME( 1992, maniacsp, 0,        maniacsq, maniacsq, gaelco_state,   empty_init, ROT0, "Gaelco",        "Maniac Square (ver 1.0, checksum b602, prototype)",              MACHINE_SUPPORTS_SAVE ) // The prototype version was an earlier project, said to be from 1992, game was rewritten in 1996
 GAME( 1995, lastkm,   0,        maniacsq, lastkm,   gaelco_state,   empty_init, ROT0, "Gaelco / Zeus", "Last KM (ver 1.0.0275, checksum 13bff751, prototype)",           MACHINE_SUPPORTS_SAVE ) // Similar 'bike controller' idea to the Salter gym equipment Gaelco developed, but in game form
+GAME( 1995, lastkma,  lastkm,   maniacsq, lastkm,   gaelco_state,   empty_init, ROT0, "Gaelco / Zeus", "Last KM (ver 1.0.0227, checksum 747a7443, prototype)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1992, squash,   0,        squash,   squash,   squash_state,   empty_init, ROT0, "Gaelco",        "Squash (ver. 1.0, checksum 015aef61)",                           MACHINE_SUPPORTS_SAVE )
 GAME( 1992, thoop,    0,        thoop,    thoop,    squash_state,   empty_init, ROT0, "Gaelco",        "Thunder Hoop (ver. 1, checksum 02a09f7d)",                       MACHINE_SUPPORTS_SAVE ) // could be other versions, still Ver. 1 but different checksum listed on boot

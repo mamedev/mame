@@ -49,6 +49,11 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 
 @implementation MAMEDebugView
+{
+	// workaround for the bug that prevents the console view from scrolling
+	// to the bottom when the console window is not full yet
+	BOOL ignoreNextFrameUpdate;
+}
 
 + (void)initialize {
 	// 10.15 and better get full adaptive Dark Mode support
@@ -298,24 +303,21 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 - (void)update {
 	// resize our frame if the total size has changed
 	debug_view_xy const newSize = view->total_size();
-	BOOL const resized = (newSize.x != totalWidth) || (newSize.y != totalHeight);
-	if (resized)
+	NSScrollView *const scroller = [self enclosingScrollView];
+	if (scroller)
 	{
-		NSScrollView *const scroller = [self enclosingScrollView];
-		if (scroller)
-		{
-			NSSize const clip = [[scroller contentView] bounds].size;
-			NSSize content = NSMakeSize((fontWidth * newSize.x) + (2 * [textContainer lineFragmentPadding]),
-										fontHeight * newSize.y);
-			if (wholeLineScroll)
-				content.height += (fontHeight * 2) - 1;
-			[self setFrameSize:NSMakeSize(ceil(std::max(clip.width, content.width)),
-										  ceil(std::max(clip.height, content.height)))];
-			[scroller reflectScrolledClipView:[scroller contentView]];
-		}
-		totalWidth = newSize.x;
-		totalHeight = newSize.y;
+		NSSize const clip = [[scroller contentView] bounds].size;
+		NSSize content = NSMakeSize((fontWidth * newSize.x) + (2 * [textContainer lineFragmentPadding]),
+									fontHeight * newSize.y);
+		if (wholeLineScroll)
+			content.height += (fontHeight * 2) - 1;
+		[self setFrameSize:NSMakeSize(ceil(std::max(clip.width, content.width)),
+									  ceil(std::max(clip.height, content.height)))];
+		ignoreNextFrameUpdate = YES;
+		[scroller reflectScrolledClipView:[scroller contentView]];
 	}
+	totalWidth = newSize.x;
+	totalHeight = newSize.y;
 
 	// scroll the view if we're being told to
 	debug_view_xy const newOrigin = view->visible_position();
@@ -476,6 +478,12 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 
 - (void)viewFrameDidChange:(NSNotification *)notification {
+	if (ignoreNextFrameUpdate) {
+		ignoreNextFrameUpdate = NO;
+		return;
+	}
+	ignoreNextFrameUpdate = NO;
+
 	NSView *const changed = [notification object];
 	if (changed == [[self enclosingScrollView] contentView])
 		[self adjustSizeAndRecomputeVisible];

@@ -4456,10 +4456,10 @@ ROM_START( swtrilgy )   /* Step 2.1, Sega game ID# is 833-13586, ROM board ID# 8
 	ROM_LOAD16_WORD_SWAP( "mpr-21355.22", 0x000000, 0x400000, CRC(c1b2d326) SHA1(118d9e02cdb9f500bd677b1de8331b29c57ca02f) )
 	ROM_LOAD16_WORD_SWAP( "mpr-21357.24", 0x400000, 0x400000, CRC(02703fab) SHA1(c312f3d7967229660a7fb81b4fcd16c204d671cd) )
 
-	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
+	ROM_REGION( 0x20000, "dsb2:mpegcpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "epr-21384.2", 0x000000, 0x20000, CRC(12fa4780) SHA1(a10ce82d81045cc49efcfba490693d06aeced3ae) )
 
-	ROM_REGION( 0x1000000, "dsb", 0 )   /* DSB samples */
+	ROM_REGION( 0x1000000, "dsb2:mpeg", 0 )
 	ROM_LOAD( "mpr-21375.18", 0x000000, 0x400000, CRC(735157a9) SHA1(d1ff5dc7a6be8c8b0b6ba33fdf353c2008507afc) )
 	ROM_LOAD( "mpr-21376.20", 0x400000, 0x400000, CRC(e635f81e) SHA1(3eb4243fd275946ce0e85d074abd59b5ed31bbcd) )
 	ROM_LOAD( "mpr-21377.22", 0x800000, 0x400000, CRC(720621f8) SHA1(191bd8159010c172a82159d0ebfa56637c2a8462) )
@@ -4526,10 +4526,10 @@ ROM_START( swtrilgya )  /* Step 2.1, Sega game ID# is 833-13586, ROM board ID# 8
 	ROM_LOAD16_WORD_SWAP( "mpr-21355.22", 0x000000, 0x400000, CRC(c1b2d326) SHA1(118d9e02cdb9f500bd677b1de8331b29c57ca02f) )
 	ROM_LOAD16_WORD_SWAP( "mpr-21357.24", 0x400000, 0x400000, CRC(02703fab) SHA1(c312f3d7967229660a7fb81b4fcd16c204d671cd) )
 
-	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
+	ROM_REGION( 0x20000, "dsb2:mpegcpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "epr-21384.2", 0x000000, 0x20000, CRC(12fa4780) SHA1(a10ce82d81045cc49efcfba490693d06aeced3ae) )
 
-	ROM_REGION( 0x1000000, "dsb", 0 )   /* DSB samples */
+	ROM_REGION( 0x1000000, "dsb2:mpeg", 0 )
 	ROM_LOAD( "mpr-21375.18", 0x000000, 0x400000, CRC(735157a9) SHA1(d1ff5dc7a6be8c8b0b6ba33fdf353c2008507afc) )
 	ROM_LOAD( "mpr-21376.20", 0x400000, 0x400000, CRC(e635f81e) SHA1(3eb4243fd275946ce0e85d074abd59b5ed31bbcd) )
 	ROM_LOAD( "mpr-21377.22", 0x800000, 0x400000, CRC(720621f8) SHA1(191bd8159010c172a82159d0ebfa56637c2a8462) )
@@ -4587,10 +4587,10 @@ ROM_START( swtrilgyp )  // Step 2.1, Sega game ID# is 833-13586-T, ROM board ID#
 	ROM_LOAD16_WORD_SWAP( "epr-srom3.24", 0x400000, 0x400000, CRC(841ed823) SHA1(450b255184b503351f17ffb3b5776634ec4f02e6) )
 
 	// prototype DSB is missing, we use ROMs from final ver
-	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
+	ROM_REGION( 0x20000, "dsb2:mpegcpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "epr-21384.2", 0x000000, 0x20000, CRC(12fa4780) SHA1(a10ce82d81045cc49efcfba490693d06aeced3ae) )
 
-	ROM_REGION( 0x1000000, "dsb", 0 )   /* DSB samples */
+	ROM_REGION( 0x1000000, "dsb2:mpeg", 0 )
 	ROM_LOAD( "mpr-21375.18", 0x000000, 0x400000, CRC(735157a9) SHA1(d1ff5dc7a6be8c8b0b6ba33fdf353c2008507afc) )
 	ROM_LOAD( "mpr-21376.20", 0x400000, 0x400000, CRC(e635f81e) SHA1(3eb4243fd275946ce0e85d074abd59b5ed31bbcd) )
 	ROM_LOAD( "mpr-21377.22", 0x800000, 0x400000, CRC(720621f8) SHA1(191bd8159010c172a82159d0ebfa56637c2a8462) )
@@ -4964,10 +4964,10 @@ ROM_START( daytona2 )   /* Step 2.1, Sega game ID# is 833-13427, ROM board ID# 8
 	ROM_LOAD16_WORD_SWAP( "mpr-20867.23", 0x800000, 0x400000, CRC(a579c884) SHA1(ffa626381b1b2c0b963f8f0bad508c052364e657) )
 	ROM_LOAD16_WORD_SWAP( "mpr-20869.25", 0xc00000, 0x400000, CRC(1f338832) SHA1(77160ea4d336aa88725b868c0035a267e92030b3) )
 
-	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
-	ROM_LOAD( "epr-20886.ic2", 0x000000, 0x020000, CRC(65b05f98) SHA1(b83a2a6e7ec3d2fcd34ce701ffa66d99f6feb86d) )
+	ROM_REGION( 0x20000, "dsb2:mpegcpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "epr-20886.ic2", 0x000000, 0x020000, CRC(65b05f98) SHA1(b83a2a6e7ec3d2fcd34ce701ffa66d99f6feb86d) )
 
-	ROM_REGION( 0x1000000, "dsb", 0 )   /* DSB samples */
+	ROM_REGION( 0x1000000, "dsb2:mpeg", 0 )
 	ROM_LOAD( "mpr-20887.ic18", 0x000000, 0x400000, CRC(a0757684) SHA1(9222527d90b3f462846a4fff95af83011871c277) )
 	ROM_LOAD( "mpr-20888.ic20", 0x400000, 0x400000, CRC(b495fe65) SHA1(1573ced683534bb279a6dd69f6460745b728eac0) )
 	ROM_LOAD( "mpr-20889.ic22", 0x800000, 0x400000, CRC(18eec79e) SHA1(341982d89952ed85c921c627c294609bf83ec44b) )
@@ -5041,10 +5041,10 @@ ROM_START( dayto2pe )   /* Step 2.1, Sega game ID# is 833-13610 DAYTONA USA2 SP,
 	ROM_LOAD16_WORD_SWAP( "mpr-21286.23", 0x800000, 0x400000, CRC(749dfef0) SHA1(43032b465f426188a6d718f22a11c6d9a79f7577) )
 	ROM_LOAD16_WORD_SWAP( "mpr-21288.25", 0xc00000, 0x400000, CRC(14bee38e) SHA1(68300bf663ec3f597c73e7a39ca7057cf51a7a47) )
 
-	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
-	ROM_LOAD( "epr-20886.ic2", 0x000000, 0x020000, CRC(65b05f98) SHA1(b83a2a6e7ec3d2fcd34ce701ffa66d99f6feb86d) )
+	ROM_REGION( 0x20000, "dsb2:mpegcpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "epr-20886.ic2", 0x000000, 0x020000, CRC(65b05f98) SHA1(b83a2a6e7ec3d2fcd34ce701ffa66d99f6feb86d) )
 
-	ROM_REGION( 0x1000000, "dsb", 0 )   /* DSB samples */
+	ROM_REGION( 0x1000000, "dsb2:mpeg", 0 )
 	ROM_LOAD( "mpr-20887.ic18", 0x000000, 0x400000, CRC(a0757684) SHA1(9222527d90b3f462846a4fff95af83011871c277) )
 	ROM_LOAD( "mpr-20888.ic20", 0x400000, 0x400000, CRC(b495fe65) SHA1(1573ced683534bb279a6dd69f6460745b728eac0) )
 	ROM_LOAD( "mpr-20889.ic22", 0x800000, 0x400000, CRC(18eec79e) SHA1(341982d89952ed85c921c627c294609bf83ec44b) )
@@ -5110,10 +5110,10 @@ ROM_START( srally2 )    /* Step 2.0, Sega game ID# is 833-13373, ROM board ID# 8
 	ROM_LOAD16_WORD_SWAP( "mpr-20614.22", 0x000000, 0x400000, CRC(a3930e4a) SHA1(6a34f5b7817db8304454235997eaa453528bc655) )
 	ROM_LOAD16_WORD_SWAP( "mpr-20615.24", 0x400000, 0x400000, CRC(62e8a94a) SHA1(abed71b1c6eb2563fe58e6598c10dd266340e5e0) )
 
-	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
-	ROM_LOAD( "epr-20641.2", 0x000000, 0x020000, CRC(c9b82035) SHA1(1e438f8104f79c2956bb1aeb710b01b6dc59101e) )
+	ROM_REGION( 0x20000, "dsb2:mpegcpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "epr-20641.2", 0x000000, 0x020000, CRC(c9b82035) SHA1(1e438f8104f79c2956bb1aeb710b01b6dc59101e) )
 
-	ROM_REGION( 0x1000000, "dsb", 0 )   /* DSB samples */
+	ROM_REGION( 0x1000000, "dsb2:mpeg", 0 )
 	ROM_LOAD( "mpr-20637.57", 0x000000, 0x400000, CRC(d66e8a02) SHA1(f5d2bf4c97139fa56d14ffe2885a86e8f17ee965) )
 	ROM_LOAD( "mpr-20638.58", 0x400000, 0x400000, CRC(d1513382) SHA1(b4d5b7680e2e73b361530d689ffdb0bab62e9ee4) )
 	ROM_LOAD( "mpr-20639.59", 0x800000, 0x400000, CRC(f6603b7b) SHA1(9f31a2562168e5eba51864935e1c15db4e3114fb) )
@@ -5176,10 +5176,10 @@ ROM_START( srally2p ) // prototype 1997/12/29
 	ROM_LOAD16_WORD_SWAP( "mpr-20614.22", 0x000000, 0x400000, CRC(a3930e4a) SHA1(6a34f5b7817db8304454235997eaa453528bc655) )
 	ROM_LOAD16_WORD_SWAP( "mpr-20615.24", 0x400000, 0x400000, CRC(62e8a94a) SHA1(abed71b1c6eb2563fe58e6598c10dd266340e5e0) )
 
-	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
-	ROM_LOAD( "ic2.2", 0x000000, 0x020000, CRC(61c3f8bc) SHA1(b6d04e286f96206d22a711b5f13cfa01f5c163ac) )
+	ROM_REGION( 0x20000, "dsb2:mpegcpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "ic2.2", 0x000000, 0x020000, CRC(61c3f8bc) SHA1(b6d04e286f96206d22a711b5f13cfa01f5c163ac) )
 
-	ROM_REGION( 0x1000000, "dsb", 0 )   /* DSB samples */
+	ROM_REGION( 0x1000000, "dsb2:mpeg", 0 )
 	ROM_LOAD( "mpr-20637.57", 0x000000, 0x400000, CRC(d66e8a02) SHA1(f5d2bf4c97139fa56d14ffe2885a86e8f17ee965) )
 	ROM_LOAD( "mpr-20638.58", 0x400000, 0x400000, CRC(d1513382) SHA1(b4d5b7680e2e73b361530d689ffdb0bab62e9ee4) )
 	ROM_LOAD( "mpr-20639.59", 0x800000, 0x400000, CRC(f6603b7b) SHA1(9f31a2562168e5eba51864935e1c15db4e3114fb) )
@@ -5242,10 +5242,10 @@ ROM_START( srally2pa ) // prototype 1997/12/08
 	ROM_LOAD16_WORD_SWAP( "mpr-20614.22", 0x000000, 0x400000, CRC(a3930e4a) SHA1(6a34f5b7817db8304454235997eaa453528bc655) )
 	ROM_LOAD16_WORD_SWAP( "mpr-20615.24", 0x400000, 0x400000, CRC(62e8a94a) SHA1(abed71b1c6eb2563fe58e6598c10dd266340e5e0) )
 
-	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
-	ROM_LOAD( "ic2.2", 0x000000, 0x020000, CRC(61c3f8bc) SHA1(b6d04e286f96206d22a711b5f13cfa01f5c163ac) )
+	ROM_REGION( 0x20000, "dsb2:mpegcpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "ic2.2", 0x000000, 0x020000, CRC(61c3f8bc) SHA1(b6d04e286f96206d22a711b5f13cfa01f5c163ac) )
 
-	ROM_REGION( 0x1000000, "dsb", 0 )   /* DSB samples */
+	ROM_REGION( 0x1000000, "dsb2:mpeg", 0 )
 	ROM_LOAD( "mpr-20637.57", 0x000000, 0x400000, CRC(d66e8a02) SHA1(f5d2bf4c97139fa56d14ffe2885a86e8f17ee965) )
 	ROM_LOAD( "mpr-20638.58", 0x400000, 0x400000, CRC(d1513382) SHA1(b4d5b7680e2e73b361530d689ffdb0bab62e9ee4) )
 	ROM_LOAD( "mpr-20639.59", 0x800000, 0x400000, CRC(f6603b7b) SHA1(9f31a2562168e5eba51864935e1c15db4e3114fb) )
@@ -5308,10 +5308,11 @@ ROM_START( srally2dx )   /* Step 2.0, Sega game ID# is 833-13371, ROM board ID# 
 	ROM_LOAD16_WORD_SWAP( "mpr-20484.22", 0x000000, 0x400000, CRC(8ac3fbc4) SHA1(8b7624506ff00256a745bb4b7393cf17a081faa4) )
 	ROM_LOAD16_WORD_SWAP( "mpr-20485.24", 0x400000, 0x400000, CRC(cfd8c19b) SHA1(3b8cc045cb02b93f9d35b81a48085d4d480d6bff) )
 
-	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
+	// TODO: missing dump?
+	ROM_REGION( 0x20000, "dsb2:mpegcpu", 0 )
 	ROM_FILL( 0x000000, 0x20000, 0x0000 )
 
-	ROM_REGION( 0x1000000, "dsb", 0 )   /* DSB samples */
+	ROM_REGION( 0x1000000, "dsb2:mpeg", 0 )
 	ROM_FILL( 0x000000, 0x1000000, 0x0000 )
 
 	ROM_REGION( 0x10000, "drivebd", 0 ) /* drive board ROM */
@@ -5647,10 +5648,10 @@ ROM_START( spikeout )   /* Step 2.1, Sega game ID# is 833-13592, ROM board ID# 8
 	ROM_LOAD16_WORD_SWAP( "mpr-21151.23", 0x800000, 0x400000, CRC(599527b9) SHA1(bc124f916a72c85a1f2a10ababc4254adc951697) )
 	ROM_LOAD16_WORD_SWAP( "mpr-21153.25", 0xc00000, 0x400000, CRC(4155f307) SHA1(420a7b9d1a4aca9ff31ff7af7c8cea00963756af) )
 
-	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
-	ROM_LOAD( "epr-21219.ic2", 0x00000, 0x20000, CRC(4e042b21) SHA1(90937659702ddcda1bdbb623a38bf26c3b29f9d9) )
+	ROM_REGION( 0x20000, "dsb2:mpegcpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "epr-21219.ic2", 0x00000, 0x20000, CRC(4e042b21) SHA1(90937659702ddcda1bdbb623a38bf26c3b29f9d9) )
 
-	ROM_REGION( 0x1000000, "dsb", 0 )   /* DSB samples */
+	ROM_REGION( 0x1000000, "dsb2:mpeg", 0 )
 	ROM_LOAD( "mpr-21170.ic18",  0x000000, 0x400000, CRC(f51f7ce3) SHA1(38b853b0545196e2c95822f572afb46a0a5d4c6c) )
 	ROM_LOAD( "mpr-21171.ic20",  0x400000, 0x400000, CRC(8d3bd5b6) SHA1(42167dd53e4562869382ec1c8a00b69d1fd4602a) )
 	ROM_LOAD( "mpr-21172.ic22",  0x800000, 0x400000, CRC(be221e27) SHA1(cf396d0145172a0492bf4203a7ff12c5c8480c0c) )
@@ -5721,10 +5722,10 @@ ROM_START( spikeofe )   /* Step 2.1, Sega game ID# is 833-13746, ROM board ID# 8
 	ROM_LOAD16_WORD_SWAP( "mpr-21631.23", 0x800000, 0x400000, CRC(299036c5) SHA1(861f5d6579ee0fba1793140468194c2ef0fd0b7f) )
 	ROM_LOAD16_WORD_SWAP( "mpr-21632.25", 0xc00000, 0x400000, CRC(ff162f0d) SHA1(e62dcf68a4bfe8087d0ab508468fd016ace1f9c5) )
 
-	ROM_REGION( 0x20000, "cpu2", 0 )    /* Z80 code */
-	ROM_LOAD( "epr-21658.ic2", 0x00000, 0x20000, CRC(50bad8cb) SHA1(83947cbf8f074e6f15055917502a77f198123efe) )
+	ROM_REGION( 0x20000, "dsb2:mpegcpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "epr-21658.ic2", 0x00000, 0x20000, CRC(50bad8cb) SHA1(83947cbf8f074e6f15055917502a77f198123efe) )
 
-	ROM_REGION( 0x1000000, "dsb", 0 )   /* DSB samples */
+	ROM_REGION( 0x1000000, "dsb2:mpeg", 0 )
 	ROM_LOAD( "mpr-21649.ic18",  0x000000, 0x400000, CRC(dac87f47) SHA1(429734ba3d97162e175a074249baf7c7a1aecdee) )
 	ROM_LOAD( "mpr-21650.ic20",  0x400000, 0x400000, CRC(86d90123) SHA1(1e90fb0242fbb032825684e763a5ebb329f63869) )
 	ROM_LOAD( "mpr-21651.ic22",  0x800000, 0x400000, CRC(81715565) SHA1(533deefed3565e7373a0aa2d043ea10e43e78b71) )
@@ -6323,6 +6324,20 @@ void model3_state::add_cpu_166mhz(machine_config &config)
 
 #define VIDEO_CLOCK         XTAL(32'000'000)
 
+void model3_state::dsb2_config(machine_config &config)
+{
+	DSB2(config, m_dsb2, 0);
+	m_dsb2->add_route(0, "speaker", 1.0, 0);
+	m_dsb2->add_route(1, "speaker", 1.0, 1);
+
+	I8251(config, m_uart, 8000000); // uPD71051
+	m_uart->txd_handler().set(m_dsb2, FUNC(dsb2_device::write_txd));
+
+	clock_device &uart_clock(CLOCK(config, "uart_clock", 500000)); // 16 times 31.25MHz (standard Sega/MIDI sound data rate)
+	uart_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
+	uart_clock.signal_handler().append(m_uart, FUNC(i8251_device::write_rxc));
+}
+
 void model3_state::add_base_devices(machine_config &config)
 {
 	M68000(config, m_audiocpu, 45.1584_MHz_XTAL / 4); // SCSP Clock / 2
@@ -6476,6 +6491,9 @@ void model3_state::lostwsga(machine_config &config)
 	m_io->serial_ch1_wr_callback().set(FUNC(model3_state::lostwsga_ser1_w));
 	m_io->serial_ch2_rd_callback().set(FUNC(model3_state::lostwsga_ser2_r));
 	m_io->serial_ch2_wr_callback().set(FUNC(model3_state::lostwsga_ser2_w));
+
+	// On deluxe cabs only?
+	//dsb2_config(config);
 }
 
 void model3_state::model3_20(machine_config &config)
@@ -6495,6 +6513,12 @@ void model3_state::model3_20_5881(machine_config &config)
 	add_crypt_devices(config);
 }
 
+void model3_state::srally2(machine_config &config)
+{
+	model3_20(config);
+	dsb2_config(config);
+}
+
 void model3_state::model3_21(machine_config &config)
 {
 	add_cpu_166mhz(config);
@@ -6506,10 +6530,34 @@ void model3_state::model3_21(machine_config &config)
 	M3COMM(config, "comm_board", 0);
 }
 
+void model3_state::swtrilgyp(machine_config &config)
+{
+	model3_21(config);
+	dsb2_config(config);
+}
+
 void model3_state::model3_21_5881(machine_config &config)
 {
 	model3_21(config);
 	add_crypt_devices(config);
+}
+
+void model3_state::daytona2(machine_config &config)
+{
+	model3_21_5881(config);
+	dsb2_config(config);
+}
+
+void model3_state::spikeout(machine_config &config)
+{
+	model3_21_5881(config);
+	dsb2_config(config);
+}
+
+void model3_state::swtrilgy(machine_config &config)
+{
+	model3_21_5881(config);
+	dsb2_config(config);
 }
 
 uint16_t model3_state::crypt_read_callback(uint32_t addr)
@@ -6780,7 +6828,7 @@ void model3_state::init_swtrilga()
 	//rom[(0xf6dd0^4)/4] = 0x60000000; // skip force feedback check
 }
 
-void model3_state::init_swtrilgp()
+void model3_state::init_swtrilgyp()
 {
 	uint32_t *rom = (uint32_t*)memregion("user1")->base();
 	init_model3_20();
@@ -6940,9 +6988,9 @@ GAME( 1998, lamachin,          0, model3_20_5881, model3,   model3_state, init_l
 GAME( 1998, oceanhun,          0, model3_20_5881, model3,   model3_state, init_oceanhun, ROT0, "Sega", "The Ocean Hunter (Japan, Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, oceanhuna,  oceanhun, model3_20_5881, model3,   model3_state, init_oceanhun, ROT0, "Sega", "The Ocean Hunter (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, skichamp,          0, model3_20,      skichamp, model3_state, init_skichamp, ROT0, "Sega", "Ski Champ (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, srally2,           0, model3_20,      scud,     model3_state,  init_srally2, ROT0, "Sega", "Sega Rally 2 (Export)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // No region specified or selectable
-GAME( 1998, srally2p,    srally2, model3_20,      scud,     model3_state,init_model3_20, ROT0, "Sega", "Sega Rally 2 (prototype, 29 Dec 1997)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // need specific JTAG access patches
-GAME( 1998, srally2pa,   srally2, model3_20,      scud,     model3_state,init_model3_20, ROT0, "Sega", "Sega Rally 2 (prototype, 8 Dec 1997)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // need specific JTAG access patches
+GAME( 1998, srally2,           0, srally2,        scud,     model3_state,  init_srally2, ROT0, "Sega", "Sega Rally 2 (Export)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // No region specified or selectable
+GAME( 1998, srally2p,    srally2, srally2,        scud,     model3_state,init_model3_20, ROT0, "Sega", "Sega Rally 2 (prototype, 29 Dec 1997)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // need specific JTAG access patches
+GAME( 1998, srally2pa,   srally2, srally2,        scud,     model3_state,init_model3_20, ROT0, "Sega", "Sega Rally 2 (prototype, 8 Dec 1997)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // need specific JTAG access patches
 GAME( 1998, srally2dx,   srally2, model3_20,      scud,     model3_state,init_model3_20, ROT0, "Sega", "Sega Rally 2 Deluxe (Export)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // need specific JTAG access patches
 GAME( 1998, von2,              0, model3_20_5881, von2,     model3_state,     init_von2, ROT0, "Sega", "Virtual On 2: Oratorio Tangram (Japan, Revision B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // No region specified or selectable
 GAME( 1998, von2a,          von2, model3_20_5881, von2,     model3_state,     init_von2, ROT0, "Sega", "Virtual On 2: Oratorio Tangram (Japan, Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // No region specified or selectable
@@ -6957,18 +7005,18 @@ GAME( 1998, vs299,       vs2v991, model3_20_5881, model3,   model3_state,    ini
 GAME( 1998, vs299j,      vs2v991, model3_20_5881, model3,   model3_state,    init_vs299, ROT0, "Sega", "Virtua Striker 2 '99.1 (Japan, Revision B)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // shows Virtua Striker 2 Version '99.1 icon during demo
 
 /* Model 3 Step 2.1 */
-GAME( 1998, daytona2,          0, model3_21_5881, daytona2, model3_state, init_daytona2, ROT0, "Sega", "Daytona USA 2: Battle on the Edge (Japan, Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, dayto2pe,          0, model3_21_5881, daytona2, model3_state, init_dayto2pe, ROT0, "Sega", "Daytona USA 2: Power Edition (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, daytona2,          0, daytona2,       daytona2, model3_state, init_daytona2, ROT0, "Sega", "Daytona USA 2: Battle on the Edge (Japan, Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, dayto2pe,          0, daytona2,       daytona2, model3_state, init_dayto2pe, ROT0, "Sega", "Daytona USA 2: Power Edition (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, dirtdvls,          0, model3_21_5881, scud,     model3_state, init_dirtdvls, ROT0, "Sega", "Dirt Devils (Export, Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, dirtdvlsu,  dirtdvls, model3_21_5881, scud,     model3_state, init_dirtdvls, ROT0, "Sega", "Dirt Devils (USA, Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, dirtdvlsau, dirtdvls, model3_21_5881, scud,     model3_state, init_dirtdvls, ROT0, "Sega", "Dirt Devils (Australia, Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, dirtdvlsj,  dirtdvls, model3_21_5881, scud,     model3_state, init_dirtdvls, ROT0, "Sega", "Dirt Devils (Japan, Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, dirtdvlsg,  dirtdvls, model3_21_5881, scud,     model3_state, init_dirtdvls, ROT0, "Sega", "Dirt Devils (Export, Ver. G?)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Game Assignments shows EXPORT
-GAME( 1998, swtrilgy,          0, model3_21_5881, swtrilgy, model3_state, init_swtrilgy, ROT0, "Sega / LucasArts", "Star Wars Trilogy Arcade (Export, Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, swtrilgya,  swtrilgy, model3_21_5881, swtrilgy, model3_state, init_swtrilga, ROT0, "Sega / LucasArts", "Star Wars Trilogy Arcade (Export)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, swtrilgyp,  swtrilgy, model3_21,      swtrilgy, model3_state, init_swtrilgp, ROT0, "Sega / LucasArts", "Star Wars Trilogy Arcade (location test, 16.09.98)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Japan, USA, Australia, Korea, Export
-GAME( 1998, spikeout,          0, model3_21_5881, model3,   model3_state, init_spikeout, ROT0, "Sega", "Spikeout (Export, Revision C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1999, spikeofe,          0, model3_21_5881, model3,   model3_state, init_spikeofe, ROT0, "Sega", "Spikeout Final Edition (Export)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, swtrilgy,          0, swtrilgy,       swtrilgy, model3_state, init_swtrilgy, ROT0, "Sega / LucasArts", "Star Wars Trilogy Arcade (Export, Revision A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, swtrilgya,  swtrilgy, swtrilgy,       swtrilgy, model3_state, init_swtrilga, ROT0, "Sega / LucasArts", "Star Wars Trilogy Arcade (Export)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, swtrilgyp,  swtrilgy, swtrilgyp,      swtrilgy, model3_state, init_swtrilgyp, ROT0, "Sega / LucasArts", "Star Wars Trilogy Arcade (location test, 16.09.98)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Japan, USA, Australia, Korea, Export
+GAME( 1998, spikeout,          0, spikeout,       model3,   model3_state, init_spikeout, ROT0, "Sega", "Spikeout (Export, Revision C)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1999, spikeofe,          0, spikeout,       model3,   model3_state, init_spikeofe, ROT0, "Sega", "Spikeout Final Edition (Export)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, magtruck,          0, model3_21_5881, eca,      model3_state, init_magtruck, ROT0, "Sega", "Magical Truck Adventure (Export)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1999, eca,               0, model3_21_5881, eca,      model3_state, init_eca,      ROT0, "Sega", "Emergency Call Ambulance (Export)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1999, ecaj,            eca, model3_21_5881, eca,      model3_state, init_eca,      ROT0, "Sega", "Emergency Call Ambulance (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

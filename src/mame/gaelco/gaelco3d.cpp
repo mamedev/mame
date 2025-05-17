@@ -1381,7 +1381,97 @@ Gaelco Football, with two accelerometers and a PIC.
   |                |
   |________________|
 */
-ROM_START( footbpow ) // Version 1.2 - REF. 000208 ROM board
+ROM_START( footbpow ) // Version 4.6
+	ROM_REGION( 0x200000, "maincpu", 0 )    // 68020 code
+	ROM_LOAD32_BYTE( "p_ic7_2431_3c9c_28-2_27c040.ic7",        0x000000, 0x80000, CRC(0f4baf2e) SHA1(d4bacc5d1d1dd901075ef125c2e9014f93710e04) )
+	ROM_LOAD32_BYTE( "p_ic12_1623_f0fb_28-2_27c040.ic12",      0x000001, 0x80000, CRC(a256a726) SHA1(421e1ec1da1f7cc8631a70256fb0b0ee282a6fc3) )
+	ROM_LOAD32_BYTE( "p_ic13_0815_4ab5_28-2_27c040.ic13",      0x000002, 0x80000, CRC(d5865820) SHA1(a9c7ec43b3487a12ade325544efe800988dacbec) )
+	ROM_LOAD32_BYTE( "p_ic19_0007_54c5_28-2_wait_27c040.ic19", 0x000003, 0x80000, CRC(48de8155) SHA1(da39621a1f65b48ad7e5dc9f15a00a7a24700143) )
+
+	ROM_REGION16_LE( 0x400000, "adsprom", 0 ) // ADSP-2115 code & data
+	ROM_LOAD( "fop_ic23.ic23", 0x0000000, 0x400000, CRC(3c02f7c6) SHA1(2325f2a1b260ac60929c82640ced481ad67bb2e0) )
+
+	ROM_REGION32_LE( 0x1000000, "tmsrom", 0 )
+	ROM_LOAD32_WORD( "fop_ic48.ic48", 0x000000, 0x800000, CRC(efddf5c1) SHA1(1014b0193d17de05ebcc733fc5d26089b932385b) )
+	ROM_LOAD32_WORD( "fop_ic42.ic42", 0x000002, 0x800000, CRC(8772e536) SHA1(530dfb4e27466bd97582c4fd50af01f14716ed2b) )
+
+	ROM_REGION( 0x2000000, "texture", 0 )
+	ROM_LOAD( "fop_ic8.ic8",   0x0000000, 0x400000, CRC(eaff30ec) SHA1(63f5d33b98194a206c558f9e02c432e7e05aa0e6) )
+	ROM_LOAD( "fop_ic10.ic10", 0x0800000, 0x400000, CRC(536c822b) SHA1(235e96af470785f6cca010782560a4071f285901) )
+	ROM_LOAD( "fop_ic15.ic15", 0x1000000, 0x400000, CRC(c8903051) SHA1(b5927a0bbba017d42b98e7850df966cfa9eeb64a) )
+	ROM_LOAD( "fop_ic17.ic17", 0x1800000, 0x400000, CRC(559a38ae) SHA1(e36d596ad90d0f3657d677e3afa984be30c1fa3b) )
+
+	ROM_REGION( 0x0080000, "texmask", 0 )
+	ROM_LOAD( "fop_24.ic24", 0x0000000, 0x020000, CRC(3214ae1b) SHA1(3ae2fa28ef603b34b3c72313c513f200e2750b85) )
+	ROM_LOAD( "fop_25.ic25", 0x0020000, 0x020000, CRC(69a8734c) SHA1(835db85371d8fbf0c1a2bc0c6109286f12c95794) )
+	ROM_LOAD( "fop_26.ic26", 0x0040000, 0x020000, CRC(b5877b68) SHA1(6f6f00da84d6d84895691266c2022fd4cd92f228) )
+	ROM_LOAD( "fop_27.ic27", 0x0060000, 0x020000, CRC(58309912) SHA1(eb62ccfd75fc168338d30bc30214e6f9f62e5e70) )
+	// These 4 are copies of the previous 4 at different IC locations
+//  ROM_LOAD( "fop_24.ic34", 0x0000000, 0x020000, CRC(3214ae1b) SHA1(3ae2fa28ef603b34b3c72313c513f200e2750b85) )
+//  ROM_LOAD( "fop_25.ic35", 0x0020000, 0x020000, CRC(69a8734c) SHA1(835db85371d8fbf0c1a2bc0c6109286f12c95794) )
+//  ROM_LOAD( "fop_26.ic36", 0x0040000, 0x020000, CRC(b5877b68) SHA1(6f6f00da84d6d84895691266c2022fd4cd92f228) )
+//  ROM_LOAD( "fop_27.ic37", 0x0060000, 0x020000, CRC(58309912) SHA1(eb62ccfd75fc168338d30bc30214e6f9f62e5e70) )
+
+	ROM_REGION( 0x4000, "io", ROMREGION_ERASEFF )
+	/* ID = 0x3FFF, 0x3FFF, 0x3FFF, 0x3FFF
+           Oscillator =  High Speed
+           Watchdog Timer = Enabled
+           Power-Up Timer = Disabled
+           Brown Out = Enabled */
+	ROM_LOAD("fop_621_pic16c710.u1", 0x0000, 0x4000, CRC(4e5d0dc5) SHA1(3029cb6830b059bd410c8fbe2d1c42e7b996582e) ) // I/O for the ball controller
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "m.1c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )
+	ROM_LOAD( "m.6a_3f91_pal16l8.bin", 0x000, 0x104, CRC(d4486738) SHA1(d5d632379c182427c7a7cf969e545ad4fccb1882) )
+	ROM_LOAD( "m.a_4426_pal16l8.bin",  0x000, 0x104, CRC(94e4f59c) SHA1(3bc0c77c77ef763400372d3aabdb15d46da2bc29) )
+ROM_END
+
+ROM_START( footbpow14 ) // Version 1.4
+	ROM_REGION( 0x200000, "maincpu", 0 )    // 68020 code
+	ROM_LOAD32_BYTE( "fut_ic7_1117_12-6-01_27c040.ic7",   0x000000, 0x80000, CRC(d6f473eb) SHA1(6db6cc78c4854cf50bfebe5b5ba747115e6e1513) )
+	ROM_LOAD32_BYTE( "fut_ic12_4ad2_12-6-01_27c040.ic12", 0x000001, 0x80000, CRC(24b6c9a0) SHA1(8301524542d8f49b1443e2866bc30578860b541c) )
+	ROM_LOAD32_BYTE( "fut_ic13_e30f_12-6-01_27c040.ic13", 0x000002, 0x80000, CRC(948c7e41) SHA1(469b9cf195e601f1bd75dfaa09ce882894608123) )
+	ROM_LOAD32_BYTE( "fut_ic19_75ab_12-6-01_27c040.ic19", 0x000003, 0x80000, CRC(985551a1) SHA1(5f6ee92883bbcb352cbcd619c45e4debe4f825d9) )
+
+	ROM_REGION16_LE( 0x400000, "adsprom", 0 ) // ADSP-2115 code & data
+	ROM_LOAD( "fop_ic23.ic23", 0x0000000, 0x400000, CRC(3c02f7c6) SHA1(2325f2a1b260ac60929c82640ced481ad67bb2e0) )
+
+	ROM_REGION32_LE( 0x1000000, "tmsrom", 0 )
+	ROM_LOAD32_WORD( "fop_ic48.ic48", 0x000000, 0x800000, CRC(efddf5c1) SHA1(1014b0193d17de05ebcc733fc5d26089b932385b) )
+	ROM_LOAD32_WORD( "fop_ic42.ic42", 0x000002, 0x800000, CRC(8772e536) SHA1(530dfb4e27466bd97582c4fd50af01f14716ed2b) )
+
+	ROM_REGION( 0x2000000, "texture", 0 )
+	ROM_LOAD( "fop_ic8.ic8",   0x0000000, 0x400000, CRC(eaff30ec) SHA1(63f5d33b98194a206c558f9e02c432e7e05aa0e6) )
+	ROM_LOAD( "fop_ic10.ic10", 0x0800000, 0x400000, CRC(536c822b) SHA1(235e96af470785f6cca010782560a4071f285901) )
+	ROM_LOAD( "fop_ic15.ic15", 0x1000000, 0x400000, CRC(c8903051) SHA1(b5927a0bbba017d42b98e7850df966cfa9eeb64a) )
+	ROM_LOAD( "fop_ic17.ic17", 0x1800000, 0x400000, CRC(559a38ae) SHA1(e36d596ad90d0f3657d677e3afa984be30c1fa3b) )
+
+	ROM_REGION( 0x0080000, "texmask", 0 )
+	ROM_LOAD( "fop_24.ic24", 0x0000000, 0x020000, CRC(3214ae1b) SHA1(3ae2fa28ef603b34b3c72313c513f200e2750b85) )
+	ROM_LOAD( "fop_25.ic25", 0x0020000, 0x020000, CRC(69a8734c) SHA1(835db85371d8fbf0c1a2bc0c6109286f12c95794) )
+	ROM_LOAD( "fop_26.ic26", 0x0040000, 0x020000, CRC(b5877b68) SHA1(6f6f00da84d6d84895691266c2022fd4cd92f228) )
+	ROM_LOAD( "fop_27.ic27", 0x0060000, 0x020000, CRC(58309912) SHA1(eb62ccfd75fc168338d30bc30214e6f9f62e5e70) )
+	// These 4 are copies of the previous 4 at different IC locations
+//  ROM_LOAD( "fop_24.ic34", 0x0000000, 0x020000, CRC(3214ae1b) SHA1(3ae2fa28ef603b34b3c72313c513f200e2750b85) )
+//  ROM_LOAD( "fop_25.ic35", 0x0020000, 0x020000, CRC(69a8734c) SHA1(835db85371d8fbf0c1a2bc0c6109286f12c95794) )
+//  ROM_LOAD( "fop_26.ic36", 0x0040000, 0x020000, CRC(b5877b68) SHA1(6f6f00da84d6d84895691266c2022fd4cd92f228) )
+//  ROM_LOAD( "fop_27.ic37", 0x0060000, 0x020000, CRC(58309912) SHA1(eb62ccfd75fc168338d30bc30214e6f9f62e5e70) )
+
+	ROM_REGION( 0x4000, "io", ROMREGION_ERASEFF )
+	/* ID = 0x3FFF, 0x3FFF, 0x3FFF, 0x3FFF
+           Oscillator =  High Speed
+           Watchdog Timer = Enabled
+           Power-Up Timer = Disabled
+           Brown Out = Enabled */
+	ROM_LOAD("fop_621_pic16c710.u1", 0x0000, 0x4000, CRC(4e5d0dc5) SHA1(3029cb6830b059bd410c8fbe2d1c42e7b996582e) ) // I/O for the ball controller
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "m.1c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )
+	ROM_LOAD( "m.6a_3f91_pal16l8.bin", 0x000, 0x104, CRC(d4486738) SHA1(d5d632379c182427c7a7cf969e545ad4fccb1882) )
+	ROM_LOAD( "m.a_4426_pal16l8.bin",  0x000, 0x104, CRC(94e4f59c) SHA1(3bc0c77c77ef763400372d3aabdb15d46da2bc29) )
+ROM_END
+
+ROM_START( footbpow12 ) // Version 1.2 - REF. 000208 ROM board
 	ROM_REGION( 0x200000, "maincpu", 0 )    // 68020 code
 	ROM_LOAD32_BYTE( "fop_7.ic7",   0x000000, 0x80000, CRC(a2d7ec69) SHA1(27e4f3d27882152244c0f9d5a984e0f1bd7b7d3f) )
 	ROM_LOAD32_BYTE( "fop_12.ic12", 0x000001, 0x80000, CRC(443caf77) SHA1(2b0c6dccee28fb3caa0b2493f59ddbd29897aed9) )
@@ -1412,8 +1502,13 @@ ROM_START( footbpow ) // Version 1.2 - REF. 000208 ROM board
 //  ROM_LOAD( "fop_26.ic36", 0x0040000, 0x020000, CRC(b5877b68) SHA1(6f6f00da84d6d84895691266c2022fd4cd92f228) ) // labeled FOP 26 in IC36 on the PCB
 //  ROM_LOAD( "fop_27.ic37", 0x0060000, 0x020000, CRC(58309912) SHA1(eb62ccfd75fc168338d30bc30214e6f9f62e5e70) ) // labeled FOP 27 in IC37 on the PCB
 
-	ROM_REGION( 0x2000, "io", ROMREGION_ERASEFF )
-	ROM_LOAD("ball_pic16c710.u1", 0x0000, 0x2000, NO_DUMP ) // I/O for the ball controller
+	ROM_REGION( 0x4000, "io", ROMREGION_ERASEFF )
+	/* ID = 0x3FFF, 0x3FFF, 0x3FFF, 0x3FFF
+           Oscillator =  High Speed
+           Watchdog Timer = Enabled
+           Power-Up Timer = Disabled
+           Brown Out = Enabled */
+	ROM_LOAD("fop_621_pic16c710.u1", 0x0000, 0x4000, CRC(4e5d0dc5) SHA1(3029cb6830b059bd410c8fbe2d1c42e7b996582e) ) // I/O for the ball controller
 
 	ROM_REGION( 0x104, "plds", 0 )
 	ROM_LOAD( "m.1c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )
@@ -1452,8 +1547,13 @@ ROM_START( footbpow11 ) // Version 1.1 - REF. 000208 ROM board
 //  ROM_LOAD( "fop_26.ic36", 0x0040000, 0x020000, CRC(b5877b68) SHA1(6f6f00da84d6d84895691266c2022fd4cd92f228) ) // labeled FOP 26 in IC36 on the PCB
 //  ROM_LOAD( "fop_27.ic37", 0x0060000, 0x020000, CRC(58309912) SHA1(eb62ccfd75fc168338d30bc30214e6f9f62e5e70) ) // labeled FOP 27 in IC37 on the PCB
 
-	ROM_REGION( 0x2000, "io", ROMREGION_ERASEFF )
-	ROM_LOAD("ball_pic16c710.u1", 0x0000, 0x2000, NO_DUMP ) // I/O for the ball controller
+	ROM_REGION( 0x4000, "io", ROMREGION_ERASEFF )
+	/* ID = 0x3FFF, 0x3FFF, 0x3FFF, 0x3FFF
+           Oscillator =  High Speed
+           Watchdog Timer = Enabled
+           Power-Up Timer = Disabled
+           Brown Out = Enabled */
+	ROM_LOAD("fop_621_pic16c710.u1", 0x0000, 0x4000, CRC(4e5d0dc5) SHA1(3029cb6830b059bd410c8fbe2d1c42e7b996582e) ) // I/O for the ball controller
 
 	ROM_REGION( 0x104, "plds", 0 )
 	ROM_LOAD( "m.1c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )
@@ -1480,5 +1580,7 @@ GAME( 1997, surfplnt20, surfplnt, gaelco3d,  surfplnt, gaelco3d_state, empty_ini
 GAME( 1998, radikalb,   0,        gaelco3d2, radikalb, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Radikal Bikers (version 2.02)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 GAME( 1998, radikalba,  radikalb, gaelco3d2, radikalb, gaelco3d_state, empty_init, ROT0, "Gaelco (Atari license)", "Radikal Bikers (version 2.02, Atari license)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 
-GAME( 1999, footbpow,   0,        footbpow,  footbpow, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Football Power (version 1.2)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )
+GAME( 1999, footbpow,   0,        footbpow,  footbpow, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Football Power (version 4.6)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )
+GAME( 1999, footbpow14, footbpow, footbpow,  footbpow, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Football Power (version 1.4)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )
+GAME( 1999, footbpow12, footbpow, footbpow,  footbpow, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Football Power (version 1.2)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )
 GAME( 1999, footbpow11, footbpow, footbpow,  footbpow, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Football Power (version 1.1)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )

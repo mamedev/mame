@@ -2,7 +2,7 @@
 // copyright-holders:
 
 /*
-Mahjongs running on IAM2 custom CPU
+Mahjongs / card games running on IAM2 custom CPU
 
 IAMPCB0007-02
 1184003B
@@ -11,6 +11,7 @@ The main components are:
 IAM2 F99130265 custom CPU (?)
 2 IS61C1024-20K RAMs (near IAM2)
 N3412256P-15 SRAM (near IAM2)
+24 MHz XTAL (near IAM2)
 UT6264PC-70LL RAM (near GFX (?) ROM)
 U6295 (Oki M6295 clone)
 4 banks of 8 DIP switches
@@ -23,6 +24,7 @@ TODO:
 #include "emu.h"
 
 #include "cpu/arm7/arm7.h"
+#include "machine/eepromser.h"
 #include "sound/okim6295.h"
 
 #include "emupal.h"
@@ -41,7 +43,8 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
-	void iam2(machine_config &config) ATTR_COLD;
+	void zhonggmj(machine_config &config) ATTR_COLD;
+	void szjl(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -156,7 +159,7 @@ static GFXDECODE_START( gfx_iam2 )
 GFXDECODE_END
 
 
-void iam2_state::iam2(machine_config &config)
+void iam2_state::zhonggmj(machine_config &config)
 {
 	ARM7(config, m_maincpu, 24'000'000); // TODO: unidentified CPU arch and clock not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &iam2_state::program_map);
@@ -178,6 +181,13 @@ void iam2_state::iam2(machine_config &config)
 	OKIM6295(config, "oki", 24'000'000 / 24, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // pin 7 and clock not verified
 }
 
+void iam2_state::szjl(machine_config &config)
+{
+	zhonggmj(config);
+
+	EEPROM_93C46_16BIT(config, "eeprom");
+}
+
 
 ROM_START( zhonggmj )
 	ROM_REGION( 0x40000, "maincpu", 0 )
@@ -190,7 +200,22 @@ ROM_START( zhonggmj )
 	ROM_LOAD( "zhonggmjmajiang_data.u15", 0x00000, 0x80000, CRC(99cb835d) SHA1(3f74e9dcfb9dfcc798fb9abb93afd865a1c6e200) )
 ROM_END
 
+// 神州接龙 (Shénzhōu Jiēlóng)
+// this is on a different PCB with very similar components, adding a 93C46N EEPROM and a 12.2880 XTAL (in the audio section)
+// the IAM2 PCB has number F99040223
+ROM_START( szjl )
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "gltk-17cn.u19", 0x00000, 0x20000, CRC(bc5fcea0) SHA1(1ba496fe9fcbfc3b24048b12ce11d5a6ec3651ef) )
+
+	ROM_REGION( 0x100000, "gfx", 0 )
+	ROM_LOAD( "gltk-dtwo.u20", 0x000000, 0x100000, CRC(672649fd) SHA1(5780ebd73277540d82adff41bb6e272c9b461afc) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "gltk-dath1.u21", 0x00000, 0x40000, CRC(a8b8ae92) SHA1(d73223922a0212988db191fb6d1f83251d37aef0) )
+ROM_END
+
 } // anonymous namespace
 
 
-GAME( 200?, zhonggmj, 0, iam2, zhonggmj, iam2_state, empty_init, ROT0, "I.A.M.", "Zhongguo Majiang", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, zhonggmj, 0, zhonggmj, zhonggmj, iam2_state, empty_init, ROT0, "I.A.M.", "Zhongguo Majiang", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, szjl,     0, szjl,     zhonggmj, iam2_state, empty_init, ROT0, "I.A.M.", "Shenzhou Jielong", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

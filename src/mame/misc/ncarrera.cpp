@@ -1,16 +1,35 @@
 // license:BSD-3-Clause
-// copyright-holders: Roberto Fresca, Grull Osgo
+// copyright-holders: Roberto Fresca, Grull Osgo, David Haywood
 
 /***************************************************************************************************
 
-  New Carrera, V2000.
+  New Carrera, Version 2000.
   JT Amusement
 
-  This game uses a newer 'TYPE C-2000' board with a 'Rania Original 2000 Type 8515'
-  riser board (the Z80 and MC6845 have been moved here along with a AT90S8515 MCU)
+
+  This is a stealth gambling machine disguised as a standard arcade game. Players initially interact
+  with what appears to be a legitimate arcade game, until they enter a hidden password. Once activated,
+  the game reveals its true nature: a fully functional video slots gambling game.
+
+  The game's code resides in a PSD312-B (an MCU peripheral), while an AT90S8515 MCU handles:
+
+   * Screen rendering
+   * Symbol placement
+   * Reel animation
+   * Input processing
+   * Management of hardcoded NVRAM values (game configuration & settings)
+
+
+  Since we lack the original MCU firmware, we've simulated its functions by replicating register-level
+  behavior based on how the game code interacts with the hardware.
+
+  For a complete and accurate emulation, we need the MCU's contents, specifically the EPROM and FLASH data.
 
 
   Tech notes:
+
+  This game uses a newer 'TYPE C-2000' board with a 'Rania Original 2000 Type 8515'
+  riser board (the Z80 and MC6845 have been moved here along with a AT90S8515 MCU)
 
   - The MCU behavior has been simulated to make the game playable.
   - The MCU has full range memory access, so it can read ROM and Read/Write NVRAM.
@@ -99,8 +118,6 @@ private:
 	std::unique_ptr<uint8_t[]> m_nvram8;
 
 	uint16_t const reel_base = 0x2910;
-	//uint16_t const reel2_base = 0x292b;
-	//uint16_t const reel3_base = 0x2946;
 
 	uint8_t m_vp = 0;
 	uint8_t m_frame = 0;
@@ -109,8 +126,6 @@ private:
 	int m_delay = 0;
 	int m_buffin0 = 0;
 	int m_buffin1 = 0;
-
-
 };
 
 
@@ -123,6 +138,51 @@ void ncarrera_state::machine_start()
 	m_nvram8 = std::make_unique<uint8_t[]>(0x800);
 	m_nvram->set_base(m_nvram8.get(), 0x800);
 	save_item(NAME(m_frame));
+}
+
+
+/*************************************************
+*                  Video Hardware                *
+*************************************************/
+
+uint32_t ncarrera_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	int count = 0;
+
+	for (int y = 0; y < 32; y++)
+	{
+		for (int x = 0; x < 64; x++)
+		{
+			int tile = m_tileram[count & 0x7ff] | m_tileram[(count & 0x7ff) + 0x800] << 8;
+
+			m_gfxdecode->gfx(0)->opaque(bitmap, cliprect, tile, 0, 0, 0, x * 8, y * 8);
+			count++;
+		}
+	}
+	return 0;
+}
+
+void ncarrera_state::palette(palette_device &palette) const
+{
+	uint8_t const *const color_prom = memregion("proms")->base();
+	for (int i = 0; i < 0x20; ++i)
+	{
+		int bit0, bit1;
+		int const br_bit0 = BIT(color_prom[i], 7);
+		int const br_bit1 = BIT(color_prom[i], 6);
+
+		bit0 = BIT(color_prom[i], 0);
+		bit1 = BIT(color_prom[i], 3);
+		int const b = 0x0e * br_bit0 + 0x1f * br_bit1 + 0x43 * bit0 + 0x8f * bit1;
+		bit0 = BIT(color_prom[i], 1);
+		bit1 = BIT(color_prom[i], 4);
+		int const g = 0x0e * br_bit0 + 0x1f * br_bit1 + 0x43 * bit0 + 0x8f * bit1;
+		bit0 = BIT(color_prom[i], 2);
+		bit1 = BIT(color_prom[i], 5);
+		int const r = 0x0e * br_bit0 + 0x1f * br_bit1 + 0x43 * bit0 + 0x8f * bit1;
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
+	}
 }
 
 
@@ -154,15 +214,11 @@ void ncarrera_state::io_map(address_map &map)
 
 uint8_t ncarrera_state::unknown_r()
 {
-//  popmessage("portB_read:%02x");
-//  logerror("portB_read:%02x\n");
 	return machine().rand();
 }
 
 void ncarrera_state::porta_w(uint8_t data)
 {
-//  if(data != 0)
-//      popmessage("porta:%02x", data);
 }
 
 uint16_t ncarrera_state::inc_idx(uint16_t& index, uint8_t i)
@@ -202,8 +258,8 @@ void ncarrera_state::print_reels(uint8_t data)
 	reels_active[2] = (m_nvram8[0x16f] == 0x0e) || (m_nvram8[0x16f] == 0x13) || (m_nvram8[0x16f] == 0x14) || (m_nvram8[0x16f] == 0x11);
 
 	// index config
-	 auto setup_indices = [&](uint8_t reel_id) -> uint16_t
-	 {
+	auto setup_indices = [&](uint8_t reel_id) -> uint16_t
+	{
 		int16_t step = (m_nvram8[0x156 + reel_id] + (data / 3) - 1) % 0x1b;
 		return static_cast<uint16_t>((step < 0) ? 0x1a : step);
 	};
@@ -403,7 +459,7 @@ static INPUT_PORTS_START( ncarrera )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME("1-7") PORT_CODE(KEYCODE_G)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SERVICE2 )
 
-//  DIP switched are harcoded in NVRAM.
+//  DIP switches are harcoded in NVRAM.
 
 INPUT_PORTS_END
 
@@ -427,54 +483,10 @@ static const gfx_layout tiles8x8_layout =
 /*************************************************
 *          Graphics Decode Information           *
 *************************************************/
+
 static GFXDECODE_START( gfx_carrera )
 	GFXDECODE_ENTRY( "tiles", 0, tiles8x8_layout, 0, 1 )
 GFXDECODE_END
-
-
-/*************************************************
-*                  Video Hardware                *
-*************************************************/
-
-uint32_t ncarrera_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	int count = 0;
-
-	for (int y = 0; y < 32; y++)
-	{
-		for (int x = 0; x < 64; x++)
-		{
-			int tile = m_tileram[count & 0x7ff] | m_tileram[(count & 0x7ff) + 0x800] << 8;
-
-			m_gfxdecode->gfx(0)->opaque(bitmap, cliprect, tile, 0, 0, 0, x * 8, y * 8);
-			count++;
-		}
-	}
-	return 0;
-}
-
-void ncarrera_state::palette(palette_device &palette) const
-{
-	uint8_t const *const color_prom = memregion("proms")->base();
-	for (int i = 0; i < 0x20; ++i)
-	{
-		int bit0, bit1;
-		int const br_bit0 = BIT(color_prom[i], 7);
-		int const br_bit1 = BIT(color_prom[i], 6);
-
-		bit0 = BIT(color_prom[i], 0);
-		bit1 = BIT(color_prom[i], 3);
-		int const b = 0x0e * br_bit0 + 0x1f * br_bit1 + 0x43 * bit0 + 0x8f * bit1;
-		bit0 = BIT(color_prom[i], 1);
-		bit1 = BIT(color_prom[i], 4);
-		int const g = 0x0e * br_bit0 + 0x1f * br_bit1 + 0x43 * bit0 + 0x8f * bit1;
-		bit0 = BIT(color_prom[i], 2);
-		bit1 = BIT(color_prom[i], 5);
-		int const r = 0x0e * br_bit0 + 0x1f * br_bit1 + 0x43 * bit0 + 0x8f * bit1;
-
-		palette.set_pen_color(i, rgb_t(r, g, b));
-	}
-}
 
 
 /*************************************************
