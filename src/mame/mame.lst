@@ -25473,6 +25473,9 @@ korgm1p1
 korgm1r
 korgm1rex
 
+@source:korg/korgtriton.cpp
+korgtriton
+
 @source:korg/korgws.cpp
 korgwsad
 korgwsex
