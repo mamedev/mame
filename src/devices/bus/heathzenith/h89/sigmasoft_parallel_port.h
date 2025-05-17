@@ -20,6 +20,8 @@ class sigmasoft_parallel_port : public device_t, public device_h89bus_left_card_
 public:
 	sigmasoft_parallel_port(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
+	virtual void map_io(address_space_installer &space) override;
+
 protected:
 	sigmasoft_parallel_port(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
@@ -36,8 +38,6 @@ protected:
 private:
 
 	required_ioport m_jumpers;
-
-	bool m_installed;
 
 	// physical jumper on the board to enable/disable entire board
 	bool m_enabled;

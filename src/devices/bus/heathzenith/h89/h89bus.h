@@ -145,6 +145,8 @@ public:
 	// inline configuration
 	void set_h89bus_tag(h89bus_device *h89bus, const char *slottag) { m_h89bus = h89bus; m_h89bus_slottag = slottag; }
 
+	virtual void map_io(address_space_installer & space) = 0;
+
 protected:
 	device_h89bus_card_interface(const machine_config &mconfig, device_t &device);
 	virtual void interface_pre_start() override;
@@ -220,6 +222,8 @@ public:
 		m_h89bus_slottag = slottag;
 	}
 
+	void map_io(address_space_installer &space);
+
 protected:
 	h89bus_left_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -263,6 +267,8 @@ public:
 	{
 		m_p506_signals = val;
 	}
+
+	void map_io(address_space_installer &space);
 
 protected:
 	h89bus_right_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -395,8 +401,6 @@ public:
 	h89bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~h89bus_device();
 
-	void install_io_device(offs_t start, offs_t end, read8sm_delegate rhandler, write8sm_delegate whandler) ATTR_COLD;
-	void install_io_device(offs_t start, offs_t end, read8smo_delegate rhandler, write8smo_delegate whandler) ATTR_COLD;
 	h89bus::addr_ranges get_address_ranges(u8 select_bits, bool p506_signals = false) ATTR_COLD;
 
 	void set_io0(int state);
@@ -410,12 +414,13 @@ public:
 
 	// inline configuration
 	template <typename T> void set_program_space(T &&tag, int spacenum) { m_program_space.set_tag(std::forward<T>(tag), spacenum); }
-	template <typename T> void set_io_space(T &&tag, int spacenum) { m_io_space.set_tag(std::forward<T>(tag), spacenum); }
 	auto out_int3_callback() { return m_out_int3_cb.bind(); }
 	auto out_int4_callback() { return m_out_int4_cb.bind(); }
 	auto out_int5_callback() { return m_out_int5_cb.bind(); }
 	auto out_fmwe_callback() { return m_out_fmwe_cb.bind(); }
 	auto out_wait_callback() { return m_out_wait_cb.bind(); }
+
+	void map_io(address_space_installer &space);
 
 protected:
 	h89bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -433,7 +438,7 @@ protected:
 	void set_wait_line(int state);
 
 	// internal state
-	required_address_space m_program_space, m_io_space;
+	required_address_space m_program_space;
 	required_device<heath_io_decoder_socket> m_io_decoder_socket;
 
 	int m_io0, m_io1, m_mem0, m_mem1;

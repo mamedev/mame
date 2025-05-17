@@ -25,6 +25,8 @@ public:
 
 	template <typename T> void set_intr_cntrl(T &&tag) { m_intr_cntrl.set_tag(std::forward<T>(tag)); }
 
+	virtual void map_io(address_space_installer &space) override;
+
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -49,8 +51,6 @@ private:
 	required_device<fd1797_device> m_fdc;
 	required_device_array<floppy_connector, 8> m_floppies;
 	required_device<heath_intr_socket> m_intr_cntrl;
-
-	bool m_installed;
 
 	bool m_irq_allowed;
 	bool m_drq_allowed;

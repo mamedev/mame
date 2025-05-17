@@ -86,6 +86,15 @@ void h89bus_left_slot_device::device_resolve_objects()
 	}
 }
 
+void h89bus_left_slot_device::map_io(address_space_installer &space)
+{
+	auto dev = get_card_device();
+	if(dev)
+	{
+		dev->map_io(space);
+	}
+}
+
 DEFINE_DEVICE_TYPE(H89BUS_RIGHT_SLOT, h89bus_right_slot_device, "h89bus_rslot", "H-89 right (I/O) slot")
 
 h89bus_right_slot_device::h89bus_right_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -115,6 +124,15 @@ void h89bus_right_slot_device::device_resolve_objects()
 		dev->set_h89bus_tag(m_h89bus.target(), m_h89bus_slottag);
 		dev->set_p506_signalling(m_p506_signals);
 		m_h89bus->add_h89bus_right_card(*dev);
+	}
+}
+
+void h89bus_right_slot_device::map_io(address_space_installer &space)
+{
+	auto dev = get_card_device();
+	if(dev)
+	{
+		dev->map_io(space);
 	}
 }
 
@@ -402,7 +420,6 @@ h89bus_device::h89bus_device(const machine_config &mconfig, const char *tag, dev
 h89bus_device::h89bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	m_program_space(*this, finder_base::DUMMY_TAG, -1),
-	m_io_space(*this, finder_base::DUMMY_TAG, -1),
 	m_io_decoder_socket(*this, "io_decoder"),
 	m_out_int3_cb(*this),
 	m_out_int4_cb(*this),
@@ -424,6 +441,18 @@ void h89bus_device::device_start()
 {
 }
 
+void h89bus_device::map_io(address_space_installer &space)
+{
+	for (device_h89bus_right_card_interface &entry : m_right_device_list)
+	{
+		entry.map_io(space);
+	}
+	for (device_h89bus_left_card_interface &entry : m_left_device_list)
+	{
+		entry.map_io(space);
+	}
+}
+
 void h89bus_device::add_h89bus_left_card(device_h89bus_left_card_interface &card)
 {
 	m_left_device_list.emplace_back(card);
@@ -432,16 +461,6 @@ void h89bus_device::add_h89bus_left_card(device_h89bus_left_card_interface &card
 void h89bus_device::add_h89bus_right_card(device_h89bus_right_card_interface &card)
 {
 	m_right_device_list.emplace_back(card);
-}
-
-void h89bus_device::install_io_device(offs_t start, offs_t end, read8sm_delegate rhandler, write8sm_delegate whandler)
-{
-	m_io_space->install_readwrite_handler(start, end, rhandler, whandler);
-}
-
-void h89bus_device::install_io_device(offs_t start, offs_t end, read8smo_delegate rhandler, write8smo_delegate whandler)
-{
-	m_io_space->install_readwrite_handler(start, end, rhandler, whandler);
 }
 
 h89bus::addr_ranges h89bus_device::get_address_ranges(u8 select_bits, bool p506_signals)

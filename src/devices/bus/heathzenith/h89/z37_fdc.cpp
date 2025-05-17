@@ -180,9 +180,6 @@ u8 h89bus_z37_device::read(offs_t offset)
 
 void h89bus_z37_device::device_start()
 {
-	m_installed = false;
-
-	save_item(NAME(m_installed));
 	save_item(NAME(m_irq_allowed));
 	save_item(NAME(m_drq_allowed));
 	save_item(NAME(m_access_track_sector));
@@ -190,28 +187,6 @@ void h89bus_z37_device::device_start()
 
 void h89bus_z37_device::device_reset()
 {
-	if (!m_installed)
-	{
-		h89bus::addr_ranges  addr_ranges = h89bus().get_address_ranges(h89bus::IO_CASS);
-
-		if (addr_ranges.size() == 1)
-		{
-			h89bus::addr_range range = addr_ranges.front();
-
-			LOGSETUP("%s: addr: 0x%04x-0x%04x\n", FUNCNAME, range.first, range.second);
-
-			h89bus().install_io_device(range.first, range.second,
-				read8sm_delegate(*this, FUNC(h89bus_z37_device::read)),
-				write8sm_delegate(*this, FUNC(h89bus_z37_device::write)));
-		}
-		else
-		{
-			LOGERR("%s: no address provided for device\n", FUNCNAME);
-		}
-
-		m_installed = true;
-	}
-
 	m_irq_allowed         = false;
 	m_drq_allowed         = false;
 	m_access_track_sector = false;
@@ -219,6 +194,27 @@ void h89bus_z37_device::device_reset()
 	m_intr_cntrl->set_irq(0);
 	m_intr_cntrl->set_drq(0);
 	m_intr_cntrl->block_interrupts(0);
+}
+
+void h89bus_z37_device::map_io(address_space_installer &space)
+{
+	h89bus::addr_ranges  addr_ranges = h89bus().get_address_ranges(h89bus::IO_CASS);
+
+	if (addr_ranges.size() == 0)
+	{
+		LOGSETUP("%s: No address specified\n", FUNCNAME);
+
+		return;
+	}
+
+	h89bus::addr_range range = addr_ranges.front();
+
+	LOGSETUP("%s: addr: 0x%04x-0x%04x\n", FUNCNAME, range.first, range.second);
+
+	space.install_readwrite_handler(range.first, range.second,
+		read8sm_delegate(*this, FUNC(h89bus_z37_device::read)),
+		write8sm_delegate(*this, FUNC(h89bus_z37_device::write))
+	);
 }
 
 static void z37_floppies(device_slot_interface &device)

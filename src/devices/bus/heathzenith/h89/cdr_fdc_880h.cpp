@@ -54,6 +54,8 @@ public:
 	// The controller has two 16L8 PALs which are not dumped (z15 and z20 from schematics).
 	static constexpr feature_type unemulated_features() { return feature::DISK; }
 
+	virtual void map_io(address_space_installer &space) override;
+
 protected:
 
 	virtual void device_start() override ATTR_COLD;
@@ -85,7 +87,6 @@ private:
 	required_device<fd1797_device>             m_fdc;
 	required_device_array<floppy_connector, 4> m_floppies;
 
-	bool m_installed;
 	bool m_irq_allowed;
 
 	bool m_irq;
@@ -297,36 +298,32 @@ u8 cdr_fdc_880h_device::read(offs_t offset)
 
 void cdr_fdc_880h_device::device_start()
 {
-	m_installed = false;
-
-	save_item(NAME(m_installed));
 	save_item(NAME(m_irq_allowed));
 	save_item(NAME(m_irq));
 	save_item(NAME(m_drq));
 }
 
-void cdr_fdc_880h_device::device_reset()
+void cdr_fdc_880h_device::map_io(address_space_installer &space)
 {
-	if (!m_installed)
+	h89bus::addr_ranges  addr_ranges = h89bus().get_address_ranges(h89bus::IO_CASS);
+
+	if (addr_ranges.size() == 0)
 	{
-		h89bus::addr_ranges  addr_ranges = h89bus().get_address_ranges(h89bus::IO_CASS);
+		LOGSETUP("%s: No address specified\n", FUNCNAME);
 
-		if (addr_ranges.size() == 1)
-		{
-			h89bus::addr_range range = addr_ranges.front();
-
-			h89bus().install_io_device(range.first, range.second,
-				read8sm_delegate(*this, FUNC(cdr_fdc_880h_device::read)),
-				write8sm_delegate(*this, FUNC(cdr_fdc_880h_device::write)));
-		}
-		else
-		{
-			LOGSETUP("%s: No address specified\n", FUNCNAME);
-		}
-
-		m_installed = true;
+		return;
 	}
 
+	h89bus::addr_range range = addr_ranges.front();
+
+	space.install_readwrite_handler(range.first, range.second,
+		read8sm_delegate(*this, FUNC(cdr_fdc_880h_device::read)),
+		write8sm_delegate(*this, FUNC(cdr_fdc_880h_device::write))
+	);
+}
+
+void cdr_fdc_880h_device::device_reset()
+{
 	m_irq_allowed = false;
 	m_irq         = false;
 

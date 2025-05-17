@@ -117,9 +117,6 @@ u8 sigmasoft_parallel_port::read(offs_t offset)
 
 void sigmasoft_parallel_port::device_start()
 {
-	m_installed = false;
-
-	save_item(NAME(m_installed));
 }
 
 void sigmasoft_parallel_port::device_reset()
@@ -129,17 +126,16 @@ void sigmasoft_parallel_port::device_reset()
 	m_enabled = bool(jumpers & 0x20);
 
 	m_base_addr = (jumpers & 0x1f) << 3;
+}
 
-	if (!m_installed)
+void sigmasoft_parallel_port::map_io(address_space_installer &space)
+{
+	if (m_enabled)
 	{
-		if (m_enabled)
-		{
-			h89bus().install_io_device(m_base_addr, m_base_addr + 7,
-				read8sm_delegate(*this, FUNC(sigmasoft_parallel_port::read)),
-				write8sm_delegate(*this, FUNC(sigmasoft_parallel_port::write)));
-		}
-
-		m_installed = true;
+		space.install_readwrite_handler(m_base_addr, m_base_addr + 7,
+			read8sm_delegate(*this, FUNC(sigmasoft_parallel_port::read)),
+			write8sm_delegate(*this, FUNC(sigmasoft_parallel_port::write))
+		);
 	}
 }
 
