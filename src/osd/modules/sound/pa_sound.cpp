@@ -132,10 +132,15 @@ int sound_pa::init(osd_interface &osd, osd_options const &options)
 
 	m_info.m_generation = 1;
 	m_info.m_nodes.resize(Pa_GetDeviceCount());
+	std::map<std::string, int> counters;
 	for(PaDeviceIndex dev = 0; dev != Pa_GetDeviceCount(); dev++) {
 		const PaDeviceInfo *di = Pa_GetDeviceInfo(dev);
 		auto &node = m_info.m_nodes[dev];
-		node.m_name = di->name;
+		int i1 = ++counters[di->name];
+		if(i1 > 1)
+			node.m_name = util::string_format("%s:%d", di->name, i1);
+		else
+			node.m_name = di->name;
 		node.m_id = dev + 1;
 		node.m_rate.m_default_rate = node.m_rate.m_min_rate = node.m_rate.m_max_rate = di->defaultSampleRate;
 		node.m_sinks = di->maxOutputChannels;
@@ -240,7 +245,9 @@ void sound_pa::stream_close(uint32_t id)
 	auto si = m_streams.find(id);
 	if(si == m_streams.end())
 		return;
-	Pa_CloseStream(si->second.m_stream);
+	auto *s = si->second.m_stream;
+	lock.unlock();
+	Pa_CloseStream(s);
 }
 
 void sound_pa::stream_sink_update(uint32_t id, const int16_t *buffer, int samples_this_frame)
