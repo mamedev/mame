@@ -94,6 +94,7 @@ void vt3xx_soc_base_device::device_add_mconfig(machine_config& config)
 	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_ppu->read_bg().set(FUNC(vt3xx_soc_base_device::chr_r));
 	m_ppu->read_sp().set(FUNC(vt3xx_soc_base_device::spr_r));
+	m_ppu->read_newmode_sp().set(FUNC(vt3xx_soc_base_device::newmode_spr_r));
 	m_ppu->set_screen(m_screen);
 
 	VT_VT1682_ALU(config, m_alu, 0);
@@ -553,6 +554,12 @@ uint8_t vt3xx_soc_base_device::vt369_418a_r()
 {
 	logerror("%s: vt369_418a_r (unknown)\n", machine().describe_context());
 	return machine().rand();
+}
+
+uint8_t vt3xx_soc_base_device::newmode_spr_r(offs_t offset)
+{
+	address_space& spc = this->space(AS_PROGRAM);
+	return spc.read_byte(offset);
 }
 
 /***********************************************************************************************************************************************************/

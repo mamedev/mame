@@ -29,6 +29,7 @@ public:
 
 	auto read_bg() { return m_read_bg.bind(); }
 	auto read_sp() { return m_read_sp.bind(); }
+	auto read_newmode_sp() { return m_read_newmode_sp.bind(); }
 
 	void set_palette_mode(vtxx_pal_mode pmode) { m_pal_mode = pmode; }
 
@@ -116,6 +117,7 @@ protected:
 
 	devcb_read8 m_read_bg;
 	devcb_read8 m_read_sp;
+	devcb_read8 m_read_newmode_sp;
 
 	int32_t m_read_bg4_bg3;
 

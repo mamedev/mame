@@ -28,7 +28,8 @@ ppu_vt03_device::ppu_vt03_device(const machine_config& mconfig, device_type type
 	m_is_pal(false),
 	m_is_50hz(false),
 	m_read_bg(*this, 0),
-	m_read_sp(*this, 0)
+	m_read_sp(*this, 0),
+	m_read_newmode_sp(*this, 0)
 {
 }
 
@@ -805,6 +806,23 @@ void ppu_vt3xx_device::draw_sprites(u8 *line_priority)
 	}
 	else
 	{
+		/*
+		new format 0  (m_newvid_1d & 0x08 set)
+
+		+ 0x000    yyyy yyyy   y = ypos
+		+ 0x080    tttt tttt   t = tile number
+		+ 0x100    YXpT TTpp   Y = ypos sign X = xpos sign T = high tile number p = palette
+		+ 0x180    xxxx xxxx   x = xpos
+
+		new format 1  (m_newvid_1d & 0x08 not set)
+
+		+ 0x000    yyyy yyyy   y = ypos
+		+ 0x080    tttt tttt   t = tile number
+		+ 0x100    fFzT TTpp   f = yflip F = xflip T = high tile number p = palette z = priority
+		+ 0x180    xxxx xxxx   x = xpos
+
+		*/
+
 		// new style sprites
 		for (int spritenum = 0x00; spritenum < 0x80; spritenum++)
 		{
@@ -812,6 +830,7 @@ void ppu_vt3xx_device::draw_sprites(u8 *line_priority)
 			int xpos = m_spriteram[0x180 + spritenum];
 			int tilenum = m_spriteram[0x080 + spritenum];
 			tilenum |= (m_spriteram[0x100 + spritenum] & 0x18) << 6;
+			uint8_t m_spritepatternbuf[16];
 
 			if (m_scanline == 128)
 				logerror("new sprite (%02x) ypos %d xpos %d tilenum %04x\n", spritenum, ypos, xpos, tilenum);
@@ -823,22 +842,39 @@ void ppu_vt3xx_device::draw_sprites(u8 *line_priority)
 				continue;
 
 			/* compute the character's line to draw */
-			//int sprite_line = m_scanline - ypos;
+			int sprite_line = m_scanline - ypos;
 
-			//read_sprite_plane_data(tilenum);
-			m_planebuf[0] = machine().rand();// m_read_sp((address + 0) & 0x1fff);
-			m_planebuf[1] = machine().rand();// m_read_sp((address + 8) & 0x1fff);
+			// a 16 pixel wide sprite (packed format), at 8bpp, requires 16 bytes for a single line
+			// at 16 pixels high it requires 256 bytes for a whole tile
+			int index1 = tilenum * 256;
+			int pattern_offset = index1 + sprite_line * 16;
+			pattern_offset += get_newmode_spritebase() * 0x800;
 
-			int width = 16;
+			for (int i = 0; i < 16; i++)
+			{
+				m_spritepatternbuf[i] = m_read_newmode_sp(pattern_offset + i);
+			}
 
+			const int width = 16;
 			for (int pixel = 0; pixel < width; pixel++)
 			{
-				u8 pixel_data = machine().rand();
-				//make_sprite_pixel_data(pixel_data, 0);
+				u8 pixel_data = m_spritepatternbuf[pixel];
 
 				if (xpos + pixel >= 0)
 				{
-					draw_sprite_pixel_high(m_bitmap, pixel_data, pixel, xpos, 0, spritenum, line_priority);
+					if (pixel_data)
+					{
+						if ((xpos + pixel) < VISIBLE_SCREEN_WIDTH)
+						{
+							/* has another sprite been drawn here? */
+							//if (BIT(~line_priority[sprite_xpos + pixel], 0))
+							{
+								const u32 palval = pixel_data + machine().rand();
+								m_bitmap.pix(m_scanline, xpos + pixel) = palval;
+								//line_priority[sprite_xpos + pixel] |= 0x01;
+							}
+						}
+					}
 				}
 			}
 
