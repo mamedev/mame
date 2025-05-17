@@ -381,6 +381,12 @@ ROM_START( matet100 )
 	ROM_IGNORE(0x100)
 ROM_END
 
+ROM_START( lxpcsp )
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	// standard flash ROM
+	ROM_LOAD( "s29gl512n11tfi02.u2", 0x00000, 0x4000000, CRC(113e22f2) SHA1(c57184131db3f3c82d09d7757f0977223698f62c) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -413,3 +419,6 @@ CONS( 2021, matet100,  0,        0,  nes_vt32_32mb,      nes_vt32, nes_vt32_unk_
 
 // Use DIP switch to select console or cartridge, as cartridge is fake and just toggles a GPIO
 CONS( 2016, fcpocket,  0,  0,  nes_vt32_4x16mb,   nes_vt32_fp, nes_vt32_unk_state, empty_init, "<unknown>",   "FC Pocket 600 in 1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )  // has external banking (2x 32mbyte banks)
+
+// uses VT32 style encryption at least, boots in this driver but shows garbage
+CONS( 2020, lxpcsp,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console - Marvel Spider-Man", MACHINE_NOT_WORKING )
