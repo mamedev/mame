@@ -183,11 +183,15 @@ u8 korgtriton_state::scu_r(offs_t offs) {
 
     if (offs == 0) {
         const static u8 data[] = { 0x66, 0x31 };
-        res = data[m_scu_hack_data_i++ % 2];
+        res = data[m_scu_hack_data_i % 2];
+        if (!machine().side_effects_disabled())
+            m_scu_hack_data_i++;
     }
 
     if (offs == 1) {
-        res = m_scu_hack_status_i++;
+        res = m_scu_hack_status_i;
+        if (!machine().side_effects_disabled())
+            m_scu_hack_status_i++;
     }
 
     LOG("scu_read: %08x -> %02x\n", offs, res);
