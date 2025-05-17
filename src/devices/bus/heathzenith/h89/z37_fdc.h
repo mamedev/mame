@@ -20,8 +20,7 @@ class h89bus_z37_device : public device_t, public device_h89bus_right_card_inter
 public:
 	h89bus_z37_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	virtual void write(u8 select_lines, u8 offset, u8 data) override;
-	virtual u8 read(u8 select_lines, u8 offset) override;
+	virtual void map_io(address_space_installer &space) override;
 
 	template <typename T> void set_intr_cntrl(T &&tag) { m_intr_cntrl.set_tag(std::forward<T>(tag)); }
 
@@ -29,6 +28,9 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	void write(offs_t offset, u8 data);
+	u8 read(offs_t offset);
 
 	void ctrl_w(u8 val);
 
