@@ -25,19 +25,15 @@ macro   rm_reg   %addr
 	@nomreq_addr %addr
 
 macro   rm16   %addr
-	@rm %addr
-	TDAT_H = TDAT_L;
-	@rm %addr+1
-	using std::swap;
-	swap(TDAT_H, TDAT_L);
+	m_memrq_cycles !! TDAT_L = data_read(%addr);
+	m_memrq_cycles !! TDAT_H = data_read(%addr+1);
 
 macro   wm   %addr
 	m_memrq_cycles !! data_write(%addr, TDAT8);
 
 macro   wm16   %addr
-	@wm %addr
-	TDAT8 = TDAT_H;
-	@wm %addr+1
+	m_memrq_cycles !! data_write(%addr, TDAT_L);
+	m_memrq_cycles !! data_write(%addr+1, TDAT_H);
 
 macro   wm16_sp %d16
 	SP--;
@@ -66,12 +62,12 @@ macro   arg
 	m_memrq_cycles !! TDAT8 = arg_read();
 	PC++;
 
-macro   arg16
-	@arg
-	TDAT_H = TDAT_L;
-	@arg
-	using std::swap;
-	swap(TDAT_H, TDAT_L);
+macro   arg16 %dd
+	m_memrq_cycles !! TDAT_L = arg_read();
+	PC++;
+	m_memrq_cycles !! TDAT_H = arg_read();
+	PC++;
+	%dd = TDAT;
 
 macro   eax
 	@arg
@@ -94,37 +90,31 @@ macro   push   %d16
 	@wm16_sp %d16
 
 macro   jp
-	@arg16
-	PC = TDAT;
+	@arg16 PC
 	WZ = PC;
 
 macro   t6a84:jp
-	@arg16
-	PC = TDAT;
+	@arg16 PC
 	WZ = PC;
 	paged_jump();
 
 macro   jp_cond
 	if (TDAT8) {
-		@arg16
-		PC = TDAT;
+		@arg16 PC
 		WZ = PC;
 	} else {
 		// implicit do PC += 2
-		@arg16
-		WZ = TDAT;
+		@arg16 WZ
 	}
 
 macro   t6a84:jp_cond
 	if (TDAT8) {
-		@arg16
-		PC = TDAT;
+		@arg16 PC
 		WZ = PC;
 		paged_jump();
 	} else {
 		// implicit do PC += 2
-		@arg16
-		WZ = TDAT;
+		@arg16 WZ
 	}
 
 macro   jr
@@ -154,16 +144,14 @@ macro   jr_cond
 	}
 
 macro   arg16_call
-	@arg16
-	m_ea = TDAT;
+	@arg16 m_ea
 	@nomreq_addr PC-1
 	WZ = m_ea;
 	@wm16_sp PC
 	PC = m_ea;
 
 macro   r800:arg16_call
-	@arg16
-	m_ea = TDAT;
+	@arg16 m_ea
 	@nomreq_addr PC-1
 	WZ = m_ea;
 	@wm16_sp PC
@@ -173,8 +161,7 @@ macro   call_cond
 	if (TDAT8) {
 		@arg16_call
 	} else {
-		@arg16
-		WZ = TDAT;
+		@arg16 WZ
 	}
 
 macro   ret_cond
@@ -287,29 +274,29 @@ macro   rld
 	A = (A & 0xf0) | (TDAT_H >> 4);
 	set_f((F & CF) | SZP[A]);
 
-macro   ex_sp   %d16
+macro   ex_sp   %dd
 	@pop
 	@nomreq_addr SP-1
-	@wm16_sp %d16
-	%d16 = TDAT;
+	@wm16_sp %dd
+	%dd = TDAT;
 	2 * @nomreq_addr SP
 	WZ = TDAT;
 
-macro   add16
+macro   add16   %dd1 %dd2
 {
 	@nomreq_ir 7
-	u32 res = TDAT + TDAT2;
-	WZ = TDAT + 1;
-	set_f((F & (SF | ZF | VF)) | (((TDAT ^ res ^ TDAT2) >> 8) & HF) | ((res >> 16) & CF) | ((res >> 8) & (YF | XF)));
-	TDAT = (u16)res;
+	u32 res = %dd1 + %dd2;
+	WZ = %dd1 + 1;
+	set_f((F & (SF | ZF | VF)) | (((%dd1 ^ res ^ %dd2) >> 8) & HF) | ((res >> 16) & CF) | ((res >> 8) & (YF | XF)));
+	%dd1 = (u16)res;
 }
 
-macro   r800:add16
+macro   r800:add16   %dd1 %dd2
 {
-	u32 res = TDAT + TDAT2;
-	WZ = TDAT + 1;
-	set_f((F & (SF | ZF | VF)) | (((TDAT ^ res ^ TDAT2) >> 8) & HF) | ((res >> 16) & CF) | ((res >> 8) & (YF | XF)));
-	TDAT = (u16)res;
+	u32 res = %dd1 + %dd2;
+	WZ = %dd1 + 1;
+	set_f((F & (SF | ZF | VF)) | (((%dd1 ^ res ^ %dd2) >> 8) & HF) | ((res >> 16) & CF) | ((res >> 8) & (YF | XF)));
+	%dd1 = (u16)res;
 }
 
 macro   adc_hl
@@ -3179,10 +3166,7 @@ dd08	# DB   DD
 	@jump 0008
 
 dd09	# ADD  IX,BC
-	TDAT = IX;
-	TDAT2 = BC;
-	@add16
-	IX = TDAT;
+	@add16 IX, BC
 
 dd0a	# DB   DD
 	illegal_1();
@@ -3245,10 +3229,7 @@ dd18	# DB   DD
 	@jump 0018
 
 dd19	# ADD  IX,DE
-	TDAT = IX;
-	TDAT2 = DE;
-	@add16
-	IX = TDAT;
+	@add16 IX, DE
 
 dd1a	# DB   DD
 	illegal_1();
@@ -3279,12 +3260,10 @@ dd20	# DB   DD
 	@jump 0020
 
 dd21	# LD   IX,w
-	@arg16
-	IX = TDAT;
+	@arg16 IX
 
 dd22	# LD   (w),IX
-	@arg16
-	m_ea = TDAT;
+	@arg16 m_ea
 	TDAT = IX;
 	@wm16 m_ea
 	WZ = m_ea + 1;
@@ -3312,14 +3291,10 @@ dd28	# DB   DD
 	@jump 0028
 
 dd29	# ADD  IX,IX
-	TDAT = IX;
-	TDAT2 = IX;
-	@add16
-	IX = TDAT;
+	@add16 IX, IX
 
 dd2a	# LD   IX,(w)
-	@arg16
-	m_ea = TDAT;
+	@arg16 m_ea
 	@rm16 m_ea
 	IX = TDAT;
 	WZ = m_ea + 1;
@@ -3387,10 +3362,7 @@ dd38	# DB   DD
 	@jump 0038
 
 dd39	# ADD  IX,SP
-	TDAT = IX;
-	TDAT2 = SP;
-	@add16
-	IX = TDAT;
+	@add16 IX, SP
 
 dd3a	# DB   DD
 	illegal_1();
@@ -4226,10 +4198,7 @@ fd08	# DB   FD
 	@jump 0008
 
 fd09	# ADD  IY,BC
-	TDAT = IY;
-	TDAT2 = BC;
-	@add16
-	IY = TDAT;
+	@add16 IY, BC
 
 fd0a	# DB   FD
 	illegal_1();
@@ -4292,10 +4261,7 @@ fd18	# DB   FD
 	@jump 0018
 
 fd19	# ADD  IY,DE
-	TDAT = IY;
-	TDAT2 = DE;
-	@add16
-	IY = TDAT;
+	@add16 IY, DE
 
 fd1a	# DB   FD
 	illegal_1();
@@ -4326,12 +4292,10 @@ fd20	# DB   FD
 	@jump 0020
 
 fd21	# LD   IY,w
-	@arg16
-	IY = TDAT;
+	@arg16 IY
 
 fd22	# LD   (w),IY
-	@arg16
-	m_ea = TDAT;
+	@arg16 m_ea
 	TDAT = IY;
 	@wm16 m_ea
 	WZ = m_ea + 1;
@@ -4359,14 +4323,10 @@ fd28	# DB   FD
 	@jump 0028
 
 fd29	# ADD  IY,IY
-	TDAT = IY;
-	TDAT2 = IY;
-	@add16
-	IY = TDAT;
+	@add16 IY, IY
 
 fd2a	# LD   IY,(w)
-	@arg16
-	m_ea = TDAT;
+	@arg16 m_ea
 	@rm16 m_ea
 	IY = TDAT;
 	WZ = m_ea + 1;
@@ -4434,10 +4394,7 @@ fd38	# DB   FD
 	@jump 0038
 
 fd39	# ADD  IY,SP
-	TDAT = IY;
-	TDAT2 = SP;
-	@add16
-	IY = TDAT;
+	@add16 IY, SP
 
 fd3a	# DB   FD
 	illegal_1();
@@ -5444,8 +5401,7 @@ ed42	# SBC  HL,BC
 	@sbc_hl
 
 ed43	# LD   (w),BC
-	@arg16
-	m_ea = TDAT;
+	@arg16 m_ea
 	TDAT = BC;
 	@wm16 m_ea
 	WZ = m_ea + 1;
@@ -5478,8 +5434,7 @@ ed4a	# ADC  HL,BC
 	@adc_hl
 
 ed4b	# LD   BC,(w)
-	@arg16
-	m_ea = TDAT;
+	@arg16 m_ea
 	@rm16 m_ea
 	BC = TDAT;
 	WZ = m_ea + 1;
@@ -5512,8 +5467,7 @@ ed52	# SBC  HL,DE
 	@sbc_hl
 
 ed53	# LD   (w),DE
-	@arg16
-	m_ea = TDAT;
+	@arg16 m_ea
 	TDAT = DE;
 	@wm16 m_ea
 	WZ = m_ea + 1;
@@ -5546,8 +5500,7 @@ ed5a	# ADC  HL,DE
 	@adc_hl
 
 ed5b	# LD   DE,(w)
-	@arg16
-	m_ea = TDAT;
+	@arg16 m_ea
 	@rm16 m_ea
 	DE = TDAT;
 	WZ = m_ea + 1;
@@ -5580,8 +5533,7 @@ ed62	# SBC  HL,HL
 	@sbc_hl
 
 ed63	# LD   (w),HL
-	@arg16
-	m_ea = TDAT;
+	@arg16 m_ea
 	TDAT = HL;
 	@wm16 m_ea
 	WZ = m_ea + 1;
@@ -5614,8 +5566,7 @@ ed6a	# ADC  HL,HL
 	@adc_hl
 
 ed6b	# LD   HL,(w)
-	@arg16
-	m_ea = TDAT;
+	@arg16 m_ea
 	@rm16 m_ea
 	HL = TDAT;
 	WZ = m_ea + 1;
@@ -5647,8 +5598,7 @@ ed72	# SBC  HL,SP
 	@sbc_hl
 
 ed73	# LD   (w),SP
-	@arg16
-	m_ea = TDAT;
+	@arg16 m_ea
 	TDAT = SP;
 	@wm16 m_ea
 	WZ = m_ea + 1;
@@ -5681,8 +5631,7 @@ ed7a	# ADC  HL,SP
 	@adc_hl
 
 ed7b	# LD   SP,(w)
-	@arg16
-	m_ea = TDAT;
+	@arg16 m_ea
 	@rm16 m_ea
 	SP = TDAT;
 	WZ = m_ea + 1;
@@ -6090,8 +6039,7 @@ edff	# DB   ED
 0000	# NOP
 
 0001	# LD BC,w
-	@arg16
-	BC = TDAT;
+	@arg16 BC
 
 0002	# LD (BC),A
 	TDAT8 = A;
@@ -6121,10 +6069,7 @@ edff	# DB   ED
 	swap(m_af, m_af2);
 
 0009	# ADD  HL,BC
-	TDAT = HL;
-	TDAT2 = BC;
-	@add16
-	HL = TDAT;
+	@add16 HL, BC
 
 000a	# LD   A,(BC)
 	@rm BC
@@ -6154,8 +6099,7 @@ edff	# DB   ED
 	@jr_cond
 
 0011	# LD   DE,w
-	@arg16
-	DE = TDAT;
+	@arg16 DE
 
 0012	# LD (DE),A
 	TDAT8 = A;
@@ -6184,10 +6128,7 @@ edff	# DB   ED
 	@jr
 
 0019	# ADD  HL,DE
-	TDAT = HL;
-	TDAT2 = DE;
-	@add16
-	HL = TDAT;
+	@add16 HL, DE
 
 001a	# LD   A,(DE)
 	@rm DE
@@ -6216,12 +6157,10 @@ edff	# DB   ED
 	@jr_cond
 
 0021	# LD   HL,w
-	@arg16
-	HL = TDAT;
+	@arg16 HL
 
 0022	# LD   (w),HL
-	@arg16
-	m_ea = TDAT;
+	@arg16 m_ea
 	TDAT = HL;
 	@wm16 m_ea
 	WZ = m_ea + 1;
@@ -6248,14 +6187,10 @@ edff	# DB   ED
 	@jr_cond
 
 0029	# ADD  HL,HL
-	TDAT = HL;
-	TDAT2 = HL;
-	@add16
-	HL = TDAT;
+	@add16 HL, HL
 
 002a	# LD   HL,(w)
-	@arg16
-	m_ea = TDAT;
+	@arg16 m_ea
 	@rm16 m_ea
 	HL = TDAT;
 	WZ = m_ea + 1;
@@ -6283,12 +6218,10 @@ edff	# DB   ED
 	@jr_cond
 
 0031	# LD   SP,w
-	@arg16
-	SP = TDAT;
+	@arg16 SP
 
 0032	# LD   (w),A
-	@arg16
-	m_ea = TDAT;
+	@arg16 m_ea
 	TDAT8 = A;
 	@wm m_ea
 	WZ_L = (m_ea + 1) & 0xFF;
@@ -6320,14 +6253,10 @@ edff	# DB   ED
 	@jr_cond
 
 0039	# ADD  HL,SP
-	TDAT = HL;
-	TDAT2 = SP;
-	@add16
-	HL = TDAT;
+	@add16 HL, SP
 
 003a	# LD   A,(w)
-	@arg16
-	m_ea = TDAT;
+	@arg16 m_ea
 	@rm m_ea
 	A = TDAT8;
 	WZ = m_ea + 1;
@@ -8905,15 +8834,15 @@ z80n:ed33	# add bc,a
 	BC += A;
 
 z80n:ed34	# add hl,**
-	@arg16
+	@arg16 TDAT
 	HL += TDAT;
 
 z80n:ed35	# add de,**
-	@arg16
+	@arg16 TDAT
 	DE += TDAT;
 
 z80n:ed36	# add bc,**
-	@arg16
+	@arg16 TDAT
 	BC += TDAT;
 
 z80n:ed8a	# push **
@@ -8928,7 +8857,7 @@ z80n:ed90	# outinb
 	HL++;
 
 z80n:ed91	# nextreg *,*
-	@arg16
+	@arg16 TDAT
 	m_out_nextreg_cb(TDAT_L, TDAT_H);
 
 z80n:ed92	# nextreg *,a
