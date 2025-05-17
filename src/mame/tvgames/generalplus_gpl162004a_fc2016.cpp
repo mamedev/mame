@@ -18,11 +18,11 @@
 #include "screen.h"
 
 namespace {
-	class furby_connect_state : public generalplus_gpl162004a_game_state
+	class furby_connect_state : public generalplus_gpac800_game_state
 	{
 	public:
 		furby_connect_state(const machine_config &mconfig, device_type type, const char *tag) :
-			generalplus_gpl162004a_game_state(mconfig, type, tag)
+			generalplus_gpac800_game_state(mconfig, type, tag)
 		{}
 	
 		void furby_connect(machine_config &config);
