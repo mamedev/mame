@@ -830,27 +830,26 @@ void ppu_vt3xx_device::draw_sprites(u8 *line_priority)
 			int xpos = m_spriteram[0x180 + spritenum];
 			int tilenum = m_spriteram[0x080 + spritenum];
 			tilenum |= (m_spriteram[0x100 + spritenum] & 0x18) << 6;
-			uint8_t m_spritepatternbuf[16];
-
-			if (m_scanline == 128)
-				logerror("new sprite (%02x) ypos %d xpos %d tilenum %04x\n", spritenum, ypos, xpos, tilenum);
+			uint8_t m_spritepatternbuf[8];
 
 			int size = 16;
 
-			/* if the sprite isn't visible, skip it */
+			// if the sprite isn't visible, skip it
 			if ((ypos + size <= m_scanline) || (ypos > m_scanline))
 				continue;
 
-			/* compute the character's line to draw */
+			// compute the character's line to draw 
 			int sprite_line = m_scanline - ypos;
 
-			// a 16 pixel wide sprite (packed format), at 8bpp, requires 16 bytes for a single line
-			// at 16 pixels high it requires 256 bytes for a whole tile
-			int index1 = tilenum * 256;
-			int pattern_offset = index1 + sprite_line * 16;
-			pattern_offset += get_newmode_spritebase() * 0x800;
+			// a 16 pixel wide sprite (packed format), at 4bpp, requires 8 bytes for a single line
+			// at 16 pixels high it requires 128 bytes for a whole tile
 
-			for (int i = 0; i < 16; i++)
+			// sprites can be 8 pixels wide and 8bpp, or 16 pixels wide and 4bpp?
+			int index1 = tilenum * 128;
+			int pattern_offset = index1 + sprite_line * 8;
+			pattern_offset += get_newmode_spritebase() * 0x2000;
+
+			for (int i = 0; i < 8; i++)
 			{
 				m_spritepatternbuf[i] = m_read_newmode_sp(pattern_offset + i);
 			}
@@ -858,7 +857,11 @@ void ppu_vt3xx_device::draw_sprites(u8 *line_priority)
 			const int width = 16;
 			for (int pixel = 0; pixel < width; pixel++)
 			{
-				u8 pixel_data = m_spritepatternbuf[pixel];
+				u8 pixel_data = m_spritepatternbuf[pixel>>1];
+				if (pixel & 1)
+					pixel_data >>= 4;
+				else
+					pixel_data &= 0xf;
 
 				if (xpos + pixel >= 0)
 				{
