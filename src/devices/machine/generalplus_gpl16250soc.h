@@ -4,6 +4,8 @@
 
   SunPlus "GCM394" (based on die pictures)
 
+  Also includes GPL162004A (no die picture, this is a GeneralPlus' official datasheet name)
+
 **********************************************************************/
 
 #ifndef MAME_MACHINE_GENERALPLUS_GPL16250SOC_H
@@ -422,6 +424,22 @@ private:
 	uint32_t m_effectiveaddress;
 };
 
+class generalplus_gpl162004a_device : public generalplus_gpac800_device
+{
+public:
+	template <typename T>
+	generalplus_gpl162004a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&screen_tag) :
+		generalplus_gpl162004a_device(mconfig, tag, owner, clock)
+	{
+		m_screen.set_tag(std::forward<T>(screen_tag));
+		m_csbase = 0x30000;
+	}
+
+	generalplus_gpl162004a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	void gpl162004a_internal_map(address_map &map) ATTR_COLD;
+};
 
 class generalplus_gpspispi_device : public sunplus_gcm394_base_device
 {
@@ -486,6 +504,7 @@ private:
 
 DECLARE_DEVICE_TYPE(GCM394, sunplus_gcm394_device)
 DECLARE_DEVICE_TYPE(GPAC800, generalplus_gpac800_device)
+DECLARE_DEVICE_TYPE(GPL162004A, generalplus_gpl162004a_device)
 DECLARE_DEVICE_TYPE(GP_SPISPI, generalplus_gpspispi_device)
 DECLARE_DEVICE_TYPE(GP_SPI_DIRECT, generalplus_gpspi_direct_device)
 

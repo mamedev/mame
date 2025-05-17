@@ -18,12 +18,22 @@
 #include "screen.h"
 
 namespace {
+	class generalplus_gpl162004a_game_state : public generalplus_gpac800_game_state
+	{
+		public:
+			generalplus_gpl162004a_game_state(const machine_config& mconfig, device_type type, const char* tag) :
+				generalplus_gpac800_game_state(mconfig, type, tag)
+			{
+			}
 
-	class furby_connect_state : public generalplus_gpac800_game_state
+			void generalplus_gpl162004a(machine_config &config);
+	};
+
+	class furby_connect_state : public generalplus_gpl162004a_game_state
 	{
 	public:
 		furby_connect_state(const machine_config &mconfig, device_type type, const char *tag) :
-			generalplus_gpac800_game_state(mconfig, type, tag)
+			generalplus_gpl162004a_game_state(mconfig, type, tag)
 		{}
 	
 		void furby_connect(machine_config &config);
@@ -34,7 +44,7 @@ namespace {
 
 	void furby_connect_state::furby_connect(machine_config &config)
 	{
-		GPAC800(config, m_maincpu, 96000000/2, m_screen);
+		GPL162004A(config, m_maincpu, 96000000/2, m_screen);
 		m_maincpu->porta_in().set(FUNC(furby_connect_state::porta_r));
 		m_maincpu->portb_in().set(FUNC(furby_connect_state::portb_r));
 		m_maincpu->portc_in().set(FUNC(furby_connect_state::portc_r));
