@@ -61,22 +61,9 @@ sunplus_gcm394_device::sunplus_gcm394_device(const machine_config &mconfig, cons
 }
 
 DEFINE_DEVICE_TYPE(GPAC800, generalplus_gpac800_device, "gpac800", "GeneralPlus GPL16250 System-on-a-Chip (with NAND handling)")
-DEFINE_DEVICE_TYPE(GPAC800_base, generalplus_gpac800_base_device, "gpac800_base", "GeneralPlus GPL16250 System-on-a-Chip (with NAND handling)")
-
-generalplus_gpac800_device::generalplus_gpac800_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal) :
-	sunplus_gcm394_base_device(mconfig, type, tag, owner, clock, internal)
-{
-}
 
 generalplus_gpac800_device::generalplus_gpac800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	sunplus_gcm394_base_device(mconfig, GPAC800, tag, owner, clock, address_map_constructor(FUNC(generalplus_gpac800_device::gpac800_internal_map), this))
-{
-}
-
-DEFINE_DEVICE_TYPE(GPL162004A, generalplus_gpl162004a_device, "gpl162004a", "GeneralPlus GPL162004A System-on-a-Chip (with NAND handling)")
-
-generalplus_gpl162004a_device::generalplus_gpl162004a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	generalplus_gpac800_base_device(mconfig, GPL162004A, tag, owner, clock, address_map_constructor(FUNC(generalplus_gpl162004a_device::gpl162004a_internal_map), this))
 {
 }
 
@@ -1610,12 +1597,6 @@ void generalplus_gpac800_device::gpac800_internal_map(address_map& map)
 	map(0x030000, 0x1fffff).rw(FUNC(generalplus_gpac800_device::cs_space_r), FUNC(generalplus_gpac800_device::cs_space_w));
 	map(0x200000, 0x3fffff).rw(FUNC(generalplus_gpac800_device::cs_bank_space_r), FUNC(generalplus_gpac800_device::cs_bank_space_w));
 }
-
-void generalplus_gpl162004a_device::gpl162004a_internal_map(address_map& map)
-{
-	generalplus_gpac800_device::gpac800_internal_map(map);
-}
-
 
 uint16_t generalplus_gpspispi_device::spi_unk_7943_r()
 {

@@ -25,8 +25,6 @@ namespace {
 				generalplus_gpac800_game_state(mconfig, type, tag)
 			{
 			}
-
-			void generalplus_gpl162004a(machine_config &config);
 	};
 
 	class furby_connect_state : public generalplus_gpl162004a_game_state
@@ -44,7 +42,7 @@ namespace {
 
 	void furby_connect_state::furby_connect(machine_config &config)
 	{
-		GPL162004A(config, m_maincpu, 96000000/2, m_screen);
+		GPAC800(config, m_maincpu, 96000000/2, m_screen);
 		m_maincpu->porta_in().set(FUNC(furby_connect_state::porta_r));
 		m_maincpu->portb_in().set(FUNC(furby_connect_state::portb_r));
 		m_maincpu->portc_in().set(FUNC(furby_connect_state::portc_r));
