@@ -4,6 +4,14 @@
 #include "emu.h"
 #include "nes_vt369_vtunknown_soc.h"
 
+#define LOG_VT3XX_SOUND     (1U << 1)
+
+#define LOG_ALL     (LOG_VT3XX_SOUND)
+
+#define VERBOSE     (0)
+
+#include "logmacro.h"
+
 
 // this has a new RGB555 mode
 DEFINE_DEVICE_TYPE(VT369_SOC_INTROM_NOSWAP, vt369_soc_introm_noswap_device, "vt369_soc", "VT369 series System on a Chip")
@@ -304,64 +312,64 @@ void vt3xx_soc_base_device::vt369_soundcpu_timer_w(offs_t offset, uint8_t data)
 	{
 	case 0x00:
 		m_timerperiod = (m_timerperiod & 0xff00) | data;
-		logerror("%s: vt369_soundcpu_timer_w %02x %02x (period low byte)\n", machine().describe_context(), offset, data);
+		LOGMASKED(LOG_VT3XX_SOUND, "%s: vt369_soundcpu_timer_w %02x %02x (period low byte)\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x01:
 		m_timerperiod = (m_timerperiod & 0x00ff) | data << 8;
-		logerror("%s: vt369_soundcpu_timer_w %02x %02x (period high byte)\n", machine().describe_context(), offset, data);
+		LOGMASKED(LOG_VT3XX_SOUND, "%s: vt369_soundcpu_timer_w %02x %02x (period high byte)\n", machine().describe_context(), offset, data);
 		break;
 
 	case 0x02:
 		// 0x01 - enable timer
 		// 0x02 - enable timer IRQ
-		logerror("%s: vt369_soundcpu_timer_w %02x %02x (control)\n", machine().describe_context(), offset, data);
+		LOGMASKED(LOG_VT3XX_SOUND, "%s: vt369_soundcpu_timer_w %02x %02x (control)\n", machine().describe_context(), offset, data);
 		m_timercontrol = data;
 		update_timer();
 		break;
 
 	case 0x03:
-		logerror("%s: vt369_soundcpu_timer_w %02x %02x (clear IRQ)\n", machine().describe_context(), offset, data);
+		LOGMASKED(LOG_VT3XX_SOUND, "%s: vt369_soundcpu_timer_w %02x %02x (clear IRQ)\n", machine().describe_context(), offset, data);
 		break;
 
 	default:
-		logerror("%s: vt369_soundcpu_timer_w %02x %02x\n", machine().describe_context(), offset, data);
+		LOGMASKED(LOG_VT3XX_SOUND, "%s: vt369_soundcpu_timer_w %02x %02x\n", machine().describe_context(), offset, data);
 		break;
 	}
 }
 
 void vt3xx_soc_base_device::vt369_soundcpu_adder_data_address_w(offs_t offset, uint8_t data)
 {
-	logerror("%s: vt369_soundcpu_adder_data_address_w %02x %02x\n", machine().describe_context(), offset, data);
+	LOGMASKED(LOG_VT3XX_SOUND, "%s: vt369_soundcpu_adder_data_address_w %02x %02x\n", machine().describe_context(), offset, data);
 }
 
 uint8_t vt3xx_soc_base_device::vt369_soundcpu_adder_result_r(offs_t offset)
 {
-	logerror("%s: vt369_soundcpu_adder_result_r %02x\n", machine().describe_context(), offset);
+	LOGMASKED(LOG_VT3XX_SOUND, "%s: vt369_soundcpu_adder_result_r %02x\n", machine().describe_context(), offset);
 	return 0x00;
 }
 
 void vt3xx_soc_base_device::vt369_soundcpu_mult_data_address_w(offs_t offset, uint8_t data)
 {
-	logerror("%s: vt369_soundcpu_mult_data_address_w %02x %02x\n", machine().describe_context(), offset, data);
+	LOGMASKED(LOG_VT3XX_SOUND, "%s: vt369_soundcpu_mult_data_address_w %02x %02x\n", machine().describe_context(), offset, data);
 }
 
 uint8_t vt3xx_soc_base_device::vt369_soundcpu_mult_result_r(offs_t offset)
 {
-	logerror("%s: vt369_soundcpu_mult_result_r %02x\n", machine().describe_context(), offset);
+	LOGMASKED(LOG_VT3XX_SOUND, "%s: vt369_soundcpu_mult_result_r %02x\n", machine().describe_context(), offset);
 	return 0x00;
 }
 
 uint8_t vt3xx_soc_base_device::vt369_soundcpu_mult_status_r()
 {
-	logerror("%s: vt369_soundcpu_mult_status_r\n", machine().describe_context());
+	LOGMASKED(LOG_VT3XX_SOUND, "%s: vt369_soundcpu_mult_status_r\n", machine().describe_context());
 	return 0x00;
 }
 
 void vt3xx_soc_base_device::vt369_soundcpu_dac_w(offs_t offset, uint8_t data)
 {
 	// 2 16-bit channels?
-	logerror("%s: vt369_soundcpu_dac_w %02x %02x\n", machine().describe_context(), offset, data);
+	LOGMASKED(LOG_VT3XX_SOUND, "%s: vt369_soundcpu_dac_w %02x %02x\n", machine().describe_context(), offset, data);
 }
 
 uint8_t vt3xx_soc_base_device::vt369_soundcpu_vectors_r(offs_t offset)
