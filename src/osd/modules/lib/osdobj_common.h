@@ -92,6 +92,9 @@
 
 #define OSDOPTION_NETWORK_PROVIDER      "networkprovider"
 
+#define OSDOPTION_SERIAL_PORT          "serial_port"
+#define OSDOPTION_SERIAL_BAUDRATE      "serial_baudrate"
+
 #define OSDOPTION_BGFX_PATH             "bgfx_path"
 #define OSDOPTION_BGFX_BACKEND          "bgfx_backend"
 #define OSDOPTION_BGFX_DEBUG            "bgfx_debug"
@@ -186,6 +189,13 @@ public:
 	const char *pa_api() const { return value(OSDOPTION_PA_API); }
 	const char *pa_device() const { return value(OSDOPTION_PA_DEVICE); }
 	float pa_latency() const { return float_value(OSDOPTION_PA_LATENCY); }
+
+	// serial options
+	const char *serial_port() const { return value(OSDOPTION_SERIAL_PORT); }
+	int serial_baudrate() const { return int_value(OSDOPTION_SERIAL_BAUDRATE); }
+
+	// MIDI options
+	const char *midi_provider() const { return value(OSDOPTION_MIDI_PROVIDER); }
 
 	static const options_entry s_option_entries[];
 };
