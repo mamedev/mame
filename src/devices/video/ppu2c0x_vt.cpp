@@ -812,10 +812,10 @@ void ppu_vt3xx_device::draw_sprites(u8 *line_priority)
 		+ 0x080    tttt tttt   t = tile number
 
 		for new format 0  (m_newvid_1d & 0x08 set)
-		+ 0x100    YXpT TTpp   Y = ypos sign X = xpos sign T = high tile number p = palette
+		+ 0x100    YXpT TTpp   Y = negative Y pos    X = negative X pos    T = high tile number    p = palette
 
 		for new format 1  (m_newvid_1d & 0x08 not set)
-		+ 0x100    fFzT TTpp   f = yflip F = xflip T = high tile number p = palette z = priority
+		+ 0x100    fFzT TTpp   f = yflip    F = xflip    T = high tile number    p = palette    z = priority
 
 		+ 0x180    xxxx xxxx   x = xpos
 
@@ -832,10 +832,6 @@ void ppu_vt3xx_device::draw_sprites(u8 *line_priority)
 
 			int pal = m_spriteram[0x100 + spritenum] & 0x03;
 
-			if (m_newvid_1d & 0x08)
-			{
-				pal |= (m_spriteram[0x100 + spritenum] & 0x20) >> 3;
-			}
 			int height = 16;
 			int width = 8;
 			int bpp = 8;
@@ -845,6 +841,23 @@ void ppu_vt3xx_device::draw_sprites(u8 *line_priority)
 				width = 16;
 				bpp = 4;
 			}
+
+			if (m_newvid_1d & 0x08)
+			{
+				pal |= (m_spriteram[0x100 + spritenum] & 0x20) >> 3;
+				if (m_spriteram[0x100 + spritenum] & 0x40)
+				{
+					xpos = -0x100 + xpos; // allows for partially offscreen sprites?
+				}
+
+				// TODO: verify
+				if (m_spriteram[0x100 + spritenum] & 0x80)
+				{
+					ypos = -0x100 + ypos;
+				}
+			}
+
+			ypos++; // red5mam alignment
 
 			// if the sprite isn't visible, skip it
 			if ((ypos + height <= m_scanline) || (ypos > m_scanline))
