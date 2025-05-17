@@ -20,10 +20,13 @@
 #include "cpu/h8/h83006.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
-#include "315_5296.h"
-#include "315_5338a.h"
 #include "machine/te7750.h"
 #include "sound/scsp.h"
+
+#include "315_5296.h"
+#include "315_5338a.h"
+#include "dsb2.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -39,6 +42,7 @@ public:
 		m_scspcpu(*this, "scspcpu"),
 		m_scsp(*this, "scsp"),
 		m_sound_ram(*this, "sound_ram"),
+		m_dsb2(*this, "dsb2"),
 		m_eeprom(*this, "eeprom"),
 		m_315_5296(*this, "segaio1"),
 		m_315_5338a(*this, "segaio2")
@@ -63,6 +67,7 @@ private:
 	required_device<m68000_device> m_scspcpu;
 	required_device<scsp_device> m_scsp;
 	required_shared_ptr<uint16_t> m_sound_ram;
+	required_device<dsb2_device> m_dsb2;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<sega_315_5296_device> m_315_5296;
 	required_device<sega_315_5338a_device> m_315_5338a;
@@ -150,6 +155,13 @@ void flashbeats_state::flashbeats(machine_config &config)
 	m_scsp->irq_cb().set(FUNC(flashbeats_state::scsp_irq));
 	m_scsp->add_route(0, "speaker", 1.0, 0);
 	m_scsp->add_route(1, "speaker", 1.0, 1);
+
+	DSB2(config, m_dsb2, 0);
+	m_dsb2->add_route(0, "speaker", 1.0, 0);
+	m_dsb2->add_route(1, "speaker", 1.0, 1);
+
+	// TODO
+	// m_uart->txd_handler().set(m_dsb2, FUNC(dsb2_device::write_txd));
 }
 
 void flashbeats_state::scsp_irq(offs_t offset, uint8_t data)
@@ -173,10 +185,10 @@ ROM_START( flsbeats )
 	ROM_LOAD16_WORD_SWAP( "epr-21610_rom4.ic14", 0x000000, 0x080000, CRC(c877e0e6) SHA1(595f143fb3789852a4af9d2920cbaefabecfa45c) )
 	ROM_LOAD16_WORD_SWAP( "epr-21611_rom3.ic4", 0x080000, 0x200000, CRC(2f5dc574) SHA1(f0b8d076b0fc8e94582de0ca17ecd5c8b90bedc4) )
 
-	ROM_REGION(0x20000, "dsb2", 0)
+	ROM_REGION(0x20000, "dsb2:mpegcpu", 0)
 	ROM_LOAD16_WORD_SWAP( "epr-21612.ic2", 0x000000, 0x020000, CRC(6912e1cb) SHA1(3497d6ae0b9be00116a3278f46d738c4c6f26d20) )
 
-	ROM_REGION(0x2000000, "mpeg", 0)
+	ROM_REGION(0x2000000, "dsb2:mpeg", 0)
 	ROM_LOAD( "mpr-21601_n26_9852k7016.ic18", 0x0000000, 0x400000, CRC(d23e2b7b) SHA1(8c26a740fee0adc4d45d34786b0c28abb105324d) )
 	ROM_LOAD( "mpr-21602_n27_9852k7017.ic19", 0x0400000, 0x400000, CRC(e143960b) SHA1(7ace5cae6f2a8868d74d4397a9c1b0a0f6f26c9f) )
 	ROM_LOAD( "mpr-21603_n28_9852k7018.ic20", 0x0800000, 0x400000, CRC(136b69d8) SHA1(ad81be6f0383f29306c8d9f21d1e7440172ebf97) )
