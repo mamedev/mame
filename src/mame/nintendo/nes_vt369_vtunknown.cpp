@@ -565,6 +565,27 @@ static INPUT_PORTS_START( vt369_vtunknown )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( vt369_vtunknown_rot )
+	PORT_START("IO0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("A")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_8WAY
+
+	PORT_START("IO1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("A")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("B")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2) PORT_8WAY
+INPUT_PORTS_END
 
 uint8_t vt369_vtunknown_dg_fapocket_state::fapocket_412c_r()
 {
@@ -1055,12 +1076,12 @@ CONS( 2012, dgun2561,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_v
 
 CONS( 2012, lxccatv,   0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade TV - 120 in 1 (JL2370)", MACHINE_NOT_WORKING ) // 32MByte ROM, 2011 on case, 2012 on PCB
 // All Lexibook units below have 64Mbyte ROMs, must be externally banked, or different addressing scheme
+CONS( 2012, lxcmcysp,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown_rot, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Marvel Ultimate Spider-Man (120-in-1)", MACHINE_NOT_WORKING | ROT270) // renders vertically, but screen stretches it to horizontal
 CONS( 200?, lxcmcy,    0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade", MACHINE_NOT_WORKING )
 CONS( 200?, lxcmc250,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - 250-in-1 (JL2375)", MACHINE_NOT_WORKING )
 CONS( 200?, lxcmcysw,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Star Wars Rebels", MACHINE_NOT_WORKING )
 CONS( 200?, lxcmcyfz,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Frozen", MACHINE_NOT_WORKING )
 CONS( 2012, lxcmcydp,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Disney Princess", MACHINE_NOT_WORKING )
-CONS( 2012, lxcmcysp,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Marvel Ultimate Spider-Man (120-in-1)", MACHINE_NOT_WORKING | ROT270) // renders vertically, but screen stretches it to horizontal
 CONS( 2014, lxcmcycr,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Cars", MACHINE_NOT_WORKING )
 CONS( 2018, lxcmcypj,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - PJ Masks", MACHINE_NOT_WORKING )
 CONS( 2014, lxcmcyba,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Barbie (JL2365BB)", MACHINE_NOT_WORKING )

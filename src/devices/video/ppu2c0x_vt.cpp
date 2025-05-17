@@ -822,13 +822,20 @@ void ppu_vt3xx_device::draw_sprites(u8 *line_priority)
 		*/
 
 		// new style sprites
-		for (int spritenum = 0x00; spritenum < 0x80; spritenum++)
+		for (int spritenum = 0x7f; spritenum >= 0x00; spritenum--)
 		{
 			int ypos = m_spriteram[0x000 + spritenum];
 			int xpos = m_spriteram[0x180 + spritenum];
 			int tilenum = m_spriteram[0x080 + spritenum];
 			tilenum |= (m_spriteram[0x100 + spritenum] & 0x1c) << 6;
 			uint8_t m_spritepatternbuf[8];
+
+			int pal = m_spriteram[0x100 + spritenum] & 0x03;
+
+			if (m_newvid_1d)
+			{
+				pal |= (m_spriteram[0x100 + spritenum] & 0x20) >> 3;
+			}
 
 			int size = 16;
 
@@ -870,7 +877,17 @@ void ppu_vt3xx_device::draw_sprites(u8 *line_priority)
 							/* has another sprite been drawn here? */
 							//if (BIT(~line_priority[sprite_xpos + pixel], 0))
 							{
-								const u32 palval = pixel_data + machine().rand();
+								const u8 pen = pixel_data | pal << 4;
+
+								uint16_t pal0 = readbyte(((pen & 0xff)*2)+0x3e00);
+										 pal0 |= readbyte(((pen & 0xff)*2)+0x3e01) << 8;
+
+								int palb = (pal0 >> 0) & 0x1f;
+								int palg = (pal0 >> 5) & 0x1f;
+								int palr = (pal0 >> 10) & 0x1f;
+
+								rgb_t palval = rgb_t(palr<<3, palg<<3, palb<<3);
+
 								m_bitmap.pix(m_scanline, xpos + pixel) = palval;
 								//line_priority[sprite_xpos + pixel] |= 0x01;
 							}
