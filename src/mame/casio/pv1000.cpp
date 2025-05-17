@@ -554,10 +554,11 @@ void pv1000_state::pv1000(machine_config &config)
 	// Display aspect is MAME's 4:3 default.
 
 	// Note that this value is overridden by the user's pv1000.cfg, if present.
-	// 206px x 48/35(PAR) / 4/3(DAR) = 212sl
+	// To allow full game display by default while preserving pixel aspect and display aspect, setting Screen Horizontal Stretch to 1.0, Screen Vertical Display to 1.097659
+	// This matches previous ratio established by lidnariq based on 206px x 48/35(PAR) / 4/3(DAR) = 212sl, or m_screen->set_default_position(216/206.0, 0, 244/212.0, 0)
 	m_screen->set_default_position(
-			216/206.0, 0, //216 px in storage aspect; cropped to 206 px
-			244/212.0, 0); //244 sl in storage aspect; cropped to 212 sl
+			1.0, 0,
+			6283.0/5724.0, 0); 
 	m_screen->set_screen_update(FUNC(pv1000_state::screen_update_pv1000));
 	m_screen->set_palette(m_palette);
 
