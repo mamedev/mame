@@ -857,7 +857,13 @@ void ppu_vt3xx_device::draw_sprites(u8 *line_priority)
 			// at 16 pixels high it requires 128 bytes for a whole tile
 
 			// sprites can be 8 pixels wide and 8bpp, or 16 pixels wide and 4bpp?
-			int index1 = tilenum * 128;
+			int index1;
+
+			if (bpp == 4)
+				index1 = tilenum * 128;
+			else
+				index1 = tilenum * 64; // why? a 16 wide 4bpp sprite takes up the same number of bytes as an 8 wide 8bpp sprite
+
 			int pattern_offset = index1 + sprite_line * 8;
 			pattern_offset += get_newmode_spritebase() * 0x2000;
 
