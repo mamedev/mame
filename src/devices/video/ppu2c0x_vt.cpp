@@ -832,15 +832,22 @@ void ppu_vt3xx_device::draw_sprites(u8 *line_priority)
 
 			int pal = m_spriteram[0x100 + spritenum] & 0x03;
 
-			if (m_newvid_1d)
+			if (m_newvid_1d & 0x08)
 			{
 				pal |= (m_spriteram[0x100 + spritenum] & 0x20) >> 3;
 			}
+			int height = 16;
+			int width = 8;
+			int bpp = 8;
 
-			int size = 16;
+			if (m_newvid_1d & 0x02)
+			{
+				width = 16;
+				bpp = 4;
+			}
 
 			// if the sprite isn't visible, skip it
-			if ((ypos + size <= m_scanline) || (ypos > m_scanline))
+			if ((ypos + height <= m_scanline) || (ypos > m_scanline))
 				continue;
 
 			// compute the character's line to draw 
@@ -859,14 +866,22 @@ void ppu_vt3xx_device::draw_sprites(u8 *line_priority)
 				m_spritepatternbuf[i] = m_read_newmode_sp(pattern_offset + i);
 			}
 
-			const int width = 16;
 			for (int pixel = 0; pixel < width; pixel++)
 			{
-				u8 pixel_data = m_spritepatternbuf[pixel>>1];
-				if (pixel & 1)
-					pixel_data >>= 4;
+				u8 pixel_data;
+
+				if (bpp == 4)
+				{
+					pixel_data = m_spritepatternbuf[pixel >> 1];
+					if (pixel & 1)
+						pixel_data >>= 4;
+					else
+						pixel_data &= 0xf;
+				}
 				else
-					pixel_data &= 0xf;
+				{
+					pixel_data = m_spritepatternbuf[pixel];
+				}
 
 				if (xpos + pixel >= 0)
 				{
@@ -874,10 +889,14 @@ void ppu_vt3xx_device::draw_sprites(u8 *line_priority)
 					{
 						if ((xpos + pixel) < VISIBLE_SCREEN_WIDTH)
 						{
-							/* has another sprite been drawn here? */
+							// has another sprite been drawn here?/
 							//if (BIT(~line_priority[sprite_xpos + pixel], 0))
 							{
-								const u8 pen = pixel_data | pal << 4;
+								uint8_t pen;
+								if (bpp == 4)
+									pen = pixel_data | pal << 4;
+								else
+									pen = pixel_data; // does pal have another meaning in 8bpp mode?
 
 								uint16_t pal0 = readbyte(((pen & 0xff)*2)+0x3e00);
 										 pal0 |= readbyte(((pen & 0xff)*2)+0x3e01) << 8;
