@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:O. Galibert
 
-#ifndef MAME_VIDEO_ST7626_H
-#define MAME_VIDEO_ST7626_H
+#ifndef MAME_VIDEO_ST7626LCDC_H
+#define MAME_VIDEO_ST7626LCDC_H
 
 #pragma once
 
@@ -30,4 +30,4 @@ private:
 
 DECLARE_DEVICE_TYPE(ST7626, st7626_device)
 
-#endif // MAME_VIDEO_ST7626_H
+#endif // MAME_VIDEO_ST7626LCDC_H
