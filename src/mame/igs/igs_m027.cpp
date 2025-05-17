@@ -238,6 +238,7 @@ private:
 	void oceanpar_output_w(u8 data);
 	void tripslot_misc_w(u8 data);
 	void tripslot_okibank_low_w(u8 data);
+	void ccly_okibank_w(u8 data);
 	void oki_128k_bank_w(u8 data);
 
 	u32 slqz3_gpio_r();
@@ -253,6 +254,7 @@ private:
 	template <bool Xor> void m027_2ppis_map(address_map &map) ATTR_COLD;
 	void cjddz_map(address_map &map) ATTR_COLD;
 	void tripslot_map(address_map &map) ATTR_COLD;
+	void ccly_map(address_map &map) ATTR_COLD;
 
 	void oki_128k_map(address_map &map) ATTR_COLD;
 };
@@ -343,6 +345,13 @@ void igs_m027_state::tripslot_map(address_map &map)
 	m027_1ppi_map<true>(map);
 
 	map(0x3800'c000, 0x3800'c003).umask32(0x0000'00ff).w(FUNC(igs_m027_state::tripslot_misc_w));
+}
+
+void igs_m027_state::ccly_map(address_map &map)
+{
+	m027_1ppi_map<true>(map);
+
+	map(0x3800'c000, 0x3800'c003).umask32(0x0000'00ff).w(FUNC(igs_m027_state::ccly_okibank_w));
 }
 
 void igs_m027_state::oki_128k_map(address_map &map)
@@ -1945,6 +1954,11 @@ void igs_m027_state::tripslot_okibank_low_w(u8 data)
 	m_oki->set_rom_bank(m_io_select[0]);
 }
 
+void igs_m027_state::ccly_okibank_w(u8 data)
+{
+	m_oki->set_rom_bank(data & 0x07);
+}
+
 void igs_m027_state::oki_128k_bank_w(u8 data)
 {
 	for (int i = 0; i < m_okibank.size(); i++)
@@ -2261,6 +2275,7 @@ void igs_m027_state::ccly(machine_config &config)
 {
 	m027_1ppi<true>(config);
 
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::ccly_map);
 	m_maincpu->in_port().set_ioport("PLAYER");
 
 	m_ppi[0]->out_pb_callback().set_ioport("PPIB");
