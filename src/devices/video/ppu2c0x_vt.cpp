@@ -829,8 +829,10 @@ void ppu_vt3xx_device::write_to_spriteram_with_increment(uint8_t data)
 	}
 	else
 	{
-		m_spriteram[m_regs[PPU_SPRITE_ADDRESS]] = data;
+		m_spriteram[m_regs[PPU_SPRITE_ADDRESS] | (m_2008_spritehigh & 0x1) << 8] = data;
 		m_regs[PPU_SPRITE_ADDRESS] = (m_regs[PPU_SPRITE_ADDRESS] + 1) & 0xff;
+		if (m_regs[PPU_SPRITE_ADDRESS] == 0x00)
+			m_2008_spritehigh ^= 0x1;
 	}
 }
 
