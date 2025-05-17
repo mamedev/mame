@@ -277,7 +277,8 @@ void vt3xx_soc_base_device::vt_dma_w(uint8_t data)
 }
 
 // this reads from the 'extra ROM' area (serial style protocol) and code is copied on gtct885 to e00 in RAM, jumps to it at EDF9: jsr $0e1c
-uint8_t vt3xx_soc_base_device::extra_rom_prot_4153_r() { logerror("%s: extra_rom_prot_4153_r (protection? / extra SPI device?)\n", machine().describe_context()); return machine().rand(); }
+// extra_rom_prot_4153_r is used by lxccminn, lxccplan and dgun2561 to check battery state instead? reports low battery and does nothing else if unhappy
+uint8_t vt3xx_soc_base_device::extra_rom_prot_4153_r() { logerror("%s: extra_rom_prot_4153_r (protection? / extra SPI device?)\n", machine().describe_context()); return 0xff; }
 // pactin and tetrtin use these for something similar, seems to want code/data for jumps?
 uint8_t vt3xx_soc_base_device::extra_rom_prot_4150_r() { logerror("%s: extra_rom_prot_4150_r (protection? / extra SPI device?)\n", machine().describe_context()); return machine().rand(); }
 uint8_t vt3xx_soc_base_device::extra_rom_prot_4152_r() { logerror("%s: extra_rom_prot_4152_r (protection? / extra SPI device?)\n", machine().describe_context()); return machine().rand(); }
@@ -555,7 +556,8 @@ uint8_t vt3xx_soc_base_device::vt369_415c_r()
 	logerror("%s: vt369_415c_r (unknown - important)\n", machine().describe_context());
 	// returning 0x00 allows zonefusn and lexi30 (and many other lexibook sets) to show menus, but stops sealvt from showing anything
 	// returning 0xff allows sealvt to show the boot screen
-	return 0x00; 
+	// 0xf0 allows all those to boot?
+	return 0xf0; 
 }
 
 uint8_t vt3xx_soc_base_device::vt369_418a_r()

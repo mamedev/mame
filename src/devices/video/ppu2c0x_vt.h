@@ -78,7 +78,7 @@ public:
 	uint16_t get_newmode_tilebase() { return m_newvid_2x[0] | (m_newvid_2x[1] << 8); }
 	uint16_t get_newmode_spritebase() { return m_newvid_2x[2] | (m_newvid_2x[3] << 8); }
 	uint8_t vt3xx_extended_palette_r(offs_t offset) { return m_vt3xx_palette[offset]; }
-	void vt3xx_extended_palette_w(offs_t offset, uint8_t data) { logerror("%s: extended palette write %04x %02x\n", machine().describe_context(), offset, data); m_vt3xx_palette[offset] = data; }
+	void vt3xx_extended_palette_w(offs_t offset, uint8_t data) { /*logerror("%s: extended palette write %04x %02x\n", machine().describe_context(), offset, data);*/ m_vt3xx_palette[offset] = data; }
 
 	uint8_t get_m_read_bg4_bg3();
 	uint8_t get_speva2_speva0();
