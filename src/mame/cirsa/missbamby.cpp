@@ -10,7 +10,7 @@ Known games on this hardware:
  | YES    | Mini Super Fruits | Cirsa              | Cirsa PCB 810601 A |
  | YES    | Lucky Player      | Cirsa              | Cirsa PCB 810702 A |
  | YES    | Miss Bamby        | Automatics Pasqual |                    |
- | YES    | Mini 3            | Arfyc              | 6MHz xtal, battery |
+ | YES    | 3 Mini            | Arfyc              | 6MHz xtal, battery |
  | YES    | Mini Azar D       | Arfyc              |                    |
  | YES    | Golden Winner     | Reben              |                    |
  | YES    | Golden Fruits     | Video Game         | 4 dipsw, battery   |
