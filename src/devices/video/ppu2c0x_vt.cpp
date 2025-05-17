@@ -816,6 +816,32 @@ void ppu_vt3xx_device::draw_sprites(u8 *line_priority)
 			if (m_scanline == 128)
 				logerror("new sprite (%02x) ypos %d xpos %d tilenum %04x\n", spritenum, ypos, xpos, tilenum);
 
+			int size = 16;
+
+			/* if the sprite isn't visible, skip it */
+			if ((ypos + size <= m_scanline) || (ypos > m_scanline))
+				continue;
+
+			/* compute the character's line to draw */
+			//int sprite_line = m_scanline - ypos;
+
+			//read_sprite_plane_data(tilenum);
+			m_planebuf[0] = machine().rand();// m_read_sp((address + 0) & 0x1fff);
+			m_planebuf[1] = machine().rand();// m_read_sp((address + 8) & 0x1fff);
+
+			int width = 16;
+
+			for (int pixel = 0; pixel < width; pixel++)
+			{
+				u8 pixel_data = machine().rand();
+				//make_sprite_pixel_data(pixel_data, 0);
+
+				if (xpos + pixel >= 0)
+				{
+					draw_sprite_pixel_high(m_bitmap, pixel_data, pixel, xpos, 0, spritenum, line_priority);
+				}
+			}
+
 		}
 
 	}
