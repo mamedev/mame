@@ -807,18 +807,16 @@ void ppu_vt3xx_device::draw_sprites(u8 *line_priority)
 	else
 	{
 		/*
-		new format 0  (m_newvid_1d & 0x08 set)
 
 		+ 0x000    yyyy yyyy   y = ypos
 		+ 0x080    tttt tttt   t = tile number
+
+		for new format 0  (m_newvid_1d & 0x08 set)
 		+ 0x100    YXpT TTpp   Y = ypos sign X = xpos sign T = high tile number p = palette
-		+ 0x180    xxxx xxxx   x = xpos
 
-		new format 1  (m_newvid_1d & 0x08 not set)
-
-		+ 0x000    yyyy yyyy   y = ypos
-		+ 0x080    tttt tttt   t = tile number
+		for new format 1  (m_newvid_1d & 0x08 not set)
 		+ 0x100    fFzT TTpp   f = yflip F = xflip T = high tile number p = palette z = priority
+
 		+ 0x180    xxxx xxxx   x = xpos
 
 		*/
@@ -829,7 +827,7 @@ void ppu_vt3xx_device::draw_sprites(u8 *line_priority)
 			int ypos = m_spriteram[0x000 + spritenum];
 			int xpos = m_spriteram[0x180 + spritenum];
 			int tilenum = m_spriteram[0x080 + spritenum];
-			tilenum |= (m_spriteram[0x100 + spritenum] & 0x18) << 6;
+			tilenum |= (m_spriteram[0x100 + spritenum] & 0x1c) << 6;
 			uint8_t m_spritepatternbuf[8];
 
 			int size = 16;
