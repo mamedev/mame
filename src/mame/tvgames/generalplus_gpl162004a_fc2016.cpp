@@ -1,12 +1,12 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:fluff_, David Haywood
 
 /*
     Furby Connect uses GPL162004A SoC, which seems like a GPL16250's (GPAC1800's) brother
     Has NAND + RAM configuration, also has an SPI flash (don't know what it is for)
     Nor NAND, nor SPI flash have appropriate headings, so bootstrap is likely custom
     Interestingly, NAND has a bunch of "GPspispisp" headings, though it shouldn't have.
-    NAND has also FAT32 filesystem, so this may indicate, why the data is so strange.
+    NAND has also FAT32 filesystem (but broken offsets), so this may indicate, why the data is so strange.
 
     --GeneralPlus GPL162004A-- --EtronTech EM639165TS-7G-- --Toshiba TC58BVG0S3HTA00-- --GeneralPlus GPR25L081B--
 */
@@ -18,15 +18,6 @@
 #include "screen.h"
 
 namespace {
-	class generalplus_gpl162004a_game_state : public generalplus_gpac800_game_state
-	{
-		public:
-			generalplus_gpl162004a_game_state(const machine_config& mconfig, device_type type, const char* tag) :
-				generalplus_gpac800_game_state(mconfig, type, tag)
-			{
-			}
-	};
-
 	class furby_connect_state : public generalplus_gpl162004a_game_state
 	{
 	public:
