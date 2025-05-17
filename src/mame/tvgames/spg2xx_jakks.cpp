@@ -21,8 +21,9 @@ public:
 	void base_config(machine_config& config);
 	void spg2xx_jakks(machine_config& config);
 	void mk(machine_config& config);
-
+	void spg2xx_dpma(machine_config& config);
 	void jakks_mpac(machine_config& config);
+	void jakks_rapm(machine_config& config);
 
 private:
 	void mem_map_2m_mkram(address_map &map) ATTR_COLD;
@@ -103,6 +104,45 @@ static INPUT_PORTS_START( jak_supm )
 	PORT_BIT( 0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( spg2xx_spdv )
+	PORT_START("P1")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_NAME("Joypad Up")
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_NAME("Joypad Down")
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_NAME("Joypad Left")
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_NAME("Joypad Right")
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(1) PORT_NAME("A Button")
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(1) PORT_NAME("B Button")
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Menu / Pause")
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P3")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::read_sda))
+	PORT_BIT( 0x0006, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PAL/NTSC flag, set to NTSC
+	PORT_BIT( 0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( spg2xx_dpma )
+	PORT_START("P1")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_NAME("Joypad Up")
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_NAME("Joypad Down")
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_NAME("Joypad Left")
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_NAME("Joypad Right")
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(1) PORT_NAME("A Button")
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Menu / Pause")
+	PORT_BIT( 0x000f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P3")
+	PORT_BIT( 0x0007, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PAL/NTSC flag, set to NTSC (unverified here)
+	PORT_BIT( 0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( mk )
 	PORT_START("P1")
@@ -151,6 +191,35 @@ static INPUT_PORTS_START( jak_mpac )
 	PORT_BIT(0x03ff, 0x0000, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0x03ff)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( jak_rapm )
+	PORT_INCLUDE( jak_mpac )
+
+	PORT_MODIFY("DIALX") // for Pole Position, joystick can be twisted like a dial/wheel (limited?) (check range)
+	PORT_BIT(0x0fff, 0x0000, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0x0fff)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( spg2xx_pacg )
+	PORT_START("P1")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_NAME("Joypad Up")
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_NAME("Joypad Down")
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_NAME("Joypad Left")
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_NAME("Joypad Right")
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(1) PORT_NAME("A Button")
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Menu / Pause")
+	PORT_BIT( 0x000f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P3")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::read_sda))
+	PORT_BIT( 0x0006, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PAL/NTSC flag, set to NTSC (unverified here)
+	PORT_BIT( 0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
 void jakks_state::base_config(machine_config& config)
 {
 	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
@@ -169,6 +238,18 @@ void jakks_state::spg2xx_jakks(machine_config &config)
 	base_config(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jakks_state::mem_map_2m);
 }
+
+void jakks_state::spg2xx_dpma(machine_config& config)
+{
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	spg2xx_base(config);
+
+	m_maincpu->porta_in().set(FUNC(jakks_state::base_porta_r));
+	m_maincpu->portc_in().set_ioport("P3");
+	m_maincpu->portc_out().set(FUNC(jakks_state::portc_w));
+	m_maincpu->set_addrmap(AS_PROGRAM, &jakks_state::mem_map_2m);
+}
+
 
 void jakks_state::mem_map_2m_mkram(address_map &map)
 {
@@ -199,6 +280,12 @@ void jakks_state::jakks_mpac(machine_config &config)
 	m_maincpu->adc_in<0>().set_ioport("DIALX");
 }
 
+void jakks_state::jakks_rapm(machine_config &config)
+{
+	spg2xx_jakks(config);
+	m_maincpu->adc_in<0>().set_ioport("DIALX");
+}
+
 
 ROM_START( jak_batm )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
@@ -215,6 +302,11 @@ ROM_END
 ROM_START( jak_potc )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "pirates.u5", 0x000000, 0x400000, CRC(935fe66c) SHA1(8b5b11c61b7f32c313aa46e33a1c918ed82f7916) )
+ROM_END
+
+ROM_START( jak_cind )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakkscinderella.u5", 0x000000, 0x200000, CRC(73008a51) SHA1(89168bc2c64836daa341a6fbacb1fa63c2fef14b) )
 ROM_END
 
 ROM_START( jak_supm )
@@ -239,6 +331,16 @@ ROM_START( jak_mpacw )
 	ROM_LOAD16_WORD_SWAP( "wirelessnamco.bin", 0x000000, 0x200000, CRC(78a318ca) SHA1(3c2601cbb023edb6a1f3d4bce686e0be1ef63eee) )
 ROM_END
 
+ROM_START( jak_rapm )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakks_retroarcade.u3", 0x000000, 0x400000, CRC(f2dcb1c8) SHA1(2361b8598279bc6642ca997bbf2072a9e6ac045e) )
+ROM_END
+
+ROM_START( jak_pacg )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakkspacmangold.u2", 0x000000, 0x200000, CRC(59904862) SHA1(f86a8847742fa918bdfa0fa927ec6e1f573ce31c) )
+ROM_END
+
 ROM_START( jak_spd3 )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "spiderman3.u4", 0x000000, 0x200000, CRC(87019271) SHA1(80d126af970236a1cecf7ade49f916caf8f67ceb) )
@@ -253,6 +355,27 @@ ROM_START( jak_pix )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "jakkspixar.bin", 0x000000, 0x200000, CRC(ec110f2b) SHA1(a57e1d45cfb537173f94d1a95323183a62976bb4) )
 ROM_END
+
+ROM_START( jak_shrk )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakkshrek.u2", 0x000000, 0x400000, CRC(4abb910d) SHA1(e663abd2ba6eacca2f4a046d8b8ebac2cf3fd36a) )
+ROM_END
+
+ROM_START( jak_spdv )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakkspiderweb.u2", 0x000000, 0x200000, CRC(408c94bc) SHA1(350f7b84abf3d0d56f081647b3a228505751ff70) )
+ROM_END
+
+ROM_START( jak_dpma )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakks_magicaladventures.u2", 0x000000, 0x200000, CRC(3c3fdf54) SHA1(9847412a0ee21819cc714ca1a2dd519edb892c95) )
+ROM_END
+
+ROM_START( jak_hsm )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakkshighschoolmusical.u3", 0x000000, 0x400000, CRC(ad83549a) SHA1(1d198209055e418402c9f3f389bccde156ca5a43) )
+ROM_END
+
 
 } // anonymous namespace
 
@@ -279,16 +402,31 @@ CONS( 2004, jak_mpacw,0, 0, jakks_mpac, jak_mpac,   jakks_state, empty_init, "JA
 //
 // A further updated version of this, adapted for touch controls, was released as a 'TV Touch' unit, see
 // spg2xx_jakks_tvtouch.cpp
-CONS( 2007, jak_sbjd, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "SpongeBob SquarePants Jellyfish Dodge (JAKKS Pacific TV Game) (Apr 5 2007)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2007, jak_sbjd, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "SpongeBob SquarePants Jellyfish Dodge (JAKKS Pacific TV Game) (Apr 5 2007)", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2008, jak_wall, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "Wall-E (JAKKS Pacific TV Game) (Dec 18 2007 11:34:25)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2008, jak_wall, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "Wall-E (JAKKS Pacific TV Game) (Dec 18 2007 11:34:25)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2007, jak_potc, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "Pirates of the Caribbean - Islands of Fortune (JAKKS Pacific TV Game) (Jun 1 2007 12:34:28)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2006, jak_supm, 0, 0, spg2xx_jakks,  jak_supm,      jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "Superman in Super Villain Showdown (JAKKS Pacific TV Game) (26 Jan 2006 A)", MACHINE_IMPERFECT_SOUND ) // has AT24C04
 
+CONS( 2006, jak_spdv, 0, 0, spg2xx_jakks,  spg2xx_spdv,   jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "The Amazing Spider-Man in Villain Round-Up (JAKKS Pacific TV Game) (24 Apr 2006 A)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2007, jak_pacg, 0, 0, spg2xx_jakks,  spg2xx_pacg,   jakks_state, empty_init, "JAKKS Pacific Inc / Namco / HotGen Ltd", "Arcade Gold featuring Pac-Man (20 APR 2007 A SKU O)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2008, jak_rapm, 0, 0, jakks_rapm,    jak_rapm,      jakks_state, empty_init, "JAKKS Pacific Inc / Namco / HotGen Ltd", "Retro Arcade featuring Pac-Man (20 AUG 2008 A SKU N)", MACHINE_IMPERFECT_SOUND )
+
 CONS( 2007, jak_spd3, 0, 0, spg2xx_jakks,  jak_spd3,      jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Spider-Man 3 (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2007, jak_cind, 0, 0, spg2xx_jakks,  spg2xx_pacg,   jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Cinderella - Once Upon a Midnight (JAKKS Pacific TV Game) (Aug 29 2007 11:15:55)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2005, jak_powr, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Power Rangers S.P.D. (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2006, jak_pix,  0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Disney Pixar Classics (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2007, jak_hsm,  0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "High School Musical (JAKKS Pacific TV Game) (Dec 19 2007 17:08:20)", MACHINE_IMPERFECT_SOUND )
+
+// menu sounds don't work until you go into a game (work after a reset, bad default initializations?)
+CONS( 2006, jak_shrk , 0, 0, spg2xx_jakks, spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Dreamworks Shrek / Over The Hedge (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2006, jak_dpma,  0, 0, spg2xx_dpma,  spg2xx_dpma,   jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Disney Princess Magical Adventures (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
