@@ -10,6 +10,7 @@ Known games on this hardware:
  | YES    | Mini Super Fruits | Cirsa              | Cirsa PCB 810601 A |
  | YES    | Lucky Player      | Cirsa              | Cirsa PCB 810702 A |
  | YES    | Miss Bamby        | Automatics Pasqual |                    |
+ | YES    | Mini 3            | Arfyc              | 6MHz xtal, battery |
  | YES    | Mini Azar D       | Arfyc              |                    |
  | YES    | Golden Winner     | Reben              |                    |
  | YES    | Golden Fruits     | Video Game         | 4 dipsw, battery   |
@@ -229,6 +230,14 @@ ROM_START( gwinner )
 	ROM_LOAD( "dm74s188n.bin", 0x00, 0x20, CRC(27ed5f29) SHA1(2d5f190fac6be15d3c5b344647333bbf47a04fc3) )
 ROM_END
 
+ROM_START( mini3 )
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD( "arfyc_b.49_1680-13.bin", 0x0000, 0x4000, CRC(78ed696f) SHA1(31f319bbe41aac6423b14752e8c0bcba5c8d262a) )
+
+	ROM_REGION(0x20, "prom", 0)
+	ROM_LOAD( "n82s23n.bin", 0x00, 0x20, NO_DUMP )
+ROM_END
+
 ROM_START( miniazard )
 	ROM_REGION(0x4000, "maincpu", 0)
 	ROM_LOAD( "mini_azar_rom1.2.bin", 0x0000, 0x2000, CRC(4368a70a) SHA1(fc09b0bfb9c7777b144b909ff306098b77ef1b82) )
@@ -369,6 +378,7 @@ GAME( 1981,  minisupf,  0, missbamby,  c_810601a, missbamby_state, empty_init, R
 // Clones
 GAME( 198?,  goldfrts,  0, missbamby,  c_810601a, missbamby_state, empty_init, ROT0, "Video Game",         "Golden Fruits",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 GAME( 1983,  gwinner,   0, gldwinner,  missbamby, missbamby_state, empty_init, ROT0, "Reben SA",           "Golden Winner",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 198?,  mini3,     0, gldwinner,  missbamby, missbamby_state, empty_init, ROT0, "Arfyc",              "Mini 3",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 GAME( 1989?, miniazard, 0, gldwinner,  missbamby, missbamby_state, empty_init, ROT0, "Arfyc",              "Mini Azar D",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 GAME( 198?,  msbamby,   0, missbamby,  missbamby, missbamby_state, empty_init, ROT0, "Automatics Pasqual", "Miss Bamby",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 
