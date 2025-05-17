@@ -137,7 +137,7 @@ int sound_pa::init(osd_interface &osd, osd_options const &options)
 		auto &node = m_info.m_nodes[dev];
 		node.m_name = di->name;
 		node.m_id = dev + 1;
-		node.m_rate.m_default_rate = node.m_rate.m_min_rate = node.m_rate.m_max_rate = options.sample_rate();
+		node.m_rate.m_default_rate = node.m_rate.m_min_rate = node.m_rate.m_max_rate = di->defaultSampleRate;
 		node.m_sinks = di->maxOutputChannels;
 		node.m_sources = di->maxInputChannels;
 
