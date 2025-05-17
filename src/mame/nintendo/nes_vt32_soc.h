@@ -27,7 +27,7 @@ protected:
 
 	virtual void device_add_mconfig(machine_config& config) override ATTR_COLD;
 
-	void nes_vt_fp_map(address_map &map) ATTR_COLD;
+	void nes_vt32_soc_map(address_map &map) ATTR_COLD;
 
 	uint8_t vtfp_4119_r();
 	void vtfp_411e_encryption_state_w(uint8_t data);
