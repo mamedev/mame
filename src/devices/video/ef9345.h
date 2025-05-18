@@ -78,9 +78,10 @@ private:
 	uint8_t get_dial(uint8_t x, uint8_t attrib);
 	void zoom(uint8_t *pix, uint16_t n);
 	uint16_t indexblock(uint16_t x, uint16_t y);
-	void bichrome40(uint8_t type, uint16_t address, uint8_t dial, uint16_t iblock, uint16_t x, uint16_t y, uint8_t c0, uint8_t c1, uint8_t insert, uint8_t flash, uint8_t hided, uint8_t negative, uint8_t underline);
+	std::tuple<uint8_t, uint8_t, bool> makecolors(uint8_t c0, uint8_t c1, bool insert, bool flash, bool conceal, bool negative, bool cursor);
+	void bichrome40(uint8_t type, uint16_t address, uint8_t dial, uint16_t iblock, uint16_t x, uint16_t y, uint8_t c0, uint8_t c1, bool insert, bool flash, bool conceal, bool negative, bool underline);
 	void quadrichrome40(uint8_t c, uint8_t b, uint8_t a, uint16_t x, uint16_t y);
-	void bichrome80(uint8_t c, uint8_t a, uint16_t x, uint16_t y, uint8_t cursor);
+	void bichrome80(uint8_t c, uint8_t a, uint16_t x, uint16_t y, bool cursor);
 	void makechar(uint16_t x, uint16_t y);
 	void draw_border(uint16_t line);
 	void makechar_16x40(uint16_t x, uint16_t y);
@@ -103,7 +104,7 @@ private:
 	uint8_t m_border[80];                     //border color
 	uint16_t m_block;                         //current memory block
 	uint16_t m_ram_base[4];                   //index of ram charset
-	uint8_t m_blink;                          //cursor status
+	uint8_t m_blink_phase;                    //flash and cursor blink phase
 	uint8_t m_last_dial[40];                  //last chars dial (for determinate the zoom position)
 	uint8_t m_latchc0;                        //background color latch
 	uint8_t m_latchm;                         //hided attribute latch
