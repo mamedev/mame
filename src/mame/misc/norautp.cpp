@@ -5730,6 +5730,25 @@ ROM_START( krampcb6 )
 	ROM_LOAD( "06ec.u51",          0x0000, 0x0100, CRC(ad33e582) SHA1(355cdf3cdc34f8c56da1f815b1ae86bba5a19821) )
 ROM_END
 
+/*
+  Original M.Kramer PCB
+  with an epoxy block
+
+  US Rev L5
+
+*/
+ROM_START( krampcb7 )  // norusa03
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "u12usrevl5_rm10012us0_37b7--15a0_2764.u12", 0x0000, 0x2000, CRC(7963c301) SHA1(684a42f10dbb02b47b8365e5edf5753804852c5d) )
+	ROM_LOAD( "u18usrevl5_rm10018us0_0e85--bd56_2764.u18", 0x2000, 0x2000, CRC(bf7a2e52) SHA1(5cd5319e752451aa5ec8c8650a29a9901b4314dd) )
+
+	ROM_REGION( 0x1000, "gfx",0 )
+	ROM_LOAD( "u31_rm03031us0_cf7b_2732a.u31", 0x0000, 0x1000, CRC(fcfc4d25) SHA1(31455903244ec8ef9005748f265f561b7a082a9c) )
+
+	ROM_REGION( 0x0100,  "proms", 0 )
+	ROM_LOAD( "82s129n.u51",  0x0000, 0x0100, CRC(ad33e582) SHA1(355cdf3cdc34f8c56da1f815b1ae86bba5a19821) )
+ROM_END
+
 
 /****************************** Unknown Sets ********************************/
 
@@ -6560,6 +6579,7 @@ GAME(  1989, pokplusb,  pokplus,  dphlxtnd,  norautp,   norautp_state, empty_ini
 GAMEL( 198?, krampcb3,  0,        krampcb4,  dphl,      norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",     "unknown Kramer Poker (pcb3, encrypted)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_noraut10 )  // encriypted
 GAMEL( 198?, krampcb4,  0,        krampcb4,  dphl,      norautp_state, init_kram4, ROT0, "M.Kramer Manufacturing.",     "unknown Kramer Poker (pcb4, encrypted)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_noraut10 )  // encriypted
 GAMEL( 198?, krampcb6,  0,        krampcb4,  dphl,      norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",     "unknown Kramer Poker (pcb6, encrypted)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_noraut10 )  // encriypted
+GAMEL( 198?, krampcb7,  0,        krampcb4,  dphl,      norautp_state, init_kram4, ROT0, "M.Kramer Manufacturing.",     "unknown Kramer Poker (US Rev L5, encrypted)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_noraut10 )  // encriypted
 
 
 // The following ones also have a custom 68705 MCU
