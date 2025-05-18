@@ -55,8 +55,11 @@ private:
     required_device<screen_device> m_screen;
     required_device<i8251_device> m_scu;
 
-    int m_scu_hack_status_i = 0;
-    int m_scu_hack_data_i = 0;
+    // SCU: hack to provide data that makes the software proceed,
+    //      instead of using the actual device, see also comment
+    //      in map() below
+    int m_scu_hack_status_idx;
+    int m_scu_hack_data_idx;
 
     void map(address_map &map) ATTR_COLD;
 
@@ -84,6 +87,8 @@ void korgtriton_state::machine_start()
 
 void korgtriton_state::machine_reset()
 {
+    m_scu_hack_status_idx = 0;
+    m_scu_hack_data_idx = 0;
 }
 
 void korgtriton_state::map(address_map &map)
@@ -105,8 +110,7 @@ void korgtriton_state::map(address_map &map)
     // map(0xd00000, 0xdfffff).ram(); // MOSS
     // map(0xe00000, 0xefffff).ram(); // FDC
 
-    // SCU: implement an hack to provide data that makes the software
-    //      proceed, instead of using the actual device.
+    // TODO: figure out why clocking the SCU device from port E is not working
     // map(0xf00000, 0xf00001).rw(m_scu, FUNC(i8251_device::read), FUNC(i8251_device::write));
     map(0xf00000, 0xf00001).rw(FUNC(korgtriton_state::scu_r), FUNC(korgtriton_state::scu_w));
 
@@ -183,15 +187,15 @@ u8 korgtriton_state::scu_r(offs_t offs) {
 
     if (offs == 0) {
         const static u8 data[] = { 0x66, 0x31 };
-        res = data[m_scu_hack_data_i % 2];
+        res = data[m_scu_hack_data_idx % 2];
         if (!machine().side_effects_disabled())
-            m_scu_hack_data_i++;
+            m_scu_hack_data_idx++;
     }
 
     if (offs == 1) {
-        res = m_scu_hack_status_i;
+        res = m_scu_hack_status_idx;
         if (!machine().side_effects_disabled())
-            m_scu_hack_status_i++;
+            m_scu_hack_status_idx++;
     }
 
     LOG("scu_read: %08x -> %02x\n", offs, res);
@@ -204,7 +208,7 @@ void korgtriton_state::scu_w(offs_t offs, u8 data) {
 
 // the following rom images are taken from the Triton OS 2.0.0 floppy disks
 // the romfiles are missing the first two bytes (checksum) present in the
-// floppy disks obtainable.
+// files obtainable from floppy disks online.
 
 ROM_START( korgtriton )
     ROM_REGION( 0x00800000, "maincpu", 0 )
