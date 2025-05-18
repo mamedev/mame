@@ -3026,23 +3026,18 @@ Core Sound Options
 
 **-audio_latency** *<value>*
 
-    The exact behavior depends on the selected audio output module.  Smaller
-    values provide less audio delay while requiring better system performance.
-    Higher values increase audio delay but may help avoid buffer under-runs and
-    audio interruptions.
+    Audio latency in milliseconds, up to a maximum of 1 second.  Smaller values
+    provide less audio delay while requiring better system performance.
+    Higher values increase audio delay but may help avoid buffer under-runs
+    and audio interruptions. A value of 0 will automatically pick a sane value,
+    depending on the selected audio output module.
 
-    The default is ``1``.
-
-    * For PortAudio, see the section on :ref:`-pa_latency <mame-commandline-palatency>`.
-    * XAudio2 calculates audio_latency as 10ms steps.
-    * DSound calculates audio_latency as 10ms steps.
-    * CoreAudio calculates audio_latency as 25ms steps.
-    * SDL calculates audio_latency as Xms steps.
+    The default is ``0``.
 
     Example:
         .. code-block:: bash
 
-            mame galaga -audio_latency 1
+            mame galaga -audio_latency 100
 
 
 .. _mame-commandline-inputoptions:
