@@ -24,8 +24,6 @@ class h_88_3_device : public device_t, public device_h89bus_right_card_interface
 public:
 	h_88_3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = XTAL(1'843'200).value());
 
-	virtual void map_io(address_space_installer &space) override;
-
 protected:
 	h_88_3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
@@ -42,6 +40,8 @@ protected:
 	required_ioport m_cfg_lp;
 	required_ioport m_cfg_aux;
 	required_ioport m_cfg_modem;
+
+	bool m_installed;
 
 	bool m_lp_enabled;
 	bool m_aux_enabled;
@@ -95,6 +95,9 @@ h_88_3_device::h_88_3_device(const machine_config &mconfig, device_type type, co
 
 void h_88_3_device::device_start()
 {
+	m_installed = false;
+
+	save_item(NAME(m_installed));
 	save_item(NAME(m_lp_intr));
 	save_item(NAME(m_aux_intr));
 	save_item(NAME(m_modem_intr));
@@ -118,53 +121,53 @@ void h_88_3_device::device_reset()
 
 	// MODEM Interrupt level
 	m_modem_int_idx = BIT(cfg_modem, 1, 2);
-}
 
-void h_88_3_device::map_io(address_space_installer &space)
-{
-	if (m_lp_enabled)
+	if (!m_installed)
 	{
-		h89bus::addr_ranges  addr_ranges = h89bus().get_address_ranges(h89bus::IO_LP);
-
-		if (addr_ranges.size() == 1)
+		if (m_lp_enabled)
 		{
-			h89bus::addr_range range = addr_ranges.front();
+			h89bus::addr_ranges  addr_ranges = h89bus().get_address_ranges(h89bus::IO_LP);
 
-			space.install_readwrite_handler(range.first, range.second,
-				read8sm_delegate(m_lp, FUNC(ins8250_uart_device::ins8250_r)),
-				write8sm_delegate(m_lp, FUNC(ins8250_uart_device::ins8250_w))
-			);
+			if (addr_ranges.size() == 1)
+			{
+				h89bus::addr_range range = addr_ranges.front();
+
+				h89bus().install_io_device(range.first, range.second,
+					read8sm_delegate(m_lp, FUNC(ins8250_uart_device::ins8250_r)),
+					write8sm_delegate(m_lp, FUNC(ins8250_uart_device::ins8250_w)));
+			}
 		}
-	}
 
-	if (m_aux_enabled)
-	{
-		h89bus::addr_ranges  addr_ranges = h89bus().get_address_ranges(h89bus::IO_SER0);
-
-		if (addr_ranges.size() == 1)
+		if (m_aux_enabled)
 		{
-			h89bus::addr_range range = addr_ranges.front();
+			h89bus::addr_ranges  addr_ranges = h89bus().get_address_ranges(h89bus::IO_SER0);
 
-			space.install_readwrite_handler(range.first, range.second,
-				read8sm_delegate(m_aux, FUNC(ins8250_uart_device::ins8250_r)),
-				write8sm_delegate(m_aux, FUNC(ins8250_uart_device::ins8250_w))
-			);
+			if (addr_ranges.size() == 1)
+			{
+				h89bus::addr_range range = addr_ranges.front();
+
+				h89bus().install_io_device(range.first, range.second,
+					read8sm_delegate(m_aux, FUNC(ins8250_uart_device::ins8250_r)),
+					write8sm_delegate(m_aux, FUNC(ins8250_uart_device::ins8250_w)));
+			}
 		}
-	}
 
-	if (m_modem_enabled)
-	{
-		h89bus::addr_ranges  addr_ranges = h89bus().get_address_ranges(h89bus::IO_SER1);
-
-		if (addr_ranges.size() == 1)
+		if (m_modem_enabled)
 		{
-			h89bus::addr_range range = addr_ranges.front();
+			h89bus::addr_ranges  addr_ranges = h89bus().get_address_ranges(h89bus::IO_SER1);
 
-			space.install_readwrite_handler(range.first, range.second,
-				read8sm_delegate(m_modem, FUNC(ins8250_uart_device::ins8250_r)),
-				write8sm_delegate(m_modem, FUNC(ins8250_uart_device::ins8250_w))
-			);
+			if (addr_ranges.size() == 1)
+			{
+				h89bus::addr_range range = addr_ranges.front();
+
+				h89bus().install_io_device(range.first, range.second,
+					read8sm_delegate(m_modem, FUNC(ins8250_uart_device::ins8250_r)),
+					write8sm_delegate(m_modem, FUNC(ins8250_uart_device::ins8250_w)));
+
+			}
 		}
+
+		m_installed = true;
 	}
 }
 

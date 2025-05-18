@@ -41,8 +41,6 @@ class h89bus_sigmasoft_snd_device : public device_t, public device_h89bus_right_
 public:
 	h89bus_sigmasoft_snd_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	virtual void map_io(address_space_installer &space) override;
-
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -60,6 +58,8 @@ private:
 	required_device<ay8910_device> m_ay8910;
 	required_ioport m_joystick1, m_joystick2;
 	required_ioport m_config;
+
+	bool m_installed;
 
 	u8 m_port_selection;
 };
@@ -165,6 +165,9 @@ u8 h89bus_sigmasoft_snd_device::read_joystick()
 
 void h89bus_sigmasoft_snd_device::device_start()
 {
+	m_installed = false;
+
+	save_item(NAME(m_installed));
 }
 
 void h89bus_sigmasoft_snd_device::device_reset()
@@ -186,30 +189,22 @@ void h89bus_sigmasoft_snd_device::device_reset()
 			m_port_selection = h89bus::IO_LP;
 			break;
 	}
-}
 
-void h89bus_sigmasoft_snd_device::map_io(address_space_installer &space)
-{
-	if (m_port_selection == 0)
+	if (!m_installed && (m_port_selection != 0))
 	{
-		return;
+		h89bus::addr_ranges  addr_ranges = h89bus().get_address_ranges(m_port_selection);
+
+		if (addr_ranges.size() == 1)
+		{
+			h89bus::addr_range range = addr_ranges.front();
+
+			h89bus().install_io_device(range.first, range.second,
+				read8sm_delegate(*this, FUNC(h89bus_sigmasoft_snd_device::read)),
+				write8sm_delegate(*this, FUNC(h89bus_sigmasoft_snd_device::write)));
+		}
+
+		m_installed = true;
 	}
-
-	h89bus::addr_ranges  addr_ranges = h89bus().get_address_ranges(m_port_selection);
-
-	if (addr_ranges.size() == 0)
-	{
-		LOGFUNC("%s: No address specified\n", FUNCNAME);
-
-		return;
-	}
-
-	h89bus::addr_range range = addr_ranges.front();
-
-	space.install_readwrite_handler(range.first, range.second,
-		read8sm_delegate(*this, FUNC(h89bus_sigmasoft_snd_device::read)),
-		write8sm_delegate(*this, FUNC(h89bus_sigmasoft_snd_device::write))
-	);
 }
 
 ioport_constructor h89bus_sigmasoft_snd_device::device_input_ports() const

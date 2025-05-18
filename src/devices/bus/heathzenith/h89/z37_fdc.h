@@ -20,8 +20,6 @@ class h89bus_z37_device : public device_t, public device_h89bus_right_card_inter
 public:
 	h89bus_z37_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	virtual void map_io(address_space_installer &space) override;
-
 	template <typename T> void set_intr_cntrl(T &&tag) { m_intr_cntrl.set_tag(std::forward<T>(tag)); }
 
 protected:
@@ -49,6 +47,8 @@ private:
 	required_device<fd1797_device> m_fdc;
 	required_device_array<floppy_connector, 4> m_floppies;
 	required_device<heath_intr_socket> m_intr_cntrl;
+
+	bool m_installed;
 
 	bool m_irq_allowed;
 	bool m_drq_allowed;

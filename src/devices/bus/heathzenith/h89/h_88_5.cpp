@@ -52,8 +52,6 @@ class h_88_5_device : public device_t, public device_h89bus_right_card_interface
 public:
 	h_88_5_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	virtual void map_io(address_space_installer &space) override;
-
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -68,6 +66,8 @@ protected:
 	required_device<i8251_device> m_uart;
 	required_device<cassette_image_device> m_cass_player;
 	required_device<cassette_image_device> m_cass_recorder;
+
+	bool m_installed;
 
 	u8 m_cass_data[4];
 	bool m_cassbit;
@@ -135,6 +135,9 @@ void h_88_5_device::uart_tx_empty(u8 data)
 
 void h_88_5_device::device_start()
 {
+	m_installed = false;
+
+	save_item(NAME(m_installed));
 	save_item(NAME(m_cass_data));
 	save_item(NAME(m_cassbit));
 	save_item(NAME(m_cassold));
@@ -142,6 +145,21 @@ void h_88_5_device::device_start()
 
 void h_88_5_device::device_reset()
 {
+	if (!m_installed)
+	{
+		h89bus::addr_ranges  addr_ranges = h89bus().get_address_ranges(h89bus::IO_CASS);
+
+		if (addr_ranges.size() == 1)
+		{
+			h89bus::addr_range range = addr_ranges.front();
+
+			h89bus().install_io_device(range.first, range.second,
+				read8sm_delegate(m_uart, FUNC(i8251_device::read)),
+				write8sm_delegate(m_uart, FUNC(i8251_device::write)));
+		}
+
+		m_installed = true;
+	}
 	// cassette
 	m_cassbit      = 1;
 	m_cassold      = 0;
@@ -153,25 +171,6 @@ void h_88_5_device::device_reset()
 	m_uart->write_cts(0);
 	m_uart->write_dsr(0);
 	m_uart->write_rxd(0);
-}
-
-void h_88_5_device::map_io(address_space_installer &space)
-{
-	h89bus::addr_ranges  addr_ranges = h89bus().get_address_ranges(h89bus::IO_CASS);
-
-	if (addr_ranges.size() == 0)
-	{
-		LOGSETUP("%s: No address specified\n", FUNCNAME);
-
-		return;
-	}
-
-	h89bus::addr_range range = addr_ranges.front();
-
-	space.install_readwrite_handler(range.first, range.second,
-		read8sm_delegate(m_uart, FUNC(i8251_device::read)),
-		write8sm_delegate(m_uart, FUNC(i8251_device::write))
-	);
 }
 
 void h_88_5_device::device_add_mconfig(machine_config &config)

@@ -201,6 +201,9 @@ u8 mms77316_fdc_device::read(offs_t reg)
 
 void mms77316_fdc_device::device_start()
 {
+	m_installed = false;
+
+	save_item(NAME(m_installed));
 	save_item(NAME(m_irq_allowed));
 	save_item(NAME(m_drq_allowed));
 	save_item(NAME(m_irq));
@@ -210,6 +213,32 @@ void mms77316_fdc_device::device_start()
 
 void mms77316_fdc_device::device_reset()
 {
+	if (!m_installed)
+	{
+		h89bus::addr_ranges  addr_ranges = h89bus().get_address_ranges(h89bus::IO_GPP);
+
+		LOGSETUP("%s: num ranges: %d\n", FUNCNAME, addr_ranges.size());
+
+		// There should be two ranges, the one with is single address should be for the real
+		// GPP, the one with a range, is for this device.
+		for (h89bus::addr_range range : addr_ranges)
+		{
+			// find the range with more than one port address.
+			if (range.first != range.second)
+			{
+				LOGSETUP("%s: range found: 0x%02x-0x%02x\n", FUNCNAME, range.first, range.second);
+
+				h89bus().install_io_device(range.first, range.second,
+					read8sm_delegate(*this, FUNC(mms77316_fdc_device::read)),
+					write8sm_delegate(*this, FUNC(mms77316_fdc_device::write)));
+
+				break;
+			}
+		}
+
+		m_installed = true;
+	}
+
 	m_irq_allowed = false;
 	m_drq_allowed = false;
 	m_irq         = false;
@@ -230,31 +259,6 @@ void mms77316_fdc_device::device_reset()
 				// turn on motor of all installed 8" floppies
 				floppy->mon_w(0);
 			}
-		}
-	}
-}
-
-void mms77316_fdc_device::map_io(address_space_installer &space)
-{
-	h89bus::addr_ranges  addr_ranges = h89bus().get_address_ranges(h89bus::IO_GPP);
-
-	LOGSETUP("%s: num ranges: %d\n", FUNCNAME, addr_ranges.size());
-
-	// There should be two ranges, the one with is single address should be for the real
-	// GPP, the one with a range, is for this device.
-	for (h89bus::addr_range range : addr_ranges)
-	{
-		// find the range with more than one port address.
-		if (range.first != range.second)
-		{
-			LOGSETUP("%s: range found: 0x%02x-0x%02x\n", FUNCNAME, range.first, range.second);
-
-			space.install_readwrite_handler(range.first, range.second,
-				read8sm_delegate(*this, FUNC(mms77316_fdc_device::read)),
-				write8sm_delegate(*this, FUNC(mms77316_fdc_device::write))
-			);
-
-			break;
 		}
 	}
 }

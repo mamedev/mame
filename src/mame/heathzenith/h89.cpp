@@ -136,6 +136,8 @@ protected:
 
 	u32  m_cpu_speed_multiplier;
 
+	bool m_installed;
+
 	// Clocks
 	static constexpr XTAL H89_CLOCK                      = XTAL(12'288'000) / 6;
 	static constexpr XTAL INS8250_CLOCK                  = XTAL(1'843'200);
@@ -639,49 +641,6 @@ INPUT_PORTS_END
 
 void h89_base_state::machine_start()
 {
-	m_h89bus->map_io(m_maincpu->space(AS_IO));
-
-	// Console/Terminal address
-	h89bus::addr_ranges term_ranges = m_h89bus->get_address_ranges(h89bus::IO_TERM);
-	if (term_ranges.size() == 1)
-	{
-		h89bus::addr_range range = term_ranges.front();
-
-		m_maincpu->space(AS_IO).install_readwrite_handler(range.first, range.second,
-			read8sm_delegate(*m_console, FUNC(ins8250_device::ins8250_r)),
-			write8sm_delegate(*m_console, FUNC(ins8250_device::ins8250_w))
-		);
-	}
-
-	h89bus::addr_ranges nmi_ranges = m_h89bus->get_address_ranges(h89bus::IO_NMI);
-
-	// Multiple ranges cause a NMI interrupt to occur, loop through all.
-	for (h89bus::addr_range range : nmi_ranges)
-	{
-		m_maincpu->space(AS_IO).install_readwrite_handler(range.first, range.second,
-			read8smo_delegate(*this, FUNC(h89_base_state::raise_NMI_r)),
-			write8smo_delegate(*this, FUNC(h89_base_state::raise_NMI_w))
-		);
-	}
-
-	h89bus::addr_ranges gpp_ranges = m_h89bus->get_address_ranges(h89bus::IO_GPP);
-
-	for (h89bus::addr_range range : gpp_ranges)
-	{
-		// check for the first single address, MMS piggy-backed on this select
-		// line for their double density floppy controller, the proper one for
-		// the CPU board GPP port is a single address
-		if (range.first == range.second)
-		{
-			m_maincpu->space(AS_IO).install_readwrite_handler(range.first, range.second,
-				read8smo_delegate(*this, FUNC(h89_base_state::read_sw)),
-				write8smo_delegate(*this, FUNC(h89_base_state::port_f2_w))
-			);
-
-			break;
-		}
-	}
-
 	save_item(NAME(m_gpp));
 	save_item(NAME(m_rom_enabled));
 	save_item(NAME(m_timer_intr_enabled));
@@ -691,6 +650,9 @@ void h89_base_state::machine_start()
 	save_item(NAME(m_555a_latch));
 	save_item(NAME(m_555b_latch));
 	save_item(NAME(m_556b_latch));
+	save_item(NAME(m_installed));
+
+	m_installed = false;
 
 	m_maincpu->space(AS_PROGRAM).specific(m_program);
 
@@ -744,6 +706,48 @@ u8 h89_base_state::read_sw()
 
 void h89_base_state::machine_reset()
 {
+	if (!m_installed)
+	{
+		// Console/Terminal address
+		h89bus::addr_ranges term_ranges = m_h89bus->get_address_ranges(h89bus::IO_TERM);
+		if (term_ranges.size() == 1)
+		{
+			h89bus::addr_range range = term_ranges.front();
+
+			m_h89bus->install_io_device(range.first, range.second,
+				read8sm_delegate(*m_console, FUNC(ins8250_device::ins8250_r)),
+				write8sm_delegate(*m_console, FUNC(ins8250_device::ins8250_w)));
+		}
+
+		h89bus::addr_ranges nmi_ranges = m_h89bus->get_address_ranges(h89bus::IO_NMI);
+
+		// Multiple ranges cause a NMI interrupt to occur, loop through all.
+		for (h89bus::addr_range range : nmi_ranges)
+		{
+			m_h89bus->install_io_device(range.first, range.second,
+				read8smo_delegate(*this, FUNC(h89_base_state::raise_NMI_r)),
+				write8smo_delegate(*this, FUNC(h89_base_state::raise_NMI_w)));
+		}
+
+		h89bus::addr_ranges gpp_ranges = m_h89bus->get_address_ranges(h89bus::IO_GPP);
+
+		for (h89bus::addr_range range : gpp_ranges)
+		{
+			// check for the first single address, MMS piggy-backed on this select
+			// line, the proper one for the CPU board GPP port is a single address
+			if (range.first == range.second)
+			{
+				m_h89bus->install_io_device(range.first, range.second,
+					read8smo_delegate(*this, FUNC(h89_base_state::read_sw)),
+					write8smo_delegate(*this, FUNC(h89_base_state::port_f2_w)));
+
+				break;
+			}
+		}
+
+		m_installed = true;
+	}
+
 	m_rom_enabled         = true;
 	m_timer_intr_enabled  = true;
 	m_single_step_enabled = false;
@@ -1016,6 +1020,7 @@ void h89_base_state::h89_base(machine_config &config)
 
 	H89BUS(config, m_h89bus, 0);
 	m_h89bus->set_program_space(m_maincpu, AS_PROGRAM);
+	m_h89bus->set_io_space(m_maincpu, AS_IO);
 	m_h89bus->out_int3_callback().set(FUNC(h89_base_state::slot_irq<3>));
 	m_h89bus->out_int4_callback().set(FUNC(h89_base_state::slot_irq<4>));
 	m_h89bus->out_int5_callback().set(FUNC(h89_base_state::slot_irq<5>));

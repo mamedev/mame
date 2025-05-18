@@ -52,8 +52,6 @@ public:
 
 	auto floppy_ram_wp_cb() { return m_floppy_ram_wp.bind(); }
 
-	virtual void map_io(address_space_installer &space) override;
-
 	[[maybe_unused]] void side_select_w(int state);
 
 protected:
@@ -84,6 +82,8 @@ protected:
 	required_device<s2350_device> m_s2350;
 	required_device_array<floppy_connector, MAX_FLOPPY_DRIVES> m_floppies;
 	required_device<timer_device> m_tx_timer;
+
+	bool m_installed;
 
 	bool m_motor_on;
 	bool m_write_gate;
@@ -303,6 +303,9 @@ u8 heath_h17_fdc_device::floppy_status_r()
 
 void heath_h17_fdc_device::device_start()
 {
+	m_installed = false;
+
+	save_item(NAME(m_installed));
 	save_item(NAME(m_motor_on));
 	save_item(NAME(m_write_gate));
 	save_item(NAME(m_sync_char_received));
@@ -312,28 +315,27 @@ void heath_h17_fdc_device::device_start()
 
 void heath_h17_fdc_device::device_reset()
 {
+	if (!m_installed)
+	{
+		h89bus::addr_ranges  addr_ranges = h89bus().get_address_ranges(h89bus::IO_FLPY);
+
+		if (addr_ranges.size() == 1)
+		{
+			h89bus::addr_range range = addr_ranges.front();
+
+			h89bus().install_io_device(range.first, range.second,
+				read8sm_delegate(*this, FUNC(heath_h17_fdc_device::read)),
+				write8sm_delegate(*this, FUNC(heath_h17_fdc_device::write)));
+		}
+
+		m_installed = true;
+	}
+
 	m_motor_on           = false;
 	m_write_gate         = false;
 	m_sync_char_received = false;
 
 	m_tx_timer->adjust(attotime::from_hz(USRT_TX_CLOCK), 0, attotime::from_hz(USRT_TX_CLOCK));
-}
-
-void heath_h17_fdc_device::map_io(address_space_installer &space)
-{
-	h89bus::addr_ranges  addr_ranges = h89bus().get_address_ranges(h89bus::IO_FLPY);
-
-	if (addr_ranges.size() == 0)
-	{
-		LOGSETUP("%s: No address specified\n", FUNCNAME);
-	}
-
-	h89bus::addr_range range = addr_ranges.front();
-
-	space.install_readwrite_handler(range.first, range.second,
-		read8sm_delegate(*this, FUNC(heath_h17_fdc_device::read)),
-		write8sm_delegate(*this, FUNC(heath_h17_fdc_device::write))
-	);
 }
 
 static void h17_floppies(device_slot_interface &device)
