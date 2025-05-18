@@ -224,11 +224,11 @@ ROM_END
 } // anonymous namespace
 
 //    YEAR  NAME         PARENT   COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY              FULLNAME                                  FLAGS
-COMP( 2006, miuchiz,     0,       0,      miuchiz, miuchiz, miuchiz_state, empty_init, "MGA Entertainment", "Miuchiz Virtual Companions common BIOS", MACHINE_NOT_WORKING | MACHINE_IS_BIOS_ROOT | MACHINE_SUPPORTS_SAVE )
-COMP( 2006, mcb_cloe,    miuchiz, 0,      miuchiz, miuchiz, miuchiz_state, empty_init, "MGA Entertainment", "Miuchiz Bratz Cloe",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 2006, mcb_yasmin,  miuchiz, 0,      miuchiz, miuchiz, miuchiz_state, empty_init, "MGA Entertainment", "Miuchiz Bratz Yasmin",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 2006, mcm_creeper, miuchiz, 0,      miuchiz, miuchiz, miuchiz_state, empty_init, "MGA Entertainment", "Miuchiz Monsterz Creeper",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 2006, mcm_inferno, miuchiz, 0,      miuchiz, miuchiz, miuchiz_state, empty_init, "MGA Entertainment", "Miuchiz Monsterz Inferno",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 2006, mcm_roc,     miuchiz, 0,      miuchiz, miuchiz, miuchiz_state, empty_init, "MGA Entertainment", "Miuchiz Monsterz Roc",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 2006, mcp_dash,    miuchiz, 0,      miuchiz, miuchiz, miuchiz_state, empty_init, "MGA Entertainment", "Miuchiz Pawz Dash",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 2006, mcp_spike,   miuchiz, 0,      miuchiz, miuchiz, miuchiz_state, empty_init, "MGA Entertainment", "Miuchiz Pawz Spike",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 2006, miuchiz,     0,       0,      miuchiz, miuchiz, miuchiz_state, empty_init, "MGA Entertainment", "Miuchiz Virtual Companions common BIOS", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IS_BIOS_ROOT | MACHINE_SUPPORTS_SAVE )
+COMP( 2006, mcb_cloe,    miuchiz, 0,      miuchiz, miuchiz, miuchiz_state, empty_init, "MGA Entertainment", "Miuchiz Bratz Cloe",                     MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 2006, mcb_yasmin,  miuchiz, 0,      miuchiz, miuchiz, miuchiz_state, empty_init, "MGA Entertainment", "Miuchiz Bratz Yasmin",                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 2006, mcm_creeper, miuchiz, 0,      miuchiz, miuchiz, miuchiz_state, empty_init, "MGA Entertainment", "Miuchiz Monsterz Creeper",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 2006, mcm_inferno, miuchiz, 0,      miuchiz, miuchiz, miuchiz_state, empty_init, "MGA Entertainment", "Miuchiz Monsterz Inferno",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 2006, mcm_roc,     miuchiz, 0,      miuchiz, miuchiz, miuchiz_state, empty_init, "MGA Entertainment", "Miuchiz Monsterz Roc",                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 2006, mcp_dash,    miuchiz, 0,      miuchiz, miuchiz, miuchiz_state, empty_init, "MGA Entertainment", "Miuchiz Pawz Dash",                      MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 2006, mcp_spike,   miuchiz, 0,      miuchiz, miuchiz, miuchiz_state, empty_init, "MGA Entertainment", "Miuchiz Pawz Spike",                     MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
