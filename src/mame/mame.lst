@@ -31562,6 +31562,9 @@ mirax
 miraxa
 miraxb
 
+@source:misc/mirderby.cpp
+mirderby
+
 @source:misc/miuchiz.cpp
 miuchiz
 mcb_cloe
@@ -31571,9 +31574,6 @@ mcm_inferno
 mcm_roc
 mcp_dash
 mcp_spike
-
-@source:misc/mirderby.cpp
-mirderby
 
 @source:misc/mjsenpu.cpp
 mjsenpu
