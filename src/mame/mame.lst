@@ -18656,7 +18656,16 @@ play2000
 play2000_40i
 play2000_50i
 sltpcycl
+sltpcycla
+sltpcyclb
+sltpcyclc
+sltpcycld
+sltpcycle
 sltpstep
+sltpstepa
+sltpstepb
+sltpstepc
+sltpstepd
 snowboar
 snowboara
 srollnd
@@ -27659,6 +27668,10 @@ pitbossps
 riviera
 rivieraa
 rivierab
+rivierac
+rivierad
+rivierae
+rivieraf
 tictac
 tictaca
 tictacuk
@@ -27780,6 +27793,7 @@ mtchxlti
 
 @source:merit/pubtimed.cpp
 pubtimed
+pubtimeda
 
 @source:metro/hyprduel.cpp
 hyprduel
@@ -30545,6 +30559,7 @@ flipjack
 @source:misc/flower.cpp
 flower
 flowerj
+flowerjb
 
 @source:misc/fortecar.cpp
 fortecrd
@@ -31550,6 +31565,16 @@ miraxb
 @source:misc/mirderby.cpp
 mirderby
 
+@source:misc/miuchiz.cpp
+miuchiz
+mcb_cloe
+mcb_yasmin
+mcm_creeper
+mcm_inferno
+mcm_roc
+mcp_dash
+mcp_spike
+
 @source:misc/mjsenpu.cpp
 mjsenpu
 
@@ -32016,6 +32041,7 @@ krampcb3
 krampcb4
 krampcb5
 krampcb6
+krampcb7
 mainline
 ndxron10
 newhilop
@@ -35695,6 +35721,7 @@ vandykejal2
 drail
 draillov
 hpierrot
+hpierrota
 omatsuri
 pldoraemon
 plpittashi
@@ -43172,9 +43199,6 @@ minifram
 
 @source:skeleton/minihock.cpp
 minihockey
-
-@source:skeleton/miuchiz.cpp
-miuchiz
 
 @source:skeleton/ml20.cpp
 ml20

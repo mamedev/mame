@@ -72,12 +72,9 @@ private:
 
 	enum
 	{
-		LATENCY_MIN = 1,
-		LATENCY_MAX = 5,
 		EFFECT_COUNT_MAX = 10
 	};
 
-	uint32_t clamped_latency() const { return unsigned(std::clamp<int>(m_audio_latency, LATENCY_MIN, LATENCY_MAX)); }
 	uint32_t buffer_avail() const { return ((m_writepos >= m_playpos) ? m_buffer_size : 0) + m_playpos - m_writepos; }
 	uint32_t buffer_used() const { return ((m_playpos > m_writepos) ? m_buffer_size : 0) + m_writepos - m_playpos; }
 
@@ -177,11 +174,10 @@ int sound_coreaudio::init(osd_interface &osd, const osd_options &options)
 {
 	OSStatus err;
 
-	// Don't bother with any of this if sound is disabled
 	m_sample_rate = options.sample_rate();
 	m_audio_latency = options.audio_latency();
-	if (m_sample_rate == 0)
-		return 0;
+	if (m_audio_latency == 0)
+		return m_audio_latency = 50;
 
 	// Create the output graph
 	osd_printf_verbose("Audio: Start initialization\n");
@@ -215,8 +211,8 @@ int sound_coreaudio::init(osd_interface &osd, const osd_options &options)
 	m_sample_bytes = format.mBytesPerFrame;
 
 	// Allocate buffer
-	m_headroom = m_sample_bytes * (clamped_latency() * m_sample_rate / 40);
-	m_buffer_size = m_sample_bytes * std::max<uint32_t>(m_sample_rate * (clamped_latency() + 3) / 40, 256U);
+	m_headroom = m_sample_bytes * (m_audio_latency * m_sample_rate / 1000);
+	m_buffer_size = m_sample_bytes * std::max<uint32_t>(m_sample_rate * (m_audio_latency + 75) / 1000, 256U);
 	try
 	{
 		m_buffer = std::make_unique<int8_t []>(m_buffer_size);
