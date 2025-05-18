@@ -2017,7 +2017,7 @@ ROM_START( rivierac )
 	ROM_REGION( 0x2000, "gfx2", 0 )
 	ROM_LOAD( "hisc_u40_c1987_mii.u40", 0x00000, 0x2000, CRC(6d2a1ca8) SHA1(96ef3e0914c2b213ed9c9082fa3e27d75d52a8ec) )
 
-	ROM_REGION( 0xc20, "plds", 0 )  // need conversion to .bin (an illegal chinese char prevents to do it)
+	ROM_REGION( 0xc20, "plds", 0 )  // need conversion to .bin (the format type prevents to do it)
 	ROM_LOAD( "sc3931_atf16v8b.jed.u13", 0x000, 0xc20, CRC(c505a4a1) SHA1(676f5f73cb14b5853aeca9cde71ad2c3ec425f9c) ) 
 ROM_END
 
@@ -2038,7 +2038,7 @@ ROM_START( rivierad )
 	ROM_REGION( 0x2000, "gfx2", 0 )
 	ROM_LOAD( "hisc_u40_2764.u40", 0x00000, 0x2000, CRC(6d2a1ca8) SHA1(96ef3e0914c2b213ed9c9082fa3e27d75d52a8ec) )
 
-	ROM_REGION( 0xc22, "plds", 0 )  // need conversion to .bin (an illegal chinese char prevents to do it)
+	ROM_REGION( 0xc22, "plds", 0 )  // need conversion to .bin (the format type prevents to do it)
 	ROM_LOAD( "dec-002_atf16v8c.jed.u13", 0x000, 0xc22, CRC(494164ba) SHA1(b7ebfd9c28e0e953beb9a4bdc331ded02ac5a67e) ) 
 ROM_END
 
@@ -2059,7 +2059,7 @@ ROM_START( rivierae )
 	ROM_REGION( 0x2000, "gfx2", 0 )
 	ROM_LOAD( "nosticker_2764.u40", 0x00000, 0x2000, CRC(6d2a1ca8) SHA1(96ef3e0914c2b213ed9c9082fa3e27d75d52a8ec) )
 
-	ROM_REGION( 0xc20, "plds", 0 )  // need conversion to .bin (an illegal chinese char prevents to do it)
+	ROM_REGION( 0xc20, "plds", 0 )  // need conversion to .bin (the format type prevents to do it)
 	ROM_LOAD( "dec-03_atf16v8b.jed.u13", 0x000, 0xc20, CRC(d24b2f03) SHA1(5156846feef7f84c7dc944dba1ffa5c4295a972a) )
 ROM_END
 
@@ -2083,7 +2083,7 @@ ROM_START( rivieraf )
 	ROM_REGION( 0x2000, "gfx2", 0 )
 	ROM_LOAD( "riv2_u40_2764.u40", 0x00000, 0x2000, CRC(6019ffb7) SHA1(e2dde1fb833feec99c2466e1da0af41c39212472) )
 
-	ROM_REGION( 0xc22, "plds", 0 )  // need conversion to .bin (an illegal chinese char prevents to do it)
+	ROM_REGION( 0xc22, "plds", 0 )  // need conversion to .bin (the format type prevents to do it)
 	ROM_LOAD( "sc3931_pal16l8amc.jed.u13", 0x000, 0xc22, CRC(5214d4d9) SHA1(b339443a8315e5dc0fac62fffc7458eeead0a4de) )
 ROM_END
 
