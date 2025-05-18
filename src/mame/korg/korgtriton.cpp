@@ -12,9 +12,8 @@ Serial Interface: uPD71051
 SCSI controller: MB86604L
 Sound: 2 * "TGL96" MB87F1710-PFV-S (proprietary)
 
-This driver runs the embedded firmware up until it needs to
-relocate and run the main application. The screen remains
-blank for all this time.
+This driver runs the embedded firmware with skeleton devices
+until the boot splash screen is shown.
 */
 
 
@@ -66,6 +65,8 @@ private:
 
     u16 m_tgl[0x1000];
 
+    int m_moss_hack_idx;
+
     void map(address_map &map) ATTR_COLD;
 
     u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -87,6 +88,9 @@ private:
 
     u8 tgl_r(offs_t offs);
     void tgl_w(offs_t offs, u8 data);
+
+    u8 moss_r(offs_t offs);
+    void moss_w(offs_t offs, u8 data);
 };
 
 static INPUT_PORTS_START(korgtriton)
@@ -121,7 +125,8 @@ void korgtriton_state::map(address_map &map)
     map(0x900000, 0x9fffff).ram().share(m_lcdcm);
     map(0xa00000, 0xafffff).rw(FUNC(korgtriton_state::lcdcio_r), FUNC(korgtriton_state::lcdcio_w));
     map(0xb00000, 0xbfffff).rw(FUNC(korgtriton_state::tgl_r), FUNC(korgtriton_state::tgl_w));
-    // map(0xd00000, 0xdfffff).ram(); // MOSS
+    map(0xd00000, 0xdfffff).rw(FUNC(korgtriton_state::moss_r), FUNC(korgtriton_state::moss_w));
+
     // map(0xe00000, 0xefffff).ram(); // FDC
 
     // TODO: figure out why clocking the SCU device from port E is not working
@@ -266,6 +271,18 @@ void korgtriton_state::tgl_w(offs_t offs, u8 data) {
 
     if (offs < sizeof(m_tgl))
         m_tgl[offs] = data;
+}
+
+u8 korgtriton_state::moss_r(offs_t offs)
+{
+    if (!machine().side_effects_disabled())
+        m_moss_hack_idx++;
+
+    return m_moss_hack_idx;
+}
+
+void korgtriton_state::moss_w(offs_t offs, u8 data)
+{
 }
 
 // the following rom images are taken from the Triton OS 2.0.0 floppy disks
