@@ -145,9 +145,9 @@ inline uint32_t mb86235_device::decode_ea(uint8_t mode, uint8_t rx, uint8_t ry, 
 			m_core->ar[ry] &= 0x3fff;
 			return m_core->ar[rx] + res;
 		case 0x08: // ARx + ARyU/ARyL (A bus/B bus)
-			return m_core->ar[rx] + isbbus ? (m_core->ar[ry] & 0x7f) : (m_core->ar[ry] >> 7);
+			return m_core->ar[rx] + (isbbus ? (m_core->ar[ry] & 0x7f) : (m_core->ar[ry] >> 7));
 		case 0x09: // ARx + ARyL/ARyU (A bus/B bus)
-			return m_core->ar[rx] + isbbus ? (m_core->ar[ry] >> 7) : (m_core->ar[ry] & 0x7f);
+			return m_core->ar[rx] + (isbbus ? (m_core->ar[ry] >> 7) : (m_core->ar[ry] & 0x7f));
 		case 0x0a: // ARx + disp14
 			return m_core->ar[rx] + disp;
 		case 0x0b: // ARx + ARy + disp14
