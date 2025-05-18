@@ -75,7 +75,7 @@ namespace {
 	
 	ROM_START( furby_connect )
 		ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
-		ROM_LOAD16_WORD_SWAP( "intflash.bin", 0x0000, 0x40000, CRC(e20eea22))
+		ROM_LOAD16_WORD_SWAP( "intflash.bin", 0x0000, 0x40000, NO_DUMP)
 
 		ROM_REGION16_BE( 0x100000, "maincpu", ROMREGION_ERASE00 )
 		ROM_LOAD16_WORD_SWAP( "spi.bin", 0x0000, 0x100000, CRC(cb819c04))
