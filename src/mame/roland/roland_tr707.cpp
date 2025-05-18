@@ -49,7 +49,7 @@ public:
 		, m_mac(*this, "mac")
 		, m_led_matrix(*this, "led_matrix")
 		, m_key_switches(*this, "KEY%u", 0U)
-		, m_cart_led(*this, "cart_led")
+		, m_cart_led(*this, "led_cart")
 		, m_leds(4)
 		, m_tapesync_in(*this, "TAPESYNC")
 		, m_dinsync_in(*this, "DINSYNC")
@@ -68,7 +68,6 @@ public:
 		, m_accent_level(*this, "ACCENT")
 		, m_cart_bank(0)
 		, m_key_led_row(0xff)
-		, m_led_col(0xff)
 		, m_tempo_source(0xff)
 		, m_midi_rxd_bit(true)  // Initial value is high, for serial "idle".
 	{
@@ -170,7 +169,6 @@ private:
 
 	u8 m_cart_bank;  // IC27 (40H174), Q5.
 	u8 m_key_led_row;  // P60-P63.
-	u8 m_led_col;  // IC301 (40H174) inverted by IC302 (M54517).
 	u8 m_tempo_source;  // P64-P66.
 	bool m_midi_rxd_bit;
 
@@ -185,7 +183,6 @@ void roland_tr707_state::machine_start()
 {
 	save_item(NAME(m_cart_bank));
 	save_item(NAME(m_key_led_row));
-	save_item(NAME(m_led_col));
 	save_item(NAME(m_tempo_source));
 	save_item(NAME(m_midi_rxd_bit));
 
@@ -225,18 +222,18 @@ u8 roland_tr707_state::key_scan_r()
 void roland_tr707_state::key_led_row_w(u8 data)
 {
 	m_key_led_row = data;
-	m_led_matrix->matrix(~m_key_led_row & 0x0f, ~m_led_col & 0x3f);  // See leds_w().
+
+	// key/led selection will enable positive supply to LED anodes (via
+	// Q301-304) when low.
+	m_led_matrix->write_my(~m_key_led_row & 0x0f);
 }
 
 void roland_tr707_state::leds_w(u8 data)
 {
-	// Data bits D0-D5 are inverted by IC302 (M54517 transistor array).
-	m_led_col = ~data & 0x3f;
-
-	// Rows: key/led selection will enable positive supply to LED anodes (via
-	// Q301-304) when low.
-	// Columns: LED cathodes connected to the outputs of IC302.
-	m_led_matrix->matrix(~m_key_led_row & 0x0f, ~m_led_col & 0x3f);
+	// Data bits D0-D5 (IC301, 40H174) are inverted by IC302 (M54517 transistor
+	// array) and connected to LED cathodes (low = on). So D0-D5 are inverted
+	// twice.
+	m_led_matrix->write_mx(data & 0x3f);
 }
 
 void roland_tr707_state::led_outputs_w(offs_t offset, u8 data)
