@@ -4,8 +4,6 @@
  *
  * MB86235 "TGPx4" (c) Fujitsu
  *
- * Written by Angelo Salese, ElSemi & Matthew Daniels
- *
  * TODO:
  * - rewrite ALU integer/floating point functions, use templates etc;
  * - rewrite fifo hookups, remove them from the actual opcodes.
