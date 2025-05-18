@@ -132,15 +132,11 @@ int sound_pa::init(osd_interface &osd, osd_options const &options)
 
 	m_info.m_generation = 1;
 	m_info.m_nodes.resize(Pa_GetDeviceCount());
-	std::map<std::string, int> counters;
 	for(PaDeviceIndex dev = 0; dev != Pa_GetDeviceCount(); dev++) {
 		const PaDeviceInfo *di = Pa_GetDeviceInfo(dev);
+		const PaHostApiInfo *ai = Pa_GetHostApiInfo(di->hostApi);
 		auto &node = m_info.m_nodes[dev];
-		int i1 = ++counters[di->name];
-		if(i1 > 1)
-			node.m_name = util::string_format("%s:%d", di->name, i1);
-		else
-			node.m_name = di->name;
+		node.m_name = util::string_format("%s: %s", ai->name, di->name);
 		node.m_id = dev + 1;
 		node.m_rate.m_default_rate = node.m_rate.m_min_rate = node.m_rate.m_max_rate = di->defaultSampleRate;
 		node.m_sinks = di->maxOutputChannels;

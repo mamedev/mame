@@ -291,7 +291,7 @@ int sound_xaudio2::init(osd_interface &osd, osd_options const &options)
 	m_sample_rate = options.sample_rate();
 	m_audio_latency = options.audio_latency();
 	if (m_audio_latency == 0)
-		return m_audio_latency = 50;
+		return m_audio_latency = 100;
 
 	// Create the IXAudio2 object
 	HR_GOERR(OSD_DYNAMIC_CALL(XAudio2Create, m_xAudio2.GetAddressOf(), 0, XAUDIO2_DEFAULT_PROCESSOR));
