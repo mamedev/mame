@@ -61,6 +61,8 @@ private:
     int m_scu_hack_status_idx;
     int m_scu_hack_data_idx;
 
+    u16 m_tgl[0x1000];
+
     void map(address_map &map) ATTR_COLD;
 
     u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -76,6 +78,9 @@ private:
 
     u8 scu_r(offs_t offs);
     void scu_w(offs_t offs, u8 data);
+
+    u8 tgl_r(offs_t offs);
+    void tgl_w(offs_t offs, u8 data);
 };
 
 static INPUT_PORTS_START(korgtriton)
@@ -89,6 +94,8 @@ void korgtriton_state::machine_reset()
 {
     m_scu_hack_status_idx = 0;
     m_scu_hack_data_idx = 0;
+
+    memset(m_tgl, 0, sizeof(m_tgl));
 }
 
 void korgtriton_state::map(address_map &map)
@@ -100,13 +107,13 @@ void korgtriton_state::map(address_map &map)
     // to SAMPLING interface
 
     // cs1 space (32 bits access)
-    map(0x400000, 0x7fffff).ram(); // FLASH
+    map(0x400000, 0x7fffff).rom(); // FLASH
 
     // cs2 space (16 bits access)
     // map(0x800000, 0x8fffff).ram(); // SPC
     map(0x900000, 0x9fffff).ram().share(m_lcdcm);
     map(0xa00000, 0xafffff).ram().share(m_lcdcio);
-    // map(0xb00000, 0xbfffff).ram(); // TGL
+    map(0xb00000, 0xbfffff).rw(FUNC(korgtriton_state::tgl_r), FUNC(korgtriton_state::tgl_w));
     // map(0xd00000, 0xdfffff).ram(); // MOSS
     // map(0xe00000, 0xefffff).ram(); // FDC
 
@@ -204,6 +211,32 @@ u8 korgtriton_state::scu_r(offs_t offs) {
 
 void korgtriton_state::scu_w(offs_t offs, u8 data) {
     LOG("scu_write: %08x %02x\n", offs, data);
+}
+
+u8 korgtriton_state::tgl_r(offs_t offs) {
+    int res = 0;
+
+    if (offs < sizeof(m_tgl))
+        res = m_tgl[offs];
+
+    if (offs == 0)
+        res = 4;
+
+    LOG("tgl_read: %08x -> %02x\n", offs, res);
+    return res;
+}
+
+void korgtriton_state::tgl_w(offs_t offs, u8 data) {
+    LOG("tgl_write: %08x %02x\n", offs, data);
+
+    if (offs == 0x609 && data == 0x01)
+        data = 0;
+
+    if (offs == 0xe09 && data == 0x01)
+        data = 0;
+
+    if (offs < sizeof(m_tgl))
+        m_tgl[offs] = data;
 }
 
 // the following rom images are taken from the Triton OS 2.0.0 floppy disks
