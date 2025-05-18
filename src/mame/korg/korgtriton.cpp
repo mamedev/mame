@@ -26,6 +26,9 @@ blank for all this time.
 #define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
+#define SCREEN_WIDTH 320
+#define SCREEN_HEIGHT 240
+
 namespace {
 
 class korgtriton_state : public driver_device
@@ -36,7 +39,6 @@ public:
         , m_maincpu(*this, "maincpu")
         , m_ram(*this, "ram")
         , m_lcdcm(*this, "lcdcm")
-        , m_lcdcio(*this, "lcdcio")
         , m_screen(*this, "screen")
         , m_scu(*this, "scu")
     { }
@@ -51,9 +53,10 @@ private:
     required_device<sh7043_device> m_maincpu;
     required_shared_ptr<u32> m_ram;
     required_shared_ptr<u32> m_lcdcm;
-    required_shared_ptr<u32> m_lcdcio;
     required_device<screen_device> m_screen;
     required_device<i8251_device> m_scu;
+
+    u8 m_lcdcio[SCREEN_WIDTH / 8 * SCREEN_HEIGHT]; // 4 bytes per pixel
 
     // SCU: hack to provide data that makes the software proceed,
     //      instead of using the actual device, see also comment
@@ -79,6 +82,9 @@ private:
     u8 scu_r(offs_t offs);
     void scu_w(offs_t offs, u8 data);
 
+    u8 lcdcio_r(offs_t offs);
+    void lcdcio_w(offs_t offs, u8 data);
+
     u8 tgl_r(offs_t offs);
     void tgl_w(offs_t offs, u8 data);
 };
@@ -96,6 +102,7 @@ void korgtriton_state::machine_reset()
     m_scu_hack_data_idx = 0;
 
     memset(m_tgl, 0, sizeof(m_tgl));
+    memset(m_lcdcio, 0, sizeof(m_lcdcio));
 }
 
 void korgtriton_state::map(address_map &map)
@@ -112,7 +119,7 @@ void korgtriton_state::map(address_map &map)
     // cs2 space (16 bits access)
     // map(0x800000, 0x8fffff).ram(); // SPC
     map(0x900000, 0x9fffff).ram().share(m_lcdcm);
-    map(0xa00000, 0xafffff).ram().share(m_lcdcio);
+    map(0xa00000, 0xafffff).rw(FUNC(korgtriton_state::lcdcio_r), FUNC(korgtriton_state::lcdcio_w));
     map(0xb00000, 0xbfffff).rw(FUNC(korgtriton_state::tgl_r), FUNC(korgtriton_state::tgl_w));
     // map(0xd00000, 0xdfffff).ram(); // MOSS
     // map(0xe00000, 0xefffff).ram(); // FDC
@@ -139,8 +146,8 @@ void korgtriton_state::korgtriton(machine_config &config)
     SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
     m_screen->set_refresh_hz(15);
     m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-    m_screen->set_size(320, 240);
-    m_screen->set_visarea(0, 319, 0, 239);
+    m_screen->set_size(SCREEN_WIDTH, SCREEN_HEIGHT);
+    m_screen->set_visarea(0, SCREEN_WIDTH - 1, 0, SCREEN_HEIGHT - 1);
     m_screen->set_screen_update(FUNC(korgtriton_state::screen_update));
 
     I8251(config, m_scu, 1021800);
@@ -168,15 +175,37 @@ void korgtriton_state::pe_w(u32 data)
     LOG("pe_w: %08x\n", data);
 }
 
-uint32_t korgtriton_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+u32 korgtriton_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-    for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
+    int byte_width = SCREEN_WIDTH / 8;
+
+    for (int y = 0; y < SCREEN_HEIGHT; ++y)
     {
-        uint32_t *scan = &bitmap.pix(y, 0);
-        for (int x = 0; x < 320; ++x)
-        scan[x] = m_lcdcio[y * 320 + x];
+        for (int x_byte = 0; x_byte < byte_width; ++x_byte)
+        {
+            uint8_t byte = m_lcdcio[y * byte_width + x_byte];
+
+            for (int bit = 0; bit < 8; ++bit)
+            {
+                int x = x_byte * 8 + (7 - bit); // MSB first
+                u32 color = (byte & (1 << bit)) ? 0xFFFFFFFF : 0xFF000000;
+                u32 *dst = &bitmap.pix(y, x);
+                *dst = color;
+            }
+        }
     }
     return 0;
+}
+
+u8 korgtriton_state::lcdcio_r(offs_t offs)
+{
+    return (offs < sizeof(m_lcdcio)) ? m_lcdcio[offs] : 0;
+}
+    
+void korgtriton_state::lcdcio_w(offs_t offs, u8 data)
+{
+    if (offs < sizeof(m_lcdcio))
+        m_lcdcio[offs] = data;
 }
 
 void korgtriton_state::scu_txrdy_w(int state)
