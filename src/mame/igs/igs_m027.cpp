@@ -2282,6 +2282,8 @@ void igs_m027_state::ccly(machine_config &config)
 	m_ppi[0]->out_pc_callback().set(FUNC(igs_m027_state::lamps_w<0>));
 
 	HOPPER(config, m_hopper, attotime::from_msec(50));
+
+	m_oki->set_clock(2'000'000);
 }
 
 void igs_m027_state::extradrw(machine_config &config)
