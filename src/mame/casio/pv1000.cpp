@@ -4,6 +4,9 @@
 
     Driver for Casio PV-1000
 
+TODO: This lists problems with Mame's emulation
+      https://obscure.nesdev.org/wiki/Casio_PV-1000/Emulation
+
 ***************************************************************************/
 
 #include "emu.h"
