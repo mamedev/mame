@@ -101,7 +101,7 @@ const options_entry emu_options::s_option_entries[] =
 	{ OPTION_KEEPASPECT ";ka",                           "1",         core_options::option_type::BOOLEAN,    "maintain aspect ratio when scaling to fill output screen/window" },
 	{ OPTION_UNEVENSTRETCH ";ues",                       "1",         core_options::option_type::BOOLEAN,    "allow non-integer ratios when scaling to fill output screen/window horizontally or vertically" },
 	{ OPTION_UNEVENSTRETCHX ";uesx",                     "0",         core_options::option_type::BOOLEAN,    "allow non-integer ratios when scaling to fill output screen/window horizontally"},
-	{ OPTION_UNEVENSTRETCHY ";uesy",                     "0",         core_options::option_type::BOOLEAN,    "allow non-integer ratios when scaling to fill otuput screen/window vertially"},
+	{ OPTION_UNEVENSTRETCHY ";uesy",                     "0",         core_options::option_type::BOOLEAN,    "allow non-integer ratios when scaling to fill output screen/window vertically"},
 	{ OPTION_AUTOSTRETCHXY ";asxy",                      "0",         core_options::option_type::BOOLEAN,    "automatically apply -unevenstretchx/y based on source native orientation"},
 	{ OPTION_INTOVERSCAN ";ios",                         "0",         core_options::option_type::BOOLEAN,    "allow overscan on integer scaled targets"},
 	{ OPTION_INTSCALEX ";sx",                            "0",         core_options::option_type::INTEGER,    "set horizontal integer scale factor"},
