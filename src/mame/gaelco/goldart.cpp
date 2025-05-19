@@ -537,8 +537,8 @@ GAME( 1994, goldartgr,  goldart, goldart,  goldart, goldart_state, empty_init, R
 GAME( 1994, goldartpt,  goldart, goldart,  goldart, goldart_state, empty_init, ROT0, "Gaelco / Covielsa", "Goldart (Portugal)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1994, goldartuk,  goldart, goldart,  goldart, goldart_state, empty_init, ROT0, "Gaelco / Covielsa", "Goldart (United Kingdom)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-GAME( 1994, goldartp,   goldart, goldartp, goldart, goldart_state, empty_init, ROT0, "Gaelco / Covielsa", "Goldart (PIC16C54, Spain)",                    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1994, goldartpfr, goldart, goldartp, goldart, goldart_state, empty_init, ROT0, "Gaelco / Jeutel",   "Goldart (PIC16C54, France, Covielsa license)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1994, goldartpgr, goldart, goldartp, goldart, goldart_state, empty_init, ROT0, "Gaelco / Covielsa", "Goldart (PIC16C54, Germany)",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1994, goldartppt, goldart, goldartp, goldart, goldart_state, empty_init, ROT0, "Gaelco / Covielsa", "Goldart (PIC16C54, Portugal)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1994, goldartpuk, goldart, goldartp, goldart, goldart_state, empty_init, ROT0, "Gaelco / Covielsa", "Goldart (PIC16C54, United Kingdom)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, goldartp,   goldart, goldartp, goldart, goldart_state, empty_init, ROT0, "Gaelco / Covielsa", "Goldart (PIC16C54, Spain)",                    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, goldartpfr, goldart, goldartp, goldart, goldart_state, empty_init, ROT0, "Gaelco / Jeutel",   "Goldart (PIC16C54, France, Covielsa license)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, goldartpgr, goldart, goldartp, goldart, goldart_state, empty_init, ROT0, "Gaelco / Covielsa", "Goldart (PIC16C54, Germany)",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, goldartppt, goldart, goldartp, goldart, goldart_state, empty_init, ROT0, "Gaelco / Covielsa", "Goldart (PIC16C54, Portugal)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, goldartpuk, goldart, goldartp, goldart, goldart_state, empty_init, ROT0, "Gaelco / Covielsa", "Goldart (PIC16C54, United Kingdom)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
