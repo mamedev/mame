@@ -497,7 +497,7 @@ void nes_vt02_vt03_soc_device::video_irq(bool hblank, int scanline, bool vblank,
 			{
 				if (m_timer_irq_enabled && !blanked)
 				{
-					logerror("scanline_irq %d\n", scanline);
+					//logerror("scanline_irq %d\n", scanline);
 					irqstate = 1;
 				}
 			}

@@ -412,14 +412,14 @@ void vt3xx_soc_base_device::vt369_411c_bank6000_enable_w(offs_t offset, uint8_t 
 {
 	// and CPU clock scaling on bit 0x80?
 
-	logerror("enable bank at 0x6000 (%02x)\n", data);
+	logerror("%s: enable bank at 0x6000 (%02x)\n", machine().describe_context(), data);
 	m_bank6000_enable = data;
 }
 
 
 void vt3xx_soc_base_device::vt369_4112_bank6000_select_w(offs_t offset, uint8_t data)
 {
-	logerror("set bank at 0x6000 to %02x\n", data);
+	logerror("%s: set bank at 0x6000 to %02x\n", machine().describe_context(), data);
 	m_bank6000 = data;
 
 	// 0x3c = 0x78000
@@ -431,7 +431,8 @@ uint8_t vt3xx_soc_base_device::vt369_6000_r(offs_t offset)
 	if (m_bank6000_enable & 0x40)
 	{
 		address_space& spc = this->space(AS_PROGRAM);
-		int address = (m_bank6000 * 0x2000) + (offset & 0x1fff);
+		// x the ball in lxcmcysp suggests we need to go through get_banks to get the higher bits
+		int address = (get_banks(m_bank6000) * 0x2000) + (offset & 0x1fff);
 		return spc.read_byte(get_relative() + address);
 	}
 	else
