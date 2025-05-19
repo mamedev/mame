@@ -869,10 +869,22 @@ void ppu_vt3xx_device::draw_sprites(u8 *line_priority)
 				int height = 16;
 				int width = 8;
 				int bpp = 8;
+				bool alt_16_handling = false;
 
 				if (m_newvid_1d & 0x02)
 				{
 					width = 16;
+					bpp = 4;
+				}
+
+				// testing with lxcmcysp later games in the list
+				// 12 09 0f -- 'alt_16_handling'
+				// 22 09 0f -- some games, works
+				// 12 0f 0f -- menu, works
+				// 12 0b 0f -- hercules in red5mam, still broken
+				if ((!(m_newvid_1d & 0x04)) && (m_newvid_1c & 0x10))
+				{
+					alt_16_handling = true;
 					bpp = 4;
 				}
 
@@ -907,11 +919,24 @@ void ppu_vt3xx_device::draw_sprites(u8 *line_priority)
 				int index1;
 
 				if (bpp == 4)
-					index1 = tilenum * 128;
+				{
+					if (alt_16_handling)
+						index1 = tilenum * 32;
+					else
+						index1 = tilenum * 128;
+				}
 				else
+				{
 					index1 = tilenum * 64; // why? a 16 wide 4bpp sprite takes up the same number of bytes as an 8 wide 8bpp sprite
+				}
 
-				int pattern_offset = index1 + sprite_line * 8;
+				int pattern_offset;
+
+				if (alt_16_handling)
+					pattern_offset = index1 + sprite_line * 4;
+				else
+					pattern_offset = index1 + sprite_line * 8;
+
 				pattern_offset += get_newmode_spritebase() * 0x2000;
 
 				for (int i = 0; i < 8; i++)
