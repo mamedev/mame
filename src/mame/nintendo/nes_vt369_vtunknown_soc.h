@@ -83,6 +83,7 @@ private:
 	required_device<vrt_vt1682_alu_device> m_alu;
 	required_device<cpu_device> m_soundcpu;
 	std::vector<u8> m_6000_ram;
+
 	uint8_t m_bank6000 = 0;
 	uint8_t m_bank6000_enable = 0;
 

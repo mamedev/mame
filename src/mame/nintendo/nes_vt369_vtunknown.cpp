@@ -74,6 +74,8 @@ protected:
 
 	void configure_soc(nes_vt02_vt03_soc_device* soc);
 
+	void extbank_w(uint8_t data);
+
 	uint8_t upper_412c_r();
 	uint8_t upper_412d_r();
 	void upper_412c_w(uint8_t data);
@@ -95,6 +97,7 @@ public:
 	void vt369_vtunknown_4k_ram_16mb(machine_config& config);
 
 	void vt_external_space_map_32mbyte(address_map &map) ATTR_COLD;
+	void vt_external_space_map_32mbyte_bank(address_map &map) ATTR_COLD;
 	void vt_external_space_map_16mbyte(address_map &map) ATTR_COLD;
 	void vt_external_space_map_8mbyte(address_map &map) ATTR_COLD;
 	void vt_external_space_map_4mbyte(address_map &map) ATTR_COLD;
@@ -105,6 +108,8 @@ public:
 	void init_lxcmcypp();
 
 protected:
+	uint8_t vt_rom_banked_r(offs_t offset);
+
 	required_device<nes_vt02_vt03_soc_device> m_soc;
 };
 
@@ -124,7 +129,6 @@ private:
 
 	void bittboy_412c_w(uint8_t data);
 
-	uint8_t vt_rom_banked_r(offs_t offset);
 };
 
 
@@ -142,7 +146,6 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	uint8_t vt_rom_banked_r(offs_t offset);
 	void vt_external_space_map_fapocket_4x16mbyte(address_map &map) ATTR_COLD;
 
 	uint8_t fapocket_412c_r();
@@ -164,7 +167,8 @@ public:
 	void vt369_vtunknown_hh_8mb(machine_config& config);
 	void vt369_vtunknown_hh_16mb(machine_config& config);
 	void vt369_vtunknown_hh_32mb(machine_config& config);
-
+	void vt369_vtunknown_hh_32mb_2banks_lexi(machine_config& config);
+	
 	void vt369_vtunknown_hh_swap_8mb(machine_config& config);
 	void vt369_vtunknown_hh_swap_2mb(machine_config& config);
 	void vt369_vtunknown_hh_swap_512kb(machine_config& config);
@@ -195,10 +199,21 @@ void vt369_vtunknown_base_state::vtspace_w(offs_t offset, uint8_t data)
 	logerror("%s: vtspace_w %08x : %02x", machine().describe_context(), offset, data);
 }
 
+// bitboy is 2 16Mbyte banks
+uint8_t vt369_vtunknown_state::vt_rom_banked_r(offs_t offset)
+{
+	return m_prgrom[m_ahigh | offset];
+}
+
 // VTxx can address 25-bit address space (32MB of ROM) so use maps with mirroring in depending on ROM size
 void vt369_vtunknown_state::vt_external_space_map_32mbyte(address_map &map)
 {
 	map(0x0000000, 0x1ffffff).r(FUNC(vt369_vtunknown_state::vt_rom_r));
+}
+
+void vt369_vtunknown_state::vt_external_space_map_32mbyte_bank(address_map &map)
+{
+	map(0x0000000, 0x1ffffff).r(FUNC(vt369_vtunknown_state::vt_rom_banked_r));
 }
 
 void vt369_vtunknown_state::vt_external_space_map_16mbyte(address_map &map)
@@ -231,21 +246,9 @@ void vt369_vtunknown_state::vt_external_space_map_512kbyte(address_map &map)
 	map(0x0000000, 0x007ffff).mirror(0x1f80000).r(FUNC(vt369_vtunknown_state::vt_rom_r));
 }
 
-// bitboy is 2 16Mbyte banks
-uint8_t vt369_vtunknown_cy_state::vt_rom_banked_r(offs_t offset)
-{
-	return m_prgrom[m_ahigh | offset];
-}
-
 void vt369_vtunknown_cy_state::vt_external_space_map_bitboy_2x16mbyte(address_map &map)
 {
 	map(0x0000000, 0x0ffffff).mirror(0x1000000).r(FUNC(vt369_vtunknown_cy_state::vt_rom_banked_r));
-}
-
-// fapocket is 4 16Mbyte banks
-uint8_t vt369_vtunknown_dg_fapocket_state::vt_rom_banked_r(offs_t offset)
-{
-	return m_prgrom[m_ahigh | offset];
 }
 
 void vt369_vtunknown_dg_fapocket_state::vt_external_space_map_fapocket_4x16mbyte(address_map &map)
@@ -318,7 +321,6 @@ void vt369_vtunknown_base_state::machine_start()
 	m_latch1 = 0;
 	m_previous_port0 = 0;
 
-	m_ahigh = 0;
 	m_4242 = 0;
 	m_411c = 0;
 	m_411d = 0;
@@ -335,7 +337,7 @@ void vt369_vtunknown_base_state::machine_start()
 
 void vt369_vtunknown_base_state::machine_reset()
 {
-
+	m_ahigh = 0;
 }
 
 void vt369_vtunknown_dg_fapocket_state::machine_reset()
@@ -547,6 +549,17 @@ void vt369_vtunknown_unk_state::vt369_vtunknown_hh_32mb(machine_config& config)
 	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_unk_state::vt_external_space_map_32mbyte);
 }
 
+void vt369_vtunknown_base_state::extbank_w(uint8_t data)
+{
+	m_ahigh |= (data & 0x01) ? (1 << 25) : 0x0;
+}
+
+void vt369_vtunknown_unk_state::vt369_vtunknown_hh_32mb_2banks_lexi(machine_config& config)
+{
+	vt369_vtunknown_hh_32mb(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_unk_state::vt_external_space_map_32mbyte_bank);
+	m_soc->set_4150_write_cb().set(FUNC(vt369_vtunknown_unk_state::extbank_w));
+}
 
 
 static INPUT_PORTS_START( vt369_vtunknown )
@@ -701,8 +714,14 @@ ROM_END
 
 ROM_START( lxcmcysw )
 	ROM_REGION( 0x4000000, "mainrom", 0 )
-	ROM_LOAD( "jl2365swr-1.u2", 0x0000000, 0x4000000, CRC(60ece391) SHA1(655de6b36ba596d873de2839522b948ccf45e006) )
-
+	ROM_LOAD( "jl2365swr-1.u2", 0x0000000, 0x0800000, CRC(60ece391) SHA1(655de6b36ba596d873de2839522b948ccf45e006) )
+	ROM_CONTINUE(0x1000000, 0x0800000)
+	ROM_CONTINUE(0x0800000, 0x0800000)
+	ROM_CONTINUE(0x1800000, 0x0800000)
+	ROM_CONTINUE(0x2000000, 0x0800000)
+	ROM_CONTINUE(0x3000000, 0x0800000)
+	ROM_CONTINUE(0x2800000, 0x0800000)
+	ROM_CONTINUE(0x3800000, 0x0800000)
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
@@ -1076,20 +1095,20 @@ CONS( 2012, dgun2561,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_v
 
 CONS( 2012, lxccatv,   0,  0,  vt369_vtunknown_hh_32mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade TV - 120 in 1 (JL2370)", MACHINE_NOT_WORKING ) // 32MByte ROM, 2011 on case, 2012 on PCB
 // All Lexibook units below have 64Mbyte ROMs, must be externally banked, or different addressing scheme
-CONS( 2012, lxcmcysp,  0,  0,  vt369_vtunknown_hh_32mb, vt369_vtunknown_rot, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Marvel Ultimate Spider-Man (120-in-1)", MACHINE_NOT_WORKING | ROT270) // renders vertically, but screen stretches it to horizontal
-CONS( 200?, lxcmcy,    0,  0,  vt369_vtunknown_hh_32mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade", MACHINE_NOT_WORKING )
-CONS( 200?, lxcmc250,  0,  0,  vt369_vtunknown_hh_32mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - 250-in-1 (JL2375)", MACHINE_NOT_WORKING )
-CONS( 200?, lxcmcysw,  0,  0,  vt369_vtunknown_hh_32mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Star Wars Rebels", MACHINE_NOT_WORKING )
-CONS( 200?, lxcmcyfz,  0,  0,  vt369_vtunknown_hh_32mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Frozen", MACHINE_NOT_WORKING )
-CONS( 2012, lxcmcydp,  0,  0,  vt369_vtunknown_hh_32mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Disney Princess", MACHINE_NOT_WORKING )
-CONS( 2014, lxcmcycr,  0,  0,  vt369_vtunknown_hh_32mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Cars", MACHINE_NOT_WORKING )
-CONS( 2018, lxcmcypj,  0,  0,  vt369_vtunknown_hh_32mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - PJ Masks", MACHINE_NOT_WORKING )
-CONS( 2014, lxcmcyba,  0,  0,  vt369_vtunknown_hh_32mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Barbie (JL2365BB)", MACHINE_NOT_WORKING )
+CONS( 2012, lxcmcysp,  0,  0,  vt369_vtunknown_hh_32mb_2banks_lexi, vt369_vtunknown_rot, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Marvel Ultimate Spider-Man (120-in-1)", MACHINE_NOT_WORKING | ROT270) // renders vertically, but screen stretches it to horizontal
+CONS( 200?, lxcmcy,    0,  0,  vt369_vtunknown_hh_32mb_2banks_lexi, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmc250,  0,  0,  vt369_vtunknown_hh_32mb_2banks_lexi, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - 250-in-1 (JL2375)", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmcysw,  0,  0,  vt369_vtunknown_hh_32mb_2banks_lexi, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Star Wars Rebels", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmcyfz,  0,  0,  vt369_vtunknown_hh_32mb_2banks_lexi, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Frozen", MACHINE_NOT_WORKING )
+CONS( 2012, lxcmcydp,  0,  0,  vt369_vtunknown_hh_32mb_2banks_lexi, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Disney Princess", MACHINE_NOT_WORKING )
+CONS( 2014, lxcmcycr,  0,  0,  vt369_vtunknown_hh_32mb_2banks_lexi, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Cars", MACHINE_NOT_WORKING )
+CONS( 2018, lxcmcypj,  0,  0,  vt369_vtunknown_hh_32mb_2banks_lexi, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - PJ Masks", MACHINE_NOT_WORKING )
+CONS( 2014, lxcmcyba,  0,  0,  vt369_vtunknown_hh_32mb_2banks_lexi, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Barbie (JL2365BB)", MACHINE_NOT_WORKING )
 // the data order is swapped for this one, maybe other internal differences?
-CONS( 2018, lxcmcypp,  0,  0,  vt369_vtunknown_hh_32mb, vt369_vtunknown, vt369_vtunknown_unk_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Paw Patrol", MACHINE_NOT_WORKING )
+CONS( 2018, lxcmcypp,  0,  0,  vt369_vtunknown_hh_32mb_2banks_lexi, vt369_vtunknown, vt369_vtunknown_unk_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Paw Patrol", MACHINE_NOT_WORKING )
 
-CONS( 200?, lxccminn,  0,  0,  vt369_vtunknown_hh_32mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Console Colour - Minnie Mouse", MACHINE_NOT_WORKING )
-CONS( 200?, lxccplan,  0,  0,  vt369_vtunknown_hh_32mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Console Colour - Disney's Planes", MACHINE_NOT_WORKING )
+CONS( 200?, lxccminn,  0,  0,  vt369_vtunknown_hh_32mb_2banks_lexi, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Console Colour - Minnie Mouse", MACHINE_NOT_WORKING )
+CONS( 200?, lxccplan,  0,  0,  vt369_vtunknown_hh_32mb_2banks_lexi, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Console Colour - Disney's Planes", MACHINE_NOT_WORKING )
 
 
 // GB-NO13-Main-VT389-2 on PCBs - uses higher resolution mode (twice usual h-res?)

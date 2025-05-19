@@ -124,7 +124,7 @@ void vt3xx_soc_base_device::vt369_soundcpu_control_w(offs_t offset, uint8_t data
 
 void vt3xx_soc_base_device::vt369_relative_w(offs_t offset, uint8_t data)
 {
-	printf("%s: vt369_relative_w %02x %02x\n", machine().describe_context().c_str(), offset,  data);
+	logerror("%s: vt369_relative_w %02x %02x\n", machine().describe_context(), offset,  data);
 	m_relative[offset] = data;
 }
 
@@ -283,7 +283,7 @@ uint8_t vt3xx_soc_base_device::extra_rom_prot_4153_r() { logerror("%s: extra_rom
 uint8_t vt3xx_soc_base_device::extra_rom_prot_4150_r() { logerror("%s: extra_rom_prot_4150_r (protection? / extra SPI device?)\n", machine().describe_context()); return machine().rand(); }
 uint8_t vt3xx_soc_base_device::extra_rom_prot_4152_r() { logerror("%s: extra_rom_prot_4152_r (protection? / extra SPI device?)\n", machine().describe_context()); return machine().rand(); }
 void vt3xx_soc_base_device::extra_rom_prot_4152_w(uint8_t data) { logerror("%s: extra_rom_prot_4152_w %02x (protection? / extra SPI device?)\n", machine().describe_context(), data); }
-void vt3xx_soc_base_device::extra_rom_prot_4150_w(uint8_t data) { logerror("%s: extra_rom_prot_4150_w %02x (protection? / extra SPI device?)\n", machine().describe_context(), data); }
+void vt3xx_soc_base_device::extra_rom_prot_4150_w(uint8_t data) { logerror("%s: extra_rom_prot_4150_w %02x (protection? / extra SPI device?)\n", machine().describe_context(), data); m_4150_write_cb(data); }
 
 void vt3xx_soc_base_device::update_timer()
 {
