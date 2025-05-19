@@ -78,6 +78,7 @@ private:
 	uint8_t m_input_matrix = 0xff;
 
 	uint8_t input_r();
+	void output_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void charram_w(offs_t offset, uint8_t data);
@@ -153,6 +154,20 @@ uint8_t boramz80_state::input_r()
 	return res;
 }
 
+void boramz80_state::output_w(uint8_t data)
+{
+	// bits 0-3 are coin counters
+	for (int i = 0; i < 4; i++)
+		machine().bookkeeping().coin_counter_w(i, BIT(data, i));
+
+	if (data & 0xf0)
+		logerror("%s output_w: %02x\n", machine().describe_context(), data);
+
+	// bit 6 is used often
+
+	// bit 7 is probably hopper motor
+}
+
 
 void boramz80_state::program_map(address_map &map)
 {
@@ -171,12 +186,12 @@ void boramz80_state::io_map(address_map &map)
 	map(0x00, 0x03).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x20, 0x20).portr("COIN");
 	map(0x40, 0x40).r(FUNC(boramz80_state::input_r));
-	map(0x60, 0x60).portr("DSW4");
+	map(0x60, 0x60).portr("DSW4"); // TODO: write?
 	map(0x80, 0x81).w("aysnd", FUNC(ay8910_device::data_address_w));
 	map(0x81, 0x81).r("aysnd", FUNC(ay8910_device::data_r));
 	//map(0xa0, 0xa0).r();
-	map(0xc0, 0xc0).w("crtc", FUNC(mc6845_device::address_w));
-	map(0xc1, 0xc1).w("crtc", FUNC(mc6845_device::register_w));
+	map(0xc0, 0xc0).w("crtc", FUNC(hd6845s_device::address_w));
+	map(0xc1, 0xc1).w("crtc", FUNC(hd6845s_device::register_w));
 }
 
 
@@ -450,7 +465,7 @@ const gfx_layout gfx_8x8x8_planar =
 };
 
 
-static GFXDECODE_START( gfx_boram ) // TODO
+static GFXDECODE_START( gfx_boram )
 	GFXDECODE_ENTRY( "chars", 0, gfx_8x8x2_planar,  0x000, 16 )
 	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x8_planar,  0x200, 16 )
 GFXDECODE_END
@@ -467,7 +482,7 @@ void boramz80_state::pk(machine_config &config)
 	ppi.in_pa_callback().set_ioport("DSW1");
 	ppi.in_pb_callback().set_ioport("DSW2");
 	ppi.in_pc_callback().set([this] () { logerror("%s: PPI port C read\n", machine().describe_context()); return 0; });
-	ppi.out_pc_callback().set([this] (uint8_t data) { logerror("%s: PPI port C write %02x\n", machine().describe_context(), data); });
+	ppi.out_pc_callback().set(FUNC(boramz80_state::output_w));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
