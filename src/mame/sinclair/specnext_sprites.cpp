@@ -128,7 +128,7 @@ void specnext_sprites_device::update_sprites_cache()
 				const u8 anchor_yscale =    anchor->rel_type ? anchor->yscale  : 0b00;
 
 				const u8 spr_rel_x0 = anchor_rotate ? sprite_attr[1] : sprite_attr[0];
-				const u8 spr_rel_y0 = anchor_rotate ? sprite_attr[0] : sprite_attr[1];;
+				const u8 spr_rel_y0 = anchor_rotate ? sprite_attr[0] : sprite_attr[1];
 				const u8 spr_rel_x1 = (anchor_rotate xor anchor_xmirror) ? (~spr_rel_x0 + 1) : spr_rel_x0;
 				const u8 spr_rel_y1 = anchor_ymirror ? (~spr_rel_y0 + 1) : spr_rel_y0;
 				const u16 spr_rel_x2 = (((BIT(spr_rel_x1, 7) << 8) | spr_rel_x1) << anchor_xscale) & 0x1ff;

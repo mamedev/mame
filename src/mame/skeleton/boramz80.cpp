@@ -21,7 +21,6 @@ Some PCBs have been seen mixing different sets of GFX ROMs with the same program
 TODO:
 - black screen after first attract cycle (interrupts?)
 - colors seem good if compared to available pics, but maybe some slight adjustment needed
-- inputs are currently verified only for the pkboram set
 - 0211 PCB only has 2 DIP banks, but the program reads 4?
 - outputs
 - decryption for tpkborama
@@ -79,6 +78,7 @@ private:
 	uint8_t m_input_matrix = 0xff;
 
 	uint8_t input_r();
+	void output_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void charram_w(offs_t offset, uint8_t data);
@@ -154,6 +154,20 @@ uint8_t boramz80_state::input_r()
 	return res;
 }
 
+void boramz80_state::output_w(uint8_t data)
+{
+	// bits 0-3 are coin counters
+	for (int i = 0; i < 4; i++)
+		machine().bookkeeping().coin_counter_w(i, BIT(data, i));
+
+	if (data & 0xf0)
+		logerror("%s output_w: %02x\n", machine().describe_context(), data);
+
+	// bit 6 is used often
+
+	// bit 7 is probably hopper motor
+}
+
 
 void boramz80_state::program_map(address_map &map)
 {
@@ -172,12 +186,12 @@ void boramz80_state::io_map(address_map &map)
 	map(0x00, 0x03).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x20, 0x20).portr("COIN");
 	map(0x40, 0x40).r(FUNC(boramz80_state::input_r));
-	map(0x60, 0x60).portr("DSW4");
+	map(0x60, 0x60).portr("DSW4"); // TODO: write?
 	map(0x80, 0x81).w("aysnd", FUNC(ay8910_device::data_address_w));
 	map(0x81, 0x81).r("aysnd", FUNC(ay8910_device::data_r));
 	//map(0xa0, 0xa0).r();
-	map(0xc0, 0xc0).w("crtc", FUNC(mc6845_device::address_w));
-	map(0xc1, 0xc1).w("crtc", FUNC(mc6845_device::register_w));
+	map(0xc0, 0xc0).w("crtc", FUNC(hd6845s_device::address_w));
+	map(0xc1, 0xc1).w("crtc", FUNC(hd6845s_device::register_w));
 }
 
 
@@ -334,8 +348,112 @@ static INPUT_PORTS_START( pkboram )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( tpkboram )
+	PORT_INCLUDE( pkboram )
 
-const gfx_layout gfx_8x8x4_planar =
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x60, 0x60, "Yen / Credit" ) PORT_DIPLOCATION("SW1:6,7")
+	PORT_DIPSETTING(    0x60, "10" )
+	PORT_DIPSETTING(    0x40, "20" )
+	PORT_DIPSETTING(    0x20, "30" )
+	PORT_DIPSETTING(    0x00, "50" )
+	PORT_DIPNAME( 0x80, 0x80, "Service" ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x03, 0x03, "X-Cut" ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x03, "X 350-" )
+	PORT_DIPSETTING(    0x02, "X 700-" )
+	PORT_DIPSETTING(    0x01, "X 1500-" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x0c, 0x0c, "Royal" ) PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x00, "0%" )
+	PORT_DIPSETTING(    0x04, "25%" )
+	PORT_DIPSETTING(    0x08, "50%" )
+	PORT_DIPSETTING(    0x0c, "100%" )
+	PORT_DIPNAME( 0x10, 0x10, "Straight Flush" ) PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x00, "50%" )
+	PORT_DIPSETTING(    0x10, "100%" )
+	PORT_DIPNAME( 0x60, 0x60, "Start %" ) PORT_DIPLOCATION("SW2:6,7")
+	PORT_DIPSETTING(    0x00, "80%" )
+	PORT_DIPSETTING(    0x20, "100%" )
+	PORT_DIPSETTING(    0x40, "120%" )
+	PORT_DIPSETTING(    0x60, "150%" )
+	PORT_DIPNAME( 0x80, 0x80, "TBO Sound" ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x00, "Cut" )
+
+	PORT_MODIFY("DSW3")
+	PORT_DIPNAME( 0x07, 0x07, "PK Game %" ) PORT_DIPLOCATION("SW3:1,2,3")
+	PORT_DIPSETTING(    0x00, "80%" )
+	PORT_DIPSETTING(    0x01, "83%" )
+	PORT_DIPSETTING(    0x02, "86%" )
+	PORT_DIPSETTING(    0x03, "89%" )
+	PORT_DIPSETTING(    0x04, "92%" )
+	PORT_DIPSETTING(    0x05, "95%" )
+	PORT_DIPSETTING(    0x06, "97%" )
+	PORT_DIPSETTING(    0x07, "99%" )
+	PORT_DIPNAME( 0x08, 0x08, "D-Up Chance" ) PORT_DIPLOCATION("SW3:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x00, "Cut" )
+
+	PORT_MODIFY("DSW4")
+	PORT_DIPNAME( 0x03, 0x03, "D-Up Game %" ) PORT_DIPLOCATION("SW4:1,2")
+	PORT_DIPSETTING(    0x00, "80%" )
+	PORT_DIPSETTING(    0x01, "85%" )
+	PORT_DIPSETTING(    0x02, "90%" )
+	PORT_DIPSETTING(    0x03, "95%" )
+	PORT_DIPNAME( 0x0c, 0x0c, "D-Up Min" ) PORT_DIPLOCATION("SW4:3,4")
+	PORT_DIPSETTING(    0x0c, "1" )
+	PORT_DIPSETTING(    0x08, "3" )
+	PORT_DIPSETTING(    0x04, "5" )
+	PORT_DIPSETTING(    0x00, "10" )
+	PORT_DIPNAME( 0x10, 0x10, "T-Analyze" ) PORT_DIPLOCATION("SW4:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x00, "Cut" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( pkrboram )
+	PORT_INCLUDE( tpkboram )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x60, 0x60, "Yen / Credit" ) PORT_DIPLOCATION("SW1:6,7")
+	PORT_DIPSETTING(    0x60, "10" )
+	PORT_DIPSETTING(    0x40, "20" )
+	PORT_DIPSETTING(    0x20, "50" )
+	PORT_DIPSETTING(    0x00, "100" )
+	PORT_DIPNAME( 0x80, 0x80, "Max Bet" ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x00, "20" )
+	PORT_DIPSETTING(    0x80, "50" )
+
+	PORT_MODIFY("DSW3")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW3:6") // marked as *OFF -don't touch- in test mode
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW3:7") // marked as *OFF -don't touch- in test mode
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW3:8") // marked as *OFF -don't touch- in test mode
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_MODIFY("DSW4")
+	PORT_DIPNAME( 0x10, 0x10, "Turbo Bet" ) PORT_DIPLOCATION("SW4:5")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x10, "5" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( pkts )
+	PORT_INCLUDE( tpkboram )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:8") // no definition in test mode
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+const gfx_layout gfx_8x8x8_planar =
 {
 	8,8,
 	RGN_FRAC(1,8),
@@ -347,9 +465,9 @@ const gfx_layout gfx_8x8x4_planar =
 };
 
 
-static GFXDECODE_START( gfx_boram ) // TODO
+static GFXDECODE_START( gfx_boram )
 	GFXDECODE_ENTRY( "chars", 0, gfx_8x8x2_planar,  0x000, 16 )
-	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x4_planar,  0x200, 16 )
+	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x8_planar,  0x200, 16 )
 GFXDECODE_END
 
 
@@ -364,7 +482,7 @@ void boramz80_state::pk(machine_config &config)
 	ppi.in_pa_callback().set_ioport("DSW1");
 	ppi.in_pb_callback().set_ioport("DSW2");
 	ppi.in_pc_callback().set([this] () { logerror("%s: PPI port C read\n", machine().describe_context()); return 0; });
-	ppi.out_pc_callback().set([this] (uint8_t data) { logerror("%s: PPI port C write %02x\n", machine().describe_context(), data); });
+	ppi.out_pc_callback().set(FUNC(boramz80_state::output_w));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -531,9 +649,9 @@ void boramz80_state::init_tpkborama()
 } // anonymous namespace
 
 
-GAME( 1987, pkboram,   0,        pk, pkboram, boramz80_state, empty_init,     ROT0, "Boram", "PK - New Exciting Poker!",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // PK-BORAM 0211 aug.04.1987. BORAM CORP
-GAME( 1988, tpkboram,  0,        pk, pkboram, boramz80_state, empty_init,     ROT0, "Boram", "PK Turbo",                        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // PK-TURBO jan.29.1988. BORAM CORP.
-GAME( 1998, tpkborama, tpkboram, pk, pkboram, boramz80_state, init_tpkborama, ROT0, "Boram", "PK Turbo (Ver 2.3B2, encrypted)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // dep inctype-23B1998 0519Ver 2.3B2
-GAME( 1990, pkrboram,  0,        pk, pkboram, boramz80_state, empty_init,     ROT0, "Boram", "PK Rainbow (v 1.5)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // PK RAINBOW v1.5 BORAM Corp. 1990.11.06
-GAME( 1992, tpkg2,     0,        pk, pkboram, boramz80_state, empty_init,     ROT0, "Boram", "PK Turbo Great 2",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // PK TURBO GREAT2 1992.06.04 BORAM CORP.
-GAME( 19??, pkts,      0,        pk, pkboram, boramz80_state, empty_init,     ROT0, "Boram", "PK Turbo Special",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // PKS v100 BORAM CORP
+GAME( 1987, pkboram,   0,        pk, pkboram,  boramz80_state, empty_init,     ROT0, "Boram", "PK - New Exciting Poker!",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // PK-BORAM 0211 aug.04.1987. BORAM CORP
+GAME( 1988, tpkboram,  0,        pk, tpkboram, boramz80_state, empty_init,     ROT0, "Boram", "PK Turbo",                        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // PK-TURBO jan.29.1988. BORAM CORP.
+GAME( 1998, tpkborama, tpkboram, pk, tpkboram, boramz80_state, init_tpkborama, ROT0, "Boram", "PK Turbo (Ver 2.3B2, encrypted)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // dep inctype-23B1998 0519Ver 2.3B2
+GAME( 1990, pkrboram,  0,        pk, pkrboram, boramz80_state, empty_init,     ROT0, "Boram", "PK Rainbow (v 1.5)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // PK RAINBOW v1.5 BORAM Corp. 1990.11.06
+GAME( 1992, tpkg2,     0,        pk, tpkboram, boramz80_state, empty_init,     ROT0, "Boram", "PK Turbo Great 2",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // PK TURBO GREAT2 1992.06.04 BORAM CORP.
+GAME( 19??, pkts,      0,        pk, pkts,     boramz80_state, empty_init,     ROT0, "Boram", "PK Turbo Special",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // PKS v100 BORAM CORP

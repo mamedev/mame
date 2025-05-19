@@ -9,6 +9,7 @@ The u3 ROM contains the following message (it's David Kittinger's company):
 Copyright (c) 1985, Intelligent Heuristic Programming, Inc
 
 Hardware notes:
+- PCB label: 100045
 - R65C02P4 @ 5MHz (10MHz XTAL)
 - 2*2KB RAM(NEC D449C-3), 2*32KB ROM
 - 64+8 leds, magnet sensors chessboard
@@ -16,8 +17,10 @@ Hardware notes:
 
 I/O is again similar to supercon
 
-The first version was on a modified Super Constellation PCB. 4MHz CPU speed,
-and 4 TMM27128 with identical ROM contents as the newer version.
+The 1st version had a R65C02P3 @ 4MHz (8MHz XTAL). IRQ and beeper via the XTAL
+instead of 555 timer, but nearly the same frequency. The 4MHz version was also
+seen on a modified Super Constellation PCB, with 4 TMM27128 and identical ROM
+contents as the newer version.
 
 *******************************************************************************/
 

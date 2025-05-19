@@ -191,7 +191,7 @@ template<typename S> void emu::detail::output_buffer_flat<S>::resample(u32 previ
 		return;
 
 	auto si = [](attotime time, u32 rate) -> s64 {
-		return time.m_seconds * rate + ((time.m_attoseconds / 100000000) * rate) / 10000000000LL;
+		return time.m_seconds * rate + ((time.m_attoseconds / 1000000000) * rate) / 1000000000;
 	};
 
 	auto cv = [](u32 source_rate, u32 dest_rate, s64 time) -> std::pair<s64, double> {
@@ -404,6 +404,9 @@ void sound_stream::set_sample_rate(u32 new_rate)
 
 void sound_stream::internal_set_sample_rate(u32 new_rate)
 {
+	if(new_rate == m_sample_rate)
+		return;
+
 	if(m_started) {
 		update();
 		m_output_buffer.resample(m_sample_rate, new_rate, m_sync_time, m_device.machine().time());
@@ -716,6 +719,8 @@ void sound_manager::before_devices_init()
 
 void sound_manager::postload()
 {
+	std::unique_lock<std::mutex> dlock(m_effects_data_mutex);
+	m_effects_prev_time = m_effects_cur_time = machine().time();
 }
 
 void sound_manager::after_devices_init()
@@ -927,10 +932,10 @@ void sound_manager::run_effects()
 			eb.prepare_space(samples);
 			if(m_muted)
 				for(int channel = 0; channel != channels; channel ++)
-					std::fill(si.m_effects_buffer.ptrw(channel, 0), si.m_effects_buffer.ptrw(channel, samples), 0);
+					std::fill(si.m_effects_buffer.ptrw(channel, 0), si.m_effects_buffer.ptrw(channel, 0) + samples, 0);
 			else
 				for(int channel = 0; channel != channels; channel ++)
-					std::copy(si.m_buffer.ptrs(channel, 0), si.m_buffer.ptrs(channel, samples), si.m_effects_buffer.ptrw(channel, 0));
+					std::copy(si.m_buffer.ptrs(channel, 0), si.m_buffer.ptrs(channel, 0) + samples, si.m_effects_buffer.ptrw(channel, 0));
 			eb.commit(samples);
 		}
 
@@ -1096,7 +1101,8 @@ sound_manager::microphone_info::microphone_info(microphone_device &dev) : m_dev(
 
 void sound_manager::reset()
 {
-	LOG_OUTPUT_FUNC("Sound reset\n");
+	if(VERBOSE & LOG_GENERAL)
+		LOG_OUTPUT_FUNC("Sound reset\n");
 }
 
 
@@ -1185,18 +1191,22 @@ void sound_manager::config_load(config_type cfg_type, config_level cfg_level, ut
 		}
 
 		// All levels
-		const util::xml::data_node *lv_node = parentnode->get_child("master_volume");
-		if(lv_node)
-			m_master_gain = lv_node->get_attribute_float("gain", 1.0);
+		if(!machine().options().volume()) {
+			const util::xml::data_node *lv_node = parentnode->get_child("master_volume");
+			if(lv_node)
+				m_master_gain = lv_node->get_attribute_float("gain", 1.0);
+		}
+		else
+			m_master_gain = osd::db_to_linear(machine().options().volume());
 
-		for(lv_node = parentnode->get_child("device_volume"); lv_node != nullptr; lv_node = lv_node->get_next_sibling("device_volume")) {
+		for(const util::xml::data_node *lv_node = parentnode->get_child("device_volume"); lv_node != nullptr; lv_node = lv_node->get_next_sibling("device_volume")) {
 			std::string device_tag = lv_node->get_attribute_string("device", "");
 			device_sound_interface *intf = dynamic_cast<device_sound_interface *>(m_machine.root_device().subdevice(device_tag));
 			if(intf)
 				intf->set_user_output_gain(lv_node->get_attribute_float("gain", 1.0));
 		}
 
-		for(lv_node = parentnode->get_child("device_channel_volume"); lv_node != nullptr; lv_node = lv_node->get_next_sibling("device_channel_volume")) {
+		for(const util::xml::data_node *lv_node = parentnode->get_child("device_channel_volume"); lv_node != nullptr; lv_node = lv_node->get_next_sibling("device_channel_volume")) {
 			std::string device_tag = lv_node->get_attribute_string("device", "");
 			int channel = lv_node->get_attribute_int("channel", -1);
 			device_sound_interface *intf = dynamic_cast<device_sound_interface *>(m_machine.root_device().subdevice(device_tag));
@@ -1277,7 +1287,7 @@ void sound_manager::config_save(config_type cfg_type, util::xml::data_node *pare
 		}
 
 		// All levels
-		if(m_master_gain != 1.0) {
+		if(m_master_gain != 1.0 && m_master_gain != osd::db_to_linear(machine().options().volume())) {
 			util::xml::data_node *const lv_node = parentnode->add_child("master_volume", nullptr);
 			lv_node->set_attribute_float("gain", m_master_gain);
 		}
@@ -2122,17 +2132,17 @@ void sound_manager::update_osd_streams()
 	} else {
 		// All sources need to be merged per-destination, max one stream per destination
 
-		std::map<u32, u32> stream_per_node;
+		std::map<u32, u32> input_stream_per_node, output_stream_per_node;
 
 		// Retrieve or create the one osd stream for a given
 		// destination.  First check if we already have it, then
 		// whether it was previously created, then otherwise create
 		// it.
 
-		auto get_input_stream_for_node = [this, &current_input_streams, &stream_per_node] (const osd::audio_info::node_info *node, bool is_system_default) -> u32 {
+		auto get_input_stream_for_node = [this, &current_input_streams, &input_stream_per_node] (const osd::audio_info::node_info *node, bool is_system_default) -> u32 {
 			// Pick up the existing stream if there's one
-			auto si = stream_per_node.find(node->m_id);
-			if(si != stream_per_node.end())
+			auto si = input_stream_per_node.find(node->m_id);
+			if(si != input_stream_per_node.end())
 				return si->second;
 
 			// Create the default unused mask
@@ -2150,7 +2160,7 @@ void sound_manager::update_osd_streams()
 					os.m_id = 0;
 					m_osd_input_streams.back().m_unused_channels_mask = umask;
 					m_osd_input_streams.back().m_is_system_default = is_system_default;
-					stream_per_node[node->m_id] = sid;
+					input_stream_per_node[node->m_id] = sid;
 					return sid;
 				}
 
@@ -2161,14 +2171,14 @@ void sound_manager::update_osd_streams()
 			osd_input_stream &stream = m_osd_input_streams.back();
 			stream.m_id = machine().osd().sound_stream_source_open(node->m_id, machine().system().name, rate);
 			stream.m_buffer.set_sync_sample(rate_and_last_sync_to_index(rate));
-			stream_per_node[node->m_id] = sid;
+			input_stream_per_node[node->m_id] = sid;
 			return sid;
 		};
 
-		auto get_output_stream_for_node = [this, &current_output_streams, &stream_per_node] (const osd::audio_info::node_info *node, bool is_system_default) -> u32 {
+		auto get_output_stream_for_node = [this, &current_output_streams, &output_stream_per_node] (const osd::audio_info::node_info *node, bool is_system_default) -> u32 {
 			// Pick up the existing stream if there's one
-			auto si = stream_per_node.find(node->m_id);
-			if(si != stream_per_node.end())
+			auto si = output_stream_per_node.find(node->m_id);
+			if(si != output_stream_per_node.end())
 				return si->second;
 
 			// Create the default unused mask
@@ -2186,7 +2196,7 @@ void sound_manager::update_osd_streams()
 					os.m_id = 0;
 					m_osd_output_streams.back().m_unused_channels_mask = umask;
 					m_osd_output_streams.back().m_is_system_default = is_system_default;
-					stream_per_node[node->m_id] = sid;
+					output_stream_per_node[node->m_id] = sid;
 					return sid;
 				}
 
@@ -2196,7 +2206,7 @@ void sound_manager::update_osd_streams()
 			m_osd_output_streams.emplace_back(osd_output_stream(node->m_id, is_system_default ? "" : node->m_name, channels, rate, is_system_default, nullptr));
 			osd_output_stream &stream = m_osd_output_streams.back();
 			stream.m_id = machine().osd().sound_stream_sink_open(node->m_id, machine().system().name, rate);
-			stream_per_node[node->m_id] = sid;
+			output_stream_per_node[node->m_id] = sid;
 			return sid;
 		};
 
@@ -2305,7 +2315,7 @@ void sound_manager::update_osd_streams()
 		if(stream.m_unused_channels_mask) {
 			for(u32 channel = 0; channel != stream.m_channels; channel ++)
 				if(stream.m_unused_channels_mask & (1 << channel))
-					m_output_mixing_steps.emplace_back(mixing_step { mixing_step::CLEAR, 0, 0, stream_index, channel, 0.0 });
+					m_output_mixing_steps.emplace_back(mixing_step { mixing_step::CLEAR, stream_index, channel, 0, 0, 0.0 });
 		}
 		if(!stream.m_volumes.empty())
 			osd.sound_stream_set_volumes(stream.m_id, stream.m_volumes);
@@ -2502,7 +2512,7 @@ void sound_manager::streams_update()
 
 	for(osd_input_stream &stream : m_osd_input_streams)
 		stream.m_buffer.sync();
-	
+
 	machine().osd().add_audio_to_recording(m_record_buffer.data(), m_record_samples);
 	machine().video().add_sound_to_recording(m_record_buffer.data(), m_record_samples);
 	if(m_wavfile)

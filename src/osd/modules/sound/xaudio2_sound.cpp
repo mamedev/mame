@@ -290,6 +290,8 @@ int sound_xaudio2::init(osd_interface &osd, osd_options const &options)
 
 	m_sample_rate = options.sample_rate();
 	m_audio_latency = options.audio_latency();
+	if (m_audio_latency == 0)
+		return m_audio_latency = 100;
 
 	// Create the IXAudio2 object
 	HR_GOERR(OSD_DYNAMIC_CALL(XAudio2Create, m_xAudio2.GetAddressOf(), 0, XAUDIO2_DEFAULT_PROCESSOR));
@@ -459,9 +461,9 @@ void sound_xaudio2::OnVoiceProcessingPassStart(uint32_t bytes_required) noexcept
 void sound_xaudio2::create_buffers(const WAVEFORMATEX &format)
 {
 	// Compute the buffer size
-	// buffer size is equal to the bytes we need to hold in memory per X tenths of a second where X is audio_latency
-	int audio_latency = std::max(m_audio_latency, 1);
-	float audio_latency_in_seconds = audio_latency / 10.0f;
+	// buffer size is equal to the bytes we need to hold in memory per X thousands of a second where X is audio_latency
+	int audio_latency = std::max(m_audio_latency, SUBMIT_FREQUENCY_TARGET_MS);
+	float audio_latency_in_seconds = audio_latency / 1000.0f;
 	uint32_t format_bytes_per_second = format.nSamplesPerSec * format.nBlockAlign;
 	uint32_t total_buffer_size = format_bytes_per_second * audio_latency_in_seconds * RESAMPLE_TOLERANCE;
 

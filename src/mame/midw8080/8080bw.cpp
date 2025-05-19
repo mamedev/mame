@@ -4267,6 +4267,19 @@ ROM_START( supinvsion )
 	ROM_LOAD( "a-am4708.bin", 0x1c00, 0x0400, CRC(bf4d3267) SHA1(45d789e57543e8efad16cb82bf898ba6b6e1ec3e) )
 ROM_END
 
+// 20 MHz xtal (instead of the usual 19.968 MHz one).
+ROM_START( cosmicbat )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.5m", 0x0000, 0x0400, CRC(6019a1aa) SHA1(4bbc49d04af208b2cfe5b8cc927648409830dc62) )
+	ROM_LOAD( "2.5n", 0x0400, 0x0400, CRC(c12eab91) SHA1(39cf2af8ac062404c9e7038021cf77172aec589f) )
+	ROM_LOAD( "3.5p", 0x0800, 0x0400, CRC(2a8d9cd5) SHA1(7948d79b326e729bcb629607c8797156ff9fb0e8) )
+	ROM_LOAD( "4.5r", 0x0c00, 0x0400, CRC(4c77ce80) SHA1(8fd40035d776ba48619a123ec3e316b5a8665606) )
+	ROM_LOAD( "5.5s", 0x1000, 0x0400, CRC(b2527c77) SHA1(3a855118d4296ea3afbf553191630f32dfbe8220) )
+	ROM_LOAD( "6.5t", 0x1400, 0x0400, CRC(a883ff01) SHA1(fdc3d1fb4e4d732810ab6746f0df640dc1642e3c) )
+	ROM_LOAD( "7.5u", 0x1800, 0x0400, CRC(46e02fcf) SHA1(5509f1a04bf44fbfebffb5dd5c78f503960b100d) )
+	ROM_LOAD( "8.5v", 0x1c00, 0x0400, CRC(ff88f38e) SHA1(8f8898ea36f46367af9bc0f615eb6ebf04ef3917) )
+ROM_END
+
 ROM_START( searthie )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "searthie.h",   0x0000, 0x0800, CRC(92b08b91) SHA1(4cebb70735e5231717619c7b8e5d3080694338b7) )
@@ -6006,6 +6019,7 @@ GAMEL(1980, searthin,    invaders, invnomb,   searthin,  invaders_state, empty_i
 GAMEL(1980, searthina,   invaders, invaders,  searthin,  invaders_state, empty_init,    ROT270, "bootleg (Competitive Video)",        "Super Earth Invasion (set 2)",                                    MACHINE_SUPPORTS_SAVE, layout_invaders )
 GAMEL(19??, searthinc,   invaders, invaders,  searthin,  invaders_state, empty_init,    ROT270, "bootleg (Centromatic)",              "Super Earth Invasion (Centromatic, Spanish)",                     MACHINE_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1979, supinvsion,  invaders, invaders,  searthin,  invaders_state, empty_init,    ROT270, "bootleg (Electromar / Irecsa)",      "Super Invasion (Electromar, Spanish)",                            MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS, layout_invaders )
+GAMEL(1979, cosmicbat,   invaders, cosmicbat, searthin,  invaders_state, empty_init,    ROT270, "bootleg (Recreativos Franco)",       "Cosmic Battle (Recreativos Franco bootleg of Space Invaders)",    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS, layout_invaders )
 GAMEL(1980, searthie,    invaders, invaders,  searthin,  invaders_state, empty_init,    ROT270, "bootleg (Electrocoin)",              "Super Earth Invasion (set 3)",                                    MACHINE_SUPPORTS_SAVE, layout_invaders )
 GAMEL(19??, alieninv,    invaders, invaders,  alieninv,  invaders_state, empty_init,    ROT270, "bootleg (Margamatics)",              "Alien Invasion",                                                  MACHINE_SUPPORTS_SAVE, layout_invaders )
 GAMEL(19??, alieninvp2,  invaders, invaders,  searthin,  invaders_state, empty_init,    ROT270, "bootleg",                            "Alien Invasion Part II",                                          MACHINE_SUPPORTS_SAVE, layout_invaders )

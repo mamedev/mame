@@ -1999,6 +1999,95 @@ ROM_START( rivierab )
 	ROM_LOAD( "dec003.u13", 0x000, 0x117, CRC(5b9a2fec) SHA1(c56c7bbe13028903cfc82440ee8b24df855134c2) ) // PAL16L8ANC - brute forced
 ROM_END
 
+
+/*
+  Riviera High Score.
+  2131-08, U5-4, 111786
+
+*/
+ROM_START( rivierac )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "nosticker.u5", 0x0000, 0x8000, CRC(ce0b00f2) SHA1(c467c2c08d0bbadf80d67f41e17127e08ce3b3ff) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "hisc_u39_c1987_mii.u39", 0x00000, 0x2000, CRC(1814c2ea) SHA1(fecc5dc1c0a56cbc7b68ee6a52222de348d6cc79) )
+	ROM_LOAD( "nosticker.u38",          0x02000, 0x2000, CRC(ef1d7a80) SHA1(539662bee187a300a6f1bcded954758c87171219) )
+	ROM_LOAD( "hisc_u37_c1987_mii.u37", 0x04000, 0x2000, CRC(f6e709f8) SHA1(02905be912d0aa794f82926462f854e8e67dc407) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "hisc_u40_c1987_mii.u40", 0x00000, 0x2000, CRC(6d2a1ca8) SHA1(96ef3e0914c2b213ed9c9082fa3e27d75d52a8ec) )
+
+	ROM_REGION( 0xc20, "plds", 0 )  // need conversion to .bin (the format type prevents to do it)
+	ROM_LOAD( "sc3931_atf16v8b.jed.u13", 0x000, 0xc20, CRC(c505a4a1) SHA1(676f5f73cb14b5853aeca9cde71ad2c3ec425f9c) ) 
+ROM_END
+
+/*
+  Riviera High Score.
+  2131-08, U5-3C, 091586
+
+*/
+ROM_START( rivierad )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "3_u5_27256.u5", 0x0000, 0x8000, CRC(c9582556) SHA1(2d960cbfadea82968e9e509d2e72c0ef16032755) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "nosticker_2764.u39", 0x00000, 0x2000, CRC(1814c2ea) SHA1(fecc5dc1c0a56cbc7b68ee6a52222de348d6cc79) )
+	ROM_LOAD( "hisc_u38_2764.u38",  0x02000, 0x2000, CRC(ef1d7a80) SHA1(539662bee187a300a6f1bcded954758c87171219) )
+	ROM_LOAD( "nosticker_2764.u37", 0x04000, 0x2000, CRC(f6e709f8) SHA1(02905be912d0aa794f82926462f854e8e67dc407) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "hisc_u40_2764.u40", 0x00000, 0x2000, CRC(6d2a1ca8) SHA1(96ef3e0914c2b213ed9c9082fa3e27d75d52a8ec) )
+
+	ROM_REGION( 0xc22, "plds", 0 )  // need conversion to .bin (the format type prevents to do it)
+	ROM_LOAD( "dec-002_atf16v8c.jed.u13", 0x000, 0xc22, CRC(494164ba) SHA1(b7ebfd9c28e0e953beb9a4bdc331ded02ac5a67e) ) 
+ROM_END
+
+/*
+  Riviera High Score.
+  2131-08P, 5C25C, 082702
+
+*/
+ROM_START( rivierae )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "nosticker_27c256.u5", 0x0000, 0x8000, CRC(a9d7606f) SHA1(0970a2158d5347624f45cccb03048d6e4175fd9b) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "nosticker_2764.u39",      0x00000, 0x2000, CRC(1814c2ea) SHA1(fecc5dc1c0a56cbc7b68ee6a52222de348d6cc79) )
+	ROM_LOAD( "hisc_u38_c1987_2764.u38", 0x02000, 0x2000, CRC(ef1d7a80) SHA1(539662bee187a300a6f1bcded954758c87171219) )
+	ROM_LOAD( "nosticker_2764.u37",      0x04000, 0x2000, CRC(f6e709f8) SHA1(02905be912d0aa794f82926462f854e8e67dc407) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "nosticker_2764.u40", 0x00000, 0x2000, CRC(6d2a1ca8) SHA1(96ef3e0914c2b213ed9c9082fa3e27d75d52a8ec) )
+
+	ROM_REGION( 0xc20, "plds", 0 )  // need conversion to .bin (the format type prevents to do it)
+	ROM_LOAD( "dec-03_atf16v8b.jed.u13", 0x000, 0xc20, CRC(d24b2f03) SHA1(5156846feef7f84c7dc944dba1ffa5c4295a972a) )
+ROM_END
+
+/*
+  Riviera High Score.
+  2131-08P, 5C25C, 082702
+
+  Same version than the set above,
+  but no Merit logo at all.
+
+*/
+ROM_START( rivieraf )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "riv2_u5_27256.u5", 0x0000, 0x8000, CRC(a9d7606f) SHA1(0970a2158d5347624f45cccb03048d6e4175fd9b) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "riv2_u39_2764.u39", 0x00000, 0x2000, CRC(fca9a4cf) SHA1(1a6f0a57ac2236e9cf7c64c671e6a6b0208cc3dd) )
+	ROM_LOAD( "riv2_u38_2764.u38", 0x02000, 0x2000, CRC(1dbe9afe) SHA1(becc5419b948ef750efb1359fbc3264d801b1b73) )
+	ROM_LOAD( "riv2_u37_2764.u37", 0x04000, 0x2000, CRC(3eea4a80) SHA1(7ab64810960799895b87c83096675872139f7070) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "riv2_u40_2764.u40", 0x00000, 0x2000, CRC(6019ffb7) SHA1(e2dde1fb833feec99c2466e1da0af41c39212472) )
+
+	ROM_REGION( 0xc22, "plds", 0 )  // need conversion to .bin (the format type prevents to do it)
+	ROM_LOAD( "sc3931_pal16l8amc.jed.u13", 0x000, 0xc22, CRC(5214d4d9) SHA1(b339443a8315e5dc0fac62fffc7458eeead0a4de) )
+ROM_END
+
+
 // Sub board CRT-203 includes 2 P8255A, parallel printer connection & MM58174AN RTC that plugs in through the CRT-200's P8255 socket.
 // There is a battery that connects to the PCB to keep the CRT-200's Mosel MS6264L-10PC RAM active and also runs to the CRT-203 for the RTC (guess)
 ROM_START( mosdraw )
@@ -3025,6 +3114,12 @@ GAME( 1984, chkndrawa,  chkndraw, pitboss, chkndraw,  merit_state,        empty_
 GAME( 1987, riviera,    0,        riviera, riviera,   merit_state,        empty_init,   ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-4A)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1986, rivieraa,   riviera,  riviera, riviera,   merit_state,        empty_init,   ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-4)",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1986, rivierab,   riviera,  riviera, rivierab,  merit_state,        empty_init,   ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-2D)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1986, rivierac,   riviera,  riviera, riviera,   merit_state,        empty_init,   ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-4, 111786)",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1986, rivierad,   riviera,  riviera, riviera,   merit_state,        empty_init,   ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-3C, 091586)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1986, rivierae,   riviera,  riviera, riviera,   merit_state,        empty_init,   ROT0,  "Merit", "Riviera Hi-Score (2131-08P, 5C25C, 082702, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1986, rivieraf,   riviera,  riviera, riviera,   merit_state,        empty_init,   ROT0,  "Merit", "Riviera Hi-Score (2131-08P, 5C25C, 082702, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )  // no merit logo
+
+
 GAME( 1990, mosdraw,    0,        mosdraw, mosdraw,   merit_state,        empty_init,   ROT0,  "Merit", "Montana Super Draw (4436-05, U5-0)", MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // needs printer and RTC hook up
 
 GAME( 1986, bigappg,    0,        bigappg, bigappg,   merit_state,        empty_init,   ROT0,  "Big Apple Games / Merit", "The Big Apple (2131-13, U5-0)",         MACHINE_SUPPORTS_SAVE )

@@ -1409,7 +1409,7 @@ void swp00_device::sound_stream_update(sound_stream &stream)
 				if((m_decay_speed[chan] & 0x60) == 0x60)
 					m_decay_done[chan] = fpstep(m_envelope_level[chan], m_decay_level[chan] << 20, decay_linear_step[m_decay_speed[chan] & 0x1f]);
 				else
-					m_decay_done[chan] = istep(m_envelope_level[chan], m_decay_level[chan] << 20, m_global_step[m_decay_speed[chan]] << 1);
+					m_decay_done[chan] = istep(m_envelope_level[chan], m_decay_level[chan] << 20, m_global_step[m_decay_speed[chan] & 0x7f] << 1);
 				if(m_envelope_level[chan] & 0x8000000)
 					m_active[chan] = false;
 

@@ -2472,7 +2472,6 @@ void gms_2layers_state::video_start()
 		m_reel_tilemap[i]->set_transparent_pen(0);
 	}
 
-	//m_tilemap[0]->set_transparent_pen(0);
 	m_tilemap[0]->set_transparent_pen(0);
 }
 

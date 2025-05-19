@@ -4368,11 +4368,10 @@ fails to self boot, dos must be loaded first
 		<year>1993</year>
 		<publisher>サムシンググッド (Something Good)</publisher>
 		<notes><![CDATA[
-Requires 3.5" floppy emulation
+Fails autobooting (has CONFIG.SYS/AUTOEXEC.BAT)
 ]]></notes>
 		<info name="alt_title" value="ＡＩ将棋" />
 		<info name="release" value="19931205" />
-		<!-- TODO: apparently not autobootable, may require DOS -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
 				<rom name="main.fdi" size="1478656" crc="5e656df1" sha1="4182f3854eb510df600df606dc6cd949d84adc8c" offset="0" />
@@ -8963,7 +8962,6 @@ DAC1BIT sounds awful on anything, cfr. title screen (tested VM class, RS class a
 		</part>
 	</software>
 
-	<!-- sometimes keyboard doesn't recognize key ups -->
 	<software name="bokosuka" supported="no">
 		<description>Bokosuka Wars</description>
 		<year>1985</year>
@@ -21793,10 +21791,11 @@ Reset machine after selecting option 1 "FUNNY start"
 	</software>
 
 	<software name="nadiaopt">
-		<description>Fushigi no Umi no Nadia - Option Disk</description>
+		<description>Fushigi no Umi no Nadia - Music Disk</description>
 		<year>1992?</year>
 		<publisher>ガイナックス (Gainax)</publisher>
-		<info name="alt_title" value="ふしぎの海のナディア オプション" />
+		<info name="alt_title" value="ふしぎの海のナディア ミュージックディスク" />
+		<!-- TODO: available in 3.5" format only? -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="nadia_op.fdi" size="1265664" crc="a31924b2" sha1="0c21f92eac460648831e1331a8437462553bde37" offset="0" />
@@ -24252,58 +24251,59 @@ TODO: to install to HDD should be "INST1.BAT B: A:<folder>" but it fails recogni
 		</part>
 	</software>
 
-	<software name="hamlet" supported="no">
+	<software name="hamlet" supported="yes">
 		<description>Hamlet</description>
 		<year>1993</year>
 		<publisher>パンサーソフトウェア (Panther Software)</publisher>
 		<info name="alt_title" value="ハムレット" />
 		<info name="release" value="19931119" />
+		<info name="usage" value="Boot with Scenario disk only to skip Opening" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Scenario"/>
 			<dataarea name="flop" size="1329680">
-				<rom name="hamlet_1.nfd" size="1329680" crc="27a871e8" sha1="2de5b50d32f08190fdc1d6e317658a79abafc389" offset="0" />
+				<rom name="hamlet_s.nfd" size="1329680" crc="4057cafc" sha1="6ba525f15828bfd81f040dedada3c101af6b283a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="1329680">
-				<rom name="hamlet_2.nfd" size="1329680" crc="7f4428d9" sha1="32882d5683a43b1f8a842fdf58540cf189ae9f90" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3"/>
-			<dataarea name="flop" size="1329680">
-				<rom name="hamlet_3.nfd" size="1329680" crc="0910b20b" sha1="e1b4b66400aad89edf847cb96cc4e2c1396586b6" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 4"/>
-			<dataarea name="flop" size="1329680">
-				<rom name="hamlet_4.nfd" size="1329680" crc="58f268b7" sha1="a6b3cb777f5c451c9a7b1967de5a12effcf77461" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 5"/>
-			<dataarea name="flop" size="1329680">
-				<rom name="hamlet_5.nfd" size="1329680" crc="a52b72c5" sha1="8737859a7b954d99bdd59fc9d1878c90bafd9b50" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop6" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 6"/>
-			<dataarea name="flop" size="1329680">
-				<rom name="hamlet_6.nfd" size="1329680" crc="34fc4165" sha1="6fc535181e507a48f16de839b73cd14bd6879794" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop7" interface="floppy_5_25">
 			<feature name="part_id" value="Opening"/>
 			<dataarea name="flop" size="1329680">
 				<rom name="hamlet_o.nfd" size="1329680" crc="bdad7d9f" sha1="e91b571228499d27f486fb80694f7ac0efa3af64" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop8" interface="floppy_5_25">
-			<feature name="part_id" value="Scenario"/>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1329680">
-				<rom name="hamlet_s.nfd" size="1329680" crc="4057cafc" sha1="6ba525f15828bfd81f040dedada3c101af6b283a" offset="0" />
+				<rom name="hamlet_1.nfd" size="1329680" crc="27a871e8" sha1="2de5b50d32f08190fdc1d6e317658a79abafc389" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1329680">
+				<rom name="hamlet_2.nfd" size="1329680" crc="7f4428d9" sha1="32882d5683a43b1f8a842fdf58540cf189ae9f90" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1329680">
+				<rom name="hamlet_3.nfd" size="1329680" crc="0910b20b" sha1="e1b4b66400aad89edf847cb96cc4e2c1396586b6" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="1329680">
+				<rom name="hamlet_4.nfd" size="1329680" crc="58f268b7" sha1="a6b3cb777f5c451c9a7b1967de5a12effcf77461" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5"/>
+			<dataarea name="flop" size="1329680">
+				<rom name="hamlet_5.nfd" size="1329680" crc="a52b72c5" sha1="8737859a7b954d99bdd59fc9d1878c90bafd9b50" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 6"/>
+			<dataarea name="flop" size="1329680">
+				<rom name="hamlet_6.nfd" size="1329680" crc="34fc4165" sha1="6fc535181e507a48f16de839b73cd14bd6879794" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -25508,7 +25508,7 @@ Optional [AMD-98] support, doesn't really use AY3
 		</part>
 	</software>
 
-	<software name="houkago" supported="no">
+	<software name="houkago" supported="yes">
 		<description>Houkago wa Betsu no Kao</description>
 		<year>1995</year>
 		<publisher>ユーコム (Ucom)</publisher>
@@ -26161,8 +26161,7 @@ Hangs on [MIDI] detection
 		</part>
 	</software>
 
-	<!-- randomly hangs with stuck note -->
-	<software name="tim" supported="partial">
+	<software name="tim" supported="yes">
 		<description>The Incredible Machine (v1.00)</description>
 		<year>1994</year>
 		<publisher>サイベル (Cybelle)</publisher>
@@ -48282,11 +48281,11 @@ Eventually hangs with stuck [PC9801-26] sound note (verify, should be fixed)
 	</software>
 
 	<software name="tesserae">
-		<description>Tesserae</description>
+		<description>Tessera Kimi wa Yogoreta Tenshi ka Seinaru Majo ka!?</description>
 		<year>1992</year>
-		<publisher>アスキー (ASCII)</publisher>
-		<info name="alt_title" value="テッセラ" />
-		<info name="release" value="19920327" />
+		<publisher>ＧＡＭＥテクノポリス (Game Technopolis)</publisher>
+		<info name="alt_title" value="テセラ キミは汚れた天使か聖なる魔女か!?" />
+		<!-- <info name="release" value="1992xxxx" /> -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1281968">
@@ -67897,12 +67896,12 @@ No keypress works for selecting main menu entries
 		</part>
 	</software>
 
-	<software name="lex" supported="no">
+	<software name="lex" supported="yes">
 		<description>LEX</description>
 		<year>1993</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="author" value="Studio Sold Out" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1497084">
 				<rom name="lex (1993)(studio sold out)(jp).fdd" size="1497084" crc="8f19d42d" sha1="69b7a35c6d2a4b6b02053093e1676d47fbcede08" offset="0" />
 			</dataarea>
@@ -68039,8 +68038,12 @@ No keypress works for selecting main menu entries
 
 	<software name="mana94" supported="no">
 		<description>Mana '94</description>
-		<year>19??</year>
+		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+Doesn't boot stand-alone, requires separate MS-DOS env, mangled boot sector?
+Draws with half height in GDC 5 MHz mode
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="mana_94.hdm" size="1261568" crc="53f53191" sha1="439bcda077addd6d94cd64b0559364112c791d32" offset="0" />
@@ -68077,10 +68080,10 @@ No keypress works for selecting main menu entries
 
 	<software name="masthand" supported="no">
 		<description>Master Hand</description>
-		<year>19??</year>
+		<year>1992?</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="alt_title" value="H. Kitajima?" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1425404">
 				<rom name="master hand (19xx)(kitajima, h.)(jp).fdd" size="1425404" crc="47348b39" sha1="5f96407f4beb62d08f85e2fc8fc7ff926bcb8809" offset="0" />
 			</dataarea>
@@ -70069,6 +70072,7 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		<year>1991</year>
 		<publisher>フェアリーテール (Fairytale)</publisher>
 		<info name="alt_title" value="花王フロッピー劇場 ルート246殺人案内" />
+		<!-- TODO: 3.5"? -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1423360">
 				<rom name="ROUTE_246.fdi" size="1423360" crc="599a082e" sha1="3bd50e646c8f22efc88fa74e00b7ed6521f3d8df" offset="0" />
