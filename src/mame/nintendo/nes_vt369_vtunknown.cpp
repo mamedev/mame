@@ -1088,7 +1088,7 @@ CONS( 2017, fapocket,   0,        0,  vt369_vtunknown_fa_4x16mb, vt369_vtunknown
 
 ****************************************************************************************************************/
 
-CONS( 2012, lexi30,  0,0,  vt369_vtunknown_hh_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "Lexibook", "Arcade Center (JL1800_01)", MACHINE_NOT_WORKING | ROT270 )
+CONS( 2012, lexi30,  0,0,  vt369_vtunknown_hh_8mb, vt369_vtunknown_rot, vt369_vtunknown_unk_state, empty_init, "Lexibook", "Arcade Center (JL1800_01)", MACHINE_NOT_WORKING | ROT270 )
 
 // don't even get to menu. very enhanced chipset, VT368/9?
 CONS( 2012, dgun2561,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "dreamGEAR", "My Arcade Portable Gaming System with 140 Games (DGUN-2561)", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
@@ -1162,7 +1162,7 @@ CONS( 200?, sealvt,    zonefusn,  0,  vt369_vtunknown_hh_16mb,     vt369_vtunkno
 // these 4 sets use a different opcode scramble at least
 CONS( 201?, red5mam,  0,  0,  vt369_vtunknown_hh_altswap_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "Red5", "Mini Arcade Machine (Red5, 'Xtra Game')", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
 CONS( 2016, dgun2593,  0,  0,  vt369_vtunknown_hh_altswap_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "dreamGEAR", "My Arcade Retro Arcade Machine - 300 Handheld Video Games (DGUN-2593)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
-CONS( 200?, gcs2mgp,   0,  0,  vt369_vtunknown_hh_altswap_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "Jungle's Soft", "Mini Game Player 48-in-1",  MACHINE_NOT_WORKING | ROT270 )
+CONS( 200?, gcs2mgp,   0,  0,  vt369_vtunknown_hh_altswap_16mb, vt369_vtunknown_rot, vt369_vtunknown_unk_state, empty_init, "Jungle's Soft", "Mini Game Player 48-in-1",  MACHINE_NOT_WORKING | ROT270 )
 // Not the same as the other 240-in-1 machine from Thumbs Up below (tup240) This one makes greater use of newer VT features with most games having sampled music, not APU sound.
 // Several of the games contained in here are buggy / broken on real hardware (see https://www.youtube.com/watch?v=-mgGNaDQ1HE )
 CONS( 201?, 240in1ar,  0,  0,  vt369_vtunknown_hh_altswap_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "Thumbs Up", "Mini Arcade Machine (Thumbs Up, 240IN1ARC)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
