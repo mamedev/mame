@@ -34,7 +34,6 @@ vt3xx_soc_base_device::vt3xx_soc_base_device(const machine_config& mconfig, cons
 
 vt3xx_soc_base_device::vt3xx_soc_base_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock) :
 	nes_vt09_soc_device(mconfig, type, tag, owner, clock),
-	m_alu(*this, "alu"),
 	m_soundcpu(*this, "soundcpu"),
 	m_sound_timer(nullptr),
 	m_internal_rom(*this, "internal"),
@@ -106,8 +105,6 @@ void vt3xx_soc_base_device::device_add_mconfig(machine_config& config)
 	m_ppu->read_newmode_bg().set(FUNC(vt3xx_soc_base_device::newmode_bg_r));
 	m_ppu->set_screen(m_screen);
 
-	VT_VT1682_ALU(config, m_alu, 0);
-
 	VT3XX_SPU(config, m_soundcpu, RP2A03_NTSC_XTAL);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &vt3xx_soc_base_device::vt369_sound_map);
 	m_soundcpu->set_addrmap(5, &vt3xx_soc_base_device::vt369_sound_external_map);	
@@ -139,6 +136,58 @@ uint8_t vt3xx_soc_base_device::read_internal(offs_t offset)
 	}
 
 	return m_internal_rom[offset];
+}
+
+uint8_t vt3xx_soc_base_device::alu_r(offs_t offset)
+{
+	if (offset < 6)
+	{
+		return m_alu_params[offset];
+	}
+	else
+	{
+		if (offset == 6)
+			return 0x00; // alu busy?
+		else
+		{
+			logerror("%s: read ALU offset 7?\n", machine().describe_context());
+			return 0x00;
+		}
+	}
+}
+
+void vt3xx_soc_base_device::alu_w(offs_t offset, uint8_t data)
+{
+	m_alu_params[offset] = data;
+
+	if (offset == 5) // do multiply
+	{
+		uint32_t param1 = m_alu_params[0] | (m_alu_params[1] << 8);
+		uint32_t param2 = m_alu_params[4] | (m_alu_params[5] << 8);
+		uint32_t result = param1 * param2;
+		m_alu_params[0] = (result >> 0);
+		m_alu_params[1] = (result >> 8);
+		m_alu_params[2] = (result >> 16);
+		m_alu_params[3] = (result >> 24);
+	}
+	else if (offset == 7) // do divide
+	{
+		uint32_t param1 = m_alu_params[0] | (m_alu_params[1] << 8) | (m_alu_params[2] << 16) | (m_alu_params[3] << 24);
+		uint32_t param2 = m_alu_params[6] | (m_alu_params[7] << 8);
+
+		if (param2)
+		{
+			uint32_t result1 = param1 / param2;
+			uint32_t result2 = param1 % param2;
+			m_alu_params[0] = (result1 >> 0);
+			m_alu_params[1] = (result1 >> 8);
+			m_alu_params[2] = (result1 >> 16);
+			m_alu_params[3] = (result1 >> 24);
+
+			m_alu_params[4] = (result2 >> 0);
+			m_alu_params[5] = (result2 >> 8);
+		}
+	}
 }
 
 void vt3xx_soc_base_device::vt369_map(address_map &map)
@@ -202,15 +251,9 @@ void vt3xx_soc_base_device::vt369_map(address_map &map)
 
 	// 412d
 
-	// is the ALU really compatible with the 1682 one?
-	map(0x4130, 0x4130).rw(m_alu, FUNC(vrt_vt1682_alu_device::alu_out_1_r), FUNC(vrt_vt1682_alu_device::alu_oprand_1_w));
-	map(0x4131, 0x4131).rw(m_alu, FUNC(vrt_vt1682_alu_device::alu_out_2_r), FUNC(vrt_vt1682_alu_device::alu_oprand_2_w));
-	map(0x4132, 0x4132).rw(m_alu, FUNC(vrt_vt1682_alu_device::alu_out_3_r), FUNC(vrt_vt1682_alu_device::alu_oprand_3_w));
-	map(0x4133, 0x4133).rw(m_alu, FUNC(vrt_vt1682_alu_device::alu_out_4_r), FUNC(vrt_vt1682_alu_device::alu_oprand_4_w));
-	map(0x4134, 0x4134).rw(m_alu, FUNC(vrt_vt1682_alu_device::alu_out_5_r), FUNC(vrt_vt1682_alu_device::alu_oprand_5_mult_w));
-	map(0x4135, 0x4135).rw(m_alu, FUNC(vrt_vt1682_alu_device::alu_out_6_r), FUNC(vrt_vt1682_alu_device::alu_oprand_6_mult_w));
-	map(0x4136, 0x4136).w(m_alu, FUNC(vrt_vt1682_alu_device::alu_oprand_5_div_w));
-	map(0x4137, 0x4137).w(m_alu, FUNC(vrt_vt1682_alu_device::alu_oprand_6_div_w));
+	// the ALU is not VT1682 compatible
+	map(0x4130, 0x4137).rw(FUNC(vt3xx_soc_base_device::alu_r), FUNC(vt3xx_soc_base_device::alu_w));
+	map(0x4138, 0x413d).r(FUNC(vt3xx_soc_base_device::alu_r)); // mirror?
 
 	// 4144
 	// 4147
@@ -516,6 +559,7 @@ void vt3xx_soc_base_device::device_start()
 	save_item(NAME(m_6000_ram));
 	save_item(NAME(m_bank6000));
 	save_item(NAME(m_bank6000_enable));
+	save_item(NAME(m_alu_params));
 
 	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x3c00, 0x3fff, read8sm_delegate(*this, FUNC(vt3xx_soc_base_device::vt3xx_palette_r)), write8sm_delegate(*this, FUNC(vt3xx_soc_base_device::vt3xx_palette_w)));
 }
@@ -524,6 +568,9 @@ void vt3xx_soc_base_device::device_reset()
 {
 	nes_vt02_vt03_soc_device::device_reset();
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+
+	for (int i = 0; i < 8; i++)
+		m_alu_params[i] = 0;
 
 	m_timerperiod = 0;
 	m_timercontrol = 0;

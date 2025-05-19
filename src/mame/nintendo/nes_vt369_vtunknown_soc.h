@@ -10,7 +10,6 @@
 #include "cpu/m6502/vt3xx_spu.h"
 #include "sound/nes_apu_vt.h"
 #include "m6502_swap_op_d5_d6.h"
-#include "vt1682_alu.h"
 #include "video/ppu2c0x_vt.h"
 #include "screen.h"
 #include "speaker.h"
@@ -80,10 +79,12 @@ private:
 
 	virtual void vt_dma_w(uint8_t data) override;
 
+	uint8_t alu_r(offs_t offset);
+	void alu_w(offs_t offset, uint8_t data);
+
 	TIMER_CALLBACK_MEMBER(sound_timer_expired);
 	void update_timer();
 
-	required_device<vrt_vt1682_alu_device> m_alu;
 	required_device<cpu_device> m_soundcpu;
 	std::vector<u8> m_6000_ram;
 
@@ -92,6 +93,7 @@ private:
 
 	uint16_t m_timerperiod;
 	uint8_t m_timercontrol;
+	uint8_t m_alu_params[8];
 
 	emu_timer *m_sound_timer;
 
