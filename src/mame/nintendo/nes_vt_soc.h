@@ -111,6 +111,7 @@ protected:
 
 	uint8_t m_8000_addr_latch = 0;
 
+	uint8_t m_relative[2];
 
 	uint8_t m_4242 = 0;
 	uint8_t m_411c = 0;
@@ -126,6 +127,8 @@ protected:
 
 	uint8_t external_space_read(offs_t offset);
 	void external_space_write(offs_t offset, uint8_t data);
+	// additional relative offset for everything on vt3xx sets (effectively expanding the address space further to 512Mbytes?)
+	int get_relative() { return (m_relative[0] + (m_relative[1] << 8)) * 0x2000; }
 
 	void do_pal_timings_and_ppu_replacement(machine_config& config);
 

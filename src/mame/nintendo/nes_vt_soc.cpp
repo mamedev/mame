@@ -194,7 +194,7 @@ void nes_vt02_vt03_soc_device::device_start()
 	save_item(NAME(m_timer_val));
 	save_item(NAME(m_vdma_ctrl));
 	save_item(NAME(m_4024_newdma));
-
+	save_item(NAME(m_relative));
 	m_ntram = std::make_unique<uint8_t[]>(0x2000);
 	save_pointer(NAME(m_ntram), 0x2000);
 
@@ -228,6 +228,7 @@ void nes_vt02_vt03_soc_device::device_reset()
 	m_411c = 0x00;
 	m_411d = 0x00;
 	m_4242 = 0x00;
+	m_relative[0] = m_relative[1] = 0x00;
 
 	m_4024_newdma = 0;
 	m_vdma_ctrl = 0;
@@ -430,7 +431,7 @@ uint8_t nes_vt02_vt03_soc_device::spr_r(offs_t offset)
 		int realaddr = calculate_real_video_address(offset, 1);
 
 		address_space& spc = this->space(AS_PROGRAM);
-		return spc.read_byte(realaddr);
+		return spc.read_byte(get_relative() + realaddr);
 	}
 }
 
@@ -445,7 +446,7 @@ uint8_t nes_vt02_vt03_soc_device::chr_r(offs_t offset)
 		int realaddr = calculate_real_video_address(offset, 0);
 
 		address_space& spc = this->space(AS_PROGRAM);
-		return spc.read_byte(realaddr);
+		return spc.read_byte(get_relative() + realaddr);
 	}
 }
 
@@ -1116,7 +1117,8 @@ uint8_t nes_vt02_vt03_soc_device::external_space_read(offs_t offset)
 {
 	address_space& spc = this->space(AS_PROGRAM);
 	int bank = (offset & 0x6000) >> 13;
-	int address = (m_bankaddr[bank] * 0x2000) + (offset & 0x1fff);
+	int relative = get_relative();
+	int address = relative + (m_bankaddr[bank] * 0x2000) + (offset & 0x1fff);
 	return spc.read_byte(address);
 }
 

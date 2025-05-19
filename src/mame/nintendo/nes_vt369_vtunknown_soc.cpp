@@ -124,7 +124,7 @@ void vt3xx_soc_base_device::vt369_soundcpu_control_w(offs_t offset, uint8_t data
 
 void vt3xx_soc_base_device::vt369_relative_w(offs_t offset, uint8_t data)
 {
-	logerror("%s: vt369_relative_w %02x %02x\n", machine().describe_context(), offset,  data);
+	printf("%s: vt369_relative_w %02x %02x\n", machine().describe_context().c_str(), offset,  data);
 	m_relative[offset] = data;
 }
 
@@ -499,7 +499,6 @@ void vt3xx_soc_base_device::device_start()
 	m_6000_ram.resize(0x2000);
 	m_bank6000 = 0;
 	m_bank6000_enable = 0;
-	m_relative[0] = m_relative[1] = 0x00;
 
 	m_sound_timer = timer_alloc(FUNC(vt3xx_soc_base_device::sound_timer_expired), this);
 
@@ -508,7 +507,6 @@ void vt3xx_soc_base_device::device_start()
 	save_item(NAME(m_6000_ram));
 	save_item(NAME(m_bank6000));
 	save_item(NAME(m_bank6000_enable));
-	save_item(NAME(m_relative));
 
 	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x3c00, 0x3fff, read8sm_delegate(*this, FUNC(vt3xx_soc_base_device::vt3xx_palette_r)), write8sm_delegate(*this, FUNC(vt3xx_soc_base_device::vt3xx_palette_w)));
 }
@@ -569,7 +567,7 @@ uint8_t vt3xx_soc_base_device::vt369_418a_r()
 uint8_t vt3xx_soc_base_device::newmode_spr_r(offs_t offset)
 {
 	address_space& spc = this->space(AS_PROGRAM);
-	return spc.read_byte(offset);
+	return spc.read_byte(get_relative() + offset);
 }
 
 /***********************************************************************************************************************************************************/

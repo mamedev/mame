@@ -163,6 +163,7 @@ public:
 	void vt369_vtunknown_hh_4mb(machine_config& config);
 	void vt369_vtunknown_hh_8mb(machine_config& config);
 	void vt369_vtunknown_hh_16mb(machine_config& config);
+	void vt369_vtunknown_hh_32mb(machine_config& config);
 
 	void vt369_vtunknown_hh_swap_8mb(machine_config& config);
 	void vt369_vtunknown_hh_swap_2mb(machine_config& config);
@@ -540,6 +541,11 @@ void vt369_vtunknown_unk_state::vt369_vtunknown_hh_16mb(machine_config& config)
 	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_unk_state::vt_external_space_map_16mbyte);
 }
 
+void vt369_vtunknown_unk_state::vt369_vtunknown_hh_32mb(machine_config& config)
+{
+	vt369_vtunknown_hh(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_unk_state::vt_external_space_map_32mbyte);
+}
 
 
 
@@ -1068,22 +1074,22 @@ CONS( 2012, lexi30,  0,0,  vt369_vtunknown_hh_8mb, vt369_vtunknown, vt369_vtunkn
 // don't even get to menu. very enhanced chipset, VT368/9?
 CONS( 2012, dgun2561,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "dreamGEAR", "My Arcade Portable Gaming System with 140 Games (DGUN-2561)", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
 
-CONS( 2012, lxccatv,   0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade TV - 120 in 1 (JL2370)", MACHINE_NOT_WORKING ) // 32MByte ROM, 2011 on case, 2012 on PCB
+CONS( 2012, lxccatv,   0,  0,  vt369_vtunknown_hh_32mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade TV - 120 in 1 (JL2370)", MACHINE_NOT_WORKING ) // 32MByte ROM, 2011 on case, 2012 on PCB
 // All Lexibook units below have 64Mbyte ROMs, must be externally banked, or different addressing scheme
-CONS( 2012, lxcmcysp,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown_rot, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Marvel Ultimate Spider-Man (120-in-1)", MACHINE_NOT_WORKING | ROT270) // renders vertically, but screen stretches it to horizontal
-CONS( 200?, lxcmcy,    0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade", MACHINE_NOT_WORKING )
-CONS( 200?, lxcmc250,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - 250-in-1 (JL2375)", MACHINE_NOT_WORKING )
-CONS( 200?, lxcmcysw,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Star Wars Rebels", MACHINE_NOT_WORKING )
-CONS( 200?, lxcmcyfz,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Frozen", MACHINE_NOT_WORKING )
-CONS( 2012, lxcmcydp,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Disney Princess", MACHINE_NOT_WORKING )
-CONS( 2014, lxcmcycr,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Cars", MACHINE_NOT_WORKING )
-CONS( 2018, lxcmcypj,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - PJ Masks", MACHINE_NOT_WORKING )
-CONS( 2014, lxcmcyba,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Barbie (JL2365BB)", MACHINE_NOT_WORKING )
+CONS( 2012, lxcmcysp,  0,  0,  vt369_vtunknown_hh_32mb, vt369_vtunknown_rot, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Marvel Ultimate Spider-Man (120-in-1)", MACHINE_NOT_WORKING | ROT270) // renders vertically, but screen stretches it to horizontal
+CONS( 200?, lxcmcy,    0,  0,  vt369_vtunknown_hh_32mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmc250,  0,  0,  vt369_vtunknown_hh_32mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - 250-in-1 (JL2375)", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmcysw,  0,  0,  vt369_vtunknown_hh_32mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Star Wars Rebels", MACHINE_NOT_WORKING )
+CONS( 200?, lxcmcyfz,  0,  0,  vt369_vtunknown_hh_32mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Frozen", MACHINE_NOT_WORKING )
+CONS( 2012, lxcmcydp,  0,  0,  vt369_vtunknown_hh_32mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Disney Princess", MACHINE_NOT_WORKING )
+CONS( 2014, lxcmcycr,  0,  0,  vt369_vtunknown_hh_32mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Cars", MACHINE_NOT_WORKING )
+CONS( 2018, lxcmcypj,  0,  0,  vt369_vtunknown_hh_32mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - PJ Masks", MACHINE_NOT_WORKING )
+CONS( 2014, lxcmcyba,  0,  0,  vt369_vtunknown_hh_32mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Barbie (JL2365BB)", MACHINE_NOT_WORKING )
 // the data order is swapped for this one, maybe other internal differences?
-CONS( 2018, lxcmcypp,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Paw Patrol", MACHINE_NOT_WORKING )
+CONS( 2018, lxcmcypp,  0,  0,  vt369_vtunknown_hh_32mb, vt369_vtunknown, vt369_vtunknown_unk_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Paw Patrol", MACHINE_NOT_WORKING )
 
-CONS( 200?, lxccminn,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Console Colour - Minnie Mouse", MACHINE_NOT_WORKING )
-CONS( 200?, lxccplan,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Console Colour - Disney's Planes", MACHINE_NOT_WORKING )
+CONS( 200?, lxccminn,  0,  0,  vt369_vtunknown_hh_32mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Console Colour - Minnie Mouse", MACHINE_NOT_WORKING )
+CONS( 200?, lxccplan,  0,  0,  vt369_vtunknown_hh_32mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Console Colour - Disney's Planes", MACHINE_NOT_WORKING )
 
 
 // GB-NO13-Main-VT389-2 on PCBs - uses higher resolution mode (twice usual h-res?)
