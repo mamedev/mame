@@ -40,6 +40,8 @@ protected:
 	void extra_rom_prot_4150_w(uint8_t data);
 	void extra_rom_prot_4152_w(uint8_t data);
 
+	void extra_io_41e6_w(uint8_t data);
+
 	uint8_t vt369_415c_r();
 
 	uint8_t vt369_418a_r();

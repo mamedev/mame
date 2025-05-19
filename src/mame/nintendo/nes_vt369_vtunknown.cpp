@@ -75,6 +75,7 @@ protected:
 	void configure_soc(nes_vt02_vt03_soc_device* soc);
 
 	void extbank_w(uint8_t data);
+	void extbank_red5mam_w(uint8_t data);
 
 	uint8_t upper_412c_r();
 	uint8_t upper_412d_r();
@@ -168,7 +169,7 @@ public:
 	void vt369_vtunknown_hh_16mb(machine_config& config);
 	void vt369_vtunknown_hh_32mb(machine_config& config);
 	void vt369_vtunknown_hh_32mb_2banks_lexi(machine_config& config);
-	
+
 	void vt369_vtunknown_hh_swap_8mb(machine_config& config);
 	void vt369_vtunknown_hh_swap_2mb(machine_config& config);
 	void vt369_vtunknown_hh_swap_512kb(machine_config& config);
@@ -176,6 +177,7 @@ public:
 	void vt369_vtunknown_hh_altswap(machine_config& config);
 	void vt369_vtunknown_hh_altswap_8mb(machine_config& config);
 	void vt369_vtunknown_hh_altswap_16mb(machine_config& config);
+	void vt369_vtunknown_hh_altswap_32mb_4banks_red5mam(machine_config& config);
 
 	void vt369_vtunknown_hh_vibesswap_8mb(machine_config& config);
 
@@ -497,6 +499,19 @@ void vt369_vtunknown_unk_state::vt369_vtunknown_hh_altswap_16mb(machine_config& 
 	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_unk_state::vt_external_space_map_16mbyte);
 }
 
+void vt369_vtunknown_base_state::extbank_red5mam_w(uint8_t data)
+{
+//	printf("extbank_red5mam_w %02x\n", data);
+	m_ahigh = ((data & 0x03) << 25);
+}
+
+void vt369_vtunknown_unk_state::vt369_vtunknown_hh_altswap_32mb_4banks_red5mam(machine_config& config)
+{
+	vt369_vtunknown_hh_altswap(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_unk_state::vt_external_space_map_32mbyte_bank);
+	m_soc->set_41e6_write_cb().set(FUNC(vt369_vtunknown_unk_state::extbank_red5mam_w));
+}
+
 void vt369_vtunknown_unk_state::vt369_vtunknown_hh_vibesswap_8mb(machine_config &config)
 {
 	vt369_vtunknown_hh_swap_8mb(config);
@@ -551,7 +566,7 @@ void vt369_vtunknown_unk_state::vt369_vtunknown_hh_32mb(machine_config& config)
 
 void vt369_vtunknown_base_state::extbank_w(uint8_t data)
 {
-	m_ahigh |= (data & 0x01) ? (1 << 25) : 0x0;
+	m_ahigh = (data & 0x01) ? (1 << 25) : 0x0;
 }
 
 void vt369_vtunknown_unk_state::vt369_vtunknown_hh_32mb_2banks_lexi(machine_config& config)
@@ -560,7 +575,6 @@ void vt369_vtunknown_unk_state::vt369_vtunknown_hh_32mb_2banks_lexi(machine_conf
 	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_unk_state::vt_external_space_map_32mbyte_bank);
 	m_soc->set_4150_write_cb().set(FUNC(vt369_vtunknown_unk_state::extbank_w));
 }
-
 
 static INPUT_PORTS_START( vt369_vtunknown )
 	PORT_START("IO0")
@@ -1180,7 +1194,7 @@ CONS( 200?, sealvt,    zonefusn,  0,  vt369_vtunknown_hh_16mb,     vt369_vtunkno
 // NOT SPI roms, code start with '6a' (possibly encrypted opcode after jump from an internal bootstrap ROM?)
 
 // these 4 sets use a different opcode scramble at least
-CONS( 201?, red5mam,  0,  0,  vt369_vtunknown_hh_altswap_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "Red5", "Mini Arcade Machine (Red5, 'Xtra Game')", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
+CONS( 201?, red5mam,  0,  0,  vt369_vtunknown_hh_altswap_32mb_4banks_red5mam, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "Red5", "Mini Arcade Machine (Red5, 'Xtra Game')", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
 CONS( 2016, dgun2593,  0,  0,  vt369_vtunknown_hh_altswap_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "dreamGEAR", "My Arcade Retro Arcade Machine - 300 Handheld Video Games (DGUN-2593)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
 CONS( 200?, gcs2mgp,   0,  0,  vt369_vtunknown_hh_altswap_16mb, vt369_vtunknown_rot, vt369_vtunknown_unk_state, empty_init, "Jungle's Soft", "Mini Game Player 48-in-1",  MACHINE_NOT_WORKING | ROT270 )
 // Not the same as the other 240-in-1 machine from Thumbs Up below (tup240) This one makes greater use of newer VT features with most games having sampled music, not APU sound.

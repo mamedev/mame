@@ -22,6 +22,7 @@ public:
 	void vt03_8000_mapper_w(offs_t offset, uint8_t data);
 
 	auto set_4150_write_cb() { return m_4150_write_cb.bind(); }
+	auto set_41e6_write_cb() { return m_41e6_write_cb.bind(); }
 
 	// 8-bit ports
 	auto write_0_callback() { return m_write_0_callback.bind(); }
@@ -135,6 +136,7 @@ protected:
 	void do_pal_timings_and_ppu_replacement(machine_config& config);
 
 	devcb_write8 m_4150_write_cb;
+	devcb_write8 m_41e6_write_cb;
 
 private:
 
