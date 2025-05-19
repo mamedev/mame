@@ -713,6 +713,30 @@ void ppu_vt3xx_device::write_204x_screenregs(offs_t offset, uint8_t data)
 	}
 }
 
+offs_t ppu_vt3xx_device::recalculate_offsets_8x8x8_tile(int address, int va34)
+{
+	// format is no longer planar
+
+	// old format 8 bits (1 byte) = 8 pixels of 1 plane (one line) of tile
+	// +1 bytes = next row
+	// +8 bytes = next plane
+	// +16 byte = next tile (or +32 bytes in ROM in 4bpp mode, but we signal this by setting 0x2000)
+
+	// new format
+	// one byte = 4 planes, 2 pixels
+
+	int finaladdr = (get_newmode_tilebase() << 1) * 0x1000;
+	int colorbits = get_m_read_bg4_bg3();
+	int offset = address & 0x1fff;
+	int tileline = offset & 0x0007;
+	int tileplane = offset & 0x0008;
+	int tilenum = offset & 0x0ff0;
+	int finaloffset = (tileline << 3) | (tileplane >> 1) | va34;
+	finaloffset |= tilenum << 2;
+	finaloffset += colorbits * 0x4000;
+	return finaladdr + finaloffset;
+}
+
 void ppu_vt3xx_device::read_tile_plane_data(int address, int color)
 {
 	if (!m_newvid_1e)
@@ -721,27 +745,18 @@ void ppu_vt3xx_device::read_tile_plane_data(int address, int color)
 	}
 	else
 	{
-		// format is no longer planar
-
-		// old format 8 bits (1 byte) = 8 pixels of 1 plane (one line) of tile
-		// +1 bytes = next row
-		// +8 bytes = next plane
-		// +16 byte = next tile (or +32 bytes in ROM in 4bpp mode, but we signal this by setting 0x2000)
-
-		// new format
-		// one byte = 4 planes, 2 pixels
-
 		m_read_bg4_bg3 = color;
 
 		m_whichpixel = 0;
-		m_planebuf[0] = m_read_newmode_bg((address & 0x1fff));
-		m_planebuf[1] = m_read_newmode_bg((address + 8) & 0x1fff);
-		m_extplanebuf[0] = m_read_newmode_bg( ((address + 0) & 0x1fff) | 0x2000 );
-		m_extplanebuf[1] = m_read_newmode_bg( ((address + 8) & 0x1fff) | 0x2000 );
-		m_extplanebuf_vt3xx_0[0] = m_read_newmode_bg( ((address + 0) & 0x1fff) | 0x4000 );
-		m_extplanebuf_vt3xx_0[1] = m_read_newmode_bg( ((address + 8) & 0x1fff) | 0x4000 );
-		m_extplanebuf_vt3xx_1[0] = m_read_newmode_bg( ((address + 0) & 0x1fff) | 0x6000 );
-		m_extplanebuf_vt3xx_1[1] = m_read_newmode_bg( ((address + 8) & 0x1fff) | 0x6000 );
+
+		m_planebuf[0] = m_read_newmode_bg(recalculate_offsets_8x8x8_tile((address + 0) & 0x1fff, 0));
+		m_planebuf[1] = m_read_newmode_bg(recalculate_offsets_8x8x8_tile((address + 8) & 0x1fff, 0));
+		m_extplanebuf[0] = m_read_newmode_bg(recalculate_offsets_8x8x8_tile((address + 0) & 0x1fff, 1));
+		m_extplanebuf[1] = m_read_newmode_bg(recalculate_offsets_8x8x8_tile((address + 8) & 0x1fff, 1));
+		m_extplanebuf_vt3xx_0[0] = m_read_newmode_bg(recalculate_offsets_8x8x8_tile((address + 0) & 0x1fff, 2));
+		m_extplanebuf_vt3xx_0[1] = m_read_newmode_bg(recalculate_offsets_8x8x8_tile((address + 8) & 0x1fff, 2));
+		m_extplanebuf_vt3xx_1[0] = m_read_newmode_bg(recalculate_offsets_8x8x8_tile((address + 0) & 0x1fff, 3));
+		m_extplanebuf_vt3xx_1[1] = m_read_newmode_bg(recalculate_offsets_8x8x8_tile((address + 8) & 0x1fff, 3));
 	}
 }
 

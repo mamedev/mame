@@ -579,30 +579,7 @@ uint8_t vt3xx_soc_base_device::newmode_spr_r(offs_t offset)
 uint8_t vt3xx_soc_base_device::newmode_bg_r(offs_t offset)
 {
 	address_space& spc = this->space(AS_PROGRAM);
-
-	int va34 = (offset & 0x6000) >> 13;
-	offset &= 0x1fff;
-
-	// denv150 ROM size is 0x1000000  ROM size  0x40000 tiles (each tile is 0x40 bytes)
-	// 8x8x8(?) tiles are tiles 0x6000+ (so at 0x180000 in ROM)
-
-	// ROM format, each byte is 1 pixel (8-bits)
-	// each line is 8 bytes (8 pixels x 8-bits)
-	// each tile is 64 bytes (8 bytes x 8 lines)
-	int finaladdr = (m_ppu->get_newmode_tilebase() << 1) * 0x1000;
-
-	int tileline = offset & 0x0007;
-	int tileplane = offset & 0x0008;
-	int tilenum = offset & 0x0ff0;
-
-	int finaloffset = (tileline << 3) | (tileplane >> 1) | va34;
-	finaloffset |= tilenum << 2;
-
-	int colorbits = m_ppu->get_m_read_bg4_bg3();
-
-	finaloffset += colorbits * 0x4000;
-
-	return spc.read_byte(get_relative() + finaladdr + finaloffset);
+	return spc.read_byte(get_relative() + offset);
 }
 
 /***********************************************************************************************************************************************************/
