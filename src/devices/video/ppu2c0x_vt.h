@@ -190,6 +190,9 @@ private:
 	offs_t recalculate_offsets_8x8x4packed_tile(int address, int va34);
 	offs_t recalculate_offsets_8x8x8packed_tile(int address, int va34);
 
+	void draw_extended_sprite_pixel_low(bitmap_rgb32& bitmap, int pixel_data, int pixel, int xpos, int pal, int bpp, u8* line_priority);
+	void draw_extended_sprite_pixel_high(bitmap_rgb32& bitmap, int pixel_data, int pixel, int xpos, int pal, int bpp, u8* line_priority);
+
 	uint8_t m_204x_screenregs[0xa];
 	uint8_t m_2008_spritehigh;
 };

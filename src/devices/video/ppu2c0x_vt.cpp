@@ -830,6 +830,70 @@ void ppu_vt3xx_device::shift_tile_plane_data(uint8_t& pix)
 	}
 }
 
+void ppu_vt3xx_device::draw_extended_sprite_pixel_low(bitmap_rgb32& bitmap, int pixel_data, int pixel, int xpos, int pal, int bpp, u8* line_priority)
+{
+	if (pixel_data) // opaque check
+	{
+		if ((xpos + pixel) < VISIBLE_SCREEN_WIDTH)
+		{
+			// has another sprite been drawn here?/
+			if (!line_priority[xpos + pixel])
+			{
+				uint8_t pen;
+				if (bpp == 4)
+					pen = pixel_data | pal << 4;
+				else
+					pen = pixel_data; // does pal have another meaning in 8bpp mode?
+
+				uint16_t pal0 = readbyte(((pen & 0xff) * 2) + 0x3e00);
+				pal0 |= readbyte(((pen & 0xff) * 2) + 0x3e01) << 8;
+
+				int palb = (pal0 >> 0) & 0x1f;
+				int palg = (pal0 >> 5) & 0x1f;
+				int palr = (pal0 >> 10) & 0x1f;
+
+				rgb_t palval = rgb_t(palr << 3, palg << 3, palb << 3);
+
+				m_bitmap.pix(m_scanline, xpos + pixel) = palval;
+				// indicate that a sprite was drawn at this location, even if it's not seen
+				line_priority[xpos + pixel] |= 0x01;
+			}
+		}
+	}
+}
+
+void ppu_vt3xx_device::draw_extended_sprite_pixel_high(bitmap_rgb32& bitmap, int pixel_data, int pixel, int xpos, int pal, int bpp, u8* line_priority)
+{
+	if (pixel_data) // opaque check
+	{
+		if ((xpos + pixel) < VISIBLE_SCREEN_WIDTH)
+		{
+			// has another sprite been drawn here?
+			if (BIT(~line_priority[xpos + pixel], 0))
+			{
+				uint8_t pen;
+				if (bpp == 4)
+					pen = pixel_data | pal << 4;
+				else
+					pen = pixel_data; // does pal have another meaning in 8bpp mode?
+
+				uint16_t pal0 = readbyte(((pen & 0xff) * 2) + 0x3e00);
+				pal0 |= readbyte(((pen & 0xff) * 2) + 0x3e01) << 8;
+
+				int palb = (pal0 >> 0) & 0x1f;
+				int palg = (pal0 >> 5) & 0x1f;
+				int palr = (pal0 >> 10) & 0x1f;
+
+				rgb_t palval = rgb_t(palr << 3, palg << 3, palb << 3);
+
+				m_bitmap.pix(m_scanline, xpos + pixel) = palval;
+				// indicate that a sprite was drawn at this location, even if it's not seen
+				line_priority[xpos + pixel] |= 0x01;
+			}
+		}
+	}
+}
+
 void ppu_vt3xx_device::draw_sprites(u8 *line_priority)
 {
 	if (!m_newvid_1e)
@@ -854,15 +918,16 @@ void ppu_vt3xx_device::draw_sprites(u8 *line_priority)
 		*/
 
 		// new style sprites
-		for (int spritenum = 0x7f; spritenum >= 0x00; spritenum--)
+		for (int spritenum = 0x00; spritenum < 0x80; spritenum++)
 		{
 			if (m_newvid_1e & 0x04)
 			{
+				int pri = 1;
 				int ypos = m_spriteram[0x000 + spritenum];
 				int xpos = m_spriteram[0x180 + spritenum];
 				int tilenum = m_spriteram[0x080 + spritenum];
 				tilenum |= (m_spriteram[0x100 + spritenum] & 0x1c) << 6;
-				uint8_t m_spritepatternbuf[8];
+				uint8_t spritepatternbuf[8];
 
 				int pal = m_spriteram[0x100 + spritenum] & 0x03;
 
@@ -888,7 +953,7 @@ void ppu_vt3xx_device::draw_sprites(u8 *line_priority)
 					bpp = 4;
 				}
 
-				if (m_newvid_1d & 0x08)
+				if (m_newvid_1d & 0x08) // for new format 0
 				{
 					pal |= (m_spriteram[0x100 + spritenum] & 0x20) >> 3;
 					if (m_spriteram[0x100 + spritenum] & 0x40)
@@ -901,6 +966,10 @@ void ppu_vt3xx_device::draw_sprites(u8 *line_priority)
 					{
 						ypos = -0x100 + ypos;
 					}
+				}
+				else // for new format 1
+				{
+					pri = (m_spriteram[0x100 + spritenum] & 0x20) >> 5;
 				}
 
 				//ypos++; // red5mam menu alignment, probably not, others disagree
@@ -941,56 +1010,59 @@ void ppu_vt3xx_device::draw_sprites(u8 *line_priority)
 
 				for (int i = 0; i < 8; i++)
 				{
-					m_spritepatternbuf[i] = m_read_newmode_sp(pattern_offset + i);
+					spritepatternbuf[i] = m_read_newmode_sp(pattern_offset + i);
 				}
 
-				for (int pixel = 0; pixel < width; pixel++)
+				if (pri)
 				{
-					u8 pixel_data;
+					for (int pixel = 0; pixel < width; pixel++)
+					{
+						u8 pixel_data;
 
-					if (bpp == 4)
-					{
-						pixel_data = m_spritepatternbuf[pixel >> 1];
-						if (pixel & 1)
-							pixel_data >>= 4;
-						else
-							pixel_data &= 0xf;
-					}
-					else
-					{
-						pixel_data = m_spritepatternbuf[pixel];
-					}
-
-					if (xpos + pixel >= 0)
-					{
-						if (pixel_data)
+						if (bpp == 4)
 						{
-							if ((xpos + pixel) < VISIBLE_SCREEN_WIDTH)
-							{
-								// has another sprite been drawn here?/
-								//if (BIT(~line_priority[sprite_xpos + pixel], 0))
-								{
-									uint8_t pen;
-									if (bpp == 4)
-										pen = pixel_data | pal << 4;
-									else
-										pen = pixel_data; // does pal have another meaning in 8bpp mode?
+							pixel_data = spritepatternbuf[pixel >> 1];
+							if (pixel & 1)
+								pixel_data >>= 4;
+							else
+								pixel_data &= 0xf;
+						}
+						else
+						{
+							pixel_data = spritepatternbuf[pixel];
+						}
 
-									uint16_t pal0 = readbyte(((pen & 0xff) * 2) + 0x3e00);
-									pal0 |= readbyte(((pen & 0xff) * 2) + 0x3e01) << 8;
-
-									int palb = (pal0 >> 0) & 0x1f;
-									int palg = (pal0 >> 5) & 0x1f;
-									int palr = (pal0 >> 10) & 0x1f;
-
-									rgb_t palval = rgb_t(palr << 3, palg << 3, palb << 3);
-
-									m_bitmap.pix(m_scanline, xpos + pixel) = palval;
-									//line_priority[sprite_xpos + pixel] |= 0x01;
-								}
-							}
+						if (xpos + pixel >= 0)
+						{
+							draw_extended_sprite_pixel_high(m_bitmap, pixel_data, pixel, xpos, pal, bpp, line_priority);
 						}
 					}
+				}
+				else
+				{
+					for (int pixel = 0; pixel < width; pixel++)
+					{
+						u8 pixel_data;
+
+						if (bpp == 4)
+						{
+							pixel_data = spritepatternbuf[pixel >> 1];
+							if (pixel & 1)
+								pixel_data >>= 4;
+							else
+								pixel_data &= 0xf;
+						}
+						else
+						{
+							pixel_data = spritepatternbuf[pixel];
+						}
+
+						if (xpos + pixel >= 0)
+						{
+							draw_extended_sprite_pixel_low(m_bitmap, pixel_data, pixel, xpos, pal, bpp, line_priority);
+						}
+					}
+
 				}
 			}
 			else
