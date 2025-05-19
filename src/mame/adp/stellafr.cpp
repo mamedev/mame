@@ -5,6 +5,33 @@
 Stella
 German Fruit Machines / Gambling Machines
 
+CPU Board:
+----------
+ ____________________________________________________________
+ |           ______________  ______________     ___________ |
+ | 74HC245N  | t1 i       |  |KM681000ALP7|     |+        | |
+ | 74HC573   |____________|  |____________|     |  3V Bat | |
+ |                                              |         | |
+ |           ______________  ______________     |        -| |
+ |           | t1 ii      |  |KM681000ALP7|     |_________| |
+ |     |||   |____________|  |____________| |||             |
+ |     |||   ___________                    |||  M62X42B    |
+ | X   |||   |         |                    |||             |
+ |     |||   |68EC000 8|  74HC32   74HC245  |||  MAX691CPE  |
+ |     |||   |         |  74AC138  74HC573  |||    74HC32   |
+ |           |         |                                    |
+ | 74HC573   |_________|  74HC08   74HC10  74HC32  74HC21   |
+ |__________________________________________________________|
+
+Parts:
+
+ 68EC000FN8         - Motorola 68k CPU
+ KM681000ALP7       - 128K X 8 Bit Low Power CMOS Static RAM
+ OKIM62X42B         - Real-time Clock ic With Built-in Crystal
+ MAX691CPE          - P Reset ic With Watchdog And Battery Switchover
+ X                    - 8MHz xtal
+ 3V Bat             - Lithium 3V power module
+
 Sound  and I/O board:
 ---------------------
 "Steuereinheit 68000"
@@ -69,6 +96,8 @@ Connectors:
 #include "sound/ay8910.h"
 #include "speaker.h"
 
+#include "stellafr.lh"
+
 namespace {
 
 class stellafr_state : public driver_device
@@ -98,7 +127,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68681_device> m_duart;
 	required_device<nvram_device> m_nvram;
-	output_finder<9> m_digits;
+	output_finder<8> m_digits;
 };
 
 
@@ -143,8 +172,12 @@ void stellafr_state::fc7_map(address_map &map)
 
 
 static INPUT_PORTS_START( stellafr )
-	PORT_START("INPUTS")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_START("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("1:1")
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_START )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Stop")
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Stop")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("1:1")
 INPUT_PORTS_END
 
 
@@ -163,7 +196,7 @@ void stellafr_state::stellafr(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	ay8910_device &aysnd(AY8910(config, "aysnd", 1000000));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.85);
-	aysnd.port_a_read_callback().set_ioport("INPUTS");
+	aysnd.port_a_read_callback().set_ioport("IN0");
 	aysnd.port_b_write_callback().set(FUNC(stellafr_state::ay8910_portb_w));
 }
 
@@ -211,10 +244,10 @@ ROM_END
 
 } // anonymous namespace
 
-GAME(1993, action,    0,      stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Action",            MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME(1994, grandhand, action, stellafr, stellafr, stellafr_state, empty_init, ROT0, "Stella", "Grand Hand",        MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME(1994, st_vulkn,  action, stellafr, stellafr, stellafr_state, empty_init, ROT0, "Stella", "Vulkan (Stella)",   MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME(1995, multimulti,action, stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Multi Multi",       MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME(1995, sunny,     action, stellafr, stellafr, stellafr_state, empty_init, ROT0, "Mega",   "Sunny",             MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME(1996, st_ohla,   action, stellafr, stellafr, stellafr_state, empty_init, ROT0, "Stella", "Oh La La (Stella)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME(2001, turbosun,  action, stellafr, stellafr, stellafr_state, empty_init, ROT0, "Mega",   "Turbo Sunny",       MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAMEL(1993, action,    0,      stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Action",            MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1994, grandhand, action, stellafr, stellafr, stellafr_state, empty_init, ROT0, "Stella", "Grand Hand",        MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1994, st_vulkn,  action, stellafr, stellafr, stellafr_state, empty_init, ROT0, "Stella", "Vulkan (Stella)",   MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1995, multimulti,action, stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Multi Multi",       MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1995, sunny,     action, stellafr, stellafr, stellafr_state, empty_init, ROT0, "Mega",   "Sunny",             MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1996, st_ohla,   action, stellafr, stellafr, stellafr_state, empty_init, ROT0, "Stella", "Oh La La (Stella)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(2001, turbosun,  action, stellafr, stellafr, stellafr_state, empty_init, ROT0, "Mega",   "Turbo Sunny",       MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
