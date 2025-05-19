@@ -1286,7 +1286,7 @@ void sound_manager::config_save(config_type cfg_type, util::xml::data_node *pare
 		}
 
 		// All levels
-		if(m_master_gain != osd::db_to_linear(machine().options().volume())) {
+		if(m_master_gain != 1.0 && m_master_gain != osd::db_to_linear(machine().options().volume())) {
 			util::xml::data_node *const lv_node = parentnode->add_child("master_volume", nullptr);
 			lv_node->set_attribute_float("gain", m_master_gain);
 		}
