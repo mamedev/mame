@@ -1101,7 +1101,8 @@ sound_manager::microphone_info::microphone_info(microphone_device &dev) : m_dev(
 
 void sound_manager::reset()
 {
-	LOG_OUTPUT_FUNC("Sound reset\n");
+	if(VERBOSE & LOG_OSD_INFO)
+		LOG_OUTPUT_FUNC("Sound reset\n");
 }
 
 
