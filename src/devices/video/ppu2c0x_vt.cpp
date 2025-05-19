@@ -894,7 +894,7 @@ void ppu_vt3xx_device::draw_extended_sprite_pixel_high(bitmap_rgb32& bitmap, int
 	}
 }
 
-void ppu_vt3xx_device::draw_sprites(u8 *line_priority)
+void ppu_vt3xx_device::draw_sprites(u8* line_priority)
 {
 	if (!m_newvid_1e)
 	{
@@ -920,156 +920,168 @@ void ppu_vt3xx_device::draw_sprites(u8 *line_priority)
 		// new style sprites
 		for (int spritenum = 0x00; spritenum < 0x80; spritenum++)
 		{
+			// old packed spriteram format
+			int ypos_table = 0x000;
+			int	xpos_table = 0x003;
+			int	tilenum_table = 0x001;
+			int	extra_table = 0x002;
+			int	table_step = 4;
+
+			// new expanded spriteram format
 			if (m_newvid_1e & 0x04)
 			{
-				int pri = 1;
-				int ypos = m_spriteram[0x000 + spritenum];
-				int xpos = m_spriteram[0x180 + spritenum];
-				int tilenum = m_spriteram[0x080 + spritenum];
-				tilenum |= (m_spriteram[0x100 + spritenum] & 0x1c) << 6;
-				uint8_t spritepatternbuf[8];
+				ypos_table = 0x000;
+				xpos_table = 0x180;
+				tilenum_table = 0x080;
+				extra_table = 0x100;
+				table_step = 1;
+			}
 
-				int pal = m_spriteram[0x100 + spritenum] & 0x03;
+			int pri = 1;
+			int ypos = m_spriteram[ypos_table + spritenum * table_step];
+			int xpos = m_spriteram[xpos_table + spritenum * table_step];
+			int tilenum = m_spriteram[tilenum_table + spritenum * table_step];
+			tilenum |= (m_spriteram[extra_table + spritenum * table_step] & 0x1c) << 6;
 
-				int height = 16;
-				int width = 8;
-				int bpp = 8;
-				bool alt_16_handling = false;
+			int pal = m_spriteram[extra_table + spritenum * table_step] & 0x03;
 
-				if (m_newvid_1d & 0x02)
+			if (m_newvid_1d & 0x08) // format 0
+			{
+				pal |= (m_spriteram[extra_table + spritenum * table_step] & 0x20) >> 3;
+				if (m_spriteram[extra_table + spritenum * table_step] & 0x40)
 				{
-					width = 16;
-					bpp = 4;
+					xpos = -0x100 + xpos; // allows for partially offscreen sprites?
 				}
 
-				// testing with lxcmcysp later games in the list
-				// 12 09 0f -- 'alt_16_handling'
-				// 22 09 0f -- some games, works
-				// 12 0f 0f -- menu, works
-				// 12 0b 0f -- hercules in red5mam, still broken
-				if ((!(m_newvid_1d & 0x04)) && (m_newvid_1c & 0x10))
+				// TODO: verify
+				if (m_spriteram[extra_table + spritenum * table_step] & 0x80)
 				{
-					alt_16_handling = true;
-					bpp = 4;
+					ypos = -0x100 + ypos;
 				}
+			}
+			else // format 1
+			{
+				pri = (m_spriteram[extra_table + spritenum * table_step] & 0x20) >> 5;
+			}
 
-				if (m_newvid_1d & 0x08) // for new format 0
-				{
-					pal |= (m_spriteram[0x100 + spritenum] & 0x20) >> 3;
-					if (m_spriteram[0x100 + spritenum] & 0x40)
-					{
-						xpos = -0x100 + xpos; // allows for partially offscreen sprites?
-					}
+			int height = 16;
+			int width = 8;
+			int bpp = 8;
+			bool alt_16_handling = false;
 
-					// TODO: verify
-					if (m_spriteram[0x100 + spritenum] & 0x80)
-					{
-						ypos = -0x100 + ypos;
-					}
-				}
-				else // for new format 1
-				{
-					pri = (m_spriteram[0x100 + spritenum] & 0x20) >> 5;
-				}
+			if (m_newvid_1d & 0x02)
+			{
+				width = 16;
+				bpp = 4;
+			}
 
-				//ypos++; // red5mam menu alignment, probably not, others disagree
+			// testing with lxcmcysp later games in the list
+			// 12 09 0f -- 'alt_16_handling'
+			// 22 09 0f -- some games, works
+			// 12 0f 0f -- menu, works
+			// 12 0b 0f -- hercules in red5mam, still broken
+			if ((!(m_newvid_1d & 0x04)) && (m_newvid_1c & 0x10))
+			{
+				alt_16_handling = true;
+				bpp = 4;
+			}
 
-				// if the sprite isn't visible, skip it
-				if ((ypos + height <= m_scanline) || (ypos > m_scanline))
-					continue;
 
-				// compute the character's line to draw 
-				int sprite_line = m_scanline - ypos;
 
-				// a 16 pixel wide sprite (packed format), at 4bpp, requires 8 bytes for a single line
-				// at 16 pixels high it requires 128 bytes for a whole tile
+			//ypos++; // red5mam menu alignment, probably not, others disagree
 
-				// sprites can be 8 pixels wide and 8bpp, or 16 pixels wide and 4bpp?
-				int index1;
+			// if the sprite isn't visible, skip it
+			if ((ypos + height <= m_scanline) || (ypos > m_scanline))
+				continue;
 
-				if (bpp == 4)
-				{
-					if (alt_16_handling)
-						index1 = tilenum * 32;
-					else
-						index1 = tilenum * 128;
-				}
-				else
-				{
-					index1 = tilenum * 64; // why? a 16 wide 4bpp sprite takes up the same number of bytes as an 8 wide 8bpp sprite
-				}
+			// compute the character's line to draw 
+			int sprite_line = m_scanline - ypos;
 
-				int pattern_offset;
+			// a 16 pixel wide sprite (packed format), at 4bpp, requires 8 bytes for a single line
+			// at 16 pixels high it requires 128 bytes for a whole tile
 
+			// sprites can be 8 pixels wide and 8bpp, or 16 pixels wide and 4bpp?
+			int index1;
+
+			if (bpp == 4)
+			{
 				if (alt_16_handling)
-					pattern_offset = index1 + sprite_line * 4;
+					index1 = tilenum * 32;
 				else
-					pattern_offset = index1 + sprite_line * 8;
+					index1 = tilenum * 128;
+			}
+			else
+			{
+				index1 = tilenum * 64; // why? a 16 wide 4bpp sprite takes up the same number of bytes as an 8 wide 8bpp sprite
+			}
 
-				pattern_offset += get_newmode_spritebase() * 0x2000;
+			int pattern_offset;
 
-				for (int i = 0; i < 8; i++)
+			if (alt_16_handling)
+				pattern_offset = index1 + sprite_line * 4;
+			else
+				pattern_offset = index1 + sprite_line * 8;
+
+			pattern_offset += get_newmode_spritebase() * 0x2000;
+
+			uint8_t spritepatternbuf[8];
+			for (int i = 0; i < 8; i++)
+			{
+				spritepatternbuf[i] = m_read_newmode_sp(pattern_offset + i);
+			}
+
+			if (pri)
+			{
+				for (int pixel = 0; pixel < width; pixel++)
 				{
-					spritepatternbuf[i] = m_read_newmode_sp(pattern_offset + i);
-				}
+					u8 pixel_data;
 
-				if (pri)
-				{
-					for (int pixel = 0; pixel < width; pixel++)
+					if (bpp == 4)
 					{
-						u8 pixel_data;
-
-						if (bpp == 4)
-						{
-							pixel_data = spritepatternbuf[pixel >> 1];
-							if (pixel & 1)
-								pixel_data >>= 4;
-							else
-								pixel_data &= 0xf;
-						}
+						pixel_data = spritepatternbuf[pixel >> 1];
+						if (pixel & 1)
+							pixel_data >>= 4;
 						else
-						{
-							pixel_data = spritepatternbuf[pixel];
-						}
-
-						if (xpos + pixel >= 0)
-						{
-							draw_extended_sprite_pixel_high(m_bitmap, pixel_data, pixel, xpos, pal, bpp, line_priority);
-						}
+							pixel_data &= 0xf;
 					}
-				}
-				else
-				{
-					for (int pixel = 0; pixel < width; pixel++)
+					else
 					{
-						u8 pixel_data;
-
-						if (bpp == 4)
-						{
-							pixel_data = spritepatternbuf[pixel >> 1];
-							if (pixel & 1)
-								pixel_data >>= 4;
-							else
-								pixel_data &= 0xf;
-						}
-						else
-						{
-							pixel_data = spritepatternbuf[pixel];
-						}
-
-						if (xpos + pixel >= 0)
-						{
-							draw_extended_sprite_pixel_low(m_bitmap, pixel_data, pixel, xpos, pal, bpp, line_priority);
-						}
+						pixel_data = spritepatternbuf[pixel];
 					}
 
+					if (xpos + pixel >= 0)
+					{
+						draw_extended_sprite_pixel_high(m_bitmap, pixel_data, pixel, xpos, pal, bpp, line_priority);
+					}
 				}
 			}
 			else
 			{
-				popmessage("older sprite style\n");
+				for (int pixel = 0; pixel < width; pixel++)
+				{
+					u8 pixel_data;
+
+					if (bpp == 4)
+					{
+						pixel_data = spritepatternbuf[pixel >> 1];
+						if (pixel & 1)
+							pixel_data >>= 4;
+						else
+							pixel_data &= 0xf;
+					}
+					else
+					{
+						pixel_data = spritepatternbuf[pixel];
+					}
+
+					if (xpos + pixel >= 0)
+					{
+						draw_extended_sprite_pixel_low(m_bitmap, pixel_data, pixel, xpos, pal, bpp, line_priority);
+					}
+				}
+
 			}
-		 }
+		}
 	}
 }
 
