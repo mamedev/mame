@@ -432,7 +432,7 @@ uint8_t vt3xx_soc_base_device::vt369_6000_r(offs_t offset)
 	{
 		address_space& spc = this->space(AS_PROGRAM);
 		int address = (m_bank6000 * 0x2000) + (offset & 0x1fff);
-		return spc.read_byte(address);
+		return spc.read_byte(get_relative() + address);
 	}
 	else
 	{
