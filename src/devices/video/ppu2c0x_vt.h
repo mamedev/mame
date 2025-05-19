@@ -187,7 +187,8 @@ private:
 	void vt3xx_palette_w(offs_t offset, uint8_t da0ta);
 	virtual void write_to_spriteram_with_increment(uint8_t data) override;
 
-	offs_t recalculate_offsets_8x8x8_tile(int address, int va34);
+	offs_t recalculate_offsets_8x8x4packed_tile(int address, int va34);
+	offs_t recalculate_offsets_8x8x8packed_tile(int address, int va34);
 
 	uint8_t m_204x_screenregs[0xa];
 	uint8_t m_2008_spritehigh;
