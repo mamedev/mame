@@ -43,7 +43,7 @@
   * daytona2 - As above
     spikeout/spikeofe - As above.
  ** dirtdvls/dirtdvlau/dirtdvlj/dirtdvlu - works
-    swtrilgy - works
+    swtrilgy - works, black screen in service mode
     swtrilga - doesn't pass "Wait Setup the Feedback Leaver"
     swtrilgyp - works if you wait past "Wait Setup the Feedback Leaver"
     magtruck - works, broken FPU values in matrices during 2nd part of attract mode (cpu core bug?)
@@ -1655,25 +1655,22 @@ void model3_state::model3_sound_w(offs_t offset, uint8_t data)
 			// send to the sound board
 			m_scsp1->midi_in(data);
 
-			if (m_sound_irq_enable)
-			{
-				m_sound_timer->adjust(attotime::from_msec(1));
-			}
-
 			break;
 
 		case 4:
 			if (m_uart.found())
 				m_uart->control_w(data);
 
-			if (data == 0x27)
+			// HACK: MIDI comms thru SCSP MCIEB?
+			if (data & 0x20)
 			{
 				m_sound_irq_enable = 1;
-				m_sound_timer->adjust(attotime::from_msec(1));
+				m_sound_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
 			}
-			else if (data == 0x06)
+			else
 			{
 				m_sound_irq_enable = 0;
+				set_irq_line(0x40, CLEAR_LINE);
 			}
 
 			break;
