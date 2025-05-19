@@ -415,9 +415,12 @@ void vt3xx_soc_base_device::vt369_sound_external_map(address_map &map)
 
 void vt3xx_soc_base_device::vt369_411c_bank6000_enable_w(offs_t offset, uint8_t data)
 {
-	// and CPU clock scaling on bit 0x80?
+	if (m_bank6000_enable != data)
+	{
+		m_maincpu->set_clock(data & 0x80 ? NTSC_APU_CLOCK * 3 : NTSC_APU_CLOCK );
+		logerror("%s: enable bank at 0x6000 + CPU clock multiplier (%02x)\n", machine().describe_context(), data);
+	}
 
-	logerror("%s: enable bank at 0x6000 (%02x)\n", machine().describe_context(), data);
 	m_bank6000_enable = data;
 }
 
