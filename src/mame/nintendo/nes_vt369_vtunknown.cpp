@@ -170,16 +170,18 @@ public:
 	void vt369_vtunknown_hh_32mb(machine_config& config);
 	void vt369_vtunknown_hh_32mb_2banks_lexi(machine_config& config);
 
-	void vt369_vtunknown_hh_swap_8mb(machine_config& config);
+	void vt369_vtunknown_hh_swap(machine_config& config);
 	void vt369_vtunknown_hh_swap_2mb(machine_config& config);
+	void vt369_vtunknown_hh_swap_8mb(machine_config& config);
+	void vt369_vtunknown_hh_swap_16mb(machine_config& config);
 	void vt369_vtunknown_hh_swap_512kb(machine_config& config);
 
 	void vt369_vtunknown_hh_altswap(machine_config& config);
-	void vt369_vtunknown_hh_altswap_8mb(machine_config& config);
+	void vt369_vtunknown_hh_altswap_4mb(machine_config& config);
 	void vt369_vtunknown_hh_altswap_16mb(machine_config& config);
 	void vt369_vtunknown_hh_altswap_32mb_4banks_red5mam(machine_config& config);
 
-	void vt369_vtunknown_hh_vibesswap_8mb(machine_config& config);
+	void vt369_vtunknown_hh_vibesswap_16mb(machine_config& config);
 
 	void vt369_vtunknown_unk(machine_config& config);
 	void vt369_vtunknown_unk_1mb(machine_config& config);
@@ -466,7 +468,7 @@ void vt369_vtunknown_unk_state::vt369_vtunknown_hh(machine_config &config)
 	m_soc->force_bad_dma();
 }
 
-void vt369_vtunknown_unk_state::vt369_vtunknown_hh_swap_8mb(machine_config &config)
+void vt369_vtunknown_unk_state::vt369_vtunknown_hh_swap(machine_config &config)
 {
 	vt369_vtunknown_4k_ram(config);
 
@@ -474,12 +476,35 @@ void vt369_vtunknown_unk_state::vt369_vtunknown_hh_swap_8mb(machine_config &conf
 	configure_soc(m_soc);
 	m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB);
 	m_soc->force_bad_dma();
+}
+
+void vt369_vtunknown_unk_state::vt369_vtunknown_hh_swap_512kb(machine_config &config)
+{
+	vt369_vtunknown_hh_swap(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_unk_state::vt_external_space_map_512kbyte);
+}
+
+void vt369_vtunknown_unk_state::vt369_vtunknown_hh_swap_2mb(machine_config &config)
+{
+	vt369_vtunknown_hh_swap(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_unk_state::vt_external_space_map_2mbyte);
+}
+
+void vt369_vtunknown_unk_state::vt369_vtunknown_hh_swap_8mb(machine_config &config)
+{
+	vt369_vtunknown_hh_swap(config);
 	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_unk_state::vt_external_space_map_8mbyte);
+}
+
+void vt369_vtunknown_unk_state::vt369_vtunknown_hh_swap_16mb(machine_config &config)
+{
+	vt369_vtunknown_hh_swap(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_unk_state::vt_external_space_map_16mbyte);
 }
 
 void vt369_vtunknown_unk_state::vt369_vtunknown_hh_altswap(machine_config &config)
 {
-	vt369_vtunknown_hh_swap_8mb(config);
+	vt369_vtunknown_4k_ram(config);
 
 	VT369_SOC_INTROM_ALTSWAP(config.replace(), m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
@@ -487,10 +512,10 @@ void vt369_vtunknown_unk_state::vt369_vtunknown_hh_altswap(machine_config &confi
 	m_soc->force_bad_dma();
 }
 
-void vt369_vtunknown_unk_state::vt369_vtunknown_hh_altswap_8mb(machine_config &config)
+void vt369_vtunknown_unk_state::vt369_vtunknown_hh_altswap_4mb(machine_config &config)
 {
 	vt369_vtunknown_hh_altswap(config);
-	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_unk_state::vt_external_space_map_8mbyte);
+	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_unk_state::vt_external_space_map_4mbyte);
 }
 
 void vt369_vtunknown_unk_state::vt369_vtunknown_hh_altswap_16mb(machine_config& config)
@@ -512,9 +537,9 @@ void vt369_vtunknown_unk_state::vt369_vtunknown_hh_altswap_32mb_4banks_red5mam(m
 	m_soc->set_41e6_write_cb().set(FUNC(vt369_vtunknown_unk_state::extbank_red5mam_w));
 }
 
-void vt369_vtunknown_unk_state::vt369_vtunknown_hh_vibesswap_8mb(machine_config &config)
+void vt369_vtunknown_unk_state::vt369_vtunknown_hh_vibesswap_16mb(machine_config &config)
 {
-	vt369_vtunknown_hh_swap_8mb(config);
+	vt369_vtunknown_hh_swap_16mb(config);
 
 	VT369_SOC_INTROM_VIBESSWAP(config.replace(), m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
@@ -523,17 +548,7 @@ void vt369_vtunknown_unk_state::vt369_vtunknown_hh_vibesswap_8mb(machine_config 
 	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_unk_state::vt_external_space_map_8mbyte);
 }
 
-void vt369_vtunknown_unk_state::vt369_vtunknown_hh_swap_2mb(machine_config &config)
-{
-	vt369_vtunknown_hh_swap_8mb(config);
-	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_unk_state::vt_external_space_map_2mbyte);
-}
 
-void vt369_vtunknown_unk_state::vt369_vtunknown_hh_swap_512kb(machine_config &config)
-{
-	vt369_vtunknown_hh_swap_8mb(config);
-	m_soc->set_addrmap(AS_PROGRAM, &vt369_vtunknown_unk_state::vt_external_space_map_512kbyte);
-}
 void vt369_vtunknown_unk_state::vt369_vtunknown_hh_1mb(machine_config& config)
 {
 	vt369_vtunknown_hh(config);
@@ -1195,32 +1210,32 @@ CONS( 200?, sealvt,    zonefusn,  0,  vt369_vtunknown_hh_16mb,     vt369_vtunkno
 
 CONS( 201?, red5mam,  0,  0,  vt369_vtunknown_hh_altswap_32mb_4banks_red5mam, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "Red5", "Mini Arcade Machine (Red5, 'Xtra Game')", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
 
-CONS( 2016, dgun2593,  0,  0,  vt369_vtunknown_hh_altswap_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "dreamGEAR", "My Arcade Retro Arcade Machine - 300 Handheld Video Games (DGUN-2593)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
+CONS( 2016, dgun2593,  0,  0,  vt369_vtunknown_hh_altswap_32mb_4banks_red5mam, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "dreamGEAR", "My Arcade Retro Arcade Machine - 300 Handheld Video Games (DGUN-2593)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
 
 CONS( 200?, gcs2mgp,   0,  0,  vt369_vtunknown_hh_altswap_16mb, vt369_vtunknown_rot, vt369_vtunknown_unk_state, empty_init, "Jungle's Soft", "Mini Game Player 48-in-1",  MACHINE_NOT_WORKING | ROT270 )
 
 // Not the same as the other 240-in-1 machine from Thumbs Up below (tup240) This one makes greater use of newer VT features with most games having sampled music, not APU sound.
 // Several of the games contained in here are buggy / broken on real hardware (see https://www.youtube.com/watch?v=-mgGNaDQ1HE )
-CONS( 201?, 240in1ar,  0,  0,  vt369_vtunknown_hh_altswap_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "Thumbs Up", "Mini Arcade Machine (Thumbs Up, 240IN1ARC)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
+CONS( 201?, 240in1ar,  0,  0,  vt369_vtunknown_hh_altswap_32mb_4banks_red5mam, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "Thumbs Up", "Mini Arcade Machine (Thumbs Up, 240IN1ARC)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
 // portable fan + famiclone combo handheld, very similar to 240in1ar
-CONS( 2020, nubsupmf,   0,      0,  vt369_vtunknown_hh_altswap_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "<unknown>", "NubSup Mini Game Fan", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2020, nubsupmf,   0,      0,  vt369_vtunknown_hh_altswap_4mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "<unknown>", "NubSup Mini Game Fan", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 
 /*****************************************************************************
 * below are VT369? games that use flash ROM
 *****************************************************************************/
 
-// is one of these bad? where do they fit? both boot, but banking is wrong (incorrect games selected)
+// is one of these bad? where do they fit? both boot, but banking is wrong (bad tiles)
 // menu in unk2020hh renders using incorrect gfx too (lacks language selection screen?)
-CONS( 2019, unk2019hh,  0,        0,  vt369_vtunknown_hh_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "<unknown>", "unknown VTxx based GameBoy style handheld (2019 PCB)", MACHINE_NOT_WORKING )
-CONS( 2020, unk2020hh,  unk2019hh,0,  vt369_vtunknown_hh_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "<unknown>", "unknown VTxx based GameBoy style handheld (2020 PCB)", MACHINE_NOT_WORKING )
+CONS( 2019, unk2019hh,  0,        0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "<unknown>", "unknown VTxx based GameBoy style handheld (2019 PCB)", MACHINE_NOT_WORKING )
+CONS( 2020, unk2020hh,  unk2019hh,0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "<unknown>", "unknown VTxx based GameBoy style handheld (2020 PCB)", MACHINE_NOT_WORKING )
 
 
 // unknown tech level, might be scrambled as default codebank/boot vectors don't seem valid, maybe bad dump
 CONS( 201?, hhgc319,  0,        0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "<unknown>", "Handheld Game Console 319-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // unknown tech, probably from 2021, probably VT369, ROM wouldn't read consistently
-CONS( 202?, vibes240, 0,        0,  vt369_vtunknown_hh_vibesswap_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "<unknown>", "Vibes Retro Pocket Gamer 240-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 202?, vibes240, 0,        0,  vt369_vtunknown_hh_vibesswap_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "<unknown>", "Vibes Retro Pocket Gamer 240-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 /*****************************************************************************
 * below are VT369 games that use BGA on sub
