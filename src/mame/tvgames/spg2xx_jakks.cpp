@@ -22,6 +22,7 @@ public:
 	void spg2xx_jakks(machine_config& config);
 	void mk(machine_config& config);
 	void spg2xx_dpma(machine_config& config);
+	void jakks_mpaco(machine_config& config);
 	void jakks_mpac(machine_config& config);
 	void jakks_rapm(machine_config& config);
 
@@ -170,7 +171,35 @@ static INPUT_PORTS_START( mk )
 	PORT_CONFSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( jak_mpaco )
+	PORT_START("P1")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1)
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1)
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1)
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Menu")
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+
+	PORT_START("P3")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PAL/NTSC flag, set to NTSC
+	PORT_BIT( 0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("DIALX") // for Pole Position, joystick can be twisted like a dial/wheel (limited?) (check range) (note, range is different to GKR unit)
+	PORT_BIT(0x03ff, 0x0000, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0x03ff)
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( jak_mpac )
+	PORT_INCLUDE( jak_mpaco )
+
+	PORT_MODIFY("P3")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::read_sda))
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( jak_spac )
 	PORT_START("P1")
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1)
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1)
@@ -186,15 +215,13 @@ static INPUT_PORTS_START( jak_mpac )
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PAL/NTSC flag, set to NTSC
 	PORT_BIT( 0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("DIALX") // for Pole Position, joystick can be twisted like a dial/wheel (limited?) (check range) (note, range is different to GKR unit)
-	PORT_BIT(0x03ff, 0x0000, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0x03ff)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( jak_rapm )
-	PORT_INCLUDE( jak_mpac )
 
-	PORT_MODIFY("DIALX") // for Pole Position, joystick can be twisted like a dial/wheel (limited?) (check range)
+static INPUT_PORTS_START( jak_rapm )
+	PORT_INCLUDE( jak_spac )
+
+	PORT_START("DIALX") // for Pole Position, joystick can be twisted like a dial/wheel (limited?) (check range)
 	PORT_BIT(0x0fff, 0x0000, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0x0fff)
 INPUT_PORTS_END
 
@@ -230,7 +257,7 @@ void jakks_state::base_config(machine_config& config)
 	m_maincpu->portc_in().set_ioport("P3");
 	m_maincpu->portc_out().set(FUNC(jakks_state::portc_w));
 
-	I2C_24C04(config, m_i2cmem, 0); // ?
+	I2C_24C04(config, m_i2cmem, 0);
 }
 
 void jakks_state::spg2xx_jakks(machine_config &config)
@@ -272,11 +299,25 @@ void jakks_state::mk(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
 }
 
+void jakks_state::jakks_mpaco(machine_config &config)
+{
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+
+	spg2xx_base(config);
+
+	m_maincpu->porta_in().set(FUNC(jakks_state::base_porta_r));
+	m_maincpu->portc_in().set_ioport("P3");
+	m_maincpu->portc_out().set(FUNC(jakks_state::portc_w));
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &jakks_state::mem_map_1m);
+	m_maincpu->adc_in<0>().set_ioport("DIALX");
+}
+
+
 void jakks_state::jakks_mpac(machine_config &config)
 {
-	base_config(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &jakks_state::mem_map_1m);
-
+	jakks_mpaco(config);
+	I2C_24C04(config, m_i2cmem, 0); 
 	m_maincpu->adc_in<0>().set_ioport("DIALX");
 }
 
@@ -309,6 +350,11 @@ ROM_START( jak_cind )
 	ROM_LOAD16_WORD_SWAP( "jakkscinderella.u5", 0x000000, 0x200000, CRC(73008a51) SHA1(89168bc2c64836daa341a6fbacb1fa63c2fef14b) )
 ROM_END
 
+ROM_START( jak_slpb )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakks_sleepingbeauty.u5", 0x000000, 0x200000, CRC(e5b20a73) SHA1(3c305c4b9265d9bbf090805daaf26ad43af54389) )
+ROM_END
+
 ROM_START( jak_supm )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "superman.u3", 0x000000, 0x400000, CRC(626bdd85) SHA1(605b3193c17f606d2de5689f045b50ac0b7ff024) )
@@ -331,6 +377,16 @@ ROM_START( jak_mpacw )
 	ROM_LOAD16_WORD_SWAP( "wirelessnamco.bin", 0x000000, 0x200000, CRC(78a318ca) SHA1(3c2601cbb023edb6a1f3d4bce686e0be1ef63eee) )
 ROM_END
 
+ROM_START( jak_mpacq )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakks_qvc7in1.u2", 0x000000, 0x200000, CRC(a0a132a0) SHA1(acb5a98dfb597151015929bdd5b6eada1764e2fe) )
+ROM_END
+
+ROM_START( jak_mpaco )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakks_mspacmanrev1.u1", 0x000000, 0x100000, CRC(de4c2262) SHA1(2a5bacdcd10ccfdb1ae792d0aaaf2d38ec936f94) )
+ROM_END
+
 ROM_START( jak_rapm )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "jakks_retroarcade.u3", 0x000000, 0x400000, CRC(f2dcb1c8) SHA1(2361b8598279bc6642ca997bbf2072a9e6ac045e) )
@@ -339,6 +395,11 @@ ROM_END
 ROM_START( jak_pacg )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "jakkspacmangold.u2", 0x000000, 0x200000, CRC(59904862) SHA1(f86a8847742fa918bdfa0fa927ec6e1f573ce31c) )
+ROM_END
+
+ROM_START( jak_spac ) // this is actually built as a gamekey, with the header text in it, sources suggest it was also going to be released as one
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakkssuperpacman.u2", 0x000000, 0x100000, CRC(490db7cc) SHA1(9b599f28b9fa8e4a502ae7a167c410d4738b8e7a) )
 ROM_END
 
 ROM_START( jak_spd3 )
@@ -388,8 +449,10 @@ CONS( 2004, jak_batm, 0, 0, spg2xx_jakks,  batman,        jakks_state, empty_ini
 CONS( 2004, jak_mk,   0, 0, mk,     mk,     jakks_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse", "Mortal Kombat (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // this is an older unit than the jak_mpac Game Key Ready set and features no GameKey branding
-CONS( 2004, jak_mpacw,0, 0, jakks_mpac, jak_mpac,   jakks_state, empty_init, "JAKKS Pacific Inc / Namco / HotGen Ltd",      "Ms. Pac-Man 7-in-1 (Wireless) (Ms. Pac-Man, Pole Position, Galaga, Xevious, Mappy, New Rally X, Bosconian) (18 AUG 2004 A)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2004, jak_mpacw, 0,         0, jakks_mpac, jak_mpac,   jakks_state, empty_init, "JAKKS Pacific Inc / Namco / HotGen Ltd",      "Ms. Pac-Man Collection 7-in-1 (JAKKS Pacific TV Game) (wireless, 18 AUG 2004 A)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2004, jak_mpacq, jak_mpacw, 0, jakks_mpac, jak_mpac,   jakks_state, empty_init, "JAKKS Pacific Inc / Namco / HotGen Ltd",      "Ms. Pac-Man Collection 7-in-1 (JAKKS Pacific TV Game) (QVC version, 12 JUL 2004 A)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
+CONS( 2004, jak_mpaco, jak_mpac,  0, jakks_mpaco, jak_mpaco,   jakks_state, empty_init, "JAKKS Pacific Inc / Namco / HotGen Ltd",      "Ms. Pac-Man Collection 5-in-1 (JAKKS Pacific TV Game) (01 APR 2004 A)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // Post-GameKey units (all of these still have GameKey references in the code even if the physical connector was no longer present on the PCB)
 
@@ -414,11 +477,15 @@ CONS( 2006, jak_spdv, 0, 0, spg2xx_jakks,  spg2xx_spdv,   jakks_state, empty_ini
 
 CONS( 2007, jak_pacg, 0, 0, spg2xx_jakks,  spg2xx_pacg,   jakks_state, empty_init, "JAKKS Pacific Inc / Namco / HotGen Ltd", "Arcade Gold featuring Pac-Man (20 APR 2007 A SKU O)", MACHINE_IMPERFECT_SOUND )
 
+CONS( 2006, jak_spac, 0, 0, spg2xx_jakks,  jak_mpac,      jakks_state, empty_init, "JAKKS Pacific Inc / Namco / HotGen Ltd", "Super Pac-Man Collection (26 JAN 2006 A SKU L)", MACHINE_IMPERFECT_SOUND )
+
 CONS( 2008, jak_rapm, 0, 0, jakks_rapm,    jak_rapm,      jakks_state, empty_init, "JAKKS Pacific Inc / Namco / HotGen Ltd", "Retro Arcade featuring Pac-Man (20 AUG 2008 A SKU N)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2007, jak_spd3, 0, 0, spg2xx_jakks,  jak_spd3,      jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Spider-Man 3 (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2007, jak_cind, 0, 0, spg2xx_jakks,  spg2xx_pacg,   jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Cinderella - Once Upon a Midnight (JAKKS Pacific TV Game) (Aug 29 2007 11:15:55)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2007, jak_slpb, 0, 0, spg2xx_jakks,  spg2xx_pacg,   jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Sleeping Beauty - Tales of Enchantment (JAKKS Pacific TV Game) (Sep 17 2007 14:45:02)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2005, jak_powr, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Power Rangers S.P.D. (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
 

@@ -46535,6 +46535,8 @@ jak_cind
 jak_dpma
 jak_hsm
 jak_mk
+jak_mpaco
+jak_mpacq
 jak_mpacw
 jak_pacg
 jak_pix
@@ -46543,6 +46545,8 @@ jak_powr
 jak_rapm
 jak_sbjd
 jak_shrk
+jak_slpb
+jak_spac
 jak_spd3
 jak_spdv
 jak_supm
