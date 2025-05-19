@@ -540,38 +540,6 @@ int nes_vt02_vt03_soc_device::calculate_real_video_address(int addr, int readtyp
 	int va34 = (addr & 0x6000) >> 13;
 	addr &= 0x1fff;
 
-	// bit of a hack to start getting the tile data we want for denv150 title screen which is 8bpp(!)
-	if (m_ppu->is_v3xx_extended_mode())
-	{
-		// denv150 ROM size is 0x1000000  ROM size  0x40000 tiles (each tile is 0x40 bytes)
-		// 8x8x8(?) tiles are tiles 0x6000+ (so at 0x180000 in ROM)
-
-		// ROM format, each byte is 1 pixel (8-bits)
-		// each line is 8 bytes (8 pixels x 8-bits)
-		// each tile is 64 bytes (8 bytes x 8 lines)
-		//int finaladdr = 0x180000; // denv150 boot screen
-		//int finaladdr = 0xb0000; // lxcmcyba, lxcmcysw boot screen 
-		//int finaladdr = 0x90000; // lxcmcypj boot screen (or 80000 first?)
-		//int finaladdr = 0x82000; // lxcmcycr, lxcmcyfz, lxcmcypp boot screen
-		//int finaladdr = 0x152000; // lxcmcydp boot screen
-		//int finaladdr = 0x80000; // lxcmcysp boot screen (vertical?!)
-		//int finaladdr = 0x20000; // lxcmc250? (shows 2 screens)
-		int finaladdr = (m_ppu->get_newmode_tilebase() << 1) * 0x1000;
-
-		int tileline = addr & 0x0007;
-		int tileplane = addr & 0x0008;
-		int tilenum = addr & 0x0ff0;
-
-		int offset = (tileline << 3) | (tileplane >> 1) | va34;
-		offset |= tilenum << 2;
-
-		int colorbits = m_ppu->get_m_read_bg4_bg3();
-
-		offset += colorbits * 0x4000;
-
-		return (finaladdr + offset + 0x0000);
-	}
-
 	/*
 	Calculating TVA17 - TVA10
 

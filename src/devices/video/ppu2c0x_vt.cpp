@@ -29,7 +29,8 @@ ppu_vt03_device::ppu_vt03_device(const machine_config& mconfig, device_type type
 	m_is_50hz(false),
 	m_read_bg(*this, 0),
 	m_read_sp(*this, 0),
-	m_read_newmode_sp(*this, 0)
+	m_read_newmode_sp(*this, 0),
+	m_read_newmode_bg(*this, 0)
 {
 }
 
@@ -733,14 +734,14 @@ void ppu_vt3xx_device::read_tile_plane_data(int address, int color)
 		m_read_bg4_bg3 = color;
 
 		m_whichpixel = 0;
-		m_planebuf[0] = m_read_bg((address & 0x1fff));
-		m_planebuf[1] = m_read_bg((address + 8) & 0x1fff);
-		m_extplanebuf[0] = m_read_bg( ((address + 0) & 0x1fff) | 0x2000 );
-		m_extplanebuf[1] = m_read_bg( ((address + 8) & 0x1fff) | 0x2000 );
-		m_extplanebuf_vt3xx_0[0] = m_read_bg( ((address + 0) & 0x1fff) | 0x4000 );
-		m_extplanebuf_vt3xx_0[1] = m_read_bg( ((address + 8) & 0x1fff) | 0x4000 );
-		m_extplanebuf_vt3xx_1[0] = m_read_bg( ((address + 0) & 0x1fff) | 0x6000 );
-		m_extplanebuf_vt3xx_1[1] = m_read_bg( ((address + 8) & 0x1fff) | 0x6000 );
+		m_planebuf[0] = m_read_newmode_bg((address & 0x1fff));
+		m_planebuf[1] = m_read_newmode_bg((address + 8) & 0x1fff);
+		m_extplanebuf[0] = m_read_newmode_bg( ((address + 0) & 0x1fff) | 0x2000 );
+		m_extplanebuf[1] = m_read_newmode_bg( ((address + 8) & 0x1fff) | 0x2000 );
+		m_extplanebuf_vt3xx_0[0] = m_read_newmode_bg( ((address + 0) & 0x1fff) | 0x4000 );
+		m_extplanebuf_vt3xx_0[1] = m_read_newmode_bg( ((address + 8) & 0x1fff) | 0x4000 );
+		m_extplanebuf_vt3xx_1[0] = m_read_newmode_bg( ((address + 0) & 0x1fff) | 0x6000 );
+		m_extplanebuf_vt3xx_1[1] = m_read_newmode_bg( ((address + 8) & 0x1fff) | 0x6000 );
 	}
 }
 
@@ -824,118 +825,123 @@ void ppu_vt3xx_device::draw_sprites(u8 *line_priority)
 		// new style sprites
 		for (int spritenum = 0x7f; spritenum >= 0x00; spritenum--)
 		{
-			int ypos = m_spriteram[0x000 + spritenum];
-			int xpos = m_spriteram[0x180 + spritenum];
-			int tilenum = m_spriteram[0x080 + spritenum];
-			tilenum |= (m_spriteram[0x100 + spritenum] & 0x1c) << 6;
-			uint8_t m_spritepatternbuf[8];
-
-			int pal = m_spriteram[0x100 + spritenum] & 0x03;
-
-			int height = 16;
-			int width = 8;
-			int bpp = 8;
-
-			if (m_newvid_1d & 0x02)
+			if (m_newvid_1e & 0x04)
 			{
-				width = 16;
-				bpp = 4;
-			}
+				int ypos = m_spriteram[0x000 + spritenum];
+				int xpos = m_spriteram[0x180 + spritenum];
+				int tilenum = m_spriteram[0x080 + spritenum];
+				tilenum |= (m_spriteram[0x100 + spritenum] & 0x1c) << 6;
+				uint8_t m_spritepatternbuf[8];
 
-			if (m_newvid_1d & 0x08)
-			{
-				pal |= (m_spriteram[0x100 + spritenum] & 0x20) >> 3;
-				if (m_spriteram[0x100 + spritenum] & 0x40)
+				int pal = m_spriteram[0x100 + spritenum] & 0x03;
+
+				int height = 16;
+				int width = 8;
+				int bpp = 8;
+
+				if (m_newvid_1d & 0x02)
 				{
-					xpos = -0x100 + xpos; // allows for partially offscreen sprites?
+					width = 16;
+					bpp = 4;
 				}
 
-				// TODO: verify
-				if (m_spriteram[0x100 + spritenum] & 0x80)
+				if (m_newvid_1d & 0x08)
 				{
-					ypos = -0x100 + ypos;
+					pal |= (m_spriteram[0x100 + spritenum] & 0x20) >> 3;
+					if (m_spriteram[0x100 + spritenum] & 0x40)
+					{
+						xpos = -0x100 + xpos; // allows for partially offscreen sprites?
+					}
+
+					// TODO: verify
+					if (m_spriteram[0x100 + spritenum] & 0x80)
+					{
+						ypos = -0x100 + ypos;
+					}
 				}
-			}
 
-			ypos++; // red5mam alignment
+				ypos++; // red5mam alignment
 
-			// if the sprite isn't visible, skip it
-			if ((ypos + height <= m_scanline) || (ypos > m_scanline))
-				continue;
+				// if the sprite isn't visible, skip it
+				if ((ypos + height <= m_scanline) || (ypos > m_scanline))
+					continue;
 
-			// compute the character's line to draw 
-			int sprite_line = m_scanline - ypos;
+				// compute the character's line to draw 
+				int sprite_line = m_scanline - ypos;
 
-			// a 16 pixel wide sprite (packed format), at 4bpp, requires 8 bytes for a single line
-			// at 16 pixels high it requires 128 bytes for a whole tile
+				// a 16 pixel wide sprite (packed format), at 4bpp, requires 8 bytes for a single line
+				// at 16 pixels high it requires 128 bytes for a whole tile
 
-			// sprites can be 8 pixels wide and 8bpp, or 16 pixels wide and 4bpp?
-			int index1;
-
-			if (bpp == 4)
-				index1 = tilenum * 128;
-			else
-				index1 = tilenum * 64; // why? a 16 wide 4bpp sprite takes up the same number of bytes as an 8 wide 8bpp sprite
-
-			int pattern_offset = index1 + sprite_line * 8;
-			pattern_offset += get_newmode_spritebase() * 0x2000;
-
-			for (int i = 0; i < 8; i++)
-			{
-				m_spritepatternbuf[i] = m_read_newmode_sp(pattern_offset + i);
-			}
-
-			for (int pixel = 0; pixel < width; pixel++)
-			{
-				u8 pixel_data;
+				// sprites can be 8 pixels wide and 8bpp, or 16 pixels wide and 4bpp?
+				int index1;
 
 				if (bpp == 4)
-				{
-					pixel_data = m_spritepatternbuf[pixel >> 1];
-					if (pixel & 1)
-						pixel_data >>= 4;
-					else
-						pixel_data &= 0xf;
-				}
+					index1 = tilenum * 128;
 				else
+					index1 = tilenum * 64; // why? a 16 wide 4bpp sprite takes up the same number of bytes as an 8 wide 8bpp sprite
+
+				int pattern_offset = index1 + sprite_line * 8;
+				pattern_offset += get_newmode_spritebase() * 0x2000;
+
+				for (int i = 0; i < 8; i++)
 				{
-					pixel_data = m_spritepatternbuf[pixel];
+					m_spritepatternbuf[i] = m_read_newmode_sp(pattern_offset + i);
 				}
 
-				if (xpos + pixel >= 0)
+				for (int pixel = 0; pixel < width; pixel++)
 				{
-					if (pixel_data)
+					u8 pixel_data;
+
+					if (bpp == 4)
 					{
-						if ((xpos + pixel) < VISIBLE_SCREEN_WIDTH)
+						pixel_data = m_spritepatternbuf[pixel >> 1];
+						if (pixel & 1)
+							pixel_data >>= 4;
+						else
+							pixel_data &= 0xf;
+					}
+					else
+					{
+						pixel_data = m_spritepatternbuf[pixel];
+					}
+
+					if (xpos + pixel >= 0)
+					{
+						if (pixel_data)
 						{
-							// has another sprite been drawn here?/
-							//if (BIT(~line_priority[sprite_xpos + pixel], 0))
+							if ((xpos + pixel) < VISIBLE_SCREEN_WIDTH)
 							{
-								uint8_t pen;
-								if (bpp == 4)
-									pen = pixel_data | pal << 4;
-								else
-									pen = pixel_data; // does pal have another meaning in 8bpp mode?
+								// has another sprite been drawn here?/
+								//if (BIT(~line_priority[sprite_xpos + pixel], 0))
+								{
+									uint8_t pen;
+									if (bpp == 4)
+										pen = pixel_data | pal << 4;
+									else
+										pen = pixel_data; // does pal have another meaning in 8bpp mode?
 
-								uint16_t pal0 = readbyte(((pen & 0xff)*2)+0x3e00);
-										 pal0 |= readbyte(((pen & 0xff)*2)+0x3e01) << 8;
+									uint16_t pal0 = readbyte(((pen & 0xff) * 2) + 0x3e00);
+									pal0 |= readbyte(((pen & 0xff) * 2) + 0x3e01) << 8;
 
-								int palb = (pal0 >> 0) & 0x1f;
-								int palg = (pal0 >> 5) & 0x1f;
-								int palr = (pal0 >> 10) & 0x1f;
+									int palb = (pal0 >> 0) & 0x1f;
+									int palg = (pal0 >> 5) & 0x1f;
+									int palr = (pal0 >> 10) & 0x1f;
 
-								rgb_t palval = rgb_t(palr<<3, palg<<3, palb<<3);
+									rgb_t palval = rgb_t(palr << 3, palg << 3, palb << 3);
 
-								m_bitmap.pix(m_scanline, xpos + pixel) = palval;
-								//line_priority[sprite_xpos + pixel] |= 0x01;
+									m_bitmap.pix(m_scanline, xpos + pixel) = palval;
+									//line_priority[sprite_xpos + pixel] |= 0x01;
+								}
 							}
 						}
 					}
 				}
 			}
-
-		}
-
+			else
+			{
+				popmessage("older sprite style\n");
+			}
+		 }
 	}
 }
 
