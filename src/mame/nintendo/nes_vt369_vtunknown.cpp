@@ -1191,27 +1191,30 @@ CONS( 200?, zonefusn,  0,         0,  vt369_vtunknown_hh_16mb,     vt369_vtunkno
 // same as above but without Jungle's Soft boot logo? model number taken from cover of manual
 CONS( 200?, sealvt,    zonefusn,  0,  vt369_vtunknown_hh_16mb,     vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "Lexibook / Sit Up Limited / Jungle's Soft", "Seal 30-in-1 (VT based, Model FN098134)",  MACHINE_NOT_WORKING )
 
-// NOT SPI roms, code start with '6a' (possibly encrypted opcode after jump from an internal bootstrap ROM?)
+// NOT SPI roms, altswap sets code starts with '6a'
 
-// these 4 sets use a different opcode scramble at least
 CONS( 201?, red5mam,  0,  0,  vt369_vtunknown_hh_altswap_32mb_4banks_red5mam, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "Red5", "Mini Arcade Machine (Red5, 'Xtra Game')", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
+
 CONS( 2016, dgun2593,  0,  0,  vt369_vtunknown_hh_altswap_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "dreamGEAR", "My Arcade Retro Arcade Machine - 300 Handheld Video Games (DGUN-2593)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
+
 CONS( 200?, gcs2mgp,   0,  0,  vt369_vtunknown_hh_altswap_16mb, vt369_vtunknown_rot, vt369_vtunknown_unk_state, empty_init, "Jungle's Soft", "Mini Game Player 48-in-1",  MACHINE_NOT_WORKING | ROT270 )
+
 // Not the same as the other 240-in-1 machine from Thumbs Up below (tup240) This one makes greater use of newer VT features with most games having sampled music, not APU sound.
 // Several of the games contained in here are buggy / broken on real hardware (see https://www.youtube.com/watch?v=-mgGNaDQ1HE )
 CONS( 201?, 240in1ar,  0,  0,  vt369_vtunknown_hh_altswap_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "Thumbs Up", "Mini Arcade Machine (Thumbs Up, 240IN1ARC)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
-
-// is one of these bad? where do they fit? the former boots, but banking is wrong (incorrect games selected, gfx corruption) the 2nd looks encrypted or bad
-CONS( 2019, unk2019hh,  0,        0,  vt369_vtunknown_hh_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "<unknown>", "unknown VTxx based GameBoy style handheld (2019 PCB)", MACHINE_NOT_WORKING )
-CONS( 2020, unk2020hh,  unk2019hh,0,  vt369_vtunknown_hh_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "<unknown>", "unknown VTxx based GameBoy style handheld (2020 PCB)", MACHINE_NOT_WORKING )
+// portable fan + famiclone combo handheld, very similar to 240in1ar
+CONS( 2020, nubsupmf,   0,      0,  vt369_vtunknown_hh_altswap_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "<unknown>", "NubSup Mini Game Fan", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 
 /*****************************************************************************
 * below are VT369? games that use flash ROM
 *****************************************************************************/
 
-// portable fan + famiclone combo handheld
-CONS( 2020, nubsupmf,   0,      0,  vt369_vtunknown_hh_altswap_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "<unknown>", "NubSup Mini Game Fan", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+// is one of these bad? where do they fit? both boot, but banking is wrong (incorrect games selected)
+// menu in unk2020hh renders using incorrect gfx too (lacks language selection screen?)
+CONS( 2019, unk2019hh,  0,        0,  vt369_vtunknown_hh_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "<unknown>", "unknown VTxx based GameBoy style handheld (2019 PCB)", MACHINE_NOT_WORKING )
+CONS( 2020, unk2020hh,  unk2019hh,0,  vt369_vtunknown_hh_8mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "<unknown>", "unknown VTxx based GameBoy style handheld (2020 PCB)", MACHINE_NOT_WORKING )
+
 
 // unknown tech level, might be scrambled as default codebank/boot vectors don't seem valid, maybe bad dump
 CONS( 201?, hhgc319,  0,        0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "<unknown>", "Handheld Game Console 319-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
