@@ -666,13 +666,6 @@ INPUT_PORTS_END
 
 // below use Flash ROMs
 
-ROM_START( dgun2561 )
-	ROM_REGION( 0x4000000, "mainrom", 0 )
-	ROM_LOAD( "dgun2561.bin", 0x00000, 0x4000000, CRC(a6e627b4) SHA1(2667d2feb02de349387f9dcfa5418e7ed3afeef6) )
-
-	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
-ROM_END
-
 ROM_START( dgun2593 )
 	ROM_REGION( 0x8000000, "mainrom", 0 )
 	ROM_LOAD( "dreamgear300.bin", 0x00000, 0x8000000, CRC(4fe0ed02) SHA1(a55590557bacca65ed9a17c5bcf0a4e5cb223126) )
@@ -696,23 +689,29 @@ ROM_START( rtvgc300fz )
 	ROM_LOAD( "jg7800fz.bin", 0x00000, 0x4000000, CRC(c9d319d2) SHA1(9d0d1435b802f63ce11b94ce54d11f4065b324cc) )
 ROM_END
 
-ROM_START( lxccatv )
+
+ROM_START( dgun2561 ) // all games selectable
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "dgun2561.bin", 0x00000, 0x4000000, CRC(a6e627b4) SHA1(2667d2feb02de349387f9dcfa5418e7ed3afeef6) )
+
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
+ROM_END
+
+ROM_START( lxccatv ) // all games selectable
 	ROM_REGION( 0x2000000, "mainrom", 0 )
 	ROM_LOAD( "120n1.bin", 0x00000, 0x2000000, CRC(6b9cf537) SHA1(44276c3ef928c76a3ecf404d2e531cd3ce5561af) )
 
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
-// The maximum address space a VT chip can see is 32MB, so these 64MB roms are actually 2 programs (there are vectors in the first half and the 2nd half)
-// there must be a bankswitch bit that switches the whole 32MB space.  Loading the 2nd half in Star Wars does actually boot straight to a game.
-ROM_START( lxcmcy )
+ROM_START( lxcmcy ) // all games selectable
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	ROM_LOAD( "lxcmcy.bin", 0x00000, 0x4000000, CRC(3f3af72c) SHA1(76127054291568fcce1431d21af71f775cfb05a6) )
 
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
-ROM_START( lxcmcysw )
+ROM_START( lxcmcysw ) // all games selectable
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	ROM_LOAD( "jl2365swr-1.u2", 0x0000000, 0x0800000, CRC(60ece391) SHA1(655de6b36ba596d873de2839522b948ccf45e006) )
 	ROM_CONTINUE(0x1000000, 0x0800000)
@@ -725,15 +724,22 @@ ROM_START( lxcmcysw )
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
-ROM_START( lxcmcyfz )
+ROM_START( lxcmcyfz ) // all games selectable
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	// sub-board was marked for 2GB capacity (A0-A26 address lines), but only address lines A0-A24 are connected to the chip
-	ROM_LOAD( "jl2365_frozen.u1", 0x00000, 0x4000000, CRC(64d4c708) SHA1(1bc2d161326ce3039ab9ba46ad62695060cfb2e1) )
+	ROM_LOAD( "jl2365_frozen.u1", 0x00000, 0x0800000, CRC(64d4c708) SHA1(1bc2d161326ce3039ab9ba46ad62695060cfb2e1) )
+	ROM_CONTINUE(0x1000000, 0x0800000)
+	ROM_CONTINUE(0x0800000, 0x0800000)
+	ROM_CONTINUE(0x1800000, 0x0800000)
+	ROM_CONTINUE(0x2000000, 0x0800000)
+	ROM_CONTINUE(0x3000000, 0x0800000)
+	ROM_CONTINUE(0x2800000, 0x0800000)
+	ROM_CONTINUE(0x3800000, 0x0800000)
 
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
-ROM_START( lxcmcydp )
+ROM_START( lxcmcydp ) // all games selectable
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	// sub-board was marked for 2GB capacity (A0-A26 address lines), but only address lines A0-A24 are connected to the chip
 	ROM_LOAD( "cyberarcade-disneyprincess.bin", 0x00000, 0x4000000, CRC(05946f81) SHA1(33eea2b70f5427e7613c836b8a08148731fac231) )
@@ -741,7 +747,7 @@ ROM_START( lxcmcydp )
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
-ROM_START( lxcmcysp )
+ROM_START( lxcmcysp ) // half the games don't work, maybe bad dump
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	// sub-board was marked for 2GB capacity (A0-A26 address lines), but only address lines A0-A24 are connected to the chip
 	ROM_LOAD( "lexibookspiderman.bin", 0x00000, 0x4000000, CRC(ef6e8847) SHA1(0012df193c52fd48595d85886fd431619c5d5e3e) )
@@ -749,29 +755,36 @@ ROM_START( lxcmcysp )
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
-ROM_START( lxcmcycr )
-	ROM_REGION( 0x4000000, "mainrom", 0 )
+ROM_START( lxcmcycr ) // all games selectable
+	ROM_REGION( 0x4000000, "mainrom", 0 ) 
 	ROM_LOAD( "lexibook cars.bin", 0x00000, 0x4000000, CRC(198fe11b) SHA1(5e35caa3fc319ec69812c187a3ec89f01749f749) )
 
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
-ROM_START( lxcmcypj )
-	ROM_REGION( 0x4000000, "mainrom", 0 )
+ROM_START( lxcmcypj ) // all games selectable
+	ROM_REGION( 0x4000000, "mainrom", 0 ) 
 	// sub-board was marked for 1GB capacity (A0-A25 address lines), but only address lines A0-A24 are connected to the chip
-	ROM_LOAD( "cob66-1g-new02.u4", 0x00000, 0x4000000, CRC(78149671) SHA1(00dab8c0919e909e910525c18142e6a195b364f8) )
+	ROM_LOAD( "cob66-1g-new02.u4", 0x00000, 0x0800000, CRC(78149671) SHA1(00dab8c0919e909e910525c18142e6a195b364f8) )
+	ROM_CONTINUE(0x1000000, 0x0800000)
+	ROM_CONTINUE(0x0800000, 0x0800000)
+	ROM_CONTINUE(0x1800000, 0x0800000)
+	ROM_CONTINUE(0x2000000, 0x0800000)
+	ROM_CONTINUE(0x3000000, 0x0800000)
+	ROM_CONTINUE(0x2800000, 0x0800000)
+	ROM_CONTINUE(0x3800000, 0x0800000)
 
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
-ROM_START( lxcmcyba )
+ROM_START( lxcmcyba ) // all games selectable
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	ROM_LOAD( "barbie.bin", 0x00000, 0x4000000, CRC(e38af9d0) SHA1(a978a4da61f007c152c70233e9628dbebb427743) )
 
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
-ROM_START( lxcmcypp )
+ROM_START( lxcmcypp ) // all games selectable
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	// marked 512mbit, possible A22 / A23 are swapped as they were marked on the board in a different way.
 	ROM_LOAD( "pawpatrol_compact.bin", 0x00000, 0x4000000, CRC(bf536762) SHA1(80dde8426a636bae33a82d779e564fa743eb3776) )
@@ -779,15 +792,22 @@ ROM_START( lxcmcypp )
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
-ROM_START( lxcmc250 )
+ROM_START( lxcmc250 ) // all games selectable
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	// sub-board was marked for 2GB capacity (A0-A26 address lines), but only address lines A0-A24 are connected to the chip
-	ROM_LOAD( "cca250in1.u1", 0x00000, 0x4000000, CRC(6ccd6ad6) SHA1(fafed339097c3d1538faa306021a8373c1b799b3) )
+	ROM_LOAD( "cca250in1.u1", 0x00000, 0x0800000, CRC(6ccd6ad6) SHA1(fafed339097c3d1538faa306021a8373c1b799b3) )
+	ROM_CONTINUE(0x1000000, 0x0800000)
+	ROM_CONTINUE(0x0800000, 0x0800000)
+	ROM_CONTINUE(0x1800000, 0x0800000)
+	ROM_CONTINUE(0x2000000, 0x0800000)
+	ROM_CONTINUE(0x3000000, 0x0800000)
+	ROM_CONTINUE(0x2800000, 0x0800000)
+	ROM_CONTINUE(0x3800000, 0x0800000)
 
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
-ROM_START( lxccminn )
+ROM_START( lxccminn ) // all games selectable
 	ROM_REGION( 0x4000000, "mainrom", 0 ) // sub-board was hardwired to only be able to address the lower 64MByte, was rewired to also dump upper half when dumping, upper half contains only garbage, hence ROM_IGNORE
 	ROM_LOAD( "minnie_lexibook.bin", 0x00000, 0x4000000, CRC(3f8e5a69) SHA1(c9f11f3e5f9b73832a191f4d1620a85c1b70f79e) )
 	ROM_IGNORE(0x4000000)
@@ -795,7 +815,7 @@ ROM_START( lxccminn )
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
-ROM_START( lxccplan )
+ROM_START( lxccplan ) // all games selectable
 	ROM_REGION( 0x4000000, "mainrom", 0 ) // sub-board was hardwired to only be able to address the lower 64MByte, was rewired to also dump upper half when dumping, upper half contains only garbage, hence ROM_IGNORE
 	ROM_LOAD( "planes_lexibook.bin", 0x00000, 0x4000000, CRC(76e1a962) SHA1(83b801c0e0e941ceb1c93e565e833b07c09412c3))
 	ROM_IGNORE(0x4000000)
@@ -850,21 +870,21 @@ ROM_START( fapocket )
 	ROM_LOAD( "s29gl512n.bin", 0x00000, 0x4000000, CRC(37d0fb06) SHA1(0146a2fae32e23b65d4032c508f0d12cedd399c3) )
 ROM_END
 
-ROM_START( zonefusn )
+ROM_START( zonefusn ) // all games selectable
 	ROM_REGION( 0x1000000, "mainrom", 0 )
 	ROM_LOAD( "fusion.bin", 0x00000, 0x1000000, CRC(240bf970) SHA1(1b82d95a252c08e52fb8da6320276574a30b60db) )
 
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
-ROM_START( sealvt )
+ROM_START( sealvt ) // all games selectable
 	ROM_REGION( 0x1000000, "mainrom", 0 )
 	ROM_LOAD( "l157-44 v02.u1", 0x00000, 0x1000000, CRC(0fabced0) SHA1(3f8cd85b12b125b01c831c9f2f2937e29c1b6205) )
 
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
-ROM_START( gcs2mgp )
+ROM_START( gcs2mgp ) // all games selectable
 	ROM_REGION( 0x2000000, "mainrom", 0 )
 	ROM_LOAD( "gcs2_v4.u3", 0x00000, 0x1000000, CRC(3b5be765) SHA1(c54f1a732d638b0ee582ca822715c9d3a3af5ef3) )
 ROM_END
@@ -1090,13 +1110,11 @@ CONS( 2017, fapocket,   0,        0,  vt369_vtunknown_fa_4x16mb, vt369_vtunknown
 
 CONS( 2012, lexi30,  0,0,  vt369_vtunknown_hh_8mb, vt369_vtunknown_rot, vt369_vtunknown_unk_state, empty_init, "Lexibook", "Arcade Center (JL1800_01)", MACHINE_NOT_WORKING | ROT270 )
 
-// don't even get to menu. very enhanced chipset, VT368/9?
-CONS( 2012, dgun2561,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "dreamGEAR", "My Arcade Portable Gaming System with 140 Games (DGUN-2561)", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
 
 CONS( 2012, lxccatv,   0,  0,  vt369_vtunknown_hh_32mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade TV - 120 in 1 (JL2370)", MACHINE_NOT_WORKING ) // 32MByte ROM, 2011 on case, 2012 on PCB
+
 // All Lexibook units below have 64Mbyte ROMs, must be externally banked, or different addressing scheme
 CONS( 2012, lxcmcysp,  0,  0,  vt369_vtunknown_hh_32mb_2banks_lexi, vt369_vtunknown_rot, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Marvel Ultimate Spider-Man (120-in-1)", MACHINE_NOT_WORKING | ROT270) // renders vertically, but screen stretches it to horizontal
-CONS( 200?, lxcmcy,    0,  0,  vt369_vtunknown_hh_32mb_2banks_lexi, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade", MACHINE_NOT_WORKING )
 CONS( 200?, lxcmc250,  0,  0,  vt369_vtunknown_hh_32mb_2banks_lexi, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - 250-in-1 (JL2375)", MACHINE_NOT_WORKING )
 CONS( 200?, lxcmcysw,  0,  0,  vt369_vtunknown_hh_32mb_2banks_lexi, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Star Wars Rebels", MACHINE_NOT_WORKING )
 CONS( 200?, lxcmcyfz,  0,  0,  vt369_vtunknown_hh_32mb_2banks_lexi, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Frozen", MACHINE_NOT_WORKING )
@@ -1109,7 +1127,9 @@ CONS( 2018, lxcmcypp,  0,  0,  vt369_vtunknown_hh_32mb_2banks_lexi, vt369_vtunkn
 
 CONS( 200?, lxccminn,  0,  0,  vt369_vtunknown_hh_32mb_2banks_lexi, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Console Colour - Minnie Mouse", MACHINE_NOT_WORKING )
 CONS( 200?, lxccplan,  0,  0,  vt369_vtunknown_hh_32mb_2banks_lexi, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Console Colour - Disney's Planes", MACHINE_NOT_WORKING )
-
+// similar menus to the lxccminn/lxccplan sets
+CONS( 200?, lxcmcy,    0,  0,  vt369_vtunknown_hh_32mb_2banks_lexi, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Compact Cyber Arcade", MACHINE_NOT_WORKING )
+CONS( 2012, dgun2561,  0,  0,  vt369_vtunknown_hh_32mb_2banks_lexi, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init, "dreamGEAR", "My Arcade Portable Gaming System with 140 Games (DGUN-2561)", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
 
 // GB-NO13-Main-VT389-2 on PCBs - uses higher resolution mode (twice usual h-res?)
 CONS( 2016, rtvgc300,  0,  0,  vt369_vtunknown_hh_16mb, vt369_vtunknown, vt369_vtunknown_unk_state, empty_init,    "Lexibook", "Retro TV Game Console - 300 Games", MACHINE_NOT_WORKING )
