@@ -1190,7 +1190,7 @@ void sound_manager::config_load(config_type cfg_type, config_level cfg_level, ut
 		}
 
 		// All levels
-		if (!machine().options().volume()) {
+		if(!machine().options().volume()) {
 			const util::xml::data_node *lv_node = parentnode->get_child("master_volume");
 			if(lv_node)
 				m_master_gain = lv_node->get_attribute_float("gain", 1.0);
