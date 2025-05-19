@@ -4,8 +4,16 @@
 
     Driver for Casio PV-1000
 
-TODO: This lists problems with Mame's emulation
-      https://obscure.nesdev.org/wiki/Casio_PV-1000/Emulation
+    TODO: Mame incorrectly:
+    -has an incorrect joystick response
+    -assumes 2KB system RAM is only accessible from $B800-$BFFF
+    -doesn't support raster effects
+    -doesn't support more than two pages ($0000 and $2000) of pattern ROM
+    -doesn't support moving the tile map address at all
+    -doesn't support moving pattern ram at all
+    -doesn't support banking the pattern data over the entire memory region,
+     not just over the entire cartridge
+
 
 ***************************************************************************/
 
