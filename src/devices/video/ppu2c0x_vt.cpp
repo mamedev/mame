@@ -891,7 +891,7 @@ void ppu_vt3xx_device::draw_sprites(u8 *line_priority)
 					}
 				}
 
-				ypos++; // red5mam alignment
+				//ypos++; // red5mam menu alignment, probably not, others disagree
 
 				// if the sprite isn't visible, skip it
 				if ((ypos + height <= m_scanline) || (ypos > m_scanline))
