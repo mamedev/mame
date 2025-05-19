@@ -713,28 +713,22 @@ void ppu_vt3xx_device::write_204x_screenregs(offs_t offset, uint8_t data)
 	}
 }
 
+// vt3xx tile modes are no longer planar, but the tile code provides ROM offsets that
+// would be, this converts them to offsets that give us the data we want.
 offs_t ppu_vt3xx_device::recalculate_offsets_8x8x4packed_tile(int address, int va34)
 {
 	int finaladdr = get_newmode_tilebase() * 0x2000;
 	int tileline = address & 0x0007;
 	int tileplane = address & 0x0008;
 	int tilenum = address & 0x0ff0;
+	int colorbits = get_m_read_bg4_bg3();
 	int finaloffset = (tilenum << 1) | (tileline << 2) | (tileplane >> 2) | va34;
+	finaloffset += colorbits * 0x2000;
 	return finaladdr + finaloffset;
 }
 
 offs_t ppu_vt3xx_device::recalculate_offsets_8x8x8packed_tile(int address, int va34)
 {
-	// format is no longer planar
-
-	// old format 8 bits (1 byte) = 8 pixels of 1 plane (one line) of tile
-	// +1 bytes = next row
-	// +8 bytes = next plane
-	// +16 byte = next tile (or +32 bytes in ROM in 4bpp mode, but we signal this by setting 0x2000)
-
-	// new format
-	// one byte = 4 planes, 2 pixels
-
 	int finaladdr = get_newmode_tilebase() * 0x2000;
 	int colorbits = get_m_read_bg4_bg3();
 	int tileline = address & 0x0007;
