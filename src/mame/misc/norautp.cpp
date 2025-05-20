@@ -4817,11 +4817,38 @@ ROM_START( gtipokrba )  //
 	ROM_LOAD( "n82s129n.u51", 0x0000, 0x0100, CRC(812dc1f1) SHA1(b2af33ff36f2eca2f782bc2239bc9e54c2564f6a) )
 ROM_END
 
-//  PCB etched: "Games of Tennessee 88"
+/*
+  GTI Poker, encrypted.
+  PCB etched: "Games of Tennessee 88"
+
+  Daughterboard in pos u18 with a 2732a EPROM + PAL20X4ACNS
+
+  Etched:  GTI
+           CIR rev a
+
+  Diagram/schematics:
+
+                2732A                               PAL20X4ACNS                       CONNECTOR
+             .----v----.                             .---v---.                       .----v----.
+   CON(01)---|01     24|--VCC               CON(20)|-|01   24|--VCC        2732(01)--|01     24|--VCC
+   CON(02)---|02     23|-----------------. 2732(20)|-|02   23|--           2732(02)--|02     23|--2732(23) & PAL(03)
+   CON(03)---|03     22|---------------. '-----------|03   22|--CON(16)    2732(03)--|03     22|--2732(22) & PAL(04)
+   CON(05)---|04     21|-------------. '-------------|04   21|--CON(17)    2732(05)--|04     21|--2732(21) & PAL(05)
+   CON(04)---|05     20|--PAL(01-02) '---------------|05   20|--           2732(04)--|05     20|--2732(20) & PAL(01-02)
+   CON(08)---|06     19|----------.        2732(10)--|06   19|--           2732(07)--|06     19|--2732(19) & PAL(07)
+   CON(06)---|07     18|--PAL(18) '------------------|07   18|--2732(18)   2732(08)--|07     18|--/CE
+   CON(07)---|08     17|-----------------------------|08   17|--           2732(06)--|08     17|--PAL(21)
+   CON(09)---|09     16|-----------------------------|09   16|--CON(15)    2732(09)--|09     16|--PAL(22)
+   PAL(06)---|10     15|-----------------------------|10   15|-----------------------|10     15|--PAL(16)
+   CON(11)---|11     14|--CON(14)          2732(13)--|11   14|--CON(13)    2732(11)--|11     14|--2732(14)
+       GND---|12     13|--PAL(11)               GND--|12   13|--GND             GND--|12     13|--PAL(14)
+             '---------'                             '-------'                       '---------'
+
+*/
 ROM_START( gtipokrc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "x13_2732a.u12",       0x0000, 0x1000, CRC(cee5b03c) SHA1(38a5885b4a95d7b3fa0dd099c160a5e4d854e00a) )
-	ROM_LOAD( "88_x13_2732a_db.u18", 0x1000, 0x1000, CRC(f44cce3a) SHA1(f3e2a2a164d05a7ef121a7f0e872841553b6b2fe) )
+	ROM_LOAD( "88_x13_2732a_db.u18", 0x1000, 0x1000, CRC(f44cce3a) SHA1(f3e2a2a164d05a7ef121a7f0e872841553b6b2fe) )  // encrypted
 
 	ROM_REGION( 0x1000, "gfx",0 )
 	ROM_LOAD( "gti_u31_2732a.u31", 0x0000, 0x1000, CRC(47e63fd2) SHA1(27bd1af9c910afb4e9955842f781954d5e8785d4) )
@@ -6659,7 +6686,7 @@ GAMEL( 1983, gtipoker,  0,        dphl,      gtipoker,  norautp_state, empty_ini
 GAME(  1983, gtipokra,  0,        gtipkra,   gtipoker,  norautp_state, empty_init, ROT0, "Game Technology Inc.",        "GTI Poker (SMS hardware)",          MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )  // second ROM 1000-1fff encrypted
 GAMEL( 1983, gtipokrb,  gtipoker, dphl,      gtipoker,  norautp_state, empty_init, ROT0, "Game Technology Inc.",        "GTI Double or Nothing Draw Poker (Cleco)",   0,                 layout_noraut10 )  // working input under test
 GAMEL( 1983, gtipokrba, gtipoker, dphl,      gtipoker,  norautp_state, empty_init, ROT0, "Game Technology Inc.",        "GTI Double or Nothing Draw Poker (GoT PCB, set 1)", 0,          layout_noraut10 )  // working input under test
-GAMEL( 1983, gtipokrc,  gtipoker, dphl,      gtipoker,  norautp_state, empty_init, ROT0, "Game Technology Inc.",        "GTI Double or Nothing Draw Poker (GoT PCB, set 2)", MACHINE_NOT_WORKING, layout_noraut10 )
+GAMEL( 1983, gtipokrc,  gtipoker, dphl,      gtipoker,  norautp_state, empty_init, ROT0, "Game Technology Inc.",        "GTI Double or Nothing Draw Poker (GoT PCB, set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_noraut10 )  // encrypted
 
 GAMEL( 1983, smshilo,   0,        dphl,      dphl,      norautp_state, empty_init, ROT0, "SMS Manufacturing Corp.",     "HI-LO Double Up Joker Poker (set 1)", 0,                          layout_noraut10 )
 GAMEL( 1983, smshiloa,  0,        dphl,      dphl,      norautp_state, empty_init, ROT0, "SMS Manufacturing Corp.",     "HI-LO Double Up Joker Poker (set 2)", MACHINE_NOT_WORKING,        layout_noraut10 )
@@ -6672,12 +6699,12 @@ GAMEL( 198?, dphlunkb,  0,        dphl,      dphla,     norautp_state, empty_ini
 GAME(  1989, pokplus,   0,        dphlxtnd,  norautp,   norautp_state, empty_init, ROT0, "LJF Corporation",             "Poker Plus 6 Cards (set 1)",        MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )  // encriypted
 GAME(  1989, pokplusa,  pokplus,  dphlxtnd,  norautp,   norautp_state, empty_init, ROT0, "LJF Corporation",             "Poker Plus 6 Cards (set 2)",        MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )  // encriypted
 GAME(  1989, pokplusb,  pokplus,  dphlxtnd,  norautp,   norautp_state, empty_init, ROT0, "LJF Corporation",             "Poker Plus 6 Cards (set 3)",        MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )  // encriypted
-GAME( 1984, krampcb3,  0,        krampcb4,  dphl,      norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",     "System 3000 Kramergame Poker (encrypted set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )  // encriypted
-GAME( 1984, krampcb4,  0,        krampcb4,  dphl,      norautp_state, init_kram4, ROT0, "M.Kramer Manufacturing.",     "System 3000 Kramergame Poker (encrypted set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )  // encriypted
-GAME( 1984, krampcb6,  0,        krampcb4,  dphl,      norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",     "System 3000 Kramergame Poker (encrypted set 3)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )  // encriypted
-GAME( 1984, krampcb7,  0,        krampcb4,  dphl,      norautp_state, init_kram4, ROT0, "M.Kramer Manufacturing.",     "System 3000 Kramergame Poker (encrypted set 4)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )  // encriypted
-GAME( 1984, krampcb8,  0,        krampcb4,  dphl,      norautp_state, init_kram4, ROT0, "M.Kramer Manufacturing.",     "System 3000 Kramergame Poker (encrypted set 5)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )  // encriypted
-GAME( 198?, krampcb9,  0,        krampcb4,  dphl,      norautp_state, init_kram4, ROT0, "M.Kramer Manufacturing.",     "unknown Kramer Poker (encrypted set 1)",         MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )  // encriypted
+GAME(  1984, krampcb3,  0,        krampcb4,  dphl,      norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",     "System 3000 Kramergame Poker (encrypted set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )  // encriypted
+GAME(  1984, krampcb4,  0,        krampcb4,  dphl,      norautp_state, init_kram4, ROT0, "M.Kramer Manufacturing.",     "System 3000 Kramergame Poker (encrypted set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )  // encriypted
+GAME(  1984, krampcb6,  0,        krampcb4,  dphl,      norautp_state, empty_init, ROT0, "M.Kramer Manufacturing.",     "System 3000 Kramergame Poker (encrypted set 3)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )  // encriypted
+GAME(  1984, krampcb7,  0,        krampcb4,  dphl,      norautp_state, init_kram4, ROT0, "M.Kramer Manufacturing.",     "System 3000 Kramergame Poker (encrypted set 4)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )  // encriypted
+GAME(  1984, krampcb8,  0,        krampcb4,  dphl,      norautp_state, init_kram4, ROT0, "M.Kramer Manufacturing.",     "System 3000 Kramergame Poker (encrypted set 5)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )  // encriypted
+GAME(  198?, krampcb9,  0,        krampcb4,  dphl,      norautp_state, init_kram4, ROT0, "M.Kramer Manufacturing.",     "unknown Kramer Poker (encrypted)",         MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )  // encriypted
 
 
 // The following ones also have a custom 68705 MCU
