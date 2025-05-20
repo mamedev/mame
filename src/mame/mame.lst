@@ -32035,6 +32035,8 @@ fastdrwp
 gtipoker
 gtipokra
 gtipokrb
+gtipokrba
+gtipokrc
 hilokimb
 kimbldhl
 kimblz80
@@ -32044,6 +32046,8 @@ krampcb4
 krampcb5
 krampcb6
 krampcb7
+krampcb8
+krampcb9
 mainline
 ndxron10
 newhilop
@@ -32071,11 +32075,14 @@ pokplus
 pokplusa
 pokplusb
 smshilo
+smshiloa
 ssjkrpkr
 sureshoto
 tpoker2
 tpoker2a
 tpoker2b
+tpoker2c
+tpoker2d
 winbnk88
 
 @source:misc/notechan.cpp
