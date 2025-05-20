@@ -1318,16 +1318,9 @@ void ppu2c0x_device::write(offs_t offset, u8 data)
 		if (!m_vidaccess_callback_proc.isnull())
 			data = m_vidaccess_callback_proc(tempAddr, data);
 
-		/* see if it's on the chargen portion */
-		if (tempAddr < 0x2000)
-		{
-			/* store the data */
-			writebyte(tempAddr, data);
-		}
-		else // this codepath is identical?
-		{
-			writebyte(tempAddr, data);
-		}
+		/* store the data */
+		writebyte(tempAddr, data);
+
 		/* increment the address */
 		m_videomem_addr += m_add;
 	}
@@ -1404,7 +1397,6 @@ void ppu2c0x_device::spriteram_dma(address_space& space, const u8 page)
 {
 	const int address = page << 8;
 
-	// use 0x100 instead of m_spriteramsize
 	for (int i = 0; i < 0x100; i++)
 	{
 		const u8 spriteData = space.read_byte(address + i);

@@ -255,16 +255,14 @@ void ppu_vt03_device::device_reset()
 	m_newvid_1d = 0x00;
 	m_newvid_1e = 0x00;
 
-	m_newvid_2x[0] = m_newvid_2x[1] = m_newvid_2x[2] = m_newvid_2x[3] = 0x00;
+	for (int i = 0; i < 4; i++)
+		m_newvid_2x[i] = 0x00;
 }
-
 
 uint8_t ppu_vt03_device::get_m_read_bg4_bg3()
 {
 	return m_read_bg4_bg3;
 }
-
-
 
 void ppu_vt03_device::read_sprite_plane_data(int address)
 {
@@ -340,8 +338,6 @@ void ppu_vt03_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, u
 				const uint8_t pen = ((pixel_data >> 5) & 0x03) + (4 * color);
 				draw_tile_pixel_inner(pen, &bitmap.pix(m_scanline, sprite_xpos + pixel + 8));
 			}
-			//ppu2c0x_device::draw_sprite_pixel(sprite_xpos, color, pixel, pixel_data & 0x03, bitmap);
-			//ppu2c0x_device::draw_sprite_pixel(sprite_xpos, color, pixel + 8, (pixel_data >> 5) & 0x03, bitmap);
 		}
 	}
 	else
@@ -411,7 +407,6 @@ void ppu_vt03_device::shift_tile_plane_data(uint8_t& pix)
 
 	m_whichpixel++;
 }
-
 
 void ppu_vt03_device::draw_back_pen(uint32_t* dst, int back_pen)
 {
@@ -552,7 +547,6 @@ uint8_t ppu_vt03_device::get_speva2_speva0()
 	return m_extra_sprite_bits;
 }
 
-
 void ppu_vt03_device::extended_modes_enable_w(offs_t offset, uint8_t data)
 {
 	/*  7   : COLCOMP
@@ -583,13 +577,11 @@ void ppu_vt03_device::videobank0_extra_w(offs_t offset, uint8_t data) { m_videob
 /* 201e read gun 2 read x (older VT chipsets) */
 /* 201f read gun 2 read y (older VT chipsets) */
 
-
 ppu_vt3xx_device::ppu_vt3xx_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
 	ppu_vt03_device(mconfig, PPU_VT3XX, tag, owner, clock)
 {
 	m_spriteramsize = 0x200;
 }
-
 
 void ppu_vt3xx_device::device_start()
 {
@@ -769,19 +761,6 @@ void ppu_vt3xx_device::read_tile_plane_data(int address, int color)
 			m_extplanebuf[0] = m_read_newmode_bg(recalculate_offsets_8x8x4packed_tile((address + 0) & 0x1fff, 1));
 			m_extplanebuf[1] = m_read_newmode_bg(recalculate_offsets_8x8x4packed_tile((address + 8) & 0x1fff, 1));
 		}
-	}
-}
-
-void ppu_vt3xx_device::draw_tile_pixel(uint8_t pix, int color, uint32_t back_pen, uint32_t*& dest)
-{
-	if (!m_newvid_1e)
-	{
-		ppu_vt03_device::draw_tile_pixel(pix, color, back_pen, dest);
-	}
-	else
-	{
-		// extended modes
-		ppu_vt03_device::draw_tile_pixel(pix, color, back_pen, dest);
 	}
 }
 
@@ -1108,18 +1087,5 @@ void ppu_vt3xx_device::write_to_spriteram_with_increment(uint8_t data)
 		m_regs[PPU_SPRITE_ADDRESS] = (m_regs[PPU_SPRITE_ADDRESS] + 1) & 0xff;
 		if (m_regs[PPU_SPRITE_ADDRESS] == 0x00)
 			m_2008_spritehigh ^= 0x1;
-	}
-}
-
-void ppu_vt3xx_device::draw_back_pen(uint32_t* dst, int back_pen)
-{
-	if (!m_newvid_1e)
-	{
-		ppu_vt03_device::draw_back_pen(dst, back_pen);
-	}
-	else
-	{
-		// extended modes
-		ppu_vt03_device::draw_back_pen(dst, back_pen);
 	}
 }

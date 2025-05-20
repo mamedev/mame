@@ -11,7 +11,7 @@ rts_imp     adc_idx     vtadcx_aba     rra_idx     nop_zpg     adc_zpg     ror_z
 bvs_rel     adc_idy     kil_non     rra_idy     nop_zpx     adc_zpx     ror_zpx     rra_zpx     sei_imp     adc_aby     vtgetdbk_imp  rra_aby     nop_abx     adc_abx     ror_abx     rra_abx
 nop_imm     sta_idx     nop_imm     sax_idx     sty_zpg     sta_zpg     stx_zpg     sax_zpg     dey_imp     nop_imm     txa_imp     ane_imm     sty_aba     sta_aba     stx_aba     sax_aba
 bcc_rel     sta_idy     kil_non     sha_idy     sty_zpx     sta_zpx     stx_zpy     sax_zpy     tya_imp     sta_aby     txs_imp     shs_aby     shy_abx     sta_abx     shx_aby     sha_aby
-ldy_imm     lda_idx     ldx_imm     lax_idx     ldy_zpg     lda_zpg     ldx_zpg     vtldabank2_zpy    tay_imp     lda_imm     tax_imp     lxa_imm     ldy_aba     lda_aba     ldx_aba     lax_aba
+ldy_imm     lda_idx     ldx_imm     lax_idx     ldy_zpg     lda_zpg     ldx_zpg     vtldabank_zpy    tay_imp     lda_imm     tax_imp     lxa_imm     ldy_aba     lda_aba     ldx_aba     lax_aba
 bcs_rel     lda_idy     kil_non     lax_idy     ldy_zpx     lda_zpx     ldx_zpy     lax_zpy     clv_imp     lda_aby     tsx_imp     las_aby     ldy_abx     lda_abx     ldx_aby     vtldabank_abx
 cpy_imm     cmp_idx     phx_vt_imp  dcp_idx     cpy_zpg     cmp_zpg     dec_zpg     dcp_zpg     iny_imp     cmp_imm     dex_imp     sbx_imm     cpy_aba     cmp_aba     dec_aba     dcp_aba
 bne_rel     cmp_idy     phy_vt_imp  dcp_idy     nop_zpx     cmp_zpx     dec_zpx     dcp_zpx     cld_imp     cmp_aby     nop_imp     dcp_aby     nop_abx     cmp_abx     dec_abx     dcp_abx

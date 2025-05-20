@@ -49,7 +49,7 @@ vtldabank_abx
 	set_nz(A);
 	prefetch();
 
-vtldabank2_zpy
+vtldabank_zpy
 	TMP = read_pc();
 	PC++;
 	A = m_extdata_space->read_byte(read(uint8_t(TMP+Y)));

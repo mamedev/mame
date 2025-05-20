@@ -179,9 +179,7 @@ protected:
 
 private:
 	virtual void read_tile_plane_data(int address, int color) override;
-	virtual void draw_tile_pixel(uint8_t pix, int color, uint32_t back_pen, uint32_t*& dest) override;
 	virtual void shift_tile_plane_data(uint8_t& pix) override;
-	virtual void draw_back_pen(uint32_t* dst, int back_pen) override;
 	virtual void draw_sprites(u8 *line_priority) override;
 	uint8_t vt3xx_palette_r(offs_t offset);
 	void vt3xx_palette_w(offs_t offset, uint8_t da0ta);
