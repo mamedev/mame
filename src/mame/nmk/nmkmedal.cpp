@@ -159,10 +159,10 @@ public:
 		, m_oki(*this, "oki")
 	{ }
 
-	void trocana(machine_config &config);
+	void trocana(machine_config &config) ATTR_COLD;
 
 private:
-	void adpcm_control_w(u8 data) ATTR_COLD;
+	void adpcm_control_w(u8 data);
 
 	void mem_map(address_map &map) ATTR_COLD;
 

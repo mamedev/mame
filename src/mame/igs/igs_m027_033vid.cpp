@@ -17,7 +17,6 @@ TODO:
  - IGS 033 appears to encapsulate the behavior of the video/interface chip found in igspoker.cpp
    so could be turned into a device, possibly shared
  - verify possibly incomplete inputs
- - lamps / layout
 */
 
 #include "emu.h"
@@ -108,6 +107,7 @@ private:
 	u32 external_rom_r(offs_t offset);
 	void xor_table_w(offs_t offset, u8 data);
 
+	void counters_w(u8 data);
 	void out_port_w(u8 data);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -171,6 +171,17 @@ void igs_m027_033vid_state::bg_attr_videoram_w(offs_t offset, u32 data, u32 mem_
 	m_bg_tilemap->mark_tile_dirty((offset * 4) + 1);
 	m_bg_tilemap->mark_tile_dirty((offset * 4) + 2);
 	m_bg_tilemap->mark_tile_dirty((offset * 4) + 3);
+}
+
+void igs_m027_033vid_state::counters_w(u8 data)
+{
+	if (data & 0x0f)
+		logerror("%s PPI out port C w: %02X\n", machine().describe_context(), data);
+
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 7)); // COIN1
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 5)); // COIN2 (or KEYIN?)
+	machine().bookkeeping().coin_counter_w(2, BIT(data, 6)); // PAYOUT
+	machine().bookkeeping().coin_counter_w(3, BIT(data, 4)); // KEYOUT
 }
 
 void igs_m027_033vid_state::out_port_w(u8 data)
@@ -387,10 +398,10 @@ void igs_m027_033vid_state::m027_033vid(machine_config &config)
 	ppi.in_pa_callback().set_ioport("IN0");
 	ppi.in_pb_callback().set_ioport("IN1");
 	ppi.in_pc_callback().set_ioport("IN2");
-	// the out ports seem unused
+	// A and B out ports seem unused
 	ppi.out_pa_callback().set([this] (u8 data) { LOGPORTS("%s: PPI port A write %02x\n", machine().describe_context(), data); });
 	ppi.out_pb_callback().set([this] (u8 data) { LOGPORTS("%s: PPI port B write %02x\n", machine().describe_context(), data); });
-	ppi.out_pc_callback().set([this] (u8 data) { LOGPORTS("%s: PPI port C write %02x\n", machine().describe_context(), data); });
+	ppi.out_pc_callback().set(FUNC(igs_m027_033vid_state::counters_w));
 
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 

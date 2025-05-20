@@ -84,7 +84,7 @@ private:
 	std::map<uint32_t, stream_info> m_streams;
 
 	uint32_t m_stream_id;
-	int m_audio_latency;
+	float m_audio_latency;
 
 	int stream_callback(stream_info *stream, const void *input, void *output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags);
 	static int s_stream_callback(const void *input, void *output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void *userData);
@@ -127,8 +127,10 @@ int sound_pa::init(osd_interface &osd, osd_options const &options)
 	};
 
 	PaError err = Pa_Initialize();
-	if(err)
+	if(err) {
+		osd_printf_error("PortAudio error: %s\n", Pa_GetErrorText(err));
 		return 1;
+	}
 
 	m_info.m_generation = 1;
 	m_info.m_nodes.resize(Pa_GetDeviceCount());
@@ -191,7 +193,7 @@ uint32_t sound_pa::stream_sink_open(uint32_t node, std::string name, uint32_t ra
 	op.device = node - 1;
 	op.channelCount = m_info.m_nodes[node-1].m_sinks;
 	op.sampleFormat = paInt16;
-	op.suggestedLatency = (m_audio_latency > 0) ? (m_audio_latency / 1000.0) : Pa_GetDeviceInfo(node - 1)->defaultLowOutputLatency;
+	op.suggestedLatency = (m_audio_latency > 0.0f) ? m_audio_latency : Pa_GetDeviceInfo(node - 1)->defaultLowOutputLatency;
 	op.hostApiSpecificStreamInfo = nullptr;
 
 	PaError err = Pa_OpenStream(&si->second.m_stream, nullptr, &op, rate, paFramesPerBufferUnspecified, 0, s_stream_callback, &si->second);
@@ -200,6 +202,7 @@ uint32_t sound_pa::stream_sink_open(uint32_t node, std::string name, uint32_t ra
 	if(!err)
 		err = Pa_StartStream(si->second.m_stream);
 	if(err) {
+		osd_printf_error("PortAudio error: %s: %s\n", m_info.m_nodes[node-1].m_name, Pa_GetErrorText(err));
 		m_streams.erase(si);
 		return 0;
 	}
@@ -219,7 +222,7 @@ uint32_t sound_pa::stream_source_open(uint32_t node, std::string name, uint32_t 
 	ip.device = node - 1;
 	ip.channelCount = m_info.m_nodes[node-1].m_sources;
 	ip.sampleFormat = paInt16;
-	ip.suggestedLatency = (m_audio_latency > 0) ? (m_audio_latency / 1000.0) : Pa_GetDeviceInfo(node - 1)->defaultLowInputLatency;
+	ip.suggestedLatency = (m_audio_latency > 0.0f) ? m_audio_latency : Pa_GetDeviceInfo(node - 1)->defaultLowInputLatency;
 	ip.hostApiSpecificStreamInfo = nullptr;
 
 	PaError err = Pa_OpenStream(&si->second.m_stream, &ip, nullptr, rate, paFramesPerBufferUnspecified, 0, s_stream_callback, &si->second);
@@ -227,8 +230,8 @@ uint32_t sound_pa::stream_source_open(uint32_t node, std::string name, uint32_t 
 		err = Pa_SetStreamFinishedCallback(si->second.m_stream, s_stream_finished_callback);
 	if(!err)
 		err = Pa_StartStream(si->second.m_stream);
-
 	if(err) {
+		osd_printf_error("PortAudio error: %s: %s\n", m_info.m_nodes[node-1].m_name, Pa_GetErrorText(err));
 		m_streams.erase(si);
 		return 0;
 	}
