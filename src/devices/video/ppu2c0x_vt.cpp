@@ -29,8 +29,7 @@ ppu_vt03_device::ppu_vt03_device(const machine_config& mconfig, device_type type
 	m_is_50hz(false),
 	m_read_bg(*this, 0),
 	m_read_sp(*this, 0),
-	m_read_newmode_sp(*this, 0),
-	m_read_newmode_bg(*this, 0)
+	m_read_onespace_with_relative(*this, 0)
 {
 }
 
@@ -79,9 +78,9 @@ uint8_t ppu_vt03_device::videobank0_3_r(offs_t offset) { return m_videobank0[0x3
 uint8_t ppu_vt03_device::videobank0_4_r(offs_t offset) { return m_videobank0[0x4]; }
 uint8_t ppu_vt03_device::videobank0_5_r(offs_t offset) { return m_videobank0[0x5]; }
 uint8_t ppu_vt03_device::videobank1_r(offs_t offset) { return m_videobank1; }
-uint8_t ppu_vt03_device::read_2019(offs_t offset) { return 0x00; } // unused?
+uint8_t ppu_vt03_device::unk_2019_r(offs_t offset) { return 0x00; } // unused?
 uint8_t ppu_vt03_device::videobank0_extra_r(offs_t offset) { return m_videobank0_extra; }
-uint8_t ppu_vt03_device::read_201b(offs_t offset) { return 0x00; } // unused?
+uint8_t ppu_vt03_device::unk_201b_r(offs_t offset) { return 0x00; } // unused?
 uint8_t ppu_vt03_device::gun_x_r(offs_t offset) { return 0x00; }
 uint8_t ppu_vt03_device::gun_y_r(offs_t offset) { return 0x00; }
 uint8_t ppu_vt03_device::gun2_x_r(offs_t offset) { return 0x00; }
@@ -208,7 +207,6 @@ void ppu_vt03_device::device_start()
 
 	save_item(NAME(m_palette_ram));
 	save_item(NAME(m_read_bg4_bg3));
-	save_item(NAME(m_extplanebuf));
 	save_item(NAME(m_extra_sprite_bits));
 	save_item(NAME(m_videobank0));
 	save_item(NAME(m_videobank1));
@@ -225,7 +223,7 @@ void ppu_vt03_device::device_start()
 	save_item(NAME(m_newvid_1c));
 	save_item(NAME(m_newvid_1d));
 	save_item(NAME(m_newvid_1e));
-	save_item(NAME(m_newvid_2x));
+	save_item(NAME(m_tilebases_2x));
 }
 
 void ppu_vt03_device::device_reset()
@@ -256,7 +254,7 @@ void ppu_vt03_device::device_reset()
 	m_newvid_1e = 0x00;
 
 	for (int i = 0; i < 4; i++)
-		m_newvid_2x[i] = 0x00;
+		m_tilebases_2x[i] = 0x00;
 }
 
 uint8_t ppu_vt03_device::get_m_read_bg4_bg3()
@@ -273,8 +271,8 @@ void ppu_vt03_device::read_sprite_plane_data(int address)
 
 	if (is4bpp)
 	{
-		m_extplanebuf[0] = m_read_sp(((address + 0) & 0x1fff)|0x2000);
-		m_extplanebuf[1] = m_read_sp(((address + 8) & 0x1fff)|0x2000);
+		m_planebuf[2] = m_read_sp(((address + 0) & 0x1fff)|0x2000);
+		m_planebuf[3] = m_read_sp(((address + 8) & 0x1fff)|0x2000);
 	}
 }
 
@@ -290,9 +288,9 @@ void ppu_vt03_device::make_sprite_pixel_data(uint8_t& pixel_data, bool flipx)
 		if (flipx)
 		{
 			// yes, shift by 5 and 6 because of the way the palette is arranged in RAM
-			pixel_data |= (((m_extplanebuf[0] & 1) << 5) | ((m_extplanebuf[1] & 1) << 6));
-			m_extplanebuf[0] = m_extplanebuf[0] >> 1;
-			m_extplanebuf[1] = m_extplanebuf[1] >> 1;
+			pixel_data |= (((m_planebuf[2] & 1) << 5) | ((m_planebuf[3] & 1) << 6));
+			m_planebuf[2] = m_planebuf[2] >> 1;
+			m_planebuf[3] = m_planebuf[3] >> 1;
 
 			if (is16pix)
 			{
@@ -303,9 +301,9 @@ void ppu_vt03_device::make_sprite_pixel_data(uint8_t& pixel_data, bool flipx)
 		}
 		else
 		{
-			pixel_data |= (((m_extplanebuf[0] >> 7) & 1) << 5) | (((m_extplanebuf[1] >> 7) & 1) << 6);
-			m_extplanebuf[0] = m_extplanebuf[0] << 1;
-			m_extplanebuf[1] = m_extplanebuf[1] << 1;
+			pixel_data |= (((m_planebuf[2] >> 7) & 1) << 5) | (((m_planebuf[3] >> 7) & 1) << 6);
+			m_planebuf[2] = m_planebuf[2] << 1;
+			m_planebuf[3] = m_planebuf[3] << 1;
 		}
 	}
 }
@@ -360,8 +358,8 @@ void ppu_vt03_device::read_tile_plane_data(int address, int color)
 	{
 		m_planebuf[0] = m_read_bg( (address + 0) & 0x1fff );
 		m_planebuf[1] = m_read_bg( (address + 8) & 0x1fff );
-		m_extplanebuf[0] = m_read_bg( ((address + 0) & 0x1fff) | 0x2000 );
-		m_extplanebuf[1] = m_read_bg( ((address + 8) & 0x1fff) | 0x2000 );
+		m_planebuf[2] = m_read_bg( ((address + 0) & 0x1fff) | 0x2000 );
+		m_planebuf[3] = m_read_bg( ((address + 8) & 0x1fff) | 0x2000 );
 	}
 	else
 	{
@@ -380,14 +378,14 @@ void ppu_vt03_device::shift_tile_plane_data(uint8_t& pix)
 	{
 		switch (m_whichpixel)
 		{
-		case 0: pix = (BIT(m_planebuf[0], 7) << 0) | (BIT(m_planebuf[1], 7) << 1) | (BIT(m_extplanebuf[0], 7) << 5) | (BIT(m_extplanebuf[1], 7) << 6); break;
-		case 1: pix = (BIT(m_planebuf[0], 6) << 0) | (BIT(m_planebuf[1], 6) << 1) | (BIT(m_extplanebuf[0], 6) << 5) | (BIT(m_extplanebuf[1], 6) << 6); break;
-		case 2: pix = (BIT(m_planebuf[0], 5) << 0) | (BIT(m_planebuf[1], 5) << 1) | (BIT(m_extplanebuf[0], 5) << 5) | (BIT(m_extplanebuf[1], 5) << 6); break;
-		case 3: pix = (BIT(m_planebuf[0], 4) << 0) | (BIT(m_planebuf[1], 4) << 1) | (BIT(m_extplanebuf[0], 4) << 5) | (BIT(m_extplanebuf[1], 4) << 6); break;
-		case 4: pix = (BIT(m_planebuf[0], 3) << 0) | (BIT(m_planebuf[1], 3) << 1) | (BIT(m_extplanebuf[0], 3) << 5) | (BIT(m_extplanebuf[1], 3) << 6); break;;
-		case 5: pix = (BIT(m_planebuf[0], 2) << 0) | (BIT(m_planebuf[1], 2) << 1) | (BIT(m_extplanebuf[0], 2) << 5) | (BIT(m_extplanebuf[1], 2) << 6); break;
-		case 6: pix = (BIT(m_planebuf[0], 1) << 0) | (BIT(m_planebuf[1], 1) << 1) | (BIT(m_extplanebuf[0], 1) << 5) | (BIT(m_extplanebuf[1], 1) << 6); break;
-		case 7: pix = (BIT(m_planebuf[0], 0) << 0) | (BIT(m_planebuf[1], 0) << 1) | (BIT(m_extplanebuf[0], 0) << 5) | (BIT(m_extplanebuf[1], 0) << 6); break;
+		case 0: pix = (BIT(m_planebuf[0], 7) << 0) | (BIT(m_planebuf[1], 7) << 1) | (BIT(m_planebuf[2], 7) << 5) | (BIT(m_planebuf[3], 7) << 6); break;
+		case 1: pix = (BIT(m_planebuf[0], 6) << 0) | (BIT(m_planebuf[1], 6) << 1) | (BIT(m_planebuf[2], 6) << 5) | (BIT(m_planebuf[3], 6) << 6); break;
+		case 2: pix = (BIT(m_planebuf[0], 5) << 0) | (BIT(m_planebuf[1], 5) << 1) | (BIT(m_planebuf[2], 5) << 5) | (BIT(m_planebuf[3], 5) << 6); break;
+		case 3: pix = (BIT(m_planebuf[0], 4) << 0) | (BIT(m_planebuf[1], 4) << 1) | (BIT(m_planebuf[2], 4) << 5) | (BIT(m_planebuf[3], 4) << 6); break;
+		case 4: pix = (BIT(m_planebuf[0], 3) << 0) | (BIT(m_planebuf[1], 3) << 1) | (BIT(m_planebuf[2], 3) << 5) | (BIT(m_planebuf[3], 3) << 6); break;;
+		case 5: pix = (BIT(m_planebuf[0], 2) << 0) | (BIT(m_planebuf[1], 2) << 1) | (BIT(m_planebuf[2], 2) << 5) | (BIT(m_planebuf[3], 2) << 6); break;
+		case 6: pix = (BIT(m_planebuf[0], 1) << 0) | (BIT(m_planebuf[1], 1) << 1) | (BIT(m_planebuf[2], 1) << 5) | (BIT(m_planebuf[3], 1) << 6); break;
+		case 7: pix = (BIT(m_planebuf[0], 0) << 0) | (BIT(m_planebuf[1], 0) << 1) | (BIT(m_planebuf[2], 0) << 5) | (BIT(m_planebuf[3], 0) << 6); break;
 		}
 	}
 	else
@@ -588,6 +586,7 @@ void ppu_vt3xx_device::device_start()
 	ppu_vt03_device::device_start();
 
 	save_item(NAME(m_204x_screenregs));
+	save_item(NAME(m_2008_spritehigh));
 }
 
 void ppu_vt3xx_device::device_reset()
@@ -596,17 +595,19 @@ void ppu_vt3xx_device::device_reset()
 
 	for (int i = 0; i < 0xa; i++)
 		m_204x_screenregs[i] = 0x00;
+
+	m_2008_spritehigh = 0;
 }
 
-uint8_t ppu_vt3xx_device::read_201c_newvid(offs_t offset) { return m_newvid_1c; }
-uint8_t ppu_vt3xx_device::read_201d_newvid(offs_t offset) { return m_newvid_1d; }
-uint8_t ppu_vt3xx_device::read_201e_newvid(offs_t offset) { return m_newvid_1e; }
-uint8_t ppu_vt3xx_device::read_202x_newvid(offs_t offset) { return m_newvid_2x[offset]; }
+uint8_t ppu_vt3xx_device::extvidreg_201c_r(offs_t offset) { return m_newvid_1c; }
+uint8_t ppu_vt3xx_device::extvidreg_201d_r(offs_t offset) { return m_newvid_1d; }
+uint8_t ppu_vt3xx_device::extvidreg_201e_r(offs_t offset) { return m_newvid_1e; }
+uint8_t ppu_vt3xx_device::tilebases_202x_r(offs_t offset) { return m_tilebases_2x[offset]; }
 
-void ppu_vt3xx_device::write_201c_newvid(offs_t offset, uint8_t data) { m_newvid_1c = data; logerror("%s: write_201c_newvid %02x\n", machine().describe_context(), data); }
-void ppu_vt3xx_device::write_201d_newvid(offs_t offset, uint8_t data) { m_newvid_1d = data; logerror("%s: write_201d_newvid %02x\n", machine().describe_context(), data); }
+void ppu_vt3xx_device::extvidreg_201c_w(offs_t offset, uint8_t data) { m_newvid_1c = data; logerror("%s: extvidreg_201c_w %02x\n", machine().describe_context(), data); }
+void ppu_vt3xx_device::extvidreg_201d_w(offs_t offset, uint8_t data) { m_newvid_1d = data; logerror("%s: extvidreg_201d_w %02x\n", machine().describe_context(), data); }
 
-void ppu_vt3xx_device::write_201e_newvid(offs_t offset, uint8_t data)
+void ppu_vt3xx_device::extvidreg_201e_w(offs_t offset, uint8_t data)
 {
 	/*
 	 extended mode feature enables
@@ -614,19 +615,19 @@ void ppu_vt3xx_device::write_201e_newvid(offs_t offset, uint8_t data)
 	 s = old/new sprite mode
 	*/
 	m_newvid_1e = data;
-	logerror("%s: write_201e_newvid %02x\n", machine().describe_context(), data);
+	logerror("%s: extvidreg_201e_w %02x\n", machine().describe_context(), data);
 }
 
-void ppu_vt3xx_device::write_202x_newvid(offs_t offset, uint8_t data)
+void ppu_vt3xx_device::tilebases_202x_w(offs_t offset, uint8_t data)
 {
-	if (data != m_newvid_2x[offset])
-		logerror("%s: NEW VALUE write_202x_newvid %d %02x\n", machine().describe_context(), offset, data);
+	if (data != m_tilebases_2x[offset])
+		logerror("%s: NEW VALUE tilebases_202x_w %d %02x\n", machine().describe_context(), offset, data);
 
-	m_newvid_2x[offset] = data;
+	m_tilebases_2x[offset] = data;
 }
 
 // move this to ppu_vt03_device? as it seems like even some of the VT32 games write here
-void ppu_vt3xx_device::write_204x_screenregs(offs_t offset, uint8_t data)
+void ppu_vt3xx_device::lcdc_regs_w(offs_t offset, uint8_t data)
 {
 	// these seem somehow related to the screen dimensions, but could
 	// be specific to the type of LCD being used (scale against the actual screen)
@@ -636,7 +637,7 @@ void ppu_vt3xx_device::write_204x_screenregs(offs_t offset, uint8_t data)
 	// config values here compared to the natively horizontal versions
 	// 
 	// the real devices scale the higher res images to the lower LCD, dropping pixels
-	logerror("%s: ppu_vt3xx_device::write_204x_screenregs %d %02x\n", machine().describe_context(), offset, data);
+	logerror("%s: ppu_vt3xx_device::lcdc_regs_w %d %02x\n", machine().describe_context(), offset, data);
 	m_204x_screenregs[offset] = data;
 
 	struct vid_mode
@@ -745,21 +746,21 @@ void ppu_vt3xx_device::read_tile_plane_data(int address, int color)
 
 		if ((m_newvid_1c & 0x03) == 0x02)
 		{
-			m_planebuf[0] = m_read_newmode_bg(recalculate_offsets_8x8x8packed_tile((address + 0) & 0x1fff, 0));
-			m_planebuf[1] = m_read_newmode_bg(recalculate_offsets_8x8x8packed_tile((address + 8) & 0x1fff, 0));
-			m_extplanebuf[0] = m_read_newmode_bg(recalculate_offsets_8x8x8packed_tile((address + 0) & 0x1fff, 1));
-			m_extplanebuf[1] = m_read_newmode_bg(recalculate_offsets_8x8x8packed_tile((address + 8) & 0x1fff, 1));
-			m_extplanebuf_vt3xx_0[0] = m_read_newmode_bg(recalculate_offsets_8x8x8packed_tile((address + 0) & 0x1fff, 2));
-			m_extplanebuf_vt3xx_0[1] = m_read_newmode_bg(recalculate_offsets_8x8x8packed_tile((address + 8) & 0x1fff, 2));
-			m_extplanebuf_vt3xx_1[0] = m_read_newmode_bg(recalculate_offsets_8x8x8packed_tile((address + 0) & 0x1fff, 3));
-			m_extplanebuf_vt3xx_1[1] = m_read_newmode_bg(recalculate_offsets_8x8x8packed_tile((address + 8) & 0x1fff, 3));
+			m_planebuf[0] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 0) & 0x1fff, 0));
+			m_planebuf[1] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 8) & 0x1fff, 0));
+			m_planebuf[2] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 0) & 0x1fff, 1));
+			m_planebuf[3] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 8) & 0x1fff, 1));
+			m_planebuf[4] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 0) & 0x1fff, 2));
+			m_planebuf[5] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 8) & 0x1fff, 2));
+			m_planebuf[6] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 0) & 0x1fff, 3));
+			m_planebuf[7] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 8) & 0x1fff, 3));
 		}
 		else
 		{
-			m_planebuf[0] = m_read_newmode_bg(recalculate_offsets_8x8x4packed_tile((address + 0) & 0x1fff, 0));
-			m_planebuf[1] = m_read_newmode_bg(recalculate_offsets_8x8x4packed_tile((address + 8) & 0x1fff, 0));
-			m_extplanebuf[0] = m_read_newmode_bg(recalculate_offsets_8x8x4packed_tile((address + 0) & 0x1fff, 1));
-			m_extplanebuf[1] = m_read_newmode_bg(recalculate_offsets_8x8x4packed_tile((address + 8) & 0x1fff, 1));
+			m_planebuf[0] = m_read_onespace_with_relative(recalculate_offsets_8x8x4packed_tile((address + 0) & 0x1fff, 0));
+			m_planebuf[1] = m_read_onespace_with_relative(recalculate_offsets_8x8x4packed_tile((address + 8) & 0x1fff, 0));
+			m_planebuf[2] = m_read_onespace_with_relative(recalculate_offsets_8x8x4packed_tile((address + 0) & 0x1fff, 1));
+			m_planebuf[3] = m_read_onespace_with_relative(recalculate_offsets_8x8x4packed_tile((address + 8) & 0x1fff, 1));
 		}
 	}
 }
@@ -779,13 +780,13 @@ void ppu_vt3xx_device::shift_tile_plane_data(uint8_t& pix)
 			switch (m_whichpixel)
 			{
 			case 0: pix = m_planebuf[0]; break;
-			case 1: pix = m_extplanebuf[0]; break;
-			case 2: pix = m_extplanebuf_vt3xx_0[0]; break;
-			case 3: pix = m_extplanebuf_vt3xx_1[0]; break;
+			case 1: pix = m_planebuf[2]; break;
+			case 2: pix = m_planebuf[4]; break;
+			case 3: pix = m_planebuf[6]; break;
 			case 4: pix = m_planebuf[1]; break;
-			case 5: pix = m_extplanebuf[1]; break;
-			case 6: pix = m_extplanebuf_vt3xx_0[1]; break;
-			case 7: pix = m_extplanebuf_vt3xx_1[1]; break;
+			case 5: pix = m_planebuf[3]; break;
+			case 6: pix = m_planebuf[5]; break;
+			case 7: pix = m_planebuf[7]; break;
 			}
 		}
 		else
@@ -796,12 +797,12 @@ void ppu_vt3xx_device::shift_tile_plane_data(uint8_t& pix)
 			{
 			case 0: pix = (m_planebuf[0] >> 0) & 0xf; break;
 			case 1: pix = (m_planebuf[0] >> 4) & 0xf; break;
-			case 2: pix = (m_extplanebuf[0] >> 0) & 0xf; break;
-			case 3: pix = (m_extplanebuf[0] >> 4) & 0xf; break;
+			case 2: pix = (m_planebuf[2] >> 0) & 0xf; break;
+			case 3: pix = (m_planebuf[2] >> 4) & 0xf; break;
 			case 4: pix = (m_planebuf[1] >> 0) & 0xf; break;
 			case 5: pix = (m_planebuf[1] >> 4) & 0xf; break;
-			case 6: pix = (m_extplanebuf[1] >> 0) & 0xf; break;
-			case 7: pix = (m_extplanebuf[1] >> 4) & 0xf; break;
+			case 6: pix = (m_planebuf[3] >> 0) & 0xf; break;
+			case 7: pix = (m_planebuf[3] >> 4) & 0xf; break;
 			}
 		}
 
@@ -1017,7 +1018,7 @@ void ppu_vt3xx_device::draw_sprites(u8* line_priority)
 			uint8_t spritepatternbuf[8];
 			for (int i = 0; i < 8; i++)
 			{
-				spritepatternbuf[i] = m_read_newmode_sp(pattern_offset + i);
+				spritepatternbuf[i] = m_read_onespace_with_relative(pattern_offset + i);
 			}
 
 			if (pri)

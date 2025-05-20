@@ -74,8 +74,7 @@ private:
 	uint8_t vt3xx_palette_r(offs_t offset);
 	void vt3xx_palette_w(offs_t offset, uint8_t data);
 
-	uint8_t newmode_spr_r(offs_t offset);
-	uint8_t newmode_bg_r(offs_t offset);
+	uint8_t read_onespace_bus_with_relative_offset(offs_t offset);
 
 	virtual void vt_dma_w(uint8_t data) override;
 

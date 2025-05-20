@@ -101,8 +101,7 @@ void vt3xx_soc_base_device::device_add_mconfig(machine_config& config)
 	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_ppu->read_bg().set(FUNC(vt3xx_soc_base_device::chr_r));
 	m_ppu->read_sp().set(FUNC(vt3xx_soc_base_device::spr_r));
-	m_ppu->read_newmode_sp().set(FUNC(vt3xx_soc_base_device::newmode_spr_r));
-	m_ppu->read_newmode_bg().set(FUNC(vt3xx_soc_base_device::newmode_bg_r));
+	m_ppu->read_onespace_with_relative().set(FUNC(vt3xx_soc_base_device::read_onespace_bus_with_relative_offset));
 	m_ppu->set_screen(m_screen);
 
 	VT3XX_SPU(config, m_soundcpu, RP2A03_NTSC_XTAL);
@@ -196,7 +195,7 @@ void vt3xx_soc_base_device::vt369_map(address_map &map)
 
 	// ddrdismx relies on the mirroring, later SoCs have different mirroring?
 	map(0x2000, 0x2007).rw(m_ppu, FUNC(ppu_vt3xx_device::read), FUNC(ppu_vt3xx_device::write));  // standard PPU registers
-	map(0x2008, 0x2008).rw(m_ppu, FUNC(ppu_vt3xx_device::read_spritehigh), FUNC(ppu_vt3xx_device::write_spritehigh));  // standard PPU registers
+	map(0x2008, 0x2008).rw(m_ppu, FUNC(ppu_vt3xx_device::spritehigh_2008_r), FUNC(ppu_vt3xx_device::spritehigh_2008_w));  // standard PPU registers
 	map(0x2010, 0x2010).rw(m_ppu, FUNC(ppu_vt3xx_device::extended_modes_enable_r), FUNC(ppu_vt3xx_device::extended_modes_enable_w));
 	map(0x2011, 0x2011).rw(m_ppu, FUNC(ppu_vt3xx_device::extended_modes2_enable_r), FUNC(ppu_vt3xx_device::extended_modes2_enable_w));
 	map(0x2012, 0x2012).rw(m_ppu, FUNC(ppu_vt3xx_device::videobank0_0_r), FUNC(ppu_vt3xx_device::videobank0_0_w));
@@ -206,17 +205,17 @@ void vt3xx_soc_base_device::vt369_map(address_map &map)
 	map(0x2016, 0x2016).rw(m_ppu, FUNC(ppu_vt3xx_device::videobank0_4_r), FUNC(ppu_vt3xx_device::videobank0_4_w));
 	map(0x2017, 0x2017).rw(m_ppu, FUNC(ppu_vt3xx_device::videobank0_5_r), FUNC(ppu_vt3xx_device::videobank0_5_w));
 	map(0x2018, 0x2018).rw(m_ppu, FUNC(ppu_vt3xx_device::videobank1_r), FUNC(ppu_vt3xx_device::videobank1_w));
-	map(0x2019, 0x2019).rw(m_ppu, FUNC(ppu_vt3xx_device::read_2019), FUNC(ppu_vt3xx_device::gun_reset_w));
+	map(0x2019, 0x2019).rw(m_ppu, FUNC(ppu_vt3xx_device::unk_2019_r), FUNC(ppu_vt3xx_device::gun_reset_w));
 	map(0x201a, 0x201a).rw(m_ppu, FUNC(ppu_vt3xx_device::videobank0_extra_r), FUNC(ppu_vt3xx_device::videobank0_extra_w));
-	map(0x201b, 0x201b).r(m_ppu, FUNC(ppu_vt3xx_device::read_201b));
-	map(0x201c, 0x201c).rw(m_ppu, FUNC(ppu_vt3xx_device::read_201c_newvid), FUNC(ppu_vt3xx_device::write_201c_newvid));
-	map(0x201d, 0x201d).rw(m_ppu, FUNC(ppu_vt3xx_device::read_201d_newvid), FUNC(ppu_vt3xx_device::write_201d_newvid));
-	map(0x201e, 0x201e).rw(m_ppu, FUNC(ppu_vt3xx_device::read_201e_newvid), FUNC(ppu_vt3xx_device::write_201e_newvid));
+	map(0x201b, 0x201b).r(m_ppu, FUNC(ppu_vt3xx_device::unk_201b_r));
+	map(0x201c, 0x201c).rw(m_ppu, FUNC(ppu_vt3xx_device::extvidreg_201c_r), FUNC(ppu_vt3xx_device::extvidreg_201c_w));
+	map(0x201d, 0x201d).rw(m_ppu, FUNC(ppu_vt3xx_device::extvidreg_201d_r), FUNC(ppu_vt3xx_device::extvidreg_201d_w));
+	map(0x201e, 0x201e).rw(m_ppu, FUNC(ppu_vt3xx_device::extvidreg_201e_r), FUNC(ppu_vt3xx_device::extvidreg_201e_w));
 	map(0x201f, 0x201f).r(m_ppu, FUNC(ppu_vt3xx_device::gun2_y_r));
 
-	map(0x2020, 0x2023).rw(m_ppu, FUNC(ppu_vt3xx_device::read_202x_newvid), FUNC(ppu_vt3xx_device::write_202x_newvid));
+	map(0x2020, 0x2023).rw(m_ppu, FUNC(ppu_vt3xx_device::tilebases_202x_r), FUNC(ppu_vt3xx_device::tilebases_202x_w));
 
-	map(0x2040, 0x2049).w(m_ppu, FUNC(ppu_vt3xx_device::write_204x_screenregs));
+	map(0x2040, 0x2049).w(m_ppu, FUNC(ppu_vt3xx_device::lcdc_regs_w));
 
 	map(0x3000, 0x3fff).ram(); // 240in1ar clears this region (does it only exist on some SoCs?)
 
@@ -620,13 +619,7 @@ uint8_t vt3xx_soc_base_device::vt369_418a_r()
 	return machine().rand();
 }
 
-uint8_t vt3xx_soc_base_device::newmode_spr_r(offs_t offset)
-{
-	address_space& spc = this->space(AS_PROGRAM);
-	return spc.read_byte(get_relative() + offset);
-}
-
-uint8_t vt3xx_soc_base_device::newmode_bg_r(offs_t offset)
+uint8_t vt3xx_soc_base_device::read_onespace_bus_with_relative_offset(offs_t offset)
 {
 	address_space& spc = this->space(AS_PROGRAM);
 	return spc.read_byte(get_relative() + offset);

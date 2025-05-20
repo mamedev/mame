@@ -29,8 +29,7 @@ public:
 
 	auto read_bg() { return m_read_bg.bind(); }
 	auto read_sp() { return m_read_sp.bind(); }
-	auto read_newmode_sp() { return m_read_newmode_sp.bind(); }
-	auto read_newmode_bg() { return m_read_newmode_bg.bind(); }
+	auto read_onespace_with_relative() { return m_read_onespace_with_relative.bind(); }
 
 	void set_palette_mode(vtxx_pal_mode pmode) { m_pal_mode = pmode; }
 
@@ -43,9 +42,9 @@ public:
 	uint8_t videobank0_4_r(offs_t offset);
 	uint8_t videobank0_5_r(offs_t offset);
 	uint8_t videobank1_r(offs_t offset);
-	uint8_t read_2019(offs_t offset);
+	uint8_t unk_2019_r(offs_t offset);
 	uint8_t videobank0_extra_r(offs_t offset);
-	uint8_t read_201b(offs_t offset);
+	uint8_t unk_201b_r(offs_t offset);
 	uint8_t gun_x_r(offs_t offset);
 	uint8_t gun_y_r(offs_t offset);
 	uint8_t gun2_x_r(offs_t offset);
@@ -76,8 +75,8 @@ public:
 	bool is_v3xx_extended_mode() { return (m_newvid_1e == 0x00) ? false : true; }
 	bool get_newvid_1d() { return m_newvid_1d; }
 
-	uint16_t get_newmode_tilebase() { return m_newvid_2x[0] | (m_newvid_2x[1] << 8); }
-	uint16_t get_newmode_spritebase() { return m_newvid_2x[2] | (m_newvid_2x[3] << 8); }
+	uint16_t get_newmode_tilebase() { return m_tilebases_2x[0] | (m_tilebases_2x[1] << 8); }
+	uint16_t get_newmode_spritebase() { return m_tilebases_2x[2] | (m_tilebases_2x[3] << 8); }
 	uint8_t vt3xx_extended_palette_r(offs_t offset) { return m_vt3xx_palette[offset]; }
 	void vt3xx_extended_palette_w(offs_t offset, uint8_t data) { /*logerror("%s: extended palette write %04x %02x\n", machine().describe_context(), offset, data);*/ m_vt3xx_palette[offset] = data; }
 
@@ -118,26 +117,19 @@ protected:
 
 	devcb_read8 m_read_bg;
 	devcb_read8 m_read_sp;
-	devcb_read8 m_read_newmode_sp;
-	devcb_read8 m_read_newmode_bg;
+	devcb_read8 m_read_onespace_with_relative;
 
 	int32_t m_read_bg4_bg3;
 
-	uint8_t m_extplanebuf[2];
-	uint8_t m_extplanebuf_vt3xx_0[2];
-	uint8_t m_extplanebuf_vt3xx_1[2];
-
-	uint32_t m_tiledata;
 	int m_whichpixel;
 
 	uint8_t m_newvid_1c;
 	uint8_t m_newvid_1d;
 	uint8_t m_newvid_1e;
-	uint8_t m_newvid_2x[4];
+	uint8_t m_tilebases_2x[4];
 
 	uint8_t m_vt3xx_palette[0x400];
 private:
-
 
 	uint8_t m_extra_sprite_bits;
 
@@ -159,19 +151,19 @@ class ppu_vt3xx_device : public ppu_vt03_device {
 public:
 	ppu_vt3xx_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 
-	uint8_t read_201c_newvid(offs_t offset);
-	uint8_t read_201d_newvid(offs_t offset);
-	uint8_t read_201e_newvid(offs_t offset);
-	uint8_t read_202x_newvid(offs_t offset);
+	uint8_t extvidreg_201c_r(offs_t offset);
+	uint8_t extvidreg_201d_r(offs_t offset);
+	uint8_t extvidreg_201e_r(offs_t offset);
+	uint8_t tilebases_202x_r(offs_t offset);
 
-	void write_201c_newvid(offs_t offset, uint8_t data);
-	void write_201d_newvid(offs_t offset, uint8_t data);
-	void write_201e_newvid(offs_t offset, uint8_t data);
-	void write_202x_newvid(offs_t offset, uint8_t data);
-	void write_204x_screenregs(offs_t offset, uint8_t data);
+	void extvidreg_201c_w(offs_t offset, uint8_t data);
+	void extvidreg_201d_w(offs_t offset, uint8_t data);
+	void extvidreg_201e_w(offs_t offset, uint8_t data);
+	void tilebases_202x_w(offs_t offset, uint8_t data);
+	void lcdc_regs_w(offs_t offset, uint8_t data);
 
-	uint8_t read_spritehigh() { return m_2008_spritehigh; }
-	void write_spritehigh(uint8_t data) { m_2008_spritehigh = data; logerror("%s: write_spritehigh %02x\n", machine().describe_context(), data); }
+	uint8_t spritehigh_2008_r() { return m_2008_spritehigh; }
+	void spritehigh_2008_w(uint8_t data) { m_2008_spritehigh = data; logerror("%s: spritehigh_2008_w %02x\n", machine().describe_context(), data); }
  
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -182,7 +174,7 @@ private:
 	virtual void shift_tile_plane_data(uint8_t& pix) override;
 	virtual void draw_sprites(u8 *line_priority) override;
 	uint8_t vt3xx_palette_r(offs_t offset);
-	void vt3xx_palette_w(offs_t offset, uint8_t da0ta);
+	void vt3xx_palette_w(offs_t offset, uint8_t data);
 	virtual void write_to_spriteram_with_increment(uint8_t data) override;
 
 	offs_t recalculate_offsets_8x8x4packed_tile(int address, int va34);

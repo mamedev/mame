@@ -1119,9 +1119,9 @@ void nes_vt02_vt03_soc_device::nes_vt_map(address_map &map)
 	map(0x2011, 0x2011).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::extended_modes2_enable_r), FUNC(ppu_vt03_device::extended_modes2_enable_w));
 	nes_vt_2012_to_2017_regs(map);// 2012 - 2017 map differently on some SoC types (re-ordered)
 	map(0x2018, 0x2018).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank1_r), FUNC(ppu_vt03_device::videobank1_w));
-	map(0x2019, 0x2019).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::read_2019), FUNC(ppu_vt03_device::gun_reset_w));
+	map(0x2019, 0x2019).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::unk_2019_r), FUNC(ppu_vt03_device::gun_reset_w));
 	map(0x201a, 0x201a).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_extra_r), FUNC(ppu_vt03_device::videobank0_extra_w));
-	map(0x201b, 0x201b).mirror(0x00e0).r(m_ppu, FUNC(ppu_vt03_device::read_201b));
+	map(0x201b, 0x201b).mirror(0x00e0).r(m_ppu, FUNC(ppu_vt03_device::unk_201b_r));
 	map(0x201c, 0x201c).mirror(0x00e0).r(m_ppu, FUNC(ppu_vt03_device::gun_x_r));
 	map(0x201d, 0x201d).mirror(0x00e0).r(m_ppu, FUNC(ppu_vt03_device::gun_y_r));
 	map(0x201e, 0x201e).mirror(0x00e0).r(m_ppu, FUNC(ppu_vt03_device::gun2_x_r));

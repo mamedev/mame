@@ -118,7 +118,6 @@ uint8_t nes_vt32_soc_device::vthh_414a_r()
 	return machine().rand();
 }
 
-
 void nes_vt32_soc_device::nes_vt32_soc_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram(); // .mask(0x0fff).ram();
@@ -135,9 +134,9 @@ void nes_vt32_soc_device::nes_vt32_soc_map(address_map &map)
 	map(0x2016, 0x2016).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_4_r), FUNC(ppu_vt03_device::videobank0_4_w));
 	map(0x2017, 0x2017).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_5_r), FUNC(ppu_vt03_device::videobank0_5_w));
 	map(0x2018, 0x2018).rw(m_ppu, FUNC(ppu_vt03_device::videobank1_r), FUNC(ppu_vt03_device::videobank1_w));
-	map(0x2019, 0x2019).rw(m_ppu, FUNC(ppu_vt03_device::read_2019), FUNC(ppu_vt03_device::gun_reset_w));
+	map(0x2019, 0x2019).rw(m_ppu, FUNC(ppu_vt03_device::unk_2019_r), FUNC(ppu_vt03_device::gun_reset_w));
 	map(0x201a, 0x201a).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_extra_r), FUNC(ppu_vt03_device::videobank0_extra_w));
-	map(0x201b, 0x201b).r(m_ppu, FUNC(ppu_vt03_device::read_201b));
+	map(0x201b, 0x201b).r(m_ppu, FUNC(ppu_vt03_device::unk_201b_r));
 	map(0x201c, 0x201c).r(m_ppu, FUNC(ppu_vt03_device::gun_x_r));
 	map(0x201d, 0x201d).r(m_ppu, FUNC(ppu_vt03_device::gun_y_r));
 	map(0x201e, 0x201e).r(m_ppu, FUNC(ppu_vt03_device::gun2_x_r));

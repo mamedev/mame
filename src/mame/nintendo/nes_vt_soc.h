@@ -97,6 +97,16 @@ protected:
 	void extraout_23_w(uint8_t data);
 	uint8_t rs232flags_region_r();
 
+	void apu_irq(int state);
+	uint8_t apu_read_mem(offs_t offset);
+
+	uint8_t external_space_read(offs_t offset);
+	void external_space_write(offs_t offset, uint8_t data);
+	// additional relative offset for everything on vt3xx sets (seems to address up to 32mbytes only still?)
+	int get_relative() { return (m_relative[0] + ((m_relative[1] & 0x0f) << 8)) * 0x2000; }
+
+	void do_pal_timings_and_ppu_replacement(machine_config& config);
+
 	uint32_t screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 
 	uint8_t m_410x[0xc]{};
@@ -125,15 +135,6 @@ protected:
 	std::unique_ptr<uint8_t[]> m_ntram;
 	std::unique_ptr<uint8_t[]> m_chrram;
 
-	void apu_irq(int state);
-	uint8_t apu_read_mem(offs_t offset);
-
-	uint8_t external_space_read(offs_t offset);
-	void external_space_write(offs_t offset, uint8_t data);
-	// additional relative offset for everything on vt3xx sets (seems to address up to 32mbytes only still?)
-	int get_relative() { return (m_relative[0] + ((m_relative[1] & 0x0f) << 8)) * 0x2000; }
-
-	void do_pal_timings_and_ppu_replacement(machine_config& config);
 
 	devcb_write8 m_4150_write_cb;
 	devcb_write8 m_41e6_write_cb;
