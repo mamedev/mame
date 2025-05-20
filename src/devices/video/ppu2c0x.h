@@ -32,7 +32,6 @@
 /* constant definitions */
 #define VISIBLE_SCREEN_WIDTH         (32*8) /* Visible screen width */
 #define VISIBLE_SCREEN_HEIGHT        (30*8) /* Visible screen height */
-#define SPRITERAM_SIZE          0x100   /* spriteram size */
 
 ///*************************************************************************
 //  TYPE DEFINITIONS
@@ -160,6 +159,8 @@ protected:
 	rgb_t nespal_to_RGB(int color_intensity, int color_num, int color_emphasis, bool is_pal_or_dendy);
 	virtual void init_palette_tables();
 
+	virtual void write_to_spriteram_with_increment(uint8_t data);
+
 	virtual void read_tile_plane_data(int address, int color);
 	virtual void shift_tile_plane_data(u8 &pix);
 	virtual void draw_tile_pixel(u8 pix, int color, u32 back_pen, u32 *&dest);
@@ -215,6 +216,8 @@ protected:
 	bool                        m_toggle;               /* used to latch hi-lo scroll */
 	s32                         m_tilecount;            /* MMC5 can change attributes to subsets of the 34 visible tiles */
 	latch_delegate              m_latch;
+
+	u16                         m_spriteramsize;
 
 	u8 readbyte(offs_t address);
 

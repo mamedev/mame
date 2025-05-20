@@ -21,6 +21,9 @@ public:
 
 	void vt03_8000_mapper_w(offs_t offset, uint8_t data);
 
+	auto set_4150_write_cb() { return m_4150_write_cb.bind(); }
+	auto set_41e6_write_cb() { return m_41e6_write_cb.bind(); }
+
 	// 8-bit ports
 	auto write_0_callback() { return m_write_0_callback.bind(); }
 	auto read_0_callback() { return m_read_0_callback.bind(); }
@@ -37,17 +40,8 @@ public:
 	auto extra_write_2_callback() { return m_extra_write_2_callback.bind(); }
 	auto extra_write_3_callback() { return m_extra_write_3_callback.bind(); }
 
-	void set_201x_descramble(uint8_t reg0, uint8_t reg1, uint8_t reg2, uint8_t reg3, uint8_t reg4, uint8_t reg5)
-	{
-		m_2012_2017_descramble[0] = reg0; // TOOD: name regs
-		m_2012_2017_descramble[1] = reg1;
-		m_2012_2017_descramble[2] = reg2;
-		m_2012_2017_descramble[3] = reg3;
-		m_2012_2017_descramble[4] = reg4;
-		m_2012_2017_descramble[5] = reg5;
-	};
-
-	void set_8000_scramble(uint8_t reg0, uint8_t reg1, uint8_t reg2, uint8_t reg3, uint8_t reg4, uint8_t reg5, uint8_t reg6, uint8_t reg7);
+	void set_8000_scramble(uint8_t reg0, uint8_t reg1, uint8_t reg2, uint8_t reg3, uint8_t reg4, uint8_t reg5);
+	void set_8006_scramble(uint8_t reg6, uint8_t reg7);
 	void set_410x_scramble(uint8_t reg0, uint8_t reg1);
 	void force_bad_dma() { m_force_baddma = true; }
 	void force_raster_timing_hack() { m_use_raster_timing_hack = true; }
@@ -69,6 +63,7 @@ protected:
 	required_device<nes_apu_vt_device> m_apu;
 
 	void nes_vt_map(address_map &map) ATTR_COLD;
+	virtual void nes_vt_2012_to_2017_regs(address_map &map);
 
 	uint32_t get_banks(uint8_t bnk);
 	void update_banks();
@@ -84,11 +79,12 @@ protected:
 	void video_irq(bool hblank, int scanline, bool vblank, bool blanked);
 	uint8_t nt_r(offs_t offset);
 	void nt_w(offs_t offset, uint8_t data);
-	int calculate_real_video_address(int addr, int extended, int readtype);
+	int calculate_real_video_address(int addr, int readtype);
 	void scrambled_8000_w(uint16_t offset, uint8_t data);
-	void vt_dma_w(uint8_t data);
+	virtual void vt_dma_w(uint8_t data);
 	void do_dma(uint8_t data, bool has_ntsc_bug);
 	void vt03_4034_w(uint8_t data);
+	void vt3xx_4024_new_dma_middle_w(uint8_t data);
 
 	uint8_t in0_r();
 	uint8_t in1_r();
@@ -106,14 +102,19 @@ protected:
 	uint8_t m_410x[0xc]{};
 
 	uint8_t m_vdma_ctrl = 0;
+	uint8_t m_4024_newdma;
+
 	int m_timer_irq_enabled = 0;
 	int m_timer_running = 0;
 	int m_timer_val = 0;
 
-	uint8_t m_8000_scramble[8]{};
-	uint8_t m_410x_scramble[2]{};
+	uint8_t m_8000_scramble[6];
+	uint8_t m_8006_scramble[2];
+	uint8_t m_410x_scramble[2];
 
 	uint8_t m_8000_addr_latch = 0;
+
+	uint8_t m_relative[2];
 
 	uint8_t m_4242 = 0;
 	uint8_t m_411c = 0;
@@ -129,8 +130,13 @@ protected:
 
 	uint8_t external_space_read(offs_t offset);
 	void external_space_write(offs_t offset, uint8_t data);
+	// additional relative offset for everything on vt3xx sets (seems to address up to 32mbytes only still?)
+	int get_relative() { return (m_relative[0] + ((m_relative[1] & 0x0f) << 8)) * 0x2000; }
 
 	void do_pal_timings_and_ppu_replacement(machine_config& config);
+
+	devcb_write8 m_4150_write_cb;
+	devcb_write8 m_41e6_write_cb;
 
 private:
 
@@ -152,7 +158,6 @@ private:
 	devcb_read8 m_extra_read_2_callback;
 	devcb_read8 m_extra_read_3_callback;
 
-	uint8_t m_2012_2017_descramble[0x6]; // passed to PPU in reset
 	vtxx_pal_mode m_default_palette_mode;
 	bool m_force_baddma = false;
 	bool m_use_raster_timing_hack = false;
@@ -162,6 +167,57 @@ class nes_vt02_vt03_soc_pal_device : public nes_vt02_vt03_soc_device
 {
 public:
 	nes_vt02_vt03_soc_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+
+protected:
+	virtual void device_add_mconfig(machine_config& config) override;
+};
+
+
+class nes_vt02_vt03_soc_waixing_device : public nes_vt02_vt03_soc_device
+{
+public:
+	nes_vt02_vt03_soc_waixing_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+
+protected:
+	nes_vt02_vt03_soc_waixing_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void nes_vt_2012_to_2017_regs(address_map &map) override;
+};
+
+class nes_vt02_vt03_soc_waixing_pal_device : public nes_vt02_vt03_soc_waixing_device
+{
+public:
+	nes_vt02_vt03_soc_waixing_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+
+protected:
+	virtual void device_add_mconfig(machine_config& config) override;
+};
+
+class nes_vt02_vt03_soc_hummer_device : public nes_vt02_vt03_soc_device
+{
+public:
+	nes_vt02_vt03_soc_hummer_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+
+protected:
+	virtual void nes_vt_2012_to_2017_regs(address_map &map) override;
+};
+
+class nes_vt02_vt03_soc_sports_device : public nes_vt02_vt03_soc_device
+{
+public:
+	nes_vt02_vt03_soc_sports_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+
+protected:
+	nes_vt02_vt03_soc_sports_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void nes_vt_2012_to_2017_regs(address_map &map) override;
+};
+
+class nes_vt02_vt03_soc_sports_pal_device : public nes_vt02_vt03_soc_sports_device
+{
+public:
+	nes_vt02_vt03_soc_sports_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config& config) override;
@@ -187,6 +243,15 @@ protected:
 
 DECLARE_DEVICE_TYPE(NES_VT02_VT03_SOC, nes_vt02_vt03_soc_device)
 DECLARE_DEVICE_TYPE(NES_VT02_VT03_SOC_PAL, nes_vt02_vt03_soc_pal_device)
+
+DECLARE_DEVICE_TYPE(NES_VT02_VT03_SOC_WAIXING,     nes_vt02_vt03_soc_waixing_device)
+DECLARE_DEVICE_TYPE(NES_VT02_VT03_SOC_WAIXING_PAL, nes_vt02_vt03_soc_waixing_pal_device)
+
+DECLARE_DEVICE_TYPE(NES_VT02_VT03_SOC_HUMMER, nes_vt02_vt03_soc_hummer_device)
+
+DECLARE_DEVICE_TYPE(NES_VT02_VT03_SOC_SPORTS, nes_vt02_vt03_soc_sports_device)
+DECLARE_DEVICE_TYPE(NES_VT02_VT03_SOC_SPORTS_PAL, nes_vt02_vt03_soc_sports_pal_device)
+
 DECLARE_DEVICE_TYPE(NES_VT02_VT03_SOC_SCRAMBLE, nes_vt02_vt03_soc_scramble_device)
 DECLARE_DEVICE_TYPE(NES_VT02_VT03_SOC_SCRAMBLE_PAL, nes_vt02_vt03_soc_scramble_pal_device)
 
