@@ -27,7 +27,7 @@ public:
 	virtual osd::audio_info get_information() {
 		osd::audio_info result;
 		result.m_generation = 1;
-		result.m_default_sink = 0;
+		result.m_default_sink = 1;
 		result.m_default_source = 0;
 		result.m_nodes.resize(1);
 		result.m_nodes[0].m_name = "";
