@@ -376,7 +376,7 @@ GAME( 1981,  luckyplr,  0, missbamby,  missbamby, missbamby_state, empty_init, R
 GAME( 1981,  minisupf,  0, missbamby,  c_810601a, missbamby_state, empty_init, ROT0, "Cirsa",              "Mini Super Fruits", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 
 // Clones
-GAME( 1987,  3mini,     0, gldwinner,  missbamby, missbamby_state, empty_init, ROT0, "Arfyc",              "Mini 3",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1987,  3mini,     0, gldwinner,  missbamby, missbamby_state, empty_init, ROT0, "Arfyc",              "3 Mini",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 GAME( 198?,  goldfrts,  0, missbamby,  c_810601a, missbamby_state, empty_init, ROT0, "Video Game",         "Golden Fruits",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 GAME( 1983,  gwinner,   0, gldwinner,  missbamby, missbamby_state, empty_init, ROT0, "Reben SA",           "Golden Winner",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 GAME( 1989?, miniazard, 0, gldwinner,  missbamby, missbamby_state, empty_init, ROT0, "Arfyc",              "Mini Azar D",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
