@@ -920,6 +920,8 @@ void ppu_vt3xx_device::draw_sprites(u8* line_priority)
 		// new style sprites
 		for (int spritenum = 0x00; spritenum < 0x80; spritenum++)
 		{
+			bool is_new_format = m_newvid_1e & 0x04;
+
 			// old packed spriteram format
 			int ypos_table = 0x000;
 			int	xpos_table = 0x003;
@@ -964,31 +966,40 @@ void ppu_vt3xx_device::draw_sprites(u8* line_priority)
 				pri = (m_spriteram[extra_table + spritenum * table_step] & 0x20) >> 5;
 			}
 
-			int height = 16;
-			int width = 8;
-			int bpp = 8;
-			bool alt_16_handling = false;
+			int height, width, bpp, alt_16_handling;
 
-			if (m_newvid_1d & 0x02)
+			if (is_new_format)
 			{
-				width = 16;
-				bpp = 4;
-			}
+				height = 16;
+				width = 8;
+				bpp = 8;
+				alt_16_handling = false;
 
-			// testing with lxcmcysp later games in the list
-			// 12 09 0f -- 'alt_16_handling'
-			// 22 09 0f -- some games, works
-			// 12 0f 0f -- menu, works
-			// 12 0b 0f -- hercules in red5mam, still broken
-			if ((!(m_newvid_1d & 0x04)) && (m_newvid_1c & 0x10))
+				if (m_newvid_1d & 0x02)
+				{
+					width = 16;
+					bpp = 4;
+				}
+
+				// testing with lxcmcysp later games in the list
+				// 12 09 0f -- 'alt_16_handling'
+				// 22 09 0f -- some games, works
+				// 12 0f 0f -- menu, works
+				// 12 0b 0f -- hercules in red5mam, still broken
+				if ((!(m_newvid_1d & 0x04)) && (m_newvid_1c & 0x10))
+				{
+					alt_16_handling = true;
+					bpp = 4;
+				}
+			}
+			else
 			{
-				alt_16_handling = true;
-				bpp = 4;
+				// use the old size register in this mode? monster jump in lxcmcysp at least sets it
+				height = (m_regs[PPU_CONTROL0] & PPU_CONTROL0_SPRITE_SIZE) ? 16 : 8;
+				width = 8;
+				bpp = 8;
+				alt_16_handling = false;
 			}
-
-
-
-			//ypos++; // red5mam menu alignment, probably not, others disagree
 
 			// if the sprite isn't visible, skip it
 			if ((ypos + height <= m_scanline) || (ypos > m_scanline))
