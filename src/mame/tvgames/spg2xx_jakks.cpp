@@ -422,6 +422,11 @@ ROM_START( jak_shrk )
 	ROM_LOAD16_WORD_SWAP( "jakkshrek.u2", 0x000000, 0x400000, CRC(4abb910d) SHA1(e663abd2ba6eacca2f4a046d8b8ebac2cf3fd36a) )
 ROM_END
 
+ROM_START( jak_marv )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakmarvelheroes.u4", 0x000000, 0x200000, CRC(e63259a3) SHA1(8745f3071ba460c8ba4a5bd376a72154b2edd8bd) )
+ROM_END
+
 ROM_START( jak_spdv )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "jakkspiderweb.u2", 0x000000, 0x200000, CRC(408c94bc) SHA1(350f7b84abf3d0d56f081647b3a228505751ff70) )
@@ -495,5 +500,7 @@ CONS( 2007, jak_hsm,  0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_ini
 
 // menu sounds don't work until you go into a game (work after a reset, bad default initializations?)
 CONS( 2006, jak_shrk , 0, 0, spg2xx_jakks, spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Dreamworks Shrek / Over The Hedge (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2006, jak_marv , 0, 0, spg2xx_jakks, spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Marvel Heroes: Ultimate Action (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2006, jak_dpma,  0, 0, spg2xx_dpma,  spg2xx_dpma,   jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Disney Princess Magical Adventures (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
