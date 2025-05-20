@@ -686,7 +686,7 @@ CONS( 2004, jak_spdmoa,jak_spdm, 0, spg110_base, jak_spdmo, spg110_game_state, e
 
 CONS( 2004, jak_wpt,  0,         0, spg110_base, jak_spdmo, spg110_game_state, init_crc, "JAKKS Pacific Inc / Digital Eclipse", "World Poker Tour (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2004, jak_diso, jak_dis,   0, spg110_base, jak_spdmo, spg110_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Disney (JAKKS Pacific TV Game) (SPG110 hardware, 28 MAY 2004 A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2004, jak_diso, jak_disn,  0, spg110_base, jak_spdmo, spg110_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Disney (JAKKS Pacific TV Game) (SPG110 hardware, 28 MAY 2004 A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // ROM bytesum is off by 0x3e, so likely a bad byte
 // sound doesn't work properly after a few initial sounds (expected, SPG110 issues)
