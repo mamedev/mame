@@ -127,8 +127,10 @@ int sound_pa::init(osd_interface &osd, osd_options const &options)
 	};
 
 	PaError err = Pa_Initialize();
-	if(err)
+	if(err) {
+		osd_printf_error("PortAudio error: %s\n", Pa_GetErrorText(err));
 		return 1;
+	}
 
 	m_info.m_generation = 1;
 	m_info.m_nodes.resize(Pa_GetDeviceCount());
@@ -200,6 +202,7 @@ uint32_t sound_pa::stream_sink_open(uint32_t node, std::string name, uint32_t ra
 	if(!err)
 		err = Pa_StartStream(si->second.m_stream);
 	if(err) {
+		osd_printf_error("PortAudio error: %s\n", Pa_GetErrorText(err));
 		m_streams.erase(si);
 		return 0;
 	}
@@ -227,8 +230,8 @@ uint32_t sound_pa::stream_source_open(uint32_t node, std::string name, uint32_t 
 		err = Pa_SetStreamFinishedCallback(si->second.m_stream, s_stream_finished_callback);
 	if(!err)
 		err = Pa_StartStream(si->second.m_stream);
-
 	if(err) {
+		osd_printf_error("PortAudio error: %s\n", Pa_GetErrorText(err));
 		m_streams.erase(si);
 		return 0;
 	}
