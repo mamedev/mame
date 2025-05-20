@@ -16,8 +16,6 @@
 
         assumed:
         JAKKS EA Sports (NHL 95 + Madden 95) (US)
-        JAKKS Bob the Builder
-        JAKKS Disney (original release)
 
 *******************************************************************************/
 
@@ -645,6 +643,12 @@ ROM_START( jak_wpt )
 	// also has an LCD display on the unit, is the display driven by the main program, or something else?
 ROM_END
 
+ROM_START( jak_diso )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakksdisneyred.u2", 0x000000, 0x200000, CRC(e88e117f) SHA1(0d5ffc831d47e46e72657d1b6bbd6ca18f76b2aa) )
+ROM_END
+
+
 ROM_START( conyteni )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "tennis_m29w160eb.bin", 0x000000, 0x200000, CRC(70050f17) SHA1(929f0d8599b7380b5994684424bb91063c4f6569) )
@@ -677,10 +681,12 @@ ROM_END
 // JAKKS Pacific Inc TV games
 CONS( 2004, jak_capb,  0,        0, spg110_base, jak_capb,  spg110_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "Classic Arcade Pinball (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2004, jak_spdmo, jak_spdm, 0, spg110_base, jak_spdmo, spg110_game_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse", "Spider-Man (JAKKS Pacific TV Game) (older hardware, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // this is the smaller more 'square' style joystick that was originally released before the GameKey slot was added.
-CONS( 2004, jak_spdmoa,jak_spdm, 0, spg110_base, jak_spdmo, spg110_game_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse", "Spider-Man (JAKKS Pacific TV Game) (older hardware, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // this is the resdesigned stick, but before the GameKey release
+CONS( 2004, jak_spdmo, jak_spdm, 0, spg110_base, jak_spdmo, spg110_game_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse", "Spider-Man (JAKKS Pacific TV Game) (SPG110 hardware, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // this is the smaller more 'square' style joystick that was originally released before the GameKey slot was added.
+CONS( 2004, jak_spdmoa,jak_spdm, 0, spg110_base, jak_spdmo, spg110_game_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse", "Spider-Man (JAKKS Pacific TV Game) (SPG110 hardware, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // this is the redesigned stick, but before the GameKey release
 
 CONS( 2004, jak_wpt,  0,         0, spg110_base, jak_spdmo, spg110_game_state, init_crc, "JAKKS Pacific Inc / Digital Eclipse", "World Poker Tour (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 2004, jak_diso, jak_dis,   0, spg110_base, jak_spdmo, spg110_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Disney (JAKKS Pacific TV Game) (SPG110 hardware, 28 MAY 2004 A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // ROM bytesum is off by 0x3e, so likely a bad byte
 // sound doesn't work properly after a few initial sounds (expected, SPG110 issues)
