@@ -53,6 +53,7 @@ RGB O/P connector
 #include "screen.h"
 #include "speaker.h"
 
+#include "pntnpuzls.lh"
 
 namespace {
 
@@ -304,4 +305,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1994, pntnpuzls, 0, pntnpuzls, pntnpuzls, pntnpuzls_state, empty_init, ROT90, "Century Vending / Green Concepts International", "Paint 'N Puzzle Super", MACHINE_NOT_WORKING )
+GAMEL( 1994, pntnpuzls, 0, pntnpuzls, pntnpuzls, pntnpuzls_state, empty_init, ROT90, "Century Vending / Green Concepts International", "Paint 'N Puzzle Super", MACHINE_NOT_WORKING, layout_pntnpuzls )

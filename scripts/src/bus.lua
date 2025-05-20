@@ -2903,6 +2903,8 @@ if (BUSES["VME"]~=null) then
 		MAME_DIR .. "src/devices/bus/vme/tp880v.h",
 		MAME_DIR .. "src/devices/bus/vme/tp881v.cpp",
 		MAME_DIR .. "src/devices/bus/vme/tp881v.h",
+		MAME_DIR .. "src/devices/bus/vme/tsvme104.cpp",
+		MAME_DIR .. "src/devices/bus/vme/tsvme104.h",
 	}
 end
 

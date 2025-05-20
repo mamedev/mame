@@ -6,7 +6,7 @@
 
     PortAudio interface.
 
-*******************************************************************c********/
+***************************************************************************/
 
 #include "sound_module.h"
 
@@ -79,11 +79,12 @@ private:
 	// Used when the stream callbacks need to be protected.
 	// In our case, when audio buffers are manipulated on a running stream.
 	// There is no real need to have one per stream.
-	std::mutex m_stream_mutex; 
+	std::mutex m_stream_mutex;
 
 	std::map<uint32_t, stream_info> m_streams;
 
 	uint32_t m_stream_id;
+	float m_audio_latency;
 
 	int stream_callback(stream_info *stream, const void *input, void *output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags);
 	static int s_stream_callback(const void *input, void *output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void *userData);
@@ -111,7 +112,7 @@ int sound_pa::init(osd_interface &osd, osd_options const &options)
 		{ -0.2,  0.0,  0.0 },
 		{  0.2,  0.0,  0.0 },
 		{  0.0,  0.0, -1.0 },
-	};		
+	};
 
 	static const uint32_t positions[9][9] = {
 		{ FC },
@@ -126,15 +127,18 @@ int sound_pa::init(osd_interface &osd, osd_options const &options)
 	};
 
 	PaError err = Pa_Initialize();
-	if(err)
+	if(err) {
+		osd_printf_error("PortAudio error: %s\n", Pa_GetErrorText(err));
 		return 1;
+	}
 
 	m_info.m_generation = 1;
 	m_info.m_nodes.resize(Pa_GetDeviceCount());
 	for(PaDeviceIndex dev = 0; dev != Pa_GetDeviceCount(); dev++) {
 		const PaDeviceInfo *di = Pa_GetDeviceInfo(dev);
+		const PaHostApiInfo *ai = Pa_GetHostApiInfo(di->hostApi);
 		auto &node = m_info.m_nodes[dev];
-		node.m_name = di->name;
+		node.m_name = util::string_format("%s: %s", ai->name, di->name);
 		node.m_id = dev + 1;
 		node.m_rate.m_default_rate = node.m_rate.m_min_rate = node.m_rate.m_max_rate = di->defaultSampleRate;
 		node.m_sinks = di->maxOutputChannels;
@@ -153,12 +157,13 @@ int sound_pa::init(osd_interface &osd, osd_options const &options)
 	m_info.m_default_sink = dc(Pa_GetDefaultOutputDevice());
 	m_info.m_default_source = dc(Pa_GetDefaultInputDevice());
 
+	m_audio_latency = options.audio_latency();
 	m_stream_id = 1;
 
 	return 0;
 }
 
-void sound_pa::exit() 
+void sound_pa::exit()
 {
 	Pa_Terminate();
 }
@@ -188,7 +193,7 @@ uint32_t sound_pa::stream_sink_open(uint32_t node, std::string name, uint32_t ra
 	op.device = node - 1;
 	op.channelCount = m_info.m_nodes[node-1].m_sinks;
 	op.sampleFormat = paInt16;
-	op.suggestedLatency = Pa_GetDeviceInfo(node - 1)->defaultLowOutputLatency;
+	op.suggestedLatency = (m_audio_latency > 0.0f) ? m_audio_latency : Pa_GetDeviceInfo(node - 1)->defaultLowOutputLatency;
 	op.hostApiSpecificStreamInfo = nullptr;
 
 	PaError err = Pa_OpenStream(&si->second.m_stream, nullptr, &op, rate, paFramesPerBufferUnspecified, 0, s_stream_callback, &si->second);
@@ -197,6 +202,7 @@ uint32_t sound_pa::stream_sink_open(uint32_t node, std::string name, uint32_t ra
 	if(!err)
 		err = Pa_StartStream(si->second.m_stream);
 	if(err) {
+		osd_printf_error("PortAudio error: %s\n", Pa_GetErrorText(err));
 		m_streams.erase(si);
 		return 0;
 	}
@@ -216,7 +222,7 @@ uint32_t sound_pa::stream_source_open(uint32_t node, std::string name, uint32_t 
 	ip.device = node - 1;
 	ip.channelCount = m_info.m_nodes[node-1].m_sources;
 	ip.sampleFormat = paInt16;
-	ip.suggestedLatency = Pa_GetDeviceInfo(node - 1)->defaultLowInputLatency;
+	ip.suggestedLatency = (m_audio_latency > 0.0f) ? m_audio_latency : Pa_GetDeviceInfo(node - 1)->defaultLowInputLatency;
 	ip.hostApiSpecificStreamInfo = nullptr;
 
 	PaError err = Pa_OpenStream(&si->second.m_stream, &ip, nullptr, rate, paFramesPerBufferUnspecified, 0, s_stream_callback, &si->second);
@@ -224,8 +230,8 @@ uint32_t sound_pa::stream_source_open(uint32_t node, std::string name, uint32_t 
 		err = Pa_SetStreamFinishedCallback(si->second.m_stream, s_stream_finished_callback);
 	if(!err)
 		err = Pa_StartStream(si->second.m_stream);
-	
 	if(err) {
+		osd_printf_error("PortAudio error: %s\n", Pa_GetErrorText(err));
 		m_streams.erase(si);
 		return 0;
 	}
@@ -238,7 +244,9 @@ void sound_pa::stream_close(uint32_t id)
 	auto si = m_streams.find(id);
 	if(si == m_streams.end())
 		return;
-	Pa_CloseStream(si->second.m_stream);
+	auto *s = si->second.m_stream;
+	lock.unlock();
+	Pa_CloseStream(s);
 }
 
 void sound_pa::stream_sink_update(uint32_t id, const int16_t *buffer, int samples_this_frame)

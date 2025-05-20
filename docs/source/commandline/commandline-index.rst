@@ -352,14 +352,6 @@ HTTP Server Options
 | :ref:`http_root <mame-commandline-httproot>`
 
 
-PortAudio Options
-~~~~~~~~~~~~~~~~~
-
-| :ref:`pa_api <mame-commandline-paapi>`
-| :ref:`pa_device <mame-commandline-padevice>`
-| :ref:`pa_latency <mame-commandline-palatency>`
-
-
 Windows-Specific Command-line Options
 -------------------------------------
 

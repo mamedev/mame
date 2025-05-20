@@ -6,7 +6,7 @@
 
     OS-dependent code interface.
 
-*******************************************************************c********/
+***************************************************************************/
 #ifndef MAME_OSD_LIB_OSDOBJ_COMMON_H
 #define MAME_OSD_LIB_OSDOBJ_COMMON_H
 
@@ -80,10 +80,6 @@
 
 #define OSDOPTION_SOUND                 "sound"
 #define OSDOPTION_AUDIO_LATENCY         "audio_latency"
-
-#define OSDOPTION_PA_API                "pa_api"
-#define OSDOPTION_PA_DEVICE             "pa_device"
-#define OSDOPTION_PA_LATENCY            "pa_latency"
 
 #define OSDOPTION_AUDIO_OUTPUT          "audio_output"
 #define OSDOPTION_AUDIO_EFFECT          "audio_effect"
@@ -167,7 +163,7 @@ public:
 
 	// sound options
 	const char *sound() const { return value(OSDOPTION_SOUND); }
-	int audio_latency() const { return int_value(OSDOPTION_AUDIO_LATENCY); }
+	float audio_latency() const { return float_value(OSDOPTION_AUDIO_LATENCY); }
 
 	// CoreAudio specific options
 	const char *audio_output() const { return value(OSDOPTION_AUDIO_OUTPUT); }
@@ -181,11 +177,6 @@ public:
 	const char *bgfx_shadow_mask() const { return value(OSDOPTION_BGFX_SHADOW_MASK); }
 	const char *bgfx_lut() const { return value(OSDOPTION_BGFX_LUT); }
 	const char *bgfx_avi_name() const { return value(OSDOPTION_BGFX_AVI_NAME); }
-
-	// PortAudio options
-	const char *pa_api() const { return value(OSDOPTION_PA_API); }
-	const char *pa_device() const { return value(OSDOPTION_PA_DEVICE); }
-	float pa_latency() const { return float_value(OSDOPTION_PA_LATENCY); }
 
 	static const options_entry s_option_entries[];
 };
@@ -301,7 +292,7 @@ protected:
 
 private:
 	// internal state
-	running_machine *   m_machine;
+	running_machine *m_machine;
 	osd_options& m_options;
 
 	bool m_print_verbose;

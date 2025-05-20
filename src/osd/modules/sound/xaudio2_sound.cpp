@@ -43,7 +43,6 @@ namespace {
 //  Constants
 //============================================================
 
-#define INITIAL_BUFFER_COUNT 4
 #define SUBMIT_FREQUENCY_TARGET_MS 20
 #define RESAMPLE_TOLERANCE 1.20f
 
@@ -192,7 +191,7 @@ public:
 		m_masterVoice(nullptr),
 		m_sourceVoice(nullptr),
 		m_sample_rate(0),
-		m_audio_latency(0),
+		m_audio_latency(0.0f),
 		m_sample_bytes(0),
 		m_buffer(nullptr),
 		m_buffer_size(0),
@@ -238,7 +237,7 @@ private:
 	mastering_voice_ptr              m_masterVoice;
 	src_voice_ptr                    m_sourceVoice;
 	int                              m_sample_rate;
-	int                              m_audio_latency;
+	float                            m_audio_latency;
 	DWORD                            m_sample_bytes;
 	std::unique_ptr<BYTE[]>          m_buffer;
 	DWORD                            m_buffer_size;
@@ -290,6 +289,8 @@ int sound_xaudio2::init(osd_interface &osd, osd_options const &options)
 
 	m_sample_rate = options.sample_rate();
 	m_audio_latency = options.audio_latency();
+	if (m_audio_latency == 0.0f)
+		m_audio_latency = 0.1f;
 
 	// Create the IXAudio2 object
 	HR_GOERR(OSD_DYNAMIC_CALL(XAudio2Create, m_xAudio2.GetAddressOf(), 0, XAUDIO2_DEFAULT_PROCESSOR));
@@ -459,15 +460,14 @@ void sound_xaudio2::OnVoiceProcessingPassStart(uint32_t bytes_required) noexcept
 void sound_xaudio2::create_buffers(const WAVEFORMATEX &format)
 {
 	// Compute the buffer size
-	// buffer size is equal to the bytes we need to hold in memory per X tenths of a second where X is audio_latency
-	int audio_latency = std::max(m_audio_latency, 1);
-	float audio_latency_in_seconds = audio_latency / 10.0f;
+	// buffer size is equal to the bytes we need to hold in memory per X thousands of a second where X is audio_latency
+	int audio_latency_ms = std::max(int(m_audio_latency * 1000.0f + 0.5f), SUBMIT_FREQUENCY_TARGET_MS);
 	uint32_t format_bytes_per_second = format.nSamplesPerSec * format.nBlockAlign;
-	uint32_t total_buffer_size = format_bytes_per_second * audio_latency_in_seconds * RESAMPLE_TOLERANCE;
+	uint32_t total_buffer_size = format_bytes_per_second * (audio_latency_ms / 1000.0f) * RESAMPLE_TOLERANCE;
 
 	// We want to be able to submit buffers every X milliseconds
 	// I want to divide these up into "packets" so figure out how many buffers we need
-	m_buffer_count = (audio_latency_in_seconds * 1000.0f) / SUBMIT_FREQUENCY_TARGET_MS;
+	m_buffer_count = audio_latency_ms / SUBMIT_FREQUENCY_TARGET_MS;
 
 	// Now record the size of the individual buffers
 	m_buffer_size = std::max(DWORD(1024), total_buffer_size / m_buffer_count);

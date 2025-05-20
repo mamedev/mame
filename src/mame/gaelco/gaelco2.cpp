@@ -426,6 +426,7 @@ ROM_START( maniacsqs ) // REF 960419/1
 	ROM_LOAD( "mu.c5_3a65_pal16r8.bin",  0x000, 0x104, BAD_DUMP CRC(27b1ca8b) SHA1(038d1352baff18f619ac4149e5825ef9664c983b) )
 ROM_END
 
+
 /*============================================================================
                             Salter Cardioline Series
   ============================================================================*/
@@ -514,6 +515,7 @@ void gaelco2_state::saltcrdi(machine_config &config)
 	gaelco.add_route(1, "speaker", 1.0, 1);
 }
 
+
 /*============================================================================
                   Salter Cardioline Pro Cycle / Pro Reclimber
   ============================================================================
@@ -578,6 +580,107 @@ ROM_START( sltpcycl ) // REF 970410
 	ROM_REGION( 0x0104, "pals", 0 )
 	ROM_LOAD( "6.pal16l8.u12", 0x0000, 0x0104, NO_DUMP )
 ROM_END
+
+ROM_START( sltpcycla )
+	ROM_REGION( 0x040000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "bici_u21_fd53_7-4-97_27c512.u21", 0x000000, 0x010000, CRC(cc3e71c6) SHA1(e4862c8a2f0f6bdfb10447fdb3310cb59bab3482) )
+	ROM_LOAD16_BYTE( "bici_u23_e223_7-4-97_27c512.u23", 0x000001, 0x010000, CRC(b86f0b78) SHA1(1b943e14553c041796b8f19db91afff988813b35) )
+
+	ROM_REGION( 0x0280000, "gfx", ROMREGION_ERASEFF ) // GFX, no sound, machine has none?
+	ROM_LOAD( "bici_u40_779a_0l_7-4-97_27c010.u40", 0x0000000, 0x0020000, CRC(56822524) SHA1(aae133e9fb85ba8995c095cc540aa35b65c27777) )
+	ROM_LOAD( "bici_u39_3fae_1l_7-4-97_27c010.u39", 0x0080000, 0x0020000, CRC(30dfcde1) SHA1(caf4429d0e1185c157eca436e9bb3a8513781a97) )
+	ROM_LOAD( "bici_u38_1391_3l_7-4-97_27c010.u38", 0x0100000, 0x0020000, CRC(84ec4b34) SHA1(01376f2534c4bc51d0a357d80db28b24c3fd71f6) )
+	ROM_LOAD( "bici_u36_d083_3l_7-4-97_27c010.u36", 0x0180000, 0x0020000, CRC(779fca47) SHA1(fce95893a5bcf0c6f26c223491c95154f072c92b) )
+	ROM_FILL(                                       0x0200000, 0x0020000, 0x00 )         // to decode GFX as 5bpp
+	ROM_LOAD( "bici_u44_0296_0h_7-4-97_27c010.u44", 0x0020000, 0x0020000, CRC(171d2f88) SHA1(e2b406dad78e3ab5bebb673ed03db5d27879283e) )
+	ROM_LOAD( "bici_u43_413c_1h_7-4-97_27c010.u43", 0x00a0000, 0x0020000, CRC(69b35d81) SHA1(d9657e3d592079071df019cd75d676fa4b1bcba9) )
+	ROM_LOAD( "bici_u42_f82s_2h_7-4-97_27c010.u42", 0x0120000, 0x0020000, CRC(eaef0565) SHA1(4214b05f1df3062eaeea91505b61816725556ed5) )
+	ROM_LOAD( "bici_u41_1f75_3h_7-4-97_27c010.u41", 0x01a0000, 0x0020000, CRC(c4d24254) SHA1(e6ff7624e628dc6ace11a50b6ff89812844b52c5) )
+	ROM_FILL(                                       0x0220000, 0x0020000, 0x00 )         // to decode GFX as 5bpp
+
+	ROM_REGION( 0x0800, "iomcu", 0 ) // on IO board
+	ROM_LOAD( "2-st62t15c6", 0x0000, 0x0800, NO_DUMP ) // 2KBytes internal ROM
+
+	ROM_REGION( 0x0104, "pals", 0 )
+	ROM_LOAD( "mu.6_pal16l8.u12", 0x0000, 0x0104, CRC(00aedab5) SHA1(497555962e1d85ffb4fd37cff778772abd1bbe32) )
+ROM_END
+
+// Older main PCB, unknown I/O PCB
+ROM_START( sltpcyclb )
+	ROM_REGION( 0x040000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "tachado_bici_0_u21_27c512.u21", 0x000000, 0x010000, CRC(7a9105e4) SHA1(c0af6984943032e0e08d575e6c84a6e788c6f6ac) )
+	ROM_LOAD16_BYTE( "tachado_bici_1_u23_27c512.u23", 0x000001, 0x010000, CRC(bde3015e) SHA1(32afa4b53b4a480737eb4ccbf160533d27c5c7ea) )
+
+	ROM_REGION( 0x0280000, "gfx", ROMREGION_ERASEFF )
+	ROM_LOAD( "bici_f0_l_j10_e71f_27c010a.bin", 0x0000000, 0x0020000, CRC(ba239de5) SHA1(f5ed168d383488a393cdc71a5ec27723aa85d433) )
+	ROM_LOAD( "bici_f1_l_j9_5c66_27c010a.bin",  0x0080000, 0x0020000, CRC(5de80a28) SHA1(86d20c53d21132cc802f9ae227ad32ec1da1c115) )
+	ROM_LOAD( "bici_f2_l_j7_326c_27c010a.bin",  0x0100000, 0x0020000, CRC(398db663) SHA1(30ffde3735500268dfe1b1524044ccbd16864709) )
+	ROM_LOAD( "bici_f3_l_j6_d1a2_27c010a.bin",  0x0180000, 0x0020000, CRC(8bc28070) SHA1(2338b077630b5982a044e2d042d94450f720dc54) )
+	ROM_FILL(                                   0x0200000, 0x0020000, 0x00 )
+	ROM_LOAD( "bici_f0_h_h10_39da_27c010a.bin", 0x0020000, 0x0020000, CRC(f8dd0e83) SHA1(8c8f6523ef40b8000bdceb67e6cc27a397e49bed) )
+	ROM_LOAD( "bici_f1_h_h9_7e79_27c010a.bin",  0x00a0000, 0x0020000, CRC(c1ecab70) SHA1(7faefc09227b7449d27ad5899de134db761fbfb7) )
+	ROM_LOAD( "bici_f2_h_h7_3418_27c010a.bin",  0x0120000, 0x0020000, CRC(1cc875ec) SHA1(5fad36b4aaf148bc3e9ea11e171d3730a0e7deba) )
+	ROM_LOAD( "bici_f3_h_h7_f314_27c010a.u41",  0x01a0000, 0x0020000, CRC(a206aa3f) SHA1(775b03f2a9a623190a5392ceadecd9fbf57cce80) )
+	ROM_FILL(                                   0x0220000, 0x0020000, 0x00 )
+ROM_END
+
+// Older main PCB, unknown I/O PCB
+ROM_START( sltpcyclc )
+	ROM_REGION( 0x040000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "bici_06.11_4f4e_0_d18_27c512.bin", 0x000000, 0x010000, CRC(62f25e57) SHA1(b49973bc8d59cf658371c9a5e0a7395a65a5539e) )
+	ROM_LOAD16_BYTE( "bici_06.11_6ce7_1_d16_27c512.bin", 0x000001, 0x010000, CRC(b3d8327b) SHA1(bc992d93e31d1442be3170c4b27950459ff5bd23) )
+
+	ROM_REGION( 0x0280000, "gfx", ROMREGION_ERASEFF )
+	ROM_LOAD( "bici_f0_l_j10_e71f_27c010a.bin", 0x0000000, 0x0020000, CRC(ba239de5) SHA1(f5ed168d383488a393cdc71a5ec27723aa85d433) )
+	ROM_LOAD( "bici_f1_l_j9_5c66_27c010a.bin",  0x0080000, 0x0020000, CRC(5de80a28) SHA1(86d20c53d21132cc802f9ae227ad32ec1da1c115) )
+	ROM_LOAD( "bici_f2_l_j7_326c_27c010a.bin",  0x0100000, 0x0020000, CRC(398db663) SHA1(30ffde3735500268dfe1b1524044ccbd16864709) )
+	ROM_LOAD( "bici_f3_l_j6_d1a2_27c010a.bin",  0x0180000, 0x0020000, CRC(8bc28070) SHA1(2338b077630b5982a044e2d042d94450f720dc54) )
+	ROM_FILL(                                   0x0200000, 0x0020000, 0x00 )
+	ROM_LOAD( "bici_f0_h_h10_39da_27c010a.bin", 0x0020000, 0x0020000, CRC(f8dd0e83) SHA1(8c8f6523ef40b8000bdceb67e6cc27a397e49bed) )
+	ROM_LOAD( "bici_f1_h_h9_7e79_27c010a.bin",  0x00a0000, 0x0020000, CRC(c1ecab70) SHA1(7faefc09227b7449d27ad5899de134db761fbfb7) )
+	ROM_LOAD( "bici_f2_h_h7_3418_27c010a.bin",  0x0120000, 0x0020000, CRC(1cc875ec) SHA1(5fad36b4aaf148bc3e9ea11e171d3730a0e7deba) )
+	ROM_LOAD( "bici_f3_h_h7_f314_27c010a.u41",  0x01a0000, 0x0020000, CRC(a206aa3f) SHA1(775b03f2a9a623190a5392ceadecd9fbf57cce80) )
+	ROM_FILL(                                   0x0220000, 0x0020000, 0x00 )
+ROM_END
+
+// Older main PCB, unknown I/O PCB
+ROM_START( sltpcycld )
+	ROM_REGION( 0x040000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "tachado_bici_22.10_4eea_d18_0_27c512.bin", 0x000000, 0x010000, CRC(d186773f) SHA1(2025597eaf2d4c461f3201be99a1d94be714c1e2) )
+	ROM_LOAD16_BYTE( "tachado_bici_22.10_6c78_d16_1_27c512.bin", 0x000001, 0x010000, CRC(1afd8cec) SHA1(14aef060d2573bc54cf0efd3690f177af9475b27) )
+
+	ROM_REGION( 0x0280000, "gfx", ROMREGION_ERASEFF )
+	ROM_LOAD( "bici_f0_l_j10_e71f_27c010a.bin", 0x0000000, 0x0020000, CRC(ba239de5) SHA1(f5ed168d383488a393cdc71a5ec27723aa85d433) )
+	ROM_LOAD( "bici_f1_l_j9_5c66_27c010a.bin",  0x0080000, 0x0020000, CRC(5de80a28) SHA1(86d20c53d21132cc802f9ae227ad32ec1da1c115) )
+	ROM_LOAD( "bici_f2_l_j7_326c_27c010a.bin",  0x0100000, 0x0020000, CRC(398db663) SHA1(30ffde3735500268dfe1b1524044ccbd16864709) )
+	ROM_LOAD( "bici_f3_l_j6_d1a2_27c010a.bin",  0x0180000, 0x0020000, CRC(8bc28070) SHA1(2338b077630b5982a044e2d042d94450f720dc54) )
+	ROM_FILL(                                   0x0200000, 0x0020000, 0x00 )
+	ROM_LOAD( "bici_f0_h_h10_39da_27c010a.bin", 0x0020000, 0x0020000, CRC(f8dd0e83) SHA1(8c8f6523ef40b8000bdceb67e6cc27a397e49bed) )
+	ROM_LOAD( "bici_f1_h_h9_7e79_27c010a.bin",  0x00a0000, 0x0020000, CRC(c1ecab70) SHA1(7faefc09227b7449d27ad5899de134db761fbfb7) )
+	ROM_LOAD( "bici_f2_h_h7_3418_27c010a.bin",  0x0120000, 0x0020000, CRC(1cc875ec) SHA1(5fad36b4aaf148bc3e9ea11e171d3730a0e7deba) )
+	ROM_LOAD( "bici_f3_h_h7_f314_27c010a.u41",  0x01a0000, 0x0020000, CRC(a206aa3f) SHA1(775b03f2a9a623190a5392ceadecd9fbf57cce80) )
+	ROM_FILL(                                   0x0220000, 0x0020000, 0x00 )
+ROM_END
+
+// Older main PCB, unknown I/O PCB
+ROM_START( sltpcycle )
+	ROM_REGION( 0x040000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "tachado_bici_13.07_4caf_d18_0_27c512.bin", 0x000000, 0x010000, CRC(8aea93cb) SHA1(0352f9c1fe2a8cfa456c661605250afa384a9af9) )
+	ROM_LOAD16_BYTE( "tachado_bici_13.07_6b79_d16_1_27c512.bin", 0x000001, 0x010000, CRC(7327f0f8) SHA1(032cfa43d7052bd0a224ebd13191123ab06c37b0) )
+
+	ROM_REGION( 0x0280000, "gfx", ROMREGION_ERASEFF )
+	ROM_LOAD( "bici_f0_l_j10_e71f_27c010a.bin", 0x0000000, 0x0020000, CRC(ba239de5) SHA1(f5ed168d383488a393cdc71a5ec27723aa85d433) )
+	ROM_LOAD( "bici_f1_l_j9_5c66_27c010a.bin",  0x0080000, 0x0020000, CRC(5de80a28) SHA1(86d20c53d21132cc802f9ae227ad32ec1da1c115) )
+	ROM_LOAD( "bici_f2_l_j7_326c_27c010a.bin",  0x0100000, 0x0020000, CRC(398db663) SHA1(30ffde3735500268dfe1b1524044ccbd16864709) )
+	ROM_LOAD( "bici_f3_l_j6_d1a2_27c010a.bin",  0x0180000, 0x0020000, CRC(8bc28070) SHA1(2338b077630b5982a044e2d042d94450f720dc54) )
+	ROM_FILL(                                   0x0200000, 0x0020000, 0x00 )
+	ROM_LOAD( "bici_f0_h_h10_39da_27c010a.bin", 0x0020000, 0x0020000, CRC(f8dd0e83) SHA1(8c8f6523ef40b8000bdceb67e6cc27a397e49bed) )
+	ROM_LOAD( "bici_f1_h_h9_7e79_27c010a.bin",  0x00a0000, 0x0020000, CRC(c1ecab70) SHA1(7faefc09227b7449d27ad5899de134db761fbfb7) )
+	ROM_LOAD( "bici_f2_h_h7_3418_27c010a.bin",  0x0120000, 0x0020000, CRC(1cc875ec) SHA1(5fad36b4aaf148bc3e9ea11e171d3730a0e7deba) )
+	ROM_LOAD( "bici_f3_h_h7_f314_27c010a.u41",  0x01a0000, 0x0020000, CRC(a206aa3f) SHA1(775b03f2a9a623190a5392ceadecd9fbf57cce80) )
+	ROM_FILL(                                   0x0220000, 0x0020000, 0x00 )
+ROM_END
+
 
 /*============================================================================
                            Salter Cardioline Pro Steper
@@ -659,14 +762,69 @@ ROM_START( sltpstep )
 	ROM_LOAD( "cpu_6022-1-st62t15b6.ic4", 0x0000, 0x0800, NO_DUMP ) // 2KBytes internal ROM
 
 	ROM_REGION( 0x0104, "pals", 0 )
-	ROM_LOAD( "6.pal16l8.u12", 0x0000, 0x0104, NO_DUMP )
+	ROM_LOAD( "mu.6_pal16l8.u12", 0x0000, 0x0104, CRC(00aedab5) SHA1(497555962e1d85ffb4fd37cff778772abd1bbe32) )
+ROM_END
+
+// Older main PCB, unknown I/O PCB
+ROM_START( sltpstepa )
+	ROM_REGION( 0x040000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "step_0_23.01.98_21_88e6_27c512.bin", 0x000000, 0x010000, CRC(c62a9d36) SHA1(674de3248b490c25620267e643540f05e2d2abac) )
+	ROM_LOAD16_BYTE( "step_1_23.01.98_23_4583_27c512.bin", 0x000001, 0x010000, CRC(b5467467) SHA1(0d111f92c84873175e44a65515efb7c8af607a63) )
+
+	ROM_REGION( 0x0280000, "gfx", ROMREGION_ERASEFF ) // GFX, no sound, machine has none?
+	ROM_LOAD( "st_17-10_f0_h10_234a_27c040.bin", 0x0000000, 0x0080000, CRC(082d0581) SHA1(5ddeb1ead89f9a287b58869fdfcfd2aff0cad9f2) )
+	ROM_LOAD( "st_17-10_f1_h9_ddb8_27c040.bin",  0x0080000, 0x0080000, CRC(595173a3) SHA1(fa879a0167ff3ef25dafcc45bbedfe5a8eb50353) )
+	ROM_LOAD( "st_17-10_f2_h7_021e_27c040.bin",  0x0100000, 0x0080000, CRC(c0100462) SHA1(453242183f35c30eb437d46ad6aa6f8124b64a71) )
+	ROM_LOAD( "st_17-10_f3_h6_56ff8_27c040.bin", 0x0180000, 0x0080000, CRC(47d6926a) SHA1(1d939f33c3e646c9d1e36875ae8dfc30ba800c20) )
+	ROM_FILL(                                    0x0200000, 0x0080000, 0x00 )         // to decode GFX as 5bpp
+ROM_END
+
+// Older main PCB, unknown I/O PCB
+ROM_START( sltpstepb )
+	ROM_REGION( 0x040000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "step_0_14.06_18_ef72_27c512.bin", 0x000000, 0x010000, CRC(d91f9e0e) SHA1(7099fc468c5aab207baa9f7653805a8a08299ca6) )
+	ROM_LOAD16_BYTE( "step_1_14.06_16_1c5a_27c512.bin", 0x000001, 0x010000, CRC(d22fc8e0) SHA1(e7602562434bb00fe1bab2451630f59ff293ecfe) )
+
+	ROM_REGION( 0x0280000, "gfx", ROMREGION_ERASEFF ) // GFX, no sound, machine has none?
+	ROM_LOAD( "st_17-10_f0_h10_234a_27c040.bin", 0x0000000, 0x0080000, CRC(082d0581) SHA1(5ddeb1ead89f9a287b58869fdfcfd2aff0cad9f2) )
+	ROM_LOAD( "st_17-10_f1_h9_ddb8_27c040.bin",  0x0080000, 0x0080000, CRC(595173a3) SHA1(fa879a0167ff3ef25dafcc45bbedfe5a8eb50353) )
+	ROM_LOAD( "st_17-10_f2_h7_021e_27c040.bin",  0x0100000, 0x0080000, CRC(c0100462) SHA1(453242183f35c30eb437d46ad6aa6f8124b64a71) )
+	ROM_LOAD( "st_17-10_f3_h6_56ff8_27c040.bin", 0x0180000, 0x0080000, CRC(47d6926a) SHA1(1d939f33c3e646c9d1e36875ae8dfc30ba800c20) )
+	ROM_FILL(                                    0x0200000, 0x0080000, 0x00 )         // to decode GFX as 5bpp
+ROM_END
+
+// Older main PCB, unknown I/O PCB
+ROM_START( sltpstepc )
+	ROM_REGION( 0x040000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "step_10.06_0_18_27c512.bin", 0x000000, 0x010000, CRC(1c84579c) SHA1(defd2754e1ba86df703cff63d8f065ceae257ecd) )
+	ROM_LOAD16_BYTE( "step_10.06_1_16_27c512.bin", 0x000001, 0x010000, CRC(ea160066) SHA1(d487c2b09bac849f7ebca5ec9a80a9eddbaf95bf) )
+
+	ROM_REGION( 0x0280000, "gfx", ROMREGION_ERASEFF ) // GFX, no sound, machine has none?
+	ROM_LOAD( "st_17-10_f0_h10_234a_27c040.bin", 0x0000000, 0x0080000, CRC(082d0581) SHA1(5ddeb1ead89f9a287b58869fdfcfd2aff0cad9f2) )
+	ROM_LOAD( "st_17-10_f1_h9_ddb8_27c040.bin",  0x0080000, 0x0080000, CRC(595173a3) SHA1(fa879a0167ff3ef25dafcc45bbedfe5a8eb50353) )
+	ROM_LOAD( "st_17-10_f2_h7_021e_27c040.bin",  0x0100000, 0x0080000, CRC(c0100462) SHA1(453242183f35c30eb437d46ad6aa6f8124b64a71) )
+	ROM_LOAD( "st_17-10_f3_h6_56ff8_27c040.bin", 0x0180000, 0x0080000, CRC(47d6926a) SHA1(1d939f33c3e646c9d1e36875ae8dfc30ba800c20) )
+	ROM_FILL(                                    0x0200000, 0x0080000, 0x00 )         // to decode GFX as 5bpp
+ROM_END
+
+// Older main PCB, unknown I/O PCB
+ROM_START( sltpstepd )
+	ROM_REGION( 0x040000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "step_0_2.07.96_18_d460_27c512.bin", 0x000000, 0x010000, CRC(ad8872c7) SHA1(1eb651417f15dabe27b5d0c3dd530c0229108c17) )
+	ROM_LOAD16_BYTE( "step_1_2.07.96_16_0d94_27c512.bin", 0x000001, 0x010000, CRC(c5cb51a0) SHA1(4826bcdf3a8e0bb79b9005835ab76c7a2994029f) )
+
+	ROM_REGION( 0x0280000, "gfx", ROMREGION_ERASEFF ) // GFX, no sound, machine has none?
+	ROM_LOAD( "st_17-10_f0_h10_234a_27c040.bin", 0x0000000, 0x0080000, CRC(082d0581) SHA1(5ddeb1ead89f9a287b58869fdfcfd2aff0cad9f2) )
+	ROM_LOAD( "st_17-10_f1_h9_ddb8_27c040.bin",  0x0080000, 0x0080000, CRC(595173a3) SHA1(fa879a0167ff3ef25dafcc45bbedfe5a8eb50353) )
+	ROM_LOAD( "st_17-10_f2_h7_021e_27c040.bin",  0x0100000, 0x0080000, CRC(c0100462) SHA1(453242183f35c30eb437d46ad6aa6f8124b64a71) )
+	ROM_LOAD( "st_17-10_f3_h6_56ff8_27c040.bin", 0x0180000, 0x0080000, CRC(47d6926a) SHA1(1d939f33c3e646c9d1e36875ae8dfc30ba800c20) )
+	ROM_FILL(                                    0x0200000, 0x0080000, 0x00 )         // to decode GFX as 5bpp
 ROM_END
 
 
 /*============================================================================
                             PLAY 2000
   ============================================================================*/
-
 
 /*
 CPU 1x MC68HC000FN12 (main)(u18)
@@ -1258,6 +1416,66 @@ JP3  - 4 pin light gun header (player 2)
 
 ROM_START( bang )
 	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "so_demo_bang_ic53_6ff0_15-2-99.ic53", 0x000000, 0x080000, CRC(0de5e331) SHA1(76ffc9c21885cd81024ce9fd328692af8e9191a9) )
+	ROM_LOAD16_BYTE( "so_demo_bang_ic55_abfc_15-2-99.ic55", 0x000001, 0x080000, CRC(b97b9d3a) SHA1(78a2f2e643b422cbb695a682c7af593e04cb93e7) )
+
+	ROM_REGION( 0x0a00000, "gfx", 0 ) // GFX + Sound
+	ROM_LOAD( "ba_16_468a_27c040.ic16", 0x0000000, 0x0080000, CRC(c926486c) SHA1(b0b977d54a8cb4fae204dd1d7c60d1e9455aacf3) )   // GFX only. Only 5 different bytes from 'bangb'. Confirmed good
+	ROM_LOAD( "ba_17_08d4_27c040.ic17", 0x0080000, 0x0080000, CRC(0c35aa6f) SHA1(df0474b1b9466d3c199e5aade39b7233f0cb45ee) )   // GFX only
+	ROM_LOAD( "ba_18_0a6a_27c040.ic18", 0x0100000, 0x0080000, CRC(2056b1ad) SHA1(b796f92eef4bbb0efa12c53580e429b8a0aa394c) )   // Sound only
+	ROM_FILL(                           0x0180000, 0x0080000, 0x00 )            // Empty
+	ROM_LOAD( "ba_9_1bc7_27c040.ic9",   0x0200000, 0x0080000, CRC(078195dc) SHA1(362ff194e2579346dfc7af88559b0718bc36ec8a) )   // GFX only
+	ROM_LOAD( "ba_10_7a6b_27c040.ic10", 0x0280000, 0x0080000, CRC(06711eeb) SHA1(3662ffe730fb54ee48925de9765f88be1abd5e4e) )   // GFX only
+	ROM_LOAD( "ba_11_e242_27c040.ic11", 0x0300000, 0x0080000, CRC(2088d15c) SHA1(0c043ab9fd33836fa4b7ad60fd8e7cb96ffb6121) )   // Sound only
+	ROM_FILL(                           0x0380000, 0x0080000, 0x00 )            // Empty
+	ROM_LOAD( "ba_1_1223_27c040.ic1",   0x0400000, 0x0080000, CRC(e7b97b0f) SHA1(b5503687ae3ca0a0faa4b867a267d89dac788d6d) )   // GFX only
+	ROM_LOAD( "ba_2_a40f_27c040.ic2",   0x0480000, 0x0080000, CRC(ff297a8f) SHA1(28819a9d7b3cb177e7a7db3fe23a94f5cba33049) )   // GFX only
+	ROM_LOAD( "ba_3_f69f_27c040.ic3",   0x0500000, 0x0080000, CRC(d3da5d4f) SHA1(b9bea0b4d20ab0bfda3fac2bb1fab974c007aaf0) )   // Sound only
+	ROM_FILL(                           0x0580000, 0x0080000, 0x00 )            // Empty
+	ROM_LOAD( "ba_20_b854_27c040.ic20", 0x0600000, 0x0080000, CRC(a1145df8) SHA1(305cda041a6f201cb011982f1bf1fc6a4153a669) )   // GFX only
+	ROM_LOAD( "ba_13_754e_27c040.ic13", 0x0680000, 0x0080000, CRC(fe3e8d07) SHA1(7a37561b1cf422b47cddb8751a6b6d57dec8baae) )   // GFX only
+	ROM_LOAD( "ba_5_a760_27c040.ic5",   0x0700000, 0x0080000, CRC(9bee444c) SHA1(aebaa3306e7e5aada99ed469da9bf64507808cff) )   // Sound only
+	ROM_FILL(                           0x0780000, 0x0080000, 0x00 )            // Empty
+	ROM_LOAD( "ba_21_2e9c_27c040.ic21", 0x0800000, 0x0080000, CRC(fd93d7f2) SHA1(ff9d8eb5ac8d9757132aa6d79d2f7662c14cd650) )   // GFX only
+	ROM_LOAD( "ba_14_6978_27c040.ic14", 0x0880000, 0x0080000, CRC(858fcbf9) SHA1(1e67431c8775666f4839bdc427fabf59ffc708c0) )   // GFX only
+	ROM_FILL(                           0x0900000, 0x0100000, 0x00 )            // Empty
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "mu.sb.3972_pal16l8.ic56", 0x000, 0x104, CRC(e5868379) SHA1(878c27a7450d7e7e3a1cce04f2f68ab3796f37e2) )
+ROM_END
+
+ROM_START( banga )
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "so_demo_bang_ic53_altera_6a11_15-2-99.ic53", 0x000000, 0x080000, CRC(09954233) SHA1(a4e560dbe1bd84f5841e1d0bdc0e1b281a3c2597) )
+	ROM_LOAD16_BYTE( "so_demo_bang_ic55_altera_1de5_15-2-99.ic55", 0x000001, 0x080000, CRC(68f8f769) SHA1(cbc3d0da91a34caee0bdadd4ff3de3d6a060c310) )
+
+	ROM_REGION( 0x0a00000, "gfx", 0 ) // GFX + Sound
+	ROM_LOAD( "ba_16_468a_27c040.ic16", 0x0000000, 0x0080000, CRC(c926486c) SHA1(b0b977d54a8cb4fae204dd1d7c60d1e9455aacf3) )   // GFX only. Only 5 different bytes from 'bangb'. Confirmed good
+	ROM_LOAD( "ba_17_08d4_27c040.ic17", 0x0080000, 0x0080000, CRC(0c35aa6f) SHA1(df0474b1b9466d3c199e5aade39b7233f0cb45ee) )   // GFX only
+	ROM_LOAD( "ba_18_0a6a_27c040.ic18", 0x0100000, 0x0080000, CRC(2056b1ad) SHA1(b796f92eef4bbb0efa12c53580e429b8a0aa394c) )   // Sound only
+	ROM_FILL(                           0x0180000, 0x0080000, 0x00 )            // Empty
+	ROM_LOAD( "ba_9_1bc7_27c040.ic9",   0x0200000, 0x0080000, CRC(078195dc) SHA1(362ff194e2579346dfc7af88559b0718bc36ec8a) )   // GFX only
+	ROM_LOAD( "ba_10_7a6b_27c040.ic10", 0x0280000, 0x0080000, CRC(06711eeb) SHA1(3662ffe730fb54ee48925de9765f88be1abd5e4e) )   // GFX only
+	ROM_LOAD( "ba_11_e242_27c040.ic11", 0x0300000, 0x0080000, CRC(2088d15c) SHA1(0c043ab9fd33836fa4b7ad60fd8e7cb96ffb6121) )   // Sound only
+	ROM_FILL(                           0x0380000, 0x0080000, 0x00 )            // Empty
+	ROM_LOAD( "ba_1_1223_27c040.ic1",   0x0400000, 0x0080000, CRC(e7b97b0f) SHA1(b5503687ae3ca0a0faa4b867a267d89dac788d6d) )   // GFX only
+	ROM_LOAD( "ba_2_a40f_27c040.ic2",   0x0480000, 0x0080000, CRC(ff297a8f) SHA1(28819a9d7b3cb177e7a7db3fe23a94f5cba33049) )   // GFX only
+	ROM_LOAD( "ba_3_f69f_27c040.ic3",   0x0500000, 0x0080000, CRC(d3da5d4f) SHA1(b9bea0b4d20ab0bfda3fac2bb1fab974c007aaf0) )   // Sound only
+	ROM_FILL(                           0x0580000, 0x0080000, 0x00 )            // Empty
+	ROM_LOAD( "ba_20_b854_27c040.ic20", 0x0600000, 0x0080000, CRC(a1145df8) SHA1(305cda041a6f201cb011982f1bf1fc6a4153a669) )   // GFX only
+	ROM_LOAD( "ba_13_754e_27c040.ic13", 0x0680000, 0x0080000, CRC(fe3e8d07) SHA1(7a37561b1cf422b47cddb8751a6b6d57dec8baae) )   // GFX only
+	ROM_LOAD( "ba_5_a760_27c040.ic5",   0x0700000, 0x0080000, CRC(9bee444c) SHA1(aebaa3306e7e5aada99ed469da9bf64507808cff) )   // Sound only
+	ROM_FILL(                           0x0780000, 0x0080000, 0x00 )            // Empty
+	ROM_LOAD( "ba_21_2e9c_27c040.ic21", 0x0800000, 0x0080000, CRC(fd93d7f2) SHA1(ff9d8eb5ac8d9757132aa6d79d2f7662c14cd650) )   // GFX only
+	ROM_LOAD( "ba_14_6978_27c040.ic14", 0x0880000, 0x0080000, CRC(858fcbf9) SHA1(1e67431c8775666f4839bdc427fabf59ffc708c0) )   // GFX only
+	ROM_FILL(                           0x0900000, 0x0100000, 0x00 )            // Empty
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "mu.sb.3972_pal16l8.ic56", 0x000, 0x104, CRC(e5868379) SHA1(878c27a7450d7e7e3a1cce04f2f68ab3796f37e2) )
+ROM_END
+
+ROM_START( bangb )
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "bang53.ic53", 0x000000, 0x080000, CRC(014bb939) SHA1(bb245acf7a3bd4a56b3559518bcb8d0ae39dbaf4) )
 	ROM_LOAD16_BYTE( "bang55.ic55", 0x000001, 0x080000, CRC(582f8b1e) SHA1(c9b0d4c1dee71cdb2c01d49f20ffde32eddc9583) )
 
@@ -1290,6 +1508,66 @@ ROM_START( bangj )
 	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "bang-a.ic53", 0x000000, 0x080000, CRC(5ee514e9) SHA1(b78b507d18de41be58049f5c597acd107ec1273f) )
 	ROM_LOAD16_BYTE( "bang-a.ic55", 0x000001, 0x080000, CRC(b90223ab) SHA1(7c097754a710169f41c574c3cc1a6346824853c4) )
+
+	ROM_REGION( 0x0a00000, "gfx", 0 ) // GFX + Sound
+	ROM_LOAD( "bang-a.ic16", 0x0000000, 0x0080000, CRC(3b63acfc) SHA1(48f5598cdbc70f342d6b75909166571271920a8f) )   // GFX only
+	ROM_LOAD( "bang-a.ic17", 0x0080000, 0x0080000, CRC(72865b80) SHA1(ec7753ea7961015149b9e6386fdeb9bd59aa962a) )   // GFX only
+	ROM_LOAD( "bang18.ic18", 0x0100000, 0x0080000, CRC(2056b1ad) SHA1(b796f92eef4bbb0efa12c53580e429b8a0aa394c) )   // Sound only
+	ROM_FILL(                0x0180000, 0x0080000, 0x00 )            // Empty
+	ROM_LOAD( "bang-a.ic9",  0x0200000, 0x0080000, CRC(3cb86360) SHA1(c803b3add253a552a1554714218740bdfca91764) )   // GFX only
+	ROM_LOAD( "bang-a.ic10", 0x0280000, 0x0080000, CRC(03fdd777) SHA1(9eec194239f93d961ee9902a585c872dcdc7728f) )   // GFX only
+	ROM_LOAD( "bang11.ic11", 0x0300000, 0x0080000, CRC(2088d15c) SHA1(0c043ab9fd33836fa4b7ad60fd8e7cb96ffb6121) )   // Sound only
+	ROM_FILL(                0x0380000, 0x0080000, 0x00 )            // Empty
+	ROM_LOAD( "bang-a.ic1",  0x0400000, 0x0080000, CRC(965d0ad9) SHA1(eff521735129b7dd9366855c6312ed568950233c) )   // GFX only
+	ROM_LOAD( "bang-a.ic2",  0x0480000, 0x0080000, CRC(8ea261a7) SHA1(50b59cf058ca03c0b8c888f6ddb40c720a210ece) )   // GFX only
+	ROM_LOAD( "bang3.ic3",   0x0500000, 0x0080000, CRC(d3da5d4f) SHA1(b9bea0b4d20ab0bfda3fac2bb1fab974c007aaf0) )   // Sound only
+	ROM_FILL(                0x0580000, 0x0080000, 0x00 )            // Empty
+	ROM_LOAD( "bang-a.ic20", 0x0600000, 0x0080000, CRC(4b828f3c) SHA1(5227a89c05c659a85d33f092c6778ce9d57a0236) )   // GFX only
+	ROM_LOAD( "bang-a.ic13", 0x0680000, 0x0080000, CRC(d1146b92) SHA1(2b28d49fbffea6c038160fdab177bc0045195ca8) )   // GFX only
+	ROM_LOAD( "bang5.ic5",   0x0700000, 0x0080000, CRC(9bee444c) SHA1(aebaa3306e7e5aada99ed469da9bf64507808cff) )   // Sound only
+	ROM_FILL(                0x0780000, 0x0080000, 0x00 )            // Empty
+	ROM_LOAD( "bang-a.ic21", 0x0800000, 0x0080000, CRC(531ce3b6) SHA1(196bb720591acc082f815b609a7cf1609510c8c1) )   // GFX only
+	ROM_LOAD( "bang-a.ic14", 0x0880000, 0x0080000, CRC(f8e1cf84) SHA1(559c08584094e605635c5ef3a25534ea0bcfa199) )   // GFX only
+	ROM_FILL(                0x0900000, 0x0100000, 0x00 )            // Empty
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "mu.sb.3972_pal16l8.ic56", 0x000, 0x104, CRC(e5868379) SHA1(878c27a7450d7e7e3a1cce04f2f68ab3796f37e2) )
+ROM_END
+
+ROM_START( bangja )
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "bang_53_2fbe_29-4-99_jap_27c040.ic53", 0x000000, 0x080000, CRC(8b1e8308) SHA1(06d1c88da98ce278023003eee510a58b95de86c3) )
+	ROM_LOAD16_BYTE( "bang_55_21b6_29-4-99_jap_27c040.ic55", 0x000001, 0x080000, CRC(5d76d79c) SHA1(8f907a151d6a32fef90da1ecce48585557088588) )
+
+	ROM_REGION( 0x0a00000, "gfx", 0 ) // GFX + Sound
+	ROM_LOAD( "bang-a.ic16", 0x0000000, 0x0080000, CRC(3b63acfc) SHA1(48f5598cdbc70f342d6b75909166571271920a8f) )   // GFX only
+	ROM_LOAD( "bang-a.ic17", 0x0080000, 0x0080000, CRC(72865b80) SHA1(ec7753ea7961015149b9e6386fdeb9bd59aa962a) )   // GFX only
+	ROM_LOAD( "bang18.ic18", 0x0100000, 0x0080000, CRC(2056b1ad) SHA1(b796f92eef4bbb0efa12c53580e429b8a0aa394c) )   // Sound only
+	ROM_FILL(                0x0180000, 0x0080000, 0x00 )            // Empty
+	ROM_LOAD( "bang-a.ic9",  0x0200000, 0x0080000, CRC(3cb86360) SHA1(c803b3add253a552a1554714218740bdfca91764) )   // GFX only
+	ROM_LOAD( "bang-a.ic10", 0x0280000, 0x0080000, CRC(03fdd777) SHA1(9eec194239f93d961ee9902a585c872dcdc7728f) )   // GFX only
+	ROM_LOAD( "bang11.ic11", 0x0300000, 0x0080000, CRC(2088d15c) SHA1(0c043ab9fd33836fa4b7ad60fd8e7cb96ffb6121) )   // Sound only
+	ROM_FILL(                0x0380000, 0x0080000, 0x00 )            // Empty
+	ROM_LOAD( "bang-a.ic1",  0x0400000, 0x0080000, CRC(965d0ad9) SHA1(eff521735129b7dd9366855c6312ed568950233c) )   // GFX only
+	ROM_LOAD( "bang-a.ic2",  0x0480000, 0x0080000, CRC(8ea261a7) SHA1(50b59cf058ca03c0b8c888f6ddb40c720a210ece) )   // GFX only
+	ROM_LOAD( "bang3.ic3",   0x0500000, 0x0080000, CRC(d3da5d4f) SHA1(b9bea0b4d20ab0bfda3fac2bb1fab974c007aaf0) )   // Sound only
+	ROM_FILL(                0x0580000, 0x0080000, 0x00 )            // Empty
+	ROM_LOAD( "bang-a.ic20", 0x0600000, 0x0080000, CRC(4b828f3c) SHA1(5227a89c05c659a85d33f092c6778ce9d57a0236) )   // GFX only
+	ROM_LOAD( "bang-a.ic13", 0x0680000, 0x0080000, CRC(d1146b92) SHA1(2b28d49fbffea6c038160fdab177bc0045195ca8) )   // GFX only
+	ROM_LOAD( "bang5.ic5",   0x0700000, 0x0080000, CRC(9bee444c) SHA1(aebaa3306e7e5aada99ed469da9bf64507808cff) )   // Sound only
+	ROM_FILL(                0x0780000, 0x0080000, 0x00 )            // Empty
+	ROM_LOAD( "bang-a.ic21", 0x0800000, 0x0080000, CRC(531ce3b6) SHA1(196bb720591acc082f815b609a7cf1609510c8c1) )   // GFX only
+	ROM_LOAD( "bang-a.ic14", 0x0880000, 0x0080000, CRC(f8e1cf84) SHA1(559c08584094e605635c5ef3a25534ea0bcfa199) )   // GFX only
+	ROM_FILL(                0x0900000, 0x0100000, 0x00 )            // Empty
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "mu.sb.3972_pal16l8.ic56", 0x000, 0x104, CRC(e5868379) SHA1(878c27a7450d7e7e3a1cce04f2f68ab3796f37e2) )
+ROM_END
+
+ROM_START( bangjb )
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "bang_53_4f19_23-4_japo_27c040.ic53", 0x000000, 0x080000, CRC(b8a67a57) SHA1(a39a6baa667fa1da761937a2871b7d21a3add499) )
+	ROM_LOAD16_BYTE( "bang_55_6b05_23-4_japo_27c040.ic55", 0x000001, 0x080000, CRC(0211d5cb) SHA1(4ba0a1310183a60259769aeca5cf6c22a7e9690f) )
 
 	ROM_REGION( 0x0a00000, "gfx", 0 ) // GFX + Sound
 	ROM_LOAD( "bang-a.ic16", 0x0000000, 0x0080000, CRC(3b63acfc) SHA1(48f5598cdbc70f342d6b75909166571271920a8f) )   // GFX only
@@ -2969,8 +3247,8 @@ ROM_END
 
 GAME( 1994, aligator,    0,         alighunt_d5002fp, alighunt, gaelco2_state,  init_alighunt,  ROT0, "Gaelco", "Alligator Hunt (World, protected, checksum 2B34128B)",      0 ) // 03/Jan/1995
 GAME( 1994, aligators,   aligator,  alighunt_d5002fp, alighunt, gaelco2_state,  init_alighunt,  ROT0, "Gaelco", "Alligator Hunt (Spain, protected, checksum 2B34128B)",      0 )
-GAME( 1994, aligatorun,  aligator,  alighunt,         alighunt, gaelco2_state,  init_alighunt,  ROT0, "Gaelco", "Alligator Hunt (unprotected, set 1, checksum F9C6891D)",    0 ) // 14/Mar
-GAME( 1994, aligatoruna, aligator,  alighunt,         alighunt, gaelco2_state,  init_alighunt,  ROT0, "Gaelco", "Alligator Hunt (unprotected, set 2, checksum 25A83609)",    0 ) // 21/Feb. Strange version, starts on space stages, but clearly a recompile not a trivial hack of the above, show version maybe?
+GAME( 1994, aligatorun,  aligator,  alighunt,         alighunt, gaelco2_state,  init_alighunt,  ROT0, "Gaelco", "Alligator Hunt (unprotected, checksum F9C6891D)",           0 ) // 14/Mar
+GAME( 1994, aligatoruna, aligator,  alighunt,         alighunt, gaelco2_state,  init_alighunt,  ROT0, "Gaelco", "Alligator Hunt (unprotected, checksum 25A83609)",           0 ) // 21/Feb. Strange version, starts on space stages, but clearly a recompile not a trivial hack of the above, show version maybe?
 GAME( 1994, aligatorp,   aligator,  alighunt_d5002fp, alighunt, gaelco2_state,  empty_init,     ROT0, "Gaelco", "Alligator Hunt (protected, prototype?, checksum B975CB0B)", MACHINE_NOT_WORKING ) // requires different protection program / data
 GAME( 1994, lizardhunt,  aligator,  alighunt,         alighunt, gaelco2_state,  init_alighunt,  ROT0, "Gaelco", "Lizard Hunt (unprotected, checksum 25A83609)",              0 ) // 29/Mar. Same as 'aligatoruna', but with a single different byte to activate the alternate title screen
 
@@ -2995,8 +3273,12 @@ GAME( 1996, maniacsqs,   maniacsq,  maniacsqs,        snowboar, snowboar_state, 
 GAME( 1997, snowboar,    0,         snowboar,         snowboar, snowboar_state, empty_init,     ROT0, "Gaelco / OMK", "Snow Board Championship (version 2.1)", 0 )
 GAME( 1996, snowboara,   snowboar,  snowboar,         snowboar, snowboar_state, init_snowboara, ROT0, "Gaelco / OMK", "Snow Board Championship (version 2.0)", 0 )
 
-GAME( 1998, bang,        0,         bang,             bang,     bang_state,     empty_init,     ROT0, "Gaelco / Bit Managers",                    "Bang!",               0 )
-GAME( 1999, bangj,       bang,      bang,             bang,     bang_state,     empty_init,     ROT0, "Gaelco / Bit Managers (GM Shoji license)", "Gun Gabacho (Japan)", 0 )
+GAME( 1998, bang,        0,         bang,             bang,     bang_state,     empty_init,     ROT0, "Gaelco / Bit Managers",                    "Bang! (version 2, checksum 140E)",              0 ) // 15/Feb/1999
+GAME( 1998, banga,       bang,      bang,             bang,     bang_state,     empty_init,     ROT0, "Gaelco / Bit Managers",                    "Bang! (version 2, checksum D35D)",              0 ) // 15/Feb/1999
+GAME( 1998, bangb,       bang,      bang,             bang,     bang_state,     empty_init,     ROT0, "Gaelco / Bit Managers",                    "Bang! (version 0, checksum B61D)",              0 )
+GAME( 1999, bangj,       bang,      bang,             bang,     bang_state,     empty_init,     ROT0, "Gaelco / Bit Managers (GM Shoji license)", "Gun Gabacho (Japan, version 2, checksum C6BB)", 0 )
+GAME( 1999, bangja,      bang,      bang,             bang,     bang_state,     empty_init,     ROT0, "Gaelco / Bit Managers (GM Shoji license)", "Gun Gabacho (Japan, version 2, checksum 1C8C)", 0 ) // 29/Apr/1999
+GAME( 1999, bangjb,      bang,      bang,             bang,     bang_state,     empty_init,     ROT0, "Gaelco / Bit Managers (GM Shoji license)", "Gun Gabacho (Japan, version 2, checksum B75B)", 0 ) // 23/Apr/1999
 
 // Hardware manufactured by Gaelco for Nova Desitec but without any Gaelco branding.
 
@@ -3011,7 +3293,17 @@ GAME( 1999, chmppool,    0,         srollnd,          play2000, gaelco2_state,  
 
 GAME( 1999, jungleani,   0,         srollnd,          play2000, gaelco2_state,  init_play2000,  ROT0, "New Impeuropex Corp. / New Chitarrina", "Jungle's Animals (v3.0)", MACHINE_NOT_WORKING ) // Developed by Nova Desitec, missing ds5002fp dump
 
-// Gym equipment
-GAME( 1997, sltpcycl,   0,          saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, V.1.0, checksum 02AB)",      0 ) // Same board and ROM as Pro Reclimber
-GAME( 1997, sltpstep,   0,          saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, V.1.0, checksum F208)", 0 )
-// there are other devices in Cardioline series but they don't use displays and aren't on Gaelco hardware
+/* Gym equipment.
+   Pro Reclimber Tele Cardioline has the same PCB and ROMs as Pro Cycle Tele Cardioline.
+   There are other devices in Cardioline series but they don't use displays and aren't on Gaelco hardware. */
+GAME( 2000, sltpcycl,   0,          saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, V.1.0, checksum 02AB)",      0 ) // 18/Jan/2000
+GAME( 1997, sltpcycla,  sltpcycl,   saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, V.1.0, checksum 3523)",      0 ) // 07/Apr/1997
+GAME( 199?, sltpcyclb,  sltpcycl,   saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, older, set 1)",              MACHINE_NOT_WORKING ) // Different sprite RAM arrangement?
+GAME( 199?, sltpcyclc,  sltpcycl,   saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, older, set 2)",              MACHINE_NOT_WORKING ) // Different sprite RAM arrangement?
+GAME( 199?, sltpcycld,  sltpcycl,   saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, older, set 3)",              MACHINE_NOT_WORKING ) // Different sprite RAM arrangement?
+GAME( 199?, sltpcycle,  sltpcycl,   saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, older, set 4)",              MACHINE_NOT_WORKING ) // Different sprite RAM arrangement?
+GAME( 1997, sltpstep,   0,          saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, V.1.0, checksum F208)", 0 ) // 07/Apr/1997
+GAME( 1998, sltpstepa,  sltpstep,   saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, older, set 1)",         MACHINE_NOT_WORKING ) // 23/Jan/1998. Different sprite RAM arrangement?
+GAME( 199?, sltpstepb,  sltpstep,   saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, older, set 2)",         MACHINE_NOT_WORKING ) // Different sprite RAM arrangement?
+GAME( 199?, sltpstepc,  sltpstep,   saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, older, set 3)",         MACHINE_NOT_WORKING ) // Different sprite RAM arrangement?
+GAME( 1996, sltpstepd,  sltpstep,   saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, older, set 4)",         MACHINE_NOT_WORKING ) // 2/Jul/1996. Different sprite RAM arrangement?

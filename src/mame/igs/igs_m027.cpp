@@ -238,6 +238,7 @@ private:
 	void oceanpar_output_w(u8 data);
 	void tripslot_misc_w(u8 data);
 	void tripslot_okibank_low_w(u8 data);
+	void ccly_okibank_w(u8 data);
 	void oki_128k_bank_w(u8 data);
 
 	u32 slqz3_gpio_r();
@@ -253,6 +254,7 @@ private:
 	template <bool Xor> void m027_2ppis_map(address_map &map) ATTR_COLD;
 	void cjddz_map(address_map &map) ATTR_COLD;
 	void tripslot_map(address_map &map) ATTR_COLD;
+	void ccly_map(address_map &map) ATTR_COLD;
 
 	void oki_128k_map(address_map &map) ATTR_COLD;
 };
@@ -343,6 +345,13 @@ void igs_m027_state::tripslot_map(address_map &map)
 	m027_1ppi_map<true>(map);
 
 	map(0x3800'c000, 0x3800'c003).umask32(0x0000'00ff).w(FUNC(igs_m027_state::tripslot_misc_w));
+}
+
+void igs_m027_state::ccly_map(address_map &map)
+{
+	m027_1ppi_map<true>(map);
+
+	map(0x3800'c000, 0x3800'c003).umask32(0x0000'00ff).w(FUNC(igs_m027_state::ccly_okibank_w));
 }
 
 void igs_m027_state::oki_128k_map(address_map &map)
@@ -716,7 +725,7 @@ INPUT_PORTS_START( jking02 )
 	PORT_DIPNAME( 0x02, 0x00, "Odds Table" )               PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x02, DEF_STR(No) )
 	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR(Demo_Sounds) )       PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR(Demo_Sounds) )       PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x04, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )
 	PORT_DIPNAME( 0x08, 0x00, "Back Color" )               PORT_DIPLOCATION("SW2:4")
@@ -1945,6 +1954,11 @@ void igs_m027_state::tripslot_okibank_low_w(u8 data)
 	m_oki->set_rom_bank(m_io_select[0]);
 }
 
+void igs_m027_state::ccly_okibank_w(u8 data)
+{
+	m_oki->set_rom_bank(data & 0x07);
+}
+
 void igs_m027_state::oki_128k_bank_w(u8 data)
 {
 	for (int i = 0; i < m_okibank.size(); i++)
@@ -2191,6 +2205,7 @@ void igs_m027_state::jking02(machine_config &config)
 	m027_1ppi<true>(config);
 
 	m_maincpu->in_port().set_ioport("PLAYER");
+	m_maincpu->out_port().append(m_oki, FUNC(okim6295_device::set_rom_bank)).mask(0x18).rshift(3);
 
 	m_ppi[0]->out_pa_callback().set(FUNC(igs_m027_state::lamps_w<8>));
 	m_ppi[0]->out_pb_callback().set(FUNC(igs_m027_state::jking02_output_w));
@@ -2202,7 +2217,7 @@ void igs_m027_state::tct2p(machine_config &config)
 	m027_1ppi<true>(config);
 
 	m_maincpu->in_port().set_ioport("PLAYER");
-	m_maincpu->out_port().append([this] (int state) { m_out_lamps[0] = state; }).bit(3); // seems to be an "insert coin" lamp - high when no credits
+	m_maincpu->out_port().append(m_oki, FUNC(okim6295_device::set_rom_bank)).mask(0x18).rshift(3);
 
 	m_ppi[0]->out_pb_callback().set_ioport("PPIB");
 	m_ppi[0]->out_pc_callback().set_ioport("PPIC");
@@ -2260,12 +2275,15 @@ void igs_m027_state::ccly(machine_config &config)
 {
 	m027_1ppi<true>(config);
 
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::ccly_map);
 	m_maincpu->in_port().set_ioport("PLAYER");
 
 	m_ppi[0]->out_pb_callback().set_ioport("PPIB");
 	m_ppi[0]->out_pc_callback().set(FUNC(igs_m027_state::lamps_w<0>));
 
 	HOPPER(config, m_hopper, attotime::from_msec(50));
+
+	m_oki->set_clock(2'000'000);
 }
 
 void igs_m027_state::extradrw(machine_config &config)

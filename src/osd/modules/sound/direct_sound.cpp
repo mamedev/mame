@@ -204,7 +204,7 @@ public:
 		osd_module(OSD_SOUND_PROVIDER, "dsound"),
 		sound_module(),
 		m_sample_rate(0),
-		m_audio_latency(0),
+		m_audio_latency(0.0f),
 		m_bytes_per_sample(0),
 		m_primary_buffer(),
 		m_stream_buffer(),
@@ -231,7 +231,7 @@ private:
 
 	// configuration
 	int             m_sample_rate;
-	int             m_audio_latency;
+	float           m_audio_latency;
 
 	// descriptors and formats
 	uint32_t        m_bytes_per_sample;
@@ -253,9 +253,11 @@ private:
 
 int sound_direct_sound::init(osd_interface &osd, osd_options const &options)
 {
+	m_buffer_underflows = m_buffer_overflows = 0;
 	m_sample_rate = options.sample_rate();
 	m_audio_latency = options.audio_latency();
-	m_buffer_underflows = m_buffer_overflows = 0;
+	if (m_audio_latency == 0.0f)
+		m_audio_latency = 0.1f;
 
 	// attempt to initialize DirectSound
 	if (dsound_init() != DS_OK)
@@ -416,8 +418,7 @@ HRESULT sound_direct_sound::dsound_init()
 		stream_format.cbSize            = 0;
 
 		// compute the buffer size based on the output sample rate
-		int audio_latency = std::max(m_audio_latency, 1);
-		DWORD stream_buffer_size = stream_format.nSamplesPerSec * stream_format.nBlockAlign * audio_latency / 10;
+		DWORD stream_buffer_size = stream_format.nSamplesPerSec * stream_format.nBlockAlign * m_audio_latency;
 		stream_buffer_size = std::max(DWORD(1024), (stream_buffer_size / 1024) * 1024);
 
 		LOG("stream_buffer_size = %u\n", stream_buffer_size);
