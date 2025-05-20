@@ -15,6 +15,7 @@
 #include "divtlb.h"
 
 #include "i386dasm.h"
+#include <algorithm>
 
 #define INPUT_LINE_A20      1
 #define INPUT_LINE_SMI      2
