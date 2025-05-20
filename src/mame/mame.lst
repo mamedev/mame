@@ -46501,6 +46501,7 @@ jak_capb
 jak_sbdd
 jak_spdmo
 jak_spdmoa
+jak_wpt
 sstarkar
 
 @source:tvgames/spg29x.cpp

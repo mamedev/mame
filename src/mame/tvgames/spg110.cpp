@@ -638,6 +638,12 @@ ROM_START( easports )
 	ROM_LOAD( "nvram", 0x000000, 0x20000, CRC(bfcbd206) SHA1(0f5b730679762547a0658c2cd0d4fa5169b857af) )
 ROM_END
 
+ROM_START( jak_wpt )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakk_worldpokertour.bin", 0x000000, 0x200000, CRC(6eac3bae) SHA1(80bf3ec0e0aa26b4bac72c1828939a18b7750f29) )
+
+	// also has an LCD display on the unit, is the display driven by the main program, or something else?
+ROM_END
 
 ROM_START( conyteni )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
@@ -673,6 +679,8 @@ CONS( 2004, jak_capb,  0,        0, spg110_base, jak_capb,  spg110_game_state, e
 
 CONS( 2004, jak_spdmo, jak_spdm, 0, spg110_base, jak_spdmo, spg110_game_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse", "Spider-Man (JAKKS Pacific TV Game) (older hardware, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // this is the smaller more 'square' style joystick that was originally released before the GameKey slot was added.
 CONS( 2004, jak_spdmoa,jak_spdm, 0, spg110_base, jak_spdmo, spg110_game_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse", "Spider-Man (JAKKS Pacific TV Game) (older hardware, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // this is the resdesigned stick, but before the GameKey release
+
+CONS( 2004, jak_wpt,  0,         0, spg110_base, jak_spdmo, spg110_game_state, init_crc, "JAKKS Pacific Inc / Digital Eclipse", "World Poker Tour (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // ROM bytesum is off by 0x3e, so likely a bad byte
 // sound doesn't work properly after a few initial sounds (expected, SPG110 issues)
