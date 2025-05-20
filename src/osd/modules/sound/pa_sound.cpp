@@ -84,7 +84,7 @@ private:
 	std::map<uint32_t, stream_info> m_streams;
 
 	uint32_t m_stream_id;
-	int m_audio_latency;
+	float m_audio_latency;
 
 	int stream_callback(stream_info *stream, const void *input, void *output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags);
 	static int s_stream_callback(const void *input, void *output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void *userData);
@@ -191,7 +191,7 @@ uint32_t sound_pa::stream_sink_open(uint32_t node, std::string name, uint32_t ra
 	op.device = node - 1;
 	op.channelCount = m_info.m_nodes[node-1].m_sinks;
 	op.sampleFormat = paInt16;
-	op.suggestedLatency = (m_audio_latency > 0) ? (m_audio_latency / 1000.0) : Pa_GetDeviceInfo(node - 1)->defaultLowOutputLatency;
+	op.suggestedLatency = (m_audio_latency > 0.0f) ? m_audio_latency : Pa_GetDeviceInfo(node - 1)->defaultLowOutputLatency;
 	op.hostApiSpecificStreamInfo = nullptr;
 
 	PaError err = Pa_OpenStream(&si->second.m_stream, nullptr, &op, rate, paFramesPerBufferUnspecified, 0, s_stream_callback, &si->second);
@@ -219,7 +219,7 @@ uint32_t sound_pa::stream_source_open(uint32_t node, std::string name, uint32_t 
 	ip.device = node - 1;
 	ip.channelCount = m_info.m_nodes[node-1].m_sources;
 	ip.sampleFormat = paInt16;
-	ip.suggestedLatency = (m_audio_latency > 0) ? (m_audio_latency / 1000.0) : Pa_GetDeviceInfo(node - 1)->defaultLowInputLatency;
+	ip.suggestedLatency = (m_audio_latency > 0.0f) ? m_audio_latency : Pa_GetDeviceInfo(node - 1)->defaultLowInputLatency;
 	ip.hostApiSpecificStreamInfo = nullptr;
 
 	PaError err = Pa_OpenStream(&si->second.m_stream, &ip, nullptr, rate, paFramesPerBufferUnspecified, 0, s_stream_callback, &si->second);

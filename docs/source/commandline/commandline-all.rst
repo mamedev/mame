@@ -3026,18 +3026,18 @@ Core Sound Options
 
 **-audio_latency** *<value>*
 
-    Audio latency in milliseconds, up to a maximum of 1 second.  Smaller values
+    Audio latency in seconds, up to a maximum of 0.5 seconds.  Smaller values
     provide less audio delay while requiring better system performance.
     Higher values increase audio delay but may help avoid buffer under-runs
-    and audio interruptions. A value of 0 will automatically pick a sane value,
+    and audio interruptions. A value of 0.0 will automatically pick a sane value,
     depending on the selected audio output module.
 
-    The default is ``0``.
+    The default is ``0.0``.
 
     Example:
         .. code-block:: bash
 
-            mame galaga -audio_latency 100
+            mame galaga -audio_latency 0.1
 
 
 .. _mame-commandline-inputoptions:
