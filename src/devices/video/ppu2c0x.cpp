@@ -1203,7 +1203,7 @@ u8 ppu2c04_clone_device::read(offs_t offset)
  *
  *************************************/
 
-void ppu2c0x_device::write_to_spriteram_with_increment(uint8_t data)
+void ppu2c0x_device::write_to_spriteram_with_increment(u8 data)
 {
 	// writes to sprite data during rendering do not modify memory
 	// TODO: however writes during rendering do perform a glitchy increment to the address

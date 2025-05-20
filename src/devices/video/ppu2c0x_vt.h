@@ -24,8 +24,8 @@ enum vtxx_pal_mode {
 
 class ppu_vt03_device : public ppu2c0x_device {
 public:
-	ppu_vt03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	ppu_vt03_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	ppu_vt03_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ppu_vt03_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	auto read_bg() { return m_read_bg.bind(); }
 	auto read_sp() { return m_read_sp.bind(); }
@@ -33,55 +33,55 @@ public:
 
 	void set_palette_mode(vtxx_pal_mode pmode) { m_pal_mode = pmode; }
 
-	uint8_t extended_modes_enable_r(offs_t offset);
-	uint8_t extended_modes2_enable_r(offs_t offset);
-	uint8_t videobank0_0_r(offs_t offset);
-	uint8_t videobank0_1_r(offs_t offset);
-	uint8_t videobank0_2_r(offs_t offset);
-	uint8_t videobank0_3_r(offs_t offset);
-	uint8_t videobank0_4_r(offs_t offset);
-	uint8_t videobank0_5_r(offs_t offset);
-	uint8_t videobank1_r(offs_t offset);
-	uint8_t unk_2019_r(offs_t offset);
-	uint8_t videobank0_extra_r(offs_t offset);
-	uint8_t unk_201b_r(offs_t offset);
-	uint8_t gun_x_r(offs_t offset);
-	uint8_t gun_y_r(offs_t offset);
-	uint8_t gun2_x_r(offs_t offset);
-	uint8_t gun2_y_r(offs_t offset);
+	u8 extended_modes_enable_r(offs_t offset);
+	u8 extended_modes2_enable_r(offs_t offset);
+	u8 videobank0_0_r(offs_t offset);
+	u8 videobank0_1_r(offs_t offset);
+	u8 videobank0_2_r(offs_t offset);
+	u8 videobank0_3_r(offs_t offset);
+	u8 videobank0_4_r(offs_t offset);
+	u8 videobank0_5_r(offs_t offset);
+	u8 videobank1_r(offs_t offset);
+	u8 unk_2019_r(offs_t offset);
+	u8 videobank0_extra_r(offs_t offset);
+	u8 unk_201b_r(offs_t offset);
+	u8 gun_x_r(offs_t offset);
+	u8 gun_y_r(offs_t offset);
+	u8 gun2_x_r(offs_t offset);
+	u8 gun2_y_r(offs_t offset);
 
-	void extended_modes_enable_w(offs_t offset, uint8_t data);
-	void extended_modes2_enable_w(offs_t offset, uint8_t data);
-	void videobank0_0_w(offs_t offset, uint8_t data);
-	void videobank0_1_w(offs_t offset, uint8_t data);
-	void videobank0_2_w(offs_t offset, uint8_t data);
-	void videobank0_3_w(offs_t offset, uint8_t data);
-	void videobank0_4_w(offs_t offset, uint8_t data);
-	void videobank0_5_w(offs_t offset, uint8_t data);
-	void videobank1_w(offs_t offset, uint8_t data);
-	void gun_reset_w(offs_t offset, uint8_t data);
-	void videobank0_extra_w(offs_t offset, uint8_t data);
+	void extended_modes_enable_w(offs_t offset, u8 data);
+	void extended_modes2_enable_w(offs_t offset, u8 data);
+	void videobank0_0_w(offs_t offset, u8 data);
+	void videobank0_1_w(offs_t offset, u8 data);
+	void videobank0_2_w(offs_t offset, u8 data);
+	void videobank0_3_w(offs_t offset, u8 data);
+	void videobank0_4_w(offs_t offset, u8 data);
+	void videobank0_5_w(offs_t offset, u8 data);
+	void videobank1_w(offs_t offset, u8 data);
+	void gun_reset_w(offs_t offset, u8 data);
+	void videobank0_extra_w(offs_t offset, u8 data);
 
-	virtual uint8_t palette_read(offs_t offset) override;
-	virtual void palette_write(offs_t offset, uint8_t data) override;
+	virtual u8 palette_read(offs_t offset) override;
+	virtual void palette_write(offs_t offset, u8 data) override;
 
-	uint8_t get_videobank0_reg(int reg) { return m_videobank0[reg]; }
-	void set_videobank0_reg(int reg, uint8_t data) { m_videobank0[reg] = data; }
-	uint8_t get_videobank1() { return m_videobank1; }
-	uint8_t get_videobank0_extra() { return m_videobank0_extra; }
-	uint8_t get_extended_modes_enable() { return m_extended_modes_enable; }
-	uint8_t get_extended_modes2_enable() { return m_extended_modes2_enable; }
+	u8 get_videobank0_reg(int reg) { return m_videobank0[reg]; }
+	void set_videobank0_reg(int reg, u8 data) { m_videobank0[reg] = data; }
+	u8 get_videobank1() { return m_videobank1; }
+	u8 get_videobank0_extra() { return m_videobank0_extra; }
+	u8 get_extended_modes_enable() { return m_extended_modes_enable; }
+	u8 get_extended_modes2_enable() { return m_extended_modes2_enable; }
 
 	bool is_v3xx_extended_mode() { return (m_newvid_1e == 0x00) ? false : true; }
 	bool get_newvid_1d() { return m_newvid_1d; }
 
-	uint16_t get_newmode_tilebase() { return m_tilebases_2x[0] | (m_tilebases_2x[1] << 8); }
-	uint16_t get_newmode_spritebase() { return m_tilebases_2x[2] | (m_tilebases_2x[3] << 8); }
-	uint8_t vt3xx_extended_palette_r(offs_t offset) { return m_vt3xx_palette[offset]; }
-	void vt3xx_extended_palette_w(offs_t offset, uint8_t data) { /*logerror("%s: extended palette write %04x %02x\n", machine().describe_context(), offset, data);*/ m_vt3xx_palette[offset] = data; }
+	u16 get_newmode_tilebase() { return m_tilebases_2x[0] | (m_tilebases_2x[1] << 8); }
+	u16 get_newmode_spritebase() { return m_tilebases_2x[2] | (m_tilebases_2x[3] << 8); }
+	u8 vt3xx_extended_palette_r(offs_t offset) { return m_vt3xx_palette[offset]; }
+	void vt3xx_extended_palette_w(offs_t offset, u8 data) { /*logerror("%s: extended palette write %04x %02x\n", machine().describe_context(), offset, data);*/ m_vt3xx_palette[offset] = data; }
 
-	uint8_t get_m_read_bg4_bg3();
-	uint8_t get_speva2_speva0();
+	u8 get_m_read_bg4_bg3();
+	u8 get_speva2_speva0();
 
 	bool get_is_pal() { return m_is_pal; }
 	bool get_is_50hz() { return m_is_50hz; }
@@ -93,27 +93,27 @@ protected:
 	virtual u32 palette_entries() const noexcept override { return (0x40 * 8) + (0x1000 * 8); }
 
 	virtual void read_tile_plane_data(int address, int color) override;
-	virtual void shift_tile_plane_data(uint8_t &pix) override;
-	virtual void draw_tile_pixel(uint8_t pix, int color, uint32_t back_pen, uint32_t *&dest) override;
-	inline void draw_tile_pixel_inner(uint8_t pen, uint32_t *dest);
-	virtual void draw_back_pen(uint32_t* dst, int back_pen) override;
+	virtual void shift_tile_plane_data(u8 &pix) override;
+	virtual void draw_tile_pixel(u8 pix, int color, u32 back_pen, u32 *&dest) override;
+	inline void draw_tile_pixel_inner(u8 pen, u32 *dest);
+	virtual void draw_back_pen(u32* dst, int back_pen) override;
 
 	virtual void read_sprite_plane_data(int address) override;
-	virtual void make_sprite_pixel_data(uint8_t &pixel_data, bool flipx) override;
-	virtual void draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_rgb32 &bitmap) override;
+	virtual void make_sprite_pixel_data(u8 &pixel_data, bool flipx) override;
+	virtual void draw_sprite_pixel(int sprite_xpos, int color, int pixel, u8 pixel_data, bitmap_rgb32 &bitmap) override;
 	virtual void read_extra_sprite_bits(int sprite_index) override;
 
 	bool m_is_pal;
 	bool m_is_50hz;
 
-	uint32_t m_vtpens_rgb555[0x8000*8];
-	uint32_t m_vtpens_rgb444[0x1000*8];
+	u32 m_vtpens_rgb555[0x8000*8];
+	u32 m_vtpens_rgb444[0x1000*8];
 
-	uint8_t m_videobank0[6];
-	uint8_t m_videobank0_extra;
-	uint8_t m_videobank1;
-	uint8_t m_extended_modes_enable;
-	uint8_t m_extended_modes2_enable;
+	u8 m_videobank0[6];
+	u8 m_videobank0_extra;
+	u8 m_videobank1;
+	u8 m_extended_modes_enable;
+	u8 m_extended_modes2_enable;
 
 	devcb_read8 m_read_bg;
 	devcb_read8 m_read_sp;
@@ -123,15 +123,15 @@ protected:
 
 	int m_whichpixel;
 
-	uint8_t m_newvid_1c;
-	uint8_t m_newvid_1d;
-	uint8_t m_newvid_1e;
-	uint8_t m_tilebases_2x[4];
+	u8 m_newvid_1c;
+	u8 m_newvid_1d;
+	u8 m_newvid_1e;
+	u8 m_tilebases_2x[4];
 
-	uint8_t m_vt3xx_palette[0x400];
+	u8 m_vt3xx_palette[0x400];
 private:
 
-	uint8_t m_extra_sprite_bits;
+	u8 m_extra_sprite_bits;
 
 	vtxx_pal_mode m_pal_mode = PAL_MODE_VT0x;
 
@@ -144,26 +144,26 @@ private:
 
 class ppu_vt03pal_device : public ppu_vt03_device {
 public:
-	ppu_vt03pal_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	ppu_vt03pal_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
 };
 
 class ppu_vt3xx_device : public ppu_vt03_device {
 public:
-	ppu_vt3xx_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	ppu_vt3xx_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
 
-	uint8_t extvidreg_201c_r(offs_t offset);
-	uint8_t extvidreg_201d_r(offs_t offset);
-	uint8_t extvidreg_201e_r(offs_t offset);
-	uint8_t tilebases_202x_r(offs_t offset);
+	u8 extvidreg_201c_r(offs_t offset);
+	u8 extvidreg_201d_r(offs_t offset);
+	u8 extvidreg_201e_r(offs_t offset);
+	u8 tilebases_202x_r(offs_t offset);
 
-	void extvidreg_201c_w(offs_t offset, uint8_t data);
-	void extvidreg_201d_w(offs_t offset, uint8_t data);
-	void extvidreg_201e_w(offs_t offset, uint8_t data);
-	void tilebases_202x_w(offs_t offset, uint8_t data);
-	void lcdc_regs_w(offs_t offset, uint8_t data);
+	void extvidreg_201c_w(offs_t offset, u8 data);
+	void extvidreg_201d_w(offs_t offset, u8 data);
+	void extvidreg_201e_w(offs_t offset, u8 data);
+	void tilebases_202x_w(offs_t offset, u8 data);
+	void lcdc_regs_w(offs_t offset, u8 data);
 
-	uint8_t spritehigh_2008_r() { return m_2008_spritehigh; }
-	void spritehigh_2008_w(uint8_t data) { m_2008_spritehigh = data; logerror("%s: spritehigh_2008_w %02x\n", machine().describe_context(), data); }
+	u8 spritehigh_2008_r() { return m_2008_spritehigh; }
+	void spritehigh_2008_w(u8 data) { m_2008_spritehigh = data; logerror("%s: spritehigh_2008_w %02x\n", machine().describe_context(), data); }
  
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -171,11 +171,13 @@ protected:
 
 private:
 	virtual void read_tile_plane_data(int address, int color) override;
-	virtual void shift_tile_plane_data(uint8_t& pix) override;
+	virtual void shift_tile_plane_data(u8& pix) override;
 	virtual void draw_sprites(u8 *line_priority) override;
-	uint8_t vt3xx_palette_r(offs_t offset);
-	void vt3xx_palette_w(offs_t offset, uint8_t data);
-	virtual void write_to_spriteram_with_increment(uint8_t data) override;
+	u8 vt3xx_palette_r(offs_t offset);
+	void vt3xx_palette_w(offs_t offset, u8 data);
+	virtual void write_to_spriteram_with_increment(u8 data) override;
+	u8 get_pixel_data(u8* spritepatternbuf, int bpp, int pixel);
+	rgb_t get_pen_value(int pixel_data, int bpp, int pal);
 
 	offs_t recalculate_offsets_8x8x4packed_tile(int address, int va34);
 	offs_t recalculate_offsets_8x8x8packed_tile(int address, int va34);
@@ -183,8 +185,8 @@ private:
 	void draw_extended_sprite_pixel_low(bitmap_rgb32& bitmap, int pixel_data, int pixel, int xpos, int pal, int bpp, u8* line_priority);
 	void draw_extended_sprite_pixel_high(bitmap_rgb32& bitmap, int pixel_data, int pixel, int xpos, int pal, int bpp, u8* line_priority);
 
-	uint8_t m_204x_screenregs[0xa];
-	uint8_t m_2008_spritehigh;
+	u8 m_204x_screenregs[0xa];
+	u8 m_2008_spritehigh;
 };
 
 

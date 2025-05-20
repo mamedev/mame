@@ -10,17 +10,17 @@
 DEFINE_DEVICE_TYPE(NES_VT32_SOC,     nes_vt32_soc_device,     "nes_vt32_soc", "VT32 series System on a Chip (FP) (NTSC)")
 DEFINE_DEVICE_TYPE(NES_VT32_SOC_PAL, nes_vt32_soc_pal_device, "nes_vt32_soc_pal", "VT32 series System on a Chip (FP) (PAL)")
 
-nes_vt32_soc_device::nes_vt32_soc_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock) :
+nes_vt32_soc_device::nes_vt32_soc_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock) :
 	nes_vt09_soc_device(mconfig, type, tag, owner, clock)
 {
 }
 
-nes_vt32_soc_device::nes_vt32_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+nes_vt32_soc_device::nes_vt32_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
 	nes_vt32_soc_device(mconfig, NES_VT32_SOC, tag, owner, clock)
 {
 }
 
-nes_vt32_soc_pal_device::nes_vt32_soc_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+nes_vt32_soc_pal_device::nes_vt32_soc_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
 	nes_vt32_soc_device(mconfig, NES_VT32_SOC_PAL, tag, owner, clock)
 {
 }
@@ -40,13 +40,13 @@ void nes_vt32_soc_pal_device::device_add_mconfig(machine_config& config)
 }
 
 
-uint8_t nes_vt32_soc_device::vtfp_4119_r()
+u8 nes_vt32_soc_device::vtfp_4119_r()
 {
 	// would be PAL/NTSC etc. in base system, maybe different here?
 	return 0x00;
 }
 
-void nes_vt32_soc_device::vtfp_411e_encryption_state_w(uint8_t data)
+void nes_vt32_soc_device::vtfp_411e_encryption_state_w(u8 data)
 {
 	logerror("%s: vtfp_411e_encryption_state_w %02x\n", machine().describe_context(), data);
 	if (data == 0x05)
@@ -81,7 +81,7 @@ void nes_vt32_soc_device::vtfp_411e_encryption_state_w(uint8_t data)
 	}
 }
 
-void nes_vt32_soc_device::vtfp_4a00_w(uint8_t data)
+void nes_vt32_soc_device::vtfp_4a00_w(u8 data)
 {
 	logerror("4a00_w %02x\n", data);
 	//if(data == 0x80)
@@ -89,23 +89,23 @@ void nes_vt32_soc_device::vtfp_4a00_w(uint8_t data)
 }
 
 
-void nes_vt32_soc_device::vtfp_412c_extbank_w(uint8_t data)
+void nes_vt32_soc_device::vtfp_412c_extbank_w(u8 data)
 {
 	m_upper_write_412c_callback(data);
 }
 
-uint8_t nes_vt32_soc_device::vtfp_412d_r()
+u8 nes_vt32_soc_device::vtfp_412d_r()
 {
 	return m_upper_read_412d_callback();
 }
 
-void nes_vt32_soc_device::vtfp_4242_w(uint8_t data)
+void nes_vt32_soc_device::vtfp_4242_w(u8 data)
 {
 	logerror("vtfp_4242_w %02x\n", data);
 	m_4242 = data;
 }
 
-void nes_vt32_soc_device::vtfp_411d_w(uint8_t data)
+void nes_vt32_soc_device::vtfp_411d_w(u8 data)
 {
 	// controls chram access and mapper emulation modes in later models
 	logerror("vtfp_411d_w  %02x\n", data);
@@ -113,7 +113,7 @@ void nes_vt32_soc_device::vtfp_411d_w(uint8_t data)
 	update_banks();
 }
 
-uint8_t nes_vt32_soc_device::vthh_414a_r()
+u8 nes_vt32_soc_device::vthh_414a_r()
 {
 	return machine().rand();
 }

@@ -159,7 +159,7 @@ protected:
 	rgb_t nespal_to_RGB(int color_intensity, int color_num, int color_emphasis, bool is_pal_or_dendy);
 	virtual void init_palette_tables();
 
-	virtual void write_to_spriteram_with_increment(uint8_t data);
+	virtual void write_to_spriteram_with_increment(u8 data);
 
 	virtual void read_tile_plane_data(int address, int color);
 	virtual void shift_tile_plane_data(u8 &pix);

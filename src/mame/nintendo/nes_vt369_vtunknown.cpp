@@ -45,43 +45,43 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	virtual uint8_t in0_r();
-	virtual uint8_t in1_r();
-	virtual void in0_w(uint8_t data);
+	virtual u8 in0_r();
+	virtual u8 in1_r();
+	virtual void in0_w(u8 data);
 
 	void vt369_map(address_map &map) ATTR_COLD;
 
 	optional_ioport m_io0;
 	optional_ioport m_io1;
 
-	uint8_t m_latch0;
-	uint8_t m_latch1;
-	uint8_t m_previous_port0;
+	u8 m_latch0;
+	u8 m_latch1;
+	u8 m_previous_port0;
 
 	optional_ioport m_cartsel;
 	optional_ioport_array<4> m_exin;
 
 	/* Misc */
-	uint32_t m_ahigh; // external banking bits
-	uint8_t m_4242;
-	uint8_t m_411c;
-	uint8_t m_411d;
+	u32 m_ahigh; // external banking bits
+	u8 m_4242;
+	u8 m_411c;
+	u8 m_411d;
 
-	required_region_ptr<uint8_t> m_prgrom;
+	required_region_ptr<u8> m_prgrom;
 
-	uint8_t vt_rom_r(offs_t offset);
+	u8 vt_rom_r(offs_t offset);
 	void configure_soc(nes_vt02_vt03_soc_device* soc);
 
-	void extbank_w(uint8_t data);
-	void extbank_red5mam_w(uint8_t data);
+	void extbank_w(u8 data);
+	void extbank_red5mam_w(u8 data);
 
-	uint8_t upper_412c_r();
-	uint8_t upper_412d_r();
-	void upper_412c_w(uint8_t data);
+	u8 upper_412c_r();
+	u8 upper_412d_r();
+	void upper_412c_w(u8 data);
 
 private:
 	/* Extra IO */
-	template <uint8_t NUM> uint8_t extrain_r();
+	template <u8 NUM> u8 extrain_r();
 };
 
 class vt369_state : public vt369_base_state
@@ -107,7 +107,7 @@ public:
 	void init_lxcmcypp();
 
 protected:
-	uint8_t vt_rom_banked_r(offs_t offset);
+	u8 vt_rom_banked_r(offs_t offset);
 
 	required_device<nes_vt02_vt03_soc_device> m_soc;
 };
@@ -125,7 +125,7 @@ public:
 	void vt_external_space_map_bitboy_2x16mbyte(address_map &map) ATTR_COLD;
 
 private:
-	void bittboy_412c_w(uint8_t data);
+	void bittboy_412c_w(u8 data);
 };
 
 class vt3xx_fapocket_state : public vt369_state
@@ -143,8 +143,8 @@ protected:
 private:
 	void vt_external_space_map_fapocket_4x16mbyte(address_map &map) ATTR_COLD;
 
-	uint8_t fapocket_412c_r();
-	void fapocket_412c_w(uint8_t data);
+	u8 fapocket_412c_r();
+	void fapocket_412c_w(u8 data);
 
 };
 
@@ -183,17 +183,17 @@ public:
 	void vt369_unk_16mb(machine_config& config);
 
 private:
-	uint8_t vt_rom_banked_r(offs_t offset);
+	u8 vt_rom_banked_r(offs_t offset);
 	[[maybe_unused]] void vt_external_space_map_fp_2x32mbyte(address_map &map) ATTR_COLD;
 };
 
-uint8_t vt369_base_state::vt_rom_r(offs_t offset)
+u8 vt369_base_state::vt_rom_r(offs_t offset)
 {
 	return m_prgrom[offset];
 }
 
 // bitboy is 2 16Mbyte banks
-uint8_t vt369_state::vt_rom_banked_r(offs_t offset)
+u8 vt369_state::vt_rom_banked_r(offs_t offset)
 {
 	return m_prgrom[m_ahigh | offset];
 }
@@ -249,7 +249,7 @@ void vt3xx_fapocket_state::vt_external_space_map_fapocket_4x16mbyte(address_map 
 	map(0x0000000, 0x0ffffff).mirror(0x1000000).r(FUNC(vt3xx_fapocket_state::vt_rom_banked_r));
 }
 
-uint8_t vt36x_state::vt_rom_banked_r(offs_t offset)
+u8 vt36x_state::vt_rom_banked_r(offs_t offset)
 {
 	return m_prgrom[m_ahigh | offset];
 }
@@ -260,7 +260,7 @@ void vt36x_state::vt_external_space_map_fp_2x32mbyte(address_map &map)
 }
 
 
-template <uint8_t NUM> uint8_t vt369_base_state::extrain_r()
+template <u8 NUM> u8 vt369_base_state::extrain_r()
 {
 	if (m_exin[NUM])
 		return m_exin[NUM]->read();
@@ -274,25 +274,25 @@ template <uint8_t NUM> uint8_t vt369_base_state::extrain_r()
 
 /* Standard I/O handlers (NES Controller clone) */
 
-uint8_t vt369_base_state::in0_r()
+u8 vt369_base_state::in0_r()
 {
 	//logerror("%s: in0_r\n", machine().describe_context());
-	uint8_t ret = 0x40;
+	u8 ret = 0x40;
 	ret |= m_latch0 & 1;
 	m_latch0 >>= 1;
 	return ret;
 }
 
-uint8_t vt369_base_state::in1_r()
+u8 vt369_base_state::in1_r()
 {
 	//logerror("%s: in1_r\n", machine().describe_context());
-	uint8_t ret = 0x40;
+	u8 ret = 0x40;
 	ret |= m_latch1 & 1;
 	m_latch1 >>= 1;
 	return ret;
 }
 
-void vt369_base_state::in0_w(uint8_t data)
+void vt369_base_state::in0_w(u8 data)
 {
 	//logerror("%s: in0_w %02x\n", machine().describe_context(), data);
 	if ((data & 0x01) != (m_previous_port0 & 0x01))
@@ -356,19 +356,19 @@ void vt369_base_state::configure_soc(nes_vt02_vt03_soc_device* soc)
 	soc->extra_read_3_callback().set(FUNC(vt369_base_state::extrain_r<3>));
 }
 
-uint8_t vt369_base_state::upper_412c_r()
+u8 vt369_base_state::upper_412c_r()
 {
 	logerror("%s: upper_412c_r\n", machine().describe_context());
 	return 0x00;
 }
 
-uint8_t vt369_base_state::upper_412d_r()
+u8 vt369_base_state::upper_412d_r()
 {
 	logerror("%s: upper_412d_r\n", machine().describe_context());
 	return 0x00;
 }
 
-void vt369_base_state::upper_412c_w(uint8_t data)
+void vt369_base_state::upper_412c_w(u8 data)
 {
 	logerror("%s: upper_412c_w %02x\n", machine().describe_context(), data);
 }
@@ -401,7 +401,7 @@ void vt3xx_bitboy_state::vt3xx_bitboy(machine_config &config)
 	configure_soc(m_soc);
 }
 
-void vt3xx_bitboy_state::bittboy_412c_w(uint8_t data)
+void vt3xx_bitboy_state::bittboy_412c_w(u8 data)
 {
 	// bittboy (ok)
 	logerror("%s: vt03_412c_extbank_w %02x\n", machine().describe_context(),  data);
@@ -513,7 +513,7 @@ void vt36x_state::vt36x_altswap_16mb(machine_config& config)
 	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_16mbyte);
 }
 
-void vt369_base_state::extbank_red5mam_w(uint8_t data)
+void vt369_base_state::extbank_red5mam_w(u8 data)
 {
 //	printf("extbank_red5mam_w %02x\n", data);
 	m_ahigh = ((data & 0x03) << 25);
@@ -568,7 +568,7 @@ void vt36x_state::vt36x_32mb(machine_config& config)
 	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_32mbyte);
 }
 
-void vt369_base_state::extbank_w(uint8_t data)
+void vt369_base_state::extbank_w(u8 data)
 {
 	m_ahigh = (data & 0x01) ? (1 << 25) : 0x0;
 }
@@ -624,7 +624,7 @@ static INPUT_PORTS_START( vt369_rot )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2) PORT_8WAY
 INPUT_PORTS_END
 
-uint8_t vt3xx_fapocket_state::fapocket_412c_r()
+u8 vt3xx_fapocket_state::fapocket_412c_r()
 {
 	if (m_cartsel)
 		return m_cartsel->read();
@@ -632,7 +632,7 @@ uint8_t vt3xx_fapocket_state::fapocket_412c_r()
 		return 0;
 }
 
-void vt3xx_fapocket_state::fapocket_412c_w(uint8_t data)
+void vt3xx_fapocket_state::fapocket_412c_w(u8 data)
 {
 	// fapocket (ok?) (also uses bank from config switch for fake cartridge slot)
 	logerror("%s: vtfa_412c_extbank_w %02x\n", machine().describe_context(), data);
@@ -1084,7 +1084,7 @@ ROM_END
 void vt369_state::init_lxcmcypp()
 {
 	int size = memregion("mainrom")->bytes()/2;
-	uint16_t* ROM = (uint16_t*)memregion("mainrom")->base();
+	u16* ROM = (u16*)memregion("mainrom")->base();
 
 	for (int i = 0; i < size; i++)
 	{

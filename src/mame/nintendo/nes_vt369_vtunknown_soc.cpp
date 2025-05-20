@@ -27,12 +27,12 @@ DEFINE_DEVICE_TYPE(VT3XX_SOC_UNK_DG, vt3xx_soc_unk_dg_device, "vt3xx_unknown_soc
 DEFINE_DEVICE_TYPE(VT3XX_SOC_UNK_FA, vt3xx_soc_unk_fa_device, "vt3xx_unknown_soc_fa", "VT3xx series System on a Chip (Family Pocket)")
 
 
-vt3xx_soc_base_device::vt3xx_soc_base_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+vt3xx_soc_base_device::vt3xx_soc_base_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
 	vt3xx_soc_base_device(mconfig, VT3XX_SOC, tag, owner, clock)
 {
 }
 
-vt3xx_soc_base_device::vt3xx_soc_base_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock) :
+vt3xx_soc_base_device::vt3xx_soc_base_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock) :
 	nes_vt09_soc_device(mconfig, type, tag, owner, clock),
 	m_soundcpu(*this, "soundcpu"),
 	m_sound_timer(nullptr),
@@ -41,48 +41,48 @@ vt3xx_soc_base_device::vt3xx_soc_base_device(const machine_config& mconfig, devi
 {
 }
 
-vt3xx_soc_unk_bt_device::vt3xx_soc_unk_bt_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+vt3xx_soc_unk_bt_device::vt3xx_soc_unk_bt_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
 	vt3xx_soc_base_device(mconfig, VT3XX_SOC_UNK_BT, tag, owner, clock)
 {
 }
 
 
-vt369_soc_introm_noswap_device::vt369_soc_introm_noswap_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock) :
+vt369_soc_introm_noswap_device::vt369_soc_introm_noswap_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock) :
 	vt3xx_soc_base_device(mconfig, type, tag, owner, clock)
 {
 }
 
-vt369_soc_introm_noswap_device::vt369_soc_introm_noswap_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+vt369_soc_introm_noswap_device::vt369_soc_introm_noswap_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
 	vt369_soc_introm_noswap_device(mconfig, VT369_SOC_INTROM_NOSWAP, tag, owner, clock)
 {
 }
 
-vt369_soc_introm_swap_device::vt369_soc_introm_swap_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+vt369_soc_introm_swap_device::vt369_soc_introm_swap_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
 	vt369_soc_introm_noswap_device(mconfig, VT369_SOC_INTROM_SWAP, tag, owner, clock)
 {
 }
 
-vt369_soc_introm_altswap_device::vt369_soc_introm_altswap_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+vt369_soc_introm_altswap_device::vt369_soc_introm_altswap_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
 	vt369_soc_introm_noswap_device(mconfig, VT369_SOC_INTROM_ALTSWAP, tag, owner, clock)
 {
 }
 
-vt369_soc_introm_vibesswap_device::vt369_soc_introm_vibesswap_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+vt369_soc_introm_vibesswap_device::vt369_soc_introm_vibesswap_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
 	vt369_soc_introm_noswap_device(mconfig, VT369_SOC_INTROM_VIBESSWAP, tag, owner, clock)
 {
 }
 
-vt3xx_soc_unk_dg_device::vt3xx_soc_unk_dg_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock) :
+vt3xx_soc_unk_dg_device::vt3xx_soc_unk_dg_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock) :
 	vt3xx_soc_base_device(mconfig, type, tag, owner, clock)
 {
 }
 
-vt3xx_soc_unk_dg_device::vt3xx_soc_unk_dg_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+vt3xx_soc_unk_dg_device::vt3xx_soc_unk_dg_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
 	vt3xx_soc_unk_dg_device(mconfig, VT3XX_SOC_UNK_DG, tag, owner, clock)
 {
 }
 
-vt3xx_soc_unk_fa_device::vt3xx_soc_unk_fa_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+vt3xx_soc_unk_fa_device::vt3xx_soc_unk_fa_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
 	vt3xx_soc_unk_dg_device(mconfig, VT3XX_SOC_UNK_FA, tag, owner, clock)
 {
 }
@@ -109,7 +109,7 @@ void vt3xx_soc_base_device::device_add_mconfig(machine_config& config)
 	m_soundcpu->set_addrmap(5, &vt3xx_soc_base_device::vt369_sound_external_map);	
 }
 
-void vt3xx_soc_base_device::vt369_soundcpu_control_w(offs_t offset, uint8_t data)
+void vt3xx_soc_base_device::vt369_soundcpu_control_w(offs_t offset, u8 data)
 {
 	logerror("%s: write to sound cpu control reg (reset etc.) %02x\n", machine().describe_context(), data);
 
@@ -119,13 +119,13 @@ void vt3xx_soc_base_device::vt369_soundcpu_control_w(offs_t offset, uint8_t data
 		m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-void vt3xx_soc_base_device::vt369_relative_w(offs_t offset, uint8_t data)
+void vt3xx_soc_base_device::vt369_relative_w(offs_t offset, u8 data)
 {
 	logerror("%s: vt369_relative_w %02x %02x\n", machine().describe_context(), offset,  data);
 	m_relative[offset] = data;
 }
 
-uint8_t vt3xx_soc_base_device::read_internal(offs_t offset)
+u8 vt3xx_soc_base_device::read_internal(offs_t offset)
 {
 	if (!m_internal_rom)
 	{
@@ -137,7 +137,7 @@ uint8_t vt3xx_soc_base_device::read_internal(offs_t offset)
 	return m_internal_rom[offset];
 }
 
-uint8_t vt3xx_soc_base_device::alu_r(offs_t offset)
+u8 vt3xx_soc_base_device::alu_r(offs_t offset)
 {
 	if (offset < 6)
 	{
@@ -155,15 +155,15 @@ uint8_t vt3xx_soc_base_device::alu_r(offs_t offset)
 	}
 }
 
-void vt3xx_soc_base_device::alu_w(offs_t offset, uint8_t data)
+void vt3xx_soc_base_device::alu_w(offs_t offset, u8 data)
 {
 	m_alu_params[offset] = data;
 
 	if (offset == 5) // do multiply
 	{
-		uint32_t param1 = m_alu_params[0] | (m_alu_params[1] << 8);
-		uint32_t param2 = m_alu_params[4] | (m_alu_params[5] << 8);
-		uint32_t result = param1 * param2;
+		u32 param1 = m_alu_params[0] | (m_alu_params[1] << 8);
+		u32 param2 = m_alu_params[4] | (m_alu_params[5] << 8);
+		u32 result = param1 * param2;
 		m_alu_params[0] = (result >> 0);
 		m_alu_params[1] = (result >> 8);
 		m_alu_params[2] = (result >> 16);
@@ -171,13 +171,13 @@ void vt3xx_soc_base_device::alu_w(offs_t offset, uint8_t data)
 	}
 	else if (offset == 7) // do divide
 	{
-		uint32_t param1 = m_alu_params[0] | (m_alu_params[1] << 8) | (m_alu_params[2] << 16) | (m_alu_params[3] << 24);
-		uint32_t param2 = m_alu_params[6] | (m_alu_params[7] << 8);
+		u32 param1 = m_alu_params[0] | (m_alu_params[1] << 8) | (m_alu_params[2] << 16) | (m_alu_params[3] << 24);
+		u32 param2 = m_alu_params[6] | (m_alu_params[7] << 8);
 
 		if (param2)
 		{
-			uint32_t result1 = param1 / param2;
-			uint32_t result2 = param1 % param2;
+			u32 result1 = param1 / param2;
+			u32 result2 = param1 % param2;
 			m_alu_params[0] = (result1 >> 0);
 			m_alu_params[1] = (result1 >> 8);
 			m_alu_params[2] = (result1 >> 16);
@@ -288,13 +288,13 @@ void vt3xx_soc_base_device::vt369_map(address_map &map)
 	map(0x8000, 0xffff).rw(FUNC(vt3xx_soc_base_device::external_space_read), FUNC(vt3xx_soc_base_device::external_space_write));
 }
 
-void vt3xx_soc_base_device::vt_dma_w(uint8_t data)
+void vt3xx_soc_base_device::vt_dma_w(u8 data)
 {
 	const bool ALLOW_NEW_DMA = true; // seems OK for cases we have at the moment
 
 	if ((m_bank6000_enable & 0x80) && ALLOW_NEW_DMA)
 	{
-		uint16_t src_addr = (m_4024_newdma) | data << 8;
+		u16 src_addr = (m_4024_newdma) | data << 8;
 
 		int length = (m_vdma_ctrl >> 1) & 7;
 		if (length == 0) length = 8;
@@ -304,7 +304,7 @@ void vt3xx_soc_base_device::vt_dma_w(uint8_t data)
 
 		for (int i = 0; i < length; i++)
 		{
-			uint8_t read_data = m_maincpu->space(AS_PROGRAM).read_byte(src_addr + i);
+			u8 read_data = m_maincpu->space(AS_PROGRAM).read_byte(src_addr + i);
 			if (m_vdma_ctrl & 1)
 			{
 				m_maincpu->space(AS_PROGRAM).write_byte(0x2007, read_data);
@@ -323,14 +323,14 @@ void vt3xx_soc_base_device::vt_dma_w(uint8_t data)
 
 // this reads from the 'extra ROM' area (serial style protocol) and code is copied on gtct885 to e00 in RAM, jumps to it at EDF9: jsr $0e1c
 // extra_rom_prot_4153_r is used by lxccminn, lxccplan and dgun2561 to check battery state instead? reports low battery and does nothing else if unhappy
-uint8_t vt3xx_soc_base_device::extra_rom_prot_4153_r() { logerror("%s: extra_rom_prot_4153_r (protection? / extra SPI device?)\n", machine().describe_context()); return 0xff; }
+u8 vt3xx_soc_base_device::extra_rom_prot_4153_r() { logerror("%s: extra_rom_prot_4153_r (protection? / extra SPI device?)\n", machine().describe_context()); return 0xff; }
 // pactin and tetrtin use these for something similar, seems to want code/data for jumps?
-uint8_t vt3xx_soc_base_device::extra_rom_prot_4150_r() { logerror("%s: extra_rom_prot_4150_r (protection? / extra SPI device?)\n", machine().describe_context()); return machine().rand(); }
-uint8_t vt3xx_soc_base_device::extra_rom_prot_4152_r() { logerror("%s: extra_rom_prot_4152_r (protection? / extra SPI device?)\n", machine().describe_context()); return machine().rand(); }
-void vt3xx_soc_base_device::extra_rom_prot_4152_w(uint8_t data) { logerror("%s: extra_rom_prot_4152_w %02x (protection? / extra SPI device?)\n", machine().describe_context(), data); }
-void vt3xx_soc_base_device::extra_rom_prot_4150_w(uint8_t data) { logerror("%s: extra_rom_prot_4150_w %02x (protection? / extra SPI device?)\n", machine().describe_context(), data); m_4150_write_cb(data); }
+u8 vt3xx_soc_base_device::extra_rom_prot_4150_r() { logerror("%s: extra_rom_prot_4150_r (protection? / extra SPI device?)\n", machine().describe_context()); return machine().rand(); }
+u8 vt3xx_soc_base_device::extra_rom_prot_4152_r() { logerror("%s: extra_rom_prot_4152_r (protection? / extra SPI device?)\n", machine().describe_context()); return machine().rand(); }
+void vt3xx_soc_base_device::extra_rom_prot_4152_w(u8 data) { logerror("%s: extra_rom_prot_4152_w %02x (protection? / extra SPI device?)\n", machine().describe_context(), data); }
+void vt3xx_soc_base_device::extra_rom_prot_4150_w(u8 data) { logerror("%s: extra_rom_prot_4150_w %02x (protection? / extra SPI device?)\n", machine().describe_context(), data); m_4150_write_cb(data); }
 
-void vt3xx_soc_base_device::extra_io_41e6_w(uint8_t data) { logerror("%s: extra_io_41e6_w %02x (external banking?)\n", machine().describe_context(), data); m_41e6_write_cb(data); }
+void vt3xx_soc_base_device::extra_io_41e6_w(u8 data) { logerror("%s: extra_io_41e6_w %02x (external banking?)\n", machine().describe_context(), data); m_41e6_write_cb(data); }
 
 void vt3xx_soc_base_device::update_timer()
 {
@@ -354,7 +354,7 @@ TIMER_CALLBACK_MEMBER(vt3xx_soc_base_device::sound_timer_expired)
 	update_timer();
 }
 
-void vt3xx_soc_base_device::vt369_soundcpu_timer_w(offs_t offset, uint8_t data)
+void vt3xx_soc_base_device::vt369_soundcpu_timer_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
@@ -386,41 +386,41 @@ void vt3xx_soc_base_device::vt369_soundcpu_timer_w(offs_t offset, uint8_t data)
 	}
 }
 
-void vt3xx_soc_base_device::vt369_soundcpu_adder_data_address_w(offs_t offset, uint8_t data)
+void vt3xx_soc_base_device::vt369_soundcpu_adder_data_address_w(offs_t offset, u8 data)
 {
 	LOGMASKED(LOG_VT3XX_SOUND, "%s: vt369_soundcpu_adder_data_address_w %02x %02x\n", machine().describe_context(), offset, data);
 }
 
-uint8_t vt3xx_soc_base_device::vt369_soundcpu_adder_result_r(offs_t offset)
+u8 vt3xx_soc_base_device::vt369_soundcpu_adder_result_r(offs_t offset)
 {
 	LOGMASKED(LOG_VT3XX_SOUND, "%s: vt369_soundcpu_adder_result_r %02x\n", machine().describe_context(), offset);
 	return 0x00;
 }
 
-void vt3xx_soc_base_device::vt369_soundcpu_mult_data_address_w(offs_t offset, uint8_t data)
+void vt3xx_soc_base_device::vt369_soundcpu_mult_data_address_w(offs_t offset, u8 data)
 {
 	LOGMASKED(LOG_VT3XX_SOUND, "%s: vt369_soundcpu_mult_data_address_w %02x %02x\n", machine().describe_context(), offset, data);
 }
 
-uint8_t vt3xx_soc_base_device::vt369_soundcpu_mult_result_r(offs_t offset)
+u8 vt3xx_soc_base_device::vt369_soundcpu_mult_result_r(offs_t offset)
 {
 	LOGMASKED(LOG_VT3XX_SOUND, "%s: vt369_soundcpu_mult_result_r %02x\n", machine().describe_context(), offset);
 	return 0x00;
 }
 
-uint8_t vt3xx_soc_base_device::vt369_soundcpu_mult_status_r()
+u8 vt3xx_soc_base_device::vt369_soundcpu_mult_status_r()
 {
 	LOGMASKED(LOG_VT3XX_SOUND, "%s: vt369_soundcpu_mult_status_r\n", machine().describe_context());
 	return 0x00;
 }
 
-void vt3xx_soc_base_device::vt369_soundcpu_dac_w(offs_t offset, uint8_t data)
+void vt3xx_soc_base_device::vt369_soundcpu_dac_w(offs_t offset, u8 data)
 {
 	// 2 16-bit channels?
 	LOGMASKED(LOG_VT3XX_SOUND, "%s: vt369_soundcpu_dac_w %02x %02x\n", machine().describe_context(), offset, data);
 }
 
-uint8_t vt3xx_soc_base_device::vt369_soundcpu_vectors_r(offs_t offset)
+u8 vt3xx_soc_base_device::vt369_soundcpu_vectors_r(offs_t offset)
 {
 	// timer IRQ (others are currently unused, point to rti, not clear what they're for or how they're enabled)
 	if ((offset == 0x04) || (offset == 0x05))
@@ -455,7 +455,7 @@ void vt3xx_soc_base_device::vt369_sound_external_map(address_map &map)
 }
 
 
-void vt3xx_soc_base_device::vt369_411c_bank6000_enable_w(offs_t offset, uint8_t data)
+void vt3xx_soc_base_device::vt369_411c_bank6000_enable_w(offs_t offset, u8 data)
 {
 	if (m_bank6000_enable != data)
 	{
@@ -467,7 +467,7 @@ void vt3xx_soc_base_device::vt369_411c_bank6000_enable_w(offs_t offset, uint8_t 
 }
 
 
-void vt3xx_soc_base_device::vt369_4112_bank6000_select_w(offs_t offset, uint8_t data)
+void vt3xx_soc_base_device::vt369_4112_bank6000_select_w(offs_t offset, u8 data)
 {
 	logerror("%s: set bank at 0x6000 to %02x\n", machine().describe_context(), data);
 	m_bank6000 = data;
@@ -476,7 +476,7 @@ void vt3xx_soc_base_device::vt369_4112_bank6000_select_w(offs_t offset, uint8_t 
 }
 
 
-uint8_t vt3xx_soc_base_device::vt369_6000_r(offs_t offset)
+u8 vt3xx_soc_base_device::vt369_6000_r(offs_t offset)
 {
 	if (m_bank6000_enable & 0x40)
 	{
@@ -491,7 +491,7 @@ uint8_t vt3xx_soc_base_device::vt369_6000_r(offs_t offset)
 	}
 }
 
-void vt3xx_soc_base_device::vt369_6000_w(offs_t offset, uint8_t data)
+void vt3xx_soc_base_device::vt369_6000_w(offs_t offset, u8 data)
 {
 	if (m_bank6000_enable & 0x40)
 	{
@@ -505,7 +505,7 @@ void vt3xx_soc_base_device::vt369_6000_w(offs_t offset, uint8_t data)
 
 
 // vt3xx has a bigger palette, starting at 3c00, it seems unaffected the fallthrough / mirroring
-uint8_t vt3xx_soc_base_device::vt3xx_palette_r(offs_t offset)
+u8 vt3xx_soc_base_device::vt3xx_palette_r(offs_t offset)
 {
 	if (m_ppu->is_v3xx_extended_mode()) // or maybe if in 'fast' CPU mode (m_bank6000_enable &0x80)
 	{
@@ -524,7 +524,7 @@ uint8_t vt3xx_soc_base_device::vt3xx_palette_r(offs_t offset)
 	}
 }
 
-void vt3xx_soc_base_device::vt3xx_palette_w(offs_t offset, uint8_t data)
+void vt3xx_soc_base_device::vt3xx_palette_w(offs_t offset, u8 data)
 {
 	if (m_ppu->is_v3xx_extended_mode()) // or maybe if in 'fast' CPU mode
 	{
@@ -579,7 +579,7 @@ void vt3xx_soc_base_device::device_reset()
 
 
 
-uint8_t vt3xx_soc_base_device::vt369_41bx_r(offs_t offset)
+u8 vt3xx_soc_base_device::vt369_41bx_r(offs_t offset)
 {
 	logerror("%s: vt369_41bx_r %02x (unknown)\n", machine().describe_context(), offset);
 
@@ -592,19 +592,19 @@ uint8_t vt3xx_soc_base_device::vt369_41bx_r(offs_t offset)
 	}
 }
 
-void vt3xx_soc_base_device::vt369_41bx_w(offs_t offset, uint8_t data)
+void vt3xx_soc_base_device::vt369_41bx_w(offs_t offset, u8 data)
 {
 	logerror("%s: vt369_41bx_w %02x %02x (unknown)\n", machine().describe_context(), offset, data);
 }
 
 
-uint8_t vt3xx_soc_base_device::vt369_414f_r()
+u8 vt3xx_soc_base_device::vt369_414f_r()
 {
 	logerror("%s: vt369_414f_r (unknown)\n", machine().describe_context());
 	return 0xff;
 }
 
-uint8_t vt3xx_soc_base_device::vt369_415c_r()
+u8 vt3xx_soc_base_device::vt369_415c_r()
 {
 	logerror("%s: vt369_415c_r (unknown - important)\n", machine().describe_context());
 	// returning 0x00 allows zonefusn and lexi30 (and many other lexibook sets) to show menus, but stops sealvt from showing anything
@@ -613,13 +613,13 @@ uint8_t vt3xx_soc_base_device::vt369_415c_r()
 	return 0xf0; 
 }
 
-uint8_t vt3xx_soc_base_device::vt369_418a_r()
+u8 vt3xx_soc_base_device::vt369_418a_r()
 {
 	logerror("%s: vt369_418a_r (unknown)\n", machine().describe_context());
 	return machine().rand();
 }
 
-uint8_t vt3xx_soc_base_device::read_onespace_bus_with_relative_offset(offs_t offset)
+u8 vt3xx_soc_base_device::read_onespace_bus_with_relative_offset(offs_t offset)
 {
 	address_space& spc = this->space(AS_PROGRAM);
 	return spc.read_byte(get_relative() + offset);
@@ -644,7 +644,7 @@ void vt369_soc_introm_noswap_device::device_start()
 	m_encryption_allowed = false;
 }
 
-void vt369_soc_introm_noswap_device::vtfp_411d_w(uint8_t data)
+void vt369_soc_introm_noswap_device::vtfp_411d_w(u8 data)
 {
 	// controls chram access and mapper emulation modes in later models
 	logerror("vtfp_411d_w  %02x\n", data);
@@ -652,7 +652,7 @@ void vt369_soc_introm_noswap_device::vtfp_411d_w(uint8_t data)
 	update_banks();
 }
 
-uint8_t vt369_soc_introm_noswap_device::vthh_414a_r()
+u8 vt369_soc_introm_noswap_device::vthh_414a_r()
 {
 	return 0x80;
 }
@@ -668,12 +668,11 @@ void vt369_soc_introm_noswap_device::vt369_introm_map(address_map &map)
 	map(0x414a, 0x414a).r(FUNC(vt369_soc_introm_noswap_device::vthh_414a_r));
 	map(0x411d, 0x411d).w(FUNC(vt369_soc_introm_noswap_device::vtfp_411d_w));
 
-
 	map(0x4169, 0x4169).w(FUNC(vt369_soc_introm_noswap_device::encryption_4169_w));
 }
 
 
-void vt369_soc_introm_noswap_device::encryption_4169_w(uint8_t data)
+void vt369_soc_introm_noswap_device::encryption_4169_w(u8 data)
 {
 	if (m_encryption_allowed)
 	{
@@ -710,11 +709,6 @@ void vt369_soc_introm_vibesswap_device::device_start()
 	m_encryption_allowed = true;
 }
 
-
-
-
-
-
 /***********************************************************************************************************************************************************/
 /* this might also just be the same as vt369 but with the games not using all features */
 /***********************************************************************************************************************************************************/
@@ -725,7 +719,7 @@ void vt3xx_soc_unk_dg_device::device_add_mconfig(machine_config& config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt3xx_soc_unk_dg_device::nes_vt_dg_map);
 }
 
-void vt3xx_soc_unk_dg_device::vt03_411c_w(uint8_t data)
+void vt3xx_soc_unk_dg_device::vt03_411c_w(u8 data)
 {
 	logerror("vt03_411c_w  %02x\n", data);
 	m_411c = data;
@@ -754,11 +748,10 @@ void vt3xx_soc_unk_bt_device::nes_vt_bt_map(address_map &map)
 	map(0x412c, 0x412c).w(FUNC(vt3xx_soc_unk_bt_device::vt03_412c_extbank_w));
 }
 
-void vt3xx_soc_unk_bt_device::vt03_412c_extbank_w(uint8_t data)
+void vt3xx_soc_unk_bt_device::vt03_412c_extbank_w(u8 data)
 {
 	m_upper_write_412c_callback(data);
 }
-
 
 /***********************************************************************************************************************************************************/
 /* 'FA' specifics (base = 'DG') */ // used by fapocket
@@ -770,18 +763,18 @@ void vt3xx_soc_unk_fa_device::device_add_mconfig(machine_config& config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt3xx_soc_unk_fa_device::nes_vt_fa_map);
 }
 
-uint8_t vt3xx_soc_unk_fa_device::vtfa_412c_r()
+u8 vt3xx_soc_unk_fa_device::vtfa_412c_r()
 {
 	return m_upper_read_412c_callback();
 }
 
-void vt3xx_soc_unk_fa_device::vtfa_412c_extbank_w(uint8_t data)
+void vt3xx_soc_unk_fa_device::vtfa_412c_extbank_w(u8 data)
 {
 	m_upper_write_412c_callback(data);
 
 }
 
-void vt3xx_soc_unk_fa_device::vtfp_4242_w(uint8_t data)
+void vt3xx_soc_unk_fa_device::vtfp_4242_w(u8 data)
 {
 	logerror("vtfp_4242_w %02x\n", data);
 	m_4242 = data;
@@ -793,4 +786,3 @@ void vt3xx_soc_unk_fa_device::nes_vt_fa_map(address_map &map)
 	map(0x412c, 0x412c).r(FUNC(vt3xx_soc_unk_fa_device::vtfa_412c_r)).w(FUNC(vt3xx_soc_unk_fa_device::vtfa_412c_extbank_w));
 	map(0x4242, 0x4242).w(FUNC(vt3xx_soc_unk_fa_device::vtfp_4242_w));
 }
-

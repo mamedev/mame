@@ -23,7 +23,7 @@ DEFINE_DEVICE_TYPE(PPU_VT03PAL, ppu_vt03pal_device, "ppu_vt03pal", "VT03 PPU (PA
 
 DEFINE_DEVICE_TYPE(PPU_VT3XX, ppu_vt3xx_device, "ppu_vt3xx", "VT3XX PPU (NTSC)")
 
-ppu_vt03_device::ppu_vt03_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock) :
+ppu_vt03_device::ppu_vt03_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock) :
 	ppu2c0x_device(mconfig, type, tag, owner, clock),
 	m_is_pal(false),
 	m_is_50hz(false),
@@ -33,13 +33,13 @@ ppu_vt03_device::ppu_vt03_device(const machine_config& mconfig, device_type type
 {
 }
 
-ppu_vt03_device::ppu_vt03_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+ppu_vt03_device::ppu_vt03_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
 	ppu_vt03_device(mconfig, PPU_VT03, tag, owner, clock)
 {
 }
 
 
-ppu_vt03pal_device::ppu_vt03pal_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+ppu_vt03pal_device::ppu_vt03pal_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
 	ppu_vt03_device(mconfig, PPU_VT03PAL, tag, owner, clock)
 {
 	m_scanlines_per_frame = PAL_SCANLINES_PER_FRAME;
@@ -49,7 +49,7 @@ ppu_vt03pal_device::ppu_vt03pal_device(const machine_config& mconfig, const char
 }
 
 
-uint8_t ppu_vt03_device::palette_read(offs_t offset)
+u8 ppu_vt03_device::palette_read(offs_t offset)
 {
 	if (offset < 0x20)
 		return ppu2c0x_device::palette_read(offset);
@@ -57,7 +57,7 @@ uint8_t ppu_vt03_device::palette_read(offs_t offset)
 		return m_palette_ram[offset];
 }
 
-void ppu_vt03_device::palette_write(offs_t offset, uint8_t data)
+void ppu_vt03_device::palette_write(offs_t offset, u8 data)
 {
 	if (offset < 0x20)
 	{
@@ -69,22 +69,22 @@ void ppu_vt03_device::palette_write(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t ppu_vt03_device::extended_modes_enable_r(offs_t offset) { return m_extended_modes_enable; }
-uint8_t ppu_vt03_device::extended_modes2_enable_r(offs_t offset) { return m_extended_modes2_enable; }
-uint8_t ppu_vt03_device::videobank0_0_r(offs_t offset) { return m_videobank0[0x0]; }
-uint8_t ppu_vt03_device::videobank0_1_r(offs_t offset) { return m_videobank0[0x1]; }
-uint8_t ppu_vt03_device::videobank0_2_r(offs_t offset) { return m_videobank0[0x2]; }
-uint8_t ppu_vt03_device::videobank0_3_r(offs_t offset) { return m_videobank0[0x3]; }
-uint8_t ppu_vt03_device::videobank0_4_r(offs_t offset) { return m_videobank0[0x4]; }
-uint8_t ppu_vt03_device::videobank0_5_r(offs_t offset) { return m_videobank0[0x5]; }
-uint8_t ppu_vt03_device::videobank1_r(offs_t offset) { return m_videobank1; }
-uint8_t ppu_vt03_device::unk_2019_r(offs_t offset) { return 0x00; } // unused?
-uint8_t ppu_vt03_device::videobank0_extra_r(offs_t offset) { return m_videobank0_extra; }
-uint8_t ppu_vt03_device::unk_201b_r(offs_t offset) { return 0x00; } // unused?
-uint8_t ppu_vt03_device::gun_x_r(offs_t offset) { return 0x00; }
-uint8_t ppu_vt03_device::gun_y_r(offs_t offset) { return 0x00; }
-uint8_t ppu_vt03_device::gun2_x_r(offs_t offset) { return 0x00; }
-uint8_t ppu_vt03_device::gun2_y_r(offs_t offset) { return 0x00; }
+u8 ppu_vt03_device::extended_modes_enable_r(offs_t offset) { return m_extended_modes_enable; }
+u8 ppu_vt03_device::extended_modes2_enable_r(offs_t offset) { return m_extended_modes2_enable; }
+u8 ppu_vt03_device::videobank0_0_r(offs_t offset) { return m_videobank0[0x0]; }
+u8 ppu_vt03_device::videobank0_1_r(offs_t offset) { return m_videobank0[0x1]; }
+u8 ppu_vt03_device::videobank0_2_r(offs_t offset) { return m_videobank0[0x2]; }
+u8 ppu_vt03_device::videobank0_3_r(offs_t offset) { return m_videobank0[0x3]; }
+u8 ppu_vt03_device::videobank0_4_r(offs_t offset) { return m_videobank0[0x4]; }
+u8 ppu_vt03_device::videobank0_5_r(offs_t offset) { return m_videobank0[0x5]; }
+u8 ppu_vt03_device::videobank1_r(offs_t offset) { return m_videobank1; }
+u8 ppu_vt03_device::unk_2019_r(offs_t offset) { return 0x00; } // unused?
+u8 ppu_vt03_device::videobank0_extra_r(offs_t offset) { return m_videobank0_extra; }
+u8 ppu_vt03_device::unk_201b_r(offs_t offset) { return 0x00; } // unused?
+u8 ppu_vt03_device::gun_x_r(offs_t offset) { return 0x00; }
+u8 ppu_vt03_device::gun_y_r(offs_t offset) { return 0x00; }
+u8 ppu_vt03_device::gun2_x_r(offs_t offset) { return 0x00; }
+u8 ppu_vt03_device::gun2_y_r(offs_t offset) { return 0x00; }
 
 
 void ppu_vt03_device::init_vtxx_rgb555_palette_tables()
@@ -94,10 +94,10 @@ void ppu_vt03_device::init_vtxx_rgb555_palette_tables()
 	{
 		for (int palval = 0; palval < 0x8000; palval++)
 		{
-			//uint16_t rgbval = (m_palette_ram[i & 0x7f] & 0xff) | ((m_palette_ram[(i & 0x7f) + 0x80] & 0xff) << 8);
-			const uint8_t blue = (palval & 0x001f) << 3;
-			const uint8_t green = (palval & 0x3e0) >> 2;
-			const uint8_t red = (palval & 0x7C00) >> 7;
+			//u16 rgbval = (m_palette_ram[i & 0x7f] & 0xff) | ((m_palette_ram[(i & 0x7f) + 0x80] & 0xff) << 8);
+			const u8 blue = (palval & 0x001f) << 3;
+			const u8 green = (palval & 0x3e0) >> 2;
+			const u8 red = (palval & 0x7C00) >> 7;
 
 			// TODO: apply emphasis values if they work in this mode
 			m_vtpens_rgb555[entry] = rgb_t(red, green, blue);
@@ -113,10 +113,10 @@ void ppu_vt03_device::init_vtxx_rgb444_palette_tables()
 	{
 		for (int palval = 0; palval < 0x1000; palval++)
 		{
-			//uint16_t rgbval = (m_palette_ram[i & 0x7f] & 0x3f) | ((m_palette_ram[(i & 0x7f) + 0x80] & 0x3f) << 6);
-			const uint8_t red = (palval & 0x000f) << 4;
-			const uint8_t green = (palval & 0x0f0);
-			const uint8_t blue = (palval & 0xf00) >> 4;
+			//u16 rgbval = (m_palette_ram[i & 0x7f] & 0x3f) | ((m_palette_ram[(i & 0x7f) + 0x80] & 0x3f) << 6);
+			const u8 red = (palval & 0x000f) << 4;
+			const u8 green = (palval & 0x0f0);
+			const u8 blue = (palval & 0xf00) >> 4;
 
 			// TODO: apply emphasis values if they work in this mode
 			m_vtpens_rgb444[entry] = rgb_t(red, green, blue);
@@ -257,7 +257,7 @@ void ppu_vt03_device::device_reset()
 		m_tilebases_2x[i] = 0x00;
 }
 
-uint8_t ppu_vt03_device::get_m_read_bg4_bg3()
+u8 ppu_vt03_device::get_m_read_bg4_bg3()
 {
 	return m_read_bg4_bg3;
 }
@@ -276,7 +276,7 @@ void ppu_vt03_device::read_sprite_plane_data(int address)
 	}
 }
 
-void ppu_vt03_device::make_sprite_pixel_data(uint8_t& pixel_data, bool flipx)
+void ppu_vt03_device::make_sprite_pixel_data(u8& pixel_data, bool flipx)
 {
 	ppu2c0x_device::make_sprite_pixel_data(pixel_data, flipx);
 
@@ -294,8 +294,8 @@ void ppu_vt03_device::make_sprite_pixel_data(uint8_t& pixel_data, bool flipx)
 
 			if (is16pix)
 			{
-				const uint8_t pix0 = pixel_data & 0x03;
-				const uint8_t pix1 = (pixel_data >> 5) & 0x03;
+				const u8 pix0 = pixel_data & 0x03;
+				const u8 pix1 = (pixel_data >> 5) & 0x03;
 				pixel_data = pix1 | (pix0 << 5);
 			}
 		}
@@ -308,7 +308,7 @@ void ppu_vt03_device::make_sprite_pixel_data(uint8_t& pixel_data, bool flipx)
 	}
 }
 
-void ppu_vt03_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_rgb32& bitmap)
+void ppu_vt03_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, u8 pixel_data, bitmap_rgb32& bitmap)
 {
 	const bool is4bpp = BIT(m_extended_modes_enable, 2);
 	const bool is16pix = BIT(m_extended_modes_enable, 0);
@@ -317,7 +317,7 @@ void ppu_vt03_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, u
 	{
 		if (!is16pix)
 		{
-			const uint8_t pen = pixel_data + (4 * color);
+			const u8 pen = pixel_data + (4 * color);
 			draw_tile_pixel_inner(pen, &bitmap.pix(m_scanline, sprite_xpos + pixel));
 		}
 		else
@@ -327,13 +327,13 @@ void ppu_vt03_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, u
 			    cliprect - not seen used yet */
 			if ((pixel_data & 0x03) != 0)
 			{
-				const uint8_t pen = (pixel_data & 0x03) + (4 * color);
+				const u8 pen = (pixel_data & 0x03) + (4 * color);
 				draw_tile_pixel_inner(pen, &bitmap.pix(m_scanline, sprite_xpos + pixel));
 			}
 
 			if (((pixel_data >> 5) & 0x03) != 0)
 			{
-				const uint8_t pen = ((pixel_data >> 5) & 0x03) + (4 * color);
+				const u8 pen = ((pixel_data >> 5) & 0x03) + (4 * color);
 				draw_tile_pixel_inner(pen, &bitmap.pix(m_scanline, sprite_xpos + pixel + 8));
 			}
 		}
@@ -368,7 +368,7 @@ void ppu_vt03_device::read_tile_plane_data(int address, int color)
 	}
 }
 
-void ppu_vt03_device::shift_tile_plane_data(uint8_t& pix)
+void ppu_vt03_device::shift_tile_plane_data(u8& pix)
 {
 	const bool is4bpp = BIT(m_extended_modes_enable, 1);
 
@@ -406,7 +406,7 @@ void ppu_vt03_device::shift_tile_plane_data(uint8_t& pix)
 	m_whichpixel++;
 }
 
-void ppu_vt03_device::draw_back_pen(uint32_t* dst, int back_pen)
+void ppu_vt03_device::draw_back_pen(u32* dst, int back_pen)
 {
 	if (m_extended_modes_enable & 0x80)
 	{
@@ -421,19 +421,19 @@ void ppu_vt03_device::draw_back_pen(uint32_t* dst, int back_pen)
 }
 
 
-void ppu_vt03_device::draw_tile_pixel_inner(uint8_t pen, uint32_t *dest)
+void ppu_vt03_device::draw_tile_pixel_inner(u8 pen, u32 *dest)
 {
 	if (is_v3xx_extended_mode())
 	{
 		// correct for lxcmcysp, lxcmc250
-		uint16_t pal0 = readbyte(((pen & 0xff)*2)+0x3c00);
-		         pal0 |= readbyte(((pen & 0xff)*2)+0x3c01) << 8;
+		u16 pal0 = readbyte(((pen & 0xff) * 2) + 0x3c00);
+		pal0 |= readbyte(((pen & 0xff) * 2) + 0x3c01) << 8;
 
-		int palb = (pal0 >> 0) & 0x1f;
-		int palg = (pal0 >> 5) & 0x1f;
-		int palr = (pal0 >> 10) & 0x1f;
+		const int palb = (pal0 >> 0) & 0x1f;
+		const int palg = (pal0 >> 5) & 0x1f;
+		const int palr = (pal0 >> 10) & 0x1f;
 
-		*dest = rgb_t(palr<<3, palg<<3, palb<<3);
+		*dest = rgb_t(palr << 3, palg << 3, palb << 3);
 	}
 	else
 	{
@@ -441,7 +441,7 @@ void ppu_vt03_device::draw_tile_pixel_inner(uint8_t pen, uint32_t *dest)
 		{
 			if (m_pal_mode == PAL_MODE_NEW_RGB) // unknown newer VT mode
 			{
-				uint32_t palval = (m_palette_ram[pen & 0x7f] & 0xff) | ((m_palette_ram[(pen & 0x7f) + 0x80] & 0x7f) << 8);
+				u32 palval = (m_palette_ram[pen & 0x7f] & 0xff) | ((m_palette_ram[(pen & 0x7f) + 0x80] & 0x7f) << 8);
 
 				// does grayscale mode exist here? (we haven't calculated any colours for it)
 				//if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
@@ -454,7 +454,7 @@ void ppu_vt03_device::draw_tile_pixel_inner(uint8_t pen, uint32_t *dest)
 			}
 			else if (m_pal_mode == PAL_MODE_NEW_RGB12) // unknown newer VT mode
 			{
-				uint32_t palval = (m_palette_ram[pen & 0x7f] & 0x3f) | ((m_palette_ram[(pen & 0x7f) + 0x80] & 0x3f) << 6);
+				u32 palval = (m_palette_ram[pen & 0x7f] & 0x3f) | ((m_palette_ram[(pen & 0x7f) + 0x80] & 0x3f) << 6);
 
 				// does grayscale mode exist here? (we haven't calculated any colours for it)
 				//if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
@@ -467,7 +467,7 @@ void ppu_vt03_device::draw_tile_pixel_inner(uint8_t pen, uint32_t *dest)
 			}
 			else // VT03 mode
 			{
-				uint32_t palval = (m_palette_ram[pen & 0x7f] & 0x3f) | ((m_palette_ram[(pen & 0x7f) + 0x80] & 0x3f) << 6);
+				u32 palval = (m_palette_ram[pen & 0x7f] & 0x3f) | ((m_palette_ram[(pen & 0x7f) + 0x80] & 0x3f) << 6);
 
 				// does grayscale mode exist here? (we haven't calculated any colours for it)
 				//if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
@@ -481,7 +481,7 @@ void ppu_vt03_device::draw_tile_pixel_inner(uint8_t pen, uint32_t *dest)
 		}
 		else // old colour compatible mode
 		{
-			uint16_t palval = (m_palette_ram[pen & 0x7f] & 0x3f);
+			u16 palval = (m_palette_ram[pen & 0x7f] & 0x3f);
 
 			if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
 				palval &= 0x30;
@@ -493,7 +493,7 @@ void ppu_vt03_device::draw_tile_pixel_inner(uint8_t pen, uint32_t *dest)
 		}
 	}
 }
-void ppu_vt03_device::draw_tile_pixel(uint8_t pix, int color, uint32_t back_pen, uint32_t*& dest)
+void ppu_vt03_device::draw_tile_pixel(u8 pix, int color, u32 back_pen, u32*& dest)
 {
 	if (is_v3xx_extended_mode())
 	{
@@ -540,12 +540,12 @@ void ppu_vt03_device::read_extra_sprite_bits(int sprite_index)
 	m_extra_sprite_bits = (m_spriteram[sprite_index + 2] & 0x1c) >> 2;
 }
 
-uint8_t ppu_vt03_device::get_speva2_speva0()
+u8 ppu_vt03_device::get_speva2_speva0()
 {
 	return m_extra_sprite_bits;
 }
 
-void ppu_vt03_device::extended_modes_enable_w(offs_t offset, uint8_t data)
+void ppu_vt03_device::extended_modes_enable_w(offs_t offset, u8 data)
 {
 	/*  7   : COLCOMP
 	    6   : UNUSED (8bpp enable on VT09?)
@@ -559,23 +559,23 @@ void ppu_vt03_device::extended_modes_enable_w(offs_t offset, uint8_t data)
 	m_extended_modes_enable = data;
 }
 
-void ppu_vt03_device::extended_modes2_enable_w(offs_t offset, uint8_t data) { m_extended_modes2_enable = data; }
-void ppu_vt03_device::videobank0_0_w(offs_t offset, uint8_t data) { m_videobank0[0x0] = data; }
-void ppu_vt03_device::videobank0_1_w(offs_t offset, uint8_t data) { m_videobank0[0x1] = data; }
-void ppu_vt03_device::videobank0_2_w(offs_t offset, uint8_t data) { m_videobank0[0x2] = data; }
-void ppu_vt03_device::videobank0_3_w(offs_t offset, uint8_t data) { m_videobank0[0x3] = data; }
-void ppu_vt03_device::videobank0_4_w(offs_t offset, uint8_t data) { m_videobank0[0x4] = data; }
-void ppu_vt03_device::videobank0_5_w(offs_t offset, uint8_t data) { m_videobank0[0x5] = data; }
-void ppu_vt03_device::videobank1_w(offs_t offset, uint8_t data) { m_videobank1 = data; }
-void ppu_vt03_device::gun_reset_w(offs_t offset, uint8_t data) { logerror("%s: gun_reset_w %02x\n", machine().describe_context(), data); }
-void ppu_vt03_device::videobank0_extra_w(offs_t offset, uint8_t data) { m_videobank0_extra = data; }
+void ppu_vt03_device::extended_modes2_enable_w(offs_t offset, u8 data) { m_extended_modes2_enable = data; }
+void ppu_vt03_device::videobank0_0_w(offs_t offset, u8 data) { m_videobank0[0x0] = data; }
+void ppu_vt03_device::videobank0_1_w(offs_t offset, u8 data) { m_videobank0[0x1] = data; }
+void ppu_vt03_device::videobank0_2_w(offs_t offset, u8 data) { m_videobank0[0x2] = data; }
+void ppu_vt03_device::videobank0_3_w(offs_t offset, u8 data) { m_videobank0[0x3] = data; }
+void ppu_vt03_device::videobank0_4_w(offs_t offset, u8 data) { m_videobank0[0x4] = data; }
+void ppu_vt03_device::videobank0_5_w(offs_t offset, u8 data) { m_videobank0[0x5] = data; }
+void ppu_vt03_device::videobank1_w(offs_t offset, u8 data) { m_videobank1 = data; }
+void ppu_vt03_device::gun_reset_w(offs_t offset, u8 data) { logerror("%s: gun_reset_w %02x\n", machine().describe_context(), data); }
+void ppu_vt03_device::videobank0_extra_w(offs_t offset, u8 data) { m_videobank0_extra = data; }
 /* 201b unused */
 /* 201c read gun read x (older VT chipsets) */
 /* 201d read gun read y (older VT chipsets) */
 /* 201e read gun 2 read x (older VT chipsets) */
 /* 201f read gun 2 read y (older VT chipsets) */
 
-ppu_vt3xx_device::ppu_vt3xx_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+ppu_vt3xx_device::ppu_vt3xx_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
 	ppu_vt03_device(mconfig, PPU_VT3XX, tag, owner, clock)
 {
 	m_spriteramsize = 0x200;
@@ -599,15 +599,15 @@ void ppu_vt3xx_device::device_reset()
 	m_2008_spritehigh = 0;
 }
 
-uint8_t ppu_vt3xx_device::extvidreg_201c_r(offs_t offset) { return m_newvid_1c; }
-uint8_t ppu_vt3xx_device::extvidreg_201d_r(offs_t offset) { return m_newvid_1d; }
-uint8_t ppu_vt3xx_device::extvidreg_201e_r(offs_t offset) { return m_newvid_1e; }
-uint8_t ppu_vt3xx_device::tilebases_202x_r(offs_t offset) { return m_tilebases_2x[offset]; }
+u8 ppu_vt3xx_device::extvidreg_201c_r(offs_t offset) { return m_newvid_1c; }
+u8 ppu_vt3xx_device::extvidreg_201d_r(offs_t offset) { return m_newvid_1d; }
+u8 ppu_vt3xx_device::extvidreg_201e_r(offs_t offset) { return m_newvid_1e; }
+u8 ppu_vt3xx_device::tilebases_202x_r(offs_t offset) { return m_tilebases_2x[offset]; }
 
-void ppu_vt3xx_device::extvidreg_201c_w(offs_t offset, uint8_t data) { m_newvid_1c = data; logerror("%s: extvidreg_201c_w %02x\n", machine().describe_context(), data); }
-void ppu_vt3xx_device::extvidreg_201d_w(offs_t offset, uint8_t data) { m_newvid_1d = data; logerror("%s: extvidreg_201d_w %02x\n", machine().describe_context(), data); }
+void ppu_vt3xx_device::extvidreg_201c_w(offs_t offset, u8 data) { m_newvid_1c = data; logerror("%s: extvidreg_201c_w %02x\n", machine().describe_context(), data); }
+void ppu_vt3xx_device::extvidreg_201d_w(offs_t offset, u8 data) { m_newvid_1d = data; logerror("%s: extvidreg_201d_w %02x\n", machine().describe_context(), data); }
 
-void ppu_vt3xx_device::extvidreg_201e_w(offs_t offset, uint8_t data)
+void ppu_vt3xx_device::extvidreg_201e_w(offs_t offset, u8 data)
 {
 	/*
 	 extended mode feature enables
@@ -618,7 +618,7 @@ void ppu_vt3xx_device::extvidreg_201e_w(offs_t offset, uint8_t data)
 	logerror("%s: extvidreg_201e_w %02x\n", machine().describe_context(), data);
 }
 
-void ppu_vt3xx_device::tilebases_202x_w(offs_t offset, uint8_t data)
+void ppu_vt3xx_device::tilebases_202x_w(offs_t offset, u8 data)
 {
 	if (data != m_tilebases_2x[offset])
 		logerror("%s: NEW VALUE tilebases_202x_w %d %02x\n", machine().describe_context(), offset, data);
@@ -627,7 +627,7 @@ void ppu_vt3xx_device::tilebases_202x_w(offs_t offset, uint8_t data)
 }
 
 // move this to ppu_vt03_device? as it seems like even some of the VT32 games write here
-void ppu_vt3xx_device::lcdc_regs_w(offs_t offset, uint8_t data)
+void ppu_vt3xx_device::lcdc_regs_w(offs_t offset, u8 data)
 {
 	// these seem somehow related to the screen dimensions, but could
 	// be specific to the type of LCD being used (scale against the actual screen)
@@ -646,7 +646,7 @@ void ppu_vt3xx_device::lcdc_regs_w(offs_t offset, uint8_t data)
 		int max_x;
 		int min_y;
 		int max_y;
-		uint8_t regvals[0xa];
+		u8 regvals[0xa];
 	};
 
 	static const vid_mode mode_table[] = {
@@ -765,7 +765,7 @@ void ppu_vt3xx_device::read_tile_plane_data(int address, int color)
 	}
 }
 
-void ppu_vt3xx_device::shift_tile_plane_data(uint8_t& pix)
+void ppu_vt3xx_device::shift_tile_plane_data(u8& pix)
 {
 	if (!m_newvid_1e)
 	{
@@ -773,7 +773,6 @@ void ppu_vt3xx_device::shift_tile_plane_data(uint8_t& pix)
 	}
 	else
 	{
-
 		if ((m_newvid_1c & 0x03) == 0x02)
 		{
 			// 8x8x8 non-planar mode
@@ -810,7 +809,25 @@ void ppu_vt3xx_device::shift_tile_plane_data(uint8_t& pix)
 	}
 }
 
-void ppu_vt3xx_device::draw_extended_sprite_pixel_low(bitmap_rgb32& bitmap, int pixel_data, int pixel, int xpos, int pal, int bpp, u8* line_priority)
+inline rgb_t ppu_vt3xx_device::get_pen_value(int pixel_data, int bpp, int pal)
+{
+	u8 pen;
+	if (bpp == 4)
+		pen = pixel_data | pal << 4;
+	else
+		pen = pixel_data; // does pal have another meaning in 8bpp mode?
+
+	u16 pal0 = readbyte(((pen & 0xff) * 2) + 0x3e00);
+	pal0 |= readbyte(((pen & 0xff) * 2) + 0x3e01) << 8;
+
+	const int palb = (pal0 >> 0) & 0x1f;
+	const int palg = (pal0 >> 5) & 0x1f;
+	const int palr = (pal0 >> 10) & 0x1f;
+
+	return rgb_t(palr << 3, palg << 3, palb << 3);
+}
+
+inline void ppu_vt3xx_device::draw_extended_sprite_pixel_low(bitmap_rgb32& bitmap, int pixel_data, int pixel, int xpos, int pal, int bpp, u8* line_priority)
 {
 	if (pixel_data) // opaque check
 	{
@@ -819,21 +836,7 @@ void ppu_vt3xx_device::draw_extended_sprite_pixel_low(bitmap_rgb32& bitmap, int 
 			// has another sprite been drawn here?/
 			if (!line_priority[xpos + pixel])
 			{
-				uint8_t pen;
-				if (bpp == 4)
-					pen = pixel_data | pal << 4;
-				else
-					pen = pixel_data; // does pal have another meaning in 8bpp mode?
-
-				uint16_t pal0 = readbyte(((pen & 0xff) * 2) + 0x3e00);
-				pal0 |= readbyte(((pen & 0xff) * 2) + 0x3e01) << 8;
-
-				int palb = (pal0 >> 0) & 0x1f;
-				int palg = (pal0 >> 5) & 0x1f;
-				int palr = (pal0 >> 10) & 0x1f;
-
-				rgb_t palval = rgb_t(palr << 3, palg << 3, palb << 3);
-
+				const rgb_t palval = get_pen_value(pixel_data, bpp, pal);
 				m_bitmap.pix(m_scanline, xpos + pixel) = palval;
 				// indicate that a sprite was drawn at this location, even if it's not seen
 				line_priority[xpos + pixel] |= 0x01;
@@ -842,7 +845,7 @@ void ppu_vt3xx_device::draw_extended_sprite_pixel_low(bitmap_rgb32& bitmap, int 
 	}
 }
 
-void ppu_vt3xx_device::draw_extended_sprite_pixel_high(bitmap_rgb32& bitmap, int pixel_data, int pixel, int xpos, int pal, int bpp, u8* line_priority)
+inline void ppu_vt3xx_device::draw_extended_sprite_pixel_high(bitmap_rgb32& bitmap, int pixel_data, int pixel, int xpos, int pal, int bpp, u8* line_priority)
 {
 	if (pixel_data) // opaque check
 	{
@@ -851,27 +854,31 @@ void ppu_vt3xx_device::draw_extended_sprite_pixel_high(bitmap_rgb32& bitmap, int
 			// has another sprite been drawn here?
 			if (BIT(~line_priority[xpos + pixel], 0))
 			{
-				uint8_t pen;
-				if (bpp == 4)
-					pen = pixel_data | pal << 4;
-				else
-					pen = pixel_data; // does pal have another meaning in 8bpp mode?
-
-				uint16_t pal0 = readbyte(((pen & 0xff) * 2) + 0x3e00);
-				pal0 |= readbyte(((pen & 0xff) * 2) + 0x3e01) << 8;
-
-				int palb = (pal0 >> 0) & 0x1f;
-				int palg = (pal0 >> 5) & 0x1f;
-				int palr = (pal0 >> 10) & 0x1f;
-
-				rgb_t palval = rgb_t(palr << 3, palg << 3, palb << 3);
-
+				const rgb_t palval = get_pen_value(pixel_data, bpp, pal);
 				m_bitmap.pix(m_scanline, xpos + pixel) = palval;
 				// indicate that a sprite was drawn at this location, even if it's not seen
 				line_priority[xpos + pixel] |= 0x01;
 			}
 		}
 	}
+}
+
+inline u8 ppu_vt3xx_device::get_pixel_data(u8* spritepatternbuf, int bpp, int pixel)
+{
+	u8 pixel_data;
+	if (bpp == 4)
+	{
+		pixel_data = spritepatternbuf[pixel >> 1];
+		if (pixel & 1)
+			pixel_data >>= 4;
+		else
+			pixel_data &= 0xf;
+	}
+	else
+	{
+		pixel_data = spritepatternbuf[pixel];
+	}
+	return pixel_data;
 }
 
 void ppu_vt3xx_device::draw_sprites(u8* line_priority)
@@ -900,7 +907,7 @@ void ppu_vt3xx_device::draw_sprites(u8* line_priority)
 		// new style sprites
 		for (int spritenum = 0x00; spritenum < 0x80; spritenum++)
 		{
-			bool is_new_format = m_newvid_1e & 0x04;
+			const bool is_new_format = m_newvid_1e & 0x04;
 
 			// old packed spriteram format
 			int ypos_table = 0x000;
@@ -919,31 +926,32 @@ void ppu_vt3xx_device::draw_sprites(u8* line_priority)
 				table_step = 1;
 			}
 
-			int pri = 1;
-			int ypos = m_spriteram[ypos_table + spritenum * table_step];
-			int xpos = m_spriteram[xpos_table + spritenum * table_step];
-			int tilenum = m_spriteram[tilenum_table + spritenum * table_step];
-			tilenum |= (m_spriteram[extra_table + spritenum * table_step] & 0x1c) << 6;
+			const int sprite_table_offset = spritenum * table_step;
+			int pri = 0;
+			int ypos = m_spriteram[ypos_table + sprite_table_offset];
+			int xpos = m_spriteram[xpos_table + sprite_table_offset];
+			int tilenum = m_spriteram[tilenum_table + sprite_table_offset];
+			tilenum |= (m_spriteram[extra_table + sprite_table_offset] & 0x1c) << 6;
 
-			int pal = m_spriteram[extra_table + spritenum * table_step] & 0x03;
+			int pal = m_spriteram[extra_table + sprite_table_offset] & 0x03;
 
 			if (m_newvid_1d & 0x08) // format 0
 			{
-				pal |= (m_spriteram[extra_table + spritenum * table_step] & 0x20) >> 3;
-				if (m_spriteram[extra_table + spritenum * table_step] & 0x40)
+				pal |= (m_spriteram[extra_table + sprite_table_offset] & 0x20) >> 3;
+				if (m_spriteram[extra_table + sprite_table_offset] & 0x40)
 				{
 					xpos = -0x100 + xpos; // allows for partially offscreen sprites?
 				}
 
 				// TODO: verify
-				if (m_spriteram[extra_table + spritenum * table_step] & 0x80)
+				if (m_spriteram[extra_table + sprite_table_offset] & 0x80)
 				{
 					ypos = -0x100 + ypos;
 				}
 			}
 			else // format 1
 			{
-				pri = (m_spriteram[extra_table + spritenum * table_step] & 0x20) >> 5;
+				pri = (m_spriteram[extra_table + sprite_table_offset] & 0x20) >> 5;
 			}
 
 			int height, width, bpp, alt_16_handling;
@@ -986,7 +994,7 @@ void ppu_vt3xx_device::draw_sprites(u8* line_priority)
 				continue;
 
 			// compute the character's line to draw 
-			int sprite_line = m_scanline - ypos;
+			const int sprite_line = m_scanline - ypos;
 
 			// a 16 pixel wide sprite (packed format), at 4bpp, requires 8 bytes for a single line
 			// at 16 pixels high it requires 128 bytes for a whole tile
@@ -1015,60 +1023,26 @@ void ppu_vt3xx_device::draw_sprites(u8* line_priority)
 
 			pattern_offset += get_newmode_spritebase() * 0x2000;
 
-			uint8_t spritepatternbuf[8];
+			u8 spritepatternbuf[8];
 			for (int i = 0; i < 8; i++)
-			{
 				spritepatternbuf[i] = m_read_onespace_with_relative(pattern_offset + i);
-			}
-
+	
 			if (pri)
 			{
 				for (int pixel = 0; pixel < width; pixel++)
 				{
-					u8 pixel_data;
-
-					if (bpp == 4)
-					{
-						pixel_data = spritepatternbuf[pixel >> 1];
-						if (pixel & 1)
-							pixel_data >>= 4;
-						else
-							pixel_data &= 0xf;
-					}
-					else
-					{
-						pixel_data = spritepatternbuf[pixel];
-					}
-
+					u8 pixel_data = get_pixel_data(spritepatternbuf, bpp, pixel);
 					if (xpos + pixel >= 0)
-					{
-						draw_extended_sprite_pixel_high(m_bitmap, pixel_data, pixel, xpos, pal, bpp, line_priority);
-					}
+						draw_extended_sprite_pixel_low(m_bitmap, pixel_data, pixel, xpos, pal, bpp, line_priority);
 				}
 			}
 			else
 			{
 				for (int pixel = 0; pixel < width; pixel++)
 				{
-					u8 pixel_data;
-
-					if (bpp == 4)
-					{
-						pixel_data = spritepatternbuf[pixel >> 1];
-						if (pixel & 1)
-							pixel_data >>= 4;
-						else
-							pixel_data &= 0xf;
-					}
-					else
-					{
-						pixel_data = spritepatternbuf[pixel];
-					}
-
+					u8 pixel_data = get_pixel_data(spritepatternbuf, bpp, pixel);
 					if (xpos + pixel >= 0)
-					{
-						draw_extended_sprite_pixel_low(m_bitmap, pixel_data, pixel, xpos, pal, bpp, line_priority);
-					}
+						draw_extended_sprite_pixel_high(m_bitmap, pixel_data, pixel, xpos, pal, bpp, line_priority);
 				}
 
 			}
@@ -1076,7 +1050,7 @@ void ppu_vt3xx_device::draw_sprites(u8* line_priority)
 	}
 }
 
-void ppu_vt3xx_device::write_to_spriteram_with_increment(uint8_t data)
+void ppu_vt3xx_device::write_to_spriteram_with_increment(u8 data)
 {
 	if (!m_newvid_1e) // might be the CPU speed control bit instead
 	{
