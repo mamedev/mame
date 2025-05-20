@@ -202,7 +202,7 @@ uint32_t sound_pa::stream_sink_open(uint32_t node, std::string name, uint32_t ra
 	if(!err)
 		err = Pa_StartStream(si->second.m_stream);
 	if(err) {
-		osd_printf_error("PortAudio error: %s\n", Pa_GetErrorText(err));
+		osd_printf_error("PortAudio error: %s: %s\n", m_info.m_nodes[node-1].m_name, Pa_GetErrorText(err));
 		m_streams.erase(si);
 		return 0;
 	}
@@ -231,7 +231,7 @@ uint32_t sound_pa::stream_source_open(uint32_t node, std::string name, uint32_t 
 	if(!err)
 		err = Pa_StartStream(si->second.m_stream);
 	if(err) {
-		osd_printf_error("PortAudio error: %s\n", Pa_GetErrorText(err));
+		osd_printf_error("PortAudio error: %s: %s\n", m_info.m_nodes[node-1].m_name, Pa_GetErrorText(err));
 		m_streams.erase(si);
 		return 0;
 	}
