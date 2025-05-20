@@ -2650,7 +2650,7 @@ GAME( 1992, rtypeleoj,   rtypeleo, rtypeleo,      rtypeleo,  m92_state, empty_in
 GAME( 1993, inthunt,     0,        inthunt,       inthunt,   m92_state, empty_init,    ROT0,   "Irem",         "In The Hunt (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
 GAME( 1993, inthuntu,    inthunt,  inthunt,       inthunt,   m92_state, empty_init,    ROT0,   "Irem America", "In The Hunt (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
 GAME( 1993, kaiteids,    inthunt,  inthunt,       inthunt,   m92_state, empty_init,    ROT0,   "Irem",         "Kaitei Daisensou (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1993, inthuntk,    inthunt,  inthunt,       inthunt,   m92_state, empty_init,    ROT0,   "Irem",         "In The Hunt (Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
+GAME( 1993, inthuntk,    inthunt,  inthunt,       inthunt,   m92_state, empty_init,    ROT0,   "Irem",         "In The Hunt (Korea?)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL)
 
 GAME( 1993, nbbatman,    0,        nbbatman,      nbbatman,  m92_state, init_bank,     ROT0,   "Irem",         "Ninja Baseball Bat Man (World)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL )
 GAME( 1993, nbbatmanu,   nbbatman, nbbatman,      nbbatman,  m92_state, init_bank,     ROT0,   "Irem America", "Ninja Baseball Bat Man (US)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL)
