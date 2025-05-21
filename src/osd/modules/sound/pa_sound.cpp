@@ -101,7 +101,7 @@ int sound_pa::init(osd_interface &osd, osd_options const &options)
 	enum { FL, FR, FC, LFE, BL, BR, BC, SL, SR, AUX };
 	static const char *const posname[10] = { "FL", "FR", "FC", "LFE", "BL", "BR", "BC", "SL", "SR", "AUX" };
 
-	static std::array<double, 3> pos3d[10] = {
+	static const std::array<double, 3> pos3d[10] = {
 		{ -0.2,  0.0,  1.0 },
 		{  0.2,  0.0,  1.0 },
 		{  0.0,  0.0,  1.0 },

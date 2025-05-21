@@ -89,7 +89,7 @@ namespace {
 //  Structs and typedefs
 //============================================================
 
-// A stucture to hold a pointer and the count of bytes of the data it points to
+// A structure to hold a pointer and the count of bytes of the data it points to
 struct xaudio2_buffer
 {
 	std::unique_ptr<BYTE[]> AudioData;
@@ -100,17 +100,15 @@ struct xaudio2_buffer
 struct xaudio2_custom_deleter
 {
 public:
-	void operator()(IXAudio2MasteringVoice* obj) const
+	void operator()(IXAudio2MasteringVoice *obj) const
 	{
-		if (obj != nullptr)
-		{
+		if (obj)
 			obj->DestroyVoice();
-		}
 	}
 
-	void operator()(IXAudio2SourceVoice* obj) const
+	void operator()(IXAudio2SourceVoice *obj) const
 	{
-		if (obj != nullptr)
+		if (obj)
 		{
 			obj->Stop(0);
 			obj->FlushSourceBuffers();
