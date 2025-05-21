@@ -385,21 +385,65 @@ void vt3xx_soc_base_device::vt369_soundcpu_timer_w(offs_t offset, u8 data)
 		break;
 	}
 }
+void vt3xx_soc_base_device::do_sound_mult()
+{
+	u16 address = (m_sound_mult_addr[0] << 8) | (m_sound_mult_addr[1]);
+	LOGMASKED(LOG_VT3XX_SOUND, "%s: sound CPU multiplying from RAM pointer %04x\n", machine().describe_context(), address);
+}
+
+void vt3xx_soc_base_device::do_sound_adder()
+{
+	u16 address = (m_sound_adder_addr[0] << 8) | (m_sound_adder_addr[1]);
+
+	s16 param1 = m_soundcpu->space(AS_PROGRAM).read_byte((address + 0) & 0x1fff) << 0;
+	param1 |=    m_soundcpu->space(AS_PROGRAM).read_byte((address + 1) & 0x1fff) << 8;
+	s16 param2 = m_soundcpu->space(AS_PROGRAM).read_byte((address + 2) & 0x1fff) << 0;
+	param2 |=    m_soundcpu->space(AS_PROGRAM).read_byte((address + 3) & 0x1fff) << 8;
+	s16 param3 = m_soundcpu->space(AS_PROGRAM).read_byte((address + 4) & 0x1fff) << 0;
+	param3 |=    m_soundcpu->space(AS_PROGRAM).read_byte((address + 5) & 0x1fff) << 8;
+	s16 param4 = m_soundcpu->space(AS_PROGRAM).read_byte((address + 6) & 0x1fff) << 0;
+	param4 |=    m_soundcpu->space(AS_PROGRAM).read_byte((address + 7) & 0x1fff) << 8;
+
+	s32 result = param1 + param2 + param3 + param4;
+
+	LOGMASKED(LOG_VT3XX_SOUND, "%s: sound CPU adding from RAM pointer %04x: %04x %04x %04x %04x - result %08x\n", machine().describe_context(), address, param1, param2, param3, param4, result);
+	m_sound_adder_result[0] = result >> 8;
+	m_sound_adder_result[1] = result >> 0;
+}
 
 void vt3xx_soc_base_device::vt369_soundcpu_adder_data_address_w(offs_t offset, u8 data)
 {
 	LOGMASKED(LOG_VT3XX_SOUND, "%s: vt369_soundcpu_adder_data_address_w %02x %02x\n", machine().describe_context(), offset, data);
+	m_sound_adder_addr[offset] = data;
+
+	if (offset == 1)
+	{
+		do_sound_adder();
+	}
 }
 
 u8 vt3xx_soc_base_device::vt369_soundcpu_adder_result_r(offs_t offset)
 {
 	LOGMASKED(LOG_VT3XX_SOUND, "%s: vt369_soundcpu_adder_result_r %02x\n", machine().describe_context(), offset);
-	return 0x00;
+	return m_sound_adder_result[offset];
+}
+
+void vt3xx_soc_base_device::vt369_soundcpu_adder_result_w(offs_t offset, u8 data)
+{
+	LOGMASKED(LOG_VT3XX_SOUND, "%s: vt369_soundcpu_adder_result_w %02x %02x\n", machine().describe_context(), offset, data);
+	m_sound_adder_result[offset] = data;
 }
 
 void vt3xx_soc_base_device::vt369_soundcpu_mult_data_address_w(offs_t offset, u8 data)
 {
 	LOGMASKED(LOG_VT3XX_SOUND, "%s: vt369_soundcpu_mult_data_address_w %02x %02x\n", machine().describe_context(), offset, data);
+	m_sound_mult_addr[offset] = data;
+
+	if (offset == 1)
+	{
+		do_sound_mult();
+	}
+
 }
 
 u8 vt3xx_soc_base_device::vt369_soundcpu_mult_result_r(offs_t offset)
@@ -435,10 +479,14 @@ void vt3xx_soc_base_device::vt369_sound_map(address_map &map)
 	map(0x1800, 0x1fff).ram().share("soundram");
 
 	map(0x2100, 0x2103).w(FUNC(vt3xx_soc_base_device::vt369_soundcpu_timer_w));
-	// 0x2204
+	map(0x2204, 0x2204).nopw(); // initialized to 0?
 	map(0x2205, 0x2206).w(FUNC(vt3xx_soc_base_device::vt369_soundcpu_adder_data_address_w));
-	// 0x2207
-	map(0x2210, 0x2211).r(FUNC(vt3xx_soc_base_device::vt369_soundcpu_adder_result_r));
+	map(0x2207, 0x2207).nopw(); // initialized to 0?
+	map(0x2210, 0x2211).rw(FUNC(vt3xx_soc_base_device::vt369_soundcpu_adder_result_r), FUNC(vt3xx_soc_base_device::vt369_soundcpu_adder_result_w));
+
+	map(0x2288, 0x2288).nopw(); // TODO: check code to see if this is intentional
+	map(0x22b6, 0x22b6).nopw();
+
 	map(0x2400, 0x2401).w(FUNC(vt3xx_soc_base_device::vt369_soundcpu_mult_data_address_w));
 	map(0x2402, 0x2403).r(FUNC(vt3xx_soc_base_device::vt369_soundcpu_mult_result_r));
 	map(0x2404, 0x2404).r(FUNC(vt3xx_soc_base_device::vt369_soundcpu_mult_status_r));
@@ -559,6 +607,9 @@ void vt3xx_soc_base_device::device_start()
 	save_item(NAME(m_bank6000));
 	save_item(NAME(m_bank6000_enable));
 	save_item(NAME(m_alu_params));
+	save_item(NAME(m_sound_adder_addr));
+	save_item(NAME(m_sound_adder_result));
+	save_item(NAME(m_sound_mult_addr));
 
 	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x3c00, 0x3fff, read8sm_delegate(*this, FUNC(vt3xx_soc_base_device::vt3xx_palette_r)), write8sm_delegate(*this, FUNC(vt3xx_soc_base_device::vt3xx_palette_w)));
 }
@@ -573,6 +624,14 @@ void vt3xx_soc_base_device::device_reset()
 
 	m_timerperiod = 0;
 	m_timercontrol = 0;
+
+	m_sound_adder_addr[0] = 0;
+	m_sound_adder_addr[1] = 0;
+	m_sound_mult_addr[0] = 0;
+	m_sound_mult_addr[1] = 0;
+	m_sound_adder_result[0] = 0;
+	m_sound_adder_result[1] = 0;
+
 	m_sound_timer->adjust(attotime::never);
 }
 

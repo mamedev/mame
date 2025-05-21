@@ -64,6 +64,7 @@ private:
 
 	void vt369_soundcpu_timer_w(offs_t offset, u8 data);
 	void vt369_soundcpu_adder_data_address_w(offs_t offset, u8 data);
+	void vt369_soundcpu_adder_result_w(offs_t offset, u8 data);
 	u8 vt369_soundcpu_adder_result_r(offs_t offset);
 	void vt369_soundcpu_mult_data_address_w(offs_t offset, u8 data);
 	u8 vt369_soundcpu_mult_result_r(offs_t offset);
@@ -81,6 +82,9 @@ private:
 	u8 alu_r(offs_t offset);
 	void alu_w(offs_t offset, u8 data);
 
+	void do_sound_adder();
+	void do_sound_mult();
+
 	TIMER_CALLBACK_MEMBER(sound_timer_expired);
 	void update_timer();
 
@@ -95,6 +99,9 @@ private:
 	u8 m_alu_params[8];
 
 	emu_timer *m_sound_timer;
+	u8 m_sound_adder_addr[2];
+	u8 m_sound_mult_addr[2];
+	u8 m_sound_adder_result[2];
 
 	optional_region_ptr<u8> m_internal_rom;
 	required_shared_ptr<u8> m_soundram;
