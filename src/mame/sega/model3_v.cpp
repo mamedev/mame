@@ -1716,6 +1716,9 @@ void model3_state::draw_model(uint32_t addr)
 				int tex_height = (header[3] & 0x7);
 				int tex_format = (header[6] >> 7) & 0x7;
 
+				// TODO: color modulation enable should really be a setting
+				// vs2 wants color modulation with ARGB1555 (format 0) radar textures
+				// doing so breaks course select in srally2 already ...
 				if (tex_format != 0 && tex_format != 7)     // enable color modulation if this is not a color texture
 					colormod = true;
 
