@@ -219,13 +219,13 @@ macro   r800:ld_r_a
 macro   ld_a_r
 	@nomreq_ir 1
 	A = (m_r & 0x7f) | m_r2;
-	set_f((F & CF) | SZ[A] | (m_iff2 << 2));
+	set_f((F & CF) | SZYX[A] | (m_iff2 << 2));
 	if (HAS_LDAIR_QUIRK)
 		set_service_attention<SA_AFTER_LDAIR, 1>();
 
 macro   r800:ld_a_r
 	A = (m_r & 0x7f) | m_r2;
-	set_f((F & CF) | SZ[A] | (m_iff2 << 2));
+	set_f((F & CF) | SZYX[A] | (m_iff2 << 2));
 	if (HAS_LDAIR_QUIRK)
 		set_service_attention<SA_AFTER_LDAIR, 1>();
 
@@ -239,13 +239,13 @@ macro   r800:ld_i_a
 macro   ld_a_i
 	@nomreq_ir 1
 	A = m_i;
-	set_f((F & CF) | SZ[A] | (m_iff2 << 2));
+	set_f((F & CF) | SZYX[A] | (m_iff2 << 2));
 	if (HAS_LDAIR_QUIRK)
 		set_service_attention<SA_AFTER_LDAIR, 1>();
 
 macro   r800:ld_a_i
 	A = m_i;
-	set_f((F & CF) | SZ[A] | (m_iff2 << 2));
+	set_f((F & CF) | SZYX[A] | (m_iff2 << 2));
 	if (HAS_LDAIR_QUIRK)
 		set_service_attention<SA_AFTER_LDAIR, 1>();
 
@@ -262,7 +262,7 @@ macro   rrd
 	TDAT8 = (TDAT8 >> 4) | (A << 4);
 	@wm HL
 	A = (A & 0xf0) | (TDAT_H & 0x0f);
-	set_f((F & CF) | SZP[A]);
+	set_f((F & CF) | SZYXP[A]);
 
 macro   rld
 	@rm HL
@@ -272,7 +272,7 @@ macro   rld
 	TDAT8 = (TDAT8 << 4) | (A & 0x0f);
 	@wm HL
 	A = (A & 0xf0) | (TDAT_H >> 4);
-	set_f((F & CF) | SZP[A]);
+	set_f((F & CF) | SZYXP[A]);
 
 macro   ex_sp   %dd
 	@pop
@@ -371,7 +371,7 @@ macro   cpi
 	WZ++;
 	HL++;
 	BC--;
-	set_f((F & CF) | (SZ[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF);
+	set_f((F & CF) | (SZYX[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF);
 	if (F & HF)
 		res -= 1;
 	if (res & 0x02)
@@ -390,7 +390,7 @@ macro   r800:cpi
 	WZ++;
 	HL++;
 	BC--;
-	set_f((F & CF) | (SZ[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF);
+	set_f((F & CF) | (SZYX[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF);
 	if (F & HF)
 		res -= 1;
 	if (res & 0x02)
@@ -409,13 +409,13 @@ macro   ini
 	B--;
 	@wm HL
 	HL++;
-	set_f(SZ[B]);
+	set_f(SZYX[B]);
 	unsigned t = (unsigned)((C + 1) & 0xff) + (unsigned)TDAT8;
 	if (TDAT8 & SF)
 		F |= NF;
 	if (t & 0x100)
 		F |= HF | CF;
-	F |= SZP[(u8)(t & 0x07) ^ B] & PF;
+	F |= SZYXP[(u8)(t & 0x07) ^ B] & PF;
 }
 
 macro   r800:ini
@@ -425,13 +425,13 @@ macro   r800:ini
 	B--;
 	@wm HL
 	HL++;
-	set_f(SZ[B]);
+	set_f(SZYX[B]);
 	unsigned t = (unsigned)((C + 1) & 0xff) + (unsigned)TDAT8;
 	if (TDAT8 & SF)
 		F |= NF;
 	if (t & 0x100)
 		F |= HF | CF;
-	F |= SZP[(u8)(t & 0x07) ^ B] & PF;
+	F |= SZYXP[(u8)(t & 0x07) ^ B] & PF;
 }
 
 macro   outi
@@ -442,13 +442,13 @@ macro   outi
 	WZ = BC + 1;
 	@out BC
 	HL++;
-	set_f(SZ[B]);
+	set_f(SZYX[B]);
 	unsigned t = (unsigned)L + (unsigned)TDAT8;
 	if (TDAT8 & SF)
 		F |= NF;
 	if (t & 0x100)
 		F |= HF | CF;
-	F |= SZP[(u8)(t & 0x07) ^ B] & PF;
+	F |= SZYXP[(u8)(t & 0x07) ^ B] & PF;
 }
 
 macro   r800:outi
@@ -458,13 +458,13 @@ macro   r800:outi
 	WZ = BC + 1;
 	@out BC
 	HL++;
-	set_f(SZ[B]);
+	set_f(SZYX[B]);
 	unsigned t = (unsigned)L + (unsigned)TDAT8;
 	if (TDAT8 & SF)
 		F |= NF;
 	if (t & 0x100)
 		F |= HF | CF;
-	F |= SZP[(u8)(t & 0x07) ^ B] & PF;
+	F |= SZYXP[(u8)(t & 0x07) ^ B] & PF;
 }
 
 macro   ldd
@@ -509,7 +509,7 @@ macro   cpd
 	WZ--;
 	HL--;
 	BC--;
-	set_f((F & CF) | (SZ[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF);
+	set_f((F & CF) | (SZYX[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF);
 	if (F & HF)
 		res -= 1;
 	if (res & 0x02)
@@ -528,7 +528,7 @@ macro   r800:cpd
 	WZ--;
 	HL--;
 	BC--;
-	set_f((F & CF) | (SZ[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF);
+	set_f((F & CF) | (SZYX[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF);
 	if (F & HF)
 		res -= 1;
 	if (res & 0x02)
@@ -547,13 +547,13 @@ macro   ind
 	B--;
 	@wm HL
 	HL--;
-	set_f(SZ[B]);
+	set_f(SZYX[B]);
 	unsigned t = ((unsigned)(C - 1) & 0xff) + (unsigned)TDAT8;
 	if (TDAT8 & SF)
 		F |= NF;
 	if (t & 0x100)
 		F |= HF | CF;
-	F |= SZP[(u8)(t & 0x07) ^ B] & PF;
+	F |= SZYXP[(u8)(t & 0x07) ^ B] & PF;
 }
 
 macro   r800:ind
@@ -563,13 +563,13 @@ macro   r800:ind
 	B--;
 	@wm HL
 	HL--;
-	set_f(SZ[B]);
+	set_f(SZYX[B]);
 	unsigned t = ((unsigned)(C - 1) & 0xff) + (unsigned)TDAT8;
 	if (TDAT8 & SF)
 		F |= NF;
 	if (t & 0x100)
 		F |= HF | CF;
-	F |= SZP[(u8)(t & 0x07) ^ B] & PF;
+	F |= SZYXP[(u8)(t & 0x07) ^ B] & PF;
 }
 
 macro   outd
@@ -580,13 +580,13 @@ macro   outd
 	WZ = BC - 1;
 	@out BC
 	HL--;
-	set_f(SZ[B]);
+	set_f(SZYX[B]);
 	unsigned t = (unsigned)L + (unsigned)TDAT8;
 	if (TDAT8 & SF)
 		F |= NF;
 	if (t & 0x100)
 		F |= HF | CF;
-	F |= SZP[(u8)(t & 0x07) ^ B] & PF;
+	F |= SZYXP[(u8)(t & 0x07) ^ B] & PF;
 }
 
 macro   r800:outd
@@ -596,13 +596,13 @@ macro   r800:outd
 	WZ = BC - 1;
 	@out BC
 	HL--;
-	set_f(SZ[B]);
+	set_f(SZYX[B]);
 	unsigned t = (unsigned)L + (unsigned)TDAT8;
 	if (TDAT8 & SF)
 		F |= NF;
 	if (t & 0x100)
 		F |= HF | CF;
-	F |= SZP[(u8)(t & 0x07) ^ B] & PF;
+	F |= SZYXP[(u8)(t & 0x07) ^ B] & PF;
 }
 
 macro   ldir
@@ -5388,7 +5388,7 @@ ed3f	# DB   ED
 ed40	# IN   B,(C)
 	@in BC
 	B = TDAT8;
-	set_f((F & CF) | SZP[B]);
+	set_f((F & CF) | SZYXP[B]);
 	WZ = BC + 1;
 
 ed41	# OUT  (C),B
@@ -5421,7 +5421,7 @@ ed47	# LD   i,A
 ed48	# IN   C,(C)
 	@in BC
 	C = TDAT8;
-	set_f((F & CF) | SZP[C]);
+	set_f((F & CF) | SZYXP[C]);
 	WZ = BC + 1;
 
 ed49	# OUT  (C),C
@@ -5454,7 +5454,7 @@ ed4f	# LD   r,A
 ed50	# IN   D,(C)
 	@in BC
 	D = TDAT8;
-	set_f((F & CF) | SZP[D]);
+	set_f((F & CF) | SZYXP[D]);
 	WZ = BC + 1;
 
 ed51	# OUT  (C),D
@@ -5487,7 +5487,7 @@ ed57	# LD   A,i
 ed58	# IN   E,(C)
 	@in BC
 	E = TDAT8;
-	set_f((F & CF) | SZP[E]);
+	set_f((F & CF) | SZYXP[E]);
 	WZ = BC + 1;
 
 ed59	# OUT  (C),E
@@ -5520,7 +5520,7 @@ ed5f	# LD   A,r
 ed60	# IN   H,(C)
 	@in BC
 	H = TDAT8;
-	set_f((F & CF) | SZP[H]);
+	set_f((F & CF) | SZYXP[H]);
 	WZ = BC + 1;
 
 ed61	# OUT  (C),H
@@ -5553,7 +5553,7 @@ ed67	# RRD  (HL)
 ed68	# IN   L,(C)
 	@in BC
 	L = TDAT8;
-	set_f((F & CF) | SZP[L]);
+	set_f((F & CF) | SZYXP[L]);
 	WZ = BC + 1;
 
 ed69	# OUT  (C),L
@@ -5585,7 +5585,7 @@ ed6f	# RLD  (HL)
 
 ed70	# IN   0,(C)
 	@in BC
-	set_f((F & CF) | SZP[TDAT8]);
+	set_f((F & CF) | SZYXP[TDAT8]);
 	WZ = BC + 1;
 
 ed71	# OUT  (C),0
@@ -5618,7 +5618,7 @@ ed77	# DB   ED,77
 ed78	# IN   A,(C)
 	@in BC
 	A = TDAT8;
-	set_f((F & CF) | SZP[A]);
+	set_f((F & CF) | SZYXP[A]);
 	WZ = BC + 1;
 
 ed79	# OUT  (C),A

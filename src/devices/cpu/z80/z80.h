@@ -191,11 +191,11 @@ protected:
 	u8 m_iorq_cycles;
 
 	static bool tables_initialised;
-	static u8 SZ[0x100];       // zero and sign flags
-	static u8 SZ_BIT[0x100];   // zero, sign and parity/overflow (=zero) flags for BIT opcode
-	static u8 SZP[0x100];      // zero, sign and parity flags
-	static u8 SZHV_inc[0x100]; // zero, sign, half carry and overflow flags INC r8
-	static u8 SZHV_dec[0x100]; // zero, sign, half carry and overflow flags DEC r8
+	static u8 SZYX[0x100];        // zero and sign flags
+	static u8 SZYXP_BIT[0x100];   // zero, sign and parity/overflow (=zero) flags for BIT opcode
+	static u8 SZYXP[0x100];       // zero, sign and parity flags
+	static u8 SZYHXPN_inc[0x100]; // zero, sign, half carry and overflow flags INC r8
+	static u8 SZYHXPN_dec[0x100]; // zero, sign, half carry and overflow flags DEC r8
 };
 
 DECLARE_DEVICE_TYPE(Z80, z80_device)

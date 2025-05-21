@@ -35,12 +35,11 @@ TODO:
 
 
 bool z80_device::tables_initialised = false;
-u8 z80_device::SZ[] = {};       // zero and sign flags
-u8 z80_device::SZ_BIT[] = {};   // zero, sign and parity/overflow (=zero) flags for BIT opcode
-u8 z80_device::SZP[] = {};      // zero, sign and parity flags
-u8 z80_device::SZHV_inc[] = {}; // zero, sign, half carry and overflow flags INC r8
-u8 z80_device::SZHV_dec[] = {}; // zero, sign, half carry and overflow flags DEC r8
-
+u8 z80_device::SZYX[] = {};        // zero and sign flags
+u8 z80_device::SZYXP_BIT[] = {};   // zero, sign and parity/overflow (=zero) flags for BIT opcode
+u8 z80_device::SZYXP[] = {};       // zero, sign and parity flags
+u8 z80_device::SZYHXPN_inc[] = {}; // zero, sign, half carry and overflow flags INC r8
+u8 z80_device::SZYHXPN_dec[] = {}; // zero, sign, half carry and overflow flags DEC r8
 
 /***************************************************************
  * Enter halt state; write 1 to callback on first execution
@@ -112,7 +111,7 @@ u8 z80_device::arg_read()
 void z80_device::inc(u8 &r)
 {
 	++r;
-	set_f((F & CF) | SZHV_inc[r]);
+	set_f((F & CF) | SZYHXPN_inc[r]);
 }
 
 /***************************************************************
@@ -121,7 +120,7 @@ void z80_device::inc(u8 &r)
 void z80_device::dec(u8 &r)
 {
 	--r;
-	set_f((F & CF) | SZHV_dec[r]);
+	set_f((F & CF) | SZYHXPN_dec[r]);
 }
 
 /***************************************************************
@@ -249,7 +248,7 @@ void z80_device::daa()
 		if ((F&CF) | (A>0x99)) a+=0x60;
 	}
 
-	set_f((F&(CF|NF)) | (A>0x99) | ((A^a)&HF) | SZP[a]);
+	set_f((F&(CF|NF)) | (A>0x99) | ((A^a)&HF) | SZYXP[a]);
 	A = a;
 }
 
@@ -259,7 +258,7 @@ void z80_device::daa()
 void z80_device::and_a(u8 value)
 {
 	A &= value;
-	set_f(SZP[A] | HF);
+	set_f(SZYXP[A] | HF);
 }
 
 /***************************************************************
@@ -268,7 +267,7 @@ void z80_device::and_a(u8 value)
 void z80_device::or_a(u8 value)
 {
 	A |= value;
-	set_f(SZP[A]);
+	set_f(SZYXP[A]);
 }
 
 /***************************************************************
@@ -277,7 +276,7 @@ void z80_device::or_a(u8 value)
 void z80_device::xor_a(u8 value)
 {
 	A ^= value;
-	set_f(SZP[A]);
+	set_f(SZYXP[A]);
 }
 
 /***************************************************************
@@ -312,7 +311,7 @@ u8 z80_device::rlc(u8 value)
 	unsigned res = value;
 	unsigned c = (res & 0x80) ? CF : 0;
 	res = ((res << 1) | (res >> 7)) & 0xff;
-	set_f(SZP[res] | c);
+	set_f(SZYXP[res] | c);
 	return res;
 }
 
@@ -324,7 +323,7 @@ u8 z80_device::rrc(u8 value)
 	unsigned res = value;
 	unsigned c = (res & 0x01) ? CF : 0;
 	res = ((res >> 1) | (res << 7)) & 0xff;
-	set_f(SZP[res] | c);
+	set_f(SZYXP[res] | c);
 	return res;
 }
 
@@ -336,7 +335,7 @@ u8 z80_device::rl(u8 value)
 	unsigned res = value;
 	unsigned c = (res & 0x80) ? CF : 0;
 	res = ((res << 1) | (F & CF)) & 0xff;
-	set_f(SZP[res] | c);
+	set_f(SZYXP[res] | c);
 	return res;
 }
 
@@ -348,7 +347,7 @@ u8 z80_device::rr(u8 value)
 	unsigned res = value;
 	unsigned c = (res & 0x01) ? CF : 0;
 	res = ((res >> 1) | (F << 7)) & 0xff;
-	set_f(SZP[res] | c);
+	set_f(SZYXP[res] | c);
 	return res;
 }
 
@@ -360,7 +359,7 @@ u8 z80_device::sla(u8 value)
 	unsigned res = value;
 	unsigned c = (res & 0x80) ? CF : 0;
 	res = (res << 1) & 0xff;
-	set_f(SZP[res] | c);
+	set_f(SZYXP[res] | c);
 	return res;
 }
 
@@ -372,7 +371,7 @@ u8 z80_device::sra(u8 value)
 	unsigned res = value;
 	unsigned c = (res & 0x01) ? CF : 0;
 	res = ((res >> 1) | (res & 0x80)) & 0xff;
-	set_f(SZP[res] | c);
+	set_f(SZYXP[res] | c);
 	return res;
 }
 
@@ -384,7 +383,7 @@ u8 z80_device::sll(u8 value)
 	unsigned res = value;
 	unsigned c = (res & 0x80) ? CF : 0;
 	res = ((res << 1) | 0x01) & 0xff;
-	set_f(SZP[res] | c);
+	set_f(SZYXP[res] | c);
 	return res;
 }
 
@@ -396,7 +395,7 @@ u8 z80_device::srl(u8 value)
 	unsigned res = value;
 	unsigned c = (res & 0x01) ? CF : 0;
 	res = (res >> 1) & 0xff;
-	set_f(SZP[res] | c);
+	set_f(SZYXP[res] | c);
 	return res;
 }
 
@@ -405,7 +404,7 @@ u8 z80_device::srl(u8 value)
  ***************************************************************/
 void z80_device::bit(int bit, u8 value)
 {
-	set_f((F & CF) | HF | (SZ_BIT[value & (1 << bit)] & ~(YF | XF)) | (value & (YF | XF)));
+	set_f((F & CF) | HF | (SZYXP_BIT[value & (1 << bit)] & ~(YF | XF)) | (value & (YF | XF)));
 }
 
 /***************************************************************
@@ -413,7 +412,7 @@ void z80_device::bit(int bit, u8 value)
  ***************************************************************/
 void z80_device::bit_hl(int bit, u8 value)
 {
-	set_f((F & CF) | HF | (SZ_BIT[value & (1 << bit)] & ~(YF | XF)) | (WZ_H & (YF | XF)));
+	set_f((F & CF) | HF | (SZYXP_BIT[value & (1 << bit)] & ~(YF | XF)) | (WZ_H & (YF | XF)));
 }
 
 /***************************************************************
@@ -421,7 +420,7 @@ void z80_device::bit_hl(int bit, u8 value)
  ***************************************************************/
 void z80_device::bit_xy(int bit, u8 value)
 {
-	set_f((F & CF) | HF | (SZ_BIT[value & (1 << bit)] & ~(YF | XF)) | ((m_ea >> 8) & (YF | XF)));
+	set_f((F & CF) | HF | (SZYXP_BIT[value & (1 << bit)] & ~(YF | XF)) | ((m_ea >> 8) & (YF | XF)));
 }
 
 /***************************************************************
@@ -449,18 +448,18 @@ void z80_device::block_io_interrupted_flags()
 		F &= ~HF;
 		if (TDAT8 & 0x80)
 		{
-			F ^= (SZP[(B - 1) & 0x07] ^ PF) & PF;
+			F ^= (SZYXP[(B - 1) & 0x07] ^ PF) & PF;
 			if ((B & 0x0f) == 0x00) F |= HF;
 		}
 		else
 		{
-			F ^= (SZP[(B + 1) & 0x07] ^ PF) & PF;
+			F ^= (SZYXP[(B + 1) & 0x07] ^ PF) & PF;
 			if ((B & 0x0f) == 0x0f) F |= HF;
 		}
 	}
 	else
 	{
-		F ^=(SZP[B & 0x07] ^ PF) & PF;
+		F ^=(SZYXP[B & 0x07] ^ PF) & PF;
 	}
 }
 
@@ -524,17 +523,17 @@ void z80_device::device_start()
 			int p = 0;
 			for (int b = 0; b < 8; b++)
 				p += BIT(i, b);
-			SZ[i] = i ? i & SF : ZF;
-			SZ[i] |= (i & (YF | XF));         // undocumented flag bits 5+3
-			SZ_BIT[i] = i ? i & SF : ZF | PF;
-			SZ_BIT[i] |= (i & (YF | XF));     // undocumented flag bits 5+3
-			SZP[i] = SZ[i] | ((p & 1) ? 0 : PF);
-			SZHV_inc[i] = SZ[i];
-			if (i == 0x80) SZHV_inc[i] |= VF;
-			if ((i & 0x0f) == 0x00) SZHV_inc[i] |= HF;
-			SZHV_dec[i] = SZ[i] | NF;
-			if (i == 0x7f) SZHV_dec[i] |= VF;
-			if ((i & 0x0f) == 0x0f) SZHV_dec[i] |= HF;
+			SZYX[i] = i ? i & SF : ZF;
+			SZYX[i] |= (i & (YF | XF));         // undocumented flag bits 5+3
+			SZYXP_BIT[i] = i ? i & SF : ZF | PF;
+			SZYXP_BIT[i] |= (i & (YF | XF));     // undocumented flag bits 5+3
+			SZYXP[i] = SZYX[i] | ((p & 1) ? 0 : PF);
+			SZYHXPN_inc[i] = SZYX[i];
+			if (i == 0x80) SZYHXPN_inc[i] |= VF;
+			if ((i & 0x0f) == 0x00) SZYHXPN_inc[i] |= HF;
+			SZYHXPN_dec[i] = SZYX[i] | NF;
+			if (i == 0x7f) SZYHXPN_dec[i] |= VF;
+			if ((i & 0x0f) == 0x0f) SZYHXPN_dec[i] |= HF;
 		}
 
 		tables_initialised = true;
