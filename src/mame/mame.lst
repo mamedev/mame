@@ -46509,8 +46509,11 @@ conyteni
 easports
 jak_bobb
 jak_capb
+jak_diso
+jak_sbdd
 jak_spdmo
 jak_spdmoa
+jak_wpt
 sstarkar
 
 @source:tvgames/spg29x.cpp
@@ -46600,13 +46603,25 @@ icanpian
 
 @source:tvgames/spg2xx_jakks.cpp
 jak_batm
+jak_cind
+jak_dpma
+jak_hsm
+jak_marv
 jak_mk
+jak_mpaco
+jak_mpacq
 jak_mpacw
+jak_pacg
 jak_pix
 jak_potc
 jak_powr
+jak_rapm
 jak_sbjd
+jak_shrk
+jak_slpb
+jak_spac
 jak_spd3
+jak_spdv
 jak_supm
 jak_wall
 

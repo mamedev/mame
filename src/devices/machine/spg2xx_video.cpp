@@ -131,7 +131,11 @@ void spg2xx_video_device::do_sprite_dma(uint32_t len)
 
 	for (uint32_t j = 0; j < len; j++)
 	{
-		m_spriteram[(dst + j) & 0x3ff] = mem.read_word(src + j);
+		int dest = dst + j;
+		// jak_dpma does a full length transfer offset from the start, which causes corruption
+		// on the options screen if we wrap, assume DMA just writes to nowhere if it goes out of bounds
+		if (dest < 0x400)
+			m_spriteram[dest] = mem.read_word(src + j);
 	}
 
 	m_video_regs[0x72] = 0;
