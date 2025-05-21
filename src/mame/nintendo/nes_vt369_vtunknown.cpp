@@ -212,19 +212,32 @@ void vt36x_tetrtin_state::machine_reset()
 	}
 	u8* gamerom = memregion("mainrom")->base();
 
+	int patchaddress;
+
+	
 	// tetrtin - jump over a whole lot of code, this is crude, there might be other code still in the startup we could be executing
-	if ((gamerom[0x7f675] == 0x20) && (gamerom[0x7f676] == 0xcb) && (gamerom[0x7f677] == 0xf5))
+	patchaddress = 0x7f675;
+	if ((gamerom[patchaddress] == 0x20) && (gamerom[patchaddress+1] == 0xcb) && (gamerom[patchaddress+2] == 0xf5))
 	{
-		gamerom[0x7f675] = 0x4c;
-		gamerom[0x7f676] = 0xcb;
-		gamerom[0x7f677] = 0xf6;
+		gamerom[patchaddress] = 0x4c;
+		gamerom[patchaddress+1] = 0xcb;
+		gamerom[patchaddress+2] = 0xf6;
 	}
 	// same for pactin
-	if ((gamerom[0x7f5a3] == 0x20) && (gamerom[0x7f5a4] == 0x04) && (gamerom[0x7f5a5] == 0xf5))
+	patchaddress = 0x7f5a3;
+	if ((gamerom[patchaddress] == 0x20) && (gamerom[patchaddress+1] == 0x04) && (gamerom[patchaddress+2] == 0xf5))
 	{
-		gamerom[0x7f5a3] = 0x4c;
-		gamerom[0x7f5a4] = 0xf9;
-		gamerom[0x7f5a5] = 0xf5;
+		gamerom[patchaddress] = 0x4c;
+		gamerom[patchaddress+1] = 0xf9;
+		gamerom[patchaddress+2] = 0xf5;
+	}
+	// lxcap (will show menu, but accesses device again afterwards)
+	patchaddress = 0x7ecd4;
+	if ((gamerom[patchaddress] == 0x20) && (gamerom[patchaddress+1] == 0x96) && (gamerom[patchaddress+2] == 0xeb))
+	{
+		gamerom[patchaddress] = 0x4c;
+		gamerom[patchaddress+1] = 0x2a;
+		gamerom[patchaddress+2] = 0xed;
 	}
 }
 
@@ -1300,7 +1313,7 @@ CONS( 2021, unk128vt, 0,      0,  vt369_unk_4mb, vt369, vt36x_state, empty_init,
 
 // uses a LCD with resolution of 160x128 (image scaled to fit for some games, others run natively at 160x128)
 // contains a protection chip, command 80 XX returns a byte
-CONS( 201?, lxcap,    0,      0,  vt36x_8mb, vt369, vt36x_state, empty_init, "Lexibook", "Cyber Arcade Pocket (JL1895)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, lxcap,    0,      0,  vt36x_8mb, vt369, vt36x_tetrtin_state, empty_init, "Lexibook", "Cyber Arcade Pocket (JL1895)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // 2022 date on 'BL-867 PCB03' PCB
 CONS( 2022, nesvt270,    0,  0,  vt36x_16mb, vt369, vt36x_state, empty_init, "<unknown>", "unknown VT3xx based 270-in-1 (BL-867 PCB03)", MACHINE_NOT_WORKING )
