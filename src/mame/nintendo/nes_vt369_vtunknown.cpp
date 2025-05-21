@@ -182,10 +182,51 @@ public:
 	void vt369_unk_4mb(machine_config& config);
 	void vt369_unk_16mb(machine_config& config);
 
-private:
-	u8 vt_rom_banked_r(offs_t offset);
-	[[maybe_unused]] void vt_external_space_map_fp_2x32mbyte(address_map &map) ATTR_COLD;
 };
+
+class vt36x_tetrtin_state : public vt36x_state
+{
+public:
+	vt36x_tetrtin_state(const machine_config& mconfig, device_type type, const char* tag) :
+		vt36x_state(mconfig, type, tag)
+	{ }
+
+protected:
+	virtual void machine_reset() override;
+
+};
+
+void vt36x_tetrtin_state::machine_reset()
+{
+	vt36x_state::machine_reset();
+	// the game appears to require code/data from an additional device (not just the standard internal ROM)
+	// there's an 8-pin chip on the PCB which is likely responsible
+
+	// simulate what that code might be doing
+	// copy VT369 internal ROM 0x0000 to 0x4ff4 in CPU space (copying boot vectors for sound CPU, as other games do in code)
+	int src = 0;
+	u8 *introm = memregion("soc:internal")->base();
+	for (int i = 0x4ff4; i < 0x5000; i++)
+	{
+		m_soc->write_byte_to_cpu(i, introm[src++]);
+	}
+	u8* gamerom = memregion("mainrom")->base();
+
+	// tetrtin - jump over a whole lot of code, this is crude, there might be other code still in the startup we could be executing
+	if ((gamerom[0x7f675] == 0x20) && (gamerom[0x7f676] == 0xcb) && (gamerom[0x7f677] == 0xf5))
+	{
+		gamerom[0x7f675] = 0x4c;
+		gamerom[0x7f676] = 0xcb;
+		gamerom[0x7f677] = 0xf6;
+	}
+	// same for pactin
+	if ((gamerom[0x7f5a3] == 0x20) && (gamerom[0x7f5a4] == 0x04) && (gamerom[0x7f5a5] == 0xf5))
+	{
+		gamerom[0x7f5a3] = 0x4c;
+		gamerom[0x7f5a4] = 0xf9;
+		gamerom[0x7f5a5] = 0xf5;
+	}
+}
 
 u8 vt369_base_state::vt_rom_r(offs_t offset)
 {
@@ -248,17 +289,6 @@ void vt3xx_fapocket_state::vt_external_space_map_fapocket_4x16mbyte(address_map 
 {
 	map(0x0000000, 0x0ffffff).mirror(0x1000000).r(FUNC(vt3xx_fapocket_state::vt_rom_banked_r));
 }
-
-u8 vt36x_state::vt_rom_banked_r(offs_t offset)
-{
-	return m_prgrom[m_ahigh | offset];
-}
-
-void vt36x_state::vt_external_space_map_fp_2x32mbyte(address_map &map)
-{
-	map(0x0000000, 0x1ffffff).r(FUNC(vt36x_state::vt_rom_banked_r));
-}
-
 
 template <u8 NUM> u8 vt369_base_state::extrain_r()
 {
@@ -1030,11 +1060,15 @@ ROM_END
 ROM_START( pactin )
 	ROM_REGION( 0x100000, "mainrom", 0 )
 	ROM_LOAD( "25q80a.u3", 0x00000, 0x100000, CRC(92935759) SHA1(2333e7dcab51fa34c8d875374371854121fff27a) )
+
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
 ROM_START( tetrtin )
 	ROM_REGION( 0x100000, "mainrom", 0 )
 	ROM_LOAD( "25q80.u3", 0x00000, 0x100000, CRC(017a99b9) SHA1(e7f891762bbc3b80ae0f177654d8d066b7524bcd) )
+
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
 
@@ -1282,9 +1316,9 @@ CONS( 201?, egame150,  denv150,  0,  vt36x_8mb, vt369, vt36x_state, empty_init, 
 CONS( 2017, otrail,     0,        0,  vt369_unk_1mb, vt369, vt36x_state, empty_init, "Basic Fun", "The Oregon Trail", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // seems to be running the NES version of Pac-Man with some extra splash screens
-CONS( 2021, pactin,     0,        0,  vt369_unk_1mb, vt369, vt36x_state, empty_init, "Fizz Creations", "Pac-Man Arcade in a Tin", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2021, pactin,     0,        0,  vt36x_1mb, vt369, vt36x_tetrtin_state, empty_init, "Fizz Creations", "Pac-Man Arcade in a Tin", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2021, tetrtin,    0,        0,  vt369_unk_1mb, vt369, vt36x_state, empty_init, "Fizz Creations", "Tetris Arcade in a Tin", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2021, tetrtin,    0,        0,  vt36x_1mb, vt369, vt36x_tetrtin_state, empty_init, "Fizz Creations", "Tetris Arcade in a Tin", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // uses a low res display (so vt3xx?)
 CONS( 2021, matet10,   0,        0,  vt36x_swap_2mb, vt369, vt36x_state, empty_init, "dreamGEAR", "My Arcade Tetris (DGUNL-7083, Pixel Pocket, with 10 bonus games)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )

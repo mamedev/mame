@@ -48,6 +48,8 @@ public:
 
 	void set_default_palette_mode(vtxx_pal_mode pmode) { m_default_palette_mode = pmode; }
 
+	void write_byte_to_cpu(offs_t address, uint8_t data) { m_maincpu->space(AS_PROGRAM).write_byte(address, data); }
+
 protected:
 	nes_vt02_vt03_soc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
