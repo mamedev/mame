@@ -8,6 +8,7 @@
 #include "nes_vt09_soc.h"
 #include "cpu/m6502/rp2a03.h"
 #include "cpu/m6502/vt3xx_spu.h"
+#include "sound/dac.h"
 #include "sound/nes_apu_vt.h"
 #include "m6502_swap_op_d5_d6.h"
 #include "video/ppu2c0x_vt.h"
@@ -102,9 +103,13 @@ private:
 	u8 m_sound_adder_addr[2];
 	u8 m_sound_mult_addr[2];
 	u8 m_sound_adder_result[2];
+	u8 m_sound_mult_result[2];
+	u8 m_sound_dac[4];
 
 	optional_region_ptr<u8> m_internal_rom;
 	required_shared_ptr<u8> m_soundram;
+	required_device<dac_12bit_r2r_device> m_leftdac;
+	required_device<dac_12bit_r2r_device> m_rightdac;
 };
 
 class vt3xx_soc_unk_bt_device : public vt3xx_soc_base_device

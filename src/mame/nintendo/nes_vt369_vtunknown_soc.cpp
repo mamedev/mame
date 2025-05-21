@@ -37,7 +37,9 @@ vt3xx_soc_base_device::vt3xx_soc_base_device(const machine_config& mconfig, devi
 	m_soundcpu(*this, "soundcpu"),
 	m_sound_timer(nullptr),
 	m_internal_rom(*this, "internal"),
-	m_soundram(*this, "soundram")
+	m_soundram(*this, "soundram"),
+	m_leftdac(*this, "leftdac"),
+	m_rightdac(*this, "rightdac")
 {
 }
 
@@ -106,7 +108,12 @@ void vt3xx_soc_base_device::device_add_mconfig(machine_config& config)
 
 	VT3XX_SPU(config, m_soundcpu, RP2A03_NTSC_XTAL);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &vt3xx_soc_base_device::vt369_sound_map);
-	m_soundcpu->set_addrmap(5, &vt3xx_soc_base_device::vt369_sound_external_map);	
+	m_soundcpu->set_addrmap(5, &vt3xx_soc_base_device::vt369_sound_external_map);
+
+	// are these really left/right, or just 2 channels (does this SoC support stereo?)
+	DAC_12BIT_R2R(config, m_leftdac, 0).add_route(0, "mono", 0.2, 0); // unknown 12-bit DAC
+	DAC_12BIT_R2R(config, m_rightdac, 0).add_route(0, "mono", 0.2, 0); // unknown 12-bit DAC
+
 }
 
 void vt3xx_soc_base_device::vt369_soundcpu_control_w(offs_t offset, u8 data)
@@ -387,8 +394,25 @@ void vt3xx_soc_base_device::vt369_soundcpu_timer_w(offs_t offset, u8 data)
 }
 void vt3xx_soc_base_device::do_sound_mult()
 {
+	// address is typically set to 9800 / 9808 / 9810, and points to values at 1800 in RAM (so mask off high bit)
 	u16 address = (m_sound_mult_addr[0] << 8) | (m_sound_mult_addr[1]);
-	LOGMASKED(LOG_VT3XX_SOUND, "%s: sound CPU multiplying from RAM pointer %04x\n", machine().describe_context(), address);
+
+	u32 param1 = m_soundcpu->space(AS_PROGRAM).read_byte((address + 0) & 0x1fff) << 0;
+	param1 |=    m_soundcpu->space(AS_PROGRAM).read_byte((address + 1) & 0x1fff) << 8;
+	param1 |=    m_soundcpu->space(AS_PROGRAM).read_byte((address + 2) & 0x1fff) << 16;
+	param1 |=    m_soundcpu->space(AS_PROGRAM).read_byte((address + 3) & 0x1fff) << 24;
+
+	u32 param2 = m_soundcpu->space(AS_PROGRAM).read_byte((address + 4) & 0x1fff) << 0;
+	param2 |=    m_soundcpu->space(AS_PROGRAM).read_byte((address + 5) & 0x1fff) << 8;
+	param2 |=    m_soundcpu->space(AS_PROGRAM).read_byte((address + 6) & 0x1fff) << 16;
+	param2 |=    m_soundcpu->space(AS_PROGRAM).read_byte((address + 7) & 0x1fff) << 24;
+
+	// likely very wrong
+	u32 result = (param1 >> 16) * (param2 & 0xffff);
+	LOGMASKED(LOG_VT3XX_SOUND, "%s: sound CPU multiplying from RAM pointer %04x (%08x %08x) (%08x)\n", machine().describe_context(), address, param1, param2, result);
+	m_sound_mult_result[0] = result >> 8;
+	m_sound_mult_result[1] = result >> 16;
+
 }
 
 void vt3xx_soc_base_device::do_sound_adder()
@@ -449,7 +473,7 @@ void vt3xx_soc_base_device::vt369_soundcpu_mult_data_address_w(offs_t offset, u8
 u8 vt3xx_soc_base_device::vt369_soundcpu_mult_result_r(offs_t offset)
 {
 	LOGMASKED(LOG_VT3XX_SOUND, "%s: vt369_soundcpu_mult_result_r %02x\n", machine().describe_context(), offset);
-	return 0x00;
+	return m_sound_mult_result[offset];
 }
 
 u8 vt3xx_soc_base_device::vt369_soundcpu_mult_status_r()
@@ -460,8 +484,20 @@ u8 vt3xx_soc_base_device::vt369_soundcpu_mult_status_r()
 
 void vt3xx_soc_base_device::vt369_soundcpu_dac_w(offs_t offset, u8 data)
 {
+	//LOGMASKED(LOG_VT3XX_SOUND, "%s: vt369_soundcpu_dac_w %02x %02x\n", machine().describe_context(), offset, data);
+	m_sound_dac[offset] = data;
+
 	// 2 16-bit channels?
-	LOGMASKED(LOG_VT3XX_SOUND, "%s: vt369_soundcpu_dac_w %02x %02x\n", machine().describe_context(), offset, data);
+	if (offset & 1)
+	{
+		int channel = (offset & 2) >> 1;
+		u16 chandata = m_sound_dac[offset] | (m_sound_dac[offset - 1] << 8);
+		//LOGMASKED(LOG_VT3XX_SOUND, "%s: soundcpu dac channel %d data %04x\n", machine().describe_context(), channel, chandata);
+		if (channel)
+			m_leftdac->write(chandata >> 4);
+		else
+			m_rightdac->write(chandata >> 4);
+	}
 }
 
 u8 vt3xx_soc_base_device::vt369_soundcpu_vectors_r(offs_t offset)
@@ -610,6 +646,8 @@ void vt3xx_soc_base_device::device_start()
 	save_item(NAME(m_sound_adder_addr));
 	save_item(NAME(m_sound_adder_result));
 	save_item(NAME(m_sound_mult_addr));
+	save_item(NAME(m_sound_mult_result));
+	save_item(NAME(m_sound_dac));
 
 	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x3c00, 0x3fff, read8sm_delegate(*this, FUNC(vt3xx_soc_base_device::vt3xx_palette_r)), write8sm_delegate(*this, FUNC(vt3xx_soc_base_device::vt3xx_palette_w)));
 }
@@ -631,6 +669,11 @@ void vt3xx_soc_base_device::device_reset()
 	m_sound_mult_addr[1] = 0;
 	m_sound_adder_result[0] = 0;
 	m_sound_adder_result[1] = 0;
+	m_sound_mult_result[0] = 0;
+	m_sound_mult_result[1] = 0;
+
+	for (int i = 0; i < 4; i++)
+		m_sound_dac[i] = 0;
 
 	m_sound_timer->adjust(attotime::never);
 }
