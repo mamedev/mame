@@ -578,10 +578,35 @@ ROM_START( sltpcycl ) // REF 970410
 	ROM_LOAD( "2-st62t15c6", 0x0000, 0x0800, NO_DUMP ) // 2KBytes internal ROM
 
 	ROM_REGION( 0x0104, "pals", 0 )
-	ROM_LOAD( "6.pal16l8.u12", 0x0000, 0x0104, NO_DUMP )
+	ROM_LOAD( "mu.6_pal16l8.u12", 0x0000, 0x0104, CRC(00aedab5) SHA1(497555962e1d85ffb4fd37cff778772abd1bbe32) )
 ROM_END
 
+// Gaelco labeled this set internally as 'freno' (brake), so, probably, the changes are related to the brake input.
 ROM_START( sltpcycla )
+	ROM_REGION( 0x040000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "bici_freno_n._u21_20-11-99_fdfc_27c512.u21", 0x000000, 0x010000, CRC(04fa879b) SHA1(d1c6e3328b1a1520d13db467d6fc42d5138af91c) )
+	ROM_LOAD16_BYTE( "step_freno_n._u23_e2ca_20-11-99_27c512.u23", 0x000001, 0x010000, CRC(d23801b7) SHA1(34890686076f53974dc633a4f8111c1ff1fb1aa9) ) // Labeled 'step', but it's bike?
+
+	ROM_REGION( 0x0280000, "gfx", ROMREGION_ERASEFF ) // GFX, no sound, machine has none?
+	ROM_LOAD( "bici_u40_779a_0l_7-4-97_27c010.u40", 0x0000000, 0x0020000, CRC(56822524) SHA1(aae133e9fb85ba8995c095cc540aa35b65c27777) )
+	ROM_LOAD( "bici_u39_3fae_1l_7-4-97_27c010.u39", 0x0080000, 0x0020000, CRC(30dfcde1) SHA1(caf4429d0e1185c157eca436e9bb3a8513781a97) )
+	ROM_LOAD( "bici_u38_1391_3l_7-4-97_27c010.u38", 0x0100000, 0x0020000, CRC(84ec4b34) SHA1(01376f2534c4bc51d0a357d80db28b24c3fd71f6) )
+	ROM_LOAD( "bici_u36_d083_3l_7-4-97_27c010.u36", 0x0180000, 0x0020000, CRC(779fca47) SHA1(fce95893a5bcf0c6f26c223491c95154f072c92b) )
+	ROM_FILL(                                       0x0200000, 0x0020000, 0x00 )         // to decode GFX as 5bpp
+	ROM_LOAD( "bici_u44_0296_0h_7-4-97_27c010.u44", 0x0020000, 0x0020000, CRC(171d2f88) SHA1(e2b406dad78e3ab5bebb673ed03db5d27879283e) )
+	ROM_LOAD( "bici_u43_413c_1h_7-4-97_27c010.u43", 0x00a0000, 0x0020000, CRC(69b35d81) SHA1(d9657e3d592079071df019cd75d676fa4b1bcba9) )
+	ROM_LOAD( "bici_u42_f82s_2h_7-4-97_27c010.u42", 0x0120000, 0x0020000, CRC(eaef0565) SHA1(4214b05f1df3062eaeea91505b61816725556ed5) )
+	ROM_LOAD( "bici_u41_1f75_3h_7-4-97_27c010.u41", 0x01a0000, 0x0020000, CRC(c4d24254) SHA1(e6ff7624e628dc6ace11a50b6ff89812844b52c5) )
+	ROM_FILL(                                       0x0220000, 0x0020000, 0x00 )         // to decode GFX as 5bpp
+
+	ROM_REGION( 0x0800, "iomcu", 0 ) // on IO board
+	ROM_LOAD( "2-st62t15c6", 0x0000, 0x0800, NO_DUMP ) // 2KBytes internal ROM
+
+	ROM_REGION( 0x0104, "pals", 0 )
+	ROM_LOAD( "mu.6_pal16l8.u12", 0x0000, 0x0104, CRC(00aedab5) SHA1(497555962e1d85ffb4fd37cff778772abd1bbe32) )
+ROM_END
+
+ROM_START( sltpcyclb )
 	ROM_REGION( 0x040000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "bici_u21_fd53_7-4-97_27c512.u21", 0x000000, 0x010000, CRC(cc3e71c6) SHA1(e4862c8a2f0f6bdfb10447fdb3310cb59bab3482) )
 	ROM_LOAD16_BYTE( "bici_u23_e223_7-4-97_27c512.u23", 0x000001, 0x010000, CRC(b86f0b78) SHA1(1b943e14553c041796b8f19db91afff988813b35) )
@@ -606,7 +631,7 @@ ROM_START( sltpcycla )
 ROM_END
 
 // Older main PCB, unknown I/O PCB
-ROM_START( sltpcyclb )
+ROM_START( sltpcyclc )
 	ROM_REGION( 0x040000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "tachado_bici_0_u21_27c512.u21", 0x000000, 0x010000, CRC(7a9105e4) SHA1(c0af6984943032e0e08d575e6c84a6e788c6f6ac) )
 	ROM_LOAD16_BYTE( "tachado_bici_1_u23_27c512.u23", 0x000001, 0x010000, CRC(bde3015e) SHA1(32afa4b53b4a480737eb4ccbf160533d27c5c7ea) )
@@ -625,7 +650,7 @@ ROM_START( sltpcyclb )
 ROM_END
 
 // Older main PCB, unknown I/O PCB
-ROM_START( sltpcyclc )
+ROM_START( sltpcycld )
 	ROM_REGION( 0x040000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "bici_06.11_4f4e_0_d18_27c512.bin", 0x000000, 0x010000, CRC(62f25e57) SHA1(b49973bc8d59cf658371c9a5e0a7395a65a5539e) )
 	ROM_LOAD16_BYTE( "bici_06.11_6ce7_1_d16_27c512.bin", 0x000001, 0x010000, CRC(b3d8327b) SHA1(bc992d93e31d1442be3170c4b27950459ff5bd23) )
@@ -644,7 +669,7 @@ ROM_START( sltpcyclc )
 ROM_END
 
 // Older main PCB, unknown I/O PCB
-ROM_START( sltpcycld )
+ROM_START( sltpcycle )
 	ROM_REGION( 0x040000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "tachado_bici_22.10_4eea_d18_0_27c512.bin", 0x000000, 0x010000, CRC(d186773f) SHA1(2025597eaf2d4c461f3201be99a1d94be714c1e2) )
 	ROM_LOAD16_BYTE( "tachado_bici_22.10_6c78_d16_1_27c512.bin", 0x000001, 0x010000, CRC(1afd8cec) SHA1(14aef060d2573bc54cf0efd3690f177af9475b27) )
@@ -663,7 +688,7 @@ ROM_START( sltpcycld )
 ROM_END
 
 // Older main PCB, unknown I/O PCB
-ROM_START( sltpcycle )
+ROM_START( sltpcyclf )
 	ROM_REGION( 0x040000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "tachado_bici_13.07_4caf_d18_0_27c512.bin", 0x000000, 0x010000, CRC(8aea93cb) SHA1(0352f9c1fe2a8cfa456c661605250afa384a9af9) )
 	ROM_LOAD16_BYTE( "tachado_bici_13.07_6b79_d16_1_27c512.bin", 0x000001, 0x010000, CRC(7327f0f8) SHA1(032cfa43d7052bd0a224ebd13191123ab06c37b0) )
@@ -3297,11 +3322,12 @@ GAME( 1999, jungleani,   0,         srollnd,          play2000, gaelco2_state,  
    Pro Reclimber Tele Cardioline has the same PCB and ROMs as Pro Cycle Tele Cardioline.
    There are other devices in Cardioline series but they don't use displays and aren't on Gaelco hardware. */
 GAME( 2000, sltpcycl,   0,          saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, V.1.0, checksum 02AB)",      0 ) // 18/Jan/2000
-GAME( 1997, sltpcycla,  sltpcycl,   saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, V.1.0, checksum 3523)",      0 ) // 07/Apr/1997
-GAME( 199?, sltpcyclb,  sltpcycl,   saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, older, set 1)",              MACHINE_NOT_WORKING ) // Different sprite RAM arrangement?
-GAME( 199?, sltpcyclc,  sltpcycl,   saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, older, set 2)",              MACHINE_NOT_WORKING ) // Different sprite RAM arrangement?
-GAME( 199?, sltpcycld,  sltpcycl,   saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, older, set 3)",              MACHINE_NOT_WORKING ) // Different sprite RAM arrangement?
-GAME( 199?, sltpcycle,  sltpcycl,   saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, older, set 4)",              MACHINE_NOT_WORKING ) // Different sprite RAM arrangement?
+GAME( 1999, sltpcycla,  0,          saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, V.1.0, checksum DECA)",      0 ) // 20/Nov/1999
+GAME( 1997, sltpcyclb,  sltpcycl,   saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, V.1.0, checksum 3523)",      0 ) // 07/Apr/1997
+GAME( 199?, sltpcyclc,  sltpcycl,   saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, older, set 1)",              MACHINE_NOT_WORKING ) // Different sprite RAM arrangement?
+GAME( 199?, sltpcycld,  sltpcycl,   saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, older, set 2)",              MACHINE_NOT_WORKING ) // Different sprite RAM arrangement?
+GAME( 199?, sltpcycle,  sltpcycl,   saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, older, set 3)",              MACHINE_NOT_WORKING ) // Different sprite RAM arrangement?
+GAME( 199?, sltpcyclf,  sltpcycl,   saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, older, set 4)",              MACHINE_NOT_WORKING ) // Different sprite RAM arrangement?
 GAME( 1997, sltpstep,   0,          saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, V.1.0, checksum F208)", 0 ) // 07/Apr/1997
 GAME( 1998, sltpstepa,  sltpstep,   saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, older, set 1)",         MACHINE_NOT_WORKING ) // 23/Jan/1998. Different sprite RAM arrangement?
 GAME( 199?, sltpstepb,  sltpstep,   saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, older, set 2)",         MACHINE_NOT_WORKING ) // Different sprite RAM arrangement?
