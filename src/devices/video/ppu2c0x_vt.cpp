@@ -987,6 +987,15 @@ void ppu_vt3xx_device::draw_sprites(u8* line_priority)
 				width = 8;
 				bpp = 8;
 				alt_16_handling = false;
+
+				// 12 0f 0b -- tetrtin
+				if ((m_newvid_1c == 0x12) && (m_newvid_1d == 0x0f) && (m_newvid_1e == 0x0b))
+				{
+					// this seems to disagree with only using the old height register in this mode
+					bpp = 4;
+					width = 16;
+					height = 16;
+				}
 			}
 
 			// if the sprite isn't visible, skip it
