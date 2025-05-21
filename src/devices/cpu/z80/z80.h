@@ -77,7 +77,6 @@ protected:
 
 	void illegal_1();
 	void illegal_2();
-	u8 flags_szyxc(u16 value);
 	template <u8 Bit, bool State> void set_service_attention() { static_assert(Bit < 8, "out of range bit index"); if (State) m_service_attention |= (1 << Bit); else m_service_attention &= ~(1 << Bit); };
 	template <u8 Bit> bool get_service_attention() { static_assert(Bit < 8, "out of range bit index"); return m_service_attention & (1 << Bit); };
 
@@ -114,7 +113,6 @@ protected:
 	u8 res(int bit, u8 value);
 	u8 set(int bit, u8 value);
 	void ei();
-	void set_f(u8 f);
 	void block_io_interrupted_flags();
 
 	virtual u8 data_read(u16 addr);
@@ -163,12 +161,10 @@ protected:
 	PAIR16       m_bc2;
 	PAIR16       m_de2;
 	PAIR16       m_hl2;
-	u8           m_qtemp;
-	u8           m_q;
 	u8           m_r;
 	u8           m_r2;
-	u8           m_iff1;
-	u8           m_iff2;
+	bool         m_iff1;
+	bool         m_iff2;
 	u8           m_halt;
 	u8           m_im;
 	u8           m_i;
@@ -178,6 +174,25 @@ protected:
 	int          m_busrq_state;        // bus request pin state
 	u8           m_busack_state;       // bus acknowledge pin state
 	u16          m_ea;
+
+	struct
+	{
+		bool sign;
+		bool zero;
+		u8 yx;
+		bool half_carry;
+		bool parity_overflow;
+		bool subtract;
+		bool carry;
+
+		u8 q;
+		u8 qtemp;
+	} m_f;
+	u8 get_f(u8 flagsMask = 0xff);
+	void set_f(u8 f, u8  flagsMask = 0xff);
+	void set_0_f(u8  flagsMask = 0xff) { set_f(0x00, flagsMask); };
+	void set_1_f(u8 flagsMask = 0xff) { set_f(0xff, flagsMask); };
+	void set_f_szc(u16 value);
 
 	int          m_icount;
 	int          m_tmp_irq_vector;

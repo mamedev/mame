@@ -67,19 +67,25 @@ void r800_device::device_validity_check(validity_checker &valid) const
  ***************************************************************/
 u8 r800_device::r800_sll(u8 value)
 {
-	const u8 c = (value & 0x80) ? CF : 0;
 	const u8 res = u8(value << 1);
-	set_f(SZYXP[res] | c);
+	{
+		set_f(SZYXP[res], SF | ZF | YXF | PF);
+		set_0_f(HF | NF);
+		m_f.carry = value & 0x80;
+	}
+
 	return res;
 }
 
 void r800_device::mulub(u8 value)
 {
-	const u16 res = A * value;
-	HL = res;
-	const u8 c = (H) ? CF : 0;
-	const u8 z = (res) ? 0 : ZF;
-	set_f((F & (HF|NF)) | z | c);
+	HL = A * value;
+	{
+		// keep HN
+		set_0_f(SF | YXF | PF);
+		m_f.zero = HL == 0;
+		m_f.carry = H;
+	}
 }
 
 void r800_device::muluw(u16 value)
@@ -87,9 +93,12 @@ void r800_device::muluw(u16 value)
 	const u32 res = HL * value;
 	DE = res >> 16;
 	HL = res & 0xffff;
-	const u8 c = (DE) ? CF : 0;
-	const u8 z = (res) ? 0 : ZF;
-	set_f((F & (HF|NF)) | z | c);
+	{
+		// keep HN
+		set_0_f(SF | YXF | PF);
+		m_f.zero = res == 0;
+		m_f.carry = DE;
+	}
 }
 
 void r800_device::execute_run()
