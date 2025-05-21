@@ -113,6 +113,8 @@ TODO:
 
 - implement palette RAM enable in most games. Done for seljan2 (in a convoluted way).
 
+- mjmysterr: background while playing seems of wrong color
+
 Notes:
 
 - all games using black as default palette is trusted from a real rongrong PCB;
@@ -11719,11 +11721,27 @@ ROM_START( mjmyorntr ) // PCB seems mostly similar to the mjschuka one
 	ROM_LOAD( "71s2.5b", 0x00000, 0x40000, CRC(5a283aca) SHA1(bdb3e70dcbe04d6be3dc1bca0a4df7d9fd04506d) )
 	ROM_RELOAD(          0x10000, 0x40000 )
 
-	ROM_REGION( 0x1c0000, "blitter", 0 ) // same as mjmyorn2 but for minor differences in 71s6.2c
+	ROM_REGION( 0x1c0000, "blitter", 0 ) // same as mjmyorn2 but for minor differences in 71s6.12c
 	ROM_LOAD( "71s3.11a", 0x000000, 0x80000, CRC(1debae36) SHA1(670fa1203b9f127f9ce3150a4a0cae730cbc426f) )
 	ROM_LOAD( "71s4.12a", 0x080000, 0x80000, CRC(fe9953f7) SHA1(db7bef218f830f7a0e7d68ee6ff363f9b5c2966c) )
 	ROM_LOAD( "71s5.11c", 0x100000, 0x80000, CRC(6d0fd29a) SHA1(9b31668acf1790d9aecd1f8e8c0cb52a7a625d2d) )
 	ROM_LOAD( "71s6.12c", 0x180000, 0x40000, CRC(be7c49e3) SHA1(3657e3218ebe99f8ab07de62048a2e63261328f5) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) // same as many other games
+	ROM_LOAD( "71s1.1b", 0x00000, 0x20000, CRC(09b7a9b2) SHA1(64d9ccbb726bb6c5b362afc92bca2e3db87fd454) )
+ROM_END
+
+ROM_START( mjmysterr )
+	ROM_REGION( 0x50000+8*0x1000, "maincpu", 0 )
+	ROM_LOAD( "77s2.5c", 0x00000, 0x40000, CRC(a2b3a480) SHA1(8d2db056d3126ba3433fe3b76b9ee7b3324cf78b) )
+	ROM_RELOAD(          0x10000, 0x40000 )
+
+	ROM_REGION( 0x5a0000, "blitter", 0 ) // same as mjmyster but for minor differences in 77s6.12d
+	ROM_LOAD( "77s3.11a", 0x400000, 0x80000, CRC(a287589a) SHA1(58659dd7e019d1d32efeaec548c84a7ded637c50) )
+	ROM_LOAD( "77s4.12a", 0x480000, 0x80000, CRC(a3475059) SHA1(ec86dcea3314b65d391a970680c021899c16449e) )
+	ROM_LOAD( "77s5.11c", 0x500000, 0x80000, CRC(f45c24d6) SHA1(0eca68f2ca5722717f27ac0839359966daa2715b) )
+	ROM_LOAD( "77s6.12c", 0x580000, 0x20000, CRC(ebe64e5a) SHA1(0dbad5af95671eff3986937c991c31c84f2a56eb) ) // 1xxxxxxxxxxxxxxxxx = 0xFF
+	ROM_IGNORE(                     0x20000 )
 
 	ROM_REGION( 0x40000, "oki", 0 ) // same as many other games
 	ROM_LOAD( "71s1.1b", 0x00000, 0x20000, CRC(09b7a9b2) SHA1(64d9ccbb726bb6c5b362afc92bca2e3db87fd454) )
@@ -12758,6 +12776,8 @@ GAME( 1996, seljan2a,    seljan2,  sryudens,  seljan2,    ddenlovr_state, empty_
 GAME( 1996, mjflove,     0,        mjflove,   mjflove,    ddenlovr_state, empty_init,    ROT0, "Nakanihon",                                   "Mahjong Fantasic Love (Japan)",                                  MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1997, mjmyorntr,   0,        mjmyorntr, mjschuka,   ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious Orient Returns (Japan, v1.00)",           MACHINE_NO_COCKTAIL  ) // no copyright warning, assume Japan from game strings
+
+GAME( 1997, mjmysterr,   0,        mjmyorntr, mjschuka,   ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Mahjong The Mysterious World Returns (Japan)",                   MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS ) // no copyright warning, assume Japan from game strings
 
 GAME( 1997, hkagerou,    0,        hkagerou,  hkagerou,   hanakanz_state, empty_init,    ROT0, "Nakanihon / Dynax",                           "Hana Kagerou (Japan)",                                           MACHINE_NO_COCKTAIL  )
 
