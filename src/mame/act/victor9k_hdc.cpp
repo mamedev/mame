@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
+// copyright-holders:D. Donohoe
 
 #include "emu.h"
-#include "v9kdmaib.h"
+#include "victor9k_hdc.h"
 
 #include "logmacro.h"
 
@@ -16,14 +17,14 @@
  * implemented on the main CPU.
  */
 
-DEFINE_DEVICE_TYPE(V9KDMAIB, v9kdmaib_device, "v9kdmaib", "Victor 9000 DMA Interface Board")
+DEFINE_DEVICE_TYPE(VICTOR_9000_HDC, victor_9000_hdc_device, "victor_9000_hdc", "Victor 9000 Hard Disk Controller")
 
-v9kdmaib_device::v9kdmaib_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	v9kdmaib_device(mconfig, V9KDMAIB, tag, owner, clock)
+victor_9000_hdc_device::victor_9000_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	victor_9000_hdc_device(mconfig, VICTOR_9000_HDC, tag, owner, clock)
 {
 }
 
-v9kdmaib_device::v9kdmaib_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+victor_9000_hdc_device::victor_9000_hdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	nscsi_device(mconfig, type, tag, owner, clock),
 	nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF),
 	m_dma_r(*this, 0xff),
@@ -41,7 +42,7 @@ v9kdmaib_device::v9kdmaib_device(const machine_config &mconfig, device_type type
 {
 }
 
-uint8_t v9kdmaib_device::read(offs_t offset)
+uint8_t victor_9000_hdc_device::read(offs_t offset)
 {
 	// Lower address bits are ignored
 	if (offset >= 0x80)
@@ -55,12 +56,13 @@ uint8_t v9kdmaib_device::read(offs_t offset)
 
 	uint8_t data = 0xff;
 
-	switch (offset) {
+	switch (offset)
+	{
 		case R_CONTROL:
 			// Write only
 			break;
 		case R_DATA:
-			if (m_non_dma_req)
+			if (m_non_dma_req && !machine().side_effects_disabled())
 			{
 				m_non_dma_req = false;
 				scsi_bus->data_w(scsi_refid, 0);
@@ -71,8 +73,11 @@ uint8_t v9kdmaib_device::read(offs_t offset)
 			data = m_data;
 			break;
 		case R_STATUS:
-			// Reading status register clears interrupt
-			update_ints(false);
+			if (!machine().side_effects_disabled())
+			{
+				// Reading status register clears interrupt
+				update_ints(false);
+			}
 
 			data = ((m_bus_ctrl & S_INP) ? R_S_INP : 0) |
 				   ((m_bus_ctrl & S_CTL) ? R_S_CMD : 0) |
@@ -98,7 +103,7 @@ uint8_t v9kdmaib_device::read(offs_t offset)
 	return data;
 }
 
-void v9kdmaib_device::write(offs_t offset, uint8_t data)
+void victor_9000_hdc_device::write(offs_t offset, uint8_t data)
 {
 	// Lower address bits are ignored
 	if (offset >= 0x80)
@@ -110,7 +115,8 @@ void v9kdmaib_device::write(offs_t offset, uint8_t data)
 		offset &= ~0xf;
 	}
 
-	switch (offset) {
+	switch (offset)
+	{
 		case R_CONTROL:
 			m_ctrl = data;
 			if (data & R_C_RESET)
@@ -173,7 +179,7 @@ void v9kdmaib_device::write(offs_t offset, uint8_t data)
 	}
 }
 
-void v9kdmaib_device::device_reset()
+void victor_9000_hdc_device::device_reset()
 {
 	m_dma_on = false;
 	m_dma_write = false;
@@ -191,9 +197,9 @@ void v9kdmaib_device::device_reset()
 	m_irq_handler(false);
 }
 
-void v9kdmaib_device::device_start()
+void victor_9000_hdc_device::device_start()
 {
-	m_ctrl_timer = timer_alloc(FUNC(v9kdmaib_device::ctrl_change_handler), this);
+	m_ctrl_timer = timer_alloc(FUNC(victor_9000_hdc_device::ctrl_change_handler), this);
 
 	save_item(NAME(m_dma_on));
 	save_item(NAME(m_dma_write));
@@ -206,7 +212,7 @@ void v9kdmaib_device::device_start()
 	save_item(NAME(m_irq_state));
 }
 
-TIMER_CALLBACK_MEMBER(v9kdmaib_device::ctrl_change_handler)
+TIMER_CALLBACK_MEMBER(victor_9000_hdc_device::ctrl_change_handler)
 {
 	m_ctrl_timer->reset();
 
@@ -238,7 +244,9 @@ TIMER_CALLBACK_MEMBER(v9kdmaib_device::ctrl_change_handler)
 			// ACK will be generated upon direct data register access
 			m_non_dma_req = true;
 		}
-	} else if (m_asserting_ack) {
+	}
+	else if (m_asserting_ack)
+	{
 		scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
 		m_asserting_ack = false;
 	}
@@ -250,7 +258,7 @@ TIMER_CALLBACK_MEMBER(v9kdmaib_device::ctrl_change_handler)
 	}
 }
 
-void v9kdmaib_device::scsi_ctrl_changed()
+void victor_9000_hdc_device::scsi_ctrl_changed()
 {
 	m_bus_ctrl = scsi_bus->ctrl_r();
 	attotime delay;
@@ -282,7 +290,7 @@ void v9kdmaib_device::scsi_ctrl_changed()
 	m_ctrl_timer->adjust(delay);
 }
 
-void v9kdmaib_device::update_ints(bool irq_state)
+void victor_9000_hdc_device::update_ints(bool irq_state)
 {
 	if (irq_state != m_irq_state)
 	{

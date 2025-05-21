@@ -1,29 +1,30 @@
 // license:BSD-3-Clause
-#ifndef MAME_MACHINE_V9KDMAIB_H
-#define MAME_MACHINE_V9KDMAIB_H
+// copyright-holders:D. Donohoe
+#ifndef MAME_ACT_VICTOR9K_HDC_H
+#define MAME_ACT_VICTOR9K_HDC_H
 
 #pragma once
 
 #include "machine/nscsi_bus.h"
 
-class v9kdmaib_device : public nscsi_device, public nscsi_slot_card_interface
+class victor_9000_hdc_device : public nscsi_device, public nscsi_slot_card_interface
 {
 public:
-	v9kdmaib_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	// Memory mapped registers
-	uint8_t read(offs_t offset);
-	void write(offs_t offset, uint8_t data);
+	victor_9000_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto irq_handler() { return m_irq_handler.bind(); }
 
 	auto dma_read() { return m_dma_r.bind(); }
 	auto dma_write() { return m_dma_w.bind(); }
 
+	// Memory mapped registers
+	uint8_t read(offs_t offset);
+	void write(offs_t offset, uint8_t data);
+
 	virtual void scsi_ctrl_changed() override;
 
 protected:
-	v9kdmaib_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	victor_9000_hdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -79,7 +80,6 @@ private:
 		R_S_MSG			= 0x10,
 	};
 
-	emu_timer *m_ctrl_timer;
 	TIMER_CALLBACK_MEMBER(ctrl_change_handler);
 
 	void update_ints(bool status);
@@ -88,6 +88,8 @@ private:
 	devcb_write8 m_dma_w;
 
 	devcb_write_line m_irq_handler;
+
+	emu_timer *m_ctrl_timer;
 
 	bool m_dma_on;
 	bool m_dma_write;
@@ -105,6 +107,6 @@ private:
 	bool m_irq_state;
 };
 
-DECLARE_DEVICE_TYPE(V9KDMAIB, v9kdmaib_device)
+DECLARE_DEVICE_TYPE(VICTOR_9000_HDC, victor_9000_hdc_device)
 
-#endif // MAME_MACHINE_V9KDMAIB_H
+#endif // MAME_ACT_VICTOR9K_HDC_H

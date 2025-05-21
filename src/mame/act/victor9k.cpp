@@ -24,10 +24,12 @@
 #include "emu.h"
 
 #include "victor9k_fdc.h"
+#include "victor9k_hdc.h"
 #include "victor9k_kb.h"
 
 #include "bus/centronics/ctronics.h"
 #include "bus/ieee488/ieee488.h"
+#include "bus/nscsi/s1410.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
 #include "imagedev/floppy.h"
@@ -37,8 +39,6 @@
 #include "machine/pit8253.h"
 #include "machine/ram.h"
 #include "machine/rescap.h"
-#include "bus/nscsi/s1410.h"
-#include "v9kdmaib.h"
 #include "machine/z80sio.h"
 #include "sound/flt_biquad.h"
 #include "sound/hc55516.h"
@@ -117,7 +117,7 @@ public:
 		m_kb(*this, KB_TAG),
 		m_fdc(*this, "fdc"),
 		m_scsibus(*this, "scsi"),
-		m_v9kdmaib(*this, "scsi:7:v9kdmaib"),
+		m_hdc(*this, "scsi:7:v9kdmaib"),
 		m_centronics(*this, "centronics"),
 		m_rs232a(*this, RS232_A_TAG),
 		m_rs232b(*this, RS232_B_TAG),
@@ -156,7 +156,7 @@ private:
 	required_device<victor_9000_keyboard_device> m_kb;
 	required_device<victor_9000_fdc_device> m_fdc;
 	required_device<nscsi_bus_device> m_scsibus;
-	required_device<v9kdmaib_device> m_v9kdmaib;
+	required_device<victor_9000_hdc_device> m_hdc;
 	required_device<centronics_device> m_centronics;
 	required_device<rs232_port_device> m_rs232a;
 	required_device<rs232_port_device> m_rs232b;
@@ -247,7 +247,7 @@ void victor9k_state::victor9k_mem(address_map &map)
 	map(0xe80a0, 0xe80af).mirror(0x7f00).rw(m_fdc, FUNC(victor_9000_fdc_device::cs5_r), FUNC(victor_9000_fdc_device::cs5_w));
 	map(0xe80c0, 0xe80cf).mirror(0x7f00).rw(m_fdc, FUNC(victor_9000_fdc_device::cs6_r), FUNC(victor_9000_fdc_device::cs6_w));
 	map(0xe80e0, 0xe80ef).mirror(0x7f00).rw(m_fdc, FUNC(victor_9000_fdc_device::cs7_r), FUNC(victor_9000_fdc_device::cs7_w));
-	map(0xef300, 0xef3ff).rw(m_v9kdmaib, FUNC(v9kdmaib_device::read), FUNC(v9kdmaib_device::write));
+	map(0xef300, 0xef3ff).rw(m_hdc, FUNC(victor_9000_hdc_device::read), FUNC(victor_9000_hdc_device::write));
 	map(0xf0000, 0xf0fff).mirror(0x1000).ram().share("video_ram");
 	map(0xf8000, 0xf9fff).mirror(0x6000).rom().region(I8088_TAG, 0);
 }
@@ -858,15 +858,21 @@ void victor9k_state::victor9k(machine_config &config)
 
 	NSCSI_BUS(config, m_scsibus);
 	NSCSI_CONNECTOR(config, "scsi:0", scsi_devices, "harddisk", false);
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("v9kdmaib", V9KDMAIB).machine_config(
+	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:2", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:3", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:4", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:5", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("v9kdmaib", VICTOR_9000_HDC).machine_config(
 		[this](device_t *device)
 		{
-			v9kdmaib_device &v9kdmaib(downcast<v9kdmaib_device &>(*device));
+			victor_9000_hdc_device &victor9k_hdc(downcast<victor_9000_hdc_device &>(*device));
 
 			device->set_clock(15_MHz_XTAL / 3);
-			v9kdmaib.irq_handler().append(m_pic, FUNC(pic8259_device::ir4_w));
-			v9kdmaib.dma_read().set(*this, FUNC(victor9k_state::hd_dma_r));
-			v9kdmaib.dma_write().set(*this, FUNC(victor9k_state::hd_dma_w));
+			victor9k_hdc.irq_handler().append(m_pic, FUNC(pic8259_device::ir4_w));
+			victor9k_hdc.dma_read().set(*this, FUNC(victor9k_state::hd_dma_r));
+			victor9k_hdc.dma_write().set(*this, FUNC(victor9k_state::hd_dma_w));
 		});
 
 	RAM(config, m_ram).set_default_size("128K").set_extra_options("128K,256K,512K,640K,768K,896K");
