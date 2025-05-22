@@ -61,8 +61,8 @@ namespace {
 //  Constants
 //============================================================
 
-#define SUBMIT_FREQUENCY_TARGET_MS 20
-#define RESAMPLE_TOLERANCE 1.20F
+constexpr unsigned SUBMIT_FREQUENCY_TARGET_MS = 10;
+constexpr float RESAMPLE_TOLERANCE = 1.20F;
 
 //============================================================
 //  Macros
