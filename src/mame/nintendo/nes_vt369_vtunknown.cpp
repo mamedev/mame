@@ -214,7 +214,7 @@ void vt36x_tetrtin_state::machine_reset()
 
 	int patchaddress;
 
-	
+
 	// tetrtin - jump over a whole lot of code, this is crude, there might be other code still in the startup we could be executing
 	patchaddress = 0x7f675;
 	if ((gamerom[patchaddress] == 0x20) && (gamerom[patchaddress+1] == 0xcb) && (gamerom[patchaddress+2] == 0xf5))
@@ -558,7 +558,7 @@ void vt36x_state::vt36x_altswap_16mb(machine_config& config)
 
 void vt369_base_state::extbank_red5mam_w(u8 data)
 {
-//	printf("extbank_red5mam_w %02x\n", data);
+//  printf("extbank_red5mam_w %02x\n", data);
 	m_ahigh = ((data & 0x03) << 25);
 }
 
@@ -707,7 +707,7 @@ static INPUT_PORTS_START( vt369_fa )
 INPUT_PORTS_END
 
 // internal ROMs - these seem to be generic, but that isn't yet verified, if they are move them to device
-// 
+//
 // maps at 0x1000-0x1fff on main CPU, and can boot using vectors in 1ffx area
 // can also be mapped at 0x4000-0x4fff on the sound CPU, typically when this is
 // done the main CPU fetch the vectors from 0x4000 and writes them to the RAM
@@ -813,14 +813,14 @@ ROM_START( lxcmcysp ) // all games selectable
 ROM_END
 
 ROM_START( lxcmcycr ) // all games selectable
-	ROM_REGION( 0x4000000, "mainrom", 0 ) 
+	ROM_REGION( 0x4000000, "mainrom", 0 )
 	ROM_LOAD( "lexibook cars.bin", 0x00000, 0x4000000, CRC(198fe11b) SHA1(5e35caa3fc319ec69812c187a3ec89f01749f749) )
 
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
 ROM_START( lxcmcypj ) // all games selectable
-	ROM_REGION( 0x4000000, "mainrom", 0 ) 
+	ROM_REGION( 0x4000000, "mainrom", 0 )
 	// sub-board was marked for 1GB capacity (A0-A25 address lines), but only address lines A0-A24 are connected to the chip
 	ROM_LOAD( "cob66-1g-new02.u4", 0x00000, 0x0800000, CRC(78149671) SHA1(00dab8c0919e909e910525c18142e6a195b364f8) )
 	ROM_CONTINUE(0x1000000, 0x0800000)

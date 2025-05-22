@@ -6,12 +6,15 @@
 #pragma once
 
 #include "nes_vt09_soc.h"
+#include "vt369_adpcm.h"
+
 #include "cpu/m6502/rp2a03.h"
 #include "cpu/m6502/vt3xx_spu.h"
 #include "sound/dac.h"
 #include "sound/nes_apu_vt.h"
 #include "m6502_swap_op_d5_d6.h"
 #include "video/ppu2c0x_vt.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -67,9 +70,9 @@ private:
 	void vt369_soundcpu_adder_data_address_w(offs_t offset, u8 data);
 	void vt369_soundcpu_adder_result_w(offs_t offset, u8 data);
 	u8 vt369_soundcpu_adder_result_r(offs_t offset);
-	void vt369_soundcpu_mult_data_address_w(offs_t offset, u8 data);
-	u8 vt369_soundcpu_mult_result_r(offs_t offset);
-	u8 vt369_soundcpu_mult_status_r();
+	void vt369_soundcpu_adpcm_data_address_w(offs_t offset, u8 data);
+	u8 vt369_soundcpu_adpcm_result_r(offs_t offset);
+	u8 vt369_soundcpu_adpcm_status_r();
 	void vt369_soundcpu_dac_w(offs_t offset, u8 data);
 	u8 vt369_soundcpu_vectors_r(offs_t offset);
 
@@ -84,7 +87,7 @@ private:
 	void alu_w(offs_t offset, u8 data);
 
 	void do_sound_adder();
-	void do_sound_mult();
+	void do_sound_adpcm_decode();
 
 	TIMER_CALLBACK_MEMBER(sound_timer_expired);
 	void update_timer();
@@ -101,15 +104,16 @@ private:
 
 	emu_timer *m_sound_timer;
 	u8 m_sound_adder_addr[2];
-	u8 m_sound_mult_addr[2];
+	u8 m_sound_adpcm_addr[2];
 	u8 m_sound_adder_result[2];
-	u8 m_sound_mult_result[2];
+	u8 m_sound_adpcm_result[2];
 	u8 m_sound_dac[4];
 
 	optional_region_ptr<u8> m_internal_rom;
 	required_shared_ptr<u8> m_soundram;
-	required_device<dac_12bit_r2r_device> m_leftdac;
-	required_device<dac_12bit_r2r_device> m_rightdac;
+	required_device<vt369_adpcm_decoder_device> m_vt369adpcm;
+	required_device<dac_16bit_r2r_twos_complement_device> m_leftdac;
+	required_device<dac_16bit_r2r_twos_complement_device> m_rightdac;
 };
 
 class vt3xx_soc_unk_bt_device : public vt3xx_soc_base_device
