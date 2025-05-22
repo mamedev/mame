@@ -52,15 +52,24 @@ vtldabank_abx
 vtldabank_zpy
 	TMP = read_pc();
 	PC++;
-	A = m_extdata_space->read_byte(read(uint8_t(TMP+Y)));
+	TMP2 = TMP+Y;
+	TMP = read(uint8_t(TMP2));
+	A = m_extdata_space->read_byte((m_databank << 16) | TMP);
+	// printf("read %02x from external address %02x%04x (TMP+Y was %02x)\n", A, m_databank, TMP, TMP2);
 	set_nz(A);
 	prefetch();
 
 vtadcx_aba
 	TMP = read_pc();
 	PC++;
-	TMP2 = read_pc();
+	TMP = set_h(TMP, read_pc());
 	PC++;
-	A = m_extdata_space->read_byte((TMP2 << 8) | TMP) + X;
-	set_nz(A); // other flags?
+	TMP2 = read(TMP);
+	TMP = TMP2 + X + (P & F_C ? 1 : 0); // do ADC, but with source + result in X
+	P &= ~(F_N|F_V|F_Z|F_C);
+	if(!uint8_t(TMP)) P |= F_Z;
+	else if(int8_t(TMP) < 0) P |= F_N;
+	if(~(TMP2^X) & (TMP2^TMP) & 0x80) P |= F_V;
+	if(TMP & 0xff00) P |= F_C;
+	X = TMP & 0xff;
 	prefetch();
