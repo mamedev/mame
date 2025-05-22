@@ -354,7 +354,7 @@ int sound_xaudio2::init(osd_interface &osd, osd_options const &options)
 	// get relevant options
 	m_audio_latency = options.audio_latency();
 	if (m_audio_latency == 0.0F)
-		m_audio_latency = 0.1F;
+		m_audio_latency = 0.03F;
 
 	// create a multimedia device enumerator and enumerate devices
 	HR_GOERR(CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr, CLSCTX_ALL, IID_PPV_ARGS(&m_device_enum)));
@@ -794,8 +794,8 @@ sound_xaudio2::voice_info::voice_info(sound_xaudio2 &h, WAVEFORMATEX const &form
 	}
 
 	// calculate required buffer size
-	int const audio_latency_ms = std::max(unsigned(m_host.m_audio_latency * 1000.0F + 0.5F), SUBMIT_FREQUENCY_TARGET_MS);
-	uint32_t const buffer_total = m_sample_bytes * (audio_latency_ms / 1000.0F) * RESAMPLE_TOLERANCE;
+	int const audio_latency_ms = std::max(unsigned((m_host.m_audio_latency * 1000.0F) + 0.5F), SUBMIT_FREQUENCY_TARGET_MS);
+	uint32_t const buffer_total = m_sample_bytes * format.nSamplesPerSec * (audio_latency_ms / 1000.0F) * RESAMPLE_TOLERANCE;
 	m_buffer_count = audio_latency_ms / SUBMIT_FREQUENCY_TARGET_MS;
 	m_buffer_size = std::max<uint32_t>(1024, buffer_total / m_buffer_count);
 
@@ -873,14 +873,21 @@ void sound_xaudio2::voice_info::submit_if_needed()
 		m_host.m_overflows.fetch_add(1, std::memory_order_relaxed);
 	}
 
-	// roll the buffer and submit whatever we have queued
-	roll_buffer();
+	if (m_buffer_queue.empty())
+		roll_buffer();
+
 	if (!m_buffer_queue.empty())
 	{
-		auto &buf = m_buffer_queue.front();
-		assert(0 < buf.AudioSize);
-		submit_buffer(std::move(buf.AudioData), buf.AudioSize);
-		m_buffer_queue.pop();
+		auto buffers = state.BuffersQueued;
+		do
+		{
+			auto &buf = m_buffer_queue.front();
+			assert(0 < buf.AudioSize);
+			submit_buffer(std::move(buf.AudioData), buf.AudioSize);
+			m_buffer_queue.pop();
+			buffers++;
+		}
+		while (!m_buffer_queue.empty() && (2 > buffers));
 	}
 }
 
