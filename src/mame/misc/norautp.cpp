@@ -5079,235 +5079,7 @@ ROM_START( drhla )
 	ROM_LOAD( "pal16l8a.u51",  0x0000, 0x0104, CRC(4c98193f) SHA1(b6bdb6eef0d962a3aa4df0e23a8937a7e3210062) )
 ROM_END
 
-
 /*
-
-  TURBO POKER 2 (100491-1)
-  1991 by MICRO MANUFACTURING.
-
-*/
-ROM_START(tpoker2 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "turbo-2_u39-015_collins_101291.u39", 0x0000, 0x8000, CRC(35dac6e0) SHA1(01e73ac51b4a18f0ccc7964700cd1a7523f48b2b) )
-
-	ROM_REGION( 0x0800,  "mcu", 0 )  // 68705
-	ROM_LOAD( "tp2-01_u35-ic4_11067_032599.u35", 0x0000, 0x0800, NO_DUMP )
-
-	ROM_REGION( 0x1000,  "gfx", 0 )
-	ROM_LOAD( "turbo_poker_char_rom.u30", 0x0000, 0x1000, CRC(6df86e08) SHA1(a451f71db7b59500b99207234ef95793afc11f03) )
-
-	ROM_REGION( 0x0800,  "nvram", 0 )  // nvram
-	ROM_LOAD( "mk48z02.u44", 0x0000, 0x0800, CRC(fcb12763) SHA1(66a672c15db7f514d190f84fba023b2733d1f194) )
-
-	ROM_REGION( 0x0200,  "proms", 0 )
-	ROM_LOAD( "82s131n.u23", 0x0000, 0x0200, CRC(6834053a) SHA1(77270591aeb3ed06f72897b8f57302502f752336) )
-
-	ROM_REGION( 0x02a1,  "plds", 0 )
-	ROM_LOAD( "pal12l6.u37",  0x0000, 0x0034, CRC(25651948) SHA1(62cd4d73c6ca8ea5d4beb9ae262d1383f8149462) )
-ROM_END
-
-
-// second set
-ROM_START(tpoker2a )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "turbo-2_u39-014_u5_ut81_051894.u39", 0x0000, 0x8000, CRC(543149fe) SHA1(beb61a27c2797341e23e020e754d63fde3b4fbb2) )
-
-	ROM_REGION( 0x0800,  "mcu", 0 )  // 68705
-	ROM_LOAD( "tp2_01_u35-ic4_10834_080494.u35", 0x0000, 0x0800, NO_DUMP )
-
-	ROM_REGION( 0x1000,  "gfx", 0 )
-	ROM_LOAD( "turbo_poker_char_rom.u30", 0x0000, 0x1000, CRC(6df86e08) SHA1(a451f71db7b59500b99207234ef95793afc11f03) )
-
-	ROM_REGION( 0x0200,  "proms", 0 )
-	ROM_LOAD( "82s131n.u23", 0x0000, 0x0200, CRC(6834053a) SHA1(77270591aeb3ed06f72897b8f57302502f752336) )
-
-	ROM_REGION( 0x02a1,  "plds", 0 )
-	ROM_LOAD( "pal12l6.u37",  0x0000, 0x0034, CRC(25651948) SHA1(62cd4d73c6ca8ea5d4beb9ae262d1383f8149462) )
-ROM_END
-
-
-/*
-
-  Turbo Poker 2 (022190-1) by Micro MFG.
-  ------------------------------------
-
-  Hardware Layout (Turbo Poker 2 by Micro MFG):
-
-  - CPU:             1x NEC D8080AFC-1 (U42).
-  - BUS:             1x 8224 (U43)
-  - RAM:             2x 2111-1 Static Random Access Memory 256 x 4 bit (U33 & U34).
-  - I/O:             3x Intel P8255A Peripeheral Interface Adapter (U31, U36 & U38).
-  - Prg ROMs:        1x 27256 (U39).
-  - Gfx ROMs:        1x 2732 (U30).
-  - Sound:           Discrete.
-  - Crystal:         1x 18.000 MHz.
-
-  - MCU:             1x Custom, based on 68705.
-
-
-  Etched in copper on board:    TP2
-
-  .U30  2732a    ; stickered  (c) 1993 MICRO MFG TURBO POKER CHAR, ROM.
-
-  .U35  unknown  ; stickered  (c) 1993 MICRO MFG TP2#01 U35\IC4 16228 022194.
-
-   Continuity errors when trying to read as a standard eprom.
-   Silkscreened below the chip 'CUSTOM I.C.'. Looks like a normal EPROM.
-   * (from other board that match 100% the set, it's a custom 68705 MCU)
-
-  .U39  27256    ; stickered  (c) 1993 MICRO MFG TURBO-2 U39-014 US UTBK 022190.
-
-  .U38  8255     ; stickered  MICRO MANUFACTURING, INC.  DATE: 02-24-1994  SER# LKY-PCB-142728.
-
-  .U37  MMI PAL12L6-2  ; Blue dot on it.
-
-  .U44  DS1220AD-150   ; Dallas 2K x 8 CMOS nonvolatile SRAM.
-
-  .U23  82S131         ; Bipolar PROM.
-
-
-        27256 @U39                                Estimated U35 pinouts
-       .----------.                                   .----------.
-  VPP -|01      28|- VCC                         GND -|01      28|- Pin 10 of U14 (7404)
-  A12 -|02      27|- A14                         VCC -|02      27|- A7
-   A7 -|03      26|- A13                         VCC -|03      26|- A6
-   A6 -|04      25|- A8                          N/C -|04      25|- A5
-   A5 -|05      24|- A9            Pull-up to pin 02 -|05      24|- A4
-   A4 -|06      23|- A11                         VCC -|06      23|- A3
-   A3 -|07      22|- /OE                         N/C -|07      22|- A2
-   A2 -|08      21|- A10            Pin 9 of U37 PAL -|08      21|- A1
-   A1 -|09      20|- /CE            Pin 8 of U37 PAL -|09      20|- A0
-   A0 -|10      19|- D7         Pin 24 of U42 (8080) -|10      19|- D7
-   D0 -|11      18|- D6             Pin 7 of U37 PAL -|11      18|- D6
-   D1 -|12      17|- D5                           D0 -|12      17|- D5
-   D2 -|13      16|- D4                           D1 -|13      16|- D4
-  GND -|14      15|- D3                           D2 -|14      15|- D3
-       '----------'                                   '----------'
-
-
-  PCB Layout (Turbo Poker 2 by Micro MFG):                                        Edge Connector 36x2
-  .---------------------------------------------------------------------------------------------------.
-  | .---------.  .---------.  .---------.  .---------.  .---------.     .-----.    .--------.         |
-  | | 74LS161 |  | 74LS161 |  | 74LS161 |  | 74LS161 |  | 74LS161 |     | 555 |    | KA2657 |  .---.  |
-  | '---------'  '---------'  '---------'  '---------'  '---------'     '-----'    '--------'  |VR1|  |
-  |     U1           U2           U3           U4           U5            U6           U7      '---'  |
-  |                                                                                                   |
-  | .---------.  .---------.  .---------.  .---------.  .---------.                .--------.         |
-  | | 74LS161 |  | 74LS157 |  | 74LS157 |  | 74LS157 |  | 74LS157 |                | KA2657 |         |
-  | '---------'  '---------'  '---------'  '---------'  '---------'                '--------!         |
-  |     U8           U9           U10          U11          U12                       U13             |
-  |                                                                                                   |
-  | .---------.  .---------.  .---------.  .---------.  .---------.   .---------.  .--------.         | 36
-  | | 74LS04P |  | 74LS11N |  | 74LS04P |  | DV7486N |  | DV7486N |   | CTS8427 |  | KA2657 |         '---.
-  | '---------'  '---------'  '---------'  '---------'  '---------'   '---------'  '--------!          ---|
-  |     U14          U15          U16          U17          U18       U19 (resnet)    U20              ---|
-  |                                                                                                    ---|
-  | .---------.  .---------.  .---------.     .-----------------.     .---------.  .-.-.-.-.-.-.-.-.   ---|
-  | |  74123  |  | 74LS174 |  | 82S131N |     | 74LS541 (R dot) |     | CTS8427 |  |1|2|3|4|5|6|7|8|   ---|
-  | '---------'  '---------'  '---------'     '-----------------'     '---------'  '-'-'-'-'-'-'-'-'   ---|
-  |     U21          U22          U23                 U24             U25 (resnet)  U26 (DIP SW x 8)   ---|
-  |                                                                                                    ---|
-  | .---------.  .---------.  .---------.     .------------------.      .------------------------.     ---|
-  | |  7474N  |  | 74LS157 |  | 74LS166 |     |      2732A       |      |     Intel  P8255A      |     ---|
-  | '---------'  '---------'  '---------'     |    (char ROM)    |      |                        |     ---|
-  |     U27          U28          U29         '------------------'      '------------------------'     ---|
-  |                                                   U30                          U31                 ---|
-  | .---------.  .----------. .----------.    .--------------------.    .------------------------.     ---|
-  | |  7474N  |  | SY2111-1 | | SY2111-1 |    | Unknown custom MCU |    |     Intel  P8255A      |     ---|
-  | '---------'  '----------' '----------'    |   (68705 based)    |    |                        |     ---|
-  |     U32          U33          U34         '--------------------'    '------------------------'     ---|
-  |                                                    U35                         U36                 ---|
-  | .---------------. .--------------------.  .--------------------.                                   ---|
-  | |PAL12L6 (B dot)| |  8255 (stickered)  |  |     27256 ROM      |                                  .---'
-  | '---------------' |                    |  |                    |                                  | 01
-  |       U37         '--------------------'  '--------------------'                 .----------.     |
-  |                           U38                    U39                             | TRW 8022 |     |
-  | .------------.   .---------------------.  .--------------------.                 '----------'     |
-  | | Intel 8224 |   |   NEC  D8080AFC-1   |  |   8224 Clock GEN   |                     U45          |
-  | '------------'   |                     |  |                    |    .-------------------.         |
-  |      U41         '---------------------'  '--------------------'    |  Dallas DS1220AD  |         |
-  | .------.                  U42                    U43                | Non Volatile SRAM |         |
-  | | Xtal |                                                            '-------------------'         |
-  | | 18MHz|                                                                     U44                  |
-  | '------'                                                                                          |
-  '---------------------------------------------------------------------------------------------------'
-
-
-  Discrete sound circuitry:
-  -------------------------
-                          .---v---.
-  GND --------------------|1     8|-----VCC
-                    N/C---|2 555 7|------------------------------------+---|1K Ohm|--- VCC
-  Volume Pot -------------|3     6|--------------------+--|100K Ohm|---+
-  Pin 10 U36 (8255)-------|4     5|---|0.1uF|---GND    |
-                          '-------'                    +-|0.01uF|---- GND
-                                                       +-|0.01uF|---- pin 12 U13 (KA2667)
-                                                       +-|0.022uF|--- pin 11 U13 (KA2667)
-                                                       +-|0.05uF|---- pin 10 U13 (KA2667)
-  DIP Switches:
-
-  DIP #1: SETUP      ON/OFF         ;"setup menu to change all the settings"
-  DIP #2: RAISE      ON/OFF
-  DIP #3: XCARDS     ON/OFF
-  DIP #4: REPLAYS    ON/OFF
-  DIP #5: BONUS      ON/OFF
-  DIP #6: COIN TYPE  QUARTER/NICKEL
-  DIP #7: HISCORE    ON/OFF         ;game saves high scores
-  DIP #8: NOT USED
-
-*/
-
-ROM_START( tpoker2b )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1993_micro_mfg_turbo-2_u39-014_us_utbk_022190.u39", 0x0000, 0x8000, CRC(543149fe) SHA1(beb61a27c2797341e23e020e754d63fde3b4fbb2) )
-
-	ROM_REGION( 0x0800,  "mcu", 0 ) // 68705 MCU
-	ROM_LOAD( "1993_micro_mfg_tp2_01_u35_ic4_16228_022194.u35", 0x0000, 0x0800, NO_DUMP )
-
-	ROM_REGION( 0x1000,  "gfx", 0 )
-	ROM_LOAD( "1993_micro_mfg_turbo_poker_char_rom.u30", 0x0000, 0x1000, CRC(6df86e08) SHA1(a451f71db7b59500b99207234ef95793afc11f03) )
-
-	ROM_REGION( 0x0800,  "nvram", 0 )  // DS1220AD-150 ; Dallas 2K x 8 CMOS nonvolatile SRAM
-	ROM_LOAD( "tpoker2a_nvram.bin", 0x0000, 0x0800, CRC(615f3888) SHA1(b7d5aeb1c52748061f8913571bc5ac3e839c3595) )
-
-	ROM_REGION( 0x0200,  "proms", 0 )
-	ROM_LOAD( "tpoker2a_82s131.u23", 0x0000, 0x0200, CRC(0222124f) SHA1(5cd8d24ee8e6525a5f9e6a93fa8854f36f4319ee) )
-	ROM_IGNORE(                              0x0200)  // second half filled with 0x80
-
-	ROM_REGION( 0x0034,  "plds", 0 )
-	ROM_LOAD( "mmi_pal12l6-2_blue_dot.u37", 0x0000, 0x0034, CRC(25651948) SHA1(62cd4d73c6ca8ea5d4beb9ae262d1383f8149462) )
-ROM_END
-
-ROM_START( tpoker2c )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "turbo-2_u39-015_uscpn8k_021990.u39", 0x0000, 0x8000, CRC(1149bb41) SHA1(5320abafafb612643479e9ac682a523ed76bcda1) )
-
-	ROM_REGION( 0x0800,  "mcu", 0 ) // 68705 MCU
-	ROM_LOAD( "tp2-01_u35-ic4_9862_051997.u35", 0x0000, 0x0800, NO_DUMP )
-
-	ROM_REGION( 0x0800,  "gfx", 0 )
-	ROM_LOAD( "turbo_poker_char_rom.u30", 0x0000, 0x0800, CRC(27402bc1) SHA1(57a4dc5c69d9c5da2e416dbea21235fe20515be5) )
-
-	ROM_REGION( 0x0200,  "proms", 0 )
-	ROM_LOAD( "n82s131n.u23", 0x0000, 0x0200, CRC(6834053a) SHA1(77270591aeb3ed06f72897b8f57302502f752336) )
-ROM_END
-
-ROM_START( tpoker2d )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "turbo-2_u39-012_us_uc8k_060989_27c256.u39", 0x0000, 0x8000, CRC(ac70f2dd) SHA1(a4264d3a0ac39e0f46b2ee594d519eef2442a3b1) )
-
-	ROM_REGION( 0x0800,  "mcu", 0 ) // 68705 MCU
-	ROM_LOAD( "turbo-2_u39-012_us_uc8k_060989_27c256.u39", 0x0000, 0x0800, NO_DUMP )
-
-	ROM_REGION( 0x1000,  "gfx", 0 )
-	ROM_LOAD( "turbo_poker_char_rom_2732a.u30", 0x0000, 0x1000, CRC(6df86e08) SHA1(a451f71db7b59500b99207234ef95793afc11f03) )
-
-	ROM_REGION( 0x0200,  "proms", 0 )
-	ROM_LOAD( "n82s131n.u23", 0x0000, 0x0200, CRC(6834053a) SHA1(77270591aeb3ed06f72897b8f57302502f752336) )
-ROM_END
-
-/*
-
   Southern Systems Joker Poker
   ----------------------------
 
@@ -5327,7 +5099,6 @@ ROM_END
   $1fe2 = call $09ee --> draw 'credit' screen sector.
 
 */
-
 ROM_START( ssjkrpkr )
 	ROM_REGION( 0x10000, "maincpu", 0 )  // Southern Systems
 	ROM_LOAD( "oc.u11", 0x0000, 0x1000, CRC(b9072aa5) SHA1(bfa3df090e1030aaebbb784cb5e686f4f84f2263) )
@@ -5343,7 +5114,6 @@ ROM_END
 
 
 /*
-
   Fast Draw (Stern Electronics)?
 
   Text font is different to other similar games.
@@ -5354,7 +5124,6 @@ ROM_END
   https://flyers.arcade-museum.com/videogames/show/4362
 
 */
-
 ROM_START( fastdrwp )
 	ROM_REGION( 0x10000, "maincpu", 0 )  // PC=0x068b for error screen
 	ROM_LOAD( "u12.bin", 0x0000, 0x1000, CRC(d020d7d3) SHA1(4808ef14adf230e3971161c9375f2b354cd9d519) )
@@ -5391,14 +5160,12 @@ ROM_START( sureshoto )
 ROM_END
 
 /*
-
   Unknown DPHL rev 2.
 
   No extra info inside the zip. Just ROM dumps...
   Maybe from SMS Manufacturing, since there are GFX tiles with the SMS logo.
 
 */
-
 ROM_START( dphlunkb )
 	ROM_REGION( 0x10000, "maincpu", 0 )  // PC=0x068b for error screen
 	ROM_LOAD( "u-12_rev-2.u12", 0x0000, 0x1000, CRC(1b1d8ca4) SHA1(405bf8a56dfc669a0890b0af9417c1ed6a3bf374) )
@@ -5425,7 +5192,6 @@ ROM_END
   Xtal 18.000 MHz.
 
 */
-
 ROM_START( pkii_dm )
 	ROM_REGION( 0x10000, "maincpu", 0 )  // no stack, call's RET go to PC=0
 	ROM_LOAD( "12.u12", 0x0000, 0x1000, CRC(048e70d8) SHA1(f0eb16ba68455638de2ce68f51f305a13d0df287) )
@@ -5925,6 +5691,274 @@ ROM_START( topdrawba )  // norusa48
 
 	ROM_REGION( 0x0100,  "proms", 0 )
 	ROM_LOAD( "n82s129n_bucks.u51",  0x0000, 0x0100, CRC(460f155c) SHA1(36be07c487fb7f474ce9249eb75ea670658767cf) )
+ROM_END
+
+
+/****************************** Sets with MCU ********************************/
+
+/*
+  Turbo Poker I
+  Micro Manufacturing.
+
+  Looks generic noraut hardware, but with one daughterboard
+  having a program ROM, a MCU, a PLD, and a Dallas or MK48Z02
+
+*/  
+ROM_START(tpoker1 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "nosticker_db_27256.ic2", 0x0000, 0x8000, CRC(55eb90a8) SHA1(9460cb028f3186c7c09c18db1b413088812e7eef) )
+
+	ROM_REGION( 0x0800,  "mcu", 0 )  // 68705?
+	ROM_LOAD( "mcu.u35", 0x0000, 0x0800, NO_DUMP )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_LOAD( "tp-u31.u31", 0x0000, 0x1000, CRC(cbf8541d) SHA1(fac979a5e3389d9fe9a1ebaaec0903807e7a5910) )
+
+	ROM_REGION( 0x0200,  "proms", 0 )
+	ROM_LOAD( "n82s131n.u51", 0x0000, 0x0200, CRC(d94373cf) SHA1(b66f4f2b2df501a134620306d4f2086952984fd2) )
+ROM_END
+
+
+ROM_START(tpoker1a )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "coindata_turbo_ic2_ver_13060_27c256.ic2", 0x0000, 0x8000, CRC(55eb90a8) SHA1(9460cb028f3186c7c09c18db1b413088812e7eef) )
+
+	ROM_REGION( 0x0800,  "mcu", 0 )  // 68705?
+	ROM_LOAD( "mcu.u35", 0x0000, 0x0800, NO_DUMP )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_LOAD( "coindata_turbo_poker_u_31.u31", 0x0000, 0x1000, CRC(cbf8541d) SHA1(fac979a5e3389d9fe9a1ebaaec0903807e7a5910) )
+
+	ROM_REGION( 0x0800,  "mk48z02", 0 )
+	ROM_LOAD( "mk48z02.ic3", 0x0000, 0x0800, CRC(67405705) SHA1(6bcaf8b4877cc01db5c381ce1586de0c1f34dcb4) )
+
+	ROM_REGION( 0x0200,  "proms", 0 )
+	ROM_LOAD( "n82s131n.u51", 0x0000, 0x0200, CRC(d94373cf) SHA1(b66f4f2b2df501a134620306d4f2086952984fd2) )
+ROM_END
+
+
+/*
+  TURBO POKER 2 (100491-1)
+  1991 by MICRO MANUFACTURING.
+
+*/
+ROM_START(tpoker2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "turbo-2_u39-015_collins_101291.u39", 0x0000, 0x8000, CRC(35dac6e0) SHA1(01e73ac51b4a18f0ccc7964700cd1a7523f48b2b) )
+
+	ROM_REGION( 0x0800,  "mcu", 0 )  // 68705
+	ROM_LOAD( "tp2-01_u35-ic4_11067_032599.u35", 0x0000, 0x0800, NO_DUMP )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_LOAD( "turbo_poker_char_rom.u30", 0x0000, 0x1000, CRC(6df86e08) SHA1(a451f71db7b59500b99207234ef95793afc11f03) )
+
+	ROM_REGION( 0x0800,  "nvram", 0 )  // nvram
+	ROM_LOAD( "mk48z02.u44", 0x0000, 0x0800, CRC(fcb12763) SHA1(66a672c15db7f514d190f84fba023b2733d1f194) )
+
+	ROM_REGION( 0x0200,  "proms", 0 )
+	ROM_LOAD( "82s131n.u23", 0x0000, 0x0200, CRC(6834053a) SHA1(77270591aeb3ed06f72897b8f57302502f752336) )
+
+	ROM_REGION( 0x02a1,  "plds", 0 )
+	ROM_LOAD( "pal12l6.u37",  0x0000, 0x0034, CRC(25651948) SHA1(62cd4d73c6ca8ea5d4beb9ae262d1383f8149462) )
+ROM_END
+
+
+// second set
+ROM_START(tpoker2a )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "turbo-2_u39-014_u5_ut81_051894.u39", 0x0000, 0x8000, CRC(543149fe) SHA1(beb61a27c2797341e23e020e754d63fde3b4fbb2) )
+
+	ROM_REGION( 0x0800,  "mcu", 0 )  // 68705
+	ROM_LOAD( "tp2_01_u35-ic4_10834_080494.u35", 0x0000, 0x0800, NO_DUMP )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_LOAD( "turbo_poker_char_rom.u30", 0x0000, 0x1000, CRC(6df86e08) SHA1(a451f71db7b59500b99207234ef95793afc11f03) )
+
+	ROM_REGION( 0x0200,  "proms", 0 )
+	ROM_LOAD( "82s131n.u23", 0x0000, 0x0200, CRC(6834053a) SHA1(77270591aeb3ed06f72897b8f57302502f752336) )
+
+	ROM_REGION( 0x02a1,  "plds", 0 )
+	ROM_LOAD( "pal12l6.u37",  0x0000, 0x0034, CRC(25651948) SHA1(62cd4d73c6ca8ea5d4beb9ae262d1383f8149462) )
+ROM_END
+
+
+/*
+  Turbo Poker 2 (022190-1) by Micro MFG.
+  ------------------------------------
+
+  Hardware Layout (Turbo Poker 2 by Micro MFG):
+
+  - CPU:             1x NEC D8080AFC-1 (U42).
+  - BUS:             1x 8224 (U43)
+  - RAM:             2x 2111-1 Static Random Access Memory 256 x 4 bit (U33 & U34).
+  - I/O:             3x Intel P8255A Peripeheral Interface Adapter (U31, U36 & U38).
+  - Prg ROMs:        1x 27256 (U39).
+  - Gfx ROMs:        1x 2732 (U30).
+  - Sound:           Discrete.
+  - Crystal:         1x 18.000 MHz.
+
+  - MCU:             1x Custom, based on 68705.
+
+
+  Etched in copper on board:    TP2
+
+  .U30  2732a    ; stickered  (c) 1993 MICRO MFG TURBO POKER CHAR, ROM.
+
+  .U35  unknown  ; stickered  (c) 1993 MICRO MFG TP2#01 U35\IC4 16228 022194.
+
+   Continuity errors when trying to read as a standard eprom.
+   Silkscreened below the chip 'CUSTOM I.C.'. Looks like a normal EPROM.
+   * (from other board that match 100% the set, it's a custom 68705 MCU)
+
+  .U39  27256    ; stickered  (c) 1993 MICRO MFG TURBO-2 U39-014 US UTBK 022190.
+
+  .U38  8255     ; stickered  MICRO MANUFACTURING, INC.  DATE: 02-24-1994  SER# LKY-PCB-142728.
+
+  .U37  MMI PAL12L6-2  ; Blue dot on it.
+
+  .U44  DS1220AD-150   ; Dallas 2K x 8 CMOS nonvolatile SRAM.
+
+  .U23  82S131         ; Bipolar PROM.
+
+
+        27256 @U39                                Estimated U35 pinouts
+       .----------.                                   .----------.
+  VPP -|01      28|- VCC                         GND -|01      28|- Pin 10 of U14 (7404)
+  A12 -|02      27|- A14                         VCC -|02      27|- A7
+   A7 -|03      26|- A13                         VCC -|03      26|- A6
+   A6 -|04      25|- A8                          N/C -|04      25|- A5
+   A5 -|05      24|- A9            Pull-up to pin 02 -|05      24|- A4
+   A4 -|06      23|- A11                         VCC -|06      23|- A3
+   A3 -|07      22|- /OE                         N/C -|07      22|- A2
+   A2 -|08      21|- A10            Pin 9 of U37 PAL -|08      21|- A1
+   A1 -|09      20|- /CE            Pin 8 of U37 PAL -|09      20|- A0
+   A0 -|10      19|- D7         Pin 24 of U42 (8080) -|10      19|- D7
+   D0 -|11      18|- D6             Pin 7 of U37 PAL -|11      18|- D6
+   D1 -|12      17|- D5                           D0 -|12      17|- D5
+   D2 -|13      16|- D4                           D1 -|13      16|- D4
+  GND -|14      15|- D3                           D2 -|14      15|- D3
+       '----------'                                   '----------'
+
+
+  PCB Layout (Turbo Poker 2 by Micro MFG):                                        Edge Connector 36x2
+  .---------------------------------------------------------------------------------------------------.
+  | .---------.  .---------.  .---------.  .---------.  .---------.     .-----.    .--------.         |
+  | | 74LS161 |  | 74LS161 |  | 74LS161 |  | 74LS161 |  | 74LS161 |     | 555 |    | KA2657 |  .---.  |
+  | '---------'  '---------'  '---------'  '---------'  '---------'     '-----'    '--------'  |VR1|  |
+  |     U1           U2           U3           U4           U5            U6           U7      '---'  |
+  |                                                                                                   |
+  | .---------.  .---------.  .---------.  .---------.  .---------.                .--------.         |
+  | | 74LS161 |  | 74LS157 |  | 74LS157 |  | 74LS157 |  | 74LS157 |                | KA2657 |         |
+  | '---------'  '---------'  '---------'  '---------'  '---------'                '--------!         |
+  |     U8           U9           U10          U11          U12                       U13             |
+  |                                                                                                   |
+  | .---------.  .---------.  .---------.  .---------.  .---------.   .---------.  .--------.         | 36
+  | | 74LS04P |  | 74LS11N |  | 74LS04P |  | DV7486N |  | DV7486N |   | CTS8427 |  | KA2657 |         '---.
+  | '---------'  '---------'  '---------'  '---------'  '---------'   '---------'  '--------!          ---|
+  |     U14          U15          U16          U17          U18       U19 (resnet)    U20              ---|
+  |                                                                                                    ---|
+  | .---------.  .---------.  .---------.     .-----------------.     .---------.  .-.-.-.-.-.-.-.-.   ---|
+  | |  74123  |  | 74LS174 |  | 82S131N |     | 74LS541 (R dot) |     | CTS8427 |  |1|2|3|4|5|6|7|8|   ---|
+  | '---------'  '---------'  '---------'     '-----------------'     '---------'  '-'-'-'-'-'-'-'-'   ---|
+  |     U21          U22          U23                 U24             U25 (resnet)  U26 (DIP SW x 8)   ---|
+  |                                                                                                    ---|
+  | .---------.  .---------.  .---------.     .------------------.      .------------------------.     ---|
+  | |  7474N  |  | 74LS157 |  | 74LS166 |     |      2732A       |      |     Intel  P8255A      |     ---|
+  | '---------'  '---------'  '---------'     |    (char ROM)    |      |                        |     ---|
+  |     U27          U28          U29         '------------------'      '------------------------'     ---|
+  |                                                   U30                          U31                 ---|
+  | .---------.  .----------. .----------.    .--------------------.    .------------------------.     ---|
+  | |  7474N  |  | SY2111-1 | | SY2111-1 |    | Unknown custom MCU |    |     Intel  P8255A      |     ---|
+  | '---------'  '----------' '----------'    |   (68705 based)    |    |                        |     ---|
+  |     U32          U33          U34         '--------------------'    '------------------------'     ---|
+  |                                                    U35                         U36                 ---|
+  | .---------------. .--------------------.  .--------------------.                                   ---|
+  | |PAL12L6 (B dot)| |  8255 (stickered)  |  |     27256 ROM      |                                  .---'
+  | '---------------' |                    |  |                    |                                  | 01
+  |       U37         '--------------------'  '--------------------'                 .----------.     |
+  |                           U38                    U39                             | TRW 8022 |     |
+  | .------------.   .---------------------.  .--------------------.                 '----------'     |
+  | | Intel 8224 |   |   NEC  D8080AFC-1   |  |   8224 Clock GEN   |                     U45          |
+  | '------------'   |                     |  |                    |    .-------------------.         |
+  |      U41         '---------------------'  '--------------------'    |  Dallas DS1220AD  |         |
+  | .------.                  U42                    U43                | Non Volatile SRAM |         |
+  | | Xtal |                                                            '-------------------'         |
+  | | 18MHz|                                                                     U44                  |
+  | '------'                                                                                          |
+  '---------------------------------------------------------------------------------------------------'
+
+
+  Discrete sound circuitry:
+  -------------------------
+                          .---v---.
+  GND --------------------|1     8|-----VCC
+                    N/C---|2 555 7|------------------------------------+---|1K Ohm|--- VCC
+  Volume Pot -------------|3     6|--------------------+--|100K Ohm|---+
+  Pin 10 U36 (8255)-------|4     5|---|0.1uF|---GND    |
+                          '-------'                    +-|0.01uF|---- GND
+                                                       +-|0.01uF|---- pin 12 U13 (KA2667)
+                                                       +-|0.022uF|--- pin 11 U13 (KA2667)
+                                                       +-|0.05uF|---- pin 10 U13 (KA2667)
+  DIP Switches:
+
+  DIP #1: SETUP      ON/OFF         ;"setup menu to change all the settings"
+  DIP #2: RAISE      ON/OFF
+  DIP #3: XCARDS     ON/OFF
+  DIP #4: REPLAYS    ON/OFF
+  DIP #5: BONUS      ON/OFF
+  DIP #6: COIN TYPE  QUARTER/NICKEL
+  DIP #7: HISCORE    ON/OFF         ;game saves high scores
+  DIP #8: NOT USED
+
+*/
+
+ROM_START( tpoker2b )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1993_micro_mfg_turbo-2_u39-014_us_utbk_022190.u39", 0x0000, 0x8000, CRC(543149fe) SHA1(beb61a27c2797341e23e020e754d63fde3b4fbb2) )
+
+	ROM_REGION( 0x0800,  "mcu", 0 ) // 68705 MCU
+	ROM_LOAD( "1993_micro_mfg_tp2_01_u35_ic4_16228_022194.u35", 0x0000, 0x0800, NO_DUMP )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_LOAD( "1993_micro_mfg_turbo_poker_char_rom.u30", 0x0000, 0x1000, CRC(6df86e08) SHA1(a451f71db7b59500b99207234ef95793afc11f03) )
+
+	ROM_REGION( 0x0800,  "nvram", 0 )  // DS1220AD-150 ; Dallas 2K x 8 CMOS nonvolatile SRAM
+	ROM_LOAD( "tpoker2a_nvram.bin", 0x0000, 0x0800, CRC(615f3888) SHA1(b7d5aeb1c52748061f8913571bc5ac3e839c3595) )
+
+	ROM_REGION( 0x0200,  "proms", 0 )
+	ROM_LOAD( "tpoker2a_82s131.u23", 0x0000, 0x0200, CRC(0222124f) SHA1(5cd8d24ee8e6525a5f9e6a93fa8854f36f4319ee) )
+	ROM_IGNORE(                              0x0200)  // second half filled with 0x80
+
+	ROM_REGION( 0x0034,  "plds", 0 )
+	ROM_LOAD( "mmi_pal12l6-2_blue_dot.u37", 0x0000, 0x0034, CRC(25651948) SHA1(62cd4d73c6ca8ea5d4beb9ae262d1383f8149462) )
+ROM_END
+
+ROM_START( tpoker2c )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "turbo-2_u39-015_uscpn8k_021990.u39", 0x0000, 0x8000, CRC(1149bb41) SHA1(5320abafafb612643479e9ac682a523ed76bcda1) )
+
+	ROM_REGION( 0x0800,  "mcu", 0 ) // 68705 MCU
+	ROM_LOAD( "tp2-01_u35-ic4_9862_051997.u35", 0x0000, 0x0800, NO_DUMP )
+
+	ROM_REGION( 0x0800,  "gfx", 0 )
+	ROM_LOAD( "turbo_poker_char_rom.u30", 0x0000, 0x0800, CRC(27402bc1) SHA1(57a4dc5c69d9c5da2e416dbea21235fe20515be5) )
+
+	ROM_REGION( 0x0200,  "proms", 0 )
+	ROM_LOAD( "n82s131n.u23", 0x0000, 0x0200, CRC(6834053a) SHA1(77270591aeb3ed06f72897b8f57302502f752336) )
+ROM_END
+
+ROM_START( tpoker2d )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "turbo-2_u39-012_us_uc8k_060989_27c256.u39", 0x0000, 0x8000, CRC(ac70f2dd) SHA1(a4264d3a0ac39e0f46b2ee594d519eef2442a3b1) )
+
+	ROM_REGION( 0x0800,  "mcu", 0 ) // 68705 MCU
+	ROM_LOAD( "turbo-2_u39-012_us_uc8k_060989_27c256.u39", 0x0000, 0x0800, NO_DUMP )
+
+	ROM_REGION( 0x1000,  "gfx", 0 )
+	ROM_LOAD( "turbo_poker_char_rom_2732a.u30", 0x0000, 0x1000, CRC(6df86e08) SHA1(a451f71db7b59500b99207234ef95793afc11f03) )
+
+	ROM_REGION( 0x0200,  "proms", 0 )
+	ROM_LOAD( "n82s131n.u23", 0x0000, 0x0200, CRC(6834053a) SHA1(77270591aeb3ed06f72897b8f57302502f752336) )
 ROM_END
 
 
@@ -6771,6 +6805,10 @@ GAME(  198?, topdrawb,  topdraw,  krampcb4,  dphl,      norautp_state, init_kram
 GAME(  198?, topdrawba, topdraw,  krampcb4,  dphl,      norautp_state, init_kram4, ROT0, "SMS Manufacturing Corp.",     "Top Draw (encrypted, set 4)",       MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )  // encriypted
 
 // The following ones also have a custom 68705 MCU
+
+GAMEL( 1991, tpoker1,   0,        dphl,      dphl,      norautp_state, empty_init, ROT0, "Micro Manufacturing",         "Turbo Poker 1 (set 1)",             MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,  layout_noraut10 )
+GAMEL( 1990, tpoker1a,  tpoker1,  dphl,      dphl,      norautp_state, empty_init, ROT0, "Micro Manufacturing",         "Turbo Poker 1 (set 2)",             MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,  layout_noraut10 )
+
 GAMEL( 1991, tpoker2,   0,        tpoker2,   tpoker2,   norautp_state, empty_init, ROT0, "Micro Manufacturing",         "Turbo Poker 2 (set 1)",             MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,  layout_noraut10 )
 GAMEL( 1990, tpoker2a,  tpoker2,  tpoker2,   tpoker2a,  norautp_state, empty_init, ROT0, "Micro Manufacturing",         "Turbo Poker 2 (set 2)",             MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,  layout_noraut10 )
 GAMEL( 1990, tpoker2b,  tpoker2,  tpoker2,   tpoker2a,  norautp_state, empty_init, ROT0, "Micro Manufacturing",         "Turbo Poker 2 (set 3)",             MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,  layout_noraut10 )
