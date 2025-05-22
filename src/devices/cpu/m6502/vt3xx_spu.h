@@ -31,7 +31,7 @@ public:
 	O(vtgetdbk_imp);
 
 	O(vtldabank_abx);	
-	O(vtldabank_zpy);
+	O(vtldabank_idy);
 	O(vtadcx_aba);
 
 #undef O

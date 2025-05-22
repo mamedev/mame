@@ -49,13 +49,15 @@ vtldabank_abx
 	set_nz(A);
 	prefetch();
 
-vtldabank_zpy
-	TMP = read_pc();
+vtldabank_idy
+	TMP2 = read_pc();
 	PC++;
-	TMP2 = TMP+Y;
-	TMP = read(uint8_t(TMP2));
-	A = m_extdata_space->read_byte((m_databank << 16) | TMP);
-	// printf("read %02x from external address %02x%04x (TMP+Y was %02x)\n", A, m_databank, TMP, TMP2);
+	TMP = read(TMP2);
+	TMP = set_h(TMP, read((TMP2+1) & 0xff));
+	if(page_changing(TMP, Y)) {
+		read(set_l(TMP, TMP+Y));
+	}
+	A = m_extdata_space->read_byte((m_databank << 16) | (TMP+Y) );
 	set_nz(A);
 	prefetch();
 
