@@ -8,6 +8,7 @@
 
 #include <array>
 #include <cmath>
+#include <cstdint>
 #include <string>
 #include <utility>
 #include <vector>
