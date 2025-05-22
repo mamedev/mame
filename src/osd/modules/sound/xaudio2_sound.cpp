@@ -794,7 +794,7 @@ sound_xaudio2::voice_info::voice_info(sound_xaudio2 &h, WAVEFORMATEX const &form
 	}
 
 	// calculate required buffer size
-	int const audio_latency_ms = std::max(int(m_host.m_audio_latency * 1000.0F + 0.5F), SUBMIT_FREQUENCY_TARGET_MS);
+	int const audio_latency_ms = std::max(unsigned(m_host.m_audio_latency * 1000.0F + 0.5F), SUBMIT_FREQUENCY_TARGET_MS);
 	uint32_t const buffer_total = format.nSamplesPerSec * (audio_latency_ms / 1000.0F) * RESAMPLE_TOLERANCE;
 	m_buffer_count = audio_latency_ms / SUBMIT_FREQUENCY_TARGET_MS;
 	m_buffer_size = std::max<uint32_t>(1024, buffer_total / m_buffer_count);
@@ -854,6 +854,8 @@ void sound_xaudio2::voice_info::submit_if_needed()
 {
 	if (!m_need_update)
 		return;
+
+	m_need_update = false;
 
 	XAUDIO2_VOICE_STATE state;
 	voice->GetState(&state, XAUDIO2_VOICE_NOSAMPLESPLAYED);
