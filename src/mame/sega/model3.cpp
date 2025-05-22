@@ -6968,10 +6968,10 @@ void model3_state::init_skichamp()
 
 void model3_state::init_oceanhun()
 {
-	uint32_t *rom = (uint32_t*)memregion("user1")->base();
+	//uint32_t *rom = (uint32_t*)memregion("user1")->base();
 	init_model3_20();
 
-	rom[(0x57995c^4)/4] = 0x60000000;   // decrementer
+	//rom[(0x57995c^4)/4] = 0x60000000;   // decrementer
 }
 
 void model3_state::init_magtruck()
