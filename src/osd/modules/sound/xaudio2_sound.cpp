@@ -263,7 +263,7 @@ private:
 		std::unique_ptr<BYTE []>    m_current_buffer;
 		std::queue<xaudio2_buffer>  m_buffer_queue;
 		uint32_t                    m_buffer_size;
-		unsigned                    m_sample_bytes;
+		unsigned const              m_sample_bytes;
 		unsigned                    m_buffer_count;
 		uint32_t                    m_write_position;
 		bool                        m_need_update;
@@ -795,14 +795,14 @@ sound_xaudio2::voice_info::voice_info(sound_xaudio2 &h, WAVEFORMATEX const &form
 
 	// calculate required buffer size
 	int const audio_latency_ms = std::max(unsigned(m_host.m_audio_latency * 1000.0F + 0.5F), SUBMIT_FREQUENCY_TARGET_MS);
-	uint32_t const buffer_total = format.nSamplesPerSec * (audio_latency_ms / 1000.0F) * RESAMPLE_TOLERANCE;
+	uint32_t const buffer_total = m_sample_bytes * (audio_latency_ms / 1000.0F) * RESAMPLE_TOLERANCE;
 	m_buffer_count = audio_latency_ms / SUBMIT_FREQUENCY_TARGET_MS;
 	m_buffer_size = std::max<uint32_t>(1024, buffer_total / m_buffer_count);
 
 	// force to a whole number of samples
-	uint32_t const remainder = m_buffer_size % format.nBlockAlign;
+	uint32_t const remainder = m_buffer_size % m_sample_bytes;
 	if (remainder)
-		m_buffer_size += format.nBlockAlign - remainder;
+		m_buffer_size += m_sample_bytes - remainder;
 
 	// allocate the initial buffers
 	m_buffer_pool = std::make_unique<bufferpool>(m_buffer_count, m_buffer_size);
