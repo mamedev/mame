@@ -88,7 +88,7 @@ private:
 
 	uint32_t m_stream_id;
 	float m_audio_latency;
-	running_machine* m_machine;
+	running_machine *m_machine;
 
 	int stream_callback(stream_info *stream, const void *input, void *output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags);
 	static int s_stream_callback(const void *input, void *output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void *userData);
