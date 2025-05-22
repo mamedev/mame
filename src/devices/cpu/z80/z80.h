@@ -188,7 +188,7 @@ protected:
 		u8 q;
 		u8 qtemp;
 	} m_f;
-	u8 get_f(u8 flagsMask = 0xff);
+	u8 get_f();
 	void set_f(u8 f, u8  flagsMask = 0xff);
 	void set_0_f(u8  flagsMask = 0xff) { set_f(0x00, flagsMask); };
 	void set_1_f(u8 flagsMask = 0xff) { set_f(0xff, flagsMask); };

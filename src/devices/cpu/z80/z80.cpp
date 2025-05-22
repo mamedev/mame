@@ -41,16 +41,16 @@ u8 z80_device::SZYXP[] = {};       // zero, sign and parity flags
 u8 z80_device::SZYHXPN_inc[] = {}; // zero, sign, half carry and overflow flags INC r8
 u8 z80_device::SZYHXPN_dec[] = {}; // zero, sign, half carry and overflow flags DEC r8
 
-u8 z80_device::get_f(u8 mask)
+u8 z80_device::get_f()
 {
 	u8 f = 0;
-	f |= m_f.sign            ?  SF & mask          : 0;
-	f |= m_f.zero            ?  ZF & mask          : 0;
-	f |= (YXF & mask)        ? YXF & m_f.yx        : 0;
-	f |= m_f.half_carry      ?  HF & mask          : 0;
-	f |= m_f.parity_overflow ?  PF & mask          : 0;
-	f |= m_f.subtract        ?  NF & mask          : 0;
-	f |= m_f.carry           ?  CF & mask          : 0;
+	f |= m_f.sign            ?  SF : 0;
+	f |= m_f.zero            ?  ZF : 0;
+	f |= YXF & m_f.yx;
+	f |= m_f.half_carry      ?  HF : 0;
+	f |= m_f.parity_overflow ?  PF : 0;
+	f |= m_f.subtract        ?  NF : 0;
+	f |= m_f.carry           ?  CF : 0;
 	return f;
 }
 
