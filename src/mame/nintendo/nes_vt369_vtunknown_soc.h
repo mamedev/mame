@@ -60,7 +60,7 @@ private:
 	void vt369_sound_map(address_map &map) ATTR_COLD;
 	void vt369_sound_external_map(address_map& map) ATTR_COLD;
 
-	u8 sound_read_external(offs_t offset) { return space(AS_PROGRAM).read_byte(offset); }
+	u8 sound_read_external(offs_t offset) { return this->space(AS_PROGRAM).read_byte(get_relative() + offset); }
 
 
 	void vt369_soundcpu_timer_w(offs_t offset, u8 data);
