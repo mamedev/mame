@@ -1451,9 +1451,7 @@ void model3_state::lostwsga_ser1_w(uint8_t data)
 
 				// off-screen detect
 				case 8:
-					m_serial_fifo2 = 0;
-					if(ioport("OFFSCREEN")->read() & 0x01)
-						m_serial_fifo2 |= 0x01;
+					m_serial_fifo2 = ioport("OFFSCREEN")->read() & 0x03;
 					break;
 			}
 			break;
@@ -1845,7 +1843,8 @@ static INPUT_PORTS_START( lostwsga )
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("IN3")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("LIGHT0_X")  // lightgun X-axis
 	PORT_BIT( 0x3ff, 0x200, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0x00,0x3ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
@@ -1861,6 +1860,7 @@ static INPUT_PORTS_START( lostwsga )
 
 	PORT_START("OFFSCREEN") // fake button to shoot offscreen
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( scud )
