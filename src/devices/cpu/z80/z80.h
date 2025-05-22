@@ -177,22 +177,30 @@ protected:
 
 	struct
 	{
-		bool sign;
-		bool zero;
-		u8 yx;
+		u8 sign_val;
+		u8 zero_val;
+		u8 yx_val;
 		bool half_carry;
-		bool parity_overflow;
+		u8 parity_overflow_val; // overflow case set in the way that parity_overflow() returns desired value
 		bool subtract;
 		bool carry;
 
 		u8 q;
 		u8 qtemp;
+
+		u8 sign() const { return sign_val & 0x80; }
+		u8 zero() const { return (zero_val == 0) ? 0x40 : 0; }
+		u8 yx() const { return yx_val & 0x28; }
+		u8 parity_overflow() const {
+			u8 p = parity_overflow_val;
+			p ^= p >> 4;
+			p ^= p << 2;
+			p ^= p >> 1;
+			return ~p & 0x04;
+		}
 	} m_f;
 	u8 get_f();
 	void set_f(u8 f, u8  flagsMask = 0xff);
-	void set_0_f(u8  flagsMask = 0xff) { set_f(0x00, flagsMask); };
-	void set_1_f(u8 flagsMask = 0xff) { set_f(0xff, flagsMask); };
-	void set_f_szc(u16 value);
 
 	int          m_icount;
 	int          m_tmp_irq_vector;
@@ -204,13 +212,6 @@ protected:
 	u8 m_m1_cycles;
 	u8 m_memrq_cycles;
 	u8 m_iorq_cycles;
-
-	static bool tables_initialised;
-	static u8 SZYX[0x100];        // zero and sign flags
-	static u8 SZYXP_BIT[0x100];   // zero, sign and parity/overflow (=zero) flags for BIT opcode
-	static u8 SZYXP[0x100];       // zero, sign and parity flags
-	static u8 SZYHXPN_inc[0x100]; // zero, sign, half carry and overflow flags INC r8
-	static u8 SZYHXPN_dec[0x100]; // zero, sign, half carry and overflow flags DEC r8
 };
 
 DECLARE_DEVICE_TYPE(Z80, z80_device)

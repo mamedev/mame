@@ -69,8 +69,11 @@ u8 r800_device::r800_sll(u8 value)
 {
 	const u8 res = u8(value << 1);
 	{
-		set_f(SZYXP[res], SF | ZF | YXF | PF);
-		set_0_f(HF | NF);
+		QT = 0;
+		m_f.sign_val = m_f.zero_val = res;
+		m_f.parity_overflow_val = !0;
+		m_f.yx_val = res;
+		m_f.half_carry = m_f.subtract = 0;
 		m_f.carry = value & 0x80;
 	}
 
@@ -82,8 +85,10 @@ void r800_device::mulub(u8 value)
 	HL = A * value;
 	{
 		// keep HN
-		set_0_f(SF | YXF | PF);
-		m_f.zero = HL == 0;
+		m_f.sign_val = 0;
+		m_f.zero_val = HL != 0;
+		m_f.parity_overflow_val = !0;
+		m_f.yx_val = 0;
 		m_f.carry = H;
 	}
 }
@@ -95,8 +100,10 @@ void r800_device::muluw(u16 value)
 	HL = res & 0xffff;
 	{
 		// keep HN
-		set_0_f(SF | YXF | PF);
-		m_f.zero = res == 0;
+		m_f.sign_val = 0;
+		m_f.zero_val = res != 0;
+		m_f.parity_overflow_val = !0;
+		m_f.yx_val = 0;
 		m_f.carry = DE;
 	}
 }

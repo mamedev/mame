@@ -26,6 +26,7 @@ TODO:
 #include "z80dasm.h"
 
 #include "z80.inc"
+#include <cstdio>
 
 #define LOG_INT   (1U << 1) // z80.lst
 #define LOG_UNDOC (1U << 2)
@@ -34,21 +35,14 @@ TODO:
 #include "logmacro.h"
 
 
-bool z80_device::tables_initialised = false;
-u8 z80_device::SZYX[] = {};        // zero and sign flags
-u8 z80_device::SZYXP_BIT[] = {};   // zero, sign and parity/overflow (=zero) flags for BIT opcode
-u8 z80_device::SZYXP[] = {};       // zero, sign and parity flags
-u8 z80_device::SZYHXPN_inc[] = {}; // zero, sign, half carry and overflow flags INC r8
-u8 z80_device::SZYHXPN_dec[] = {}; // zero, sign, half carry and overflow flags DEC r8
-
 u8 z80_device::get_f()
 {
 	u8 f = 0;
-	f |= m_f.sign            ?  SF : 0;
-	f |= m_f.zero            ?  ZF : 0;
-	f |= YXF & m_f.yx;
+	f |= m_f.sign();
+	f |= m_f.zero();
+	f |= m_f.yx();
 	f |= m_f.half_carry      ?  HF : 0;
-	f |= m_f.parity_overflow ?  PF : 0;
+	f |= m_f.parity_overflow();
 	f |= m_f.subtract        ?  NF : 0;
 	f |= m_f.carry           ?  CF : 0;
 	return f;
@@ -57,21 +51,13 @@ u8 z80_device::get_f()
 void z80_device::set_f(u8 f, u8 mask)
 {
 	QT = 0;
-	if (mask & SF)  m_f.sign            = SF & f;
-	if (mask & ZF)  m_f.zero            = ZF & f;
-	if (mask & YXF) m_f.yx              = f; // filtered in get
-	if (mask & HF)  m_f.half_carry      = HF & f;
-	if (mask & PF)  m_f.parity_overflow = PF & f;
-	if (mask & NF)  m_f.subtract        = NF & f;
-	if (mask & CF)  m_f.carry           = CF & f;
-}
-
-void z80_device::set_f_szc(u16 value)
-{
-	QT = 0;
-	m_f.sign = value & SF;
-	m_f.zero = u8(value) == 0;
-	m_f.carry = value & 0x100;
+	if (mask & SF)  m_f.sign_val            = f;
+	if (mask & ZF)  m_f.zero_val            = !(f & ZF);
+	if (mask & YXF) m_f.yx_val              = f;
+	if (mask & HF)  m_f.half_carry          = HF & f;
+	if (mask & PF)  m_f.parity_overflow_val = !(f & PF);
+	if (mask & NF)  m_f.subtract            = NF & f;
+	if (mask & CF)  m_f.carry               = CF & f;
 }
 
 
@@ -146,8 +132,12 @@ void z80_device::inc(u8 &r)
 {
 	++r;
 	{
+		QT = 0;
 		// keep C
-		set_f(SZYHXPN_inc[r], SF | ZF | YXF | HF | PF | NF);
+		m_f.sign_val = m_f.zero_val = m_f.yx_val = r;
+		m_f.parity_overflow_val = r != 0x80;
+		m_f.half_carry = (r & 0x0f) == 0x00;
+		m_f.subtract = 0;
 	}
 }
 
@@ -158,8 +148,12 @@ void z80_device::dec(u8 &r)
 {
 	--r;
 	{
+		QT = 0;
 		// keep C
-		set_f(SZYHXPN_dec[r], SF | ZF | YXF | HF | PF | NF);
+		m_f.sign_val = m_f.zero_val = m_f.yx_val = r;
+		m_f.parity_overflow_val = r != 0x7f;
+		m_f.half_carry = (r & 0x0f) == 0x0f;
+		m_f.subtract = 1;
 	}
 }
 
@@ -170,9 +164,11 @@ void z80_device::rlca()
 {
 	A = (A << 1) | (A >> 7);
 	{
+		QT = 0;
 		// keep SZP
-		set_f(A, YXF | CF);
-		set_0_f(HF | NF);
+		m_f.yx_val = A;
+		m_f.half_carry = m_f.subtract = 0;
+		m_f.carry = A & 0x01;
 	}
 }
 
@@ -184,9 +180,10 @@ void z80_device::rrca()
 	const u8 a0 = A;
 	A = (a0 >> 1) | (a0 << 7);
 	{
+		QT = 0;
 		//keep SZP;
-		m_f.yx = A;
-		set_0_f(HF | NF);
+		m_f.yx_val = A;
+		m_f.half_carry = m_f.subtract = 0;
 		m_f.carry = a0 & 0x01;
 	}
 }
@@ -198,9 +195,10 @@ void z80_device::rla()
 {
 	u8 res = (A << 1) + m_f.carry;
 	{
+		QT = 0;
 		// keep SZP;
-		m_f.yx = res;
-		set_0_f(HF | NF);
+		m_f.yx_val = res;
+		m_f.half_carry = m_f.subtract = 0;
 		m_f.carry = A & 0x80;
 	}
 	A = res;
@@ -213,9 +211,10 @@ void z80_device::rra()
 {
 	u8 res = (m_f.carry << 7) | (A >> 1);
 	{
+		QT = 0;
 		// keep SZP;
-		m_f.yx = res;
-		set_0_f(HF | NF);
+		m_f.yx_val = res;
+		m_f.half_carry = m_f.subtract = 0;
 		m_f.carry = A & 0x01;
 	}
 	A = res;
@@ -228,10 +227,11 @@ void z80_device::add_a(u8 value)
 {
 	const u16 res = A + value;
 	{
-		set_f_szc(res);
-		m_f.yx = res;
+		QT = 0;
+		m_f.sign_val = m_f.zero_val = m_f.yx_val = res;
+		m_f.carry = res & 0x100;
 		m_f.half_carry = ((A & 0x0f) + (value & 0x0f)) & HF;
-		m_f.parity_overflow = (A ^ res) & (value ^ res) & 0x80;
+		m_f.parity_overflow_val = !((A ^ res) & (value ^ res) & 0x80);
 		m_f.subtract = 0;
 	}
 	A = res;
@@ -245,10 +245,11 @@ void z80_device::adc_a(u8 value)
 	const int c = m_f.carry;
 	const u16 res = A + value + c;
 	{
-		set_f_szc(res);
-		m_f.yx = res;
+		QT = 0;
+		m_f.sign_val = m_f.zero_val = m_f.yx_val = res;
+		m_f.carry = res & 0x100;
 		m_f.half_carry = ((A & 0x0f) + (value & 0x0f) + c) & HF;
-		m_f.parity_overflow = (A ^ res) & (value ^ res) & 0x80;
+		m_f.parity_overflow_val = !((A ^ res) & (value ^ res) & 0x80);
 		m_f.subtract = 0;
 	}
 	A = res;
@@ -261,10 +262,11 @@ void z80_device::sub_a(u8 value)
 {
 	const u16 res = A - value;
 	{
-		set_f_szc(res);
-		m_f.yx = res;
+		QT = 0;
+		m_f.sign_val = m_f.zero_val = m_f.yx_val = res;
+		m_f.carry = res & 0x100;
 		m_f.half_carry = ((A & 0x0f) - (value & 0x0f)) & HF;
-		m_f.parity_overflow = (A ^ value) & (A ^ res) & 0x80;
+		m_f.parity_overflow_val = !((A ^ value) & (A ^ res) & 0x80);
 		m_f.subtract = 1;
 	}
 	A = res;
@@ -278,10 +280,11 @@ void z80_device::sbc_a(u8 value)
 	const int c = m_f.carry;
 	const u16 res = A - value - c;
 	{
-		set_f_szc(res);
-		m_f.yx = res;
+		QT = 0;
+		m_f.sign_val = m_f.zero_val = m_f.yx_val = res;
+		m_f.carry = res & 0x100;
 		m_f.half_carry = ((A & 0x0f) - (value & 0x0f) - c) & HF;
-		m_f.parity_overflow = (A ^ value) & (A ^ res) & 0x80;
+		m_f.parity_overflow_val = !((A ^ value) & (A ^ res) & 0x80);
 		m_f.subtract = 1;
 	}
 	A = res;
@@ -314,8 +317,9 @@ void z80_device::daa()
 		if (m_f.carry || (A > 0x99)) a += 0x60;
 	}
 	{
+		QT = 0;
 		// keep N
-		set_f(SZYXP[a], SF | ZF | YXF | PF);
+		m_f.sign_val = m_f.zero_val = m_f.parity_overflow_val = m_f.yx_val = a;
 		m_f.half_carry = (A ^ a) & HF;
 		m_f.carry |= A > 0x99;
 	}
@@ -329,9 +333,10 @@ void z80_device::and_a(u8 value)
 {
 	A &= value;
 	{
-		set_f(SZYXP[A], SF | ZF  | YXF | PF);
-		set_0_f(NF | CF);
-		set_1_f(HF);
+		QT = 0;
+		m_f.sign_val = m_f.zero_val = m_f.parity_overflow_val = m_f.yx_val = A;
+		m_f.subtract = m_f.carry = 0;
+		m_f.half_carry = 1;
 	}
 }
 
@@ -342,8 +347,9 @@ void z80_device::or_a(u8 value)
 {
 	A |= value;
 	{
-		set_f(SZYXP[A], SF | ZF  | YXF | PF);
-		set_0_f(HF | NF | CF);
+		QT = 0;
+		m_f.sign_val = m_f.zero_val = m_f.parity_overflow_val = m_f.yx_val = A;
+		m_f.half_carry = m_f.subtract = m_f.carry = 0;
 	}
 }
 
@@ -354,8 +360,9 @@ void z80_device::xor_a(u8 value)
 {
 	A ^= value;
 	{
-		set_f(SZYXP[A], SF | ZF  | YXF | PF);
-		set_0_f(HF | NF | CF);
+		QT = 0;
+		m_f.sign_val = m_f.zero_val = m_f.parity_overflow_val = m_f.yx_val = A;
+		m_f.half_carry = m_f.subtract = m_f.carry = 0;
 	}
 }
 
@@ -366,10 +373,12 @@ void z80_device::cp(u8 value)
 {
 	const u16 res = A - value;
 	{
-		set_f_szc(res);
-		m_f.yx = value;
+		QT = 0;
+		m_f.sign_val = m_f.zero_val = res;
+		m_f.yx_val = value;
+		m_f.carry = res & 0x100;
 		m_f.half_carry = ((A & 0x0f) - (value & 0x0f)) & HF;
-		m_f.parity_overflow = (A ^ value) & (A ^ res) & 0x80;
+		m_f.parity_overflow_val = !((A ^ value) & (A ^ res) & 0x80);
 		m_f.subtract = 1;
 	}
 }
@@ -392,8 +401,8 @@ u8 z80_device::rlc(u8 value)
 {
 	const u8 res = ((value << 1) | (value >> 7)) & 0xff;
 	{
-		set_f(SZYXP[res], SF | ZF | YXF | PF);
-		set_0_f(HF | NF);
+		m_f.sign_val = m_f.zero_val = m_f.parity_overflow_val = m_f.yx_val = res;
+		m_f.half_carry = m_f.subtract = 0;
 		m_f.carry = value & 0x80;
 	}
 
@@ -407,8 +416,9 @@ u8 z80_device::rrc(u8 value)
 {
 	const u8 res = ((value >> 1) | (value << 7)) & 0xff;
 	{
-		set_f(SZYXP[res], SF | ZF | YXF | PF);
-		set_0_f(HF | NF);
+		QT = 0;
+		m_f.sign_val = m_f.zero_val = m_f.parity_overflow_val = m_f.yx_val = res;
+		m_f.half_carry = m_f.subtract = 0;
 		m_f.carry = value & 0x01;
 	}
 
@@ -422,8 +432,9 @@ u8 z80_device::rl(u8 value)
 {
 	const u8 res = ((value << 1) + m_f.carry) & 0xff;
 	{
-		set_f(SZYXP[res], SF | ZF | YXF | PF);
-		set_0_f(HF | NF);
+		QT = 0;
+		m_f.sign_val = m_f.zero_val = m_f.parity_overflow_val = m_f.yx_val = res;
+		m_f.half_carry = m_f.subtract = 0;
 		m_f.carry = value & 0x80;
 	}
 
@@ -437,8 +448,9 @@ u8 z80_device::rr(u8 value)
 {
 	const u8 res = ((value >> 1) | (m_f.carry << 7)) & 0xff;
 	{
-		set_f(SZYXP[res], SF | ZF | YXF | PF);
-		set_0_f(HF | NF);
+		QT = 0;
+		m_f.sign_val = m_f.zero_val = m_f.parity_overflow_val = m_f.yx_val = res;
+		m_f.half_carry = m_f.subtract = 0;
 		m_f.carry = value & 0x01;
 	}
 
@@ -452,8 +464,9 @@ u8 z80_device::sla(u8 value)
 {
 	const u8 res = (value << 1) & 0xff;
 	{
-		set_f(SZYXP[res], SF | ZF | YXF | PF);
-		set_0_f(HF | NF);
+		QT = 0;
+		m_f.sign_val = m_f.zero_val = m_f.parity_overflow_val = m_f.yx_val = res;
+		m_f.half_carry = m_f.subtract = 0;
 		m_f.carry = value & 0x80;
 	}
 
@@ -467,8 +480,9 @@ u8 z80_device::sra(u8 value)
 {
 	const u8 res = ((value >> 1) | (value & 0x80)) & 0xff;
 	{
-		set_f(SZYXP[res], SF | ZF | YXF | PF);
-		set_0_f(HF | NF);
+		QT = 0;
+		m_f.sign_val = m_f.zero_val = m_f.parity_overflow_val = m_f.yx_val = res;
+		m_f.half_carry = m_f.subtract = 0;
 		m_f.carry = value & 0x01;
 	}
 
@@ -482,8 +496,9 @@ u8 z80_device::sll(u8 value)
 {
 	const u8 res = ((value << 1) | 0x01) & 0xff;
 	{
-		set_f(SZYXP[res], SF | ZF | YXF | PF);
-		set_0_f(HF | NF);
+		QT = 0;
+		m_f.sign_val = m_f.zero_val = m_f.parity_overflow_val = m_f.yx_val = res;
+		m_f.half_carry = m_f.subtract = 0;
 		m_f.carry = value & 0x80;
 	}
 
@@ -497,8 +512,9 @@ u8 z80_device::srl(u8 value)
 {
 	const u8 res = (value >> 1) & 0xff;
 	{
-		set_f(SZYXP[res], SF | ZF | YXF | PF);
-		set_0_f(HF | NF);
+		QT = 0;
+		m_f.sign_val = m_f.zero_val = m_f.parity_overflow_val = m_f.yx_val = res;
+		m_f.half_carry = m_f.subtract = 0;
 		m_f.carry = value & 0x01;
 	}
 
@@ -510,9 +526,11 @@ u8 z80_device::srl(u8 value)
  ***************************************************************/
 void z80_device::bit(int bit, u8 value)
 {
-	set_1_f(HF);
-	set_f(SZYXP_BIT[value & (1 << bit)], SF | ZF  | PF | NF);
-	m_f.yx = value;
+	QT = 0;
+	m_f.sign_val = m_f.zero_val = m_f.parity_overflow_val = value & (1 << bit);
+	m_f.half_carry = 1;
+	m_f.subtract = 0;
+	m_f.yx_val = value;
 }
 
 /***************************************************************
@@ -520,9 +538,11 @@ void z80_device::bit(int bit, u8 value)
  ***************************************************************/
 void z80_device::bit_hl(int bit, u8 value)
 {
-	set_1_f(HF);
-	set_f(SZYXP_BIT[value & (1 << bit)], SF | ZF | PF | NF);
-	m_f.yx = WZ_H;
+	QT = 0;
+	m_f.sign_val = m_f.zero_val = m_f.parity_overflow_val = value & (1 << bit);
+	m_f.half_carry = 1;
+	m_f.subtract = 0;
+	m_f.yx_val = WZ_H;
 }
 
 /***************************************************************
@@ -530,9 +550,11 @@ void z80_device::bit_hl(int bit, u8 value)
  ***************************************************************/
 void z80_device::bit_xy(int bit, u8 value)
 {
-	set_1_f(HF);
-	set_f(SZYXP_BIT[value & (1 << bit)], SF | ZF  | PF | NF);
-	m_f.yx = m_ea >> 8;
+	QT = 0;
+	m_f.sign_val = m_f.zero_val = m_f.parity_overflow_val = value & (1 << bit);
+	m_f.half_carry = 1;
+	m_f.subtract = 0;
+	m_f.yx_val = m_ea >> 8;
 }
 
 /***************************************************************
@@ -553,28 +575,28 @@ u8 z80_device::set(int bit, u8 value)
 
 void z80_device::block_io_interrupted_flags()
 {
-	m_f.yx = PC >> 8;
+	m_f.yx_val = PC >> 8;
 
-	u8 p = m_f.parity_overflow ? PF : 0;
+	const u8 p_old = m_f.parity_overflow();
 	if (m_f.carry)
 	{
-		set_0_f(HF);
+		m_f.half_carry = 0;
 		if (TDAT8 & 0x80)
 		{
-			p ^= (SZYXP[(B - 1) & 0x07] ^ PF) & PF;
-			if ((B & 0x0f) == 0x00) set_1_f(HF);
+			m_f.parity_overflow_val = (B - 1) & 0x07;
+			if ((B & 0x0f) == 0x00) m_f.half_carry = 1;
 		}
 		else
 		{
-			p ^= (SZYXP[(B + 1) & 0x07] ^ PF) & PF;
-			if ((B & 0x0f) == 0x0f) set_1_f(HF);
+			m_f.parity_overflow_val = (B + 1) & 0x07;
+			if ((B & 0x0f) == 0x0f) m_f.half_carry = 1;
 		}
 	}
 	else
 	{
-		p ^=(SZYXP[B & 0x07] ^ PF) & PF;
+		m_f.parity_overflow_val = B & 0x07;
 	}
-	m_f.parity_overflow = p;
+	m_f.parity_overflow_val = (p_old ^ m_f.parity_overflow()) & PF;
 }
 
 /***************************************************************
@@ -616,29 +638,6 @@ void z80_device::device_validity_check(validity_checker &valid) const
 
 void z80_device::device_start()
 {
-	if (!tables_initialised)
-	{
-		for (int i = 0; i < 256; i++)
-		{
-			int p = 0;
-			for (int b = 0; b < 8; b++)
-				p += BIT(i, b);
-			SZYX[i] = i ? i & SF : ZF;
-			SZYX[i] |= (i & YXF);
-			SZYXP_BIT[i] = i ? i & SF : ZF | PF;
-			SZYXP_BIT[i] |= (i & YXF);
-			SZYXP[i] = SZYX[i] | ((p & 1) ? 0 : PF);
-			SZYHXPN_inc[i] = SZYX[i];
-			if (i == 0x80) SZYHXPN_inc[i] |= VF;
-			if ((i & 0x0f) == 0x00) SZYHXPN_inc[i] |= HF;
-			SZYHXPN_dec[i] = SZYX[i] | NF;
-			if (i == 0x7f) SZYHXPN_dec[i] |= VF;
-			if ((i & 0x0f) == 0x0f) SZYHXPN_dec[i] |= HF;
-		}
-
-		tables_initialised = true;
-	}
-
 	save_item(NAME(PRVPC));
 	save_item(NAME(PC));
 	save_item(NAME(SP));
@@ -715,7 +714,7 @@ void z80_device::device_start()
 	space(AS_IO).specific(m_io);
 
 	IX = IY = 0xffff; // IX and IY are FFFF after a reset!
-	m_f.zero = 1;     // Zero flag is set
+	m_f.zero_val = 0; // Zero flag is set
 
 	// set up the state table
 	state_add(STATE_GENPC,     "PC",        m_pc.w).callimport();
@@ -874,14 +873,14 @@ void z80_device::state_string_export(const device_state_entry &entry, std::strin
 		case STATE_GENFLAGS:
 		{
 			str = string_format("%c%c%c%c%c%c%c%c",
-				m_f.sign            ? 'S':'.',
-				m_f.zero            ? 'Z':'.',
-				m_f.yx & 0x20       ? 'Y':'.',
-				m_f.half_carry      ? 'H':'.',
-				m_f.yx & 0x08       ? 'X':'.',
-				m_f.parity_overflow ? 'P':'.',
-				m_f.subtract        ? 'N':'.',
-				m_f.carry           ? 'C':'.');
+				m_f.sign()            ? 'S':'.',
+				m_f.zero()            ? 'Z':'.',
+				m_f.yx() & 0x20       ? 'Y':'.',
+				m_f.half_carry        ? 'H':'.',
+				m_f.yx() & 0x08       ? 'X':'.',
+				m_f.parity_overflow() ? 'P':'.',
+				m_f.subtract          ? 'N':'.',
+				m_f.carry             ? 'C':'.');
 		}
 		break;
 	}
