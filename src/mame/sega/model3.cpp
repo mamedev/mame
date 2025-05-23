@@ -30,7 +30,7 @@
     vs2 - works
     harley - works
     skichamp - boots after skipping the drive board errors, massive slowdowns
-    srally2 - works
+    srally2 - works, uses JTAG patch, draws no polygon if coin is inserted at Sega logo
     srally2p/srally2pa/sraly2dx - needs specific JTAG patch / bypass
     von2/von2a/von2o/von254g - works
     fvipers2 - crashes after player selection
@@ -1520,33 +1520,13 @@ void model3_state::model3_sys_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 			else logerror("m3_sys: unknown mask on IRQen write\n");
 			break;
 		case 0x18/8:
-			if ((mem_mask & 0xff000000) == 0xff000000)  // int ACK with bits in REVERSE ORDER from the other registers (Seeeee-gaaaa!)
-			{                       // may also be a secondary enable based on behavior of e.g. magtruck VBL handler
-//              uint32_t old_irq = m_irq_state;
-				uint8_t ack = (data>>24)&0xff, realack;
-				int i;
-
-				switch (ack)
-				{
-					case 0xff:  // no ack, do nothing
-						return;
-
-					default:
-						realack = 0xff; // default to all bits set, no clearing
-						for (i = 7; i >= 0; i--)
-						{
-							// if bit is clear, clear the bit on the opposite end
-							if (!(ack & (1<<i)))
-							{
-								realack &= ~(1<<(7-i));
-							}
-						}
-
-//                      printf("%x to ack (realack %x)\n", ack, realack);
-
-						m_irq_state &= realack;
-						break;
-				}
+			if ((mem_mask & 0xff000000) == 0xff000000)
+			{
+				// check irq status only
+				// - spikeout/spikeofe cares about this;
+				// - vs215o implies that the value written doesn't really matter
+				//   (writes the full range of 0-0xff), classifying this as a strobe only
+				update_irq_state();
 			}
 			else
 			{
@@ -6920,6 +6900,7 @@ void model3_state::init_dayto2pe()
 //  rom[(0x64ca34^4)/4] = 0x60000000;       // dec
 }
 
+// TODO: sound dies often without these patches, investigate
 void model3_state::init_spikeout()
 {
 	uint32_t *rom = (uint32_t*)memregion("user1")->base();
