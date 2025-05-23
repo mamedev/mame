@@ -201,7 +201,7 @@ protected:
 		}
 	} m_f;
 	u8 get_f();
-	void set_f(u8 f, u8  flagsMask = 0xff);
+	void set_f(u8 f);
 
 	int          m_icount;
 	int          m_tmp_irq_vector;

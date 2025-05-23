@@ -48,16 +48,15 @@ u8 z80_device::get_f()
 	return f;
 }
 
-void z80_device::set_f(u8 f, u8 mask)
+void z80_device::set_f(u8 f)
 {
-	QT = 0;
-	if (mask & SF)  m_f.sign_val            = f;
-	if (mask & ZF)  m_f.zero_val            = !(f & ZF);
-	if (mask & YXF) m_f.yx_val              = f;
-	if (mask & HF)  m_f.half_carry_val      = f;
-	if (mask & PF)  m_f.parity_overflow_val = !(f & PF);
-	if (mask & NF)  m_f.subtract            = NF & f;
-	if (mask & CF)  m_f.carry               = CF & f;
+	m_f.sign_val            = f;
+	m_f.zero_val            = !(f & ZF);
+	m_f.yx_val              = f;
+	m_f.half_carry_val      = f;
+	m_f.parity_overflow_val = !(f & PF);
+	m_f.subtract            = NF & f;
+	m_f.carry               = CF & f;
 }
 
 
