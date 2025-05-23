@@ -281,7 +281,7 @@ bool menu_audio_mixer::handle(event const *ev)
 			else
 				m_current_selection.m_db -= 1.0f;
 
-			m_current_selection.m_db = floorf(m_current_selection.m_db * 10.0f) / 10.0f;
+			m_current_selection.m_db = floorf(m_current_selection.m_db * 10.0f + 0.5f) / 10.0f;
 			m_current_selection.m_db = std::clamp(m_current_selection.m_db, -96.0f, 12.0f);
 
 			if(m_current_selection.m_maptype == MT_FULL) {
@@ -422,7 +422,7 @@ bool menu_audio_mixer::handle(event const *ev)
 			else
 				m_current_selection.m_db += 1.0f;
 
-			m_current_selection.m_db = floorf(m_current_selection.m_db * 10.0f) / 10.0f;
+			m_current_selection.m_db = floorf(m_current_selection.m_db * 10.0f + 0.5f) / 10.0f;
 			m_current_selection.m_db = std::clamp(m_current_selection.m_db, -96.0f, 12.0f);
 
 			if(m_current_selection.m_maptype == MT_FULL) {

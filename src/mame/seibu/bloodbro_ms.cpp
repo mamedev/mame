@@ -19,18 +19,25 @@
     MOD 4/3 - Tilemap board, has logic + 4 tilemap ROMs, long thin sub-board (CAR-0484/1 SOLD) with no chips, just routing along one edge.
 
     PCBs pictures and dip listing are available at: http://www.recreativas.org/modular-system-blood-bros-4316-gaelco-sa
+
+TODO:
+- sound (seems rather similar to seibu/toki_ms.cpp, at least address-wise);
+- sprite / tilemap priorities
 */
 
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
 #include "sound/ymopn.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
 
 
 namespace {
@@ -41,101 +48,258 @@ public:
 	bloodbro_ms_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_palette(*this, "palette"),
-		m_screen(*this, "screen"),
+		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_msm(*this, "msm"),
 		m_spriteram(*this, "spriteram"),
-		m_gfxdecode(*this, "gfxdecode")
+		m_tileram(*this, "tileram%u", 0U)
 	{ }
 
-	void bloodbrom(machine_config &config);
-	void init_bloodbrom();
+	void bloodbrom(machine_config &config) ATTR_COLD;
+
+	void init_bloodbrom() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<palette_device> m_palette;
-	required_device<screen_device> m_screen;
-	required_shared_ptr<uint16_t> m_spriteram;
+	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<msm5205_device> m_msm;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr_array<uint16_t, 3> m_tileram; // 0 bg, 1 fg, 2 tx
 
+	tilemap_t *m_tilemap[3] {};
+	uint16_t m_scrollreg[2] {};
+
+	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_tile_info);
+	template <uint8_t Which> void tileram_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void bloodbrom_map(address_map &map) ATTR_COLD;
+	void main_program_map(address_map &map) ATTR_COLD;
+	void sound_program_map(address_map &map) ATTR_COLD;
 
-	void descramble_16x16tiles(uint8_t* src, int len);
+	void descramble_16x16tiles(uint8_t *src, int len) ATTR_COLD;
 };
-
-
-void bloodbro_ms_state::bloodbrom_map(address_map &map)
-{
-	map(0x000000, 0x07ffff).rom();
-
-
-	map(0x080000, 0x08ffff).ram(); // original vram is in here, but bootleg copies some of it elsewhere for use
-
-	map(0x0a0000, 0x0a0001).nopw();
-	map(0x0a0008, 0x0a0009).nopw();
-	map(0x0a000c, 0x0a000d).nopw();
-
-	map(0x0c0100, 0x0c0101).nopw();
-
-	map(0x0e000e, 0x0e000f).nopw();
-
-
-	map(0x100000, 0x1003ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x100400, 0x1007ff).ram().w(m_palette, FUNC(palette_device::write16_ext)).share("palette_ext");
-	map(0x100800, 0x100fff).ram();
-	map(0x101000, 0x1017ff).ram().share("spriteram");
-	map(0x101800, 0x101fff).ram();
-
-	map(0x102000, 0x102001).nopw();
-
-	map(0x18d000, 0x18dfff).ram();
-}
 
 
 void bloodbro_ms_state::machine_start()
 {
+	membank("sound_bank")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x8000, 0x4000);
+	membank("sound_bank")->set_entry(0);
+
+	save_item(NAME(m_scrollreg));
 }
 
 
-uint32_t bloodbro_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void bloodbro_ms_state::video_start()
 {
-	bitmap.fill(0, cliprect);
+	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bloodbro_ms_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 16);
+	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bloodbro_ms_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16, 16, 32, 16);
+	m_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(bloodbro_ms_state::get_tile_info<2>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	// TODO, convert to device, share between Modular System games
+	m_tilemap[1]->set_transparent_pen(0x0f);
+	m_tilemap[2]->set_transparent_pen(0x0f);
+}
+
+template <uint8_t Which>
+TILE_GET_INFO_MEMBER(bloodbro_ms_state::get_tile_info)
+{
+	int const tile = m_tileram[Which][tile_index];
+	tileinfo.set(Which, tile & 0xfff, tile >> 12, 0);
+}
+
+template <uint8_t Which>
+void bloodbro_ms_state::tileram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_tileram[Which][offset]);
+	m_tilemap[Which]->mark_tile_dirty(offset);
+}
+
+void bloodbro_ms_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
 	const int NUM_SPRITES = 0x200;
-	const int X_EXTRA_OFFSET = 256;
+	const int X_EXTRA_OFFSET = 240;
 
-	for (int i = NUM_SPRITES-2; i >= 0; i-=2)
+	for (int i = NUM_SPRITES - 2; i >= 0; i -= 2)
 	{
-		gfx_element *gfx = m_gfxdecode->gfx(0);
+		gfx_element *gfx = m_gfxdecode->gfx(3);
 
-		uint16_t attr0 = m_spriteram[i + 0];
-		uint16_t attr1 = m_spriteram[i + 1];
+		uint16_t const attr0 = m_spriteram[i + 0];
+		uint16_t const attr1 = m_spriteram[i + 1];
 
-		uint16_t attr2 = m_spriteram[i + NUM_SPRITES];
-		//uint16_t attr3 = m_spriteram[i + NUM_SPRITES + 1]; // unused?
+		uint16_t const attr2 = m_spriteram[i + NUM_SPRITES];
+		//uint16_t const attr3 = m_spriteram[i + NUM_SPRITES + 1]; // unused?
 
 		int ypos = attr0 & 0x00ff;
-		int xpos = (attr1 & 0xff00)>>8;
+		int xpos = (attr1 & 0xff00) >> 8;
 		xpos |= (attr2 & 0x8000) ? 0x100 : 0x000;
 
 		ypos = (0xff - ypos);
 
 		int tile = (attr0 & 0xff00) >> 8;
-		tile |= (attr1 & 0x003f) << 8;
+		tile |= (attr1 & 0x001f) << 8;
 
-		int flipx = (attr1 & 0x0040);
-		int flipy = (attr2 & 0x4000);
+		int const flipx = (attr1 & 0x0020);
+		int const flipy = (attr2 & 0x4000);
 
-		gfx->transpen(bitmap,cliprect,tile,(attr2&0x0f00)>>8,flipx,flipy,xpos-16-X_EXTRA_OFFSET,ypos-16,15);
+		// TODO: switch to prio_transpen
+		gfx->transpen(bitmap, cliprect, tile, (attr2 & 0x0f00) >> 8, flipx, flipy, xpos - 16 - X_EXTRA_OFFSET, ypos - 16, 15);
 	}
+}
+
+uint32_t bloodbro_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// TODO: is scrollx used?
+	m_tilemap[1]->set_scrolly(0, (int8_t)m_scrollreg[1] + 1);
+
+	bitmap.fill(0, cliprect);
+
+	m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
+
+	draw_sprites(bitmap, cliprect);
+
+	m_tilemap[2]->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
+
+
+void bloodbro_ms_state::main_program_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x080000, 0x08bfff).ram(); // original vram is in here, but bootleg copies some of it elsewhere for use
+	map(0x08c000, 0x08cfff).ram().w(FUNC(bloodbro_ms_state::tileram_w<0>)).share(m_tileram[0]);
+	map(0x08d000, 0x08d7ff).ram();
+	map(0x08d800, 0x08dfff).ram().w(FUNC(bloodbro_ms_state::tileram_w<2>)).share(m_tileram[2]);
+	map(0x08e000, 0x08ffff).ram();
+	map(0x0a0000, 0x0a000d).nopw(); // remnants of original code (Seibu sound system)?
+	map(0x0c0100, 0x0c0101).nopw(); // ??? written once
+	// map(0x0e000f, 0x0e000f).w("soundlatch", FUNC(generic_latch_8_device::write)); // half of the sound commands (wrt weststry)?
+	map(0x100000, 0x1003ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0x100400, 0x1007ff).ram().w("palette", FUNC(palette_device::write16_ext)).share("palette_ext");
+	map(0x100800, 0x100fff).ram();
+	map(0x101000, 0x1017ff).ram().share(m_spriteram);
+	map(0x101800, 0x101fff).ram();
+	// map(0x102001, 0x102001).w("soundlatch2", FUNC(generic_latch_8_device::write)); // the other half of the sound commands (wrt weststry)?
+	map(0x18d000, 0x18d7ff).w(FUNC(bloodbro_ms_state::tileram_w<1>)).share(m_tileram[1]);
+	map(0x18d800, 0x18d803).lw16(NAME([this] (offs_t offset, uint16_t data) { m_scrollreg[offset] = data; }));
+	map(0x0e0000, 0x0e0001).portr("DSW");
+	map(0x0e0002, 0x0e0003).portr("IN0");
+	map(0x0e0004, 0x0e0005).portr("IN1");
+}
+
+void bloodbro_ms_state::sound_program_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	// map(0x8000, 0x8000).w(FUNC(bloodbro_ms_state::adpcm_w)); // almost surely ADPCM
+	map(0x8000, 0xbfff).bankr("sound_bank");
+	map(0xc000, 0xc7ff).ram();
+	map(0xd000, 0xd7ff).ram();
+	map(0xdff0, 0xdff5).noprw(); // ???
+	// returning machine().rand() to both below addresses causes sounds to be played
+	// map(0xdffe, 0xdffe).r("soundlatch", FUNC(generic_latch_8_device::read)); // or is read pending_r? write is acknowledge?
+	// map(0xdfff, 0xdfff).r("soundlatch2", FUNC(generic_latch_8_device::read));
+	map(0xe000, 0xe001).w("ym1", FUNC(ym2203_device::write));
+	map(0xe002, 0xe003).w("ym2", FUNC(ym2203_device::write));
+	map(0xe008, 0xe009).r("ym1", FUNC(ym2203_device::read));
+	map(0xe00a, 0xe00b).r("ym2", FUNC(ym2203_device::read));
+}
+
+
+static INPUT_PORTS_START( bloodbrom )
+	PORT_START("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x00e0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x0001, 0x0001, "Coin Mode" ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(      0x0001, "Mode 1" )
+	PORT_DIPSETTING(      0x0000, "Mode 2" )
+	// Coin Mode 1
+	PORT_DIPNAME( 0x001e, 0x001e, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:2,3,4,5") PORT_CONDITION("DSW", 0x0001, EQUALS, 0x0001)
+	PORT_DIPSETTING(      0x0014, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(      0x0016, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(      0x0018, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x001a, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( 8C_3C ) )
+	PORT_DIPSETTING(      0x001c, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( 5C_3C ) )
+	PORT_DIPSETTING(      0x0006, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(      0x001e, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(      0x0012, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x000e, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0x000a, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
+	// Coin Mode 2
+	PORT_DIPNAME( 0x0006, 0x0006, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:2,3") PORT_CONDITION("DSW", 0x0001, EQUALS, 0x0000)
+	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0006, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0x0018, 0x0018, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:4,5") PORT_CONDITION("DSW", 0x0001, EQUALS, 0x0000)
+	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )
+	PORT_DIPNAME( 0x0020, 0x0020, "Starting Coin" ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(      0x0020, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0000, "x2" )
+
+	PORT_DIPUNKNOWN_DIPLOC( 0x0040, IP_ACTIVE_LOW, "SW1:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x0080, IP_ACTIVE_LOW, "SW1:8" )
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(      0x0000, "1" )
+	PORT_DIPSETTING(      0x0200, "2" )
+	PORT_DIPSETTING(      0x0300, "3" )
+	PORT_DIPSETTING(      0x0100, "5" )
+	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(      0x0c00, "300K 500K+" )
+	PORT_DIPSETTING(      0x0800, "500K+" )
+	PORT_DIPSETTING(      0x0400, "500K" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( None ) )
+	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(      0x2000, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x3000, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Hard ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
+INPUT_PORTS_END
 
 
 static const gfx_layout tiles16x16x4_layout =
@@ -161,35 +325,33 @@ static const gfx_layout tiles8x8x4_layout =
 };
 
 static GFXDECODE_START( gfx_bloodbro_ms )
-	GFXDECODE_ENTRY( "sprites", 0, tiles16x16x4_layout, 0x100, 32 )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16x4_layout, 0x000, 32 )
-	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16x4_layout, 0x000, 32 )
-	GFXDECODE_ENTRY( "gfx3", 0, tiles8x8x4_layout, 0x000, 32 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16x4_layout, 0x300, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16x4_layout, 0x200, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, tiles8x8x4_layout, 0x000, 16 )
+	GFXDECODE_ENTRY( "sprites", 0, tiles16x16x4_layout, 0x100, 16 )
 GFXDECODE_END
 
-
-static INPUT_PORTS_START( bloodbrom )
-INPUT_PORTS_END
 
 void bloodbro_ms_state::bloodbrom(machine_config &config)
 {
 	// basic machine hardware
 	M68000(config, m_maincpu, 22.1184_MHz_XTAL / 2); // divisor unknown
-	m_maincpu->set_addrmap(AS_PROGRAM, &bloodbro_ms_state::bloodbrom_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &bloodbro_ms_state::main_program_map);
 	m_maincpu->set_vblank_int("screen", FUNC(bloodbro_ms_state::irq4_line_hold));
 
-	Z80(config, "audiocpu", 24_MHz_XTAL / 8).set_disable(); // divisor unknown, no XTAL on the PCB, might also use the 20 MHz one
+	Z80(config, m_audiocpu, 24_MHz_XTAL / 8); // divisor unknown, no XTAL on the PCB, might also use the 20 MHz one
+	m_audiocpu->set_addrmap(AS_PROGRAM, &bloodbro_ms_state::sound_program_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER); // all wrong
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
-	m_screen->set_size(256, 256);
-	m_screen->set_visarea(0, 256-1, 0, 256-32-1);
-	m_screen->set_screen_update(FUNC(bloodbro_ms_state::screen_update));
-	m_screen->set_palette("palette");
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	screen.set_size(256, 256);
+	screen.set_visarea(0, 256-1, 16, 240-1);
+	screen.set_screen_update(FUNC(bloodbro_ms_state::screen_update));
+	screen.set_palette("palette");
 
-	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 0x400);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 0x400);
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_bloodbro_ms);
 
@@ -197,33 +359,14 @@ void bloodbro_ms_state::bloodbrom(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
+	GENERIC_LATCH_8(config, "soundlatch2").set_separate_acknowledge(true);
 
-	YM2203(config, "ym1", 24_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.15); // divisor unknown, no XTAL on the PCB, might also use the 20 MHz one
+	YM2203(config, "ym1", 24_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.75); // divisor unknown, no XTAL on the PCB, might also use the 20 MHz one
 
-	YM2203(config, "ym2", 24_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.15); // divisor unknown, no XTAL on the PCB, might also use the 20 MHz one
+	YM2203(config, "ym2", 24_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.75); // divisor unknown, no XTAL on the PCB, might also use the 20 MHz one
 
-	MSM5205(config, "msm", 24_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.15); // divisor unknown, no XTAL on the PCB, might also use the 20 MHz one
-}
-
-// reorganize graphics into something we can decode with a single pass
-void bloodbro_ms_state::descramble_16x16tiles(uint8_t* src, int len)
-{
-	std::vector<uint8_t> buffer(len);
-	{
-		for (int i = 0; i < len; i++)
-		{
-			int j = bitswap<20>(i, 19,18,17,16,15,12,11,10,9,8,7,6,5,14,13,4,3,2,1,0);
-			buffer[j] = src[i];
-		}
-
-		std::copy(buffer.begin(), buffer.end(), &src[0]);
-	}
-}
-
-void bloodbro_ms_state::init_bloodbrom()
-{
-	descramble_16x16tiles(memregion("gfx1")->base(), memregion("gfx1")->bytes());
-	descramble_16x16tiles(memregion("gfx2")->base(), memregion("gfx2")->bytes());
+	MSM5205(config, m_msm, 24_MHz_XTAL / 8); // divisor unknown, no XTAL on the PCB, might also use the 20 MHz one
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.75);
 }
 
 
@@ -296,7 +439,29 @@ ROM_START( bloodbrom )
 	ROM_LOAD( "51-1-b_5246_gal16v8-20hb1.ic8", 0x000, 0x117, NO_DUMP ) // Protected
 ROM_END
 
+
+// reorganize graphics into something we can decode with a single pass
+void bloodbro_ms_state::descramble_16x16tiles(uint8_t *src, int len)
+{
+	std::vector<uint8_t> buffer(len);
+	{
+		for (int i = 0; i < len; i++)
+		{
+			int j = bitswap<20>(i, 19, 18, 17, 16, 15, 12, 11, 10, 9, 8, 7, 6, 5, 14, 13, 4, 3, 2, 1, 0);
+			buffer[j] = src[i];
+		}
+
+		std::copy(buffer.begin(), buffer.end(), &src[0]);
+	}
+}
+
+void bloodbro_ms_state::init_bloodbrom()
+{
+	descramble_16x16tiles(memregion("gfx1")->base(), memregion("gfx1")->bytes());
+	descramble_16x16tiles(memregion("gfx2")->base(), memregion("gfx2")->bytes());
+}
+
 } // anonymous namespace
 
 
-GAME( 199?, bloodbrom,  bloodbro,  bloodbrom,  bloodbrom,  bloodbro_ms_state, init_bloodbrom, ROT0, "bootleg (Gaelco / Ervisa)", "Blood Bros. (Modular System)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 199?, bloodbrom,  bloodbro,  bloodbrom,  bloodbrom,  bloodbro_ms_state, init_bloodbrom, ROT0, "bootleg (Gaelco / Ervisa)", "Blood Bros. (Modular System)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

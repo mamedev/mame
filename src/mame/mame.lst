@@ -16548,6 +16548,7 @@ minimonyb
 miniguay
 
 @source:cirsa/missbamby.cpp
+3mini
 basket
 goldfrts
 gwinner
@@ -17667,6 +17668,7 @@ mjmyorn2
 mjmyornt
 mjmyorntr
 mjmyster
+mjmysterr
 mjmyuniv
 mjmyunivh
 mjmywrld
@@ -18622,6 +18624,7 @@ watrball
 
 @source:gaelco/gaelco.cpp
 bigkarnk
+bigkarnka
 biomtoy
 biomtoya
 biomtoyb
@@ -18631,6 +18634,8 @@ maniacsp
 lastkm
 lastkma
 squash
+squasha
+squashb
 thoop
 
 @source:gaelco/gaelco2.cpp
@@ -18661,6 +18666,7 @@ sltpcyclb
 sltpcyclc
 sltpcycld
 sltpcycle
+sltpcyclf
 sltpstep
 sltpstepa
 sltpstepb
@@ -18781,6 +18787,10 @@ targeth10
 @source:gaelco/thoop2.cpp
 thoop2
 thoop2a
+thoop2b
+thoop2c
+thoop2d
+thoop2e
 
 @source:gaelco/wrally.cpp
 wrally
@@ -27672,7 +27682,6 @@ rivierab
 rivierac
 rivierad
 rivierae
-rivieraf
 tictac
 tictaca
 tictacuk
@@ -32034,6 +32043,9 @@ fastdrwp
 gtipoker
 gtipokra
 gtipokrb
+gtipokrba
+gtipokrc
+gtipokrd
 hilokimb
 kimbldhl
 kimblz80
@@ -32043,6 +32055,8 @@ krampcb4
 krampcb5
 krampcb6
 krampcb7
+krampcb8
+krampcb9
 mainline
 ndxron10
 newhilop
@@ -32070,11 +32084,20 @@ pokplus
 pokplusa
 pokplusb
 smshilo
+smshiloa
 ssjkrpkr
 sureshoto
+topdraw
+topdrawa
+topdrawb
+topdrawba
+tpoker1
+tpoker1a
 tpoker2
 tpoker2a
 tpoker2b
+tpoker2c
+tpoker2d
 winbnk88
 
 @source:misc/notechan.cpp
@@ -43630,6 +43653,9 @@ smiconk
 joyfulr
 mnchmobl
 
+@source:snk/neocrnvl.cpp
+neocrnvl
+
 @source:snk/ngp.cpp
 ngp
 ngpc
@@ -46498,8 +46524,11 @@ conyteni
 easports
 jak_bobb
 jak_capb
+jak_diso
+jak_sbdd
 jak_spdmo
 jak_spdmoa
+jak_wpt
 sstarkar
 
 @source:tvgames/spg29x.cpp
@@ -46589,13 +46618,25 @@ icanpian
 
 @source:tvgames/spg2xx_jakks.cpp
 jak_batm
+jak_cind
+jak_dpma
+jak_hsm
+jak_marv
 jak_mk
+jak_mpaco
+jak_mpacq
 jak_mpacw
+jak_pacg
 jak_pix
 jak_potc
 jak_powr
+jak_rapm
 jak_sbjd
+jak_shrk
+jak_slpb
+jak_spac
 jak_spd3
+jak_spdv
 jak_supm
 jak_wall
 

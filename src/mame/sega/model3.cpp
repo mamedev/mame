@@ -1451,9 +1451,7 @@ void model3_state::lostwsga_ser1_w(uint8_t data)
 
 				// off-screen detect
 				case 8:
-					m_serial_fifo2 = 0;
-					if(ioport("OFFSCREEN")->read() & 0x01)
-						m_serial_fifo2 |= 0x01;
+					m_serial_fifo2 = ioport("OFFSCREEN")->read() & 0x03;
 					break;
 			}
 			break;
@@ -1760,8 +1758,33 @@ static INPUT_PORTS_START( model3 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(2) PORT_8WAY
 
+	// TODO: map per-game, add diplocations
 	PORT_START("DSW")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	// vs215o: enables debug stats if ON
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("AN0")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1820,7 +1843,8 @@ static INPUT_PORTS_START( lostwsga )
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("IN3")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("LIGHT0_X")  // lightgun X-axis
 	PORT_BIT( 0x3ff, 0x200, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0x00,0x3ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
@@ -1836,6 +1860,7 @@ static INPUT_PORTS_START( lostwsga )
 
 	PORT_START("OFFSCREEN") // fake button to shoot offscreen
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( scud )
@@ -2050,6 +2075,10 @@ ROM_START( lemans24 )   /* step 1.5, Sega game ID# is 833-13159, ROM board ID# 8
 	ROM_LOAD64_WORD_SWAP( "mpr-19866.10", 0x2800004, 0x400000, CRC(ede5fc78) SHA1(ff170fad7aaf1a6ba86d50022ad7586d0e785668) )
 	ROM_LOAD64_WORD_SWAP( "mpr-19867.11", 0x2800002, 0x400000, CRC(ae610fc5) SHA1(b03c85cb661a67becf59b6bb29e52de736470add) )
 	ROM_LOAD64_WORD_SWAP( "mpr-19868.12", 0x2800000, 0x400000, CRC(3c43d64f) SHA1(00e1bd91496a6b3f73343ef4ad24a0dd3cb6bcf5) )
+
+	ROM_COPY("user1", 0x0800000, 0x4800000, 0x1000000)
+	ROM_COPY("user1", 0x1800000, 0x5800000, 0x1000000)
+	ROM_COPY("user1", 0x2800000, 0x6800000, 0x1000000)
 
 	ROM_REGION( 0x1000000, "user3", 0 )  /* Video ROMs Part 1 */
 	ROM_LOAD_VROM( "mpr-19871.26", 0x000002, 0x200000, CRC(5168e02b) SHA1(3572c748c8f1b70b194fcf27919d3e671c7a09a5) )
@@ -3104,6 +3133,11 @@ ROM_START( lostwsga )   /* Step 1.5, PCB cage labeled 834-13172 THE LOST WORLD U
 	// mirror CROM0 to CROM
 	ROM_COPY("user1", 0x800000, 0x000000, 0x600000)
 
+	ROM_COPY("user1", 0x0800000, 0x4800000, 0x1000000)
+	ROM_COPY("user1", 0x1800000, 0x5800000, 0x1000000)
+	ROM_COPY("user1", 0x2800000, 0x6800000, 0x1000000)
+	ROM_COPY("user1", 0x3800000, 0x7800000, 0x1000000)
+
 	ROM_REGION( 0x1000000, "user3", 0 )  /* Video ROMs Part 1 */
 	ROM_LOAD_VROM( "mpr-19902.26", 0x0000002, 0x200000, CRC(178bd471) SHA1(dc2cb409081e4fd1176470869e025320449a8d02) )
 	ROM_LOAD_VROM( "mpr-19903.27", 0x0000000, 0x200000, CRC(fe575871) SHA1(db7aec4997b0c9d9a77a611139d53bcfba4bf258) )
@@ -3172,6 +3206,11 @@ ROM_START( lostwsgp )   /* Step 1.5, build 1997/06/24, location test or preview 
 
 	// mirror CROM0 to CROM
 	ROM_COPY("user1", 0x800000, 0x000000, 0x600000)
+
+	ROM_COPY("user1", 0x0800000, 0x4800000, 0x1000000)
+	ROM_COPY("user1", 0x1800000, 0x5800000, 0x1000000)
+	ROM_COPY("user1", 0x2800000, 0x6800000, 0x1000000)
+	ROM_COPY("user1", 0x3800000, 0x7800000, 0x1000000)
 
 	ROM_REGION( 0x1000000, "user3", 0 )  /* Video ROMs Part 1 */
 	ROM_LOAD_VROM( "mpr-19902.26", 0x0000002, 0x200000, CRC(178bd471) SHA1(dc2cb409081e4fd1176470869e025320449a8d02) )
@@ -6929,10 +6968,10 @@ void model3_state::init_skichamp()
 
 void model3_state::init_oceanhun()
 {
-	uint32_t *rom = (uint32_t*)memregion("user1")->base();
+	//uint32_t *rom = (uint32_t*)memregion("user1")->base();
 	init_model3_20();
 
-	rom[(0x57995c^4)/4] = 0x60000000;   // decrementer
+	//rom[(0x57995c^4)/4] = 0x60000000;   // decrementer
 }
 
 void model3_state::init_magtruck()
