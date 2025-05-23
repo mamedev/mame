@@ -189,10 +189,10 @@ void wrally_ms_state::descramble_16x16tiles(uint8_t* src, int len)
 
 void wrally_ms_state::init_wrally_ms()
 {
-	descramble_16x16tiles(memregion("gfx2")->base(), memregion("gfx1")->bytes());
-	descramble_16x16tiles(memregion("gfx3")->base(), memregion("gfx2")->bytes());
-	descramble_16x16tiles(memregion("gfx4")->base(), memregion("gfx2")->bytes());
-	descramble_16x16tiles(memregion("gfx5")->base(), memregion("gfx2")->bytes());
+	descramble_16x16tiles(memregion("gfx2")->base(), memregion("gfx2")->bytes());
+	descramble_16x16tiles(memregion("gfx3")->base(), memregion("gfx3")->bytes());
+	descramble_16x16tiles(memregion("gfx4")->base(), memregion("gfx4")->bytes());
+	descramble_16x16tiles(memregion("gfx5")->base(), memregion("gfx5")->bytes());
 }
 
 void wrally_ms_state::wrally_ms(machine_config &config)
@@ -229,8 +229,8 @@ void wrally_ms_state::wrally_ms(machine_config &config)
 ROM_START( wrallymp )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	// These were a row of 8 ROMs next to the M68000, they appear to form the start of the code, but the initial boot vector is wrong
-	ROM_LOAD16_BYTE( "mod_6-esp-2_z0_e_25-11_27c1001.u8",  0x000000, 0x020000, CRC(a0d200eb) SHA1(fbca9b84d8b010aa0bfb546ddf366ec9812f0bb5) )
-	ROM_LOAD16_BYTE( "mod_6-esp-2_z0_o_25-11_27c1001.u7",  0x000001, 0x020000, CRC(4113a030) SHA1(e6cac2b0e97ec7f15610aa72198a575631b937f6) )
+	ROM_LOAD16_BYTE( "mod_6-esp-2_z0_e_25-11_27c1001.u8", 0x000000, 0x020000, CRC(a0d200eb) SHA1(fbca9b84d8b010aa0bfb546ddf366ec9812f0bb5) )
+	ROM_LOAD16_BYTE( "mod_6-esp-2_z0_o_25-11_27c1001.u7", 0x000001, 0x020000, CRC(4113a030) SHA1(e6cac2b0e97ec7f15610aa72198a575631b937f6) )
 
 	// FIXED BITS (0xxxxxxx) on z1_e - but intentional? 15-bit data tables?
 	ROM_LOAD16_BYTE( "mod_6-esp-2_z1_e_25-11_27c1001.u36", 0x040000, 0x020000, CRC(4346b650) SHA1(a0feca5d9d93af2548b59c11032384703d432a30) )
@@ -245,8 +245,8 @@ ROM_START( wrallymp )
 
 	// Does this act as an overlay? It's basically the same as the above, but with a valid boot vector and some other changes.
 	// Was found on the PCB just above the 8 loaded previously
-	ROM_LOAD16_BYTE( "mod_6-esp-2_pds_0_coche_27c512.u6",  0x000000, 0x010000, CRC(362c8f1e) SHA1(013499bf78fc9806f988354ca17e99e9cc2f7f71) )
-	ROM_LOAD16_BYTE( "mod_6-esp-2_pds_1_coche_27c512.u5",  0x000001, 0x010000, CRC(f87e0e9b) SHA1(55eec7612baede958e0abffe426945d85726ffdc) )
+	ROM_LOAD16_BYTE( "mod_6-esp-2_pds_0_coche_27c512.u6", 0x000000, 0x010000, CRC(362c8f1e) SHA1(013499bf78fc9806f988354ca17e99e9cc2f7f71) )
+	ROM_LOAD16_BYTE( "mod_6-esp-2_pds_1_coche_27c512.u5", 0x000001, 0x010000, CRC(f87e0e9b) SHA1(55eec7612baede958e0abffe426945d85726ffdc) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 ) // 8x8
 	// all ROMs 11xxxxxxxxxxxxxx = 0x00 (last 3/4 0x00)
@@ -256,41 +256,41 @@ ROM_START( wrallymp )
 	ROM_LOAD32_BYTE( "mod_8-2_fijas_d_23-11_27c512.ic37", 0x000000, 0x10000, CRC(96644b11) SHA1(4f6a972610ad043d13df6157975739be141ff1e7) )
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD32_BYTE( "mod_8-2_la-i_27c010.ic13",  0x000003, 0x20000, CRC(c1b2f2e6) SHA1(4555f0024289d395484c172cff58544b73e92ddb) )
-	ROM_LOAD32_BYTE( "mod_8-2_lb-j_27c010.ic20",  0x000002, 0x20000, CRC(f0dbd657) SHA1(2fb269d3e90d1211f1c4ecf4ef4c785fed0f1111) )
-	ROM_LOAD32_BYTE( "mod_8-2_lc_k_27c010.ic28",  0x000001, 0x20000, CRC(f09f8067) SHA1(bbfe21cefce2307f87a3416af1767fa4b30da446) )
-	ROM_LOAD32_BYTE( "mod_8-2_ld-l_27c010.ic35",  0x000000, 0x20000, CRC(4feb7aab) SHA1(86f222cb95bd7366ec921b2da438847c3679ab46) )
+	ROM_LOAD32_BYTE( "mod_8-2_la-i_27c010.ic13", 0x000003, 0x20000, CRC(c1b2f2e6) SHA1(4555f0024289d395484c172cff58544b73e92ddb) )
+	ROM_LOAD32_BYTE( "mod_8-2_lb-j_27c010.ic20", 0x000002, 0x20000, CRC(f0dbd657) SHA1(2fb269d3e90d1211f1c4ecf4ef4c785fed0f1111) )
+	ROM_LOAD32_BYTE( "mod_8-2_lc_k_27c010.ic28", 0x000001, 0x20000, CRC(f09f8067) SHA1(bbfe21cefce2307f87a3416af1767fa4b30da446) )
+	ROM_LOAD32_BYTE( "mod_8-2_ld-l_27c010.ic35", 0x000000, 0x20000, CRC(4feb7aab) SHA1(86f222cb95bd7366ec921b2da438847c3679ab46) )
 
 	ROM_REGION( 0x80000, "gfx3", 0 )
 	// All ROMs 1xxxxxxxxxxxxxxxx = 0xFF (2nd half 0xff)
-	ROM_LOAD32_BYTE( "mod_8-2_fon_he_27c1001.ic12",  0x000003, 0x20000, CRC(0279bb03) SHA1(fde2613164651c738469bbfe1a5918c89c0f3cb2) )
-	ROM_LOAD32_BYTE( "mod_8-2_fon_hf_27c1001.ic19",  0x000002, 0x20000, CRC(221c3249) SHA1(2a8f3d93dddc38ed38ee330687fc970507316b02) )
-	ROM_LOAD32_BYTE( "mod_8-2_fon_hg_27c1001.ic27",  0x000001, 0x20000, CRC(f186dcca) SHA1(6dbf2438862592bb0e8647b6aaca4747ad8e2755) )
-	ROM_LOAD32_BYTE( "mod_8-2_fon_hh_27c1001.ic34",  0x000000, 0x20000, CRC(2e73266c) SHA1(1a7a668483e30bf664aa037f86d4a73033dab83b) )
+	ROM_LOAD32_BYTE( "mod_8-2_fon_he_27c1001.ic12", 0x000003, 0x20000, CRC(0279bb03) SHA1(fde2613164651c738469bbfe1a5918c89c0f3cb2) )
+	ROM_LOAD32_BYTE( "mod_8-2_fon_hf_27c1001.ic19", 0x000002, 0x20000, CRC(221c3249) SHA1(2a8f3d93dddc38ed38ee330687fc970507316b02) )
+	ROM_LOAD32_BYTE( "mod_8-2_fon_hg_27c1001.ic27", 0x000001, 0x20000, CRC(f186dcca) SHA1(6dbf2438862592bb0e8647b6aaca4747ad8e2755) )
+	ROM_LOAD32_BYTE( "mod_8-2_fon_hh_27c1001.ic34", 0x000000, 0x20000, CRC(2e73266c) SHA1(1a7a668483e30bf664aa037f86d4a73033dab83b) )
 
 	ROM_REGION( 0x80000, "gfx4", 0 )
 	// All ROMs 1xxxxxxxxxxxxxxxx = 0x00 (2nd half 0x00)
-	ROM_LOAD32_BYTE( "mod_8-2_ned_la_27c1001.ic11",  0x000003, 0x20000, CRC(6b8b4d0d) SHA1(165a6e54004fd2249a8a26554a45a6940ca3873f) )
-	ROM_LOAD32_BYTE( "mod_8-2_ned_lb_27c1001.ic18",  0x000002, 0x20000, CRC(f00783aa) SHA1(3f2025dba2dfa863b754aaaadf0e0de4a2546c0c) )
-	ROM_LOAD32_BYTE( "mod_8-2_ned_lc_27c1001.ic26",  0x000001, 0x20000, CRC(f346ad2c) SHA1(2e335dab1d6a7cc7087e7be17013e1bd63f22f51) )
-	ROM_LOAD32_BYTE( "mod_8-2_ned_ld_27c1001.ic33",  0x000000, 0x20000, CRC(79e991af) SHA1(45163d8692926512e47ddfea8c32848a74910e9d) )
+	ROM_LOAD32_BYTE( "mod_8-2_ned_la_27c1001.ic11", 0x000003, 0x20000, CRC(6b8b4d0d) SHA1(165a6e54004fd2249a8a26554a45a6940ca3873f) )
+	ROM_LOAD32_BYTE( "mod_8-2_ned_lb_27c1001.ic18", 0x000002, 0x20000, CRC(f00783aa) SHA1(3f2025dba2dfa863b754aaaadf0e0de4a2546c0c) )
+	ROM_LOAD32_BYTE( "mod_8-2_ned_lc_27c1001.ic26", 0x000001, 0x20000, CRC(f346ad2c) SHA1(2e335dab1d6a7cc7087e7be17013e1bd63f22f51) )
+	ROM_LOAD32_BYTE( "mod_8-2_ned_ld_27c1001.ic33", 0x000000, 0x20000, CRC(79e991af) SHA1(45163d8692926512e47ddfea8c32848a74910e9d) )
 
 	ROM_REGION( 0x80000, "gfx5", 0 )
 	// All ROMs 1xxxxxxxxxxxxxxxx = 0x00 (2nd half 0x00)
-	ROM_LOAD32_BYTE( "mod_8-2_hed_he_27c1001.ic9",   0x000003, 0x20000, CRC(9f90fa11) SHA1(f5ebebb8e9cab802193ebd61449ca922ed9db380) )
-	ROM_LOAD32_BYTE( "mod_8-2_ned_hf_27c1001.ic17",  0x000002, 0x20000, CRC(b3ae8c46) SHA1(f37bbd8ac5a3e0b3a3419ef9cf7bea5fe9600c77) )
-	ROM_LOAD32_BYTE( "mod_8-2_ned_hg_27c1001.ic25",  0x000001, 0x20000, CRC(d362172d) SHA1(f9b1e26a8b4b55e48e5b94ba9270e2e3bf82fec2) )
-	ROM_LOAD32_BYTE( "mod_8-2_ned_hh_27c1001.ic32",  0x000000, 0x20000, CRC(4a3e115c) SHA1(130094a6a4bb62f61a42e9e9cef12ae7215724f7) )
+	ROM_LOAD32_BYTE( "mod_8-2_hed_he_27c1001.ic9",  0x000003, 0x20000, CRC(9f90fa11) SHA1(f5ebebb8e9cab802193ebd61449ca922ed9db380) )
+	ROM_LOAD32_BYTE( "mod_8-2_ned_hf_27c1001.ic17", 0x000002, 0x20000, CRC(b3ae8c46) SHA1(f37bbd8ac5a3e0b3a3419ef9cf7bea5fe9600c77) )
+	ROM_LOAD32_BYTE( "mod_8-2_ned_hg_27c1001.ic25", 0x000001, 0x20000, CRC(d362172d) SHA1(f9b1e26a8b4b55e48e5b94ba9270e2e3bf82fec2) )
+	ROM_LOAD32_BYTE( "mod_8-2_ned_hh_27c1001.ic32", 0x000000, 0x20000, CRC(4a3e115c) SHA1(130094a6a4bb62f61a42e9e9cef12ae7215724f7) )
 
 	ROM_REGION( 0x80000, "sprites", ROMREGION_ERASEFF | ROMREGION_INVERT )
-	ROM_LOAD32_BYTE( "mod_5-1_mov_la_23-11_27c512.ic3",   0x000003, 0x010000, CRC(8a5f3713) SHA1(73a8ccebfe55daf17ab91cc57cdca866477ba09f) )
-	ROM_LOAD32_BYTE( "mod_5-1_mov_lb_23-11_27c512.ic12",  0x000002, 0x010000, CRC(a410e537) SHA1(f15a8f9f3951a428decd7ebf64881e8dcd959060) )
-	ROM_LOAD32_BYTE( "mod_5-1_mov_lc_23-11_27c512.ic18",  0x000001, 0x010000, CRC(94551ca4) SHA1(bc72f092be9646b89f2c7d304a7e8b87d91b9f31) )
-	ROM_LOAD32_BYTE( "mod_5-1_mov_ld_23-11_27c512.ic24",  0x000000, 0x010000, CRC(7db6e321) SHA1(19a81c122c48926f377a844f3eb2d17613e8be03) )
-	ROM_LOAD32_BYTE( "mod_5-1_mov_ha_23-11_27c512.ic4",   0x040003, 0x010000, CRC(db0e9342) SHA1(c80fdf1653cb9218d8db25daf14983d8b73f5225) )
-	ROM_LOAD32_BYTE( "mod_5-1_mov_hb_23-11_27c512.ic13",  0x040002, 0x010000, CRC(8df327ec) SHA1(f66014dd593464230cff94440abb4c63051121e1) )
-	ROM_LOAD32_BYTE( "mod_5-1_mov_hc_23-11_27c512.ic19",  0x040001, 0x010000, CRC(32733ee6) SHA1(abcc60b4cb6a672f5e68c16fa634da839d4dc38a) )
-	ROM_LOAD32_BYTE( "mod_5-1_mov_hd_23-11_27c512.ic25",  0x040000, 0x010000, CRC(fc7ddb14) SHA1(80b00269498d704775fd85518fc451f00acadc0a) )
+	ROM_LOAD32_BYTE( "mod_5-1_mov_la_23-11_27c512.ic3",  0x000003, 0x010000, CRC(8a5f3713) SHA1(73a8ccebfe55daf17ab91cc57cdca866477ba09f) )
+	ROM_LOAD32_BYTE( "mod_5-1_mov_lb_23-11_27c512.ic12", 0x000002, 0x010000, CRC(a410e537) SHA1(f15a8f9f3951a428decd7ebf64881e8dcd959060) )
+	ROM_LOAD32_BYTE( "mod_5-1_mov_lc_23-11_27c512.ic18", 0x000001, 0x010000, CRC(94551ca4) SHA1(bc72f092be9646b89f2c7d304a7e8b87d91b9f31) )
+	ROM_LOAD32_BYTE( "mod_5-1_mov_ld_23-11_27c512.ic24", 0x000000, 0x010000, CRC(7db6e321) SHA1(19a81c122c48926f377a844f3eb2d17613e8be03) )
+	ROM_LOAD32_BYTE( "mod_5-1_mov_ha_23-11_27c512.ic4",  0x040003, 0x010000, CRC(db0e9342) SHA1(c80fdf1653cb9218d8db25daf14983d8b73f5225) )
+	ROM_LOAD32_BYTE( "mod_5-1_mov_hb_23-11_27c512.ic13", 0x040002, 0x010000, CRC(8df327ec) SHA1(f66014dd593464230cff94440abb4c63051121e1) )
+	ROM_LOAD32_BYTE( "mod_5-1_mov_hc_23-11_27c512.ic19", 0x040001, 0x010000, CRC(32733ee6) SHA1(abcc60b4cb6a672f5e68c16fa634da839d4dc38a) )
+	ROM_LOAD32_BYTE( "mod_5-1_mov_hd_23-11_27c512.ic25", 0x040000, 0x010000, CRC(fc7ddb14) SHA1(80b00269498d704775fd85518fc451f00acadc0a) )
 
 	ROM_REGION( 0x010000, "soundcpu", 0 )
 	ROM_LOAD( "mod_9-2_sp_906_27c512.u6", 0x000000, 0x010000, CRC(5567fa22) SHA1(3993c733a0222ca292b60f409c78b45280a5fec6) ) // same as Splash (Modular System)
