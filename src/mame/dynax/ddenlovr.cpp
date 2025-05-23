@@ -115,6 +115,9 @@ TODO:
 
 - mjmysterr: background while playing seems of wrong color
 
+- jongoh: a lightning effect during transitions in attract mode doesn't seem to be rendered correctly
+  (hw reference: https://www.youtube.com/watch?v=ytJiqOvHKgM)
+
 Notes:
 
 - all games using black as default palette is trusted from a real rongrong PCB;
@@ -134,14 +137,24 @@ Notes:
 #include "cpu/z80/kl5c80a12.h"
 #include "cpu/z80/tmpz84c015.h"
 #include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
-#include "sound/ymopl.h"
 #include "machine/74259.h"
 #include "machine/gen_latch.h"
 #include "machine/msm6242.h"
 #include "machine/nvram.h"
+#include "sound/ay8910.h"
+#include "sound/ymopl.h"
 
 #include "speaker.h"
+
+
+// configurable logging
+#define LOG_BLIT     (1U << 1)
+
+//#define VERBOSE (LOG_GENERAL | LOG_BLIT)
+
+#include "logmacro.h"
+
+#define LOGBLIT(...)     LOGMASKED(LOG_BLIT,     __VA_ARGS__)
 
 
 namespace {
@@ -204,6 +217,7 @@ public:
 	void dtoyoken(machine_config &config) ATTR_COLD;
 	void hgokou(machine_config &config) ATTR_COLD;
 	void seljan2(machine_config &config) ATTR_COLD;
+	void jongoh(machine_config &config) ATTR_COLD;
 	void janshinp(machine_config &config) ATTR_COLD;
 	void ultrchmp(machine_config &config) ATTR_COLD;
 	void rongrong(machine_config &config) ATTR_COLD;
@@ -298,8 +312,9 @@ private:
 	void rongrong_select_w(uint8_t data);
 protected:
 	uint8_t hanakanz_rand_r();
+	void protection_w(uint8_t data);
+	template <uint8_t Xor> uint8_t technotop_protection_r();
 private:
-	void mjschuka_protection_w(uint8_t data);
 	uint8_t mjschuka_protection_r();
 protected:
 	void mjmyster_rambank_w(uint8_t data);
@@ -395,6 +410,7 @@ private:
 	void hparadis_portmap(address_map &map) ATTR_COLD;
 	void janshinp_map(address_map &map) ATTR_COLD;
 	void janshinp_portmap(address_map &map) ATTR_COLD;
+	void jongoh_portmap(address_map &map) ATTR_COLD;
 	void mjflove_portmap(address_map &map) ATTR_COLD;
 	void mjmyorntr_portmap(address_map &map) ATTR_COLD;
 	void mjmyster_map(address_map &map) ATTR_COLD;
@@ -594,11 +610,10 @@ public:
 	void mjchuuka(machine_config &config) ATTR_COLD;
 	void mjreach1(machine_config &config) ATTR_COLD;
 	void daimyojn(machine_config &config) ATTR_COLD;
+	void momotaro(machine_config &config) ATTR_COLD;
 	void kotbinyo(machine_config &config) ATTR_COLD;
 	void daireach(machine_config &config) ATTR_COLD;
 	void hnrose(machine_config &config) ATTR_COLD;
-
-	void init_momotaro() ATTR_COLD;
 
 private:
 	DECLARE_MACHINE_START(hanakanz);
@@ -617,8 +632,6 @@ private:
 	void hanakanz_coincounter_w(uint8_t data);
 	void hanakanz_palette_w(uint8_t data);
 	//uint8_t hanakanz_rand_r();
-	void mjreach1_protection_w(uint8_t data);
-	uint8_t mjreach1_protection_r();
 	uint8_t mjchuuka_keyb_r(offs_t offset);
 	void mjchuuka_blitter_w(offs_t offset, uint8_t data);
 	uint8_t mjchuuka_gfxrom_0_r();
@@ -628,16 +641,9 @@ private:
 	void jongtei_dsw_keyb_w(uint8_t data);
 	uint8_t jongtei_busy_r();
 	uint8_t mjgnight_protection_r();
-	void mjgnight_protection_w(uint8_t data);
 	void mjgnight_coincounter_w(uint8_t data);
 	//uint8_t daimyojn_keyb1_r();
 	//uint8_t daimyojn_keyb2_r();
-	void daimyojn_protection_w(uint8_t data);
-	uint8_t daimyojn_protection_r();
-	uint8_t momotaro_protection_r();
-	uint8_t jongteia_protection_r();
-	uint8_t daireach_protection_r();
-	uint8_t hnrose_protection_r();
 	void daimyojn_palette_sel_w(uint8_t data);
 	void daimyojn_blitter_data_palette_w(uint8_t data);
 	uint8_t daimyojn_year_hack_r(offs_t offset);
@@ -661,6 +667,7 @@ private:
 	void mjchuuka_portmap(address_map &map) ATTR_COLD;
 	void mjgnight_portmap(address_map &map) ATTR_COLD;
 	void mjreach1_portmap(address_map &map) ATTR_COLD;
+	void momotaro_portmap(address_map &map) ATTR_COLD;
 
 	memory_share_creator<uint8_t> m_banked_nvram;
 	required_memory_bank m_bank1;
@@ -1177,16 +1184,13 @@ void ddenlovr_state::blit_vert_line()
 
 
 
-inline void ddenlovr_state::log_blit( int data )
+inline void ddenlovr_state::log_blit(int data)
 {
-#if 0
-
-	logerror("%s: blit src %06x x %03x y %03x flags %02x layer %02x pen %02x penmode %02x w %03x h %03x linelen %03x flip %02x clip: ctrl %x xy %03x %03x wh %03x %03x\n",
+	LOGBLIT("%s: blit src %06x x %03x y %03x flags %02x layer %02x pen %02x penmode %02x w %03x h %03x linelen %03x flip %02x clip: ctrl %x xy %03x %03x wh %03x %03x\n",
 			machine().describe_context(),
 			m_ddenlovr_blit_address, m_ddenlovr_blit_x, m_ddenlovr_blit_y, data,
 			m_ddenlovr_dest_layer, m_ddenlovr_blit_pen, m_ddenlovr_blit_pen_mode, m_ddenlovr_rect_width, m_ddenlovr_rect_height, m_ddenlovr_line_length, m_ddenlovr_blit_flip,
 			m_ddenlovr_clip_ctrl, m_ddenlovr_clip_x, m_ddenlovr_clip_y, m_ddenlovr_clip_width, m_ddenlovr_clip_height);
-#endif
 }
 
 void ddenlovr_state::blitter_w(int blitter, offs_t offset, uint8_t data)
@@ -1976,6 +1980,22 @@ void ddenlovr_state::quiz365_oki_bank2_w(int state)
 uint8_t ddenlovr_state::unk_r()
 {
 	return 0x78;
+}
+
+void ddenlovr_state::protection_w(uint8_t data)
+{
+	m_prot_val = data;
+}
+
+// Most Techno Top games have a slight protection.
+// They always have 5 bytes, they are 0xd4, 0xed, 0x76, 0xc9, 0xcb, in the program ROM.
+// They get written to a port and the game immediately expects them back from a read
+// port, XORed. The expected bytes are found in the program ROM immediately after the
+// 5 bytes above. Therefore, determining the expected XOR is trivial.
+template <uint8_t Xor>
+uint8_t ddenlovr_state::technotop_protection_r()
+{
+	return m_prot_val ^ Xor;
 }
 
 
@@ -2960,16 +2980,6 @@ void hanakanz_state::kotbinsp_portmap(address_map &map)
 }
 
 
-void hanakanz_state::mjreach1_protection_w(uint8_t data)
-{
-	m_prot_val = data;
-}
-
-uint8_t hanakanz_state::mjreach1_protection_r()
-{
-	return m_prot_val;
-}
-
 void hanakanz_state::mjreach1_portmap(address_map &map)
 {
 	map.global_mask(0xff);
@@ -2978,7 +2988,7 @@ void hanakanz_state::mjreach1_portmap(address_map &map)
 	map(0x83, 0x84).r(FUNC(hanakanz_state::hanakanz_gfxrom_r));
 	map(0x90, 0x90).w(FUNC(hanakanz_state::hanamai_keyboard_w));
 	map(0x92, 0x92).r(FUNC(hanakanz_state::hanakanz_rand_r));
-	map(0x93, 0x93).rw(FUNC(hanakanz_state::mjreach1_protection_r), FUNC(hanakanz_state::mjreach1_protection_w));
+	map(0x93, 0x93).rw(FUNC(hanakanz_state::technotop_protection_r<0x00>), FUNC(hanakanz_state::protection_w));
 	map(0x94, 0x94).portr("SYSTEM");
 	map(0x95, 0x96).r(FUNC(hanakanz_state::hanakanz_keyb_r));
 	map(0x97, 0x97).w(FUNC(hanakanz_state::hanakanz_coincounter_w));
@@ -3115,11 +3125,6 @@ void hanakanz_state::mjchuuka_portmap(address_map &map)
 // 255F: 13 34 7A 96 A8
 // 2564: 13 34 7A 96 13
 
-void ddenlovr_state::mjschuka_protection_w(uint8_t data)
-{
-	m_prot_val = data;
-}
-
 uint8_t ddenlovr_state::mjschuka_protection_r()
 {
 	switch (m_prot_val)
@@ -3148,7 +3153,7 @@ void ddenlovr_state::mjschuka_portmap(address_map &map)
 	map(0x43, 0x43).r(FUNC(ddenlovr_state::ddenlovr_gfxrom_r));
 	map(0x50, 0x50).w(FUNC(ddenlovr_state::mjflove_okibank_w));
 
-	map(0x54, 0x54).rw(FUNC(ddenlovr_state::mjschuka_protection_r), FUNC(ddenlovr_state::mjschuka_protection_w));
+	map(0x54, 0x54).rw(FUNC(ddenlovr_state::mjschuka_protection_r), FUNC(ddenlovr_state::protection_w));
 	// 58 writes ? (0/1)
 	map(0x5c, 0x5c).r(FUNC(ddenlovr_state::hanakanz_rand_r));
 
@@ -4016,7 +4021,7 @@ void hanakanz_state::jongteia_portmap(address_map &map)
 	map(0x7e, 0x7e).w(FUNC(hanakanz_state::hanakanz_coincounter_w));
 	map(0x80, 0x8f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 	map(0xa0, 0xa0).r(FUNC(hanakanz_state::hanakanz_rand_r));
-	map(0xb0, 0xb0).rw(FUNC(hanakanz_state::jongteia_protection_r), FUNC(hanakanz_state::daimyojn_protection_w));
+	map(0xb0, 0xb0).rw(FUNC(hanakanz_state::technotop_protection_r<0x18>), FUNC(hanakanz_state::protection_w));
 }
 
 
@@ -4041,11 +4046,6 @@ void hanakanz_state::mjgnight_coincounter_w(uint8_t data)
 #endif
 }
 
-void hanakanz_state::mjgnight_protection_w(uint8_t data)
-{
-	m_prot_val = data;
-}
-
 uint8_t hanakanz_state::mjgnight_protection_r()
 {
 	switch (m_prot_val)
@@ -4063,7 +4063,7 @@ void hanakanz_state::mjgnight_portmap(address_map &map)
 	map(0x41, 0x42).r(FUNC(hanakanz_state::hanakanz_keyb_r));
 	map(0x46, 0x46).w(FUNC(hanakanz_state::mjgnight_coincounter_w));
 	map(0x46, 0x46).r(FUNC(hanakanz_state::hanakanz_rand_r));
-	map(0x47, 0x47).rw(FUNC(hanakanz_state::mjgnight_protection_r), FUNC(hanakanz_state::mjgnight_protection_w));
+	map(0x47, 0x47).rw(FUNC(hanakanz_state::mjgnight_protection_r), FUNC(hanakanz_state::protection_w));
 	map(0x60, 0x60).w(FUNC(hanakanz_state::hanakanz_blitter_data_w));
 	map(0x61, 0x61).w(FUNC(hanakanz_state::hanakanz_palette_w));
 	map(0x63, 0x64).r(FUNC(hanakanz_state::hanakanz_gfxrom_r));
@@ -4291,6 +4291,18 @@ void ddenlovr_state::seljan2_portmap(address_map &map)
 	map(0xa0, 0xa0).r(FUNC(ddenlovr_state::hanakanz_rand_r));
 }
 
+
+void ddenlovr_state::jongoh_portmap(address_map &map)
+{
+	seljan2_portmap(map);
+
+	map(0x60, 0x60).w(FUNC(ddenlovr_state::seljan2_rombank_w));
+	map(0x70, 0x70).nopr().w(FUNC(ddenlovr_state::sryudens_rambank_w));    // ? ack on RTC int
+	map(0x80, 0x80).unmapw();
+	map(0xb0, 0xb0).r(FUNC(ddenlovr_state::technotop_protection_r<0x06>));
+	map(0xe4, 0xe4).w(FUNC(hanakanz_state::seljan2_palette_enab_w));
+	map(0xe8, 0xe8).w(FUNC(ddenlovr_state::protection_w));
+}
 
 /***************************************************************************
                             Hanafuda Hana Tengoku
@@ -4554,60 +4566,6 @@ uint8_t ddenlovr_state::daimyojn_keyb2_r()
 	return val;
 }
 
-// 1B18: D4 ED 76 C9 CB
-// 1B1D: 96 AF 34 8B 89
-
-void hanakanz_state::daimyojn_protection_w(uint8_t data)
-{
-	m_prot_val = data;
-}
-
-uint8_t hanakanz_state::daimyojn_protection_r()
-{
-	switch (m_prot_val)
-	{
-		case 0xd4:  return 0x96;
-		case 0xed:  return 0xaf;
-		case 0x76:  return 0x34;
-		case 0xc9:  return 0x8b;
-		case 0xcb:  return 0x89;
-	}
-	return 0xff;
-}
-
-// 1ADD: D4 ED 76 C9 CB
-// 1AE2: D9 E0 7B C4 C6
-
-uint8_t hanakanz_state::momotaro_protection_r()
-{
-	switch (m_prot_val)
-	{
-		case 0xd4: return 0xd9;
-		case 0xed: return 0xe0;
-		case 0x76: return 0x7b;
-		case 0xc9: return 0xc4;
-		case 0xcb: return 0xc6;
-	}
-
-	return 0xff;
-}
-
-// 1ED0: D4 ED 76 C9 CB
-// 1ED5: CC F5 6E D1 D3
-
-uint8_t hanakanz_state::jongteia_protection_r()
-{
-	switch (m_prot_val)
-	{
-		case 0xd4:  return 0xcc;
-		case 0xed:  return 0xf5;
-		case 0x76:  return 0x6e;
-		case 0xc9:  return 0xd1;
-		case 0xcb:  return 0xd3;
-	}
-	return 0xff;
-}
-
 void hanakanz_state::daimyojn_okibank_w(uint8_t data)
 {
 	m_oki->set_rom_bank((data >> 4) & 0x01);
@@ -4648,29 +4606,20 @@ void hanakanz_state::daimyojn_portmap(address_map &map)
 	map(0xb0, 0xb0).w(FUNC(hanakanz_state::mjmyster_rambank_w));
 	map(0xc0, 0xc0).w(FUNC(hanakanz_state::mjflove_rombank_w));
 	map(0xd0, 0xd0).r(FUNC(hanakanz_state::hanakanz_rand_r));
-	map(0xe0, 0xe0).rw(FUNC(hanakanz_state::daimyojn_protection_r), FUNC(hanakanz_state::daimyojn_protection_w));
+	map(0xe0, 0xe0).rw(FUNC(hanakanz_state::technotop_protection_r<0x42>), FUNC(hanakanz_state::protection_w));
+}
+
+void hanakanz_state::momotaro_portmap(address_map &map)
+{
+	daimyojn_portmap(map);
+
+	map(0xe0, 0xe0).r(FUNC(hanakanz_state::technotop_protection_r<0x0d>));
 }
 
 
 /***************************************************************************
                             Mahjong Dai-Reach
 ***************************************************************************/
-
-// 1B40: D4 ED 76 C9 CB
-// 1B45: C3 FA 61 DE DC
-
-uint8_t hanakanz_state::daireach_protection_r()
-{
-	switch (m_prot_val)
-	{
-		case 0xd4:  return 0xc3;
-		case 0xed:  return 0xfa;
-		case 0x76:  return 0x61;
-		case 0xc9:  return 0xde;
-		case 0xcb:  return 0xdc;
-	}
-	return 0xff;
-}
 
 
 void hanakanz_state::daireach_portmap(address_map &map)
@@ -4694,7 +4643,7 @@ void hanakanz_state::daireach_portmap(address_map &map)
 	map(0x68, 0x68).w(FUNC(hanakanz_state::mjflove_rombank_w));
 	map(0x6a, 0x6a).nopr().w(FUNC(hanakanz_state::sryudens_rambank_w));
 	map(0x6c, 0x6c).r(FUNC(hanakanz_state::hanakanz_rand_r));
-	map(0x6e, 0x6e).rw(FUNC(hanakanz_state::daireach_protection_r), FUNC(hanakanz_state::daimyojn_protection_w));
+	map(0x6e, 0x6e).rw(FUNC(hanakanz_state::technotop_protection_r<0x17>), FUNC(hanakanz_state::protection_w));
 	map(0x70, 0x70).portr("SYSTEM");
 	map(0x72, 0x72).r(FUNC(hanakanz_state::daimyojn_keyb1_r));
 	map(0x74, 0x74).r(FUNC(hanakanz_state::daimyojn_keyb2_r));
@@ -4708,20 +4657,6 @@ void hanakanz_state::daireach_portmap(address_map &map)
 
 // 29EE: D4 ED 76 C9 CB
 // 29F3: 4D 74 EF 50 52
-
-uint8_t hanakanz_state::hnrose_protection_r()
-{
-	switch (m_prot_val)
-	{
-		case 0xd4:  return 0x4d;
-		case 0xed:  return 0x74;
-		case 0x76:  return 0xef;
-		case 0xc9:  return 0x50;
-		case 0xcb:  return 0x52;
-	}
-	return 0xff;
-}
-
 
 void hanakanz_state::hnrose_portmap(address_map &map)
 {
@@ -4737,7 +4672,7 @@ void hanakanz_state::hnrose_portmap(address_map &map)
 	map(0x80, 0x8f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 	map(0x8a, 0x8b).r(FUNC(hanakanz_state::daimyojn_year_hack_r));  // ?
 	map(0xa0, 0xa0).r(FUNC(hanakanz_state::hanakanz_rand_r));
-	map(0xb0, 0xb0).rw(FUNC(hanakanz_state::hnrose_protection_r), FUNC(hanakanz_state::daimyojn_protection_w));
+	map(0xb0, 0xb0).rw(FUNC(hanakanz_state::technotop_protection_r<0x99>), FUNC(hanakanz_state::protection_w));
 	map(0xc0, 0xc0).w(FUNC(hanakanz_state::mjflove_rombank_w));
 }
 
@@ -8273,7 +8208,7 @@ static INPUT_PORTS_START( seljan2 )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  // used
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )  // used
+	PORT_DIPNAME( 0x10, 0x00, "More Revealing Attract Mode" )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )   // 3
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  // used
@@ -10078,6 +10013,13 @@ void ddenlovr_state::seljan2(machine_config &config)
 	MSM6242(config, "rtc", XTAL(32'768)).out_int_handler().set(m_maincpu, FUNC(tmpz84c015_device::trg1));
 }
 
+void ddenlovr_state::jongoh(machine_config &config)
+{
+	seljan2(config);
+
+	subdevice<tmpz84c015_device>("maincpu")->set_addrmap(AS_IO, &hanakanz_state::jongoh_portmap);
+}
+
 void hanakanz_state::daireach(machine_config &config)
 {
 	seljan2(config);
@@ -10134,6 +10076,13 @@ void hanakanz_state::daimyojn(machine_config &config)
 
 	// devices
 	MSM6242(config, "rtc", XTAL(32'768)).out_int_handler().set("maincpu:kp69", FUNC(kp69_device::ir_w<1>));
+}
+
+void hanakanz_state::momotaro(machine_config &config)
+{
+	daimyojn(config);
+
+	m_maincpu->set_addrmap(AS_IO, &hanakanz_state::momotaro_portmap);
 }
 
 void hanakanz_state::hnrose(machine_config &config)
@@ -11175,6 +11124,21 @@ ROM_START( mjreach1 )
 	ROM_LOAD( "52601.1c",     0x00000, 0x80000, CRC(52666107) SHA1(1e1c17b1da7ded5fc52422c7e569ef02af1ee11d) )  // 2 banks
 ROM_END
 
+ROM_START( mjreach1a )
+	ROM_REGION( 0x80000, "maincpu", 0 )   // ! KL5C80 Code !
+	ROM_LOAD( "52602-1.5b",   0x00000, 0x80000, CRC(493cb0ff) SHA1(e133a7eba736c0b8b1b52c7ee0200d1284faab7b) )
+
+	ROM_REGION( 0x500000, "blitter", 0 )
+	ROM_LOAD16_BYTE( "52604.8b",     0x000000, 0x100000, CRC(6ce01bb4) SHA1(800043d8203ab5560ed0b24e0a4e01c14b6a3ac0) )
+	ROM_LOAD16_BYTE( "52603.8c",     0x000001, 0x100000, CRC(16d2c169) SHA1(3e50b1109c86d0e8f931ce5a3abf20d807ebabba) )
+	ROM_LOAD16_BYTE( "52606.10b",    0x200000, 0x100000, CRC(07fe5dae) SHA1(221ec21c2d84497af5b769d7409f8775be933783) )
+	ROM_LOAD16_BYTE( "52605.10c",    0x200001, 0x100000, CRC(b5d57163) SHA1(d6480904bd72d298d48fbcb251b902b0b994cab1) )
+	ROM_LOAD16_BYTE( "52608.12b",    0x400000, 0x080000, CRC(2f93dde4) SHA1(8efaa920e485f50ef7f4396cc8c47dfbfc97bd01) )
+	ROM_LOAD16_BYTE( "52607.12c",    0x400001, 0x080000, CRC(5e685c4d) SHA1(57c99fb791429d0edb7416cffb4d1d1eb34a2813) )
+
+	ROM_REGION( 0x80000, "oki", 0 )  // samples
+	ROM_LOAD( "52601.1c",     0x00000, 0x80000, CRC(52666107) SHA1(1e1c17b1da7ded5fc52422c7e569ef02af1ee11d) )  // 2 banks
+ROM_END
 /***************************************************************************
 
 麻雀中華兒女 (Máquè zhōnghuá érnǚ)
@@ -12576,10 +12540,19 @@ ROM_START( seljan2 )
 	ROM_LOAD( "5571.1c", 0x000000, 0x80000, CRC(5a8cd45c) SHA1(25ca573b8ba226fb3f2de48c57b5ced6884eaa63) )  // = 50201.1c (sryudens)
 ROM_END
 
-void hanakanz_state::init_momotaro()
-{
-	m_maincpu->space(AS_IO).install_read_handler(0xe0, 0xe0, read8smo_delegate(*this, FUNC(hanakanz_state::momotaro_protection_r)));
-}
+ROM_START( jongoh )
+	ROM_REGION( 0x90000+0x8000+16*0x1000, "maincpu", 0 )  // Z80 Code
+	ROM_LOAD( "t80324.4c", 0x00000, 0x80000, CRC(31c5864b) SHA1(7a89c4023868a51e3bb9b3eeffa17602d285e0d0) )
+	ROM_RELOAD(            0x10000, 0x80000 )
+
+	ROM_REGION( 0x500000, "blitter", 0 )
+	ROM_LOAD( "t80334.11c", 0x000000, 0x200000, CRC(530aeea8) SHA1(605c14db86fde1cab91d223a21a89d571d5555ef) )
+	// 200000-3fffff empty
+	ROM_LOAD( "t8034.13c",  0x400000, 0x100000, CRC(260fb823) SHA1(0b63172e95d9d3fa99d34097f728427076281174) )
+
+	ROM_REGION( 0x80000, "oki", 0 )  // Samples
+	ROM_LOAD( "t8031.1c", 0x000000, 0x80000, CRC(5a8cd45c) SHA1(25ca573b8ba226fb3f2de48c57b5ced6884eaa63) )  // same as sryudens, seljan2
+ROM_END
 
 /***************************************************************************
 
@@ -12783,7 +12756,8 @@ GAME( 1997, hkagerou,    0,        hkagerou,  hkagerou,   hanakanz_state, empty_
 
 GAME( 1998, mjchuuka,    0,        mjchuuka,  mjchuuka,   hanakanz_state, empty_init,    ROT0, "Dynax",                                       "Maque Zhonghua Ernu (Taiwan)",                                   MACHINE_NO_COCKTAIL  )
 
-GAME( 1998, mjreach1,    0,        mjreach1,  mjreach1,   hanakanz_state, empty_init,    ROT0, "Nihon System",                                "Mahjong Reach Ippatsu (Japan)",                                  MACHINE_NO_COCKTAIL  )
+GAME( 1998, mjreach1,    0,        mjreach1,  mjreach1,   hanakanz_state, empty_init,    ROT0, "Nihon System",                                "Mahjong Reach Ippatsu (Japan, NM526-NSI)",                       MACHINE_NO_COCKTAIL  )
+GAME( 1998, mjreach1a,   mjreach1, mjreach1,  mjreach1,   hanakanz_state, empty_init,    ROT0, "Nihon System",                                "Mahjong Reach Ippatsu (Japan, NM526-01)",                        MACHINE_NO_COCKTAIL  )
 
 GAME( 1999, jongtei,     0,        jongtei,   jongtei,    hanakanz_state, empty_init,    ROT0, "Dynax",                                       "Mahjong Jong-Tei (Japan, NM532-01)",                             MACHINE_NO_COCKTAIL  )
 GAME( 2000, jongteia,    jongtei,  jongteia,  jongtei,    hanakanz_state, empty_init,    ROT0, "Dynax (Techno-Top license)",                  "Mahjong Jong-Tei (Japan, Techno-Top license)",                   MACHINE_NO_COCKTAIL  )
@@ -12792,10 +12766,12 @@ GAME( 2000, mjgnight,    0,        mjgnight,  mjgnight,   hanakanz_state, empty_
 
 GAME( 2000, hnrose,      0,        hnrose,    hnrose,     hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Hanafuda Night Rose (Japan, TSM008-04)",                         MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL  )
 
+GAME( 2000, jongoh,      0,        jongoh,    seljan2,    ddenlovr_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Jongoh (Japan, TTL800-03-04)",                           MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL ) // needs verifying of inputs, outputs
+
 GAME( 2001, daireach,    0,        daireach,  seljan2,    hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Dai-Reach (Japan, TSM012-C01)",                          MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL )
 
 GAME( 2002, daimyojn,    0,        daimyojn,  daimyojn,   hanakanz_state, empty_init,    ROT0, "Dynax / Techno-Top / Techno-Planning",        "Mahjong Daimyojin (Japan, T017-PB-00)",                          MACHINE_NO_COCKTAIL  )
 
 GAME( 2002, mjtenho,     0,        daimyojn,  daimyojn,   hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Tenho (Japan, P016B-000)",                               MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL  )
 
-GAME( 2004, momotaro,    0,        daimyojn,  daimyojn,   hanakanz_state, init_momotaro, ROT0, "Techno-Top",                                  "Mahjong Momotarou (Japan, T027-RB-01)",                          MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 2004, momotaro,    0,        momotaro,  daimyojn,   hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Momotarou (Japan, T027-RB-01)",                          MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
