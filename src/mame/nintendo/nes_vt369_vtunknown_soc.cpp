@@ -346,8 +346,14 @@ void vt3xx_soc_base_device::update_timer()
 {
 	if (m_timercontrol & 0x01)
 	{
-		// TODO: use m_timerperiod
-		m_sound_timer->adjust(attotime::from_hz(8000), 0);
+		// TODO: this is probably not the correct calculation
+		// denv150 fc30
+		// tetrtin ff18
+		// lxcmcysp (most lexibook sets) fd00
+		// rtvgc300 fac0
+		// red5mam/dgun2593 fac2
+		// nubsupmf fd61
+		m_sound_timer->adjust(attotime::from_hz(m_timerperiod/8), 0);
 	}
 	else
 	{
