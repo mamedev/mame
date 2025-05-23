@@ -21,7 +21,7 @@
     PCBs pictures and dip listing are available at: http://www.recreativas.org/modular-system-blood-bros-4316-gaelco-sa
 
 TODO:
-- sound (seems rather similar to seibu/toki_ms.cpp, at least address-wise);
+- not sure if MSM5205 is playing all sounds it should
 - sprite / tilemap priorities
 */
 
@@ -50,9 +50,12 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_soundlatch(*this, "soundlatch%u", 0U),
+		m_ym(*this, "ym%u", 0U),
 		m_msm(*this, "msm"),
 		m_spriteram(*this, "spriteram"),
-		m_tileram(*this, "tileram%u", 0U)
+		m_tileram(*this, "tileram%u", 0U),
+		m_soundbank(*this, "sound_bank")
 	{ }
 
 	void bloodbrom(machine_config &config) ATTR_COLD;
@@ -67,12 +70,24 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device_array<generic_latch_8_device, 2> m_soundlatch;
+	required_device_array<ym2203_device, 2> m_ym;
 	required_device<msm5205_device> m_msm;
+
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr_array<uint16_t, 3> m_tileram; // 0 bg, 1 fg, 2 tx
+	required_memory_bank m_soundbank;
+
+	bool m_audio_select = false;
+	uint8_t m_adpcm_data = 0;
 
 	tilemap_t *m_tilemap[3] {};
 	uint16_t m_scrollreg[2] {};
+
+	void adpcm_w(uint8_t data);
+	void ym_w(offs_t offset, uint8_t data);
+	void adpcm_int(int state);
+	void soundlatch_w(uint8_t data);
 
 	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_tile_info);
 	template <uint8_t Which> void tileram_w(offs_t offset, uint16_t data, uint16_t mem_mask);
@@ -88,12 +103,50 @@ private:
 
 void bloodbro_ms_state::machine_start()
 {
-	membank("sound_bank")->configure_entries(0, 2, memregion("audiocpu")->base() + 0x8000, 0x4000);
-	membank("sound_bank")->set_entry(0);
+	m_soundbank->configure_entries(0, 2, memregion("audiocpu")->base() + 0x8000, 0x4000);
+	m_soundbank->set_entry(0);
 
+	save_item(NAME(m_audio_select));
+	save_item(NAME(m_adpcm_data));
 	save_item(NAME(m_scrollreg));
 }
 
+
+void bloodbro_ms_state::adpcm_w(uint8_t data)
+{
+	m_audio_select = BIT(data, 7);
+	m_soundbank->set_entry(m_audio_select);
+	m_msm->reset_w(BIT(data, 4));
+
+	m_adpcm_data = data & 0x0f;
+}
+
+void bloodbro_ms_state::ym_w(offs_t offset, uint8_t data)
+{
+	if (!m_audio_select)
+	{
+		if (!BIT(offset, 1))
+			m_ym[0]->write(offset & 1, data);
+		else
+			m_ym[1]->write(offset & 1, data);
+	}
+	else
+	{
+		// ??? (written during ADPCM IRQ)
+	}
+}
+
+void bloodbro_ms_state::soundlatch_w(uint8_t data)
+{
+	m_soundlatch[0]->clear_w(data);
+	m_soundlatch[1]->clear_w(data);
+}
+
+void bloodbro_ms_state::adpcm_int(int state)
+{
+	m_msm->data_w(m_adpcm_data);
+	m_audiocpu->set_input_line(0, HOLD_LINE);
+}
 
 void bloodbro_ms_state::video_start()
 {
@@ -179,13 +232,14 @@ void bloodbro_ms_state::main_program_map(address_map &map)
 	map(0x08e000, 0x08ffff).ram();
 	map(0x0a0000, 0x0a000d).nopw(); // remnants of original code (Seibu sound system)?
 	map(0x0c0100, 0x0c0101).nopw(); // ??? written once
-	// map(0x0e000f, 0x0e000f).w("soundlatch", FUNC(generic_latch_8_device::write)); // half of the sound commands (wrt weststry)?
+	map(0x0e000e, 0x0e000e).w(m_soundlatch[1], FUNC(generic_latch_8_device::write)); // half of the sound commands (wrt weststry)?
+	map(0x0e000f, 0x0e000f).w(m_soundlatch[0], FUNC(generic_latch_8_device::write)); // half of the sound commands (wrt weststry)?
 	map(0x100000, 0x1003ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x100400, 0x1007ff).ram().w("palette", FUNC(palette_device::write16_ext)).share("palette_ext");
 	map(0x100800, 0x100fff).ram();
 	map(0x101000, 0x1017ff).ram().share(m_spriteram);
 	map(0x101800, 0x101fff).ram();
-	// map(0x102001, 0x102001).w("soundlatch2", FUNC(generic_latch_8_device::write)); // the other half of the sound commands (wrt weststry)?
+	map(0x102000, 0x102001).nopw(); // ??? written often
 	map(0x18d000, 0x18d7ff).w(FUNC(bloodbro_ms_state::tileram_w<1>)).share(m_tileram[1]);
 	map(0x18d800, 0x18d803).lw16(NAME([this] (offs_t offset, uint16_t data) { m_scrollreg[offset] = data; }));
 	map(0x0e0000, 0x0e0001).portr("DSW");
@@ -196,18 +250,17 @@ void bloodbro_ms_state::main_program_map(address_map &map)
 void bloodbro_ms_state::sound_program_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	// map(0x8000, 0x8000).w(FUNC(bloodbro_ms_state::adpcm_w)); // almost surely ADPCM
-	map(0x8000, 0xbfff).bankr("sound_bank");
+	map(0x8000, 0x8000).w(FUNC(bloodbro_ms_state::adpcm_w));
+	map(0x8000, 0xbfff).bankr(m_soundbank);
 	map(0xc000, 0xc7ff).ram();
 	map(0xd000, 0xd7ff).ram();
 	map(0xdff0, 0xdff5).noprw(); // ???
 	// returning machine().rand() to both below addresses causes sounds to be played
-	// map(0xdffe, 0xdffe).r("soundlatch", FUNC(generic_latch_8_device::read)); // or is read pending_r? write is acknowledge?
-	// map(0xdfff, 0xdfff).r("soundlatch2", FUNC(generic_latch_8_device::read));
-	map(0xe000, 0xe001).w("ym1", FUNC(ym2203_device::write));
-	map(0xe002, 0xe003).w("ym2", FUNC(ym2203_device::write));
-	map(0xe008, 0xe009).r("ym1", FUNC(ym2203_device::read));
-	map(0xe00a, 0xe00b).r("ym2", FUNC(ym2203_device::read));
+	map(0xdffe, 0xdffe).r(m_soundlatch[1], FUNC(generic_latch_8_device::read)).w(FUNC(bloodbro_ms_state::soundlatch_w));
+	map(0xdfff, 0xdfff).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
+	map(0xe000, 0xe003).w(FUNC(bloodbro_ms_state::ym_w));
+	map(0xe008, 0xe009).r(m_ym[0], FUNC(ym2203_device::read));
+	map(0xe00a, 0xe00b).r(m_ym[1], FUNC(ym2203_device::read));
 }
 
 
@@ -233,7 +286,7 @@ static INPUT_PORTS_START( bloodbrom )
 	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x00e0, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -358,14 +411,16 @@ void bloodbro_ms_state::bloodbrom(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, "soundlatch");
-	GENERIC_LATCH_8(config, "soundlatch2").set_separate_acknowledge(true);
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
+	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
-	YM2203(config, "ym1", 24_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.75); // divisor unknown, no XTAL on the PCB, might also use the 20 MHz one
+	YM2203(config, m_ym[0], 24_MHz_XTAL / 12).add_route(ALL_OUTPUTS, "mono", 0.75); // divisor unknown, no XTAL on the PCB, might also use the 20 MHz one
 
-	YM2203(config, "ym2", 24_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.75); // divisor unknown, no XTAL on the PCB, might also use the 20 MHz one
+	YM2203(config, m_ym[1], 24_MHz_XTAL / 12).add_route(ALL_OUTPUTS, "mono", 0.75); // divisor unknown, no XTAL on the PCB, might also use the 20 MHz one
 
-	MSM5205(config, m_msm, 24_MHz_XTAL / 8); // divisor unknown, no XTAL on the PCB, might also use the 20 MHz one
+	MSM5205(config, m_msm, 24_MHz_XTAL / 64); // divisor unknown, no XTAL on the PCB, might also use the 20 MHz one
+	m_msm->vck_legacy_callback().set(FUNC(bloodbro_ms_state::adpcm_int));
+	m_msm->set_prescaler_selector(msm5205_device::S96_4B); // unverified
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.75);
 }
 
@@ -464,4 +519,4 @@ void bloodbro_ms_state::init_bloodbrom()
 } // anonymous namespace
 
 
-GAME( 199?, bloodbrom,  bloodbro,  bloodbrom,  bloodbrom,  bloodbro_ms_state, init_bloodbrom, ROT0, "bootleg (Gaelco / Ervisa)", "Blood Bros. (Modular System)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 199?, bloodbrom,  bloodbro,  bloodbrom,  bloodbrom,  bloodbro_ms_state, init_bloodbrom, ROT0, "bootleg (Gaelco / Ervisa)", "Blood Bros. (Modular System)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
