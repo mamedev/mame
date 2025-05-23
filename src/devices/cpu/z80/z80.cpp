@@ -400,6 +400,7 @@ u8 z80_device::rlc(u8 value)
 {
 	const u8 res = ((value << 1) | (value >> 7)) & 0xff;
 	{
+		QT = 0;
 		m_f.sign_val = m_f.zero_val = m_f.parity_overflow_val = m_f.yx_val = res;
 		m_f.half_carry_val = m_f.subtract = 0;
 		m_f.carry = value & 0x80;
