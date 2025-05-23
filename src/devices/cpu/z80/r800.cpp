@@ -73,7 +73,7 @@ u8 r800_device::r800_sll(u8 value)
 		m_f.sign_val = m_f.zero_val = res;
 		m_f.parity_overflow_val = !0;
 		m_f.yx_val = res;
-		m_f.half_carry = m_f.subtract = 0;
+		m_f.half_carry_val = m_f.subtract = 0;
 		m_f.carry = value & 0x80;
 	}
 

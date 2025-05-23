@@ -227,7 +227,7 @@ macro   ld_a_r
 		// keep C
 		m_f.sign_val = m_f.zero_val = A;
 		m_f.yx_val = A;
-		m_f.half_carry = m_f.subtract = 0;
+		m_f.half_carry_val = m_f.subtract = 0;
 		m_f.parity_overflow_val = !m_iff2;
 	}
 	if (HAS_LDAIR_QUIRK)
@@ -240,7 +240,7 @@ macro   r800:ld_a_r
 		// keep C
 		m_f.sign_val = m_f.zero_val = A;
 		m_f.yx_val = A;
-		m_f.half_carry = m_f.subtract = 0;
+		m_f.half_carry_val = m_f.subtract = 0;
 		m_f.parity_overflow_val = !m_iff2;
 	}
 	if (HAS_LDAIR_QUIRK)
@@ -261,7 +261,7 @@ macro   ld_a_i
 		// keep C
 		m_f.sign_val = m_f.zero_val = A;
 		m_f.yx_val = A;
-		m_f.half_carry = m_f.subtract = 0;
+		m_f.half_carry_val = m_f.subtract = 0;
 		m_f.parity_overflow_val = !m_iff2;
 	}
 	if (HAS_LDAIR_QUIRK)
@@ -274,7 +274,7 @@ macro   r800:ld_a_i
 		// keep C
 		m_f.sign_val = m_f.zero_val = A;
 		m_f.yx_val = A;
-		m_f.half_carry = m_f.subtract = 0;
+		m_f.half_carry_val = m_f.subtract = 0;
 		m_f.parity_overflow_val = !m_iff2;
 	}
 	if (HAS_LDAIR_QUIRK)
@@ -298,7 +298,7 @@ macro   rrd
 		// keep C
 		m_f.sign_val = m_f.zero_val = m_f.parity_overflow_val = A;
 		m_f.yx_val = A;
-		m_f.half_carry = m_f.subtract = 0;
+		m_f.half_carry_val = m_f.subtract = 0;
 	}
 
 macro   rld
@@ -314,7 +314,7 @@ macro   rld
 		// keep C
 		m_f.sign_val = m_f.zero_val = m_f.parity_overflow_val = A;
 		m_f.yx_val = A;
-		m_f.half_carry = m_f.subtract = 0;
+		m_f.half_carry_val = m_f.subtract = 0;
 	}
 
 macro   ex_sp   %dd
@@ -334,7 +334,7 @@ macro   add16   %dd1 %dd2
 		QT = 0;
 		// keep szv
 		m_f.yx_val = res >> 8;
-		m_f.half_carry = ((%dd1 ^ res ^ %dd2) >> 8) & HF;
+		m_f.half_carry_val = (%dd1 ^ res ^ %dd2) >> 8;
 		m_f.subtract = 0;
 		m_f.carry = res & 0x10000;
 	}
@@ -349,7 +349,7 @@ macro   r800:add16   %dd1 %dd2
 		QT = 0;
 		// keep szv
 		m_f.yx_val = res >> 8;
-		m_f.half_carry = ((%dd1 ^ res ^ %dd2) >> 8) & HF;
+		m_f.half_carry_val = (%dd1 ^ res ^ %dd2) >> 8;
 		m_f.subtract = 0;
 		m_f.carry = res & 0x10000;
 	}
@@ -365,7 +365,7 @@ macro   adc_hl   %dd
 		QT = 0;
 		m_f.sign_val = m_f.zero_val = ((res & 0x8000) >> 8) | (u16(res) != 0);
 		m_f.yx_val = res >> 8;
-		m_f.half_carry = ((HL ^ res ^ %dd) >> 8) & HF;
+		m_f.half_carry_val = (HL ^ res ^ %dd) >> 8;
 		m_f.parity_overflow_val = !((%dd ^ HL ^ 0x8000) & (%dd ^ res) & 0x8000);
 		m_f.subtract = 0;
 		m_f.carry = res & 0x10000;
@@ -381,7 +381,7 @@ macro   r800:adc_hl   %dd
 		QT = 0;
 		m_f.sign_val = m_f.zero_val = ((res & 0x8000) >> 8) | (u16(res) != 0);
 		m_f.yx_val = res >> 8;
-		m_f.half_carry = ((HL ^ res ^ %dd) >> 8) & HF;
+		m_f.half_carry_val = (HL ^ res ^ %dd) >> 8;
 		m_f.parity_overflow_val = !((%dd ^ HL ^ 0x8000) & (%dd ^ res) & 0x8000);
 		m_f.subtract = 0;
 		m_f.carry = res & 0x10000;
@@ -398,7 +398,7 @@ macro   sbc_hl   %dd
 		QT = 0;
 		m_f.sign_val = m_f.zero_val = ((res & 0x8000) >> 8) | (u16(res) != 0);
 		m_f.yx_val = res >> 8;
-		m_f.half_carry = ((HL ^ res ^ %dd) >> 8) & HF;
+		m_f.half_carry_val = (HL ^ res ^ %dd) >> 8;
 		m_f.parity_overflow_val = !((%dd ^ HL) & (HL ^ res) & 0x8000);
 		m_f.subtract = 1;
 		m_f.carry = res & 0x10000;
@@ -414,7 +414,7 @@ macro   r800:sbc_hl   %dd
 		QT = 0;
 		m_f.sign_val = m_f.zero_val = ((res & 0x8000) >> 8) | (u16(res) != 0);
 		m_f.yx_val = res >> 8;
-		m_f.half_carry = ((HL ^ res ^ %dd) >> 8) & HF;
+		m_f.half_carry_val = (HL ^ res ^ %dd) >> 8;
 		m_f.parity_overflow_val = !((%dd ^ HL) & (HL ^ res) & 0x8000);
 		m_f.subtract = 1;
 		m_f.carry = res & 0x10000;
@@ -433,7 +433,7 @@ macro   ldi
 		QT = 0;
 		// keep SZC
 		m_f.yx_val = ((A + TDAT8) << 4) | ((A + TDAT8) & 0x0f);
-		m_f.half_carry = m_f.subtract = 0;
+		m_f.half_carry_val = m_f.subtract = 0;
 		m_f.parity_overflow_val = !BC;
 	}
 
@@ -448,7 +448,7 @@ macro   r800:ldi
 		QT = 0;
 		// keep SZC
 		m_f.yx_val = ((A + TDAT8) << 4) | ((A + TDAT8) & 0x0f);
-		m_f.half_carry = m_f.subtract = 0;
+		m_f.half_carry_val = m_f.subtract = 0;
 		m_f.parity_overflow_val = !BC;
 	}
 
@@ -464,8 +464,8 @@ macro   cpi
 		QT = 0;
 		// keep C
 		m_f.sign_val = m_f.zero_val = res;
-		m_f.half_carry = (A ^ TDAT8 ^ res) & HF;
-		if (m_f.half_carry)
+		m_f.half_carry_val = A ^ TDAT8 ^ res;
+		if (m_f.half_carry())
 			res -= 1;
 		m_f.yx_val = (res << 4) | (res & 0x0f);
 		m_f.parity_overflow_val = !BC;
@@ -485,8 +485,8 @@ macro   r800:cpi
 		QT = 0;
 		// keep C
 		m_f.sign_val = m_f.zero_val = res;
-		m_f.half_carry = (A ^ TDAT8 ^ res) & HF;
-		if (m_f.half_carry)
+		m_f.half_carry_val = A ^ TDAT8 ^ res;
+		if (m_f.half_carry())
 			res -= 1;
 		m_f.yx_val = (res << 4) | (res & 0x0f);
 		m_f.parity_overflow_val = !BC;
@@ -507,7 +507,7 @@ macro   ini
 		QT = 0;
 		m_f.sign_val = m_f.zero_val = B;
 		m_f.yx_val = B;
-		m_f.half_carry = t & 0x100;
+		m_f.half_carry_val = t >> 4;
 		m_f.parity_overflow_val = (t & 0x07) ^ B;
 		m_f.subtract = TDAT8 & SF;
 		m_f.carry = t & 0x100;
@@ -526,7 +526,7 @@ macro   r800:ini
 		QT = 0;
 		m_f.sign_val = m_f.zero_val = B;
 		m_f.yx_val = B;
-		m_f.half_carry = t & 0x100;
+		m_f.half_carry_val = t >> 4;
 		m_f.parity_overflow_val = (t & 0x07) ^ B;
 		m_f.subtract = TDAT8 & SF;
 		m_f.carry = t & 0x100;
@@ -546,7 +546,7 @@ macro   outi
 		QT = 0;
 		m_f.sign_val = m_f.zero_val = B;
 		m_f.yx_val = B;
-		m_f.half_carry = t & 0x100;
+		m_f.half_carry_val = t >> 4;
 		m_f.parity_overflow_val = (t & 0x07) ^ B;
 		m_f.subtract = TDAT8 & SF;
 		m_f.carry = t & 0x100;
@@ -565,7 +565,7 @@ macro   r800:outi
 		QT = 0;
 		m_f.sign_val = m_f.zero_val = B;
 		m_f.yx_val = B;
-		m_f.half_carry = t & 0x100;
+		m_f.half_carry_val = t >> 4;
 		m_f.parity_overflow_val = (t & 0x07) ^ B;
 		m_f.subtract = TDAT8 & SF;
 		m_f.carry = t & 0x100;
@@ -584,7 +584,7 @@ macro   ldd
 		QT = 0;
 		// keep SZC
 		m_f.yx_val = ((A + TDAT8) << 4) | ((A + TDAT8) & 0x0f);
-		m_f.half_carry = m_f.subtract = 0;
+		m_f.half_carry_val = m_f.subtract = 0;
 		m_f.parity_overflow_val = !BC;
 	}
 }
@@ -601,7 +601,7 @@ macro   r800:ldd
 		QT = 0;
 		// keep SZC
 		m_f.yx_val = ((A + TDAT8) << 4) | ((A + TDAT8) & 0x0f);
-		m_f.half_carry = m_f.subtract = 0;
+		m_f.half_carry_val = m_f.subtract = 0;
 		m_f.parity_overflow_val = !BC;
 	}
 }
@@ -618,8 +618,8 @@ macro   cpd
 		QT = 0;
 		// keep C
 		m_f.sign_val = m_f.zero_val = res;
-		m_f.half_carry = (A ^ TDAT8 ^ res) & HF;
-		if (m_f.half_carry)
+		m_f.half_carry_val = A ^ TDAT8 ^ res;
+		if (m_f.half_carry())
 			res -= 1;
 		m_f.yx_val = (res << 4) | (res & 0x0f);
 		m_f.parity_overflow_val = !BC;
@@ -639,8 +639,8 @@ macro   r800:cpd
 		QT = 0;
 		// keep C
 		m_f.sign_val = m_f.zero_val = res;
-		m_f.half_carry = (A ^ TDAT8 ^ res) & HF;
-		if (m_f.half_carry)
+		m_f.half_carry_val = A ^ TDAT8 ^ res;
+		if (m_f.half_carry())
 			res -= 1;
 		m_f.yx_val = (res << 4) | (res & 0x0f);
 		m_f.parity_overflow_val = !BC;
@@ -661,7 +661,7 @@ macro   ind
 		QT = 0;
 		m_f.sign_val = m_f.zero_val = B;
 		m_f.yx_val = B;
-		m_f.half_carry = t & 0x100;
+		m_f.half_carry_val = t >> 4;
 		m_f.parity_overflow_val = (t & 0x07) ^ B;
 		m_f.subtract = TDAT8 & SF;
 		m_f.carry = t & 0x100;
@@ -680,7 +680,7 @@ macro   r800:ind
 		QT = 0;
 		m_f.sign_val = m_f.zero_val = B;
 		m_f.yx_val = B;
-		m_f.half_carry = t & 0x100;
+		m_f.half_carry_val = t >> 4;
 		m_f.parity_overflow_val = (t & 0x07) ^ B;
 		m_f.subtract = TDAT8 & SF;
 		m_f.carry = t & 0x100;
@@ -700,7 +700,7 @@ macro   outd
 		QT = 0;
 		m_f.sign_val = m_f.zero_val = B;
 		m_f.yx_val = B;
-		m_f.half_carry = t & 0x100;
+		m_f.half_carry_val = t >> 4;
 		m_f.parity_overflow_val = (t & 0x07) ^ B;
 		m_f.subtract = TDAT8 & SF;
 		m_f.carry = t & 0x100;
@@ -719,7 +719,7 @@ macro   r800:outd
 		QT = 0;
 		m_f.sign_val = m_f.zero_val = B;
 		m_f.yx_val = B;
-		m_f.half_carry = t & 0x100;
+		m_f.half_carry_val = t >> 4;
 		m_f.parity_overflow_val = (t & 0x07) ^ B;
 		m_f.subtract = TDAT8 & SF;
 		m_f.carry = t & 0x100;
@@ -5505,7 +5505,7 @@ ed40	# IN   B,(C)
 		// keep C
 		m_f.sign_val = m_f.zero_val = m_f.parity_overflow_val = TDAT8;
 		m_f.yx_val = TDAT8;
-		m_f.half_carry = m_f.subtract = 0;
+		m_f.half_carry_val = m_f.subtract = 0;
 	}
 	B = TDAT8;
 	WZ = BC + 1;
@@ -5543,7 +5543,7 @@ ed48	# IN   C,(C)
 		// keep C
 		m_f.sign_val = m_f.zero_val = m_f.parity_overflow_val = TDAT8;
 		m_f.yx_val = TDAT8;
-		m_f.half_carry = m_f.subtract = 0;
+		m_f.half_carry_val = m_f.subtract = 0;
 	}
 	C = TDAT8;
 	WZ = BC + 1;
@@ -5581,7 +5581,7 @@ ed50	# IN   D,(C)
 		// keep C
 		m_f.sign_val = m_f.zero_val = m_f.parity_overflow_val = TDAT8;
 		m_f.yx_val = TDAT8;
-		m_f.half_carry = m_f.subtract = 0;
+		m_f.half_carry_val = m_f.subtract = 0;
 	}
 	D = TDAT8;
 	WZ = BC + 1;
@@ -5619,7 +5619,7 @@ ed58	# IN   E,(C)
 		// keep C
 		m_f.sign_val = m_f.zero_val = m_f.parity_overflow_val = TDAT8;
 		m_f.yx_val = TDAT8;
-		m_f.half_carry = m_f.subtract = 0;
+		m_f.half_carry_val = m_f.subtract = 0;
 	}
 	E = TDAT8;
 	WZ = BC + 1;
@@ -5657,7 +5657,7 @@ ed60	# IN   H,(C)
 		// keep C
 		m_f.sign_val = m_f.zero_val = m_f.parity_overflow_val = TDAT8;
 		m_f.yx_val = TDAT8;
-		m_f.half_carry = m_f.subtract = 0;
+		m_f.half_carry_val = m_f.subtract = 0;
 	}
 	H = TDAT8;
 	WZ = BC + 1;
@@ -5695,7 +5695,7 @@ ed68	# IN   L,(C)
 		// keep C
 		m_f.sign_val = m_f.zero_val = m_f.parity_overflow_val = TDAT8;
 		m_f.yx_val = TDAT8;
-		m_f.half_carry = m_f.subtract = 0;
+		m_f.half_carry_val = m_f.subtract = 0;
 	}
 	L = TDAT8;
 	WZ = BC + 1;
@@ -5733,7 +5733,7 @@ ed70	# IN   0,(C)
 		// keep C
 		m_f.sign_val = m_f.zero_val = m_f.parity_overflow_val = TDAT8;
 		m_f.yx_val = TDAT8;
-		m_f.half_carry = m_f.subtract = 0;
+		m_f.half_carry_val = m_f.subtract = 0;
 	}
 	WZ = BC + 1;
 
@@ -5770,7 +5770,7 @@ ed78	# IN   A,(C)
 		// keep C
 		m_f.sign_val = m_f.zero_val = m_f.parity_overflow_val = TDAT8;
 		m_f.yx_val = TDAT8;
-		m_f.half_carry = m_f.subtract = 0;
+		m_f.half_carry_val = m_f.subtract = 0;
 	}
 	A = TDAT8;
 	WZ = BC + 1;
@@ -6366,7 +6366,8 @@ edff	# DB   ED
 	{
 		// keep SZPC
 		m_f.yx_val = A;
-		m_f.half_carry = m_f.subtract = 1;
+		m_f.half_carry_val = HF;
+		m_f.subtract = 1;
 	}
 
 0030	# JR   NC,o
@@ -6405,7 +6406,7 @@ edff	# DB   ED
 		QT = 0;
 		// keep SZP
 		m_f.yx_val = (m_f.yx_val & Q) | A;
-		m_f.half_carry = m_f.subtract = 0;
+		m_f.half_carry_val = m_f.subtract = 0;
 		m_f.carry = 1;
 	}
 
@@ -6440,7 +6441,7 @@ edff	# DB   ED
 	QT = 0;
 	// keep SZP
 	m_f.yx_val = (m_f.yx_val & Q) | A;
-	m_f.half_carry = m_f.carry;
+	m_f.half_carry_val = m_f.carry << 4;
 	m_f.subtract = 0;
 	m_f.carry = !m_f.carry;
 }

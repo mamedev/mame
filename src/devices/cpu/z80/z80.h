@@ -180,7 +180,7 @@ protected:
 		u8 sign_val;
 		u8 zero_val;
 		u8 yx_val;
-		bool half_carry;
+		u8 half_carry_val;
 		u8 parity_overflow_val; // overflow case set in the way that parity_overflow() returns desired value
 		bool subtract;
 		bool carry;
@@ -191,6 +191,7 @@ protected:
 		u8 sign() const { return sign_val & 0x80; }
 		u8 zero() const { return (zero_val == 0) ? 0x40 : 0; }
 		u8 yx() const { return yx_val & 0x28; }
+		u8 half_carry() const { return half_carry_val & 0x10; }
 		u8 parity_overflow() const {
 			u8 p = parity_overflow_val;
 			p ^= p >> 4;
