@@ -107,7 +107,7 @@ public:
 	{
 		if (obj)
 		{
-			obj->Stop(0);
+			obj->Stop(0, XAUDIO2_COMMIT_NOW);
 			obj->FlushSourceBuffers();
 			obj->DestroyVoice();
 		}
@@ -222,6 +222,7 @@ private:
 	{
 	public:
 		device_info(sound_xaudio2 &host) : m_host(host) { }
+		~device_info();
 		device_info(device_info const &) = delete;
 		device_info(device_info &&) = delete;
 
@@ -466,6 +467,7 @@ void sound_xaudio2::exit()
 	if (m_endpoint_notifications)
 	{
 		m_device_enum->UnregisterEndpointNotificationCallback(this);
+		m_endpoint_notifications = false;
 	}
 
 	// Wait on processing thread to end
@@ -489,7 +491,28 @@ void sound_xaudio2::exit()
 
 	{
 		std::lock_guard voice_lock(m_voice_mutex);
-		m_voice_info.clear();
+		while (!m_voice_info.empty())
+		{
+			{
+				std::lock_guard cleanup_lock(m_cleanup_mutex);
+				m_zombie_voices.emplace_back(std::move(m_voice_info.back()));
+				m_cleanup_condition.notify_all();
+			}
+			m_voice_info.pop_back();
+		}
+	}
+
+	{
+		std::lock_guard device_lock(m_device_mutex);
+		while (!m_device_info.empty())
+		{
+			{
+				std::lock_guard cleanup_lock(m_cleanup_mutex);
+				m_zombie_devices.emplace_back(std::move(m_device_info.back()));
+				m_cleanup_condition.notify_all();
+			}
+			m_device_info.pop_back();
+		}
 	}
 
 	if (m_cleanup_thread.joinable())
@@ -502,10 +525,11 @@ void sound_xaudio2::exit()
 		m_cleanup_thread.join();
 	}
 
-	{
-		std::lock_guard device_lock(m_device_mutex);
-		m_device_info.clear();
-	}
+	// just to be extra sure
+	m_zombie_voices.clear();
+	m_voice_info.clear();
+	m_zombie_devices.clear();
+	m_device_info.clear();
 
 	m_device_enum = nullptr;
 
@@ -801,6 +825,21 @@ void sound_xaudio2::stream_sink_update(
 }
 
 //============================================================
+//  ~device_info
+//============================================================
+
+sound_xaudio2::device_info::~device_info()
+{
+	// try to clean up in an orderly fashion
+	mastering_voice.reset();
+	if (engine)
+	{
+		engine->UnregisterForCallbacks(this);
+		engine = nullptr;
+	}
+}
+
+//============================================================
 //  IXAudio2EngineCallback::OnCriticalError
 //============================================================
 
@@ -817,9 +856,8 @@ void sound_xaudio2::device_info::OnCriticalError(HRESULT error)
 			m_host.m_device_info.begin(),
 			m_host.m_device_info.end(),
 			[this] (device_info_ptr const &value) { return value.get() == this; });
-	assert(m_host.m_device_info.end() != pos);
-
-	m_host.remove_device(pos);
+	if (m_host.m_device_info.end() != pos)
+		m_host.remove_device(pos);
 }
 
 //============================================================
@@ -864,7 +902,12 @@ sound_xaudio2::voice_info::voice_info(sound_xaudio2 &host, WAVEFORMATEX const &f
 sound_xaudio2::voice_info::~voice_info()
 {
 	// stop this before any buffers get destructed
-	voice.reset();
+	if (voice)
+	{
+		voice->Stop(0, XAUDIO2_COMMIT_NOW);
+		voice->FlushSourceBuffers();
+		voice.reset();
+	}
 }
 
 //============================================================
@@ -1059,7 +1102,8 @@ void sound_xaudio2::voice_info::OnVoiceError(void *pBufferContext, HRESULT error
 				m_host.m_voice_info.begin(),
 				m_host.m_voice_info.end(),
 				[this] (voice_info_ptr const &value) { return value.get() == this; });
-		assert(m_host.m_voice_info.end() != pos);
+		if (m_host.m_voice_info.end() == pos)
+			return;
 
 		our_pointer = std::move(*pos);
 		m_host.m_voice_info.erase(pos);
@@ -1265,11 +1309,13 @@ HRESULT sound_xaudio2::OnPropertyValueChanged(LPCWSTR pwstrDeviceId, PROPERTYKEY
 		{
 			if ((m_device_info.end() != pos) && ((*pos)->device_id == device_id))
 			{
-				// FIXME: update format
+				// XAudio2 can't deal with this - it needs to be torn down and re-created,
+				remove_device(pos);
+				add_device(find_device(device_id), pwstrDeviceId);
 			}
 			else
 			{
-				// deal with empty prop
+				// deal with devices added with the format property empty and updated later
 				HRESULT const result = add_device(pos, pwstrDeviceId);
 				if (FAILED(result))
 					return result;
@@ -1368,6 +1414,8 @@ HRESULT sound_xaudio2::add_device(device_info_vector_iterator pos, std::wstring_
 			devinfo->device_id = std::move(device_id_str);
 			devinfo->device = std::move(device);
 			devinfo->info = std::move(info);
+			if (!m_default_sink)
+				m_default_sink = devinfo->info.m_id;
 			m_device_info.emplace(pos, std::move(devinfo));
 
 			++m_generation;
@@ -1411,6 +1459,8 @@ HRESULT sound_xaudio2::remove_device(device_info_vector_iterator pos)
 				voice_info_ptr voice = std::move(*it);
 				it = m_voice_info.erase(it);
 				{
+					voice->voice->Stop(0, XAUDIO2_COMMIT_NOW);
+					voice->voice->FlushSourceBuffers();
 					std::lock_guard cleanup_lock(m_cleanup_mutex);
 					m_zombie_voices.emplace_back(std::move(voice));
 				}
@@ -1462,30 +1512,29 @@ void sound_xaudio2::cleanup_task()
 {
 	// clean up removed devices on a separate thread to avoid deadlocks
 	std::unique_lock cleanup_lock(m_cleanup_mutex);
-	while (!m_exiting)
+	while (!m_exiting || !m_zombie_devices.empty() || !m_zombie_voices.empty())
 	{
 		if (m_zombie_devices.empty() && m_zombie_voices.empty())
 			m_cleanup_condition.wait(cleanup_lock);
 
-		while (!m_zombie_devices.empty() && !m_zombie_voices.empty())
+		while (!m_zombie_devices.empty() || !m_zombie_voices.empty())
 		{
 			while (!m_zombie_voices.empty())
 			{
 				voice_info_ptr voice(std::move(m_zombie_voices.back()));
 				m_zombie_voices.pop_back();
 				cleanup_lock.unlock();
-				voice->voice->Stop(0, XAUDIO2_COMMIT_NOW);
-				voice->voice->FlushSourceBuffers();
 				voice.reset();
 				cleanup_lock.lock();
 			}
-			device_info_ptr device(std::move(m_zombie_devices.back()));
-			m_zombie_devices.pop_back();
-			cleanup_lock.unlock();
-			device->mastering_voice.reset();
-			device->engine->UnregisterForCallbacks(device.get());
-			device->engine = nullptr;
-			cleanup_lock.lock();
+			if (!m_zombie_devices.empty())
+			{
+				device_info_ptr device(std::move(m_zombie_devices.back()));
+				m_zombie_devices.pop_back();
+				cleanup_lock.unlock();
+				device.reset();
+				cleanup_lock.lock();
+			}
 		}
 	}
 }
