@@ -13,6 +13,8 @@
 
 #pragma once
 
+#include "debugcmd.h"
+
 #include <set>
 #include <utility>
 
@@ -189,7 +191,7 @@ private:
 
 	// global state
 	u32                         m_flags;                // debugging flags for this CPU
-	std::unique_ptr<symbol_table> m_symtable;           // symbol table for expression evaluation
+	std::unique_ptr<described_symbol_table> m_symtable;            // symbol table for expression evaluation
 
 	// stepping information
 	offs_t                  m_stepaddr;                 // step target address for DEBUG_FLAG_STEPPING_OVER or DEBUG_FLAG_STEPPING_BRANCH
@@ -426,7 +428,7 @@ private:
 	device_t *  m_livecpu;
 	device_t *  m_breakcpu;
 
-	std::unique_ptr<symbol_table> m_symtable;           // global symbol table
+	std::unique_ptr<described_symbol_table> m_symtable;           // global symbol table
 
 	bool        m_within_instruction_hook;
 	bool        m_vblank_occurred;
