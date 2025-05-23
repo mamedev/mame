@@ -84,6 +84,7 @@ void r800_device::mulub(u8 value)
 {
 	HL = A * value;
 	{
+		QT = 0;
 		// keep HN
 		m_f.sign_val = 0;
 		m_f.zero_val = HL != 0;
@@ -99,6 +100,7 @@ void r800_device::muluw(u16 value)
 	DE = res >> 16;
 	HL = res & 0xffff;
 	{
+		QT = 0;
 		// keep HN
 		m_f.sign_val = 0;
 		m_f.zero_val = res != 0;
