@@ -12,6 +12,7 @@
 #include "emu.h"
 #include "ppu2c0x_vt.h"
 
+#include "screen.h"
 
 /* constant definitions */
 #define VISIBLE_SCREEN_WIDTH         (32*8) /* Visible screen width */
@@ -20,22 +21,25 @@
 DEFINE_DEVICE_TYPE(PPU_VT03, ppu_vt03_device, "ppu_vt03", "VT03 PPU (NTSC)")
 DEFINE_DEVICE_TYPE(PPU_VT03PAL, ppu_vt03pal_device, "ppu_vt03pal", "VT03 PPU (PAL)")
 
-ppu_vt03_device::ppu_vt03_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock) :
+DEFINE_DEVICE_TYPE(PPU_VT3XX, ppu_vt3xx_device, "ppu_vt3xx", "VT3XX PPU (NTSC)")
+
+ppu_vt03_device::ppu_vt03_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock) :
 	ppu2c0x_device(mconfig, type, tag, owner, clock),
 	m_is_pal(false),
 	m_is_50hz(false),
 	m_read_bg(*this, 0),
-	m_read_sp(*this, 0)
+	m_read_sp(*this, 0),
+	m_read_onespace_with_relative(*this, 0)
 {
 }
 
-ppu_vt03_device::ppu_vt03_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+ppu_vt03_device::ppu_vt03_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
 	ppu_vt03_device(mconfig, PPU_VT03, tag, owner, clock)
 {
 }
 
 
-ppu_vt03pal_device::ppu_vt03pal_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock) :
+ppu_vt03pal_device::ppu_vt03pal_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
 	ppu_vt03_device(mconfig, PPU_VT03PAL, tag, owner, clock)
 {
 	m_scanlines_per_frame = PAL_SCANLINES_PER_FRAME;
@@ -45,7 +49,7 @@ ppu_vt03pal_device::ppu_vt03pal_device(const machine_config& mconfig, const char
 }
 
 
-uint8_t ppu_vt03_device::palette_read(offs_t offset)
+u8 ppu_vt03_device::palette_read(offs_t offset)
 {
 	if (offset < 0x20)
 		return ppu2c0x_device::palette_read(offset);
@@ -53,19 +57,7 @@ uint8_t ppu_vt03_device::palette_read(offs_t offset)
 		return m_palette_ram[offset];
 }
 
-void ppu_vt03_device::set_201x_descramble(uint8_t reg0, uint8_t reg1, uint8_t reg2, uint8_t reg3, uint8_t reg4, uint8_t reg5)
-{
-	m_2012_2017_descramble[0] = reg0; // TOOD: name regs
-	m_2012_2017_descramble[1] = reg1;
-	m_2012_2017_descramble[2] = reg2;
-	m_2012_2017_descramble[3] = reg3;
-	m_2012_2017_descramble[4] = reg4;
-	m_2012_2017_descramble[5] = reg5;
-}
-
-
-
-void ppu_vt03_device::palette_write(offs_t offset, uint8_t data)
+void ppu_vt03_device::palette_write(offs_t offset, u8 data)
 {
 	if (offset < 0x20)
 	{
@@ -77,66 +69,22 @@ void ppu_vt03_device::palette_write(offs_t offset, uint8_t data)
 	}
 }
 
-
-uint8_t ppu_vt03_device::read_extended(offs_t offset)
-{
-	offset += 0x10;
-	logerror("%s: read from extended PPU reg %02x\n", machine().describe_context(), offset);
-
-	switch (offset)
-	{
-	case 0x10:
-		return m_201x_regs[0x0];
-
-	case 0x11:
-		return m_201x_regs[0x1];
-
-	case 0x12:
-		return m_201x_regs[m_2012_2017_descramble[0]];
-
-	case 0x13:
-		return m_201x_regs[m_2012_2017_descramble[1]];
-
-	case 0x14:
-		return m_201x_regs[m_2012_2017_descramble[2]];
-
-	case 0x15:
-		return m_201x_regs[m_2012_2017_descramble[3]];
-
-	case 0x16:
-		return m_201x_regs[m_2012_2017_descramble[4]];
-
-	case 0x17:
-		return m_201x_regs[m_2012_2017_descramble[5]];
-
-	case 0x18:
-		return m_201x_regs[0x8];
-
-	case 0x19:
-		return 0x00;
-
-	case 0x1a:
-		return m_201x_regs[0xa];
-
-	case 0x1b:
-		return 0x00;
-
-	case 0x1c:
-		return 0x00;
-
-	case 0x1d:
-		return 0x00;
-
-	case 0x1e:
-		return 0x00;
-
-	case 0x1f:
-		return 0x00;
-	}
-
-	return 0x00;
-}
-
+u8 ppu_vt03_device::extended_modes_enable_r(offs_t offset) { return m_extended_modes_enable; }
+u8 ppu_vt03_device::extended_modes2_enable_r(offs_t offset) { return m_extended_modes2_enable; }
+u8 ppu_vt03_device::videobank0_0_r(offs_t offset) { return m_videobank0[0x0]; }
+u8 ppu_vt03_device::videobank0_1_r(offs_t offset) { return m_videobank0[0x1]; }
+u8 ppu_vt03_device::videobank0_2_r(offs_t offset) { return m_videobank0[0x2]; }
+u8 ppu_vt03_device::videobank0_3_r(offs_t offset) { return m_videobank0[0x3]; }
+u8 ppu_vt03_device::videobank0_4_r(offs_t offset) { return m_videobank0[0x4]; }
+u8 ppu_vt03_device::videobank0_5_r(offs_t offset) { return m_videobank0[0x5]; }
+u8 ppu_vt03_device::videobank1_r(offs_t offset) { return m_videobank1; }
+u8 ppu_vt03_device::unk_2019_r(offs_t offset) { return 0x00; } // unused?
+u8 ppu_vt03_device::videobank0_extra_r(offs_t offset) { return m_videobank0_extra; }
+u8 ppu_vt03_device::unk_201b_r(offs_t offset) { return 0x00; } // unused?
+u8 ppu_vt03_device::gun_x_r(offs_t offset) { return 0x00; }
+u8 ppu_vt03_device::gun_y_r(offs_t offset) { return 0x00; }
+u8 ppu_vt03_device::gun2_x_r(offs_t offset) { return 0x00; }
+u8 ppu_vt03_device::gun2_y_r(offs_t offset) { return 0x00; }
 
 
 void ppu_vt03_device::init_vtxx_rgb555_palette_tables()
@@ -146,10 +94,10 @@ void ppu_vt03_device::init_vtxx_rgb555_palette_tables()
 	{
 		for (int palval = 0; palval < 0x8000; palval++)
 		{
-			//uint16_t rgbval = (m_palette_ram[i & 0x7f] & 0xff) | ((m_palette_ram[(i & 0x7f) + 0x80] & 0xff) << 8);
-			const uint8_t blue = (palval & 0x001f) << 3;
-			const uint8_t green = (palval & 0x3e0) >> 2;
-			const uint8_t red = (palval & 0x7C00) >> 7;
+			//u16 rgbval = (m_palette_ram[i & 0x7f] & 0xff) | ((m_palette_ram[(i & 0x7f) + 0x80] & 0xff) << 8);
+			const u8 blue = (palval & 0x001f) << 3;
+			const u8 green = (palval & 0x3e0) >> 2;
+			const u8 red = (palval & 0x7C00) >> 7;
 
 			// TODO: apply emphasis values if they work in this mode
 			m_vtpens_rgb555[entry] = rgb_t(red, green, blue);
@@ -165,10 +113,10 @@ void ppu_vt03_device::init_vtxx_rgb444_palette_tables()
 	{
 		for (int palval = 0; palval < 0x1000; palval++)
 		{
-			//uint16_t rgbval = (m_palette_ram[i & 0x7f] & 0x3f) | ((m_palette_ram[(i & 0x7f) + 0x80] & 0x3f) << 6);
-			const uint8_t red = (palval & 0x000f) << 4;
-			const uint8_t green = (palval & 0x0f0);
-			const uint8_t blue = (palval & 0xf00) >> 4;
+			//u16 rgbval = (m_palette_ram[i & 0x7f] & 0x3f) | ((m_palette_ram[(i & 0x7f) + 0x80] & 0x3f) << 6);
+			const u8 red = (palval & 0x000f) << 4;
+			const u8 green = (palval & 0x0f0);
+			const u8 blue = (palval & 0xf00) >> 4;
 
 			// TODO: apply emphasis values if they work in this mode
 			m_vtpens_rgb444[entry] = rgb_t(red, green, blue);
@@ -259,26 +207,23 @@ void ppu_vt03_device::device_start()
 
 	save_item(NAME(m_palette_ram));
 	save_item(NAME(m_read_bg4_bg3));
-	save_item(NAME(m_va34));
-	save_item(NAME(m_extplanebuf));
 	save_item(NAME(m_extra_sprite_bits));
-	save_item(NAME(m_201x_regs));
+	save_item(NAME(m_videobank0));
+	save_item(NAME(m_videobank1));
+	save_item(NAME(m_extended_modes_enable));
+	save_item(NAME(m_extended_modes2_enable));
+	save_item(NAME(m_videobank0_extra));
+	save_item(NAME(m_vt3xx_palette));
 
 	init_vt03_palette_tables(0);
 	init_vtxx_rgb555_palette_tables();
 	init_vtxx_rgb444_palette_tables();
-}
 
-uint8_t ppu_vt03_device::get_201x_reg(int reg)
-{
-	//logerror(" getting reg %d is %02x ", reg, m_201x_regs[reg]);
-
-	return m_201x_regs[reg];
-}
-
-void ppu_vt03_device::set_201x_reg(int reg, uint8_t data)
-{
-	m_201x_regs[reg] = data;
+	// for VT3xx
+	save_item(NAME(m_newvid_1c));
+	save_item(NAME(m_newvid_1d));
+	save_item(NAME(m_newvid_1e));
+	save_item(NAME(m_tilebases_2x));
 }
 
 void ppu_vt03_device::device_reset()
@@ -288,84 +233,91 @@ void ppu_vt03_device::device_reset()
 	for (int i = 0; i < 0xff; i++)
 		m_palette_ram[i] = 0x0;
 
+	for (int i = 0; i < 0x400; i++)
+		m_vt3xx_palette[i] = 0x00;
+
 	// todo: what are the actual defaults for these?
-	for (int i = 0; i < 0x20; i++)
-		set_201x_reg(i, 0x00);
+	m_extended_modes_enable = 0x00;
+	m_extended_modes2_enable = 0x00;
+
+	for (int i = 0; i < 6; i++)
+		m_videobank0[i] = 0;
+
+	m_videobank0_extra = 0;
+	m_videobank1 = 0;
 
 	m_read_bg4_bg3 = 0;
-	m_va34 = false;
+
+	// for VT3xx
+	m_newvid_1c = 0x00;
+	m_newvid_1d = 0x00;
+	m_newvid_1e = 0x00;
+
+	for (int i = 0; i < 4; i++)
+		m_tilebases_2x[i] = 0x00;
 }
 
-
-uint8_t ppu_vt03_device::get_m_read_bg4_bg3()
+u8 ppu_vt03_device::get_m_read_bg4_bg3()
 {
 	return m_read_bg4_bg3;
 }
 
-uint8_t ppu_vt03_device::get_va34()
-{
-	return m_va34;
-}
-
-
 void ppu_vt03_device::read_sprite_plane_data(int address)
 {
-	m_va34 = false;
 	m_planebuf[0] = m_read_sp((address + 0) & 0x1fff);
 	m_planebuf[1] = m_read_sp((address + 8) & 0x1fff);
 
-	const bool is4bpp = BIT(get_201x_reg(0x0), 2);
+	const bool is4bpp = BIT(m_extended_modes_enable, 2);
 
 	if (is4bpp)
 	{
-		m_va34 = true;
-		m_extplanebuf[0] = m_read_sp((address + 0) & 0x1fff);
-		m_extplanebuf[1] = m_read_sp((address + 8) & 0x1fff);
+		m_planebuf[2] = m_read_sp(((address + 0) & 0x1fff)|0x2000);
+		m_planebuf[3] = m_read_sp(((address + 8) & 0x1fff)|0x2000);
 	}
 }
 
-void ppu_vt03_device::make_sprite_pixel_data(uint8_t& pixel_data, bool flipx)
+void ppu_vt03_device::make_sprite_pixel_data(u8& pixel_data, bool flipx)
 {
 	ppu2c0x_device::make_sprite_pixel_data(pixel_data, flipx);
 
-	const bool is4bpp = BIT(get_201x_reg(0x0), 2);
-	const bool is16pix = BIT(get_201x_reg(0x0), 0);
+	const bool is4bpp = BIT(m_extended_modes_enable, 2);
+	const bool is16pix = BIT(m_extended_modes_enable, 0);
 
 	if (is4bpp)
 	{
 		if (flipx)
 		{
 			// yes, shift by 5 and 6 because of the way the palette is arranged in RAM
-			pixel_data |= (((m_extplanebuf[0] & 1) << 5) | ((m_extplanebuf[1] & 1) << 6));
-			m_extplanebuf[0] = m_extplanebuf[0] >> 1;
-			m_extplanebuf[1] = m_extplanebuf[1] >> 1;
+			pixel_data |= (((m_planebuf[2] & 1) << 5) | ((m_planebuf[3] & 1) << 6));
+			m_planebuf[2] = m_planebuf[2] >> 1;
+			m_planebuf[3] = m_planebuf[3] >> 1;
 
 			if (is16pix)
 			{
-				const uint8_t pix0 = pixel_data & 0x03;
-				const uint8_t pix1 = (pixel_data >> 5) & 0x03;
+				const u8 pix0 = pixel_data & 0x03;
+				const u8 pix1 = (pixel_data >> 5) & 0x03;
 				pixel_data = pix1 | (pix0 << 5);
 			}
 		}
 		else
 		{
-			pixel_data |= (((m_extplanebuf[0] >> 7) & 1) << 5) | (((m_extplanebuf[1] >> 7) & 1) << 6);
-			m_extplanebuf[0] = m_extplanebuf[0] << 1;
-			m_extplanebuf[1] = m_extplanebuf[1] << 1;
+			pixel_data |= (((m_planebuf[2] >> 7) & 1) << 5) | (((m_planebuf[3] >> 7) & 1) << 6);
+			m_planebuf[2] = m_planebuf[2] << 1;
+			m_planebuf[3] = m_planebuf[3] << 1;
 		}
 	}
 }
 
-void ppu_vt03_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_rgb32& bitmap)
+void ppu_vt03_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, u8 pixel_data, bitmap_rgb32& bitmap)
 {
-	const bool is4bpp = BIT(get_201x_reg(0x0), 2);
-	const bool is16pix = BIT(get_201x_reg(0x0), 0);
+	const bool is4bpp = BIT(m_extended_modes_enable, 2);
+	const bool is16pix = BIT(m_extended_modes_enable, 0);
 
 	if (is4bpp)
 	{
 		if (!is16pix)
 		{
-			const uint8_t pen = pixel_data + (4 * color);
+			const u8 pen = pixel_data + (4 * color);
 			draw_tile_pixel_inner(pen, &bitmap.pix(m_scanline, sprite_xpos + pixel));
 		}
 		else
@@ -375,17 +327,15 @@ void ppu_vt03_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, u
 			    cliprect - not seen used yet */
 			if ((pixel_data & 0x03) != 0)
 			{
-				const uint8_t pen = (pixel_data & 0x03) + (4 * color);
+				const u8 pen = (pixel_data & 0x03) + (4 * color);
 				draw_tile_pixel_inner(pen, &bitmap.pix(m_scanline, sprite_xpos + pixel));
 			}
 
 			if (((pixel_data >> 5) & 0x03) != 0)
 			{
-				const uint8_t pen = ((pixel_data >> 5) & 0x03) + (4 * color);
+				const u8 pen = ((pixel_data >> 5) & 0x03) + (4 * color);
 				draw_tile_pixel_inner(pen, &bitmap.pix(m_scanline, sprite_xpos + pixel + 8));
 			}
-			//ppu2c0x_device::draw_sprite_pixel(sprite_xpos, color, pixel, pixel_data & 0x03, bitmap);
-			//ppu2c0x_device::draw_sprite_pixel(sprite_xpos, color, pixel + 8, (pixel_data >> 5) & 0x03, bitmap);
 		}
 	}
 	else
@@ -396,48 +346,69 @@ void ppu_vt03_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, u
 
 void ppu_vt03_device::read_tile_plane_data(int address, int color)
 {
-	const bool is4bpp = BIT(get_201x_reg(0x0), 1);
+	const bool is4bpp = BIT(m_extended_modes_enable, 1);
+	m_whichpixel = 0;
 
-	if (m_201x_regs[0] & 0x10) // extended mode
+	if (m_extended_modes_enable & 0x10) // extended mode
 		m_read_bg4_bg3 = color;
 	else
 		m_read_bg4_bg3 = 0;
 
 	if (is4bpp)
 	{
-		m_va34 = false;
-		m_planebuf[0] = m_read_bg((address & 0x1fff));
-		m_planebuf[1] = m_read_bg((address + 8) & 0x1fff);
-		m_va34 = true;
-		m_extplanebuf[0] = m_read_bg((address & 0x1fff));
-		m_extplanebuf[1] = m_read_bg((address + 8) & 0x1fff);
+		m_planebuf[0] = m_read_bg( (address + 0) & 0x1fff );
+		m_planebuf[1] = m_read_bg( (address + 8) & 0x1fff );
+		m_planebuf[2] = m_read_bg( ((address + 0) & 0x1fff) | 0x2000 );
+		m_planebuf[3] = m_read_bg( ((address + 8) & 0x1fff) | 0x2000 );
 	}
 	else
 	{
-		m_va34 = false;
 		m_planebuf[0] = m_read_bg((address & 0x1fff));
 		m_planebuf[1] = m_read_bg((address + 8) & 0x1fff);
 	}
 }
 
-void ppu_vt03_device::shift_tile_plane_data(uint8_t& pix)
+void ppu_vt03_device::shift_tile_plane_data(u8& pix)
 {
-	const bool is4bpp = BIT(get_201x_reg(0x0), 1);
+	const bool is4bpp = BIT(m_extended_modes_enable, 1);
 
-	ppu2c0x_device::shift_tile_plane_data(pix);
+	pix = 0;
 
 	if (is4bpp)
 	{
-		pix |= (((m_extplanebuf[0] >> 7) & 1) << 5) | (((m_extplanebuf[1] >> 7) & 1) << 6); // yes, shift by 5 and 6 because of the way the palette is arranged in RAM
-		m_extplanebuf[0] = m_extplanebuf[0] << 1;
-		m_extplanebuf[1] = m_extplanebuf[1] << 1;
+		switch (m_whichpixel)
+		{
+		case 0: pix = (BIT(m_planebuf[0], 7) << 0) | (BIT(m_planebuf[1], 7) << 1) | (BIT(m_planebuf[2], 7) << 5) | (BIT(m_planebuf[3], 7) << 6); break;
+		case 1: pix = (BIT(m_planebuf[0], 6) << 0) | (BIT(m_planebuf[1], 6) << 1) | (BIT(m_planebuf[2], 6) << 5) | (BIT(m_planebuf[3], 6) << 6); break;
+		case 2: pix = (BIT(m_planebuf[0], 5) << 0) | (BIT(m_planebuf[1], 5) << 1) | (BIT(m_planebuf[2], 5) << 5) | (BIT(m_planebuf[3], 5) << 6); break;
+		case 3: pix = (BIT(m_planebuf[0], 4) << 0) | (BIT(m_planebuf[1], 4) << 1) | (BIT(m_planebuf[2], 4) << 5) | (BIT(m_planebuf[3], 4) << 6); break;
+		case 4: pix = (BIT(m_planebuf[0], 3) << 0) | (BIT(m_planebuf[1], 3) << 1) | (BIT(m_planebuf[2], 3) << 5) | (BIT(m_planebuf[3], 3) << 6); break;;
+		case 5: pix = (BIT(m_planebuf[0], 2) << 0) | (BIT(m_planebuf[1], 2) << 1) | (BIT(m_planebuf[2], 2) << 5) | (BIT(m_planebuf[3], 2) << 6); break;
+		case 6: pix = (BIT(m_planebuf[0], 1) << 0) | (BIT(m_planebuf[1], 1) << 1) | (BIT(m_planebuf[2], 1) << 5) | (BIT(m_planebuf[3], 1) << 6); break;
+		case 7: pix = (BIT(m_planebuf[0], 0) << 0) | (BIT(m_planebuf[1], 0) << 1) | (BIT(m_planebuf[2], 0) << 5) | (BIT(m_planebuf[3], 0) << 6); break;
+		}
 	}
+	else
+	{
+		switch (m_whichpixel)
+		{
+		case 0: pix = (BIT(m_planebuf[0], 7) << 0) | (BIT(m_planebuf[1], 7) << 1); break;
+		case 1: pix = (BIT(m_planebuf[0], 6) << 0) | (BIT(m_planebuf[1], 6) << 1); break;
+		case 2: pix = (BIT(m_planebuf[0], 5) << 0) | (BIT(m_planebuf[1], 5) << 1); break;
+		case 3: pix = (BIT(m_planebuf[0], 4) << 0) | (BIT(m_planebuf[1], 4) << 1); break;
+		case 4: pix = (BIT(m_planebuf[0], 3) << 0) | (BIT(m_planebuf[1], 3) << 1); break;
+		case 5: pix = (BIT(m_planebuf[0], 2) << 0) | (BIT(m_planebuf[1], 2) << 1); break;
+		case 6: pix = (BIT(m_planebuf[0], 1) << 0) | (BIT(m_planebuf[1], 1) << 1); break;
+		case 7: pix = (BIT(m_planebuf[0], 0) << 0) | (BIT(m_planebuf[1], 0) << 1); break;
+		}
+	}
+
+	m_whichpixel++;
 }
 
-
-void ppu_vt03_device::draw_back_pen(uint32_t* dst, int back_pen)
+void ppu_vt03_device::draw_back_pen(u32* dst, int back_pen)
 {
-	if (m_201x_regs[0] & 0x80)
+	if (m_extended_modes_enable & 0x80)
 	{
 		// is the back_pen always just pen 0 in VT modes? (using last data written to a transparent pen as per NES logic doesn't work as writes are split across 2 bytes)
 		draw_tile_pixel_inner(0, dst);
@@ -450,95 +421,117 @@ void ppu_vt03_device::draw_back_pen(uint32_t* dst, int back_pen)
 }
 
 
-void ppu_vt03_device::draw_tile_pixel_inner(uint8_t pen, uint32_t *dest)
+void ppu_vt03_device::draw_tile_pixel_inner(u8 pen, u32 *dest)
 {
-	if (BIT(m_201x_regs[0], 7))
+	if (is_v3xx_extended_mode())
 	{
-		if (m_pal_mode == PAL_MODE_NEW_RGB) // unknown newer VT mode
-		{
-			uint32_t palval = (m_palette_ram[pen & 0x7f] & 0xff) | ((m_palette_ram[(pen & 0x7f) + 0x80] & 0x7f) << 8);
+		// correct for lxcmcysp, lxcmc250
+		u16 pal0 = readbyte(((pen & 0xff) * 2) + 0x3c00);
+		pal0 |= readbyte(((pen & 0xff) * 2) + 0x3c01) << 8;
 
-			// does grayscale mode exist here? (we haven't calculated any colours for it)
-			//if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
-			//  palval &= 0x30;
+		const int palb = (pal0 >> 0) & 0x1f;
+		const int palg = (pal0 >> 5) & 0x1f;
+		const int palr = (pal0 >> 10) & 0x1f;
 
-			// apply colour emphasis (does it really exist here?) (we haven't calculated any colours for it, so ths has no effect)
-			palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 10);
-
-			*dest = m_vtpens_rgb555[palval & 0x3ffff];
-		}
-		else if (m_pal_mode == PAL_MODE_NEW_RGB12) // unknown newer VT mode
-		{
-			uint32_t palval = (m_palette_ram[pen & 0x7f] & 0x3f) | ((m_palette_ram[(pen & 0x7f) + 0x80] & 0x3f) << 6);
-
-			// does grayscale mode exist here? (we haven't calculated any colours for it)
-			//if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
-			//  palval &= 0x30;
-
-			// apply colour emphasis (does it really exist here?) (we haven't calculated any colours for it, so ths has no effect)
-			palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 7);
-
-			*dest = m_vtpens_rgb444[palval & 0x7fff];
-		}
-		else // VT03 mode
-		{
-			uint32_t palval = (m_palette_ram[pen & 0x7f] & 0x3f) | ((m_palette_ram[(pen & 0x7f) + 0x80] & 0x3f) << 6);
-
-			// does grayscale mode exist here? (we haven't calculated any colours for it)
-			//if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
-			//  palval &= 0x30;
-
-			// apply colour emphasis (does it really exist here?) (we calculate values for it when building the palette lookup)
-			palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 7);
-
-			*dest = pen_color(YUV444_COLOR + (palval & 0x7fff));
-		}
-	}
-	else // old colour compatible mode
-	{
-		uint16_t palval = (m_palette_ram[pen & 0x7f] & 0x3f);
-
-		if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
-			palval &= 0x30;
-
-		// apply colour emphasis
-		palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 1);
-
-		*dest = pen_color(palval & 0x1ff);
-	}
-}
-void ppu_vt03_device::draw_tile_pixel(uint8_t pix, int color, uint32_t back_pen, uint32_t*& dest)
-{
-	const bool is4bpp = BIT(get_201x_reg(0x0), 1);
-
-	if (!is4bpp)
-	{
-		ppu2c0x_device::draw_tile_pixel(pix, color, back_pen, dest);
+		*dest = rgb_t(palr << 3, palg << 3, palb << 3);
 	}
 	else
 	{
-		int basepen;
-		int pen;
-
-		if (m_201x_regs[0] & 0x10) // extended mode
+		if (BIT(m_extended_modes_enable, 7))
 		{
-			basepen = 0;
+			if (m_pal_mode == PAL_MODE_NEW_RGB) // unknown newer VT mode
+			{
+				u32 palval = (m_palette_ram[pen & 0x7f] & 0xff) | ((m_palette_ram[(pen & 0x7f) + 0x80] & 0x7f) << 8);
+
+				// does grayscale mode exist here? (we haven't calculated any colours for it)
+				//if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
+				//  palval &= 0x30;
+
+				// apply colour emphasis (does it really exist here?) (we haven't calculated any colours for it, so ths has no effect)
+				palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 10);
+
+				*dest = m_vtpens_rgb555[palval & 0x3ffff];
+			}
+			else if (m_pal_mode == PAL_MODE_NEW_RGB12) // unknown newer VT mode
+			{
+				u32 palval = (m_palette_ram[pen & 0x7f] & 0x3f) | ((m_palette_ram[(pen & 0x7f) + 0x80] & 0x3f) << 6);
+
+				// does grayscale mode exist here? (we haven't calculated any colours for it)
+				//if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
+				//  palval &= 0x30;
+
+				// apply colour emphasis (does it really exist here?) (we haven't calculated any colours for it, so ths has no effect)
+				palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 7);
+
+				*dest = m_vtpens_rgb444[palval & 0x7fff];
+			}
+			else // VT03 mode
+			{
+				u32 palval = (m_palette_ram[pen & 0x7f] & 0x3f) | ((m_palette_ram[(pen & 0x7f) + 0x80] & 0x3f) << 6);
+
+				// does grayscale mode exist here? (we haven't calculated any colours for it)
+				//if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
+				//  palval &= 0x30;
+
+				// apply colour emphasis (does it really exist here?) (we calculate values for it when building the palette lookup)
+				palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 7);
+
+				*dest = pen_color(YUV444_COLOR + (palval & 0x7fff));
+			}
+		}
+		else // old colour compatible mode
+		{
+			u16 palval = (m_palette_ram[pen & 0x7f] & 0x3f);
+
+			if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
+				palval &= 0x30;
+
+			// apply colour emphasis
+			palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 1);
+
+			*dest = pen_color(palval & 0x1ff);
+		}
+	}
+}
+void ppu_vt03_device::draw_tile_pixel(u8 pix, int color, u32 back_pen, u32*& dest)
+{
+	if (is_v3xx_extended_mode())
+	{
+		draw_tile_pixel_inner(pix, dest);
+	}
+	else
+	{
+		const bool is4bpp = BIT(m_extended_modes_enable, 1);
+
+		if (!is4bpp)
+		{
+			ppu2c0x_device::draw_tile_pixel(pix, color, back_pen, dest);
 		}
 		else
 		{
-			basepen = 4 * color; // for use in the palette decoding
-		}
+			int basepen;
+			int pen;
 
-		if (pix)
-		{
-			pen = pix + basepen;
-		}
-		else
-		{
-			pen = 0; // back_pen; // fixme backpen logic probably differs on vt03 due to extra colours
-		}
+			if (m_extended_modes_enable & 0x10) // extended mode
+			{
+				basepen = 0;
+			}
+			else
+			{
+				basepen = 4 * color; // for use in the palette decoding
+			}
 
-		draw_tile_pixel_inner(pen, dest);
+			if (pix)
+			{
+				pen = pix + basepen;
+			}
+			else
+			{
+				pen = 0; // back_pen; // fixme backpen logic probably differs on vt03 due to extra colours
+			}
+
+			draw_tile_pixel_inner(pen, dest);
+		}
 	}
 }
 
@@ -547,12 +540,12 @@ void ppu_vt03_device::read_extra_sprite_bits(int sprite_index)
 	m_extra_sprite_bits = (m_spriteram[sprite_index + 2] & 0x1c) >> 2;
 }
 
-uint8_t ppu_vt03_device::get_speva2_speva0()
+u8 ppu_vt03_device::get_speva2_speva0()
 {
 	return m_extra_sprite_bits;
 }
 
-void ppu_vt03_device::set_2010_reg(uint8_t data)
+void ppu_vt03_device::extended_modes_enable_w(offs_t offset, u8 data)
 {
 	/*  7   : COLCOMP
 	    6   : UNUSED (8bpp enable on VT09?)
@@ -563,81 +556,520 @@ void ppu_vt03_device::set_2010_reg(uint8_t data)
 	    1   : BK16EN
 	    0   : PIX16EN */
 
-	m_201x_regs[0x0] = data;
+	m_extended_modes_enable = data;
 }
 
-void ppu_vt03_device::write_extended(offs_t offset, uint8_t data)
+void ppu_vt03_device::extended_modes2_enable_w(offs_t offset, u8 data) { m_extended_modes2_enable = data; }
+void ppu_vt03_device::videobank0_0_w(offs_t offset, u8 data) { m_videobank0[0x0] = data; }
+void ppu_vt03_device::videobank0_1_w(offs_t offset, u8 data) { m_videobank0[0x1] = data; }
+void ppu_vt03_device::videobank0_2_w(offs_t offset, u8 data) { m_videobank0[0x2] = data; }
+void ppu_vt03_device::videobank0_3_w(offs_t offset, u8 data) { m_videobank0[0x3] = data; }
+void ppu_vt03_device::videobank0_4_w(offs_t offset, u8 data) { m_videobank0[0x4] = data; }
+void ppu_vt03_device::videobank0_5_w(offs_t offset, u8 data) { m_videobank0[0x5] = data; }
+void ppu_vt03_device::videobank1_w(offs_t offset, u8 data) { m_videobank1 = data; }
+void ppu_vt03_device::gun_reset_w(offs_t offset, u8 data) { logerror("%s: gun_reset_w %02x\n", machine().describe_context(), data); }
+void ppu_vt03_device::videobank0_extra_w(offs_t offset, u8 data) { m_videobank0_extra = data; }
+/* 201b unused */
+/* 201c read gun read x (older VT chipsets) */
+/* 201d read gun read y (older VT chipsets) */
+/* 201e read gun 2 read x (older VT chipsets) */
+/* 201f read gun 2 read y (older VT chipsets) */
+
+ppu_vt3xx_device::ppu_vt3xx_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+	ppu_vt03_device(mconfig, PPU_VT3XX, tag, owner, clock)
 {
-	offset += 0x10;
-	logerror("%s: write to extended PPU reg 0x20%02x %02x\n", machine().describe_context(), offset, data);
-	switch (offset)
+	m_spriteramsize = 0x200;
+}
+
+void ppu_vt3xx_device::device_start()
+{
+	ppu_vt03_device::device_start();
+
+	save_item(NAME(m_204x_screenregs));
+	save_item(NAME(m_2008_spritehigh));
+}
+
+void ppu_vt3xx_device::device_reset()
+{
+	ppu_vt03_device::device_reset();
+
+	for (int i = 0; i < 0xa; i++)
+		m_204x_screenregs[i] = 0x00;
+
+	m_2008_spritehigh = 0;
+}
+
+u8 ppu_vt3xx_device::extvidreg_201c_r(offs_t offset) { return m_newvid_1c; }
+u8 ppu_vt3xx_device::extvidreg_201d_r(offs_t offset) { return m_newvid_1d; }
+u8 ppu_vt3xx_device::extvidreg_201e_r(offs_t offset) { return m_newvid_1e; }
+u8 ppu_vt3xx_device::tilebases_202x_r(offs_t offset) { return m_tilebases_2x[offset]; }
+
+void ppu_vt3xx_device::extvidreg_201c_w(offs_t offset, u8 data) { m_newvid_1c = data; logerror("%s: extvidreg_201c_w %02x\n", machine().describe_context(), data); }
+void ppu_vt3xx_device::extvidreg_201d_w(offs_t offset, u8 data) { m_newvid_1d = data; logerror("%s: extvidreg_201d_w %02x\n", machine().describe_context(), data); }
+
+void ppu_vt3xx_device::extvidreg_201e_w(offs_t offset, u8 data)
+{
+	/*
+	 extended mode feature enables
+	 ---- -s--
+	 s = old/new sprite mode
+	*/
+	m_newvid_1e = data;
+	logerror("%s: extvidreg_201e_w %02x\n", machine().describe_context(), data);
+}
+
+void ppu_vt3xx_device::tilebases_202x_w(offs_t offset, u8 data)
+{
+	if (data != m_tilebases_2x[offset])
+		logerror("%s: NEW VALUE tilebases_202x_w %d %02x\n", machine().describe_context(), offset, data);
+
+	m_tilebases_2x[offset] = data;
+}
+
+// move this to ppu_vt03_device? as it seems like even some of the VT32 games write here
+void ppu_vt3xx_device::lcdc_regs_w(offs_t offset, u8 data)
+{
+	// these seem somehow related to the screen dimensions, but could
+	// be specific to the type of LCD being used (scale against the actual screen)
+	// so for now we just use a table lookup
+	//
+	// of note lxcmcysp (which has a vertical screen squashed to horizontal) writes different
+	// config values here compared to the natively horizontal versions
+	// 
+	// the real devices scale the higher res images to the lower LCD, dropping pixels
+	logerror("%s: ppu_vt3xx_device::lcdc_regs_w %d %02x\n", machine().describe_context(), offset, data);
+	m_204x_screenregs[offset] = data;
+
+	struct vid_mode
 	{
-	case 0x10:
-		set_2010_reg(data);
-		break;
+		int min_x;
+		int max_x;
+		int min_y;
+		int max_y;
+		u8 regvals[0xa];
+	};
 
-	case 0x11:
-		m_201x_regs[0x1] = data;
-		break;
+	static const vid_mode mode_table[] = {
+		// configurations used for lower resolution output
+		{ 0, 159, 0, 127, { 0xa0, 0xff, 0x00, 0x40, 0xff, 0x04, 0x00, 0xa8, 0x04, 0x0f }, },
+		{ 0, 199, 0, 199, { 0xdc, 0xff, 0x00, 0x58, 0xff, 0x04, 0x10, 0xa8, 0x04, 0x00 }, },  // hkb502 menu, uncertain dimensions
+		{ 0, 127, 0, 159, { 0x80, 0x80, 0x00, 0x50, 0xff, 0x04, 0x00, 0xaa, 0x08, 0x00 }, },  // lexi30 menu
+		{ 0, 127, 0, 159, { 0x80, 0x3f, 0x00, 0x50, 0xff, 0x69, 0x00, 0x54, 0x08, 0x00 }, }, // gcs2mgp
 
-	case 0x12:
-		m_201x_regs[m_2012_2017_descramble[0]] = data;
-		break;
+		// configurations used for 'regular' output
+		{ 0, 255, 0, 239, { 0xa0, 0x57, 0x09, 0x40, 0x93, 0x04, 0x00, 0x83, 0x08, 0x00 }, }, // full mode for the 0, 159, 0, 127 config
 
-	case 0x13:
-		m_201x_regs[m_2012_2017_descramble[1]] = data;
-		break;
+		{ 0, 255, 0, 239, { 0x40, 0xa1, 0x00, 0x78, 0xff, 0x69, 0x0a, 0x69, 0x26, 0x00 }, }, // denv150
+		{ 0, 255, 0, 239, { 0x40, 0xa1, 0x00, 0x78, 0xff, 0x04, 0x0a, 0xd4, 0x0a, 0x00 }, }, // myarccn
+		{ 0, 255, 0, 239, { 0xdc, 0xe1, 0x00, 0x58, 0xbf, 0x04, 0x10, 0x93, 0x04, 0x00 }, }, // hkb502 normal games
 
-	case 0x14:
-		m_201x_regs[m_2012_2017_descramble[2]] = data;
-		break;
+		{ -1, -1, -1, -1, { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }, },
+	};
 
-	case 0x15:
-		m_201x_regs[m_2012_2017_descramble[3]] = data;
-		break;
+	if (offset == 0x09)
+	{
+		// default to these (standard resolution) if no entry is found
+		int new_min_x = 0;
+		int new_max_x = 255;
+		int new_min_y = 0;
+		int new_max_y = 239;
 
-	case 0x16:
-		m_201x_regs[m_2012_2017_descramble[4]] = data;
-		break;
+		rectangle curvisarea = screen().visible_area();
+		logerror("current screen dimensions are %d %d %d %d\n", curvisarea.min_x, curvisarea.max_x, curvisarea.min_y, curvisarea.max_y);
 
-	case 0x17:
-		logerror("set reg 7 %02x\n", data);
-		m_201x_regs[m_2012_2017_descramble[5]] = data;
-		break;
+		int tablenum = 0;
+		do
+		{
+			bool found = true;
+			for (int entry = 0; entry < 0xa; entry++)
+			{
+				if (mode_table[tablenum].regvals[entry] != m_204x_screenregs[entry])
+					found = false;
+			}
 
-	case 0x18:
-		logerror("set reg 8 %02x\n", data);
-		m_201x_regs[0x8] = data;
-		break;
+			if (found)
+			{
+				new_min_x = mode_table[tablenum].min_x;
+				new_max_x = mode_table[tablenum].max_x;
+				new_min_y = mode_table[tablenum].min_y;
+				new_max_y = mode_table[tablenum].max_y;
 
-	case 0x19:
-		// reset gun port (value doesn't matter)
-		break;
+				logerror("new screen dimensions are %d %d %d %d\n", new_min_x, new_max_x, new_min_y, new_max_y);
 
-	case 0x1a:
-		m_201x_regs[0xa] = data;
-		break;
+			}
 
-	case 0x1b:
-		// unused
-		break;
+			tablenum++;
+		} while (mode_table[tablenum].min_x != -1);
 
-	case 0x1c:
-		// (READ) x-coordinate of gun
-		break;
+		screen().set_visible_area(new_min_x, new_max_x, new_min_y, new_max_y);
 
-	case 0x1d:
-		// (READ) y-coordinate of gun
-		break;
-
-	case 0x1e:
-		// (READ) x-coordinate of gun 2
-		break;
-
-	case 0x1f:
-		// (READ) y-coordinate of gun 2
-		break;
 	}
 }
 
+// vt3xx tile modes are no longer planar, but the tile code provides ROM offsets that
+// would be, this converts them to offsets that give us the data we want.
+offs_t ppu_vt3xx_device::recalculate_offsets_8x8x4packed_tile(int address, int va34)
+{
+	int finaladdr = get_newmode_tilebase() * 0x2000;
+	int tileline = address & 0x0007;
+	int tileplane = address & 0x0008;
+	int tilenum = address & 0x0ff0;
+	int colorbits = get_m_read_bg4_bg3();
+	int finaloffset = (tilenum << 1) | (tileline << 2) | (tileplane >> 2) | va34;
+	finaloffset += colorbits * 0x2000;
+	return finaladdr + finaloffset;
+}
 
+offs_t ppu_vt3xx_device::recalculate_offsets_8x8x8packed_tile(int address, int va34)
+{
+	int finaladdr = get_newmode_tilebase() * 0x2000;
+	int colorbits = get_m_read_bg4_bg3();
+	int tileline = address & 0x0007;
+	int tileplane = address & 0x0008;
+	int tilenum = address & 0x0ff0;
+	int finaloffset = (tilenum << 2) | (tileline << 3) | (tileplane >> 1) | va34;
+	finaloffset += colorbits * 0x4000;
+	return finaladdr + finaloffset;
+}
+
+void ppu_vt3xx_device::read_tile_plane_data(int address, int color)
+{
+	if (!m_newvid_1e)
+	{
+		ppu_vt03_device::read_tile_plane_data(address, color);
+	}
+	else
+	{
+		m_read_bg4_bg3 = color;
+
+		m_whichpixel = 0;
+
+		if ((m_newvid_1c & 0x03) == 0x02)
+		{
+			m_planebuf[0] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 0) & 0x1fff, 0));
+			m_planebuf[1] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 8) & 0x1fff, 0));
+			m_planebuf[2] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 0) & 0x1fff, 1));
+			m_planebuf[3] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 8) & 0x1fff, 1));
+			m_planebuf[4] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 0) & 0x1fff, 2));
+			m_planebuf[5] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 8) & 0x1fff, 2));
+			m_planebuf[6] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 0) & 0x1fff, 3));
+			m_planebuf[7] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 8) & 0x1fff, 3));
+		}
+		else
+		{
+			m_planebuf[0] = m_read_onespace_with_relative(recalculate_offsets_8x8x4packed_tile((address + 0) & 0x1fff, 0));
+			m_planebuf[1] = m_read_onespace_with_relative(recalculate_offsets_8x8x4packed_tile((address + 8) & 0x1fff, 0));
+			m_planebuf[2] = m_read_onespace_with_relative(recalculate_offsets_8x8x4packed_tile((address + 0) & 0x1fff, 1));
+			m_planebuf[3] = m_read_onespace_with_relative(recalculate_offsets_8x8x4packed_tile((address + 8) & 0x1fff, 1));
+		}
+	}
+}
+
+void ppu_vt3xx_device::shift_tile_plane_data(u8& pix)
+{
+	if (!m_newvid_1e)
+	{
+		ppu_vt03_device::shift_tile_plane_data(pix);
+	}
+	else
+	{
+		if ((m_newvid_1c & 0x03) == 0x02)
+		{
+			// 8x8x8 non-planar mode
+			switch (m_whichpixel)
+			{
+			case 0: pix = m_planebuf[0]; break;
+			case 1: pix = m_planebuf[2]; break;
+			case 2: pix = m_planebuf[4]; break;
+			case 3: pix = m_planebuf[6]; break;
+			case 4: pix = m_planebuf[1]; break;
+			case 5: pix = m_planebuf[3]; break;
+			case 6: pix = m_planebuf[5]; break;
+			case 7: pix = m_planebuf[7]; break;
+			}
+		}
+		else
+		{
+			// extended modes
+			// 8x8x4 non-planar mode
+			switch (m_whichpixel)
+			{
+			case 0: pix = (m_planebuf[0] >> 0) & 0xf; break;
+			case 1: pix = (m_planebuf[0] >> 4) & 0xf; break;
+			case 2: pix = (m_planebuf[2] >> 0) & 0xf; break;
+			case 3: pix = (m_planebuf[2] >> 4) & 0xf; break;
+			case 4: pix = (m_planebuf[1] >> 0) & 0xf; break;
+			case 5: pix = (m_planebuf[1] >> 4) & 0xf; break;
+			case 6: pix = (m_planebuf[3] >> 0) & 0xf; break;
+			case 7: pix = (m_planebuf[3] >> 4) & 0xf; break;
+			}
+		}
+
+		m_whichpixel++;
+	}
+}
+
+inline rgb_t ppu_vt3xx_device::get_pen_value(int pixel_data, int bpp, int pal)
+{
+	u8 pen;
+	if (bpp == 4)
+		pen = pixel_data | pal << 4;
+	else
+		pen = pixel_data; // does pal have another meaning in 8bpp mode?
+
+	u16 pal0 = readbyte(((pen & 0xff) * 2) + 0x3e00);
+	pal0 |= readbyte(((pen & 0xff) * 2) + 0x3e01) << 8;
+
+	const int palb = (pal0 >> 0) & 0x1f;
+	const int palg = (pal0 >> 5) & 0x1f;
+	const int palr = (pal0 >> 10) & 0x1f;
+
+	return rgb_t(palr << 3, palg << 3, palb << 3);
+}
+
+inline void ppu_vt3xx_device::draw_extended_sprite_pixel_low(bitmap_rgb32& bitmap, int pixel_data, int pixel, int xpos, int pal, int bpp, u8* line_priority)
+{
+	if (pixel_data) // opaque check
+	{
+		if ((xpos + pixel) < VISIBLE_SCREEN_WIDTH)
+		{
+			// has another sprite been drawn here?/
+			if (!line_priority[xpos + pixel])
+			{
+				const rgb_t palval = get_pen_value(pixel_data, bpp, pal);
+				m_bitmap.pix(m_scanline, xpos + pixel) = palval;
+				// indicate that a sprite was drawn at this location, even if it's not seen
+				line_priority[xpos + pixel] |= 0x01;
+			}
+		}
+	}
+}
+
+inline void ppu_vt3xx_device::draw_extended_sprite_pixel_high(bitmap_rgb32& bitmap, int pixel_data, int pixel, int xpos, int pal, int bpp, u8* line_priority)
+{
+	if (pixel_data) // opaque check
+	{
+		if ((xpos + pixel) < VISIBLE_SCREEN_WIDTH)
+		{
+			// has another sprite been drawn here?
+			if (BIT(~line_priority[xpos + pixel], 0))
+			{
+				const rgb_t palval = get_pen_value(pixel_data, bpp, pal);
+				m_bitmap.pix(m_scanline, xpos + pixel) = palval;
+				// indicate that a sprite was drawn at this location, even if it's not seen
+				line_priority[xpos + pixel] |= 0x01;
+			}
+		}
+	}
+}
+
+inline u8 ppu_vt3xx_device::get_pixel_data(u8* spritepatternbuf, int bpp, int pixel)
+{
+	u8 pixel_data;
+	if (bpp == 4)
+	{
+		pixel_data = spritepatternbuf[pixel >> 1];
+		if (pixel & 1)
+			pixel_data >>= 4;
+		else
+			pixel_data &= 0xf;
+	}
+	else
+	{
+		pixel_data = spritepatternbuf[pixel];
+	}
+	return pixel_data;
+}
+
+void ppu_vt3xx_device::draw_sprites(u8* line_priority)
+{
+	if (!m_newvid_1e)
+	{
+		ppu_vt03_device::draw_sprites(line_priority);
+	}
+	else
+	{
+		/*
+
+		+ 0x000    yyyy yyyy   y = ypos
+		+ 0x080    tttt tttt   t = tile number
+
+		for new format 0  (m_newvid_1d & 0x08 set)
+		+ 0x100    YXpT TTpp   Y = negative Y pos    X = negative X pos    T = high tile number    p = palette
+
+		for new format 1  (m_newvid_1d & 0x08 not set)
+		+ 0x100    fFzT TTpp   f = yflip    F = xflip    T = high tile number    p = palette    z = priority
+
+		+ 0x180    xxxx xxxx   x = xpos
+
+		*/
+
+		// new style sprites
+		for (int spritenum = 0x00; spritenum < 0x80; spritenum++)
+		{
+			const bool is_new_format = m_newvid_1e & 0x04;
+
+			// old packed spriteram format
+			int ypos_table = 0x000;
+			int	xpos_table = 0x003;
+			int	tilenum_table = 0x001;
+			int	extra_table = 0x002;
+			int	table_step = 4;
+
+			// new expanded spriteram format
+			if (m_newvid_1e & 0x04)
+			{
+				ypos_table = 0x000;
+				xpos_table = 0x180;
+				tilenum_table = 0x080;
+				extra_table = 0x100;
+				table_step = 1;
+			}
+
+			const int sprite_table_offset = spritenum * table_step;
+			int pri = 0;
+			int ypos = m_spriteram[ypos_table + sprite_table_offset];
+			int xpos = m_spriteram[xpos_table + sprite_table_offset];
+			int tilenum = m_spriteram[tilenum_table + sprite_table_offset];
+			tilenum |= (m_spriteram[extra_table + sprite_table_offset] & 0x1c) << 6;
+
+			int pal = m_spriteram[extra_table + sprite_table_offset] & 0x03;
+
+			if (m_newvid_1d & 0x08) // format 0
+			{
+				pal |= (m_spriteram[extra_table + sprite_table_offset] & 0x20) >> 3;
+				if (m_spriteram[extra_table + sprite_table_offset] & 0x40)
+				{
+					xpos = -0x100 + xpos; // allows for partially offscreen sprites?
+				}
+
+				// TODO: verify
+				if (m_spriteram[extra_table + sprite_table_offset] & 0x80)
+				{
+					ypos = -0x100 + ypos;
+				}
+			}
+			else // format 1
+			{
+				pri = (m_spriteram[extra_table + sprite_table_offset] & 0x20) >> 5;
+			}
+
+			int height, width, bpp, alt_16_handling;
+
+			if (is_new_format)
+			{
+				height = 16;
+				width = 8;
+				bpp = 8;
+				alt_16_handling = false;
+
+				if (m_newvid_1d & 0x02)
+				{
+					width = 16;
+					bpp = 4;
+				}
+
+				// testing with lxcmcysp later games in the list
+				// 12 09 0f -- 'alt_16_handling'
+				// 22 09 0f -- some games, works
+				// 12 0f 0f -- menu, works
+				// 12 0b 0f -- hercules in red5mam, still broken
+				if ((!(m_newvid_1d & 0x04)) && (m_newvid_1c & 0x10))
+				{
+					alt_16_handling = true;
+					bpp = 4;
+				}
+			}
+			else
+			{
+				// use the old size register in this mode? monster jump in lxcmcysp at least sets it
+				height = (m_regs[PPU_CONTROL0] & PPU_CONTROL0_SPRITE_SIZE) ? 16 : 8;
+				width = 8;
+				bpp = 8;
+				alt_16_handling = false;
+
+				// 12 0f 0b -- tetrtin
+				if ((m_newvid_1c == 0x12) && (m_newvid_1d == 0x0f) && (m_newvid_1e == 0x0b))
+				{
+					// this seems to disagree with only using the old height register in this mode
+					bpp = 4;
+					width = 16;
+					height = 16;
+				}
+			}
+
+			// if the sprite isn't visible, skip it
+			if ((ypos + height <= m_scanline) || (ypos > m_scanline))
+				continue;
+
+			// compute the character's line to draw 
+			const int sprite_line = m_scanline - ypos;
+
+			// a 16 pixel wide sprite (packed format), at 4bpp, requires 8 bytes for a single line
+			// at 16 pixels high it requires 128 bytes for a whole tile
+
+			// sprites can be 8 pixels wide and 8bpp, or 16 pixels wide and 4bpp?
+			int index1;
+
+			if (bpp == 4)
+			{
+				if (alt_16_handling)
+					index1 = tilenum * 32;
+				else
+					index1 = tilenum * 128;
+			}
+			else
+			{
+				index1 = tilenum * 64; // why? a 16 wide 4bpp sprite takes up the same number of bytes as an 8 wide 8bpp sprite
+			}
+
+			int pattern_offset;
+
+			if (alt_16_handling)
+				pattern_offset = index1 + sprite_line * 4;
+			else
+				pattern_offset = index1 + sprite_line * 8;
+
+			pattern_offset += get_newmode_spritebase() * 0x2000;
+
+			u8 spritepatternbuf[8];
+			for (int i = 0; i < 8; i++)
+				spritepatternbuf[i] = m_read_onespace_with_relative(pattern_offset + i);
+	
+			if (pri)
+			{
+				for (int pixel = 0; pixel < width; pixel++)
+				{
+					u8 pixel_data = get_pixel_data(spritepatternbuf, bpp, pixel);
+					if (xpos + pixel >= 0)
+						draw_extended_sprite_pixel_low(m_bitmap, pixel_data, pixel, xpos, pal, bpp, line_priority);
+				}
+			}
+			else
+			{
+				for (int pixel = 0; pixel < width; pixel++)
+				{
+					u8 pixel_data = get_pixel_data(spritepatternbuf, bpp, pixel);
+					if (xpos + pixel >= 0)
+						draw_extended_sprite_pixel_high(m_bitmap, pixel_data, pixel, xpos, pal, bpp, line_priority);
+				}
+
+			}
+		}
+	}
+}
+
+void ppu_vt3xx_device::write_to_spriteram_with_increment(u8 data)
+{
+	if (!m_newvid_1e) // might be the CPU speed control bit instead
+	{
+		ppu_vt03_device::write_to_spriteram_with_increment(data);
+	}
+	else
+	{
+		m_spriteram[m_regs[PPU_SPRITE_ADDRESS] | (m_2008_spritehigh & 0x1) << 8] = data;
+		m_regs[PPU_SPRITE_ADDRESS] = (m_regs[PPU_SPRITE_ADDRESS] + 1) & 0xff;
+		if (m_regs[PPU_SPRITE_ADDRESS] == 0x00)
+			m_2008_spritehigh ^= 0x1;
+	}
+}
