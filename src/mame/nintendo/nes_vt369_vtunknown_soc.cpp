@@ -510,10 +510,10 @@ void vt3xx_soc_base_device::vt369_sound_map(address_map &map)
 	map(0x2204, 0x2204).nopw(); // initialized to 0?
 	map(0x2205, 0x2206).w(FUNC(vt3xx_soc_base_device::vt369_soundcpu_adder_data_address_w));
 	map(0x2207, 0x2207).nopw(); // initialized to 0?
-	map(0x2210, 0x2211).r(FUNC(vt3xx_soc_base_device::vt369_soundcpu_adder_result_r)).nopw();// , FUNC(vt3xx_soc_base_device::vt369_soundcpu_adder_result_w));
+	map(0x2210, 0x2211).rw(FUNC(vt3xx_soc_base_device::vt369_soundcpu_adder_result_r), FUNC(vt3xx_soc_base_device::vt369_soundcpu_adder_result_w));
 
-	map(0x2288, 0x2288).nopw(); // TODO: check code to see if this is intentional
-	map(0x22b6, 0x22b6).nopw();
+	map(0x2288, 0x2288).nopw(); // these are written after 2206 (with the same value written to 2206)
+	map(0x22b6, 0x22b6).nopw(); // are they just dummy writes to kill cycles until the result is ready? (no status register for the adder?)
 
 	map(0x2400, 0x2401).w(FUNC(vt3xx_soc_base_device::vt369_soundcpu_adpcm_data_address_w));
 	map(0x2402, 0x2403).r(FUNC(vt3xx_soc_base_device::vt369_soundcpu_adpcm_result_r));
