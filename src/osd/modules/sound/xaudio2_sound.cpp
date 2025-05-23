@@ -27,9 +27,9 @@
 #include <algorithm>
 #include <atomic>
 #include <cassert>
-#include <chrono>
 #include <condition_variable>
 #include <iterator>
+#include <memory>
 #include <mutex>
 #include <queue>
 #include <string>
@@ -72,7 +72,7 @@ constexpr float RESAMPLE_TOLERANCE = 1.20F;
 #define HR_LOG( CALL, LOGFN, ONFAIL ) do { \
 	result = CALL; \
 	if (FAILED(result)) { \
-		LOGFN(#CALL " failed with error 0x%X\n", (unsigned int)result); \
+		LOGFN("Sound: " #CALL " failed with error 0x%X\n", (unsigned int)result); \
 		ONFAIL; } \
 } while (0)
 
@@ -207,13 +207,13 @@ public:
 	virtual int init(osd_interface &osd, osd_options const &options) override;
 	virtual void exit() override;
 
-	// sound_module
+	// sound_module implementation
 	virtual uint32_t get_generation() override;
 	virtual audio_info get_information() override;
 	virtual bool external_per_channel_volume() override { return true; }
 	virtual bool split_streams_per_source() override { return true; }
 	virtual uint32_t stream_sink_open(uint32_t node, std::string name, uint32_t rate) override;
-	virtual void stream_set_volumes(uint32_t id, const std::vector<float> &db) override;
+	virtual void stream_set_volumes(uint32_t id, std::vector<float> const &db) override;
 	virtual void stream_close(uint32_t id) override;
 	virtual void stream_sink_update(uint32_t id, int16_t const *buffer, int samples_this_frame) override;
 
@@ -250,6 +250,7 @@ private:
 
 		void update(int16_t const *buffer, int samples_this_frame);
 		void submit_if_needed();
+		void stop();
 
 		source_voice_ptr            voice;
 		audio_info::stream_info     info;
@@ -286,21 +287,22 @@ private:
 	using voice_info_vector = std::vector<voice_info_ptr>;
 
 	// IMMNotificationClient callbacks
-	virtual HRESULT STDMETHODCALLTYPE OnDefaultDeviceChanged(EDataFlow flow, ERole role, LPCWSTR pwstrDefaultDeviceId) override;
+	virtual HRESULT STDMETHODCALLTYPE OnDeviceStateChanged(LPCWSTR pwstrDeviceId, DWORD dwNewState) override;
 	virtual HRESULT STDMETHODCALLTYPE OnDeviceAdded(LPCWSTR pwstrDeviceId) override;
 	virtual HRESULT STDMETHODCALLTYPE OnDeviceRemoved(LPCWSTR pwstrDeviceId) override;
-	virtual HRESULT STDMETHODCALLTYPE OnDeviceStateChanged(LPCWSTR pwstrDeviceId, DWORD dwNewState) override;
+	virtual HRESULT STDMETHODCALLTYPE OnDefaultDeviceChanged(EDataFlow flow, ERole role, LPCWSTR pwstrDefaultDeviceId) override;
 	virtual HRESULT STDMETHODCALLTYPE OnPropertyValueChanged(LPCWSTR pwstrDefaultDeviceId, PROPERTYKEY const key) override;
 
 	// stub IUnknown implementation
-	virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void **ppvObject) override;
-	virtual ULONG STDMETHODCALLTYPE AddRef() override { return 1; }
-	virtual ULONG STDMETHODCALLTYPE Release() override { return 1; }
+	virtual HRESULT STDMETHODCALLTYPE QueryInterface(REFIID riid, void **ppvObject) noexcept override;
+	virtual ULONG STDMETHODCALLTYPE AddRef() noexcept override { return 1; }
+	virtual ULONG STDMETHODCALLTYPE Release() noexcept override { return 1; }
 
 	device_info_vector_iterator find_device(std::wstring_view device_id);
 	HRESULT add_device(device_info_vector_iterator pos, LPCWSTR device_id);
 	HRESULT add_device(device_info_vector_iterator pos, std::wstring_view device_id, mm_device_ptr &&device);
 	HRESULT remove_device(device_info_vector_iterator pos);
+	void purge_voices(uint32_t node);
 
 	void audio_task();
 	void cleanup_task();
@@ -376,23 +378,17 @@ int sound_xaudio2::init(osd_interface &osd, osd_options const &options)
 		HR_GOERR(m_device_enum->RegisterEndpointNotificationCallback(this));
 		m_endpoint_notifications = true;
 
-		{
-			mm_device_ptr default_device;
-			LPWSTR id_raw = nullptr;
-			HR_GOERR(m_device_enum->GetDefaultAudioEndpoint(eRender, eMultimedia, default_device.GetAddressOf()));
-			HR_GOERR(default_device->GetId(&id_raw));
-			default_id.reset(std::exchange(id_raw, nullptr));
-		}
+		HR_GOERR(get_default_audio_device_id(*m_device_enum.Get(), eRender, eMultimedia, default_id));
 
 		result = enumerate_audio_endpoints(
 				*m_device_enum.Get(),
-				eAll,
+				eRender,
 				DEVICE_STATE_ACTIVE | DEVICE_STATE_UNPLUGGED,
 				[this, &default_id] (HRESULT hr, mm_device_ptr &dev) -> bool
 				{
 					if (FAILED(hr) || !dev)
 					{
-						osd_printf_error("Error getting audio device. Error: 0x%X\n", static_cast<unsigned int>(hr));
+						osd_printf_error("Sound: Error getting audio device. Error: 0x%X\n", static_cast<unsigned int>(hr));
 						return true;
 					}
 
@@ -401,7 +397,7 @@ int sound_xaudio2::init(osd_interface &osd, osd_options const &options)
 					hr = dev->GetState(&state);
 					if (FAILED(hr))
 					{
-						osd_printf_error("Error getting audio device state. Error: 0x%X\n", static_cast<unsigned int>(hr));
+						osd_printf_error("Sound: Error getting audio device state. Error: 0x%X\n", static_cast<unsigned int>(hr));
 						return true;
 					}
 					if ((DEVICE_STATE_ACTIVE != state) && (DEVICE_STATE_UNPLUGGED != state))
@@ -426,6 +422,12 @@ int sound_xaudio2::init(osd_interface &osd, osd_options const &options)
 					devinfo->device_id = std::move(device_id);
 					devinfo->device = std::move(dev);
 					devinfo->info = std::move(info);
+
+					osd_printf_verbose(
+							"Sound: Found audio device %s (%s), assigned ID %u.\n",
+							devinfo->info.m_name,
+							osd::text::from_wstring(devinfo->device_id),
+							devinfo->info.m_id);
 					if (!m_default_sink && default_id && (devinfo->device_id == default_id.get()))
 						m_default_sink = devinfo->info.m_id;
 					m_device_info.emplace(pos, std::move(devinfo));
@@ -437,7 +439,7 @@ int sound_xaudio2::init(osd_interface &osd, osd_options const &options)
 	}
 	if (FAILED(result))
 	{
-		osd_printf_error("Error enumerating audio endpoints. Error: 0x%X\n", static_cast<unsigned int>(result));
+		osd_printf_error("Sound: Error enumerating audio endpoints. Error: 0x%X\n", static_cast<unsigned int>(result));
 		goto Error;
 	}
 
@@ -464,10 +466,39 @@ Error:
 
 void sound_xaudio2::exit()
 {
+	// unsubscribe from device events
 	if (m_endpoint_notifications)
 	{
 		m_device_enum->UnregisterEndpointNotificationCallback(this);
 		m_endpoint_notifications = false;
+	}
+
+	// schedule destruction of voices
+	{
+		std::lock_guard voice_lock(m_voice_mutex);
+		while (!m_voice_info.empty())
+		{
+			{
+				std::lock_guard cleanup_lock(m_cleanup_mutex);
+				m_zombie_voices.emplace_back(std::move(m_voice_info.back()));
+				m_cleanup_condition.notify_all();
+			}
+			m_voice_info.pop_back();
+		}
+	}
+
+	// schedule destruction of devices
+	{
+		std::lock_guard device_lock(m_device_mutex);
+		while (!m_device_info.empty())
+		{
+			{
+				std::lock_guard cleanup_lock(m_cleanup_mutex);
+				m_zombie_devices.emplace_back(std::move(m_device_info.back()));
+				m_cleanup_condition.notify_all();
+			}
+			m_device_info.pop_back();
+		}
 	}
 
 	// Wait on processing thread to end
@@ -487,32 +518,6 @@ void sound_xaudio2::exit()
 	{
 		CloseHandle(m_hEventExiting);
 		m_hEventExiting = nullptr;
-	}
-
-	{
-		std::lock_guard voice_lock(m_voice_mutex);
-		while (!m_voice_info.empty())
-		{
-			{
-				std::lock_guard cleanup_lock(m_cleanup_mutex);
-				m_zombie_voices.emplace_back(std::move(m_voice_info.back()));
-				m_cleanup_condition.notify_all();
-			}
-			m_voice_info.pop_back();
-		}
-	}
-
-	{
-		std::lock_guard device_lock(m_device_mutex);
-		while (!m_device_info.empty())
-		{
-			{
-				std::lock_guard cleanup_lock(m_cleanup_mutex);
-				m_zombie_devices.emplace_back(std::move(m_device_info.back()));
-				m_cleanup_condition.notify_all();
-			}
-			m_device_info.pop_back();
-		}
 	}
 
 	if (m_cleanup_thread.joinable())
@@ -593,70 +598,76 @@ uint32_t sound_xaudio2::stream_sink_open(uint32_t node, std::string name, uint32
 			m_device_info.begin(),
 			m_device_info.end(),
 			[node] (device_info_ptr const &value) { return value->info.m_id == node; });
-	if (m_device_info.end() == device)
-	{
-		osd_printf_error("Attempt to open audio stream %s for unknown node %u.\n", name, node);
-		return 0;
-	}
-
-	// instantiate XAudio2 engine if necessary
-	if (!(*device)->engine)
-	{
-		result = OSD_DYNAMIC_CALL(XAudio2Create, &(*device)->engine, 0, XAUDIO2_DEFAULT_PROCESSOR);
-		if (FAILED(result) || !(*device)->engine)
-		{
-			(*device)->engine = nullptr;
-			osd_printf_error(
-					"Error creating XAudio2 engine for audio device %s. Error: 0x%X\n",
-					(*device)->info.m_name,
-					static_cast<unsigned int>(result));
-			return 0;
-		}
-
-		result = (*device)->engine->RegisterForCallbacks(device->get());
-		if (FAILED(result))
-		{
-			(*device)->engine = nullptr;
-			osd_printf_error(
-					"Error registering to receive XAudio2 engine callbacks for audio device %s. Error: 0x%X\n",
-					(*device)->info.m_name,
-					static_cast<unsigned int>(result));
-			return 0;
-		}
-	}
-
-	// create a mastering voice if we don't already have one for this device
-	if (!(*device)->mastering_voice)
-	{
-		IXAudio2MasteringVoice *mastering_voice_raw = nullptr;
-		result = (*device)->engine->CreateMasteringVoice(
-				&mastering_voice_raw,
-				(*device)->info.m_sinks,
-				(*device)->info.m_rate.m_default_rate,
-				0,
-				(*device)->device_id.c_str(),
-				nullptr,
-				AudioCategory_Other);
-		(*device)->mastering_voice.reset(std::exchange(mastering_voice_raw, nullptr));
-		if (FAILED(result) || !(*device)->mastering_voice)
-		{
-			(*device)->mastering_voice.reset();
-			osd_printf_error(
-					"Error creating mastering voice for audio device %s. Error: 0x%X\n",
-					(*device)->info.m_name,
-					static_cast<unsigned int>(result));
-			return 0;
-		}
-	}
-
-	voice_info_ptr info;
-	WAVEFORMATEX format;
-	XAUDIO2_SEND_DESCRIPTOR destination;
-	XAUDIO2_VOICE_SENDS sends;
 
 	try
 	{
-		// set up desired input format and destination
+		// always check for stale argument values
+		if (m_device_info.end() == device)
+		{
+			osd_printf_verbose("Sound: Attempt to open audio stream %s for unknown node %u.\n", name, node);
+			return 0;
+		}
+
+		// instantiate XAudio2 engine if necessary
+		if (!(*device)->engine)
+		{
+			result = OSD_DYNAMIC_CALL(XAudio2Create, &(*device)->engine, 0, XAUDIO2_DEFAULT_PROCESSOR);
+			if (FAILED(result) || !(*device)->engine)
+			{
+				(*device)->engine = nullptr;
+				osd_printf_error(
+						"Sound: Error creating XAudio2 engine for audio device %s. Error: 0x%X\n",
+						(*device)->info.m_name,
+						static_cast<unsigned int>(result));
+				return 0;
+			}
+
+			result = (*device)->engine->RegisterForCallbacks(device->get());
+			if (FAILED(result))
+			{
+				(*device)->engine = nullptr;
+				osd_printf_error(
+						"Sound: Error registering to receive XAudio2 engine callbacks for audio device %s. Error: 0x%X\n",
+						(*device)->info.m_name,
+						static_cast<unsigned int>(result));
+				return 0;
+			}
+
+			osd_printf_verbose(
+					"Sound: Created XAudio2 engine for audio device %s.\n",
+					(*device)->info.m_name);
+		}
+
+		// create a mastering voice if we don't already have one for this device
+		if (!(*device)->mastering_voice)
+		{
+			IXAudio2MasteringVoice *mastering_voice_raw = nullptr;
+			result = (*device)->engine->CreateMasteringVoice(
+					&mastering_voice_raw,
+					(*device)->info.m_sinks,
+					(*device)->info.m_rate.m_default_rate,
+					0,
+					(*device)->device_id.c_str(),
+					nullptr,
+					AudioCategory_Other);
+			(*device)->mastering_voice.reset(std::exchange(mastering_voice_raw, nullptr));
+			if (FAILED(result) || !(*device)->mastering_voice)
+			{
+				(*device)->mastering_voice.reset();
+				osd_printf_error(
+						"Sound: Error creating mastering voice for audio device %s. Error: 0x%X\n",
+						(*device)->info.m_name,
+						static_cast<unsigned int>(result));
+				return 0;
+			}
+
+			osd_printf_verbose(
+					"Sound: Created XAudio2 mastering voice for audio device %s.\n",
+					(*device)->info.m_name);
+		}
+
+		// set up desired input format
+		WAVEFORMATEX format;
 		format.wFormatTag = WAVE_FORMAT_PCM;
 		format.nChannels = (*device)->info.m_sinks;
 		format.nSamplesPerSec = rate;
@@ -664,70 +675,72 @@ uint32_t sound_xaudio2::stream_sink_open(uint32_t node, std::string name, uint32
 		format.nBlockAlign = 2 * format.nChannels;
 		format.wBitsPerSample = 16;
 		format.cbSize = 0;
+
+		// set up destinations
+		XAUDIO2_SEND_DESCRIPTOR destination;
+		XAUDIO2_VOICE_SENDS sends;
 		destination.Flags = 0;
 		destination.pOutputVoice = (*device)->mastering_voice.get();
 		sends.SendCount = 1;
 		sends.pSends = &destination;
 
 		// create the voice info object
-		info = std::make_unique<voice_info>(*this, format);
+		voice_info_ptr info = std::make_unique<voice_info>(*this, format);
 		info->info.m_node = node;
 		info->info.m_volumes.resize((*device)->info.m_sinks, 0.0F);
-	}
-	catch (std::bad_alloc const &)
-	{
-		return 0;
-	}
 
-	// create a source voice for this stream
-	IXAudio2SourceVoice *source_voice_raw = nullptr;
-	result = (*device)->engine->CreateSourceVoice(
-			&source_voice_raw,
-			&format,
-			XAUDIO2_VOICE_NOPITCH,
-			1.0F,
-			info.get(),
-			&sends,
-			nullptr);
-	info->voice.reset(std::exchange(source_voice_raw, nullptr));
-	if (FAILED(result) || !info->voice)
-	{
-		osd_printf_error(
-				"Error creating source voice for audio device %s. Error: 0x%X\n",
-				(*device)->info.m_name,
-				static_cast<unsigned int>(result));
-		return 0;
-	}
+		// create a source voice for this stream
+		IXAudio2SourceVoice *source_voice_raw = nullptr;
+		result = (*device)->engine->CreateSourceVoice(
+				&source_voice_raw,
+				&format,
+				XAUDIO2_VOICE_NOPITCH,
+				1.0F,
+				info.get(),
+				&sends,
+				nullptr);
+		info->voice.reset(std::exchange(source_voice_raw, nullptr));
+		if (FAILED(result) || !info->voice)
+		{
+			osd_printf_error(
+					"Sound: Error creating source voice for audio device %s. Error: 0x%X\n",
+					(*device)->info.m_name,
+					static_cast<unsigned int>(result));
+			return 0;
+		}
+		osd_printf_verbose(
+				"Sound: Created XAudio2 source voice for %s on audio device %s.\n",
+				name,
+				(*device)->info.m_name);
 
-	// set the channel mapping
-	result = info->voice->SetOutputMatrix(
-			nullptr,
-			format.nChannels,
-			format.nChannels,
-			info->volume_matrix.get(),
-			XAUDIO2_COMMIT_NOW);
-	if (FAILED(result))
-	{
-		osd_printf_error(
-				"Error setting source voice output matrix for audio device %s. Error: 0x%X\n",
-				(*device)->info.m_name,
-				static_cast<unsigned int>(result));
-		return 0;
-	}
+		// set the channel mapping
+		result = info->voice->SetOutputMatrix(
+				nullptr,
+				format.nChannels,
+				format.nChannels,
+				info->volume_matrix.get(),
+				XAUDIO2_COMMIT_NOW);
+		if (FAILED(result))
+		{
+			osd_printf_error(
+					"Sound: Error setting source voice output matrix for audio device %s. Error: 0x%X\n",
+					(*device)->info.m_name,
+					static_cast<unsigned int>(result));
+			return 0;
+		}
 
-	// start the voice
-	result = info->voice->Start();
-	if (FAILED(result))
-	{
-		osd_printf_error(
-				"Error starting source voice for audio device %s. Error: 0x%X\n",
-				(*device)->info.m_name,
-				static_cast<unsigned int>(result));
-		return 0;
-	}
+		// start the voice
+		result = info->voice->Start();
+		if (FAILED(result))
+		{
+			osd_printf_error(
+					"Sound: Error starting source voice for audio device %s. Error: 0x%X\n",
+					(*device)->info.m_name,
+					static_cast<unsigned int>(result));
+			return 0;
+		}
 
-	try
-	{
+		// try to add it to the collection
 		std::lock_guard voice_lock(m_voice_mutex);
 		{
 			std::lock_guard cleanup_lock(m_cleanup_mutex);
@@ -776,7 +789,7 @@ void sound_xaudio2::stream_set_volumes(uint32_t id, const std::vector<float> &db
 	if (FAILED(result))
 	{
 		osd_printf_error(
-				"Error setting source voice output matrix for audio stream %u. Error: 0x%X\n",
+				"Sound: Error setting source voice output matrix for audio stream %u. Error: 0x%X\n",
 				(*pos)->info.m_id,
 				static_cast<unsigned int>(result));
 	}
@@ -845,19 +858,55 @@ sound_xaudio2::device_info::~device_info()
 
 void sound_xaudio2::device_info::OnCriticalError(HRESULT error)
 {
-	std::lock_guard device_lock(m_host.m_device_mutex);
+	x_audio_2_ptr old_engine;
+	mastering_voice_ptr old_mastering_voice;
+	{
+		std::lock_guard device_lock(m_host.m_device_mutex);
 
-	osd_printf_verbose(
-			"XAudio2 critical error for device %s. Error: 0x%X\n",
-			info.m_name,
-			static_cast<unsigned int>(error));
+		// clean up any voices associated with this device
+		m_host.purge_voices(info.m_id);
 
-	auto const pos = std::find_if(
-			m_host.m_device_info.begin(),
-			m_host.m_device_info.end(),
-			[this] (device_info_ptr const &value) { return value.get() == this; });
-	if (m_host.m_device_info.end() != pos)
-		m_host.remove_device(pos);
+		// tear down the XAudio2 engine - it will be recreated next time a stream is opened
+		old_engine = std::move(engine);
+		old_mastering_voice = std::move(mastering_voice);
+		mastering_voice.reset();
+		engine = nullptr;
+
+		// bump this so the sound manager recreates its streams
+		//info.m_id = m_host.m_next_node_id++; FIXME: causes crash in sound_manager::update_osd_streams()
+
+		++m_host.m_generation;
+
+		osd_printf_verbose(
+				"Sound: XAudio2 critical error for device %s. Error: 0x%X\n",
+				info.m_name,
+				static_cast<unsigned int>(error));
+	}
+
+	// try to get another thread to do the cleanup
+	device_info_ptr zombie;
+	try
+	{
+		zombie = std::make_unique<device_info>(m_host);
+		zombie->engine = std::move(old_engine);
+		zombie->mastering_voice = std::move(old_mastering_voice);
+		old_mastering_voice.reset();
+		old_engine = nullptr;
+		{
+			std::lock_guard cleanup_lock(m_host.m_cleanup_mutex);
+			m_host.m_zombie_devices.emplace_back(std::move(zombie));
+			m_host.m_cleanup_condition.notify_one();
+		}
+	}
+	catch (std::bad_alloc const &)
+	{
+		// make sure the cleanup thread wakes up
+		std::lock_guard cleanup_lock(m_host.m_cleanup_mutex);
+		m_host.m_cleanup_condition.notify_one();
+
+		// old engine and mastering voice will fall out of scope and be destroyed
+		// this could block things it shouldn't, but leaking would be worse
+	}
 }
 
 //============================================================
@@ -902,12 +951,8 @@ sound_xaudio2::voice_info::voice_info(sound_xaudio2 &host, WAVEFORMATEX const &f
 sound_xaudio2::voice_info::~voice_info()
 {
 	// stop this before any buffers get destructed
-	if (voice)
-	{
-		voice->Stop(0, XAUDIO2_COMMIT_NOW);
-		voice->FlushSourceBuffers();
-		voice.reset();
-	}
+	stop();
+	voice.reset();
 }
 
 //============================================================
@@ -979,6 +1024,23 @@ void sound_xaudio2::voice_info::submit_if_needed()
 			buffers++;
 		}
 		while (!m_buffer_queue.empty() && (2 > buffers));
+	}
+}
+
+//============================================================
+//  stop
+//============================================================
+
+void sound_xaudio2::voice_info::stop()
+{
+	while (!m_buffer_queue.empty())
+		m_buffer_queue.pop();
+	m_write_position = 0;
+	m_need_update = false;
+	if (voice)
+	{
+		voice->Stop(0, XAUDIO2_COMMIT_NOW);
+		voice->FlushSourceBuffers();
 	}
 }
 
@@ -1091,7 +1153,7 @@ void sound_xaudio2::voice_info::OnVoiceError(void *pBufferContext, HRESULT error
 		std::lock_guard voice_lock(m_host.m_voice_mutex);
 
 		osd_printf_verbose(
-				"XAudio2 voice error for stream %u. Error: 0x%X\n",
+				"Sound: XAudio2 voice error for stream %u. Error: 0x%X\n",
 				info.m_id,
 				static_cast<unsigned int>(error));
 
@@ -1118,23 +1180,46 @@ void sound_xaudio2::voice_info::OnVoiceError(void *pBufferContext, HRESULT error
 }
 
 //============================================================
-//  IMMNotificationClient::OnDefaultDeviceChanged
+//  IMMNotificationClient::OnDeviceStateChanged
 //============================================================
 
-HRESULT sound_xaudio2::OnDefaultDeviceChanged(EDataFlow flow, ERole role, LPCWSTR pwstrDefaultDeviceId)
+HRESULT sound_xaudio2::OnDeviceStateChanged(LPCWSTR pwstrDeviceId, DWORD dwNewState)
 {
 	try
 	{
-		if ((eRender == flow) && (eMultimedia == role))
-		{
-			std::lock_guard device_lock(m_device_mutex);
-			std::wstring_view device_id(pwstrDefaultDeviceId);
-			auto const pos = find_device(device_id);
-			if ((m_device_info.end() != pos) && ((*pos)->device_id == device_id) && ((*pos)->info.m_id != m_default_sink))
-			{
-				m_default_sink = (*pos)->info.m_id;
+		std::lock_guard device_lock(m_device_mutex);
+		std::wstring_view device_id(pwstrDeviceId);
+		auto const pos = find_device(device_id);
 
-				++m_generation;
+		if ((DEVICE_STATE_ACTIVE == dwNewState) || (DEVICE_STATE_UNPLUGGED == dwNewState))
+		{
+			if ((m_device_info.end() == pos) || ((*pos)->device_id != device_id))
+			{
+				HRESULT result;
+
+				mm_device_ptr device;
+				result = m_device_enum->GetDevice(pwstrDeviceId, device.GetAddressOf());
+				if (FAILED(result))
+				{
+					osd_printf_error(
+							"Sound: Error getting audio device %s. Error: 0x%X\n",
+							osd::text::from_wstring(device_id),
+							static_cast<unsigned int>(result));
+					return result;
+				}
+
+				result = add_device(pos, device_id, std::move(device));
+				if (FAILED(result))
+					return result;
+			}
+		}
+		else
+		{
+			if ((m_device_info.end() != pos) && ((*pos)->device_id == device_id))
+			{
+				HRESULT const result = remove_device(pos);
+				if (FAILED(result))
+					return result;
 			}
 		}
 		return S_OK;
@@ -1162,7 +1247,7 @@ HRESULT sound_xaudio2::OnDeviceAdded(LPCWSTR pwstrDeviceId)
 		if ((m_device_info.end() != pos) && ((*pos)->device_id == device_id))
 		{
 			osd_printf_error(
-					"Added sound device %s appears to already be present.\n",
+					"Sound: Added sound device %s appears to already be present.\n",
 					osd::text::from_wstring(device_id));
 			return S_OK;
 		}
@@ -1207,46 +1292,23 @@ HRESULT sound_xaudio2::OnDeviceRemoved(LPCWSTR pwstrDeviceId)
 }
 
 //============================================================
-//  IMMNotificationClient::OnDeviceStateChanged
+//  IMMNotificationClient::OnDefaultDeviceChanged
 //============================================================
 
-HRESULT sound_xaudio2::OnDeviceStateChanged(LPCWSTR pwstrDeviceId, DWORD dwNewState)
+HRESULT sound_xaudio2::OnDefaultDeviceChanged(EDataFlow flow, ERole role, LPCWSTR pwstrDefaultDeviceId)
 {
 	try
 	{
-		std::lock_guard device_lock(m_device_mutex);
-		std::wstring_view device_id(pwstrDeviceId);
-		auto const pos = find_device(device_id);
-
-		if ((DEVICE_STATE_ACTIVE == dwNewState) || (DEVICE_STATE_UNPLUGGED == dwNewState))
+		if ((eRender == flow) && (eMultimedia == role))
 		{
-			if ((m_device_info.end() == pos) || ((*pos)->device_id != device_id))
+			std::lock_guard device_lock(m_device_mutex);
+			std::wstring_view device_id(pwstrDefaultDeviceId);
+			auto const pos = find_device(device_id);
+			if ((m_device_info.end() != pos) && ((*pos)->device_id == device_id) && ((*pos)->info.m_id != m_default_sink))
 			{
-				HRESULT result;
+				m_default_sink = (*pos)->info.m_id;
 
-				mm_device_ptr device;
-				result = m_device_enum->GetDevice(pwstrDeviceId, device.GetAddressOf());
-				if (FAILED(result))
-				{
-					osd_printf_error(
-							"Error getting audio device %s. Error: 0x%X\n",
-							osd::text::from_wstring(device_id),
-							static_cast<unsigned int>(result));
-					return result;
-				}
-
-				result = add_device(pos, device_id, std::move(device));
-				if (FAILED(result))
-					return result;
-			}
-		}
-		else
-		{
-			if ((m_device_info.end() != pos) && ((*pos)->device_id == device_id))
-			{
-				HRESULT const result = remove_device(pos);
-				if (FAILED(result))
-					return result;
+				++m_generation;
 			}
 		}
 		return S_OK;
@@ -1280,7 +1342,7 @@ HRESULT sound_xaudio2::OnPropertyValueChanged(LPCWSTR pwstrDeviceId, PROPERTYKEY
 				if (FAILED(result))
 				{
 					osd_printf_error(
-							"Error opening property store for audio device %s. Error: 0x%X\n",
+							"Sound: Error opening property store for audio device %s. Error: 0x%X\n",
 							(*pos)->info.m_name,
 							static_cast<unsigned int>(result));
 					return result;
@@ -1291,7 +1353,7 @@ HRESULT sound_xaudio2::OnPropertyValueChanged(LPCWSTR pwstrDeviceId, PROPERTYKEY
 				if (FAILED(result))
 				{
 					osd_printf_error(
-							"Error getting updated display name for audio device %s. Error: 0x%X\n",
+							"Sound: Error getting updated display name for audio device %s. Error: 0x%X\n",
 							(*pos)->info.m_name,
 							static_cast<unsigned int>(result));
 					return result;
@@ -1334,7 +1396,7 @@ HRESULT sound_xaudio2::OnPropertyValueChanged(LPCWSTR pwstrDeviceId, PROPERTYKEY
 //  IUnknown::QueryInterface
 //============================================================
 
-HRESULT sound_xaudio2::QueryInterface(REFIID riid, void **ppvObject)
+HRESULT sound_xaudio2::QueryInterface(REFIID riid, void **ppvObject) noexcept
 {
 	if (!ppvObject)
 		return E_POINTER;
@@ -1368,7 +1430,7 @@ HRESULT sound_xaudio2::add_device(device_info_vector_iterator pos, LPCWSTR devic
 	if (FAILED(result))
 	{
 		osd_printf_error(
-				"Error getting audio device %s. Error: 0x%X\n",
+				"Sound: Error getting audio device %s. Error: 0x%X\n",
 				osd::text::from_wstring(device_id),
 				static_cast<unsigned int>(result));
 		return result;
@@ -1380,7 +1442,7 @@ HRESULT sound_xaudio2::add_device(device_info_vector_iterator pos, LPCWSTR devic
 	if (FAILED(result))
 	{
 		osd_printf_error(
-				"Error getting audio device %s state. Error: 0x%X\n",
+				"Sound: Error getting audio device %s state. Error: 0x%X\n",
 				osd::text::from_wstring(device_id),
 				static_cast<unsigned int>(result));
 		return result;
@@ -1449,28 +1511,7 @@ HRESULT sound_xaudio2::remove_device(device_info_vector_iterator pos)
 	}
 
 	// clean up any voices associated with this device
-	{
-		std::lock_guard voice_lock(m_voice_mutex);
-		auto it = m_voice_info.begin();
-		while (m_voice_info.end() != it)
-		{
-			if ((*it)->info.m_node == (*pos)->info.m_id)
-			{
-				voice_info_ptr voice = std::move(*it);
-				it = m_voice_info.erase(it);
-				{
-					voice->voice->Stop(0, XAUDIO2_COMMIT_NOW);
-					voice->voice->FlushSourceBuffers();
-					std::lock_guard cleanup_lock(m_cleanup_mutex);
-					m_zombie_voices.emplace_back(std::move(voice));
-				}
-			}
-			else
-			{
-				++it;
-			}
-		}
-	}
+	purge_voices((*pos)->info.m_id);
 
 	// flag the device for cleanup
 	{
@@ -1483,6 +1524,29 @@ HRESULT sound_xaudio2::remove_device(device_info_vector_iterator pos)
 	++m_generation;
 
 	return S_OK;
+}
+
+void sound_xaudio2::purge_voices(uint32_t node)
+{
+	std::lock_guard voice_lock(m_voice_mutex);
+	auto it = m_voice_info.begin();
+	while (m_voice_info.end() != it)
+	{
+		if ((*it)->info.m_node == node)
+		{
+			voice_info_ptr voice = std::move(*it);
+			it = m_voice_info.erase(it);
+			voice->stop();
+			{
+				std::lock_guard cleanup_lock(m_cleanup_mutex);
+				m_zombie_voices.emplace_back(std::move(voice));
+			}
+		}
+		else
+		{
+			++it;
+		}
+	}
 }
 
 void sound_xaudio2::audio_task()
@@ -1510,7 +1574,7 @@ void sound_xaudio2::audio_task()
 
 void sound_xaudio2::cleanup_task()
 {
-	// clean up removed devices on a separate thread to avoid deadlocks
+	// clean up removed voices and devices on a separate thread to avoid deadlocks
 	std::unique_lock cleanup_lock(m_cleanup_mutex);
 	while (!m_exiting || !m_zombie_devices.empty() || !m_zombie_voices.empty())
 	{

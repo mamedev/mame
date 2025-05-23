@@ -292,6 +292,25 @@ HRESULT populate_audio_node_info(
 }
 
 
+HRESULT get_default_audio_device_id(
+		IMMDeviceEnumerator &enumerator,
+		EDataFlow data_flow,
+		ERole role,
+		co_task_wstr_ptr &value)
+{
+	HRESULT result;
+
+	mm_device_ptr device;
+	LPWSTR id_raw = nullptr;
+	result = enumerator.GetDefaultAudioEndpoint(data_flow, role, device.GetAddressOf());
+	if (SUCCEEDED(result) && device)
+		result = device->GetId(&id_raw);
+
+	value.reset(std::exchange(id_raw, nullptr));
+	return result;
+}
+
+
 HRESULT get_string_property_value(
 		IPropertyStore &properties,
 		REFPROPERTYKEY key,

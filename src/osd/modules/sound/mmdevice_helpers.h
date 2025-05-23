@@ -92,11 +92,16 @@ HRESULT populate_audio_node_info(
 		std::wstring &device_id,
 		audio_info::node_info &info);
 
+HRESULT get_default_audio_device_id(
+		IMMDeviceEnumerator &enumerator,
+		EDataFlow data_flow,
+		ERole role,
+		co_task_wstr_ptr &value);
+
 HRESULT get_string_property_value(
 		IPropertyStore &properties,
 		REFPROPERTYKEY key,
 		std::optional<std::string> &value);
-
 
 } // namespace osd
 
