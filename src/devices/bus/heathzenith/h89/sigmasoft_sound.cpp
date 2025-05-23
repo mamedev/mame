@@ -41,14 +41,14 @@ class h89bus_sigmasoft_snd_device : public device_t, public device_h89bus_right_
 public:
 	h89bus_sigmasoft_snd_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	virtual u8 read(u8 select_lines, u8 reg) override;
-	virtual void write(u8 select_lines, u8 reg, u8 val) override;
-
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+
+	u8 read(offs_t reg);
+	void write(offs_t reg, u8 val);
 
 	u8 read_joystick();
 
@@ -59,6 +59,8 @@ private:
 	required_ioport m_joystick1, m_joystick2;
 	required_ioport m_config;
 
+	bool m_installed;
+
 	u8 m_port_selection;
 };
 
@@ -67,11 +69,11 @@ private:
 //**************************************************************************
 static INPUT_PORTS_START( sigma_sound )
 	PORT_START("joystick_p1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(1)
 
 	PORT_START("joystick_p2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(2)
@@ -89,23 +91,18 @@ static INPUT_PORTS_START( sigma_sound )
 INPUT_PORTS_END
 
 
-h89bus_sigmasoft_snd_device::h89bus_sigmasoft_snd_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
-	device_t(mconfig, H89BUS_SIGMASOFT_SND, tag, owner, clock),
-	device_h89bus_right_card_interface(mconfig, *this),
-	m_ay8910(*this, "ay8910"),
-	m_joystick1(*this, "joystick_p1"),
-	m_joystick2(*this, "joystick_p2"),
-	m_config(*this, "CONFIG")
+h89bus_sigmasoft_snd_device::h89bus_sigmasoft_snd_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, H89BUS_SIGMASOFT_SND, tag, owner, clock)
+	, device_h89bus_right_card_interface(mconfig, *this)
+	, m_ay8910(*this, "ay8910")
+	, m_joystick1(*this, "joystick_p1")
+	, m_joystick2(*this, "joystick_p2")
+	, m_config(*this, "CONFIG")
 {
 }
 
-void h89bus_sigmasoft_snd_device::write(u8 select_lines, u8 reg, u8 val)
+void h89bus_sigmasoft_snd_device::write(offs_t reg, u8 val)
 {
-	if (!(select_lines & m_port_selection))
-	{
-		return;
-	}
-
 	LOGFUNC("%s: reg: %d val: %d\n", FUNCNAME, reg, val);
 
 	switch (reg)
@@ -121,13 +118,8 @@ void h89bus_sigmasoft_snd_device::write(u8 select_lines, u8 reg, u8 val)
 	}
 }
 
-u8 h89bus_sigmasoft_snd_device::read(u8 select_lines, u8 reg)
+u8 h89bus_sigmasoft_snd_device::read(offs_t reg)
 {
-	if (!(select_lines & m_port_selection))
-	{
-		return 0;
-	}
-
 	u8 value = 0x00;
 
 	switch (reg)
@@ -173,6 +165,9 @@ u8 h89bus_sigmasoft_snd_device::read_joystick()
 
 void h89bus_sigmasoft_snd_device::device_start()
 {
+	m_installed = false;
+
+	save_item(NAME(m_installed));
 }
 
 void h89bus_sigmasoft_snd_device::device_reset()
@@ -185,14 +180,30 @@ void h89bus_sigmasoft_snd_device::device_reset()
 			m_port_selection = 0;
 			break;
 		case 0x01:
-			m_port_selection = h89bus_device::H89_SER0;
+			m_port_selection = h89bus::IO_SER0;
 			break;
 		case 0x02:
-			m_port_selection = h89bus_device::H89_SER1;
+			m_port_selection = h89bus::IO_SER1;
 			break;
 		case 0x03:
-			m_port_selection = h89bus_device::H89_LP;
+			m_port_selection = h89bus::IO_LP;
 			break;
+	}
+
+	if (!m_installed && (m_port_selection != 0))
+	{
+		h89bus::addr_ranges  addr_ranges = h89bus().get_address_ranges(m_port_selection);
+
+		if (addr_ranges.size() == 1)
+		{
+			h89bus::addr_range range = addr_ranges.front();
+
+			h89bus().install_io_device(range.first, range.second,
+				read8sm_delegate(*this, FUNC(h89bus_sigmasoft_snd_device::read)),
+				write8sm_delegate(*this, FUNC(h89bus_sigmasoft_snd_device::write)));
+		}
+
+		m_installed = true;
 	}
 }
 
