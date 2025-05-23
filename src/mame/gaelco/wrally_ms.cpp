@@ -221,7 +221,7 @@ void wrally_ms_state::wrally_ms(machine_config &config)
 
 	YM3812(config, "ymsnd", 16_MHz_XTAL / 4); // Unknown divisor
 
-	OKIM6295(config, "oki", 1_MHz_XTAL, okim6295_device::PIN7_LOW); // Unverified PIN 7
+	OKIM6295(config, "oki", 1_MHz_XTAL, okim6295_device::PIN7_LOW); // PIN 7 seems like it's not connected to anything at all
 
 	MSM5205(config, "msm", 384_kHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.15);
 }
