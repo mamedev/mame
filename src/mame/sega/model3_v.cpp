@@ -471,7 +471,7 @@ void model3_state::model3_vid_reg_w(offs_t offset, uint64_t data, uint64_t mem_m
 	{
 		case 0x00/8:    logerror("vid_reg0: %08X%08X\n", (uint32_t)(data>>32),(uint32_t)(data)); m_vid_reg0 = data; break;
 		case 0x08/8:    break;      /* ??? */
-		case 0x10/8:    set_irq_line((data >> 56) & 0x0f, CLEAR_LINE); break;     /* VBL IRQ Ack */
+		case 0x10/8:    set_irq_line((data >> 56) & 0xff, CLEAR_LINE); break;     /* VBL IRQ Ack */
 
 		case 0x20/8:    m_layer_priority = (data >> 48); break;
 
@@ -1725,8 +1725,8 @@ void model3_state::draw_model(uint32_t addr)
 
 				// TODO: color modulation enable should really be a setting
 				// vs2 wants color modulation with ARGB1555 (format 0) radar textures
-				// doing so breaks course select in srally2 already ...
-				if (tex_format != 0 && tex_format != 7)     // enable color modulation if this is not a color texture
+				// if (tex_format != 0 && tex_format != 7)
+				if (tex_format != 7)     // enable color modulation if this is not a color texture
 					colormod = true;
 
 				if (tex_width >= 6 || tex_height >= 6)      // srally2 poly ram has degenerate polys with 2k tex size (cpu bug or intended?)
