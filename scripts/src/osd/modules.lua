@@ -141,6 +141,7 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/sound/sdl_sound.cpp",
 		MAME_DIR .. "src/osd/modules/sound/sound_module.cpp",
 		MAME_DIR .. "src/osd/modules/sound/sound_module.h",
+		MAME_DIR .. "src/osd/modules/sound/wasapi_sound.cpp",
 		MAME_DIR .. "src/osd/modules/sound/xaudio2_sound.cpp",
 	}
 	includedirs {

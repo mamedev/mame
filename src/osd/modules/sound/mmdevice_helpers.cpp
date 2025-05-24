@@ -86,9 +86,7 @@ HRESULT populate_audio_node_info(
 		result = device.GetId(&id_raw);
 		if (FAILED(result) || !id_raw)
 		{
-			osd_printf_error(
-					"Error getting ID for audio device. Error: 0x%X\n",
-					static_cast<unsigned int>(result));
+			osd_printf_error("Error getting ID for audio device. Error: 0x%X\n", result);
 			return FAILED(result) ? result : E_POINTER;
 		}
 		device_id_w.reset(std::exchange(id_raw, nullptr));
@@ -110,7 +108,7 @@ HRESULT populate_audio_node_info(
 		osd_printf_error(
 				"Error opening property store for audio device %s. Error: 0x%X\n",
 				id_string,
-				static_cast<unsigned int>(result));
+				result);
 		return FAILED(result) ? result : E_POINTER;
 	}
 
@@ -125,7 +123,7 @@ HRESULT populate_audio_node_info(
 			osd_printf_error(
 					"Error getting display name for audio device %s. Error: 0x%X\n",
 					id_string,
-					static_cast<unsigned int>(result));
+					result);
 			try
 			{
 				device_name = id_string;
@@ -151,7 +149,7 @@ HRESULT populate_audio_node_info(
 			osd_printf_error(
 					"Error getting endpoint information for audio device %s. Error: 0x%X\n",
 					device_name,
-					static_cast<unsigned int>(result));
+					result);
 			return FAILED(result) ? result : E_POINTER;
 		}
 
@@ -161,7 +159,7 @@ HRESULT populate_audio_node_info(
 			osd_printf_error(
 					"Error getting data flow direction for audio device %s. Error: 0x%X\n",
 					device_name,
-					static_cast<unsigned int>(result));
+					result);
 			return result;
 		}
 
@@ -183,7 +181,7 @@ HRESULT populate_audio_node_info(
 		osd_printf_error(
 				"Error getting stream format for audio device %s. Error: 0x%X\n",
 				device_name,
-				static_cast<unsigned int>(result));
+				result);
 		return result;
 	}
 	else if (VT_BLOB != format_property.value.vt)
@@ -210,7 +208,7 @@ HRESULT populate_audio_node_info(
 			osd_printf_error(
 					"Error getting speaker arrangement for audio device %s. Error: 0x%X\n",
 					device_name,
-					static_cast<unsigned int>(result));
+					result);
 		}
 		else switch (speakers_property.value.vt)
 		{
@@ -263,7 +261,7 @@ HRESULT populate_audio_node_info(
 			channel_names.emplace_back(util::string_format("Channel %u", i + 1));
 			++i;
 		}
-		channel_positions.resize(format->nChannels, std::array<double, 3>{ 0.0, 0.0, 0.0 });
+		channel_positions.resize(format->nChannels, std::array<double, 3>{ 0.0, 0.0, 1.0 });
 	}
 	catch (std::bad_alloc const &)
 	{
