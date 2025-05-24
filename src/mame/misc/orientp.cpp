@@ -2,7 +2,7 @@
 // copyright-holders:flama12333
 /*************************************************************************
 
-// Features Notes:
+// Features Notes Was from archived websited:
 src: Chang yu website
 
 Pearl in the  East 
@@ -27,8 +27,8 @@ Big bonus for scoring on all letters of "ORIENTAL PEARL".
 
 Electronic ball-checking device ensures where ball lands.
 
-
-// Hardware info
+// Hardware info - may not accurate
+the dump was from Soccer Santiago II 6 ball pinball
 
 Buttons
 K1
@@ -151,7 +151,7 @@ void orientalpearl_state::orientp(machine_config &config)
 	
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	ay8910_device &psg(AY8910(config, "psg", XTAL(10'738'000) / 6));  // Divider not verified
+	ay8910_device &psg(AY8910(config, "psg", XTAL(10'738'000) / 6));
 	psg.add_route(ALL_OUTPUTS, "mono", 1.0);
 	ym2413_device &opll(YM2413(config, "opll", 3.579545_MHz_XTAL));
 	opll.add_route(ALL_OUTPUTS, "mono", 1.0);
@@ -163,13 +163,16 @@ ROM_START( east8 )
 	ROM_REGION( 0x10000, "maincpu", 0 ) //  EAST8  v1.05 string
 	ROM_LOAD( "w27c512.u33", 0x00000, 0x10000, CRC(8d3d1e91) SHA1(b80907df0878057a1ded8b56225059e06382b9d6) ) // main program
 	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASE00 )
-	ROM_LOAD( "at89s51.u39", 0x0000, 0x1000, NO_DUMP ) // mcu. protection
-	ROM_REGION( 0x40000, "oki", ROMREGION_ERASE00 )
-	ROM_LOAD( "w27c020.bin", 0x00000, 0x40000, NO_DUMP ) //  oki rom voice
-ROM_END
+
+    ROM_LOAD( "at89s51.u39", 0x0000, 0x1000, NO_DUMP ) // mcu. protection
+	
+    ROM_REGION( 0x40000, "oki", ROMREGION_ERASE00 )
+    ROM_LOAD( "w27c020.bin", 0x00000, 0x40000, NO_DUMP ) //  oki rom voice
+
+    ROM_END
 
 } // anonymous namespace
 
 
 //    YEAR  NAME    PARENT   MACHINE   INPUT   STATE         INIT        ROT   COMPANY      FULLNAME                                                FLAGS
-GAME( 200?, east8,  0,       orientp,   orientp, orientalpearl_state, empty_init, ROT0, "<unknown>", " Unknown EAST8 (v1.05)",  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // EAST8  v1.05  string . this was dumped from soccer santiago II 6 ball pinball
+GAME( 200?, east8,  0,       orientp,   orientp, orientalpearl_state, empty_init, ROT0, "<unknown>", " Unknown EAST8 (v1.05)",  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // EAST8  v1.05  string
