@@ -484,9 +484,9 @@ void hh_sm510_state::sm510_dualh(machine_config &config, u16 leftwidth, u16 left
 	config.set_default_layout(layout_hh_sm510_dualh);
 }
 
-void hh_sm510_state::sm510_tripleh(machine_config &config, u16 leftwidth, u16 leftheight, u16 middlewidth, u16 middleheight, u16 rightwidth, u16 rightheight)
+void hh_sm510_state::sm511_tripleh(machine_config &config, u16 leftwidth, u16 leftheight, u16 middlewidth, u16 middleheight, u16 rightwidth, u16 rightheight)
 {
-	mcfg_cpu_sm510(config);
+	mcfg_cpu_sm511(config);
 	mcfg_sound_r1(config);
 	mcfg_svg_screen(config, leftwidth, leftheight, "screen_left");
 	mcfg_svg_screen(config, middlewidth, middleheight, "screen_middle");
@@ -11817,6 +11817,96 @@ ROM_END
 
 /*******************************************************************************
 
+  Tronica Treasure Island (model TI-31)
+  * PCB labels: TI-31 160383 32-537-1
+  * Sharp SM511 label 1113 239B TRONICA (no decap)
+  * horizontal triple lcd screens with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class trtreisl_state : public hh_sm510_state
+{
+public:
+	trtreisl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void trtreisl(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( trtreisl )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, 0x01, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x03, NOTEQUALS, 0x00) // Button/Hour
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE4 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Min")
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // S4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x00, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x00, "Score Booster (Cheat)" ) // factory test, unpopulated on PCB -- this one multiplies scoring factor with 10
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+
+	PORT_START("FAKE") // SJP and Hour are electronically the same button
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Start/Jump/Pick")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE3 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Hour")
+INPUT_PORTS_END
+
+// config
+
+void trtreisl_state::trtreisl(machine_config &config)
+{
+	sm511_tripleh(config, 525, 675, 870, 675, 525, 675); // 1555 x 547
+}
+
+// roms
+
+ROM_START( trtreisl )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "1113_239b.program", 0x0000, 0x1000, CRC(fec16266) SHA1(f2725a077cff9dbed9cd324ff802d10dcbdb4451) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "1113_239b.melody", 0x000, 0x100, BAD_DUMP CRC(2de3f974) SHA1(17e7a3947a457580efefa544c3132e93e20cbc71) ) // decap needed for verification
+
+	ROM_REGION( 59803, "screen_left", 0)
+	ROM_LOAD( "trtreisl_left.svg", 0, 59803, CRC(92f5f11e) SHA1(fdf8edf7742d2e0d2893e2226872c897e966f64e) )
+
+	ROM_REGION( 94316, "screen_middle", 0)
+	ROM_LOAD( "trtreisl_middle.svg", 0, 94316, CRC(adcf5308) SHA1(0c7932e4ba7a3daba24f0ff385c21035b86f4e23) )
+
+	ROM_REGION( 46905, "screen_right", 0)
+	ROM_LOAD( "trtreisl_right.svg", 0, 46905, CRC(26e6b4bd) SHA1(7469f2d5291f20621dc3f2b7f260cf4b4681f95b) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
   Tronica: Diver's Adventure (model DA-37), Clever Chicken (model CC-38V)
   * PCB labels: DA-37 260383 32-541-1 (DA-37)
                 CC38V 210483 32-545-1 (CC-38V)
@@ -12207,6 +12297,7 @@ SYST( 1983, trsgkeep,     0,           0,      trsgkeep,     trsgkeep,     trsgk
 SYST( 1982, trspacmis,    0,           0,      trspacmis,    trspacmis,    trspacmis_state,    empty_init, "Tronica", "Space Mission (Tronica)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1982, trspider,     trspacmis,   0,      trspider,     trspacmis,    trspacmis_state,    empty_init, "Tronica", "Spider (Tronica)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1982, trspacadv,    0,           0,      trspacadv,    trspacadv,    trspacadv_state,    empty_init, "Tronica", "Space Adventure", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1983, trtreisl,     0,           0,      trtreisl,     trtreisl,     trtreisl_state,     empty_init, "Tronica", "Treasure Island (Tronica)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1983, trdivadv,     0,           0,      trdivadv,     trdivadv,     trdivadv_state,     empty_init, "Tronica", "Diver's Adventure", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1983, trclchick,    trdivadv,    0,      trclchick,    trclchick,    trdivadv_state,     empty_init, "Tronica", "Clever Chicken", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
