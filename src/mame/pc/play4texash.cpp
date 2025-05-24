@@ -81,7 +81,7 @@ ROM_START(play4texash)
 	ROM_LOAD("81-lc4384v.u31",       0x00000, 0x00100, NO_DUMP) // Lattice ispMACH LC4384V
 
 	DISK_REGION("ide:0:hdd")
-	DISK_IMAGE("sleic_play_4_texas_holdem_v2.1.4_12-00314", 0, SHA1(6cbf515ee80a68c98a13be02b17c9d306f4e1445))
+	DISK_IMAGE("sleic_play_4_texas_holdem_v2.1.4_12-00314", 0, SHA1(6cbf515ee80a68c98a13be02b17c9d306f4e1445)) // Transcend CompactFlash 133x 1GB
 ROM_END
 
 } // anonymous namespace
