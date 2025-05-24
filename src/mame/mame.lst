@@ -32537,8 +32537,10 @@ tomsadvs                        //
 @source:misc/toratora.cpp
 toratora                        // (c) 1980 Game Plan
 toratorab                       // (c) 1980 Game Plan
+
 @source:misc/toysoldier.cpp
 toysoldier                      // (c) 2003 Paokai
+
 @source:misc/triplex.cpp
 triplex                         // Torch Triple X
 
