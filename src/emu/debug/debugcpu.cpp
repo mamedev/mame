@@ -57,7 +57,7 @@ debugger_cpu::debugger_cpu(running_machine &machine)
 	m_tempvar = make_unique_clear<u64[]>(NUM_TEMP_VARIABLES);
 
 	/* create a global symbol table */
-	m_symtable = std::make_unique<symbol_table>(machine);
+	m_symtable = std::make_unique<symbol_table>(machine, symbol_table::BUILTIN_GLOBALS);
 	m_symtable->set_memory_modified_func([this]() { set_memory_modified(true); });
 
 	/* add "wpaddr", "wpdata", "wpsize" to the global symbol table */
@@ -488,7 +488,7 @@ device_debug::device_debug(device_t &device)
 	, m_state(nullptr)
 	, m_disasm(nullptr)
 	, m_flags(0)
-	, m_symtable(std::make_unique<symbol_table>(device.machine(), &device.machine().debugger().cpu().global_symtable(), &device))
+	, m_symtable(std::make_unique<symbol_table>(device.machine(), symbol_table::CPU_STATE, &device.machine().debugger().cpu().global_symtable(), &device))
 	, m_stepaddr(0)
 	, m_stepsleft(0)
 	, m_delay_steps(0)
