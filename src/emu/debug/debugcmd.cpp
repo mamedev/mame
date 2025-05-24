@@ -3930,7 +3930,7 @@ void debugger_commands::execute_symlist(const std::vector<std::string_view> &par
 	for (; symtable != nullptr; symtable = symtable->parent())
 	{
 		// Skip globals if user explicitly requested CPU
-		if (symtable->type() == symbol_table::BUILTIN_GLOBALS && !params.empty())
+		if (symtable->type() == symbol_table::DEBUGGER_GLOBALS && !params.empty())
 			continue;
 
 		if (symtable->entries().size() == 0)
@@ -3944,7 +3944,7 @@ void debugger_commands::execute_symlist(const std::vector<std::string_view> &par
 		case symbol_table::CPU_STATE:
 			m_console.printf("\n**** CPU '%s' symbols ****\n", cpu->tag());
 			break;
-		case symbol_table::BUILTIN_GLOBALS:
+		case symbol_table::DEBUGGER_GLOBALS:
 			m_console.printf("\n**** Global symbols ****\n");
 			break;
 		default:
