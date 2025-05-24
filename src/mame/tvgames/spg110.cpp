@@ -65,6 +65,7 @@ public:
 	spg110_easports_game_state(const machine_config &mconfig, device_type type, const char *tag) :
 		spg110_game_state(mconfig, type, tag)
 	{ }
+	void easports(machine_config &config);
 	void easports_pal(machine_config &config);
 
 private:
@@ -539,6 +540,12 @@ void spg110_game_state::spg110_base_pal(machine_config &config)
 }
 
 
+void spg110_easports_game_state::easports(machine_config &config)
+{
+	spg110_base(config);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+}
+
 void spg110_easports_game_state::easports_pal(machine_config &config)
 {
 	spg110_base_pal(config);
@@ -636,6 +643,13 @@ ROM_START( easports )
 	ROM_LOAD( "nvram", 0x000000, 0x20000, CRC(bfcbd206) SHA1(0f5b730679762547a0658c2cd0d4fa5169b857af) )
 ROM_END
 
+
+ROM_START( easportsu )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "ea.u2", 0x000000, 0x400000, CRC(ca896683) SHA1(0d655e8a5e07e1259c358328fdc9f0084709ecc3) )
+ROM_END
+
+
 ROM_START( jak_wpt )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "jakk_worldpokertour.bin", 0x000000, 0x200000, CRC(6eac3bae) SHA1(80bf3ec0e0aa26b4bac72c1828939a18b7750f29) )
@@ -710,4 +724,4 @@ CONS( 200?, conyfght,  0,        0, spg110_base, conyteni,  spg110_game_state, e
 CONS( 200?, sstarkar,  0,        0, sstarkar, conyteni,  spg110_sstarkar_game_state, empty_init, "Taikee",      "Singing Star Karaoke (World) / Karao Kids (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // "ItsMagical" brand from Imaginarium
 
 CONS( 2004, easports,  0,        0, easports_pal, easports,  spg110_easports_game_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse",      "EA Sports Classics: NHL 95 & FIFA Soccer 96 (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-// US release has Madden instead of FIFA
+CONS( 2004, easportsu, easports, 0, easports,     easports,  spg110_easports_game_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse",      "EA Sports Classics: NHL 95 & Madden 95 (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
