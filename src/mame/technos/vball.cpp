@@ -436,8 +436,9 @@ void vball_state::main_map(address_map &map)
 	map(0x100c, 0x100c).w(FUNC(vball_state::scrollx_lo_w));
 	map(0x100d, 0x100d).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x100e, 0x100e).writeonly().share(m_scrolly_lo);
-	map(0x2000, 0x2fff).w(FUNC(vball_state::videoram_w)).share(m_videoram);
-	map(0x3000, 0x3fff).w(FUNC(vball_state::attrib_w)).share(m_attribram);
+	// spams logerror without reading, assume readable
+	map(0x2000, 0x2fff).ram().w(FUNC(vball_state::videoram_w)).share(m_videoram);
+	map(0x3000, 0x3fff).ram().w(FUNC(vball_state::attrib_w)).share(m_attribram);
 	map(0x4000, 0x7fff).bankr(m_mainbank);
 	map(0x8000, 0xffff).rom();
 }
@@ -785,4 +786,4 @@ ROM_END
 GAME( 1988, vball,    0,     vball,    vball,    vball_state, empty_init, ROT0, "Technos Japan", "U.S. Championship V'ball (US)",                   MACHINE_SUPPORTS_SAVE )
 GAME( 1988, vball2pj, vball, vball,    vball2pj, vball_state, empty_init, ROT0, "Technos Japan", "U.S. Championship V'ball (Japan)",                MACHINE_SUPPORTS_SAVE )
 GAME( 1988, vballb,   vball, vball,    vball,    vball_state, empty_init, ROT0, "bootleg",       "U.S. Championship V'ball (bootleg of US set)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1988, vball2pjb,vball, vball,    vball,    vball_state, empty_init, ROT0, "bootleg",       "U.S. Championship V'ball (bootleg of Japan set)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, vball2pjb,vball, vball,    vball,    vball_state, empty_init, ROT0, "bootleg",       "U.S. Championship V'ball (bootleg of Japan set)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // garbage to no samples, $9800 - $9803 in sound_map doesn't look OKI-like and not a mirror, adapted to MSM5205?

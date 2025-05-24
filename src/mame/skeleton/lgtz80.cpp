@@ -18,16 +18,15 @@ HM86171-80 RAMDAC (near CPU ROM)
 The two dumped games use PCBs with different layout, however the components appear
 to be the same or at least same from different manufacturers.
 
-"ASIC 1" is probably a KL5C80A12 CPU, though its on-chip peripherals are mostly unused.
+"ASIC 1" is probably a KL5C80A12 CPU, though its on-chip peripherals are used for little
+besides rudimentary ROM banking and port I/O.
 
 TODO:
-- arthurkn uploads NVRAM contents if missing, fruitcat seemingly needs them pre-populated,
-  thus currently runs off the rails when calling to NVRAM, seems to fortuitously recover,
-  but never populates tile RAM
-- fruitcat will need Oki banking once it works
+- arthurkn uploads code to NVRAM at 2B000-2BFFF if missing, fruitcat seemingly needs the
+  same range pre-populated, thus currently runs off the rails when calling to NVRAM, seems
+  to fortuitously recover, but never populates tile RAM
 - arthurkn runs correctly and needs the following:
   - reels' scrolling implementation is weird (hacky?)
-  - NVRAM doesn't save state, only uploaded code?
   - outputs (lamps / meters)
   - hopper (off by default)
   - visible area is probably not 100% correct
@@ -57,6 +56,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_oki(*this, "oki"),
 		m_tile_ram(*this, "tile_ram"),
 		m_tile_attr_ram(*this, "tile_attr_ram"),
 		m_reel_ram(*this, "reel_ram%u", 0U),
@@ -79,6 +79,7 @@ protected:
 private:
 	required_device<kl5c80a12_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<okim6295_device> m_oki;
 
 	required_shared_ptr<u8> m_tile_ram;
 	required_shared_ptr<u8> m_tile_attr_ram;
@@ -94,8 +95,8 @@ private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void vblank_nmi_w(int state);
+	void oki_bank_w(u8 data);
 
-	void p0_w(u8 data);
 	u8 control_r();
 	void control_w(u8 data);
 	u8 e0_r();
@@ -208,9 +209,10 @@ void lgtz80_state::reel_scroll_ram_w(offs_t offset, u8 data)
 }
 
 
-void lgtz80_state::p0_w(u8 data)
+void lgtz80_state::oki_bank_w(u8 data)
 {
-	logerror("%s: p0_w(%02X)\n", machine().describe_context(), data);
+	// fruitcat only? arthurkn configures P00 as an output pin but never writes to the data register
+	m_oki->set_rom_bank(BIT(data, 0));
 }
 
 u8 lgtz80_state::control_r()
@@ -250,8 +252,7 @@ void lgtz80_state::vblank_nmi_w(int state)
 void lgtz80_state::program_map(address_map &map)
 {
 	map(0x00000, 0x1ffff).rom();
-	map(0x28000, 0x29fff).ram();
-	map(0x2a000, 0x2bfff).ram().share("nvram"); // arthurkn needs to copy code to RAM here, but fruitcat doesn't initialize it!
+	map(0x28000, 0x2bfff).ram().share("nvram");
 	map(0x4c000, 0x4c1ff).ram().w(FUNC(lgtz80_state::reel_attr_ram_w<0>)).share(m_reel_attr_ram[0]);
 	map(0x4c200, 0x4c3ff).ram().w(FUNC(lgtz80_state::reel_attr_ram_w<1>)).share(m_reel_attr_ram[1]);
 	map(0x4c400, 0x4c5ff).ram().w(FUNC(lgtz80_state::reel_attr_ram_w<2>)).share(m_reel_attr_ram[2]);
@@ -275,6 +276,7 @@ void lgtz80_state::fruitcat_io_map(address_map &map)
 	map(0x81, 0x81).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x82, 0x82).w("ramdac", FUNC(ramdac_device::mask_w));
 	map(0x88, 0x88).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	// map(0x98, 0x98).w(); TODO
 	map(0xc0, 0xc0).rw(FUNC(lgtz80_state::control_r), FUNC(lgtz80_state::control_w));
 }
 
@@ -345,7 +347,7 @@ void lgtz80_state::fruitcat(machine_config &config)
 	KL5C80A12(config, m_maincpu, 12_MHz_XTAL); // exact CPU model and divider not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &lgtz80_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &lgtz80_state::fruitcat_io_map);
-	m_maincpu->out_p0_callback().set(FUNC(lgtz80_state::p0_w));
+	m_maincpu->out_p0_callback().set(FUNC(lgtz80_state::oki_bank_w));
 	m_maincpu->in_p1_callback().set_ioport("IN1");
 	m_maincpu->in_p2_callback().set_ioport("IN2");
 	m_maincpu->in_p3_callback().set_ioport("IN3");

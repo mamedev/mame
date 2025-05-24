@@ -15,7 +15,6 @@
 #include "bus/acorn/bus.h"
 #include "machine/timer.h"
 #include "imagedev/cassette.h"
-#include "sound/wave.h"
 #include "speaker.h"
 
 //**************************************************************************

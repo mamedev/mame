@@ -1101,7 +1101,8 @@ sound_manager::microphone_info::microphone_info(microphone_device &dev) : m_dev(
 
 void sound_manager::reset()
 {
-	LOG_OUTPUT_FUNC("Sound reset\n");
+	if(VERBOSE & LOG_GENERAL)
+		LOG_OUTPUT_FUNC("Sound reset\n");
 }
 
 
@@ -1190,18 +1191,22 @@ void sound_manager::config_load(config_type cfg_type, config_level cfg_level, ut
 		}
 
 		// All levels
-		const util::xml::data_node *lv_node = parentnode->get_child("master_volume");
-		if(lv_node)
-			m_master_gain = lv_node->get_attribute_float("gain", 1.0);
+		if(!machine().options().volume()) {
+			const util::xml::data_node *lv_node = parentnode->get_child("master_volume");
+			if(lv_node)
+				m_master_gain = lv_node->get_attribute_float("gain", 1.0);
+		}
+		else
+			m_master_gain = osd::db_to_linear(machine().options().volume());
 
-		for(lv_node = parentnode->get_child("device_volume"); lv_node != nullptr; lv_node = lv_node->get_next_sibling("device_volume")) {
+		for(const util::xml::data_node *lv_node = parentnode->get_child("device_volume"); lv_node != nullptr; lv_node = lv_node->get_next_sibling("device_volume")) {
 			std::string device_tag = lv_node->get_attribute_string("device", "");
 			device_sound_interface *intf = dynamic_cast<device_sound_interface *>(m_machine.root_device().subdevice(device_tag));
 			if(intf)
 				intf->set_user_output_gain(lv_node->get_attribute_float("gain", 1.0));
 		}
 
-		for(lv_node = parentnode->get_child("device_channel_volume"); lv_node != nullptr; lv_node = lv_node->get_next_sibling("device_channel_volume")) {
+		for(const util::xml::data_node *lv_node = parentnode->get_child("device_channel_volume"); lv_node != nullptr; lv_node = lv_node->get_next_sibling("device_channel_volume")) {
 			std::string device_tag = lv_node->get_attribute_string("device", "");
 			int channel = lv_node->get_attribute_int("channel", -1);
 			device_sound_interface *intf = dynamic_cast<device_sound_interface *>(m_machine.root_device().subdevice(device_tag));
@@ -1282,7 +1287,7 @@ void sound_manager::config_save(config_type cfg_type, util::xml::data_node *pare
 		}
 
 		// All levels
-		if(m_master_gain != 1.0) {
+		if(m_master_gain != 1.0 && m_master_gain != osd::db_to_linear(machine().options().volume())) {
 			util::xml::data_node *const lv_node = parentnode->add_child("master_volume", nullptr);
 			lv_node->set_attribute_float("gain", m_master_gain);
 		}
@@ -1355,6 +1360,7 @@ void sound_manager::config_add_sound_io_connection_node(sound_io_device *dev, st
 {
 	internal_config_add_sound_io_connection_node(dev, name, db);
 	m_osd_info.m_generation --;
+	mapping_update();
 }
 
 void sound_manager::internal_config_add_sound_io_connection_node(sound_io_device *dev, std::string name, float db)
@@ -1370,6 +1376,7 @@ void sound_manager::config_add_sound_io_connection_default(sound_io_device *dev,
 {
 	internal_config_add_sound_io_connection_default(dev, db);
 	m_osd_info.m_generation --;
+	mapping_update();
 }
 
 void sound_manager::internal_config_add_sound_io_connection_default(sound_io_device *dev, float db)
@@ -1385,6 +1392,7 @@ void sound_manager::config_remove_sound_io_connection_node(sound_io_device *dev,
 {
 	internal_config_remove_sound_io_connection_node(dev, name);
 	m_osd_info.m_generation --;
+	mapping_update();
 }
 
 void sound_manager::internal_config_remove_sound_io_connection_node(sound_io_device *dev, std::string name)
@@ -1401,6 +1409,7 @@ void sound_manager::config_remove_sound_io_connection_default(sound_io_device *d
 {
 	internal_config_remove_sound_io_connection_default(dev);
 	m_osd_info.m_generation --;
+	mapping_update();
 }
 
 void sound_manager::internal_config_remove_sound_io_connection_default(sound_io_device *dev)
@@ -1417,6 +1426,7 @@ void sound_manager::config_set_volume_sound_io_connection_node(sound_io_device *
 {
 	internal_config_set_volume_sound_io_connection_node(dev, name, db);
 	m_osd_info.m_generation --;
+	mapping_update();
 }
 
 void sound_manager::internal_config_set_volume_sound_io_connection_node(sound_io_device *dev, std::string name, float db)
@@ -1433,6 +1443,7 @@ void sound_manager::config_set_volume_sound_io_connection_default(sound_io_devic
 {
 	internal_config_set_volume_sound_io_connection_default(dev, db);
 	m_osd_info.m_generation --;
+	mapping_update();
 }
 
 void sound_manager::internal_config_set_volume_sound_io_connection_default(sound_io_device *dev, float db)
@@ -1450,6 +1461,7 @@ void sound_manager::config_add_sound_io_channel_connection_node(sound_io_device 
 {
 	internal_config_add_sound_io_channel_connection_node(dev, guest_channel, name, node_channel, db);
 	m_osd_info.m_generation --;
+	mapping_update();
 }
 
 void sound_manager::internal_config_add_sound_io_channel_connection_node(sound_io_device *dev, u32 guest_channel, std::string name, u32 node_channel, float db)
@@ -1465,6 +1477,7 @@ void sound_manager::config_add_sound_io_channel_connection_default(sound_io_devi
 {
 	internal_config_add_sound_io_channel_connection_default(dev, guest_channel, node_channel, db);
 	m_osd_info.m_generation --;
+	mapping_update();
 }
 
 void sound_manager::internal_config_add_sound_io_channel_connection_default(sound_io_device *dev, u32 guest_channel, u32 node_channel, float db)
@@ -1480,6 +1493,7 @@ void sound_manager::config_remove_sound_io_channel_connection_node(sound_io_devi
 {
 	internal_config_remove_sound_io_channel_connection_node(dev, guest_channel, name, node_channel);
 	m_osd_info.m_generation --;
+	mapping_update();
 }
 
 void sound_manager::internal_config_remove_sound_io_channel_connection_node(sound_io_device *dev, u32 guest_channel, std::string name, u32 node_channel)
@@ -1496,6 +1510,7 @@ void sound_manager::config_remove_sound_io_channel_connection_default(sound_io_d
 {
 	internal_config_remove_sound_io_channel_connection_default(dev, guest_channel, node_channel);
 	m_osd_info.m_generation --;
+	mapping_update();
 }
 
 void sound_manager::internal_config_remove_sound_io_channel_connection_default(sound_io_device *dev, u32 guest_channel, u32 node_channel)
@@ -1512,6 +1527,7 @@ void sound_manager::config_set_volume_sound_io_channel_connection_node(sound_io_
 {
 	internal_config_set_volume_sound_io_channel_connection_node(dev, guest_channel, name, node_channel, db);
 	m_osd_info.m_generation --;
+	mapping_update();
 }
 
 void sound_manager::internal_config_set_volume_sound_io_channel_connection_node(sound_io_device *dev, u32 guest_channel, std::string name, u32 node_channel, float db)
@@ -1528,6 +1544,7 @@ void sound_manager::config_set_volume_sound_io_channel_connection_default(sound_
 {
 	internal_config_set_volume_sound_io_channel_connection_default(dev, guest_channel, node_channel, db);
 	m_osd_info.m_generation --;
+	mapping_update();
 }
 
 void sound_manager::internal_config_set_volume_sound_io_channel_connection_default(sound_io_device *dev, u32 guest_channel, u32 node_channel, float db)
@@ -2507,7 +2524,7 @@ void sound_manager::streams_update()
 
 	for(osd_input_stream &stream : m_osd_input_streams)
 		stream.m_buffer.sync();
-	
+
 	machine().osd().add_audio_to_recording(m_record_buffer.data(), m_record_samples);
 	machine().video().add_sound_to_recording(m_record_buffer.data(), m_record_samples);
 	if(m_wavfile)

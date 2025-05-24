@@ -163,7 +163,7 @@ public:
 
 	// sound options
 	const char *sound() const { return value(OSDOPTION_SOUND); }
-	int audio_latency() const { return int_value(OSDOPTION_AUDIO_LATENCY); }
+	float audio_latency() const { return float_value(OSDOPTION_AUDIO_LATENCY); }
 
 	// CoreAudio specific options
 	const char *audio_output() const { return value(OSDOPTION_AUDIO_OUTPUT); }
@@ -292,7 +292,7 @@ protected:
 
 private:
 	// internal state
-	running_machine *   m_machine;
+	running_machine *m_machine;
 	osd_options& m_options;
 
 	bool m_print_verbose;

@@ -30,7 +30,7 @@
     vs2 - works
     harley - works
     skichamp - boots after skipping the drive board errors, massive slowdowns
-    srally2 - works
+    srally2 - works, uses JTAG patch, draws no polygon if coin is inserted at Sega logo
     srally2p/srally2pa/sraly2dx - needs specific JTAG patch / bypass
     von2/von2a/von2o/von254g - works
     fvipers2 - crashes after player selection
@@ -43,7 +43,7 @@
   * daytona2 - As above
     spikeout/spikeofe - As above.
  ** dirtdvls/dirtdvlau/dirtdvlj/dirtdvlu - works
-    swtrilgy - works
+    swtrilgy - works, black screen in service mode
     swtrilga - doesn't pass "Wait Setup the Feedback Leaver"
     swtrilgyp - works if you wait past "Wait Setup the Feedback Leaver"
     magtruck - works, broken FPU values in matrices during 2nd part of attract mode (cpu core bug?)
@@ -1451,9 +1451,7 @@ void model3_state::lostwsga_ser1_w(uint8_t data)
 
 				// off-screen detect
 				case 8:
-					m_serial_fifo2 = 0;
-					if(ioport("OFFSCREEN")->read() & 0x01)
-						m_serial_fifo2 |= 0x01;
+					m_serial_fifo2 = ioport("OFFSCREEN")->read() & 0x03;
 					break;
 			}
 			break;
@@ -1522,33 +1520,13 @@ void model3_state::model3_sys_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 			else logerror("m3_sys: unknown mask on IRQen write\n");
 			break;
 		case 0x18/8:
-			if ((mem_mask & 0xff000000) == 0xff000000)  // int ACK with bits in REVERSE ORDER from the other registers (Seeeee-gaaaa!)
-			{                       // may also be a secondary enable based on behavior of e.g. magtruck VBL handler
-//              uint32_t old_irq = m_irq_state;
-				uint8_t ack = (data>>24)&0xff, realack;
-				int i;
-
-				switch (ack)
-				{
-					case 0xff:  // no ack, do nothing
-						return;
-
-					default:
-						realack = 0xff; // default to all bits set, no clearing
-						for (i = 7; i >= 0; i--)
-						{
-							// if bit is clear, clear the bit on the opposite end
-							if (!(ack & (1<<i)))
-							{
-								realack &= ~(1<<(7-i));
-							}
-						}
-
-//                      printf("%x to ack (realack %x)\n", ack, realack);
-
-						m_irq_state &= realack;
-						break;
-				}
+			if ((mem_mask & 0xff000000) == 0xff000000)
+			{
+				// check irq status only
+				// - spikeout/spikeofe cares about this;
+				// - vs215o implies that the value written doesn't really matter
+				//   (writes the full range of 0-0xff), classifying this as a strobe only
+				update_irq_state();
 			}
 			else
 			{
@@ -1655,25 +1633,22 @@ void model3_state::model3_sound_w(offs_t offset, uint8_t data)
 			// send to the sound board
 			m_scsp1->midi_in(data);
 
-			if (m_sound_irq_enable)
-			{
-				m_sound_timer->adjust(attotime::from_msec(1));
-			}
-
 			break;
 
 		case 4:
 			if (m_uart.found())
 				m_uart->control_w(data);
 
-			if (data == 0x27)
+			// HACK: MIDI comms thru SCSP MCIEB?
+			if (data & 0x20)
 			{
 				m_sound_irq_enable = 1;
-				m_sound_timer->adjust(attotime::from_msec(1));
+				m_sound_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
 			}
-			else if (data == 0x06)
+			else
 			{
 				m_sound_irq_enable = 0;
+				set_irq_line(0x40, CLEAR_LINE);
 			}
 
 			break;
@@ -1763,8 +1738,33 @@ static INPUT_PORTS_START( model3 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(2) PORT_8WAY
 
+	// TODO: map per-game, add diplocations
 	PORT_START("DSW")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	// vs215o: enables debug stats if ON
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("AN0")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1823,7 +1823,8 @@ static INPUT_PORTS_START( lostwsga )
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("IN3")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("LIGHT0_X")  // lightgun X-axis
 	PORT_BIT( 0x3ff, 0x200, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0x00,0x3ff) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
@@ -1839,6 +1840,7 @@ static INPUT_PORTS_START( lostwsga )
 
 	PORT_START("OFFSCREEN") // fake button to shoot offscreen
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( scud )
@@ -2053,6 +2055,10 @@ ROM_START( lemans24 )   /* step 1.5, Sega game ID# is 833-13159, ROM board ID# 8
 	ROM_LOAD64_WORD_SWAP( "mpr-19866.10", 0x2800004, 0x400000, CRC(ede5fc78) SHA1(ff170fad7aaf1a6ba86d50022ad7586d0e785668) )
 	ROM_LOAD64_WORD_SWAP( "mpr-19867.11", 0x2800002, 0x400000, CRC(ae610fc5) SHA1(b03c85cb661a67becf59b6bb29e52de736470add) )
 	ROM_LOAD64_WORD_SWAP( "mpr-19868.12", 0x2800000, 0x400000, CRC(3c43d64f) SHA1(00e1bd91496a6b3f73343ef4ad24a0dd3cb6bcf5) )
+
+	ROM_COPY("user1", 0x0800000, 0x4800000, 0x1000000)
+	ROM_COPY("user1", 0x1800000, 0x5800000, 0x1000000)
+	ROM_COPY("user1", 0x2800000, 0x6800000, 0x1000000)
 
 	ROM_REGION( 0x1000000, "user3", 0 )  /* Video ROMs Part 1 */
 	ROM_LOAD_VROM( "mpr-19871.26", 0x000002, 0x200000, CRC(5168e02b) SHA1(3572c748c8f1b70b194fcf27919d3e671c7a09a5) )
@@ -3107,6 +3113,11 @@ ROM_START( lostwsga )   /* Step 1.5, PCB cage labeled 834-13172 THE LOST WORLD U
 	// mirror CROM0 to CROM
 	ROM_COPY("user1", 0x800000, 0x000000, 0x600000)
 
+	ROM_COPY("user1", 0x0800000, 0x4800000, 0x1000000)
+	ROM_COPY("user1", 0x1800000, 0x5800000, 0x1000000)
+	ROM_COPY("user1", 0x2800000, 0x6800000, 0x1000000)
+	ROM_COPY("user1", 0x3800000, 0x7800000, 0x1000000)
+
 	ROM_REGION( 0x1000000, "user3", 0 )  /* Video ROMs Part 1 */
 	ROM_LOAD_VROM( "mpr-19902.26", 0x0000002, 0x200000, CRC(178bd471) SHA1(dc2cb409081e4fd1176470869e025320449a8d02) )
 	ROM_LOAD_VROM( "mpr-19903.27", 0x0000000, 0x200000, CRC(fe575871) SHA1(db7aec4997b0c9d9a77a611139d53bcfba4bf258) )
@@ -3175,6 +3186,11 @@ ROM_START( lostwsgp )   /* Step 1.5, build 1997/06/24, location test or preview 
 
 	// mirror CROM0 to CROM
 	ROM_COPY("user1", 0x800000, 0x000000, 0x600000)
+
+	ROM_COPY("user1", 0x0800000, 0x4800000, 0x1000000)
+	ROM_COPY("user1", 0x1800000, 0x5800000, 0x1000000)
+	ROM_COPY("user1", 0x2800000, 0x6800000, 0x1000000)
+	ROM_COPY("user1", 0x3800000, 0x7800000, 0x1000000)
 
 	ROM_REGION( 0x1000000, "user3", 0 )  /* Video ROMs Part 1 */
 	ROM_LOAD_VROM( "mpr-19902.26", 0x0000002, 0x200000, CRC(178bd471) SHA1(dc2cb409081e4fd1176470869e025320449a8d02) )
@@ -6884,6 +6900,7 @@ void model3_state::init_dayto2pe()
 //  rom[(0x64ca34^4)/4] = 0x60000000;       // dec
 }
 
+// TODO: sound dies often without these patches, investigate
 void model3_state::init_spikeout()
 {
 	uint32_t *rom = (uint32_t*)memregion("user1")->base();
@@ -6932,10 +6949,10 @@ void model3_state::init_skichamp()
 
 void model3_state::init_oceanhun()
 {
-	uint32_t *rom = (uint32_t*)memregion("user1")->base();
+	//uint32_t *rom = (uint32_t*)memregion("user1")->base();
 	init_model3_20();
 
-	rom[(0x57995c^4)/4] = 0x60000000;   // decrementer
+	//rom[(0x57995c^4)/4] = 0x60000000;   // decrementer
 }
 
 void model3_state::init_magtruck()
