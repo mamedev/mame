@@ -197,6 +197,7 @@ void tsconf_state::machine_reset()
 	m_int_mask = 0;
 
 	m_bank0_rom.select(0);
+	update_io(0);
 
 	m_glukrs->disable();
 
