@@ -132,6 +132,7 @@ void orientalpearl_state::io_map(address_map &map)
 {
     map(0xfa00, 0xfa01).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
     map(0xfb02, 0xfb03).w("psg", FUNC(ay8910_device::address_data_w));
+	map(0xfe00, 0xfe01).w("opll", FUNC(ym2413_device::write));
 	
 }
 
