@@ -10017,7 +10017,7 @@ void ddenlovr_state::jongoh(machine_config &config)
 {
 	seljan2(config);
 
-	subdevice<tmpz84c015_device>("maincpu")->set_addrmap(AS_IO, &hanakanz_state::jongoh_portmap);
+	m_maincpu->set_addrmap(AS_IO, &hanakanz_state::jongoh_portmap);
 }
 
 void hanakanz_state::daireach(machine_config &config)
@@ -12541,7 +12541,7 @@ ROM_START( seljan2 )
 ROM_END
 
 ROM_START( jongoh )
-	ROM_REGION( 0x90000+0x8000+16*0x1000, "maincpu", 0 )  // Z80 Code
+	ROM_REGION( 0x90000+0x8000+16*0x1000, "maincpu", 0 )
 	ROM_LOAD( "t80324.4c", 0x00000, 0x80000, CRC(31c5864b) SHA1(7a89c4023868a51e3bb9b3eeffa17602d285e0d0) )
 	ROM_RELOAD(            0x10000, 0x80000 )
 

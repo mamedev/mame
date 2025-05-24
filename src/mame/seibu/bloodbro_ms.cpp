@@ -232,8 +232,8 @@ void bloodbro_ms_state::main_program_map(address_map &map)
 	map(0x08e000, 0x08ffff).ram();
 	map(0x0a0000, 0x0a000d).nopw(); // remnants of original code (Seibu sound system)?
 	map(0x0c0100, 0x0c0101).nopw(); // ??? written once
-	map(0x0e000e, 0x0e000e).w(m_soundlatch[1], FUNC(generic_latch_8_device::write)); // half of the sound commands (wrt weststry)?
-	map(0x0e000f, 0x0e000f).w(m_soundlatch[0], FUNC(generic_latch_8_device::write)); // half of the sound commands (wrt weststry)?
+	map(0x0e000e, 0x0e000e).w(m_soundlatch[1], FUNC(generic_latch_8_device::write));
+	map(0x0e000f, 0x0e000f).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
 	map(0x100000, 0x1003ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x100400, 0x1007ff).ram().w("palette", FUNC(palette_device::write16_ext)).share("palette_ext");
 	map(0x100800, 0x100fff).ram();
