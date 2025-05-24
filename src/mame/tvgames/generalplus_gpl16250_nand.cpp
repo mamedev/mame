@@ -906,9 +906,16 @@ void generalplus_gpac800_game_state::nand_beambox()
 
 void generalplus_gpac800_game_state::nand_fc2016()
 {
-	nand_init840();
+	m_sdram.resize(m_sdram_kwords);
+	m_sdram2.resize(0x10000);
+
+	m_nandblocksize = 0x800;
+	m_nandblocksize_stripped = 0x800;
+
+	m_vectorbase = 0x6fe0;
+
 	m_initial_copy_words = 0x500000;
-	m_maincpu->set_romtype(1);
+	//m_maincpu->set_romtype(2);
 }
 
 // NAND dumps w/ internal bootstrap (and u'nSP 2.0 extended opcodes)  (have gpnandnand strings)
