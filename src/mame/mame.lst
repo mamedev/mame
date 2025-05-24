@@ -18807,6 +18807,9 @@ wrallyata
 wrallyb
 wrallyc
 
+@source:gaelco/wrally_ms.cpp
+wrallymp
+
 @source:gaelco/xorworld.cpp
 xorworld
 
