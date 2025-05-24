@@ -34,7 +34,8 @@ TODO:
   verification is wanted for: bassmate, gnw_bfightn, gnw_bjack, gnw_bsweep,
   gnw_climbern, gnw_dkcirc, gnw_dkhockey, gnw_dkjrp, gnw_dkong3, gnw_gcliff,
   gnw_mariocmt, gnw_mariocmta, gnw_mariotj, gnw_mbaway, gnw_mmousep,
-  gnw_pinball, gnw_popeyep, gnw_sbuster, gnw_snoopyp, gnw_zelda, trspacadv
+  gnw_pinball, gnw_popeyep, gnw_sbuster, gnw_snoopyp, gnw_zelda, trtreisl,
+  trspacadv, amusarit
 
 ================================================================================
 
@@ -4960,8 +4961,10 @@ ROM_END
 
 /*******************************************************************************
 
-  Elektronika Весёлая арифметика (model ИМ-50) or Amusing Arithmetic (export version, model MG-50)
-  * КБ1515ХМ3-2 9202 006 (no decap); seems to be compatible with КБ1013ВК7-2 which in turn is compatible with Sharp SM511
+  Elektronika Весёлая арифметика (model ИМ-50) or Amusing Arithmetic (export
+  version, model MG-50)
+  * КБ1515ХМ3-2 9202 006 (no decap); seems to be compatible with КБ1013ВК7-2
+    which in turn is compatible with Sharp SM511
   * lcd screen with custom segments, 1-bit sound
   * ROM signature: ALEXANDER GAGANOV, USSR, MOSCOW, 1990
 
@@ -4993,7 +4996,7 @@ static INPUT_PORTS_START( amusarit )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY
 
 	PORT_START("ACL")
-        PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
 INPUT_PORTS_END
 
 // config
