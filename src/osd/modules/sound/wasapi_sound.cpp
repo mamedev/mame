@@ -89,8 +89,8 @@ public:
 	virtual uint32_t get_generation() override;
 	virtual audio_info get_information() override;
 	virtual bool split_streams_per_source() override { return true; }
-	virtual uint32_t stream_sink_open(uint32_t node, std::string name, uint32_t rate);
-	virtual uint32_t stream_source_open(uint32_t node, std::string name, uint32_t rate);
+	virtual uint32_t stream_sink_open(uint32_t node, std::string name, uint32_t rate) override;
+	virtual uint32_t stream_source_open(uint32_t node, std::string name, uint32_t rate) override;
 	virtual void stream_close(uint32_t id) override;
 	virtual void stream_sink_update(uint32_t id, int16_t const *buffer, int samples_this_frame) override;
 	virtual void stream_source_update(uint32_t id, int16_t *buffer, int samples_this_frame) override;
