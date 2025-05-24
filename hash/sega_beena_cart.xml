@@ -138,6 +138,48 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="advdrv_1" supported="no" cloneof="advdrv">
+		<description>Go! Go! Advance Drive: 6-tsu no Machine ni Chousen da! (Rev. S-100004-1100)</description>
+		<year>2005</year>
+		<publisher>Sega Toys</publisher>
+		<info name="alt_title" value="GO!GO!アドバンスドライブ～6つのマシンに挑戦だ!～"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x800000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="S-100004-1100 - Go Go Advance Drive - 6-tsu no Machine ni Chousen da (Japan).bin" size="0x800000" crc="2f0aa7e7" sha1="497df94b4dad5696ca1110a37657ebfec060faa7"/>
+			</dataarea>
+			<dataarea name="page1" size="0x1417c15"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x1417c15" crc="a1292e39" sha1="6a37ba2ffcc839415e2f591a1ec5287851c5d648"/>
+			</dataarea>
+			<dataarea name="page2" size="0x16e6cb0"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x16e6cb0" crc="c17f9c1d" sha1="5968d4fa08da233fe06fe58684e514f5d61f18b1"/>
+			</dataarea>
+			<dataarea name="page3" size="0x1755d32"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x1755d32" crc="9235a71f" sha1="a83779417d0afcadbd742c0db9eaec52e901a391"/>
+			</dataarea>
+			<dataarea name="page4" size="0x16cbe28"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x16cbe28" crc="b4f06882" sha1="31334f087480099d3e9389b239ff42fa1d274588"/>
+			</dataarea>
+			<dataarea name="page5" size="0x1734ed9"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x1734ed9" crc="a316a839" sha1="f6cbf0bc3f314b7bf3c1dee4541d1a7837435926"/>
+			</dataarea>
+			<dataarea name="page6" size="0x17a4b96"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x17a4b96" crc="d59bcca9" sha1="852533b7d69fe01d3c8e1a398775003cd11f53c2"/>
+			</dataarea>
+			<dataarea name="page7" size="0x178eeb8"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x178eeb8" crc="d018eb06" sha1="2140a8a765223969911f9db185ba305c8e353c6a"/>
+			</dataarea>
+			<dataarea name="page8" size="0x1742466"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x1742466" crc="e475ee4f" sha1="358661d5084e28e7d9f251922f1a9c0ce6705ff0"/>
+			</dataarea>
+			<dataarea name="page9" size="0x1849247"> <!-- book pages -->
+				<rom name="0 - 0009.png" size="0x1849247" crc="f2dd07b9" sha1="08e0f52d72e4da329ded4d321dbc2f02103d88b4"/>
+			</dataarea>
+			<dataarea name="page10" size="0x156a000"> <!-- book pages -->
+				<rom name="0 - 0010.png" size="0x156a000" crc="78996f95" sha1="bb0f466e72778a3b029dc23182d7d4bda031c4da"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="advdrv" supported="no">
 		<description>Go! Go! Advance Drive: 6-tsu no Machine ni Chousen da!</description>
 		<year>2005</year>
@@ -180,7 +222,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="anpaabc" supported="no">
+	<software name="anpaabc" supported="yes">
 		<description>Soreike! Anpanman Card de Tanoshiku ABC</description>
 		<year>2006</year>
 		<publisher>Sega Toys</publisher>
@@ -189,35 +231,392 @@ license:CC0-1.0
 			<dataarea name="rom" size="0x800000" width="32" endianness="big">
 				<rom loadflag="load16_word_swap" name="S-100016-1000 - Soreike Anpanman Card de Tanoshiku ABC (Japan).bin" size="0x800000" crc="c08872bf" sha1="1f575821a7d4ac2af96f1af031b10367ba6ade98"/>
 			</dataarea>
-			<dataarea name="page1" size="0x1897242"> <!-- book pages -->
-				<rom name="0 - 0001.png" size="0x1897242" crc="eb69057e" sha1="554905c5c38bde64f2488d7bcdb7d8d2f31472da"/>
+			<dataarea name="page1" size="0x16c7b99"> <!-- book pages -->
+				<rom name="0 - 0001.png" size="0x16c7b99" crc="5376f995" sha1="c29764c6148f5a0559da24922091e279f7ed910f"/>
 			</dataarea>
-			<dataarea name="page2" size="0x185d2b1"> <!-- book pages -->
-				<rom name="0 - 0002.png" size="0x185d2b1" crc="058e578e" sha1="7512cc28c84a3e849d28c979b55327ba90f1cb45"/>
+			<dataarea name="page2" size="0x14ffe32"> <!-- book pages -->
+				<rom name="0 - 0002.png" size="0x14ffe32" crc="68d25d7b" sha1="cc47e9daf7e88e7c6f56d631c24b5bde9aed27d6"/>
 			</dataarea>
-			<dataarea name="page3" size="0x180c71d"> <!-- book pages -->
-				<rom name="0 - 0003.png" size="0x180c71d" crc="863eb5fb" sha1="dfeedc49aaf56bda7a93b547ae700d03f8712c9c"/>
+			<dataarea name="page3" size="0x14d816c"> <!-- book pages -->
+				<rom name="0 - 0003.png" size="0x14d816c" crc="54553418" sha1="6c89fefc43bdb0b79a57389107bdadca069c6158"/>
 			</dataarea>
-			<dataarea name="page4" size="0x1a77273"> <!-- book pages -->
-				<rom name="0 - 0004.png" size="0x1a77273" crc="764a9cc8" sha1="2bad074980b8f8e04a04f0f86591ff7ca7fb95ad"/>
+			<dataarea name="page4" size="0x1679c14"> <!-- book pages -->
+				<rom name="0 - 0004.png" size="0x1679c14" crc="67e4cc33" sha1="ae66e2a651ad789c817bd37bcb41d1b24f3354b2"/>
 			</dataarea>
-			<dataarea name="page5" size="0x193e84b"> <!-- book pages -->
-				<rom name="0 - 0005.png" size="0x193e84b" crc="c84b9659" sha1="16075c1e6fe139daf0e0989160857171ab686d0e"/>
+			<dataarea name="page5" size="0x15808d8"> <!-- book pages -->
+				<rom name="0 - 0005.png" size="0x15808d8" crc="89d90ea3" sha1="5cd422d13a506e8c03ea95da5cef16bd1d02048c"/>
 			</dataarea>
-			<dataarea name="page6" size="0x1759710"> <!-- book pages -->
-				<rom name="0 - 0006.png" size="0x1759710" crc="b0114e20" sha1="ae6820e191b7b42ca045571915d6e84a1fa56a4a"/>
+			<dataarea name="page6" size="0x14099b7"> <!-- book pages -->
+				<rom name="0 - 0006.png" size="0x14099b7" crc="c2580ec8" sha1="8914f9ab671e6d0fe00255ea022f14f2cb8e6199"/>
 			</dataarea>
-			<dataarea name="page7" size="0x188f521"> <!-- book pages -->
-				<rom name="0 - 0007.png" size="0x188f521" crc="2f92f654" sha1="5dc47ba40815e69ddef868b12ad44350190227a1"/>
+			<dataarea name="page7" size="0x14b0a95"> <!-- book pages -->
+				<rom name="0 - 0007.png" size="0x14b0a95" crc="de362a0e" sha1="2df1d7b69c5fbccab2cf793fddbf71e62625ac3b"/>
 			</dataarea>
-			<dataarea name="page8" size="0x13a85a9"> <!-- book pages -->
-				<rom name="0 - 0008.png" size="0x13a85a9" crc="92338e43" sha1="7e99f82bfe574479e31ba7189ea0042cf0b13c1e"/>
+			<dataarea name="page8" size="0x104a600"> <!-- book pages -->
+				<rom name="0 - 0008.png" size="0x104a600" crc="057c0b75" sha1="058972b5f9bc79a9412dfd3f16839d21e71ae688"/>
 			</dataarea>
-			<dataarea name="page9" size="0x130f19d"> <!-- book pages -->
-				<rom name="0 - 0009.png" size="0x130f19d" crc="24ad5674" sha1="8993d7f4994ec6bc71f635624dbd693e81f3a5d4"/>
+			<dataarea name="page9" size="0xf9d23c"> <!-- book pages -->
+				<rom name="0 - 0009.png" size="0xf9d23c" crc="3e4d0b9c" sha1="12a465d6f530bd1879f99359a221ba4f83cc5cfd"/>
 			</dataarea>
-			<dataarea name="page10" size="0x13a1f78"> <!-- book pages -->
-				<rom name="0 - 0010.png" size="0x13a1f78" crc="1c7b70d5" sha1="e5f5f2a54fa4294ffa6c4960ba6cec5ea0f1d82f"/>
+			<dataarea name="page10" size="0x118dbf9"> <!-- book pages -->
+				<rom name="0 - 0010.png" size="0x118dbf9" crc="a179bf10" sha1="12da44b7a29befe002782dcfae607e1735df93da"/>
+			</dataarea>
+		</part>
+		<part name="card1" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 1"/>
+			<feature name="barcode" value="0x0de1"/>
+			<dataarea name="card" size="0x001263d3">
+				<rom name="1 - 0001.png" size="0x001263d3" crc="7b5a427d" sha1="c083bae9869dd9fa2992b15d610a4be280a2a510"/>
+			</dataarea>
+		</part>
+		<part name="card2" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 2"/>
+			<feature name="barcode" value="0x0de5"/>
+			<dataarea name="card" size="0x00138d3a">
+				<rom name="1 - 0002.png" size="0x00138d3a" crc="e9eb7a99" sha1="e8258d2fdecb9990be7bc4bf2b34a6ac93210438"/>
+			</dataarea>
+		</part>
+		<part name="card3" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 3"/>
+			<feature name="barcode" value="0x0de9"/>
+			<dataarea name="card" size="0x00122aec">
+				<rom name="1 - 0003.png" size="0x00122aec" crc="2659e8b3" sha1="9b4a79a78d135e50b3fe74549d90b5cb396cf020"/>
+			</dataarea>
+		</part>
+		<part name="card4" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 4"/>
+			<feature name="barcode" value="0x0ded"/>
+			<dataarea name="card" size="0x00126a4d">
+				<rom name="1 - 0004.png" size="0x00126a4d" crc="accf783a" sha1="aa65bea8425158ed952dfcf67d9e0e5ba626909e"/>
+			</dataarea>
+		</part>
+		<part name="card5" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 5"/>
+			<feature name="barcode" value="0x0df1"/>
+			<dataarea name="card" size="0x0011cbf3">
+				<rom name="1 - 0005.png" size="0x0011cbf3" crc="df681d63" sha1="d6e6d9b1980dbaf5014ce4533317f49315a37147"/>
+			</dataarea>
+		</part>
+		<part name="card6" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 6"/>
+			<feature name="barcode" value="0x0df5"/>
+			<dataarea name="card" size="0x000e86e9">
+				<rom name="1 - 0006.png" size="0x000e86e9" crc="8cb800b1" sha1="c64838ec54c644b1593684763d638c3a70f53965"/>
+			</dataarea>
+		</part>
+		<part name="card7" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 7"/>
+			<feature name="barcode" value="0x0df9"/>
+			<dataarea name="card" size="0x000fe78b">
+				<rom name="1 - 0007.png" size="0x000fe78b" crc="2b0a7832" sha1="24ebfb640629caed1aaa770a5761bb41fc111bc7"/>
+			</dataarea>
+		</part>
+		<part name="card8" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 8"/>
+			<feature name="barcode" value="0x0dfd"/>
+			<dataarea name="card" size="0x000fa9aa">
+				<rom name="1 - 0008.png" size="0x000fa9aa" crc="26faabc8" sha1="0489d1a3f21dec9cd39ebea9827930d112ae0f51"/>
+			</dataarea>
+		</part>
+		<part name="card9" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 9"/>
+			<feature name="barcode" value="0x0ee1"/>
+			<dataarea name="card" size="0x000e2033">
+				<rom name="1 - 0009.png" size="0x000e2033" crc="16a0b3ad" sha1="c3ad32567660e672573ae741feca9e0ca2bdae03"/>
+			</dataarea>
+		</part>
+		<part name="card10" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 10"/>
+			<feature name="barcode" value="0x0ee5"/>
+			<dataarea name="card" size="0x000e823b">
+				<rom name="1 - 0010.png" size="0x000e823b" crc="5e39c31d" sha1="fb6b9d9b9425c975ab1b1b94a457e484895c0cab"/>
+			</dataarea>
+		</part>
+		<part name="card11" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 11"/>
+			<feature name="barcode" value="0x0ee9"/>
+			<dataarea name="card" size="0x001304af">
+				<rom name="1 - 0011.png" size="0x001304af" crc="0466d69d" sha1="32e800cb51aef7a2f9a017f0b8e289c407433ad8"/>
+			</dataarea>
+		</part>
+		<part name="card12" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 12"/>
+			<feature name="barcode" value="0x0eed"/>
+			<dataarea name="card" size="0x0011ab6b">
+				<rom name="1 - 0012.png" size="0x0011ab6b" crc="e8b11e8f" sha1="c65aef26d4e7fabb17c98ff8f909e8356c731671"/>
+			</dataarea>
+		</part>
+		<part name="card13" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 13"/>
+			<feature name="barcode" value="0x0ef1"/>
+			<dataarea name="card" size="0x00127967">
+				<rom name="1 - 0013.png" size="0x00127967" crc="085c6bb9" sha1="3105175ea6266b17bfaf5b4d17f1bb6165b936a6"/>
+			</dataarea>
+		</part>
+		<part name="card14" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 14"/>
+			<feature name="barcode" value="0x0ef5"/>
+			<dataarea name="card" size="0x001315d8">
+				<rom name="1 - 0014.png" size="0x001315d8" crc="22079678" sha1="3a672389e280acab20a15d8e894fde90369b606c"/>
+			</dataarea>
+		</part>
+		<part name="card15" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 15"/>
+			<feature name="barcode" value="0x0ef9"/>
+			<dataarea name="card" size="0x0012b370">
+				<rom name="1 - 0015.png" size="0x0012b370" crc="07ecc2fa" sha1="c3ec31b4952d8a1cc66c7a37a66ee8b7cbe03c19"/>
+			</dataarea>
+		</part>
+		<part name="card16" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 16"/>
+			<feature name="barcode" value="0x0efd"/>
+			<dataarea name="card" size="0x00122d6b">
+				<rom name="1 - 0016.png" size="0x00122d6b" crc="e810c822" sha1="c617ef3c1a16712984b288c75a6c797d1a36ea33"/>
+			</dataarea>
+		</part>
+		<part name="card17" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 17"/>
+			<feature name="barcode" value="0x0f51"/>
+			<dataarea name="card" size="0x00128609">
+				<rom name="1 - 0017.png" size="0x00128609" crc="6dad0851" sha1="0d5dbdd7faea88c02081cbbf00947917723c6ea9"/>
+			</dataarea>
+		</part>
+		<part name="card18" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 18"/>
+			<feature name="barcode" value="0x0f55"/>
+			<dataarea name="card" size="0x00121034">
+				<rom name="1 - 0018.png" size="0x00121034" crc="b8765139" sha1="dd5dd93127046b796437f77d185d605592bd77ca"/>
+			</dataarea>
+		</part>
+		<part name="card19" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 19"/>
+			<feature name="barcode" value="0x0f59"/>
+			<dataarea name="card" size="0x0012a6df">
+				<rom name="1 - 0019.png" size="0x0012a6df" crc="4efd4187" sha1="802ce4745cba8285950bc66f9a513f7b5de6cdb0"/>
+			</dataarea>
+		</part>
+		<part name="card20" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 20"/>
+			<feature name="barcode" value="0x0f5d"/>
+			<dataarea name="card" size="0x0011c05d">
+				<rom name="1 - 0020.png" size="0x0011c05d" crc="d6c41013" sha1="43a4f310cd521473945bb2b9afca484ae3af2502"/>
+			</dataarea>
+		</part>
+		<part name="card21" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 21"/>
+			<feature name="barcode" value="0x0f61"/>
+			<dataarea name="card" size="0x0010cdfe">
+				<rom name="1 - 0021.png" size="0x0010cdfe" crc="7f00c22a" sha1="f04e48b49d6d83b230f78e77ee3c95655f81aba6"/>
+			</dataarea>
+		</part>
+		<part name="card22" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 22"/>
+			<feature name="barcode" value="0x0f65"/>
+			<dataarea name="card" size="0x00118e8f">
+				<rom name="1 - 0022.png" size="0x00118e8f" crc="5954b625" sha1="2cab5961841b714e2ed9265ef3adfff945110e50"/>
+			</dataarea>
+		</part>
+		<part name="card23" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 23"/>
+			<feature name="barcode" value="0x0f69"/>
+			<dataarea name="card" size="0x00140b5f">
+				<rom name="1 - 0023.png" size="0x00140b5f" crc="ac221fa1" sha1="3eb07b34bd2e29b7efc0c884d141b51cb6a7e03f"/>
+			</dataarea>
+		</part>
+		<part name="card24" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 24"/>
+			<feature name="barcode" value="0x0f6d"/>
+			<dataarea name="card" size="0x00123b8b">
+				<rom name="1 - 0024.png" size="0x00123b8b" crc="547d8281" sha1="283173690decd66d2f8a7efb966ecf5e50efbb7a"/>
+			</dataarea>
+		</part>
+		<part name="card25" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 25"/>
+			<feature name="barcode" value="0x0f71"/>
+			<dataarea name="card" size="0x001151a6">
+				<rom name="1 - 0025.png" size="0x001151a6" crc="f653e803" sha1="758d3fafc0c72498abedbe4327470545f4060080"/>
+			</dataarea>
+		</part>
+		<part name="card26" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 26"/>
+			<feature name="barcode" value="0x0f75"/>
+			<dataarea name="card" size="0x0011994c">
+				<rom name="1 - 0026.png" size="0x0011994c" crc="78a37dd3" sha1="1cc7576f4009f3718956523074dced52b685e00a"/>
+			</dataarea>
+		</part>
+		<part name="card27" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 27"/>
+			<feature name="barcode" value="0x0f79"/>
+			<dataarea name="card" size="0x00153214">
+				<rom name="1 - 0027.png" size="0x00153214" crc="c4daa8f5" sha1="d7f3ad46456be31581a7ba5f88eb7ab1e7165b8b"/>
+			</dataarea>
+		</part>
+		<part name="card28" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 28"/>
+			<feature name="barcode" value="0x0f7d"/>
+			<dataarea name="card" size="0x00120a9e">
+				<rom name="1 - 0028.png" size="0x00120a9e" crc="d3f1d133" sha1="9094f51aa63d3ca70ff9a899fc2c77f43864ad8a"/>
+			</dataarea>
+		</part>
+		<part name="card29" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 29"/>
+			<feature name="barcode" value="0x0fa1"/>
+			<dataarea name="card" size="0x0013f970">
+				<rom name="1 - 0029.png" size="0x0013f970" crc="5fbd756f" sha1="2d2e7ec87673cb072fb47ccf33bc44080f75f5aa"/>
+			</dataarea>
+		</part>
+		<part name="card30" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 30"/>
+			<feature name="barcode" value="0x0fa5"/>
+			<dataarea name="card" size="0x0014af80">
+				<rom name="1 - 0030.png" size="0x0014af80" crc="26a6b5b9" sha1="938036ca330d13f9e3a7f83d4c2df689b9664ddd"/>
+			</dataarea>
+		</part>
+		<part name="card31" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 31"/>
+			<feature name="barcode" value="0x0fa9"/>
+			<dataarea name="card" size="0x00137147">
+				<rom name="1 - 0031.png" size="0x00137147" crc="0383db62" sha1="e932634f94f39103a6cb652d818e0821bc918864"/>
+			</dataarea>
+		</part>
+		<part name="card32" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 32"/>
+			<feature name="barcode" value="0x0fad"/>
+			<dataarea name="card" size="0x00149dd0">
+				<rom name="1 - 0032.png" size="0x00149dd0" crc="719c41cb" sha1="316ff03ff0fdc683288984e71447621ddcce8a7f"/>
+			</dataarea>
+		</part>
+		<part name="card33" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 33"/>
+			<feature name="barcode" value="0x0fb1"/>
+			<dataarea name="card" size="0x00151de8">
+				<rom name="1 - 0033.png" size="0x00151de8" crc="98331b97" sha1="bb2fbecc47edecba99ea89c940f5dd50a517cc64"/>
+			</dataarea>
+		</part>
+		<part name="card34" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 34"/>
+			<feature name="barcode" value="0x0fb5"/>
+			<dataarea name="card" size="0x00142a8f">
+				<rom name="1 - 0034.png" size="0x00142a8f" crc="a4ce019f" sha1="aa617659acb9f4ae45d4cfc9afcdee3e27c4e567"/>
+			</dataarea>
+		</part>
+		<part name="card35" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 35"/>
+			<feature name="barcode" value="0x0fb9"/>
+			<dataarea name="card" size="0x00170309">
+				<rom name="1 - 0035.png" size="0x00170309" crc="5dbe018a" sha1="4f302370c92236989b442a267a7a771672511848"/>
+			</dataarea>
+		</part>
+		<part name="card36" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 36"/>
+			<feature name="barcode" value="0x0fbd"/>
+			<dataarea name="card" size="0x001a2a36">
+				<rom name="1 - 0036.png" size="0x001a2a36" crc="5bd21268" sha1="b19bfdf9904df90ae5a2cfda1b04008d22104b5b"/>
+			</dataarea>
+		</part>
+		<part name="card37" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 37"/>
+			<feature name="barcode" value="0x0fc9"/>
+			<dataarea name="card" size="0x001b19f9">
+				<rom name="1 - 0037.png" size="0x001b19f9" crc="6aabc554" sha1="e05cad9036d4a6cfc7ebda514becb33764954c21"/>
+			</dataarea>
+		</part>
+		<part name="card38" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 38"/>
+			<feature name="barcode" value="0x0fcd"/>
+			<dataarea name="card" size="0x0016c15f">
+				<rom name="1 - 0038.png" size="0x0016c15f" crc="93039eab" sha1="c660b65656f8d9c5261da1ef6f613815bbff8860"/>
+			</dataarea>
+		</part>
+		<part name="card39" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 39"/>
+			<feature name="barcode" value="0x0fd1"/>
+			<dataarea name="card" size="0x00184c1f">
+				<rom name="1 - 0039.png" size="0x00184c1f" crc="00aa52c6" sha1="56f1416c4c08ba6bd409d09f14e7b1eebe89f71a"/>
+			</dataarea>
+		</part>
+		<part name="card40" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 40"/>
+			<feature name="barcode" value="0x0fd5"/>
+			<dataarea name="card" size="0x001a149b">
+				<rom name="1 - 0040.png" size="0x001a149b" crc="74f2af65" sha1="83c404cff44ad08b68899018b7e9954e305290fe"/>
+			</dataarea>
+		</part>
+		<part name="card41" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 41"/>
+			<feature name="barcode" value="0x0fd9"/>
+			<dataarea name="card" size="0x0017c776">
+				<rom name="1 - 0041.png" size="0x0017c776" crc="4e51bb14" sha1="50da77c7714fca8aa850d8269bd791452048d230"/>
+			</dataarea>
+		</part>
+		<part name="card42" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 42"/>
+			<feature name="barcode" value="0x0fdd"/>
+			<dataarea name="card" size="0x0019535d">
+				<rom name="1 - 0042.png" size="0x0019535d" crc="28f72bc2" sha1="b9cdaff79f61ef23ee67adc48663dc8cdf3bedcd"/>
+			</dataarea>
+		</part>
+		<part name="card43" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 43"/>
+			<feature name="barcode" value="0x0fe1"/>
+			<dataarea name="card" size="0x001db52d">
+				<rom name="1 - 0043.png" size="0x001db52d" crc="8502b8ef" sha1="a63eed1c32c40a6db67af676a656fbe997efda51"/>
+			</dataarea>
+		</part>
+		<part name="card44" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 44"/>
+			<feature name="barcode" value="0x0fe5"/>
+			<dataarea name="card" size="0x001cbbb7">
+				<rom name="1 - 0044.png" size="0x001cbbb7" crc="7182c8c2" sha1="ae303fa08bc52eea68bfbd4ec4b371fb16b10d8b"/>
+			</dataarea>
+		</part>
+		<part name="card45" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 45"/>
+			<feature name="barcode" value="0x0fe9"/>
+			<dataarea name="card" size="0x001d1460">
+				<rom name="1 - 0045.png" size="0x001d1460" crc="83516d87" sha1="56e04aeecef8f678dedb0ff02eeea71539ff4f66"/>
+			</dataarea>
+		</part>
+		<part name="card46" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 46"/>
+			<feature name="barcode" value="0x0fed"/>
+			<dataarea name="card" size="0x001d0480">
+				<rom name="1 - 0046.png" size="0x001d0480" crc="2eb53085" sha1="5afc5cee5238ca0ba0d47df3d357cf40468b2e50"/>
+			</dataarea>
+		</part>
+		<part name="card47" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 47"/>
+			<feature name="barcode" value="0x0ff1"/>
+			<dataarea name="card" size="0x001cf50e">
+				<rom name="1 - 0047.png" size="0x001cf50e" crc="26eceb64" sha1="64b102d6603520277c45e54f8ea94d373483a51f"/>
+			</dataarea>
+		</part>
+		<part name="card48" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 48"/>
+			<feature name="barcode" value="0x0ff5"/>
+			<dataarea name="card" size="0x001dfc37">
+				<rom name="1 - 0048.png" size="0x001dfc37" crc="10b9edcf" sha1="af613e1b745c892154223a22de1694da55efc63a"/>
+			</dataarea>
+		</part>
+		<part name="card49" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 49"/>
+			<feature name="barcode" value="0x0ff9"/>
+			<dataarea name="card" size="0x001a0034">
+				<rom name="1 - 0049.png" size="0x001a0034" crc="ef635e67" sha1="a3db51b922996614a182bb95ef89e7a6f1c26880"/>
+			</dataarea>
+		</part>
+		<part name="card50" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 50"/>
+			<feature name="barcode" value="0x0dcd"/>
+			<dataarea name="card" size="0x001d2f9d">
+				<rom name="1 - 0050.png" size="0x001d2f9d" crc="ab3224e1" sha1="df84e63158a56f4aad32a7f034feff25883e5335"/>
+			</dataarea>
+		</part>
+		<part name="card51" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Test Card 51 - Congratulations Screen"/>
+			<feature name="barcode" value="0x0dd5"/>
+			<dataarea name="card" size="0x001d2f9d">
+				<rom name="1 - 0050.png" size="0x001d2f9d" crc="ab3224e1" sha1="df84e63158a56f4aad32a7f034feff25883e5335"/>
 			</dataarea>
 		</part>
 	</software>
@@ -635,6 +1034,406 @@ license:CC0-1.0
 			</dataarea>
 			<dataarea name="page8" size="0x1b3d110"> <!-- book pages -->
 				<rom name="0 - 0008.png" size="0x1b3d110" crc="db5ff567" sha1="2d4fcb531a1495630ee4404fbd03e3b7e014fbc9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="denshaca" supported="yes">
+		<description>Densha Daishuugou! Card de Asobou</description>
+		<year>2006</year>
+		<publisher>Sega Toys</publisher>
+		<notes>Missing card 16 artwork</notes>
+		<info name="alt_title" value="電車大集合！カードであそぼう"/>
+		<part name="cart" interface="sega_beena_cart">
+			<dataarea name="rom" size="0x800000" width="32" endianness="big">
+				<rom loadflag="load16_word_swap" name="S-100022-1000 - Densha Daishuugou Card de Asobou (Japan).bin" size="0x800000" crc="a4a7697a" sha1="069977d6c00f4360ab2ca026e0bb60bf261edf29"/>
+			</dataarea>
+			<dataarea name="page1" size="0x15350b2">
+				<rom name="0 - 0001.png" size="0x15350b2" crc="46f4a256" sha1="de222e0a835364647d0dddc5921504545919d8dc"/>
+			</dataarea>
+			<dataarea name="page2" size="0x17d760f">
+				<rom name="0 - 0002.png" size="0x17d760f" crc="d5598f7b" sha1="e03edb9eaa8c59cb39c269aef39575f0d9b6bf31"/>
+			</dataarea>
+			<dataarea name="page3" size="0x170b186">
+				<rom name="0 - 0003.png" size="0x170b186" crc="239a6a46" sha1="7dad8c05026c875992f3a41b6a39abeace53a7c8"/>
+			</dataarea>
+			<dataarea name="page4" size="0x1659d63">
+				<rom name="0 - 0004.png" size="0x1659d63" crc="71a09097" sha1="2d78015e6716bffea49189092bb29fc9d78a7f1b"/>
+			</dataarea>
+			<dataarea name="page5" size="0x181b2b8">
+				<rom name="0 - 0005.png" size="0x181b2b8" crc="51a0b8c4" sha1="d9e4dd73b028f63e9840498ed185d7f0f1853316"/>
+			</dataarea>
+			<dataarea name="page6" size="0x17bb59f">
+				<rom name="0 - 0006.png" size="0x17bb59f" crc="218edda0" sha1="85ea8698625fb6fa2cc1276eeff09d85d75b61ab"/>
+			</dataarea>
+			<dataarea name="page7" size="0x1965c2d">
+				<rom name="0 - 0007.png" size="0x1965c2d" crc="fa69b210" sha1="1672b3529709fdf4202a398c5125529dda411f25"/>
+			</dataarea>
+			<dataarea name="page8" size="0x17a8554">
+				<rom name="0 - 0008.png" size="0x17a8554" crc="719125ec" sha1="a7498603c79b029a0896d90fdb5d9526daca07de"/>
+			</dataarea>
+			<dataarea name="page9" size="0x161ed8a">
+				<rom name="0 - 0009.png" size="0x161ed8a" crc="a0c44165" sha1="a3117d267a57a6120706733794a76bad4c98f674"/>
+			</dataarea>
+			<dataarea name="page10" size="0x154e140">
+				<rom name="0 - 0010.png" size="0x154e140" crc="a1d108b0" sha1="cd2c56a0487565d7f63c93057575794a6a52fd00"/>
+			</dataarea>
+		</part>
+		<part name="card1" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 1"/>
+			<feature name="barcode" value="0x0cc5"/>
+			<dataarea name="card" size="0x70d3df">
+				<rom name="1 - 0001.png" size="0x70d3df" crc="2a5629c2" sha1="afeb86286ce6827e1df176d0a9ebdf8a5d55b556"/>
+			</dataarea>
+		</part>
+		<part name="card2" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 2"/>
+			<feature name="barcode" value="0x0cc9"/>
+			<dataarea name="card" size="0x681a4e">
+				<rom name="1 - 0002.png" size="0x681a4e" crc="2427017a" sha1="61f37d36297a5092f96710c139351c689753c9c2"/>
+			</dataarea>
+		</part>
+		<part name="card3" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 3"/>
+			<feature name="barcode" value="0x0ccd"/>
+			<dataarea name="card" size="0x6bda27">
+				<rom name="1 - 0003.png" size="0x6bda27" crc="c690fbff" sha1="3bad67ca3dd982e3a06f7ba95325de355e6c15ca"/>
+			</dataarea>
+		</part>
+		<part name="card4" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 4"/>
+			<feature name="barcode" value="0x0cd1"/>
+			<dataarea name="card" size="0x6fa761">
+				<rom name="1 - 0004.png" size="0x6fa761" crc="5eeeb473" sha1="bc38f8cab1f27fbc196d2a44cf211d5dff00f504"/>
+			</dataarea>
+		</part>
+		<part name="card5" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 5"/>
+			<feature name="barcode" value="0x0cd5"/>
+			<dataarea name="card" size="0x6283fd">
+				<rom name="1 - 0005.png" size="0x6283fd" crc="072c786c" sha1="32ccbb3a854f82304627d41994a40c80bae4acee"/>
+			</dataarea>
+		</part>
+		<part name="card6" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 6"/>
+			<feature name="barcode" value="0x0cd9"/>
+			<dataarea name="card" size="0x6f24c0">
+				<rom name="1 - 0006.png" size="0x6f24c0" crc="3a63d099" sha1="5a665f9ce8b57834e0433cafaa762e9328fa279a"/>
+			</dataarea>
+		</part>
+		<part name="card7" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 7"/>
+			<feature name="barcode" value="0x0cdd"/>
+			<dataarea name="card" size="0x5e7f34">
+				<rom name="1 - 0007.png" size="0x5e7f34" crc="f0e4b228" sha1="bdee727651e9365bbac18891c1611d03581a7f69"/>
+			</dataarea>
+		</part>
+		<part name="card8" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 8"/>
+			<feature name="barcode" value="0x0ce1"/>
+			<dataarea name="card" size="0x6a194f">
+				<rom name="1 - 0008.png" size="0x6a194f" crc="c54a364e" sha1="cdca7fa5ecb7c66c425f596a7127c923833993db"/>
+			</dataarea>
+		</part>
+		<part name="card9" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 9"/>
+			<feature name="barcode" value="0x0ce5"/>
+			<dataarea name="card" size="0x611f1e">
+				<rom name="1 - 0009.png" size="0x611f1e" crc="838d34e8" sha1="0c06d9b91471f9dcd6b1d16751dffdfeeee9418e"/>
+			</dataarea>
+		</part>
+		<part name="card10" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 10"/>
+			<feature name="barcode" value="0x0ce9"/>
+			<dataarea name="card" size="0x6a767d">
+				<rom name="1 - 0010.png" size="0x6a767d" crc="1d8efa70" sha1="ee67cc6d42e6dc60583461c9951a5ec6bace1ad9"/>
+			</dataarea>
+		</part>
+		<part name="card11" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 11"/>
+			<feature name="barcode" value="0x0ced"/>
+			<dataarea name="card" size="0x5af138">
+				<rom name="1 - 0011.png" size="0x5af138" crc="452f6817" sha1="98b645f3acb8b95f68a45b0f47db3471a46b86b1"/>
+			</dataarea>
+		</part>
+		<part name="card12" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 12"/>
+			<feature name="barcode" value="0x0d01"/>
+			<dataarea name="card" size="0x6c9247">
+				<rom name="1 - 0012.png" size="0x6c9247" crc="3d153d9a" sha1="8575785ff1e363ea9ea43e2c1dbe84347761788f"/>
+			</dataarea>
+		</part>
+		<part name="card13" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 13"/>
+			<feature name="barcode" value="0x0d05"/>
+			<dataarea name="card" size="0x5f5fba">
+				<rom name="1 - 0013.png" size="0x5f5fba" crc="69fa4f15" sha1="fab4d7210f5b998f972e8ba9ff9050cd563663d9"/>
+			</dataarea>
+		</part>
+		<part name="card14" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 14"/>
+			<feature name="barcode" value="0x0d09"/>
+			<dataarea name="card" size="0x680837">
+				<rom name="1 - 0014.png" size="0x680837" crc="115041b3" sha1="9ccef27a3057de8a4eb3e8caef7a51b2b4b579b7"/>
+			</dataarea>
+		</part>
+		<part name="card15" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 15"/>
+			<feature name="barcode" value="0x0d0d"/>
+			<dataarea name="card" size="0x643f69">
+				<rom name="1 - 0015.png" size="0x643f69" crc="65d867b1" sha1="dfa20d63e7ed6453b4a18b224e96846d00b8be62"/>
+			</dataarea>
+		</part>
+		<part name="card16" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 16"/>
+			<feature name="barcode" value="0x0d21"/>
+			<dataarea name="card" size="0x667e3b">
+				<rom name="1 - 0050.png" size="0x667e3b" crc="3c5610db" sha1="1e887d3601956f0fbbf7642cb185f8e37a75c530"/>
+			</dataarea>
+		</part>
+		<part name="card17" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 17"/>
+			<feature name="barcode" value="0x0d25"/>
+			<dataarea name="card" size="0x6f9494">
+				<rom name="1 - 0017.png" size="0x6f9494" crc="7ba26427" sha1="3b6f882ff649de3fe79f8c9e2efd7a4b83a77fff"/>
+			</dataarea>
+		</part>
+		<part name="card18" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 18"/>
+			<feature name="barcode" value="0x0d29"/>
+			<dataarea name="card" size="0x5a37a6">
+				<rom name="1 - 0018.png" size="0x5a37a6" crc="69ec169a" sha1="6c27c7157a2215d59cff192fffe1aef6bfa8a58d"/>
+			</dataarea>
+		</part>
+		<part name="card19" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 19"/>
+			<feature name="barcode" value="0x0d2d"/>
+			<dataarea name="card" size="0x74dcb5">
+				<rom name="1 - 0019.png" size="0x74dcb5" crc="a0503eba" sha1="a65f0aa5e9d5682bebd8276fe20556f10b8f6de6"/>
+			</dataarea>
+		</part>
+		<part name="card20" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 20"/>
+			<feature name="barcode" value="0x0d41"/>
+			<dataarea name="card" size="0x6b08f3">
+				<rom name="1 - 0020.png" size="0x6b08f3" crc="5d96c9a4" sha1="25cdd0bbe8c93784a0944ea65983eebaae3ebfd5"/>
+			</dataarea>
+		</part>
+		<part name="card21" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 21"/>
+			<feature name="barcode" value="0x0d45"/>
+			<dataarea name="card" size="0x62fb60">
+				<rom name="1 - 0021.png" size="0x62fb60" crc="24c3c0b3" sha1="f281b2978fb8b5487eff4cb40ff1f98fc4caca45"/>
+			</dataarea>
+		</part>
+		<part name="card22" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 22"/>
+			<feature name="barcode" value="0x0d49"/>
+			<dataarea name="card" size="0x75e3ff">
+				<rom name="1 - 0022.png" size="0x75e3ff" crc="12ea5761" sha1="387610f10c400852530005a516da05a19cc67441"/>
+			</dataarea>
+		</part>
+		<part name="card23" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 23"/>
+			<feature name="barcode" value="0x0d4d"/>
+			<dataarea name="card" size="0x6e8cd8">
+				<rom name="1 - 0023.png" size="0x6e8cd8" crc="bbcbf0a3" sha1="f146a43b24415ea1d03645ed75afd419bf43137b"/>
+			</dataarea>
+		</part>
+		<part name="card24" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 24"/>
+			<feature name="barcode" value="0x0d51"/>
+			<dataarea name="card" size="0x6ab52f">
+				<rom name="1 - 0024.png" size="0x6ab52f" crc="3ae2cf04" sha1="13f00e73bd124823118e5324bac3323c426ce4ed"/>
+			</dataarea>
+		</part>
+		<part name="card25" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 25"/>
+			<feature name="barcode" value="0x0d55"/>
+			<dataarea name="card" size="0x6fa103">
+				<rom name="1 - 0025.png" size="0x6fa103" crc="d3decb80" sha1="d262e3be37930d21cbddd7f0bd21508e97fac244"/>
+			</dataarea>
+		</part>
+		<part name="card26" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 26"/>
+			<feature name="barcode" value="0x0d59"/>
+			<dataarea name="card" size="0x6f765e">
+				<rom name="1 - 0026.png" size="0x6f765e" crc="fb08c938" sha1="918ee7fd9a4f8e5d445612636d37e1597d619252"/>
+			</dataarea>
+		</part>
+		<part name="card27" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 27"/>
+			<feature name="barcode" value="0x0d5d"/>
+			<dataarea name="card" size="0x705a3c">
+				<rom name="1 - 0027.png" size="0x705a3c" crc="70c316e1" sha1="472f5ee97e3ce673e5afacce9a048915366be485"/>
+			</dataarea>
+		</part>
+		<part name="card28" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 28"/>
+			<feature name="barcode" value="0x0d61"/>
+			<dataarea name="card" size="0x60315d">
+				<rom name="1 - 0028.png" size="0x60315d" crc="eebc1b99" sha1="018581bd14c857fd807b842884f1ed152939658f"/>
+			</dataarea>
+		</part>
+		<part name="card29" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 29"/>
+			<feature name="barcode" value="0x0d65"/>
+			<dataarea name="card" size="0x6cfa83">
+				<rom name="1 - 0029.png" size="0x6cfa83" crc="e580f382" sha1="cf1caab0835c804a5350a1937d98eb6b4d2619b5"/>
+			</dataarea>
+		</part>
+		<part name="card30" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 30"/>
+			<feature name="barcode" value="0x0d69"/>
+			<dataarea name="card" size="0x570b82">
+				<rom name="1 - 0030.png" size="0x570b82" crc="7edec474" sha1="1e723ce46a1c56cec9dc95174ab30377af5dff26"/>
+			</dataarea>
+		</part>
+		<part name="card31" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 31"/>
+			<feature name="barcode" value="0x0d6d"/>
+			<dataarea name="card" size="0x6ef88c">
+				<rom name="1 - 0031.png" size="0x6ef88c" crc="694143ae" sha1="d5971f311196776c2d1268ddf8c4635e11a0cca6"/>
+			</dataarea>
+		</part>
+		<part name="card32" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 32"/>
+			<feature name="barcode" value="0x0d71"/>
+			<dataarea name="card" size="0x71a371">
+				<rom name="1 - 0032.png" size="0x71a371" crc="f9cb9352" sha1="c39e32aad3bb8c7c7bfb3a852aca980b72e1b0a0"/>
+			</dataarea>
+		</part>
+		<part name="card33" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 33"/>
+			<feature name="barcode" value="0x0d75"/>
+			<dataarea name="card" size="0x6b896f">
+				<rom name="1 - 0033.png" size="0x6b896f" crc="033102e7" sha1="b2837d2aeeb4deed9231479197272f78dde787e6"/>
+			</dataarea>
+		</part>
+		<part name="card34" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 34"/>
+			<feature name="barcode" value="0x0d79"/>
+			<dataarea name="card" size="0x634e82">
+				<rom name="1 - 0034.png" size="0x634e82" crc="9085a6da" sha1="59e2a72e051a6631ab2920e20c24b4339ee18bb2"/>
+			</dataarea>
+		</part>
+		<part name="card35" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 35"/>
+			<feature name="barcode" value="0x0d7d"/>
+			<dataarea name="card" size="0x6540b0">
+				<rom name="1 - 0035.png" size="0x6540b0" crc="930bb120" sha1="b08a4aab11db5f7ccec09f8705eca5d2d4103879"/>
+			</dataarea>
+		</part>
+		<part name="card36" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 36"/>
+			<feature name="barcode" value="0x0d81"/>
+			<dataarea name="card" size="0x6a6575">
+				<rom name="1 - 0036.png" size="0x6a6575" crc="b8adf823" sha1="f76f45a3994adcbaada7236f5c89585c21ec7382"/>
+			</dataarea>
+		</part>
+		<part name="card37" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 37"/>
+			<feature name="barcode" value="0x0d85"/>
+			<dataarea name="card" size="0x6865fa">
+				<rom name="1 - 0037.png" size="0x6865fa" crc="d4779672" sha1="81bb45028c09b228abd8e8ad5ec72e659148895f"/>
+			</dataarea>
+		</part>
+		<part name="card38" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 38"/>
+			<feature name="barcode" value="0x0d89"/>
+			<dataarea name="card" size="0x6ae496">
+				<rom name="1 - 0038.png" size="0x6ae496" crc="8283dd24" sha1="9341dcce9c722c592ee2b4f545adc31188732a15"/>
+			</dataarea>
+		</part>
+		<part name="card39" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 39"/>
+			<feature name="barcode" value="0x0d8d"/>
+			<dataarea name="card" size="0x7556f3">
+				<rom name="1 - 0039.png" size="0x7556f3" crc="6f4befb4" sha1="73f0b553f86e007ed260f048fdb7fccb2d0e358a"/>
+			</dataarea>
+		</part>
+		<part name="card40" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 40"/>
+			<feature name="barcode" value="0x0d91"/>
+			<dataarea name="card" size="0x75cc39">
+				<rom name="1 - 0040.png" size="0x75cc39" crc="b4dd906a" sha1="4403f7b85fc3b14d113f4e4628f86a6d2ee6a2f4"/>
+			</dataarea>
+		</part>
+		<part name="card41" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 41"/>
+			<feature name="barcode" value="0x0d95"/>
+			<dataarea name="card" size="0x705063">
+				<rom name="1 - 0041.png" size="0x705063" crc="086b9ae8" sha1="a4986aebbd14f66090f3036513d75bb2b13b9bc5"/>
+			</dataarea>
+		</part>
+		<part name="card42" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 42"/>
+			<feature name="barcode" value="0x0d99"/>
+			<dataarea name="card" size="0x68f8c3">
+				<rom name="1 - 0042.png" size="0x68f8c3" crc="30706ea7" sha1="5fb2a416aca430b0bb3680f5d3be242f413d9f1d"/>
+			</dataarea>
+		</part>
+		<part name="card43" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 43"/>
+			<feature name="barcode" value="0x0d9d"/>
+			<dataarea name="card" size="0x64a045">
+				<rom name="1 - 0043.png" size="0x64a045" crc="11ba51ef" sha1="d19348d5ee82ad44a1ed9f7b79fe3602de30b20e"/>
+			</dataarea>
+		</part>
+		<part name="card44" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 44"/>
+			<feature name="barcode" value="0x0da1"/>
+			<dataarea name="card" size="0x66e744">
+				<rom name="1 - 0044.png" size="0x66e744" crc="0170bacf" sha1="b066b251f3610bf88d0cc56917900278fc8d0681"/>
+			</dataarea>
+		</part>
+		<part name="card45" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 45"/>
+			<feature name="barcode" value="0x0da5"/>
+			<dataarea name="card" size="0x669f0e">
+				<rom name="1 - 0045.png" size="0x669f0e" crc="1005a72f" sha1="38c45ca66f6c44d78da906d1ee719bcc6dd1ee81"/>
+			</dataarea>
+		</part>
+		<part name="card46" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 46"/>
+			<feature name="barcode" value="0x0da9"/>
+			<dataarea name="card" size="0x6595cc">
+				<rom name="1 - 0046.png" size="0x6595cc" crc="f5af92fc" sha1="d5501659ab549460f95f90fc2ae4711443240ecc"/>
+			</dataarea>
+		</part>
+		<part name="card47" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 47"/>
+			<feature name="barcode" value="0x0dad"/>
+			<dataarea name="card" size="0x6a0bf8">
+				<rom name="1 - 0047.png" size="0x6a0bf8" crc="8e87ed0c" sha1="d767b4abdb19eeea50ab884c27a50a4c6a3d5069"/>
+			</dataarea>
+		</part>
+		<part name="card48" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 48"/>
+			<feature name="barcode" value="0x0dc1"/>
+			<dataarea name="card" size="0x69de76">
+				<rom name="1 - 0048.png" size="0x69de76" crc="0296d03f" sha1="60d1f81111f19bf87f3258ea89a165423599b4f5"/>
+			</dataarea>
+		</part>
+		<part name="card49" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 49"/>
+			<feature name="barcode" value="0x0dc5"/>
+			<dataarea name="card" size="0x6532b6">
+				<rom name="1 - 0049.png" size="0x6532b6" crc="b9f8dd9f" sha1="a57ee6cbce6b36b0f934a75abc235f3f3fc47985"/>
+			</dataarea>
+		</part>
+		<part name="card50" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Card 50"/>
+			<feature name="barcode" value="0x0dc9"/>
+			<dataarea name="card" size="0x667e3b">
+				<rom name="1 - 0050.png" size="0x667e3b" crc="3c5610db" sha1="1e887d3601956f0fbbf7642cb185f8e37a75c530"/>
+			</dataarea>
+		</part>
+		<part name="card51" interface="sega_9h0_0008_card">
+			<feature name="part_id" value="Test Card 51"/>
+			<feature name="barcode" value="0x0ddd"/>
+			<dataarea name="card" size="0x667e3b">
+				<rom name="1 - 0050.png" size="0x667e3b" crc="3c5610db" sha1="1e887d3601956f0fbbf7642cb185f8e37a75c530"/>
 			</dataarea>
 		</part>
 	</software>
