@@ -2921,6 +2921,6 @@ GAME( 1999, pwrshovla, pwrshovl, taitotz,  pwrshovl, taitotz_state, init_pwrshov
 GAME( 2000, batlgr2,   taitotz,  taitotz,  batlgr2,  taitotz_state, init_batlgr2,  ROT0, "Taito", "Battle Gear 2 (Ver 2.04 J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NODEVICE_LAN )
 GAME( 2000, batlgr2a,  batlgr2,  taitotz,  batlgr2,  taitotz_state, init_batlgr2a, ROT0, "Taito", "Battle Gear 2 (Ver 2.01 J, Side by Side cabinet)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NODEVICE_LAN ) // "BATTLE GEAR2(S)" on test menu
 GAME( 2000, dendego3,  taitotz,  taitotz,  dendego3, taitotz_state, init_dendego3, ROT0, "Taito", "Densha de GO 3! Tsukin-hen (Ver 2.03 J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 2001/01/27 09:52:56
-GAME( 2000, styphp,    taitotz,  taitotz,  styphp,   taitotz_state, init_styphp,   ROT0, "Taito", "Stunt Typhoon Plus (Ver 2.04 J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2001, styphp,    taitotz,  taitotz,  styphp,   taitotz_state, init_styphp,   ROT0, "Taito", "Stunt Typhoon Plus (Ver 2.04 J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2002, raizpin,   taitotz,  taitotz,  taitotz,  taitotz_state, init_raizpin,  ROT0, "Taito", "Raizin Ping Pong (Ver 2.01 O)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2002, raizpinj,  raizpin,  taitotz,  taitotz,  taitotz_state, init_raizpinj, ROT0, "Taito", "Raizin Ping Pong (Ver 2.01 J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
