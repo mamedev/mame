@@ -44,8 +44,8 @@
 
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
-#include "machine/nvram.h"
 #include "cpu/pic16c5x/pic16c5x.h"
+#include "machine/nvram.h"
 #include "sound/okim6295.h"
 #include "emupal.h"
 #include "screen.h"
