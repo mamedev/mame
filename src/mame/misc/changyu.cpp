@@ -508,7 +508,8 @@ ROM_START( changyu )
 	ROM_LOAD( "2.u2",    0x08000, 0x08000, CRC(b9d78664) SHA1(763876f075f2b5b07e96b36b4e670dc466808f08) ) // 27C256
 	ROM_LOAD( "3.u3",    0x10000, 0x08000, CRC(17cc6716) SHA1(df8af0fbe93b8f92219721a35772ef93bca7adb5) ) // 27C256
 	ROM_LOAD( "4.u4",    0x18000, 0x08000, CRC(31b76c13) SHA1(c46da02aff8f57c0277e493c82e01970c0acd4fb) ) // 27C256
-	ROM_REGION(0x08000, "snd", 0)
+
+    ROM_REGION(0x08000, "snd", 0)
 	ROM_LOAD( "14.u70",  0x00000, 0x08000, CRC(cdfdfe11) SHA1(b170f9a6e2c77ce3ae01aabc8a963a11eb7fe74e) ) // under the sub board and near an empty socket (u77), program for a removed second CPU? or for the first?
 
 	ROM_REGION(0x30000, "samples", 0)
