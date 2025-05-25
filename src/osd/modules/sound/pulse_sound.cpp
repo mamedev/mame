@@ -130,7 +130,7 @@ const sound_pulse::position_info sound_pulse::position_infos[] = {
 	{ PA_CHANNEL_POSITION_REAR_LEFT,    { -0.2,  0.0, -0.5 } },
 	{ PA_CHANNEL_POSITION_REAR_RIGHT,   {  0.2,  0.0, -0.5 } },
 	{ PA_CHANNEL_POSITION_REAR_CENTER,  {  0.0,  0.0, -0.5 } },
-	{ PA_CHANNEL_POSITION_MAX,          {  0.0,  0.0,  0.0 } }
+	{ PA_CHANNEL_POSITION_MAX,          {  0.0,  0.0, 10.0 } }
 };
 
 

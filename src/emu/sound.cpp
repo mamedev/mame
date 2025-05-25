@@ -38,7 +38,7 @@
 #define LOG_OSD_STREAMS (1U << 3)
 #define LOG_ORDER       (1U << 4)
 
-#define VERBOSE LOG_OSD_INFO
+#define VERBOSE 0
 
 #include "logmacro.h"
 
@@ -1954,7 +1954,7 @@ std::vector<u32> sound_manager::find_channel_mapping(const std::array<double, 3>
 		return result;
 	double best_dist = -1;
 	for(u32 port = 0; port != node->m_port_positions.size(); port++)
-		if(node->m_port_positions[port][0] || node->m_port_positions[port][1] || node->m_port_positions[port][2]) {
+		if(sound_io_device::mapping_allowed(node->m_port_positions[port])) {
 			double dx = position[0] - node->m_port_positions[port][0];
 			double dy = position[1] - node->m_port_positions[port][1];
 			double dz = position[2] - node->m_port_positions[port][2];

@@ -173,7 +173,9 @@ const sound_pipewire::position_info sound_pipewire::position_infos[] = {
 	{ SPA_AUDIO_CHANNEL_RL,      { -0.2,  0.0, -0.5 } },
 	{ SPA_AUDIO_CHANNEL_RR,      {  0.2,  0.0, -0.5 } },
 	{ SPA_AUDIO_CHANNEL_RC,      {  0.0,  0.0, -0.5 } },
+	{ SPA_AUDIO_CHANNEL_AUX0,    {  0.0,  0.0, 10.0 } },
 	{ SPA_AUDIO_CHANNEL_UNKNOWN, {  0.0,  0.0,  0.0 } }
+
 };
 
 
@@ -423,7 +425,9 @@ void sound_pipewire::node_event_param(node_info *node, int seq, uint32_t id, uin
 						SPA_POD_ARRAY_FOREACH((spa_pod_array *)(&position->value), entry) {
 							node->m_position_codes.push_back(*entry);
 							for(uint32_t i = 0;; i++) {
-								if((position_infos[i].m_position == *entry) || (position_infos[i].m_position == SPA_AUDIO_CHANNEL_UNKNOWN)) {
+								if((position_infos[i].m_position == *entry)
+								   || (*entry >= SPA_AUDIO_CHANNEL_START_Aux && position_infos[i].m_position == SPA_AUDIO_CHANNEL_AUX0)
+								   || (position_infos[i].m_position == SPA_AUDIO_CHANNEL_UNKNOWN)) {
 									node->m_positions.push_back(position_infos[i].m_coords);
 									break;
 								}

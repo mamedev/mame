@@ -87,7 +87,7 @@ bool menu_audio_mixer::handle(event const *ev)
 		u32 default_osd_id = m_current_selection.m_dev->is_output() ? info.m_default_sink : info.m_default_source;
 		for(node_index = default_osd_id == 0 ? 0 : 0xffffffff; node_index != info.m_nodes.size(); node_index++) {
 			node_id = node_index == 0xffffffff ? 0 : info.m_nodes[node_index].m_id;
-			u32 guest_channel_count = m_current_selection.m_dev->inputs();
+			u32 guest_channel_count = m_current_selection.m_dev->is_output() ? m_current_selection.m_dev->inputs() : m_current_selection.m_dev->outputs();
 			u32 node_channel_count = 0;
 			if(node_index == 0xffffffff) {
 				for(u32 i = 0; i != info.m_nodes.size(); i++)
@@ -97,7 +97,6 @@ bool menu_audio_mixer::handle(event const *ev)
 					}
 			} else
 				node_channel_count = m_current_selection.m_dev->is_output() ? info.m_nodes[node_index].m_sinks : info.m_nodes[node_index].m_sources;
-
 			for(guest_channel = 0; guest_channel != guest_channel_count; guest_channel ++)
 				for(node_channel = 0; node_channel != node_channel_count; node_channel ++)
 					if(channel_mapping_available(m_current_selection.m_dev, guest_channel, node_id, node_channel))
@@ -303,7 +302,7 @@ bool menu_audio_mixer::handle(event const *ev)
 			if(m_current_selection.m_maptype != MT_CHANNEL)
 				return false;
 
-			u32 guest_channel_count = m_current_selection.m_dev->inputs();
+			u32 guest_channel_count = m_current_selection.m_dev->is_output() ? m_current_selection.m_dev->inputs() : m_current_selection.m_dev->outputs();
 			if(guest_channel_count == 1)
 				return false;
 			u32 guest_channel = m_current_selection.m_guest_channel;
@@ -444,7 +443,7 @@ bool menu_audio_mixer::handle(event const *ev)
 			if(m_current_selection.m_maptype != MT_CHANNEL)
 				return false;
 
-			u32 guest_channel_count = m_current_selection.m_dev->inputs();
+			u32 guest_channel_count = m_current_selection.m_dev->is_output() ? m_current_selection.m_dev->inputs() : m_current_selection.m_dev->outputs();
 			if(guest_channel_count == 1)
 				return false;
 			u32 guest_channel = m_current_selection.m_guest_channel;

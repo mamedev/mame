@@ -246,6 +246,13 @@ If a node has both sources and sinks, the sources are *monitors* of
 the sinks, e.g. they're loopbacks.  They should have the same count in
 such a case.
 
+Node must be independant.  It must be possible to open streams to two
+different nodes at the same time.  Be careful of multi-api libraries
+that collide between apis.  In addition, with monitoring streams
+(input on an output), it must be possible to open different streams
+for input and output.  If it's not the case, do not publish the
+monitoring inputs.
+
 When external control exists, a module should change the value of
 *stream_info::m_node* when the user changes it, and same for
 *stream_info::m_volumes*.  Generation number should be incremented
@@ -254,6 +261,12 @@ when this happens, so that the core knows to look for changes.
 Volumes are floats in dB, where 0 means 100% and -96 means no sound.
 audio.h provides osd::db_to_linear and osd::linear_to_db if such a
 conversion is needed.
+
+Positions have two special values: unknown() means the position of the
+speaker or microphone is unknown, but it should be used anyway.  The
+used position will be centered.  map_on_request_only() means the input
+or output should not be used on full mappings but only when explicitly
+requested with a channel mapping.
 
 There is an inherent race condition with this system, because things
 can change at any point after returning for the method.  The idea is
