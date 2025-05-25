@@ -351,7 +351,7 @@ void sound_wasapi::stream_info::stop()
 	if (m_thread.joinable())
 	{
 		EnterCriticalSection(&m_critical_section);
-		m_exiting.store(true, std::memory_order_acquire);
+		m_exiting.store(true, std::memory_order_release);
 		SetEvent(m_event.get());
 		LeaveCriticalSection(&m_critical_section);
 		m_thread.join();
@@ -1480,7 +1480,7 @@ bool sound_wasapi::activate_audio_client(
 	WAVEFORMATEX *mix_raw = nullptr;
 	result = client->GetMixFormat(&mix_raw);
 	mix_format.reset(std::exchange(mix_raw, nullptr));
-	if (FAILED(result))
+	if (FAILED(result) || !mix_format)
 	{
 		osd_printf_error(
 				"Sound: Error getting mix format for %s stream %s on device %s. Error: 0x%X\n",
