@@ -349,25 +349,17 @@ inline bool addu_64x64_co(uint64_t a, uint64_t b, uint64_t &sum)
 
 
 /*-------------------------------------------------
-    muldiv64 - perform an unsigned 64 bits a*b/c,
-    rounding down.  Unpredictable (including crashes)
-    when the result does not fit in 64 bits
+    muldivu_64 - perform an unsigned 64 bits a*b/c,
+    rounding toward zero.  Unpredictable (including
+    crashes) when the result does not fit in 64
+    bits.
 -------------------------------------------------*/
 
-#if ((defined(__LP64__) && __LP64__) || defined(_WIN64)) && defined(__GNUC__)
-
-// GGC/clang on 64-bits systems have __uint128_t
-inline uint64_t muldiv64(uint64_t m1, uint64_t m2, uint64_t d)
+#ifndef muldivu_64
+inline uint64_t muldivu_64(uint64_t a, uint64_t b, uint64_t c)
 {
-    return (__uint128_t(m1) * m2) / d;
-}
+	// Borrowed from https://stackoverflow.com/questions/8733178/most-accurate-way-to-do-a-combined-multiply-and-divide-operation-in-64-bit
 
-#else
-
-// Borrowed from https://stackoverflow.com/questions/8733178/most-accurate-way-to-do-a-combined-multiply-and-divide-operation-in-64-bit
-
-inline uint64_t muldiv64(uint64_t a, uint64_t b, uint64_t c)
-{
 	constexpr uint64_t base = 1ULL<<32;
 	constexpr uint64_t maxdiv = (base-1)*base + (base-1);
 
@@ -401,7 +393,7 @@ inline uint64_t muldiv64(uint64_t a, uint64_t b, uint64_t c)
 	// p2 holds 2 digits, p1 and p0 one
 
 	// first digit is easy, not null only in case of overflow
-	//	uint64_t q2 = p2 / c;
+	//  uint64_t q2 = p2 / c;
 	p2 = p2 % c;
 
 	// second digit, estimate
@@ -414,7 +406,7 @@ inline uint64_t muldiv64(uint64_t a, uint64_t b, uint64_t c)
 		q1--;
 		rhat += ch;
 	}
-	// subtract 
+	// subtract
 	p1 = ((p2 % base) * base + p1) - q1 * cl;
 	p2 = (p2 / base * base + p1 / base) - q1 * ch;
 	p1 = p1 % base + (p2 % base) * base;
@@ -430,30 +422,22 @@ inline uint64_t muldiv64(uint64_t a, uint64_t b, uint64_t c)
 	// in which case we have to divide it by norm)
 	return res + q0 + q1 * base; // + q2 *base*base
 }
-
 #endif
 
 
 /*-------------------------------------------------
-    muldiv64u - perform an unsigned 64 bits a*b/c,
-    rounding up.  Unpredictable (including crashes)
-    when the result does not fit in 64 bits
+    muldivupu_64 - perform an unsigned 64 bits
+    a*b/c, rounding away from zero.  Unpredictable
+    (including crashes) when the result does not
+    fit in 64 bits.
 -------------------------------------------------*/
 
-#if ((defined(__LP64__) && __LP64__) || defined(_WIN64)) && defined(__GNUC__)
-
-inline uint64_t muldiv64u(uint64_t m1, uint64_t m2, uint64_t d)
+#ifndef muldivupu_64
+inline uint64_t muldivupu_64(uint64_t a, uint64_t b, uint64_t c)
 {
-    return (__uint128_t(m1) * m2 + d - 1) / d;
-}
+	// The annoying case is c > 1e32, which is a case we do not use yet so
+	// hard to test.
 
-#else
-
-// The annoying case is c > 1e32, which is a case we do not use yet so
-// hard to test.
-
-inline uint64_t muldiv64u(uint64_t a, uint64_t b, uint64_t c)
-{
 	constexpr uint64_t base = 1ULL<<32;
 
 	// First get the easy thing
@@ -469,7 +453,6 @@ inline uint64_t muldiv64u(uint64_t a, uint64_t b, uint64_t c)
 	fprintf(stderr, "muldiv64c: Annoying case not handled\n");
 	abort();
 }
-
 #endif
 
 

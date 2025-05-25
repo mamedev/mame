@@ -373,6 +373,7 @@ int sound_xaudio2::init(osd_interface &osd, osd_options const &options)
 	m_audio_latency = options.audio_latency();
 	if (m_audio_latency == 0.0F)
 		m_audio_latency = 0.03F;
+	m_audio_latency = std::clamp(m_audio_latency, 0.01F, 1.0F);
 
 	// create a multimedia device enumerator and enumerate devices
 	HR_GOERR(CoCreateInstance(__uuidof(MMDeviceEnumerator), nullptr, CLSCTX_ALL, IID_PPV_ARGS(&m_device_enum)));
@@ -695,13 +696,7 @@ uint32_t sound_xaudio2::stream_sink_open(uint32_t node, std::string name, uint32
 
 		// set up desired input format
 		WAVEFORMATEX format;
-		format.wFormatTag = WAVE_FORMAT_PCM;
-		format.nChannels = (*device)->info.m_sinks;
-		format.nSamplesPerSec = rate;
-		format.nAvgBytesPerSec = 2 * format.nChannels * rate;
-		format.nBlockAlign = 2 * format.nChannels;
-		format.wBitsPerSample = 16;
-		format.cbSize = 0;
+		populate_wave_format(format, (*device)->info.m_sinks, rate);
 
 		// set up destinations
 		XAUDIO2_SEND_DESCRIPTOR destination;
@@ -1339,12 +1334,12 @@ HRESULT sound_xaudio2::OnPropertyValueChanged(LPCWSTR pwstrDeviceId, PROPERTYKEY
 {
 	try
 	{
-		std::lock_guard device_lock(m_device_mutex);
-		std::wstring_view device_id(pwstrDeviceId);
-		auto const pos = find_device(device_id);
-
 		if (PKEY_Device_FriendlyName == key)
 		{
+			std::lock_guard device_lock(m_device_mutex);
+			std::wstring_view device_id(pwstrDeviceId);
+			auto const pos = find_device(device_id);
+
 			if ((m_device_info.end() != pos) && ((*pos)->device_id == device_id))
 			{
 				HRESULT result;
@@ -1381,6 +1376,10 @@ HRESULT sound_xaudio2::OnPropertyValueChanged(LPCWSTR pwstrDeviceId, PROPERTYKEY
 		}
 		else if (PKEY_AudioEngine_DeviceFormat == key)
 		{
+			std::lock_guard device_lock(m_device_mutex);
+			std::wstring_view device_id(pwstrDeviceId);
+			auto const pos = find_device(device_id);
+
 			if ((m_device_info.end() != pos) && ((*pos)->device_id == device_id))
 			{
 				// XAudio2 can't deal with this - it needs to be torn down and re-created,

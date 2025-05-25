@@ -209,7 +209,7 @@ template<typename S> void emu::detail::output_buffer_flat<S>::resample(u32 previ
 		return;
 
 	auto si = [](attotime time, u32 rate) -> s64 {
-		return time.m_seconds * rate + muldiv64(time.m_attoseconds, rate, ATTOSECONDS_PER_SECOND);
+		return time.m_seconds * rate + muldivu_64(time.m_attoseconds, rate, ATTOSECONDS_PER_SECOND);
 	};
 
 	auto cv = [](u32 source_rate, u32 dest_rate, s64 time) -> std::pair<s64, double> {
@@ -514,7 +514,7 @@ void sound_stream::init()
 u64 sound_stream::get_current_sample_index() const
 {
 	attotime now = m_device.machine().time();
-	return now.m_seconds * m_sample_rate + muldiv64(now.m_attoseconds, m_sample_rate, ATTOSECONDS_PER_SECOND);
+	return now.m_seconds * m_sample_rate + muldivu_64(now.m_attoseconds, m_sample_rate, ATTOSECONDS_PER_SECOND);
 }
 
 void sound_stream::update()
@@ -643,7 +643,7 @@ attotime sound_stream::sample_to_time(u64 index) const
 {
 	attotime res = attotime::zero;
 	res.m_seconds = index / m_sample_rate;
-	res.m_attoseconds = muldiv64u(index % m_sample_rate, ATTOSECONDS_PER_SECOND, m_sample_rate);
+	res.m_attoseconds = muldivupu_64(index % m_sample_rate, ATTOSECONDS_PER_SECOND, m_sample_rate);
 	return res;
 }
 
@@ -892,8 +892,8 @@ void sound_manager::input_get(int id, sound_stream &stream)
 			source_start_pos = dest_start_pos;
 			source_end_pos = dest_end_pos;
 		} else {
-			source_start_pos = muldiv64(dest_start_pos, istream.m_rate, machine().sample_rate());
-			source_end_pos = muldiv64(dest_end_pos, istream.m_rate, machine().sample_rate());
+			source_start_pos = muldivu_64(dest_start_pos, istream.m_rate, machine().sample_rate());
+			source_end_pos = muldivu_64(dest_end_pos, istream.m_rate, machine().sample_rate());
 		}
 
 		if(istream.m_buffer.write_sample() < source_end_pos) {
@@ -976,9 +976,9 @@ void sound_manager::run_effects()
 				int channels = si.m_buffer.channels();
 				auto &eb = si.m_effects_buffer;
 				eb.prepare_space(source_samples / sf + 1);
-				int source_sample_index;
-				int dest_index;
-				double m_phase;
+				int source_sample_index = 0;
+				int dest_index = 0;
+				double m_phase = 0.0;
 				for(int channel = 0; channel != channels; channel ++) {
 					const sample_t *src = si.m_buffer.ptrs(channel, 0);
 					m_phase = si.m_speed_phase;
@@ -1023,8 +1023,8 @@ void sound_manager::run_effects()
 			u32 source_samples = m_speakers[step.m_device_index].m_effects.back().m_buffer.available_samples();
 
 			if(ostream.m_resampler) {
-				u64 start_sync = muldiv64(eb.sync_sample(), ostream.m_rate, machine().sample_rate());
-				u64 end_sync = muldiv64(eb.sync_sample() + source_samples, ostream.m_rate, machine().sample_rate());
+				u64 start_sync = muldivu_64(eb.sync_sample(), ostream.m_rate, machine().sample_rate());
+				u64 end_sync = muldivu_64(eb.sync_sample() + source_samples, ostream.m_rate, machine().sample_rate());
 				ostream.m_samples = end_sync - start_sync;
 				switch(step.m_mode) {
 				case mixing_step::COPY: {
@@ -2547,7 +2547,7 @@ void sound_manager::mapping_update()
 
 u64 sound_manager::rate_and_time_to_index(attotime time, u32 sample_rate) const
 {
-	return time.m_seconds * sample_rate + muldiv64(time.m_attoseconds, sample_rate,  ATTOSECONDS_PER_SECOND);
+	return time.m_seconds * sample_rate + muldivu_64(time.m_attoseconds, sample_rate,  ATTOSECONDS_PER_SECOND);
 }
 
 void sound_manager::update(s32)

@@ -20,6 +20,7 @@
 #include <propsys.h>
 
 #include <mmdeviceapi.h>
+#include <mmreg.h>
 
 #include <wrl/client.h>
 
@@ -102,6 +103,17 @@ HRESULT get_string_property_value(
 		IPropertyStore &properties,
 		REFPROPERTYKEY key,
 		std::optional<std::string> &value);
+
+inline void populate_wave_format(WAVEFORMATEX &format, DWORD channels, DWORD rate)
+{
+	format.wFormatTag = WAVE_FORMAT_PCM;
+	format.nChannels = channels;
+	format.nSamplesPerSec = rate;
+	format.nAvgBytesPerSec = 2 * channels * rate;
+	format.nBlockAlign = 2 * channels;
+	format.wBitsPerSample = 16;
+	format.cbSize = 0;
+}
 
 } // namespace osd
 

@@ -88,3 +88,11 @@ void sound_module::abuffer::push(const int16_t *data, uint32_t samples)
 		buf.m_cpos = 5;
 	}
 }
+
+uint32_t sound_module::abuffer::available() const
+{
+	uint32_t result = 0;
+	for(const auto &buf : m_buffers)
+		result += (buf.m_data.size() / m_channels) - buf.m_cpos;
+	return result;
+}

@@ -505,7 +505,7 @@ private:
 
 		emu::detail::output_buffer_flat<sample_t> m_buffer;
 		emu::detail::output_buffer_flat<sample_t> m_effects_buffer;
-		
+
 		std::vector<effect_step> m_effects;
 
 		speaker_info(speaker_device &dev, u32 rate, u32 first_output);

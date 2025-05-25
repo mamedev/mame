@@ -16,12 +16,15 @@
 #include "mmdevice_helpers.h"
 
 // OSD headers
+#include "modules/lib/osdobj_common.h"
 #include "osdcore.h"
 #include "strconv.h"
 
 // C++ standard library
 #include <algorithm>
+#include <atomic>
 #include <cassert>
+#include <cmath>
 #include <condition_variable>
 #include <memory>
 #include <mutex>
@@ -60,7 +63,7 @@ struct handle_deleter
 };
 
 using handle_ptr                = std::unique_ptr<std::remove_pointer_t<HANDLE>, handle_deleter>;
-using wave_format_ptr           = std::unique_ptr<WAVEFORMATEX, co_task_mem_deleter>;
+using co_task_wave_format_ptr   = std::unique_ptr<WAVEFORMATEX, co_task_mem_deleter>;
 
 using audio_client_ptr          = Microsoft::WRL::ComPtr<IAudioClient>;
 using audio_render_client_ptr   = Microsoft::WRL::ComPtr<IAudioRenderClient>;
@@ -107,13 +110,17 @@ private:
 	{
 	public:
 		stream_info(
+				sound_wasapi &host,
 				audio_info::node_info const &node,
+				uint32_t rate,
 				audio_client_ptr client,
 				audio_render_client_ptr render,
 				UINT32 buffer_frames,
 				handle_ptr &&event);
 		stream_info(
+				sound_wasapi &host,
 				audio_info::node_info const &node,
+				uint32_t rate,
 				audio_client_ptr client,
 				audio_capture_client_ptr capture,
 				UINT32 buffer_frames,
@@ -122,8 +129,6 @@ private:
 
 		stream_info(stream_info const &) = delete;
 		stream_info(stream_info &&) = delete;
-		stream_info operator=(stream_info const &) = delete;
-		stream_info operator=(stream_info &&) = delete;
 
 		HRESULT start();
 		void render(int16_t const *buffer, int samples_this_frame);
@@ -133,17 +138,21 @@ private:
 
 	private:
 		stream_info(
+				sound_wasapi &host,
 				audio_info::node_info const &node,
 				audio_client_ptr client,
 				UINT32 buffer_frames,
 				handle_ptr &&event,
-				uint32_t channels);
+				uint32_t channels,
+				uint32_t rate);
 
 		void stop();
+		void purge();
 		void render_task();
 		void capture_task();
 
 		// order is important so things unwind properly
+		sound_wasapi &              m_host;
 		handle_ptr                  m_event;
 		std::thread                 m_thread;
 		CRITICAL_SECTION            m_critical_section;
@@ -152,7 +161,8 @@ private:
 		audio_render_client_ptr     m_render;
 		audio_capture_client_ptr    m_capture;
 		UINT32                      m_buffer_frames;
-		bool                        m_exiting;
+		UINT32                      m_minimum_frames;
+		std::atomic<bool>           m_exiting;
 	};
 
 	using device_info_ptr = std::unique_ptr<device_info>;
@@ -178,6 +188,16 @@ private:
 	HRESULT add_device(device_info_vector_iterator pos, std::wstring_view device_id, mm_device_ptr &&device);
 	HRESULT remove_device(device_info_vector_iterator pos);
 
+	bool activate_audio_client(
+			uint32_t node,
+			std::string_view name,
+			uint32_t rate,
+			bool input,
+			device_info_vector_iterator &device,
+			audio_client_ptr &client,
+			co_task_wave_format_ptr &mix_format,
+			WAVEFORMATEX &format);
+
 	void cleanup_task();
 
 	mm_device_enumerator_ptr    m_device_enum;
@@ -199,6 +219,7 @@ private:
 	std::thread                 m_cleanup_thread;
 	std::mutex                  m_cleanup_mutex;
 
+	float                       m_audio_latency = 0.0F;
 	uint32_t                    m_generation = 1;
 	bool                        m_exiting = false;
 };
@@ -210,39 +231,47 @@ private:
 //============================================================
 
 sound_wasapi::stream_info::stream_info(
+		sound_wasapi &host,
 		audio_info::node_info const &node,
+		uint32_t rate,
 		audio_client_ptr client,
 		audio_render_client_ptr render,
 		UINT32 buffer_frames,
 		handle_ptr &&event) :
-	stream_info(node, std::move(client), buffer_frames, std::move(event), node.m_sinks)
+	stream_info(host, node, std::move(client), buffer_frames, std::move(event), node.m_sinks, rate)
 {
 	m_render = std::move(render);
 }
 
 
 sound_wasapi::stream_info::stream_info(
+		sound_wasapi &host,
 		audio_info::node_info const &node,
+		uint32_t rate,
 		audio_client_ptr client,
 		audio_capture_client_ptr capture,
 		UINT32 buffer_frames,
 		handle_ptr &&event) :
-	stream_info(node, std::move(client), buffer_frames, std::move(event), node.m_sources)
+	stream_info(host, node, std::move(client), buffer_frames, std::move(event), node.m_sources, rate)
 {
 	m_capture = std::move(capture);
 }
 
 
 sound_wasapi::stream_info::stream_info(
+		sound_wasapi &host,
 		audio_info::node_info const &node,
 		audio_client_ptr client,
 		UINT32 buffer_frames,
 		handle_ptr &&event,
-		uint32_t channels) :
+		uint32_t channels,
+		uint32_t rate) :
+	m_host(host),
 	m_event(std::move(event)),
 	m_buffer(channels),
 	m_client(std::move(client)),
 	m_buffer_frames(buffer_frames),
+	m_minimum_frames(std::min(buffer_frames, UINT32(rate / 100))),
 	m_exiting(false)
 {
 	info.m_node = node.m_id;
@@ -322,40 +351,82 @@ void sound_wasapi::stream_info::stop()
 	if (m_thread.joinable())
 	{
 		EnterCriticalSection(&m_critical_section);
-		m_exiting = true;
+		m_exiting.store(true, std::memory_order_acquire);
 		SetEvent(m_event.get());
 		LeaveCriticalSection(&m_critical_section);
 		m_thread.join();
-		m_exiting = false;
+		m_exiting.store(false, std::memory_order_release);
 	}
+}
+
+
+void sound_wasapi::stream_info::purge()
+{
+	m_exiting.store(true, std::memory_order_relaxed);
+	LeaveCriticalSection(&m_critical_section);
+	{
+		std::unique_lock device_lock(m_host.m_device_mutex);
+		std::unique_lock stream_lock(m_host.m_stream_mutex);
+
+		auto const pos = std::find_if(
+				m_host.m_stream_info.begin(),
+				m_host.m_stream_info.end(),
+				[this] (stream_info_ptr const &value) { return value.get() == this; });
+		if (m_host.m_stream_info.end() != pos)
+		{
+			stream_info_ptr our_pointer = std::move(*pos);
+			m_host.m_stream_info.erase(pos);
+
+			++m_host.m_generation;
+
+			stream_lock.unlock();
+			device_lock.unlock();
+
+			std::lock_guard cleanup_lock(m_host.m_cleanup_mutex);
+			m_host.m_zombie_streams.emplace_back(std::move(our_pointer));
+			m_host.m_cleanup_condition.notify_one();
+		}
+	}
+	EnterCriticalSection(&m_critical_section);
 }
 
 
 void sound_wasapi::stream_info::render_task()
 {
 	EnterCriticalSection(&m_critical_section);
-	while (!m_exiting)
+	while (!m_exiting.load(std::memory_order_relaxed))
 	{
 		LeaveCriticalSection(&m_critical_section);
 		WaitForSingleObject(m_event.get(), INFINITE);
 
-		if (!m_exiting)
+		if (!m_exiting.load(std::memory_order_relaxed))
 		{
-			// FIXME: need to deal with AUDCLNT_E_DEVICE_INVALIDATED
 			HRESULT result;
 
 			UINT32 padding = 0;
 			BYTE *data = nullptr;
+			UINT32 locked = 0;
 			result = m_client->GetCurrentPadding(&padding);
-			if (SUCCEEDED(result))
-				result = m_render->GetBuffer(m_buffer_frames - padding, &data);
-
 			EnterCriticalSection(&m_critical_section);
+
 			if (SUCCEEDED(result))
 			{
-				m_buffer.get(reinterpret_cast<int16_t *>(data), m_buffer_frames - padding);
-				result = m_render->ReleaseBuffer(m_buffer_frames - padding, 0);
+				auto const available = m_buffer.available();
+				auto const space = m_buffer_frames - padding;
+				UINT32 const maximum = std::min<UINT32>(available, space);
+				locked = std::max<UINT32>(maximum, (padding < m_minimum_frames) ? (m_minimum_frames - padding) : 0U);
+				if (locked)
+					result = m_render->GetBuffer(locked, &data);
 			}
+
+			if (SUCCEEDED(result) && locked)
+			{
+				m_buffer.get(reinterpret_cast<int16_t *>(data), locked);
+				result = m_render->ReleaseBuffer(locked, 0);
+			}
+
+			if (AUDCLNT_E_DEVICE_INVALIDATED == result)
+				purge();
 		}
 		else
 		{
@@ -369,41 +440,49 @@ void sound_wasapi::stream_info::render_task()
 void sound_wasapi::stream_info::capture_task()
 {
 	EnterCriticalSection(&m_critical_section);
-	while (!m_exiting)
+	while (!m_exiting.load(std::memory_order_relaxed))
 	{
 		LeaveCriticalSection(&m_critical_section);
 		WaitForSingleObject(m_event.get(), INFINITE);
 
-		if (!m_exiting)
+		if (!m_exiting.load(std::memory_order_relaxed))
 		{
-			// FIXME: need to deal with AUDCLNT_E_DEVICE_INVALIDATED
 			HRESULT result;
-
-			BYTE *data = nullptr;
-			UINT32 frames = 0;
-			DWORD flags = 0;
-			result = m_capture->GetBuffer(&data, &frames, &flags, nullptr, nullptr);
-
-			EnterCriticalSection(&m_critical_section);
-			if (SUCCEEDED(result))
+			do
 			{
-				if (AUDCLNT_S_BUFFER_EMPTY != result)
+				BYTE *data = nullptr;
+				UINT32 frames = 0;
+				DWORD flags = 0;
+				result = m_capture->GetBuffer(&data, &frames, &flags, nullptr, nullptr);
+
+				if (SUCCEEDED(result))
 				{
-					try
+					if (AUDCLNT_S_BUFFER_EMPTY != result)
 					{
-						m_buffer.push(reinterpret_cast<int16_t const *>(data), frames);
+						EnterCriticalSection(&m_critical_section);
+						try
+						{
+							m_buffer.push(reinterpret_cast<int16_t const *>(data), frames);
+						}
+						catch (...)
+						{
+						}
+						LeaveCriticalSection(&m_critical_section);
 					}
-					catch (...)
-					{
-					}
+					result = m_capture->ReleaseBuffer(frames);
 				}
-				result = m_capture->ReleaseBuffer(frames);
+
+				if (AUDCLNT_E_DEVICE_INVALIDATED == result)
+				{
+					EnterCriticalSection(&m_critical_section);
+					purge();
+					LeaveCriticalSection(&m_critical_section);
+				}
 			}
+			while (!m_exiting.load(std::memory_order_relaxed) && SUCCEEDED(result) && (AUDCLNT_S_BUFFER_EMPTY != result));
 		}
-		else
-		{
-			EnterCriticalSection(&m_critical_section);
-		}
+
+		EnterCriticalSection(&m_critical_section);
 	}
 	LeaveCriticalSection(&m_critical_section);
 }
@@ -423,6 +502,12 @@ bool sound_wasapi::probe()
 int sound_wasapi::init(osd_interface &osd, osd_options const &options)
 {
 	HRESULT result;
+
+	// get relevant options
+	m_audio_latency = options.audio_latency();
+	if (m_audio_latency == 0.0F)
+		m_audio_latency = 0.03F;
+	m_audio_latency = std::clamp(m_audio_latency, 0.01F, 1.0F);
 
 	// create a multimedia device enumerator and enumerate devices
 	result = CoCreateInstance(
@@ -644,71 +729,15 @@ uint32_t sound_wasapi::stream_sink_open(uint32_t node, std::string name, uint32_
 	std::lock_guard device_lock(m_device_mutex);
 	HRESULT result;
 
-	// find the requested device
-	auto const device = std::find_if(
-			m_device_info.begin(),
-			m_device_info.end(),
-			[node] (device_info_ptr const &value) { return value->info.m_id == node; });
-
 	try
 	{
-		// always check for stale argument values
-		if (m_device_info.end() == device)
-		{
-			osd_printf_verbose("Sound: Attempt to open audio output stream %s on unknown node %u.\n", name, node);
-			return 0;
-		}
-
-		// make sure it's an output device
-		if (!(*device)->info.m_sinks)
-		{
-			osd_printf_error(
-					"Sound: Attempt to open audio output stream %s on input device %s.\n",
-					name,
-					(*device)->info.m_name);
-			return 0;
-		}
-
-		// create an audio client interface
+		// get common stuff
+		device_info_vector_iterator device;
 		audio_client_ptr client;
-		result = (*device)->device->Activate(
-				__uuidof(IAudioClient),
-				CLSCTX_ALL,
-				nullptr,
-				reinterpret_cast<void **>(client.GetAddressOf()));
-		if (FAILED(result) || !client)
-		{
-			osd_printf_error(
-					"Sound: Error activating audio client interface for output stream %s on device %s. Error: 0x%X\n",
-					name,
-					(*device)->info.m_name,
-					result);
-			return 0;
-		}
-
-		// get the mix format for the endpoint
-		WAVEFORMATEX *mix_raw = nullptr;
-		result = client->GetMixFormat(&mix_raw);
-		wave_format_ptr mix(std::exchange(mix_raw, nullptr));
-		if (FAILED(result))
-		{
-			osd_printf_error(
-					"Sound: Error getting mix format for output stream %s on device %s. Error: 0x%X\n",
-					name,
-					(*device)->info.m_name,
-					result);
-			return 0;
-		}
-
-		// set up desired input format
+		co_task_wave_format_ptr mix;
 		WAVEFORMATEX format;
-		format.wFormatTag = WAVE_FORMAT_PCM;
-		format.nChannels = (*device)->info.m_sinks;
-		format.nSamplesPerSec = rate;
-		format.nAvgBytesPerSec = 2 * format.nChannels * rate;
-		format.nBlockAlign = 2 * format.nChannels;
-		format.wBitsPerSample = 16;
-		format.cbSize = 0;
+		if (!activate_audio_client(node, name, rate, false, device, client, mix, format))
+			return 0;
 
 		// need sample rate conversion if the sample rates don't match
 		DWORD stream_flags = AUDCLNT_STREAMFLAGS_EVENTCALLBACK;
@@ -719,7 +748,7 @@ uint32_t sound_wasapi::stream_sink_open(uint32_t node, std::string name, uint32_
 		result = client->Initialize(
 				AUDCLNT_SHAREMODE_SHARED,
 				stream_flags,
-				10 * 10'000, // 10 ms in units of 100 ns
+				lround(m_audio_latency * 1e4F), // 100 ns units
 				0,
 				&format,
 				nullptr);
@@ -779,7 +808,9 @@ uint32_t sound_wasapi::stream_sink_open(uint32_t node, std::string name, uint32_
 
 		// create a stream info structure
 		stream_info_ptr stream = std::make_unique<stream_info>(
+				*this,
 				(*device)->info,
+				rate,
 				std::move(client),
 				std::move(render),
 				buffer_frames,
@@ -823,61 +854,15 @@ uint32_t sound_wasapi::stream_source_open(uint32_t node, std::string name, uint3
 	std::lock_guard device_lock(m_device_mutex);
 	HRESULT result;
 
-	// find the requested device
-	auto const device = std::find_if(
-			m_device_info.begin(),
-			m_device_info.end(),
-			[node] (device_info_ptr const &value) { return value->info.m_id == node; });
-
 	try
 	{
-		// always check for stale argument values
-		if (m_device_info.end() == device)
-		{
-			osd_printf_verbose("Sound: Attempt to open audio input stream %s on unknown node %u.\n", name, node);
-			return 0;
-		}
-
-		// create an audio client interface
+		// get common stuff
+		device_info_vector_iterator device;
 		audio_client_ptr client;
-		result = (*device)->device->Activate(
-				__uuidof(IAudioClient),
-				CLSCTX_ALL,
-				nullptr,
-				reinterpret_cast<void **>(client.GetAddressOf()));
-		if (FAILED(result) || !client)
-		{
-			osd_printf_error(
-					"Sound: Error activating audio client interface for input stream %s on device %s. Error: 0x%X\n",
-					name,
-					(*device)->info.m_name,
-					result);
-			return 0;
-		}
-
-		// get the mix format for the endpoint
-		WAVEFORMATEX *mix_raw = nullptr;
-		result = client->GetMixFormat(&mix_raw);
-		wave_format_ptr mix(std::exchange(mix_raw, nullptr));
-		if (FAILED(result))
-		{
-			osd_printf_error(
-					"Sound: Error getting mix format for input stream %s on device %s. Error: 0x%X\n",
-					name,
-					(*device)->info.m_name,
-					result);
-			return 0;
-		}
-
-		// set up desired input format
+		co_task_wave_format_ptr mix;
 		WAVEFORMATEX format;
-		format.wFormatTag = WAVE_FORMAT_PCM;
-		format.nChannels = (*device)->info.m_sources;
-		format.nSamplesPerSec = rate;
-		format.nAvgBytesPerSec = 2 * format.nChannels * rate;
-		format.nBlockAlign = 2 * format.nChannels;
-		format.wBitsPerSample = 16;
-		format.cbSize = 0;
+		if (!activate_audio_client(node, name, rate, true, device, client, mix, format))
+			return 0;
 
 		// need sample rate conversion if the sample rates don't match, need loopback for output
 		DWORD stream_flags = AUDCLNT_STREAMFLAGS_EVENTCALLBACK;
@@ -950,7 +935,9 @@ uint32_t sound_wasapi::stream_source_open(uint32_t node, std::string name, uint3
 
 		// create a stream info structure
 		stream_info_ptr stream = std::make_unique<stream_info>(
+				*this,
 				(*device)->info,
+				rate,
 				std::move(client),
 				std::move(capture),
 				buffer_frames,
@@ -1193,12 +1180,13 @@ HRESULT sound_wasapi::OnPropertyValueChanged(LPCWSTR pwstrDeviceId, PROPERTYKEY 
 {
 	try
 	{
-		std::lock_guard device_lock(m_device_mutex);
-		std::wstring_view device_id(pwstrDeviceId);
-		auto const pos = find_device(device_id);
-
+		// don't acquire the device lock until we know the callback won't block WASAPI
 		if (PKEY_Device_FriendlyName == key)
 		{
+			std::lock_guard device_lock(m_device_mutex);
+			std::wstring_view device_id(pwstrDeviceId);
+			auto const pos = find_device(device_id);
+
 			if ((m_device_info.end() != pos) && ((*pos)->device_id == device_id))
 			{
 				HRESULT result;
@@ -1231,6 +1219,26 @@ HRESULT sound_wasapi::OnPropertyValueChanged(LPCWSTR pwstrDeviceId, PROPERTYKEY 
 
 					++m_generation;
 				}
+			}
+		}
+		else if (PKEY_AudioEngine_DeviceFormat == key)
+		{
+			std::lock_guard device_lock(m_device_mutex);
+			std::wstring_view device_id(pwstrDeviceId);
+			auto const pos = find_device(device_id);
+
+			if ((m_device_info.end() != pos) && ((*pos)->device_id == device_id))
+			{
+				// if we don't purge the streams ourselves, they'll get fatal errors anyway
+				remove_device(pos);
+				add_device(find_device(device_id), pwstrDeviceId);
+			}
+			else
+			{
+				// deal with devices added with the format property empty and updated later
+				HRESULT const result = add_device(pos, pwstrDeviceId);
+				if (FAILED(result))
+					return result;
 			}
 		}
 
@@ -1377,6 +1385,8 @@ HRESULT sound_wasapi::remove_device(device_info_vector_iterator pos)
 		}
 	}
 
+	// clean up any streams associated with this device
+	bool purged_streams = false;
 	{
 		std::lock_guard stream_lock(m_stream_mutex);
 		auto it = m_stream_info.begin();
@@ -1384,6 +1394,7 @@ HRESULT sound_wasapi::remove_device(device_info_vector_iterator pos)
 		{
 			if ((*it)->info.m_node == (*pos)->info.m_id)
 			{
+				purged_streams = true;
 				stream_info_ptr stream = std::move(*it);
 				it = m_stream_info.erase(it);
 				{
@@ -1397,12 +1408,96 @@ HRESULT sound_wasapi::remove_device(device_info_vector_iterator pos)
 			}
 		}
 	}
+	if (purged_streams)
+	{
+		std::lock_guard cleanup_lock(m_cleanup_mutex);
+		m_cleanup_condition.notify_one();
+	}
 
 	m_device_info.erase(pos);
 
 	++m_generation;
 
 	return S_OK;
+}
+
+
+bool sound_wasapi::activate_audio_client(
+		uint32_t node,
+		std::string_view name,
+		uint32_t rate,
+		bool input,
+		device_info_vector_iterator &device,
+		audio_client_ptr &client,
+		co_task_wave_format_ptr &mix_format,
+		WAVEFORMATEX &format)
+{
+	HRESULT result;
+
+	// find the requested device
+	device = std::find_if(
+			m_device_info.begin(),
+			m_device_info.end(),
+			[node] (device_info_ptr const &value) { return value->info.m_id == node; });
+
+	// always check for stale argument values
+	if (m_device_info.end() == device)
+	{
+		osd_printf_verbose(
+				"Sound: Attempt to open audio %s stream %s on unknown node %u.\n",
+				input ? "input" : "output",
+				name,
+				node);
+		return 0;
+	}
+
+	// make sure it supports the requested direction
+	if (input ? !(*device)->info.m_sources : !(*device)->info.m_sinks)
+	{
+		osd_printf_error(
+				"Sound: Attempt to open audio %s stream %s on %s device %s.\n",
+				input ? "input" : "output",
+				name,
+				input ? "output" : "input",
+				(*device)->info.m_name);
+		return false;
+	}
+
+	// create an audio client interface
+	result = (*device)->device->Activate(__uuidof(IAudioClient), CLSCTX_ALL, nullptr, &client);
+	if (FAILED(result) || !client)
+	{
+		osd_printf_error(
+				"Sound: Error activating audio client interface for %s stream %s on device %s. Error: 0x%X\n",
+				input ? "input" : "output",
+				name,
+				(*device)->info.m_name,
+				result);
+		return false;
+	}
+
+	// get the mix format for the endpoint
+	WAVEFORMATEX *mix_raw = nullptr;
+	result = client->GetMixFormat(&mix_raw);
+	mix_format.reset(std::exchange(mix_raw, nullptr));
+	if (FAILED(result))
+	{
+		osd_printf_error(
+				"Sound: Error getting mix format for %s stream %s on device %s. Error: 0x%X\n",
+				input ? "input" : "output",
+				name,
+				(*device)->info.m_name,
+				result);
+		return false;
+	}
+
+	// set up desired format
+	populate_wave_format(
+			format,
+			input ? (*device)->info.m_sources : (*device)->info.m_sinks,
+			rate);
+
+	return true;
 }
 
 

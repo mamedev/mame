@@ -842,10 +842,10 @@ static INPUT_PORTS_START( venture )
 	PORT_DIPSETTING(    0x02, "30000" )
 	PORT_DIPSETTING(    0x04, "40000" )
 	PORT_DIPSETTING(    0x06, "50000" )
-	PORT_DIPNAME( 0x98, 0x80, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:4,5,8")
+	PORT_DIPNAME( 0x98, 0x90, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:4,5,8")
 	PORT_DIPSETTING(    0x88, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_1C ) )
-	/*0x90 same as 0x80 */
+	PORT_DIPSETTING(    0x90, DEF_STR( 1C_1C ) ) // this is the 1 coin/1 credit setting shown in the manual
 	PORT_DIPSETTING(    0x98, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x00, "Pence: A 2C/1C B 1C/3C" )
 	PORT_DIPSETTING(    0x18, "Pence: A 1C/1C B 1C/6C" )

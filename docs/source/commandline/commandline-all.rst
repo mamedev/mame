@@ -2970,13 +2970,15 @@ Core Sound Options
 
 .. _mame-commandline-sound:
 
-**-sound** *<dsound | coreaudio | sdl | xaudio2 | portaudio | none>*
+**-sound** *<wasapi | xaudio2 | dsound | coreaudio | pipewire | pulse | sdl | portaudio | none>*
 
-    Specifies which sound subsystem to use. Selecting ``none`` disables sound
-    output altogether (sound hardware is still emulated).
+    Specifies which sound module to use.  Selecting ``none`` disables sound
+    output and input altogether (sound hardware is still emulated).
 
-    On Windows and Linux, *portaudio* is likely to give the lowest possible
-    latency, while Mac users will find *coreaudio* provides the best results.
+    Available features, performance and latency vary between sound modules.  The
+    exact interpretation and useful range of the :ref:`latency option
+    <mame-commandline-audiolatency>` varies between sound modules.  You may have
+    to change the value of the latency option if you change the sound module.
 
     When using the ``sdl`` sound subsystem, the audio API to use may be selected
     by setting the *SDL_AUDIODRIVER* environment variable.  Available audio APIs
@@ -2991,46 +2993,97 @@ Core Sound Options
 
             mame pacman -sound portaudio
 
-.. list-table:: Supported sound subsystems per-platform
-    :header-rows: 0
+.. list-table:: Sound module supported platforms and features
+    :header-rows: 1
     :stub-columns: 0
 
-    * - **Microsoft Windows**
-      - dsound
-      - xaudio2
-      - portaudio
-      -
-      - sdl [#SoundWinSDL]_.
-      - none
-    * - **macOS**
-      -
-      -
-      - portaudio
-      - coreaudio
-      - sdl
-      - none
-    * - **Linux** and others
-      -
-      -
-      - portaudio
-      -
-      - sdl
-      - none
+    * - Module
+      - Supported OS
+      - Output
+      - Input
+      - Output monitoring
+      - Multi-channel
+      - Device changes
+    * - ``wasapi``
+      - Windows
+      - Yes
+      - Yes
+      - Yes (Windows 10 1703 or later)
+      - Yes
+      - Yes
+    * - ``xaudio2``
+      - Windows 8 or later
+      - Yes
+      - No
+      - No
+      - Yes
+      - Yes
+    * - ``dsound``
+      - Windows
+      - Yes
+      - No
+      - No
+      - No
+      - No
+    * - ``coreaudio``
+      - macOS
+      - Yes
+      - No
+      - No
+      - No
+      - No
+    * - ``pipewire``
+      - Linux
+      - Yes
+      - Yes
+      - ?
+      - Yes
+      - Yes
+    * - ``pulse``
+      - Linux
+      - Yes
+      - No
+      - No
+      - Yes
+      - Yes
+    * - ``sdl``
+      - All [#SoundWinSDL]_
+      - Yes
+      - No
+      - No
+      - Yes
+      - No
+    * - ``portaudio``
+      - All
+      - Yes
+      - Yes
+      - Yes [#SoundPortAudioMonitoring]_
+      - Yes
+      - No
 
 
 ..  rubric:: Footnotes
 
-..  [#SoundWinSDL] While SDL is not a supported option on official builds for Windows, you can compile MAME with SDL support on Windows.
+..  [#SoundWinSDL] While SDL is not a supported option on official MAME builds
+    for Windows, you can compile MAME with SDL support on Windows.
+
+..  [#SoundPortAudioMonitoring] PortAudio support for output monitoring depends
+    on the platform and sound API.
 
 .. _mame-commandline-audiolatency:
 
 **-audio_latency** *<value>*
 
     Audio latency in seconds, up to a maximum of 0.5 seconds.  Smaller values
-    provide less audio delay while requiring better system performance.
-    Higher values increase audio delay but may help avoid buffer under-runs
-    and audio interruptions. A value of 0.0 will automatically pick a sane value,
-    depending on the selected audio output module.
+    provide less audio delay while requiring better system performance.  Larger
+    values increase audio delay but may help avoid buffer under-runs and audio
+    interruptions.  A value of 0.0 will use the default for the selected sound
+    module.
+
+    The exact interpretation and useful range of values for this option depends
+    on the selected sound module.  You may need to change the value of this
+    option if you change the sound module using the :ref:`sound option
+    <mame-commandline-sound>`.
 
     The default is ``0.0``.
 

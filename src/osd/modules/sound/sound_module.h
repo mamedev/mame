@@ -42,11 +42,18 @@ protected:
 		void get(int16_t *data, uint32_t samples);
 		void push(const int16_t *data, uint32_t samples);
 		uint32_t channels() const { return m_channels; }
+		uint32_t available() const;
 
 	private:
 		struct buffer {
 			uint32_t m_cpos;
 			std::vector<int16_t> m_data;
+
+			buffer() = default;
+			buffer(const buffer &) = default;
+			buffer(buffer &&) = default;
+			buffer &operator=(const buffer &) = default;
+			buffer &operator=(buffer &&) = default;
 		};
 
 		uint32_t m_channels;

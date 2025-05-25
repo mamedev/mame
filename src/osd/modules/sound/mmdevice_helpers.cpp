@@ -261,7 +261,7 @@ HRESULT populate_audio_node_info(
 			channel_names.emplace_back(util::string_format("Channel %u", i + 1));
 			++i;
 		}
-		channel_positions.resize(format->nChannels, std::array<double, 3>{ 0.0, 0.0, 1.0 });
+		channel_positions.resize(format->nChannels, std::array<double, 3>{ 0.0, 0.0, 0.0 });
 	}
 	catch (std::bad_alloc const &)
 	{
