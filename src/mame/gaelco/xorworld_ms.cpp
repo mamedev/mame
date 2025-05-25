@@ -240,7 +240,7 @@ ROM_START( xorworldm )
 	ROM_REGION( 0x157, "plds", ROMREGION_ERASE00 )
 	ROM_LOAD( "mod_5-1_52fx_gal16v8.ic8",  0x0000, 0x117, CRC(f3d686c9) SHA1(6bc1bd40f49663e776c0d40b2f146338a2057097) )
 	ROM_LOAD( "mod_5-1_51fx_gal16v8.ic9",  0x0000, 0x117, CRC(0070e8b9) SHA1(8a3ef9445599dc88c001a919e01f47844eec81eb) )
-	ROM_LOAD( "mod_6-1_gal16v8.ic7",       0x0000, 0x117, NO_DUMP )
+	ROM_LOAD( "mod_6-1_gal16v8.ic7",       0x0000, 0x117, BAD_DUMP CRC(470a0194) SHA1(810c51fca7d2430b7c2292f3e1dd02c86d74d64b) ) // Bruteforced
 	ROM_LOAD( "mod_6-1_palce16v8.ic13",    0x0000, 0x117, BAD_DUMP CRC(0b90f141) SHA1(4b0f2b98073d52b6a49941031e8e37b5aeb6d507) ) // Bruteforced
 	ROM_LOAD( "mod_7-4_gal20v8.ic7",       0x0000, 0x157, NO_DUMP )
 	ROM_LOAD( "mod_7-4_gal16v8.ic9",       0x0000, 0x117, NO_DUMP )
