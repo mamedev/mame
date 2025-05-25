@@ -410,6 +410,7 @@ public:
 	running_machine &machine() const { return m_machine; }
 	const std::vector<std::unique_ptr<sound_stream>> &streams() const { return m_stream_list; }
 	int unique_id() { return m_unique_id++; }
+	bool no_sound() const { return m_nosound_mode; }
 
 	const typename osd::audio_info &get_osd_info() const { return m_osd_info; }
 	const std::vector<mapping> &get_mappings() const { return m_mappings; }

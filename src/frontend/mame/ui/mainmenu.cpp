@@ -161,7 +161,7 @@ void menu_main::populate()
 	if (network_interface_enumerator(machine().root_device()).first() != nullptr)
 		item_append(_("menu-main", "Network Devices"), 0, (void*)NETWORK_DEVICES);
 
-	if (sound_interface_enumerator(machine().root_device()).first() != nullptr)
+	if (!machine().sound().no_sound() && sound_interface_enumerator(machine().root_device()).first() != nullptr)
 	{
 		item_append(_("menu-main", "Audio Mixer"), 0, (void *)AUDIO_MIXER);
 

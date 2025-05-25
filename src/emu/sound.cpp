@@ -865,8 +865,11 @@ void sound_manager::after_devices_init()
 
 	m_effects_done = false;
 
-	m_effects_thread = std::make_unique<std::thread>(
-													 [this]{ run_effects(); });
+	if(m_nosound_mode)
+		m_effects_thread = nullptr;
+	else
+		m_effects_thread = std::make_unique<std::thread>(
+														 [this]{ run_effects(); });
 }
 
 
@@ -952,7 +955,7 @@ void sound_manager::run_effects()
 
 		std::unique_lock<std::mutex> lock(m_effects_mutex);
 
-		// Copy the data to the effects threads, expanding as need
+		// Copy the data to the effects threads, expanding as needed
 		// when -speed is in use
 		double sf = machine().video().speed_factor();
 		if(sf == 1000) {
@@ -978,7 +981,7 @@ void sound_manager::run_effects()
 				eb.prepare_space(source_samples / sf + 1);
 				int source_sample_index = 0;
 				int dest_index = 0;
-				double m_phase = 0.0;
+				double m_phase = si.m_speed_phase;
 				for(int channel = 0; channel != channels; channel ++) {
 					const sample_t *src = si.m_buffer.ptrs(channel, 0);
 					m_phase = si.m_speed_phase;
@@ -2437,6 +2440,9 @@ void sound_manager::mapping_update()
 {
 	// fffffffe means the config is not loaded yet, so too early
 	// ffffffff means the config is loaded but the defaults are not setup yet
+	if(m_nosound_mode)
+		return;
+
 	if(m_osd_info.m_generation == 0xfffffffe)
 		return;
 	if(m_osd_info.m_generation == 0xffffffff)
