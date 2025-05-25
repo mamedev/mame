@@ -31016,8 +31016,8 @@ malzak                          // (c) 1980? Kitronix
 malzak2                         // (c) 1980? Kitronix
 
 @source:misc/marywu.cpp
-marywu                          //
 marysun                         //
+marywu                          //
 
 @source:misc/matrix.cpp
 matrix                          //
