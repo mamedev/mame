@@ -16548,6 +16548,7 @@ minimonyb
 miniguay
 
 @source:cirsa/missbamby.cpp
+3mini
 basket
 goldfrts
 gwinner
@@ -17654,6 +17655,7 @@ hnrose
 hparadis
 htengoku
 janshinp
+jongoh
 jongtei
 jongteia
 kotbinsp
@@ -17667,11 +17669,13 @@ mjmyorn2
 mjmyornt
 mjmyorntr
 mjmyster
+mjmysterr
 mjmyuniv
 mjmyunivh
 mjmywrld
 mjmywrldt
 mjreach1
+mjreach1a
 mjschuka
 mjtenho
 mmpanic
@@ -18632,7 +18636,14 @@ maniacsp
 lastkm
 lastkma
 squash
+squasha
+squashb
 thoop
+thoopa
+thoopb
+thoopna
+thoopnna
+thoopnnaa
 
 @source:gaelco/gaelco2.cpp
 aligator
@@ -18662,6 +18673,7 @@ sltpcyclb
 sltpcyclc
 sltpcycld
 sltpcycle
+sltpcyclf
 sltpstep
 sltpstepa
 sltpstepb
@@ -18720,7 +18732,12 @@ glasskr
 goldart
 goldartfr
 goldartgr
+goldartp
+goldartpfr
+goldartpgr
+goldartppt
 goldartpt
+goldartpuk
 goldartuk
 
 @source:gaelco/lotoplay.cpp
@@ -18782,6 +18799,10 @@ targeth10
 @source:gaelco/thoop2.cpp
 thoop2
 thoop2a
+thoop2b
+thoop2c
+thoop2d
+thoop2e
 
 @source:gaelco/wrally.cpp
 wrally
@@ -19428,6 +19449,7 @@ rw30r
 rw31r
 
 @source:handheld/hh_sm510.cpp
+amusarit
 atakaast
 auslalom
 bassmate
@@ -19578,6 +19600,7 @@ trspacmis
 trspider
 trsrescue
 trthuball
+trtreisl
 tsddragon
 tsf2010
 tsfight2
@@ -27673,7 +27696,6 @@ rivierab
 rivierac
 rivierad
 rivierae
-rivieraf
 tictac
 tictaca
 tictacuk
@@ -32037,6 +32059,7 @@ gtipokra
 gtipokrb
 gtipokrba
 gtipokrc
+gtipokrd
 hilokimb
 kimbldhl
 kimblz80
@@ -32078,6 +32101,12 @@ smshilo
 smshiloa
 ssjkrpkr
 sureshoto
+topdraw
+topdrawa
+topdrawb
+topdrawba
+tpoker1
+tpoker1a
 tpoker2
 tpoker2a
 tpoker2b
@@ -34874,6 +34903,7 @@ av2mj2rg
 finalbny
 galkaika
 galkoku
+galkokua
 hyouban
 ladymakr
 mcontest
@@ -35276,7 +35306,6 @@ cybar120
 dturbogt
 jl2050
 joypad65
-matetsl
 msiwwe
 msiwwea
 msidd
@@ -35285,7 +35314,6 @@ msimm2
 msinamco
 msisinv
 msifrog
-rbbrite
 rcapnp
 senario25
 timetp25
@@ -35302,6 +35330,8 @@ dgun2573a
 dgunl3201
 dgunl3202
 fcpocket
+lxpcsp
+matet100
 matet220
 matet300
 myaasa
@@ -35340,9 +35370,8 @@ lxcmcypp
 lxcmcysp
 lxcmcysw
 lxcyber
-lxpcsp
 matet10
-matet100
+matetsl
 mc_cb280
 mc_hh210
 mog_m320
@@ -35352,6 +35381,7 @@ nubsupmf
 otrail
 pactin
 q5_500in1
+rbbrite
 rd5_240
 red5mam
 retro400
@@ -37514,6 +37544,7 @@ smbp
 smbpa
 smbpb
 smbpc
+smbpv
 smbmush
 snspares
 snspares1

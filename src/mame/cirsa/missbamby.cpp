@@ -10,6 +10,7 @@ Known games on this hardware:
  | YES    | Mini Super Fruits | Cirsa              | Cirsa PCB 810601 A |
  | YES    | Lucky Player      | Cirsa              | Cirsa PCB 810702 A |
  | YES    | Miss Bamby        | Automatics Pasqual |                    |
+ | YES    | 3 Mini            | Arfyc              | 6MHz xtal, battery |
  | YES    | Mini Azar D       | Arfyc              |                    |
  | YES    | Golden Winner     | Reben              |                    |
  | YES    | Golden Fruits     | Video Game         | 4 dipsw, battery   |
@@ -181,6 +182,14 @@ ROM_END
 // *****************
 // **** Clones *****
 // *****************
+
+ROM_START( 3mini )
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD( "arfyc_b.49_1680-13.bin", 0x0000, 0x4000, CRC(78ed696f) SHA1(31f319bbe41aac6423b14752e8c0bcba5c8d262a) )
+
+	ROM_REGION(0x20, "prom", 0)
+	ROM_LOAD( "n82s23n.bin", 0x00, 0x20, NO_DUMP )
+ROM_END
 
 // 4 dipswitches, battery on PCB, exact clone of Mini Super Fruits PCB
 ROM_START( goldfrts )
@@ -367,6 +376,7 @@ GAME( 1981,  luckyplr,  0, missbamby,  missbamby, missbamby_state, empty_init, R
 GAME( 1981,  minisupf,  0, missbamby,  c_810601a, missbamby_state, empty_init, ROT0, "Cirsa",              "Mini Super Fruits", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 
 // Clones
+GAME( 1987,  3mini,     0, gldwinner,  missbamby, missbamby_state, empty_init, ROT0, "Arfyc",              "3 Mini",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 GAME( 198?,  goldfrts,  0, missbamby,  c_810601a, missbamby_state, empty_init, ROT0, "Video Game",         "Golden Fruits",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 GAME( 1983,  gwinner,   0, gldwinner,  missbamby, missbamby_state, empty_init, ROT0, "Reben SA",           "Golden Winner",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 GAME( 1989?, miniazard, 0, gldwinner,  missbamby, missbamby_state, empty_init, ROT0, "Arfyc",              "Mini Azar D",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )

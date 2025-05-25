@@ -1761,6 +1761,7 @@ end
 --@src/devices/cpu/m6502/st2xxx.h,CPUS["ST2XXX"] = true
 --@src/devices/cpu/m6502/st2204.h,CPUS["ST2XXX"] = true
 --@src/devices/cpu/m6502/st2205u.h,CPUS["ST2XXX"] = true
+--@src/devices/cpu/m6502/vt3xx_spu.h,CPUS["VT3XX_SPU"] = true
 --@src/devices/cpu/m6502/w65c02.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/w65c02s.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/xavix.h,CPUS["XAVIX"] = true
@@ -1868,6 +1869,21 @@ if CPUS["ST2XXX"] then
 	}
 end
 
+if CPUS["VT3XX_SPU"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/m6502/vt3xx_spu.cpp",
+		MAME_DIR .. "src/devices/cpu/m6502/vt3xx_spu.h",
+	}
+
+	custombuildtask {
+		{ MAME_DIR .. "src/devices/cpu/m6502/ovt3xx_spu.lst",   GEN_DIR .. "emu/cpu/m6502/vt3xx_spu.hxx",   { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dvt3xx_spu.lst"   }, {"@echo Generating VT3xx SPU instruction source file...", PYTHON .. " $(1) s vt3xx_spu $(<) $(2) $(@)" }},
+	}
+
+	dependency {
+		{ MAME_DIR .. "src/devices/cpu/m6502/vt3xx_spu.cpp",    GEN_DIR .. "emu/cpu/m6502/vt3xx_spu.hxx" },
+	}
+end
+
 if CPUS["XAVIX"] then
 	files {
 		MAME_DIR .. "src/devices/cpu/m6502/xavix.cpp",
@@ -1945,6 +1961,15 @@ if opt_tool(CPUS, "M6502") then
 	table.insert(disasm_files, MAME_DIR .. "src/devices/cpu/m6502/rp2a03d.h")
 	table.insert(disasm_files, MAME_DIR .. "src/devices/cpu/m6502/w65c02d.cpp")
 	table.insert(disasm_files, MAME_DIR .. "src/devices/cpu/m6502/w65c02d.h")
+end
+
+if opt_tool(CPUS, "VT3XX_SPU") then
+	table.insert(disasm_custombuildtask, { MAME_DIR .. "src/devices/cpu/m6502/ovt3xx_spu.lst",   GEN_DIR .. "emu/cpu/m6502/vt3xx_spud.hxx",   { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dvt3xx_spu.lst"   }, {"@echo Generating VT3xx SPU disassembler source file...", PYTHON .. " $(1) d vt3xx_spu $(<) $(2) $(@)" }})
+
+	table.insert(disasm_dependency, { MAME_DIR .. "src/devices/cpu/m6502/vt3xx_spud.cpp",    GEN_DIR .. "emu/cpu/m6502/vt3xx_spud.hxx" })
+
+	table.insert(disasm_files, MAME_DIR .. "src/devices/cpu/m6502/vt3xx_spud.cpp")
+	table.insert(disasm_files, MAME_DIR .. "src/devices/cpu/m6502/vt3xx_spud.h")
 end
 
 if opt_tool(CPUS, "XAVIX") then

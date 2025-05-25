@@ -104,6 +104,7 @@ ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, 
 	m_toggle(false),
 	m_tilecount(0),
 	m_latch(*this),
+	m_spriteramsize(0x100),
 	m_scanline_callback_proc(*this),
 	m_hblank_callback_proc(*this),
 	m_vidaccess_callback_proc(*this),
@@ -228,7 +229,7 @@ void ppu2c0x_device::start_nopalram()
 
 	/* allocate a screen bitmap, videomem and spriteram, a dirtychar array and the monochromatic colortable */
 	m_bitmap.allocate(VISIBLE_SCREEN_WIDTH, VISIBLE_SCREEN_HEIGHT);
-	m_spriteram = make_unique_clear<u8[]>(SPRITERAM_SIZE);
+	m_spriteram = make_unique_clear<u8[]>(m_spriteramsize);
 
 	init_palette_tables();
 
@@ -251,7 +252,7 @@ void ppu2c0x_device::start_nopalram()
 	save_item(NAME(m_regs));
 	save_item(NAME(m_draw_phase));
 	save_item(NAME(m_tilecount));
-	save_pointer(NAME(m_spriteram), SPRITERAM_SIZE);
+	save_pointer(NAME(m_spriteram), m_spriteramsize);
 
 	save_item(NAME(m_bitmap));
 }
@@ -281,8 +282,8 @@ void ppu2c04_clone_device::device_start()
 	also generally affects PPU-side read timings involving the OAM, but
 	this still doesn't seem to matter for Vs. SMB specifically)
 	*/
-	m_spritebuf = make_unique_clear<u8[]>(SPRITERAM_SIZE);
-	save_pointer(NAME(m_spritebuf), SPRITERAM_SIZE);
+	m_spritebuf = make_unique_clear<u8[]>(m_spriteramsize);
+	save_pointer(NAME(m_spritebuf), m_spriteramsize);
 }
 
 //**************************************************************************
@@ -839,7 +840,8 @@ void ppu2c0x_device::draw_sprites(u8 *line_priority)
 
 	int first_pixel = (m_regs[PPU_CONTROL1] & PPU_CONTROL1_SPRITES_L8) ? 0 : 8;
 
-	for (int sprite_index = 0; sprite_index < SPRITERAM_SIZE; sprite_index += 4)
+	// use 0x100 instead of m_spriteramsize because this is for old handling
+	for (int sprite_index = 0; sprite_index < 0x100; sprite_index += 4)
 	{
 		int sprite_ypos = m_spriteram[sprite_index] + 1;
 		int sprite_xpos = m_spriteram[sprite_index + 3];
@@ -959,7 +961,7 @@ void ppu2c04_clone_device::draw_sprites(u8 *line_priority)
 		/* this frame's sprite buffer is cleared after being displayed
 		and the other one that was filled this frame will be displayed next frame */
 		m_spriteram.swap(m_spritebuf);
-		memset(m_spritebuf.get(), 0, SPRITERAM_SIZE);
+		memset(m_spritebuf.get(), 0, m_spriteramsize);
 	}
 }
 
@@ -1201,6 +1203,17 @@ u8 ppu2c04_clone_device::read(offs_t offset)
  *
  *************************************/
 
+void ppu2c0x_device::write_to_spriteram_with_increment(u8 data)
+{
+	// writes to sprite data during rendering do not modify memory
+	// TODO: however writes during rendering do perform a glitchy increment to the address
+	if (m_scanline > BOTTOM_VISIBLE_SCANLINE || !(m_regs[PPU_CONTROL1] & (PPU_CONTROL1_BACKGROUND | PPU_CONTROL1_SPRITES)))
+	{
+		m_spriteram[m_regs[PPU_SPRITE_ADDRESS]] = data;
+		m_regs[PPU_SPRITE_ADDRESS] = (m_regs[PPU_SPRITE_ADDRESS] + 1) & 0xff;
+	}
+}
+
 void ppu2c0x_device::write(offs_t offset, u8 data)
 {
 	if (offset >= PPU_MAX_REG)
@@ -1247,13 +1260,7 @@ void ppu2c0x_device::write(offs_t offset, u8 data)
 		break;
 
 	case PPU_SPRITE_DATA: /* 4 */
-		// writes to sprite data during rendering do not modify memory
-		// TODO: however writes during rendering do perform a glitchy increment to the address
-		if (m_scanline > BOTTOM_VISIBLE_SCANLINE || !(m_regs[PPU_CONTROL1] & (PPU_CONTROL1_BACKGROUND | PPU_CONTROL1_SPRITES)))
-		{
-			m_spriteram[m_regs[PPU_SPRITE_ADDRESS]] = data;
-			m_regs[PPU_SPRITE_ADDRESS] = (m_regs[PPU_SPRITE_ADDRESS] + 1) & 0xff;
-		}
+		write_to_spriteram_with_increment(data);
 		break;
 
 	case PPU_SCROLL: /* 5 */
@@ -1311,16 +1318,9 @@ void ppu2c0x_device::write(offs_t offset, u8 data)
 		if (!m_vidaccess_callback_proc.isnull())
 			data = m_vidaccess_callback_proc(tempAddr, data);
 
-		/* see if it's on the chargen portion */
-		if (tempAddr < 0x2000)
-		{
-			/* store the data */
-			writebyte(tempAddr, data);
-		}
-		else // this codepath is identical?
-		{
-			writebyte(tempAddr, data);
-		}
+		/* store the data */
+		writebyte(tempAddr, data);
+
 		/* increment the address */
 		m_videomem_addr += m_add;
 	}
@@ -1397,7 +1397,7 @@ void ppu2c0x_device::spriteram_dma(address_space& space, const u8 page)
 {
 	const int address = page << 8;
 
-	for (int i = 0; i < SPRITERAM_SIZE; i++)
+	for (int i = 0; i < 0x100; i++)
 	{
 		const u8 spriteData = space.read_byte(address + i);
 		space.write_byte(0x2004, spriteData);
