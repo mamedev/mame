@@ -57,8 +57,9 @@ Need Layout as and Add segment display as marywu.cpp
 #include "machine/i8255.h"
 #include "machine/i8279.h"
 #include "sound/ay8910.h"
-#include "sound/ymopl.h"
 #include "sound/okim6295.h"
+#include "sound/ymopl.h"
+
 #include "speaker.h"
 
 namespace {
