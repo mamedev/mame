@@ -215,7 +215,7 @@ ROM_START( marywu )
 	ROM_LOAD( "marywu_sunkiss_chen.rom", 0x0000, 0x8000, CRC(11f67c7d) SHA1(9c1fd1a5cc6e2b0d675f0217aa8ff21c30609a0c) )
 ROM_END
 
-ROM_START( marysun ) // actual cpu is W78E52B-24. Xtal Not verified.
+ROM_START( marysun ) // actual cpu is W78E52B-24. xtal jfc 10.7386 mhz
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mary_sunrise.rom", 0x0000, 0x10000, CRC(746463A4) SHA1(065478223a809c75fe0302d1c85f129d94f503b4) )
 ROM_END
