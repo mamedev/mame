@@ -35,7 +35,7 @@ TODO:
   gnw_climbern, gnw_dkcirc, gnw_dkhockey, gnw_dkjrp, gnw_dkong3, gnw_gcliff,
   gnw_mariocmt, gnw_mariocmta, gnw_mariotj, gnw_mbaway, gnw_mmousep,
   gnw_pinball, gnw_popeyep, gnw_sbuster, gnw_snoopyp, gnw_zelda, trtreisl,
-  trspacadv, amusarit, ariteach
+  trspacadv, amusarit, uchitari
 
 ================================================================================
 
@@ -5025,26 +5025,27 @@ ROM_END
 
 /*******************************************************************************
 
-  Elektronika(?) Arithmetics Teacher(?) (Учитель арифметики(?), model ???)
+  Elektronika(?) Uchitel' arifmetiki(?) (Учитель арифметики(?), model ???)
   * КБ1515ХМ3-2 9108 001 (no decap); seems to be compatible with КБ1013ВК7-2
     which in turn is compatible with Sharp SM511
   * lcd screen with custom segments, 1-bit sound
+  * ROM signature: ALEXANDER GAGANOV USSR, MOSCOW
 
 *******************************************************************************/
 
-class ariteach_state : public hh_sm510_state
+class uchitari_state : public hh_sm510_state
 {
 public:
-	ariteach_state(const machine_config &mconfig, device_type type, const char *tag) :
+	uchitari_state(const machine_config &mconfig, device_type type, const char *tag) :
 		hh_sm510_state(mconfig, type, tag)
 	{ }
 
-	void ariteach(machine_config &config);
+	void uchitari(machine_config &config);
 };
 
 // inputs
 
-static INPUT_PORTS_START( ariteach )
+static INPUT_PORTS_START( uchitari )
 	PORT_START("IN.0") // S1
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("Evaluate entry")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -5105,22 +5106,22 @@ INPUT_PORTS_END
 
 // config
 
-void ariteach_state::ariteach(machine_config &config)
+void uchitari_state::uchitari(machine_config &config)
 {
 	sm511_common(config, 1520, 1080); // 1341 x 953
 }
 
 // roms
 
-ROM_START( ariteach )
+ROM_START( uchitari )
 	ROM_REGION( 0x1000, "maincpu", 0 )
-	ROM_LOAD( "ariteach.program", 0x0000, 0x1000, CRC(1d2d7abb) SHA1(10d90f63813cddc5c986ed3942c64ee6d67f545e) )
+	ROM_LOAD( "uchitari.program", 0x0000, 0x1000, CRC(1d2d7abb) SHA1(10d90f63813cddc5c986ed3942c64ee6d67f545e) )
 
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "ariteach.melody", 0x000, 0x100, BAD_DUMP CRC(28041942) SHA1(a36e246b215499b7392c28fddf1aad499016a480) ) // decap needed for verification
+	ROM_LOAD( "uchitari.melody", 0x000, 0x100, BAD_DUMP CRC(28041942) SHA1(a36e246b215499b7392c28fddf1aad499016a480) ) // decap needed for verification
 
 	ROM_REGION( 98301, "screen", 0)
-	ROM_LOAD( "ariteach.svg", 0, 98301, CRC(a4908088) SHA1(e8986638b89d8c4601a1abe5591326cb694a5750) )
+	ROM_LOAD( "uchitari.svg", 0, 98301, CRC(584a5ce4) SHA1(6971c6aee3ccb3acd3ea52d2ef0edf740db3c56d) )
 ROM_END
 
 
@@ -12368,7 +12369,7 @@ SYST( 1989, kosmicmt,     gnw_fire,    0,      kosmicmt,     gnw_fire,     gnw_f
 SYST( 1990, auslalom,     0,           0,      auslalom,     auslalom,     auslalom_state,     empty_init, "Elektronika", "Autoslalom", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 199?, elbaskb,      0,           0,      elbaskb,      elbaskb,      elbaskb_state,      empty_init, "Elektronika", "Basketbol (Elektronika)", MACHINE_SUPPORTS_SAVE )
 SYST( 1992, amusarit,     0,           0,      amusarit,     amusarit,     amusarit_state,     empty_init, "Elektronika", "Amusing Arithmetic", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1991, ariteach,     0,           0,      ariteach,     ariteach,     ariteach_state,     empty_init, "Elektronika(?)", "Arithmetics Teacher(?)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, uchitari,     0,           0,      uchitari,     uchitari,     uchitari_state,     empty_init, "Elektronika(?)", "Uchitel' arifmetiki(?)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // Konami
 SYST( 1989, kdribble,     0,           0,      kdribble,     kdribble,     kdribble_state,     empty_init, "Konami", "Double Dribble (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
