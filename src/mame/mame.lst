@@ -46636,8 +46636,10 @@ icanpian
 @source:tvgames/spg2xx_jakks.cpp
 jak_batm
 jak_cind
+jak_ctah
 jak_dpma
 jak_dwa
+jak_gdg
 jak_hsm
 jak_marv
 jak_mk
@@ -46650,6 +46652,7 @@ jak_potc
 jak_powr
 jak_rapm
 jak_sbjd
+jak_sesa
 jak_shrk
 jak_slpb
 jak_spac
