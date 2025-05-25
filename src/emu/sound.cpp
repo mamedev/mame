@@ -1713,9 +1713,11 @@ template<bool is_output, typename S> void sound_manager::apply_osd_changes(std::
 	for(S &stream : streams) {
 		u32 sidx;
 		for(sidx = 0; sidx != m_osd_info.m_streams.size() && m_osd_info.m_streams[sidx].m_id != stream.m_id; sidx++);
-		// If the stream has been lost, continue.  It will be cleared in update_osd_streams.
-		if(sidx == m_osd_info.m_streams.size())
+		// If the stream has been lost, mark it lost and continue.  It will be cleared in update_osd_streams.
+		if(sidx == m_osd_info.m_streams.size()) {
+			stream.m_id = 0;
 			continue;
+		}
 
 		// Check if the target and/or the volumes changed
 		bool node_changed = stream.m_node != m_osd_info.m_streams[sidx].m_node;
@@ -1853,7 +1855,7 @@ void sound_manager::osd_information_update()
 	// split stream case.
 	if(machine().osd().sound_split_streams_per_source()) {
 		apply_osd_changes<false, osd_input_stream >(m_osd_input_streams );
-		apply_osd_changes<false, osd_output_stream>(m_osd_output_streams);
+		apply_osd_changes<true,  osd_output_stream>(m_osd_output_streams);
 	}
 }
 
