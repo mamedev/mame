@@ -323,4 +323,4 @@ ROM_END
 } // anonymous namespace
 
 // World Rally was originally developed using the Modular System, so this isn't a bootleg, it's the original development version
-GAME( 1992?, wrallymp, wrally, wrally_ms, wrally_ms, wrally_ms_state, init_wrally_ms, ROT0, "Gaelco", "World Rally (prototype on Modular System)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 23/11
+GAME( 1992, wrallymp, wrally, wrally_ms, wrally_ms, wrally_ms_state, init_wrally_ms, ROT0, "Gaelco", "World Rally (prototype on Modular System)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 23/11/1992
