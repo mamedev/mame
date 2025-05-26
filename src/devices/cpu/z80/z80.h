@@ -77,7 +77,6 @@ protected:
 
 	void illegal_1();
 	void illegal_2();
-	u8 flags_szyxc(u16 value);
 	template <u8 Bit, bool State> void set_service_attention() { static_assert(Bit < 8, "out of range bit index"); if (State) m_service_attention |= (1 << Bit); else m_service_attention &= ~(1 << Bit); };
 	template <u8 Bit> bool get_service_attention() { static_assert(Bit < 8, "out of range bit index"); return m_service_attention & (1 << Bit); };
 
@@ -114,7 +113,6 @@ protected:
 	u8 res(int bit, u8 value);
 	u8 set(int bit, u8 value);
 	void ei();
-	void set_f(u8 f);
 	void block_io_interrupted_flags();
 
 	virtual u8 data_read(u16 addr);
@@ -163,12 +161,10 @@ protected:
 	PAIR16       m_bc2;
 	PAIR16       m_de2;
 	PAIR16       m_hl2;
-	u8           m_qtemp;
-	u8           m_q;
 	u8           m_r;
 	u8           m_r2;
-	u8           m_iff1;
-	u8           m_iff2;
+	bool         m_iff1;
+	bool         m_iff2;
 	u8           m_halt;
 	u8           m_im;
 	u8           m_i;
@@ -178,6 +174,34 @@ protected:
 	int          m_busrq_state;        // bus request pin state
 	u8           m_busack_state;       // bus acknowledge pin state
 	u16          m_ea;
+
+	struct
+	{
+		u8 sign_val;
+		u8 zero_val;
+		u8 yx_val;
+		u8 half_carry_val;
+		u8 parity_overflow_val; // overflow case set in the way that parity_overflow() returns desired value
+		bool subtract;
+		bool carry;
+
+		u8 q;
+		u8 qtemp;
+
+		u8 sign() const { return sign_val & 0x80; }
+		u8 zero() const { return (zero_val == 0) ? 0x40 : 0; }
+		u8 yx() const { return yx_val & 0x28; }
+		u8 half_carry() const { return half_carry_val & 0x10; }
+		u8 parity_overflow() const {
+			u8 p = parity_overflow_val;
+			p ^= p >> 4;
+			p ^= p << 2;
+			p ^= p >> 1;
+			return ~p & 0x04;
+		}
+	} m_f;
+	u8 get_f();
+	void set_f(u8 f);
 
 	int          m_icount;
 	int          m_tmp_irq_vector;
@@ -189,13 +213,6 @@ protected:
 	u8 m_m1_cycles;
 	u8 m_memrq_cycles;
 	u8 m_iorq_cycles;
-
-	static bool tables_initialised;
-	static u8 SZ[0x100];       // zero and sign flags
-	static u8 SZ_BIT[0x100];   // zero, sign and parity/overflow (=zero) flags for BIT opcode
-	static u8 SZP[0x100];      // zero, sign and parity flags
-	static u8 SZHV_inc[0x100]; // zero, sign, half carry and overflow flags INC r8
-	static u8 SZHV_dec[0x100]; // zero, sign, half carry and overflow flags DEC r8
 };
 
 DECLARE_DEVICE_TYPE(Z80, z80_device)

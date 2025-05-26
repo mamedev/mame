@@ -67,19 +67,31 @@ void r800_device::device_validity_check(validity_checker &valid) const
  ***************************************************************/
 u8 r800_device::r800_sll(u8 value)
 {
-	const u8 c = (value & 0x80) ? CF : 0;
 	const u8 res = u8(value << 1);
-	set_f(SZP[res] | c);
+	{
+		QT = 0;
+		m_f.sign_val = m_f.zero_val = res;
+		m_f.parity_overflow_val = !0;
+		m_f.yx_val = res;
+		m_f.half_carry_val = m_f.subtract = 0;
+		m_f.carry = value & 0x80;
+	}
+
 	return res;
 }
 
 void r800_device::mulub(u8 value)
 {
-	const u16 res = A * value;
-	HL = res;
-	const u8 c = (H) ? CF : 0;
-	const u8 z = (res) ? 0 : ZF;
-	set_f((F & (HF|NF)) | z | c);
+	HL = A * value;
+	{
+		QT = 0;
+		// keep HN
+		m_f.sign_val = 0;
+		m_f.zero_val = HL != 0;
+		m_f.parity_overflow_val = !0;
+		m_f.yx_val = 0;
+		m_f.carry = H;
+	}
 }
 
 void r800_device::muluw(u16 value)
@@ -87,9 +99,15 @@ void r800_device::muluw(u16 value)
 	const u32 res = HL * value;
 	DE = res >> 16;
 	HL = res & 0xffff;
-	const u8 c = (DE) ? CF : 0;
-	const u8 z = (res) ? 0 : ZF;
-	set_f((F & (HF|NF)) | z | c);
+	{
+		QT = 0;
+		// keep HN
+		m_f.sign_val = 0;
+		m_f.zero_val = res != 0;
+		m_f.parity_overflow_val = !0;
+		m_f.yx_val = 0;
+		m_f.carry = DE;
+	}
 }
 
 void r800_device::execute_run()
