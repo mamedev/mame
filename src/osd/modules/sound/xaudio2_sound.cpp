@@ -1113,7 +1113,6 @@ void sound_xaudio2::voice_info::submit_buffer(std::unique_ptr<BYTE []> &&data, D
 
 	// If we succeeded, relinquish the buffer allocation to the XAudio2 runtime
 	// The buffer will be freed on the OnBufferCompleted callback
-	// FIXME: does this leak when the voice is destroyed?
 	data.release();
 }
 
@@ -1597,7 +1596,7 @@ void sound_xaudio2::audio_task()
 					device->engine_error = false;
 
 					// bump this so the sound manager recreates its streams
-					//device->info.m_id = m_next_node_id++; FIXME: causes crash in sound_manager::update_osd_streams()
+					device->info.m_id = m_next_node_id++;
 
 					// try to get another thread to do the cleanup
 					device_info_ptr zombie;
