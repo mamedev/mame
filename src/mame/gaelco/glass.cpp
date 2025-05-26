@@ -593,6 +593,44 @@ ROM_START( glasskr )
 	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
 ROM_END
 
+
+ROM_START( glassp )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	// There were 8 x SRM20100LC chips near the CPU and the 2 ROMs below; presumably the game code would have
+	// been uploaded to those for testing as these program ROMs do not contain the game, only a stub program.
+	ROM_LOAD16_BYTE( "omk_pds_glass_0_27c512_e.bin", 0x000000, 0x010000, CRC(3b106c6e) SHA1(403b5402e36c9c484cdb7a709deb3cc2b55374a1) )
+	ROM_LOAD16_BYTE( "omk_pds_glass_1_27c512_o.bin", 0x000001, 0x010000, CRC(593581e1) SHA1(927b06857f17552c5315e2e5e1bb3feca4255010) )
+
+	// there was space for a DS5002, but not populated
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD16_BYTE( "al_d0-d7_27c4001.bin",  0x000000, 0x080000, CRC(c668caad) SHA1(742030d27ed5f7f7966d00181e13c7ba9b885df5) )
+	ROM_LOAD16_BYTE( "bl_d8-d15_27c4001.bin", 0x000001, 0x080000, CRC(7a6cb91f) SHA1(2c8592d4f92ea380a85f3a43acef3f3898973963) )
+	ROM_LOAD16_BYTE( "ah_d0-d7_27c4001.bin",  0x100000, 0x080000, CRC(de27b785) SHA1(aa14e33f42039f67fb418ff45b26bef511c9c7c8) )
+	ROM_LOAD16_BYTE( "bh_d8-d15_27c4001.bin", 0x100001, 0x080000, CRC(e9aa45d3) SHA1(a9e09b2e338d75a414eea90672a1a7142e858d84) )
+	ROM_LOAD16_BYTE( "cl_d0-d7_27c4001.bin",  0x200000, 0x080000, CRC(e32639be) SHA1(9c18c871d042fe7c62a344f35968457ae8302fa9) )
+	ROM_LOAD16_BYTE( "dl_d8-d15_27c4001.bin", 0x200001, 0x080000, CRC(b56eb8a4) SHA1(5d647a3ae175051a11a3c496a32b34a368096487) )
+	ROM_LOAD16_BYTE( "ch_d0-d7_27c4001.bin",  0x300000, 0x080000, CRC(1b3f148d) SHA1(b62c5c6fb3f4ad543538764305e2e27b35c37334) )
+	ROM_LOAD16_BYTE( "dh_d8-d15_27c4001.bin", 0x300001, 0x080000, CRC(f3638123) SHA1(60d58608de193c1a3176c95419aa38a66e149e2a) )
+
+	ROM_REGION( 0x100000, "bmap", 0 )   // 16 bitmaps (320x200, indexed colors)
+	ROM_LOAD( "el_spain_27c4001.bin", 0x000000, 0x080000, CRC(e8c10b29) SHA1(ee289ff8fb8d4dad6e83f8d837dd10942e554695) )
+	ROM_LOAD( "eh_spain_27c4001.bin", 0x080000, 0x080000, CRC(ea568c62) SHA1(ccf155b32cfb6fc52b2ea13ce72444eb68c3417d) )
+
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "c1_fl_27c4001.bin", 0x000000, 0x080000, CRC(8d9aff0c) SHA1(c704988f752126ee59241aa79bd648986242cf56) )
+	ROM_LOAD( "c3_fh_27c4001.bin", 0x080000, 0x080000, CRC(124e1bb2) SHA1(a715fd294b93c80adfc91a7d69eea716ff040232) )
+	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
+
+	ROM_REGION( 0x144, "plds", 0 )
+	ROM_LOAD( "dec_pds_new_gal16v8.bin", 0x000, 0x117, CRC(3e165a3e) SHA1(bf40d26cb004b4a652848b2ef335a9a8272b7400) )
+	ROM_LOAD( "palce16v8h.e2",           0x000, 0x117, CRC(d5ed5985) SHA1(a4e9c8e3a7774e2a02fbca3ddf8175cf251825ba) )
+	ROM_LOAD( "palce16v8h.h21",          0x000, 0x117, CRC(f4f1e1e8) SHA1(0802a84b988a06ad276f3d593d8f826b765185c9) )
+	ROM_LOAD( "tibpal16r8.b15",          0x000, 0x104, CRC(27b1ca8b) SHA1(038d1352baff18f619ac4149e5825ef9664c983b) )
+	ROM_LOAD( "tibpal20l8.b23",          0x000, 0x144, CRC(87e5e6ab) SHA1(f42b952128bd26fe565b06403c7b1c95061e5034) )
+	ROM_LOAD( "tibpal20l8.h15",          0x000, 0x144, CRC(55a214bd) SHA1(956738e0bbe8cc91e220a158893b61867bae5cb2) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -600,12 +638,15 @@ ROM_END
  ALL versions of Glass contain the 'Break Edition' string (it just seems to be part of the title?)
  The 2 version 1.0 releases are very similar code, it was thought that one was a break edition and the other wasn't, but this is not the case.
 
- Version 1.1 releases also show Version 1994 on the title screen.  These versions do not have skulls in the playfield (at least not on early stages)
+ Version 1.1 releases also show Version 1994 on the title screen. These versions do not have skulls in the playfield (at least not on early stages)
  The protected version 1.1 also doesn't show any kind of attract gameplay, looks like it was patched out? (should be verified on an untouched original 1.1 using its original SRAM tho)
  The unprotected version appears to be a Korean set, is censored, and has different girl pictures.
 */
 
-GAME( 1994, glass,    0,     glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.1, Break Edition, Checksum 49D5E66B, Version 1994)",                           MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, glasskr,  glass, glass,          glass, glass_state, empty_init, ROT0, "OMK / Gaelco (Promat license)", "Glass (Ver 1.1, Break Edition, Checksum D419AB69, Version 1994) (censored, unprotected)",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // promat stickers on program ROMs
-GAME( 1993, glass10,  glass, glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.0, Break Edition, Checksum C5513F3C)",                                         MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, glass10a, glass, glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.0, Break Edition, Checksum D3864FDB)",                                         MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, glass,    0,     glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.1, Break Edition, checksum 49D5E66B, Version 1994)",                        MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, glasskr,  glass, glass,          glass, glass_state, empty_init, ROT0, "OMK / Gaelco (Promat license)", "Glass (Ver 1.1, Break Edition, checksum D419AB69, Version 1994, censored, unprotected)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // promat stickers on program ROMs
+GAME( 1993, glass10,  glass, glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.0, Break Edition, checksum C5513F3C)",                                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, glass10a, glass, glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.0, Break Edition, checksum D3864FDB)",                                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+
+// this development board can't work without the code/data that would have been remotely uploaded to the SRAMs, hence 'incomplete' flag.
+GAME( 1993, glassp,   glass, glass,          glass, glass_state, empty_init, ROT0, "OMK / Gaelco", "Glass (development PCB)", MACHINE_NOT_WORKING | MACHINE_IS_INCOMPLETE )
