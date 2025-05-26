@@ -5032,8 +5032,8 @@ ROM_END
   * ROM signature: ALEXANDER GAGANOV USSR, MOSCOW
 
   There is no evidence of a real unit yet. Only two hardware parts are
-  available at the moment: PCB with chip (in fact, there must have been two PCBs;
-  the other one was for the keypad, battery compartment and speaker), and LCD.
+  available at the moment: PCB with chip, and LCD (in fact, there must have been
+  two PCBs; the other one was for the keypad, battery compartment and speaker).
   Both parts were found in ruins of the factory in Vinnytsia (Ukraine) formerly
   producing LCD games.
 
@@ -12377,7 +12377,7 @@ SYST( 1989, kosmicmt,     gnw_fire,    0,      kosmicmt,     gnw_fire,     gnw_f
 SYST( 1990, auslalom,     0,           0,      auslalom,     auslalom,     auslalom_state,     empty_init, "Elektronika", "Autoslalom", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 199?, elbaskb,      0,           0,      elbaskb,      elbaskb,      elbaskb_state,      empty_init, "Elektronika", "Basketbol (Elektronika)", MACHINE_SUPPORTS_SAVE )
 SYST( 1992, vesarif,      0,           0,      vesarif,      vesarif,      vesarif_state,      empty_init, "Elektronika", "Vesolaya arifmetika", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1991, uchitari,     0,           0,      uchitari,     uchitari,     uchitari_state,     empty_init, "Elektronika", "Uchitel' arifmetiki (prototype?)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, uchitari,     0,           0,      uchitari,     uchitari,     uchitari_state,     empty_init, "Elektronika", "Uchitel' arifmetiki (prototype?)", MACHINE_SUPPORTS_SAVE )
 
 // Konami
 SYST( 1989, kdribble,     0,           0,      kdribble,     kdribble,     kdribble_state,     empty_init, "Konami", "Double Dribble (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
