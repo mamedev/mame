@@ -1326,9 +1326,9 @@ HRESULT sound_xaudio2::OnDefaultDeviceChanged(EDataFlow flow, ERole role, LPCWST
 			}
 
 			std::lock_guard device_lock(m_device_mutex);
-			if (m_default_sink_id != device_id)
+			if (m_default_sink_id != default_id)
 			{
-				m_default_sink_id = device_id;
+				m_default_sink_id = default_id;
 				auto const pos = find_device(m_default_sink_id);
 				if ((m_device_info.end() != pos) && ((*pos)->device_id == m_default_sink_id) && ((*pos)->info.m_id != m_default_sink))
 				{
