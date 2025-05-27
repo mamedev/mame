@@ -1146,28 +1146,51 @@ HRESULT sound_wasapi::OnDefaultDeviceChanged(EDataFlow flow, ERole role, LPCWSTR
 	{
 		if (eMultimedia == role)
 		{
+			co_task_wstr_ptr default_id_str;
+			std::wstring_view default_id;
+			if (pwstrDefaultDeviceId)
+			{
+				default_id = pwstrDefaultDeviceId;
+			}
+			else
+			{
+				// changing the app setting to "Default" in mixer controls gives a null string here
+				HRESULT const result = get_default_audio_device_id(*m_device_enum.Get(), flow, role, default_id_str);
+				if (FAILED(result))
+					return result;
+				else if (!default_id_str)
+					return E_POINTER;
+				default_id = default_id_str.get();
+			}
+
 			if (eRender == flow)
 			{
 				std::lock_guard device_lock(m_device_mutex);
-				m_default_sink_id = pwstrDefaultDeviceId;
-				auto const pos = find_device(m_default_sink_id);
-				if ((m_device_info.end() != pos) && ((*pos)->device_id == m_default_sink_id) && (*pos)->info.m_sinks && ((*pos)->info.m_id != m_default_sink))
+				if (m_default_sink_id != default_id)
 				{
-					m_default_sink = (*pos)->info.m_id;
+					m_default_sink_id = default_id;
+					auto const pos = find_device(m_default_sink_id);
+					if ((m_device_info.end() != pos) && ((*pos)->device_id == m_default_sink_id) && (*pos)->info.m_sinks && ((*pos)->info.m_id != m_default_sink))
+					{
+						m_default_sink = (*pos)->info.m_id;
 
-					++m_generation;
+						++m_generation;
+					}
 				}
 			}
 			else if (eCapture == flow)
 			{
 				std::lock_guard device_lock(m_device_mutex);
-				m_default_source_id = pwstrDefaultDeviceId;
-				auto const pos = find_device(m_default_source_id);
-				if ((m_device_info.end() != pos) && ((*pos)->device_id == m_default_source_id) && (*pos)->info.m_sources && ((*pos)->info.m_id != m_default_source))
+				if (m_default_source_id != default_id)
 				{
-					m_default_source = (*pos)->info.m_id;
+					m_default_source_id = default_id;
+					auto const pos = find_device(m_default_source_id);
+					if ((m_device_info.end() != pos) && ((*pos)->device_id == m_default_source_id) && (*pos)->info.m_sources && ((*pos)->info.m_id != m_default_source))
+					{
+						m_default_source = (*pos)->info.m_id;
 
-					++m_generation;
+						++m_generation;
+					}
 				}
 			}
 		}

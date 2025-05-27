@@ -1308,14 +1308,34 @@ HRESULT sound_xaudio2::OnDefaultDeviceChanged(EDataFlow flow, ERole role, LPCWST
 	{
 		if ((eRender == flow) && (eMultimedia == role))
 		{
-			std::lock_guard device_lock(m_device_mutex);
-			m_default_sink_id = pwstrDefaultDeviceId;
-			auto const pos = find_device(m_default_sink_id);
-			if ((m_device_info.end() != pos) && ((*pos)->device_id == m_default_sink_id) && ((*pos)->info.m_id != m_default_sink))
+			co_task_wstr_ptr default_id_str;
+			std::wstring_view default_id;
+			if (pwstrDefaultDeviceId)
 			{
-				m_default_sink = (*pos)->info.m_id;
+				default_id = pwstrDefaultDeviceId;
+			}
+			else
+			{
+				// changing the app setting to "Default" in mixer controls gives a null string here
+				HRESULT const result = get_default_audio_device_id(*m_device_enum.Get(), flow, role, default_id_str);
+				if (FAILED(result))
+					return result;
+				else if (!default_id_str)
+					return E_POINTER;
+				default_id = default_id_str.get();
+			}
 
-				++m_generation;
+			std::lock_guard device_lock(m_device_mutex);
+			if (m_default_sink_id != device_id)
+			{
+				m_default_sink_id = device_id;
+				auto const pos = find_device(m_default_sink_id);
+				if ((m_device_info.end() != pos) && ((*pos)->device_id == m_default_sink_id) && ((*pos)->info.m_id != m_default_sink))
+				{
+					m_default_sink = (*pos)->info.m_id;
+
+					++m_generation;
+				}
 			}
 		}
 		return S_OK;
