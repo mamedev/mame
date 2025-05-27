@@ -630,81 +630,24 @@ ROM_START( sltpcyclb )
 	ROM_LOAD( "mu.6_pal16l8.u12", 0x0000, 0x0104, CRC(00aedab5) SHA1(497555962e1d85ffb4fd37cff778772abd1bbe32) )
 ROM_END
 
-// Older main PCB, unknown I/O PCB
 ROM_START( sltpcyclc )
 	ROM_REGION( 0x040000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "tachado_bici_0_u21_27c512.u21", 0x000000, 0x010000, CRC(7a9105e4) SHA1(c0af6984943032e0e08d575e6c84a6e788c6f6ac) )
 	ROM_LOAD16_BYTE( "tachado_bici_1_u23_27c512.u23", 0x000001, 0x010000, CRC(bde3015e) SHA1(32afa4b53b4a480737eb4ccbf160533d27c5c7ea) )
 
-	ROM_REGION( 0x0280000, "gfx", ROMREGION_ERASEFF )
-	ROM_LOAD( "bici_f0_l_j10_e71f_27c010a.bin", 0x0000000, 0x0020000, CRC(ba239de5) SHA1(f5ed168d383488a393cdc71a5ec27723aa85d433) )
-	ROM_LOAD( "bici_f1_l_j9_5c66_27c010a.bin",  0x0080000, 0x0020000, CRC(5de80a28) SHA1(86d20c53d21132cc802f9ae227ad32ec1da1c115) )
-	ROM_LOAD( "bici_f2_l_j7_326c_27c010a.bin",  0x0100000, 0x0020000, CRC(398db663) SHA1(30ffde3735500268dfe1b1524044ccbd16864709) )
-	ROM_LOAD( "bici_f3_l_j6_d1a2_27c010a.bin",  0x0180000, 0x0020000, CRC(8bc28070) SHA1(2338b077630b5982a044e2d042d94450f720dc54) )
-	ROM_FILL(                                   0x0200000, 0x0020000, 0x00 )
-	ROM_LOAD( "bici_f0_h_h10_39da_27c010a.bin", 0x0020000, 0x0020000, CRC(f8dd0e83) SHA1(8c8f6523ef40b8000bdceb67e6cc27a397e49bed) )
-	ROM_LOAD( "bici_f1_h_h9_7e79_27c010a.bin",  0x00a0000, 0x0020000, CRC(c1ecab70) SHA1(7faefc09227b7449d27ad5899de134db761fbfb7) )
-	ROM_LOAD( "bici_f2_h_h7_3418_27c010a.bin",  0x0120000, 0x0020000, CRC(1cc875ec) SHA1(5fad36b4aaf148bc3e9ea11e171d3730a0e7deba) )
-	ROM_LOAD( "bici_f3_h_h7_f314_27c010a.u41",  0x01a0000, 0x0020000, CRC(a206aa3f) SHA1(775b03f2a9a623190a5392ceadecd9fbf57cce80) )
-	ROM_FILL(                                   0x0220000, 0x0020000, 0x00 )
+	ROM_REGION( 0x0280000, "gfx", ROMREGION_ERASEFF ) // GFX, no sound, machine has none?
+	ROM_LOAD( "u40", 0x0000000, 0x0020000, NO_DUMP )
+	ROM_LOAD( "u39", 0x0080000, 0x0020000, NO_DUMP )
+	ROM_LOAD( "u38", 0x0100000, 0x0020000, NO_DUMP)
+	ROM_LOAD( "u36", 0x0180000, 0x0020000, NO_DUMP )
+	ROM_FILL(                                       0x0200000, 0x0020000, 0x00 )         // to decode GFX as 5bpp
+	ROM_LOAD( "u44", 0x0020000, 0x0020000, NO_DUMP )
+	ROM_LOAD( "u43", 0x00a0000, 0x0020000, NO_DUMP )
+	ROM_LOAD( "u42", 0x0120000, 0x0020000, NO_DUMP )
+	ROM_LOAD( "u41", 0x01a0000, 0x0020000, NO_DUMP )
+	ROM_FILL(                                       0x0220000, 0x0020000, 0x00 )         // to decode GFX as 5bpp
 ROM_END
 
-// Older main PCB, unknown I/O PCB
-ROM_START( sltpcycld )
-	ROM_REGION( 0x040000, "maincpu", 0 )    // 68000 code
-	ROM_LOAD16_BYTE( "bici_06.11_4f4e_0_d18_27c512.bin", 0x000000, 0x010000, CRC(62f25e57) SHA1(b49973bc8d59cf658371c9a5e0a7395a65a5539e) )
-	ROM_LOAD16_BYTE( "bici_06.11_6ce7_1_d16_27c512.bin", 0x000001, 0x010000, CRC(b3d8327b) SHA1(bc992d93e31d1442be3170c4b27950459ff5bd23) )
-
-	ROM_REGION( 0x0280000, "gfx", ROMREGION_ERASEFF )
-	ROM_LOAD( "bici_f0_l_j10_e71f_27c010a.bin", 0x0000000, 0x0020000, CRC(ba239de5) SHA1(f5ed168d383488a393cdc71a5ec27723aa85d433) )
-	ROM_LOAD( "bici_f1_l_j9_5c66_27c010a.bin",  0x0080000, 0x0020000, CRC(5de80a28) SHA1(86d20c53d21132cc802f9ae227ad32ec1da1c115) )
-	ROM_LOAD( "bici_f2_l_j7_326c_27c010a.bin",  0x0100000, 0x0020000, CRC(398db663) SHA1(30ffde3735500268dfe1b1524044ccbd16864709) )
-	ROM_LOAD( "bici_f3_l_j6_d1a2_27c010a.bin",  0x0180000, 0x0020000, CRC(8bc28070) SHA1(2338b077630b5982a044e2d042d94450f720dc54) )
-	ROM_FILL(                                   0x0200000, 0x0020000, 0x00 )
-	ROM_LOAD( "bici_f0_h_h10_39da_27c010a.bin", 0x0020000, 0x0020000, CRC(f8dd0e83) SHA1(8c8f6523ef40b8000bdceb67e6cc27a397e49bed) )
-	ROM_LOAD( "bici_f1_h_h9_7e79_27c010a.bin",  0x00a0000, 0x0020000, CRC(c1ecab70) SHA1(7faefc09227b7449d27ad5899de134db761fbfb7) )
-	ROM_LOAD( "bici_f2_h_h7_3418_27c010a.bin",  0x0120000, 0x0020000, CRC(1cc875ec) SHA1(5fad36b4aaf148bc3e9ea11e171d3730a0e7deba) )
-	ROM_LOAD( "bici_f3_h_h7_f314_27c010a.u41",  0x01a0000, 0x0020000, CRC(a206aa3f) SHA1(775b03f2a9a623190a5392ceadecd9fbf57cce80) )
-	ROM_FILL(                                   0x0220000, 0x0020000, 0x00 )
-ROM_END
-
-// Older main PCB, unknown I/O PCB
-ROM_START( sltpcycle )
-	ROM_REGION( 0x040000, "maincpu", 0 )    // 68000 code
-	ROM_LOAD16_BYTE( "tachado_bici_22.10_4eea_d18_0_27c512.bin", 0x000000, 0x010000, CRC(d186773f) SHA1(2025597eaf2d4c461f3201be99a1d94be714c1e2) )
-	ROM_LOAD16_BYTE( "tachado_bici_22.10_6c78_d16_1_27c512.bin", 0x000001, 0x010000, CRC(1afd8cec) SHA1(14aef060d2573bc54cf0efd3690f177af9475b27) )
-
-	ROM_REGION( 0x0280000, "gfx", ROMREGION_ERASEFF )
-	ROM_LOAD( "bici_f0_l_j10_e71f_27c010a.bin", 0x0000000, 0x0020000, CRC(ba239de5) SHA1(f5ed168d383488a393cdc71a5ec27723aa85d433) )
-	ROM_LOAD( "bici_f1_l_j9_5c66_27c010a.bin",  0x0080000, 0x0020000, CRC(5de80a28) SHA1(86d20c53d21132cc802f9ae227ad32ec1da1c115) )
-	ROM_LOAD( "bici_f2_l_j7_326c_27c010a.bin",  0x0100000, 0x0020000, CRC(398db663) SHA1(30ffde3735500268dfe1b1524044ccbd16864709) )
-	ROM_LOAD( "bici_f3_l_j6_d1a2_27c010a.bin",  0x0180000, 0x0020000, CRC(8bc28070) SHA1(2338b077630b5982a044e2d042d94450f720dc54) )
-	ROM_FILL(                                   0x0200000, 0x0020000, 0x00 )
-	ROM_LOAD( "bici_f0_h_h10_39da_27c010a.bin", 0x0020000, 0x0020000, CRC(f8dd0e83) SHA1(8c8f6523ef40b8000bdceb67e6cc27a397e49bed) )
-	ROM_LOAD( "bici_f1_h_h9_7e79_27c010a.bin",  0x00a0000, 0x0020000, CRC(c1ecab70) SHA1(7faefc09227b7449d27ad5899de134db761fbfb7) )
-	ROM_LOAD( "bici_f2_h_h7_3418_27c010a.bin",  0x0120000, 0x0020000, CRC(1cc875ec) SHA1(5fad36b4aaf148bc3e9ea11e171d3730a0e7deba) )
-	ROM_LOAD( "bici_f3_h_h7_f314_27c010a.u41",  0x01a0000, 0x0020000, CRC(a206aa3f) SHA1(775b03f2a9a623190a5392ceadecd9fbf57cce80) )
-	ROM_FILL(                                   0x0220000, 0x0020000, 0x00 )
-ROM_END
-
-// Older main PCB, unknown I/O PCB
-ROM_START( sltpcyclf )
-	ROM_REGION( 0x040000, "maincpu", 0 )    // 68000 code
-	ROM_LOAD16_BYTE( "tachado_bici_13.07_4caf_d18_0_27c512.bin", 0x000000, 0x010000, CRC(8aea93cb) SHA1(0352f9c1fe2a8cfa456c661605250afa384a9af9) )
-	ROM_LOAD16_BYTE( "tachado_bici_13.07_6b79_d16_1_27c512.bin", 0x000001, 0x010000, CRC(7327f0f8) SHA1(032cfa43d7052bd0a224ebd13191123ab06c37b0) )
-
-	ROM_REGION( 0x0280000, "gfx", ROMREGION_ERASEFF )
-	ROM_LOAD( "bici_f0_l_j10_e71f_27c010a.bin", 0x0000000, 0x0020000, CRC(ba239de5) SHA1(f5ed168d383488a393cdc71a5ec27723aa85d433) )
-	ROM_LOAD( "bici_f1_l_j9_5c66_27c010a.bin",  0x0080000, 0x0020000, CRC(5de80a28) SHA1(86d20c53d21132cc802f9ae227ad32ec1da1c115) )
-	ROM_LOAD( "bici_f2_l_j7_326c_27c010a.bin",  0x0100000, 0x0020000, CRC(398db663) SHA1(30ffde3735500268dfe1b1524044ccbd16864709) )
-	ROM_LOAD( "bici_f3_l_j6_d1a2_27c010a.bin",  0x0180000, 0x0020000, CRC(8bc28070) SHA1(2338b077630b5982a044e2d042d94450f720dc54) )
-	ROM_FILL(                                   0x0200000, 0x0020000, 0x00 )
-	ROM_LOAD( "bici_f0_h_h10_39da_27c010a.bin", 0x0020000, 0x0020000, CRC(f8dd0e83) SHA1(8c8f6523ef40b8000bdceb67e6cc27a397e49bed) )
-	ROM_LOAD( "bici_f1_h_h9_7e79_27c010a.bin",  0x00a0000, 0x0020000, CRC(c1ecab70) SHA1(7faefc09227b7449d27ad5899de134db761fbfb7) )
-	ROM_LOAD( "bici_f2_h_h7_3418_27c010a.bin",  0x0120000, 0x0020000, CRC(1cc875ec) SHA1(5fad36b4aaf148bc3e9ea11e171d3730a0e7deba) )
-	ROM_LOAD( "bici_f3_h_h7_f314_27c010a.u41",  0x01a0000, 0x0020000, CRC(a206aa3f) SHA1(775b03f2a9a623190a5392ceadecd9fbf57cce80) )
-	ROM_FILL(                                   0x0220000, 0x0020000, 0x00 )
-ROM_END
 
 
 /*============================================================================
@@ -790,60 +733,23 @@ ROM_START( sltpstep )
 	ROM_LOAD( "mu.6_pal16l8.u12", 0x0000, 0x0104, CRC(00aedab5) SHA1(497555962e1d85ffb4fd37cff778772abd1bbe32) )
 ROM_END
 
-// Older main PCB, unknown I/O PCB
 ROM_START( sltpstepa )
 	ROM_REGION( 0x040000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "step_0_23.01.98_21_88e6_27c512.bin", 0x000000, 0x010000, CRC(c62a9d36) SHA1(674de3248b490c25620267e643540f05e2d2abac) )
 	ROM_LOAD16_BYTE( "step_1_23.01.98_23_4583_27c512.bin", 0x000001, 0x010000, CRC(b5467467) SHA1(0d111f92c84873175e44a65515efb7c8af607a63) )
 
 	ROM_REGION( 0x0280000, "gfx", ROMREGION_ERASEFF ) // GFX, no sound, machine has none?
-	ROM_LOAD( "st_17-10_f0_h10_234a_27c040.bin", 0x0000000, 0x0080000, CRC(082d0581) SHA1(5ddeb1ead89f9a287b58869fdfcfd2aff0cad9f2) )
-	ROM_LOAD( "st_17-10_f1_h9_ddb8_27c040.bin",  0x0080000, 0x0080000, CRC(595173a3) SHA1(fa879a0167ff3ef25dafcc45bbedfe5a8eb50353) )
-	ROM_LOAD( "st_17-10_f2_h7_021e_27c040.bin",  0x0100000, 0x0080000, CRC(c0100462) SHA1(453242183f35c30eb437d46ad6aa6f8124b64a71) )
-	ROM_LOAD( "st_17-10_f3_h6_56ff8_27c040.bin", 0x0180000, 0x0080000, CRC(47d6926a) SHA1(1d939f33c3e646c9d1e36875ae8dfc30ba800c20) )
-	ROM_FILL(                                    0x0200000, 0x0080000, 0x00 )         // to decode GFX as 5bpp
-ROM_END
+	ROM_LOAD( "st_u_40.u40", 0x0000000, 0x0080000, CRC(813270de) SHA1(9a6ce7679bd5c6ecf0c3328d6ff9dc2240a95328) ) // 27C4000DC
+	ROM_LOAD( "st_u_39.u39", 0x0080000, 0x0080000, CRC(1d42e124) SHA1(add866310511f4f406b80ed0d3983b79b80c701c) ) // 27C4000DC
+	ROM_LOAD( "st_u_38.u38", 0x0100000, 0x0080000, CRC(9d0d795c) SHA1(ef7cf61f8c687ecc68678a634f65386cc25d8a8f) ) // 27C4000DC
+	ROM_LOAD( "st_u_37.u37", 0x0180000, 0x0080000, CRC(5543d4d1) SHA1(1f9f358dfb252412468ddd68331bda5acbe99329) ) // 27C4000DC
+	ROM_FILL(                0x0200000, 0x0080000, 0x00 )         // to decode GFX as 5bpp
 
-// Older main PCB, unknown I/O PCB
-ROM_START( sltpstepb )
-	ROM_REGION( 0x040000, "maincpu", 0 )    // 68000 code
-	ROM_LOAD16_BYTE( "step_0_14.06_18_ef72_27c512.bin", 0x000000, 0x010000, CRC(d91f9e0e) SHA1(7099fc468c5aab207baa9f7653805a8a08299ca6) )
-	ROM_LOAD16_BYTE( "step_1_14.06_16_1c5a_27c512.bin", 0x000001, 0x010000, CRC(d22fc8e0) SHA1(e7602562434bb00fe1bab2451630f59ff293ecfe) )
+	ROM_REGION( 0x0800, "iomcu", 0 ) // on IO board
+	ROM_LOAD( "cpu_6022-1-st62t15b6.ic4", 0x0000, 0x0800, NO_DUMP ) // 2KBytes internal ROM
 
-	ROM_REGION( 0x0280000, "gfx", ROMREGION_ERASEFF ) // GFX, no sound, machine has none?
-	ROM_LOAD( "st_17-10_f0_h10_234a_27c040.bin", 0x0000000, 0x0080000, CRC(082d0581) SHA1(5ddeb1ead89f9a287b58869fdfcfd2aff0cad9f2) )
-	ROM_LOAD( "st_17-10_f1_h9_ddb8_27c040.bin",  0x0080000, 0x0080000, CRC(595173a3) SHA1(fa879a0167ff3ef25dafcc45bbedfe5a8eb50353) )
-	ROM_LOAD( "st_17-10_f2_h7_021e_27c040.bin",  0x0100000, 0x0080000, CRC(c0100462) SHA1(453242183f35c30eb437d46ad6aa6f8124b64a71) )
-	ROM_LOAD( "st_17-10_f3_h6_56ff8_27c040.bin", 0x0180000, 0x0080000, CRC(47d6926a) SHA1(1d939f33c3e646c9d1e36875ae8dfc30ba800c20) )
-	ROM_FILL(                                    0x0200000, 0x0080000, 0x00 )         // to decode GFX as 5bpp
-ROM_END
-
-// Older main PCB, unknown I/O PCB
-ROM_START( sltpstepc )
-	ROM_REGION( 0x040000, "maincpu", 0 )    // 68000 code
-	ROM_LOAD16_BYTE( "step_10.06_0_18_27c512.bin", 0x000000, 0x010000, CRC(1c84579c) SHA1(defd2754e1ba86df703cff63d8f065ceae257ecd) )
-	ROM_LOAD16_BYTE( "step_10.06_1_16_27c512.bin", 0x000001, 0x010000, CRC(ea160066) SHA1(d487c2b09bac849f7ebca5ec9a80a9eddbaf95bf) )
-
-	ROM_REGION( 0x0280000, "gfx", ROMREGION_ERASEFF ) // GFX, no sound, machine has none?
-	ROM_LOAD( "st_17-10_f0_h10_234a_27c040.bin", 0x0000000, 0x0080000, CRC(082d0581) SHA1(5ddeb1ead89f9a287b58869fdfcfd2aff0cad9f2) )
-	ROM_LOAD( "st_17-10_f1_h9_ddb8_27c040.bin",  0x0080000, 0x0080000, CRC(595173a3) SHA1(fa879a0167ff3ef25dafcc45bbedfe5a8eb50353) )
-	ROM_LOAD( "st_17-10_f2_h7_021e_27c040.bin",  0x0100000, 0x0080000, CRC(c0100462) SHA1(453242183f35c30eb437d46ad6aa6f8124b64a71) )
-	ROM_LOAD( "st_17-10_f3_h6_56ff8_27c040.bin", 0x0180000, 0x0080000, CRC(47d6926a) SHA1(1d939f33c3e646c9d1e36875ae8dfc30ba800c20) )
-	ROM_FILL(                                    0x0200000, 0x0080000, 0x00 )         // to decode GFX as 5bpp
-ROM_END
-
-// Older main PCB, unknown I/O PCB
-ROM_START( sltpstepd )
-	ROM_REGION( 0x040000, "maincpu", 0 )    // 68000 code
-	ROM_LOAD16_BYTE( "step_0_2.07.96_18_d460_27c512.bin", 0x000000, 0x010000, CRC(ad8872c7) SHA1(1eb651417f15dabe27b5d0c3dd530c0229108c17) )
-	ROM_LOAD16_BYTE( "step_1_2.07.96_16_0d94_27c512.bin", 0x000001, 0x010000, CRC(c5cb51a0) SHA1(4826bcdf3a8e0bb79b9005835ab76c7a2994029f) )
-
-	ROM_REGION( 0x0280000, "gfx", ROMREGION_ERASEFF ) // GFX, no sound, machine has none?
-	ROM_LOAD( "st_17-10_f0_h10_234a_27c040.bin", 0x0000000, 0x0080000, CRC(082d0581) SHA1(5ddeb1ead89f9a287b58869fdfcfd2aff0cad9f2) )
-	ROM_LOAD( "st_17-10_f1_h9_ddb8_27c040.bin",  0x0080000, 0x0080000, CRC(595173a3) SHA1(fa879a0167ff3ef25dafcc45bbedfe5a8eb50353) )
-	ROM_LOAD( "st_17-10_f2_h7_021e_27c040.bin",  0x0100000, 0x0080000, CRC(c0100462) SHA1(453242183f35c30eb437d46ad6aa6f8124b64a71) )
-	ROM_LOAD( "st_17-10_f3_h6_56ff8_27c040.bin", 0x0180000, 0x0080000, CRC(47d6926a) SHA1(1d939f33c3e646c9d1e36875ae8dfc30ba800c20) )
-	ROM_FILL(                                    0x0200000, 0x0080000, 0x00 )         // to decode GFX as 5bpp
+	ROM_REGION( 0x0104, "pals", 0 )
+	ROM_LOAD( "mu.6_pal16l8.u12", 0x0000, 0x0104, CRC(00aedab5) SHA1(497555962e1d85ffb4fd37cff778772abd1bbe32) )
 ROM_END
 
 
@@ -3324,12 +3230,7 @@ GAME( 1999, jungleani,   0,         srollnd,          play2000, gaelco2_state,  
 GAME( 2000, sltpcycl,   0,          saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, V.1.0, checksum 02AB)",      0 ) // 18/Jan/2000
 GAME( 1999, sltpcycla,  sltpcycl,   saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, V.1.0, checksum DECA)",      0 ) // 20/Nov/1999
 GAME( 1997, sltpcyclb,  sltpcycl,   saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, V.1.0, checksum 3523)",      0 ) // 07/Apr/1997
-GAME( 199?, sltpcyclc,  sltpcycl,   saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, older, set 1)",              MACHINE_NOT_WORKING ) // Different sprite RAM arrangement?
-GAME( 199?, sltpcycld,  sltpcycl,   saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, older, set 2)",              MACHINE_NOT_WORKING ) // Different sprite RAM arrangement?
-GAME( 199?, sltpcycle,  sltpcycl,   saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, older, set 3)",              MACHINE_NOT_WORKING ) // Different sprite RAM arrangement?
-GAME( 199?, sltpcyclf,  sltpcycl,   saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, older, set 4)",              MACHINE_NOT_WORKING ) // Different sprite RAM arrangement?
+GAME( 199?, sltpcyclc,  sltpcycl,   saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, unknown version)",           MACHINE_NOT_WORKING ) // missing GFX ROMs
+
 GAME( 1997, sltpstep,   0,          saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, V.1.0, checksum F208)", 0 ) // 07/Apr/1997
-GAME( 1998, sltpstepa,  sltpstep,   saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, older, set 1)",         MACHINE_NOT_WORKING ) // 23/Jan/1998. Different sprite RAM arrangement?
-GAME( 199?, sltpstepb,  sltpstep,   saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, older, set 2)",         MACHINE_NOT_WORKING ) // Different sprite RAM arrangement?
-GAME( 199?, sltpstepc,  sltpstep,   saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, older, set 3)",         MACHINE_NOT_WORKING ) // Different sprite RAM arrangement?
-GAME( 1996, sltpstepd,  sltpstep,   saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, older, set 4)",         MACHINE_NOT_WORKING ) // 2/Jul/1996. Different sprite RAM arrangement?
+GAME( 1998, sltpstepa,  sltpstep,   saltcrdi,         saltcrdi, gaelco2_state,  init_play2000,  ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, unknown version)",      0 ) // 23/Jan/1998

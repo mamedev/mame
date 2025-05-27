@@ -18635,6 +18635,12 @@ bioplayc
 maniacsp
 lastkm
 lastkma
+sltpcycld
+sltpcycle
+sltpcyclf
+sltpstepb
+sltpstepc
+sltpstepd
 squash
 squasha
 squashb
@@ -18671,14 +18677,8 @@ sltpcycl
 sltpcycla
 sltpcyclb
 sltpcyclc
-sltpcycld
-sltpcycle
-sltpcyclf
 sltpstep
 sltpstepa
-sltpstepb
-sltpstepc
-sltpstepd
 snowboar
 snowboara
 srollnd
