@@ -29,6 +29,8 @@ protected:
 
 	void nes_vt32_soc_map(address_map &map) ATTR_COLD;
 
+	virtual void scrambled_8000_w(u16 offset, u8 data) override;
+
 	u8 vtfp_4119_r();
 	void vtfp_411e_encryption_state_w(u8 data);
 	void vtfp_412c_extbank_w(u8 data);

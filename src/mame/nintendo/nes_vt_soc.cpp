@@ -750,125 +750,93 @@ int nes_vt02_vt03_soc_device::calculate_real_video_address(int addr, int readtyp
 void nes_vt02_vt03_soc_device::scrambled_8000_w(u16 offset, u8 data)
 {
 	offset &= 0x7fff;
-
 	u16 addr = offset+0x8000;
-	if ((m_411d & 0x03) == 0x03) // (VT32 only, not VT03/09, split)
-	{
-		//CNROM compat
-		logerror("%s: vtxx_cnrom_8000_w real address: (%04x) translated address: (%04x) %02x\n", machine().describe_context(), addr, offset + 0x8000, data);
-		m_ppu->set_videobank0_reg(0x4, data * 8);
-		m_ppu->set_videobank0_reg(0x5, data * 8 + 2);
-		m_ppu->set_videobank0_reg(0x0, data * 8 + 4);
-		m_ppu->set_videobank0_reg(0x1, data * 8 + 5);
-		m_ppu->set_videobank0_reg(0x2, data * 8 + 6);
-		m_ppu->set_videobank0_reg(0x3, data * 8 + 7);
 
-	}
-	else if ((m_411d & 0x03) == 0x01) // (VT32 only, not VT03/09, split)
+	//MMC3 compat
+	if ((addr < 0xa000) && !(addr & 0x01))
 	{
-		//MMC1 compat, TODO
-		logerror("%s: vtxx_mmc1_8000_w real address: (%04x) translated address: (%04x) %02x\n", machine().describe_context(), addr, offset + 0x8000, data);
-
-	}
-	else if ((m_411d & 0x03) == 0x02) // (VT32 only, not VT03/09, split)
-	{
-		//UNROM compat
-		logerror("%s: vtxx_unrom_8000_w real address: (%04x) translated address: (%04x) %02x\n", machine().describe_context(), addr, offset + 0x8000, data);
-
-		m_410x[0x7] = ((data & 0x0F) << 1);
-		m_410x[0x8] = ((data & 0x0F) << 1) + 1;
+		logerror("%s: scrambled_8000_w real address: (%04x) translated address: (%04x) %02x (banking)\n",  machine().describe_context(), addr, offset + 0x8000, data);
+		// Bank select
+		m_8000_addr_latch = data & 0x07;
+		// Bank config
+		m_410x[0x05] = data & ~(1 << 5);
 		update_banks();
 	}
-	else // standard mode (VT03/09)
+	else if ((addr < 0xa000) && (addr & 0x01))
 	{
-		//logerror("%s: vtxx_mmc3_8000_w real address: (%04x) translated address: (%04x) %02x\n",  machine().describe_context(), addr, offset+0x8000, data );
+		logerror("%s: scrambled_8000_w real address: (%04x) translated address: (%04x) %02x (other scrambled stuff)\n",  machine().describe_context(), addr, offset + 0x8000, data);
 
-		//MMC3 compat
-		if ((addr < 0xA000) && !(addr & 0x01))
+		switch (m_410x[0x05] & 0x07)
 		{
-			logerror("%s: scrambled_8000_w real address: (%04x) translated address: (%04x) %02x (banking)\n",  machine().describe_context(), addr, offset + 0x8000, data);
-			// Bank select
-			m_8000_addr_latch = data & 0x07;
-			// Bank config
-			m_410x[0x05] = data & ~(1 << 5);
+		case 0x00:
+			m_ppu->set_videobank0_reg(m_8000_scramble[0], data);
+			break;
+
+		case 0x01:
+			m_ppu->set_videobank0_reg(m_8000_scramble[1], data);
+			break;
+
+		case 0x02: // hand?
+			m_ppu->set_videobank0_reg(m_8000_scramble[2], data);
+			break;
+
+		case 0x03: // dog?
+			m_ppu->set_videobank0_reg(m_8000_scramble[3], data);
+			break;
+
+		case 0x04: // ball thrown
+			m_ppu->set_videobank0_reg(m_8000_scramble[4], data);
+			break;
+
+		case 0x05: // ball thrown
+			m_ppu->set_videobank0_reg(m_8000_scramble[5], data);
+			break;
+
+		case 0x06:
+			m_410x[m_8006_scramble[0]] = data;
+			//m_410x[0x9] = data;
 			update_banks();
-		}
-		else if ((addr < 0xA000) && (addr & 0x01))
-		{
-			logerror("%s: scrambled_8000_w real address: (%04x) translated address: (%04x) %02x (other scrambled stuff)\n",  machine().describe_context(), addr, offset + 0x8000, data);
+			break;
 
-			switch (m_410x[0x05] & 0x07)
-			{
-			case 0x00:
-				m_ppu->set_videobank0_reg(m_8000_scramble[0], data);
-				break;
-
-			case 0x01:
-				m_ppu->set_videobank0_reg(m_8000_scramble[1], data);
-				break;
-
-			case 0x02: // hand?
-				m_ppu->set_videobank0_reg(m_8000_scramble[2], data);
-				break;
-
-			case 0x03: // dog?
-				m_ppu->set_videobank0_reg(m_8000_scramble[3], data);
-				break;
-
-			case 0x04: // ball thrown
-				m_ppu->set_videobank0_reg(m_8000_scramble[4], data);
-				break;
-
-			case 0x05: // ball thrown
-				m_ppu->set_videobank0_reg(m_8000_scramble[5], data);
-				break;
-
-			case 0x06:
-				m_410x[m_8006_scramble[0]] = data;
-				//m_410x[0x9] = data;
-				update_banks();
-				break;
-
-			case 0x07:
-				m_410x[m_8006_scramble[1]] = data;
-				update_banks();
-				break;
-			}
+		case 0x07:
+			m_410x[m_8006_scramble[1]] = data;
+			update_banks();
+			break;
 		}
-		else if ((addr >= 0xA000) && (addr < 0xC000) && !(addr & 0x01))
-		{
-			// Mirroring
-			m_410x[0x6] &= 0xFE;
-			m_410x[0x6] |= data & 0x01;
-		}
-		else if ((addr >= 0xA000) && (addr < 0xC000) && (addr & 0x01))
-		{
-			// PRG RAM control, ignore
-		}
-		else if ((addr >= 0xC000) && (addr < 0xE000) && !(addr & 0x01))
-		{
-			// IRQ latch
-			vt03_410x_w(1, data);
-		}
-		else if ((addr >= 0xC000) && (addr < 0xE000) && (addr & 0x01))
-		{
-			// IRQ reload
-			vt03_410x_w(2, data);
-		}
-		else if ((addr >= 0xE000) && !(addr & 0x01))
-		{
-			// IRQ disable
-			vt03_410x_w(3, data);
-		}
-		else if ((addr >= 0xE000) && (addr & 0x01))
-		{
-			// IRQ enable
-			vt03_410x_w(4, data);
-		}
-		else
-		{
+	}
+	else if ((addr >= 0xa000) && (addr < 0xc000) && !(addr & 0x01))
+	{
+		// Mirroring
+		m_410x[0x6] &= 0xFE;
+		m_410x[0x6] |= data & 0x01;
+	}
+	else if ((addr >= 0xa000) && (addr < 0xc000) && (addr & 0x01))
+	{
+		// PRG RAM control, ignore
+	}
+	else if ((addr >= 0xc000) && (addr < 0xe000) && !(addr & 0x01))
+	{
+		// IRQ latch
+		vt03_410x_w(1, data);
+	}
+	else if ((addr >= 0xc000) && (addr < 0xe000) && (addr & 0x01))
+	{
+		// IRQ reload
+		vt03_410x_w(2, data);
+	}
+	else if ((addr >= 0xe000) && !(addr & 0x01))
+	{
+		// IRQ disable
+		vt03_410x_w(3, data);
+	}
+	else if ((addr >= 0xe000) && (addr & 0x01))
+	{
+		// IRQ enable
+		vt03_410x_w(4, data);
+	}
+	else
+	{
 
-		}
 	}
 }
 

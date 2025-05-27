@@ -118,6 +118,45 @@ u8 nes_vt32_soc_device::vthh_414a_r()
 	return machine().rand();
 }
 
+
+void nes_vt32_soc_device::scrambled_8000_w(u16 offset, u8 data)
+{
+	offset &= 0x7fff;
+
+	u16 addr = offset+0x8000;
+	if ((m_411d & 0x03) == 0x03) // (VT32 only, not VT03/09)
+	{
+		//CNROM compat
+		logerror("%s: vtxx_cnrom_8000_w real address: (%04x) translated address: (%04x) %02x\n", machine().describe_context(), addr, offset + 0x8000, data);
+		m_ppu->set_videobank0_reg(0x4, data * 8);
+		m_ppu->set_videobank0_reg(0x5, data * 8 + 2);
+		m_ppu->set_videobank0_reg(0x0, data * 8 + 4);
+		m_ppu->set_videobank0_reg(0x1, data * 8 + 5);
+		m_ppu->set_videobank0_reg(0x2, data * 8 + 6);
+		m_ppu->set_videobank0_reg(0x3, data * 8 + 7);
+
+	}
+	else if ((m_411d & 0x03) == 0x01) // (VT32 only, not VT03/09)
+	{
+		//MMC1 compat, TODO
+		logerror("%s: vtxx_mmc1_8000_w real address: (%04x) translated address: (%04x) %02x\n", machine().describe_context(), addr, offset + 0x8000, data);
+	}
+	else if ((m_411d & 0x03) == 0x02) // (VT32 only, not VT03/09)
+	{
+		//UNROM compat
+		logerror("%s: vtxx_unrom_8000_w real address: (%04x) translated address: (%04x) %02x\n", machine().describe_context(), addr, offset + 0x8000, data);
+
+		m_410x[0x7] = ((data & 0x0F) << 1);
+		m_410x[0x8] = ((data & 0x0F) << 1) + 1;
+		update_banks();
+	}
+	else // standard mode (VT03/09)
+	{
+		nes_vt02_vt03_soc_device::scrambled_8000_w(offset, data);
+	}
+}
+
+
 void nes_vt32_soc_device::nes_vt32_soc_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram(); // .mask(0x0fff).ram();

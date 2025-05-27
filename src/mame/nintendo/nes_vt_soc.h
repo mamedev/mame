@@ -78,7 +78,7 @@ protected:
 	u8 nt_r(offs_t offset);
 	void nt_w(offs_t offset, u8 data);
 	int calculate_real_video_address(int addr, int readtype);
-	void scrambled_8000_w(u16 offset, u8 data);
+	virtual void scrambled_8000_w(u16 offset, u8 data);
 	virtual void vt_dma_w(u8 data);
 	void do_dma(u8 data, bool has_ntsc_bug);
 	void vt03_4034_w(u8 data);
