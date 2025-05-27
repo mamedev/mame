@@ -330,7 +330,7 @@ void sound_pulse::context_subscribe(pa_subscription_event_type_t t, uint32_t idx
 		m_nodes.erase(si);
 		m_generation++;
 		break;
-	}		
+	}
 
 	case PA_SUBSCRIPTION_EVENT_NEW | PA_SUBSCRIPTION_EVENT_SINK:
 		pa_context_get_sink_info_by_index(m_context, idx, i_sink_info_new, this);

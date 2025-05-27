@@ -38,7 +38,7 @@ public:
 protected:
 	class abuffer {
 	public:
-		abuffer(uint32_t channels) : m_channels(channels), m_last_sample(channels, 0) {}
+		abuffer(uint32_t channels);
 		void get(int16_t *data, uint32_t samples);
 		void push(const int16_t *data, uint32_t samples);
 		uint32_t channels() const { return m_channels; }
@@ -56,7 +56,11 @@ protected:
 			buffer &operator=(buffer &&) = default;
 		};
 
+		void pop_buffer();
+		buffer &push_buffer();
+
 		uint32_t m_channels;
+		uint32_t m_used_buffers;
 		std::vector<int16_t> m_last_sample;
 		std::vector<buffer> m_buffers;
 	};

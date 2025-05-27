@@ -42,6 +42,8 @@
 #include <combaseapi.h>
 #include <objbase.h>
 
+#include <wrl/client.h>
+
 // sound API headers
 #include <audioclient.h>
 #include <functiondiscoverykeys_devpkey.h>
@@ -613,6 +615,7 @@ int sound_wasapi::init(osd_interface &osd, osd_options const &options)
 
 					// add a device ID mapping
 					auto const pos = find_device(device_id);
+					assert((m_device_info.end() == pos) || ((*pos)->device_id != device_id));
 					device_info_ptr devinfo = std::make_unique<device_info>();
 					info.m_id = m_next_node_id++;
 					devinfo->device_id = std::move(device_id);
@@ -676,6 +679,7 @@ void sound_wasapi::exit()
 		m_cleanup_thread.join();
 	}
 
+	m_zombie_streams.clear();
 	m_stream_info.clear();
 	m_device_info.clear();
 
@@ -1241,7 +1245,6 @@ HRESULT sound_wasapi::OnPropertyValueChanged(LPCWSTR pwstrDeviceId, PROPERTYKEY 
 					return result;
 			}
 		}
-
 		return S_OK;
 	}
 	catch (std::bad_alloc const &)
@@ -1448,7 +1451,7 @@ bool sound_wasapi::activate_audio_client(
 				input ? "input" : "output",
 				name,
 				node);
-		return 0;
+		return false;
 	}
 
 	// make sure it supports the requested direction
@@ -1524,7 +1527,6 @@ void sound_wasapi::cleanup_task()
 } // anonymous namespace
 
 } // namespace osd
-
 
 #else
 
