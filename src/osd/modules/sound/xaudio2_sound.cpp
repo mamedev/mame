@@ -404,7 +404,7 @@ int sound_xaudio2::init(osd_interface &osd, osd_options const &options)
 		result = enumerate_audio_endpoints(
 				*m_device_enum.Get(),
 				eRender,
-				DEVICE_STATE_ACTIVE | DEVICE_STATE_UNPLUGGED,
+				DEVICE_STATE_ACTIVE,
 				[this] (HRESULT hr, mm_device_ptr &dev) -> bool
 				{
 					if (FAILED(hr) || !dev)
@@ -421,7 +421,7 @@ int sound_xaudio2::init(osd_interface &osd, osd_options const &options)
 						osd_printf_error("Sound: Error getting audio device state. Error: 0x%X\n", hr);
 						return true;
 					}
-					if ((DEVICE_STATE_ACTIVE != state) && (DEVICE_STATE_UNPLUGGED != state))
+					if (DEVICE_STATE_ACTIVE != state)
 						return true;
 
 					// populate node info structure
@@ -437,6 +437,7 @@ int sound_xaudio2::init(osd_interface &osd, osd_options const &options)
 
 					// add a device ID mapping
 					auto const pos = find_device(device_id);
+					assert((m_device_info.end() == pos) || ((*pos)->device_id != device_id));
 					m_zombie_devices.reserve(m_zombie_devices.size() + m_device_info.size() + 1);
 					device_info_ptr devinfo = std::make_unique<device_info>(*this);
 					info.m_id = m_next_node_id++;
@@ -1197,7 +1198,7 @@ HRESULT sound_xaudio2::OnDeviceStateChanged(LPCWSTR pwstrDeviceId, DWORD dwNewSt
 		std::wstring_view device_id(pwstrDeviceId);
 		auto const pos = find_device(device_id);
 
-		if ((DEVICE_STATE_ACTIVE == dwNewState) || (DEVICE_STATE_UNPLUGGED == dwNewState))
+		if (DEVICE_STATE_ACTIVE == dwNewState)
 		{
 			if ((m_device_info.end() == pos) || ((*pos)->device_id != device_id))
 			{
@@ -1307,14 +1308,34 @@ HRESULT sound_xaudio2::OnDefaultDeviceChanged(EDataFlow flow, ERole role, LPCWST
 	{
 		if ((eRender == flow) && (eMultimedia == role))
 		{
-			std::lock_guard device_lock(m_device_mutex);
-			m_default_sink_id = pwstrDefaultDeviceId;
-			auto const pos = find_device(m_default_sink_id);
-			if ((m_device_info.end() != pos) && ((*pos)->device_id == m_default_sink_id) && ((*pos)->info.m_id != m_default_sink))
+			co_task_wstr_ptr default_id_str;
+			std::wstring_view default_id;
+			if (pwstrDefaultDeviceId)
 			{
-				m_default_sink = (*pos)->info.m_id;
+				default_id = pwstrDefaultDeviceId;
+			}
+			else
+			{
+				// changing the app setting to "Default" in mixer controls gives a null string here
+				HRESULT const result = get_default_audio_device_id(*m_device_enum.Get(), flow, role, default_id_str);
+				if (FAILED(result))
+					return result;
+				else if (!default_id_str)
+					return E_POINTER;
+				default_id = default_id_str.get();
+			}
 
-				++m_generation;
+			std::lock_guard device_lock(m_device_mutex);
+			if (m_default_sink_id != default_id)
+			{
+				m_default_sink_id = default_id;
+				auto const pos = find_device(m_default_sink_id);
+				if ((m_device_info.end() != pos) && ((*pos)->device_id == m_default_sink_id) && ((*pos)->info.m_id != m_default_sink))
+				{
+					m_default_sink = (*pos)->info.m_id;
+
+					++m_generation;
+				}
 			}
 		}
 		return S_OK;
@@ -1393,7 +1414,6 @@ HRESULT sound_xaudio2::OnPropertyValueChanged(LPCWSTR pwstrDeviceId, PROPERTYKEY
 					return result;
 			}
 		}
-
 		return S_OK;
 	}
 	catch (std::bad_alloc const &)
@@ -1457,7 +1477,7 @@ HRESULT sound_xaudio2::add_device(device_info_vector_iterator pos, LPCWSTR devic
 				result);
 		return result;
 	}
-	if ((DEVICE_STATE_ACTIVE != state) && (DEVICE_STATE_UNPLUGGED != state))
+	if (DEVICE_STATE_ACTIVE != state)
 		return S_OK;
 
 	// add it if it's an output device

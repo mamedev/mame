@@ -86,7 +86,7 @@ private:
 			spa_zero(m_node_listener);
 		}
 	};
-	
+
 	struct stream_info {
 		sound_pipewire *m_wire;
 		bool m_is_output;
@@ -101,7 +101,7 @@ private:
 
 		stream_info(sound_pipewire *wire, bool is_output, uint32_t osdid, uint32_t channels) : m_wire(wire), m_is_output(is_output), m_wait_stream(true), m_osdid(osdid), m_channels(channels), m_stream(nullptr), m_buffer(channels) {}
 	};
-	
+
 	static const pw_core_events     core_events;
 	static const pw_registry_events registry_events;
 	static const pw_node_events     node_events;
@@ -262,7 +262,7 @@ void sound_pipewire::register_node(uint32_t id, const spa_dict *props)
 	m_node_osdid_to_id[m_node_current_id] = id;
 	auto &node = m_nodes.emplace(id, node_info(this, id, m_node_current_id++, type, serial->value, desc ? desc->value : "?", name ? name->value : "?")).first->second;
 
-	//	printf("node %03x: %s %s %s | %s\n", node.m_id, serial->value, typenames[node.m_type], node.m_name.c_str(), node.m_text_id.c_str());
+	//  printf("node %03x: %s %s %s | %s\n", node.m_id, serial->value, typenames[node.m_type], node.m_name.c_str(), node.m_text_id.c_str());
 
 	node.m_node = (pw_node *)pw_registry_bind(m_registry, id, PW_TYPE_INTERFACE_Node, PW_VERSION_NODE, 0);
 	pw_node_add_listener(node.m_node, &node.m_node_listener, &node_events, &node);
@@ -295,7 +295,7 @@ void sound_pipewire::register_port(uint32_t id, const spa_dict *props)
 		port_names[index] = channel ? channel->value : "?";
 
 	m_generation++;
-	//	printf("port %03x.%d %03x: %s\n", node, index, id, port_names[index].c_str());
+	//  printf("port %03x.%d %03x: %s\n", node, index, id, port_names[index].c_str());
 }
 
 void sound_pipewire::register_link(uint32_t id, const spa_dict *props)
@@ -332,7 +332,7 @@ void sound_pipewire::register_link(uint32_t id, const spa_dict *props)
 void sound_pipewire::register_default_metadata(uint32_t id)
 {
 	m_default = (pw_metadata *)pw_registry_bind(m_registry, id, PW_TYPE_INTERFACE_Metadata, PW_VERSION_METADATA, 0);
-	pw_metadata_add_listener(m_default, &m_default_listener, &default_events, this);	
+	pw_metadata_add_listener(m_default, &m_default_listener, &default_events, this);
 }
 
 void sound_pipewire::register_metadata(uint32_t id, const spa_dict *props)
@@ -355,7 +355,7 @@ void sound_pipewire::registry_event_global(uint32_t id,
 	else if(!strcmp(type, PW_TYPE_INTERFACE_Link))
 		register_link(id, props);
 	else {
-		//		printf("type %03x %s\n", id, type);
+		//      printf("type %03x %s\n", id, type);
 	}
 }
 
@@ -439,7 +439,7 @@ void sound_pipewire::node_event_param(node_info *node, int seq, uint32_t id, uin
 			}
 		}
 		m_generation++;
-		
+
 	} else
 		spa_debug_pod(2, nullptr, param);
 }
@@ -462,7 +462,7 @@ int sound_pipewire::default_event_property(uint32_t subject, const char *key, co
 			val = json["name"].GetString();
 	} else
 		val = value;
-	   
+
 	if(!strcmp(key, "default.audio.sink"))
 		m_default_audio_sink = val;
 
@@ -490,7 +490,7 @@ int sound_pipewire::init(osd_interface &osd, osd_options const &options)
 	m_wait_sync = false;
 
 	pw_init(nullptr, nullptr);
- 	m_loop = pw_thread_loop_new(nullptr, nullptr);
+	m_loop = pw_thread_loop_new(nullptr, nullptr);
 	m_context = pw_context_new(pw_thread_loop_get_loop(m_loop), nullptr, 0);
 	m_core = pw_context_connect(m_context, nullptr, 0);
 
@@ -528,7 +528,7 @@ void sound_pipewire::sync()
 {
 	pw_thread_loop_lock(m_loop);
 	m_wait_sync = true;
-	pw_core_sync(m_core, PW_ID_CORE, 0);	
+	pw_core_sync(m_core, PW_ID_CORE, 0);
 	while(m_wait_sync)
 		pw_thread_loop_wait(m_loop);
 	pw_thread_loop_unlock(m_loop);
@@ -670,7 +670,7 @@ uint32_t sound_pipewire::stream_sink_open(uint32_t node, std::string name, uint3
 	auto &stream = m_streams.emplace(id, stream_info(this, true, id, snode.m_sinks)).first->second;
 
 	stream.m_stream = pw_stream_new_simple(pw_thread_loop_get_loop(m_loop),
-										   name.c_str(), 
+										   name.c_str(),
 										   pw_properties_new(PW_KEY_MEDIA_TYPE, "Audio",
 															 PW_KEY_MEDIA_CATEGORY, "Playback",
 															 PW_KEY_MEDIA_ROLE, "Game",
@@ -723,7 +723,7 @@ uint32_t sound_pipewire::stream_source_open(uint32_t node, std::string name, uin
 	auto &stream = m_streams.emplace(id, stream_info(this, false, id, snode.m_sources)).first->second;
 
 	stream.m_stream = pw_stream_new_simple(pw_thread_loop_get_loop(m_loop),
-										   name.c_str(), 
+										   name.c_str(),
 										   pw_properties_new(PW_KEY_MEDIA_TYPE, "Audio",
 															 PW_KEY_MEDIA_CATEGORY, "Record",
 															 PW_KEY_MEDIA_ROLE, "Game",
