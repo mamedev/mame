@@ -550,6 +550,11 @@ ROM_START( jak_ntsc )
 	ROM_LOAD16_WORD_SWAP( "jakkssummercamp.bin", 0x000000, 0x200000, CRC(4b6711a0) SHA1(694eb97be72233adb5de322dfc00633c4db79113) )
 ROM_END
 
+ROM_START( jak_wof2 )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakkswheeloffortun2nd.u4", 0x000000, 0x200000, CRC(9eff79a8) SHA1(342b736aba13705d63f49f58bb3a2ef2505620a4) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -586,6 +591,10 @@ CONS( 2007, jak_potc, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_ini
 CONS( 2006, jak_supm, 0, 0, spg2xx_jakks,  jak_supm,      jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "Superman in Super Villain Showdown (JAKKS Pacific TV Game) (26 Jan 2006 A)", MACHINE_IMPERFECT_SOUND ) // has AT24C04
 
 CONS( 2006, jak_spdv, 0, 0, spg2xx_jakks,  spg2xx_spdv,   jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "The Amazing Spider-Man in Villain Round-Up (JAKKS Pacific TV Game) (24 Apr 2006 A)", MACHINE_IMPERFECT_SOUND )
+
+// the physical 2nd edition does't have a dpad, you need to use the wheel to navigate (although the inputs still work in emulation)
+// test mode button code is unknown (changed from usual HotGen code due to lack of dpad)
+CONS( 2007, jak_wof2, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "Wheel of Fortune - 2nd Edition (JAKKS Pacific TV Game) (Mar 15 2007 PAK2)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2007, jak_pacg, 0, 0, spg2xx_jakks,  spg2xx_pacg,   jakks_state, empty_init, "JAKKS Pacific Inc / Namco / HotGen Ltd", "Arcade Gold featuring Pac-Man (20 APR 2007 A SKU O)", MACHINE_IMPERFECT_SOUND )
 

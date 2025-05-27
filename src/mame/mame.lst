@@ -46665,6 +46665,7 @@ jak_spd3
 jak_spdv
 jak_supm
 jak_wall
+jak_wof2
 
 @source:tvgames/spg2xx_jakks_gkr.cpp
 jak_capc
