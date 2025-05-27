@@ -758,6 +758,7 @@ void ppu_vt3xx_device::read_tile_plane_data(int address, int color)
 		m_read_bg4_bg3 = color;
 		m_whichpixel = 0;
 
+		// used by the rtvgc300 / rtvgc300fz menus, and also 'image match' in lxcmcysp
 		if (m_newvid_1c & 0x04) // high resolution mode
 		{
 			m_planebuf[0] = m_read_onespace_with_relative(recalculate_offsets_16x16x8packed_hires_tile((address + 0) & 0x1fff, 0));
