@@ -934,6 +934,208 @@ inline u8 ppu_vt3xx_device::get_pixel_data(u8* spritepatternbuf, int bpp, int pi
 	return pixel_data;
 }
 
+void ppu_vt3xx_device::draw_sprites_high_res(u8* line_priority)
+{
+	// high res sprite mode uses an entirely different format (and possibly different spriteram)
+	for (int spritenum = 0x00; spritenum < 0x80; spritenum++)
+	{
+		int ypos =    m_spriteram[(spritenum * 8) + 0];
+		int tilenum = m_spriteram[(spritenum * 8) + 1];
+		tilenum |=    m_spriteram[(spritenum * 8) + 2] << 8;
+		int bpp =     m_spriteram[(spritenum * 8) + 3] & 0x80;
+		int xsize =   m_spriteram[(spritenum * 8) + 3] & 0x30;
+		int ysize =   m_spriteram[(spritenum * 8) + 3] & 0x0c;
+		int pal =     m_spriteram[(spritenum * 8) + 6] & 0x3f;
+		int flipx =   m_spriteram[(spritenum * 8) + 6] & 0x40;
+		int flipy =   m_spriteram[(spritenum * 8) + 6] & 0x80;
+		int xpos =    m_spriteram[(spritenum * 8) + 7];
+
+		bpp = bpp >> 7;
+		flipx = flipx >> 6;
+		flipy = flipy >> 7;
+
+		xsize = xsize >> 4;
+		xsize = 4 << xsize;
+		ysize = ysize >> 2;
+		ysize = 4 << ysize;
+
+		if (m_scanline == 128)
+			logerror("high res sprite %d xpos %02x ypos %02x tile %04x pal %02x xsize %d ysize %d bpp %d flipx %d flipy %d\n", spritenum, xpos, ypos, tilenum, pal, xsize, ysize, bpp, flipx, flipy);
+
+	}
+}
+
+void ppu_vt3xx_device::draw_sprites_standard_res(u8* line_priority)
+{
+	/*
+
+	+ 0x000    yyyy yyyy   y = ypos
+	+ 0x080    tttt tttt   t = tile number
+
+	for new format 0  (m_newvid_1d & 0x08 set)
+	+ 0x100    YXpT TTpp   Y = negative Y pos    X = negative X pos    T = high tile number    p = palette
+
+	for new format 1  (m_newvid_1d & 0x08 not set)
+	+ 0x100    fFzT TTpp   f = yflip    F = xflip    T = high tile number    p = palette    z = priority
+
+	+ 0x180    xxxx xxxx   x = xpos
+
+	*/
+
+	// new style sprites
+	for (int spritenum = 0x00; spritenum < 0x80; spritenum++)
+	{
+		const bool is_new_format = m_newvid_1e & 0x04;
+
+		// old packed spriteram format
+		int ypos_table = 0x000;
+		int	xpos_table = 0x003;
+		int	tilenum_table = 0x001;
+		int	extra_table = 0x002;
+		int	table_step = 4;
+
+		// new expanded spriteram format
+		if (m_newvid_1e & 0x04)
+		{
+			ypos_table = 0x000;
+			xpos_table = 0x180;
+			tilenum_table = 0x080;
+			extra_table = 0x100;
+			table_step = 1;
+		}
+
+		const int sprite_table_offset = spritenum * table_step;
+		int pri = 0;
+		int ypos = m_spriteram[ypos_table + sprite_table_offset];
+		int xpos = m_spriteram[xpos_table + sprite_table_offset];
+		int tilenum = m_spriteram[tilenum_table + sprite_table_offset];
+		tilenum |= (m_spriteram[extra_table + sprite_table_offset] & 0x1c) << 6;
+
+		int pal = m_spriteram[extra_table + sprite_table_offset] & 0x03;
+
+		if (m_newvid_1d & 0x08) // format 0
+		{
+			pal |= (m_spriteram[extra_table + sprite_table_offset] & 0x20) >> 3;
+			if (m_spriteram[extra_table + sprite_table_offset] & 0x40)
+			{
+				xpos = -0x100 + xpos; // allows for partially offscreen sprites?
+			}
+
+			// TODO: verify
+			if (m_spriteram[extra_table + sprite_table_offset] & 0x80)
+			{
+				ypos = -0x100 + ypos;
+			}
+		}
+		else // format 1
+		{
+			pri = (m_spriteram[extra_table + sprite_table_offset] & 0x20) >> 5;
+		}
+
+		int height, width, bpp, alt_16_handling;
+
+		if (is_new_format)
+		{
+			height = 16;
+			width = 8;
+			bpp = 8;
+			alt_16_handling = false;
+
+			if (m_newvid_1d & 0x02)
+			{
+				width = 16;
+				bpp = 4;
+			}
+
+			// testing with lxcmcysp later games in the list
+			// 12 09 0f -- 'alt_16_handling'
+			// 22 09 0f -- some games, works
+			// 12 0f 0f -- menu, works
+			// 12 0b 0f -- hercules in red5mam, still broken
+			if ((!(m_newvid_1d & 0x04)) && (m_newvid_1c & 0x10))
+			{
+				alt_16_handling = true;
+				bpp = 4;
+			}
+		}
+		else
+		{
+			// use the old size register in this mode? monster jump in lxcmcysp at least sets it
+			height = (m_regs[PPU_CONTROL0] & PPU_CONTROL0_SPRITE_SIZE) ? 16 : 8;
+			width = 8;
+			bpp = 8;
+			alt_16_handling = false;
+
+			// 12 0f 0b -- tetrtin
+			if ((m_newvid_1c == 0x12) && (m_newvid_1d == 0x0f) && (m_newvid_1e == 0x0b))
+			{
+				// this seems to disagree with only using the old height register in this mode
+				bpp = 4;
+				width = 16;
+				height = 16;
+			}
+		}
+
+		// if the sprite isn't visible, skip it
+		if ((ypos + height <= m_scanline) || (ypos > m_scanline))
+			continue;
+
+		// compute the character's line to draw 
+		const int sprite_line = m_scanline - ypos;
+
+		// a 16 pixel wide sprite (packed format), at 4bpp, requires 8 bytes for a single line
+		// at 16 pixels high it requires 128 bytes for a whole tile
+
+		// sprites can be 8 pixels wide and 8bpp, or 16 pixels wide and 4bpp?
+		int index1;
+
+		if (bpp == 4)
+		{
+			if (alt_16_handling)
+				index1 = tilenum * 32;
+			else
+				index1 = tilenum * 128;
+		}
+		else
+		{
+			index1 = tilenum * 64; // why? a 16 wide 4bpp sprite takes up the same number of bytes as an 8 wide 8bpp sprite
+		}
+
+		int pattern_offset;
+
+		if (alt_16_handling)
+			pattern_offset = index1 + sprite_line * 4;
+		else
+			pattern_offset = index1 + sprite_line * 8;
+
+		pattern_offset += get_newmode_spritebase() * 0x2000;
+
+		u8 spritepatternbuf[8];
+		for (int i = 0; i < 8; i++)
+			spritepatternbuf[i] = m_read_onespace_with_relative(pattern_offset + i);
+
+		if (pri)
+		{
+			for (int pixel = 0; pixel < width; pixel++)
+			{
+				u8 pixel_data = get_pixel_data(spritepatternbuf, bpp, pixel);
+				if (xpos + pixel >= 0)
+					draw_extended_sprite_pixel_low(m_bitmap, pixel_data, pixel, xpos, pal, bpp, line_priority);
+			}
+		}
+		else
+		{
+			for (int pixel = 0; pixel < width; pixel++)
+			{
+				u8 pixel_data = get_pixel_data(spritepatternbuf, bpp, pixel);
+				if (xpos + pixel >= 0)
+					draw_extended_sprite_pixel_high(m_bitmap, pixel_data, pixel, xpos, pal, bpp, line_priority);
+			}
+
+		}
+	}
+}
+
 void ppu_vt3xx_device::draw_sprites(u8* line_priority)
 {
 	if (!m_newvid_1e)
@@ -942,172 +1144,13 @@ void ppu_vt3xx_device::draw_sprites(u8* line_priority)
 	}
 	else
 	{
-		/*
-
-		+ 0x000    yyyy yyyy   y = ypos
-		+ 0x080    tttt tttt   t = tile number
-
-		for new format 0  (m_newvid_1d & 0x08 set)
-		+ 0x100    YXpT TTpp   Y = negative Y pos    X = negative X pos    T = high tile number    p = palette
-
-		for new format 1  (m_newvid_1d & 0x08 not set)
-		+ 0x100    fFzT TTpp   f = yflip    F = xflip    T = high tile number    p = palette    z = priority
-
-		+ 0x180    xxxx xxxx   x = xpos
-
-		*/
-
-		// new style sprites
-		for (int spritenum = 0x00; spritenum < 0x80; spritenum++)
+		if (m_newvid_1c & 0x04) // high resolution mode
 		{
-			const bool is_new_format = m_newvid_1e & 0x04;
-
-			// old packed spriteram format
-			int ypos_table = 0x000;
-			int	xpos_table = 0x003;
-			int	tilenum_table = 0x001;
-			int	extra_table = 0x002;
-			int	table_step = 4;
-
-			// new expanded spriteram format
-			if (m_newvid_1e & 0x04)
-			{
-				ypos_table = 0x000;
-				xpos_table = 0x180;
-				tilenum_table = 0x080;
-				extra_table = 0x100;
-				table_step = 1;
-			}
-
-			const int sprite_table_offset = spritenum * table_step;
-			int pri = 0;
-			int ypos = m_spriteram[ypos_table + sprite_table_offset];
-			int xpos = m_spriteram[xpos_table + sprite_table_offset];
-			int tilenum = m_spriteram[tilenum_table + sprite_table_offset];
-			tilenum |= (m_spriteram[extra_table + sprite_table_offset] & 0x1c) << 6;
-
-			int pal = m_spriteram[extra_table + sprite_table_offset] & 0x03;
-
-			if (m_newvid_1d & 0x08) // format 0
-			{
-				pal |= (m_spriteram[extra_table + sprite_table_offset] & 0x20) >> 3;
-				if (m_spriteram[extra_table + sprite_table_offset] & 0x40)
-				{
-					xpos = -0x100 + xpos; // allows for partially offscreen sprites?
-				}
-
-				// TODO: verify
-				if (m_spriteram[extra_table + sprite_table_offset] & 0x80)
-				{
-					ypos = -0x100 + ypos;
-				}
-			}
-			else // format 1
-			{
-				pri = (m_spriteram[extra_table + sprite_table_offset] & 0x20) >> 5;
-			}
-
-			int height, width, bpp, alt_16_handling;
-
-			if (is_new_format)
-			{
-				height = 16;
-				width = 8;
-				bpp = 8;
-				alt_16_handling = false;
-
-				if (m_newvid_1d & 0x02)
-				{
-					width = 16;
-					bpp = 4;
-				}
-
-				// testing with lxcmcysp later games in the list
-				// 12 09 0f -- 'alt_16_handling'
-				// 22 09 0f -- some games, works
-				// 12 0f 0f -- menu, works
-				// 12 0b 0f -- hercules in red5mam, still broken
-				if ((!(m_newvid_1d & 0x04)) && (m_newvid_1c & 0x10))
-				{
-					alt_16_handling = true;
-					bpp = 4;
-				}
-			}
-			else
-			{
-				// use the old size register in this mode? monster jump in lxcmcysp at least sets it
-				height = (m_regs[PPU_CONTROL0] & PPU_CONTROL0_SPRITE_SIZE) ? 16 : 8;
-				width = 8;
-				bpp = 8;
-				alt_16_handling = false;
-
-				// 12 0f 0b -- tetrtin
-				if ((m_newvid_1c == 0x12) && (m_newvid_1d == 0x0f) && (m_newvid_1e == 0x0b))
-				{
-					// this seems to disagree with only using the old height register in this mode
-					bpp = 4;
-					width = 16;
-					height = 16;
-				}
-			}
-
-			// if the sprite isn't visible, skip it
-			if ((ypos + height <= m_scanline) || (ypos > m_scanline))
-				continue;
-
-			// compute the character's line to draw 
-			const int sprite_line = m_scanline - ypos;
-
-			// a 16 pixel wide sprite (packed format), at 4bpp, requires 8 bytes for a single line
-			// at 16 pixels high it requires 128 bytes for a whole tile
-
-			// sprites can be 8 pixels wide and 8bpp, or 16 pixels wide and 4bpp?
-			int index1;
-
-			if (bpp == 4)
-			{
-				if (alt_16_handling)
-					index1 = tilenum * 32;
-				else
-					index1 = tilenum * 128;
-			}
-			else
-			{
-				index1 = tilenum * 64; // why? a 16 wide 4bpp sprite takes up the same number of bytes as an 8 wide 8bpp sprite
-			}
-
-			int pattern_offset;
-
-			if (alt_16_handling)
-				pattern_offset = index1 + sprite_line * 4;
-			else
-				pattern_offset = index1 + sprite_line * 8;
-
-			pattern_offset += get_newmode_spritebase() * 0x2000;
-
-			u8 spritepatternbuf[8];
-			for (int i = 0; i < 8; i++)
-				spritepatternbuf[i] = m_read_onespace_with_relative(pattern_offset + i);
-	
-			if (pri)
-			{
-				for (int pixel = 0; pixel < width; pixel++)
-				{
-					u8 pixel_data = get_pixel_data(spritepatternbuf, bpp, pixel);
-					if (xpos + pixel >= 0)
-						draw_extended_sprite_pixel_low(m_bitmap, pixel_data, pixel, xpos, pal, bpp, line_priority);
-				}
-			}
-			else
-			{
-				for (int pixel = 0; pixel < width; pixel++)
-				{
-					u8 pixel_data = get_pixel_data(spritepatternbuf, bpp, pixel);
-					if (xpos + pixel >= 0)
-						draw_extended_sprite_pixel_high(m_bitmap, pixel_data, pixel, xpos, pal, bpp, line_priority);
-				}
-
-			}
+			draw_sprites_high_res(line_priority);
+		}
+		else
+		{
+			draw_sprites_standard_res(line_priority);
 		}
 	}
 }

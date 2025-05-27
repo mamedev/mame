@@ -52,6 +52,8 @@ protected:
 	u8 vt369_6000_r(offs_t offset);
 	void vt369_6000_w(offs_t offset, u8 data);
 
+	void highres_sprite_dma_w(u8 data);
+
 	void vt369_soundcpu_control_w(offs_t offset, u8 data);
 	void vt369_4112_bank6000_select_w(offs_t offset, u8 data);
 	void vt369_411c_bank6000_enable_w(offs_t offset, u8 data);

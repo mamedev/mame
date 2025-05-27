@@ -78,6 +78,8 @@ public:
 	auto int_callback() { return m_int_callback.bind(); }
 
 	void spriteram_dma(address_space &space, const u8 page);
+	void set_spriteram_value(offs_t offset, u8 data) { m_spriteram[offset] = data; }
+
 	void render(bitmap_rgb32 &bitmap, bool flipx, bool flipy, int sx, int sy, const rectangle &cliprect);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

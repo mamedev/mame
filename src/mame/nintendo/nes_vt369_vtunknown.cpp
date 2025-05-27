@@ -730,12 +730,16 @@ ROM_START( rtvgc300 )
 	ROM_REGION( 0x8000000, "mainrom", 0 )
 	// some of the higher address lines might be swapped
 	ROM_LOAD( "lexibook300.bin", 0x00000, 0x4000000, CRC(015c4067) SHA1(a12986c4a366a23c4c7ca7b3d33e421a8dfdffc0) )
+
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
 ROM_START( rtvgc300fz )
 	ROM_REGION( 0x8000000, "mainrom", 0 )
 	// some of the higher address lines might be swapped
 	ROM_LOAD( "jg7800fz.bin", 0x00000, 0x4000000, CRC(c9d319d2) SHA1(9d0d1435b802f63ce11b94ce54d11f4065b324cc) )
+
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
 
@@ -1192,8 +1196,8 @@ CONS( 200?, lxcmcy,    0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty
 CONS( 2012, dgun2561,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init, "dreamGEAR", "My Arcade Portable Gaming System with 140 Games (DGUN-2561)", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
 
 // GB-NO13-Main-VT389-2 on PCBs - uses higher resolution mode (twice usual h-res?)
-CONS( 2016, rtvgc300,  0,  0,  vt36x_16mb, vt369, vt36x_state, empty_init,    "Lexibook", "Retro TV Game Console - 300 Games", MACHINE_NOT_WORKING )
-CONS( 2017, rtvgc300fz,0,  0,  vt36x_16mb, vt369, vt36x_state, empty_init,    "Lexibook", "Retro TV Game Console - Frozen - 300 Games", MACHINE_NOT_WORKING )
+CONS( 2016, rtvgc300,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Retro TV Game Console - 300 Games", MACHINE_NOT_WORKING )
+CONS( 2017, rtvgc300fz,0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Retro TV Game Console - Frozen - 300 Games", MACHINE_NOT_WORKING )
 
 
 /* The following are also confirmed to be NES/VT derived units, most having a standard set of games with a handful of lazy graphic mods thrown in to fit the unit theme

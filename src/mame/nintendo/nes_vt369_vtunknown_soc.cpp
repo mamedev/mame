@@ -199,6 +199,21 @@ void vt3xx_soc_base_device::alu_w(offs_t offset, u8 data)
 	}
 }
 
+void vt3xx_soc_base_device::highres_sprite_dma_w(u8 data)
+{
+	// is this correct? the rtvgc300 / rtvgc300fz don't appear to transfer the
+	// sprite data from main RAM to sprite RAM in any other way.
+	//
+	// do the high res sprites use their own spriteram, or does this go to the
+	// standard PPU spriteram?
+
+	for (int i = 0; i < 0x200; i++)
+	{
+		u8 read_data = m_maincpu->space(AS_PROGRAM).read_byte((data << 8) + i);
+		m_ppu->set_spriteram_value(i, read_data);
+	}
+}
+
 void vt3xx_soc_base_device::vt369_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram(); // 8k RAM?
@@ -288,6 +303,8 @@ void vt3xx_soc_base_device::vt369_map(address_map &map)
 	map(0x41b0, 0x41bf).r(FUNC(vt3xx_soc_base_device::vt369_41bx_r)).w(FUNC(vt3xx_soc_base_device::vt369_41bx_w));
 
 	map(0x41e6, 0x41e6).w(FUNC(vt3xx_soc_base_device::extra_io_41e6_w)); // banking on red5mam
+
+	map(0x4201, 0x4201).w(FUNC(vt3xx_soc_base_device::highres_sprite_dma_w));
 
 	// 4304
 
