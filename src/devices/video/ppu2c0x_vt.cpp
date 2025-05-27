@@ -938,30 +938,92 @@ inline u8 ppu_vt3xx_device::get_pixel_data(u8* spritepatternbuf, int bpp, int pi
 void ppu_vt3xx_device::draw_sprites_high_res(u8* line_priority)
 {
 	// high res sprite mode uses an entirely different format (and possibly different spriteram)
-	for (int spritenum = 0x00; spritenum < 0x80; spritenum++)
+	for (int spritenum = 0x00; spritenum < 0x40; spritenum++)
 	{
-		int ypos =    m_spriteram[(spritenum * 8) + 0];
+		int ypos = m_spriteram[(spritenum * 8) + 0];
 		int tilenum = m_spriteram[(spritenum * 8) + 1];
-		tilenum |=    m_spriteram[(spritenum * 8) + 2] << 8;
-		int bpp =     m_spriteram[(spritenum * 8) + 3] & 0x80;
-		int xsize =   m_spriteram[(spritenum * 8) + 3] & 0x30;
-		int ysize =   m_spriteram[(spritenum * 8) + 3] & 0x0c;
-		int pal =     m_spriteram[(spritenum * 8) + 6] & 0x3f;
-		int flipx =   m_spriteram[(spritenum * 8) + 6] & 0x40;
-		int flipy =   m_spriteram[(spritenum * 8) + 6] & 0x80;
-		int xpos =    m_spriteram[(spritenum * 8) + 7];
+		tilenum |= m_spriteram[(spritenum * 8) + 2] << 8;
+		int bpp = m_spriteram[(spritenum * 8) + 3] & 0x80;
+		int width = m_spriteram[(spritenum * 8) + 3] & 0x30;
+		int height = m_spriteram[(spritenum * 8) + 3] & 0x0c;
+		int pal = m_spriteram[(spritenum * 8) + 6] & 0x3f;
+		//int flipx = m_spriteram[(spritenum * 8) + 6] & 0x40;
+		//int flipy = m_spriteram[(spritenum * 8) + 6] & 0x80;
+		int xpos = m_spriteram[(spritenum * 8) + 7];
 
-		bpp = bpp >> 7;
-		flipx = flipx >> 6;
-		flipy = flipy >> 7;
+		if (bpp)
+			bpp = 8;
+		else
+			bpp = 4;
 
-		xsize = xsize >> 4;
-		xsize = 4 << xsize;
-		ysize = ysize >> 2;
-		ysize = 4 << ysize;
+		//flipx = flipx >> 6;
+		//flipy = flipy >> 7;
 
-		if (m_scanline == 128)
-			logerror("high res sprite %d xpos %02x ypos %02x tile %04x pal %02x xsize %d ysize %d bpp %d flipx %d flipy %d\n", spritenum, xpos, ypos, tilenum, pal, xsize, ysize, bpp, flipx, flipy);
+		width = width >> 4;
+		width = 4 << width;
+		height = height >> 2;
+		height = 4 << height;
+
+		//if (m_scanline == 128)
+		//	logerror("high res sprite %d xpos %02x ypos %02x tile %04x pal %02x xsize %d ysize %d bpp %d flipx %d flipy %d\n", spritenum, xpos, ypos, tilenum, pal, width, height, bpp, flipx, flipy);
+
+		// if the sprite isn't visible, skip it
+		if ((ypos + height <= m_scanline) || (ypos > m_scanline))
+			continue;
+
+		// compute the character's line to draw 
+		const int sprite_line = m_scanline - ypos;
+
+		int pattern_offset;
+		if (bpp == 4)
+		{
+			pattern_offset = tilenum * (0x20 * width);
+			pattern_offset += sprite_line * (0x2 * width);
+		}
+		else
+		{
+			pattern_offset = tilenum * (0x40 * width);
+			pattern_offset += sprite_line * (0x4 * width);
+		}
+
+		pattern_offset += get_newmode_spritebase() * 0x2000;
+
+		for (int pixel = 0; pixel < width; pixel++)
+		{
+			u8 pixel_data;
+
+			if (bpp == 4)
+			{
+				/*
+				pixel_data = m_read_onespace_with_relative(pattern_offset + (pixel >> 1));
+				if (pixel & 1)
+					pixel_data >>= 4;
+				else
+					pixel_data &= 0xf;
+				*/
+				// we're pretending this isn't high-res so skipping pixels
+				pixel_data = m_read_onespace_with_relative(pattern_offset + pixel);
+				pixel_data &= 0xf;
+			}
+			else
+			{
+				//pixel_data = m_read_onespace_with_relative(pattern_offset + pixel);
+				// we're pretending this isn't high-res so skipping pixels
+				pixel_data = m_read_onespace_with_relative(pattern_offset + (pixel * 2));
+			}
+
+			if (xpos + pixel >= 0)
+			{
+				if (pixel_data) // opaque check
+				{
+					if ((xpos + pixel) < VISIBLE_SCREEN_WIDTH)
+					{
+						const rgb_t palval = get_pen_value(pixel_data, bpp, pal);
+						m_bitmap.pix(m_scanline, xpos + pixel) = palval;
+					}
+				}
+			}
+		}
 
 	}
 }
