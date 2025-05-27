@@ -5128,8 +5128,8 @@ ROM_START( uchitari )
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "uchitari.melody", 0x000, 0x100, BAD_DUMP CRC(28041942) SHA1(a36e246b215499b7392c28fddf1aad499016a480) ) // decap needed for verification
 
-	ROM_REGION( 98301, "screen", 0)
-	ROM_LOAD( "uchitari.svg", 0, 98301, CRC(584a5ce4) SHA1(6971c6aee3ccb3acd3ea52d2ef0edf740db3c56d) )
+	ROM_REGION( 98294, "screen", 0)
+	ROM_LOAD( "uchitari.svg", 0, 98294, CRC(f84b9d59) SHA1(a05713d571824d11f037b7592c0d280e418dc8b3) )
 ROM_END
 
 

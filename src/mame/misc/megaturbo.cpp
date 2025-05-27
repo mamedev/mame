@@ -89,7 +89,6 @@ private:
 	// i8031
 	uint8_t unk_port_r();
 	void unk_port_w(uint8_t data);
-
 };
 
 
@@ -136,14 +135,14 @@ void megaturbo2_state::main_map(address_map &map)
 {
 	map(0x00000, 0x03fff).ram();
 	map(0x20000, 0x207ff).ram();
-	
+
 	map(0x2c000, 0x2cfff).ram();
-	
+
 	map(0x30400, 0x30fff).ram();  // some device
 	map(0x38000, 0x38003).ram();  // some device
-	
+
 	map(0x38300, 0x38300).r(FUNC(megaturbo2_state::unk1_r));
-	
+
 	map(0x48000, 0x48001).ram();  // some device
 	map(0xd0000, 0xdffff).rom();  // u17 - u18 ???
 
@@ -247,7 +246,7 @@ void megaturbo2_state::megaturbo2(machine_config &config)
 	I80188(config, m_maincpu, CPU_CLOCK / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &megaturbo2_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &megaturbo2_state::main_io_map);
-	
+
 	I8031(config, m_mcu, MCU_CLOCK);
 	m_mcu->set_addrmap(AS_PROGRAM, &megaturbo2_state::mem_prg);
 	m_mcu->set_addrmap(AS_IO, &megaturbo2_state::mem_io);
@@ -292,5 +291,5 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-//    YEAR  NAME        PARENT   MACHINE      INPUT       CLASS             INIT        ROT   COMPANY              FULLNAME         FLAGS
-GAME( 1991, megaturbo,  0,       megaturbo2,  megaturbo2, megaturbo2_state, empty_init, ROT0, "Premier Tecnology", "Mega Turbo 2",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME        PARENT   MACHINE      INPUT       CLASS             INIT        ROT   COMPANY               FULLNAME         FLAGS
+GAME( 1991, megaturbo,  0,       megaturbo2,  megaturbo2, megaturbo2_state, empty_init, ROT0, "Premier Technology", "Mega Turbo 2",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
