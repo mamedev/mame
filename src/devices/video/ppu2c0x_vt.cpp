@@ -977,13 +977,13 @@ void ppu_vt3xx_device::draw_sprites_high_res(u8* line_priority)
 		int pattern_offset;
 		if (bpp == 4)
 		{
-			pattern_offset = tilenum * (0x20 * width);
-			pattern_offset += sprite_line * (0x2 * width);
+			pattern_offset = tilenum * (2 * height * width);
+			pattern_offset += sprite_line * (2 * width);
 		}
 		else
 		{
-			pattern_offset = tilenum * (0x40 * width);
-			pattern_offset += sprite_line * (0x4 * width);
+			pattern_offset = tilenum * (4 * height * width);
+			pattern_offset += sprite_line * (4 * width);
 		}
 
 		pattern_offset += get_newmode_spritebase() * 0x2000;
