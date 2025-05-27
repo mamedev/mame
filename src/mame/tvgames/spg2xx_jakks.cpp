@@ -25,6 +25,7 @@ public:
 	void jakks_mpaco(machine_config& config);
 	void jakks_mpac(machine_config& config);
 	void jakks_rapm(machine_config& config);
+	void jakks_sesa(machine_config& config);
 
 private:
 	void mem_map_2m_mkram(address_map &map) ATTR_COLD;
@@ -35,9 +36,9 @@ private:
 void jakks_state::portc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (BIT(mem_mask, 1))
-		m_i2cmem->write_scl(BIT(data, 1));
+		if (m_i2cmem) m_i2cmem->write_scl(BIT(data, 1));
 	if (BIT(mem_mask, 0))
-		m_i2cmem->write_sda(BIT(data, 0));
+		if (m_i2cmem) m_i2cmem->write_sda(BIT(data, 0));
 }
 
 static INPUT_PORTS_START( batman )
@@ -192,6 +193,28 @@ static INPUT_PORTS_START( jak_mpaco )
 	PORT_BIT(0x03ff, 0x0000, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(100) PORT_MINMAX(0x00,0x03ff)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( spg2xx_sesa )
+	PORT_START("P1")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_UNUSED ) 
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("Red Button")
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("Blue Button")
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Menu / Pause")
+	PORT_BIT( 0x000f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P3")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNUSED ) // no SEEPROM on this
+	PORT_BIT( 0x0006, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // PAL/NTSC flag, set to PAL
+	PORT_BIT( 0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( jak_mpac )
 	PORT_INCLUDE( jak_mpaco )
 
@@ -247,6 +270,51 @@ static INPUT_PORTS_START( spg2xx_pacg )
 	PORT_BIT( 0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( spg2xx_gdg )
+	PORT_START("P1")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_NAME("Joypad Up")
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_NAME("Joypad Down")
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_NAME("Joypad Left")
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_NAME("Joypad Right")
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(1) PORT_NAME("A Button")
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNUSED )  
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Menu / Pause")
+	PORT_BIT( 0x000f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P3")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNUSED ) // no SEEPROM on this
+	PORT_BIT( 0x0006, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PAL/NTSC flag, set to NTSC (unverified here)
+	PORT_BIT( 0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( spg2xx_ntoonsc )
+	PORT_START("P1")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Menu / Pause")
+	PORT_BIT( 0x000f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P3")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::read_sda))
+	PORT_BIT( 0x0006, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PAL/NTSC flag, set to NTSC (unverified here)
+	PORT_BIT( 0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+
 void jakks_state::base_config(machine_config& config)
 {
 	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
@@ -276,6 +344,21 @@ void jakks_state::spg2xx_dpma(machine_config& config)
 	m_maincpu->portc_out().set(FUNC(jakks_state::portc_w));
 	m_maincpu->set_addrmap(AS_PROGRAM, &jakks_state::mem_map_2m);
 }
+
+void jakks_state::jakks_sesa(machine_config& config)
+{
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	spg2xx_base(config);
+
+	m_maincpu->set_pal(true);
+	m_screen->set_refresh_hz(50);
+
+	m_maincpu->porta_in().set(FUNC(jakks_state::base_porta_r));
+	m_maincpu->portc_in().set_ioport("P3");
+	m_maincpu->portc_out().set(FUNC(jakks_state::portc_w));
+	m_maincpu->set_addrmap(AS_PROGRAM, &jakks_state::mem_map_2m);
+}
+
 
 
 void jakks_state::mem_map_2m_mkram(address_map &map)
@@ -442,6 +525,30 @@ ROM_START( jak_hsm )
 	ROM_LOAD16_WORD_SWAP( "jakkshighschoolmusical.u3", 0x000000, 0x400000, CRC(ad83549a) SHA1(1d198209055e418402c9f3f389bccde156ca5a43) )
 ROM_END
 
+ROM_START( jak_ctah )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakkscheetahgirls.u4", 0x000000, 0x400000, CRC(cab222c2) SHA1(2fda5599d86850ffaaa35824c7788d153bd1d615) )
+ROM_END
+
+ROM_START( jak_dwa )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakksdorawa.u3", 0x000000, 0x200000, CRC(fd519d3a) SHA1(a68a0dca5b722d83258c452a1c9243d4e9cb9de0) )
+ROM_END
+
+ROM_START( jak_gdg )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakksgodiegogo.u4", 0x000000, 0x200000, CRC(eaffbf9f) SHA1(7a415b817c8fed44569e1b66a42e80de9a81d4de) )
+ROM_END
+
+ROM_START( jak_sesa )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakkssesamestreet.u2", 0x000000, 0x400000, CRC(bae5f43a) SHA1(24e7875cea236e51c10013a33cc41f3c1816514c) )
+ROM_END
+
+ROM_START( jak_ntsc )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakkssummercamp.bin", 0x000000, 0x200000, CRC(4b6711a0) SHA1(694eb97be72233adb5de322dfc00633c4db79113) )
+ROM_END
 
 } // anonymous namespace
 
@@ -490,7 +597,11 @@ CONS( 2007, jak_spd3, 0, 0, spg2xx_jakks,  jak_spd3,      jakks_state, empty_ini
 
 CONS( 2007, jak_cind, 0, 0, spg2xx_jakks,  spg2xx_pacg,   jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Cinderella - Once Upon a Midnight (JAKKS Pacific TV Game) (Aug 29 2007 11:15:55)", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2007, jak_slpb, 0, 0, spg2xx_jakks,  spg2xx_pacg,   jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Sleeping Beauty - Tales of Enchantment (JAKKS Pacific TV Game) (Sep 17 2007 14:45:02)", MACHINE_IMPERFECT_SOUND )
+CONS( 2007, jak_slpb, 0, 0, spg2xx_jakks,  spg2xx_pacg,   jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",  "Sleeping Beauty - Tales of Enchantment (JAKKS Pacific TV Game) (Sep 17 2007 14:45:02)", MACHINE_IMPERFECT_SOUND )
+
+// from a PAL unit, and seems to have timing issues on the audio (speech cutting off / starting before previous has finished) when using an NTSC machine config, so maybe the NTSC ROM is different?
+// test mode combination isn't the usual HotGen one, but can be accessed by setting a breakpoint at 0xa6ba and setting r2 to 0x0a - TODO: figure out combination so version can be checked against an NTSC unit.
+CONS( 2006, jak_sesa, 0, 0, jakks_sesa,    spg2xx_sesa,   jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",  "Sesame Street Beat (JAKKS Pacific TV Game) (Aug 23 2006 19:12:03, PAL/UK)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2005, jak_powr, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Power Rangers S.P.D. (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
 
@@ -498,9 +609,17 @@ CONS( 2006, jak_pix,  0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_ini
 
 CONS( 2007, jak_hsm,  0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "High School Musical (JAKKS Pacific TV Game) (Dec 19 2007 17:08:20)", MACHINE_IMPERFECT_SOUND )
 
+CONS( 2007, jak_ctah, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "The Cheetah Girls - Passport to Fame (JAKKS Pacific TV Game) (Aug 1 2007 10:32:50)", MACHINE_IMPERFECT_SOUND )
+
 // menu sounds don't work until you go into a game (work after a reset, bad default initializations?)
-CONS( 2006, jak_shrk , 0, 0, spg2xx_jakks, spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Dreamworks Shrek / Over The Hedge (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
+CONS( 2006, jak_shrk, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Dreamworks Shrek / Over The Hedge (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2006, jak_marv , 0, 0, spg2xx_jakks, spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Marvel Heroes: Ultimate Action (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
+CONS( 2006, jak_marv, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Marvel Heroes: Ultimate Action (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2006, jak_dpma,  0, 0, spg2xx_dpma,  spg2xx_dpma,   jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Disney Princess Magical Adventures (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
+CONS( 2006, jak_ntsc, 0, 0, spg2xx_jakks,  spg2xx_ntoonsc,jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Nicktoons - Summer Camp (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2006, jak_dpma, 0, 0, spg2xx_dpma,  spg2xx_dpma,    jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Disney Princess Magical Adventures (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2007, jak_dwa,  0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Dora the Explorer - Dora's World Adventure! (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2006, jak_gdg,  0, 0, spg2xx_dpma,   spg2xx_gdg,    jakks_state, empty_init, "JAKKS Pacific Inc / 1st Playable Productions",  "Go Diego Go! (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
