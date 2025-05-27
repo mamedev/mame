@@ -807,7 +807,7 @@ void nes_vt02_vt03_soc_device::scrambled_8000_w(u16 offset, u8 data)
 	else if ((addr >= 0xa000) && (addr < 0xc000) && !(addr & 0x01))
 	{
 		// Mirroring
-		m_410x[0x6] &= 0xFE;
+		m_410x[0x6] &= 0xfe;
 		m_410x[0x6] |= data & 0x01;
 	}
 	else if ((addr >= 0xa000) && (addr < 0xc000) && (addr & 0x01))
