@@ -179,7 +179,6 @@ public:
 
 	void vt369_unk(machine_config& config);
 	void vt369_unk_1mb(machine_config& config);
-	void vt369_unk_4mb(machine_config& config);
 	void vt369_unk_16mb(machine_config& config);
 
 };
@@ -479,13 +478,6 @@ void vt36x_state::vt369_unk_1mb(machine_config& config)
 	vt369_unk(config);
 	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_1mbyte);
 }
-
-void vt36x_state::vt369_unk_4mb(machine_config& config)
-{
-	vt369_unk(config);
-	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_4mbyte);
-}
-
 
 
 // New mystery handheld architecture, VTxx derived
@@ -1316,7 +1308,7 @@ CONS( 201?, rd5_240,    0,        0,  vt36x_8mb, vt369, vt36x_state, empty_init,
 CONS( 201?, hkb502,   0,      0,  vt36x_4mb, vt369, vt36x_state, empty_init, "<unknown>", "HKB-502 268-in-1 (set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 201?, hkb502a,  hkb502, 0,  vt36x_4mb, vt369, vt36x_state, empty_init, "<unknown>", "HKB-502 268-in-1 (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 // similar to above, fewer games in menu
-CONS( 2021, unk128vt, 0,      0,  vt369_unk_4mb, vt369, vt36x_state, empty_init, "<unknown>", "unknown VT369 based 128-in-1 (GC31-369-20210702-V2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2021, unk128vt, 0,      0,  vt36x_4mb, vt369, vt36x_state, empty_init, "<unknown>", "unknown VT369 based 128-in-1 (GC31-369-20210702-V2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // uses a LCD with resolution of 160x128 (image scaled to fit for some games, others run natively at 160x128)
 // contains a protection chip, command 80 XX returns a byte
@@ -1332,7 +1324,7 @@ CONS( 201?, myarccn,   0, 0,  vt36x_1mb, vt369, vt36x_state, empty_init, "DreamG
 CONS( 201?, denv150,   0,        0,  vt36x_8mb, vt369, vt36x_state, empty_init, "Denver", "Denver Game Console GMP-240C 150-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 201?, egame150,  denv150,  0,  vt36x_8mb, vt369, vt36x_state, empty_init, "<unknown>", "E-Game! 150-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
-// uncertain, uses SPI ROM so probably VT369, has extra protection?
+// uncertain, uses SPI ROM so probably VT369, has extra protection? (but RAM test goes up to 0x2000, over the internal ROM area?)
 CONS( 2017, otrail,     0,        0,  vt369_unk_1mb, vt369, vt36x_state, empty_init, "Basic Fun", "The Oregon Trail", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // has extra protection?

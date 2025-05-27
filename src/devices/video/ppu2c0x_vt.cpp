@@ -732,6 +732,21 @@ offs_t ppu_vt3xx_device::recalculate_offsets_8x8x8packed_tile(int address, int v
 	return finaladdr + finaloffset;
 }
 
+offs_t ppu_vt3xx_device::recalculate_offsets_16x16x8packed_hires_tile(int address, int va34)
+{
+	int finaladdr = get_newmode_tilebase() * 0x2000;
+	int colorbits = get_m_read_bg4_bg3();
+	int tileline = address & 0x0007;
+	int tileplane = address & 0x0008;
+	int tilenum = (address & 0x0ff0) >> 4;
+	int finaloffset = tilenum * 0x100;
+	finaloffset += tileline * 0x20; // 0x10 are the odd lines, we currently only fetch even as we're pretending these are 8x8
+	finaloffset += va34; // 3 bits
+	finaloffset += tileplane; // 1 bit
+	finaloffset += colorbits * 0x10000;
+	return finaladdr + finaloffset;
+}
+
 void ppu_vt3xx_device::read_tile_plane_data(int address, int color)
 {
 	if (!m_newvid_1e)
@@ -741,26 +756,47 @@ void ppu_vt3xx_device::read_tile_plane_data(int address, int color)
 	else
 	{
 		m_read_bg4_bg3 = color;
-
 		m_whichpixel = 0;
 
-		if ((m_newvid_1c & 0x03) == 0x02)
+		if (m_newvid_1c & 0x04) // high resolution mode
 		{
-			m_planebuf[0] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 0) & 0x1fff, 0));
-			m_planebuf[1] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 8) & 0x1fff, 0));
-			m_planebuf[2] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 0) & 0x1fff, 1));
-			m_planebuf[3] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 8) & 0x1fff, 1));
-			m_planebuf[4] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 0) & 0x1fff, 2));
-			m_planebuf[5] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 8) & 0x1fff, 2));
-			m_planebuf[6] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 0) & 0x1fff, 3));
-			m_planebuf[7] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 8) & 0x1fff, 3));
+			m_planebuf[0] = m_read_onespace_with_relative(recalculate_offsets_16x16x8packed_hires_tile((address + 0) & 0x1fff, 0));
+			m_planebuf[1] = m_read_onespace_with_relative(recalculate_offsets_16x16x8packed_hires_tile((address + 8) & 0x1fff, 0));
+			m_planebuf[2] = m_read_onespace_with_relative(recalculate_offsets_16x16x8packed_hires_tile((address + 0) & 0x1fff, 1));
+			m_planebuf[3] = m_read_onespace_with_relative(recalculate_offsets_16x16x8packed_hires_tile((address + 8) & 0x1fff, 1));
+			m_planebuf[4] = m_read_onespace_with_relative(recalculate_offsets_16x16x8packed_hires_tile((address + 0) & 0x1fff, 2));
+			m_planebuf[5] = m_read_onespace_with_relative(recalculate_offsets_16x16x8packed_hires_tile((address + 8) & 0x1fff, 2));
+			m_planebuf[6] = m_read_onespace_with_relative(recalculate_offsets_16x16x8packed_hires_tile((address + 0) & 0x1fff, 3));
+			m_planebuf[7] = m_read_onespace_with_relative(recalculate_offsets_16x16x8packed_hires_tile((address + 8) & 0x1fff, 3));
+			m_planebuf[8] = m_read_onespace_with_relative(recalculate_offsets_16x16x8packed_hires_tile((address + 0) & 0x1fff, 4));
+			m_planebuf[9] = m_read_onespace_with_relative(recalculate_offsets_16x16x8packed_hires_tile((address + 8) & 0x1fff, 4));
+			m_planebuf[10] = m_read_onespace_with_relative(recalculate_offsets_16x16x8packed_hires_tile((address + 0) & 0x1fff, 5));
+			m_planebuf[11] = m_read_onespace_with_relative(recalculate_offsets_16x16x8packed_hires_tile((address + 8) & 0x1fff, 5));
+			m_planebuf[12] = m_read_onespace_with_relative(recalculate_offsets_16x16x8packed_hires_tile((address + 0) & 0x1fff, 6));
+			m_planebuf[13] = m_read_onespace_with_relative(recalculate_offsets_16x16x8packed_hires_tile((address + 8) & 0x1fff, 6));
+			m_planebuf[14] = m_read_onespace_with_relative(recalculate_offsets_16x16x8packed_hires_tile((address + 0) & 0x1fff, 7));
+			m_planebuf[15] = m_read_onespace_with_relative(recalculate_offsets_16x16x8packed_hires_tile((address + 8) & 0x1fff, 7));
 		}
 		else
 		{
-			m_planebuf[0] = m_read_onespace_with_relative(recalculate_offsets_8x8x4packed_tile((address + 0) & 0x1fff, 0));
-			m_planebuf[1] = m_read_onespace_with_relative(recalculate_offsets_8x8x4packed_tile((address + 8) & 0x1fff, 0));
-			m_planebuf[2] = m_read_onespace_with_relative(recalculate_offsets_8x8x4packed_tile((address + 0) & 0x1fff, 1));
-			m_planebuf[3] = m_read_onespace_with_relative(recalculate_offsets_8x8x4packed_tile((address + 8) & 0x1fff, 1));
+			if ((m_newvid_1c & 0x03) == 0x02)
+			{
+				m_planebuf[0] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 0) & 0x1fff, 0));
+				m_planebuf[1] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 8) & 0x1fff, 0));
+				m_planebuf[2] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 0) & 0x1fff, 1));
+				m_planebuf[3] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 8) & 0x1fff, 1));
+				m_planebuf[4] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 0) & 0x1fff, 2));
+				m_planebuf[5] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 8) & 0x1fff, 2));
+				m_planebuf[6] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 0) & 0x1fff, 3));
+				m_planebuf[7] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 8) & 0x1fff, 3));
+			}
+			else
+			{
+				m_planebuf[0] = m_read_onespace_with_relative(recalculate_offsets_8x8x4packed_tile((address + 0) & 0x1fff, 0));
+				m_planebuf[1] = m_read_onespace_with_relative(recalculate_offsets_8x8x4packed_tile((address + 8) & 0x1fff, 0));
+				m_planebuf[2] = m_read_onespace_with_relative(recalculate_offsets_8x8x4packed_tile((address + 0) & 0x1fff, 1));
+				m_planebuf[3] = m_read_onespace_with_relative(recalculate_offsets_8x8x4packed_tile((address + 8) & 0x1fff, 1));
+			}
 		}
 	}
 }
@@ -773,38 +809,55 @@ void ppu_vt3xx_device::shift_tile_plane_data(u8& pix)
 	}
 	else
 	{
-		if ((m_newvid_1c & 0x03) == 0x02)
+		if (m_newvid_1c & 0x04) // high resolution mode
 		{
-			// 8x8x8 non-planar mode
+			// we currently pretend this is 8x8, not 16x16
 			switch (m_whichpixel)
 			{
-			case 0: pix = m_planebuf[0]; break;
-			case 1: pix = m_planebuf[2]; break;
-			case 2: pix = m_planebuf[4]; break;
-			case 3: pix = m_planebuf[6]; break;
-			case 4: pix = m_planebuf[1]; break;
-			case 5: pix = m_planebuf[3]; break;
-			case 6: pix = m_planebuf[5]; break;
-			case 7: pix = m_planebuf[7]; break;
+				case 0: pix = m_planebuf[0]; break;
+				case 1: pix = m_planebuf[4]; break;
+				case 2: pix = m_planebuf[8]; break;
+				case 3: pix = m_planebuf[12]; break;
+				case 4: pix = m_planebuf[1]; break;
+				case 5: pix = m_planebuf[5]; break;
+				case 6: pix = m_planebuf[9]; break;
+				case 7: pix = m_planebuf[13]; break;
 			}
 		}
 		else
 		{
-			// extended modes
-			// 8x8x4 non-planar mode
-			switch (m_whichpixel)
+			if ((m_newvid_1c & 0x03) == 0x02)
 			{
-			case 0: pix = (m_planebuf[0] >> 0) & 0xf; break;
-			case 1: pix = (m_planebuf[0] >> 4) & 0xf; break;
-			case 2: pix = (m_planebuf[2] >> 0) & 0xf; break;
-			case 3: pix = (m_planebuf[2] >> 4) & 0xf; break;
-			case 4: pix = (m_planebuf[1] >> 0) & 0xf; break;
-			case 5: pix = (m_planebuf[1] >> 4) & 0xf; break;
-			case 6: pix = (m_planebuf[3] >> 0) & 0xf; break;
-			case 7: pix = (m_planebuf[3] >> 4) & 0xf; break;
+				// 8x8x8 non-planar mode
+				switch (m_whichpixel)
+				{
+				case 0: pix = m_planebuf[0]; break;
+				case 1: pix = m_planebuf[2]; break;
+				case 2: pix = m_planebuf[4]; break;
+				case 3: pix = m_planebuf[6]; break;
+				case 4: pix = m_planebuf[1]; break;
+				case 5: pix = m_planebuf[3]; break;
+				case 6: pix = m_planebuf[5]; break;
+				case 7: pix = m_planebuf[7]; break;
+				}
+			}
+			else
+			{
+				// extended modes
+				// 8x8x4 non-planar mode
+				switch (m_whichpixel)
+				{
+				case 0: pix = (m_planebuf[0] >> 0) & 0xf; break;
+				case 1: pix = (m_planebuf[0] >> 4) & 0xf; break;
+				case 2: pix = (m_planebuf[2] >> 0) & 0xf; break;
+				case 3: pix = (m_planebuf[2] >> 4) & 0xf; break;
+				case 4: pix = (m_planebuf[1] >> 0) & 0xf; break;
+				case 5: pix = (m_planebuf[1] >> 4) & 0xf; break;
+				case 6: pix = (m_planebuf[3] >> 0) & 0xf; break;
+				case 7: pix = (m_planebuf[3] >> 4) & 0xf; break;
+				}
 			}
 		}
-
 		m_whichpixel++;
 	}
 }

@@ -198,7 +198,7 @@ protected:
 	int                         m_vblank_first_scanline;  /* the very first scanline where VBLANK occurs */
 
 	// used in rendering
-	u8 m_planebuf[8]; // temp buffer used for fetching tile data
+	u8 m_planebuf[16]; // temp buffer used for fetching tile data
 	s32                    m_scanline;         /* scanline count */
 	std::unique_ptr<u8[]>  m_spriteram;           /* sprite ram */
 
