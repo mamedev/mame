@@ -27,7 +27,7 @@ TODO:
   per segment, adding pwm_display_device right now has no added value
 - add nstarfox sound effect chip emulation
 - naltair IPT_DIAL should be 1-way, it's not supposed to rotate left
-- add svg screen for nsmb3, nsmw
+- add svg screen for nsmw
 - Currently there is no accurate way to dump the SM511/SM512 melody ROM
   electronically. For the ones that weren't decapped, they were read by
   playing back all melody data and reconstructing it to ROM. Visual(decap)
@@ -6618,7 +6618,7 @@ INPUT_PORTS_END
 
 void gamewatch_state::nsmb3(machine_config &config)
 {
-	sm530_common(config, 1000, 1000);
+	sm530_common(config, 1203, 1080);
 	config.set_default_layout(layout_hh_sm500_test);
 }
 
@@ -6637,8 +6637,8 @@ ROM_START( nsmb3 )
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "633.melody", 0x000, 0x100, CRC(98340c46) SHA1(94b5865fc669b7f6487845647866c06f4f581f63) )
 
-	ROM_REGION( 100000, "screen", 0)
-	ROM_LOAD( "nsmb3.svg", 0, 100000, NO_DUMP )
+	ROM_REGION( 373935, "screen", 0)
+	ROM_LOAD( "nsmb3.svg", 0, 373935, CRC(d3dd4ef9) SHA1(2e95bdf55b8ba050efbd8fd27442a1872d93685f) )
 ROM_END
 
 ROM_START( nsmw )
@@ -12402,7 +12402,7 @@ SYST( 1991, kbucky,       0,           0,      kbucky,       kbucky,       kbuck
 SYST( 1991, kgarfld,      0,           0,      kgarfld,      kgarfld,      kgarfld_state,      empty_init, "Konami", "Garfield (Konami)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // Nelsonic Game Watch series
-SYST( 1990, nsmb3,        0,           0,      nsmb3,        gamewatch,    gamewatch_state,    empty_init, "Nelsonic", "Super Mario Bros. 3 (Nelsonic)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
+SYST( 1990, nsmb3,        0,           0,      nsmb3,        gamewatch,    gamewatch_state,    empty_init, "Nelsonic", "Super Mario Bros. 3 (Nelsonic)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, nsmw,         0,           0,      nsmw,         gamewatch,    gamewatch_state,    empty_init, "Nelsonic", "Super Mario World (Nelsonic)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
 SYST( 1993, nstarfox,     0,           0,      nstarfox,     nstarfox,     nstarfox_state,     empty_init, "Nelsonic", "Star Fox (Nelsonic)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_SOUND )
 
