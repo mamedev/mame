@@ -57,6 +57,8 @@ protected:
 	void vt369_soundcpu_control_w(offs_t offset, u8 data);
 	void vt369_4112_bank6000_select_w(offs_t offset, u8 data);
 	void vt369_411c_bank6000_enable_w(offs_t offset, u8 data);
+	void vt369_411d_w(offs_t offset, u8 data);
+	void vt369_411e_w(offs_t offset, u8 data);
 	void vt369_relative_w(offs_t offset, u8 data);
 
 	u8 read_internal(offs_t offset);
@@ -145,7 +147,6 @@ protected:
 	void vt369_introm_map(address_map &map) ATTR_COLD;
 
 	u8 vthh_414a_r();
-	void vtfp_411d_w(u8 data);
 	void encryption_4169_w(u8 data);
 
 	bool m_encryption_allowed;

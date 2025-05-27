@@ -272,6 +272,8 @@ void vt3xx_soc_base_device::vt369_map(address_map &map)
 	// 0x411a RS232 TX data
 	// 0x411b RS232 RX data
 	map(0x411c, 0x411c).w(FUNC(vt3xx_soc_base_device::vt369_411c_bank6000_enable_w));
+	map(0x411d, 0x411d).w(FUNC(vt3xx_soc_base_device::vt369_411d_w));
+	map(0x411e, 0x411e).w(FUNC(vt3xx_soc_base_device::vt369_411e_w));
 
 	// 412d
 
@@ -565,6 +567,22 @@ void vt3xx_soc_base_device::vt369_411c_bank6000_enable_w(offs_t offset, u8 data)
 	m_bank6000_enable = data;
 }
 
+void vt3xx_soc_base_device::vt369_411d_w(offs_t offset, u8 data)
+{
+	// controls chram access and mapper emulation modes in later models
+	// also written by rtvgc300 and rtvgc300fz (with the same value as 411e)
+	// when external banking is needed?
+	logerror("%s: vt369_411d_w  %02x\n", machine().describe_context(), data);
+	m_411d = data;
+	update_banks();
+}
+
+void vt3xx_soc_base_device::vt369_411e_w(offs_t offset, u8 data)
+{
+	logerror("%s: vt369_411e_w (%02x) (external bankswitch + more?)\n", machine().describe_context(), data);
+	m_411e_write_cb(data); 
+}
+
 
 void vt3xx_soc_base_device::vt369_4112_bank6000_select_w(offs_t offset, u8 data)
 {
@@ -761,13 +779,6 @@ void vt369_soc_introm_noswap_device::device_start()
 	m_encryption_allowed = false;
 }
 
-void vt369_soc_introm_noswap_device::vtfp_411d_w(u8 data)
-{
-	// controls chram access and mapper emulation modes in later models
-	logerror("vtfp_411d_w  %02x\n", data);
-	m_411d = data;
-	update_banks();
-}
 
 u8 vt369_soc_introm_noswap_device::vthh_414a_r()
 {
@@ -783,7 +794,6 @@ void vt369_soc_introm_noswap_device::vt369_introm_map(address_map &map)
 	map(0x1000, 0x1fff).r(FUNC(vt369_soc_introm_noswap_device::read_internal));
 
 	map(0x414a, 0x414a).r(FUNC(vt369_soc_introm_noswap_device::vthh_414a_r));
-	map(0x411d, 0x411d).w(FUNC(vt369_soc_introm_noswap_device::vtfp_411d_w));
 
 	map(0x4169, 0x4169).w(FUNC(vt369_soc_introm_noswap_device::encryption_4169_w));
 }

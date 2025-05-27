@@ -163,6 +163,7 @@ public:
 	void vt36x_16mb(machine_config& config);
 	void vt36x_32mb(machine_config& config);
 	void vt36x_32mb_2banks_lexi(machine_config& config);
+	void vt36x_32mb_2banks_lexi300(machine_config& config);
 
 	void vt36x_swap(machine_config& config);
 	void vt36x_swap_2mb(machine_config& config);
@@ -615,6 +616,13 @@ void vt36x_state::vt36x_32mb_2banks_lexi(machine_config& config)
 	m_soc->set_4150_write_cb().set(FUNC(vt36x_state::extbank_w));
 }
 
+void vt36x_state::vt36x_32mb_2banks_lexi300(machine_config& config)
+{
+	vt36x_32mb(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_32mbyte_bank);
+	m_soc->set_411e_write_cb().set(FUNC(vt36x_state::extbank_w)); // could be on 411d
+}
+
 static INPUT_PORTS_START( vt369 )
 	PORT_START("IO0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("A")
@@ -729,7 +737,14 @@ ROM_END
 ROM_START( rtvgc300 )
 	ROM_REGION( 0x8000000, "mainrom", 0 )
 	// some of the higher address lines might be swapped
-	ROM_LOAD( "lexibook300.bin", 0x00000, 0x4000000, CRC(015c4067) SHA1(a12986c4a366a23c4c7ca7b3d33e421a8dfdffc0) )
+	ROM_LOAD( "lexibook300.bin", 0x00000, 0x0800000, CRC(015c4067) SHA1(a12986c4a366a23c4c7ca7b3d33e421a8dfdffc0) )
+	ROM_CONTINUE(0x1000000, 0x0800000)
+	ROM_CONTINUE(0x0800000, 0x0800000)
+	ROM_CONTINUE(0x1800000, 0x0800000)
+	ROM_CONTINUE(0x2000000, 0x0800000)
+	ROM_CONTINUE(0x3000000, 0x0800000)
+	ROM_CONTINUE(0x2800000, 0x0800000)
+	ROM_CONTINUE(0x3800000, 0x0800000)
 
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
@@ -774,6 +789,7 @@ ROM_START( lxcmcysw ) // all games selectable
 	ROM_CONTINUE(0x3000000, 0x0800000)
 	ROM_CONTINUE(0x2800000, 0x0800000)
 	ROM_CONTINUE(0x3800000, 0x0800000)
+
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
@@ -1196,8 +1212,8 @@ CONS( 200?, lxcmcy,    0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty
 CONS( 2012, dgun2561,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init, "dreamGEAR", "My Arcade Portable Gaming System with 140 Games (DGUN-2561)", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
 
 // GB-NO13-Main-VT389-2 on PCBs - uses higher resolution mode (twice usual h-res?)
-CONS( 2016, rtvgc300,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Retro TV Game Console - 300 Games", MACHINE_NOT_WORKING )
-CONS( 2017, rtvgc300fz,0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Retro TV Game Console - Frozen - 300 Games", MACHINE_NOT_WORKING )
+CONS( 2016, rtvgc300,  0,  0,  vt36x_32mb_2banks_lexi300, vt369, vt36x_state, empty_init,    "Lexibook", "Retro TV Game Console - 300 Games", MACHINE_NOT_WORKING )
+CONS( 2017, rtvgc300fz,0,  0,  vt36x_32mb_2banks_lexi300, vt369, vt36x_state, empty_init,    "Lexibook", "Retro TV Game Console - Frozen - 300 Games", MACHINE_NOT_WORKING )
 
 
 /* The following are also confirmed to be NES/VT derived units, most having a standard set of games with a handful of lazy graphic mods thrown in to fit the unit theme
