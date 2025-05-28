@@ -35,7 +35,7 @@ TODO:
   gnw_climbern, gnw_dkcirc, gnw_dkhockey, gnw_dkjrp, gnw_dkong3, gnw_gcliff,
   gnw_mariocmt, gnw_mariocmta, gnw_mariotj, gnw_mbaway, gnw_mmousep,
   gnw_pinball, gnw_popeyep, gnw_sbuster, gnw_snoopyp, gnw_zelda, trtreisl,
-  trspacadv, vesarif, uchitari
+  trspacadv, vesarif, uchitari, ewinpooh
 
 ================================================================================
 
@@ -3209,6 +3209,12 @@ ROM_END
 
   The tabletop version was also licensed to Coleco.
 
+  Also cloned by Elektronika(USSR) as Винни-Пух (Winnie the Pooh) (model ИМ-12).
+  * КБ1515ХМ3-2 9009 (no decap); seems to be compatible with КБ1013ВК7-2
+    which in turn is compatible with Sharp SM511
+  Program ROM is identical, melody ROM is practically identical (i.e. minor
+  differences, hardly audible on playback)
+
 *******************************************************************************/
 
 class gnw_dkjrp_state : public hh_sm510_state
@@ -3219,6 +3225,7 @@ public:
 	{ }
 
 	void gnw_dkjrp(machine_config &config);
+	void ewinpooh(machine_config &config);
 };
 
 // inputs
@@ -3261,6 +3268,11 @@ void gnw_dkjrp_state::gnw_dkjrp(machine_config &config)
 	sm511_common(config, 1920, 1049);
 }
 
+void gnw_dkjrp_state::ewinpooh(machine_config &config)
+{
+	sm511_common(config, 1890, 1080); // 1638 x 936
+}
+
 // roms
 
 ROM_START( gnw_dkjrp )
@@ -3272,6 +3284,17 @@ ROM_START( gnw_dkjrp )
 
 	ROM_REGION( 340751, "screen", 0)
 	ROM_LOAD( "gnw_dkjrp.svg", 0, 340751, CRC(eb3cb98b) SHA1(5b148557d3ade2e2050ddde879a6cc05e119b446) )
+ROM_END
+
+ROM_START( ewinpooh )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "ewinpooh.program", 0x0000, 0x1000, CRC(a2cd5a91) SHA1(33f6fd1530e5522491851f16d7c9f928b2dbdc3b) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "ewinpooh.melody", 0x000, 0x100, BAD_DUMP CRC(38946be7) SHA1(affdb8514d32dc9dbf2ccc1c4a0394e68ebc61cb) ) // decap needed for verification
+
+	ROM_REGION( 193376, "screen", 0)
+	ROM_LOAD( "ewinpooh.svg", 0, 193376, CRC(69c4e5c5) SHA1(313f164706c3d24e2fc1363ff9730a21e5b1ca6c) )
 ROM_END
 
 
@@ -12372,6 +12395,7 @@ SYST( 1992, atakaast,     gnw_mmouse,  0,      atakaast,     gnw_mmouse,   nupog
 SYST( 19??, ecircus,      gnw_mmouse,  0,      ecircus,      gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Circus (Elektronika)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, naltair,      gnw_mmouse,  0,      vfutbol,      naltair,      nupogodi_state,     empty_init, "bootleg (Nauchpribor)", "Altair (Nauchpribor)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 SYST( 1989, kosmicmt,     gnw_fire,    0,      kosmicmt,     gnw_fire,     gnw_fire_state,     empty_init, "bootleg (Elektronika)", "Kosmicheskiy most", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 199?, ewinpooh,     gnw_dkjrp,   0,      ewinpooh,     gnw_dkjrp,    gnw_dkjrp_state,    empty_init, "bootleg (Elektronika)", "Winnie the Pooh (Elektronika)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // Elektronika (original)
 SYST( 1990, auslalom,     0,           0,      auslalom,     auslalom,     auslalom_state,     empty_init, "Elektronika", "Autoslalom", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
