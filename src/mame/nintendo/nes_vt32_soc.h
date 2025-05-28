@@ -48,6 +48,8 @@ public:
 
 protected:
 	virtual void device_add_mconfig(machine_config& config) override ATTR_COLD;
+
+	virtual void do_pal_timings_and_ppu_replacement(machine_config& config) override;
 };
 
 

@@ -103,7 +103,7 @@ protected:
 	// additional relative offset for everything on vt3xx sets (seems to address up to 32mbytes only still?)
 	int get_relative() { return (m_relative[0] + ((m_relative[1] & 0x0f) << 8)) * 0x2000; }
 
-	void do_pal_timings_and_ppu_replacement(machine_config& config);
+	virtual void do_pal_timings_and_ppu_replacement(machine_config& config);
 
 	u32 screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 

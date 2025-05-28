@@ -21,6 +21,9 @@
 DEFINE_DEVICE_TYPE(PPU_VT03, ppu_vt03_device, "ppu_vt03", "VT03 PPU (NTSC)")
 DEFINE_DEVICE_TYPE(PPU_VT03PAL, ppu_vt03pal_device, "ppu_vt03pal", "VT03 PPU (PAL)")
 
+DEFINE_DEVICE_TYPE(PPU_VT32, ppu_vt32_device, "ppu_vt32", "VT32 PPU (NTSC)")
+DEFINE_DEVICE_TYPE(PPU_VT32PAL, ppu_vt32pal_device, "ppu_vt32pal", "VT32 PPU (PAL)")
+
 DEFINE_DEVICE_TYPE(PPU_VT3XX, ppu_vt3xx_device, "ppu_vt3xx", "VT3XX PPU (NTSC)")
 
 ppu_vt03_device::ppu_vt03_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock) :
@@ -48,6 +51,24 @@ ppu_vt03pal_device::ppu_vt03pal_device(const machine_config& mconfig, const char
 	m_is_50hz = true;
 }
 
+ppu_vt32_device::ppu_vt32_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock) :
+	ppu_vt03_device(mconfig, type, tag, owner, clock)
+{
+}
+
+ppu_vt32_device::ppu_vt32_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+	ppu_vt32_device(mconfig, PPU_VT32, tag, owner, clock)
+{
+}
+
+ppu_vt32pal_device::ppu_vt32pal_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+	ppu_vt32_device(mconfig, PPU_VT32PAL, tag, owner, clock)
+{
+	m_scanlines_per_frame = PAL_SCANLINES_PER_FRAME;
+	m_vblank_first_scanline = VBLANK_FIRST_SCANLINE_PALC;
+	m_is_pal = true;
+	m_is_50hz = true;
+}
 
 u8 ppu_vt03_device::palette_read(offs_t offset)
 {
@@ -574,6 +595,19 @@ void ppu_vt03_device::videobank0_extra_w(offs_t offset, u8 data) { m_videobank0_
 /* 201d read gun read y (older VT chipsets) */
 /* 201e read gun 2 read x (older VT chipsets) */
 /* 201f read gun 2 read y (older VT chipsets) */
+
+void ppu_vt32_device::draw_background(u8* line_priority)
+{
+	if (TEST_VT32_NEW_BGMODE)
+	{
+		popmessage("TEST_VT32_NEW_BGMODE");
+	}
+	else
+	{
+		ppu2c0x_device::draw_background(line_priority);
+	}
+}
+
 
 ppu_vt3xx_device::ppu_vt3xx_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
 	ppu_vt03_device(mconfig, PPU_VT3XX, tag, owner, clock)

@@ -147,6 +147,28 @@ public:
 	ppu_vt03pal_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
 };
 
+class ppu_vt32_device : public ppu_vt03_device {
+public:
+	ppu_vt32_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
+	ppu_vt32_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
+private:
+	virtual void draw_background(u8 *line_priority) override;
+
+	// This is used by matet220 and matet300 for the menus
+	// it seems a lot more like a VT369 mode, and even uses packed
+	// format tiles, but those sets use VT32 style encryption
+	// and don't touch the usual VT369 registers.
+	// maybe a revision of the VT32?
+	static constexpr bool TEST_VT32_NEW_BGMODE = false;
+};
+
+class ppu_vt32pal_device : public ppu_vt32_device {
+public:
+	ppu_vt32pal_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
+};
+
+
 class ppu_vt3xx_device : public ppu_vt03_device {
 public:
 	ppu_vt3xx_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
@@ -196,6 +218,9 @@ private:
 
 DECLARE_DEVICE_TYPE(PPU_VT03,    ppu_vt03_device)
 DECLARE_DEVICE_TYPE(PPU_VT03PAL, ppu_vt03pal_device)
+
+DECLARE_DEVICE_TYPE(PPU_VT32, ppu_vt32_device)
+DECLARE_DEVICE_TYPE(PPU_VT32PAL, ppu_vt32pal_device)
 
 DECLARE_DEVICE_TYPE(PPU_VT3XX,    ppu_vt3xx_device)
 

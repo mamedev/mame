@@ -27,10 +27,49 @@ nes_vt32_soc_pal_device::nes_vt32_soc_pal_device(const machine_config& mconfig, 
 
 void nes_vt32_soc_device::device_add_mconfig(machine_config& config)
 {
-	nes_vt02_vt03_soc_device::device_add_mconfig(config);
-
-	RP2A03_VTSCR(config.replace(), m_maincpu, NTSC_APU_CLOCK);
+	RP2A03_VTSCR(config, m_maincpu, NTSC_APU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt32_soc_device::nes_vt32_soc_map);
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_refresh_hz(60.0988);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((113.66/(NTSC_APU_CLOCK.dvalue()/1000000)) *
+							 (ppu2c0x_device::VBLANK_LAST_SCANLINE_NTSC-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)));
+	m_screen->set_size(32*8, 262);
+	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+	m_screen->set_screen_update(FUNC(nes_vt32_soc_device::screen_update));
+
+	PPU_VT32(config, m_ppu, RP2A03_NTSC_XTAL);
+	m_ppu->set_cpu_tag(m_maincpu);
+	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_ppu->read_bg().set(FUNC(nes_vt32_soc_device::chr_r));
+	m_ppu->read_sp().set(FUNC(nes_vt32_soc_device::spr_r));
+	m_ppu->set_screen(m_screen);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+
+	NES_APU_VT(config, m_apu, NTSC_APU_CLOCK);
+	m_apu->irq().set(FUNC(nes_vt32_soc_device::apu_irq));
+	m_apu->mem_read().set(FUNC(nes_vt32_soc_device::apu_read_mem));
+	m_apu->add_route(ALL_OUTPUTS, "mono", 0.50);
+}
+
+void nes_vt32_soc_pal_device::do_pal_timings_and_ppu_replacement(machine_config& config)
+{
+	m_maincpu->set_clock(PALC_APU_CLOCK);
+
+	PPU_VT32PAL(config.replace(), m_ppu, RP2A03_PAL_XTAL);
+	m_ppu->set_cpu_tag(m_maincpu);
+	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_ppu->read_bg().set(FUNC(nes_vt32_soc_pal_device::chr_r));
+	m_ppu->read_sp().set(FUNC(nes_vt32_soc_pal_device::spr_r));
+	m_ppu->set_screen(m_screen);
+
+	m_screen->set_refresh_hz(50.0070);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((113.66 / (PALC_APU_CLOCK.dvalue() / 1000000)) *
+		(ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL - ppu2c0x_device::VBLANK_FIRST_SCANLINE_PALC + 1 + 2)));
+	m_screen->set_size(32 * 8, 312);
+	m_screen->set_visarea(0 * 8, 32 * 8 - 1, 0 * 8, 30 * 8 - 1);
 }
 
 void nes_vt32_soc_pal_device::device_add_mconfig(machine_config& config)
