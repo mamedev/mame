@@ -25,6 +25,13 @@ nes_vt32_soc_pal_device::nes_vt32_soc_pal_device(const machine_config& mconfig, 
 {
 }
 
+
+u8 nes_vt32_soc_device::read_onespace_bus(offs_t offset)
+{
+	address_space& spc = this->space(AS_PROGRAM);
+	return spc.read_byte(offset);
+}
+
 void nes_vt32_soc_device::device_add_mconfig(machine_config& config)
 {
 	RP2A03_VTSCR(config, m_maincpu, NTSC_APU_CLOCK);
@@ -44,6 +51,8 @@ void nes_vt32_soc_device::device_add_mconfig(machine_config& config)
 	m_ppu->read_bg().set(FUNC(nes_vt32_soc_device::chr_r));
 	m_ppu->read_sp().set(FUNC(nes_vt32_soc_device::spr_r));
 	m_ppu->set_screen(m_screen);
+	m_ppu->read_onespace().set(FUNC(nes_vt32_soc_device::read_onespace_bus));
+
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

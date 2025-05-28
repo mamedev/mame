@@ -29,6 +29,7 @@ public:
 
 	auto read_bg() { return m_read_bg.bind(); }
 	auto read_sp() { return m_read_sp.bind(); }
+	auto read_onespace() { return m_read_onespace.bind(); }
 	auto read_onespace_with_relative() { return m_read_onespace_with_relative.bind(); }
 
 	void set_palette_mode(vtxx_pal_mode pmode) { m_pal_mode = pmode; }
@@ -117,6 +118,7 @@ protected:
 
 	devcb_read8 m_read_bg;
 	devcb_read8 m_read_sp;
+	devcb_read8 m_read_onespace;
 	devcb_read8 m_read_onespace_with_relative;
 
 	int32_t m_read_bg4_bg3;
@@ -155,11 +157,8 @@ public:
 private:
 	virtual void draw_background(u8 *line_priority) override;
 
-	// This is used by matet220 and matet300 for the menus
-	// it seems a lot more like a VT369 mode, and even uses packed
-	// format tiles, but those sets use VT32 style encryption
-	// and don't touch the usual VT369 registers.
-	// maybe a revision of the VT32?
+	// see notes in .cpp file, there's an extra mode
+	// but we don't know how to enable it for now
 	static constexpr bool TEST_VT32_NEW_BGMODE = false;
 };
 

@@ -32,6 +32,7 @@ ppu_vt03_device::ppu_vt03_device(const machine_config& mconfig, device_type type
 	m_is_50hz(false),
 	m_read_bg(*this, 0),
 	m_read_sp(*this, 0),
+	m_read_onespace(*this, 0),
 	m_read_onespace_with_relative(*this, 0)
 {
 }
@@ -600,7 +601,68 @@ void ppu_vt32_device::draw_background(u8* line_priority)
 {
 	if (TEST_VT32_NEW_BGMODE)
 	{
-		popmessage("TEST_VT32_NEW_BGMODE");
+		// strange custom mode, feels more like a vt369 mode
+		// tiles use 16x16x8 packed data
+		// if ROM is decoded as this they're at
+		// tile 0x680 in matet220 (0x68000 in ROM)
+		// tile 0x800 in matet300 (0x80000 in ROM)
+
+		/* determine where in the nametable to start drawing from */
+		/* based on the current scanline and scroll regs */
+		const u8  scroll_x_coarse = m_refresh_data & 0x001f;
+		const u8  scroll_y_coarse = (m_refresh_data & 0x03c0) >> 5;
+		// m_refresh_data & 0x0020 in this case would be the top/bottom of the tile
+
+		const u16 nametable = m_refresh_data & 0x0c00;
+		const u8  scroll_y_fine = (m_refresh_data & 0x7000) >> 12;
+
+		int x = scroll_x_coarse & ~1;
+
+		/* get the tile index */
+		int tile_index = (nametable | 0x2000) + scroll_y_coarse * 16;
+
+		int start_x = 0;
+		u32* dest = &m_bitmap.pix(m_scanline, start_x);
+
+		m_tilecount = 0;
+
+		/* draw the 15 or 16 tiles that make up a line */
+		while (m_tilecount < 17)
+		{
+			const int index1 = tile_index + (x * 2);
+			int page2 = readbyte(index1);
+	
+			if (start_x < VISIBLE_SCREEN_WIDTH)
+			{
+				int gfx_address = page2 * 0x100;
+				gfx_address += 0x68000;
+				gfx_address += scroll_y_fine * 16;
+				gfx_address += ((m_refresh_data & 0x0020) >> 5) * 0x80;
+				m_whichpixel = 0;
+
+				for (int i = 0; i < 16; i++)
+					m_planebuf[i] = m_read_onespace(gfx_address + i);
+
+				for (int i = 0; i < 16; i++)
+				{
+					u8 pix = m_planebuf[m_whichpixel];
+
+					m_whichpixel++;
+
+					if ((start_x + i) >= 0 && (start_x + i) < VISIBLE_SCREEN_WIDTH)
+					{
+						u16 palval = (m_palette_ram[pix & 0x7f] & 0x3f);
+						*dest = pen_color(palval & 0x1ff);
+						if (pix)
+							line_priority[start_x + i] |= 0x02;
+					}
+					dest++;
+				}
+				start_x += 16;
+			}
+			m_tilecount++;
+			x++;
+		}
 	}
 	else
 	{
