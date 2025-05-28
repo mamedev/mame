@@ -205,6 +205,41 @@ void nes_vt32_soc_device::scrambled_8000_w(u16 offset, u8 data)
 }
 
 
+u8 nes_vt32_soc_device::vt32_palette_r(offs_t offset)
+{
+	if (offset < 0x100)
+	{
+		// can the usual nametable mirroring be enabled?
+		//return nt_r(offset + 0x3e00);
+		return m_ppu->vt3xx_extended_palette_r(offset);
+	}
+	else
+	{
+		return m_ppu->palette_read(offset - 0x100);
+	}
+}
+
+void nes_vt32_soc_device::vt32_palette_w(offs_t offset, u8 data)
+{
+	if (offset < 0x100)
+	{
+		// can the usual nametable mirroring be enabled?
+		//nt_w(offset + 0x3e00, data);
+		m_ppu->vt3xx_extended_palette_w(offset, data);
+	}
+	else
+	{
+		m_ppu->palette_write(offset - 0x100, data);
+	}	
+}
+
+void nes_vt32_soc_device::device_start()
+{
+	nes_vt09_soc_device::device_start();
+	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x3e00, 0x3fff, read8sm_delegate(*this, FUNC(nes_vt32_soc_device::vt32_palette_r)), write8sm_delegate(*this, FUNC(nes_vt32_soc_device::vt32_palette_w)));
+}
+
+
 void nes_vt32_soc_device::nes_vt32_soc_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram(); // .mask(0x0fff).ram();
@@ -223,9 +258,9 @@ void nes_vt32_soc_device::nes_vt32_soc_map(address_map &map)
 	map(0x2018, 0x2018).rw(m_ppu, FUNC(ppu_vt32_device::videobank1_r), FUNC(ppu_vt32_device::videobank1_w));
 	map(0x2019, 0x2019).rw(m_ppu, FUNC(ppu_vt32_device::unk_2019_r), FUNC(ppu_vt32_device::gun_reset_w));
 	map(0x201a, 0x201a).rw(m_ppu, FUNC(ppu_vt32_device::videobank0_extra_r), FUNC(ppu_vt32_device::videobank0_extra_w));
-	map(0x201b, 0x201b).rw(m_ppu, FUNC(ppu_vt32_device::unk_201b_r), FUNC(ppu_vt32_device::vt32_extvid_201b_w));
-	map(0x201c, 0x201c).rw(m_ppu, FUNC(ppu_vt32_device::gun_x_r), FUNC(ppu_vt32_device::vt32_extvid_201c_w));
-	map(0x201d, 0x201d).rw(m_ppu, FUNC(ppu_vt32_device::gun_y_r), FUNC(ppu_vt32_device::vt32_extvid_201d_w));
+	map(0x201b, 0x201b).rw(m_ppu, FUNC(ppu_vt32_device::unk_201b_r), FUNC(ppu_vt32_device::m_newvid_1b_w));
+	map(0x201c, 0x201c).rw(m_ppu, FUNC(ppu_vt32_device::gun_x_r), FUNC(ppu_vt32_device::m_newvid_1c_w));
+	map(0x201d, 0x201d).rw(m_ppu, FUNC(ppu_vt32_device::gun_y_r), FUNC(ppu_vt32_device::m_newvid_1d_w));
 	map(0x201e, 0x201e).r(m_ppu, FUNC(ppu_vt32_device::gun2_x_r));
 	map(0x201f, 0x201f).r(m_ppu, FUNC(ppu_vt32_device::gun2_y_r));
 

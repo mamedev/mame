@@ -241,7 +241,8 @@ void ppu_vt03_device::device_start()
 	init_vtxx_rgb555_palette_tables();
 	init_vtxx_rgb444_palette_tables();
 
-	// for VT3xx
+	// for VT3xx / VT32 (may have different meanings on each though)
+	save_item(NAME(m_newvid_1b));
 	save_item(NAME(m_newvid_1c));
 	save_item(NAME(m_newvid_1d));
 	save_item(NAME(m_newvid_1e));
@@ -271,6 +272,7 @@ void ppu_vt03_device::device_reset()
 	m_read_bg4_bg3 = 0;
 
 	// for VT3xx
+	m_newvid_1b = 0x00;
 	m_newvid_1c = 0x00;
 	m_newvid_1d = 0x00;
 	m_newvid_1e = 0x00;
@@ -597,31 +599,13 @@ void ppu_vt03_device::videobank0_extra_w(offs_t offset, u8 data) { m_videobank0_
 /* 201e read gun 2 read x (older VT chipsets) */
 /* 201f read gun 2 read y (older VT chipsets) */
 
-void ppu_vt32_device::vt32_extvid_201b_w(u8 data) { logerror("%s: vt32_extvid_201b_w %02x\n", machine().describe_context(), data); vt32_extvid_201b = data; }
-void ppu_vt32_device::vt32_extvid_201c_w(u8 data) { logerror("%s: vt32_extvid_201c_w %02x\n", machine().describe_context(), data); vt32_extvid_201c = data; }
-void ppu_vt32_device::vt32_extvid_201d_w(u8 data) { logerror("%s: vt32_extvid_201d_w %02x\n", machine().describe_context(), data); vt32_extvid_201d = data; }
-
-void ppu_vt32_device::device_start()
-{
-	ppu_vt03_device::device_start();
-
-	save_item(NAME(vt32_extvid_201b));
-	save_item(NAME(vt32_extvid_201c));
-	save_item(NAME(vt32_extvid_201d));
-}
-
-void ppu_vt32_device::device_reset()
-{
-	ppu_vt03_device::device_reset();
-
-	vt32_extvid_201b = 0x00;
-	vt32_extvid_201c = 0x00;
-	vt32_extvid_201d = 0x00;
-}
+void ppu_vt32_device::m_newvid_1b_w(u8 data) { logerror("%s: m_newvid_1b_w %02x\n", machine().describe_context(), data); m_newvid_1b = data; }
+void ppu_vt32_device::m_newvid_1c_w(u8 data) { logerror("%s: m_newvid_1c_w %02x\n", machine().describe_context(), data); m_newvid_1c = data; }
+void ppu_vt32_device::m_newvid_1d_w(u8 data) { logerror("%s: m_newvid_1d_w %02x\n", machine().describe_context(), data); m_newvid_1d = data; }
 
 void ppu_vt32_device::draw_background(u8* line_priority)
 {
-	if (vt32_extvid_201c == 0x2e)
+	if (get_newvid_1c() == 0x2e)
 	{
 		// strange custom mode, feels more like a vt369 mode
 		// tiles use 16x16x8 packed data
@@ -671,8 +655,21 @@ void ppu_vt32_device::draw_background(u8* line_priority)
 					u8 pix = m_read_onespace(gfx_address + i);
 					if ((start_x + i) >= 0 && (start_x + i) < VISIBLE_SCREEN_WIDTH)
 					{
-						u16 palval = (m_palette_ram[pix & 0x7f] & 0x3f);
-						*dest = pen_color(palval & 0x1ff);
+						u32 palval;
+
+						if (pix & 0x80)
+							palval = (m_vt3xx_palette[pix & 0x7f] & 0x3f) | ((m_vt3xx_palette[(pix & 0x7f) + 0x80] & 0x3f) << 6);
+						else
+							palval = (m_palette_ram[pix & 0x7f] & 0x3f) | ((m_palette_ram[(pix & 0x7f) + 0x80] & 0x3f) << 6);
+
+						// does grayscale mode exist here? (we haven't calculated any colours for it)
+						//if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
+						//  palval &= 0x30;
+
+						// apply colour emphasis (does it really exist here?) (we haven't calculated any colours for it, so ths has no effect)
+						palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 7);
+
+						*dest = m_vtpens_rgb444[palval & 0x7fff];
 						if (pix)
 							line_priority[start_x + i] |= 0x02;
 					}

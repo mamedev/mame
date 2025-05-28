@@ -23,6 +23,8 @@ public:
 	nes_vt32_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
 
 protected:
+	virtual void device_start() override;
+
 	nes_vt32_soc_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock);
 
 	virtual void device_add_mconfig(machine_config& config) override ATTR_COLD;
@@ -41,6 +43,10 @@ protected:
 	void vtfp_4a00_w(u8 data);
 	void vtfp_411d_w(u8 data);
 	u8 vthh_414a_r();
+
+private:
+	u8 vt32_palette_r(offs_t offset);
+	void vt32_palette_w(offs_t offset, u8 data);
 };
 
 class nes_vt32_soc_pal_device : public nes_vt32_soc_device

@@ -73,8 +73,9 @@ public:
 	u8 get_extended_modes_enable() { return m_extended_modes_enable; }
 	u8 get_extended_modes2_enable() { return m_extended_modes2_enable; }
 
+	u8 get_newvid_1c() { return m_newvid_1c; }
+	u8 get_newvid_1d() { return m_newvid_1d; }
 	bool is_v3xx_extended_mode() { return (m_newvid_1e == 0x00) ? false : true; }
-	bool get_newvid_1d() { return m_newvid_1d; }
 
 	u16 get_newmode_tilebase() { return m_tilebases_2x[0] | (m_tilebases_2x[1] << 8); }
 	u16 get_newmode_spritebase() { return m_tilebases_2x[2] | (m_tilebases_2x[3] << 8); }
@@ -125,12 +126,15 @@ protected:
 
 	int m_whichpixel;
 
+	u8 m_newvid_1b;
 	u8 m_newvid_1c;
 	u8 m_newvid_1d;
 	u8 m_newvid_1e;
 	u8 m_tilebases_2x[4];
 
 	u8 m_vt3xx_palette[0x400];
+
+	static constexpr unsigned YUV444_COLOR = (0x40 * 8);
 private:
 
 	u8 m_extra_sprite_bits;
@@ -141,7 +145,6 @@ private:
 	void init_vtxx_rgb555_palette_tables();
 	void init_vtxx_rgb444_palette_tables();
 
-	static constexpr unsigned YUV444_COLOR = (0x40 * 8);
 };
 
 class ppu_vt03pal_device : public ppu_vt03_device {
@@ -154,20 +157,12 @@ public:
 	ppu_vt32_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
 	ppu_vt32_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	void vt32_extvid_201b_w(u8 data);
-	void vt32_extvid_201c_w(u8 data);
-	void vt32_extvid_201d_w(u8 data);
-
-protected:
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
+	void m_newvid_1b_w(u8 data);
+	void m_newvid_1c_w(u8 data);
+	void m_newvid_1d_w(u8 data);
 
 private:
 	virtual void draw_background(u8 *line_priority) override;
-
-	u8 vt32_extvid_201b;
-	u8 vt32_extvid_201c;
-	u8 vt32_extvid_201d;
 };
 
 class ppu_vt32pal_device : public ppu_vt32_device {
