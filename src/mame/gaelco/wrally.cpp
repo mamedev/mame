@@ -861,7 +861,7 @@ GAME( 1993, wrallyc,   wrally, wrally, wrally, wrally_state, empty_init, ROT0, "
 GAME( 1993, wrallyd,   wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco", "World Rally (version 1.0, checksum D384)", MACHINE_SUPPORTS_SAVE ) // 02/Apr/1993
 GAME( 1993, wrallye,   wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco", "World Rally (version 1.0, checksum 8AA2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, wrallyac,  wrally, wrally, wrally, wrally_state, empty_init, ROT0, u8"Gaelco (Automáticos Canarios license)", "World Rally (version 1.0, checksum C448)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1993, wrallyac,  wrally, wrally, wrally, wrally_state, empty_init, ROT0, u8"Gaelco (Automáticos Canarios license)", "World Rally (version 1.0, checksum C448)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, wrallyat,  wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco (Atari license)", "World Rally (US, version 1.0, checksum 2CC1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, wrallyata, wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco (Atari license)", "World Rally (US, version 1.0, checksum 75A5)", MACHINE_SUPPORTS_SAVE ) // 16/Jun/1993
+GAME( 1993, wrallyat,  wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco (Atari license)", "World Rally (America, version 1.0, checksum 2CC1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, wrallyata, wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco (Atari license)", "World Rally (America, version 1.0, checksum 75A5)", MACHINE_SUPPORTS_SAVE ) // 16/Jun/1993
