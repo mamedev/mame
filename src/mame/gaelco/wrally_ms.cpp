@@ -52,9 +52,13 @@ public:
 		, m_vram(*this, "vram")
 	{ }
 
-	void wrally_ms(machine_config &config);
+	void wrally_ms(machine_config &config) ATTR_COLD;
 
-	void init_wrally_ms();
+	void init_wrally_ms() ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -63,17 +67,14 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<u16> m_vram;
 
-	virtual void machine_start() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
+	tilemap_t *m_tx_tilemap = nullptr;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	void vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	tilemap_t *m_tx_tilemap = nullptr;
-
-	void descramble_16x16tiles(uint8_t* src, int len);
+	void descramble_16x16tiles(uint8_t *src, int len) ATTR_COLD;
 
 	uint16_t unk_r() { return machine().rand(); }
 	uint16_t unk2_r() { return 0x0000; }
@@ -173,7 +174,7 @@ void wrally_ms_state::machine_start()
 }
 
 // Reorganize graphics into something we can decode with a single pass
-void wrally_ms_state::descramble_16x16tiles(uint8_t* src, int len)
+void wrally_ms_state::descramble_16x16tiles(uint8_t *src, int len)
 {
 	std::vector<uint8_t> buffer(len);
 	{
