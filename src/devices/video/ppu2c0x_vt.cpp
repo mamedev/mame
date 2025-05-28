@@ -631,24 +631,18 @@ void ppu_vt32_device::draw_background(u8* line_priority)
 		{
 			const int index1 = tile_index + (x * 2);
 			int page2 = readbyte(index1);
-	
+			// index+1 is colour data? maybe extra tile bits?
+
 			if (start_x < VISIBLE_SCREEN_WIDTH)
 			{
 				int gfx_address = page2 * 0x100;
 				gfx_address += 0x68000;
 				gfx_address += scroll_y_fine * 16;
 				gfx_address += ((m_refresh_data & 0x0020) >> 5) * 0x80;
-				m_whichpixel = 0;
-
-				for (int i = 0; i < 16; i++)
-					m_planebuf[i] = m_read_onespace(gfx_address + i);
 
 				for (int i = 0; i < 16; i++)
 				{
-					u8 pix = m_planebuf[m_whichpixel];
-
-					m_whichpixel++;
-
+					u8 pix = m_read_onespace(gfx_address + i);
 					if ((start_x + i) >= 0 && (start_x + i) < VISIBLE_SCREEN_WIDTH)
 					{
 						u16 palval = (m_palette_ram[pix & 0x7f] & 0x3f);
