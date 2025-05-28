@@ -255,7 +255,6 @@ void bloodbro_ms_state::sound_program_map(address_map &map)
 	map(0xc000, 0xc7ff).ram();
 	map(0xd000, 0xd7ff).ram();
 	map(0xdff0, 0xdff5).noprw(); // ???
-	// returning machine().rand() to both below addresses causes sounds to be played
 	map(0xdffe, 0xdffe).r(m_soundlatch[1], FUNC(generic_latch_8_device::read)).w(FUNC(bloodbro_ms_state::soundlatch_w));
 	map(0xdfff, 0xdfff).r(m_soundlatch[0], FUNC(generic_latch_8_device::read));
 	map(0xe000, 0xe003).w(FUNC(bloodbro_ms_state::ym_w));
