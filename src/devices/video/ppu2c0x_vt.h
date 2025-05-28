@@ -154,12 +154,20 @@ public:
 	ppu_vt32_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
 	ppu_vt32_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
+	void vt32_extvid_201b_w(u8 data);
+	void vt32_extvid_201c_w(u8 data);
+	void vt32_extvid_201d_w(u8 data);
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
 private:
 	virtual void draw_background(u8 *line_priority) override;
 
-	// see notes in .cpp file, there's an extra mode
-	// but we don't know how to enable it for now
-	static constexpr bool TEST_VT32_NEW_BGMODE = false;
+	u8 vt32_extvid_201b;
+	u8 vt32_extvid_201c;
+	u8 vt32_extvid_201d;
 };
 
 class ppu_vt32pal_device : public ppu_vt32_device {

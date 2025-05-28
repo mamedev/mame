@@ -149,14 +149,14 @@ u8 nes_vt32_soc_device::vtfp_412d_r()
 
 void nes_vt32_soc_device::vtfp_4242_w(u8 data)
 {
-	logerror("vtfp_4242_w %02x\n", data);
+	logerror("%s: vtfp_4242_w %02x\n", machine().describe_context(), data);
 	m_4242 = data;
 }
 
 void nes_vt32_soc_device::vtfp_411d_w(u8 data)
 {
 	// controls chram access and mapper emulation modes in later models
-	logerror("vtfp_411d_w  %02x\n", data);
+	logerror("%s: vtfp_411d_w  %02x\n", machine().describe_context(), data);
 	m_411d = data;
 	update_banks();
 }
@@ -212,22 +212,24 @@ void nes_vt32_soc_device::nes_vt32_soc_map(address_map &map)
 	map(0x2000, 0x2007).rw(m_ppu, FUNC(ppu2c0x_device::read), FUNC(ppu2c0x_device::write)); // standard PPU registers
 
 	// 2010 - 201f are extended regs, and can differ between VT models
-	map(0x2010, 0x2010).rw(m_ppu, FUNC(ppu_vt03_device::extended_modes_enable_r), FUNC(ppu_vt03_device::extended_modes_enable_w));
-	map(0x2011, 0x2011).rw(m_ppu, FUNC(ppu_vt03_device::extended_modes2_enable_r), FUNC(ppu_vt03_device::extended_modes2_enable_w));
-	map(0x2012, 0x2012).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_0_r), FUNC(ppu_vt03_device::videobank0_0_w));
-	map(0x2013, 0x2013).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_1_r), FUNC(ppu_vt03_device::videobank0_1_w));
-	map(0x2014, 0x2014).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_2_r), FUNC(ppu_vt03_device::videobank0_2_w));
-	map(0x2015, 0x2015).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_3_r), FUNC(ppu_vt03_device::videobank0_3_w));
-	map(0x2016, 0x2016).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_4_r), FUNC(ppu_vt03_device::videobank0_4_w));
-	map(0x2017, 0x2017).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_5_r), FUNC(ppu_vt03_device::videobank0_5_w));
-	map(0x2018, 0x2018).rw(m_ppu, FUNC(ppu_vt03_device::videobank1_r), FUNC(ppu_vt03_device::videobank1_w));
-	map(0x2019, 0x2019).rw(m_ppu, FUNC(ppu_vt03_device::unk_2019_r), FUNC(ppu_vt03_device::gun_reset_w));
-	map(0x201a, 0x201a).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_extra_r), FUNC(ppu_vt03_device::videobank0_extra_w));
-	map(0x201b, 0x201b).r(m_ppu, FUNC(ppu_vt03_device::unk_201b_r));
-	map(0x201c, 0x201c).r(m_ppu, FUNC(ppu_vt03_device::gun_x_r));
-	map(0x201d, 0x201d).r(m_ppu, FUNC(ppu_vt03_device::gun_y_r));
-	map(0x201e, 0x201e).r(m_ppu, FUNC(ppu_vt03_device::gun2_x_r));
-	map(0x201f, 0x201f).r(m_ppu, FUNC(ppu_vt03_device::gun2_y_r));
+	map(0x2010, 0x2010).rw(m_ppu, FUNC(ppu_vt32_device::extended_modes_enable_r), FUNC(ppu_vt32_device::extended_modes_enable_w));
+	map(0x2011, 0x2011).rw(m_ppu, FUNC(ppu_vt32_device::extended_modes2_enable_r), FUNC(ppu_vt32_device::extended_modes2_enable_w));
+	map(0x2012, 0x2012).rw(m_ppu, FUNC(ppu_vt32_device::videobank0_0_r), FUNC(ppu_vt32_device::videobank0_0_w));
+	map(0x2013, 0x2013).rw(m_ppu, FUNC(ppu_vt32_device::videobank0_1_r), FUNC(ppu_vt32_device::videobank0_1_w));
+	map(0x2014, 0x2014).rw(m_ppu, FUNC(ppu_vt32_device::videobank0_2_r), FUNC(ppu_vt32_device::videobank0_2_w));
+	map(0x2015, 0x2015).rw(m_ppu, FUNC(ppu_vt32_device::videobank0_3_r), FUNC(ppu_vt32_device::videobank0_3_w));
+	map(0x2016, 0x2016).rw(m_ppu, FUNC(ppu_vt32_device::videobank0_4_r), FUNC(ppu_vt32_device::videobank0_4_w));
+	map(0x2017, 0x2017).rw(m_ppu, FUNC(ppu_vt32_device::videobank0_5_r), FUNC(ppu_vt32_device::videobank0_5_w));
+	map(0x2018, 0x2018).rw(m_ppu, FUNC(ppu_vt32_device::videobank1_r), FUNC(ppu_vt32_device::videobank1_w));
+	map(0x2019, 0x2019).rw(m_ppu, FUNC(ppu_vt32_device::unk_2019_r), FUNC(ppu_vt32_device::gun_reset_w));
+	map(0x201a, 0x201a).rw(m_ppu, FUNC(ppu_vt32_device::videobank0_extra_r), FUNC(ppu_vt32_device::videobank0_extra_w));
+	map(0x201b, 0x201b).rw(m_ppu, FUNC(ppu_vt32_device::unk_201b_r), FUNC(ppu_vt32_device::vt32_extvid_201b_w));
+	map(0x201c, 0x201c).rw(m_ppu, FUNC(ppu_vt32_device::gun_x_r), FUNC(ppu_vt32_device::vt32_extvid_201c_w));
+	map(0x201d, 0x201d).rw(m_ppu, FUNC(ppu_vt32_device::gun_y_r), FUNC(ppu_vt32_device::vt32_extvid_201d_w));
+	map(0x201e, 0x201e).r(m_ppu, FUNC(ppu_vt32_device::gun2_x_r));
+	map(0x201f, 0x201f).r(m_ppu, FUNC(ppu_vt32_device::gun2_y_r));
+
+	map(0x2040, 0x2049).nopw();// w(m_ppu, FUNC(ppu_vt3xx_device::lcdc_regs_w)); // LCD control like on VT369?
 
 	map(0x4000, 0x4017).w(m_apu, FUNC(nes_apu_vt_device::write));
 	map(0x4014, 0x4014).w(FUNC(nes_vt32_soc_device::vt_dma_w));
@@ -256,7 +258,10 @@ void nes_vt32_soc_device::nes_vt32_soc_map(address_map &map)
 	map(0x414a, 0x414a).r(FUNC(nes_vt32_soc_device::vthh_414a_r));
 
 	map(0x412c, 0x412c).w(FUNC(nes_vt32_soc_device::vtfp_412c_extbank_w)); // GPIO
-	map(0x412d, 0x412d).r(FUNC(nes_vt32_soc_device::vtfp_412d_r)); // GPIO
+	map(0x412d, 0x412d).r(FUNC(nes_vt32_soc_device::vtfp_412d_r)).nopw(); // GPIO
+
+	map(0x4141, 0x4141).nopw(); // ??
+	map(0x4142, 0x4142).nopw(); // ??
 
 	map(0x4242, 0x4242).w(FUNC(nes_vt32_soc_device::vtfp_4242_w));
 

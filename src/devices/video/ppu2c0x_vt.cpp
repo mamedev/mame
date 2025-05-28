@@ -597,9 +597,31 @@ void ppu_vt03_device::videobank0_extra_w(offs_t offset, u8 data) { m_videobank0_
 /* 201e read gun 2 read x (older VT chipsets) */
 /* 201f read gun 2 read y (older VT chipsets) */
 
+void ppu_vt32_device::vt32_extvid_201b_w(u8 data) { logerror("%s: vt32_extvid_201b_w %02x\n", machine().describe_context(), data); vt32_extvid_201b = data; }
+void ppu_vt32_device::vt32_extvid_201c_w(u8 data) { logerror("%s: vt32_extvid_201c_w %02x\n", machine().describe_context(), data); vt32_extvid_201c = data; }
+void ppu_vt32_device::vt32_extvid_201d_w(u8 data) { logerror("%s: vt32_extvid_201d_w %02x\n", machine().describe_context(), data); vt32_extvid_201d = data; }
+
+void ppu_vt32_device::device_start()
+{
+	ppu_vt03_device::device_start();
+
+	save_item(NAME(vt32_extvid_201b));
+	save_item(NAME(vt32_extvid_201c));
+	save_item(NAME(vt32_extvid_201d));
+}
+
+void ppu_vt32_device::device_reset()
+{
+	ppu_vt03_device::device_reset();
+
+	vt32_extvid_201b = 0x00;
+	vt32_extvid_201c = 0x00;
+	vt32_extvid_201d = 0x00;
+}
+
 void ppu_vt32_device::draw_background(u8* line_priority)
 {
-	if (TEST_VT32_NEW_BGMODE)
+	if (vt32_extvid_201c == 0x2e)
 	{
 		// strange custom mode, feels more like a vt369 mode
 		// tiles use 16x16x8 packed data
@@ -607,8 +629,10 @@ void ppu_vt32_device::draw_background(u8* line_priority)
 		// tile 0x680 in matet220 (0x68000 in ROM)
 		// tile 0x800 in matet300 (0x80000 in ROM)
 
-		/* determine where in the nametable to start drawing from */
-		/* based on the current scanline and scroll regs */
+		// palette data seems to be written to 3c00? (usually VT32 would be 3e00+ for palette)
+
+		// determine where in the nametable to start drawing from
+		// based on the current scanline and scroll regs
 		const u8  scroll_x_coarse = m_refresh_data & 0x001f;
 		const u8  scroll_y_coarse = (m_refresh_data & 0x03c0) >> 5;
 		// m_refresh_data & 0x0020 in this case would be the top/bottom of the tile
@@ -618,7 +642,6 @@ void ppu_vt32_device::draw_background(u8* line_priority)
 
 		int x = scroll_x_coarse & ~1;
 
-		/* get the tile index */
 		int tile_index = (nametable | 0x2000) + scroll_y_coarse * 16;
 
 		int start_x = 0;
@@ -626,7 +649,7 @@ void ppu_vt32_device::draw_background(u8* line_priority)
 
 		m_tilecount = 0;
 
-		/* draw the 15 or 16 tiles that make up a line */
+		// draw the 15 or 16 tiles that make up a line
 		while (m_tilecount < 17)
 		{
 			const int index1 = tile_index + (x * 2);
@@ -636,7 +659,10 @@ void ppu_vt32_device::draw_background(u8* line_priority)
 			if (start_x < VISIBLE_SCREEN_WIDTH)
 			{
 				int gfx_address = page2 * 0x100;
-				gfx_address += 0x68000;
+				// this should probably go through the standard video banking?
+				gfx_address += m_videobank0[0x5] * 0x800;
+				gfx_address += m_videobank1 * 0x8000;
+
 				gfx_address += scroll_y_fine * 16;
 				gfx_address += ((m_refresh_data & 0x0020) >> 5) * 0x80;
 
