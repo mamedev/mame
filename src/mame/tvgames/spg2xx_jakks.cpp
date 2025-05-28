@@ -460,6 +460,11 @@ ROM_START( jak_slpb )
 	ROM_LOAD16_WORD_SWAP( "jakks_sleepingbeauty.u5", 0x000000, 0x200000, CRC(e5b20a73) SHA1(3c305c4b9265d9bbf090805daaf26ad43af54389) )
 ROM_END
 
+ROM_START( jak_hm1m )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakkshmoiam.u4", 0x000000, 0x400000, CRC(38f0ec0c) SHA1(15458aa3de77776a9e3419073a8af7f92e403b6e) )
+ROM_END
+
 ROM_START( jak_supm )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "superman.u3", 0x000000, 0x400000, CRC(626bdd85) SHA1(605b3193c17f606d2de5689f045b50ac0b7ff024) )
@@ -635,6 +640,8 @@ CONS( 2007, jak_cind, 0, 0, spg2xx_jakks,  spg2xx_pacg,   jakks_state, empty_ini
 
 CONS( 2007, jak_slpb, 0, 0, spg2xx_jakks,  spg2xx_pacg,   jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",  "Sleeping Beauty - Tales of Enchantment (JAKKS Pacific TV Game) (Sep 17 2007 14:45:02)", MACHINE_IMPERFECT_SOUND )
 
+CONS( 2007, jak_hm1m, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",  "Hannah Montana - One in a Million (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
+
 // from a PAL unit, and seems to have timing issues on the audio (speech cutting off / starting before previous has finished) when using an NTSC machine config, so maybe the NTSC ROM is different?
 // test mode combination isn't the usual HotGen one, but can be accessed by setting a breakpoint at 0xa6ba and setting r2 to 0x0a - TODO: figure out combination so version can be checked against an NTSC unit.
 CONS( 2006, jak_sesa, 0, 0, jakks_sesa,    spg2xx_sesa,   jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",  "Sesame Street Beat (JAKKS Pacific TV Game) (Aug 23 2006 19:12:03, PAL/UK)", MACHINE_IMPERFECT_SOUND )
@@ -660,4 +667,4 @@ CONS( 2007, jak_dwa,  0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_ini
 
 CONS( 2006, jak_gdg,  0, 0, spg2xx_dpma,   spg2xx_gdg,    jakks_state, empty_init, "JAKKS Pacific Inc / 1st Playable Productions",  "Go Diego Go! (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2007, jak_dond, 0, 0, spg2xx_jakks,  jak_dond,      jakks_state, empty_init, "JAKKS Pacific Inc / Pronto Games",    "Deal or No Deal (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
+CONS( 2006, jak_dond, 0, 0, spg2xx_jakks,  jak_dond,      jakks_state, empty_init, "JAKKS Pacific Inc / Pronto Games",    "Deal or No Deal (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
