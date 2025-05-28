@@ -195,9 +195,6 @@ public:
 		m_generation(1),
 		m_exiting(false),
 		m_audio_latency(0.0F),
-		m_hEventNeedUpdate(nullptr),
-		m_hEventEngineError(nullptr),
-		m_hEventExiting(nullptr),
 		m_overflows(0),
 		m_underflows(0)
 	{
@@ -334,9 +331,9 @@ private:
 	bool                        m_exiting;
 
 	float                       m_audio_latency;
-	HANDLE                      m_hEventNeedUpdate;
-	HANDLE                      m_hEventEngineError;
-	HANDLE                      m_hEventExiting;
+	handle_ptr                  m_need_update_event;
+	handle_ptr                  m_engine_error_event;
+	handle_ptr                  m_exiting_event;
 	std::thread                 m_audioThread;
 	std::atomic<uint32_t>       m_overflows;
 	std::atomic<uint32_t>       m_underflows;
@@ -365,7 +362,7 @@ int sound_xaudio2::init(osd_interface &osd, osd_options const &options)
 	// make sure our XAudio2Create entry point is bound
 	if (!OSD_DYNAMIC_API_TEST(XAudio2Create))
 	{
-		osd_printf_error("Could not find XAudio2. Please try to reinstall DirectX runtime package.\n");
+		osd_printf_error("Sound: Could not find XAudio2 library.\n");
 		return 1;
 	}
 
@@ -384,13 +381,18 @@ int sound_xaudio2::init(osd_interface &osd, osd_options const &options)
 		m_endpoint_notifications = true;
 
 		{
+			m_default_sink_id.clear();
+			m_default_sink = 0;
 			co_task_wstr_ptr default_id;
 			result = get_default_audio_device_id(*m_device_enum.Get(), eRender, eMultimedia, default_id);
-			if (FAILED(result) || !default_id)
+			if (HRESULT_FROM_WIN32(ERROR_NOT_FOUND) == result)
+			{
+				// no active output devices, hence no default
+			}
+			else if (FAILED(result) || !default_id)
 			{
 				// this is non-fatal, they just might get the wrong default output device
 				osd_printf_error("Sound: Error getting default audio output device ID. Error: 0x%X\n", result);
-				m_default_sink_id.clear();
 			}
 			else
 			{
@@ -398,6 +400,9 @@ int sound_xaudio2::init(osd_interface &osd, osd_options const &options)
 				std::wstring_view default_id_str(default_id.get());
 				m_default_sink_id.reserve(default_id_str.length() * 2);
 				m_default_sink_id = default_id_str;
+				osd_printf_verbose(
+						"Sound: Got default output device ID: %s\n",
+						osd::text::from_wstring(m_default_sink_id));
 			}
 		}
 
@@ -450,7 +455,7 @@ int sound_xaudio2::init(osd_interface &osd, osd_options const &options)
 							devinfo->info.m_name,
 							osd::text::from_wstring(devinfo->device_id),
 							devinfo->info.m_id);
-					if (!m_default_sink && (devinfo->device_id == m_default_sink_id))
+					if (devinfo->device_id == m_default_sink_id)
 						m_default_sink = devinfo->info.m_id;
 					m_device_info.emplace(pos, std::move(devinfo));
 
@@ -469,9 +474,11 @@ int sound_xaudio2::init(osd_interface &osd, osd_options const &options)
 	m_cleanup_thread = std::thread([] (sound_xaudio2 *self) { self->cleanup_task(); }, this);
 
 	// Initialize our events
-	m_hEventNeedUpdate = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-	m_hEventEngineError = CreateEvent(nullptr, FALSE, FALSE, nullptr);
-	m_hEventExiting = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+	m_need_update_event.reset(CreateEvent(nullptr, FALSE, FALSE, nullptr));
+	m_engine_error_event.reset(CreateEvent(nullptr, FALSE, FALSE, nullptr));
+	m_exiting_event.reset(CreateEvent(nullptr, FALSE, FALSE, nullptr));
+	if (!m_need_update_event || !m_engine_error_event || !m_exiting_event)
+		goto Error;
 
 	// Start the thread listening
 	m_audioThread = std::thread([] (sound_xaudio2 *self) { self->audio_task(); }, this);
@@ -525,29 +532,15 @@ void sound_xaudio2::exit()
 	}
 
 	// Wait on processing thread to end
-	if (m_hEventExiting)
-		SetEvent(m_hEventExiting);
+	if (m_exiting_event)
+		SetEvent(m_exiting_event.get());
 
 	if (m_audioThread.joinable())
 		m_audioThread.join();
 
-	if (m_hEventNeedUpdate)
-	{
-		CloseHandle(m_hEventNeedUpdate);
-		m_hEventNeedUpdate = nullptr;
-	}
-
-	if (m_hEventEngineError)
-	{
-		CloseHandle(m_hEventEngineError);
-		m_hEventEngineError = nullptr;
-	}
-
-	if (m_hEventExiting)
-	{
-		CloseHandle(m_hEventExiting);
-		m_hEventExiting = nullptr;
-	}
+	m_need_update_event.reset();
+	m_engine_error_event.reset();
+	m_exiting_event.reset();
 
 	if (m_cleanup_thread.joinable())
 	{
@@ -557,6 +550,7 @@ void sound_xaudio2::exit()
 			m_cleanup_condition.notify_all();
 		}
 		m_cleanup_thread.join();
+		m_exiting = false;
 	}
 
 	// just to be extra sure
@@ -569,6 +563,8 @@ void sound_xaudio2::exit()
 
 	if (m_overflows != 0 || m_underflows != 0)
 		osd_printf_verbose("Sound: overflows=%u, underflows=%u\n", m_overflows, m_underflows);
+	m_overflows.store(0, std::memory_order_relaxed);
+	m_underflows.store(0, std::memory_order_relaxed);
 
 	osd_printf_verbose("Sound: XAudio2 deinitialized\n");
 }
@@ -900,7 +896,7 @@ void sound_xaudio2::device_info::OnCriticalError(HRESULT error)
 	{
 		std::lock_guard device_lock(m_host.m_device_mutex);
 		engine_error = true;
-		SetEvent(m_host.m_hEventEngineError);
+		SetEvent(m_host.m_engine_error_event.get());
 
 		try
 		{
@@ -990,7 +986,7 @@ void sound_xaudio2::voice_info::update(int16_t const *buffer, int samples_this_f
 	}
 
 	m_need_update = true;
-	SetEvent(m_host.m_hEventNeedUpdate);
+	SetEvent(m_host.m_need_update_event.get());
 }
 
 //============================================================
@@ -1140,6 +1136,7 @@ void sound_xaudio2::voice_info::OnVoiceProcessingPassStart(UINT32 BytesRequired)
 
 void sound_xaudio2::voice_info::OnBufferEnd(void *pBufferContext) noexcept
 {
+	// FIXME: this is an XAudio2 callback, so it should really use a more fine-grained lock
 	BYTE *const completed_buffer = static_cast<BYTE *>(pBufferContext);
 	std::lock_guard voice_lock(m_host.m_voice_mutex);
 
@@ -1147,7 +1144,7 @@ void sound_xaudio2::voice_info::OnBufferEnd(void *pBufferContext) noexcept
 		m_buffer_pool->return_to_pool(std::unique_ptr<BYTE []>(completed_buffer));
 
 	m_need_update = true;
-	SetEvent(m_host.m_hEventNeedUpdate);
+	SetEvent(m_host.m_need_update_event.get());
 }
 
 //============================================================
@@ -1318,7 +1315,9 @@ HRESULT sound_xaudio2::OnDefaultDeviceChanged(EDataFlow flow, ERole role, LPCWST
 			{
 				// changing the app setting to "Default" in mixer controls gives a null string here
 				HRESULT const result = get_default_audio_device_id(*m_device_enum.Get(), flow, role, default_id_str);
-				if (FAILED(result))
+				if (HRESULT_FROM_WIN32(ERROR_NOT_FOUND) == result)
+					return S_OK;
+				else if (FAILED(result))
 					return result;
 				else if (!default_id_str)
 					return E_POINTER;
@@ -1332,9 +1331,30 @@ HRESULT sound_xaudio2::OnDefaultDeviceChanged(EDataFlow flow, ERole role, LPCWST
 				auto const pos = find_device(m_default_sink_id);
 				if ((m_device_info.end() != pos) && ((*pos)->device_id == m_default_sink_id) && ((*pos)->info.m_id != m_default_sink))
 				{
+					try
+					{
+						osd_printf_verbose(
+								"Sound: Default output device changed to %s.\n",
+								(*pos)->info.m_name);
+					}
+					catch (std::bad_alloc const &)
+					{
+					}
 					m_default_sink = (*pos)->info.m_id;
 
 					++m_generation;
+				}
+				else
+				{
+					try
+					{
+						osd_printf_verbose(
+								"Sound: Default output device changed ID changed to %s (not found).\n",
+								osd::text::from_wstring(m_default_sink_id));
+					}
+					catch (std::bad_alloc const &)
+					{
+					}
 				}
 			}
 		}
@@ -1581,7 +1601,7 @@ void sound_xaudio2::purge_voices(uint32_t node)
 void sound_xaudio2::audio_task()
 {
 	bool exiting = FALSE;
-	HANDLE hEvents[] = { m_hEventNeedUpdate, m_hEventEngineError, m_hEventExiting };
+	HANDLE hEvents[] = { m_need_update_event.get(), m_engine_error_event.get(), m_exiting_event.get() };
 	while (!exiting)
 	{
 		DWORD wait_result = WaitForMultipleObjects(std::size(hEvents), hEvents, FALSE, INFINITE);

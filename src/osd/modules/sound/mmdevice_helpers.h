@@ -37,6 +37,15 @@ struct prop_variant_helper
 	prop_variant_helper &operator=(prop_variant_helper const &) = delete;
 };
 
+struct handle_deleter
+{
+	void operator()(HANDLE obj) const
+	{
+		if (obj)
+			CloseHandle(obj);
+	}
+};
+
 struct co_task_mem_deleter
 {
 	template <typename T>
@@ -46,6 +55,8 @@ struct co_task_mem_deleter
 			CoTaskMemFree(obj);
 	}
 };
+
+using handle_ptr               = std::unique_ptr<std::remove_pointer_t<HANDLE>, handle_deleter>;
 
 using co_task_wstr_ptr         = std::unique_ptr<wchar_t, co_task_mem_deleter>;
 
