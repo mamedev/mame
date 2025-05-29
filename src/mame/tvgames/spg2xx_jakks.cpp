@@ -26,9 +26,11 @@ public:
 	void jakks_mpac(machine_config& config);
 	void jakks_rapm(machine_config& config);
 	void jakks_sesa(machine_config& config);
-
+	void spg2xx_hmbb(machine_config& config);
+	
 private:
 	void mem_map_2m_mkram(address_map &map) ATTR_COLD;
+	void mem_map_hmbb(address_map &map) ATTR_COLD;
 	void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 };
 
@@ -389,6 +391,12 @@ void jakks_state::mem_map_2m_mkram(address_map &map)
 	map(0x3e0000, 0x3fffff).ram().share("nvram"); // backed up by the CR2032
 }
 
+void jakks_state::mem_map_hmbb(address_map &map)
+{
+	map(0x000000, 0x3fffff).bankr("cartbank");
+	map(0x3e0000, 0x3fffff).ram();
+}
+
 void jakks_state::mk(machine_config &config)
 {
 	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
@@ -403,6 +411,22 @@ void jakks_state::mk(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
 }
+
+void jakks_state::spg2xx_hmbb(machine_config &config)
+{
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+
+	spg2xx_base(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &jakks_state::mem_map_hmbb);
+
+	m_maincpu->porta_in().set(FUNC(jakks_state::base_porta_r));
+	m_maincpu->portc_in().set_ioport("P3");
+	m_maincpu->portc_out().set(FUNC(jakks_state::portc_w));
+
+	I2C_24C16(config, m_i2cmem, 0);
+}
+
 
 void jakks_state::jakks_mpaco(machine_config &config)
 {
@@ -587,6 +611,11 @@ ROM_START( jak_dond )
 	ROM_LOAD16_WORD_SWAP( "jakksdond.u4", 0x000000, 0x200000, CRC(0ae0706f) SHA1(6144190d126b36378c05b6e0a633ab2b53b3fa39) )
 ROM_END
 
+ROM_START( jak_hmbb )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakkhmbobw.bin", 0x000000, 0x800000, CRC(4e72cbf9) SHA1(efcec76da39c8373e8ef769c4fa0a35d379896d8) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -641,6 +670,8 @@ CONS( 2007, jak_cind, 0, 0, spg2xx_jakks,  spg2xx_pacg,   jakks_state, empty_ini
 CONS( 2007, jak_slpb, 0, 0, spg2xx_jakks,  spg2xx_pacg,   jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",  "Sleeping Beauty - Tales of Enchantment (JAKKS Pacific TV Game) (Sep 17 2007 14:45:02)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2007, jak_hm1m, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",  "Hannah Montana - One in a Million (JAKKS Pacific TV Game) (Aug 13 2007 15:42:29)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2007, jak_hmbb, 0, 0, spg2xx_hmbb,   spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",  "Hannah Montana - Best of Both Worlds (JAKKS Pacific TV Game) (Aug 17 2007 22:47:47)", MACHINE_IMPERFECT_SOUND )
 
 // from a PAL unit, and seems to have timing issues on the audio (speech cutting off / starting before previous has finished) when using an NTSC machine config, so maybe the NTSC ROM is different?
 // test mode combination isn't the usual HotGen one, but can be accessed by setting a breakpoint at 0xa6ba and setting r2 to 0x0a - TODO: figure out combination so version can be checked against an NTSC unit.
