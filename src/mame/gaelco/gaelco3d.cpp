@@ -1394,10 +1394,10 @@ ROM_START( radikalbp ) // Development PCB, silkscreened "3D-3G-AER/2"
 	ROM_LOAD( "rab_27.ic27", 0x0060000, 0x020000, BAD_DUMP CRC(bbcf6977) SHA1(0282c8ba79c35ed1240711d5812bfb590d151738) ) // Not present on the development PCB ??
 
 	ROM_REGION( 0x117, "plds", 0 )
-	ROM_LOAD( "deco-i_pal16l8.ic21", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "deco-i_pal16l8.ic21", 0x000, 0x117, BAD_DUMP CRC(81484e3b) SHA1(c63f35dba20c7fd7226e03cf18d2860740b0dd0c) ) // Bruteforced
 	ROM_LOAD( "m.1_pal16l8.ic91",    0x000, 0x117, NO_DUMP )
-	ROM_LOAD( "p_pal16l8d.u21",      0x000, 0x117, NO_DUMP )
-	ROM_LOAD( "so_pal16l8d.u82",     0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "p_pal16l8d.u21",      0x000, 0x117, BAD_DUMP CRC(f957b735) SHA1(7015400a94f1a07762f1b285a9038bec72c1aa3b) ) // Bruteforced
+	ROM_LOAD( "so_pal16l8d.u82",     0x000, 0x117, BAD_DUMP CRC(f706c313) SHA1(90c615d817267d809515050bf8ca1ac816a8a57f) ) // Bruteforced
 ROM_END
 
 
