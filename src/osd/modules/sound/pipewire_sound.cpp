@@ -547,6 +547,12 @@ void sound_pipewire::exit()
 	pw_context_destroy(m_context);
 	pw_thread_loop_destroy(m_loop);
 	pw_deinit();
+
+	m_nodes.clear();
+	m_node_osdid_to_id.clear();
+	m_streams.clear();
+	m_default_audio_sink = "";
+	m_default_audio_source = "";
 }
 
 uint32_t sound_pipewire::get_generation()
