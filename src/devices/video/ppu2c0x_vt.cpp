@@ -609,11 +609,6 @@ void ppu_vt32_device::draw_background(u8* line_priority)
 	{
 		// strange custom mode, feels more like a vt369 mode
 		// tiles use 16x16x8 packed data
-		// if ROM is decoded as this they're at
-		// tile 0x680 in matet220 (0x68000 in ROM)
-		// tile 0x800 in matet300 (0x80000 in ROM)
-
-		// palette data seems to be written to 3c00? (usually VT32 would be 3e00+ for palette)
 
 		// determine where in the nametable to start drawing from
 		// based on the current scanline and scroll regs
