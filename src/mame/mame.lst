@@ -18824,6 +18824,9 @@ wrallymp
 @source:gaelco/xorworld.cpp
 xorworld
 
+@source:gaelco/xorworld_ms.cpp
+xorworldm
+
 @source:galaxian/dambustr.cpp
 dambustr
 dambustra
