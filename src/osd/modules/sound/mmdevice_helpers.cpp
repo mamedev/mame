@@ -272,7 +272,8 @@ HRESULT populate_audio_node_info(
 	try
 	{
 		device_id = device_id_w.get();
-		info.m_name = std::move(device_name);
+		info.m_name = osd::text::from_wstring(device_id);
+		info.m_display_name = std::move(device_name);
 		info.m_rate.m_default_rate = format->nSamplesPerSec;
 		info.m_rate.m_min_rate = format->nSamplesPerSec;
 		info.m_rate.m_max_rate = format->nSamplesPerSec;

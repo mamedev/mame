@@ -1420,7 +1420,6 @@ HRESULT sound_xaudio2::OnPropertyValueChanged(LPCWSTR pwstrDeviceId, PROPERTYKEY
 
 				if (name)
 				{
-					(*pos)->info.m_name = std::move(*name);
 					(*pos)->info.m_display_name = (*pos)->info.m_name;
 
 					++m_generation;
