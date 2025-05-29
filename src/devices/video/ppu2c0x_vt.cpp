@@ -616,7 +616,7 @@ void ppu_vt32_device::draw_background(u8* line_priority)
 		const u8  scroll_y_coarse = (m_refresh_data & 0x03c0) >> 5;
 		// m_refresh_data & 0x0020 in this case would be the top/bottom of the tile
 
-		const u16 nametable = m_refresh_data & 0x0c00;
+		const u16 nametable = (m_refresh_data & 0x0c00) >> 1;
 		const u8  scroll_y_fine = (m_refresh_data & 0x7000) >> 12;
 
 		int x = scroll_x_coarse >> 1;// &~1;
@@ -633,7 +633,7 @@ void ppu_vt32_device::draw_background(u8* line_priority)
 		{
 			const int index1 = tile_index + (x * 2);
 			int page2 = readbyte(index1);
-			page2 |= (readbyte(index1+1) & 0x03) << 8; // index+1 is colour data? and extra tile bits
+			page2 |= (readbyte(index1 + 1) & 0x03) << 8; // index+1 is colour data? and extra tile bits
 
 			if (start_x < VISIBLE_SCREEN_WIDTH)
 			{
