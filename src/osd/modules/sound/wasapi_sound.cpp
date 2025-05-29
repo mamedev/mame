@@ -191,7 +191,7 @@ private:
 			device_info_vector_iterator &device,
 			audio_client_ptr &client,
 			co_task_wave_format_ptr &mix_format,
-			WAVEFORMATEX &format);
+			WAVEFORMATEXTENSIBLE &format);
 
 	void cleanup_task();
 
@@ -749,13 +749,13 @@ uint32_t sound_wasapi::stream_sink_open(uint32_t node, std::string name, uint32_
 		device_info_vector_iterator device;
 		audio_client_ptr client;
 		co_task_wave_format_ptr mix;
-		WAVEFORMATEX format;
+		WAVEFORMATEXTENSIBLE format;
 		if (!activate_audio_client(node, name, rate, false, device, client, mix, format))
 			return 0;
 
 		// need sample rate conversion if the sample rates don't match
 		DWORD stream_flags = AUDCLNT_STREAMFLAGS_EVENTCALLBACK;
-		if (format.nSamplesPerSec != mix->nSamplesPerSec)
+		if (format.Format.nSamplesPerSec != mix->nSamplesPerSec)
 			stream_flags |= AUDCLNT_STREAMFLAGS_AUTOCONVERTPCM | AUDCLNT_STREAMFLAGS_SRC_DEFAULT_QUALITY;
 
 		// initialise the audio client interface
@@ -764,7 +764,7 @@ uint32_t sound_wasapi::stream_sink_open(uint32_t node, std::string name, uint32_
 				stream_flags,
 				lround(m_audio_latency * 1e4F), // 100 ns units
 				0,
-				&format,
+				&format.Format,
 				nullptr);
 		if (FAILED(result))
 		{
@@ -879,7 +879,7 @@ uint32_t sound_wasapi::stream_source_open(uint32_t node, std::string name, uint3
 		device_info_vector_iterator device;
 		audio_client_ptr client;
 		co_task_wave_format_ptr mix;
-		WAVEFORMATEX format;
+		WAVEFORMATEXTENSIBLE format;
 		if (!activate_audio_client(node, name, rate, true, device, client, mix, format))
 			return 0;
 
@@ -887,7 +887,7 @@ uint32_t sound_wasapi::stream_source_open(uint32_t node, std::string name, uint3
 		DWORD stream_flags = AUDCLNT_STREAMFLAGS_EVENTCALLBACK;
 		if (device->info.m_sinks)
 			stream_flags |= AUDCLNT_STREAMFLAGS_LOOPBACK;
-		if (format.nSamplesPerSec != mix->nSamplesPerSec)
+		if (format.Format.nSamplesPerSec != mix->nSamplesPerSec)
 			stream_flags |= AUDCLNT_STREAMFLAGS_AUTOCONVERTPCM | AUDCLNT_STREAMFLAGS_SRC_DEFAULT_QUALITY;
 
 		// initialise the audio client interface
@@ -896,7 +896,7 @@ uint32_t sound_wasapi::stream_source_open(uint32_t node, std::string name, uint3
 				stream_flags,
 				10 * 10'000, // 10 ms in units of 100 ns
 				0,
-				&format,
+				&format.Format,
 				nullptr);
 		if (FAILED(result))
 		{
@@ -1519,7 +1519,7 @@ bool sound_wasapi::activate_audio_client(
 		device_info_vector_iterator &device,
 		audio_client_ptr &client,
 		co_task_wave_format_ptr &mix_format,
-		WAVEFORMATEX &format)
+		WAVEFORMATEXTENSIBLE &format)
 {
 	HRESULT result;
 
@@ -1581,10 +1581,14 @@ bool sound_wasapi::activate_audio_client(
 	}
 
 	// set up desired format
+	std::optional<DWORD> positions;
+	if (WAVE_FORMAT_EXTENSIBLE == mix_format->wFormatTag)
+		positions = reinterpret_cast<WAVEFORMATEXTENSIBLE const *>(mix_format.get())->dwChannelMask;
 	populate_wave_format(
 			format,
 			input ? device->info.m_sources : device->info.m_sinks,
-			rate);
+			rate,
+			positions);
 
 	return true;
 }

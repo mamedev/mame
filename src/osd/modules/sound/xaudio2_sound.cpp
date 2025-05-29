@@ -712,8 +712,8 @@ uint32_t sound_xaudio2::stream_sink_open(uint32_t node, std::string name, uint32
 		}
 
 		// set up desired input format
-		WAVEFORMATEX format;
-		populate_wave_format(format, (*device)->info.m_sinks, rate);
+		WAVEFORMATEXTENSIBLE format;
+		populate_wave_format(format, (*device)->info.m_sinks, rate, std::nullopt);
 
 		// set up destinations
 		XAUDIO2_SEND_DESCRIPTOR destination;
@@ -724,7 +724,7 @@ uint32_t sound_xaudio2::stream_sink_open(uint32_t node, std::string name, uint32
 		sends.pSends = &destination;
 
 		// create the voice info object
-		voice_info_ptr info = std::make_unique<voice_info>(*this, format);
+		voice_info_ptr info = std::make_unique<voice_info>(*this, format.Format);
 		info->info.m_node = node;
 		info->info.m_volumes.resize((*device)->info.m_sinks, 0.0F);
 
@@ -732,7 +732,7 @@ uint32_t sound_xaudio2::stream_sink_open(uint32_t node, std::string name, uint32
 		IXAudio2SourceVoice *source_voice_raw = nullptr;
 		result = (*device)->engine->CreateSourceVoice(
 				&source_voice_raw,
-				&format,
+				&format.Format,
 				XAUDIO2_VOICE_NOPITCH,
 				1.0F,
 				info.get(),
@@ -755,8 +755,8 @@ uint32_t sound_xaudio2::stream_sink_open(uint32_t node, std::string name, uint32
 		// set the channel mapping
 		result = info->voice->SetOutputMatrix(
 				nullptr,
-				format.nChannels,
-				format.nChannels,
+				format.Format.nChannels,
+				format.Format.nChannels,
 				info->volume_matrix.get(),
 				XAUDIO2_COMMIT_NOW);
 		if (FAILED(result))

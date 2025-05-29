@@ -9,6 +9,7 @@
 
 #include "interface/audio.h"
 
+#include <cstring>
 #include <memory>
 #include <optional>
 #include <string>
@@ -115,15 +116,30 @@ HRESULT get_string_property_value(
 		REFPROPERTYKEY key,
 		std::optional<std::string> &value);
 
-inline void populate_wave_format(WAVEFORMATEX &format, DWORD channels, DWORD rate)
+inline void populate_wave_format(
+		WAVEFORMATEXTENSIBLE &format,
+		DWORD channels,
+		DWORD rate,
+		std::optional<DWORD> positions)
 {
-	format.wFormatTag = WAVE_FORMAT_PCM;
-	format.nChannels = channels;
-	format.nSamplesPerSec = rate;
-	format.nAvgBytesPerSec = 2 * channels * rate;
-	format.nBlockAlign = 2 * channels;
-	format.wBitsPerSample = 16;
-	format.cbSize = 0;
+	std::memset(&format, 0, sizeof(format));
+
+	format.Format.wFormatTag = WAVE_FORMAT_PCM;
+	format.Format.nChannels = channels;
+	format.Format.nSamplesPerSec = rate;
+	format.Format.nAvgBytesPerSec = 2 * channels * rate;
+	format.Format.nBlockAlign = 2 * channels;
+	format.Format.wBitsPerSample = 16;
+	format.Format.cbSize = 0;
+
+	if (positions || (2 < channels))
+	{
+		format.Format.wFormatTag = WAVE_FORMAT_EXTENSIBLE;
+		format.Format.cbSize = sizeof(format) - sizeof(format.Format);
+		format.Samples.wValidBitsPerSample = 16;
+		format.dwChannelMask = positions ? *positions : 0;
+		format.SubFormat = KSDATAFORMAT_SUBTYPE_PCM;
+	}
 }
 
 } // namespace osd
