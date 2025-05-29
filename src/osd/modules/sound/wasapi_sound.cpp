@@ -634,8 +634,8 @@ int sound_wasapi::init(osd_interface &osd, osd_options const &options)
 					osd_printf_verbose(
 							"Sound: Found audio %sdevice %s (%s), assigned ID %u.\n",
 							devinfo.info.m_sinks ? "output " : devinfo.info.m_sources ? "input " : "",
+							devinfo.info.m_display_name,
 							devinfo.info.m_name,
-							osd::text::from_wstring(devinfo.device_id),
 							devinfo.info.m_id);
 					if (devinfo.info.m_sinks)
 					{
@@ -771,7 +771,7 @@ uint32_t sound_wasapi::stream_sink_open(uint32_t node, std::string name, uint32_
 			osd_printf_error(
 					"Sound: Error initializing audio client interface for output stream %s on device %s. Error: 0x%X\n",
 					name,
-					device->info.m_name,
+					device->info.m_display_name,
 					result);
 			return 0;
 		}
@@ -782,7 +782,7 @@ uint32_t sound_wasapi::stream_sink_open(uint32_t node, std::string name, uint32_
 			osd_printf_error(
 					"Sound: Error getting audio client buffer size for output stream %s on device %s. Error: 0x%X\n",
 					name,
-					device->info.m_name,
+					device->info.m_display_name,
 					result);
 			return 0;
 		}
@@ -793,7 +793,7 @@ uint32_t sound_wasapi::stream_sink_open(uint32_t node, std::string name, uint32_
 			osd_printf_error(
 					"Sound: Error getting audio render client service for output stream %s on device %s. Error: 0x%X\n",
 					name,
-					device->info.m_name,
+					device->info.m_display_name,
 					result);
 			return 0;
 		}
@@ -806,7 +806,7 @@ uint32_t sound_wasapi::stream_sink_open(uint32_t node, std::string name, uint32_
 			osd_printf_error(
 					"Sound: Error creating event handle for output stream %s on device %s. Error: %u\n",
 					name,
-					device->info.m_name,
+					device->info.m_display_name,
 					err);
 			return 0;
 		}
@@ -816,7 +816,7 @@ uint32_t sound_wasapi::stream_sink_open(uint32_t node, std::string name, uint32_
 			osd_printf_error(
 					"Sound: Error setting event handle for output stream %s on device %s. Error: 0x%X\n",
 					name,
-					device->info.m_name,
+					device->info.m_display_name,
 					result);
 			return 0;
 		}
@@ -840,7 +840,7 @@ uint32_t sound_wasapi::stream_sink_open(uint32_t node, std::string name, uint32_
 			osd_printf_error(
 					"Sound: Error starting output stream %s on device %s. Error: 0x%X\n",
 					name,
-					device->info.m_name,
+					device->info.m_display_name,
 					result);
 			return 0;
 		}
@@ -854,7 +854,7 @@ uint32_t sound_wasapi::stream_sink_open(uint32_t node, std::string name, uint32_
 		m_stream_info.reserve(m_stream_info.size() + 1);
 
 		// now add it to the collection
-		osd_printf_verbose("Sound: Created output stream %s on device %s.\n", name, device->info.m_name);
+		osd_printf_verbose("Sound: Created output stream %s on device %s.\n", name, device->info.m_display_name);
 		stream->info.m_id = m_next_stream_id++;
 		assert(m_stream_info.empty() || (m_stream_info.back()->info.m_id < stream->info.m_id));
 		auto &pos = m_stream_info.emplace_back(std::move(stream));
@@ -903,7 +903,7 @@ uint32_t sound_wasapi::stream_source_open(uint32_t node, std::string name, uint3
 			osd_printf_error(
 					"Sound: Error initializing audio client interface for input stream %s on device %s. Error: 0x%X\n",
 					name,
-					device->info.m_name,
+					device->info.m_display_name,
 					result);
 			return 0;
 		}
@@ -914,7 +914,7 @@ uint32_t sound_wasapi::stream_source_open(uint32_t node, std::string name, uint3
 			osd_printf_error(
 					"Sound: Error getting audio client buffer size for input stream %s on device %s. Error: 0x%X\n",
 					name,
-					device->info.m_name,
+					device->info.m_display_name,
 					result);
 			return 0;
 		}
@@ -925,7 +925,7 @@ uint32_t sound_wasapi::stream_source_open(uint32_t node, std::string name, uint3
 			osd_printf_error(
 					"Sound: Error getting audio capture client service for input stream %s on device %s. Error: 0x%X\n",
 					name,
-					device->info.m_name,
+					device->info.m_display_name,
 					result);
 			return 0;
 		}
@@ -938,7 +938,7 @@ uint32_t sound_wasapi::stream_source_open(uint32_t node, std::string name, uint3
 			osd_printf_error(
 					"Sound: Error creating event handle for input stream %s on device %s. Error: %u\n",
 					name,
-					device->info.m_name,
+					device->info.m_display_name,
 					err);
 			return 0;
 		}
@@ -948,7 +948,7 @@ uint32_t sound_wasapi::stream_source_open(uint32_t node, std::string name, uint3
 			osd_printf_error(
 					"Sound: Error setting event handle for input stream %s on device %s. Error: 0x%X\n",
 					name,
-					device->info.m_name,
+					device->info.m_display_name,
 					result);
 			return 0;
 		}
@@ -972,7 +972,7 @@ uint32_t sound_wasapi::stream_source_open(uint32_t node, std::string name, uint3
 			osd_printf_error(
 					"Sound: Error starting input stream %s on device %s. Error: 0x%X\n",
 					name,
-					device->info.m_name,
+					device->info.m_display_name,
 					result);
 			return 0;
 		}
@@ -986,7 +986,7 @@ uint32_t sound_wasapi::stream_source_open(uint32_t node, std::string name, uint3
 		m_stream_info.reserve(m_stream_info.size() + 1);
 
 		// try to add it to the collection
-		osd_printf_verbose("Sound: Created input stream %s on device %s.\n", name, device->info.m_name);
+		osd_printf_verbose("Sound: Created input stream %s on device %s.\n", name, device->info.m_display_name);
 		stream->info.m_id = m_next_stream_id++;
 		assert(m_stream_info.empty() || (m_stream_info.back()->info.m_id < stream->info.m_id));
 		auto &pos = m_stream_info.emplace_back(std::move(stream));
@@ -1197,7 +1197,7 @@ HRESULT sound_wasapi::OnDefaultDeviceChanged(EDataFlow flow, ERole role, LPCWSTR
 						{
 							osd_printf_verbose(
 									"Sound: Default output device changed to %s.\n",
-									pos->info.m_name);
+									pos->info.m_display_name);
 						}
 						catch (std::bad_alloc const &)
 						{
@@ -1233,7 +1233,7 @@ HRESULT sound_wasapi::OnDefaultDeviceChanged(EDataFlow flow, ERole role, LPCWSTR
 						{
 							osd_printf_verbose(
 									"Sound: Default input device changed to %s.\n",
-									pos->info.m_name);
+									pos->info.m_display_name);
 						}
 						catch (std::bad_alloc const &)
 						{
@@ -1287,7 +1287,7 @@ HRESULT sound_wasapi::OnPropertyValueChanged(LPCWSTR pwstrDeviceId, PROPERTYKEY 
 				{
 					osd_printf_error(
 							"Sound: Error opening property store for audio device %s. Error: 0x%X\n",
-							pos->info.m_name,
+							pos->info.m_display_name,
 							static_cast<unsigned int>(result));
 					return result;
 				}
@@ -1298,14 +1298,14 @@ HRESULT sound_wasapi::OnPropertyValueChanged(LPCWSTR pwstrDeviceId, PROPERTYKEY 
 				{
 					osd_printf_error(
 							"Sound: Error getting updated display name for audio device %s. Error: 0x%X\n",
-							pos->info.m_name,
+							pos->info.m_display_name,
 							static_cast<unsigned int>(result));
 					return result;
 				}
 
 				if (name)
 				{
-					pos->info.m_display_name = pos->info.m_name;
+					pos->info.m_display_name = std::move(*name);
 
 					++m_generation;
 				}
@@ -1548,7 +1548,7 @@ bool sound_wasapi::activate_audio_client(
 				input ? "input" : "output",
 				name,
 				input ? "output" : "input",
-				device->info.m_name);
+				device->info.m_display_name);
 		return false;
 	}
 
@@ -1560,7 +1560,7 @@ bool sound_wasapi::activate_audio_client(
 				"Sound: Error activating audio client interface for %s stream %s on device %s. Error: 0x%X\n",
 				input ? "input" : "output",
 				name,
-				device->info.m_name,
+				device->info.m_display_name,
 				result);
 		return false;
 	}
@@ -1575,7 +1575,7 @@ bool sound_wasapi::activate_audio_client(
 				"Sound: Error getting mix format for %s stream %s on device %s. Error: 0x%X\n",
 				input ? "input" : "output",
 				name,
-				device->info.m_name,
+				device->info.m_display_name,
 				result);
 		return false;
 	}

@@ -472,8 +472,8 @@ int sound_xaudio2::init(osd_interface &osd, osd_options const &options)
 
 					osd_printf_verbose(
 							"Sound: Found audio device %s (%s), assigned ID %u.\n",
+							devinfo->info.m_display_name,
 							devinfo->info.m_name,
-							osd::text::from_wstring(devinfo->device_id),
 							devinfo->info.m_id);
 					if (devinfo->device_id == m_default_sink_id)
 						m_default_sink = devinfo->info.m_id;
@@ -662,7 +662,7 @@ uint32_t sound_xaudio2::stream_sink_open(uint32_t node, std::string name, uint32
 				(*device)->engine = nullptr;
 				osd_printf_error(
 						"Sound: Error creating XAudio2 engine for audio device %s. Error: 0x%X\n",
-						(*device)->info.m_name,
+						(*device)->info.m_display_name,
 						result);
 				return 0;
 			}
@@ -673,14 +673,14 @@ uint32_t sound_xaudio2::stream_sink_open(uint32_t node, std::string name, uint32
 				(*device)->engine = nullptr;
 				osd_printf_error(
 						"Sound: Error registering to receive XAudio2 engine callbacks for audio device %s. Error: 0x%X\n",
-						(*device)->info.m_name,
+						(*device)->info.m_display_name,
 						result);
 				return 0;
 			}
 
 			osd_printf_verbose(
 					"Sound: Created XAudio2 engine for audio device %s.\n",
-					(*device)->info.m_name);
+					(*device)->info.m_display_name);
 		}
 
 		// create a mastering voice if we don't already have one for this device
@@ -701,14 +701,14 @@ uint32_t sound_xaudio2::stream_sink_open(uint32_t node, std::string name, uint32
 				(*device)->mastering_voice.reset();
 				osd_printf_error(
 						"Sound: Error creating mastering voice for audio device %s. Error: 0x%X\n",
-						(*device)->info.m_name,
+						(*device)->info.m_display_name,
 						result);
 				return 0;
 			}
 
 			osd_printf_verbose(
 					"Sound: Created XAudio2 mastering voice for audio device %s.\n",
-					(*device)->info.m_name);
+					(*device)->info.m_display_name);
 		}
 
 		// set up desired input format
@@ -743,14 +743,14 @@ uint32_t sound_xaudio2::stream_sink_open(uint32_t node, std::string name, uint32
 		{
 			osd_printf_error(
 					"Sound: Error creating source voice for audio device %s. Error: 0x%X\n",
-					(*device)->info.m_name,
+					(*device)->info.m_display_name,
 					result);
 			return 0;
 		}
 		osd_printf_verbose(
 				"Sound: Created XAudio2 source voice for %s on audio device %s.\n",
 				name,
-				(*device)->info.m_name);
+				(*device)->info.m_display_name);
 
 		// set the channel mapping
 		result = info->voice->SetOutputMatrix(
@@ -763,7 +763,7 @@ uint32_t sound_xaudio2::stream_sink_open(uint32_t node, std::string name, uint32
 		{
 			osd_printf_error(
 					"Sound: Error setting source voice output matrix for audio device %s. Error: 0x%X\n",
-					(*device)->info.m_name,
+					(*device)->info.m_display_name,
 					result);
 			return 0;
 		}
@@ -774,7 +774,7 @@ uint32_t sound_xaudio2::stream_sink_open(uint32_t node, std::string name, uint32
 		{
 			osd_printf_error(
 					"Sound: Error starting source voice for audio device %s. Error: 0x%X\n",
-					(*device)->info.m_name,
+					(*device)->info.m_display_name,
 					result);
 			return 0;
 		}
@@ -920,7 +920,7 @@ void sound_xaudio2::device_info::OnCriticalError(HRESULT error)
 
 		try
 		{
-			name = info.m_name;
+			name = info.m_display_name;
 		}
 		catch (std::bad_alloc const &)
 		{
@@ -1347,7 +1347,7 @@ HRESULT sound_xaudio2::OnDefaultDeviceChanged(EDataFlow flow, ERole role, LPCWST
 					{
 						osd_printf_verbose(
 								"Sound: Default output device changed to %s.\n",
-								(*pos)->info.m_name);
+								(*pos)->info.m_display_name);
 					}
 					catch (std::bad_alloc const &)
 					{
@@ -1402,7 +1402,7 @@ HRESULT sound_xaudio2::OnPropertyValueChanged(LPCWSTR pwstrDeviceId, PROPERTYKEY
 				{
 					osd_printf_error(
 							"Sound: Error opening property store for audio device %s. Error: 0x%X\n",
-							(*pos)->info.m_name,
+							(*pos)->info.m_display_name,
 							result);
 					return result;
 				}
@@ -1413,14 +1413,14 @@ HRESULT sound_xaudio2::OnPropertyValueChanged(LPCWSTR pwstrDeviceId, PROPERTYKEY
 				{
 					osd_printf_error(
 							"Sound: Error getting updated display name for audio device %s. Error: 0x%X\n",
-							(*pos)->info.m_name,
+							(*pos)->info.m_display_name,
 							result);
 					return result;
 				}
 
 				if (name)
 				{
-					(*pos)->info.m_display_name = (*pos)->info.m_name;
+					(*pos)->info.m_display_name = std::move(*name);
 
 					++m_generation;
 				}
