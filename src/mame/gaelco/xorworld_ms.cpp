@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders: 
+// copyright-holders:
 
 /***************************************************************************************************
     Xor World (Modular System).
@@ -25,7 +25,6 @@
 #include "cpu/z80/z80.h"
 
 #include "sound/msm5205.h"
-#include "sound/okim6295.h"
 #include "sound/ymopl.h"
 
 #include "emupal.h"
@@ -44,83 +43,43 @@ public:
 		, m_palette(*this, "palette")
 		, m_screen(*this, "screen")
 		, m_gfxdecode(*this, "gfxdecode")
-		, m_vram(*this, "vram")
 	{ }
 
-	void xorworld_ms(machine_config &config);
+	void xorworld_ms(machine_config &config) ATTR_COLD;
 
-	void init_xorworld_ms();
+	void init_xorworld_ms() ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_shared_ptr<u16> m_vram;
 
-	virtual void machine_start() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	TILE_GET_INFO_MEMBER(get_tile_info);
-	void vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-
-	tilemap_t *m_tx_tilemap = nullptr;
-
-	void descramble_16x16tiles(uint8_t* src, int len);
-
-	uint16_t unk_r() { return machine().rand(); }
-	uint16_t unk2_r() { return 0x0000; }
+	void descramble_16x16tiles(u8 *src, int len);
 
 	void xorworld_ms_map(address_map &map) ATTR_COLD;
 };
 
-TILE_GET_INFO_MEMBER(xorworld_ms_state::get_tile_info)
-{
-	u16 code = (m_vram[tile_index*2] & 0xfff);
-	tileinfo.set(0, code, 0, 0);
-}
-
-void xorworld_ms_state::vram_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	COMBINE_DATA(&m_vram[offset]);
-	m_tx_tilemap->mark_tile_dirty(offset/2);
-}
 
 void xorworld_ms_state::video_start()
 {
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(xorworld_ms_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
-uint32_t xorworld_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 xorworld_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_palette->black_pen());
-	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
-// Map from 'wrallymp', probably wrong
+
 void xorworld_ms_state::xorworld_ms_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom();
-
-	map(0x200000, 0x2001ff).ram();
-
-	map(0x300000, 0x301fff).ram().w(FUNC(xorworld_ms_state::vram_w)).share("vram");
-	map(0x340000, 0x341fff).ram();
-	map(0x380000, 0x381fff).ram();
-
-	map(0x400000, 0x400001).r(FUNC(xorworld_ms_state::unk_r));
-	map(0x400002, 0x400003).r(FUNC(xorworld_ms_state::unk_r));
-	map(0x400004, 0x400005).r(FUNC(xorworld_ms_state::unk_r));
-	map(0x400006, 0x400007).r(FUNC(xorworld_ms_state::unk_r));
-	map(0x40000c, 0x40000d).r(FUNC(xorworld_ms_state::unk_r));
-
-	map(0x600000, 0x600001).r(FUNC(xorworld_ms_state::unk2_r));
-	map(0x600180, 0x600181).r(FUNC(xorworld_ms_state::unk2_r));
-
-	map(0xff0000, 0xffffff).ram();
+	map(0x000000, 0x01ffff).rom();
 }
 
 static INPUT_PORTS_START( xorworld_ms )
@@ -160,9 +119,9 @@ void xorworld_ms_state::machine_start()
 }
 
 // Reorganize graphics into something we can decode with a single pass
-void xorworld_ms_state::descramble_16x16tiles(uint8_t* src, int len)
+void xorworld_ms_state::descramble_16x16tiles(u8 *src, int len)
 {
-	std::vector<uint8_t> buffer(len);
+	std::vector<u8> buffer(len);
 	{
 		for (int i = 0; i < len; i++)
 		{
