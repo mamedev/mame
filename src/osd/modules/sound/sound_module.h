@@ -35,6 +35,9 @@ public:
 	virtual void stream_sink_update(uint32_t id, const int16_t *buffer, int samples_this_frame) {}
 	virtual void stream_source_update(uint32_t id, int16_t *buffer, int samples_this_frame) {}
 
+	virtual void begin_update() {}
+	virtual void end_update() {}
+
 protected:
 	class abuffer {
 	public:

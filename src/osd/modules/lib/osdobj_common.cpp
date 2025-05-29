@@ -552,6 +552,15 @@ void osd_common_t::sound_stream_source_update(uint32_t id, int16_t *buffer, int 
 	m_sound->stream_source_update(id, buffer, samples_this_frame);
 }
 
+void osd_common_t::sound_begin_update()
+{
+	m_sound->begin_update();
+}
+
+void osd_common_t::sound_end_update()
+{
+	m_sound->end_update();
+}
 
 
 
