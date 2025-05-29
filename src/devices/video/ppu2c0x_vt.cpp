@@ -633,7 +633,7 @@ void ppu_vt32_device::draw_background(u8* line_priority)
 		{
 			const int index1 = tile_index + (x * 2);
 			int page2 = readbyte(index1);
-			// index+1 is colour data? maybe extra tile bits?
+			page2 |= (readbyte(index1+1) & 0x01) << 8; // index+1 is colour data? maybe extra tile bits?
 
 			if (start_x < VISIBLE_SCREEN_WIDTH)
 			{
