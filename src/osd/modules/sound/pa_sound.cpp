@@ -115,7 +115,7 @@ int sound_pa::init(osd_interface &osd, osd_options const &options)
 		{  0.0,  0.0, -0.5 },
 		{ -0.2,  0.0,  0.0 },
 		{  0.2,  0.0,  0.0 },
-		{  0.0,  0.0, -1.0 },
+		{  0.0,  0.0, 10.0 },
 	};
 
 	static const uint32_t positions[9][9] = {
@@ -172,6 +172,7 @@ int sound_pa::init(osd_interface &osd, osd_options const &options)
 void sound_pa::exit()
 {
 	Pa_Terminate();
+	m_info.m_nodes.clear();
 }
 
 uint32_t sound_pa::get_generation()
