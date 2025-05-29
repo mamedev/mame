@@ -109,13 +109,6 @@ void device_slot_interface::option_remove(const char *name)
 }
 
 
-void device_slot_interface::set_option_device_input_defaults_all(const input_device_default *default_input)
-{
-	for (auto &option : option_list())
-		option.second->input_device_defaults(default_input);
-}
-
-
 device_slot_interface::slot_option *device_slot_interface::config_option(const char *name)
 {
 	auto const search = m_options.find(name);

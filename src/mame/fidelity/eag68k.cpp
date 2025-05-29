@@ -707,11 +707,6 @@ static INPUT_PORTS_START( premiere )
 	PORT_CONFSETTING(    0x01, "2265" )
 INPUT_PORTS_END
 
-static DEVICE_INPUT_DEFAULTS_START( rs232 )
-	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_600)
-	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_600)
-DEVICE_INPUT_DEFAULTS_END
-
 
 
 /*******************************************************************************
@@ -790,7 +785,6 @@ void eag_state::eag_base(machine_config &config)
 	usart_clock.signal_handler().set(m_usart, FUNC(i8251_device::write_txc));
 
 	auto &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
-	rs232.set_option_device_input_defaults_all(DEVICE_INPUT_DEFAULTS_NAME(rs232));
 	rs232.rxd_handler().set(m_usart, FUNC(i8251_device::write_rxd));
 	rs232.cts_handler().set(m_usart, FUNC(i8251_device::write_cts));
 

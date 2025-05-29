@@ -387,11 +387,6 @@ static INPUT_PORTS_START( galileo ) // same buttons, but different locations
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(leo_state::go_button), 0) PORT_NAME("Go")
 INPUT_PORTS_END
 
-static DEVICE_INPUT_DEFAULTS_START( rs232 )
-	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_1200)
-	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_1200)
-DEVICE_INPUT_DEFAULTS_END
-
 
 
 /*******************************************************************************
@@ -440,7 +435,6 @@ void leo_state::leonardo(machine_config &config)
 
 	// rs232 (configure after expansion module)
 	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
-	m_rs232->set_option_device_input_defaults_all(DEVICE_INPUT_DEFAULTS_NAME(rs232));
 }
 
 void leo_state::leonardoa(machine_config &config)
