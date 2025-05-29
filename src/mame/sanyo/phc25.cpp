@@ -22,6 +22,7 @@
     - sound is strange, volume is often low to non-existent.
     - colours and graphics are different to those shown at
       http://www.phc25.com/collection.htm - who is correct?
+    - screen attribute bit 7 is unknown in alphanumeric/semigraphics mode (0x6800-0x6BFF)
     - cursor flashes too rapidly, maybe VDG FSYNC issue?
     - Japanese keyboard labels for phc25j.
 
