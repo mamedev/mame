@@ -660,7 +660,7 @@ void ppu_vt32_device::draw_background(u8* line_priority)
 						if (pix & 0x80)
 							palval = (m_vt3xx_palette[pix & 0x7f] & 0x3f) | ((m_vt3xx_palette[(pix & 0x7f) + 0x80] & 0x3f) << 6);
 						else
-							palval = (m_palette_ram[pix & 0x7f] & 0x3f) | ((m_palette_ram[(pix & 0x7f) + 0x80] & 0x3f) << 6);
+							palval = (m_vt3xx_palette[(pix & 0x7f) + 0x100] & 0x3f) | ((m_vt3xx_palette[(pix & 0x7f) + 0x180] & 0x3f) << 6);
 
 						// does grayscale mode exist here? (we haven't calculated any colours for it)
 						//if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
