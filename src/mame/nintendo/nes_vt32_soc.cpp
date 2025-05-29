@@ -35,7 +35,7 @@ u8 nes_vt32_soc_device::read_onespace_bus(offs_t offset)
 
 u8 nes_vt32_soc_device::spr_r(offs_t offset)
 {
-	if (m_4242 & 0x1 || m_411d & 0x04)
+	if (m_4242 & 0x1 || m_411d & 0x04) // VT32 only?
 	{
 		return m_chrram[offset & 0x1fff];
 	}
@@ -52,7 +52,7 @@ u8 nes_vt32_soc_device::spr_r(offs_t offset)
 
 u8 nes_vt32_soc_device::chr_r(offs_t offset)
 {
-	if (m_4242 & 0x1 || m_411d & 0x04) // newer VT platforms only (not VT03/09), split out
+	if (m_4242 & 0x1 || m_411d & 0x04) // VT32 only?
 	{
 		return m_chrram[offset & 0x1fff];
 	}
