@@ -122,6 +122,7 @@ int sound_sdl::init(osd_interface &osd, const osd_options &options)
 void sound_sdl::exit()
 {
 	SDL_QuitSubSystem(SDL_INIT_AUDIO);
+	m_devices.clear();
 }
 
 uint32_t sound_sdl::get_generation()
