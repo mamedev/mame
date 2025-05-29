@@ -619,11 +619,11 @@ void ppu_vt32_device::draw_background(u8* line_priority)
 		const u16 nametable = m_refresh_data & 0x0c00;
 		const u8  scroll_y_fine = (m_refresh_data & 0x7000) >> 12;
 
-		int x = scroll_x_coarse & ~1;
+		int x = scroll_x_coarse >> 1;// &~1;
 
 		int tile_index = (nametable | 0x2000) + scroll_y_coarse * 16;
 
-		int start_x = 0;
+		int start_x = ((((scroll_x_coarse & 1) << 3) + m_x_fine) ^ 0x0f) - 0xf;
 		u32* dest = &m_bitmap.pix(m_scanline, start_x);
 
 		m_tilecount = 0;
@@ -633,7 +633,7 @@ void ppu_vt32_device::draw_background(u8* line_priority)
 		{
 			const int index1 = tile_index + (x * 2);
 			int page2 = readbyte(index1);
-			page2 |= (readbyte(index1+1) & 0x01) << 8; // index+1 is colour data? maybe extra tile bits?
+			page2 |= (readbyte(index1+1) & 0x03) << 8; // index+1 is colour data? and extra tile bits
 
 			if (start_x < VISIBLE_SCREEN_WIDTH)
 			{
@@ -657,10 +657,6 @@ void ppu_vt32_device::draw_background(u8* line_priority)
 						else
 							palval = (m_vt3xx_palette[(pix & 0x7f) + 0x100] & 0x3f) | ((m_vt3xx_palette[(pix & 0x7f) + 0x180] & 0x3f) << 6);
 
-						// does grayscale mode exist here? (we haven't calculated any colours for it)
-						//if (m_regs[PPU_CONTROL1] & PPU_CONTROL1_DISPLAY_MONO)
-						//  palval &= 0x30;
-
 						// apply colour emphasis (does it really exist here?) (we haven't calculated any colours for it, so ths has no effect)
 						palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 7);
 
@@ -671,9 +667,15 @@ void ppu_vt32_device::draw_background(u8* line_priority)
 					dest++;
 				}
 				start_x += 16;
+				x++;
+				if (x > 15)
+				{
+					x = 0;
+					tile_index ^= 0x200;
+				}
+
 			}
 			m_tilecount++;
-			x++;
 		}
 	}
 	else
