@@ -18809,10 +18809,13 @@ thoop2e
 @source:gaelco/wrally.cpp
 wrally
 wrallya
+wrallyac
 wrallyat
 wrallyata
 wrallyb
 wrallyc
+wrallyd
+wrallye
 
 @source:gaelco/wrally_ms.cpp
 wrallymp
