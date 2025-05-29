@@ -37,6 +37,7 @@ struct audio_rate_range {
 struct audio_info {
 	struct node_info {
 		std::string m_name;
+		std::string m_display_name;
 		uint32_t m_id;
 		audio_rate_range m_rate;
 		std::vector<std::string> m_port_names;

@@ -21,7 +21,8 @@ osd::audio_info sound_module::get_information()
 	result.m_default_sink = 1;
 	result.m_default_source = 0;
 	result.m_nodes.resize(1);
-	result.m_nodes[0].m_name = "";
+	result.m_nodes[0].m_name = "-";
+	result.m_nodes[0].m_display_name = "fallthrough";
 	result.m_nodes[0].m_id = 1;
 	result.m_nodes[0].m_rate.m_default_rate = 0; // Magic value meaning "use configured sample rate"
 	result.m_nodes[0].m_rate.m_min_rate = 0;

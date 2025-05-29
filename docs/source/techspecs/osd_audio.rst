@@ -191,6 +191,7 @@ reasonably lightweight when nothing special happens.
     struct audio_info {
         struct node_info {
                 std::string m_name;
+                std::string m_display_name;
                 uint32_t m_id;
                 audio_rate_range m_rate;
 		std::vector<std::string> m_port_names;
@@ -218,7 +219,8 @@ of the host and the module.  This state is:
 * m_generation:  The current generation number
 * m_nodes: The vector available nodes (*node_info*)
 
-  * m_name: The name of the node
+  * m_name: The name of the node to be used in non-user-visible configurations (can be a uuid or equivalent)
+  * m_display_name: The name of the node to be used in the user interfaces (should be readable)
   * m_id: The numeric ID of the node
   * m_rate: The minimum, maximum and preferred sample rate for the node
   * m_port_names: The vector of port names
@@ -246,7 +248,7 @@ If a node has both sources and sinks, the sources are *monitors* of
 the sinks, e.g. they're loopbacks.  They should have the same count in
 such a case.
 
-Node must be independent.  It must be possible to open streams to two
+Nodes must be independent.  It must be possible to open streams to two
 different nodes at the same time.  Be careful of multi-api libraries
 that collide between apis.  In addition, with monitoring streams
 (input on an output), it must be possible to open different streams

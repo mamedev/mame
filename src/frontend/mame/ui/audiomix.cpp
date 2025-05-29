@@ -582,7 +582,7 @@ void menu_audio_mixer::populate()
 		item_append(omap.m_dev->tag(), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
 		for(const auto &nmap : omap.m_node_mappings) {
 			const auto &node = find_node(nmap.m_node);
-			std::string lnode = nmap.m_is_system_default || node->m_name == "" ? "[default]" : node->m_name;
+			std::string lnode = nmap.m_is_system_default ? "[default]" : node->m_display_name;
 			if(!omap.m_dev->is_output() && node->m_sinks)
 				lnode = util::string_format("Monitor of %s", lnode);
 			if(curline == cursel_line && m_current_group == GRP_NODE)
@@ -603,7 +603,7 @@ void menu_audio_mixer::populate()
 			if(curline == cursel_line && m_current_group == GRP_GUEST_CHANNEL)
 				guest_channel = u8"\u25c4" + guest_channel + u8"\u25ba";
 
-			std::string lnode = cmap.m_is_system_default || node->m_name == "" ? "[default]" : node->m_name;
+			std::string lnode = cmap.m_is_system_default ? "[default]" : node->m_display_name;
 			if(!omap.m_dev->is_output() && node->m_sinks)
 				lnode = util::string_format("Monitor of %s", lnode);
 			if(curline == cursel_line && m_current_group == GRP_NODE)

@@ -143,6 +143,7 @@ int sound_pa::init(osd_interface &osd, osd_options const &options)
 		const PaHostApiInfo *ai = Pa_GetHostApiInfo(di->hostApi);
 		auto &node = m_info.m_nodes[dev];
 		node.m_name = util::string_format("%s: %s", ai->name, di->name);
+		node.m_display_name = util::string_format("%s: %s", ai->name, di->name);
 		node.m_id = dev + 1;
 		node.m_rate.m_default_rate = node.m_rate.m_min_rate = node.m_rate.m_max_rate = di->defaultSampleRate;
 		node.m_sinks = di->maxOutputChannels;

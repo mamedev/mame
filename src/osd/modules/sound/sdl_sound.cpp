@@ -166,6 +166,7 @@ osd::audio_info sound_sdl::get_information()
 	result.m_generation = 1;
 	for(uint32_t node = 0; node != m_devices.size(); node++) {
 		result.m_nodes[node].m_name = m_devices[node].m_name;
+		result.m_nodes[node].m_display_name = m_devices[node].m_name;
 		result.m_nodes[node].m_id = node + 1;
 		uint32_t freq = m_devices[node].m_freq;
 		result.m_nodes[node].m_rate = audio_rate_range{ freq, freq, freq };

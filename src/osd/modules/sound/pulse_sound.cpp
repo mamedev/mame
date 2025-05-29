@@ -411,6 +411,7 @@ osd::audio_info sound_pulse::get_information()
 	uint32_t node = 0;
 	for(auto &inode : m_nodes) {
 		result.m_nodes[node].m_name = inode.second.m_desc;
+		result.m_nodes[node].m_display_name = inode.second.m_desc;
 		result.m_nodes[node].m_id = inode.second.m_osdid;
 		result.m_nodes[node].m_rate = inode.second.m_rate;
 		result.m_nodes[node].m_sinks = inode.second.m_sink_port_count;
