@@ -577,8 +577,6 @@ void victor_9000_fdc_device::update_rpm(floppy_image_device *floppy, emu_timer *
 		tach_hz = rpm / 60.0 * SPINDLE_RATIO * MOTOR_POLES;
 
 		LOGSCP("%s: motor speed %u rpm / tach %0.1f hz %0.9f s (DAC %02x)\n", floppy->tag(), rpm, (double)tach_hz, 1.0/(double)tach_hz, dacval);
-
-		floppy->set_rpm(rpm);
 	}
 }
 
@@ -879,12 +877,25 @@ void victor_9000_fdc_device::via6_pa_w(uint8_t data)
 	{
 		live_sync();
 
-		m_side = side;
-		cur_live.side = side;
-		if (m_floppy[0]->get_device())
-			m_floppy[0]->get_device()->ss_w(side);
-		if (m_floppy[1]->get_device())
-			m_floppy[1]->get_device()->ss_w(side);
+		if (side != m_side)
+		{
+			m_side = side;
+			cur_live.side = side;
+
+			for (int i = 0; i < 2; i++)
+			{
+				floppy_image_device *floppy = m_floppy[i]->get_device();
+				if (floppy)
+				{
+					floppy->ss_w(side);
+
+					// RPM may have changed since the zones are different for
+					// the upper and lower heads.
+					floppy->set_rpm(victor9k_format::get_rpm(side, floppy->get_cyl()));
+				}
+			}
+		}
+
 
 		m_drive = drive;
 		cur_live.drive = drive;
@@ -1013,16 +1024,16 @@ void victor_9000_fdc_device::drw_w(int state)
 	{
 		live_sync();
 		m_drw = cur_live.drw = state;
-		checkpoint();
 		LOGVIA("%s %s DRW %u\n", machine().time().as_string(), machine().describe_context(), state);
 		if (state)
 		{
-			pll_stop_writing(get_floppy(), machine().time());
+			pll_stop_writing(get_floppy(), cur_live.tm);
 		}
 		else
 		{
-			pll_start_writing(machine().time());
+			pll_start_writing(cur_live.tm);
 		}
+		checkpoint();
 		live_run();
 	}
 }
@@ -1103,8 +1114,8 @@ void victor_9000_fdc_device::pll_reset(const attotime &when)
 
 void victor_9000_fdc_device::pll_start_writing(const attotime &tm)
 {
-	cur_pll.start_writing(tm);
 	pll_reset(cur_live.tm);
+	cur_pll.start_writing(tm);
 }
 
 void victor_9000_fdc_device::pll_commit(floppy_image_device *floppy, const attotime &tm)
