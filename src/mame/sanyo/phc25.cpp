@@ -22,7 +22,7 @@
     - sound is strange, volume is often low to non-existent.
     - colours and graphics are different to those shown at
       http://www.phc25.com/collection.htm - who is correct?
-    - screen attribute bit 7 is unknown
+    - screen attribute bit 7 is unknown in alphanumeric/semigraphics mode (0x6800-0x6BFF)
     - cursor flashes too rapidly, maybe VDG FSYNC issue?
     - Japanese keyboard labels for phc25j.
 
@@ -221,7 +221,7 @@ void phc25_state::port40_w(uint8_t data)
 	    1       cassette motor
 	    2       LED in the LOCK button (on = capslock)
 	    3       centronics strobe
-	    4
+	    4       MC6847 GM1
 	    5       MC6847 GM0
 	    6       MC6847 CSS
 	    7       MC6847 A/G
@@ -238,6 +238,7 @@ void phc25_state::port40_w(uint8_t data)
 	m_centronics->write_strobe(BIT(data, 3));
 
 	/* MC6847 */
+	m_vdg->gm1_w(BIT(data, 4));
 	m_vdg->gm0_w(BIT(data, 5));
 	m_vdg->css_w(BIT(data, 6));
 	m_vdg->ag_w(BIT(data, 7));
