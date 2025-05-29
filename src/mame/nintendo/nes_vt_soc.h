@@ -77,6 +77,7 @@ protected:
 	void video_irq(bool hblank, int scanline, bool vblank, bool blanked);
 	u8 nt_r(offs_t offset);
 	void nt_w(offs_t offset, u8 data);
+	int calculate_va17_va10(int addr);
 	int calculate_real_video_address(int addr, int readtype);
 	virtual void scrambled_8000_w(u16 offset, u8 data);
 	virtual void vt_dma_w(u8 data);

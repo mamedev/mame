@@ -511,22 +511,8 @@ void nes_vt02_vt03_soc_device::nt_w(offs_t offset, u8 data)
 }
 
 
-
-
-
-
-int nes_vt02_vt03_soc_device::calculate_real_video_address(int addr, int readtype)
+int nes_vt02_vt03_soc_device::calculate_va17_va10(int addr)
 {
-	// this is what gets passed in
-	//      00Pb bbtt tttt plll
-	//  P = plane3/4 select (4bpp modes)
-	//  p = plane0/1 select
-	//  l = tile line
-	//  b = tile number bits passed into banking
-	//  t = tile number (0x1ff tile number bits total)
-	int va34 = (addr & 0x6000) >> 13;
-	addr &= 0x1fff;
-
 	/*
 	Calculating TVA17 - TVA10
 
@@ -550,7 +536,6 @@ int nes_vt02_vt03_soc_device::calculate_real_video_address(int addr, int readtyp
 	m_r2017 = rv5x
 
 	*/
-	int finaladdr = 0;
 
 	int sel = (addr & 0x1c00) | ((m_410x[0x5] & 0x80) ? 0x2000 : 0x000);
 
@@ -631,6 +616,24 @@ int nes_vt02_vt03_soc_device::calculate_real_video_address(int addr, int readtyp
 	case 0x7: return -1;
 	}
 
+	return va17_va10;
+}
+
+
+int nes_vt02_vt03_soc_device::calculate_real_video_address(int addr, int readtype)
+{
+	// this is what gets passed in
+	//      00Pb bbtt tttt plll
+	//  P = plane3/4 select (4bpp modes)
+	//  p = plane0/1 select
+	//  l = tile line
+	//  b = tile number bits passed into banking
+	//  t = tile number (0x1ff tile number bits total)
+	int va34 = (addr & 0x6000) >> 13;
+	addr &= 0x1fff;
+
+	int va17_va10 = calculate_va17_va10(addr);
+
 	// Adjust where we actually read from for special modes
 
 	// might be a VT09 only feature (alt 4bpp mode?)
@@ -650,6 +653,8 @@ int nes_vt02_vt03_soc_device::calculate_real_video_address(int addr, int readtyp
 			extended = 1;
 		}
 	}
+
+	int finaladdr = 0;
 
 	if (!extended)
 	{
