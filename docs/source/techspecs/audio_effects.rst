@@ -93,7 +93,7 @@ Finally the actual implementation goes into the ``apply`` method:
 
 That method takes two buffers with the same number of channels and has
 to apply the effect to ``src`` to produce ``dest``.  The
-``output_buffer_flat`` is non-interleaved with independant per-channel
+``output_buffer_flat`` is non-interleaved with independent per-channel
 buffers.
 
 To make bypassing easier, the ``copy(src, dest)`` method of

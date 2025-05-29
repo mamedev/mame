@@ -237,7 +237,7 @@ of the host and the module.  This state is:
   * m_volumes: empty if *external_per_channel_volume* is false, current volume
     value per-channel otherwise
 
-IDs, for nodes and streams, are (independant) 32-bit unsigned non-zero
+IDs, for nodes and streams, are (independent) 32-bit unsigned non-zero
 values associated to respectively nodes and streams.  IDs should not
 be reused.  A node that goes away then comes back should get a new ID.
 A stream closing does not allow reuse of its ID.
@@ -246,7 +246,7 @@ If a node has both sources and sinks, the sources are *monitors* of
 the sinks, e.g. they're loopbacks.  They should have the same count in
 such a case.
 
-Node must be independant.  It must be possible to open streams to two
+Node must be independent.  It must be possible to open streams to two
 different nodes at the same time.  Be careful of multi-api libraries
 that collide between apis.  In addition, with monitoring streams
 (input on an output), it must be possible to open different streams

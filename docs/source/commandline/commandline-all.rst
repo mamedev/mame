@@ -3050,7 +3050,7 @@ Core Sound Options
 ..  rubric:: Footnotes
 
 ..  [#SoundWASAPIMonitoring] MAME requires Windows 10 1703 or later to use
-    output moitoring with WASAPI.
+    output monitoring with WASAPI.
 
 ..  [#SoundXAudio2OS] MAME requires Windows 8 or later to use XAudio2.
 
