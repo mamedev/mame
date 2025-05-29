@@ -413,7 +413,7 @@ static INPUT_PORTS_START( sltpcycld )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Test ) ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -1690,10 +1690,11 @@ GAME( 1992, thoopna,   thoop,    thoop,    thoop,    squash_state,   empty_init,
 GAME( 1992, thoopnna,  thoop,    thoop,    thoop,    squash_state,   empty_init, ROT0, "Gaelco",        "Thunder Hoop (non North America, ver. X, checksum 00000020, set 1)", MACHINE_SUPPORTS_SAVE ) // 09/Jun/1992
 GAME( 1992, thoopnnaa, thoop,    thoop,    thoop,    squash_state,   empty_init, ROT0, "Gaelco",        "Thunder Hoop (non North America, ver. X, checksum 00000020, set 2)", MACHINE_SUPPORTS_SAVE ) // Non North America but with FBI screen ??
 
-GAME( 199?, sltpcycld,  sltpcycl,   maniacsq,         sltpcycld, gaelco_state,  empty_init,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, older hardware, set 1)",              MACHINE_NOT_WORKING )
-GAME( 199?, sltpcycle,  sltpcycl,   maniacsq,         sltpcycld, gaelco_state,  empty_init,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, older hardware, set 2)",              MACHINE_NOT_WORKING )
-GAME( 199?, sltpcyclf,  sltpcycl,   maniacsq,         sltpcycld, gaelco_state,  empty_init,  ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, older hardware, set 3)",              MACHINE_NOT_WORKING )
+GAME( 199?, sltpcycld, sltpcycl, maniacsq, sltpcycld, gaelco_state,  empty_init, ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, older hardware, ver. 1.0, checksum BAE7)",      MACHINE_NOT_WORKING )
+GAME( 199?, sltpcycle, sltpcycl, maniacsq, sltpcycld, gaelco_state,  empty_init, ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, older hardware, ver. 1.0, checksum 5678)",      MACHINE_NOT_WORKING )
+GAME( 199?, sltpcyclf, sltpcycl, maniacsq, sltpcycld, gaelco_state,  empty_init, ROT0, "Salter Fitness / Gaelco", "Pro Cycle Tele Cardioline (Salter fitness bike, older hardware, ver. 1.0, checksum 1AF9)",      MACHINE_NOT_WORKING )
 
-GAME( 199?, sltpstepb,  sltpstep,   maniacsq,         sltpcycld, gaelco_state,  empty_init,  ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, older hardware, set 1)",         MACHINE_NOT_WORKING )
-GAME( 199?, sltpstepc,  sltpstep,   maniacsq,         sltpcycld, gaelco_state,  empty_init,  ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, older hardware, set 2)",         MACHINE_NOT_WORKING )
-GAME( 1996, sltpstepd,  sltpstep,   maniacsq,         sltpcycld, gaelco_state,  empty_init,  ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, older hardware, set 3)",         MACHINE_NOT_WORKING ) // 2/Jul/1996.
+GAME( 199?, sltpstepb, sltpstep, maniacsq, sltpcycld, gaelco_state,  empty_init, ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, older hardware, ver. 1.0, checksum 8E5A)", MACHINE_NOT_WORKING )
+GAME( 199?, sltpstepc, sltpstep, maniacsq, sltpcycld, gaelco_state,  empty_init, ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, older hardware, ver. 1.0, checksum 8BF3)", MACHINE_NOT_WORKING )
+GAME( 1996, sltpstepd, sltpstep, maniacsq, sltpcycld, gaelco_state,  empty_init, ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, older hardware, ver. 1.0, checksum 6D94)", MACHINE_NOT_WORKING ) // 2/Jul/1996	.
+
