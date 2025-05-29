@@ -35,7 +35,7 @@ TODO:
   gnw_climbern, gnw_dkcirc, gnw_dkhockey, gnw_dkjrp, gnw_dkong3, gnw_gcliff,
   gnw_mariocmt, gnw_mariocmta, gnw_mariotj, gnw_mbaway, gnw_mmousep,
   gnw_pinball, gnw_popeyep, gnw_sbuster, gnw_snoopyp, gnw_zelda, trtreisl,
-  trspacadv, vesarif, uchitari, vinnpukh
+  trspacadv, vesarif, uchitari
 
 ================================================================================
 
@@ -3210,11 +3210,9 @@ ROM_END
   The tabletop version was also licensed to Coleco.
 
   Also cloned by Elektronika(USSR) as Винни-Пух (Vinni-Pukh, i.e. Winnie the
-  Pooh) (model ИМ-12).
+  Pooh) (model ИМ-12), with different LCD graphics.
   * КБ1515ХМ3-2 9009 (no decap); seems to be compatible with КБ1013ВК7-2
-    which in turn is compatible with Sharp SM511
-  Program ROM is identical, melody ROM is practically identical (i.e. minor
-  differences, hardly audible on playback)
+    which in turn is compatible with Sharp SM511 (same ROM contents as CJ-93)
 
 *******************************************************************************/
 
@@ -3281,7 +3279,7 @@ ROM_START( gnw_dkjrp )
 	ROM_LOAD( "cj-93.program", 0x0000, 0x1000, CRC(a2cd5a91) SHA1(33f6fd1530e5522491851f16d7c9f928b2dbdc3b) )
 
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "cj-93.melody", 0x000, 0x100, BAD_DUMP CRC(99fbf76a) SHA1(15ba1af51bebc316146eb9a0a3d58d28f644d45f) ) // decap needed for verification
+	ROM_LOAD( "cj-93.melody", 0x000, 0x100, BAD_DUMP CRC(38946be7) SHA1(affdb8514d32dc9dbf2ccc1c4a0394e68ebc61cb) ) // decap needed for verification
 
 	ROM_REGION( 340751, "screen", 0)
 	ROM_LOAD( "gnw_dkjrp.svg", 0, 340751, CRC(eb3cb98b) SHA1(5b148557d3ade2e2050ddde879a6cc05e119b446) )
