@@ -23,10 +23,14 @@
 #include "strconv.h"
 #include "windows/winutil.h"
 
+// MAME utility library
+#include "util/corealloc.h"
+
 // stdlib includes
 #include <algorithm>
 #include <atomic>
 #include <cassert>
+#include <cstring>
 #include <condition_variable>
 #include <iterator>
 #include <memory>
@@ -129,9 +133,10 @@ using x_audio_2_ptr       = Microsoft::WRL::ComPtr<IXAudio2>;
 class bufferpool
 {
 private:
+	std::vector<std::unique_ptr<BYTE []> > m_pool;
+	CRITICAL_SECTION m_critical_section;
 	int m_initial;
 	int m_buffersize;
-	std::queue<std::unique_ptr<BYTE []>> m_queue;
 
 public:
 	// constructor
@@ -139,28 +144,33 @@ public:
 		m_initial(capacity),
 		m_buffersize(bufferSize)
 	{
+		InitializeCriticalSectionAndSpinCount(&m_critical_section, 4096);
+
+		m_pool.reserve(m_initial * 2);
 		for (int i = 0; i < m_initial; i++)
-		{
-			auto newBuffer = std::make_unique<BYTE []>(m_buffersize);
-			memset(newBuffer.get(), 0, m_buffersize);
-			m_queue.push(std::move(newBuffer));
-		}
+			m_pool.emplace_back(util::make_unique_clear<BYTE []>(m_buffersize));
+	}
+
+	~bufferpool()
+	{
+		DeleteCriticalSection(&m_critical_section);
 	}
 
 	// get next buffer element from the pool
 	std::unique_ptr<BYTE []> next()
 	{
 		std::unique_ptr<BYTE []> next_buffer;
-		if (!m_queue.empty())
+
+		EnterCriticalSection(&m_critical_section);
+		if (!m_pool.empty())
 		{
-			next_buffer = std::move(m_queue.front());
-			m_queue.pop();
+			next_buffer = std::move(m_pool.back());
+			m_pool.pop_back();
 		}
-		else
-		{
-			next_buffer.reset(new BYTE[m_buffersize]);
-			memset(next_buffer.get(), 0, m_buffersize);
-		}
+		LeaveCriticalSection(&m_critical_section);
+
+		if (!next_buffer)
+			next_buffer = util::make_unique_clear<BYTE []>(m_buffersize);
 
 		return next_buffer;
 	}
@@ -170,7 +180,17 @@ public:
 	{
 		assert(buffer);
 		memset(buffer.get(), 0, m_buffersize);
-		m_queue.push(std::move(buffer));
+		EnterCriticalSection(&m_critical_section);
+		try
+		{
+			m_pool.emplace_back(std::move(buffer));
+			LeaveCriticalSection(&m_critical_section);
+		}
+		catch (...)
+		{
+			LeaveCriticalSection(&m_critical_section);
+			throw;
+		}
 	}
 };
 
@@ -275,7 +295,7 @@ private:
 		unsigned const              m_sample_bytes;
 		unsigned                    m_buffer_count;
 		uint32_t                    m_write_position;
-		bool                        m_need_update;
+		std::atomic<bool>           m_need_update;
 		bool                        m_underflowing;
 	};
 
@@ -972,20 +992,19 @@ void sound_xaudio2::voice_info::update(int16_t const *buffer, int samples_this_f
 	uint32_t bytes_left = bytes_this_frame;
 	while (bytes_left)
 	{
-		uint32_t const chunk = std::min(uint32_t(m_buffer_size), bytes_left);
-
-		// roll buffer if the chunk won't fit
-		if ((m_write_position + chunk) >= m_buffer_size)
-			roll_buffer();
-
-		// copy sample data
-		memcpy(&m_current_buffer[m_write_position], buffer, chunk);
+		// copy as much data as we can into the current buffer
+		uint32_t const chunk = std::min(uint32_t(m_buffer_size - m_write_position), bytes_left);
+		std::memcpy(&m_current_buffer[m_write_position], buffer, chunk);
 		m_write_position += chunk;
 		buffer += chunk / 2;
 		bytes_left -= chunk;
+
+		// roll buffer if it's full
+		if (m_write_position >= m_buffer_size)
+			roll_buffer();
 	}
 
-	m_need_update = true;
+	m_need_update.store(true, std::memory_order_relaxed);
 	SetEvent(m_host.m_need_update_event.get());
 }
 
@@ -995,7 +1014,7 @@ void sound_xaudio2::voice_info::update(int16_t const *buffer, int samples_this_f
 
 void sound_xaudio2::voice_info::submit_if_needed()
 {
-	if (!m_need_update)
+	if (!m_need_update.load(std::memory_order_relaxed))
 		return;
 
 	m_need_update = false;
@@ -1008,15 +1027,11 @@ void sound_xaudio2::voice_info::submit_if_needed()
 	if ((1 <= state.BuffersQueued) && m_buffer_queue.empty())
 		return;
 
-	// We do however want to achieve some kind of minimal latency, so if the queued buffers
-	// are greater than 2, flush them to re-sync the audio
-	if (2 < state.BuffersQueued)
-	{
-		voice->FlushSourceBuffers();
-		m_host.m_overflows.fetch_add(1, std::memory_order_relaxed);
-	}
+	// don't keep more than two buffers queued in the source voice
+	if (2 <= state.BuffersQueued)
+		return;
 
-	if (m_buffer_queue.empty())
+	if (m_buffer_queue.empty() && m_write_position)
 		roll_buffer();
 
 	if (!m_buffer_queue.empty())
@@ -1043,7 +1058,7 @@ void sound_xaudio2::voice_info::stop()
 	while (!m_buffer_queue.empty())
 		m_buffer_queue.pop();
 	m_write_position = 0;
-	m_need_update = false;
+	m_need_update.store(false, std::memory_order_relaxed);
 	if (voice)
 	{
 		voice->Stop(0, XAUDIO2_COMMIT_NOW);
@@ -1058,8 +1073,7 @@ void sound_xaudio2::voice_info::stop()
 void sound_xaudio2::voice_info::roll_buffer()
 {
 	// don't queue an empty buffer
-	if (!m_write_position)
-		return;
+	assert(m_write_position);
 
 	// queue the current buffer
 	xaudio2_buffer buf;
@@ -1088,7 +1102,7 @@ void sound_xaudio2::voice_info::roll_buffer()
 //  submit_buffer
 //============================================================
 
-void sound_xaudio2::voice_info::submit_buffer(std::unique_ptr<BYTE []> &&data, DWORD length) const
+inline void sound_xaudio2::voice_info::submit_buffer(std::unique_ptr<BYTE []> &&data, DWORD length) const
 {
 	assert(length);
 
@@ -1097,20 +1111,21 @@ void sound_xaudio2::voice_info::submit_buffer(std::unique_ptr<BYTE []> &&data, D
 	buf.pAudioData = data.get();
 	buf.PlayBegin = 0;
 	buf.PlayLength = length / m_sample_bytes;
-	buf.Flags = XAUDIO2_END_OF_STREAM;
+	buf.Flags = XAUDIO2_END_OF_STREAM; // this flag just suppresses underrun warnings
 	buf.pContext = data.get();
 
-	HRESULT result;
-	if (FAILED(result = voice->SubmitSourceBuffer(&buf)))
+	HRESULT const result = voice->SubmitSourceBuffer(&buf);
+	if (SUCCEEDED(result))
+	{
+		// If we succeeded, relinquish the buffer allocation to the XAudio2 runtime
+		// The buffer will be freed on the OnBufferCompleted callback
+		data.release();
+	}
+	else
 	{
 		osd_printf_verbose("Sound: XAudio2 failed to submit source buffer (non-fatal). Error: 0x%X\n", result);
 		m_buffer_pool->return_to_pool(std::move(data));
-		return;
 	}
-
-	// If we succeeded, relinquish the buffer allocation to the XAudio2 runtime
-	// The buffer will be freed on the OnBufferCompleted callback
-	data.release();
 }
 
 //============================================================
@@ -1136,14 +1151,11 @@ void sound_xaudio2::voice_info::OnVoiceProcessingPassStart(UINT32 BytesRequired)
 
 void sound_xaudio2::voice_info::OnBufferEnd(void *pBufferContext) noexcept
 {
-	// FIXME: this is an XAudio2 callback, so it should really use a more fine-grained lock
 	BYTE *const completed_buffer = static_cast<BYTE *>(pBufferContext);
-	std::lock_guard voice_lock(m_host.m_voice_mutex);
-
 	if (completed_buffer)
 		m_buffer_pool->return_to_pool(std::unique_ptr<BYTE []>(completed_buffer));
 
-	m_need_update = true;
+	m_need_update.store(true, std::memory_order_relaxed);
 	SetEvent(m_host.m_need_update_event.get());
 }
 

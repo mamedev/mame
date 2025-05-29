@@ -2970,7 +2970,7 @@ Core Sound Options
 
 .. _mame-commandline-sound:
 
-**-sound** *<wasapi | xaudio2 | dsound | coreaudio | pipewire | pulse | sdl | portaudio | none>*
+**-sound** *<wasapi | xaudio2 | coreaudio | pipewire | pulse | sdl | portaudio | none>*
 
     Specifies which sound module to use.  Selecting ``none`` disables sound
     output and input altogether (sound hardware is still emulated).
@@ -2999,7 +2999,6 @@ Core Sound Options
 
     * - Module
       - Supported OS
-      - Output
       - Input
       - Output monitoring
       - Multi-channel
@@ -3007,27 +3006,17 @@ Core Sound Options
     * - ``wasapi``
       - Windows
       - Yes
-      - Yes
-      - Yes (Windows 10 1703 or later)
+      - Yes [#SoundWASAPIMonitoring]_
       - Yes
       - Yes
     * - ``xaudio2``
-      - Windows 8 or later
-      - Yes
+      - Windows [#SoundXAudio2OS]_
       - No
       - No
       - Yes
       - Yes
-    * - ``dsound``
-      - Windows
-      - Yes
-      - No
-      - No
-      - No
-      - No
     * - ``coreaudio``
       - macOS
-      - Yes
       - No
       - No
       - No
@@ -3035,20 +3024,17 @@ Core Sound Options
     * - ``pipewire``
       - Linux
       - Yes
-      - Yes
       - ?
       - Yes
       - Yes
     * - ``pulse``
       - Linux
-      - Yes
       - No
       - No
       - Yes
       - Yes
     * - ``sdl``
       - All [#SoundWinSDL]_
-      - Yes
       - No
       - No
       - Yes
@@ -3056,13 +3042,17 @@ Core Sound Options
     * - ``portaudio``
       - All
       - Yes
-      - Yes
       - Yes [#SoundPortAudioMonitoring]_
       - Yes
       - No
 
 
 ..  rubric:: Footnotes
+
+..  [#SoundWASAPIMonitoring] MAME requires Windows 10 1703 or later to use
+    output moitoring with WASAPI.
+
+..  [#SoundXAudio2OS] MAME requires Windows 8 or later to use XAudio2.
 
 ..  [#SoundWinSDL] While SDL is not a supported option on official MAME builds
     for Windows, you can compile MAME with SDL support on Windows.

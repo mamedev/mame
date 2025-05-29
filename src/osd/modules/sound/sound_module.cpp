@@ -38,11 +38,11 @@ osd::audio_info sound_module::get_information()
 	return result;
 }
 
-sound_module::abuffer::abuffer(uint32_t channels) : m_channels(channels), m_used_buffers(0), m_last_sample(channels, 0)
+sound_module::abuffer::abuffer(uint32_t channels) noexcept : m_channels(channels), m_used_buffers(0), m_last_sample(channels, 0)
 {
 }
 
-void sound_module::abuffer::get(int16_t *data, uint32_t samples)
+void sound_module::abuffer::get(int16_t *data, uint32_t samples) noexcept
 {
 	uint32_t pos = 0;
 	while(pos != samples) {
@@ -99,7 +99,7 @@ void sound_module::abuffer::push(const int16_t *data, uint32_t samples)
 	}
 }
 
-uint32_t sound_module::abuffer::available() const
+uint32_t sound_module::abuffer::available() const noexcept
 {
 	uint32_t result = 0;
 	for(uint32_t i = 0; m_used_buffers > i; ++i)
@@ -107,7 +107,7 @@ uint32_t sound_module::abuffer::available() const
 	return result;
 }
 
-inline void sound_module::abuffer::pop_buffer()
+inline void sound_module::abuffer::pop_buffer() noexcept
 {
 	assert(m_used_buffers);
 	if(--m_used_buffers) {
