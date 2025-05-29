@@ -24,6 +24,7 @@ public:
 
 protected:
 	virtual void device_start() override;
+	virtual void device_reset() override;
 
 	nes_vt32_soc_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock);
 
@@ -43,10 +44,14 @@ protected:
 	void vtfp_4a00_w(u8 data);
 	void vtfp_411d_w(u8 data);
 	u8 vthh_414a_r();
+	virtual u8 spr_r(offs_t offset) override;
+	virtual u8 chr_r(offs_t offset) override;
 
 private:
 	u8 vt32_palette_r(offs_t offset);
 	void vt32_palette_w(offs_t offset, u8 data);
+
+	int m_ppu_chr_data_scramble;
 };
 
 class nes_vt32_soc_pal_device : public nes_vt32_soc_device

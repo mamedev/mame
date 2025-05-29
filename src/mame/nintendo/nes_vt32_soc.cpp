@@ -32,6 +32,41 @@ u8 nes_vt32_soc_device::read_onespace_bus(offs_t offset)
 	return spc.read_byte(offset);
 }
 
+
+u8 nes_vt32_soc_device::spr_r(offs_t offset)
+{
+	if (m_4242 & 0x1 || m_411d & 0x04)
+	{
+		return m_chrram[offset & 0x1fff];
+	}
+	else
+	{
+		u8 ret = nes_vt09_soc_device::spr_r(offset);
+		// used by some games in myaass
+		if (m_ppu_chr_data_scramble == 1)
+			ret = bitswap<8>(ret, 3, 5, 6, 0, 7, 1, 2, 4);
+
+		return ret;
+	}
+}
+
+u8 nes_vt32_soc_device::chr_r(offs_t offset)
+{
+	if (m_4242 & 0x1 || m_411d & 0x04) // newer VT platforms only (not VT03/09), split out
+	{
+		return m_chrram[offset & 0x1fff];
+	}
+	else
+	{
+		u8 ret = nes_vt09_soc_device::chr_r(offset);
+		// used by some games in myaass
+		if (m_ppu_chr_data_scramble == 1)
+			ret = bitswap<8>(ret, 3, 5, 6, 0, 7, 1, 2, 4);
+		return ret;
+	}
+}
+
+
 void nes_vt32_soc_device::device_add_mconfig(machine_config& config)
 {
 	RP2A03_VTSCR(config, m_maincpu, NTSC_APU_CLOCK);
@@ -97,6 +132,8 @@ u8 nes_vt32_soc_device::vtfp_4119_r()
 void nes_vt32_soc_device::vtfp_411e_encryption_state_w(u8 data)
 {
 	logerror("%s: vtfp_411e_encryption_state_w %02x\n", machine().describe_context(), data);
+	m_ppu_chr_data_scramble = 0;
+
 	if (data == 0x05)
 	{
 		downcast<rp2a03_vtscr&>(*m_maincpu).set_next_scramble(true);
@@ -124,7 +161,7 @@ void nes_vt32_soc_device::vtfp_411e_encryption_state_w(u8 data)
 		writes involving the VRAM
 
 		*/
-
+		m_ppu_chr_data_scramble = 1;
 		downcast<rp2a03_vtscr&>(*m_maincpu).set_next_scramble(false);
 	}
 }
@@ -240,8 +277,14 @@ void nes_vt32_soc_device::device_start()
 {
 	nes_vt09_soc_device::device_start();
 	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x3e00, 0x3fff, read8sm_delegate(*this, FUNC(nes_vt32_soc_device::vt32_palette_r)), write8sm_delegate(*this, FUNC(nes_vt32_soc_device::vt32_palette_w)));
+	save_item(NAME(m_ppu_chr_data_scramble));
 }
 
+void nes_vt32_soc_device::device_reset()
+{
+	nes_vt09_soc_device::device_reset();
+	m_ppu_chr_data_scramble = 0;
+}
 
 void nes_vt32_soc_device::nes_vt32_soc_map(address_map &map)
 {

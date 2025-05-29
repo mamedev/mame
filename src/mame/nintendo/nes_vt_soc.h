@@ -69,8 +69,8 @@ protected:
 	void vt03_410x_w(offs_t offset, u8 data);
 	u8 vt03_410x_r(offs_t offset);
 	void scrambled_410x_w(u16 offset, u8 data);
-	u8 spr_r(offs_t offset);
-	u8 chr_r(offs_t offset);
+	virtual u8 spr_r(offs_t offset);
+	virtual u8 chr_r(offs_t offset);
 	void chr_w(offs_t offset, u8 data);
 	void scanline_irq(int scanline, bool vblank, bool blanked);
 	void hblank_irq(int scanline, bool vblank, bool blanked);

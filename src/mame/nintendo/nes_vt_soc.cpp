@@ -425,32 +425,18 @@ void nes_vt02_vt03_soc_device::scrambled_410x_w(u16 offset, u8 data)
 
 u8 nes_vt02_vt03_soc_device::spr_r(offs_t offset)
 {
-	if (m_4242 & 0x1 || m_411d & 0x04)
-	{
-		return m_chrram[offset & 0x1fff];
-	}
-	else
-	{
-		int realaddr = calculate_real_video_address(offset, 1);
+	int realaddr = calculate_real_video_address(offset, 1);
 
-		address_space& spc = this->space(AS_PROGRAM);
-		return spc.read_byte(get_relative() + realaddr);
-	}
+	address_space& spc = this->space(AS_PROGRAM);
+	return spc.read_byte(get_relative() + realaddr);
 }
 
 u8 nes_vt02_vt03_soc_device::chr_r(offs_t offset)
 {
-	if (m_4242 & 0x1 || m_411d & 0x04) // newer VT platforms only (not VT03/09), split out
-	{
-		return m_chrram[offset & 0x1fff];
-	}
-	else
-	{
-		int realaddr = calculate_real_video_address(offset, 0);
+	int realaddr = calculate_real_video_address(offset, 0);
 
-		address_space& spc = this->space(AS_PROGRAM);
-		return spc.read_byte(get_relative() + realaddr);
-	}
+	address_space& spc = this->space(AS_PROGRAM);
+	return spc.read_byte(get_relative() + realaddr);
 }
 
 
