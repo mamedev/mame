@@ -145,10 +145,17 @@ chess computers also have support for it. Two models were released:
 FP: Challenger Printer - thermal printer, MCU=D8048C243
 IFP: Impact Printer - also compatible with C64 apparently.
 
+The printer data outputs at 600 baud, with 7 data bits and 1 stop bit.
+
+To use the printer with the serial terminal, add -rs232 terminal to the command line.
+For the terminal to work properly, in the Machine Configuration menu,
+set the RX data rate to 600, 7 data bits, no parity, and 1 stop bit.
+
 *******************************************************************************/
 
 #include "emu.h"
 
+#include "bus/rs232/rs232.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/clock.h"
@@ -176,6 +183,7 @@ public:
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_speech(*this, "speech"),
+		m_rs232(*this, "rs232"),
 		m_language(*this, "language"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
@@ -194,6 +202,7 @@ private:
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	required_device<s14001a_device> m_speech;
+	required_device<rs232_port_device> m_rs232;
 	required_region_ptr<u8> m_language;
 	required_ioport_array<2> m_inputs;
 
@@ -311,6 +320,9 @@ void vsc_state::pio_portb_w(u8 data)
 
 	// d2: lower S14001A volume
 	m_speech->set_output_gain(0, (data & 4) ? 0.25 : 1.0);
+
+	// d3: serial data to printer
+	m_rs232->write_txd(!BIT(data,3));
 }
 
 
@@ -420,6 +432,9 @@ void vsc_state::vsc(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 	S14001A(config, m_speech, 25000); // R/C circuit, around 25khz
 	m_speech->add_route(ALL_OUTPUTS, "speaker", 0.75);
+
+	// serial output
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 }
 
 
