@@ -3053,20 +3053,11 @@ TLC549 (IC2 and IC7) is a 8-bit serial ADC
 
 Also known to come with a GAE1 with various production codes including 449, 501 & 506
 
-*/
+For all wrally2 sets, the DS5002FP SRAM has been dumped from 2 PCBs.  The first had unused space filled as 0xff, the 2nd space was filled as 0x00.
+In addition, the first had 2 bad bytes, one of which was identified at the time, the other not.
+For reference the one that was not is "1938: 18 <-> 9B" (part of a data table)
 
-ROM_START( wrally2 )
-	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
-	ROM_LOAD16_BYTE( "dallas_usa_wr-2_2_64_usa_e47e_31-7.bin",  0x000000, 0x080000, CRC(5e6a364a) SHA1(c1124f40c71f663ddac07c3d55a188692e8b65dc) )
-	ROM_LOAD16_BYTE( "dallas_usa_wr-2_1_63_usa_c584_31-7.bin",  0x000001, 0x080000, CRC(5c106494) SHA1(a8b93fad5b2e6d88b9a671ac44d7278abc8ea872) )
-
-	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) // DS5002FP code
-	/* This SRAM has been dumped from 2 PCBs.  The first had unused space filled as 0xff, the 2nd space was filled as 0x00.
-	   In addition, the first had 2 bad bytes, one of which was identified at the time, the other not.  For reference the
-	   one that was not is "1938: 18 <-> 9B" (part of a data table)
-
-	   A little less obvious is why the older dump had the following startup code, which appears to have been partially
-	   patched out
+A little less obvious is why the older dump had the following startup code, which appears to have been partially patched out
 
 	    0200: mov   sp,#$70
 	    0203: mov   a,pcon
@@ -3085,8 +3076,16 @@ ROM_START( wrally2 )
 	    0209: mov   crcr,#$80
 	    020C: mov   dptr,#$FC01
 
-	   either way the 2nd dump is in much better state, so we're using that.
-	*/
+Either way the 2nd dump is in much better state, so we're using that.
+
+*/
+
+ROM_START( wrally2 ) // Program ROMs from 31/Jul/1995, graphics ROMs from 14/Jun/1995
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "dallas_usa_wr-2_2_64_usa_e47e_31-7.bin", 0x000000, 0x080000, CRC(5e6a364a) SHA1(c1124f40c71f663ddac07c3d55a188692e8b65dc) )
+	ROM_LOAD16_BYTE( "dallas_usa_wr-2_1_63_usa_c584_31-7.bin", 0x000001, 0x080000, CRC(5c106494) SHA1(a8b93fad5b2e6d88b9a671ac44d7278abc8ea872) )
+
+	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) // DS5002FP code
 	ROM_LOAD( "wrally2_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(4c532e9e) SHA1(d0aad72b204d4abd3b8d7d5bbaf8d2d2f78edaa6) )
 
 	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
@@ -3126,32 +3125,6 @@ ROM_START( wrally2a ) // REF: 950510-1
 	ROM_LOAD16_BYTE( "wr2_63.ic63",  0x000001, 0x080000, CRC(94887c9f) SHA1(ad09f1fbeff4c3ba47f72346d261b22fa6a51457) )
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) // DS5002FP code
-	/* This SRAM has been dumped from 2 PCBs.  The first had unused space filled as 0xff, the 2nd space was filled as 0x00.
-	   In addition, the first had 2 bad bytes, one of which was identified at the time, the other not.  For reference the
-	   one that was not is "1938: 18 <-> 9B" (part of a data table)
-
-	   A little less obvious is why the older dump had the following startup code, which appears to have been partially
-	   patched out
-
-	    0200: mov   sp,#$70
-	    0203: mov   a,pcon
-	    0205: anl   a,#$20
-	    0207: jnz   $0203
-	    0209: nop
-	    020A: nop
-	    020B: nop
-	    020C: mov   dptr,#$FC01
-
-	   while the newer dump has this
-
-	    0200: mov   sp,#$70
-	    0203: mov   mcon,#$68
-	    0206: mov   i2cfg,#$00
-	    0209: mov   crcr,#$80
-	    020C: mov   dptr,#$FC01
-
-	   either way the 2nd dump is in much better state, so we're using that.
-	*/
 	ROM_LOAD( "wrally2_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(4c532e9e) SHA1(d0aad72b204d4abd3b8d7d5bbaf8d2d2f78edaa6) )
 
 	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
@@ -3174,38 +3147,12 @@ ROM_START( wrally2a ) // REF: 950510-1
 	ROM_LOAD( "mu8_668b_palf20l8.bin",  0x000, 0x144, CRC(4145d424) SHA1(0e6b5074a9c576645b24351a14890438109b0813) )
 ROM_END
 
-ROM_START( wrally2b ) // REF: 950510
+ROM_START( wrally2b ) // REF: 950510. Program ROMs from 26/Jun/1995, graphics ROMs from 14/Jun/1995
 	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
-	ROM_LOAD16_BYTE( "wr2_64.ic64",  0x000000, 0x080000, CRC(4cdf4e1e) SHA1(a3b3ff4a70336b61c7bba5d518527bf4bd901867) )
-	ROM_LOAD16_BYTE( "wr2_63.ic63",  0x000001, 0x080000, CRC(94887c9f) SHA1(ad09f1fbeff4c3ba47f72346d261b22fa6a51457) )
+	ROM_LOAD16_BYTE( "wr2_64.ic64", 0x000000, 0x080000, CRC(4cdf4e1e) SHA1(a3b3ff4a70336b61c7bba5d518527bf4bd901867) )
+	ROM_LOAD16_BYTE( "wr2_63.ic63", 0x000001, 0x080000, CRC(94887c9f) SHA1(ad09f1fbeff4c3ba47f72346d261b22fa6a51457) )
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) // DS5002FP code
-	/* This SRAM has been dumped from 2 PCBs.  The first had unused space filled as 0xff, the 2nd space was filled as 0x00.
-	   In addition, the first had 2 bad bytes, one of which was identified at the time, the other not.  For reference the
-	   one that was not is "1938: 18 <-> 9B" (part of a data table)
-
-	   A little less obvious is why the older dump had the following startup code, which appears to have been partially
-	   patched out
-
-	    0200: mov   sp,#$70
-	    0203: mov   a,pcon
-	    0205: anl   a,#$20
-	    0207: jnz   $0203
-	    0209: nop
-	    020A: nop
-	    020B: nop
-	    020C: mov   dptr,#$FC01
-
-	   while the newer dump has this
-
-	    0200: mov   sp,#$70
-	    0203: mov   mcon,#$68
-	    0206: mov   i2cfg,#$00
-	    0209: mov   crcr,#$80
-	    020C: mov   dptr,#$FC01
-
-	   either way the 2nd dump is in much better state, so we're using that.
-	*/
 	ROM_LOAD( "wrally2_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(4c532e9e) SHA1(d0aad72b204d4abd3b8d7d5bbaf8d2d2f78edaa6) )
 
 	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
@@ -3239,6 +3186,84 @@ ROM_START( wrally2b ) // REF: 950510
 	ROM_LOAD( "mu8_668b_palf20l8.bin",  0x000, 0x144, CRC(4145d424) SHA1(0e6b5074a9c576645b24351a14890438109b0813) )
 ROM_END
 
+ROM_START( wrally2c ) // Program ROMs from 12/Jun/1995, graphics ROMs from 04/Jun/1995
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "wr2_e_ab01_12-6_27c040.bin", 0x000000, 0x080000, CRC(c1c5ab6a) SHA1(9a49aa9bbf22dc069b540eaf981d300d95dfacf1) )
+	ROM_LOAD16_BYTE( "wr2_o_7f46_12-6_27c040.bin", 0x000001, 0x080000, CRC(ddbcc45b) SHA1(c903451099d36a26336d65a54850530dc9bc912a) )
+
+	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) // DS5002FP code
+	ROM_LOAD( "wrally2_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(4c532e9e) SHA1(d0aad72b204d4abd3b8d7d5bbaf8d2d2f78edaa6) )
+
+	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
+	// These are the default states stored in NVRAM
+	DS5002FP_SET_MON( 0x69 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
+
+	ROM_REGION( 0x0a00000, "gfx", 0 ) // GFX + Sound
+	ROM_LOAD( "wr2_16_00_c846_4-6_27c040.bin", 0x0000000, 0x0080000, CRC(76b9e7a4) SHA1(164b68a15b0e23b2a14e4b9763ca2f9fc517aa95) )
+	ROM_LOAD( "wr2_17_01_7913_4-6_27c040.bin", 0x0080000, 0x0080000, CRC(c1ec0745) SHA1(a6c3ce9c889e6a53f4155f54d6655825af34a35b) )
+	ROM_LOAD( "wr2.18d",                       0x0100000, 0x0080000, CRC(e3617814) SHA1(9f9514052bb07d7e243f33b11bae409a444b7d9f) )    // Sound only
+	ROM_LOAD( "wr2.19d",                       0x0180000, 0x0080000, CRC(2dae988c) SHA1(a585e10b0e1519b828738b0b90698f8600082250) )    // Sound only
+	ROM_LOAD( "wr2_9_10_3334_4-6_27c040.bin",  0x0200000, 0x0080000, CRC(abf2c077) SHA1(3b505f2b6a008d96e7a10f1641d3d51802bedadd) )
+	ROM_LOAD( "wr2_10_11_8573_4-6_27c040.bin", 0x0280000, 0x0080000, CRC(5db67eb3) SHA1(faa58dafa26befb3291e5185ee04c39ce3b45b3f) )
+	ROM_LOAD( "wr2.11d",                       0x0300000, 0x0080000, CRC(ae66b97c) SHA1(bd0eba0b1c77864e06a9e136cfd834b35f200683) )    // Sound only
+	ROM_LOAD( "wr2.12d",                       0x0380000, 0x0080000, CRC(6dbdaa95) SHA1(f23df65e3df92d79f7b1e99d611c067a79fc849a) )    // Sound only
+	ROM_LOAD( "wr2_1_20_b950_4-6_27c040.bin",  0x0400000, 0x0080000, CRC(0e089410) SHA1(b2ad3b8be486017ec7bfc96c7a79974cfd9ea42f) )
+	ROM_LOAD( "wr2_2_21_fdc3_4-6_27c040.bin",  0x0480000, 0x0080000, CRC(9c2a723c) SHA1(5259c8fa1ad73518e89a8df6e76a565b8f8799e3) )
+	ROM_FILL(                                  0x0500000, 0x0100000, 0x00 )         // Empty
+	ROM_LOAD( "wr2_20_30_452c_4-6_27c040.bin", 0x0600000, 0x0080000, CRC(f8108c1a) SHA1(915876ceebb6ea4eac26754341b6524c68808ffe) )
+	ROM_LOAD( "wr2_13_31_cddf_4-6_27c040.bin", 0x0680000, 0x0080000, CRC(a4cd32f8) SHA1(bc4cc73b7a58aecd735bf55bb5062baa6dd22f83) )
+	ROM_FILL(                                  0x0700000, 0x0100000, 0x00 )         // Empty
+	ROM_LOAD( "wr2_21_40_b704_4-6_27c040.bin", 0x0800000, 0x0080000, CRC(2214c465) SHA1(3a119ffb9ecf4e9bcd34888e9fd025a9a9d716ae) )
+	ROM_LOAD( "wr2_14_41_999d_4-6_27c040.bin", 0x0880000, 0x0080000, CRC(6eb781d5) SHA1(d5c13db88e6de606b34805391cef9f3fbf09fac4) )
+	ROM_FILL(                                  0x0900000, 0x0100000, 0x00 )         // Empty
+
+	ROM_REGION( 0x144, "plds", 0 )
+	ROM_LOAD( "7a_5461_gal16v8.bin",    0x000, 0x117, CRC(a9bbdb7e) SHA1(3bd19558513171b269ede03c96e5caf57e021bef) )
+	ROM_LOAD( "mu.7a_436f_pal16l8.bin", 0x000, 0x104, CRC(632adb2f) SHA1(a80e478cf2edb46271aa78bbb924a6bfccf2f478) )
+	ROM_LOAD( "mu8_668b_palf20l8.bin",  0x000, 0x144, CRC(4145d424) SHA1(0e6b5074a9c576645b24351a14890438109b0813) )
+ROM_END
+
+ROM_START( wrally2d ) // Program ROMs from 09/Jun/1995, graphics ROMs from 04/Jun/1995
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "wr2_e_f1d9_9-6_27c040.bin", 0x000000, 0x080000, CRC(3de4dbfe) SHA1(2e278ba06ded2de7880703220d3c87ae4b3b17d9) )
+	ROM_LOAD16_BYTE( "wr2_o_080e_9-6_27c040.bin", 0x000001, 0x080000, CRC(6652ebd9) SHA1(0714cfdaa0b50c74eae4eb863994e2053f1799c8) )
+
+	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) // DS5002FP code
+	ROM_LOAD( "wrally2_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(4c532e9e) SHA1(d0aad72b204d4abd3b8d7d5bbaf8d2d2f78edaa6) )
+
+	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
+	// These are the default states stored in NVRAM
+	DS5002FP_SET_MON( 0x69 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
+
+	ROM_REGION( 0x0a00000, "gfx", 0 ) // GFX + Sound
+	ROM_LOAD( "wr2_16_00_c846_4-6_27c040.bin", 0x0000000, 0x0080000, CRC(76b9e7a4) SHA1(164b68a15b0e23b2a14e4b9763ca2f9fc517aa95) )
+	ROM_LOAD( "wr2_17_01_7913_4-6_27c040.bin", 0x0080000, 0x0080000, CRC(c1ec0745) SHA1(a6c3ce9c889e6a53f4155f54d6655825af34a35b) )
+	ROM_LOAD( "wr2.18d",                       0x0100000, 0x0080000, CRC(e3617814) SHA1(9f9514052bb07d7e243f33b11bae409a444b7d9f) )    // Sound only
+	ROM_LOAD( "wr2.19d",                       0x0180000, 0x0080000, CRC(2dae988c) SHA1(a585e10b0e1519b828738b0b90698f8600082250) )    // Sound only
+	ROM_LOAD( "wr2_9_10_3334_4-6_27c040.bin",  0x0200000, 0x0080000, CRC(abf2c077) SHA1(3b505f2b6a008d96e7a10f1641d3d51802bedadd) )
+	ROM_LOAD( "wr2_10_11_8573_4-6_27c040.bin", 0x0280000, 0x0080000, CRC(5db67eb3) SHA1(faa58dafa26befb3291e5185ee04c39ce3b45b3f) )
+	ROM_LOAD( "wr2.11d",                       0x0300000, 0x0080000, CRC(ae66b97c) SHA1(bd0eba0b1c77864e06a9e136cfd834b35f200683) )    // Sound only
+	ROM_LOAD( "wr2.12d",                       0x0380000, 0x0080000, CRC(6dbdaa95) SHA1(f23df65e3df92d79f7b1e99d611c067a79fc849a) )    // Sound only
+	ROM_LOAD( "wr2_1_20_b950_4-6_27c040.bin",  0x0400000, 0x0080000, CRC(0e089410) SHA1(b2ad3b8be486017ec7bfc96c7a79974cfd9ea42f) )
+	ROM_LOAD( "wr2_2_21_fdc3_4-6_27c040.bin",  0x0480000, 0x0080000, CRC(9c2a723c) SHA1(5259c8fa1ad73518e89a8df6e76a565b8f8799e3) )
+	ROM_FILL(                                  0x0500000, 0x0100000, 0x00 )         // Empty
+	ROM_LOAD( "wr2_20_30_452c_4-6_27c040.bin", 0x0600000, 0x0080000, CRC(f8108c1a) SHA1(915876ceebb6ea4eac26754341b6524c68808ffe) )
+	ROM_LOAD( "wr2_13_31_cddf_4-6_27c040.bin", 0x0680000, 0x0080000, CRC(a4cd32f8) SHA1(bc4cc73b7a58aecd735bf55bb5062baa6dd22f83) )
+	ROM_FILL(                                  0x0700000, 0x0100000, 0x00 )         // Empty
+	ROM_LOAD( "wr2_21_40_b704_4-6_27c040.bin", 0x0800000, 0x0080000, CRC(2214c465) SHA1(3a119ffb9ecf4e9bcd34888e9fd025a9a9d716ae) )
+	ROM_LOAD( "wr2_14_41_999d_4-6_27c040.bin", 0x0880000, 0x0080000, CRC(6eb781d5) SHA1(d5c13db88e6de606b34805391cef9f3fbf09fac4) )
+	ROM_FILL(                                  0x0900000, 0x0100000, 0x00 )         // Empty
+
+	ROM_REGION( 0x144, "plds", 0 )
+	ROM_LOAD( "7a_5461_gal16v8.bin",    0x000, 0x117, CRC(a9bbdb7e) SHA1(3bd19558513171b269ede03c96e5caf57e021bef) )
+	ROM_LOAD( "mu.7a_436f_pal16l8.bin", 0x000, 0x104, CRC(632adb2f) SHA1(a80e478cf2edb46271aa78bbb924a6bfccf2f478) )
+	ROM_LOAD( "mu8_668b_palf20l8.bin",  0x000, 0x144, CRC(4145d424) SHA1(0e6b5074a9c576645b24351a14890438109b0813) )
+ROM_END
+
 // Dates from Gaelco stickers on ROMs
 
 GAME( 1994, aligator,    0,         alighunt_d5002fp, alighunt, gaelco2_state,  init_alighunt,  ROT0, "Gaelco", "Alligator Hunt (World, protected, checksum 2B34128B)",      0 ) // 03/Jan/1995
@@ -3248,9 +3273,11 @@ GAME( 1994, aligatoruna, aligator,  alighunt,         alighunt, gaelco2_state,  
 GAME( 1994, aligatorp,   aligator,  alighunt_d5002fp, alighunt, gaelco2_state,  empty_init,     ROT0, "Gaelco", "Alligator Hunt (protected, prototype?, checksum B975CB0B)", MACHINE_NOT_WORKING ) // requires different protection program / data
 GAME( 1994, lizardhunt,  aligator,  alighunt,         alighunt, gaelco2_state,  init_alighunt,  ROT0, "Gaelco", "Lizard Hunt (unprotected, checksum 25A83609)",              0 ) // 29/Mar. Same as 'aligatoruna', but with a single different byte to activate the alternate title screen
 
-GAME( 1995, wrally2,     0,         wrally2,          wrally2,  wrally2_state,  empty_init,     ROT0, "Gaelco", "World Rally 2: Twin Racing (version 20-07, checksum B1B8, EPROM version)",    0 ) // 31/Jul/1995 (but 20/Jul on screen). Marked as "USA" internally at Gaelco.
+GAME( 1995, wrally2,     0,         wrally2,          wrally2,  wrally2_state,  empty_init,     ROT0, "Gaelco", "World Rally 2: Twin Racing (version 20-07, checksum B1B8)",                   0 ) // 31/Jul/1995 (but version 20/Jul on screen). Marked as "USA" internally at Gaelco.
 GAME( 1995, wrally2a,    wrally2,   wrally2,          wrally2,  wrally2_state,  init_wrally2,   ROT0, "Gaelco", "World Rally 2: Twin Racing (version 26-06, checksum 3EDB, mask ROM version)", 0 ) // 26/Jun/1995
-GAME( 1995, wrally2b,    wrally2,   wrally2,          wrally2,  wrally2_state,  empty_init,     ROT0, "Gaelco", "World Rally 2: Twin Racing (version 26-06, checksum 3EDB, EPROM version)",    0 ) // 26/Jun/1995
+GAME( 1995, wrally2b,    wrally2,   wrally2,          wrally2,  wrally2_state,  empty_init,     ROT0, "Gaelco", "World Rally 2: Twin Racing (version 26-06, checksum 3EDB)",                   0 ) // 26/Jun/1995
+GAME( 1995, wrally2c,    wrally2,   wrally2,          wrally2,  wrally2_state,  empty_init,     ROT0, "Gaelco", "World Rally 2: Twin Racing (version 09-06, checksum 7BE1)",                   0 ) // 12/Jun/1995 (but version 09/Jun on screen)
+GAME( 1995, wrally2d,    wrally2,   wrally2,          wrally2,  wrally2_state,  empty_init,     ROT0, "Gaelco", "World Rally 2: Twin Racing (version 09-06, checksum 50A2)",                   0 ) // 09/Jun/1995
 
 GAME( 1996, touchgo,     0,         touchgo_d5002fp,  touchgo,  gaelco2_state,  init_touchgo,   ROT0, "Gaelco", "Touch and Go (World, checksum 059D0235)",             0 ) // 05/Feb/1996
 GAME( 1995, touchgoa,    touchgo,   touchgo_d5002fp,  touchgo,  gaelco2_state,  init_touchgo,   ROT0, "Gaelco", "Touch and Go (World, checksum 05A0C7FB)",             0 ) // 11/Dec/1995
