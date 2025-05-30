@@ -54,9 +54,6 @@ static constexpr u8 ZF_OK_RES        = 0x00;
 
 static constexpr u8 ZF_VER           = 0x01;
 
-static constexpr u8 ZF_BUF_SIZE      = 0x400;
-static constexpr u8 ZF_BUF_MASK      = ZF_BUF_SIZE - 1;
-
 
 // device type definition
 DEFINE_DEVICE_TYPE(TSCONF_RS232, tsconf_rs232_device, "tsconf_rs232", "ZiFi")
