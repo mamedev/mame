@@ -2655,6 +2655,27 @@ void validity_checker::validate_inputs(device_t &root)
 			m_current_ioport = nullptr;
 		}
 
+		// validate the default settings
+		const input_device_default *def = device.input_ports_defaults();
+		if (def != nullptr)
+		{
+			for ( ; def->tag != nullptr; def++)
+			{
+				if (def->defvalue & ~def->mask)
+					osd_printf_error("Default value 0x%x for field of port '%s' lies outside mask 0x%x\n", def->defvalue, def->mask);
+
+				auto it = portlist.find(device.subtag(def->tag));
+				if (portlist.end() == it)
+					osd_printf_error("Default specified for nonexistent port '%s'\n", def->tag);
+				else
+				{
+					const auto &fields = it->second->fields();
+					if (fields.end() == std::find_if(fields.begin(), fields.end(), [def](const ioport_field &field) { return field.mask() == def->mask; }))
+						osd_printf_error("Field with mask 0x%x not found in port '%s'\n", def->mask, def->tag);
+				}
+			}
+		}
+
 		// done with this device
 		m_current_device = nullptr;
 	}
