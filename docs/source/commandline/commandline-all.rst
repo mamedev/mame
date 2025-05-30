@@ -1936,8 +1936,10 @@ Core Performance Options
     run the system at its normal speed, a *<factor>* of ``0.5`` means run at
     half speed, and a *<factor>* of 2.0 means run at double speed.  Note that
     changing this value affects sound playback as well, which will scale in
-    pitch accordingly.  The internal precision of the fraction is two decimal
-    places, so a *<factor>* of ``1.002`` is rounded to ``1.00``.
+    pitch accordingly.  A very low speed will introduce sound glitches, this
+    can be prevented by increasing **-audio_latency**.  The internal precision
+    of the fraction is two decimal places, so a *<factor>* of ``1.002`` is
+    rounded to ``1.00``.
 
     The default is ``1.0`` (normal speed).
 
@@ -3062,7 +3064,7 @@ Core Sound Options
 
 .. _mame-commandline-audiolatency:
 
-**-audio_latency** *<value>*
+**-audio_latency** *<value>* / **-alat** *<value>*
 
     Audio latency in seconds, up to a maximum of 0.5 seconds.  Smaller values
     provide less audio delay while requiring better system performance.  Larger
@@ -3973,7 +3975,7 @@ Core Misc Options
 
     Activates the cheat menu with autofire options and other tricks from the
     cheat database, if present. This also activates additional options on the
-    slider menu for overclocking/underclocking.
+    slider menu for overall speed and overclocking/underclocking.
 
     *Be advised that savestates created with cheats on may not work correctly
     with this turned off and vice-versa.*

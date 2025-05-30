@@ -1888,9 +1888,11 @@ std::vector<ui::menu_item> mame_ui_manager::slider_init(running_machine &machine
 		}
 	}
 
-	// add CPU overclocking (cheat only)
+	// add speed and CPU overclocking (cheat only)
 	if (machine.options().cheat())
 	{
+		slider_alloc(_("Speed Factor"), 100, 1000, 10000, 10, std::bind(&mame_ui_manager::slider_speed, this, _1, _2));
+
 		for (device_execute_interface &exec : execute_interface_enumerator(machine.root_device()))
 		{
 			std::string str = string_format(_("Overclock CPU %1$s"), exec.device().tag());
@@ -2102,6 +2104,28 @@ int32_t mame_ui_manager::slider_adjuster(ioport_field &field, std::string *str, 
 	if (str)
 		*str = string_format(_("%1$3d%%"), settings.value);
 	return settings.value;
+}
+
+
+//-------------------------------------------------
+//  slider_speed - speed factor slider callback
+//-------------------------------------------------
+
+int32_t mame_ui_manager::slider_speed(std::string *str, int32_t newval)
+{
+	if (newval != SLIDER_NOCHANGE)
+		machine().video().set_speed_factor(newval);
+
+	int32_t curval = machine().video().speed_factor();
+	if (str)
+	{
+		if (curval % 10)
+			*str = string_format(_("%1$.1f%%"), float(curval) * 0.1f);
+		else
+			*str = string_format(_("%1$3d%%"), curval / 10);
+	}
+
+	return curval;
 }
 
 
