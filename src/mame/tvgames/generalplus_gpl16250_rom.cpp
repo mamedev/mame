@@ -201,6 +201,23 @@ static INPUT_PORTS_START( jak_spmm )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON3 )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( jak_bj )
+	PORT_INCLUDE( base )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Hint Button") // test mode calls this B
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Menu") // test mode calls this C
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("A Button") // test mode calls this A
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON4 ) // test mode calls this menu (but that seems to be 0x0010 in reality? this is unused?)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+
+INPUT_PORTS_END
+
+
+
 static INPUT_PORTS_START( smartfp )
 	PORT_INCLUDE( base )
 
@@ -330,6 +347,12 @@ ROM_START( jak_prr )
 	// has a ISSI 827 404 (?) to store settings
 ROM_END
 
+ROM_START( jak_bj )
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP("jakkpopcap.bin", 0x000000, 0x200000, CRC(21e59932) SHA1(cb0854674bbaf95d45ba4702b8e9482924e3935b) )
+
+	// has a HT24LC04 to store settings
+ROM_END
 
 ROM_START( smartfp )
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
@@ -696,6 +719,7 @@ void gameu_handheld_game_state::init_gameu108()
 // the JAKKS ones of these seem to be known as 'Generalplus GPAC500' hardware?
 CONS(2008, jak_spmm,  0,       0, base, jak_spmm,  gormiti_game_state, empty_init, "JAKKS Pacific Inc / Santa Cruz Games", "The Amazing Spider-Man and The Masked Menace (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 CONS(2008, jak_prr,   0,       0, base, jak_spmm,  gormiti_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Power Rangers to the Rescue (JAKKS Pacific TV Game) (Aug 8 2008 16:46:59)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS(2008, jak_bj,    0,       0, base, jak_bj,    gormiti_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Bejeweled Deluxe (JAKKS Pacific TV Game) (Feb 28 2008 22:54:43)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 CONS(2009, smartfp,   0,       0, base, smartfp,  gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (UK)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2009, smartfps,  smartfp, 0, base, smartfp,  gcm394_game_state, empty_init, "Fisher-Price", "Fun 2 Learn Smart Fit Park (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
