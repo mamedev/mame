@@ -122,7 +122,8 @@ u8 tsconf_rs232_device::dr_r()
 			if (m_zf_rx_tl != m_zf_rx_hd)
 			{
 				data = m_zf_rxbuff[m_zf_rx_tl];
-				m_zf_rx_tl = (m_zf_rx_tl + 1) & 0x01ff;
+				if (!machine().side_effects_disabled())
+					m_zf_rx_tl = (m_zf_rx_tl + 1) & 0x01ff;
 			}
 		}
 	}
@@ -134,7 +135,8 @@ u8 tsconf_rs232_device::dr_r()
 			if (m_rs_rx_tl != m_rs_rx_hd)
 			{
 				data = m_rs_rxbuff[m_rs_rx_tl];
-				m_rs_rx_tl = (m_rs_rx_tl + 1) & 0x01ff;
+				if (!machine().side_effects_disabled())
+					m_rs_rx_tl = (m_rs_rx_tl + 1) & 0x01ff;
 			}
 		}
 	}
