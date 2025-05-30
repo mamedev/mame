@@ -2110,7 +2110,7 @@ void lua_engine::initialize()
 			luaL_pushresultsize(&buff, size);
 			return sol::make_reference(s, sol::stack_reference(s, -1));
 		};
-	video_type["speed_factor"] = sol::property(&video_manager::speed_factor);
+	video_type["speed_factor"] = sol::property(&video_manager::speed_factor, &video_manager::set_speed_factor);
 	video_type["throttled"] = sol::property(&video_manager::throttled, &video_manager::set_throttled);
 	video_type["throttle_rate"] = sol::property(&video_manager::throttle_rate, &video_manager::set_throttle_rate);
 	video_type["frameskip"] = sol::property(&video_manager::frameskip, &video_manager::set_frameskip);
