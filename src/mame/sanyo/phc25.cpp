@@ -190,7 +190,7 @@ uint8_t phc25_state::port40_r()
 	data |= !m_vdg->fs_r() << 4;
 
 	/* cassette read */
-	data |= (m_cassette->input() < +0.3) << 5;
+	data |= (m_cassette->input() > +0.3) << 5;
 
 	/* centronics busy */
 	data |= m_centronics_busy << 6;
@@ -229,7 +229,7 @@ void phc25_state::port40_w(uint8_t data)
 	*/
 
 	/* cassette output */
-	m_cassette->output( BIT(data, 0) ? -1.0 : +1.0);
+	m_cassette->output( BIT(data, 0) ? +1.0 : -1.0);
 
 	/* cassette motor */
 	m_cassette->change_state(BIT(data, 1) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
