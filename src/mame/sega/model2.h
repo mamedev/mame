@@ -490,6 +490,25 @@ private:
 	required_device<sega_billboard_device> m_billboard;
 };
 
+class model2a_airwlkrs_state : public model2a_state
+{
+public:
+	model2a_airwlkrs_state(const machine_config &mconfig, device_type type, const char *tag)
+		: model2a_state(mconfig, type, tag),
+		  m_player_in(*this, "IN_P%u", 1U),
+		  m_start_in(*this, "IN_START")
+	{}
+
+	void airwlkrs(machine_config &config);
+
+	template <unsigned N> ioport_value start_in_r();
+
+private:
+	required_ioport_array<4> m_player_in;
+	required_ioport m_start_in;
+	u8 m_key_matrix;
+};
+
 /*****************************
  *
  * Model 2B
