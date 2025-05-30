@@ -2743,9 +2743,12 @@ void validity_checker::validate_devices(machine_config &config)
 					const char *const def_bios = option.second->default_bios();
 					if (def_bios)
 						card->set_default_bios_tag(def_bios);
-					auto additions = option.second->machine_config();
+					auto const &additions = option.second->machine_config();
 					if (additions)
 						additions(card);
+					input_device_default const *input_def = option.second->input_device_defaults();
+					if (input_def)
+						card->set_input_default(input_def);
 				}
 
 				for (device_slot_interface &subslot : slot_interface_enumerator(*card))
@@ -2771,6 +2774,7 @@ void validity_checker::validate_devices(machine_config &config)
 				for (device_t &card_dev : device_enumerator(*card))
 					card_dev.config_complete();
 				validate_roms(*card);
+				validate_inputs(*card);
 
 				for (device_t &card_dev : device_enumerator(*card))
 				{
