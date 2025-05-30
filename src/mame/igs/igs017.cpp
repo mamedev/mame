@@ -20,7 +20,8 @@ Year + Game                                    PCB        CPU    Sound          
 97  Manguan Daheng (V123T1)                    NO-0252    68000  M6295           IGS031 IGS025 IGS???* Battery
 98  Genius 6 (V110F)                           NO-0131-4  Z180   K668    U3567   IGS017 IGS003c        Battery
 98  Long Hu Zhengba 2 (set 1)                  NO-0206    68000  K668            IGS031 IGS025 IGS022* Battery
-98  Long Hu Zhengba 2 (VS105M)                 NO-0182-2  68000  M6295           IGS031 IGS025 IGS022  Battery
+98  Long Hu Zhengba 2 (VS210M)                 NO-0218-2  68000  K668            IGS031 IGS025 IGS029  Battery
+98  Long Hu Zhengba (VS105M)                   NO-0182-2  68000  M6295           IGS031 IGS025 IGS022  Battery
 98  Shuang Long Qiang Zhu 2 VS (VS203J)        NO-0207    68000  K668            IGS031 IGS025 IGS022  Battery
 98  Manguan Caishen (V103CS)                   NO-0192-1  68000  K668            IGS017 IGS025 IGS029  Battery
 98  Manguan Caishen (V106CS)                   NO-0208    68000  M6295           IGS031 IGS025 IGS029  Battery
@@ -694,6 +695,7 @@ public:
 	void init_jking302us() ATTR_COLD;
 	void init_lhzb2() ATTR_COLD;
 	void init_lhzb2a() ATTR_COLD;
+	void init_lhzb2b() ATTR_COLD;
 	void init_mgcs() ATTR_COLD;
 	void init_mgcsa() ATTR_COLD;
 	void init_mgcsb() ATTR_COLD;
@@ -1919,6 +1921,75 @@ void igs017_state::init_lhzb2a()
 	m_igs017_igs031->lhzb2_decrypt_sprites();
 
 //  m_igs_string->dump("lhzb2a_string.key", 0x6e11c, 0x6e030, true); // same data as lhzb2
+}
+
+// lhzb2a
+
+void igs017_state::init_lhzb2b() // TODO: possibly not 100% correct
+{
+	const int rom_size = memregion("maincpu")->bytes();
+	u16 * const rom = (u16 *)memregion("maincpu")->base();
+
+	for (int i = 0; i < rom_size / 2; i++)
+	{
+		u16 x = rom[i];
+
+		// bit 0 xor layer
+		if (i & 0x20/2)
+		{
+			if (i & 0x02/2)
+			{
+				x ^= 0x0001;
+			}
+		}
+
+		if (!(i & 0x4000/2))
+		{
+			if (!(i & 0x300/2))
+			{
+				x ^= 0x0001;
+			}
+		}
+
+		// bit 10 xor layer
+
+		if (i & 0x8000/2)
+		{
+			if (!(i & 0x2000/2))
+			{
+				if (!(i & 0x800/2))
+				{
+					if (!(i & 0x200/2))
+						if (i & 0x100/2)
+							if (i & 0x40/2)
+								x ^= 0x0400;
+				}
+				else
+					if (i & 0x100/2)
+						if (i & 0x40/2)
+							x ^= 0x0400;
+			}
+		}
+		else
+		{
+			if (!(i & 0x800/2))
+			{
+				if (!(i & 0x200/2))
+					if (i & 0x040/2)
+						x ^= 0x0400;
+			}
+			else
+				if (i & 0x040/2)
+					x ^= 0x0400;
+		}
+
+		rom[i] = x;
+	}
+
+	m_igs017_igs031->lhzb2_decrypt_tiles();
+	m_igs017_igs031->lhzb2_decrypt_sprites();
+
+//  m_igs_string->dump("lhzb2b_string.key", 0x6e11c, 0x6e030, true);
 }
 
 
@@ -5621,6 +5692,25 @@ ROM_START( lhzb2a )
 	ROM_LOAD( "lhzb2_string.key", 0x00, 0xec, CRC(c964dc35) SHA1(81036e0dfa9abad123701ae8939d0d5b6f91b015) )
 ROM_END
 
+ROM_START( lhzb2b ) // IGS PCB N0-0218-2 (has IGS025 stickered M3, IGS029, 2 banks of 8 switches)
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "p-4096", 0x00000, 0x80000, CRC(46bbef6e) SHA1(45cc9de0515adcbc1de6732191511ff5ce3391ca) )
+
+	ROM_REGION( 0x10000, "igs022", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD16_WORD_SWAP( "m1101.u6", 0x000000, 0x400000, CRC(0114e9d1) SHA1(5b16170d3cd8b8e1662c949b7234fbdd2ca927f7) ) // FIXED BITS (0xxxxxxxxxxxxxxx)
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD16_WORD_SWAP( "m1103.u8", 0x00000, 0x80000, CRC(4d3776b4) SHA1(fa9b311b1a6ad56e136b66d090bc62ed5003b2f2) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "s1102.u23", 0x00000, 0x80000, CRC(51ffe245) SHA1(849011b186096add657ab20d49d260ec23363ef3) )
+
+	ROM_REGION( 0xec, "igs_string", 0 )
+	ROM_LOAD( "lhzb2_string.key", 0x00, 0xec, CRC(c964dc35) SHA1(81036e0dfa9abad123701ae8939d0d5b6f91b015) )
+ROM_END
+
 /*
 PCB NO-0182-2
 IGS025 sticker is D2
@@ -6335,6 +6425,7 @@ GAME ( 1998,  lhzb,        0,        lhzb2,      lhzb,        igs017_state, init
 GAME ( 1998,  lhzba,       lhzb,     lhzb2,      lhzb,        igs017_state, init_lhzb2,      ROT0, "IGS", "Long Hu Zhengba (China, VS105M, set 2)",                             MACHINE_UNEMULATED_PROTECTION ) // 龙虎争霸, finish IGS022 protection
 GAME ( 1998,  lhzb2,       0,        lhzb2,      lhzb2,       igs017_state, init_lhzb2,      ROT0, "IGS", "Long Hu Zhengba 2 (China, set 1)",                                   MACHINE_UNEMULATED_PROTECTION ) // 龙虎争霸2, finish IGS022 protection
 GAME ( 1998,  lhzb2a,      lhzb2,    lhzb2a,     lhzb2a,      igs017_state, init_lhzb2a,     ROT0, "IGS", "Long Hu Zhengba 2 (China, VS221M)",                                  0 ) // 龙虎争霸2
+GAME ( 1998,  lhzb2b,      lhzb2,    lhzb2,      lhzb2,       igs017_state, init_lhzb2b,     ROT0, "IGS", "Long Hu Zhengba 2 (China, VS210M)",                                  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME ( 1998,  slqz2,       0,        slqz2,      slqz2,       igs017_state, init_slqz2,      ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, VS203J, set 1)",                  MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, finish IGS022 protection
 GAME ( 1998,  slqz2a,      slqz2,    slqz2,      slqz2,       igs017_state, init_slqz2,      ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, unknown version)",                MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, misses program ROM dump, finish IGS022 protection
 GAME ( 1998,  slqz2b,      slqz2,    slqz2,      slqz2,       igs017_state, init_slqz2b,     ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, VS203J, set 2)",                  MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, finish IGS022 protection

@@ -26,10 +26,24 @@ public:
 	void jakks_mpac(machine_config& config);
 	void jakks_rapm(machine_config& config);
 	void jakks_sesa(machine_config& config);
-
+	void spg2xx_hmbb(machine_config& config);
+	void spg2xx_wof2(machine_config& config);
+	
 private:
 	void mem_map_2m_mkram(address_map &map) ATTR_COLD;
+	void mem_map_hmbb(address_map &map) ATTR_COLD;
 	void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+
+	u16 wof2_wheel_r()
+	{
+		// bits 0x0003 are input?
+		// read in the 4096hz timer interrupt
+		// but the timer interrupt causes glitches on the wheel spin screen
+		// is there an interrupt priority issue?
+		u16 ret = 0x0003;
+		logerror("%s: wof2_wheel_r returning %04x\n", machine().describe_context(), ret);
+		return ret;
+	}
 };
 
 
@@ -71,6 +85,28 @@ static INPUT_PORTS_START( spg2xx_jakks )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Menu / Pause")
+	PORT_BIT( 0x000f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P3")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::read_sda))
+	PORT_BIT( 0x0006, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) // PAL/NTSC flag, set to NTSC (unverified here)
+	PORT_BIT( 0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( jak_dond )
+	PORT_START("P1")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_NAME("Joypad Up")
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_NAME("Joypad Down")
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_NAME("Joypad Left")
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_NAME("Joypad Right")
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_UNUSED )        
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNUSED )     
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("No Deal Button")
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("Deal Button")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("Menu / Pause")
 	PORT_BIT( 0x000f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P3")
@@ -367,6 +403,12 @@ void jakks_state::mem_map_2m_mkram(address_map &map)
 	map(0x3e0000, 0x3fffff).ram().share("nvram"); // backed up by the CR2032
 }
 
+void jakks_state::mem_map_hmbb(address_map &map)
+{
+	map(0x000000, 0x3fffff).bankr("cartbank");
+	map(0x3e0000, 0x3fffff).ram();
+}
+
 void jakks_state::mk(machine_config &config)
 {
 	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
@@ -381,6 +423,22 @@ void jakks_state::mk(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
 }
+
+void jakks_state::spg2xx_hmbb(machine_config &config)
+{
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+
+	spg2xx_base(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &jakks_state::mem_map_hmbb);
+
+	m_maincpu->porta_in().set(FUNC(jakks_state::base_porta_r));
+	m_maincpu->portc_in().set_ioport("P3");
+	m_maincpu->portc_out().set(FUNC(jakks_state::portc_w));
+
+	I2C_24C16(config, m_i2cmem, 0);
+}
+
 
 void jakks_state::jakks_mpaco(machine_config &config)
 {
@@ -410,6 +468,11 @@ void jakks_state::jakks_rapm(machine_config &config)
 	m_maincpu->adc_in<0>().set_ioport("DIALX");
 }
 
+void jakks_state::spg2xx_wof2(machine_config &config)
+{
+	spg2xx_jakks(config);
+	m_maincpu->portb_in().set(FUNC(jakks_state::wof2_wheel_r));
+}
 
 ROM_START( jak_batm )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
@@ -436,6 +499,11 @@ ROM_END
 ROM_START( jak_slpb )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "jakks_sleepingbeauty.u5", 0x000000, 0x200000, CRC(e5b20a73) SHA1(3c305c4b9265d9bbf090805daaf26ad43af54389) )
+ROM_END
+
+ROM_START( jak_hm1m )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakkshmoiam.u4", 0x000000, 0x400000, CRC(38f0ec0c) SHA1(15458aa3de77776a9e3419073a8af7f92e403b6e) )
 ROM_END
 
 ROM_START( jak_supm )
@@ -550,6 +618,21 @@ ROM_START( jak_ntsc )
 	ROM_LOAD16_WORD_SWAP( "jakkssummercamp.bin", 0x000000, 0x200000, CRC(4b6711a0) SHA1(694eb97be72233adb5de322dfc00633c4db79113) )
 ROM_END
 
+ROM_START( jak_wof2 )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakkswheeloffortun2nd.u4", 0x000000, 0x200000, CRC(9eff79a8) SHA1(342b736aba13705d63f49f58bb3a2ef2505620a4) )
+ROM_END
+
+ROM_START( jak_dond )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakksdond.u4", 0x000000, 0x200000, CRC(0ae0706f) SHA1(6144190d126b36378c05b6e0a633ab2b53b3fa39) )
+ROM_END
+
+ROM_START( jak_hmbb )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakkhmbobw.bin", 0x000000, 0x800000, CRC(4e72cbf9) SHA1(efcec76da39c8373e8ef769c4fa0a35d379896d8) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -587,6 +670,10 @@ CONS( 2006, jak_supm, 0, 0, spg2xx_jakks,  jak_supm,      jakks_state, empty_ini
 
 CONS( 2006, jak_spdv, 0, 0, spg2xx_jakks,  spg2xx_spdv,   jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "The Amazing Spider-Man in Villain Round-Up (JAKKS Pacific TV Game) (24 Apr 2006 A)", MACHINE_IMPERFECT_SOUND )
 
+// the physical 2nd edition does't have a dpad, you need to use the wheel to navigate (although the inputs still work in emulation)
+// test mode button code is unknown (changed from usual HotGen code due to lack of dpad) routine is at 0xd5fd
+CONS( 2007, jak_wof2, 0, 0, spg2xx_wof2,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "Wheel of Fortune - 2nd Edition (JAKKS Pacific TV Game) (Mar 15 2007 PAK2)", MACHINE_IMPERFECT_SOUND )
+
 CONS( 2007, jak_pacg, 0, 0, spg2xx_jakks,  spg2xx_pacg,   jakks_state, empty_init, "JAKKS Pacific Inc / Namco / HotGen Ltd", "Arcade Gold featuring Pac-Man (20 APR 2007 A SKU O)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2006, jak_spac, 0, 0, spg2xx_jakks,  jak_mpac,      jakks_state, empty_init, "JAKKS Pacific Inc / Namco / HotGen Ltd", "Super Pac-Man Collection (26 JAN 2006 A SKU L)", MACHINE_IMPERFECT_SOUND )
@@ -598,6 +685,10 @@ CONS( 2007, jak_spd3, 0, 0, spg2xx_jakks,  jak_spd3,      jakks_state, empty_ini
 CONS( 2007, jak_cind, 0, 0, spg2xx_jakks,  spg2xx_pacg,   jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Cinderella - Once Upon a Midnight (JAKKS Pacific TV Game) (Aug 29 2007 11:15:55)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2007, jak_slpb, 0, 0, spg2xx_jakks,  spg2xx_pacg,   jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",  "Sleeping Beauty - Tales of Enchantment (JAKKS Pacific TV Game) (Sep 17 2007 14:45:02)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2007, jak_hm1m, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",  "Hannah Montana - One in a Million (JAKKS Pacific TV Game) (Aug 13 2007 15:42:29)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2007, jak_hmbb, 0, 0, spg2xx_hmbb,   spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",  "Hannah Montana - Best of Both Worlds (JAKKS Pacific TV Game) (Aug 17 2007 22:47:47)", MACHINE_IMPERFECT_SOUND )
 
 // from a PAL unit, and seems to have timing issues on the audio (speech cutting off / starting before previous has finished) when using an NTSC machine config, so maybe the NTSC ROM is different?
 // test mode combination isn't the usual HotGen one, but can be accessed by setting a breakpoint at 0xa6ba and setting r2 to 0x0a - TODO: figure out combination so version can be checked against an NTSC unit.
@@ -623,3 +714,5 @@ CONS( 2006, jak_dpma, 0, 0, spg2xx_dpma,  spg2xx_dpma,    jakks_state, empty_ini
 CONS( 2007, jak_dwa,  0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Dora the Explorer - Dora's World Adventure! (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2006, jak_gdg,  0, 0, spg2xx_dpma,   spg2xx_gdg,    jakks_state, empty_init, "JAKKS Pacific Inc / 1st Playable Productions",  "Go Diego Go! (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2006, jak_dond, 0, 0, spg2xx_jakks,  jak_dond,      jakks_state, empty_init, "JAKKS Pacific Inc / Pronto Games",    "Deal or No Deal (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )

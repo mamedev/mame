@@ -1,11 +1,12 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders: David Haywood
+
 /*
 
   Master Boy, Z80 hardware version.
 
-  This is Gaelco's first game, although there should be a 1986 release too,
-  likely on the same hardware.
+  This is Gaelco's first game, although there is a 1986 release too,
+  for Modular System.
 
 */
 
@@ -193,7 +194,7 @@ void mastboyo_state::machine_start()
 
 void mastboyo_state::mastboyo(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z80(config, m_maincpu, 20_MHz_XTAL / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mastboyo_state::mastboyo_map);
 	m_maincpu->set_addrmap(AS_IO, &mastboyo_state::mastboyo_portmap);
@@ -201,7 +202,7 @@ void mastboyo_state::mastboyo(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -214,7 +215,7 @@ void mastboyo_state::mastboyo(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(mastboyo_state::palette), 256);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	ay8910_device &aysnd(AY8910(config, "aysnd", 20_MHz_XTAL / 4));
@@ -280,7 +281,7 @@ ROM_START( mastboyoa )
 	ROM_LOAD( "masterboy-1987-27128-mbfij-ic36.bin", 0x00000, 0x04000, CRC(aa2a174d) SHA1(a27eae023453877131646594100b575af7a3c473) )
 
 	ROM_REGION( 0x80000, "questions", ROMREGION_ERASEFF )
-	/* IC6 - IC9 empty */
+	// IC6 - IC9 empty
 	ROM_LOAD( "masterboy-1987-27c512-ic10.bin", 0x40000, 0x10000, CRC(66da2826) SHA1(ef86efbfa251fc7cf62fe99b26551203fd599294) )
 	ROM_LOAD( "masterboy-1987-27256-ic11.bin",  0x50000, 0x08000, CRC(40b07eeb) SHA1(93f62e0a2a330f7ff1041eaa7cba3ef42121b1a8) )  // Identical to ic8 from the parent.
 	ROM_LOAD( "masterboy-1987-27c512-ic12.bin", 0x60000, 0x10000, CRC(b2819e38) SHA1(e4dd036747221926d0f9f86e00e28f578decc942) )

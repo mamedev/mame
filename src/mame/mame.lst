@@ -18774,6 +18774,9 @@ mastboyob
 mastboyoc
 mastboyod
 
+@source:gaelco/mastboyo_ms.cpp
+mastboyom
+
 @source:gaelco/radikaldarts.cpp
 radikaldrt
 
@@ -20643,6 +20646,7 @@ lhzb
 lhzba
 lhzb2
 lhzb2a
+lhzb2b
 mgcs
 mgcsa
 mgcsb
@@ -20745,6 +20749,7 @@ crzybugs200us
 crzybugs202us
 haunthig
 haunthig101us
+jking04
 tripfev
 tripfev105us
 tripfev107us
@@ -41451,6 +41456,7 @@ stactics
 astrass
 bakubaku
 batmanfr
+chalgolf
 choroqhr
 colmns97
 cotton2
@@ -46464,6 +46470,7 @@ gameu90
 gameu108
 gormiti
 imgame
+jak_bj
 jak_prr
 jak_spmm
 myac220
@@ -46476,6 +46483,7 @@ tkmag220
 paccon
 lazertag
 jak_s500
+jak_sinv
 jak_smwm
 jak_pf
 jak_prft
@@ -46656,9 +46664,12 @@ icanpian
 jak_batm
 jak_cind
 jak_ctah
+jak_dond
 jak_dpma
 jak_dwa
 jak_gdg
+jak_hm1m
+jak_hmbb
 jak_hsm
 jak_marv
 jak_mk
@@ -46680,6 +46691,7 @@ jak_spd3
 jak_spdv
 jak_supm
 jak_wall
+jak_wof2
 
 @source:tvgames/spg2xx_jakks_gkr.cpp
 jak_capc
