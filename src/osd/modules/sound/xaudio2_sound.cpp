@@ -730,10 +730,13 @@ uint32_t sound_xaudio2::stream_sink_open(uint32_t node, std::string name, uint32
 
 		// create a source voice for this stream
 		IXAudio2SourceVoice *source_voice_raw = nullptr;
+		UINT32 flags = XAUDIO2_VOICE_NOPITCH;
+		if (rate == (*device)->info.m_rate.m_default_rate)
+			flags |= XAUDIO2_VOICE_NOSRC;
 		result = (*device)->engine->CreateSourceVoice(
 				&source_voice_raw,
 				&format.Format,
-				XAUDIO2_VOICE_NOPITCH,
+				flags,
 				1.0F,
 				info.get(),
 				&sends,
