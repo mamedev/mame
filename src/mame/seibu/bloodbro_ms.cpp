@@ -365,21 +365,11 @@ static const gfx_layout tiles16x16x4_layout =
 	16 * 16 * 4
 };
 
-static const gfx_layout tiles8x8x4_layout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 0,8,16,24 },
-	{ 0,1,2,3,4,5,6,7 },
-	{ STEP8(0,32) },
-	16 * 16
-};
 
 static GFXDECODE_START( gfx_bloodbro_ms )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16x4_layout, 0x300, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16x4_layout, 0x200, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, tiles8x8x4_layout, 0x000, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x4_planar, 0x000, 16 )
 	GFXDECODE_ENTRY( "sprites", 0, tiles16x16x4_layout, 0x100, 16 )
 GFXDECODE_END
 
@@ -453,10 +443,10 @@ ROM_START( bloodbrom )
 
 	// ROMs for frontmost tile layer (text)
 	ROM_REGION( 0x20000, "gfx3", ROMREGION_INVERT ) // on another MOD 4/3 board
-	ROM_LOAD32_BYTE( "4-3_bb401.ic17",    0x00003, 0x08000, CRC(07e12bd2) SHA1(33977f97f0c1a45055f6f8cb06294b2eb3c27acc) ) // 27256
-	ROM_LOAD32_BYTE( "4-3_bb402.ic16",    0x00002, 0x08000, CRC(eca374ea) SHA1(4da5b876ccc9a7ac64f129ef18da521a56a022e0) ) // 27256
-	ROM_LOAD32_BYTE( "4-3_bb403.ic15",    0x00001, 0x08000, CRC(d77b84d3) SHA1(baa7d3175e42c3872682ca3080e8d07ce3f5e43b) ) // 27256
-	ROM_LOAD32_BYTE( "4-3_bb404.ic14",    0x00000, 0x08000, CRC(f8d2d4dc) SHA1(7210de80cb0939d9f703ed4c1e2d030dcb99d5f4) ) // 27256
+	ROM_LOAD( "4-3_bb401.ic17",    0x00000, 0x08000, CRC(07e12bd2) SHA1(33977f97f0c1a45055f6f8cb06294b2eb3c27acc) ) // 27256
+	ROM_LOAD( "4-3_bb402.ic16",    0x08000, 0x08000, CRC(eca374ea) SHA1(4da5b876ccc9a7ac64f129ef18da521a56a022e0) ) // 27256
+	ROM_LOAD( "4-3_bb403.ic15",    0x10000, 0x08000, CRC(d77b84d3) SHA1(baa7d3175e42c3872682ca3080e8d07ce3f5e43b) ) // 27256
+	ROM_LOAD( "4-3_bb404.ic14",    0x18000, 0x08000, CRC(f8d2d4dc) SHA1(7210de80cb0939d9f703ed4c1e2d030dcb99d5f4) ) // 27256
 
 	ROM_REGION( 0x100000, "sprites", ROMREGION_INVERT ) // on MOD 51/1 board
 	ROM_LOAD32_BYTE( "51-1-b_bb503.ic3",  0x00003, 0x10000, CRC(9d2a382d) SHA1(734b495ace73f07c622f64b305dafe43099395c1) )

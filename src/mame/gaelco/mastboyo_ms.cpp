@@ -15,9 +15,8 @@
     - MOD ?: ROM board for questions.
 
   TODO:
-  - colors
+  - improve colors
   - adjust visible area
-  - verify inputs once colors are better
   - verify ROM bank once colors are better
   - sound
 
@@ -126,7 +125,7 @@ void mastboyo_ms_state::main_program_map(address_map &map)
 	map(0x5000, 0x53ff).ram().w(FUNC(mastboyo_ms_state::tileram_w<0>)).share(m_tileram[0]);
 	map(0x5400, 0x57ff).ram().w(FUNC(mastboyo_ms_state::tileram_w<1>)).share(m_tileram[1]);
 	map(0x6000, 0x6000).w(FUNC(mastboyo_ms_state::rombank_w));
-	map(0x6404, 0x6404).nopw(); // TODO: sound latch
+	map(0x6400, 0x6400).nopw(); // TODO: sound latch
 	map(0x6404, 0x6404).portr("DSW");
 	map(0x6405, 0x6405).portr("IN0");
 	map(0x6800, 0x68ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
@@ -150,10 +149,10 @@ static INPUT_PORTS_START( mastboyo_ms )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START1 )
 	// note, Player 2 buttons must be used when entering name, and can be used for answering questions even in single player mode
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Red / Enter Initial")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Green / Delete Initial")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Red / <<")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Green / >>")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Green / Delete Initial")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Red / Enter Initial")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Green / >>")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Red / <<")
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Coin_A ) )
@@ -210,7 +209,7 @@ void mastboyo_ms_state::mastboyo_ms(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_mastboyo_ms);
 
-	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 0x100);
+	PALETTE(config, "palette").set_format(palette_device::xBGR_333_nibble, 0x100);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -230,7 +229,7 @@ ROM_START( mastboyom )
 	ROM_LOAD( "ma_0101_n_27c256.bin", 0x0000, 0x8000, CRC(7c1ae820) SHA1(2922b9094289daa2830acb6aab3b72941eab02b8) ) // 1xxxxxxxxxxxxxx = 0xFF
 	ROM_LOAD( "ma_0101_v_27c256.bin", 0x8000, 0x8000, CRC(e754176b) SHA1(325415ddc6bbe77493a7ee0130c1fe103f771bb0) ) // 1xxxxxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x8000, "tiles", 0 ) // on MOD-4 board
+	ROM_REGION( 0x8000, "tiles", ROMREGION_INVERT ) // on MOD-4 board
 	ROM_LOAD( "ma_0401_27128.bin", 0x00000, 0x02000, CRC(ad9f97d2) SHA1(1b8cde21c5fd5f1970ef6cc20616bff5c36a6b68) ) // 1ST AND 2ND HALF IDENTICAL
 	ROM_CONTINUE(                  0x00000, 0x02000)
 	ROM_LOAD( "ma_0402_27128.bin", 0x02000, 0x02000, CRC(76d14275) SHA1(6bd920bd58b9b30cd81e2658084639a16314322d) ) // 1ST AND 2ND HALF IDENTICAL
@@ -265,4 +264,4 @@ void mastboyo_ms_state::init_mastboyom()
 } // anonymous namespace
 
 
-GAME( 1987, mastboyom, mastboyo, mastboyo_ms, mastboyo_ms, mastboyo_ms_state, init_mastboyom, ROT0, "Gaelco", "Master Boy (1987, Modular System)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_WRONG_COLORS )
+GAME( 1987, mastboyom, mastboyo, mastboyo_ms, mastboyo_ms, mastboyo_ms_state, init_mastboyom, ROT0, "Gaelco", "Master Boy (1987, Modular System)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS )
