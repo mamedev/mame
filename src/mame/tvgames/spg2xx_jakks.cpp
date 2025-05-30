@@ -27,11 +27,23 @@ public:
 	void jakks_rapm(machine_config& config);
 	void jakks_sesa(machine_config& config);
 	void spg2xx_hmbb(machine_config& config);
+	void spg2xx_wof2(machine_config& config);
 	
 private:
 	void mem_map_2m_mkram(address_map &map) ATTR_COLD;
 	void mem_map_hmbb(address_map &map) ATTR_COLD;
 	void portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+
+	u16 wof2_wheel_r()
+	{
+		// bits 0x0003 are input?
+		// read in the 4096hz timer interrupt
+		// but the timer interrupt causes glitches on the wheel spin screen
+		// is there an interrupt priority issue?
+		u16 ret = 0x0003;
+		logerror("%s: wof2_wheel_r returning %04x\n", machine().describe_context(), ret);
+		return ret;
+	}
 };
 
 
@@ -456,6 +468,11 @@ void jakks_state::jakks_rapm(machine_config &config)
 	m_maincpu->adc_in<0>().set_ioport("DIALX");
 }
 
+void jakks_state::spg2xx_wof2(machine_config &config)
+{
+	spg2xx_jakks(config);
+	m_maincpu->portb_in().set(FUNC(jakks_state::wof2_wheel_r));
+}
 
 ROM_START( jak_batm )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
@@ -654,8 +671,8 @@ CONS( 2006, jak_supm, 0, 0, spg2xx_jakks,  jak_supm,      jakks_state, empty_ini
 CONS( 2006, jak_spdv, 0, 0, spg2xx_jakks,  spg2xx_spdv,   jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "The Amazing Spider-Man in Villain Round-Up (JAKKS Pacific TV Game) (24 Apr 2006 A)", MACHINE_IMPERFECT_SOUND )
 
 // the physical 2nd edition does't have a dpad, you need to use the wheel to navigate (although the inputs still work in emulation)
-// test mode button code is unknown (changed from usual HotGen code due to lack of dpad)
-CONS( 2007, jak_wof2, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "Wheel of Fortune - 2nd Edition (JAKKS Pacific TV Game) (Mar 15 2007 PAK2)", MACHINE_IMPERFECT_SOUND )
+// test mode button code is unknown (changed from usual HotGen code due to lack of dpad) routine is at 0xd5fd
+CONS( 2007, jak_wof2, 0, 0, spg2xx_wof2,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "Wheel of Fortune - 2nd Edition (JAKKS Pacific TV Game) (Mar 15 2007 PAK2)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2007, jak_pacg, 0, 0, spg2xx_jakks,  spg2xx_pacg,   jakks_state, empty_init, "JAKKS Pacific Inc / Namco / HotGen Ltd", "Arcade Gold featuring Pac-Man (20 APR 2007 A SKU O)", MACHINE_IMPERFECT_SOUND )
 
