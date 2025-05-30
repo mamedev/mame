@@ -2675,7 +2675,7 @@ void validity_checker::validate_inputs(device_t &root)
 					if (fields.end() == std::find_if(fields.begin(), fields.end(), [def] (const ioport_field &field) { return field.mask() == def->mask; }))
 					{
 						osd_printf_error(
-								"Default value specified for field with mask 0x%x in port '%s' but no correspondig field found\n",
+								"Default value specified for field with mask 0x%x in port '%s' but no corresponding field found\n",
 								def->mask,
 								def->tag);
 					}
