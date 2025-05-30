@@ -2644,8 +2644,8 @@ void validity_checker::validate_inputs(device_t &root)
 						{
 							osd_printf_error("Field '%s' has non-character U+%04X in PORT_CHAR(%d)\n",
 									name,
-									(unsigned)code,
-									(int)code);
+									uint32_t(code),
+									int32_t(code));
 						}
 					}
 				}
@@ -2659,19 +2659,26 @@ void validity_checker::validate_inputs(device_t &root)
 		const input_device_default *def = device.input_ports_defaults();
 		if (def != nullptr)
 		{
-			for ( ; def->tag != nullptr; def++)
+			for ( ; def->tag; def++)
 			{
 				if (def->defvalue & ~def->mask)
 					osd_printf_error("Default value 0x%x for field of port '%s' lies outside mask 0x%x\n", def->defvalue, def->mask);
 
-				auto it = portlist.find(device.subtag(def->tag));
+				const auto it = portlist.find(device.subtag(def->tag));
 				if (portlist.end() == it)
+				{
 					osd_printf_error("Default specified for nonexistent port '%s'\n", def->tag);
+				}
 				else
 				{
 					const auto &fields = it->second->fields();
-					if (fields.end() == std::find_if(fields.begin(), fields.end(), [def](const ioport_field &field) { return field.mask() == def->mask; }))
-						osd_printf_error("Field with mask 0x%x not found in port '%s'\n", def->mask, def->tag);
+					if (fields.end() == std::find_if(fields.begin(), fields.end(), [def] (const ioport_field &field) { return field.mask() == def->mask; }))
+					{
+						osd_printf_error(
+								"Default value specified for field with mask 0x%x in port '%s' but no correspondig field found\n",
+								def->mask,
+								def->tag);
+					}
 				}
 			}
 		}
