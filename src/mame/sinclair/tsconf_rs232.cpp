@@ -56,12 +56,13 @@ static constexpr u8 ZF_VER           = 0x01;
 
 
 // device type definition
-DEFINE_DEVICE_TYPE(TSCONF_RS232, tsconf_rs232_device, "tsconf_rs232", "ZiFi")
+DEFINE_DEVICE_TYPE(TSCONF_RS232, tsconf_rs232_device, "tsconf_rs232", "TS-Conf UART")
 
 tsconf_rs232_device::tsconf_rs232_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, TSCONF_RS232, tag, owner, clock)
 	, device_serial_interface(mconfig, *this)
-	, m_rs232(*this, "serport")
+	, m_out_txd_cb(*this)
+	, m_out_rts_cb(*this)
 {
 }
 
@@ -74,15 +75,9 @@ void tsconf_rs232_device::rcv_callback()
 	receive_register_extract();
 	const u8 data = get_received_char();
 	if (m_select_zf)
-	{
-		m_zf_rxbuff[m_zf_rx_hd] = data;
-		m_zf_rx_hd = (m_zf_rx_hd + 1) & 0x01ff;
-	}
+		m_zf_rxbuff[inc_ptr(m_zf_rx_hd)] = data;
 	else
-	{
-		m_rs_rxbuff[m_rs_rx_hd++] = data;
-		m_rs_rx_hd = (m_rs_rx_hd + 1) & 0x01ff;
-	}
+		m_rs_rxbuff[inc_ptr(m_rs_rx_hd)] = data;
 }
 
 void tsconf_rs232_device::tra_complete()
@@ -93,19 +88,19 @@ void tsconf_rs232_device::tra_complete()
 	if (m_select_zf)
 	{
 		if (m_zf_tx_tl != m_zf_tx_hd)
-			transmit_register_setup(m_zf_txbuff[m_zf_tx_tl++]);
+			transmit_register_setup(m_zf_txbuff[inc_ptr(m_zf_tx_tl)]);
 	}
 	else
 	{
 		if (m_rs_tx_tl != m_rs_tx_hd)
-			transmit_register_setup(m_rs_txbuff[m_rs_tx_tl++]);
+			transmit_register_setup(m_rs_txbuff[inc_ptr(m_rs_tx_tl)]);
 	}
 }
 
 void tsconf_rs232_device::tra_callback()
 {
 	const int txd = transmit_register_get_data_bit();
-	m_rs232->write_txd(txd);
+	m_out_txd_cb(txd);
 }
 
 u8 tsconf_rs232_device::dr_r()
@@ -120,7 +115,7 @@ u8 tsconf_rs232_device::dr_r()
 			{
 				data = m_zf_rxbuff[m_zf_rx_tl];
 				if (!machine().side_effects_disabled())
-					m_zf_rx_tl = (m_zf_rx_tl + 1) & 0x01ff;
+					inc_ptr(m_zf_rx_tl);
 			}
 		}
 	}
@@ -133,7 +128,7 @@ u8 tsconf_rs232_device::dr_r()
 			{
 				data = m_rs_rxbuff[m_rs_rx_tl];
 				if (!machine().side_effects_disabled())
-					m_rs_rx_tl = (m_rs_rx_tl + 1) & 0x01ff;
+					inc_ptr(m_rs_rx_tl);
 			}
 		}
 	}
@@ -150,7 +145,7 @@ void tsconf_rs232_device::dr_w(u8 data)
 		{
 			if ((m_zf_tx_tl - 1 - m_zf_tx_hd) & 0xff)
 			{
-				m_zf_txbuff[m_zf_tx_hd++] = data;
+				m_zf_txbuff[inc_ptr(m_zf_tx_hd)] = data;
 				tra_complete();
 			}
 		}
@@ -162,7 +157,7 @@ void tsconf_rs232_device::dr_w(u8 data)
 		{
 			if ((m_rs_tx_tl - 1 - m_rs_tx_hd) & 0xff)
 			{
-				m_rs_txbuff[m_rs_tx_hd++] = data;
+				m_rs_txbuff[inc_ptr(m_rs_tx_hd)] = data;
 				tra_complete();
 			}
 
@@ -331,9 +326,8 @@ void tsconf_rs232_device::update_serial(int state)
 
 		receive_register_reset();
 		transmit_register_reset();
-		m_rs232->write_txd(1);
-		m_rs232->write_rts(1);
-		m_rs232->write_dtr(1);
+		m_out_txd_cb(1);
+		m_out_rts_cb(1);
 	}
 	else
 	{
@@ -361,8 +355,8 @@ void tsconf_rs232_device::device_start()
 	save_item(NAME(m_zf_api));
 	save_item(NAME(m_zf_err));
 
-	save_pointer(NAME(m_rs_txbuff), 0x200);
-	save_pointer(NAME(m_rs_rxbuff), 0x200);
+	save_item(NAME(m_rs_txbuff));
+	save_item(NAME(m_rs_rxbuff));
 	save_item(NAME(m_rs_tx_hd));
 	save_item(NAME(m_rs_tx_tl));
 	save_item(NAME(m_rs_rx_hd));
@@ -371,8 +365,8 @@ void tsconf_rs232_device::device_start()
 	save_item(NAME(m_rs_itor));
 	save_item(NAME(m_rs_tmo_cnt));
 
-	save_pointer(NAME(m_zf_txbuff), 0x200);
-	save_pointer(NAME(m_zf_rxbuff), 0x200);
+	save_item(NAME(m_zf_txbuff));
+	save_item(NAME(m_zf_rxbuff));
 	save_item(NAME(m_zf_tx_hd));
 	save_item(NAME(m_zf_tx_tl));
 	save_item(NAME(m_zf_rx_hd));
@@ -416,10 +410,4 @@ void tsconf_rs232_device::device_reset()
 	m_zf_tmo_cnt = 0;
 
 	update_serial(0);
-}
-
-void tsconf_rs232_device::device_add_mconfig(machine_config &config)
-{
-	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
-	m_rs232->rxd_handler().set(FUNC(tsconf_rs232_device::rx_w));
 }

@@ -37,7 +37,7 @@ public:
 		, m_beta(*this, BETA_DISK_TAG)
 		, m_dma(*this, "dma")
 		, m_sdcard(*this, "sdcard")
-		, m_rs232(*this, "rs232")
+		, m_uart(*this, "uart")
 		, m_glukrs(*this, "glukrs")
 		, m_palette(*this, "palette")
 		, m_gfxdecode(*this, "gfxdecode")
@@ -226,7 +226,7 @@ private:
 	required_device<beta_disk_device> m_beta;
 	required_device<tsconfdma_device> m_dma;
 	required_device<spi_sdcard_device> m_sdcard;
-	required_device<tsconf_rs232_device> m_rs232;
+	required_device<tsconf_rs232_device> m_uart;
 	u8 m_zctl_di = 0;
 	u8 m_zctl_cs = 0;
 
