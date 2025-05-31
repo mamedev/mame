@@ -7,7 +7,7 @@ Profitech 3000 Servicetastatur
 Hardware:
 - CPU: 80C52 @ 11.0592MHz
 - LCD: LCD4002A
-- Memory: 27C256 EPROM (32KB), 24C16 I2C EEPROM (2KB)
+- Memory: 27C256 EPROM (32KB), 24CS16 I2C EEPROM (2KB)
 
 Key Matrix Layout:
 Col 0 (P1.0): OK, F4, UP
@@ -42,14 +42,14 @@ enum
 
 enum
 {
-	PORT_3_RXD     = 1 << 0,
-	PORT_3_TXD     = 1 << 1,
-	PORT_3_INT0    = 1 << 2,
-	PORT_3_INT1    = 1 << 3,
-	PORT_3_SDA     = 1 << 4,
-	PORT_3_SCL     = 1 << 5,
-	PORT_3_WR      = 1 << 6,
-	PORT_3_RD      = 1 << 7,
+	PORT_3_RXD  = 1 << 0,
+	PORT_3_TXD  = 1 << 1,
+	PORT_3_INT0 = 1 << 2,
+	PORT_3_INT1 = 1 << 3,
+	PORT_3_SDA  = 1 << 4,
+	PORT_3_SCL  = 1 << 5,
+	PORT_3_WR   = 1 << 6,
+	PORT_3_RD   = 1 << 7,
 };
 
 class servicet_state : public driver_device
@@ -87,13 +87,6 @@ private:
 	uint8_t m_port3 = 0xff;  // Port 3 output latch
 	uint8_t m_lcd_data = 0;      // LCD data bus
 
-	// I2C debugging state
-	bool m_last_scl = true;
-	bool m_last_sda = true;
-	uint32_t m_i2c_bit_count = 0;
-	uint8_t m_i2c_byte = 0;
-	bool m_in_i2c_transaction = false;
-	
 	void servicet_io(address_map &map) ATTR_COLD;
 	void servicet_map(address_map &map) ATTR_COLD;
 };
@@ -287,7 +280,7 @@ void servicet_state::servicet(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_color(rgb_t(6, 120, 245));
 	screen.set_physical_aspect(7*40, 10*2);
-	screen.set_refresh_hz(78.1);
+	screen.set_refresh_hz(72);
 	screen.set_size(6*40, 9*2);
 	screen.set_visarea_full();
 	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
@@ -296,9 +289,8 @@ void servicet_state::servicet(machine_config &config)
 	// Simple 2-color palette for LCD
 	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
-	// HD44780 LCD controller - LCD4002A configuration
 	HD44780(config, m_lcd, 270'000);
-	m_lcd->set_lcd_size(2, 40);      // 2 lines, 40 characters each (LCD4002A)
+	m_lcd->set_lcd_size(2, 40);      // 2 lines, 40 characters
 }
 
 ROM_START( servicet )
@@ -306,7 +298,7 @@ ROM_START( servicet )
 	ROM_LOAD( "service_tastatur_v3.3.u3", 0x0000, 0x8000, CRC(8eb161c4) SHA1(d44f3b38e75e1095487893d8b30c4e3212c1a143) )
 
 	ROM_REGION(0x800, "eeprom", 0)
-	ROM_LOAD("24cs16.u15", 0x000, 0x800, NO_DUMP) // Atmel 24CS16
+	ROM_LOAD("24cs16.u15", 0x000, 0x800, NO_DUMP)
 ROM_END
 
 } // anonymous namespace
