@@ -3066,9 +3066,9 @@ Core Sound Options
 **-audio_latency** *<value>* / **-alat** *<value>*
 
     Audio latency, conventionally in number of audio frames (1 audio frame is 20ms).
-	It is not required to supply whole numbers, eg. a value of ``1.5`` is 30ms).
+    It is not required to supply whole numbers, eg. a value of ``1.5`` is 30ms).
     Smaller values provide less audio delay while requiring better system
-	performance.  Larger values increase audio delay but may help avoid buffer
+    performance.  Larger values increase audio delay but may help avoid buffer
     under-runs and audio interruptions.  A value of ``0`` will use the default
     for the selected sound module.
 
