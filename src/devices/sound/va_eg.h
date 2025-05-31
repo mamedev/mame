@@ -47,6 +47,11 @@ public:
 	float get_v(const attotime &t) const;
 	float get_v() const;  // Get voltage at the machine's current time.
 
+	// Returns the remaining time required to reach voltage `v`.
+	// Returns attotime::never if `v` was reached in the past, or if it is
+	// impossible to reach.
+	attotime get_dt(float v) const;
+
 protected:
 	void device_start() override ATTR_COLD;
 	void sound_stream_update(sound_stream &stream) override;

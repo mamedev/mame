@@ -87,6 +87,28 @@ float va_rc_eg_device::get_v() const
 	return get_v(machine().time());
 }
 
+attotime va_rc_eg_device::get_dt(float v) const
+{
+	if (m_v_start == m_v_end)
+	{
+		// This only happens after a set_instant_v. If v != m_v_start, then it
+		// is unreachable. If v == m_vstart, then we (somewhat arbitrarily)
+		// consider it as having been reached in the past.
+		return attotime::never;
+	}
+	if (m_v_start < m_v_end && (v < m_v_start || v >= m_v_end))
+		return attotime::never;
+	if (m_v_start > m_v_end && (v > m_v_start || v <= m_v_end))
+		return attotime::never;
+
+	const double t_from_start = -m_r * m_c * log((m_v_end - v) / (m_v_end - m_v_start));
+	const attotime t_abs = m_t_start + attotime::from_double(t_from_start);
+	const attotime now = has_running_machine() ? machine().time() : attotime::zero;
+	if (t_abs < now)
+		return attotime::never;
+	return t_abs - now;
+}
+
 void va_rc_eg_device::device_start()
 {
 	m_stream = stream_alloc(0, 1, SAMPLE_RATE_OUTPUT_ADAPTIVE);
