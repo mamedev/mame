@@ -163,7 +163,7 @@ int sound_pa::init(osd_interface &osd, osd_options const &options)
 	m_info.m_default_source = dc(Pa_GetDefaultInputDevice());
 
 	m_stream_id = 1;
-	m_audio_latency = options.audio_latency();
+	m_audio_latency = options.audio_latency() / sound_manager::STREAMS_UPDATE_FREQUENCY;
 	m_machine = &downcast<osd_common_t &>(osd).machine();
 
 	return 0;

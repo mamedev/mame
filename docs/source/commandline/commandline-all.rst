@@ -3065,22 +3065,23 @@ Core Sound Options
 
 **-audio_latency** *<value>* / **-alat** *<value>*
 
-    Audio latency in seconds, up to a maximum of 0.5 seconds.  Smaller values
-    provide less audio delay while requiring better system performance.  Larger
-    values increase audio delay but may help avoid buffer under-runs and audio
-    interruptions.  A value of 0.0 will use the default for the selected sound
-    module.
+    Audio latency, conventionally in number of audio frames (1 audio frame is 20ms).
+	It is not required to supply whole numbers, eg. a value of ``1.5`` is 30ms).
+    Smaller values provide less audio delay while requiring better system
+	performance.  Larger values increase audio delay but may help avoid buffer
+    under-runs and audio interruptions.  A value of ``0`` will use the default
+    for the selected sound module.
 
     You may need to change the value of this option if you change the sound module
     using the :ref:`sound option <mame-commandline-sound>`.  This option is
     unsupported on sound modules ``pipewire``, ``pulse``, ``sdl``.
 
-    The default is ``0.0``.
+    The default is ``0``.
 
     Example:
         .. code-block:: bash
 
-            mame galaga -audio_latency 0.1
+            mame galaga -audio_latency 2
 
 
 .. _mame-commandline-inputoptions:
