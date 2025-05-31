@@ -74,8 +74,8 @@ license:CC0-1.0
 	  After Burner II (Japan) (Sega Ages) [GS-9109]                                         | (aburner2)      gets stuck on loading screen
 	  AI Igo (Japan) [T-17601G]                                                             | (aiigo)         playable
 	  Ai Iijima: Good Island Cafe (Japan) [T-25201G]                                        | (aiiijima)      menu options missing after first video?
-	  AI Shougi (Japan) [T-18602G]                                                          | (aishogi)       hangs after making move
-	  AI Shougi 2 (Japan) [T-17602G]                                                        | ########MISSING########
+	  AI Shougi (Japan) [T-18602G]                                                          | (aishogi)
+	  AI Shougi 2 (Japan) [T-17602G]                                                        | (aishogi2)
 	  Air Management '96 (Japan) [T-7611G]                                                  | (airman96)      sound issues in intro, can't see what's selected?
 	  Air Management '96 (Japan) (Koei the Best) [T-7668G]                                  |  @@
 	  Airs Adventure (Japan) [T-20301G]                                                     | (airsadve)      some fmv issues, but seems playable
@@ -2525,8 +2525,25 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- -->
-	<software name="aishogi">
+	<!-- The Genteiban box contains the same disc. -->
+	<!-- Game crashes in the intro of Chapter 2 of Story Mode, has some transparency and color issues in some places. -->
+	<software name="avg" supported="no">
+		<description>Advanced V.G. (Japan)</description>
+		<year>1997</year>
+		<publisher>TGL</publisher>
+		<info name="serial" value="T-32501G, T-32506G"/>
+		<info name="release" value="19970314"/>
+		<info name="alt_title" value="アドヴァンスド ヴァリアブル・ジオ"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<feature name="cd_matrix" value="T-32501GP-01392   A"/>
+			<diskarea name="cdrom">
+				<disk name="Advanced V.G. (Japan)" sha1="b803811f945b9eee1cc342cf0dc142cbfcb6edc4" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="aishogi" supported="no">
 		<description>AI Shougi (Japan)</description>
 		<year>1995</year>
 		<publisher>Soft Bank</publisher>
@@ -2535,8 +2552,26 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="alt_title" value="AI将棋"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
+			<feature name="cd_matrix" value="T-18602GP-00413-P1K   V"/>
 			<diskarea name="cdrom">
 				<disk name="ai shougi (japan)" sha1="307542ffe38bc51517930eda0159d5a501c9807e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- CHD is missing index data from track 2; game uses them for audio playback. -->
+	<software name="aishogi2" supported="no">
+		<description>AI Shougi 2 (Japan)</description>
+		<year>1995</year>
+		<publisher>ASCII Something Good</publisher>
+		<info name="serial" value="T-17602G"/>
+		<info name="release" value="19980611"/>
+		<info name="alt_title" value="AI将棋 2"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<feature name="cd_matrix" value="T-17602GP-02272   A"/>
+			<diskarea name="cdrom">
+				<disk name="ai shougi 2 (japan)" sha1="6c42d91ce7ace93baeccabf4aac80c39a93c4d21" status="baddump" />
 			</diskarea>
 		</part>
 	</software>
@@ -2634,6 +2669,22 @@ Olympic Soccer (Fra) T-7904H-09
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="america oudan ultra quiz (japan)" sha1="86b2d798208373707912715cc090adc9a0063537" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="anearth" supported="no">
+		<description>AnEarth Fantasy Stories: The First Volume (Japan)</description>
+		<year>1997</year>
+		<publisher>Media Works</publisher>
+		<info name="serial" value="T-27801G"/>
+		<info name="release" value="19970328"/>
+		<info name="alt_title" value="エイナス ファンタジー・ストーリーズ"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<feature name="cd_matrix" value="T-27801GP-01400-P1K   V"/>
+			<diskarea name="cdrom">
+				<disk name="anearth fantasy stories - the first volume (japan)" sha1="680b884abf635c7c5dc1ff2b76ffc5b6d2d00145" />
 			</diskarea>
 		</part>
 	</software>
@@ -2750,6 +2801,22 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
+	<software name="asuka120" supported="no">
+		<description>Asuka 120% Limited: Burning Fest. Limited (Japan)</description>
+		<year>1997</year>
+		<publisher>ASK Kodansha</publisher>
+		<info name="serial" value="T-16708G"/>
+		<info name="release" value="19971009"/>
+		<info name="alt_title" value="あすか120%リミテッド"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<feature name="cd_matrix" value="T-16708GP-01840-P2K   V"/>
+			<diskarea name="cdrom">
+				<disk name="asuka 120 limited - burning fest. limited (japan)" sha1="1f9454dca643bb3af39180b01cbcc0be0780c48c" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Identifying Ayakashi Ninden Kunoichiban Plus (Japan) (Disc 1)... -->
 	<software name="ankplsa" cloneof="ankpls" supported="no">
 		<description>Ayakashi Ninden Kunoichiban Plus (Japan, alt disc 1)</description>
@@ -2844,6 +2911,23 @@ Olympic Soccer (Fra) T-7904H-09
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="bakuretsu hunter r (japan)" sha1="7b8050326aa22751eb335e446f8775a0feac55ea" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Game immediately crashes MAME. -->
+	<software name="baldylnd" supported="no">
+		<description>Baldy Land (Japan)</description>
+		<year>1998</year>
+		<publisher>Banpresto</publisher>
+		<info name="serial" value="T-20608G"/>
+		<info name="release" value="19981126"/>
+		<info name="alt_title" value="ボールディランド"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<feature name="cd_matrix" value="T-20608GP-02396-P1K   V"/>
+			<diskarea name="cdrom">
+				<disk name="baldy land (japan)" sha1="5781903e2b4a169e5970687ea783a9010a7de3b7" />
 			</diskarea>
 		</part>
 	</software>
@@ -2958,6 +3042,23 @@ Olympic Soccer (Fra) T-7904H-09
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="blue breaker - ken yori mo hohoemi wo (japan)" sha1="6b2884ecdeea546fddc9b0cf0fd5000196cd298e" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Game has severe transparency issues that make the game difficult to play. -->
+	<software name="bombwars" supported="no">
+		<description>Bomberman Wars (Japan)</description>
+		<year>1998</year>
+		<publisher>Hudson</publisher>
+		<info name="serial" value="T-14320G"/>
+		<info name="release" value="19980416"/>
+		<info name="alt_title" value="ボンバーマンウォーズ"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<feature name="cd_matrix" value="T-14320GP-02126-P1K   V"/>
+			<diskarea name="cdrom">
+				<disk name="bomberman wars (japan)" sha1="5cfa7f329929ae13b1d169ccfb2ab013b105037d" />
 			</diskarea>
 		</part>
 	</software>
@@ -3344,7 +3445,24 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Identifying Dark Savior (Japan)... -->
+	<!-- CHD is missing index data from track 2; crashes MAME after starting a game. -->
+	<software name="darksav" supported="no">
+		<description>Dark Savior (Europe)</description>
+		<year>1996</year>
+		<publisher>Climax</publisher>
+		<info name="serial" value="MK81304-50"/>
+		<info name="release" value="19960830"/>
+		<info name="alt_title" value="ダークセイバー"/>
+		<sharedfeat name="compatibility" value="PAL"/>
+		<part name="cdrom" interface="cdrom">
+			<feature name="cd_matrix" value="MK-81304P-01319   A   12345"/>
+			<diskarea name="cdrom">
+				<disk name="dark savior (europe)" sha1="8bbb624a8f1f6b452ed5325ee58bc5a86dae7bca" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- CHD is missing index data from track 2; crashes MAME after starting a game. -->
 	<software name="darksavj" cloneof="darksav" supported="no">
 		<description>Dark Savior (Japan)</description>
 		<year>1996</year>
@@ -3354,8 +3472,25 @@ Olympic Soccer (Fra) T-7904H-09
 		<info name="alt_title" value="ダークセイバー"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
+			<feature name="cd_matrix" value="T-22101GP-01013-P1K   V"/>
 			<diskarea name="cdrom">
-				<disk name="dark savior (japan)" sha1="7d31a47530efd9071ad1ff3e70347f9479ae7e0f" />
+				<disk name="dark savior (japan)" sha1="7d31a47530efd9071ad1ff3e70347f9479ae7e0f" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- CHD is missing index data from track 2; crashes MAME after starting a game. -->
+	<software name="darksavu" cloneof="darksav" supported="no">
+		<description>Dark Savior (USA)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<info name="serial" value="81304"/>
+		<info name="release" value="199611xx"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="cdrom">
+			<feature name="cd_matrix" value="*3S*   # 1008681304"/>
+			<diskarea name="cdrom">
+				<disk name="dark savior (usa)" sha1="4c331f8360bd23a4117f14ace761aeac51c00f2c" status="baddump" />
 			</diskarea>
 		</part>
 	</software>
@@ -3388,6 +3523,39 @@ Olympic Soccer (Fra) T-7904H-09
 			<feature name="cd_matrix" value="610-6200P-00704-P1K   V"/>
 			<diskarea name="cdrom">
 				<disk name="dark savior (japan, taikenban, 19960205)" sha1="a0ad545203a811340e42298efb6cc1de73981174" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="darkseed" supported="no">
+		<description>Dark Seed (Japan)</description>
+		<year>1995</year>
+		<publisher>GAGA Communications</publisher>
+		<info name="serial" value="T-18501G"/>
+		<info name="release" value="19950707"/>
+		<info name="alt_title" value="ダークシード"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+		<feature name="cd_matrix" value="T-18501GP-00350-P1K   V"/>
+			<diskarea name="cdrom">
+				<disk name="dark seed (japan)" sha1="27cf985cb49263ce14adf56b4ab8c208eac9ded2" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Hangs at now loading screen, [SH2] $60ffc13 comms -->
+	<software name="darksed2" supported="no">
+		<description>Dark Seed II (Japan)</description>
+		<year>1997</year>
+		<publisher>B-Factory</publisher>
+		<info name="serial" value="T-36101G"/>
+		<info name="release" value="19970829"/>
+		<info name="alt_title" value="ダークシードⅡ"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+		<feature name="cd_matrix" value="T-36101GP-01731   A"/>
+			<diskarea name="cdrom">
+				<disk name="dark seed ii (japan)" sha1="0213aac2e9086fd7fab2913a3fffe24674d0fae8" />
 			</diskarea>
 		</part>
 	</software>
@@ -9752,22 +9920,6 @@ Sega logo animation draws offset [VDP2]
 		</part>
 	</software>
 
-	<!-- Identifying Anearth Fantasy Stories (JAP) (DW0598)... -->
-	<software name="anearth" supported="no">
-		<description>AnEarth Fantasy Stories - The First Volume (Japan)</description>
-		<year>1997</year>
-		<publisher>Media Works</publisher>
-		<info name="serial" value="T-27801G"/>
-		<info name="release" value="19970328"/>
-		<info name="alt_title" value="エイナス ファンタジー・ストーリーズ"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="anearth fantasy stories (jpn) (dw0598)" sha1="424349e97d0f9684c85ba6ba41731be73e7929f0" />
-			</diskarea>
-		</part>
-	</software>
-
 	<!-- Identifying Arcana Strikes (JAP) (DW0519)... -->
 	<software name="acstrike" supported="no">
 		<description>Arcana Strikes (Japan)</description>
@@ -9812,22 +9964,6 @@ Sega logo animation draws offset [VDP2]
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="astal - kisuisyoudensetu asutaru (jpn) (dw0446)" sha1="ca955899766e8f76153e8c38fe1c26296c3fb8d3" />
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Identifying Asuka 120pct Burning Fest Limited (JAP) (DW0264)... -->
-	<software name="asuka120" supported="no">
-		<description>Asuka 120% Burning Fest Limited (Japan)</description>
-		<year>1997</year>
-		<publisher>ASK Kodansha</publisher>
-		<info name="serial" value="T-16708G"/>
-		<info name="release" value="19971009"/>
-		<info name="alt_title" value="あすか120%リミテッド"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="asuka 120pct burning fest limited (jpn) (dw0264)" sha1="88c5691aa5ff1d537ac1ead5c797ea2af5e0c03a" />
 			</diskarea>
 		</part>
 	</software>
@@ -9897,22 +10033,6 @@ Sega logo animation draws offset [VDP2]
 		</part>
 	</software>
 
-	<!-- Identifying Baldy Land (JAP) (DW0513)... -->
-	<software name="baldylnd" supported="no">
-		<description>Baldy Land (Japan)</description>
-		<year>1998</year>
-		<publisher>Banpresto</publisher>
-		<info name="serial" value="T-20608G"/>
-		<info name="release" value="19981126"/>
-		<info name="alt_title" value="ボールディランド"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="baldy land (jpn) (dw0513)" sha1="1dce4bfe36a7eaceff4daa4be219444a097f712b" />
-			</diskarea>
-		</part>
-	</software>
-
 	<!-- Identifying Baroque Report CD Data File (JAP) (DW0867)... -->
 	<software name="baroquerep" cloneof="baroque" supported="no">
 		<description>Baroque Report CD Data File (Japan)</description>
@@ -9971,22 +10091,6 @@ Sega logo animation draws offset [VDP2]
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="blam - machinehead (jpn) (dw0613)" sha1="709557e127f5d0090bfda9705a97f2b70383974b" />
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Identifying Bomberman Wars (JAP) (DW0157)... -->
-	<software name="bombwars" supported="no">
-		<description>Bomberman Wars (Japan)</description>
-		<year>1998</year>
-		<publisher>Hudson</publisher>
-		<info name="serial" value="T-14320G"/>
-		<info name="release" value="19980416"/>
-		<info name="alt_title" value="ボンバーマンウォーズ"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="bomberman wars (jpn) (dw0157)" sha1="8220e7fc63faa6692e39b4d0e6fb7d556de091d8" />
 			</diskarea>
 		</part>
 	</software>
@@ -10222,54 +10326,6 @@ Sega logo animation draws offset [VDP2]
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="darius gaiden (jpn) (dw0125)" sha1="f355074172da91c2b166e74e74b298808f842b7f" />
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Identifying Dark Savior (JAP) (DW0579)... -->
-	<software name="darksavja" cloneof="darksav" supported="no">
-		<description>Dark Savior (Japan, alt)</description>
-		<year>1996</year>
-		<publisher>Climax</publisher>
-		<info name="serial" value="T-22101G"/>
-		<info name="release" value="19960830"/>
-		<info name="alt_title" value="ダークセイバー"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="dark savior (jpn) (dw0579)" sha1="8a40bd99c76dbebcc232072b8649eb1ef106ea62" />
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Identifying Dark Seed (JAP) (DW0616)... -->
-	<software name="darkseed" supported="no">
-		<description>Darkseed (Japan)</description>
-		<year>1995</year>
-		<publisher>GAGA Communications</publisher>
-		<info name="serial" value="T-18501G"/>
-		<info name="release" value="19950707"/>
-		<info name="alt_title" value="ダークシード"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="dark seed (jpn) (dw0616)" sha1="f1164902b9d582a00ee8176d22bd103c177d8e7c" />
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Hangs at now loading screen, [SH2] $60ffc13 comms -->
-	<software name="darksed2" supported="no">
-		<description>Darkseed II (Japan)</description>
-		<year>1997</year>
-		<publisher>B-Factory</publisher>
-		<info name="serial" value="T-36101G"/>
-		<info name="release" value="19970829"/>
-		<info name="alt_title" value="ダークシードⅡ"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="dark seed ii (jpn) (dw0617)" sha1="ba5c5ac26da82e0db4b45a2acf91abe60ced8d1a" />
 			</diskarea>
 		</part>
 	</software>
@@ -14941,35 +14997,6 @@ Sega logo animation draws offset [VDP2]
 		</part>
 	</software>
 
-	<!-- Identifying Advanced VG (T-32501G)... -->
-	<!-- The Genteiban box contained the same disc -->
-	<software name="avg" supported="no">
-		<description>Advanced V.G. (Japan)</description>
-		<year>1997</year>
-		<publisher>TGL</publisher>
-		<info name="serial" value="T-32501G, T-32506G"/>
-		<info name="release" value="19970314"/>
-		<info name="alt_title" value="アドヴァンスド ヴァリアブル・ジオ"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="advanced vg (t-32506g)" sha1="41e81a75e402224630d2fb82ba4621351139ddae" />
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Identifying Advanced VG (Genteiban) (T-32506G)... -->
-	<!--<software name="advanced01" cloneof="advanced" supported="no">
-	    <description>Advanced VG (Genteiban) (T-32506G)</description>
-	    <year>199?</year>
-	    <publisher>&lt;unknown&gt;</publisher>
-	    <part name="cdrom" interface="cdrom">
-	        <diskarea name="cdrom">
-	            <disk name="advanced vg (genteiban) (t-32506g)" sha1="41e81a75e402224630d2fb82ba4621351139ddae" />
-	        </diskarea>
-	    </part>
-	</software>-->
-
 	<!-- Identifying Afterburner II (GS-9109)... -->
 	<software name="aburner2" supported="no">
 		<description>Sega Ages - Afterburner II (Japan)</description>
@@ -14982,22 +15009,6 @@ Sega logo animation draws offset [VDP2]
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="afterburner ii (gs-9109)" sha1="8d6a666a7b029265f0246fd3c92df1a37161e928" />
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Identifying Ai Shogi (J) (T-18602G)... -->
-	<software name="aishogia" cloneof="aishogi" supported="no">
-		<description>AI Shougi (Japan, alt)</description>
-		<year>1995</year>
-		<publisher>Soft Bank</publisher>
-		<info name="serial" value="T-18602G"/>
-		<info name="release" value="19950925"/>
-		<info name="alt_title" value="AI将棋"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="ai shogi (j) (t-18602g)" sha1="b3f901e2e25bb4a7aae9ab05567765fc0151715f" />
 			</diskarea>
 		</part>
 	</software>
@@ -15111,22 +15122,6 @@ Sega logo animation draws offset [VDP2]
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="amok (t-7637g)" sha1="2fba02911bd759d20f6519595fce406b54b57677" />
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Identifying AnEarth Fantasy Stories - The First Volume (T-27801G)... -->
-	<software name="aneartha" cloneof="anearth" supported="no">
-		<description>AnEarth Fantasy Stories - The First Volume (Japan, alt)</description>
-		<year>1997</year>
-		<publisher>Media Works</publisher>
-		<info name="serial" value="T-27801G"/>
-		<info name="release" value="19970328"/>
-		<info name="alt_title" value="エイナス ファンタジー・ストーリーズ"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="anearth fantasy stories - the first volume (t-27801g)" sha1="f39ada490a07c251a3e4b1c7df9cbcff6178e2cf" />
 			</diskarea>
 		</part>
 	</software>
@@ -16257,38 +16252,6 @@ Sega logo animation draws offset [VDP2]
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="dark hunter jou ijigen gakuen (t-7631g)" sha1="6b312988d9871c216b37f6d04ed951dab38b9c89" />
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Identifying Dark Savior (T-22101G)... -->
-	<software name="darksavjb" cloneof="darksav" supported="no">
-		<description>Dark Savior (Japan, alt 2)</description>
-		<year>1996</year>
-		<publisher>Climax</publisher>
-		<info name="serial" value="T-22101G"/>
-		<info name="release" value="19960830"/>
-		<info name="alt_title" value="ダークセイバー"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="dark savior (t-22101g)" sha1="aa5f58ad5264af1ae5bd63b8532fd20650eacaf8" />
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Identifying Dark Seed 2 (J) (T-36101)... -->
-	<software name="darksed2a" cloneof="darksed2" supported="no">
-		<description>Darkseed II (Japan, alt)</description>
-		<year>1997</year>
-		<publisher>B-Factory</publisher>
-		<info name="serial" value="T-36101G"/>
-		<info name="release" value="19970829"/>
-		<info name="alt_title" value="ダークシードⅡ"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="dark seed 2 (j) (t-36101)" sha1="3912165ecaecb424ed9bacc46eb1a434e0a3dd41" />
 			</diskarea>
 		</part>
 	</software>
@@ -28677,22 +28640,6 @@ Sega logo animation draws offset [VDP2]
 		</part>
 	</software>
 
-	<!-- Identifying DarkSavior... -->
-	<software name="darksavjc" cloneof="darksav" supported="no">
-		<description>Dark Savior (Japan, alt 3)</description>
-		<year>1996</year>
-		<publisher>Climax</publisher>
-		<info name="serial" value="T-22101G"/>
-		<info name="release" value="19960830"/>
-		<info name="alt_title" value="ダークセイバー"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="darksaviorjapan" sha1="684c805c932ead19543b613d4bed5f2b0fa5614a" />
-			</diskarea>
-		</part>
-	</software>
-
 	<!-- Hangs on FMV opening, [CD-Block] never completes transfer after FAD=3460 -->
 	<software name="defcon5j" cloneof="defcon5" supported="no">
 		<description>Defcon 5 (Japan)</description>
@@ -31157,20 +31104,6 @@ Sega logo animation draws offset [VDP2]
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="darius ii v1.000 (1996)(sega)(pal)" sha1="d0137deb386607458a14f4b957a3efb6aa94b63c" />
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Identifying 0232-darksavior-eur... -->
-	<software name="darksav" supported="no">
-		<description>Dark Savior (Europe)</description>
-		<year>1996</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="MK81304-50"/>
-		<sharedfeat name="compatibility" value="PAL"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="0232-darksavior-eur" sha1="e39f5c85414d2077cc55741ffd2045e19b33cb07" />
 			</diskarea>
 		</part>
 	</software>
@@ -35645,21 +35578,6 @@ Sega logo animation draws offset [VDP2]
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="dark legend v1.002 (1995)(data east)(ntsc)(us)" sha1="f935a4eabfd1d8827279181f1f622ebde2efb171" />
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- Identifying DarkSavior... -->
-	<software name="darksavu" cloneof="darksav" supported="no">
-		<description>Dark Savior (USA)</description>
-		<year>1996</year>
-		<publisher>Sega</publisher>
-		<info name="serial" value="81304"/>
-		<info name="release" value="199611xx"/>
-		<sharedfeat name="compatibility" value="NTSC-U"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="darksaviorusa" sha1="32d84134406686fe9b4f12caa34b7e12c4efe22d" />
 			</diskarea>
 		</part>
 	</software>
