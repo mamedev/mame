@@ -729,4 +729,4 @@ CONS( 2006, jak_gdg,  0, 0, spg2xx_dpma,   spg2xx_gdg,    jakks_state, empty_ini
 
 CONS( 2006, jak_dond, 0, 0, spg2xx_jakks,  jak_dond,      jakks_state, init_crc,   "JAKKS Pacific Inc / Pronto Games",    "Deal or No Deal (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2007, jak_1vs, 0, 0,  spg2xx_jakks,  spg2xx_1vs,    jakks_state, init_crc,   "JAKKS Pacific Inc / Pronto Games",    "1 Vs 100 (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
+CONS( 2007, jak_1vs,  0, 0, spg2xx_jakks,  spg2xx_1vs,    jakks_state, init_crc,   "JAKKS Pacific Inc / Pronto Games",    "1 Vs 100 (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
