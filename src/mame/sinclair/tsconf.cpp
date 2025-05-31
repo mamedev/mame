@@ -90,7 +90,8 @@ void tsconf_state::tsconf_io(address_map &map)
 
 	// RS-232
 	map(0x00ef, 0x00ef).mirror(0xff00).rw(m_rs232, FUNC(tsconf_rs232_device::dr_r), FUNC(tsconf_rs232_device::dr_w)); // 0x00ef..0xbfef
-	map(0xc0ef, 0xc0ef).select(0x0700)
+	map(0xc0ef, 0xc0ef).mirror(0x3f00).unmaprw();
+	map(0xc0ef, 0xc0ef).select(0x0f00)
 		.lr8(NAME([this](offs_t offset) -> u8 { return m_rs232->reg_r(offset >> 8); }))
 		.lw8(NAME([this](offs_t offset, u8 data) { m_rs232->reg_w(offset >> 8, data); }));
 
