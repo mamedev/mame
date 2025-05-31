@@ -350,6 +350,12 @@ static INPUT_PORTS_START( spg2xx_ntoonsc )
 	PORT_BIT( 0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( spg2xx_1vs )
+	PORT_INCLUDE( spg2xx_jakks )
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON3 )        PORT_PLAYER(1) PORT_NAME("C Button")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Menu / Pause")
+INPUT_PORTS_END
 
 void jakks_state::base_config(machine_config& config)
 {
@@ -626,6 +632,14 @@ ROM_START( jak_dond )
 	ROM_LOAD16_WORD_SWAP( "jakksdond.u4", 0x000000, 0x200000, CRC(0ae0706f) SHA1(6144190d126b36378c05b6e0a633ab2b53b3fa39) )
 ROM_END
 
+ROM_START( jak_1vs )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	// Calculated checksum of ROM (after 0x10) is 0b1d28a4, checksum in ROM header (listed before 0x10) is 0b1d28a3
+	// so it's likely a single bit is flipped somewhere in this
+	// Ingame checksum gives a black screen, but seems unrelated
+	ROM_LOAD16_WORD_SWAP( "jakks1vs100.u3", 0x000000, 0x200000, BAD_DUMP CRC(3e8808f4) SHA1(acacd7ad2d74e3f6374215a75236fd6c27e07984) )
+ROM_END
+
 ROM_START( jak_hmbb )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "jakkhmbobw.bin", 0x000000, 0x800000, CRC(4e72cbf9) SHA1(efcec76da39c8373e8ef769c4fa0a35d379896d8) )
@@ -713,4 +727,6 @@ CONS( 2007, jak_dwa,  0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_ini
 
 CONS( 2006, jak_gdg,  0, 0, spg2xx_dpma,   spg2xx_gdg,    jakks_state, empty_init, "JAKKS Pacific Inc / 1st Playable Productions",  "Go Diego Go! (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2006, jak_dond, 0, 0, spg2xx_jakks,  jak_dond,      jakks_state, empty_init, "JAKKS Pacific Inc / Pronto Games",    "Deal or No Deal (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
+CONS( 2006, jak_dond, 0, 0, spg2xx_jakks,  jak_dond,      jakks_state, init_crc,   "JAKKS Pacific Inc / Pronto Games",    "Deal or No Deal (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2006, jak_1vs, 0, 0,  spg2xx_jakks,  spg2xx_1vs,    jakks_state, init_crc,   "JAKKS Pacific Inc / Pronto Games",    "1 Vs 100 (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
