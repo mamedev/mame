@@ -255,19 +255,26 @@ ROM_START( kniffi )
 	ROM_LOAD( "kniffi.icd6", 0x8000, 0x8000, CRC(1c129cec) SHA1(bad22f18b94c16dba36995ff8daf4d48f4d082a2) )
 ROM_END
 
+ROM_START( supermultib )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "super_multi_dob_pr1.ice6", 0x0000, 0x8000, CRC(2eb21e6b) SHA1(214f0f26f03551ecda88a64d4e1d75a49f376aae) )
+	ROM_LOAD( "super_multi_dob_pr2.icd6", 0x8000, 0x8000, CRC(e3f14918) SHA1(8ba7fc80044b5d27005a53ddbf9e928c74c25d48) )
+ROM_END
+
 } // anonymous namespace
 
 
 // 'STELLA DICE MASTER F2' and 'COPYRIGHT BY ADP LUEBBECKE GERMANY 1993' in ROM
-GAME( 1993, dicemstr,    0,         dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "Stella", "Dice Master",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 1986, doppelpot,   0,         doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "Nova",   "Doppelpot",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 1987, disc2000,    doppelpot, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Disc 2000",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 1987, disc2001,    doppelpot, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Disc 2001",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 1989, disc3000,    doppelpot, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Disc 3000",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 1986, elitedisc,   doppelpot, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Elite Disc",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 1982, excellent,   0,         excellent, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Excellent",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 1987, kniffi,      0,         dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "Nova",   "Kniffi",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 1988, extrablatt,  kniffi,    dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Extrablatt",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 1998, glucksstern, kniffi,    dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "ADP",    u8"Glücks-Stern", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 1988, juwel,       kniffi,    dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Juwel",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 1992, karoas,      kniffi,    dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Karo As",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1993, dicemstr,    0,         dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "Stella", "Dice Master",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1986, doppelpot,   0,         doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "Nova",   "Doppelpot",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1987, disc2000,    doppelpot, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Disc 2000",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1987, disc2001,    doppelpot, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Disc 2001",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1987, supermultib, doppelpot, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "Venus",  "Super Multi (DOB)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1989, disc3000,    doppelpot, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Disc 3000",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1986, elitedisc,   doppelpot, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Elite Disc",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1982, excellent,   0,         excellent, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Excellent",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1987, kniffi,      0,         dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "Nova",   "Kniffi",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1988, extrablatt,  kniffi,    dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Extrablatt",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1998, glucksstern, kniffi,    dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "ADP",    u8"Glücks-Stern",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1988, juwel,       kniffi,    dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Juwel",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1992, karoas,      kniffi,    dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Karo As",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
