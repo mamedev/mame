@@ -108,7 +108,9 @@ int sound_sdl::init(osd_interface &osd, const osd_options &options)
 		if(!err)
 			m_devices.emplace_back(name, spec.freq, spec.channels);
 	}
-	char *def_name;
+	m_default_sink = 0;
+#if SDL_VERSION_ATLEAST(2, 24, 0)
+	char *def_name = nullptr;
 	SDL_AudioSpec def_spec;
 	if(!SDL_GetDefaultAudioInfo(&def_name, &def_spec, 0)) {
 		uint32_t idx;
@@ -117,8 +119,8 @@ int sound_sdl::init(osd_interface &osd, const osd_options &options)
 			m_devices.emplace_back(def_name, def_spec.freq, def_spec.channels, true);
 		m_default_sink = idx+1;
 		SDL_free(def_name);
-	} else
-		m_default_sink = 0;
+	}
+#endif
 	return 0;
 }
 
