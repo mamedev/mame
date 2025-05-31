@@ -349,7 +349,7 @@ ROM_END
   |                ____                               ____               |
   |_______________|    |_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|    |______________|
 
- The same exact ROM contents, but with a different arrangement, was found on a straight clone (also same layout) of the
+ The same exact ROM contents, but with a different arrangement, were found on a straight clone (also same layout) of the
  Mini Super Fruits PCB (blue PCB with no markings, Toshiba TMP8085AP, 6.144 MHz xtal, AMD P8212, NEC D8155C, GI AY-3-8910,
  battery, etc.). The ROMs were labeled as "LP" (Lucky Player?) and had the following hashes:
    lp_c-100a.bin [0x1000] CRC(437ce010) SHA1(14f8448a854204b604e5c90e218832f916985397) SUM(06e4)
