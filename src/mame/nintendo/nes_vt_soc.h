@@ -22,6 +22,7 @@ public:
 	void vt03_8000_mapper_w(offs_t offset, u8 data);
 
 	auto set_4150_write_cb() { return m_4150_write_cb.bind(); }
+	auto set_411e_write_cb() { return m_411e_write_cb.bind(); }
 	auto set_41e6_write_cb() { return m_41e6_write_cb.bind(); }
 
 	// 8-bit ports
@@ -68,16 +69,17 @@ protected:
 	void vt03_410x_w(offs_t offset, u8 data);
 	u8 vt03_410x_r(offs_t offset);
 	void scrambled_410x_w(u16 offset, u8 data);
-	u8 spr_r(offs_t offset);
-	u8 chr_r(offs_t offset);
+	virtual u8 spr_r(offs_t offset);
+	virtual u8 chr_r(offs_t offset);
 	void chr_w(offs_t offset, u8 data);
 	void scanline_irq(int scanline, bool vblank, bool blanked);
 	void hblank_irq(int scanline, bool vblank, bool blanked);
 	void video_irq(bool hblank, int scanline, bool vblank, bool blanked);
 	u8 nt_r(offs_t offset);
 	void nt_w(offs_t offset, u8 data);
+	int calculate_va17_va10(int addr);
 	int calculate_real_video_address(int addr, int readtype);
-	void scrambled_8000_w(u16 offset, u8 data);
+	virtual void scrambled_8000_w(u16 offset, u8 data);
 	virtual void vt_dma_w(u8 data);
 	void do_dma(u8 data, bool has_ntsc_bug);
 	void vt03_4034_w(u8 data);
@@ -102,7 +104,7 @@ protected:
 	// additional relative offset for everything on vt3xx sets (seems to address up to 32mbytes only still?)
 	int get_relative() { return (m_relative[0] + ((m_relative[1] & 0x0f) << 8)) * 0x2000; }
 
-	void do_pal_timings_and_ppu_replacement(machine_config& config);
+	virtual void do_pal_timings_and_ppu_replacement(machine_config& config);
 
 	u32 screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect);
 
@@ -139,6 +141,7 @@ protected:
 
 
 	devcb_write8 m_4150_write_cb;
+	devcb_write8 m_411e_write_cb;
 	devcb_write8 m_41e6_write_cb;
 
 private:

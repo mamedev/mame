@@ -163,6 +163,7 @@ public:
 	void vt36x_16mb(machine_config& config);
 	void vt36x_32mb(machine_config& config);
 	void vt36x_32mb_2banks_lexi(machine_config& config);
+	void vt36x_32mb_2banks_lexi300(machine_config& config);
 
 	void vt36x_swap(machine_config& config);
 	void vt36x_swap_2mb(machine_config& config);
@@ -179,7 +180,6 @@ public:
 
 	void vt369_unk(machine_config& config);
 	void vt369_unk_1mb(machine_config& config);
-	void vt369_unk_4mb(machine_config& config);
 	void vt369_unk_16mb(machine_config& config);
 
 };
@@ -480,13 +480,6 @@ void vt36x_state::vt369_unk_1mb(machine_config& config)
 	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_1mbyte);
 }
 
-void vt36x_state::vt369_unk_4mb(machine_config& config)
-{
-	vt369_unk(config);
-	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_4mbyte);
-}
-
-
 
 // New mystery handheld architecture, VTxx derived
 void vt36x_state::vt36x(machine_config &config)
@@ -623,6 +616,13 @@ void vt36x_state::vt36x_32mb_2banks_lexi(machine_config& config)
 	m_soc->set_4150_write_cb().set(FUNC(vt36x_state::extbank_w));
 }
 
+void vt36x_state::vt36x_32mb_2banks_lexi300(machine_config& config)
+{
+	vt36x_32mb(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_32mbyte_bank);
+	m_soc->set_411e_write_cb().set(FUNC(vt36x_state::extbank_w)); // could be on 411d
+}
+
 static INPUT_PORTS_START( vt369 )
 	PORT_START("IO0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("A")
@@ -737,13 +737,24 @@ ROM_END
 ROM_START( rtvgc300 )
 	ROM_REGION( 0x8000000, "mainrom", 0 )
 	// some of the higher address lines might be swapped
-	ROM_LOAD( "lexibook300.bin", 0x00000, 0x4000000, CRC(015c4067) SHA1(a12986c4a366a23c4c7ca7b3d33e421a8dfdffc0) )
+	ROM_LOAD( "lexibook300.bin", 0x00000, 0x0800000, CRC(015c4067) SHA1(a12986c4a366a23c4c7ca7b3d33e421a8dfdffc0) )
+	ROM_CONTINUE(0x1000000, 0x0800000)
+	ROM_CONTINUE(0x0800000, 0x0800000)
+	ROM_CONTINUE(0x1800000, 0x0800000)
+	ROM_CONTINUE(0x2000000, 0x0800000)
+	ROM_CONTINUE(0x3000000, 0x0800000)
+	ROM_CONTINUE(0x2800000, 0x0800000)
+	ROM_CONTINUE(0x3800000, 0x0800000)
+
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
 ROM_START( rtvgc300fz )
 	ROM_REGION( 0x8000000, "mainrom", 0 )
 	// some of the higher address lines might be swapped
 	ROM_LOAD( "jg7800fz.bin", 0x00000, 0x4000000, CRC(c9d319d2) SHA1(9d0d1435b802f63ce11b94ce54d11f4065b324cc) )
+
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
 
@@ -778,6 +789,7 @@ ROM_START( lxcmcysw ) // all games selectable
 	ROM_CONTINUE(0x3000000, 0x0800000)
 	ROM_CONTINUE(0x2800000, 0x0800000)
 	ROM_CONTINUE(0x3800000, 0x0800000)
+
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
@@ -1200,8 +1212,8 @@ CONS( 200?, lxcmcy,    0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty
 CONS( 2012, dgun2561,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init, "dreamGEAR", "My Arcade Portable Gaming System with 140 Games (DGUN-2561)", MACHINE_NOT_WORKING ) // 64Mbyte ROM, must be externally banked, or different addressing scheme
 
 // GB-NO13-Main-VT389-2 on PCBs - uses higher resolution mode (twice usual h-res?)
-CONS( 2016, rtvgc300,  0,  0,  vt36x_16mb, vt369, vt36x_state, empty_init,    "Lexibook", "Retro TV Game Console - 300 Games", MACHINE_NOT_WORKING )
-CONS( 2017, rtvgc300fz,0,  0,  vt36x_16mb, vt369, vt36x_state, empty_init,    "Lexibook", "Retro TV Game Console - Frozen - 300 Games", MACHINE_NOT_WORKING )
+CONS( 2016, rtvgc300,  0,  0,  vt36x_32mb_2banks_lexi300, vt369, vt36x_state, empty_init,    "Lexibook", "Retro TV Game Console - 300 Games", MACHINE_NOT_WORKING )
+CONS( 2017, rtvgc300fz,0,  0,  vt36x_32mb_2banks_lexi300, vt369, vt36x_state, empty_init,    "Lexibook", "Retro TV Game Console - Frozen - 300 Games", MACHINE_NOT_WORKING )
 
 
 /* The following are also confirmed to be NES/VT derived units, most having a standard set of games with a handful of lazy graphic mods thrown in to fit the unit theme
@@ -1316,7 +1328,7 @@ CONS( 201?, rd5_240,    0,        0,  vt36x_8mb, vt369, vt36x_state, empty_init,
 CONS( 201?, hkb502,   0,      0,  vt36x_4mb, vt369, vt36x_state, empty_init, "<unknown>", "HKB-502 268-in-1 (set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 201?, hkb502a,  hkb502, 0,  vt36x_4mb, vt369, vt36x_state, empty_init, "<unknown>", "HKB-502 268-in-1 (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 // similar to above, fewer games in menu
-CONS( 2021, unk128vt, 0,      0,  vt369_unk_4mb, vt369, vt36x_state, empty_init, "<unknown>", "unknown VT369 based 128-in-1 (GC31-369-20210702-V2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2021, unk128vt, 0,      0,  vt36x_4mb, vt369, vt36x_state, empty_init, "<unknown>", "unknown VT369 based 128-in-1 (GC31-369-20210702-V2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // uses a LCD with resolution of 160x128 (image scaled to fit for some games, others run natively at 160x128)
 // contains a protection chip, command 80 XX returns a byte
@@ -1332,7 +1344,7 @@ CONS( 201?, myarccn,   0, 0,  vt36x_1mb, vt369, vt36x_state, empty_init, "DreamG
 CONS( 201?, denv150,   0,        0,  vt36x_8mb, vt369, vt36x_state, empty_init, "Denver", "Denver Game Console GMP-240C 150-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 201?, egame150,  denv150,  0,  vt36x_8mb, vt369, vt36x_state, empty_init, "<unknown>", "E-Game! 150-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
-// uncertain, uses SPI ROM so probably VT369, has extra protection?
+// uncertain, uses SPI ROM so probably VT369, has extra protection? (but RAM test goes up to 0x2000, over the internal ROM area?)
 CONS( 2017, otrail,     0,        0,  vt369_unk_1mb, vt369, vt36x_state, empty_init, "Basic Fun", "The Oregon Trail", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // has extra protection?

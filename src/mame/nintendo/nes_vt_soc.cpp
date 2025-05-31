@@ -86,6 +86,7 @@ nes_vt02_vt03_soc_device::nes_vt02_vt03_soc_device(const machine_config& mconfig
 	m_ntram(nullptr),
 	m_chrram(nullptr),
 	m_4150_write_cb(*this),
+	m_411e_write_cb(*this),
 	m_41e6_write_cb(*this),
 	m_space_config("program", ENDIANNESS_LITTLE, 8, 25, 0, address_map_constructor(FUNC(nes_vt02_vt03_soc_device::program_map), this)),
 	m_write_0_callback(*this),
@@ -424,32 +425,18 @@ void nes_vt02_vt03_soc_device::scrambled_410x_w(u16 offset, u8 data)
 
 u8 nes_vt02_vt03_soc_device::spr_r(offs_t offset)
 {
-	if (m_4242 & 0x1 || m_411d & 0x04)
-	{
-		return m_chrram[offset & 0x1fff];
-	}
-	else
-	{
-		int realaddr = calculate_real_video_address(offset, 1);
+	int realaddr = calculate_real_video_address(offset, 1);
 
-		address_space& spc = this->space(AS_PROGRAM);
-		return spc.read_byte(get_relative() + realaddr);
-	}
+	address_space& spc = this->space(AS_PROGRAM);
+	return spc.read_byte(get_relative() + realaddr);
 }
 
 u8 nes_vt02_vt03_soc_device::chr_r(offs_t offset)
 {
-	if (m_4242 & 0x1 || m_411d & 0x04) // newer VT platforms only (not VT03/09), split out
-	{
-		return m_chrram[offset & 0x1fff];
-	}
-	else
-	{
-		int realaddr = calculate_real_video_address(offset, 0);
+	int realaddr = calculate_real_video_address(offset, 0);
 
-		address_space& spc = this->space(AS_PROGRAM);
-		return spc.read_byte(get_relative() + realaddr);
-	}
+	address_space& spc = this->space(AS_PROGRAM);
+	return spc.read_byte(get_relative() + realaddr);
 }
 
 
@@ -524,22 +511,8 @@ void nes_vt02_vt03_soc_device::nt_w(offs_t offset, u8 data)
 }
 
 
-
-
-
-
-int nes_vt02_vt03_soc_device::calculate_real_video_address(int addr, int readtype)
+int nes_vt02_vt03_soc_device::calculate_va17_va10(int addr)
 {
-	// this is what gets passed in
-	//      00Pb bbtt tttt plll
-	//  P = plane3/4 select (4bpp modes)
-	//  p = plane0/1 select
-	//  l = tile line
-	//  b = tile number bits passed into banking
-	//  t = tile number (0x1ff tile number bits total)
-	int va34 = (addr & 0x6000) >> 13;
-	addr &= 0x1fff;
-
 	/*
 	Calculating TVA17 - TVA10
 
@@ -563,7 +536,6 @@ int nes_vt02_vt03_soc_device::calculate_real_video_address(int addr, int readtyp
 	m_r2017 = rv5x
 
 	*/
-	int finaladdr = 0;
 
 	int sel = (addr & 0x1c00) | ((m_410x[0x5] & 0x80) ? 0x2000 : 0x000);
 
@@ -644,6 +616,24 @@ int nes_vt02_vt03_soc_device::calculate_real_video_address(int addr, int readtyp
 	case 0x7: return -1;
 	}
 
+	return va17_va10;
+}
+
+
+int nes_vt02_vt03_soc_device::calculate_real_video_address(int addr, int readtype)
+{
+	// this is what gets passed in
+	//      00Pb bbtt tttt plll
+	//  P = plane3/4 select (4bpp modes)
+	//  p = plane0/1 select
+	//  l = tile line
+	//  b = tile number bits passed into banking
+	//  t = tile number (0x1ff tile number bits total)
+	int va34 = (addr & 0x6000) >> 13;
+	addr &= 0x1fff;
+
+	int va17_va10 = calculate_va17_va10(addr);
+
 	// Adjust where we actually read from for special modes
 
 	// might be a VT09 only feature (alt 4bpp mode?)
@@ -663,6 +653,8 @@ int nes_vt02_vt03_soc_device::calculate_real_video_address(int addr, int readtyp
 			extended = 1;
 		}
 	}
+
+	int finaladdr = 0;
 
 	if (!extended)
 	{
@@ -749,125 +741,93 @@ int nes_vt02_vt03_soc_device::calculate_real_video_address(int addr, int readtyp
 void nes_vt02_vt03_soc_device::scrambled_8000_w(u16 offset, u8 data)
 {
 	offset &= 0x7fff;
-
 	u16 addr = offset+0x8000;
-	if ((m_411d & 0x03) == 0x03) // (VT32 only, not VT03/09, split)
-	{
-		//CNROM compat
-		logerror("%s: vtxx_cnrom_8000_w real address: (%04x) translated address: (%04x) %02x\n", machine().describe_context(), addr, offset + 0x8000, data);
-		m_ppu->set_videobank0_reg(0x4, data * 8);
-		m_ppu->set_videobank0_reg(0x5, data * 8 + 2);
-		m_ppu->set_videobank0_reg(0x0, data * 8 + 4);
-		m_ppu->set_videobank0_reg(0x1, data * 8 + 5);
-		m_ppu->set_videobank0_reg(0x2, data * 8 + 6);
-		m_ppu->set_videobank0_reg(0x3, data * 8 + 7);
 
-	}
-	else if ((m_411d & 0x03) == 0x01) // (VT32 only, not VT03/09, split)
+	//MMC3 compat
+	if ((addr < 0xa000) && !(addr & 0x01))
 	{
-		//MMC1 compat, TODO
-		logerror("%s: vtxx_mmc1_8000_w real address: (%04x) translated address: (%04x) %02x\n", machine().describe_context(), addr, offset + 0x8000, data);
-
-	}
-	else if ((m_411d & 0x03) == 0x02) // (VT32 only, not VT03/09, split)
-	{
-		//UNROM compat
-		logerror("%s: vtxx_unrom_8000_w real address: (%04x) translated address: (%04x) %02x\n", machine().describe_context(), addr, offset + 0x8000, data);
-
-		m_410x[0x7] = ((data & 0x0F) << 1);
-		m_410x[0x8] = ((data & 0x0F) << 1) + 1;
+		logerror("%s: scrambled_8000_w real address: (%04x) translated address: (%04x) %02x (banking)\n",  machine().describe_context(), addr, offset + 0x8000, data);
+		// Bank select
+		m_8000_addr_latch = data & 0x07;
+		// Bank config
+		m_410x[0x05] = data & ~(1 << 5);
 		update_banks();
 	}
-	else // standard mode (VT03/09)
+	else if ((addr < 0xa000) && (addr & 0x01))
 	{
-		//logerror("%s: vtxx_mmc3_8000_w real address: (%04x) translated address: (%04x) %02x\n",  machine().describe_context(), addr, offset+0x8000, data );
+		logerror("%s: scrambled_8000_w real address: (%04x) translated address: (%04x) %02x (other scrambled stuff)\n",  machine().describe_context(), addr, offset + 0x8000, data);
 
-		//MMC3 compat
-		if ((addr < 0xA000) && !(addr & 0x01))
+		switch (m_410x[0x05] & 0x07)
 		{
-			logerror("%s: scrambled_8000_w real address: (%04x) translated address: (%04x) %02x (banking)\n",  machine().describe_context(), addr, offset + 0x8000, data);
-			// Bank select
-			m_8000_addr_latch = data & 0x07;
-			// Bank config
-			m_410x[0x05] = data & ~(1 << 5);
+		case 0x00:
+			m_ppu->set_videobank0_reg(m_8000_scramble[0], data);
+			break;
+
+		case 0x01:
+			m_ppu->set_videobank0_reg(m_8000_scramble[1], data);
+			break;
+
+		case 0x02: // hand?
+			m_ppu->set_videobank0_reg(m_8000_scramble[2], data);
+			break;
+
+		case 0x03: // dog?
+			m_ppu->set_videobank0_reg(m_8000_scramble[3], data);
+			break;
+
+		case 0x04: // ball thrown
+			m_ppu->set_videobank0_reg(m_8000_scramble[4], data);
+			break;
+
+		case 0x05: // ball thrown
+			m_ppu->set_videobank0_reg(m_8000_scramble[5], data);
+			break;
+
+		case 0x06:
+			m_410x[m_8006_scramble[0]] = data;
+			//m_410x[0x9] = data;
 			update_banks();
-		}
-		else if ((addr < 0xA000) && (addr & 0x01))
-		{
-			logerror("%s: scrambled_8000_w real address: (%04x) translated address: (%04x) %02x (other scrambled stuff)\n",  machine().describe_context(), addr, offset + 0x8000, data);
+			break;
 
-			switch (m_410x[0x05] & 0x07)
-			{
-			case 0x00:
-				m_ppu->set_videobank0_reg(m_8000_scramble[0], data);
-				break;
-
-			case 0x01:
-				m_ppu->set_videobank0_reg(m_8000_scramble[1], data);
-				break;
-
-			case 0x02: // hand?
-				m_ppu->set_videobank0_reg(m_8000_scramble[2], data);
-				break;
-
-			case 0x03: // dog?
-				m_ppu->set_videobank0_reg(m_8000_scramble[3], data);
-				break;
-
-			case 0x04: // ball thrown
-				m_ppu->set_videobank0_reg(m_8000_scramble[4], data);
-				break;
-
-			case 0x05: // ball thrown
-				m_ppu->set_videobank0_reg(m_8000_scramble[5], data);
-				break;
-
-			case 0x06:
-				m_410x[m_8006_scramble[0]] = data;
-				//m_410x[0x9] = data;
-				update_banks();
-				break;
-
-			case 0x07:
-				m_410x[m_8006_scramble[1]] = data;
-				update_banks();
-				break;
-			}
+		case 0x07:
+			m_410x[m_8006_scramble[1]] = data;
+			update_banks();
+			break;
 		}
-		else if ((addr >= 0xA000) && (addr < 0xC000) && !(addr & 0x01))
-		{
-			// Mirroring
-			m_410x[0x6] &= 0xFE;
-			m_410x[0x6] |= data & 0x01;
-		}
-		else if ((addr >= 0xA000) && (addr < 0xC000) && (addr & 0x01))
-		{
-			// PRG RAM control, ignore
-		}
-		else if ((addr >= 0xC000) && (addr < 0xE000) && !(addr & 0x01))
-		{
-			// IRQ latch
-			vt03_410x_w(1, data);
-		}
-		else if ((addr >= 0xC000) && (addr < 0xE000) && (addr & 0x01))
-		{
-			// IRQ reload
-			vt03_410x_w(2, data);
-		}
-		else if ((addr >= 0xE000) && !(addr & 0x01))
-		{
-			// IRQ disable
-			vt03_410x_w(3, data);
-		}
-		else if ((addr >= 0xE000) && (addr & 0x01))
-		{
-			// IRQ enable
-			vt03_410x_w(4, data);
-		}
-		else
-		{
+	}
+	else if ((addr >= 0xa000) && (addr < 0xc000) && !(addr & 0x01))
+	{
+		// Mirroring
+		m_410x[0x6] &= 0xfe;
+		m_410x[0x6] |= data & 0x01;
+	}
+	else if ((addr >= 0xa000) && (addr < 0xc000) && (addr & 0x01))
+	{
+		// PRG RAM control, ignore
+	}
+	else if ((addr >= 0xc000) && (addr < 0xe000) && !(addr & 0x01))
+	{
+		// IRQ latch
+		vt03_410x_w(1, data);
+	}
+	else if ((addr >= 0xc000) && (addr < 0xe000) && (addr & 0x01))
+	{
+		// IRQ reload
+		vt03_410x_w(2, data);
+	}
+	else if ((addr >= 0xe000) && !(addr & 0x01))
+	{
+		// IRQ disable
+		vt03_410x_w(3, data);
+	}
+	else if ((addr >= 0xe000) && (addr & 0x01))
+	{
+		// IRQ enable
+		vt03_410x_w(4, data);
+	}
+	else
+	{
 
-		}
 	}
 }
 
