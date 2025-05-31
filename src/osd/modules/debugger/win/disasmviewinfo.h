@@ -22,12 +22,12 @@ namespace osd::debugger::win {
 class disasmview_info : public debugview_info
 {
 public:
-	disasmview_info(debugger_windows_interface &debugger, debugwin_info &owner, HWND parent);
+	disasmview_info(debugger_windows_interface &debugger, debugwin_info &owner, HWND parent, bool source_code_debugging = false);
 	virtual ~disasmview_info();
 
 	char const *expression() const;
 	disasm_right_column right_column() const;
-	offs_t selected_address() const;
+	virtual std::optional<offs_t> selected_address() const;
 
 	void set_expression(const std::string &expression);
 	void set_right_column(disasm_right_column contents);

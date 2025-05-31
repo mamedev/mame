@@ -433,3 +433,272 @@ s32(<x>)
     Sign-extends the argument from 32 bits to 64 bits (overwrites bits
     32 through 63, inclusive, with the value of bit 31, counting from
     the least significant bit).
+
+
+.. _srcdbg:
+
+Source-level debugging
+----------------------
+
+Source-level debugging allows you to step through and reference symbols
+from the original source of a program, rather than the disassembly.
+This feature is intended for use
+when emulating a vintage microcomputer and running software on that
+emulated machine for which you have access to the original source code.
+For example, if you are developing new software for a vintage machine,
+source-level debugging allows you to view your own source code while
+debugging.
+
+
+.. _srcdbg_enable:
+
+Enabling source-level debugging
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You will need to generate a :ref:`MAME Debugging Information File <srcdbg_mdi>`.
+You can then enable source-level debugging by launching MAME with
+the :ref:`-src_debug_info <mame-commandline-srcdbginfo>`
+command-line option.  You may also want
+to specify :ref:`-src_debug_search_path <mame-commandline-srcdbgsearchpath>`
+and / or :ref:`-src_debug_prefix_map <mame-commandline-srcdbgprefixmap>`.
+
+Once source-level debugging is enabled, you will then be able to
+access the Options menu, Show Source command from
+the main debugger window.  You may switch back and forth between source
+and disassembly view, and open separate disassembly windows even
+while the main window shows source.
+
+The source view has a drop-list at the top for selecting which source
+file to view.  The list is populated with source file paths from the
+:ref:`MAME Debugging Information File <srcdbg_mdi>`.  When the debugger is paused,
+you can change the selection to view the file you wish.  When stepping,
+the selection is automatically updated to show the file associated
+with the current PC address.
+
+
+.. _srcdbg_bp:
+
+Source-level breakpoints
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+The expression evaluator includes syntax for specifying a source
+file and line number.  This can be used in conjunction with the
+:ref:`bpset <debugger-command-bpset>` command to set
+a breakpoint on a particular line number,
+rather than specifying the address manually.  Source-level symbols
+evaluate to addresses, and so may also be used in ``bpset`` commands.
+
+When specifying a
+source file, you may specify either the full path to the source file
+as it existed on the machine that built the binary, the full path
+to the source file as it exists on the host running MAME, or any
+non-ambiguous substring at the end of the full path (such as
+just the filename).  The filename or path is surrounded by single
+backticks `````, with the line number immediately following
+the closing backtick.
+
+Examples:
+
+``bpset `c:\full\path\to\file.c`3``
+    Set a breakpoint on the first instruction associated with file.c, line 3
+``bpset `file.c`3``
+    Set a breakpoint on the first instruction associated with file.c, line 3.
+    Note the use of just the filename instead of a full path.  This is fine
+    so long as it is unambiguous relative to the other paths present in the
+    MAME Debugging Information File.
+``print `to\file.c`3``
+    Print the address of the first instruction associated with file.c, line 3.
+    Note the use of the path *ending* rather than the full path.  This is fine
+    so long as it is unambiguous.
+``bpset Main``
+    Set a breakpoint on the label named ``Main``
+
+When the main window is showing source, you may also click on any source line
+and hit F9 to set a breakpoint on that line.
+
+
+.. _srcdbg_stepping:
+
+Source-level stepping
+~~~~~~~~~~~~~~~~~~~~~
+
+The stepping commands ``step``, ``over``, and ``out`` have source-level debugging
+versions :ref:`steps <debugger-command-steps>`,
+:ref:`overs <debugger-command-overs>`, and
+:ref:`outs <debugger-command-outs>`, respectively, which operate
+at the source level rather than at the disassembly level.
+To take ``step`` as an example, if
+the PC points to an address associated with line 4, ``step`` (with
+no parameters) will advance
+to the next instruction, whereas ``steps`` will advance to the next instruction
+that is associated with a source line other than 4.  When the original
+source is assembly language, ``step`` and ``steps`` generally behave the same.
+But when the original source is in a higher-level language like C or BASIC, ``steps``
+executes the remainder of a block of instructions associated with
+the current source line.
+
+When executing Step Into, Step Over, and Step Out from the menu or keyboard
+shortcuts, the behavior depends on what the main window is showing.
+If the main window shows disassembly, then ``step``, ``over``, or ``out``
+would be invoked.  If the main window shows source, 
+``steps``, ``overs``, or ``outs``  would be invoked.
+
+
+.. _srcdbg_symbols:
+
+Source-level symbol evaluation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+MAME defines its own built-in symbols based on the current
+CPU (e.g., register names) and from its global symbol table
+(e.g., ``beamx``, ``frame``, names of built-in :ref:`functions <debugger-express-func>`, etc.).  
+When source-level debugging is enabled, symbols from the source code will
+be imported from the MAME Debugging Information File and added
+to the list of symbols recognized by MAME's expression evaluator.
+
+A symbol from the MAME Debugging Information File representing a source-code
+variable evaluates to the variable's *address*, not its *value*.  So,
+for example, a 16-bit C compiler that compiles ``int harry = 4;`` will
+create a symbol named ``harry`` whose value is the address at which
+the variable is stored.  To view the *value* you would issue a command
+to the debugger console such as ``print w@harry``.
+
+* **Symbol collisions and priority**: It is possible that source-level symbols
+  present in the MAME Debugging Information File will conflict with built-in symbols.
+  When source-level debugging is enabled, source-level symbols take precedence.  You
+  may always force a reference to the built-in symbol by prefixing the symbol with ``ns\``
+  ("not source").  For example, suppose the MAME Debugging Information File includes the
+  source-level symbol ``y`` which conflicts with the symbol for the register ``y``.
+  References to ``y`` will be interpreted as the source-level symbol ``y``.
+  References to ``ns\y``, such as:
+
+  * ``print ns\y``
+  * ``print b@ns\y``
+  * ``wpset ns\y``
+
+  will be interpeted as the register ``y``.   
+* **Case sensitivity**: When the debugger evaluates expressions, symbols
+  are generally interpreted case-insensitively when source-level debugging
+  is not active.  Many programming languages treat symbols
+  case-sensitively.  This can lead to source-level symbols like ``Foo`` and ``foo``
+  being present in the MAME Debugging Information File simultaneously.
+  When source-level debugging is active and MAME's expression evaluator
+  encounters a symbol, it will give precendence to
+  a case-sensitive match.  If no such match is found, it will look for a
+  case-insensitive match.
+
+
+.. _srcdbg_offsets:
+
+Address offsets
+~~~~~~~~~~~~~~~
+
+In some cases, the assembler or compiler does not know where the generated
+code will be loaded at run-time.  For example, the program might be written
+in position-independent code to allow an operating system to decide
+where to load the code at run-time.  In such cases, the assembler or compiler
+will be unable to provide the correct addresses in the MAME Debugging Information
+File.  A build tool that supports run-time relocation could then start numbering
+its addresses at 0, assuming that the operating system will apply the appropriate
+offset when the binary is loaded.  Similarly, the MAME debugger may also
+apply an offset to the addresses from the debugging info so that the
+resulting addresses match where the code is loaded at run-time.  You can do this
+in two ways:
+
+* On the command-line, specify :ref:`-src_debug_offset <mame-commandline-srcdbgoffset>`
+  with the offset to apply.
+  This approach makes sense if the code to be debugged is reliably loaded
+  at an offset you can predict.
+* At any time during the debugging of the program, use the command :ref:`debugger-command-sdoffset`
+  from the debugger console with the offset to apply.  This approach can be used by
+  users or LUA scripts that need to inspect memory to determine where the program was
+  loaded.  Any breakpoints set before ``sdoffset`` was executed will need to be removed
+  and re-added so the new offset can be applied.  Any source-level symbols loaded
+  from the MAME Debugging Information File will automatically evaluate to 
+  values with the new offset the next time a command references them.
+
+
+.. _srcdbg_mdi:
+
+Generating MAME Debugging Information Files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+MAME Debugging Information Files (or ``.mdi`` files) are generated by
+assemblers or compilers that target machines emulated by MAME.  Currently
+``.mdi`` files adhere to a single binary format called "Simple".  In the
+future, new formats may be created as the need arises.  The Simple format includes:
+
+* Full or relative paths to the source files input to the build tool
+* Mappings from source file and line numbers to blocks of 16-bit addresses where the
+  corresponding instructions reside
+* Mappings from symbol names to 16-bit addresses
+
+    * These symbols can either be global or scoped
+    * Scoped symbols can either have fixed values or values
+      dependent on register values (e.g., stack local variables)
+
+The recommended way for build tools to generate ``.mdi`` files is to use
+the small static library ``libmame_srcdbg_static.a``.  The source code resides
+in the MAME tree at ``src/lib/srcdbg``, and the library gets built to
+a configuration-specific subdirectory, such as
+``build/linux_gcc/bin/x64/Release/libmame_srcdbg_static.a``.  The header
+file ``srcdbg_api.h`` includes declarations and documentation for the C
+functions comprising the API, along with comments that describe how to use
+them.
+
+.. DANGER::
+	**Tools must not rely on any functionality     
+	other than that declared in** ``srcdbg_api.h`` 
+	**and** ``srcdbg_format.h``. **Other files will   
+	change without warning.**
+
+Tools written in **C++** can include  ``srcdbg_api.h`` and link to
+``libmame_srcdbg_static.a`` without any further makefile changes.  Since
+the library's API is pure C, tools
+written in **C** can also include ``srcdbg_api.h`` and link to
+``libmame_srcdbg_static.a``, but will need to add the C++ standard library
+to the link line (as the library's *implementation* is C++).  For example,
+``cc -m64 -o mytool mytool.c -L/path/to/lib/dir -lmame_srcdbg_static -lstdc++``.
+Note that ``-lstdc++`` must appear at the *end*.
+
+Tools *not* written in C or C++ may be able to use the shared library
+``libmame_srcdbg_shared.so`` or ``mame_srcdbg_shared.dll``, assuming the tool
+is written in a language that supports interfacing with shared libraries.
+
+.. admonition:: Linux shared library versioning
+
+	On Linux the shared library follows the recommended versioning names, with
+	the initial version of the library's *real name* being
+	``libmame_srcdbg_shared.so.1.0`` and *soname* being ``libmame_srcdbg_shared.so.1``.
+	MAME does not have a setup program, so the responsibility is on tools
+	redistributing the shared library to perform the usual shared library installation
+	steps.  For example, a tool might want to insulate itself from the machine's
+	environment, and tuck its own copy of the shared library into a tool-specific
+	folder, and use the ``-rpath`` linker option to declare where the tool can
+	find ``libmame_srcdbg_shared.so`` at run-time.  Alternatively, a tool could
+	install ``libmame_srcdbg_shared.so`` into a machine-wide folder like
+	``/usr/lib`` and run ``sudo ldconfig`` to register the library and create
+	a symbolic link from the soname to the real name.  In any case, the tool
+	will need to manually create a symbolic link from the *linker name*
+	``libmame_srcdbg_shared.so`` to either the soname
+	(if ``ldconfig`` was run) or directly to the real
+	name to ensure that the build-time linker can find ``libmame_srcdbg_shared.so``.
+	Before proceeding with any of these options, it's recommended that you read up
+	on Linux shared library versioning, for example:
+	https://tldp.org/HOWTO/Program-Library-HOWTO/shared-libraries.html
+
+If consuming neither the static nor shared version of the MAME srcdbg library is
+feasible, tools may also manually generate the binary format directly.  The format
+is defined in ``src/lib/srcdbg/srcdbg_format.h``.  Because this is error-prone,
+tools should prefer using the static or shared library over generating the binary
+format directly.
+
+
+.. _srcdbg_dump:
+
+Viewing MAME Debugging Information Files with srcdbgdump
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A small console executable, :ref:`srcdbgdump <othertools_srcdbgdump>` is built
+along with other MAME tools.  It may be used to view the contents
+of MAME Debugging Information files.  

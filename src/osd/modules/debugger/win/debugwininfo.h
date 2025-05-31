@@ -105,6 +105,8 @@ protected:
 		ID_SHOW_RAW,
 		ID_SHOW_ENCRYPTED,
 		ID_SHOW_COMMENTS,
+		ID_SHOW_SOURCE,
+		ID_SHOW_DISASM,
 
 		ID_SHOW_BREAKPOINTS,
 		ID_SHOW_WATCHPOINTS,
@@ -128,6 +130,7 @@ protected:
 	// classes (e.g., logwin_info, pointswin_info, etc.) just use m_views[0]
 	enum
 	{
+		VIEW_IDX_SOURCE,
 		VIEW_IDX_DISASM,
 		VIEW_IDX_STATE,
 		VIEW_IDX_CONSOLE,
