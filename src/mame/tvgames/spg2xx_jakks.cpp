@@ -634,10 +634,10 @@ ROM_END
 
 ROM_START( jak_1vs )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
-	// Calculated checksum of ROM (after 0x10) is 0b1d28a4, checksum in ROM header (listed before 0x10) is 0b1d28a3
-	// so it's likely a single bit is flipped somewhere in this
-	// Ingame checksum gives a black screen, but seems unrelated
-	ROM_LOAD16_WORD_SWAP( "jakks1vs100.u3", 0x000000, 0x200000, BAD_DUMP CRC(3e8808f4) SHA1(acacd7ad2d74e3f6374215a75236fd6c27e07984) )
+	// byte 0xb5a27 originally gave 0xff with consistent reads (but bytesum was wrong)
+	// with different settings gave 0xfe and consistent reads (bytesum in header matches)
+	// ingame checksum screen seems to be broken (gives black screen after calculating)
+	ROM_LOAD16_WORD_SWAP( "jakks1vs100.u3", 0x000000, 0x200000, CRC(4a8cdedf) SHA1(e6d035262d9b022e9cd19f2322ba6ef1a1db7b38) )
 ROM_END
 
 ROM_START( jak_hmbb )
@@ -729,4 +729,4 @@ CONS( 2006, jak_gdg,  0, 0, spg2xx_dpma,   spg2xx_gdg,    jakks_state, empty_ini
 
 CONS( 2006, jak_dond, 0, 0, spg2xx_jakks,  jak_dond,      jakks_state, init_crc,   "JAKKS Pacific Inc / Pronto Games",    "Deal or No Deal (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2006, jak_1vs, 0, 0,  spg2xx_jakks,  spg2xx_1vs,    jakks_state, init_crc,   "JAKKS Pacific Inc / Pronto Games",    "1 Vs 100 (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
+CONS( 2007, jak_1vs, 0, 0,  spg2xx_jakks,  spg2xx_1vs,    jakks_state, init_crc,   "JAKKS Pacific Inc / Pronto Games",    "1 Vs 100 (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
