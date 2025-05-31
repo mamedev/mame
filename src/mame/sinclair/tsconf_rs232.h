@@ -3,7 +3,6 @@
 #ifndef MAME_SINCLAIR_TSCONF_RS232_H
 #define MAME_SINCLAIR_TSCONF_RS232_H
 
-#include "emu.h"
 #pragma once
 
 #include "bus/rs232/rs232.h"
@@ -67,7 +66,6 @@ private:
 	void update_serial(int state);
 	u16 zf_ifr_r() { return (m_zf_rx_hd - m_zf_rx_tl) & 0x01ff; }
 	u16 rs_ifr_r() { return (m_rs_rx_hd - m_rs_rx_tl) & 0x01ff; }
-
 };
 
 

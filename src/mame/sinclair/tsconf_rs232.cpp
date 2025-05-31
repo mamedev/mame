@@ -34,7 +34,7 @@ static constexpr u8 UART_LSR_REG     = 0xfd;
 static constexpr u8 UART_MSR_REG     = 0xfe;
 static constexpr u8 UART_SPR_REG     = 0xff;
 
-static constexpr u8 ZF_DR_REG_LIM    =  0xbf;
+static constexpr u8 ZF_DR_REG_LIM    = 0xbf;
 static constexpr u8 ZF_CLRFIFO       = 0b00000000;
 static constexpr u8 ZF_CLRFIFO_MASK  = 0b11111100;
 static constexpr u8 ZF_CLRFIFO_IN    = 0b00000001;
@@ -92,12 +92,12 @@ void tsconf_rs232_device::tra_complete()
 
 	if (m_select_zf)
 	{
-		if(m_zf_tx_tl != m_zf_tx_hd)
+		if (m_zf_tx_tl != m_zf_tx_hd)
 			transmit_register_setup(m_zf_txbuff[m_zf_tx_tl++]);
 	}
 	else
 	{
-		if(m_rs_tx_tl != m_rs_tx_hd)
+		if (m_rs_tx_tl != m_rs_tx_hd)
 			transmit_register_setup(m_rs_txbuff[m_rs_tx_tl++]);
 	}
 }
@@ -175,40 +175,46 @@ void tsconf_rs232_device::dr_w(u8 data)
 
 u8 tsconf_rs232_device::reg_r(offs_t offset)
 {
-	if (!m_zf_api) return 0xff;
+	if (!m_zf_api)
+		return 0xff;
 
 	u8 data = 0xff;
 	switch (offset & 0xf)
 	{
 		case 0: // ZIFR
-			m_select_zf = 1;
+			if (!machine().side_effects_disabled())
+				m_select_zf = 1;
 			data = std::min<u16>(zf_ifr_r(), ZF_DR_REG_LIM);
 			//LOGDIN("ZIFR: %02x\n", data);
 			break;
 		case 1: // ZOFR
 			{
-			u8 tmp = m_zf_tx_tl - 1 - m_zf_tx_hd;
-			data = (tmp > ZF_DR_REG_LIM) ? ZF_DR_REG_LIM : tmp;
-			m_select_zf = 1;
+				const u8 tmp = m_zf_tx_tl - 1 - m_zf_tx_hd;
+				data = (tmp > ZF_DR_REG_LIM) ? ZF_DR_REG_LIM : tmp;
+				if (!machine.side_effects_disabled())
+					m_select_zf = 1;
 			}
 			LOGDOUT("ZOFR: %02x\n", data);
 			break;
 		case 2: // RIFR
-			m_select_zf = 0;
+			if (!machine.side_effects_disabled())
+				m_select_zf = 0;
 			data = std::min<u16>(rs_ifr_r(), ZF_DR_REG_LIM);
 			LOGDIN("RIFR: %02x\n", data);
 			break;
 		case 3: // ROFR
 			{
-			u8 tmp = m_rs_tx_tl - 1 - m_rs_tx_hd;
-			data = (tmp > ZF_DR_REG_LIM) ? ZF_DR_REG_LIM : tmp;
-			m_select_zf = 0;
+				const u8 tmp = m_rs_tx_tl - 1 - m_rs_tx_hd;
+				data = (tmp > ZF_DR_REG_LIM) ? ZF_DR_REG_LIM : tmp;
+				if (!machine().side_effects_disabled())
+					m_select_zf = 0;
 			}
 			LOGDOUT("ROFR: %02x\n", data);
 			break;
 		case 4: // ISR
 			data = m_zf_int_src;
-			m_zf_int_src = 0;   // clear flags
+			if (!machine().side_effects_disabled())
+				m_zf_int_src = 0;   // clear flags
 			break;
 		case 5: // ZIBTR
 			data = m_zf_ibtr;
@@ -247,9 +253,9 @@ void tsconf_rs232_device::reg_w(offs_t offset, u8 data)
 			m_zf_itor = data;
 			break;
 		case 7: // CR
-			// set API mode
 			if ((data & ZF_SETAPI_MASK) == ZF_SETAPI)
 			{
+				// set API mode
 				m_zf_api = data & ~ZF_SETAPI_MASK;
 				if (m_zf_api > ZF_VER)
 					m_zf_api = 0;
@@ -257,10 +263,9 @@ void tsconf_rs232_device::reg_w(offs_t offset, u8 data)
 				m_zf_err = ZF_OK_RES;
 				LOGCMD("API: %d\n", m_zf_api);
 			}
-
-			// get API version
 			else if (m_zf_api)
 			{
+				// get API version
 				if ((data & ZF_GETVER_MASK) == ZF_GETVER)
 				{
 					m_zf_err = ZF_VER;
@@ -299,7 +304,9 @@ void tsconf_rs232_device::reg_w(offs_t offset, u8 data)
 					}
 				}
 				else
+				{
 					LOGCMD("Unknown CMD %02x\n", data);
+				}
 			}
 			break;
 		case 8: // RIBTR
