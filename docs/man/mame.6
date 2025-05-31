@@ -907,7 +907,7 @@ Split full screen image across monitors. Default is OFF (\-nouseallheads).
 .SS Sound options
 .\" *******************************************************
 .TP
-.B \-sound\fR [\fIsdl\fR|\fIportaudio\fR|\fIcoreaudio\fR|\fIdsound\fR|\fIxaudio2\fR|\fInone\fR]
+.B \-sound\fR [\fIsdl\fR|\fIportaudio\fR|\fIcoreaudio\fR|\fIwasapi\fR|\fIxaudio2\fR|\fInone\fR]
 Specifies which sound subsystem to use for audio output:
 .br
 \fBsdl\fR  uses the Simple DirectMedia Layer audio output system
@@ -919,14 +919,15 @@ output and multiple audio APIs.
 \fBcoreaudio\fR  uses the Core Audio API which supports low-latency
 output and AudioUnit effects (only available on macOS).
 .br
-\fBdsound\fR  uses the DirectSound API (only available on Windows).
+\fBwasapi\fR  uses the Windows Audio Session API (WASAPI) (only available
+on Windows).
 .br
 \fBxaudio2\fR  uses the XAudio2 API which supports low-latency output
 (only available on Windows).
 .br
 \fBnone\fR  produces no audio output.
 .br
-Default is 'dsound' on Windows, 'coreaudio' on macOS or 'sdl' on other
+Default is 'wasapi' on Windows, 'coreaudio' on macOS or 'sdl' on other
 platforms.
 .TP
 .B \-samplerate, \-srf \fIvalue

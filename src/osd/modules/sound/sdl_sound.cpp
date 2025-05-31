@@ -95,6 +95,9 @@ int sound_sdl::init(osd_interface &osd, const osd_options &options)
 	char const *const audio_driver = SDL_GetCurrentAudioDriver();
 	osd_printf_verbose("Audio: Driver is %s\n", audio_driver ? audio_driver : "not initialized");
 
+	if(options.audio_latency() > 0.0f)
+		osd_printf_verbose("Audio: %s module does not support audio_latency option\n", name());
+
 	// Capture is not implemented in SDL2, and the enumeration
 	// interface is different in SDL3
 	int dev_count = SDL_GetNumAudioDevices(0);

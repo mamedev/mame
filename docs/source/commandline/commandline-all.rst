@@ -1937,9 +1937,9 @@ Core Performance Options
     half speed, and a *<factor>* of 2.0 means run at double speed.  Note that
     changing this value affects sound playback as well, which will scale in
     pitch accordingly.  A very low speed will introduce sound glitches, this
-    can be prevented by increasing **-audio_latency**.  The internal precision
-    of the fraction is two decimal places, so a *<factor>* of ``1.002`` is
-    rounded to ``1.00``.
+    can be prevented by increasing the :ref:`audio latency
+    <mame-commandline-audiolatency>`.  The internal precision of the fraction is
+    two decimal places, so a *<factor>* of ``1.002`` is rounded to ``1.00``.
 
     The default is ``1.0`` (normal speed).
 
@@ -2977,17 +2977,16 @@ Core Sound Options
     Specifies which sound module to use.  Selecting ``none`` disables sound
     output and input altogether (sound hardware is still emulated).
 
-    Available features, performance and latency vary between sound modules.  The
-    exact interpretation and useful range of the :ref:`latency option
-    <mame-commandline-audiolatency>` varies between sound modules.  You may have
-    to change the value of the latency option if you change the sound module.
+    Available features, performance and latency vary between sound modules.
+    You may have to change the value of the :ref:`latency option
+    <mame-commandline-audiolatency>` if you change the sound module.
 
     When using the ``sdl`` sound subsystem, the audio API to use may be selected
     by setting the *SDL_AUDIODRIVER* environment variable.  Available audio APIs
     depend on the operating system.  On Windows, it may be necessary to set
     ``SDL_AUDIODRIVER=directsound`` if no sound output is produced by default.
 
-    The default is ``dsound`` on Windows. On Mac, ``coreaudio`` is the default.
+    The default is ``wasapi`` on Windows. On Mac, ``coreaudio`` is the default.
     On all other platforms, ``sdl`` is the default.
 
     Example:
@@ -3072,10 +3071,9 @@ Core Sound Options
     interruptions.  A value of 0.0 will use the default for the selected sound
     module.
 
-    The exact interpretation and useful range of values for this option depends
-    on the selected sound module.  You may need to change the value of this
-    option if you change the sound module using the :ref:`sound option
-    <mame-commandline-sound>`.
+    You may need to change the value of this option if you change the sound module
+    using the :ref:`sound option <mame-commandline-sound>`.  This option is
+    unsupported on sound modules ``pipewire``, ``pulse``, ``sdl``.
 
     The default is ``0.0``.
 
