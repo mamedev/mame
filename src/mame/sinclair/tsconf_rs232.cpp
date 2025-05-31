@@ -191,13 +191,13 @@ u8 tsconf_rs232_device::reg_r(offs_t offset)
 			{
 				const u8 tmp = m_zf_tx_tl - 1 - m_zf_tx_hd;
 				data = (tmp > ZF_DR_REG_LIM) ? ZF_DR_REG_LIM : tmp;
-				if (!machine.side_effects_disabled())
+				if (!machine().side_effects_disabled())
 					m_select_zf = 1;
 			}
 			LOGDOUT("ZOFR: %02x\n", data);
 			break;
 		case 2: // RIFR
-			if (!machine.side_effects_disabled())
+			if (!machine().side_effects_disabled())
 				m_select_zf = 0;
 			data = std::min<u16>(rs_ifr_r(), ZF_DR_REG_LIM);
 			LOGDIN("RIFR: %02x\n", data);
