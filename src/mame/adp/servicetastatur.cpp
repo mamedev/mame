@@ -303,4 +303,4 @@ ROM_END
 
 } // anonymous namespace
 
-GAME( 1992, servicet, 0, servicet, servicet, servicet_state, empty_init, ROT0, "ADP", "Merkur Service Testgerät", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+GAME( 1992, servicet, 0, servicet, servicet, servicet_state, empty_init, ROT0, "ADP", u8"Merkur Service Testgerät", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
