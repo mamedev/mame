@@ -161,6 +161,8 @@ static const std::array<double,3> sChannelPositions[sMacChannelCount] =
 	{  0.1,  0.0,  1.0 }  // Right Edge of Screen
 };
 
+static bool sDeviceStatusChanged = false;
+
 struct coreaudio_device
 {
 	std::string m_name;
@@ -258,6 +260,7 @@ private:
 		bool create_source_graph(struct coreaudio_device &device);
 		bool add_device_output(struct coreaudio_device &device);
 		bool add_device_input(struct coreaudio_device &device);
+		bool add_alive_callback(struct coreaudio_device &device);
 		bool add_converter();
 
 		OSStatus add_node(OSType type, OSType subtype, OSType manufacturer)
@@ -314,6 +317,17 @@ private:
 			UInt32 bus_number,
 			UInt32 number_frames,
 			AudioBufferList *data);
+
+		OSStatus is_alive(
+			AudioObjectID inObjectID,
+			UInt32 inNumberAddresses,
+			const AudioObjectPropertyAddress inAddresses[]);
+
+		static OSStatus is_alive_callback(
+			AudioObjectID inObjectID,
+			UInt32 inNumberAddresses,
+			const AudioObjectPropertyAddress inAddresses[],
+			void *inClientData);
 
 		AudioDeviceID m_id;
 		AUGraph m_graph;
@@ -389,6 +403,7 @@ int sound_coreaudio::init(osd_interface &osd, const osd_options &options)
 
 	// build the list of available CoreAudio devices
 	build_device_list();
+	sDeviceStatusChanged = false;
 
 	m_deviceinfo.m_generation = 1;
 	m_deviceinfo.m_default_sink = get_default_sink();
@@ -441,6 +456,17 @@ void sound_coreaudio::rebuild_stream_info()
 
 uint32_t sound_coreaudio::get_generation()
 {
+	if (sDeviceStatusChanged)
+	{
+		std::lock_guard<std::mutex> list_guard(m_stream_list_mutex);
+		m_deviceinfo.m_default_sink = get_default_sink();
+		m_deviceinfo.m_default_source = get_default_source();
+		build_device_list();
+		m_deviceinfo.m_generation++;
+
+		sDeviceStatusChanged = false;
+	}
+
 	return m_deviceinfo.m_generation;
 }
 
@@ -452,6 +478,7 @@ osd::audio_info sound_coreaudio::get_information()
 	if (default_sink != m_deviceinfo.m_default_sink ||
 		default_source != m_deviceinfo.m_default_source)
 	{
+		std::lock_guard<std::mutex> list_guard(m_stream_list_mutex);
 		m_deviceinfo.m_default_sink = default_sink;
 		m_deviceinfo.m_default_source = default_source;
 		build_device_list();
@@ -1088,6 +1115,9 @@ bool sound_coreaudio::coreaudio_stream::create_sink_graph(struct coreaudio_devic
 	if (!add_device_output(device))
 		goto close_graph_and_return_error;
 
+	if (!add_alive_callback(device))
+		goto close_graph_and_return_error;
+
 	if ((1U < m_node_count) && !add_converter())
 		goto close_graph_and_return_error;
 
@@ -1136,7 +1166,7 @@ bool sound_coreaudio::coreaudio_stream::create_source_graph(struct coreaudio_dev
 	AudioObjectPropertyAddress const packet_size_addr = {
 		kAudioDevicePropertyBufferFrameSize,
 		kAudioDevicePropertyScopeInput,
-		1};
+		1 };
 	AudioStreamBasicDescription format, out_format;
 
 	memset(&format, 0, sizeof(AudioStreamBasicDescription));
@@ -1172,6 +1202,9 @@ bool sound_coreaudio::coreaudio_stream::create_source_graph(struct coreaudio_dev
 		osd_printf_error("CoreAudio: Could not set input packet size (%ld)\n", (long)err);
 		goto close_graph_and_return_error;
 	}
+
+	if (!add_alive_callback(device))
+		goto close_graph_and_return_error;
 
 	format.mFormatID = kAudioFormatLinearPCM;
 	format.mFormatFlags = kAudioFormatFlagsNativeEndian | kLinearPCMFormatFlagIsSignedInteger | kLinearPCMFormatFlagIsPacked;
@@ -1374,6 +1407,27 @@ remove_node_and_return_error:
 	return false;
 }
 
+bool sound_coreaudio::coreaudio_stream::add_alive_callback(struct coreaudio_device &device)
+{
+	OSStatus err;
+	AudioObjectPropertyAddress const alive_addr = {
+		kAudioDevicePropertyDeviceIsAlive,
+		kAudioObjectPropertyScopeGlobal,
+		PROPERTY_ELEMENT_MASTER};
+
+	err = AudioObjectAddPropertyListener(
+		device.m_id,
+		&alive_addr,
+		this->is_alive_callback,
+		this);
+	if (noErr != err)
+	{
+		osd_printf_error("CoreAudio: Could not set isAlive callback (%ld)\n", (long)err);
+		return false;
+	}
+	return true;
+}
+
 bool sound_coreaudio::coreaudio_stream::add_converter()
 {
 	OSStatus err;
@@ -1503,6 +1557,33 @@ OSStatus sound_coreaudio::coreaudio_stream::source_render_callback(
 	AudioBufferList *data)
 {
 	return ((coreaudio_stream *)refcon)->source_render(action_flags, timestamp, bus_number, number_frames, data);
+}
+
+OSStatus sound_coreaudio::coreaudio_stream::is_alive(
+	AudioObjectID inObjectID,
+	UInt32 inNumberAddresses,
+	const AudioObjectPropertyAddress inAddresses[])
+{
+	printf("CoreAudio: is_alive callback for device %d, addresses %d\n", inObjectID, inNumberAddresses);
+	for (int i = 0; i < inNumberAddresses; i++)
+	{
+		if (inAddresses[i].mSelector == kAudioDevicePropertyDeviceIsAlive)
+		{
+			osd_printf_verbose("CoreAudio: Device %d alive status changed\n", inObjectID);
+			sDeviceStatusChanged = true;
+		}
+	}
+
+	return noErr;
+}
+
+OSStatus sound_coreaudio::coreaudio_stream::is_alive_callback(
+	AudioObjectID inObjectID,
+	UInt32 inNumberAddresses,
+	const AudioObjectPropertyAddress inAddresses[],
+	void *inClientData)
+{
+	return ((coreaudio_stream *)inClientData)->is_alive(inObjectID, inNumberAddresses, inAddresses);
 }
 
 int sound_coreaudio::coreaudio_stream::create_sink_stream(struct coreaudio_device &device, const char *name, int sample_rate, float latency)
