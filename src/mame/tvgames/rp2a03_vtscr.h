@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_NINTENDO_RP2A03_VTSCR_H
-#define MAME_NINTENDO_RP2A03_VTSCR_H
+#ifndef MAME_TVGAMES_RP2A03_VTSCR_H
+#define MAME_TVGAMES_RP2A03_VTSCR_H
 
 #pragma once
 
@@ -55,4 +55,4 @@ protected:
 
 DECLARE_DEVICE_TYPE(RP2A03_VTSCR, rp2a03_vtscr)
 
-#endif // MAME_NINTENDO_RP2A03_VTSCR_H
+#endif // MAME_TVGAMES_RP2A03_VTSCR_H

@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood
 
 #include "emu.h"
-#include "nes_vt369_vtunknown_soc.h"
+#include "vt369_vtunknown_soc.h"
 
 #define LOG_VT3XX_SOUND     (1U << 1)
 
@@ -33,7 +33,7 @@ vt3xx_soc_base_device::vt3xx_soc_base_device(const machine_config& mconfig, cons
 }
 
 vt3xx_soc_base_device::vt3xx_soc_base_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock) :
-	nes_vt09_soc_device(mconfig, type, tag, owner, clock),
+	vt09_soc_device(mconfig, type, tag, owner, clock),
 	m_soundcpu(*this, "soundcpu"),
 	m_sound_timer(nullptr),
 	m_internal_rom(*this, "internal"),
@@ -96,7 +96,7 @@ vt3xx_soc_unk_fa_device::vt3xx_soc_unk_fa_device(const machine_config& mconfig, 
 
 void vt3xx_soc_base_device::device_add_mconfig(machine_config& config)
 {
-	nes_vt02_vt03_soc_device::device_add_mconfig(config);
+	vt02_vt03_soc_device::device_add_mconfig(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt3xx_soc_base_device::vt369_map);
 
 	PPU_VT3XX(config.replace(), m_ppu, RP2A03_NTSC_XTAL);
@@ -346,7 +346,7 @@ void vt3xx_soc_base_device::vt_dma_w(u8 data)
 	}
 	else
 	{
-		nes_vt09_soc_device::vt_dma_w(data);
+		vt09_soc_device::vt_dma_w(data);
 	}
 }
 
@@ -662,7 +662,7 @@ void vt3xx_soc_base_device::vt3xx_palette_w(offs_t offset, u8 data)
 
 void vt3xx_soc_base_device::device_start()
 {
-	nes_vt02_vt03_soc_device::device_start();
+	vt02_vt03_soc_device::device_start();
 
 	m_6000_ram.resize(0x2000);
 	m_bank6000 = 0;
@@ -687,7 +687,7 @@ void vt3xx_soc_base_device::device_start()
 
 void vt3xx_soc_base_device::device_reset()
 {
-	nes_vt02_vt03_soc_device::device_reset();
+	vt02_vt03_soc_device::device_reset();
 	m_soundcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	for (int i = 0; i < 8; i++)
@@ -843,7 +843,7 @@ void vt369_soc_introm_vibesswap_device::device_start()
 void vt3xx_soc_unk_dg_device::device_add_mconfig(machine_config& config)
 {
 	vt3xx_soc_base_device::device_add_mconfig(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &vt3xx_soc_unk_dg_device::nes_vt_dg_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vt3xx_soc_unk_dg_device::vt_dg_map);
 }
 
 void vt3xx_soc_unk_dg_device::vt03_411c_w(u8 data)
@@ -853,7 +853,7 @@ void vt3xx_soc_unk_dg_device::vt03_411c_w(u8 data)
 	update_banks();
 }
 
-void vt3xx_soc_unk_dg_device::nes_vt_dg_map(address_map &map)
+void vt3xx_soc_unk_dg_device::vt_dg_map(address_map &map)
 {
 	vt3xx_soc_base_device::vt369_map(map);
 	map(0x411c, 0x411c).w(FUNC(vt3xx_soc_unk_dg_device::vt03_411c_w));
@@ -866,10 +866,10 @@ void vt3xx_soc_unk_dg_device::nes_vt_dg_map(address_map &map)
 void vt3xx_soc_unk_bt_device::device_add_mconfig(machine_config& config)
 {
 	vt3xx_soc_base_device::device_add_mconfig(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &vt3xx_soc_unk_bt_device::nes_vt_bt_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vt3xx_soc_unk_bt_device::vt_bt_map);
 }
 
-void vt3xx_soc_unk_bt_device::nes_vt_bt_map(address_map &map)
+void vt3xx_soc_unk_bt_device::vt_bt_map(address_map &map)
 {
 	vt3xx_soc_base_device::vt369_map(map);
 	map(0x412c, 0x412c).w(FUNC(vt3xx_soc_unk_bt_device::vt03_412c_extbank_w));
@@ -887,7 +887,7 @@ void vt3xx_soc_unk_bt_device::vt03_412c_extbank_w(u8 data)
 void vt3xx_soc_unk_fa_device::device_add_mconfig(machine_config& config)
 {
 	vt3xx_soc_base_device::device_add_mconfig(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &vt3xx_soc_unk_fa_device::nes_vt_fa_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vt3xx_soc_unk_fa_device::vt_fa_map);
 }
 
 u8 vt3xx_soc_unk_fa_device::vtfa_412c_r()
@@ -907,7 +907,7 @@ void vt3xx_soc_unk_fa_device::vtfp_4242_w(u8 data)
 	m_4242 = data;
 }
 
-void vt3xx_soc_unk_fa_device::nes_vt_fa_map(address_map &map)
+void vt3xx_soc_unk_fa_device::vt_fa_map(address_map &map)
 {
 	vt3xx_soc_base_device::vt369_map(map);
 	map(0x412c, 0x412c).r(FUNC(vt3xx_soc_unk_fa_device::vtfa_412c_r)).w(FUNC(vt3xx_soc_unk_fa_device::vtfa_412c_extbank_w));

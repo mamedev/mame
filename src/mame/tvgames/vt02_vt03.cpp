@@ -2,9 +2,9 @@
 // copyright-holders:David Haywood
 /***************************************************************************
 
-  nes_vt.cpp
+  vt02_vt03.cpp
 
-  VT02/VT03 systems go in here
+  VT02/VT03-based NES clone systems go in here
 
   - 2KB RAM
   - VT03 adds alt palette style (not available on VT02?)
@@ -16,15 +16,15 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "nes_vt_soc.h"
+#include "vt_soc.h"
 
 
 namespace {
 
-class nes_vt_base_state : public driver_device
+class vt_base_state : public driver_device
 {
 public:
-	nes_vt_base_state(const machine_config& mconfig, device_type type, const char* tag) :
+	vt_base_state(const machine_config& mconfig, device_type type, const char* tag) :
 		driver_device(mconfig, type, tag),
 		m_io0(*this, "IO0"),
 		m_io1(*this, "IO1"),
@@ -40,7 +40,7 @@ protected:
 	virtual uint8_t in1_r();
 	virtual void in0_w(uint8_t data);
 
-	void nes_vt_map(address_map &map) ATTR_COLD;
+	void vt_map(address_map &map) ATTR_COLD;
 
 	optional_ioport m_io0;
 	optional_ioport m_io1;
@@ -56,7 +56,7 @@ protected:
 	uint8_t vt_rom_r(offs_t offset);
 	[[maybe_unused]] void vtspace_w(offs_t offset, uint8_t data);
 
-	void configure_soc(nes_vt02_vt03_soc_device* soc);
+	void configure_soc(vt02_vt03_soc_device* soc);
 
 	[[maybe_unused]] uint8_t upper_412c_r();
 	[[maybe_unused]] uint8_t upper_412d_r();
@@ -67,29 +67,29 @@ private:
 	template <uint8_t NUM> uint8_t extrain_r();
 };
 
-class nes_vt_state : public nes_vt_base_state
+class vt02_vt03_state : public vt_base_state
 {
 public:
-	nes_vt_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt_base_state(mconfig, type, tag),
+	vt02_vt03_state(const machine_config& mconfig, device_type type, const char* tag) :
+		vt_base_state(mconfig, type, tag),
 		m_soc(*this, "soc")
 	{ }
 
-	void nes_vt_pal_1mb(machine_config& config);
-	void nes_vt_pal_2mb(machine_config& config);
-	void nes_vt_pal_4mb(machine_config& config);
-	void nes_vt_pal_8mb(machine_config& config);
-	void nes_vt_pal_16mb(machine_config& config);
+	void vt_pal_1mb(machine_config& config);
+	void vt_pal_2mb(machine_config& config);
+	void vt_pal_4mb(machine_config& config);
+	void vt_pal_8mb(machine_config& config);
+	void vt_pal_16mb(machine_config& config);
 
-	void nes_vt_512kb(machine_config& config);
-	void nes_vt_1mb(machine_config& config);
-	void nes_vt_2mb(machine_config& config);
-	void nes_vt_4mb(machine_config& config);
-	void nes_vt_8mb(machine_config& config);
-	void nes_vt_16mb(machine_config& config);
-	void nes_vt_32mb(machine_config& config);
+	void vt_512kb(machine_config& config);
+	void vt_1mb(machine_config& config);
+	void vt_2mb(machine_config& config);
+	void vt_4mb(machine_config& config);
+	void vt_8mb(machine_config& config);
+	void vt_16mb(machine_config& config);
+	void vt_32mb(machine_config& config);
 
-	void nes_vt_1mb_majkon(machine_config& config);
+	void vt_1mb_majkon(machine_config& config);
 
 	void vt_external_space_map_32mbyte(address_map &map) ATTR_COLD;
 	void vt_external_space_map_16mbyte(address_map &map) ATTR_COLD;
@@ -105,73 +105,73 @@ public:
 	void init_gamezn2();
 
 protected:
-	required_device<nes_vt02_vt03_soc_device> m_soc;
+	required_device<vt02_vt03_soc_device> m_soc;
 };
 
 
-class nes_vt_swap_op_d5_d6_state : public nes_vt_state
+class vt_swap_op_d5_d6_state : public vt02_vt03_state
 {
 public:
-	nes_vt_swap_op_d5_d6_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt_state(mconfig, type, tag)
+	vt_swap_op_d5_d6_state(const machine_config& mconfig, device_type type, const char* tag) :
+		vt02_vt03_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt_vh2009(machine_config& config);
-	void nes_vt_vh2009_pal(machine_config& config);
-	void nes_vt_vh2009_1mb(machine_config& config);
-	void nes_vt_vh2009_2mb(machine_config& config);
-	void nes_vt_vh2009_pal_2mb(machine_config& config);
-	void nes_vt_vh2009_4mb(machine_config& config);
-	void nes_vt_vh2009_8mb(machine_config& config);
+	void vt_vh2009(machine_config& config);
+	void vt_vh2009_pal(machine_config& config);
+	void vt_vh2009_1mb(machine_config& config);
+	void vt_vh2009_2mb(machine_config& config);
+	void vt_vh2009_pal_2mb(machine_config& config);
+	void vt_vh2009_4mb(machine_config& config);
+	void vt_vh2009_8mb(machine_config& config);
 
-	void nes_vt_senwld_512kb(machine_config& config);
+	void vt_senwld_512kb(machine_config& config);
 
 protected:
 	void vt_external_space_map_senwld_512kbyte(address_map &map) ATTR_COLD;
 };
 
-class nes_vt_pjoy_state : public nes_vt_state
+class vt_pjoy_state : public vt02_vt03_state
 {
 public:
-	nes_vt_pjoy_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt_state(mconfig, type, tag)
+	vt_pjoy_state(const machine_config& mconfig, device_type type, const char* tag) :
+		vt02_vt03_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt_pjoy_4mb(machine_config& config);
+	void vt_pjoy_4mb(machine_config& config);
 };
 
-class nes_vt_waixing_state : public nes_vt_state
+class vt_waixing_state : public vt02_vt03_state
 {
 public:
-	nes_vt_waixing_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt_state(mconfig, type, tag)
+	vt_waixing_state(const machine_config& mconfig, device_type type, const char* tag) :
+		vt02_vt03_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt_waixing_512kb(machine_config& config);
-	void nes_vt_waixing_512kb_rasterhack(machine_config& config);
-	void nes_vt_waixing_2mb(machine_config& config);
+	void vt_waixing_512kb(machine_config& config);
+	void vt_waixing_512kb_rasterhack(machine_config& config);
+	void vt_waixing_2mb(machine_config& config);
 };
 
-class nes_vt_waixing_alt_state : public nes_vt_waixing_state
+class vt_waixing_alt_state : public vt_waixing_state
 {
 public:
-	nes_vt_waixing_alt_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt_waixing_state(mconfig, type, tag)
+	vt_waixing_alt_state(const machine_config& mconfig, device_type type, const char* tag) :
+		vt_waixing_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt_waixing_alt_4mb(machine_config& config);
-	void nes_vt_waixing_alt_pal_8mb(machine_config& config);
+	void vt_waixing_alt_4mb(machine_config& config);
+	void vt_waixing_alt_pal_8mb(machine_config& config);
 };
 
-class nes_vt_waixing_alt_sporzpp_state : public nes_vt_waixing_alt_state
+class vt_waixing_alt_sporzpp_state : public vt_waixing_alt_state
 {
 public:
-	nes_vt_waixing_alt_sporzpp_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt_waixing_alt_state(mconfig, type, tag)
+	vt_waixing_alt_sporzpp_state(const machine_config& mconfig, device_type type, const char* tag) :
+		vt_waixing_alt_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt_waixing_alt_4mb_sporzpp(machine_config& config);
-	void nes_vt_pal_4mb_sporzbxa(machine_config& config);
+	void vt_waixing_alt_4mb_sporzpp(machine_config& config);
+	void vt_pal_4mb_sporzbxa(machine_config& config);
 
 private:
 	uint8_t in1_r() override
@@ -182,11 +182,11 @@ private:
 	}
 };
 
-class nes_vt_wldsoctv_state : public nes_vt_state
+class vt_wldsoctv_state : public vt02_vt03_state
 {
 public:
-	nes_vt_wldsoctv_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt_state(mconfig, type, tag)
+	vt_wldsoctv_state(const machine_config& mconfig, device_type type, const char* tag) :
+		vt02_vt03_state(mconfig, type, tag)
 	{ }
 
 private:
@@ -198,44 +198,44 @@ private:
 	}
 };
 
-class nes_vt_timetp36_state : public nes_vt_state
+class vt_timetp36_state : public vt02_vt03_state
 {
 public:
-	nes_vt_timetp36_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt_state(mconfig, type, tag)
+	vt_timetp36_state(const machine_config& mconfig, device_type type, const char* tag) :
+		vt02_vt03_state(mconfig, type, tag)
 	{ }
 };
 
-class nes_vt_hum_state : public nes_vt_state
+class vt_hum_state : public vt02_vt03_state
 {
 public:
-	nes_vt_hum_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt_state(mconfig, type, tag)
+	vt_hum_state(const machine_config& mconfig, device_type type, const char* tag) :
+		vt02_vt03_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt_hummer_2mb(machine_config& config);
-	void nes_vt_hummer_4mb(machine_config& config);
+	void vt_hummer_2mb(machine_config& config);
+	void vt_hummer_4mb(machine_config& config);
 };
 
-class nes_vt_sp69_state : public nes_vt_state
+class vt_sp69_state : public vt02_vt03_state
 {
 public:
-	nes_vt_sp69_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt_state(mconfig, type, tag)
+	vt_sp69_state(const machine_config& mconfig, device_type type, const char* tag) :
+		vt02_vt03_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt_4mb_sp69(machine_config& config);
+	void vt_4mb_sp69(machine_config& config);
 };
 
-class nes_vt_ablping_state : public nes_vt_state
+class vt_ablping_state : public vt02_vt03_state
 {
 public:
-	nes_vt_ablping_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt_state(mconfig, type, tag)
+	vt_ablping_state(const machine_config& mconfig, device_type type, const char* tag) :
+		vt02_vt03_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt_2mb_ablping(machine_config& config);
-	void nes_vt_2mb_vfootbal(machine_config& config);
+	void vt_2mb_ablping(machine_config& config);
+	void vt_2mb_vfootbal(machine_config& config);
 
 private:
 	uint8_t ablping_extraio_r();
@@ -243,16 +243,16 @@ private:
 };
 
 
-class nes_vt_ablpinb_state : public nes_vt_state
+class vt_ablpinb_state : public vt02_vt03_state
 {
 public:
-	nes_vt_ablpinb_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt_state(mconfig, type, tag),
+	vt_ablpinb_state(const machine_config& mconfig, device_type type, const char* tag) :
+		vt02_vt03_state(mconfig, type, tag),
 		m_ablpinb_in0_val(0),
 		m_plunger(*this, "PLUNGER")
 	{ }
 
-	void nes_vt_waixing_alt_4mb_sporzpp(machine_config& config);
+	void vt_waixing_alt_4mb_sporzpp(machine_config& config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -272,67 +272,67 @@ private:
 };
 
 
-uint8_t nes_vt_base_state::vt_rom_r(offs_t offset)
+uint8_t vt_base_state::vt_rom_r(offs_t offset)
 {
 	return m_prgrom[offset];
 }
 
-void nes_vt_base_state::vtspace_w(offs_t offset, uint8_t data)
+void vt_base_state::vtspace_w(offs_t offset, uint8_t data)
 {
 	logerror("%s: vtspace_w %08x : %02x", machine().describe_context(), offset, data);
 }
 
 // VTxx can address 25-bit address space (32MB of ROM) so use maps with mirroring in depending on ROM size
-void nes_vt_state::vt_external_space_map_32mbyte(address_map &map)
+void vt02_vt03_state::vt_external_space_map_32mbyte(address_map &map)
 {
-	map(0x0000000, 0x1ffffff).r(FUNC(nes_vt_state::vt_rom_r));
+	map(0x0000000, 0x1ffffff).r(FUNC(vt02_vt03_state::vt_rom_r));
 }
 
-void nes_vt_state::vt_external_space_map_16mbyte(address_map &map)
+void vt02_vt03_state::vt_external_space_map_16mbyte(address_map &map)
 {
-	map(0x0000000, 0x0ffffff).mirror(0x1000000).r(FUNC(nes_vt_state::vt_rom_r));
+	map(0x0000000, 0x0ffffff).mirror(0x1000000).r(FUNC(vt02_vt03_state::vt_rom_r));
 }
 
-void nes_vt_state::vt_external_space_map_8mbyte(address_map &map)
+void vt02_vt03_state::vt_external_space_map_8mbyte(address_map &map)
 {
-	map(0x0000000, 0x07fffff).mirror(0x1800000).r(FUNC(nes_vt_state::vt_rom_r));
+	map(0x0000000, 0x07fffff).mirror(0x1800000).r(FUNC(vt02_vt03_state::vt_rom_r));
 }
 
-void nes_vt_state::vt_external_space_map_4mbyte(address_map &map)
+void vt02_vt03_state::vt_external_space_map_4mbyte(address_map &map)
 {
-	map(0x0000000, 0x03fffff).mirror(0x1c00000).r(FUNC(nes_vt_state::vt_rom_r));
+	map(0x0000000, 0x03fffff).mirror(0x1c00000).r(FUNC(vt02_vt03_state::vt_rom_r));
 }
 
-void nes_vt_state::vt_external_space_map_2mbyte(address_map &map)
+void vt02_vt03_state::vt_external_space_map_2mbyte(address_map &map)
 {
-	map(0x0000000, 0x01fffff).mirror(0x1e00000).r(FUNC(nes_vt_state::vt_rom_r));
+	map(0x0000000, 0x01fffff).mirror(0x1e00000).r(FUNC(vt02_vt03_state::vt_rom_r));
 }
 
-void nes_vt_state::vt_external_space_map_1mbyte(address_map &map)
+void vt02_vt03_state::vt_external_space_map_1mbyte(address_map &map)
 {
-	map(0x0000000, 0x00fffff).mirror(0x1f00000).r(FUNC(nes_vt_state::vt_rom_r));
+	map(0x0000000, 0x00fffff).mirror(0x1f00000).r(FUNC(vt02_vt03_state::vt_rom_r));
 }
 
-void nes_vt_state::vt_external_space_map_512kbyte(address_map &map)
+void vt02_vt03_state::vt_external_space_map_512kbyte(address_map &map)
 {
-	map(0x0000000, 0x007ffff).mirror(0x1f80000).r(FUNC(nes_vt_state::vt_rom_r));
+	map(0x0000000, 0x007ffff).mirror(0x1f80000).r(FUNC(vt02_vt03_state::vt_rom_r));
 }
 
 // Win Lose Draw has RAM as well as ROM
-void nes_vt_swap_op_d5_d6_state::vt_external_space_map_senwld_512kbyte(address_map &map)
+void vt_swap_op_d5_d6_state::vt_external_space_map_senwld_512kbyte(address_map &map)
 {
-	map(0x0000000, 0x007ffff).r(FUNC(nes_vt_swap_op_d5_d6_state::vt_rom_r));
+	map(0x0000000, 0x007ffff).r(FUNC(vt_swap_op_d5_d6_state::vt_rom_r));
 	map(0x0100000, 0x010ffff).ram();
-	map(0x0180000, 0x01fffff).r(FUNC(nes_vt_swap_op_d5_d6_state::vt_rom_r));
+	map(0x0180000, 0x01fffff).r(FUNC(vt_swap_op_d5_d6_state::vt_rom_r));
 }
 
-void nes_vt_state::vt_external_space_map_1mbyte_majkon(address_map &map)
+void vt02_vt03_state::vt_external_space_map_1mbyte_majkon(address_map &map)
 {
-	map(0x0000000, 0x00fffff).mirror(0x1f00000).r(FUNC(nes_vt_state::vt_rom_r));
+	map(0x0000000, 0x00fffff).mirror(0x1f00000).r(FUNC(vt02_vt03_state::vt_rom_r));
 	map(0x1400000, 0x1401fff).ram(); // rush'n attack writes to chr space, after setting the program and character outer bank to a mirror, is the correct way to handle it?
 }
 
-template <uint8_t NUM> uint8_t nes_vt_base_state::extrain_r()
+template <uint8_t NUM> uint8_t vt_base_state::extrain_r()
 {
 	if (m_exin[NUM])
 		return m_exin[NUM]->read();
@@ -346,7 +346,7 @@ template <uint8_t NUM> uint8_t nes_vt_base_state::extrain_r()
 
 /* Standard I/O handlers (NES Controller clone) */
 
-uint8_t nes_vt_base_state::in0_r()
+uint8_t vt_base_state::in0_r()
 {
 	//logerror("%s: in0_r\n", machine().describe_context());
 	uint8_t ret = 0x40;
@@ -355,7 +355,7 @@ uint8_t nes_vt_base_state::in0_r()
 	return ret;
 }
 
-uint8_t nes_vt_base_state::in1_r()
+uint8_t vt_base_state::in1_r()
 {
 	//logerror("%s: in1_r\n", machine().describe_context());
 	uint8_t ret = 0x40;
@@ -364,7 +364,7 @@ uint8_t nes_vt_base_state::in1_r()
 	return ret;
 }
 
-void nes_vt_base_state::in0_w(uint8_t data)
+void vt_base_state::in0_w(uint8_t data)
 {
 	//logerror("%s: in0_w %02x\n", machine().describe_context(), data);
 
@@ -384,19 +384,19 @@ void nes_vt_base_state::in0_w(uint8_t data)
 
 // ablping polls this (also writes here) what is it? 4-bit DAC? PCM? (inputs only start responding once it finishes writing data on startup but takes longer than a sample should)
 // (this is the extended IO port on VT)
-uint8_t nes_vt_ablping_state::ablping_extraio_r()
+uint8_t vt_ablping_state::ablping_extraio_r()
 {
 	// needs to change at least
 	return machine().rand()&0xf;
 };
 
-void nes_vt_ablping_state::ablping_extraio_w(uint8_t data)
+void vt_ablping_state::ablping_extraio_w(uint8_t data)
 {
 	popmessage("ablping_extraio_w %02x", data);
 };
 
 
-void nes_vt_base_state::machine_start()
+void vt_base_state::machine_start()
 {
 	m_latch0 = 0;
 	m_latch1 = 0;
@@ -407,15 +407,15 @@ void nes_vt_base_state::machine_start()
 	save_item(NAME(m_previous_port0));
 }
 
-void nes_vt_base_state::machine_reset()
+void vt_base_state::machine_reset()
 {
 
 }
 
 
-void nes_vt_ablpinb_state::machine_start()
+void vt_ablpinb_state::machine_start()
 {
-	nes_vt_base_state::machine_start();
+	vt_base_state::machine_start();
 
 	save_item(NAME(m_plunger_off));
 	save_item(NAME(m_plunger_state_count));
@@ -423,9 +423,9 @@ void nes_vt_ablpinb_state::machine_start()
 
 }
 
-void nes_vt_ablpinb_state::machine_reset()
+void vt_ablpinb_state::machine_reset()
 {
-	nes_vt_base_state::machine_reset();
+	vt_base_state::machine_reset();
 
 	m_plunger_off = 0;
 	m_plunger_state_count = 0;
@@ -433,7 +433,7 @@ void nes_vt_ablpinb_state::machine_reset()
 }
 
 
-uint8_t nes_vt_ablpinb_state::in0_r()
+uint8_t vt_ablpinb_state::in0_r()
 {
 	if (m_plunger_off)
 	{
@@ -462,7 +462,7 @@ uint8_t nes_vt_ablpinb_state::in0_r()
 }
 
 
-uint8_t nes_vt_ablpinb_state::in1_r()
+uint8_t vt_ablpinb_state::in1_r()
 {
 	uint8_t i = machine().rand() & 0x10;
 
@@ -474,7 +474,7 @@ uint8_t nes_vt_ablpinb_state::in1_r()
 	return i | ret;
 }
 
-void nes_vt_ablpinb_state::in0_w(uint8_t data)
+void vt_ablpinb_state::in0_w(uint8_t data)
 {
 	// write 0x04 to 0x4016 sets bit 0x08 in 0x4017
 	// write 0x00 to 0x4016 clears bit 0x08 in 0x4017
@@ -485,246 +485,246 @@ void nes_vt_ablpinb_state::in0_w(uint8_t data)
 }
 
 
-void nes_vt_base_state::configure_soc(nes_vt02_vt03_soc_device* soc)
+void vt_base_state::configure_soc(vt02_vt03_soc_device* soc)
 {
-	soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_32mbyte);
-	soc->read_0_callback().set(FUNC(nes_vt_base_state::in0_r));
-	soc->read_1_callback().set(FUNC(nes_vt_base_state::in1_r));
-	soc->write_0_callback().set(FUNC(nes_vt_base_state::in0_w));
+	soc->set_addrmap(AS_PROGRAM, &vt02_vt03_state::vt_external_space_map_32mbyte);
+	soc->read_0_callback().set(FUNC(vt_base_state::in0_r));
+	soc->read_1_callback().set(FUNC(vt_base_state::in1_r));
+	soc->write_0_callback().set(FUNC(vt_base_state::in0_w));
 
-	soc->extra_read_0_callback().set(FUNC(nes_vt_base_state::extrain_r<0>));
-	soc->extra_read_1_callback().set(FUNC(nes_vt_base_state::extrain_r<1>));
-	soc->extra_read_2_callback().set(FUNC(nes_vt_base_state::extrain_r<2>));
-	soc->extra_read_3_callback().set(FUNC(nes_vt_base_state::extrain_r<3>));
+	soc->extra_read_0_callback().set(FUNC(vt_base_state::extrain_r<0>));
+	soc->extra_read_1_callback().set(FUNC(vt_base_state::extrain_r<1>));
+	soc->extra_read_2_callback().set(FUNC(vt_base_state::extrain_r<2>));
+	soc->extra_read_3_callback().set(FUNC(vt_base_state::extrain_r<3>));
 }
 
-void nes_vt_state::nes_vt_512kb(machine_config& config)
+void vt02_vt03_state::vt_512kb(machine_config& config)
 {
-	NES_VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
+	VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_512kbyte);
+	m_soc->set_addrmap(AS_PROGRAM, &vt02_vt03_state::vt_external_space_map_512kbyte);
 }
 
-void nes_vt_state::nes_vt_1mb(machine_config& config)
+void vt02_vt03_state::vt_1mb(machine_config& config)
 {
-	NES_VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
+	VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_1mbyte);
+	m_soc->set_addrmap(AS_PROGRAM, &vt02_vt03_state::vt_external_space_map_1mbyte);
 }
 
-void nes_vt_state::nes_vt_2mb(machine_config& config)
+void vt02_vt03_state::vt_2mb(machine_config& config)
 {
-	NES_VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
+	VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_2mbyte);
+	m_soc->set_addrmap(AS_PROGRAM, &vt02_vt03_state::vt_external_space_map_2mbyte);
 }
 
 
 
-void nes_vt_state::nes_vt_4mb(machine_config& config)
+void vt02_vt03_state::vt_4mb(machine_config& config)
 {
-	NES_VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
+	VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_4mbyte);
+	m_soc->set_addrmap(AS_PROGRAM, &vt02_vt03_state::vt_external_space_map_4mbyte);
 }
 
-void nes_vt_state::nes_vt_8mb(machine_config& config)
+void vt02_vt03_state::vt_8mb(machine_config& config)
 {
-	NES_VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
+	VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_8mbyte);
+	m_soc->set_addrmap(AS_PROGRAM, &vt02_vt03_state::vt_external_space_map_8mbyte);
 }
 
-void nes_vt_state::nes_vt_16mb(machine_config& config)
+void vt02_vt03_state::vt_16mb(machine_config& config)
 {
-	NES_VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
+	VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_16mbyte);
+	m_soc->set_addrmap(AS_PROGRAM, &vt02_vt03_state::vt_external_space_map_16mbyte);
 }
 
-void nes_vt_state::nes_vt_32mb(machine_config& config)
+void vt02_vt03_state::vt_32mb(machine_config& config)
 {
-	NES_VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
+	VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_32mbyte);
+	m_soc->set_addrmap(AS_PROGRAM, &vt02_vt03_state::vt_external_space_map_32mbyte);
 }
 
-void nes_vt_state::nes_vt_pal_1mb(machine_config& config)
+void vt02_vt03_state::vt_pal_1mb(machine_config& config)
 {
-	NES_VT02_VT03_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
+	VT02_VT03_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
 	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_1mbyte);
+	m_soc->set_addrmap(AS_PROGRAM, &vt02_vt03_state::vt_external_space_map_1mbyte);
 }
 
-void nes_vt_state::nes_vt_pal_2mb(machine_config& config)
+void vt02_vt03_state::vt_pal_2mb(machine_config& config)
 {
-	NES_VT02_VT03_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
+	VT02_VT03_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
 	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_2mbyte);
+	m_soc->set_addrmap(AS_PROGRAM, &vt02_vt03_state::vt_external_space_map_2mbyte);
 }
 
-void nes_vt_state::nes_vt_pal_4mb(machine_config& config)
+void vt02_vt03_state::vt_pal_4mb(machine_config& config)
 {
-	NES_VT02_VT03_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
+	VT02_VT03_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
 	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_4mbyte);
+	m_soc->set_addrmap(AS_PROGRAM, &vt02_vt03_state::vt_external_space_map_4mbyte);
 }
 
-void nes_vt_state::nes_vt_pal_8mb(machine_config& config)
+void vt02_vt03_state::vt_pal_8mb(machine_config& config)
 {
-	NES_VT02_VT03_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
+	VT02_VT03_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
 	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_8mbyte);
+	m_soc->set_addrmap(AS_PROGRAM, &vt02_vt03_state::vt_external_space_map_8mbyte);
 }
 
-void nes_vt_state::nes_vt_pal_16mb(machine_config& config)
+void vt02_vt03_state::vt_pal_16mb(machine_config& config)
 {
-	NES_VT02_VT03_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
+	VT02_VT03_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
 	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_16mbyte);
+	m_soc->set_addrmap(AS_PROGRAM, &vt02_vt03_state::vt_external_space_map_16mbyte);
 }
 
 
-void nes_vt_waixing_state::nes_vt_waixing_512kb(machine_config &config)
+void vt_waixing_state::vt_waixing_512kb(machine_config &config)
 {
-	NES_VT02_VT03_SOC_WAIXING(config, m_soc, NTSC_APU_CLOCK);
+	VT02_VT03_SOC_WAIXING(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_waixing_state::vt_external_space_map_512kbyte);
+	m_soc->set_addrmap(AS_PROGRAM, &vt_waixing_state::vt_external_space_map_512kbyte);
 }
 
-void nes_vt_waixing_state::nes_vt_waixing_512kb_rasterhack(machine_config &config)
+void vt_waixing_state::vt_waixing_512kb_rasterhack(machine_config &config)
 {
-	nes_vt_waixing_512kb(config);
+	vt_waixing_512kb(config);
 	m_soc->force_raster_timing_hack();
 }
 
 
-void nes_vt_waixing_state::nes_vt_waixing_2mb(machine_config &config)
+void vt_waixing_state::vt_waixing_2mb(machine_config &config)
 {
-	NES_VT02_VT03_SOC_WAIXING(config, m_soc, NTSC_APU_CLOCK);
+	VT02_VT03_SOC_WAIXING(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_waixing_state::vt_external_space_map_2mbyte);
+	m_soc->set_addrmap(AS_PROGRAM, &vt_waixing_state::vt_external_space_map_2mbyte);
 }
 
-void nes_vt_waixing_alt_state::nes_vt_waixing_alt_4mb(machine_config &config)
+void vt_waixing_alt_state::vt_waixing_alt_4mb(machine_config &config)
 {
-	NES_VT02_VT03_SOC_WAIXING(config, m_soc, NTSC_APU_CLOCK);
+	VT02_VT03_SOC_WAIXING(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_waixing_state::vt_external_space_map_4mbyte);
+	m_soc->set_addrmap(AS_PROGRAM, &vt_waixing_state::vt_external_space_map_4mbyte);
 	m_soc->set_8000_scramble(0x3, 0x2, 0x1, 0x0, 0x5, 0x4);
 	//m_soc->set_8006_scramble(0x7, 0x8); // this is the default config in the SoC device
 }
 
-void nes_vt_waixing_alt_state::nes_vt_waixing_alt_pal_8mb(machine_config &config)
+void vt_waixing_alt_state::vt_waixing_alt_pal_8mb(machine_config &config)
 {
-	NES_VT02_VT03_SOC_WAIXING_PAL(config, m_soc, PAL_APU_CLOCK);
+	VT02_VT03_SOC_WAIXING_PAL(config, m_soc, PAL_APU_CLOCK);
 	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_waixing_alt_state::vt_external_space_map_8mbyte);
+	m_soc->set_addrmap(AS_PROGRAM, &vt_waixing_alt_state::vt_external_space_map_8mbyte);
 	m_soc->set_8000_scramble(0x3, 0x2, 0x1, 0x0, 0x5, 0x4);
 	//m_soc->set_8006_scramble(0x7, 0x8); // this is the default config in the SoC device;
 }
 
-void nes_vt_waixing_alt_sporzpp_state::nes_vt_waixing_alt_4mb_sporzpp(machine_config& config)
+void vt_waixing_alt_sporzpp_state::vt_waixing_alt_4mb_sporzpp(machine_config& config)
 {
-	NES_VT02_VT03_SOC_WAIXING(config, m_soc, NTSC_APU_CLOCK);
+	VT02_VT03_SOC_WAIXING(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_ablping_state::vt_external_space_map_4mbyte);
+	m_soc->set_addrmap(AS_PROGRAM, &vt_ablping_state::vt_external_space_map_4mbyte);
 	m_soc->set_8000_scramble(0x3, 0x2, 0x1, 0x0, 0x5, 0x4);
 	//m_soc->set_8006_scramble(0x7, 0x8); // this is the default config in the SoC device
 }
 
-void nes_vt_waixing_alt_sporzpp_state::nes_vt_pal_4mb_sporzbxa(machine_config& config)
+void vt_waixing_alt_sporzpp_state::vt_pal_4mb_sporzbxa(machine_config& config)
 {
-	NES_VT02_VT03_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
+	VT02_VT03_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
 	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_4mbyte);
+	m_soc->set_addrmap(AS_PROGRAM, &vt02_vt03_state::vt_external_space_map_4mbyte);
 }
 
-void nes_vt_hum_state::nes_vt_hummer_2mb(machine_config& config)
+void vt_hum_state::vt_hummer_2mb(machine_config& config)
 {
-	NES_VT02_VT03_SOC_HUMMER(config, m_soc, NTSC_APU_CLOCK);
+	VT02_VT03_SOC_HUMMER(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_sp69_state::vt_external_space_map_2mbyte);
+	m_soc->set_addrmap(AS_PROGRAM, &vt_sp69_state::vt_external_space_map_2mbyte);
 	//m_soc->set_8000_scramble(0x4, 0x5, 0x0, 0x1, 0x2, 0x3); // this is the default config in the SoC device
 	//m_soc->set_8006_scramble(0x7, 0x8); // this is the default config in the SoC device
 }
 
-void nes_vt_hum_state::nes_vt_hummer_4mb(machine_config& config)
+void vt_hum_state::vt_hummer_4mb(machine_config& config)
 {
-	nes_vt_hummer_2mb(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_hum_state::vt_external_space_map_4mbyte);
+	vt_hummer_2mb(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt_hum_state::vt_external_space_map_4mbyte);
 }
 
-void nes_vt_pjoy_state::nes_vt_pjoy_4mb(machine_config &config)
+void vt_pjoy_state::vt_pjoy_4mb(machine_config &config)
 {
-	NES_VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
+	VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_sp69_state::vt_external_space_map_4mbyte);
+	m_soc->set_addrmap(AS_PROGRAM, &vt_sp69_state::vt_external_space_map_4mbyte);
 	//m_soc->set_8000_scramble(0x4, 0x5, 0x0, 0x1, 0x2, 0x3); // this is the default config in the SoC device
 	m_soc->set_8006_scramble(0x8, 0x7);
 	m_soc->set_410x_scramble(0x8, 0x7);
 }
 
 
-void nes_vt_sp69_state::nes_vt_4mb_sp69(machine_config& config)
+void vt_sp69_state::vt_4mb_sp69(machine_config& config)
 {
-	NES_VT02_VT03_SOC_SPORTS(config, m_soc, NTSC_APU_CLOCK);
+	VT02_VT03_SOC_SPORTS(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_sp69_state::vt_external_space_map_4mbyte);
+	m_soc->set_addrmap(AS_PROGRAM, &vt_sp69_state::vt_external_space_map_4mbyte);
 	//m_soc->set_8000_scramble(0x4, 0x5, 0x0, 0x1, 0x2, 0x3); // this is the default config in the SoC device
 	//m_soc->set_8006_scramble(0x7, 0x8);  // this is the default config in the SoC device
 }
 
-void nes_vt_ablping_state::nes_vt_2mb_ablping(machine_config &config)
+void vt_ablping_state::vt_2mb_ablping(machine_config &config)
 {
-	NES_VT02_VT03_SOC_SPORTS_PAL(config, m_soc, PAL_APU_CLOCK);
+	VT02_VT03_SOC_SPORTS_PAL(config, m_soc, PAL_APU_CLOCK);
 	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_ablping_state::vt_external_space_map_2mbyte);
+	m_soc->set_addrmap(AS_PROGRAM, &vt_ablping_state::vt_external_space_map_2mbyte);
 	//m_soc->set_8000_scramble(0x4, 0x5, 0x0, 0x1, 0x2, 0x3); // this is the default config in the SoC device
 	//m_soc->set_8006_scramble(0x7, 0x8); // this is the default config in the SoC device
 
-	m_soc->extra_read_2_callback().set(FUNC(nes_vt_ablping_state::ablping_extraio_r));
-	m_soc->extra_read_3_callback().set(FUNC(nes_vt_ablping_state::ablping_extraio_r));
-	m_soc->extra_write_2_callback().set(FUNC(nes_vt_ablping_state::ablping_extraio_w));
-	m_soc->extra_write_3_callback().set(FUNC(nes_vt_ablping_state::ablping_extraio_w));
+	m_soc->extra_read_2_callback().set(FUNC(vt_ablping_state::ablping_extraio_r));
+	m_soc->extra_read_3_callback().set(FUNC(vt_ablping_state::ablping_extraio_r));
+	m_soc->extra_write_2_callback().set(FUNC(vt_ablping_state::ablping_extraio_w));
+	m_soc->extra_write_3_callback().set(FUNC(vt_ablping_state::ablping_extraio_w));
 }
 
-void nes_vt_ablping_state::nes_vt_2mb_vfootbal(machine_config &config)
+void vt_ablping_state::vt_2mb_vfootbal(machine_config &config)
 {
-	NES_VT02_VT03_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
+	VT02_VT03_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
 	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_ablping_state::vt_external_space_map_2mbyte);
+	m_soc->set_addrmap(AS_PROGRAM, &vt_ablping_state::vt_external_space_map_2mbyte);
 
-	m_soc->extra_read_2_callback().set(FUNC(nes_vt_ablping_state::ablping_extraio_r));
-	m_soc->extra_read_3_callback().set(FUNC(nes_vt_ablping_state::ablping_extraio_r));
-	m_soc->extra_write_2_callback().set(FUNC(nes_vt_ablping_state::ablping_extraio_w));
-	m_soc->extra_write_3_callback().set(FUNC(nes_vt_ablping_state::ablping_extraio_w));
+	m_soc->extra_read_2_callback().set(FUNC(vt_ablping_state::ablping_extraio_r));
+	m_soc->extra_read_3_callback().set(FUNC(vt_ablping_state::ablping_extraio_r));
+	m_soc->extra_write_2_callback().set(FUNC(vt_ablping_state::ablping_extraio_w));
+	m_soc->extra_write_3_callback().set(FUNC(vt_ablping_state::ablping_extraio_w));
 }
 
-uint8_t nes_vt_base_state::upper_412c_r()
+uint8_t vt_base_state::upper_412c_r()
 {
 	logerror("%s: upper_412c_r\n", machine().describe_context());
 	return 0x00;
 }
 
-uint8_t nes_vt_base_state::upper_412d_r()
+uint8_t vt_base_state::upper_412d_r()
 {
 	logerror("%s: upper_412d_r\n", machine().describe_context());
 	return 0x00;
 }
 
-void nes_vt_base_state::upper_412c_w(uint8_t data)
+void vt_base_state::upper_412c_w(uint8_t data)
 {
 	logerror("%s: upper_412c_w %02x\n", machine().describe_context(), data);
 }
 
 
-void nes_vt_state::nes_vt_1mb_majkon(machine_config& config)
+void vt02_vt03_state::vt_1mb_majkon(machine_config& config)
 {
-	NES_VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
+	VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_state::vt_external_space_map_1mbyte_majkon);
+	m_soc->set_addrmap(AS_PROGRAM, &vt02_vt03_state::vt_external_space_map_1mbyte_majkon);
 	m_soc->force_raster_timing_hack();
 }
 
@@ -766,7 +766,7 @@ static INPUT_PORTS_START( lxnoddy )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( nes_vt_ddr )
+static INPUT_PORTS_START( vt_ddr )
 	PORT_START("IO0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -805,53 +805,53 @@ static INPUT_PORTS_START( dbdancem )
 INPUT_PORTS_END
 
 
-void nes_vt_swap_op_d5_d6_state::nes_vt_vh2009(machine_config &config)
+void vt_swap_op_d5_d6_state::vt_vh2009(machine_config &config)
 {
-	NES_VT02_VT03_SOC_SCRAMBLE(config, m_soc, NTSC_APU_CLOCK);
+	VT02_VT03_SOC_SCRAMBLE(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 }
 
-void nes_vt_swap_op_d5_d6_state::nes_vt_vh2009_pal(machine_config &config)
+void vt_swap_op_d5_d6_state::vt_vh2009_pal(machine_config &config)
 {
-	NES_VT02_VT03_SOC_SCRAMBLE_PAL(config, m_soc, PAL_APU_CLOCK);
+	VT02_VT03_SOC_SCRAMBLE_PAL(config, m_soc, PAL_APU_CLOCK);
 	configure_soc(m_soc);
 }
 
-void nes_vt_swap_op_d5_d6_state::nes_vt_vh2009_1mb(machine_config& config)
+void vt_swap_op_d5_d6_state::vt_vh2009_1mb(machine_config& config)
 {
-	nes_vt_vh2009(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_swap_op_d5_d6_state::vt_external_space_map_1mbyte);
+	vt_vh2009(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt_swap_op_d5_d6_state::vt_external_space_map_1mbyte);
 }
 
-void nes_vt_swap_op_d5_d6_state::nes_vt_vh2009_2mb(machine_config& config)
+void vt_swap_op_d5_d6_state::vt_vh2009_2mb(machine_config& config)
 {
-	nes_vt_vh2009(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_swap_op_d5_d6_state::vt_external_space_map_2mbyte);
+	vt_vh2009(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt_swap_op_d5_d6_state::vt_external_space_map_2mbyte);
 }
 
-void nes_vt_swap_op_d5_d6_state::nes_vt_vh2009_pal_2mb(machine_config& config)
+void vt_swap_op_d5_d6_state::vt_vh2009_pal_2mb(machine_config& config)
 {
-	nes_vt_vh2009_pal(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_swap_op_d5_d6_state::vt_external_space_map_2mbyte);
+	vt_vh2009_pal(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt_swap_op_d5_d6_state::vt_external_space_map_2mbyte);
 }
 
-void nes_vt_swap_op_d5_d6_state::nes_vt_vh2009_4mb(machine_config& config)
+void vt_swap_op_d5_d6_state::vt_vh2009_4mb(machine_config& config)
 {
-	nes_vt_vh2009(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_swap_op_d5_d6_state::vt_external_space_map_4mbyte);
+	vt_vh2009(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt_swap_op_d5_d6_state::vt_external_space_map_4mbyte);
 }
 
-void nes_vt_swap_op_d5_d6_state::nes_vt_vh2009_8mb(machine_config& config)
+void vt_swap_op_d5_d6_state::vt_vh2009_8mb(machine_config& config)
 {
-	nes_vt_vh2009(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_swap_op_d5_d6_state::vt_external_space_map_8mbyte);
+	vt_vh2009(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt_swap_op_d5_d6_state::vt_external_space_map_8mbyte);
 }
 
 
-void nes_vt_swap_op_d5_d6_state::nes_vt_senwld_512kb(machine_config &config)
+void vt_swap_op_d5_d6_state::vt_senwld_512kb(machine_config &config)
 {
-	nes_vt_vh2009(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_swap_op_d5_d6_state::vt_external_space_map_senwld_512kbyte);
+	vt_vh2009(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt_swap_op_d5_d6_state::vt_external_space_map_senwld_512kbyte);
 }
 
 
@@ -1395,7 +1395,7 @@ ROM_START( gujtv108 )
 ROM_END
 
 
-void nes_vt_state::init_protpp()
+void vt02_vt03_state::init_protpp()
 {
 	// this gets the tiles correct
 	u8 *src = memregion("mainrom")->base();
@@ -1412,7 +1412,7 @@ void nes_vt_state::init_protpp()
 	}
 }
 
-void nes_vt_state::init_gamezn2()
+void vt02_vt03_state::init_gamezn2()
 {
 	u8 *src = memregion("mainrom")->base();
 	int len = memregion("mainrom")->bytes();
@@ -1432,180 +1432,180 @@ void nes_vt_state::init_gamezn2()
 
 
 // earlier version of vdogdemo
-CONS( 200?, vdogdeme,  0,  0,  nes_vt_1mb,    nes_vt, nes_vt_state, empty_init, "VRT", "V-Dog (prototype, earlier)", MACHINE_NOT_WORKING )
+CONS( 200?, vdogdeme,  0,  0,  vt_1mb,    nes_vt, vt02_vt03_state, empty_init, "VRT", "V-Dog (prototype, earlier)", MACHINE_NOT_WORKING )
 
 // this is glitchy even in other emulators, might just be entirely unfinished, it selects banks but they don't contain the required gfx?
-CONS( 200?, vdogdemo,  0,  0,  nes_vt_512kb,    nes_vt, nes_vt_state, empty_init, "VRT", "V-Dog (prototype)", MACHINE_NOT_WORKING )
+CONS( 200?, vdogdemo,  0,  0,  vt_512kb,    nes_vt, vt02_vt03_state, empty_init, "VRT", "V-Dog (prototype)", MACHINE_NOT_WORKING )
 
 // Bundled as "VT03 Demo" on the V.R. Technology VT SDK
-CONS( 200?, pinkjelly, 0,  0,  nes_vt_2mb,    nes_vt, nes_vt_state, empty_init, "VRT / Simmer Technology Co., Ltd.", "VRT VT SDK 'Pink Jelly' (VT03 Demo)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, pinkjelly, 0,  0,  vt_2mb,    nes_vt, vt02_vt03_state, empty_init, "VRT / Simmer Technology Co., Ltd.", "VRT VT SDK 'Pink Jelly' (VT03 Demo)", MACHINE_IMPERFECT_GRAPHICS )
 
 // Bundled as "C-Compiler Demo Program 2" on the V.R. Technology VT SDK
-CONS( 200?, vtpinball, 0,  0,  nes_vt_512kb,    nes_vt, nes_vt_state, empty_init, "VRT / OJ-Jungle", "VRT VT SDK 'Pinball' (C-Compiler Demo Program 2)", MACHINE_NOT_WORKING )
+CONS( 200?, vtpinball, 0,  0,  vt_512kb,    nes_vt, vt02_vt03_state, empty_init, "VRT / OJ-Jungle", "VRT VT SDK 'Pinball' (C-Compiler Demo Program 2)", MACHINE_NOT_WORKING )
 
 // Bundled as "Sound Generator FMDemo" on the V.R. Technology VT SDK
-CONS( 200?, vtsndtest, 0,  0,  nes_vt_512kb,    nes_vt, nes_vt_state, empty_init, "VRT", "VRT VT SDK 'VT03 Sound Test' (Sound Generator FMDemo)", MACHINE_IMPERFECT_CONTROLS )
+CONS( 200?, vtsndtest, 0,  0,  vt_512kb,    nes_vt, vt02_vt03_state, empty_init, "VRT", "VRT VT SDK 'VT03 Sound Test' (Sound Generator FMDemo)", MACHINE_IMPERFECT_CONTROLS )
 
 // Bundled as "Demo for VT03 Pic32" on the V.R. Technology VT SDK
-CONS( 200?, vtboxing,     0,  0,  nes_vt_512kb, nes_vt, nes_vt_state, empty_init, "VRT", "VRT VT SDK 'Boxing' (Demo for VT03 Pic32)", MACHINE_NOT_WORKING )
+CONS( 200?, vtboxing,     0,  0,  vt_512kb, nes_vt, vt02_vt03_state, empty_init, "VRT", "VRT VT SDK 'Boxing' (Demo for VT03 Pic32)", MACHINE_NOT_WORKING )
 
 
 // Menu system clearly started off as 'vtpinball'  Many elements seem similar to Family Pinball for the Famicom.
 // 050329 (29th March 2005) date on PCB
-CONS( 2005, ablpinb, 0,  0,  nes_vt_pal_2mb,    ablpinb, nes_vt_ablpinb_state, empty_init, "Advance Bright Ltd", "Pinball (P8002, ABL TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, ablpinb, 0,  0,  vt_pal_2mb,    ablpinb, vt_ablpinb_state, empty_init, "Advance Bright Ltd", "Pinball (P8002, ABL TV Game)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // need to map 2 player controls for Ping Pong, 'Eat-Bean' (the PacMan hack) gets stuck during intermission? (same happens on hardware?)
-CONS( 2004, sporzpp,   0,  0,  nes_vt_waixing_alt_4mb_sporzpp,        sporzpp, nes_vt_waixing_alt_sporzpp_state, empty_init, "Macro Winners", "Game Sporz Wireless Duet Play Ping-Pong", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2004, sporzpp,   0,  0,  vt_waixing_alt_4mb_sporzpp,        sporzpp, vt_waixing_alt_sporzpp_state, empty_init, "Macro Winners", "Game Sporz Wireless Duet Play Ping-Pong", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // has some longer than expected delays when sounds should play on the Boxing part, but NES hacks are all functional
-CONS( 2004, sporzbx,   0,        0,  nes_vt_waixing_alt_4mb_sporzpp,        sporzpp, nes_vt_waixing_alt_sporzpp_state, empty_init, "Macro Winners",                       "Game Sporz Wireless Boxing", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 2004, sporzbxa,  sporzbx,  0,  nes_vt_pal_4mb_sporzbxa,               sporzpp, nes_vt_waixing_alt_sporzpp_state, empty_init, "Macro Winners (Play Vision license)", "Wireless Boxing (PAL, Play Vision)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2004, sporzbx,   0,        0,  vt_waixing_alt_4mb_sporzpp,        sporzpp, vt_waixing_alt_sporzpp_state, empty_init, "Macro Winners",                       "Game Sporz Wireless Boxing", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2004, sporzbxa,  sporzbx,  0,  vt_pal_4mb_sporzbxa,               sporzpp, vt_waixing_alt_sporzpp_state, empty_init, "Macro Winners (Play Vision license)", "Wireless Boxing (PAL, Play Vision)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // has some longer than expected delays when sounds should play on the Tennis part, but NES hacks are all functional, US version is sold in DreamGear branded box.
-CONS( 2004, sporztn,   0,  0,  nes_vt_pal_4mb,        sporzpp, nes_vt_wldsoctv_state, empty_init, "Macro Winners (Play Vision license)", "Wireless Tennis (PAL, Play Vision)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2004, sporztn,   0,  0,  vt_pal_4mb,        sporzpp, vt_wldsoctv_state, empty_init, "Macro Winners (Play Vision license)", "Wireless Tennis (PAL, Play Vision)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // missing PCM audio, but regular APU SFX work
-CONS( 200?, wldsoctv,  0,  0,  nes_vt_pal_4mb,        nes_vt,  nes_vt_wldsoctv_state, empty_init, "Taikee", "World Soccer TV Game 10-in-1 (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, wldsoctv,  0,  0,  vt_pal_4mb,        nes_vt,  vt_wldsoctv_state, empty_init, "Taikee", "World Soccer TV Game 10-in-1 (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // should be VT03 based
 // for testing 'Shark', 'Octopus', 'Harbor', and 'Earth Fighter' use the extended colour modes, other games just seem to use standard NES modes
-CONS( 200?, mc_dgear,  0,  0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "dreamGEAR", "dreamGEAR 75-in-1", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, mc_dgear,  0,  0,  vt_4mb,    nes_vt, vt02_vt03_state, empty_init, "dreamGEAR", "dreamGEAR 75-in-1", MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 200?, sudo6in1,  0,  0,  nes_vt_pal_1mb,    nes_vt, nes_vt_state, empty_init, "Nice Code", "6-in-1 Sudoku Plug & Play", MACHINE_IMPERFECT_GRAPHICS ) // no manufacturer info on packaging, games seem to be from Nice Code, although this isn't certain
+CONS( 200?, sudo6in1,  0,  0,  vt_pal_1mb,    nes_vt, vt02_vt03_state, empty_init, "Nice Code", "6-in-1 Sudoku Plug & Play", MACHINE_IMPERFECT_GRAPHICS ) // no manufacturer info on packaging, games seem to be from Nice Code, although this isn't certain
 
-CONS( 200?, gujtv108,  0,  0,  nes_vt_4mb,        nes_vt, nes_vt_state, empty_init, "YSN",    "GameU Joint TV Bank 108-in-1 (model AH9069)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, gujtv108,  0,  0,  vt_4mb,        nes_vt, vt02_vt03_state, empty_init, "YSN",    "GameU Joint TV Bank 108-in-1 (model AH9069)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // small black unit, dpad on left, 4 buttons (A,B,X,Y) on right, Start/Reset/Select in middle, unit text "Sudoku Plug & Play TV Game"
-CONS( 200?, sudopptv,  0, 0,  nes_vt_waixing_512kb_rasterhack,        nes_vt, nes_vt_waixing_state, empty_init, "Smart Planet", "Sudoku Plug & Play TV Game '6 Intelligent Games'", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, sudopptv,  0, 0,  vt_waixing_512kb_rasterhack,        nes_vt, vt_waixing_state, empty_init, "Smart Planet", "Sudoku Plug & Play TV Game '6 Intelligent Games'", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-CONS( 200?, megapad,   0, 0,  nes_vt_waixing_2mb,        nes_vt, nes_vt_waixing_state, empty_init, "Waixing", "Megapad 31-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Happy Biqi has broken sprites, investigate before promoting
+CONS( 200?, megapad,   0, 0,  vt_waixing_2mb,        nes_vt, vt_waixing_state, empty_init, "Waixing", "Megapad 31-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Happy Biqi has broken sprites, investigate before promoting
 
 // 060303 date code on PCB
-CONS( 2006, ablmini,   0, 0,  nes_vt_waixing_alt_pal_8mb, nes_vt, nes_vt_waixing_alt_state, empty_init, "Advance Bright Ltd", "Double Players Mini Joystick 80-in-1 (MJ8500, ABL TV Game)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, ablmini,   0, 0,  vt_waixing_alt_pal_8mb, nes_vt, vt_waixing_alt_state, empty_init, "Advance Bright Ltd", "Double Players Mini Joystick 80-in-1 (MJ8500, ABL TV Game)", MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 200?, solargm,   0,  0, nes_vt_waixing_alt_pal_8mb, nes_vt, nes_vt_waixing_alt_state, empty_init, "<unknown>", "Solar Games 80-in-1 (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Solar Games logo is also found in the SunPlus based Millennium Arcade units
+CONS( 200?, solargm,   0,  0, vt_waixing_alt_pal_8mb, nes_vt, vt_waixing_alt_state, empty_init, "<unknown>", "Solar Games 80-in-1 (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Solar Games logo is also found in the SunPlus based Millennium Arcade units
 
 // silver 'N64' type controller design
-CONS( 200?, zudugo,    0, 0,  nes_vt_waixing_alt_4mb,     nes_vt, nes_vt_waixing_alt_state, empty_init, "Macro Winners / Waixing", "Zudu-go / 2udu-go", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // the styling on the box looks like a '2' in places, a 'Z' in others.
+CONS( 200?, zudugo,    0, 0,  vt_waixing_alt_4mb,     nes_vt, vt_waixing_alt_state, empty_init, "Macro Winners / Waixing", "Zudu-go / 2udu-go", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // the styling on the box looks like a '2' in places, a 'Z' in others.
 
  // needs PCM samples, Y button is not mapped (not used by any of the games? some sources indicate it's just a hardware autofire button)
-CONS( 200?, timetp36,  0, 0,  nes_vt_pal_4mb, timetp36, nes_vt_timetp36_state,        empty_init, "TimeTop", "Super Game 36-in-1 (TimeTop SuperGame) (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, timetp36,  0, 0,  vt_pal_4mb, timetp36, vt_timetp36_state,        empty_init, "TimeTop", "Super Game 36-in-1 (TimeTop SuperGame) (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-CONS( 200?, timetp7,   0, 0,  nes_vt_pal_2mb, timetp36, nes_vt_timetp36_state,        empty_init, "TimeTop", "Super Game 7-in-1 (TimeTop SuperGame) (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, timetp7,   0, 0,  vt_pal_2mb, timetp36, vt_timetp36_state,        empty_init, "TimeTop", "Super Game 7-in-1 (TimeTop SuperGame) (PAL)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2004, majkon,    0, 0,  nes_vt_1mb_majkon, nes_vt, nes_vt_state, empty_init, "Majesco (licensed from Konami) / JungleTac", "Konami Collector's Series Arcade Advanced", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // raster timing for Frogger needs a hack, Rush'n Attack also has raster timing issues on the status bar split
+CONS( 2004, majkon,    0, 0,  vt_1mb_majkon, nes_vt, vt02_vt03_state, empty_init, "Majesco (licensed from Konami) / JungleTac", "Konami Collector's Series Arcade Advanced", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // raster timing for Frogger needs a hack, Rush'n Attack also has raster timing issues on the status bar split
 
-CONS( 200?, majgnc,    0, 0,  nes_vt_1mb, majgnc, nes_vt_state,  empty_init, "Majesco / JungleTac", "Golden Nugget Casino", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, majgnc,    0, 0,  vt_1mb, majgnc, vt02_vt03_state,  empty_init, "Majesco / JungleTac", "Golden Nugget Casino", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2004, vt25in1,   0, 0,  nes_vt_1mb, nes_vt, nes_vt_state,  empty_init, "<unknown>", "unknown VT02 based 25-in-1 handheld", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2004, vt25in1,   0, 0,  vt_1mb, nes_vt, vt02_vt03_state,  empty_init, "<unknown>", "unknown VT02 based 25-in-1 handheld", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // might be a later VT type, 'pump' control is mapped on extra IO address that I don't think is present on 02/03
-CONS( 200?, pumpactv,  0, 0,  nes_vt_1mb, nes_vt, nes_vt_state,  empty_init, "Giggle", "TV Pump Active", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, pumpactv,  0, 0,  vt_1mb, nes_vt, vt02_vt03_state,  empty_init, "Giggle", "TV Pump Active", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // CPU die is marked 'VH2009' There's also a 62256 RAM chip on the PCB, some scrambled opcodes
-CONS( 2004, vsmaxx17,  0,  0,  nes_vt_vh2009_2mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Senario / JungleTac",   "Vs Maxx 17-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // from a Green unit, '17 Classic & Racing Game'
-CONS( 200?, vsmax25v,  0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Senario / JungleTac",   "Vs Maxx 25-in-1 (VT03 hardware)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 2004, polmega,   0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Polaroid / JungleTac",  "TV MegaMax active power game system 30-in-1 (MegaMax GPD001SDG)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 200?, dgun851,   0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "dreamGEAR / JungleTac", "Plug 'N' Play 30-in-1 (DGUN-851)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 200?, dgun853,   0,  0,  nes_vt_vh2009_8mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "dreamGEAR / JungleTac", "Plug 'N' Play 50-in-1 (DGUN-853)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 200?, silv35,    0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "SilverLit / JungleTac", "35 in 1 Super Twins", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 2004, vsmaxxvd,  0,  0,  nes_vt_vh2009_8mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Senario / JungleTac",   "Vs Maxx Video Extreme 50-in-1 (with Speed Racer and Snood)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 200?, vsmaxx77,  0,  0,  nes_vt_vh2009_8mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Senario / JungleTac",   "Vs Maxx Wireless 77-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 200?, joysti30,  0,  0,  nes_vt_vh2009_4mb,        nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "WinFun / JungleTac",    "Joystick 30", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // doesn't show WinFun onscreen, but packaging does
+CONS( 2004, vsmaxx17,  0,  0,  vt_vh2009_2mb,        nes_vt, vt_swap_op_d5_d6_state, empty_init, "Senario / JungleTac",   "Vs Maxx 17-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // from a Green unit, '17 Classic & Racing Game'
+CONS( 200?, vsmax25v,  0,  0,  vt_vh2009_4mb,        nes_vt, vt_swap_op_d5_d6_state, empty_init, "Senario / JungleTac",   "Vs Maxx 25-in-1 (VT03 hardware)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2004, polmega,   0,  0,  vt_vh2009_4mb,        nes_vt, vt_swap_op_d5_d6_state, empty_init, "Polaroid / JungleTac",  "TV MegaMax active power game system 30-in-1 (MegaMax GPD001SDG)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, dgun851,   0,  0,  vt_vh2009_4mb,        nes_vt, vt_swap_op_d5_d6_state, empty_init, "dreamGEAR / JungleTac", "Plug 'N' Play 30-in-1 (DGUN-851)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, dgun853,   0,  0,  vt_vh2009_8mb,        nes_vt, vt_swap_op_d5_d6_state, empty_init, "dreamGEAR / JungleTac", "Plug 'N' Play 50-in-1 (DGUN-853)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, silv35,    0,  0,  vt_vh2009_4mb,        nes_vt, vt_swap_op_d5_d6_state, empty_init, "SilverLit / JungleTac", "35 in 1 Super Twins", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2004, vsmaxxvd,  0,  0,  vt_vh2009_8mb,        nes_vt, vt_swap_op_d5_d6_state, empty_init, "Senario / JungleTac",   "Vs Maxx Video Extreme 50-in-1 (with Speed Racer and Snood)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, vsmaxx77,  0,  0,  vt_vh2009_8mb,        nes_vt, vt_swap_op_d5_d6_state, empty_init, "Senario / JungleTac",   "Vs Maxx Wireless 77-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, joysti30,  0,  0,  vt_vh2009_4mb,        nes_vt, vt_swap_op_d5_d6_state, empty_init, "WinFun / JungleTac",    "Joystick 30", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // doesn't show WinFun onscreen, but packaging does
 
 // has no audio, is there extra hardware, or is it just using unemulated VT features?
-CONS( 2005, lxnoddy,   0,  0,  nes_vt_vh2009_pal_2mb,        lxnoddy, nes_vt_swap_op_d5_d6_state, empty_init, "Lexibook",   "Noddy's TV Console", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
+CONS( 2005, lxnoddy,   0,  0,  vt_vh2009_pal_2mb,        lxnoddy, vt_swap_op_d5_d6_state, empty_init, "Lexibook",   "Noddy's TV Console", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 
 // mostly bootleg NES games, but also has Frogger, Scramble and Asteroids in it
-CONS( 200?, gamezn2,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, init_gamezn2, "<unknown>", "Game Zone II 128-in-1", MACHINE_IMPERFECT_GRAPHICS ) // was this PAL? (lots of raster splits are broken at the moment either way)
+CONS( 200?, gamezn2,   0,        0,  vt_4mb,    nes_vt, vt02_vt03_state, init_gamezn2, "<unknown>", "Game Zone II 128-in-1", MACHINE_IMPERFECT_GRAPHICS ) // was this PAL? (lots of raster splits are broken at the moment either way)
 
 // die is marked as VH2009, as above, but no scrambled opcodes here
-CONS( 201?, techni4,   0,  0,  nes_vt_pal_2mb,           nes_vt, nes_vt_state,               empty_init, "Technigame", "Technigame Super 4-in-1 Sports (PAL)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, techni4,   0,  0,  vt_pal_2mb,           nes_vt, vt02_vt03_state,               empty_init, "Technigame", "Technigame Super 4-in-1 Sports (PAL)", MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2005, senwld,   0,          0,  nes_vt_senwld_512kb,    nes_vt, nes_vt_swap_op_d5_d6_state, empty_init, "Senario", "Win, Lose or Draw (Senario)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // needs RAM in banked space, Alpha display emulating, Touchpad emulating etc.
+CONS( 2005, senwld,   0,          0,  vt_senwld_512kb,    nes_vt, vt_swap_op_d5_d6_state, empty_init, "Senario", "Win, Lose or Draw (Senario)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // needs RAM in banked space, Alpha display emulating, Touchpad emulating etc.
 
  // seems to use PCM for all sound, some garbage at bottom of screen, needs correct inputs (seems to respond to start, and any direction input for 'hit' - check if they're power related)
-CONS( 200?, protpp,   0,  0,  nes_vt_vh2009_1mb,      nes_vt, nes_vt_swap_op_d5_d6_state,        init_protpp, "Protocol", "Virtual Ping Pong (Protocol)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 200?, protpp,   0,  0,  vt_vh2009_1mb,      nes_vt, vt_swap_op_d5_d6_state,        init_protpp, "Protocol", "Virtual Ping Pong (Protocol)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 // this has 'Shark' and 'Octopus' etc. like mc_dgear but uses scrambled bank registers
 // This was also often found in cart form with SunPlus / Famiclone hybrid systems to boost the game count, eg. the WiWi (ROM verified to match)
-CONS( 200?, mc_sp69,   0,  0,  nes_vt_4mb_sp69,    nes_vt, nes_vt_sp69_state, empty_init, "<unknown>", "Sports Game 69 in 1", MACHINE_IMPERFECT_GRAPHICS  | MACHINE_IMPERFECT_SOUND)
+CONS( 200?, mc_sp69,   0,  0,  vt_4mb_sp69,    nes_vt, vt_sp69_state, empty_init, "<unknown>", "Sports Game 69 in 1", MACHINE_IMPERFECT_GRAPHICS  | MACHINE_IMPERFECT_SOUND)
 
 // this game was also sold by dreamGEAR and several others companies, each time with a different name and different case, although the dumped version was from ABL, and it hasn't been confirmed that the ROMs are identical for the other units
 // Super Ping Pong appears on the title screen, but not the box / product art which simply has "Ping Pong Plug & Play TV Game" on front/back/bottom/manual, and "Table Tennis Plug & Play TV Game" on left/right sides.  Product code is PP1100
 // PCB has PP1100-MB 061110 on it, possible date YYMMDD code? (pinball is 050329, guitar fever is 070516, air blaster 050423, kickboxing 061011 etc.)
-CONS( 2006, ablping,   0,        0,  nes_vt_2mb_ablping, nes_vt, nes_vt_ablping_state, empty_init, "Advance Bright Ltd", "Ping Pong / Table Tennis / Super Ping Pong (PP1100, ABL TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, ablping,   0,        0,  vt_2mb_ablping, nes_vt, vt_ablping_state, empty_init, "Advance Bright Ltd", "Ping Pong / Table Tennis / Super Ping Pong (PP1100, ABL TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-CONS( 200?, vfootbal,  0,        0,  nes_vt_2mb_vfootbal,nes_vt, nes_vt_ablping_state, empty_init, "<unknown>", "Virtual Football (with 3 bonus games)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, vfootbal,  0,        0,  vt_2mb_vfootbal,nes_vt, vt_ablping_state, empty_init, "<unknown>", "Virtual Football (with 3 bonus games)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // Hummer systems, scrambled bank register
-CONS( 200?, mc_sam60,  0,  0,  nes_vt_hummer_2mb,    nes_vt, nes_vt_hum_state, empty_init, "Hummer Technology Co., Ltd.", "Samuri (60 in 1)", MACHINE_IMPERFECT_GRAPHICS  | MACHINE_IMPERFECT_SOUND )
-CONS( 200?, zdog,      0,  0,  nes_vt_hummer_4mb,    nes_vt, nes_vt_hum_state, empty_init, "Hummer Technology Co., Ltd.", "ZDog (44 in 1)", MACHINE_IMPERFECT_GRAPHICS  | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, mc_sam60,  0,  0,  vt_hummer_2mb,    nes_vt, vt_hum_state, empty_init, "Hummer Technology Co., Ltd.", "Samuri (60 in 1)", MACHINE_IMPERFECT_GRAPHICS  | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, zdog,      0,  0,  vt_hummer_4mb,    nes_vt, vt_hum_state, empty_init, "Hummer Technology Co., Ltd.", "ZDog (44 in 1)", MACHINE_IMPERFECT_GRAPHICS  | MACHINE_IMPERFECT_SOUND )
 
 // very plain menus
-CONS( 200?, pjoyn50,    0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "PowerJoy Navigator 50 in 1", MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, pjoys30,    0,        0,  nes_vt_pjoy_4mb,    nes_vt, nes_vt_pjoy_state, empty_init, "<unknown>", "PowerJoy Supermax 30 in 1", MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, pjoys60,    0,        0,  nes_vt_pjoy_4mb,    nes_vt, nes_vt_pjoy_state, empty_init, "<unknown>", "PowerJoy Supermax 60 in 1", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, pjoyn50,    0,        0,  vt_4mb,    nes_vt, vt02_vt03_state, empty_init, "<unknown>", "PowerJoy Navigator 50 in 1", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, pjoys30,    0,        0,  vt_pjoy_4mb,    nes_vt, vt_pjoy_state, empty_init, "<unknown>", "PowerJoy Supermax 30 in 1", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, pjoys60,    0,        0,  vt_pjoy_4mb,    nes_vt, vt_pjoy_state, empty_init, "<unknown>", "PowerJoy Supermax 60 in 1", MACHINE_IMPERFECT_GRAPHICS )
 // both offer chinese or english menus
-CONS( 200?, mc_110cb,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "CoolBoy", "110 in 1 CoolBaby (CoolBoy RS-1S)", MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, mc_138cb,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "CoolBoy", "138 in 1 CoolBaby (CoolBoy RS-5, PCB060-10009011V1.3)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, mc_110cb,   0,        0,  vt_4mb,    nes_vt, vt02_vt03_state, empty_init, "CoolBoy", "110 in 1 CoolBaby (CoolBoy RS-1S)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, mc_138cb,   0,        0,  vt_4mb,    nes_vt, vt02_vt03_state, empty_init, "CoolBoy", "138 in 1 CoolBaby (CoolBoy RS-5, PCB060-10009011V1.3)", MACHINE_IMPERFECT_GRAPHICS )
 
 // doesn't boot, bad dump
-CONS( 201?, cbrs8,      0,        0,  nes_vt_16mb,    nes_vt, nes_vt_state, empty_init, "CoolBoy", "CoolBoy RS-8 168 in 1", MACHINE_NOT_WORKING )
+CONS( 201?, cbrs8,      0,        0,  vt_16mb,    nes_vt, vt02_vt03_state, empty_init, "CoolBoy", "CoolBoy RS-8 168 in 1", MACHINE_NOT_WORKING )
 
-CONS( 201?, rfcp168,    0,        0,  nes_vt_16mb,    nes_vt, nes_vt_state, empty_init, "<unknown>",   "Retro FC Plus 168 in 1 Handheld", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // "RETRO_FC_V3.5"  (doesn't boot, ends up in weeds after jumping to bank with no code, dump not verified)
+CONS( 201?, rfcp168,    0,        0,  vt_16mb,    nes_vt, vt02_vt03_state, empty_init, "<unknown>",   "Retro FC Plus 168 in 1 Handheld", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // "RETRO_FC_V3.5"  (doesn't boot, ends up in weeds after jumping to bank with no code, dump not verified)
 
-CONS( 200?, gprnrs1,    0,        0,  nes_vt_8mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "Game Prince RS-1", MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, gprnrs16,   0,        0,  nes_vt_32mb,   nes_vt, nes_vt_state, empty_init, "<unknown>", "Game Prince RS-16", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, gprnrs1,    0,        0,  vt_8mb,    nes_vt, vt02_vt03_state, empty_init, "<unknown>", "Game Prince RS-1", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, gprnrs16,   0,        0,  vt_32mb,   nes_vt, vt02_vt03_state, empty_init, "<unknown>", "Game Prince RS-16", MACHINE_IMPERFECT_GRAPHICS )
 
 // Notes about the DDR games:
 // * Missing PCM sounds (unsupported in NES VT APU code right now)
 // * Console has stereo output (dual RCA connectors).
-CONS( 2006, ddrdismx,   0,        0,  nes_vt_2mb, nes_vt_ddr, nes_vt_state, empty_init, "Majesco (licensed from Konami, Disney)", "Dance Dance Revolution Disney Mix",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // shows (c)2001 Disney onscreen, but that's recycled art from the Playstation release, actual release was 2006
-CONS( 2006, ddrstraw,   0,        0,  nes_vt_2mb, nes_vt_ddr, nes_vt_state, empty_init, "Majesco (licensed from Konami)",         "Dance Dance Revolution Strawberry Shortcake", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, ddrdismx,   0,        0,  vt_2mb, vt_ddr, vt02_vt03_state, empty_init, "Majesco (licensed from Konami, Disney)", "Dance Dance Revolution Disney Mix",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // shows (c)2001 Disney onscreen, but that's recycled art from the Playstation release, actual release was 2006
+CONS( 2006, ddrstraw,   0,        0,  vt_2mb, vt_ddr, vt02_vt03_state, empty_init, "Majesco (licensed from Konami)",         "Dance Dance Revolution Strawberry Shortcake", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // there is also a 'Spectra Light Edition' which could be a different ROM as the title screen on this one does show the unit type.
-CONS( 2006, dbdancem,   0,        0,  nes_vt_2mb, dbdancem, nes_vt_state, empty_init, "Senario", "Double Dance Mania - Techno Light Edition",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, dbdancem,   0,        0,  vt_2mb, dbdancem, vt02_vt03_state, empty_init, "Senario", "Double Dance Mania - Techno Light Edition",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // Unlike other Senario products this one is mostly just NES games, it also appears to be one of the final Senario products.
 // Some games aren't what they claim to be, Warpman is Soccer for example.
 // Senario had another 101 unit with different games (not JungleTac or NES bootlegs) it might be the same as the dreamGEAR 101 below
-CONS( 2009, sen101,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "Senario", "101 Games in 1 (Senario, NES/Famicom bootlegs)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2009, sen101,   0,        0,  vt_4mb,    nes_vt, vt02_vt03_state, empty_init, "Senario", "101 Games in 1 (Senario, NES/Famicom bootlegs)", MACHINE_IMPERFECT_GRAPHICS )
 
 // unsorted, these were all in nes.xml listed as ONE BUS systems
-CONS( 200?, mc_dg101,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "dreamGEAR", "dreamGEAR 101 in 1", MACHINE_IMPERFECT_GRAPHICS ) // dreamGear, but no enhanced games?
-CONS( 200?, mc_aa2,     0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "100 in 1 Arcade Action II (AT-103)", MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, mc_105te,   0,        0,  nes_vt_8mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "2011 Super HiK 105 in 1 Turbo Edition", MACHINE_NOT_WORKING )
-CONS( 200?, mc_8x6cb,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "CoolBoy",   "888888 in 1 (Coolboy AEF-390)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 200?, mc_9x6ss,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "999999 in 1 (PXP2 Slim Station)", MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, mc_9x6sa,   mc_9x6ss, 0,  nes_vt_2mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "999999 in 1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)", MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, mc_7x6ss,   0,        0,  nes_vt_1mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "777777 in 1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)", MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, mc_8x6ss,   0,        0,  nes_vt_1mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "888888 in 1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)", MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2004, mc_dcat8,   0,        0,  nes_vt_8mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "100 in 1 (D-CAT8 8bit Console, set 1) (v5.01.11-frd, BL 20041217)", MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2004, mc_dcat8a,  mc_dcat8, 0,  nes_vt_8mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "100 in 1 (D-CAT8 8bit Console, set 2)", MACHINE_IMPERFECT_GRAPHICS )
-CONS( 201?, fccomp88,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "Columbus Circle", "FC Compact 88-in-1 (CC-SFFC-WT) (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, mc_dg101,   0,        0,  vt_4mb,    nes_vt, vt02_vt03_state, empty_init, "dreamGEAR", "dreamGEAR 101 in 1", MACHINE_IMPERFECT_GRAPHICS ) // dreamGear, but no enhanced games?
+CONS( 200?, mc_aa2,     0,        0,  vt_4mb,    nes_vt, vt02_vt03_state, empty_init, "<unknown>", "100 in 1 Arcade Action II (AT-103)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, mc_105te,   0,        0,  vt_8mb,    nes_vt, vt02_vt03_state, empty_init, "<unknown>", "2011 Super HiK 105 in 1 Turbo Edition", MACHINE_NOT_WORKING )
+CONS( 200?, mc_8x6cb,   0,        0,  vt_4mb,    nes_vt, vt02_vt03_state, empty_init, "CoolBoy",   "888888 in 1 (Coolboy AEF-390)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, mc_9x6ss,   0,        0,  vt_4mb,    nes_vt, vt02_vt03_state, empty_init, "<unknown>", "999999 in 1 (PXP2 Slim Station)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, mc_9x6sa,   mc_9x6ss, 0,  vt_2mb,    nes_vt, vt02_vt03_state, empty_init, "<unknown>", "999999 in 1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, mc_7x6ss,   0,        0,  vt_1mb,    nes_vt, vt02_vt03_state, empty_init, "<unknown>", "777777 in 1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, mc_8x6ss,   0,        0,  vt_1mb,    nes_vt, vt02_vt03_state, empty_init, "<unknown>", "888888 in 1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2004, mc_dcat8,   0,        0,  vt_8mb,    nes_vt, vt02_vt03_state, empty_init, "<unknown>", "100 in 1 (D-CAT8 8bit Console, set 1) (v5.01.11-frd, BL 20041217)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2004, mc_dcat8a,  mc_dcat8, 0,  vt_8mb,    nes_vt, vt02_vt03_state, empty_init, "<unknown>", "100 in 1 (D-CAT8 8bit Console, set 2)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, fccomp88,   0,        0,  vt_4mb,    nes_vt, vt02_vt03_state, empty_init, "Columbus Circle", "FC Compact 88-in-1 (CC-SFFC-WT) (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
 // Runs well, all games seem to work
-CONS( 201?, mc_89in1,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "89 in 1 Mini Game Console (060-92023011V1.0)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, mc_89in1,   0,        0,  vt_4mb,    nes_vt, vt02_vt03_state, empty_init, "<unknown>", "89 in 1 Mini Game Console (060-92023011V1.0)", MACHINE_IMPERFECT_GRAPHICS )
 
 // Works fine, uses ony VT02 features
-CONS( 201?, mc_tv200,   0,        0,  nes_vt_8mb,    nes_vt, nes_vt_state, empty_init, "Thumbs Up", "200 in 1 Retro TV Game", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, mc_tv200,   0,        0,  vt_8mb,    nes_vt, vt02_vt03_state, empty_init, "Thumbs Up", "200 in 1 Retro TV Game", MACHINE_IMPERFECT_GRAPHICS )
 
 // TODO: add cart port and hook up nes_vt_cart.xml
-CONS( 201?, 88in1joy,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "Play Vision", "Joystick88", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, 88in1joy,   0,        0,  vt_4mb,    nes_vt, vt02_vt03_state, empty_init, "Play Vision", "Joystick88", MACHINE_IMPERFECT_GRAPHICS )
 
 
 // Runs fine, non-sport 121 in 1 games perfect, but minor graphical issues in
 // sport games, also no sound in menu or sport games due to missing PCM
 // emulation
-CONS( 200?, dgun2500,  0,  0,  nes_vt_16mb, nes_vt, nes_vt_state, empty_init, "dreamGEAR", "dreamGEAR Wireless Motion Control with 130 games (DGUN-2500)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
+CONS( 200?, dgun2500,  0,  0,  vt_16mb, nes_vt, vt02_vt03_state, empty_init, "dreamGEAR", "dreamGEAR Wireless Motion Control with 130 games (DGUN-2500)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
 
 // available in a number of colours, with various brands, but likely all the same.
 // This was a red coloured pad, contains various unlicensed bootleg reskinned NES game eg Blob Buster is a hack of Dig Dug 2 and there are also hacks of Xevious, Donkey Kong Jr, Donkey Kong 3 and many others.
 // Also available in handheld form where Supreme 200 is also shown on the main menu background
 // unclear if this is VT03 or VT09, the boot logo needs either VT09 or PAL mode for the DMA to be correct, dump is from a PAL unit
-CONS( 201?, ppgc200g,   0,         0,  nes_vt_pal_8mb, nes_vt, nes_vt_state, empty_init, "Fizz Creations", "Plug & Play Game Controller with 200 Games (Supreme 200)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, ppgc200g,   0,         0,  vt_pal_8mb, nes_vt, vt02_vt03_state, empty_init, "Fizz Creations", "Plug & Play Game Controller with 200 Games (Supreme 200)", MACHINE_IMPERFECT_GRAPHICS )
 
 // unknown tech level, it's most likely a vt09 or vt369 but isn't using any of the extended features
-CONS( 201?, dgun2869,  0,         0,  nes_vt_16mb,     nes_vt, nes_vt_state, empty_init, "dreamGEAR", "My Arcade Retro Micro Controller - 220 Built-In Video Games (DGUN-2869)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 201?, dgun2959,  0,         0,  nes_vt_pal_16mb, nes_vt, nes_vt_state, empty_init, "dreamGEAR", "My Arcade Plug And Play 220 Game Retro Controller (DGUN-2959)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 201?, dgun2869,  0,         0,  vt_16mb,     nes_vt, vt02_vt03_state, empty_init, "dreamGEAR", "My Arcade Retro Micro Controller - 220 Built-In Video Games (DGUN-2869)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 201?, dgun2959,  0,         0,  vt_pal_16mb, nes_vt, vt02_vt03_state, empty_init, "dreamGEAR", "My Arcade Plug And Play 220 Game Retro Controller (DGUN-2959)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // needs inputs - unit is a Mahjong controller.  This is said to be a hack(?) of a Famicom game (unless it was licensed by the original developer)
-CONS( 200?, tvmjfc,    0,        0,  nes_vt_2mb,    nes_vt, nes_vt_state, empty_init, "bootleg?", "TV Mahjong Game (VTxx hardware)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, tvmjfc,    0,        0,  vt_2mb,    nes_vt, vt02_vt03_state, empty_init, "bootleg?", "TV Mahjong Game (VTxx hardware)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )

@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-#ifndef MAME_NINTENDO_VT1682_IO_H
-#define MAME_NINTENDO_VT1682_IO_H
+#ifndef MAME_TVGAMES_VT1682_IO_H
+#define MAME_TVGAMES_VT1682_IO_H
 
 #pragma once
 
@@ -52,4 +52,4 @@ private:
 	devcb_read8 m_portd_in;
 };
 
-#endif // MAME_NINTENDO_VT1682_IO_H
+#endif // MAME_TVGAMES_VT1682_IO_H

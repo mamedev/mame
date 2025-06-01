@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_NINTENDO_M6502_SWAP_OP_D5_D6_H
-#define MAME_NINTENDO_M6502_SWAP_OP_D5_D6_H
+#ifndef MAME_TVGAMES_M6502_SWAP_OP_D5_D6_H
+#define MAME_TVGAMES_M6502_SWAP_OP_D5_D6_H
 
 #pragma once
 
@@ -93,4 +93,4 @@ private:
 DECLARE_DEVICE_TYPE(M6502_SWAP_OP_D5_D6, m6502_swap_op_d5_d6)
 DECLARE_DEVICE_TYPE(RP2A03_CORE_SWAP_OP_D5_D6, rp2a03_core_swap_op_d5_d6)
 
-#endif // MAME_NINTENDO_M6502_SWAP_OP_D5_D6_H
+#endif // MAME_TVGAMES_M6502_SWAP_OP_D5_D6_H

@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood
 /***************************************************************************
 
-  nes_vt369_vtunknown.cpp
+  vt369_vtunknown.cpp
 
   VT369 and unknown/higher
 
@@ -23,8 +23,8 @@
   ***************************************************************************/
 
 #include "emu.h"
-#include "nes_vt369_vtunknown_soc.h"
-#include "nes_vt32_soc.h"
+#include "vt369_vtunknown_soc.h"
+#include "vt32_soc.h"
 
 
 namespace {
@@ -70,7 +70,7 @@ protected:
 	required_region_ptr<u8> m_prgrom;
 
 	u8 vt_rom_r(offs_t offset);
-	void configure_soc(nes_vt02_vt03_soc_device* soc);
+	void configure_soc(vt02_vt03_soc_device* soc);
 
 	void extbank_w(u8 data);
 	void extbank_red5mam_w(u8 data);
@@ -109,7 +109,7 @@ public:
 protected:
 	u8 vt_rom_banked_r(offs_t offset);
 
-	required_device<nes_vt02_vt03_soc_device> m_soc;
+	required_device<vt02_vt03_soc_device> m_soc;
 };
 
 class vt3xx_bitboy_state : public vt369_state
@@ -386,7 +386,7 @@ void vt3xx_fapocket_state::machine_reset()
 	else
 		m_ahigh = 0;
 }
-void vt369_base_state::configure_soc(nes_vt02_vt03_soc_device* soc)
+void vt369_base_state::configure_soc(vt02_vt03_soc_device* soc)
 {
 	soc->set_addrmap(AS_PROGRAM, &vt369_state::vt_external_space_map_32mbyte);
 	soc->read_0_callback().set(FUNC(vt369_base_state::in0_r));
@@ -419,12 +419,12 @@ void vt369_base_state::upper_412c_w(u8 data)
 void vt369_state::vt369_4k_ram(machine_config &config)
 {
 	/* basic machine hardware */
-	NES_VT09_SOC(config, m_soc, NTSC_APU_CLOCK);
+	VT09_SOC(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 
-	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_read_412c_callback().set(FUNC(vt369_state::upper_412c_r));
-	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_read_412d_callback().set(FUNC(vt369_state::upper_412d_r));
-	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_write_412c_callback().set(FUNC(vt369_state::upper_412c_w));
+	dynamic_cast<vt09_soc_device&>(*m_soc).upper_read_412c_callback().set(FUNC(vt369_state::upper_412c_r));
+	dynamic_cast<vt09_soc_device&>(*m_soc).upper_read_412d_callback().set(FUNC(vt369_state::upper_412d_r));
+	dynamic_cast<vt09_soc_device&>(*m_soc).upper_write_412c_callback().set(FUNC(vt369_state::upper_412c_w));
 }
 
 void vt369_state::vt369_4k_ram_16mb(machine_config &config)
@@ -456,7 +456,7 @@ void vt3xx_bitboy_state::vt3xx_bitboy_2x16mb(machine_config& config)
 	vt3xx_bitboy(config);
 	m_soc->set_addrmap(AS_PROGRAM, &vt3xx_bitboy_state::vt_external_space_map_bitboy_2x16mbyte);
 
-	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_write_412c_callback().set(FUNC(vt3xx_bitboy_state::bittboy_412c_w));
+	dynamic_cast<vt09_soc_device&>(*m_soc).upper_write_412c_callback().set(FUNC(vt3xx_bitboy_state::bittboy_412c_w));
 }
 
 void vt36x_state::vt369_unk(machine_config &config)
@@ -693,8 +693,8 @@ void vt3xx_fapocket_state::vt369_fa_4x16mb(machine_config& config) // fapocket
 
 	m_soc->set_addrmap(AS_PROGRAM, &vt3xx_fapocket_state::vt_external_space_map_fapocket_4x16mbyte);
 
-	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_read_412c_callback().set(FUNC(vt3xx_fapocket_state::fapocket_412c_r));
-	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_write_412c_callback().set(FUNC(vt3xx_fapocket_state::fapocket_412c_w));
+	dynamic_cast<vt09_soc_device&>(*m_soc).upper_read_412c_callback().set(FUNC(vt3xx_fapocket_state::fapocket_412c_r));
+	dynamic_cast<vt09_soc_device&>(*m_soc).upper_write_412c_callback().set(FUNC(vt3xx_fapocket_state::fapocket_412c_w));
 }
 
 static INPUT_PORTS_START( vt369_fa )

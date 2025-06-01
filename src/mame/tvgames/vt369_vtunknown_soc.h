@@ -1,11 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_NINTENDO_NES_VT369_VTUNKNOWN_SOC_H
-#define MAME_NINTENDO_NES_VT369_VTUNKNOWN_SOC_H
+#ifndef MAME_TVGAMES_VT369_VTUNKNOWN_SOC_H
+#define MAME_TVGAMES_VT369_VTUNKNOWN_SOC_H
 
 #pragma once
 
-#include "nes_vt09_soc.h"
+#include "vt09_soc.h"
 #include "vt369_adpcm.h"
 
 #include "cpu/m6502/rp2a03.h"
@@ -18,7 +18,7 @@
 #include "screen.h"
 #include "speaker.h"
 
-class vt3xx_soc_base_device : public nes_vt09_soc_device
+class vt3xx_soc_base_device : public vt09_soc_device
 {
 public:
 	vt3xx_soc_base_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
@@ -128,7 +128,7 @@ public:
 protected:
 	virtual void device_add_mconfig(machine_config& config) override;
 
-	void nes_vt_bt_map(address_map &map) ATTR_COLD;
+	void vt_bt_map(address_map &map) ATTR_COLD;
 
 	void vt03_412c_extbank_w(u8 data);
 };
@@ -189,7 +189,7 @@ protected:
 
 	virtual void device_add_mconfig(machine_config& config) override;
 
-	void nes_vt_dg_map(address_map &map) ATTR_COLD;
+	void vt_dg_map(address_map &map) ATTR_COLD;
 
 	void vt03_411c_w(u8 data);
 };
@@ -203,7 +203,7 @@ protected:
 
 	virtual void device_add_mconfig(machine_config& config) override;
 
-	void nes_vt_fa_map(address_map &map) ATTR_COLD;
+	void vt_fa_map(address_map &map) ATTR_COLD;
 
 	u8 vtfa_412c_r();
 	void vtfa_412c_extbank_w(u8 data);
@@ -223,4 +223,4 @@ DECLARE_DEVICE_TYPE(VT3XX_SOC_UNK_BT, vt3xx_soc_unk_bt_device)
 DECLARE_DEVICE_TYPE(VT3XX_SOC_UNK_DG, vt3xx_soc_unk_dg_device)
 DECLARE_DEVICE_TYPE(VT3XX_SOC_UNK_FA, vt3xx_soc_unk_fa_device)
 
-#endif // MAME_NINTENDO_NES_VT369_VTUNKNOWN_SOC_H
+#endif // MAME_TVGAMES_VT369_VTUNKNOWN_SOC_H

@@ -54,28 +54,28 @@
 **************************************************************************/
 
 #include "emu.h"
-#include "nes_vt_soc.h"
+#include "vt_soc.h"
 
 
-DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC,              nes_vt02_vt03_soc_device,              "nes_vt02_vt03_soc",             "VT02/03 series System on a Chip (NTSC)")
-DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_PAL,          nes_vt02_vt03_soc_pal_device,          "nes_vt02_vt03_soc_pal",         "VT02/03 series System on a Chip (PAL)")
+DEFINE_DEVICE_TYPE(VT02_VT03_SOC,              vt02_vt03_soc_device,              "vt02_vt03_soc",             "VT02/03 series System on a Chip (NTSC)")
+DEFINE_DEVICE_TYPE(VT02_VT03_SOC_PAL,          vt02_vt03_soc_pal_device,          "vt02_vt03_soc_pal",         "VT02/03 series System on a Chip (PAL)")
 
-DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_WAIXING,      nes_vt02_vt03_soc_waixing_device,      "nes_vt02_vt03_soc_waixing",     "VT02/03 series System on a Chip (Waixing, NTSC)")
-DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_WAIXING_PAL,  nes_vt02_vt03_soc_waixing_pal_device,  "nes_vt02_vt03_soc_waixing_pal", "VT02/03 series System on a Chip (Waixing, PAL)")
+DEFINE_DEVICE_TYPE(VT02_VT03_SOC_WAIXING,      vt02_vt03_soc_waixing_device,      "vt02_vt03_soc_waixing",     "VT02/03 series System on a Chip (Waixing, NTSC)")
+DEFINE_DEVICE_TYPE(VT02_VT03_SOC_WAIXING_PAL,  vt02_vt03_soc_waixing_pal_device,  "vt02_vt03_soc_waixing_pal", "VT02/03 series System on a Chip (Waixing, PAL)")
 
-DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_HUMMER,       nes_vt02_vt03_soc_hummer_device,       "nes_vt02_vt03_soc_hummer",      "VT02/03 series System on a Chip (Hummer, NTSC)")
+DEFINE_DEVICE_TYPE(VT02_VT03_SOC_HUMMER,       vt02_vt03_soc_hummer_device,       "vt02_vt03_soc_hummer",      "VT02/03 series System on a Chip (Hummer, NTSC)")
 
-DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_SPORTS,       nes_vt02_vt03_soc_sports_device,       "nes_vt02_vt03_soc_sports",      "VT02/03 series System on a Chip (Sports, NTSC)")
-DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_SPORTS_PAL,   nes_vt02_vt03_soc_sports_pal_device,   "nes_vt02_vt03_soc_sports_pal",  "VT02/03 series System on a Chip (Sports, PAL)")
+DEFINE_DEVICE_TYPE(VT02_VT03_SOC_SPORTS,       vt02_vt03_soc_sports_device,       "vt02_vt03_soc_sports",      "VT02/03 series System on a Chip (Sports, NTSC)")
+DEFINE_DEVICE_TYPE(VT02_VT03_SOC_SPORTS_PAL,   vt02_vt03_soc_sports_pal_device,   "vt02_vt03_soc_sports_pal",  "VT02/03 series System on a Chip (Sports, PAL)")
 
-DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_SCRAMBLE,     nes_vt02_vt03_soc_scramble_device,     "nes_vt02_vt03_soc_scram",       "VT02/03 series System on a Chip (NTSC, with simple Opcode scrambling)")
-DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_SCRAMBLE_PAL, nes_vt02_vt03_soc_scramble_pal_device, "nes_vt02_vt03_soc_pal_scram",   "VT02/03 series System on a Chip (PAL, with simple Opcode scrambling)")
+DEFINE_DEVICE_TYPE(VT02_VT03_SOC_SCRAMBLE,     vt02_vt03_soc_scramble_device,     "vt02_vt03_soc_scram",       "VT02/03 series System on a Chip (NTSC, with simple Opcode scrambling)")
+DEFINE_DEVICE_TYPE(VT02_VT03_SOC_SCRAMBLE_PAL, vt02_vt03_soc_scramble_pal_device, "vt02_vt03_soc_pal_scram",   "VT02/03 series System on a Chip (PAL, with simple Opcode scrambling)")
 
-void nes_vt02_vt03_soc_device::program_map(address_map &map)
+void vt02_vt03_soc_device::program_map(address_map &map)
 {
 }
 
-nes_vt02_vt03_soc_device::nes_vt02_vt03_soc_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock) :
+vt02_vt03_soc_device::vt02_vt03_soc_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),
@@ -88,7 +88,7 @@ nes_vt02_vt03_soc_device::nes_vt02_vt03_soc_device(const machine_config& mconfig
 	m_4150_write_cb(*this),
 	m_411e_write_cb(*this),
 	m_41e6_write_cb(*this),
-	m_space_config("program", ENDIANNESS_LITTLE, 8, 25, 0, address_map_constructor(FUNC(nes_vt02_vt03_soc_device::program_map), this)),
+	m_space_config("program", ENDIANNESS_LITTLE, 8, 25, 0, address_map_constructor(FUNC(vt02_vt03_soc_device::program_map), this)),
 	m_write_0_callback(*this),
 	m_read_0_callback(*this, 0xff),
 	m_read_1_callback(*this, 0xff),
@@ -122,66 +122,66 @@ nes_vt02_vt03_soc_device::nes_vt02_vt03_soc_device(const machine_config& mconfig
 	m_use_raster_timing_hack = false;
 }
 
-nes_vt02_vt03_soc_device::nes_vt02_vt03_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
-	nes_vt02_vt03_soc_device(mconfig, NES_VT02_VT03_SOC, tag, owner, clock)
+vt02_vt03_soc_device::vt02_vt03_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+	vt02_vt03_soc_device(mconfig, VT02_VT03_SOC, tag, owner, clock)
 {
 }
 
-nes_vt02_vt03_soc_pal_device::nes_vt02_vt03_soc_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
-	nes_vt02_vt03_soc_device(mconfig, NES_VT02_VT03_SOC_PAL, tag, owner, clock)
-{
-}
-
-
-
-nes_vt02_vt03_soc_waixing_device::nes_vt02_vt03_soc_waixing_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock) :
-	nes_vt02_vt03_soc_device(mconfig, type, tag, owner, clock)
-{
-}
-
-nes_vt02_vt03_soc_waixing_device::nes_vt02_vt03_soc_waixing_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
-	nes_vt02_vt03_soc_waixing_device(mconfig, NES_VT02_VT03_SOC_WAIXING, tag, owner, clock)
-{
-}
-
-nes_vt02_vt03_soc_waixing_pal_device::nes_vt02_vt03_soc_waixing_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
-	nes_vt02_vt03_soc_waixing_device(mconfig, NES_VT02_VT03_SOC_WAIXING_PAL, tag, owner, clock)
+vt02_vt03_soc_pal_device::vt02_vt03_soc_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+	vt02_vt03_soc_device(mconfig, VT02_VT03_SOC_PAL, tag, owner, clock)
 {
 }
 
 
-nes_vt02_vt03_soc_hummer_device::nes_vt02_vt03_soc_hummer_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
-	nes_vt02_vt03_soc_device(mconfig, NES_VT02_VT03_SOC_HUMMER, tag, owner, clock)
+
+vt02_vt03_soc_waixing_device::vt02_vt03_soc_waixing_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock) :
+	vt02_vt03_soc_device(mconfig, type, tag, owner, clock)
 {
 }
 
-nes_vt02_vt03_soc_sports_device::nes_vt02_vt03_soc_sports_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock) :
-	nes_vt02_vt03_soc_device(mconfig, type, tag, owner, clock)
+vt02_vt03_soc_waixing_device::vt02_vt03_soc_waixing_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+	vt02_vt03_soc_waixing_device(mconfig, VT02_VT03_SOC_WAIXING, tag, owner, clock)
 {
 }
 
-nes_vt02_vt03_soc_sports_device::nes_vt02_vt03_soc_sports_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
-	nes_vt02_vt03_soc_sports_device(mconfig, NES_VT02_VT03_SOC_SPORTS, tag, owner, clock)
-{
-}
-
-nes_vt02_vt03_soc_sports_pal_device::nes_vt02_vt03_soc_sports_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
-	nes_vt02_vt03_soc_sports_device(mconfig, NES_VT02_VT03_SOC_SPORTS_PAL, tag, owner, clock)
+vt02_vt03_soc_waixing_pal_device::vt02_vt03_soc_waixing_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+	vt02_vt03_soc_waixing_device(mconfig, VT02_VT03_SOC_WAIXING_PAL, tag, owner, clock)
 {
 }
 
 
-nes_vt02_vt03_soc_scramble_device::nes_vt02_vt03_soc_scramble_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
-	nes_vt02_vt03_soc_device(mconfig, NES_VT02_VT03_SOC_SCRAMBLE, tag, owner, clock)
+vt02_vt03_soc_hummer_device::vt02_vt03_soc_hummer_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+	vt02_vt03_soc_device(mconfig, VT02_VT03_SOC_HUMMER, tag, owner, clock)
 {
 }
 
-nes_vt02_vt03_soc_scramble_pal_device::nes_vt02_vt03_soc_scramble_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
-	nes_vt02_vt03_soc_device(mconfig, NES_VT02_VT03_SOC_SCRAMBLE_PAL, tag, owner, clock)
+vt02_vt03_soc_sports_device::vt02_vt03_soc_sports_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock) :
+	vt02_vt03_soc_device(mconfig, type, tag, owner, clock)
 {
 }
 
-void nes_vt02_vt03_soc_device::device_start()
+vt02_vt03_soc_sports_device::vt02_vt03_soc_sports_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+	vt02_vt03_soc_sports_device(mconfig, VT02_VT03_SOC_SPORTS, tag, owner, clock)
+{
+}
+
+vt02_vt03_soc_sports_pal_device::vt02_vt03_soc_sports_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+	vt02_vt03_soc_sports_device(mconfig, VT02_VT03_SOC_SPORTS_PAL, tag, owner, clock)
+{
+}
+
+
+vt02_vt03_soc_scramble_device::vt02_vt03_soc_scramble_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+	vt02_vt03_soc_device(mconfig, VT02_VT03_SOC_SCRAMBLE, tag, owner, clock)
+{
+}
+
+vt02_vt03_soc_scramble_pal_device::vt02_vt03_soc_scramble_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+	vt02_vt03_soc_device(mconfig, VT02_VT03_SOC_SCRAMBLE_PAL, tag, owner, clock)
+{
+}
+
+void vt02_vt03_soc_device::device_start()
 {
 	save_item(NAME(m_410x));
 
@@ -204,16 +204,16 @@ void nes_vt02_vt03_soc_device::device_start()
 	m_chrram = std::make_unique<u8[]>(0x2000);
 	save_pointer(NAME(m_chrram), 0x2000);
 
-	m_ppu->set_scanline_callback(*this, FUNC(nes_vt02_vt03_soc_device::scanline_irq));
-	m_ppu->set_hblank_callback(*this, FUNC(nes_vt02_vt03_soc_device::hblank_irq));
+	m_ppu->set_scanline_callback(*this, FUNC(vt02_vt03_soc_device::scanline_irq));
+	m_ppu->set_hblank_callback(*this, FUNC(vt02_vt03_soc_device::hblank_irq));
 
 	//m_ppu->set_hblank_callback(*m_cartslot->m_cart, FUNC(device_nes_cart_interface::hblank_irq)));
 	//m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8sm_delegate(*m_cartslot->m_cart, FUNC(device_nes_cart_interface::chr_r)), write8sm_delegate(*m_cartslot->m_cart, FUNC(device_nes_cart_interface::chr_w)));
-	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8sm_delegate(*this, FUNC(nes_vt02_vt03_soc_device::nt_r)), write8sm_delegate(*this, FUNC(nes_vt02_vt03_soc_device::nt_w)));
-	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8sm_delegate(*this, FUNC(nes_vt02_vt03_soc_device::chr_r)), write8sm_delegate(*this, FUNC(nes_vt02_vt03_soc_device::chr_w)));
+	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8sm_delegate(*this, FUNC(vt02_vt03_soc_device::nt_r)), write8sm_delegate(*this, FUNC(vt02_vt03_soc_device::nt_w)));
+	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8sm_delegate(*this, FUNC(vt02_vt03_soc_device::chr_r)), write8sm_delegate(*this, FUNC(vt02_vt03_soc_device::chr_w)));
 }
 
-void nes_vt02_vt03_soc_device::device_reset()
+void vt02_vt03_soc_device::device_reset()
 {
 	// what are the actual defaults?
 	m_410x[0x0] = 0x00;
@@ -247,7 +247,7 @@ void nes_vt02_vt03_soc_device::device_reset()
 
 }
 
-u32 nes_vt02_vt03_soc_device::get_banks(u8 bnk)
+u32 vt02_vt03_soc_device::get_banks(u8 bnk)
 {
 	switch (m_410x[0xb] & 0x07)
 	{
@@ -265,7 +265,7 @@ u32 nes_vt02_vt03_soc_device::get_banks(u8 bnk)
 }
 
 // 8000 needs to bank in 60000  ( bank 0x30 )
-void nes_vt02_vt03_soc_device::update_banks()
+void vt02_vt03_soc_device::update_banks()
 {
 	u8 bank;
 
@@ -304,7 +304,7 @@ void nes_vt02_vt03_soc_device::update_banks()
 	m_bankaddr[3] = get_banks(bank);
 }
 
-u16 nes_vt02_vt03_soc_device::decode_nt_addr(u16 addr)
+u16 vt02_vt03_soc_device::decode_nt_addr(u16 addr)
 {
 	bool vert_mirror = !(m_410x[0x6] & 0x01);
 	int a11 = (addr >> 11) & 0x01;
@@ -313,12 +313,12 @@ u16 nes_vt02_vt03_soc_device::decode_nt_addr(u16 addr)
 	return ((vert_mirror ? a10 : a11) << 10) | base;
 }
 
-void nes_vt02_vt03_soc_device::vt03_410x_w(offs_t offset, u8 data)
+void vt02_vt03_soc_device::vt03_410x_w(offs_t offset, u8 data)
 {
 	scrambled_410x_w(offset, data);
 }
 
-u8 nes_vt02_vt03_soc_device::vt03_410x_r(offs_t offset)
+u8 vt02_vt03_soc_device::vt03_410x_r(offs_t offset)
 {
 	return m_410x[offset];
 }
@@ -326,7 +326,7 @@ u8 nes_vt02_vt03_soc_device::vt03_410x_r(offs_t offset)
 
 // Source: https://wiki.nesdev.com/w/index.php/NES_2.0_submappers/Proposals#NES_2.0_Mapper_256
 
-void nes_vt02_vt03_soc_device::scrambled_410x_w(u16 offset, u8 data)
+void vt02_vt03_soc_device::scrambled_410x_w(u16 offset, u8 data)
 {
 	switch (offset)
 	{
@@ -423,7 +423,7 @@ void nes_vt02_vt03_soc_device::scrambled_410x_w(u16 offset, u8 data)
 
 
 
-u8 nes_vt02_vt03_soc_device::spr_r(offs_t offset)
+u8 vt02_vt03_soc_device::spr_r(offs_t offset)
 {
 	int realaddr = calculate_real_video_address(offset, 1);
 
@@ -431,7 +431,7 @@ u8 nes_vt02_vt03_soc_device::spr_r(offs_t offset)
 	return spc.read_byte(get_relative() + realaddr);
 }
 
-u8 nes_vt02_vt03_soc_device::chr_r(offs_t offset)
+u8 vt02_vt03_soc_device::chr_r(offs_t offset)
 {
 	int realaddr = calculate_real_video_address(offset, 0);
 
@@ -440,7 +440,7 @@ u8 nes_vt02_vt03_soc_device::chr_r(offs_t offset)
 }
 
 
-void nes_vt02_vt03_soc_device::chr_w(offs_t offset, u8 data)
+void vt02_vt03_soc_device::chr_w(offs_t offset, u8 data)
 {
 	if (m_4242 & 0x1 || m_411d & 0x04) // newer VT platforms only (not VT03/09), split out
 	{
@@ -458,17 +458,17 @@ void nes_vt02_vt03_soc_device::chr_w(offs_t offset, u8 data)
 
 
 
-void nes_vt02_vt03_soc_device::scanline_irq(int scanline, bool vblank, bool blanked)
+void vt02_vt03_soc_device::scanline_irq(int scanline, bool vblank, bool blanked)
 {
 	video_irq(false, scanline, vblank, blanked);
 }
 
-void nes_vt02_vt03_soc_device::hblank_irq(int scanline, bool vblank, bool blanked)
+void vt02_vt03_soc_device::hblank_irq(int scanline, bool vblank, bool blanked)
 {
 	video_irq(true, scanline, vblank, blanked);
 }
 
-void nes_vt02_vt03_soc_device::video_irq(bool hblank, int scanline, bool vblank, bool blanked)
+void vt02_vt03_soc_device::video_irq(bool hblank, int scanline, bool vblank, bool blanked)
 {
 	//TSYNEN
 	if (((m_410x[0xb] >> 7) & 0x01) == hblank)
@@ -499,19 +499,19 @@ void nes_vt02_vt03_soc_device::video_irq(bool hblank, int scanline, bool vblank,
 }
 
 /* todo, handle custom VT nametable stuff here */
-u8 nes_vt02_vt03_soc_device::nt_r(offs_t offset)
+u8 vt02_vt03_soc_device::nt_r(offs_t offset)
 {
 	return m_ntram[decode_nt_addr(offset)];
 }
 
-void nes_vt02_vt03_soc_device::nt_w(offs_t offset, u8 data)
+void vt02_vt03_soc_device::nt_w(offs_t offset, u8 data)
 {
 	//logerror("nt wr %04x %02x", offset, data);
 	m_ntram[decode_nt_addr(offset)] = data;
 }
 
 
-int nes_vt02_vt03_soc_device::calculate_va17_va10(int addr)
+int vt02_vt03_soc_device::calculate_va17_va10(int addr)
 {
 	/*
 	Calculating TVA17 - TVA10
@@ -620,7 +620,7 @@ int nes_vt02_vt03_soc_device::calculate_va17_va10(int addr)
 }
 
 
-int nes_vt02_vt03_soc_device::calculate_real_video_address(int addr, int readtype)
+int vt02_vt03_soc_device::calculate_real_video_address(int addr, int readtype)
 {
 	// this is what gets passed in
 	//      00Pb bbtt tttt plll
@@ -732,13 +732,13 @@ int nes_vt02_vt03_soc_device::calculate_real_video_address(int addr, int readtyp
 }
 
 /*
-   nes_vt02_vt03_soc_device::vt03_8000_mapper_w notes
+   vt02_vt03_soc_device::vt03_8000_mapper_w notes
 
      used for MMC3/other mapper compatibility
      some consoles have scrambled registers for crude copy protection
 */
 
-void nes_vt02_vt03_soc_device::scrambled_8000_w(u16 offset, u8 data)
+void vt02_vt03_soc_device::scrambled_8000_w(u16 offset, u8 data)
 {
 	offset &= 0x7fff;
 	u16 addr = offset+0x8000;
@@ -833,7 +833,7 @@ void nes_vt02_vt03_soc_device::scrambled_8000_w(u16 offset, u8 data)
 
 // MMC3 compatibility mode
 
-void nes_vt02_vt03_soc_device::set_8000_scramble(u8 reg0, u8 reg1, u8 reg2, u8 reg3, u8 reg4, u8 reg5)
+void vt02_vt03_soc_device::set_8000_scramble(u8 reg0, u8 reg1, u8 reg2, u8 reg3, u8 reg4, u8 reg5)
 {
 	m_8000_scramble[0] = reg0; // TODO: name the regs
 	m_8000_scramble[1] = reg1;
@@ -844,7 +844,7 @@ void nes_vt02_vt03_soc_device::set_8000_scramble(u8 reg0, u8 reg1, u8 reg2, u8 r
 
 }
 
-void nes_vt02_vt03_soc_device::set_8006_scramble(u8 reg6, u8 reg7)
+void vt02_vt03_soc_device::set_8006_scramble(u8 reg6, u8 reg7)
 {
 	// not for PPU?
 	m_8006_scramble[0] = reg6;
@@ -852,20 +852,20 @@ void nes_vt02_vt03_soc_device::set_8006_scramble(u8 reg6, u8 reg7)
 }
 
 
-void nes_vt02_vt03_soc_device::set_410x_scramble(u8 reg0, u8 reg1)
+void vt02_vt03_soc_device::set_410x_scramble(u8 reg0, u8 reg1)
 {
 	m_410x_scramble[0] = reg0; // TODO: name the regs
 	m_410x_scramble[1] = reg1;
 }
 
-void nes_vt02_vt03_soc_device::vt03_8000_mapper_w(offs_t offset, u8 data)
+void vt02_vt03_soc_device::vt03_8000_mapper_w(offs_t offset, u8 data)
 {
 	scrambled_8000_w(offset, data);
 	//logerror("%s: vt03_8000_mapper_w (%04x) %02x\n", machine().describe_context(), offset+0x8000, data );
 }
 
 // early units (VT03?) have a DMA bug in NTSC mode
-void nes_vt02_vt03_soc_device::vt_dma_w(u8 data)
+void vt02_vt03_soc_device::vt_dma_w(u8 data)
 {
 	if (!m_force_baddma)
 		do_dma(data, true);
@@ -875,7 +875,7 @@ void nes_vt02_vt03_soc_device::vt_dma_w(u8 data)
 
 
 
-void nes_vt02_vt03_soc_device::do_dma(u8 data, bool has_ntsc_bug)
+void vt02_vt03_soc_device::do_dma(u8 data, bool has_ntsc_bug)
 {
 	// only NTSC systems have 'broken' DMA which requires the DMA addresses to be shifted by 1, PAL systems work as expected
 	if (m_ppu->get_is_pal())
@@ -928,14 +928,14 @@ void nes_vt02_vt03_soc_device::do_dma(u8 data, bool has_ntsc_bug)
 }
 
 // probably VT3xx only, not earlier?
-void nes_vt02_vt03_soc_device::vt3xx_4024_new_dma_middle_w(u8 data)
+void vt02_vt03_soc_device::vt3xx_4024_new_dma_middle_w(u8 data)
 {
 	logerror("%s: vt3xx_4024_new_dma_middle_w %02x (VT3xx newer DMA middle bits?)\n", machine().describe_context(), data);
 	// can set all 8-bits of the lower address using this register
 	m_4024_newdma = data;
 }
 
-void nes_vt02_vt03_soc_device::vt03_4034_w(u8 data)
+void vt02_vt03_soc_device::vt03_4034_w(u8 data)
 {
 	logerror("%s: vt03_4034_w %02x (2nd APU DMA / new DMA)\n", machine().describe_context(), data);
 	m_vdma_ctrl = data;
@@ -950,22 +950,22 @@ void nes_vt02_vt03_soc_device::vt03_4034_w(u8 data)
 	}
 }
 
-u8 nes_vt02_vt03_soc_device::in0_r()
+u8 vt02_vt03_soc_device::in0_r()
 {
 	return m_read_0_callback();
 }
 
-u8 nes_vt02_vt03_soc_device::in1_r()
+u8 vt02_vt03_soc_device::in1_r()
 {
 	return m_read_1_callback();
 }
 
-void nes_vt02_vt03_soc_device::in0_w(offs_t offset, u8 data)
+void vt02_vt03_soc_device::in0_w(offs_t offset, u8 data)
 {
 	m_write_0_callback(offset, data);
 }
 
-void nes_vt02_vt03_soc_device::extra_io_control_w(u8 data)
+void vt02_vt03_soc_device::extra_io_control_w(u8 data)
 {
 	/*
 	410d Extra I/O control
@@ -983,7 +983,7 @@ void nes_vt02_vt03_soc_device::extra_io_control_w(u8 data)
 	logerror("%s: extra_io_control_w %02x\n", machine().describe_context(), data);
 }
 
-u8 nes_vt02_vt03_soc_device::extrain_01_r()
+u8 vt02_vt03_soc_device::extrain_01_r()
 {
 	// TODO: check status of 410d port to make sure we only read from enabled ports
 	u8 in0 = 0x00, in1 = 0x00;
@@ -994,7 +994,7 @@ u8 nes_vt02_vt03_soc_device::extrain_01_r()
 	return in0 | (in1<<4);
 }
 
-u8 nes_vt02_vt03_soc_device::extrain_23_r()
+u8 vt02_vt03_soc_device::extrain_23_r()
 {
 	// TODO: check status of 410d port to make sure we only read from enabled ports
 	u8 in2 = 0x00, in3 = 0x00;
@@ -1005,19 +1005,19 @@ u8 nes_vt02_vt03_soc_device::extrain_23_r()
 	return in2 | (in3<<4);
 }
 
-void nes_vt02_vt03_soc_device::extraout_01_w(u8 data)
+void vt02_vt03_soc_device::extraout_01_w(u8 data)
 {
 	// TODO: use callbacks for this as output can be hooked up to anything
 	logerror("%s: extraout_01_w %02x\n", machine().describe_context(), data);
 }
 
-void nes_vt02_vt03_soc_device::extraout_23_w(u8 data)
+void vt02_vt03_soc_device::extraout_23_w(u8 data)
 {
 	// TODO: use callbacks for this as output can be hooked up to anything
 	logerror("%s: extraout_23_w %02x\n", machine().describe_context(), data);
 }
 
-u8 nes_vt02_vt03_soc_device::rs232flags_region_r()
+u8 vt02_vt03_soc_device::rs232flags_region_r()
 {
 	/*
 	0x4119 RS232 Flags + Region
@@ -1043,7 +1043,7 @@ u8 nes_vt02_vt03_soc_device::rs232flags_region_r()
 }
 
 
-u8 nes_vt02_vt03_soc_device::external_space_read(offs_t offset)
+u8 vt02_vt03_soc_device::external_space_read(offs_t offset)
 {
 	address_space& spc = this->space(AS_PROGRAM);
 	int bank = (offset & 0x6000) >> 13;
@@ -1052,7 +1052,7 @@ u8 nes_vt02_vt03_soc_device::external_space_read(offs_t offset)
 	return spc.read_byte(address);
 }
 
-void nes_vt02_vt03_soc_device::external_space_write(offs_t offset, u8 data)
+void vt02_vt03_soc_device::external_space_write(offs_t offset, u8 data)
 {
 	if ((m_410x[0xb] & 0x08))
 	{
@@ -1067,7 +1067,7 @@ void nes_vt02_vt03_soc_device::external_space_write(offs_t offset, u8 data)
 	}
 };
 
-void nes_vt02_vt03_soc_device::nes_vt_map(address_map &map)
+void vt02_vt03_soc_device::vt_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().mirror(0x1800); // zudugo relies on mirror when selecting 'game' menu
 
@@ -1077,7 +1077,7 @@ void nes_vt02_vt03_soc_device::nes_vt_map(address_map &map)
 	// 2010 - 201f are extended regs, and can differ between VT models
 	map(0x2010, 0x2010).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::extended_modes_enable_r), FUNC(ppu_vt03_device::extended_modes_enable_w));
 	map(0x2011, 0x2011).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::extended_modes2_enable_r), FUNC(ppu_vt03_device::extended_modes2_enable_w));
-	nes_vt_2012_to_2017_regs(map);// 2012 - 2017 map differently on some SoC types (re-ordered)
+	vt_2012_to_2017_regs(map);// 2012 - 2017 map differently on some SoC types (re-ordered)
 	map(0x2018, 0x2018).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank1_r), FUNC(ppu_vt03_device::videobank1_w));
 	map(0x2019, 0x2019).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::unk_2019_r), FUNC(ppu_vt03_device::gun_reset_w));
 	map(0x201a, 0x201a).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_extra_r), FUNC(ppu_vt03_device::videobank0_extra_w));
@@ -1088,32 +1088,32 @@ void nes_vt02_vt03_soc_device::nes_vt_map(address_map &map)
 	map(0x201f, 0x201f).mirror(0x00e0).r(m_ppu, FUNC(ppu_vt03_device::gun2_y_r));
 
 	map(0x4000, 0x4017).w(m_apu, FUNC(nes_apu_vt_device::write));
-	map(0x4014, 0x4014).w(FUNC(nes_vt02_vt03_soc_device::vt_dma_w));
+	map(0x4014, 0x4014).w(FUNC(vt02_vt03_soc_device::vt_dma_w));
 	map(0x4015, 0x4015).r(m_apu, FUNC(nes_apu_vt_device::status_r)); // PSG status / first control register
-	map(0x4016, 0x4016).rw(FUNC(nes_vt02_vt03_soc_device::in0_r), FUNC(nes_vt02_vt03_soc_device::in0_w));
-	map(0x4017, 0x4017).r(FUNC(nes_vt02_vt03_soc_device::in1_r));
+	map(0x4016, 0x4016).rw(FUNC(vt02_vt03_soc_device::in0_r), FUNC(vt02_vt03_soc_device::in0_w));
+	map(0x4017, 0x4017).r(FUNC(vt02_vt03_soc_device::in1_r));
 
-	map(0x4034, 0x4034).w(FUNC(nes_vt02_vt03_soc_device::vt03_4034_w)); // secondary DMA
+	map(0x4034, 0x4034).w(FUNC(vt02_vt03_soc_device::vt03_4034_w)); // secondary DMA
 
-	map(0x4100, 0x410b).r(FUNC(nes_vt02_vt03_soc_device::vt03_410x_r)).w(FUNC(nes_vt02_vt03_soc_device::vt03_410x_w));
+	map(0x4100, 0x410b).r(FUNC(vt02_vt03_soc_device::vt03_410x_r)).w(FUNC(vt02_vt03_soc_device::vt03_410x_w));
 	// 0x410c unused
-	map(0x410d, 0x410d).w(FUNC(nes_vt02_vt03_soc_device::extra_io_control_w));
-	map(0x410e, 0x410e).rw(FUNC(nes_vt02_vt03_soc_device::extrain_01_r), FUNC(nes_vt02_vt03_soc_device::extraout_01_w));
-	map(0x410f, 0x410f).rw(FUNC(nes_vt02_vt03_soc_device::extrain_23_r), FUNC(nes_vt02_vt03_soc_device::extraout_23_w));
+	map(0x410d, 0x410d).w(FUNC(vt02_vt03_soc_device::extra_io_control_w));
+	map(0x410e, 0x410e).rw(FUNC(vt02_vt03_soc_device::extrain_01_r), FUNC(vt02_vt03_soc_device::extraout_01_w));
+	map(0x410f, 0x410f).rw(FUNC(vt02_vt03_soc_device::extrain_23_r), FUNC(vt02_vt03_soc_device::extraout_23_w));
 	// 0x4114 RS232 timer (low)
 	// 0x4115 RS232 timer (high)
 	// 0x4116 unused
 	// 0x4117 unused
 	// 0x4118 unused
-	map(0x4119, 0x4119).r(FUNC(nes_vt02_vt03_soc_device::rs232flags_region_r));
+	map(0x4119, 0x4119).r(FUNC(vt02_vt03_soc_device::rs232flags_region_r));
 	// 0x411a RS232 TX data
 	// 0x411b RS232 RX data
 
-	map(0x8000, 0xffff).rw(FUNC(nes_vt02_vt03_soc_device::external_space_read), FUNC(nes_vt02_vt03_soc_device::external_space_write));
+	map(0x8000, 0xffff).rw(FUNC(vt02_vt03_soc_device::external_space_read), FUNC(vt02_vt03_soc_device::external_space_write));
 	map(0x6000, 0x7fff).ram();
 }
 
-void nes_vt02_vt03_soc_device::nes_vt_2012_to_2017_regs(address_map &map)
+void vt02_vt03_soc_device::vt_2012_to_2017_regs(address_map &map)
 {
 	map(0x2012, 0x2012).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_0_r), FUNC(ppu_vt03_device::videobank0_0_w));
 	map(0x2013, 0x2013).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_1_r), FUNC(ppu_vt03_device::videobank0_1_w));
@@ -1123,7 +1123,7 @@ void nes_vt02_vt03_soc_device::nes_vt_2012_to_2017_regs(address_map &map)
 	map(0x2017, 0x2017).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_5_r), FUNC(ppu_vt03_device::videobank0_5_w));
 }
 
-void nes_vt02_vt03_soc_waixing_device::nes_vt_2012_to_2017_regs(address_map& map)
+void vt02_vt03_soc_waixing_device::vt_2012_to_2017_regs(address_map& map)
 {
 	map(0x2012, 0x2012).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_1_r), FUNC(ppu_vt03_device::videobank0_1_w));
 	map(0x2013, 0x2013).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_0_r), FUNC(ppu_vt03_device::videobank0_0_w));
@@ -1133,7 +1133,7 @@ void nes_vt02_vt03_soc_waixing_device::nes_vt_2012_to_2017_regs(address_map& map
 	map(0x2017, 0x2017).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_2_r), FUNC(ppu_vt03_device::videobank0_2_w));
 }
 
-void nes_vt02_vt03_soc_hummer_device::nes_vt_2012_to_2017_regs(address_map& map)
+void vt02_vt03_soc_hummer_device::vt_2012_to_2017_regs(address_map& map)
 {
 	map(0x2012, 0x2012).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_5_r), FUNC(ppu_vt03_device::videobank0_5_w));
 	map(0x2013, 0x2013).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_4_r), FUNC(ppu_vt03_device::videobank0_4_w));
@@ -1143,7 +1143,7 @@ void nes_vt02_vt03_soc_hummer_device::nes_vt_2012_to_2017_regs(address_map& map)
 	map(0x2017, 0x2017).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_1_r), FUNC(ppu_vt03_device::videobank0_1_w));
 }
 
-void nes_vt02_vt03_soc_sports_device::nes_vt_2012_to_2017_regs(address_map& map)
+void vt02_vt03_soc_sports_device::vt_2012_to_2017_regs(address_map& map)
 {
 	map(0x2012, 0x2012).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_2_r), FUNC(ppu_vt03_device::videobank0_2_w));
 	map(0x2013, 0x2013).mirror(0x00e0).rw(m_ppu, FUNC(ppu_vt03_device::videobank0_5_r), FUNC(ppu_vt03_device::videobank0_5_w));
@@ -1155,40 +1155,40 @@ void nes_vt02_vt03_soc_sports_device::nes_vt_2012_to_2017_regs(address_map& map)
 
 
 
-void nes_vt02_vt03_soc_device::apu_irq(int state)
+void vt02_vt03_soc_device::apu_irq(int state)
 {
 	// TODO
 //  set_input_line(RP2A03_APU_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-u8 nes_vt02_vt03_soc_device::apu_read_mem(offs_t offset)
+u8 vt02_vt03_soc_device::apu_read_mem(offs_t offset)
 {
 	// TODO
 	return 0x00;//mintf->program->read_byte(offset);
 }
 
-u32 nes_vt02_vt03_soc_device::screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
+u32 vt02_vt03_soc_device::screen_update(screen_device& screen, bitmap_rgb32& bitmap, const rectangle& cliprect)
 {
 	return m_ppu->screen_update(screen, bitmap, cliprect);
 }
 
 
-device_memory_interface::space_config_vector nes_vt02_vt03_soc_device::memory_space_config() const
+device_memory_interface::space_config_vector vt02_vt03_soc_device::memory_space_config() const
 {
 	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_space_config)
 	};
 }
 
-void nes_vt02_vt03_soc_device::do_pal_timings_and_ppu_replacement(machine_config& config)
+void vt02_vt03_soc_device::do_pal_timings_and_ppu_replacement(machine_config& config)
 {
 	m_maincpu->set_clock(PALC_APU_CLOCK);
 
 	PPU_VT03PAL(config.replace(), m_ppu, RP2A03_PAL_XTAL);
 	m_ppu->set_cpu_tag(m_maincpu);
 	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	m_ppu->read_bg().set(FUNC(nes_vt02_vt03_soc_device::chr_r));
-	m_ppu->read_sp().set(FUNC(nes_vt02_vt03_soc_device::spr_r));
+	m_ppu->read_bg().set(FUNC(vt02_vt03_soc_device::chr_r));
+	m_ppu->read_sp().set(FUNC(vt02_vt03_soc_device::spr_r));
 	m_ppu->set_screen(m_screen);
 
 	m_screen->set_refresh_hz(50.0070);
@@ -1199,10 +1199,10 @@ void nes_vt02_vt03_soc_device::do_pal_timings_and_ppu_replacement(machine_config
 }
 
 
-void nes_vt02_vt03_soc_device::device_add_mconfig(machine_config &config)
+void vt02_vt03_soc_device::device_add_mconfig(machine_config &config)
 {
 	RP2A03_CORE(config, m_maincpu, NTSC_APU_CLOCK); // Butterfly Catch in vgpocket confirms RP2A03 core type, not 6502
-	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt02_vt03_soc_device::nes_vt_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vt02_vt03_soc_device::vt_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60.0988);
@@ -1210,40 +1210,40 @@ void nes_vt02_vt03_soc_device::device_add_mconfig(machine_config &config)
 							 (ppu2c0x_device::VBLANK_LAST_SCANLINE_NTSC-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)));
 	m_screen->set_size(32*8, 262);
 	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(nes_vt02_vt03_soc_device::screen_update));
+	m_screen->set_screen_update(FUNC(vt02_vt03_soc_device::screen_update));
 
 	PPU_VT03(config, m_ppu, RP2A03_NTSC_XTAL);
 	m_ppu->set_cpu_tag(m_maincpu);
 	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	m_ppu->read_bg().set(FUNC(nes_vt02_vt03_soc_device::chr_r));
-	m_ppu->read_sp().set(FUNC(nes_vt02_vt03_soc_device::spr_r));
+	m_ppu->read_bg().set(FUNC(vt02_vt03_soc_device::chr_r));
+	m_ppu->read_sp().set(FUNC(vt02_vt03_soc_device::spr_r));
 	m_ppu->set_screen(m_screen);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	NES_APU_VT(config, m_apu, NTSC_APU_CLOCK);
-	m_apu->irq().set(FUNC(nes_vt02_vt03_soc_device::apu_irq));
-	m_apu->mem_read().set(FUNC(nes_vt02_vt03_soc_device::apu_read_mem));
+	m_apu->irq().set(FUNC(vt02_vt03_soc_device::apu_irq));
+	m_apu->mem_read().set(FUNC(vt02_vt03_soc_device::apu_read_mem));
 	m_apu->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
-void nes_vt02_vt03_soc_pal_device::device_add_mconfig(machine_config& config)
+void vt02_vt03_soc_pal_device::device_add_mconfig(machine_config& config)
 {
-	nes_vt02_vt03_soc_device::device_add_mconfig(config);
+	vt02_vt03_soc_device::device_add_mconfig(config);
 	do_pal_timings_and_ppu_replacement(config);
 }
 
 
-void nes_vt02_vt03_soc_waixing_pal_device::device_add_mconfig(machine_config& config)
+void vt02_vt03_soc_waixing_pal_device::device_add_mconfig(machine_config& config)
 {
-	nes_vt02_vt03_soc_waixing_device::device_add_mconfig(config);
+	vt02_vt03_soc_waixing_device::device_add_mconfig(config);
 	do_pal_timings_and_ppu_replacement(config);
 }
 
-void nes_vt02_vt03_soc_sports_pal_device::device_add_mconfig(machine_config& config)
+void vt02_vt03_soc_sports_pal_device::device_add_mconfig(machine_config& config)
 {
-	nes_vt02_vt03_soc_sports_device::device_add_mconfig(config);
+	vt02_vt03_soc_sports_device::device_add_mconfig(config);
 	do_pal_timings_and_ppu_replacement(config);
 }
 
@@ -1251,19 +1251,19 @@ void nes_vt02_vt03_soc_sports_pal_device::device_add_mconfig(machine_config& con
 /* 'Scramble' specifics */
 /***********************************************************************************************************************************************************/
 
-void nes_vt02_vt03_soc_scramble_device::device_add_mconfig(machine_config& config)
+void vt02_vt03_soc_scramble_device::device_add_mconfig(machine_config& config)
 {
-	nes_vt02_vt03_soc_device::device_add_mconfig(config);
+	vt02_vt03_soc_device::device_add_mconfig(config);
 
 	RP2A03_CORE_SWAP_OP_D5_D6(config.replace(), m_maincpu, NTSC_APU_CLOCK); // Insect Chase in polmega confirms RP2A03 core type, not 6502
-	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt02_vt03_soc_scramble_device::nes_vt_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vt02_vt03_soc_scramble_device::vt_map);
 }
 
-void nes_vt02_vt03_soc_scramble_pal_device::device_add_mconfig(machine_config& config)
+void vt02_vt03_soc_scramble_pal_device::device_add_mconfig(machine_config& config)
 {
-	nes_vt02_vt03_soc_device::device_add_mconfig(config);
+	vt02_vt03_soc_device::device_add_mconfig(config);
 
 	RP2A03_CORE_SWAP_OP_D5_D6(config.replace(), m_maincpu, PAL_APU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt02_vt03_soc_scramble_pal_device::nes_vt_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vt02_vt03_soc_scramble_pal_device::vt_map);
 	do_pal_timings_and_ppu_replacement(config);
 }

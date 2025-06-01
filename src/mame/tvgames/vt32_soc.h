@@ -1,12 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-#ifndef MAME_NINTENDO_NES_VT32_SOC_H
-#define MAME_NINTENDO_NES_VT32_SOC_H
+#ifndef MAME_TVGAMES_VT32_SOC_H
+#define MAME_TVGAMES_VT32_SOC_H
 
 #pragma once
 
 #include "m6502_swap_op_d5_d6.h"
-#include "nes_vt09_soc.h"
+#include "vt09_soc.h"
 #include "rp2a03_vtscr.h"
 
 #include "cpu/m6502/rp2a03.h"
@@ -17,20 +17,20 @@
 #include "speaker.h"
 
 
-class nes_vt32_soc_device : public nes_vt09_soc_device
+class vt32_soc_device : public vt09_soc_device
 {
 public:
-	nes_vt32_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
+	vt32_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
 
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	nes_vt32_soc_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock);
+	vt32_soc_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock);
 
 	virtual void device_add_mconfig(machine_config& config) override ATTR_COLD;
 
-	void nes_vt32_soc_map(address_map &map) ATTR_COLD;
+	void vt32_soc_map(address_map &map) ATTR_COLD;
 
 	virtual void scrambled_8000_w(u16 offset, u8 data) override;
 
@@ -54,10 +54,10 @@ private:
 	int m_ppu_chr_data_scramble;
 };
 
-class nes_vt32_soc_pal_device : public nes_vt32_soc_device
+class vt32_soc_pal_device : public vt32_soc_device
 {
 public:
-	nes_vt32_soc_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
+	vt32_soc_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config& config) override ATTR_COLD;
@@ -66,7 +66,7 @@ protected:
 };
 
 
-DECLARE_DEVICE_TYPE(NES_VT32_SOC, nes_vt32_soc_device)
-DECLARE_DEVICE_TYPE(NES_VT32_SOC_PAL, nes_vt32_soc_pal_device)
+DECLARE_DEVICE_TYPE(VT32_SOC, vt32_soc_device)
+DECLARE_DEVICE_TYPE(VT32_SOC_PAL, vt32_soc_pal_device)
 
-#endif // MAME_NINTENDO_NES_VT32_SOC_H
+#endif // MAME_TVGAMES_VT32_SOC_H

@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood
 /***************************************************************************
 
-  nes_vt09.cpp
+  vt09.cpp
 
   VT09 and higher go in here
 
@@ -18,7 +18,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "nes_vt09_soc.h"
+#include "vt09_soc.h"
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
@@ -28,10 +28,10 @@
 
 namespace {
 
-class nes_vt09_common_base_state : public driver_device
+class vt09_common_base_state : public driver_device
 {
 public:
-	nes_vt09_common_base_state(const machine_config& mconfig, device_type type, const char* tag) :
+	vt09_common_base_state(const machine_config& mconfig, device_type type, const char* tag) :
 		driver_device(mconfig, type, tag),
 		m_io0(*this, "IO0"),
 		m_io1(*this, "IO1"),
@@ -47,7 +47,7 @@ protected:
 	virtual uint8_t in1_r();
 	virtual void in0_w(uint8_t data);
 
-	void nes_vt09_map(address_map &map) ATTR_COLD;
+	void vt09_map(address_map &map) ATTR_COLD;
 
 	optional_ioport m_io0;
 	optional_ioport m_io1;
@@ -63,7 +63,7 @@ protected:
 	uint8_t vt_rom_r(offs_t offset);
 	[[maybe_unused]] void vtspace_w(offs_t offset, uint8_t data);
 
-	void configure_soc(nes_vt02_vt03_soc_device* soc);
+	void configure_soc(vt02_vt03_soc_device* soc);
 
 	uint8_t upper_412c_r();
 	uint8_t upper_412d_r();
@@ -74,11 +74,11 @@ private:
 	template <uint8_t NUM> uint8_t extrain_r();
 };
 
-class nes_vt09_common_state : public nes_vt09_common_base_state
+class vt09_common_state : public vt09_common_base_state
 {
 public:
-	nes_vt09_common_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt09_common_base_state(mconfig, type, tag),
+	vt09_common_state(const machine_config& mconfig, device_type type, const char* tag) :
+		vt09_common_base_state(mconfig, type, tag),
 		m_soc(*this, "soc")
 	{ }
 
@@ -92,38 +92,38 @@ public:
 
 
 protected:
-	required_device<nes_vt02_vt03_soc_device> m_soc;
+	required_device<vt02_vt03_soc_device> m_soc;
 };
 
-class nes_vt09_state : public nes_vt09_common_state
+class vt09_state : public vt09_common_state
 {
 public:
-	nes_vt09_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt09_common_state(mconfig, type, tag)
+	vt09_state(const machine_config& mconfig, device_type type, const char* tag) :
+		vt09_common_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt09(machine_config& config);
-	void nes_vt09_1mb(machine_config& config);
-	void nes_vt09_2mb(machine_config& config);
-	void nes_vt09_4mb(machine_config& config);
-	void nes_vt09_4mb_rasterhack(machine_config& config);
-	void nes_vt09_8mb(machine_config& config);
-	void nes_vt09_16mb(machine_config& config);
+	void vt09(machine_config& config);
+	void vt09_1mb(machine_config& config);
+	void vt09_2mb(machine_config& config);
+	void vt09_4mb(machine_config& config);
+	void vt09_4mb_rasterhack(machine_config& config);
+	void vt09_8mb(machine_config& config);
+	void vt09_16mb(machine_config& config);
 
 private:
 };
 
-class nes_vt09_cart_state : public nes_vt09_state
+class vt09_cart_state : public vt09_state
 {
 public:
-	nes_vt09_cart_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_vt09_state(mconfig, type, tag),
+	vt09_cart_state(const machine_config& mconfig, device_type type, const char* tag) :
+		vt09_state(mconfig, type, tag),
 		m_bank(*this, "cartbank"),
 		m_cart(*this, "cartslot"),
 		m_cart_region(nullptr)
 	{ }
 
-	void nes_vt09_cart(machine_config& config);
+	void vt09_cart(machine_config& config);
 
 protected:
 	void machine_start() override ATTR_COLD;
@@ -138,9 +138,9 @@ private:
 	memory_region *m_cart_region;
 };
 
-void nes_vt09_cart_state::machine_start()
+void vt09_cart_state::machine_start()
 {
-	nes_vt09_state::machine_start();
+	vt09_state::machine_start();
 
 	m_bank->configure_entries(0, 1, memregion("mainrom")->base(), 0x200000);
 	m_bank->set_entry(0);
@@ -154,7 +154,7 @@ void nes_vt09_cart_state::machine_start()
 	}
 }
 
-DEVICE_IMAGE_LOAD_MEMBER(nes_vt09_cart_state::cart_load)
+DEVICE_IMAGE_LOAD_MEMBER(vt09_cart_state::cart_load)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -165,59 +165,59 @@ DEVICE_IMAGE_LOAD_MEMBER(nes_vt09_cart_state::cart_load)
 }
 
 
-uint8_t nes_vt09_common_base_state::vt_rom_r(offs_t offset)
+uint8_t vt09_common_base_state::vt_rom_r(offs_t offset)
 {
 	return m_prgrom[offset];
 }
 
-void nes_vt09_common_base_state::vtspace_w(offs_t offset, uint8_t data)
+void vt09_common_base_state::vtspace_w(offs_t offset, uint8_t data)
 {
 	logerror("%s: vtspace_w %08x : %02x", machine().describe_context(), offset, data);
 }
 
 // VTxx can address 25-bit address space (32MB of ROM) so use maps with mirroring in depending on ROM size
-void nes_vt09_common_state::vt_external_space_map_32mbyte(address_map &map)
+void vt09_common_state::vt_external_space_map_32mbyte(address_map &map)
 {
-	map(0x0000000, 0x1ffffff).r(FUNC(nes_vt09_common_state::vt_rom_r));
+	map(0x0000000, 0x1ffffff).r(FUNC(vt09_common_state::vt_rom_r));
 }
 
-void nes_vt09_common_state::vt_external_space_map_16mbyte(address_map &map)
+void vt09_common_state::vt_external_space_map_16mbyte(address_map &map)
 {
-	map(0x0000000, 0x0ffffff).mirror(0x1000000).r(FUNC(nes_vt09_common_state::vt_rom_r));
+	map(0x0000000, 0x0ffffff).mirror(0x1000000).r(FUNC(vt09_common_state::vt_rom_r));
 }
 
-void nes_vt09_common_state::vt_external_space_map_8mbyte(address_map &map)
+void vt09_common_state::vt_external_space_map_8mbyte(address_map &map)
 {
-	map(0x0000000, 0x07fffff).mirror(0x1800000).r(FUNC(nes_vt09_common_state::vt_rom_r));
+	map(0x0000000, 0x07fffff).mirror(0x1800000).r(FUNC(vt09_common_state::vt_rom_r));
 }
 
-void nes_vt09_common_state::vt_external_space_map_4mbyte(address_map &map)
+void vt09_common_state::vt_external_space_map_4mbyte(address_map &map)
 {
-	map(0x0000000, 0x03fffff).mirror(0x1c00000).r(FUNC(nes_vt09_common_state::vt_rom_r));
+	map(0x0000000, 0x03fffff).mirror(0x1c00000).r(FUNC(vt09_common_state::vt_rom_r));
 }
 
-void nes_vt09_common_state::vt_external_space_map_2mbyte(address_map &map)
+void vt09_common_state::vt_external_space_map_2mbyte(address_map &map)
 {
-	map(0x0000000, 0x01fffff).mirror(0x1e00000).r(FUNC(nes_vt09_common_state::vt_rom_r));
+	map(0x0000000, 0x01fffff).mirror(0x1e00000).r(FUNC(vt09_common_state::vt_rom_r));
 }
 
-void nes_vt09_common_state::vt_external_space_map_1mbyte(address_map &map)
+void vt09_common_state::vt_external_space_map_1mbyte(address_map &map)
 {
-	map(0x0000000, 0x00fffff).mirror(0x1f00000).r(FUNC(nes_vt09_common_state::vt_rom_r));
+	map(0x0000000, 0x00fffff).mirror(0x1f00000).r(FUNC(vt09_common_state::vt_rom_r));
 }
 
-void nes_vt09_common_state::vt_external_space_map_512kbyte(address_map &map)
+void vt09_common_state::vt_external_space_map_512kbyte(address_map &map)
 {
-	map(0x0000000, 0x007ffff).mirror(0x1f80000).r(FUNC(nes_vt09_common_state::vt_rom_r));
+	map(0x0000000, 0x007ffff).mirror(0x1f80000).r(FUNC(vt09_common_state::vt_rom_r));
 }
 
-void nes_vt09_cart_state::vt_external_space_map_cart(address_map &map)
+void vt09_cart_state::vt_external_space_map_cart(address_map &map)
 {
 	map(0x0000000, 0x01fffff).mirror(0x1e00000).bankr("cartbank");
 }
 
 
-template <uint8_t NUM> uint8_t nes_vt09_common_base_state::extrain_r()
+template <uint8_t NUM> uint8_t vt09_common_base_state::extrain_r()
 {
 	if (m_exin[NUM])
 		return m_exin[NUM]->read();
@@ -231,7 +231,7 @@ template <uint8_t NUM> uint8_t nes_vt09_common_base_state::extrain_r()
 
 /* Standard I/O handlers (NES Controller clone) */
 
-uint8_t nes_vt09_common_base_state::in0_r()
+uint8_t vt09_common_base_state::in0_r()
 {
 	//logerror("%s: in0_r\n", machine().describe_context());
 	uint8_t ret = 0x40;
@@ -240,7 +240,7 @@ uint8_t nes_vt09_common_base_state::in0_r()
 	return ret;
 }
 
-uint8_t nes_vt09_common_base_state::in1_r()
+uint8_t vt09_common_base_state::in1_r()
 {
 	//logerror("%s: in1_r\n", machine().describe_context());
 	uint8_t ret = 0x40;
@@ -249,7 +249,7 @@ uint8_t nes_vt09_common_base_state::in1_r()
 	return ret;
 }
 
-void nes_vt09_common_base_state::in0_w(uint8_t data)
+void vt09_common_base_state::in0_w(uint8_t data)
 {
 	//logerror("%s: in0_w %02x\n", machine().describe_context(), data);
 	if ((data & 0x01) != (m_previous_port0 & 0x01))
@@ -265,7 +265,7 @@ void nes_vt09_common_base_state::in0_w(uint8_t data)
 }
 
 
-void nes_vt09_common_base_state::machine_start()
+void vt09_common_base_state::machine_start()
 {
 	m_latch0 = 0;
 	m_latch1 = 0;
@@ -276,100 +276,100 @@ void nes_vt09_common_base_state::machine_start()
 	save_item(NAME(m_previous_port0));
 }
 
-void nes_vt09_common_base_state::machine_reset()
+void vt09_common_base_state::machine_reset()
 {
 }
 
-void nes_vt09_common_base_state::configure_soc(nes_vt02_vt03_soc_device* soc)
+void vt09_common_base_state::configure_soc(vt02_vt03_soc_device* soc)
 {
-	soc->set_addrmap(AS_PROGRAM, &nes_vt09_common_state::vt_external_space_map_32mbyte);
-	soc->read_0_callback().set(FUNC(nes_vt09_common_base_state::in0_r));
-	soc->read_1_callback().set(FUNC(nes_vt09_common_base_state::in1_r));
-	soc->write_0_callback().set(FUNC(nes_vt09_common_base_state::in0_w));
+	soc->set_addrmap(AS_PROGRAM, &vt09_common_state::vt_external_space_map_32mbyte);
+	soc->read_0_callback().set(FUNC(vt09_common_base_state::in0_r));
+	soc->read_1_callback().set(FUNC(vt09_common_base_state::in1_r));
+	soc->write_0_callback().set(FUNC(vt09_common_base_state::in0_w));
 
-	soc->extra_read_0_callback().set(FUNC(nes_vt09_common_base_state::extrain_r<0>));
-	soc->extra_read_1_callback().set(FUNC(nes_vt09_common_base_state::extrain_r<1>));
-	soc->extra_read_2_callback().set(FUNC(nes_vt09_common_base_state::extrain_r<2>));
-	soc->extra_read_3_callback().set(FUNC(nes_vt09_common_base_state::extrain_r<3>));
+	soc->extra_read_0_callback().set(FUNC(vt09_common_base_state::extrain_r<0>));
+	soc->extra_read_1_callback().set(FUNC(vt09_common_base_state::extrain_r<1>));
+	soc->extra_read_2_callback().set(FUNC(vt09_common_base_state::extrain_r<2>));
+	soc->extra_read_3_callback().set(FUNC(vt09_common_base_state::extrain_r<3>));
 }
 
 
-uint8_t nes_vt09_common_base_state::upper_412c_r()
+uint8_t vt09_common_base_state::upper_412c_r()
 {
 	logerror("%s: upper_412c_r\n", machine().describe_context());
 	return 0x00;
 }
 
-uint8_t nes_vt09_common_base_state::upper_412d_r()
+uint8_t vt09_common_base_state::upper_412d_r()
 {
 	logerror("%s: upper_412d_r\n", machine().describe_context());
 	return 0x00;
 }
 
-void nes_vt09_common_base_state::upper_412c_w(uint8_t data)
+void vt09_common_base_state::upper_412c_w(uint8_t data)
 {
 	logerror("%s: upper_412c_w %02x\n", machine().describe_context(), data);
 }
 
 
 
-void nes_vt09_state::nes_vt09(machine_config &config)
+void vt09_state::vt09(machine_config &config)
 {
 	/* basic machine hardware */
-	NES_VT09_SOC(config, m_soc, NTSC_APU_CLOCK);
+	VT09_SOC(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 
-	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_read_412c_callback().set(FUNC(nes_vt09_state::upper_412c_r));
-	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_read_412d_callback().set(FUNC(nes_vt09_state::upper_412d_r));
-	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_write_412c_callback().set(FUNC(nes_vt09_state::upper_412c_w));
+	dynamic_cast<vt09_soc_device&>(*m_soc).upper_read_412c_callback().set(FUNC(vt09_state::upper_412c_r));
+	dynamic_cast<vt09_soc_device&>(*m_soc).upper_read_412d_callback().set(FUNC(vt09_state::upper_412d_r));
+	dynamic_cast<vt09_soc_device&>(*m_soc).upper_write_412c_callback().set(FUNC(vt09_state::upper_412c_w));
 
 	m_soc->force_bad_dma();
 }
 
-void nes_vt09_state::nes_vt09_16mb(machine_config& config)
+void vt09_state::vt09_16mb(machine_config& config)
 {
-	nes_vt09(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09_state::vt_external_space_map_16mbyte);
+	vt09(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt09_state::vt_external_space_map_16mbyte);
 }
 
-void nes_vt09_state::nes_vt09_8mb(machine_config& config)
+void vt09_state::vt09_8mb(machine_config& config)
 {
-	nes_vt09(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09_state::vt_external_space_map_8mbyte);
+	vt09(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt09_state::vt_external_space_map_8mbyte);
 }
 
-void nes_vt09_state::nes_vt09_1mb(machine_config& config)
+void vt09_state::vt09_1mb(machine_config& config)
 {
-	nes_vt09(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09_state::vt_external_space_map_1mbyte);
+	vt09(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt09_state::vt_external_space_map_1mbyte);
 }
 
-void nes_vt09_state::nes_vt09_2mb(machine_config& config)
+void vt09_state::vt09_2mb(machine_config& config)
 {
-	nes_vt09(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09_state::vt_external_space_map_2mbyte);
+	vt09(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt09_state::vt_external_space_map_2mbyte);
 }
 
-void nes_vt09_state::nes_vt09_4mb(machine_config& config)
+void vt09_state::vt09_4mb(machine_config& config)
 {
-	nes_vt09(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09_state::vt_external_space_map_4mbyte);
+	vt09(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt09_state::vt_external_space_map_4mbyte);
 }
 
-void nes_vt09_state::nes_vt09_4mb_rasterhack(machine_config& config)
+void vt09_state::vt09_4mb_rasterhack(machine_config& config)
 {
-	nes_vt09_4mb(config);
+	vt09_4mb(config);
 	m_soc->force_raster_timing_hack();
 }
 
-void nes_vt09_cart_state::nes_vt09_cart(machine_config& config)
+void vt09_cart_state::vt09_cart(machine_config& config)
 {
-	nes_vt09(config);
-	m_soc->set_addrmap(AS_PROGRAM, &nes_vt09_cart_state::vt_external_space_map_cart);
+	vt09(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt09_cart_state::vt_external_space_map_cart);
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "nes_vt_cart");
 	m_cart->set_width(GENERIC_ROM8_WIDTH);
-	m_cart->set_device_load(FUNC(nes_vt09_cart_state::cart_load));
+	m_cart->set_device_load(FUNC(vt09_cart_state::cart_load));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("nes_vt_cart");
 }
@@ -396,7 +396,7 @@ static INPUT_PORTS_START( nes_vt09 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( nes_vt09_msi )
+static INPUT_PORTS_START( vt09_msi )
 	PORT_START("IO0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("A")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("B")
@@ -412,7 +412,7 @@ static INPUT_PORTS_START( nes_vt09_msi )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( nes_vt09_msi_mm2 )
+static INPUT_PORTS_START( vt09_msi_mm2 )
 	PORT_START("IO0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("A")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("B")
@@ -544,42 +544,42 @@ ROM_END
 
 // There are meant to be multiple revisions of this software, some with theme tunes for the new wrestlers, some without. This one appears to lack them.
 // 2 box variations exist, one with Randy Savage in purple attire and another with green, this was dumped from a unit with purple on the box.
-CONS( 2017, msiwwe,     0,      0,  nes_vt09_2mb, nes_vt09_msi, nes_vt09_state, empty_init, "MSI", "WWE Wrestlemania Steel Cage Challenge (Plug & Play) (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2017, msiwwe,     0,      0,  vt09_2mb, vt09_msi, vt09_state, empty_init, "MSI", "WWE Wrestlemania Steel Cage Challenge (Plug & Play) (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // this one was dumped from the version with Randy Savage in green, the box was much larger than the other one.  This one also has new theme music for the adjusted roster.
-CONS( 2017, msiwwea,    msiwwe, 0,  nes_vt09_1mb, nes_vt09_msi, nes_vt09_state, empty_init, "MSI", "WWE Wrestlemania Steel Cage Challenge (Plug & Play) (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2017, msiwwea,    msiwwe, 0,  vt09_1mb, vt09_msi, vt09_state, empty_init, "MSI", "WWE Wrestlemania Steel Cage Challenge (Plug & Play) (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2017, msidd,      0,  0,  nes_vt09_2mb, nes_vt09_msi, nes_vt09_state, empty_init, "MSI / Arc System Works", "Double Dragon - 30 Years Anniversary (Plug & Play)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2017, msidd,      0,  0,  vt09_2mb, vt09_msi, vt09_state, empty_init, "MSI / Arc System Works", "Double Dragon - 30 Years Anniversary (Plug & Play)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2016, msimpac,    0,  0,  nes_vt09_1mb, nes_vt09_msi, nes_vt09_state, empty_init, "MSI / Bandai Namco", "Ms. Pac-Man (MSI Plug & Play)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2016, msimpac,    0,  0,  vt09_1mb, vt09_msi, vt09_state, empty_init, "MSI / Bandai Namco", "Ms. Pac-Man (MSI Plug & Play)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2017, msimm2,     0,  0,  nes_vt09_4mb, nes_vt09_msi_mm2, nes_vt09_state, empty_init, "MSI / Capcom", "Mega Man 2 (MSI Plug & Play)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // various issues (glitched Metal Man stage boss, missing 'ready' text) happen on real unit
+CONS( 2017, msimm2,     0,  0,  vt09_4mb, vt09_msi_mm2, vt09_state, empty_init, "MSI / Capcom", "Mega Man 2 (MSI Plug & Play)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // various issues (glitched Metal Man stage boss, missing 'ready' text) happen on real unit
 
-CONS( 2016, msisinv,    0,  0,  nes_vt09_1mb, nes_vt09_msi, nes_vt09_state, empty_init, "MSI / Taito", "Space Invaders (MSI Plug & Play)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2016, msisinv,    0,  0,  vt09_1mb, vt09_msi, vt09_state, empty_init, "MSI / Taito", "Space Invaders (MSI Plug & Play)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // This is from the version with the same case type as the above MSI units.
 // MSI also issued a version in the original Majesco shell but with the updated case logos and boot logos in the software, the software on that revision might match this one.
-CONS( 2016, msifrog,    0,  0,  nes_vt09_4mb_rasterhack, nes_vt09_msi, nes_vt09_state, empty_init, "MSI / Konami", "Frogger (MSI Plug & Play, white joystick)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) //  raster timing for need a hack
+CONS( 2016, msifrog,    0,  0,  vt09_4mb_rasterhack, vt09_msi, vt09_state, empty_init, "MSI / Konami", "Frogger (MSI Plug & Play, white joystick)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) //  raster timing for need a hack
 
-CONS( 2018, msinamco,   0,  0,  nes_vt09_1mb, nes_vt09_msi, nes_vt09_state, empty_init, "MSI / Bandai Namco", "Namco Classics Vol.1 (3-in-1) (MSI Plug & Play)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2018, msinamco,   0,  0,  vt09_1mb, vt09_msi, vt09_state, empty_init, "MSI / Bandai Namco", "Namco Classics Vol.1 (3-in-1) (MSI Plug & Play)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // MSI Midway (Joust+Gauntlet 2 + Defender 2) has 2x Globs, rather than Glob + Flash ROM
 
 // this is VT09 based
-CONS( 2009, cybar120,  0,  0,  nes_vt09_16mb,nes_vt09, nes_vt09_state, empty_init, "Defender / JungleTac",                      "Defender M2500P 120-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 200?, vsmaxtx2,  0,  0,  nes_vt09_4mb, nes_vt09, nes_vt09_state, empty_init, "Senario / JungleTac",                       "Vs Maxx TX-2 50-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 200?, senario25, 0,  0,  nes_vt09_2mb, nes_vt09, nes_vt09_state, empty_init, "Senario / JungleTac",                       "25 Video Games - All in 1 Video System (Senario)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // no Vs Maxx branding, newer style packaging
-CONS( 200?, rcapnp,    0,  0,  nes_vt09_2mb, nes_vt09, nes_vt09_state, empty_init, "RCA / JungleTac",                           "RCA NS-500 30-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 200?, dturbogt,  0,  0,  nes_vt09_8mb, nes_vt09, nes_vt09_state, empty_init, "dreamGEAR / JungleTac",                     "Turbo GT 50-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 200?, ventur25,  0,  0,  nes_vt09_4mb, nes_vt09, nes_vt09_state, empty_init, "<unknown> / JungleTac",                     "Venturer '25 Games' 25-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 200?, joypad65,  0,  0,  nes_vt09_8mb, nes_vt09, nes_vt09_state, empty_init, "WinFun / JungleTac",                        "Joypad 65", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 200?, wfmotor,   0,  0,  nes_vt09_4mb, nes_vt09, nes_vt09_state, empty_init, "WinFun / JungleTac",                        "Motorcycle 30-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 2005, vgpocket,  0,  0,  nes_vt09_4mb, nes_vt09, nes_vt09_state, empty_init, "Performance Designed Products / JungleTac", "VG Pocket (VG-2000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 200?, vgpmini,   0,  0,  nes_vt09_4mb, nes_vt09, nes_vt09_state, empty_init, "Performance Designed Products / JungleTac", "VG Pocket Mini (VG-1500)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2009, cybar120,  0,  0,  vt09_16mb,nes_vt09, vt09_state, empty_init, "Defender / JungleTac",                      "Defender M2500P 120-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, vsmaxtx2,  0,  0,  vt09_4mb, nes_vt09, vt09_state, empty_init, "Senario / JungleTac",                       "Vs Maxx TX-2 50-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, senario25, 0,  0,  vt09_2mb, nes_vt09, vt09_state, empty_init, "Senario / JungleTac",                       "25 Video Games - All in 1 Video System (Senario)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // no Vs Maxx branding, newer style packaging
+CONS( 200?, rcapnp,    0,  0,  vt09_2mb, nes_vt09, vt09_state, empty_init, "RCA / JungleTac",                           "RCA NS-500 30-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, dturbogt,  0,  0,  vt09_8mb, nes_vt09, vt09_state, empty_init, "dreamGEAR / JungleTac",                     "Turbo GT 50-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, ventur25,  0,  0,  vt09_4mb, nes_vt09, vt09_state, empty_init, "<unknown> / JungleTac",                     "Venturer '25 Games' 25-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, joypad65,  0,  0,  vt09_8mb, nes_vt09, vt09_state, empty_init, "WinFun / JungleTac",                        "Joypad 65", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, wfmotor,   0,  0,  vt09_4mb, nes_vt09, vt09_state, empty_init, "WinFun / JungleTac",                        "Motorcycle 30-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, vgpocket,  0,  0,  vt09_4mb, nes_vt09, vt09_state, empty_init, "Performance Designed Products / JungleTac", "VG Pocket (VG-2000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, vgpmini,   0,  0,  vt09_4mb, nes_vt09, vt09_state, empty_init, "Performance Designed Products / JungleTac", "VG Pocket Mini (VG-1500)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // VG Pocket Max (VG-2500) (blue case, 75 games)
 // VG Pocket Max (VG-3000) (white case, 75 games) (does the game selection differ, or only the case?)
-CONS( 2006, vgtablet,  0, 0,  nes_vt09_4mb_rasterhack,  nes_vt09, nes_vt09_state, empty_init, "Performance Designed Products (licensed by Konami) / JungleTac", "VG Pocket Tablet (VG-4000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // raster timing for Frogger needs a hack
+CONS( 2006, vgtablet,  0, 0,  vt09_4mb_rasterhack,  nes_vt09, vt09_state, empty_init, "Performance Designed Products (licensed by Konami) / JungleTac", "VG Pocket Tablet (VG-4000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // raster timing for Frogger needs a hack
 // VG Pocket Caplet is SunPlus hardware instead, see spg2xx_lexibook.cpp
 
-CONS( 200?, jl2050,  0,  0,  nes_vt09_16mb,nes_vt09, nes_vt09_state, empty_init, "LexiBook / JungleTac / NiceCode",  "Cyber Console Center 200-in-1 (JL2050)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, jl2050,  0,  0,  vt09_16mb,nes_vt09, vt09_state, empty_init, "LexiBook / JungleTac / NiceCode",  "Cyber Console Center 200-in-1 (JL2050)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-CONS( 200?, timetp25,   0,  0,  nes_vt09_cart, nes_vt09, nes_vt09_cart_state, empty_init, "Timetop", "Super Game 25-in-1 (GM-228)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 200?, timetp25,   0,  0,  vt09_cart, nes_vt09, vt09_cart_state, empty_init, "Timetop", "Super Game 25-in-1 (GM-228)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

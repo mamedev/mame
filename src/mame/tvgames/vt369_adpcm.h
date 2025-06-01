@@ -1,8 +1,8 @@
 // license:GPL-2.0+
 // copyright-holders:NewRisingSun
 
-#ifndef MAME_NINTENDO_VT369_ADPCM_H
-#define MAME_NINTENDO_VT369_ADPCM_H
+#ifndef MAME_TVGAMES_VT369_ADPCM_H
+#define MAME_TVGAMES_VT369_ADPCM_H
 
 #pragma once
 
@@ -49,4 +49,4 @@ private:
 
 };
 
-#endif // MAME_NINTENDO_VT369_ADPCM_H
+#endif // MAME_TVGAMES_VT369_ADPCM_H

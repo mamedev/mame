@@ -4,36 +4,36 @@
 // used by fcpocket, dgun2573, rminitv
 
 #include "emu.h"
-#include "nes_vt32_soc.h"
+#include "vt32_soc.h"
 
 // these have RGB12 output mode
-DEFINE_DEVICE_TYPE(NES_VT32_SOC,     nes_vt32_soc_device,     "nes_vt32_soc", "VT32 series System on a Chip (FP) (NTSC)")
-DEFINE_DEVICE_TYPE(NES_VT32_SOC_PAL, nes_vt32_soc_pal_device, "nes_vt32_soc_pal", "VT32 series System on a Chip (FP) (PAL)")
+DEFINE_DEVICE_TYPE(VT32_SOC,     vt32_soc_device,     "vt32_soc", "VT32 series System on a Chip (FP) (NTSC)")
+DEFINE_DEVICE_TYPE(VT32_SOC_PAL, vt32_soc_pal_device, "vt32_soc_pal", "VT32 series System on a Chip (FP) (PAL)")
 
-nes_vt32_soc_device::nes_vt32_soc_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock) :
-	nes_vt09_soc_device(mconfig, type, tag, owner, clock)
+vt32_soc_device::vt32_soc_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock) :
+	vt09_soc_device(mconfig, type, tag, owner, clock)
 {
 }
 
-nes_vt32_soc_device::nes_vt32_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
-	nes_vt32_soc_device(mconfig, NES_VT32_SOC, tag, owner, clock)
+vt32_soc_device::vt32_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+	vt32_soc_device(mconfig, VT32_SOC, tag, owner, clock)
 {
 }
 
-nes_vt32_soc_pal_device::nes_vt32_soc_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
-	nes_vt32_soc_device(mconfig, NES_VT32_SOC_PAL, tag, owner, clock)
+vt32_soc_pal_device::vt32_soc_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+	vt32_soc_device(mconfig, VT32_SOC_PAL, tag, owner, clock)
 {
 }
 
 
-u8 nes_vt32_soc_device::read_onespace_bus(offs_t offset)
+u8 vt32_soc_device::read_onespace_bus(offs_t offset)
 {
 	address_space& spc = this->space(AS_PROGRAM);
 	return spc.read_byte(offset);
 }
 
 
-u8 nes_vt32_soc_device::spr_r(offs_t offset)
+u8 vt32_soc_device::spr_r(offs_t offset)
 {
 	if (m_4242 & 0x1 || m_411d & 0x04) // VT32 only?
 	{
@@ -41,7 +41,7 @@ u8 nes_vt32_soc_device::spr_r(offs_t offset)
 	}
 	else
 	{
-		u8 ret = nes_vt09_soc_device::spr_r(offset);
+		u8 ret = vt09_soc_device::spr_r(offset);
 		// used by some games in myaass
 		if (m_ppu_chr_data_scramble == 1)
 			ret = bitswap<8>(ret, 3, 5, 6, 0, 7, 1, 2, 4);
@@ -50,7 +50,7 @@ u8 nes_vt32_soc_device::spr_r(offs_t offset)
 	}
 }
 
-u8 nes_vt32_soc_device::chr_r(offs_t offset)
+u8 vt32_soc_device::chr_r(offs_t offset)
 {
 	if (m_4242 & 0x1 || m_411d & 0x04) // VT32 only?
 	{
@@ -58,7 +58,7 @@ u8 nes_vt32_soc_device::chr_r(offs_t offset)
 	}
 	else
 	{
-		u8 ret = nes_vt09_soc_device::chr_r(offset);
+		u8 ret = vt09_soc_device::chr_r(offset);
 		// used by some games in myaass
 		if (m_ppu_chr_data_scramble == 1)
 			ret = bitswap<8>(ret, 3, 5, 6, 0, 7, 1, 2, 4);
@@ -67,10 +67,10 @@ u8 nes_vt32_soc_device::chr_r(offs_t offset)
 }
 
 
-void nes_vt32_soc_device::device_add_mconfig(machine_config& config)
+void vt32_soc_device::device_add_mconfig(machine_config& config)
 {
 	RP2A03_VTSCR(config, m_maincpu, NTSC_APU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt32_soc_device::nes_vt32_soc_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &vt32_soc_device::vt32_soc_map);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60.0988);
@@ -78,35 +78,35 @@ void nes_vt32_soc_device::device_add_mconfig(machine_config& config)
 							 (ppu2c0x_device::VBLANK_LAST_SCANLINE_NTSC-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)));
 	m_screen->set_size(32*8, 262);
 	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
-	m_screen->set_screen_update(FUNC(nes_vt32_soc_device::screen_update));
+	m_screen->set_screen_update(FUNC(vt32_soc_device::screen_update));
 
 	PPU_VT32(config, m_ppu, RP2A03_NTSC_XTAL);
 	m_ppu->set_cpu_tag(m_maincpu);
 	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	m_ppu->read_bg().set(FUNC(nes_vt32_soc_device::chr_r));
-	m_ppu->read_sp().set(FUNC(nes_vt32_soc_device::spr_r));
+	m_ppu->read_bg().set(FUNC(vt32_soc_device::chr_r));
+	m_ppu->read_sp().set(FUNC(vt32_soc_device::spr_r));
 	m_ppu->set_screen(m_screen);
-	m_ppu->read_onespace().set(FUNC(nes_vt32_soc_device::read_onespace_bus));
+	m_ppu->read_onespace().set(FUNC(vt32_soc_device::read_onespace_bus));
 
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
 	NES_APU_VT(config, m_apu, NTSC_APU_CLOCK);
-	m_apu->irq().set(FUNC(nes_vt32_soc_device::apu_irq));
-	m_apu->mem_read().set(FUNC(nes_vt32_soc_device::apu_read_mem));
+	m_apu->irq().set(FUNC(vt32_soc_device::apu_irq));
+	m_apu->mem_read().set(FUNC(vt32_soc_device::apu_read_mem));
 	m_apu->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
-void nes_vt32_soc_pal_device::do_pal_timings_and_ppu_replacement(machine_config& config)
+void vt32_soc_pal_device::do_pal_timings_and_ppu_replacement(machine_config& config)
 {
 	m_maincpu->set_clock(PALC_APU_CLOCK);
 
 	PPU_VT32PAL(config.replace(), m_ppu, RP2A03_PAL_XTAL);
 	m_ppu->set_cpu_tag(m_maincpu);
 	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	m_ppu->read_bg().set(FUNC(nes_vt32_soc_pal_device::chr_r));
-	m_ppu->read_sp().set(FUNC(nes_vt32_soc_pal_device::spr_r));
+	m_ppu->read_bg().set(FUNC(vt32_soc_pal_device::chr_r));
+	m_ppu->read_sp().set(FUNC(vt32_soc_pal_device::spr_r));
 	m_ppu->set_screen(m_screen);
 
 	m_screen->set_refresh_hz(50.0070);
@@ -116,20 +116,20 @@ void nes_vt32_soc_pal_device::do_pal_timings_and_ppu_replacement(machine_config&
 	m_screen->set_visarea(0 * 8, 32 * 8 - 1, 0 * 8, 30 * 8 - 1);
 }
 
-void nes_vt32_soc_pal_device::device_add_mconfig(machine_config& config)
+void vt32_soc_pal_device::device_add_mconfig(machine_config& config)
 {
-	nes_vt32_soc_device::device_add_mconfig(config);
+	vt32_soc_device::device_add_mconfig(config);
 	do_pal_timings_and_ppu_replacement(config);
 }
 
 
-u8 nes_vt32_soc_device::vtfp_4119_r()
+u8 vt32_soc_device::vtfp_4119_r()
 {
 	// would be PAL/NTSC etc. in base system, maybe different here?
 	return 0x00;
 }
 
-void nes_vt32_soc_device::vtfp_411e_encryption_state_w(u8 data)
+void vt32_soc_device::vtfp_411e_encryption_state_w(u8 data)
 {
 	logerror("%s: vtfp_411e_encryption_state_w %02x\n", machine().describe_context(), data);
 	m_ppu_chr_data_scramble = 0;
@@ -166,7 +166,7 @@ void nes_vt32_soc_device::vtfp_411e_encryption_state_w(u8 data)
 	}
 }
 
-void nes_vt32_soc_device::vtfp_4a00_w(u8 data)
+void vt32_soc_device::vtfp_4a00_w(u8 data)
 {
 	logerror("4a00_w %02x\n", data);
 	//if(data == 0x80)
@@ -174,23 +174,23 @@ void nes_vt32_soc_device::vtfp_4a00_w(u8 data)
 }
 
 
-void nes_vt32_soc_device::vtfp_412c_extbank_w(u8 data)
+void vt32_soc_device::vtfp_412c_extbank_w(u8 data)
 {
 	m_upper_write_412c_callback(data);
 }
 
-u8 nes_vt32_soc_device::vtfp_412d_r()
+u8 vt32_soc_device::vtfp_412d_r()
 {
 	return m_upper_read_412d_callback();
 }
 
-void nes_vt32_soc_device::vtfp_4242_w(u8 data)
+void vt32_soc_device::vtfp_4242_w(u8 data)
 {
 	logerror("%s: vtfp_4242_w %02x\n", machine().describe_context(), data);
 	m_4242 = data;
 }
 
-void nes_vt32_soc_device::vtfp_411d_w(u8 data)
+void vt32_soc_device::vtfp_411d_w(u8 data)
 {
 	// controls chram access and mapper emulation modes in later models
 	logerror("%s: vtfp_411d_w  %02x\n", machine().describe_context(), data);
@@ -198,13 +198,13 @@ void nes_vt32_soc_device::vtfp_411d_w(u8 data)
 	update_banks();
 }
 
-u8 nes_vt32_soc_device::vthh_414a_r()
+u8 vt32_soc_device::vthh_414a_r()
 {
 	return machine().rand();
 }
 
 
-void nes_vt32_soc_device::scrambled_8000_w(u16 offset, u8 data)
+void vt32_soc_device::scrambled_8000_w(u16 offset, u8 data)
 {
 	offset &= 0x7fff;
 
@@ -237,12 +237,12 @@ void nes_vt32_soc_device::scrambled_8000_w(u16 offset, u8 data)
 	}
 	else // standard mode (VT03/09)
 	{
-		nes_vt02_vt03_soc_device::scrambled_8000_w(offset, data);
+		vt02_vt03_soc_device::scrambled_8000_w(offset, data);
 	}
 }
 
 
-u8 nes_vt32_soc_device::vt32_palette_r(offs_t offset)
+u8 vt32_soc_device::vt32_palette_r(offs_t offset)
 {
 	if (offset < 0x100)
 	{
@@ -256,7 +256,7 @@ u8 nes_vt32_soc_device::vt32_palette_r(offs_t offset)
 	}
 }
 
-void nes_vt32_soc_device::vt32_palette_w(offs_t offset, u8 data)
+void vt32_soc_device::vt32_palette_w(offs_t offset, u8 data)
 {
 	if (offset < 0x100)
 	{
@@ -273,20 +273,20 @@ void nes_vt32_soc_device::vt32_palette_w(offs_t offset, u8 data)
 	}	
 }
 
-void nes_vt32_soc_device::device_start()
+void vt32_soc_device::device_start()
 {
-	nes_vt09_soc_device::device_start();
-	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x3e00, 0x3fff, read8sm_delegate(*this, FUNC(nes_vt32_soc_device::vt32_palette_r)), write8sm_delegate(*this, FUNC(nes_vt32_soc_device::vt32_palette_w)));
+	vt09_soc_device::device_start();
+	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x3e00, 0x3fff, read8sm_delegate(*this, FUNC(vt32_soc_device::vt32_palette_r)), write8sm_delegate(*this, FUNC(vt32_soc_device::vt32_palette_w)));
 	save_item(NAME(m_ppu_chr_data_scramble));
 }
 
-void nes_vt32_soc_device::device_reset()
+void vt32_soc_device::device_reset()
 {
-	nes_vt09_soc_device::device_reset();
+	vt09_soc_device::device_reset();
 	m_ppu_chr_data_scramble = 0;
 }
 
-void nes_vt32_soc_device::nes_vt32_soc_map(address_map &map)
+void vt32_soc_device::vt32_soc_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram(); // .mask(0x0fff).ram();
 
@@ -313,42 +313,42 @@ void nes_vt32_soc_device::nes_vt32_soc_map(address_map &map)
 	map(0x2040, 0x2049).nopw();// w(m_ppu, FUNC(ppu_vt3xx_device::lcdc_regs_w)); // LCD control like on VT369?
 
 	map(0x4000, 0x4017).w(m_apu, FUNC(nes_apu_vt_device::write));
-	map(0x4014, 0x4014).w(FUNC(nes_vt32_soc_device::vt_dma_w));
+	map(0x4014, 0x4014).w(FUNC(vt32_soc_device::vt_dma_w));
 	map(0x4015, 0x4015).r(m_apu, FUNC(nes_apu_vt_device::status_r)); // PSG status / first control register
-	map(0x4016, 0x4016).rw(FUNC(nes_vt32_soc_device::in0_r), FUNC(nes_vt32_soc_device::in0_w));
-	map(0x4017, 0x4017).r(FUNC(nes_vt32_soc_device::in1_r));
+	map(0x4016, 0x4016).rw(FUNC(vt32_soc_device::in0_r), FUNC(vt32_soc_device::in0_w));
+	map(0x4017, 0x4017).r(FUNC(vt32_soc_device::in1_r));
 
-	map(0x4034, 0x4034).w(FUNC(nes_vt32_soc_device::vt03_4034_w)); // secondary DMA
+	map(0x4034, 0x4034).w(FUNC(vt32_soc_device::vt03_4034_w)); // secondary DMA
 
-	map(0x4100, 0x410b).r(FUNC(nes_vt32_soc_device::vt03_410x_r)).w(FUNC(nes_vt32_soc_device::vt03_410x_w));
+	map(0x4100, 0x410b).r(FUNC(vt32_soc_device::vt03_410x_r)).w(FUNC(vt32_soc_device::vt03_410x_w));
 	// 0x410c unused
-	map(0x410d, 0x410d).w(FUNC(nes_vt32_soc_device::extra_io_control_w));
-	map(0x410e, 0x410e).rw(FUNC(nes_vt32_soc_device::extrain_01_r), FUNC(nes_vt32_soc_device::extraout_01_w));
-	map(0x410f, 0x410f).rw(FUNC(nes_vt32_soc_device::extrain_23_r), FUNC(nes_vt32_soc_device::extraout_23_w));
+	map(0x410d, 0x410d).w(FUNC(vt32_soc_device::extra_io_control_w));
+	map(0x410e, 0x410e).rw(FUNC(vt32_soc_device::extrain_01_r), FUNC(vt32_soc_device::extraout_01_w));
+	map(0x410f, 0x410f).rw(FUNC(vt32_soc_device::extrain_23_r), FUNC(vt32_soc_device::extraout_23_w));
 	// 0x4114 RS232 timer (low)
 	// 0x4115 RS232 timer (high)
 	// 0x4116 unused
 	// 0x4117 unused
 	// 0x4118 unused
-	map(0x4119, 0x4119).r(FUNC(nes_vt32_soc_device::vtfp_4119_r));
+	map(0x4119, 0x4119).r(FUNC(vt32_soc_device::vtfp_4119_r));
 	// 0x411a RS232 TX data
 	// 0x411b RS232 RX data
-	map(0x411d, 0x411d).w(FUNC(nes_vt32_soc_device::vtfp_411d_w));
-	map(0x411e, 0x411e).w(FUNC(nes_vt32_soc_device::vtfp_411e_encryption_state_w)); // encryption toggle
+	map(0x411d, 0x411d).w(FUNC(vt32_soc_device::vtfp_411d_w));
+	map(0x411e, 0x411e).w(FUNC(vt32_soc_device::vtfp_411e_encryption_state_w)); // encryption toggle
 
-	map(0x414a, 0x414a).r(FUNC(nes_vt32_soc_device::vthh_414a_r));
+	map(0x414a, 0x414a).r(FUNC(vt32_soc_device::vthh_414a_r));
 
-	map(0x412c, 0x412c).w(FUNC(nes_vt32_soc_device::vtfp_412c_extbank_w)); // GPIO
-	map(0x412d, 0x412d).r(FUNC(nes_vt32_soc_device::vtfp_412d_r)).nopw(); // GPIO
+	map(0x412c, 0x412c).w(FUNC(vt32_soc_device::vtfp_412c_extbank_w)); // GPIO
+	map(0x412d, 0x412d).r(FUNC(vt32_soc_device::vtfp_412d_r)).nopw(); // GPIO
 
 	map(0x4141, 0x4141).nopw(); // ??
 	map(0x4142, 0x4142).nopw(); // ??
 
-	map(0x4242, 0x4242).w(FUNC(nes_vt32_soc_device::vtfp_4242_w));
+	map(0x4242, 0x4242).w(FUNC(vt32_soc_device::vtfp_4242_w));
 
-	map(0x4a00, 0x4a00).w(FUNC(nes_vt32_soc_device::vtfp_4a00_w));
+	map(0x4a00, 0x4a00).w(FUNC(vt32_soc_device::vtfp_4a00_w));
 
 	map(0x6000, 0x7fff).ram();
-	map(0x8000, 0xffff).rw(FUNC(nes_vt32_soc_device::external_space_read), FUNC(nes_vt32_soc_device::external_space_write));
+	map(0x8000, 0xffff).rw(FUNC(vt32_soc_device::external_space_read), FUNC(vt32_soc_device::external_space_write));
 }
 
