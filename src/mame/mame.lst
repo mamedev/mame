@@ -35964,6 +35964,9 @@ ob8
 @source:oberheim/xpander.cpp
 xpander
 
+@source:olivetti/celint2k.cpp
+celint2kss
+
 @source:olivetti/m20.cpp
 m20
 m40
