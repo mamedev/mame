@@ -454,6 +454,7 @@ osd::audio_info sound_coreaudio::get_information()
 	{
 		m_deviceinfo.m_default_sink = default_sink;
 		m_deviceinfo.m_default_source = default_source;
+		build_device_list();
 		m_deviceinfo.m_generation++;
 	}
 
@@ -1130,7 +1131,7 @@ return_error:
 bool sound_coreaudio::coreaudio_stream::create_source_graph(struct coreaudio_device &device)
 {
 	OSStatus err;
-	UInt32 packet_size = 512;	// larger than 512 samples/packet causes errors with some devices
+	UInt32 packet_size = 512;   // larger than 512 samples/packet causes errors with some devices
 	AURenderCallbackStruct const renderer = { this->source_render_callback, this };
 	AudioObjectPropertyAddress const packet_size_addr = {
 		kAudioDevicePropertyBufferFrameSize,
