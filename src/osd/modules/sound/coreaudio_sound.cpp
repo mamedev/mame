@@ -456,35 +456,27 @@ void sound_coreaudio::rebuild_stream_info()
 
 uint32_t sound_coreaudio::get_generation()
 {
-	if (sDeviceStatusChanged)
-	{
-		std::lock_guard<std::mutex> list_guard(m_stream_list_mutex);
-		m_deviceinfo.m_default_sink = get_default_sink();
-		m_deviceinfo.m_default_source = get_default_source();
-		build_device_list();
-		m_deviceinfo.m_generation++;
+	const auto default_sink = get_default_sink();
+	const auto default_source = get_default_source();
 
-		sDeviceStatusChanged = false;
-	}
+	if ((default_sink != m_deviceinfo.m_default_sink ||
+		default_source != m_deviceinfo.m_default_source) ||
+		(sDeviceStatusChanged))
+		{
+			std::lock_guard<std::mutex> list_guard(m_stream_list_mutex);
+			m_deviceinfo.m_default_sink = default_sink;
+			m_deviceinfo.m_default_source = default_source;
+			build_device_list();
+			m_deviceinfo.m_generation++;
+
+			sDeviceStatusChanged = false;
+		}
 
 	return m_deviceinfo.m_generation;
 }
 
 osd::audio_info sound_coreaudio::get_information()
 {
-	// Check if the default devices have changed
-	const auto default_sink = get_default_sink();
-	const auto default_source = get_default_source();
-	if (default_sink != m_deviceinfo.m_default_sink ||
-		default_source != m_deviceinfo.m_default_source)
-	{
-		std::lock_guard<std::mutex> list_guard(m_stream_list_mutex);
-		m_deviceinfo.m_default_sink = default_sink;
-		m_deviceinfo.m_default_source = default_source;
-		build_device_list();
-		m_deviceinfo.m_generation++;
-	}
-
 	return m_deviceinfo;
 }
 
