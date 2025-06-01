@@ -93,7 +93,7 @@ ROM_END
 } // anonymous namespace
 
 //    YEAR   NAME       PARENT    MACHINE      INPUT     CLASS           INIT        ROT   COMPANY              FULLNAME              FLAGS
-GAME( 1988?, lotoplay,  0,        lotoplay_p3, lotoplay, lotoplay_state, empty_init, ROT0, "Gaelco / Covielsa", "Loto-Play (set 1)",  MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-GAME( 1988?, lotoplaya, lotoplay, lotoplay_p3, lotoplay, lotoplay_state, empty_init, ROT0, "Gaelco / Covielsa", "Loto-Play (set 2)",  MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-GAME( 1988?, lotoplayb, lotoplay, lotoplay_p3, lotoplay, lotoplay_state, empty_init, ROT0, "Gaelco / Covielsa", "Loto-Play (set 3)",  MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-GAME( 1988?, lotoplayc, lotoplay, lotoplay_p5, lotoplay, lotoplay_state, empty_init, ROT0, "Gaelco / Covielsa", "Loto-Play (set 4)",  MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+GAME( 1988?, lotoplay,  0,        lotoplay_p3, lotoplay, lotoplay_state, empty_init, ROT0, "Gaelco / Covielsa", "Loto-Play (set 1)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1988?, lotoplaya, lotoplay, lotoplay_p3, lotoplay, lotoplay_state, empty_init, ROT0, "Gaelco / Covielsa", "Loto-Play (set 2)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1988?, lotoplayb, lotoplay, lotoplay_p3, lotoplay, lotoplay_state, empty_init, ROT0, "Gaelco / Covielsa", "Loto-Play (set 3)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1988?, lotoplayc, lotoplay, lotoplay_p5, lotoplay, lotoplay_state, empty_init, ROT0, "Gaelco / Covielsa", "Loto-Play (set 4)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
