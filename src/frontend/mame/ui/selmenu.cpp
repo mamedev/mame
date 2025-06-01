@@ -3882,7 +3882,8 @@ std::string menu_select_launch::make_system_audit_fail_text(media_auditor const 
 		osd_printf_info(str.str());
 		str.str("");
 	}
-	str << _("Required ROM/disk images for the selected system are missing or incorrect. Please acquire the correct files or select a different system.\n\n");
+	str << util::string_format(_("Required ROM/disk images for the selected system are missing or incorrect.\nPlease acquire the correct file(s) applicable to %1$s %2$s, or select a different system.\n\n"),
+			emulator_info::get_appname(), bare_build_version);
 	make_audit_fail_text(str, auditor, summary);
 	return str.str();
 }
@@ -3898,7 +3899,8 @@ std::string menu_select_launch::make_software_audit_fail_text(media_auditor cons
 		osd_printf_info(str.str());
 		str.str("");
 	}
-	str << _("Required ROM/disk images for the selected software are missing or incorrect. Please acquire the correct files or select a different software item.\n\n");
+	str << util::string_format(_("Required ROM/disk images for the selected software are missing or incorrect.\nPlease acquire the correct file(s) applicable to %1$s %2$s, or select a different software item.\n\n"),
+			emulator_info::get_appname(), bare_build_version);
 	make_audit_fail_text(str, auditor, summary);
 	return str.str();
 }
