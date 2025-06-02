@@ -711,7 +711,7 @@ CONS( 2007, jak_slpb, 0, 0, spg2xx_jakks,  spg2xx_pacg,   jakks_state, empty_ini
 
 CONS( 2007, jak_hm1m, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",  "Hannah Montana - One in a Million (JAKKS Pacific TV Game) (Aug 13 2007 15:42:29)", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2007, jak_avtr, 0, 0, spg2xx_jakks,  spg2xx_avtr,  jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",  "Avatar: The Last Airbender - Book One Challenges (JAKKS Pacific TV Game) (06 Jun 2006 A)", MACHINE_IMPERFECT_SOUND )
+CONS( 2006, jak_avtr, 0, 0, spg2xx_jakks,  spg2xx_avtr,   jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",  "Avatar: The Last Airbender - Book One Challenges (JAKKS Pacific TV Game) (06 Jun 2006 A)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2007, jak_hmbb, 0, 0, spg2xx_hmbb,   spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",  "Hannah Montana - Best of Both Worlds (JAKKS Pacific TV Game) (Aug 17 2007 22:47:47)", MACHINE_IMPERFECT_SOUND )
 
