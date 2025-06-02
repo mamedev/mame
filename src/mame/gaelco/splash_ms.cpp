@@ -575,4 +575,4 @@ ROM_START( splashms )
 	ROM_LOAD( "snd_9-2_9359_gal16v8as.ic10", 0x000, 0x117, NO_DUMP )
 ROM_END
 
-GAME( 1992, splashms,  splash,  splashms,  splashms,  splashms_state, init_splashms, ROT0, "Gaelco", "Splash (Modular System)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1992, splashms, splash, splashms, splashms, splashms_state, init_splashms, ROT0, "Gaelco", "Splash (Modular System)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
