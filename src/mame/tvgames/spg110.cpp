@@ -720,8 +720,8 @@ CONS( 2004, jak_sbdd,  0,        0, spg110_base, jak_spdmo, spg110_game_state, i
 // has Game-Key strings in test mode even if there were no SPG110 Game-Key units at all
 CONS( 2006, jak_bobb,  0,        0, spg110_base, jak_bobb,  spg110_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Bob the Builder - Project: Build It (JAKKS Pacific TV Game) (JUN 2 2006 14:42:01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2006, jak_thom,  0,        0, spg110_base, jak_bobb,  spg110_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Thomas & Friends - Right on Time (JAKKS Pacific TV Game) (Jun 28 2006 18:24:37)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2006, jak_thomp, jak_thom, 0, spg110_base, jak_bobb,  spg110_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Thomas & Friends - Right on Time (JAKKS Pacific TV Game) (Jun 28 2006 18:01:22)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, jak_thom,  0,        0, spg110_base,     jak_bobb,  spg110_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Thomas & Friends - Right on Time (JAKKS Pacific TV Game) (Jun 28 2006 18:24:37) (US, NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, jak_thomp, jak_thom, 0, spg110_base_pal, jak_bobb,  spg110_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Thomas & Friends - Right on Time (JAKKS Pacific TV Game) (Jun 28 2006 18:01:22) (UK, PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // PAL versions have different voices
 // another version of Thomas & Friends (with a different screen layout, no map in the corner) also exists
 // https://www.youtube.com/watch?v=PfEELfnXaXE
 // is it an earlier version, or an SPG2xx port that loses the map for some reason?
