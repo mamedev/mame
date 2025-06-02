@@ -925,7 +925,7 @@ bool debugger_console::validate_target_address_parameter(std::string_view param,
 ///   failure.
 /// \return true if the parameter refers to a memory region in the
 ///   current system, or false otherwise.
-bool debugger_console::validate_memory_region_parameter(std::string_view param, memory_region *&result)
+bool debugger_console::validate_memory_region_parameter(std::string_view param, memory_region *&result, bool print_error)
 {
 	auto const &regions = m_machine.memory().regions();
 	std::string_view relative = param;
@@ -938,7 +938,37 @@ bool debugger_console::validate_memory_region_parameter(std::string_view param, 
 	}
 	else
 	{
-		printf("No matching memory region found for '%s'\n", param);
+		if (print_error)
+			printf("No matching memory region found for '%s'\n", param);
+		return false;
+	}
+}
+
+
+/// \brief Validate a parameter as a memory share
+///
+/// Validates a parameter as a memory share tag and retrieves the
+/// specified memory share.
+/// \param [in] The parameter string.
+/// \param [out] result The memory share on success, or unchanged on
+///   failure.
+/// \return true if the parameter refers to a memory share in the
+///   current system, or false otherwise.
+bool debugger_console::validate_memory_share_parameter(std::string_view param, memory_share *&result, bool print_error)
+{
+	auto const &shares = m_machine.memory().shares();
+	std::string_view relative = param;
+	device_t &base = get_device_search_base(relative);
+	auto const iter = shares.find(base.subtag(strmakelower(relative)));
+	if (shares.end() != iter)
+	{
+		result = iter->second.get();
+		return true;
+	}
+	else
+	{
+		if (print_error)
+			printf("No matching memory share found for '%s'\n", param);
 		return false;
 	}
 }

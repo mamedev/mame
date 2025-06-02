@@ -131,7 +131,10 @@ public:
 	bool validate_target_address_parameter(std::string_view param, int spacenum, address_space *&space, u64 &addr);
 
 	// validates a parameter as a memory region name and retrieves the given region
-	bool validate_memory_region_parameter(std::string_view param, memory_region *&result);
+	bool validate_memory_region_parameter(std::string_view param, memory_region *&result, bool print_error = true);
+
+	// validates a parameter as a memory region name and retrieves the given share
+	bool validate_memory_share_parameter(std::string_view param, memory_share *&result, bool print_error = true);
 
 	// validates a parameter as a debugger expression
 	bool validate_expression_parameter(std::string_view param, parsed_expression &result);

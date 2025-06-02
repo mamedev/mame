@@ -127,9 +127,14 @@ private:
 	void execute_stateload(const std::vector<std::string_view> &params);
 	void execute_rewind(const std::vector<std::string_view> &params);
 	void execute_save(int spacenum, const std::vector<std::string_view> &params);
+	void execute_region_deprecated(const std::vector<std::string_view> &params);
 	void execute_saveregion(const std::vector<std::string_view> &params);
+	void execute_saveshare(const std::vector<std::string_view> &params);
+	void execute_savememory(const std::vector<std::string_view> &params);
 	void execute_load(int spacenum, const std::vector<std::string_view> &params);
 	void execute_loadregion(const std::vector<std::string_view> &params);
+	void execute_loadshare(const std::vector<std::string_view> &params);
+	void execute_loadmemory(const std::vector<std::string_view> &params);
 	void execute_dump(int spacenum, const std::vector<std::string_view> &params);
 	void execute_strdump(int spacenum, const std::vector<std::string_view> &params);
 	void execute_cheatrange(bool init, const std::vector<std::string_view> &params);
