@@ -2,20 +2,20 @@
 // copyright-holders:Michael Zapf
 /*****************************************************************************
 
-    74610: Memory mappers 
-    
+    74610: Memory mappers
+
     Variant   Output       Type
     ----------------------------------------
     74610     latched      tristate
     74611     latched      open collector
     74612     direct       tristate
     74613     direct       open collector
-    
- 
+
+
     Connection Diagram:
               _________
      RS2  1 |   | |   | 40  Vcc
-     MA3  2 |   ---   | 39  MA2 
+     MA3  2 |   ---   | 39  MA2
      RS3  3 |         | 38  RS1
      CS*  4 |         | 37  MA1
  STROBE*  5 |         | 36  RS0
@@ -33,14 +33,14 @@
     MO3  17 |         | 24  MO8
     MO4  18 |         | 23  MO7
     MO5  19 |         | 22  MO6
-    GND  20 |_________| 21  ME*    
+    GND  20 |_________| 21  ME*
 
-    
+
     Data bus connection: D0-D11
     Map output: MO0-MO11
-    
+
     The internal memory is a 16 words (selected by RS3...RS0) by 12 bit RAM.
-    
+
     The mapper is intended to expand e.g. a 16-bit address by 8 additional bits,
     making it a 24-bit address.
 
@@ -48,39 +48,39 @@
                          ||  D11 ... D0
     MA3...MA0      _____________
     ==============|             |---------------
-                  |             | 
+                  |             |
     --------------|             |  MO11 ... MO0
     RS3 ... RS0   |             |  (A23 ... A12)
-    (A15...A12)   |             |  
+    (A15...A12)   |             |
     --------------|_____________|---------------
     A11 ... A0                     A11 ... A0
     --------------------------------------------
-    
-   
-    
-    
-    
-    The mapping value can be changed by loading the new value into the chip at 
-    the selected address (via the data bus). If the computer's data bus is 
+
+
+
+
+
+    The mapping value can be changed by loading the new value into the chip at
+    the selected address (via the data bus). If the computer's data bus is
     smaller (e.g. 8 bit), the remaining four bits may be set by mapping the
     chip at different memory locations:
-    
+
     4000: D11=0, D10=0, D9=0, D8=0
     4001: D11=0, D10=0, D9=0, D8=1
     4002: D11=0, D10=0, D9=1, D8=0
     ...
     400F: D11=1, D10=1, D9=1, D8=1
-    
-    
+
+
 *****************************************************************************/
 
 #include "emu.h"
 #include "74610.h"
 
-DEFINE_DEVICE_TYPE(TTL74610, ttl74610_device, "ttl74610", "Memory mapper (latched, tristate)")
-DEFINE_DEVICE_TYPE(TTL74611, ttl74611_device, "ttl74611", "Memory mapper (latched, openc)")
-DEFINE_DEVICE_TYPE(TTL74612, ttl74612_device, "ttl74612", "Memory mapper (tristate)")
-DEFINE_DEVICE_TYPE(TTL74613, ttl74613_device, "ttl74613", "Memory mapper (openc)")
+DEFINE_DEVICE_TYPE(TTL74610, ttl74610_device, "ttl74610", "SN74LS610 Memory mapper (latched, tristate)")
+DEFINE_DEVICE_TYPE(TTL74611, ttl74611_device, "ttl74611", "SN74LS611 Memory mapper (latched, openc)")
+DEFINE_DEVICE_TYPE(TTL74612, ttl74612_device, "ttl74612", "SN74LS612 Memory mapper (tristate)")
+DEFINE_DEVICE_TYPE(TTL74613, ttl74613_device, "ttl74613", "SN74LS613 Memory mapper (openc)")
 
 ttl7461x_device::ttl7461x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock),
@@ -123,7 +123,7 @@ ttl74613_device::ttl74613_device(const machine_config &mconfig, const char *tag,
 void ttl7461x_device::device_start()
 {
 	for (auto & elem : m_map) elem = 0;
-	
+
 	save_item(NAME(m_map));
 	save_item(NAME(m_map_mode));
 	save_item(NAME(m_enabled));
@@ -144,8 +144,8 @@ uint16_t ttl7461x_device::get_register(int num)
 }
 
 /*
-	To make full use of the tristate/open collector feature, this method
-	should be used.
+    To make full use of the tristate/open collector feature, this method
+    should be used.
 */
 void ttl7461x_device::mapper_output_rz(uint8_t num, uint16_t& value)
 {
@@ -186,15 +186,15 @@ void ttl7461x_latched_device::device_start()
 	save_item(NAME(m_latched_output));
 }
 
-uint16_t ttl7461x_latched_device::get_mapper_output() 
-{ 
-	return m_latched_output; 
+uint16_t ttl7461x_latched_device::get_mapper_output()
+{
+	return m_latched_output;
 }
 
-void ttl7461x_latched_device::mapper_output_rz(uint16_t& value) 
-{ 
-	if (m_enabled) value = get_mapper_output(); 
-}	
+void ttl7461x_latched_device::mapper_output_rz(uint16_t& value)
+{
+	if (m_enabled) value = get_mapper_output();
+}
 
 void ttl7461x_latched_device::latch_enable_w(int enable)
 {
@@ -206,7 +206,7 @@ void ttl7461x_latched_device::set_map_address(uint8_t num)
 	uint16_t mapvalue = ttl7461x_device::get_mapper_output(num);
 	if (m_latch_enabled)
 		m_latched_output = mapvalue;
-	
+
 	if (m_enabled)
 		m_map_output(mapvalue);
 }
