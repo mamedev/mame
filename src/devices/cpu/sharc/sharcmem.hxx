@@ -2,14 +2,16 @@
 // copyright-holders:Ville Linde
 /* SHARC memory operations */
 
+// When PM bus is used to transfer 32-bit data, it is aligned to the upper 32 bits of the bus
 uint32_t adsp21062_device::pm_read32(uint32_t address)
 {
-	return m_program->read_dword(address);
+	return m_program->read_qword(address) >> 16;
 }
 
 void adsp21062_device::pm_write32(uint32_t address, uint32_t data)
 {
-	m_program->write_dword(address, data);
+	u64 res = ((u64)data << 16) | (m_program->read_qword(address) & 0xffff);
+	m_program->write_qword(address, res);
 }
 
 uint64_t adsp21062_device::pm_read48(uint32_t address)
