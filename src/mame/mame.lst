@@ -18710,8 +18710,11 @@ speedup
 speedup10
 speedup12
 surfplnt
+surfplnt10
+surfplnt12
 surfplnt20
 surfplnt30
+surfplnt31
 surfplnt40
 
 @source:gaelco/gaelcof3.cpp
