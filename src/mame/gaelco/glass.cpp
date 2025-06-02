@@ -498,9 +498,61 @@ void glass_state::glass_ds5002fp(machine_config &config)
 	config.set_perfect_quantum("gaelco_ds5002fp:mcu");
 }
 
-ROM_START( glass ) // Version 1.1
+ROM_START( glass )
 	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
-	ROM_LOAD16_BYTE( "1.c23", 0x000000, 0x040000, CRC(aeebd4ed) SHA1(04759dc146dff0fc74b78d70e79dfaebe68328f9) )
+	ROM_LOAD16_BYTE( "europa_c23_3-2-94_3fb0 27c020.bin", 0x000000, 0x040000, CRC(f2932dc2) SHA1(7fc49da53f608599325670c8c92e0a1a7a8850a9) )
+	ROM_LOAD16_BYTE( "europa_c22_3-2-94_a20c_27c020.bin", 0x000001, 0x040000, CRC(165e2e01) SHA1(180a2e2b5151f2321d85ac23eff7fbc9f52023a5) )
+
+	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) // DS5002FP code
+	ROM_LOAD( "glass_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(47c9df4c) SHA1(e0ac4f3d3086a4e8164d42aaae125037c222118a) )
+
+	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
+	// these are the default states stored in NVRAM
+	DS5002FP_SET_MON( 0x29 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "h13.bin", 0x000000, 0x200000, CRC(13ab7f31) SHA1(468424f74d6cccd1b445a9f20e2d24bc46d61ed6) )
+	ROM_LOAD( "h11.bin", 0x200000, 0x200000, CRC(c6ac41c8) SHA1(22408ef1e35c66d0fba0c72972c46fad891d1193) )
+
+	ROM_REGION( 0x100000, "bmap", 0 )   // 16 bitmaps (320x200, indexed colors)
+	ROM_LOAD( "h9.bin", 0x000000, 0x100000, CRC(b9492557) SHA1(3f5c0d696d65e1cd492763dfa749c813dd56a9bf) )
+
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "c1.bin", 0x000000, 0x100000, CRC(d9f075a2) SHA1(31a7a677861f39d512e9d1f51925c689e481159a) )
+	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
+ROM_END
+
+ROM_START( ssplash )
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "c_23_splash_titulo_11-4_27c2001.bin", 0x000000, 0x040000, CRC(563c4883) SHA1(98fff2df5eeeed58692c70ea995458b48355bb01) )
+	ROM_LOAD16_BYTE( "europa_c22_3-2-94_a20c_27c020.bin", 0x000001, 0x040000, CRC(165e2e01) SHA1(180a2e2b5151f2321d85ac23eff7fbc9f52023a5) )
+
+	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) // DS5002FP code
+	ROM_LOAD( "glass_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(47c9df4c) SHA1(e0ac4f3d3086a4e8164d42aaae125037c222118a) )
+
+	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
+	// these are the default states stored in NVRAM
+	DS5002FP_SET_MON( 0x29 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "h13.bin", 0x000000, 0x200000, CRC(13ab7f31) SHA1(468424f74d6cccd1b445a9f20e2d24bc46d61ed6) )
+	ROM_LOAD( "h11.bin", 0x200000, 0x200000, CRC(c6ac41c8) SHA1(22408ef1e35c66d0fba0c72972c46fad891d1193) )
+
+	ROM_REGION( 0x100000, "bmap", 0 )   // 16 bitmaps (320x200, indexed colors)
+	ROM_LOAD( "h9.bin", 0x000000, 0x100000, CRC(b9492557) SHA1(3f5c0d696d65e1cd492763dfa749c813dd56a9bf) )
+
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "c1.bin", 0x000000, 0x100000, CRC(d9f075a2) SHA1(31a7a677861f39d512e9d1f51925c689e481159a) )
+	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
+ROM_END
+
+ROM_START( glassa ) // Version 1.1
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "1.c23", 0x000000, 0x040000, CRC(aeebd4ed) SHA1(04759dc146dff0fc74b78d70e79dfaebe68328f9) ) // old parent set, only differs from glass / ssplash by 2 bytes outside of the region byte, could be bad?
 	ROM_LOAD16_BYTE( "2.c22", 0x000001, 0x040000, CRC(165e2e01) SHA1(180a2e2b5151f2321d85ac23eff7fbc9f52023a5) )
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) // DS5002FP code
@@ -576,10 +628,40 @@ ROM_START( glass10a ) // Title screen shows "GLASS" and under that "Break Editio
 	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
 ROM_END
 
+ROM_START( glassat )
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "atari_c-23_3-2-94_27c020.bin", 0x000000, 0x040000, CRC(ff26f608) SHA1(c72a3294e2878e5e93501d19555c62a7d5dd2f57) )
+	ROM_LOAD16_BYTE( "atari_c-22_3-2-94_27c020.bin", 0x000001, 0x040000, CRC(ad805bc3) SHA1(7558a81d988bb4758a938ddf52823af11142889f) )
+
+	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) // DS5002FP code
+	ROM_LOAD( "glass_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(47c9df4c) SHA1(e0ac4f3d3086a4e8164d42aaae125037c222118a) )
+
+	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
+	// these are the default states stored in NVRAM
+	DS5002FP_SET_MON( 0x29 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "h13.bin", 0x000000, 0x200000, CRC(13ab7f31) SHA1(468424f74d6cccd1b445a9f20e2d24bc46d61ed6) )
+	ROM_LOAD( "h11.bin", 0x200000, 0x200000, CRC(c6ac41c8) SHA1(22408ef1e35c66d0fba0c72972c46fad891d1193) )
+
+	ROM_REGION( 0x100000, "bmap", 0 )   // 16 bitmaps (320x200, indexed colors)
+	ROM_LOAD( "atari_el_4269_27c4001.bin", 0x000000, 0x080000, CRC(514e50ea) SHA1(36b0209b1061103c99d26ff563fdbcdf0aa59433) )
+	ROM_LOAD( "atari_eh", 0x080000, 0x080000, NO_DUMP ) // test mode shows this is used, but was missing
+
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "c1.bin", 0x000000, 0x100000, CRC(d9f075a2) SHA1(31a7a677861f39d512e9d1f51925c689e481159a) )
+	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
+ROM_END
+
 ROM_START( glasskr )
 	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
-	ROM_LOAD16_BYTE( "glassk.c23", 0x000000, 0x080000, CRC(6ee19376) SHA1(8a8fdeebe094bd3e29c35cf59584e3cab708732d) )
-	ROM_LOAD16_BYTE( "glassk.c22", 0x000001, 0x080000, CRC(bd546568) SHA1(bcd5e7591f4e68c9470999b8a0ef1ee4392c907c) )
+	ROM_LOAD16_BYTE( "c_23_korea_4f3e_27c020.bin", 0x000000, 0x040000, CRC(4d7749e4) SHA1(a9bbf2c51fef89321042e5b65b1fe27ced1c25f1) )
+	ROM_LOAD16_BYTE( "c_22_korea_7522_27c020.bin", 0x000001, 0x040000, CRC(a23bba9e) SHA1(d4558e2d8c952296b930e09c265071d4fda7f731) )
+	// also seen with these oversized ROMs - 1ST AND 2ND HALF IDENTICAL, matches above
+	//ROM_LOAD16_BYTE( "glassk.c23", 0x000000, 0x080000, CRC(6ee19376) SHA1(8a8fdeebe094bd3e29c35cf59584e3cab708732d) )
+	//ROM_LOAD16_BYTE( "glassk.c22", 0x000001, 0x080000, CRC(bd546568) SHA1(bcd5e7591f4e68c9470999b8a0ef1ee4392c907c) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
 	ROM_LOAD( "h13.bin", 0x000000, 0x200000, CRC(13ab7f31) SHA1(468424f74d6cccd1b445a9f20e2d24bc46d61ed6) )
@@ -593,6 +675,120 @@ ROM_START( glasskr )
 	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
 ROM_END
 
+ROM_START( glasskra )
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "c_23_alt_korea_7ce8_27c020.bin", 0x000000, 0x040000, CRC(6534fd44) SHA1(5e59c283a595b38f6e01930334bb9861e6efccdd) )
+	ROM_LOAD16_BYTE( "c_22_alt_korea_8ce7_27c020.bin", 0x000001, 0x040000, CRC(ccde51eb) SHA1(0adb8f4a69cdc3f9470cd007f68c2435efcfacb0) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "h13.bin", 0x000000, 0x200000, CRC(13ab7f31) SHA1(468424f74d6cccd1b445a9f20e2d24bc46d61ed6) )
+	ROM_LOAD( "h11.bin", 0x200000, 0x200000, CRC(c6ac41c8) SHA1(22408ef1e35c66d0fba0c72972c46fad891d1193) )
+
+	ROM_REGION( 0x100000, "bmap", 0 )   // 16 bitmaps (320x200, indexed colors)
+	// same as glasskr but split in 2
+	ROM_LOAD( "el_korea_d4f1_27c4001.bin", 0x000000, 0x080000, CRC(b7b78b93) SHA1(dd0ae387a95ee4912b1c2b80732b3e6e0a496c8e) )
+	ROM_LOAD( "eh_glass.bin",              0x080000, 0x080000, CRC(ea568c62) SHA1(ccf155b32cfb6fc52b2ea13ce72444eb68c3417d) )
+
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "c1.bin", 0x000000, 0x100000, CRC(d9f075a2) SHA1(31a7a677861f39d512e9d1f51925c689e481159a) )
+	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
+ROM_END
+
+ROM_START( glass10b )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "glass 0 23 22-11 b041 27c020.bin", 0x000000, 0x040000, CRC(d2e81d61) SHA1(01dab0a670ac314576f24886701accb9be732fb8) )
+	ROM_LOAD16_BYTE( "glass 1 22 22-11 90d9 27c020.bin", 0x000001, 0x040000, CRC(8b631fb8) SHA1(1101d671611cbae29b96e75601e6856f2931b00c) )
+
+	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) // DS5002FP code
+	ROM_LOAD( "glass_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(47c9df4c) SHA1(e0ac4f3d3086a4e8164d42aaae125037c222118a) )
+
+	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
+	// these are the default states stored in NVRAM
+	DS5002FP_SET_MON( 0x29 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
+
+	ROM_REGION( 0x400000, "gfx", 0 ) // same split format as the development board
+	ROM_LOAD16_BYTE( "al_d0-d7_27c4001.bin",  0x000000, 0x080000, CRC(c668caad) SHA1(742030d27ed5f7f7966d00181e13c7ba9b885df5) )
+	ROM_LOAD16_BYTE( "bl_d8-d15_27c4001.bin", 0x000001, 0x080000, CRC(7a6cb91f) SHA1(2c8592d4f92ea380a85f3a43acef3f3898973963) )
+	ROM_LOAD16_BYTE( "ah_d0-d7_27c4001.bin",  0x100000, 0x080000, CRC(de27b785) SHA1(aa14e33f42039f67fb418ff45b26bef511c9c7c8) )
+	ROM_LOAD16_BYTE( "bh_d8-d15_27c4001.bin", 0x100001, 0x080000, CRC(e9aa45d3) SHA1(a9e09b2e338d75a414eea90672a1a7142e858d84) )
+	ROM_LOAD16_BYTE( "cl_d0-d7_27c4001.bin",  0x200000, 0x080000, CRC(e32639be) SHA1(9c18c871d042fe7c62a344f35968457ae8302fa9) )
+	ROM_LOAD16_BYTE( "dl_d8-d15_27c4001.bin", 0x200001, 0x080000, CRC(b56eb8a4) SHA1(5d647a3ae175051a11a3c496a32b34a368096487) )
+	ROM_LOAD16_BYTE( "ch_d0-d7_27c4001.bin",  0x300000, 0x080000, CRC(1b3f148d) SHA1(b62c5c6fb3f4ad543538764305e2e27b35c37334) )
+	ROM_LOAD16_BYTE( "dh_d8-d15_27c4001.bin", 0x300001, 0x080000, CRC(f3638123) SHA1(60d58608de193c1a3176c95419aa38a66e149e2a) )
+
+	ROM_REGION( 0x100000, "bmap", 0 )   // 16 bitmaps (320x200, indexed colors)
+	ROM_LOAD( "h9.bin", 0x000000, 0x100000, CRC(b9492557) SHA1(3f5c0d696d65e1cd492763dfa749c813dd56a9bf) )
+
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "c1.bin", 0x000000, 0x100000, CRC(d9f075a2) SHA1(31a7a677861f39d512e9d1f51925c689e481159a) )
+	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
+ROM_END
+
+ROM_START( glass10c )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "glass break 0 16-11 e419 27c020.bin", 0x000000, 0x040000, CRC(dab83534) SHA1(daf7c5b82d4912b78264e9a2d17b19fafc2d96a9) )
+	ROM_LOAD16_BYTE( "glass break 1 16-11 d948 27c020.bin", 0x000001, 0x040000, CRC(35348cae) SHA1(6657a2564a8f9af1673183ea997c0f3c4a65d639) )
+
+	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) // DS5002FP code
+	ROM_LOAD( "glass_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(47c9df4c) SHA1(e0ac4f3d3086a4e8164d42aaae125037c222118a) )
+
+	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
+	// these are the default states stored in NVRAM
+	DS5002FP_SET_MON( 0x29 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
+
+	ROM_REGION( 0x400000, "gfx", 0 ) // same split format as the development board
+	ROM_LOAD16_BYTE( "al_d0-d7_27c4001.bin",  0x000000, 0x080000, CRC(c668caad) SHA1(742030d27ed5f7f7966d00181e13c7ba9b885df5) )
+	ROM_LOAD16_BYTE( "bl_d8-d15_27c4001.bin", 0x000001, 0x080000, CRC(7a6cb91f) SHA1(2c8592d4f92ea380a85f3a43acef3f3898973963) )
+	ROM_LOAD16_BYTE( "ah_d0-d7_27c4001.bin",  0x100000, 0x080000, CRC(de27b785) SHA1(aa14e33f42039f67fb418ff45b26bef511c9c7c8) )
+	ROM_LOAD16_BYTE( "bh_d8-d15_27c4001.bin", 0x100001, 0x080000, CRC(e9aa45d3) SHA1(a9e09b2e338d75a414eea90672a1a7142e858d84) )
+	ROM_LOAD16_BYTE( "cl_d0-d7_27c4001.bin",  0x200000, 0x080000, CRC(e32639be) SHA1(9c18c871d042fe7c62a344f35968457ae8302fa9) )
+	ROM_LOAD16_BYTE( "dl_d8-d15_27c4001.bin", 0x200001, 0x080000, CRC(b56eb8a4) SHA1(5d647a3ae175051a11a3c496a32b34a368096487) )
+	ROM_LOAD16_BYTE( "ch_d0-d7_27c4001.bin",  0x300000, 0x080000, CRC(1b3f148d) SHA1(b62c5c6fb3f4ad543538764305e2e27b35c37334) )
+	ROM_LOAD16_BYTE( "dh_d8-d15_27c4001.bin", 0x300001, 0x080000, CRC(f3638123) SHA1(60d58608de193c1a3176c95419aa38a66e149e2a) )
+
+	ROM_REGION( 0x100000, "bmap", 0 )   // 16 bitmaps (320x200, indexed colors)
+	ROM_LOAD( "h9.bin", 0x000000, 0x100000, CRC(b9492557) SHA1(3f5c0d696d65e1cd492763dfa749c813dd56a9bf) )
+
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "c1.bin", 0x000000, 0x100000, CRC(d9f075a2) SHA1(31a7a677861f39d512e9d1f51925c689e481159a) )
+	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
+ROM_END
+
+ROM_START( glass10d )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "glass spain 0 10-11-93 27c020.bin", 0x000000, 0x040000, CRC(9e359418) SHA1(5f735af493cf1565ae7d8304e042f4809f3bc64c) )
+	ROM_LOAD16_BYTE( "glass spain 1 10-11-93 27c020.bin", 0x000001, 0x040000, CRC(1f5ed48d) SHA1(e900574791b4d2fbe7d0d706dac93b3086aed7eb) )
+
+	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) // DS5002FP code
+	ROM_LOAD( "glass_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(47c9df4c) SHA1(e0ac4f3d3086a4e8164d42aaae125037c222118a) )
+
+	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
+	// these are the default states stored in NVRAM
+	DS5002FP_SET_MON( 0x29 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
+
+	ROM_REGION( 0x400000, "gfx", 0 ) // same split format as the development board
+	ROM_LOAD16_BYTE( "al_d0-d7_27c4001.bin",  0x000000, 0x080000, CRC(c668caad) SHA1(742030d27ed5f7f7966d00181e13c7ba9b885df5) )
+	ROM_LOAD16_BYTE( "bl_d8-d15_27c4001.bin", 0x000001, 0x080000, CRC(7a6cb91f) SHA1(2c8592d4f92ea380a85f3a43acef3f3898973963) )
+	ROM_LOAD16_BYTE( "ah_d0-d7_27c4001.bin",  0x100000, 0x080000, CRC(de27b785) SHA1(aa14e33f42039f67fb418ff45b26bef511c9c7c8) )
+	ROM_LOAD16_BYTE( "bh_d8-d15_27c4001.bin", 0x100001, 0x080000, CRC(e9aa45d3) SHA1(a9e09b2e338d75a414eea90672a1a7142e858d84) )
+	ROM_LOAD16_BYTE( "cl_d0-d7_27c4001.bin",  0x200000, 0x080000, CRC(e32639be) SHA1(9c18c871d042fe7c62a344f35968457ae8302fa9) )
+	ROM_LOAD16_BYTE( "dl_d8-d15_27c4001.bin", 0x200001, 0x080000, CRC(b56eb8a4) SHA1(5d647a3ae175051a11a3c496a32b34a368096487) )
+	ROM_LOAD16_BYTE( "ch_d0-d7_27c4001.bin",  0x300000, 0x080000, CRC(1b3f148d) SHA1(b62c5c6fb3f4ad543538764305e2e27b35c37334) )
+	ROM_LOAD16_BYTE( "dh_d8-d15_27c4001.bin", 0x300001, 0x080000, CRC(f3638123) SHA1(60d58608de193c1a3176c95419aa38a66e149e2a) )
+
+	ROM_REGION( 0x100000, "bmap", 0 )   // 16 bitmaps (320x200, indexed colors)
+	ROM_LOAD( "h9.bin", 0x000000, 0x100000, CRC(b9492557) SHA1(3f5c0d696d65e1cd492763dfa749c813dd56a9bf) )
+
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "c1.bin", 0x000000, 0x100000, CRC(d9f075a2) SHA1(31a7a677861f39d512e9d1f51925c689e481159a) )
+	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
+ROM_END
 
 ROM_START( glassp )
 	ROM_REGION( 0x100000, "maincpu", 0 )
@@ -643,10 +839,28 @@ ROM_END
  The unprotected version appears to be a Korean set, is censored, and has different girl pictures.
 */
 
-GAME( 1994, glass,    0,     glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.1, Break Edition, checksum 49D5E66B, Version 1994)",                        MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1994, glasskr,  glass, glass,          glass, glass_state, empty_init, ROT0, "OMK / Gaelco (Promat license)", "Glass (Ver 1.1, Break Edition, checksum D419AB69, Version 1994, censored, unprotected)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // promat stickers on program ROMs
-GAME( 1993, glass10,  glass, glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.0, Break Edition, checksum C5513F3C)",                                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, glass10a, glass, glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.0, Break Edition, checksum D3864FDB)",                                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+// Newer 1.1 versions from 1994, all seem to be dated 3 Feb 1994 (apart from Korea?)
 
-// this development board can't work without the code/data that would have been remotely uploaded to the SRAMs, hence 'incomplete' flag.
-GAME( 1993, glassp,   glass, glass,          glass, glass_state, empty_init, ROT0, "OMK / Gaelco", "Glass (development PCB)", MACHINE_NOT_WORKING | MACHINE_IS_INCOMPLETE )
+// These 2 are the same codebase, just a config byte change
+GAME( 1994, glass,    0,     glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.1, Break Edition, checksum 49D5E66B, Version 1994, set 1)",              MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 3 Feb 1994 on stickers
+GAME( 1994, ssplash,  glass, glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Super Splash (Ver 1.1, Break Edition, checksum 59D5E66B, Version 1994)",              MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 3 Feb 1994 on stickers
+
+// This is 2 bytes different to the above 'glass' set, could be bad? shows same checksum(!)
+GAME( 1994, glassa,   glass, glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.1, Break Edition, checksum 49D5E66B, Version 1994, set 2)",              MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+
+// Censored images, playable but missing a GFX ROM used for some images, Atari marked on ROMs, not shown in game
+GAME( 1994, glassat,  glass, glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco (Atari license)",  "Glass (Ver 1.1, Break Edition, checksum D7AF5496, Version 1994, US)",                 MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 3 Feb 1994 on stickers
+
+// Censored images, unprotected
+GAME( 1994, glasskr,  glass, glass,          glass, glass_state, empty_init, ROT0, "OMK / Gaelco (Promat license)", "Glass (Ver 1.1, Break Edition, checksum D419AB69, Version 1994, unprotected, Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // promat stickers on program ROMs
+GAME( 1994, glasskra, glass, glass,          glass, glass_state, empty_init, ROT0, "OMK / Gaelco (Promat license)", "Glass (Ver 1.1, Break Edition, checksum 3D8A724F, Version 1994, unprotected, Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // promat stickers on program ROMs
+
+// Older 1.0 versions from 1993
+GAME( 1993, glass10,  glass, glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.0, Break Edition, checksum C5513F3C)",                                   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, glass10a, glass, glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.0, Break Edition, checksum D3864FDB)",                                   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, glass10b, glass, glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.0, Break Edition, checksum EBCB0BFE, 22 Nov 1993)",                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // date from stickers
+GAME( 1993, glass10c, glass, glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.0, Break Edition, checksum 6241CD67, 16 Nov 1993)",                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // date from stickers
+GAME( 1993, glass10d, glass, glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.0, Break Edition, checksum 2B43D337, 10 Nov 1993)",                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // date from stickers
+
+// This development board can't work without the code/data that would have been remotely uploaded to the SRAMs, hence 'incomplete' flag.
+GAME( 1993, glassp,   glass, glass,          glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Glass (development PCB)",                                                             MACHINE_NOT_WORKING | MACHINE_IS_INCOMPLETE )
