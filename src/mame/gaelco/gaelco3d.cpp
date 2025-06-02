@@ -1202,6 +1202,43 @@ ROM_START( surfplnt40 ) // Version 4.0 - REF. 970514 ROM board
 	ROM_LOAD( "c_m.b1_4936_pal16l8.bin", 0x000, 0x104, CRC(28ad6ecb) SHA1(994c6701d8675fa7ff10da588eff4d4228a15aef) )
 ROM_END
 
+ROM_START( surfplnt31 ) // Version 3.1
+	ROM_REGION( 0x200000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "3.1_0l_6bcc_ic5_skate_27c040.bin",  0x000000, 0x80000, CRC(e33186ce) SHA1(915f32f3219ec32151086f97da7759967d0d883d) )
+	ROM_LOAD16_BYTE( "3.1_1l_d75a_ic11_skate_27c040.bin", 0x000001, 0x80000, CRC(b832dd0e) SHA1(d2468cee640682c484daed324e8c91ac4497946d) )
+	ROM_LOAD16_BYTE( "3.1_0h_ab01_ic8_skate_27c040.bin",  0x100000, 0x80000, CRC(aef9e1d0) SHA1(15258e62fbf61e21e7d77aa7a81fdbf842fd4560) )
+	ROM_LOAD16_BYTE( "3.1_1h_2b87_ic13_skate_27c040.bin", 0x100001, 0x80000, CRC(d9754369) SHA1(0d82569cb925402a9f4634e52f15435112ec4878) )
+
+	ROM_REGION16_LE( 0x400000, "adsprom", 0 ) // ADSP-2115 code & data
+	ROM_LOAD( "pls_ic18.ic18", 0x0000000, 0x400000, CRC(a1b64695) SHA1(7487cd51305e30a5b55aada0bae9161fcb3fcd19) ) // designation silkscreend on SMT mask ROM
+
+	ROM_REGION32_LE( 0x1000000, "tmsrom", 0 )
+	ROM_LOAD32_WORD( "pls_ic40.ic40", 0x000000, 0x400000, CRC(26877ad3) SHA1(2e0c15b0e060e0b3d5b5cdaf1e22b9ec8e1abc9a) ) // designation silkscreend on SMT mask ROM
+	ROM_LOAD32_WORD( "pls_ic37.ic37", 0x000002, 0x400000, CRC(75893062) SHA1(81f10243336a309f8cc8532ee9a130ecc35bbcd6) ) // designation silkscreend on SMT mask ROM
+
+	ROM_REGION( 0x1000000, "texture", 0 )
+	ROM_LOAD( "pls_ic7.ic7",   0x0000000, 0x400000, CRC(04bd1605) SHA1(4871758e57af5132c30137cd6c46f1a3a567b640) ) // designation silkscreend on SMT mask ROM
+	ROM_LOAD( "pls_ic9.ic9",   0x0400000, 0x400000, CRC(f4400160) SHA1(206557cd4c73b6b3a04bd35b48de736c7546c5e1) ) // designation silkscreend on SMT mask ROM
+	ROM_LOAD( "pls_ic12.ic12", 0x0800000, 0x400000, CRC(edc2e826) SHA1(48d428f928a9805a62bbeaecffcac21aaa76ce77) ) // designation silkscreend on SMT mask ROM
+	ROM_LOAD( "pls_ic15.ic15", 0x0c00000, 0x400000, CRC(b0f6b8da) SHA1(7404ec7455adf145919a28907443994f6a5706a1) ) // designation silkscreend on SMT mask ROM
+
+	ROM_REGION( 0x0080000, "texmask", 0 )
+	ROM_LOAD( "pls_19.ic19", 0x0000000, 0x020000, CRC(691bd7a7) SHA1(2ff404b3974a64097372ed15fb5fbbe52c503265) )
+	ROM_LOAD( "pls_20.ic20", 0x0020000, 0x020000, CRC(fb293318) SHA1(d255fe3db1b91ec7cc744b0158e70503bca5ceab) )
+	ROM_LOAD( "pls_21.ic21", 0x0040000, 0x020000, CRC(b80611fb) SHA1(70d6767ddfb04e94cf2796e3f7090f89fd36fe8c) )
+	ROM_LOAD( "pls_22.ic22", 0x0060000, 0x020000, CRC(ccf88f7e) SHA1(c6a3bb9d6cf14a93a36ed20a47b7c068ccd630aa) )
+	// These 4 are copies of the previous 4 at different IC locations
+//  ROM_LOAD( "pls_19.ic27", 0x0000000, 0x020000, CRC(691bd7a7) SHA1(2ff404b3974a64097372ed15fb5fbbe52c503265) ) // labeled PLS 19 in IC27 on the PCB
+//  ROM_LOAD( "pls_20.ic28", 0x0020000, 0x020000, CRC(fb293318) SHA1(d255fe3db1b91ec7cc744b0158e70503bca5ceab) ) // labeled PLS 20 in IC28 on the PCB
+//  ROM_LOAD( "pls_21.ic29", 0x0040000, 0x020000, CRC(b80611fb) SHA1(70d6767ddfb04e94cf2796e3f7090f89fd36fe8c) ) // labeled PLS 21 in IC29 on the PCB
+//  ROM_LOAD( "pls_22.ic30", 0x0060000, 0x020000, CRC(ccf88f7e) SHA1(c6a3bb9d6cf14a93a36ed20a47b7c068ccd630aa) ) // labeled PLS 22 in IC30 on the PCB
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "a_m_b2_4914_pal16l8.bin", 0x000, 0x104, CRC(0702ddc2) SHA1(8f68eda2f3bfbaae1ce382683f6126e47a205693) )
+	ROM_LOAD( "c_deco_-i_pal16l8.bin",   0x000, 0x104, CRC(4c298505) SHA1(5a4f57e3d3cd5e329426d6d469b0fdd614812b25) )
+	ROM_LOAD( "c_m.b1_4936_pal16l8.bin", 0x000, 0x104, CRC(28ad6ecb) SHA1(994c6701d8675fa7ff10da588eff4d4228a15aef) )
+ROM_END
+
 ROM_START( surfplnt30 ) // Version 3.0 - REF. 970514 ROM board
 	ROM_REGION( 0x200000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "pls_5.ic5",   0x000000, 0x80000, CRC(9845d0e9) SHA1(48bbe43aecdf79d095c37d74f84f449e79a2b372) ) // sldh
@@ -1245,6 +1282,80 @@ ROM_START( surfplnt20 ) // Version 2.0 - REF. 970514 ROM board
 	ROM_LOAD16_BYTE( "pls_11.ic11", 0x000001, 0x80000, CRC(08e74d50) SHA1(8f49307c7aacba3161ac6ed01b4333048e24194f) ) // sldh
 	ROM_LOAD16_BYTE( "pls_8.ic8",   0x100000, 0x80000, CRC(aef9e1d0) SHA1(15258e62fbf61e21e7d77aa7a81fdbf842fd4560) )
 	ROM_LOAD16_BYTE( "pls_13.ic13", 0x100001, 0x80000, CRC(d9754369) SHA1(0d82569cb925402a9f4634e52f15435112ec4878) )
+
+	ROM_REGION16_LE( 0x400000, "adsprom", 0 ) // ADSP-2115 code & data
+	ROM_LOAD( "pls_ic18.ic18", 0x0000000, 0x400000, CRC(a1b64695) SHA1(7487cd51305e30a5b55aada0bae9161fcb3fcd19) ) // designation silkscreend on SMT mask ROM
+
+	ROM_REGION32_LE( 0x1000000, "tmsrom", 0 )
+	ROM_LOAD32_WORD( "pls_ic40.ic40", 0x000000, 0x400000, CRC(26877ad3) SHA1(2e0c15b0e060e0b3d5b5cdaf1e22b9ec8e1abc9a) ) // designation silkscreend on SMT mask ROM
+	ROM_LOAD32_WORD( "pls_ic37.ic37", 0x000002, 0x400000, CRC(75893062) SHA1(81f10243336a309f8cc8532ee9a130ecc35bbcd6) ) // designation silkscreend on SMT mask ROM
+
+	ROM_REGION( 0x1000000, "texture", 0 )
+	ROM_LOAD( "pls_ic7.ic7",   0x0000000, 0x400000, CRC(04bd1605) SHA1(4871758e57af5132c30137cd6c46f1a3a567b640) ) // designation silkscreend on SMT mask ROM
+	ROM_LOAD( "pls_ic9.ic9",   0x0400000, 0x400000, CRC(f4400160) SHA1(206557cd4c73b6b3a04bd35b48de736c7546c5e1) ) // designation silkscreend on SMT mask ROM
+	ROM_LOAD( "pls_ic12.ic12", 0x0800000, 0x400000, CRC(edc2e826) SHA1(48d428f928a9805a62bbeaecffcac21aaa76ce77) ) // designation silkscreend on SMT mask ROM
+	ROM_LOAD( "pls_ic15.ic15", 0x0c00000, 0x400000, CRC(b0f6b8da) SHA1(7404ec7455adf145919a28907443994f6a5706a1) ) // designation silkscreend on SMT mask ROM
+
+	ROM_REGION( 0x0080000, "texmask", 0 )
+	ROM_LOAD( "pls_19.ic19", 0x0000000, 0x020000, CRC(691bd7a7) SHA1(2ff404b3974a64097372ed15fb5fbbe52c503265) )
+	ROM_LOAD( "pls_20.ic20", 0x0020000, 0x020000, CRC(fb293318) SHA1(d255fe3db1b91ec7cc744b0158e70503bca5ceab) )
+	ROM_LOAD( "pls_21.ic21", 0x0040000, 0x020000, CRC(b80611fb) SHA1(70d6767ddfb04e94cf2796e3f7090f89fd36fe8c) )
+	ROM_LOAD( "pls_22.ic22", 0x0060000, 0x020000, CRC(ccf88f7e) SHA1(c6a3bb9d6cf14a93a36ed20a47b7c068ccd630aa) )
+	// These 4 are copies of the previous 4 at different IC locations
+//  ROM_LOAD( "pls_19.ic27", 0x0000000, 0x020000, CRC(691bd7a7) SHA1(2ff404b3974a64097372ed15fb5fbbe52c503265) ) // labeled PLS 19 in IC27 on the PCB
+//  ROM_LOAD( "pls_20.ic28", 0x0020000, 0x020000, CRC(fb293318) SHA1(d255fe3db1b91ec7cc744b0158e70503bca5ceab) ) // labeled PLS 20 in IC28 on the PCB
+//  ROM_LOAD( "pls_21.ic29", 0x0040000, 0x020000, CRC(b80611fb) SHA1(70d6767ddfb04e94cf2796e3f7090f89fd36fe8c) ) // labeled PLS 21 in IC29 on the PCB
+//  ROM_LOAD( "pls_22.ic30", 0x0060000, 0x020000, CRC(ccf88f7e) SHA1(c6a3bb9d6cf14a93a36ed20a47b7c068ccd630aa) ) // labeled PLS 22 in IC30 on the PCB
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "a_m_b2_4914_pal16l8.bin", 0x000, 0x104, CRC(0702ddc2) SHA1(8f68eda2f3bfbaae1ce382683f6126e47a205693) )
+	ROM_LOAD( "c_deco_-i_pal16l8.bin",   0x000, 0x104, CRC(4c298505) SHA1(5a4f57e3d3cd5e329426d6d469b0fdd614812b25) )
+	ROM_LOAD( "c_m.b1_4936_pal16l8.bin", 0x000, 0x104, CRC(28ad6ecb) SHA1(994c6701d8675fa7ff10da588eff4d4228a15aef) )
+ROM_END
+
+ROM_START( surfplnt12 ) // Version 1.2
+	ROM_REGION( 0x200000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "snow_1.2_ic12_25-6_0l_8f33_27c040.bin", 0x000000, 0x80000, CRC(e64072d3) SHA1(3d1295021ac235941051d560ccc0d6481a95ed92) )
+	ROM_LOAD16_BYTE( "snow_1.2_ic11_25-6_1l_b99v_27c040.bin", 0x000001, 0x80000, CRC(fd50c3c3) SHA1(09e39b8b04f9d4471b5c37ed5a93f9b8f6dde219) )
+	ROM_LOAD16_BYTE( "snow_1.2_ic20_25-6_0h_ab01_27c040.bin", 0x100000, 0x80000, CRC(aef9e1d0) SHA1(15258e62fbf61e21e7d77aa7a81fdbf842fd4560) )
+	ROM_LOAD16_BYTE( "snow_1.2_ic10_25-6_1h_2b87_27c040.bin", 0x100001, 0x80000, CRC(d9754369) SHA1(0d82569cb925402a9f4634e52f15435112ec4878) )
+
+	ROM_REGION16_LE( 0x400000, "adsprom", 0 ) // ADSP-2115 code & data
+	ROM_LOAD( "pls_ic18.ic18", 0x0000000, 0x400000, CRC(a1b64695) SHA1(7487cd51305e30a5b55aada0bae9161fcb3fcd19) ) // designation silkscreend on SMT mask ROM
+
+	ROM_REGION32_LE( 0x1000000, "tmsrom", 0 )
+	ROM_LOAD32_WORD( "pls_ic40.ic40", 0x000000, 0x400000, CRC(26877ad3) SHA1(2e0c15b0e060e0b3d5b5cdaf1e22b9ec8e1abc9a) ) // designation silkscreend on SMT mask ROM
+	ROM_LOAD32_WORD( "pls_ic37.ic37", 0x000002, 0x400000, CRC(75893062) SHA1(81f10243336a309f8cc8532ee9a130ecc35bbcd6) ) // designation silkscreend on SMT mask ROM
+
+	ROM_REGION( 0x1000000, "texture", 0 )
+	ROM_LOAD( "pls_ic7.ic7",   0x0000000, 0x400000, CRC(04bd1605) SHA1(4871758e57af5132c30137cd6c46f1a3a567b640) ) // designation silkscreend on SMT mask ROM
+	ROM_LOAD( "pls_ic9.ic9",   0x0400000, 0x400000, CRC(f4400160) SHA1(206557cd4c73b6b3a04bd35b48de736c7546c5e1) ) // designation silkscreend on SMT mask ROM
+	ROM_LOAD( "pls_ic12.ic12", 0x0800000, 0x400000, CRC(edc2e826) SHA1(48d428f928a9805a62bbeaecffcac21aaa76ce77) ) // designation silkscreend on SMT mask ROM
+	ROM_LOAD( "pls_ic15.ic15", 0x0c00000, 0x400000, CRC(b0f6b8da) SHA1(7404ec7455adf145919a28907443994f6a5706a1) ) // designation silkscreend on SMT mask ROM
+
+	ROM_REGION( 0x0080000, "texmask", 0 )
+	ROM_LOAD( "pls_19.ic19", 0x0000000, 0x020000, CRC(691bd7a7) SHA1(2ff404b3974a64097372ed15fb5fbbe52c503265) )
+	ROM_LOAD( "pls_20.ic20", 0x0020000, 0x020000, CRC(fb293318) SHA1(d255fe3db1b91ec7cc744b0158e70503bca5ceab) )
+	ROM_LOAD( "pls_21.ic21", 0x0040000, 0x020000, CRC(b80611fb) SHA1(70d6767ddfb04e94cf2796e3f7090f89fd36fe8c) )
+	ROM_LOAD( "pls_22.ic22", 0x0060000, 0x020000, CRC(ccf88f7e) SHA1(c6a3bb9d6cf14a93a36ed20a47b7c068ccd630aa) )
+	// These 4 are copies of the previous 4 at different IC locations
+//  ROM_LOAD( "pls_19.ic27", 0x0000000, 0x020000, CRC(691bd7a7) SHA1(2ff404b3974a64097372ed15fb5fbbe52c503265) ) // labeled PLS 19 in IC27 on the PCB
+//  ROM_LOAD( "pls_20.ic28", 0x0020000, 0x020000, CRC(fb293318) SHA1(d255fe3db1b91ec7cc744b0158e70503bca5ceab) ) // labeled PLS 20 in IC28 on the PCB
+//  ROM_LOAD( "pls_21.ic29", 0x0040000, 0x020000, CRC(b80611fb) SHA1(70d6767ddfb04e94cf2796e3f7090f89fd36fe8c) ) // labeled PLS 21 in IC29 on the PCB
+//  ROM_LOAD( "pls_22.ic30", 0x0060000, 0x020000, CRC(ccf88f7e) SHA1(c6a3bb9d6cf14a93a36ed20a47b7c068ccd630aa) ) // labeled PLS 22 in IC30 on the PCB
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "a_m_b2_4914_pal16l8.bin", 0x000, 0x104, CRC(0702ddc2) SHA1(8f68eda2f3bfbaae1ce382683f6126e47a205693) )
+	ROM_LOAD( "c_deco_-i_pal16l8.bin",   0x000, 0x104, CRC(4c298505) SHA1(5a4f57e3d3cd5e329426d6d469b0fdd614812b25) )
+	ROM_LOAD( "c_m.b1_4936_pal16l8.bin", 0x000, 0x104, CRC(28ad6ecb) SHA1(994c6701d8675fa7ff10da588eff4d4228a15aef) )
+ROM_END
+
+ROM_START( surfplnt10 ) // Version 1.0
+	ROM_REGION( 0x200000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "1.0_snow_10-09_5_f375_0l_27c040.ic5",   0x000000, 0x80000, CRC(7db0a114) SHA1(65723a08acc56d3eec6f9a96d3f06e32dd5e95b6) )
+	ROM_LOAD16_BYTE( "1.0_snow_10-09_11_c6fd_1l_27c040.ic11", 0x000001, 0x80000, CRC(87bdb700) SHA1(e4c6d4808073500cb870e3866e2377701572b234) )
+	ROM_LOAD16_BYTE( "1.0_snow_10-09_8_ab01_0h_27c040.ic8",   0x100000, 0x80000, CRC(aef9e1d0) SHA1(15258e62fbf61e21e7d77aa7a81fdbf842fd4560) )
+	ROM_LOAD16_BYTE( "1.0_snow_10-09_13_2b87_1h_27c040.ic13", 0x100001, 0x80000, CRC(d9754369) SHA1(0d82569cb925402a9f4634e52f15435112ec4878) )
 
 	ROM_REGION16_LE( 0x400000, "adsprom", 0 ) // ADSP-2115 code & data
 	ROM_LOAD( "pls_ic18.ic18", 0x0000000, 0x400000, CRC(a1b64695) SHA1(7487cd51305e30a5b55aada0bae9161fcb3fcd19) ) // designation silkscreend on SMT mask ROM
@@ -1608,20 +1719,23 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1996, speedup,   0,        gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 2.20)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup )
-GAMEL( 1996, speedup12, speedup,  gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 1.20)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup )
-GAMEL( 1996, speedup10, speedup,  gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 1.00)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup )
+GAMEL( 1996, speedup,    0,        gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 2.20)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup )
+GAMEL( 1996, speedup12,  speedup,  gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 1.20)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup )
+GAMEL( 1996, speedup10,  speedup,  gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 1.00)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup )
 
-GAME( 1997, surfplnt,   0,        gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco (Atari license)", "Surf Planet (version 4.1)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 1997, surfplnt40, surfplnt, gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco (Atari license)", "Surf Planet (version 4.0)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 1997, surfplnt30, surfplnt, gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Surf Planet (version 3.0)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 1997, surfplnt20, surfplnt, gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Surf Planet (version 2.0)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1997, surfplnt,    0,        gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco (Atari license)", "Surf Planet (version 4.1)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1997, surfplnt40,  surfplnt, gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco (Atari license)", "Surf Planet (version 4.0)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1997, surfplnt31,  surfplnt, gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Surf Planet (version 3.1)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1997, surfplnt30,  surfplnt, gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Surf Planet (version 3.0)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE) // 12/Nov
+GAME( 1997, surfplnt20,  surfplnt, gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Surf Planet (version 2.0)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE) // 12/Sep
+GAME( 1997, surfplnt12,  surfplnt, gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Surf Planet (version 1.2)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE) // 25/Jun. Older than 1.0??
+GAME( 1997, surfplnt10,  surfplnt, gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Surf Planet (version 1.0)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE) // 10/Sep
 
-GAME( 1998, radikalb,   0,        gaelco3d2, radikalb, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Radikal Bikers (version 2.02)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 1998, radikalba,  radikalb, gaelco3d2, radikalb, gaelco3d_state, empty_init, ROT0, "Gaelco (Atari license)", "Radikal Bikers (version 2.02, Atari license)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
-GAME( 1998, radikalbp,  radikalb, gaelco3d2, radikalb, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Radikal Bikers (prototype)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)
+GAME( 1998, radikalb,    0,        gaelco3d2, radikalb, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Radikal Bikers (version 2.02)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1998, radikalba,   radikalb, gaelco3d2, radikalb, gaelco3d_state, empty_init, ROT0, "Gaelco (Atari license)", "Radikal Bikers (version 2.02, Atari license)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1998, radikalbp,   radikalb, gaelco3d2, radikalb, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Radikal Bikers (prototype)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)
 
-GAME( 1999, footbpow,   0,        footbpow,  footbpow, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Football Power (version 4.6)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )
-GAME( 1999, footbpow14, footbpow, footbpow,  footbpow, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Football Power (version 1.4)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )
-GAME( 1999, footbpow12, footbpow, footbpow,  footbpow, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Football Power (version 1.2)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )
-GAME( 1999, footbpow11, footbpow, footbpow,  footbpow, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Football Power (version 1.1)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )
+GAME( 1999, footbpow,    0,        footbpow,  footbpow, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Football Power (version 4.6)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )
+GAME( 1999, footbpow14,  footbpow, footbpow,  footbpow, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Football Power (version 1.4)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )
+GAME( 1999, footbpow12,  footbpow, footbpow,  footbpow, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Football Power (version 1.2)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )
+GAME( 1999, footbpow11,  footbpow, footbpow,  footbpow, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Football Power (version 1.1)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )
