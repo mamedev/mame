@@ -116,6 +116,21 @@ static INPUT_PORTS_START( jak_dond )
 	PORT_BIT( 0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( spg2xx_jpdy )
+	PORT_INCLUDE( spg2xx_jakks )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_NAME("Joypad Up")
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_NAME("Joypad Down")
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_NAME("Joypad Left")
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("Joypad Right")
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(1) PORT_NAME("P1 Answer")
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(2) PORT_NAME("P2 Answer")
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(3) PORT_NAME("P3 Answer")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Menu / Pause")
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( jak_spd3 )
 	PORT_INCLUDE( spg2xx_jakks )
 
@@ -667,6 +682,11 @@ ROM_START( jak_1vs )
 	ROM_LOAD16_WORD_SWAP( "jakks1vs100.u3", 0x000000, 0x200000, CRC(4a8cdedf) SHA1(e6d035262d9b022e9cd19f2322ba6ef1a1db7b38) )
 ROM_END
 
+ROM_START( jak_jpdy )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakksjeopardy.u2", 0x000000, 0x200000, CRC(6ccf00b7) SHA1(51e6fe60f3169e52d03f46469923253231a7262e) )
+ROM_END
+
 ROM_START( jak_hmbb )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "jakkhmbobw.bin", 0x000000, 0x800000, CRC(4e72cbf9) SHA1(efcec76da39c8373e8ef769c4fa0a35d379896d8) )
@@ -774,6 +794,8 @@ CONS( 2007, jak_spd3, 0, 0, spg2xx_jakks,  jak_spd3,      jakks_state, empty_ini
 CONS( 2007, jak_cind, 0, 0, spg2xx_jakks,  spg2xx_pacg,   jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Cinderella - Once Upon a Midnight (JAKKS Pacific TV Game) (Aug 29 2007 11:15:55)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2007, jak_dwa,  0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Dora the Explorer - Dora's World Adventure! (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2006, jak_jpdy, 0, 0, spg2xx_jakks,  spg2xx_jpdy,   jakks_state, empty_init, "JAKKS Pacific Inc / 5000ft, Inc",  "Jeopardy (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2006, jak_gdg,  0, 0, spg2xx_dpma,   spg2xx_gdg,    jakks_state, empty_init, "JAKKS Pacific Inc / 1st Playable Productions",  "Go Diego Go! (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
 
