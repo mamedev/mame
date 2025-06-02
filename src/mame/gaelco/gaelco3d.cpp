@@ -1361,6 +1361,46 @@ ROM_START( radikalba ) // Version 2.02, Atari license - REF. 980311 ROM board
 	ROM_LOAD( "m.a_4426_pal16l8.bin",  0x000, 0x104, CRC(94e4f59c) SHA1(3bc0c77c77ef763400372d3aabdb15d46da2bc29) )
 ROM_END
 
+/* All ROMs but the two program ROMs were on custom DIP42 PCBs with solderded flash chips:
+   - FLA32X8 dip modules are equivalent to 27c322 eproms but in “8 bit mode” (such EPROM doesnt exist), the module has A0 in place of D15. These modules use two 29F016 flash chips.
+   - FLASH32M/1 dip modules are equivalent to 27c322 (full 16 bit output), pin 11 chip enable is active HIGH (instead of active LOW). These modules use two 29F016 flash chips. */
+ROM_START( radikalbp ) // Development PCB, silkscreened "3D-3G-AER/2"
+	ROM_REGION( 0x400000, "maincpu", 0 )    // 68020 code
+	ROM_LOAD16_BYTE( "29f016.u22", 0x000000, 0x200000, CRC(534ce101) SHA1(4763ecd7e075b69b0742912050633b5d87b26413) )
+	ROM_LOAD16_BYTE( "29f016.u30", 0x000001, 0x200000, CRC(48b26455) SHA1(743d7f32642891d608e345021cabbdf3dd025870) )
+
+	ROM_REGION16_LE( 0x400000, "adsprom", 0 ) // ADSP-2115 code & data
+	ROM_LOAD( "so_flash32m-1.u87", 0x0000000, 0x400000, CRC(89af0f3e) SHA1(9e63b19696fd309bf55d990b0b1e1f3a4aa3cb36) )
+
+	ROM_REGION32_LE( 0x1000000, "tmsrom", 0 )
+	ROM_LOAD32_WORD( "h_flash32m.u89", 0x000000, 0x400000, CRC(9c56a06a) SHA1(54f12d8b55fa14446c47e31684c92074c4157fe1) )
+	ROM_LOAD32_WORD( "flash32m.u88",   0x000002, 0x400000, CRC(e011cf9c) SHA1(f3563a1fc6be0596e1aa08255343e9ad8074d2c4) )
+
+	ROM_REGION( 0x2000000, "texture", 0 )
+	ROM_LOAD( "b_fla32x8_8_bit.u18", 0x0000000, 0x400000, CRC(4fbd4737) SHA1(594438d3edbe00682290986cc631615d7bef67f3) )
+	ROM_LOAD( "d_fla32x8_8_bit.u28", 0x0800000, 0x400000, CRC(2eaa42e7) SHA1(0fd6bf9a464392a201fe55327a86573ee7e82890) )
+	ROM_LOAD( "a_fla32x8_8_bit.u41", 0x1000000, 0x400000, CRC(edb9d409) SHA1(1f8df507e990eee197f2779b45bd8f143d1bd439) )
+	ROM_LOAD( "c_fla32x8_8_bit.u43", 0x1800000, 0x400000, CRC(72fe2ad9) SHA1(b65b099eb245f75dde9758690ada3acf35cce8f1) )
+	ROM_LOAD( "f_fla32x8_8_bit.u27", 0x0400000, 0x400000, CRC(5b88077f) SHA1(d38db0df40f078273c6ac6d001a6c83460915beb) )
+	ROM_LOAD( "h_fla32x8_8_bit.u29", 0x0c00000, 0x400000, CRC(4fbbd8df) SHA1(08f9b43dd4de967a26434c7295ea3b21dfea0405) )
+	ROM_LOAD( "e_fla32x8_8_bit.u42", 0x1400000, 0x400000, CRC(dd16837e) SHA1(7d37b5a571895a4ae39e2bbb804acae645de68c1) )
+	ROM_LOAD( "g_fla32x8_8_bit.u44", 0x1c00000, 0x400000, CRC(7d868c37) SHA1(fdc7e836208f904a53417d61daf765bc9804dfea) )
+
+	// There were neither texmask ROMs on this PCB nor sockets for them
+	ROM_REGION( 0x0080000, "texmask", 0 )
+	ROM_LOAD( "rab_24.ic24", 0x0000000, 0x020000, BAD_DUMP CRC(2984bc1d) SHA1(1f62bdaa86feeff96640e325f8241b9c5f383a44) ) // Not present on the development PCB ??
+	ROM_LOAD( "rab_25.ic25", 0x0020000, 0x020000, BAD_DUMP CRC(777758e3) SHA1(bd334b1ba46189ac8509eee3a4ab295c121400fd) ) // Not present on the development PCB ??
+	ROM_LOAD( "rab_26.ic26", 0x0040000, 0x020000, BAD_DUMP CRC(bd9c1b54) SHA1(c9ef679cf7eca9ed315ea62a7ada452bc85f7a6a) ) // Not present on the development PCB ??
+	ROM_LOAD( "rab_27.ic27", 0x0060000, 0x020000, BAD_DUMP CRC(bbcf6977) SHA1(0282c8ba79c35ed1240711d5812bfb590d151738) ) // Not present on the development PCB ??
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "deco-i_pal16l8.ic21", 0x000, 0x117, BAD_DUMP CRC(81484e3b) SHA1(c63f35dba20c7fd7226e03cf18d2860740b0dd0c) ) // Bruteforced
+	ROM_LOAD( "m.1_pal16l8.ic91",    0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "p_pal16l8d.u21",      0x000, 0x117, BAD_DUMP CRC(f957b735) SHA1(7015400a94f1a07762f1b285a9038bec72c1aa3b) ) // Bruteforced
+	ROM_LOAD( "so_pal16l8d.u82",     0x000, 0x117, BAD_DUMP CRC(f706c313) SHA1(90c615d817267d809515050bf8ca1ac816a8a57f) ) // Bruteforced
+ROM_END
+
+
 /*
 Football Power has a small PCB inside the ball controller, very similar to the one found on
 Gaelco Football, with two accelerometers and a PIC.
@@ -1579,6 +1619,7 @@ GAME( 1997, surfplnt20, surfplnt, gaelco3d,  surfplnt, gaelco3d_state, empty_ini
 
 GAME( 1998, radikalb,   0,        gaelco3d2, radikalb, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Radikal Bikers (version 2.02)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 GAME( 1998, radikalba,  radikalb, gaelco3d2, radikalb, gaelco3d_state, empty_init, ROT0, "Gaelco (Atari license)", "Radikal Bikers (version 2.02, Atari license)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
+GAME( 1998, radikalbp,  radikalb, gaelco3d2, radikalb, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Radikal Bikers (prototype)",                   MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)
 
 GAME( 1999, footbpow,   0,        footbpow,  footbpow, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Football Power (version 4.6)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )
 GAME( 1999, footbpow14, footbpow, footbpow,  footbpow, gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Football Power (version 1.4)",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_CONTROLS )
