@@ -46676,6 +46676,8 @@ jak_ctah
 jak_dond
 jak_dpma
 jak_dwa
+jak_dwmn
+jak_dwmno
 jak_gdg
 jak_hm1m
 jak_hmbb
@@ -46701,6 +46703,8 @@ jak_spdv
 jak_supm
 jak_wall
 jak_wof2
+jak_xmen
+jak_xmenp
 
 @source:tvgames/spg2xx_jakks_gkr.cpp
 jak_capc
@@ -46712,8 +46716,6 @@ jak_dora
 jak_dorr
 jak_dpr
 jak_dprs
-jak_dwmn
-jak_dwmno
 jak_fan4
 jak_just
 jak_mpac
@@ -46727,7 +46729,6 @@ jak_spdm
 jak_swot
 jak_wof
 jak_wwe
-jak_xmenp
 
 @source:tvgames/spg2xx_jakks_sharp.cpp
 jsc_dora

@@ -134,6 +134,18 @@ static INPUT_PORTS_START( spg2xx_avtr )
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(1) PORT_NAME("B Button")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( spg2xx_xmen )
+	PORT_INCLUDE( spg2xx_jakks )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(1) PORT_NAME("A Button")
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(1) PORT_NAME("B Button")
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON3 )        PORT_PLAYER(1) PORT_NAME("X Button")
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON4 )        PORT_PLAYER(1) PORT_NAME("Menu / Pause")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( jak_supm )
 	PORT_START("P1")
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_NAME("Joypad Up")
@@ -660,6 +672,26 @@ ROM_START( jak_hmbb )
 	ROM_LOAD16_WORD_SWAP( "jakkhmbobw.bin", 0x000000, 0x800000, CRC(4e72cbf9) SHA1(efcec76da39c8373e8ef769c4fa0a35d379896d8) )
 ROM_END
 
+ROM_START( jak_xmen )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakkxmen.u3", 0x000000, 0x400000, CRC(f4383dca) SHA1(9850782e498ab0036850aa1f8926299c658a6099) )
+ROM_END
+
+ROM_START( jak_xmenp )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "xmen.bin", 0x000000, 0x400000, CRC(1fa271e0) SHA1(c32652e9eddf82ab496e3609f8fa444e447fb509) )
+ROM_END
+
+ROM_START( jak_dwmn )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "dreamworks.bin", 0x000000, 0x400000, CRC(3ae9f786) SHA1(46451be3af459fbdb75d1155b3817543afe183d5) )
+ROM_END
+
+ROM_START( jak_dwmno )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "dw_spg300_test.bin", 0x000000, 0x400000, CRC(1ca2817b) SHA1(39ae519457c102c4420fae3699b2db0557ef1cf5) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -748,3 +780,10 @@ CONS( 2006, jak_gdg,  0, 0, spg2xx_dpma,   spg2xx_gdg,    jakks_state, empty_ini
 CONS( 2006, jak_dond, 0, 0, spg2xx_jakks,  jak_dond,      jakks_state, init_crc,   "JAKKS Pacific Inc / Pronto Games",    "Deal or No Deal (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2007, jak_1vs,  0, 0, spg2xx_jakks,  spg2xx_1vs,    jakks_state, init_crc,   "JAKKS Pacific Inc / Pronto Games",    "1 Vs 100 (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2005, jak_xmen, 0,        0, spg2xx_jakks,  spg2xx_xmen,  jakks_state, empty_init, "JAKKS Pacific Inc / Amaze Entertainment",     "X-Men - Mutant Reign (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
+CONS( 2005, jak_xmenp,jak_xmen, 0, spg2xx_jakks,  spg2xx_xmen,  jakks_state, empty_init, "JAKKS Pacific Inc / Amaze Entertainment",     "X-Men - Mutant Reign (JAKKS Pacific TV Game, prototype)", MACHINE_IMPERFECT_SOUND )
+
+// Dreamworks Movie Night was never manufactured
+CONS( 2006, jak_dwmn, 0,        0, spg2xx_jakks, spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Amaze Entertainment",      "Dreamworks Movie Night (JAKKS Pacific TV Game, Oct 18 2006, prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, jak_dwmno,jak_dwmn, 0, spg2xx_jakks, spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Amaze Entertainment",      "Dreamworks Movie Night (JAKKS Pacific TV Game, Apr 24 2006, test program)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
