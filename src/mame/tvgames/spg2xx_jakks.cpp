@@ -122,6 +122,16 @@ static INPUT_PORTS_START( jak_spd3 )
 	PORT_MODIFY("P1")
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("C Button")
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("Menu / Pause")
+
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( spg2xx_avtr )
+	PORT_INCLUDE( spg2xx_jakks )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(1) PORT_NAME("A Button")
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(1) PORT_NAME("B Button")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( jak_supm )
@@ -510,6 +520,11 @@ ROM_START( jak_hm1m )
 	ROM_LOAD16_WORD_SWAP( "jakkshmoiam.u4", 0x000000, 0x400000, CRC(38f0ec0c) SHA1(15458aa3de77776a9e3419073a8af7f92e403b6e) )
 ROM_END
 
+ROM_START( jak_avtr )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakksavatar.u2", 0x000000, 0x400000, CRC(e6f3fd64) SHA1(fe364eab4fb8d729a9c1c6a640779e54ad34fb24) )
+ROM_END
+
 ROM_START( jak_supm )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "superman.u3", 0x000000, 0x400000, CRC(626bdd85) SHA1(605b3193c17f606d2de5689f045b50ac0b7ff024) )
@@ -695,6 +710,8 @@ CONS( 2008, jak_rapm, 0, 0, jakks_rapm,    jak_rapm,      jakks_state, empty_ini
 CONS( 2007, jak_slpb, 0, 0, spg2xx_jakks,  spg2xx_pacg,   jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",  "Sleeping Beauty - Tales of Enchantment (JAKKS Pacific TV Game) (Sep 17 2007 14:45:02)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2007, jak_hm1m, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",  "Hannah Montana - One in a Million (JAKKS Pacific TV Game) (Aug 13 2007 15:42:29)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2007, jak_avtr, 0, 0, spg2xx_jakks,  spg2xx_avtr,  jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",  "Avatar: The Last Airbender - Book One Challenges (JAKKS Pacific TV Game) (06 Jun 2006 A)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2007, jak_hmbb, 0, 0, spg2xx_hmbb,   spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",  "Hannah Montana - Best of Both Worlds (JAKKS Pacific TV Game) (Aug 17 2007 22:47:47)", MACHINE_IMPERFECT_SOUND )
 
