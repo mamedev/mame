@@ -11,7 +11,7 @@ Hardware:
 
 Key Matrix Layout:
 Col 0 (P1.0): OK, F4, UP
-Col 1 (P1.1): LEFT, RIGHT, DOWN  
+Col 1 (P1.1): RIGHT, LEFT, DOWN  
 Col 2 (P1.2): F3, F1, F2
 
 Rows are scanned via P1.4, P1.5, P1.6
@@ -85,7 +85,7 @@ private:
 	
 	uint8_t m_port1 = 0xff;  // Port 1 output latch
 	uint8_t m_port3 = 0xff;  // Port 3 output latch
-	uint8_t m_lcd_data = 0;      // LCD data bus
+	uint8_t m_lcd_data = 0;  // LCD data bus
 
 	void servicet_io(address_map &map) ATTR_COLD;
 	void servicet_map(address_map &map) ATTR_COLD;
@@ -103,19 +103,19 @@ void servicet_state::servicet_io(address_map &map)
 
 static INPUT_PORTS_START( servicet )
 	PORT_START("IN0") // P1.0
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("OK")    PORT_CODE(KEYCODE_ENTER) // Row 0
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("F4")    PORT_CODE(KEYCODE_F4)    // Row 1
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP)   PORT_4WAY                            // Row 2
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("OK") PORT_CODE(KEYCODE_ENTER)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("F4") PORT_CODE(KEYCODE_F4)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP)    PORT_4WAY
 
 	PORT_START("IN1") // P1.1
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT)  PORT_4WAY                           // Row 0
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_4WAY                           // Row 1
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN)  PORT_4WAY                           // Row 2
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_4WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT)  PORT_4WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN)  PORT_4WAY
 	
 	PORT_START("IN2") // P1.2
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("F3")    PORT_CODE(KEYCODE_F3)    // Row 0
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("F1")    PORT_CODE(KEYCODE_F1)    // Row 1
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("F2")    PORT_CODE(KEYCODE_F2)    // Row 2
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("F3") PORT_CODE(KEYCODE_F3)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("F1") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("F2") PORT_CODE(KEYCODE_F2)
 INPUT_PORTS_END
 
 void servicet_state::machine_start()
