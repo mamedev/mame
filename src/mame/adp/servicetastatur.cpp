@@ -14,7 +14,6 @@ Col 0 (P1.0): OK, F4, UP
 Col 1 (P1.1): RIGHT, LEFT, DOWN  
 Col 2 (P1.2): F3, F1, F2
 
-Rows are scanned via P1.4, P1.5, P1.6
 */
 
 #include "emu.h"
@@ -73,8 +72,8 @@ private:
 	void port1_w(uint8_t data);
 	uint8_t port3_r();
 	void port3_w(uint8_t data);
-	uint8_t lcd_bus_r(offs_t offset);
-	void lcd_bus_w(offs_t offset, uint8_t data);
+	uint8_t bus_r(offs_t offset);
+	void bus_w(offs_t offset, uint8_t data);
 		
 	HD44780_PIXEL_UPDATE(servicet_pixel_update);
 
@@ -83,9 +82,9 @@ private:
 	required_device<hd44780_device> m_lcd;
 	required_ioport_array<3> m_io_keys;
 	
-	uint8_t m_port1 = 0xff;  // Port 1 output latch
-	uint8_t m_port3 = 0xff;  // Port 3 output latch
-	uint8_t m_lcd_data = 0;  // LCD data bus
+	uint8_t m_port1 = 0xff;
+	uint8_t m_port3 = 0xff;
+	uint8_t m_lcd_data = 0;
 
 	void servicet_io(address_map &map) ATTR_COLD;
 	void servicet_map(address_map &map) ATTR_COLD;
@@ -98,7 +97,7 @@ void servicet_state::servicet_map(address_map &map)
 
 void servicet_state::servicet_io(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(servicet_state::lcd_bus_r), FUNC(servicet_state::lcd_bus_w));
+	map(0x0000, 0xffff).rw(FUNC(servicet_state::bus_r), FUNC(servicet_state::bus_w));
 }
 
 static INPUT_PORTS_START( servicet )
@@ -206,7 +205,7 @@ void servicet_state::port3_w(uint8_t data)
 	}
 }
 
-uint8_t servicet_state::lcd_bus_r(offs_t offset)
+uint8_t servicet_state::bus_r(offs_t offset)
 {
 	uint8_t data = 0xff;
 	
@@ -235,7 +234,7 @@ uint8_t servicet_state::lcd_bus_r(offs_t offset)
 	return data;
 }
 
-void servicet_state::lcd_bus_w(offs_t offset, uint8_t data)
+void servicet_state::bus_w(offs_t offset, uint8_t data)
 {	
 	// LCD is mapped to addresses where A6:A4 = 111 (0x70-0x7f)
 	if ((offset & 0x70) == 0x70)
@@ -286,7 +285,6 @@ void servicet_state::servicet(machine_config &config)
 	screen.set_screen_update("hd44780", FUNC(hd44780_device::screen_update));
 	screen.set_palette("palette");
 
-	// Simple 2-color palette for LCD
 	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
 	HD44780(config, m_lcd, 270'000);
