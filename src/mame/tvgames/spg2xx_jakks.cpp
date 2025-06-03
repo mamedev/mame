@@ -649,6 +649,11 @@ ROM_START( jak_dwa )
 	ROM_LOAD16_WORD_SWAP( "jakksdorawa.u3", 0x000000, 0x200000, CRC(fd519d3a) SHA1(a68a0dca5b722d83258c452a1c9243d4e9cb9de0) )
 ROM_END
 
+ROM_START( jak_5thg )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakks5thgrader.u2", 0x000000, 0x200000, CRC(d460d360) SHA1(b6547a5ba93b40dcd7c993c4dfc917c1f415f4f0) )
+ROM_END
+
 ROM_START( jak_gdg )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "jakksgodiegogo.u4", 0x000000, 0x200000, CRC(eaffbf9f) SHA1(7a415b817c8fed44569e1b66a42e80de9a81d4de) )
@@ -794,6 +799,8 @@ CONS( 2007, jak_spd3, 0, 0, spg2xx_jakks,  jak_spd3,      jakks_state, empty_ini
 CONS( 2007, jak_cind, 0, 0, spg2xx_jakks,  spg2xx_pacg,   jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Cinderella - Once Upon a Midnight (JAKKS Pacific TV Game) (Aug 29 2007 11:15:55)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2007, jak_dwa,  0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Dora the Explorer - Dora's World Adventure! (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2007, jak_5thg, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Are You Smarter than a 5th Grader? (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2006, jak_jpdy, 0, 0, spg2xx_jakks,  spg2xx_jpdy,   jakks_state, empty_init, "JAKKS Pacific Inc / 5000ft, Inc",  "Jeopardy! (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
 
