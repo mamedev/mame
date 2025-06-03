@@ -42918,6 +42918,9 @@ dmndhrt
 dmndhrtn
 honeybee
 
+@source:skeleton/clownmgc.cpp
+clownmgc
+
 @source:skeleton/clxvme186.cpp
 clxvme186
 

@@ -3435,7 +3435,7 @@ ROM_START( vs215o ) /* Step 1.5, original release.. might even be for Step 1.0??
 	ROM_FILL( 0x000000, 0x800000, 0x0000 )
 ROM_END
 
-ROM_START( vs298 )  /* Step 2.0, Sega ID# 833-13496, ROM board ID# 834-13497 VS2 VER98 STEP2 */
+ROM_START( vs298 )  /* Step 2.0, Sega ID# 833-13496, ROM board ID# 834-13497 VS2 VER98 STEP2, Security board ID# 837-13498-COM (317-0237-COM security chip) */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-20917.17",  0x400006, 0x100000, CRC(c3bbb270) SHA1(16b2342031ff72408f2290e775df5c8aa344c2e4) )
@@ -3507,7 +3507,7 @@ ROM_START( vs298 )  /* Step 2.0, Sega ID# 833-13496, ROM board ID# 834-13497 VS2
 	ROM_PARAMETER( ":315_5881:key", "29234e96" )
 ROM_END
 
-ROM_START( vs29815 )    /* Step 1.5, Sega game ID# is 833-13494, ROM board ID# 834-13495 VS2 VER98 STEP 1.5, Security board ID# 837-13498-COM (317-0237-COM) */
+ROM_START( vs29815 )    /* Step 1.5, Sega game ID# is 833-13494, ROM board ID# 834-13495 VS2 VER98 STEP 1.5 */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-20909.17",  0x600006, 0x080000, CRC(3dff0d7e) SHA1(c6a6a103f499cd451796ae2480b8c38c3e87a143) )
@@ -3576,7 +3576,7 @@ ROM_START( vs29815 )    /* Step 1.5, Sega game ID# is 833-13494, ROM board ID# 8
 	ROM_FILL( 0x000000, 0x800000, 0x0000 )
 ROM_END
 
-ROM_START( vs2v991 )    /* Step 2.0, Sega game ID# is 833-13688, ROM board ID# 834-13689 VS2 VER99 STEP 2, Security board ID# 837-13690-COM (317-0245-COM) */
+ROM_START( vs2v991 )    /* Step 2.0, Sega game ID# is 833-13688, ROM board ID# 834-13689 VS2 VER99 STEP 2, Security board ID# 837-13690-COM (317-0245-COM security chip) */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-21535b.17", 0x400006, 0x100000, CRC(76c5fa8e) SHA1(862438198cb7fdd20beeba53e707a7c59e618ad9) ) // shows Virtua Striker 2 Version '99.1 icon during demo, but not on title screen
@@ -3648,7 +3648,7 @@ ROM_START( vs2v991 )    /* Step 2.0, Sega game ID# is 833-13688, ROM board ID# 8
 	ROM_PARAMETER( ":315_5881:key", "29222ac8" )
 ROM_END
 
-ROM_START( vs299a ) /* Step 2.0, Sega game ID# is 833-13688, ROM board ID# 834-13689 VS2 VER99 STEP2, Security board ID# 837-13690-COM (317-0245-COM) */
+ROM_START( vs299a ) /* Step 2.0, Sega game ID# is 833-13688, ROM board ID# 834-13689 VS2 VER99 STEP2, Security board ID# 837-13690-COM (317-0245-COM security chip) */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-21535a.17",  0x400006, 0x100000, CRC(8e4ec341) SHA1(973c71e7a48e728cbcb2465b56e90669fee0ec53) )
@@ -3720,7 +3720,7 @@ ROM_START( vs299a ) /* Step 2.0, Sega game ID# is 833-13688, ROM board ID# 834-1
 	ROM_PARAMETER( ":315_5881:key", "29222ac8" )
 ROM_END
 
-ROM_START( vs299 )  /* Step 2.0, Sega game ID# is 833-13688, ROM board ID# 834-13689 VS2 VER99 STEP2, Security board ID# 837-13690-COM (317-0245-COM) */
+ROM_START( vs299 )  /* Step 2.0, Sega game ID# is 833-13688, ROM board ID# 834-13689 VS2 VER99 STEP2, Security board ID# 837-13690-COM (317-0245-COM security chip) */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-21535.17",  0x400006, 0x100000, CRC(976a00bf) SHA1(d4be52ff59faa877b169f96ac509a2196cefb908) )
@@ -3792,7 +3792,7 @@ ROM_START( vs299 )  /* Step 2.0, Sega game ID# is 833-13688, ROM board ID# 834-1
 	ROM_PARAMETER( ":315_5881:key", "29222ac8" )
 ROM_END
 
-ROM_START( vs299j ) /* Step 2.0, Sega game ID# is 833-13688-01, ROM board ID# 834-13689-01 VS2 VER99 STEP2 JPN, Security board ID# 837-13690-COM (317-0245-COM) */
+ROM_START( vs299j ) /* Step 2.0, Sega game ID# is 833-13688-01, ROM board ID# 834-13689-01 VS2 VER99 STEP2 JPN, Security board ID# 837-13690-COM (317-0245-COM security chip) */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-21550b.17",  0x400006, 0x100000, CRC(c508e488) SHA1(3134d418beaee9f824a0bd0e5441a997b5911d16) ) // shows Virtua Striker 2 Version '99.1 icon during demo, but not on title screen
@@ -4071,7 +4071,7 @@ ROM_START( vs29915j )  /* Step 1.5, Sega game ID# is 833-13687-01 VS2 VER99 STEP
 	ROM_FILL( 0x000000, 0x800000, 0x0000 )
 ROM_END
 
-ROM_START( von2 )   /* Step 2.0, Sega game ID# is 833-13346, ROM board ID# 834-13347 VOT, Security board ID# 837-13379-COM */
+ROM_START( von2 )   /* Step 2.0, Sega game ID# is 833-13346, ROM board ID# 834-13347 VOT, Security board ID# 837-13379-COM (317-0234-COM security chip) */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-20683b.17", 0x000006, 0x200000, CRC(59d9c974) SHA1(c45594ed474a9e8fd074e0d9d5fa6662bc88dee6) )
@@ -4142,7 +4142,7 @@ ROM_START( von2 )   /* Step 2.0, Sega game ID# is 833-13346, ROM board ID# 834-1
 	ROM_PARAMETER( ":315_5881:key", "292a0e97" )
 ROM_END
 
-ROM_START( von2a )   /* Step 2.0, Sega game ID# is 833-13346, ROM board ID# 834-13347 VOT, Security board ID# 837-13379-COM */
+ROM_START( von2a )   /* Step 2.0, Sega game ID# is 833-13346, ROM board ID# 834-13347 VOT, Security board ID# 837-13379-COM (317-0234-COM security chip) */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-20683a.17", 0x000006, 0x200000, CRC(16b202e9) SHA1(e87f5f4a29b43856c51f27a42aa5abbc7d1e595a) )
@@ -4213,7 +4213,7 @@ ROM_START( von2a )   /* Step 2.0, Sega game ID# is 833-13346, ROM board ID# 834-
 	ROM_PARAMETER( ":315_5881:key", "292a0e97" )
 ROM_END
 
-ROM_START( von2o )   /* Step 2.0, Sega game ID# is 833-13346, ROM board ID# 834-13347 VOT, Security board ID# 837-13379-COM */
+ROM_START( von2o )   /* Step 2.0, Sega game ID# is 833-13346, ROM board ID# 834-13347 VOT, Security board ID# 837-13379-COM (317-0234-COM security chip) */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-20683.17", 0x000006, 0x200000, CRC(bb21aea7) SHA1(8d75a79411f37c921b923329fa499fb96c3084b2) )
@@ -4284,7 +4284,9 @@ ROM_START( von2o )   /* Step 2.0, Sega game ID# is 833-13346, ROM board ID# 834-
 	ROM_PARAMETER( ":315_5881:key", "292a0e97" )
 ROM_END
 
-ROM_START( von254g )    /* Step 2.0, Sega game ID# is 833-13789 VOT VER 5.4 */
+/* Virtual On 2: Oratorio Tangram Ver 5.2 known to exist, just not currently dumped */
+
+ROM_START( von254g )    /* Step 2.0, Sega game ID# is 833-13789 VOT VER 5.4, ROM board ID# 834-13790 VOT VER 5.4, Security board ID# 837-13379-COM (317-0234-COM security chip) */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-21788.17",  0x000006, 0x200000, CRC(97066bcf) SHA1(234c45ee1f23b22f61893825eebf31d867cf420f) )
@@ -5533,7 +5535,7 @@ ROM_START( fvipers2 )   /* Step 2.0, Sega game ID# is 833-13407 FIGHTING VIPERS2
 	ROM_PARAMETER( ":315_5881:key", "29260e96" )
 ROM_END
 
-ROM_START( fvipers2o )   /* Step 2.0 */
+ROM_START( fvipers2o )   /* Step 2.0, Sega game ID# is 833-13407 FIGHTING VIPERS2, ROM board ID# 834-13408 FIGHTING VIPERS2, Security board ID# 837-13423-COM */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-20596.17", 0x000006, 0x200000, CRC(a311b4af) SHA1(daf88c12533c3ae5e6c63b581a6141a829b4e133) )
@@ -6070,7 +6072,7 @@ ROM_START( magtruck )   /* Step 2.1, Sega game ID# is 833-13601-01 (Export), ROM
 	ROM_PARAMETER( ":315_5881:key", "29266e45" )
 ROM_END
 
-ROM_START( oceanhun )   /* Step 2.0, Sega game ID# is 833-13571, ROM board ID# 834-13572 THE OCEAN HUNTER, 317-0242-COM security chip (837-13576-COM security board) */
+ROM_START( oceanhun )   /* Step 2.0, Sega game ID# is 833-13571, ROM board ID# 834-13572 THE OCEAN HUNTER, Security board ID# 837-13576-COM (317-0242-COM security chip) */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-21114a.17", 0x000006, 0x200000, CRC(75024695) SHA1(cc4a3da4072a2d73127b16384db85fa5d1db870c) )
@@ -6137,7 +6139,7 @@ ROM_START( oceanhun )   /* Step 2.0, Sega game ID# is 833-13571, ROM board ID# 8
 	ROM_PARAMETER( ":315_5881:key", "292b6a01" )
 ROM_END
 
-ROM_START( oceanhuna )   /* Step 2.0, Sega game ID# is 833-13571, ROM board ID# 834-13572 THE OCEAN HUNTER, 317-0242-COM security chip (837-13576-COM security board) */
+ROM_START( oceanhuna )   /* Step 2.0, Sega game ID# is 833-13571, ROM board ID# 834-13572 THE OCEAN HUNTER, Security board ID# 837-13576-COM (317-0242-COM security chip) */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-21114.17", 0x000006, 0x200000, CRC(3adfcb9d) SHA1(22307e36a48e59ab881d6df2fbf2864f6a8b239c) )
@@ -6204,7 +6206,7 @@ ROM_START( oceanhuna )   /* Step 2.0, Sega game ID# is 833-13571, ROM board ID# 
 	ROM_PARAMETER( ":315_5881:key", "292b6a01" )
 ROM_END
 
-ROM_START( lamachin )   /* Step 2.0, Sega game ID# is 833-13664, ROM board ID# 834-13665 L.A.MACHINEGUNS, 317-0244-COM security chip (837-13666-COM security board) */
+ROM_START( lamachin )   /* Step 2.0, Sega game ID# is 833-13664, ROM board ID# 834-13665 L.A.MACHINEGUNS, Security board ID# 837-13666-COM (317-0244-COM security chip) */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-21483.17", 0x000006, 0x200000, CRC(940637c2) SHA1(89894b603c17d27f57500ec8030eaa7e0e991479) )
