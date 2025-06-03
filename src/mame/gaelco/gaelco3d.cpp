@@ -1050,8 +1050,110 @@ ROM_START( speedup ) // Version 2.20 - REF. 960717 ROM board
 //  ROM_LOAD( "ic43.bin", 0x0000000, 0x020000, CRC(34737d1d) SHA1(e9109a88e211aa49851e72a6fa3417f1cad1cb8b) ) // nondescript green dot label
 //  ROM_LOAD( "ic42.bin", 0x0020000, 0x020000, CRC(e89e829b) SHA1(50c99bd9667d78a61252eaad5281a2e7f57be85a) ) // nondescript white dot label
 
-	ROM_REGION( 0x2000, "coin", 0 ) // Credit distribution PCB
-	ROM_LOAD( "2x1c_pic16c54.u1", 0x0000, 0x2000, NO_DUMP )
+	ROM_REGION( 0x407, "coin", 0 ) // Credit distribution PCB
+	ROM_LOAD( "m.2x1_covi_152b6_pic16c54.bin", 0x000, 0x407, CRC(3e6f76fd) SHA1(c271a31043c9792bf0571489487bbde1141ad273) ) // For Covielsa cabinet. Twin or other cabinets use different PIC programs
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "a1_a_4426_pal16l8.bin", 0x000, 0x104, CRC(94e4f59c) SHA1(3bc0c77c77ef763400372d3aabdb15d46da2bc29) )
+	ROM_LOAD( "m.b_48f6_pal16l8.bin",  0x000, 0x104, CRC(4c298505) SHA1(5a4f57e3d3cd5e329426d6d469b0fdd614812b25) )
+	ROM_LOAD( "m1_c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )
+ROM_END
+
+ROM_START( speedup21 ) // Version 2.10
+	ROM_REGION( 0x200000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "sup_e_v2.10_5-3_ic10_2345_27c040.bin", 0x000000, 0x80000, CRC(d6fabf94) SHA1(b900fe3816c9c1c9b7669a9b58cf15db858fee78) )
+	ROM_LOAD16_BYTE( "sup_o_v2.10_5-3_ic15_5e35_27c040.bin", 0x000001, 0x80000, CRC(ee2c215e) SHA1(047a833333bfa277a2aaaa302d2a38a36b494e64) )
+
+	ROM_REGION16_LE( 0x400000, "adsprom", 0 ) // ADSP-2115 code & data
+	ROM_LOAD( "sup_ic25.ic25", 0x0000000, 0x400000, CRC(284c7cd1) SHA1(58fbe73195aac9808a347c543423593e17ad3a10) ) // designation silkscreend on mask ROM
+
+	ROM_REGION32_LE( 0x1000000, "tmsrom", 0 )
+	ROM_LOAD32_WORD( "sup_ic32.ic32", 0x000000, 0x200000, CRC(aed151de) SHA1(a139d4451d3758aa70621a25289d64c98c26d5c0) ) // designation silkscreend on mask ROM
+	ROM_LOAD32_WORD( "sup_ic33.ic33", 0x000002, 0x200000, CRC(9be6ab7d) SHA1(8bb07f2a096d1f8989a5a409f87b35b7d771de88) ) // designation silkscreend on mask ROM
+
+	ROM_REGION( 0x1000000, "texture", 0 )
+	ROM_LOAD( "sup_ic12.ic12", 0x0000000, 0x400000, CRC(311f3247) SHA1(95014ea177011521a01df85fb511e5e6673dbdcb) ) // designation silkscreend on mask ROM
+	ROM_LOAD( "sup_ic14.ic14", 0x0400000, 0x400000, CRC(3ad3c089) SHA1(1bd577679ed436251995a100aece2c26c0214fd8) ) // designation silkscreend on mask ROM
+	ROM_LOAD( "sup_ic11.ic11", 0x0800000, 0x400000, CRC(b993e65a) SHA1(b95bd4c1eac7fba1d2429250446b58f741350bb3) ) // designation silkscreend on mask ROM
+	ROM_LOAD( "sup_ic13.ic13", 0x0c00000, 0x400000, CRC(ad00023c) SHA1(9d7cce280fff38d7e0dac21e7a1774809d9758bd) ) // designation silkscreend on mask ROM
+
+	ROM_REGION( 0x0080000, "texmask", 0 )
+	ROM_LOAD( "ic35.bin", 0x0000000, 0x020000, CRC(34737d1d) SHA1(e9109a88e211aa49851e72a6fa3417f1cad1cb8b) ) // nondescript green dot label
+	ROM_LOAD( "ic34.bin", 0x0020000, 0x020000, CRC(e89e829b) SHA1(50c99bd9667d78a61252eaad5281a2e7f57be85a) ) // nondescript white dot label
+	// These 2 are copies of the previous 2 at different IC locations
+//  ROM_LOAD( "ic43.bin", 0x0000000, 0x020000, CRC(34737d1d) SHA1(e9109a88e211aa49851e72a6fa3417f1cad1cb8b) ) // nondescript green dot label
+//  ROM_LOAD( "ic42.bin", 0x0020000, 0x020000, CRC(e89e829b) SHA1(50c99bd9667d78a61252eaad5281a2e7f57be85a) ) // nondescript white dot label
+
+	ROM_REGION( 0x407, "coin", 0 ) // Credit distribution PCB
+	ROM_LOAD( "m.2x1_covi_152b6_pic16c54.bin", 0x000, 0x407, CRC(3e6f76fd) SHA1(c271a31043c9792bf0571489487bbde1141ad273) ) // For Covielsa cabinet. Twin or other cabinets use different PIC programs
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "a1_a_4426_pal16l8.bin", 0x000, 0x104, CRC(94e4f59c) SHA1(3bc0c77c77ef763400372d3aabdb15d46da2bc29) )
+	ROM_LOAD( "m.b_48f6_pal16l8.bin",  0x000, 0x104, CRC(4c298505) SHA1(5a4f57e3d3cd5e329426d6d469b0fdd614812b25) )
+	ROM_LOAD( "m1_c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )
+ROM_END
+
+ROM_START( speedup20 ) // Version 2.00 (18/Feb)
+	ROM_REGION( 0x200000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "sup_e_v2.00_18-2_ic10_c5a4_27c040.bin", 0x000000, 0x80000, CRC(cbab8d60) SHA1(c2dfad8da835d274bc5c9449c9aa401ad1702d0a) )
+	ROM_LOAD16_BYTE( "sup_o_v2.00_18-2_ic15_9c28_27c040.bin", 0x000001, 0x80000, CRC(4be05b03) SHA1(c8788a3e521ff3bd6e40a97ba9c225b13ec56b33) )
+
+	ROM_REGION16_LE( 0x400000, "adsprom", 0 ) // ADSP-2115 code & data
+	ROM_LOAD( "sup_ic25.ic25", 0x0000000, 0x400000, CRC(284c7cd1) SHA1(58fbe73195aac9808a347c543423593e17ad3a10) ) // designation silkscreend on mask ROM
+
+	ROM_REGION32_LE( 0x1000000, "tmsrom", 0 )
+	ROM_LOAD32_WORD( "sup_ic32.ic32", 0x000000, 0x200000, CRC(aed151de) SHA1(a139d4451d3758aa70621a25289d64c98c26d5c0) ) // designation silkscreend on mask ROM
+	ROM_LOAD32_WORD( "sup_ic33.ic33", 0x000002, 0x200000, CRC(9be6ab7d) SHA1(8bb07f2a096d1f8989a5a409f87b35b7d771de88) ) // designation silkscreend on mask ROM
+
+	ROM_REGION( 0x1000000, "texture", 0 )
+	ROM_LOAD( "sup_ic12.ic12", 0x0000000, 0x400000, CRC(311f3247) SHA1(95014ea177011521a01df85fb511e5e6673dbdcb) ) // designation silkscreend on mask ROM
+	ROM_LOAD( "sup_ic14.ic14", 0x0400000, 0x400000, CRC(3ad3c089) SHA1(1bd577679ed436251995a100aece2c26c0214fd8) ) // designation silkscreend on mask ROM
+	ROM_LOAD( "sup_ic11.ic11", 0x0800000, 0x400000, CRC(b993e65a) SHA1(b95bd4c1eac7fba1d2429250446b58f741350bb3) ) // designation silkscreend on mask ROM
+	ROM_LOAD( "sup_ic13.ic13", 0x0c00000, 0x400000, CRC(ad00023c) SHA1(9d7cce280fff38d7e0dac21e7a1774809d9758bd) ) // designation silkscreend on mask ROM
+
+	ROM_REGION( 0x0080000, "texmask", 0 )
+	ROM_LOAD( "ic35.bin", 0x0000000, 0x020000, CRC(34737d1d) SHA1(e9109a88e211aa49851e72a6fa3417f1cad1cb8b) ) // nondescript green dot label
+	ROM_LOAD( "ic34.bin", 0x0020000, 0x020000, CRC(e89e829b) SHA1(50c99bd9667d78a61252eaad5281a2e7f57be85a) ) // nondescript white dot label
+	// These 2 are copies of the previous 2 at different IC locations
+//  ROM_LOAD( "ic43.bin", 0x0000000, 0x020000, CRC(34737d1d) SHA1(e9109a88e211aa49851e72a6fa3417f1cad1cb8b) ) // nondescript green dot label
+//  ROM_LOAD( "ic42.bin", 0x0020000, 0x020000, CRC(e89e829b) SHA1(50c99bd9667d78a61252eaad5281a2e7f57be85a) ) // nondescript white dot label
+
+	ROM_REGION( 0x407, "coin", 0 ) // Credit distribution PCB
+	ROM_LOAD( "m.2x1_covi_152b6_pic16c54.bin", 0x000, 0x407, CRC(3e6f76fd) SHA1(c271a31043c9792bf0571489487bbde1141ad273) ) // For Covielsa cabinet. Twin or other cabinets use different PIC programs
+
+	ROM_REGION( 0x104, "plds", 0 )
+	ROM_LOAD( "a1_a_4426_pal16l8.bin", 0x000, 0x104, CRC(94e4f59c) SHA1(3bc0c77c77ef763400372d3aabdb15d46da2bc29) )
+	ROM_LOAD( "m.b_48f6_pal16l8.bin",  0x000, 0x104, CRC(4c298505) SHA1(5a4f57e3d3cd5e329426d6d469b0fdd614812b25) )
+	ROM_LOAD( "m1_c_2af3_pal16l8.bin", 0x000, 0x104, CRC(4509408b) SHA1(8d54570d8faa2d055f4c743794c268141a69c20d) )
+ROM_END
+
+ROM_START( speedup20a ) // Version 2.00 (17/Feb)
+	ROM_REGION( 0x200000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "sup_e-10_v2.00_17-2_d5bb_27c040.bin", 0x000000, 0x80000, CRC(1c9796d8) SHA1(251a911bcd6459aeb2af78bf37c983738ca04898) )
+	ROM_LOAD16_BYTE( "sup_o-15_v2.00_17-2_a8d5_27c040.bin", 0x000001, 0x80000, CRC(3ebe3ce0) SHA1(6437e0564b4d8a572bb771b2c4dcdb2e9c9ae762) )
+
+	ROM_REGION16_LE( 0x400000, "adsprom", 0 ) // ADSP-2115 code & data
+	ROM_LOAD( "sup_ic25.ic25", 0x0000000, 0x400000, CRC(284c7cd1) SHA1(58fbe73195aac9808a347c543423593e17ad3a10) ) // designation silkscreend on mask ROM
+
+	ROM_REGION32_LE( 0x1000000, "tmsrom", 0 )
+	ROM_LOAD32_WORD( "sup_ic32.ic32", 0x000000, 0x200000, CRC(aed151de) SHA1(a139d4451d3758aa70621a25289d64c98c26d5c0) ) // designation silkscreend on mask ROM
+	ROM_LOAD32_WORD( "sup_ic33.ic33", 0x000002, 0x200000, CRC(9be6ab7d) SHA1(8bb07f2a096d1f8989a5a409f87b35b7d771de88) ) // designation silkscreend on mask ROM
+
+	ROM_REGION( 0x1000000, "texture", 0 )
+	ROM_LOAD( "sup_ic12.ic12", 0x0000000, 0x400000, CRC(311f3247) SHA1(95014ea177011521a01df85fb511e5e6673dbdcb) ) // designation silkscreend on mask ROM
+	ROM_LOAD( "sup_ic14.ic14", 0x0400000, 0x400000, CRC(3ad3c089) SHA1(1bd577679ed436251995a100aece2c26c0214fd8) ) // designation silkscreend on mask ROM
+	ROM_LOAD( "sup_ic11.ic11", 0x0800000, 0x400000, CRC(b993e65a) SHA1(b95bd4c1eac7fba1d2429250446b58f741350bb3) ) // designation silkscreend on mask ROM
+	ROM_LOAD( "sup_ic13.ic13", 0x0c00000, 0x400000, CRC(ad00023c) SHA1(9d7cce280fff38d7e0dac21e7a1774809d9758bd) ) // designation silkscreend on mask ROM
+
+	ROM_REGION( 0x0080000, "texmask", 0 )
+	ROM_LOAD( "ic35.bin", 0x0000000, 0x020000, CRC(34737d1d) SHA1(e9109a88e211aa49851e72a6fa3417f1cad1cb8b) ) // nondescript green dot label
+	ROM_LOAD( "ic34.bin", 0x0020000, 0x020000, CRC(e89e829b) SHA1(50c99bd9667d78a61252eaad5281a2e7f57be85a) ) // nondescript white dot label
+	// These 2 are copies of the previous 2 at different IC locations
+//  ROM_LOAD( "ic43.bin", 0x0000000, 0x020000, CRC(34737d1d) SHA1(e9109a88e211aa49851e72a6fa3417f1cad1cb8b) ) // nondescript green dot label
+//  ROM_LOAD( "ic42.bin", 0x0020000, 0x020000, CRC(e89e829b) SHA1(50c99bd9667d78a61252eaad5281a2e7f57be85a) ) // nondescript white dot label
+
+	ROM_REGION( 0x407, "coin", 0 ) // Credit distribution PCB
+	ROM_LOAD( "m.2x1_covi_152b6_pic16c54.bin", 0x000, 0x407, CRC(3e6f76fd) SHA1(c271a31043c9792bf0571489487bbde1141ad273) ) // For Covielsa cabinet. Twin or other cabinets use different PIC programs
 
 	ROM_REGION( 0x104, "plds", 0 )
 	ROM_LOAD( "a1_a_4426_pal16l8.bin", 0x000, 0x104, CRC(94e4f59c) SHA1(3bc0c77c77ef763400372d3aabdb15d46da2bc29) )
@@ -1084,8 +1186,8 @@ ROM_START( speedup12 ) // Version 1.20 - REF. 960717 ROM board
 //  ROM_LOAD( "ic43.bin", 0x0000000, 0x020000, CRC(34737d1d) SHA1(e9109a88e211aa49851e72a6fa3417f1cad1cb8b) ) // nondescript green dot label
 //  ROM_LOAD( "ic42.bin", 0x0020000, 0x020000, CRC(e89e829b) SHA1(50c99bd9667d78a61252eaad5281a2e7f57be85a) ) // nondescript white dot label
 
-	ROM_REGION( 0x2000, "coin", 0 ) // Credit distribution PCB
-	ROM_LOAD( "2x1c_pic16c54.u1", 0x0000, 0x2000, NO_DUMP )
+	ROM_REGION( 0x407, "coin", 0 ) // Credit distribution PCB
+	ROM_LOAD( "m.2x1_covi_152b6_pic16c54.bin", 0x000, 0x407, CRC(3e6f76fd) SHA1(c271a31043c9792bf0571489487bbde1141ad273) ) // For Covielsa cabinet. Twin or other cabinets use different PIC programs
 
 	ROM_REGION( 0x104, "plds", 0 )
 	ROM_LOAD( "a1_a_4426_pal16l8.bin", 0x000, 0x104, CRC(94e4f59c) SHA1(3bc0c77c77ef763400372d3aabdb15d46da2bc29) )
@@ -1118,8 +1220,8 @@ ROM_START( speedup10 ) // Version 1.00 - REF. 960717 ROM board
 //  ROM_LOAD( "ic43.bin", 0x0000000, 0x020000, CRC(34737d1d) SHA1(e9109a88e211aa49851e72a6fa3417f1cad1cb8b) ) // nondescript green dot label
 //  ROM_LOAD( "ic42.bin", 0x0020000, 0x020000, CRC(e89e829b) SHA1(50c99bd9667d78a61252eaad5281a2e7f57be85a) ) // nondescript white dot label
 
-	ROM_REGION( 0x2000, "coin", 0 ) // Credit distribution PCB
-	ROM_LOAD( "2x1c_pic16c54.u1", 0x0000, 0x2000, NO_DUMP )
+	ROM_REGION( 0x407, "coin", 0 ) // Credit distribution PCB
+	ROM_LOAD( "m.2x1_covi_152b6_pic16c54.bin", 0x000, 0x407, CRC(3e6f76fd) SHA1(c271a31043c9792bf0571489487bbde1141ad273) ) // For Covielsa cabinet. Twin or other cabinets use different PIC programs
 
 	ROM_REGION( 0x104, "plds", 0 )
 	ROM_LOAD( "a1_a_4426_pal16l8.bin", 0x000, 0x104, CRC(94e4f59c) SHA1(3bc0c77c77ef763400372d3aabdb15d46da2bc29) )
@@ -1719,9 +1821,12 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1996, speedup,    0,        gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 2.20)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup )
-GAMEL( 1996, speedup12,  speedup,  gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 1.20)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup )
-GAMEL( 1996, speedup10,  speedup,  gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 1.00)",                      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup )
+GAMEL( 1996, speedup,    0,        gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 2.20, checksum 2037)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup ) // 11/Mar
+GAMEL( 1996, speedup21,  speedup,  gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 2.10, checksum 9536)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup ) // 05/Mar
+GAMEL( 1996, speedup20,  speedup,  gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 2.00, checksum E145)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup ) // 18/Feb
+GAMEL( 1996, speedup20a, speedup,  gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 2.00, checksum 491B)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup ) // 17/Feb
+GAMEL( 1996, speedup12,  speedup,  gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 1.20, checksum 6851)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup ) // 10/Oct
+GAMEL( 1996, speedup10,  speedup,  gaelco3d,  speedup,  gaelco3d_state, empty_init, ROT0, "Gaelco",                 "Speed Up (version 1.00, checksum 31A9)",       MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_speedup )
 
 GAME( 1997, surfplnt,    0,        gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco (Atari license)", "Surf Planet (version 4.1)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
 GAME( 1997, surfplnt40,  surfplnt, gaelco3d,  surfplnt, gaelco3d_state, empty_init, ROT0, "Gaelco (Atari license)", "Surf Planet (version 4.0)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE)
