@@ -630,6 +630,16 @@ ROM_START( jak_bobb )
 	ROM_LOAD16_WORD_SWAP( "bob.bin", 0x000000, 0x400000, CRC(16b0b39f) SHA1(43a45e5346d108a9ec1b672fa727e97722b4eaa1) )
 ROM_END
 
+ROM_START( jak_thom )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakksthomasus.u3", 0x000000, 0x400000, CRC(f43d5d12) SHA1(863a1cf08bc45f7bca7db7e2aae45071ac25adfa) )
+ROM_END
+
+ROM_START( jak_thomp )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakksthomasuk.u3", 0x000000, 0x400000, CRC(2bbfa218) SHA1(d13d7d093c962d04f2c84571cceacf87e3768a78) )
+ROM_END
+
 ROM_START( easports )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "ea.u3", 0x000000, 0x400000, CRC(d750089e) SHA1(426f04c3d841103d434a892561db55ade684db54) )
@@ -703,12 +713,18 @@ CONS( 2004, jak_wpt,  0,         0, spg110_base, jak_spdmo, spg110_game_state, i
 CONS( 2004, jak_diso, jak_disn,  0, spg110_base, jak_spdmo, spg110_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Disney (JAKKS Pacific TV Game) (SPG110 hardware, 28 MAY 2004 A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // ROM bytesum is off by 0x3e, so likely a bad byte
-// sound doesn't work properly after a few initial sounds (expected, SPG110 issues)
+// sound doesn't work properly after a few initial sounds (expected, SPG110 emulation issues)
 // fill position in the 'Color Me Spongy' mini-game is completely wrong, maybe dump issue, maybe SPG110/unSP issue.
 CONS( 2004, jak_sbdd,  0,        0, spg110_base, jak_spdmo, spg110_game_state, init_crc, "JAKKS Pacific Inc", "SpongeBob SquarePants Dilly Dabbler (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // has Game-Key strings in test mode even if there were no SPG110 Game-Key units at all
 CONS( 2006, jak_bobb,  0,        0, spg110_base, jak_bobb,  spg110_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Bob the Builder - Project: Build It (JAKKS Pacific TV Game) (JUN 2 2006 14:42:01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 2006, jak_thom,  0,        0, spg110_base,     jak_bobb,  spg110_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Thomas & Friends - Right on Time (JAKKS Pacific TV Game) (Jun 28 2006 18:24:37) (US, NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, jak_thomp, jak_thom, 0, spg110_base_pal, jak_bobb,  spg110_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Thomas & Friends - Right on Time (JAKKS Pacific TV Game) (Jun 28 2006 18:01:22) (UK, PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // PAL versions have different voices
+// another version of Thomas & Friends (with a different screen layout, no map in the corner) also exists
+// https://www.youtube.com/watch?v=PfEELfnXaXE
+// is it an earlier version, or an SPG2xx port that loses the map for some reason?
 
 // this was sold by SDW Games for the US market, ROM not yet verified to be the same, also appears in some multigames?
 CONS( 2003, conyteni,  0,        0, spg110_base, conyteni,  spg110_game_state, empty_init, "Conny",      "TV Virtual Tennis", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // needs motion inputs, and video fixes, setting to PAL
