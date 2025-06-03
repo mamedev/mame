@@ -880,7 +880,7 @@ void z80_device::state_string_export(const device_state_entry &entry, std::strin
 				m_f.s()         ? 'S':'.',
 				m_f.z()         ? 'Z':'.',
 				m_f.yx() & 0x20 ? 'Y':'.',
-				m_f.h_val       ? 'H':'.',
+				m_f.h()         ? 'H':'.',
 				m_f.yx() & 0x08 ? 'X':'.',
 				m_f.pv()        ? 'P':'.',
 				m_f.n           ? 'N':'.',
