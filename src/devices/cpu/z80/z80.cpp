@@ -722,6 +722,7 @@ void z80_device::device_start()
 	state_add(Z80_SP,          "SP",        SP);
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  F).noshow().formatstr("%8s");
 	state_add(Z80_A,           "A",         A).noshow();
+	state_add(Z80_F,           "F",         F).noshow().callimport().callexport();
 	state_add(Z80_B,           "B",         B).noshow();
 	state_add(Z80_C,           "C",         C).noshow();
 	state_add(Z80_D,           "D",         D).noshow();
@@ -837,7 +838,7 @@ void z80_device::state_import(const device_state_entry &entry)
 			set_service_attention<SA_AFTER_LDAIR, 0>();
 		break;
 
-	case Z80_AF:
+	case Z80_F: case Z80_AF:
 		set_f(F);
 		break;
 	case Z80_R:
@@ -854,7 +855,7 @@ void z80_device::state_export(const device_state_entry &entry)
 {
 	switch (entry.index())
 	{
-	case Z80_AF:
+	case Z80_F: case Z80_AF:
 		F = get_f();
 		break;
 	case Z80_R:
