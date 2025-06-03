@@ -225,10 +225,10 @@ macro   ld_a_r
 	{
 		QT = 0;
 		// keep C
-		m_f.sign_val = m_f.zero_val = A;
+		m_f.s_val = m_f.z_val = A;
 		m_f.yx_val = A;
-		m_f.half_carry_val = m_f.subtract = 0;
-		m_f.parity_overflow_val = !m_iff2;
+		m_f.h_val = m_f.n = 0;
+		m_f.pv_val = !m_iff2;
 	}
 	if (HAS_LDAIR_QUIRK)
 		set_service_attention<SA_AFTER_LDAIR, 1>();
@@ -238,10 +238,10 @@ macro   r800:ld_a_r
 	{
 		QT = 0;
 		// keep C
-		m_f.sign_val = m_f.zero_val = A;
+		m_f.s_val = m_f.z_val = A;
 		m_f.yx_val = A;
-		m_f.half_carry_val = m_f.subtract = 0;
-		m_f.parity_overflow_val = !m_iff2;
+		m_f.h_val = m_f.n = 0;
+		m_f.pv_val = !m_iff2;
 	}
 	if (HAS_LDAIR_QUIRK)
 		set_service_attention<SA_AFTER_LDAIR, 1>();
@@ -259,10 +259,10 @@ macro   ld_a_i
 	{
 		QT = 0;
 		// keep C
-		m_f.sign_val = m_f.zero_val = A;
+		m_f.s_val = m_f.z_val = A;
 		m_f.yx_val = A;
-		m_f.half_carry_val = m_f.subtract = 0;
-		m_f.parity_overflow_val = !m_iff2;
+		m_f.h_val = m_f.n = 0;
+		m_f.pv_val = !m_iff2;
 	}
 	if (HAS_LDAIR_QUIRK)
 		set_service_attention<SA_AFTER_LDAIR, 1>();
@@ -272,10 +272,10 @@ macro   r800:ld_a_i
 	{
 		QT = 0;
 		// keep C
-		m_f.sign_val = m_f.zero_val = A;
+		m_f.s_val = m_f.z_val = A;
 		m_f.yx_val = A;
-		m_f.half_carry_val = m_f.subtract = 0;
-		m_f.parity_overflow_val = !m_iff2;
+		m_f.h_val = m_f.n = 0;
+		m_f.pv_val = !m_iff2;
 	}
 	if (HAS_LDAIR_QUIRK)
 		set_service_attention<SA_AFTER_LDAIR, 1>();
@@ -296,9 +296,9 @@ macro   rrd
 	{
 		QT = 0;
 		// keep C
-		m_f.sign_val = m_f.zero_val = m_f.parity_overflow_val = A;
+		m_f.s_val = m_f.z_val = m_f.pv_val = A;
 		m_f.yx_val = A;
-		m_f.half_carry_val = m_f.subtract = 0;
+		m_f.h_val = m_f.n = 0;
 	}
 
 macro   rld
@@ -312,9 +312,9 @@ macro   rld
 	{
 		QT = 0;
 		// keep C
-		m_f.sign_val = m_f.zero_val = m_f.parity_overflow_val = A;
+		m_f.s_val = m_f.z_val = m_f.pv_val = A;
 		m_f.yx_val = A;
-		m_f.half_carry_val = m_f.subtract = 0;
+		m_f.h_val = m_f.n = 0;
 	}
 
 macro   ex_sp   %dd
@@ -334,9 +334,9 @@ macro   add16   %dd1 %dd2
 		QT = 0;
 		// keep szv
 		m_f.yx_val = res >> 8;
-		m_f.half_carry_val = (%dd1 ^ res ^ %dd2) >> 8;
-		m_f.subtract = 0;
-		m_f.carry = res & 0x10000;
+		m_f.h_val = (%dd1 ^ res ^ %dd2) >> 8;
+		m_f.n = 0;
+		m_f.c = res & 0x10000;
 	}
 	%dd1 = (u16)res;
 }
@@ -349,9 +349,9 @@ macro   r800:add16   %dd1 %dd2
 		QT = 0;
 		// keep szv
 		m_f.yx_val = res >> 8;
-		m_f.half_carry_val = (%dd1 ^ res ^ %dd2) >> 8;
-		m_f.subtract = 0;
-		m_f.carry = res & 0x10000;
+		m_f.h_val = (%dd1 ^ res ^ %dd2) >> 8;
+		m_f.n = 0;
+		m_f.c = res & 0x10000;
 	}
 	%dd1 = (u16)res;
 }
@@ -359,32 +359,32 @@ macro   r800:add16   %dd1 %dd2
 macro   adc_hl   %dd
 {
 	@nomreq_ir 7
-	const u32 res = HL + %dd + m_f.carry;
+	const u32 res = HL + %dd + m_f.c;
 	WZ = HL + 1;
 	{
 		QT = 0;
-		m_f.sign_val = m_f.zero_val = ((res & 0x8000) >> 8) | (u16(res) != 0);
+		m_f.s_val = m_f.z_val = ((res & 0x8000) >> 8) | (u16(res) != 0);
 		m_f.yx_val = res >> 8;
-		m_f.half_carry_val = (HL ^ res ^ %dd) >> 8;
-		m_f.parity_overflow_val = !((%dd ^ HL ^ 0x8000) & (%dd ^ res) & 0x8000);
-		m_f.subtract = 0;
-		m_f.carry = res & 0x10000;
+		m_f.h_val = (HL ^ res ^ %dd) >> 8;
+		m_f.pv_val = !((%dd ^ HL ^ 0x8000) & (%dd ^ res) & 0x8000);
+		m_f.n = 0;
+		m_f.c = res & 0x10000;
 	}
 	HL = (u16)res;
 }
 
 macro   r800:adc_hl   %dd
 {
-	u32 res = HL + %dd + m_f.carry;
+	u32 res = HL + %dd + m_f.c;
 	WZ = HL + 1;
 	{
 		QT = 0;
-		m_f.sign_val = m_f.zero_val = ((res & 0x8000) >> 8) | (u16(res) != 0);
+		m_f.s_val = m_f.z_val = ((res & 0x8000) >> 8) | (u16(res) != 0);
 		m_f.yx_val = res >> 8;
-		m_f.half_carry_val = (HL ^ res ^ %dd) >> 8;
-		m_f.parity_overflow_val = !((%dd ^ HL ^ 0x8000) & (%dd ^ res) & 0x8000);
-		m_f.subtract = 0;
-		m_f.carry = res & 0x10000;
+		m_f.h_val = (HL ^ res ^ %dd) >> 8;
+		m_f.pv_val = !((%dd ^ HL ^ 0x8000) & (%dd ^ res) & 0x8000);
+		m_f.n = 0;
+		m_f.c = res & 0x10000;
 	}
 	HL = (u16)res;
 }
@@ -392,32 +392,32 @@ macro   r800:adc_hl   %dd
 macro   sbc_hl   %dd
 {
 	@nomreq_ir 7
-	u32 res = HL - %dd - m_f.carry;
+	u32 res = HL - %dd - m_f.c;
 	WZ = HL + 1;
 	{
 		QT = 0;
-		m_f.sign_val = m_f.zero_val = ((res & 0x8000) >> 8) | (u16(res) != 0);
+		m_f.s_val = m_f.z_val = ((res & 0x8000) >> 8) | (u16(res) != 0);
 		m_f.yx_val = res >> 8;
-		m_f.half_carry_val = (HL ^ res ^ %dd) >> 8;
-		m_f.parity_overflow_val = !((%dd ^ HL) & (HL ^ res) & 0x8000);
-		m_f.subtract = 1;
-		m_f.carry = res & 0x10000;
+		m_f.h_val = (HL ^ res ^ %dd) >> 8;
+		m_f.pv_val = !((%dd ^ HL) & (HL ^ res) & 0x8000);
+		m_f.n = 1;
+		m_f.c = res & 0x10000;
 	}
 	HL = (u16)res;
 }
 
 macro   r800:sbc_hl   %dd
 {
-	u32 res = HL - %dd - m_f.carry;
+	u32 res = HL - %dd - m_f.c;
 	WZ = HL + 1;
 	{
 		QT = 0;
-		m_f.sign_val = m_f.zero_val = ((res & 0x8000) >> 8) | (u16(res) != 0);
+		m_f.s_val = m_f.z_val = ((res & 0x8000) >> 8) | (u16(res) != 0);
 		m_f.yx_val = res >> 8;
-		m_f.half_carry_val = (HL ^ res ^ %dd) >> 8;
-		m_f.parity_overflow_val = !((%dd ^ HL) & (HL ^ res) & 0x8000);
-		m_f.subtract = 1;
-		m_f.carry = res & 0x10000;
+		m_f.h_val = (HL ^ res ^ %dd) >> 8;
+		m_f.pv_val = !((%dd ^ HL) & (HL ^ res) & 0x8000);
+		m_f.n = 1;
+		m_f.c = res & 0x10000;
 	}
 	HL = (u16)res;
 }
@@ -433,8 +433,8 @@ macro   ldi
 		QT = 0;
 		// keep SZC
 		m_f.yx_val = ((A + TDAT8) << 4) | ((A + TDAT8) & 0x0f);
-		m_f.half_carry_val = m_f.subtract = 0;
-		m_f.parity_overflow_val = !BC;
+		m_f.h_val = m_f.n = 0;
+		m_f.pv_val = !BC;
 	}
 
 macro   r800:ldi
@@ -448,8 +448,8 @@ macro   r800:ldi
 		QT = 0;
 		// keep SZC
 		m_f.yx_val = ((A + TDAT8) << 4) | ((A + TDAT8) & 0x0f);
-		m_f.half_carry_val = m_f.subtract = 0;
-		m_f.parity_overflow_val = !BC;
+		m_f.h_val = m_f.n = 0;
+		m_f.pv_val = !BC;
 	}
 
 macro   cpi
@@ -463,13 +463,13 @@ macro   cpi
 	{
 		QT = 0;
 		// keep C
-		m_f.sign_val = m_f.zero_val = res;
-		m_f.half_carry_val = A ^ TDAT8 ^ res;
-		if (m_f.half_carry())
+		m_f.s_val = m_f.z_val = res;
+		m_f.h_val = A ^ TDAT8 ^ res;
+		if (m_f.h())
 			res -= 1;
 		m_f.yx_val = (res << 4) | (res & 0x0f);
-		m_f.parity_overflow_val = !BC;
-		m_f.subtract = 1;
+		m_f.pv_val = !BC;
+		m_f.n = 1;
 	}
 }
 
@@ -484,13 +484,13 @@ macro   r800:cpi
 	{
 		QT = 0;
 		// keep C
-		m_f.sign_val = m_f.zero_val = res;
-		m_f.half_carry_val = A ^ TDAT8 ^ res;
-		if (m_f.half_carry())
+		m_f.s_val = m_f.z_val = res;
+		m_f.h_val = A ^ TDAT8 ^ res;
+		if (m_f.h())
 			res -= 1;
 		m_f.yx_val = (res << 4) | (res & 0x0f);
-		m_f.parity_overflow_val = !BC;
-		m_f.subtract = 1;
+		m_f.pv_val = !BC;
+		m_f.n = 1;
 	}
 }
 
@@ -505,12 +505,12 @@ macro   ini
 	const u16 t = ((C + 1) & 0xff) + TDAT8;
 	{
 		QT = 0;
-		m_f.sign_val = m_f.zero_val = B;
+		m_f.s_val = m_f.z_val = B;
 		m_f.yx_val = B;
-		m_f.half_carry_val = t >> 4;
-		m_f.parity_overflow_val = (t & 0x07) ^ B;
-		m_f.subtract = TDAT8 & SF;
-		m_f.carry = t & 0x100;
+		m_f.h_val = t >> 4;
+		m_f.pv_val = (t & 0x07) ^ B;
+		m_f.n = TDAT8 & SF;
+		m_f.c = t & 0x100;
 	}
 }
 
@@ -524,12 +524,12 @@ macro   r800:ini
 	const u16 t = ((C + 1) & 0xff) + TDAT8;
 	{
 		QT = 0;
-		m_f.sign_val = m_f.zero_val = B;
+		m_f.s_val = m_f.z_val = B;
 		m_f.yx_val = B;
-		m_f.half_carry_val = t >> 4;
-		m_f.parity_overflow_val = (t & 0x07) ^ B;
-		m_f.subtract = TDAT8 & SF;
-		m_f.carry = t & 0x100;
+		m_f.h_val = t >> 4;
+		m_f.pv_val = (t & 0x07) ^ B;
+		m_f.n = TDAT8 & SF;
+		m_f.c = t & 0x100;
 	}
 }
 
@@ -544,12 +544,12 @@ macro   outi
 	const u16 t = L + TDAT8;
 	{
 		QT = 0;
-		m_f.sign_val = m_f.zero_val = B;
+		m_f.s_val = m_f.z_val = B;
 		m_f.yx_val = B;
-		m_f.half_carry_val = t >> 4;
-		m_f.parity_overflow_val = (t & 0x07) ^ B;
-		m_f.subtract = TDAT8 & SF;
-		m_f.carry = t & 0x100;
+		m_f.h_val = t >> 4;
+		m_f.pv_val = (t & 0x07) ^ B;
+		m_f.n = TDAT8 & SF;
+		m_f.c = t & 0x100;
 	}
 }
 
@@ -563,12 +563,12 @@ macro   r800:outi
 	const u16 t = L + TDAT8;
 	{
 		QT = 0;
-		m_f.sign_val = m_f.zero_val = B;
+		m_f.s_val = m_f.z_val = B;
 		m_f.yx_val = B;
-		m_f.half_carry_val = t >> 4;
-		m_f.parity_overflow_val = (t & 0x07) ^ B;
-		m_f.subtract = TDAT8 & SF;
-		m_f.carry = t & 0x100;
+		m_f.h_val = t >> 4;
+		m_f.pv_val = (t & 0x07) ^ B;
+		m_f.n = TDAT8 & SF;
+		m_f.c = t & 0x100;
 	}
 }
 
@@ -584,8 +584,8 @@ macro   ldd
 		QT = 0;
 		// keep SZC
 		m_f.yx_val = ((A + TDAT8) << 4) | ((A + TDAT8) & 0x0f);
-		m_f.half_carry_val = m_f.subtract = 0;
-		m_f.parity_overflow_val = !BC;
+		m_f.h_val = m_f.n = 0;
+		m_f.pv_val = !BC;
 	}
 }
 
@@ -601,8 +601,8 @@ macro   r800:ldd
 		QT = 0;
 		// keep SZC
 		m_f.yx_val = ((A + TDAT8) << 4) | ((A + TDAT8) & 0x0f);
-		m_f.half_carry_val = m_f.subtract = 0;
-		m_f.parity_overflow_val = !BC;
+		m_f.h_val = m_f.n = 0;
+		m_f.pv_val = !BC;
 	}
 }
 
@@ -617,13 +617,13 @@ macro   cpd
 	{
 		QT = 0;
 		// keep C
-		m_f.sign_val = m_f.zero_val = res;
-		m_f.half_carry_val = A ^ TDAT8 ^ res;
-		if (m_f.half_carry())
+		m_f.s_val = m_f.z_val = res;
+		m_f.h_val = A ^ TDAT8 ^ res;
+		if (m_f.h())
 			res -= 1;
 		m_f.yx_val = (res << 4) | (res & 0x0f);
-		m_f.parity_overflow_val = !BC;
-		m_f.subtract = 1;
+		m_f.pv_val = !BC;
+		m_f.n = 1;
 	}
 }
 
@@ -638,13 +638,13 @@ macro   r800:cpd
 	{
 		QT = 0;
 		// keep C
-		m_f.sign_val = m_f.zero_val = res;
-		m_f.half_carry_val = A ^ TDAT8 ^ res;
-		if (m_f.half_carry())
+		m_f.s_val = m_f.z_val = res;
+		m_f.h_val = A ^ TDAT8 ^ res;
+		if (m_f.h())
 			res -= 1;
 		m_f.yx_val = (res << 4) | (res & 0x0f);
-		m_f.parity_overflow_val = !BC;
-		m_f.subtract = 1;
+		m_f.pv_val = !BC;
+		m_f.n = 1;
 	}
 }
 
@@ -659,12 +659,12 @@ macro   ind
 	const u16 t = ((C - 1) & 0xff) + TDAT8;
 	{
 		QT = 0;
-		m_f.sign_val = m_f.zero_val = B;
+		m_f.s_val = m_f.z_val = B;
 		m_f.yx_val = B;
-		m_f.half_carry_val = t >> 4;
-		m_f.parity_overflow_val = (t & 0x07) ^ B;
-		m_f.subtract = TDAT8 & SF;
-		m_f.carry = t & 0x100;
+		m_f.h_val = t >> 4;
+		m_f.pv_val = (t & 0x07) ^ B;
+		m_f.n = TDAT8 & SF;
+		m_f.c = t & 0x100;
 	}
 }
 
@@ -678,12 +678,12 @@ macro   r800:ind
 	const u16 t = ((C - 1) & 0xff) + TDAT8;
 	{
 		QT = 0;
-		m_f.sign_val = m_f.zero_val = B;
+		m_f.s_val = m_f.z_val = B;
 		m_f.yx_val = B;
-		m_f.half_carry_val = t >> 4;
-		m_f.parity_overflow_val = (t & 0x07) ^ B;
-		m_f.subtract = TDAT8 & SF;
-		m_f.carry = t & 0x100;
+		m_f.h_val = t >> 4;
+		m_f.pv_val = (t & 0x07) ^ B;
+		m_f.n = TDAT8 & SF;
+		m_f.c = t & 0x100;
 	}
 }
 
@@ -698,12 +698,12 @@ macro   outd
 	const u16 t = L + TDAT8;
 	{
 		QT = 0;
-		m_f.sign_val = m_f.zero_val = B;
+		m_f.s_val = m_f.z_val = B;
 		m_f.yx_val = B;
-		m_f.half_carry_val = t >> 4;
-		m_f.parity_overflow_val = (t & 0x07) ^ B;
-		m_f.subtract = TDAT8 & SF;
-		m_f.carry = t & 0x100;
+		m_f.h_val = t >> 4;
+		m_f.pv_val = (t & 0x07) ^ B;
+		m_f.n = TDAT8 & SF;
+		m_f.c = t & 0x100;
 	}
 }
 
@@ -717,12 +717,12 @@ macro   r800:outd
 	const u16 t = L + TDAT8;
 	{
 		QT = 0;
-		m_f.sign_val = m_f.zero_val = B;
+		m_f.s_val = m_f.z_val = B;
 		m_f.yx_val = B;
-		m_f.half_carry_val = t >> 4;
-		m_f.parity_overflow_val = (t & 0x07) ^ B;
-		m_f.subtract = TDAT8 & SF;
-		m_f.carry = t & 0x100;
+		m_f.h_val = t >> 4;
+		m_f.pv_val = (t & 0x07) ^ B;
+		m_f.n = TDAT8 & SF;
+		m_f.c = t & 0x100;
 	}
 }
 
@@ -746,7 +746,7 @@ macro   r800:ldir
 
 macro   cpir
 	@cpi
-	if (BC != 0 && !m_f.zero()) {
+	if (BC != 0 && !m_f.z()) {
 		5 * @nomreq_addr HL
 		PC -= 2;
 		WZ = PC + 1;
@@ -756,7 +756,7 @@ macro   cpir
 macro   r800:cpir
 	@cpi
 	@nomreq_addr HL
-	if (BC != 0 && !m_f.zero()) {
+	if (BC != 0 && !m_f.z()) {
 		PC -= 2;
 		WZ = PC + 1;
 		m_f.yx_val = PC >> 8;
@@ -821,7 +821,7 @@ macro   r800:lddr
 
 macro   cpdr
 	@cpd
-	if (BC != 0 && !m_f.zero()) {
+	if (BC != 0 && !m_f.z()) {
 		5 * @nomreq_addr HL
 		PC -= 2;
 		WZ = PC + 1;
@@ -831,7 +831,7 @@ macro   cpdr
 macro   r800:cpdr
 	@cpd
 	@nomreq_addr HL /* suspected wrong. must be inside if? */
-	if (BC != 0 && !m_f.zero()) {
+	if (BC != 0 && !m_f.z()) {
 		PC -= 2;
 		WZ = PC + 1;
 		m_f.yx_val = PC >> 8;
@@ -888,7 +888,7 @@ macro   take_nmi
 	leave_halt();
 	if (HAS_LDAIR_QUIRK)
 		// reset parity flag after LD A,I or LD A,R
-		if (get_service_attention<SA_AFTER_LDAIR>()) m_f.parity_overflow_val = !0;
+		if (get_service_attention<SA_AFTER_LDAIR>()) m_f.pv_val = !0;
 	m_iff1 = 0;
 	m_r++;
 	+ 5
@@ -979,7 +979,7 @@ macro   take_interrupt
 	WZ = PC;
 	if (HAS_LDAIR_QUIRK)
 		// reset parity flag after LD A,I or LD A,R
-		if (get_service_attention<SA_AFTER_LDAIR>()) m_f.parity_overflow_val = !0;
+		if (get_service_attention<SA_AFTER_LDAIR>()) m_f.pv_val = !0;
 
 macro   check_interrupts
 	if (get_service_attention<SA_NMI_PENDING>()) {
@@ -1023,7 +1023,7 @@ macro   nsc800_take_interrupt
 	WZ = PC;
 	if (HAS_LDAIR_QUIRK)
 		// reset parity flag after LD A,I or LD A,R
-		if (get_service_attention<SA_AFTER_LDAIR>()) m_f.parity_overflow_val = !0;
+		if (get_service_attention<SA_AFTER_LDAIR>()) m_f.pv_val = !0;
 
 macro   nsc800:check_interrupts
 	if (get_service_attention<SA_NMI_PENDING>()) {
@@ -5503,9 +5503,9 @@ ed40	# IN   B,(C)
 	{
 		QT = 0;
 		// keep C
-		m_f.sign_val = m_f.zero_val = m_f.parity_overflow_val = TDAT8;
+		m_f.s_val = m_f.z_val = m_f.pv_val = TDAT8;
 		m_f.yx_val = TDAT8;
-		m_f.half_carry_val = m_f.subtract = 0;
+		m_f.h_val = m_f.n = 0;
 	}
 	B = TDAT8;
 	WZ = BC + 1;
@@ -5541,9 +5541,9 @@ ed48	# IN   C,(C)
 	{
 		QT = 0;
 		// keep C
-		m_f.sign_val = m_f.zero_val = m_f.parity_overflow_val = TDAT8;
+		m_f.s_val = m_f.z_val = m_f.pv_val = TDAT8;
 		m_f.yx_val = TDAT8;
-		m_f.half_carry_val = m_f.subtract = 0;
+		m_f.h_val = m_f.n = 0;
 	}
 	C = TDAT8;
 	WZ = BC + 1;
@@ -5579,9 +5579,9 @@ ed50	# IN   D,(C)
 	{
 		QT = 0;
 		// keep C
-		m_f.sign_val = m_f.zero_val = m_f.parity_overflow_val = TDAT8;
+		m_f.s_val = m_f.z_val = m_f.pv_val = TDAT8;
 		m_f.yx_val = TDAT8;
-		m_f.half_carry_val = m_f.subtract = 0;
+		m_f.h_val = m_f.n = 0;
 	}
 	D = TDAT8;
 	WZ = BC + 1;
@@ -5617,9 +5617,9 @@ ed58	# IN   E,(C)
 	{
 		QT = 0;
 		// keep C
-		m_f.sign_val = m_f.zero_val = m_f.parity_overflow_val = TDAT8;
+		m_f.s_val = m_f.z_val = m_f.pv_val = TDAT8;
 		m_f.yx_val = TDAT8;
-		m_f.half_carry_val = m_f.subtract = 0;
+		m_f.h_val = m_f.n = 0;
 	}
 	E = TDAT8;
 	WZ = BC + 1;
@@ -5655,9 +5655,9 @@ ed60	# IN   H,(C)
 	{
 		QT = 0;
 		// keep C
-		m_f.sign_val = m_f.zero_val = m_f.parity_overflow_val = TDAT8;
+		m_f.s_val = m_f.z_val = m_f.pv_val = TDAT8;
 		m_f.yx_val = TDAT8;
-		m_f.half_carry_val = m_f.subtract = 0;
+		m_f.h_val = m_f.n = 0;
 	}
 	H = TDAT8;
 	WZ = BC + 1;
@@ -5693,9 +5693,9 @@ ed68	# IN   L,(C)
 	{
 		QT = 0;
 		// keep C
-		m_f.sign_val = m_f.zero_val = m_f.parity_overflow_val = TDAT8;
+		m_f.s_val = m_f.z_val = m_f.pv_val = TDAT8;
 		m_f.yx_val = TDAT8;
-		m_f.half_carry_val = m_f.subtract = 0;
+		m_f.h_val = m_f.n = 0;
 	}
 	L = TDAT8;
 	WZ = BC + 1;
@@ -5731,9 +5731,9 @@ ed70	# IN   0,(C)
 	{
 		QT = 0;
 		// keep C
-		m_f.sign_val = m_f.zero_val = m_f.parity_overflow_val = TDAT8;
+		m_f.s_val = m_f.z_val = m_f.pv_val = TDAT8;
 		m_f.yx_val = TDAT8;
-		m_f.half_carry_val = m_f.subtract = 0;
+		m_f.h_val = m_f.n = 0;
 	}
 	WZ = BC + 1;
 
@@ -5768,9 +5768,9 @@ ed78	# IN   A,(C)
 	{
 		QT = 0;
 		// keep C
-		m_f.sign_val = m_f.zero_val = m_f.parity_overflow_val = TDAT8;
+		m_f.s_val = m_f.z_val = m_f.pv_val = TDAT8;
 		m_f.yx_val = TDAT8;
-		m_f.half_carry_val = m_f.subtract = 0;
+		m_f.h_val = m_f.n = 0;
 	}
 	A = TDAT8;
 	WZ = BC + 1;
@@ -6307,7 +6307,7 @@ edff	# DB   ED
 	rra();
 
 0020	# JR   NZ,o
-	@jr_cond !m_f.zero()
+	@jr_cond !m_f.z()
 
 0021	# LD   HL,w
 	@arg16 HL
@@ -6336,7 +6336,7 @@ edff	# DB   ED
 	daa();
 
 0028	# JR   Z,o
-	@jr_cond m_f.zero()
+	@jr_cond m_f.z()
 
 0029	# ADD  HL,HL
 	@add16 HL, HL
@@ -6366,12 +6366,12 @@ edff	# DB   ED
 	{
 		// keep SZPC
 		m_f.yx_val = A;
-		m_f.half_carry_val = HF;
-		m_f.subtract = 1;
+		m_f.h_val = HF;
+		m_f.n = 1;
 	}
 
 0030	# JR   NC,o
-	@jr_cond !m_f.carry
+	@jr_cond !m_f.c
 
 0031	# LD   SP,w
 	@arg16 SP
@@ -6402,16 +6402,16 @@ edff	# DB   ED
 	@wm HL
 
 0037	# SCF
-	{
-		QT = 0;
-		// keep SZP
-		m_f.yx_val = (m_f.yx_val & Q) | A;
-		m_f.half_carry_val = m_f.subtract = 0;
-		m_f.carry = 1;
-	}
+{
+	QT = 0;
+	// keep SZP
+	m_f.yx_val = (m_f.yx_val & Q) | A;
+	m_f.h_val = m_f.n = 0;
+	m_f.c = 1;
+}
 
 0038	# JR   C,o
-	@jr_cond m_f.carry
+	@jr_cond m_f.c
 
 0039	# ADD  HL,SP
 	@add16 HL, SP
@@ -6441,9 +6441,9 @@ edff	# DB   ED
 	QT = 0;
 	// keep SZP
 	m_f.yx_val = (m_f.yx_val & Q) | A;
-	m_f.half_carry_val = m_f.carry << 4;
-	m_f.subtract = 0;
-	m_f.carry = !m_f.carry;
+	m_f.h_val = m_f.c << 4;
+	m_f.n = 0;
+	m_f.c = !m_f.c;
 }
 
 0040	# LD   B,B
@@ -6846,20 +6846,20 @@ edff	# DB   ED
 	cp(A);
 
 00c0	# RET  NZ
-	@ret_cond !m_f.zero()
+	@ret_cond !m_f.z()
 
 00c1	# POP  BC
 	@pop
 	BC = TDAT;
 
 00c2	# JP   NZ,a
-	@jp_cond !m_f.zero()
+	@jp_cond !m_f.z()
 
 00c3	# JP   a
 	@jp
 
 00c4	# CALL NZ,a
-	@call_cond !m_f.zero()
+	@call_cond !m_f.z()
 
 00c5	# PUSH BC
 	@push BC
@@ -6872,7 +6872,7 @@ edff	# DB   ED
 	@rst 0x00
 
 00c8	# RET  Z
-	@ret_cond m_f.zero()
+	@ret_cond m_f.z()
 
 00c9	# RET
 	@pop
@@ -6880,14 +6880,14 @@ edff	# DB   ED
 	WZ = PC;
 
 00ca	# JP   Z,a
-	@jp_cond m_f.zero()
+	@jp_cond m_f.z()
 
 00cb	# **** CB xx
 	@rop
 	@jump_prefixed 0xcb
 
 00cc	# CALL Z,a
-	@call_cond m_f.zero()
+	@call_cond m_f.z()
 
 00cd	# CALL a
 	@arg16_call
@@ -6900,14 +6900,14 @@ edff	# DB   ED
 	@rst 0x08
 
 00d0	# RET  NC
-	@ret_cond !m_f.carry
+	@ret_cond !m_f.c
 
 00d1	# POP  DE
 	@pop
 	DE = TDAT;
 
 00d2	# JP   NC,a
-	@jp_cond !m_f.carry
+	@jp_cond !m_f.c
 
 00d3	# OUT  (n),A
 	@arg
@@ -6918,7 +6918,7 @@ edff	# DB   ED
 	WZ_H = A;
 
 00d4	# CALL NC,a
-	@call_cond !m_f.carry
+	@call_cond !m_f.c
 
 00d5	# PUSH DE
 	@push DE
@@ -6931,13 +6931,13 @@ edff	# DB   ED
 	@rst 0x10
 
 00d8	# RET  C
-	@ret_cond m_f.carry
+	@ret_cond m_f.c
 
 00d9	# EXX
 	exx();
 
 00da	# JP   C,a
-	@jp_cond m_f.carry
+	@jp_cond m_f.c
 
 00db	# IN   A,(n)
 	@arg
@@ -6947,7 +6947,7 @@ edff	# DB   ED
 	WZ = TDAT2 + 1;
 
 00dc	# CALL C,a
-	@call_cond m_f.carry
+	@call_cond m_f.c
 
 00dd	# **** DD xx
 	@rop
@@ -6961,20 +6961,20 @@ edff	# DB   ED
 	@rst 0x18
 
 00e0	# RET  PO
-	@ret_cond !m_f.parity_overflow()
+	@ret_cond !m_f.pv()
 
 00e1	# POP  HL
 	@pop
 	HL = TDAT;
 
 00e2	# JP   PO,a
-	@jp_cond !m_f.parity_overflow()
+	@jp_cond !m_f.pv()
 
 00e3	# EX   HL,(SP)
 	@ex_sp HL
 
 00e4	# CALL PO,a
-	@call_cond !m_f.parity_overflow()
+	@call_cond !m_f.pv()
 
 00e5	# PUSH HL
 	@push HL
@@ -6987,20 +6987,20 @@ edff	# DB   ED
 	@rst 0x20
 
 00e8	# RET  PE
-	@ret_cond m_f.parity_overflow()
+	@ret_cond m_f.pv()
 
 00e9	# JP   (HL)
 	PC = HL;
 
 00ea	# JP   PE,a
-	@jp_cond m_f.parity_overflow()
+	@jp_cond m_f.pv()
 
 00eb	# EX   DE,HL
 	using std::swap;
 	swap(DE, HL);
 
 00ec	# CALL PE,a
-	@call_cond m_f.parity_overflow()
+	@call_cond m_f.pv()
 
 00ed	# **** ED xx
 	@rop
@@ -7014,7 +7014,7 @@ edff	# DB   ED
 	@rst 0x28
 
 00f0	# RET  P
-	@ret_cond !m_f.sign()
+	@ret_cond !m_f.s()
 
 00f1	# POP  AF
 	@pop
@@ -7022,13 +7022,13 @@ edff	# DB   ED
 	set_f(TDAT_L);
 
 00f2	# JP   P,a
-	@jp_cond !m_f.sign()
+	@jp_cond !m_f.s()
 
 00f3	# DI
 	m_iff1 = m_iff2 = 0;
 
 00f4	# CALL P,a
-	@call_cond !m_f.sign()
+	@call_cond !m_f.s()
 
 00f5	# PUSH AF
 	@nomreq_ir 1
@@ -7043,20 +7043,20 @@ edff	# DB   ED
 	@rst 0x30
 
 00f8	# RET  M
-	@ret_cond m_f.sign()
+	@ret_cond m_f.s()
 
 00f9	# LD   SP,HL
 	@nomreq_ir 2
 	SP = HL;
 
 00fa	# JP   M,a
-	@jp_cond m_f.sign()
+	@jp_cond m_f.s()
 
 00fb	# EI
 	ei();
 
 00fc	# CALL M,a
-	@call_cond m_f.sign()
+	@call_cond m_f.s()
 
 00fd	# **** FD xx
 	@rop

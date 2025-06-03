@@ -170,36 +170,36 @@ protected:
 	u8           m_halt;
 	u8           m_im;
 	u8           m_i;
-	u8           m_nmi_state;          // nmi pin state
-	u8           m_irq_state;          // irq pin state
-	int          m_wait_state;         // wait pin state
-	int          m_busrq_state;        // bus request pin state
-	u8           m_busack_state;       // bus acknowledge pin state
+	u8           m_nmi_state;    // nmi pin state
+	u8           m_irq_state;    // irq pin state
+	int          m_wait_state;   // wait pin state
+	int          m_busrq_state;  // bus request pin state
+	u8           m_busack_state; // bus acknowledge pin state
 	u16          m_ea;
 
 	struct
 	{
-		u8 sign_val;
-		u8 zero_val;
-		u8 yx_val;
-		u8 half_carry_val;
-		u8 parity_overflow_val; // overflow case set in the way that parity_overflow() returns desired value
-		bool subtract;
-		bool carry;
+		u8 s_val;  // bit 7, other bits = don't care
+		u8 z_val;  // 0 or not 0
+		u8 yx_val; // bit 5 for Y, bit 3 for X, other bits = don't care
+		u8 h_val;  // bit 4, other bits = don't care
+		u8 pv_val; // overflow case set in the way that pv() returns desired value
+		bool n;
+		bool c;
 
-		u8 q;
+		u8 q;      // CCF/SCF YX mask
 		u8 qtemp;
 
-		u8 sign() const { return sign_val & 0x80; }
-		u8 zero() const { return (zero_val == 0) ? 0x40 : 0; }
+		u8 s() const { return s_val & 0x80; }
+		u8 z() const { return z_val ? 0 : 0x40; }
 		u8 yx() const { return yx_val & 0x28; }
-		u8 half_carry() const { return half_carry_val & 0x10; }
-		u8 parity_overflow() const {
-			u8 p = parity_overflow_val;
-			p ^= p >> 4;
-			p ^= p << 2;
-			p ^= p >> 1;
-			return ~p & 0x04;
+		u8 h() const { return h_val & 0x10; }
+		u8 pv() const {
+			u8 val = pv_val;
+			val ^= val >> 4;
+			val ^= val << 2;
+			val ^= val >> 1;
+			return ~val & 0x04;
 		}
 	} m_f;
 	u8 get_f();
