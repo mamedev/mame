@@ -641,7 +641,7 @@ void z80_device::device_start()
 	save_item(NAME(PRVPC));
 	save_item(NAME(PC));
 	save_item(NAME(SP));
-	save_item(NAME(m_af.w));
+	save_item(NAME(AF));
 	save_item(NAME(BC));
 	save_item(NAME(DE));
 	save_item(NAME(HL));
@@ -678,8 +678,10 @@ void z80_device::device_start()
 	PRVPC = 0;
 	PC = 0;
 	SP = 0;
-	A = 0;
+	AF = 0;
 	set_f(0);
+	Q = 0;
+	QT = 0;
 	BC = 0;
 	DE = 0;
 	HL = 0;
@@ -690,8 +692,6 @@ void z80_device::device_start()
 	m_bc2.w = 0;
 	m_de2.w = 0;
 	m_hl2.w = 0;
-	QT = 0;
-	Q = 0;
 	R = 0;
 	R2 = 0;
 	m_iff1 = 0;
@@ -720,7 +720,7 @@ void z80_device::device_start()
 	state_add(STATE_GENPC,     "PC",        m_pc.w).callimport();
 	state_add(STATE_GENPCBASE, "CURPC",     m_prvpc.w).callimport().noshow();
 	state_add(Z80_SP,          "SP",        SP);
-	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_af.b.l).noshow().formatstr("%8s");
+	state_add(STATE_GENFLAGS,  "GENFLAGS",  F).noshow().formatstr("%8s");
 	state_add(Z80_A,           "A",         A).noshow();
 	state_add(Z80_B,           "B",         B).noshow();
 	state_add(Z80_C,           "C",         C).noshow();
@@ -728,7 +728,7 @@ void z80_device::device_start()
 	state_add(Z80_E,           "E",         E).noshow();
 	state_add(Z80_H,           "H",         H).noshow();
 	state_add(Z80_L,           "L",         L).noshow();
-	state_add(Z80_AF,          "AF",        m_af.w).callimport().callexport();
+	state_add(Z80_AF,          "AF",        AF).callimport().callexport();
 	state_add(Z80_BC,          "BC",        BC);
 	state_add(Z80_DE,          "DE",        DE);
 	state_add(Z80_HL,          "HL",        HL);
@@ -838,7 +838,7 @@ void z80_device::state_import(const device_state_entry &entry)
 		break;
 
 	case Z80_AF:
-		set_f(m_af.b.l);
+		set_f(F);
 		break;
 	case Z80_R:
 		m_r = m_rtemp & 0x7f;
@@ -855,7 +855,7 @@ void z80_device::state_export(const device_state_entry &entry)
 	switch (entry.index())
 	{
 	case Z80_AF:
-		m_af.w = (A << 8) | get_f();
+		F = get_f();
 		break;
 	case Z80_R:
 		m_rtemp = (m_r & 0x7f) | (m_r2 & 0x80);
@@ -876,7 +876,7 @@ void z80_device::state_string_export(const device_state_entry &entry, std::strin
 				m_f.sign()            ? 'S':'.',
 				m_f.zero()            ? 'Z':'.',
 				m_f.yx() & 0x20       ? 'Y':'.',
-				m_f.half_carry_val        ? 'H':'.',
+				m_f.half_carry_val    ? 'H':'.',
 				m_f.yx() & 0x08       ? 'X':'.',
 				m_f.parity_overflow() ? 'P':'.',
 				m_f.subtract          ? 'N':'.',

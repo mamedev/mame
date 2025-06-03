@@ -54,6 +54,8 @@ protected:
 	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void device_pre_save() override ATTR_COLD { m_af.b.l = get_f(); }
+	virtual void device_post_load() override ATTR_COLD { set_f(m_af.b.l); }
 
 	// device_execute_interface implementation
 	virtual bool cpu_is_interruptible() const override { return true; }

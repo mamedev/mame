@@ -6218,10 +6218,10 @@ edff	# DB   ED
 	rlca();
 
 0008	# EX   AF,AF'
-	m_af.b.l = get_f();
+	F = get_f();
 	using std::swap;
 	swap(m_af, m_af2);
-	set_f(m_af.b.l);
+	set_f(F);
 
 0009	# ADD  HL,BC
 	@add16 HL, BC

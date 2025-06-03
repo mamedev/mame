@@ -25,12 +25,15 @@
 
 #define SP      m_sp.w
 
-#define A       m_af.b.h
 #define Q       m_f.q
 #define QT      m_f.qtemp
 #define I       m_i
 #define R       m_r
 #define R2      m_r2
+
+#define AF      m_af.w
+#define A       m_af.b.h
+#define F       m_af.b.l
 
 #define BC      m_bc.w
 #define B       m_bc.b.h
