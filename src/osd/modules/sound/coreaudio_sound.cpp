@@ -1039,7 +1039,8 @@ void sound_coreaudio::build_device_list()
 									chanLayout->mChannelBitmap,
 									chanLayout->mNumberChannelDescriptions);
 
-				if (chanLayout->mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelDescriptions)
+				UInt32 descType = chanLayout->mChannelLayoutTag & kAudioChannelLayoutTag_UseChannelBitmap;
+				if (!descType)  // bit clear = use channel descriptions
 				{
 					for (int desc = 0; desc < chanLayout->mNumberChannelDescriptions; desc++)
 					{
@@ -1058,7 +1059,7 @@ void sound_coreaudio::build_device_list()
 						}
 					}
 				}
-				else if (chanLayout->mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelBitmap)
+				else    // bit set, use channel bitmap
 				{
 					for (int channel = 0; channel < 32; channel++)
 					{
@@ -1075,10 +1076,6 @@ void sound_coreaudio::build_device_list()
 							node.m_port_positions.emplace_back(sChannelPositions[channel + 1]);
 						}
 					}
-				}
-				else
-				{
-					osd_printf_error("\t\tCoreAudio layout tag %x is not supported, contact MAMEdev\n", (int)chanLayout->mChannelLayoutTag);
 				}
 
 				for (int desc = 0; desc < chanLayout->mNumberChannelDescriptions; desc++)
