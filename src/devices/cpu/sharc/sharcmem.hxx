@@ -10,7 +10,7 @@ uint32_t adsp21062_device::pm_read32(uint32_t address)
 
 void adsp21062_device::pm_write32(uint32_t address, uint32_t data)
 {
-	m_program->write_qword(address, (u64)data << 16, 0xffffffff0000);
+	m_program->write_qword(address, (u64)data << 16, 0x0000ffffffff0000U);
 }
 
 uint64_t adsp21062_device::pm_read48(uint32_t address)
