@@ -516,7 +516,7 @@ void splashms_state::init_splashms()
 }
 
 
-ROM_START( splashm )
+ROM_START( splashms )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "cpu1_6-1_sp_608a.ic8",  0x00001, 0x20000, CRC(befdbaf0) SHA1(94efdeec1e1311317ffd0fe3d5fdbb02e151b985) )
 	ROM_LOAD16_BYTE( "cpu1_6-1_sp_617a.ic17", 0x00000, 0x20000, CRC(080edb2b) SHA1(6104345bc72cd20051d66c04b97c9a365a88ec3f) )
@@ -575,7 +575,7 @@ ROM_START( splashm )
 	ROM_LOAD( "snd_9-2_9359_gal16v8as.ic10", 0x000, 0x117, NO_DUMP )
 ROM_END
 
-ROM_START( splashma )
+ROM_START( splashmsa )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "sp_608_27c010.bin", 0x00001, 0x20000, CRC(5367f36f) SHA1(fa42b4571bb14ce2f2adc681f1141fcffc9de757) )
 	ROM_LOAD16_BYTE( "sp_617_27c010.bin", 0x00000, 0x20000, CRC(754c2d1a) SHA1(7f9417ad3009e7d2c4e9df618b24fd87a4233cbd) )
@@ -634,5 +634,5 @@ ROM_START( splashma )
 	ROM_LOAD( "snd_9-2_9359_gal16v8as.ic10", 0x000, 0x117, NO_DUMP )
 ROM_END
 
-GAME( 1992, splashm,  splash, splashms, splashms, splashms_state, init_splashms, ROT0, "Gaelco / OMK Software", "Splash (Modular System, ver. 1.0, checksum 16EDD8FB, non North America, censored)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1992, splashma, splash, splashms, splashms, splashms_state, init_splashms, ROT0, "Gaelco / OMK Software", "Splash (Modular System, ver. 1.0, checksum A6C431A4, non North America, uncensored)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1992, splashms,  splash, splashms, splashms, splashms_state, init_splashms, ROT0, "Gaelco / OMK Software", "Splash (Modular System, ver. 1.0, checksum 16EDD8FB, non North America, censored)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1992, splashmsa, splash, splashms, splashms, splashms_state, init_splashms, ROT0, "Gaelco / OMK Software", "Splash (Modular System, ver. 1.0, checksum A6C431A4, non North America, uncensored)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
