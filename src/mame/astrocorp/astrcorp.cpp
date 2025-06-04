@@ -43,6 +43,8 @@ Year + Game              PCB ID                    CPU                Video     
 06  Win Win Bingo        M1.2                      ASTRO V102PX-006?  ASTRO V06      ASTRO F02 2005-09-17                       Encrypted
 07? Western Venture      O (CS350P032)             ASTRO V102?        ASTRO V07      ASTRO F01 2007-06-03                       Encrypted
 07  Happy Farm           _P_ROHS                   ASTRO V102PX-008?  ASTRO V07      ASTRO ROHS BA21C00009 M835KK01             Encrypted
+13  Monkey Land (EN.20B) N1                        ASTRO V102PX-005?  ASTRO V05      ?                                          Encrypted
+14  Magic Bomb (BR.71A)  P1                        ASTRO V102PX-014?  ASTRO V07      ASTRO ROHS BA21C00009 JF13022              Encrypted
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 - astoneag, magibomb, winbingo, etc.: to initialize EEPROM (and self test in some games), keep keyout (W) pressed during boot.
@@ -204,14 +206,14 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void luckycoin(machine_config &config);
-	void showhanc(machine_config &config);
-	void showhand(machine_config &config);
-	void skilldrp(machine_config &config);
-	void speeddrp(machine_config &config);
+	void luckycoin(machine_config &config) ATTR_COLD;
+	void showhanc(machine_config &config) ATTR_COLD;
+	void showhand(machine_config &config) ATTR_COLD;
+	void skilldrp(machine_config &config) ATTR_COLD;
+	void speeddrp(machine_config &config) ATTR_COLD;
 
-	void init_showhanc();
-	void init_showhand();
+	void init_showhanc() ATTR_COLD;
+	void init_showhand() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -274,11 +276,11 @@ public:
 		astrocorp_state(mconfig, type, tag)
 	{ }
 
-	void magibomb(machine_config &config);
-	void magibombb(machine_config &config);
-	void magibombf(machine_config &config);
+	void magibomb(machine_config &config) ATTR_COLD;
+	void magibombb(machine_config &config) ATTR_COLD;
+	void magibombf(machine_config &config) ATTR_COLD;
 
-	void init_magibomb(); // simple encryption
+	void init_magibomb() ATTR_COLD; // simple encryption
 
 private:
 	u16 video_flags_r();
@@ -299,38 +301,41 @@ public:
 		m_cpucode_out(*this, "CPUCODE_OUT")
 	{ }
 
-	void hacher(machine_config &config);
-	void dinodino(machine_config &config);
-	void gostop(machine_config &config);
-	void hapfarm(machine_config &config);
-	void magibombd(machine_config &config);
-	void magibombg(machine_config &config);
-	void magibombm(machine_config &config);
-	void monkeyl(machine_config &config);
-	void monkeyld(machine_config &config);
-	void speedmst(machine_config &config);
-	void winbingo(machine_config &config);
-	void wwitch(machine_config &config);
-	void zoo(machine_config &config);
+	void hacher(machine_config &config) ATTR_COLD;
+	void dinodino(machine_config &config) ATTR_COLD;
+	void gostop(machine_config &config) ATTR_COLD;
+	void hapfarm(machine_config &config) ATTR_COLD;
+	void magibombd(machine_config &config) ATTR_COLD;
+	void magibombg(machine_config &config) ATTR_COLD;
+	void magibombm(machine_config &config) ATTR_COLD;
+	void magibombo(machine_config &config) ATTR_COLD;
+	void monkeyl(machine_config &config) ATTR_COLD;
+	void monkeyld(machine_config &config) ATTR_COLD;
+	void monkeyle(machine_config &config) ATTR_COLD;
+	void speedmst(machine_config &config) ATTR_COLD;
+	void winbingo(machine_config &config) ATTR_COLD;
+	void wwitch(machine_config &config) ATTR_COLD;
+	void zoo(machine_config &config) ATTR_COLD;
 
-	void init_cptshark();
-	void init_dinodino();
-	void init_gostop();
-	void init_hacher();
-	void init_hapfarm();
-	void init_magibombd();
-	void init_magibombg();
-	void init_magibombm();
-	void init_monkeyl();
-	void init_monkeyla();
-	void init_monkeyld();
-	void init_speedmst();
-	void init_speedmsta();
-	void init_speedmstb();
-	void init_winbingo();
-	void init_winbingoa();
-	void init_wwitch();
-	void init_zoo();
+	void init_cptshark() ATTR_COLD;
+	void init_dinodino() ATTR_COLD;
+	void init_gostop() ATTR_COLD;
+	void init_hacher() ATTR_COLD;
+	void init_hapfarm() ATTR_COLD;
+	void init_magibombd() ATTR_COLD;
+	void init_magibombg() ATTR_COLD;
+	void init_magibombm() ATTR_COLD;
+	void init_magibombo() ATTR_COLD;
+	void init_monkeyl() ATTR_COLD;
+	void init_monkeyla() ATTR_COLD;
+	void init_monkeyld() ATTR_COLD;
+	void init_speedmst() ATTR_COLD;
+	void init_speedmsta() ATTR_COLD;
+	void init_speedmstb() ATTR_COLD;
+	void init_winbingo() ATTR_COLD;
+	void init_winbingoa() ATTR_COLD;
+	void init_wwitch() ATTR_COLD;
+	void init_zoo() ATTR_COLD;
 
 	virtual void eeprom_w(u8 data) override;
 
@@ -351,7 +356,7 @@ protected:
 		// Global address bitswap (src -> dest, some sets use bits 12-8 only, while others 12-2)
 		u8 bits[11];
 	};
-	void decrypt_rom(const decryption_info &table);
+	void decrypt_rom(const decryption_info &table) ATTR_COLD;
 
 private:
 	required_device<astro_cpucode_device> m_cpucode;
@@ -367,7 +372,9 @@ private:
 	void magibombd_map(address_map &map) ATTR_COLD;
 	void magibombg_map(address_map &map) ATTR_COLD;
 	void magibombm_map(address_map &map) ATTR_COLD;
+	void magibombo_map(address_map &map) ATTR_COLD;
 	void monkeyl_map(address_map &map) ATTR_COLD;
+	void monkeyle_map(address_map &map) ATTR_COLD;
 	void speedmst_map(address_map &map) ATTR_COLD;
 	void winbingo_map(address_map &map) ATTR_COLD;
 	void wwitch_map(address_map &map) ATTR_COLD;
@@ -391,9 +398,9 @@ public:
 		m_ramdac(*this, "ramdac")
 	{ }
 
-	void astoneag(machine_config &config);
+	void astoneag(machine_config &config) ATTR_COLD;
 
-	void init_astoneag();
+	void init_astoneag() ATTR_COLD;
 
 private:
 	required_device<ramdac_device> m_ramdac;
@@ -402,7 +409,7 @@ private:
 	void ramdac_map(address_map &map) ATTR_COLD;
 
 	static const decryption_info v102_px012_table;
-	void interleave_sprites_16x32();
+	void interleave_sprites_16x32() ATTR_COLD;
 };
 
 /***************************************************************************
@@ -899,6 +906,23 @@ void zoo_state::magibombm_map(address_map &map)
 //  map(0x??0001, 0x??0001).w(FUNC(zoo_state::screen_enable_w)); // unknown location
 }
 
+void zoo_state::magibombo_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom().mirror(0x800000); // POST checks for ROM checksum at mirror
+	map(0x900000, 0x903fff).ram().share("nvram"); // battery
+	map(0xc00000, 0xc00fff).ram().share("spriteram");
+	map(0xc02000, 0xc02001).nopr().w(FUNC(zoo_state::draw_sprites_w));
+	map(0xc04000, 0xc04001).portr("INPUTS");
+	map(0xc08001, 0xc08001).w(FUNC(zoo_state::eeprom_w));
+	map(0xc0a000, 0xc0a001).w(FUNC(zoo_state::magibomb_outputs_w));
+	map(0xc0e000, 0xc0e001).portr("EEPROM_IN");
+	map(0xc80000, 0xc801ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xd00000, 0xd00001).portr("CPUCODE_IN");
+	map(0xd80000, 0xd80000).w(FUNC(zoo_state::oki_bank_w));
+	map(0xe00001, 0xe00001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+//  map(0x??0001, 0x??0001).w(FUNC(zoo_state::screen_enable_w)); // unknown location
+}
+
 void zoo_state::winbingo_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom().mirror(0x800000); // POST checks for ROM checksum at mirror
@@ -981,6 +1005,22 @@ void zoo_state::monkeyl_map(address_map &map)
 	map(0xd00000, 0xd001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xd80001, 0xd80001).w(FUNC(zoo_state::oki_bank_w));
 	map(0xe80001, 0xe80001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
+
+void zoo_state::monkeyle_map(address_map &map)
+{
+	map(0x000000, 0x03ffff).rom().mirror(0x800000); // POST checks for ROM checksum at mirror
+	map(0xa00000, 0xa03fff).ram().share("nvram"); // battery
+	map(0xa80000, 0xa80fff).ram().share("spriteram");
+	map(0xa82000, 0xa82001).nopr().w(FUNC(zoo_state::draw_sprites_w));
+	map(0xa84000, 0xa84001).portr("INPUTS");
+	map(0xa88001, 0xa88001).w(FUNC(zoo_state::eeprom_w));
+	map(0xa8a000, 0xa8a001).w(FUNC(zoo_state::magibomb_outputs_w));
+	map(0xa8e000, 0xa8e001).portr("EEPROM_IN");
+	map(0xb80000, 0xb80001).portr("CPUCODE_IN");
+	map(0xd00000, 0xd001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0xd80001, 0xd80001).w(FUNC(zoo_state::oki_bank_w));
+	map(0xe00001, 0xe00001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
 void zoo_state::speedmst_map(address_map &map)
@@ -1440,6 +1480,12 @@ void zoo_state::magibombm(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::magibombm_map);
 }
 
+void zoo_state::magibombo(machine_config &config)
+{
+	magibombd(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::magibombo_map);
+}
+
 void zoo_state::winbingo(machine_config &config)
 {
 	zoo(config);
@@ -1479,6 +1525,12 @@ void zoo_state::monkeyld(machine_config &config)
 {
 	monkeyl(config);
 	TIMER(config.replace(), "scantimer").configure_scanline(FUNC(zoo_state::irq_2_4_scanline_cb), "screen", 0, 1);
+}
+
+void zoo_state::monkeyle(machine_config &config)
+{
+	monkeyl(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::monkeyle_map);
 }
 
 void zoo_state::speedmst(machine_config &config)
@@ -2043,6 +2095,24 @@ ROM_START( magibombn ) // MIN BET 1-8-16-32 MINIMUM % = 91/50%
 
 	ROM_REGION16_LE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "93c46.u6", 0x00, 0x80, CRC(59306190) SHA1(c4e6f3070da90c447786e7bc769b37bdc0fa3b77) ) // factory default
+ROM_END
+
+ROM_START( magibombo )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "1_m.b.br.71.a.u26", 0x00000, 0x20000, CRC(6e815fa3) SHA1(f88b07c0d0bdb9667d7de5383623ac20ce48a7e9) ) // A290011T
+	ROM_LOAD16_BYTE( "2_m.b.br.71.a.u25", 0x00001, 0x20000, CRC(b3c24e55) SHA1(34e2e2e2862c761e6b869aaac003a73615ab730b) ) // A290011T
+
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD( "gfx.u51", 0x000000, 0x200000, BAD_DUMP CRC(ec43e200) SHA1(bf30d2e99751a93c0b72dd782fce77e9b582c89c) ) // MX29F1610MC
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "5_magic_bomb", 0x00000, 0x80000, CRC(c9edbf1b) SHA1(8e3a96a38aea23950d6add66a5a3d079013bc217) ) // A29040
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46.u13", 0x00, 0x80, CRC(70b07946) SHA1(45aa5c118064d1f4c9555e53e0ef1bc788144c72) ) // TODO: factory default
+
+	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
+	ROM_LOAD( "magibombo_cpucode.key", 0x00, 0x02, NO_DUMP ) // TODO: RE correct one
 ROM_END
 
 
@@ -2611,6 +2681,31 @@ ROM_START( monkeyld )
 	ROM_LOAD( "monkeyld_cpucode.key", 0x00, 0x02, NO_DUMP )
 ROM_END
 
+ROM_START( monkeyle )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "1_m.l._en.20.b.u26", 0x00000, 0x20000, CRC(ec638bad) SHA1(dd7d7e2bfdbb2cf27b4523c49caf005b887d96f9) ) // A290011T
+	ROM_LOAD16_BYTE( "2_m.l._en.20.b.u25", 0x00001, 0x20000, CRC(65441a49) SHA1(07d7d5993ed5857c724bf071059a029098b34672) ) // A290011T
+
+	ROM_REGION( 0x1000000, "sprites", 0 )
+	ROM_LOAD( "mx29f1610mc.u26", 0x000000, 0x200000, CRC(1ec8b75d) SHA1(53f501126c81bdc8ccd8c44ed9f82078156c48ff) ) // MX29F1610MC
+	ROM_LOAD( "mx29f1610mc.u30", 0x200000, 0x200000, CRC(3d3cb084) SHA1(c2a2bd18570a03fc37c403a750b3e346e34818f5) ) // MX29F1610MC
+	ROM_RELOAD(                  0x400000, 0x200000 )
+	ROM_RELOAD(                  0x600000, 0x200000 )
+	ROM_RELOAD(                  0x800000, 0x200000 )
+	ROM_RELOAD(                  0xa00000, 0x200000 )
+	ROM_RELOAD(                  0xc00000, 0x200000 )
+	ROM_RELOAD(                  0xe00000, 0x200000 )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "5_monkey_land.u33", 0x00000, 0x80000, CRC(62122100) SHA1(519df7825ab62f0648192e6b1760dd9cc5ec7f9f) ) // MX27C4000A
+
+	ROM_REGION16_LE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46.u10", 0x0000, 0x0080, CRC(32f4814f) SHA1(bfef933dfab8ddeb4ab51c4ce4aa936e427579b9) ) // TODO: factory default
+
+	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
+	ROM_LOAD( "monkeyle_cpucode.key", 0x00, 0x02, NO_DUMP )
+ROM_END
+
 
 /***************************************************************************
 
@@ -2970,6 +3065,22 @@ void zoo_state::init_magibombm()
 	rom[0x00400/2] = 0x4e75; // overlay!?
 
 	rom[0x00f80/2] = 0x4e75; // Mirror ROM word checksum (it expects 0)
+#endif
+}
+
+void zoo_state::init_magibombo()
+{
+	decrypt_rom(v102_px014_table);
+#if 1
+	// TODO: There's more stuff happening for addresses < 0x400...
+	// override reset vector for now
+	u16 * const rom = (u16 *)memregion("maincpu")->base();
+	rom[0x00004/2] = 0x0000;
+	rom[0x00006/2] = 0x0446;
+
+	rom[0x00400/2] = 0x4e75; // overlay!?
+
+	rom[0x00f52/2] = 0x4e75; // Mirror ROM word checksum (it expects 0)
 #endif
 }
 
@@ -3481,10 +3592,12 @@ GAME(  2004,  monkeyla,  monkeyl,  monkeyl,   magibombd, zoo_state,       init_m
 GAME(  2005,  monkeylb,  monkeyl,  monkeyl,   magibombd, zoo_state,       init_monkeyl,   ROT0, "Astro Corp.", "Monkey Land (Ver. AA.21.B)",                    MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 25/05/2005 11:18
 GAME(  2007,  monkeylc,  monkeyl,  monkeyl,   magibombd, zoo_state,       init_monkeyl,   ROT0, "Astro Corp.", "Monkey Land (Ver. AA.21.C)",                    MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 05/03/2007 10:40
 GAME(  2003,  monkeyld,  monkeyl,  monkeyld,  magibombg, zoo_state,       init_monkeyld,  ROT0, "Astro Corp.", "Monkey Land (Ver. A1.2)",                       MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 122303S
+GAME(  2013,  monkeyle,  monkeyl,  monkeyle,  magibombd, zoo_state,       init_monkeyl,   ROT0, "Astro Corp.", "Monkey Land (Ver. EN.20.B)",                    MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 24/03/2013 17:42
 GAMEL( 2005,  magibombd, magibomb, magibombd, magibombd, zoo_state,       init_magibombd, ROT0, "Astro Corp.", "Magic Bomb (Ver. AA.72.D, 14/11/05)",           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibombb ) // 15/11/05 09:31
 GAMEL( 2005,  magibombj, magibomb, magibombd, magibombd, zoo_state,       init_magibombd, ROT0, "Astro Corp.", "Magic Bomb (Ver. AA.72.C, 25/05/05)",           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibombb ) // 25/05/05 11:26
 GAMEL( 2004,  magibombg, magibomb, magibombg, magibombg, zoo_state,       init_magibombg, ROT0, "Astro Corp.", "Magic Bomb (Ver. NB6.1, 26/04/04)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibomb  ) // 26/04/04. Undumped sprite ROM
 GAMEL( 2003,  magibombm, magibomb, magibombm, magibombg, zoo_state,       init_magibombm, ROT0, "Astro Corp.", "Magic Bomb (Ver. AB5.3, 20/06/03)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibomb  ) // 062003S
+GAMEL( 2014,  magibombo, magibomb, magibombo, magibombd, zoo_state,       init_magibombo, ROT0, "Astro Corp.", "Magic Bomb (Ver. BR71.A, 30/05/14)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,           layout_magibomb  ) // 30/05/14 10:29
 GAMEL( 2004,  speedmst,  0,        speedmst,  magibombg, zoo_state,       init_speedmst,  ROT0, "D2 Enterprises", "Speed Master (Ver. V1.0, Apr 29 2004)",      MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_magibomb  ) // Apr 29 2004 16:29:35
 GAMEL( 2003,  speedmsta, speedmst, speedmst,  magibombg, zoo_state,       init_speedmsta, ROT0, "D2 Enterprises", "Speed Master (Ver. V1.0, May 23 2003)",      MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_magibomb  ) // May 23 2003 16:38:02
 GAMEL( 2003,  speedmstb, speedmst, speedmst,  magibombg, zoo_state,       init_speedmstb, ROT0, "D2 Enterprises", "Speed Master (Ver. V1.0, Apr 28 2004)",      MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_magibomb  ) // Apr 28 2004 17:21:26

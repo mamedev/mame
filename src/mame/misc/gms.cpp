@@ -88,6 +88,7 @@ TODO:
 - jinpaish seems to play the wrong sound samples?
 - broken title GFX in yyhm (transparent pen problem?)
 - the newer games seem to use range 0x9e1000-0x9e1fff during gameplay
+- smatch03 seems to use newer / different custom chips, currently not emulated
 
 Video references:
 rbspm: https://www.youtube.com/watch?v=pPk-6N1wXoE
@@ -160,6 +161,7 @@ public:
 
 	void super555(machine_config &config) ATTR_COLD;
 	void hgly(machine_config &config) ATTR_COLD;
+	void smatch03(machine_config &config) ATTR_COLD;
 
 	void init_ballch() ATTR_COLD;
 	void init_cjdlz() ATTR_COLD;
@@ -222,6 +224,7 @@ private:
 	void rbspm_mem(address_map &map) ATTR_COLD;
 	void ssanguoj_mem(address_map &map) ATTR_COLD;
 	void hgly_mem(address_map &map) ATTR_COLD;
+	void smatch03_mem(address_map &map) ATTR_COLD;
 
 	uint16_t unk_r();
 	uint16_t dipsw_matrix_r();
@@ -595,6 +598,34 @@ void gms_2layers_state::hgly_mem(address_map &map)
 
 	map(0xf00000, 0xf00001).w(FUNC(gms_2layers_state::hgly_eeprom_w));
 }
+
+void gms_2layers_state::smatch03_mem(address_map &map) // TODO: everything
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x700000, 0x70ffff).ram(); // ok
+	map(0x300000, 0x300001).w(FUNC(gms_2layers_state::reels_toggle_w));
+	map(0x600000, 0x600001).rw(FUNC(gms_2layers_state::dipsw_matrix_r), FUNC(gms_2layers_state::input_matrix_w));
+	map(0x608000, 0x608001).portr("IN1").w(FUNC(gms_2layers_state::tilebank_w)); // ok
+	map(0x610000, 0x610001).portr("IN2");
+	map(0x618080, 0x618081).nopr();//.lr16(NAME([this] () -> uint16_t { return m_prot_data; })); // reads something here from below, if these are hooked up booting stops with '0x09 U64 ERROR', like it's failing some checksum test
+	map(0x620000, 0x620000).r(m_oki, FUNC(okim6295_device::read)); // Oki controlled through a GAL at 18C
+	// map(0x620080, 0x620081).lw16(NAME([this] (uint16_t data) { m_prot_data = data; })); // writes something here that expects to read above
+	map(0x628000, 0x628000).w(m_oki, FUNC(okim6295_device::write));
+	map(0x638000, 0x638001).w(FUNC(gms_2layers_state::lamps_w));
+	map(0x900000, 0x900fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x940000, 0x9403ff).ram().w(FUNC(gms_2layers_state::reelram_w<0>)).share(m_reelram[0]);
+	map(0x940400, 0x9407ff).ram().w(FUNC(gms_2layers_state::reelram_w<1>)).share(m_reelram[1]);
+	map(0x940800, 0x940bff).ram().w(FUNC(gms_2layers_state::reelram_w<2>)).share(m_reelram[2]);
+	map(0x940c00, 0x940fff).ram().w(FUNC(gms_2layers_state::reelram_w<3>)).share(m_reelram[3]);
+	map(0x980000, 0x983fff).ram(); // 0x2048  words ???, byte access, u25 and u26 according to test mode
+	map(0x980180, 0x9801ff).ram().share(m_scrolly[0]);
+	map(0x980280, 0x9802ff).ram().share(m_scrolly[1]);
+	map(0x980300, 0x98037f).ram().share(m_scrolly[2]);
+	map(0x980380, 0x9803ff).ram().share(m_scrolly[3]);
+	map(0x9c0000, 0x9c0fff).ram().w(FUNC(gms_2layers_state::vram_w<0>)).share(m_vidram[0]);
+	map(0xf00000, 0xf00001).rw(FUNC(gms_2layers_state::eeprom_r), FUNC(gms_2layers_state::eeprom_w));
+}
+
 
 uint8_t gms_2layers_state::mcu_io_r(offs_t offset)
 {
@@ -2429,6 +2460,17 @@ static const gfx_layout magslot32_layout =
 	32*64
 };
 
+const gfx_layout gfx_8x8x4_packed_smatch03 = // TODO: not correct
+{
+	8,8,
+	RGN_FRAC(1,1),
+	4,
+	{ STEP4(0,1) },
+	{ 2*4, 3*4, 0*4, 1*4, 6*4, 7*4, 4*4, 5*4 },
+	{ STEP8(0,4*8) },
+	8*8*4
+};
+
 
 static GFXDECODE_START( gfx_rbmk )
 	GFXDECODE_ENTRY( "gfx1", 0, rbmk32_layout,            0x0, 32  )
@@ -2439,6 +2481,11 @@ static GFXDECODE_START( gfx_magslot )
 	GFXDECODE_ENTRY( "gfx1", 0, magslot32_layout,         0x000, 32  )
 	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_lsb,     0x100, 16  )
 	GFXDECODE_ENTRY( "gfx3", 0, gfx_8x8x4_packed_lsb,     0x400, 16  )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_smatch03 ) // TODO
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_packed_smatch03, 0x000, 16  )
+	GFXDECODE_ENTRY( "gfx2", 0, gfx_8x8x4_packed_smatch03, 0x100, 16  )
 GFXDECODE_END
 
 void gms_2layers_state::machine_start()
@@ -2658,6 +2705,15 @@ void gms_2layers_state::hgly(machine_config &config)
 	super555(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &gms_2layers_state::hgly_mem);
+}
+
+void gms_2layers_state::smatch03(machine_config &config)
+{
+	super555(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &gms_2layers_state::smatch03_mem);
+
+	m_gfxdecode->set_info(gfx_smatch03);
 }
 
 
@@ -3141,6 +3197,30 @@ ROM_START( cjdlz )
 ROM_END
 
 
+// Possibly to be moved to separate driver.
+// Usual standard components but much bigger GFX ROMs. 1 bank of 8 switches.
+// Custom chips: GMS 99A-A1 A80, GMS-A202, GMS A203, 2x GMS M203
+ROM_START( smatch03 )
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_WORD_SWAP( "v3_1_489dec.u49", 0x00000, 0x80000, CRC(ca2b5c51) SHA1(f1bab9e70fbd24a166a18cf8fdbbd70c2b1f3093) )
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "29f1610.u156", 0x000000, 0x200000, CRC(0f468d92) SHA1(dc5b639dee2063564927d6087819b19c7b1c928d) ) // 1ST AND 2ND HALF IDENTICAL
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "a0_b026.u48", 0x00000, 0x80000, CRC(afdd022f) SHA1(d2c382ea89cdda9f44e748bab03514d6848a14c9) )
+
+	ROM_REGION( 0x800000, "gfx2", 0 )
+	ROM_LOAD( "29f1610.u158", 0x000000, 0x200000, CRC(fda672c7) SHA1(dce2856e061b52ad455fc0d3ae4492842334bc83) )
+	ROM_LOAD( "29f1610.u159", 0x200000, 0x200000, CRC(524d2a35) SHA1(afd8ed8a5ac5c2ea3e5f19482a3625400540ef31) )
+	ROM_LOAD( "29f1610.u160", 0x400000, 0x200000, CRC(c385018f) SHA1(ba0a81c465941b2ee8e69b0d8f2fba8e0e510b0e) )
+	ROM_LOAD( "29f1610.u161", 0x600000, 0x200000, CRC(f2486028) SHA1(3bc6092dbd82b2038a46a404dd152e15bbc56fc7) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD_SWAP( "93c46.u39", 0x00, 0x080, NO_DUMP )
+ROM_END
+
+
 // the following inits patch out protection (?) checks to allow for testing
 // unfortunately the various U errors shown don't always correspond to correct PCB locations
 
@@ -3330,3 +3410,6 @@ GAME( 2003, magslot,  0, magslot,  magslot,  gms_3layers_state, empty_init,    R
 GAME( 1999, hgly,     0, hgly,     hgly,     gms_2layers_state, init_hgly,     ROT0,  "GMS", "Huangguan Leyuan (990726 CRG1.1)",                      MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                // stops during boot, patched for now. EEPROM interface isn't fully understood.
 GAMEL(2002, ballch,   0, super555, ballch,   gms_2layers_state, init_ballch,   ROT0,  "TVE", "Ball Challenge (20020607 1.0 OVERSEA)",                 MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_ballch ) // stops during boot, patched for now.
 GAMEL(2005, cots,     0, hgly,     cots,     gms_2layers_state, init_cots,     ROT0,  "ECM", "Creatures of the Sea (20050328 USA 6.3)",               MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_cots )   // stops during boot, patched for now. EEPROM interface isn't fully understood.
+
+// roulette games
+GAME( 2003, smatch03, 0, smatch03, hgly,     gms_2layers_state, empty_init,    ROT0,  "GMS", "Super Match 2003 (Version 3.1 2003-11-04)",             MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                // stops during boot, patched for now. EEPROM interface isn't fully understood.

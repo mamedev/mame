@@ -2,14 +2,17 @@
 // copyright-holders:
 
 /*
-Clown Magic by unknown manufacturer
+Clown Magic by Visco
+Distributed by Able
 String in ROM says '2002.11.20'
+Video reference: https://www.youtube.com/watch?v=h88O2nWpjbo
 
 MS-02B Main PCB
 
 MC68EC020FG16C CPU (PCB silkscreened MC68EC020FG)
 MX27C4100DC-12 (program ROM, silkscreened MX27C4100)
 33.33 MHz XTAL (near program ROM)
+AT93C46F EEPROM
 240-pin, scratched off chip (PCB silkscreened VDC)
 42.95454 MHz XTAL (between CPU and VDC)
 2x T224160B-35J RAM (on the left of the VDC)
@@ -36,6 +39,7 @@ TA8213K audio power amplifier
 #include "emu.h"
 
 #include "cpu/m68000/m68020.h"
+#include "machine/eepromser.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -148,6 +152,8 @@ void clownmgc_state::clownmgc(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &clownmgc_state::program_map);
 	//m_maincpu->set_vblank_int("screen", FUNC(clownmgc_state::irq2_line_hold));
 
+	EEPROM_93C46_16BIT(config, "eeprom");
+
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
@@ -178,4 +184,4 @@ ROM_END
 
 } // anonymous namespace
 
-GAME( 2002, clownmgc, 0, clownmgc, clownmgc, clownmgc_state, empty_init, ROT0, "<unknown>", "Clown Magic", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2002, clownmgc, 0, clownmgc, clownmgc, clownmgc_state, empty_init, ROT0, "Visco", "Progressive Clown Magic", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
