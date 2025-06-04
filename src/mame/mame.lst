@@ -18816,7 +18816,8 @@ splashna
 ringball
 
 @source:gaelco/splash_ms.cpp
-splashms
+splashm
+splashma
 
 @source:gaelco/targeth.cpp
 quickshts
