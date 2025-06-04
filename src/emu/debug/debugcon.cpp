@@ -925,7 +925,7 @@ bool debugger_console::validate_target_address_parameter(std::string_view param,
 ///   failure.
 /// \return true if the parameter refers to a memory region in the
 ///   current system, or false otherwise.
-bool debugger_console::validate_memory_region_parameter(std::string_view param, memory_region *&result, bool print_error)
+bool debugger_console::validate_memory_region_parameter(std::string_view param, memory_region *&result)
 {
 	auto const &regions = m_machine.memory().regions();
 	std::string_view relative = param;
@@ -938,8 +938,7 @@ bool debugger_console::validate_memory_region_parameter(std::string_view param, 
 	}
 	else
 	{
-		if (print_error)
-			printf("No matching memory region found for '%s'\n", param);
+		printf("No matching memory region found for '%s'\n", param);
 		return false;
 	}
 }
@@ -954,7 +953,7 @@ bool debugger_console::validate_memory_region_parameter(std::string_view param, 
 ///   failure.
 /// \return true if the parameter refers to a memory share in the
 ///   current system, or false otherwise.
-bool debugger_console::validate_memory_share_parameter(std::string_view param, memory_share *&result, bool print_error)
+bool debugger_console::validate_memory_share_parameter(std::string_view param, memory_share *&result)
 {
 	auto const &shares = m_machine.memory().shares();
 	std::string_view relative = param;
@@ -967,8 +966,7 @@ bool debugger_console::validate_memory_share_parameter(std::string_view param, m
 	}
 	else
 	{
-		if (print_error)
-			printf("No matching memory share found for '%s'\n", param);
+		printf("No matching memory share found for '%s'\n", param);
 		return false;
 	}
 }

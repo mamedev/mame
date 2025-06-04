@@ -274,15 +274,13 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("saved",     CMDFLAG_NONE, 3, 3, std::bind(&debugger_commands::execute_save, this, AS_DATA, _1));
 	m_console.register_command("savei",     CMDFLAG_NONE, 3, 3, std::bind(&debugger_commands::execute_save, this, AS_IO, _1));
 	m_console.register_command("saveo",     CMDFLAG_NONE, 3, 3, std::bind(&debugger_commands::execute_save, this, AS_OPCODES, _1));
-	m_console.register_command("saver",     CMDFLAG_NONE, 4, 4, std::bind(&debugger_commands::execute_region_deprecated, this, _1));
-	m_console.register_command("savem",     CMDFLAG_NONE, 4, 4, std::bind(&debugger_commands::execute_savememory, this, _1));
+	m_console.register_command("saver",     CMDFLAG_NONE, 4, 4, std::bind(&debugger_commands::execute_saveregion, this, _1));
 
 	m_console.register_command("load",      CMDFLAG_NONE, 2, 3, std::bind(&debugger_commands::execute_load, this, -1, _1));
 	m_console.register_command("loadd",     CMDFLAG_NONE, 2, 3, std::bind(&debugger_commands::execute_load, this, AS_DATA, _1));
 	m_console.register_command("loadi",     CMDFLAG_NONE, 2, 3, std::bind(&debugger_commands::execute_load, this, AS_IO, _1));
 	m_console.register_command("loado",     CMDFLAG_NONE, 2, 3, std::bind(&debugger_commands::execute_load, this, AS_OPCODES, _1));
-	m_console.register_command("loadr",     CMDFLAG_NONE, 4, 4, std::bind(&debugger_commands::execute_region_deprecated, this, _1));
-	m_console.register_command("loadm",     CMDFLAG_NONE, 4, 4, std::bind(&debugger_commands::execute_loadmemory, this, _1));
+	m_console.register_command("loadr",     CMDFLAG_NONE, 4, 4, std::bind(&debugger_commands::execute_loadregion, this, _1));
 
 	m_console.register_command("dump",      CMDFLAG_NONE, 3, 6, std::bind(&debugger_commands::execute_dump, this, -1, _1));
 	m_console.register_command("dumpd",     CMDFLAG_NONE, 3, 6, std::bind(&debugger_commands::execute_dump, this, AS_DATA, _1));
@@ -2095,10 +2093,12 @@ void debugger_commands::execute_save(int spacenum, const std::vector<std::string
 	m_console.printf("Data saved successfully\n");
 }
 
+/*-------------------------------------------------
+    execute_savememory - execute the save command on memory
+-------------------------------------------------*/
 
-void debugger_commands::execute_region_deprecated(const std::vector<std::string_view> &params)
+void debugger_commands::execute_savememory(const std::vector<std::string_view> &params)
 {
-	m_console.printf("saver/loadr is deprecated, use savem/loadm instead.\n");
 }
 
 
@@ -2139,70 +2139,6 @@ void debugger_commands::execute_saveregion(const std::vector<std::string_view> &
 
 	fclose(f);
 	m_console.printf("Data saved successfully\n");
-}
-
-/*-------------------------------------------------
-    execute_saveshare - execute the save command on share memory
--------------------------------------------------*/
-
-void debugger_commands::execute_saveshare(const std::vector<std::string_view> &params)
-{
-	u64 offset, length;
-	memory_share *share;
-
-	// validate parameters
-	if (!m_console.validate_number_parameter(params[1], offset))
-		return;
-	if (!m_console.validate_number_parameter(params[2], length))
-		return;
-	if (!m_console.validate_memory_share_parameter(params[3], share))
-		return;
-
-	if (offset >= share->bytes())
-	{
-		m_console.printf("Invalid offset\n");
-		return;
-	}
-	if ((length <= 0) || ((length + offset) >= share->bytes()))
-		length = share->bytes() - offset;
-
-	/* open the file */
-	std::string const filename(params[0]);
-	FILE *f = fopen(filename.c_str(), "wb");
-	if (!f)
-	{
-		m_console.printf("Error opening file '%s'\n", params[0]);
-		return;
-	}
-	fwrite(reinterpret_cast<u8 *>(share->ptr()) + offset, 1, length, f);
-
-	fclose(f);
-	m_console.printf("Data saved successfully\n");
-}
-
-
-/*-------------------------------------------------
-    execute_savememory - execute the save command on memory
--------------------------------------------------*/
-
-void debugger_commands::execute_savememory(const std::vector<std::string_view> &params)
-{
-	u64 offset, length;
-
-	// validate parameters
-	if (!m_console.validate_number_parameter(params[1], offset))
-		return;
-	if (!m_console.validate_number_parameter(params[2], length))
-		return;
-
-	memory_region *region;
-	memory_share *share;
-	if (m_console.validate_memory_region_parameter(params[3], region, false))
-		execute_saveregion(params);
-	else if (m_console.validate_memory_share_parameter(params[3], share, false))
-		execute_saveshare(params);
-	else
-		m_console.printf("No matching memory found for '%s'\n", params[3]);
 }
 
 
@@ -2319,6 +2255,14 @@ void debugger_commands::execute_load(int spacenum, const std::vector<std::string
 		m_console.printf("Data loaded successfully to memory : 0x%X to 0x%X\n", offset, i-1);
 }
 
+/*-------------------------------------------------
+    execute_loadmemory - execute the load command on memory
+-------------------------------------------------*/
+
+void debugger_commands::execute_loadmemory(const std::vector<std::string_view> &params)
+{
+}
+
 
 /*-------------------------------------------------
     execute_loadregion - execute the load command on region memory
@@ -2366,80 +2310,6 @@ void debugger_commands::execute_loadregion(const std::vector<std::string_view> &
 
 	fclose(f);
 	m_console.printf("Data loaded successfully to memory : 0x%X to 0x%X\n", offset, offset + length - 1);
-}
-
-
-/*-------------------------------------------------
-    execute_loadshare - execute the load command on share memory
--------------------------------------------------*/
-
-void debugger_commands::execute_loadshare(const std::vector<std::string_view> &params)
-{
-	u64 offset, length;
-	memory_share *share;
-
-	// validate parameters
-	if (!m_console.validate_number_parameter(params[1], offset))
-		return;
-	if (!m_console.validate_number_parameter(params[2], length))
-		return;
-	if (!m_console.validate_memory_share_parameter(params[3], share))
-		return;
-
-	if (offset >= share->bytes())
-	{
-		m_console.printf("Invalid offset\n");
-		return;
-	}
-	if ((length <= 0) || ((length + offset) >= share->bytes()))
-		length = share->bytes() - offset;
-
-	// open the file
-	std::string filename(params[0]);
-	FILE *const f = fopen(filename.c_str(), "rb");
-	if (!f)
-	{
-		m_console.printf("Error opening file '%s'\n", params[0]);
-		return;
-	}
-
-	fseek(f, 0L, SEEK_END);
-	u64 size = ftell(f);
-	rewind(f);
-
-	// check file size
-	if (length >= size)
-		length = size;
-
-	fread(reinterpret_cast<u8 *>(share->ptr()) + offset, 1, length, f);
-
-	fclose(f);
-	m_console.printf("Data loaded successfully to memory : 0x%X to 0x%X\n", offset, offset + length - 1);
-}
-
-
-/*-------------------------------------------------
-    execute_loadregion - execute the load command on memory
--------------------------------------------------*/
-
-void debugger_commands::execute_loadmemory(const std::vector<std::string_view> &params)
-{
-	u64 offset, length;
-
-	// validate parameters
-	if (!m_console.validate_number_parameter(params[1], offset))
-		return;
-	if (!m_console.validate_number_parameter(params[2], length))
-		return;
-
-	memory_region *region;
-	memory_share *share;
-	if (m_console.validate_memory_region_parameter(params[3], region, false))
-		execute_loadregion(params);
-	else if (m_console.validate_memory_share_parameter(params[3], share, false))
-		execute_loadshare(params);
-	else
-		m_console.printf("No matching memory found for '%s'\n", params[3]);
 }
 
 
@@ -2606,6 +2476,13 @@ void debugger_commands::execute_dump(int spacenum, const std::vector<std::string
 	m_console.printf("Data dumped successfully\n");
 }
 
+/*-------------------------------------------------
+    execute_dumpmemory - execute the dump command on memory
+-------------------------------------------------*/
+
+void debugger_commands::execute_dumpmemory(const std::vector<std::string_view> &params)
+{
+}
 
 //-------------------------------------------------
 //  execute_strdump - execute the strdump command
@@ -2781,6 +2658,13 @@ void debugger_commands::execute_strdump(int spacenum, const std::vector<std::str
 	// close the file
 	fclose(f);
 	m_console.printf("Data dumped successfully\n");
+}
+/*-------------------------------------------------
+    execute_strdumpmemory - execute the strdump command on memory
+-------------------------------------------------*/
+
+void debugger_commands::execute_strdumpmemory(const std::vector<std::string_view> &params)
+{
 }
 
 
@@ -3408,6 +3292,14 @@ void debugger_commands::execute_find(int spacenum, const std::vector<std::string
 		m_console.printf("Not found\n");
 }
 
+/*-------------------------------------------------
+    execute_findmemory - execute the find command on memory
+-------------------------------------------------*/
+
+void debugger_commands::execute_findmemory(const std::vector<std::string_view> &params)
+{
+}
+
 
 //-------------------------------------------------
 //  execute_fill - execute the fill command
@@ -3515,6 +3407,14 @@ void debugger_commands::execute_fill(int spacenum, const std::vector<std::string
 				count -= fill_data_size[j];
 		}
 	}
+}
+
+/*-------------------------------------------------
+    execute_fillmemory - execute the fill command on memory
+-------------------------------------------------*/
+
+void debugger_commands::execute_fillmemory(const std::vector<std::string_view> &params)
+{
 }
 
 
