@@ -441,6 +441,59 @@ static INPUT_PORTS_START( glass )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( ssplash10 )
+	PORT_INCLUDE( glass )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2,3,4")
+	PORT_DIPSETTING(    0x60, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0xe0, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x90, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x80, "1 Coin / 1 Credit (duplicate 1)" )
+	PORT_DIPSETTING(    0xc0, "1 Coin / 1 Credit (duplicate 2)" )
+	PORT_DIPSETTING(    0xa0, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x70, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x50, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:5,6,7,8")
+	PORT_DIPSETTING(    0x06, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x0e, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x09, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x08, "1 Coin / 1 Credit (duplicate 1)" )
+	PORT_DIPSETTING(    0x0c, "1 Coin / 1 Credit (duplicate 2)" )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+
+	PORT_MODIFY("DSW2") 
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x30, "3" )
+	PORT_DIPSETTING(    0x10, "1" )
+	PORT_DIPSETTING(    0x20, "2" )
+	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:6" ) // Listed as "Unused"
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Version ) ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x00, "Light" )
+	PORT_SERVICE_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW2:8" )
+INPUT_PORTS_END
+
+
 
 void glass_state::machine_start()
 {
@@ -531,6 +584,33 @@ ROM_START( ssplash )
 
 	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) // DS5002FP code
 	ROM_LOAD( "glass_ds5002fp_sram.bin", 0x00000, 0x8000, CRC(47c9df4c) SHA1(e0ac4f3d3086a4e8164d42aaae125037c222118a) )
+
+	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
+	// these are the default states stored in NVRAM
+	DS5002FP_SET_MON( 0x29 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "h13.bin", 0x000000, 0x200000, CRC(13ab7f31) SHA1(468424f74d6cccd1b445a9f20e2d24bc46d61ed6) )
+	ROM_LOAD( "h11.bin", 0x200000, 0x200000, CRC(c6ac41c8) SHA1(22408ef1e35c66d0fba0c72972c46fad891d1193) )
+
+	ROM_REGION( 0x100000, "bmap", 0 )   // 16 bitmaps (320x200, indexed colors)
+	ROM_LOAD( "h9.bin", 0x000000, 0x100000, CRC(b9492557) SHA1(3f5c0d696d65e1cd492763dfa749c813dd56a9bf) )
+
+	ROM_REGION( 0x100000, "oki", 0 )
+	ROM_LOAD( "c1.bin", 0x000000, 0x100000, CRC(d9f075a2) SHA1(31a7a677861f39d512e9d1f51925c689e481159a) )
+	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
+ROM_END
+
+ROM_START( ssplash10 )
+	ROM_REGION( 0x100000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "c-23_splash_0_27-10-93_27c020.bin", 0x000000, 0x040000, CRC(931b4cfd) SHA1(f323f489dfe5c35d0901fe906a973cc839bba248) )
+	ROM_LOAD16_BYTE( "c-22_splash_1_27-10-93_27c020.bin", 0x000001, 0x040000, CRC(fa3049e9) SHA1(caa67837084b093b3ed1c0df4a43b3d0db179a6d) )
+
+	ROM_REGION( 0x8000, "gaelco_ds5002fp:sram", 0 ) // DS5002FP code
+	// needs to be different?
+	ROM_LOAD( "ssplash10_ds5002fp_sram.bin", 0x00000, 0x8000, BAD_DUMP CRC(47c9df4c) SHA1(e0ac4f3d3086a4e8164d42aaae125037c222118a) )
 
 	ROM_REGION( 0x100, "gaelco_ds5002fp:mcu:internal", ROMREGION_ERASE00 )
 	// these are the default states stored in NVRAM
@@ -831,36 +911,39 @@ ROM_END
 
 
 /*
- ALL versions of Glass contain the 'Break Edition' string (it just seems to be part of the title?)
- The 2 version 1.0 releases are very similar code, it was thought that one was a break edition and the other wasn't, but this is not the case.
+ All versions of Glass (but 'ssplash10') contain the 'Break Edition' string (it just seems to be part of the title?).
 
- Version 1.1 releases also show Version 1994 on the title screen. These versions do not have skulls in the playfield (at least not on early stages)
- The protected version 1.1 also doesn't show any kind of attract gameplay, looks like it was patched out? (should be verified on an untouched original 1.1 using its original SRAM tho)
- The unprotected version appears to be a Korean set, is censored, and has different girl pictures.
+ Version 1.1 releases also show Version 1994 on the title screen. These versions do not have skulls in the playfield (at least not on early stages).
+ The protected version 1.1 also doesn't show any kind of attract gameplay, looks like it was patched out? (should be verified on an untouched original 1.1 using its original SRAM tho).
+ The unprotected versions are Korean sets, they're censored, and have different girl pictures.
 */
 
 // Newer 1.1 versions from 1994, all seem to be dated 3 Feb 1994 (apart from Korea?)
 
 // These 2 are the same codebase, just a config byte change
-GAME( 1994, glass,    0,     glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.1, Break Edition, checksum 49D5E66B, Version 1994, set 1)",              MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 3 Feb 1994 on stickers
-GAME( 1994, ssplash,  glass, glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Super Splash (Ver 1.1, Break Edition, checksum 59D5E66B, Version 1994)",              MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 3 Feb 1994 on stickers
+GAME( 1994, glass,     0,     glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Glass (ver 1.1, Break Edition, checksum 49D5E66B, Version 1994, set 1)",              MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 3 Feb 1994 on stickers
+GAME( 1994, ssplash,   glass, glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Super Splash (ver 1.1, Break Edition, checksum 59D5E66B, Version 1994)",              MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 3 Feb 1994 on stickers
 
 // This is 2 bytes different to the above 'glass' set, could be bad? shows same checksum(!)
-GAME( 1994, glassa,   glass, glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.1, Break Edition, checksum 49D5E66B, Version 1994, set 2)",              MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1994, glassa,    glass, glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Glass (ver 1.1, Break Edition, checksum 49D5E66B, Version 1994, set 2)",              MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 
 // Censored images, playable but missing a GFX ROM used for some images, Atari marked on ROMs, not shown in game
-GAME( 1994, glassat,  glass, glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco (Atari license)",  "Glass (Ver 1.1, Break Edition, checksum D7AF5496, Version 1994, US)",                 MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 3 Feb 1994 on stickers
+GAME( 1994, glassat,   glass, glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco (Atari license)",  "Glass (ver 1.1, Break Edition, checksum D7AF5496, Version 1994, US)",                 MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 3 Feb 1994 on stickers
 
 // Censored images, unprotected
-GAME( 1994, glasskr,  glass, glass,          glass, glass_state, empty_init, ROT0, "OMK / Gaelco (Promat license)", "Glass (Ver 1.1, Break Edition, checksum D419AB69, Version 1994, unprotected, Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // promat stickers on program ROMs
-GAME( 1994, glasskra, glass, glass,          glass, glass_state, empty_init, ROT0, "OMK / Gaelco (Promat license)", "Glass (Ver 1.1, Break Edition, checksum 3D8A724F, Version 1994, unprotected, Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // promat stickers on program ROMs
+GAME( 1994, glasskr,   glass, glass,          glass, glass_state, empty_init, ROT0, "OMK / Gaelco (Promat license)", "Glass (ver 1.1, Break Edition, checksum D419AB69, Version 1994, unprotected, Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // promat stickers on program ROMs
+GAME( 1994, glasskra,  glass, glass,          glass, glass_state, empty_init, ROT0, "OMK / Gaelco (Promat license)", "Glass (ver 1.1, Break Edition, checksum 3D8A724F, Version 1994, unprotected, Korea)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // promat stickers on program ROMs
 
 // Older 1.0 versions from 1993
-GAME( 1993, glass10,  glass, glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.0, Break Edition, checksum C5513F3C)",                                   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, glass10a, glass, glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.0, Break Edition, checksum D3864FDB)",                                   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, glass10b, glass, glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.0, Break Edition, checksum EBCB0BFE, 22 Nov 1993)",                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // date from stickers
-GAME( 1993, glass10c, glass, glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.0, Break Edition, checksum 6241CD67, 16 Nov 1993)",                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // date from stickers
-GAME( 1993, glass10d, glass, glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Glass (Ver 1.0, Break Edition, checksum 2B43D337, 10 Nov 1993)",                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // date from stickers
+GAME( 1993, glass10,   glass, glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Glass (ver 1.0, Break Edition, checksum C5513F3C)",                                   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, glass10a,  glass, glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Glass (ver 1.0, Break Edition, checksum D3864FDB)",                                   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, glass10b,  glass, glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Glass (ver 1.0, Break Edition, checksum EBCB0BFE, 22 Nov 1993)",                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // date from stickers
+GAME( 1993, glass10c,  glass, glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Glass (ver 1.0, Break Edition, checksum 6241CD67, 16 Nov 1993)",                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // date from stickers
+GAME( 1993, glass10d,  glass, glass_ds5002fp, glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Glass (ver 1.0, Break Edition, checksum 2B43D337, 10 Nov 1993)",                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // date from stickers
+
+// Even older 1.0 version, without the Break Edition subtitle, maybe prototype?
+// Enemies don't move correctly and can't be shot, probably requires a different DS5002FP even if it 'passes' the startup check
+GAME( 1993, ssplash10, glass, glass_ds5002fp, ssplash10, glass_state, empty_init, ROT0, "OMK / Gaelco", "Super Splash (Ver 1.0, checksum 2104394E, 27 Oct 1993)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // date from stickers
 
 // This development board can't work without the code/data that would have been remotely uploaded to the SRAMs, hence 'incomplete' flag.
-GAME( 1993, glassp,   glass, glass,          glass, glass_state, empty_init, ROT0, "OMK / Gaelco",                  "Glass (development PCB)",                                                             MACHINE_NOT_WORKING | MACHINE_IS_INCOMPLETE )
+GAME( 1993, glassp,    glass, glass,          glass, glass_state, empty_init, ROT0, "OMK / Gaelco", "Glass (development PCB)", MACHINE_NOT_WORKING | MACHINE_IS_INCOMPLETE )
