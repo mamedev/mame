@@ -6,7 +6,6 @@
 //
 //============================================================
 
-#include "emu.h"
 #include "sound_module.h"
 #include "modules/osdmodule.h"
 
@@ -1679,8 +1678,8 @@ int sound_coreaudio::coreaudio_stream::create_sink_stream(struct coreaudio_devic
 	m_sample_bytes = format.mBytesPerFrame;
 
 	// Allocate buffer
-	m_headroom = m_sample_bytes * (m_audio_latency * m_sample_rate / sound_manager::STREAMS_UPDATE_FREQUENCY);
-	m_buffer_size = m_sample_bytes * std::max<uint32_t>(m_sample_rate * (m_audio_latency + 3) / sound_manager::STREAMS_UPDATE_FREQUENCY, 512U);
+	m_headroom = m_sample_bytes * (m_audio_latency * m_sample_rate * 20e-3f);
+	m_buffer_size = m_sample_bytes * std::max<uint32_t>(m_sample_rate * (m_audio_latency + 3) * 20e-3f, 512U);
 	osd_printf_verbose("CoreAudio: Allocating %d bytes of buffer space (%d bytes per frame)\n", m_buffer_size, m_sample_bytes);
 	try
 	{
@@ -1737,7 +1736,7 @@ int sound_coreaudio::coreaudio_stream::create_source_stream(struct coreaudio_dev
 		return -1;
 
 	// Allocate 3 audio frames of buffer space for source streams
-	m_buffer_size = (m_sample_rate / sound_manager::STREAMS_UPDATE_FREQUENCY) * 3 * m_sample_bytes;
+	m_buffer_size = (m_sample_rate * 20e-3) * 3 * m_sample_bytes;
 	try
 	{
 		m_buffer = std::make_unique<int8_t[]>(m_buffer_size);

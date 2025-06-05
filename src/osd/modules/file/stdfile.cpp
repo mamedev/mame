@@ -223,7 +223,7 @@ int osd_uchar_from_osdchar(char32_t *uchar, const char *osdchar, size_t count) n
 //  osd_stat
 //============================================================
 
-std::unique_ptr<osd::directory::entry> osd_stat(const std::string &path)
+osd::directory::entry::ptr osd_stat(const std::string &path)
 {
 	// create an osd_directory_entry; be sure to make sure that the caller can
 	// free all resources by just freeing the resulting osd_directory_entry
@@ -250,7 +250,7 @@ std::unique_ptr<osd::directory::entry> osd_stat(const std::string &path)
 		std::fclose(f);
 	}
 
-	return std::unique_ptr<osd::directory::entry>(result);
+	return osd::directory::entry::ptr(result);
 }
 
 

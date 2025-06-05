@@ -104,7 +104,16 @@ public:
 	bool open_impl(std::string const &dirname);
 
 private:
-	typedef std::unique_ptr<DIR, int (*)(DIR *)>    dir_ptr;
+	struct dir_deleter
+	{
+		void operator()(DIR *object) const noexcept
+		{
+			if (object)
+				::closedir(object);
+		}
+	};
+
+	using dir_ptr = std::unique_ptr<DIR, dir_deleter>;
 
 	entry       m_entry;
 	sdl_dirent  *m_data;
@@ -120,7 +129,7 @@ private:
 posix_directory::posix_directory()
 	: m_entry()
 	, m_data(nullptr)
-	, m_fd(nullptr, &::closedir)
+	, m_fd(nullptr)
 	, m_path()
 {
 }

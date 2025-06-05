@@ -6,7 +6,6 @@
 //
 //====================================================================
 
-#include "emu.h"
 #include "sound_module.h"
 
 #include "modules/osdmodule.h"
@@ -388,7 +387,7 @@ int sound_xaudio2::init(osd_interface &osd, osd_options const &options)
 	}
 
 	// get relevant options
-	m_audio_latency = options.audio_latency() / sound_manager::STREAMS_UPDATE_FREQUENCY;
+	m_audio_latency = options.audio_latency() * 20e-3;
 	if (m_audio_latency == 0.0F)
 		m_audio_latency = 0.03F;
 	m_audio_latency = std::clamp(m_audio_latency, 0.01F, 1.0F);

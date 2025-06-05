@@ -359,7 +359,7 @@ bool osd_get_physical_drive_geometry(const char *filename, uint32_t *cylinders, 
 //  osd_stat
 //============================================================
 
-std::unique_ptr<osd::directory::entry> osd_stat(const std::string &path)
+osd::directory::entry::ptr osd_stat(const std::string &path)
 {
 	// convert the path to TCHARs
 	osd::text::tstring t_path;
@@ -401,7 +401,7 @@ std::unique_ptr<osd::directory::entry> osd_stat(const std::string &path)
 	result->size = find_data.nFileSizeLow | ((uint64_t) find_data.nFileSizeHigh << 32);
 	result->last_modified = win_time_point_from_filetime(&find_data.ftLastWriteTime);
 
-	return std::unique_ptr<osd::directory::entry>(result);
+	return osd::directory::entry::ptr(result);
 }
 
 

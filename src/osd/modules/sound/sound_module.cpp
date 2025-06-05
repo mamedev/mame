@@ -2,7 +2,6 @@
 // copyright-holders:O. Galibert
 
 
-#include "emu.h"
 #include "sound_module.h"
 
 #include <algorithm>

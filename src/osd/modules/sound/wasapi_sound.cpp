@@ -6,7 +6,6 @@
 //
 //====================================================================
 
-#include "emu.h"
 #include "sound_module.h"
 
 #include "modules/osdmodule.h"
@@ -154,11 +153,13 @@ private:
 		std::thread                 m_thread;
 		CRITICAL_SECTION            m_critical_section;
 		abuffer                     m_buffer;
+		std::vector<int16_t>        m_underflow_fill;
 		audio_client_ptr            m_client;
 		audio_render_client_ptr     m_render;
 		audio_capture_client_ptr    m_capture;
 		UINT32                      m_buffer_frames;
-		UINT32                      m_minimum_frames;
+		UINT32                      m_minimum_headroom;
+		bool                        m_underflowing;
 		std::atomic<bool>           m_exiting;
 	};
 
@@ -265,9 +266,11 @@ sound_wasapi::stream_info::stream_info(
 	m_host(host),
 	m_event(std::move(event)),
 	m_buffer(channels),
+	m_underflow_fill(channels, 0U),
 	m_client(std::move(client)),
 	m_buffer_frames(buffer_frames),
-	m_minimum_frames(std::min(buffer_frames, UINT32(rate / 100))),
+	m_minimum_headroom(std::max<UINT32>(lround(host.m_audio_latency * rate), buffer_frames)),
+	m_underflowing(true),
 	m_exiting(false)
 {
 	info.m_node = node.m_id;
@@ -407,17 +410,34 @@ void sound_wasapi::stream_info::render_task()
 
 			if (SUCCEEDED(result))
 			{
-				auto const available = m_buffer.available();
-				auto const space = m_buffer_frames - padding;
-				UINT32 const maximum = std::min<UINT32>(available, space);
-				locked = std::max<UINT32>(maximum, (padding < m_minimum_frames) ? (m_minimum_frames - padding) : 0U);
+				locked = m_buffer_frames - padding;
 				if (locked)
 					result = m_render->GetBuffer(locked, &data);
 			}
 
 			if (SUCCEEDED(result) && locked)
 			{
-				m_buffer.get(reinterpret_cast<int16_t *>(data), locked);
+				auto const available = m_buffer.available();
+				auto *samples = reinterpret_cast<int16_t *>(data);
+				if (!m_underflowing)
+				{
+					m_buffer.get(samples, locked);
+					if (available < locked)
+					{
+						m_underflowing = true;
+						m_buffer.get(m_underflow_fill.data(), 1);
+					}
+				}
+				else if (available >= m_minimum_headroom)
+				{
+					m_buffer.get(samples, locked);
+					m_underflowing = false;
+				}
+				else
+				{
+					for (UINT32 i = 0; locked > i; ++i, samples += m_buffer.channels())
+						std::copy_n(m_underflow_fill.data(), m_buffer.channels(), samples);
+				}
 				result = m_render->ReleaseBuffer(locked, 0);
 			}
 
@@ -500,7 +520,7 @@ int sound_wasapi::init(osd_interface &osd, osd_options const &options)
 	HRESULT result;
 
 	// get relevant options
-	m_audio_latency = options.audio_latency() / sound_manager::STREAMS_UPDATE_FREQUENCY;
+	m_audio_latency = options.audio_latency() * 20e-3F;
 	if (m_audio_latency == 0.0F)
 		m_audio_latency = 0.03F;
 	m_audio_latency = std::clamp(m_audio_latency, 0.01F, 1.0F);
@@ -763,7 +783,7 @@ uint32_t sound_wasapi::stream_sink_open(uint32_t node, std::string name, uint32_
 		result = client->Initialize(
 				AUDCLNT_SHAREMODE_SHARED,
 				stream_flags,
-				lround(m_audio_latency * 1e4F), // 100 ns units
+				10 * 10'000, // 10 ms in 100 ns units - it'll give a bigger buffer
 				0,
 				&format.Format,
 				nullptr);
