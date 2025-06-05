@@ -4,6 +4,8 @@
 
   SigmaSoft Universal Parallel Interface Board
 
+  TODO
+    - add support for hard/floppy drive controller
 
 ****************************************************************************/
 
@@ -33,41 +35,29 @@
 #endif
 
 
-static constexpr u16 SELECT_ADDR_MASK = 0xF8;
+static constexpr u16 SELECT_ADDR_MASK = 0xf8;
 
 /**
  * The SigmaSoft Parallel Port
  */
-sigmasoft_parallel_port::sigmasoft_parallel_port(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
-	sigmasoft_parallel_port(mconfig, H89BUS_SIGMASOFT_PARALLEL, tag, owner, clock)
+sigmasoft_parallel_port::sigmasoft_parallel_port(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: sigmasoft_parallel_port(mconfig, H89BUS_SIGMASOFT_PARALLEL, tag, owner, clock)
 {
 }
 
-sigmasoft_parallel_port::sigmasoft_parallel_port(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock):
-	device_t(mconfig, type, tag, owner, clock),
-	device_h89bus_left_card_interface(mconfig, *this),
-	m_jumpers(*this, "JUMPERS")
+sigmasoft_parallel_port::sigmasoft_parallel_port(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_h89bus_left_card_interface(mconfig, *this)
+	, m_jumpers(*this, "JUMPERS")
 {
-}
-
-inline bool sigmasoft_parallel_port::card_selected(u8 select_lines, u16 offset)
-{
-	return m_enabled &&
-		(select_lines & h89bus_device::H89_IO) &&
-		((offset & SELECT_ADDR_MASK) == m_base_addr);
 }
 
 void sigmasoft_parallel_port::igc_w(u8 offset, u8 val)
 {
 }
 
-void sigmasoft_parallel_port::write(u8 select_lines, u16 offset, u8 data)
+void sigmasoft_parallel_port::write(offs_t offset, u8 data)
 {
-	if (!card_selected(select_lines, offset))
-	{
-		return;
-	}
-
 	LOGFUNC("%s: reg: %d val: %d\n", FUNCNAME, offset, data);
 
 	offset &= 0x07;
@@ -96,14 +86,9 @@ u8 sigmasoft_parallel_port::igc_r(u8 offset)
 	return 0;
 }
 
-u8 sigmasoft_parallel_port::read(u8 select_lines, u16 offset)
+u8 sigmasoft_parallel_port::read(offs_t offset)
 {
 	u8 value = 0;
-
-	if (!card_selected(select_lines, offset))
-	{
-		return value;
-	}
 
 	offset &= 0x07;
 
@@ -132,6 +117,9 @@ u8 sigmasoft_parallel_port::read(u8 select_lines, u16 offset)
 
 void sigmasoft_parallel_port::device_start()
 {
+	m_installed = false;
+
+	save_item(NAME(m_installed));
 }
 
 void sigmasoft_parallel_port::device_reset()
@@ -141,6 +129,18 @@ void sigmasoft_parallel_port::device_reset()
 	m_enabled = bool(jumpers & 0x20);
 
 	m_base_addr = (jumpers & 0x1f) << 3;
+
+	if (!m_installed)
+	{
+		if (m_enabled)
+		{
+			h89bus().install_io_device(m_base_addr, m_base_addr + 7,
+				read8sm_delegate(*this, FUNC(sigmasoft_parallel_port::read)),
+				write8sm_delegate(*this, FUNC(sigmasoft_parallel_port::write)));
+		}
+
+		m_installed = true;
+	}
 }
 
 static INPUT_PORTS_START( sigmasoft_parallel_port_device )
@@ -202,5 +202,5 @@ void sigmasoft_parallel_port_igc::device_reset()
 }
 
 
-DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_SIGMASOFT_PARALLEL, device_h89bus_left_card_interface, sigmasoft_parallel_port, "sigmasoft_parallel_port", "SigmaSoft Universal Parallel Board");
+DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_SIGMASOFT_PARALLEL,     device_h89bus_left_card_interface, sigmasoft_parallel_port,     "sigmasoft_parallel_port",     "SigmaSoft Universal Parallel Board");
 DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_SIGMASOFT_PARALLEL_IGC, device_h89bus_left_card_interface, sigmasoft_parallel_port_igc, "sigmasoft_parallel_port_igc", "SigmaSoft Universal Parallel Board connected to SigmaSoft IGC");
