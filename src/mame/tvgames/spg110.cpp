@@ -632,6 +632,12 @@ ROM_START( jak_dood )
 	ROM_LOAD16_WORD_SWAP( "jakksteledoodle.u2", 0x000000, 0x100000, CRC(ddc623a9) SHA1(92f72747c99f37525a6565e9587b357d629c560c) )
 ROM_END
 
+ROM_START( jak_ssmo )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	// checksum matches header
+	ROM_LOAD16_WORD_SWAP( "jakkssillymakeover.u2", 0x000000, 0x100000, CRC(80cf7b10) SHA1(493b257eff0d479889bb5944ce8e7676f15639a4) )
+ROM_END
+
 ROM_START( jak_spdmo )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "spidermaneyes.bin", 0x000000, 0x200000, CRC(d5eaa6ae) SHA1(df226d378b41cf6ef90b9f72e48ff5e66385dcba) )
@@ -736,6 +742,7 @@ CONS( 2004, jak_sbdd,  0,        0, spg110_base, jak_spdmo, spg110_game_state, i
 
 CONS( 2004, jak_blue,  0,        0, spg110_base, jak_spdmo, spg110_game_state, init_crc, "JAKKS Pacific Inc", "Blue's Room: Coloring With Blue (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2004, jak_dood,  0,        0, spg110_base, jak_spdmo, spg110_game_state, init_crc, "JAKKS Pacific Inc", "Tele-Doodle (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2004, jak_ssmo,  0,        0, spg110_base, jak_spdmo, spg110_game_state, init_crc, "JAKKS Pacific Inc", "Super Silly Makeover (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 
 // has Game-Key strings in test mode even if there were no SPG110 Game-Key units at all
