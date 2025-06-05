@@ -682,7 +682,7 @@ ROM_END
 
 ROM_START( jak_swot )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "starwars_originaltrilogy_prototype.bin", 0x000000, 0x400000, CRC(3dda7aff) SHA1(970044a6b2f14863353e559f5d2a4e928c8de439) )
+	ROM_LOAD16_WORD_SWAP( "starwars_originaltrilogy.bin", 0x000000, 0x400000, CRC(3dda7aff) SHA1(970044a6b2f14863353e559f5d2a4e928c8de439) )
 ROM_END
 
 ROM_START( jak_capc )
@@ -712,8 +712,7 @@ CONS( 2005, jak_dprs,  0,        0, jakks_gkr_dp_i2c, jak_dpr_i2c,  jakks_gkr_st
 // Some versions of the 'Revenge of the Sith' box art show 'Classic Battles' below the Star Wars logo
 CONS( 2005, jak_sith,  0,        0, jakks_gkr_sw_i2c, jak_sith_i2c, jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Griptonite Games",        "Star Wars - Revenge of the Sith (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses SW keys (1 released)
 CONS( 2005, jak_sithp, jak_sith, 0, jakks_gkr_sw_i2c, jak_sith_i2c, jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Griptonite Games",        "Star Wars - Revenge of the Sith (JAKKS Pacific TV Game, Game-Key Ready, prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // ^
-// release version of Star Wars Original Trilogy not dumped yet
-CONS( 2006, jak_swot,  0,        0, jakks_gkr_sw_i2c, jak_sith_i2c, jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Amaze Entertainment",     "Star Wars - Original Trilogy (JAKKS Pacific TV Game, prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // was designed with SW keys in mind, but retail lacked the port
+CONS( 2006, jak_swot,  0,        0, jakks_gkr_sw_i2c, jak_sith_i2c, jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Amaze Entertainment",     "Star Wars - Original Trilogy (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // was designed with SW keys in mind, but retail lacked the port
 CONS( 2005, jak_dbz,   0,        0, jakks_gkr_1m_i2c, jak_gkr_i2c,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Handheld Games",          "Dragon Ball Z (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // DB (no game-keys released, 1 in development but cancelled)
 CONS( 2005, jak_mpac,  0,        0, jakks_gkr_nm_i2c, jak_nm_i2c,   jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Namco / HotGen Ltd",      "Ms. Pac-Man Collection 5-in-1 (JAKKS Pacific TV Game, Game-Key Ready) (07 FEB 2005 A SKU F)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses NM (3 keys available [Dig Dug, New Rally-X], [Rally-X, Pac-Man, Bosconian], [Pac-Man, Bosconian])
 CONS( 2005, jak_capc,  0,        0, jakks_gkr_cc_i2c, jak_cc_i2c,   jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Capcom / HotGen Ltd",     "Capcom 3-in-1 (1942, Commando, Ghosts'n Goblins) (JAKKS Pacific TV Game, Game-Key Ready) (29 MAR 2005 B)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses CC keys (no game-keys released)
