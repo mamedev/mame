@@ -615,6 +615,29 @@ ROM_START( jak_sbdd )
 	ROM_LOAD16_WORD_SWAP( "pineapple.u2", 0x000000, 0x100000, BAD_DUMP CRC(8a815acc) SHA1(6b174617b4c099c5c41fadb35e6cb1a8207045eb) )
 ROM_END
 
+ROM_START( jak_blue )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	// checksum matches header
+	ROM_LOAD16_WORD_SWAP( "jakksbluesroom.u1", 0x000000, 0x100000, CRC(797b10f4) SHA1(3389fb940b67bebc4ce8976c9d67335787b2ecb3) )
+ROM_END
+
+ROM_START( jak_dood )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	// The checksum does *NOT* match the header here 03547c9a calculated, 0355a1ac in header  which means the checksum
+	// is off by 00012512 so is unlikely to be flipped bits
+	// The ROM also seems to abruptly end in the middle of a sound sample, but there is definitely no higher address
+	// line connected (the CPU glob was entirely removed to check)
+	// It seems most likely the game was just over 1Mbyte but the additonal data wasn't needed, so it got chopped down
+	// without the checksum being corrected.
+	ROM_LOAD16_WORD_SWAP( "jakksteledoodle.u2", 0x000000, 0x100000, CRC(ddc623a9) SHA1(92f72747c99f37525a6565e9587b357d629c560c) )
+ROM_END
+
+ROM_START( jak_ssmo )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	// checksum matches header
+	ROM_LOAD16_WORD_SWAP( "jakkssillymakeover.u2", 0x000000, 0x100000, CRC(80cf7b10) SHA1(493b257eff0d479889bb5944ce8e7676f15639a4) )
+ROM_END
+
 ROM_START( jak_spdmo )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "spidermaneyes.bin", 0x000000, 0x200000, CRC(d5eaa6ae) SHA1(df226d378b41cf6ef90b9f72e48ff5e66385dcba) )
@@ -629,6 +652,12 @@ ROM_START( jak_bobb )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "bob.bin", 0x000000, 0x400000, CRC(16b0b39f) SHA1(43a45e5346d108a9ec1b672fa727e97722b4eaa1) )
 ROM_END
+
+ROM_START( jak_bobbo )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakksbobfeb2006.bin", 0x000000, 0x400000, CRC(206712c4) SHA1(be07662e1776ebe6ea31c69d09e1d08c0886bb49) )
+ROM_END
+
 
 ROM_START( jak_thom )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
@@ -717,8 +746,14 @@ CONS( 2004, jak_diso, jak_disn,  0, spg110_base, jak_spdmo, spg110_game_state, e
 // fill position in the 'Color Me Spongy' mini-game is completely wrong, maybe dump issue, maybe SPG110/unSP issue.
 CONS( 2004, jak_sbdd,  0,        0, spg110_base, jak_spdmo, spg110_game_state, init_crc, "JAKKS Pacific Inc", "SpongeBob SquarePants Dilly Dabbler (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
+CONS( 2004, jak_blue,  0,        0, spg110_base, jak_spdmo, spg110_game_state, init_crc, "JAKKS Pacific Inc", "Blue's Room: Coloring With Blue (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2004, jak_dood,  0,        0, spg110_base, jak_spdmo, spg110_game_state, init_crc, "JAKKS Pacific Inc", "Tele-Doodle (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2004, jak_ssmo,  0,        0, spg110_base, jak_spdmo, spg110_game_state, init_crc, "JAKKS Pacific Inc", "Super Silly Makeover (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+
 // has Game-Key strings in test mode even if there were no SPG110 Game-Key units at all
-CONS( 2006, jak_bobb,  0,        0, spg110_base, jak_bobb,  spg110_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Bob the Builder - Project: Build It (JAKKS Pacific TV Game) (JUN 2 2006 14:42:01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, jak_bobb,  0,        0, spg110_base, jak_bobb,  spg110_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Bob the Builder - Project: Build It (JAKKS Pacific TV Game) (Jun  2 2006 14:42:01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // UK?
+CONS( 2006, jak_bobbo, jak_bobb, 0, spg110_base, jak_bobb,  spg110_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Bob the Builder - Project: Build It (JAKKS Pacific TV Game) (Feb 28 2006 10:48:40)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // US?
 
 CONS( 2006, jak_thom,  0,        0, spg110_base,     jak_bobb,  spg110_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Thomas & Friends - Right on Time (JAKKS Pacific TV Game) (Jun 28 2006 18:24:37) (US, NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2006, jak_thomp, jak_thom, 0, spg110_base_pal, jak_bobb,  spg110_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Thomas & Friends - Right on Time (JAKKS Pacific TV Game) (Jun 28 2006 18:01:22) (UK, PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // PAL versions have different voices
