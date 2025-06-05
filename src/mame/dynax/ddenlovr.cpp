@@ -11271,6 +11271,21 @@ ROM_START( mjdchuka )
 	ROM_LOAD( "1.1b", 0x00000, 0x80000, CRC(9759c65e) SHA1(cf098c07616b6d2a2ba10ff6ae0006442b675326) )
 ROM_END
 
+ROM_START( mjxysl ) // 麻将 幸运神龙 (Májiàng Xìngyùn Shénlóng)
+	ROM_REGION( 0x80000, "maincpu", 0 )  // Z80 Code
+	ROM_LOAD( "b.5b", 0x00000, 0x80000, CRC(3b0761c9) SHA1(cb9cf9dc693c2ac9b91ee21db51c9b279412340e) )
+
+	ROM_REGION( 0x200000, "blitter", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "c.11c", 0x000000, 0x080000, CRC(83bfc841) SHA1(36547e737244f95004c598adeb46cebce9ab3231) )
+	ROM_LOAD16_BYTE( "d.11a", 0x000001, 0x080000, CRC(1bf6220a) SHA1(ea18fdf6e1298a3b4c91fbf6219b1edcfecaeca3) )
+	ROM_LOAD16_BYTE( "e.12c", 0x100000, 0x020000, CRC(bec823ac) SHA1(2c82c376618fe937e3b7e0fef357f10dbbae00ae) )
+	ROM_LOAD16_BYTE( "f.12a", 0x100001, 0x020000, CRC(a1030162) SHA1(25f3c27d8197d6c1a801219aec7c8dbad214892d) )
+	// 13c and 13a not populated
+
+	ROM_REGION( 0x80000, "oki", 0 )  // samples
+	ROM_LOAD( "a.1b", 0x00000, 0x80000, CRC(ce32dcbc) SHA1(89a96e34d05b97f74b9427303316486e6aae3e6d) )
+ROM_END
+
 
 /***************************************************************************
 
@@ -12728,6 +12743,8 @@ GAME( 1995, ddenlovj,    0,        ddenlovj,  ddenlovj,   ddenlovr_state, empty_
 GAME( 1995, ddenlovrk,   ddenlovj, ddenlovrk, ddenlovr,   ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Don Den Lover Vol. 1 - Heukbaeg-euro Jeonghaja (Korea)",         MACHINE_NO_COCKTAIL  )
 GAME( 1995, ddenlovrb,   ddenlovj, ddenlovr,  ddenlovr,   ddenlovr_state, empty_init,    ROT0, "bootleg",                                     "Don Den Lover Vol. 1 - Heukbaeg-euro Jeonghaja (Korea, bootleg)", MACHINE_NO_COCKTAIL  )
 GAME( 1996, ddenlovr,    ddenlovj, ddenlovr,  ddenlovr,   ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Don Den Lover Vol. 1 (Hong Kong)",                               MACHINE_NO_COCKTAIL  )
+
+GAME( 1996, mjxysl,      0,        mjchuuka,  mjchuuka,   hanakanz_state, empty_init,    ROT0, "Dynax",                                       "Majiang Xingyun Shenlong (China, D121)",                         MACHINE_NO_COCKTAIL  )
 
 GAME( 1996, hanakanz,    0,        hanakanz,  hanakanz,   hanakanz_state, empty_init,    ROT0, "Dynax",                                       "Hana Kanzashi (Japan)",                                          MACHINE_NO_COCKTAIL  )
 GAME( 1997, kotbinyo,    hanakanz, kotbinyo,  kotbinyo,   hanakanz_state, empty_init,    ROT0, "Dynax / Shinwhajin",                          "Kkotbinyeo (Korea)",                                             MACHINE_NO_COCKTAIL  )

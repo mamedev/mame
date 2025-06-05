@@ -6,7 +6,7 @@ license:CC0-1.0
 Atari 7800 Software List
 Prototype information obtained from http://www.atariprotos.com
 Other list info obtained from http://www.atari7800.org and http://www.atariage.com
-Some hardware and software information obtained from Dan Boris https://www.atarihq.com/danb/
+Some hardware and software information obtained from Dan Boris https://atarihq.com/danb/7800cart/a7800cart.shtml
 
 
 Atari 7800 Known Model Numbers
@@ -224,7 +224,7 @@ Notes:
 
 - Cart PCB numbers are documented where known. Many PAL carts use a different PCB vs the NTSC cart. In some cases
   they are assumed to be the same but some have been found to be different. Most PAL carts are completely undocumented
-  and have made up ROM names because the info in not available and they are too expensive to buy just to open it to
+  and have made up ROM names because the info is not available and they are too expensive to buy just to open it to
   document a couple of numbers.
 
   If you have A7800 carts and want to help, please provide information and verification of ROM numbers and cart PCB
@@ -1631,7 +1631,7 @@ Saarna for debugging the problem)
 		<year>1988</year>
 		<publisher>Atari / Nintendo</publisher>
 		<info name="serial" value="CX7850"/>
-		<info name="pcb" value="C100339 REV. 7800 SUPERCART"/> <!-- not verified -->
+		<info name="pcb" value="C100339 REV. 7800 SUPERCART"/> <!-- PCB type not verified -->
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
@@ -1964,7 +1964,7 @@ almost nothing like the prototype.
 
 <!--  One On One (NTSC)
       PCB Type "C026445-001 7800 48K ROM REV A"
-      C300048-024A.U1 (32kB) and C028424-001.U2 (16kB), both (C)1987 - One On One (NTSC), old ROM name for U2, possibly earlier release or identical?
+      C300048-024A.U1 (16kB) and C028424-001.U2 (32kB), both (C)1987 - One On One (NTSC), old ROM name for U2, possibly earlier release or identical?
 -->
 
 	<software name="1on1">
