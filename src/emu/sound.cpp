@@ -673,7 +673,9 @@ sound_manager::sound_manager(running_machine &machine) :
 	m_machine(machine),
 	m_update_timer(nullptr),
 	m_last_sync_time(attotime::zero),
+#ifndef SOUND_DISABLE_THREADING
 	m_effects_thread(nullptr),
+#endif
 	m_effects_done(false),
 	m_master_gain(1.0),
 	m_muted(0),
@@ -708,12 +710,14 @@ sound_manager::sound_manager(running_machine &machine) :
 
 sound_manager::~sound_manager()
 {
+#ifndef SOUND_DISABLE_THREADING
 	if(m_effects_thread) {
 		m_effects_done = true;
 		m_effects_condition.notify_all();
 		m_effects_thread->join();
 		m_effects_thread = nullptr;
 	}
+#endif
 }
 
 sound_stream *sound_manager::stream_alloc(device_t &device, u32 inputs, u32 outputs, u32 sample_rate, stream_update_delegate callback, sound_stream_flags flags)
@@ -736,7 +740,9 @@ void sound_manager::before_devices_init()
 
 void sound_manager::postload()
 {
+#ifndef SOUND_DISABLE_THREADING
 	std::unique_lock<std::mutex> dlock(m_effects_data_mutex);
+#endif
 	m_effects_prev_time = m_effects_cur_time = machine().time();
 }
 
@@ -865,11 +871,12 @@ void sound_manager::after_devices_init()
 
 	m_effects_done = false;
 
+#ifndef SOUND_DISABLE_THREADING
 	if(m_nosound_mode)
 		m_effects_thread = nullptr;
 	else
-		m_effects_thread = std::make_unique<std::thread>(
-														 [this]{ run_effects(); });
+		m_effects_thread = std::make_unique<std::thread>([this]{ run_effects(); });
+#endif
 }
 
 
@@ -947,6 +954,7 @@ void sound_manager::output_push(int id, sound_stream &stream)
 
 void sound_manager::run_effects()
 {
+#ifndef SOUND_DISABLE_THREADING
 	std::unique_lock<std::mutex> dlock(m_effects_data_mutex);
 	for(;;) {
 		m_effects_condition.wait(dlock);
@@ -954,7 +962,7 @@ void sound_manager::run_effects()
 			return;
 
 		std::unique_lock<std::mutex> lock(m_effects_mutex);
-
+#endif
 		// Copy the data to the effects threads, expanding as needed
 		// when -speed is in use
 		double sf = machine().video().speed_factor();
@@ -1005,8 +1013,9 @@ void sound_manager::run_effects()
 				eb.commit(dest_index);
 			}
 		}
-
+#ifndef SOUND_DISABLE_THREADING
 		dlock.unlock();
+#endif
 
 		// Apply the effects
 		for(auto &si : m_speakers)
@@ -1090,9 +1099,11 @@ void sound_manager::run_effects()
 				machine().osd().sound_stream_sink_update(stream.m_id, stream.m_buffer.data(), stream.m_samples);
 
 		machine().osd().sound_end_update();
+#ifndef SOUND_DISABLE_THREADING
 
 		dlock.lock();
 	}
+#endif
 }
 
 std::string sound_manager::effect_chain_tag(s32 index) const
@@ -1165,7 +1176,9 @@ void sound_manager::stop_recording()
 
 void sound_manager::mute(bool mute, u8 reason)
 {
+#ifndef SOUND_DISABLE_THREADING
 	std::unique_lock<std::mutex> lock(m_effects_mutex);
+#endif
 	if(mute)
 		m_muted |= reason;
 	else
@@ -1981,7 +1994,9 @@ std::vector<u32> sound_manager::find_channel_mapping(const std::array<double, 3>
 
 void sound_manager::update_osd_streams()
 {
+#ifndef SOUND_DISABLE_THREADING
 	std::unique_lock<std::mutex> lock(m_effects_mutex);
+#endif
 	auto current_input_streams = std::move(m_osd_input_streams);
 	auto current_output_streams = std::move(m_osd_output_streams);
 	m_osd_input_streams.clear();
@@ -2576,7 +2591,9 @@ void sound_manager::streams_update()
 {
 	attotime now = machine().time();
 	{
+#ifndef SOUND_DISABLE_THREADING
 		std::unique_lock<std::mutex> dlock(m_effects_data_mutex);
+#endif
 		for(auto &si : m_speakers)
 			si.m_buffer.sync();
 
@@ -2585,7 +2602,11 @@ void sound_manager::streams_update()
 
 		for(sound_stream *stream : m_ordered_streams)
 			stream->update_nodeps();
+#ifndef SOUND_DISABLE_THREADING
 		m_effects_condition.notify_all();
+#else
+		run_effects();
+#endif
 	}
 
 
@@ -2686,7 +2707,9 @@ void sound_manager::rebuild_all_resamplers()
 void sound_manager::set_resampler_type(u32 type)
 {
 	if(type != m_resampler_type) {
+#ifndef SOUND_DISABLE_THREADING
 		std::unique_lock<std::mutex> lock(m_effects_mutex);
+#endif
 		m_resampler_type = type;
 		rebuild_all_resamplers();
 		rebuild_all_stream_resamplers();
@@ -2696,7 +2719,9 @@ void sound_manager::set_resampler_type(u32 type)
 void sound_manager::set_resampler_hq_latency(double latency)
 {
 	if(latency != m_resampler_hq_latency) {
+#ifndef SOUND_DISABLE_THREADING
 		std::unique_lock<std::mutex> lock(m_effects_mutex);
+#endif
 		m_resampler_hq_latency = latency;
 		rebuild_all_resamplers();
 		rebuild_all_stream_resamplers();
@@ -2706,7 +2731,9 @@ void sound_manager::set_resampler_hq_latency(double latency)
 void sound_manager::set_resampler_hq_length(u32 length)
 {
 	if(length != m_resampler_hq_length) {
+#ifndef SOUND_DISABLE_THREADING
 		std::unique_lock<std::mutex> lock(m_effects_mutex);
+#endif
 		m_resampler_hq_length = length;
 		rebuild_all_resamplers();
 		rebuild_all_stream_resamplers();
@@ -2716,7 +2743,9 @@ void sound_manager::set_resampler_hq_length(u32 length)
 void sound_manager::set_resampler_hq_phases(u32 phases)
 {
 	if(phases != m_resampler_hq_phases) {
+#ifndef SOUND_DISABLE_THREADING
 		std::unique_lock<std::mutex> lock(m_effects_mutex);
+#endif
 		m_resampler_hq_phases = phases;
 		rebuild_all_resamplers();
 		rebuild_all_stream_resamplers();
