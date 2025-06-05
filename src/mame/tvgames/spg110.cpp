@@ -653,6 +653,12 @@ ROM_START( jak_bobb )
 	ROM_LOAD16_WORD_SWAP( "bob.bin", 0x000000, 0x400000, CRC(16b0b39f) SHA1(43a45e5346d108a9ec1b672fa727e97722b4eaa1) )
 ROM_END
 
+ROM_START( jak_bobbo )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakksbobfeb2006.bin", 0x000000, 0x400000, CRC(206712c4) SHA1(be07662e1776ebe6ea31c69d09e1d08c0886bb49) )
+ROM_END
+
+
 ROM_START( jak_thom )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "jakksthomasus.u3", 0x000000, 0x400000, CRC(f43d5d12) SHA1(863a1cf08bc45f7bca7db7e2aae45071ac25adfa) )
@@ -746,7 +752,8 @@ CONS( 2004, jak_ssmo,  0,        0, spg110_base, jak_spdmo, spg110_game_state, i
 
 
 // has Game-Key strings in test mode even if there were no SPG110 Game-Key units at all
-CONS( 2006, jak_bobb,  0,        0, spg110_base, jak_bobb,  spg110_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Bob the Builder - Project: Build It (JAKKS Pacific TV Game) (JUN 2 2006 14:42:01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, jak_bobb,  0,        0, spg110_base, jak_bobb,  spg110_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Bob the Builder - Project: Build It (JAKKS Pacific TV Game) (Jun  2 2006 14:42:01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // UK?
+CONS( 2006, jak_bobbo, jak_bobb, 0, spg110_base, jak_bobb,  spg110_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Bob the Builder - Project: Build It (JAKKS Pacific TV Game) (Feb 28 2006 10:48:40)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // US?
 
 CONS( 2006, jak_thom,  0,        0, spg110_base,     jak_bobb,  spg110_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Thomas & Friends - Right on Time (JAKKS Pacific TV Game) (Jun 28 2006 18:24:37) (US, NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2006, jak_thomp, jak_thom, 0, spg110_base_pal, jak_bobb,  spg110_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Thomas & Friends - Right on Time (JAKKS Pacific TV Game) (Jun 28 2006 18:01:22) (UK, PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // PAL versions have different voices
