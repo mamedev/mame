@@ -28,10 +28,10 @@ public:
 		m_ppu(*this, "ppu")
 	{ }
 
-	void nes_clone(machine_config &config);
-	void nes_clone_pal(machine_config &config);
+	void nes_clone(machine_config &config) ATTR_COLD;
+	void nes_clone_pal(machine_config &config) ATTR_COLD;
 
-	void init_nes_clone();
+	void init_nes_clone() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -73,7 +73,7 @@ public:
 		m_gfxrom(*this, "gfxrom"),
 		m_mainrom(*this, "maincpu")
 	{ }
-	void nes_clone_dancexpt(machine_config &config);
+	void nes_clone_dancexpt(machine_config &config) ATTR_COLD;
 
 private:
 	void nes_clone_dancexpt_map(address_map &map) ATTR_COLD;
@@ -109,7 +109,7 @@ public:
 	nes_clone_dnce2000_state(const machine_config& mconfig, device_type type, const char* tag) :
 		nes_clone_state(mconfig, type, tag)
 	{ }
-	void nes_clone_dnce2000(machine_config& config);
+	void nes_clone_dnce2000(machine_config& config) ATTR_COLD;
 
 private:
 	void nes_clone_dnce2000_map(address_map &map) ATTR_COLD;
@@ -127,9 +127,9 @@ public:
 		nes_clone_state(mconfig, type, tag)
 	{ }
 
-	void init_sudoku();
+	void init_sudoku() ATTR_COLD;
 
-	void nes_clone_sudoku(machine_config& config);
+	void nes_clone_sudoku(machine_config& config) ATTR_COLD;
 
 private:
 	void nes_clone_sudoku_map(address_map &map) ATTR_COLD;
@@ -171,7 +171,7 @@ public:
 		m_charbank(*this, "charbank"),
 		m_rom_solderpad_bank(*this, "rom_sldpad_bank")
 	{ }
-	void nes_clone_afbm7800(machine_config& config);
+	void nes_clone_afbm7800(machine_config& config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -244,7 +244,7 @@ public:
 		nes_clone_afbm7800_state(mconfig, type, tag)
 	{ }
 
-	void init_vtvppong();
+	void init_vtvppong() ATTR_COLD;
 
 protected:
 	virtual void handle_mmc3chr_banks(uint16_t* selected_chrbanks) override;
@@ -684,6 +684,7 @@ void nes_clone_afbm7800_state::update_prg_banks()
 		selected_banks[3] = outerbank | (basebank + 1);
 	}
 
+	//logerror("%s: PRG bank select: 0=$%X 1=$%X 2=$%X 3=$%X\n", machine().describe_context(), selected_banks[0] * 0x2000, selected_banks[1] * 0x2000, selected_banks[2] * 0x2000, selected_banks[3] * 0x2000);
 	m_prgbank[0]->set_entry(selected_banks[0]);
 	m_prgbank[1]->set_entry(selected_banks[1]);
 	m_prgbank[2]->set_entry(selected_banks[2]);
@@ -1220,7 +1221,6 @@ void nes_clone_vtvsocr_state::bank_w(offs_t offset, uint8_t data)
  Ping Pong Specifics
 **************************************************/
 
-
 void nes_clone_taikee_new_state::init_vtvppong()
 {
 	{
@@ -1306,16 +1306,6 @@ ROM_START( vtvsocr )
 	ROM_LOAD16_WORD_SWAP( "virtualtvsoccer.bin", 0x00000, 0x40000, CRC(2cfe42aa) SHA1(c2cafdbd5cc6491c94efd3f1be4b70c9de737b46) )
 ROM_END
 
-ROM_START( hs36red )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "mx29lv160cb.u3", 0x00000, 0x200000, CRC(318a81bb) SHA1(8b207e6a5fca53cbf383b79ff570fcdb89639fa3) )
-ROM_END
-
-ROM_START( hs36blk )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "mx29lv160cbtc.u3", 0x00000, 0x200000, CRC(b5cf91a0) SHA1(399f015fb0580c90928e7f3d73810cc4b6cc70d9) )
-ROM_END
-
 ROM_START( dancexpt )
 	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "dancingexpert27c010.bin", 0x0000, 0x20000, CRC(658ba2ea) SHA1(c08f6a2735b3c7383cba3a5fa3af905d5af6926f) )
@@ -1361,7 +1351,7 @@ CONS( 200?, nytsudo,      0,  0,  nes_clone_sudoku, papsudok, nes_clone_sudoku_s
 
 CONS( 200?, vtvppong, 0,  0, nes_clone_afbm7800, nes_clone, nes_clone_taikee_new_state, init_vtvppong, "<unknown>", "Virtual TV Ping Pong", MACHINE_NOT_WORKING )
 
-CONS( 200?, pjoypj001, 0, 0, nes_clone, nes_clone, nes_clone_state, init_nes_clone, "Trump Grand", "PowerJoy (PJ001, NES based plug & play)", MACHINE_NOT_WORKING )
+CONS( 200?, pjoypj001, 0, 0, nes_clone_afbm7800, nes_clone, nes_clone_taikee_new_state, init_nes_clone, "Trump Grand", "PowerJoy (PJ001, NES based plug & play)", MACHINE_NOT_WORKING )
 
 //
 
@@ -1382,10 +1372,6 @@ CONS( 200?, pjoypj001, 0, 0, nes_clone, nes_clone, nes_clone_state, init_nes_clo
 CONS( 200?, dancexpt, 0, 0, nes_clone_dancexpt, dancexpt, nes_clone_dancexpt_state, init_nes_clone, "Daidaixing", "Dancing Expert", MACHINE_NOT_WORKING )
 
 CONS( 200?, vtvsocr,     0,  0,  nes_clone_vtvsocr, nes_clone, nes_clone_vtvsocr_state, init_nes_clone, "<unknown>", "Virtual TV Soccer", MACHINE_NOT_WORKING )
-
-// might be VT02 hardware, needs decrypting, possibly designed by wellminds (M350 etc.)
-CONS( 2010, hs36red, 0, 0, nes_clone, nes_clone, nes_clone_state, init_nes_clone, "HengSheng", "HengSheng 36-in-1 (Red pad)", MACHINE_NOT_WORKING )
-CONS( 2010, hs36blk, 0, 0, nes_clone, nes_clone, nes_clone_state, init_nes_clone, "HengSheng", "HengSheng 36-in-1 (Black pad)", MACHINE_NOT_WORKING )
 
 
 // in early 2000s LG TVs
