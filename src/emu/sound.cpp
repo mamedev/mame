@@ -1257,16 +1257,9 @@ void sound_manager::config_load(config_type cfg_type, config_level cfg_level, ut
 			for(util::xml::data_node const *ef_node = efl_node->get_child("effect"); ef_node != nullptr; ef_node = ef_node->get_next_sibling("effect")) {
 				unsigned int id = ef_node->get_attribute_int("step", 0);
 				std::string type = ef_node->get_attribute_string("type", "");
-				if(id >= 1 && id <= m_default_effects.size()) {
-					if(audio_effect::effect_names[m_default_effects[id-1]->type()] == type)
-						m_default_effects[id-1]->config_load(ef_node);
-
-					// also apply defaults to current system (in case there's no system.cfg)
-					for(auto &speaker : m_speakers) {
-						auto &eff = speaker.m_effects;
-						if(audio_effect::effect_names[eff[id-1].m_effect->type()] == type)
-							eff[id-1].m_effect->config_load(ef_node);
-					}
+				if(id >= 1 && id <= m_default_effects.size() && audio_effect::effect_names[m_default_effects[id-1]->type()] == type) {
+					m_default_effects[id-1]->config_load(ef_node);
+					default_effect_changed(id-1);
 				}
 			}
 		}
