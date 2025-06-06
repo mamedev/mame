@@ -3527,4 +3527,4 @@ ROM_END
 } // Anonymous namespace
 
 /*    YEAR   NAME     PARENT    COMPAT  MACHINE  INPUT      CLASS            INIT         COMPANY                                            FULLNAME                     FLAGS */
-COMP( 2017,  tbblue,  spec128,  0,      tbblue,  specnext,  specnext_state,  empty_init,  "SpecNext Ltd., Victor Trucco, Fabio Belavenuto",  "ZX Spectrum Next: TBBlue",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 2017,  tbblue,  spec128,  0,      tbblue,  specnext,  specnext_state,  empty_init,  "SpecNext Ltd., Victor Trucco, Fabio Belavenuto",  "ZX Spectrum Next: TBBlue",  MACHINE_SUPPORTS_SAVE )
