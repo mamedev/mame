@@ -120,20 +120,6 @@ private:
 	uint8_t m_rombase = 0;
 };
 
-class nes_clone_vtvppong_state : public nes_clone_state
-{
-public:
-	nes_clone_vtvppong_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_clone_state(mconfig, type, tag)
-	{ }
-	void nes_clone_vtvppong(machine_config& config);
-
-	void init_vtvppong();
-
-private:
-	void nes_clone_vtvppong_map(address_map &map) ATTR_COLD;
-};
-
 class nes_clone_sudoku_state : public nes_clone_state
 {
 public:
@@ -257,6 +243,8 @@ public:
 	nes_clone_taikee_new_state(const machine_config &mconfig, device_type type, const char *tag) :
 		nes_clone_afbm7800_state(mconfig, type, tag)
 	{ }
+
+	void init_vtvppong();
 
 protected:
 	virtual void handle_mmc3chr_banks(uint16_t* selected_chrbanks) override;
@@ -616,22 +604,6 @@ uint8_t nes_clone_dnce2000_state::rom_r(offs_t offset)
 void nes_clone_dnce2000_state::bank_w(uint8_t data)
 {
 	m_rombase = data;
-}
-
-/**************************************************
- Virtual Ping Pong Specifics
-**************************************************/
-
-void nes_clone_vtvppong_state::nes_clone_vtvppong(machine_config& config)
-{
-	nes_clone_pal(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &nes_clone_vtvppong_state::nes_clone_vtvppong_map);
-}
-
-void nes_clone_vtvppong_state::nes_clone_vtvppong_map(address_map& map)
-{
-	nes_clone_basemap(map);
-	map(0x8000, 0xffff).rom().region("maincpu", 0x38000);
 }
 
 /**************************************************
@@ -1249,18 +1221,17 @@ void nes_clone_vtvsocr_state::bank_w(offs_t offset, uint8_t data)
 **************************************************/
 
 
-void nes_clone_vtvppong_state::init_vtvppong()
+void nes_clone_taikee_new_state::init_vtvppong()
 {
-	u8 *src = memregion("maincpu")->base();
-	int len = memregion("maincpu")->bytes();
-
-	std::vector<u8> buffer(len);
 	{
+		u8 *src = memregion("maincpu")->base();
+		int len = memregion("maincpu")->bytes();
+		std::vector<u8> buffer(len);
 		for (int i = 0; i < len; i++)
 		{
-			int newaddr = bitswap<18>(i, 17, 16, 15, 13, 14, 12,
-				11, 10, 9, 8,
-				7, 6, 5, 4,
+			int newaddr = bitswap<18>(i, 17, 16, 15, 13, 14, 10,
+				8, 4, 12, 11,
+				9, 7, 6, 5,
 				3, 2, 1, 0);
 
 			buffer[i] = src[newaddr];
@@ -1268,17 +1239,22 @@ void nes_clone_vtvppong_state::init_vtvppong()
 		std::copy(buffer.begin(), buffer.end(), &src[0]);
 	}
 
-#if 0
-	FILE *fp;
-	char filename[256];
-	sprintf(filename,"decrypted_%s", machine().system().name);
-	fp=fopen(filename, "w+b");
-	if (fp)
 	{
-		fwrite(&src[0], len, 1, fp);
-		fclose(fp);
+		u8 *src = memregion("gfx1")->base();
+		int len = memregion("gfx1")->bytes();
+		std::vector<u8> buffer(len);
+		for (int i = 0; i < len; i++)
+		{
+			// TODO: this doesn't look entirely correct
+			int newaddr = bitswap<17>(i, 16, 12, 14, 13, 15,
+				4, 10, 8, 11,
+				6, 7, 5, 9,
+				3, 2, 1, 0);
+
+			buffer[i] = src[newaddr];
+		}
+		std::copy(buffer.begin(), buffer.end(), &src[0]);
 	}
-#endif
 }
 
 
@@ -1317,10 +1293,10 @@ ROM_START( croaky )
 ROM_END
 
 ROM_START( vtvppong )
-	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 ) // high bit is never set in the first 0x28000 bytes of this ROM, probably 7-bit sound data? code might need opcode bits swapping
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 ) // address lines are swapped
 	ROM_LOAD( "vtvpongcpu.bin", 0x00000, 0x40000, CRC(52df95fa) SHA1(3015bcc90eee862b3568f122b402c9defa566aab) )
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x20000, "gfx1", ROMREGION_ERASE00 ) // address lines are swapped
 	ROM_LOAD( "vtvpongppu.bin", 0x00000, 0x20000, CRC(474dfc0c) SHA1(4d0afab111e40172ae0b31e94f1b74b73a18385f) )
 ROM_END
 
@@ -1383,7 +1359,7 @@ CONS( 200?, papsudok,     0,  0,  nes_clone_sudoku, papsudok, nes_clone_sudoku_s
 
 CONS( 200?, nytsudo,      0,  0,  nes_clone_sudoku, papsudok, nes_clone_sudoku_state, init_sudoku, "Excalibur Electronics / Nice Code", "The New York Times Sudoku", 0 ) // based on the above
 
-CONS( 200?, vtvppong,  0,  0,  nes_clone_vtvppong,    nes_clone, nes_clone_vtvppong_state, init_vtvppong, "<unknown>", "Virtual TV Ping Pong", MACHINE_NOT_WORKING )
+CONS( 200?, vtvppong, 0,  0, nes_clone_afbm7800, nes_clone, nes_clone_taikee_new_state, init_vtvppong, "<unknown>", "Virtual TV Ping Pong", MACHINE_NOT_WORKING )
 
 CONS( 200?, pjoypj001, 0, 0, nes_clone, nes_clone, nes_clone_state, init_nes_clone, "Trump Grand", "PowerJoy (PJ001, NES based plug & play)", MACHINE_NOT_WORKING )
 
@@ -1413,7 +1389,7 @@ CONS( 2010, hs36blk, 0, 0, nes_clone, nes_clone, nes_clone_state, init_nes_clone
 
 
 // in early 2000s LG TVs
-CONS( 200?, digezlg, 0, 0, nes_clone, nes_clone, nes_clone_state, init_nes_clone, "LG", "Digital ez LG", MACHINE_NOT_WORKING )
+CONS( 200?, digezlg, 0, 0, nes_clone_dnce2000, nes_clone, nes_clone_dnce2000_state, init_nes_clone, "LG", "Digital ez LG", MACHINE_NOT_WORKING )
 
 // 2005-04-03 date on PCB
 CONS( 2005, racechl8, 0, 0, nes_clone_afbm7800, nes_clone, nes_clone_taikee_new_state, init_nes_clone, "Play Vision / Taikee", "Racing Challenge - 8 Games In 1", 0 )
