@@ -2232,6 +2232,7 @@ static INPUT_PORTS_START( korinaim )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( crystalg )
+	// defaults based on crystalg2 manual
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x0f, 0x05, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("DSWA:1,2,3,4")
 	PORT_DIPSETTING(    0x0d, "1 (Easy)" )
@@ -2262,10 +2263,10 @@ static INPUT_PORTS_START( crystalg )
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x01, "5" )
 	PORT_DIPSETTING(    0x00, "10" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSWB:5")
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSWB:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSWB:6")
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSWB:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSWB:5")
@@ -2285,7 +2286,7 @@ static INPUT_PORTS_START( crystalg )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )                                         // MEMORY RESET
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                          // ANALYZER
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_TOGGLE                              // ANALYZER
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                                                       // TEST
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )                                                // COIN1
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
@@ -2339,7 +2340,7 @@ static INPUT_PORTS_START( crystal2 )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSWB:7")        // 常時 OFF
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("DSWB:8")        // DEMO音声
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("DSWB:8")        // DEMO音声    (suggested default is Off in manual)
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 

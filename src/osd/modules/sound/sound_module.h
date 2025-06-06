@@ -44,6 +44,7 @@ protected:
 		abuffer(uint32_t channels) noexcept;
 		void get(int16_t *data, uint32_t samples) noexcept;
 		void push(const int16_t *data, uint32_t samples);
+		void clear() noexcept { m_used_buffers = 0; }
 		uint32_t channels() const noexcept { return m_channels; }
 		uint32_t available() const noexcept;
 

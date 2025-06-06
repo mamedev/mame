@@ -35,7 +35,6 @@
 #include <iterator>
 #include <memory>
 #include <mutex>
-#include <queue>
 #include <string>
 #include <string_view>
 #include <thread>
@@ -65,7 +64,7 @@ namespace {
 //  Constants
 //============================================================
 
-constexpr unsigned SUBMIT_FREQUENCY_TARGET_MS = 10;
+constexpr float SUBMIT_INTERVAL_TARGET = 10e-3;
 constexpr float RESAMPLE_TOLERANCE = 1.20F;
 
 //============================================================
@@ -89,13 +88,6 @@ constexpr float RESAMPLE_TOLERANCE = 1.20F;
 //============================================================
 //  Structs and typedefs
 //============================================================
-
-// A structure to hold a pointer and the count of bytes of the data it points to
-struct xaudio2_buffer
-{
-	std::unique_ptr<BYTE[]> AudioData;
-	DWORD                   AudioSize;
-};
 
 // Custom deleter with overloads to free smart pointer types used in the implementations
 struct xaudio2_custom_deleter
@@ -276,8 +268,7 @@ private:
 		std::unique_ptr<float []>   volume_matrix;
 
 	private:
-		void roll_buffer();
-		void submit_buffer(std::unique_ptr<BYTE []> &&data, DWORD length) const;
+		void submit_buffer(std::unique_ptr<BYTE []> &&data, DWORD length);
 
 		virtual void STDMETHODCALLTYPE OnVoiceProcessingPassStart(UINT32 BytesRequired) noexcept override;
 		virtual void STDMETHODCALLTYPE OnVoiceProcessingPassEnd() noexcept override { }
@@ -287,16 +278,15 @@ private:
 		virtual void STDMETHODCALLTYPE OnLoopEnd(void *pBufferContext) noexcept override { }
 		virtual void STDMETHODCALLTYPE OnVoiceError(void *pBufferContext, HRESULT error) noexcept override;
 
-		sound_xaudio2 &             m_host;
-		std::unique_ptr<bufferpool> m_buffer_pool;
-		std::unique_ptr<BYTE []>    m_current_buffer;
-		std::queue<xaudio2_buffer>  m_buffer_queue;
-		uint32_t                    m_buffer_size;
-		unsigned const              m_sample_bytes;
-		unsigned                    m_buffer_count;
-		uint32_t                    m_write_position;
-		std::atomic<bool>           m_need_update;
-		bool                        m_underflowing;
+		static uint32_t calculate_packet_bytes(WAVEFORMATEX const &format);
+
+		sound_xaudio2 &     m_host;
+		bufferpool          m_buffer_pool;
+		abuffer             m_buffer;
+		uint32_t const      m_packet_bytes;
+		unsigned const      m_sample_bytes;
+		std::atomic<bool>   m_need_update;
+		bool                m_underflowing;
 	};
 
 	using device_info_ptr = std::unique_ptr<device_info>;
@@ -946,8 +936,10 @@ void sound_xaudio2::device_info::OnCriticalError(HRESULT error)
 sound_xaudio2::voice_info::voice_info(sound_xaudio2 &host, WAVEFORMATEX const &format) :
 	volume_matrix(std::make_unique<float []>(format.nChannels * format.nChannels)),
 	m_host(host),
+	m_buffer_pool(4, calculate_packet_bytes(format)),
+	m_buffer(format.nChannels),
+	m_packet_bytes(calculate_packet_bytes(format)),
 	m_sample_bytes(format.nBlockAlign),
-	m_write_position(0),
 	m_need_update(false),
 	m_underflowing(false)
 {
@@ -957,21 +949,6 @@ sound_xaudio2::voice_info::voice_info(sound_xaudio2 &host, WAVEFORMATEX const &f
 		for (unsigned j = 0; format.nChannels > j; ++j)
 			volume_matrix[(format.nChannels * i) + j] = (i == j) ? 1.0F : 0.0F;
 	}
-
-	// calculate required buffer size
-	int const audio_latency_ms = std::max(unsigned((m_host.m_audio_latency * 1000.0F) + 0.5F), SUBMIT_FREQUENCY_TARGET_MS);
-	uint32_t const buffer_total = m_sample_bytes * format.nSamplesPerSec * (audio_latency_ms / 1000.0F) * RESAMPLE_TOLERANCE;
-	m_buffer_count = audio_latency_ms / SUBMIT_FREQUENCY_TARGET_MS;
-	m_buffer_size = std::max<uint32_t>(1024, buffer_total / m_buffer_count);
-
-	// force to a whole number of samples
-	uint32_t const remainder = m_buffer_size % m_sample_bytes;
-	if (remainder)
-		m_buffer_size += m_sample_bytes - remainder;
-
-	// allocate the initial buffers
-	m_buffer_pool = std::make_unique<bufferpool>(m_buffer_count, m_buffer_size);
-	m_current_buffer = m_buffer_pool->next();
 }
 
 //============================================================
@@ -991,22 +968,13 @@ sound_xaudio2::voice_info::~voice_info()
 
 void sound_xaudio2::voice_info::update(int16_t const *buffer, int samples_this_frame)
 {
-	uint32_t const bytes_this_frame = samples_this_frame * m_sample_bytes;
-	uint32_t bytes_left = bytes_this_frame;
-	while (bytes_left)
+	try
 	{
-		// copy as much data as we can into the current buffer
-		uint32_t const chunk = std::min(uint32_t(m_buffer_size - m_write_position), bytes_left);
-		std::memcpy(&m_current_buffer[m_write_position], buffer, chunk);
-		m_write_position += chunk;
-		buffer += chunk / 2;
-		bytes_left -= chunk;
-
-		// roll buffer if it's full
-		if (m_write_position >= m_buffer_size)
-			roll_buffer();
+		m_buffer.push(buffer, samples_this_frame);
 	}
-
+	catch (...)
+	{
+	}
 	m_need_update.store(true, std::memory_order_relaxed);
 	SetEvent(m_host.m_need_update_event.get());
 }
@@ -1025,30 +993,37 @@ void sound_xaudio2::voice_info::submit_if_needed()
 	XAUDIO2_VOICE_STATE state;
 	voice->GetState(&state, XAUDIO2_VOICE_NOSAMPLESPLAYED);
 
-	// If we have buffers queued into XAudio and our current in-memory buffer
-	// isn't yet full, there's no need to submit it
-	if ((1 <= state.BuffersQueued) && m_buffer_queue.empty())
+	uint32_t available_bytes = m_buffer.available() * m_sample_bytes;
+
+	// if there's at least one packet queued and we don't have enough to fill another packet, wait
+	if ((1 <= state.BuffersQueued) && (m_packet_bytes > available_bytes))
 		return;
 
-	// don't keep more than two buffers queued in the source voice
+	// don't keep more than two packets queued in the engine
 	if (2 <= state.BuffersQueued)
 		return;
 
-	if (m_buffer_queue.empty() && m_write_position)
-		roll_buffer();
-
-	if (!m_buffer_queue.empty())
+	if (available_bytes)
 	{
 		auto buffers = state.BuffersQueued;
 		do
 		{
-			auto &buf = m_buffer_queue.front();
-			assert(0 < buf.AudioSize);
-			submit_buffer(std::move(buf.AudioData), buf.AudioSize);
-			m_buffer_queue.pop();
+			std::unique_ptr<BYTE []> packet;
+			try
+			{
+				packet = m_buffer_pool.next();
+			}
+			catch (...)
+			{
+				return;
+			}
+			auto const packet_size = std::min(available_bytes, m_packet_bytes);
+			m_buffer.get(reinterpret_cast<int16_t *>(packet.get()), packet_size / m_sample_bytes);
+			submit_buffer(std::move(packet), packet_size);
+			available_bytes -= packet_size;
 			buffers++;
 		}
-		while (!m_buffer_queue.empty() && (2 > buffers));
+		while ((2 > buffers) && (m_packet_bytes <= available_bytes));
 	}
 }
 
@@ -1058,9 +1033,7 @@ void sound_xaudio2::voice_info::submit_if_needed()
 
 void sound_xaudio2::voice_info::stop()
 {
-	while (!m_buffer_queue.empty())
-		m_buffer_queue.pop();
-	m_write_position = 0;
+	m_buffer.clear();
 	m_need_update.store(false, std::memory_order_relaxed);
 	if (voice)
 	{
@@ -1070,42 +1043,10 @@ void sound_xaudio2::voice_info::stop()
 }
 
 //============================================================
-//  roll_buffer
-//============================================================
-
-void sound_xaudio2::voice_info::roll_buffer()
-{
-	// don't queue an empty buffer
-	assert(m_write_position);
-
-	// queue the current buffer
-	xaudio2_buffer buf;
-	buf.AudioData = std::move(m_current_buffer);
-	buf.AudioSize = m_write_position;
-	m_buffer_queue.push(std::move(buf));
-
-	// get a fresh buffer
-	m_current_buffer = m_buffer_pool->next();
-	m_write_position = 0;
-
-	// remove excess buffers from queue
-	if (m_buffer_queue.size() > m_buffer_count)
-	{
-		m_host.m_overflows.fetch_add(1, std::memory_order_relaxed);
-		while (m_buffer_queue.size() > m_buffer_count)
-		{
-			// return the oldest buffer to the pool, and remove it from queue
-			m_buffer_pool->return_to_pool(std::move(m_buffer_queue.front().AudioData));
-			m_buffer_queue.pop();
-		}
-	}
-}
-
-//============================================================
 //  submit_buffer
 //============================================================
 
-inline void sound_xaudio2::voice_info::submit_buffer(std::unique_ptr<BYTE []> &&data, DWORD length) const
+inline void sound_xaudio2::voice_info::submit_buffer(std::unique_ptr<BYTE []> &&data, DWORD length)
 {
 	assert(length);
 
@@ -1127,7 +1068,7 @@ inline void sound_xaudio2::voice_info::submit_buffer(std::unique_ptr<BYTE []> &&
 	else
 	{
 		osd_printf_verbose("Sound: XAudio2 failed to submit source buffer (non-fatal). Error: 0x%X\n", result);
-		m_buffer_pool->return_to_pool(std::move(data));
+		m_buffer_pool.return_to_pool(std::move(data));
 	}
 }
 
@@ -1156,7 +1097,7 @@ void sound_xaudio2::voice_info::OnBufferEnd(void *pBufferContext) noexcept
 {
 	BYTE *const completed_buffer = static_cast<BYTE *>(pBufferContext);
 	if (completed_buffer)
-		m_buffer_pool->return_to_pool(std::unique_ptr<BYTE []>(completed_buffer));
+		m_buffer_pool.return_to_pool(std::unique_ptr<BYTE []>(completed_buffer));
 
 	m_need_update.store(true, std::memory_order_relaxed);
 	SetEvent(m_host.m_need_update_event.get());
@@ -1177,7 +1118,7 @@ void sound_xaudio2::voice_info::OnVoiceError(void *pBufferContext, HRESULT error
 		osd_printf_verbose("Sound: XAudio2 voice error for stream %u. Error: 0x%X\n", info.m_id, error);
 
 		if (completed_buffer)
-			m_buffer_pool->return_to_pool(std::unique_ptr<BYTE []>(completed_buffer));
+			m_buffer_pool.return_to_pool(std::unique_ptr<BYTE []>(completed_buffer));
 
 		auto const pos = std::find_if(
 				m_host.m_voice_info.begin(),
@@ -1196,6 +1137,15 @@ void sound_xaudio2::voice_info::OnVoiceError(void *pBufferContext, HRESULT error
 	std::lock_guard cleanup_lock(m_host.m_cleanup_mutex);
 	m_host.m_zombie_voices.emplace_back(std::move(our_pointer));
 	m_host.m_cleanup_condition.notify_one();
+}
+
+//============================================================
+//  calculate_packet_bytes
+//============================================================
+
+uint32_t sound_xaudio2::voice_info::calculate_packet_bytes(WAVEFORMATEX const &format)
+{
+	return format.nBlockAlign * uint32_t(format.nSamplesPerSec * SUBMIT_INTERVAL_TARGET * RESAMPLE_TOLERANCE);
 }
 
 //============================================================

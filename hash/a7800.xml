@@ -502,7 +502,6 @@ Notes:
 		<year>1989</year>
 		<publisher>Absolute Entertainment, Inc</publisher>
 		<info name="serial" value="AV-045-04"/>
-		<info name="pcb" value="?"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
@@ -617,7 +616,7 @@ Notes:
 	<software name="chopliftu" cloneof="choplift">
 		<description>Choplifter! (NTSC)</description>
 		<year>1987</year>
-		<publisher>Atari / Broderbund</publisher>
+		<publisher>Atari / Brøderbund</publisher>
 		<info name="serial" value="CX7821"/>
 		<info name="pcb" value="CO24926-001 REV. B"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
@@ -632,7 +631,7 @@ Notes:
 	<software name="choplift">
 		<description>Choplifter! (PAL)</description>
 		<year>1987</year>
-		<publisher>Atari / Broderbund</publisher>
+		<publisher>Atari / Brøderbund</publisher>
 		<info name="serial" value="CX7821"/>
 		<info name="pcb" value="C026445-001 7800 48K ROM REV A"/>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1532,7 +1531,7 @@ the buttons not work in emulators.
 	<software name="karatekau" cloneof="karateka">
 		<description>Karateka (NTSC)</description>
 		<year>1987</year>
-		<publisher>Atari / Broderbund</publisher>
+		<publisher>Atari / Brøderbund</publisher>
 		<info name="serial" value="CX7822"/>
 		<info name="pcb" value="C026445-001 7800 48K ROM REV A"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
@@ -1548,7 +1547,7 @@ the buttons not work in emulators.
 	<software name="karateka">
 		<description>Karateka (PAL)</description>
 		<year>1987</year>
-		<publisher>Atari / Broderbund</publisher>
+		<publisher>Atari / Brøderbund</publisher>
 		<info name="serial" value="CX7822"/>
 		<info name="pcb" value="C300703"/>
 		<sharedfeat name="compatibility" value="PAL"/>
@@ -1586,7 +1585,6 @@ Saarna for debugging the problem)
 		<year>1989</year>
 		<publisher>Absolute / Data East / Irem</publisher>
 		<info name="serial" value="AM-039-04"/>
-		<info name="pcb" value="?"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
@@ -1601,7 +1599,6 @@ Saarna for debugging the problem)
 		<year>1989</year>
 		<publisher>Absolute / Data East / Irem</publisher>
 		<info name="serial" value="AM-039-04"/>
-		<info name="pcb" value="?"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
@@ -1976,7 +1973,7 @@ almost nothing like the prototype.
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
-			<dataarea name="rom" size="0xc000">
+			<dataarea name="rom" size="0xc000"> <!-- Actually two ROMs, 32kB and 16kB -->
 				<rom name="1on1.bin" size="0xc000" crc="7a628295" sha1="01dfc5e4e615cf20ee4f07245285f85684ee445d"/>
 			</dataarea>
 		</part>
@@ -1987,7 +1984,6 @@ almost nothing like the prototype.
 		<year>1989</year>
 		<publisher>Absolute Entertainment, Inc</publisher>
 		<info name="serial" value="AV-045-04"/>
-		<info name="pcb" value="?"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
@@ -2199,7 +2195,6 @@ almost nothing like the prototype.
 		<year>1989</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="AM-049-03"/>
-		<info name="pcb" value="?"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_act" />
@@ -2566,7 +2561,6 @@ almost nothing like the prototype.
 		<year>1988</year>
 		<publisher>Absolute Entertainment, Inc.</publisher>
 		<info name="serial" value="AV-047-04"/>
-		<info name="pcb" value="?"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
@@ -2581,7 +2575,6 @@ almost nothing like the prototype.
 		<year>1988</year>
 		<publisher>Absolute Entertainment, Inc.</publisher>
 		<info name="serial" value="AV-047-04"/>
-		<info name="pcb" value="?"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
@@ -2596,7 +2589,6 @@ almost nothing like the prototype.
 		<year>1988</year>
 		<publisher>Froggo</publisher>
 		<info name="serial" value="FG2003"/>
-		<info name="pcb" value="?"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
@@ -2611,7 +2603,6 @@ almost nothing like the prototype.
 		<year>1989</year>
 		<publisher>Absolute Entertainment, Inc.</publisher>
 		<info name="serial" value="AV-041-04"/>
-		<info name="pcb" value="?"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
@@ -2626,7 +2617,6 @@ almost nothing like the prototype.
 		<year>1989</year>
 		<publisher>Absolute Entertainment, Inc.</publisher>
 		<info name="serial" value="AV-041-04"/>
-		<info name="pcb" value="?"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
@@ -2641,7 +2631,6 @@ almost nothing like the prototype.
 		<year>1989</year>
 		<publisher>Absolute Entertainment, Inc.</publisher>
 		<info name="serial" value="AV-046-04"/>
-		<info name="pcb" value="?"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
@@ -2656,7 +2645,6 @@ almost nothing like the prototype.
 		<year>1989</year>
 		<publisher>Absolute Entertainment, Inc.</publisher>
 		<info name="serial" value="AV-046-04"/>
-		<info name="pcb" value="?"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
@@ -2737,7 +2725,6 @@ almost nothing like the prototype.
 		<year>1988</year>
 		<publisher>Froggo</publisher>
 		<info name="serial" value="FG2002"/>
-		<info name="pcb" value="?"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_sg" />
