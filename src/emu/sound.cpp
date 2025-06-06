@@ -889,7 +889,7 @@ void sound_manager::input_get(int id, sound_stream &stream)
 	u64 dest_end_pos = dest_start_pos + dest_samples;
 	u32 skip = stream.output_count();
 
-	
+
 	for(const auto &step : m_microphones[id].m_input_mixing_steps) {
 		if(step.m_mode == mixing_step::CLEAR || step.m_mode == mixing_step::COPY)
 				fatalerror("Impossible step encountered in input\n");
@@ -1064,7 +1064,7 @@ void sound_manager::run_effects()
 					}
 					break;
 				}
-					
+
 				case mixing_step::ADD: {
 					float gain = 32768 * step.m_linear_volume * m_master_gain;
 					for(u32 sample = 0; sample != source_samples; sample++) {
@@ -1252,13 +1252,22 @@ void sound_manager::config_load(config_type cfg_type, config_level cfg_level, ut
 	case config_type::DEFAULT: {
 		// In the global config, get the default effect chain configuration
 
-		util::xml::data_node const *efl_node = parentnode->get_child("default_audio_effects");
+		util::xml::data_node const *efl_node = parentnode->get_child("audio_effects");
 		if(efl_node) {
 			for(util::xml::data_node const *ef_node = efl_node->get_child("effect"); ef_node != nullptr; ef_node = ef_node->get_next_sibling("effect")) {
 				unsigned int id = ef_node->get_attribute_int("step", 0);
 				std::string type = ef_node->get_attribute_string("type", "");
-				if(id >= 1 && id <= m_default_effects.size() && audio_effect::effect_names[m_default_effects[id-1]->type()] == type)
-					m_default_effects[id-1]->config_load(ef_node);
+				if(id >= 1 && id <= m_default_effects.size()) {
+					if(audio_effect::effect_names[m_default_effects[id-1]->type()] == type)
+						m_default_effects[id-1]->config_load(ef_node);
+
+					// also apply defaults to current system (in case there's no system.cfg)
+					for(auto &speaker : m_speakers) {
+						auto &eff = speaker.m_effects;
+						if(audio_effect::effect_names[eff[id-1].m_effect->type()] == type)
+							eff[id-1].m_effect->config_load(ef_node);
+					}
+				}
 			}
 		}
 
@@ -1357,7 +1366,7 @@ void sound_manager::config_save(config_type cfg_type, util::xml::data_node *pare
 
 	case config_type::DEFAULT: {
 		// In the global config, save the default effect chain configuration
-		util::xml::data_node *const efl_node = parentnode->add_child("default_audio_effects", nullptr);
+		util::xml::data_node *const efl_node = parentnode->add_child("audio_effects", nullptr);
 		for(u32 ei = 0; ei != m_default_effects.size(); ei++) {
 			const audio_effect *e = m_default_effects[ei].get();
 			util::xml::data_node *const ef_node = efl_node->add_child("effect", nullptr);
@@ -2689,7 +2698,7 @@ void sound_manager::rebuild_all_stream_resamplers()
 		if(step.m_mode != mixing_step::CLEAR) {
 			auto &stream = m_osd_output_streams[step.m_osd_index];
 			if(stream.m_resampler)
-				m_speakers[step.m_device_index].m_effects.back().m_buffer.set_history(stream.m_resampler->history_size());			
+				m_speakers[step.m_device_index].m_effects.back().m_buffer.set_history(stream.m_resampler->history_size());
 		}
 }
 
