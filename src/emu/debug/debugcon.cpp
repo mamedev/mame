@@ -24,6 +24,7 @@
 #include <cctype>
 #include <fstream>
 #include <iterator>
+#include <regex>
 
 
 /***************************************************************************
@@ -883,7 +884,7 @@ bool debugger_console::validate_device_space_parameter(std::string_view param, i
 /// optionally followed by a colon and a device identifier.  If the
 /// device identifier is not presnt, the current CPU with debugger focus
 /// is assumed.  See #validate_device_parameter for information on how
-/// device parametersare interpreted.
+/// device parameters are interpreted.
 /// \param [in] The parameter string.
 /// \param [in] spacenum The default address space index.  If negative,
 ///   the first address space exposed by the device (i.e. the address
@@ -913,6 +914,37 @@ bool debugger_console::validate_target_address_parameter(std::string_view param,
 	// set the address now that we have the space
 	addr = addrval;
 	return true;
+}
+
+
+/// \brief Validate a parameter as a address with memory region or share name
+///
+/// Validates a parameter as a address with memory region or share tag and
+//  ... .
+/// \param [in] The parameter string.
+/// \param [out] addr The address on success, or unchanged on failure.
+/// \return true if the parameter refers to a memory region in the
+///   current system, or false otherwise.
+bool debugger_console::validate_address_with_memory_parameter(std::string_view param, u64 &addr, memory_region *&region, memory_share *&share)
+{
+	std::string str(param);
+	std::regex re("^([^:]+)(:.+)\\.([ms])$");
+	std::smatch m;
+	if (std::regex_match(str, m, re))
+	{
+		if ('m' == m[3])
+			validate_memory_region_parameter(m.str(2), region);
+		else if ('s' == m[3])
+			validate_memory_share_parameter(m.str(2), share);
+		else
+			return false;
+
+		validate_number_parameter(m.str(1), addr);
+
+		return true;
+	}
+
+	return false;
 }
 
 
