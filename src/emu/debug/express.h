@@ -176,8 +176,10 @@ public:
 	enum table_type
 	{
 		CPU_STATE,         // CPU registers, etc.
-		BUILTIN_GLOBALS,   // Built-in MAME global symbols (e.g., beamx, beamy, frame, etc.)
-						   // (also used for tables outside debugger: lua scripts, cheat engine)
+		DEBUGGER_GLOBALS,  // Debugger global symbol table (e.g., beamx, beamy, frame, etc.)
+		CHEAT_ENTRY,       // symbols used in cheat entry actions (argindex, temp variables)
+		CHEAT_MANAGER,     // symbols from the cheat manager (frame value, from/tobcd functions)
+		LUA_SCRIPT,        // custom symbols added by a LUA script for use from the LUA script
 	};
 
 	// construction/destruction

@@ -91,7 +91,7 @@ public:
 
 	symbol_table_wrapper(lua_engine &host, running_machine &machine, std::shared_ptr<symbol_table_wrapper> const &parent, device_t *device)
 		: m_host(host)
-		, m_table(machine, symbol_table::BUILTIN_GLOBALS, parent ? &parent->table() : nullptr, device)
+		, m_table(machine, symbol_table::LUA_SCRIPT, parent ? &parent->table() : nullptr, device)
 		, m_parent(parent)
 	{
 	}
