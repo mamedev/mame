@@ -48,6 +48,7 @@ TODO:
 #include "machine/ram.h"
 #include "machine/sensorboard.h"
 #include "sound/dac.h"
+#include "video/pwm.h"
 #include "video/sed1520.h"
 
 #include "emupal.h"
@@ -71,13 +72,13 @@ public:
 		m_rom(*this, "maincpu"),
 		m_ram(*this, "ram"),
 		m_nvram(*this, "nvram"),
-		m_dac(*this, "dac"),
-		m_lcdc(*this, "lcdc"),
 		m_board(*this, "board"),
+		m_lcdc(*this, "lcdc"),
+		m_led_pwm(*this, "led_pwm"),
+		m_dac(*this, "dac"),
 		m_inputs(*this, "IN.%u", 0),
 		m_digits(*this, "digit%u", 0U),
-		m_syms(*this, "sym%u", 0U),
-		m_leds(*this, "led%u", 0U)
+		m_syms(*this, "sym%u", 0U)
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(on_button);
@@ -95,13 +96,13 @@ private:
 	required_region_ptr<u32> m_rom;
 	required_device<ram_device> m_ram;
 	required_device<nvram_device> m_nvram;
-	required_device<dac_2bit_ones_complement_device> m_dac;
-	required_device<sed1520_device> m_lcdc;
 	required_device<sensorboard_device> m_board;
+	required_device<sed1520_device> m_lcdc;
+	required_device<pwm_display_device> m_led_pwm;
+	required_device<dac_2bit_ones_complement_device> m_dac;
 	required_ioport_array<8> m_inputs;
 	output_finder<12> m_digits;
 	output_finder<14> m_syms;
-	output_finder<16> m_leds;
 
 	emu_timer *m_boot_timer;
 
@@ -133,7 +134,6 @@ void risc2500_state::machine_start()
 {
 	m_digits.resolve();
 	m_syms.resolve();
-	m_leds.resolve();
 
 	m_boot_timer = timer_alloc(FUNC(risc2500_state::disable_bootrom), this);
 	m_boot_view[1].install_ram(0, m_ram->size() - 1, m_ram->pointer());
@@ -234,9 +234,7 @@ void risc2500_state::power_off()
 
 	// clear display
 	m_lcdc->reset();
-
-	for (int i = 0; i < 16; i++)
-		m_leds[i] = 0;
+	m_led_pwm->clear();
 }
 
 
@@ -244,11 +242,11 @@ void risc2500_state::power_off()
 
 u32 risc2500_state::input_r()
 {
-	u32 data = (u32)m_lcdc->status_read() << 16;
+	u32 data = 0;
 
 	for (int i = 0; i < 8; i++)
 	{
-		if (m_control & (1 << i))
+		if (BIT(m_control, i))
 		{
 			data |= m_inputs[i]->read() << 24;
 			data |= m_board->read_rank(i, true);
@@ -264,7 +262,7 @@ u32 risc2500_state::input_r()
 void risc2500_state::control_w(u32 data)
 {
 	// lcd
-	if (!BIT(data, 27))
+	if (BIT(m_control & ~data, 27))
 	{
 		if (BIT(data, 26))
 			m_lcdc->data_write(data);
@@ -272,19 +270,8 @@ void risc2500_state::control_w(u32 data)
 			m_lcdc->control_write(data);
 	}
 
-	// vertical leds
-	if (BIT(data, 31))
-	{
-		for (int i = 0; i < 8; i++)
-			m_leds[i] = BIT(~data, i);
-	}
-
-	// horizontal leds
-	if (BIT(data, 30))
-	{
-		for (int i = 0; i < 8; i++)
-			m_leds[8 + i] = BIT(~data, i);
-	}
+	// leds
+	m_led_pwm->matrix(data >> 30, ~data & 0xff);
 
 	// speaker
 	m_dac->write(data >> 28 & 3);
@@ -438,12 +425,13 @@ void risc2500_state::risc2500(machine_config &config)
 	screen.set_screen_update(m_lcdc, FUNC(sed1520_device::screen_update));
 	screen.set_palette("palette");
 
-	config.set_default_layout(layout_saitek_risc2500);
-
 	PALETTE(config, "palette", FUNC(risc2500_state::lcd_palette), 3);
 
 	SED1520(config, m_lcdc);
 	m_lcdc->set_screen_update_cb(FUNC(risc2500_state::screen_update_cb));
+
+	PWM_DISPLAY(config, m_led_pwm).set_size(2, 8);
+	config.set_default_layout(layout_saitek_risc2500);
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
