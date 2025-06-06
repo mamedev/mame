@@ -1936,10 +1936,8 @@ Core Performance Options
     run the system at its normal speed, a *<factor>* of ``0.5`` means run at
     half speed, and a *<factor>* of 2.0 means run at double speed.  Note that
     changing this value affects sound playback as well, which will scale in
-    pitch accordingly.  A very low speed will introduce sound glitches, this
-    can be prevented by increasing the :ref:`audio latency
-    <mame-commandline-audiolatency>`.  The internal precision of the fraction is
-    two decimal places, so a *<factor>* of ``1.002`` is rounded to ``1.00``.
+    pitch accordingly.  The internal precision of the fraction is two decimal
+    places, so a *<factor>* of ``1.002`` is rounded to ``1.00``.
 
     The default is ``1.0`` (normal speed).
 
