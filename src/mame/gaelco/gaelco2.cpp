@@ -217,7 +217,27 @@ void gaelco2_state::maniacsq_d5002fp(machine_config &config)
 }
 
 
-ROM_START( maniacsq ) // REF 940411
+ROM_START( maniacsq ) // REF 940411, unprotected
+	ROM_REGION( 0x040000, "maincpu", 0 )    // 68000 code
+	ROM_LOAD16_BYTE( "d8-d15.1m", 0x000000, 0x020000, CRC(9121d1b6) SHA1(ad8f0d996b6d42fc0c6645466608e82ca96e0b66) )
+	ROM_LOAD16_BYTE( "d0-d7.1m",  0x000001, 0x020000, CRC(a95cfd2a) SHA1(b5bad76f12d2a1f6bf6b35482f2f933ceb00e552) )
+
+	ROM_REGION( 0x0280000, "gfx", 0 ) // GFX + Sound
+	ROM_LOAD( "d0-d7.4m",   0x0000000, 0x0080000, CRC(d8551b2f) SHA1(78b5b07112bd89fed18055180e7cc64f8e0bd0b1) )    // GFX + Sound
+	ROM_LOAD( "d8-d15.4m",  0x0080000, 0x0080000, CRC(b269c427) SHA1(b7f9501529fbb7ee82700cff82740ba5770cf3c5) )    // GFX + Sound
+	ROM_LOAD( "d16-d23.1m", 0x0100000, 0x0020000, CRC(af4ea5e7) SHA1(ffaf09dc2588e32c124e7dd2f86ba009f1b8b176) )    // GFX only
+	ROM_FILL(               0x0120000, 0x0060000, 0x00 )         // Empty
+	ROM_LOAD( "d24-d31.1m", 0x0180000, 0x0020000, CRC(578c3588) SHA1(c2e1fba29f21d6822677886fb2d26e050b336c14) )    // GFX only
+	ROM_FILL(               0x01a0000, 0x0060000, 0x00 )         // Empty
+	ROM_FILL(               0x0200000, 0x0080000, 0x00 )         // to decode GFX as 5bpp
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "mu.6_4769_pal16l8.bin",   0x000, 0x104, CRC(00aedab5) SHA1(497555962e1d85ffb4fd37cff778772abd1bbe32) )
+	ROM_LOAD( "mu.6_585b_palce16v8.bin", 0x000, 0x117, CRC(6ba240e3) SHA1(8ecdb5623d2a8e2e305e2467403e034451e86a4d) )
+	ROM_LOAD( "mu.c5_3a65_pal16r8.bin",  0x000, 0x104, CRC(27b1ca8b) SHA1(038d1352baff18f619ac4149e5825ef9664c983b) )
+ROM_END
+
+ROM_START( maniacsqa ) // REF 940411, protected
 	ROM_REGION( 0x040000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "tms27c010a.msu45", 0x000000, 0x020000, CRC(fa44c907) SHA1(4d9b3a6cf044395cc4e04f6dd8d1109e8ee4d52d) )
 	ROM_LOAD16_BYTE( "tms27c010a.msu44", 0x000001, 0x020000, CRC(42e20121) SHA1(6662fa8ec5756bf5c4ebaaa9aa2e0e241cf582a4) )
@@ -282,7 +302,7 @@ REF: 940411
 |                                                                            |
 -----------------------------------------------------------------------------|
 */
-ROM_START( maniacsqa ) // REF 940411
+ROM_START( maniacsqb ) // REF 940411, protected
 	ROM_REGION( 0x040000, "maincpu", 0 )    // 68000 code
 	ROM_LOAD16_BYTE( "ms_u_45.u45", 0x000000, 0x020000, CRC(98f4fdc0) SHA1(1e4d5b0a8a432de885c96319c21280d304b38db0) )
 	ROM_LOAD16_BYTE( "ms_u_44.u44", 0x000001, 0x020000, CRC(1785dd41) SHA1(5c6a65c00248971ce54c8185858393f2c52cc583) )
@@ -312,25 +332,27 @@ ROM_START( maniacsqa ) // REF 940411
 	ROM_LOAD( "mu.c5_3a65_pal16r8.bin",  0x000, 0x104, CRC(27b1ca8b) SHA1(038d1352baff18f619ac4149e5825ef9664c983b) )
 ROM_END
 
-ROM_START( maniacsqu ) // REF 940411
+ROM_START( maniacsqc ) // unprotected
 	ROM_REGION( 0x040000, "maincpu", 0 )    // 68000 code
-	ROM_LOAD16_BYTE( "d8-d15.1m", 0x000000, 0x020000, CRC(9121d1b6) SHA1(ad8f0d996b6d42fc0c6645466608e82ca96e0b66) )
-	ROM_LOAD16_BYTE( "d0-d7.1m",  0x000001, 0x020000, CRC(a95cfd2a) SHA1(b5bad76f12d2a1f6bf6b35482f2f933ceb00e552) )
+	ROM_LOAD16_BYTE( "ms_45_no_dallas_23-5_27c010.bin", 0x000000, 0x020000, CRC(ccf5724f) SHA1(467bfe6c6ce1c35b5be7f8467e07a268772dcad7) )
+	ROM_LOAD16_BYTE( "ms_44_no_dallas_23-5_27c010.bin", 0x000001, 0x020000, CRC(9aeaa141) SHA1(aa0aa969ae011d090ba90000ee517c5ca97b2c9d) )
 
 	ROM_REGION( 0x0280000, "gfx", 0 ) // GFX + Sound
-	ROM_LOAD( "d0-d7.4m",   0x0000000, 0x0080000, CRC(d8551b2f) SHA1(78b5b07112bd89fed18055180e7cc64f8e0bd0b1) )    // GFX + Sound
-	ROM_LOAD( "d8-d15.4m",  0x0080000, 0x0080000, CRC(b269c427) SHA1(b7f9501529fbb7ee82700cff82740ba5770cf3c5) )    // GFX + Sound
-	ROM_LOAD( "d16-d23.1m", 0x0100000, 0x0020000, CRC(af4ea5e7) SHA1(ffaf09dc2588e32c124e7dd2f86ba009f1b8b176) )    // GFX only
-	ROM_FILL(               0x0120000, 0x0060000, 0x00 )         // Empty
-	ROM_LOAD( "d24-d31.1m", 0x0180000, 0x0020000, CRC(578c3588) SHA1(c2e1fba29f21d6822677886fb2d26e050b336c14) )    // GFX only
-	ROM_FILL(               0x01a0000, 0x0060000, 0x00 )         // Empty
-	ROM_FILL(               0x0200000, 0x0080000, 0x00 )         // to decode GFX as 5bpp
+	// all 4 roms on a sub-board, no IC positions marked
+	ROM_LOAD( "ms1", 0x0000000, 0x0080000, CRC(d8551b2f) SHA1(78b5b07112bd89fed18055180e7cc64f8e0bd0b1) )    // GFX + Sound
+	ROM_LOAD( "ms2", 0x0080000, 0x0080000, CRC(b269c427) SHA1(b7f9501529fbb7ee82700cff82740ba5770cf3c5) )    // GFX + Sound
+	ROM_LOAD( "ms3", 0x0100000, 0x0020000, CRC(af4ea5e7) SHA1(ffaf09dc2588e32c124e7dd2f86ba009f1b8b176) )    // GFX only
+	ROM_FILL(        0x0120000, 0x0060000, 0x00 )         // Empty
+	ROM_LOAD( "ms4", 0x0180000, 0x0020000, CRC(578c3588) SHA1(c2e1fba29f21d6822677886fb2d26e050b336c14) )    // GFX only
+	ROM_FILL(        0x01a0000, 0x0060000, 0x00 )         // Empty
+	ROM_FILL(        0x0200000, 0x0080000, 0x00 )         // to decode GFX as 5bpp
 
 	ROM_REGION( 0x117, "plds", 0 )
 	ROM_LOAD( "mu.6_4769_pal16l8.bin",   0x000, 0x104, CRC(00aedab5) SHA1(497555962e1d85ffb4fd37cff778772abd1bbe32) )
 	ROM_LOAD( "mu.6_585b_palce16v8.bin", 0x000, 0x117, CRC(6ba240e3) SHA1(8ecdb5623d2a8e2e305e2467403e034451e86a4d) )
 	ROM_LOAD( "mu.c5_3a65_pal16r8.bin",  0x000, 0x104, CRC(27b1ca8b) SHA1(038d1352baff18f619ac4149e5825ef9664c983b) )
 ROM_END
+
 
 /*
 Maniac Square
@@ -3289,12 +3311,13 @@ GAME( 1995, touchgonnac, touchgo,   touchgo_d5002fp,  touchgo,  gaelco2_state,  
 GAME( 1995, touchgoun,   touchgo,   touchgo,          touchgo,  gaelco2_state,  init_touchgo,   ROT0, "Gaelco", "Touch and Go (unprotected, checksum 059CC336)",       0 )
 
 // All sets identify as Version 1.0, but are clearly different revisions
-GAME( 1996, maniacsq,    0,         maniacsq_d5002fp, maniacsq, gaelco2_state,  empty_init,     ROT0, "Gaelco", "Maniac Square (protected, version 1.0, checksum DEEE)",                 0 )
-GAME( 1996, maniacsqa,   maniacsq,  maniacsq_d5002fp, maniacsq, gaelco2_state,  empty_init,     ROT0, "Gaelco", "Maniac Square (protected, version 1.0, checksum CF2D)",                 0 )
-GAME( 1996, maniacsqu,   maniacsq,  maniacsq,         maniacsq, gaelco2_state,  empty_init,     ROT0, "Gaelco", "Maniac Square (unprotected, version 1.0, checksum BB73)",               0 )
+GAME( 1996, maniacsq,    0,         maniacsq,         maniacsq, gaelco2_state,  empty_init,     ROT0, "Gaelco", "Maniac Square (unprotected, version 1.0, checksum BB73)",               0 ) // 15/Jul/1996
+GAME( 1996, maniacsqa,   maniacsq,  maniacsq_d5002fp, maniacsq, gaelco2_state,  empty_init,     ROT0, "Gaelco", "Maniac Square (protected, version 1.0, checksum DEEE)",                 0 ) // 10/Jun/1996
+GAME( 1996, maniacsqb,   maniacsq,  maniacsq_d5002fp, maniacsq, gaelco2_state,  empty_init,     ROT0, "Gaelco", "Maniac Square (protected, version 1.0, checksum CF2D)",                 0 ) // 23/May/1996
+GAME( 1996, maniacsqc,   maniacsq,  maniacsq,         maniacsq, gaelco2_state,  empty_init,     ROT0, "Gaelco", "Maniac Square (unprotected, version 1.0, checksum BEAE)",               0 ) // 23/May/1996
 GAME( 1996, maniacsqs,   maniacsq,  maniacsqs,        snowboar, snowboar_state, empty_init,     ROT0, "Gaelco", "Maniac Square (unprotected, version 1.0, checksum 66B1, 960419/1 PCB)", 0 ) // Official version on Snow Board Championship PCB, doesn't use the protection
 
-GAME( 1997, snowboar,    0,         snowboar,         snowboar, snowboar_state, empty_init,     ROT0, "Gaelco / OMK", "Snow Board Championship (version 2.1)", 0 )
+GAME( 1997, snowboar,    0,         snowboar,         snowboar, snowboar_state, empty_init,     ROT0, "Gaelco / OMK", "Snow Board Championship (version 2.1)", 0 ) // 20/Mar, labeled internally at Gaelco as "DEMO STICK"
 GAME( 1996, snowboara,   snowboar,  snowboar,         snowboar, snowboar_state, init_snowboara, ROT0, "Gaelco / OMK", "Snow Board Championship (version 2.0)", 0 )
 
 GAME( 1998, bang,        0,         bang,             bang,     bang_state,     empty_init,     ROT0, "Gaelco / Bit Managers",                    "Bang! (version 2, checksum 140E)",              0 ) // 15/Feb/1999
