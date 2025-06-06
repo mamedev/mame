@@ -3317,7 +3317,7 @@ GAME( 1996, maniacsqb,   maniacsq,  maniacsq_d5002fp, maniacsq, gaelco2_state,  
 GAME( 1996, maniacsqc,   maniacsq,  maniacsq,         maniacsq, gaelco2_state,  empty_init,     ROT0, "Gaelco", "Maniac Square (unprotected, version 1.0, checksum BEAE)",               0 ) // 23/May/1996
 GAME( 1996, maniacsqs,   maniacsq,  maniacsqs,        snowboar, snowboar_state, empty_init,     ROT0, "Gaelco", "Maniac Square (unprotected, version 1.0, checksum 66B1, 960419/1 PCB)", 0 ) // Official version on Snow Board Championship PCB, doesn't use the protection
 
-GAME( 1997, snowboar,    0,         snowboar,         snowboar, snowboar_state, empty_init,     ROT0, "Gaelco / OMK", "Snow Board Championship (version 2.1)", 0 ) // 20/Mar, labeled internaly at Gaelco as "DEMO STICK"
+GAME( 1997, snowboar,    0,         snowboar,         snowboar, snowboar_state, empty_init,     ROT0, "Gaelco / OMK", "Snow Board Championship (version 2.1)", 0 ) // 20/Mar, labeled internally at Gaelco as "DEMO STICK"
 GAME( 1996, snowboara,   snowboar,  snowboar,         snowboar, snowboar_state, init_snowboara, ROT0, "Gaelco / OMK", "Snow Board Championship (version 2.0)", 0 )
 
 GAME( 1998, bang,        0,         bang,             bang,     bang_state,     empty_init,     ROT0, "Gaelco / Bit Managers",                    "Bang! (version 2, checksum 140E)",              0 ) // 15/Feb/1999
