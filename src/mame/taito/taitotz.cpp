@@ -2870,7 +2870,7 @@ ROM_START( raizpinj )
 	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
 
 	DISK_REGION( "ata:0:hdd" )
-	DISK_IMAGE( "raizin ping pong ver 2.01j", 0, SHA1(eddc803c2507d19f0a3e3cc217bb22a565c04f3e) )
+	DISK_IMAGE( "raizin ping pong ver 2.01j", 0, BAD_DUMP SHA1(eddc803c2507d19f0a3e3cc217bb22a565c04f3e) ) // mokonaXVI says SYSROM file on HDD is corrupted
 ROM_END
 
 ROM_START( styphp )
