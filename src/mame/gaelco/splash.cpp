@@ -1320,7 +1320,6 @@ ROM_START( rebus ) // there's also a year hack dumped: it has 4 different bytes 
 	ROM_LOAD( "pal20v8h",   0x1000, 0x157, NO_DUMP )
 ROM_END
 
-
 ROM_START( splash )
 	ROM_REGION( 0x400000, "maincpu", 0 )    // 68000 code + gfx
 	ROM_LOAD16_BYTE( "splash_2_no_fbi_no_eeuu_27c010.bin", 0x000000, 0x020000, CRC(5d58ce67) SHA1(1bff8f87776542051bbab692c4a03d5ab847c509) )
@@ -1352,12 +1351,12 @@ ROM_START( splashna )
 	ROM_REGION( 0x400000, "maincpu", 0 )    // 68000 code + gfx
 	ROM_LOAD16_BYTE( "fbi_eeuu_2_splash_27c010.bin", 0x000000, 0x020000, CRC(6350027d) SHA1(eee85bf5cf63343a7cfb993ddc77910139b178fc) )
 	ROM_LOAD16_BYTE( "fbi_eeuu_6_splash_27c010.bin", 0x000001, 0x020000, CRC(45f83601) SHA1(b00233bac4283803144603572a4c70e435131444) )
-	ROM_LOAD16_BYTE( "splash_3.g5", 0x100000, 0x080000, CRC(a4e8ed18) SHA1(64ce47193ee4bb3a8014d7c14c559b4ebb3af083) )
-	ROM_LOAD16_BYTE( "splash_7.i5", 0x100001, 0x080000, CRC(73e1154d) SHA1(2c055ad29a32c6c1e712cc35b5972f1e69cdebb7) )
-	ROM_LOAD16_BYTE( "splash_4.g6", 0x200000, 0x080000, CRC(ffd56771) SHA1(35ad9874b6ea5aa3ba38a31d723093b4dd2cfdb8) )
-	ROM_LOAD16_BYTE( "splash_8.i6", 0x200001, 0x080000, CRC(16e9170c) SHA1(96fc237cb172039df153dc70d15ed7d9ee750363) )
-	ROM_LOAD16_BYTE( "splash_5.g8", 0x300000, 0x080000, CRC(dc3a3172) SHA1(2b322b52e3e8da00f26dd276cb72bd2d48c2deaa) )
-	ROM_LOAD16_BYTE( "splash_9.i8", 0x300001, 0x080000, CRC(2e23e6c3) SHA1(baf9ab4c3261c3f06f5e43c1e50aba9222acb71d) )
+	ROM_LOAD16_BYTE( "splash_3.g5",                  0x100000, 0x080000, CRC(a4e8ed18) SHA1(64ce47193ee4bb3a8014d7c14c559b4ebb3af083) )
+	ROM_LOAD16_BYTE( "splash_7.i5",                  0x100001, 0x080000, CRC(73e1154d) SHA1(2c055ad29a32c6c1e712cc35b5972f1e69cdebb7) )
+	ROM_LOAD16_BYTE( "splash_4.g6",                  0x200000, 0x080000, CRC(ffd56771) SHA1(35ad9874b6ea5aa3ba38a31d723093b4dd2cfdb8) )
+	ROM_LOAD16_BYTE( "splash_8.i6",                  0x200001, 0x080000, CRC(16e9170c) SHA1(96fc237cb172039df153dc70d15ed7d9ee750363) )
+	ROM_LOAD16_BYTE( "splash_5.g8",                  0x300000, 0x080000, CRC(dc3a3172) SHA1(2b322b52e3e8da00f26dd276cb72bd2d48c2deaa) )
+	ROM_LOAD16_BYTE( "splash_9.i8",                  0x300001, 0x080000, CRC(2e23e6c3) SHA1(baf9ab4c3261c3f06f5e43c1e50aba9222acb71d) )
 
 	ROM_REGION( 0x010000, "audiocpu", 0 )   // Z80 code + sound data
 	ROM_LOAD( "splash_1.c5", 0x00000, 0x10000, CRC(0ed7ebc9) SHA1(28ef16e20d754deef49be6a5c9f63311e9ec94a3) )
@@ -1446,6 +1445,44 @@ ROM_START( paintlad )
 	ROM_LOAD( "gal20v8a-25lp.f4",  0x600, 0x157, NO_DUMP )
 ROM_END
 
+ROM_START( nsplashkr )
+	ROM_REGION( 0x400000, "maincpu", 0 )	// 68000 code + gfx
+	ROM_LOAD16_BYTE( "new_splash_cor_2_27c010.bin", 0x000000, 0x020000, CRC(eadf12dd) SHA1(e029e8c87d566ab4337d50936b97913043f62c82) )
+	ROM_LOAD16_BYTE( "new_splash_cor_6_27c010.bin", 0x000001, 0x020000, CRC(5a70d95b) SHA1(4117c156cda6bd4638b097f807e0d7d2e2d02b2a) )
+	ROM_LOAD16_BYTE( "new_splash_cor_4_27c040.bin", 0x200000, 0x080000, CRC(0f71b5c5) SHA1(605bafa0f5382ee197971cd4a615d507742d7123) )
+	ROM_LOAD16_BYTE( "new_splash_cor_8_27c040.bin", 0x200001, 0x080000, CRC(ccc0d187) SHA1(1b4d54685117bbc0ec1863b67776625c23f3db2a) )
+	ROM_LOAD16_BYTE( "new_splash_cor_5_27c040.bin", 0x300000, 0x080000, CRC(e71f8536) SHA1(70b4910dc2454aab756682f8a3f4f63d1bce342a) )
+	ROM_LOAD16_BYTE( "new_splash_cor_9_27c040.bin", 0x300001, 0x080000, CRC(a50537cc) SHA1(e80fd8ef88d6db3a33a9f1db604895f404d1b833) )
+
+	ROM_REGION( 0x010000, "audiocpu", 0 )   // Z80 code + sound data
+	ROM_LOAD( "splash_1.c5", 0x00000, 0x10000, CRC(0ed7ebc9) SHA1(28ef16e20d754deef49be6a5c9f63311e9ec94a3) )
+
+	ROM_REGION( 0x080000, "gfx1", 0 )
+	ROM_LOAD( "new_splash_cor_13_27c010.bin", 0x000000, 0x020000, CRC(72ef9811) SHA1(4af1e1ba06a043e79f4a46148db1809fce961a9f) )
+	ROM_LOAD( "new_splash_cor_11_27c010.bin", 0x020000, 0x020000, CRC(effa8d57) SHA1(7e497e00d15a426d3c8ad5a42d24e86a5aa3ee37) )
+	ROM_LOAD( "new_splash_cor_12_27c010.bin", 0x040000, 0x020000, CRC(0f2d8006) SHA1(0bd1c8fa211992ea901e15927a2b248f1bb88d59) )
+	ROM_LOAD( "new_splash_cor_10_27c010.bin", 0x060000, 0x020000, CRC(cb4bdf04) SHA1(33a492af170d2e673a073201e9d71febf51662bd) )
+ROM_END
+
+ROM_START( nsplashkra )
+	ROM_REGION( 0x400000, "maincpu", 0 )	// 68000 code + gfx
+	ROM_LOAD16_BYTE( "demo_2_set_1_27c010.bin",     0x000000, 0x020000, CRC(9f2d1cd5) SHA1(c75f8ca8fb862ee820b326ba0091cf8a864bb0b5) )
+	ROM_LOAD16_BYTE( "demo_6_set_1_27c010.bin",     0x000001, 0x020000, CRC(8faf055e) SHA1(cae095d268f6410a82270927bcad755063ca43f8) )
+	ROM_LOAD16_BYTE( "new_splash_cor_4_27c040.bin", 0x200000, 0x080000, CRC(0f71b5c5) SHA1(605bafa0f5382ee197971cd4a615d507742d7123) )
+	ROM_LOAD16_BYTE( "new_splash_cor_8_27c040.bin", 0x200001, 0x080000, CRC(ccc0d187) SHA1(1b4d54685117bbc0ec1863b67776625c23f3db2a) )
+	ROM_LOAD16_BYTE( "new_splash_cor_5_27c040.bin", 0x300000, 0x080000, CRC(e71f8536) SHA1(70b4910dc2454aab756682f8a3f4f63d1bce342a) )
+	ROM_LOAD16_BYTE( "new_splash_cor_9_27c040.bin", 0x300001, 0x080000, CRC(a50537cc) SHA1(e80fd8ef88d6db3a33a9f1db604895f404d1b833) )
+
+	ROM_REGION( 0x010000, "audiocpu", 0 )   // Z80 code + sound data
+	ROM_LOAD( "splash_1.c5", 0x00000, 0x10000, CRC(0ed7ebc9) SHA1(28ef16e20d754deef49be6a5c9f63311e9ec94a3) )
+
+	ROM_REGION( 0x080000, "gfx1", 0 )
+	ROM_LOAD( "new_splash_cor_13_27c010.bin", 0x000000, 0x020000, CRC(72ef9811) SHA1(4af1e1ba06a043e79f4a46148db1809fce961a9f) )
+	ROM_LOAD( "new_splash_cor_11_27c010.bin", 0x020000, 0x020000, CRC(effa8d57) SHA1(7e497e00d15a426d3c8ad5a42d24e86a5aa3ee37) )
+	ROM_LOAD( "new_splash_cor_12_27c010.bin", 0x040000, 0x020000, CRC(0f2d8006) SHA1(0bd1c8fa211992ea901e15927a2b248f1bb88d59) )
+	ROM_LOAD( "new_splash_cor_10_27c010.bin", 0x060000, 0x020000, CRC(cb4bdf04) SHA1(33a492af170d2e673a073201e9d71febf51662bd) )
+ROM_END
+
 ROM_START( splashkr )
 	ROM_REGION( 0x400000, "maincpu", 0 )    // 68000 code + gfx
 	ROM_LOAD16_BYTE( "windial_2_splash_27c010.bin", 0x000000, 0x020000, CRC(55a97ae2) SHA1(e41aa0b97f22a53bb3b78b69d8ce59355497304f) )
@@ -1483,6 +1520,33 @@ ROM_START( splash12 )
 	ROM_LOAD16_BYTE( "splash_8.i6", 0x200001, 0x080000, CRC(16e9170c) SHA1(96fc237cb172039df153dc70d15ed7d9ee750363) )
 	ROM_LOAD16_BYTE( "splash_5.g8", 0x300000, 0x080000, CRC(dc3a3172) SHA1(2b322b52e3e8da00f26dd276cb72bd2d48c2deaa) )
 	ROM_LOAD16_BYTE( "splash_9.i8", 0x300001, 0x080000, CRC(2e23e6c3) SHA1(baf9ab4c3261c3f06f5e43c1e50aba9222acb71d) )
+
+	ROM_REGION( 0x010000, "audiocpu", 0 )   // Z80 code + sound data
+	ROM_LOAD( "splash_1.c5", 0x00000, 0x10000, CRC(0ed7ebc9) SHA1(28ef16e20d754deef49be6a5c9f63311e9ec94a3) )
+
+	ROM_REGION( 0x080000, "gfx1", 0 )
+	ROM_LOAD( "splash_13.i17", 0x000000, 0x020000, CRC(028a4a68) SHA1(19384988e3690886ed55886ecdc4e4c566dbe4ba) )
+	ROM_LOAD( "splash_11.i14", 0x020000, 0x020000, CRC(2a8cb830) SHA1(bc54dfb03fade154085aa2f66784e07664a7a3d8) )
+	ROM_LOAD( "splash_12.i16", 0x040000, 0x020000, CRC(21aeff2c) SHA1(0c307e94f4a814c674ba0ab471a6bdd57e43c265) )
+	ROM_LOAD( "splash_10.i13", 0x060000, 0x020000, CRC(febb9893) SHA1(bb607a608c6c1658748a17a62431e8c30323c7ec) )
+
+	ROM_REGION( 0x800, "plds", 0 ) // all protected
+	ROM_LOAD( "p_a1020a-pl84c.g14",  0x000, 0x200, NO_DUMP ) // not actual size
+	ROM_LOAD( "1_gal16v8a-25lp.c13", 0x200, 0x117, NO_DUMP )
+	ROM_LOAD( "2_gal16v8a-25lp.d5",  0x400, 0x117, NO_DUMP )
+	ROM_LOAD( "3_gal20v8a-25lp.f4",  0x600, 0x157, NO_DUMP )
+ROM_END
+
+ROM_START( splash11 )
+	ROM_REGION( 0x400000, "maincpu", 0 )    // 68000 code + gfx
+	ROM_LOAD16_BYTE( "sp_2_de3d_27c010.bin", 0x000000, 0x020000, CRC(ca3bc3a6) SHA1(3b3bc8fa6f3333ff00ed4688d0807237a1252a27) )
+	ROM_LOAD16_BYTE( "sp_6_f9af_27c010.bin", 0x000001, 0x020000, CRC(9d727e1c) SHA1(39975f28f418c4ef5cb8f52f1e764a743a74783e) )
+	ROM_LOAD16_BYTE( "splash_3.g5",          0x100000, 0x080000, CRC(a4e8ed18) SHA1(64ce47193ee4bb3a8014d7c14c559b4ebb3af083) )
+	ROM_LOAD16_BYTE( "splash_7.i5",          0x100001, 0x080000, CRC(73e1154d) SHA1(2c055ad29a32c6c1e712cc35b5972f1e69cdebb7) )
+	ROM_LOAD16_BYTE( "splash_4.g6",          0x200000, 0x080000, CRC(ffd56771) SHA1(35ad9874b6ea5aa3ba38a31d723093b4dd2cfdb8) )
+	ROM_LOAD16_BYTE( "splash_8.i6",          0x200001, 0x080000, CRC(16e9170c) SHA1(96fc237cb172039df153dc70d15ed7d9ee750363) )
+	ROM_LOAD16_BYTE( "splash_5.g8",          0x300000, 0x080000, CRC(dc3a3172) SHA1(2b322b52e3e8da00f26dd276cb72bd2d48c2deaa) )
+	ROM_LOAD16_BYTE( "splash_9.i8",          0x300001, 0x080000, CRC(2e23e6c3) SHA1(baf9ab4c3261c3f06f5e43c1e50aba9222acb71d) )
 
 	ROM_REGION( 0x010000, "audiocpu", 0 )   // Z80 code + sound data
 	ROM_LOAD( "splash_1.c5", 0x00000, 0x10000, CRC(0ed7ebc9) SHA1(28ef16e20d754deef49be6a5c9f63311e9ec94a3) )
@@ -1613,7 +1677,7 @@ no idea on this one...
 
 ROM_START( ringball )
 	ROM_REGION( 0x080000, "maincpu", 0 )    // 68000 code + gfx
-	// TODO: encrypted, there's a device with scratched part between 68k and roms
+	// TODO: encrypted, there's a device with scratched part between 68k and ROMs
 	ROM_LOAD16_BYTE( "u87.bin",  0x000000, 0x040000, CRC(f8f21cfd) SHA1(c258689fc79195945db21663d2df0a33a4412618) )
 	ROM_LOAD16_BYTE( "u111.bin", 0x000001, 0x040000, CRC(11e246b0) SHA1(b056bcaa52ab2898f470a29b0a5c2f3594e2522b) ) // actually "u101"?
 
@@ -1629,8 +1693,11 @@ ROM_END
 GAME( 1992, splash,     0,        splash,   splash,   splash_state,   init_splash,   ROT0, "Gaelco / OMK Software",                   "Splash! (ver. 1.3, checksum E7BEF3FA, World)",              MACHINE_SUPPORTS_SAVE )
 GAME( 1992, splashna,   splash,   splash,   splash,   splash_state,   init_splash,   ROT0, "Gaelco / OMK Software",                   "Splash! (ver. 1.3, checksum E7BEEEFA, North America)",      MACHINE_SUPPORTS_SAVE )
 GAME( 1992, paintlad,   splash,   splash,   splash,   splash_state,   init_splash,   ROT0, "Gaelco / OMK Software",                   "Painted Lady (ver. 1.3, checksum E7BEEEFA, North America)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, nsplashkr,  splash,   splash,   splash,   splash_state,   init_splash,   ROT0, "Gaelco / OMK Software (Windial license)", "New Splash (ver. 1.4, checksum A26032A3, Korea, set 1)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1992, nsplashkra, splash,   splash,   splash,   splash_state,   init_splash,   ROT0, "Gaelco / OMK Software (Windial license)", "New Splash (ver. 1.4, checksum A26032A3, Korea, set 2)",    MACHINE_SUPPORTS_SAVE ) // Labeled as "Demo"
 GAME( 1992, splashkr,   splash,   splash,   splash,   splash_state,   init_splash,   ROT0, "Gaelco / OMK Software (Windial license)", "Splash! (ver. 1.3, checksum E7BEEBFA, Korea)",              MACHINE_SUPPORTS_SAVE )
 GAME( 1992, splash12,   splash,   splash,   splash,   splash_state,   init_splash,   ROT0, "Gaelco / OMK Software",                   "Splash! (ver. 1.2, checksum 5071804D, non North America)",  MACHINE_SUPPORTS_SAVE ) // 06/May/1992
+GAME( 1992, splash11,   splash,   splash,   splash,   splash_state,   init_splash,   ROT0, "Gaelco / OMK Software",                   "Splash! (ver. 1.1, checksum 4697D2BF, non North America)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1992, splash10,   splash,   splash,   splash,   splash_state,   init_splash10, ROT0, "Gaelco / OMK Software",                   "Splash! (ver. 1.0, checksum 2FC9AE1D, non North America)",  MACHINE_SUPPORTS_SAVE )
 
 GAME( 1993, roldfrog,   0,        roldfrog, splash,   splash_state,   init_roldfrog, ROT0, "Microhard",              "The Return of Lady Frog (set 1)", MACHINE_SUPPORTS_SAVE )
