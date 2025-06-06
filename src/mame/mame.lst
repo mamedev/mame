@@ -18822,6 +18822,7 @@ ringball
 
 @source:gaelco/splash_ms.cpp
 splashms
+splashmsa
 
 @source:gaelco/targeth.cpp
 quickshts
