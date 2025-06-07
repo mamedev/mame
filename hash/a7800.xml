@@ -1973,7 +1973,7 @@ almost nothing like the prototype.
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cart" interface="a7800_cart">
 			<feature name="slot" value="a78_rom" />
-			<dataarea name="rom" size="0xc000"> <!-- Actually two ROMs, 32kB and 16kB -->
+			<dataarea name="rom" size="0xc000"> <!-- likely 64kB ROM with 0xFF padding -->
 				<rom name="1on1.bin" size="0xc000" crc="7a628295" sha1="01dfc5e4e615cf20ee4f07245285f85684ee445d"/>
 			</dataarea>
 		</part>
