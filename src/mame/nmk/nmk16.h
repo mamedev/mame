@@ -194,6 +194,7 @@ protected:
 	TILE_GET_INFO_MEMBER(bjtwin_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(powerins_get_bg_tile_info);
 	DECLARE_VIDEO_START(macross);
+	DECLARE_VIDEO_START(manybloc);
 	DECLARE_VIDEO_START(bioship);
 	DECLARE_VIDEO_START(strahl);
 	DECLARE_VIDEO_START(macross2);
