@@ -205,12 +205,24 @@ template<typename S> void emu::detail::output_buffer_flat<S>::set_history(u32 hi
 
 template<typename S> void emu::detail::output_buffer_flat<S>::resample(u32 previous_rate, u32 next_rate, attotime sync_time, attotime now)
 {
-	if(!m_write_position)
-		return;
-
 	auto si = [](attotime time, u32 rate) -> s64 {
 		return time.m_seconds * rate + muldivu_64(time.m_attoseconds, rate, ATTOSECONDS_PER_SECOND);
 	};
+
+	if(!m_write_position || !previous_rate) {
+		m_sync_position = 0;
+		m_sync_sample = si(sync_time, next_rate);
+		m_write_position = si(now, next_rate) - m_sync_sample;
+		m_history = 0;
+		for(u32 channel = 0; channel != m_channels; channel++)
+			std::fill(m_buffer[channel].begin(), m_buffer[channel].begin() + m_write_position, 0);
+		return;
+	}
+
+	if(!next_rate) {
+		m_write_position = m_sync_position = 0;
+		return;
+	}
 
 	auto cv = [](u32 source_rate, u32 dest_rate, s64 time) -> std::pair<s64, double> {
 		s64 sec = time / source_rate;
