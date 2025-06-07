@@ -696,9 +696,9 @@ uint8_t huc6272_device::adpcm_update_1()
 void huc6272_device::cdda_update(offs_t offset, uint8_t data)
 {
 	if (offset)
-		m_cdda_r->set_output_gain(ALL_OUTPUTS, float(data) / 63.0);
+		m_cdda_r->set_input_gain(0, float(data) / 63.0);
 	else
-		m_cdda_l->set_output_gain(ALL_OUTPUTS, float(data) / 63.0);
+		m_cdda_l->set_input_gain(0, float(data) / 63.0);
 }
 
 void huc6272_device::interrupt_update()
