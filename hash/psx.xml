@@ -31,12 +31,16 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 
 
 	<software name="007rcng">
+		<!--
+		redump.org/disc/633
+		<rom name="007 Racing (USA).cue" size="82" crc="5c58d484" sha1="f74c52098f149c91f066b17e9000d5a059ec4405"/>
+		<rom name="007 Racing (USA).bin" size="565011552" crc="5a39ae64" sha1="91c0c4b5c888f074a777f891be5432064678070e"/>
+		-->
 		<description>007 Racing (USA)</description>
 		<year>2000</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="developer" value="Eutechnyx"/>
 		<info name="language" value="English"/>
-		<info name="redump.org" value="633"/>
 		<info name="serial" value="SLUS-01300, SLUS-01300CE"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -47,11 +51,15 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 	</software>
 
 	<software name="007tnd">
+		<!--
+		redump.org/disc/830
+		<rom name="007 - Tomorrow Never Dies (USA).cue" size="97" crc="dc22c9e3" sha1="55b145bd5563c4b62cf3fadeda704340824c7b55"/>
+		<rom name="007 - Tomorrow Never Dies (USA).bin" size="573594000" crc="02f976df" sha1="5c635e990dc77c481eb177dc86deb7a198f17cf8"/>
+		-->
 		<description>007 - Tomorrow Never Dies (USA)</description>
 		<year>1999</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="language" value="English" />
-		<info name="redump.org" value="830"/>
 		<info name="serial" value="SLUS-00975, SLUS-00975CE, SLUS-00975GH"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -62,11 +70,15 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 	</software>
 
 	<software name="007twine">
+		<!--
+		redump.org/disc/2387
+		<rom name="007 - The World Is Not Enough (USA).cue" size="101" crc="adc163bd" sha1="1e4a0731b245ab3419a5e0f23cb1001e1f1e7613"/>
+		<rom name="007 - The World Is Not Enough (USA).bin" size="726429312" crc="6e91b75f" sha1="0d6f886485318959b9a86209a91228840b61fbad"/>
+		-->
 		<description>007 - The World Is Not Enough (USA)</description>
 		<year>2000</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="language" value="English" />
-		<info name="redump.org" value="2387"/>
 		<info name="serial" value="SLUS-01272, SLUS-01272GH"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -77,11 +89,15 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 	</software>
 
 	<software name="007twine_p" cloneof="007twine">
+		<!--
+		redump.org/disc/59807
+		<rom name="007 - The World Is Not Enough (USA) (Beta) (2000-08-26).cue" size="121" crc="503a4cf6" sha1="79cf7463d72934e8887c3d9977bb384858588dae"/>
+		<rom name="007 - The World Is Not Enough (USA) (Beta) (2000-08-26).bin" size="750278592" crc="a709d8bd" sha1="edb14c9b988cf2a6052c9f770a0190077bd7de8e"/>
+		-->
 		<description>007 - The World Is Not Enough (USA, prototype 20000826)</description>
 		<year>2000</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="language" value="English" />
-		<info name="redump.org" value="59807"/>
 		<info name="serial" value="SLUS-00978"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -245,12 +261,23 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 	</software>
 
 	<software name="2xtreme_us" cloneof="2xtreme">
+		<!--
+		http://redump.org/disc/2094/
+		<rom name="2Xtreme (USA).cue" size="700" crc="7e95393e" sha1="ed526fe2905f428530cc001038dd72c413bbe291"/>
+		<rom name="2Xtreme (USA) (Track 1).bin" size="45715824" crc="aad124a6" sha1="3f25e5d1366e60e70a416109711e109d48c9f19b"/>
+		<rom name="2Xtreme (USA) (Track 2).bin" size="56064624" crc="6f8d371b" sha1="9b986d87e8314c72757f629f6d7201bdeb0190b0"/>
+		<rom name="2Xtreme (USA) (Track 3).bin" size="80120880" crc="162546d0" sha1="c37b8229fbabf82d1fd998b3e38f84f33bf62462"/>
+		<rom name="2Xtreme (USA) (Track 4).bin" size="76465872" crc="50225eae" sha1="ea6ed6e3d9b32cc78b2ed207165015bf5f37046a"/>
+		<rom name="2Xtreme (USA) (Track 5).bin" size="64992816" crc="11e2eb17" sha1="b79dd757b07e6540ac886b0b2f58b042ae9f8628"/>
+		<rom name="2Xtreme (USA) (Track 6).bin" size="60799200" crc="326d328e" sha1="133d61d62c239ca9efe3ff6b8d36944ef6955322"/>
+		<rom name="2Xtreme (USA) (Track 7).bin" size="76423536" crc="7b086381" sha1="793799dfa58aee0d825cfb43cd7dae59d1337c08"/>
+		<rom name="2Xtreme (USA) (Track 8).bin" size="19733280" crc="04dfaa48" sha1="9ea7615182e887372ec8e5b1c1df83696ec07d4d"/>
+		-->
 		<description>2Xtreme (USA)</description>
 		<year>1996</year>
 		<publisher>Sony Computer Entertainment America</publisher>
 		<info name="developer" value="Sony" />
 		<info name="language" value="English" />
-		<info name="redump.org" value="2094"/>
 		<info name="serial" value="SCUS-94508"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -261,12 +288,16 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 	</software>
 
 	<software name="fifa2k2w_us" cloneof="fifa2k2w">
+		<!--
+		http://redump.org/disc/7292/
+		<rom name="2002 FIFA World Cup (USA) (En,Es).cue" size="99" crc="ce349b32" sha1="57df3eb3cfcd44be5f422c13ad181b53460dfe90"/>
+		<rom name="2002 FIFA World Cup (USA) (En,Es).bin" size="514612896" crc="472333bc" sha1="720c8613669d684be002e1f454acc532a98eb241"/>
+		-->
 		<description>2002 FIFA World Cup (USA)</description>
 		<year>2002</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="developer" value="Electronic Arts"/>
 		<info name="language" value="English/Spanish" />
-		<info name="redump.org" value="7292"/>
 		<info name="serial" value="SLUS-01449"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -294,12 +325,39 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 	</software>
 
 	<software name="3dlemmin_us" cloneof="3dlemmin">
+		<!--
+		http://redump.org/disc/14951/
+		<rom name="3D Lemmings (USA).cue" size="2670" crc="b394a6d2" sha1="b2b3cbba19838d9883c5042f5119a2e531e93484"/>
+		<rom name="3D Lemmings (USA) (Track 01).bin" size="192184272" crc="b7dbfea7" sha1="f713cdcb5d0e3d875031dbdc438dbbab0cdd3340"/>
+		<rom name="3D Lemmings (USA) (Track 02).bin" size="17741136" crc="7bacf147" sha1="a96d42f61d3952bc7956433c453ffa34fdcc97b7"/>
+		<rom name="3D Lemmings (USA) (Track 03).bin" size="15593760" crc="a998222f" sha1="387e15b378a75acaa16a126273e95c112e7d58c5"/>
+		<rom name="3D Lemmings (USA) (Track 04).bin" size="16626288" crc="a6d9c21b" sha1="d8c681ea04e29f43f7a24a67d07ab12d384ffb60"/>
+		<rom name="3D Lemmings (USA) (Track 05).bin" size="15798384" crc="9b0692b7" sha1="dcf195fd7b364a2a2c4e2023ae2159c938f970ee"/>
+		<rom name="3D Lemmings (USA) (Track 06).bin" size="15311520" crc="5376fed3" sha1="288d1aaa5e2af517178feda3adcf4179e0b7d978"/>
+		<rom name="3D Lemmings (USA) (Track 07).bin" size="14669424" crc="817c1e4b" sha1="2d81f0fa59c47fdae024249cbe7e1764d6a00e36"/>
+		<rom name="3D Lemmings (USA) (Track 08).bin" size="14982240" crc="29a46a79" sha1="a75aa456140bf1572b9344822a81368fd97bf879"/>
+		<rom name="3D Lemmings (USA) (Track 09).bin" size="15327984" crc="ed9b1ae8" sha1="0e1087c49fb61d2d1bca61667e81dbeb871cfbf4"/>
+		<rom name="3D Lemmings (USA) (Track 10).bin" size="15960672" crc="ee48037e" sha1="235b6e2090135866cb30dc3bbf209089be3556cb"/>
+		<rom name="3D Lemmings (USA) (Track 11).bin" size="18794832" crc="a31147db" sha1="8281f5a9429e73288c3e8dfbc2b35348bd5ed6bc"/>
+		<rom name="3D Lemmings (USA) (Track 12).bin" size="18366768" crc="adb10891" sha1="fe1571f0a692baa43edf2f4bb39d214951922685"/>
+		<rom name="3D Lemmings (USA) (Track 13).bin" size="14596512" crc="d920f2ed" sha1="80862a1597da82c7590e2d1f9652c576202f0369"/>
+		<rom name="3D Lemmings (USA) (Track 14).bin" size="14787024" crc="d33bef1b" sha1="fd3ee97ff11b21fe020255b2640f393fc1ee8b43"/>
+		<rom name="3D Lemmings (USA) (Track 15).bin" size="17148432" crc="8ce16106" sha1="ce0d0d81334156cdd6cf7fa7b7469e1c7e04aea2"/>
+		<rom name="3D Lemmings (USA) (Track 16).bin" size="15840720" crc="9dbb8470" sha1="93b23c4a4199d81a9098bcb975949ab2c23b8496"/>
+		<rom name="3D Lemmings (USA) (Track 17).bin" size="15492624" crc="a0b90757" sha1="bddbaea5766784cb8e7b23d6ee005a525ad70e5d"/>
+		<rom name="3D Lemmings (USA) (Track 18).bin" size="15036336" crc="d2f88b4f" sha1="53f18dd471d5ad59f66aba4c039edfcb2d971f25"/>
+		<rom name="3D Lemmings (USA) (Track 19).bin" size="15647856" crc="ef63cef4" sha1="65b78e3fd2ff621afa78b9b23d0da86a5ad18796"/>
+		<rom name="3D Lemmings (USA) (Track 20).bin" size="15069264" crc="9db75cf2" sha1="f9b62c22012413bc3ff9c4ed91e103a48c820948"/>
+		<rom name="3D Lemmings (USA) (Track 21).bin" size="15375024" crc="ae7ef886" sha1="5ebc5d291c8fdba624e9f973cf9e2abd75114ef9"/>
+		<rom name="3D Lemmings (USA) (Track 22).bin" size="12792528" crc="266c2120" sha1="c4b153fcacca362886c3f503f539cc8204f03ee8"/>
+		<rom name="3D Lemmings (USA) (Track 23).bin" size="11089680" crc="3402228c" sha1="9057a5bd1a656e2fa8afc8b2d7ef216b218ca74a"/>
+		<rom name="3D Lemmings (USA) (Track 24).bin" size="11089680" crc="3402228c" sha1="9057a5bd1a656e2fa8afc8b2d7ef216b218ca74a"/>
+		-->
 		<description>3D Lemmings (USA)</description>
 		<year>1995</year>
 		<publisher>Psygnosis</publisher>
 		<info name="developer" value="Clockwork Games" />
 		<info name="language" value="English" />
-		<info name="redump.org" value="14951"/>
 		<info name="serial" value="SCUS-94601"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -339,13 +397,18 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 	</software>
 
 	<software name="3xtreme" supported="no">
+		<!--
+		http://redump.org/disc/2715/
+		<rom name="3Xtreme (USA).cue" size="196" crc="a689937f" sha1="6d16c06c59a0eab13c1364c03dce6db699c5793a"/>
+		<rom name="3Xtreme (USA) (Track 1).bin" size="340649568" crc="c16782c6" sha1="4e6ced10157eda5e1881e95d1bd8363ae6b560f8"/>
+		<rom name="3Xtreme (USA) (Track 2).bin" size="26732832" crc="efb07e5e" sha1="60da792ac141a78f7fe875788d0e73b5bc1b943d"/>
+		-->
 		<description>3Xtreme (USA)</description>
 		<year>1999</year>
 		<publisher>989 Sports</publisher>
 		<notes>Work on PAL but it doesn't work on NTSC system</notes>
 		<info name="developer" value="989 Sports" />
 		<info name="language" value="English" />
-		<info name="redump.org" value="2715"/>
 		<info name="serial" value="SCUS-94231"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -356,12 +419,17 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 	</software>
 
 	<software name="3xtreme_d" cloneof="3xtreme">
+		<!--
+		http://redump.org/disc/63416/
+		<rom name="3Xtreme (USA) (Demo).cue" size="210" crc="afd8623e" sha1="bb568da1f73df38143f07e8487fb8b18414f2b23"/>
+		<rom name="3Xtreme (USA) (Demo) (Track 1).bin" size="88625712" crc="a20fb256" sha1="a6f3eb421cab68ad005fab381c634827226f1388"/>
+		<rom name="3Xtreme (USA) (Demo) (Track 2).bin" size="12999504" crc="fe85bf0c" sha1="7744ffae36986f09cc87a649a6a8d44e3756284f"/>
+		-->
 		<description>3Xtreme (USA, demo)</description>
 		<year>1999</year>
 		<publisher>989 Sports</publisher>
 		<info name="developer" value="989 Sports" />
 		<info name="language" value="English" />
-		<info name="redump.org" value="63416"/>
 		<info name="serial" value="SCUS-94365"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -372,12 +440,16 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 	</software>
 
 	<software name="40winks_us" cloneof="40winks">
+		<!--
+		http://redump.org/disc/583/
+		<rom name="40 Winks (USA).cue" size="80" crc="1d060c48" sha1="327eb468983d8aeebc67998a7e8a017d5c41bdd3"/>
+		<rom name="40 Winks (USA).bin" size="540854160" crc="5b53f0a5" sha1="68b0e80f3f59cb673fc5ae7c4ebb8eba4a7b6a50"/>
+		-->
 		<description>40 Winks (USA)</description>
 		<year>1999</year>
 		<publisher>GT Interactive</publisher>
 		<info name="developer" value="Eurocom Entertainment" />
 		<info name="language" value="English" />
-		<info name="redump.org" value="583"/>
 		<info name="serial" value="SLUS-00874"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -629,12 +701,78 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 	</software>
 
 	<software name="aircombt_us" cloneof="aircombt">
+		<!--
+		http://redump.org/disc/2997
+		<rom name="Air Combat (USA).cue" size="6975" crc="6cb0aaa1" md5="ca0eeaac6ffd9061df6fb281631663d3" sha1="6bb0056c230defaa52bc56e86c0f3c00e114b7d6"/>
+		<rom name="Air Combat (USA) (Track 01).bin" size="106249248" crc="719f2efa" md5="5a6e6a68e85925596983799278a5fec6" sha1="fba261a0ca69bed3018d00e89a74aa2921cffd51"/>
+		<rom name="Air Combat (USA) (Track 02).bin" size="36738240" crc="e6604b54" md5="8de4f55b6c6a00d0afc3bdecacd8e243" sha1="f2868a668beeb5b709afac84d14555fd50372041"/>
+		<rom name="Air Combat (USA) (Track 03).bin" size="28652064" crc="b18c652d" md5="3244e6e93e44f5a879a26cb420fb68c1" sha1="62fc6f4574f6cd05412460bffa8a6c71d68f90eb"/>
+		<rom name="Air Combat (USA) (Track 04).bin" size="27024480" crc="fd6529d3" md5="7299d6de5f1e8a5a1a6b8ff6202a50b3" sha1="632313b0e7de9d4f87ffe853f65943b8fe15ebfc"/>
+		<rom name="Air Combat (USA) (Track 05).bin" size="28993104" crc="f71fe9c4" md5="82c049afed8be6bdbc03a8db7ed116e0" sha1="1c924e33b0183ed0e4f7213dfba903a6ff7b7cfe"/>
+		<rom name="Air Combat (USA) (Track 06).bin" size="13373472" crc="fd8c35df" md5="68dca330de2f16b7c0d3d00390634454" sha1="70d8b090774191b5e22cc265fdfd4b9bb476a155"/>
+		<rom name="Air Combat (USA) (Track 07).bin" size="21010416" crc="7937b637" md5="596ebd01751fff991b3370469de67bd3" sha1="198e26e3c16495ed00ff27004ea75c0183fff163"/>
+		<rom name="Air Combat (USA) (Track 08).bin" size="29425872" crc="e84043cf" md5="045fd745da52a4ba0967b68725a33536" sha1="72daa305a67a920909dcb18af4e6c9e6abf10204"/>
+		<rom name="Air Combat (USA) (Track 09).bin" size="31634400" crc="70e129c6" md5="fdeb5dab0336e391a237fa7be42c53af" sha1="909b416fcbb83a7c590cc97ad0309464de167b30"/>
+		<rom name="Air Combat (USA) (Track 10).bin" size="26391792" crc="73ac9def" md5="413f8d58119c4cb270a5c05ce034d924" sha1="21d8cf0dfceecc17ecb958b6bf9799895f87cef2"/>
+		<rom name="Air Combat (USA) (Track 11).bin" size="21946512" crc="de0fa43e" md5="f8c06321f407d8201410546048a1ead5" sha1="0fc0b8580200d4e72b37f3f2778163f108844fab"/>
+		<rom name="Air Combat (USA) (Track 12).bin" size="15066912" crc="b067eb09" md5="a07aab1aae50baeca1959f3e57ddec80" sha1="df716bba8ef894eb57792879229b2019622aa59b"/>
+		<rom name="Air Combat (USA) (Track 13).bin" size="15172752" crc="59efad88" md5="e139dd24fa12a7b75325d3a218d84098" sha1="7b79eb67e3205623653ebdfb30f5aae411f91de3"/>
+		<rom name="Air Combat (USA) (Track 14).bin" size="2253216" crc="6325eb0a" md5="3d425e1782087faf1ef13d8345948ce8" sha1="4c297ef440556ea34bfccd9bd5af31bdf4484d26"/>
+		<rom name="Air Combat (USA) (Track 15).bin" size="12103392" crc="9e063251" md5="52c05bb4fd205c6872d221c92060ee77" sha1="4de8924fbd50846dfac165daa1961b40dd8517c6"/>
+		<rom name="Air Combat (USA) (Track 16).bin" size="2471952" crc="4058386a" md5="ff2d34a17607f3d5b2a8320061e853ff" sha1="a6268a8d77d1238d3ebbb859031a826ed53e72a3"/>
+		<rom name="Air Combat (USA) (Track 17).bin" size="21417312" crc="4e808c90" md5="e71bcb8c1a078e96fcda98d105e798ad" sha1="6b7380ab04dc0b3e6a465e94abf4ad2f626b4bf8"/>
+		<rom name="Air Combat (USA) (Track 18).bin" size="26709312" crc="101c6976" md5="5ece0636ba2e4ad60977f09dca5b1564" sha1="e8828fa899d1946bd1ea69ccd65547ddd373ddf8"/>
+		<rom name="Air Combat (USA) (Track 19).bin" size="9175152" crc="dbd916ca" md5="3e8d2b94e0cbad99568327d3f3eb1b23" sha1="fed3c81ab2046787b4020531d92f46fac7f0ae1c"/>
+		<rom name="Air Combat (USA) (Track 20).bin" size="16061808" crc="1bf98118" md5="464ab71da52ef46d528ec0ba6e04e4ac" sha1="078e39531684272903d3eb4aafdd31b989675fd2"/>
+		<rom name="Air Combat (USA) (Track 21).bin" size="2775360" crc="6c254834" md5="a26d8cbb052f355558e232e79e4bf260" sha1="4baa057175777ac899032192ccbc39295b20f40a"/>
+		<rom name="Air Combat (USA) (Track 22).bin" size="1147776" crc="8aae87d1" md5="4c2aace802c88df9eca3ce9ee701e6d8" sha1="cf7dd4c7cd35476ded88f604e85ee9236ba2e3da"/>
+		<rom name="Air Combat (USA) (Track 23).bin" size="2105040" crc="eb78944b" md5="bc87cbe8e822dbee50d26361fe23bcaa" sha1="c9576bdc8bdf73f256808a883e6b7daaa6c66556"/>
+		<rom name="Air Combat (USA) (Track 24).bin" size="1147776" crc="11133ce5" md5="f575da9ffd5c392c6e078b9e1dfa27ad" sha1="11fa285e225a93063890481d81fb3d2e96335683"/>
+		<rom name="Air Combat (USA) (Track 25).bin" size="1846320" crc="7f3709ac" md5="20604cae6e4330f3af0a9f96e3512181" sha1="1d04eefcd5c0178e38c72f587f51cf8aaf611d05"/>
+		<rom name="Air Combat (USA) (Track 26).bin" size="1192464" crc="9bcb2928" md5="4a3dcce198a5002f9e0f52d82e04d725" sha1="ee5d4369f95d106faa045ae6b8898e26265bb5b8"/>
+		<rom name="Air Combat (USA) (Track 27).bin" size="1150128" crc="b3735a67" md5="e617e1b52ffd2e902880407af1e8a305" sha1="1966f4a4aefd7e2462476acbd4ad86aef53146ea"/>
+		<rom name="Air Combat (USA) (Track 28).bin" size="2243808" crc="a2f89695" md5="ebf55b9969eca86f5b18166d4f134532" sha1="2eb425b4265de08e6ed5971628dc099acc734291"/>
+		<rom name="Air Combat (USA) (Track 29).bin" size="1514688" crc="aeda8a6b" md5="af52fd6bec907312b906d21dc572a401" sha1="9f48166062a4e29f548a1231e8cb50e1d251d1c2"/>
+		<rom name="Air Combat (USA) (Track 30).bin" size="2907072" crc="d7e9dbbc" md5="3e5347b67f7de5808edd03b9ad7f0664" sha1="6a55683bec61d0ea4abdd1ca443b3a5b6d67f9e7"/>
+		<rom name="Air Combat (USA) (Track 31).bin" size="2145024" crc="07116b29" md5="9c4cc30b7db4d6263aa7a62fa7b0857a" sha1="677391b7f58e9bf22caa38726cf0ce7971bc296a"/>
+		<rom name="Air Combat (USA) (Track 32).bin" size="1147776" crc="4567d162" md5="32f183699fa023280cbb63fca908e9ac" sha1="63cfce6a894f361d11484f7d0d3f717e53c0beae"/>
+		<rom name="Air Combat (USA) (Track 33).bin" size="1161888" crc="2dc65e7c" md5="3539c113697d8962bc283686f19b064b" sha1="b1a50baf0bcbf510fb4f858ecfaa41c110294aa7"/>
+		<rom name="Air Combat (USA) (Track 34).bin" size="2036832" crc="e73d96e3" md5="42e8510e1285ae9238ad58d4f26d660e" sha1="1ce2f0ed5c83e5feb0ce03c6219c59cbbb7c8427"/>
+		<rom name="Air Combat (USA) (Track 35).bin" size="1190112" crc="e7c897cc" md5="cc2404caa3222f551b02671036cea05b" sha1="2316f0988e96166980504896f36184f3afcb47fa"/>
+		<rom name="Air Combat (USA) (Track 36).bin" size="1698144" crc="64c1b3c7" md5="18a4671e840e9638bdd1d447d07ff25e" sha1="c6813c2db55175d28462298b0a2cb21afa19a1b8"/>
+		<rom name="Air Combat (USA) (Track 37).bin" size="4370016" crc="6c5117e0" md5="1887ae272c1450f35dc57aeb33e03831" sha1="6a2dea25522ef46de2b65d8dc1ba45491149f233"/>
+		<rom name="Air Combat (USA) (Track 38).bin" size="1147776" crc="5f560df7" md5="f3e4fc59fd886f5380023f445cde2453" sha1="1e63a3c893c10557dfba70d5bccacd34c7cf4b95"/>
+		<rom name="Air Combat (USA) (Track 39).bin" size="1333584" crc="5953a590" md5="c608afe251543fb6461bd8a29acbbc33" sha1="2d2afb9a8ffb6bbb62864b0cc6e2c9b7acb7b0cd"/>
+		<rom name="Air Combat (USA) (Track 40).bin" size="1851024" crc="ddced3a7" md5="566029534c7989c3cb8d1104cfdae78d" sha1="250a1a449dafd96ff915e2797ca039874b7dc1d5"/>
+		<rom name="Air Combat (USA) (Track 41).bin" size="1147776" crc="e9473517" md5="4de41de86194d53a12196eb56da2f01f" sha1="795d09fb292b7c598988eb7fb7182d08d68ac8d8"/>
+		<rom name="Air Combat (USA) (Track 42).bin" size="1147776" crc="d3dba64b" md5="d0f762913872a992f8a7baafde804a99" sha1="7a4cc713157994a3b90b853d0e6c33cd0c24cae1"/>
+		<rom name="Air Combat (USA) (Track 43).bin" size="4235952" crc="4c1f8962" md5="de754075b17b9b94efc25634f57df53a" sha1="2b1a3c8f76e68d3d423b81b1ac26797a442e20a0"/>
+		<rom name="Air Combat (USA) (Track 44).bin" size="2330832" crc="2ac449a1" md5="e18472edbcc74217df332a9a38d2f207" sha1="d107d3290e203b01a72cea241d39fc4d877f08b1"/>
+		<rom name="Air Combat (USA) (Track 45).bin" size="1147776" crc="1a8dd5bd" md5="888ec9aaa6a99e3bf386796ed4550a8d" sha1="822a999f89d6d8bd001c0cb7f25ef368ee7059a9"/>
+		<rom name="Air Combat (USA) (Track 46).bin" size="1183056" crc="14949216" md5="e1653296ff2f104cef7a5e5e8a8c29cc" sha1="f373b8ef003f56b69e63b382158b9593757f7436"/>
+		<rom name="Air Combat (USA) (Track 47).bin" size="3229296" crc="5e4a84d8" md5="6402f93e8e40012f8348ed611158007b" sha1="7d8e75995fd4dcea4ae728345636cc37ae076ecf"/>
+		<rom name="Air Combat (USA) (Track 48).bin" size="1147776" crc="f803e31c" md5="385814b2a9830060671be1be01ff6495" sha1="bc64abb228025b6d15e7b458ac0aa13e800a71bc"/>
+		<rom name="Air Combat (USA) (Track 49).bin" size="2613072" crc="49e4e3f3" md5="396757d89e95d6e269c96dfdea00058e" sha1="94756a349674ca84c1166ab099cf728a64320762"/>
+		<rom name="Air Combat (USA) (Track 50).bin" size="1147776" crc="95f930a9" md5="8261a86e1ce9cc7fb20c59ed7d8327a7" sha1="3b760c45abad3b385d6adf21da0fd946f494d502"/>
+		<rom name="Air Combat (USA) (Track 51).bin" size="1905120" crc="c773efa2" md5="828057e2f9f973713053e09c1a18718b" sha1="d6785861aa3f8cbb923c572bdf29c6637ca5398e"/>
+		<rom name="Air Combat (USA) (Track 52).bin" size="1350048" crc="db8c1eef" md5="c508564ff0873865f624d370a72ace90" sha1="aa78a1bea5c8d94b9be3ad440b37c0d793c0e860"/>
+		<rom name="Air Combat (USA) (Track 53).bin" size="1147776" crc="7f9cec6f" md5="b9cc695f7c458bcba090c3b9defe1034" sha1="251603cb0b437cdc2bee48f6872b1083cdd48238"/>
+		<rom name="Air Combat (USA) (Track 54).bin" size="1147776" crc="83e91720" md5="7d6d8853d198a4682b53b0605611ce9c" sha1="0a41ee59aaf610dce3108a4822372781acf3f677"/>
+		<rom name="Air Combat (USA) (Track 55).bin" size="1150128" crc="c0f1a962" md5="e1e9acb9a592a9a3daa2bb7274e842e8" sha1="d4923027288040fde405470d9f9a1b3eaf767519"/>
+		<rom name="Air Combat (USA) (Track 56).bin" size="1150128" crc="0301987b" md5="92e34be99cff756958928b5a1ab649c9" sha1="fb871082c45b47315948f35e5e72a13b2feb05c6"/>
+		<rom name="Air Combat (USA) (Track 57).bin" size="1178352" crc="dbf35e36" md5="980dcfef6a44b4d8e02d581e54ca2510" sha1="29ec4551096c038436f92962983d453f5aba3d75"/>
+		<rom name="Air Combat (USA) (Track 58).bin" size="2196768" crc="b64928fa" md5="63a794ba9d01a8f13569c1b3dcf55c10" sha1="10e7395f83b758fdfe49cc99e815ee637d2241c8"/>
+		<rom name="Air Combat (USA) (Track 59).bin" size="1190112" crc="d45922f7" md5="a2807622d03c58636b43d1e1c0cd017b" sha1="6acf92b0c350db98beafac389d51602deb4d539b"/>
+		<rom name="Air Combat (USA) (Track 60).bin" size="1484112" crc="5e029cf7" md5="274b15533f85d58e11f39533ee4788c7" sha1="69ce8ef6ae3b043d3417b0bd0fdf3ca3c8bc4a58"/>
+		<rom name="Air Combat (USA) (Track 61).bin" size="3532704" crc="3389aac7" md5="d8cb581c3d0091b714d6fa1319226c3a" sha1="7cecef95f3affa36dcb05166e5a02de54ecdf336"/>
+		<rom name="Air Combat (USA) (Track 62).bin" size="2100336" crc="b15ec2c2" md5="9c515b65a2123ad80a1dc070b41fd297" sha1="ba80e7e73aa3f6c43084ce4f9e7c316018692cd9"/>
+		<rom name="Air Combat (USA) (Track 63).bin" size="42796992" crc="df07e201" md5="e39f4fc9326ac17019c63547665beb5b" sha1="56cbbf607b9f3c4fe620bb6f6a84349a349a755a"/>
+		-->
 		<description>Air Combat (USA)</description>
 		<year>1995</year>
 		<publisher>Namco Hometek</publisher>
 		<info name="developer" value="Namco"/>
 		<info name="language" value="English"/>
-		<info name="redump.org" value="2997"/>
 		<info name="release" value="19950913"/>
 		<info name="serial" value="SLUS-00001"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -23566,12 +23704,16 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 	</software>
 
 	<software name="smurfrac_us" cloneof="smurfrac">
+		<!--
+		http://redump.org/disc/7497
+		<rom name="Smurf Racer! (USA) (En,Fr,Es).cue" size="95" crc="cb1eef81" sha1="71192eb409ecf87c41c64795a8943ddd2d00052d"/>
+		<rom name="Smurf Racer! (USA) (En,Fr,Es).bin" size="250480944" crc="42fcf35f" sha1="37a12b2791b2b433fa867f65197c056c5bfb48e1"/>
+		-->
 		<description>Smurf Racer! (USA)</description>
 		<year>2001</year>
 		<publisher> Infogrames</publisher>
 		<info name="developer" value="Artificial Mind + Movement"/>
 		<info name="language" value="English/French/Spanish" />
-		<info name="redump.org" value="7497"/>
 		<info name="serial" value="SLUS-01359"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -31314,12 +31456,16 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 <!-- WE SPLIT THEM HERE BECAUSE THEY USE A SEPARATE CODE SYSTEM -->
 
 	<software name="16tales1">
+		<!--
+		http://redump.org/disc/44996/
+		<rom name="16 Tales 1 (USA).cue" size="82" crc="79224c44" sha1="d887c3ed3f743b8dfe0579db1e4884ab00736f96"/>
+		<rom name="16 Tales 1 (USA).bin" size="622045200" crc="eaba661f" sha1="d57b2141d93c179a638c92cd9dd501fd3ec83c44"/>
+		-->
 		<description>16 Tales 1 (USA)</description>
 		<year>1996</year>
 		<publisher>The Lightspan Partnership</publisher>
 		<info name="language" value="English" />
 		<info name="developer" value="The Lightspan Partnership" />
-		<info name="redump.org" value="44996"/>
 		<info name="serial" value="LSP-99012101"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -37121,13 +37267,17 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 -->
 
 	<software name="007tnd_jp" cloneof="007tnd">
+		<!--
+		redump.org/disc/20884
+		<rom name="007 - Tomorrow Never Dies (Japan).cue" size="99" crc="424cea74" sha1="a87f7a645cb57ae467656682773ea1e7a926adec"/>
+		<rom name="007 - Tomorrow Never Dies (Japan).bin" size="564764592" crc="da5649d7" sha1="b189c39cde5e35cd1d4f20c912de4aa0e2fc5897"/>
+		-->
 		<description>007 - Tomorrow Never Dies (Japan)</description>
 		<year>2000</year>
 		<publisher>Electronic Arts Square</publisher>
 		<info name="alt_title" value="００７　～トゥモロー・ネバー・ダイ～"/>
 		<info name="language" value="Japanese" />
 		<info name="release" value="20000210" />
-		<info name="redump.org" value="20884"/>
 		<info name="serial" value="SLPS-02604" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
@@ -37138,12 +37288,39 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<software name="3dlemmin_jp" cloneof="3dlemmin">
+		<!--
+		http://redump.org/disc/10867/
+		<rom name="3D Lemmings (Japan).cue" size="2718" crc="e2404409" sha1="45987f8afb3ea4396b8d8b6dc45cfb4178808d48"/>
+		<rom name="3D Lemmings (Japan) (Track 01).bin" size="192160752" crc="c67ef7af" sha1="f7359b9946dd97e974c37b1d18ea109f87928467"/>
+		<rom name="3D Lemmings (Japan) (Track 02).bin" size="17741136" crc="7bacf147" sha1="a96d42f61d3952bc7956433c453ffa34fdcc97b7"/>
+		<rom name="3D Lemmings (Japan) (Track 03).bin" size="15593760" crc="a998222f" sha1="387e15b378a75acaa16a126273e95c112e7d58c5"/>
+		<rom name="3D Lemmings (Japan) (Track 04).bin" size="16626288" crc="a6d9c21b" sha1="d8c681ea04e29f43f7a24a67d07ab12d384ffb60"/>
+		<rom name="3D Lemmings (Japan) (Track 05).bin" size="15798384" crc="9b0692b7" sha1="dcf195fd7b364a2a2c4e2023ae2159c938f970ee"/>
+		<rom name="3D Lemmings (Japan) (Track 06).bin" size="15311520" crc="5376fed3" sha1="288d1aaa5e2af517178feda3adcf4179e0b7d978"/>
+		<rom name="3D Lemmings (Japan) (Track 07).bin" size="14669424" crc="817c1e4b" sha1="2d81f0fa59c47fdae024249cbe7e1764d6a00e36"/>
+		<rom name="3D Lemmings (Japan) (Track 08).bin" size="14982240" crc="29a46a79" sha1="a75aa456140bf1572b9344822a81368fd97bf879"/>
+		<rom name="3D Lemmings (Japan) (Track 09).bin" size="15327984" crc="ed9b1ae8" sha1="0e1087c49fb61d2d1bca61667e81dbeb871cfbf4"/>
+		<rom name="3D Lemmings (Japan) (Track 10).bin" size="15960672" crc="ee48037e" sha1="235b6e2090135866cb30dc3bbf209089be3556cb"/>
+		<rom name="3D Lemmings (Japan) (Track 11).bin" size="18794832" crc="a31147db" sha1="8281f5a9429e73288c3e8dfbc2b35348bd5ed6bc"/>
+		<rom name="3D Lemmings (Japan) (Track 12).bin" size="18366768" crc="adb10891" sha1="fe1571f0a692baa43edf2f4bb39d214951922685"/>
+		<rom name="3D Lemmings (Japan) (Track 13).bin" size="14596512" crc="d920f2ed" sha1="80862a1597da82c7590e2d1f9652c576202f0369"/>
+		<rom name="3D Lemmings (Japan) (Track 14).bin" size="14787024" crc="d33bef1b" sha1="fd3ee97ff11b21fe020255b2640f393fc1ee8b43"/>
+		<rom name="3D Lemmings (Japan) (Track 15).bin" size="17148432" crc="8ce16106" sha1="ce0d0d81334156cdd6cf7fa7b7469e1c7e04aea2"/>
+		<rom name="3D Lemmings (Japan) (Track 16).bin" size="15840720" crc="9dbb8470" sha1="93b23c4a4199d81a9098bcb975949ab2c23b8496"/>
+		<rom name="3D Lemmings (Japan) (Track 17).bin" size="15492624" crc="a0b90757" sha1="bddbaea5766784cb8e7b23d6ee005a525ad70e5d"/>
+		<rom name="3D Lemmings (Japan) (Track 18).bin" size="15036336" crc="d2f88b4f" sha1="53f18dd471d5ad59f66aba4c039edfcb2d971f25"/>
+		<rom name="3D Lemmings (Japan) (Track 19).bin" size="15647856" crc="ef63cef4" sha1="65b78e3fd2ff621afa78b9b23d0da86a5ad18796"/>
+		<rom name="3D Lemmings (Japan) (Track 20).bin" size="15069264" crc="9db75cf2" sha1="f9b62c22012413bc3ff9c4ed91e103a48c820948"/>
+		<rom name="3D Lemmings (Japan) (Track 21).bin" size="15375024" crc="ae7ef886" sha1="5ebc5d291c8fdba624e9f973cf9e2abd75114ef9"/>
+		<rom name="3D Lemmings (Japan) (Track 22).bin" size="12792528" crc="266c2120" sha1="c4b153fcacca362886c3f503f539cc8204f03ee8"/>
+		<rom name="3D Lemmings (Japan) (Track 23).bin" size="11089680" crc="3402228c" sha1="9057a5bd1a656e2fa8afc8b2d7ef216b218ca74a"/>
+		<rom name="3D Lemmings (Japan) (Track 24).bin" size="33908784" crc="857edda8" sha1="28a06c34d53442f736fed283c086340d7c56321e"/>
+		-->
 		<description>3D Lemmings (Japan)</description>
 		<year>1996</year>
 		<publisher>Psygnosis</publisher>
 		<info name="developer" value="Clockwork Games" />
 		<info name="language" value="English" />
-		<info name="redump.org" value="10867"/>
 		<info name="serial" value="SIPS 60002"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
@@ -37154,12 +37331,22 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<software name="aressh4" cloneof="a4evolgl">
+		<!--
+		redump.org/disc/8493
+		<rom name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De).cue" size="1053" crc="38e1543b" sha1="74b73ce187e809cbad379c07a17932a79dd078f5"/>
+		<rom name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De) (Track 1).bin" size="44107056" crc="37f6f723" sha1="4df18857c44f340a215bbabc42e12ce4396a2c98"/>
+		<rom name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De) (Track 2).bin" size="7888608" crc="7b223ddf" sha1="9ef79a55725bea41827258083fbfc4de0e825d58"/>
+		<rom name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De) (Track 3).bin" size="1921584" crc="19dbfa70" sha1="fe0b2b01e8b73c44025dede31b69f87c8838295c"/>
+		<rom name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De) (Track 4).bin" size="1900416" crc="f00fa27e" sha1="5e87626933fe6f4cf8f4d4c270daf1dc58e3c033"/>
+		<rom name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De) (Track 5).bin" size="2733024" crc="c1df5352" sha1="a2ea3e3bcd10c1eeeacbf69394c04aed3573dcda"/>
+		<rom name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De) (Track 6).bin" size="2737728" crc="c4a8d40a" sha1="d76522940b195ba6260918e0b1eff9172a085499"/>
+		<rom name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De) (Track 7).bin" size="37874256" crc="5de84afb" sha1="d510836a6eae9902405fc73a284231a72b051407"/>
+		-->
 		<description>A Ressha de Ikou 4 - Evolution Global (Japan)</description>
 		<year>1995</year>
 		<publisher>Artdink</publisher>
 		<info name="developer" value="Artdink" />
 		<info name="language" value="English/French/German/Japanese" />
-		<info name="redump.org" value="8493"/>
 		<info name="serial" value="SLPS-00125" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
@@ -37170,12 +37357,22 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<software name="aressh4pb" cloneof="a4evolgl">
+		<!--
+		redump.org/disc/8444
+		<rom name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De) (PlayStation the Best).cue" size="1214" crc="21cade5a" sha1="11130d6957e03d01660d6cde6c0a773841386271"/>
+		<rom name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De) (PlayStation the Best) (Track 1).bin" size="91422240" crc="0f783082" sha1="2bfc122a3a9f0b662ee84fa5bffc36ce124d1932"/>
+		<rom name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De) (PlayStation the Best) (Track 2).bin" size="2606016" crc="8691e800" sha1="46983681565b3f698abe8a172b3792ee67fddcfa"/>
+		<rom name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De) (PlayStation the Best) (Track 3).bin" size="1881600" crc="4d66301b" sha1="29139b6a2785bb596dac96e929202449f25feb47"/>
+		<rom name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De) (PlayStation the Best) (Track 4).bin" size="1841616" crc="1c17c78e" sha1="c539153f7d57216b3f72f5b0cddbc2dbddbd6c12"/>
+		<rom name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De) (PlayStation the Best) (Track 5).bin" size="2634240" crc="bc7030a7" sha1="330b8ed76aca9ad566e1c46f814f3dc4460346a0"/>
+		<rom name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De) (PlayStation the Best) (Track 6).bin" size="2725968" crc="ea4b3a4f" sha1="4725220b27cb4bc82bee0a75bd877a8b82918125"/>
+		<rom name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De) (PlayStation the Best) (Track 7).bin" size="37777824" crc="8dad9514" sha1="8bac1847399d12808ddcc2b39b8c8d2eafe18870"/>
+		-->
 		<description>A Ressha de Ikou 4 - Evolution Global (Japan) (PlayStation the Best)</description>
 		<year>1997</year>
 		<publisher>Artdink</publisher>
 		<info name="developer" value="Artdink" />
 		<info name="language" value="English/French/German/Japanese" />
-		<info name="redump.org" value="8444"/>
 		<info name="serial" value="SLPS-91019" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
@@ -37186,12 +37383,17 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<software name="actgolf_jp" cloneof="actgolf">
+		<!--
+		redump.org/disc/32490
+		<rom name="Actua Golf (Japan).cue" size="206" crc="f0a253e7" sha1="f3bde627da77561a7c62730d20da50724bff737c"/>
+		<rom name="Actua Golf (Japan) (Track 1).bin" size="227861760" crc="20765b8d" sha1="03009357cb1b3756fa3effebd5490a1c97563006"/>
+		<rom name="Actua Golf (Japan) (Track 2).bin" size="34350960" crc="4c9d46fe" sha1="75b6ded9f51980c306ca2f3a40dcd640c0101745"/>
+		-->
 		<description>Actua Golf (Japan)</description>
 		<year>1996</year>
 		<publisher>Naxat Soft</publisher>
 		<info name="developer" value="Gremlin Interactive"/>
 		<info name="language" value="English" />
-		<info name="redump.org" value="32490"/>
 		<info name="serial" value="SLPS-00298" />
 		<info name="speech" value="Japanese" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
@@ -37203,13 +37405,36 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<software name="cheesy_jp" cloneof="cheesy">
+		<!--
+		http://redump.org/disc/23696/
+		<rom name="Cheesy (Japan).cue" size="2462" crc="b05983db" sha1="06f9f01c529a544743932119b009361c2782eb6b"/>
+		<rom name="Cheesy (Japan) (Track 01).bin" size="123583488" crc="25c7dfd9" sha1="d6cd42f7a3b23797380e098ba2106ce63746cb17"/>
+		<rom name="Cheesy (Japan) (Track 02).bin" size="48201888" crc="12a2b3fa" sha1="de96feb091ef6194d0e71b5c2821860c0f223094"/>
+		<rom name="Cheesy (Japan) (Track 03).bin" size="23988048" crc="f599934b" sha1="b5d80811e7f9ca8d328f09223a8ce02e1a5426bf"/>
+		<rom name="Cheesy (Japan) (Track 04).bin" size="33233760" crc="29ff8e58" sha1="3ed95b4cc6665847ad3710e2610f6ca562d72a6d"/>
+		<rom name="Cheesy (Japan) (Track 05).bin" size="26521152" crc="58137ecc" sha1="d49a59d282f0a6283ce1b993775aee4d718eab9d"/>
+		<rom name="Cheesy (Japan) (Track 06).bin" size="13855632" crc="f97816d5" sha1="1b16bf8ed08d16c27d8153114827fb09a70541e1"/>
+		<rom name="Cheesy (Japan) (Track 07).bin" size="48872208" crc="fcb13505" sha1="975afd5604c32336a44755ba2e7a251ac1ed0bc7"/>
+		<rom name="Cheesy (Japan) (Track 08).bin" size="19952016" crc="d1e10ce1" sha1="ed97a5217d9083615a245c4ae3b5c6842b9d5af9"/>
+		<rom name="Cheesy (Japan) (Track 09).bin" size="21426720" crc="9c79b80b" sha1="cea109fc53ed3c01075d2399fa6f1e468f389d8c"/>
+		<rom name="Cheesy (Japan) (Track 10).bin" size="14020272" crc="5b95f932" sha1="df54df9fa2344a83e955dacf4e8f5cc231b8a97c"/>
+		<rom name="Cheesy (Japan) (Track 11).bin" size="12463248" crc="114b0719" sha1="7e68611e2c7858cfe26d29266ab3d1b41641a298"/>
+		<rom name="Cheesy (Japan) (Track 12).bin" size="44097648" crc="d16dbe0b" sha1="f0f41a3f3330de5902b21c41eea95009778eb3bd"/>
+		<rom name="Cheesy (Japan) (Track 13).bin" size="30477216" crc="5fc1335d" sha1="a54f4080f1b4a3e3b92a4f0dd90a404ee3149fa7"/>
+		<rom name="Cheesy (Japan) (Track 14).bin" size="15739584" crc="f24073ed" sha1="2d9e9b058d773b29ac09330b47bd33e50d3e6304"/>
+		<rom name="Cheesy (Japan) (Track 15).bin" size="17289552" crc="a41707e2" sha1="1be05ff317b931ac7022ee9d990dc909995cc3f6"/>
+		<rom name="Cheesy (Japan) (Track 16).bin" size="17484768" crc="ea9ef323" sha1="379b5d5a8a81a8a792329efd16abfdcd794cade7"/>
+		<rom name="Cheesy (Japan) (Track 17).bin" size="18180960" crc="f5469959" sha1="d930350e918f65b0204bbb7e513500a1c090214c"/>
+		<rom name="Cheesy (Japan) (Track 18).bin" size="16409904" crc="ba4eb43d" sha1="1b6629730b6d503054796ec9c85b8fd1ab4da8c1"/>
+		<rom name="Cheesy (Japan) (Track 19).bin" size="21349104" crc="52ec4cc9" sha1="852f8f04b74e0858a976fe555edac11a42c691d1"/>
+		<rom name="Cheesy (Japan) (Track 20).bin" size="55121472" crc="0bb5ee7d" sha1="76b1878250676aeb823bc9b476e8c195e94efe60"/>
+		-->
 		<description>Cheesy (Japan)</description>
 		<year>1997</year>
 		<publisher>Jaleco Entertainment</publisher>
 		<info name="alt_title" value="チージィー" />
 		<info name="developer" value="Ocean" />
 		<info name="language" value="Japanese" />
-		<info name="redump.org" value="23696"/>
 		<info name="serial" value="SLPS 00893"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
@@ -41505,13 +41730,17 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<software name="darkseed">
+		<!--
+		http://redump.org/disc/1640
+		<rom name="Darkseed (Japan).cue" size="82" crc="362cf7d6" sha1="588ba9424ce50e166ec7e0b468f9fec87c7cab18"/>
+		<rom name="Darkseed (Japan).bin" size="67723488" crc="1d33c82d" sha1="c82fc8ab1e92d1837b05cf3dd81ff949f91fc695"/>
+		-->
 		<description>Darkseed (Japan)</description>
 		<year>1995</year>
 		<publisher>GaGa Communications</publisher>
 		<info name="developer" value="Cyberdreams"/>
 		<info name="language" value="Japanese" />
 		<info name="release" value="19951027"/>
-		<info name="redump.org" value="1640"/>
 		<info name="serial" value="SLPS-00108"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
@@ -41522,13 +41751,17 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<software name="darksed2">
+		<!--
+		http://redump.org/disc/13946
+		<rom name="Dark Seed II (Japan).cue" size="86" crc="c588daa2" sha1="38ea9419248d65565f0fa98544b37df40ca0ea94"/>
+		<rom name="Dark Seed II (Japan).bin" size="496504848" crc="1633f553" sha1="08d2212dffa2592c380bd3671ab619ec73b8c2aa"/>
+		-->
 		<description>Darkseed II (Japan)</description>
 		<year>1997</year>
 		<publisher>B-Factory</publisher>
 		<info name="alt_title" value="ダークシードII"/>
 		<info name="developer" value="Aim at Entertainment"/>
 		<info name="language" value="Japanese" />
-		<info name="redump.org" value="13946"/>
 		<info name="release" value="19970918" />
 		<info name="serial" value="SLPS-00938" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
@@ -57381,13 +57614,27 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<software name="ttycoon_jp" cloneof="ttycoon">
+		<!--
+		http://redump.org/disc/7918
+		<rom name="Transport Tycoon 3D - SL Kara Hajimeyou!! (Japan).cue" size="1566" crc="d2603384" sha1="10fe0343fd0e20e18fd502beb32246f48d2cdf11"/>
+		<rom name="Transport Tycoon 3D - SL Kara Hajimeyou!! (Japan) (Track 01).bin" size="52242624" crc="9ce74ec3" sha1="a41ead073c5641f9ac87eb9dc87469bd775300e0"/>
+		<rom name="Transport Tycoon 3D - SL Kara Hajimeyou!! (Japan) (Track 02).bin" size="42858144" crc="3233248e" sha1="571ac211fca70fdf95d8981688664217d889144e"/>
+		<rom name="Transport Tycoon 3D - SL Kara Hajimeyou!! (Japan) (Track 03).bin" size="43008672" crc="57aed47c" sha1="849e7b29f769060594407e6a727d0e0f0c088098"/>
+		<rom name="Transport Tycoon 3D - SL Kara Hajimeyou!! (Japan) (Track 04).bin" size="40470864" crc="d1000a47" sha1="d69f8fa48646b5d5e459f3100cfb8651617dd619"/>
+		<rom name="Transport Tycoon 3D - SL Kara Hajimeyou!! (Japan) (Track 05).bin" size="43262688" crc="84cba52d" sha1="dd05eb6fcf5a453b25452cbb6645e76884922019"/>
+		<rom name="Transport Tycoon 3D - SL Kara Hajimeyou!! (Japan) (Track 06).bin" size="44382240" crc="1321fedb" sha1="4871a6f90709e029f82615c89a9b50c3b415589d"/>
+		<rom name="Transport Tycoon 3D - SL Kara Hajimeyou!! (Japan) (Track 07).bin" size="41103552" crc="554771fb" sha1="3d812fe5e9ce422b8c9b5da5934c2294870822ab"/>
+		<rom name="Transport Tycoon 3D - SL Kara Hajimeyou!! (Japan) (Track 08).bin" size="40414416" crc="5482d255" sha1="4a03aa86c8b528d68996fdb32ddc0383450a7ba5"/>
+		<rom name="Transport Tycoon 3D - SL Kara Hajimeyou!! (Japan) (Track 09).bin" size="42178416" crc="1b533fa3" sha1="af1f32695ef3aa4e4469243c433309de6793db73"/>
+		<rom name="Transport Tycoon 3D - SL Kara Hajimeyou!! (Japan) (Track 10).bin" size="46353216" crc="a7be7787" sha1="65fb31bcc92b4fe84815ebe1735cf2cf93345bec"/>
+		<rom name="Transport Tycoon 3D - SL Kara Hajimeyou!! (Japan) (Track 11).bin" size="41573952" crc="b7ca085c" sha1="aa38d004457b9689a385e9eceb3450c73b78bb08"/>
+		-->
 		<description>Transport Tycoon 3D: SL Kara Hajimeyou!! (Japan)</description>
 		<year>1998</year>
 		<publisher>Ocean</publisher>
 		<info name="developer" value="MicroProse / Digital Amusement"/>
 		<info name="language" value="Japanese"/>
 		<info name="release" value="19980806"/>
-		<info name="redump.org" value="7918"/>
 		<info name="serial" value="SLPS-00694"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
@@ -59556,11 +59803,15 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	<!-- Redump PAL (Europe) -->
 
 	<software name="007tnd_eu" cloneof="007tnd">
+		<!--
+		redump.org/disc/967
+		<rom name="007 - Tomorrow Never Dies (Europe).cue" size="100" crc="765606dd" sha1="fd5f043ce416db55a16a72ea4cd7b408aef20f2f"/>
+		<rom name="007 - Tomorrow Never Dies (Europe).bin" size="572408592" crc="763e4df9" sha1="c7022a564fa7d839f6a84c09c2ec47c96778b7c8"/>
+		-->
 		<description>007 - Tomorrow Never Dies (Europe)</description>
 		<year>1999</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="language" value="English" />
-		<info name="redump.org" value="967" />
 		<info name="serial" value="SLES-01324, SLES-01324-T, SLES-01324/P"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -59571,11 +59822,15 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<software name="007tnd_fr" cloneof="007tnd">
+		<!--
+		redump.org/disc/13398
+		<rom name="007 - Demain ne Meurt Jamais (France).cue" size="103" crc="804de764" sha1="079196f7c1bce6e74a32db7185aa889cd40f634f"/>
+		<rom name="007 - Demain ne Meurt Jamais (France).bin" size="570611664" crc="20d12f7b" sha1="077bddb3f832e3f2ec660634cd37b50f0d927eb9"/>
+		-->
 		<description>007 - Demain ne Meurt Jamais (France)</description>
 		<year>1999</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="language" value="French" />
-		<info name="redump.org" value="13398" />
 		<info name="serial" value="SLES-02375, SLES-02375-P"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -59586,11 +59841,15 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<software name="007tnd_de" cloneof="007tnd">
+		<!--
+		redump.org/disc/4003
+		<rom name="007 - Die Welt Ist Nicht Genug (Germany).cue" size="106" crc="4a7ed159" sha1="79eb3b595147b7b1058162d3aa126355a15e448e"/>
+		<rom name="007 - Die Welt Ist Nicht Genug (Germany).bin" size="724728816" crc="40fb0330" sha1="109bb1cb7e7fc9c9305d85a42d19c17bf467060d"/>
+		-->
 		<description>007 - Der Morgen Stirbt Nie (Germany)</description>
 		<year>1999</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="language" value="German" />
-		<info name="redump.org" value="4003" />
 		<info name="serial" value="SLES-02376, SLES-02376-T"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -59601,11 +59860,15 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<software name="007twine_eu" cloneof="007twine">
+		<!--
+		redump.org/disc/968
+		<rom name="007 - The World Is Not Enough (Europe).cue" size="104" crc="7d9fe2b7" sha1="b46ef39f671f819d7077d38b401d251ebbb208fd"/>
+		<rom name="007 - The World Is Not Enough (Europe).bin" size="727292496" crc="8df63204" sha1="9062140eb4952b3addd0197cb6202723032117f7"/>
+		-->
 		<description>007 - The World Is Not Enough (Europe)</description>
 		<year>2000</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="language" value="English" />
-		<info name="redump.org" value="968" />
 		<info name="serial" value="SLES-03134, SLES-03134-T"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -59616,11 +59879,15 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<software name="007twine_fr" cloneof="007twine">
+		<!--
+		redump.org/disc/28132
+		<rom name="007 - Le Monde ne Suffit Pas (France).cue" size="103" crc="b7873d96" sha1="ff26ea5b4c4a840afbdc90123686a3012494b9d8"/>
+		<rom name="007 - Le Monde ne Suffit Pas (France).bin" size="727325424" crc="c2d1c87a" sha1="183815d71895adf29c7111ea9ac57ebdc4df7333"/>
+		-->
 		<description>007 - Le Monde ne Suffit Pas (France)</description>
 		<year>2000</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="language" value="French" />
-		<info name="redump.org" value="28132" />
 		<info name="serial" value="SLES-03135"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -59631,11 +59898,15 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<software name="007twine_de" cloneof="007twine">
+		<!--
+		redump.org/disc/3271
+		<rom name="007 - Die Welt Ist Nicht Genug (Germany).cue" size="106" crc="4a7ed159" sha1="79eb3b595147b7b1058162d3aa126355a15e448e"/>
+		<rom name="007 - Die Welt Ist Nicht Genug (Germany).bin" size="724728816" crc="40fb0330" sha1="109bb1cb7e7fc9c9305d85a42d19c17bf467060d"/>
+		-->
 		<description>007 - Die Welt Ist Nicht Genug (Germany)</description>
 		<year>2000</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="language" value="German" />
-		<info name="redump.org" value="3271" />
 		<info name="serial" value="SLES-03136, SLES-03136-P, SLES-03136-T"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -59646,11 +59917,15 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<software name="007twine_es" cloneof="007twine">
+		<!--
+		redump.org/disc/4881
+		<rom name="007 - El Mundo Nunca es Suficiente (Spain).cue" size="108" crc="a0760ab7" sha1="4a3db376fded915a172ff249bd27b2b219c2455f"/>
+		<rom name="007 - El Mundo Nunca es Suficiente (Spain).bin" size="725182752" crc="f2614069" sha1="d058f1ae8891e5dcbb05fd872e2b4cf263be1a00"/>
+		-->
 		<description>007 - El Mundo Nunca es Suficiente (Spain)</description>
 		<year>2000</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="language" value="Spanish" />
-		<info name="redump.org" value="4881" />
 		<info name="serial" value="SLES-03137-T"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -59661,11 +59936,15 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<software name="007twine_sv" cloneof="007twine">
+		<!--
+		redump.org/disc/48547
+		<rom name="007 - The World Is Not Enough (Sweden).cue" size="104" crc="02fe70a7" sha1="535fe9288f572c2eff15a7cc1800ce33ec33296b"/>
+		<rom name="007 - The World Is Not Enough (Sweden).bin" size="727299552" crc="b535d4c5" sha1="73376a3287a874068ef32cc3bd2d918fb7f33d2b"/>
+		-->
 		<description>007 - The World Is Not Enough (Sweden)</description>
 		<year>2000</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="language" value="Swedish" />
-		<info name="redump.org" value="48547" />
 		<info name="speech" value="English" />
 		<info name="serial" value="SLES-03138"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
@@ -59677,12 +59956,16 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<software name="007rcng_eu" cloneof="007rcng">
+		<!--
+		redump.org/disc/6858
+		<rom name="007 Racing (Europe).cue" size="85" crc="74722fc6" sha1="db19e66b47df3b885c8a43d177524eb72cbbb9e8"/>
+		<rom name="007 Racing (Europe).bin" size="565672464" crc="2693623a" sha1="2b6802f8a7dcc28840d4e5e1369a5bd2e90fb5ae"/>
+		-->
 		<description>007 Racing (Europe)</description>
 		<year>2000</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="developer" value="Eutechnyx"/>
 		<info name="language" value="English"/>
-		<info name="redump.org" value="6858" />
 		<info name="serial" value="SLES-03355, SLES-03355-P"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -59693,12 +59976,16 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<software name="007rcng_fr" cloneof="007rcng">
+		<!--
+		redump.org/disc/18697
+		<rom name="007 Racing (France).cue" size="85" crc="527a9ec3" sha1="6566b324e064957a31c7aacaeda10dc13957a626"/>
+		<rom name="007 Racing (France).bin" size="547510320" crc="f8500248" sha1="ca37e0995412d40cecec47c16db5bebf5e6e1b14"/>
+		-->
 		<description>007 Racing (France)</description>
 		<year>2000</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="developer" value="Eutechnyx"/>
 		<info name="language" value="French" />
-		<info name="redump.org" value="18697" />
 		<info name="serial" value="SLES-03356, SLES-03356-P"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -59709,12 +59996,16 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<software name="007rcng_de" cloneof="007rcng">
+		<!--
+		redump.org/disc/17273
+		<rom name="007 Racing (Germany).cue" size="86" crc="66c0c70d" sha1="b8f87935e390d87227779bac72443d20eb2fe5ed"/>
+		<rom name="007 Racing (Germany).bin" size="552463632" crc="bbe6471e" sha1="f440f37ab90c78b022cdb3d8e73575b6f720ce69"/>
+		-->
 		<description>007 Racing (Germany)</description>
 		<year>2000</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="developer" value="Eutechnyx"/>
 		<info name="language" value="German" />
-		<info name="redump.org" value="17273" />
 		<info name="serial" value="SLES-03357"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -59725,12 +60016,16 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<software name="fifa2k2w">
+		<!--
+		http://redump.org/disc/1219
+		<rom name="2002 FIFA World Cup (Europe) (En,Sv).cue" size="102" crc="0f104a50" sha1="d30e080e0c3d4f8e1f969b17a06b100ec21c1a96"/>
+		<rom name="2002 FIFA World Cup (Europe) (En,Sv).bin" size="514107216" crc="8034c7ff" sha1="845aa8143ba57a60e61ac91d456d1b22668905d9"/>
+		-->
 		<description>2002 FIFA World Cup (Europe)</description>
 		<year>2002</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="developer" value="Electronic Arts"/>
 		<info name="language" value="English/Swedish" />
-		<info name="redump.org" value="1219" />
 		<info name="serial" value="SLES-03830"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -59741,13 +60036,17 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<software name="fifa2k2w_fr" cloneof="fifa2k2w">
+		<!--
+		http://redump.org/disc/27688
+		<rom name="2002 FIFA World Cup (France).cue" size="94" crc="faa22c68" sha1="e3ad4658dee0ba8f31f742f7308be397f3f2a23f"/>
+		<rom name="2002 FIFA World Cup (France).bin" size="518470176" crc="a1803d25" sha1="600dad6316b61f395e0bf8d237279db7e293147f"/>
+		-->
 		<description>2002 FIFA World Cup (France)</description>
 		<year>2002</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="alt_title" value="Coupe du Monde FIFA 2002"/>
 		<info name="developer" value="Electronic Arts"/>
 		<info name="language" value="French" />
-		<info name="redump.org" value="27688" />
 		<info name="serial" value="SLES-03831"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -59758,13 +60057,17 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<software name="fifa2k2w_de" cloneof="fifa2k2w">
+		<!--
+		http://redump.org/disc/7583
+		<rom name="2002 FIFA World Cup (Germany).cue" size="95" crc="276c65df" sha1="0c07d0ff4504548c20609b2fd4b1799e16353e38"/>
+		<rom name="2002 FIFA World Cup (Germany).bin" size="618284352" crc="2b2c62ab" sha1="4c218395a8d58401a25ba361f9148da939361f32"/>
+		-->
 		<description>2002 FIFA World Cup (Germany)</description>
 		<year>2002</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="alt_title" value="FIFA Fussball Weltmeisterschaft 2002"/>
 		<info name="developer" value="Electronic Arts"/>
 		<info name="language" value="German" />
-		<info name="redump.org" value="7583" />
 		<info name="serial" value="SLES-03832"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -59775,13 +60078,17 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<software name="fifa2k2w_it" cloneof="fifa2k2w">
+		<!--
+		http://redump.org/disc/28026
+		<rom name="2002 FIFA World Cup (Italy).cue" size="93" crc="dd742bf0" sha1="0f4816f9d97e6a9079649206305d2cd599871a89"/>
+		<rom name="2002 FIFA World Cup (Italy).bin" size="532488096" crc="6e470a92" sha1="cb559e708f26d3e17f1463ca84d0b21ef2cc803d"/>
+		-->
 		<description>2002 FIFA World Cup (Italy)</description>
 		<year>2002</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="alt_title" value="Mondiali FIFA 2002"/>
 		<info name="developer" value="Electronic Arts"/>
 		<info name="language" value="Italian" />
-		<info name="redump.org" value="28026" />
 		<info name="serial" value="SLES-03833"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -59792,12 +60099,16 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<software name="fifa2k2w_es" cloneof="fifa2k2w">
+		<!--
+		http://redump.org/disc/29392
+		<rom name="2002 FIFA World Cup (Spain).cue" size="93" crc="8030da28" sha1="66aa099ce4aad0ef3df9fbd65d315de3eb3554a3"/>
+		<rom name="2002 FIFA World Cup (Spain).bin" size="561695232" crc="43b5dcb3" sha1="2bc8097d8306b35e69c293f604dc088f44508c3a"/>
+		-->
 		<description>2002 FIFA World Cup (Spain)</description>
 		<year>2002</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="alt_title" value="Mundial FIFA 2002"/>
 		<info name="developer" value="Electronic Arts"/>
-		<info name="redump.org" value="29392" />
 		<info name="language" value="Spanish" />
 		<info name="serial" value="SLES-03834"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
@@ -59809,12 +60120,23 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<software name="2xtreme">
+		<!--
+		http://redump.org/disc/504/
+		<rom name="2Xtreme (Europe).cue" size="862" crc="4211e6e3" sha1="35b196dfe7cc8b15f22db1474382f9ed43b535b9"/>
+		<rom name="2Xtreme (Europe) (Track 1).bin" size="45511200" crc="f0cfee6d" sha1="cca776ddb1b0142846befd9d5565a43af0ab2197"/>
+		<rom name="2Xtreme (Europe) (Track 2).bin" size="59239824" crc="62b16b5d" sha1="c615beaa8e4aab515aa2473b2d1e4a6482a6ca62"/>
+		<rom name="2Xtreme (Europe) (Track 3).bin" size="80473680" crc="129b5977" sha1="ee55f9f8d332805d1a42bfb97ec9e7e4f3c102d1"/>
+		<rom name="2Xtreme (Europe) (Track 4).bin" size="76818672" crc="1ba44c84" sha1="19adda1a8e2021dfc4a0b94d714016989348ea08"/>
+		<rom name="2Xtreme (Europe) (Track 5).bin" size="65345616" crc="5490ecbc" sha1="8a449968494f1dd88399256e08d0bc8001f435c1"/>
+		<rom name="2Xtreme (Europe) (Track 6).bin" size="61152000" crc="2a432ca6" sha1="bab1fc47b782be10e76eb49ba5689a19e2cebca4"/>
+		<rom name="2Xtreme (Europe) (Track 7).bin" size="76776336" crc="73d57534" sha1="5257a96d6b864d1ff11a3a26cafab6f6827ee78b"/>
+		<rom name="2Xtreme (Europe) (Track 8).bin" size="76776336" crc="73d57534" sha1="5257a96d6b864d1ff11a3a26cafab6f6827ee78b"/>
+		-->
 		<description>2Xtreme (Europe)</description>
 		<year>1997</year>
 		<publisher>Sony Computer Entertainment</publisher>
 		<info name="developer" value="Sony"/>
 		<info name="language" value="English" />
-		<info name="redump.org" value="504" />
 		<info name="serial" value="SCES-00400"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -59825,12 +60147,16 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<software name="smurfrac">
+		<!--
+		http://redump.org/disc/6260
+		<rom name="3, 2, 1, Smurf! My First Racing Game (Europe) (En,Fr,De,Es,It,Nl).cue" size="131" crc="f564283d" sha1="45b800c86b31bcf7904138f457d4432ae68c74e5"/>
+		<rom name="3, 2, 1, Smurf! My First Racing Game (Europe) (En,Fr,De,Es,It,Nl).bin" size="250916064" crc="f17c2a33" sha1="50ea49e56a815f42899d5cebed38483e822244d4"/>
+		-->
 		<description>3, 2, 1, Smurf! My First Racing Game (Europe)</description>
 		<year>2001</year>
 		<publisher> Infogrames</publisher>
 		<info name="developer" value="Artificial Mind + Movement"/>
 		<info name="language" value="Dutch/English/French/German/Italian/Spanish" />
-		<info name="redump.org" value="6260" />
 		<info name="serial" value="SLES-03120"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -59841,12 +60167,39 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<software name="3dlemmin">
+		<!--
+		http://redump.org/disc/1127/
+		<rom name="3D Lemmings (Europe).cue" size="2742" crc="51c41b34" sha1="28327fb2e596ffeff96db17948b5e3463bf7bf08"/>
+		<rom name="3D Lemmings (Europe) (Track 01).bin" size="191979648" crc="d01f4b54" sha1="4b650f874c19a5526700c8fcfb254947adca0b7a"/>
+		<rom name="3D Lemmings (Europe) (Track 02).bin" size="17741136" crc="7bacf147" sha1="a96d42f61d3952bc7956433c453ffa34fdcc97b7"/>
+		<rom name="3D Lemmings (Europe) (Track 03).bin" size="15593760" crc="a998222f" sha1="387e15b378a75acaa16a126273e95c112e7d58c5"/>
+		<rom name="3D Lemmings (Europe) (Track 04).bin" size="16626288" crc="a6d9c21b" sha1="d8c681ea04e29f43f7a24a67d07ab12d384ffb60"/>
+		<rom name="3D Lemmings (Europe) (Track 05).bin" size="15798384" crc="9b0692b7" sha1="dcf195fd7b364a2a2c4e2023ae2159c938f970ee"/>
+		<rom name="3D Lemmings (Europe) (Track 06).bin" size="15311520" crc="5376fed3" sha1="288d1aaa5e2af517178feda3adcf4179e0b7d978"/>
+		<rom name="3D Lemmings (Europe) (Track 07).bin" size="14669424" crc="817c1e4b" sha1="2d81f0fa59c47fdae024249cbe7e1764d6a00e36"/>
+		<rom name="3D Lemmings (Europe) (Track 08).bin" size="14982240" crc="29a46a79" sha1="a75aa456140bf1572b9344822a81368fd97bf879"/>
+		<rom name="3D Lemmings (Europe) (Track 09).bin" size="15327984" crc="ed9b1ae8" sha1="0e1087c49fb61d2d1bca61667e81dbeb871cfbf4"/>
+		<rom name="3D Lemmings (Europe) (Track 10).bin" size="15960672" crc="ee48037e" sha1="235b6e2090135866cb30dc3bbf209089be3556cb"/>
+		<rom name="3D Lemmings (Europe) (Track 11).bin" size="18794832" crc="a31147db" sha1="8281f5a9429e73288c3e8dfbc2b35348bd5ed6bc"/>
+		<rom name="3D Lemmings (Europe) (Track 12).bin" size="18366768" crc="adb10891" sha1="fe1571f0a692baa43edf2f4bb39d214951922685"/>
+		<rom name="3D Lemmings (Europe) (Track 13).bin" size="14596512" crc="d920f2ed" sha1="80862a1597da82c7590e2d1f9652c576202f0369"/>
+		<rom name="3D Lemmings (Europe) (Track 14).bin" size="14787024" crc="d33bef1b" sha1="fd3ee97ff11b21fe020255b2640f393fc1ee8b43"/>
+		<rom name="3D Lemmings (Europe) (Track 15).bin" size="17148432" crc="8ce16106" sha1="ce0d0d81334156cdd6cf7fa7b7469e1c7e04aea2"/>
+		<rom name="3D Lemmings (Europe) (Track 16).bin" size="15840720" crc="9dbb8470" sha1="93b23c4a4199d81a9098bcb975949ab2c23b8496"/>
+		<rom name="3D Lemmings (Europe) (Track 17).bin" size="15492624" crc="a0b90757" sha1="bddbaea5766784cb8e7b23d6ee005a525ad70e5d"/>
+		<rom name="3D Lemmings (Europe) (Track 18).bin" size="15036336" crc="d2f88b4f" sha1="53f18dd471d5ad59f66aba4c039edfcb2d971f25"/>
+		<rom name="3D Lemmings (Europe) (Track 19).bin" size="15647856" crc="ef63cef4" sha1="65b78e3fd2ff621afa78b9b23d0da86a5ad18796"/>
+		<rom name="3D Lemmings (Europe) (Track 20).bin" size="15069264" crc="9db75cf2" sha1="f9b62c22012413bc3ff9c4ed91e103a48c820948"/>
+		<rom name="3D Lemmings (Europe) (Track 21).bin" size="15375024" crc="ae7ef886" sha1="5ebc5d291c8fdba624e9f973cf9e2abd75114ef9"/>
+		<rom name="3D Lemmings (Europe) (Track 22).bin" size="12792528" crc="266c2120" sha1="c4b153fcacca362886c3f503f539cc8204f03ee8"/>
+		<rom name="3D Lemmings (Europe) (Track 23).bin" size="11089680" crc="3402228c" sha1="9057a5bd1a656e2fa8afc8b2d7ef216b218ca74a"/>
+		<rom name="3D Lemmings (Europe) (Track 24).bin" size="11089680" crc="3402228c" sha1="9057a5bd1a656e2fa8afc8b2d7ef216b218ca74a"/>
+		-->
 		<description>3D Lemmings (Europe)</description>
 		<year>1995</year>
 		<publisher>Psygnosis</publisher>
 		<info name="developer" value="Clockwork Games" />
 		<info name="language" value="English" />
-		<info name="redump.org" value="1127" />
 		<info name="serial" value="SCES-00009"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -59857,12 +60210,29 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<software name="442soccr">
+		<!--
+		http://redump.org/disc/26612/
+		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es).cue" size="1802" crc="66d6bc0d" sha1="aee918fb7a54ca358f4021b817637d2c2348ac2b"/>
+		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 01).bin" size="18846576" crc="f80f364c" sha1="c51ecc78eb1bc377ea20d16ecff5aa7542a016d8"/>
+		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 02).bin" size="30164400" crc="5d496b28" sha1="2a618624fa812be29120fe22c5e2c72abde9cf74"/>
+		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 03).bin" size="10464048" crc="f71c03c5" sha1="82dc9c7a5262b138d1ea6233231d7585cb15df9e"/>
+		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 04).bin" size="22685040" crc="fe680473" sha1="0923efa57897402ee94c7535f569b08f796f9b40"/>
+		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 05).bin" size="21436128" crc="c654b4c8" sha1="7fb67ab5d2f060d4b3ac20f65ba2d7da2e6edc76"/>
+		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 06).bin" size="24907680" crc="0858e3b7" sha1="2bdc7f209db5f9295f96c727a54be0b7fc3b84cd"/>
+		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 07).bin" size="15709008" crc="bd38bdef" sha1="afe7852732811e0e1c1ba78f1c365f23ab316c66"/>
+		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 08).bin" size="5063856" crc="0451acba" sha1="f434bcf8ddebc27f8da334826a3bf9dc22357543"/>
+		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 09).bin" size="11792928" crc="7795b29c" sha1="77b511fab22e701d096f6ceec3a6b188d57404cc"/>
+		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 10).bin" size="4631088" crc="8908ea9d" sha1="f497522fdf182991b7cb2bf5231d5f1ee0dfadeb"/>
+		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 11).bin" size="33219648" crc="55c88f25" sha1="47b3e9893e45e7928ce3834cabb700036e8548e1"/>
+		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 12).bin" size="5882352" crc="d01bf7b5" sha1="bce99580a35140e5e5ac2c5b29b14934f87edf48"/>
+		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 13).bin" size="5169696" crc="16c4eda7" sha1="e8a5d9c00e1edfc221ba12aaf33c337b4425d41d"/>
+		<rom name="4-4-2 Soccer (Europe) (En,Fr,De,Es) (Track 14).bin" size="33219648" crc="55c88f25" sha1="47b3e9893e45e7928ce3834cabb700036e8548e1"/>
+		-->
 		<description>4-4-2 Soccer (Europe)</description>
 		<year>1997</year>
 		<publisher>Virgin Interactive</publisher>
 		<info name="developer" value="Arc Developments" />
 		<info name="language" value="English/French/German/Spanish" />
-		<info name="redump.org" value="26612" />
 		<info name="serial" value="SLES-00095"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -59873,13 +60243,17 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<software name="40winks">
+		<!--
+		http://redump.org/disc/6859/
+		<rom name="40 Winks (Europe).cue" size="83" crc="29f57347" sha1="4cd2841e565a42c73d4fc00b736c1d2cc8ebd7a6"/>
+		<rom name="40 Winks (Europe).bin" size="551478144" crc="fdcde564" sha1="43fa48364b0693a4b6144b11b010cc80cc5af2c4"/>
+		-->
 		<description>40 Winks (Europe)</description>
 		<year>1999</year>
 		<publisher>GT Interactive</publisher>
 		<info name="alt_title" value="40 Winks: Conquer Your Dream" />
 		<info name="developer" value="Eurocom Entertainment" />
 		<info name="language" value="English" />
-		<info name="redump.org" value="6859" />
 		<info name="serial" value="SLES-01937"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -59890,12 +60264,16 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<software name="40winks_d" cloneof="40winks">
+		<!--
+		http://redump.org/disc/45283/
+		<rom name="40 Winks (Europe) (Demo).cue" size="90" crc="b254247f" sha1="13baf191b3e859aeec99558a7e821f58b82fbddf"/>
+		<rom name="40 Winks (Europe) (Demo).bin" size="201604032" crc="284dcd3a" sha1="8094ce1df453de43b859a75ab443aff77451f527"/>
+		-->
 		<description>40 Winks (Europe, demo)</description>
 		<year>1999</year>
 		<publisher>GT Interactive</publisher>
 		<info name="developer" value="Eurocom Entertainment" />
 		<info name="language" value="English" />
-		<info name="redump.org" value="45283" />
 		<info name="serial" value="SLED-02435"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -59906,13 +60284,17 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<software name="40winks_it" cloneof="40winks">
+		<!--
+		http://redump.org/disc/28334/
+		<rom name="40 Winks (Italy).cue" size="82" crc="8d5e56a7" sha1="23978daf31ac2a0dd20e57f18d8d80e14ee281bb"/>
+		<rom name="40 Winks (Italy).bin" size="551344080" crc="677b7ea9" sha1="70380215dd02ae68cdff88ee29738771f57d0207"/>
+		-->
 		<description>40 Winks (Italy)</description>
 		<year>1999</year>
 		<publisher>GT Interactive</publisher>
 		<info name="alt_title" value="40 Winks: Con Ruff e Tumble" />
 		<info name="developer" value="Eurocom Entertainment" />
 		<info name="language" value="Italian" />
-		<info name="redump.org" value="28334" />
 		<info name="serial" value="SLES-01940"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -59923,12 +60305,16 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<software name="40winks_es" cloneof="40winks">
+		<!--
+		http://redump.org/disc/25544/
+		<rom name="40 Winks (Spain).cue" size="82" crc="d01aa77f" sha1="b11bb31d90d22571e311edc270b4d3044540abe4"/>
+		<rom name="40 Winks (Spain).bin" size="551268816" crc="815a014f" sha1="eac587a040ea4db03772bade7ad4a85ab81fd039"/>
+		-->
 		<description>40 Winks (Spain)</description>
 		<year>1999</year>
 		<publisher>GT Interactive</publisher>
 		<info name="developer" value="Eurocom Entertainment" />
 		<info name="language" value="Spanish" />
-		<info name="redump.org" value="25544" />
 		<info name="serial" value="SLES-01941"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -59939,12 +60325,17 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<software name="actgolf">
+		<!--
+		redump.org/disc/26887
+		<rom name="Actua Golf (Europe) (En,Fr,De).cue" size="230" crc="dc8424ff" sha1="19c094f28be0dbd45913de4997498a6e5b9f469e"/>
+		<rom name="Actua Golf (Europe) (En,Fr,De) (Track 1).bin" size="489281856" crc="49825417" sha1="fcac9c694177ff7077ae79d5693b88d32e92fe92"/>
+		<rom name="Actua Golf (Europe) (En,Fr,De) (Track 2).bin" size="34350960" crc="4c9d46fe" sha1="75b6ded9f51980c306ca2f3a40dcd640c0101745"/>
+		-->
 		<description>Actua Golf (Europe)</description>
 		<year>1996</year>
 		<publisher>Gremlin Interactive</publisher>
 		<info name="developer" value="Gremlin Interactive"/>
 		<info name="language" value="English/French/German" />
-		<info name="redump.org" value="26887" />
 		<info name="serial" value="SLES-00015"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -59955,12 +60346,18 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<software name="actgolf2">
+		<!--
+		redump.org/disc/25391
+		<rom name="Actua Golf 2 (Europe).cue" size="327" crc="fc7af053" sha1="9841a45e0f2b97b5c1790174c663eab72abd29a1"/>
+		<rom name="Actua Golf 2 (Europe) (Track 1).bin" size="376538736" crc="b1330c67" sha1="1bd438534b63fc0ee498f92602be16d467a251e6"/>
+		<rom name="Actua Golf 2 (Europe) (Track 2).bin" size="31248672" crc="9ee267d5" sha1="3fb66132c709bd012e578f45e638410ffe76ba2c"/>
+		<rom name="Actua Golf 2 (Europe) (Track 3).bin" size="44742096" crc="305d867b" sha1="27de9f1b4dbb893ee994c6fef00c8ff29eeca325"/>
+		-->
 		<description>Actua Golf 2 (Europe)</description>
 		<year>1997</year>
 		<publisher>Gremlin Graphics</publisher>
 		<info name="developer" value="Gremlin Graphics"/>
 		<info name="language" value="English" />
-		<info name="redump.org" value="25391" />
 		<info name="serial" value="SLES-00044"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -59971,13 +60368,19 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<software name="actgolf3" supported="partial">
+		<!--
+		redump.org/disc/1240
+		<rom name="Actua Golf 3 (Europe).cue" size="327" crc="f649a1db" sha1="a5f55882b69566e13bd2899c94b810421c0b7ac6"/>
+		<rom name="Actua Golf 3 (Europe) (Track 1).bin" size="524987568" crc="73317df6" sha1="e263ff68a25402ce834771c3de9e8fb20c015643"/>
+		<rom name="Actua Golf 3 (Europe) (Track 2).bin" size="30971136" crc="73a866cc" sha1="06d166e9aff4ad151031bd3307e1b1d6a89f856a"/>
+		<rom name="Actua Golf 3 (Europe) (Track 3).bin" size="33003264" crc="c88e041e" sha1="b6bafa8d15d29dc311554dce550230632bc58eba"/>
+		-->
 		<description>Actua Golf 3 (Europe)</description>
 		<year>1998</year>
 		<publisher>Gremlin Graphics</publisher>
 		<notes>Scrambled graphics when shooting the ball</notes>
 		<info name="developer" value="Gremlin Graphics"/>
 		<info name="language" value="English" />
-		<info name="redump.org" value="1240" />
 		<info name="serial" value="SLES-01042"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -59988,12 +60391,22 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<software name="a4evolgl">
+		<!--
+		redump.org/disc/25901
+		<rom name="A.IV - Evolution Global (Europe) (En,Ja,Fr,De).cue" size="962" crc="e4b052e4" sha1="24aabd7b6daf83154f012d532ce30534391a175e"/>
+		<rom name="A.IV - Evolution Global (Europe) (En,Ja,Fr,De) (Track 1).bin" size="57621648" crc="7c89428c" sha1="56035d31d27b732eed956bb1736a5502f8b326b9"/>
+		<rom name="A.IV - Evolution Global (Europe) (En,Ja,Fr,De) (Track 2).bin" size="4958016" crc="5a4bdaa9" sha1="b3aad8076cd6dce6b3d8fd0bc76b5f7bc54fe8f9"/>
+		<rom name="A.IV - Evolution Global (Europe) (En,Ja,Fr,De) (Track 3).bin" size="1921584" crc="19dbfa70" sha1="fe0b2b01e8b73c44025dede31b69f87c8838295c"/>
+		<rom name="A.IV - Evolution Global (Europe) (En,Ja,Fr,De) (Track 4).bin" size="1900416" crc="f00fa27e" sha1="5e87626933fe6f4cf8f4d4c270daf1dc58e3c033"/>
+		<rom name="A.IV - Evolution Global (Europe) (En,Ja,Fr,De) (Track 5).bin" size="2733024" crc="c1df5352" sha1="a2ea3e3bcd10c1eeeacbf69394c04aed3573dcda"/>
+		<rom name="A.IV - Evolution Global (Europe) (En,Ja,Fr,De) (Track 6).bin" size="2737728" crc="c4a8d40a" sha1="d76522940b195ba6260918e0b1eff9172a085499"/>
+		<rom name="A.IV - Evolution Global (Europe) (En,Ja,Fr,De) (Track 7).bin" size="37874256" crc="5de84afb" sha1="d510836a6eae9902405fc73a284231a72b051407"/>
+		-->
 		<description>A.IV - Evolution Global (Europe)</description>
 		<year>1996</year>
 		<publisher>Sony Computer Entertainment Europe</publisher>
 		<info name="developer" value="Artdink"/>
 		<info name="language" value="English/French/German/Japanese" />
-		<info name="redump.org" value="25901" />
 		<info name="serial" value="SCES-00290"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -60037,12 +60450,78 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<software name="aircombt">
+		<!--
+		http://redump.org/disc/929
+		<rom name="Air Combat (Europe).cue" size="7164" crc="a76704ae" sha1="166d9b3f8eb411ff33c806b01cae1890b3a48e85"/>
+		<rom name="Air Combat (Europe) (Track 01).bin" size="106968960" crc="f59696b1" sha1="834f181b0463f36ef7efc6cc0f50fb7d98d6086c"/>
+		<rom name="Air Combat (Europe) (Track 02).bin" size="36738240" crc="e6604b54" sha1="f2868a668beeb5b709afac84d14555fd50372041"/>
+		<rom name="Air Combat (Europe) (Track 03).bin" size="28652064" crc="b18c652d" sha1="62fc6f4574f6cd05412460bffa8a6c71d68f90eb"/>
+		<rom name="Air Combat (Europe) (Track 04).bin" size="27024480" crc="fd6529d3" sha1="632313b0e7de9d4f87ffe853f65943b8fe15ebfc"/>
+		<rom name="Air Combat (Europe) (Track 05).bin" size="28993104" crc="f71fe9c4" sha1="1c924e33b0183ed0e4f7213dfba903a6ff7b7cfe"/>
+		<rom name="Air Combat (Europe) (Track 06).bin" size="13373472" crc="fd8c35df" sha1="70d8b090774191b5e22cc265fdfd4b9bb476a155"/>
+		<rom name="Air Combat (Europe) (Track 07).bin" size="21010416" crc="7937b637" sha1="198e26e3c16495ed00ff27004ea75c0183fff163"/>
+		<rom name="Air Combat (Europe) (Track 08).bin" size="29425872" crc="e84043cf" sha1="72daa305a67a920909dcb18af4e6c9e6abf10204"/>
+		<rom name="Air Combat (Europe) (Track 09).bin" size="31634400" crc="70e129c6" sha1="909b416fcbb83a7c590cc97ad0309464de167b30"/>
+		<rom name="Air Combat (Europe) (Track 10).bin" size="26391792" crc="73ac9def" sha1="21d8cf0dfceecc17ecb958b6bf9799895f87cef2"/>
+		<rom name="Air Combat (Europe) (Track 11).bin" size="21946512" crc="de0fa43e" sha1="0fc0b8580200d4e72b37f3f2778163f108844fab"/>
+		<rom name="Air Combat (Europe) (Track 12).bin" size="15066912" crc="b067eb09" sha1="df716bba8ef894eb57792879229b2019622aa59b"/>
+		<rom name="Air Combat (Europe) (Track 13).bin" size="15172752" crc="59efad88" sha1="7b79eb67e3205623653ebdfb30f5aae411f91de3"/>
+		<rom name="Air Combat (Europe) (Track 14).bin" size="2253216" crc="6325eb0a" sha1="4c297ef440556ea34bfccd9bd5af31bdf4484d26"/>
+		<rom name="Air Combat (Europe) (Track 15).bin" size="12103392" crc="9e063251" sha1="4de8924fbd50846dfac165daa1961b40dd8517c6"/>
+		<rom name="Air Combat (Europe) (Track 16).bin" size="2471952" crc="4058386a" sha1="a6268a8d77d1238d3ebbb859031a826ed53e72a3"/>
+		<rom name="Air Combat (Europe) (Track 17).bin" size="21417312" crc="4e808c90" sha1="6b7380ab04dc0b3e6a465e94abf4ad2f626b4bf8"/>
+		<rom name="Air Combat (Europe) (Track 18).bin" size="26709312" crc="101c6976" sha1="e8828fa899d1946bd1ea69ccd65547ddd373ddf8"/>
+		<rom name="Air Combat (Europe) (Track 19).bin" size="9175152" crc="dbd916ca" sha1="fed3c81ab2046787b4020531d92f46fac7f0ae1c"/>
+		<rom name="Air Combat (Europe) (Track 20).bin" size="16061808" crc="1bf98118" sha1="078e39531684272903d3eb4aafdd31b989675fd2"/>
+		<rom name="Air Combat (Europe) (Track 21).bin" size="2775360" crc="6c254834" sha1="4baa057175777ac899032192ccbc39295b20f40a"/>
+		<rom name="Air Combat (Europe) (Track 22).bin" size="1147776" crc="8aae87d1" sha1="cf7dd4c7cd35476ded88f604e85ee9236ba2e3da"/>
+		<rom name="Air Combat (Europe) (Track 23).bin" size="2105040" crc="eb78944b" sha1="c9576bdc8bdf73f256808a883e6b7daaa6c66556"/>
+		<rom name="Air Combat (Europe) (Track 24).bin" size="1147776" crc="11133ce5" sha1="11fa285e225a93063890481d81fb3d2e96335683"/>
+		<rom name="Air Combat (Europe) (Track 25).bin" size="1846320" crc="7f3709ac" sha1="1d04eefcd5c0178e38c72f587f51cf8aaf611d05"/>
+		<rom name="Air Combat (Europe) (Track 26).bin" size="1192464" crc="9bcb2928" sha1="ee5d4369f95d106faa045ae6b8898e26265bb5b8"/>
+		<rom name="Air Combat (Europe) (Track 27).bin" size="1150128" crc="b3735a67" sha1="1966f4a4aefd7e2462476acbd4ad86aef53146ea"/>
+		<rom name="Air Combat (Europe) (Track 28).bin" size="2243808" crc="a2f89695" sha1="2eb425b4265de08e6ed5971628dc099acc734291"/>
+		<rom name="Air Combat (Europe) (Track 29).bin" size="1514688" crc="aeda8a6b" sha1="9f48166062a4e29f548a1231e8cb50e1d251d1c2"/>
+		<rom name="Air Combat (Europe) (Track 30).bin" size="2907072" crc="d7e9dbbc" sha1="6a55683bec61d0ea4abdd1ca443b3a5b6d67f9e7"/>
+		<rom name="Air Combat (Europe) (Track 31).bin" size="2145024" crc="07116b29" sha1="677391b7f58e9bf22caa38726cf0ce7971bc296a"/>
+		<rom name="Air Combat (Europe) (Track 32).bin" size="1147776" crc="4567d162" sha1="63cfce6a894f361d11484f7d0d3f717e53c0beae"/>
+		<rom name="Air Combat (Europe) (Track 33).bin" size="1161888" crc="2dc65e7c" sha1="b1a50baf0bcbf510fb4f858ecfaa41c110294aa7"/>
+		<rom name="Air Combat (Europe) (Track 34).bin" size="2036832" crc="e73d96e3" sha1="1ce2f0ed5c83e5feb0ce03c6219c59cbbb7c8427"/>
+		<rom name="Air Combat (Europe) (Track 35).bin" size="1190112" crc="e7c897cc" sha1="2316f0988e96166980504896f36184f3afcb47fa"/>
+		<rom name="Air Combat (Europe) (Track 36).bin" size="1698144" crc="64c1b3c7" sha1="c6813c2db55175d28462298b0a2cb21afa19a1b8"/>
+		<rom name="Air Combat (Europe) (Track 37).bin" size="4370016" crc="6c5117e0" sha1="6a2dea25522ef46de2b65d8dc1ba45491149f233"/>
+		<rom name="Air Combat (Europe) (Track 38).bin" size="1147776" crc="5f560df7" sha1="1e63a3c893c10557dfba70d5bccacd34c7cf4b95"/>
+		<rom name="Air Combat (Europe) (Track 39).bin" size="1333584" crc="5953a590" sha1="2d2afb9a8ffb6bbb62864b0cc6e2c9b7acb7b0cd"/>
+		<rom name="Air Combat (Europe) (Track 40).bin" size="1851024" crc="ddced3a7" sha1="250a1a449dafd96ff915e2797ca039874b7dc1d5"/>
+		<rom name="Air Combat (Europe) (Track 41).bin" size="1147776" crc="e9473517" sha1="795d09fb292b7c598988eb7fb7182d08d68ac8d8"/>
+		<rom name="Air Combat (Europe) (Track 42).bin" size="1147776" crc="d3dba64b" sha1="7a4cc713157994a3b90b853d0e6c33cd0c24cae1"/>
+		<rom name="Air Combat (Europe) (Track 43).bin" size="4235952" crc="4c1f8962" sha1="2b1a3c8f76e68d3d423b81b1ac26797a442e20a0"/>
+		<rom name="Air Combat (Europe) (Track 44).bin" size="2330832" crc="2ac449a1" sha1="d107d3290e203b01a72cea241d39fc4d877f08b1"/>
+		<rom name="Air Combat (Europe) (Track 45).bin" size="1147776" crc="1a8dd5bd" sha1="822a999f89d6d8bd001c0cb7f25ef368ee7059a9"/>
+		<rom name="Air Combat (Europe) (Track 46).bin" size="1183056" crc="14949216" sha1="f373b8ef003f56b69e63b382158b9593757f7436"/>
+		<rom name="Air Combat (Europe) (Track 47).bin" size="3229296" crc="5e4a84d8" sha1="7d8e75995fd4dcea4ae728345636cc37ae076ecf"/>
+		<rom name="Air Combat (Europe) (Track 48).bin" size="1147776" crc="f803e31c" sha1="bc64abb228025b6d15e7b458ac0aa13e800a71bc"/>
+		<rom name="Air Combat (Europe) (Track 49).bin" size="2613072" crc="49e4e3f3" sha1="94756a349674ca84c1166ab099cf728a64320762"/>
+		<rom name="Air Combat (Europe) (Track 50).bin" size="1147776" crc="95f930a9" sha1="3b760c45abad3b385d6adf21da0fd946f494d502"/>
+		<rom name="Air Combat (Europe) (Track 51).bin" size="1905120" crc="c773efa2" sha1="d6785861aa3f8cbb923c572bdf29c6637ca5398e"/>
+		<rom name="Air Combat (Europe) (Track 52).bin" size="1350048" crc="db8c1eef" sha1="aa78a1bea5c8d94b9be3ad440b37c0d793c0e860"/>
+		<rom name="Air Combat (Europe) (Track 53).bin" size="1147776" crc="7f9cec6f" sha1="251603cb0b437cdc2bee48f6872b1083cdd48238"/>
+		<rom name="Air Combat (Europe) (Track 54).bin" size="1147776" crc="83e91720" sha1="0a41ee59aaf610dce3108a4822372781acf3f677"/>
+		<rom name="Air Combat (Europe) (Track 55).bin" size="1150128" crc="c0f1a962" sha1="d4923027288040fde405470d9f9a1b3eaf767519"/>
+		<rom name="Air Combat (Europe) (Track 56).bin" size="1150128" crc="0301987b" sha1="fb871082c45b47315948f35e5e72a13b2feb05c6"/>
+		<rom name="Air Combat (Europe) (Track 57).bin" size="1178352" crc="dbf35e36" sha1="29ec4551096c038436f92962983d453f5aba3d75"/>
+		<rom name="Air Combat (Europe) (Track 58).bin" size="2196768" crc="b64928fa" sha1="10e7395f83b758fdfe49cc99e815ee637d2241c8"/>
+		<rom name="Air Combat (Europe) (Track 59).bin" size="1190112" crc="d45922f7" sha1="6acf92b0c350db98beafac389d51602deb4d539b"/>
+		<rom name="Air Combat (Europe) (Track 60).bin" size="1484112" crc="5e029cf7" sha1="69ce8ef6ae3b043d3417b0bd0fdf3ca3c8bc4a58"/>
+		<rom name="Air Combat (Europe) (Track 61).bin" size="3532704" crc="3389aac7" sha1="7cecef95f3affa36dcb05166e5a02de54ecdf336"/>
+		<rom name="Air Combat (Europe) (Track 62).bin" size="2100336" crc="b15ec2c2" sha1="ba80e7e73aa3f6c43084ce4f9e7c316018692cd9"/>
+		<rom name="Air Combat (Europe) (Track 63).bin" size="42796992" crc="df07e201" sha1="56cbbf607b9f3c4fe620bb6f6a84349a349a755a"/>
+		-->
 		<description>Air Combat (Europe)</description>
 		<year>1995</year>
 		<publisher>Namco</publisher>
 		<info name="developer" value="Namco"/>
 		<info name="language" value="English"/>
-		<info name="redump.org" value="929" />
 		<info name="serial" value="SCES-00007"/>
 		<info name="release" value="19951010"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
@@ -60054,12 +60533,78 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<software name="aircombt_a" cloneof="aircombt">
+		<!--
+		http://redump.org/disc/15771
+		<rom name="Air Combat (Europe) (EDC).cue" size="7542" crc="abbbca9e" sha1="6509de37b7338511b30b49aba87ee858abb27a94"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 01).bin" size="106968960" crc="41d03f71" sha1="ee99101b8468966919169fe1172c032397761c49"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 02).bin" size="36738240" crc="f6c605d4" sha1="e4baf5fd8fddbf6f32f4591a4683ca8af9079837"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 03).bin" size="28652064" crc="0f6701d5" sha1="3145cf3d0941a1e77e0571e044eb2d6f24a60313"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 04).bin" size="27024480" crc="cf61aa8c" sha1="d5b398a93051ac439c27d8d90536340e35cc5340"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 05).bin" size="28993104" crc="ea1cd5bf" sha1="8bd55b8169ec0196a8d7bd1d4b0882ac259ffc5a"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 06).bin" size="13373472" crc="6aa8fd26" sha1="da9105bf61487f097213e890dfe983e6615f1885"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 07).bin" size="21010416" crc="eb04f063" sha1="faacbae8645e145df304b79f4dfcc1e242dac8b5"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 08).bin" size="29425872" crc="11b28580" sha1="08c543621cc771ade7bca8df22c4f02126db3720"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 09).bin" size="31634400" crc="b61e737e" sha1="5c6d5df4939d65b0abbae7c82a756dd38c32dc48"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 10).bin" size="26391792" crc="cb74a154" sha1="eb923566aaaa5472405cd4ee790daf35d171a8de"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 11).bin" size="21946512" crc="3cd15eb4" sha1="dacb4eca0cae0b524f5730826593225c71b24420"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 12).bin" size="15066912" crc="3d35b1d1" sha1="d941c6a80c6ac5128598e7f24030ace374a24936"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 13).bin" size="15172752" crc="d87bad30" sha1="ef5183602a4dbab15026c4ea4eae7d2b410280c9"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 14).bin" size="2253216" crc="3c7d513d" sha1="8e4679d2df38e9c72ea4ce45933d847c86d1d951"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 15).bin" size="12103392" crc="84470724" sha1="6ab473fae0527795e5d847483aed86ede62f150c"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 16).bin" size="2471952" crc="60b6e445" sha1="107cd28bae69d7b88c399f9e67a9484948b47a63"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 17).bin" size="21417312" crc="d3762ce9" sha1="8006e3729b39ce27ae71ed09030637781431feb5"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 18).bin" size="26709312" crc="411e09bc" sha1="cbe1962a23ba60f481f1dbc480642b9ab2cdfbd4"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 19).bin" size="9175152" crc="a9eaf5e0" sha1="656bdf71b7454f47446bb69de42adef61568774e"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 20).bin" size="16061808" crc="b4966391" sha1="90a4f48da841a2a891c73f275d13c3f2ca7e9fcd"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 21).bin" size="2775360" crc="7c786180" sha1="8f538d7f8eebac5b8343c0f3f683f5ee9aa1d910"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 22).bin" size="1147776" crc="d8202a47" sha1="1a5ef326ddc7db0ef9f0b4e4403c674eed10a334"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 23).bin" size="2105040" crc="2c256d18" sha1="cc96c7211612d1c3563c04b1070bcc425dec3b6c"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 24).bin" size="1147776" crc="78b4214f" sha1="83f409e81eb1c205a1688c9926cf7023e1c7f6c6"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 25).bin" size="1846320" crc="e3de689d" sha1="f3909d4697b8745449f3988d7d8149908c2c9dda"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 26).bin" size="1192464" crc="fd4c36a0" sha1="3a649da59fcf05ab98a45bde2375897a542fd807"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 27).bin" size="1150128" crc="b8bbd8a3" sha1="01f559f021dec45ec29a587047ff1b1717b51c41"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 28).bin" size="2243808" crc="df6f9331" sha1="2c1bcd2f0cc738c255eafa407b3e717aefaf3807"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 29).bin" size="1514688" crc="58f7ce79" sha1="33c7dc9d3477a66a4ccacaa6bffdad45726b7429"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 30).bin" size="2907072" crc="da3e15ad" sha1="a3cec882f90d67cc465a7f086d8959c8a9e63dbc"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 31).bin" size="2145024" crc="7bd50570" sha1="8dfe2829d134dc6d27c212cc0e1d17f5703f06f7"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 32).bin" size="1147776" crc="1bb1abed" sha1="7a867faf60112d095b12d157bd51357ac0567c09"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 33).bin" size="1161888" crc="26592556" sha1="d1d47a7ef6a6897d8344ddcd384cce8eca2c2794"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 34).bin" size="2036832" crc="55862c53" sha1="3c8e4e026d1ed223e3a7f4fc9fbed772adb2583c"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 35).bin" size="1190112" crc="f2d28286" sha1="5f2f952949e8c1b9975c4b476018052129094f37"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 36).bin" size="1698144" crc="fd183aef" sha1="7c90d79a83f39da81f3e42d184c0ad1c82a8e681"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 37).bin" size="4370016" crc="52b5129f" sha1="2a45b42b9b9979883a8f32e6a4d483bff5657059"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 38).bin" size="1147776" crc="48404490" sha1="1e81abe3251e81725b696c5400bda42387a92b01"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 39).bin" size="1333584" crc="144c010f" sha1="3f365e9bd4ef45e1379fdfba5e4323d320e712be"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 40).bin" size="1851024" crc="dfaf557b" sha1="69723c4d6e446caf1f2dd44d5a927f4d8f5370c0"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 41).bin" size="1147776" crc="5319e9ad" sha1="886f2f974ec9d221755be9b394dba1dc16ed2c8e"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 42).bin" size="1147776" crc="36297c54" sha1="37628ba6cfa1b4e3198562bec8bc2c38f4cab1d6"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 43).bin" size="4235952" crc="3c1ffc3d" sha1="ae96df9a4e79c226700ac0ff6032542152e0df48"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 44).bin" size="2330832" crc="5dd8dc38" sha1="a379551448e5b0b5c2d0d5da1b21946b8851a5e8"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 45).bin" size="1147776" crc="fcc81032" sha1="4652a93deae63b2028c41215937adaedd3e61545"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 46).bin" size="1183056" crc="e8e5a26b" sha1="0d171cd5e0decb1fe614983e1cced4a6d332727d"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 47).bin" size="3229296" crc="a995bc5e" sha1="2ed4d54a459a75606e941119ddfa017b6d1de42c"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 48).bin" size="1147776" crc="f99be18a" sha1="058dc8fd19f259723dc803da101afca7925ec840"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 49).bin" size="2613072" crc="a22b6fc7" sha1="298f0379f054a553276851a5b15de323c32c59e3"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 50).bin" size="1147776" crc="70902137" sha1="bfbc5d8e3d6431623992db76c60c4e230d283fbc"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 51).bin" size="1905120" crc="3d3d6a8e" sha1="a694f3951dcdedf5f73044ac9dc5c986f93aab81"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 52).bin" size="1350048" crc="369de36f" sha1="7200b9bc866352ea58f1b3d64ba93fb42790b6fe"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 53).bin" size="1147776" crc="a2ff2935" sha1="fc412daaec9276612f17a7a85f8a3ec02b8bf872"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 54).bin" size="1147776" crc="5f9c111d" sha1="9b69afd05692db3461a8c771896ef566bcbf2f0d"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 55).bin" size="1150128" crc="e329791d" sha1="9baa63630768f235785c306cd46368435c396fb4"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 56).bin" size="1150128" crc="0b11133c" sha1="cbe7fa6d9bc0f07c14062ea41683076f554aaa00"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 57).bin" size="1178352" crc="32813fc0" sha1="8cd9a9a22c20be8c829173841d6e81a61993310f"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 58).bin" size="2196768" crc="a9f48da4" sha1="5ca366743fd4c6853622c9a438b63a48382e0b60"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 59).bin" size="1190112" crc="c64ba9c2" sha1="043c3b75f8f3b00179d010f22ccd010806bed3e2"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 60).bin" size="1484112" crc="9861cdae" sha1="43592e0985dac93a71479470318bb6304abf7c12"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 61).bin" size="3532704" crc="8cc6941f" sha1="7473f2433a19b1a3561a4f163148c47f37d50e64"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 62).bin" size="2100336" crc="7d423523" sha1="2d5cc1e3e8ffa44789f305517b5d5adcba39fc31"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 63).bin" size="42796992" crc="bfdf8a56" sha1="7d5b95a36a5194f6391dd57a234a515db2e671da"/>
+		-->
 		<description>Air Combat (Europe) (EDC)</description>
 		<year>1995</year>
 		<publisher>Namco</publisher>
 		<info name="developer" value="Namco"/>
 		<info name="language" value="English"/>
-		<info name="redump.org" value="15771" />
 		<info name="serial" value="SCES-00007#"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
@@ -60103,13 +60648,24 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<software name="bedlam" supported="no">
+		<!--
+		http://redump.org/disc/1034
+		<rom name="Bedlam (Europe) (En,Fr,De,Es,It,Nl).cue" size="1014" crc="6e0a59d3" sha1="a94120a4812030448734fefe32f25adde66d021c"/>
+		<rom name="Bedlam (Europe) (En,Fr,De,Es,It,Nl) (Track 1).bin" size="82157712" crc="725f01ad" sha1="c01f8bd0b5b08b2b8b006fea7d04abb826ed07ff"/>
+		<rom name="Bedlam (Europe) (En,Fr,De,Es,It,Nl) (Track 2).bin" size="37025184" crc="511ba896" sha1="659ff970996b9aa9f0a4c017ee8ce3502d79e33d"/>
+		<rom name="Bedlam (Europe) (En,Fr,De,Es,It,Nl) (Track 3).bin" size="39758208" crc="d3fb5919" sha1="35f80dce49039423acd82164f9fda28cf697bc15"/>
+		<rom name="Bedlam (Europe) (En,Fr,De,Es,It,Nl) (Track 4).bin" size="37702560" crc="bb3c9155" sha1="f01186ff6d3783a281d59b0fc05392ddcd8648cb"/>
+		<rom name="Bedlam (Europe) (En,Fr,De,Es,It,Nl) (Track 5).bin" size="38422272" crc="71dcd79b" sha1="fb4357096df7bce7c958bdd78003820862087532"/>
+		<rom name="Bedlam (Europe) (En,Fr,De,Es,It,Nl) (Track 6).bin" size="36980496" crc="d5e42319" sha1="7898473bec6f7cbb77f482deb6cdc42d0e66ad31"/>
+		<rom name="Bedlam (Europe) (En,Fr,De,Es,It,Nl) (Track 7).bin" size="37815456" crc="97aae9e0" sha1="27aac3c90aa09fe2ca26695b408a88ccea0a6f19"/>
+		<rom name="Bedlam (Europe) (En,Fr,De,Es,It,Nl) (Track 8).bin" size="36420720" crc="89871b70" sha1="64e4472de2d9c50db2676abf5c23c720ea25a599"/>
+		-->
 		<description>Bedlam (Europe)</description>
 		<year>1997</year>
 		<publisher>GT Interactive</publisher>
 		<notes>Scrambled graphics</notes>
 		<info name="developer" value="Mirage Technologies"/>
 		<info name="language" value="Dutch/English/French/German/Italian/Spanish" />
-		<info name="redump.org" value="1034" />
 		<info name="release" value="19970407" />
 		<info name="serial" value="SLES-00334"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
@@ -60145,12 +60701,35 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 	</software>
 
 	<software name="cheesy">
+		<!--
+		http://redump.org/disc/27322/
+		<rom name="Cheesy (Europe) (En,Fr).cue" size="2342" crc="788ddfa4" sha1="1624d915936a55499d57548a97938db7b8d78e67"/>
+		<rom name="Cheesy (Europe) (En,Fr) (Track 01).bin" size="109095168" crc="50078ebd" sha1="8e2f9f1f97e7962efc7179f33198d0cb274a4963"/>
+		<rom name="Cheesy (Europe) (En,Fr) (Track 02).bin" size="48201888" crc="12a2b3fa" sha1="de96feb091ef6194d0e71b5c2821860c0f223094"/>
+		<rom name="Cheesy (Europe) (En,Fr) (Track 03).bin" size="23988048" crc="f599934b" sha1="b5d80811e7f9ca8d328f09223a8ce02e1a5426bf"/>
+		<rom name="Cheesy (Europe) (En,Fr) (Track 04).bin" size="33233760" crc="29ff8e58" sha1="3ed95b4cc6665847ad3710e2610f6ca562d72a6d"/>
+		<rom name="Cheesy (Europe) (En,Fr) (Track 05).bin" size="26521152" crc="58137ecc" sha1="d49a59d282f0a6283ce1b993775aee4d718eab9d"/>
+		<rom name="Cheesy (Europe) (En,Fr) (Track 06).bin" size="13855632" crc="f97816d5" sha1="1b16bf8ed08d16c27d8153114827fb09a70541e1"/>
+		<rom name="Cheesy (Europe) (En,Fr) (Track 07).bin" size="48872208" crc="fcb13505" sha1="975afd5604c32336a44755ba2e7a251ac1ed0bc7"/>
+		<rom name="Cheesy (Europe) (En,Fr) (Track 08).bin" size="19952016" crc="d1e10ce1" sha1="ed97a5217d9083615a245c4ae3b5c6842b9d5af9"/>
+		<rom name="Cheesy (Europe) (En,Fr) (Track 09).bin" size="21426720" crc="9c79b80b" sha1="cea109fc53ed3c01075d2399fa6f1e468f389d8c"/>
+		<rom name="Cheesy (Europe) (En,Fr) (Track 10).bin" size="14020272" crc="5b95f932" sha1="df54df9fa2344a83e955dacf4e8f5cc231b8a97c"/>
+		<rom name="Cheesy (Europe) (En,Fr) (Track 11).bin" size="12463248" crc="114b0719" sha1="7e68611e2c7858cfe26d29266ab3d1b41641a298"/>
+		<rom name="Cheesy (Europe) (En,Fr) (Track 12).bin" size="44097648" crc="d16dbe0b" sha1="f0f41a3f3330de5902b21c41eea95009778eb3bd"/>
+		<rom name="Cheesy (Europe) (En,Fr) (Track 13).bin" size="30477216" crc="5fc1335d" sha1="a54f4080f1b4a3e3b92a4f0dd90a404ee3149fa7"/>
+		<rom name="Cheesy (Europe) (En,Fr) (Track 14).bin" size="15739584" crc="f24073ed" sha1="2d9e9b058d773b29ac09330b47bd33e50d3e6304"/>
+		<rom name="Cheesy (Europe) (En,Fr) (Track 15).bin" size="17289552" crc="a41707e2" sha1="1be05ff317b931ac7022ee9d990dc909995cc3f6"/>
+		<rom name="Cheesy (Europe) (En,Fr) (Track 16).bin" size="17484768" crc="ea9ef323" sha1="379b5d5a8a81a8a792329efd16abfdcd794cade7"/>
+		<rom name="Cheesy (Europe) (En,Fr) (Track 17).bin" size="18180960" crc="f5469959" sha1="d930350e918f65b0204bbb7e513500a1c090214c"/>
+		<rom name="Cheesy (Europe) (En,Fr) (Track 18).bin" size="16409904" crc="ba4eb43d" sha1="1b6629730b6d503054796ec9c85b8fd1ab4da8c1"/>
+		<rom name="Cheesy (Europe) (En,Fr) (Track 19).bin" size="21349104" crc="52ec4cc9" sha1="852f8f04b74e0858a976fe555edac11a42c691d1"/>
+		<rom name="Cheesy (Europe) (En,Fr) (Track 20).bin" size="55121472" crc="0bb5ee7d" sha1="76b1878250676aeb823bc9b476e8c195e94efe60"/>
+		-->
 		<description>Cheesy (Europe)</description>
 		<year>1996</year>
 		<publisher>Ocean</publisher>
 		<info name="developer" value="Ocean" />
 		<info name="language" value="English/French" />
-		<info name="redump.org" value="27332" />
 		<info name="serial" value="SLES-00053"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
