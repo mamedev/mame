@@ -26,13 +26,16 @@
 //#include "video/hd61603.h"
 #include "video/pwm.h"
 
+#include "roland_tr707.lh"
+
 #define LOG_TRIGGER (1U << 1)
 #define LOG_SYNC    (1U << 2)
 #define LOG_TEMPO   (1U << 3)
 #define LOG_ACCENT  (1U << 4)
 #define LOG_CART    (1U << 5)
+#define LOG_MIX     (1U << 6)
 
-#define VERBOSE (LOG_GENERAL | LOG_TRIGGER | LOG_TEMPO | LOG_CART)
+#define VERBOSE (LOG_GENERAL | LOG_TRIGGER | LOG_TEMPO | LOG_CART | LOG_MIX)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
@@ -65,7 +68,9 @@ public:
 		, m_accent_adc_ff(*this, "accent_adc_flipflop")
 		, m_accent_trimmer_series(*this, "TM2")
 		, m_accent_trimmer_parallel(*this, "TM3")
-		, m_accent_level(*this, "ACCENT")
+		, m_accent_level(*this, "SLIDER_1")
+		, m_layout_727(*this, "is727")
+		, m_is_727(false)
 		, m_cart_bank(0)
 		, m_key_led_row(0xff)
 		, m_tempo_source(0xff)
@@ -75,8 +80,8 @@ public:
 		{
 			{"1", "2", "3", "4", "scale_1", "scale_2"},
 			{"5", "6", "7", "8", "scale_3", "scale_4"},
-			{"9", "10", "11", "12", "group_a", "group_b"},
-			{"13", "14", "15", "16", "group_c", "group_d"},
+			{"9", "10", "11", "12", "group_1", "group_2"},
+			{"13", "14", "15", "16", "group_3", "group_4"},
 		};
 		for (int i = 0; i < 4; ++i)
 			for (int j = 0; j < 6; ++j)
@@ -84,10 +89,13 @@ public:
 	}
 
 	void tr707(machine_config &config);
+	void tr727(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(sync_input_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(tempo_pots_adjusted);
 	DECLARE_INPUT_CHANGED_MEMBER(accent_pots_adjusted);
+	DECLARE_INPUT_CHANGED_MEMBER(mix_adjusted);
+	DECLARE_INPUT_CHANGED_MEMBER(master_volume_adjusted);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -130,7 +138,7 @@ private:
 
 	void tempo_source_w(u8 data);
 	void update_tempo_line();
-	void internal_tempo_clock_changed(int state);
+	void internal_tempo_clock_cb(int state);
 	void update_internal_tempo_timer(bool cap_reset);
 	TIMER_DEVICE_CALLBACK_MEMBER(tempo_timer_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(tempo_restart_timer_tick);
@@ -167,6 +175,9 @@ private:
 	required_ioport m_accent_trimmer_parallel;  // TM-3, 200K(B).
 	required_ioport m_accent_level;  // VR201, 50K(B).
 
+	output_finder<> m_layout_727;
+	bool m_is_727;  // Configuration. Not needed in save state.
+
 	u8 m_cart_bank;  // IC27 (40H174), Q5.
 	u8 m_key_led_row;  // P60-P63.
 	u8 m_tempo_source;  // P64-P66.
@@ -186,6 +197,7 @@ void roland_tr707_state::machine_start()
 	save_item(NAME(m_tempo_source));
 	save_item(NAME(m_midi_rxd_bit));
 
+	m_layout_727.resolve();
 	m_dinsync_out.resolve();
 	m_cart_led.resolve();
 	for (std::vector<output_finder<>> &led_row : m_leds)
@@ -197,6 +209,7 @@ void roland_tr707_state::machine_reset()
 {
 	update_internal_tempo_timer(true);
 	update_accent_adc();
+	m_layout_727 = m_is_727;
 }
 
 
@@ -408,7 +421,7 @@ void roland_tr707_state::update_internal_tempo_timer(bool cap_reset)
 	          r, period, remaining, 1.0 / period, 60.0 / period / 24 / 2);
 }
 
-void roland_tr707_state::internal_tempo_clock_changed(int state)
+void roland_tr707_state::internal_tempo_clock_cb(int state)
 {
 	// Divide-by-two configuration: output /Q connected to input D.
 	m_tempo_ff->d_w(state);
@@ -521,6 +534,16 @@ DECLARE_INPUT_CHANGED_MEMBER(roland_tr707_state::accent_pots_adjusted)
 	update_accent_adc();
 }
 
+DECLARE_INPUT_CHANGED_MEMBER(roland_tr707_state::mix_adjusted)
+{
+	LOGMASKED(LOG_MIX, "Mix slider adjusted %d\n", newval);
+}
+
+DECLARE_INPUT_CHANGED_MEMBER(roland_tr707_state::master_volume_adjusted)
+{
+	LOGMASKED(LOG_MIX, "Master volume adjusted %d\n", newval);
+}
+
 void roland_tr707_state::mem_map(address_map &map)
 {
 	// Address bus A0-A11 pulled high by RA1 and RA2.
@@ -533,7 +556,7 @@ void roland_tr707_state::mem_map(address_map &map)
 	map(0x3000, 0x3fff).rw(FUNC(roland_tr707_state::cart_r), FUNC(roland_tr707_state::cart_w));
 	map(0x4000, 0x4000).mirror(0xfff).w(FUNC(roland_tr707_state::leds_w));
 	map(0x5000, 0x5000).mirror(0xfff).w(FUNC(roland_tr707_state::accent_level_w));
-	map(0x6000, 0x6fff).r(FUNC(roland_tr707_state::ga_trigger_r)).w(FUNC(roland_tr707_state::ga_trigger_w));
+	map(0x6000, 0x6fff).rw(FUNC(roland_tr707_state::ga_trigger_r), FUNC(roland_tr707_state::ga_trigger_w));
 	map(0x7000, 0x7000).mirror(0xfff).w(FUNC(roland_tr707_state::voice_select_w));
 	map(0x8000, 0xbfff).mirror(0x4000).rom().region("program", 0);
 }
@@ -583,12 +606,36 @@ static INPUT_PORTS_START(tr707)
 	PORT_START("TEMPO")  // Tempo knob, VR301, 1M (EWH-LNAF20C16).
 	PORT_ADJUSTER(50, "Tempo") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(roland_tr707_state::tempo_pots_adjusted), 0)
 
-	PORT_START("ACCENT")  // Accent level slider, VR201, 50K(B) (S2018).
+	PORT_START("VOLUME")  // Master volume slider, VR212, 50K(B) (S3028, dual-gang).
+	PORT_ADJUSTER(50, "Volume Level") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(roland_tr707_state::master_volume_adjusted), 0)
+
+	// SLIDER_* are all 50K B-curve (linear) potentiomenters (part# S2018).
+	PORT_START("SLIDER_1")  // VR201
 	PORT_ADJUSTER(50, "Accent") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(roland_tr707_state::accent_pots_adjusted), 0)
+	PORT_START("SLIDER_2")  // VR202
+	PORT_ADJUSTER(100, "Bass Drum Level") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(roland_tr707_state::mix_adjusted), 0)
+	PORT_START("SLIDER_3")  // VR203
+	PORT_ADJUSTER(100, "Snare Drum Level") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(roland_tr707_state::mix_adjusted), 0)
+	PORT_START("SLIDER_4")  // VR204
+	PORT_ADJUSTER(100, "Low Tom Level") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(roland_tr707_state::mix_adjusted), 0)
+	PORT_START("SLIDER_5")  // VR205
+	PORT_ADJUSTER(100, "Mid Tom Level") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(roland_tr707_state::mix_adjusted), 0)
+	PORT_START("SLIDER_6")  // VR206
+	PORT_ADJUSTER(100, "Hi Tom Level") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(roland_tr707_state::mix_adjusted), 0)
+	PORT_START("SLIDER_7")  // VR207
+	PORT_ADJUSTER(100, "Rimshot / Cowbell Level") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(roland_tr707_state::mix_adjusted), 0)
+	PORT_START("SLIDER_8")  // VR208
+	PORT_ADJUSTER(100, "Handclap / Tambourine Level") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(roland_tr707_state::mix_adjusted), 0)
+	PORT_START("SLIDER_9")  // VR209
+	PORT_ADJUSTER(100, "Hi Hat Level") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(roland_tr707_state::mix_adjusted), 0)
+	PORT_START("SLIDER_10")  // VR210
+	PORT_ADJUSTER(100, "Crash Level") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(roland_tr707_state::mix_adjusted), 0)
+	PORT_START("SLIDER_11")  // VR211
+	PORT_ADJUSTER(100, "Ride Level") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(roland_tr707_state::mix_adjusted), 0)
 
 	// Trimmer defaults based on calibration instructions in the service notes.
 	PORT_START("TM1")  // Tempo trimmer, TM-1, 200K(B) (RVF8P01-204).
-	PORT_ADJUSTER(62, "TRIMMER: tempo")
+	PORT_ADJUSTER(62, "TRIMMER: tempo (TM1)")
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(roland_tr707_state::tempo_pots_adjusted), 0)
 	PORT_START("TM2")  // Accent series trimmer, TM-2, 50K(B) (RVF8P01-503).
 	PORT_ADJUSTER(45, "TRIMMER: accent, series (TM2)")
@@ -639,8 +686,7 @@ void roland_tr707_state::tr707(machine_config &config)
 	m_maincpu->in_p5_cb().set_constant(0).mask(0x01);  // Connected to gnd.
 	// P51 (IRQ2) connected to IC4b (m_accent_adc_ff), pin Q. Not configured
 	// here, look for HD6301_IRQ2_LINE.
-	// P52 and P53 are inputs connected to eact other. Assuming they evaluate
-	// to 1, but not sure.
+	// A table in the service notes describes P52 and P53 as "unused, pulled up".
 	m_maincpu->in_p5_cb().append_constant(0x0c).mask(0x0c);
 	m_maincpu->in_p5_cb().append(FUNC(roland_tr707_state::cart_connected_r)).mask(0x01).lshift(4);
 	m_maincpu->in_p5_cb().append(FUNC(roland_tr707_state::dinsync_r<DINSYNC_CONTINUE>)).mask(0x01).lshift(5);
@@ -657,7 +703,7 @@ void roland_tr707_state::tr707(machine_config &config)
 	TIMER(config, m_tempo_timer).configure_generic(FUNC(roland_tr707_state::tempo_timer_tick));
 	TIMER(config, m_tempo_restart_timer).configure_generic(FUNC(roland_tr707_state::tempo_restart_timer_tick));
 	TTL7474(config, m_tempo_ff, 0);  // 4013, IC4a.
-	m_tempo_ff->comp_output_cb().set(FUNC(roland_tr707_state::internal_tempo_clock_changed));
+	m_tempo_ff->comp_output_cb().set(FUNC(roland_tr707_state::internal_tempo_clock_cb));
 
 	VA_RC_EG(config, m_accent_adc_rc).set_c(CAP_U(0.27));  // C15.
 	TIMER(config, m_accent_adc_timer).configure_generic(FUNC(roland_tr707_state::accent_adc_timer_tick));
@@ -676,6 +722,15 @@ void roland_tr707_state::tr707(machine_config &config)
 	m_led_matrix->output_x().set(FUNC(roland_tr707_state::led_outputs_w));
 
 	MB63H114(config, m_mac, 1.6_MHz_XTAL);
+
+	config.set_default_layout(layout_roland_tr707);
+	m_is_727 = false;
+}
+
+void roland_tr707_state::tr727(machine_config &config)
+{
+	tr707(config);
+	m_is_727 = true;
 }
 
 ROM_START(tr707)
@@ -712,4 +767,4 @@ ROM_END
 
 
 SYST(1985, tr707, 0, 0, tr707, tr707, roland_tr707_state, empty_init, "Roland", "TR-707 Rhythm Composer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-SYST(1985, tr727, 0, 0, tr707, tr707, roland_tr707_state, empty_init, "Roland", "TR-727 Rhythm Composer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1985, tr727, 0, 0, tr727, tr707, roland_tr707_state, empty_init, "Roland", "TR-727 Rhythm Composer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
