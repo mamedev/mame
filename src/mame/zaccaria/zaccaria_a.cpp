@@ -299,7 +299,7 @@ void zac1b11107_audio_device::melodypsg1_porta_w(u8 data)
 			RES_R(390),
 			RES_K(1.5),
 			RES_R(47) };
-	m_melodypsg2->set_volume(1, 150 * RES_VOLTAGE_DIVIDER(RES_K(4.7), table[data & 0x07]));
+	m_melodypsg2->set_output_gain(1, 1.5 * RES_VOLTAGE_DIVIDER(RES_K(4.7), table[data & 0x07]));
 }
 
 void zac1b11107_audio_device::melodypsg2_porta_w(u8 data)

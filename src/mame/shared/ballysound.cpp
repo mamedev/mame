@@ -177,8 +177,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(bally_as2888_device::timer_as2888)
 //--------------------------------------------------------------------------
 
 static INPUT_PORTS_START(as3022)
-		PORT_START("SW1")
-		PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Sound Test") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(bally_as3022_device::sw1), 0)
+	PORT_START("SW1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Sound Test") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(bally_as3022_device::sw1), 0)
 INPUT_PORTS_END
 
 ioport_constructor bally_as3022_device::device_input_ports() const
@@ -261,10 +261,11 @@ void bally_as3022_device::device_add_mconfig(machine_config &config)
 	m_pia->irqa_handler().set(FUNC(bally_as3022_device::pia_irq_w));
 	m_pia->irqb_handler().set(FUNC(bally_as3022_device::pia_irq_w));
 
+	// TODO: Calculate exact filter values. An AC filter is good enough for now
+	// and required as the chip likes to output a DC offset at idle.
 	for (required_device<filter_rc_device> &filter : m_ay_filters)
-		// TODO: Calculate exact filter values. An AC filter is good enough for now
-		// and required as the chip likes to output a DC offset at idle.
 		FILTER_RC(config, filter).set_ac().add_route(ALL_OUTPUTS, *this, 1.0);
+
 	AY8910(config, m_ay, DERIVED_CLOCK(1, 4));
 	m_ay->add_route(0, "ay_filter0", 0.33);
 	m_ay->add_route(1, "ay_filter1", 0.33);
@@ -280,10 +281,11 @@ void bally_as3022_device::device_add_mconfig(machine_config &config)
 
 void bally_as3022_device::device_start()
 {
+	if (!m_ay->started())
+		throw device_missing_dependencies();
+
 	// Set volumes to a sane default.
-	m_ay->set_volume(0, 0);
-	m_ay->set_volume(1, 0);
-	m_ay->set_volume(2, 0);
+	m_ay->set_output_gain(ALL_OUTPUTS, 0.0);
 
 	save_item(NAME(m_bc1));
 	save_item(NAME(m_bdir));
@@ -345,18 +347,7 @@ void bally_as3022_device::pia_portb_w(uint8_t data)
 void bally_as3022_device::pia_cb2_w(int state)
 {
 	// This pin is hooked up to the amp, and disables sounds when hi
-	if (state)
-	{
-		m_ay->set_volume(0, 0);
-		m_ay->set_volume(1, 0);
-		m_ay->set_volume(2, 0);
-	}
-	else
-	{
-		m_ay->set_volume(0, 0xff);
-		m_ay->set_volume(1, 0xff);
-		m_ay->set_volume(2, 0xff);
-	}
+	m_ay->set_output_gain(ALL_OUTPUTS, state ? 0.0 : 1.0);
 }
 
 //-------------------------------------------------
@@ -787,12 +778,13 @@ void bally_squawk_n_talk_ay_device::device_add_mconfig(machine_config &config)
 //-------------------------------------------------
 void bally_squawk_n_talk_ay_device::device_start()
 {
+	if (!m_ay->started())
+		throw device_missing_dependencies();
+
 	bally_squawk_n_talk_device::device_start();
 
 	// Set volumes to a sane default.
-	m_ay->set_volume(0, 0);
-	m_ay->set_volume(1, 0);
-	m_ay->set_volume(2, 0);
+	m_ay->set_output_gain(ALL_OUTPUTS, 0.0);
 
 	save_item(NAME(m_bc1));
 	save_item(NAME(m_bdir));
@@ -849,18 +841,7 @@ void bally_squawk_n_talk_ay_device::pia2_portb_w(uint8_t data)
 void bally_squawk_n_talk_ay_device::pia2_cb2_w(int state)
 {
 	// This pin is hooked up to the amp, and disables sounds when hi
-	if (state)
-	{
-		m_ay->set_volume(0, 0);
-		m_ay->set_volume(1, 0);
-		m_ay->set_volume(2, 0);
-	}
-	else
-	{
-		m_ay->set_volume(0, 0xff);
-		m_ay->set_volume(1, 0xff);
-		m_ay->set_volume(2, 0xff);
-	}
+	m_ay->set_output_gain(ALL_OUTPUTS, state ? 0.0 : 1.0);
 }
 
 //-------------------------------------------------
