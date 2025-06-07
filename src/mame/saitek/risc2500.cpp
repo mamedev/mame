@@ -73,12 +73,15 @@ public:
 		m_ram(*this, "ram"),
 		m_nvram(*this, "nvram"),
 		m_board(*this, "board"),
-		m_lcdc(*this, "lcdc"),
 		m_led_pwm(*this, "led_pwm"),
+		m_lcdc(*this, "lcdc"),
+		m_screen(*this, "screen"),
 		m_dac(*this, "dac"),
 		m_inputs(*this, "IN.%u", 0),
-		m_digits(*this, "digit%u", 0U),
-		m_syms(*this, "sym%u", 0U)
+		m_lcd_dmz(*this, "dmz%u.%u.%u", 0U, 0U, 0U),
+		m_lcd_digit(*this, "digit%u", 0U),
+		m_lcd_seg(*this, "seg%u.%u", 0U, 0U),
+		m_lcd_sym(*this, "sym%u", 0U)
 	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(on_button);
@@ -97,12 +100,15 @@ private:
 	required_device<ram_device> m_ram;
 	required_device<nvram_device> m_nvram;
 	required_device<sensorboard_device> m_board;
-	required_device<sed1520_device> m_lcdc;
 	required_device<pwm_display_device> m_led_pwm;
+	required_device<sed1520_device> m_lcdc;
+	required_device<screen_device> m_screen;
 	required_device<dac_2bit_ones_complement_device> m_dac;
 	required_ioport_array<8> m_inputs;
-	output_finder<12> m_digits;
-	output_finder<14> m_syms;
+	output_finder<12, 7, 6> m_lcd_dmz;
+	output_finder<12> m_lcd_digit;
+	output_finder<12, 8> m_lcd_seg;
+	output_finder<14> m_lcd_sym;
 
 	emu_timer *m_boot_timer;
 
@@ -113,8 +119,9 @@ private:
 
 	void risc2500_mem(address_map &map) ATTR_COLD;
 
-	void lcd_palette(palette_device &palette) const;
-	SED1520_UPDATE_CB(screen_update_cb);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	SED1520_UPDATE_CB(sed1520_update);
+
 	u32 input_r();
 	void control_w(u32 data);
 	u32 rom_r(offs_t offset);
@@ -132,8 +139,10 @@ private:
 
 void risc2500_state::machine_start()
 {
-	m_digits.resolve();
-	m_syms.resolve();
+	m_lcd_dmz.resolve();
+	m_lcd_digit.resolve();
+	m_lcd_seg.resolve();
+	m_lcd_sym.resolve();
 
 	m_boot_timer = timer_alloc(FUNC(risc2500_state::disable_bootrom), this);
 	m_boot_view[1].install_ram(0, m_ram->size() - 1, m_ram->pointer());
@@ -163,49 +172,45 @@ void risc2500_state::machine_reset()
     Video
 *******************************************************************************/
 
-void risc2500_state::lcd_palette(palette_device &palette) const
+u32 risc2500_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	palette.set_pen_color(0, rgb_t(131, 136, 139)); // lcd pixel off
-	palette.set_pen_color(1, rgb_t(51, 42, 43)); // lcd pixel on
-	palette.set_pen_color(2, rgb_t(138, 146, 148)); // background
+	// forward to SED1520
+	return m_lcdc->screen_update(screen, m_screen->curbitmap().as_ind16(), cliprect);
 }
 
-SED1520_UPDATE_CB(risc2500_state::screen_update_cb)
+SED1520_UPDATE_CB(risc2500_state::sed1520_update)
 {
-	bitmap.fill(2, cliprect);
-
 	for (int c = 0; c < 12; c++)
 	{
+		u8 data = 0;
+
 		// 12 characters 5 x 7
 		for (int x = 0; x < 5; x++)
 		{
-			u8 gfx = 0;
 			if (lcd_on)
-				gfx = bitswap<8>(dram[c * 5 + x], 6,5,0,1,2,3,4,7);
+				data = bitswap<8>(dram[c * 5 + x], 6,5,0,1,2,3,4,7);
 
 			for (int y = 1; y < 8; y++)
-				bitmap.pix(y, 71 - (c * 6 + x)) = BIT(gfx, y);
+				m_lcd_dmz[11 - c][y - 1][4 - x] = BIT(data, y);
 		}
 
 		// LCD digits and symbols
+		int data_addr = 80 + c * 5;
 		if (lcd_on)
 		{
-			int data_addr = 80 + c * 5;
-			u16 data = ((dram[data_addr + 1] & 0x3) << 5) | ((dram[data_addr + 2] & 0x7) << 2) | (dram[data_addr + 4] & 0x3);
+			data = ((dram[data_addr + 1] & 0x3) << 5) | ((dram[data_addr + 2] & 0x7) << 2) | (dram[data_addr + 4] & 0x3);
 			data = bitswap<8>(data, 7,3,0,1,4,6,5,2) | ((dram[data_addr - 1] & 0x04) ? 0x80 : 0);
+		}
 
-			m_digits[c] = data;
-			m_syms[c] = BIT(dram[data_addr + 1], 2);
-		}
-		else
-		{
-			m_digits[c] = 0;
-			m_syms[c] = 0;
-		}
+		for (int s = 0; s < 8; s++)
+			m_lcd_seg[11 - c][s] = BIT(data, s);
+
+		m_lcd_digit[11 - c] = data;
+		m_lcd_sym[c] = lcd_on ? BIT(dram[data_addr + 1], 2) : 0;
 	}
 
-	m_syms[12] = lcd_on ? BIT(dram[0x73], 0) : 0;
-	m_syms[13] = lcd_on ? BIT(dram[0x5a], 0) : 0;
+	m_lcd_sym[12] = lcd_on ? BIT(dram[0x73], 0) : 0;
+	m_lcd_sym[13] = lcd_on ? BIT(dram[0x5a], 0) : 0;
 
 	return 0;
 }
@@ -418,17 +423,14 @@ void risc2500_state::risc2500(machine_config &config)
 	m_board->set_nvram_enable(true);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
-	screen.set_refresh_hz(60);
-	screen.set_size(12*6+1, 7+2);
-	screen.set_visarea_full();
-	screen.set_screen_update(m_lcdc, FUNC(sed1520_device::screen_update));
-	screen.set_palette("palette");
-
-	PALETTE(config, "palette", FUNC(risc2500_state::lcd_palette), 3);
-
 	SED1520(config, m_lcdc);
-	m_lcdc->set_screen_update_cb(FUNC(risc2500_state::screen_update_cb));
+	m_lcdc->set_screen_update_cb(FUNC(risc2500_state::sed1520_update));
+
+	SCREEN(config, m_screen, SCREEN_TYPE_SVG);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_size(1920/5, 768/5);
+	m_screen->set_visarea_full();
+	m_screen->set_screen_update(FUNC(risc2500_state::screen_update));
 
 	PWM_DISPLAY(config, m_led_pwm).set_size(2, 8);
 	config.set_default_layout(layout_saitek_risc2500);
@@ -453,16 +455,25 @@ void risc2500_state::montreux(machine_config &config)
 ROM_START( risc2500 )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD("risc2500_v.1.04.u7", 0x000000, 0x020000, CRC(84a06178) SHA1(66f4d9f53de6da865a3ebb4af1d6a3e245c59a3c) ) // M27C1001
+
+	ROM_REGION( 221204, "screen", 0 )
+	ROM_LOAD("risc2500.svg", 0, 221204, CRC(5f845271) SHA1(3ce80b6d132d854b4157ae548e15a60bea1960a4) )
 ROM_END
 
 ROM_START( risc2500a )
 	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD("risc2500_v.1.03.u7", 0x000000, 0x020000, CRC(7a707e82) SHA1(87187fa58117a442f3abd30092cfcc2a4d7c7efc) )
+
+	ROM_REGION( 221204, "screen", 0 )
+	ROM_LOAD("risc2500.svg", 0, 221204, CRC(5f845271) SHA1(3ce80b6d132d854b4157ae548e15a60bea1960a4) )
 ROM_END
 
 ROM_START( montreux ) // v1.00
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD("rt17b_103_u_7.u7", 0x000000, 0x040000, CRC(db374cf3) SHA1(44dd60d56779084326c3dfb41d2137ebf0b4e0ac) ) // 27C020-15
+
+	ROM_REGION( 221204, "screen", 0 )
+	ROM_LOAD("risc2500.svg", 0, 221204, CRC(5f845271) SHA1(3ce80b6d132d854b4157ae548e15a60bea1960a4) )
 ROM_END
 
 } // anonymous namespace
