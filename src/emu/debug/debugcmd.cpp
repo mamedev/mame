@@ -28,6 +28,7 @@
 #include "softlist.h"
 
 #include "corestr.h"
+#include "multibyte.h"
 
 #include <algorithm>
 #include <cctype>
@@ -2526,11 +2527,11 @@ bool debugger_commands::execute_dump_try_memory(const std::vector<std::string_vi
 	memory_region *region = nullptr;
 	memory_share *share = nullptr;
 	if (!m_console.validate_address_with_memory_parameter(params[1], offset, region, share))
-		return false;
+		return false; // not memory case
 
 	u64 length;
 	if (offset == u64(-1) || !m_console.validate_number_parameter(params[2], length) || (region == nullptr && share == nullptr))
-		return true; // not memory case
+		return true;
 
 	// ...
 
@@ -2715,6 +2716,7 @@ void debugger_commands::execute_strdump(int spacenum, const std::vector<std::str
 	fclose(f);
 	m_console.printf("Data dumped successfully\n");
 }
+
 /*-------------------------------------------------
     execute_strdumpmemory - execute the strdump command on memory
 -------------------------------------------------*/
@@ -3380,7 +3382,120 @@ bool debugger_commands::execute_find_try_memory(const std::vector<std::string_vi
 	if (offset == u64(-1) || !m_console.validate_number_parameter(params[1], length) || (region == nullptr && share == nullptr))
 		return true;
 
-	// ...
+	u32 msize;
+	u8 *base;
+	bool is_le;
+	if (region != nullptr)
+	{
+		msize = region->bytes();
+		base = region->base();
+		is_le = region->endianness() == ENDIANNESS_LITTLE;
+	}
+	else // if (share != nullptr)
+	{
+		msize = share->bytes();
+		base = reinterpret_cast<u8 *>(share->ptr());
+		is_le = share->endianness() == ENDIANNESS_LITTLE;
+	}
+
+	if (offset >= msize)
+	{
+		m_console.printf("Invalid offset\n");
+		return true;
+	}
+	if ((length <= 0) || ((length + offset) >= msize))
+		length = msize - offset;
+
+	// further validation
+	u64 const endoffset = offset + length - 1;
+	int cur_data_size = 1;
+
+	// parse the data parameters
+	u64 data_to_find[256];
+	u8 data_size[256];
+	int data_count = 0;
+	for (int i = 2; i < params.size(); i++)
+	{
+		std::string_view pdata = params[i];
+
+		if (!pdata.empty() && pdata.front() == '"' && pdata.back() == '"') // check for a string
+		{
+			auto const pdatalen = params[i].length() - 1;
+			for (int j = 1; j < pdatalen; j++)
+			{
+				data_to_find[data_count] = pdata[j];
+				data_size[data_count++] = 1;
+			}
+		}
+		else // otherwise, validate as a number
+		{
+			// check for a 'b','w','d',or 'q' prefix
+			data_size[data_count] = cur_data_size;
+			if (pdata.length() >= 2)
+			{
+				if (tolower(u8(pdata[0])) == 'b' && pdata[1] == '.') { data_size[data_count] = cur_data_size = 1; pdata.remove_prefix(2); }
+				if (tolower(u8(pdata[0])) == 'w' && pdata[1] == '.') { data_size[data_count] = cur_data_size = 2; pdata.remove_prefix(2); }
+				if (tolower(u8(pdata[0])) == 'd' && pdata[1] == '.') { data_size[data_count] = cur_data_size = 4; pdata.remove_prefix(2); }
+				if (tolower(u8(pdata[0])) == 'q' && pdata[1] == '.') { data_size[data_count] = cur_data_size = 8; pdata.remove_prefix(2); }
+			}
+
+			// look for a wildcard
+			if (pdata == "?")
+				data_size[data_count++] |= 0x10;
+
+			// otherwise, validate as a number
+			else if (!m_console.validate_number_parameter(pdata, data_to_find[data_count++]))
+				return true;
+		}
+	}
+
+	// now search
+	int found = 0;
+	for (u64 i = offset; i <= endoffset; i += data_size[0])
+	{
+		int suboffset = 0;
+		bool match = true;
+
+		// find the entire string
+		for (int j = 0; j < data_count && match; j++)
+		{
+			offs_t address = i + suboffset;
+			switch (data_size[j])
+			{
+			case 1:
+				match = u8(data_to_find[j]) == base[address];
+				break;
+
+			case 2:
+				match = u16(data_to_find[j]) == (is_le ? get_u16le(&base[address]) : get_u16be(&base[address]));
+				break;
+
+			case 4:
+				match = u32(data_to_find[j]) == (is_le ? get_u32le(&base[address]) : get_u32be(&base[address]));
+				break;
+
+			case 8:
+				match = u64(data_to_find[j]) == (is_le ? get_u64le(&base[address]) : get_u64be(&base[address]));
+				break;
+
+			default:
+				// all other cases are wildcards
+				break;
+			}
+			suboffset += data_size[j] & 0x0f;
+		}
+
+		// did we find it?
+		if (match)
+		{
+			found++;
+			m_console.printf("Found at %04X\n", i);
+		}
+	}
+
+	// print something if not found
+	if (found == 0)
+		m_console.printf("Not found\n");
 
 	return true;
 }
@@ -3513,7 +3628,119 @@ bool debugger_commands::execute_fill_try_memory(const std::vector<std::string_vi
 	if (offset == u64(-1) || !m_console.validate_number_parameter(params[1], length) || (region == nullptr && share == nullptr))
 		return true;
 
-	// ...
+	u32 msize;
+	u8 *base;
+	bool is_le;
+	if (region != nullptr)
+	{
+		msize = region->bytes();
+		base = region->base();
+		is_le = region->endianness() == ENDIANNESS_LITTLE;
+	}
+	else // if (share != nullptr)
+	{
+		msize = share->bytes();
+		base = reinterpret_cast<u8 *>(share->ptr());
+		is_le = share->endianness() == ENDIANNESS_LITTLE;
+	}
+
+	if (offset >= msize)
+	{
+		m_console.printf("Invalid offset\n");
+		return true;
+	}
+	if ((length <= 0) || ((length + offset) >= msize))
+		length = msize - offset;
+
+	// further validation
+	int cur_data_size = 1;
+
+	// parse the data parameters
+	u64 fill_data[256];
+	u8 fill_data_size[256];
+	int data_count = 0;
+	for (int i = 2; i < params.size(); i++)
+	{
+		std::string_view pdata = params[i];
+
+		// check for a string
+		if (!pdata.empty() && pdata.front() == '"' && pdata.back() == '"')
+		{
+			auto const pdatalen = pdata.length() - 1;
+			for (int j = 1; j < pdatalen; j++)
+			{
+				fill_data[data_count] = pdata[j];
+				fill_data_size[data_count++] = 1;
+			}
+		}
+
+		// otherwise, validate as a number
+		else
+		{
+			// check for a 'b','w','d',or 'q' prefix
+			fill_data_size[data_count] = cur_data_size;
+			if (pdata.length() >= 2)
+			{
+				if (tolower(u8(pdata[0])) == 'b' && pdata[1] == '.') { fill_data_size[data_count] = cur_data_size = 1; pdata.remove_prefix(2); }
+				if (tolower(u8(pdata[0])) == 'w' && pdata[1] == '.') { fill_data_size[data_count] = cur_data_size = 2; pdata.remove_prefix(2); }
+				if (tolower(u8(pdata[0])) == 'd' && pdata[1] == '.') { fill_data_size[data_count] = cur_data_size = 4; pdata.remove_prefix(2); }
+				if (tolower(u8(pdata[0])) == 'q' && pdata[1] == '.') { fill_data_size[data_count] = cur_data_size = 8; pdata.remove_prefix(2); }
+			}
+
+			// validate as a number
+			if (!m_console.validate_number_parameter(pdata, fill_data[data_count++]))
+				return true;
+		}
+	}
+	if (data_count == 0)
+		return true;
+
+	// now fill memory
+	u64 count = length;
+	while (count != 0)
+	{
+		// write the entire string
+		for (int j = 0; j < data_count; j++)
+		{
+			offs_t address = offset;
+			switch (fill_data_size[j])
+			{
+			case 1:
+				base[address] = u8(fill_data[j]);
+				break;
+
+			case 2:
+				if (is_le)
+					put_u16le(&base[address], u16(fill_data[j]));
+				else
+					put_u16be(&base[address], u16(fill_data[j]));
+				break;
+
+			case 4:
+				if (is_le)
+					put_u32le(&base[address], u32(fill_data[j]));
+				else
+					put_u32be(&base[address], u32(fill_data[j]));
+				break;
+
+			case 8:
+				if (is_le)
+					put_u64le(&base[address], u64(fill_data[j]));
+				else
+					put_u64be(&base[address], u64(fill_data[j]));
+				break;
+			}
+
+			offset += fill_data_size[j];
+			if (count <= fill_data_size[j])
+			{
+				count = 0;
+				break;
+			}
+			else
+				count -= fill_data_size[j];
+		}
+	}
 
 	return true;
 }
