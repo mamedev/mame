@@ -30,7 +30,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 -->
 
 
-	<software name="007rcng">
+	<software name="007rcng_us" cloneof="007rcng">
 		<!--
 		redump.org/disc/633
 		<rom name="007 Racing (USA).cue" size="82" crc="5c58d484" sha1="f74c52098f149c91f066b17e9000d5a059ec4405"/>
@@ -50,7 +50,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		</part>
 	</software>
 
-	<software name="007tnd">
+	<software name="007tnd_us" cloneof="007tnd">
 		<!--
 		redump.org/disc/830
 		<rom name="007 - Tomorrow Never Dies (USA).cue" size="97" crc="dc22c9e3" sha1="55b145bd5563c4b62cf3fadeda704340824c7b55"/>
@@ -69,7 +69,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		</part>
 	</software>
 
-	<software name="007twine">
+	<software name="007twine_us" cloneof="007twine">
 		<!--
 		redump.org/disc/2387
 		<rom name="007 - The World Is Not Enough (USA).cue" size="101" crc="adc163bd" sha1="1e4a0731b245ab3419a5e0f23cb1001e1f1e7613"/>
@@ -59802,7 +59802,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 
 	<!-- Redump PAL (Europe) -->
 
-	<software name="007tnd_eu" cloneof="007tnd">
+	<software name="007tnd">
 		<!--
 		redump.org/disc/967
 		<rom name="007 - Tomorrow Never Dies (Europe).cue" size="100" crc="765606dd" sha1="fd5f043ce416db55a16a72ea4cd7b408aef20f2f"/>
@@ -59859,7 +59859,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="007twine_eu" cloneof="007twine">
+	<software name="007twine">
 		<!--
 		redump.org/disc/968
 		<rom name="007 - The World Is Not Enough (Europe).cue" size="104" crc="7d9fe2b7" sha1="b46ef39f671f819d7077d38b401d251ebbb208fd"/>
@@ -59955,7 +59955,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="007rcng_eu" cloneof="007rcng">
+	<software name="007rcng">
 		<!--
 		redump.org/disc/6858
 		<rom name="007 Racing (Europe).cue" size="85" crc="74722fc6" sha1="db19e66b47df3b885c8a43d177524eb72cbbb9e8"/>
