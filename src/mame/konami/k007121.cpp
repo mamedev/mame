@@ -210,22 +210,57 @@ void k007121_device::ctrl_w(offs_t offset, uint8_t data)
  *
  */
 
+#define SPRITE_FORMAT_SIZE 5
+#define MAX_SPRITE_BLOCKS 264		// Maximum number of 8x8 sprite blocks that can be drawn
+#define MAX_SPRITES 0x199		// floor(0x800 / SPRITE_FORMAT_SIZE)
+
 void k007121_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect,
 		const uint8_t *source, int base_color, int global_x_offset, int bank_base, bitmap_ind8 &priority_bitmap, uint32_t pri_mask)
 {
-	// TODO: sprite limit is supposed to be per-line! (check MT #00185)
-	int num = 0x40;
-	//num = (m_ctrlram[0x03] & 0x40) ? 0x80 : 0x40; // WRONG!!! (needed by combatsc)
 
-	int inc = 5;
+	// determine number of sprites that will be drawn
+	int num_sprites = 0;
+	int sprite_blocks = 0;
+	for (int i = 0;i < MAX_SPRITES && sprite_blocks < MAX_SPRITE_BLOCKS; i+= SPRITE_FORMAT_SIZE) {
+		num_sprites++;
+		int attr = source[i + 4];
+		switch (attr & 0xe)
+		{
+			case 0x06:
+				sprite_blocks += 1;
+				break;
+
+			case 0x04:
+				sprite_blocks += 3;
+				break;
+
+			case 0x02:
+				sprite_blocks += 3;
+				break;
+
+			case 0x00:
+				sprite_blocks += 4;
+				break;
+
+			case 0x08:
+				sprite_blocks += 16;
+				break;
+
+			default:
+				sprite_blocks += 1;
+				break;
+		}
+	}
+
+	int inc = SPRITE_FORMAT_SIZE;
 	// when using priority buffer, draw front to back
 	if (pri_mask != (uint32_t)-1)
 	{
-		source += (num - 1)*inc;
+		source += (num_sprites - 1)*inc;
 		inc = -inc;
 	}
 
-	for (int i = 0; i < num; i++)
+	for (int i = 0; i < num_sprites; i++)
 	{
 		int number = source[0];
 		int sprite_bank = source[1] & 0x0f;
