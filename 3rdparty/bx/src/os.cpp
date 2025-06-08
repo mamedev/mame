@@ -19,17 +19,7 @@
 #	endif // WIN32_LEAN_AND_MEAN
 #	include <windows.h>
 #	include <psapi.h>
-#elif  BX_PLATFORM_ANDROID    \
-	|| BX_PLATFORM_BSD        \
-	|| BX_PLATFORM_EMSCRIPTEN \
-	|| BX_PLATFORM_HAIKU      \
-	|| BX_PLATFORM_HURD       \
-	|| BX_PLATFORM_IOS        \
-	|| BX_PLATFORM_LINUX      \
-	|| BX_PLATFORM_NX         \
-	|| BX_PLATFORM_OSX        \
-	|| BX_PLATFORM_PS4        \
-	|| BX_PLATFORM_RPI
+#elif  BX_PLATFORM_POSIX
 #	include <sched.h> // sched_yield
 #	if BX_PLATFORM_BSD       \
 	|| BX_PLATFORM_HAIKU     \
