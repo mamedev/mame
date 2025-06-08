@@ -342,13 +342,13 @@ void samples_device::sound_stream_update(sound_stream &stream)
 
 				for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 				{
-					// do a linear interp on the sample
+					// do a linear interpolation on the sample
 					double pos_floor = floor(chan.pos);
 					double frac = chan.pos - pos_floor;
 					int32_t ipos = int32_t(pos_floor);
 
 					sound_stream::sample_t sample1 = sound_stream::sample_t(sample[ipos++]);
-					sound_stream::sample_t sample2 = sound_stream::sample_t(sample[(ipos + 1) % chan.source_len]);
+					sound_stream::sample_t sample2 = sound_stream::sample_t(sample[ipos % chan.source_len]);
 					stream.put(0, sampindex, sample_scale * ((1.0 - frac) * sample1 + frac * sample2));
 
 					// advance
