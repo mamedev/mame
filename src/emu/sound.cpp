@@ -224,20 +224,12 @@ template<typename S> void emu::detail::output_buffer_flat<S>::resample(u32 previ
 		return;
 	}
 
-	auto cv = [](u32 source_rate, u32 dest_rate, s64 time) -> std::pair<s64, double> {
-		s64 sec = time / source_rate;
-		s64 prem = time % source_rate;
-		double nrem = double(prem * dest_rate) / double(source_rate);
-		s64 cyc = s64(nrem);
-		return std::make_pair(sec * dest_rate + cyc, nrem - cyc);
-	};
-
 	// Compute what will be the new start, sync and write positions (if it fits)
 	s64 nsync = si(sync_time, next_rate);
 	s64 nwrite = si(now, next_rate);
 	s64 pbase = m_sync_sample - m_sync_position; // Beware, pbase can be negative at startup due to history size
-	auto [nbase, nbase_dec] = cv(previous_rate, next_rate, pbase < 0 ? 0 : pbase);
-	nbase += 1;
+	u64 nbase = pbase <= 0 ? 0 : muldivupu_64(pbase, next_rate, previous_rate);
+
 	if(nbase > nsync)
 		nbase = nsync;
 
@@ -248,11 +240,13 @@ template<typename S> void emu::detail::output_buffer_flat<S>::resample(u32 previ
 			fatalerror("Stream buffer too small, can't proceed, rate change %d -> %d, space=%d\n", previous_rate, next_rate, space);
 	}
 
-	auto [ppos, pdec] = cv(next_rate, previous_rate, nbase);
-	if(ppos < pbase || ppos > pbase + m_write_position)
+	u64 ppos = muldivu_64(nbase, previous_rate, next_rate);
+	if(ppos > pbase + m_write_position)
 		fatalerror("Something went very wrong, ppos=%d, pbase=%d, pbase+wp=%d\n", ppos, pbase, pbase + m_write_position);
 
 	double step = double(previous_rate) / double(next_rate);
+	double pdec = double(nbase % next_rate) * next_rate / previous_rate;
+	pdec -= floor(pdec);
 	u32 pindex = ppos - pbase;
 	u32 nend = nwrite - nbase;
 
