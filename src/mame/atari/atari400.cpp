@@ -2009,8 +2009,6 @@ void a400_state::atari_common_nodac(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	POKEY(config, m_pokey, pokey_device::FREQ_17_EXACT);
-	m_pokey->serin_r().set("fdc", FUNC(atari_fdc_device::serin_r));
-	m_pokey->serout_w().set("fdc", FUNC(atari_fdc_device::serout_w));
 	//m_pokey->oclk_w().set("sio", FUNC(a8sio_device::clock_out_w));
 	//m_pokey->sod_w().set("sio", FUNC(a8sio_device::data_out_w));
 	m_pokey->set_keyboard_callback(FUNC(a400_state::a800_keyboard));
@@ -2032,6 +2030,7 @@ void a400_state::atari_common(machine_config &config)
 	m_pokey->pot_r<5>().set(m_ctrl[2], FUNC(vcs_control_port_device::read_pot_x));
 	m_pokey->pot_r<6>().set(m_ctrl[3], FUNC(vcs_control_port_device::read_pot_y));
 	m_pokey->pot_r<7>().set(m_ctrl[3], FUNC(vcs_control_port_device::read_pot_x));
+	m_pokey->sod_w().set("fdc", FUNC(atari_fdc_device::rx_w));
 
 	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.03);
 
@@ -2245,8 +2244,8 @@ void a5200_state::a5200(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(a5200_state::a5200_interrupt), "screen", 0, 1);
 
 	// Not used but exposed via expansion port
-	m_pokey->serin_r().set_constant(0);
-	m_pokey->serout_w().set_nop();
+	//m_pokey->serin_r().set_constant(0);
+	//m_pokey->serout_w().set_nop();
 	m_pokey->pot_r<0>().set_ioport("analog_0");
 	m_pokey->pot_r<1>().set_ioport("analog_1");
 	m_pokey->pot_r<2>().set_ioport("analog_2");

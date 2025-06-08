@@ -11,14 +11,13 @@
 #include "imagedev/flopdrv.h"
 #include "machine/6821pia.h"
 #include "sound/pokey.h"
+#include "diserial.h"
 
-class atari_fdc_device : public device_t
+class atari_fdc_device : public device_t, public device_serial_interface
 {
 public:
 	atari_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	uint8_t serin_r();
-	void serout_w(uint8_t data);
 	void pia_cb2_w(int state);
 	void atari_load_proc(device_image_interface &image, bool is_created);
 
@@ -27,7 +26,14 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
+	// device_serial_interface implementation
+	virtual void tra_callback() override;
+	virtual void tra_complete() override;
+	virtual void rcv_complete() override;
+
 private:
+	TIMER_CALLBACK_MEMBER(serin_ready);
+
 	void clr_serout(int expect_data);
 	void add_serout(int expect_data);
 	void clr_serin(int ser_delay);
@@ -65,6 +71,7 @@ private:
 	uint8_t m_serin_buff[512];
 	uint8_t m_serin_chksum;
 	int  m_serin_delay;
+	emu_timer *m_serin_timer;
 
 	atari_drive m_drv[4];
 };
