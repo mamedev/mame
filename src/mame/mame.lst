@@ -357,6 +357,16 @@ torchh
 torch301
 torch725
 
+@source:acorn/belatra.cpp
+fairyl2
+fairyl2a
+fairyl2b
+fairyl2bl
+ldrink
+ldrinka
+merryjn
+unkbel
+
 @source:acorn/cms.cpp
 cms6502
 
@@ -29616,16 +29626,6 @@ ctainv
 @source:misc/beezer.cpp
 beezer
 beezer1
-
-@source:misc/belatra.cpp
-fairyl2
-fairyl2a
-fairyl2b
-fairyl2bl
-ldrink
-ldrinka
-merryjn
-unkbel
 
 @source:misc/bingoman.cpp
 bingoman
