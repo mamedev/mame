@@ -57,7 +57,7 @@ debugger_cpu::debugger_cpu(running_machine &machine)
 	m_tempvar = make_unique_clear<u64[]>(NUM_TEMP_VARIABLES);
 
 	/* create a global symbol table */
-	m_symtable = std::make_unique<symbol_table>(machine, symbol_table::BUILTIN_GLOBALS);
+	m_symtable = std::make_unique<symbol_table>(machine, symbol_table::DEBUGGER_GLOBALS);
 	m_symtable->set_memory_modified_func([this]() { set_memory_modified(true); });
 
 	/* add "wpaddr", "wpdata", "wpsize" to the global symbol table */
