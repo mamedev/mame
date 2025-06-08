@@ -303,6 +303,7 @@ private:
 	bool m_ser_iclk;
 	bool m_ser_oclk;
 	bool m_serout_full;
+	bool m_sod_twotone;
 
 	attotime m_clock_period;
 

@@ -289,8 +289,11 @@ void pokey_device::device_start()
 	m_kbd_state = 0;
 
 	m_serin_shift = 1;
-	m_serout_shift = 0;
+	m_serout_shift = 1;
 	m_serout_full = false;
+	m_ser_iclk = true;
+	m_ser_oclk = false;
+	m_sod_twotone = false;
 
 	/* reset more internal state */
 	std::fill(std::begin(m_clock_cnt), std::end(m_clock_cnt), 0);
@@ -336,6 +339,7 @@ void pokey_device::device_start()
 	save_item(NAME(m_serout_full));
 	save_item(NAME(m_ser_iclk));
 	save_item(NAME(m_ser_oclk));
+	save_item(NAME(m_sod_twotone));
 
 	// State support
 
@@ -738,6 +742,9 @@ void pokey_device::step_one_clock()
 	{
 		m_channel[CHAN1].reset_channel();
 		m_old_raw_inval = true;
+
+		m_sod_twotone = !m_sod_twotone;
+		m_sod_w_cb(!m_sod_twotone);
 	}
 
 	if (m_channel[CHAN1].check_borrow())
@@ -749,9 +756,19 @@ void pokey_device::step_one_clock()
 			m_channel[CHAN2].inc_chan(*this, 1);
 		}
 		else
+		{
 			m_channel[CHAN1].reset_channel();
 
-		// TODO: If two-tone is enabled *and* serial output == 1 then reset the channel 2 timer.
+			// If two-tone is enabled *and* serial output == 1 then reset the channel 2 timer.
+			if ((m_SKCTL & SK_TWOTONE) && ((m_IRQST & IRQ_SEROC) ? !(m_SKCTL & SK_BREAK) : m_serout_shift & 1))
+			{
+				m_channel[CHAN2].reset_channel();
+				m_old_raw_inval = true;
+
+				m_sod_twotone = !m_sod_twotone;
+				m_sod_w_cb(!m_sod_twotone);
+			}
+		}
 
 		process_channel(CHAN1);
 	}
@@ -1113,9 +1130,8 @@ void pokey_device::write_internal(offs_t offset, uint8_t data)
 
 			// Reset serial port
 			m_serin_shift = 1;
-			m_serout_shift = 0;
+			m_serout_shift = 1;
 			m_serout_full = false;
-			m_sod_w_cb(1);
 			m_oclk_w_cb(0);
 			m_SKSTAT &= ~SK_BUSY;
 			m_serout_complete_timer->adjust(attotime::zero);
@@ -1135,6 +1151,8 @@ void pokey_device::write_internal(offs_t offset, uint8_t data)
 			m_channel[CHAN3].reset_channel();
 			m_channel[CHAN4].reset_channel();
 		}
+		if (!(m_SKSTAT & SK_BUSY) && !(data & SK_TWOTONE))
+			m_sod_w_cb((data & SK_BREAK) ? 0 : 1);
 		m_old_raw_inval = true;
 		break;
 	}
@@ -1218,27 +1236,33 @@ void pokey_device::process_serin()
 
 void pokey_device::process_serout()
 {
-	if (m_serout_shift == 0)
+	if (m_serout_shift == 1)
 	{
 		if (m_serout_full)
 		{
 			// Output start bit and reload the shift register
-			LOG_SEROUT("SEROUT transmitting start bit of %02x @ %s\n", machine().time().to_string(), m_SEROUT);
-			m_sod_w_cb(0);
+			LOG_SEROUT("SEROUT transmitting start bit of %02x @ %s\n", m_SEROUT, machine().time().to_string());
+			if (!(m_SKCTL & SK_TWOTONE))
+				m_sod_w_cb(0);
 			m_oclk_w_cb(1);
-			m_serout_shift = m_SEROUT | (1 << 8);
+			m_serout_shift = (m_SEROUT << 1) | (1 << 9);
 			m_serout_full = false;
 			m_serout_ready_timer->adjust(attotime::zero);
 		}
 		else
+		{
+			if (!(m_SKCTL & SK_TWOTONE) && (m_SKCTL & SK_BREAK))
+				m_sod_w_cb(0);
 			m_serout_complete_timer->adjust(attotime::zero);
+		}
 	}
 	else
 	{
-		LOG_SEROUT("SEROUT transmitting %d bit @ %s\n", m_serout_shift & 1, machine().time().to_string());
-		m_sod_w_cb(m_serout_shift & 1);
-		m_oclk_w_cb(1);
 		m_serout_shift >>= 1;
+		LOG_SEROUT("SEROUT transmitting %d bit @ %s\n", m_serout_shift & 1, machine().time().to_string());
+		if (!(m_SKCTL & SK_TWOTONE))
+			m_sod_w_cb(m_serout_shift & 1);
+		m_oclk_w_cb(1);
 	}
 }
 
