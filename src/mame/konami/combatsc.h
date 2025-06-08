@@ -42,12 +42,12 @@ protected:
 
 	// memory pointers
 	required_shared_ptr_array<uint8_t, 2> m_videoram;
-	std::unique_ptr<uint8_t[]> m_spriteram[2];
 
 	// video-related
 	tilemap_t *m_bg_tilemap[2]{};
 	tilemap_t *m_textlayer = nullptr;
 	uint8_t m_priority = 0U;
+	uint8_t m_spriterambank[2] = {0U, 0U};
 
 	uint8_t m_vreg = 0U;
 	uint8_t m_video_circuit = 0U; // 0 or 1

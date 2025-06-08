@@ -11,7 +11,7 @@ a single 64x32 one, or one of them can be moved to the side of screen, giving
 a high score display suitable for vertical games.
 The chip also generates clock and interrupt signals suitable for a 6809.
 It uses 0x2000 bytes of static RAM for the tilemaps and sprite lists, and two
-64kx4bit DRAMs, presumably as a double frame buffer. The maximum addressable
+64kx4bit DRAMs, for color LUT data for sprites. The maximum addressable
 ROM is 0x80000 bytes (addressed 16 bits at a time). Tile and sprite data both
 come from the same ROM space. Like the 005885, external circuitry can cause
 tiles and sprites to be fetched from different ROMs (used by Haunted Castle).
@@ -57,7 +57,7 @@ control registers
      ------x- unknown (contra)
      -----x-- might be sprite / tilemap priority (0 = sprites have priority)
               (combat school, contra, haunted castle(0/1), labyrunr)
-     ----x--- selects sprite buffer (and makes a copy to a private buffer?)
+     ----x--- selects sprite ram bank/offset (0 = 0x0, 1 = 0x800)
      ---x---- screen layout selector:
               when this is set, 5 columns are added on the left of the screen
               (that means 5 rows at the top for vertical games), and the

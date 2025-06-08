@@ -61,9 +61,9 @@ private:
 	required_device<cpu_device> m_audiocpu;
 	required_device_array<k007121_device, 2> m_k007121;
 	required_device<k007232_device> m_k007232;
-	required_device_array<buffered_spriteram8_device, 2> m_spriteram;
 
 	// memory pointers
+	required_shared_ptr_array<uint8_t, 2> m_spriteram;
 	required_shared_ptr_array<uint8_t, 2> m_pf_videoram;
 	memory_share_creator<u8> m_bankedram;
 	required_memory_bank m_mainbank;
@@ -74,6 +74,7 @@ private:
 	uint16_t m_pf_bankbase[2]{};
 	int32_t m_old_pf[2]{};
 	uint8_t m_gfx_bank = 0;
+	uint8_t m_spriterambank[2] = {0, 0};
 
 	void bankswitch_w(uint8_t data);
 	void soundirq_w(uint8_t data);
@@ -203,10 +204,7 @@ void hcastle_state::pf_control_w(offs_t offset, uint8_t data)
 {
 	if (offset == 3)
 	{
-		if ((data & 0x8) == 0)
-			m_spriteram[Which]->copy(0x800, 0x800);
-		else
-			m_spriteram[Which]->copy(0x000, 0x800);
+		m_spriterambank[Which] = (data & 0x8) >> 3;
 	}
 	else if (offset == 7)
 	{
@@ -266,16 +264,16 @@ uint32_t hcastle_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	if ((m_gfx_bank & 0x04) == 0)
 	{
 		m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
-		draw_sprites<0>(bitmap, cliprect, screen.priority(), m_spriteram[0]->buffer());
-		draw_sprites<1>(bitmap, cliprect, screen.priority(), m_spriteram[1]->buffer());
+		draw_sprites<0>(bitmap, cliprect, screen.priority(), m_spriteram[0] + (m_spriterambank[0] ? 0x800 : 0x0));
+		draw_sprites<1>(bitmap, cliprect, screen.priority(), m_spriteram[1] + (m_spriterambank[1] ? 0x800 : 0x0));
 		m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
 	}
 	else
 	{
 		m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 		m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
-		draw_sprites<0>(bitmap, cliprect, screen.priority(), m_spriteram[0]->buffer());
-		draw_sprites<1>(bitmap, cliprect, screen.priority(), m_spriteram[1]->buffer());
+		draw_sprites<0>(bitmap, cliprect, screen.priority(), m_spriteram[0] + (m_spriterambank[0] ? 0x800 : 0x0));
+		draw_sprites<1>(bitmap, cliprect, screen.priority(), m_spriteram[1] + (m_spriterambank[1] ? 0x800 : 0x0));
 	}
 	return 0;
 }
@@ -451,9 +449,6 @@ void hcastle_state::hcastle(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	BUFFERED_SPRITERAM8(config, m_spriteram[0]);
-	BUFFERED_SPRITERAM8(config, m_spriteram[1]);
-
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(59);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));  // frames per second verified by comparison with real board
