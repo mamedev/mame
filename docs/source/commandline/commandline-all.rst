@@ -2984,7 +2984,7 @@ Core Sound Options
     depend on the operating system.  On Windows, it may be necessary to set
     ``SDL_AUDIODRIVER=directsound`` if no sound output is produced by default.
 
-    The default is ``wasapi`` on Windows. On Mac, ``coreaudio`` is the default.
+    The default is ``wasapi`` on Windows.  On Mac, ``coreaudio`` is the default.
     On all other platforms, ``sdl`` is the default.
 
     Example:
@@ -3036,7 +3036,7 @@ Core Sound Options
       - All [#SoundWinSDL]_
       - No
       - No
-      - Yes
+      - Yes [#SoundSDLMultiChannel]_
       - No
     * - ``portaudio``
       - All
@@ -3055,6 +3055,9 @@ Core Sound Options
 
 ..  [#SoundWinSDL] While SDL is not a supported option on official MAME builds
     for Windows, you can compile MAME with SDL support on Windows.
+
+..  [#SoundSDLMultiChannel] MAME requires SDL 2.0.16 or later for multi-channel
+    sound support.
 
 ..  [#SoundPortAudioMonitoring] PortAudio support for output monitoring depends
     on the platform and sound API.
