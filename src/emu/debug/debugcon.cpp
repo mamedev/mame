@@ -919,10 +919,13 @@ bool debugger_console::validate_target_address_parameter(std::string_view param,
 
 /// \brief Validate a parameter as a address with memory region or share name
 ///
-/// Validates a parameter as a address with memory region or share tag and
-//  ... .
+/// Validates a parameter as a address with memory region or share tag. addres
+/// parameters stays unchanged if invalid and requires additional validation on
+/// the caller side.
 /// \param [in] The parameter string.
 /// \param [out] addr The address on success, or unchanged on failure.
+/// \param [out] region The region on success, or unchanged on failure.
+/// \param [out] share The share on success, or unchanged on failure.
 /// \return true if the parameter refers to a memory region in the
 ///   current system, or false otherwise.
 bool debugger_console::validate_address_with_memory_parameter(std::string_view param, u64 &addr, memory_region *&region, memory_share *&share)
