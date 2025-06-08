@@ -17,8 +17,6 @@ TODO:
 - Unless it's an infinitely looping sample, start_raw() is not compatible
   with savestates. Save state right after start_raw(), load state later,
   and the sample won't be playing.
-- No need for m_samples_start_cb, drivers that need to initialize after
-  samples_device::device_start can just throw missing dependencies.
 - No need for set_volume, can just use set_output_gain, but it's harmless.
 
 ***************************************************************************/
@@ -57,7 +55,6 @@ samples_device::samples_device(const machine_config &mconfig, const char *tag, d
 samples_device::samples_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, m_samples_start_cb(*this)
 	, m_channels(0)
 	, m_names(nullptr)
 {
@@ -263,12 +260,6 @@ void samples_device::device_start()
 		save_item(NAME(chan.loop), channel);
 		save_item(NAME(chan.paused), channel);
 	}
-
-	// initialize any custom handlers
-	m_samples_start_cb.resolve();
-
-	if (!m_samples_start_cb.isnull())
-		m_samples_start_cb();
 }
 
 
