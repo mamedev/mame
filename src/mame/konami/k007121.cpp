@@ -173,6 +173,11 @@ void k007121_device::ctrl_w(offs_t offset, uint8_t data)
 
 	switch (offset)
 	{
+	case 3:
+		// tile high bit change
+		if ((m_ctrlram[offset] & 0x1) != (data & 0x1))
+			machine().tilemap().mark_all_dirty();
+		break;
 	case 6:
 		// palette bank change
 		if ((m_ctrlram[offset] & 0x30) != (data & 0x30))
