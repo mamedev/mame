@@ -20,11 +20,11 @@
 	quite similar to splash_ms.cpp but without the extra bitmap layer and CPU driving it
 
 	TODO:
-	 - sprite alignment/bg etc. (and garbage at the top)
+	 - make use of scroll regs (only seem to be written on startup, mostly 0)
 	 - sound
-	 - service mode colours are broken
+	 - service mode colours are broken (maybe due to being a prototype?)
 	 - do the higher attribute bits in the 16x16 layer have meaning?
-	 - verify there's no (subtle) protection
+	 - verify there's no (subtle) protection as found in 'xorworld'
 
 ***************************************************************************************************/
 
