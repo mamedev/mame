@@ -12,9 +12,8 @@
 #define NF      0x02
 #define PF      0x04
 #define VF      PF
-#define XF      0x08
 #define HF      0x10
-#define YF      0x20
+#define YXF     0x28
 #define ZF      0x40
 #define SF      0x80
 
@@ -26,14 +25,15 @@
 
 #define SP      m_sp.w
 
-#define AF      m_af.w
-#define A       m_af.b.h
-#define F       m_af.b.l
-#define Q       m_q
-#define QT      m_qtemp
+#define Q       m_f.q
+#define QT      m_f.qtemp
 #define I       m_i
 #define R       m_r
 #define R2      m_r2
+
+#define AF      m_af.w
+#define A       m_af.b.h
+#define F       m_af.b.l
 
 #define BC      m_bc.w
 #define B       m_bc.b.h
@@ -60,9 +60,6 @@
 #define WZ_L    m_wz.b.l
 
 
-#define TADR    m_shared_addr.w   // Typically represents values from A0..15 pins. 16bit input in steps.
-#define TADR_H  m_shared_addr.b.h
-#define TADR_L  m_shared_addr.b.l
 #define TDAT    m_shared_data.w   // 16bit input(if use as second parameter) or output in steps.
 #define TDAT2   m_shared_data2.w
 #define TDAT_H  m_shared_data.b.h

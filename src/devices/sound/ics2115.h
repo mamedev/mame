@@ -39,7 +39,7 @@ protected:
 	virtual void device_clock_changed() override;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	// device_memory_interface configuration
 	virtual space_config_vector memory_space_config() const override;
@@ -119,7 +119,7 @@ private:
 	void recalc_irq();
 
 	// stream helper functions
-	int fill_output(ics2115_voice& voice, std::vector<write_stream_view> &outputs);
+	int fill_output(ics2115_voice& voice, sound_stream &stream);
 	s32 get_sample(ics2115_voice& voice);
 	u8 read_sample(ics2115_voice& voice, u32 addr) { return m_cache.read_byte((voice.osc.saddr << 20) | (addr & 0xfffff)); }
 

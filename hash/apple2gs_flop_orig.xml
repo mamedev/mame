@@ -45,7 +45,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="marble">
+	<software name="marblem">
 		<description>Marble Madness</description>
 		<year>1986</year>
 		<publisher>Electronic Arts</publisher>
@@ -128,7 +128,7 @@ license:CC0-1.0
 	<software name="btlchess">
 		<description>Battle Chess</description>
 		<year>1989</year>
-		<publisher>Interplay</publisher>
+		<publisher>Interplay Productions</publisher>
 		<info name="programmer" value="Jim Sproul, Todd J. Camasta, Bruce Schlickbernd, Kurt Heiden, Bill (Weez) Dugan, Thomas R. Decker, Troy P. Worrell, Michael Quarles, Rebecca Heineman, and Alan Pavlish" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS" />
@@ -1220,7 +1220,7 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 768K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-05-30 -->
-		<!-- roleplaying game -->
+		<!-- role-playing game -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1296196">
 				<rom name="dragon wars iigs.woz" size="1296196" crc="331a8128" sha1="551d0e2fd5a4a33c41a7ba3f9b381bd41a8a7e9d" />
@@ -1747,10 +1747,11 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="brdtale">
+	<software name="brdstale">
 		<description>The Bard's Tale: Tales of the Unknown</description>
 		<year>1987</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Interplay Productions" />
 		<info name="programmer" value="Rebecca Heineman" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS" />
@@ -2305,7 +2306,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="artfilm">
-		<description>Art and Film Director</description>
+		<description>Art &amp; Film Director</description>
 		<year>1989</year>
 		<publisher>Epyx</publisher>
 		<info name="programmer" value="Novotrade, Caesar Studio, Amanda Dee, Jeff Dee, Sheryl Knowles, Janet Kramer, and Matthew Sarconi" />
@@ -2392,13 +2393,13 @@ license:CC0-1.0
 		<!-- Dump released: 2021-06-05 -->
 		<!-- roleplaying game -->
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1 - Play disk" />
+			<feature name="part_id" value="Disk 1 - Play" />
 			<dataarea name="flop" size="1296229">
 				<rom name="the immortal iigs - disk 1 - play.woz" size="1296229" crc="b804341e" sha1="72322fd7d8e5d3904bd89796725fb106d3cca5a5" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2 - Graphics disk" />
+			<feature name="part_id" value="Disk 2 - Graphics" />
 			<dataarea name="flop" size="1296226">
 				<rom name="the immortal iigs - disk 2 - graphics.woz" size="1296226" crc="bf428297" sha1="cdf5ea12029204a4a8dfed975d2c917406e3a7d5" />
 			</dataarea>
@@ -2807,7 +2808,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="musicons">
+	<software name="mcs">
 		<description>Music Construction Set (version 1.0)</description>
 		<year>1986</year>
 		<publisher>Electronic Arts</publisher>
@@ -3596,7 +3597,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="readnme">
+	<software name="readandme">
 		<description>Reading and Me (version 1.0)</description>
 		<year>1988</year>
 		<publisher>Davidson &amp; Associates</publisher>
@@ -4176,7 +4177,7 @@ license:CC0-1.0
 	<software name="mthbpl11">
 		<description>Math Blaster Plus! (version 1.1)</description>
 		<year>1989</year>
-		<publisher>Davidson and Associates</publisher>
+		<publisher>Davidson &amp; Associates</publisher>
 		<info name="author" value="Jan Davidson and Cathy Johnson" />
 		<info name="programmer" value="C.K. Haun" />
 		<info name="usage" value="Requires a 512K Apple IIgs ROM1 or later." />

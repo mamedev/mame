@@ -174,10 +174,10 @@ void ymf278b_device::ymfm_external_write(ymfm::access_class type, uint32_t offse
 //  default address space
 //-------------------------------------------------
 
-void ymf278b_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void ymf278b_device::sound_stream_update(sound_stream &stream)
 {
 	// rotate the outputs so that the DO2 outputs are first
-	parent::update_internal(outputs, 2);
+	parent::update_internal(stream, 2);
 }
 
 

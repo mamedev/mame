@@ -162,13 +162,13 @@ void qsound_hle_device::device_reset()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void qsound_hle_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void qsound_hle_device::sound_stream_update(sound_stream &stream)
 {
-	for (int i = 0; i < outputs[0].samples(); i ++)
+	for (int i = 0; i < stream.samples(); i ++)
 	{
 		update_sample();
-		outputs[0].put_int(i, m_out[0], 32768);
-		outputs[1].put_int(i, m_out[1], 32768);
+		stream.put_int(0, i, m_out[0], 32768);
+		stream.put_int(1, i, m_out[1], 32768);
 	}
 }
 
@@ -265,7 +265,7 @@ void qsound_hle_device::init_register_map()
 
 int16_t qsound_hle_device::read_sample(uint16_t bank, uint16_t address)
 {
-	bank &= 0x7FFF;
+	bank &= 0x7fff;
 	const uint32_t rom_addr = (bank << 16) | (address << 0);
 	const uint8_t sample_data = read_byte(rom_addr);
 	return (int16_t)(sample_data << 8); // bit0-7 is tied to ground

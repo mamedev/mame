@@ -2309,8 +2309,7 @@ void pspikes_banked_sound_state::pspikes(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(pspikes_banked_sound_state,pspikes)
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set(FUNC(pspikes_banked_sound_state::soundlatch_pending_w));
@@ -2318,10 +2317,10 @@ void pspikes_banked_sound_state::pspikes(machine_config &config)
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
-	ymsnd.add_route(1, "lspeaker", 1.0);
-	ymsnd.add_route(2, "rspeaker", 1.0);
+	ymsnd.add_route(0, "speaker", 0.75, 0);
+	ymsnd.add_route(0, "speaker", 0.75, 1);
+	ymsnd.add_route(1, "speaker", 1.0, 0);
+	ymsnd.add_route(2, "speaker", 1.0, 1);
 }
 
 void spikes91_state::spikes91(machine_config &config)
@@ -2510,8 +2509,7 @@ void pspikes_banked_sound_state::karatblz(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(pspikes_banked_sound_state,karatblz)
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set(FUNC(pspikes_banked_sound_state::soundlatch_pending_w));
@@ -2519,10 +2517,10 @@ void pspikes_banked_sound_state::karatblz(machine_config &config)
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(8'000'000))); // verified on pcb
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
-	ymsnd.add_route(1, "lspeaker", 1.0);
-	ymsnd.add_route(2, "rspeaker", 1.0);
+	ymsnd.add_route(0, "speaker", 0.75, 0);
+	ymsnd.add_route(0, "speaker", 0.75, 1);
+	ymsnd.add_route(1, "speaker", 1.0, 0);
+	ymsnd.add_route(2, "speaker", 1.0, 1);
 }
 
 void karatblzbl_state::karatblzbl(machine_config &config)
@@ -2608,8 +2606,7 @@ void pspikes_banked_sound_state::spinlbrk(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(pspikes_banked_sound_state,spinlbrk)
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set(FUNC(pspikes_banked_sound_state::soundlatch_pending_w));
@@ -2617,10 +2614,10 @@ void pspikes_banked_sound_state::spinlbrk(machine_config &config)
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(8'000'000)));  // verified on pcb
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
-	ymsnd.add_route(1, "lspeaker", 1.0);
-	ymsnd.add_route(2, "rspeaker", 1.0);
+	ymsnd.add_route(0, "speaker", 0.75, 0);
+	ymsnd.add_route(0, "speaker", 0.75, 1);
+	ymsnd.add_route(1, "speaker", 1.0, 0);
+	ymsnd.add_route(2, "speaker", 1.0, 1);
 }
 
 void pspikes_banked_sound_state::turbofrc(machine_config &config)
@@ -2657,8 +2654,7 @@ void pspikes_banked_sound_state::turbofrc(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(pspikes_banked_sound_state,turbofrc)
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set(FUNC(pspikes_banked_sound_state::soundlatch_pending_w));
@@ -2666,10 +2662,10 @@ void pspikes_banked_sound_state::turbofrc(machine_config &config)
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(8'000'000)));  // verified on pcb
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
-	ymsnd.add_route(1, "lspeaker", 1.0);
-	ymsnd.add_route(2, "rspeaker", 1.0);
+	ymsnd.add_route(0, "speaker", 0.75, 0);
+	ymsnd.add_route(0, "speaker", 0.75, 1);
+	ymsnd.add_route(1, "speaker", 1.0, 0);
+	ymsnd.add_route(2, "speaker", 1.0, 1);
 }
 
 void pspikes_banked_sound_state::aerofgtb(machine_config &config)
@@ -2708,8 +2704,7 @@ void pspikes_banked_sound_state::aerofgtb(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(pspikes_banked_sound_state,aerofgtb)
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set(FUNC(pspikes_banked_sound_state::soundlatch_pending_w));
@@ -2717,10 +2712,10 @@ void pspikes_banked_sound_state::aerofgtb(machine_config &config)
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", 8000000));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "lspeaker", 0.25);
-	ymsnd.add_route(0, "rspeaker", 0.25);
-	ymsnd.add_route(1, "lspeaker", 1.0);
-	ymsnd.add_route(2, "rspeaker", 1.0);
+	ymsnd.add_route(0, "speaker", 0.75, 0);
+	ymsnd.add_route(1, "speaker", 0.75, 1);
+	ymsnd.add_route(2, "speaker", 1.0, 0);
+	ymsnd.add_route(2, "speaker", 1.0, 1);
 }
 
 void pspikes_sound_cpu_state::aerfboot(machine_config &config)

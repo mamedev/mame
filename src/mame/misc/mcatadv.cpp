@@ -746,7 +746,7 @@ void mcatadv_state::mcatadv(machine_config &config)
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(16'000'000) / 2)); // verified on PCB
 	ymsnd.irq_handler().set_inputline(m_soundcpu, 0);
-	ymsnd.add_route(0, "mono", 0.32);
+	ymsnd.add_route(0, "mono", 1.0);
 	ymsnd.add_route(1, "mono", 0.5);
 	ymsnd.add_route(2, "mono", 0.5);
 }
@@ -760,7 +760,7 @@ void mcatadv_state::nost(machine_config &config)
 
 	ym2610_device *ymsnd = subdevice<ym2610_device>("ymsnd");
 	ymsnd->reset_routes();
-	ymsnd->add_route(0, "mono", 0.2);
+	ymsnd->add_route(0, "mono", 0.6);
 	ymsnd->add_route(1, "mono", 0.5);
 	ymsnd->add_route(2, "mono", 0.5);
 }

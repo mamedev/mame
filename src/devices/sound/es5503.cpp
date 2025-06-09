@@ -152,12 +152,12 @@ void es5503_device::halt_osc(int onum, int type, uint32_t *accumulator, int ress
 		m_irq_func(1);
 	}
 }
-void es5503_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void es5503_device::sound_stream_update(sound_stream &stream)
 {
 	int32_t *mixp;
 	int osc, snum, i;
 	uint32_t ramptr;
-	int samples = outputs[0].samples();
+	int samples = stream.samples();
 
 	assert(samples < (44100/50));
 	std::fill_n(&m_mix_buffer[0], samples*output_channels, 0);
@@ -257,9 +257,9 @@ void es5503_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 	mixp = &m_mix_buffer[0];
 	for (int chan = 0; chan < output_channels; chan++)
 	{
-		for (i = 0; i < outputs[chan].samples(); i++)
+		for (i = 0; i < stream.samples(); i++)
 		{
-			outputs[chan].put_int(i, *mixp++, 32768*8);
+			stream.put_int(chan, i, *mixp++, 32768*8);
 		}
 	}
 }

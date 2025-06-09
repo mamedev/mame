@@ -55,14 +55,15 @@ public:
 		m_out_lamps(*this, "lamp%u", 1U)
 	{ }
 
-	void base(machine_config &config);
-	void base_xor(machine_config &config);
+	void base(machine_config &config) ATTR_COLD;
+	void base_xor(machine_config &config) ATTR_COLD;
 
-	void init_crzybugs();
-	void init_crzybugsj();
-	void init_hauntedh();
-	void init_tripfev();
-	void init_wldfruit();
+	void init_crzybugs() ATTR_COLD;
+	void init_crzybugsj() ATTR_COLD;
+	void init_hauntedh() ATTR_COLD;
+	void init_jking04() ATTR_COLD;
+	void init_tripfev() ATTR_COLD;
+	void init_wldfruit() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -91,7 +92,7 @@ private:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
-	void pgm_create_dummy_internal_arm_region();
+	void pgm_create_dummy_internal_arm_region() ATTR_COLD;
 	void main_map(address_map &map) ATTR_COLD;
 	void main_xor_map(address_map &map) ATTR_COLD;
 
@@ -670,7 +671,28 @@ ROM_START( crzybugs103jp ) // IGS PCB-0575-04-HU - Has IGS027A, MX10EXAQC, IGS03
 	ROM_LOAD( "hu_u39.u39", 0x200, 0x2dd, CRC(75f58b46) SHA1(7cb136a41899ddd50c95a67ca6353ce5d8d92149) ) // AT22V10
 ROM_END
 
-ROM_START( tripfev ) // IGS PCB-0575-02-HU PCB
+ROM_START( tripfev )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS027A ARM based MCU
+	ROM_LOAD( "igs027a.u42", 0x00000, 0x4000, CRC(a40ec1f8) SHA1(f6f7005d61522934758fd0a98bf383c6076b6afe) )
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "v110.u23", 0x000000, 0x80000, CRC(68658bf9) SHA1(7d7f2c67acb55a8ef24b7cc54cb2e5b3f94c387a) ) // 27C4096
+
+	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU)
+	ROM_LOAD( "h9.u17", 0x00000, 0x10000, CRC(3c76b157) SHA1(d8d3a434fd649577a30d5855e3fb34998041f4e5) ) // MX10EXAQC (80C51 XA based MCU)
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD16_WORD_SWAP( "u10", 0x000000, 0x80000, CRC(522a1030) SHA1(9a7a5ba9b26bceb0d251be6139c10e4655fc19ec) ) // M27C4002
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "u19",  0x000000, 0x400000, CRC(cd45bbf2) SHA1(7f1cf270245bbe4604de2cacade279ab13584dbd) ) // M27C322, FIXED BITS (xxxxxxx0xxxxxxxx)
+
+	ROM_REGION( 0x200000, "oki", 0 ) // plain Oki M6295 samples
+	ROM_LOAD( "u16", 0x000000, 0x200000, CRC(98b9cafd) SHA1(3bf3971f0d9520c98fc6b1c2e77ab9c178d21c62) ) // M27C160
+ROM_END
+
+ROM_START( tripfev108us ) // IGS PCB-0575-02-HU PCB
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A ARM based MCU
 	ROM_LOAD( "w1_igs027a.u42", 0x00000, 0x4000, CRC(a40ec1f8) SHA1(f6f7005d61522934758fd0a98bf383c6076b6afe) ) // sticker marked 'W1'
@@ -758,6 +780,28 @@ ROM_START( wldfruit ) // IGS PCB-0447-05-GM - Has IGS027A, MX10EXAQC, IGS031, Ok
 	ROM_LOAD( "wild_fruit_sp.u15", 0x000000, 0x200000, CRC(9da3e9dd) SHA1(7e447492713549e6be362d4aca6d223dad20771a) ) // M27C160
 ROM_END
 
+ROM_START( jking04 ) // IGS PCB-0447-03-GM - Has IGS027A, MX10EXAQC, IGS031, Oki M6295, three banks of 8 DIP switches
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS027A ARM based MCU
+	ROM_LOAD( "j10_igs027a.u37", 0x00000, 0x4000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "j_k_2004_v101_us.u23", 0x000000, 0x80000, CRC(8ab70d64) SHA1(4ddda6d9eba3db7b3e5267d70349933d6bce2266) ) // 27C4096
+
+	ROM_REGION( 0x10000, "xa:mcu", 0 ) // MX10EXAQC (80C51 XA based MCU)
+	ROM_LOAD( "v10.u27", 0x00000, 0x10000, CRC(57370d24) SHA1(ec82ecc96e958866143902c3961b5f6ee5fbe6dd) )
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD16_WORD_SWAP( "j_k_2004_text.u10", 0x000000, 0x80000, CRC(a8188f38) SHA1(776d44beb032d31d2acb6f965094cfd417ea1c36) ) // M27C4002
+
+	ROM_REGION( 0x200000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "j_k_2004_cg.u19",  0x000000, 0x200000, CRC(8ef08081) SHA1(16d1d9af7eb9d7fe150f5d64a36898b42f530ac7) ) // M27C160, FIXED BITS (xxxxxxx0xxxxxxxx)
+	// u18 not populated
+
+	ROM_REGION( 0x200000, "oki", 0 ) // plain Oki M6295 samples
+	ROM_LOAD( "j_k_2004_sp.u15", 0x000000, 0x200000, CRC(e6870430) SHA1(e90ab3b41c5a60bf4ad8caa27293a870a63faaaf) ) // M27C160
+ROM_END
+
 
 void igs_m027xa_state::pgm_create_dummy_internal_arm_region()
 {
@@ -818,6 +862,13 @@ void igs_m027xa_state::init_wldfruit()
 	pgm_create_dummy_internal_arm_region();
 }
 
+void igs_m027xa_state::init_jking04()
+{
+	pgm_create_dummy_internal_arm_region();
+	m_igs017_igs031->sdwx_gfx_decrypt();
+	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
+}
+
 } // anonymous namespace
 
 // These use the MX10EXAQC (80c51XA from Philips)
@@ -831,8 +882,11 @@ GAMEL( 2005, crzybugs200us, crzybugs, base_xor,   crzybugs_us, igs_m027xa_state,
 
 GAMEL( 2007, crzybugs103jp, crzybugs, base_xor,   crzybugs_jp, igs_m027xa_state, init_crzybugsj, ROT0, "IGS", "Crazy Bugs (V103JP)", 0, layout_crzybugs ) // IGS FOR V101JP 2007 06 08 (test mode calls this V102JP, ROM label was V103JP)
 
-GAMEL( 2006, tripfev,       0,        base_xor,   tripfev,     igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V108US)", 0, layout_tripfev )
+GAMEL( 2006, tripfev,       0,        base_xor,   tripfev,     igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V110US)", 0, layout_tripfev )
+GAMEL( 2006, tripfev108us,  tripfev,  base_xor,   tripfev,     igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V108US)", 0, layout_tripfev )
 GAMEL( 2006, tripfev107us,  tripfev,  base_xor,   tripfev,     igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V107US)", 0, layout_tripfev ) // IGS FOR V107US 2006 09 07
 GAMEL( 2006, tripfev105us,  tripfev,  base_xor,   tripfev,     igs_m027xa_state, init_tripfev,   ROT0, "IGS", "Triple Fever (V105US)", MACHINE_NOT_WORKING, layout_tripfev )
 
 GAME(  200?, wldfruit,      0,        base,       base,        igs_m027xa_state, init_wldfruit,  ROT0, "IGS", "Wild Fruit (V208US)", MACHINE_NOT_WORKING ) // IGS-----97----V208US
+
+GAME(  200?, jking04,       0,        base,       base,        igs_m027xa_state, init_jking04,   ROT0, "IGS", "Jungle King 2004 (V101US)", MACHINE_NOT_WORKING ) // no IGS027A dump

@@ -596,6 +596,13 @@ static INPUT_PORTS_START( sasuke )
 	PORT_DIPUNUSED_DIPLOC( 0x08, IP_ACTIVE_HIGH, "SW1:!4" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( sasukea )
+	PORT_INCLUDE(sasuke)
+
+	PORT_MODIFY("DSW")
+	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_HIGH, "SW1:!7" )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( vanguard )
 	PORT_INCLUDE(snk6502_generic_joy8way)
 
@@ -954,6 +961,32 @@ ROM_START( sasuke )
 	ROM_LOAD( "sc8",          0x7800, 0x0800, CRC(0219104b) SHA1(fd5c43304d59bc34e9ae6ef7576d75cf319d823e) )
 	ROM_RELOAD(               0xf800, 0x0800 ) /* for the reset/interrupt vectors */
 	ROM_LOAD( "sc9",          0x8000, 0x0800, CRC(d6ff889a) SHA1(1eea0366205dd0d9bffb5d093f259edc1d51cbe0) )
+	ROM_LOAD( "sc10",         0x8800, 0x0800, CRC(19df6b9a) SHA1(95e904251c39dcef227a4c125fc573e958ee78b7) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "mcs_c",        0x0000, 0x0800, CRC(aff9743d) SHA1(a968a193ca551d92f79e09d1761dd2ccebc76eee) )
+	ROM_LOAD( "mcs_d",        0x0800, 0x0800, CRC(9c805120) SHA1(74b83daa3ce3c9f7d96ad872b9134edd6f1bcb8a) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "sasuke.clr",   0x0000, 0x0020, CRC(b70f34c1) SHA1(890cfbb25e14112713ba7900b9cd56554a8bc1ec) )
+
+	ROM_REGION( 0x1000, "snk6502", 0 )  /* sound data for Vanguard-style audio section */
+	ROM_LOAD( "sc11",         0x0000, 0x0800, CRC(24a0e121) SHA1(e3cde355309de6678026d595955297258f069946) )
+ROM_END
+
+ROM_START( sasukea )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sc1",          0x4000, 0x0800, CRC(34cbbe03) SHA1(3d643e11370e61dde0c42c7761a856c5cf53d621) )
+	ROM_LOAD( "sc2",          0x4800, 0x0800, CRC(38cc14f0) SHA1(d60df67f2a32c131e8957e225b79618d6262463d) )
+	ROM_LOAD( "sc3",          0x5000, 0x0800, CRC(c7a0c668) SHA1(f16cda4f1caaba3582e2fbef4f4f4992bb93aed7) )
+	ROM_LOAD( "sc4",          0x5800, 0x0800, CRC(23edafcf) SHA1(bda3bcb506f6e23f422aafd7ca9b95bfb4d1d8e1) )
+	ROM_LOAD( "sc5",          0x6000, 0x0800, CRC(ca410e4f) SHA1(0d09422d01b4359853c173a4cb18c9b5fbc7fe7c) )
+	// dump repaired using bytes 0x6a00 to 0x6a13 from parent set & filling 0x6e00 to 0x6e11 with 0xff
+	ROM_LOAD( "sc6",          0x6800, 0x0800, BAD_DUMP CRC(d97e98fa) SHA1(c3dd6175d5c31b88f36c7151d78b037fd8611eee) )
+	ROM_LOAD( "sc7",          0x7000, 0x0800, CRC(04d0f104) SHA1(73ed501f70d2a9e8994f8392f617450eafef39b3) )
+	ROM_LOAD( "sc8",          0x7800, 0x0800, CRC(1893a1d3) SHA1(1651e5ee023de7823d41dca9dcecc03302270a1a) )
+	ROM_RELOAD(               0xf800, 0x0800 ) /* for the reset/interrupt vectors */
+	ROM_LOAD( "sc9",          0x8000, 0x0800, CRC(681dc3c5) SHA1(4bd0943b2fe4b016b251fba36d05cffb9f0f92b2) )
 	ROM_LOAD( "sc10",         0x8800, 0x0800, CRC(19df6b9a) SHA1(95e904251c39dcef227a4c125fc573e958ee78b7) )
 
 	ROM_REGION( 0x1000, "gfx1", 0 )
@@ -1575,7 +1608,8 @@ ROM_END
  *
  *************************************/
 
-GAME( 1980, sasuke,      0,        sasuke,   sasuke,   snk6502_state, empty_init, ROT90, "SNK", "Sasuke vs. Commander", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, sasuke,      0,        sasuke,   sasuke,   snk6502_state, empty_init, ROT90, "SNK", "Sasuke vs. Commander (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, sasukea,     sasuke,   sasuke,   sasukea,  snk6502_state, empty_init, ROT90, "SNK", "Sasuke vs. Commander (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, satansat,    0,        satansat, satansat, snk6502_state, empty_init, ROT90, "SNK", "Satan of Saturn (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, satansata,   satansat, satansat, satansat, snk6502_state, empty_init, ROT90, "SNK", "Satan of Saturn (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, zarzon,      satansat, satansat, satansat, snk6502_state, empty_init, ROT90, "SNK (Taito America license)", "Zarzon", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

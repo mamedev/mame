@@ -744,8 +744,8 @@ void dassault_state::dassault(machine_config &config)
 
 	H6280(config, m_audiocpu, XTAL(32'220'000) / 8); // Accurate
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dassault_state::sound_map);
-	m_audiocpu->add_route(ALL_OUTPUTS, "lspeaker", 0); // internal sound unused
-	m_audiocpu->add_route(ALL_OUTPUTS, "rspeaker", 0);
+	m_audiocpu->add_route(ALL_OUTPUTS, "speaker", 0, 0); // internal sound unused
+	m_audiocpu->add_route(ALL_OUTPUTS, "speaker", 0, 1);
 
 	config.set_maximum_quantum(attotime::from_hz(m_maincpu->clock() / 4)); // I was seeing random lockups.. let's see if this helps
 
@@ -794,29 +794,28 @@ void dassault_state::dassault(machine_config &config)
 	DECO_SPRITE(config, m_sprgen[1], 0, m_palette, gfx_dassault_spr2);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0); // IRQ1
 
 	ym2203_device &ym1(YM2203(config, "ym1", XTAL(32'220'000) / 8));
-	ym1.add_route(ALL_OUTPUTS, "lspeaker", 0.40);
-	ym1.add_route(ALL_OUTPUTS, "rspeaker", 0.40);
+	ym1.add_route(ALL_OUTPUTS, "speaker", 0.40, 0);
+	ym1.add_route(ALL_OUTPUTS, "speaker", 0.40, 1);
 
 	ym2151_device &ym2(YM2151(config, "ym2", XTAL(32'220'000) / 9));
 	ym2.irq_handler().set_inputline(m_audiocpu, 1);
 	ym2.port_write_handler().set(FUNC(dassault_state::sound_bankswitch_w));
-	ym2.add_route(0, "lspeaker", 0.45);
-	ym2.add_route(1, "rspeaker", 0.45);
+	ym2.add_route(0, "speaker", 0.45, 0);
+	ym2.add_route(1, "speaker", 0.45, 1);
 
 	okim6295_device &oki1(OKIM6295(config, "oki1", XTAL(32'220'000) / 32, okim6295_device::PIN7_HIGH)); // verified
-	oki1.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	oki1.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	oki1.add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
+	oki1.add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 
 	OKIM6295(config, m_oki2, XTAL(32'220'000) / 16, okim6295_device::PIN7_HIGH); // verified
-	m_oki2->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-	m_oki2->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	m_oki2->add_route(ALL_OUTPUTS, "speaker", 0.25, 0);
+	m_oki2->add_route(ALL_OUTPUTS, "speaker", 0.25, 1);
 }
 
 /**********************************************************************************/

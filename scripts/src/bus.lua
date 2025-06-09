@@ -44,6 +44,8 @@ if (BUSES["A800"]~=null) then
 		MAME_DIR .. "src/devices/bus/a800/atari810.h",
 		MAME_DIR .. "src/devices/bus/a800/atari1050.cpp",
 		MAME_DIR .. "src/devices/bus/a800/atari1050.h",
+		MAME_DIR .. "src/devices/bus/a800/atarifdc.cpp",
+		MAME_DIR .. "src/devices/bus/a800/atarifdc.h",
 		MAME_DIR .. "src/devices/bus/a800/cassette.cpp",
 		MAME_DIR .. "src/devices/bus/a800/cassette.h",
 		MAME_DIR .. "src/devices/bus/a800/a800_slot.cpp",
@@ -2108,6 +2110,8 @@ if (BUSES["MSX_SLOT"]~=null) then
 		MAME_DIR .. "src/devices/bus/msx/cart/superloderunner.h",
 		MAME_DIR .. "src/devices/bus/msx/cart/super_swangi.cpp",
 		MAME_DIR .. "src/devices/bus/msx/cart/super_swangi.h",
+		MAME_DIR .. "src/devices/bus/msx/cart/video80.h",
+		MAME_DIR .. "src/devices/bus/msx/cart/video80.cpp",
 		MAME_DIR .. "src/devices/bus/msx/cart/yamaha_ucn01.cpp",
 		MAME_DIR .. "src/devices/bus/msx/cart/yamaha_ucn01.h",
 		MAME_DIR .. "src/devices/bus/msx/minicart/minicart.cpp",
@@ -2901,6 +2905,8 @@ if (BUSES["VME"]~=null) then
 		MAME_DIR .. "src/devices/bus/vme/tp880v.h",
 		MAME_DIR .. "src/devices/bus/vme/tp881v.cpp",
 		MAME_DIR .. "src/devices/bus/vme/tp881v.h",
+		MAME_DIR .. "src/devices/bus/vme/tsvme104.cpp",
+		MAME_DIR .. "src/devices/bus/vme/tsvme104.h",
 	}
 end
 
@@ -3250,8 +3256,6 @@ if (BUSES["NUBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/nubus/nubus_asntmc3b.h",
 		MAME_DIR .. "src/devices/bus/nubus/nubus_image.cpp",
 		MAME_DIR .. "src/devices/bus/nubus/nubus_image.h",
-		MAME_DIR .. "src/devices/bus/nubus/nubus_wsportrait.cpp",
-		MAME_DIR .. "src/devices/bus/nubus/nubus_wsportrait.h",
 		MAME_DIR .. "src/devices/bus/nubus/8lc.cpp",
 		MAME_DIR .. "src/devices/bus/nubus/8lc.h",
 		MAME_DIR .. "src/devices/bus/nubus/bootbug.cpp",
@@ -3272,8 +3276,6 @@ if (BUSES["NUBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/nubus/pds30_sigmalview.h",
 		MAME_DIR .. "src/devices/bus/nubus/pds30_30hr.cpp",
 		MAME_DIR .. "src/devices/bus/nubus/pds30_30hr.h",
-		MAME_DIR .. "src/devices/bus/nubus/pds30_mc30.cpp",
-		MAME_DIR .. "src/devices/bus/nubus/pds30_mc30.h",
 	}
 end
 
@@ -3673,6 +3675,8 @@ if (BUSES["SNES"]~=null) then
 		MAME_DIR .. "src/devices/bus/snes/sgb.h",
 		MAME_DIR .. "src/devices/bus/snes/spc7110.cpp",
 		MAME_DIR .. "src/devices/bus/snes/spc7110.h",
+		MAME_DIR .. "src/devices/bus/snes/st018.cpp",
+		MAME_DIR .. "src/devices/bus/snes/st018.h",
 		MAME_DIR .. "src/devices/bus/snes/sufami.cpp",
 		MAME_DIR .. "src/devices/bus/snes/sufami.h",
 		MAME_DIR .. "src/devices/bus/snes/upd.cpp",
@@ -5306,8 +5310,6 @@ if (BUSES["CBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_118.h",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_cbus.cpp",
 		MAME_DIR .. "src/devices/bus/cbus/pc9801_cbus.h",
-		MAME_DIR .. "src/devices/bus/cbus/pc9801_snd.cpp",
-		MAME_DIR .. "src/devices/bus/cbus/pc9801_snd.h",
 		MAME_DIR .. "src/devices/bus/cbus/sb16_ct2720.cpp",
 		MAME_DIR .. "src/devices/bus/cbus/sb16_ct2720.h",
 	}
@@ -5448,20 +5450,6 @@ if (BUSES["MULTIBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/multibus/robotron_k7070.h",
 		MAME_DIR .. "src/devices/bus/multibus/robotron_k7071.cpp",
 		MAME_DIR .. "src/devices/bus/multibus/robotron_k7071.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/bus/rtpc/kbd_con.h,BUSES["RTPC_KBD"] = true
----------------------------------------------------
-
-if (BUSES["RTPC_KBD"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/bus/rtpc/kbd_con.cpp",
-		MAME_DIR .. "src/devices/bus/rtpc/kbd_con.h",
-		MAME_DIR .. "src/devices/bus/rtpc/kbd.cpp",
-		MAME_DIR .. "src/devices/bus/rtpc/kbd.h",
 	}
 end
 
@@ -5818,13 +5806,13 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/heathzenith/h89/intr_cntrl.h,BUSES["HEATH_INTR_SOCKET"] = true
+--@src/devices/bus/heathzenith/intr_cntrl/intr_cntrl.h,BUSES["HEATH_INTR_SOCKET"] = true
 ---------------------------------------------------
 
 if (BUSES["HEATH_INTR_SOCKET"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/bus/heathzenith/h89/intr_cntrl.cpp",
-		MAME_DIR .. "src/devices/bus/heathzenith/h89/intr_cntrl.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/intr_cntrl/intr_cntrl.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/intr_cntrl/intr_cntrl.h",
 	}
 end
 
@@ -5859,5 +5847,19 @@ if (BUSES["AMIGA_CPUSLOT"]~=null) then
 		MAME_DIR .. "src/devices/bus/amiga/cpuslot/action_replay.h",
 		MAME_DIR .. "src/devices/bus/amiga/cpuslot/megamix500.cpp",
 		MAME_DIR .. "src/devices/bus/amiga/cpuslot/megamix500.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/st/stcart.h,BUSES["STCART_CONNECTOR"] = true
+---------------------------------------------------
+
+if (BUSES["STCART_CONNECTOR"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/st/stcart.cpp",
+		MAME_DIR .. "src/devices/bus/st/stcart.h",
+		MAME_DIR .. "src/devices/bus/st/replay.cpp",
+		MAME_DIR .. "src/devices/bus/st/replay.h",
 	}
 end

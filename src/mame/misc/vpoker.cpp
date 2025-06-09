@@ -11,7 +11,7 @@
   * Challenger Draw Poker
   https://flyers.arcade-museum.com/videogames/show/4296
   https://flyers.arcade-museum.com/videogames/show/4374
-  
+
   * Challenger Black Jack 21
   https://flyers.arcade-museum.com/videogames/show/4295
 
@@ -130,7 +130,7 @@
 
 
   registers:
-  
+
   Credits:        da-db
   Coins in:       dd
 
@@ -159,9 +159,9 @@
               SET UP
     TIMER               6     (range: 1 to 12)
     MAX BET             8     (range: 5 to 50)
-	AUTO BET            OFF   (options: OFF/ON)
-	AUTO DEAL           OFF   (options: OFF/ON)
-	REBET               OFF   (options: OFF/ON)
+    AUTO BET            OFF   (options: OFF/ON)
+    AUTO DEAL           OFF   (options: OFF/ON)
+    REBET               OFF   (options: OFF/ON)
 
   After adjusting the last item, you will return to the game mode.
 
@@ -244,7 +244,7 @@ public:
 		m_dac(*this, "dac"),
 		m_in0(*this, "IN0"),
 		m_in1(*this, "IN1"),
-		m_in2(*this, "IN2"),		
+		m_in2(*this, "IN2"),
 		m_lamps(*this, "lamp%u", 0U)
 
 	{ }
@@ -316,10 +316,10 @@ uint8_t vpoker_state::blitter_r(offs_t offset)
 {
 	if(m_in2->read() == 1 )  // Save and Halt
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	
+
 	if(offset == 6)
 		return m_in0->read();
-	
+
 	if(offset == 7)
 		return m_in1->read();
 
@@ -331,7 +331,7 @@ void vpoker_state::blitter_w(offs_t offset, uint8_t data)
 	uint8_t *videoram = m_videoram.get();
 
 	m_blit_ram[offset] = data;
-	
+
 	if(offset == 1)
 	{
 		machine().bookkeeping().coin_counter_w(0, BIT(data, 5));  // coin_in
@@ -407,8 +407,8 @@ void vpoker_state::main_map(address_map &map)
 
 static INPUT_PORTS_START( vpoker )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_NAME("Coin In") PORT_IMPULSE(3) 
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )   
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_NAME("Coin In") PORT_IMPULSE(3)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_GAMBLE_BOOK )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("IN0-10")  PORT_CODE(KEYCODE_Q)
@@ -425,7 +425,7 @@ static INPUT_PORTS_START( vpoker )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )        PORT_NAME("Deal")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )   PORT_NAME("Draw")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
-	
+
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
@@ -498,7 +498,7 @@ void vpoker_state::ptm_5_irq(int state)
 
 void vpoker_state::firq_coin_line(int state)
 {
-	if(m_in0->read() == 0xfe) 
+	if(m_in0->read() == 0xfe)
 		m_maincpu->set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -512,7 +512,7 @@ void vpoker_state::vpoker(machine_config &config)
 	// basic machine hardware
 	MC6809(config, m_maincpu, XTAL(4'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &vpoker_state::main_map);
-	
+
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
@@ -546,7 +546,7 @@ void vpoker_state::fiveaces(machine_config &config)
 	// video hardware
 	screen_device &screen(SCREEN(config.replace(), "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
-	screen.screen_vblank().set(FUNC(vpoker_state::firq_coin_line)); 
+	screen.screen_vblank().set(FUNC(vpoker_state::firq_coin_line));
 	screen.set_size(512, 256);
 	screen.set_visarea(48, 448-1, 0, 240-1);  // 512x256 total
 	screen.set_screen_update(FUNC(vpoker_state::screen_update_vpoker));

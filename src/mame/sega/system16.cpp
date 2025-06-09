@@ -2078,10 +2078,9 @@ void segas1x_bootleg_state::z80_ym2151(machine_config &config)
 	m_soundcpu->set_addrmap(AS_IO, &segas1x_bootleg_state::sound_io_map);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	YM2151(config, "ymsnd", 4000000).add_route(0, "lspeaker", 0.32).add_route(1, "rspeaker", 0.32);
+	YM2151(config, "ymsnd", 4000000).add_route(0, "speaker", 0.32, 0).add_route(1, "speaker", 0.32, 1);
 }
 
 void segas1x_bootleg_state::sound_cause_nmi(int state)
@@ -2097,15 +2096,14 @@ void segas1x_bootleg_state::z80_ym2151_upd7759(machine_config &config)
 	m_soundcpu->set_addrmap(AS_IO, &segas1x_bootleg_state::sound_7759_io_map);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	YM2151(config, "ymsnd", 4000000).add_route(0, "lspeaker", 0.32).add_route(1, "rspeaker", 0.32);
+	YM2151(config, "ymsnd", 4000000).add_route(0, "speaker", 0.32, 0).add_route(1, "speaker", 0.32, 1);
 
 	UPD7759(config, m_upd7759);
 	m_upd7759->drq().set(FUNC(segas1x_bootleg_state::sound_cause_nmi));
-	m_upd7759->add_route(ALL_OUTPUTS, "lspeaker", 0.48);
-	m_upd7759->add_route(ALL_OUTPUTS, "rspeaker", 0.48);
+	m_upd7759->add_route(ALL_OUTPUTS, "speaker", 0.48, 0);
+	m_upd7759->add_route(ALL_OUTPUTS, "speaker", 0.48, 1);
 }
 
 void segas1x_bootleg_state::datsu_ym2151_msm5205(machine_config &config)
@@ -2119,16 +2117,15 @@ void segas1x_bootleg_state::datsu_ym2151_msm5205(machine_config &config)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::tturfbl_sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &segas1x_bootleg_state::tturfbl_sound_io_map);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	YM2151(config, "ymsnd", 4000000).add_route(0, "lspeaker", 0.32).add_route(1, "rspeaker", 0.32);
+	YM2151(config, "ymsnd", 4000000).add_route(0, "speaker", 0.32, 0).add_route(1, "speaker", 0.32, 1);
 
 	MSM5205(config, m_msm, 220000);
 	m_msm->vck_legacy_callback().set(FUNC(segas1x_bootleg_state::tturfbl_msm5205_callback));
 	m_msm->set_prescaler_selector(msm5205_device::S48_4B);
-	m_msm->add_route(ALL_OUTPUTS, "lspeaker", 0.80);
-	m_msm->add_route(ALL_OUTPUTS, "rspeaker", 0.80);
+	m_msm->add_route(ALL_OUTPUTS, "speaker", 0.80, 0);
+	m_msm->add_route(ALL_OUTPUTS, "speaker", 0.80, 1);
 }
 
 void segas1x_bootleg_state::datsu_2x_ym2203_msm5205(machine_config &config)
@@ -2458,22 +2455,21 @@ void segas1x_bootleg_state::system18(machine_config &config)
 	m_sprites->set_local_originx(64);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
 	ym3438_device &ym3438_0(YM3438(config, "3438.0", 8000000));
-	ym3438_0.add_route(0, "lspeaker", 0.40);
-	ym3438_0.add_route(1, "rspeaker", 0.40);
+	ym3438_0.add_route(0, "speaker", 0.40, 0);
+	ym3438_0.add_route(1, "speaker", 0.40, 1);
 
 	ym3438_device &ym3438_1(YM3438(config, "3438.1", 8000000));
-	ym3438_1.add_route(0, "lspeaker", 0.40);
-	ym3438_1.add_route(1, "rspeaker", 0.40);
+	ym3438_1.add_route(0, "speaker", 0.40, 0);
+	ym3438_1.add_route(1, "speaker", 0.40, 1);
 
 	rf5c68_device &rf5c68(RF5C68(config, "5c68", 8000000));
-	rf5c68.add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	rf5c68.add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	rf5c68.add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	rf5c68.add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 	rf5c68.set_addrmap(0, &segas1x_bootleg_state::pcm_map);
 }
 
@@ -2530,8 +2526,8 @@ void segas1x_bootleg_state::shdancbl(machine_config &config)
 	MSM5205(config, m_msm, 200000);
 	m_msm->vck_legacy_callback().set(FUNC(segas1x_bootleg_state::shdancbl_msm5205_callback));
 	m_msm->set_prescaler_selector(msm5205_device::S48_4B);
-	m_msm->add_route(ALL_OUTPUTS, "lspeaker", 0.80);
-	m_msm->add_route(ALL_OUTPUTS, "rspeaker", 0.80);
+	m_msm->add_route(ALL_OUTPUTS, "speaker", 0.80, 0);
+	m_msm->add_route(ALL_OUTPUTS, "speaker", 0.80, 1);
 }
 
 void segas1x_bootleg_state::shdancbla(machine_config &config)
@@ -2549,8 +2545,8 @@ void segas1x_bootleg_state::shdancbla(machine_config &config)
 	MSM5205(config, m_msm, 200000);
 	m_msm->vck_legacy_callback().set(FUNC(segas1x_bootleg_state::shdancbl_msm5205_callback));
 	m_msm->set_prescaler_selector(msm5205_device::S48_4B);
-	m_msm->add_route(ALL_OUTPUTS, "lspeaker", 0.80);
-	m_msm->add_route(ALL_OUTPUTS, "rspeaker", 0.80);
+	m_msm->add_route(ALL_OUTPUTS, "speaker", 0.80, 0);
+	m_msm->add_route(ALL_OUTPUTS, "speaker", 0.80, 1);
 }
 
 
@@ -2827,11 +2823,11 @@ ROM_START( wb3bble )  /*  Appears to be a pre-system 16 bootleg with encryption 
 	ROM_LOAD16_BYTE( "epr12093.b4", 0x60001, 0x010000, CRC(4891e7bb) SHA1(1be04fcabe9bfa8cf746263a5bcca67902a021a0) ) // 12- ic71
 	ROM_LOAD16_BYTE( "epr12097.b8", 0x60000, 0x010000, CRC(e645902c) SHA1(497cfcf6c25cc2e042e16dbcb1963d2223def15a) ) // 16- ic103
 
-	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "a-1 ic68", 0x0000, 0x8000, CRC(8321eb0b) SHA1(61cf95833c0aa38e35fc18db39d4ec74e4aaf01e) )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* MCU code */
-	ROM_LOAD( "d8749h.mcu", 0x0000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x800, "mcu", 0 )
+	ROM_LOAD( "d8749h.mcu", 0x000, 0x800, CRC(4d4fa98d) SHA1(3c1500e7d008232a0eac8394a8d077e159aa43d1) )
 ROM_END
 
 /******************************

@@ -1686,7 +1686,7 @@ void pc88va_state::picture_mask_w(offs_t offset, u16 data, u16 mem_mask)
 		case 3: COMBINE_DATA(&m_picture_mask.bottom); m_picture_mask.bottom &= 0xff;  break;
 	}
 
-//	popmessage("x0 %d y0 %d - x1 %d y1 %d", m_picture_mask.left, m_picture_mask.top, m_picture_mask.right, m_picture_mask.bottom);
+//  popmessage("x0 %d y0 %d - x1 %d y1 %d", m_picture_mask.left, m_picture_mask.top, m_picture_mask.right, m_picture_mask.bottom);
 }
 
 /*

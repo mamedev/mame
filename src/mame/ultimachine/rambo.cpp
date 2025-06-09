@@ -57,7 +57,7 @@ private:
 
 void rambo_state::rambo_prg_map(address_map &map)
 {
-	map(0x0000, 0x1FFFF).rom();
+	map(0x00000, 0x3ffff).rom();
 }
 
 void rambo_state::rambo_data_map(address_map &map)
@@ -101,7 +101,7 @@ void rambo_state::rambo(machine_config &config)
 }
 
 ROM_START( metamaq2 )
-	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_DEFAULT_BIOS("20131015")
 
 	ROM_SYSTEM_BIOS( 0, "20130619", "June 19th, 2013" )
@@ -158,7 +158,7 @@ ROM_START( metamaq2 )
 	   A proper dump would be good.
 	   Also, it is not clear whether there's any difference in the bootloader
 	   between the ATMEGA1280 and the ATMEGA2560 MCUs */
-	ROM_LOAD( "atmegaboot_168_atmega1280.bin", 0x1f000, 0x0f16, BAD_DUMP CRC(c041f8db) SHA1(d995ebf360a264cccacec65f6dc0c2257a3a9224) )
+	ROM_LOAD( "atmegaboot_168_atmega1280.bin", 0x3f000, 0x0f16, BAD_DUMP CRC(c041f8db) SHA1(d995ebf360a264cccacec65f6dc0c2257a3a9224) )
 
 	/* on-die 4kbyte eeprom */
 	ROM_REGION( 0x1000, "eeprom", ROMREGION_ERASEFF )

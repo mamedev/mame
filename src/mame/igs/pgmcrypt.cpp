@@ -284,7 +284,7 @@ void pgm_dfront_decrypt(running_machine &machine)
 		IGS27_CRYPT7
 		IGS27_CRYPT8
 
-		x ^= dfront_tab[(i>> 1) & 0xff] << 8;
+		x ^= dfront_tab[(i >> 1) & 0xff] << 8;
 
 		src[i] = x;
 	}
@@ -944,7 +944,7 @@ void hauntedh_decrypt(running_machine &machine)
 		IGS27_CRYPT7_ALT
 		IGS27_CRYPT8
 
-		x ^= hauntedh_tab[(i>> 1) & 0xff] << 8;
+		x ^= hauntedh_tab[(i >> 1) & 0xff] << 8;
 
 		src[i] = x;
 	}
@@ -966,7 +966,7 @@ void chessc2_decrypt(running_machine &machine)
 	//  IGS27_CRYPT3
 		IGS27_CRYPT4
 		IGS27_CRYPT5
-		IGS27_CRYPT6 // correct??
+		IGS27_CRYPT6
 		IGS27_CRYPT7
 		IGS27_CRYPT8
 
@@ -974,52 +974,6 @@ void chessc2_decrypt(running_machine &machine)
 	}
 }
 
-
-// IGS TARZAN  CHINA ONLINE
-//V104CN
-static const uint8_t klxyj_tab[0x100] = {
-	0x49, 0x47, 0x53, 0x30, 0x30, 0x30, 0x38, 0x52, 0x44, 0x34, 0x30, 0x31, 0x30, 0x39, 0x32, 0x34, // IGS0008RD4010924
-	0x3f, 0x0f, 0x66, 0x9a, 0xbf, 0x0d, 0x06, 0x55, 0x09, 0x01, 0xeb, 0x72, 0xeb, 0x9b, 0x89, 0xfa,
-	0x24, 0xd1, 0x5d, 0xca, 0xe6, 0x8a, 0x8c, 0xe0, 0x92, 0x8d, 0xbf, 0xe4, 0xaf, 0xaa, 0x3e, 0xfa,
-	0x2b, 0x27, 0x4b, 0xc7, 0xd6, 0x6d, 0xc1, 0xc2, 0x1c, 0xf4, 0xed, 0xbd, 0x03, 0x6c, 0xad, 0xb3,
-	0x65, 0x2d, 0xc7, 0xd3, 0x6e, 0xe0, 0x8c, 0xce, 0x59, 0x6f, 0xae, 0x5e, 0x66, 0x2b, 0x5e, 0x17,
-	0x20, 0x3d, 0xa9, 0x72, 0xcd, 0x4f, 0x14, 0x17, 0x35, 0x7b, 0x77, 0x6b, 0x98, 0x73, 0x17, 0x5a,
-	0xea, 0xf2, 0x07, 0x66, 0x51, 0x64, 0xc1, 0xf0, 0xe2, 0xd1, 0x00, 0xc6, 0x97, 0x0f, 0xe0, 0xee,
-	0x94, 0x28, 0x39, 0xb2, 0x9b, 0x0a, 0x38, 0xed, 0xcc, 0x6e, 0x40, 0x94, 0xa2, 0x0a, 0x00, 0x88,
-	0x2b, 0xfa, 0xd5, 0x9a, 0x87, 0x6c, 0x62, 0xdf, 0xa4, 0x8b, 0x6d, 0x37, 0x38, 0xae, 0xfd, 0x18,
-	0xff, 0xc2, 0xb2, 0xa0, 0x37, 0xf5, 0x64, 0xdb, 0x59, 0xa5, 0x00, 0x51, 0x19, 0x88, 0x9f, 0xd4,
-	0xa0, 0x1c, 0xe7, 0x88, 0x08, 0x51, 0xa7, 0x33, 0x19, 0x75, 0xae, 0xc7, 0x42, 0x61, 0xec, 0x2d,
-	0xdb, 0xe2, 0xcc, 0x54, 0x9a, 0x6a, 0xd1, 0x7a, 0x53, 0xf8, 0x6f, 0xba, 0xf4, 0x45, 0x2c, 0xd7,
-	0xc0, 0x30, 0xf7, 0x47, 0xcc, 0x6b, 0xc8, 0x83, 0xb7, 0x67, 0x7a, 0x8e, 0xad, 0x7e, 0xe5, 0xc4,
-	0x9f, 0x60, 0x40, 0xe5, 0xbc, 0xc0, 0xb5, 0x61, 0x33, 0x3f, 0x46, 0xe6, 0x2d, 0x98, 0xdf, 0x28,
-	0x05, 0x0e, 0xbc, 0xf0, 0xca, 0x13, 0xfe, 0x68, 0xf7, 0x3a, 0x89, 0xa5, 0x71, 0x5f, 0x21, 0x76,
-	0xc2, 0x14, 0xc5, 0x6c, 0x95, 0x4f, 0x4a, 0x2a, 0x71, 0x52, 0x3c, 0xee, 0xba, 0xdb, 0xf1, 0x60
-};
-
-void klxyj_decrypt(running_machine &machine)
-{
-	auto const src = reinterpret_cast<u16 *>(machine.root_device().memregion("user1")->base());
-
-	int const rom_size = 0x80000;
-
-	for (int i = 0; i < rom_size / 2; i++)
-	{
-		uint16_t x = src[i];
-
-		IGS27_CRYPT1
-		IGS27_CRYPT2_ALT
-	//  IGS27_CRYPT3
-		IGS27_CRYPT4
-		IGS27_CRYPT5
-		IGS27_CRYPT6
-		IGS27_CRYPT7
-		IGS27_CRYPT8
-
-		x ^= klxyj_tab[(i>> 1) & 0xff] << 8;
-
-		src[i] = x;
-	}
-}
 
 void zhongguo_decrypt(running_machine &machine)
 {
@@ -1086,7 +1040,7 @@ void gonefsh2_decrypt(running_machine &machine)
 		IGS27_CRYPT7
 		IGS27_CRYPT8
 
-		x ^= gonefsh2_tab[(i>> 1) & 0xff] << 8;
+		x ^= gonefsh2_tab[(i >> 1) & 0xff] << 8;
 
 		src[i] = x;
 	}
@@ -1271,7 +1225,6 @@ void slqz3_decrypt(running_machine &machine)
 	{
 		uint16_t x = 0;
 
-		// not 100% verified
 		IGS27_CRYPT1
 		IGS27_CRYPT2_ALT
 		IGS27_CRYPT3
@@ -1293,7 +1246,6 @@ void fruitpar_decrypt(running_machine &machine)
 	auto const src = util::little_endian_cast<u16>(reinterpret_cast<u32 *>(region->base()));
 	auto const rom_size = region->bytes();
 
-	// not 100% verified
 	for (int i = 0; i < rom_size / 2; i++)
 	{
 		uint16_t x = 0;
@@ -1317,7 +1269,6 @@ void oceanpar_decrypt(running_machine &machine)
 	auto const src = util::little_endian_cast<u16>(reinterpret_cast<u32 *>(region->base()));
 	auto const rom_size = region->bytes();
 
-	// not 100% verified
 	for (int i = 0; i < rom_size / 2; i++)
 	{
 		uint16_t x = 0;
@@ -1533,38 +1484,12 @@ void qlgs_decrypt(running_machine &machine)
 	{
 		uint16_t x = 0;
 
-		// may need corrected
 		IGS27_CRYPT1_ALT
 		IGS27_CRYPT2_ALT
 		IGS27_CRYPT3
 		IGS27_CRYPT4
-		IGS27_CRYPT5 // correct
-		IGS27_CRYPT6
-		IGS27_CRYPT7
-		IGS27_CRYPT8
-
-		src[i] ^= x;
-	}
-}
-
-// IGS0004RD4010921
-void jking02_decrypt(running_machine &machine)
-{
-	memory_region *const region = machine.root_device().memregion("user1");
-	auto const src = util::little_endian_cast<u16>(reinterpret_cast<u32 *>(region->base()));
-	auto const rom_size = region->bytes();
-
-	for (int i = 0; i < rom_size / 2; i++)
-	{
-		uint16_t x = 0;
-
-		// probably needs work...
-		IGS27_CRYPT1
-		IGS27_CRYPT2_ALT
-	//  IGS27_CRYPT3
-		IGS27_CRYPT4
 		IGS27_CRYPT5
-		IGS27_CRYPT6_ALT
+		IGS27_CRYPT6
 		IGS27_CRYPT7
 		IGS27_CRYPT8
 
@@ -1659,7 +1584,7 @@ void luckycrs_decrypt(running_machine &machine)
 		IGS27_CRYPT7
 		IGS27_CRYPT8_ALT    // 3a40
 
-		x ^= luckycrs_tab[(i>> 1) & 0xff] << 8;
+		x ^= luckycrs_tab[(i >> 1) & 0xff] << 8;
 
 		src[i] = x;
 	}
@@ -1704,7 +1629,7 @@ void olympic5_decrypt(running_machine &machine)
 		IGS27_CRYPT7
 		IGS27_CRYPT8 // 3340
 
-		x ^= olympic5_tab[(i>> 1) & 0xff] << 8;
+		x ^= olympic5_tab[(i >> 1) & 0xff] << 8;
 
 		src[i] = x;
 	}
@@ -1745,10 +1670,10 @@ void icescape_decrypt(running_machine &machine)
 		uint16_t x = 0;
 
 		IGS27_CRYPT1
-		IGS27_CRYPT2_ALT // $18ed0
-		IGS27_CRYPT3_ALT // $1030
-		IGS27_CRYPT4 // $106d0
-		IGS27_CRYPT5_ALT // $10800
+		IGS27_CRYPT2_ALT
+		IGS27_CRYPT3_ALT
+		IGS27_CRYPT4
+		IGS27_CRYPT5_ALT
 		IGS27_CRYPT6
 		IGS27_CRYPT7_ALT
 		IGS27_CRYPT8
@@ -1769,13 +1694,13 @@ void tripfev_decrypt(running_machine &machine)
 		uint16_t x = 0;
 
 		IGS27_CRYPT1
-		IGS27_CRYPT2 //
+		IGS27_CRYPT2
 		IGS27_CRYPT3
-		IGS27_CRYPT4_ALT // $2fc0
-		IGS27_CRYPT5_ALT // $35da0
+		IGS27_CRYPT4_ALT
+		IGS27_CRYPT5_ALT
 		IGS27_CRYPT6
-		IGS27_CRYPT7_ALT // $2b0
-		IGS27_CRYPT8 // $1100
+		IGS27_CRYPT7_ALT
+		IGS27_CRYPT8
 
 		src[i] ^= x;
 	}
@@ -1820,34 +1745,9 @@ void wldfruit_decrypt(running_machine &machine)
 		IGS27_CRYPT7 // $2b0
 		IGS27_CRYPT8 // $1100
 
-		x ^= wldfruit_tab[(i>> 1) & 0xff] << 8;
+		x ^= wldfruit_tab[(i >> 1) & 0xff] << 8;
 
 		src[i] = x;
-	}
-}
-
-
-// IGS MAHJONG CHINA S104CN
-void lthyp_decrypt(running_machine &machine)
-{
-	memory_region *const region = machine.root_device().memregion("user1");
-	auto const src = util::little_endian_cast<u16>(reinterpret_cast<u32 *>(region->base()));
-	auto const rom_size = region->bytes();
-
-	for (int i = 0; i < rom_size / 2; i++)
-	{
-		uint16_t x = 0;
-
-		IGS27_CRYPT1
-		IGS27_CRYPT2_ALT    // correct-85a8
-		IGS27_CRYPT3        // correct-85a8
-		IGS27_CRYPT4        // correct-85a8
-		IGS27_CRYPT5        // correct-125c0
-		IGS27_CRYPT6_ALT    // correct
-		IGS27_CRYPT7        // ?
-		IGS27_CRYPT8        // correct 12c0
-
-		src[i] ^= x;
 	}
 }
 
@@ -1987,6 +1887,29 @@ void qiji6_decrypt(running_machine &machine)
 		IGS27_CRYPT5_ALT
 		IGS27_CRYPT6
 		IGS27_CRYPT7
+		IGS27_CRYPT8
+
+		src[i] ^= x;
+	}
+}
+
+void mjzb_decrypt(running_machine &machine)
+{
+	memory_region *const region = machine.root_device().memregion("user1");
+	auto const src = util::little_endian_cast<u16>(reinterpret_cast<u32 *>(region->base()));
+	auto const rom_size = region->bytes();
+
+	for (int i = 0; i < rom_size / 2; i++)
+	{
+		uint16_t x = 0;
+
+		IGS27_CRYPT1
+		IGS27_CRYPT2_ALT
+		IGS27_CRYPT3_ALT2
+		IGS27_CRYPT4
+		IGS27_CRYPT5
+		IGS27_CRYPT6_ALT
+		IGS27_CRYPT7_ALT
 		IGS27_CRYPT8
 
 		src[i] ^= x;

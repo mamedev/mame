@@ -98,10 +98,10 @@ void pc88va_sgp_device::control_w(u8 data)
 u8 pc88va_sgp_device::status_r()
 {
 // crude debug single-stepping
-//	if (machine().input().code_pressed(KEYCODE_S))
-//		return 0;
-//	if (!machine().input().code_pressed_once(KEYCODE_A))
-//		return 1;
+//  if (machine().input().code_pressed(KEYCODE_S))
+//      return 0;
+//  if (!machine().input().code_pressed_once(KEYCODE_A))
+//      return 1;
 	return 0;
 }
 

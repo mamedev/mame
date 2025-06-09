@@ -485,6 +485,48 @@ static INPUT_PORTS_START( spg2xx ) // base structure for easy debugging / figuri
 	PORT_DIPSETTING(      0x8000, "8000" )
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( carled99 )
+	PORT_INCLUDE( spg2xx )
+
+	// controls seem to be 100% digital despite it being a wheel + pedals controller similar in appearance to ford racing
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_NAME("Steer Left")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_NAME("Steer Right")
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) // directional buttons, not a real joystick!
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Menu Select")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Menu Back")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("Accelerate")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("Brake")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( wordlnch )
+	PORT_INCLUDE( spg2xx )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON2 ) // might be multiple inputs here
+	PORT_DIPNAME( 0x8000, 0x8000, "PAL/NTSC" ) // shows in test mode, changes Z from 'Zed' to 'Zee'
+	PORT_DIPSETTING(      0x0000, "NTSC" )
+	PORT_DIPSETTING(      0x8000, "PAL" )
+
+	PORT_MODIFY("P2")
+	PORT_DIPNAME( 0x0040, 0x0000, "Test Pin?" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON3 )
+
+	PORT_MODIFY("P3")
+	PORT_DIPNAME( 0x4000, 0x0000, "P3:4000 (Battery?)" ) // state of this can cause shutdowns too?
+	PORT_DIPSETTING(      0x0000, "0000" )
+	PORT_DIPSETTING(      0x4000, "4000" )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( epo_tetr ) // all inputs verified against hidden test mode
 	PORT_INCLUDE( spg2xx )
 
@@ -1476,10 +1518,9 @@ void spg2xx_game_state::spg2xx_base(machine_config &config)
 	m_screen->set_screen_update("maincpu", FUNC(spg2xx_device::screen_update));
 	m_screen->screen_vblank().set(m_maincpu, FUNC(spg2xx_device::vblank));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	m_maincpu->add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	m_maincpu->add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	SPEAKER(config, "speaker", 2).front();
+	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
+	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
 }
 
 void spg2xx_game_state::non_spg_base(machine_config &config)
@@ -2273,7 +2314,12 @@ ROM_START( rad_fb2 )
 	ROM_LOAD16_WORD_SWAP( "football2.bin", 0x000000, 0x400000, CRC(96b4f0d2) SHA1(e91f2ac679fb0c026ffe216eb4ab58802f361a17) )
 ROM_END
 
+ROM_START( rad_jib )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jibbi.u6", 0x000000, 0x200000, CRC(33f93a80) SHA1(1ecfc66435405206003f5c23c4a0aa9195a7fe0d) )
 
+	// has an AT24C02
+ROM_END
 
 ROM_START( rad_crik ) // only released in EU?
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
@@ -2316,6 +2362,10 @@ ROM_START( fordrace )
 	ROM_LOAD16_WORD_SWAP( "fordracing_29lv320ct_00c222a7.bin", 0x000000, 0x400000, CRC(998cad17) SHA1(98a65e9e0ec17e3366e0ac6ddc2d852a7efb360e) )
 ROM_END
 
+ROM_START( carled99 )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "carledwards.u2", 0x000000, 0x400000, CRC(8921f13a) SHA1(e7216e42745ab6bfd1ad02382eedbc5e741a86e9) )
+ROM_END
 
 ROM_START( comil )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
@@ -2448,6 +2498,11 @@ ROM_START( doraglob )
 	ROM_LOAD16_WORD_SWAP( "doraglobe.bin", 0x000000, 0x800000, CRC(6f454c50) SHA1(201e2de3d90abe017a8dc141613cbf6383423d13) )
 ROM_END
 
+ROM_START( doraglobuk )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "doraglobeuk.u4", 0x000000, 0x800000, CRC(b20a22b8) SHA1(f7e42a86479e68092b27068535cff90ca686f361) )
+ROM_END
+
 ROM_START( doraglobf )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "doraglobefrance.bin", 0x000000, 0x800000, CRC(7124edc1) SHA1(b144fc1f13a28299ef14f1d01f7acd2677e4ebb9) )
@@ -2536,6 +2591,13 @@ ROM_START( ban_krkk )
 	ROM_LOAD16_WORD_SWAP( "quiz.bin", 0x000000, 0x400000, CRC(6f51180a) SHA1(38017ecaae4eead38482aeb04c90b5a5eeebd6ca) )
 ROM_END
 
+ROM_START( ban_tam2 )
+	// has "#12175 TV Game Tamagotchi 2" on PCB
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "tvgametamagotchi2.bin", 0x000000, 0x800000, CRC(cc4322fa) SHA1(7ba0d3e8b9012dfa631a921cc2c7da9a21e535bd) )
+ROM_END
+
+
 ROM_START( epo_tetr )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "mx29lv320mb.bin", 0x000000, 0x400000, CRC(b4ad30e0) SHA1(83e30e199854c647f9a197562d1bf1f3bc847fff) )
@@ -2545,6 +2607,20 @@ ROM_END
 ROM_START( prail )
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "traingame.u1", 0x000000, 0x8000000, CRC(5c96d526) SHA1(cda0280b320762bda7a7358ec7ce29690aa815fb) )
+ROM_END
+
+ROM_START( wordlnch )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "wordplay.u7", 0x000000, 0x800000, CRC(604f59ff) SHA1(024d554a15e6c3a6b9c3a15bfd657964d1deba83) )
+
+	// these are needed to boot right now, checksum passes without them
+	// patch start-up check
+	ROM_FILL(                      0x97f9e, 1, 0x42 )
+	ROM_FILL(                      0x97f9f, 1, 0x40 )
+
+	// patch loop on leapfrog logo
+	ROM_FILL(                      0x95bc8, 1, 0x44 )
+	ROM_FILL(                      0x95bc9, 1, 0x40 )
 ROM_END
 
 
@@ -2627,6 +2703,9 @@ CONS( 2006, rad_crik,   0,        0, rad_crik,  rad_crik,  spg2xx_game_state,   
 
 CONS( 2007, rad_fb2,    0,        0, rad_skat,  rad_fb2,   spg2xx_game_state,          init_crc,      "Radica",                                                 "Play TV Football 2",                                                    MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // offers a 2 player option in menus, but seems to have only been programmed for, and released as, a single player unit, P2 controls appear unfinished.
 
+// this is 'voice activated' and one of the other globs is likely doing the voice processing
+CONS( 2006, rad_jib,    0,        0, spg28x,    spg2xx,   spg2xx_game_state,          init_crc,      "Radica",                                                 "Jibbi",                                                                 MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+
 // ABL TV Games
 CONS( 2006, abltenni,   0,        0, spg2xx,    abltenni,  spg2xx_game_state,          empty_init,    "Advance Bright Ltd / V-Tac Technology Co Ltd.",          "Wireless Tennis (WT2000, ABL TV Game)",                                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
@@ -2639,6 +2718,8 @@ CONS( 2007, lxairjet,   0,        0, spg2xx_pal,lxspidaj,  spg2xx_game_albkickb_
 CONS( 2006, totspies,   0,        0, spg2xx_pal,totspies,  spg2xx_game_state,          empty_init,    "Senario / Marathon - Mystery Animation Inc.",            "Totally Spies! (France)",                                               MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 2006, fordrace,   0,        0, fordrace,  fordrace,  spg2xx_game_fordrace_state, empty_init,    "Excalibur Electronics",                                  "Ford Racing",                                                           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 200?, carled99,   0,        0, spg2xx,    carled99,  spg2xx_game_state,          empty_init,    "Excalibur Electronics",                                  "Carl Edwards 99",                                                       MACHINE_IMPERFECT_SOUND )
 
 CONS( 2008, comil,      0,        0, comil,     comil,     spg2xx_game_comil_state,    empty_init,    "Character Options",                                      "Who Wants to Be a Millionaire? (Character Options, Plug and Play, UK)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
@@ -2668,12 +2749,13 @@ CONS( 2006, vtechtvsgr, 0,        0, spg2xx,    spg2xx,    spg2xx_game_state,   
 CONS( 2007, itvphone,   0,        0, spg2xx_pal, itvphone, spg2xx_game_state,          init_itvphone, "Taikee / Oregon Scientific / V-Tac Technology Co Ltd.",  u8"Teléfono interactivo de TV (Spain)",                                  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // "Boots's" is used on the title screen and in the manual, even if "Boots'" is usually used outside of this game.
-CONS( 2006, doraphon,   0,        0, doraphone, doraphone, spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora the Explorer - Dora TV Explorer Phone / Boots's Special Day (US)",            MACHINE_IMPERFECT_SOUND )
+CONS( 2006, doraphon,   0,        0, doraphone, doraphone, spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora the Explorer - Dora TV Explorer Phone / Boots's Special Day (US/UK)",         MACHINE_IMPERFECT_SOUND ) // same ROM confirmed on both US and UK units
 CONS( 2006, doraphonf,  doraphon, 0, doraphonep,doraphonep,spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora the Explorer - Dora TV Explorer Phone / L'anniversaire de Babouche (France)", MACHINE_IMPERFECT_SOUND )
 // This was from a 'cost reduced' unit with the 'non-TV' mode switch and internal speaker removed, however it looks like the code was not disabled or removed as the mode is fully functional.
 // The ZC-Infinity video for this on YouTube shows the map scrolling to center the continent, there doesn't appear to be an input for this, different revision?
 // a Dutch localized version also exists, which again must be different code
-CONS( 2007, doraglob,   0,        0, doraphone, doraglobe, spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora the Explorer - Dora TV Adventure Globe",                           MACHINE_IMPERFECT_SOUND )
+CONS( 2007, doraglob,   0,        0, doraphone, doraglobe, spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora the Explorer - Dora TV Adventure Globe (US)",                      MACHINE_IMPERFECT_SOUND )
+CONS( 2007, doraglobuk, doraglob, 0, doraphone, doraglobe, spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora the Explorer - Dora TV Adventure Globe (UK)",                      MACHINE_IMPERFECT_SOUND )
 CONS( 2007, doraglobf,  doraglob, 0, doraphone, doraglobe, spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora the Explorer - Dora TV Globe-Trotter (France)",                    MACHINE_IMPERFECT_SOUND )
 CONS( 2007, doraglobg,  doraglob, 0, doraphone, doraglobe, spg2xx_game_doraphone_state,empty_init,    "VTech",                                                  "Dora the Explorer - Doras Abenteuer-Globus (Germany)",                  MACHINE_IMPERFECT_SOUND )
 
@@ -2743,9 +2825,14 @@ CONS( 2006, dmbtjunc,   0,        0, spg2xx,    dmbtjunc,  spg2xx_game_state,   
 // Let's!TVプレイ 脳と体を鍛える 体感頭脳ファミリーマットレ  - Let's! TV Play branding appears on the box
 CONS( 2006, ban_krkk,   0,        0, spg2xx,    ban_krkk,  spg2xx_game_state,          init_crc,      "Bandai",                                                "Let's! TV Play Nou to Karada o Kitaeru Taikan Zunou Family Mattore (Japan)", MACHINE_IMPERFECT_SOUND )
 
+// Let's!TVプレイ チームたいこー! カードでパワーUP! たまごっちスクール選手権 - has IR for optional connectivity with external Tamagotchi device, and a card scanner used for gameplay
+CONS( 2007, ban_tam2,   0,        0, spg2xx,    spg2xx,    spg2xx_game_state,          init_crc,      "Bandai",                                                "Let's! TV Play Team Taikou! Card de Power Up! Tamagotchi School Senshuken (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
 CONS( 2007, epo_tetr,   0,        0, epo_tetr,  epo_tetr,  epo_tetr_game_state,          empty_init,    "Epoch",                                                "Minna no Tetris (Japan)", MACHINE_IMPERFECT_SOUND )
 
 // Train Game V1.4 2012-08-15 on PCB. SPG243 headers in each chunk.
 // Last few bytes of SEEPROM have 'JUNGT' in them, is this developed by JungleSoft/JungleTac?
 CONS( 2012, prail,      0,        0, prail,     prail,     spg2xx_game_prail_state,    empty_init,   "Takara Tomy",                                            "Boku wa Plarail Untenshi - Shinkansen de Ikou! (Japan)",                MACHINE_IMPERFECT_SOUND )
 // the 'plus' version from 2015 runs on newer hardware, see generalplus_gpl16250_spi.cpp
+
+CONS( 2007, wordlnch,   0,        0, spg2xx,    wordlnch,  spg2xx_game_state,          empty_init,    "LeapFrog",                                                "Word Launch (UK)",                MACHINE_NOT_WORKING )

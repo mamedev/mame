@@ -477,28 +477,27 @@ void chqflag_state::chqflag(machine_config &config)
 	K051733(config, "k051733", 0);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 	GENERIC_LATCH_8(config, "soundlatch2").data_pending_callback().set_inputline(m_audiocpu, 0);
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545))); /* verified on pcb */
 	ymsnd.irq_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
-	ymsnd.add_route(0, "lspeaker", 1.00);
-	ymsnd.add_route(1, "rspeaker", 1.00);
+	ymsnd.add_route(0, "speaker", 1.00, 0);
+	ymsnd.add_route(1, "speaker", 1.00, 1);
 
 	K007232(config, m_k007232[0], XTAL(3'579'545)); /* verified on pcb */
 	m_k007232[0]->port_write().set(FUNC(chqflag_state::volume_callback0));
-	m_k007232[0]->add_route(0, "lspeaker", 0.20);
-	m_k007232[0]->add_route(1, "rspeaker", 0.20);
+	m_k007232[0]->add_route(0, "speaker", 0.20, 0);
+	m_k007232[0]->add_route(1, "speaker", 0.20, 1);
 
 	K007232(config, m_k007232[1], XTAL(3'579'545)); /* verified on pcb */
 	m_k007232[1]->port_write().set(FUNC(chqflag_state::volume_callback1));
-	m_k007232[1]->add_route(0, "lspeaker", 0.20);
-	m_k007232[1]->add_route(0, "rspeaker", 0.20);
-	m_k007232[1]->add_route(1, "lspeaker", 0.20);
-	m_k007232[1]->add_route(1, "rspeaker", 0.20);
+	m_k007232[1]->add_route(0, "speaker", 0.20, 0);
+	m_k007232[1]->add_route(0, "speaker", 0.20, 1);
+	m_k007232[1]->add_route(1, "speaker", 0.20, 0);
+	m_k007232[1]->add_route(1, "speaker", 0.20, 1);
 }
 
 ROM_START( chqflag )

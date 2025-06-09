@@ -437,19 +437,18 @@ void flkatck_state::flkatck(machine_config &config)
 	K007121(config, m_k007121, 0, "palette", gfx_flkatck);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	YM2151(config, "ymsnd", 3.579545_MHz_XTAL).add_route(0, "lspeaker", 1.0).add_route(0, "rspeaker", 1.0);
+	YM2151(config, "ymsnd", 3.579545_MHz_XTAL).add_route(0, "speaker", 1.0, 0).add_route(0, "speaker", 1.0, 1);
 
 	K007232(config, m_k007232, 3.579545_MHz_XTAL);
 	m_k007232->port_write().set(FUNC(flkatck_state::volume_callback));
-	m_k007232->add_route(0, "lspeaker", 0.50);
-	m_k007232->add_route(0, "rspeaker", 0.50);
-	m_k007232->add_route(1, "lspeaker", 0.50);
-	m_k007232->add_route(1, "rspeaker", 0.50);
+	m_k007232->add_route(0, "speaker", 0.50, 0);
+	m_k007232->add_route(0, "speaker", 0.50, 1);
+	m_k007232->add_route(1, "speaker", 0.50, 0);
+	m_k007232->add_route(1, "speaker", 0.50, 1);
 }
 
 

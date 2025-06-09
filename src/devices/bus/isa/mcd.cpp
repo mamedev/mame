@@ -26,11 +26,10 @@ DEFINE_DEVICE_TYPE(ISA16_MCD, mcd_isa_device, "mcd_isa", "Mitsumi ISA CD-ROM Ada
 
 void mcd_isa_device::device_add_mconfig(machine_config &config)
 {
-	SPEAKER(config, "lheadphone").front_left();
-	SPEAKER(config, "rheadphone").front_right();
+	SPEAKER(config, "headphone", 2).front();
 	CDDA(config, m_cdda);
-	m_cdda->add_route(0, "lheadphone", 1.0);
-	m_cdda->add_route(1, "rheadphone", 1.0);
+	m_cdda->add_route(0, "headphone", 1.0, 0);
+	m_cdda->add_route(1, "headphone", 1.0, 1);
 	m_cdda->set_cdrom_tag(*this);
 }
 

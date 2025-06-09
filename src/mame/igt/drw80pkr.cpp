@@ -111,7 +111,7 @@
   - Reworked coin inputs per game.
   - Promoted Draw 80 Poker (Minn) to working.
   - Promoted Wild 1 (Quick Change Kit) to working.
-  
+
 
   TODO:
 
@@ -585,8 +585,8 @@ static INPUT_PORTS_START( drw80wld )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_GAMBLE_KEYOUT )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("KeyIn x01") PORT_CODE(KEYCODE_A) // KeyIn A (Coinage x 1 )  No timeout
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )  // coin sequencer A  Or Coin Switch (DSW_1 Selector)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )	 // coin sequencer B
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN3 )	 // coin sequencer C
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )  // coin sequencer B
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN3 )  // coin sequencer C
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("KeyIn x04") PORT_CODE(KEYCODE_S) // Key In B (Coinage x 4)  No Timeout
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("KeyIn x20") PORT_CODE(KEYCODE_D) // Key In C (Coinage x 20) No Timeout
 

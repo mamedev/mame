@@ -1,49 +1,49 @@
 // license:LGPL-2.1+
 // copyright-holders:Michael Zapf
 /****************************************************************************
-    
+
     TI-99 Speech synthesizer
 
     This is the emulation Speech Synthesizer, which plugs into the I/O port of
     the TI console. Even though the sidecar expansion concept was largely
     abandoned by the introduction of the Peripheral Expansion Box with the 4A,
     the Speech Synthesizer was sold as a sidecar expansion until the end.
-    
+
     Typical setup:
                         Speech Synthesizer
                         sidecar
-                        v  
+                        v
      +----------------+---+----------
      |   TI-99/4(A)   |   |    PEB connection cable
      +------------+---+   +----------
      | oooooooooo |   |---+
      | oooooooooo |   |
      +-----------------
-    
+
     Also as a common modification, users removed the board inside the sidecar
     and placed it on an adapter to go into the PEB and thus to become
     available for the Geneve or SGCPU. See bus/ti99/peb/speechadapter.cpp.
 
-    The sidecar offers a flippable lid where vocabulary expansion modules were 
-    supposed to be plugged in, but those have never seen daylight. In most of 
-    the units, including mine, no connector can be found under the lid, so the 
-    decision to drop this idea must have come early. 
+    The sidecar offers a flippable lid where vocabulary expansion modules were
+    supposed to be plugged in, but those have never seen daylight. In most of
+    the units, including mine, no connector can be found under the lid, so the
+    decision to drop this idea must have come early.
 
     Technical details:
-    
-    The Voice Synthesis Processor (VSP) used for the TI Speech Synthesizer 
-    is the CD2501E, aka TMS5200 (internal name TMC0285), a predecessor of the 
-    TMS5220 which was used in many other commercial products. 
+
+    The Voice Synthesis Processor (VSP) used for the TI Speech Synthesizer
+    is the CD2501E, aka TMS5200 (internal name TMC0285), a predecessor of the
+    TMS5220 which was used in many other commercial products.
     Two TMS6100 circuits hold the standard vocabulary, mainly used from Extended
     Basic programs.
-    
+
     The interaction with the TMS5200 relies completely on the READY*
     line; the INT* line is not connected.
 
     The VSP delivers a READY* signal, which needs to be inverted for the rest
-    of the TI system. The board of the Speech Synthesizer uses a simple 
+    of the TI system. The board of the Speech Synthesizer uses a simple
     transistor for this purpose.
-    
+
     Michael Zapf
     March 2025
 
@@ -74,7 +74,7 @@ namespace bus::ti99::sidecar {
     Constructor called from subclasses.
 */
 ti_speech_synthesizer_device::ti_speech_synthesizer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: 	bus::ti99::internal::ioport_attached_device(mconfig, TI99_SPEECHSYN, tag, owner, clock),
+	:   bus::ti99::internal::ioport_attached_device(mconfig, TI99_SPEECHSYN, tag, owner, clock),
 		m_vsp(*this, VSP),
 		m_port(*this, PORT),
 		m_reading(false),
@@ -144,7 +144,7 @@ void ti_speech_synthesizer_device::setaddress_dbin(offs_t offset, int state)
 	{
 		// If other address, turn off RS* and WS* (negative logic!)
 		m_vsp->combined_rsq_wsq_w(~0);
-		
+
 		// Pass through to the external port
 		if (m_port != nullptr)
 			m_port->setaddress_dbin(offset, state);
@@ -200,7 +200,7 @@ void ti_speech_synthesizer_device::reset_in(int state)
 }
 
 /*
-	Forward the incoming interrupt to the console
+    Forward the incoming interrupt to the console
 */
 void ti_speech_synthesizer_device::extint(int state)
 {
@@ -216,10 +216,10 @@ void ti_speech_synthesizer_device::extready(int state)
 
 void ti_speech_synthesizer_device::speech_ready(int state)
 {
-	// Invert the READY* signal	
-	m_ssyn_ready = (state==0)? ASSERT_LINE : CLEAR_LINE; 
+	// Invert the READY* signal
+	m_ssyn_ready = (state==0)? ASSERT_LINE : CLEAR_LINE;
 	LOGMASKED(LOG_READY, "SSyn READY = %d\n", (state==0));
-	
+
 	if ((state==0) && !m_reading)
 		// Clear the lines only when we are done with writing.
 		m_vsp->combined_rsq_wsq_w(~0);

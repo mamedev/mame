@@ -2095,7 +2095,7 @@ void dec0_state::bandit(machine_config &config)
 	mcu.port_out_cb<3>().set(FUNC(dec0_state::dec0_mcu_port3_w));
 
 	/* video hardware */
-	m_screen->set_screen_update(FUNC(dec0_state::screen_update_hbarrel));
+	m_screen->set_screen_update(FUNC(dec0_state::screen_update_bandit));
 	m_spritegen->set_colpri_callback(FUNC(dec0_state::bandit_colpri_cb));
 }
 
@@ -4357,7 +4357,7 @@ GAME( 1988, robocopw,   robocop,  robocop,    robocop,    robocop_state,  empty_
 GAME( 1988, robocopj,   robocop,  robocop,    robocop,    robocop_state,  empty_init,      ROT0,   "Data East Corporation", "Robocop (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, robocopu,   robocop,  robocop,    robocop,    robocop_state,  empty_init,      ROT0,   "Data East USA",         "Robocop (US, revision 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, robocopu0,  robocop,  robocop,    robocop,    robocop_state,  empty_init,      ROT0,   "Data East USA",         "Robocop (US, revision 0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bandit,     0,        bandit,     bandit,     dec0_state,     init_hbarrel,    ROT90,  "Data East USA",         "Bandit (US)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bandit,     0,        bandit,     bandit,     dec0_state,     init_hbarrel,    ROT90,  "Data East USA / Incredible Technologies",         "Bandit (US prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // Incredible Technologies credited during ending (select track #75). MIG for the ending screen (which may be a btanb).
 GAME( 1989, hippodrm,   0,        hippodrm,   hippodrm,   hippodrm_state, init_hippodrm,   ROT0,   "Data East USA",         "Hippodrome (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, ffantasy,   hippodrm, hippodrm,   ffantasy,   hippodrm_state, init_hippodrm,   ROT0,   "Data East Corporation", "Fighting Fantasy (Japan, revision 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, ffantasyj,  hippodrm, hippodrm,   ffantasy,   hippodrm_state, init_hippodrm,   ROT0,   "Data East Corporation", "Fighting Fantasy (Japan, revision 2)", MACHINE_SUPPORTS_SAVE )

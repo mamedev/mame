@@ -279,7 +279,6 @@ register. So what is controlling priority.
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/timer.h"
-#include "sound/mixer.h"
 #include "sound/msm5205.h"
 #include "sound/ymopm.h"
 
@@ -876,13 +875,13 @@ void opwolf_state::opwolf(machine_config &config)
 	m_pc090oj->set_colpri_callback(FUNC(opwolf_state::colpri_cb));
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 8_MHz_XTAL / 2)); /* 4 MHz */
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.port_write_handler().set_membank(m_z80bank).mask(0x03);
-	ymsnd.add_route(ALL_OUTPUTS, "mixer", 0.35);
+	ymsnd.add_route(ALL_OUTPUTS, m_tc0060dca[1], 0.35, 0);
+	ymsnd.add_route(ALL_OUTPUTS, m_tc0060dca[1], 0.35, 1);
 
 	MSM5205(config, m_msm[0], 384_kHz_XTAL);
 	m_msm[0]->vck_legacy_callback().set(FUNC(opwolf_state::msm5205_vck_w<0>));
@@ -895,15 +894,12 @@ void opwolf_state::opwolf(machine_config &config)
 	m_msm[1]->add_route(0, m_tc0060dca[0], 1.0, 1);
 
 	TC0060DCA(config, m_tc0060dca[0]);
-	m_tc0060dca[0]->add_route(ALL_OUTPUTS, "mixer", 1.0);
-
-	mixer_device &mixer = MIXER(config, "mixer");
-	mixer.add_route(0, m_tc0060dca[1], 1.0, 0);
-	mixer.add_route(0, m_tc0060dca[1], 1.0, 1);
+	m_tc0060dca[0]->add_route(ALL_OUTPUTS, m_tc0060dca[1], 1.0, 0);
+	m_tc0060dca[0]->add_route(ALL_OUTPUTS, m_tc0060dca[1], 1.0, 1);
 
 	TC0060DCA(config, m_tc0060dca[1]);
-	m_tc0060dca[1]->add_route(0, "lspeaker", 1.0);
-	m_tc0060dca[1]->add_route(1, "rspeaker", 1.0);
+	m_tc0060dca[1]->add_route(0, "speaker", 1.0, 0);
+	m_tc0060dca[1]->add_route(1, "speaker", 1.0, 1);
 }
 
 void opwolf_state::opwolfp(machine_config &config)

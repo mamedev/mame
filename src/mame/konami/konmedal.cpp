@@ -967,12 +967,11 @@ void konmedal_state::tsukande(machine_config &config)
 	m_k056832->set_palette(m_palette);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	YMZ280B(config, m_ymz, XTAL(16'934'400)); // 16.9344MHz xtal verified on PCB
-	m_ymz->add_route(0, "lspeaker", 1.0);
-	m_ymz->add_route(1, "rspeaker", 1.0);
+	m_ymz->add_route(0, "speaker", 1.0, 0);
+	m_ymz->add_route(1, "speaker", 1.0, 1);
 }
 
 void konmedal_state::ddboy(machine_config &config)

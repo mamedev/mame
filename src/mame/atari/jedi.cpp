@@ -946,30 +946,29 @@ void jedi_state::jedi(machine_config &config)
 	M6502(config, m_audiocpu, JEDI_AUDIO_CPU_CLOCK);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &jedi_state::audio_map);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	pokey_device &pokey1(POKEY(config, "pokey1", JEDI_POKEY_CLOCK));
 	pokey1.set_output_opamp(RES_K(1), 0.0, 5.0);
-	pokey1.add_route(ALL_OUTPUTS, "lspeaker", 0.30);
-	pokey1.add_route(ALL_OUTPUTS, "rspeaker", 0.30);
+	pokey1.add_route(ALL_OUTPUTS, "speaker", 0.30, 0);
+	pokey1.add_route(ALL_OUTPUTS, "speaker", 0.30, 1);
 
 	pokey_device &pokey2(POKEY(config, "pokey2", JEDI_POKEY_CLOCK));
 	pokey2.set_output_opamp(RES_K(1), 0.0, 5.0);
-	pokey2.add_route(ALL_OUTPUTS, "lspeaker", 0.30);
-	pokey2.add_route(ALL_OUTPUTS, "rspeaker", 0.30);
+	pokey2.add_route(ALL_OUTPUTS, "speaker", 0.30, 0);
+	pokey2.add_route(ALL_OUTPUTS, "speaker", 0.30, 1);
 
 	pokey_device &pokey3(POKEY(config, "pokey3", JEDI_POKEY_CLOCK));
 	pokey3.set_output_opamp(RES_K(1), 0.0, 5.0);
-	pokey3.add_route(ALL_OUTPUTS, "lspeaker", 0.30);
+	pokey3.add_route(ALL_OUTPUTS, "speaker", 0.30, 0);
 
 	pokey_device &pokey4(POKEY(config, "pokey4", JEDI_POKEY_CLOCK));
 	pokey4.set_output_opamp(RES_K(1), 0.0, 5.0);
-	pokey4.add_route(ALL_OUTPUTS, "rspeaker", 0.30);
+	pokey4.add_route(ALL_OUTPUTS, "speaker", 0.30, 1);
 
 	TMS5220(config, m_tms, JEDI_TMS5220_CLOCK);
-	m_tms->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_tms->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_tms->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	m_tms->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 	GENERIC_LATCH_8(config, m_soundlatch); // 5E (LS374) + 3E (LS279) pins 13-15
 	GENERIC_LATCH_8(config, m_sacklatch); // 4E (LS374) + 3E (LS279) pins 1-4

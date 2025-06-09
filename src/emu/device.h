@@ -63,6 +63,18 @@ template <typename T>
 using is_device_interface = std::bool_constant<std::is_base_of_v<device_interface, T> && !is_device_implementation<T>::value>;
 
 
+struct device_flags
+{
+	enum type : u16
+	{
+		NOT_WORKING         = u16(1) << 0,
+		SAVE_UNSUPPORTED    = u16(1) << 1,
+
+		NONE                = u16(0),
+		ALL                 = (u16(1) << 2) - 1U
+	};
+};
+
 struct device_feature
 {
 	enum type : u32
@@ -107,6 +119,7 @@ struct device_feature
 	};
 };
 
+DECLARE_ENUM_BITWISE_OPERATORS(device_flags::type);
 DECLARE_ENUM_BITWISE_OPERATORS(device_feature::type);
 
 
@@ -165,13 +178,8 @@ private:
 
 template <class DeviceClass, char const *ShortName, char const *FullName, char const *Source>
 struct device_tag_struct { typedef DeviceClass type; };
-template <class DriverClass, char const *ShortName, char const *FullName, char const *Source, device_feature::type Unemulated, device_feature::type Imperfect>
+template <class DriverClass, char const *ShortName, char const *FullName, char const *Source, device_flags::type Flags, device_feature::type Unemulated, device_feature::type Imperfect>
 struct driver_tag_struct { typedef DriverClass type; };
-
-template <class DeviceClass, char const *ShortName, char const *FullName, char const *Source>
-auto device_tag_func() { return device_tag_struct<DeviceClass, ShortName, FullName, Source>{ }; };
-template <class DriverClass, char const *ShortName, char const *FullName, char const *Source, device_feature::type Unemulated, device_feature::type Imperfect>
-auto driver_tag_func() { return driver_tag_struct<DriverClass, ShortName, FullName, Source, Unemulated, Imperfect>{ }; };
 
 class device_type_impl_base
 {
@@ -205,6 +213,7 @@ private:
 	char const *const m_shortname;
 	char const *const m_fullname;
 	char const *const m_source;
+	device_flags::type const m_emulation_flags;
 	device_feature::type const m_unemulated_features;
 	device_feature::type const m_imperfect_features;
 	device_type_impl_base const *const m_parent_rom;
@@ -220,6 +229,7 @@ public:
 		, m_shortname(nullptr)
 		, m_fullname(nullptr)
 		, m_source(nullptr)
+		, m_emulation_flags(device_flags::NONE)
 		, m_unemulated_features(device_feature::NONE)
 		, m_imperfect_features(device_feature::NONE)
 		, m_parent_rom(nullptr)
@@ -228,12 +238,13 @@ public:
 	}
 
 	template <class DeviceClass, char const *ShortName, char const *FullName, char const *Source>
-	device_type_impl_base(device_tag_struct<DeviceClass, ShortName, FullName, Source> (*)())
+	device_type_impl_base(device_tag_struct<DeviceClass, ShortName, FullName, Source>)
 		: m_creator(&create_device<DeviceClass>)
 		, m_type(typeid(DeviceClass))
 		, m_shortname(ShortName)
 		, m_fullname(FullName)
 		, m_source(Source)
+		, m_emulation_flags(DeviceClass::emulation_flags())
 		, m_unemulated_features(DeviceClass::unemulated_features())
 		, m_imperfect_features(DeviceClass::imperfect_features())
 		, m_parent_rom(DeviceClass::parent_rom_device_type())
@@ -241,13 +252,14 @@ public:
 	{
 	}
 
-	template <class DriverClass, char const *ShortName, char const *FullName, char const *Source, device_feature::type Unemulated, device_feature::type Imperfect>
-	device_type_impl_base(driver_tag_struct<DriverClass, ShortName, FullName, Source, Unemulated, Imperfect> (*)())
+	template <class DriverClass, char const *ShortName, char const *FullName, char const *Source, device_flags::type Flags, device_feature::type Unemulated, device_feature::type Imperfect>
+	device_type_impl_base(driver_tag_struct<DriverClass, ShortName, FullName, Source, Flags, Unemulated, Imperfect>)
 		: m_creator(&create_driver<DriverClass>)
 		, m_type(typeid(DriverClass))
 		, m_shortname(ShortName)
 		, m_fullname(FullName)
 		, m_source(Source)
+		, m_emulation_flags(DriverClass::emulation_flags() | Flags)
 		, m_unemulated_features(DriverClass::unemulated_features() | Unemulated)
 		, m_imperfect_features((DriverClass::imperfect_features() & ~Unemulated) | Imperfect)
 		, m_parent_rom(DriverClass::parent_rom_device_type())
@@ -259,6 +271,7 @@ public:
 	char const *shortname() const { return m_shortname; }
 	char const *fullname() const { return m_fullname; }
 	char const *source() const { return m_source; }
+	device_flags::type emulation_flags() const { return m_emulation_flags; }
 	device_feature::type unemulated_features() const { return m_unemulated_features; }
 	device_feature::type imperfect_features() const { return m_imperfect_features; }
 	device_type_impl_base const *parent_rom_device_type() const { return m_parent_rom; }
@@ -305,22 +318,6 @@ inline device_registrar::const_iterator &device_registrar::const_iterator::opera
 typedef emu::detail::device_type_impl_base const &device_type;
 typedef std::add_pointer_t<device_type> device_type_ptr;
 extern emu::detail::device_registrar const registered_device_types;
-
-template <
-		typename DeviceClass,
-		char const *ShortName,
-		char const *FullName,
-		char const *Source>
-constexpr auto device_creator = &emu::detail::device_tag_func<DeviceClass, ShortName, FullName, Source>;
-
-template <
-		typename DriverClass,
-		char const *ShortName,
-		char const *FullName,
-		char const *Source,
-		emu::detail::device_feature::type Unemulated,
-		emu::detail::device_feature::type Imperfect>
-constexpr auto driver_device_creator = &emu::detail::driver_tag_func<DriverClass, ShortName, FullName, Source, Unemulated, Imperfect>;
 
 
 /// \addtogroup machinedef
@@ -404,7 +401,7 @@ constexpr auto driver_device_creator = &emu::detail::driver_tag_func<DriverClass
 			struct Type##_device_traits { static constexpr char const shortname[] = ShortName, fullname[] = FullName, source[] = __FILE__; }; \
 			constexpr char const Type##_device_traits::shortname[], Type##_device_traits::fullname[], Type##_device_traits::source[]; \
 		} \
-		emu::detail::device_type_impl<Class> const Type = device_creator<Class, (Type##_device_traits::shortname), (Type##_device_traits::fullname), (Type##_device_traits::source)>; \
+		emu::detail::device_type_impl<Class> const Type = emu::detail::device_tag_struct<Class, (Type##_device_traits::shortname), (Type##_device_traits::fullname), (Type##_device_traits::source)>{ }; \
 		template class device_finder<Class, false>; \
 		template class device_finder<Class, true>;
 
@@ -440,7 +437,7 @@ constexpr auto driver_device_creator = &emu::detail::driver_tag_func<DriverClass
 			struct Type##_device_traits { static constexpr char const shortname[] = ShortName, fullname[] = FullName, source[] = __FILE__; }; \
 			constexpr char const Type##_device_traits::shortname[], Type##_device_traits::fullname[], Type##_device_traits::source[]; \
 		} \
-		emu::detail::device_type_impl<Base> const Type = device_creator<Class, (Type##_device_traits::shortname), (Type##_device_traits::fullname), (Type##_device_traits::source)>;
+		emu::detail::device_type_impl<Base> const Type = emu::detail::device_tag_struct<Class, (Type##_device_traits::shortname), (Type##_device_traits::fullname), (Type##_device_traits::source)>{ };
 
 /// \}
 
@@ -565,8 +562,21 @@ protected:
 
 public:
 	// device flags
+	using flags = emu::detail::device_flags;
+	using flags_type = emu::detail::device_flags::type;
 	using feature = emu::detail::device_feature;
 	using feature_type = emu::detail::device_feature::type;
+
+	/// \brief Report emulation status flags
+	///
+	/// Implement this member in a derived class to declare flags
+	/// pertaining to the overall emulation status of the device.  Some
+	/// flags propagate to all other devices and systems that use the
+	/// device.
+	/// \return Bitwise or of the flag constants pertaining to the
+	///   device emulation.
+	/// \sa unemulated_features imperfect_features
+	static constexpr flags_type emulation_flags() { return flags::NONE; }
 
 	/// \brief Report unemulated features
 	///
@@ -577,7 +587,7 @@ public:
 	/// displayed on starting a system.
 	/// \return Bitwise or of the feature constants for unemulated
 	///   features of the device.
-	/// \sa imperfect_features
+	/// \sa emulation_flags imperfect_features
 	static constexpr feature_type unemulated_features() { return feature::NONE; }
 
 	/// \brief Report imperfectly emulated features
@@ -594,7 +604,7 @@ public:
 	/// in a red warning being displayed when starting a system.
 	/// \return Bitwise or of the feature constants for imperfectly
 	///   emulated features of the device.
-	/// \sa unemulated_features
+	/// \sa emulation_flags unemulated_features
 	static constexpr feature_type imperfect_features() { return feature::NONE; }
 
 	/// \brief Get parent device type for ROM search

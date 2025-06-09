@@ -20,13 +20,15 @@ Year + Game                                    PCB        CPU    Sound          
 97  Manguan Daheng (V123T1)                    NO-0252    68000  M6295           IGS031 IGS025 IGS???* Battery
 98  Genius 6 (V110F)                           NO-0131-4  Z180   K668    U3567   IGS017 IGS003c        Battery
 98  Long Hu Zhengba 2 (set 1)                  NO-0206    68000  K668            IGS031 IGS025 IGS022* Battery
-98  Long Hu Zhengba 2 (VS105M)                 NO-0182-2  68000  M6295           IGS031 IGS025 IGS022  Battery
+98  Long Hu Zhengba 2 (VS210M)                 NO-0218-2  68000  K668            IGS031 IGS025 IGS029  Battery
+98  Long Hu Zhengba (VS105M)                   NO-0182-2  68000  M6295           IGS031 IGS025 IGS022  Battery
 98  Shuang Long Qiang Zhu 2 VS (VS203J)        NO-0207    68000  K668            IGS031 IGS025 IGS022  Battery
 98  Manguan Caishen (V103CS)                   NO-0192-1  68000  K668            IGS017 IGS025 IGS029  Battery
 98  Manguan Caishen (V106CS)                   NO-0208    68000  M6295           IGS031 IGS025 IGS029  Battery
+98  Manguan Caishen (V110C)                    NO-0266    68000  M6295           IGS031 IGS025 IGS026  Battery
 99  Tarzan (V107)                              NO-0228?   Z180   U6295           IGS031 IGS025 IGS029  Battery
 99  Tarzan (V109C)                             NO-0248-1  Z180   U6295           IGS031 IGS025         Battery
-00  Chaoji Da manguan 2 - Jiaqiang Ban (V100C) NO-0271    68000  K668            IGS031 IGS025         Battery
+00  Chaoji Da Manguan 2 - Jiaqiang Ban (V100C) NO-0271    68000  K668            IGS031 IGS025         Battery
 00? Jungle King (V103A)                        NO-0230-1  Z180   U6295           IGS031 IGS025 (N9)    Battery
 00? Super Tarzan (V100I)                       NO-0230-1  Z180   K668            IGS031 IGS025         Battery
 00? Happy Skill (V611IT)                       NO-0281    Z180   K668            IGS031 IGS025         Battery
@@ -37,10 +39,11 @@ Year + Game                                    PCB        CPU    Sound          
                                                                          not present in another set *
 To Do:
 
-- Protection emulation in some games, instead of patching the roms.
-- NVRAM.
+- Protection emulation in some games, instead of patching the ROMs.
+- Do iqblocka and clones, genius6 and clones, tjsb support NVRAM?
 - mgcs: Finish IGS029 protection simulation.
 - jking302us: IGS025 and IGS029 protection simulation.
+- sdmg2: different protection that kicks in after several dozens of hands
 
 Notes:
 
@@ -87,6 +90,7 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "cpu/z180/z180.h"
 #include "machine/i8255.h"
+#include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "machine/timer.h"
 #include "sound/okim6295.h"
@@ -675,6 +679,7 @@ public:
 	void lhzb2a(machine_config &config) ATTR_COLD;
 	void mgcs(machine_config &config) ATTR_COLD;
 	void mgcsa(machine_config &config) ATTR_COLD;
+	void mgcsb(machine_config &config) ATTR_COLD;
 	void mgdh(machine_config &config) ATTR_COLD;
 	void mgdha(machine_config &config) ATTR_COLD;
 	void sdmg2(machine_config &config) ATTR_COLD;
@@ -690,14 +695,18 @@ public:
 	void init_jking302us() ATTR_COLD;
 	void init_lhzb2() ATTR_COLD;
 	void init_lhzb2a() ATTR_COLD;
+	void init_lhzb2b() ATTR_COLD;
 	void init_mgcs() ATTR_COLD;
 	void init_mgcsa() ATTR_COLD;
+	void init_mgcsb() ATTR_COLD;
 	void init_mgdh() ATTR_COLD;
 	void init_mgdha() ATTR_COLD;
 	void init_sdmg2() ATTR_COLD;
-	void init_sdmg2a() ATTR_COLD;
+	void init_sdmg2754ca() ATTR_COLD;
+	void init_sdmg2754cb() ATTR_COLD;
 	void init_sdmg2p() ATTR_COLD;
 	void init_slqz2() ATTR_COLD;
+	void init_slqz2b() ATTR_COLD;
 	void init_spkrform() ATTR_COLD;
 	void init_starzan() ATTR_COLD;
 	void init_tarzan() ATTR_COLD;
@@ -868,6 +877,7 @@ private:
 	void jking200pr_decrypt_program_rom() ATTR_COLD;
 	void mgcs_decrypt_program_rom() ATTR_COLD;
 	void mgcsa_decrypt_program_rom() ATTR_COLD;
+	void mgcsb_decrypt_program_rom() ATTR_COLD;
 	void mgcs_igs029_run() ATTR_COLD;
 	void starzan_decrypt_program_rom() ATTR_COLD;
 	void tarzan_decrypt_program_rom() ATTR_COLD;
@@ -893,6 +903,7 @@ private:
 	void cpoker2_io(address_map &map) ATTR_COLD;
 	void cpoker2_map(address_map &map) ATTR_COLD;
 	void cpoker2_mux_map(address_map &map) ATTR_COLD;
+	void happyskl_map(address_map &map) ATTR_COLD;
 	void happyskl_io(address_map &map) ATTR_COLD;
 	void happyskl_mux_map(address_map &map) ATTR_COLD;
 	void iqblocka_io(address_map &map) ATTR_COLD;
@@ -908,6 +919,8 @@ private:
 	void mgcs_map(address_map &map) ATTR_COLD;
 	void mgcs_mux_map(address_map &map) ATTR_COLD;
 	void mgcsa_map(address_map &map) ATTR_COLD;
+	void mgcsb_map(address_map &map) ATTR_COLD;
+	void mgcsb_mux_map(address_map &map) ATTR_COLD;
 	void mgdh_mux_map(address_map &map) ATTR_COLD;
 	void mgdh_map(address_map &map) ATTR_COLD;
 	void mgdha_mux_map(address_map &map) ATTR_COLD;
@@ -1183,6 +1196,44 @@ void igs017_state::mgcsa_decrypt_program_rom()
 	}
 }
 
+void igs017_state::mgcsb_decrypt_program_rom()
+{
+	const int rom_size = memregion("maincpu")->bytes();
+	u16 * const rom = (u16 *)memregion("maincpu")->base();
+
+	for (int i = 0; i < rom_size / 2; i++)
+	{
+		u16 x = rom[i];
+
+		if (i & 0x20 / 2)
+		{
+			if (i & 0x02 / 2)
+			{
+				x ^= 0x0001;
+			}
+		}
+
+		if (!(i & 0x4000 / 2))
+		{
+			if (!(i & 0x300 / 2))
+			{
+				x ^= 0x0001;
+			}
+		}
+
+		if ((i & 0x50100 / 2) == 0x10100 / 2) // TODO: maybe incomplete
+		{
+			x ^= 0x0200;
+		}
+		if ((i & 0x50300 / 2) == 0x100 / 2) // TODO: maybe incomplete
+		{
+			x ^= 0x0200;
+		}
+
+		rom[i] = x;
+	}
+}
+
 
 #if 0
 void igs017_state::mgcs_patch_rom()
@@ -1212,6 +1263,14 @@ void igs017_state::init_mgcs()
 void igs017_state::init_mgcsa()
 {
 	mgcsa_decrypt_program_rom();
+
+	m_igs017_igs031->mgcs_decrypt_tiles();
+	m_igs017_igs031->mgcs_flip_sprites(0);
+}
+
+void igs017_state::init_mgcsb()
+{
+	mgcsb_decrypt_program_rom();
 
 	m_igs017_igs031->mgcs_decrypt_tiles();
 	m_igs017_igs031->mgcs_flip_sprites(0);
@@ -1481,7 +1540,7 @@ void igs017_state::init_cpoker2()
 
 // sdmg2
 
-void igs017_state::init_sdmg2()
+void igs017_state::init_sdmg2754ca()
 {
 	const int rom_size = memregion("maincpu")->bytes();
 	u16 * const rom = (u16 *)memregion("maincpu")->base();
@@ -1532,7 +1591,7 @@ void igs017_state::init_sdmg2()
 }
 
 //
-void igs017_state::init_sdmg2a()
+void igs017_state::init_sdmg2754cb()
 {
 	const int rom_size = memregion("maincpu")->bytes();
 	u16 * const rom = (u16 *)memregion("maincpu")->base();
@@ -1577,6 +1636,37 @@ void igs017_state::init_sdmg2a()
 		{
 			x ^= 0x1000;
 		}
+
+		rom[i] = x;
+	}
+}
+
+void igs017_state::init_sdmg2()
+{
+	const int rom_size = memregion("maincpu")->bytes();
+	u16 * const rom = (u16 *)memregion("maincpu")->base();
+
+	for (int i = 0; i < rom_size / 2; i++)
+	{
+		u16 x = rom[i];
+
+		// bit 0 xor layer
+		if (i & 0x20 / 2)
+			if (i & 0x02 / 2)
+				x ^= 0x0001;
+
+		if (!(i & 0x4000 / 2))
+			if (!(i & 0x300 / 2))
+				x ^= 0x0001;
+
+		// bit 9 xor layer
+		if (!(i & 0x20000 / 2))
+			if (i & 0x400 / 2)
+				x ^= 0x0200;
+
+		// bit 12 xor layer
+		if (i & 0x20000 / 2)
+			x ^= 0x1000;
 
 		rom[i] = x;
 	}
@@ -1833,6 +1923,75 @@ void igs017_state::init_lhzb2a()
 //  m_igs_string->dump("lhzb2a_string.key", 0x6e11c, 0x6e030, true); // same data as lhzb2
 }
 
+// lhzb2a
+
+void igs017_state::init_lhzb2b() // TODO: possibly not 100% correct
+{
+	const int rom_size = memregion("maincpu")->bytes();
+	u16 * const rom = (u16 *)memregion("maincpu")->base();
+
+	for (int i = 0; i < rom_size / 2; i++)
+	{
+		u16 x = rom[i];
+
+		// bit 0 xor layer
+		if (i & 0x20/2)
+		{
+			if (i & 0x02/2)
+			{
+				x ^= 0x0001;
+			}
+		}
+
+		if (!(i & 0x4000/2))
+		{
+			if (!(i & 0x300/2))
+			{
+				x ^= 0x0001;
+			}
+		}
+
+		// bit 10 xor layer
+
+		if (i & 0x8000/2)
+		{
+			if (!(i & 0x2000/2))
+			{
+				if (!(i & 0x800/2))
+				{
+					if (!(i & 0x200/2))
+						if (i & 0x100/2)
+							if (i & 0x40/2)
+								x ^= 0x0400;
+				}
+				else
+					if (i & 0x100/2)
+						if (i & 0x40/2)
+							x ^= 0x0400;
+			}
+		}
+		else
+		{
+			if (!(i & 0x800/2))
+			{
+				if (!(i & 0x200/2))
+					if (i & 0x040/2)
+						x ^= 0x0400;
+			}
+			else
+				if (i & 0x040/2)
+					x ^= 0x0400;
+		}
+
+		rom[i] = x;
+	}
+
+	m_igs017_igs031->lhzb2_decrypt_tiles();
+	m_igs017_igs031->lhzb2_decrypt_sprites();
+
+//  m_igs_string->dump("lhzb2b_string.key", 0x6e11c, 0x6e030, true);
+}
+
 
 // slqz2
 
@@ -1913,6 +2072,81 @@ void igs017_state::init_slqz2()
 				if (!(i & 0x100/2))
 				{
 					if (i & 0x40/2)
+					{
+						x ^= 0x4000;
+					}
+				}
+			}
+		}
+
+		rom[i] = x;
+	}
+
+	m_igs017_igs031->slqz2_decrypt_tiles();
+	m_igs017_igs031->lhzb2_decrypt_sprites();
+
+//  slqz2_patch_rom();
+
+//  m_igs_string->dump("slqz2_string.key", 0x7b214, 0x7b128, true);
+}
+
+void igs017_state::init_slqz2b()
+{
+	const int rom_size = memregion("maincpu")->bytes();
+	u16 * const rom = (u16 *)memregion("maincpu")->base();
+
+	for (int i = 0; i < rom_size / 2; i++)
+	{
+		u16 x = rom[i];
+
+		// bit 0 xor layer
+
+		if (i & 0x20/2)
+		{
+			if (i & 0x02/2)
+			{
+				x ^= 0x0001;
+			}
+		}
+
+		if (!(i & 0x4000/2))
+		{
+			if (!(i & 0x300/2))
+			{
+				x ^= 0x0001;
+			}
+		}
+
+		// bit 14 xor layer
+
+		if (!(i & 0x800/2))
+		{
+			if (i & 0x1000/2)
+			{
+				if (i & 0x200/2)
+				{
+					if (!(i & 0x100/2))
+						{
+							if (!(i & 0x40/2))
+							{
+								x ^= 0x4000;
+							}
+						}
+					else
+					{
+						x ^= 0x4000;
+					}
+				}
+			}
+			else
+			{
+				if (i & 0x100/2)
+				{
+					x ^= 0x4000;
+				}
+				else
+				{
+					if (!(i & 0x40/2))
 					{
 						x ^= 0x4000;
 					}
@@ -2060,7 +2294,7 @@ void igs017_state::igs_fixed_data_mux_map(address_map &map)
 void igs017_state::iqblocka_map(address_map &map)
 {
 	map(0x00000, 0x0dfff).rom();
-	map(0x0e000, 0x0efff).ram();
+	map(0x0e000, 0x0efff).ram().share("nvram");
 	map(0x0f000, 0x0ffff).ram();
 	map(0x10000, 0x3ffff).rom();
 }
@@ -2198,6 +2432,13 @@ void igs017_state::starzan_mux_map(address_map &map)
 
 
 // happyksl
+
+void igs017_state::happyskl_map(address_map &map)
+{
+	map(0x00000, 0x0dfff).rom();
+	map(0x0e000, 0x0ffff).ram().share("nvram");
+	map(0x10000, 0x3ffff).rom();
+}
 
 void igs017_state::happyskl_io(address_map &map)
 {
@@ -2539,7 +2780,7 @@ u8 igs017_state::mgcs_keys_joy_r()
 void igs017_state::mgcs_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x300000, 0x303fff).ram();
+	map(0x300000, 0x303fff).ram().share("nvram");
 
 	map(0x49c000, 0x49c001).nopr().w(m_igs_mux, FUNC(igs_mux_device::address_w)).umask16(0x00ff); // clr.w dummy read
 	map(0x49c002, 0x49c003).rw(m_igs_mux, FUNC(igs_mux_device::data_r), FUNC(igs_mux_device::data_w)).umask16(0x00ff);
@@ -2563,7 +2804,7 @@ void igs017_state::mgcs_mux_map(address_map &map)
 void igs017_state::mgcsa_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x100000, 0x103fff).ram();
+	map(0x100000, 0x103fff).ram().share("nvram");
 
 	map(0x49c000, 0x49c001).nopr().w(m_igs_mux, FUNC(igs_mux_device::address_w)).umask16(0x00ff); // clr.w dummy read
 	map(0x49c002, 0x49c003).rw(m_igs_mux, FUNC(igs_mux_device::data_r), FUNC(igs_mux_device::data_w)).umask16(0x00ff);
@@ -2574,6 +2815,28 @@ void igs017_state::mgcsa_map(address_map &map)
 	// oki banking through protection (code at $1a350)
 }
 
+void igs017_state::mgcsb_map(address_map &map)
+{
+	map(0x000000, 0x07ffff).rom();
+	map(0x300000, 0x303fff).ram().share("nvram");
+
+	map(0x49c000, 0x49c001).nopr().w(m_igs_mux, FUNC(igs_mux_device::address_w)).umask16(0x00ff); // clr.w dummy read
+	map(0x49c002, 0x49c003).rw(m_igs_mux, FUNC(igs_mux_device::data_r), FUNC(igs_mux_device::data_w)).umask16(0x00ff);
+
+	map(0xa00000, 0xa0ffff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write)).umask16(0x00ff);
+
+	map(0xa10001, 0xa10001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+}
+
+void igs017_state::mgcsb_mux_map(address_map &map) // TODO
+{
+	//map(0x00, 0x00).lr8(NAME([this](){ return m_input_select | 0x02; })).w(FUNC(igs017_state::mgcs_keys_hopper_igs029_w));
+	//map(0x01, 0x01).r(FUNC(igs017_state::mgcs_scramble_data_r)).w(FUNC(igs017_state::mgcs_scramble_data_w));
+	//map(0x02, 0x02).r(FUNC(igs017_state::mgcs_igs029_data_r));
+	//map(0x03, 0x03).w(FUNC(igs017_state::mgcs_igs029_data_w));
+
+	//igs_string_mux_map(map); // 0x05 r, 0x20 - 0x27 w, 0x40 r
+}
 
 // sdmg2
 
@@ -2587,7 +2850,7 @@ void igs017_state::sdmg2_map(address_map &map)
 	map(0x002007, 0x002007).w(m_igs_incdec, FUNC(igs_incdec_device::inc_w));
 	map(0x00200b, 0x00200b).r(m_igs_incdec, FUNC(igs_incdec_device::result_r));
 
-	map(0x1f0000, 0x1fffff).ram();
+	map(0x1f0000, 0x1fffff).ram().share("nvram");
 
 	map(0x200000, 0x20ffff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write)).umask16(0x00ff);
 
@@ -2629,7 +2892,7 @@ void igs017_state::sdmg2_mux_map(address_map &map)
 void igs017_state::mgdh_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x600000, 0x603fff).ram();
+	map(0x600000, 0x603fff).ram().share("nvram");
 
 	map(0x876000, 0x876001).nopr().w(m_igs_mux, FUNC(igs_mux_device::address_w)).umask16(0x00ff); // clr.w dummy read
 	map(0x876002, 0x876003).rw(m_igs_mux, FUNC(igs_mux_device::data_r), FUNC(igs_mux_device::data_w)).umask16(0x00ff);
@@ -2678,7 +2941,7 @@ void igs017_state::sdmg2p_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 
-	map(0x100000, 0x103fff).ram();
+	map(0x100000, 0x103fff).ram().share("nvram");
 
 	map(0x38d000, 0x38d001).nopr().w(m_igs_mux, FUNC(igs_mux_device::address_w)).umask16(0x00ff); // clr.w dummy read
 	map(0x38d002, 0x38d003).rw(m_igs_mux, FUNC(igs_mux_device::data_r), FUNC(igs_mux_device::data_w)).umask16(0x00ff);
@@ -2773,7 +3036,7 @@ void igs017_state::lhzb2_map(address_map &map)
 
 	map(0x100000, 0x103fff).ram().share("igs022:sharedprotram"); // Shared with protection device
 
-	map(0x500000, 0x503fff).ram();
+	map(0x500000, 0x503fff).ram().share("nvram");
 
 	map(0x910000, 0x910001).nopr().w(m_igs_mux, FUNC(igs_mux_device::address_w)).umask16(0x00ff); // clr.w dummy read
 	map(0x910002, 0x910003).rw(m_igs_mux, FUNC(igs_mux_device::data_r), FUNC(igs_mux_device::data_w)).umask16(0x00ff);
@@ -2906,7 +3169,7 @@ void igs017_state::lhzb2a_map(address_map &map)
 	map(0x003207, 0x003207).w(m_igs_incdec, FUNC(igs_incdec_device::inc_w));
 	map(0x00320b, 0x00320b).r(m_igs_incdec, FUNC(igs_incdec_device::result_r));
 
-	map(0x500000, 0x503fff).ram();
+	map(0x500000, 0x503fff).ram().share("nvram");
 //  map(0x910000, 0x910003) accesses appear to be from leftover code where the final checks were disabled
 
 	map(0xb00000, 0xb0ffff).rw(m_igs017_igs031, FUNC(igs017_igs031_device::read), FUNC(igs017_igs031_device::write)).umask16(0x00ff);
@@ -2932,7 +3195,7 @@ void igs017_state::lhzb2a_mux_map(address_map &map)
 void igs017_state::slqz2_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x100000, 0x103fff).ram();
+	map(0x100000, 0x103fff).ram().share("nvram");
 
 	map(0x300000, 0x303fff).ram().share("igs022:sharedprotram"); // Shared with protection device
 
@@ -2979,7 +3242,7 @@ void igs017_state::slqz2_mux_map(address_map &map)
 void igs017_state::jking302us_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x100000, 0x103fff).ram();
+	map(0x100000, 0x103fff).ram().share("nvram"); // TODO: verify once it works
 
 	map(0x638000, 0x638001).nopr().w(m_igs_mux, FUNC(igs_mux_device::address_w)).umask16(0x00ff); // clr.w dummy read
 	map(0x638002, 0x638003).rw(m_igs_mux, FUNC(igs_mux_device::data_r), FUNC(igs_mux_device::data_w)).umask16(0x00ff);
@@ -4293,6 +4556,8 @@ void igs017_state::iqblocka(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &igs017_state::iqblocka_io);
 	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::iqblocka_interrupt), "screen", 0, 1);
 
+	// NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
 	// i/o
 	m_igs_mux->set_addrmap(0, &igs017_state::iqblocka_mux_map);
 
@@ -4350,6 +4615,8 @@ void igs017_state::tarzan(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &igs017_state::decrypted_opcodes_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::iqblocka_interrupt), "screen", 0, 1);
 
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
 	// I/O
 	m_igs_mux->set_addrmap(0, &igs017_state::tarzan_mux_map);
 
@@ -4383,6 +4650,8 @@ void igs017_state::starzan(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &igs017_state::decrypted_opcodes_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::iqblocka_interrupt), "screen", 0, 1);
 
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
 	// i/o
 	m_igs_mux->set_addrmap(0, &igs017_state::starzan_mux_map);
 
@@ -4412,10 +4681,12 @@ void igs017_state::happyskl(machine_config &config)
 	base_machine_oki(config, 16_MHz_XTAL / 16);
 
 	HD64180RP(config, m_maincpu, 16_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::iqblocka_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::happyskl_map);
 	m_maincpu->set_addrmap(AS_IO, &igs017_state::happyskl_io);
 	m_maincpu->set_addrmap(AS_OPCODES, &igs017_state::decrypted_opcodes_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::iqblocka_interrupt), "screen", 0, 1);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// i/o
 	m_igs_mux->set_addrmap(0, &igs017_state::happyskl_mux_map);
@@ -4441,6 +4712,8 @@ void igs017_state::cpoker2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::cpoker2_map);
 	m_maincpu->set_addrmap(AS_IO, &igs017_state::cpoker2_io);
 	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::iqblocka_interrupt), "screen", 0, 1);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// i/o
 	m_igs_mux->set_addrmap(0, &igs017_state::cpoker2_mux_map);
@@ -4503,6 +4776,8 @@ void igs017_state::spkrform(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &igs017_state::spkrform_io);
 	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::iqblocka_interrupt), "screen", 0, 1);
 
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
 	// i/o
 	m_igs_mux->set_addrmap(0, &igs017_state::spkrform_mux_map);
 
@@ -4543,6 +4818,8 @@ void igs017_state::mgcs(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::mgcs_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::mgcs_interrupt), "screen", 0, 1);
 
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
 	// i/o
 	m_igs_mux->set_addrmap(0, &igs017_state::mgcs_mux_map);
 
@@ -4566,6 +4843,15 @@ void igs017_state::mgcsa(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::mgcsa_map);
 }
 
+void igs017_state::mgcsb(machine_config &config)
+{
+	mgcs(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::mgcsb_map);
+
+	m_igs_mux->set_addrmap(0, &igs017_state::mgcsb_mux_map);
+}
+
 
 // lhzb2
 
@@ -4576,6 +4862,8 @@ void igs017_state::lhzb2(machine_config &config)
 	M68000(config, m_maincpu, 22_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::lhzb2_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::mgcs_interrupt), "screen", 0, 1);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// i/o
 	m_igs_mux->set_addrmap(0, &igs017_state::lhzb2_mux_map);
@@ -4611,6 +4899,8 @@ void igs017_state::lhzb2a(machine_config &config)
 	M68000(config, m_maincpu, 22_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::lhzb2a_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::mgcs_interrupt), "screen", 0, 1);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_MACHINE_RESET_OVERRIDE(igs017_state, lhzb2a)
 
@@ -4649,6 +4939,8 @@ void igs017_state::slqz2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::slqz2_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::mgcs_interrupt), "screen", 0, 1);
 
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
 	// i/o
 	m_igs_mux->set_addrmap(0, &igs017_state::slqz2_mux_map);
 
@@ -4677,6 +4969,8 @@ void igs017_state::sdmg2(machine_config &config)
 	M68000(config, m_maincpu, 22_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::sdmg2_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::mgcs_interrupt), "screen", 0, 1);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// i/o
 	m_igs_mux->set_addrmap(0, &igs017_state::sdmg2_mux_map);
@@ -4713,6 +5007,8 @@ void igs017_state::mgdha(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::mgdh_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::mgdh_interrupt), "screen", 0, 1);
 
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
 	// i/o
 	m_igs_mux->set_addrmap(0, &igs017_state::mgdha_mux_map);
 
@@ -4739,6 +5035,8 @@ void igs017_state::sdmg2p(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::sdmg2p_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::mgcs_interrupt), "screen", 0, 1);
 
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
 	// i/o
 	m_igs_mux->set_addrmap(0, &igs017_state::sdmg2p_mux_map);
 
@@ -4758,6 +5056,8 @@ void igs017_state::jking302us(machine_config &config)
 	M68000(config, m_maincpu, 22_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs017_state::jking302us_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(igs017_state::mgdh_interrupt), "screen", 0, 1);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// i/o
 	m_igs_mux->set_addrmap(0, &igs017_state::jking302us_mux_map);
@@ -5140,6 +5440,23 @@ ROM_START( mgcsa )
 	ROM_LOAD( "mgcs_string.key", 0x00, 0xec, BAD_DUMP CRC(6cdadd19) SHA1(c2b4ced5d45d0af1ddeeabd0e352fd5383995d32) ) // TODO: seems the same as the parent, but double-check
 ROM_END
 
+// IGS PCB N0-0266. No IGS029, but a IGS026
+ROM_START( mgcsb )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "rom.u23", 0x00000, 0x80000, CRC(efc2b198) SHA1(bb004d1a7d6a623540423e1a45f93a24d9f22c88) )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "m1501.u21", 0x000000, 0x400000, CRC(96fce058) SHA1(6b87f47d646bad9b3061bdc8a9af65467fdbbc9f) )
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "m1503-text v100c.u12", 0x00000, 0x80000, CRC(9925423e) SHA1(c0df6f9a0886810d1f137093f5bff1b326c4a522) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "s1502.u16", 0x00000, 0x80000, CRC(a8a6ba58) SHA1(59276a8ab4a31812600816c2a43b74bd71394419) )
+
+	ROM_REGION( 0xec, "igs_string", ROMREGION_ERASE00 )
+ROM_END
+
 /***************************************************************************
 
 Chaoji Da Manguan II (China, V754C)
@@ -5184,9 +5501,9 @@ Notes:
 
 ***************************************************************************/
 
-ROM_START( sdmg2 )
+ROM_START( sdmg2754ca )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "p0900.u25", 0x00000, 0x80000,CRC(43366f51) SHA1(48dd965dceff7de15b43c2140226a8b17a792dbc) )
+	ROM_LOAD16_WORD_SWAP( "p0900.u25", 0x00000, 0x80000, CRC(43366f51) SHA1(48dd965dceff7de15b43c2140226a8b17a792dbc) )
 
 	ROM_REGION( 0x280000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "m0901.u5", 0x000000, 0x200000, CRC(9699db24) SHA1(50fc2f173c20b48d10595f01f1e9545f1b13a61b) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
@@ -5199,9 +5516,9 @@ ROM_START( sdmg2 )
 	ROM_LOAD( "s0903.u15", 0x00000, 0x80000, CRC(ae5a441c) SHA1(923774ef73ab0f70e0db1738a4292dcbd70d2384) )
 ROM_END
 
-ROM_START( sdmg2a ) // supposedly earlier / easier, but reports same version as the other set
+ROM_START( sdmg2754cb ) // supposedly earlier / easier, but reports same version as sdmg2754ca
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "p0900.u25", 0x00000, 0x80000,CRC(1afc95d8) SHA1(924e198437359beec2abe6ee42a985f63d70b7e3) ) // SLDH
+	ROM_LOAD16_WORD_SWAP( "p0900.u25", 0x00000, 0x80000, CRC(1afc95d8) SHA1(924e198437359beec2abe6ee42a985f63d70b7e3) ) // SLDH
 
 	ROM_REGION( 0x280000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "m0901.u5", 0x000000, 0x200000, CRC(9699db24) SHA1(50fc2f173c20b48d10595f01f1e9545f1b13a61b) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
@@ -5212,6 +5529,21 @@ ROM_START( sdmg2a ) // supposedly earlier / easier, but reports same version as 
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "s0903.u15", 0x00000, 0x80000, CRC(ae5a441c) SHA1(923774ef73ab0f70e0db1738a4292dcbd70d2384) )
+ROM_END
+
+ROM_START( sdmg2 ) // C5220P001 PCB
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "rom.u16", 0x00000, 0x80000, CRC(362800e8) SHA1(00d93002272b1f3171ca84e67822eb31f760191f) )
+
+	ROM_REGION( 0x280000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "m0205.u6", 0x000000, 0x200000, BAD_DUMP CRC(9699db24) SHA1(50fc2f173c20b48d10595f01f1e9545f1b13a61b) ) // ROM didn't read correctly, taken from other sets
+	ROM_LOAD( "rom.u5",   0x200000, 0x080000, CRC(3298b13b) SHA1(13b21ddeed368b7f4fea1408c8fc511244342faf) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
+
+	ROM_REGION( 0x20000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "text.u7", 0x000000, 0x020000, CRC(cb34cbc0) SHA1(ceedbdda085fd1acc9a575502bdf7cf998f54f05) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "s0206.u3", 0x00000, 0x80000, CRC(ae5a441c) SHA1(923774ef73ab0f70e0db1738a4292dcbd70d2384) )
 ROM_END
 
 /***************************************************************************
@@ -5360,6 +5692,25 @@ ROM_START( lhzb2a )
 	ROM_LOAD( "lhzb2_string.key", 0x00, 0xec, CRC(c964dc35) SHA1(81036e0dfa9abad123701ae8939d0d5b6f91b015) )
 ROM_END
 
+ROM_START( lhzb2b ) // IGS PCB N0-0218-2 (has IGS025 stickered M3, IGS029, 2 banks of 8 switches)
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "p-4096", 0x00000, 0x80000, CRC(46bbef6e) SHA1(45cc9de0515adcbc1de6732191511ff5ce3391ca) )
+
+	ROM_REGION( 0x10000, "igs022", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD16_WORD_SWAP( "m1101.u6", 0x000000, 0x400000, CRC(0114e9d1) SHA1(5b16170d3cd8b8e1662c949b7234fbdd2ca927f7) ) // FIXED BITS (0xxxxxxxxxxxxxxx)
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD16_WORD_SWAP( "m1103.u8", 0x00000, 0x80000, CRC(4d3776b4) SHA1(fa9b311b1a6ad56e136b66d090bc62ed5003b2f2) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "s1102.u23", 0x00000, 0x80000, CRC(51ffe245) SHA1(849011b186096add657ab20d49d260ec23363ef3) )
+
+	ROM_REGION( 0xec, "igs_string", 0 )
+	ROM_LOAD( "lhzb2_string.key", 0x00, 0xec, CRC(c964dc35) SHA1(81036e0dfa9abad123701ae8939d0d5b6f91b015) )
+ROM_END
+
 /*
 PCB NO-0182-2
 IGS025 sticker is D2
@@ -5454,6 +5805,26 @@ Notes:
 ROM_START( slqz2 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "p1100.u28", 0x00000, 0x80000, CRC(0b8e5c9e) SHA1(16572bd1163bba4da8a76b10649d2f71e50ad369) )
+
+	ROM_REGION( 0x10000, "igs022", 0 )
+	ROM_LOAD( "m1103.u12", 0x00000, 0x10000, CRC(9f3b8d65) SHA1(5ee1ad025474399c2826f21d970e76f25d0fa1fd) ) // INTERNATIONAL GAMES SYSTEM CO.,LTD
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD16_WORD_SWAP( "m1101.u4", 0x000000, 0x400000, CRC(0114e9d1) SHA1(5b16170d3cd8b8e1662c949b7234fbdd2ca927f7) ) // FIXED BITS (0xxxxxxxxxxxxxxx)
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "text.u6", 0x00000, 0x80000, CRC(40d21adf) SHA1(18b202d6330ac89026bec2c9c8224b52540dd48d) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "s1102.u20", 0x00000, 0x80000, CRC(51ffe245) SHA1(849011b186096add657ab20d49d260ec23363ef3) ) // = s1102.u23 Long Hu Zhengba 2
+
+	ROM_REGION( 0xec, "igs_string", 0 )
+	ROM_LOAD( "slqz2_string.key", 0x00, 0xec, CRC(5ca22f9d) SHA1(a795415016fdcb6329623786dc992ac7b0877ddf) )
+ROM_END
+
+ROM_START( slqz2b ) // IGS PCB NO-0207
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "slqz2.u28", 0x00000, 0x80000, CRC(63be02a3) SHA1(973a2de12852b533dd6dfb00c96e6760ddc4a430) )
 
 	ROM_REGION( 0x10000, "igs022", 0 )
 	ROM_LOAD( "m1103.u12", 0x00000, 0x10000, CRC(9f3b8d65) SHA1(5ee1ad025474399c2826f21d970e76f25d0fa1fd) ) // INTERNATIONAL GAMES SYSTEM CO.,LTD
@@ -6040,20 +6411,24 @@ GAME ( 1996,  iqblocka,    iqblock,  iqblocka,   iqblocka,    igs017_state, init
 GAME ( 1997,  iqblockf,    iqblock,  iqblockf,   iqblockf,    igs017_state, init_iqblocka,   ROT0, "IGS", "IQ Block (V113FR, gambling)",                                        0 )
 GAME ( 1997,  mgdh,        0,        mgdh,       mgdh,        igs017_state, init_mgdh,       ROT0, "IGS", "Manguan Daheng (Taiwan, V125T1)",                                    MACHINE_IMPERFECT_COLORS | MACHINE_UNEMULATED_PROTECTION) // 滿貫大亨, wrong colors in betting screen, game id check (patched out)
 GAME ( 1997,  mgdha,       mgdh,     mgdha,      mgdh,        igs017_state, init_mgdha,      ROT0, "IGS", "Manguan Daheng (Taiwan, V123T1)",                                    0 ) // 滿貫大亨
-GAME ( 1997,  sdmg2,       0,        sdmg2,      sdmg2,       igs017_state, init_sdmg2,      ROT0, "IGS", "Chaoji Da Manguan II (China, V754C, set 1)",                         0 ) // 超級大滿貫II
-GAME ( 1997,  sdmg2a,      sdmg2,    sdmg2,      sdmg2,       igs017_state, init_sdmg2a,     ROT0, "IGS", "Chaoji Da Manguan II (China, V754C, set 2)",                         0 ) // 超級大滿貫II
+GAME ( 1997,  sdmg2,       0,        sdmg2,      sdmg2,       igs017_state, init_sdmg2,      ROT0, "IGS", "Chaoji Da Manguan II (China, V765C)",                                MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 超級大滿貫II
+GAME ( 1997,  sdmg2754ca,  sdmg2,    sdmg2,      sdmg2,       igs017_state, init_sdmg2754ca, ROT0, "IGS", "Chaoji Da Manguan II (China, V754C, set 1)",                         0 ) // 超級大滿貫II
+GAME ( 1997,  sdmg2754cb,  sdmg2,    sdmg2,      sdmg2,       igs017_state, init_sdmg2754cb, ROT0, "IGS", "Chaoji Da Manguan II (China, V754C, set 2)",                         0 ) // 超級大滿貫II
 GAME ( 1997,  tjsb,        0,        tjsb,       tjsb,        igs017_state, init_tjsb,       ROT0, "IGS", "Tian Jiang Shen Bing (China, V137C)",                                MACHINE_UNEMULATED_PROTECTION ) // 天將神兵, fails the bonus round protection check (if enabled via DSW), see e.g. demo mode
 GAME ( 1998,  genius6,     0,        genius6,    genius6,     igs017_state, init_iqblocka,   ROT0, "IGS", "Genius 6 (V110F)",                                                   0 ) // shows Chinese text in puzzle game
 GAME ( 1997,  genius6a,    genius6,  genius6,    genius6,     igs017_state, init_iqblocka,   ROT0, "IGS", "Genius 6 (V133F)",                                                   0 ) // clone because it has older copyright year
 GAME ( 1997,  genius6b,    genius6,  genius6,    genius6,     igs017_state, init_iqblocka,   ROT0, "IGS", "Genius 6 (V132F)",                                                   0 ) // "
 GAME ( 1998,  mgcs,        0,        mgcs,       mgcs,        igs017_state, init_mgcs,       ROT0, "IGS", "Manguan Caishen (China, V103CS)",                                    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 满贯财神, finish IGS029 protection
 GAME ( 1998,  mgcsa,       mgcs,     mgcsa,      mgcs,        igs017_state, init_mgcsa,      ROT0, "IGS", "Manguan Caishen (China, V106CS)",                                    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 满贯财神, finish IGS029 protection
+GAME ( 1998,  mgcsb,       mgcs,     mgcsb,      mgcs,        igs017_state, init_mgcsb,      ROT0, "IGS", "Manguan Caishen (China, V110C)",                                     MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME ( 1998,  lhzb,        0,        lhzb2,      lhzb,        igs017_state, init_lhzb2,      ROT0, "IGS", "Long Hu Zhengba (China, VS105M, set 1)",                             MACHINE_UNEMULATED_PROTECTION ) // 龙虎争霸, finish IGS022 protection
 GAME ( 1998,  lhzba,       lhzb,     lhzb2,      lhzb,        igs017_state, init_lhzb2,      ROT0, "IGS", "Long Hu Zhengba (China, VS105M, set 2)",                             MACHINE_UNEMULATED_PROTECTION ) // 龙虎争霸, finish IGS022 protection
 GAME ( 1998,  lhzb2,       0,        lhzb2,      lhzb2,       igs017_state, init_lhzb2,      ROT0, "IGS", "Long Hu Zhengba 2 (China, set 1)",                                   MACHINE_UNEMULATED_PROTECTION ) // 龙虎争霸2, finish IGS022 protection
 GAME ( 1998,  lhzb2a,      lhzb2,    lhzb2a,     lhzb2a,      igs017_state, init_lhzb2a,     ROT0, "IGS", "Long Hu Zhengba 2 (China, VS221M)",                                  0 ) // 龙虎争霸2
-GAME ( 1998,  slqz2,       0,        slqz2,      slqz2,       igs017_state, init_slqz2,      ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, VS203J)",                         MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, finish IGS022 protection
-GAME ( 1998,  slqz2a,      slqz2,    slqz2,      slqz2,       igs017_state, init_slqz2,      ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, set 2)",                          MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, misses program ROM dump, finish IGS022 protection
+GAME ( 1998,  lhzb2b,      lhzb2,    lhzb2,      lhzb2,       igs017_state, init_lhzb2b,     ROT0, "IGS", "Long Hu Zhengba 2 (China, VS210M)",                                  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME ( 1998,  slqz2,       0,        slqz2,      slqz2,       igs017_state, init_slqz2,      ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, VS203J, set 1)",                  MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, finish IGS022 protection
+GAME ( 1998,  slqz2a,      slqz2,    slqz2,      slqz2,       igs017_state, init_slqz2,      ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, unknown version)",                MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, misses program ROM dump, finish IGS022 protection
+GAME ( 1998,  slqz2b,      slqz2,    slqz2,      slqz2,       igs017_state, init_slqz2b,     ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, VS203J, set 2)",                  MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, finish IGS022 protection
 GAME ( 1999,  tarzanc,     0,        tarzan,     tarzan,      igs017_state, init_tarzanc,    ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V109C, set 1)",                      0 ) // 泰山闯天关
 GAME ( 1999,  tarzan,      tarzanc,  tarzan,     tarzan,      igs017_state, init_tarzan,     ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V109C, set 2)",                      MACHINE_NOT_WORKING ) // missing sprites and sound rom, imperfect tiles decryption
 GAME ( 1999,  tarzana,     tarzanc,  tarzan,     tarzan,      igs017_state, init_tarzana,    ROT0, "IGS", "Tarzan (V107)",                                                      MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // missing IGS029 protection, missing sprites and sound rom

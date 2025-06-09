@@ -16,7 +16,7 @@ Main components for the IGS PCB-0405-02-FZ are:
 TODO:
  - IGS 033 appears to encapsulate the behavior of the video/interface chip found in igspoker.cpp
    so could be turned into a device, possibly shared
- - complete inputs / outputs / hopper
+ - verify possibly incomplete inputs
 */
 
 #include "emu.h"
@@ -59,17 +59,20 @@ public:
 		driver_device(mconfig, type, tag),
 		m_external_rom(*this, "user1"),
 		m_nvram(*this, "nvram"),
+		m_bg_videoram(*this, "bg_videoram"),
+		m_bg_attr_videoram(*this, "bg_attr_videoram"),
 		m_maincpu(*this, "maincpu"),
+		m_hopper(*this, "hopper"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_oki(*this, "oki"),
-		m_bg_videoram(*this, "bg_videoram"),
-		m_bg_attr_videoram(*this, "bg_attr_videoram")
+		m_oki(*this, "oki")
 	{ }
 
 	void m027_033vid(machine_config &config) ATTR_COLD;
+	void huahuas5(machine_config &config) ATTR_COLD;
 
+	void init_huahuas5() ATTR_COLD;
 	void init_qiji6() ATTR_COLD;
 
 protected:
@@ -79,14 +82,15 @@ protected:
 private:
 	required_region_ptr<u32> m_external_rom;
 	required_shared_ptr<u32> m_nvram;
+	required_shared_ptr<u32> m_bg_videoram;
+	required_shared_ptr<u32> m_bg_attr_videoram;
 
 	required_device<igs027a_cpu_device> m_maincpu;
+	required_device<hopper_device> m_hopper;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<okim6295_device> m_oki;
-	required_shared_ptr<u32> m_bg_videoram;
-	required_shared_ptr<u32> m_bg_attr_videoram;
 
 	u32 m_xor_table[0x100];
 	tilemap_t *m_bg_tilemap = nullptr;
@@ -103,6 +107,7 @@ private:
 	u32 external_rom_r(offs_t offset);
 	void xor_table_w(offs_t offset, u8 data);
 
+	void counters_w(u8 data);
 	void out_port_w(u8 data);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -168,14 +173,25 @@ void igs_m027_033vid_state::bg_attr_videoram_w(offs_t offset, u32 data, u32 mem_
 	m_bg_tilemap->mark_tile_dirty((offset * 4) + 3);
 }
 
+void igs_m027_033vid_state::counters_w(u8 data)
+{
+	if (data & 0x0f)
+		logerror("%s PPI out port C w: %02X\n", machine().describe_context(), data);
+
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 7)); // COIN1
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 5)); // COIN2 (or KEYIN?)
+	machine().bookkeeping().coin_counter_w(2, BIT(data, 6)); // PAYOUT
+	machine().bookkeeping().coin_counter_w(3, BIT(data, 4)); // KEYOUT
+}
+
 void igs_m027_033vid_state::out_port_w(u8 data)
 {
-	if (data & 0xea)
+	if (data & 0xe8)
 		logerror("%s IGS027A out port w: %02X\n", machine().describe_context(), data);
 
 	m_video_enable = BIT(data, 0);
 
-	m_oki->set_rom_bank(BIT(data, 2));
+	m_oki->set_rom_bank(bitswap<2>(data, 1, 2)); // TODO: fishy, verify when more games are dumped
 
 	m_tilebank = BIT(data, 4);
 
@@ -199,13 +215,19 @@ void igs_m027_033vid_state::m027_map(address_map &map) // TODO: some unknown wri
 	map(0x3800'3000, 0x3800'30ff).ram().w(m_palette, FUNC(palette_device::write32_ext)).share("palette_ext");
 
 	map(0x3800'4000, 0x3800'4003).portr("DSW");
+	map(0x3800'5003, 0x3800'5003).lw8(NAME([this] (uint8_t data) { m_hopper->motor_w(BIT(data, 0)); }));
 	map(0x3800'5010, 0x3800'5013).umask32(0x0000'00ff).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x3800'5030, 0x3800'5033).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 
 	map(0x3800'7000, 0x3800'77ff).ram().w(FUNC(igs_m027_033vid_state::bg_videoram_w)).share(m_bg_videoram);
 	map(0x3800'7800, 0x3800'7fff).ram().w(FUNC(igs_m027_033vid_state::bg_attr_videoram_w)).share(m_bg_attr_videoram);
 
+	map(0x4000'0008, 0x4000'000b).nopw();
+	map(0x4800'0000, 0x4800'0003).nopw();
+
 	map(0x5000'0000, 0x5000'03ff).umask32(0x0000'00ff).w(FUNC(igs_m027_033vid_state::xor_table_w)); // uploads XOR table to external ROM here
+
+	map(0x7000'0000, 0x7000'01ff).nopw();
 }
 
 
@@ -224,7 +246,7 @@ INPUT_PORTS_START( qiji6 ) // TODO: complete
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -280,7 +302,7 @@ INPUT_PORTS_START( qiji6 ) // TODO: complete
 	PORT_DIPSETTING(                   0x00000003, "20 (duplicate)" )
 	PORT_DIPSETTING(                   0x00000002, "20 (duplicate)" )
 	PORT_DIPSETTING(                   0x00000001, "20 (duplicate)" )
-	PORT_DIPSETTING(                   0x00000000, "20" )
+	PORT_DIPSETTING(                   0x00000000, "20 (duplicate)" )
 	PORT_DIPUNKNOWN_DIPLOC(0x00000020, 0x00000020, "SW1:6")
 	PORT_DIPUNKNOWN_DIPLOC(0x00000040, 0x00000040, "SW1:7")
 	PORT_DIPNAME(          0x00000080, 0x00000080, "Link Mode" ) PORT_DIPLOCATION("SW1:8") // Hard-coded?
@@ -306,6 +328,16 @@ INPUT_PORTS_START( qiji6 ) // TODO: complete
 	PORT_DIPUNKNOWN_DIPLOC(0x00800000, 0x00800000, "SW2:8")
 	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
+
+INPUT_PORTS_START( huahuas5 )
+	PORT_INCLUDE( qiji6 )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME(          0x00010000, 0x00010000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(                   0x00000000, DEF_STR( Off ) )
+	PORT_DIPSETTING(                   0x00010000, DEF_STR( On ) )
+INPUT_PORTS_END
+
 
 static const gfx_layout tiles8x8x4_layout =
 {
@@ -366,10 +398,12 @@ void igs_m027_033vid_state::m027_033vid(machine_config &config)
 	ppi.in_pa_callback().set_ioport("IN0");
 	ppi.in_pb_callback().set_ioport("IN1");
 	ppi.in_pc_callback().set_ioport("IN2");
-	// the out ports seem unused
+	// A and B out ports seem unused
 	ppi.out_pa_callback().set([this] (u8 data) { LOGPORTS("%s: PPI port A write %02x\n", machine().describe_context(), data); });
 	ppi.out_pb_callback().set([this] (u8 data) { LOGPORTS("%s: PPI port B write %02x\n", machine().describe_context(), data); });
-	ppi.out_pc_callback().set([this] (u8 data) { LOGPORTS("%s: PPI port C write %02x\n", machine().describe_context(), data); });
+	ppi.out_pc_callback().set(FUNC(igs_m027_033vid_state::counters_w));
+
+	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -392,6 +426,13 @@ void igs_m027_033vid_state::m027_033vid(machine_config &config)
 	OKIM6295(config, m_oki, 24_MHz_XTAL / 24, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5); // divider and pin 7 not verified
 }
 
+void igs_m027_033vid_state::huahuas5(machine_config &config)
+{
+	m027_033vid(config);
+
+	m_oki->set_clock(24_MHz_XTAL / 12); // divider and pin 7 not verified
+}
+
 
 /***************************************************************************
 
@@ -411,16 +452,40 @@ ROM_START( qiji6 )
 	ROM_LOAD( "v118.u12", 0x00000, 0x80000, CRC(c2729fbe) SHA1(2153675a1161bd6aea6367c55fcf801c7fb0dd3a) )
 
 	ROM_REGION( 0x80000, "igs033", 0 )
-	ROM_LOAD( "7e.u20",  0x000000, 0x080000, CRC(8362eeff) SHA1(1babebe872d253d9131131658e701fbf270d42e2) )
+	ROM_LOAD( "7e.u20", 0x000000, 0x080000, CRC(8362eeff) SHA1(1babebe872d253d9131131658e701fbf270d42e2) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "sp.3", 0x00000, 0x80000, CRC(06b70fe9) SHA1(5df34f870d32893b5c3095fb9653954209712cdb) )
+ROM_END
+
+// 花花世界 5 (Huāhuā Shìjiè 5) / 飞行世界 (Fēixíng Shìjiè)
+// Alternate title is shown if the card type is changed in the test menu
+// IGS PCB-0405-02-FZ + IGS PCB-0492-00 riser board
+ROM_START( huahuas5 )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	// Internal rom of IGS027A ARM based MCU
+	ROM_LOAD( "f11_027a.bin", 0x0000, 0x4000, CRC(f4cacbcf) SHA1(e09f554c1539f37f56d235134754b2a371ea6ad5) )
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "v107.u12", 0x00000, 0x80000, CRC(f7b2265a) SHA1(87a5987c39888b18b71675ddfc014a49dab60839) )
+
+	ROM_REGION( 0x80000, "igs033", 0 )
+	ROM_LOAD( "full.u20", 0x000000, 0x080000, CRC(26c30dd7) SHA1(ae53a5986262ce587e414a37e6b3bcb3acec83a5) )
+
+	ROM_REGION( 0x100000, "oki", 0 ) // on the riser board with a PAL, probably for banking
+	ROM_LOAD( "fullsp.u3", 0x000000, 0x100000, CRC(25c7a2a8) SHA1(01133bf0b7ef140e3d1608d49d041fd86c90ac94) ) //  1xxxxxxxxxxxxxxxxxxxx = 0x00
+	ROM_IGNORE(                      0x100000 )
 ROM_END
 
 
 void igs_m027_033vid_state::init_qiji6()
 {
 	qiji6_decrypt(machine());
+}
+
+void igs_m027_033vid_state::init_huahuas5()
+{
+	cjddzlf_decrypt(machine());
 }
 
 } // anonymous namespace
@@ -433,4 +498,6 @@ void igs_m027_033vid_state::init_qiji6()
 ***************************************************************************/
 
 // internal ROM date is 2002, external software revision could be later
-GAME( 2002, qiji6, 0, m027_033vid, qiji6, igs_m027_033vid_state, init_qiji6, ROT0, "IGS", "Qiji 6 (V118CN)", MACHINE_NOT_WORKING ) // lacks hopper support
+GAME( 2002, qiji6,    0, m027_033vid, qiji6,    igs_m027_033vid_state, init_qiji6,    ROT0, "IGS", "Qiji 6 (V118CN)",                           MACHINE_SUPPORTS_SAVE )
+// internal ROM date is 2004, external software revision could be later
+GAME( 2004, huahuas5, 0, huahuas5,    huahuas5, igs_m027_033vid_state, init_huahuas5, ROT0, "IGS", "Huahua Shijie 5 / Feixing Shijie (V107CN)", MACHINE_SUPPORTS_SAVE )

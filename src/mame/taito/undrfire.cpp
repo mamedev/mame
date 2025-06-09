@@ -72,8 +72,6 @@
     seen changing except in game inits. Perhaps only used
     in later levels?
 
-    Chase Bombers title screen has wrong Taito logo;
-
     Chase Bombers proto sports lots of gfx bugs;
 
     Sprites are delayed, but not yet implemented
@@ -553,12 +551,11 @@ void undrfire_state::undrfire(machine_config &config)
 	m_tc0480scp->set_offsets_tx(-1, 0);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	taito_en_device &taito_en(TAITO_EN(config, "taito_en", 0));
-	taito_en.add_route(0, "lspeaker", 1.0);
-	taito_en.add_route(1, "rspeaker", 1.0);
+	taito_en.add_route(0, "speaker", 1.0, 0);
+	taito_en.add_route(1, "speaker", 1.0, 1);
 }
 
 
@@ -618,12 +615,11 @@ void undrfire_state::cbombers(machine_config &config)
 	TC0360PRI(config, m_tc0360pri, 0);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	taito_en_device &taito_en(TAITO_EN(config, "taito_en", 0));
-	taito_en.add_route(0, "lspeaker", 1.0);
-	taito_en.add_route(1, "rspeaker", 1.0);
+	taito_en.add_route(0, "speaker", 1.0, 0);
+	taito_en.add_route(1, "speaker", 1.0, 1);
 }
 
 
@@ -658,7 +654,7 @@ ROM_START( undrfire )
 	ROM_LOAD16_BYTE( "d67-11", 0x000000, 0x100000, CRC(7a401bb3) SHA1(47257a6a4b37ec1ceb4e974b776ee3ea30db06fa) )
 
 	ROM_REGION( 0x100000, "tc0620scc:hi_gfx", 0 )
-	ROM_LOAD       ( "d67-12", 0x000000, 0x100000, CRC(67b16fec) SHA1(af0f9f50516331780ef6cfab1e12a23edf87daa7) )   /* PIV 8x8 tiles, 2bpp */
+	ROM_LOAD( "d67-12", 0x000000, 0x100000, CRC(67b16fec) SHA1(af0f9f50516331780ef6cfab1e12a23edf87daa7) )   /* PIV 8x8 tiles, 2bpp */
 
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "d67-13", 0x00000,  0x80000,  CRC(42e7690d) SHA1(5f00f3f814653733bf9a5cb010675799de02fa76) )   /* STY, spritemap */
@@ -699,7 +695,7 @@ ROM_START( undrfireu )
 	ROM_LOAD16_BYTE( "d67-11", 0x000000, 0x100000, CRC(7a401bb3) SHA1(47257a6a4b37ec1ceb4e974b776ee3ea30db06fa) )
 
 	ROM_REGION( 0x100000, "tc0620scc:hi_gfx", 0 )
-	ROM_LOAD       ( "d67-12", 0x000000, 0x100000, CRC(67b16fec) SHA1(af0f9f50516331780ef6cfab1e12a23edf87daa7) )   /* PIV 8x8 tiles, 2bpp */
+	ROM_LOAD( "d67-12", 0x000000, 0x100000, CRC(67b16fec) SHA1(af0f9f50516331780ef6cfab1e12a23edf87daa7) )   /* PIV 8x8 tiles, 2bpp */
 
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "d67-13", 0x00000,  0x80000,  CRC(42e7690d) SHA1(5f00f3f814653733bf9a5cb010675799de02fa76) )   /* STY, spritemap */
@@ -739,7 +735,7 @@ ROM_START( undrfirej )
 	ROM_LOAD16_BYTE( "d67-11", 0x000000, 0x100000, CRC(7a401bb3) SHA1(47257a6a4b37ec1ceb4e974b776ee3ea30db06fa) )
 
 	ROM_REGION( 0x100000, "tc0620scc:hi_gfx", 0 )
-	ROM_LOAD       ( "d67-12", 0x000000, 0x100000, CRC(67b16fec) SHA1(af0f9f50516331780ef6cfab1e12a23edf87daa7) )   /* PIV 8x8 tiles, 2bpp */
+	ROM_LOAD( "d67-12", 0x000000, 0x100000, CRC(67b16fec) SHA1(af0f9f50516331780ef6cfab1e12a23edf87daa7) )   /* PIV 8x8 tiles, 2bpp */
 
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_WORD( "d67-13", 0x00000,  0x80000,  CRC(42e7690d) SHA1(5f00f3f814653733bf9a5cb010675799de02fa76) )   /* STY, spritemap */
@@ -788,7 +784,7 @@ ROM_START( cbombers )
 	ROM_LOAD16_BYTE( "d83_17.ic5",  0x000000, 0x100000, CRC(0ffe737c) SHA1(5923a4edf9d0c8339f793840c2bdc691e2c651e6) )
 
 	ROM_REGION( 0x100000, "tc0620scc:hi_gfx", 0 )
-	ROM_LOAD       ( "d83_18.ic6",  0x000000, 0x100000, CRC(87979155) SHA1(0ffafa970f9f9c98f8938104b97e63d2b5757804) )
+	ROM_LOAD( "d83_18.ic6",  0x000000, 0x100000, CRC(87979155) SHA1(0ffafa970f9f9c98f8938104b97e63d2b5757804) )
 
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_BYTE( "d83_31.ic10", 0x000001, 0x40000, CRC(85c37961) SHA1(15ea5c4904d910575e984e146c8941dff913d45f) )
@@ -843,7 +839,7 @@ ROM_START( cbombersj )
 	ROM_LOAD16_BYTE( "d83_17.ic5",  0x000000, 0x100000, CRC(0ffe737c) SHA1(5923a4edf9d0c8339f793840c2bdc691e2c651e6) )
 
 	ROM_REGION( 0x100000, "tc0620scc:hi_gfx", 0 )
-	ROM_LOAD       ( "d83_18.ic6",  0x000000, 0x100000, CRC(87979155) SHA1(0ffafa970f9f9c98f8938104b97e63d2b5757804) )
+	ROM_LOAD( "d83_18.ic6",  0x000000, 0x100000, CRC(87979155) SHA1(0ffafa970f9f9c98f8938104b97e63d2b5757804) )
 
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_BYTE( "d83_31.ic10", 0x000001, 0x40000, CRC(85c37961) SHA1(15ea5c4904d910575e984e146c8941dff913d45f) )
@@ -931,8 +927,8 @@ ROM_START( cbombersp )
 	ROM_LOAD16_BYTE( "ic57_1a62.bin",  0x100001, 0x080000, CRC(afd45e35) SHA1(6d7c0729c7d2b204473679b97923130e289f429d) )
 
 	ROM_REGION( 0x100000, "tc0620scc:hi_gfx", 0 )
-	ROM_LOAD       ( "ic45_5cc2.bin",  0x000000, 0x080000, CRC(7ae48d63) SHA1(2a8b291f0a683ed5b0c39d221737956b6fc72fa5) )
-	ROM_LOAD       ( "ic59_7cce.bin",  0x080000, 0x080000, CRC(ee762199) SHA1(d56e96feeedba8b77f8f18cb380d2902ca3f1e50) )
+	ROM_LOAD( "ic45_5cc2.bin",  0x000000, 0x080000, CRC(7ae48d63) SHA1(2a8b291f0a683ed5b0c39d221737956b6fc72fa5) )
+	ROM_LOAD( "ic59_7cce.bin",  0x080000, 0x080000, CRC(ee762199) SHA1(d56e96feeedba8b77f8f18cb380d2902ca3f1e50) )
 
 	ROM_REGION16_LE( 0x80000, "spritemap", 0 )
 	ROM_LOAD16_BYTE( "st8_ic2.bin", 0x000001, 0x40000, CRC(d74254d8) SHA1(f4a4f9d95f70edf74d937be067d6a9f68a955ea7) )
@@ -947,17 +943,9 @@ ROM_START( cbombersp )
 	ROM_LOAD16_BYTE("ic86_9e88_wave2.bin", 0x200000, 0x080000, CRC(d6dcb45d) SHA1(ec69fb0a9fc6f7e72850775656e9fcd185889825) )
 	ROM_LOAD16_BYTE("ic87_42e7_wave3.bin", 0x300000, 0x080000, CRC(fe52856b) SHA1(fc68301d8b514a142cb38c3aa7a081674bdba6ca) )
 	ROM_LOAD16_BYTE("ic88_2704_wave4.bin", 0x400000, 0x080000, CRC(cba55d36) SHA1(944188bb3d9466ba246cabc57db6b965f2a902a0) )
-	// wave 5 not populated
-	// wave 6 not populated
-	// wave 7 not populated
-	// wave 8 not populated
-	// wave 9 not populated
-	// wave 10 not populated
-	// wave 11 not populated
-	// wave 12 not populated
-	// wave 13 not populated
-	ROM_LOAD16_BYTE("ic107_3a9c_wave14.bin", 0xe00000, 0x080000, CRC(26312451) SHA1(9f947a11592fd8420fc581914bf16e7ade75390c) )    // -std-
-	ROM_LOAD16_BYTE("ic108_a148_wave15.bin", 0xf00000, 0x080000, CRC(2edaa9dc) SHA1(72fead505c4f44e5736ff7d545d72dfa37d613e2) )    // -std-
+	// wave 5-13 not populated
+	ROM_LOAD16_BYTE("ic107_3a9c_wave14.bin", 0xe00000, 0x080000, CRC(26312451) SHA1(9f947a11592fd8420fc581914bf16e7ade75390c) ) // -std-
+	ROM_LOAD16_BYTE("ic108_a148_wave15.bin", 0xf00000, 0x080000, CRC(2edaa9dc) SHA1(72fead505c4f44e5736ff7d545d72dfa37d613e2) ) // -std-
 ROM_END
 
 

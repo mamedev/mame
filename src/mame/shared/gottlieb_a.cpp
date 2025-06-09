@@ -150,8 +150,6 @@ void gottlieb_sound_p2_device::device_add_mconfig(machine_config &config)
 
 void gottlieb_sound_p2_device::device_start()
 {
-	// register for save states
-	save_item(NAME(m_dummy));
 }
 
 
@@ -369,8 +367,6 @@ void gottlieb_sound_r1_device::device_add_mconfig(machine_config &config)
 
 void gottlieb_sound_r1_device::device_start()
 {
-	// register for save states
-	save_item(NAME(m_dummy));
 }
 
 

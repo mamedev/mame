@@ -587,9 +587,9 @@ void wc90_state::wc90(machine_config &config)
 
 	ym2608_device &ymsnd(YM2608(config, "ymsnd", XTAL(8'000'000)));  // verified on PCB
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
-	ymsnd.add_route(0, "mono", 0.50);
-	ymsnd.add_route(1, "mono", 1.0);
-	ymsnd.add_route(2, "mono", 1.0);
+	ymsnd.add_route(0, "mono", 0.75);
+	ymsnd.add_route(1, "mono", 0.5);
+	ymsnd.add_route(2, "mono", 0.5);
 }
 
 void wc90_state::wc90t(machine_config &config)

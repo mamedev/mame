@@ -631,8 +631,8 @@ void othunder_state::othunder(machine_config &config)
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16000000/2));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "2610.0l", 0.25);
-	ymsnd.add_route(0, "2610.0r", 0.25);
+	ymsnd.add_route(0, "2610.0l", 0.75);
+	ymsnd.add_route(0, "2610.0r", 0.75);
 	ymsnd.add_route(1, "2610.1l", 1.0);
 	ymsnd.add_route(1, "2610.1r", 1.0);
 	ymsnd.add_route(2, "2610.2l", 1.0);

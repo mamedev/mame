@@ -2031,4 +2031,137 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="macracqb">
+		<description>MacRacquetball (version 2.0) (4am crack)</description>
+		<year>1987</year>
+		<publisher>Practical Computing Applications</publisher>
+		<info name="programmer" value="Robert Pappas" />
+		<info name="usage" value="Self-boots and runs on Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<info name="version" value="2.0" />
+		<sharedfeat name="compatibility" value="macplus,macse,macsefd,macclasc" />
+		<!-- Dump released: 2023-08-05 -->
+		<!-- sports game -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="838484">
+				<rom name="macracquetball v2.0 (4am crack).dc42" size="838484" crc="46dbdba4" sha1="9e9c9d56f16f761feba63b901aa5366a4b29d4f6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gridwars">
+		<description>Grid Wars (version 1.0) (san inc crack)</description>
+		<year>1985</year>
+		<publisher>Ann Arbor Softworks</publisher>
+		<info name="programmer" value="Roy Harvey and Fred Zinn" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE FDHD, and Mac Classic." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!-- Dump released: 2023-08-17 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="419284">
+				<rom name="grid wars (san inc crack).dc42" size="419284" crc="37faf66e" sha1="cc77facb5c86b246a3490be7892de32f8e17f132" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blockout">
+		<description>Blockout (version 1.3) (4am crack)</description>
+		<year>1989</year>
+		<publisher>California Dreams</publisher>
+		<info name="programmer" value="Aleksander Ustaszewski, Marek Jackiewicz, Konrad Grabowski, and Dorota Błaszczak" />
+		<info name="usage" value="Runs on Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, Mac Classic, and Mac II." />
+		<info name="version" value="1.3" />
+		<sharedfeat name="compatibility" value="mac512ke,macplus,macse,macsefd,macclasc,macii" />
+		<!-- Dump released: 2023-08-19 -->
+		<!-- puzzle game -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="838484">
+				<rom name="blockout v1.3 (4am crack).dc42" size="838484" crc="60b39a92" sha1="0bf4efd51a3c7f875cca771ecd5c003e09c2fed4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hardball">
+		<description>HardBall (san inc crack)</description>
+		<year>1986</year>
+		<publisher>Accolade</publisher>
+		<info name="programmer" value="Bob Whitehead, Mike Benna, Tony Lee, and Ed Bogas" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!-- Dump released: 2024-11-20 -->
+		<!-- sports game -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="419284">
+				<rom name="hardball (san inc crack).dc42" size="419284" crc="3b6a39fb" sha1="63962699436ae2cad72cbdeee674328a6709633d" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="archon">
+		<description>Archon (san inc crack)</description>
+		<year>1986</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="programmer" value="Anne Westfall, Jon Freeman, Paul Reiche III, and Jim Nitchals" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, and Mac Plus." />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus" />
+		<!-- Dump released: 2024-11-20 -->
+		<!-- strategy game -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="419284">
+				<rom name="archon (san inc crack).dc42" size="419284" crc="6fea6b42" sha1="b1adb8292f2e22f8ef86f91d2d7f8355244fd6bb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hacker">
+		<description>Hacker (san inc crack)</description>
+		<year>1986</year>
+		<publisher>Activision</publisher>
+		<info name="developer" value="Activision" />
+		<info name="programmer" value="Steve Cartwright" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/FD, and Mac Classic." />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!-- Dump released: 2024-11-20 -->
+		<!-- strategy game -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="419284">
+				<rom name="hacker (san inc crack).dc42" size="419284" crc="b4ef066f" sha1="ade98bbcb9c2a1adb776ccf50d53d9444f4700e5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fractact">
+		<description>Fraction Action (san inc crack)</description>
+		<year>1985</year>
+		<publisher>Unicorn Software</publisher>
+		<info name="programmer" value="David Howard Flatman and Ray Tripamer" />
+		<info name="usage" value="Self-boots and runs on Mac 128K, Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/30, and Mac Classic." />
+		<sharedfeat name="compatibility" value="mac128k,mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!-- Dump released: 2025-01-14 -->
+		<!-- educational game -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="419284">
+				<rom name="fraction action (san inc crack).dc42" size="419284" crc="2fe9a60b" sha1="6ce7749f06425246c5863d1a33b4b93799c8e157" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fullpnt">
+		<description>FullPaint (version 1.0) (san inc crack)</description>
+		<year>1986</year>
+		<publisher>Ann Arbor Softworks</publisher>
+		<info name="programmer" value="Steve Newman, Scott Wiener, and Jeff Young" />
+		<info name="usage" value="Self-boots and runs on Mac 512K, Mac 512Ke, Mac Plus, Mac SE, Mac SE/30, and Mac Classic." />
+		<info name="version" value="1.0" />
+		<sharedfeat name="compatibility" value="mac512k,mac512ke,macplus,macse,macsefd,macclasc" />
+		<!-- Dump released: 2025-01-23 -->
+		<!-- graphics program -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="419284">
+				<rom name="fullpaint v1.0 (san inc crack).dc42" size="419284" crc="fcae3ea1" sha1="8a17a59f6702b3fae66992622a4fd084d350e553" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>

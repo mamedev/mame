@@ -151,7 +151,7 @@ end
 		ext_lib("jpeg"),
 		"7z",
 	}
-if not _OPTIONS["FORCE_DRC_C_BACKEND"] then
+if CPU_INCLUDE_DRC_NATIVE then
 	links {
 		"asmjit",
 	}

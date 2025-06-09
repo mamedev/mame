@@ -225,7 +225,6 @@ device_memory_interface::space_config_vector ics2115_device::memory_space_config
 */
 int ics2115_device::ics2115_voice::update_volume_envelope()
 {
-
 	// test for boundary cross
 	bool bc = false;
 	if (vol.acc >= vol.end || vol.acc <= vol.end)
@@ -422,13 +421,13 @@ void ics2115_device::ics2115_voice::update_ramp()
 	}
 }
 
-int ics2115_device::fill_output(ics2115_voice& voice, std::vector<write_stream_view> &outputs)
+int ics2115_device::fill_output(ics2115_voice& voice, sound_stream &stream)
 {
 	bool irq_invalid = false;
 	const u16 fine = 1 << (3*(voice.vol.incr >> 6));
 	voice.vol.add = (voice.vol.incr & 0x3f)<< (10 - fine);
 
-	for (int i = 0; i < outputs[0].samples(); i++)
+	for (int i = 0; i < stream.samples(); i++)
 	{
 		constexpr int RAMP_SHIFT = 6;
 		const u32 volacc = (voice.vol.acc >> 14) & 0xfff;
@@ -449,8 +448,8 @@ int ics2115_device::fill_output(ics2115_voice& voice, std::vector<write_stream_v
 		//if (voice.playing())
 		if (!m_vmode || voice.playing())
 		{
-			outputs[0].add_int(i, (sample * vleft) >> (5 + volume_bits), 32768);
-			outputs[1].add_int(i, (sample * vright) >> (5 + volume_bits), 32768);
+			stream.add_int(0, i, (sample * vleft) >> (5 + volume_bits), 32768);
+			stream.add_int(1, i, (sample * vright) >> (5 + volume_bits), 32768);
 		}
 
 		voice.update_ramp();
@@ -465,11 +464,8 @@ int ics2115_device::fill_output(ics2115_voice& voice, std::vector<write_stream_v
 	return irq_invalid;
 }
 
-void ics2115_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void ics2115_device::sound_stream_update(sound_stream &stream)
 {
-	outputs[0].fill(0);
-	outputs[1].fill(0);
-
 	bool irq_invalid = false;
 	for (int osc = 0; osc <= m_active_osc; osc++)
 	{
@@ -486,7 +482,7 @@ void ics2115_device::sound_stream_update(sound_stream &stream, std::vector<read_
         logerror("[%06x=%04x]", curaddr, (s16)sample);
 #endif
 */
-		if (fill_output(voice, outputs))
+		if (fill_output(voice, stream))
 			irq_invalid = true;
 
 #ifdef ICS2115_DEBUG
@@ -520,12 +516,13 @@ void ics2115_device::sound_stream_update(sound_stream &stream, std::vector<read_
 
 	if (irq_invalid)
 		recalc_irq();
-
 }
 
 //Helper Function (Reads off current register)
 u16 ics2115_device::reg_read()
 {
+	m_stream->update();
+
 	u16 ret = 0;
 	ics2115_voice& voice = m_voice[m_osc_select];
 
@@ -632,9 +629,6 @@ u16 ics2115_device::reg_read()
 				if (v.osc_conf.bitflags.irq_pending || v.vol_ctrl.bitflags.irq_pending)
 				{
 					ret = i | 0xe0;
-					ret &= v.vol_ctrl.bitflags.irq_pending ? (~0x40) : 0xff;
-					ret &= v.osc_conf.bitflags.irq_pending ? (~0x80) : 0xff;
-					recalc_irq();
 					if (v.osc_conf.bitflags.irq_pending)
 					{
 						v.osc_conf.bitflags.irq_pending = 0;
@@ -645,6 +639,7 @@ u16 ics2115_device::reg_read()
 						v.vol_ctrl.bitflags.irq_pending = 0;
 						ret &= ~0x40;
 					}
+					recalc_irq();
 					break;
 				}
 			}
@@ -710,6 +705,8 @@ u16 ics2115_device::reg_read()
 
 void ics2115_device::reg_write(u16 data, u16 mem_mask)
 {
+	m_stream->update();
+
 	ics2115_voice& voice = m_voice[m_osc_select];
 	if (m_reg_select < 0x20)
 		COMBINE_DATA(&voice.regs[m_reg_select]);
@@ -723,6 +720,7 @@ void ics2115_device::reg_write(u16 data, u16 mem_mask)
 			{
 				voice.osc_conf.value &= 0x80;
 				voice.osc_conf.value |= (data >> 8) & 0x7f;
+				recalc_irq();
 			}
 			break;
 
@@ -822,6 +820,7 @@ void ics2115_device::reg_write(u16 data, u16 mem_mask)
 			{
 				voice.vol_ctrl.value &= 0x80;
 				voice.vol_ctrl.value |= (data >> 8) & 0x7f;
+				recalc_irq();
 			}
 			break;
 
@@ -942,6 +941,7 @@ u8 ics2115_device::read(offs_t offset)
 	{
 		case 0:
 			//TODO: check this suspect code
+			m_stream->update();
 			if (m_irq_on)
 			{
 				ret |= 0x80;
@@ -1086,7 +1086,10 @@ void ics2115_device::recalc_irq()
 	//Suspect
 	bool irq = (m_irq_pending & m_irq_enabled);
 	for (int i = 0; (!irq) && (i < 32); i++)
-		irq |= m_voice[i].vol_ctrl.bitflags.irq_pending || m_voice[i].osc_conf.bitflags.irq_pending;
+	{
+		irq |= m_voice[i].osc_conf.bitflags.irq && m_voice[i].osc_conf.bitflags.irq_pending;
+		irq |= m_voice[i].vol_ctrl.bitflags.irq && m_voice[i].vol_ctrl.bitflags.irq_pending;
+	}
 	m_irq_on = irq;
 	m_irq_cb(irq ? ASSERT_LINE : CLEAR_LINE);
 }

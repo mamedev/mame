@@ -215,9 +215,8 @@ void dai_state::dai(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	DAI_SOUND(config, m_sound).add_route(0, "lspeaker", 0.50).add_route(1, "rspeaker", 0.50);
+	SPEAKER(config, "speaker", 2).front();
+	DAI_SOUND(config, m_sound).add_route(0, "speaker", 0.50, 0).add_route(1, "speaker", 0.50, 1);
 
 	/* cassette */
 	CASSETTE(config, m_cassette);

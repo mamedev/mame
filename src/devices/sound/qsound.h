@@ -33,7 +33,7 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	// device_sound_interface implementation
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	// device_rom_interface implementation
 	virtual void rom_bank_post_change() override;
@@ -68,6 +68,8 @@ private:
 
 DECLARE_DEVICE_TYPE(QSOUND, qsound_device)
 
+// hack to make sure MAME drivers pick up the right device
+// (undo the // && 0 comment to force LLE)
 #if !defined(QSOUND_LLE) // && 0
 #include "qsoundhle.h"
 #define qsound_device qsound_hle_device

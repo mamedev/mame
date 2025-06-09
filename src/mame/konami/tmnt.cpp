@@ -158,7 +158,9 @@ private:
 	// misc
 	int        m_tmnt_soundlatch = 0;
 	int        m_last = 0;
+	uint8_t    m_irq5_mask = 0;
 	uint16_t   m_cuebrick_nvram[0x400 * 0x20 / 2]{}; // 32k paged in a 1k window
+	int16_t    m_sampledata[0x40000];
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -170,14 +172,11 @@ private:
 	optional_device<samples_device> m_samples;
 	required_device<palette_device> m_palette;
 
-	// memory buffers
-	int16_t      m_sampledata[0x40000];
-
-	uint8_t      m_irq5_mask = 0;
 	uint16_t k052109_word_noA12_r(offs_t offset, uint16_t mem_mask = ~0);
 	void k052109_word_noA12_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t tmnt_sres_r();
 	void tmnt_sres_w(uint8_t data);
+	void tmnt_decode_sample();
 	void cuebrick_nvbank_w(uint8_t data);
 	void tmnt_0a0000_w(offs_t offset, uint16_t data);
 	void tmnt_priority_w(offs_t offset, uint16_t data);
@@ -196,7 +195,6 @@ private:
 	K052109_CB_MEMBER(mia_tile_callback);
 	K052109_CB_MEMBER(cuebrick_tile_callback);
 	K052109_CB_MEMBER(tmnt_tile_callback);
-	SAMPLES_START_CB_MEMBER(tmnt_decode_sample);
 
 	void cuebrick_main_map(address_map &map) ATTR_COLD;
 	void mia_audio_map(address_map &map) ATTR_COLD;
@@ -267,7 +265,7 @@ uint8_t tmnt_state::tmnt_upd_busy_r()
 	return m_upd7759->busy_r() ? 1 : 0;
 }
 
-SAMPLES_START_CB_MEMBER(tmnt_state::tmnt_decode_sample)
+void tmnt_state::tmnt_decode_sample()
 {
 	// using MAME samples to HLE the title music
 	// to put it briefly, it's like this on the PCB:
@@ -993,7 +991,6 @@ void tmnt_state::tmnt(machine_config &config)
 
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(1); /* 1 channel for the title music */
-	m_samples->set_samples_start_callback(FUNC(tmnt_state::tmnt_decode_sample));
 	m_samples->add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
@@ -1713,6 +1710,8 @@ void tmnt_state::init_tmnt()
 
 		gfxdata[A] = temp[B];
 	}
+
+	tmnt_decode_sample();
 }
 
 void tmnt_state::init_cuebrick()

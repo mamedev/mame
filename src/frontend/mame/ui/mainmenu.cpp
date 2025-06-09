@@ -12,6 +12,8 @@
 #include "ui/mainmenu.h"
 
 #include "ui/about.h"
+#include "ui/audiomix.h"
+#include "ui/audioeffects.h"
 #include "ui/barcode.h"
 #include "ui/cheatopt.h"
 #include "ui/confswitch.h"
@@ -56,6 +58,8 @@ enum : unsigned {
 	TAPE_CONTROL,
 	SLOT_DEVICES,
 	NETWORK_DEVICES,
+	AUDIO_MIXER,
+	AUDIO_EFFECTS,
 	SLIDERS,
 	VIDEO_TARGETS,
 	CROSSHAIR,
@@ -122,7 +126,7 @@ void menu_main::populate()
 
 	item_append(_("menu-main", "System Information"), 0, (void *)GAME_INFO);
 
-	if (ui().found_machine_warnings())
+	if (ui().machine_info().has_warnings())
 		item_append(_("menu-main", "Warning Information"), 0, (void *)WARN_INFO);
 
 	for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
@@ -157,7 +161,15 @@ void menu_main::populate()
 	if (network_interface_enumerator(machine().root_device()).first() != nullptr)
 		item_append(_("menu-main", "Network Devices"), 0, (void*)NETWORK_DEVICES);
 
-	item_append(_("menu-main", "Slider Controls"), 0, (void *)SLIDERS);
+	if (!machine().sound().no_sound() && sound_interface_enumerator(machine().root_device()).first() != nullptr)
+	{
+		item_append(_("menu-main", "Audio Mixer"), 0, (void *)AUDIO_MIXER);
+
+		item_append(_("menu-main", "Audio Effects"), 0, (void *)AUDIO_EFFECTS);
+	}
+
+	if (!ui().get_slider_list().empty())
+		item_append(_("menu-main", "Slider Controls"), 0, (void *)SLIDERS);
 
 	item_append(_("menu-main", "Video Options"), 0, (void *)VIDEO_TARGETS);
 
@@ -260,6 +272,14 @@ bool menu_main::handle(event const *ev)
 
 		case NETWORK_DEVICES:
 			menu::stack_push<menu_network_devices>(ui(), container());
+			break;
+
+		case AUDIO_MIXER:
+			menu::stack_push<menu_audio_mixer>(ui(), container());
+			break;
+
+		case AUDIO_EFFECTS:
+			menu::stack_push<menu_audio_effects>(ui(), container());
 			break;
 
 		case SLIDERS:

@@ -28,7 +28,7 @@ public:
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	void i2c_nak();
@@ -41,7 +41,7 @@ private:
 	void reg_write(uint32_t adr, uint32_t val);
 
 	void fill_buffer();
-	void append_buffer(std::vector<write_stream_view> &outputs, int &pos, int scount);
+	void append_buffer(sound_stream &stream, int &pos, int scount);
 
 	int gain_to_db(double val);
 	float gain_to_percentage(int val);

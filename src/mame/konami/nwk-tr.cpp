@@ -700,15 +700,14 @@ void nwktr_state::nwktr(machine_config &config)
 	K001604(config, m_k001604[1], 0);
 	m_k001604[1]->set_palette(m_palette[1]);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	K056800(config, m_k056800, XTAL(16'934'400));
 	m_k056800->int_callback().set_inputline(m_audiocpu, M68K_IRQ_2);
 
 	rf5c400_device &rfsnd(RF5C400(config, "rfsnd", XTAL(16'934'400)));  // as per Guru readme above
-	rfsnd.add_route(0, "lspeaker", 1.0);
-	rfsnd.add_route(1, "rspeaker", 1.0);
+	rfsnd.add_route(0, "speaker", 1.0, 0);
+	rfsnd.add_route(1, "speaker", 1.0, 1);
 
 	KONPPC(config, m_konppc, 0);
 	m_konppc->set_dsp_tag(0, m_dsp[0]);

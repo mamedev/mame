@@ -83,6 +83,7 @@ const double XTAL::known_xtals[] = {
 	  2'250'000, // 2.25_MHz_XTAL          Resonator - YM2154 on Yamaha PSR-60 & PSR-70
 	  2'376'000, // 2.376_MHz_XTAL         CIT-101 keyboard
 	  2'457'600, // 2.4576_MHz_XTAL        Atari ST MFP
+	  2'470'000, // 2.47_MHz_XTAL          CSA2.47MG ceramic oscillator - Casio CZ-1
 	  2'500'000, // 2.5_MHz_XTAL           Janken Man units
 	  2'600'000, // 2.6_MHz_XTAL           Sharp PC-1500
 	  2'700'000, // 2.7_MHz_XTAL           Resonator - YM2154 on Yamaha RX15
@@ -119,6 +120,7 @@ const double XTAL::known_xtals[] = {
 	  4'433'619, // 4.433619_MHz_XTAL      PAL color subcarrier (technically 4.43361875mhz)
 	  4'608'000, // 4.608_MHz_XTAL         Luxor ABC-77 keyboard (Keytronic custom part #48-300-107 is equivalent)
 	  4'915'200, // 4.9152_MHz_XTAL        -
+	  4'946'800, // 4.9468_MHz_XTAL        Casio CPS-2000
 	  4'946'864, // 4.946864_MHz_XTAL      Casiotone 8000
 	  4'952'000, // 4.952_MHz_XTAL         IGS M036 based mahjong games, for TT5665 sound chip
 	  5'000'000, // 5_MHz_XTAL             Mutant Night

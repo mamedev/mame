@@ -133,6 +133,12 @@ copyright-holders:m1macrophage
 		</element>
 	</group>
 
+	<element name="script_warning" defstate="1">
+		<text state="1" string="To control sliders and knobs with a mouse, enable the layout plugin.">
+			<color red="0.65" green="0.65" blue="0.65"/>
+		</text>
+	</element>
+
 	<element name="text-tune">
 		<text string="TUNE:"><color red="0.8" green="0.8" blue="0.8"/></text>
 	</element>
@@ -368,6 +374,11 @@ copyright-holders:m1macrophage
 				</group>
 			</repeat>
 		</collection>
+		<collection name="script warning">
+			<element ref="script_warning" id="warning">
+				<bounds x="600" y="105" width="300" height="20"/>
+			</element>
+		</collection>
 
 		<!-- Mixer -->
 		<repeat count="9">
@@ -553,6 +564,8 @@ copyright-holders:m1macrophage
 				for i = 1, 8 do
 					add_vertical_slider(view, "trimmer_" .. i, "trimmer_knob_" .. i, "pitch_adj_" .. i)
 				end
+
+				view.items["warning"]:set_state(0)
 			end)
 
 		-----------------------------------------------------------------------

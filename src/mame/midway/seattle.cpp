@@ -2119,15 +2119,14 @@ void seattle_state::wg3dh(machine_config &config)
 {
 	phoenix(config);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DCS2_AUDIO_2115(config, m_dcs, 0);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(2);
 	m_dcs->set_polling_offset(0x3839);
-	m_dcs->add_route(0, "rspeaker", 1.0);
-	m_dcs->add_route(1, "lspeaker", 1.0);
+	m_dcs->add_route(0, "speaker", 1.0, 1);
+	m_dcs->add_route(1, "speaker", 1.0, 0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
@@ -2145,15 +2144,14 @@ void seattle_state::mace(machine_config &config)
 {
 	seattle150(config);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DCS2_AUDIO_2115(config, m_dcs, 0);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(2);
 	m_dcs->set_polling_offset(0x3839);
-	m_dcs->add_route(0, "rspeaker", 1.0);
-	m_dcs->add_route(1, "lspeaker", 1.0);
+	m_dcs->add_route(0, "speaker", 1.0, 1);
+	m_dcs->add_route(1, "speaker", 1.0, 0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
@@ -2172,20 +2170,17 @@ void seattle_state::sfrush(machine_config &config)
 	flagstaff(config);
 
 	// 5 Channel output (4 Channel input connected to Quad Amp PCB)
-	SPEAKER(config, "flspeaker").front_left();
-	SPEAKER(config, "frspeaker").front_right();
-	SPEAKER(config, "rlspeaker").headrest_left();
-	SPEAKER(config, "rrspeaker").headrest_right();
+	SPEAKER(config, "speaker", 4).corners();
 	//SPEAKER(config, "subwoofer").seat(); Not implemented, Quad Amp PCB output;
 
 	ATARI_CAGE_SEATTLE(config, m_cage, 0);
 	m_cage->set_speedup(0x5236);
 	m_cage->irq_handler().set(m_ioasic, FUNC(midway_ioasic_device::cage_irq_handler));
 	// TODO: copied from atarigt.cpp; Same configurations as T-Mek?
-	m_cage->add_route(0, "frspeaker", 1.0); // Foward Right
-	m_cage->add_route(1, "rlspeaker", 1.0); // Back Left
-	m_cage->add_route(2, "flspeaker", 1.0); // Foward Left
-	m_cage->add_route(3, "rrspeaker", 1.0); // Back Right
+	m_cage->add_route(0, "speaker", 1.0, 1); // Forward Right
+	m_cage->add_route(1, "speaker", 1.0, 2); // Back Left
+	m_cage->add_route(2, "speaker", 1.0, 0); // Forward Left
+	m_cage->add_route(3, "speaker", 1.0, 3); // Back Right
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
@@ -2205,20 +2200,17 @@ void seattle_state::sfrushrk(machine_config &config)
 	flagstaff(config);
 
 	// 5 Channel output (4 Channel input connected to Quad Amp PCB)
-	SPEAKER(config, "flspeaker").front_left();
-	SPEAKER(config, "frspeaker").front_right();
-	SPEAKER(config, "rlspeaker").headrest_left();
-	SPEAKER(config, "rrspeaker").headrest_right();
+	SPEAKER(config, "speaker", 4).corners();
 	//SPEAKER(config, "subwoofer").seat(); Not implemented, Quad Amp PCB output;
 
 	ATARI_CAGE_SEATTLE(config, m_cage, 0);
 	m_cage->set_speedup(0x5329);
 	m_cage->irq_handler().set(m_ioasic, FUNC(midway_ioasic_device::cage_irq_handler));
 	// TODO: copied from atarigt.cpp; Same configurations as T-Mek?
-	m_cage->add_route(0, "frspeaker", 1.0); // Foward Right
-	m_cage->add_route(1, "rlspeaker", 1.0); // Back Left
-	m_cage->add_route(2, "flspeaker", 1.0); // Foward Left
-	m_cage->add_route(3, "rrspeaker", 1.0); // Back Right
+	m_cage->add_route(0, "speaker", 1.0, 1); // Forward Right
+	m_cage->add_route(1, "speaker", 1.0, 2); // Back Left
+	m_cage->add_route(2, "speaker", 1.0, 0); // Forward Left
+	m_cage->add_route(3, "speaker", 1.0, 3); // Back Right
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
@@ -2243,15 +2235,14 @@ void seattle_state::calspeed(machine_config &config)
 {
 	seattle150_widget(config);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DCS2_AUDIO_2115(config, m_dcs, 0);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(2);
 	m_dcs->set_polling_offset(0x39c0);
-	m_dcs->add_route(0, "rspeaker", 1.0);
-	m_dcs->add_route(1, "lspeaker", 1.0);
+	m_dcs->add_route(0, "speaker", 1.0, 1);
+	m_dcs->add_route(1, "speaker", 1.0, 0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
@@ -2270,15 +2261,14 @@ void seattle_state::vaportrx(machine_config &config)
 {
 	seattle200_widget(config);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DCS2_AUDIO_2115(config, m_dcs, 0);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(2);
 	m_dcs->set_polling_offset(0x39c2);
-	m_dcs->add_route(0, "rspeaker", 1.0);
-	m_dcs->add_route(1, "lspeaker", 1.0);
+	m_dcs->add_route(0, "speaker", 1.0, 1);
+	m_dcs->add_route(1, "speaker", 1.0, 0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
@@ -2296,15 +2286,14 @@ void seattle_state::biofreak(machine_config &config)
 {
 	seattle150(config);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DCS2_AUDIO_2115(config, m_dcs, 0);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(2);
 	m_dcs->set_polling_offset(0x3835);
-	m_dcs->add_route(0, "rspeaker", 1.0);
-	m_dcs->add_route(1, "lspeaker", 1.0);
+	m_dcs->add_route(0, "speaker", 1.0, 1);
+	m_dcs->add_route(1, "speaker", 1.0, 0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
@@ -2322,15 +2311,14 @@ void seattle_state::blitz(machine_config &config)
 {
 	seattle150(config);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DCS2_AUDIO_2115(config, m_dcs, 0);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(2);
 	m_dcs->set_polling_offset(0x39c2);
-	m_dcs->add_route(0, "rspeaker", 1.0);
-	m_dcs->add_route(1, "lspeaker", 1.0);
+	m_dcs->add_route(0, "speaker", 1.0, 1);
+	m_dcs->add_route(1, "speaker", 1.0, 0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
@@ -2349,15 +2337,14 @@ void seattle_state::blitz99(machine_config &config)
 {
 	seattle150(config);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DCS2_AUDIO_2115(config, m_dcs, 0);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(2);
 	m_dcs->set_polling_offset(0x0afb);
-	m_dcs->add_route(0, "rspeaker", 1.0);
-	m_dcs->add_route(1, "lspeaker", 1.0);
+	m_dcs->add_route(0, "speaker", 1.0, 1);
+	m_dcs->add_route(1, "speaker", 1.0, 0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
@@ -2376,15 +2363,14 @@ void seattle_state::blitz2k(machine_config &config)
 {
 	seattle150(config);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DCS2_AUDIO_2115(config, m_dcs, 0);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(2);
 	m_dcs->set_polling_offset(0x0b5d);
-	m_dcs->add_route(0, "rspeaker", 1.0);
-	m_dcs->add_route(1, "lspeaker", 1.0);
+	m_dcs->add_route(0, "speaker", 1.0, 1);
+	m_dcs->add_route(1, "speaker", 1.0, 0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
@@ -2404,15 +2390,14 @@ void seattle_state::carnevil(machine_config &config)
 	seattle150(config);
 	m_galileo->set_map(3, address_map_constructor(&seattle_state::carnevil_cs3_map, "carnevil_cs3_map", this), this);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DCS2_AUDIO_2115(config, m_dcs, 0);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(2);
 	m_dcs->set_polling_offset(0x0af7);
-	m_dcs->add_route(0, "rspeaker", 1.0);
-	m_dcs->add_route(1, "lspeaker", 1.0);
+	m_dcs->add_route(0, "speaker", 1.0, 1);
+	m_dcs->add_route(1, "speaker", 1.0, 0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
@@ -2430,15 +2415,14 @@ void seattle_state::hyprdriv(machine_config &config)
 {
 	seattle200_widget(config);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DCS2_AUDIO_2115(config, m_dcs, 0);
 	m_dcs->set_maincpu_tag(m_maincpu);
 	m_dcs->set_dram_in_mb(2);
 	m_dcs->set_polling_offset(0x0af7);
-	m_dcs->add_route(0, "rspeaker", 1.0);
-	m_dcs->add_route(1, "lspeaker", 1.0);
+	m_dcs->add_route(0, "speaker", 1.0, 1);
+	m_dcs->add_route(1, "speaker", 1.0, 0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");

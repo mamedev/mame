@@ -870,10 +870,9 @@ void applix_state::applix(machine_config &config)
 	PALETTE(config, m_palette, FUNC(applix_state::applix_palette), 16);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	DAC0800(config, "ldac", 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // 74ls374.u20 + dac0800.u21 + 4052.u23
-	DAC0800(config, "rdac", 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // 74ls374.u20 + dac0800.u21 + 4052.u23
+	SPEAKER(config, "speaker", 2).front();
+	DAC0800(config, "ldac", 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 0); // 74ls374.u20 + dac0800.u21 + 4052.u23
+	DAC0800(config, "rdac", 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 1); // 74ls374.u20 + dac0800.u21 + 4052.u23
 
 	/* Devices */
 	MC6845(config, m_crtc, 30_MHz_XTAL / 16); // MC6545 @ 1.875 MHz
@@ -902,7 +901,7 @@ void applix_state::applix(machine_config &config)
 
 	CASSETTE(config, m_cass);
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
-	m_cass->add_route(ALL_OUTPUTS, "lspeaker", 0.10);
+	m_cass->add_route(ALL_OUTPUTS, "speaker", 0.10, 0);
 
 	WD1772(config, m_fdc, 16_MHz_XTAL / 2); //connected to Z80H clock pin
 	FLOPPY_CONNECTOR(config, m_floppy[0], applix_floppies, "35dd", applix_state::floppy_formats).enable_sound(true);

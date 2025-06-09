@@ -708,31 +708,18 @@ void msm5232_device::set_clock(int clock)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void msm5232_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void msm5232_device::sound_stream_update(sound_stream &stream)
 {
-	auto &buf1 = outputs[0];
-	auto &buf2 = outputs[1];
-	auto &buf3 = outputs[2];
-	auto &buf4 = outputs[3];
-	auto &buf5 = outputs[4];
-	auto &buf6 = outputs[5];
-	auto &buf7 = outputs[6];
-	auto &buf8 = outputs[7];
-	auto &bufsolo1 = outputs[8];
-	auto &bufsolo2 = outputs[9];
-	auto &bufnoise = outputs[10];
-	int i;
-
-	for (i=0; i<buf1.samples(); i++)
+	for (int i=0; i<stream.samples(); i++)
 	{
 		/* calculate all voices' envelopes */
 		EG_voices_advance();
 
 		TG_group_advance(0);   /* calculate tones group 1 */
-		buf1.put_int(i, o2, 32768);
-		buf2.put_int(i, o4, 32768);
-		buf3.put_int(i, o8, 32768);
-		buf4.put_int(i, o16, 32768);
+		stream.put_int(0, i, o2, 32768);
+		stream.put_int(1, i, o4, 32768);
+		stream.put_int(2, i, o8, 32768);
+		stream.put_int(3, i, o16, 32768);
 
 		SAVE_SINGLE_CHANNEL(0,o2)
 		SAVE_SINGLE_CHANNEL(1,o4)
@@ -740,13 +727,13 @@ void msm5232_device::sound_stream_update(sound_stream &stream, std::vector<read_
 		SAVE_SINGLE_CHANNEL(3,o16)
 
 		TG_group_advance(1);   /* calculate tones group 2 */
-		buf5.put_int(i, o2, 32768);
-		buf6.put_int(i, o4, 32768);
-		buf7.put_int(i, o8, 32768);
-		buf8.put_int(i, o16, 32768);
+		stream.put_int(4, i, o2, 32768);
+		stream.put_int(5, i, o4, 32768);
+		stream.put_int(6, i, o8, 32768);
+		stream.put_int(7, i, o16, 32768);
 
-		bufsolo1.put_int(i, solo8, 32768);
-		bufsolo2.put_int(i, solo16, 32768);
+		stream.put_int(8, i, solo8, 32768);
+		stream.put_int(9, i, solo16, 32768);
 
 		SAVE_SINGLE_CHANNEL(4,o2)
 		SAVE_SINGLE_CHANNEL(5,o4)
@@ -774,6 +761,6 @@ void msm5232_device::sound_stream_update(sound_stream &stream, std::vector<read_
 			}
 		}
 
-		bufnoise.put(i, (m_noise_rng & (1<<16)) ? 1.0 : 0.0);
+		stream.put(10, i, (m_noise_rng & (1<<16)) ? 1.0 : 0.0);
 	}
 }

@@ -465,22 +465,21 @@ void crimfght_state::crimfght(machine_config &config)
 	m_k051960->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545)));  // verified on pcb
 	ymsnd.port_write_handler().set(FUNC(crimfght_state::ym2151_ct_w));
-	ymsnd.add_route(0, "lspeaker", 1.0);
-	ymsnd.add_route(1, "rspeaker", 1.0);
+	ymsnd.add_route(0, "speaker", 1.0, 0);
+	ymsnd.add_route(1, "speaker", 1.0, 1);
 
 	K007232(config, m_k007232, XTAL(3'579'545)); // verified on pcb
 	m_k007232->port_write().set(FUNC(crimfght_state::volume_callback));
-	m_k007232->add_route(0, "lspeaker", 0.20);
-	m_k007232->add_route(0, "rspeaker", 0.20);
-	m_k007232->add_route(1, "lspeaker", 0.20);
-	m_k007232->add_route(1, "rspeaker", 0.20);
+	m_k007232->add_route(0, "speaker", 0.20, 0);
+	m_k007232->add_route(0, "speaker", 0.20, 1);
+	m_k007232->add_route(1, "speaker", 0.20, 0);
+	m_k007232->add_route(1, "speaker", 0.20, 1);
 }
 
 /***************************************************************************

@@ -438,7 +438,7 @@ void device_execute_interface::interface_post_reset()
 	if (m_vblank_interrupt_screen != nullptr)
 	{
 		// get the screen that will trigger the VBLANK
-		screen_device * screen = device().siblingdevice<screen_device>(m_vblank_interrupt_screen);
+		screen_device *const screen = device().siblingdevice<screen_device>(m_vblank_interrupt_screen);
 
 		assert(screen != nullptr);
 		screen->register_vblank_callback(vblank_state_delegate(&device_execute_interface::on_vblank, this));
@@ -513,7 +513,7 @@ int device_execute_interface::standard_irq_callback(int irqline, offs_t pc)
 		vector = m_driver_irq(device(), irqline);
 
 	// notify the debugger
-	if (device().machine().debug_flags & DEBUG_FLAG_ENABLED)
+	if (debugger_enabled())
 		device().debug()->interrupt_hook(irqline, pc);
 
 	return vector;
@@ -584,21 +584,28 @@ TIMER_CALLBACK_MEMBER(device_execute_interface::trigger_periodic_interrupt)
 
 void device_execute_interface::pulse_input_line(int irqline, const attotime &duration)
 {
-	// treat instantaneous pulses as ASSERT+CLEAR
+	const attotime expiry = m_pulse_end_timers[irqline]->expire();
 	if (duration == attotime::zero)
 	{
-		if (irqline != INPUT_LINE_RESET && !input_edge_triggered(irqline))
+		// treat instantaneous pulses as ASSERT+CLEAR
+		if ((irqline != INPUT_LINE_RESET) && !input_edge_triggered(irqline))
 			throw emu_fatalerror("device '%s': zero-width pulse is not allowed for input line %d\n", device().tag(), irqline);
 
-		set_input_line(irqline, ASSERT_LINE);
-		set_input_line(irqline, CLEAR_LINE);
+		if (expiry.is_never() || (expiry <= m_scheduler->time()))
+		{
+			set_input_line(irqline, ASSERT_LINE);
+			set_input_line(irqline, CLEAR_LINE);
+		}
 	}
 	else
 	{
-		set_input_line(irqline, ASSERT_LINE);
+		const attotime target_time = local_time() + duration;
+		if (expiry.is_never() || (target_time > expiry))
+		{
+			set_input_line(irqline, ASSERT_LINE);
 
-		attotime target_time = local_time() + duration;
-		m_pulse_end_timers[irqline]->adjust(target_time - m_scheduler->time(), irqline);
+			m_pulse_end_timers[irqline]->adjust(target_time - m_scheduler->time(), irqline);
+		}
 	}
 }
 

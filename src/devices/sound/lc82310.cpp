@@ -258,15 +258,15 @@ void lc82310_device::fill_buffer()
 	stream->set_sample_rate(frame_sample_rate);
 }
 
-void lc82310_device::append_buffer(std::vector<write_stream_view> &outputs, int &pos, int scount)
+void lc82310_device::append_buffer(sound_stream &stream, int &pos, int scount)
 {
 	int s1 = std::min(scount - pos, m_sample_count);
 	int words_per_sample = std::min(m_frame_channels, 2);
 
 	for (int i = 0; i < s1; i++)
 	{
-		outputs[0].put_int(pos, samples[m_samples_idx * words_per_sample], 32768);
-		outputs[1].put_int(pos, samples[m_samples_idx * words_per_sample + (words_per_sample >> 1)], 32768);
+		stream.put_int(0, pos, samples[m_samples_idx * words_per_sample], 32768);
+		stream.put_int(1, pos, samples[m_samples_idx * words_per_sample + (words_per_sample >> 1)], 32768);
 
 		m_samples_idx++;
 		pos++;
@@ -279,9 +279,9 @@ void lc82310_device::append_buffer(std::vector<write_stream_view> &outputs, int 
 	}
 }
 
-void lc82310_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void lc82310_device::sound_stream_update(sound_stream &stream)
 {
-	int csamples = outputs[0].samples();
+	int csamples = stream.samples();
 	int pos = 0;
 
 	while (pos < csamples)
@@ -290,12 +290,8 @@ void lc82310_device::sound_stream_update(sound_stream &stream, std::vector<read_
 			fill_buffer();
 
 		if (m_sample_count <= 0)
-		{
-			outputs[0].fill(0, pos);
-			outputs[1].fill(0, pos);
 			return;
-		}
 
-		append_buffer(outputs, pos, csamples);
+		append_buffer(stream, pos, csamples);
 	}
 }

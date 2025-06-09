@@ -6,10 +6,9 @@
 
 #pragma once
 
-#include "pseudovia.h"
-
 #include "machine/6522via.h"
 #include "machine/applefdintf.h"
+#include "machine/pseudovia.h"
 #include "machine/swim2.h"
 #include "sound/asc.h"
 #include "emupal.h"
@@ -66,7 +65,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	virtual void ram_size(u8 config);
 

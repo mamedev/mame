@@ -399,10 +399,9 @@ void hng64_state::hng64_audio(machine_config &config)
 	m_audiocpu->tout_handler<1>().set(FUNC(hng64_state::tcu_tm1_cb));
 	m_audiocpu->tout_handler<2>().set(FUNC(hng64_state::tcu_tm2_cb));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	L7A1045(config, m_dsp, 32000000/2); // ??
-	m_dsp->add_route(0, "lspeaker", 0.1);
-	m_dsp->add_route(1, "rspeaker", 0.1);
+	m_dsp->add_route(0, "speaker", 0.1, 0);
+	m_dsp->add_route(1, "speaker", 0.1, 1);
 }

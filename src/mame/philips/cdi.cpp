@@ -462,14 +462,13 @@ void cdi_state::cdimono1_base(machine_config &config)
 	m_cdrom->set_interface("cdrom");
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DMADAC(config, m_dmadac[0]);
-	m_dmadac[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_dmadac[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 
 	DMADAC(config, m_dmadac[1]);
-	m_dmadac[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_dmadac[1]->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 	MK48T08(config, "mk48t08");
 }
@@ -508,14 +507,13 @@ void cdi_state::cdimono2(machine_config &config)
 	SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DMADAC(config, m_dmadac[0]);
-	m_dmadac[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_dmadac[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 
 	DMADAC(config, m_dmadac[1]);
-	m_dmadac[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_dmadac[1]->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 	MK48T08(config, "mk48t08");
 }
@@ -553,14 +551,13 @@ void cdi_state::cdi910(machine_config &config)
 	SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DMADAC(config, m_dmadac[0]);
-	m_dmadac[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_dmadac[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 
 	DMADAC(config, m_dmadac[1]);
-	m_dmadac[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_dmadac[1]->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 	MK48T08(config, "mk48t08");
 }

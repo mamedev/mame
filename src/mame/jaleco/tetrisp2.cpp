@@ -1819,12 +1819,11 @@ void tetrisp2_state::tetrisp2(machine_config &config)
 	setup_main_sysctrl(config, XTAL(48'000'000));
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL(16'934'400))); // 16.9344MHz
-	ymz.add_route(0, "lspeaker", 1.0);
-	ymz.add_route(1, "rspeaker", 1.0);
+	ymz.add_route(0, "speaker", 1.0, 0);
+	ymz.add_route(1, "speaker", 1.0, 1);
 }
 
 
@@ -1886,13 +1885,12 @@ void rockn_state::rockn(machine_config &config)
 	setup_main_sysctrl(config, XTAL(48'000'000));
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL(16'934'400))); // 16.9344MHz
 	ymz.set_addrmap(0, &rockn_state::rockn1_ymz_map);
-	ymz.add_route(0, "lspeaker", 1.0);
-	ymz.add_route(1, "rspeaker", 1.0);
+	ymz.add_route(0, "speaker", 1.0, 0);
+	ymz.add_route(1, "speaker", 1.0, 1);
 }
 
 
@@ -1920,13 +1918,12 @@ void rockn_state::rockn2(machine_config &config)
 	setup_main_sysctrl(config, XTAL(48'000'000));
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL(16'934'400))); // 16.9344MHz
 	ymz.set_addrmap(0, &rockn_state::rockn2_ymz_map);
-	ymz.add_route(0, "lspeaker", 1.0);
-	ymz.add_route(1, "rspeaker", 1.0);
+	ymz.add_route(0, "speaker", 1.0, 0);
+	ymz.add_route(1, "speaker", 1.0, 1);
 }
 
 void rocknms_state::sub_field_irq_w(int state)
@@ -2001,13 +1998,12 @@ void rocknms_state::rocknms(machine_config &config)
 	m_sub_sysctrl->sound_reset_cb().set(FUNC(rocknms_state::sub_sound_reset_line_w));
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL(16'934'400))); // 16.9344MHz
 	ymz.set_addrmap(0, &rocknms_state::rockn1_ymz_map);
-	ymz.add_route(0, "lspeaker", 1.0);
-	ymz.add_route(1, "rspeaker", 1.0);
+	ymz.add_route(0, "speaker", 1.0, 0);
+	ymz.add_route(1, "speaker", 1.0, 1);
 }
 
 void stepstag_state::field_cb(int state)
@@ -2114,15 +2110,14 @@ void stepstag_state::stepstag(machine_config &config)
 	config.set_default_layout(layout_stepstag);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_16(config, m_soundlatch);
 
 	JALECO_VJ_PC(config, m_jaleco_vj_pc, 0);
 	m_jaleco_vj_pc->set_steppingstage_mode(true);
-	m_jaleco_vj_pc->add_route(0, "lspeaker", 1.0);
-	m_jaleco_vj_pc->add_route(1, "rspeaker", 1.0);
+	m_jaleco_vj_pc->add_route(0, "speaker", 1.0, 0);
+	m_jaleco_vj_pc->add_route(1, "speaker", 1.0, 1);
 }
 
 void stepstag_state::vjdash(machine_config &config)    // 4 Screens
@@ -2202,15 +2197,14 @@ void stepstag_state::vjdash(machine_config &config)    // 4 Screens
 	config.set_default_layout(layout_vjdash);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_16(config, m_soundlatch);
 
 	JALECO_VJ_PC(config, m_jaleco_vj_pc, 0);
 	m_jaleco_vj_pc->set_steppingstage_mode(false);
-	m_jaleco_vj_pc->add_route(0, "lspeaker", 1.0);
-	m_jaleco_vj_pc->add_route(1, "rspeaker", 1.0);
+	m_jaleco_vj_pc->add_route(0, "speaker", 1.0, 0);
+	m_jaleco_vj_pc->add_route(1, "speaker", 1.0, 1);
 }
 
 void stepstag_state::machine_start()

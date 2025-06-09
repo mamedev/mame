@@ -848,7 +848,7 @@ void mips3_device::static_generate_memory_mode_checks(drcuml_block &block, uml::
 
 void mips3_device::static_generate_fastram_accessor(drcuml_block &block, int &label, int size, bool iswrite, bool ismasked)
 {
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) == 0)
+	if (!debugger_enabled())
 	{
 		for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
 		{
@@ -1364,7 +1364,7 @@ void mips3_device::generate_sequence_instruction(drcuml_block &block, compiler_s
 	}
 
 	/* if we are debugging, call the debugger */
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	if (debugger_enabled())
 	{
 		UML_MOV(block, mem(&m_core->pc), desc->pc);                              // mov     [pc],desc->pc
 		save_fast_iregs(block);

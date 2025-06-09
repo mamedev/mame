@@ -516,18 +516,17 @@ void mechatt_state::mechatt(machine_config &config)
 	m_sprites->set_spriteram_tag("spriteram");
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch[0]);
 	GENERIC_LATCH_8(config, m_soundlatch[1]);
 
 	ym2608_device &ymsnd(YM2608(config, "ymsnd", 8000000));
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
-	ymsnd.add_route(0, "lspeaker", 0.15);
-	ymsnd.add_route(0, "rspeaker", 0.15);
-	ymsnd.add_route(1, "lspeaker", 0.80);
-	ymsnd.add_route(2, "rspeaker", 0.80);
+	ymsnd.add_route(0, "speaker", 0.45, 0);
+	ymsnd.add_route(0, "speaker", 0.45, 1);
+	ymsnd.add_route(1, "speaker", 0.80, 0);
+	ymsnd.add_route(2, "speaker", 0.80, 1);
 }
 
 /******************************************************************************/

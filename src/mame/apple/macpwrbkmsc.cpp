@@ -798,14 +798,14 @@ void macpbmsc_state::macpd210(machine_config &config)
 	m_msc->set_pmu_tag("pge");
 	m_msc->set_rom_tag("bootrom");
 	m_msc->set_cpu_clock(25_MHz_XTAL);
-	m_msc->add_route(0, m_dfac, 1.0);
-	m_msc->add_route(1, m_dfac, 1.0);
+	m_msc->add_route(0, m_dfac, 1.0, 0);
+	m_msc->add_route(1, m_dfac, 1.0, 1);
 	m_msc->cb2_callback().set(m_pmu, FUNC(m68hc05pge_device::spi_miso_w));
 	m_msc->vbl_callback().set(FUNC(macpbmsc_state::vbl_w));
 
 	APPLE_DFAC(config, m_dfac, 22257);
-	m_dfac->add_route(0, "lspeaker", 1.0);
-	m_dfac->add_route(1, "rspeaker", 1.0);
+	m_dfac->add_route(0, "speaker", 1.0, 0);
+	m_dfac->add_route(1, "speaker", 1.0, 1);
 
 	GSC(config, m_gsc, 31.3344_MHz_XTAL);
 	m_gsc->set_panel_id(6);
@@ -817,8 +817,8 @@ void macpbmsc_state::macpd210(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
 		[](device_t *device)
 		{
-			device->subdevice<cdda_device>("cdda")->add_route(0, "^^lspeaker", 1.0);
-			device->subdevice<cdda_device>("cdda")->add_route(1, "^^rspeaker", 1.0);
+			device->subdevice<cdda_device>("cdda")->add_route(0, "^^speaker", 1.0, 0);
+			device->subdevice<cdda_device>("cdda")->add_route(1, "^^speaker", 1.0, 1);
 		});
 	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
@@ -842,8 +842,7 @@ void macpbmsc_state::macpd210(machine_config &config)
 
 	DS2401(config, m_battserial, 0); // actually DS2400, but 2400/2401 are compatible
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	RAM(config, m_ram);
 	m_ram->set_default_size("4M");

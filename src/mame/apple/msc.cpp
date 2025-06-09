@@ -63,8 +63,8 @@ void msc_device::device_add_mconfig(machine_config &config)
 	m_pseudovia->writevideo_handler().set(FUNC(msc_device::msc_config_w));
 
 	ASC(config, m_asc, C15M, asc_device::asc_type::EASC);
-	m_asc->add_route(0, tag(), 1.0);
-	m_asc->add_route(1, tag(), 1.0);
+	m_asc->add_route(0, tag(), 1.0, 0);
+	m_asc->add_route(1, tag(), 1.0, 1);
 	m_asc->irqf_callback().set(m_pseudovia, FUNC(pseudovia_device::asc_irq_w));
 }
 
@@ -106,7 +106,7 @@ msc_device::msc_device(const machine_config &mconfig, const char *tag, device_t 
 
 void msc_device::device_start()
 {
-	m_stream = stream_alloc(8, 2, m_asc->clock(), STREAM_SYNCHRONOUS);
+	m_stream = stream_alloc(8, 2, 22257, STREAM_SYNCHRONOUS);
 
 	m_6015_timer = timer_alloc(FUNC(msc_device::msc_6015_tick), this);
 	m_6015_timer->adjust(attotime::never);
@@ -160,13 +160,10 @@ void msc_device::device_reset()
 	space.install_rom(0x00000000, memory_end & ~memory_mirror, memory_mirror, m_rom_ptr);
 }
 
-void msc_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void msc_device::sound_stream_update(sound_stream &stream)
 {
-	for (int i = 0; i < inputs[0].samples(); i++)
-	{
-		outputs[0].put(i, inputs[0].get(i));
-		outputs[1].put(i, inputs[1].get(i));
-	}
+	stream.copy(0, 0);
+	stream.copy(1, 1);
 }
 
 u32 msc_device::rom_switch_r(offs_t offset)

@@ -27,14 +27,14 @@ TODO:
   per segment, adding pwm_display_device right now has no added value
 - add nstarfox sound effect chip emulation
 - naltair IPT_DIAL should be 1-way, it's not supposed to rotate left
-- add svg screen for nsmb3, nsmw
 - Currently there is no accurate way to dump the SM511/SM512 melody ROM
   electronically. For the ones that weren't decapped, they were read by
   playing back all melody data and reconstructing it to ROM. Visual(decap)
   verification is wanted for: bassmate, gnw_bfightn, gnw_bjack, gnw_bsweep,
   gnw_climbern, gnw_dkcirc, gnw_dkhockey, gnw_dkjrp, gnw_dkong3, gnw_gcliff,
   gnw_mariocmt, gnw_mariocmta, gnw_mariotj, gnw_mbaway, gnw_mmousep,
-  gnw_pinball, gnw_popeyep, gnw_sbuster, gnw_snoopyp, gnw_zelda, trspacadv
+  gnw_pinball, gnw_popeyep, gnw_sbuster, gnw_snoopyp, gnw_zelda, trtreisl,
+  trspacadv, vesarif, uchitari
 
 ================================================================================
 
@@ -139,7 +139,7 @@ Fire(FR-27), Octopus, Chef, Egg/Mickey Mouse, Donkey Kong Jr.(CJ-93),
 Spitball Sparky.
 
 The MCUs used were not imported from Sharp, but cloned by USSR, renamed to
-КБ1013ВК1-2 for SM5A and КБ1013ВК4-2 for SM510.
+КБ1013ВК1-2 for SM5A, КБ1013ВК4-2 for SM510 and КБ1013ВК7-2 for SM511.
 
 *******************************************************************************/
 
@@ -484,9 +484,9 @@ void hh_sm510_state::sm510_dualh(machine_config &config, u16 leftwidth, u16 left
 	config.set_default_layout(layout_hh_sm510_dualh);
 }
 
-void hh_sm510_state::sm510_tripleh(machine_config &config, u16 leftwidth, u16 leftheight, u16 middlewidth, u16 middleheight, u16 rightwidth, u16 rightheight)
+void hh_sm510_state::sm511_tripleh(machine_config &config, u16 leftwidth, u16 leftheight, u16 middlewidth, u16 middleheight, u16 rightwidth, u16 rightheight)
 {
-	mcfg_cpu_sm510(config);
+	mcfg_cpu_sm511(config);
 	mcfg_sound_r1(config);
 	mcfg_svg_screen(config, leftwidth, leftheight, "screen_left");
 	mcfg_svg_screen(config, middlewidth, middleheight, "screen_middle");
@@ -3208,6 +3208,11 @@ ROM_END
 
   The tabletop version was also licensed to Coleco.
 
+  Also cloned by Elektronika(USSR) as Винни-Пух (Vinni-Pukh, i.e. Winnie the
+  Pooh) (model ИМ-12), with different LCD graphics.
+  * КБ1515ХМ3-2 9009 (no decap); seems to be compatible with КБ1013ВК7-2
+    which in turn is compatible with Sharp SM511 (same ROM contents as CJ-93)
+
 *******************************************************************************/
 
 class gnw_dkjrp_state : public hh_sm510_state
@@ -3218,6 +3223,7 @@ public:
 	{ }
 
 	void gnw_dkjrp(machine_config &config);
+	void vinnpukh(machine_config &config);
 };
 
 // inputs
@@ -3260,6 +3266,11 @@ void gnw_dkjrp_state::gnw_dkjrp(machine_config &config)
 	sm511_common(config, 1920, 1049);
 }
 
+void gnw_dkjrp_state::vinnpukh(machine_config &config)
+{
+	sm511_common(config, 1890, 1080); // 1638 x 936
+}
+
 // roms
 
 ROM_START( gnw_dkjrp )
@@ -3267,10 +3278,21 @@ ROM_START( gnw_dkjrp )
 	ROM_LOAD( "cj-93.program", 0x0000, 0x1000, CRC(a2cd5a91) SHA1(33f6fd1530e5522491851f16d7c9f928b2dbdc3b) )
 
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "cj-93.melody", 0x000, 0x100, BAD_DUMP CRC(99fbf76a) SHA1(15ba1af51bebc316146eb9a0a3d58d28f644d45f) ) // decap needed for verification
+	ROM_LOAD( "cj-93.melody", 0x000, 0x100, BAD_DUMP CRC(38946be7) SHA1(affdb8514d32dc9dbf2ccc1c4a0394e68ebc61cb) ) // decap needed for verification
 
 	ROM_REGION( 340751, "screen", 0)
 	ROM_LOAD( "gnw_dkjrp.svg", 0, 340751, CRC(eb3cb98b) SHA1(5b148557d3ade2e2050ddde879a6cc05e119b446) )
+ROM_END
+
+ROM_START( vinnpukh )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "vinnpukh.program", 0x0000, 0x1000, CRC(a2cd5a91) SHA1(33f6fd1530e5522491851f16d7c9f928b2dbdc3b) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "vinnpukh.melody", 0x000, 0x100, BAD_DUMP CRC(38946be7) SHA1(affdb8514d32dc9dbf2ccc1c4a0394e68ebc61cb) ) // decap needed for verification
+
+	ROM_REGION( 193376, "screen", 0)
+	ROM_LOAD( "vinnpukh.svg", 0, 193376, CRC(69c4e5c5) SHA1(313f164706c3d24e2fc1363ff9730a21e5b1ca6c) )
 ROM_END
 
 
@@ -4525,7 +4547,7 @@ ROM_END
   * KB1013VK1-2 MCU
   * lcd screen with custom segments, 1-bit sound
 
-  In 1984, Электроника (Elektronika, USSR) released an unlicensed clone of
+  In 1983, Электроника (Elektronika, USSR) released an unlicensed clone of
   Nintendo G&W Egg: Ну, погоди! (Nu, pogodi!). This was followed by several other
   titles that were the same under the hood, only differing in graphics. They also
   made a slightly modified version, adding a new game mode (by pressing A+B)
@@ -4555,7 +4577,7 @@ ROM_END
   ИМ-32    Кот-рыболов         Kot-rybolov          -                   -
   ИМ-33    Квака-задавака      Kvaka-zadavaka       Frogling            -
   ИМ-49    Ночные воришки      Nochnye vorishki     Night Burglars      -
-  ИМ-50    Космический полёт   Kosmicheskiy polyot  Space Flight        Same Model ID as Весёлая арифметика (Amusing Arithmetic) which isn't emulated yet
+  ИМ-50    Космический полёт   Kosmicheskiy polyot  Space Flight        Same Model ID as Весёлая арифметика (Amusing Arithmetic)
   ИМ-51    Морская атака       Morskaya ataka       -                   -
   ИМ-53    Атака астероидов    Ataka asteroidov     -                   Graphics are very similar to ИМ-50
   -        Цирк                Circus (Tsirk)       -                   Unknown Model ID
@@ -4952,6 +4974,183 @@ void elbaskb_state::elbaskb(machine_config &config)
 ROM_START( elbaskb )
 	ROM_REGION( 0x800, "maincpu", 0 )
 	ROM_LOAD( "im-55.bin", 0x0000, 0x0740, CRC(006f82d0) SHA1(aca582dcb387345cd09a08e42a954c43430772fc) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Elektronika Весёлая арифметика (model ИМ-50) or Amusing Arithmetic (export
+  version, model MG-50)
+  * КБ1515ХМ3-2 9202 006 (no decap); seems to be compatible with КБ1013ВК7-2
+    which in turn is compatible with Sharp SM511
+  * lcd screen with custom segments, 1-bit sound
+  * ROM signature: ALEXANDER GAGANOV, USSR, MOSCOW, 1990
+
+*******************************************************************************/
+
+class vesarif_state : public hh_sm510_state
+{
+public:
+	vesarif_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void vesarif(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( vesarif )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Start")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_DOWN ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_CHANGED_CB(input_changed) PORT_16WAY
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+// config
+
+void vesarif_state::vesarif(machine_config &config)
+{
+	sm511_common(config, 1672, 1080); // 1326 x 856
+}
+
+// roms
+
+ROM_START( vesarif )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "vesarif.program", 0x0000, 0x1000, CRC(ae9053ef) SHA1(40dcda3616c9f430e04e20aef22e7db6b2b94f37) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "vesarif.melody", 0x000, 0x100, BAD_DUMP CRC(28fb8872) SHA1(18db11d27d8af2fddf8bba8080e05e2fa50b8215) ) // decap needed for verification
+
+	ROM_REGION( 81240, "screen", 0)
+	ROM_LOAD( "vesarif.svg", 0, 81240, CRC(27121109) SHA1(63d53e5718b1a014a5cfd7dffa5cb17469fa3182) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Elektronika Учитель арифметики(?) (Uchitel' arifmetiki(?), model ???)
+  * КБ1515ХМ3-2 9108 001 (no decap); seems to be compatible with КБ1013ВК7-2
+    which in turn is compatible with Sharp SM511
+  * lcd screen with custom segments, 1-bit sound
+  * ROM signature: ALEXANDER GAGANOV USSR, MOSCOW
+
+  There is no evidence of a real unit yet. Only two hardware parts are
+  available at the moment: PCB with chip, and LCD (in fact, there must have been
+  two PCBs; the other one was for the keypad, battery compartment and speaker).
+  Both parts were found in ruins of the factory in Vinnytsia (Ukraine) formerly
+  producing LCD games.
+
+  As the device did not come into mass production, it's considered to be
+  just a prototype. The game title is not fully determined. There is a reference
+  to a game called "Учитель арифметики" in the Микропроцессорные средства и
+  системы magazine (year 1990, number 4, page 38), and this reference was
+  taken as the most probable name for this game.
+
+*******************************************************************************/
+
+class uchitari_state : public hh_sm510_state
+{
+public:
+	uchitari_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void uchitari(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( uchitari )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("Evaluate Entry")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_S) PORT_CHANGED_CB(input_changed) PORT_NAME("Start Exam")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_CHANGED_CB(input_changed) PORT_NAME("Evaluate Division Entries")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_M) PORT_CHANGED_CB(input_changed) PORT_NAME("Mode")
+	PORT_BIT( 0x04, 0x04, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x30, NOTEQUALS, 0x00) // Alarm / Exam Level
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, 0x01, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x03, NOTEQUALS, 0x00) // "0"/Minute
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_CHANGED_CB(input_changed) PORT_NAME("Clear entry / Correction")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("5")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // S4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("6")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("+")
+	PORT_BIT( 0x04, 0x04, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x0c, NOTEQUALS, 0x00) // "1"/Hour
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.4") // S5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("7")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("-")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("2")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.5") // S6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("8")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"×")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.6") // S7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("9")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"÷")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("4")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_ON ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("FAKE") // some of the buttons are presumed to be physically separate but electronically the same
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("0")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_RIGHT) PORT_CHANGED_CB(input_changed) PORT_NAME("Minute")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CHANGED_CB(input_changed) PORT_NAME("1")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_LEFT) PORT_CHANGED_CB(input_changed) PORT_NAME("Hour")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_A) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_L) PORT_CHANGED_CB(input_changed) PORT_NAME("Exam Level")
+INPUT_PORTS_END
+
+// config
+
+void uchitari_state::uchitari(machine_config &config)
+{
+	sm511_common(config, 1520, 1080); // 1341 x 953
+}
+
+// roms
+
+ROM_START( uchitari )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "uchitari.program", 0x0000, 0x1000, CRC(1d2d7abb) SHA1(10d90f63813cddc5c986ed3942c64ee6d67f545e) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "uchitari.melody", 0x000, 0x100, BAD_DUMP CRC(28041942) SHA1(a36e246b215499b7392c28fddf1aad499016a480) ) // decap needed for verification
+
+	ROM_REGION( 98294, "screen", 0)
+	ROM_LOAD( "uchitari.svg", 0, 98294, CRC(f84b9d59) SHA1(a05713d571824d11f037b7592c0d280e418dc8b3) )
 ROM_END
 
 
@@ -6440,13 +6639,13 @@ INPUT_PORTS_END
 
 void gamewatch_state::nsmb3(machine_config &config)
 {
-	sm530_common(config, 1000, 1000);
+	sm530_common(config, 1203, 1080);
 	config.set_default_layout(layout_hh_sm500_test);
 }
 
 void gamewatch_state::nsmw(machine_config &config)
 {
-	sm530_common(config, 1000, 1000);
+	sm530_common(config, 1190, 1080);
 	config.set_default_layout(layout_hh_sm500_test);
 }
 
@@ -6459,8 +6658,8 @@ ROM_START( nsmb3 )
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "633.melody", 0x000, 0x100, CRC(98340c46) SHA1(94b5865fc669b7f6487845647866c06f4f581f63) )
 
-	ROM_REGION( 100000, "screen", 0)
-	ROM_LOAD( "nsmb3.svg", 0, 100000, NO_DUMP )
+	ROM_REGION( 373935, "screen", 0)
+	ROM_LOAD( "nsmb3.svg", 0, 373935, CRC(d3dd4ef9) SHA1(2e95bdf55b8ba050efbd8fd27442a1872d93685f) )
 ROM_END
 
 ROM_START( nsmw )
@@ -6470,8 +6669,8 @@ ROM_START( nsmw )
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
 	ROM_LOAD( "636.melody", 0x000, 0x100, CRC(5df99e13) SHA1(98d5f78b5bcf59a232ccb5c61210568948c4501b) )
 
-	ROM_REGION( 100000, "screen", 0)
-	ROM_LOAD( "nsmw.svg", 0, 100000, NO_DUMP )
+	ROM_REGION( 401273, "screen", 0)
+	ROM_LOAD( "nsmw.svg", 0, 401273, CRC(72cb618d) SHA1(cecf9bb7ad21896c9a68ca606359f2b6f9c08d5d) )
 ROM_END
 
 
@@ -11817,6 +12016,96 @@ ROM_END
 
 /*******************************************************************************
 
+  Tronica Treasure Island (model TI-31)
+  * PCB labels: TI-31 160383 32-537-1
+  * Sharp SM511 label 1113 239B TRONICA (no decap)
+  * horizontal triple lcd screens with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class trtreisl_state : public hh_sm510_state
+{
+public:
+	trtreisl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void trtreisl(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( trtreisl )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, 0x01, IPT_CUSTOM ) PORT_CONDITION("FAKE", 0x03, NOTEQUALS, 0x00) // Button/Hour
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_CHANGED_CB(input_changed)
+
+	PORT_START("IN.2") // S3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE4 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Min")
+	PORT_BIT( 0x0e, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // S4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Alarm")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game A")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Game B")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME("Time")
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+
+	PORT_START("B")
+	PORT_CONFNAME( 0x01, 0x00, "Infinite Lives (Cheat)" ) // factory test, unpopulated on PCB
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+
+	PORT_START("BA")
+	PORT_CONFNAME( 0x01, 0x00, "Score Booster (Cheat)" ) // factory test, unpopulated on PCB -- this one multiplies scoring factor with 10
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+
+	PORT_START("FAKE") // SJP and Hour are electronically the same button
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Start/Jump/Pick")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE3 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Hour")
+INPUT_PORTS_END
+
+// config
+
+void trtreisl_state::trtreisl(machine_config &config)
+{
+	sm511_tripleh(config, 525, 675, 870, 675, 525, 675); // 1555 x 547
+}
+
+// roms
+
+ROM_START( trtreisl )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "1113_239b.program", 0x0000, 0x1000, CRC(fec16266) SHA1(f2725a077cff9dbed9cd324ff802d10dcbdb4451) )
+
+	ROM_REGION( 0x100, "maincpu:melody", 0 )
+	ROM_LOAD( "1113_239b.melody", 0x000, 0x100, BAD_DUMP CRC(2de3f974) SHA1(17e7a3947a457580efefa544c3132e93e20cbc71) ) // decap needed for verification
+
+	ROM_REGION( 59803, "screen_left", 0)
+	ROM_LOAD( "trtreisl_left.svg", 0, 59803, CRC(92f5f11e) SHA1(fdf8edf7742d2e0d2893e2226872c897e966f64e) )
+
+	ROM_REGION( 94316, "screen_middle", 0)
+	ROM_LOAD( "trtreisl_middle.svg", 0, 94316, CRC(adcf5308) SHA1(0c7932e4ba7a3daba24f0ff385c21035b86f4e23) )
+
+	ROM_REGION( 46905, "screen_right", 0)
+	ROM_LOAD( "trtreisl_right.svg", 0, 46905, CRC(26e6b4bd) SHA1(7469f2d5291f20621dc3f2b7f260cf4b4681f95b) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
   Tronica: Diver's Adventure (model DA-37), Clever Chicken (model CC-38V)
   * PCB labels: DA-37 260383 32-541-1 (DA-37)
                 CC38V 210483 32-545-1 (CC-38V)
@@ -12089,7 +12378,7 @@ SYST( 1984, bassmate,     0,           0,      bassmate,     bassmate,     bassm
 // Elektronika (G&W clones)
 SYST( 1988, taynyoke,     gnw_octopus, 0,      taynyoke,     gnw_octopus,  gnw_octopus_state,  empty_init, "bootleg (Elektronika)", "Tayny okeana", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1989, vespovar,     gnw_chef,    0,      vespovar,     gnw_chef,     gnw_chef_state,     empty_init, "bootleg (Elektronika)", "Vesyolyy povar", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
-SYST( 1984, nupogodi,     gnw_mmouse,  0,      nupogodi,     gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1983, nupogodi,     gnw_mmouse,  0,      nupogodi,     gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Nu, pogodi!", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1988, ehockey,      gnw_mmouse,  0,      ehockey,      gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Hockey (Elektronika)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1989, rkosmosa,     gnw_mmouse,  0,      rkosmosa,     rkosmosa,     nupogodi_state,     empty_init, "bootleg (Elektronika)", "Razvedchiki kosmosa", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1989, okhota,       gnw_mmouse,  0,      okhota,       gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Okhota", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
@@ -12104,10 +12393,13 @@ SYST( 1992, atakaast,     gnw_mmouse,  0,      atakaast,     gnw_mmouse,   nupog
 SYST( 19??, ecircus,      gnw_mmouse,  0,      ecircus,      gnw_mmouse,   nupogodi_state,     empty_init, "bootleg (Elektronika)", "Circus (Elektronika)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, naltair,      gnw_mmouse,  0,      vfutbol,      naltair,      nupogodi_state,     empty_init, "bootleg (Nauchpribor)", "Altair (Nauchpribor)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_CONTROLS )
 SYST( 1989, kosmicmt,     gnw_fire,    0,      kosmicmt,     gnw_fire,     gnw_fire_state,     empty_init, "bootleg (Elektronika)", "Kosmicheskiy most", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 199?, vinnpukh,     gnw_dkjrp,   0,      vinnpukh,     gnw_dkjrp,    gnw_dkjrp_state,    empty_init, "bootleg (Elektronika)", "Vinni-Pukh", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // Elektronika (original)
 SYST( 1990, auslalom,     0,           0,      auslalom,     auslalom,     auslalom_state,     empty_init, "Elektronika", "Autoslalom", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 199?, elbaskb,      0,           0,      elbaskb,      elbaskb,      elbaskb_state,      empty_init, "Elektronika", "Basketbol (Elektronika)", MACHINE_SUPPORTS_SAVE )
+SYST( 1992, vesarif,      0,           0,      vesarif,      vesarif,      vesarif_state,      empty_init, "Elektronika", "Vesolaya arifmetika", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, uchitari,     0,           0,      uchitari,     uchitari,     uchitari_state,     empty_init, "Elektronika", "Uchitel' arifmetiki (prototype?)", MACHINE_SUPPORTS_SAVE )
 
 // Konami
 SYST( 1989, kdribble,     0,           0,      kdribble,     kdribble,     kdribble_state,     empty_init, "Konami", "Double Dribble (handheld)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
@@ -12132,8 +12424,8 @@ SYST( 1991, kbucky,       0,           0,      kbucky,       kbucky,       kbuck
 SYST( 1991, kgarfld,      0,           0,      kgarfld,      kgarfld,      kgarfld_state,      empty_init, "Konami", "Garfield (Konami)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
 // Nelsonic Game Watch series
-SYST( 1990, nsmb3,        0,           0,      nsmb3,        gamewatch,    gamewatch_state,    empty_init, "Nelsonic", "Super Mario Bros. 3 (Nelsonic)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
-SYST( 1991, nsmw,         0,           0,      nsmw,         gamewatch,    gamewatch_state,    empty_init, "Nelsonic", "Super Mario World (Nelsonic)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
+SYST( 1990, nsmb3,        0,           0,      nsmb3,        gamewatch,    gamewatch_state,    empty_init, "Nelsonic", "Super Mario Bros. 3 (Nelsonic)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1991, nsmw,         0,           0,      nsmw,         gamewatch,    gamewatch_state,    empty_init, "Nelsonic", "Super Mario World (Nelsonic)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1993, nstarfox,     0,           0,      nstarfox,     nstarfox,     nstarfox_state,     empty_init, "Nelsonic", "Star Fox (Nelsonic)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_IMPERFECT_SOUND )
 
 // Tiger 7-xxx/78-xxx models
@@ -12207,6 +12499,7 @@ SYST( 1983, trsgkeep,     0,           0,      trsgkeep,     trsgkeep,     trsgk
 SYST( 1982, trspacmis,    0,           0,      trspacmis,    trspacmis,    trspacmis_state,    empty_init, "Tronica", "Space Mission (Tronica)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1982, trspider,     trspacmis,   0,      trspider,     trspacmis,    trspacmis_state,    empty_init, "Tronica", "Spider (Tronica)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1982, trspacadv,    0,           0,      trspacadv,    trspacadv,    trspacadv_state,    empty_init, "Tronica", "Space Adventure", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+SYST( 1983, trtreisl,     0,           0,      trtreisl,     trtreisl,     trtreisl_state,     empty_init, "Tronica", "Treasure Island (Tronica)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1983, trdivadv,     0,           0,      trdivadv,     trdivadv,     trdivadv_state,     empty_init, "Tronica", "Diver's Adventure", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1983, trclchick,    trdivadv,    0,      trclchick,    trclchick,    trdivadv_state,     empty_init, "Tronica", "Clever Chicken", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 

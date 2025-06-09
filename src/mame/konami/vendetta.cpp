@@ -646,14 +646,13 @@ void vendetta_state::vendetta(machine_config &config)
 	K054000(config, m_k054000, 0);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "lspeaker", 0.5).add_route(1, "rspeaker", 0.5); // verified with PCB
+	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "speaker", 0.5, 0).add_route(1, "speaker", 0.5, 1); // verified with PCB
 
 	k053260_device &k053260(K053260(config, "k053260", XTAL(3'579'545))); // verified with PCB
-	k053260.add_route(0, "lspeaker", 0.75);
-	k053260.add_route(1, "rspeaker", 0.75);
+	k053260.add_route(0, "speaker", 0.75, 0);
+	k053260.add_route(1, "speaker", 0.75, 1);
 	k053260.sh1_cb().set(FUNC(vendetta_state::z80_nmi_w));
 }
 

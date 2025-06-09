@@ -297,12 +297,14 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD { exidy_state::machine_reset(); init_tonegen(); }
 
 	void set_max_freq(int freq) { m_max_freq = freq; }
 
 	void spectar_audio_1_w(uint8_t data);
 	void spectar_audio_2_w(uint8_t data);
 
+	void init_tonegen();
 	void adjust_sample(uint8_t freq);
 	bool RISING_EDGE(uint8_t data, uint8_t bit) const { return (data & bit) && !(m_port_1_last & bit); }
 	bool FALLING_EDGE(uint8_t data, uint8_t bit) const { return !(data & bit) && (m_port_1_last & bit); }
@@ -842,10 +844,10 @@ static INPUT_PORTS_START( venture )
 	PORT_DIPSETTING(    0x02, "30000" )
 	PORT_DIPSETTING(    0x04, "40000" )
 	PORT_DIPSETTING(    0x06, "50000" )
-	PORT_DIPNAME( 0x98, 0x80, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:4,5,8")
+	PORT_DIPNAME( 0x98, 0x90, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:4,5,8")
 	PORT_DIPSETTING(    0x88, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_1C ) )
-	/*0x90 same as 0x80 */
+	PORT_DIPSETTING(    0x90, DEF_STR( 1C_1C ) ) // this is the 1 coin/1 credit setting shown in the manual
 	PORT_DIPSETTING(    0x98, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x00, "Pence: A 2C/1C B 1C/3C" )
 	PORT_DIPSETTING(    0x18, "Pence: A 1C/1C B 1C/6C" )
@@ -1469,14 +1471,6 @@ void spectar_state::machine_start()
 {
 	exidy_state::machine_start();
 
-	/* start_raw can't be called here: chan.source will be set by
-	samples_device::device_start and then nulled out by samples_device::device_reset
-	at the soft_reset stage of init_machine() and will never be set again.
-	Thus, I've moved it to exidy_state::adjust_sample() were it will be set after
-	machine initialization. */
-	//m_samples->set_volume(3, 0);
-	//m_samples->start_raw(3, sine_wave, 32, 1000, true);
-
 	save_item(NAME(m_port_1_last));
 	save_item(NAME(m_tone_freq));
 	save_item(NAME(m_tone_active));
@@ -1700,28 +1694,34 @@ void fax_state::fax(machine_config &config)
 *************************************************************************/
 
 /* Sound channel usage
-   0 = CPU music,  Shoot
+   0 = CPU music, Shoot
    1 = Crash
    2 = Spectar sound
    3 = Tone generator
 */
 
-static const int16_t sine_wave[32] =
+void spectar_state::init_tonegen()
 {
-	 0x0f0f,  0x0f0f,  0x0f0f,  0x0606,  0x0606,  0x0909,  0x0909,  0x0606,  0x0606,  0x0909,  0x0606,  0x0d0d,  0x0f0f,  0x0f0f,  0x0d0d,  0x0000,
-	-0x191a, -0x2122, -0x1e1f, -0x191a, -0x1314, -0x191a, -0x1819, -0x1819, -0x1819, -0x1314, -0x1314, -0x1314, -0x1819, -0x1e1f, -0x1e1f, -0x1819
-};
+	static const int16_t sine_wave[32] =
+	{
+		0x0f0f,  0x0f0f,  0x0f0f,  0x0606,  0x0606,  0x0909,  0x0909,  0x0606,
+		0x0606,  0x0909,  0x0606,  0x0d0d,  0x0f0f,  0x0f0f,  0x0d0d,  0x0000,
+		-0x191a, -0x2122, -0x1e1f, -0x191a, -0x1314, -0x191a, -0x1819, -0x1819,
+		-0x1819, -0x1314, -0x1314, -0x1314, -0x1819, -0x1e1f, -0x1e1f, -0x1819
+	};
+
+	// initialized after samples_device::device_reset
+	if (!m_samples->playing(3))
+	{
+		m_samples->set_volume(3, 0);
+		m_samples->start_raw(3, sine_wave, 32, m_max_freq, true);
+	}
+}
 
 
 void spectar_state::adjust_sample(uint8_t freq)
 {
 	m_tone_freq = freq;
-
-	if (!m_samples->playing(3))
-	{
-		m_samples->set_volume(3, 0);
-		m_samples->start_raw(3, sine_wave, 32, 1000, true);
-	}
 
 	if ((m_tone_freq == 0xff) || (m_tone_freq == 0x00))
 		m_samples->set_volume(3, 0);

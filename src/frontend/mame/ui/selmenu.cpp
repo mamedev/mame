@@ -222,6 +222,7 @@ template void menu_select_launch::draw_left_panel<software_filter>(u32 flags, so
 
 menu_select_launch::system_flags::system_flags(machine_static_info const &info)
 	: m_machine_flags(info.machine_flags())
+	, m_emulation_flags(info.emulation_flags())
 	, m_unemulated_features(info.unemulated_features())
 	, m_imperfect_features(info.imperfect_features())
 	, m_has_keyboard(info.has_keyboard())
@@ -873,7 +874,7 @@ void menu_select_launch::custom_render(uint32_t flags, void *selectedref, float 
 
 		// next line is overall driver status
 		system_flags const &flags(get_system_flags(driver));
-		if (flags.machine_flags() & machine_flags::NOT_WORKING)
+		if (flags.emulation_flags() & device_t::flags::NOT_WORKING)
 			tempbuf[2] = _("Status: NOT WORKING");
 		else if ((flags.unemulated_features() | flags.imperfect_features()) & device_t::feature::PROTECTION)
 			tempbuf[2] = _("Status: Unemulated Protection");
@@ -3881,7 +3882,8 @@ std::string menu_select_launch::make_system_audit_fail_text(media_auditor const 
 		osd_printf_info(str.str());
 		str.str("");
 	}
-	str << _("Required ROM/disk images for the selected system are missing or incorrect. Please acquire the correct files or select a different system.\n\n");
+	str << util::string_format(_("Required ROM/disk images for the selected system are missing or incorrect.\nPlease acquire the correct file(s) applicable to %1$s %2$s, or select a different system.\n\n"),
+			emulator_info::get_appname(), bare_build_version);
 	make_audit_fail_text(str, auditor, summary);
 	return str.str();
 }
@@ -3897,7 +3899,8 @@ std::string menu_select_launch::make_software_audit_fail_text(media_auditor cons
 		osd_printf_info(str.str());
 		str.str("");
 	}
-	str << _("Required ROM/disk images for the selected software are missing or incorrect. Please acquire the correct files or select a different software item.\n\n");
+	str << util::string_format(_("Required ROM/disk images for the selected software are missing or incorrect.\nPlease acquire the correct file(s) applicable to %1$s %2$s, or select a different software item.\n\n"),
+			emulator_info::get_appname(), bare_build_version);
 	make_audit_fail_text(str, auditor, summary);
 	return str.str();
 }
@@ -4150,7 +4153,7 @@ void menu_select_launch::general_info(ui_system_info const *system, game_driver 
 	if (flags.has_keyboard())
 		str << _("Keyboard Inputs\tYes\n");
 
-	if (flags.machine_flags() & machine_flags::NOT_WORKING)
+	if (flags.emulation_flags() & device_t::flags::NOT_WORKING)
 		str << _("Overall\tNOT WORKING\n");
 	else if ((flags.unemulated_features() | flags.imperfect_features()) & device_t::feature::PROTECTION)
 		str << _("Overall\tUnemulated Protection\n");
@@ -4262,13 +4265,13 @@ void menu_select_launch::general_info(ui_system_info const *system, game_driver 
 	else if (flags.imperfect_features() & device_t::feature::TIMING)
 		str << _("Timing\tImperfect\n");
 
-	str << ((flags.machine_flags() & machine_flags::MECHANICAL)        ? _("Mechanical System\tYes\n")          : _("Mechanical System\tNo\n"));
-	str << ((flags.machine_flags() & machine_flags::REQUIRES_ARTWORK)  ? _("Requires Artwork\tYes\n")           : _("Requires Artwork\tNo\n"));
+	str << ((flags.machine_flags() & machine_flags::MECHANICAL)           ? _("Mechanical System\tYes\n")          : _("Mechanical System\tNo\n"));
+	str << ((flags.machine_flags() & machine_flags::REQUIRES_ARTWORK)     ? _("Requires Artwork\tYes\n")           : _("Requires Artwork\tNo\n"));
 	if (flags.machine_flags() & machine_flags::NO_COCKTAIL)
 		str << _("Support Cocktail\tNo\n");
-	str << ((flags.machine_flags() & machine_flags::IS_BIOS_ROOT)      ? _("System is BIOS\tYes\n")             : _("System is BIOS\tNo\n"));
-	str << ((flags.machine_flags() & machine_flags::SUPPORTS_SAVE)     ? _("Support Save\tYes\n")               : _("Support Save\tNo\n"));
-	str << ((flags.machine_flags() & ORIENTATION_SWAP_XY)              ? _("Screen Orientation\tVertical\n")    : _("Screen Orientation\tHorizontal\n"));
+	str << ((flags.machine_flags() & machine_flags::IS_BIOS_ROOT)         ? _("System is BIOS\tYes\n")             : _("System is BIOS\tNo\n"));
+	str << ((flags.emulation_flags() & device_t::flags::SAVE_UNSUPPORTED) ? _("Support Save\tNo\n")                : _("Support Save\tYes\n"));
+	str << ((flags.machine_flags() & ORIENTATION_SWAP_XY)                 ? _("Screen Orientation\tVertical\n")    : _("Screen Orientation\tHorizontal\n"));
 	bool found = false;
 	for (romload::region const &region : romload::entries(driver.rom).get_regions())
 	{

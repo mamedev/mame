@@ -164,15 +164,15 @@ public:
 	{
 	}
 
-	void mac512ke(machine_config &config);
-	void mac128k(machine_config &config);
-	void mac512k(machine_config &config);
-	void macplus(machine_config &config);
-	void macse(machine_config &config);
-	void macsefd(machine_config &config);
-	void macclasc(machine_config &config);
+	void mac512ke(machine_config &config) ATTR_COLD;
+	void mac128k(machine_config &config) ATTR_COLD;
+	void mac512k(machine_config &config) ATTR_COLD;
+	void macplus(machine_config &config) ATTR_COLD;
+	void macse(machine_config &config) ATTR_COLD;
+	void macsefd(machine_config &config) ATTR_COLD;
+	void macclasc(machine_config &config) ATTR_COLD;
 
-	void mac_driver_init();
+	void mac_driver_init() ATTR_COLD;
 
 private:
 	required_device<m68000_device> m_maincpu;
@@ -1125,9 +1125,9 @@ void mac128_state::mac512ke(machine_config &config)
 	MACPDS_SLOT(config, "pds", "macpds", mac_pds_cards, nullptr);
 
 	// software list
-	SOFTWARE_LIST(config, "flop_mac35_orig").set_original("mac_flop_orig");
-	SOFTWARE_LIST(config, "flop_mac35_clean").set_original("mac_flop_clcracked");
-	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop");
+	SOFTWARE_LIST(config, "flop_mac35_orig").set_original("mac_flop_orig").set_filter("MC68000,mac512ke");
+	SOFTWARE_LIST(config, "flop_mac35_clean").set_original("mac_flop_clcracked").set_filter("MC68000,mac512ke");
+	SOFTWARE_LIST(config, "flop35_list").set_original("mac_flop").set_filter("MC68000,mac512ke");
 }
 
 void mac128_state::mac128k(machine_config &config)
@@ -1143,12 +1143,20 @@ void mac128_state::mac128k(machine_config &config)
 
 	applefdintf_device::add_35_sd(config, m_floppy[0]);
 	applefdintf_device::add_35_sd(config, m_floppy[1]);
+
+	subdevice<software_list_device>("flop_mac35_orig")->set_filter("MC68000,mac128k");
+	subdevice<software_list_device>("flop_mac35_clean")->set_filter("MC68000,mac128k");
+	subdevice<software_list_device>("flop35_list")->set_filter("MC68000,mac128k");
 }
 
 void mac128_state::mac512k(machine_config &config)
 {
 	mac128k(config);
 	m_ram->set_default_size("512K");
+
+	subdevice<software_list_device>("flop_mac35_orig")->set_filter("MC68000,mac512k");
+	subdevice<software_list_device>("flop_mac35_clean")->set_filter("MC68000,mac512k");
+	subdevice<software_list_device>("flop35_list")->set_filter("MC68000,mac512k");
 }
 
 void mac128_state::macplus(machine_config &config)
@@ -1161,8 +1169,7 @@ void mac128_state::macplus(machine_config &config)
 	// SCSI bus and devices
 	// These machines were strictly external CD-ROMs so sound didn't route back into them; the AppleCD SC had
 	// RCA jacks for connection to speakers/a stereo.
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speakers", 2).front();
 
 	NSCSI_BUS(config, m_scsibus);
 	NSCSI_CONNECTOR(config, "scsi:0", mac_scsi_devices, nullptr);
@@ -1171,8 +1178,8 @@ void mac128_state::macplus(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
 		[](device_t *device)
 		{
-			device->subdevice<cdda_device>("cdda")->add_route(0, "^^lspeaker", 1.0);
-			device->subdevice<cdda_device>("cdda")->add_route(1, "^^rspeaker", 1.0);
+			device->subdevice<cdda_device>("cdda")->add_route(0, "^^speakers", 1.0, 0);
+			device->subdevice<cdda_device>("cdda")->add_route(1, "^^speakers", 1.0, 1);
 		});
 	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
@@ -1183,8 +1190,11 @@ void mac128_state::macplus(machine_config &config)
 		adapter.drq_handler().set(*this, FUNC(mac128_state::scsi_drq_w));
 	});
 
-	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
-	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68000");
+	subdevice<software_list_device>("flop_mac35_orig")->set_filter("MC68000,macplus");
+	subdevice<software_list_device>("flop_mac35_clean")->set_filter("MC68000,macplus");
+	subdevice<software_list_device>("flop35_list")->set_filter("MC68000,macplus");
+	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd").set_filter("MC68000,macplus");
+	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68000,macplus");
 
 	/* internal ram */
 	m_ram->set_default_size("4M");
@@ -1199,6 +1209,7 @@ static void mac_sepds_cards(device_slot_interface &device)
 void mac128_state::macse(machine_config &config)
 {
 	macplus(config);
+
 	M68000(config.replace(), m_maincpu, C7M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac128_state::macse_map);
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
@@ -1250,6 +1261,12 @@ void mac128_state::macse(machine_config &config)
 
 	MACPDS(config, "sepds", "maincpu");
 	MACPDS_SLOT(config, "pds", "sepds", mac_sepds_cards, nullptr);
+
+	subdevice<software_list_device>("flop_mac35_orig")->set_filter("MC68000,macse");
+	subdevice<software_list_device>("flop_mac35_clean")->set_filter("MC68000,macse");
+	subdevice<software_list_device>("flop35_list")->set_filter("MC68000,macse");
+	subdevice<software_list_device>("hdd_list")->set_filter("MC68000,macse");
+	subdevice<software_list_device>("cd_list")->set_filter("MC68000,macse");
 }
 
 void mac128_state::macsefd(machine_config &config)
@@ -1263,7 +1280,7 @@ void mac128_state::macsefd(machine_config &config)
 	applefdintf_device::add_35_hd(config, m_floppy[0]);
 	applefdintf_device::add_35_hd(config, m_floppy[1]);
 
-	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop");
+	SOFTWARE_LIST(config, "flop35hd_list").set_original("mac_hdflop").set_filter("MC68000,macse");
 }
 
 void mac128_state::macclasc(machine_config &config)
@@ -1278,6 +1295,13 @@ void mac128_state::macclasc(machine_config &config)
 		adapter.irq_handler().set(*this, FUNC(mac128_state::scsi_irq_w));
 		adapter.drq_handler().set(m_scsihelp, FUNC(mac_scsi_helper_device::drq_w));
 	});
+
+	subdevice<software_list_device>("flop_mac35_orig")->set_filter("MC68000,macclasc");
+	subdevice<software_list_device>("flop_mac35_clean")->set_filter("MC68000,macclasc");
+	subdevice<software_list_device>("flop35_list")->set_filter("MC68000,macclasc");
+	subdevice<software_list_device>("hdd_list")->set_filter("MC68000,macclasc");
+	subdevice<software_list_device>("cd_list")->set_filter("MC68000,macclasc");
+	subdevice<software_list_device>("flop35hd_list")->set_filter("MC68000,macclasc");
 }
 
 static INPUT_PORTS_START( macplus )

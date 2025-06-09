@@ -101,8 +101,6 @@ private:
 	INTERRUPT_GEN_MEMBER(chloe_interrupt);
 
 	memory_access<8, 0, 0, ENDIANNESS_LITTLE>::specific m_uno_regs;
-	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
-	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
 	memory_bank_array_creator<8> m_bank_ram;
 	memory_view m_bank0_view, m_bank1_view;
 	required_device<address_map_bank_device> m_regs_map;
@@ -838,8 +836,6 @@ void chloe_state::machine_start()
 	m_irq_raster_off_timer = timer_alloc(FUNC(chloe_state::raster_irq_off), this);
 
 	m_regs_map->space(AS_PROGRAM).specific(m_uno_regs);
-	m_maincpu->space(AS_PROGRAM).specific(m_program);
-	m_maincpu->space(AS_IO).specific(m_io);
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -934,7 +930,6 @@ void chloe_state::chloe(machine_config &config)
 	m_maincpu->set_memory_map(&chloe_state::map_mem);
 	m_maincpu->set_io_map(&chloe_state::map_io);
 	m_maincpu->set_vblank_int("screen", FUNC(chloe_state::chloe_interrupt));
-	m_maincpu->nomreq_cb().set_nop();
 
 	ADDRESS_MAP_BANK(config, m_regs_map).set_map(&chloe_state::map_regs).set_options(ENDIANNESS_LITTLE, 8, 8, 0);
 
@@ -959,24 +954,23 @@ void chloe_state::chloe(machine_config &config)
 	PALETTE(config, m_palette, FUNC(chloe_state::spectrum_palette), 256);
 	SCREEN_ULA_PLUS(config, m_ula, 0).set_raster_offset(SCR_256x192.left(), SCR_256x192.top()).set_palette(m_palette->device().tag(), 0x000, 0x000);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker2", 2).front();
 
 	config.device_remove("ay8912");
 	AY8912(config, m_ay[0], 28_MHz_XTAL / 16)
-		.add_route(0, "lspeaker", 0.50)
-		.add_route(2, "lspeaker", 0.25)
-		.add_route(2, "rspeaker", 0.25)
-		.add_route(1, "rspeaker", 0.50);
+		.add_route(0, "speaker2", 0.50, 0)
+		.add_route(2, "speaker2", 0.25, 0)
+		.add_route(2, "speaker2", 0.25, 1)
+		.add_route(1, "speaker2", 0.50, 1);
 	AY8912(config, m_ay[1], 28_MHz_XTAL / 16)
-		.add_route(0, "lspeaker", 0.50)
-		.add_route(2, "lspeaker", 0.25)
-		.add_route(2, "rspeaker", 0.25)
-		.add_route(1, "rspeaker", 0.50);
+		.add_route(0, "speaker2", 0.50, 0)
+		.add_route(2, "speaker2", 0.25, 0)
+		.add_route(2, "speaker2", 0.25, 1)
+		.add_route(1, "speaker2", 0.50, 1);
 
 	DAC_8BIT_R2R(config, m_covox, 0)
-		.add_route(ALL_OUTPUTS, "lspeaker", 0.75)
-		.add_route(ALL_OUTPUTS, "rspeaker", 0.75);
+		.add_route(ALL_OUTPUTS, "speaker2", 0.75, 0)
+		.add_route(ALL_OUTPUTS, "speaker2", 0.75, 1);
 
 	KBDC8042(config, m_kbdc);
 	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_STANDARD);

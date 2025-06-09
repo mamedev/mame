@@ -448,6 +448,7 @@ void sis950_lpc_device::io_map(address_map &map)
 	);
 
 	// map(0x00e0, 0x00ef) MCA bus (cfr. Bochs) or PnP
+	map(0x00eb, 0x00eb).lw8(NAME([] (offs_t offset, u8 data) { }));
 
 	// map(0x00f0, 0x00f0) COPRO error
 	// map(0x0480, 0x048f) DMA high page registers

@@ -236,7 +236,7 @@ private:
 	u8 m_firq_timer_preset = 0xff;  // Preset for 40103 timer. Pulled high.
 	u8 m_selected_cv_in = 0x07;  // MUX A-C inputs. Pulled high.
 	bool m_inhibit_cv_in = true;  // MUX INHibit input. Pulled high.
-	std::array<bool, 4> m_haltreq = { false, false, false, false };	 // Halt request to the voice board (HALTREQ).
+	std::array<bool, 4> m_haltreq = { false, false, false, false };  // Halt request to the voice board (HALTREQ).
 	std::array<bool, 6> m_encoder_dir = { false, false, false, false, false, false };
 	std::array<bool, 6> m_encoder_changed = { false, false, false, false, false, false };
 	std::array<u64, 3> m_vfd_anode_masks = { 0, 0, 0 };
@@ -288,7 +288,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(xpander_state::firq_timer_elapsed)
 		// board). This also clears the grid mask as a side effect. See
 		// display_w() for more info.
 		for (int i = 0; i < m_vfd_devices.size(); ++i)
-			m_vfd_devices[i]->matrix(0, m_vfd_anode_masks[i]);
+			m_vfd_devices[i]->write_my(0);
 	}
 }
 
@@ -453,7 +453,7 @@ void xpander_state::haltset_w(u8 data)
 
 	// Bit 4: RES* (voice cpu reset).
 	const bool reset_voice = !BIT(data, 4);  // Active low.
-	const bool voice_resetting = (m_voicecpu->input_state(INPUT_LINE_RESET) == ASSERT_LINE);
+	const bool voice_resetting = (m_voicecpu->input_line_state(INPUT_LINE_RESET) == ASSERT_LINE);
 	if (reset_voice != voice_resetting)
 	{
 		m_voicecpu->set_input_line(INPUT_LINE_RESET, reset_voice ? ASSERT_LINE : CLEAR_LINE);
@@ -490,6 +490,7 @@ void xpander_state::display_w(offs_t offset, u8 data)
 			m_vfd_anode_masks[display] = (u16(data) << 8) | (m_vfd_anode_masks[display] & 0x00ff);
 		else
 			m_vfd_anode_masks[display] = (m_vfd_anode_masks[display] & 0xff00) | data;
+		m_vfd_devices[display]->write_mx(m_vfd_anode_masks[display]);
 	}
 
 	// An 74LS42 (U9), combined with 5 x 4028 (U2, U6, U8, U14, U18) form a
@@ -501,14 +502,9 @@ void xpander_state::display_w(offs_t offset, u8 data)
 	if (grid_enabled && grid_offset < 40)  // There are 40 grid signals.
 		grid_mask = u64(1) << grid_offset;
 
-	// Refresh VFD devices with the latest state.
+	// Refresh VFD devices with the latest grid mask.
 	for (int i = 0; i < m_vfd_devices.size(); ++i)
-		m_vfd_devices[i]->matrix(grid_mask, m_vfd_anode_masks[i]);
-
-	// Note that the output of U12 (anode select decoder), the grid mask, and
-	// the address driving it (A3-A8, U11, 74LS174) are latched until the next
-	// write, or until FIRQ is invoked. But there is no need to store state
-	// for these, the "matrix()" call above achieves the same, implicitly.
+		m_vfd_devices[i]->write_my(grid_mask);
 }
 
 void xpander_state::display_output_w(int display, offs_t offset, u32 data)

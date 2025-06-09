@@ -2629,19 +2629,27 @@ bool invaders_state::is_cabinet_cocktail()
 }
 
 
-void invaders_state::io_map(address_map &map)
+void invaders_state::io_map_noshift(address_map &map)
 {
 	map.global_mask(0x7);
 	map(0x00, 0x00).mirror(0x04).portr("IN0");
 	map(0x01, 0x01).mirror(0x04).portr("IN1");
 	map(0x02, 0x02).mirror(0x04).portr("IN2");
+
+	map(0x02, 0x02).nopw(); // galmonst has residual writes to this port
+	map(0x03, 0x03).w("soundboard", FUNC(invaders_audio_device::p1_w));
+	map(0x05, 0x05).w("soundboard", FUNC(invaders_audio_device::p2_w));
+	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
+}
+
+void invaders_state::io_map(address_map &map)
+{
+	io_map_noshift(map);
+
 	map(0x03, 0x03).mirror(0x04).r(m_mb14241, FUNC(mb14241_device::shift_result_r));
 
 	map(0x02, 0x02).w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x03, 0x03).w("soundboard", FUNC(invaders_audio_device::p1_w));
 	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
-	map(0x05, 0x05).w("soundboard", FUNC(invaders_audio_device::p2_w));
-	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));
 }
 
 
@@ -2726,6 +2734,22 @@ void invaders_state::invaders(machine_config &config)
 						if (is_cabinet_cocktail()) // the flip screen line is only connected on the cocktail PCB
 							m_flip_screen = state ? 1 : 0;
 					});
+}
+
+void invaders_state::invnomb(machine_config &config)
+{
+	invaders(config);
+
+	m_maincpu->set_addrmap(AS_IO, &invaders_state::io_map_noshift);
+
+	config.device_remove("mb14241");
+}
+
+void invaders_state::cosmicbat(machine_config &config)
+{
+	invaders(config);
+
+	m_maincpu->set_clock(20_MHz_XTAL / 10);
 }
 
 

@@ -223,13 +223,11 @@ private:
 	required_device<device_palette_interface> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 	tilemap_t *m_tilemap;
-	memory_region *m_rom;
 	memory_share_creator<u8> m_vram;
 	memory_share_creator<u8> m_fastram;
 	memory_bank_creator m_bank0_fastram;
 	memory_view m_bank_view0;
 	memory_view m_bank_view3;
-	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 	output_finder<> m_turbo_led;
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
@@ -909,7 +907,7 @@ void sprinter_state::accel_control_r(u8 data)
 				case 1: m_acc_dir = 0b00100101; break; // LD C,C % % fill by constant
 				case 2: m_acc_dir = 0b00001001; break; // LD D,D % % load count accelerator
 				case 3: m_acc_dir = 0b00010101; break; // LD E,E % % fill by constant VERTICAL
-				case 4: m_acc_dir = 0b01000001; break; // LD H,H % % duble byte fn
+				case 4: m_acc_dir = 0b01000001; break; // LD H,H % % double byte fn
 				case 5: m_acc_dir = 0b00100111; break; // LD L,L % % copy line
 				case 6: m_acc_dir = 0b00000000; break; // HALT
 				case 7: m_acc_dir = 0b00010111; break; // LD A,A % % copy line VERTICAL
@@ -1462,14 +1460,13 @@ void sprinter_state::machine_start()
 	m_beta->enable();
 
 	// reconfigure ROMs
-	m_rom = memregion("maincpu");
-	m_bank_rom[0]->configure_entries(0, m_rom->bytes() / 0x4000, m_rom->base(), 0x4000);
+	memory_region *rom = memregion("maincpu");
+	m_bank_rom[0]->configure_entries(0, rom->bytes() / 0x4000, rom->base(), 0x4000);
 	m_bank0_fastram->configure_entries(0, m_fastram.bytes() / 0x4000, m_fastram.target(), 0x4000);
 	for (auto i = 0; i < 4; i++)
 		m_bank_ram[i]->configure_entries(0, m_ram->size() / 0x4000, m_ram->pointer(), 0x4000);
 
 	m_dcp_location = m_ram->pointer() + (0x40 << 14);
-	m_maincpu->space(AS_PROGRAM).specific(m_program);
 
 	const u8 port_default[0x40] = {
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // Cx - SYS PORTS COPIES
@@ -1886,7 +1883,6 @@ void sprinter_state::sprinter(machine_config &config)
 	m_maincpu->set_m1_map(&sprinter_state::map_fetch);
 	m_maincpu->set_memory_map(&sprinter_state::map_mem);
 	m_maincpu->set_io_map(&sprinter_state::map_io);
-	m_maincpu->nomreq_cb().set_nop();
 	m_maincpu->set_irq_acknowledge_callback(NAME([](device_t &, int){ return 0xff; }));
 	m_maincpu->irqack_cb().set(m_irqs, FUNC(input_merger_any_high_device::in_clear<2>));
 	m_maincpu->irqack_cb().append(m_irqs, FUNC(input_merger_any_high_device::in_clear<1>));
@@ -1936,17 +1932,16 @@ void sprinter_state::sprinter(machine_config &config)
 	m_maincpu->zc_callback<0>().append(m_maincpu, FUNC(z84c015_device::txcb_w));
 	m_maincpu->zc_callback<2>().set(m_maincpu, FUNC(z84c015_device::trg3));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speakers", 2).front();
 
 	ay8910_device &ay8910(AY8910(config.replace(), "ay8912", X_SP / 24));
-	ay8910.add_route(0, "lspeaker", 0.50);
-	ay8910.add_route(1, "lspeaker", 0.25);
-	ay8910.add_route(1, "rspeaker", 0.25);
-	ay8910.add_route(2, "rspeaker", 0.50);
+	ay8910.add_route(0, "speakers", 0.50, 0);
+	ay8910.add_route(1, "speakers", 0.25, 0);
+	ay8910.add_route(1, "speakers", 0.25, 1);
+	ay8910.add_route(2, "speakers", 0.50, 1);
 
-	DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "speakers", 0.5, 0);
+	DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "speakers", 0.5, 1);
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_sprinter);
 }

@@ -23,26 +23,32 @@
 */
 
 #include "emu.h"
+
+#include "victor9k_fdc.h"
+#include "victor9k_kb.h"
+
 #include "bus/centronics/ctronics.h"
 #include "bus/ieee488/ieee488.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
-#include "formats/victor9k_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/6522via.h"
 #include "machine/mc6852.h"
-#include "machine/pit8253.h"
 #include "machine/pic8259.h"
+#include "machine/pit8253.h"
 #include "machine/ram.h"
-#include "victor9k_kb.h"
-#include "victor9k_fdc.h"
+#include "machine/rescap.h"
 #include "machine/z80sio.h"
+#include "sound/flt_biquad.h"
 #include "sound/hc55516.h"
 #include "video/mc6845.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
+
+#include "formats/victor9k_dsk.h"
 
 #include <iostream>
 
@@ -96,6 +102,7 @@ public:
 		m_maincpu(*this, I8088_TAG),
 		m_ieee488(*this, IEEE488_TAG),
 		m_pic(*this, I8259A_TAG),
+		m_pit(*this, I8253_TAG),
 		m_upd7201(*this, UPD7201_TAG),
 		m_ssda(*this, MC6852_TAG),
 		m_via1(*this, M6522_1_TAG),
@@ -104,6 +111,8 @@ public:
 		m_cvsd(*this, HC55516_TAG),
 		m_crtc(*this, HD46505S_TAG),
 		m_ram(*this, RAM_TAG),
+		m_cvsd_filter(*this, "cvsd_filter"),
+		m_cvsd_filter2(*this, "cvsd_filter2"),
 		m_kb(*this, KB_TAG),
 		m_fdc(*this, "fdc"),
 		m_centronics(*this, "centronics"),
@@ -130,6 +139,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ieee488_device> m_ieee488;
 	required_device<pic8259_device> m_pic;
+	required_device<pit8253_device> m_pit;
 	required_device<upd7201_device> m_upd7201;
 	required_device<mc6852_device> m_ssda;
 	required_device<via6522_device> m_via1;
@@ -138,6 +148,8 @@ private:
 	required_device<hc55516_device> m_cvsd;
 	required_device<mc6845_device> m_crtc;
 	required_device<ram_device> m_ram;
+	optional_device<filter_biquad_device> m_cvsd_filter;
+	optional_device<filter_biquad_device> m_cvsd_filter2;
 	required_device<victor_9000_keyboard_device> m_kb;
 	required_device<victor_9000_fdc_device> m_fdc;
 	required_device<centronics_device> m_centronics;
@@ -178,9 +190,6 @@ private:
 	MC6845_UPDATE_ROW( crtc_update_row );
 	MC6845_BEGIN_UPDATE( crtc_begin_update );
 
-	void mux_serial_b_w(int state);
-	void mux_serial_a_w(int state);
-
 	void victor9k_palette(palette_device &palette) const;
 
 	// video state
@@ -218,7 +227,7 @@ void victor9k_state::victor9k_mem(address_map &map)
 	map(0x00000, 0x1ffff).ram();
 	map(0x20000, 0xdffff).noprw();
 	map(0xe0000, 0xe0001).mirror(0x7f00).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0xe0020, 0xe0023).mirror(0x7f00).rw(I8253_TAG, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0xe0020, 0xe0023).mirror(0x7f00).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0xe0040, 0xe0043).mirror(0x7f00).rw(m_upd7201, FUNC(upd7201_device::cd_ba_r), FUNC(upd7201_device::cd_ba_w));
 	map(0xe8000, 0xe8000).mirror(0x7f00).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0xe8001, 0xe8001).mirror(0x7f00).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
@@ -348,14 +357,6 @@ void victor9k_state::vert_w(int state)
 	m_pic->ir7_w(state);
 }
 
-void victor9k_state::mux_serial_b_w(int state)
-{
-}
-
-void victor9k_state::mux_serial_a_w(int state)
-{
-}
-
 //-------------------------------------------------
 //  PIC8259
 //-------------------------------------------------
@@ -391,7 +392,12 @@ void victor9k_state::ssda_sm_dtr_w(int state)
 {
 	m_ssda->cts_w(state);
 	m_ssda->dcd_w(!state);
-	//m_cvsd->enc_dec_w(!state);
+
+	/*
+	 * We're supposed to set the _ENC/DEC input of the HC55516 to !state,
+	 * but only playback/decode is currently supported, and that input
+	 * is not implemenented.
+	 */
 }
 
 
@@ -733,10 +739,12 @@ void victor9k_state::victor9k(machine_config &config)
 	m_crtc->set_begin_update_callback(FUNC(victor9k_state::crtc_begin_update));
 
 	// sound hardware
+	FILTER_BIQUAD(config, m_cvsd_filter2).opamp_mfb_lowpass_setup(RES_K(27), RES_K(15), RES_K(27), CAP_P(4700), CAP_P(1200));
+	FILTER_BIQUAD(config, m_cvsd_filter).opamp_mfb_lowpass_setup(RES_K(43), RES_K(36), RES_K(180), CAP_P(1800), CAP_P(180));
+	HC55516(config, m_cvsd, 0).add_route(ALL_OUTPUTS, m_cvsd_filter, 1.0);
+	m_cvsd_filter->add_route(ALL_OUTPUTS, m_cvsd_filter2, 1.0);
+	m_cvsd_filter2->add_route(ALL_OUTPUTS, "mono", 0.25);
 	SPEAKER(config, "mono").front_center();
-	HC55516(config, m_cvsd, 0);
-	//MCFG_HC55516_DIG_OUT_CB(WRITELINE(MC6852_TAG, mc6852_device, rx_w))
-	m_cvsd->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
 	IEEE488(config, m_ieee488, 0);
@@ -753,13 +761,15 @@ void victor9k_state::victor9k(machine_config &config)
 	PIC8259(config, m_pic, 0);
 	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	pit8253_device &pit(PIT8253(config, I8253_TAG, 0));
-	pit.set_clk<0>(2500000);
-	pit.out_handler<0>().set(FUNC(victor9k_state::mux_serial_b_w));
-	pit.set_clk<1>(2500000);
-	pit.out_handler<1>().set(FUNC(victor9k_state::mux_serial_a_w));
-	pit.set_clk<2>(100000);
-	pit.out_handler<2>().set(I8259A_TAG, FUNC(pic8259_device::ir2_w));
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(15_MHz_XTAL / 12);
+	m_pit->out_handler<0>().set(m_upd7201, FUNC(upd7201_device::rxca_w));
+	m_pit->out_handler<0>().append(m_upd7201, FUNC(upd7201_device::txca_w));
+	m_pit->set_clk<1>(15_MHz_XTAL / 12);
+	m_pit->out_handler<1>().set(m_upd7201, FUNC(upd7201_device::rxcb_w));
+	m_pit->out_handler<1>().append(m_upd7201, FUNC(upd7201_device::txcb_w));
+	m_pit->set_clk<2>(125000);
+	m_pit->out_handler<2>().set(I8259A_TAG, FUNC(pic8259_device::ir2_w));
 
 	UPD7201(config, m_upd7201, 15_MHz_XTAL / 6);
 	m_upd7201->out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
@@ -853,4 +863,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                     FULLNAME       FLAGS
-COMP( 1982, victor9k, 0,      0,      victor9k, victor9k, victor9k_state, empty_init, "Victor Business Products", "Victor 9000", MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+COMP( 1982, victor9k, 0,      0,      victor9k, victor9k, victor9k_state, empty_init, "Victor Business Products", "Victor 9000", MACHINE_IMPERFECT_COLORS )

@@ -622,11 +622,11 @@ void am9513_device::set_tc(int c, bool state)
 	if ((m_counter_mode[d] & 0x1f00) == (state ? 0x0000 : 0x1000))
 	{
 		LOGMASKED(LOG_TC, "Counter %d: TC cascade Next Count %u \n", c + 1, m_count[d]);
-	
+
 		count_edge(d);
 
 	}
-	
+
 	// TC gating
 	if ((m_counter_mode[d] & 0xe000) == 0x2000)
 		gate_count(d, state && (bus_is_16_bit() || m_gate_alt[d]));
