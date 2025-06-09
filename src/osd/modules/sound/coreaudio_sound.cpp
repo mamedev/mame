@@ -199,8 +199,12 @@ public:
 	virtual uint32_t stream_sink_open(uint32_t node, std::string name, uint32_t rate) override;
 	virtual uint32_t stream_source_open(uint32_t node, std::string name, uint32_t rate) override;
 	virtual void stream_source_update(uint32_t id, int16_t *buffer, int samples_this_frame) override;
+	virtual void stream_set_volumes(uint32_t id, const std::vector<float> &db) override;
 	virtual void stream_close(uint32_t id) override;
 	virtual void stream_sink_update(uint32_t stream_id, int16_t const *buffer, int samples_this_frame) override;
+
+	virtual bool external_per_channel_volume() override { return false; }
+	virtual bool split_streams_per_source() override { return true; }
 
 private:
 	bool set_property_listener(AudioDeviceID device, AudioObjectPropertyElement element, AudioObjectPropertyScope scope);
@@ -386,6 +390,7 @@ private:
 		std::string m_name;
 		AudioDeviceID m_id;
 		std::shared_ptr<coreaudio_stream> m_stream;
+		std::vector<float> m_volumes;
 
 		coreaudio_stream_info(sound_coreaudio *parent, int channels)
 		{
@@ -493,13 +498,7 @@ void sound_coreaudio::rebuild_stream_info()
 	m_deviceinfo.m_streams.clear();
 	for (const auto &[key, stream] : m_stream_list)
 	{
-		std::vector<float> volumes;
-		volumes.clear();
-		for (int i = 0; i < 2; i++)
-		{
-			volumes.push_back(0.0f);
-		}
-		m_deviceinfo.m_streams.emplace_back(osd::audio_info::stream_info{key, stream.m_id, volumes});
+		m_deviceinfo.m_streams.emplace_back(osd::audio_info::stream_info{key, stream.m_id, stream.m_volumes});
 	}
 }
 
@@ -613,6 +612,22 @@ void sound_coreaudio::stream_sink_update(uint32_t stream_id, int16_t const *buff
 	{
 		std::lock_guard<std::mutex> stream_guard(our_stream->second.m_stream->m_stream_mutex);
 		our_stream->second.m_stream->sink_update(buffer, samples_this_frame);
+	}
+}
+
+void sound_coreaudio::stream_set_volumes(uint32_t id, const std::vector<float> &db)
+{
+	std::lock_guard<std::mutex> list_guard(m_stream_list_mutex);
+
+	auto our_stream = m_stream_list.find(id);
+	if (our_stream != m_stream_list.end())
+	{
+		our_stream->second.m_volumes.clear();
+		our_stream->second.m_volumes.reserve(db.size());
+		for (const auto &volume : db)
+		{
+			our_stream->second.m_volumes.push_back(volume);
+		}
 	}
 }
 
