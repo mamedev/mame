@@ -109,7 +109,7 @@ void xorworld_ms_state::video_start()
 	m_tilemap_8x8_fg->set_transparent_pen(0);
 }
 
-u32 xorworld_ms_state::screen_update(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect)
+u32 xorworld_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// TODO: use scroll regs (only set once on startup though?)
 	m_tilemap_8x8_mg->set_scrollx(0, 128);
@@ -306,9 +306,9 @@ static GFXDECODE_START( gfx_xorworld_ms )
 GFXDECODE_END
 
 // reorganize graphics into something we can decode with a single pass
-void xorworld_ms_state::descramble_16x16tiles(uint8_t* src, int len)
+void xorworld_ms_state::descramble_16x16tiles(u8* src, int len)
 {
-	std::vector<uint8_t> buffer(len);
+	std::vector<u8> buffer(len);
 	{
 		for (int i = 0; i < len; i++)
 		{
