@@ -68,6 +68,7 @@ private:
 
 DECLARE_DEVICE_TYPE(QSOUND, qsound_device)
 
+// override to make sure MAME drivers pick up the right device
 #if !defined(QSOUND_LLE) // && 0
 #include "qsoundhle.h"
 #define qsound_device qsound_hle_device

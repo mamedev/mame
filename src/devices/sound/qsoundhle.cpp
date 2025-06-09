@@ -15,6 +15,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "qsound.h"
 #include "qsoundhle.h"
 
 #include <algorithm>
@@ -265,7 +266,7 @@ void qsound_hle_device::init_register_map()
 
 int16_t qsound_hle_device::read_sample(uint16_t bank, uint16_t address)
 {
-	bank &= 0x7FFF;
+	bank &= 0x7fff;
 	const uint32_t rom_addr = (bank << 16) | (address << 0);
 	const uint8_t sample_data = read_byte(rom_addr);
 	return (int16_t)(sample_data << 8); // bit0-7 is tied to ground
