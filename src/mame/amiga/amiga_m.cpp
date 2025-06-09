@@ -1617,8 +1617,7 @@ void amiga_state::custom_chip_w(offs_t offset, uint16_t data)
 
 		case REG_DDFSTOP:
 			/* impose hardware limits ( HRM, page 75 ) */
-			// amigaaga_flop:aladdin writes 0x0100 here, expecting the HW limit to hit instead
-			data &= (IS_AGA() || IS_ECS()) ? 0xfffe : 0xfffc;
+			data &= (IS_AGA() || IS_ECS()) ? 0xfe : 0xfc;
 			if (data > 0xd8)
 			{
 				logerror("%s: Attempt to overrun DDFSTOP with %04x\n", machine().describe_context(), data);
