@@ -1,24 +1,21 @@
 // license:GPL-2.0+
 // copyright-holders:Juergen Buchmueller
-/*
-    ataridev.h
 
-*/
+#ifndef MAME_BUS_A800_ATARIFDC_H
+#define MAME_BUS_A800_ATARIFDC_H
 
-#ifndef MAME_ATARI_ATARIFDC_H
-#define MAME_ATARI_ATARIFDC_H
+#include "a8sio.h"
 
 #include "imagedev/flopdrv.h"
 #include "machine/6821pia.h"
 #include "sound/pokey.h"
 #include "diserial.h"
 
-class atari_fdc_device : public device_t, public device_serial_interface
+class atari_fdc_device : public device_t, public device_serial_interface, public device_a8sio_card_interface
 {
 public:
 	atari_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void pia_cb2_w(int state);
 	void atari_load_proc(device_image_interface &image, bool is_created);
 
 protected:
@@ -30,6 +27,10 @@ protected:
 	virtual void tra_callback() override;
 	virtual void tra_complete() override;
 	virtual void rcv_complete() override;
+
+	// device_a8sio_card_interface implementation
+	virtual void data_out_w(int state) override;
+	virtual void command_w(int state) override;
 
 private:
 	TIMER_CALLBACK_MEMBER(serin_ready);
@@ -57,8 +58,6 @@ private:
 	};
 
 	required_device_array<legacy_floppy_image_device, 4> m_floppy;
-	required_device<pokey_device> m_pokey;
-	required_device<pia6821_device> m_pia;
 
 	int  m_serout_count;
 	int  m_serout_offs;
@@ -73,9 +72,11 @@ private:
 	int  m_serin_delay;
 	emu_timer *m_serin_timer;
 
+	bool m_command;
+
 	atari_drive m_drv[4];
 };
 
 DECLARE_DEVICE_TYPE(ATARI_FDC, atari_fdc_device)
 
-#endif // MAME_ATARI_ATARIFDC_H
+#endif // MAME_BUS_A800_ATARIFDC_H

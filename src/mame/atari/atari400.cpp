@@ -66,7 +66,6 @@
 #include "machine/input_merger.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
-#include "atarifdc.h"
 #include "sound/dac.h"
 #include "sound/pokey.h"
 
@@ -2009,8 +2008,6 @@ void a400_state::atari_common_nodac(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 	POKEY(config, m_pokey, pokey_device::FREQ_17_EXACT);
-	//m_pokey->oclk_w().set("sio", FUNC(a8sio_device::clock_out_w));
-	//m_pokey->sod_w().set("sio", FUNC(a8sio_device::data_out_w));
 	m_pokey->set_keyboard_callback(FUNC(a400_state::a800_keyboard));
 	m_pokey->irq_w().set_inputline(m_maincpu, m6502_device::IRQ_LINE);
 	m_pokey->add_route(ALL_OUTPUTS, "speaker", 1.0);
@@ -2030,7 +2027,8 @@ void a400_state::atari_common(machine_config &config)
 	m_pokey->pot_r<5>().set(m_ctrl[2], FUNC(vcs_control_port_device::read_pot_x));
 	m_pokey->pot_r<6>().set(m_ctrl[3], FUNC(vcs_control_port_device::read_pot_y));
 	m_pokey->pot_r<7>().set(m_ctrl[3], FUNC(vcs_control_port_device::read_pot_x));
-	m_pokey->sod_w().set("fdc", FUNC(atari_fdc_device::rx_w));
+	m_pokey->oclk_w().set("sio", FUNC(a8sio_device::clock_out_w));
+	m_pokey->sod_w().set("sio", FUNC(a8sio_device::data_out_w));
 
 	DAC_1BIT(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.03);
 
@@ -2052,18 +2050,15 @@ void a400_state::atari_common(machine_config &config)
 	m_pia->readpb_handler().set(FUNC(a400_state::djoy_2_3_r));
 	m_pia->writepb_handler().set(FUNC(a400_state::djoy_2_3_w));
 	m_pia->ca2_handler().set("sio", FUNC(a8sio_device::motor_w));
-	m_pia->cb2_handler().set("fdc", FUNC(atari_fdc_device::pia_cb2_w));
-	m_pia->cb2_handler().append("sio", FUNC(a8sio_device::command_w));
+	m_pia->cb2_handler().set("sio", FUNC(a8sio_device::command_w));
 	m_pia->irqa_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
 	m_pia->irqb_handler().set("mainirq", FUNC(input_merger_device::in_w<2>));
 
-	a8sio_device &sio(A8SIO(config, "sio", nullptr));
+	a8sio_device &sio(A8SIO(config, "sio", "fdc"));
 	//sio.clock_in().set(m_pokey, FUNC(pokey_device::bclk_w));
 	sio.data_in().set(m_pokey, FUNC(pokey_device::sid_w));
 	sio.proceed().set(m_pia, FUNC(pia6821_device::ca1_w));
 	sio.interrupt().set(m_pia, FUNC(pia6821_device::cb1_w));
-
-	ATARI_FDC(config, "fdc", 0);
 
 	A800_CART_SLOT(config, m_cartleft, a800_left, nullptr);
 	m_cartleft->rd4_callback().set(FUNC(a400_state::cart_rd4_w));

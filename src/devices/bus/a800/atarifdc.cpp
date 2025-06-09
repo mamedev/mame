@@ -672,7 +672,7 @@ TIMER_CALLBACK_MEMBER(atari_fdc_device::serin_ready)
 
 void atari_fdc_device::tra_callback()
 {
-	m_pokey->sid_w(transmit_register_get_data_bit());
+	m_a8sio->data_in_w(transmit_register_get_data_bit());
 }
 
 void atari_fdc_device::tra_complete()
@@ -716,7 +716,7 @@ void atari_fdc_device::rcv_complete()
 			/* exclusive or written checksum with calculated */
 			m_serout_chksum ^= data;
 			/* if the attention line is high, this should be data */
-			if (m_pia->irq_b_state())
+			if (m_command)
 				a800_serial_write();
 		}
 		else
@@ -726,8 +726,14 @@ void atari_fdc_device::rcv_complete()
 	}
 }
 
-void atari_fdc_device::pia_cb2_w(int state)
+void atari_fdc_device::data_out_w(int state)
 {
+	rx_w(state);
+}
+
+void atari_fdc_device::command_w(int state)
+{
+	m_command = state;
 	if (!state)
 	{
 		clr_serout(4); /* expect 4 command bytes + checksum */
@@ -746,14 +752,13 @@ static const floppy_interface atari_floppy_interface =
 	"floppy_5_25"
 };
 
-DEFINE_DEVICE_TYPE(ATARI_FDC, atari_fdc_device, "atari_fdc", "Atari FDC")
+DEFINE_DEVICE_TYPE(ATARI_FDC, atari_fdc_device, "atari_fdc", "Atari FDC (HLE)")
 
 atari_fdc_device::atari_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ATARI_FDC, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
+	device_a8sio_card_interface(mconfig, *this),
 	m_floppy(*this, "floppy%u", 0U),
-	m_pokey(*this, "^pokey"),
-	m_pia(*this, "^pia"),
 	m_serout_count(0),
 	m_serout_offs(0),
 	m_serout_chksum(0),
@@ -761,7 +766,8 @@ atari_fdc_device::atari_fdc_device(const machine_config &mconfig, const char *ta
 	m_serin_count(0),
 	m_serin_offs(0),
 	m_serin_chksum(0),
-	m_serin_delay(0)
+	m_serin_delay(0),
+	m_command(false)
 {
 }
 
@@ -784,6 +790,17 @@ void atari_fdc_device::device_start()
 	set_tra_rate(19230);
 
 	m_serin_timer = timer_alloc(FUNC(atari_fdc_device::serin_ready), this);
+
+	save_item(NAME(m_serout_count));
+	save_item(NAME(m_serout_offs));
+	save_item(NAME(m_serout_buff));
+	save_item(NAME(m_serout_chksum));
+	save_item(NAME(m_serin_count));
+	save_item(NAME(m_serin_offs));
+	save_item(NAME(m_serin_buff));
+	save_item(NAME(m_serin_chksum));
+	save_item(NAME(m_serin_delay));
+	save_item(NAME(m_command));
 }
 
 //-------------------------------------------------
