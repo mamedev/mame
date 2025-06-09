@@ -125,7 +125,7 @@ u32 xorworld_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 	// TODO, convert to device, share between Modualar System games
 	const int NUM_SPRITES = 0x200;
-	const int X_EXTRA_OFFSET = 128;
+	const int X_EXTRA_OFFSET = 126;
 
 	for (int i = NUM_SPRITES - 2; i >= 0; i -= 2)
 	{
@@ -138,7 +138,13 @@ u32 xorworld_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 		//uint16_t attr3 = m_spriteram[i + NUM_SPRITES+1]; // unused?
 
 		int ypos = attr0 & 0x00ff;
+
+		// unknown, unused sprites (sometimes garbage sprites) have a ypos of 00f8 and not much else
+		if (ypos == 0x00f8)
+			continue;
+
 		int xpos = (attr1 & 0xff00) >> 8;
+
 		xpos |= (attr2 & 0x8000) ? 0x100 : 0x000;
 
 		ypos = (0xff - ypos);
@@ -208,6 +214,17 @@ void xorworld_ms_state::xorworld_ms_map(address_map &map)
 	map(0x080000, 0x081fff).ram().w(FUNC(xorworld_ms_state::videoram8x8_fg_w)).share("videoram_8x8fg");
 	map(0x090000, 0x091fff).ram().w(FUNC(xorworld_ms_state::videoram8x8_mg_w)).share("videoram_8x8mg");
 	map(0x0a0000, 0x0a1fff).ram().w(FUNC(xorworld_ms_state::videoram16x16_bg_w)).share("videoram16x16bg");
+
+	// almost certainly the video regs (scroll etc.)
+	map(0x0c0000, 0x0c0001).noprw(); // startup
+	map(0x0c0002, 0x0c0003).nopw(); // startup
+	map(0x0c0004, 0x0c0005).nopw(); // startup
+	map(0x0c0006, 0x0c0007).nopw(); // startup
+	map(0x0c0008, 0x0c0009).noprw(); // startup
+	map(0x0c000a, 0x0c000b).noprw(); // startup
+	map(0x0c000c, 0x0c000d).nopw(); // startup
+	map(0x0c000e, 0x0c000f).noprw(); // quite often
+
 	map(0x100000, 0x1007ff).ram().share("spriteram");
 	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
@@ -215,6 +232,8 @@ void xorworld_ms_state::xorworld_ms_map(address_map &map)
 	map(0x400002, 0x400003).portr("IN1");
 	map(0x400006, 0x400007).portr("DSW1");
 	map(0x400008, 0x400009).portr("DSW2");
+	map(0x40000c, 0x40000d).noprw(); // unknown
+	map(0x40000e, 0x40000f).nopw(); // unknown (sound?)
 
 	map(0xff0000, 0xffffff).ram();
 }
