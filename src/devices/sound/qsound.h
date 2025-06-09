@@ -68,8 +68,6 @@ private:
 
 DECLARE_DEVICE_TYPE(QSOUND, qsound_device)
 
-#ifndef MAME_SOUND_QSOUNDHLE_H_QSOUND_H
-
 // hack to make sure MAME drivers pick up the right device
 // (undo the // && 0 comment to force LLE)
 #if !defined(QSOUND_LLE) // && 0
@@ -77,7 +75,5 @@ DECLARE_DEVICE_TYPE(QSOUND, qsound_device)
 #define qsound_device qsound_hle_device
 #define QSOUND QSOUND_HLE
 #endif // QSOUND_LLE
-
-#endif // MAME_SOUND_QSOUNDHLE_H_QSOUND_H
 
 #endif // MAME_SOUND_QSOUND_H
