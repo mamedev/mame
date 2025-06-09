@@ -712,6 +712,7 @@ void sound_wasapi::exit()
 		m_exiting = false;
 	}
 
+	m_updated_devices.clear();
 	m_zombie_streams.clear();
 	m_stream_info.clear();
 	m_device_info.clear();
@@ -1614,7 +1615,7 @@ void sound_wasapi::housekeeping_task()
 		if (m_zombie_streams.empty() && m_updated_devices.empty())
 			m_housekeeping_condition.wait(housekeeping_lock);
 
-		while (!m_updated_devices.empty())
+		while (!m_exiting && !m_updated_devices.empty())
 		{
 			std::wstring const device_id(std::move(m_updated_devices.front()));
 			m_updated_devices.erase(m_updated_devices.begin());
