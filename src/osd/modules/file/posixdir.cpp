@@ -81,7 +81,7 @@ using sdl_stat = struct stat64;
 #define sdl_stat_fn stat64
 #endif
 
-#if (defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__bsdi__) || defined(__DragonFly__))
+#if (defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__bsdi__) || defined(__DragonFly__) || defined(__GLIBC__))
 #define HAS_DT_XXX 1
 #else
 #define HAS_DT_XXX 0
@@ -157,7 +157,7 @@ const osd::directory::entry *posix_directory::read()
 	m_entry.name = m_data->d_name;
 
 	sdl_stat st;
-	bool stat_err(0 > sdl_stat_fn(util::string_format("%s%c%s", m_path, PATHSEPCH, m_data->d_name).c_str(), &st));
+	bool stat_err(0 > sdl_stat_fn(util::string_format("%s%c%s", m_path, PATHSEPCH, static_cast<const char *>(m_data->d_name)).c_str(), &st));
 
 #if HAS_DT_XXX
 	switch (m_data->d_type)
