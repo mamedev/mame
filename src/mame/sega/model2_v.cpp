@@ -222,9 +222,6 @@ static int32_t clip_polygon(poly_vertex *v, int32_t num_vertices, poly_vertex *v
 		nextin = (nextdot >= clip_plane.distance) ? 1 : 0;
 
 		/* Add a clipped vertex if one end of the current edge is inside the plane and the other is outside */
-		// TODO: displaying Honey in Fighting Vipers and Bean in Sonic the Fighters somehow causes a NaN dot product here,
-		//       causing MAME to hardlock in the renderer routine. They are also causing lots of invalid polygon renders
-		//       which might be related.
 		if ( curin != nextin && std::isnan(curdot) == false && std::isnan(nextdot) == false )
 		{
 			scale = (clip_plane.distance - curdot) / (nextdot - curdot);
@@ -811,11 +808,10 @@ void model2_renderer::model2_3d_render(triangle *tri, const rectangle &cliprect)
 	{
 		extra.texwidth = 32 << ((tri->texheader[0] >> 0) & 0x7);
 		extra.texheight = 32 << ((tri->texheader[0] >> 3) & 0x7);
-		extra.texx = 32 * ((tri->texheader[2] >> 0) & 0x1f);
-		extra.texy = 32 * (((tri->texheader[2] >> 6) & 0x1f) + ( tri->texheader[2] & 0x20 ));
-		/* TODO: Virtua Striker contradicts with this. */
-		extra.texmirrorx = 0;//(tri->texheader[0] >> 9) & 1;
-		extra.texmirrory = 0;//(tri->texheader[0] >> 8) & 1;
+		extra.texx = 32 * ((tri->texheader[2] >> 0) & 0x3f);
+		extra.texy = 32 * ((tri->texheader[2] >> 6) & 0x1f);
+		extra.texmirrorx = (tri->texheader[0] >> 8) & 1;
+		extra.texmirrory = (tri->texheader[0] >> 9) & 1;
 		extra.texsheet = (tri->texheader[2] & 0x1000) ? m_state.m_textureram1 : m_state.m_textureram0;
 
 		tri->v[0].pz = 1.0f / (tri->v[0].pz + std::numeric_limits<float>::min());
@@ -1092,7 +1088,7 @@ void model2_state::model2_3d_push( raster_state *raster, u32 input )
 				for( i = 0; i < 4; i++ )
 				{
 					/* center x */
-					raster->center[i][0] = (raster->command_buffer[2+i] >> 12) & 0xffF;
+					raster->center[i][0] = (raster->command_buffer[2+i] >> 12) & 0xfff;
 
 					if ( raster->center[i][0] & 0x800 )
 						raster->center[i][0] = -( 0x800 - (raster->center[i][0] & 0x7ff) );
@@ -1324,10 +1320,9 @@ void model2_state::geo_parse_np_ns( geo_state *geo, u32 *input, u32 count )
 			else luminance = fabs( dotl );
 
 			luminance = (luminance * texparam->diffuse) + texparam->ambient;
-			luma = (int32_t)luminance;
+			luminance = std::clamp(luminance, 0.0f, 255.0f);
 
-			if ( luma > 255 ) luma = 255;
-			if ( luma < 0 ) luma = 0;
+			luma = (int32_t)luminance;
 
 			/* add the face bit to the luma */
 			luma += face;
@@ -1481,10 +1476,9 @@ void model2_state::geo_parse_np_s( geo_state *geo, u32 *input, u32 count )
 			specular *= texparam->specular_scale;
 
 			luminance = (luminance * texparam->diffuse) + texparam->ambient + specular;
-			luma = (int32_t)luminance;
+			luminance = std::clamp(luminance, 0.0f, 255.0f);
 
-			if ( luma > 255 ) luma = 255;
-			if ( luma < 0 ) luma = 0;
+			luma = (int32_t)luminance;
 
 			/* add the face bit to the luma */
 			luma += face;
@@ -1639,10 +1633,9 @@ void model2_state::geo_parse_nn_ns( geo_state *geo, u32 *input, u32 count )
 			else luminance = fabs( dotl );
 
 			luminance = (luminance * texparam->diffuse) + texparam->ambient;
-			luma = (int32_t)luminance;
+			luminance = std::clamp(luminance, 0.0f, 255.0f);
 
-			if ( luma > 255 ) luma = 255;
-			if ( luma < 0 ) luma = 0;
+			luma = (int32_t)luminance;
 
 			/* add the face bit to the luma */
 			luma += face;
@@ -1839,10 +1832,9 @@ void model2_state::geo_parse_nn_s( geo_state *geo, u32 *input, u32 count )
 			specular *= texparam->specular_scale;
 
 			luminance = (luminance * texparam->diffuse) + texparam->ambient + specular;
-			luma = (int32_t)luminance;
+			luminance = std::clamp(luminance, 0.0f, 255.0f);
 
-			if ( luma > 255 ) luma = 255;
-			if ( luma < 0 ) luma = 0;
+			luma = (int32_t)luminance;
 
 			/* add the face bit to the luma */
 			luma += face;

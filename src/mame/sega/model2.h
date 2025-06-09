@@ -634,9 +634,15 @@ struct m2_poly_extra_data
 
 static inline u16 get_texel( u32 base_x, u32 base_y, int x, int y, u32 *sheet )
 {
-	u32  baseoffs = ((base_y/2)*512)+(base_x/2);
-	u32  texeloffs = ((y/2)*512)+(x/2);
-	u32  offset = baseoffs + texeloffs;
+	int x2 = base_x + x;
+	int y2 = base_y + y;
+	if (x2 >= 1024)
+	{
+		// texture sheets are mapped as 2048x1024 but stored in RAM as 1024x2048
+		x2 -= 1024;
+		y2 ^= 1024;
+	}
+	u32  offset = ((y2 / 2) * 512) + (x2 / 2);
 	u32  texel = sheet[offset>>1];
 
 	if ( offset & 1 )
