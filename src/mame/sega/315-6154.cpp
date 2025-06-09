@@ -70,6 +70,9 @@ void sega_315_6154_device::regenerate_config_mapping()
 
 u32 sega_315_6154_device::registers_r(offs_t offset)
 {
+	if (offset == 0)
+		return m_mode;
+
 	return m_registers[offset];
 }
 

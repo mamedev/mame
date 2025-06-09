@@ -394,9 +394,18 @@ Notes:
 
 #include "emu.h"
 #include "cpu/sh/sh4.h"
-#include "emupal.h"
 #include "screen.h"
-
+#include "speaker.h"
+#include "315-6154.h"
+#include "machine/eepromser.h"
+#include "machine/x76f100.h"
+#include "machine/nvram.h"
+#include "machine/aicartc.h"
+#include "machine/jvsdev.h"
+#include "mie.h"
+#include "jvs13551.h"
+#include "sound/aica.h"
+#include "m3comm.h"
 
 namespace {
 
@@ -409,6 +418,8 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_slave(*this, "slave")
+		, m_315_6154(*this, "pci0:00.0")
+		, s_315_6154(*this, "pci1:00.0")
 	{ }
 
 	void hikaru(machine_config &config);
@@ -416,13 +427,18 @@ public:
 private:
 	virtual void video_start() override ATTR_COLD;
 
-	void hikaru_map(address_map &map) ATTR_COLD;
-	void hikaru_map_slave(address_map &map) ATTR_COLD;
+	void sh4_map_main(address_map &map) ATTR_COLD;
+	void sh4_map_slave(address_map &map) ATTR_COLD;
+	void pci_map(address_map& map) ATTR_COLD;
 
 	uint32_t screen_update_hikaru(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	required_device<sh4_device> m_maincpu;
-	required_device<sh4_device> m_slave;
+	required_device<sh7091_device> m_maincpu;
+	required_device<sh7091_device> m_slave;
+	required_device<sega_315_6154_device> m_315_6154;
+	required_device<sega_315_6154_device> s_315_6154;
+
+	u32 m_mie_busrq;
 };
 
 void hikaru_state::video_start()
@@ -438,101 +454,135 @@ static INPUT_PORTS_START( hikaru )
 	PORT_START("IN0")
 INPUT_PORTS_END
 
-/*
- Area 0
-  00000000-00200000    boot ROM
-  00400000-00400003    ?
-  00800000-0083ffff    MIE + Service/Test switches and more
-  00c00000-00c0ffff    backup RAM
-  01000000-01000003    ?
-  01000100-01000103    ?
-  02000000-02ffffff    banked area (ROMBD+AICA+COMM+other devices)
-  03000000-03ffffff    banked area (ROMBD+EEPROM+COMM+other devices)
- Area 1
-  04000000-0400003f    Memory controller (Master)
- Area 3
-  0c000000-0dffffff    RAM
- Area 5
-  14000000-140000ff    Master/Slave COMM
-  14000100-143fffff    GPU command RAM
-  15000000-150000ff    GPU Regs
-  16000000-163fffff x2 ? \ these two overlap [selected by 040000xx = 0x04,0x06,0x40]
-  16010000-17ffffff    Slave RAM /
- Area 6
-  18001000-1800101f    ?
-  1a000000-1a000103    GPU Regs
-  1a000180-150001bf    GPU Texture Regs A
-  1a000200-1500023f    GPU Texture Regs B
-  1a040000-1a04000f    GPU Texture fIfO (?)
-  1b000000-1b7fffff    GPU Texture RAM and framebuffer (a 2048x2048x16-bit sheet?)
-
-*/
-
-void hikaru_state::hikaru_map(address_map &map)
+void hikaru_state::pci_map(address_map& map)
 {
-//  Area 0
-	map(0x00000000, 0x001fffff).rom().share("share1");  // boot ROM
-	map(0x00400000, 0x00400007).noprw(); // unknown
-	map(0x00800000, 0x0083ffff).noprw(); // MIE + Service/Test switches and more
-	map(0x00c00000, 0x00c0ffff).ram(); // backup RAM
-	map(0x01000000, 0x01000007).noprw(); // unknown
-	map(0x01000100, 0x01000107).noprw(); // unknown
-	map(0x02000000, 0x02ffffff).noprw(); // banked area (ROMBD + AICA + COMM + other devices)
-	map(0x03000000, 0x03ffffff).noprw(); // banked area (ROMBD + EEPROM + COMM + other devices)
-//  Area 1
-	map(0x04000000, 0x0400003f).noprw(); // memory controller (Master)
-//  Area 3
-	map(0x0c000000, 0x0dffffff).ram(); // main Work RAM
-//  Area 5
-	map(0x14000000, 0x140000ff).noprw(); // Master/Slave COMM
-	map(0x14000100, 0x143fffff).ram(); // GPU command RAM
-	map(0x15000000, 0x150000ff).noprw(); // GPU Regs
-	map(0x16010000, 0x17ffffff).ram(); // Slave Work RAM
-	map(0x16001000, 0x163fffff).ram(); // ? \ these two overlap [selected by 040000xx = 0x04,0x06,0x40]
-//  Area 6
-	map(0x18001000, 0x1800101f).noprw(); // unknown
-	map(0x1a000000, 0x1a000107).noprw(); // GPU Regs
-	map(0x1a000180, 0x1a0001bf).noprw(); // GPU Texture Regs A
-	map(0x1a000200, 0x1a00023f).noprw(); // GPU Texture Regs B
-	map(0x1a040000, 0x1a04000f).noprw(); // GPU Texture FIFO (?)
-	map(0x1b000000, 0x1b7fffff).noprw(); // GPU Texture RAM and framebuffer (a 2048x2048x16-bit sheet?)
+	//const char* t = tag();
+	// master bridge "Local Bus" area
+//	map(0x00000000, 0x001fffff).rom();   // boot ROM
+	map(0x00400000, 0x007fffff).noprw(); // r/w trigger "OKBCS" line to PLD between Antarctic and Africa, purpose unknown
+	map(0x00800000, 0x0081ffff).mirror(0x80000000).m("^mie", FUNC(mie_device::mie_port)).umask16(0x00ff);
+	//map(0x00820000, 0x0083ffff).m("^mie", FUNC(mie_device::mie_map)).umask16(0x00ff);
+	map(0x00c00000, 0x00c0ffff).ram().share("^nvram");
+	map(0x02000000, 0x02ffffff).mirror(0x80000000).lrw32(                  // MIE BUSRQ/BUSAK, TODO should be passed through MIE
+		NAME([this](offs_t offset) { return m_mie_busrq ^ 0x100; }),
+		NAME([this](offs_t offset, u32 data) { m_mie_busrq = data; })
+	);
+//	map(0x0a000000, 0x0a0fffff).rw();    // optional ROMBD-specific security
+//  map(0x0c000000, 0x0cffffff).rw();    // onboard AICA + RAM
+//  map(0x0d000000, 0x0dffffff).rw();    // optional AICA + RAM
+//  map(0x0e000000, 0x0effffff).rw();    // optional Communication Board
+    map(0x10000000, 0x13ffffff).rom().region("^user1", 0);
+//  map(0x14000000, 0x14ffffff).rw();    // ROMBD x76f100 eprom
+    map(0x20000000, 0x2fffffff).rom().region("^user2", 0);
+
+// bridge automapped
+//	map(0x40000000, 0x41ffffff).rw(t, FUNC(hikaru_state::slave_sh4_sdram_r), FUNC(hikaru_state::slave_sh4_sdram_w));
+	map(0x48000000, 0x483fffff).ram().share("^sharedram"); // slave bridge local RAM
+//	map(0x70000000, 0x71ffffff).rw(t, FUNC(hikaru_state::master_sh4_sdram_r), FUNC(hikaru_state::master_sh4_sdram_w));
+//  78000000 master bridge local RAM, not present in Hikaru
+
+// PCI
+
+// 	Antarctic ASIC 17C3:11DB (315-6083) 3D GPU Command Processor (CP), connected to slave bridge PCI port B (66MHz)
+// 	BAR0
+// 	map(0x00000000, 0x000000ff).rw();  // control/status registers, note: not clear how exactly it works as it clashing with boot ROM area
+// 	BAR1
+//	map(0x04000000, 0x043fffff).ram(); // texture bank 0, IC41 Australia ASIC internal
+//	map(0x06000000, 0x063fffff).ram(); // texture bank 1, IC42 Australia ASIC internal
+
+//  Eurasia ASIC 17C7:11DB (315-6087) 2D GPU, connected to master bridge PCI port C (33MHz)
+// 	BAR0
+//  map(0xf2000000, 0xf2000023).rw();  // control, interrupts, status registers
+//  map(0xf2000080, 0xf20000d3).rw();  // CRTC config
+//  map(0xf2000100, 0xf2000103).rw();  // display 0/1 enable
+//  map(0xf2000180, 0xf20001bf).rw();  // display 0 layers registers
+//  map(0xf2000200, 0xf200023f).rw();  // display 1 layers registers
+// 	BAR1
+//  map(0xf2040000, 0xf204000f).rw();  // blitter/DMA registers
+// 	BAR2
+//  map(0xf2080000, 0xf208000?);       // unused/unknown
+// 	BAR3
+//  map(0xf3000000, 0xf37fffff).ram(); // video RAM (frame buffers and layers bitmaps)
 }
 
-void hikaru_state::hikaru_map_slave(address_map &map)
+void hikaru_state::sh4_map_main(address_map &map)
 {
-	map.unmap_value_high();
-	map(0x00000000, 0x001FFFFF).rom().share("share1");
-	map(0x0C000000, 0x0DFFFFFF).ram();
-	map(0x10000000, 0x100000FF).ram();
-	map(0x1A800000, 0x1A8000FF).ram();
-	map(0x1B000000, 0x1B0001FF).ram();
+	map(0x00000000, 0x03ffffff).rw(m_315_6154, FUNC(sega_315_6154_device::aperture_r<2>), FUNC(sega_315_6154_device::aperture_w<2>));
+	map(0x00000000, 0x001fffff).rom().region("maincpu", 0);
+	map(0x04000000, 0x040000ff).rw(m_315_6154, FUNC(sega_315_6154_device::registers_r), FUNC(sega_315_6154_device::registers_w));
+	map(0x0c000000, 0x0dffffff).ram();
+	map(0x14000000, 0x17ffffff).rw(m_315_6154, FUNC(sega_315_6154_device::aperture_r<0>), FUNC(sega_315_6154_device::aperture_w<0>));
+	map(0x18000000, 0x1bffffff).rw(m_315_6154, FUNC(sega_315_6154_device::aperture_r<1>), FUNC(sega_315_6154_device::aperture_w<1>));
+}
+
+void hikaru_state::sh4_map_slave(address_map &map)
+{
+	map(0x00000000, 0x03ffffff).rw(s_315_6154, FUNC(sega_315_6154_device::aperture_r<2>), FUNC(sega_315_6154_device::aperture_w<2>));
+	map(0x00000000, 0x001fffff).rom().region("maincpu", 0);
+	map(0x04000000, 0x040000ff).rw(s_315_6154, FUNC(sega_315_6154_device::registers_r), FUNC(sega_315_6154_device::registers_w));
+	map(0x0c000000, 0x0dffffff).ram();
+	map(0x10000000, 0x103fffff).ram(); // slave bridge local RAM
+	map(0x14000000, 0x17ffffff).rw(s_315_6154, FUNC(sega_315_6154_device::aperture_r<0>), FUNC(sega_315_6154_device::aperture_w<0>));
+	map(0x18000000, 0x1bffffff).rw(s_315_6154, FUNC(sega_315_6154_device::aperture_r<1>), FUNC(sega_315_6154_device::aperture_w<1>));
 }
 
 
 void hikaru_state::hikaru(machine_config &config)
 {
 	/* basic machine hardware */
-	SH4(config, m_maincpu, CPU_CLOCK);
-//  m_maincpu->set_md(0, 1);
-//  m_maincpu->set_md(1, 0);
-//  m_maincpu->set_md(2, 1);
-//  m_maincpu->set_md(3, 0);
-//  m_maincpu->set_md(4, 0);
-//  m_maincpu->set_md(5, 1);
-//  m_maincpu->set_md(6, 0);
-//  m_maincpu->set_md(7, 1);
-//  m_maincpu->set_md(8, 0);
-//  m_maincpu->set_sh4_clock(CPU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &hikaru_state::hikaru_map);
+	SH7091(config, m_maincpu, CPU_CLOCK);
+    m_maincpu->set_md(0, 1);
+    m_maincpu->set_md(1, 0);
+    m_maincpu->set_md(2, 1);
+    m_maincpu->set_md(3, 0);
+    m_maincpu->set_md(4, 0);
+    m_maincpu->set_md(5, 1);
+    m_maincpu->set_md(6, 0);
+    m_maincpu->set_md(7, 1);
+    m_maincpu->set_md(8, 0);
+    m_maincpu->set_sh4_clock(CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &hikaru_state::sh4_map_main);
 //  m_maincpu->set_addrmap(AS_IO, &hikaru_state::hikaru_port);
 	m_maincpu->set_force_no_drc(true);
 //  m_maincpu->set_vblank_int("screen", FUNC(hikaru_state::vblank));
 
-	SH4(config, m_slave, CPU_CLOCK);
-	m_slave->set_addrmap(AS_PROGRAM, &hikaru_state::hikaru_map_slave);
+	SH7091(config, m_slave, CPU_CLOCK);
+	m_slave->set_md(0, 1);
+	m_slave->set_md(1, 0);
+	m_slave->set_md(2, 1);
+	m_slave->set_md(3, 0);
+	m_slave->set_md(4, 0);
+	m_slave->set_md(5, 1);
+	m_slave->set_md(6, 0);
+	m_slave->set_md(7, 1);
+	m_slave->set_md(8, 0);
+	m_slave->set_sh4_clock(CPU_CLOCK);
+	m_slave->set_addrmap(AS_PROGRAM, &hikaru_state::sh4_map_slave);
 	m_slave->set_force_no_drc(true);
 
-//  MCFG_NVRAM_HANDLER(hikaru_eeproms)
+	PCI_ROOT(config, "pci0", 0);
+	SEGA315_6154(config, m_315_6154, 0);
+	m_315_6154->set_addrmap(sega_315_6154_device::AS_PCI_MEMORY, &hikaru_state::pci_map);
+	m_315_6154->set_mode(sega_315_6154_device::MODE_MASTER);
+	PCI_ROOT(config, "pci1", 0);
+	SEGA315_6154(config, s_315_6154, 0);
+	s_315_6154->set_addrmap(sega_315_6154_device::AS_PCI_MEMORY, &hikaru_state::pci_map);
+	s_315_6154->set_mode(sega_315_6154_device::MODE_SLAVE);
+
+	MAPLE_DC(config, "maple", 0, m_maincpu); // TODO: get rid of this, there is no any Maple-host in Hikaru
+
+	mie_device& mie(MIE(config, "mie", 16000000, "maple", 0, "jvs"));
+	mie.set_gpio_name<3>("MIE.3");
+	mie.set_gpio_name<5>("MIE.5");
+	MIE_JVS(config, "jvs", 16000000);
+
+	sega_837_13551_device& sega837(SEGA_837_13551(config, "837_13551", 0, "jvs"));
+	sega837.set_port_tags("TILT", "P1", "P2", "A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "OUTPUT");
+
+	EEPROM_93C46_16BIT(config, "main_eeprom").default_value(0);
+	EEPROM_93C46_8BIT(config, "mie_eeprom");
+	X76F100(config, "rombd_eeprom");
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -541,8 +591,6 @@ void hikaru_state::hikaru(machine_config &config)
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 640-1, 0, 480-1);
 	screen.set_screen_update(FUNC(hikaru_state::screen_update_hikaru));
-
-	PALETTE(config, "palette").set_entries(0x1000);
 
 //  SPEAKER(config, "speaker").front();
 
@@ -554,38 +602,38 @@ void hikaru_state::hikaru(machine_config &config)
 }
 
 
-#define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios))
+#define ROM_LOAD_BIOS(bios,name,offset,length,hash) \
+		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios))
 
 
 #define HIKARU_BIOS \
+	ROM_REGION( 0x200000, "maincpu", 0) \
 	ROM_SYSTEM_BIOS( 0, "bios0", "epr23400a" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0, "epr-23400a.ic94",  0x000000, 0x200000, CRC(2aa906a7) SHA1(098c9909b123ed6c338ac874f2ee90e3b2da4c02) ) \
+	ROM_LOAD_BIOS( 0, "epr-23400a.ic94",  0x000000, 0x200000, CRC(2aa906a7) SHA1(098c9909b123ed6c338ac874f2ee90e3b2da4c02) ) \
 	ROM_SYSTEM_BIOS( 1, "bios1", "epr23400" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 1, "epr-23400.ic94",   0x000000, 0x200000, CRC(3d557104) SHA1(d39879f5a1acbd54ad8ee4fbd412f870c9ff4aa5) ) \
+	ROM_LOAD_BIOS( 1, "epr-23400.ic94",   0x000000, 0x200000, CRC(3d557104) SHA1(d39879f5a1acbd54ad8ee4fbd412f870c9ff4aa5) ) \
 	ROM_SYSTEM_BIOS( 2, "bios2", "epr21904" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 1, "epr-21904.ic94",   0x000000, 0x200000, CRC(d96298b6) SHA1(d10d837bc7d68eb7125c34beffe21a91305627b0) ) \
+	ROM_LOAD_BIOS( 1, "epr-21904.ic94",   0x000000, 0x200000, CRC(d96298b6) SHA1(d10d837bc7d68eb7125c34beffe21a91305627b0) ) \
 	ROM_SYSTEM_BIOS( 3, "bios3", "Development / prototype" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 1, "prot_bot.ic94",    0x000000, 0x200000, CRC(7cbf2fb6) SHA1(7384e3c9314add7d61f93c9edd9fb7788d08f423) )
+	ROM_LOAD_BIOS( 1, "prot_bot.ic94",    0x000000, 0x200000, CRC(7cbf2fb6) SHA1(7384e3c9314add7d61f93c9edd9fb7788d08f423) )
 // bios 0 is SAMURAI boot rom 0.96 / 2000/8/10
-// bios 1 is SAMURAI boot rom 0.92 / 1999/7/2
-// bios 2 is SAMURAI boot rom 0.84 / 1999/7/22
+// bios 1 is SAMURAI boot rom 0.92 / 1999/7/22
+// bios 2 is SAMURAI boot rom 0.84 / 1999/07/22
 // bios 3 is SAMURAI boot rom 0.74 / 1999/5/01 Development version, have options to change country, SCSI ID, boot into debugger mode (will wait for commands from host via SCSI).
 
 
 ROM_START( hikaru )
-	ROM_REGION( 0x200000, "maincpu", 0)
 	HIKARU_BIOS
 
-	ROM_REGION( 0x400000, "user1", ROMREGION_ERASE)
+	ROM_REGION32_LE( 0x4000000, "user1", ROMREGION_ERASE00)
+	ROM_REGION32_LE( 0x10000000, "user2", ROMREGION_ERASE00)
 ROM_END
 
 
 ROM_START( airtrix )
-	ROM_REGION( 0x200000, "maincpu", 0)
 	HIKARU_BIOS
 
-	ROM_REGION( 0x800000, "user1", 0)
+	ROM_REGION32_LE( 0x4000000, "user1", ROMREGION_ERASE00)
 	ROM_LOAD32_WORD( "epr-23601a.ic29", 0x0000000, 0x0400000, CRC(cd3ccc05) SHA1(49de32d3588511f37486aff900773453739d706d) )
 	ROM_LOAD32_WORD( "epr-23602a.ic30", 0x0000002, 0x0400000, CRC(24f1bca9) SHA1(719dc4e003c1d13fcbb39604c156c89042c47dfd) )
 	/* ic31 unpopulated */
@@ -596,7 +644,7 @@ ROM_START( airtrix )
 	/* ic36 unpopulated */
 
 	/* ROM board using 128M TSOP48 mask ROMs */
-	ROM_REGION( 0x10000000, "user2", 0)
+	ROM_REGION32_LE( 0x10000000, "user2", ROMREGION_ERASE00)
 	ROM_LOAD32_WORD( "mpr-23573.ic37" , 0x0000000, 0x1000000, CRC(e22a0734) SHA1(fc06d5972d285d09473874aaeb1efed2d19c8f36) )
 	ROM_LOAD32_WORD( "mpr-23577.ic38" , 0x0000002, 0x1000000, CRC(d007680d) SHA1(a795057c40b1851adb0e19e5dfb39e16206215bf) )
 	ROM_LOAD32_WORD( "mpr-23574.ic41" , 0x2000000, 0x1000000, CRC(a77034a5) SHA1(e6e8e2f747e7a972144436103741acfd7030fe84) )
@@ -619,15 +667,14 @@ ROM_START( airtrix )
 ROM_END
 
 ROM_START( airtrixo )
-	ROM_REGION( 0x200000, "maincpu", 0)
 	HIKARU_BIOS
 
-	ROM_REGION( 0x800000, "user1", 0)
+	ROM_REGION32_LE(0x4000000, "user1", ROMREGION_ERASE00)
 	ROM_LOAD32_WORD( "epr-23601.ic29", 0x0000000, 0x0400000, CRC(e0c642cb) SHA1(f04f8e13cc46d462c79ecebcded7dee9b3500bdc) )
 	ROM_LOAD32_WORD( "epr-23602.ic30", 0x0000002, 0x0400000, CRC(fac11d21) SHA1(70b48a7e1ac4268fc09d96d6845c5a5099d4e301) )
 
 	/* ROM board using 128M TSOP48 mask ROMs */
-	ROM_REGION( 0x10000000, "user2", 0)
+	ROM_REGION32_LE( 0x10000000, "user2", ROMREGION_ERASE00)
 	ROM_LOAD32_WORD( "mpr-23573.ic37" , 0x0000000, 0x1000000, CRC(e22a0734) SHA1(fc06d5972d285d09473874aaeb1efed2d19c8f36) )
 	ROM_LOAD32_WORD( "mpr-23577.ic38" , 0x0000002, 0x1000000, CRC(d007680d) SHA1(a795057c40b1851adb0e19e5dfb39e16206215bf) )
 	ROM_LOAD32_WORD( "mpr-23574.ic41" , 0x2000000, 0x1000000, CRC(a77034a5) SHA1(e6e8e2f747e7a972144436103741acfd7030fe84) )
@@ -643,10 +690,9 @@ ROM_END
 
 
 ROM_START( pharrier )
-	ROM_REGION( 0x200000, "maincpu", 0)
 	HIKARU_BIOS
 
-	ROM_REGION( 0x2000000, "user1", 0)
+	ROM_REGION32_LE( 0x4000000, "user1", ROMREGION_ERASE00)
 	ROM_LOAD32_WORD("epr-23565a.ic29", 0x0000000, 0x0400000, CRC(ca9af8a7) SHA1(e7d6badc03ec5833ee89e49dd389ee19b45da29c) )
 	ROM_LOAD32_WORD("epr-23566a.ic30", 0x0000002, 0x0400000, CRC(aad0057c) SHA1(c18c0f1797432c74dc21bcd806cb5760916e4936) )
 	ROM_LOAD32_WORD("epr-23567.ic31",  0x0800000, 0x0400000, CRC(f0e3dcdc) SHA1(422978a13e39f439da54e43a65dcad1a5b1f2f27) )
@@ -657,7 +703,7 @@ ROM_START( pharrier )
 	ROM_LOAD32_WORD("epr-23572.ic36",  0x1800002, 0x0400000, CRC(46054067) SHA1(449800bdc2c40c76aed9bc5e7e8831d8f03ef286) )
 
 	/* ROM board using 128M TSOP48 mask ROMs */
-	ROM_REGION( 0x10000000, "user2", 0)
+	ROM_REGION32_LE( 0x10000000, "user2", ROMREGION_ERASE00)
 	ROM_LOAD32_WORD( "mpr-23549.ic37", 0x0000000, 0x1000000, CRC(ed764200) SHA1(ad840a40347345f72a443f284b1bb0ae2b37f7ac) )
 	ROM_LOAD32_WORD( "mpr-23553.ic38", 0x0000002, 0x1000000, CRC(5e70ae78) SHA1(2ae6bdb5aa1434bb60b2b9bca7af12d6476cd35f) )
 	ROM_LOAD32_WORD( "mpr-23550.ic41", 0x2000000, 0x1000000, CRC(841b4d3b) SHA1(d442078b6b4926e6e32b911d88a4408d20a8f0df) )
@@ -680,10 +726,9 @@ ROM_START( pharrier )
 ROM_END
 
 ROM_START( swracer )
-	ROM_REGION( 0x200000, "maincpu", 0)
 	HIKARU_BIOS
 
-	ROM_REGION( 0x2000000, "user1", 0)
+	ROM_REGION32_LE( 0x4000000, "user1", ROMREGION_ERASE00)
 	ROM_LOAD32_WORD("epr-23174.ic29", 0x0000000, 0x0400000, CRC(eae62b46) SHA1(f1458072b002d64bbb7c43c582e3191e8031e19a) )
 	ROM_LOAD32_WORD("epr-23175.ic30", 0x0000002, 0x0400000, CRC(b92da060) SHA1(dd9ecbd0977aef7629441ff45f4ad807b2408603) )
 	ROM_LOAD32_WORD("epr-23176.ic31", 0x0800000, 0x0400000, CRC(2f2824a7) SHA1(a375719e3cababab5b33d00d8696c7cd62c5af30) )
@@ -694,7 +739,7 @@ ROM_START( swracer )
 	/* ic36 unpopulated */
 
 	/* ROM board using 64M SOP44 mask ROM */
-	ROM_REGION( 0x10000000, "user2", 0)
+	ROM_REGION32_LE( 0x10000000, "user2", ROMREGION_ERASE00)
 	ROM_LOAD32_WORD("mpr-23086.ic37" ,  0x0000000, 0x0800000, CRC(ef6f20f1) SHA1(11fb66bf71223b4c6650d3adaea21e8709b8d67b))
 	ROM_LOAD32_WORD("mpr-23087.ic38" ,  0x0000002, 0x0800000, CRC(54389822) SHA1(6357f0aa77ef0a5a08a751e085fa026d26ba47d1))
 	ROM_LOAD32_WORD("mpr-23088.ic39" ,  0x1000000, 0x0800000, CRC(9f1a382e) SHA1(b846c3a091d04e49cc1e731237c9326ccac39a64))
@@ -733,10 +778,9 @@ ROM_START( swracer )
 ROM_END
 
 ROM_START( braveff )
-	ROM_REGION( 0x200000, "maincpu", 0)
 	HIKARU_BIOS
 
-	ROM_REGION( 0x2000000, "user1", 0)
+	ROM_REGION32_LE( 0x4000000, "user1", ROMREGION_ERASE00)
 	ROM_LOAD32_WORD( "epr-21994.ic29", 0x0000000, 0x200000, CRC(31b0a754) SHA1(b49c998a15fbc790b780ed6665a56681d4edd369) )
 	ROM_LOAD32_WORD( "epr-21995.ic30", 0x0000002, 0x200000, CRC(bcccb56b) SHA1(6e7a69934e5b47495ae8e90c57759573bc519d24) )
 	ROM_LOAD32_WORD( "epr-21996.ic31", 0x0800000, 0x200000, CRC(a8f88e17) SHA1(dbbd2a73335c740bcf2ff9680c575841af29b340) )
@@ -747,7 +791,7 @@ ROM_START( braveff )
 	/* ic36 unpopulated */
 
 	/* ROM board using 64M SOP44 mask ROM */
-	ROM_REGION( 0xc000000, "user2", ROMREGION_ERASE00)
+	ROM_REGION32_LE( 0x10000000, "user2", ROMREGION_ERASE00)
 	ROM_LOAD32_WORD( "mpr-22000.ic37",  0x0000000, 0x800000, CRC(53d641d6) SHA1(f47d7c77d0e36c4ec3b7171fd7a017f9f58ca5a0) )
 	ROM_LOAD32_WORD( "mpr-22001.ic38",  0x0000002, 0x800000, CRC(234bc48f) SHA1(177c46884de0ba4bac1f9b778f99c905410a9345) )
 	ROM_LOAD32_WORD( "mpr-22002.ic39",  0x1000000, 0x800000, CRC(d8f3aa9e) SHA1(f73208034fdd51fed086e912cb8580d2270122b6) )
@@ -777,15 +821,14 @@ ROM_START( braveff )
 ROM_END
 
 ROM_START( sgnascar )
-	ROM_REGION( 0x200000, "maincpu", 0)
 	HIKARU_BIOS
 
-	ROM_REGION( 0x2000000, "user1", 0)
+	ROM_REGION32_LE( 0x4000000, "user1", ROMREGION_ERASE00)
 	ROM_LOAD32_WORD( "epr-23485a.ic35", 0x000000, 0x400000, CRC(1072f531) SHA1(ca07a8bfb7247e4aec57e18cb091d24dcef666c1) )
 	ROM_LOAD32_WORD( "epr-23486a.ic36", 0x000002, 0x400000, CRC(02d4aab6) SHA1(b1b0e07dc71dc124177e27dfd8b459444e8ae4d3) )
 
 	/* ROM board using 128M TSOP48 mask ROMs */
-	ROM_REGION( 0x10000000, "user2", ROMREGION_ERASE00)
+	ROM_REGION32_LE( 0x10000000, "user2", ROMREGION_ERASE00)
 	ROM_LOAD32_WORD( "mpr-23469.ic19", 0x0000000, 0x1000000, CRC(89cbad8d) SHA1(e4f103b96a3a842a90182172ddcf3bc5dfe6cca8) )
 	ROM_LOAD32_WORD( "mpr-23473.ic20", 0x0000002, 0x1000000, CRC(977b87d6) SHA1(079eeebc6f9c60d0a016a46386bbe846d8a354da) )
 	ROM_LOAD32_WORD( "mpr-23470.ic21", 0x2000000, 0x1000000, CRC(faf4940f) SHA1(72fee9ea5b78da260ed99ebe80ca6300f62cdbd7) )
@@ -809,15 +852,14 @@ ROM_START( sgnascar )
 ROM_END
 
 ROM_START( sgnascaro )
-	ROM_REGION( 0x200000, "maincpu", 0)
 	HIKARU_BIOS
 
-	ROM_REGION( 0x2000000, "user1", 0)
+	ROM_REGION32_LE( 0x4000000, "user1", ROMREGION_ERASE00)
 	ROM_LOAD32_WORD( "epr-23485.ic35", 0x000000, 0x400000, CRC(13b44fbf) SHA1(73416fa7b671ec5c96f0b084a427ff701bf6c399) )
 	ROM_LOAD32_WORD( "epr-23486.ic36", 0x000002, 0x400000, CRC(ac3acd19) SHA1(1ec96be0bfceb2f1f808d78b07425d32056fbde0) )
 
 	/* ROM board using 128M TSOP48 mask ROMs */
-	ROM_REGION( 0x10000000, "user2", ROMREGION_ERASE00)
+	ROM_REGION32_LE( 0x10000000, "user2", ROMREGION_ERASE00)
 	ROM_LOAD32_WORD( "mpr-23469.ic19", 0x0000000, 0x1000000, CRC(89cbad8d) SHA1(e4f103b96a3a842a90182172ddcf3bc5dfe6cca8) )
 	ROM_LOAD32_WORD( "mpr-23473.ic20", 0x0000002, 0x1000000, CRC(977b87d6) SHA1(079eeebc6f9c60d0a016a46386bbe846d8a354da) )
 	ROM_LOAD32_WORD( "mpr-23470.ic21", 0x2000000, 0x1000000, CRC(faf4940f) SHA1(72fee9ea5b78da260ed99ebe80ca6300f62cdbd7) )
@@ -843,10 +885,9 @@ ROM_END
 // HIKARU CHECK ROM BD, 837-13766
 // Development ROM board type, looks same as Type 2/837-13403/171-7640B but have ZIF sockets instead of Mask ROMs and socketed 315-5881 chip.
 ROM_START( hikcheck )
-	ROM_REGION( 0x200000, "maincpu", 0)
 	HIKARU_BIOS
 
-	ROM_REGION( 0x2000000, "user1", 0)
+	ROM_REGION32_LE( 0x4000000, "user1", 0)
 	// Flash ROM module, label:
 	// SEGA HIKARU
 	// Manufacturer Test Use Program (Japanese)
@@ -866,7 +907,7 @@ ROM_START( hikcheck )
 	// ic36 unpopulated
 
 	// SOP44 sockets, no ROMs populated
-	ROM_REGION( 0x10000000, "user2", ROMREGION_ERASE00)
+	ROM_REGION32_LE( 0x10000000, "user2", ROMREGION_ERASE00)
 
 	// 315-5881 populated, have no 317-xxxx stamp, key is unknown.
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1" )
