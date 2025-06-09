@@ -56,6 +56,7 @@ public:
 		, m_videoram_8x8_mg(*this, "videoram_8x8mg")
 		, m_videoram_8x8_mg_8x8_fg(*this, "videoram_8x8fg")
 		, m_videoram_16x16_bg(*this, "videoram16x16bg")
+		, m_videoregs(*this, "videoregs")
 		, m_spriteram(*this, "spriteram")
 	{ }
 
@@ -76,6 +77,7 @@ private:
 	required_shared_ptr<uint16_t> m_videoram_8x8_mg;
 	required_shared_ptr<uint16_t> m_videoram_8x8_mg_8x8_fg;
 	required_shared_ptr<uint16_t> m_videoram_16x16_bg;
+	required_shared_ptr<uint16_t> m_videoregs;
 	required_shared_ptr<uint16_t> m_spriteram;
 
 	void descramble_16x16tiles(uint8_t* src, int len);
@@ -216,14 +218,15 @@ void xorworld_ms_state::xorworld_ms_map(address_map &map)
 	map(0x0a0000, 0x0a1fff).ram().w(FUNC(xorworld_ms_state::videoram16x16_bg_w)).share("videoram16x16bg");
 
 	// almost certainly the video regs (scroll etc.)
-	map(0x0c0000, 0x0c0001).noprw(); // startup
-	map(0x0c0002, 0x0c0003).nopw(); // startup
-	map(0x0c0004, 0x0c0005).nopw(); // startup
-	map(0x0c0006, 0x0c0007).nopw(); // startup
-	map(0x0c0008, 0x0c0009).noprw(); // startup
-	map(0x0c000a, 0x0c000b).noprw(); // startup
-	map(0x0c000c, 0x0c000d).nopw(); // startup
-	map(0x0c000e, 0x0c000f).noprw(); // quite often
+//	map(0x0c0000, 0x0c0001).noprw(); // startup
+//	map(0x0c0002, 0x0c0003).nopw(); // startup
+//	map(0x0c0004, 0x0c0005).nopw(); // startup
+//	map(0x0c0006, 0x0c0007).nopw(); // startup
+//	map(0x0c0008, 0x0c0009).noprw(); // startup
+//	map(0x0c000a, 0x0c000b).noprw(); // startup
+//	map(0x0c000c, 0x0c000d).nopw(); // startup
+//	map(0x0c000e, 0x0c000f).noprw(); // quite often
+	map(0x0c0000, 0x0c000f).ram().share("videoregs");
 
 	map(0x100000, 0x1007ff).ram().share("spriteram");
 	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -253,7 +256,7 @@ static INPUT_PORTS_START( xorworld_ms )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("P1 Button 3 / P1 Start")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("IN1") 
@@ -263,7 +266,7 @@ static INPUT_PORTS_START( xorworld_ms )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("P2 Button 3 / P2 Start")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
 	PORT_START("DSW1")
