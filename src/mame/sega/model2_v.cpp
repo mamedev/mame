@@ -1320,10 +1320,9 @@ void model2_state::geo_parse_np_ns( geo_state *geo, u32 *input, u32 count )
 			else luminance = fabs( dotl );
 
 			luminance = (luminance * texparam->diffuse) + texparam->ambient;
-			luma = (int32_t)luminance;
+			luminance = std::clamp(luminance, 0.0f, 255.0f);
 
-			if ( luma > 255 ) luma = 255;
-			if ( luma < 0 ) luma = 0;
+			luma = (int32_t)luminance;
 
 			/* add the face bit to the luma */
 			luma += face;
@@ -1477,9 +1476,7 @@ void model2_state::geo_parse_np_s( geo_state *geo, u32 *input, u32 count )
 			specular *= texparam->specular_scale;
 
 			luminance = (luminance * texparam->diffuse) + texparam->ambient + specular;
-
-			if (luminance > 255.0f) luminance = 255.0f;
-			if (luminance < 0.0f) luminance = 0.0;
+			luminance = std::clamp(luminance, 0.0f, 255.0f);
 
 			luma = (int32_t)luminance;
 
@@ -1636,10 +1633,9 @@ void model2_state::geo_parse_nn_ns( geo_state *geo, u32 *input, u32 count )
 			else luminance = fabs( dotl );
 
 			luminance = (luminance * texparam->diffuse) + texparam->ambient;
-			luma = (int32_t)luminance;
+			luminance = std::clamp(luminance, 0.0f, 255.0f);
 
-			if ( luma > 255 ) luma = 255;
-			if ( luma < 0 ) luma = 0;
+			luma = (int32_t)luminance;
 
 			/* add the face bit to the luma */
 			luma += face;
@@ -1836,9 +1832,7 @@ void model2_state::geo_parse_nn_s( geo_state *geo, u32 *input, u32 count )
 			specular *= texparam->specular_scale;
 
 			luminance = (luminance * texparam->diffuse) + texparam->ambient + specular;
-
-			if (luminance > 255.0f) luminance = 255.0f;
-			if (luminance < 0.0f) luminance = 0.0;
+			luminance = std::clamp(luminance, 0.0f, 255.0f);
 
 			luma = (int32_t)luminance;
 
