@@ -5455,20 +5455,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/rtpc/kbd_con.h,BUSES["RTPC_KBD"] = true
----------------------------------------------------
-
-if (BUSES["RTPC_KBD"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/bus/rtpc/kbd_con.cpp",
-		MAME_DIR .. "src/devices/bus/rtpc/kbd_con.h",
-		MAME_DIR .. "src/devices/bus/rtpc/kbd.cpp",
-		MAME_DIR .. "src/devices/bus/rtpc/kbd.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/bus/saitek_osa/expansion.h,BUSES["SAITEK_OSA"] = true
 ---------------------------------------------------
 
