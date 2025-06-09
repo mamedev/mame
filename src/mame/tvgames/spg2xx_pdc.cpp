@@ -362,7 +362,7 @@ CONS( 2011, pdc40t,   0,        0, pdc_tactile, pdc_tactile,  spg2xx_pdc_game_st
 
 CONS( 2011, pdc150t,  0,        0, pdc_tactile, pdc_tactile,  spg2xx_pdc150t_game_state, init_pdc150t, "Conny / VideoJet", "PDC150 Tactile - Pocket Dream Console (VideoJet, France)", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2008, ouipdc,   0,        0, pdc100,      pdc100,       spg2xx_pdc_game_state,     empty_init,   "Conny / VideoJet", "Oui Oui - Pocket Dream Console (VideoJet, France)", MACHINE_IMPERFECT_SOUND )
+CONS( 2008, ouipdc,   0,        0, pdc100,      pdc100,       spg2xx_pdc_game_state,     empty_init,   "Conny / VideoJet", "Oui-Oui - Pocket Dream Console (VideoJet, France)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2013, tmntpdc,  0,        0, pdc100,      pdc100,       spg2xx_pdc_game_state,     empty_init,   "Conny / VideoJet", "Teenage Mutant Ninja Turtles - Pocket Dream Console (VideoJet, France)", MACHINE_IMPERFECT_SOUND )
 
