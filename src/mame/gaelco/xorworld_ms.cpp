@@ -17,6 +17,15 @@
     SYSTEM 2: (sound) 1 x EPROM, Z8400BB1, 28 MHz xtal, 16 MHz xtal, 1 x OKI5205, 384 kHz osc,
               1 x GAL16V8, 1 x GAL20V8, 1 x YM3812.
 
+	quite similar to splash_ms.cpp but without the extra bitmap layer and CPU driving it
+
+	TODO:
+	 - sprite alignment/bg etc. (and garbage at the top)
+	 - sound
+	 - service mode colours are broken
+	 - do the higher attribute bits in the 16x16 layer have meaning?
+	 - verify there's no (subtle) protection
+
 ***************************************************************************************************/
 
 #include "emu.h"
@@ -40,9 +49,14 @@ public:
 	xorworld_ms_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_soundcpu(*this, "soundcpu")
 		, m_palette(*this, "palette")
 		, m_screen(*this, "screen")
 		, m_gfxdecode(*this, "gfxdecode")
+		, m_videoram_8x8_mg(*this, "videoram_8x8mg")
+		, m_videoram_8x8_mg_8x8_fg(*this, "videoram_8x8fg")
+		, m_videoram_16x16_bg(*this, "videoram16x16bg")
+		, m_spriteram(*this, "spriteram")
 	{ }
 
 	void xorworld_ms(machine_config &config) ATTR_COLD;
@@ -55,34 +69,211 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_shared_ptr<uint16_t> m_videoram_8x8_mg;
+	required_shared_ptr<uint16_t> m_videoram_8x8_mg_8x8_fg;
+	required_shared_ptr<uint16_t> m_videoram_16x16_bg;
+	required_shared_ptr<uint16_t> m_spriteram;
+
+	void descramble_16x16tiles(uint8_t* src, int len);
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void descramble_16x16tiles(u8 *src, int len);
+	void videoram8x8_mg_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void videoram8x8_fg_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void videoram16x16_bg_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	TILE_GET_INFO_MEMBER(get_tile_info_tilemap_8x8mg);
+	TILE_GET_INFO_MEMBER(get_tile_info_tilemap_8x8fg);
+	TILE_GET_INFO_MEMBER(get_tile_info_tilemap_16x16bg);
 
 	void xorworld_ms_map(address_map &map) ATTR_COLD;
+	void xorworld_ms_sound_map(address_map &map) ATTR_COLD;
+
+	tilemap_t *m_tilemap_8x8_mg = nullptr;
+	tilemap_t *m_tilemap_8x8_fg = nullptr;
+	tilemap_t *m_tilemap_16x16_bg = nullptr;
 };
 
 
 void xorworld_ms_state::video_start()
 {
+	m_tilemap_8x8_mg = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(xorworld_ms_state::get_tile_info_tilemap_8x8mg)), TILEMAP_SCAN_ROWS,  8,  8, 64, 32);
+	m_tilemap_8x8_fg = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(xorworld_ms_state::get_tile_info_tilemap_8x8fg)), TILEMAP_SCAN_ROWS,  8,  8, 64, 32);
+	m_tilemap_16x16_bg = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(xorworld_ms_state::get_tile_info_tilemap_16x16bg)), TILEMAP_SCAN_ROWS,  16,  16, 64, 32);
+
+	m_tilemap_8x8_mg->set_transparent_pen(0);
+	m_tilemap_8x8_fg->set_transparent_pen(0);
 }
 
-u32 xorworld_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 xorworld_ms_state::screen_update(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect)
 {
+	// TODO: use scroll regs (only set once on startup though?)
+	m_tilemap_8x8_mg->set_scrollx(0, 128);
+	m_tilemap_8x8_mg->set_scrolly(0, 0);
+	m_tilemap_8x8_fg->set_scrollx(0, 128);
+	m_tilemap_8x8_fg->set_scrolly(0, 0);
+	m_tilemap_16x16_bg->set_scrollx(0, 128);
+	m_tilemap_16x16_bg->set_scrolly(0, 0);
+
+	m_tilemap_16x16_bg->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap_8x8_mg->draw(screen, bitmap, cliprect, 0, 0);
+	m_tilemap_8x8_fg->draw(screen, bitmap, cliprect, 0, 0);
+
+	// TODO, convert to device, share between Modualar System games
+	const int NUM_SPRITES = 0x200;
+	const int X_EXTRA_OFFSET = 128;
+
+	for (int i = NUM_SPRITES - 2; i >= 0; i -= 2)
+	{
+		gfx_element* gfx = m_gfxdecode->gfx(0);
+
+		uint16_t attr0 = m_spriteram[i + 0];
+		uint16_t attr1 = m_spriteram[i + 1];
+
+		uint16_t attr2 = m_spriteram[i + NUM_SPRITES];
+		//uint16_t attr3 = m_spriteram[i + NUM_SPRITES+1]; // unused?
+
+		int ypos = attr0 & 0x00ff;
+		int xpos = (attr1 & 0xff00) >> 8;
+		xpos |= (attr2 & 0x8000) ? 0x100 : 0x000;
+
+		ypos = (0xff - ypos);
+		ypos |= (attr2 & 0x4000) ? 0x100 : 0x000; // maybe
+
+		int tile = (attr0 & 0xff00) >> 8;
+		tile |= (attr1 & 0x003f) << 8;
+
+		int flipx = (attr1 & 0x0040);
+		int flipy = (attr1 & 0x0080);
+
+		gfx->transpen(bitmap, cliprect, tile, (attr2 & 0x0f00) >> 8, flipx, flipy, xpos - 16 - X_EXTRA_OFFSET, ypos - 16, 15);
+	}
+
 	return 0;
 }
 
+void xorworld_ms_state::videoram8x8_mg_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_videoram_8x8_mg[offset]);
+	m_tilemap_8x8_mg->mark_tile_dirty(offset/2);
+}
+
+TILE_GET_INFO_MEMBER(xorworld_ms_state::get_tile_info_tilemap_8x8mg)
+{
+	int tile = m_videoram_8x8_mg[tile_index * 2];
+	int attr = m_videoram_8x8_mg[(tile_index * 2) + 1] & 0x1f;
+	//	int fx = (m_videoram_8x8_mg[(tile_index*2)+1] & 0xc0)>>6;
+
+	tileinfo.set(2, tile, attr, 0); // must be region 2 for the score display tiles
+}
+
+void xorworld_ms_state::videoram8x8_fg_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_videoram_8x8_mg_8x8_fg[offset]);
+	m_tilemap_8x8_fg->mark_tile_dirty(offset / 2);
+}
+
+TILE_GET_INFO_MEMBER(xorworld_ms_state::get_tile_info_tilemap_8x8fg)
+{
+	int tile = m_videoram_8x8_mg_8x8_fg[tile_index * 2];
+	int attr = m_videoram_8x8_mg_8x8_fg[(tile_index * 2) + 1] & 0x1f;
+	//	int fx = (m_videoram_8x8_mg[(tile_index*2)+1] & 0xc0)>>6;
+
+	tileinfo.set(1, tile, attr, 0); // assume region 1 as other tilemap is region 2
+}
+
+void xorworld_ms_state::videoram16x16_bg_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_videoram_16x16_bg[offset]);
+	m_tilemap_16x16_bg->mark_tile_dirty(offset / 2);
+}
+
+TILE_GET_INFO_MEMBER(xorworld_ms_state::get_tile_info_tilemap_16x16bg)
+{
+	// some other upper bits in attributes are used, but on areas
+	// that are intentionally invisible?
+	int tile = m_videoram_16x16_bg[tile_index * 2];
+	int attr = (m_videoram_16x16_bg[(tile_index * 2) + 1]);
+
+	tileinfo.set(3, tile, attr & 0x1f, 0);
+}
 
 void xorworld_ms_state::xorworld_ms_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
+	map(0x080000, 0x081fff).ram().w(FUNC(xorworld_ms_state::videoram8x8_fg_w)).share("videoram_8x8fg");
+	map(0x090000, 0x091fff).ram().w(FUNC(xorworld_ms_state::videoram8x8_mg_w)).share("videoram_8x8mg");
+	map(0x0a0000, 0x0a1fff).ram().w(FUNC(xorworld_ms_state::videoram16x16_bg_w)).share("videoram16x16bg");
+	map(0x100000, 0x1007ff).ram().share("spriteram");
+	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+
+	map(0x400000, 0x400001).portr("IN0");
+	map(0x400002, 0x400003).portr("IN1");
+	map(0x400006, 0x400007).portr("DSW1");
+	map(0x400008, 0x400009).portr("DSW2");
+
+	map(0xff0000, 0xffffff).ram();
+}
+
+void xorworld_ms_state::xorworld_ms_sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xe800, 0xe801).noprw();
+	map(0xf000, 0xffff).ram();
 }
 
 static INPUT_PORTS_START( xorworld_ms )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+
+	PORT_START("IN1") 
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
+
+	PORT_START("DSW1")
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x0700, 0x0700, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0700, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0600, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0500, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x0300, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( 1C_6C ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) ) // unused according to service mode
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x6000, 0x6000, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x6000, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
+	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )
+
+	PORT_START("DSW2")
+	// no 2nd dip bank?
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static const gfx_layout tiles8x8x4_layout =
@@ -107,21 +298,17 @@ static const gfx_layout tiles16x16x4_layout =
 	16 * 16 * 4
 };
 
-// Probably wrong
 static GFXDECODE_START( gfx_xorworld_ms )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x4_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16x4_layout, 0, 16 )
-	GFXDECODE_ENTRY( "sprites", 0, tiles16x16x4_layout, 0x000, 16 )
+	GFXDECODE_ENTRY( "sprites", 0, tiles16x16x4_layout, 0x200, 16 )
+	GFXDECODE_ENTRY( "gfx_8x8fg", 0, tiles8x8x4_layout, 0x000, 32 )
+	GFXDECODE_ENTRY( "gfx_8x8mg", 0, tiles8x8x4_layout, 0x000, 32 )
+	GFXDECODE_ENTRY( "gfx_16x16bg", 0, tiles16x16x4_layout, 0x000, 32 )
 GFXDECODE_END
 
-void xorworld_ms_state::machine_start()
+// reorganize graphics into something we can decode with a single pass
+void xorworld_ms_state::descramble_16x16tiles(uint8_t* src, int len)
 {
-}
-
-// Reorganize graphics into something we can decode with a single pass
-void xorworld_ms_state::descramble_16x16tiles(u8 *src, int len)
-{
-	std::vector<u8> buffer(len);
+	std::vector<uint8_t> buffer(len);
 	{
 		for (int i = 0; i < len; i++)
 		{
@@ -133,9 +320,13 @@ void xorworld_ms_state::descramble_16x16tiles(u8 *src, int len)
 	}
 }
 
+void xorworld_ms_state::machine_start()
+{
+}
+
 void xorworld_ms_state::init_xorworld_ms()
 {
-	descramble_16x16tiles(memregion("gfx2")->base(), memregion("gfx2")->bytes());
+	descramble_16x16tiles(memregion("gfx_16x16bg")->base(), memregion("gfx_16x16bg")->bytes());
 }
 
 void xorworld_ms_state::xorworld_ms(machine_config &config)
@@ -147,12 +338,12 @@ void xorworld_ms_state::xorworld_ms(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(64*8, 32*8);
-	m_screen->set_visarea(0*8, 64*8-1, 0*8, 32*8-1);
+	m_screen->set_size(32*8, 32*8);
+	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(xorworld_ms_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette).set_entries(0x400);
+	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 0x400);
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_xorworld_ms);
 
@@ -160,7 +351,8 @@ void xorworld_ms_state::xorworld_ms(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	Z80(config, "soundcpu", 16_MHz_XTAL / 4); // Z8400BB1
+	Z80(config, m_soundcpu, 16_MHz_XTAL / 4); // Z8400BB1
+	m_soundcpu->set_addrmap(AS_PROGRAM, &xorworld_ms_state::xorworld_ms_sound_map);
 
 	YM3812(config, "ymsnd", 16_MHz_XTAL / 4); // Unknown divisor
 
@@ -169,28 +361,28 @@ void xorworld_ms_state::xorworld_ms(machine_config &config)
 
 ROM_START( xorworldm )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "mod_6-1_xo_608a_27c512.ic8",  0x000000, 0x010000, CRC(cebcd3e7) SHA1(ee6d107dd13e4faa8d5b6ba9815c57919a69568e) )
-	ROM_LOAD16_BYTE( "mod_6-1_xo_617a_27c512.ic17", 0x000001, 0x010000, CRC(47bae292) SHA1(f36e2f80d4da31d7edc7dc8c07abb158ef21cb20) )
+	ROM_LOAD16_BYTE( "mod_6-1_xo_608a_27c512.ic8",  0x000001, 0x010000, CRC(cebcd3e7) SHA1(ee6d107dd13e4faa8d5b6ba9815c57919a69568e) )
+	ROM_LOAD16_BYTE( "mod_6-1_xo_617a_27c512.ic17", 0x000000, 0x010000, CRC(47bae292) SHA1(f36e2f80d4da31d7edc7dc8c07abb158ef21cb20) )
 
-	ROM_REGION( 0x40000, "gfx1", 0 )
+	ROM_REGION( 0x40000, "gfx_8x8fg", ROMREGION_INVERT )
 	ROM_LOAD32_BYTE( "mod_8-2_27c512.ic15", 0x00003, 0x10000, CRC(01d16cac) SHA1(645b3380e66ab158392f8161485ae957ab2dfa44) )
 	ROM_LOAD32_BYTE( "mod_8-2_27c512.ic22", 0x00002, 0x10000, CRC(3aadacaf) SHA1(f640a1d6a32774cb70e180c49965f70f5b79ba6a) )
 	ROM_LOAD32_BYTE( "mod_8-2_27c512.ic30", 0x00001, 0x10000, CRC(fa75826e) SHA1(1db9cc8ec5811b9d497b060bfc3245c6e082e98c) )
 	ROM_LOAD32_BYTE( "mod_8-2_27c512.ic37", 0x00000, 0x10000, CRC(157832ed) SHA1(5dec1c7046d2449d3d4330654554f1a9430c8057) )
 
-	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_REGION( 0x40000, "gfx_8x8mg", 0 ) // *almost* the same as gfx1 but not inverted, some tiles changed
+	ROM_LOAD32_BYTE( "mod_8-2_27c512.ic11", 0x00003, 0x10000, CRC(93373f1f) SHA1(06718a09c76060914a1b2a4c57d0328a9f59eb99) )
+	ROM_LOAD32_BYTE( "mod_8-2_27c512.ic18", 0x00002, 0x10000, CRC(7015d8ff) SHA1(83d40ef2ca1cf8dfb2229b8f47c08a303b8490ea) )
+	ROM_LOAD32_BYTE( "mod_8-2_27c512.ic26", 0x00001, 0x10000, CRC(4be8db92) SHA1(8983893570587de9cdd63bc645d1ae2d8c3400a2) )
+	ROM_LOAD32_BYTE( "mod_8-2_27c512.ic33", 0x00000, 0x10000, CRC(c29cd83b) SHA1(e8833b6ab8f7f6ce4c01937e94332a86908353db) )
+
+	ROM_REGION( 0x40000, "gfx_16x16bg", 0 )
 	ROM_LOAD32_BYTE( "mod_8-2_27c512.ic13", 0x00003, 0x10000, CRC(56a683fc) SHA1(986a6b26e38308dd3230dd13a1a2f5cfc7b1dda8) )
 	ROM_LOAD32_BYTE( "mod_8-2_27c512.ic20", 0x00002, 0x10000, CRC(950090e6) SHA1(cdec2eb93884c5a759af39d02f5cc0fa25011103) )
 	ROM_LOAD32_BYTE( "mod_8-2_27c512.ic28", 0x00001, 0x10000, CRC(ca950a11) SHA1(cef2a65d1f5562556fc28a95f6ba8f3ff1a3678d) )
 	ROM_LOAD32_BYTE( "mod_8-2_27c512.ic35", 0x00000, 0x10000, CRC(5e7582f9) SHA1(fdb3ddb2a224fdea610f6bd55a3e3efe1a5515a2) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )
-	ROM_LOAD32_BYTE( "mod_8-2_27c512.ic11", 0x00003, 0x10000, CRC(93373f1f) SHA1(06718a09c76060914a1b2a4c57d0328a9f59eb99) )
-	ROM_LOAD32_BYTE( "mod_8-2_27c512.ic33", 0x00002, 0x10000, CRC(c29cd83b) SHA1(e8833b6ab8f7f6ce4c01937e94332a86908353db) )
-	ROM_LOAD32_BYTE( "mod_8-2_27c512.ic18", 0x00001, 0x10000, CRC(7015d8ff) SHA1(83d40ef2ca1cf8dfb2229b8f47c08a303b8490ea) )
-	ROM_LOAD32_BYTE( "mod_8-2_27c512.ic26", 0x00000, 0x10000, CRC(4be8db92) SHA1(8983893570587de9cdd63bc645d1ae2d8c3400a2) )
-
-	ROM_REGION( 0x80000, "sprites", ROMREGION_ERASEFF | ROMREGION_INVERT )
+	ROM_REGION( 0x40000, "sprites", ROMREGION_ERASEFF | ROMREGION_INVERT )
 	ROM_LOAD32_BYTE( "mod_5-1_27c512.ic3",  0x00003, 0x10000, CRC(26b2181e) SHA1(03cc280a4e9d9d8ac1c04da7d90c684d83fc2444) )
 	ROM_LOAD32_BYTE( "mod_5-1_27c512.ic12", 0x00002, 0x10000, CRC(b2bdb8d1) SHA1(eeace8dc4e6c192ad7b2f53cd01fcc2e92125f35) )
 	ROM_LOAD32_BYTE( "mod_5-1_27c512.ic18", 0x00001, 0x10000, CRC(d0c7a07b) SHA1(698883f2a91a34c802c1bc9a86bec0a77f4de7fe) )
@@ -221,28 +413,28 @@ ROM_END
 
 ROM_START( xorworldma )
 	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "xo_608_27c512.bin", 0x000000, 0x010000, CRC(12ed0ab0) SHA1(dcdd6dccc367fe1084af71001afaa26c4879817e) )
-	ROM_LOAD16_BYTE( "xo_617_27c512.bin", 0x000001, 0x010000, CRC(fea2750f) SHA1(b6ed781514a9c1901372e489ba46a36120bde528) )
+	ROM_LOAD16_BYTE( "xo_608_27c512.bin", 0x000001, 0x010000, CRC(12ed0ab0) SHA1(dcdd6dccc367fe1084af71001afaa26c4879817e) )
+	ROM_LOAD16_BYTE( "xo_617_27c512.bin", 0x000000, 0x010000, CRC(fea2750f) SHA1(b6ed781514a9c1901372e489ba46a36120bde528) )
 
-	ROM_REGION( 0x40000, "gfx1", 0 )
+	ROM_REGION( 0x40000, "gfx_8x8fg", ROMREGION_INVERT )
 	ROM_LOAD32_BYTE( "mod_8-2_27c512.ic15", 0x00003, 0x10000, CRC(01d16cac) SHA1(645b3380e66ab158392f8161485ae957ab2dfa44) )
 	ROM_LOAD32_BYTE( "mod_8-2_27c512.ic22", 0x00002, 0x10000, CRC(3aadacaf) SHA1(f640a1d6a32774cb70e180c49965f70f5b79ba6a) )
 	ROM_LOAD32_BYTE( "mod_8-2_27c512.ic30", 0x00001, 0x10000, CRC(fa75826e) SHA1(1db9cc8ec5811b9d497b060bfc3245c6e082e98c) )
 	ROM_LOAD32_BYTE( "mod_8-2_27c512.ic37", 0x00000, 0x10000, CRC(157832ed) SHA1(5dec1c7046d2449d3d4330654554f1a9430c8057) )
 
-	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_REGION( 0x40000, "gfx_8x8mg", 0 ) // *almost* the same as gfx1 but not inverted, some tiles changed
+	ROM_LOAD32_BYTE( "mod_8-2_27c512.ic11", 0x00003, 0x10000, CRC(93373f1f) SHA1(06718a09c76060914a1b2a4c57d0328a9f59eb99) )
+	ROM_LOAD32_BYTE( "mod_8-2_27c512.ic18", 0x00002, 0x10000, CRC(7015d8ff) SHA1(83d40ef2ca1cf8dfb2229b8f47c08a303b8490ea) )
+	ROM_LOAD32_BYTE( "mod_8-2_27c512.ic26", 0x00001, 0x10000, CRC(4be8db92) SHA1(8983893570587de9cdd63bc645d1ae2d8c3400a2) )
+	ROM_LOAD32_BYTE( "mod_8-2_27c512.ic33", 0x00000, 0x10000, CRC(c29cd83b) SHA1(e8833b6ab8f7f6ce4c01937e94332a86908353db) )
+
+	ROM_REGION( 0x40000, "gfx_16x16bg", 0 )
 	ROM_LOAD32_BYTE( "mod_8-2_27c512.ic13", 0x00003, 0x10000, CRC(56a683fc) SHA1(986a6b26e38308dd3230dd13a1a2f5cfc7b1dda8) )
 	ROM_LOAD32_BYTE( "mod_8-2_27c512.ic20", 0x00002, 0x10000, CRC(950090e6) SHA1(cdec2eb93884c5a759af39d02f5cc0fa25011103) )
 	ROM_LOAD32_BYTE( "mod_8-2_27c512.ic28", 0x00001, 0x10000, CRC(ca950a11) SHA1(cef2a65d1f5562556fc28a95f6ba8f3ff1a3678d) )
 	ROM_LOAD32_BYTE( "mod_8-2_27c512.ic35", 0x00000, 0x10000, CRC(5e7582f9) SHA1(fdb3ddb2a224fdea610f6bd55a3e3efe1a5515a2) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )
-	ROM_LOAD32_BYTE( "mod_8-2_27c512.ic11", 0x00003, 0x10000, CRC(93373f1f) SHA1(06718a09c76060914a1b2a4c57d0328a9f59eb99) )
-	ROM_LOAD32_BYTE( "mod_8-2_27c512.ic33", 0x00002, 0x10000, CRC(c29cd83b) SHA1(e8833b6ab8f7f6ce4c01937e94332a86908353db) )
-	ROM_LOAD32_BYTE( "mod_8-2_27c512.ic18", 0x00001, 0x10000, CRC(7015d8ff) SHA1(83d40ef2ca1cf8dfb2229b8f47c08a303b8490ea) )
-	ROM_LOAD32_BYTE( "mod_8-2_27c512.ic26", 0x00000, 0x10000, CRC(4be8db92) SHA1(8983893570587de9cdd63bc645d1ae2d8c3400a2) )
-
-	ROM_REGION( 0x80000, "sprites", ROMREGION_ERASEFF | ROMREGION_INVERT )
+	ROM_REGION( 0x40000, "sprites", ROMREGION_ERASEFF | ROMREGION_INVERT )
 	ROM_LOAD32_BYTE( "mod_5-1_27c512.ic3",  0x00003, 0x10000, CRC(26b2181e) SHA1(03cc280a4e9d9d8ac1c04da7d90c684d83fc2444) )
 	ROM_LOAD32_BYTE( "mod_5-1_27c512.ic12", 0x00002, 0x10000, CRC(b2bdb8d1) SHA1(eeace8dc4e6c192ad7b2f53cd01fcc2e92125f35) )
 	ROM_LOAD32_BYTE( "mod_5-1_27c512.ic18", 0x00001, 0x10000, CRC(d0c7a07b) SHA1(698883f2a91a34c802c1bc9a86bec0a77f4de7fe) )
@@ -274,6 +466,7 @@ ROM_END
 } // anonymous namespace
 
 // Xor World was originally developed using the Modular System, so this isn't a bootleg
-
-GAME( 1990, xorworldm,  xorworld, xorworld_ms, xorworld_ms, xorworld_ms_state, init_xorworld_ms, ROT0, "Gaelco", "Xor World (Modular System, set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1990, xorworldma, xorworld, xorworld_ms, xorworld_ms, xorworld_ms_state, init_xorworld_ms, ROT0, "Gaelco", "Xor World (Modular System, set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+// however the ROMs here contain the title logos from the 'xorworld' sets but don't
+// make use of them, instead opting for their own, so which really came first?
+GAME( 1990, xorworldm,  xorworld, xorworld_ms, xorworld_ms, xorworld_ms_state, init_xorworld_ms, ROT0, "Gaelco", "Xor World (Modular System, prototype, set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1990, xorworldma, xorworld, xorworld_ms, xorworld_ms, xorworld_ms_state, init_xorworld_ms, ROT0, "Gaelco", "Xor World (Modular System, prototype, set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
