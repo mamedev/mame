@@ -13,6 +13,10 @@
 #include "cpu/dsp16/dsp16.h"
 #include "dirom.h"
 
+#define MAME_SOUND_QSOUNDHLE_H_QSOUND_H
+#include "qsound.h"
+#undef MAME_SOUND_QSOUNDHLE_H_QSOUND_H
+
 
 class qsound_hle_device : public device_t, public device_sound_interface, public device_rom_interface<24>
 {

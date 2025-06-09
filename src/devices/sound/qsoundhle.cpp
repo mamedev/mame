@@ -15,7 +15,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "qsound.h"
 #include "qsoundhle.h"
 
 #include <algorithm>
