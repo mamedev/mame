@@ -74,7 +74,6 @@ private:
 	uint16_t m_pf_bankbase[2]{};
 	int32_t m_old_pf[2]{};
 	uint8_t m_gfx_bank = 0;
-	uint8_t m_spriterambank[2] = {0, 0};
 
 	void bankswitch_w(uint8_t data);
 	void soundirq_w(uint8_t data);
@@ -202,11 +201,7 @@ uint8_t hcastle_state::gfxbank_r()
 template <uint8_t Which> // 0 = FG, 1 = BG
 void hcastle_state::pf_control_w(offs_t offset, uint8_t data)
 {
-	if (offset == 3)
-	{
-		m_spriterambank[Which] = (data & 0x8) >> 3;
-	}
-	else if (offset == 7)
+	if (offset == 7)
 	{
 		m_tilemap[Which]->set_flip((data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	}
@@ -264,16 +259,16 @@ uint32_t hcastle_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	if ((m_gfx_bank & 0x04) == 0)
 	{
 		m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
-		draw_sprites<0>(bitmap, cliprect, screen.priority(), m_spriteram[0] + (m_spriterambank[0] ? 0x800 : 0x0));
-		draw_sprites<1>(bitmap, cliprect, screen.priority(), m_spriteram[1] + (m_spriterambank[1] ? 0x800 : 0x0));
+		draw_sprites<0>(bitmap, cliprect, screen.priority(), m_spriteram[0]);
+		draw_sprites<1>(bitmap, cliprect, screen.priority(), m_spriteram[1]);
 		m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
 	}
 	else
 	{
 		m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 		m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
-		draw_sprites<0>(bitmap, cliprect, screen.priority(), m_spriteram[0] + (m_spriterambank[0] ? 0x800 : 0x0));
-		draw_sprites<1>(bitmap, cliprect, screen.priority(), m_spriteram[1] + (m_spriterambank[1] ? 0x800 : 0x0));
+		draw_sprites<0>(bitmap, cliprect, screen.priority(), m_spriteram[0]);
+		draw_sprites<1>(bitmap, cliprect, screen.priority(), m_spriteram[1]);
 	}
 	return 0;
 }

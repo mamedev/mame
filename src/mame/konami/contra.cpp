@@ -192,7 +192,6 @@ private:
 	// video-related
 	tilemap_t *m_tilemap[3]{};
 	rectangle m_clip[3]{};
-	uint8_t m_spriterambank[2] = {0, 0};
 
 	// devices
 	required_device<cpu_device> m_audiocpu;
@@ -365,11 +364,6 @@ void contra_state::K007121_ctrl_w(offs_t offset, uint8_t data)
 {
 	uint8_t prev = m_k007121[Which]->ctrlram_r(offset);
 
-	if (offset == 3)
-	{
-		m_spriterambank[Which] = (data & 0x8) >> 3;
-	}
-
 	if (offset == 6)
 	{
 		if (prev != data)
@@ -394,7 +388,7 @@ void contra_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 {
 	int base_color = (m_k007121[Which]->ctrlram_r(6) & 0x30) * 2;
 
-	m_k007121[Which]->sprites_draw(bitmap, cliprect, m_spriteram[Which] + (m_spriterambank[Which] ? 0x800 : 0x0), base_color, 40, 0, priority_bitmap, (uint32_t)-1);
+	m_k007121[Which]->sprites_draw(bitmap, cliprect, m_spriteram[Which], base_color, 40, 0, priority_bitmap, (uint32_t)-1);
 }
 
 uint32_t contra_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

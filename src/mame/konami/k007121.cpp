@@ -223,6 +223,9 @@ void k007121_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprec
 		const uint8_t *source, int base_color, int global_x_offset, int bank_base, bitmap_ind8 &priority_bitmap, uint32_t pri_mask)
 {
 
+	if (BIT(m_ctrlram[3], 3))
+		source += 0x800;
+
 	// determine number of sprites that will be drawn
 	int num_sprites = 0;
 	int sprite_blocks = 0;

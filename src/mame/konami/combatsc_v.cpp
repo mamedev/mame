@@ -321,10 +321,6 @@ void combatsc_state::pf_control_w(offs_t offset, uint8_t data)
 			m_textlayer->set_flip((data & 0x08) ? TILEMAP_FLIPY | TILEMAP_FLIPX : 0);
 		}
 	}
-	if (offset == 3)
-	{
-		m_spriterambank[m_video_circuit] = (data & 0x8) >> 3;
-	}
 }
 
 /***************************************************************************
@@ -381,8 +377,8 @@ uint32_t combatsc_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 1, 2);
 
 		// we use the priority buffer so sprites are drawn front to back
-		draw_sprites(bitmap, cliprect, m_videoram[1] + (m_spriterambank[1] ? 0x1800 : 0x1000), 1, screen.priority(), 0x0f00);
-		draw_sprites(bitmap, cliprect, m_videoram[0] + (m_spriterambank[0] ? 0x1800 : 0x1000), 0, screen.priority(), 0x4444);
+		draw_sprites(bitmap, cliprect, m_videoram[1] + 0x1000, 1, screen.priority(), 0x0f00);
+		draw_sprites(bitmap, cliprect, m_videoram[0] + 0x1000, 0, screen.priority(), 0x4444);
 	}
 	else
 	{
@@ -391,9 +387,9 @@ uint32_t combatsc_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 		// we use the priority buffer so sprites are drawn front to back
 		// drill sergeant ribbons goes here, MT #06259
-		draw_sprites(bitmap, cliprect, m_videoram[1] + (m_spriterambank[1] ? 0x1800 : 0x1000), 1, screen.priority(), 0x0f00);
+		draw_sprites(bitmap, cliprect, m_videoram[1] + 0x1000, 1, screen.priority(), 0x0f00);
 		// guess: move the face as well (should go behind hands but it isn't tested)
-		draw_sprites(bitmap, cliprect, m_videoram[0] + (m_spriterambank[0] ? 0x1800 : 0x1000), 0, screen.priority(), 0x4444);
+		draw_sprites(bitmap, cliprect, m_videoram[0] + 0x1000, 0, screen.priority(), 0x4444);
 
 		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 1, 4);
 		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 8);

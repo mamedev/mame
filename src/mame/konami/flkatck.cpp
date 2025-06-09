@@ -207,7 +207,6 @@ uint32_t flkatck_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 {
 	rectangle clip[2];
 	const rectangle &visarea = screen.visible_area();
-	uint8_t spriterambank = (m_k007121->ctrlram_r(3) & 0x8) >> 3;
 
 	if (m_flipscreen)
 	{
@@ -241,7 +240,7 @@ uint32_t flkatck_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 	// draw the graphics
 	m_k007121_tilemap[0]->draw(screen, bitmap, clip[0], 0, 0);
-	m_k007121->sprites_draw(bitmap, cliprect, m_spriteram + (spriterambank ? 0x800 : 0x0), 0, 40, 0, screen.priority(), (uint32_t)-1);
+	m_k007121->sprites_draw(bitmap, cliprect, m_spriteram, 0, 40, 0, screen.priority(), (uint32_t)-1);
 	m_k007121_tilemap[1]->draw(screen, bitmap, clip[1], 0, 0);
 	return 0;
 }
