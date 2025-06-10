@@ -693,11 +693,6 @@ void cops_state::base(machine_config &config)
 
 	SPEAKER(config, "mspeaker").front_center();
 
-	R65C52(config, m_dacia, DACIA_CLOCK);
-	m_dacia->txd1_handler().set("laserdisc", FUNC(sony_ldp1450hle_device::rx_w));
-	m_dacia->irq1_handler().set(FUNC(cops_state::acia1_irq));
-	m_dacia->irq2_handler().set(FUNC(cops_state::acia2_irq));
-
 	SN76489(config, m_sn, MAIN_CLOCK/2);
 	m_sn->add_route(ALL_OUTPUTS, "mspeaker", 0.30);
 
