@@ -996,7 +996,7 @@ macro   z80n:check_interrupts
 			m_out_nextreg_cb(0xc3, m_pc.b.h);
 		}
 		@take_nmi
-	} else if (m_irq_state != CLEAR_LINE && m_iff1 && !get_service_attention<SA_AFTER_EI>()) {
+	} else if (m_irq_state != CLEAR_LINE && m_iff1 && !get_service_attention<SA_AFTER_EI>()) { // SA_IRQ_ON
 		@take_interrupt
 	}
 
