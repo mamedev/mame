@@ -56,6 +56,8 @@ public:
 		, m_spriteram(*this, "spriteram")
 		, m_scrollregs(*this, "scrollregs")
 		, m_prgbank(*this,"prgbank")
+		, m_okibank(*this, "okibank")
+		, m_oki(*this,"oki")
 	{ }
 
 	void wrally_ms(machine_config &config) ATTR_COLD;
@@ -78,6 +80,8 @@ private:
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr<uint16_t> m_scrollregs;
 	required_memory_bank m_prgbank;
+	required_memory_bank m_okibank;
+	required_device<okim6295_device> m_oki;
 
 	tilemap_t *m_tx_tilemap = nullptr;
 	tilemap_t *m_bg_tilemap = nullptr;
@@ -93,6 +97,8 @@ private:
 	void bg_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void bg2_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
+	void okim6295_bankswitch_w(uint8_t data);
+
 	void descramble_16x16tiles(uint8_t *src, int len) ATTR_COLD;
 
 	uint16_t unk_r() { return machine().rand(); }
@@ -100,6 +106,7 @@ private:
 
 	void wrally_ms_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map);
+	void oki_map(address_map &map) ATTR_COLD;
 };
 
 TILE_GET_INFO_MEMBER(wrally_ms_state::get_tile_info)
@@ -236,6 +243,10 @@ void wrally_ms_state::wrally_ms_map(address_map &map)
 	map(0x40000c, 0x40000d).r(FUNC(wrally_ms_state::unk_r));
 
 	map(0x600000, 0x600001).r(FUNC(wrally_ms_state::unk2_r));
+
+	map(0x600081, 0x600081).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x600101, 0x600101).w(FUNC(wrally_ms_state::okim6295_bankswitch_w));
+
 	map(0x600180, 0x600181).r(FUNC(wrally_ms_state::unk2_r));
 
 	map(0xff0000, 0xffffff).ram();
@@ -247,6 +258,13 @@ void wrally_ms_state::sound_map(address_map &map)
 	map(0xe800, 0xe801).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
 	map(0xf000, 0xffff).ram();
 }
+
+void wrally_ms_state::oki_map(address_map &map)
+{
+	map(0x00000, 0x2ffff).rom();
+	map(0x30000, 0x3ffff).bankr(m_okibank);
+}
+
 
 static INPUT_PORTS_START( wrally_ms )
 	// some modular games read inputs in the high byte, others low, maybe it mirrors?
@@ -360,7 +378,15 @@ void wrally_ms_state::machine_start()
 	m_prgbank->configure_entry(1, memregion("maincpu")->base() + 0x100000);
 	m_prgbank->set_entry(0);
 	//m_prgbank->set_entry(1); // use overlay ROM instead (doesn't upload a valid palette?)
+
+	m_okibank->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
 }
+
+void wrally_ms_state::okim6295_bankswitch_w(uint8_t data)
+{
+	m_okibank->set_entry(data & 0x0f);
+}
+
 
 // Reorganize graphics into something we can decode with a single pass
 void wrally_ms_state::descramble_16x16tiles(uint8_t *src, int len)
@@ -405,7 +431,9 @@ void wrally_ms_state::wrally_ms(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, "oki", 1_MHz_XTAL, okim6295_device::PIN7_LOW); // PIN 7 seems like it's not connected to anything at all
+	OKIM6295(config, m_oki, 1_MHz_XTAL, okim6295_device::PIN7_HIGH); // PIN 7 seems like it's not connected to anything at all
+	m_oki->set_addrmap(0, &wrally_ms_state::oki_map);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
 
 	// does the game use the rest of the sound hardware? the program is from Splash modular system
 	// maybe only the OKI above is used (and driven by the 68k?)
