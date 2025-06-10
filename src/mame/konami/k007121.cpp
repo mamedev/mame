@@ -16,9 +16,9 @@ ROM is 0x80000 bytes (addressed 16 bits at a time). Tile and sprite data both
 come from the same ROM space. Like the 005885, external circuitry can cause
 tiles and sprites to be fetched from different ROMs (used by Haunted Castle).
 
-The chip will render a maximum of 264 8x8 sprite blocks.  There is no limit on
+The chip will render a maximum of 264 8x8 sprite blocks. There is no limit on
 the number of sprites, including per-scanline, other than bumping into the 264
-8x8 sprite block limit.  Games often append 17 off-screen 32x32 sprites after
+8x8 sprite block limit. Games often append 17 off-screen 32x32 sprites after
 their active sprite list so they bump into the block limit and avoid having to
 fully clear out all old sprites.  If a large sprite where to straddle the 264
 limit it would only draw the available 8x8 sprite blocks. As soon as it hits the
@@ -117,6 +117,16 @@ control registers
      ----x--- flip screen
      ---x---- unknown (contra, labyrunr)
 
+TODO:
+- As noted above, the maximum number of 8x8 sprite blocks is 264. MAME doesn't
+  emulate partial sprites at the end of the spritelist. The exact 8x8 block
+  rendering order is unknown. Is's not expected any game relies on this.
+
+BTANB:
+- Some games don't take the internal 1-frame sprite lag (due to framebuffer) into
+  account, see for example the ground turrets in Flak Attack, confirmed on PCB
+  video. Other games, eg. Contra and Labyrinth Runner are fine.
+
 */
 
 #include "emu.h"
@@ -134,6 +144,7 @@ k007121_device::k007121_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, K007121, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this)
 	, m_flipscreen(false)
+	, m_spriteram(nullptr)
 {
 }
 
@@ -145,6 +156,9 @@ void k007121_device::device_start()
 {
 	save_item(NAME(m_ctrlram));
 	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_sprites_buffer));
+
+	memset(m_sprites_buffer, 0, sizeof(m_sprites_buffer));
 }
 
 //-------------------------------------------------
@@ -217,7 +231,7 @@ void k007121_device::ctrl_w(offs_t offset, uint8_t data)
  */
 
 void k007121_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect,
-		const uint8_t *source, int base_color, int global_x_offset, int bank_base, bitmap_ind8 &priority_bitmap, uint32_t pri_mask)
+		int base_color, int global_x_offset, int bank_base, bitmap_ind8 &priority_bitmap, uint32_t pri_mask)
 {
 	// maximum number of 8x8 sprite blocks that can be drawn
 	constexpr int MAX_SPRITE_BLOCKS = 264;
@@ -225,10 +239,7 @@ void k007121_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 	assert(MAX_SPRITE_BLOCKS < 0x199); // floor(0x800 / SPRITE_FORMAT_SIZE)
 
-	// There is 0x1000 sprite ram, which is broken up into 2 0x800 banks.
-	// The following control bit determines which bank is used.
-	if (BIT(m_ctrlram[3], 3))
-		source += 0x800;
+	const uint8_t *source = m_sprites_buffer;
 
 	// determine number of sprites that will be drawn
 	int num_sprites = 0;
@@ -376,4 +387,20 @@ void k007121_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 		source += inc;
 	}
+}
+
+void k007121_device::sprites_buffer(int state)
+{
+	if (!state || !m_spriteram)
+		return;
+
+	const uint8_t *source = m_spriteram;
+
+	// There is 0x1000 sprite ram, which is broken up into 2 0x800 banks.
+	// The following control bit determines which bank is used.
+	if (BIT(m_ctrlram[3], 3))
+		source += 0x800;
+
+	// It's actually a framebuffer, but it's sufficient to just buffer the sprite list.
+	memcpy(m_sprites_buffer, source, sizeof(m_sprites_buffer));
 }

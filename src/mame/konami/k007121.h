@@ -19,12 +19,13 @@ public:
 		set_palette(std::forward<T>(palette_tag));
 	}
 
+	void set_spriteram(uint8_t *spriteram) { m_spriteram = spriteram; }
+
 	uint8_t ctrlram_r(offs_t offset);
 	void ctrl_w(offs_t offset, uint8_t data);
 
-	// shall we move source in the interface?
-	// also notice that now we directly pass *gfx[chip] instead of **gfx !!
-	void sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *source, int base_color, int global_x_offset, int bank_base, bitmap_ind8 &priority_bitmap, uint32_t pri_mask);
+	void sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int base_color, int global_x_offset, int bank_base, bitmap_ind8 &priority_bitmap, uint32_t pri_mask);
+	void sprites_buffer(int state = 1);
 
 protected:
 	// device-level overrides
@@ -35,6 +36,8 @@ private:
 	// internal state
 	uint8_t  m_ctrlram[8];
 	bool     m_flipscreen;
+	uint8_t  *m_spriteram;
+	uint8_t  m_sprites_buffer[0x800];
 };
 
 DECLARE_DEVICE_TYPE(K007121, k007121_device)

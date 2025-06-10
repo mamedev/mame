@@ -693,6 +693,8 @@ void combatsc_state::combatsc(machine_config &config)
 	m_screen->set_raw(XTAL(24'000'000)/3, 528, 0, 256, 256, 16, 240); // not accurate, assuming same to other Konami games (59.17)
 	m_screen->set_screen_update(FUNC(combatsc_state::screen_update));
 	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(m_k007121[0], FUNC(k007121_device::sprites_buffer));
+	m_screen->screen_vblank().append(m_k007121[1], FUNC(k007121_device::sprites_buffer));
 
 	PALETTE(config, m_palette, FUNC(combatsc_state::palette));
 	m_palette->set_format(palette_device::xBGR_555, 8 * 16 * 16, 128);

@@ -142,6 +142,8 @@ TILE_GET_INFO_MEMBER(fastlane_state::get_tile_info)
 
 void fastlane_state::video_start()
 {
+	m_k007121->set_spriteram(m_spriteram);
+
 	m_layer[0] = &machine().tilemap().create(*m_k007121, tilemap_get_info_delegate(*this, FUNC(fastlane_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_layer[1] = &machine().tilemap().create(*m_k007121, tilemap_get_info_delegate(*this, FUNC(fastlane_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
@@ -190,7 +192,7 @@ uint32_t fastlane_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_layer[0]->set_scrolly(0, m_k007121->ctrlram_r(2));
 
 	m_layer[0]->draw(screen, bitmap, finalclip0, 0, 0);
-	m_k007121->sprites_draw(bitmap, cliprect, m_spriteram, 0, 40, 0, screen.priority(), (uint32_t)- 1);
+	m_k007121->sprites_draw(bitmap, cliprect, 0, 40, 0, screen.priority(), (uint32_t)- 1);
 	m_layer[1]->draw(screen, bitmap, finalclip1, 0, 0);
 	return 0;
 }
@@ -367,6 +369,7 @@ void fastlane_state::fastlane(machine_config &config)
 	m_screen->set_visarea(0*8, 35*8-1, 2*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(fastlane_state::screen_update));
 	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(m_k007121, FUNC(k007121_device::sprites_buffer));
 
 	PALETTE(config, m_palette, FUNC(fastlane_state::palette)).set_format(palette_device::xBGR_555, 1024*16, 0x400);
 
