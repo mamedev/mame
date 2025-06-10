@@ -1262,6 +1262,23 @@ static INPUT_PORTS_START( rocksock )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( whacmole )
+	PORT_START("P1")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Blue / Top Left")
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Yellow / Bottom Left")
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Red / Bottom Right")
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Green / Top Right")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Pause / Menu")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Special")
+	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( hotwheels )
 	// 2 pads, each pad has 4 directions and 1 button, and an internal solder pad to select type, but input reading code seems a bit more complex
 	// the unit this was dumped from was a PAL, with P1 as 'Bling' and P2 as 'Tuner' so those are the defaults used
@@ -1707,6 +1724,38 @@ void spg2xx_game_state::guitarfv(machine_config &config)
 	m_maincpu->porta_in().set_ioport("P1");
 	m_maincpu->portb_in().set_ioport("P2");
 	m_maincpu->portc_in().set_ioport("P3");
+}
+
+uint16_t spg2xx_game_whacmole_state::whacmole_porta_r()
+{
+	uint16_t ret = 0x0000;
+	logerror("%s: porta_r\n", machine().describe_context());
+	ret |= m_eeprom->do_read() << 3;
+	return ret;
+}
+
+void spg2xx_game_whacmole_state::whacmole_porta_w(uint16_t data)
+{
+	logerror("%s: porta_w (%04x)\n", machine().describe_context(), data);
+	m_eeprom->di_write(BIT(data, 2));
+	m_eeprom->cs_write(BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->clk_write(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+void spg2xx_game_whacmole_state::whacmole(machine_config &config)
+{
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_whacmole_state::mem_map_2m); // accesses mirror addresses
+
+	spg2xx_base(config);
+
+	m_maincpu->porta_in().set(FUNC(spg2xx_game_whacmole_state::whacmole_porta_r));
+	m_maincpu->porta_out().set(FUNC(spg2xx_game_whacmole_state::whacmole_porta_w));
+
+	m_maincpu->portb_in().set(FUNC(spg2xx_game_whacmole_state::base_portb_r));
+	m_maincpu->portc_in().set(FUNC(spg2xx_game_whacmole_state::base_portc_r));
+
+	EEPROM_93C66_16BIT(config, m_eeprom); // HT93LC66A
 }
 
 
@@ -2639,6 +2688,11 @@ ROM_START( prail )
 	ROM_LOAD16_WORD_SWAP( "traingame.u1", 0x000000, 0x8000000, CRC(5c96d526) SHA1(cda0280b320762bda7a7358ec7ce29690aa815fb) )
 ROM_END
 
+ROM_START( whacmole )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "whacamole.u1a", 0x000000, 0x400000, CRC(5841ba80) SHA1(b3ec922e1899a1f2e34069a50e36721e925afb9f) )
+ROM_END
+
 ROM_START( wordlnch )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "wordplay.u7", 0x000000, 0x800000, CRC(604f59ff) SHA1(024d554a15e6c3a6b9c3a15bfd657964d1deba83) )
@@ -2818,7 +2872,7 @@ CONS( 2005, mattelcs,   0,        0, rad_skat,  mattelcs,  spg2xx_game_state,   
 // there's also a single player Hot Wheels Plug and Play that uses a wheel style controller
 CONS( 2006, hotwhl2p,   0,        0, hotwheels, hotwheels, spg2xx_game_hotwheels_state,empty_init,    "Mattel",                                                 "Hot Wheels (2 player, pad controllers)",                                MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2006, rocksock,   0,        0, spg2xx,    rocksock,  spg2xx_game_state,          empty_init,    "Mattel",                                                 "Rock 'Em Sock 'Em Robots",                                              MACHINE_IMPERFECT_SOUND )
+CONS( 2006, rocksock,   0,        0, spg2xx,    rocksock,  spg2xx_game_state,          empty_init,    "Mattel",                                                 "Rock 'Em Sock 'Em Robots (TV Game)",                                    MACHINE_IMPERFECT_SOUND )
 
 // there was also an English release of this, simply titled "Interactive TV Computer"
 CONS( 2007, ordentv,    0,        0, ordentv,   ordentv,   spg2xx_game_ordentv_state,  init_ordentv,  "Taikee / V-Tac",                                         "Ordenador-TV (Spain)",                                                  MACHINE_NOT_WORKING )
@@ -2860,11 +2914,13 @@ CONS( 2006, ban_krkk,   0,        0, spg2xx,    ban_krkk,  spg2xx_game_state,   
 // Let's!TVプレイ チームたいこー! カードでパワーUP! たまごっちスクール選手権 - has IR for optional connectivity with external Tamagotchi device, and a card scanner used for gameplay
 CONS( 2007, ban_tam2,   0,        0, spg2xx,    spg2xx,    spg2xx_game_state,          init_crc,      "Bandai",                                                "Let's! TV Play Team Taikou! Card de Power Up! Tamagotchi School Senshuken (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2007, epo_tetr,   0,        0, epo_tetr,  epo_tetr,  epo_tetr_game_state,          empty_init,    "Epoch",                                                "Minna no Tetris (Japan)", MACHINE_IMPERFECT_SOUND )
+CONS( 2007, epo_tetr,   0,        0, epo_tetr,  epo_tetr,  epo_tetr_game_state,        empty_init,    "Epoch",                                                 "Minna no Tetris (Japan)", MACHINE_IMPERFECT_SOUND )
 
 // Train Game V1.4 2012-08-15 on PCB. SPG243 headers in each chunk.
 // Last few bytes of SEEPROM have 'JUNGT' in them, is this developed by JungleSoft/JungleTac?
-CONS( 2012, prail,      0,        0, prail,     prail,     spg2xx_game_prail_state,    empty_init,   "Takara Tomy",                                            "Boku wa Plarail Untenshi - Shinkansen de Ikou! (Japan)",                MACHINE_IMPERFECT_SOUND )
+CONS( 2012, prail,      0,        0, prail,     prail,     spg2xx_game_prail_state,    empty_init,    "Takara Tomy",                                           "Boku wa Plarail Untenshi - Shinkansen de Ikou! (Japan)", MACHINE_IMPERFECT_SOUND )
 // the 'plus' version from 2015 runs on newer hardware, see generalplus_gpl16250_spi.cpp
 
-CONS( 2007, wordlnch,   0,        0, spg2xx,    wordlnch,  spg2xx_game_state,          empty_init,    "LeapFrog",                                                "Word Launch (UK)",                MACHINE_NOT_WORKING )
+CONS( 2007, wordlnch,   0,        0, spg2xx,    wordlnch,  spg2xx_game_state,          empty_init,    "LeapFrog",                                              "Word Launch (UK)", MACHINE_NOT_WORKING ) // seems to have a PAL/NTSC flag so US ROM might be the same
+
+CONS( 2005, whacmole,   0,        0, whacmole,  whacmole,  spg2xx_game_whacmole_state, empty_init,    "Hasbro / Milton Bradley",                               "Whac-A-Mole (TV Game)", MACHINE_IMPERFECT_SOUND )
