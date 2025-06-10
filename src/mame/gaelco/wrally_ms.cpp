@@ -54,6 +54,7 @@ public:
 		, m_bg_vram(*this, "bg_vram")
 		, m_bg2_vram(*this, "bg2_vram")
 		, m_spriteram(*this, "spriteram")
+		, m_scrollregs(*this, "scrollregs")
 		, m_prgbank(*this,"prgbank")
 	{ }
 
@@ -75,6 +76,7 @@ private:
 	required_shared_ptr<u16> m_bg_vram;
 	required_shared_ptr<u16> m_bg2_vram;
 	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_scrollregs;
 	required_memory_bank m_prgbank;
 
 	tilemap_t *m_tx_tilemap = nullptr;
@@ -158,10 +160,13 @@ void wrally_ms_state::video_start()
 
 uint32_t wrally_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_bg2_tilemap->set_scrollx(0, 80);
-	m_bg2_tilemap->set_scrolly(0, 0);
-	m_bg_tilemap->set_scrollx(0, 80);
-	m_bg_tilemap->set_scrolly(0, 0);
+	// are these using the correct reg pairs?
+	m_bg2_tilemap->set_scrollx(0, 80-(m_scrollregs[0]));
+	m_bg2_tilemap->set_scrolly(0, -m_scrollregs[1]);
+
+	m_bg_tilemap->set_scrollx(0, 80-(m_scrollregs[6]));
+	m_bg_tilemap->set_scrolly(0, -m_scrollregs[7]);
+
 	m_tx_tilemap->set_scrollx(0, 80);
 	m_tx_tilemap->set_scrolly(0, 0);
 
@@ -221,7 +226,7 @@ void wrally_ms_state::wrally_ms_map(address_map &map)
 	map(0x340000, 0x341fff).ram().w(FUNC(wrally_ms_state::bg_w)).share("bg_vram");
 	map(0x380000, 0x381fff).ram().w(FUNC(wrally_ms_state::bg2_w)).share("bg2_vram");
 
-	map(0x3c0000, 0x3c000f).ram(); // video regs
+	map(0x3c0000, 0x3c000f).ram().share("scrollregs"); // video regs
 
 	map(0x400000, 0x400001).portr("IN0");
 	map(0x400002, 0x400003).portr("IN1");
