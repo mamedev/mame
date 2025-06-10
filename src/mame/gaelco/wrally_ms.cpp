@@ -168,11 +168,11 @@ void wrally_ms_state::video_start()
 uint32_t wrally_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// are these using the correct reg pairs?
-	m_bg2_tilemap->set_scrollx(0, 80-(m_scrollregs[0]));
-	m_bg2_tilemap->set_scrolly(0, -m_scrollregs[1]);
+	m_bg_tilemap->set_scrollx(0, 80-(m_scrollregs[0]));
+	m_bg_tilemap->set_scrolly(0, -m_scrollregs[1]);
 
-	m_bg_tilemap->set_scrollx(0, 80-(m_scrollregs[6]));
-	m_bg_tilemap->set_scrolly(0, -m_scrollregs[7]);
+	m_bg2_tilemap->set_scrollx(0, 80-(m_scrollregs[6]));
+	m_bg2_tilemap->set_scrolly(0, -m_scrollregs[7]);
 
 	m_tx_tilemap->set_scrollx(0, 80);
 	m_tx_tilemap->set_scrolly(0, 0);
@@ -183,7 +183,7 @@ uint32_t wrally_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 
 	// TODO, convert to device, share between Modular System games
 	const int NUM_SPRITES = 0x200;
-	const int X_EXTRA_OFFSET = 70;
+	const int X_EXTRA_OFFSET = 78;
 
 	for (int i = NUM_SPRITES - 2; i >= 0; i -= 2)
 	{
