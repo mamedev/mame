@@ -254,17 +254,12 @@ void combatsc_state::video_start()
 	m_bg_tilemap[1] = &machine().tilemap().create(*m_k007121[1], tilemap_get_info_delegate(*this, FUNC(combatsc_state::get_tile_info1)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_textlayer =  &machine().tilemap().create(*m_k007121[0], tilemap_get_info_delegate(*this, FUNC(combatsc_state::get_text_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	m_spriteram[0] = make_unique_clear<uint8_t[]>(0x800);
-	m_spriteram[1] = make_unique_clear<uint8_t[]>(0x800);
-
 	m_bg_tilemap[0]->set_transparent_pen(0);
 	m_bg_tilemap[1]->set_transparent_pen(0);
 	m_textlayer->set_transparent_pen(0);
 
 	m_textlayer->set_scroll_rows(32);
 
-	save_pointer(NAME(m_spriteram[0]), 0x800);
-	save_pointer(NAME(m_spriteram[1]), 0x800);
 	save_item(NAME(m_textflip));
 }
 
@@ -274,18 +269,12 @@ void combatscb_state::video_start()
 	m_bg_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(combatscb_state::get_tile_info1)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_textlayer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(combatscb_state::get_text_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	m_spriteram[0] = make_unique_clear<uint8_t[]>(0x800);
-	m_spriteram[1] = make_unique_clear<uint8_t[]>(0x800);
-
 	m_bg_tilemap[0]->set_transparent_pen(0);
 	m_bg_tilemap[1]->set_transparent_pen(0);
 	m_textlayer->set_transparent_pen(0);
 
 	m_bg_tilemap[0]->set_scroll_rows(32);
 	m_bg_tilemap[1]->set_scroll_rows(32);
-
-	save_pointer(NAME(m_spriteram[0]), 0x800);
-	save_pointer(NAME(m_spriteram[1]), 0x800);
 }
 
 /***************************************************************************
@@ -331,13 +320,6 @@ void combatsc_state::pf_control_w(offs_t offset, uint8_t data)
 			m_textflip = (data & 0x08) == 0x08;
 			m_textlayer->set_flip((data & 0x08) ? TILEMAP_FLIPY | TILEMAP_FLIPX : 0);
 		}
-	}
-	if (offset == 3)
-	{
-		if (data & 0x08)
-			memcpy(m_spriteram[m_video_circuit].get(), m_videoram[m_video_circuit] + 0x1000, 0x800);
-		else
-			memcpy(m_spriteram[m_video_circuit].get(), m_videoram[m_video_circuit] + 0x1800, 0x800);
 	}
 }
 
@@ -395,8 +377,8 @@ uint32_t combatsc_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		m_bg_tilemap[0]->draw(screen, bitmap, cliprect, 1, 2);
 
 		// we use the priority buffer so sprites are drawn front to back
-		draw_sprites(bitmap, cliprect, m_spriteram[1].get(), 1, screen.priority(), 0x0f00);
-		draw_sprites(bitmap, cliprect, m_spriteram[0].get(), 0, screen.priority(), 0x4444);
+		draw_sprites(bitmap, cliprect, m_videoram[1] + 0x1000, 1, screen.priority(), 0x0f00);
+		draw_sprites(bitmap, cliprect, m_videoram[0] + 0x1000, 0, screen.priority(), 0x4444);
 	}
 	else
 	{
@@ -405,9 +387,9 @@ uint32_t combatsc_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 		// we use the priority buffer so sprites are drawn front to back
 		// drill sergeant ribbons goes here, MT #06259
-		draw_sprites(bitmap, cliprect, m_spriteram[1].get(), 1, screen.priority(), 0x0f00);
+		draw_sprites(bitmap, cliprect, m_videoram[1] + 0x1000, 1, screen.priority(), 0x0f00);
 		// guess: move the face as well (should go behind hands but it isn't tested)
-		draw_sprites(bitmap, cliprect, m_spriteram[0].get(), 0, screen.priority(), 0x4444);
+		draw_sprites(bitmap, cliprect, m_videoram[0] + 0x1000, 0, screen.priority(), 0x4444);
 
 		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 1, 4);
 		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 8);

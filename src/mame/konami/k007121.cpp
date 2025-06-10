@@ -11,10 +11,18 @@ a single 64x32 one, or one of them can be moved to the side of screen, giving
 a high score display suitable for vertical games.
 The chip also generates clock and interrupt signals suitable for a 6809.
 It uses 0x2000 bytes of static RAM for the tilemaps and sprite lists, and two
-64kx4bit DRAMs, presumably as a double frame buffer. The maximum addressable
+64kx4bit DRAMs, for color LUT data for sprites. The maximum addressable
 ROM is 0x80000 bytes (addressed 16 bits at a time). Tile and sprite data both
 come from the same ROM space. Like the 005885, external circuitry can cause
 tiles and sprites to be fetched from different ROMs (used by Haunted Castle).
+
+The chip will render a maximum of 264 8x8 sprite blocks.  There is no limit on
+the number of sprites, including per-scanline, other than bumping into the 264
+8x8 sprite block limit.  Games often append 17 off-screen 32x32 sprites after
+their active sprite list so they bump into the block limit and avoid having to
+fully clear out all old sprites.  If a large sprite where to straddle the 264
+limit it would only draw the available 8x8 sprite blocks. As soon as it hits the
+limit it stops drawing the rest of the sprite.
 
 Two 256x4 lookup PROMs are also used to increase the color combinations.
 All tilemap / sprite priority handling is done internally and the chip exports
@@ -57,7 +65,7 @@ control registers
      ------x- unknown (contra)
      -----x-- might be sprite / tilemap priority (0 = sprites have priority)
               (combat school, contra, haunted castle(0/1), labyrunr)
-     ----x--- selects sprite buffer (and makes a copy to a private buffer?)
+     ----x--- selects sprite ram bank/offset (0 = 0x0, 1 = 0x800)
      ---x---- screen layout selector:
               when this is set, 5 columns are added on the left of the screen
               (that means 5 rows at the top for vertical games), and the
@@ -73,9 +81,6 @@ control registers
      -x------ Chops away the leftmost and rightmost columns, switching the
               visible area from 256 to 240 pixels. This is used by combatsc on
               the scrolling stages, and by labyrunr on the title screen.
-              At first I thought that this enabled an extra bank of 0x40
-              sprites, needed by combatsc, but labyrunr proves that this is not
-              the case
      x------- unknown (contra)
 004: ----xxxx bits 9-12 of the tile code. Only the bits enabled by the following
               mask are actually used, and replace the ones selected by register
@@ -173,6 +178,11 @@ void k007121_device::ctrl_w(offs_t offset, uint8_t data)
 
 	switch (offset)
 	{
+	case 3:
+		// tile high bit change
+		if ((m_ctrlram[offset] & 0x1) != (data & 0x1))
+			machine().tilemap().mark_all_dirty();
+		break;
 	case 6:
 		// palette bank change
 		if ((m_ctrlram[offset] & 0x30) != (data & 0x30))
@@ -189,10 +199,6 @@ void k007121_device::ctrl_w(offs_t offset, uint8_t data)
 /*
  * Sprite Format
  * ------------------
- *
- * There are 0x40 sprites, each one using 5 bytes. However the number of
- * sprites can be increased to 0x80 with a control register (Combat School
- * sets it on and off during the game).
  *
  * Byte | Bit(s)   | Use
  * -----+-76543210-+----------------
@@ -213,19 +219,55 @@ void k007121_device::ctrl_w(offs_t offset, uint8_t data)
 void k007121_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect,
 		const uint8_t *source, int base_color, int global_x_offset, int bank_base, bitmap_ind8 &priority_bitmap, uint32_t pri_mask)
 {
-	// TODO: sprite limit is supposed to be per-line! (check MT #00185)
-	int num = 0x40;
-	//num = (m_ctrlram[0x03] & 0x40) ? 0x80 : 0x40; // WRONG!!! (needed by combatsc)
+	// maximum number of 8x8 sprite blocks that can be drawn
+	constexpr int MAX_SPRITE_BLOCKS = 264;
+	constexpr int SPRITE_FORMAT_SIZE = 5;
 
-	int inc = 5;
-	// when using priority buffer, draw front to back
-	if (pri_mask != (uint32_t)-1)
+	assert(MAX_SPRITE_BLOCKS < 0x199); // floor(0x800 / SPRITE_FORMAT_SIZE)
+
+	// There is 0x1000 sprite ram, which is broken up into 2 0x800 banks.
+	// The following control bit determines which bank is used.
+	if (BIT(m_ctrlram[3], 3))
+		source += 0x800;
+
+	// determine number of sprites that will be drawn
+	int num_sprites = 0;
+	int sprite_blocks = 0;
+	while (sprite_blocks < MAX_SPRITE_BLOCKS)
 	{
-		source += (num - 1)*inc;
+		int attr = source[(num_sprites * SPRITE_FORMAT_SIZE) + 4];
+		switch (attr & 0xe)
+		{
+			case 0x06:
+			default:
+				sprite_blocks += 1;
+				break;
+
+			case 0x02:
+			case 0x04:
+				sprite_blocks += 2;
+				break;
+
+			case 0x00:
+				sprite_blocks += 4;
+				break;
+
+			case 0x08:
+				sprite_blocks += 16;
+				break;
+		}
+		num_sprites++;
+	}
+
+	int inc = SPRITE_FORMAT_SIZE;
+	// when using priority buffer, draw front to back
+	if (pri_mask != uint32_t(~0))
+	{
+		source += (num_sprites - 1) * inc;
 		inc = -inc;
 	}
 
-	for (int i = 0; i < num; i++)
+	for (int i = 0; i < num_sprites; i++)
 	{
 		int number = source[0];
 		int sprite_bank = source[1] & 0x0f;
@@ -237,8 +279,8 @@ void k007121_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprec
 		int color = base_color + ((source[1] & 0xf0) >> 4);
 		int width, height;
 		int transparent_mask;
-		static const int x_offset[4] = {0x0,0x1,0x4,0x5};
-		static const int y_offset[4] = {0x0,0x2,0x8,0xa};
+		static const int x_offset[4] = { 0x0, 0x1, 0x4, 0x5 };
+		static const int y_offset[4] = { 0x0, 0x2, 0x8, 0xa };
 		int flipx, flipy, destx, desty;
 
 		if (attr & 0x01) sx -= 256;
@@ -262,14 +304,14 @@ void k007121_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprec
 				width = height = 1;
 				break;
 
-			case 0x04:
-				width = 1; height = 2;
-				number &= ~2;
-				break;
-
 			case 0x02:
 				width = 2; height = 1;
 				number &= ~1;
+				break;
+
+			case 0x04:
+				width = 1; height = 2;
+				number &= ~2;
 				break;
 
 			case 0x00:
@@ -315,9 +357,9 @@ void k007121_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprec
 					gfx(0)->prio_transmask(bitmap,cliprect,
 							number + x_offset[ex] + y_offset[ey],
 							color,
-							flipx,flipy,
-							destx,desty,
-							priority_bitmap,pri_mask,
+							flipx, flipy,
+							destx, desty,
+							priority_bitmap, pri_mask,
 							transparent_mask);
 				}
 				else
@@ -325,8 +367,8 @@ void k007121_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprec
 					gfx(0)->transmask(bitmap,cliprect,
 							number + x_offset[ex] + y_offset[ey],
 							color,
-							flipx,flipy,
-							destx,desty,
+							flipx, flipy,
+							destx, desty,
 							transparent_mask);
 				}
 			}

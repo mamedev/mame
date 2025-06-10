@@ -166,8 +166,8 @@ public:
 		driver_device(mconfig, type, tag),
 		m_cram(*this, "cram%u", 0U),
 		m_vram(*this, "vram%u", 0U),
+		m_spriteram(*this, "spriteram%u", 1U),
 		m_mainbank(*this, "mainbank"),
-		m_buffered_spriteram(*this, "spriteram%u", 1U),
 		m_audiocpu(*this, "audiocpu"),
 		m_k007121(*this, "k007121_%u", 1U),
 		m_maincpu(*this, "maincpu"),
@@ -186,6 +186,7 @@ private:
 	// memory pointers
 	required_shared_ptr_array<uint8_t, 3> m_cram;
 	required_shared_ptr_array<uint8_t, 3> m_vram;
+	required_shared_ptr_array<uint8_t, 2> m_spriteram;
 	required_memory_bank m_mainbank;
 
 	// video-related
@@ -193,7 +194,6 @@ private:
 	rectangle m_clip[3]{};
 
 	// devices
-	required_device_array<buffered_spriteram8_device, 2> m_buffered_spriteram;
 	required_device<cpu_device> m_audiocpu;
 	required_device_array<k007121_device, 2> m_k007121;
 	required_device<cpu_device> m_maincpu;
@@ -364,14 +364,6 @@ void contra_state::K007121_ctrl_w(offs_t offset, uint8_t data)
 {
 	uint8_t prev = m_k007121[Which]->ctrlram_r(offset);
 
-	if (offset == 3)
-	{
-		if ((data & 0x8) == 0)
-			m_buffered_spriteram[Which]->copy(0x800, 0x800);
-		else
-			m_buffered_spriteram[Which]->copy(0x000, 0x800);
-	}
-
 	if (offset == 6)
 	{
 		if (prev != data)
@@ -396,7 +388,7 @@ void contra_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 {
 	int base_color = (m_k007121[Which]->ctrlram_r(6) & 0x30) * 2;
 
-	m_k007121[Which]->sprites_draw(bitmap, cliprect, m_buffered_spriteram[Which]->buffer(), base_color, 40, 0, priority_bitmap, (uint32_t)-1);
+	m_k007121[Which]->sprites_draw(bitmap, cliprect, m_spriteram[Which], base_color, 40, 0, priority_bitmap, (uint32_t)-1);
 }
 
 uint32_t contra_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -480,11 +472,11 @@ void contra_state::main_map(address_map &map)
 	map(0x2400, 0x27ff).ram().w(FUNC(contra_state::vram_w<0>)).share(m_vram[0]);
 	map(0x2800, 0x2bff).ram().w(FUNC(contra_state::cram_w<2>)).share(m_cram[2]);
 	map(0x2c00, 0x2fff).ram().w(FUNC(contra_state::vram_w<2>)).share(m_vram[2]);
-	map(0x3000, 0x3fff).ram().share("spriteram1");
+	map(0x3000, 0x3fff).ram().share(m_spriteram[0]);
 	map(0x4000, 0x43ff).ram().w(FUNC(contra_state::cram_w<1>)).share(m_cram[1]);
 	map(0x4400, 0x47ff).ram().w(FUNC(contra_state::vram_w<1>)).share(m_vram[1]);
 	map(0x4800, 0x4fff).ram();
-	map(0x5000, 0x5fff).ram().share("spriteram2");
+	map(0x5000, 0x5fff).ram().share(m_spriteram[1]);
 
 	map(0x6000, 0x7fff).bankr(m_mainbank);
 	map(0x7000, 0x7000).w(FUNC(contra_state::bankswitch_w));
@@ -605,10 +597,6 @@ void contra_state::contra(machine_config &config)
 	KONAMI_007452_MATH(config, "k007452");
 
 	// video hardware
-	BUFFERED_SPRITERAM8(config, m_buffered_spriteram[0]);
-
-	BUFFERED_SPRITERAM8(config, m_buffered_spriteram[1]);
-
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
