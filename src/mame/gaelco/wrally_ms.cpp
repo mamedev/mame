@@ -223,7 +223,7 @@ uint32_t wrally_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 void wrally_ms_state::wrally_ms_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).bankr("prgbank");
-	map(0x020000, 0x0fffff).rom().region("maincpu", 0x20000);
+	map(0x020000, 0x0fffff).rom().region("maincpu", 0x20000).nopw(); // sometimes writes to the ROM area
 
 	map(0x100000, 0x1007ff).ram().share("spriteram");
 
@@ -240,7 +240,7 @@ void wrally_ms_state::wrally_ms_map(address_map &map)
 	map(0x400004, 0x400005).r(FUNC(wrally_ms_state::unk_r));
 	map(0x400006, 0x400007).portr("DSW1");
 	map(0x400008, 0x400009).portr("DSW2");
-	map(0x40000c, 0x40000d).r(FUNC(wrally_ms_state::unk_r));
+	map(0x40000c, 0x40000d).r(FUNC(wrally_ms_state::unk_r)).nopw(); // writes 00 sometimes
 
 	map(0x600000, 0x600001).r(FUNC(wrally_ms_state::unk2_r));
 
@@ -433,7 +433,7 @@ void wrally_ms_state::wrally_ms(machine_config &config)
 
 	OKIM6295(config, m_oki, 1_MHz_XTAL, okim6295_device::PIN7_HIGH); // PIN 7 seems like it's not connected to anything at all
 	m_oki->set_addrmap(0, &wrally_ms_state::oki_map);
-	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.7);
 
 	// does the game use the rest of the sound hardware? the program is from Splash modular system
 	// maybe only the OKI above is used (and driven by the 68k?)
