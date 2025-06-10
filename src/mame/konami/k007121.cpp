@@ -16,6 +16,14 @@ ROM is 0x80000 bytes (addressed 16 bits at a time). Tile and sprite data both
 come from the same ROM space. Like the 005885, external circuitry can cause
 tiles and sprites to be fetched from different ROMs (used by Haunted Castle).
 
+The chip will render a maximum of 264 8x8 sprite blocks.  There is no limit on
+the number of sprites, including per-scanline, other then bumping into the 264
+8x8 sprite block limit.  Games often append 17 offscreen 32x32 sprites after
+their active sprite list so they bump into the block limit and avoid having to
+fully clear out all old sprites.  If a large sprite where to straddle the 264
+limit it would only draw the available 8x8 sprite blocks. As soon as it hits the
+limit it stops drawing the rest of the sprite.
+
 Two 256x4 lookup PROMs are also used to increase the color combinations.
 All tilemap / sprite priority handling is done internally and the chip exports
 7 bits of color code, composed of 2 bits of palette bank, 1 bit indicating tile
@@ -73,9 +81,6 @@ control registers
      -x------ Chops away the leftmost and rightmost columns, switching the
               visible area from 256 to 240 pixels. This is used by combatsc on
               the scrolling stages, and by labyrunr on the title screen.
-              At first I thought that this enabled an extra bank of 0x40
-              sprites, needed by combatsc, but labyrunr proves that this is not
-              the case
      x------- unknown (contra)
 004: ----xxxx bits 9-12 of the tile code. Only the bits enabled by the following
               mask are actually used, and replace the ones selected by register
@@ -195,10 +200,6 @@ void k007121_device::ctrl_w(offs_t offset, uint8_t data)
  * Sprite Format
  * ------------------
  *
- * There are 0x40 sprites, each one using 5 bytes. However the number of
- * sprites can be increased to 0x80 with a control register (Combat School
- * sets it on and off during the game).
- *
  * Byte | Bit(s)   | Use
  * -----+-76543210-+----------------
  *   0  | xxxxxxxx | sprite code
@@ -215,23 +216,25 @@ void k007121_device::ctrl_w(offs_t offset, uint8_t data)
  *
  */
 
-#define SPRITE_FORMAT_SIZE 5
-#define MAX_SPRITE_BLOCKS 264		// Maximum number of 8x8 sprite blocks that can be drawn
-#define MAX_SPRITES 0x199		// floor(0x800 / SPRITE_FORMAT_SIZE)
-
 void k007121_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect,
 		const uint8_t *source, int base_color, int global_x_offset, int bank_base, bitmap_ind8 &priority_bitmap, uint32_t pri_mask)
 {
 
+	// maximum number of 8x8 sprite blocks that can be drawn
+	constexpr int MAX_SPRITE_BLOCKS = 264;
+	constexpr int SPRITE_FORMAT_SIZE = 5;
+
+	// There is 0x1000 sprite ram, which is broken up into 2 0x800 chunks.
+	// The follow control bit determine which chunk is used.
 	if (BIT(m_ctrlram[3], 3))
 		source += 0x800;
 
 	// determine number of sprites that will be drawn
 	int num_sprites = 0;
 	int sprite_blocks = 0;
-	for (int i = 0;i < MAX_SPRITES && sprite_blocks < MAX_SPRITE_BLOCKS; i+= SPRITE_FORMAT_SIZE) {
-		num_sprites++;
-		int attr = source[i + 4];
+	while(sprite_blocks < MAX_SPRITE_BLOCKS)
+	{
+		int attr = source[(num_sprites * SPRITE_FORMAT_SIZE) + 4];
 		switch (attr & 0xe)
 		{
 			case 0x06:
@@ -239,11 +242,11 @@ void k007121_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprec
 				break;
 
 			case 0x04:
-				sprite_blocks += 3;
+				sprite_blocks += 2;
 				break;
 
 			case 0x02:
-				sprite_blocks += 3;
+				sprite_blocks += 2;
 				break;
 
 			case 0x00:
@@ -258,6 +261,7 @@ void k007121_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprec
 				sprite_blocks += 1;
 				break;
 		}
+		num_sprites++;
 	}
 
 	int inc = SPRITE_FORMAT_SIZE;
