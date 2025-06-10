@@ -17,8 +17,8 @@ come from the same ROM space. Like the 005885, external circuitry can cause
 tiles and sprites to be fetched from different ROMs (used by Haunted Castle).
 
 The chip will render a maximum of 264 8x8 sprite blocks.  There is no limit on
-the number of sprites, including per-scanline, other then bumping into the 264
-8x8 sprite block limit.  Games often append 17 offscreen 32x32 sprites after
+the number of sprites, including per-scanline, other than bumping into the 264
+8x8 sprite block limit.  Games often append 17 off-screen 32x32 sprites after
 their active sprite list so they bump into the block limit and avoid having to
 fully clear out all old sprites.  If a large sprite where to straddle the 264
 limit it would only draw the available 8x8 sprite blocks. As soon as it hits the
@@ -219,10 +219,11 @@ void k007121_device::ctrl_w(offs_t offset, uint8_t data)
 void k007121_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect,
 		const uint8_t *source, int base_color, int global_x_offset, int bank_base, bitmap_ind8 &priority_bitmap, uint32_t pri_mask)
 {
-
 	// maximum number of 8x8 sprite blocks that can be drawn
 	constexpr int MAX_SPRITE_BLOCKS = 264;
 	constexpr int SPRITE_FORMAT_SIZE = 5;
+
+	assert(MAX_SPRITE_BLOCKS < 0x199); // floor(0x800 / SPRITE_FORMAT_SIZE)
 
 	// There is 0x1000 sprite ram, which is broken up into 2 0x800 chunks.
 	// The follow control bit determine which chunk is used.
@@ -232,20 +233,18 @@ void k007121_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprec
 	// determine number of sprites that will be drawn
 	int num_sprites = 0;
 	int sprite_blocks = 0;
-	while(sprite_blocks < MAX_SPRITE_BLOCKS)
+	while (sprite_blocks < MAX_SPRITE_BLOCKS)
 	{
 		int attr = source[(num_sprites * SPRITE_FORMAT_SIZE) + 4];
 		switch (attr & 0xe)
 		{
 			case 0x06:
+			default:
 				sprite_blocks += 1;
 				break;
 
-			case 0x04:
-				sprite_blocks += 2;
-				break;
-
 			case 0x02:
+			case 0x04:
 				sprite_blocks += 2;
 				break;
 
@@ -256,19 +255,15 @@ void k007121_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprec
 			case 0x08:
 				sprite_blocks += 16;
 				break;
-
-			default:
-				sprite_blocks += 1;
-				break;
 		}
 		num_sprites++;
 	}
 
 	int inc = SPRITE_FORMAT_SIZE;
 	// when using priority buffer, draw front to back
-	if (pri_mask != (uint32_t)-1)
+	if (pri_mask != uint32_t(~0))
 	{
-		source += (num_sprites - 1)*inc;
+		source += (num_sprites - 1) * inc;
 		inc = -inc;
 	}
 
@@ -284,8 +279,8 @@ void k007121_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprec
 		int color = base_color + ((source[1] & 0xf0) >> 4);
 		int width, height;
 		int transparent_mask;
-		static const int x_offset[4] = {0x0,0x1,0x4,0x5};
-		static const int y_offset[4] = {0x0,0x2,0x8,0xa};
+		static const int x_offset[4] = { 0x0, 0x1, 0x4, 0x5 };
+		static const int y_offset[4] = { 0x0, 0x2, 0x8, 0xa };
 		int flipx, flipy, destx, desty;
 
 		if (attr & 0x01) sx -= 256;
@@ -309,14 +304,14 @@ void k007121_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprec
 				width = height = 1;
 				break;
 
-			case 0x04:
-				width = 1; height = 2;
-				number &= ~2;
-				break;
-
 			case 0x02:
 				width = 2; height = 1;
 				number &= ~1;
+				break;
+
+			case 0x04:
+				width = 1; height = 2;
+				number &= ~2;
 				break;
 
 			case 0x00:
@@ -362,9 +357,9 @@ void k007121_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprec
 					gfx(0)->prio_transmask(bitmap,cliprect,
 							number + x_offset[ex] + y_offset[ey],
 							color,
-							flipx,flipy,
-							destx,desty,
-							priority_bitmap,pri_mask,
+							flipx, flipy,
+							destx, desty,
+							priority_bitmap, pri_mask,
 							transparent_mask);
 				}
 				else
@@ -372,8 +367,8 @@ void k007121_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprec
 					gfx(0)->transmask(bitmap,cliprect,
 							number + x_offset[ex] + y_offset[ey],
 							color,
-							flipx,flipy,
-							destx,desty,
+							flipx, flipy,
+							destx, desty,
 							transparent_mask);
 				}
 			}
