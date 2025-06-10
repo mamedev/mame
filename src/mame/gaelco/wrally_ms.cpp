@@ -51,6 +51,8 @@ public:
 		, m_screen(*this, "screen")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_vram(*this, "vram")
+		, m_bg_vram(*this, "bg_vram")
+		, m_bg2_vram(*this, "bg2_vram")
 		, m_prgbank(*this,"prgbank")
 	{ }
 
@@ -69,14 +71,23 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<u16> m_vram;
+	required_shared_ptr<u16> m_bg_vram;
+	required_shared_ptr<u16> m_bg2_vram;
 	required_memory_bank m_prgbank;
 
 	tilemap_t *m_tx_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_bg2_tilemap = nullptr;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
+
 	void vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void bg_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void bg2_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	void descramble_16x16tiles(uint8_t *src, int len) ATTR_COLD;
 
@@ -102,14 +113,54 @@ void wrally_ms_state::vram_w(offs_t offset, u16 data, u16 mem_mask)
 	m_tx_tilemap->mark_tile_dirty(offset/2);
 }
 
+TILE_GET_INFO_MEMBER(wrally_ms_state::get_bg_tile_info)
+{
+	u16 code = m_bg_vram[tile_index * 2];
+	u16 attr = m_bg_vram[(tile_index * 2) + 1];
+	int fx = (attr & 0xc0) >> 6;
+
+	tileinfo.set(3, code & 0xfff, attr & 0xf, TILE_FLIPYX(fx));
+}
+
+void wrally_ms_state::bg_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_bg_vram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset/2);
+}
+
+TILE_GET_INFO_MEMBER(wrally_ms_state::get_bg2_tile_info)
+{
+	u16 code = m_bg2_vram[tile_index * 2];
+	u16 attr = m_bg2_vram[(tile_index * 2) + 1];
+	int fx = (attr & 0xc0) >> 6;
+
+	tileinfo.set(1, code & 0xfff, attr & 0xf, TILE_FLIPYX(fx));
+}
+
+void wrally_ms_state::bg2_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_bg2_vram[offset]);
+	m_bg2_tilemap->mark_tile_dirty(offset/2);
+}
+
+
 void wrally_ms_state::video_start()
 {
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wrally_ms_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wrally_ms_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wrally_ms_state::get_bg2_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+
+	m_tx_tilemap->set_transparent_pen(15);
+	m_bg_tilemap->set_transparent_pen(0);
+	m_bg2_tilemap->set_transparent_pen(0);
+
 }
 
 uint32_t wrally_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen());
+	m_bg2_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
@@ -119,13 +170,15 @@ void wrally_ms_state::wrally_ms_map(address_map &map)
 	map(0x000000, 0x01ffff).bankr("prgbank");
 	map(0x020000, 0x0fffff).rom().region("maincpu", 0x20000);
 
-	map(0x100000, 0x1003ff).ram();
+	map(0x100000, 0x1007ff).ram();
 
-	map(0x200000, 0x2001ff).w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
 	map(0x300000, 0x301fff).ram().w(FUNC(wrally_ms_state::vram_w)).share("vram");
-	map(0x340000, 0x341fff).ram(); // these get populated if you turn the 'show something' dip off, before the code quickly crashes
-	map(0x380000, 0x381fff).ram();
+	map(0x340000, 0x341fff).ram().w(FUNC(wrally_ms_state::bg_w)).share("bg_vram");
+	map(0x380000, 0x381fff).ram().w(FUNC(wrally_ms_state::bg2_w)).share("bg2_vram");
+
+	map(0x3c0000, 0x3c000f).ram(); // video regs
 
 	map(0x400000, 0x400001).portr("IN0");
 	map(0x400002, 0x400003).portr("IN1");
@@ -302,7 +355,7 @@ void wrally_ms_state::wrally_ms(machine_config &config)
 	m_screen->set_screen_update(FUNC(wrally_ms_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 0x100);
+	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 0x400);
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_wrally_ms);
 
@@ -343,12 +396,16 @@ ROM_START( wrallymp )
 	ROM_LOAD16_BYTE( "mod_6-esp-2_pds_0_coche_27c512.u6", 0x100000, 0x010000, CRC(362c8f1e) SHA1(013499bf78fc9806f988354ca17e99e9cc2f7f71) )
 	ROM_LOAD16_BYTE( "mod_6-esp-2_pds_1_coche_27c512.u5", 0x100001, 0x010000, CRC(f87e0e9b) SHA1(55eec7612baede958e0abffe426945d85726ffdc) )
 
-	ROM_REGION( 0x40000, "gfx1", 0 ) // 8x8
+	ROM_REGION( 0x10000, "gfx1", 0 ) // 8x8
 	// all ROMs 11xxxxxxxxxxxxxx = 0x00 (last 3/4 0x00)
-	ROM_LOAD32_BYTE( "mod_8-2_fijas_a_23-11_27c512.ic15", 0x000003, 0x10000, CRC(0241312b) SHA1(3a912731cd85bfdf4789d994580729f407eaace2) )
-	ROM_LOAD32_BYTE( "mod_8-2_fijas_b_23-11_27c512.ic22", 0x000002, 0x10000, CRC(44a2fc73) SHA1(90353c54ec0bd26f3e290b3b03cbfc120b85cfe2) )
-	ROM_LOAD32_BYTE( "mod_8-2_fijas_c_23-11_27c512.ic30", 0x000001, 0x10000, CRC(b9e94ba5) SHA1(50c9ba5455a7383f07f13a851d50444477e83ff4) )
-	ROM_LOAD32_BYTE( "mod_8-2_fijas_d_23-11_27c512.ic37", 0x000000, 0x10000, CRC(96644b11) SHA1(4f6a972610ad043d13df6157975739be141ff1e7) )
+	ROM_LOAD32_BYTE( "mod_8-2_fijas_a_23-11_27c512.ic15", 0x000003, 0x4000, CRC(0241312b) SHA1(3a912731cd85bfdf4789d994580729f407eaace2) )
+	ROM_IGNORE(0xc000)
+	ROM_LOAD32_BYTE( "mod_8-2_fijas_b_23-11_27c512.ic22", 0x000002, 0x4000, CRC(44a2fc73) SHA1(90353c54ec0bd26f3e290b3b03cbfc120b85cfe2) )
+	ROM_IGNORE(0xc000)
+	ROM_LOAD32_BYTE( "mod_8-2_fijas_c_23-11_27c512.ic30", 0x000001, 0x4000, CRC(b9e94ba5) SHA1(50c9ba5455a7383f07f13a851d50444477e83ff4) )
+	ROM_IGNORE(0xc000)
+	ROM_LOAD32_BYTE( "mod_8-2_fijas_d_23-11_27c512.ic37", 0x000000, 0x4000, CRC(96644b11) SHA1(4f6a972610ad043d13df6157975739be141ff1e7) )
+	ROM_IGNORE(0xc000)
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD32_BYTE( "mod_8-2_la-i_27c010.ic13", 0x000003, 0x20000, CRC(c1b2f2e6) SHA1(4555f0024289d395484c172cff58544b73e92ddb) )
@@ -356,26 +413,38 @@ ROM_START( wrallymp )
 	ROM_LOAD32_BYTE( "mod_8-2_lc_k_27c010.ic28", 0x000001, 0x20000, CRC(f09f8067) SHA1(bbfe21cefce2307f87a3416af1767fa4b30da446) )
 	ROM_LOAD32_BYTE( "mod_8-2_ld-l_27c010.ic35", 0x000000, 0x20000, CRC(4feb7aab) SHA1(86f222cb95bd7366ec921b2da438847c3679ab46) )
 
-	ROM_REGION( 0x80000, "gfx3", 0 )
+	ROM_REGION( 0x40000, "gfx3", 0 )
 	// All ROMs 1xxxxxxxxxxxxxxxx = 0xFF (2nd half 0xff)
-	ROM_LOAD32_BYTE( "mod_8-2_fon_he_27c1001.ic12", 0x000003, 0x20000, CRC(0279bb03) SHA1(fde2613164651c738469bbfe1a5918c89c0f3cb2) )
-	ROM_LOAD32_BYTE( "mod_8-2_fon_hf_27c1001.ic19", 0x000002, 0x20000, CRC(221c3249) SHA1(2a8f3d93dddc38ed38ee330687fc970507316b02) )
-	ROM_LOAD32_BYTE( "mod_8-2_fon_hg_27c1001.ic27", 0x000001, 0x20000, CRC(f186dcca) SHA1(6dbf2438862592bb0e8647b6aaca4747ad8e2755) )
-	ROM_LOAD32_BYTE( "mod_8-2_fon_hh_27c1001.ic34", 0x000000, 0x20000, CRC(2e73266c) SHA1(1a7a668483e30bf664aa037f86d4a73033dab83b) )
+	ROM_LOAD32_BYTE( "mod_8-2_fon_he_27c1001.ic12", 0x000003, 0x10000, CRC(0279bb03) SHA1(fde2613164651c738469bbfe1a5918c89c0f3cb2) )
+	ROM_IGNORE(0x10000)
+	ROM_LOAD32_BYTE( "mod_8-2_fon_hf_27c1001.ic19", 0x000002, 0x10000, CRC(221c3249) SHA1(2a8f3d93dddc38ed38ee330687fc970507316b02) )
+	ROM_IGNORE(0x10000)
+	ROM_LOAD32_BYTE( "mod_8-2_fon_hg_27c1001.ic27", 0x000001, 0x10000, CRC(f186dcca) SHA1(6dbf2438862592bb0e8647b6aaca4747ad8e2755) )
+	ROM_IGNORE(0x10000)
+	ROM_LOAD32_BYTE( "mod_8-2_fon_hh_27c1001.ic34", 0x000000, 0x10000, CRC(2e73266c) SHA1(1a7a668483e30bf664aa037f86d4a73033dab83b) )
+	ROM_IGNORE(0x10000)
 
-	ROM_REGION( 0x80000, "gfx4", 0 )
+	ROM_REGION( 0x40000, "gfx4", 0 )
 	// All ROMs 1xxxxxxxxxxxxxxxx = 0x00 (2nd half 0x00)
-	ROM_LOAD32_BYTE( "mod_8-2_ned_la_27c1001.ic11", 0x000003, 0x20000, CRC(6b8b4d0d) SHA1(165a6e54004fd2249a8a26554a45a6940ca3873f) )
-	ROM_LOAD32_BYTE( "mod_8-2_ned_lb_27c1001.ic18", 0x000002, 0x20000, CRC(f00783aa) SHA1(3f2025dba2dfa863b754aaaadf0e0de4a2546c0c) )
-	ROM_LOAD32_BYTE( "mod_8-2_ned_lc_27c1001.ic26", 0x000001, 0x20000, CRC(f346ad2c) SHA1(2e335dab1d6a7cc7087e7be17013e1bd63f22f51) )
-	ROM_LOAD32_BYTE( "mod_8-2_ned_ld_27c1001.ic33", 0x000000, 0x20000, CRC(79e991af) SHA1(45163d8692926512e47ddfea8c32848a74910e9d) )
+	ROM_LOAD32_BYTE( "mod_8-2_ned_la_27c1001.ic11", 0x000003, 0x10000, CRC(6b8b4d0d) SHA1(165a6e54004fd2249a8a26554a45a6940ca3873f) )
+	ROM_IGNORE(0x10000)
+	ROM_LOAD32_BYTE( "mod_8-2_ned_lb_27c1001.ic18", 0x000002, 0x10000, CRC(f00783aa) SHA1(3f2025dba2dfa863b754aaaadf0e0de4a2546c0c) )
+	ROM_IGNORE(0x10000)
+	ROM_LOAD32_BYTE( "mod_8-2_ned_lc_27c1001.ic26", 0x000001, 0x10000, CRC(f346ad2c) SHA1(2e335dab1d6a7cc7087e7be17013e1bd63f22f51) )
+	ROM_IGNORE(0x10000)
+	ROM_LOAD32_BYTE( "mod_8-2_ned_ld_27c1001.ic33", 0x000000, 0x10000, CRC(79e991af) SHA1(45163d8692926512e47ddfea8c32848a74910e9d) )
+	ROM_IGNORE(0x10000)
 
-	ROM_REGION( 0x80000, "gfx5", 0 )
+	ROM_REGION( 0x40000, "gfx5", 0 )
 	// All ROMs 1xxxxxxxxxxxxxxxx = 0x00 (2nd half 0x00)
-	ROM_LOAD32_BYTE( "mod_8-2_hed_he_27c1001.ic9",  0x000003, 0x20000, CRC(9f90fa11) SHA1(f5ebebb8e9cab802193ebd61449ca922ed9db380) )
-	ROM_LOAD32_BYTE( "mod_8-2_ned_hf_27c1001.ic17", 0x000002, 0x20000, CRC(b3ae8c46) SHA1(f37bbd8ac5a3e0b3a3419ef9cf7bea5fe9600c77) )
-	ROM_LOAD32_BYTE( "mod_8-2_ned_hg_27c1001.ic25", 0x000001, 0x20000, CRC(d362172d) SHA1(f9b1e26a8b4b55e48e5b94ba9270e2e3bf82fec2) )
-	ROM_LOAD32_BYTE( "mod_8-2_ned_hh_27c1001.ic32", 0x000000, 0x20000, CRC(4a3e115c) SHA1(130094a6a4bb62f61a42e9e9cef12ae7215724f7) )
+	ROM_LOAD32_BYTE( "mod_8-2_hed_he_27c1001.ic9",  0x000003, 0x10000, CRC(9f90fa11) SHA1(f5ebebb8e9cab802193ebd61449ca922ed9db380) )
+	ROM_IGNORE(0x10000)
+	ROM_LOAD32_BYTE( "mod_8-2_ned_hf_27c1001.ic17", 0x000002, 0x10000, CRC(b3ae8c46) SHA1(f37bbd8ac5a3e0b3a3419ef9cf7bea5fe9600c77) )
+	ROM_IGNORE(0x10000)
+	ROM_LOAD32_BYTE( "mod_8-2_ned_hg_27c1001.ic25", 0x000001, 0x10000, CRC(d362172d) SHA1(f9b1e26a8b4b55e48e5b94ba9270e2e3bf82fec2) )
+	ROM_IGNORE(0x10000)
+	ROM_LOAD32_BYTE( "mod_8-2_ned_hh_27c1001.ic32", 0x000000, 0x10000, CRC(4a3e115c) SHA1(130094a6a4bb62f61a42e9e9cef12ae7215724f7) )
+	ROM_IGNORE(0x10000)
 
 	ROM_REGION( 0x80000, "sprites", ROMREGION_ERASEFF | ROMREGION_INVERT )
 	ROM_LOAD32_BYTE( "mod_5-1_mov_la_23-11_27c512.ic3",  0x000003, 0x010000, CRC(8a5f3713) SHA1(73a8ccebfe55daf17ab91cc57cdca866477ba09f) )
