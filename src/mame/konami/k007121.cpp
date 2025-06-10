@@ -225,8 +225,8 @@ void k007121_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 	assert(MAX_SPRITE_BLOCKS < 0x199); // floor(0x800 / SPRITE_FORMAT_SIZE)
 
-	// There is 0x1000 sprite ram, which is broken up into 2 0x800 chunks.
-	// The follow control bit determine which chunk is used.
+	// There is 0x1000 sprite ram, which is broken up into 2 0x800 banks.
+	// The following control bit determines which bank is used.
 	if (BIT(m_ctrlram[3], 3))
 		source += 0x800;
 
