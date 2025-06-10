@@ -36,6 +36,8 @@
 #include "sound/msm5205.h"
 #include "sound/ymopl.h"
 
+#include "machine/gen_latch.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -58,6 +60,8 @@ public:
 		, m_videoram_16x16_bg(*this, "videoram16x16bg")
 		, m_videoregs(*this, "videoregs")
 		, m_spriteram(*this, "spriteram")
+		, m_soundlatch(*this, "soundlatch")
+		, m_msm(*this, "msm")
 	{ }
 
 	void xorworld_ms(machine_config &config) ATTR_COLD;
@@ -79,6 +83,8 @@ private:
 	required_shared_ptr<uint16_t> m_videoram_16x16_bg;
 	required_shared_ptr<uint16_t> m_videoregs;
 	required_shared_ptr<uint16_t> m_spriteram;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<msm5205_device> m_msm;
 
 	void descramble_16x16tiles(uint8_t* src, int len);
 
@@ -93,7 +99,12 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info_tilemap_16x16bg);
 
 	void xorworld_ms_map(address_map &map) ATTR_COLD;
-	void xorworld_ms_sound_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+
+	void msm5205_int(int state);
+	void adpcm_data_w(uint8_t data);
+	void adpcm_control_w(uint8_t data);
+	int m_adpcm_data = 0;
 
 	tilemap_t *m_tilemap_8x8_mg = nullptr;
 	tilemap_t *m_tilemap_8x8_fg = nullptr;
@@ -236,16 +247,37 @@ void xorworld_ms_state::xorworld_ms_map(address_map &map)
 	map(0x400006, 0x400007).portr("DSW1");
 	map(0x400008, 0x400009).portr("DSW2");
 	map(0x40000c, 0x40000d).noprw(); // unknown
-	map(0x40000e, 0x40000f).nopw(); // unknown (sound?)
+	map(0x40000e, 0x40000e).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 
 	map(0xff0000, 0xffffff).ram();
 }
 
-void xorworld_ms_state::xorworld_ms_sound_map(address_map &map)
+void xorworld_ms_state::adpcm_data_w(uint8_t data)
+{
+	m_adpcm_data = data;
+}
+
+void xorworld_ms_state::adpcm_control_w(uint8_t data)
+{
+	m_msm->reset_w(BIT(data, 7));
+}
+
+void xorworld_ms_state::msm5205_int(int state)
+{
+	m_msm->data_w(m_adpcm_data >> 4);
+	m_adpcm_data = (m_adpcm_data << 4) & 0xf0;
+}
+
+void xorworld_ms_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0xe800, 0xe801).noprw();
-	map(0xf000, 0xffff).ram();
+	map(0xe000, 0xe000).w(FUNC(xorworld_ms_state::adpcm_control_w));
+	map(0xe400, 0xe400).w(FUNC(xorworld_ms_state::adpcm_data_w));
+
+	map(0xe800, 0xe801).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
+
+	map(0xf000, 0xf7ff).ram();
+	map(0xf800, 0xf800).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 }
 
 static INPUT_PORTS_START( xorworld_ms )
@@ -344,6 +376,7 @@ void xorworld_ms_state::descramble_16x16tiles(u8* src, int len)
 
 void xorworld_ms_state::machine_start()
 {
+	save_item(NAME(m_adpcm_data));
 }
 
 void xorworld_ms_state::init_xorworld_ms()
@@ -370,15 +403,21 @@ void xorworld_ms_state::xorworld_ms(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_xorworld_ms);
 
 	// Sound hardware
+	Z80(config, m_soundcpu, 16_MHz_XTAL/4);
+	m_soundcpu->set_addrmap(AS_PROGRAM, &xorworld_ms_state::sound_map);
+	m_soundcpu->set_periodic_int(FUNC(xorworld_ms_state::nmi_line_pulse), attotime::from_hz(60*64));
+
+	GENERIC_LATCH_8(config, m_soundlatch);
+	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_IRQ0);
 
 	SPEAKER(config, "mono").front_center();
 
-	Z80(config, m_soundcpu, 16_MHz_XTAL / 4); // Z8400BB1
-	m_soundcpu->set_addrmap(AS_PROGRAM, &xorworld_ms_state::xorworld_ms_sound_map);
+	YM3812(config, "ymsnd", XTAL(16'000'000)/4).add_route(ALL_OUTPUTS, "mono", 0.80);
 
-	YM3812(config, "ymsnd", 16_MHz_XTAL / 4); // Unknown divisor
-
-	MSM5205(config, "msm", 384_kHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.15);
+	MSM5205(config, m_msm, XTAL(384'000));
+	m_msm->vck_legacy_callback().set(FUNC(xorworld_ms_state::msm5205_int));
+	m_msm->set_prescaler_selector(msm5205_device::S48_4B);
+	m_msm->add_route(ALL_OUTPUTS, "mono", 0.80);
 }
 
 ROM_START( xorwldms )
@@ -492,5 +531,5 @@ ROM_END
 // make use of them, instead opting for their own, so which really came first?
 
 // due to this being almost an entirely different piece of code on entirely different hardware it isn't set as a clone of xorworld
-GAME( 1990, xorwldms,  0,        xorworld_ms, xorworld_ms, xorworld_ms_state, init_xorworld_ms, ROT0, "Gaelco", "Xor World (Modular System, prototype, set 1)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1990, xorwldmsa, xorwldms, xorworld_ms, xorworld_ms, xorworld_ms_state, init_xorworld_ms, ROT0, "Gaelco", "Xor World (Modular System, prototype, set 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1990, xorwldms,  0,        xorworld_ms, xorworld_ms, xorworld_ms_state, init_xorworld_ms, ROT0, "Gaelco", "Xor World (Modular System, prototype, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1990, xorwldmsa, xorwldms, xorworld_ms, xorworld_ms, xorworld_ms_state, init_xorworld_ms, ROT0, "Gaelco", "Xor World (Modular System, prototype, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
