@@ -174,6 +174,9 @@ uint32_t wrally_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 	m_bg2_tilemap->set_scrollx(0, 80-(m_scrollregs[6]));
 	m_bg2_tilemap->set_scrolly(0, -m_scrollregs[7]);
 
+	// what are m_scrollregs 2,3 and 4,5?
+	// one is probably tx scroll, the other priority control
+
 	m_tx_tilemap->set_scrollx(0, 80);
 	m_tx_tilemap->set_scrolly(0, 0);
 
@@ -223,7 +226,7 @@ uint32_t wrally_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 void wrally_ms_state::wrally_ms_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).bankr("prgbank");
-	map(0x020000, 0x0fffff).rom().region("maincpu", 0x20000).nopw(); // sometimes writes to the ROM area
+	map(0x020000, 0x0fffff).rom().region("maincpu", 0x20000).nopw(); // sometimes writes to the ROM area (code bug?)
 
 	map(0x100000, 0x1007ff).ram().share("spriteram");
 
@@ -232,6 +235,7 @@ void wrally_ms_state::wrally_ms_map(address_map &map)
 	map(0x300000, 0x301fff).ram().w(FUNC(wrally_ms_state::vram_w)).share("vram");
 	map(0x340000, 0x341fff).ram().w(FUNC(wrally_ms_state::bg_w)).share("bg_vram");
 	map(0x380000, 0x381fff).ram().w(FUNC(wrally_ms_state::bg2_w)).share("bg2_vram");
+	// sometimes writes to 382000, 382002 (code bug?)
 
 	map(0x3c0000, 0x3c000f).ram().share("scrollregs"); // video regs
 
@@ -242,13 +246,9 @@ void wrally_ms_state::wrally_ms_map(address_map &map)
 	map(0x400008, 0x400009).portr("DSW2");
 	map(0x40000c, 0x40000d).r(FUNC(wrally_ms_state::unk_r)).nopw(); // writes 00 sometimes
 
-	map(0x600000, 0x600001).r(FUNC(wrally_ms_state::unk2_r));
-
-	map(0x600081, 0x600081).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+//	map(0x600000, 0x600001).r(FUNC(wrally_ms_state::unk2_r));
+	map(0x600081, 0x600081).mirror(0x100).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x600101, 0x600101).w(FUNC(wrally_ms_state::okim6295_bankswitch_w));
-
-	map(0x600180, 0x600181).r(FUNC(wrally_ms_state::unk2_r));
-
 	map(0xff0000, 0xffffff).ram();
 }
 
@@ -435,8 +435,8 @@ void wrally_ms_state::wrally_ms(machine_config &config)
 	m_oki->set_addrmap(0, &wrally_ms_state::oki_map);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 0.7);
 
-	// does the game use the rest of the sound hardware? the program is from Splash modular system
-	// maybe only the OKI above is used (and driven by the 68k?)
+	// the sound hardware below seems to go unused, the program is the same as Splash (Modular System)
+	// all sounds for this are from the OKIM6295, driven by the 68000
 
 	Z80(config, m_soundcpu, 16_MHz_XTAL / 4); // NEC D780C-2
 	m_soundcpu->set_addrmap(AS_PROGRAM, &wrally_ms_state::sound_map);
