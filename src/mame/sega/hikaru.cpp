@@ -420,15 +420,21 @@ public:
 		, m_slave(*this, "slave")
 		, m_315_6154(*this, "pci0:00.0")
 		, s_315_6154(*this, "pci1:00.0")
+		, m_mie(*this, "mie")
+		, m_eeprom(*this, "main_eeprom")
+		, m_rombd_eeprom(*this, "rombd_eeprom")
 	{ }
 
 	void hikaru(machine_config &config);
 
 private:
 	virtual void video_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 	void sh4_map_main(address_map &map) ATTR_COLD;
+	void sh4_io_main(address_map& map) ATTR_COLD;
 	void sh4_map_slave(address_map &map) ATTR_COLD;
+	void sh4_io_slave(address_map& map) ATTR_COLD;
 	void pci_map(address_map& map) ATTR_COLD;
 
 	uint32_t screen_update_hikaru(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -437,12 +443,39 @@ private:
 	required_device<sh7091_device> m_slave;
 	required_device<sega_315_6154_device> m_315_6154;
 	required_device<sega_315_6154_device> s_315_6154;
+	required_device<mie_device> m_mie;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<x76f100_device> m_rombd_eeprom;
 
-	u32 m_mie_busrq;
+	address_space* space_main_sh4;
+	address_space* space_slave_sh4;
+	address_space* space_6154;
+
+	uint64_t main_io_r();
+	uint64_t slave_io_r();
+	void main_io_w(uint64_t data);
+	void slave_io_w(uint64_t data);
+
+	void irq_update();
+	//void gpu_irq(int state);
+
+	u32 m_irq_pending;
+	u32 m_irq_mask;
+public:
+	int mie_b_r();
+	void mie_c_w(int state);
+	void mie_f_w(int state);
 };
 
 void hikaru_state::video_start()
 {
+}
+
+void hikaru_state::machine_start()
+{
+	space_main_sh4 = &m_maincpu->space(AS_PROGRAM);
+	space_slave_sh4 = &m_slave->space(AS_PROGRAM);
+	space_6154 = &m_315_6154->space(sega_315_6154_device::AS_PCI_MEMORY);
 }
 
 uint32_t hikaru_state::screen_update_hikaru(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -450,8 +483,236 @@ uint32_t hikaru_state::screen_update_hikaru(screen_device &screen, bitmap_rgb32 
 	return 0;
 }
 
+// main SH4 port A
+// 0 - /IRL3 Slave SH4
+// 1 - LED5 (active high)
+// 2 - 93C46 DI / 76F100 SCL
+// 3 - 93C46 SK / 76F100 SDA
+// 4 - 93C46 CS / 76F100 RST
+// 5 - 93C46 DO / 76F100 CS
+// 6 - /INT0 ANT_INT
+// 7 - /INT1 SZK_INT (AICA)
+// 8 - /INT2 CN4_INT
+// 9 - /INT4 CN3_INT1
+
+uint64_t hikaru_state::main_io_r()
+{
+	return (m_eeprom->do_read() << 5) | (!BIT(m_irq_pending, 0) << 6) | (!BIT(m_irq_pending, 4) << 7) | (!BIT(m_irq_pending, 5) << 8) | (!BIT(m_irq_pending, 7) << 9);
+}
+
+void hikaru_state::main_io_w(uint64_t data)
+{
+	m_slave->set_input_line(SH4_IRL3, BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
+
+	m_eeprom->di_write(BIT(data,2));
+	m_eeprom->cs_write(BIT(data, 4));
+	m_eeprom->clk_write(BIT(data, 3));
+}
+
+// slave SH4 port A
+// 0 - /IRL3 Main SH4
+// 1 - LED6 (active high)
+// 6-9 - DIPSW 4
+
+uint64_t hikaru_state::slave_io_r()
+{
+	return ioport("DIPSW")->read() << 6;
+}
+
+void hikaru_state::slave_io_w(uint64_t data)
+{
+	m_maincpu->set_input_line(SH4_IRL3, BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
+}
+
+void hikaru_state::irq_update()
+{
+	m_maincpu->set_input_line(SH4_IRL2, (m_irq_pending & m_irq_mask) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+#if 0
+void hikaru_state::gpu_irq(int state)
+{
+	if (state)
+	{
+		m_irq_pending |= 1;
+		m_slave->set_input_line(SH4_IRL2, ASSERT_LINE);
+	}
+	else {
+		m_irq_pending &= ~1;
+		m_slave->set_input_line(SH4_IRL2, CLEAR_LINE);
+	}
+	irq_update();
+}
+#endif
+
+int hikaru_state::mie_b_r()
+{
+	return m_irq_pending;
+}
+
+void hikaru_state::mie_c_w(int state)
+{
+	m_irq_mask = state;
+	irq_update();
+}
+
+void hikaru_state::mie_f_w(int state)
+{
+	m_irq_pending &= ~0xe;
+	m_irq_pending |= state << 1;
+	irq_update();
+}
+
+/* MIE GPIO ports:
+	A not populated DIPSW 6
+	B pending IRQs (active high)
+	  0 - INT0 ANT_INT
+	  1 - PortF 4
+	  2 - PortF 5
+	  3 - PortF 6
+	  4 - INT1 SZK_INT (AICA)
+	  5 - INT2 CN4_INT
+	  6 - INT3 CN3_INT0
+	  7 - INT4 CN3_INT1
+	C INT_MASK, for main SH4 IRL2, 1=enabled,
+	  0 - INT0 (ANT_INT)
+	  1 - portF 4
+	  2 - portF 5
+	  3 - portF 6
+	  4 - INT1 SZK_INT (AICA)
+	  5 - INT2 CN4_INT
+	  6 - INT3 CN3_INT0
+	  7 - INT4 CN3_INT1
+	D Reset (active low) and clock control
+	  0 - System Reset
+	  1 - GP_RES (all GPU ASICs reset)
+	  2 - Slave SH4 Reset
+	  3 - CN4_RES
+	  4 - PCI1_RES (Eurasia)
+	  5 - SND_RES
+	  6 - V S0, video clock PLL control
+	  7 - V S1, video clock PLL control
+	E LEDs and GPU JTAG
+	  0-3 - LEDs 7-10
+	  4 - TRST
+	  5 - TDO
+	  6 - TMS
+	  7 - TCK
+	F
+	  0 - 93C46 SK
+	  1 - 93C46 DI
+	  2 - 93C46 ORG
+	  3 - 93C46 CS
+	  4 - PortF 4 interrupt
+	  5 - PortF 5 interrupt
+	  6 - PortF 6 interrupt
+	  7 - GPU JTAG control, 0 - port E, 1 - external
+	G
+	  0 - 93C46 DO
+	  1 - 
+	  2 - /Test SW7
+	  3 - /Service SW8
+	  4 - FAN2 sensor
+	  5 - FAN1 sensor (not populated)
+	  6 - FAN0 sensor (not populated)
+	  7 - GPU JTAG chain TDO input
+*/
+
+static INPUT_PORTS_START( hikaru_common )
+	PORT_START("MIE.0")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED ) // not populated DIPSW6, in theory may be used by some dev/debug code leftowers
+	PORT_START("MIE.1")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(hikaru_state::mie_b_r))
+	PORT_START("MIE.2")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_MEMBER(FUNC(hikaru_state::mie_c_w))
+
+	PORT_START("MIE.5")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("mie_eeprom", FUNC(eeprom_serial_93cxx_device::clk_write))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("mie_eeprom", FUNC(eeprom_serial_93cxx_device::di_write))
+//	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("mie_eeprom", FUNC(eeprom_serial_93cxx_device::org_write)) // not implemented 8/16 bit mode switch
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("mie_eeprom", FUNC(eeprom_serial_93cxx_device::cs_write))
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_MEMBER(FUNC(hikaru_state::mie_f_w))
+
+	PORT_START("MIE.6")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mie_eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0xf2, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DIPSW")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW4:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( hikaru )
-	PORT_START("IN0")
+	PORT_INCLUDE( hikaru_common )
+
+	PORT_START("TILT")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_TILT )
+	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P1")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON4 )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON5 )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON6 )
+	PORT_BIT( 0x400f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P2")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(2)
+	PORT_BIT( 0x400f, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	/* Dummy high bytes so we can easily get the analog ch # */
+	PORT_START("A0")
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("A1")
+	PORT_BIT( 0x01ff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("A2")
+	PORT_BIT( 0x02ff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("A3")
+	PORT_BIT( 0x03ff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("A4")
+	PORT_BIT( 0x04ff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("A5")
+	PORT_BIT( 0x05ff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("A6")
+	PORT_BIT( 0x06ff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("A7")
+	PORT_BIT( 0x07ff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 void hikaru_state::pci_map(address_map& map)
@@ -459,26 +720,40 @@ void hikaru_state::pci_map(address_map& map)
 	//const char* t = tag();
 	// master bridge "Local Bus" area
 //	map(0x00000000, 0x001fffff).rom();   // boot ROM
-	map(0x00400000, 0x007fffff).noprw(); // r/w trigger "OKBCS" line to PLD between Antarctic and Africa, purpose unknown
-	map(0x00800000, 0x0081ffff).mirror(0x80000000).m("^mie", FUNC(mie_device::mie_port)).umask16(0x00ff);
-	map(0x00820000, 0x0083ffff).m("^mie", FUNC(mie_device::mie_map)).umask16(0x00ff);
-	map(0x00c00000, 0x00c0ffff).ram().share("^nvram");
-	map(0x02000000, 0x02ffffff).mirror(0x80000000).lrw32(                  // MIE BUSRQ/BUSAK, TODO should be passed through MIE
-		NAME([this](offs_t offset) { return m_mie_busrq ^ 0x100; }),
-		NAME([this](offs_t offset, u32 data) { m_mie_busrq = data; })
+	map(0x00400000, 0x007fffff).mirror(0x80000000).noprw(); // r/w trigger "OKBCS" line to PLD between Antarctic and Africa, purpose unknown
+	map(0x00800000, 0x0081ffff).mirror(0x80000000).m(m_mie, FUNC(mie_device::mie_port)).umask16(0x00ff);
+	map(0x00820000, 0x0083ffff).mirror(0x80000000).m(m_mie, FUNC(mie_device::mie_map)).umask16(0x00ff);
+	map(0x00c00000, 0x00c0ffff).mirror(0x80000000).ram().share("^nvram");
+	map(0x02000000, 0x02ffffff).mirror(0x80000000).lrw32(
+		NAME([this](offs_t offset) { return (!m_mie->busak_r() << 8) | 0x600; }),
+		NAME([this](offs_t offset, u32 data) { m_mie->busrq_w(BIT(data, 8)); })
 	);
 //	map(0x0a000000, 0x0a0fffff).rw();    // optional ROMBD-specific security
 //  map(0x0c000000, 0x0cffffff).rw();    // onboard AICA + RAM
 //  map(0x0d000000, 0x0dffffff).rw();    // optional AICA + RAM
 //  map(0x0e000000, 0x0effffff).rw();    // optional Communication Board
-    map(0x10000000, 0x13ffffff).rom().region("^user1", 0);
-//  map(0x14000000, 0x14ffffff).rw();    // ROMBD x76f100 eprom
-    map(0x20000000, 0x2fffffff).rom().region("^user2", 0);
+    map(0x10000000, 0x13ffffff).mirror(0x80000000).rom().region("^user1", 0);
+    map(0x14000000, 0x14ffffff).lrw32(
+		NAME([this](offs_t offset) { return m_rombd_eeprom->read_sda(); }),
+		NAME([this](offs_t offset, u32 data) {
+			m_rombd_eeprom->write_cs(BIT(data, 2));
+			m_rombd_eeprom->write_rst(BIT(data, 3));
+			m_rombd_eeprom->write_scl(BIT(data, 1));
+			m_rombd_eeprom->write_sda(BIT(data, 0));
+			})
+	);
+    map(0x20000000, 0x2fffffff).mirror(0x80000000).rom().region("^user2", 0);
 
-// bridge automapped
-//	map(0x40000000, 0x41ffffff).rw(t, FUNC(hikaru_state::slave_sh4_sdram_r), FUNC(hikaru_state::slave_sh4_sdram_w));
+// bridge mapped RAMs
+	map(0x40000000, 0x41ffffff).lrw32(
+		NAME([this](offs_t offset) { return space_slave_sh4->read_dword(0x0c000000 + (offset << 2)); }),
+		NAME([this](offs_t offset, uint32_t data, uint32_t mem_mask) { space_slave_sh4->write_dword(0x0c000000 + (offset << 2), data, mem_mask); })
+	);
 	map(0x48000000, 0x483fffff).ram().share("^sharedram"); // slave bridge local RAM
-//	map(0x70000000, 0x71ffffff).rw(t, FUNC(hikaru_state::master_sh4_sdram_r), FUNC(hikaru_state::master_sh4_sdram_w));
+	map(0x70000000, 0x71ffffff).lrw32(
+		NAME([this](offs_t offset) { return space_main_sh4->read_dword(0x0c000000 + (offset << 2)); }),
+		NAME([this](offs_t offset, uint32_t data, uint32_t mem_mask) { space_main_sh4->write_dword(0x0c000000 + (offset << 2), data, mem_mask); })
+	);
 //  78000000 master bridge local RAM, not present in Hikaru
 
 // PCI
@@ -505,6 +780,15 @@ void hikaru_state::pci_map(address_map& map)
 //  map(0xf3000000, 0xf37fffff).ram(); // video RAM (frame buffers and layers bitmaps)
 }
 
+void hikaru_state::sh4_io_main(address_map& map)
+{
+	map(0x00, 0x0f).rw(FUNC(hikaru_state::main_io_r), FUNC(hikaru_state::main_io_w));
+}
+void hikaru_state::sh4_io_slave(address_map& map)
+{
+	map(0x00, 0x0f).rw(FUNC(hikaru_state::slave_io_r), FUNC(hikaru_state::slave_io_w));
+}
+
 void hikaru_state::sh4_map_main(address_map &map)
 {
 	map(0x00000000, 0x03ffffff).rw(m_315_6154, FUNC(sega_315_6154_device::aperture_r<2>), FUNC(sega_315_6154_device::aperture_w<2>));
@@ -521,7 +805,10 @@ void hikaru_state::sh4_map_slave(address_map &map)
 	map(0x00000000, 0x001fffff).rom().region("maincpu", 0);
 	map(0x04000000, 0x040000ff).rw(s_315_6154, FUNC(sega_315_6154_device::registers_r), FUNC(sega_315_6154_device::registers_w));
 	map(0x0c000000, 0x0dffffff).ram();
-	map(0x10000000, 0x103fffff).ram(); // slave bridge local RAM
+	map(0x10000000, 0x103fffff).lrw64(
+		NAME([this](offs_t offset) { return space_6154->read_qword(0x48000000 + (offset << 3)); }),
+		NAME([this](offs_t offset, uint64_t data, uint64_t mem_mask) { space_6154->write_qword(0x48000000 + (offset << 3), data, mem_mask); })
+	);
 	map(0x14000000, 0x17ffffff).rw(s_315_6154, FUNC(sega_315_6154_device::aperture_r<0>), FUNC(sega_315_6154_device::aperture_w<0>));
 	map(0x18000000, 0x1bffffff).rw(s_315_6154, FUNC(sega_315_6154_device::aperture_r<1>), FUNC(sega_315_6154_device::aperture_w<1>));
 }
@@ -542,7 +829,7 @@ void hikaru_state::hikaru(machine_config &config)
     m_maincpu->set_md(8, 0);
     m_maincpu->set_sh4_clock(CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &hikaru_state::sh4_map_main);
-//  m_maincpu->set_addrmap(AS_IO, &hikaru_state::hikaru_port);
+    m_maincpu->set_addrmap(AS_IO, &hikaru_state::sh4_io_main);
 	m_maincpu->set_force_no_drc(true);
 //  m_maincpu->set_vblank_int("screen", FUNC(hikaru_state::vblank));
 
@@ -558,6 +845,7 @@ void hikaru_state::hikaru(machine_config &config)
 	m_slave->set_md(8, 0);
 	m_slave->set_sh4_clock(CPU_CLOCK);
 	m_slave->set_addrmap(AS_PROGRAM, &hikaru_state::sh4_map_slave);
+	m_slave->set_addrmap(AS_IO, &hikaru_state::sh4_io_slave);
 	m_slave->set_force_no_drc(true);
 
 	PCI_ROOT(config, "pci0", 0);
@@ -571,17 +859,20 @@ void hikaru_state::hikaru(machine_config &config)
 
 	MAPLE_DC(config, "maple", 0, m_maincpu); // TODO: get rid of this, there is no any Maple-host in Hikaru
 
-	mie_device& mie(MIE(config, "mie", 16000000, "maple", 0, "jvs"));
-	mie.set_gpio_name<3>("MIE.3");
-	mie.set_gpio_name<5>("MIE.5");
+	MIE(config, m_mie, 16000000, "maple", 0, "jvs");
+	m_mie->set_gpio_name<0>("MIE.0");
+	m_mie->set_gpio_name<1>("MIE.1");
+	m_mie->set_gpio_name<2>("MIE.2");
+	m_mie->set_gpio_name<5>("MIE.5");
+	m_mie->set_gpio_name<6>("MIE.6");
 	MIE_JVS(config, "jvs", 16000000);
 
 	sega_837_13551_device& sega837(SEGA_837_13551(config, "837_13551", 0, "jvs"));
 	sega837.set_port_tags("TILT", "P1", "P2", "A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "OUTPUT");
 
-	EEPROM_93C46_16BIT(config, "main_eeprom").default_value(0);
+	EEPROM_93C46_8BIT(config, m_eeprom);
 	EEPROM_93C46_8BIT(config, "mie_eeprom");
-	X76F100(config, "rombd_eeprom");
+	X76F100(config, m_rombd_eeprom);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
