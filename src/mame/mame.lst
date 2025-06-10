@@ -18872,8 +18872,8 @@ wrallymp
 xorworld
 
 @source:gaelco/xorworld_ms.cpp
-xorworldm
-xorworldma
+xorwldms
+xorwldmsa
 
 @source:galaxian/dambustr.cpp
 dambustr
