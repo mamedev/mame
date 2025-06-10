@@ -23,7 +23,7 @@
 #include "machine/rescap.h"
 #include "machine/timer.h"
 #include "sound/va_eg.h"
-#include "video/hd61603.h"
+#include "video/hd61602.h"
 #include "video/pwm.h"
 
 #include "roland_tr707.lh"
