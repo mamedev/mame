@@ -351,6 +351,8 @@ ROM_END
 // This was dumped from an Anncia branded unit, although there's no ingame branding, so ROM is probably the same for all PDC100 units
 CONS( 2008, pdc100,  0,         0, pdc100,      pdc100,       spg2xx_pdc_game_state,     empty_init,   "Conny / Anncia",   "PDC100 - Pocket Dream Console (Anncia, US)", MACHINE_IMPERFECT_SOUND )
 
+// there seem to be at least 3 different pink PDC30 units, possibly with different games / software revisions
+// design differences can be seen in the packaging and d-pad style at least
 CONS( 2008, pdc30p,  0,         0, pdc100,      pdc100,       spg2xx_pdc_game_state,     empty_init,   "Conny / VideoJet", "PDC30 - Pocket Dream Console (Pink version) (VideoJet, France)", MACHINE_IMPERFECT_SOUND )
 
 // interestingly this is newer than the PDC100 above, despite containing fewer games
