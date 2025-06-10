@@ -46,10 +46,12 @@ public:
 	wrally_ms_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_soundcpu(*this, "soundcpu")
 		, m_palette(*this, "palette")
 		, m_screen(*this, "screen")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_vram(*this, "vram")
+		, m_prgbank(*this,"prgbank")
 	{ }
 
 	void wrally_ms(machine_config &config) ATTR_COLD;
@@ -62,10 +64,12 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<u16> m_vram;
+	required_memory_bank m_prgbank;
 
 	tilemap_t *m_tx_tilemap = nullptr;
 
@@ -80,12 +84,16 @@ private:
 	uint16_t unk2_r() { return 0x0000; }
 
 	void wrally_ms_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map);
 };
 
 TILE_GET_INFO_MEMBER(wrally_ms_state::get_tile_info)
 {
-	u16 code = (m_vram[tile_index*2] & 0xfff);
-	tileinfo.set(0, code, 0, 0);
+	u16 code = m_vram[tile_index * 2];
+	u16 attr = m_vram[(tile_index * 2) + 1];
+	int fx = (attr & 0xc0) >> 6;
+
+	tileinfo.set(0, code & 0xfff, attr & 0xf, TILE_FLIPYX(fx));
 }
 
 void wrally_ms_state::vram_w(offs_t offset, u16 data, u16 mem_mask)
@@ -108,19 +116,22 @@ uint32_t wrally_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 
 void wrally_ms_state::wrally_ms_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom();
+	map(0x000000, 0x01ffff).bankr("prgbank");
+	map(0x020000, 0x0fffff).rom().region("maincpu", 0x20000);
 
-	map(0x200000, 0x2001ff).ram();
+	map(0x100000, 0x1003ff).ram();
+
+	map(0x200000, 0x2001ff).w(m_palette, FUNC(palette_device::write16)).share("palette");
 
 	map(0x300000, 0x301fff).ram().w(FUNC(wrally_ms_state::vram_w)).share("vram");
 	map(0x340000, 0x341fff).ram(); // these get populated if you turn the 'show something' dip off, before the code quickly crashes
 	map(0x380000, 0x381fff).ram();
 
-	map(0x400000, 0x400001).r(FUNC(wrally_ms_state::unk_r));
-	map(0x400002, 0x400003).r(FUNC(wrally_ms_state::unk_r));
+	map(0x400000, 0x400001).portr("IN0");
+	map(0x400002, 0x400003).portr("IN1");
 	map(0x400004, 0x400005).r(FUNC(wrally_ms_state::unk_r));
-	map(0x400006, 0x400007).r(FUNC(wrally_ms_state::unk_r));
-	map(0x400008, 0x400009).portr("IN1");
+	map(0x400006, 0x400007).portr("DSW1");
+	map(0x400008, 0x400009).portr("DSW2");
 	map(0x40000c, 0x40000d).r(FUNC(wrally_ms_state::unk_r));
 
 	map(0x600000, 0x600001).r(FUNC(wrally_ms_state::unk2_r));
@@ -129,13 +140,90 @@ void wrally_ms_state::wrally_ms_map(address_map &map)
 	map(0xff0000, 0xffffff).ram();
 }
 
+void wrally_ms_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xe800, 0xe801).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
+	map(0xf000, 0xffff).ram();
+}
+
 static INPUT_PORTS_START( wrally_ms )
+	// some modular games read inputs in the high byte, others low, maybe it mirrors?
+	PORT_START("IN0")
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN1 )
+
 	PORT_START("IN1")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x0100, 0x0100, "Show Something" ) // Turned off code seems to crash, turned on it seems get to a test menu
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN2 )
+
+	PORT_START("DSW1")
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x0100, 0x0100, "DSW1" )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0xfe00, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x0100, 0x0000, "Show Something" ) // Turned off code seems to crash, turned on it seems get to a test menu (service mode switch?)
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, "DSW2" )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static const gfx_layout tiles8x8x4_layout =
@@ -171,6 +259,10 @@ GFXDECODE_END
 
 void wrally_ms_state::machine_start()
 {
+	m_prgbank->configure_entry(0, memregion("maincpu")->base());
+	m_prgbank->configure_entry(1, memregion("maincpu")->base() + 0x100000);
+	m_prgbank->set_entry(0);
+	//m_prgbank->set_entry(1); // use overlay ROM instead (doesn't upload a valid palette?)
 }
 
 // Reorganize graphics into something we can decode with a single pass
@@ -210,7 +302,7 @@ void wrally_ms_state::wrally_ms(machine_config &config)
 	m_screen->set_screen_update(FUNC(wrally_ms_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette).set_entries(0x400);
+	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 0x100);
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_wrally_ms);
 
@@ -218,7 +310,8 @@ void wrally_ms_state::wrally_ms(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	Z80(config, "soundcpu", 16_MHz_XTAL / 4); // NEC D780C-2
+	Z80(config, m_soundcpu, 16_MHz_XTAL / 4); // NEC D780C-2
+	m_soundcpu->set_addrmap(AS_PROGRAM, &wrally_ms_state::sound_map);
 
 	YM3812(config, "ymsnd", 16_MHz_XTAL / 4); // Unknown divisor
 
@@ -228,10 +321,11 @@ void wrally_ms_state::wrally_ms(machine_config &config)
 }
 
 ROM_START( wrallymp )
-	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_REGION( 0x120000, "maincpu", 0 )
 	// These were a row of 8 ROMs next to the M68000, they appear to form the start of the code, but the initial boot vector is wrong
 	ROM_LOAD16_BYTE( "mod_6-esp-2_z0_e_25-11_27c1001.u8", 0x000000, 0x020000, CRC(a0d200eb) SHA1(fbca9b84d8b010aa0bfb546ddf366ec9812f0bb5) )
 	ROM_LOAD16_BYTE( "mod_6-esp-2_z0_o_25-11_27c1001.u7", 0x000001, 0x020000, CRC(4113a030) SHA1(e6cac2b0e97ec7f15610aa72198a575631b937f6) )
+	ROM_FILL( 0x06, 1, 0x24 ) // fix the boot vector for if we do want to use these ROMs
 
 	// FIXED BITS (0xxxxxxx) on z1_e - but intentional? 15-bit data tables?
 	ROM_LOAD16_BYTE( "mod_6-esp-2_z1_e_25-11_27c1001.u36", 0x040000, 0x020000, CRC(4346b650) SHA1(a0feca5d9d93af2548b59c11032384703d432a30) )
@@ -246,8 +340,8 @@ ROM_START( wrallymp )
 
 	// Does this act as an overlay? It's basically the same as the above, but with a valid boot vector and some other changes.
 	// Was found on the PCB just above the 8 loaded previously
-	ROM_LOAD16_BYTE( "mod_6-esp-2_pds_0_coche_27c512.u6", 0x000000, 0x010000, CRC(362c8f1e) SHA1(013499bf78fc9806f988354ca17e99e9cc2f7f71) )
-	ROM_LOAD16_BYTE( "mod_6-esp-2_pds_1_coche_27c512.u5", 0x000001, 0x010000, CRC(f87e0e9b) SHA1(55eec7612baede958e0abffe426945d85726ffdc) )
+	ROM_LOAD16_BYTE( "mod_6-esp-2_pds_0_coche_27c512.u6", 0x100000, 0x010000, CRC(362c8f1e) SHA1(013499bf78fc9806f988354ca17e99e9cc2f7f71) )
+	ROM_LOAD16_BYTE( "mod_6-esp-2_pds_1_coche_27c512.u5", 0x100001, 0x010000, CRC(f87e0e9b) SHA1(55eec7612baede958e0abffe426945d85726ffdc) )
 
 	ROM_REGION( 0x40000, "gfx1", 0 ) // 8x8
 	// all ROMs 11xxxxxxxxxxxxxx = 0x00 (last 3/4 0x00)
@@ -319,7 +413,6 @@ ROM_START( wrallymp )
 	ROM_LOAD( "aud_oki_gal16v8as.bin",          0x0000, 0x117, NO_DUMP )
 	ROM_LOAD( "mod_9-2_92fl_gal20v8as.ic18",    0x0000, 0x157, CRC(3a1465c2) SHA1(c98227c29301fdff7ab8144222ff0c257412dd78) )
 ROM_END
-
 
 } // anonymous namespace
 
