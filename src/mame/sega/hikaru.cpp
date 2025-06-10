@@ -461,7 +461,7 @@ void hikaru_state::pci_map(address_map& map)
 //	map(0x00000000, 0x001fffff).rom();   // boot ROM
 	map(0x00400000, 0x007fffff).noprw(); // r/w trigger "OKBCS" line to PLD between Antarctic and Africa, purpose unknown
 	map(0x00800000, 0x0081ffff).mirror(0x80000000).m("^mie", FUNC(mie_device::mie_port)).umask16(0x00ff);
-	//map(0x00820000, 0x0083ffff).m("^mie", FUNC(mie_device::mie_map)).umask16(0x00ff);
+	map(0x00820000, 0x0083ffff).m("^mie", FUNC(mie_device::mie_map)).umask16(0x00ff);
 	map(0x00c00000, 0x00c0ffff).ram().share("^nvram");
 	map(0x02000000, 0x02ffffff).mirror(0x80000000).lrw32(                  // MIE BUSRQ/BUSAK, TODO should be passed through MIE
 		NAME([this](offs_t offset) { return m_mie_busrq ^ 0x100; }),
