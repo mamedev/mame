@@ -363,7 +363,7 @@ void k007121_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprec
 					desty = sy + y * 8;
 				}
 
-				if (pri_mask != (uint32_t)-1)
+				if (pri_mask != uint32_t(~0))
 				{
 					gfx(0)->prio_transmask(bitmap,cliprect,
 							number + x_offset[ex] + y_offset[ey],
