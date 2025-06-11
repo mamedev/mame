@@ -1279,6 +1279,25 @@ static INPUT_PORTS_START( barbpet )
 	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( hotwhls )
+	PORT_START("P1")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("B")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("A")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("J")
+	PORT_BIT( 0xff80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( whacmole )
 	PORT_START("P1")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2742,6 +2761,13 @@ ROM_START( barbpet )
 	ROM_LOAD16_WORD_SWAP( "barbiepetrescue.u3", 0x000000, 0x200000, CRC(a740b19d) SHA1(e3c5bc3e1b38457ca826d6eba6e492c33d04b97e) )
 ROM_END
 
+ROM_START( hotwhls )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	// the shadow on the letter K of the 'track' text in the menus is wrong, could be a dump issue
+	ROM_LOAD16_WORD_SWAP( "hotwheels.u2", 0x000000, 0x200000, BAD_DUMP CRC(d8a07cec) SHA1(dcdf876073f69b5565eb83fee80c4ea0deea1ff9) )
+ROM_END
+
+
 ROM_START( wordlnch )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "wordplay.u7", 0x000000, 0x800000, CRC(604f59ff) SHA1(024d554a15e6c3a6b9c3a15bfd657964d1deba83) )
@@ -2918,7 +2944,8 @@ CONS( 2008, swclone,    0,        0, swclone,   swclone,   spg2xx_game_swclone_s
 // Mattel games
 CONS( 2005, mattelcs,   0,        0, rad_skat,  mattelcs,  spg2xx_game_state,          empty_init,    "Mattel",                                                 "Mattel Classic Sports",                                                 MACHINE_IMPERFECT_SOUND )
 
-// there's also a single player Hot Wheels Plug and Play that uses a wheel style controller
+CONS( 2005, hotwhls,    0,        0, spg2xx,    hotwhls,   spg2xx_game_state,          empty_init,    "Mattel",                                                 "Hot Wheels (steering wheel controller)",                                MACHINE_IMPERFECT_SOUND )
+
 CONS( 2006, hotwhl2p,   0,        0, hotwheels, hotwheels, spg2xx_game_hotwheels_state,empty_init,    "Mattel",                                                 "Hot Wheels (2 player, pad controllers)",                                MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 2006, rocksock,   0,        0, spg2xx,    rocksock,  spg2xx_game_state,          empty_init,    "Mattel",                                                 "Rock 'Em Sock 'Em Robots (TV Game)",                                    MACHINE_IMPERFECT_SOUND )
