@@ -90,6 +90,7 @@ void mie_device::device_start()
 {
 	maple_device::device_start();
 	timer = timer_alloc(FUNC(mie_device::update_irq_reply), this);
+	m_space = &cpu->space(AS_PROGRAM);
 
 	save_item(NAME(gpiodir));
 	save_item(NAME(gpio_val));
@@ -216,7 +217,12 @@ uint8_t mie_device::gpiodir_r()
 
 void mie_device::gpiodir_w(uint8_t data)
 {
+	// refresh output ports if direction changed
+	u8 r_to_w = (data ^ gpiodir) & ~data;
 	gpiodir = data;
+	for (unsigned i = 0; i < 7; i++)
+		if (BIT(r_to_w, i) && gpio_port[i])
+			gpio_port[i]->write(gpio_val[i], 0xff);
 }
 
 uint8_t mie_device::adc_r()
