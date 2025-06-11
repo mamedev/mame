@@ -2763,8 +2763,7 @@ ROM_END
 
 ROM_START( hotwhls )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
-	// the shadow on the letter K of the 'track' text in the menus is wrong, could be a dump issue
-	ROM_LOAD16_WORD_SWAP( "hotwheels.u2", 0x000000, 0x200000, BAD_DUMP CRC(d8a07cec) SHA1(dcdf876073f69b5565eb83fee80c4ea0deea1ff9) )
+	ROM_LOAD16_WORD_SWAP( "hotwheels.u2", 0x000000, 0x200000, CRC(d8a07cec) SHA1(dcdf876073f69b5565eb83fee80c4ea0deea1ff9) )
 ROM_END
 
 
@@ -2944,7 +2943,9 @@ CONS( 2008, swclone,    0,        0, swclone,   swclone,   spg2xx_game_swclone_s
 // Mattel games
 CONS( 2005, mattelcs,   0,        0, rad_skat,  mattelcs,  spg2xx_game_state,          empty_init,    "Mattel",                                                 "Mattel Classic Sports",                                                 MACHINE_IMPERFECT_SOUND )
 
-CONS( 2005, hotwhls,    0,        0, spg2xx,    hotwhls,   spg2xx_game_state,          empty_init,    "Mattel",                                                 "Hot Wheels (steering wheel controller)",                                MACHINE_IMPERFECT_SOUND )
+// the shadow on the letter K of the 'track' text in the menus is in the wrong place (appears under the number instead)
+// revision difference or emulation bug?
+CONS( 2005, hotwhls,    0,        0, spg2xx,    hotwhls,   spg2xx_game_state,          empty_init,    "Mattel",                                                 "Hot Wheels (steering wheel controller)",                                MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 CONS( 2006, hotwhl2p,   0,        0, hotwheels, hotwheels, spg2xx_game_hotwheels_state,empty_init,    "Mattel",                                                 "Hot Wheels (2 player, pad controllers)",                                MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
