@@ -1296,6 +1296,28 @@ static INPUT_PORTS_START( whacmole )
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( backybbs )
+	PORT_START("P1")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P2") // inputs MUST be ACTIVE_LOW to function properly
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("A")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("X") // used to select in menus
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Y")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("B") // used to go back in menus
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P3")
+	PORT_BIT( 0x0003, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Pause / Menu")
+	PORT_BIT( 0xfff8, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( hotwheels )
 	// 2 pads, each pad has 4 directions and 1 button, and an internal solder pad to select type, but input reading code seems a bit more complex
 	// the unit this was dumped from was a PAL, with P1 as 'Bling' and P2 as 'Tuner' so those are the defaults used
@@ -2710,6 +2732,11 @@ ROM_START( whacmole )
 	ROM_LOAD16_WORD_SWAP( "whacamole.u1a", 0x000000, 0x400000, CRC(5841ba80) SHA1(b3ec922e1899a1f2e34069a50e36721e925afb9f) )
 ROM_END
 
+ROM_START( backybbs )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "backyardbs.bin", 0x000000, 0x400000, CRC(9c378f27) SHA1(ca0c212482d0743db10046f550fee511a13e1ddb) )
+ROM_END
+
 ROM_START( barbpet )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "barbiepetrescue.u3", 0x000000, 0x200000, CRC(a740b19d) SHA1(e3c5bc3e1b38457ca826d6eba6e492c33d04b97e) )
@@ -2948,3 +2975,5 @@ CONS( 2007, wordlnch,   0,        0, spg2xx,    wordlnch,  spg2xx_game_state,   
 CONS( 2005, whacmole,   0,        0, whacmole,  whacmole,  spg2xx_game_whacmole_state, empty_init,    "Hasbro / Milton Bradley",                               "Whac-A-Mole (TV Game)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2005, barbpet,    0,        0, spg2xx,    barbpet,   spg2xx_game_state,          empty_init,    "Mattel",                                                "Barbie: I Love Pets - Pet Rescue", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2005, backybbs,   0,        0, whacmole,  backybbs,  spg2xx_game_whacmole_state, empty_init,    "Hasbro / Milton Bradley / Atari",                       "Backyard Baseball & Soccer", MACHINE_IMPERFECT_SOUND )
