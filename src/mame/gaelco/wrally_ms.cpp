@@ -22,6 +22,10 @@
               socket intended for a YB2151/AY2203 (and another empty YB2151/AY2203 socket).
     VOLANTE MODULAR: (small sub-board) Logic for the driving wheel.
 
+    TODO:
+    - priorities aren't understood
+    - sound implementation may not be totally correct
+    - wheel support
 ***************************************************************************************************/
 
 #include "emu.h"
@@ -77,8 +81,8 @@ private:
 	required_shared_ptr<u16> m_vram;
 	required_shared_ptr<u16> m_bg_vram;
 	required_shared_ptr<u16> m_bg2_vram;
-	required_shared_ptr<uint16_t> m_spriteram;
-	required_shared_ptr<uint16_t> m_scrollregs;
+	required_shared_ptr<u16> m_spriteram;
+	required_shared_ptr<u16> m_scrollregs;
 	required_memory_bank m_prgbank;
 	required_memory_bank m_okibank;
 	required_device<okim6295_device> m_oki;
@@ -87,7 +91,7 @@ private:
 	tilemap_t *m_bg_tilemap = nullptr;
 	tilemap_t *m_bg2_tilemap = nullptr;
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -97,12 +101,12 @@ private:
 	void bg_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void bg2_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	void okim6295_bankswitch_w(uint8_t data);
+	void okim6295_bankswitch_w(u8 data);
 
-	void descramble_16x16tiles(uint8_t *src, int len) ATTR_COLD;
+	void descramble_16x16tiles(u8 *src, int len) ATTR_COLD;
 
-	uint16_t unk_r() { return machine().rand(); }
-	uint16_t unk2_r() { return 0x0000; }
+	u16 unk_r() { return machine().rand(); }
+	u16 unk2_r() { return 0x0000; }
 
 	void wrally_ms_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map);
@@ -162,10 +166,10 @@ void wrally_ms_state::video_start()
 
 	m_tx_tilemap->set_transparent_pen(15);
 	m_bg_tilemap->set_transparent_pen(0);
-//	m_bg2_tilemap->set_transparent_pen(0);
+//  m_bg2_tilemap->set_transparent_pen(0);
 }
 
-uint32_t wrally_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 wrally_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// are these using the correct reg pairs?
 	m_bg_tilemap->set_scrollx(0, 80-(m_scrollregs[0]));
@@ -192,11 +196,11 @@ uint32_t wrally_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 	{
 		gfx_element* gfx = m_gfxdecode->gfx(3);
 
-		uint16_t attr0 = m_spriteram[i + 0];
-		uint16_t attr1 = m_spriteram[i + 1];
+		u16 attr0 = m_spriteram[i + 0];
+		u16 attr1 = m_spriteram[i + 1];
 
-		uint16_t attr2 = m_spriteram[i + NUM_SPRITES];
-		//uint16_t attr3 = m_spriteram[i + NUM_SPRITES+1]; // unused?
+		u16 attr2 = m_spriteram[i + NUM_SPRITES];
+		//u16 attr3 = m_spriteram[i + NUM_SPRITES+1]; // unused?
 
 		int ypos = attr0 & 0x00ff;
 
@@ -246,7 +250,7 @@ void wrally_ms_state::wrally_ms_map(address_map &map)
 	map(0x400008, 0x400009).portr("DSW2");
 	map(0x40000c, 0x40000d).r(FUNC(wrally_ms_state::unk_r)).nopw(); // writes 00 sometimes
 
-//	map(0x600000, 0x600001).r(FUNC(wrally_ms_state::unk2_r));
+//  map(0x600000, 0x600001).r(FUNC(wrally_ms_state::unk2_r));
 	map(0x600081, 0x600081).mirror(0x100).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x600101, 0x600101).w(FUNC(wrally_ms_state::okim6295_bankswitch_w));
 	map(0xff0000, 0xffffff).ram();
@@ -382,16 +386,16 @@ void wrally_ms_state::machine_start()
 	m_okibank->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
 }
 
-void wrally_ms_state::okim6295_bankswitch_w(uint8_t data)
+void wrally_ms_state::okim6295_bankswitch_w(u8 data)
 {
 	m_okibank->set_entry(data & 0x0f);
 }
 
 
 // Reorganize graphics into something we can decode with a single pass
-void wrally_ms_state::descramble_16x16tiles(uint8_t *src, int len)
+void wrally_ms_state::descramble_16x16tiles(u8 *src, int len)
 {
-	std::vector<uint8_t> buffer(len);
+	std::vector<u8> buffer(len);
 	{
 		for (int i = 0; i < len; i++)
 		{
@@ -560,4 +564,4 @@ ROM_END
 } // anonymous namespace
 
 // World Rally was originally developed using the Modular System, so this isn't a bootleg, it's the original development version
-GAME( 1992, wrallymp, wrally, wrally_ms, wrally_ms, wrally_ms_state, init_wrally_ms, ROT0, "Gaelco", "World Rally (prototype on Modular System)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 23/11/1992
+GAME( 1992, wrallymp, wrally, wrally_ms, wrally_ms, wrally_ms_state, init_wrally_ms, ROT0, "Gaelco", "World Rally (prototype on Modular System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // 23/11/1992
