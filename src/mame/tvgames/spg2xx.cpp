@@ -2763,7 +2763,11 @@ ROM_END
 
 ROM_START( hotwhls )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "hotwheels.u2", 0x000000, 0x200000, CRC(d8a07cec) SHA1(dcdf876073f69b5565eb83fee80c4ea0deea1ff9) )
+	// this dump was consistent when using one programmer to dump it, but has broken shadow on TRACK text in menu
+	//ROM_LOAD16_WORD_SWAP( "hotwheels.u2", 0x000000, 0x200000, CRC(d8a07cec) SHA1(dcdf876073f69b5565eb83fee80c4ea0deea1ff9) )
+	// this dump has a lot of differences to above, and was consistent with another programmer, no corrupt shadow
+	// leaving BAD_DUMP flag due to low confidence though, could be the ROM was failing.
+	ROM_LOAD16_WORD_SWAP( "hotwheels.u2", 0x000000, 0x200000, BAD_DUMP CRC(0237d6b2) SHA1(e962720cf950f841d9aed2924d4878201763b309) )
 ROM_END
 
 
@@ -2943,9 +2947,7 @@ CONS( 2008, swclone,    0,        0, swclone,   swclone,   spg2xx_game_swclone_s
 // Mattel games
 CONS( 2005, mattelcs,   0,        0, rad_skat,  mattelcs,  spg2xx_game_state,          empty_init,    "Mattel",                                                 "Mattel Classic Sports",                                                 MACHINE_IMPERFECT_SOUND )
 
-// the shadow on the letter K of the 'track' text in the menus is in the wrong place (appears under the number instead)
-// revision difference or emulation bug?
-CONS( 2005, hotwhls,    0,        0, spg2xx,    hotwhls,   spg2xx_game_state,          empty_init,    "Mattel",                                                 "Hot Wheels (steering wheel controller)",                                MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, hotwhls,    0,        0, spg2xx,    hotwhls,   spg2xx_game_state,          empty_init,    "Mattel",                                                 "Hot Wheels (steering wheel controller)",                                MACHINE_IMPERFECT_SOUND )
 
 CONS( 2006, hotwhl2p,   0,        0, hotwheels, hotwheels, spg2xx_game_hotwheels_state,empty_init,    "Mattel",                                                 "Hot Wheels (2 player, pad controllers)",                                MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
