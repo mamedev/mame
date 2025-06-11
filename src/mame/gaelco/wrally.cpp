@@ -854,14 +854,14 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1993, wrally,    0,      wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco", "World Rally (version 1.0, checksum DE0D)", MACHINE_SUPPORTS_SAVE ) // 08/Nov/1993
-GAME( 1993, wrallya,   wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco", "World Rally (version 1.0, checksum E586)", MACHINE_SUPPORTS_SAVE ) // 25/Jun/1993. Marked as "Japan"
-GAME( 1993, wrallyb,   wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco", "World Rally (version 1.0, checksum 3873)", MACHINE_SUPPORTS_SAVE ) // 06/Apr/1993. Dallas DS5002FP power failure shows as: "Power Failure"
-GAME( 1993, wrallyc,   wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco", "World Rally (version 1.0, checksum 0E56)", MACHINE_SUPPORTS_SAVE ) // Marked as "Spain". Dallas DS5002FP power failure shows as: "Tension baja"
-GAME( 1993, wrallyd,   wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco", "World Rally (version 1.0, checksum D384)", MACHINE_SUPPORTS_SAVE ) // 02/Apr/1993
-GAME( 1993, wrallye,   wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco", "World Rally (version 1.0, checksum 8AA2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, wrally,    0,      wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco", "World Rally Championship (version 1.0, checksum DE0D)", MACHINE_SUPPORTS_SAVE ) // 08/Nov/1993
+GAME( 1993, wrallya,   wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco", "World Rally Championship (version 1.0, checksum E586)", MACHINE_SUPPORTS_SAVE ) // 25/Jun/1993. Marked as "Japan"
+GAME( 1993, wrallyb,   wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco", "World Rally Championship (version 1.0, checksum 3873)", MACHINE_SUPPORTS_SAVE ) // 06/Apr/1993. Dallas DS5002FP power failure shows as: "Power Failure"
+GAME( 1993, wrallyc,   wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco", "World Rally Championship (version 1.0, checksum 0E56)", MACHINE_SUPPORTS_SAVE ) // Marked as "Spain". Dallas DS5002FP power failure shows as: "Tension baja"
+GAME( 1993, wrallyd,   wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco", "World Rally Championship (version 1.0, checksum D384)", MACHINE_SUPPORTS_SAVE ) // 02/Apr/1993
+GAME( 1993, wrallye,   wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco", "World Rally Championship (version 1.0, checksum 8AA2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, wrallyac,  wrally, wrally, wrally, wrally_state, empty_init, ROT0, u8"Gaelco (Automáticos Canarios license)", "World Rally (version 1.0, checksum C448)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, wrallyac,  wrally, wrally, wrally, wrally_state, empty_init, ROT0, u8"Gaelco (Automáticos Canarios license)", "World Rally Championship (version 1.0, checksum C448)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, wrallyat,  wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco (Atari license)", "World Rally (America, version 1.0, checksum 2CC1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, wrallyata, wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco (Atari license)", "World Rally (America, version 1.0, checksum 75A5)", MACHINE_SUPPORTS_SAVE ) // 16/Jun/1993
+GAME( 1993, wrallyat,  wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco (Atari license)", "World Rally Championship (America, version 1.0, checksum 2CC1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, wrallyata, wrally, wrally, wrally, wrally_state, empty_init, ROT0, "Gaelco (Atari license)", "World Rally Championship (America, version 1.0, checksum 75A5)", MACHINE_SUPPORTS_SAVE ) // 16/Jun/1993
