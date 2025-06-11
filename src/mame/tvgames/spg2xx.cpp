@@ -1237,6 +1237,105 @@ static INPUT_PORTS_START( tmntbftc )
 	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( rocksock )
+	PORT_START("P1")
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0xc000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( barbpet )
+	PORT_START("P1")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+	PORT_BIT( 0xff80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( hotwhls )
+	PORT_START("P1")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("B")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("A")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("J")
+	PORT_BIT( 0xff80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( whacmole )
+	PORT_START("P1")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Blue / Top Left")
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Yellow / Bottom Left")
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Red / Bottom Right")
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Green / Top Right")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Pause / Menu")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Special")
+	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( backybbs )
+	PORT_START("P1")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P2") // inputs MUST be ACTIVE_LOW to function properly
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("A")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("X") // used to select in menus
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Y")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("B") // used to go back in menus
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P3")
+	PORT_BIT( 0x0003, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Pause / Menu")
+	PORT_BIT( 0xfff8, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( hotwheels )
 	// 2 pads, each pad has 4 directions and 1 button, and an internal solder pad to select type, but input reading code seems a bit more complex
@@ -1683,6 +1782,38 @@ void spg2xx_game_state::guitarfv(machine_config &config)
 	m_maincpu->porta_in().set_ioport("P1");
 	m_maincpu->portb_in().set_ioport("P2");
 	m_maincpu->portc_in().set_ioport("P3");
+}
+
+uint16_t spg2xx_game_whacmole_state::whacmole_porta_r()
+{
+	uint16_t ret = 0x0000;
+	logerror("%s: porta_r\n", machine().describe_context());
+	ret |= m_eeprom->do_read() << 3;
+	return ret;
+}
+
+void spg2xx_game_whacmole_state::whacmole_porta_w(uint16_t data)
+{
+	logerror("%s: porta_w (%04x)\n", machine().describe_context(), data);
+	m_eeprom->di_write(BIT(data, 2));
+	m_eeprom->cs_write(BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->clk_write(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+void spg2xx_game_whacmole_state::whacmole(machine_config &config)
+{
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_whacmole_state::mem_map_2m); // accesses mirror addresses
+
+	spg2xx_base(config);
+
+	m_maincpu->porta_in().set(FUNC(spg2xx_game_whacmole_state::whacmole_porta_r));
+	m_maincpu->porta_out().set(FUNC(spg2xx_game_whacmole_state::whacmole_porta_w));
+
+	m_maincpu->portb_in().set(FUNC(spg2xx_game_whacmole_state::base_portb_r));
+	m_maincpu->portc_in().set(FUNC(spg2xx_game_whacmole_state::base_portc_r));
+
+	EEPROM_93C66_16BIT(config, m_eeprom); // HT93LC66A
 }
 
 
@@ -2553,6 +2684,12 @@ ROM_START( hotwhl2p )
 	ROM_LOAD16_WORD_SWAP( "hotwheels.bin", 0x000000, 0x400000, CRC(f3520b74) SHA1(02a53558d68cf3640a9ab09514cd6cebff8b30af) )
 ROM_END
 
+ROM_START( rocksock )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "rsrobots.u2", 0x000000, 0x400000, CRC(1f86aeab) SHA1(0b4afeb113ecdb5349629fa7cc9ceaf282490e01) )
+ROM_END
+
+
 ROM_START( doyousud )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "doyousudoku.bin", 0x000000, 0x100000, CRC(83cafebb) SHA1(a84c7191bc6b0d321415af0b7d2dd69e52c134a1) )
@@ -2608,6 +2745,31 @@ ROM_START( prail )
 	ROM_REGION( 0x8000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "traingame.u1", 0x000000, 0x8000000, CRC(5c96d526) SHA1(cda0280b320762bda7a7358ec7ce29690aa815fb) )
 ROM_END
+
+ROM_START( whacmole )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "whacamole.u1a", 0x000000, 0x400000, CRC(5841ba80) SHA1(b3ec922e1899a1f2e34069a50e36721e925afb9f) )
+ROM_END
+
+ROM_START( backybbs )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "backyardbs.bin", 0x000000, 0x400000, CRC(9c378f27) SHA1(ca0c212482d0743db10046f550fee511a13e1ddb) )
+ROM_END
+
+ROM_START( barbpet )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "barbiepetrescue.u3", 0x000000, 0x200000, CRC(a740b19d) SHA1(e3c5bc3e1b38457ca826d6eba6e492c33d04b97e) )
+ROM_END
+
+ROM_START( hotwhls )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	// this dump was consistent when using one programmer to dump it, but has broken shadow on TRACK text in menu
+	//ROM_LOAD16_WORD_SWAP( "hotwheels.u2", 0x000000, 0x200000, CRC(d8a07cec) SHA1(dcdf876073f69b5565eb83fee80c4ea0deea1ff9) )
+	// this dump has a lot of differences to above, and was consistent with another programmer, no corrupt shadow
+	// leaving BAD_DUMP flag due to low confidence though, could be the ROM was failing.
+	ROM_LOAD16_WORD_SWAP( "hotwheels.u2", 0x000000, 0x200000, BAD_DUMP CRC(0237d6b2) SHA1(e962720cf950f841d9aed2924d4878201763b309) )
+ROM_END
+
 
 ROM_START( wordlnch )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
@@ -2785,8 +2947,11 @@ CONS( 2008, swclone,    0,        0, swclone,   swclone,   spg2xx_game_swclone_s
 // Mattel games
 CONS( 2005, mattelcs,   0,        0, rad_skat,  mattelcs,  spg2xx_game_state,          empty_init,    "Mattel",                                                 "Mattel Classic Sports",                                                 MACHINE_IMPERFECT_SOUND )
 
-// there's also a single player Hot Wheels Plug and Play that uses a wheel style controller
+CONS( 2005, hotwhls,    0,        0, spg2xx,    hotwhls,   spg2xx_game_state,          empty_init,    "Mattel",                                                 "Hot Wheels (steering wheel controller)",                                MACHINE_IMPERFECT_SOUND )
+
 CONS( 2006, hotwhl2p,   0,        0, hotwheels, hotwheels, spg2xx_game_hotwheels_state,empty_init,    "Mattel",                                                 "Hot Wheels (2 player, pad controllers)",                                MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 2006, rocksock,   0,        0, spg2xx,    rocksock,  spg2xx_game_state,          empty_init,    "Mattel",                                                 "Rock 'Em Sock 'Em Robots (TV Game)",                                    MACHINE_IMPERFECT_SOUND )
 
 // there was also an English release of this, simply titled "Interactive TV Computer"
 CONS( 2007, ordentv,    0,        0, ordentv,   ordentv,   spg2xx_game_ordentv_state,  init_ordentv,  "Taikee / V-Tac",                                         "Ordenador-TV (Spain)",                                                  MACHINE_NOT_WORKING )
@@ -2828,11 +2993,17 @@ CONS( 2006, ban_krkk,   0,        0, spg2xx,    ban_krkk,  spg2xx_game_state,   
 // Let's!TVプレイ チームたいこー! カードでパワーUP! たまごっちスクール選手権 - has IR for optional connectivity with external Tamagotchi device, and a card scanner used for gameplay
 CONS( 2007, ban_tam2,   0,        0, spg2xx,    spg2xx,    spg2xx_game_state,          init_crc,      "Bandai",                                                "Let's! TV Play Team Taikou! Card de Power Up! Tamagotchi School Senshuken (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2007, epo_tetr,   0,        0, epo_tetr,  epo_tetr,  epo_tetr_game_state,          empty_init,    "Epoch",                                                "Minna no Tetris (Japan)", MACHINE_IMPERFECT_SOUND )
+CONS( 2007, epo_tetr,   0,        0, epo_tetr,  epo_tetr,  epo_tetr_game_state,        empty_init,    "Epoch",                                                 "Minna no Tetris (Japan)", MACHINE_IMPERFECT_SOUND )
 
 // Train Game V1.4 2012-08-15 on PCB. SPG243 headers in each chunk.
 // Last few bytes of SEEPROM have 'JUNGT' in them, is this developed by JungleSoft/JungleTac?
-CONS( 2012, prail,      0,        0, prail,     prail,     spg2xx_game_prail_state,    empty_init,   "Takara Tomy",                                            "Boku wa Plarail Untenshi - Shinkansen de Ikou! (Japan)",                MACHINE_IMPERFECT_SOUND )
+CONS( 2012, prail,      0,        0, prail,     prail,     spg2xx_game_prail_state,    empty_init,    "Takara Tomy",                                           "Boku wa Plarail Untenshi - Shinkansen de Ikou! (Japan)", MACHINE_IMPERFECT_SOUND )
 // the 'plus' version from 2015 runs on newer hardware, see generalplus_gpl16250_spi.cpp
 
-CONS( 2007, wordlnch,   0,        0, spg2xx,    wordlnch,  spg2xx_game_state,          empty_init,    "LeapFrog",                                                "Word Launch (UK)",                MACHINE_NOT_WORKING )
+CONS( 2007, wordlnch,   0,        0, spg2xx,    wordlnch,  spg2xx_game_state,          empty_init,    "LeapFrog",                                              "Word Launch (UK)", MACHINE_NOT_WORKING ) // seems to have a PAL/NTSC flag so US ROM might be the same
+
+CONS( 2005, whacmole,   0,        0, whacmole,  whacmole,  spg2xx_game_whacmole_state, empty_init,    "Hasbro / Milton Bradley",                               "Whac-A-Mole (TV Game)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2005, barbpet,    0,        0, spg2xx,    barbpet,   spg2xx_game_state,          empty_init,    "Mattel",                                                "Barbie: I Love Pets - Pet Rescue", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2005, backybbs,   0,        0, whacmole,  backybbs,  spg2xx_game_whacmole_state, empty_init,    "Hasbro / Milton Bradley / Atari",                       "Backyard Baseball & Soccer", MACHINE_IMPERFECT_SOUND )
