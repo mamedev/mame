@@ -417,14 +417,15 @@ private:
 	required_device<i2cmem_device> m_i2cmem;
 };
 
-class spg2xx_game_whacmole_state : public spg2xx_game_state
+class spg2xx_game_hasbro_93lc66_state : public spg2xx_game_state
 {
 public:
-	spg2xx_game_whacmole_state(const machine_config &mconfig, device_type type, const char *tag) :
+	spg2xx_game_hasbro_93lc66_state(const machine_config &mconfig, device_type type, const char *tag) :
 		spg2xx_game_state(mconfig, type, tag),
 		m_eeprom(*this, "eeprom")
 	{ }
 
+	void mylpony(machine_config &config);
 	void whacmole(machine_config &config);
 
 private:

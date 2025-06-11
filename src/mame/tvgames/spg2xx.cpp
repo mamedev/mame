@@ -486,6 +486,26 @@ static INPUT_PORTS_START( spg2xx ) // base structure for easy debugging / figuri
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( mylpony )
+	PORT_START("P1")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Pause / Menu")
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Yellow")
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Red / Select")
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Purple")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( carled99 )
 	PORT_INCLUDE( spg2xx )
 
@@ -1784,7 +1804,7 @@ void spg2xx_game_state::guitarfv(machine_config &config)
 	m_maincpu->portc_in().set_ioport("P3");
 }
 
-uint16_t spg2xx_game_whacmole_state::whacmole_porta_r()
+uint16_t spg2xx_game_hasbro_93lc66_state::whacmole_porta_r()
 {
 	uint16_t ret = 0x0000;
 	logerror("%s: porta_r\n", machine().describe_context());
@@ -1792,7 +1812,7 @@ uint16_t spg2xx_game_whacmole_state::whacmole_porta_r()
 	return ret;
 }
 
-void spg2xx_game_whacmole_state::whacmole_porta_w(uint16_t data)
+void spg2xx_game_hasbro_93lc66_state::whacmole_porta_w(uint16_t data)
 {
 	logerror("%s: porta_w (%04x)\n", machine().describe_context(), data);
 	m_eeprom->di_write(BIT(data, 2));
@@ -1800,20 +1820,26 @@ void spg2xx_game_whacmole_state::whacmole_porta_w(uint16_t data)
 	m_eeprom->clk_write(BIT(data, 1) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-void spg2xx_game_whacmole_state::whacmole(machine_config &config)
+void spg2xx_game_hasbro_93lc66_state::mylpony(machine_config &config)
 {
 	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
-	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_whacmole_state::mem_map_2m); // accesses mirror addresses
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_hasbro_93lc66_state::mem_map_4m);
 
 	spg2xx_base(config);
 
-	m_maincpu->porta_in().set(FUNC(spg2xx_game_whacmole_state::whacmole_porta_r));
-	m_maincpu->porta_out().set(FUNC(spg2xx_game_whacmole_state::whacmole_porta_w));
+	m_maincpu->porta_in().set(FUNC(spg2xx_game_hasbro_93lc66_state::whacmole_porta_r));
+	m_maincpu->porta_out().set(FUNC(spg2xx_game_hasbro_93lc66_state::whacmole_porta_w));
 
-	m_maincpu->portb_in().set(FUNC(spg2xx_game_whacmole_state::base_portb_r));
-	m_maincpu->portc_in().set(FUNC(spg2xx_game_whacmole_state::base_portc_r));
+	m_maincpu->portb_in().set(FUNC(spg2xx_game_hasbro_93lc66_state::base_portb_r));
+	m_maincpu->portc_in().set(FUNC(spg2xx_game_hasbro_93lc66_state::base_portc_r));
 
 	EEPROM_93C66_16BIT(config, m_eeprom); // HT93LC66A
+}
+
+void spg2xx_game_hasbro_93lc66_state::whacmole(machine_config &config)
+{
+	mylpony(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_hasbro_93lc66_state::mem_map_2m);
 }
 
 
@@ -2770,6 +2796,10 @@ ROM_START( hotwhls )
 	ROM_LOAD16_WORD_SWAP( "hotwheels.u2", 0x000000, 0x200000, BAD_DUMP CRC(0237d6b2) SHA1(e962720cf950f841d9aed2924d4878201763b309) )
 ROM_END
 
+ROM_START( mylpony )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "mylittlepony.u1", 0x000000, 0x800000, CRC(4df05ad2) SHA1(7b0c19c1fda57c91717db33b7a960fcd77949a04) )
+ROM_END
 
 ROM_START( wordlnch )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
@@ -3002,8 +3032,11 @@ CONS( 2012, prail,      0,        0, prail,     prail,     spg2xx_game_prail_sta
 
 CONS( 2007, wordlnch,   0,        0, spg2xx,    wordlnch,  spg2xx_game_state,          empty_init,    "LeapFrog",                                              "Word Launch (UK)", MACHINE_NOT_WORKING ) // seems to have a PAL/NTSC flag so US ROM might be the same
 
-CONS( 2005, whacmole,   0,        0, whacmole,  whacmole,  spg2xx_game_whacmole_state, empty_init,    "Hasbro / Milton Bradley",                               "Whac-A-Mole (TV Game)", MACHINE_IMPERFECT_SOUND )
+CONS( 2005, whacmole,   0,        0, whacmole,  whacmole,  spg2xx_game_hasbro_93lc66_state, empty_init, "Hasbro / Milton Bradley",                             "Whac-A-Mole (TV Game)", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2005, barbpet,    0,        0, spg2xx,    barbpet,   spg2xx_game_state,          empty_init,    "Mattel",                                                "Barbie: I Love Pets - Pet Rescue", MACHINE_IMPERFECT_SOUND )
+CONS( 2005, backybbs,   0,        0, whacmole,  backybbs,  spg2xx_game_hasbro_93lc66_state, empty_init, "Hasbro / Milton Bradley / Atari",                     "Backyard Baseball & Soccer", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2005, backybbs,   0,        0, whacmole,  backybbs,  spg2xx_game_whacmole_state, empty_init,    "Hasbro / Milton Bradley / Atari",                       "Backyard Baseball & Soccer", MACHINE_IMPERFECT_SOUND )
+CONS( 2006, mylpony,    0,        0, mylpony,   mylpony,   spg2xx_game_hasbro_93lc66_state, empty_init, "Hasbro / Milton Bradley",                             "My Little Pony - Grand Puzzleventure", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2005, barbpet,    0,        0, spg2xx,    barbpet,   spg2xx_game_state,               empty_init, "Mattel",                                              "Barbie: I Love Pets - Pet Rescue", MACHINE_IMPERFECT_SOUND )
+
