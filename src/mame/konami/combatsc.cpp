@@ -671,11 +671,11 @@ void combatscb_state::machine_reset()
 void combatsc_state::combatsc(machine_config &config)
 {
 	// basic machine hardware
-	HD6309E(config, m_maincpu, 24_MHz_XTAL / 8);  // HD63C09E, 3 MHz?
+	HD6309E(config, m_maincpu, 24_MHz_XTAL / 8); // HD63C09E, 3 MHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &combatsc_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(combatsc_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, 3579545);   // 3.579545 MHz??? (no such XTAL on board!)
+	Z80(config, m_audiocpu, 3579545); // 3.579545 MHz??? (no such XTAL on board!)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &combatsc_state::sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(1200));
@@ -686,11 +686,7 @@ void combatsc_state::combatsc(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-//  m_screen->set_refresh_hz(60);
-//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-//  m_screen->set_size(32*8, 32*8);
-//  m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	m_screen->set_raw(XTAL(24'000'000)/3, 528, 0, 256, 256, 16, 240); // not accurate, assuming same to other Konami games (59.17)
+	m_screen->set_raw(XTAL(24'000'000)/3, 512, 0, 256, 264, 16, 240); // not verified, assuming same to other Konami games (59.18)
 	m_screen->set_screen_update(FUNC(combatsc_state::screen_update));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(m_k007121[0], FUNC(k007121_device::sprites_buffer));

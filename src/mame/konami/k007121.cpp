@@ -16,13 +16,15 @@ ROM is 0x80000 bytes (addressed 16 bits at a time). Tile and sprite data both
 come from the same ROM space. Like the 005885, external circuitry can cause
 tiles and sprites to be fetched from different ROMs (used by Haunted Castle).
 
-The chip will render a maximum of 264 8x8 sprite blocks. There is no limit on
-the number of sprites, including per-scanline, other than bumping into the 264
-8x8 sprite block limit. Games often append 17 off-screen 32x32 sprites after
-their active sprite list so they bump into the block limit and avoid having to
-fully clear out all old sprites.  If a large sprite where to straddle the 264
-limit it would only draw the available 8x8 sprite blocks. As soon as it hits the
-limit it stops drawing the rest of the sprite.
+The chip will render a maximum of 264 64-pixel sprite blocks, presumably one
+per scanline. There is no limit on the number of sprites, including per-scanline,
+other than bumping into the 264 sprite block limit. Games often append 17
+off-screen 32x32 sprites after their active sprite list so they bump into the
+block limit and avoid having to fully clear out all old sprites. If a large
+sprite were to straddle the 264 limit, it would only draw the available sprite
+blocks, top to bottom. As soon as it hits the limit, it stops drawing the rest
+of the sprite. For example, 263 8x8 sprites and 1 32x32 sprite, it would draw
+the latter partial sprite with a width of 32 and a height of 2.
 
 Two 256x4 lookup PROMs are also used to increase the color combinations.
 All tilemap / sprite priority handling is done internally and the chip exports
@@ -119,8 +121,8 @@ control registers
 
 TODO:
 - As noted above, the maximum number of 8x8 sprite blocks is 264. MAME doesn't
-  emulate partial sprites at the end of the spritelist. The exact 8x8 block
-  rendering order is unknown. Is's not expected any game relies on this.
+  emulate partial sprites at the end of the spritelist. Is's not expected any
+  game relies on this.
 
 BTANB:
 - Some games don't take the internal 1-frame sprite lag (due to framebuffer) into
@@ -233,7 +235,7 @@ void k007121_device::ctrl_w(offs_t offset, uint8_t data)
 void k007121_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect,
 		int base_color, int global_x_offset, int bank_base, bitmap_ind8 &priority_bitmap, uint32_t pri_mask)
 {
-	// maximum number of 8x8 sprite blocks that can be drawn
+	// maximum number of 64-pixel sprite blocks that can be drawn
 	constexpr int MAX_SPRITE_BLOCKS = 264;
 	constexpr int SPRITE_FORMAT_SIZE = 5;
 
