@@ -30,7 +30,7 @@
 
 #define LOG_REGISTERS   (1U << 1)
 
-#define VERBOSE (LOG_REGISTERS)
+#define VERBOSE (0)
 
 #include "logmacro.h"
 

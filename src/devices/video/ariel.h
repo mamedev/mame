@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, Patrick Mackinlay
 
-#ifndef MAME_VIDEO_BTARIEL_H
-#define MAME_VIDEO_BTARIEL_H
+#ifndef MAME_VIDEO_ARIEL_H
+#define MAME_VIDEO_ARIEL_H
 
 #pragma once
 
