@@ -4,7 +4,7 @@
 /* IGS Gambling games using IGS036 CPU
    pgm2.cpp also uses this CPU
 
-<Chao Ji Da Heng 2>
+<Chaoji Da Heng 2>
 cjdh2.zip
 ---------------------------------------------------
 CPU: IGS036
@@ -566,7 +566,7 @@ ROM_START( xyddz )
 ROM_END
 
 
-// 超级憋七 (Chāo Jí Biē Qī). Has an Altera EPM3032.
+// 超级憋七 (Chāojí Biē Qī). Has an Altera EPM3032.
 ROM_START( cjbq )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
@@ -584,7 +584,7 @@ ROM_START( cjbq )
 ROM_END
 
 
-// 超级干瞪眼 (Chāo Jí Gān Dèng Yǎn). Has an Altera EPM3032.
+// 超级干瞪眼 (Chāojí Gān Dèngyǎn). Has an Altera EPM3032.
 ROM_START( cjgdy )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
@@ -602,7 +602,7 @@ ROM_START( cjgdy )
 ROM_END
 
 
-// 西游斗牛 (Xī Yóu Dòu Niú). Has an Altera EPM3032.
+// 西游斗牛 (Xīyóu Dòuniú). Has an Altera EPM3032.
 ROM_START( xydn )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
@@ -620,8 +620,8 @@ ROM_START( xydn )
 ROM_END
 
 
-// 麻将至尊 (Májiàng Zhì Zūn)
-ROM_START( mjzz ) // PCB-0918-02-JV. Has a Xilinx XC9536XL
+// 麻将至尊 (Májiàng Zhìzūn)
+ROM_START( mjzhizun ) // PCB-0918-02-JV. Has a Xilinx XC9536XL
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
 	ROM_LOAD( "v21.igs036", 0x00000, 0x4000, NO_DUMP )
@@ -638,8 +638,8 @@ ROM_START( mjzz ) // PCB-0918-02-JV. Has a Xilinx XC9536XL
 ROM_END
 
 
-// 大话西游 (Dà Huà Xī Yóu). Has an Altera EPM3032.
-ROM_START( dhxy )
+// 大话西游 (Dàhuà Xīyóu). Has an Altera EPM3032.
+ROM_START( dahuaxy )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
 	ROM_LOAD( "igs036", 0x0000, 0x4000, NO_DUMP )
@@ -656,7 +656,7 @@ ROM_START( dhxy )
 ROM_END
 
 
-// 火麒麟 (Huǒ Qí Lín)
+// 火麒麟 (Huǒ Qílín)
 ROM_START( huoqilin )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
@@ -811,9 +811,9 @@ GAME( 200?, jhzb,     0,     igs_m036,    igs_m036, igs_m036_state, init_igs_m03
 
 GAME( 200?, jxry,     0,     igs_m036,    igs_m036, igs_m036_state, init_igs_m036, ROT0, "IGS",           "Jixiang Ruyi (V116CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 200?, dhxy,     0,     igs_m036,    igs_m036, igs_m036_state, init_igs_m036, ROT0, "IGS",           "Da Hua Xi You (V201CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, dahuaxy,  0,     igs_m036,    igs_m036, igs_m036_state, init_igs_m036, ROT0, "IGS",           "Dahua Xiyou (V201CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 200?, huoqilin, 0,     igs_m036,    igs_m036, igs_m036_state, init_igs_m036, ROT0, "IGS",           "Huo Qi Lin (V116CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, huoqilin, 0,     igs_m036,    igs_m036, igs_m036_state, init_igs_m036, ROT0, "IGS",           "Huo Qilin (V116CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 GAME( 200?, slqzsp,   0,     igs_m036_tt, igs_m036, igs_m036_state, init_igs_m036, ROT0, "IGS",           "Shuang Long Qiang Zhu Tebie Ban (V104CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
@@ -821,13 +821,13 @@ GAME( 200?, sydh,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_igs_m03
 
 GAME( 200?, xyddz,    0,     igs_m036_tt, igs_m036, igs_m036_state, init_igs_m036, ROT0, "IGS",           "Xiaoyao Dou Dizhu", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 200?, cjbq,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_igs_m036, ROT0, "IGS",           "Chao Ji Bie Qi (V205CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, cjbq,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_igs_m036, ROT0, "IGS",           "Chaoji Bie Qi (V205CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 200?, cjgdy,    0,     igs_m036_tt, igs_m036, igs_m036_state, init_igs_m036, ROT0, "IGS",           "Chao Ji Gan Deng Yan (V110CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, cjgdy,    0,     igs_m036_tt, igs_m036, igs_m036_state, init_igs_m036, ROT0, "IGS",           "Chaoji Gan Dengyan (V110CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 200?, xydn,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_igs_m036, ROT0, "IGS",           "Xi You Dou Niu (S110CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, xydn,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_igs_m036, ROT0, "IGS",           "Xiyou Douniu (S110CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 200?, mjzz,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_igs_m036, ROT0, "IGS",           "Majiang Zhi Zun (S100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, mjzhizun, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_igs_m036, ROT0, "IGS",           "Majiang Zhizun (S100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 GAME( 2010, lhfy,     0,     igs_m036_tt, igs_m036, igs_m036_state, init_igsm312,  ROT0, "IGS",           "Long Hu Feng Yun Gao Qing Ban (V206CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 

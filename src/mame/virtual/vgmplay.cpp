@@ -6,7 +6,9 @@
 
 #include "emu.h"
 
+#ifndef QSOUND_LLE
 #define QSOUND_LLE
+#endif
 
 #include "mega32x.h"
 #include "vboysound.h"

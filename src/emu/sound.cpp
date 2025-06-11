@@ -228,7 +228,7 @@ template<typename S> void emu::detail::output_buffer_flat<S>::resample(u32 previ
 	s64 nsync = si(sync_time, next_rate);
 	s64 nwrite = si(now, next_rate);
 	s64 pbase = m_sync_sample - m_sync_position; // Beware, pbase can be negative at startup due to history size
-	u64 nbase = pbase <= 0 ? 0 : muldivupu_64(pbase, next_rate, previous_rate);
+	u64 nbase = (pbase <= 0) ? 0 : muldivupu_64(pbase, next_rate, previous_rate);
 
 	if(nbase > nsync)
 		nbase = nsync;
@@ -297,7 +297,7 @@ sound_manager::effect_step::effect_step(u32 buffer_size, u32 channels) : m_buffe
 sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 sample_rate, stream_update_delegate callback, sound_stream_flags flags) :
 	m_device(device),
 	m_output_buffer(0, outputs),
-	m_sample_rate(sample_rate == SAMPLE_RATE_INPUT_ADAPTIVE || sample_rate == SAMPLE_RATE_OUTPUT_ADAPTIVE || sample_rate == SAMPLE_RATE_ADAPTIVE ? 0 : sample_rate),
+	m_sample_rate((sample_rate == SAMPLE_RATE_INPUT_ADAPTIVE || sample_rate == SAMPLE_RATE_OUTPUT_ADAPTIVE || sample_rate == SAMPLE_RATE_ADAPTIVE) ? 0 : sample_rate),
 	m_input_count(inputs),
 	m_output_count(outputs),
 	m_input_adaptive(sample_rate == SAMPLE_RATE_INPUT_ADAPTIVE || sample_rate == SAMPLE_RATE_ADAPTIVE),
@@ -493,7 +493,7 @@ bool sound_stream::try_solving_frequency()
 		if(!freqbw && !freqfw)
 			return false;
 
-		m_sample_rate = freqfw > freqbw ? freqfw : freqbw;
+		m_sample_rate = (freqfw > freqbw) ? freqfw : freqbw;
 		return true;
 	}
 }
@@ -2494,8 +2494,8 @@ void sound_manager::mapping_update()
 					port_count = node.m_sources;
 				for(uint32_t port = 0; port != port_count; port++)
 					LOG_OUTPUT_FUNC("      %s %s [%g %g %g]\n",
-							port < node.m_sinks ? port < node.m_sources ? "<>" : ">" : "<",
-							node.m_port_names[port].c_str(),
+							(port < node.m_sinks) ? ((port < node.m_sources) ? "<>" : ">") : "<",
+							node.m_port_names[port],
 							node.m_port_positions[port][0],
 							node.m_port_positions[port][1],
 							node.m_port_positions[port][2]);

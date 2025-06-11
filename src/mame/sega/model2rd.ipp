@@ -145,8 +145,8 @@ void MODEL2_FUNC_NAME(int32_t scanline, const extent_t& extent, const m2_poly_ex
 	float dvoz = extent.param[2].dpdx;
 	int     x;
 
-	tex_x_mask  = (tex_mirr_x ? tex_width * 2 : tex_width) - 1;
-	tex_y_mask  = (tex_mirr_y ? tex_height * 2 : tex_height) - 1;
+	tex_x_mask  = (tex_mirr_x ? (tex_width * 2) : tex_width) - 1;
+	tex_y_mask  = (tex_mirr_y ? (tex_height * 2) : tex_height) - 1;
 
 	colorbase = state->m_palram[(colorbase + 0x1000)] & 0x7fff;
 
