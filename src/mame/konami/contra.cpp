@@ -588,23 +588,20 @@ void contra_state::machine_reset()
 void contra_state::contra(machine_config &config)
 {
 	// basic machine hardware
-	HD6309E(config, m_maincpu, XTAL(24'000'000) / 8); // (HD63C09EP)
+	HD6309E(config, m_maincpu, 24_MHz_XTAL / 8); // (HD63C09EP)
 	m_maincpu->set_addrmap(AS_PROGRAM, &contra_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(contra_state::interrupt));
 
-	MC6809E(config, m_audiocpu, XTAL(3'579'545) / 2); // (HD68B09EP)
+	MC6809E(config, m_audiocpu, 3.579545_MHz_XTAL / 2); // (HD68B09EP)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &contra_state::sound_map);
 
-	config.set_maximum_quantum(attotime::from_hz(6000));  // enough for the sound CPU to read all commands
+	config.set_maximum_quantum(attotime::from_hz(6000)); // enough for the sound CPU to read all commands
 
 	KONAMI_007452_MATH(config, "k007452");
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-	m_screen->set_size(37*8, 32*8);
-	m_screen->set_visarea(0*8, 35*8-1, 2*8, 30*8-1);
+	m_screen->set_raw(24_MHz_XTAL / 3, 512, 0, 280, 264, 16, 240); // not verified
 	m_screen->set_screen_update(FUNC(contra_state::screen_update));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(m_k007121[0], FUNC(k007121_device::sprites_buffer));
@@ -623,7 +620,7 @@ void contra_state::contra(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "speaker", 0.60, 0).add_route(1, "speaker", 0.60, 1);
+	YM2151(config, "ymsnd", 3.579545_MHz_XTAL).add_route(0, "speaker", 0.60, 0).add_route(1, "speaker", 0.60, 1);
 }
 
 

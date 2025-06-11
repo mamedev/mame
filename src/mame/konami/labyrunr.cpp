@@ -17,6 +17,7 @@
 #include "k051733.h"
 
 #include "cpu/m6809/hd6309.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/ymopn.h"
 
@@ -71,8 +72,7 @@ private:
 	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_tile_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void vblank_irq(int state);
-	INTERRUPT_GEN_MEMBER(timer_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 	void prg_map(address_map &map) ATTR_COLD;
 };
 
@@ -300,16 +300,17 @@ uint32_t labyrunr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-void labyrunr_state::vblank_irq(int state)
+TIMER_DEVICE_CALLBACK_MEMBER(labyrunr_state::interrupt)
 {
-	if (state && (m_k007121->ctrlram_r(7) & 0x02))
-		m_maincpu->set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
-}
+	int scanline = param;
 
-INTERRUPT_GEN_MEMBER(labyrunr_state::timer_interrupt)
-{
-	if (m_k007121->ctrlram_r(7) & 0x01)
-		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	// vblank interrupt
+	if (scanline == 240 && (m_k007121->ctrlram_r(7) & 0x02))
+		m_maincpu->set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
+
+	// timer (4 times per frame)
+	if ((scanline & 0x3f) == 0x20 && m_k007121->ctrlram_r(7) & 0x01)
+		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -438,20 +439,16 @@ void labyrunr_state::labyrunr(machine_config &config)
 	// basic machine hardware
 	HD6309E(config, m_maincpu, 24_MHz_XTAL / 8); // HD63C09EP
 	m_maincpu->set_addrmap(AS_PROGRAM, &labyrunr_state::prg_map);
-	m_maincpu->set_periodic_int(FUNC(labyrunr_state::timer_interrupt), attotime::from_hz(4 * 60));
+	TIMER(config, "scantimer").configure_scanline(FUNC(labyrunr_state::interrupt), "screen", 0, 1);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(37*8, 32*8);
-	screen.set_visarea(0*8, 35*8-1, 2*8, 30*8-1);
+	screen.set_raw(24_MHz_XTAL / 3, 512, 0, 280, 264, 16, 240); // not verified
 	screen.set_screen_update(FUNC(labyrunr_state::screen_update));
 	screen.set_palette(m_palette);
-	screen.screen_vblank().set(FUNC(labyrunr_state::vblank_irq));
-	screen.screen_vblank().append(m_k007121, FUNC(k007121_device::sprites_buffer));
+	screen.screen_vblank().set(m_k007121, FUNC(k007121_device::sprites_buffer));
 
 	PALETTE(config, m_palette, FUNC(labyrunr_state::palette));
 	m_palette->set_format(palette_device::xBGR_555, 2*8*16*16, 128);
