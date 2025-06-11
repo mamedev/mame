@@ -16,9 +16,11 @@
    - pocketrc locks up if you try to exit testmode (note: it is not related to
      unimplemented C76 internal watchdog timer or software reset)
      Update: now it always locks up in test mode, regression?
+
+  Notes:
    - pocketrc long samples and drum loops go out of sync, it sounds better when
-     the C352 is underclocked to match the one in namcos22. It's possibly a BTANB,
-     since current C352 frequency is the same as Tekken/Tekken 2 real PCB.
+     the C352 is underclocked to match the one in namcos22. It's a BTANB, however,
+	 since current C352 frequency is the same as Tekken/Tekken 2 real PCB.
 
 Known Dumps
 -----------
