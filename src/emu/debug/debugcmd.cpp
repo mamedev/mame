@@ -3909,58 +3909,80 @@ void debugger_commands::execute_memdump(const std::vector<std::string_view> &par
 
 void debugger_commands::execute_symlist(const std::vector<std::string_view> &params)
 {
-	const char *namelist[1000];
+	// Default to CPU "0" if none specified
+	const char * cpuname = (params.empty()) ? "0" : params[0].cbegin();
+	device_t *cpu = nullptr;
 	symbol_table *symtable;
-	int count = 0;
-
-	if (!params.empty())
+	if (!m_console.validate_cpu_parameter(cpuname, cpu))
 	{
-		// validate parameters
-		device_t *cpu;
-		if (!m_console.validate_cpu_parameter(params[0], cpu))
-			return;
-		symtable = &cpu->debug()->symtable();
-		m_console.printf("CPU '%s' symbols:\n", cpu->tag());
+		if (!params.empty())
+			return;     // Explicitly specified cpu is invalid
+
+		// Somehow cpu "0" is invalid, so just stick with global symbol table
+		symtable = &m_machine.debugger().cpu().global_symtable();
 	}
 	else
 	{
-		symtable = &m_machine.debugger().cpu().global_symtable();
-		m_console.printf("Global symbols:\n");
+		symtable = &cpu->debug()->symtable();
 	}
 
-	// gather names for all symbols
-	for (auto &entry : symtable->entries())
+	// Traverse symbol_table parent chain, printing each table's symbols in its own block
+	for (; symtable != nullptr; symtable = symtable->parent())
 	{
-		// only display "register" type symbols
-		if (!entry.second->is_function())
+		// Skip globals if user explicitly requested CPU
+		if (symtable->type() == symbol_table::BUILTIN_GLOBALS && !params.empty())
+			continue;
+
+		if (symtable->entries().size() == 0)
+			continue;
+
+		std::vector<const char *> namelist;
+
+		// Print heading for table
+		switch (symtable->type())
 		{
-			namelist[count++] = entry.second->name();
-			if (count >= std::size(namelist))
-				break;
+		case symbol_table::CPU_STATE:
+			m_console.printf("\n**** CPU '%s' symbols ****\n", cpu->tag());
+			break;
+		case symbol_table::BUILTIN_GLOBALS:
+			m_console.printf("\n**** Global symbols ****\n");
+			break;
+		default:
+			assert (!"Unrecognized symbol table type");
+		}
+
+		// gather names for all relevant symbols
+		for (auto &entry : symtable->entries())
+		{
+			// ignore built-in function symbols
+			if (!entry.second->is_function())
+			{
+				namelist.push_back(entry.second->name());
+			}
+		}
+
+		// sort the symbols
+		std::sort(
+				namelist.begin(),
+				namelist.end(),
+				[] (const char *item1, const char *item2) { return strcmp(item1, item2) < 0; });
+
+		// iterate over symbols and print them
+		for (const char * symname : namelist)
+		{
+			symbol_entry const *const entry = symtable->find(symname);
+			assert(entry != nullptr);
+			m_console.printf("%s = %X", symname, entry->value());
+			if (!entry->is_lval())
+				m_console.printf("  (read-only)");
+			m_console.printf("\n");
 		}
 	}
-
-	// sort the symbols
-	if (count > 1)
+	if (params.empty())
 	{
-		std::sort(
-				&namelist[0],
-				&namelist[count],
-				[] (const char *item1, const char *item2) { return strcmp(item1, item2) < 0; });
-	}
-
-	// iterate over symbols and print out relevant ones
-	for (int symnum = 0; symnum < count; symnum++)
-	{
-		symbol_entry const *const entry = symtable->find(namelist[symnum]);
-		assert(entry != nullptr);
-		u64 value = entry->value();
-
-		// only display "register" type symbols
-		m_console.printf("%s = %X", namelist[symnum], value);
-		if (!entry->is_lval())
-			m_console.printf("  (read-only)");
-		m_console.printf("\n");
+		m_console.printf(
+			"\nTo view the symbols for a particular CPU, try symlist <cpu>,\n"
+			"where <cpu> is the ID number or tag for a CPU.\n");
 	}
 }
 

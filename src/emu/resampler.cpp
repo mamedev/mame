@@ -260,8 +260,10 @@ void audio_resampler_hq::apply(const emu::detail::output_buffer_flat<sample_t> &
 	}
 }
 
-void audio_resampler_hq::apply(const emu::detail::output_buffer_interleaved<s16> &src, std::vector<sample_t> &dest, u64 dest_sample, u32 srcc, float gain, u32 samples) const
+void audio_resampler_hq::apply(const emu::detail::output_buffer_interleaved<s16> &src, sound_stream &dest, u32 srcc, u32 destc, float gain) const
 {
+	u64 dest_sample = dest.start_index();
+	u32 samples = dest.samples();
 	u32 seconds = dest_sample / m_ft;
 	u32 dsamp = dest_sample % m_ft;
 	u32 ssamp = (u64(dsamp) * m_fs) / m_ft;
@@ -271,7 +273,7 @@ void audio_resampler_hq::apply(const emu::detail::output_buffer_interleaved<s16>
 	gain /= 32768;
 
 	const s16 *s = src.ptrs(srcc, ssample - src.sync_sample());
-	sample_t *d = dest.data();
+	u32 dest_index = 0;
 	int step = src.channels();
 	for(u32 sample = 0; sample != samples; sample++) {
 		sample_t acc = 0;
@@ -281,7 +283,7 @@ void audio_resampler_hq::apply(const emu::detail::output_buffer_interleaved<s16>
 			acc += *filter++ * *s1;
 			s1 -= step;
 		}
-		*d++ += acc * gain;
+		dest.add(destc, dest_index++, acc * gain);
 		phase += m_delta;
 		s += m_skip * step;
 		while(phase >= m_fsm) {
@@ -292,7 +294,36 @@ void audio_resampler_hq::apply(const emu::detail::output_buffer_interleaved<s16>
 }
 
 
-void audio_resampler_hq::apply(const emu::detail::output_buffer_flat<sample_t> &src, std::vector<s16> &dest, u32 destc, int dchannels, u64 dest_sample, u32 srcc, float gain, u32 samples) const
+void audio_resampler_hq::apply_copy(const emu::detail::output_buffer_flat<sample_t> &src, std::vector<s16> &dest, u32 destc, int dchannels, u64 dest_sample, u32 srcc, float gain, u32 samples) const
+{
+	u32 seconds = dest_sample / m_ft;
+	u32 dsamp = dest_sample % m_ft;
+	u32 ssamp = (u64(dsamp) * m_fs) / m_ft;
+	u64 ssample = ssamp + u64(m_fs) * seconds;
+	u32 phase = (dsamp * m_ftm) % m_fsm;
+
+	gain *= 32768;
+
+	const sample_t *s = src.ptrs(srcc, ssample - src.sync_sample());
+	s16 *d = dest.data() + destc;
+	for(u32 sample = 0; sample != samples; sample++) {
+		sample_t acc = 0;
+		const sample_t *s1 = s;
+		const float *filter = m_coefficients[phase >> m_phase_shift].data();
+		for(u32 k = 0; k != m_order_per_lane; k++)
+			acc += *filter++ * *s1--;
+		*d = acc * gain;
+		d += dchannels;
+		phase += m_delta;
+		s += m_skip;
+		while(phase >= m_fsm) {
+			phase -= m_fsm;
+			s ++;
+		}
+	}
+}
+
+void audio_resampler_hq::apply_add(const emu::detail::output_buffer_flat<sample_t> &src, std::vector<s16> &dest, u32 destc, int dchannels, u64 dest_sample, u32 srcc, float gain, u32 samples) const
 {
 	u32 seconds = dest_sample / m_ft;
 	u32 dsamp = dest_sample % m_ft;
@@ -433,10 +464,156 @@ void audio_resampler_lofi::apply(const emu::detail::output_buffer_flat<sample_t>
 	}
 }
 
-void audio_resampler_lofi::apply(const emu::detail::output_buffer_interleaved<s16> &src, std::vector<sample_t> &dest, u64 dest_sample, u32 srcc, float gain, u32 samples) const
+void audio_resampler_lofi::apply(const emu::detail::output_buffer_interleaved<s16> &src, sound_stream &dest, u32 srcc, u32 destc, float gain) const
 {
+	u64 dest_sample = dest.start_index();
+	u32 samples = dest.samples();
+	u32 seconds = dest_sample / m_ft;
+	u32 dsamp = dest_sample % m_ft;
+	u64 ssamp = (u64(dsamp) * m_fs * 0x1000) / m_ft;
+	u64 ssample = (ssamp >> 12) + u64(m_fs) * seconds;
+	u32 phase = ssamp & 0xfff;
+	if(m_source_divide > 1) {
+		u32 delta = ssample % m_source_divide;
+		phase = (phase | (delta << 12)) / m_source_divide;
+		ssample -= delta;
+	}
+
+	gain /= 32768;
+
+	// We're getting 2 samples latency, which is small enough
+
+	ssample -= 4*m_source_divide;
+
+	const s16 *s = src.ptrs(srcc, ssample - src.sync_sample());
+
+	std::function<s16()> reader;
+	if(m_source_divide == 1)
+		reader = [s, schannels = src.channels()]() mutable -> sample_t { s16 r = *s; s += schannels; return r; };
+	else
+		reader = [s, schannels = src.channels(), count = m_source_divide]() mutable -> sample_t { s32 sm = 0; for(u32 i=0; i != count; i++) { sm += *s; s += schannels; } return sm / count; };
+
+	phase <<= 12;
+
+	sample_t s0 = reader();
+	sample_t s1 = reader();
+	sample_t s2 = reader();
+	sample_t s3 = reader();
+
+	int dest_index = 0;
+	for(u32 sample = 0; sample != samples; sample++) {
+		u32 cphase = phase >> 12;
+		dest.add(destc, dest_index++, gain * (- s0 * interpolation_table[0][0x1000-cphase] + s1 * interpolation_table[1][0x1000-cphase] + s2 * interpolation_table[1][cphase] - s3 * interpolation_table[0][cphase]));
+
+		phase += m_step;
+		if(phase & 0x1000000) {
+			phase &= 0xffffff;
+			s0 = s1;
+			s1 = s2;
+			s2 = s3;
+			s3 = reader();
+		}
+	}
 }
 
-void audio_resampler_lofi::apply(const emu::detail::output_buffer_flat<sample_t> &src, std::vector<s16> &dest, u32 destc, int dchannels, u64 dest_sample, u32 srcc, float gain, u32 samples) const
+void audio_resampler_lofi::apply_copy(const emu::detail::output_buffer_flat<sample_t> &src, std::vector<s16> &dest, u32 destc, int dchannels, u64 dest_sample, u32 srcc, float gain, u32 samples) const
 {
+	u32 seconds = dest_sample / m_ft;
+	u32 dsamp = dest_sample % m_ft;
+	u64 ssamp = (u64(dsamp) * m_fs * 0x1000) / m_ft;
+	u64 ssample = (ssamp >> 12) + u64(m_fs) * seconds;
+	u32 phase = ssamp & 0xfff;
+	if(m_source_divide > 1) {
+		u32 delta = ssample % m_source_divide;
+		phase = (phase | (delta << 12)) / m_source_divide;
+		ssample -= delta;
+	}
+
+	gain *= 32768;
+
+	// We're getting 2 samples latency, which is small enough
+
+	ssample -= 4*m_source_divide;
+
+	const sample_t *s = src.ptrs(srcc, ssample - src.sync_sample());
+
+	std::function<sample_t()> reader;
+	if(m_source_divide == 1)
+		reader = [s]() mutable -> sample_t { return *s++; };
+	else
+		reader = [s, count = m_source_divide]() mutable -> sample_t { sample_t sm = 0; for(u32 i=0; i != count; i++) { sm += *s++; } return sm / count; };
+
+	phase <<= 12;
+
+	sample_t s0 = reader();
+	sample_t s1 = reader();
+	sample_t s2 = reader();
+	sample_t s3 = reader();
+
+	s16 *d = dest.data() + destc;
+	for(u32 sample = 0; sample != samples; sample++) {
+		u32 cphase = phase >> 12;
+		*d = gain * (- s0 * interpolation_table[0][0x1000-cphase] + s1 * interpolation_table[1][0x1000-cphase] + s2 * interpolation_table[1][cphase] - s3 * interpolation_table[0][cphase]);
+		d += dchannels;
+
+		phase += m_step;
+		if(phase & 0x1000000) {
+			phase &= 0xffffff;
+			s0 = s1;
+			s1 = s2;
+			s2 = s3;
+			s3 = reader();
+		}
+	}
+}
+
+void audio_resampler_lofi::apply_add(const emu::detail::output_buffer_flat<sample_t> &src, std::vector<s16> &dest, u32 destc, int dchannels, u64 dest_sample, u32 srcc, float gain, u32 samples) const
+{
+	u32 seconds = dest_sample / m_ft;
+	u32 dsamp = dest_sample % m_ft;
+	u64 ssamp = (u64(dsamp) * m_fs * 0x1000) / m_ft;
+	u64 ssample = (ssamp >> 12) + u64(m_fs) * seconds;
+	u32 phase = ssamp & 0xfff;
+	if(m_source_divide > 1) {
+		u32 delta = ssample % m_source_divide;
+		phase = (phase | (delta << 12)) / m_source_divide;
+		ssample -= delta;
+	}
+
+	gain *= 32768;
+
+	// We're getting 2 samples latency, which is small enough
+
+	ssample -= 4*m_source_divide;
+
+	const sample_t *s = src.ptrs(srcc, ssample - src.sync_sample());
+
+	std::function<sample_t()> reader;
+	if(m_source_divide == 1)
+		reader = [s]() mutable -> sample_t { return *s++; };
+	else
+		reader = [s, count = m_source_divide]() mutable -> sample_t { sample_t sm = 0; for(u32 i=0; i != count; i++) { sm += *s++; } return sm / count; };
+
+	phase <<= 12;
+
+	sample_t s0 = reader();
+	sample_t s1 = reader();
+	sample_t s2 = reader();
+	sample_t s3 = reader();
+
+	s16 *d = dest.data() + destc;
+	for(u32 sample = 0; sample != samples; sample++) {
+		u32 cphase = phase >> 12;
+		*d += gain * (- s0 * interpolation_table[0][0x1000-cphase] + s1 * interpolation_table[1][0x1000-cphase] + s2 * interpolation_table[1][cphase] - s3 * interpolation_table[0][cphase]);
+		d += dchannels;
+
+		phase += m_step;
+		if(phase & 0x1000000) {
+			phase &= 0xffffff;
+			s0 = s1;
+			s1 = s2;
+			s2 = s3;
+			s3 = reader();
+		}
+	}
 }

@@ -149,6 +149,8 @@ TILE_GET_INFO_MEMBER(labyrunr_state::get_tile_info)
 
 void labyrunr_state::video_start()
 {
+	m_k007121->set_spriteram(m_spriteram);
+
 	m_layer[0] = &machine().tilemap().create(*m_k007121, tilemap_get_info_delegate(*this, FUNC(labyrunr_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_layer[1] = &machine().tilemap().create(*m_k007121, tilemap_get_info_delegate(*this, FUNC(labyrunr_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
@@ -217,7 +219,7 @@ uint32_t labyrunr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		}
 
 		m_layer[0]->draw(screen, bitmap, finalclip0, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_CATEGORY(0), 0);
-		m_k007121->sprites_draw(bitmap, cliprect, m_spriteram, (m_k007121->ctrlram_r(6) & 0x30) * 2, 40, 0, screen.priority(), (m_k007121->ctrlram_r(3) & 0x20) >> 4);
+		m_k007121->sprites_draw(bitmap, cliprect, (m_k007121->ctrlram_r(6) & 0x30) * 2, 40, 0, screen.priority(), (m_k007121->ctrlram_r(3) & 0x20) >> 4);
 		m_layer[0]->draw(screen, bitmap, finalclip0, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_CATEGORY(1), 0);
 		// we ignore the transparency because layer1 is drawn only at the top of the screen also covering sprites
 		m_layer[1]->draw(screen, bitmap, finalclip1, TILEMAP_DRAW_OPAQUE, 0);
@@ -283,7 +285,7 @@ uint32_t labyrunr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		if (use_clip3[0])
 			m_layer[0]->draw(screen, bitmap, finalclip3, TILEMAP_DRAW_CATEGORY(0), 0);
 
-		m_k007121->sprites_draw(bitmap, cliprect, m_spriteram, (m_k007121->ctrlram_r(6) & 0x30) * 2, 40, 0, screen.priority(), (m_k007121->ctrlram_r(3) & 0x20) >> 4);
+		m_k007121->sprites_draw(bitmap, cliprect, (m_k007121->ctrlram_r(6) & 0x30) * 2, 40, 0, screen.priority(), (m_k007121->ctrlram_r(3) & 0x20) >> 4);
 
 		m_layer[0]->draw(screen, bitmap, finalclip0, TILEMAP_DRAW_CATEGORY(1), 0);
 		if (use_clip3[0])
@@ -449,6 +451,7 @@ void labyrunr_state::labyrunr(machine_config &config)
 	screen.set_screen_update(FUNC(labyrunr_state::screen_update));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(labyrunr_state::vblank_irq));
+	screen.screen_vblank().append(m_k007121, FUNC(k007121_device::sprites_buffer));
 
 	PALETTE(config, m_palette, FUNC(labyrunr_state::palette));
 	m_palette->set_format(palette_device::xBGR_555, 2*8*16*16, 128);

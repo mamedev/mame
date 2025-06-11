@@ -28,9 +28,8 @@ void acorn_cass_device::device_add_mconfig(machine_config &config)
 {
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	WAVE(config, "wave", "cassette").add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	CASSETTE(config, "cassette", 0);
+	CASSETTE(config, "cassette", 0).add_route(ALL_OUTPUTS, "mono", 0.05);
 	TIMER(config, "cass_c").configure_periodic(FUNC(acorn_cass_device::cass_c), attotime::from_hz(4800));
 	TIMER(config, "cass_p").configure_periodic(FUNC(acorn_cass_device::cass_p), attotime::from_hz(40000));
 }

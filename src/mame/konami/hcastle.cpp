@@ -61,9 +61,9 @@ private:
 	required_device<cpu_device> m_audiocpu;
 	required_device_array<k007121_device, 2> m_k007121;
 	required_device<k007232_device> m_k007232;
-	required_device_array<buffered_spriteram8_device, 2> m_spriteram;
 
 	// memory pointers
+	required_shared_ptr_array<uint8_t, 2> m_spriteram;
 	required_shared_ptr_array<uint8_t, 2> m_pf_videoram;
 	memory_share_creator<u8> m_bankedram;
 	required_memory_bank m_mainbank;
@@ -86,7 +86,7 @@ private:
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	template <uint8_t Which> void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, uint8_t *sbank);
+	template <uint8_t Which> void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap);
 	void volume_callback(uint8_t data);
 
 	void main_map(address_map &map) ATTR_COLD;
@@ -166,6 +166,9 @@ TILE_GET_INFO_MEMBER(hcastle_state::get_tile_info)
 
 void hcastle_state::video_start()
 {
+	m_k007121[0]->set_spriteram(m_spriteram[0]);
+	m_k007121[1]->set_spriteram(m_spriteram[1]);
+
 	// 0 = FG, 1 = BG
 	m_tilemap[0] = &machine().tilemap().create(*m_k007121[0], tilemap_get_info_delegate(*this, FUNC(hcastle_state::get_tile_info<0>)), tilemap_mapper_delegate(*this, FUNC(hcastle_state::tilemap_scan)), 8, 8, 64, 32);
 	m_tilemap[1] = &machine().tilemap().create(*m_k007121[1], tilemap_get_info_delegate(*this, FUNC(hcastle_state::get_tile_info<1>)), tilemap_mapper_delegate(*this, FUNC(hcastle_state::tilemap_scan)), 8, 8, 64, 32);
@@ -201,14 +204,7 @@ uint8_t hcastle_state::gfxbank_r()
 template <uint8_t Which> // 0 = FG, 1 = BG
 void hcastle_state::pf_control_w(offs_t offset, uint8_t data)
 {
-	if (offset == 3)
-	{
-		if ((data & 0x8) == 0)
-			m_spriteram[Which]->copy(0x800, 0x800);
-		else
-			m_spriteram[Which]->copy(0x000, 0x800);
-	}
-	else if (offset == 7)
+	if (offset == 7)
 	{
 		m_tilemap[Which]->set_flip((data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 	}
@@ -218,12 +214,12 @@ void hcastle_state::pf_control_w(offs_t offset, uint8_t data)
 /*****************************************************************************/
 
 template <uint8_t Which> // 0 = FG, 1 = BG
-void hcastle_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, uint8_t *sbank)
+void hcastle_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap)
 {
 	int base_color = (m_k007121[Which]->ctrlram_r(6) & 0x30) * 2;
 	int bank_base = (Which == 0) ? 0x4000 * (m_gfx_bank & 1) : 0;
 
-	m_k007121[Which]->sprites_draw(bitmap, cliprect, sbank, base_color, 0, bank_base, priority_bitmap, (uint32_t)-1);
+	m_k007121[Which]->sprites_draw(bitmap, cliprect, base_color, 0, bank_base, priority_bitmap, (uint32_t)-1);
 }
 
 /*****************************************************************************/
@@ -266,16 +262,16 @@ uint32_t hcastle_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	if ((m_gfx_bank & 0x04) == 0)
 	{
 		m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
-		draw_sprites<0>(bitmap, cliprect, screen.priority(), m_spriteram[0]->buffer());
-		draw_sprites<1>(bitmap, cliprect, screen.priority(), m_spriteram[1]->buffer());
+		draw_sprites<0>(bitmap, cliprect, screen.priority());
+		draw_sprites<1>(bitmap, cliprect, screen.priority());
 		m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
 	}
 	else
 	{
 		m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
 		m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
-		draw_sprites<0>(bitmap, cliprect, screen.priority(), m_spriteram[0]->buffer());
-		draw_sprites<1>(bitmap, cliprect, screen.priority(), m_spriteram[1]->buffer());
+		draw_sprites<0>(bitmap, cliprect, screen.priority());
+		draw_sprites<1>(bitmap, cliprect, screen.priority());
 	}
 	return 0;
 }
@@ -441,7 +437,7 @@ void hcastle_state::machine_reset()
 void hcastle_state::hcastle(machine_config &config)
 {
 	// basic machine hardware
-	KONAMI(config, m_maincpu, 12000000);    // Derived from 24 MHz clock
+	KONAMI(config, m_maincpu, 12000000); // Derived from 24 MHz clock
 	m_maincpu->set_addrmap(AS_PROGRAM, &hcastle_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(hcastle_state::irq0_line_hold));
 
@@ -451,16 +447,15 @@ void hcastle_state::hcastle(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	BUFFERED_SPRITERAM8(config, m_spriteram[0]);
-	BUFFERED_SPRITERAM8(config, m_spriteram[1]);
-
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(59);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));  // frames per second verified by comparison with real board
+	screen.set_refresh_hz(59); // frames per second verified by comparison with real board
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(hcastle_state::screen_update));
 	screen.set_palette(m_palette);
+	screen.screen_vblank().set(m_k007121[0], FUNC(k007121_device::sprites_buffer));
+	screen.screen_vblank().append(m_k007121[1], FUNC(k007121_device::sprites_buffer));
 
 	PALETTE(config, m_palette, FUNC(hcastle_state::palette)).set_format(palette_device::xBGR_555, 2*8*16*16, 128);
 

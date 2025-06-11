@@ -58,7 +58,6 @@ protected:
 	static DWORD const  DEBUG_WINDOW_STYLE = (WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN) & (~WS_MINIMIZEBOX & ~WS_MAXIMIZEBOX);
 	static DWORD const  DEBUG_WINDOW_STYLE_EX = 0;
 
-	static int const    MAX_VIEWS = 4;
 	static int const    EDGE_WIDTH = 3;
 
 	enum
@@ -120,6 +119,19 @@ protected:
 		ID_DARK_BACKGROUND,
 
 		ID_DEVICE_OPTIONS   // always keep this at the end
+	};
+
+	// Indices for use with m_views.  Each *win_info class that can appear
+	// as a frame within the main consolewin_info should use these
+	// indices to find its *view_info class, even when it's currently
+	// shown as an independent free-floating window.  All other *win_info
+	// classes (e.g., logwin_info, pointswin_info, etc.) just use m_views[0]
+	enum
+	{
+		VIEW_IDX_DISASM,
+		VIEW_IDX_STATE,
+		VIEW_IDX_CONSOLE,
+		MAX_VIEWS
 	};
 
 	debugwin_info(debugger_windows_interface &debugger, bool is_main_console, LPCSTR title, WNDPROC handler);

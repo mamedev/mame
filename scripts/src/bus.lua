@@ -44,6 +44,8 @@ if (BUSES["A800"]~=null) then
 		MAME_DIR .. "src/devices/bus/a800/atari810.h",
 		MAME_DIR .. "src/devices/bus/a800/atari1050.cpp",
 		MAME_DIR .. "src/devices/bus/a800/atari1050.h",
+		MAME_DIR .. "src/devices/bus/a800/atarifdc.cpp",
+		MAME_DIR .. "src/devices/bus/a800/atarifdc.h",
 		MAME_DIR .. "src/devices/bus/a800/cassette.cpp",
 		MAME_DIR .. "src/devices/bus/a800/cassette.h",
 		MAME_DIR .. "src/devices/bus/a800/a800_slot.cpp",
@@ -2903,6 +2905,8 @@ if (BUSES["VME"]~=null) then
 		MAME_DIR .. "src/devices/bus/vme/tp880v.h",
 		MAME_DIR .. "src/devices/bus/vme/tp881v.cpp",
 		MAME_DIR .. "src/devices/bus/vme/tp881v.h",
+		MAME_DIR .. "src/devices/bus/vme/tsvme104.cpp",
+		MAME_DIR .. "src/devices/bus/vme/tsvme104.h",
 	}
 end
 
@@ -5446,20 +5450,6 @@ if (BUSES["MULTIBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/multibus/robotron_k7070.h",
 		MAME_DIR .. "src/devices/bus/multibus/robotron_k7071.cpp",
 		MAME_DIR .. "src/devices/bus/multibus/robotron_k7071.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/bus/rtpc/kbd_con.h,BUSES["RTPC_KBD"] = true
----------------------------------------------------
-
-if (BUSES["RTPC_KBD"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/bus/rtpc/kbd_con.cpp",
-		MAME_DIR .. "src/devices/bus/rtpc/kbd_con.h",
-		MAME_DIR .. "src/devices/bus/rtpc/kbd.cpp",
-		MAME_DIR .. "src/devices/bus/rtpc/kbd.h",
 	}
 end
 

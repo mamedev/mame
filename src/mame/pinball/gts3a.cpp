@@ -615,6 +615,27 @@ ROM_START(cueballc)
 	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(c22f5cc5) SHA1(a5bfbc1824bc483eecc961851bd411cb0dbcdc4a))
 ROM_END
 
+ROM_START(cueballv)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("cue_ball_wizard_734_bx_gprom.u2", 0x0000, 0x10000, CRC(e14b378d) SHA1(d815d302a8d82d22d986214e55b24914a69a49d6))
+
+	ROM_REGION(0x80000, "dmdcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("wizard_espanol_dsprom.u3", 0x00000, 0x40000, CRC(21e60313) SHA1(fb343dfe65ce5f23f616756959d998053b8c77f6))
+	ROM_RELOAD(0x40000, 0x40000)
+
+	ROM_REGION(0x10000, "p7sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("drom1.bin", 0x8000, 0x8000, CRC(9fd04109) SHA1(27864fe4e9c248dce6221c9e56861967d089b216))
+
+	ROM_REGION(0x100000, "p7sound:oki", ROMREGION_ERASEFF)
+	ROM_LOAD("arom1.bin", 0x00000, 0x40000, CRC(476bb11c) SHA1(ce546df59933cc230a6671dec493bbbe71146dee))
+	ROM_RELOAD(0x40000, 0x40000)
+	ROM_LOAD("arom2.bin", 0x80000, 0x40000, CRC(23708ad9) SHA1(156fcb19403f9845404af1a4ac4edfd3fcde601d))
+	ROM_RELOAD(0xc0000, 0x40000)
+
+	ROM_REGION(0x10000, "p7sound:speechcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(c22f5cc5) SHA1(a5bfbc1824bc483eecc961851bd411cb0dbcdc4a))
+ROM_END
+
 /*-------------------------------------------------------------------
 / Frank Thomas' Big Hurt (#745)
 /-------------------------------------------------------------------*/
@@ -1146,6 +1167,27 @@ ROM_START(smbpc)
 	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(e1379106) SHA1(10c46bad7cbae528716c5ba0709bb1fd3574a0a8))
 ROM_END
 
+ROM_START(smbpv)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("gprom_v.u2", 0x0000, 0x10000, CRC(a50f1b45) SHA1(5ac95e92b13d3205f0d94382f10e3a57fb5af357))
+
+	ROM_REGION(0x80000, "dmdcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("dsprom2.bin", 0x00000, 0x40000, BAD_DUMP CRC(181e8234) SHA1(9b22681f61cae401269a88c3cfd783d683390877)) // Damaged on the Vifico PCB, taken from 'smbp'
+	ROM_RELOAD( 0x40000, 0x40000)
+
+	ROM_REGION(0x10000, "p7sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("drom1.bin", 0x8000, 0x8000, CRC(6f1d0a3e) SHA1(c7f665d79b9073f28f90debde16cafa9ab57a47c))
+
+	ROM_REGION(0x100000, "p7sound:oki", ROMREGION_ERASEFF)
+	ROM_LOAD("arom1.bin", 0x00000, 0x40000, CRC(e9cef116) SHA1(5f710bc24e1a168f296a22417aebecbde3bfaa5c))
+	ROM_RELOAD(0x40000, 0x40000)
+	ROM_LOAD("arom2.bin", 0x80000, 0x40000, CRC(0acdfd49) SHA1(0baabd32b546842bc5c76a61b509b558677b50f9))
+	ROM_RELOAD(0xc0000, 0x40000)
+
+	ROM_REGION(0x10000, "p7sound:speechcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(e1379106) SHA1(10c46bad7cbae528716c5ba0709bb1fd3574a0a8))
+ROM_END
+
 /*-------------------------------------------------------------------
 / Super Mario Brothers Mushroom World (N105)
 /-------------------------------------------------------------------*/
@@ -1364,11 +1406,13 @@ GAME(1992,  smbp,       0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Got
 GAME(1992,  smbpa,      smbp,     p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Super Mario Brothers (pinball, set 2)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 GAME(1992,  smbpb,      smbp,     p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Super Mario Brothers (pinball, set 3)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 GAME(1992,  smbpc,      smbp,     p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Super Mario Brothers (pinball, set 4)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  smbpv,      smbp,     p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb (Vifico license)", "Super Mario Brothers (pinball, Spanish)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE ) // Missing the Spanish display ROM
 GAME(1992,  smbmush,    0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Super Mario Brothers Mushroom World",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 GAME(1992,  cueball,    0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Cue Ball Wizard",                            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 GAME(1992,  cueballa,   cueball,  p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Cue Ball Wizard (rev. 2)",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 GAME(1992,  cueballb,   cueball,  p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Cue Ball Wizard (rev. 3)",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 GAME(1992,  cueballc,   cueball,  p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Cue Ball Wizard (older display rev.)",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
+GAME(1992,  cueballv,   cueball,  p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb (Vifico license)", "Cue Ball Wizard (Spanish)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 GAME(1993,  sfightii,   0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Street Fighter II (pinball, set 1)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 GAME(1993,  sfightiia,  sfightii, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Street Fighter II (pinball, set 2)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 GAME(1993,  sfightiib,  sfightii, p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Street Fighter II (pinball, set 3)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )

@@ -93,7 +93,7 @@ protected:
 private:
 	void wk1600_map(address_map &map) ATTR_COLD;
 
-	void render_w(int state);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	required_memory_region m_sound_rom;
 
@@ -205,11 +205,8 @@ void wk1600_state::apo_w(int state)
 }
 
 /**************************************************************************/
-void wk1600_state::render_w(int state)
+u32 wk1600_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if (!state)
-		return;
-
 	const u8 *render = m_lcdc->render();
 	for (int x = 0; x < 64; x++)
 	{
@@ -221,6 +218,8 @@ void wk1600_state::render_w(int state)
 		}
 		render += 8;
 	}
+
+	return 0;
 }
 
 
@@ -319,7 +318,7 @@ void wk1600_state::wk1600(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_size(1755, 450);
 	screen.set_visarea_full();
-	screen.screen_vblank().set(FUNC(wk1600_state::render_w));
+	screen.set_screen_update(FUNC(wk1600_state::screen_update));
 
 	SPEAKER(config, "speaker", 2).front();
 

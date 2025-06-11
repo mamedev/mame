@@ -5,6 +5,9 @@
 Hitachi HD61603 LCD Driver
 64 segment outputs, no duty cycle
 
+It's the same chip family as HD61602, but the lack of duty cycle makes the
+implementation very different.
+
 TODO:
 - OSC pin (input is resistor)
 - SB pin, halts internal clock

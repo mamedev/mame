@@ -223,6 +223,7 @@ void model3_state::draw_texture_sheet(bitmap_ind16 &bitmap, const rectangle &cli
 }
 #endif
 
+// TODO: merge main/sub layer mixing for perfomance
 void model3_state::draw_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, int sx, int sy, int prio)
 {
 	int bitdepth = (m_layer_priority & (0x10 << layer)) ? 1 : 0;
@@ -234,6 +235,7 @@ void model3_state::draw_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, i
 
 	uint32_t* palram = (uint32_t*)&m_paletteram64[0];
 	uint16_t* rowscroll_ram = (uint16_t*)&m_m3_char_ram[0x1ec00];
+	// $f7000: stencil mask
 	uint32_t* rowmask_ram = (uint32_t*)&m_m3_char_ram[0x1ee00];
 
 	int x1 = cliprect.min_x;
@@ -262,10 +264,14 @@ void model3_state::draw_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, i
 			rowscroll |= ~0x1ff;
 
 		uint16_t rowmask;
-		if (prio && (layer == 1 || layer == 2))
-			rowmask = BYTE_REVERSE32(rowmask_ram[(y & 0x1ff) ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)]) & 0xffff;
-		else
-			rowmask = 0xffff;
+		// layers are in pair, only one of them can be displayed at any time
+		// cfr. daytona2 "The Heat Is Back" attract, lemans24 bootup, fvipers2 gameplay/attract
+		const uint8_t shift = (layer & 2) ? 0 : 16;
+		rowmask = (BYTE_REVERSE32(rowmask_ram[(y & 0x1ff) ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)]) >> shift) & 0xffff;
+
+		// reverse mask meaning for sub-layer
+		if (layer & 1)
+			rowmask ^= 0xffff;
 
 		int iix = ix & 0x1ff;
 
@@ -282,6 +288,7 @@ void model3_state::draw_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, i
 
 		for (int x = rx1; x <= rx2; x++)
 		{
+			// each stencil mask bit takes a span of 32 pixels
 			uint32_t mask = rowmask & (1 << ((iix & 0x1ff) >> 5));
 
 			if (mask)
@@ -464,7 +471,7 @@ void model3_state::model3_vid_reg_w(offs_t offset, uint64_t data, uint64_t mem_m
 	{
 		case 0x00/8:    logerror("vid_reg0: %08X%08X\n", (uint32_t)(data>>32),(uint32_t)(data)); m_vid_reg0 = data; break;
 		case 0x08/8:    break;      /* ??? */
-		case 0x10/8:    set_irq_line((data >> 56) & 0x0f, CLEAR_LINE); break;     /* VBL IRQ Ack */
+		case 0x10/8:    set_irq_line((data >> 56) & 0xff, CLEAR_LINE); break;     /* VBL IRQ Ack */
 
 		case 0x20/8:    m_layer_priority = (data >> 48); break;
 
@@ -1716,7 +1723,10 @@ void model3_state::draw_model(uint32_t addr)
 				int tex_height = (header[3] & 0x7);
 				int tex_format = (header[6] >> 7) & 0x7;
 
-				if (tex_format != 0 && tex_format != 7)     // enable color modulation if this is not a color texture
+				// TODO: color modulation enable should really be a setting
+				// vs2 wants color modulation with ARGB1555 (format 0) radar textures
+				// if (tex_format != 0 && tex_format != 7)
+				if (tex_format != 7)     // enable color modulation if this is not a color texture
 					colormod = true;
 
 				if (tex_width >= 6 || tex_height >= 6)      // srally2 poly ram has degenerate polys with 2k tex size (cpu bug or intended?)

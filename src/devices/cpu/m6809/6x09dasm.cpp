@@ -203,19 +203,19 @@ offs_t m6x09_base_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 		if (pb & 0x80)
 			util::stream_format(stream, "PC");
 		if (pb & 0x40)
-			util::stream_format(stream, "%s%s", (pb&0x80)?",":"", (op->mode() == PSHS)?"U":"S");
+			util::stream_format(stream, "%s%s", (pb & 0x80) ? "," : "", (op->mode() == PSHS) ? "U" : "S");
 		if (pb & 0x20)
-			util::stream_format(stream, "%sY",  (pb&0xc0)?",":"");
+			util::stream_format(stream, "%sY",  (pb & 0xc0) ? "," : "");
 		if (pb & 0x10)
-			util::stream_format(stream, "%sX",  (pb&0xe0)?",":"");
+			util::stream_format(stream, "%sX",  (pb & 0xe0) ? "," : "");
 		if (pb & 0x08)
-			util::stream_format(stream, "%sDP", (pb&0xf0)?",":"");
+			util::stream_format(stream, "%sDP", (pb & 0xf0) ? "," : "");
 		if (pb & 0x04)
-			util::stream_format(stream, "%s%s", (pb&0xf8)?",":"", (pb & 0x02) ? "D" : "B");
+			util::stream_format(stream, "%s%s", (pb & 0xf8) ? "," : "", (pb & 0x02) ? "D" : "B");
 		else if (pb & 0x02)
-			util::stream_format(stream, "%sA",  (pb&0xfc)?",":"");
+			util::stream_format(stream, "%sA",  (pb & 0xfc) ? "," : "");
 		if (pb & 0x01)
-			util::stream_format(stream, "%sCC", (pb&0xfe)?",":"");
+			util::stream_format(stream, "%sCC", (pb & 0xfe) ? "," : "");
 		break;
 
 	case PULS:
@@ -224,33 +224,33 @@ offs_t m6x09_base_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 		if (pb & 0x01)
 			util::stream_format(stream, "CC");
 		if (pb & 0x02)
-			util::stream_format(stream, "%s%s", (pb&0x01)?",":"", (pb & 0x04) ? "D" : "A");
+			util::stream_format(stream, "%s%s", (pb & 0x01) ? "," : "", (pb & 0x04) ? "D" : "A");
 		else if (pb & 0x04)
-			util::stream_format(stream, "%sB",  (pb&0x03)?",":"");
+			util::stream_format(stream, "%sB",  (pb & 0x03) ? "," : "");
 		if (pb & 0x08)
-			util::stream_format(stream, "%sDP", (pb&0x07)?",":"");
+			util::stream_format(stream, "%sDP", (pb & 0x07) ? "," : "");
 		if (pb & 0x10)
-			util::stream_format(stream, "%sX",  (pb&0x0f)?",":"");
+			util::stream_format(stream, "%sX",  (pb & 0x0f) ? "," : "");
 		if (pb & 0x20)
-			util::stream_format(stream, "%sY",  (pb&0x1f)?",":"");
+			util::stream_format(stream, "%sY",  (pb & 0x1f) ? "," : "");
 		if (pb & 0x40)
-			util::stream_format(stream, "%s%s", (pb&0x3f)?",":"", (op->mode() == PULS)?"U":"S");
+			util::stream_format(stream, "%s%s", (pb & 0x3f) ? "," : "", (op->mode() == PULS) ? "U" : "S");
 		if (pb & 0x80)
 		{
-			util::stream_format(stream, "%sPC", (pb&0x7f)?",":"");
+			util::stream_format(stream, "%sPC", (pb & 0x7f) ? "," : "");
 			flags |= STEP_OUT;
 		}
 		break;
 
 	case DIR:
 		ea = params.r8(ppc);
-		util::stream_format(stream, "$%02X", ea);
+		util::stream_format(stream, "<$%02X", ea);
 		break;
 
 	case DIR_IM:
 		assert_hd6309_exclusive();
 		util::stream_format(stream, "#$%02X;", params.r8(ppc));
-		util::stream_format(stream, "$%02X", params.r8(ppc + 1));
+		util::stream_format(stream, "<$%02X", params.r8(ppc + 1));
 		break;
 
 	case REL:
@@ -274,7 +274,7 @@ offs_t m6x09_base_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 		else if (op->operand_length() == 2)
 		{
 			ea = params.r16(ppc);
-			if( !(ea & 0xff00) )
+			if (!(ea & 0xff00))
 			{
 				stream << '>'; // need the '>' to force an assembler to use EXT addressing
 			}
@@ -1365,7 +1365,7 @@ void konami_disassembler::indexed(std::ostream &stream, uint8_t mode, const data
 				break;
 
 			case 0x04: /* direct - mode */
-				util::stream_format(stream, "[$%02X]", params.r8(p++));
+				util::stream_format(stream, "[<$%02X]", params.r8(p++));
 				break;
 
 			case 0x07: /* register d */
@@ -1390,7 +1390,7 @@ void konami_disassembler::indexed(std::ostream &stream, uint8_t mode, const data
 				break;
 
 			case 0x04: /* direct - mode */
-				util::stream_format(stream, "$%02X", params.r8(p++));
+				util::stream_format(stream, "<$%02X", params.r8(p++));
 				break;
 
 			case 0x07: /* register d */

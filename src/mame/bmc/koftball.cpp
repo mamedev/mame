@@ -159,12 +159,13 @@ private:
 	optional_device<hopper_device> m_hopper;
 
 	tilemap_t *m_tilemap[4]{};
+	bitmap_ind16 m_pixbitmap;
+
 	u16 m_prot_data = 0;
 	u8 m_irq_enable = 0;
 	u8 m_gfx_ctrl = 0;
 	u8 m_priority = 0;
 	u8 m_backpen = 0;
-	bitmap_ind16 m_pixbitmap;
 	u8 m_pixpal = 0;
 
 	void irq_ack_w(u8 data);
@@ -176,7 +177,6 @@ private:
 	void prot_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void pixpal_w(offs_t offset, u8 data, u8 mem_mask = ~0);
 	template <u8 Which> void videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-
 
 	template <u8 Which> TILE_GET_INFO_MEMBER(get_tile_info);
 	void draw_pixlayer(bitmap_ind16 &bitmap, const rectangle &cliprect);

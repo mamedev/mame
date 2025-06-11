@@ -8,15 +8,16 @@
  */
 
 #include "emu.h"
-#include "kbd_con.h"
+
+#include "rtpc_kbdc.h"
 
 //#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(RTPC_KBD_CON, rtpc_kbd_con_device, "rtpc_kbd_con", "RT PC keyboard connector")
+DEFINE_DEVICE_TYPE(RTPC_KBDC, rtpc_kbdc_device, "rtpc_kbdc", "RT PC keyboard connector")
 
-rtpc_kbd_con_device::rtpc_kbd_con_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, RTPC_KBD_CON, tag, owner, clock)
+rtpc_kbdc_device::rtpc_kbdc_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, RTPC_KBDC, tag, owner, clock)
 	, device_single_card_slot_interface<device_rtpc_kbd_interface>(mconfig, *this)
 	, m_out_clock_cb(*this)
 	, m_out_data_cb(*this)
@@ -30,12 +31,12 @@ rtpc_kbd_con_device::rtpc_kbd_con_device(machine_config const &mconfig, char con
 {
 }
 
-void rtpc_kbd_con_device::device_config_complete()
+void rtpc_kbdc_device::device_config_complete()
 {
 	m_keyboard = get_card_device();
 }
 
-void rtpc_kbd_con_device::device_start()
+void rtpc_kbdc_device::device_start()
 {
 	save_item(NAME(m_clock_state));
 	save_item(NAME(m_data_state));
@@ -54,7 +55,7 @@ void rtpc_kbd_con_device::device_start()
 	m_kb_data_state = 1;
 }
 
-void rtpc_kbd_con_device::update_clock_state(bool fromkb)
+void rtpc_kbdc_device::update_clock_state(bool fromkb)
 {
 	int new_clock_state = m_mb_clock_state & m_kb_clock_state;
 
@@ -72,7 +73,7 @@ void rtpc_kbd_con_device::update_clock_state(bool fromkb)
 	}
 }
 
-void rtpc_kbd_con_device::update_data_state(bool fromkb)
+void rtpc_kbdc_device::update_data_state(bool fromkb)
 {
 	int new_data_state = m_mb_data_state & m_kb_data_state;
 
@@ -90,25 +91,25 @@ void rtpc_kbd_con_device::update_data_state(bool fromkb)
 	}
 }
 
-void rtpc_kbd_con_device::clock_write_from_mb(int state)
+void rtpc_kbdc_device::clock_write_from_mb(int state)
 {
 	m_mb_clock_state = state;
 	update_clock_state(false);
 }
 
-void rtpc_kbd_con_device::data_write_from_mb(int state)
+void rtpc_kbdc_device::data_write_from_mb(int state)
 {
 	m_mb_data_state = state;
 	update_data_state(false);
 }
 
-void rtpc_kbd_con_device::clock_write_from_kb(int state)
+void rtpc_kbdc_device::clock_write_from_kb(int state)
 {
 	m_kb_clock_state = state;
 	update_clock_state(true);
 }
 
-void rtpc_kbd_con_device::data_write_from_kb(int state)
+void rtpc_kbdc_device::data_write_from_kb(int state)
 {
 	m_kb_data_state = state;
 	update_data_state(true);
@@ -116,6 +117,6 @@ void rtpc_kbd_con_device::data_write_from_kb(int state)
 
 device_rtpc_kbd_interface::device_rtpc_kbd_interface(machine_config const &mconfig, device_t &device)
 	: device_interface(device, "rtpc_kbd_if")
-	, m_port(dynamic_cast<rtpc_kbd_con_device *>(device.owner()))
+	, m_port(dynamic_cast<rtpc_kbdc_device *>(device.owner()))
 {
 }

@@ -295,7 +295,7 @@ void device_sound_interface::interface_validity_check(validity_checker &valid) c
 		if(!target)
 			osd_printf_error("Attempting to route sound to non-existent device '%s'\n", route.m_base.get().subtag(route.m_target));
 
-		// ifit's not a speaker or a sound device, error
+		// if it's not a speaker or a sound device, error
 		device_sound_interface const *sound;
 		if(target && !target->interface(sound))
 			osd_printf_error("Attempting to route sound to a non-sound device '%s' (%s)\n", target->tag(), target->name());
@@ -366,7 +366,7 @@ void device_mixer_interface::interface_pre_start()
 	u32 no = get_sound_requested_outputs();
 	u32 nc = ni > no ? ni : no;
 	for(u32 i = 0; i != nc; i++)
-		stream_alloc(1, 1, SAMPLE_RATE_ADAPTIVE);
+		stream_alloc(1, 1, SAMPLE_RATE_OUTPUT_ADAPTIVE);
 }
 
 void device_mixer_interface::sound_stream_update(sound_stream &stream)

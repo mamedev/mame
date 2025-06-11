@@ -42,6 +42,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
+		m_gfx(*this, "gfx1"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
@@ -65,7 +66,7 @@ private:
 	void asic_w(offs_t offset, uint8_t data);
 	void a3003_w(uint8_t data);
 
-	void cardline_palette(palette_device &palette) const;
+	void cardline_palette(palette_device &palette) const ATTR_COLD;
 
 	void hsync_changed(int state);
 	void vsync_changed(int state);
@@ -77,15 +78,16 @@ private:
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_colorram;
-
-	uint8_t m_video = 0;
-	uint8_t m_hsync_q = 0;
+	required_region_ptr<uint8_t> m_gfx;
 
 	required_device<i80c32_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	output_finder<8> m_lamps;
+
+	uint8_t m_video = 0;
+	uint8_t m_hsync_q = 0;
 };
 
 void cardline_state::machine_start()
@@ -108,8 +110,7 @@ MC6845_BEGIN_UPDATE( cardline_state::crtc_begin_update )
 
 MC6845_UPDATE_ROW( cardline_state::crtc_update_row )
 {
-	uint16_t x = 0;
-	const rgb_t *palette = m_palette->palette()->entry_list_raw();
+	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 
 	int gfx_ofs = 0;
 
@@ -118,33 +119,27 @@ MC6845_UPDATE_ROW( cardline_state::crtc_update_row )
 	// state. The next statement doesn't add functionality but documents
 	// how this works.
 
-	if(m_video & 1)
+	if (m_video & 1)
 		gfx_ofs = 0;
 
-	if(m_video & 2)
+	if (m_video & 2)
 		gfx_ofs = 0x1000;
-
-	uint8_t *gfx = memregion("gfx1")->base();
 
 	for (uint8_t cx = 0; cx < x_count; cx++)
 	{
-		int bg_tile = (m_videoram[ma + gfx_ofs] | (m_colorram[ma + gfx_ofs]<<8)) & 0x3fff;
-		int bg_pal_ofs = ((m_colorram[ma + gfx_ofs] & 0x80) ? 256 : 0);
-		int fg_tile = (m_videoram[ma + gfx_ofs + 0x800] | (m_colorram[ma + gfx_ofs + 0x800]<<8)) & 0x3fff;
-		int fg_pal_ofs = ((m_colorram[ma + gfx_ofs + 0x800] & 0x80) ? 256 : 0);
+		int const tile_index = ma + cx + gfx_ofs;
+		int const bg_tile = (m_videoram[tile_index] | (m_colorram[tile_index] << 8)) & 0x3fff;
+		int const bg_pal_ofs = BIT(m_colorram[tile_index], 7) ? 256 : 0;
+		int const fg_tile = (m_videoram[tile_index + 0x800] | (m_colorram[tile_index + 0x800] << 8)) & 0x3fff;
+		int const fg_pal_ofs = BIT(m_colorram[tile_index + 0x800], 7) ? 256 : 0;
 		for (int i = 0; i < 8; i++)
 		{
-			int bg_col = gfx[bg_tile * 64 + ra * 8 + i];
-			int fg_col = gfx[fg_tile * 64 + ra * 8 + i];
+			int const x = (cx << 3) | i;
+			int const bg_col = m_gfx[(bg_tile << 6) | (ra << 3) | i];
+			int const fg_col = m_gfx[(fg_tile << 6) | (ra << 3) | i];
 
-			if (fg_col == 1)
-				bitmap.pix(y, x) = palette[bg_pal_ofs + bg_col];
-			else
-				bitmap.pix(y, x) = palette[fg_pal_ofs + fg_col];
-
-			x++;
+			bitmap.pix(y, x) = palette[(fg_col == 1) ? (bg_pal_ofs + bg_col) : (fg_pal_ofs + fg_col)];
 		}
-		ma++;
 	}
 }
 
@@ -169,8 +164,8 @@ void cardline_state::a3003_w(uint8_t data)
 
 void cardline_state::vram_w(offs_t offset, uint8_t data)
 {
-	offset+=0x1000*((m_video&2)>>1);
-	m_videoram[offset]=data;
+	offset += uint16_t(BIT(m_video, 1)) << 12;
+	m_videoram[offset] = data;
 }
 
 uint8_t cardline_state::asic_r(offs_t offset)
@@ -192,13 +187,13 @@ void cardline_state::asic_w(offs_t offset, uint8_t data)
 
 void cardline_state::attr_w(offs_t offset, uint8_t data)
 {
-	offset+=0x1000*((m_video&2)>>1);
-	m_colorram[offset]=data;
+	offset += uint16_t(BIT(m_video, 1)) << 12;
+	m_colorram[offset] = data;
 }
 
 void cardline_state::video_w(uint8_t data)
 {
-	m_video=data;
+	m_video = data;
 	//printf("m_video %x\n", m_video);
 }
 
@@ -241,31 +236,31 @@ void cardline_state::mem_io(address_map &map)
 	//map(0x2840, 0x2840).noprw(); // ???
 	//map(0x2880, 0x2880).noprw(); // ???
 	map(0x3003, 0x3003).w(FUNC(cardline_state::a3003_w));
-	map(0xc000, 0xdfff).w(FUNC(cardline_state::vram_w)).share("videoram");
-	map(0xe000, 0xffff).w(FUNC(cardline_state::attr_w)).share("colorram");
+	map(0xc000, 0xdfff).w(FUNC(cardline_state::vram_w)).share(m_videoram);
+	map(0xe000, 0xffff).w(FUNC(cardline_state::attr_w)).share(m_colorram);
 }
 
 
 static INPUT_PORTS_START( cardline )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Collect")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Card 1 / Double-Up")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Card 2")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Card 3")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Card 4")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Card 5 / Winning Plan")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Bet")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )   PORT_NAME("Collect")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )   PORT_NAME("Card 1 / Double Up")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )   PORT_NAME("Card 2")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )   PORT_NAME("Card 3")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )   PORT_NAME("Card 4")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )   PORT_NAME("Card 5 / Winning Plan")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Unknown1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )       PORT_NAME("Unknown1")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Bookkeeping Info") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_L) PORT_NAME("Payout 2")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Unknown2")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_CODE(KEYCODE_ENTER) PORT_NAME("Payout")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Unknown3")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )       PORT_NAME("Unknown2")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )       PORT_NAME("Unknown3")
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
@@ -274,12 +269,15 @@ static INPUT_PORTS_START( cardline )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0xf5, IP_ACTIVE_HIGH, IPT_CUSTOM ) // h/w status bits
-
-	PORT_START("VBLANK")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank)) // VBLANK_Q
-	PORT_BIT( 0xef, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
+	// TODO: h/w status bits (will throw errors during POST if low)
+	// Rough translation:
+	// - Coin Counter Coin In
+	// - Coin Counter Coin Out
+	// - <fill me>
+	// - Payout
+	// - Lamp
+	// - Hopper
+	PORT_BIT( 0xf5, IP_ACTIVE_HIGH, IPT_CUSTOM )
 INPUT_PORTS_END
 
 static GFXDECODE_START( gfx_cardline )
@@ -329,10 +327,7 @@ void cardline_state::cardline(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 35*8);
-	screen.set_visarea(0*8, 64*8-1, 0*8, 32*8-1);
+	screen.set_raw(MASTER_CLOCK, 760, 0, 511, 280, 0, 255);
 	//screen.set_screen_update(FUNC(cardline_state::screen_update_cardline));
 	//screen.set_palette(m_palette);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));

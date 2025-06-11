@@ -1,13 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
-#ifndef MAME_BUS_RTPC_KBD_H
-#define MAME_BUS_RTPC_KBD_H
+#ifndef MAME_IBM_RTPC_KBD_H
+#define MAME_IBM_RTPC_KBD_H
 
 #pragma once
 
-#include "kbd_con.h"
 #include "cpu/mcs48/mcs48.h"
+
+#include "rtpc_kbdc.h"
 
 class rtpc_kbd_device
 	: public device_t
@@ -17,14 +18,14 @@ public:
 	rtpc_kbd_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
-	// device_t overrides
+	// device_t implementation
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	// device_rtpc_kbd_interface overrides
+	// device_rtpc_kbd_interface implementation
 	virtual void data_w(int state) override;
 
 private:
@@ -44,4 +45,4 @@ private:
 
 DECLARE_DEVICE_TYPE(RTPC_KBD, rtpc_kbd_device)
 
-#endif // MAME_BUS_RTPC_KBD_H
+#endif // MAME_IBM_RTPC_KBD_H

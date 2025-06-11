@@ -16,8 +16,7 @@ Main components for the IGS PCB-0405-02-FZ are:
 TODO:
  - IGS 033 appears to encapsulate the behavior of the video/interface chip found in igspoker.cpp
    so could be turned into a device, possibly shared
- - complete inputs / outputs / hopper
- - huahuas5 needs correct Oki banking
+ - verify possibly incomplete inputs
 */
 
 #include "emu.h"
@@ -60,16 +59,18 @@ public:
 		driver_device(mconfig, type, tag),
 		m_external_rom(*this, "user1"),
 		m_nvram(*this, "nvram"),
+		m_bg_videoram(*this, "bg_videoram"),
+		m_bg_attr_videoram(*this, "bg_attr_videoram"),
 		m_maincpu(*this, "maincpu"),
+		m_hopper(*this, "hopper"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_oki(*this, "oki"),
-		m_bg_videoram(*this, "bg_videoram"),
-		m_bg_attr_videoram(*this, "bg_attr_videoram")
+		m_oki(*this, "oki")
 	{ }
 
 	void m027_033vid(machine_config &config) ATTR_COLD;
+	void huahuas5(machine_config &config) ATTR_COLD;
 
 	void init_huahuas5() ATTR_COLD;
 	void init_qiji6() ATTR_COLD;
@@ -81,14 +82,15 @@ protected:
 private:
 	required_region_ptr<u32> m_external_rom;
 	required_shared_ptr<u32> m_nvram;
+	required_shared_ptr<u32> m_bg_videoram;
+	required_shared_ptr<u32> m_bg_attr_videoram;
 
 	required_device<igs027a_cpu_device> m_maincpu;
+	required_device<hopper_device> m_hopper;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<okim6295_device> m_oki;
-	required_shared_ptr<u32> m_bg_videoram;
-	required_shared_ptr<u32> m_bg_attr_videoram;
 
 	u32 m_xor_table[0x100];
 	tilemap_t *m_bg_tilemap = nullptr;
@@ -105,6 +107,7 @@ private:
 	u32 external_rom_r(offs_t offset);
 	void xor_table_w(offs_t offset, u8 data);
 
+	void counters_w(u8 data);
 	void out_port_w(u8 data);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -170,16 +173,25 @@ void igs_m027_033vid_state::bg_attr_videoram_w(offs_t offset, u32 data, u32 mem_
 	m_bg_tilemap->mark_tile_dirty((offset * 4) + 3);
 }
 
+void igs_m027_033vid_state::counters_w(u8 data)
+{
+	if (data & 0x0f)
+		logerror("%s PPI out port C w: %02X\n", machine().describe_context(), data);
+
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 7)); // COIN1
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 5)); // COIN2 (or KEYIN?)
+	machine().bookkeeping().coin_counter_w(2, BIT(data, 6)); // PAYOUT
+	machine().bookkeeping().coin_counter_w(3, BIT(data, 4)); // KEYOUT
+}
+
 void igs_m027_033vid_state::out_port_w(u8 data)
 {
-	if (data & 0xea)
+	if (data & 0xe8)
 		logerror("%s IGS027A out port w: %02X\n", machine().describe_context(), data);
 
 	m_video_enable = BIT(data, 0);
 
-	// TODO: bit 1 seems to be always set by huahuas5
-
-	m_oki->set_rom_bank(BIT(data, 2));
+	m_oki->set_rom_bank(bitswap<2>(data, 1, 2)); // TODO: fishy, verify when more games are dumped
 
 	m_tilebank = BIT(data, 4);
 
@@ -203,6 +215,7 @@ void igs_m027_033vid_state::m027_map(address_map &map) // TODO: some unknown wri
 	map(0x3800'3000, 0x3800'30ff).ram().w(m_palette, FUNC(palette_device::write32_ext)).share("palette_ext");
 
 	map(0x3800'4000, 0x3800'4003).portr("DSW");
+	map(0x3800'5003, 0x3800'5003).lw8(NAME([this] (uint8_t data) { m_hopper->motor_w(BIT(data, 0)); }));
 	map(0x3800'5010, 0x3800'5013).umask32(0x0000'00ff).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x3800'5030, 0x3800'5033).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 
@@ -233,7 +246,7 @@ INPUT_PORTS_START( qiji6 ) // TODO: complete
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -385,10 +398,12 @@ void igs_m027_033vid_state::m027_033vid(machine_config &config)
 	ppi.in_pa_callback().set_ioport("IN0");
 	ppi.in_pb_callback().set_ioport("IN1");
 	ppi.in_pc_callback().set_ioport("IN2");
-	// the out ports seem unused
+	// A and B out ports seem unused
 	ppi.out_pa_callback().set([this] (u8 data) { LOGPORTS("%s: PPI port A write %02x\n", machine().describe_context(), data); });
 	ppi.out_pb_callback().set([this] (u8 data) { LOGPORTS("%s: PPI port B write %02x\n", machine().describe_context(), data); });
-	ppi.out_pc_callback().set([this] (u8 data) { LOGPORTS("%s: PPI port C write %02x\n", machine().describe_context(), data); });
+	ppi.out_pc_callback().set(FUNC(igs_m027_033vid_state::counters_w));
+
+	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -409,6 +424,13 @@ void igs_m027_033vid_state::m027_033vid(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	OKIM6295(config, m_oki, 24_MHz_XTAL / 24, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5); // divider and pin 7 not verified
+}
+
+void igs_m027_033vid_state::huahuas5(machine_config &config)
+{
+	m027_033vid(config);
+
+	m_oki->set_clock(24_MHz_XTAL / 12); // divider and pin 7 not verified
 }
 
 
@@ -476,6 +498,6 @@ void igs_m027_033vid_state::init_huahuas5()
 ***************************************************************************/
 
 // internal ROM date is 2002, external software revision could be later
-GAME( 2002, qiji6,    0, m027_033vid, qiji6,    igs_m027_033vid_state, init_qiji6,    ROT0, "IGS", "Qiji 6 (V118CN)",                           MACHINE_NOT_WORKING ) // lacks hopper support
+GAME( 2002, qiji6,    0, m027_033vid, qiji6,    igs_m027_033vid_state, init_qiji6,    ROT0, "IGS", "Qiji 6 (V118CN)",                           MACHINE_SUPPORTS_SAVE )
 // internal ROM date is 2004, external software revision could be later
-GAME( 2004, huahuas5, 0, m027_033vid, huahuas5, igs_m027_033vid_state, init_huahuas5, ROT0, "IGS", "Huahua Shijie 5 / Feixing Shijie (V107CN)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // lacks hopper support, Oki banking
+GAME( 2004, huahuas5, 0, huahuas5,    huahuas5, igs_m027_033vid_state, init_huahuas5, ROT0, "IGS", "Huahua Shijie 5 / Feixing Shijie (V107CN)", MACHINE_SUPPORTS_SAVE )

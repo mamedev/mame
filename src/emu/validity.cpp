@@ -2644,8 +2644,8 @@ void validity_checker::validate_inputs(device_t &root)
 						{
 							osd_printf_error("Field '%s' has non-character U+%04X in PORT_CHAR(%d)\n",
 									name,
-									(unsigned)code,
-									(int)code);
+									uint32_t(code),
+									int32_t(code));
 						}
 					}
 				}
@@ -2653,6 +2653,34 @@ void validity_checker::validate_inputs(device_t &root)
 
 			// done with this port
 			m_current_ioport = nullptr;
+		}
+
+		// validate the default settings
+		const input_device_default *def = device.input_ports_defaults();
+		if (def != nullptr)
+		{
+			for ( ; def->tag; def++)
+			{
+				if (def->defvalue & ~def->mask)
+					osd_printf_error("Default value 0x%x for field of port '%s' lies outside mask 0x%x\n", def->defvalue, def->mask);
+
+				const auto it = portlist.find(device.subtag(def->tag));
+				if (portlist.end() == it)
+				{
+					osd_printf_error("Default specified for nonexistent port '%s'\n", def->tag);
+				}
+				else
+				{
+					const auto &fields = it->second->fields();
+					if (fields.end() == std::find_if(fields.begin(), fields.end(), [def] (const ioport_field &field) { return field.mask() == def->mask; }))
+					{
+						osd_printf_error(
+								"Default value specified for field with mask 0x%x in port '%s' but no corresponding field found\n",
+								def->mask,
+								def->tag);
+					}
+				}
+			}
 		}
 
 		// done with this device
@@ -2715,9 +2743,12 @@ void validity_checker::validate_devices(machine_config &config)
 					const char *const def_bios = option.second->default_bios();
 					if (def_bios)
 						card->set_default_bios_tag(def_bios);
-					auto additions = option.second->machine_config();
+					auto const &additions = option.second->machine_config();
 					if (additions)
 						additions(card);
+					input_device_default const *input_def = option.second->input_device_defaults();
+					if (input_def)
+						card->set_input_default(input_def);
 				}
 
 				for (device_slot_interface &subslot : slot_interface_enumerator(*card))
@@ -2743,6 +2774,7 @@ void validity_checker::validate_devices(machine_config &config)
 				for (device_t &card_dev : device_enumerator(*card))
 					card_dev.config_complete();
 				validate_roms(*card);
+				validate_inputs(*card);
 
 				for (device_t &card_dev : device_enumerator(*card))
 				{

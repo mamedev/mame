@@ -1,21 +1,18 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
-/***************************************************************************
+// thanks-to: Tomasz Slanina
+/**************************************************************************************************
 
-    Sharp MZ-2000
+Sharp MZ-80B/MZ-2000/MZ-2200
 
-    driver by Angelo Salese
-    font conversion by Tomasz Slanina
+TODO:
+- find common points between other MZ machines;
+- cassette programs that are bigger than 8kb fails to load;
+- implement remaining video capabilities
+- add 80b compatibility support;
+- Vosque (color): keyboard doesn't work properly;
 
-    Basically a simpler version of Sharp MZ-2500
-
-    TODO:
-    - cassette interface, basically any program that's bigger than 8kb fails to load;
-    - implement remaining video capabilities
-    - add 80b compatibility support;
-    - Vosque (color): keyboard doesn't work properly;
-
-****************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 
@@ -40,7 +37,8 @@
 
 namespace {
 
-#define MASTER_CLOCK 17.73447_MHz_XTAL  / 5  /* TODO: was 4 MHz, but otherwise cassette won't work due of a bug with MZF support ... */
+// TODO: was 4 MHz, but otherwise cassette won't work due of a bug with MZF support
+#define MASTER_CLOCK 17.73447_MHz_XTAL  / 5
 
 
 class mz2000_state : public driver_device
@@ -71,6 +69,9 @@ public:
 
 	void mz2000(machine_config &config);
 	void mz80b(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(boot_reset_cb);
+	DECLARE_INPUT_CHANGED_MEMBER(ipl_reset_cb);
 
 private:
 	static void floppy_formats(format_registration &fr);
@@ -114,18 +115,18 @@ private:
 	void mz2000_gvram_mask_w(uint8_t data);
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
-	uint32_t screen_update_mz2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint8_t fdc_r(offs_t offset);
 	void fdc_w(offs_t offset, uint8_t data);
-	uint8_t mz2000_porta_r();
-	uint8_t mz2000_portb_r();
-	uint8_t mz2000_portc_r();
-	void mz2000_porta_w(uint8_t data);
-	void mz2000_portb_w(uint8_t data);
-	void mz2000_portc_w(uint8_t data);
-	void mz2000_pio1_porta_w(uint8_t data);
-	uint8_t mz2000_pio1_portb_r();
-	uint8_t mz2000_pio1_porta_r();
+	uint8_t ppi_porta_r();
+	uint8_t ppi_portb_r();
+	uint8_t ppi_portc_r();
+	void ppi_porta_w(uint8_t data);
+	void ppi_portb_w(uint8_t data);
+	void ppi_portc_w(uint8_t data);
+	void pio_porta_w(uint8_t data);
+	uint8_t pio_portb_r();
+	uint8_t pio_porta_r();
 
 	void mz2000_io(address_map &map) ATTR_COLD;
 	void mz2000_map(address_map &map) ATTR_COLD;
@@ -154,7 +155,8 @@ void mz2000_state::video_start()
 {
 }
 
-uint32_t mz2000_state::screen_update_mz2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+// TODO: modernize
+uint32_t mz2000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint8_t *tvram = m_region_tvram->base();
 	uint8_t *gvram = m_region_gvram->base();
@@ -165,11 +167,11 @@ uint32_t mz2000_state::screen_update_mz2000(screen_device &screen, bitmap_ind16 
 
 	count = 0;
 
-	for(y=0;y<200;y++)
+	for(y = 0; y < 200; y++)
 	{
-		for(x=0;x<640;x+=8)
+		for(x = 0; x < 640; x+=8)
 		{
-			for(xi=0;xi<8;xi++)
+			for(xi = 0; xi < 8; xi++)
 			{
 				int pen;
 				pen  = ((gvram[count+0x4000] >> (xi)) & 1) ? 1 : 0; //B
@@ -184,18 +186,18 @@ uint32_t mz2000_state::screen_update_mz2000(screen_device &screen, bitmap_ind16 
 		}
 	}
 
-	x_size = (m_width80+1)*40;
+	x_size = (m_width80 + 1) * 40;
 
-	for(y=0;y<25;y++)
+	for(y = 0; y < 25; y++)
 	{
-		for(x=0;x<x_size;x++)
+		for(x = 0; x < x_size; x++)
 		{
 			uint8_t tile = tvram[y*x_size+x];
 			uint8_t color = m_tvram_attr & 7;
 
-			for(yi=0;yi<8*(m_hi_mode+1);yi++)
+			for(yi = 0; yi < 8 * (m_hi_mode+1); yi++)
 			{
-				for(xi=0;xi<8;xi++)
+				for(xi = 0; xi < 8; xi++)
 				{
 					int pen;
 					int res_x,res_y;
@@ -207,11 +209,10 @@ uint32_t mz2000_state::screen_update_mz2000(screen_device &screen, bitmap_ind16 
 					if(res_x > 640-1 || res_y > (200*(m_hi_mode+1))-1)
 						continue;
 
-					tile_offset = tile*(8*(m_hi_mode+1))+yi + (m_hi_mode * 0x800);
+					tile_offset = tile * (8 * (m_hi_mode + 1)) + yi + (m_hi_mode * 0x800);
 
 					pen = ((gfx_data[tile_offset] >> (7-xi)) & 1) ? color : -1;
 
-					/* TODO: clean this up */
 					if(pen != -1)
 					{
 						if(m_hi_mode)
@@ -443,8 +444,22 @@ void mz2000_state::mz2000_io(address_map &map)
    has been mapped accordingly.
 */
 
-/* Input ports */
+INPUT_CHANGED_MEMBER(mz2000_state::boot_reset_cb)
+{
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+}
+
+INPUT_CHANGED_MEMBER(mz2000_state::ipl_reset_cb)
+{
+	machine().schedule_soft_reset();
+}
+
+
 static INPUT_PORTS_START( mz80be ) // European keyboard
+	PORT_START("BACK_PANEL")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mz2000_state::boot_reset_cb), 0) PORT_NAME("Boot Reset")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mz2000_state::ipl_reset_cb), 0) PORT_NAME("IPL Reset")
+
 	PORT_START("KEY0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2))
@@ -695,13 +710,13 @@ static GFXDECODE_START( gfx_mz2000 )
 	GFXDECODE_ENTRY( "chargen", 0x0800, mz2000_charlayout_16, 0, 1 )
 GFXDECODE_END
 
-uint8_t mz2000_state::mz2000_porta_r()
+uint8_t mz2000_state::ppi_porta_r()
 {
-	printf("A R\n");
+	logerror("A R\n");
 	return 0xff;
 }
 
-uint8_t mz2000_state::mz2000_portb_r()
+uint8_t mz2000_state::ppi_portb_r()
 {
 	/*
 	x--- ---- break key
@@ -727,13 +742,13 @@ uint8_t mz2000_state::mz2000_portb_r()
 	return res;
 }
 
-uint8_t mz2000_state::mz2000_portc_r()
+uint8_t mz2000_state::ppi_portc_r()
 {
-	printf("C R\n");
+	logerror("C R\n");
 	return 0xff;
 }
 
-void mz2000_state::mz2000_porta_w(uint8_t data)
+void mz2000_state::ppi_porta_w(uint8_t data)
 {
 	/*
 	These are enabled thru a 0->1 transition
@@ -749,22 +764,22 @@ void mz2000_state::mz2000_porta_w(uint8_t data)
 
 	if((m_tape_ctrl & 0x80) == 0 && data & 0x80)
 	{
-		//printf("Tape APSS control\n");
+		//logerror("Tape APSS control\n");
 	}
 
 	if((m_tape_ctrl & 0x40) == 0 && data & 0x40)
 	{
-		//printf("Tape APLAY control\n");
+		//logerror("Tape APLAY control\n");
 	}
 
 	if((m_tape_ctrl & 0x20) == 0 && data & 0x20)
 	{
-		//printf("Tape AREW control\n");
+		//logerror("Tape AREW control\n");
 	}
 
 	if((m_tape_ctrl & 0x10) == 0 && data & 0x10)
 	{
-		//printf("reverse video control\n");
+		//logerror("reverse video control\n");
 	}
 
 	if((m_tape_ctrl & 0x08) == 0 && data & 0x08) // stop
@@ -781,25 +796,25 @@ void mz2000_state::mz2000_porta_w(uint8_t data)
 
 	if((m_tape_ctrl & 0x02) == 0 && data & 0x02)
 	{
-		//printf("Tape FF control\n");
+		//logerror("Tape FF control\n");
 	}
 
 	if((m_tape_ctrl & 0x01) == 0 && data & 0x01)
 	{
-		//printf("Tape Rewind control\n");
+		//logerror("Tape Rewind control\n");
 	}
 
 	m_tape_ctrl = data;
 }
 
-void mz2000_state::mz2000_portb_w(uint8_t data)
+void mz2000_state::ppi_portb_w(uint8_t data)
 {
-	//printf("B W %02x\n",data);
+	//logerror("B W %02x\n",data);
 
 	// ...
 }
 
-void mz2000_state::mz2000_portc_w(uint8_t data)
+void mz2000_state::ppi_portc_w(uint8_t data)
 {
 	/*
 	    x--- ---- tape data write
@@ -810,7 +825,7 @@ void mz2000_state::mz2000_portc_w(uint8_t data)
 	    ---- -x-- beeper state
 	    ---- --x- 0->1 transition = Work RAM reset
 	*/
-	//printf("C W %02x\n",data);
+	//logerror("C W %02x\n",data);
 
 	if(((m_old_portc & 8) == 0) && data & 8)
 		m_ipl_enable = 1;
@@ -827,7 +842,7 @@ void mz2000_state::mz2000_portc_w(uint8_t data)
 	m_old_portc = data;
 }
 
-void mz2000_state::mz2000_pio1_porta_w(uint8_t data)
+void mz2000_state::pio_porta_w(uint8_t data)
 {
 	m_tvram_enable = ((data & 0xc0) == 0xc0);
 	m_gvram_enable = ((data & 0xc0) == 0x80);
@@ -837,14 +852,14 @@ void mz2000_state::mz2000_pio1_porta_w(uint8_t data)
 	m_porta_latch = data;
 }
 
-uint8_t mz2000_state::mz2000_pio1_portb_r()
+uint8_t mz2000_state::pio_portb_r()
 {
 	if(((m_key_mux & 0x10) == 0x00) || ((m_key_mux & 0x0f) == 0x0f)) //status read
 	{
 		int res,i;
 
 		res = 0xff;
-		for(i=0;i<0xe;i++)
+		for(i = 0; i < 0xe; i++)
 			res &= m_io_keys[i]->read();
 
 		return res;
@@ -853,7 +868,7 @@ uint8_t mz2000_state::mz2000_pio1_portb_r()
 	return m_io_keys[m_key_mux & 0xf]->read();
 }
 
-uint8_t mz2000_state::mz2000_pio1_porta_r()
+uint8_t mz2000_state::pio_porta_r()
 {
 	return m_porta_latch;
 }
@@ -865,11 +880,13 @@ void mz2000_state::floppy_formats(format_registration &fr)
 	fr.add(FLOPPY_2D_FORMAT);
 }
 
+// TODO: "MZ-2000/2200 5/3/3.5'2-D System generator" printed with cpm22 SYSGEN.COM, investigate
 static void mz2000_floppies(device_slot_interface &device)
 {
-	device.option_add("dd", FLOPPY_525_DD);
+	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("3ssdd", FLOPPY_3_SSDD);
+	device.option_add("35dd", FLOPPY_35_DD);
 }
-
 
 void mz2000_state::mz2000(machine_config &config)
 {
@@ -879,22 +896,22 @@ void mz2000_state::mz2000(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &mz2000_state::mz2000_io);
 
 	i8255_device &ppi(I8255(config, "i8255_0"));
-	ppi.in_pa_callback().set(FUNC(mz2000_state::mz2000_porta_r));
-	ppi.out_pa_callback().set(FUNC(mz2000_state::mz2000_porta_w));
-	ppi.in_pb_callback().set(FUNC(mz2000_state::mz2000_portb_r));
-	ppi.out_pb_callback().set(FUNC(mz2000_state::mz2000_portb_w));
-	ppi.in_pc_callback().set(FUNC(mz2000_state::mz2000_portc_r));
-	ppi.out_pc_callback().set(FUNC(mz2000_state::mz2000_portc_w));
+	ppi.in_pa_callback().set(FUNC(mz2000_state::ppi_porta_r));
+	ppi.out_pa_callback().set(FUNC(mz2000_state::ppi_porta_w));
+	ppi.in_pb_callback().set(FUNC(mz2000_state::ppi_portb_r));
+	ppi.out_pb_callback().set(FUNC(mz2000_state::ppi_portb_w));
+	ppi.in_pc_callback().set(FUNC(mz2000_state::ppi_portc_r));
+	ppi.out_pc_callback().set(FUNC(mz2000_state::ppi_portc_w));
 
 	z80pio_device& pio(Z80PIO(config, "z80pio_1", MASTER_CLOCK));
-	pio.in_pa_callback().set(FUNC(mz2000_state::mz2000_pio1_porta_r));
-	pio.out_pa_callback().set(FUNC(mz2000_state::mz2000_pio1_porta_w));
-	pio.in_pb_callback().set(FUNC(mz2000_state::mz2000_pio1_portb_r));
+	pio.in_pa_callback().set(FUNC(mz2000_state::pio_porta_r));
+	pio.out_pa_callback().set(FUNC(mz2000_state::pio_porta_w));
+	pio.in_pb_callback().set(FUNC(mz2000_state::pio_portb_r));
 
 	/* TODO: clocks aren't known */
 	PIT8253(config, m_pit8253, 0);
 	m_pit8253->set_clk<0>(31250);
-	m_pit8253->set_clk<1>(31250); /* needed by "Art Magic" to boot */
+	m_pit8253->set_clk<1>(31250); // needed by mz2000_flop:gfxedit to boot
 	m_pit8253->set_clk<2>(31250);
 
 	SPEAKER(config, "mono").front_center();
@@ -902,10 +919,10 @@ void mz2000_state::mz2000(machine_config &config)
 
 	MB8877(config, m_mb8877a, 1_MHz_XTAL);
 
-	FLOPPY_CONNECTOR(config, "mb8877a:0", mz2000_floppies, "dd", mz2000_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, "mb8877a:1", mz2000_floppies, "dd", mz2000_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, "mb8877a:2", mz2000_floppies, "dd", mz2000_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, "mb8877a:3", mz2000_floppies, "dd", mz2000_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "mb8877a:0", mz2000_floppies, "525dd", mz2000_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "mb8877a:1", mz2000_floppies, "525dd", mz2000_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "mb8877a:2", mz2000_floppies, nullptr, mz2000_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "mb8877a:3", mz2000_floppies, nullptr, mz2000_state::floppy_formats);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("mz2000_flop");
 
@@ -924,7 +941,7 @@ void mz2000_state::mz2000(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_size(640, 480);
 	m_screen->set_visarea(0, 640-1, 0, 400-1);
-	m_screen->set_screen_update(FUNC(mz2000_state::screen_update_mz2000));
+	m_screen->set_screen_update(FUNC(mz2000_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_mz2000);
@@ -936,8 +953,6 @@ void mz2000_state::mz80b(machine_config &config)
 	mz2000(config);
 	m_maincpu->set_addrmap(AS_IO, &mz2000_state::mz80b_io);
 }
-
-
 
 
 ROM_START( mz80b )
@@ -997,9 +1012,6 @@ ROM_END
 } // anonymous namespace
 
 
-/* Driver */
-
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY  FULLNAME   FLAGS
 COMP( 1981, mz80b,  0,      0,      mz80b,   mz80be, mz2000_state, empty_init, "Sharp", "MZ-80B",  MACHINE_NOT_WORKING )
 COMP( 1982, mz2000, 0,      0,      mz2000,  mz80bj, mz2000_state, empty_init, "Sharp", "MZ-2000", MACHINE_NOT_WORKING )
 COMP( 1982, mz2200, mz2000, 0,      mz2000,  mz80bj, mz2000_state, empty_init, "Sharp", "MZ-2200", MACHINE_NOT_WORKING )

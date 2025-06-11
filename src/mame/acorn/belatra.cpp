@@ -5,6 +5,9 @@
 
 /*
 
+TODO:
+- r/w msedat (auxiliary PS/2 port, protection? NVRAM?), craps out if bypassed bp 10800914,1,{r0|=20;g}
+
 SoC is suspected to be an ARM7500 or similar.
 
 The following hardware description comes from PCB with "GS Unterhaltungssysteme Vertriebs- & Produktions GmbH" sticker.
@@ -109,10 +112,12 @@ void belatra_state::program_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).rom().region("maincpu", 0x000000); // TODO: implement this as proper flash ROM device
 	map(0x00800000, 0x009fffff).rom().region("maincpu", 0x200000); // "
-	map(0x03200000, 0x032001ff).m(m_iomd, FUNC(arm7500fe_iomd_device::map)); // TODO: the games write to adn read from some unimplemented registers
-																			 //       msecr_r is hardcoded to return 0x80 but these games seem to expect 0x20, too
-	// map(0x03340000, 0x03340003).lr32(NAME([this] () -> uint32_t { return machine().rand() & 0x01; }));
-	// map(0x03400000, 0x037fffff).w(m_vidc, FUNC(arm_vidc20_device::write));
+	map(0x03200000, 0x032001ff).m(m_iomd, FUNC(arm7500fe_iomd_device::map));
+	map(0x03340000, 0x03340003).lr32(NAME([] () -> uint32_t {
+		return 0xff;
+		//return machine().rand() & 0x01;
+	}));
+	map(0x03400000, 0x037fffff).w(m_vidc, FUNC(arm_vidc20_device::write));
 	// map(0x08000000, 0x0800000f).r;
 	map(0x10000000, 0x13ffffff).ram();
 	map(0x14000000, 0x17ffffff).ram();

@@ -22,8 +22,13 @@ public:
 	template<int Aperture>
 	void aperture_w(offs_t offset, u32 data, u32 mem_mask = 0xffffffff);
 
+	void set_mode(u32 mode) { m_mode = mode; };
 	enum {
 		AS_PCI_MEMORY = 1
+	};
+	enum {
+		MODE_MASTER = 0,
+		MODE_SLAVE = 0xffffffff
 	};
 
 protected:
@@ -41,6 +46,7 @@ private:
 
 	u32 m_registers[0x100 / 4];
 	u32 m_bases[4 * 3];
+	u32 m_mode;
 	bool m_useconfig_14x;
 	bool m_useconfig_18x;
 

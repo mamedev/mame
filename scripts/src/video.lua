@@ -1732,3 +1732,15 @@ if (VIDEOS["BT450"]~=null) then
 		MAME_DIR .. "src/devices/video/bt450.h",
 	}
 end
+
+--------------------------------------------------
+--
+--@src/devices/video/st7626.h,VIDEOS["ST7626"] = true
+--------------------------------------------------
+
+if (VIDEOS["ST7626"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/st7626.cpp",
+		MAME_DIR .. "src/devices/video/st7626.h",
+	}
+end

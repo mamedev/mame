@@ -2382,7 +2382,7 @@ void towns_state::driver_start()
 	save_item(NAME(m_towns_ram_enable));
 	save_pointer(NAME(m_towns_vram), 0x20000);
 	save_pointer(NAME(m_towns_gfxvram), 0x80000);
-	save_pointer(NAME(m_towns_txtvram), 0x20000);;
+	save_pointer(NAME(m_towns_txtvram), 0x20000);
 	save_item(NAME(m_towns_selected_drive));
 	save_item(NAME(m_towns_fdc_irq6mask));
 	save_pointer(NAME(m_towns_serial_rom), 256/8);

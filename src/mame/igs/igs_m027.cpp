@@ -77,7 +77,8 @@
               cancel                            放弃
 
  Known issues:
- * ccly shows a black screen when it should show its bookeeping and input test modes
+ * ccly and cjsxp show a black screen when it should show its bookeeping and input test modes
+   the tile RAM is populated but the palette is black
  * klxyj102cn/klxyj104cn occasionally think the hopper is empty in "Joystick" mode - why?
 
  TODO:
@@ -238,6 +239,7 @@ private:
 	void oceanpar_output_w(u8 data);
 	void tripslot_misc_w(u8 data);
 	void tripslot_okibank_low_w(u8 data);
+	void ccly_okibank_w(u8 data);
 	void oki_128k_bank_w(u8 data);
 
 	u32 slqz3_gpio_r();
@@ -253,6 +255,7 @@ private:
 	template <bool Xor> void m027_2ppis_map(address_map &map) ATTR_COLD;
 	void cjddz_map(address_map &map) ATTR_COLD;
 	void tripslot_map(address_map &map) ATTR_COLD;
+	void ccly_map(address_map &map) ATTR_COLD;
 
 	void oki_128k_map(address_map &map) ATTR_COLD;
 };
@@ -343,6 +346,13 @@ void igs_m027_state::tripslot_map(address_map &map)
 	m027_1ppi_map<true>(map);
 
 	map(0x3800'c000, 0x3800'c003).umask32(0x0000'00ff).w(FUNC(igs_m027_state::tripslot_misc_w));
+}
+
+void igs_m027_state::ccly_map(address_map &map)
+{
+	m027_1ppi_map<true>(map);
+
+	map(0x3800'c000, 0x3800'c003).umask32(0x0000'00ff).w(FUNC(igs_m027_state::ccly_okibank_w));
 }
 
 void igs_m027_state::oki_128k_map(address_map &map)
@@ -716,7 +726,7 @@ INPUT_PORTS_START( jking02 )
 	PORT_DIPNAME( 0x02, 0x00, "Odds Table" )               PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x02, DEF_STR(No) )
 	PORT_DIPSETTING(    0x00, DEF_STR(Yes) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR(Demo_Sounds) )       PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR(Demo_Sounds) )       PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x04, DEF_STR(Off) )
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )
 	PORT_DIPNAME( 0x08, 0x00, "Back Color" )               PORT_DIPLOCATION("SW2:4")
@@ -1945,6 +1955,11 @@ void igs_m027_state::tripslot_okibank_low_w(u8 data)
 	m_oki->set_rom_bank(m_io_select[0]);
 }
 
+void igs_m027_state::ccly_okibank_w(u8 data)
+{
+	m_oki->set_rom_bank(data & 0x07);
+}
+
 void igs_m027_state::oki_128k_bank_w(u8 data)
 {
 	for (int i = 0; i < m_okibank.size(); i++)
@@ -2191,6 +2206,7 @@ void igs_m027_state::jking02(machine_config &config)
 	m027_1ppi<true>(config);
 
 	m_maincpu->in_port().set_ioport("PLAYER");
+	m_maincpu->out_port().append(m_oki, FUNC(okim6295_device::set_rom_bank)).mask(0x18).rshift(3);
 
 	m_ppi[0]->out_pa_callback().set(FUNC(igs_m027_state::lamps_w<8>));
 	m_ppi[0]->out_pb_callback().set(FUNC(igs_m027_state::jking02_output_w));
@@ -2202,7 +2218,7 @@ void igs_m027_state::tct2p(machine_config &config)
 	m027_1ppi<true>(config);
 
 	m_maincpu->in_port().set_ioport("PLAYER");
-	m_maincpu->out_port().append([this] (int state) { m_out_lamps[0] = state; }).bit(3); // seems to be an "insert coin" lamp - high when no credits
+	m_maincpu->out_port().append(m_oki, FUNC(okim6295_device::set_rom_bank)).mask(0x18).rshift(3);
 
 	m_ppi[0]->out_pb_callback().set_ioport("PPIB");
 	m_ppi[0]->out_pc_callback().set_ioport("PPIC");
@@ -2260,12 +2276,15 @@ void igs_m027_state::ccly(machine_config &config)
 {
 	m027_1ppi<true>(config);
 
+	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::ccly_map);
 	m_maincpu->in_port().set_ioport("PLAYER");
 
 	m_ppi[0]->out_pb_callback().set_ioport("PPIB");
 	m_ppi[0]->out_pc_callback().set(FUNC(igs_m027_state::lamps_w<0>));
 
 	HOPPER(config, m_hopper, attotime::from_msec(50));
+
+	m_oki->set_clock(2'000'000);
 }
 
 void igs_m027_state::extradrw(machine_config &config)
@@ -2632,6 +2651,24 @@ ROM_START( olympic5107us )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "olympic_5_sp.u28", 0x00000, 0x80000, CRC(216b5418) SHA1(b7bc24ced0ccb5476c974420aa506c13b971fc9f) ) // MX27C4000
+ROM_END
+
+ROM_START( royal5p ) // PCB-0367-08-FG-1
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS027A type G ARM based MCU
+	ROM_LOAD( "v21_027a.u32", 0x0000, 0x4000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "r5+_v-101us.u23", 0x00000, 0x80000, CRC(99e83ba0) SHA1(f069b23261399e29827d14f1cb03f8bb12e3f50d) ) // 27C4002
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD16_WORD_SWAP( "r5+_text_u12.u12", 0x00000, 0x80000, CRC(f0e0d113) SHA1(36f8abec90695084a5de2b3d9b57f8d0b188a71a) ) // 27C4002
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "r5+_cg_u13.u13", 0x000000, 0x400000, CRC(16e9a946) SHA1(665ad42a4aded32c49373a7b391b4f98b9bdf504) ) // 27C322, 0xxxxxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "r5+_sp_u37.u37", 0x000000, 0x200000, CRC(030ffdb4) SHA1(7ba129d0301e4e3d58245e733a505ff035395089) ) // 27C160, BADADDR   --xxxxxxxxxxxxxxxxxxx
 ROM_END
 
 // Games with prg at u16
@@ -3681,6 +3718,25 @@ ROM_START( ccly ) // IGS PCB-0415-05-GD - no XA, contrary to the other regions s
 	ROM_LOAD( "rom.u18", 0x00000, 0x200000, CRC(2cbfc5aa) SHA1(94817f5d1babad4ff1bb12701797982e7a106a72) )
 ROM_END
 
+// 皇冠足球 Plus (Huángpái Zúqiú Plus) / 超级双星 Plus (Chāojí Shuāngxīng Plus)
+ROM_START( cjsxp ) // IGS PCB-0362-02-FP. 3 banks of 8 switches.
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	// Internal rom of IGS027A ARM based MCU
+	ROM_LOAD( "s6_027a.u26", 0x0000, 0x4000, CRC(56749e61) SHA1(56f3eb0865fc8fd12d4015956f70ecaf9ed9705b) )
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "v103cn.u18", 0x00000, 0x80000, CRC(9fb75727) SHA1(47c1c640e618b7fb49b0254639880a1b4104b932) ) // no label
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "text.u15", 0x00000, 0x80000, CRC(3ac39fa3) SHA1(cff8086fa31ef50d220f1434ba8dd4f9b96b2150) )
+
+	ROM_REGION( 0x200000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "cg.u14", 0x000000, 0x200000, CRC(a6b52a44) SHA1(e801060d99eefabb214b7446fd5695e351874d40) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "sp.u17", 0x00000, 0x80000, CRC(c7d10e13) SHA1(b992540b63340b37830c50d8f49521f3f34ca2c4) )
+ROM_END
+
 
 void igs_m027_state::pgm_create_dummy_internal_arm_region()
 {
@@ -3970,6 +4026,7 @@ GAME(  2005, cjtljp,        0,        xypdk,        lhzb4,         igs_m027_stat
 GAME(  2005, xypdk,         0,        xypdk,        lhzb4,         igs_m027_state, init_xypdk,    ROT0, "IGS", "Xingyun Pao De Kuai (V106CN)", 0 )
 GAMEL( 2007, tripslot,      0,        tripslot,     tripslot,      igs_m027_state, init_tripslot, ROT0, "IGS", "Triple Slot (V200VE)", 0, layout_tripslot ) // 2007 date in internal ROM at least, could be later, default settings password is all 'start 1'
 GAMEL( 2005, ccly,          crzybugs, ccly,         ccly,          igs_m027_state, init_ccly,     ROT0, "IGS", "Chong Chong Leyuan (V100CN)", MACHINE_NOT_WORKING, layout_ccly )
+GAME(  2001, cjsxp,         0,        ccly,         ccly,          igs_m027_state, init_klxyj,    ROT0, "IGS", "Huangpai Zuqiu Plus / Chaoji Shuangxing Plus (V103CN)", MACHINE_NOT_WORKING ) // inputs, outputs, Oki ROM bank
 // this has a 2nd 8255
 GAME(  2001, extradrw,      0,        extradrw,     base,          igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw (V100VE)", MACHINE_NOT_WORKING )
 // these have an IGS025 protection device instead of the 8255
@@ -3989,5 +4046,6 @@ GAME(  200?, luckycrs,      0,        m027_1ppi<false>, base,     igs_m027_state
 GAME(  2003, amazoni2,      0,        m027_1ppi<false>, base,     igs_m027_state, init_amazoni2, ROT0, "IGS", "Amazonia King II (V202BR)", MACHINE_NOT_WORKING )
 GAME(  2002, sdwx,          0,        m027_1ppi<false>, base,     igs_m027_state, init_sdwx,     ROT0, "IGS", "Sheng Dan Wu Xian", MACHINE_NOT_WORKING ) // aka Christmas 5 Line? (or Amazonia King II, shares roms at least?)
 GAME(  2001, cjdh6th,       0,        m027_1ppi<false>, base,     igs_m027_state, init_extradrw, ROT0, "IGS", "Chaoji Daheng 6th", MACHINE_NOT_WORKING )
+GAME(  200?, royal5p,       0,        m027_1ppi<false>, base,     igs_m027_state, empty_init,    ROT0, "IGS", "Royal 5+ (V101US)", MACHINE_NOT_WORKING )
 // these have an IGS025 protection device instead of the 8255
 GAME(  200?, gonefsh2,      0,        m027_noppi<false>,base,     igs_m027_state, init_gonefsh2, ROT0, "IGS", "Gone Fishing 2", MACHINE_NOT_WORKING )

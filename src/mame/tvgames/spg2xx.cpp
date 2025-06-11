@@ -485,6 +485,26 @@ static INPUT_PORTS_START( spg2xx ) // base structure for easy debugging / figuri
 	PORT_DIPSETTING(      0x8000, "8000" )
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( carled99 )
+	PORT_INCLUDE( spg2xx )
+
+	// controls seem to be 100% digital despite it being a wheel + pedals controller similar in appearance to ford racing
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_NAME("Steer Left")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_NAME("Steer Right")
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) // directional buttons, not a real joystick!
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Menu Select")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Menu Back")
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("Accelerate")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("Brake")
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( wordlnch )
 	PORT_INCLUDE( spg2xx )
 
@@ -2294,7 +2314,12 @@ ROM_START( rad_fb2 )
 	ROM_LOAD16_WORD_SWAP( "football2.bin", 0x000000, 0x400000, CRC(96b4f0d2) SHA1(e91f2ac679fb0c026ffe216eb4ab58802f361a17) )
 ROM_END
 
+ROM_START( rad_jib )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jibbi.u6", 0x000000, 0x200000, CRC(33f93a80) SHA1(1ecfc66435405206003f5c23c4a0aa9195a7fe0d) )
 
+	// has an AT24C02
+ROM_END
 
 ROM_START( rad_crik ) // only released in EU?
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
@@ -2337,6 +2362,10 @@ ROM_START( fordrace )
 	ROM_LOAD16_WORD_SWAP( "fordracing_29lv320ct_00c222a7.bin", 0x000000, 0x400000, CRC(998cad17) SHA1(98a65e9e0ec17e3366e0ac6ddc2d852a7efb360e) )
 ROM_END
 
+ROM_START( carled99 )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "carledwards.u2", 0x000000, 0x400000, CRC(8921f13a) SHA1(e7216e42745ab6bfd1ad02382eedbc5e741a86e9) )
+ROM_END
 
 ROM_START( comil )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
@@ -2674,6 +2703,9 @@ CONS( 2006, rad_crik,   0,        0, rad_crik,  rad_crik,  spg2xx_game_state,   
 
 CONS( 2007, rad_fb2,    0,        0, rad_skat,  rad_fb2,   spg2xx_game_state,          init_crc,      "Radica",                                                 "Play TV Football 2",                                                    MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // offers a 2 player option in menus, but seems to have only been programmed for, and released as, a single player unit, P2 controls appear unfinished.
 
+// this is 'voice activated' and one of the other globs is likely doing the voice processing
+CONS( 2006, rad_jib,    0,        0, spg28x,    spg2xx,   spg2xx_game_state,          init_crc,      "Radica",                                                 "Jibbi",                                                                 MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+
 // ABL TV Games
 CONS( 2006, abltenni,   0,        0, spg2xx,    abltenni,  spg2xx_game_state,          empty_init,    "Advance Bright Ltd / V-Tac Technology Co Ltd.",          "Wireless Tennis (WT2000, ABL TV Game)",                                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
@@ -2686,6 +2718,8 @@ CONS( 2007, lxairjet,   0,        0, spg2xx_pal,lxspidaj,  spg2xx_game_albkickb_
 CONS( 2006, totspies,   0,        0, spg2xx_pal,totspies,  spg2xx_game_state,          empty_init,    "Senario / Marathon - Mystery Animation Inc.",            "Totally Spies! (France)",                                               MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 2006, fordrace,   0,        0, fordrace,  fordrace,  spg2xx_game_fordrace_state, empty_init,    "Excalibur Electronics",                                  "Ford Racing",                                                           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 200?, carled99,   0,        0, spg2xx,    carled99,  spg2xx_game_state,          empty_init,    "Excalibur Electronics",                                  "Carl Edwards 99",                                                       MACHINE_IMPERFECT_SOUND )
 
 CONS( 2008, comil,      0,        0, comil,     comil,     spg2xx_game_comil_state,    empty_init,    "Character Options",                                      "Who Wants to Be a Millionaire? (Character Options, Plug and Play, UK)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 

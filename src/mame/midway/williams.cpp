@@ -1600,6 +1600,13 @@ void defender_state::defender(machine_config &config)
 	m_screen->set_visarea(12, 304-1, 7, 247-1);
 }
 
+void defender_state::nextcent(machine_config &config)
+{
+	defender(config);
+
+	m_soundcpu->set_clock(3.12_MHz_XTAL);
+}
+
 void defender_state::defender_6802snd(machine_config &config)
 {
 	defender(config);
@@ -1704,7 +1711,7 @@ void williams_state::sinistar_cockpit(machine_config &config)
 
 	// additional sound hardware
 	SPEAKER(config, "rspeaker").rear_center();
-	MC1408(config, "rdac").add_route(ALL_OUTPUTS, "rspeaker", 0.25, 1); // unknown DAC
+	MC1408(config, "rdac").add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
 
 	// pia
 	INPUT_MERGER_ANY_HIGH(config, "soundirq_b").output_handler().set_inputline("soundcpu_b", M6808_IRQ_LINE);
@@ -2188,6 +2195,28 @@ ROM_START( defcmnd )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "defcmnda.snd", 0xf800, 0x0800, CRC(f122d9c9) SHA1(70092fc354a2efbe7365be922fa36309b50d5c6f) )
+ROM_END
+
+// PCB silkscreened "H-P4  085311". Main clock is 12 MHz (same as regular Defender), but sound clock is 3.1200 MHz.
+ROM_START( nextcent )
+	ROM_REGION( 0x3000, "maincpu", ROMREGION_BE )
+	ROM_LOAD( "nextcentury_2732.ic29", 0x0000, 0x1000, CRC(68effc1d) SHA1(459fd95cdf94233e1a4302d1c166e0f7cc239579) )
+	ROM_LOAD( "nextcentury_2732.ic28", 0x1000, 0x1000, CRC(1126adc9) SHA1(526cf1ca3a7eefd6115d74ac9af1a50774cc258e) )
+	ROM_LOAD( "nextcentury_2732.ic27", 0x2000, 0x1000, CRC(7340209d) SHA1(d2cdab8ac4830ac027655ed7fe54314c5b87fdb3) )
+
+	ROM_REGION( 0x7000, "banked", ROMREGION_BE )
+	ROM_LOAD( "nextcentury_2732.ic30", 0x0000, 0x1000, CRC(78b33590) SHA1(4ef62d52e7080c0814b21f1c20074707a8c6ab74) )
+	ROM_LOAD( "nextcentury_2732.ic31", 0x1000, 0x1000, CRC(23bddfaf) SHA1(881ed5efdf7c4dfec10fe06c451a57de1716db4b) )
+	ROM_LOAD( "nextcentury_2732.ic32", 0x2000, 0x1000, CRC(03721aa7) SHA1(719097e2ee18f63404bf24948d0b4791ef967246) )
+	ROM_LOAD( "nextcentury_2732.ic33", 0x6000, 0x1000, CRC(e4a27e2f) SHA1(74fa7f03b171f32c81b6fbcbb4b013be4ebd1c0a) ) // 1xxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "nextcentury_2732.ic24", 0xf800, 0x0800, CRC(4c2236cc) SHA1(87372bbaae53a790add8cf24be52a19e11b17d0c) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE( 0x800 )
+
+	ROM_REGION( 0x400, "proms", 0 )
+	ROM_LOAD( "nextcentury_7343_82s137.ic34", 0x000, 0x400, CRC(00b0b5b5) SHA1(8ccc94387088f00150ebd96c1d2723904cc07769) )
+	ROM_LOAD( "nextcentury_7343_82s137.ic41", 0x000, 0x400, CRC(ba1d88cd) SHA1(2d0d1d771c60bf143aa357fb2a41d24ebd6d30c9) )
 ROM_END
 
 ROM_START( startrkd )
@@ -3909,6 +3938,7 @@ GAME( 1980, zero2,      defender, defender,         defender, defender_state,  i
 GAME( 1981, defenderom, defender, defender_6802snd, defender, defender_state,  empty_init,    ROT0,   "bootleg (Operamatic)",                 "Operacion Defender (bootleg of Defender)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, defcmnd,    defender, defender,         defender, defender_state,  empty_init,    ROT0,   "bootleg",                              "Defense Command (bootleg of Defender)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1981, defence,    defender, defender,         defender, defender_state,  empty_init,    ROT0,   "bootleg (Outer Limits)",               "Defence Command (bootleg of Defender)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1981, nextcent,   defender, nextcent,         defender, defender_state,  empty_init,    ROT0,   "bootleg (Petaco)",                     "Next Century (bootleg of Defender)",       MACHINE_SUPPORTS_SAVE )
 GAME( 198?, defenseb,   defender, defender,         defender, defender_state,  empty_init,    ROT0,   "bootleg",                              "Defense (bootleg of Defender)",            MACHINE_SUPPORTS_SAVE )
 GAME( 1981, startrkd,   defender, defender,         defender, defender_state,  empty_init,    ROT0,   "bootleg",                              "Star Trek (bootleg of Defender)",          MACHINE_SUPPORTS_SAVE )
 GAME( 1980, attackf,    defender, defender,         defender, defender_state,  empty_init,    ROT0,   "bootleg (Famaresa)",                   "Attack (bootleg of Defender)",             MACHINE_SUPPORTS_SAVE )

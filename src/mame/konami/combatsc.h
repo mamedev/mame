@@ -42,7 +42,6 @@ protected:
 
 	// memory pointers
 	required_shared_ptr_array<uint8_t, 2> m_videoram;
-	std::unique_ptr<uint8_t[]> m_spriteram[2];
 
 	// video-related
 	tilemap_t *m_bg_tilemap[2]{};
@@ -119,7 +118,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_text_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *source, int circuit, bitmap_ind8 &priority_bitmap, uint32_t pri_mask);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int circuit, bitmap_ind8 &priority_bitmap, uint32_t pri_mask);
 	void main_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
 };

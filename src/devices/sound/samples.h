@@ -19,8 +19,6 @@ DECLARE_DEVICE_TYPE(SAMPLES, samples_device)
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-#define SAMPLES_START_CB_MEMBER(_name) void _name()
-
 // ======================> samples_device
 
 class samples_device :  public device_t,
@@ -35,9 +33,6 @@ public:
 	// configuration helpers
 	void set_channels(uint8_t channels) { m_channels = channels; }
 	void set_samples_names(const char *const *names) { m_names = names; }
-
-	// start callback helpers
-	template <typename... T> void set_samples_start_callback(T &&...args) { m_samples_start_cb.set(std::forward<T>(args)...); }
 
 	// getters
 	bool playing(uint8_t channel) const;
@@ -98,8 +93,6 @@ protected:
 	static bool read_wav_sample(emu_file &file, sample_t &sample);
 	static bool read_flac_sample(emu_file &file, sample_t &sample);
 	bool load_samples();
-
-	start_cb_delegate m_samples_start_cb; // optional callback
 
 	// interface
 	uint8_t m_channels;         // number of discrete audio channels needed

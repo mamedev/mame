@@ -191,6 +191,7 @@ reasonably lightweight when nothing special happens.
     struct audio_info {
         struct node_info {
                 std::string m_name;
+                std::string m_display_name;
                 uint32_t m_id;
                 audio_rate_range m_rate;
 		std::vector<std::string> m_port_names;
@@ -218,7 +219,8 @@ of the host and the module.  This state is:
 * m_generation:  The current generation number
 * m_nodes: The vector available nodes (*node_info*)
 
-  * m_name: The name of the node
+  * m_name: The name of the node to be used in non-user-visible configurations (can be a uuid or equivalent)
+  * m_display_name: The name of the node to be used in the user interfaces (should be readable)
   * m_id: The numeric ID of the node
   * m_rate: The minimum, maximum and preferred sample rate for the node
   * m_port_names: The vector of port names
@@ -237,7 +239,7 @@ of the host and the module.  This state is:
   * m_volumes: empty if *external_per_channel_volume* is false, current volume
     value per-channel otherwise
 
-IDs, for nodes and streams, are (independant) 32-bit unsigned non-zero
+IDs, for nodes and streams, are (independent) 32-bit unsigned non-zero
 values associated to respectively nodes and streams.  IDs should not
 be reused.  A node that goes away then comes back should get a new ID.
 A stream closing does not allow reuse of its ID.
@@ -245,6 +247,13 @@ A stream closing does not allow reuse of its ID.
 If a node has both sources and sinks, the sources are *monitors* of
 the sinks, e.g. they're loopbacks.  They should have the same count in
 such a case.
+
+Nodes must be independent.  It must be possible to open streams to two
+different nodes at the same time.  Be careful of multi-api libraries
+that collide between apis.  In addition, with monitoring streams
+(input on an output), it must be possible to open different streams
+for input and output.  If it's not the case, do not publish the
+monitoring inputs.
 
 When external control exists, a module should change the value of
 *stream_info::m_node* when the user changes it, and same for
@@ -254,6 +263,12 @@ when this happens, so that the core knows to look for changes.
 Volumes are floats in dB, where 0 means 100% and -96 means no sound.
 audio.h provides osd::db_to_linear and osd::linear_to_db if such a
 conversion is needed.
+
+Positions have two special values: unknown() means the position of the
+speaker or microphone is unknown, but it should be used anyway.  The
+used position will be centered.  map_on_request_only() means the input
+or output should not be used on full mappings but only when explicitly
+requested with a channel mapping.
 
 There is an inherent race condition with this system, because things
 can change at any point after returning for the method.  The idea is
