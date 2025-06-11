@@ -22,6 +22,10 @@
               socket intended for a YB2151/AY2203 (and another empty YB2151/AY2203 socket).
     VOLANTE MODULAR: (small sub-board) Logic for the driving wheel.
 
+    TODO:
+    - priorities aren't understood
+    - sound implementation may not be totally correct
+    - wheel support
 ***************************************************************************************************/
 
 #include "emu.h"
@@ -46,10 +50,18 @@ public:
 	wrally_ms_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_soundcpu(*this, "soundcpu")
 		, m_palette(*this, "palette")
 		, m_screen(*this, "screen")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_vram(*this, "vram")
+		, m_bg_vram(*this, "bg_vram")
+		, m_bg2_vram(*this, "bg2_vram")
+		, m_spriteram(*this, "spriteram")
+		, m_scrollregs(*this, "scrollregs")
+		, m_prgbank(*this,"prgbank")
+		, m_okibank(*this, "okibank")
+		, m_oki(*this,"oki")
 	{ }
 
 	void wrally_ms(machine_config &config) ATTR_COLD;
@@ -62,30 +74,52 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_soundcpu;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<u16> m_vram;
+	required_shared_ptr<u16> m_bg_vram;
+	required_shared_ptr<u16> m_bg2_vram;
+	required_shared_ptr<u16> m_spriteram;
+	required_shared_ptr<u16> m_scrollregs;
+	required_memory_bank m_prgbank;
+	required_memory_bank m_okibank;
+	required_device<okim6295_device> m_oki;
 
 	tilemap_t *m_tx_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_bg2_tilemap = nullptr;
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
+
 	void vram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void bg_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void bg2_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	void descramble_16x16tiles(uint8_t *src, int len) ATTR_COLD;
+	void okim6295_bankswitch_w(u8 data);
 
-	uint16_t unk_r() { return machine().rand(); }
-	uint16_t unk2_r() { return 0x0000; }
+	void descramble_16x16tiles(u8 *src, int len) ATTR_COLD;
+
+	u16 unk_r() { return machine().rand(); }
+	u16 unk2_r() { return 0x0000; }
 
 	void wrally_ms_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map);
+	void oki_map(address_map &map) ATTR_COLD;
 };
 
 TILE_GET_INFO_MEMBER(wrally_ms_state::get_tile_info)
 {
-	u16 code = (m_vram[tile_index*2] & 0xfff);
-	tileinfo.set(0, code, 0, 0);
+	u16 code = m_vram[tile_index * 2];
+	u16 attr = m_vram[(tile_index * 2) + 1];
+	int fx = (attr & 0xc0) >> 6;
+
+	tileinfo.set(0, code & 0xfff, attr & 0xf, TILE_FLIPYX(fx));
 }
 
 void wrally_ms_state::vram_w(offs_t offset, u16 data, u16 mem_mask)
@@ -94,48 +128,223 @@ void wrally_ms_state::vram_w(offs_t offset, u16 data, u16 mem_mask)
 	m_tx_tilemap->mark_tile_dirty(offset/2);
 }
 
+TILE_GET_INFO_MEMBER(wrally_ms_state::get_bg_tile_info)
+{
+	u16 code = m_bg_vram[tile_index * 2];
+	u16 attr = m_bg_vram[(tile_index * 2) + 1];
+	int fx = (attr & 0xc0) >> 6;
+
+	tileinfo.set(2, code & 0xfff, attr & 0x1f, TILE_FLIPYX(fx));
+}
+
+void wrally_ms_state::bg_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_bg_vram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset/2);
+}
+
+TILE_GET_INFO_MEMBER(wrally_ms_state::get_bg2_tile_info)
+{
+	u16 code = m_bg2_vram[tile_index * 2];
+	u16 attr = m_bg2_vram[(tile_index * 2) + 1];
+	int fx = (attr & 0xc0) >> 6;
+
+	tileinfo.set(1, code & 0x1fff, attr & 0x1f, TILE_FLIPYX(fx)); // some valid road gfx drawn from here
+}
+
+void wrally_ms_state::bg2_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_bg2_vram[offset]);
+	m_bg2_tilemap->mark_tile_dirty(offset/2);
+}
+
 void wrally_ms_state::video_start()
 {
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wrally_ms_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wrally_ms_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wrally_ms_state::get_bg2_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+
+	m_tx_tilemap->set_transparent_pen(15);
+	m_bg_tilemap->set_transparent_pen(0);
+//  m_bg2_tilemap->set_transparent_pen(0);
 }
 
-uint32_t wrally_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 wrally_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_palette->black_pen());
+	// are these using the correct reg pairs?
+	m_bg_tilemap->set_scrollx(0, 80-(m_scrollregs[0]));
+	m_bg_tilemap->set_scrolly(0, -m_scrollregs[1]);
+
+	m_bg2_tilemap->set_scrollx(0, 80-(m_scrollregs[6]));
+	m_bg2_tilemap->set_scrolly(0, -m_scrollregs[7]);
+
+	// what are m_scrollregs 2,3 and 4,5?
+	// one is probably tx scroll, the other priority control
+
+	m_tx_tilemap->set_scrollx(0, 80);
+	m_tx_tilemap->set_scrolly(0, 0);
+
+	m_bg2_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	// TODO, convert to device, share between Modular System games
+	const int NUM_SPRITES = 0x200;
+	const int X_EXTRA_OFFSET = 78;
+
+	for (int i = NUM_SPRITES - 2; i >= 0; i -= 2)
+	{
+		gfx_element* gfx = m_gfxdecode->gfx(3);
+
+		u16 attr0 = m_spriteram[i + 0];
+		u16 attr1 = m_spriteram[i + 1];
+
+		u16 attr2 = m_spriteram[i + NUM_SPRITES];
+		//u16 attr3 = m_spriteram[i + NUM_SPRITES+1]; // unused?
+
+		int ypos = attr0 & 0x00ff;
+
+		// unknown, unused sprites (sometimes garbage sprites) have a ypos of 00f8 and not much else
+		if (ypos == 0x00f8)
+			continue;
+
+		int xpos = (attr1 & 0xff00) >> 8;
+
+		xpos |= (attr2 & 0x8000) ? 0x100 : 0x000;
+
+		ypos = (0xff - ypos);
+		ypos |= (attr2 & 0x4000) ? 0x100 : 0x000; // maybe
+
+		int tile = (attr0 & 0xff00) >> 8;
+		tile |= (attr1 & 0x003f) << 8;
+
+		int flipx = (attr1 & 0x0040);
+		int flipy = (attr1 & 0x0080);
+
+		gfx->transpen(bitmap, cliprect, tile, (attr2 & 0x0f00) >> 8, flipx, flipy, xpos - 16 - X_EXTRA_OFFSET, ypos - 16, 15);
+	}
+
 	return 0;
 }
 
 void wrally_ms_state::wrally_ms_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom();
+	map(0x000000, 0x01ffff).bankr("prgbank");
+	map(0x020000, 0x0fffff).rom().region("maincpu", 0x20000).nopw(); // sometimes writes to the ROM area (code bug?)
 
-	map(0x200000, 0x2001ff).ram();
+	map(0x100000, 0x1007ff).ram().share("spriteram");
+
+	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
 	map(0x300000, 0x301fff).ram().w(FUNC(wrally_ms_state::vram_w)).share("vram");
-	map(0x340000, 0x341fff).ram(); // these get populated if you turn the 'show something' dip off, before the code quickly crashes
-	map(0x380000, 0x381fff).ram();
+	map(0x340000, 0x341fff).ram().w(FUNC(wrally_ms_state::bg_w)).share("bg_vram");
+	map(0x380000, 0x381fff).ram().w(FUNC(wrally_ms_state::bg2_w)).share("bg2_vram");
+	// sometimes writes to 382000, 382002 (code bug?)
 
-	map(0x400000, 0x400001).r(FUNC(wrally_ms_state::unk_r));
-	map(0x400002, 0x400003).r(FUNC(wrally_ms_state::unk_r));
+	map(0x3c0000, 0x3c000f).ram().share("scrollregs"); // video regs
+
+	map(0x400000, 0x400001).portr("IN0");
+	map(0x400002, 0x400003).portr("IN1");
 	map(0x400004, 0x400005).r(FUNC(wrally_ms_state::unk_r));
-	map(0x400006, 0x400007).r(FUNC(wrally_ms_state::unk_r));
-	map(0x400008, 0x400009).portr("IN1");
-	map(0x40000c, 0x40000d).r(FUNC(wrally_ms_state::unk_r));
+	map(0x400006, 0x400007).portr("DSW1");
+	map(0x400008, 0x400009).portr("DSW2");
+	map(0x40000c, 0x40000d).r(FUNC(wrally_ms_state::unk_r)).nopw(); // writes 00 sometimes
 
-	map(0x600000, 0x600001).r(FUNC(wrally_ms_state::unk2_r));
-	map(0x600180, 0x600181).r(FUNC(wrally_ms_state::unk2_r));
-
+//  map(0x600000, 0x600001).r(FUNC(wrally_ms_state::unk2_r));
+	map(0x600081, 0x600081).mirror(0x100).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x600101, 0x600101).w(FUNC(wrally_ms_state::okim6295_bankswitch_w));
 	map(0xff0000, 0xffffff).ram();
 }
 
+void wrally_ms_state::sound_map(address_map &map)
+{
+	map(0x0000, 0x7fff).rom();
+	map(0xe800, 0xe801).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
+	map(0xf000, 0xffff).ram();
+}
+
+void wrally_ms_state::oki_map(address_map &map)
+{
+	map(0x00000, 0x2ffff).rom();
+	map(0x30000, 0x3ffff).bankr(m_okibank);
+}
+
+
 static INPUT_PORTS_START( wrally_ms )
+	// some modular games read inputs in the high byte, others low, maybe it mirrors?
+	PORT_START("IN0")
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN1 )
+
 	PORT_START("IN1")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x0100, 0x0100, "Show Something" ) // Turned off code seems to crash, turned on it seems get to a test menu
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN2 )
+
+	PORT_START("DSW1")
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x0100, 0x0100, "DSW1" )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0xfe00, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_SERVICE( 0x0100, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x0200, 0x0200, "DSW2" )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x0000, "Control Type" ) // currently locks up after a few seconds of gameplay with wheel
+	PORT_DIPSETTING(      0x2000, "Wheel" )
+	PORT_DIPSETTING(      0x0000, "Joystick" )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static const gfx_layout tiles8x8x4_layout =
@@ -162,21 +371,31 @@ static const gfx_layout tiles16x16x4_layout =
 
 static GFXDECODE_START( gfx_wrally_ms )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x4_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16x4_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, tiles16x16x4_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx4", 0, tiles16x16x4_layout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx5", 0, tiles16x16x4_layout, 0, 16 )
-	GFXDECODE_ENTRY( "sprites", 0, tiles16x16x4_layout, 0x000, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tiles16x16x4_layout, 0, 32 )
+	GFXDECODE_ENTRY( "gfx3", 0, tiles16x16x4_layout, 0, 32 )
+	GFXDECODE_ENTRY( "sprites", 0, tiles16x16x4_layout, 0x200, 16 )
 GFXDECODE_END
 
 void wrally_ms_state::machine_start()
 {
+	m_prgbank->configure_entry(0, memregion("maincpu")->base());
+	m_prgbank->configure_entry(1, memregion("maincpu")->base() + 0x100000);
+	m_prgbank->set_entry(0);
+	//m_prgbank->set_entry(1); // use overlay ROM instead (doesn't upload a valid palette?)
+
+	m_okibank->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
 }
 
-// Reorganize graphics into something we can decode with a single pass
-void wrally_ms_state::descramble_16x16tiles(uint8_t *src, int len)
+void wrally_ms_state::okim6295_bankswitch_w(u8 data)
 {
-	std::vector<uint8_t> buffer(len);
+	m_okibank->set_entry(data & 0x0f);
+}
+
+
+// Reorganize graphics into something we can decode with a single pass
+void wrally_ms_state::descramble_16x16tiles(u8 *src, int len)
+{
+	std::vector<u8> buffer(len);
 	{
 		for (int i = 0; i < len; i++)
 		{
@@ -192,8 +411,6 @@ void wrally_ms_state::init_wrally_ms()
 {
 	descramble_16x16tiles(memregion("gfx2")->base(), memregion("gfx2")->bytes());
 	descramble_16x16tiles(memregion("gfx3")->base(), memregion("gfx3")->bytes());
-	descramble_16x16tiles(memregion("gfx4")->base(), memregion("gfx4")->bytes());
-	descramble_16x16tiles(memregion("gfx5")->base(), memregion("gfx5")->bytes());
 }
 
 void wrally_ms_state::wrally_ms(machine_config &config)
@@ -206,11 +423,11 @@ void wrally_ms_state::wrally_ms(machine_config &config)
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);
-	m_screen->set_visarea(0*8, 64*8-1, 0*8, 32*8-1);
+	m_screen->set_visarea(0*8, 46*8-1, 0*8, 29*8-1); // visarea based on test mode
 	m_screen->set_screen_update(FUNC(wrally_ms_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette).set_entries(0x400);
+	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 0x400);
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_wrally_ms);
 
@@ -218,20 +435,27 @@ void wrally_ms_state::wrally_ms(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	Z80(config, "soundcpu", 16_MHz_XTAL / 4); // NEC D780C-2
+	OKIM6295(config, m_oki, 1_MHz_XTAL, okim6295_device::PIN7_HIGH); // PIN 7 seems like it's not connected to anything at all
+	m_oki->set_addrmap(0, &wrally_ms_state::oki_map);
+	m_oki->add_route(ALL_OUTPUTS, "mono", 0.7);
+
+	// the sound hardware below seems to go unused, the program is the same as Splash (Modular System)
+	// all sounds for this are from the OKIM6295, driven by the 68000
+
+	Z80(config, m_soundcpu, 16_MHz_XTAL / 4); // NEC D780C-2
+	m_soundcpu->set_addrmap(AS_PROGRAM, &wrally_ms_state::sound_map);
 
 	YM3812(config, "ymsnd", 16_MHz_XTAL / 4); // Unknown divisor
-
-	OKIM6295(config, "oki", 1_MHz_XTAL, okim6295_device::PIN7_LOW); // PIN 7 seems like it's not connected to anything at all
 
 	MSM5205(config, "msm", 384_kHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.15);
 }
 
 ROM_START( wrallymp )
-	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_REGION( 0x120000, "maincpu", 0 )
 	// These were a row of 8 ROMs next to the M68000, they appear to form the start of the code, but the initial boot vector is wrong
 	ROM_LOAD16_BYTE( "mod_6-esp-2_z0_e_25-11_27c1001.u8", 0x000000, 0x020000, CRC(a0d200eb) SHA1(fbca9b84d8b010aa0bfb546ddf366ec9812f0bb5) )
 	ROM_LOAD16_BYTE( "mod_6-esp-2_z0_o_25-11_27c1001.u7", 0x000001, 0x020000, CRC(4113a030) SHA1(e6cac2b0e97ec7f15610aa72198a575631b937f6) )
+	ROM_FILL( 0x06, 1, 0x24 ) // fix the boot vector as we're using this set of program ROMs
 
 	// FIXED BITS (0xxxxxxx) on z1_e - but intentional? 15-bit data tables?
 	ROM_LOAD16_BYTE( "mod_6-esp-2_z1_e_25-11_27c1001.u36", 0x040000, 0x020000, CRC(4346b650) SHA1(a0feca5d9d93af2548b59c11032384703d432a30) )
@@ -246,42 +470,59 @@ ROM_START( wrallymp )
 
 	// Does this act as an overlay? It's basically the same as the above, but with a valid boot vector and some other changes.
 	// Was found on the PCB just above the 8 loaded previously
-	ROM_LOAD16_BYTE( "mod_6-esp-2_pds_0_coche_27c512.u6", 0x000000, 0x010000, CRC(362c8f1e) SHA1(013499bf78fc9806f988354ca17e99e9cc2f7f71) )
-	ROM_LOAD16_BYTE( "mod_6-esp-2_pds_1_coche_27c512.u5", 0x000001, 0x010000, CRC(f87e0e9b) SHA1(55eec7612baede958e0abffe426945d85726ffdc) )
+	// running these however just results in bad palette uploads for test mode and a crash outside of that
+	ROM_LOAD16_BYTE( "mod_6-esp-2_pds_0_coche_27c512.u6", 0x100000, 0x010000, CRC(362c8f1e) SHA1(013499bf78fc9806f988354ca17e99e9cc2f7f71) )
+	ROM_LOAD16_BYTE( "mod_6-esp-2_pds_1_coche_27c512.u5", 0x100001, 0x010000, CRC(f87e0e9b) SHA1(55eec7612baede958e0abffe426945d85726ffdc) )
 
-	ROM_REGION( 0x40000, "gfx1", 0 ) // 8x8
+	ROM_REGION( 0x10000, "gfx1", 0 ) // 8x8
 	// all ROMs 11xxxxxxxxxxxxxx = 0x00 (last 3/4 0x00)
-	ROM_LOAD32_BYTE( "mod_8-2_fijas_a_23-11_27c512.ic15", 0x000003, 0x10000, CRC(0241312b) SHA1(3a912731cd85bfdf4789d994580729f407eaace2) )
-	ROM_LOAD32_BYTE( "mod_8-2_fijas_b_23-11_27c512.ic22", 0x000002, 0x10000, CRC(44a2fc73) SHA1(90353c54ec0bd26f3e290b3b03cbfc120b85cfe2) )
-	ROM_LOAD32_BYTE( "mod_8-2_fijas_c_23-11_27c512.ic30", 0x000001, 0x10000, CRC(b9e94ba5) SHA1(50c9ba5455a7383f07f13a851d50444477e83ff4) )
-	ROM_LOAD32_BYTE( "mod_8-2_fijas_d_23-11_27c512.ic37", 0x000000, 0x10000, CRC(96644b11) SHA1(4f6a972610ad043d13df6157975739be141ff1e7) )
+	ROM_LOAD32_BYTE( "mod_8-2_fijas_a_23-11_27c512.ic15", 0x000003, 0x4000, CRC(0241312b) SHA1(3a912731cd85bfdf4789d994580729f407eaace2) )
+	ROM_IGNORE(0xc000)
+	ROM_LOAD32_BYTE( "mod_8-2_fijas_b_23-11_27c512.ic22", 0x000002, 0x4000, CRC(44a2fc73) SHA1(90353c54ec0bd26f3e290b3b03cbfc120b85cfe2) )
+	ROM_IGNORE(0xc000)
+	ROM_LOAD32_BYTE( "mod_8-2_fijas_c_23-11_27c512.ic30", 0x000001, 0x4000, CRC(b9e94ba5) SHA1(50c9ba5455a7383f07f13a851d50444477e83ff4) )
+	ROM_IGNORE(0xc000)
+	ROM_LOAD32_BYTE( "mod_8-2_fijas_d_23-11_27c512.ic37", 0x000000, 0x4000, CRC(96644b11) SHA1(4f6a972610ad043d13df6157975739be141ff1e7) )
+	ROM_IGNORE(0xc000)
 
-	ROM_REGION( 0x80000, "gfx2", 0 )
-	ROM_LOAD32_BYTE( "mod_8-2_la-i_27c010.ic13", 0x000003, 0x20000, CRC(c1b2f2e6) SHA1(4555f0024289d395484c172cff58544b73e92ddb) )
-	ROM_LOAD32_BYTE( "mod_8-2_lb-j_27c010.ic20", 0x000002, 0x20000, CRC(f0dbd657) SHA1(2fb269d3e90d1211f1c4ecf4ef4c785fed0f1111) )
-	ROM_LOAD32_BYTE( "mod_8-2_lc_k_27c010.ic28", 0x000001, 0x20000, CRC(f09f8067) SHA1(bbfe21cefce2307f87a3416af1767fa4b30da446) )
-	ROM_LOAD32_BYTE( "mod_8-2_ld-l_27c010.ic35", 0x000000, 0x20000, CRC(4feb7aab) SHA1(86f222cb95bd7366ec921b2da438847c3679ab46) )
+	ROM_REGION( 0xc0000, "gfx2", 0 )
+	ROM_LOAD32_BYTE( "mod_8-2_la-i_27c010.ic13", 0x000003, 0x10000, CRC(c1b2f2e6) SHA1(4555f0024289d395484c172cff58544b73e92ddb) )
+	ROM_CONTINUE(0x080003, 0x10000)
+	ROM_LOAD32_BYTE( "mod_8-2_lb-j_27c010.ic20", 0x000002, 0x10000, CRC(f0dbd657) SHA1(2fb269d3e90d1211f1c4ecf4ef4c785fed0f1111) )
+	ROM_CONTINUE(0x080002, 0x10000)
+	ROM_LOAD32_BYTE( "mod_8-2_lc_k_27c010.ic28", 0x000001, 0x10000, CRC(f09f8067) SHA1(bbfe21cefce2307f87a3416af1767fa4b30da446) )
+	ROM_CONTINUE(0x080001, 0x10000)
+	ROM_LOAD32_BYTE( "mod_8-2_ld-l_27c010.ic35", 0x000000, 0x10000, CRC(4feb7aab) SHA1(86f222cb95bd7366ec921b2da438847c3679ab46) )
+	ROM_CONTINUE(0x080000, 0x10000)
+	// All ROMs 1xxxxxxxxxxxxxxxx = 0xFF (2nd half 0xff)
+	ROM_LOAD32_BYTE( "mod_8-2_fon_he_27c1001.ic12", 0x040003, 0x10000, CRC(0279bb03) SHA1(fde2613164651c738469bbfe1a5918c89c0f3cb2) )
+	ROM_IGNORE(0x10000)
+	ROM_LOAD32_BYTE( "mod_8-2_fon_hf_27c1001.ic19", 0x040002, 0x10000, CRC(221c3249) SHA1(2a8f3d93dddc38ed38ee330687fc970507316b02) )
+	ROM_IGNORE(0x10000)
+	ROM_LOAD32_BYTE( "mod_8-2_fon_hg_27c1001.ic27", 0x040001, 0x10000, CRC(f186dcca) SHA1(6dbf2438862592bb0e8647b6aaca4747ad8e2755) )
+	ROM_IGNORE(0x10000)
+	ROM_LOAD32_BYTE( "mod_8-2_fon_hh_27c1001.ic34", 0x040000, 0x10000, CRC(2e73266c) SHA1(1a7a668483e30bf664aa037f86d4a73033dab83b) )
+	ROM_IGNORE(0x10000)
 
 	ROM_REGION( 0x80000, "gfx3", 0 )
-	// All ROMs 1xxxxxxxxxxxxxxxx = 0xFF (2nd half 0xff)
-	ROM_LOAD32_BYTE( "mod_8-2_fon_he_27c1001.ic12", 0x000003, 0x20000, CRC(0279bb03) SHA1(fde2613164651c738469bbfe1a5918c89c0f3cb2) )
-	ROM_LOAD32_BYTE( "mod_8-2_fon_hf_27c1001.ic19", 0x000002, 0x20000, CRC(221c3249) SHA1(2a8f3d93dddc38ed38ee330687fc970507316b02) )
-	ROM_LOAD32_BYTE( "mod_8-2_fon_hg_27c1001.ic27", 0x000001, 0x20000, CRC(f186dcca) SHA1(6dbf2438862592bb0e8647b6aaca4747ad8e2755) )
-	ROM_LOAD32_BYTE( "mod_8-2_fon_hh_27c1001.ic34", 0x000000, 0x20000, CRC(2e73266c) SHA1(1a7a668483e30bf664aa037f86d4a73033dab83b) )
-
-	ROM_REGION( 0x80000, "gfx4", 0 )
 	// All ROMs 1xxxxxxxxxxxxxxxx = 0x00 (2nd half 0x00)
-	ROM_LOAD32_BYTE( "mod_8-2_ned_la_27c1001.ic11", 0x000003, 0x20000, CRC(6b8b4d0d) SHA1(165a6e54004fd2249a8a26554a45a6940ca3873f) )
-	ROM_LOAD32_BYTE( "mod_8-2_ned_lb_27c1001.ic18", 0x000002, 0x20000, CRC(f00783aa) SHA1(3f2025dba2dfa863b754aaaadf0e0de4a2546c0c) )
-	ROM_LOAD32_BYTE( "mod_8-2_ned_lc_27c1001.ic26", 0x000001, 0x20000, CRC(f346ad2c) SHA1(2e335dab1d6a7cc7087e7be17013e1bd63f22f51) )
-	ROM_LOAD32_BYTE( "mod_8-2_ned_ld_27c1001.ic33", 0x000000, 0x20000, CRC(79e991af) SHA1(45163d8692926512e47ddfea8c32848a74910e9d) )
-
-	ROM_REGION( 0x80000, "gfx5", 0 )
+	ROM_LOAD32_BYTE( "mod_8-2_ned_la_27c1001.ic11", 0x000003, 0x10000, CRC(6b8b4d0d) SHA1(165a6e54004fd2249a8a26554a45a6940ca3873f) )
+	ROM_IGNORE(0x10000)
+	ROM_LOAD32_BYTE( "mod_8-2_ned_lb_27c1001.ic18", 0x000002, 0x10000, CRC(f00783aa) SHA1(3f2025dba2dfa863b754aaaadf0e0de4a2546c0c) )
+	ROM_IGNORE(0x10000)
+	ROM_LOAD32_BYTE( "mod_8-2_ned_lc_27c1001.ic26", 0x000001, 0x10000, CRC(f346ad2c) SHA1(2e335dab1d6a7cc7087e7be17013e1bd63f22f51) )
+	ROM_IGNORE(0x10000)
+	ROM_LOAD32_BYTE( "mod_8-2_ned_ld_27c1001.ic33", 0x000000, 0x10000, CRC(79e991af) SHA1(45163d8692926512e47ddfea8c32848a74910e9d) )
+	ROM_IGNORE(0x10000)
 	// All ROMs 1xxxxxxxxxxxxxxxx = 0x00 (2nd half 0x00)
-	ROM_LOAD32_BYTE( "mod_8-2_hed_he_27c1001.ic9",  0x000003, 0x20000, CRC(9f90fa11) SHA1(f5ebebb8e9cab802193ebd61449ca922ed9db380) )
-	ROM_LOAD32_BYTE( "mod_8-2_ned_hf_27c1001.ic17", 0x000002, 0x20000, CRC(b3ae8c46) SHA1(f37bbd8ac5a3e0b3a3419ef9cf7bea5fe9600c77) )
-	ROM_LOAD32_BYTE( "mod_8-2_ned_hg_27c1001.ic25", 0x000001, 0x20000, CRC(d362172d) SHA1(f9b1e26a8b4b55e48e5b94ba9270e2e3bf82fec2) )
-	ROM_LOAD32_BYTE( "mod_8-2_ned_hh_27c1001.ic32", 0x000000, 0x20000, CRC(4a3e115c) SHA1(130094a6a4bb62f61a42e9e9cef12ae7215724f7) )
+	ROM_LOAD32_BYTE( "mod_8-2_hed_he_27c1001.ic9",  0x040003, 0x10000, CRC(9f90fa11) SHA1(f5ebebb8e9cab802193ebd61449ca922ed9db380) )
+	ROM_IGNORE(0x10000)
+	ROM_LOAD32_BYTE( "mod_8-2_ned_hf_27c1001.ic17", 0x040002, 0x10000, CRC(b3ae8c46) SHA1(f37bbd8ac5a3e0b3a3419ef9cf7bea5fe9600c77) )
+	ROM_IGNORE(0x10000)
+	ROM_LOAD32_BYTE( "mod_8-2_ned_hg_27c1001.ic25", 0x040001, 0x10000, CRC(d362172d) SHA1(f9b1e26a8b4b55e48e5b94ba9270e2e3bf82fec2) )
+	ROM_IGNORE(0x10000)
+	ROM_LOAD32_BYTE( "mod_8-2_ned_hh_27c1001.ic32", 0x040000, 0x10000, CRC(4a3e115c) SHA1(130094a6a4bb62f61a42e9e9cef12ae7215724f7) )
+	ROM_IGNORE(0x10000)
 
 	ROM_REGION( 0x80000, "sprites", ROMREGION_ERASEFF | ROMREGION_INVERT )
 	ROM_LOAD32_BYTE( "mod_5-1_mov_la_23-11_27c512.ic3",  0x000003, 0x010000, CRC(8a5f3713) SHA1(73a8ccebfe55daf17ab91cc57cdca866477ba09f) )
@@ -320,8 +561,7 @@ ROM_START( wrallymp )
 	ROM_LOAD( "mod_9-2_92fl_gal20v8as.ic18",    0x0000, 0x157, CRC(3a1465c2) SHA1(c98227c29301fdff7ab8144222ff0c257412dd78) )
 ROM_END
 
-
 } // anonymous namespace
 
 // World Rally was originally developed using the Modular System, so this isn't a bootleg, it's the original development version
-GAME( 1992, wrallymp, wrally, wrally_ms, wrally_ms, wrally_ms_state, init_wrally_ms, ROT0, "Gaelco", "World Rally (prototype on Modular System)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 23/11/1992
+GAME( 1992, wrallymp, wrally, wrally_ms, wrally_ms, wrally_ms_state, init_wrally_ms, ROT0, "Gaelco", "World Rally (prototype on Modular System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // 23/11/1992
