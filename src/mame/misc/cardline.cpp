@@ -327,7 +327,7 @@ void cardline_state::cardline(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(MASTER_CLOCK / 8, 760, 0, 511, 280, 0, 255);
+	screen.set_raw(MASTER_CLOCK, 760, 0, 511, 280, 0, 255);
 	//screen.set_screen_update(FUNC(cardline_state::screen_update_cardline));
 	//screen.set_palette(m_palette);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
