@@ -1,27 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria,Hiromitsu Shioya
+// copyright-holders:Nicola Salmoria, Hiromitsu Shioya
 /*********************************************************/
 /*    Konami PCM controller                              */
 /*********************************************************/
-
-/*
-  Changelog, Hiromitsu Shioya 02/05/2002
-    fixed start address decode timing. (sample loop bug.)
-
-  Changelog, Mish, August 1999:
-    Removed interface support for different memory regions per channel.
-    Removed interface support for differing channel volume.
-
-    Added bankswitching.
-    Added support for multiple chips.
-
-    (NB: Should different memory regions per channel be needed, the bankswitching function can set this up).
-
-  Changelog, Nicola, August 1999:
-    Added Support for the k007232_VOL() macro.
-    Added external port callback, and functions to set the volume of the channels
-*/
-
 
 #include "emu.h"
 #include "k007232.h"
@@ -69,7 +50,7 @@ void k007232_device::device_start()
 	}
 	space(0).cache(m_cache);
 
-	/* Set up the chips */
+	// set up the chips
 	for (int i = 0; i < 2; i++)
 	{
 		m_channel[i].addr = 0;
@@ -79,10 +60,10 @@ void k007232_device::device_start()
 		m_channel[i].play = 0;
 		m_channel[i].bank = 0;
 	}
-	m_channel[0].vol[0] = 255;  /* channel A output to output A */
+	m_channel[0].vol[0] = 255;  // channel A output to output A
 	m_channel[0].vol[1] = 0;
 	m_channel[1].vol[0] = 0;
-	m_channel[1].vol[1] = 255;  /* channel B output to output B */
+	m_channel[1].vol[1] = 255;  // channel B output to output B
 
 	for (auto & elem : m_wreg)
 		elem = 0;
@@ -242,7 +223,7 @@ void k007232_device::sound_stream_update(sound_stream &stream)
 			channel_t &channel = m_channel[i];
 			if (channel.play)
 			{
-				/**** PCM setup ****/
+				// PCM setup
 				int const vol_a = channel.vol[0] * 2;
 				int const vol_b = channel.vol[1] * 2;
 
@@ -254,12 +235,12 @@ void k007232_device::sound_stream_update(sound_stream &stream)
 						// end of sample
 						if (BIT(m_wreg[13], i))
 						{
-							/* loop to the beginning */
+							// loop to the beginning
 							addr = channel.start;
 						}
 						else
 						{
-							/* stop sample */
+							// stop sample
 							channel.play = false;
 							break;
 						}

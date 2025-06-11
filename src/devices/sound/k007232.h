@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria
+// copyright-holders:Nicola Salmoria, Hiromitsu Shioya
 /*********************************************************/
 /*    Konami PCM controller                              */
 /*********************************************************/
@@ -51,7 +51,7 @@ private:
 
 	struct channel_t
 	{
-		u8           vol[2]; /* volume for the left and right channel */
+		u8           vol[2]; // volume for the left and right channel
 		u32          addr;
 		int          counter;
 		u32          start;
@@ -65,7 +65,7 @@ private:
 	void start(int ch);
 
 	channel_t     m_channel[2]; // 2 channels
-	u8            m_wreg[0x10]; /* write data */
+	u8            m_wreg[0x10]; // write data
 	u32           m_pcmlimit;
 	u32           m_bank;
 
