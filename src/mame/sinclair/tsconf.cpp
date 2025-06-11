@@ -36,7 +36,7 @@ TODO:
 #include "emu.h"
 #include "tsconf.h"
 
-#include "bus/spectrum/zxbus.h"
+#include "bus/spectrum/zxbus/bus.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "speaker.h"

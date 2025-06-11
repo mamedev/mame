@@ -7,7 +7,7 @@
 *******************************************************************************************/
 
 #include "emu.h"
-#include "zxbus.h"
+#include "bus.h"
 
 DEFINE_DEVICE_TYPE(ZXBUS_SLOT, zxbus_slot_device, "zxbus_slot", "ZXBUS slot")
 
