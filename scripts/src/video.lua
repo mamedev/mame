@@ -57,6 +57,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/ariel.h,VIDEOS["ARIEL"] = true
+--------------------------------------------------
+
+if (VIDEOS["ARIEL"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/ariel.cpp",
+		MAME_DIR .. "src/devices/video/ariel.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/atirage.h,VIDEOS["ATIRAGE"] = true
 --------------------------------------------------
 

@@ -437,7 +437,7 @@ void hcastle_state::machine_reset()
 void hcastle_state::hcastle(machine_config &config)
 {
 	// basic machine hardware
-	KONAMI(config, m_maincpu, 12000000); // Derived from 24 MHz clock
+	KONAMI(config, m_maincpu, 24_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &hcastle_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(hcastle_state::irq0_line_hold));
 
@@ -448,10 +448,7 @@ void hcastle_state::hcastle(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(59); // frames per second verified by comparison with real board
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_raw(24_MHz_XTAL / 3, 512, 0, 256, 264, 16, 240); // not verified
 	screen.set_screen_update(FUNC(hcastle_state::screen_update));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(m_k007121[0], FUNC(k007121_device::sprites_buffer));

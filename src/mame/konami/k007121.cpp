@@ -120,9 +120,9 @@ control registers
      ---x---- unknown (contra, labyrunr)
 
 TODO:
-- As noted above, the maximum number of 8x8 sprite blocks is 264. MAME doesn't
-  emulate partial sprites at the end of the spritelist. Is's not expected any
-  game relies on this.
+- As noted above, the maximum number of 64-pixel sprite blocks is 264. MAME
+  doesn't emulate partial sprites at the end of the spritelist. Is's not
+  expected any game relies on this.
 
 BTANB:
 - Some games don't take the internal 1-frame sprite lag (due to framebuffer) into

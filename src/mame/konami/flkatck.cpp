@@ -425,10 +425,7 @@ void flkatck_state::flkatck(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(37*8, 32*8);
-	screen.set_visarea(0*8, 35*8-1, 2*8, 30*8-1);
+	screen.set_raw(24_MHz_XTAL / 3, 512, 0, 280, 264, 16, 240); // not verified
 	screen.set_screen_update(FUNC(flkatck_state::screen_update));
 	screen.set_palette("palette");
 	screen.screen_vblank().set(m_k007121, FUNC(k007121_device::sprites_buffer));

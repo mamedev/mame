@@ -79,7 +79,7 @@ private:
 	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_tile_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 	template <uint8_t Which> void volume_callback(uint8_t data);
 	void prg_map(address_map &map) ATTR_COLD;
 };
@@ -192,19 +192,22 @@ uint32_t fastlane_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_layer[0]->set_scrolly(0, m_k007121->ctrlram_r(2));
 
 	m_layer[0]->draw(screen, bitmap, finalclip0, 0, 0);
-	m_k007121->sprites_draw(bitmap, cliprect, 0, 40, 0, screen.priority(), (uint32_t)- 1);
+	m_k007121->sprites_draw(bitmap, cliprect, 0, 40, 0, screen.priority(), (uint32_t)-1);
 	m_layer[1]->draw(screen, bitmap, finalclip1, 0, 0);
 	return 0;
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(fastlane_state::scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(fastlane_state::interrupt)
 {
 	int scanline = param;
 
-	if (scanline == 240 && m_k007121->ctrlram_r(7) & 0x02) // vblank irq
+	// vblank irq
+	if (scanline == 240 && m_k007121->ctrlram_r(7) & 0x02)
 		m_maincpu->set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
-	else if (((scanline % 32) == 0) && m_k007121->ctrlram_r(7) & 0x01) // timer irq
+
+	// timer (8 times per frame)
+	if ((scanline & 0x1f) == 0x10 && m_k007121->ctrlram_r(7) & 0x01)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
@@ -357,16 +360,13 @@ void fastlane_state::fastlane(machine_config &config)
 	// basic machine hardware
 	HD6309E(config, m_maincpu, XTAL(24'000'000) / 8); // HD63C09EP, 3 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &fastlane_state::prg_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(fastlane_state::scanline), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(fastlane_state::interrupt), "screen", 0, 1);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(59.17); // measured
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(37*8, 32*8);
-	m_screen->set_visarea(0*8, 35*8-1, 2*8, 30*8-1);
+	m_screen->set_raw(24_MHz_XTAL / 3, 512, 0, 280, 264, 16, 240); // not verified
 	m_screen->set_screen_update(FUNC(fastlane_state::screen_update));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(m_k007121, FUNC(k007121_device::sprites_buffer));
