@@ -4929,6 +4929,20 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/spectrum/ay/slot.h,BUSES["AY_SLOT"] = true
+---------------------------------------------------
+
+if (BUSES["AY_SLOT"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/spectrum/ay/slot.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/ay/slot.h",
+		MAME_DIR .. "src/devices/bus/spectrum/ay/cards.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/ay/cards.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/spectrum/zxbus.h,BUSES["ZXBUS"] = true
 ---------------------------------------------------
 
