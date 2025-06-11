@@ -165,7 +165,6 @@ uint8_t servicet_state::port1_r()
 		}
 	}
 	
-	//LOG("Port1 read: out=%02X, in=%02X\n", m_port1, data);
 	return data;
 }
 
@@ -184,7 +183,6 @@ uint8_t servicet_state::port3_r()
 		data |= PORT_3_SDA;
 	else
 		data &= ~PORT_3_SDA;
-	//LOG("Port3 read: %02X \n", data);
 	return data;
 }
 
@@ -295,8 +293,7 @@ ROM_START( servicet )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "service_tastatur_v3.3.u3", 0x0000, 0x8000, CRC(8eb161c4) SHA1(d44f3b38e75e1095487893d8b30c4e3212c1a143) )
 
-	ROM_REGION(0x800, "eeprom", 0)
-	ROM_LOAD("24cs16.u15", 0x000, 0x800, NO_DUMP)
+	ROM_REGION(0x800, "eeprom", ROMREGION_ERASEFF)
 ROM_END
 
 } // anonymous namespace
