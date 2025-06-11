@@ -70,8 +70,6 @@ public:
 private:
 	required_device<v25_device> m_maincpu;
 
-	void st25(machine_config &config) ATTR_COLD;
-
 	void program_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
 	void data_map(address_map &map) ATTR_COLD;
@@ -80,7 +78,8 @@ private:
 
 void st25_state::program_map(address_map &map)
 {
-	map(0x00000, 0xfbfff).rom().region("maincpu", 0);
+	//map(0x00000, 0x3ffff).ram();
+	//map(0x40000, 0x7ffff).rom().region("maincpu", 0);
     map(0xfc000, 0xfffff).rom().region("maskrom", 0);
 }
 
@@ -91,7 +90,7 @@ void st25_state::io_map(address_map &map)
 
 void st25_state::data_map(address_map &map)
 {
-	map(0xe00, 0xeff).ram();
+	map(0x100, 0x1ff).ram();
 }
 
 
@@ -117,15 +116,8 @@ void st25_state::st25(machine_config &config)
 	m_maincpu->p1_out_cb().set([this] (uint8_t data) { logerror("%s: p1 out %02X\n", machine().describe_context(), data); });
 	m_maincpu->p2_out_cb().set([this] (uint8_t data) { logerror("%s: p2 out %02X\n", machine().describe_context(), data); });
 
-}
 
-void st25_state::st25(machine_config &config)
-{
-	// Basic machine hardware
-
-	st25(config);
-
-    M48T02(config, "m48t18", 0); // ST M48T18-150PC1
+	M48T02(config, "m48t18", 0); // ST M48T18-150PC1
 
 	// Sound hardware
 
@@ -134,10 +126,9 @@ void st25_state::st25(machine_config &config)
 	OKIM6376(config, "oki", 4_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.5); // Divider not verified
 }
 
-
 ROM_START(stakeoff)
 	ROM_REGION(0x4000, "maskrom", 0)
-	ROM_LOAD("d70322.icc2", 0x0000, 0x4000, NO_DUMP)
+	ROM_LOAD("d70322.icc2", 0x0000, 0x4000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
 	ROM_REGION(0x40000, "maincpu", 0)
 	ROM_LOAD("27c020a.ic2", 0x00000, 0x40000, CRC(b1553dc1) SHA1(d04d1e0d7cf553588d6abf2f5c95e0d8a761f8b6))

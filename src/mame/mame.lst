@@ -44102,6 +44102,9 @@ sols5e
 @source:skeleton/squale.cpp
 squale
 
+@source:skeleton/st25.cpp
+stakeoff
+
 @source:skeleton/sterz80.cpp
 tongzi
 
