@@ -175,6 +175,7 @@ void hd61602_device::data_w(u8 data)
 			}
 			break;
 		}
+		// case 3 is a 1-byte nop command, checked at the start of this function.
 	}
 
 	// Updates for modes other than 'static' are handled in refresh_timer_tick().
