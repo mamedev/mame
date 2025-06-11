@@ -396,19 +396,6 @@ ppcar
 ssfindo
 tetfight
 
-@source:acorn/z88.cpp
-z88
-z88ch
-z88de
-z88dk
-z88es
-z88fi
-z88fr
-z88it
-z88no
-z88se
-z88tr
-
 @source:act/apricot.cpp
 apricot
 apricotxi
@@ -42686,18 +42673,6 @@ pentagon
 @source:sinclair/pentevo.cpp
 pentevo
 
-@source:sinclair/ql.cpp
-ql
-ql_de
-ql_dk
-ql_es
-ql_fr
-ql_gr
-ql_it
-ql_se
-ql_us
-tonto
-
 @source:sinclair/scorpion.cpp
 bestzx
 kay1024
@@ -42760,15 +42735,24 @@ zvezda
 @source:sinclair/sprinter.cpp
 sprinter
 
-@source:sinclair/timex.cpp
+@source:sinclair/timex/ql.cpp
+ql
+ql_de
+ql_dk
+ql_es
+ql_fr
+ql_gr
+ql_it
+ql_se
+ql_us
+tonto
+
+@source:sinclair/timex/timex.cpp
 tc2048
 ts2068
 uk2086
 
-@source:sinclair/tsconf.cpp
-tsconf
-
-@source:sinclair/zx.cpp
+@source:sinclair/timex/zx.cpp
 lambda
 pc8300
 pow3000
@@ -42779,6 +42763,22 @@ ts1500
 zx80
 zx81
 zx97
+
+@source:sinclair/timex/z88.cpp
+z88
+z88ch
+z88de
+z88dk
+z88es
+z88fi
+z88fr
+z88it
+z88no
+z88se
+z88tr
+
+@source:sinclair/tsconf.cpp
+tsconf
 
 @source:sinclair/specnext.cpp
 tbblue

@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_SINCLAIR_ZX_H
-#define MAME_SINCLAIR_ZX_H
+#ifndef MAME_SINCLAIR_TIMEX_ZX_H
+#define MAME_SINCLAIR_TIMEX_ZX_H
 
 #pragma once
 
@@ -112,4 +112,4 @@ private:
 	void recalc_hsync();
 };
 
-#endif // MAME_SINCLAIR_ZX_H
+#endif // MAME_SINCLAIR_TIMEX_ZX_H

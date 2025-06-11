@@ -33,7 +33,7 @@
 #include "specpls3.h"
 #include "spec128.h"
 #include "spectrum.h"
-#include "timex.h"
+#include "timex/timex.h"
 
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"

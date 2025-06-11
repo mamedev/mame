@@ -6,8 +6,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_SINCLAIR_QIMI_H
-#define MAME_SINCLAIR_QIMI_H
+#ifndef MAME_SINCLAIR_TIMEX_QIMI_H
+#define MAME_SINCLAIR_TIMEX_QIMI_H
 
 #pragma once
 
@@ -62,4 +62,4 @@ private:
 DECLARE_DEVICE_TYPE(QIMI, qimi_device)
 
 
-#endif // MAME_SINCLAIR_QIMI_H
+#endif // MAME_SINCLAIR_TIMEX_QIMI_H

@@ -29,8 +29,8 @@
 
 **********************************************************************/
 
-#ifndef MAME_SINCLAIR_ZX8302_H
-#define MAME_SINCLAIR_ZX8302_H
+#ifndef MAME_SINCLAIR_TIMEX_ZX8302_H
+#define MAME_SINCLAIR_TIMEX_ZX8302_H
 
 #pragma once
 
@@ -207,4 +207,4 @@ DECLARE_DEVICE_TYPE(ZX8302, zx8302_device)
 
 
 
-#endif // MAME_SINCLAIR_ZX8302_H
+#endif // MAME_SINCLAIR_TIMEX_ZX8302_H
