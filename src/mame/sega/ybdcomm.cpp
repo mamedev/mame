@@ -48,12 +48,47 @@ public:
 	m_acceptor(m_ioctx),
 	m_sock_rx(m_ioctx),
 	m_sock_tx(m_ioctx),
-	m_timeout_tx(m_ioctx)
+	m_timeout_tx(m_ioctx),
+	m_state_rx(0U),
+	m_state_tx(0U)
 	{
 	}
 
-	void start(std::string localhost, std::string localport, std::string remotehost, std::string remoteport)
+	void start()
 	{
+
+		m_thread = std::thread(
+				[this] ()
+				{
+					LOG("YBDCOMM: network thread started\n");
+					try {
+						m_ioctx.run();
+					} catch (const std::exception& e) {
+						LOG("YBDCOMM: Exception in network thread: %s\n", e.what());
+					} catch (...) { // Catch any other unknown exceptions
+						LOG("YBDCOMM: Unknown exception in network thread\n");
+					}
+					LOG("YBDCOMM: network thread completed\n");
+				});
+	}
+
+	void reset(std::string localhost, std::string localport, std::string remotehost, std::string remoteport)
+	{
+		m_ioctx.post(
+				[this] ()
+				{
+					std::error_code err;
+					if (m_acceptor.is_open())
+						m_acceptor.close(err);
+					if (m_sock_rx.is_open())
+						m_sock_rx.close(err);
+					if (m_sock_tx.is_open())
+						m_sock_tx.close(err);
+					m_timeout_tx.cancel();
+					m_state_rx.store(0);
+					m_state_tx.store(0);
+				});
+
 		std::error_code err;
 		asio::ip::tcp::resolver resolver(m_ioctx);
 
@@ -80,129 +115,59 @@ public:
 
 	void stop()
 	{
-		std::error_code err;
-		if (m_acceptor.is_open())
-			m_acceptor.close(err);
-		if (m_sock_rx.is_open())
-			m_sock_rx.close(err);
-		if (m_sock_tx.is_open())
-			m_sock_tx.close(err);
-		m_timeout_tx.cancel();
-		m_state_tx = 0;
-		m_state_rx = 0;
+		m_ioctx.post(
+				[this] ()
+				{
+					std::error_code err;
+					if (m_acceptor.is_open())
+						m_acceptor.close(err);
+					if (m_sock_rx.is_open())
+						m_sock_rx.close(err);
+					if (m_sock_tx.is_open())
+						m_sock_tx.close(err);
+					m_timeout_tx.cancel();
+					m_state_rx.store(0);
+					m_state_tx.store(0);
+					m_ioctx.stop();
+				});
+		m_work_guard.reset();
+		if (m_thread.joinable()) {
+			m_thread.join();
+		}
 	}
 
 	void check_sockets()
 	{
-		// if async operation in progress, poll context
-		if ((m_state_rx > 0) || (m_state_tx > 0))
-			m_ioctx.poll();
-
 		// start acceptor if needed
-		if (m_localaddr && m_state_rx == 0)
+		if (m_localaddr && m_state_rx.load() == 0)
 		{
-			std::error_code err;
-			m_acceptor.open(m_localaddr->protocol(), err);
-			m_acceptor.set_option(asio::ip::tcp::acceptor::reuse_address(true));
-			if (!err)
-			{
-				m_acceptor.bind(*m_localaddr, err);
-				if (!err)
-				{
-					m_acceptor.listen(1, err);
-					if (!err)
+			m_ioctx.post(
+					[this] ()
 					{
-						osd_printf_verbose("YBDCOMM: RX listen on %s\n", *m_localaddr);
-						m_acceptor.async_accept(
-								[this] (std::error_code const &err, asio::ip::tcp::socket sock)
-								{
-									if (err)
-									{
-										LOG("YBDCOMM: RX error accepting - %d %s\n", err.value(), err.message());
-										std::error_code e;
-										m_acceptor.close(e);
-										m_state_rx = 0;
-									}
-									else
-									{
-										LOG("YBDCOMM: RX connection from %s\n", sock.remote_endpoint());
-										std::error_code e;
-										m_acceptor.close(e);
-										m_sock_rx = std::move(sock);
-										m_sock_rx.set_option(asio::socket_base::keep_alive(true));
-										m_state_rx = 2;
-										start_receive_rx();
-									}
-								});
-						m_state_rx = 1;
-					}
-				}
-			}
-			if (err)
-			{
-				LOG("YBDCOMM: RX failed - %d %s\n", err.value(), err.message());
-			}
+						start_accept();
+					});
 		}
 
 		// connect socket if needed
-		if (m_remoteaddr && m_state_tx == 0)
+		if (m_remoteaddr && m_state_tx.load() == 0)
 		{
-			std::error_code err;
-			if (m_sock_tx.is_open())
-				m_sock_tx.close(err);
-			m_sock_tx.open(m_remoteaddr->protocol(), err);
-			if (!err)
-			{
-				m_sock_tx.non_blocking(true);
-				m_sock_tx.set_option(asio::ip::tcp::no_delay(true));
-				m_sock_tx.set_option(asio::socket_base::keep_alive(true));
-				osd_printf_verbose("YBDCOMM: TX connecting to %s\n", *m_remoteaddr);
-				m_timeout_tx.expires_after(std::chrono::seconds(10));
-				m_timeout_tx.async_wait(
-						[this] (std::error_code const &err)
-						{
-							if (!err && m_state_tx == 1)
-							{
-								osd_printf_verbose("YBDCOMM: TX connect timed out\n");
-								std::error_code e;
-								m_sock_tx.close(e);
-								m_state_tx = 0;
-							}
-						});
-				m_sock_tx.async_connect(
-						*m_remoteaddr,
-						[this] (std::error_code const &err)
-						{
-							m_timeout_tx.cancel();
-							if (err)
-							{
-								osd_printf_verbose("YBDCOMM: TX connect error - %d %s\n", err.value(), err.message());
-								std::error_code e;
-								m_sock_tx.close(e);
-								m_state_tx = 0;
-							}
-							else
-							{
-								LOG("YBDCOMM: TX connection established\n");
-								m_state_tx = 2;
-							}
-						});
-				m_state_tx = 1;
-			}
+			m_ioctx.post(
+					[this] ()
+					{
+						start_connect();
+					});
 		}
 	}
 
 	bool connected()
 	{
-		return m_state_rx == 2 && m_state_tx == 2;
+		return m_state_rx.load() == 2 && m_state_tx.load() == 2;
 	}
 
 	unsigned receive(uint8_t *buffer, unsigned data_size)
 	{
-		if (m_state_rx < 2)
+		if (m_state_rx.load() < 2)
 			return UINT_MAX;
-
-		m_ioctx.poll();
 
 		if (data_size > m_fifo_rx.used())
 			return 0;
@@ -212,7 +177,7 @@ public:
 
 	unsigned send(uint8_t *buffer, unsigned data_size)
 	{
-		if (m_state_tx < 2)
+		if (m_state_tx.load() < 2)
 			return UINT_MAX;
 
 		if (data_size > m_fifo_tx.free())
@@ -224,7 +189,11 @@ public:
 		bool const sending = m_fifo_tx.used();
 		m_fifo_tx.write(&buffer[0], data_size);
 		if (!sending)
-			start_send_tx();
+			m_ioctx.post(
+					[this] ()
+					{
+						start_send_tx();
+					});
 		return data_size;
 	}
 
@@ -234,12 +203,13 @@ private:
 	public:
 		unsigned write(uint8_t *buffer, unsigned data_size)
 		{
+			std::lock_guard<std::mutex> lock(m_mutex);
 			unsigned used = 0;
 			if (m_wp >= m_rp)
 			{
-				used = std::min<unsigned>(size() - m_wp, data_size);
+				used = std::min<unsigned>(m_buffer.size() - m_wp, data_size);
 				std::copy_n(&buffer[0], used, &m_buffer[m_wp]);
-				m_wp = (m_wp + used) % size();
+				m_wp = (m_wp + used) % m_buffer.size();
 			}
 			unsigned const block = std::min<unsigned>(data_size - used, m_rp - m_wp);
 			if (block)
@@ -254,13 +224,14 @@ private:
 
 		unsigned read(uint8_t *buffer, unsigned data_size, bool peek)
 		{
+			std::lock_guard<std::mutex> lock(m_mutex);
 			unsigned rp = m_rp;
 			unsigned used = 0;
 			if (rp >= m_wp)
 			{
-				used = std::min<std::size_t>(size() - rp, data_size);
+				used = std::min<std::size_t>(m_buffer.size() - rp, data_size);
 				std::copy_n(&m_buffer[rp], used, &buffer[0]);
-				rp = (rp + used) % size();
+				rp = (rp + used) % m_buffer.size();
 			}
 			unsigned const block = std::min<unsigned>(data_size - used, m_wp - rp);
 			if (block)
@@ -270,33 +241,35 @@ private:
 				rp += block;
 			}
 			if (!peek)
-				consume(used);
+			{
+				m_rp = (m_rp + used) % m_buffer.size();
+				m_used -= used;
+			}
 			return used;
 		}
 
 		void consume(unsigned data_size)
 		{
-			m_rp = (m_rp + data_size) % size();
+			std::lock_guard<std::mutex> lock(m_mutex);
+			m_rp = (m_rp + data_size) % m_buffer.size();
 			m_used -= data_size;
-		}
-
-		unsigned size()
-		{
-			return m_buffer.size();
 		}
 
 		unsigned used()
 		{
+			std::lock_guard<std::mutex> lock(m_mutex);
 			return m_used;
 		}
 
 		unsigned free()
 		{
-			return size() - used();
+			std::lock_guard<std::mutex> lock(m_mutex);
+			return m_buffer.size() - m_used;
 		}
 
 		void clear()
 		{
+			std::lock_guard<std::mutex> lock(m_mutex);
 			m_wp = m_rp = m_used = 0;
 		}
 
@@ -306,7 +279,98 @@ private:
 		unsigned m_rp = 0;
 		unsigned m_used = 0;
 		std::array<uint8_t, 0x80000> m_buffer;
+		std::mutex m_mutex;
 	};
+
+	void start_accept()
+	{
+		std::error_code err;
+		m_acceptor.open(m_localaddr->protocol(), err);
+		m_acceptor.set_option(asio::ip::tcp::acceptor::reuse_address(true));
+		if (!err)
+		{
+			m_acceptor.bind(*m_localaddr, err);
+			if (!err)
+			{
+				m_acceptor.listen(1, err);
+				if (!err)
+				{
+					osd_printf_verbose("YBDCOMM: RX listen on %s\n", *m_localaddr);
+					m_acceptor.async_accept(
+							[this] (std::error_code const &err, asio::ip::tcp::socket sock)
+							{
+								if (err)
+								{
+									LOG("YBDCOMM: RX error accepting - %d %s\n", err.value(), err.message());
+									std::error_code e;
+									m_acceptor.close(e);
+									m_state_rx.store(0);
+								}
+								else
+								{
+									LOG("YBDCOMM: RX connection from %s\n", sock.remote_endpoint());
+									std::error_code e;
+									m_acceptor.close(e);
+									m_sock_rx = std::move(sock);
+									m_sock_rx.set_option(asio::socket_base::keep_alive(true));
+									m_state_rx.store(2);
+									start_receive_rx();
+								}
+							});
+					m_state_rx.store(1);
+				}
+			}
+		}
+		if (err)
+		{
+			LOG("YBDCOMM: RX failed - %d %s\n", err.value(), err.message());
+		}
+	}
+
+	void start_connect()
+	{
+		std::error_code err;
+		if (m_sock_tx.is_open())
+			m_sock_tx.close(err);
+		m_sock_tx.open(m_remoteaddr->protocol(), err);
+		if (!err)
+		{
+			m_sock_tx.set_option(asio::ip::tcp::no_delay(true));
+			m_sock_tx.set_option(asio::socket_base::keep_alive(true));
+			osd_printf_verbose("YBDCOMM: TX connecting to %s\n", *m_remoteaddr);
+			m_timeout_tx.expires_after(std::chrono::seconds(10));
+			m_timeout_tx.async_wait(
+					[this] (std::error_code const &err)
+					{
+						if (!err && m_state_tx.load() == 1)
+						{
+							osd_printf_verbose("YBDCOMM: TX connect timed out\n");
+							std::error_code e;
+							m_sock_tx.close(e);
+							m_state_tx.store(0);
+						}
+					});
+			m_sock_tx.async_connect(
+					*m_remoteaddr,
+					[this] (std::error_code const &err)
+					{
+						m_timeout_tx.cancel();
+						if (err)
+						{
+							osd_printf_verbose("YBDCOMM: TX connect error - %d %s\n", err.value(), err.message());
+							std::error_code e;
+							m_sock_tx.close(e);
+							m_state_tx.store(0);
+						}
+						else
+						{
+							LOG("YBDCOMM: TX connection established\n");
+							m_state_tx.store(2);
+						}
+					});
+			m_state_tx.store(1);
+		}
+	}
 
 	void start_send_tx()
 	{
@@ -320,7 +384,7 @@ private:
 					{
 						LOG("YBDCOMM: TX connection error: %s\n", err.message().c_str());
 						m_sock_tx.close();
-						m_state_tx = 0;
+						m_state_tx.store(0);
 						m_fifo_tx.clear();
 					}
 					else if (m_fifo_tx.used())
@@ -343,7 +407,7 @@ private:
 						else
 							LOG("YBDCOMM: RX connection lost\n");
 						m_sock_rx.close();
-						m_state_rx = 0;
+						m_state_rx.store(0);
 						m_fifo_rx.clear();
 					}
 					else
@@ -352,7 +416,7 @@ private:
 						{
 							LOG("YBDCOMM: RX buffer overflow\n");
 							m_sock_rx.close();
-							m_state_rx = 0;
+							m_state_rx.store(0);
 							m_fifo_rx.clear();
 						}
 						start_receive_rx();
@@ -369,20 +433,21 @@ private:
 				util::string_format(std::forward<Format>(fmt), std::forward<Params>(args)...));
 	}
 
+	std::thread m_thread;
 	asio::io_context m_ioctx;
+	asio::executor_work_guard<asio::io_context::executor_type> m_work_guard{m_ioctx.get_executor()};
 	std::optional<asio::ip::tcp::endpoint> m_localaddr;
 	std::optional<asio::ip::tcp::endpoint> m_remoteaddr;
 	asio::ip::tcp::acceptor m_acceptor;
 	asio::ip::tcp::socket m_sock_rx;
 	asio::ip::tcp::socket m_sock_tx;
 	asio::steady_timer m_timeout_tx;
-	uint8_t m_state_rx;
-	uint8_t m_state_tx;
+	std::atomic_uint m_state_rx;
+	std::atomic_uint m_state_tx;
 	fifo m_fifo_rx;
 	fifo m_fifo_tx;
-	std::array<uint8_t, 0x200> m_buffer_rx;
-	std::array<uint8_t, 0x200> m_buffer_tx;
-	
+	std::array<uint8_t, 0x400> m_buffer_rx;
+	std::array<uint8_t, 0x400> m_buffer_tx;
 };
 #endif
 
@@ -509,6 +574,7 @@ void sega_ybdcomm_device::device_start()
 
 	auto ctx = std::make_unique<context>();
 	m_context = std::move(ctx);
+	m_context->start();
 
 	save_item(NAME(m_linkenable));
 	save_item(NAME(m_linktimer));
@@ -529,10 +595,9 @@ void sega_ybdcomm_device::device_reset()
 
 #ifdef YBDCOMM_SIMULATION
 	std::fill(std::begin(m_buffer), std::end(m_buffer), 0);
-	m_context->stop();
 
 	auto const &opts = mconfig().options();
-	m_context->start(opts.comm_localhost(), opts.comm_localport(), opts.comm_remotehost(), opts.comm_remoteport());
+	m_context->reset(opts.comm_localhost(), opts.comm_localport(), opts.comm_remotehost(), opts.comm_remoteport());
 
 	m_linkenable = 0;
 	m_linktimer = 0;
