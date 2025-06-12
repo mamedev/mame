@@ -60,8 +60,11 @@ ROM_END
 void nubus_enetlctp_device::device_add_mconfig(machine_config &config)
 {
 	DP83932C(config, m_sonic, 20_MHz_XTAL);
-	m_fulltag = string_format(":%s", ((nubus_slot_device *)owner())->get_nubus_bustag());
-	m_sonic->set_bus(m_fulltag.c_str(), AS_DATA);
+	if (((nubus_slot_device *)owner())->get_nubus_bustag() != nullptr)
+	{
+		m_fulltag = string_format(":%s", ((nubus_slot_device *)owner())->get_nubus_bustag());
+		m_sonic->set_bus(m_fulltag.c_str(), AS_DATA);
+	}
 	m_sonic->out_int_cb().set(FUNC(nubus_enetlctp_device::slot_irq_w));
 }
 

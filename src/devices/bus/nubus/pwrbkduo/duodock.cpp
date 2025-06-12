@@ -263,8 +263,11 @@ void duodock_device::device_add_mconfig(machine_config &config)
 	applefdintf_device::add_35_nc(config, m_floppy[1]);
 
 	nubus_device &nubus(NUBUS(config, "nubus", 0));
-	m_fulltag = string_format(":%s", ((nubus_slot_device *)owner())->get_nubus_bustag());
-	nubus.set_space(m_fulltag.c_str(), AS_DATA);
+	if (((nubus_slot_device *)owner())->get_nubus_bustag() != nullptr)
+	{
+		m_fulltag = string_format(":%s", ((nubus_slot_device *)owner())->get_nubus_bustag());
+		nubus.set_space(m_fulltag.c_str(), AS_DATA);
+	}
 	// tell NuBus to leave the slot $E space alone
 	nubus.set_bus_mode(nubus_device::nubus_mode_t::SE30);
 	nubus.out_irqc_callback().set(m_pvia, FUNC(pseudovia_device::slot_irq_w<0x08>));
