@@ -359,6 +359,15 @@ ROM_START(arcade10)
 	ROM_LOAD("25q40.bin", 0x000000, 0x080000, CRC(62784666) SHA1(ba1a4abed0a41b2fb3868543306243e68ea6b2e1))
 ROM_END
 
+ROM_START(retro150)
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF)
+	// might not be correct for this set, as it doesn't boot
+	ROM_LOAD("st2x_internal.bin", 0x002000, 0x002000, BAD_DUMP CRC(f4dc1fc2) SHA1(bbc11539c48eb612ebae50da45e03b6fde440941)) // internal OTPROM BIOS, dumped from dgun2953 PCB, 6000-7fff range
+
+	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
+	ROM_LOAD("p25d32sh.u2", 0x000000, 0x400000, CRC(294290aa) SHA1(078892b2bb10e347ed07273bafed486e0f52c909) )
+ROM_END
+
 ROM_START(supreme)
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("st2x_internal.bin", 0x002000, 0x002000, BAD_DUMP CRC(f4dc1fc2) SHA1(bbc11539c48eb612ebae50da45e03b6fde440941)) // internal OTPROM BIOS, dumped from dgun2953 PCB, 6000-7fff range
@@ -412,4 +421,6 @@ CONS( 201?, supreme,       0,       0,      bbl380,   bbl380, bbl380_state, empt
 CONS( 2019, pg118,         0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Pocket Game / Game Computer", "Pocket Game 118-in-1 / Game Computer 118-in-1", MACHINE_NOT_WORKING )
 // also has the 0xE4 XOR, also doesn't currently boot
 CONS( 2021, toumapet,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Shenzhen Shiji New Technology", "Tou ma Pet", MACHINE_NOT_WORKING )
+// for the UK market, but does't boot either
+CONS( 201?, retro150,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Red5", "Retro Arcade Game Controller (150-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
