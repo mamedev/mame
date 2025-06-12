@@ -768,6 +768,7 @@ public:
 		m_i2cmem(*this, "i2cmem")
 	{ }
 
+	void superxavix_i2c_24c64(machine_config &config);
 	void superxavix_i2c_24c16(machine_config &config);
 	void superxavix_i2c_24c08(machine_config &config);
 	void superxavix_i2c_24c04(machine_config &config);

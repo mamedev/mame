@@ -559,6 +559,14 @@ void superxavix_doradraw_state::superxavix_doradraw(machine_config& config)
 	xavix2002(config);
 }
 
+void superxavix_i2c_state::superxavix_i2c_24c64(machine_config &config)
+{
+	xavix2002(config);
+
+	I2C_24C64(config, "i2cmem", 0);
+}
+
+
 void superxavix_i2c_state::superxavix_i2c_24c16(machine_config &config)
 {
 	xavix2002(config);
@@ -678,6 +686,16 @@ ROM_START( xavmusic )
 	ROM_LOAD( "u3", 0x0000000, 0x0800000, CRC(977c956f) SHA1(debc086d0cf6c391002ad163e7bfaa2f010cc8f5) )
 ROM_END
 
+ROM_START( xavpkjr )
+	ROM_REGION( 0x0800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "tc58fvm6b5b.u2", 0x0000000, 0x0800000, CRC(82a32ede) SHA1(a555662b05925126ebc94ae6e4e13c1cfc3c86e0) )
+
+	ROM_REGION( 0x0800000, "extra", ROMREGION_ERASE00 )
+	ROM_LOAD( "tc58fvm6b5b.u3", 0x0000000, 0x0800000, CRC(75facaf0) SHA1(4302181a0d3ffc5cf1f4f64b2ca8b10c05e9a59d) )
+
+	ROM_REGION( 0x2000, "i2cmem", ROMREGION_ERASE00 )
+	ROM_LOAD( "s-24cs64a.u1", 0x0000, 0x2000, CRC(3a7637f7) SHA1(df5b5903900ae8488a44e3449dd2757d1dc35bc2) )
+ROM_END
 
 // Domyos DiS (XaviX 2002 based titles)
 ROM_START( domfitex )
@@ -903,9 +921,10 @@ CONS( 2004, xavbox,   0,       0, superxavix_i2c_jmat,  xavix,      superxavix_i
 CONS( 2004, xavbassf, 0,       0, superxavix_i2c_24c08, xavix_i2c,  superxavix_i2c_state,      init_xavix, "SSD Company LTD",         "XaviX Bass Fishing (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // TODO: check SEEPROM type and hookup, banking!
-CONS( 2005, xavjmat,  0, 0, superxavix_i2c_jmat,  xavix,      superxavix_i2c_jmat_state, init_xavix, "SSD Company LTD",         "Jackie Chan J-Mat Fitness (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 2005, xavaero,  0, 0, superxavix_i2c_jmat,  xavix,      superxavix_i2c_jmat_state, init_xavix, "SSD Company LTD",         "XaviX Aerostep (XaviXPORT, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, xavjmat,  0, 0, superxavix_i2c_jmat,  xavix,      superxavix_i2c_jmat_state, init_xavix,    "SSD Company LTD",         "Jackie Chan J-Mat Fitness (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, xavaero,  0, 0, superxavix_i2c_jmat,  xavix,      superxavix_i2c_jmat_state, init_xavix,    "SSD Company LTD",         "XaviX Aerostep (XaviXPORT, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 2007, xavmusic, 0, 0, superxavix_i2c_jmat,  xavix,      superxavix_i2c_jmat_state, init_xavmusic, "SSD Company LTD",         "XaviX Music & Circuit (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2007, xavpkjr,  0, 0, superxavix_i2c_24c64, xavix,      superxavix_i2c_state,      init_xavix,    "SSD Company LTD",         "PowerKIDS Jr. (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // https://arnaudmeyer.wordpress.com/domyos-interactive-system/
 // Domyos Fitness Adventure
