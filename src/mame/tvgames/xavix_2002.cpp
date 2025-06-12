@@ -733,7 +733,7 @@ ROM_START( domfitch )
 	ROM_REGION( 0x0800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "u2", 0x0000000, 0x0800000, CRC(0ff2a7a6) SHA1(9b924cc4330e3f8d9204390854048fe2325bfdf7) )
 
-	ROM_REGION( 0x0800000, "extra_u3", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0800000, "extra", ROMREGION_ERASE00 )
 	ROM_LOAD( "u3", 0x0000000, 0x0800000, CRC(284583f6) SHA1(bd2d5304f1e01eed656b5de957ec0a0330a3d969) )
 ROM_END
 
@@ -741,7 +741,7 @@ ROM_START( domdance )
 	ROM_REGION( 0x0800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "u2", 0x0000000, 0x0800000, CRC(74f9499d) SHA1(a64235075e32567cd6d2ab7b1284efcb8e7538e2) )
 
-	ROM_REGION( 0x0800000, "extra_u3", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0800000, "extra", ROMREGION_ERASE00 )
 	ROM_LOAD( "u3", 0x0000000, 0x0800000, CRC(e437565c) SHA1(f6db219ea14404b698ca453f6e50c726b2e77abb) )
 ROM_END
 
@@ -749,7 +749,7 @@ ROM_START( domstepc )
 	ROM_REGION( 0x0800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "u2", 0x0000000, 0x0800000, CRC(cb37b5e9) SHA1(b742e3db98f36720adf5af9096c6bc235279de12) )
 
-	ROM_REGION( 0x0800000, "extra_u3", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0800000, "extra", ROMREGION_ERASE00 )
 	ROM_LOAD( "u3", 0x0000000, 0x0800000, CRC(dadaa744) SHA1(fd7ca77232a8fe228fc93b0a8a47ba3260349d90) )
 ROM_END
 
@@ -964,10 +964,10 @@ CONS( 2007, xavpkjr,  0, 0, superxavix_i2c_jmat_24c64, xavix, superxavix_i2c_jma
 // Domyos Bike Concept (not listed on site above)
 
 // Has SEEPROM and an RTC.  Exercise has some leftover PC buffer stuff.  (TODO, check SEEPROM type, RTC type, banking) (both Exercises and Challenge are identical PCBs)
-CONS( 2008, domfitex, 0, 0, superxavix_i2c_jmat, xavixp, superxavix_i2c_jmat_state, init_xavix, "Decathlon / SSD Company LTD", "Domyos Fitness Exercises (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 2008, domfitch, 0, 0, superxavix_i2c_jmat, xavixp, superxavix_i2c_jmat_state, init_xavix, "Decathlon / SSD Company LTD", "Domyos Fitness Challenge (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 2007, domdance, 0, 0, superxavix_i2c_jmat, xavixp, superxavix_i2c_jmat_state, init_xavix, "Decathlon / SSD Company LTD", "Domyos Fitness Dance (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 2007, domstepc, 0, 0, superxavix_i2c_jmat, xavixp, superxavix_i2c_jmat_state, init_xavix, "Decathlon / SSD Company LTD", "Domyos Step Concept (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2008, domfitex, 0, 0, superxavix_i2c_jmat_24c64, xavixp, superxavix_i2c_jmat_state, init_xavmusic, "Decathlon / SSD Company LTD", "Domyos Fitness Exercises (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2008, domfitch, 0, 0, superxavix_i2c_jmat_24c64, xavixp, superxavix_i2c_jmat_state, init_xavmusic, "Decathlon / SSD Company LTD", "Domyos Fitness Challenge (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2007, domdance, 0, 0, superxavix_i2c_jmat_24c64, xavixp, superxavix_i2c_jmat_state, init_xavmusic, "Decathlon / SSD Company LTD", "Domyos Fitness Dance (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2007, domstepc, 0, 0, superxavix_i2c_jmat_24c64, xavixp, superxavix_i2c_jmat_state, init_xavmusic, "Decathlon / SSD Company LTD", "Domyos Step Concept (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // some DIS games run on XaviX 2 instead, see xavix2.cpp for Domyos Fitness Adventure and Domyos Bike Concept
 
