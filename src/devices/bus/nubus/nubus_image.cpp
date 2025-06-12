@@ -273,8 +273,7 @@ void nubus_image_device::file_cmd_w(u32 data)
 	filectx.curcmd = data;
 	switch (data) {
 	case kFileCmdGetDir:
-		std::fill(std::begin(filectx.filename), std::end(filectx.filename), '\0');
-		strncpy(filectx.filename, filectx.curdir.c_str(), std::size(filectx.filename) - 1);
+		strncpy(filectx.filename, filectx.curdir.c_str(), std::size(filectx.filename));
 		break;
 	case kFileCmdSetDir:
 		if ((filectx.filename[0] == '/') || (filectx.filename[0] == '$')) {
@@ -288,11 +287,16 @@ void nubus_image_device::file_cmd_w(u32 data)
 		filectx.dirp = osd::directory::open(filectx.curdir);
 		[[fallthrough]];
 	case kFileCmdGetNextListing:
-		std::fill(std::begin(filectx.filename), std::end(filectx.filename), '\0');
 		if (filectx.dirp) {
 			osd::directory::entry const *const dp = filectx.dirp->read();
-			if (dp)
-				strncpy(filectx.filename, dp->name, std::size(filectx.filename) - 1);
+			if (dp) {
+				strncpy(filectx.filename, dp->name, std::size(filectx.filename));
+			} else {
+				std::fill(std::begin(filectx.filename), std::end(filectx.filename), '\0');
+			}
+		}
+		else {
+			std::fill(std::begin(filectx.filename), std::end(filectx.filename), '\0');
 		}
 		break;
 	case kFileCmdGetFile:
