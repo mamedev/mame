@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_BUS_PWRBKDUO_CARDS_H
-#define MAME_BUS_PWRBKDUO_CARDS_H
+#ifndef MAME_BUS_NUBUS_PWRBKDUO_CARDS_H
+#define MAME_BUS_NUBUS_PWRBKDUO_CARDS_H
 
 #pragma once
 
