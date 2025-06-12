@@ -75,18 +75,24 @@ private:
 	int32_t m_old_pf[2]{};
 	uint8_t m_gfx_bank = 0;
 
+	void palette(palette_device &palette) const;
+
+	TILEMAP_MAPPER_MEMBER(tilemap_scan);
+	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_tile_info);
+
+	template <uint8_t Which> void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	template <uint8_t Which> void pf_video_w(offs_t offset, uint8_t data);
+	void gfxbank_w(uint8_t data) { m_gfx_bank = data; }
+	uint8_t gfxbank_r() { return m_gfx_bank; }
 	void bankswitch_w(uint8_t data);
 	void soundirq_w(uint8_t data);
-	void gfxbank_w(uint8_t data);
-	uint8_t gfxbank_r();
+
+	template <uint8_t Which> void flipscreen_w(int state) { m_tilemap[Which]->set_flip(state ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0); }
+	template <uint8_t Which> void dirtytiles() { m_tilemap[Which]->mark_all_dirty(); }
+
 	void sound_bank_w(uint8_t data);
-	template <uint8_t Which> void pf_video_w(offs_t offset, uint8_t data);
-	template <uint8_t Which> void pf_control_w(offs_t offset, uint8_t data);
-	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_tile_info);
-	TILEMAP_MAPPER_MEMBER(tilemap_scan);
-	void palette(palette_device &palette) const;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	template <uint8_t Which> void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap);
 	void volume_callback(uint8_t data);
 
 	void main_map(address_map &map) ATTR_COLD;
@@ -129,7 +135,7 @@ void hcastle_state::palette(palette_device &palette) const
 TILEMAP_MAPPER_MEMBER(hcastle_state::tilemap_scan)
 {
 	// logical (col,row) -> memory offset
-	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 6);    // skip 0x400
+	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 6); // skip 0x400
 }
 
 template <uint8_t Which> // 0 = FG, 1 = BG
@@ -180,38 +186,9 @@ void hcastle_state::video_start()
 
 /***************************************************************************
 
-    Memory handlers
+    Video update
 
 ***************************************************************************/
-
-template <uint8_t Which> // 0 = FG, 1 = BG
-void hcastle_state::pf_video_w(offs_t offset, uint8_t data)
-{
-	m_pf_videoram[Which][offset] = data;
-	m_tilemap[Which]->mark_tile_dirty(offset & 0xbff);
-}
-
-void hcastle_state::gfxbank_w(uint8_t data)
-{
-	m_gfx_bank = data;
-}
-
-uint8_t hcastle_state::gfxbank_r()
-{
-	return m_gfx_bank;
-}
-
-template <uint8_t Which> // 0 = FG, 1 = BG
-void hcastle_state::pf_control_w(offs_t offset, uint8_t data)
-{
-	if (offset == 7)
-	{
-		m_tilemap[Which]->set_flip((data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-	}
-	m_k007121[Which]->ctrl_w(offset, data);
-}
-
-/*****************************************************************************/
 
 template <uint8_t Which> // 0 = FG, 1 = BG
 void hcastle_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap)
@@ -221,8 +198,6 @@ void hcastle_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 	m_k007121[Which]->sprites_draw(bitmap, cliprect, base_color, 0, bank_base, priority_bitmap, (uint32_t)-1);
 }
-
-/*****************************************************************************/
 
 uint32_t hcastle_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -273,9 +248,24 @@ uint32_t hcastle_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 		draw_sprites<0>(bitmap, cliprect, screen.priority());
 		draw_sprites<1>(bitmap, cliprect, screen.priority());
 	}
+
 	return 0;
 }
 
+
+
+/***************************************************************************
+
+    Memory handlers
+
+***************************************************************************/
+
+template <uint8_t Which> // 0 = FG, 1 = BG
+void hcastle_state::pf_video_w(offs_t offset, uint8_t data)
+{
+	m_pf_videoram[Which][offset] = data;
+	m_tilemap[Which]->mark_tile_dirty(offset & 0xbff);
+}
 
 void hcastle_state::bankswitch_w(uint8_t data)
 {
@@ -297,9 +287,9 @@ void hcastle_state::soundirq_w(uint8_t data)
 
 void hcastle_state::main_map(address_map &map)
 {
-	map(0x0000, 0x0007).w(FUNC(hcastle_state::pf_control_w<0>));
+	map(0x0000, 0x0007).w(m_k007121[0], FUNC(k007121_device::ctrl_w));
 	map(0x0020, 0x003f).ram(); // rowscroll?
-	map(0x0200, 0x0207).w(FUNC(hcastle_state::pf_control_w<1>));
+	map(0x0200, 0x0207).w(m_k007121[1], FUNC(k007121_device::ctrl_w));
 	map(0x0220, 0x023f).ram(); // rowscroll?
 	map(0x0400, 0x0400).w(FUNC(hcastle_state::bankswitch_w));
 	map(0x0404, 0x0404).w("soundlatch", FUNC(generic_latch_8_device::write));
@@ -457,7 +447,12 @@ void hcastle_state::hcastle(machine_config &config)
 	PALETTE(config, m_palette, FUNC(hcastle_state::palette)).set_format(palette_device::xBGR_555, 2*8*16*16, 128);
 
 	K007121(config, m_k007121[0], 0, m_palette, gfx_hcastle_1);
+	m_k007121[0]->set_flipscreen_cb().set(FUNC(hcastle_state::flipscreen_w<0>));
+	m_k007121[0]->set_dirtytiles_cb(FUNC(hcastle_state::dirtytiles<0>));
+
 	K007121(config, m_k007121[1], 0, m_palette, gfx_hcastle_2);
+	m_k007121[1]->set_flipscreen_cb().set(FUNC(hcastle_state::flipscreen_w<1>));
+	m_k007121[1]->set_dirtytiles_cb(FUNC(hcastle_state::dirtytiles<1>));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

@@ -138,7 +138,6 @@ Notes:
 
 ***************************************************************************/
 
-
 #include "emu.h"
 
 #include "konamipt.h"
@@ -200,19 +199,23 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
+	void palette(palette_device &palette) const;
+	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_tile_info);
+	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+
+	template <uint8_t Which> void vram_w(offs_t offset, uint8_t data);
+	template <uint8_t Which> void cram_w(offs_t offset, uint8_t data);
+	template <uint8_t Which> void flipscreen_w(int state);
+	template <uint8_t Which> void dirtytiles();
+
+	template <uint8_t Which> void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	INTERRUPT_GEN_MEMBER(interrupt);
 	void bankswitch_w(uint8_t data);
 	void sh_irqtrigger_w(uint8_t data);
 	void sirq_clear_w(uint8_t data);
 	void coin_counter_w(uint8_t data);
-	template <uint8_t Which> void vram_w(offs_t offset, uint8_t data);
-	template <uint8_t Which> void cram_w(offs_t offset, uint8_t data);
-	template <uint8_t Which> void K007121_ctrl_w(offs_t offset, uint8_t data);
-	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_tile_info);
-	TILE_GET_INFO_MEMBER(get_tx_tile_info);
-	void palette(palette_device &palette) const;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(interrupt);
-	template <uint8_t Which> void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap);
 
 	void main_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
@@ -363,20 +366,17 @@ void contra_state::cram_w(offs_t offset, uint8_t data)
 }
 
 template <uint8_t Which>
-void contra_state::K007121_ctrl_w(offs_t offset, uint8_t data)
+void contra_state::flipscreen_w(int state)
 {
-	uint8_t prev = m_k007121[Which]->ctrlram_r(offset);
+	m_tilemap[Which]->set_flip(state ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+}
 
-	if (offset == 6)
-	{
-		if (prev != data)
-			m_tilemap[Which]->mark_all_dirty();
-	}
-
-	if (offset == 7)
-		m_tilemap[Which]->set_flip((data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-
-	m_k007121[Which]->ctrl_w(offset, data);
+template <uint8_t Which>
+void contra_state::dirtytiles()
+{
+	m_tilemap[Which]->mark_all_dirty();
+	if (Which == 0)
+		m_tilemap[2]->mark_all_dirty();
 }
 
 
@@ -418,6 +418,7 @@ uint32_t contra_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	draw_sprites<0>(bitmap, cliprect, screen.priority());
 	draw_sprites<1>(bitmap, cliprect, screen.priority());
 	m_tilemap[2]->draw(screen, bitmap, tx_finalclip, 0 ,0);
+
 	return 0;
 }
 
@@ -451,7 +452,7 @@ void contra_state::coin_counter_w(uint8_t data)
 
 void contra_state::main_map(address_map &map)
 {
-	map(0x0000, 0x0007).w(FUNC(contra_state::K007121_ctrl_w<0>));
+	map(0x0000, 0x0007).w(m_k007121[0], FUNC(k007121_device::ctrl_w));
 	map(0x0008, 0x000f).rw("k007452", FUNC(k007452_device::read), FUNC(k007452_device::write));
 	map(0x0010, 0x0010).portr("SYSTEM");
 	map(0x0011, 0x0011).portr("P1");
@@ -464,8 +465,8 @@ void contra_state::main_map(address_map &map)
 	map(0x0018, 0x0018).w(FUNC(contra_state::coin_counter_w));
 	map(0x001a, 0x001a).w(FUNC(contra_state::sh_irqtrigger_w));
 	map(0x001c, 0x001c).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x001e, 0x001e).nopw();    // ?
-	map(0x0060, 0x0067).w(FUNC(contra_state::K007121_ctrl_w<1>));
+	map(0x001e, 0x001e).nopw(); // ?
+	map(0x0060, 0x0067).w(m_k007121[1], FUNC(k007121_device::ctrl_w));
 
 	map(0x0c00, 0x0cff).ram().w(m_palette, FUNC(palette_device::write_indirect)).share("palette");
 
@@ -613,14 +614,22 @@ void contra_state::contra(machine_config &config)
 	m_palette->set_endianness(ENDIANNESS_LITTLE);
 
 	K007121(config, m_k007121[0], 0, m_palette, gfx_contra_1);
+	m_k007121[0]->set_flipscreen_cb().set(FUNC(contra_state::flipscreen_w<0>));
+	m_k007121[0]->set_flipscreen_cb().append(FUNC(contra_state::flipscreen_w<2>));
+	m_k007121[0]->set_dirtytiles_cb(FUNC(contra_state::dirtytiles<0>));
+
 	K007121(config, m_k007121[1], 0, m_palette, gfx_contra_2);
+	m_k007121[1]->set_flipscreen_cb().set(FUNC(contra_state::flipscreen_w<1>));
+	m_k007121[1]->set_dirtytiles_cb(FUNC(contra_state::dirtytiles<1>));
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	YM2151(config, "ymsnd", 3.579545_MHz_XTAL).add_route(0, "speaker", 0.60, 0).add_route(1, "speaker", 0.60, 1);
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL));
+	ymsnd.add_route(0, "speaker", 0.60, 0);
+	ymsnd.add_route(1, "speaker", 0.60, 1);
 }
 
 

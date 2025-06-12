@@ -67,13 +67,11 @@ private:
 
 	// video-related
 	tilemap_t *m_k007121_tilemap[2];
-	uint8_t m_flipscreen;
 
 	// misc
 	required_ioport m_coin;
 	required_ioport_array<2> m_pl;
 	required_ioport_array<3> m_dsw;
-	uint8_t m_irq_enabled;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -83,16 +81,22 @@ private:
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<generic_latch_8_device> m_soundlatch;
 
+	TILE_GET_INFO_MEMBER(get_tile_info_a);
+	TILE_GET_INFO_MEMBER(get_tile_info_b);
+
+	void vram_w(offs_t offset, uint8_t data);
+	void flipscreen_w(int state) { machine().tilemap().set_flip_all(state ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0); }
+	void dirtytiles() { machine().tilemap().mark_all_dirty(); }
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	INTERRUPT_GEN_MEMBER(interrupt);
 	void bankswitch_w(uint8_t data);
 	uint8_t ls138_r(offs_t offset);
 	void ls138_w(offs_t offset, uint8_t data);
-	void vram_w(offs_t offset, uint8_t data);
-	void k007121_regs_w(offs_t offset, uint8_t data);
-	TILE_GET_INFO_MEMBER(get_tile_info_a);
-	TILE_GET_INFO_MEMBER(get_tile_info_b);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(interrupt);
+
 	void volume_callback(uint8_t data);
+
 	void main_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
 };
@@ -179,25 +183,6 @@ void flkatck_state::vram_w(offs_t offset, uint8_t data)
 		m_k007121_tilemap[0]->mark_tile_dirty(offset & 0x3ff);
 }
 
-void flkatck_state::k007121_regs_w(offs_t offset, uint8_t data)
-{
-	switch (offset)
-	{
-		case 0x04:  // ROM bank select
-			if (data != m_k007121->ctrlram_r(4))
-				machine().tilemap().mark_all_dirty();
-			break;
-
-		case 0x07:  // flip screen + IRQ control
-			m_flipscreen = data & 0x08;
-			machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-			m_irq_enabled = data & 0x02;
-			break;
-	}
-
-	m_k007121->ctrl_w(offset, data);
-}
-
 
 /***************************************************************************
 
@@ -210,7 +195,13 @@ uint32_t flkatck_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	rectangle clip[2];
 	const rectangle &visarea = screen.visible_area();
 
-	if (m_flipscreen)
+	int scrollx = m_k007121->ctrlram_r(0);
+	int scrolly = m_k007121->ctrlram_r(2);
+
+	if (!scrollx && !scrolly)
+		machine().tilemap().mark_all_dirty();
+
+	if (m_k007121->flipscreen())
 	{
 		clip[0] = visarea;
 		clip[0].max_x -= 40;
@@ -218,8 +209,8 @@ uint32_t flkatck_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 		clip[1] = visarea;
 		clip[1].min_x = clip[1].max_x - 40;
 
-		m_k007121_tilemap[0]->set_scrollx(0, m_k007121->ctrlram_r(0) - 56 );
-		m_k007121_tilemap[0]->set_scrolly(0, m_k007121->ctrlram_r(2));
+		m_k007121_tilemap[0]->set_scrollx(0, scrollx - 56 );
+		m_k007121_tilemap[0]->set_scrolly(0, scrolly);
 		m_k007121_tilemap[1]->set_scrollx(0, -16);
 	}
 	else
@@ -231,8 +222,8 @@ uint32_t flkatck_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 		clip[1].max_x = 39;
 		clip[1].min_x = 0;
 
-		m_k007121_tilemap[0]->set_scrollx(0, m_k007121->ctrlram_r(0) - 40 );
-		m_k007121_tilemap[0]->set_scrolly(0, m_k007121->ctrlram_r(2));
+		m_k007121_tilemap[0]->set_scrollx(0, scrollx - 40 );
+		m_k007121_tilemap[0]->set_scrolly(0, scrolly);
 		m_k007121_tilemap[1]->set_scrollx(0, 0);
 	}
 
@@ -244,6 +235,7 @@ uint32_t flkatck_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	m_k007121_tilemap[0]->draw(screen, bitmap, clip[0], 0, 0);
 	m_k007121->sprites_draw(bitmap, cliprect, 0, 40, 0, screen.priority(), (uint32_t)-1);
 	m_k007121_tilemap[1]->draw(screen, bitmap, clip[1], 0, 0);
+
 	return 0;
 }
 
@@ -251,7 +243,7 @@ uint32_t flkatck_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 // machine
 INTERRUPT_GEN_MEMBER(flkatck_state::interrupt)
 {
-	if (m_irq_enabled)
+	if (m_k007121->ctrlram_r(7) & 0x02)
 		device.execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
 }
 
@@ -308,7 +300,7 @@ void flkatck_state::ls138_w(offs_t offset, uint8_t data)
 
 void flkatck_state::main_map(address_map &map)
 {
-	map(0x0000, 0x0007).ram().w(FUNC(flkatck_state::k007121_regs_w));
+	map(0x0000, 0x0007).w(m_k007121, FUNC(k007121_device::ctrl_w));
 	map(0x0008, 0x03ff).ram();
 	map(0x0400, 0x041f).rw(FUNC(flkatck_state::ls138_r), FUNC(flkatck_state::ls138_w)); // inputs, DIPS, bankswitch, counters, sound command
 	map(0x0800, 0x0bff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
@@ -392,19 +384,12 @@ void flkatck_state::volume_callback(uint8_t data)
 void flkatck_state::machine_start()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
-
 	m_mainbank->configure_entries(0, 3, &ROM[0x0000], 0x2000);
-
-	save_item(NAME(m_irq_enabled));
-	save_item(NAME(m_flipscreen));
 }
 
 void flkatck_state::machine_reset()
 {
 	m_k007232->set_bank(0, 1);
-
-	m_irq_enabled = 0;
-	m_flipscreen = 0;
 }
 
 void flkatck_state::flkatck(machine_config &config)
@@ -433,6 +418,8 @@ void flkatck_state::flkatck(machine_config &config)
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 512).set_endianness(ENDIANNESS_LITTLE);
 
 	K007121(config, m_k007121, 0, "palette", gfx_flkatck);
+	m_k007121->set_flipscreen_cb().set(FUNC(flkatck_state::flipscreen_w));
+	m_k007121->set_dirtytiles_cb(FUNC(flkatck_state::dirtytiles));
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();

@@ -2,15 +2,15 @@
 // copyright-holders:Phil Stroffolino, Manuel Abadia
 /***************************************************************************
 
-  combatsc.cpp
+  combatsc_v.cpp
 
   Functions to emulate the video hardware of the machine.
 
 ***************************************************************************/
 
 #include "emu.h"
-
 #include "combatsc.h"
+
 
 void combatsc_state::palette(palette_device &palette) const
 {
@@ -82,7 +82,6 @@ void combatscb_state::palette(palette_device &palette) const
 }
 
 
-
 /***************************************************************************
 
     Callbacks for the TileMap code
@@ -115,10 +114,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info0)
 
 	number = m_videoram[0][tile_index + 0x400] + 256 * bank;
 
-	tileinfo.set(0,
-			number,
-			color,
-			0);
+	tileinfo.set(0, number, color, 0);
 	tileinfo.category = (attributes & 0x40) >> 6;
 }
 
@@ -148,10 +144,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info1)
 
 	number = m_videoram[1][tile_index + 0x400] + 256 * bank;
 
-	tileinfo.set(0,
-			number,
-			color,
-			0);
+	tileinfo.set(0, number, color, 0);
 	tileinfo.category = (attributes & 0x40) >> 6;
 }
 
@@ -161,10 +154,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_text_info)
 	int number = m_videoram[0][tile_index + 0xc00];
 	int color = 16 + (attributes & 0x0f);
 
-	tileinfo.set(0,
-			number,
-			color,
-			0);
+	tileinfo.set(0, number, color, 0);
 }
 
 
@@ -193,10 +183,7 @@ TILE_GET_INFO_MEMBER(combatscb_state::get_tile_info0)
 	color = pal*16;// + (attributes & 0x0f);
 	number = m_videoram[0][tile_index + 0x400] + 256 * bank;
 
-	tileinfo.set(0,
-			number,
-			color,
-			0);
+	tileinfo.set(0, number, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(combatscb_state::get_tile_info1)
@@ -224,23 +211,18 @@ TILE_GET_INFO_MEMBER(combatscb_state::get_tile_info1)
 	color = pal * 16;// + (attributes & 0x0f);
 	number = m_videoram[1][tile_index + 0x400] + 256 * bank;
 
-	tileinfo.set(1,
-			number,
-			color,
-			0);
+	tileinfo.set(1, number, color, 0);
 }
 
 TILE_GET_INFO_MEMBER(combatscb_state::get_text_info)
 {
-//  uint8_t attributes = m_videoram[0][tile_index + 0x800];
+	//uint8_t attributes = m_videoram[0][tile_index + 0x800];
 	int number = m_videoram[0][tile_index + 0xc00];
 	int color = 16;// + (attributes & 0x0f);
 
-	tileinfo.set(1,
-			number,
-			color,
-			0);
+	tileinfo.set(1, number, color, 0);
 }
+
 
 /***************************************************************************
 
@@ -255,15 +237,13 @@ void combatsc_state::video_start()
 
 	m_bg_tilemap[0] = &machine().tilemap().create(*m_k007121[0], tilemap_get_info_delegate(*this, FUNC(combatsc_state::get_tile_info0)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap[1] = &machine().tilemap().create(*m_k007121[1], tilemap_get_info_delegate(*this, FUNC(combatsc_state::get_tile_info1)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_textlayer =  &machine().tilemap().create(*m_k007121[0], tilemap_get_info_delegate(*this, FUNC(combatsc_state::get_text_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_textlayer = &machine().tilemap().create(*m_k007121[0], tilemap_get_info_delegate(*this, FUNC(combatsc_state::get_text_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_bg_tilemap[0]->set_transparent_pen(0);
 	m_bg_tilemap[1]->set_transparent_pen(0);
 	m_textlayer->set_transparent_pen(0);
 
 	m_textlayer->set_scroll_rows(32);
-
-	save_item(NAME(m_textflip));
 }
 
 void combatscb_state::video_start()
@@ -279,6 +259,7 @@ void combatscb_state::video_start()
 	m_bg_tilemap[0]->set_scroll_rows(32);
 	m_bg_tilemap[1]->set_scroll_rows(32);
 }
+
 
 /***************************************************************************
 
@@ -310,21 +291,6 @@ void combatsc_base_state::videoview1_w(offs_t offset, uint8_t data)
 	}
 }
 
-void combatsc_state::pf_control_w(offs_t offset, uint8_t data)
-{
-	k007121_device *k007121 = m_video_circuit ? m_k007121[1] : m_k007121[0];
-	k007121->ctrl_w(offset, data);
-
-	if (offset == 7)
-	{
-		m_bg_tilemap[m_video_circuit]->set_flip((data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-		if (m_video_circuit == 0)
-		{
-			m_textflip = (data & 0x08) == 0x08;
-			m_textlayer->set_flip((data & 0x08) ? TILEMAP_FLIPY | TILEMAP_FLIPX : 0);
-		}
-	}
-}
 
 /***************************************************************************
 
@@ -406,11 +372,10 @@ uint32_t combatsc_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		for (int i = 0; i < 32; i++)
 		{
 			// scrollram [0x20]-[0x3f]: char enable (presumably bit 0 only)
-			uint8_t base_scroll = m_textflip == true ? (0x3f - i) : (0x20 + i);
+			uint8_t base_scroll = m_k007121[0]->flipscreen() ? (0x3f - i) : (0x20 + i);
 			auto slot = m_scroll_view.entry();
 			if (m_scrollram[*slot][base_scroll] == 0)
 				continue;
-
 
 			clip.min_y = i * 8;
 			clip.max_y = clip.min_y + 7;
@@ -433,14 +398,9 @@ uint32_t combatsc_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		clip.min_x = clip.max_x - 7;
 		bitmap.fill(0, clip);
 	}
+
 	return 0;
 }
-
-
-
-
-
-
 
 
 /***************************************************************************
@@ -497,14 +457,14 @@ void combatscb_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clipre
 			color = (circuit * 4) * 16 + (color >> 4);
 
 			//  hacks to select alternate palettes
-//          if(m_vreg == 0x40 && (attributes & 0x40)) color += 1*16;
-//          if(m_vreg == 0x23 && (attributes & 0x02)) color += 1*16;
-//          if(m_vreg == 0x66 ) color += 2*16;
+			//if(m_vreg == 0x40 && (attributes & 0x40)) color += 1*16;
+			//if(m_vreg == 0x23 && (attributes & 0x02)) color += 1*16;
+			//if(m_vreg == 0x66 ) color += 2*16;
 
-				gfx->transpen(bitmap,cliprect,
-							number, color,
-							attributes & 0x10,0, // flip
-							x, y, 15 );
+			gfx->transpen(bitmap,cliprect,
+					number, color,
+					attributes & 0x10,0, // flip
+					x, y, 15 );
 		}
 		source -= 8;
 	}
@@ -536,5 +496,6 @@ uint32_t combatscb_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 	}
 
 	m_textlayer->draw(screen, bitmap, cliprect, 0, 0);
+
 	return 0;
 }

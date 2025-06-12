@@ -67,12 +67,17 @@ private:
 	tilemap_t *m_layer[2]{};
 	rectangle m_clip[2]{};
 
+	void palette(palette_device &palette) const;
+	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_tile_info);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 	void bankswitch_w(uint8_t data);
 	template <uint8_t Which> void vram_w(offs_t offset, uint8_t data);
-	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_tile_info);
-	void palette(palette_device &palette) const;
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+
+	void flipscreen_w(int state) { machine().tilemap().set_flip_all(state ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0); }
+	void dirtytiles() { machine().tilemap().mark_all_dirty(); }
+
 	void prg_map(address_map &map) ATTR_COLD;
 };
 
@@ -166,22 +171,6 @@ void labyrunr_state::video_start()
 
 	m_layer[0]->set_scroll_cols(32);
 }
-
-
-
-/***************************************************************************
-
-  Memory Handlers
-
-***************************************************************************/
-
-template <uint8_t Which>
-void labyrunr_state::vram_w(offs_t offset, uint8_t data)
-{
-	m_videoram[Which][offset] = data;
-	m_layer[Which]->mark_tile_dirty(offset & 0x3ff);
-}
-
 
 
 /***************************************************************************
@@ -313,7 +302,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(labyrunr_state::interrupt)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-
 void labyrunr_state::bankswitch_w(uint8_t data)
 {
 	if (data & 0xe0) logerror("bankswitch %02x", data);
@@ -324,6 +312,13 @@ void labyrunr_state::bankswitch_w(uint8_t data)
 	// bits 3 and 4 are coin counters
 	machine().bookkeeping().coin_counter_w(0, data & 0x08);
 	machine().bookkeeping().coin_counter_w(1, data & 0x10);
+}
+
+template <uint8_t Which>
+void labyrunr_state::vram_w(offs_t offset, uint8_t data)
+{
+	m_videoram[Which][offset] = data;
+	m_layer[Which]->mark_tile_dirty(offset & 0x3ff);
 }
 
 void labyrunr_state::prg_map(address_map &map)
@@ -454,6 +449,8 @@ void labyrunr_state::labyrunr(machine_config &config)
 	m_palette->set_format(palette_device::xBGR_555, 2*8*16*16, 128);
 
 	K007121(config, m_k007121, 0, m_palette, gfx_labyrunr);
+	m_k007121->set_flipscreen_cb().set(FUNC(labyrunr_state::flipscreen_w));
+	m_k007121->set_dirtytiles_cb(FUNC(labyrunr_state::dirtytiles));
 
 	K051733(config, "k051733", 0);
 

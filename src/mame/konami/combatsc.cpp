@@ -5,8 +5,6 @@
 "Combat School" (also known as "Boot Camp") - (Konami GX611)
 
 TODO:
-- Ugly text flickering in various places, namely the text when you finish level 1.
-  This is due of completely busted sprite limit hook-up. (check k007121.cpp and MT #00185)
 - understand how the trackball really works for clone sets.
 - it seems that to get correct target colors in firing range III we have to
   use the WRONG lookup table (the one for tiles instead of the one for
@@ -127,6 +125,7 @@ Dip location and recommended settings verified with the US manual
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/ymopn.h"
+
 #include "speaker.h"
 
 
@@ -135,6 +134,29 @@ Dip location and recommended settings verified with the US manual
  *  Memory handlers
  *
  *************************************/
+
+void combatsc_state::pf_control_w(offs_t offset, uint8_t data)
+{
+	m_k007121[m_video_circuit]->ctrl_w(offset, data);
+}
+
+template <uint8_t Which>
+void combatsc_state::flipscreen_w(int state)
+{
+	const uint32_t flip = state ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0;
+
+	m_bg_tilemap[Which]->set_flip(flip);
+	if (Which == 0)
+		m_textlayer->set_flip(flip);
+}
+
+template <uint8_t Which>
+void combatsc_state::dirtytiles()
+{
+	m_bg_tilemap[Which]->mark_all_dirty();
+	if (Which == 0)
+		m_textlayer->mark_all_dirty();
+}
 
 void combatsc_base_state::vreg_w(uint8_t data)
 {
@@ -188,11 +210,6 @@ void combatsc_state::bankselect_w(uint8_t data)
 		m_mainbank->set_entry(8 + (data & 1));
 }
 
-void combatscb_state::io_w(offs_t offset, uint8_t data)
-{
-	m_io_ram[offset] = data;
-}
-
 void combatscb_state::bankselect_w(uint8_t data)
 {
 	if (data & 0x40)
@@ -227,6 +244,12 @@ void combatscb_state::bankselect_w(uint8_t data)
 	}
 }
 
+void combatscb_state::io_w(offs_t offset, uint8_t data)
+{
+	m_io_ram[offset] = data;
+}
+
+
 /****************************************************************************/
 
 void combatsc_state::coin_counter_w(uint8_t data)
@@ -243,9 +266,9 @@ uint8_t combatsc_state::trackball_r(offs_t offset)
 {
 	if (offset == 0)
 	{
-		int i, dir[4];
+		int dir[4];
 
-		for (i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++)
 		{
 			uint8_t curr = m_track_ports[i].read_safe(0xff);
 
@@ -697,7 +720,12 @@ void combatsc_state::combatsc(machine_config &config)
 	m_palette->set_endianness(ENDIANNESS_LITTLE);
 
 	K007121(config, m_k007121[0], 0, m_palette, gfx_combatsc_1);
+	m_k007121[0]->set_flipscreen_cb().set(FUNC(combatsc_state::flipscreen_w<0>));
+	m_k007121[0]->set_dirtytiles_cb(FUNC(combatsc_state::dirtytiles<0>));
+
 	K007121(config, m_k007121[1], 0, m_palette, gfx_combatsc_2);
+	m_k007121[1]->set_flipscreen_cb().set(FUNC(combatsc_state::flipscreen_w<1>));
+	m_k007121[1]->set_dirtytiles_cb(FUNC(combatsc_state::dirtytiles<1>));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
