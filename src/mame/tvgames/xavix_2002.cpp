@@ -945,11 +945,11 @@ CONS( 2004, xavbox,   0,       0, superxavix_i2c_jmat,  xavix,      superxavix_i
 CONS( 2004, xavbassf, 0,       0, superxavix_i2c_24c08, xavix_i2c,  superxavix_i2c_state,      init_xavix, "SSD Company LTD",         "XaviX Bass Fishing (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // TODO: check SEEPROM type and hookup, banking!
-CONS( 2005, xavjmat,  0, 0, superxavix_i2c_jmat_24c64,  xavix_jmat, superxavix_i2c_jmat_state, init_xavmusic, "SSD Company LTD",         "Jackie Chan J-Mat Fitness (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 2005, xavaero,  0, 0, superxavix_i2c_jmat_24c64,  xavix_jmat, superxavix_i2c_jmat_state, init_xavmusic, "SSD Company LTD",         "XaviX Aerostep (XaviXPORT, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-CONS( 2007, xavmusic, 0, 0, superxavix_i2c_jmat_24c64,  xavix,      superxavix_i2c_jmat_state, init_xavmusic, "SSD Company LTD",         "XaviX Music & Circuit (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, xavjmat,  0,       0, superxavix_i2c_jmat_24c64,  xavix_jmat, superxavix_i2c_jmat_state, init_xavmusic, "SSD Company LTD",         "Jackie Chan J-Mat Fitness (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2005, xavaero,  xavjmat, 0, superxavix_i2c_jmat_24c64,  xavix_jmat, superxavix_i2c_jmat_state, init_xavmusic, "SSD Company LTD",         "XaviX Aerostep (XaviXPORT, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2007, xavmusic, 0,       0, superxavix_i2c_jmat_24c64,  xavix,      superxavix_i2c_jmat_state, init_xavmusic, "SSD Company LTD",         "XaviX Music & Circuit (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // xavpkjr has U6 = S-35390A REAL-TIME CLOCK
-CONS( 2007, xavpkjr,  0, 0, superxavix_i2c_jmat_24c64, xavix, superxavix_i2c_jmat_state,      init_xavix,    "SSD Company LTD",         "PowerKIDS Jr. (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2007, xavpkjr,  0, 0, superxavix_i2c_jmat_24c64, xavix, superxavix_i2c_jmat_state,      init_xavix,    "SSD Company LTD",         "PowerKIDS Jr. (XaviXPORT, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // https://arnaudmeyer.wordpress.com/domyos-interactive-system/
 // Domyos Fitness Adventure
