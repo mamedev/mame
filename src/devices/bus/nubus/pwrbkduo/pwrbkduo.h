@@ -31,7 +31,7 @@ public:
 protected:
 	device_pwrbkduo_card_interface(const machine_config &mconfig, device_t &device);
 	virtual void interface_pre_start() override;
-	pwrbkduo_device &pwrbkduo() { assert(m_nubus); return downcast<pwrbkduo_device&>(nubus()); }
+	pwrbkduo_device &pwrbkduo() { return downcast<pwrbkduo_device&>(nubus()); }
 };
 
 class pwrbkduo_slot_device : public nubus_slot_device
