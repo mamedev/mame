@@ -194,24 +194,17 @@ uint32_t flkatck_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 {
 	// compute clipping
 	rectangle clip[2];
-	const rectangle &visarea = screen.visible_area();
+	clip[0] = clip[1] = screen.visible_area();
 
 	if (m_k007121->flipscreen())
 	{
-		clip[0] = visarea;
 		clip[0].max_x -= 40;
-
-		clip[1] = visarea;
 		clip[1].min_x = clip[1].max_x - 39;
 	}
 	else
 	{
-		clip[0] = visarea;
 		clip[0].min_x += 40;
-
-		clip[1] = visarea;
 		clip[1].max_x = 39;
-		clip[1].min_x = 0;
 	}
 
 	clip[0] &= cliprect;
@@ -226,7 +219,6 @@ uint32_t flkatck_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 	m_k007121_tilemap[0]->set_scrollx(0, scrollx - 40);
 	m_k007121_tilemap[0]->set_scrolly(0, scrolly);
-	m_k007121_tilemap[1]->set_scrollx(0, 0);
 
 	// draw the graphics
 	m_k007121_tilemap[0]->draw(screen, bitmap, clip[0], 0, 0);

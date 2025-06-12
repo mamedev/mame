@@ -188,28 +188,23 @@ uint32_t labyrunr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
+	const rectangle &visarea = screen.visible_area();
+
 	if (~m_k007121->ctrlram_r(3) & 0x20)
 	{
 		// compute clipping
 		rectangle clip[2];
-		const rectangle &visarea = screen.visible_area();
+		clip[0] = clip[1] = visarea;
 
 		if (m_k007121->flipscreen())
 		{
-			clip[0] = visarea;
 			clip[0].max_x -= 40;
-
-			clip[1] = visarea;
 			clip[1].min_x = clip[1].max_x - 39;
 		}
 		else
 		{
-			clip[0] = visarea;
 			clip[0].min_x += 40;
-
-			clip[1] = visarea;
 			clip[1].max_x = 39;
-			clip[1].min_x = 0;
 		}
 
 		clip[0] &= cliprect;
@@ -241,52 +236,46 @@ uint32_t labyrunr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		int use_clip2[2] = { 0, 0 };
 
 		// custom cliprects needed for the weird effect used in the ending sequence to hide and show the needed part of text
-		clip[0].min_y = clip[1].min_y = cliprect.min_y;
-		clip[0].max_y = clip[1].max_y = cliprect.max_y;
+		clip[0] = clip[1] = clip[2] = visarea;
 
 		if (m_k007121->ctrlram_r(1) & 1)
 		{
-			clip[0].min_x = cliprect.max_x - ctrl_0 + 8;
-			clip[0].max_x = cliprect.max_x;
-
-			if (ctrl_0 >= 40)
-			{
-				clip[1].min_x = cliprect.min_x;
-			}
-			else
+			if (ctrl_0 < 40)
 			{
 				use_clip2[0] = 1;
-
 				clip[1].min_x = 40 - ctrl_0;
 			}
 
-			clip[1].max_x = cliprect.max_x - ctrl_0 + 8;
+			clip[0].min_x = clip[0].max_x - ctrl_0 + 8;
+			clip[1].max_x = clip[1].max_x - ctrl_0 + 8;
 		}
 		else
 		{
-			if (ctrl_0 >= 40)
-			{
-				clip[0].min_x = cliprect.min_x;
-			}
-			else
+			if (ctrl_0 < 40)
 			{
 				use_clip2[1] = 1;
-
 				clip[0].min_x = 40 - ctrl_0;
 			}
 
-			clip[0].max_x = cliprect.max_x - ctrl_0 + 8;
-
-			clip[1].min_x = cliprect.max_x - ctrl_0 + 8;
-			clip[1].max_x = cliprect.max_x;
+			clip[0].max_x = clip[0].max_x - ctrl_0 + 8;
+			clip[1].min_x = clip[1].max_x - ctrl_0 + 8;
 		}
 
 		if (use_clip2[0] || use_clip2[1])
-		{
-			clip[2].min_y = cliprect.min_y;
-			clip[2].max_y = cliprect.max_y;
-			clip[2].min_x = cliprect.min_x;
 			clip[2].max_x = 40 - ctrl_0 - 8;
+
+		for (int i = 0; i < 3; i++)
+		{
+			// flip the cliprects
+			if (m_k007121->flipscreen())
+			{
+				int max_x = visarea.max_x - clip[i].min_x;
+				int min_x = visarea.max_x - clip[i].max_x;
+				clip[i].max_x = max_x;
+				clip[i].min_x = min_x;
+			}
+
+			clip[i] &= cliprect;
 		}
 
 		m_layer[0]->set_scrollx(0, ctrl_0 - 40);

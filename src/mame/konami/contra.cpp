@@ -389,24 +389,17 @@ uint32_t contra_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 {
 	// compute clipping
 	rectangle clip[2];
-	const rectangle &visarea = screen.visible_area();
+	clip[0] = clip[1] = screen.visible_area();
 
 	if (m_k007121[0]->flipscreen())
 	{
-		clip[0] = visarea;
 		clip[0].max_x -= 40;
-
-		clip[1] = visarea;
 		clip[1].min_x = clip[1].max_x - 39;
 	}
 	else
 	{
-		clip[0] = visarea;
 		clip[0].min_x += 40;
-
-		clip[1] = visarea;
 		clip[1].max_x = 39;
-		clip[1].min_x = 0;
 	}
 
 	clip[0] &= cliprect;
