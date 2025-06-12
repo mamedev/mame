@@ -1,6 +1,20 @@
 // license:BSD-3-Clause
 // copyright-holders:m1macrophage
 
+/*
+Not emulated:
+- External oscillator (OSC1) [*]
+- Effects of resistor between OSC1 and OSC2, when using internal oscillator [*].
+- SB pin, halts internal clock.
+- SYNC pin for chip cascading.
+- READY pin.
+
+[*] The datasheet specifies the frequency of the internal oscillator as
+100KHz +/- 30KHz. This requires using the recommended resistor values. Examples
+are shown with a 330K and a 360K resistor. An external oscillator can be used
+too, and it is also specified as 100Khz +/- 30KHz.
+*/
+
 #include "emu.h"
 #include "hd61602.h"
 
@@ -57,22 +71,25 @@ void hd61602_device::set_drive_mode(u8 drive_mode)
 	int frame_rate = 0;
 	switch (m_drive_mode)
 	{
-		// Frame rates are from the datasheet.
+		// Frame rates are reported on the datasheet for an 100KHz clock.
+		// 100KHz is the nominal frequency of the internal oscillator, and the
+		// recommended frequency for an external oscillator.
 		case DM_STATIC:  m_com_count = 1; break;
 		case DM_HALF:    m_com_count = 2; frame_rate =  65; break;
 		case DM_THIRD:   m_com_count = 3; frame_rate = 208; break;
 		case DM_QUARTER: m_com_count = 4; frame_rate = 223; break;
 	}
 
-	if (frame_rate > 0)
+	if (m_com_count > 1)
 	{
 		const attotime timer_t = attotime::from_hz(frame_rate * m_com_count);
 		m_refresh_timer->adjust(timer_t, 0, timer_t);
 	}
 	else
 	{
-		// The frame rate in 'static' mode is actually 33 Hz. But there is no
-		// time-multiplexing in that mode, so no need for the timer.
+		// The frame rate in 'static' mode is actually 33 Hz (assuming a 100KHz
+		// clock). But there is no time-multiplexing in that mode, so there is
+		// no need for the timer.
 		m_refresh_timer->reset();
 	}
 
