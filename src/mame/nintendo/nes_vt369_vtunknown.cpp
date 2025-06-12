@@ -1113,11 +1113,6 @@ ROM_START( 168pcase )
 	ROM_LOAD( "25q32.u7", 0x000000, 0x400000, CRC(98e8e97a) SHA1(fd516ef2819a597130f5f7ace9a7838cb99ab08a) )
 ROM_END
 
-ROM_START( 168pls )
-	ROM_REGION( 0x1000000, "mainrom", 0 )
-	ROM_LOAD( "s29gl128n10tfi01.bin", 0x000000, 0x1000000, CRC(d11caf71) SHA1(64b269cee30a51549a2d0491bbeed07751771559) )
-ROM_END
-
 ROM_START( vibes240 )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
 	// wouldn't read consistently
@@ -1297,9 +1292,6 @@ CONS( 201?, hhgc319,  0,        0,  vt36x_16mb, vt369, vt36x_state, empty_init, 
 
 // unknown tech, probably from 2021, probably VT369, ROM wouldn't read consistently
 CONS( 202?, vibes240, 0,        0,  vt36x_vibesswap_16mb, vt369, vt36x_state, empty_init, "<unknown>", "Vibes Retro Pocket Gamer 240-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-
-// quickly crashes, doesn't show anything, might not belong here
-CONS( 202?, 168pls, 0,      0,  vt36x_16mb, vt369, vt36x_state, empty_init, "<unknown>", "unknown 168-in-1 Plus handheld", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 /*****************************************************************************
 * below are VT369 games that use BGA on sub
