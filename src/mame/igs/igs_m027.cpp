@@ -3779,8 +3779,27 @@ ROM_START( tshs ) // IGS PCB-0312-00. 2 banks of 8 switches. 1 PPI. IGS3590 + NT
 	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "igs_a3701_anim_v100.u8", 0x000000, 0x400000, CRC(bed56f35) SHA1(5a29d2a39fd997ed9ef0ec695c63629ee2303ce2) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
 
-	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_REGION( 0x200000, "igs3590", 0 )
 	ROM_LOAD( "igs_s3703_speech_v100.u25", 0x000000, 0x200000, CRC(41313c68) SHA1(4c996c22e84b916edd35c33645da01d3e5d520c8) ) // BADADDR   xxxxxxxxxx-xxxxxxxxxx
+ROM_END
+
+// 金皇冠3代 (Jīn Huáng Guàn 3 Dài)
+ROM_START( jhg3d ) // IGS PCB-0376-01-FS. 3 banks of 8 switches. 1 PPI.
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	// Internal rom of IGS027A ARM based MCU
+	ROM_LOAD( "g5_027a.u23", 0x0000, 0x4000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "v-445cn.u8", 0x00000, 0x80000, CRC(9d503a1f) SHA1(8ead38738386c2f7e375bd56eea2262173715c9c) )
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "u16", 0x00000, 0x80000, NO_DUMP )
+
+	ROM_REGION( 0x200000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "cg_u21.u21", 0x000000, 0x200000, CRC(1e1c243a) SHA1(441e837fc806160182d019b9719f40a85327ba12) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "u8", 0x00000, 0x80000, CRC(9d503a1f) SHA1(8ead38738386c2f7e375bd56eea2262173715c9c) )
 ROM_END
 
 
@@ -4094,5 +4113,7 @@ GAME(  2003, amazoni2,      0,        m027_1ppi<false>, base,     igs_m027_state
 GAME(  2002, sdwx,          0,        m027_1ppi<false>, base,     igs_m027_state, init_sdwx,     ROT0, "IGS", "Sheng Dan Wu Xian", MACHINE_NOT_WORKING ) // aka Christmas 5 Line? (or Amazonia King II, shares roms at least?)
 GAME(  2001, cjdh6th,       0,        m027_1ppi<false>, base,     igs_m027_state, init_extradrw, ROT0, "IGS", "Chaoji Daheng 6th", MACHINE_NOT_WORKING )
 GAME(  200?, royal5p,       0,        m027_1ppi<false>, base,     igs_m027_state, empty_init,    ROT0, "IGS", "Royal 5+ (V101US)", MACHINE_NOT_WORKING )
+GAME(  200?, jhg3d,         0,        m027_1ppi<false>, base,     igs_m027_state, empty_init,    ROT0, "IGS", "Jin Huang Guan 3 Dai (V445CN)", MACHINE_NOT_WORKING )
+
 // these have an IGS025 protection device instead of the 8255
 GAME(  200?, gonefsh2,      0,        m027_noppi<false>,base,     igs_m027_state, init_gonefsh2, ROT0, "IGS", "Gone Fishing 2", MACHINE_NOT_WORKING )

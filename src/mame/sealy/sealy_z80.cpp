@@ -181,8 +181,9 @@ ROM_START( djddz )
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "4.u23", 0x00000, 0x80000, CRC(249b1a34) SHA1(94af1a9c64fb7d06a7510d527c176b2fa6845885) ) // 27c040
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // this dump comes from the PCB with 顶级100分 labels
-	ROM_LOAD( "93c46", 0x00, 0x80, CRC(bed2d363) SHA1(7e0c0d4c47274a87024e3e5cd74bc883b7d46415) )
+	ROM_REGION( 0x80, "eeprom", 0 ) // keeping dumps from both PCBs for now, until it can be determined if they are useful or just user data
+	ROM_LOAD( "93c46",   0x00, 0x80, CRC(bed2d363) SHA1(7e0c0d4c47274a87024e3e5cd74bc883b7d46415) ) // this dump comes from the PCB with 顶级100分 labels
+	ROM_LOAD( "93c46_2", 0x00, 0x80, CRC(43c87f6c) SHA1(1e9ed6033cacd5412de7d236392f626abd1e2eb8) ) // this dump comes from the PCB with 顶级斗地主 labels
 ROM_END
 
 // 漂亮金花 (Piàoliang Jīnhuā). All labels prepend 漂亮金花 to what's below
