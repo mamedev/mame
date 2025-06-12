@@ -485,6 +485,24 @@ static INPUT_PORTS_START( spg2xx ) // base structure for easy debugging / figuri
 	PORT_DIPSETTING(      0x8000, "8000" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( lpetshop )
+	PORT_START("P1")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Pause / Menu")
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("C")
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("B")
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("A")
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( mylpony )
 	PORT_START("P1")
@@ -2068,6 +2086,42 @@ void spg2xx_game_dreamlss_state::dreamlss(machine_config &config)
 	I2C_24C08(config, "i2cmem", 0);
 }
 
+uint16_t spg2xx_game_lpetshop_state::porta_r()
+{
+	uint16_t ret = 0;
+	ret |= m_i2cmem->read_sda() ? 0x1: 0x0;
+	return ret;
+}
+
+void spg2xx_game_lpetshop_state::porta_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	//logerror("%s: spg2xx_game_lpetshop_state::porta_w (%04x & %04x)\n", machine().describe_context(), data, mem_mask);
+	if (BIT(mem_mask, 1))
+		m_i2cmem->write_scl(BIT(data, 1));
+	if (BIT(mem_mask, 0))
+		m_i2cmem->write_sda(BIT(data, 0));
+}
+
+
+void spg2xx_game_lpetshop_state::lpetshop(machine_config &config)
+{
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_lpetshop_state::mem_map_4m);
+
+	spg2xx_base(config);
+
+	m_maincpu->porta_in().set(FUNC(spg2xx_game_lpetshop_state::porta_r));
+	m_maincpu->portb_in().set(FUNC(spg2xx_game_lpetshop_state::base_portb_r));
+	m_maincpu->portc_in().set(FUNC(spg2xx_game_lpetshop_state::base_portc_r));
+
+	m_maincpu->porta_out().set(FUNC(spg2xx_game_lpetshop_state::porta_w));
+	m_maincpu->portb_out().set(FUNC(spg2xx_game_lpetshop_state::portb_w));
+	m_maincpu->portc_out().set(FUNC(spg2xx_game_lpetshop_state::portc_w));
+
+	I2C_24C08(config, "i2cmem", 0);
+}
+
+
 void spg2xx_game_gssytts_state::portc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int bank = 0;
@@ -2787,6 +2841,11 @@ ROM_START( barbpet )
 	ROM_LOAD16_WORD_SWAP( "barbiepetrescue.u3", 0x000000, 0x200000, CRC(a740b19d) SHA1(e3c5bc3e1b38457ca826d6eba6e492c33d04b97e) )
 ROM_END
 
+ROM_START( lpetshop )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "littlestpetshop.u1a", 0x000000, 0x800000, CRC(b5a2a922) SHA1(681bd2dd6eae87ec285307f3fc50b3b2c384edaf) )
+ROM_END
+
 ROM_START( hotwhls )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	// this dump was consistent when using one programmer to dump it, but has broken shadow on TRACK text in menu
@@ -3037,6 +3096,8 @@ CONS( 2005, whacmole,   0,        0, whacmole,  whacmole,  spg2xx_game_hasbro_93
 CONS( 2005, backybbs,   0,        0, whacmole,  backybbs,  spg2xx_game_hasbro_93lc66_state, empty_init, "Hasbro / Milton Bradley / Atari",                     "Backyard Baseball & Soccer", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2006, mylpony,    0,        0, mylpony,   mylpony,   spg2xx_game_hasbro_93lc66_state, empty_init, "Hasbro / Milton Bradley",                             "My Little Pony - Grand Puzzleventure", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2007, lpetshop,   0,        0, lpetshop,  lpetshop,  spg2xx_game_lpetshop_state,      empty_init, "Hasbro",                                              "Littlest Pet Shop", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2005, barbpet,    0,        0, spg2xx,    barbpet,   spg2xx_game_state,               empty_init, "Mattel",                                              "Barbie: I Love Pets - Pet Rescue", MACHINE_IMPERFECT_SOUND )
 
