@@ -190,7 +190,6 @@ private:
 
 	// video-related
 	tilemap_t *m_tilemap[3]{};
-	rectangle m_clip[3]{};
 
 	// devices
 	required_device<cpu_device> m_audiocpu;
@@ -332,15 +331,6 @@ void contra_state::video_start()
 	m_tilemap[1] = &machine().tilemap().create(*m_k007121[1], tilemap_get_info_delegate(*this, FUNC(contra_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_tilemap[2] = &machine().tilemap().create(*m_k007121[0], tilemap_get_info_delegate(*this, FUNC(contra_state::get_tx_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	m_clip[1] = m_screen->visible_area();
-	m_clip[1].min_x += 40;
-
-	m_clip[0] = m_clip[1];
-
-	m_clip[2] = m_screen->visible_area();
-	m_clip[2].max_x = 39;
-	m_clip[2].min_x = 0;
-
 	m_tilemap[0]->set_transparent_pen(0);
 }
 
@@ -390,34 +380,55 @@ template <uint8_t Which>
 void contra_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap)
 {
 	int base_color = (m_k007121[Which]->ctrlram_r(6) & 0x30) * 2;
+	int global_x_offset = m_k007121[Which]->flipscreen() ? 16 : 40;
 
-	m_k007121[Which]->sprites_draw(bitmap, cliprect, base_color, 40, 0, priority_bitmap, (uint32_t)-1);
+	m_k007121[Which]->sprites_draw(bitmap, cliprect, base_color, global_x_offset, 0, priority_bitmap, (uint32_t)-1);
 }
 
 uint32_t contra_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	// compute clipping
+	rectangle clip[2];
+	const rectangle &visarea = screen.visible_area();
+
+	if (m_k007121[0]->flipscreen())
+	{
+		clip[0] = visarea;
+		clip[0].max_x -= 40;
+
+		clip[1] = visarea;
+		clip[1].min_x = clip[1].max_x - 39;
+	}
+	else
+	{
+		clip[0] = visarea;
+		clip[0].min_x += 40;
+
+		clip[1] = visarea;
+		clip[1].max_x = 39;
+		clip[1].min_x = 0;
+	}
+
+	clip[0] &= cliprect;
+	clip[1] &= cliprect;
+
+	// set scroll registers
 	uint8_t ctrl_1_0 = m_k007121[0]->ctrlram_r(0);
 	uint8_t ctrl_1_2 = m_k007121[0]->ctrlram_r(2);
 	uint8_t ctrl_2_0 = m_k007121[1]->ctrlram_r(0);
 	uint8_t ctrl_2_2 = m_k007121[1]->ctrlram_r(2);
-	rectangle bg_finalclip = m_clip[1];
-	rectangle fg_finalclip = m_clip[0];
-	rectangle tx_finalclip = m_clip[2];
-
-	bg_finalclip &= cliprect;
-	fg_finalclip &= cliprect;
-	tx_finalclip &= cliprect;
 
 	m_tilemap[0]->set_scrollx(0, ctrl_1_0 - 40);
 	m_tilemap[0]->set_scrolly(0, ctrl_1_2);
 	m_tilemap[1]->set_scrollx(0, ctrl_2_0 - 40);
 	m_tilemap[1]->set_scrolly(0, ctrl_2_2);
 
-	m_tilemap[1]->draw(screen, bitmap, bg_finalclip, 0 ,0);
-	m_tilemap[0]->draw(screen, bitmap, fg_finalclip, 0 ,0);
+	// draw the graphics
+	m_tilemap[1]->draw(screen, bitmap, clip[0], 0 ,0);
+	m_tilemap[0]->draw(screen, bitmap, clip[0], 0 ,0);
 	draw_sprites<0>(bitmap, cliprect, screen.priority());
 	draw_sprites<1>(bitmap, cliprect, screen.priority());
-	m_tilemap[2]->draw(screen, bitmap, tx_finalclip, 0 ,0);
+	m_tilemap[2]->draw(screen, bitmap, clip[1], 0 ,0);
 
 	return 0;
 }

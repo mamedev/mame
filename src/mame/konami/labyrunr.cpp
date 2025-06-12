@@ -65,10 +65,10 @@ private:
 
 	// video-related
 	tilemap_t *m_layer[2]{};
-	rectangle m_clip[2]{};
 
 	void palette(palette_device &palette) const;
 	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_tile_info);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
@@ -162,13 +162,6 @@ void labyrunr_state::video_start()
 	m_layer[0]->set_transparent_pen(0);
 	m_layer[1]->set_transparent_pen(0);
 
-	m_clip[0] = m_screen->visible_area();
-	m_clip[0].min_x += 40;
-
-	m_clip[1] = m_screen->visible_area();
-	m_clip[1].max_x = 39;
-	m_clip[1].min_x = 0;
-
 	m_layer[0]->set_scroll_cols(32);
 }
 
@@ -179,22 +172,50 @@ void labyrunr_state::video_start()
 
 ***************************************************************************/
 
+void labyrunr_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap)
+{
+	int base_color = (m_k007121->ctrlram_r(6) & 0x30) * 2;
+	int global_x_offset = m_k007121->flipscreen() ? 16 : 40;
+	uint32_t pri_mask = (m_k007121->ctrlram_r(3) & 0x20) >> 4;
+
+	m_k007121->sprites_draw(bitmap, cliprect, base_color, global_x_offset, 0, priority_bitmap, pri_mask);
+}
+
 uint32_t labyrunr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint8_t ctrl_0 = m_k007121->ctrlram_r(0);
-	rectangle finalclip0, finalclip1;
 
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	if (~m_k007121->ctrlram_r(3) & 0x20)
 	{
-		finalclip0 = m_clip[0];
-		finalclip1 = m_clip[1];
+		// compute clipping
+		rectangle clip[2];
+		const rectangle &visarea = screen.visible_area();
 
-		finalclip0 &= cliprect;
-		finalclip1 &= cliprect;
+		if (m_k007121->flipscreen())
+		{
+			clip[0] = visarea;
+			clip[0].max_x -= 40;
 
+			clip[1] = visarea;
+			clip[1].min_x = clip[1].max_x - 39;
+		}
+		else
+		{
+			clip[0] = visarea;
+			clip[0].min_x += 40;
+
+			clip[1] = visarea;
+			clip[1].max_x = 39;
+			clip[1].min_x = 0;
+		}
+
+		clip[0] &= cliprect;
+		clip[1] &= cliprect;
+
+		// set scroll registers
 		m_layer[0]->set_scrollx(0, ctrl_0 - 40);
 		m_layer[1]->set_scrollx(0, 0);
 
@@ -207,82 +228,84 @@ uint32_t labyrunr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 				m_layer[0]->set_scrolly((i + 2) & 0x1f, m_k007121->ctrlram_r(2));
 		}
 
-		m_layer[0]->draw(screen, bitmap, finalclip0, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_CATEGORY(0), 0);
-		m_k007121->sprites_draw(bitmap, cliprect, (m_k007121->ctrlram_r(6) & 0x30) * 2, 40, 0, screen.priority(), (m_k007121->ctrlram_r(3) & 0x20) >> 4);
-		m_layer[0]->draw(screen, bitmap, finalclip0, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_CATEGORY(1), 0);
+		// draw the graphics
+		m_layer[0]->draw(screen, bitmap, clip[0], TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_CATEGORY(0), 0);
+		draw_sprites(bitmap, cliprect, screen.priority());
+		m_layer[0]->draw(screen, bitmap, clip[0], TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_CATEGORY(1), 0);
 		// we ignore the transparency because layer1 is drawn only at the top of the screen also covering sprites
-		m_layer[1]->draw(screen, bitmap, finalclip1, TILEMAP_DRAW_OPAQUE, 0);
+		m_layer[1]->draw(screen, bitmap, clip[1], TILEMAP_DRAW_OPAQUE, 0);
 	}
 	else
 	{
-		int use_clip3[2] = { 0, 0 };
-		rectangle finalclip3;
+		rectangle clip[3];
+		int use_clip2[2] = { 0, 0 };
 
 		// custom cliprects needed for the weird effect used in the ending sequence to hide and show the needed part of text
-		finalclip0.min_y = finalclip1.min_y = cliprect.min_y;
-		finalclip0.max_y = finalclip1.max_y = cliprect.max_y;
+		clip[0].min_y = clip[1].min_y = cliprect.min_y;
+		clip[0].max_y = clip[1].max_y = cliprect.max_y;
 
 		if (m_k007121->ctrlram_r(1) & 1)
 		{
-			finalclip0.min_x = cliprect.max_x - ctrl_0 + 8;
-			finalclip0.max_x = cliprect.max_x;
+			clip[0].min_x = cliprect.max_x - ctrl_0 + 8;
+			clip[0].max_x = cliprect.max_x;
 
 			if (ctrl_0 >= 40)
 			{
-				finalclip1.min_x = cliprect.min_x;
+				clip[1].min_x = cliprect.min_x;
 			}
 			else
 			{
-				use_clip3[0] = 1;
+				use_clip2[0] = 1;
 
-				finalclip1.min_x = 40 - ctrl_0;
+				clip[1].min_x = 40 - ctrl_0;
 			}
 
-			finalclip1.max_x = cliprect.max_x - ctrl_0 + 8;
+			clip[1].max_x = cliprect.max_x - ctrl_0 + 8;
 		}
 		else
 		{
 			if (ctrl_0 >= 40)
 			{
-				finalclip0.min_x = cliprect.min_x;
+				clip[0].min_x = cliprect.min_x;
 			}
 			else
 			{
-				use_clip3[1] = 1;
+				use_clip2[1] = 1;
 
-				finalclip0.min_x = 40 - ctrl_0;
+				clip[0].min_x = 40 - ctrl_0;
 			}
 
-			finalclip0.max_x = cliprect.max_x - ctrl_0 + 8;
+			clip[0].max_x = cliprect.max_x - ctrl_0 + 8;
 
-			finalclip1.min_x = cliprect.max_x - ctrl_0 + 8;
-			finalclip1.max_x = cliprect.max_x;
+			clip[1].min_x = cliprect.max_x - ctrl_0 + 8;
+			clip[1].max_x = cliprect.max_x;
 		}
 
-		if (use_clip3[0] || use_clip3[1])
+		if (use_clip2[0] || use_clip2[1])
 		{
-			finalclip3.min_y = cliprect.min_y;
-			finalclip3.max_y = cliprect.max_y;
-			finalclip3.min_x = cliprect.min_x;
-			finalclip3.max_x = 40 - ctrl_0 - 8;
+			clip[2].min_y = cliprect.min_y;
+			clip[2].max_y = cliprect.max_y;
+			clip[2].min_x = cliprect.min_x;
+			clip[2].max_x = 40 - ctrl_0 - 8;
 		}
 
 		m_layer[0]->set_scrollx(0, ctrl_0 - 40);
 		m_layer[1]->set_scrollx(0, ctrl_0 - 40);
 
-		m_layer[0]->draw(screen, bitmap, finalclip0, TILEMAP_DRAW_CATEGORY(0), 0);
-		if (use_clip3[0])
-			m_layer[0]->draw(screen, bitmap, finalclip3, TILEMAP_DRAW_CATEGORY(0), 0);
+		// draw the graphics
+		m_layer[0]->draw(screen, bitmap, clip[0], TILEMAP_DRAW_CATEGORY(0), 0);
+		if (use_clip2[0])
+			m_layer[0]->draw(screen, bitmap, clip[2], TILEMAP_DRAW_CATEGORY(0), 0);
 
-		m_k007121->sprites_draw(bitmap, cliprect, (m_k007121->ctrlram_r(6) & 0x30) * 2, 40, 0, screen.priority(), (m_k007121->ctrlram_r(3) & 0x20) >> 4);
+		draw_sprites(bitmap, cliprect, screen.priority());
 
-		m_layer[0]->draw(screen, bitmap, finalclip0, TILEMAP_DRAW_CATEGORY(1), 0);
-		if (use_clip3[0])
-			m_layer[0]->draw(screen, bitmap, finalclip3, TILEMAP_DRAW_CATEGORY(1), 0);
+		m_layer[0]->draw(screen, bitmap, clip[0], TILEMAP_DRAW_CATEGORY(1), 0);
+		if (use_clip2[0])
+			m_layer[0]->draw(screen, bitmap, clip[2], TILEMAP_DRAW_CATEGORY(1), 0);
 
-		m_layer[1]->draw(screen, bitmap, finalclip1, 0, 0);
-		if (use_clip3[1])
-			m_layer[1]->draw(screen, bitmap, finalclip3, 0, 0);
+		m_layer[1]->draw(screen, bitmap, clip[1], 0, 0);
+		if (use_clip2[1])
+			m_layer[1]->draw(screen, bitmap, clip[2], 0, 0);
 	}
 
 	return 0;

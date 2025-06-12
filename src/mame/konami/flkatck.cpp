@@ -192,14 +192,9 @@ void flkatck_state::vram_w(offs_t offset, uint8_t data)
 
 uint32_t flkatck_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	// compute clipping
 	rectangle clip[2];
 	const rectangle &visarea = screen.visible_area();
-
-	int scrollx = m_k007121->ctrlram_r(0);
-	int scrolly = m_k007121->ctrlram_r(2);
-
-	if (!scrollx && !scrolly)
-		machine().tilemap().mark_all_dirty();
 
 	if (m_k007121->flipscreen())
 	{
@@ -207,11 +202,7 @@ uint32_t flkatck_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 		clip[0].max_x -= 40;
 
 		clip[1] = visarea;
-		clip[1].min_x = clip[1].max_x - 40;
-
-		m_k007121_tilemap[0]->set_scrollx(0, scrollx - 56 );
-		m_k007121_tilemap[0]->set_scrolly(0, scrolly);
-		m_k007121_tilemap[1]->set_scrollx(0, -16);
+		clip[1].min_x = clip[1].max_x - 39;
 	}
 	else
 	{
@@ -221,19 +212,25 @@ uint32_t flkatck_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 		clip[1] = visarea;
 		clip[1].max_x = 39;
 		clip[1].min_x = 0;
-
-		m_k007121_tilemap[0]->set_scrollx(0, scrollx - 40 );
-		m_k007121_tilemap[0]->set_scrolly(0, scrolly);
-		m_k007121_tilemap[1]->set_scrollx(0, 0);
 	}
 
-	// compute clipping
 	clip[0] &= cliprect;
 	clip[1] &= cliprect;
 
+	// set scroll registers
+	int scrollx = m_k007121->ctrlram_r(0);
+	int scrolly = m_k007121->ctrlram_r(2);
+
+	if (!scrollx && !scrolly)
+		machine().tilemap().mark_all_dirty();
+
+	m_k007121_tilemap[0]->set_scrollx(0, scrollx - 40);
+	m_k007121_tilemap[0]->set_scrolly(0, scrolly);
+	m_k007121_tilemap[1]->set_scrollx(0, 0);
+
 	// draw the graphics
 	m_k007121_tilemap[0]->draw(screen, bitmap, clip[0], 0, 0);
-	m_k007121->sprites_draw(bitmap, cliprect, 0, 40, 0, screen.priority(), (uint32_t)-1);
+	m_k007121->sprites_draw(bitmap, cliprect, 0, m_k007121->flipscreen() ? 16 : 40, 0, screen.priority(), (uint32_t)-1);
 	m_k007121_tilemap[1]->draw(screen, bitmap, clip[1], 0, 0);
 
 	return 0;

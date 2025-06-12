@@ -63,7 +63,6 @@ private:
 
 	// video-related
 	tilemap_t *m_layer[2];
-	rectangle m_clip[2];
 
 	// devices
 	required_device_array<k007232_device, 2> m_k007232;
@@ -154,13 +153,6 @@ void fastlane_state::video_start()
 	m_layer[1] = &machine().tilemap().create(*m_k007121, tilemap_get_info_delegate(*this, FUNC(fastlane_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_layer[0]->set_scroll_rows(32);
-
-	m_clip[0] = m_screen->visible_area();
-	m_clip[0].min_x += 40;
-
-	m_clip[1] = m_screen->visible_area();
-	m_clip[1].max_x = 39;
-	m_clip[1].min_x = 0;
 }
 
 
@@ -186,10 +178,30 @@ void fastlane_state::vram_w(offs_t offset, uint8_t data)
 
 uint32_t fastlane_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	rectangle finalclip0 = m_clip[0], finalclip1 = m_clip[1];
+	// compute clipping
+	rectangle clip[2];
+	const rectangle &visarea = screen.visible_area();
 
-	finalclip0 &= cliprect;
-	finalclip1 &= cliprect;
+	if (m_k007121->flipscreen())
+	{
+		clip[0] = visarea;
+		clip[0].max_x -= 40;
+
+		clip[1] = visarea;
+		clip[1].min_x = clip[1].max_x - 39;
+	}
+	else
+	{
+		clip[0] = visarea;
+		clip[0].min_x += 40;
+
+		clip[1] = visarea;
+		clip[1].max_x = 39;
+		clip[1].min_x = 0;
+	}
+
+	clip[0] &= cliprect;
+	clip[1] &= cliprect;
 
 	// set scroll registers
 	int scrollx = m_k007121->ctrlram_r(0);
@@ -200,9 +212,10 @@ uint32_t fastlane_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	m_layer[0]->set_scrolly(0, scrolly);
 
-	m_layer[0]->draw(screen, bitmap, finalclip0, 0, 0);
-	m_k007121->sprites_draw(bitmap, cliprect, 0, 40, 0, screen.priority(), (uint32_t)-1);
-	m_layer[1]->draw(screen, bitmap, finalclip1, 0, 0);
+	// draw the graphics
+	m_layer[0]->draw(screen, bitmap, clip[0], 0, 0);
+	m_k007121->sprites_draw(bitmap, cliprect, 0, m_k007121->flipscreen() ? 16 : 40, 0, screen.priority(), (uint32_t)-1);
+	m_layer[1]->draw(screen, bitmap, clip[1], 0, 0);
 
 	return 0;
 }
@@ -424,4 +437,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1987, fastlane, 0, fastlane, fastlane, fastlane_state, empty_init, ROT90, "Konami", "Fast Lane", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, fastlane, 0, fastlane, fastlane, fastlane_state, empty_init, ROT90, "Konami", "Fast Lane", MACHINE_SUPPORTS_SAVE )
