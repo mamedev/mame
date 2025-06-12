@@ -712,6 +712,11 @@ ROM_START( matet )
 	ROM_IGNORE(0x100)
 ROM_END
 
+ROM_START( mypac )
+	ROM_REGION( 0x800000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "en29lb160bb.bin", 0x000000, 0x200000, CRC(d741a601) SHA1(a8d89034458b14c5cea83980be5400b82081b274) )
+ROM_END
+
 ROM_START( mympac )
 	ROM_REGION( 0x800000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "m29w640ft.bin", 0x000000, 0x800000, CRC(d6ceda9e) SHA1(c897f8d5661fea0c030daf9c5e92524eb4e71d52) )
@@ -960,7 +965,13 @@ CONS( 2018, ra145,     0,        0, megadriv_ra145_ntsc, msi_6button,           
 //
 // We don't seem to emulate the system it's designed for, so for now just treat it as its own thing (which may become
 // the basis of a driver for that console)
-CONS( 2021, mympac,    0,        0, megadriv_radica_3button_ntsc,  mympac, megadriv_b010xx_select_state, init_megadriv,         "dreamGEAR",            "My Arcade Ms. Pac-Man (DGUNL-7010, Pocket Player Pro)", ROT270 )
+//
+// due to differences in the SoC compared to real MD hardware (including sound + new video modes) these have been left
+// as NOT WORKING for now although some games run to a degree
+
+CONS( 2021, mypac,     0,        0, megadriv_radica_3button_ntsc,  mympac, megadriv_b010xx_select_state, init_megadriv,         "dreamGEAR",            "My Arcade Pac-Man (DGUNL-4198, Pocket Player Pro)", MACHINE_NOT_WORKING | ROT270 )
+
+CONS( 2021, mympac,    0,        0, megadriv_radica_3button_ntsc,  mympac, megadriv_b010xx_select_state, init_megadriv,         "dreamGEAR",            "My Arcade Ms. Pac-Man (DGUNL-7010, Pocket Player Pro)", MACHINE_NOT_WORKING | ROT270 )
 
 CONS( 2012, atgame40,  0,        0, megadriv_radica_3button_pal,  radica_3button, megadriv_b010xx_select_state, init_atgame40, "AtGames",               "40 Bonus Games in 1 (AtGames)", MACHINE_NOT_WORKING)
 
