@@ -44,27 +44,24 @@ namespace {
 class mz2000_state : public driver_device
 {
 public:
-	mz2000_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-		m_cass(*this, "cassette"),
-		m_floppy(nullptr),
-		m_maincpu(*this, "maincpu"),
-		m_screen(*this, "screen"),
-		m_mb8877a(*this, "mb8877a"),
-		m_floppy0(*this, "mb8877a:0"),
-		m_floppy1(*this, "mb8877a:1"),
-		m_floppy2(*this, "mb8877a:2"),
-		m_floppy3(*this, "mb8877a:3"),
-		m_pit8253(*this, "pit"),
-		m_beeper(*this, "beeper"),
-		m_region_tvram(*this, "tvram"),
-		m_region_gvram(*this, "gvram"),
-		m_region_chargen(*this, "chargen"),
-		m_region_ipl(*this, "ipl"),
-		m_region_wram(*this, "wram"),
-		m_io_keys(*this, {"KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7", "KEY8", "KEY9", "KEYA", "KEYB", "KEYC", "KEYD", "UNUSED", "UNUSED"}),
-		m_io_config(*this, "CONFIG"),
-		m_palette(*this, "palette")
+	mz2000_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_cass(*this, "cassette")
+		, m_floppy(nullptr)
+		, m_maincpu(*this, "maincpu")
+		, m_screen(*this, "screen")
+		, m_fdc(*this, "fdc")
+		, m_floppy0(*this, "fdc:0")
+		, m_floppy1(*this, "fdc:1")
+		, m_floppy2(*this, "fdc:2")
+		, m_floppy3(*this, "fdc:3")
+		, m_pit8253(*this, "pit")
+		, m_beeper(*this, "beeper")
+		, m_region_chargen(*this, "chargen")
+		, m_io_keys(*this, {"KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7", "KEY8", "KEY9", "KEYA", "KEYB", "KEYC", "KEYD", "UNUSED", "UNUSED"})
+		, m_io_config(*this, "CONFIG")
+		, m_palette(*this, "palette")
+		, m_ipl_view(*this, "ipl_view")
 	{ }
 
 	void mz2000(machine_config &config);
@@ -73,6 +70,11 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(boot_reset_cb);
 	DECLARE_INPUT_CHANGED_MEMBER(ipl_reset_cb);
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
 private:
 	static void floppy_formats(format_registration &fr);
 
@@ -80,9 +82,26 @@ private:
 
 	floppy_image_device *m_floppy;
 
-	uint8_t m_ipl_enable;
-	uint8_t m_tvram_enable;
-	uint8_t m_gvram_enable;
+	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	required_device<mb8877_device> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
+	required_device<floppy_connector> m_floppy2;
+	required_device<floppy_connector> m_floppy3;
+	required_device<pit8253_device> m_pit8253;
+	required_device<beep_device> m_beeper;
+	std::unique_ptr<uint8_t[]> m_work_ram;
+	std::unique_ptr<uint8_t[]> m_tvram;
+	std::unique_ptr<uint8_t[]> m_gvram;
+	required_memory_region m_region_chargen;
+	required_ioport_array<16> m_io_keys;
+	required_ioport m_io_config;
+	required_device<palette_device> m_palette;
+	memory_view m_ipl_view;
+
+	uint8_t m_vram_overlay_enable, m_vram_overlay_select;
+
 	uint8_t m_gvram_bank;
 
 	uint8_t m_key_mux;
@@ -98,23 +117,18 @@ private:
 
 	uint8_t m_porta_latch;
 	uint8_t m_tape_ctrl;
-	uint8_t mz2000_ipl_r(offs_t offset);
-	uint8_t mz2000_wram_r(offs_t offset);
-	void mz2000_wram_w(offs_t offset, uint8_t data);
-	uint8_t mz2000_tvram_r(offs_t offset);
-	void mz2000_tvram_w(offs_t offset, uint8_t data);
-	uint8_t mz2000_gvram_r(offs_t offset);
-	void mz2000_gvram_w(offs_t offset, uint8_t data);
-	uint8_t mz2000_mem_r(offs_t offset);
-	void mz2000_mem_w(offs_t offset, uint8_t data);
-	void mz2000_gvram_bank_w(uint8_t data);
+	emu_timer *m_ipl_reset_timer = nullptr;
+
+	template <unsigned N> void work_ram_w(offs_t offset, u8 data);
+	template <unsigned N> u8 work_ram_r(offs_t offset);
+	void gvram_w(offs_t offset, u8 data);
+	u8 gvram_r(offs_t offset);
+	void gvram_bank_w(uint8_t data);
 	void floppy_select_w(uint8_t data);
 	void floppy_side_w(uint8_t data);
 	void timer_w(uint8_t data);
-	void mz2000_tvram_attr_w(uint8_t data);
-	void mz2000_gvram_mask_w(uint8_t data);
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
+	void tvram_attr_w(uint8_t data);
+	void gvram_mask_w(uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint8_t fdc_r(offs_t offset);
 	void fdc_w(offs_t offset, uint8_t data);
@@ -131,35 +145,23 @@ private:
 	void mz2000_io(address_map &map) ATTR_COLD;
 	void mz2000_map(address_map &map) ATTR_COLD;
 	void mz80b_io(address_map &map) ATTR_COLD;
+//	void mz2000_opcodes(address_map &map) ATTR_COLD;
 
-	required_device<cpu_device> m_maincpu;
-	required_device<screen_device> m_screen;
-	required_device<mb8877_device> m_mb8877a;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<floppy_connector> m_floppy2;
-	required_device<floppy_connector> m_floppy3;
-	required_device<pit8253_device> m_pit8253;
-	required_device<beep_device> m_beeper;
-	required_memory_region m_region_tvram;
-	required_memory_region m_region_gvram;
-	required_memory_region m_region_chargen;
-	required_memory_region m_region_ipl;
-	required_memory_region m_region_wram;
-	required_ioport_array<16> m_io_keys;
-	required_ioport m_io_config;
-	required_device<palette_device> m_palette;
+	TIMER_CALLBACK_MEMBER(ipl_timer_reset_cb);
 };
 
 void mz2000_state::video_start()
 {
+	m_tvram = std::make_unique<uint8_t[]>(0x1000);
+	m_gvram = std::make_unique<uint8_t[]>(0x10000);
+
+	save_pointer(NAME(m_tvram), 0x1000);
+	save_pointer(NAME(m_gvram), 0x10000);
 }
 
 // TODO: modernize
 uint32_t mz2000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *tvram = m_region_tvram->base();
-	uint8_t *gvram = m_region_gvram->base();
 	uint8_t *gfx_data = m_region_chargen->base();
 	int x,y,xi,yi;
 	uint8_t x_size;
@@ -173,10 +175,10 @@ uint32_t mz2000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 		{
 			for(xi = 0; xi < 8; xi++)
 			{
-				int pen;
-				pen  = ((gvram[count+0x4000] >> (xi)) & 1) ? 1 : 0; //B
-				pen |= ((gvram[count+0x8000] >> (xi)) & 1) ? 2 : 0; //R
-				pen |= ((gvram[count+0xc000] >> (xi)) & 1) ? 4 : 0; //G
+				u8 pen;
+				pen  = ((m_gvram[count + 0x4000] >> (xi)) & 1) ? 1 : 0; //B
+				pen |= ((m_gvram[count + 0x8000] >> (xi)) & 1) ? 2 : 0; //R
+				pen |= ((m_gvram[count + 0xc000] >> (xi)) & 1) ? 4 : 0; //G
 				pen &= m_gvram_mask;
 
 				bitmap.pix(y*2+0, x+xi) = m_palette->pen(pen);
@@ -192,7 +194,7 @@ uint32_t mz2000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	{
 		for(x = 0; x < x_size; x++)
 		{
-			uint8_t tile = tvram[y*x_size+x];
+			uint8_t tile = m_tvram[y*x_size+x];
 			uint8_t color = m_tvram_attr & 7;
 
 			for(yi = 0; yi < 8 * (m_hi_mode+1); yi++)
@@ -251,103 +253,69 @@ uint32_t mz2000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-uint8_t mz2000_state::mz2000_ipl_r(offs_t offset)
+uint8_t mz2000_state::gvram_r(offs_t offset)
 {
-	return m_region_ipl->base()[offset];
+	if (!m_gvram_bank)
+		return 0xff;
+	return m_gvram[offset + m_gvram_bank * 0x4000];
 }
 
-uint8_t mz2000_state::mz2000_wram_r(offs_t offset)
+void mz2000_state::gvram_w(offs_t offset, uint8_t data)
 {
-	return m_region_wram->base()[offset];
+	if (!m_gvram_bank)
+		return;
+	m_gvram[offset + m_gvram_bank * 0x4000] = data;
 }
 
-void mz2000_state::mz2000_wram_w(offs_t offset, uint8_t data)
-{
-	m_region_wram->base()[offset] = data;
-}
-
-uint8_t mz2000_state::mz2000_tvram_r(offs_t offset)
-{
-	return m_region_tvram->base()[offset];
-}
-
-void mz2000_state::mz2000_tvram_w(offs_t offset, uint8_t data)
-{
-	m_region_tvram->base()[offset] = data;
-}
-
-uint8_t mz2000_state::mz2000_gvram_r(offs_t offset)
-{
-	return m_region_gvram->base()[offset+m_gvram_bank*0x4000];
-}
-
-void mz2000_state::mz2000_gvram_w(offs_t offset, uint8_t data)
-{
-	m_region_gvram->base()[offset+m_gvram_bank*0x4000] = data;
-}
-
-
-uint8_t mz2000_state::mz2000_mem_r(offs_t offset)
-{
-	uint8_t page_mem;
-
-	page_mem = (offset & 0xf000) >> 12;
-
-	if(page_mem == 0 && m_ipl_enable)
-		return mz2000_ipl_r(offset & 0xfff);
-
-	if(((page_mem & 8) == 0) && m_ipl_enable == 0) // if ipl is enabled, 0x1000 - 0x7fff accesses to dummy region
-		return mz2000_wram_r(offset);
-
-	if(page_mem & 8)
-	{
-		if(page_mem == 0xd && m_tvram_enable)
-			return mz2000_tvram_r(offset & 0xfff);
-		else if(page_mem >= 0xc && m_gvram_enable)
-			return mz2000_gvram_r(offset & 0x3fff);
-		else
-		{
-			uint16_t wram_mask = (m_ipl_enable) ? 0x7fff : 0xffff;
-			return mz2000_wram_r(offset & wram_mask);
-		}
-	}
-
-	return 0xff;
-}
-
-void mz2000_state::mz2000_mem_w(offs_t offset, uint8_t data)
-{
-	uint8_t page_mem;
-
-	page_mem = (offset & 0xf000) >> 12;
-
-	if((page_mem & 8) == 0 && m_ipl_enable == 0)
-		mz2000_wram_w(offset,data);
-
-	if(page_mem & 8)
-	{
-		if(page_mem == 0xd && m_tvram_enable)
-			mz2000_tvram_w(offset & 0xfff,data);
-		else if(page_mem >= 0xc && m_gvram_enable)
-			mz2000_gvram_w(offset & 0x3fff,data);
-		else
-		{
-			uint16_t wram_mask = (m_ipl_enable) ? 0x7fff : 0xffff;
-
-			mz2000_wram_w(offset & wram_mask,data);
-		}
-	}
-}
-
-void mz2000_state::mz2000_gvram_bank_w(uint8_t data)
+void mz2000_state::gvram_bank_w(uint8_t data)
 {
 	m_gvram_bank = data & 3;
+}
+
+template <unsigned N> uint8_t mz2000_state::work_ram_r(offs_t offset)
+{
+	if (m_vram_overlay_enable)
+	{
+		const u8 page_mem = (offset | (N << 15)) >> 12;
+
+		if (page_mem == 0xd && m_vram_overlay_select == 1)
+		{
+			return m_tvram[offset & 0xfff];
+		}
+		else if (page_mem >= 0xc && m_vram_overlay_select == 0)
+		{
+			return gvram_r(offset & 0x3fff);
+		}
+	}
+
+	return m_work_ram[offset];
+}
+
+template <unsigned N> void mz2000_state::work_ram_w(offs_t offset, uint8_t data)
+{
+	if (m_vram_overlay_enable)
+	{
+		const u8 page_mem = (offset | (N << 15)) >> 12;
+
+		if (page_mem == 0xd && m_vram_overlay_select == 1)
+		{
+			m_tvram[offset & 0xfff] = data;
+			return;
+		}
+		else if (page_mem >= 0xc && m_vram_overlay_select == 0)
+		{
+			gvram_w(offset & 0x3fff, data);
+			return;
+		}
+	}
+
+	m_work_ram[offset] = data;
 }
 
 uint8_t mz2000_state::fdc_r(offs_t offset)
 {
 	if(m_has_fdc)
-		return m_mb8877a->read(offset) ^ 0xff;
+		return m_fdc->read(offset) ^ 0xff;
 
 	return 0xff;
 }
@@ -355,7 +323,7 @@ uint8_t mz2000_state::fdc_r(offs_t offset)
 void mz2000_state::fdc_w(offs_t offset, uint8_t data)
 {
 	if(m_has_fdc)
-		m_mb8877a->write(offset, data ^ 0xff);
+		m_fdc->write(offset, data ^ 0xff);
 }
 
 void mz2000_state::floppy_select_w(uint8_t data)
@@ -368,7 +336,7 @@ void mz2000_state::floppy_select_w(uint8_t data)
 	case 3: m_floppy = m_floppy3->get_device(); break;
 	}
 
-	m_mb8877a->set_floppy(m_floppy);
+	m_fdc->set_floppy(m_floppy);
 
 	// todo: bit 2 is connected to something too...
 
@@ -392,12 +360,12 @@ void mz2000_state::timer_w(uint8_t data)
 	m_pit8253->write_gate1(1);
 }
 
-void mz2000_state::mz2000_tvram_attr_w(uint8_t data)
+void mz2000_state::tvram_attr_w(uint8_t data)
 {
 	m_tvram_attr = data;
 }
 
-void mz2000_state::mz2000_gvram_mask_w(uint8_t data)
+void mz2000_state::gvram_mask_w(uint8_t data)
 {
 	m_gvram_mask = data;
 }
@@ -405,7 +373,18 @@ void mz2000_state::mz2000_gvram_mask_w(uint8_t data)
 void mz2000_state::mz2000_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0xffff).rw(FUNC(mz2000_state::mz2000_mem_r), FUNC(mz2000_state::mz2000_mem_w));
+	map(0x0000, 0xffff).rw(FUNC(mz2000_state::work_ram_r<0>), FUNC(mz2000_state::work_ram_w<0>));
+	map(0x0000, 0xffff).view(m_ipl_view);
+	m_ipl_view[0](0x0000, 0x07ff).rom().region("ipl", 0);
+	m_ipl_view[0](0x0800, 0x7fff).unmaprw();
+	m_ipl_view[0](0x8000, 0xffff).rw(FUNC(mz2000_state::work_ram_r<1>), FUNC(mz2000_state::work_ram_w<1>));
+
+	// theoretical, cpm22 executes stuff from GVRAM at 0xfa00 during bootstrap,
+	// core gets confused and execute from work RAM instead.
+	// wpset 0,ffff,r,1,{printf "%04x",wpaddr;g} will make this approach to work ...
+//	map(0xc000, 0xffff).view(m_vram_view);
+//	m_vram_view[0](0xc000, 0xffff).rw(FUNC(mz2000_state::gvram_r), FUNC(mz2000_state::gvram_w));
+//	m_vram_view[1](0xd000, 0xdfff).ram().share("tvram");
 }
 
 void mz2000_state::mz80b_io(address_map &map)
@@ -427,11 +406,10 @@ void mz2000_state::mz2000_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	mz80b_io(map);
-	map(0xf5, 0xf5).w(FUNC(mz2000_state::mz2000_tvram_attr_w));
-	map(0xf6, 0xf6).w(FUNC(mz2000_state::mz2000_gvram_mask_w));
-	map(0xf7, 0xf7).w(FUNC(mz2000_state::mz2000_gvram_bank_w));
+	map(0xf5, 0xf5).w(FUNC(mz2000_state::tvram_attr_w));
+	map(0xf6, 0xf6).w(FUNC(mz2000_state::gvram_mask_w));
+	map(0xf7, 0xf7).w(FUNC(mz2000_state::gvram_bank_w));
 }
-
 
 /*
    The \ key is actually directly to the left of the BREAK key; the CLR/HOME and INST/DEL keys sit
@@ -454,6 +432,11 @@ INPUT_CHANGED_MEMBER(mz2000_state::ipl_reset_cb)
 	machine().schedule_soft_reset();
 }
 
+TIMER_CALLBACK_MEMBER(mz2000_state::ipl_timer_reset_cb)
+{
+	logerror("IPL reset kicked in\n");
+	machine().schedule_soft_reset();
+}
 
 static INPUT_PORTS_START( mz80be ) // European keyboard
 	PORT_START("BACK_PANEL")
@@ -668,22 +651,7 @@ static INPUT_PORTS_START( mz80bj ) // Japanese keyboard (kana, no RVS)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(u8"\u30ab\u30ca")              PORT_CODE(KEYCODE_TILDE)      PORT_CHAR(UCHAR_MAMEKEY(RALT)) // カナ (kana)
 INPUT_PORTS_END
 
-
-void mz2000_state::machine_reset()
-{
-	m_ipl_enable = 1;
-	m_tvram_enable = 0;
-	m_gvram_enable = 0;
-
-	m_beeper->set_state(0);
-
-	m_color_mode = m_io_config->read() & 1;
-	m_has_fdc = (m_io_config->read() & 2) >> 1;
-	m_hi_mode = (m_io_config->read() & 4) >> 2;
-}
-
-
-static const gfx_layout mz2000_charlayout_8 =
+static const gfx_layout charlayout_8x8 =
 {
 	8, 8,
 	256,
@@ -694,7 +662,7 @@ static const gfx_layout mz2000_charlayout_8 =
 	8*8
 };
 
-static const gfx_layout mz2000_charlayout_16 =
+static const gfx_layout charlayout_8x16 =
 {
 	8, 16,
 	256,
@@ -706,9 +674,35 @@ static const gfx_layout mz2000_charlayout_16 =
 };
 
 static GFXDECODE_START( gfx_mz2000 )
-	GFXDECODE_ENTRY( "chargen", 0x0000, mz2000_charlayout_8, 0, 1 )
-	GFXDECODE_ENTRY( "chargen", 0x0800, mz2000_charlayout_16, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, charlayout_8x8, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0800, charlayout_8x16, 0, 1 )
 GFXDECODE_END
+
+void mz2000_state::machine_start()
+{
+	m_work_ram = make_unique_clear<uint8_t[]>(0x10000);
+	save_pointer(NAME(m_work_ram), 0x10000);
+	save_item(NAME(m_vram_overlay_enable));
+	save_item(NAME(m_vram_overlay_select));
+
+	m_vram_overlay_enable = 0;
+	m_vram_overlay_select = 0;
+	// m_vram_view.disable();
+
+	m_ipl_reset_timer = timer_alloc(FUNC(mz2000_state::ipl_timer_reset_cb), this);
+}
+
+void mz2000_state::machine_reset()
+{
+	m_ipl_view.select(0);
+
+	m_ipl_reset_timer->adjust(attotime::never);
+	m_beeper->set_state(0);
+
+	m_color_mode = m_io_config->read() & 1;
+	m_has_fdc = (m_io_config->read() & 2) >> 1;
+	m_hi_mode = (m_io_config->read() & 4) >> 2;
+}
 
 uint8_t mz2000_state::ppi_porta_r()
 {
@@ -821,19 +815,22 @@ void mz2000_state::ppi_portc_w(uint8_t data)
 	    -x-- ---- tape rec
 	    --x- ---- tape ?
 	    ---x ---- tape open
-	    ---- x--- 0->1 transition = IPL reset
+	    ---- x--- 1->0 transition = IPL start
 	    ---- -x-- beeper state
 	    ---- --x- 0->1 transition = Work RAM reset
 	*/
 	//logerror("C W %02x\n",data);
 
-	if(((m_old_portc & 8) == 0) && data & 8)
-		m_ipl_enable = 1;
-
-	if(((m_old_portc & 2) == 0) && data & 2)
+	if(BIT(m_old_portc, 3) != BIT(data, 3))
 	{
-		m_ipl_enable = 0;
-		/* correct? */
+		logerror("PIO PC: IPL reset %s\n", BIT(data, 3) ? "stopped" : "started");
+		m_ipl_reset_timer->adjust(!BIT(data, 3) ? attotime::from_hz(100) : attotime::never);
+	}
+
+	if(!BIT(m_old_portc, 1) && BIT(data, 1))
+	{
+		logerror("PIO PC: Work RAM reset\n");
+		m_ipl_view.disable();
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	}
 
@@ -844,8 +841,18 @@ void mz2000_state::ppi_portc_w(uint8_t data)
 
 void mz2000_state::pio_porta_w(uint8_t data)
 {
-	m_tvram_enable = ((data & 0xc0) == 0xc0);
-	m_gvram_enable = ((data & 0xc0) == 0x80);
+	m_vram_overlay_enable = BIT(data, 7);
+	m_vram_overlay_select = BIT(data, 6);
+	//logerror("PIO PA vram %s %02x\n", m_vram_overlay_enable ? "select" : "disable", BIT(data, 6));
+//	if (BIT(data, 7))
+//	{
+//		m_vram_view.select(BIT(data, 6));
+//	}
+//	else
+//	{
+//		m_vram_view.disable();
+//	}
+
 	m_width80 = ((data & 0x20) >> 5);
 	m_key_mux = data & 0x1f;
 
@@ -894,6 +901,7 @@ void mz2000_state::mz2000(machine_config &config)
 	Z80(config, m_maincpu, MASTER_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mz2000_state::mz2000_map);
 	m_maincpu->set_addrmap(AS_IO, &mz2000_state::mz2000_io);
+//	m_maincpu->set_addrmap(AS_OPCODES, &mz2000_state::mz2000_opcodes);
 
 	i8255_device &ppi(I8255(config, "i8255_0"));
 	ppi.in_pa_callback().set(FUNC(mz2000_state::ppi_porta_r));
@@ -917,12 +925,12 @@ void mz2000_state::mz2000(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, "beeper", 4096).add_route(ALL_OUTPUTS,"mono",0.15);
 
-	MB8877(config, m_mb8877a, 1_MHz_XTAL);
+	MB8877(config, m_fdc, 1_MHz_XTAL);
 
-	FLOPPY_CONNECTOR(config, "mb8877a:0", mz2000_floppies, "525dd", mz2000_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, "mb8877a:1", mz2000_floppies, "525dd", mz2000_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, "mb8877a:2", mz2000_floppies, nullptr, mz2000_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, "mb8877a:3", mz2000_floppies, nullptr, mz2000_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", mz2000_floppies, "525dd", mz2000_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:1", mz2000_floppies, "525dd", mz2000_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:2", mz2000_floppies, nullptr, mz2000_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:3", mz2000_floppies, nullptr, mz2000_state::floppy_formats);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("mz2000_flop");
 
@@ -948,6 +956,7 @@ void mz2000_state::mz2000(machine_config &config)
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 }
 
+// TODO: significantly different memory model and video output (PIO-3039)
 void mz2000_state::mz80b(machine_config &config)
 {
 	mz2000(config);
@@ -956,32 +965,16 @@ void mz2000_state::mz80b(machine_config &config)
 
 
 ROM_START( mz80b )
-	ROM_REGION( 0x1000, "ipl", 0 )
+	ROM_REGION( 0x800, "ipl", 0 )
 	ROM_LOAD( "ipl.rom",  0x0000, 0x0800, CRC(80beeec0) SHA1(d2b8167cc77ad023a807198993cb5e7a94c9e19e) )
-
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x10000, "wram", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x1000, "tvram", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x10000, "gvram", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x1800, "chargen", 0 )
 	ROM_LOAD( "mzfont.rom", 0x0000, 0x0800, CRC(0631efc3) SHA1(99b206af5c9845995733d877e9e93e9681b982a8) )
 ROM_END
 
 ROM_START( mz2000 )
-	ROM_REGION( 0x1000, "ipl", ROMREGION_ERASEFF )
+	ROM_REGION( 0x800, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "mz20ipl.bin",0x0000, 0x0800, CRC(d7ccf37f) SHA1(692814ffc2cf50fa8bf9e30c96ebe4a9ee536a86))
-
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x10000, "wram", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x1000, "tvram", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x10000, "gvram", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x1800, "chargen", 0 )
 //  ROM_LOAD( "mzfont.rom", 0x0000, 0x0800, BAD_DUMP CRC(0631efc3) SHA1(99b206af5c9845995733d877e9e93e9681b982a8) ) //original has JP characters
@@ -991,16 +984,8 @@ ROM_START( mz2000 )
 ROM_END
 
 ROM_START( mz2200 )
-	ROM_REGION( 0x10000, "ipl", 0 )
+	ROM_REGION( 0x800, "ipl", 0 )
 	ROM_LOAD( "mz2200ipl.bin", 0x0000, 0x0800, CRC(476801e8) SHA1(6b1f0620945c5492475ea1694bd09a3fcf88549d) )
-
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-
-	ROM_REGION( 0x10000, "wram", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x1000, "tvram", ROMREGION_ERASE00 )
-
-	ROM_REGION( 0x10000, "gvram", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x1800, "chargen", 0 )
 //  ROM_LOAD( "mzfont.rom", 0x0000, 0x0800, BAD_DUMP CRC(0631efc3) SHA1(99b206af5c9845995733d877e9e93e9681b982a8) ) //original has JP characters
