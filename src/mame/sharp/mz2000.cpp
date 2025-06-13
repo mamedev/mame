@@ -927,10 +927,10 @@ void mz2000_state::mz2000(machine_config &config)
 
 	MB8877(config, m_fdc, 1_MHz_XTAL);
 
-	FLOPPY_CONNECTOR(config, "fdc:0", mz2000_floppies, "525dd", mz2000_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:1", mz2000_floppies, "525dd", mz2000_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:2", mz2000_floppies, nullptr, mz2000_state::floppy_formats);
-	FLOPPY_CONNECTOR(config, "fdc:3", mz2000_floppies, nullptr, mz2000_state::floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", mz2000_floppies, "525dd", mz2000_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", mz2000_floppies, "525dd", mz2000_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:2", mz2000_floppies, nullptr, mz2000_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:3", mz2000_floppies, nullptr, mz2000_state::floppy_formats).enable_sound(true);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("mz2000_flop");
 
