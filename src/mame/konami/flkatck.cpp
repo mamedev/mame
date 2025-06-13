@@ -7,9 +7,14 @@
     Driver by:
         Manuel Abadia <emumanu+mame@gmail.com>
 
-NOTE: A USA version of Flak Attack is known to exist  - currently not dumped
+NOTE: A USA version of Flak Attack is known to exist - currently not dumped
 
 24MHz & 3.579545MHz OSCs
+
+TODO:
+- remove the bank 0 hack from get_tile_info_a. k007121 register 4 is supposed
+  to be 0xc0 on the press start screen, but if you insert a coin during demo
+  play, it won't update this register properly?
 
 ***************************************************************************/
 
@@ -249,7 +254,7 @@ void flkatck_state::bankswitch_w(uint8_t data)
 
 uint8_t flkatck_state::ls138_r(offs_t offset)
 {
-	int data = 0;
+	uint8_t data = 0;
 
 	switch ((offset & 0x1c) >> 2)
 	{
@@ -290,7 +295,7 @@ void flkatck_state::ls138_w(offs_t offset, uint8_t data)
 void flkatck_state::main_map(address_map &map)
 {
 	map(0x0000, 0x0007).w(m_k007121, FUNC(k007121_device::ctrl_w));
-	map(0x0008, 0x03ff).ram();
+	map(0x0020, 0x005f).ram(); // rowscroll?
 	map(0x0400, 0x041f).rw(FUNC(flkatck_state::ls138_r), FUNC(flkatck_state::ls138_w)); // inputs, DIPS, bankswitch, counters, sound command
 	map(0x0800, 0x0bff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 	map(0x1000, 0x1fff).ram().share(m_spriteram);
