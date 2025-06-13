@@ -373,7 +373,7 @@ void fastlane_state::fastlane(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(24_MHz_XTAL / 3, 512, 0, 280, 264, 16, 240); // not verified
+	m_screen->set_raw(24_MHz_XTAL / 3, 512, 0, 280, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(fastlane_state::screen_update));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(m_k007121, FUNC(k007121_device::sprites_buffer));

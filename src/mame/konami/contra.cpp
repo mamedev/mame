@@ -455,6 +455,7 @@ void contra_state::coin_counter_w(uint8_t data)
 
 void contra_state::main_map(address_map &map)
 {
+	map.unmap_value_high();
 	map(0x0000, 0x0007).w(m_k007121[0], FUNC(k007121_device::ctrl_w));
 	map(0x0008, 0x000f).rw("k007452", FUNC(k007452_device::read), FUNC(k007452_device::write));
 	map(0x0010, 0x0010).portr("SYSTEM");
@@ -493,6 +494,7 @@ void contra_state::main_map(address_map &map)
 
 void contra_state::sound_map(address_map &map)
 {
+	map.unmap_value_high();
 	map(0x0000, 0x0000).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x2000, 0x2001).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0x4000, 0x4000).w(FUNC(contra_state::sirq_clear_w)); // read triggers irq reset and latch read (in the hardware only).
@@ -601,13 +603,13 @@ void contra_state::contra(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(6000)); // enough for the sound CPU to read all commands
 
-	WATCHDOG_TIMER(config, "watchdog");
+	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_msec(310)); // measured
 
 	KONAMI_007452_MATH(config, "k007452");
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(24_MHz_XTAL / 3, 512, 0, 280, 264, 16, 240); // not verified
+	m_screen->set_raw(24_MHz_XTAL / 3, 512, 0, 280, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(contra_state::screen_update));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set(m_k007121[0], FUNC(k007121_device::sprites_buffer));

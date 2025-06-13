@@ -438,7 +438,7 @@ void hcastle_state::hcastle(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(24_MHz_XTAL / 3, 512, 0, 256, 264, 16, 240); // not verified
+	screen.set_raw(24_MHz_XTAL / 3, 512, 0, 256, 264, 16, 240);
 	screen.set_screen_update(FUNC(hcastle_state::screen_update));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(m_k007121[0], FUNC(k007121_device::sprites_buffer));
