@@ -344,7 +344,7 @@ license:CC0-1.0
 	*KD-1  Kids' Song 20 - Volume 1
 	*KD-2  Kids' Song 20 - Volume 2
 	*KD-3  Kids' Song 20 - Volume 3
-	 KD-4  Kids' Song 20 - Volume 4
+	*KD-4  Kids' Song 20 - Volume 4
 
 	***********************************************************************************
 
@@ -2357,6 +2357,19 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="kd4">
+		<description>Kids' Song 20 (Japan) (KD-4)</description>
+		<year>2004</year>
+		<publisher>Takara</publisher>
+		<info name="alt_title" value="キッズソング20" />
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="kd0004.bin" size="0x100000" crc="c9719803" sha1="5aa6ec9742d8e560a86319e40d5f731b8ef60dd3"/>
+			</dataarea>
+		</part>
+	</software>	
 
 	<!-- ********************************************************************************************************************************************************************** -->
 
@@ -3126,10 +3139,22 @@ license:CC0-1.0
 		<sharedfeat name="compatibility" value="EKARA"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x200000">
-				<rom name="web.u1" size="0x200000" crc="69bb06bf" sha1="dafa4fde7b59cb547e1f3af0b29606b33cb76fd0"/>
+				<rom name="ekaraweb_28m_blank.u1" size="0x200000" crc="69bb06bf" sha1="dafa4fde7b59cb547e1f3af0b29606b33cb76fd0"/>
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="ekaraweb28a" cloneof="ekaraweb28">
+		<description>e-kara Web cartridge 28M (used, with 26 songs) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="ekaraweb_28m_26.u1" size="0x200000" crc="3c03be04" sha1="c3a68376d798f911a38634f19abe4ca870ae8b5c"/>
+			</dataarea>
+		</part>
+	</software>	
 
 	<software name="ekaraweb12">
 		<description>e-kara Web cartridge 12M (blank) (Japan)</description>
@@ -3138,7 +3163,7 @@ license:CC0-1.0
 		<sharedfeat name="compatibility" value="EKARA"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="ekaraweb2.bin" size="0x100000" crc="9149a3a8" sha1="01277650706c1b168c5125b0ddcceacbd207be25"/>
+				<rom name="ekaraweb_12m_blank.u1" size="0x100000" crc="9149a3a8" sha1="01277650706c1b168c5125b0ddcceacbd207be25"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3158,7 +3183,7 @@ license:CC0-1.0
 		<sharedfeat name="compatibility" value="EKARA"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="ekaraweb3.bin" size="0x100000" crc="a6a095b9" sha1="709d7edb5799b97127502408bec698663b902462"/>
+				<rom name="ekaraweb_12m_7.u1" size="0x100000" crc="a6a095b9" sha1="709d7edb5799b97127502408bec698663b902462"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3177,13 +3202,13 @@ license:CC0-1.0
 	     キラリ☆セーラードリーム     小枝(さえ)          Kirari ☆ Sailor Dream                      Koeda (Sae)
 	     夏祭り                      Whiteberry          Natsu Matsuri                              Whiteberry -->
 	<software name="ekaraweb12b" cloneof="ekaraweb12">
-		<description>e-kara Web cartridge 12M (used, with 12 songs) (Japan)</description>
+		<description>e-kara Web cartridge 12M (used, with 12 songs, set 1) (Japan)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="ekaraweb4.bin" size="0x100000" crc="23df7749" sha1="cfd3f9f0b9f4713d560700c4e463d0e9d94c9447"/>
+				<rom name="ekaraweb_12m_12_set1.u1" size="0x100000" crc="23df7749" sha1="cfd3f9f0b9f4713d560700c4e463d0e9d94c9447"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3201,11 +3226,107 @@ license:CC0-1.0
 		<sharedfeat name="compatibility" value="EKARA"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="usercart.bin" size="0x100000" crc="bc4635cd" sha1="5343b254218f85a2f9e5ae9e4646b456d82c7d27"/>
+				<rom name="ekaraweb_12m_5.u1" size="0x100000" crc="bc4635cd" sha1="5343b254218f85a2f9e5ae9e4646b456d82c7d27"/>
 			</dataarea>
 		</part>
 	</software>
+	
+	<software name="ekaraweb12d" cloneof="ekaraweb12">
+		<description>e-kara Web cartridge 12M (used, with 12 songs, set 2) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekaraweb_12m_12_set2.u1" size="0x100000" crc="23507ed2" sha1="254c24c23b51cae181579ac062cf01f76edebb73"/>
+			</dataarea>
+		</part>
+	</software>			
 
+	<software name="ekaraweb12e" cloneof="ekaraweb12">
+		<description>e-kara Web cartridge 12M (used, with 12 songs, set 3) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekaraweb_12m_12_set3.u1" size="0x100000" crc="1aa61941" sha1="002353dfd8ac61c4ea3e82d3fdd95d98a0fbf29e"/>
+			</dataarea>
+		</part>
+	</software>	
+
+	<software name="ekaraweb12f" cloneof="ekaraweb12">
+		<description>e-kara Web cartridge 12M (used, with 12 songs, set 4) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekaraweb_12m_12_set4.u1" size="0x100000" crc="4df715fe" sha1="8aa22b8f1823c186124c4e083efc94d3b1adb5f9"/>
+			</dataarea>
+		</part>
+	</software>		
+
+	<software name="ekaraweb12g" cloneof="ekaraweb12">
+		<description>e-kara Web cartridge 12M (used, with 12 songs, set 5) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekaraweb_12m_12_set5.u1" size="0x100000" crc="2d05d13d" sha1="252a74157e403e61107945d05e72d0c0d7b8f1c1"/>
+			</dataarea>
+		</part>
+	</software>	
+
+	<software name="ekaraweb12h" cloneof="ekaraweb12">
+		<description>e-kara Web cartridge 12M (used, with 12 songs, set 6) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekaraweb_12m_12_set6.u1" size="0x100000" crc="cc7d21bc" sha1="14da4da1af6c9c36fac03d80a596b033347aae30"/>
+			</dataarea>
+		</part>
+	</software>	
+	
+	<software name="ekaraweb12i" cloneof="ekaraweb12">
+		<description>e-kara Web cartridge 12M (used, with 12 songs, set 7) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekaraweb_12m_12_set7.u1" size="0x100000" crc="6230d3d2" sha1="8b9ca56d64b37cf96cc97f953d2ad2525c4ee98e"/>
+			</dataarea>
+		</part>
+	</software>		
+	
+	<software name="ekaraweb12j" cloneof="ekaraweb12">
+		<description>e-kara Web cartridge 12M (used, with 12 songs, set 8) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekaraweb_12m_12_set8.u1" size="0x100000" crc="fd6f4039" sha1="d8b5e4dab616aaa2ae63ab14a919ca4b0e395614"/>
+			</dataarea>
+		</part>
+	</software>		
+	
+	<software name="ekaraweb12k" cloneof="ekaraweb12">
+		<description>e-kara Web cartridge 12M (used, with 12 songs, set 9) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekaraweb_12m_12_set9.u1" size="0x100000" crc="52535bbf" sha1="598734744c661226e4be79ec44d75ad556c05262"/>
+			</dataarea>
+		</part>
+	</software>		
+	
 	<!-- this one has some songs programmed into it:
 	    世界に一つだけの花            SMAP                                  Sekai ni Hitotsu Dake no Hana   SMAP
 	    さくらんぼ                    大塚愛                                Sakuranbo                       Ōtsuka Ai
@@ -3216,13 +3337,49 @@ license:CC0-1.0
 	    ミニモニ。ジャンケンぴょん!   ミニモニ。                            mini-moni Jankenpyon!           mini-moni
 	    大きな古時計                  童謡                                  Ōkina Furudokei                 Dōyō -->
 	<software name="ekaraweb8">
-		<description>e-kara Web cartridge 8M (used, with 8 songs) (Japan)</description>
+		<description>e-kara Web cartridge 8M (used, with 8 songs, set 1) (Japan)</description>
 		<year>2003</year>
 		<publisher>Takara</publisher>
 		<sharedfeat name="compatibility" value="EKARA"/>
 		<part name="cart" interface="ekara_cart">
 			<dataarea name="rom" size="0x100000">
-				<rom name="usercart.u1" size="0x100000" crc="28a5a5c7" sha1="408ef97a8a42e286cb18b9df61ac575a24b1462d"/>
+				<rom name="ekaraweb_8m_8_set1.u1" size="0x100000" crc="28a5a5c7" sha1="408ef97a8a42e286cb18b9df61ac575a24b1462d"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="ekaraweb8a" cloneof="ekaraweb8">
+		<description>e-kara Web cartridge 8M (used, with 8 songs, set 2) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekaraweb_8m_8_set2.u1" size="0x100000" crc="abc09a19" sha1="8b65e4b00a8757a0df3965548fd52e6b12b92756"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="ekaraweb8b" cloneof="ekaraweb8">
+		<description>e-kara Web cartridge 8M (used, with 8 songs, set 3) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekaraweb_8m_8_set3.u1" size="0x100000" crc="a97521cb" sha1="d5b826e7313697491cbcfab243439899a46f17c4"/>
+			</dataarea>
+		</part>
+	</software>	
+
+	<software name="ekaraweb8c" cloneof="ekaraweb8">
+		<description>e-kara Web cartridge 8M (used, with 8 songs, set 4) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekaraweb_8m_8_set4.u1" size="0x100000" crc="4e7c04d8" sha1="f81c134849cd846ede0106bf355c71408a2771a1"/>
 			</dataarea>
 		</part>
 	</software>
