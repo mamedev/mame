@@ -396,19 +396,6 @@ ppcar
 ssfindo
 tetfight
 
-@source:acorn/z88.cpp
-z88
-z88ch
-z88de
-z88dk
-z88es
-z88fi
-z88fr
-z88it
-z88no
-z88se
-z88tr
-
 @source:act/apricot.cpp
 apricot
 apricotxi
@@ -42793,6 +42780,19 @@ zx97
 
 @source:sinclair/specnext.cpp
 tbblue
+
+@source:sinclair/z88.cpp
+z88
+z88ch
+z88de
+z88dk
+z88es
+z88fi
+z88fr
+z88it
+z88no
+z88se
+z88tr
 
 @source:skeleton/600cat.cpp
 600cat
