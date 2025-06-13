@@ -23,9 +23,11 @@
     VOLANTE MODULAR: (small sub-board) Logic for the driving wheel.
 
     TODO:
-    - priorities aren't understood
-    - sound implementation may not be totally correct
+    - sound implementation may not be totally correct (although regular Modular sound seems completely unused)
     - wheel support
+	- dipswitches
+	- identify unimplemented video registers
+
 ***************************************************************************************************/
 
 #include "emu.h"
@@ -91,6 +93,7 @@ private:
 	tilemap_t *m_bg_tilemap = nullptr;
 	tilemap_t *m_bg2_tilemap = nullptr;
 
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
@@ -135,6 +138,7 @@ TILE_GET_INFO_MEMBER(wrally_ms_state::get_bg_tile_info)
 	int fx = (attr & 0xc0) >> 6;
 
 	tileinfo.set(2, code & 0xfff, attr & 0x1f, TILE_FLIPYX(fx));
+	tileinfo.category = (attr & 0x0020) >> 5;
 }
 
 void wrally_ms_state::bg_w(offs_t offset, u16 data, u16 mem_mask)
@@ -148,8 +152,8 @@ TILE_GET_INFO_MEMBER(wrally_ms_state::get_bg2_tile_info)
 	u16 code = m_bg2_vram[tile_index * 2];
 	u16 attr = m_bg2_vram[(tile_index * 2) + 1];
 	int fx = (attr & 0xc0) >> 6;
-
-	tileinfo.set(1, code & 0x1fff, attr & 0x1f, TILE_FLIPYX(fx)); // some valid road gfx drawn from here
+	tileinfo.set(1, code & 0x1fff, attr & 0x1f, TILE_FLIPYX(fx));
+	//tileinfo.category = (attr & 0x0020) >> 5; // not used on this layer?
 }
 
 void wrally_ms_state::bg2_w(offs_t offset, u16 data, u16 mem_mask)
@@ -169,30 +173,13 @@ void wrally_ms_state::video_start()
 //  m_bg2_tilemap->set_transparent_pen(0);
 }
 
-u32 wrally_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void wrally_ms_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	// are these using the correct reg pairs?
-	m_bg_tilemap->set_scrollx(0, 80-(m_scrollregs[0]));
-	m_bg_tilemap->set_scrolly(0, -m_scrollregs[1]);
-
-	m_bg2_tilemap->set_scrollx(0, 80-(m_scrollregs[6]));
-	m_bg2_tilemap->set_scrolly(0, -m_scrollregs[7]);
-
-	// what are m_scrollregs 2,3 and 4,5?
-	// one is probably tx scroll, the other priority control
-
-	m_tx_tilemap->set_scrollx(0, 80);
-	m_tx_tilemap->set_scrolly(0, 0);
-
-	m_bg2_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-
 	// TODO, convert to device, share between Modular System games
 	const int NUM_SPRITES = 0x200;
 	const int X_EXTRA_OFFSET = 78;
 
-	for (int i = NUM_SPRITES - 2; i >= 0; i -= 2)
+	for (int i = 0; i < NUM_SPRITES; i += 2)
 	{
 		gfx_element* gfx = m_gfxdecode->gfx(3);
 
@@ -220,9 +207,43 @@ u32 wrally_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 
 		int flipx = (attr1 & 0x0040);
 		int flipy = (attr1 & 0x0080);
+		int col = (attr2 & 0x0f00) >> 8;
 
-		gfx->transpen(bitmap, cliprect, tile, (attr2 & 0x0f00) >> 8, flipx, flipy, xpos - 16 - X_EXTRA_OFFSET, ypos - 16, 15);
+		int pri_mask;
+		if (col & 8)
+			pri_mask = 0xf0;
+		else
+			pri_mask = 0x00;
+
+		gfx->prio_transpen(bitmap, cliprect, tile, col, flipx, flipy, xpos - 16 - X_EXTRA_OFFSET, ypos - 16, screen.priority(),	pri_mask, 15);
 	}
+}
+
+u32 wrally_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	screen.priority().fill(0, cliprect);
+	bitmap.fill(0, cliprect);
+
+	// are these using the correct reg pairs?
+	m_bg_tilemap->set_scrollx(0, 80-(m_scrollregs[0]));
+	m_bg_tilemap->set_scrolly(0, -m_scrollregs[1]);
+
+	m_bg2_tilemap->set_scrollx(0, 80-(m_scrollregs[6]));
+	m_bg2_tilemap->set_scrolly(0, -m_scrollregs[7]);
+
+	// what are m_scrollregs 2,3 and 4,5?
+	// one is probably tx scroll, the other priority control (or not?)
+
+	m_tx_tilemap->set_scrollx(0, 80);
+	m_tx_tilemap->set_scrolly(0, 0);
+
+	m_bg2_tilemap->draw(screen, bitmap, cliprect, 0, 1);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0), 2);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1), 4);
+
+	draw_sprites(screen, bitmap, cliprect);
+
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -564,4 +585,4 @@ ROM_END
 } // anonymous namespace
 
 // World Rally was originally developed using the Modular System, so this isn't a bootleg, it's the original development version
-GAME( 1992, wrallymp, wrally, wrally_ms, wrally_ms, wrally_ms_state, init_wrally_ms, ROT0, "Gaelco", "World Rallye Championship (prototype on Modular System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // 23/11/1992
+GAME( 1992, wrallymp, wrally, wrally_ms, wrally_ms, wrally_ms_state, init_wrally_ms, ROT0, "Gaelco", "World Rallye Championship (prototype on Modular System, 23 Nov 1992)", 0 ) // 23/11/1992
