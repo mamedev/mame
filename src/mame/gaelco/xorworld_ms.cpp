@@ -20,11 +20,9 @@
 	quite similar to splash_ms.cpp but without the extra bitmap layer and CPU driving it
 
 	TODO:
-	 - make use of scroll regs (only seem to be written on startup, mostly 0)
-	 - sound
-	 - service mode colours are broken (maybe due to being a prototype?)
-	 - do the higher attribute bits in the 16x16 layer have meaning?
-	 - verify there's no (subtle) protection as found in 'xorworld'
+	 - service mode colours are broken (probably due to being a prototype?)
+	 - do the higher attribute bits in the 16x16 layer have meaning? (probably not)
+	 - what determines sound NMI frequency on these Modular boards as it's different to splash?
 
 ***************************************************************************************************/
 
@@ -58,10 +56,11 @@ public:
 		, m_videoram_8x8_mg(*this, "videoram_8x8mg")
 		, m_videoram_8x8_mg_8x8_fg(*this, "videoram_8x8fg")
 		, m_videoram_16x16_bg(*this, "videoram16x16bg")
-		, m_videoregs(*this, "videoregs")
+		, m_scrollregs(*this, "scrollregs")
 		, m_spriteram(*this, "spriteram")
 		, m_soundlatch(*this, "soundlatch")
 		, m_msm(*this, "msm")
+		, m_ymsnd(*this, "ymsnd")
 	{ }
 
 	void xorworld_ms(machine_config &config) ATTR_COLD;
@@ -81,10 +80,11 @@ private:
 	required_shared_ptr<uint16_t> m_videoram_8x8_mg;
 	required_shared_ptr<uint16_t> m_videoram_8x8_mg_8x8_fg;
 	required_shared_ptr<uint16_t> m_videoram_16x16_bg;
-	required_shared_ptr<uint16_t> m_videoregs;
+	required_shared_ptr<uint16_t> m_scrollregs;
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<msm5205_device> m_msm;
+	required_device<ym3812_device> m_ymsnd;
 
 	void descramble_16x16tiles(uint8_t* src, int len);
 
@@ -124,21 +124,32 @@ void xorworld_ms_state::video_start()
 
 u32 xorworld_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	// TODO: use scroll regs (only set once on startup though?)
-	m_tilemap_8x8_mg->set_scrollx(0, 128);
-	m_tilemap_8x8_mg->set_scrolly(0, 0);
-	m_tilemap_8x8_fg->set_scrollx(0, 128);
-	m_tilemap_8x8_fg->set_scrolly(0, 0);
-	m_tilemap_16x16_bg->set_scrollx(0, 128);
-	m_tilemap_16x16_bg->set_scrolly(0, 0);
+	// based on other Modular games I think this is correct
+	// scrollregs 0/1 for layer at 90000 (middle layer?)
+	// scrollregs 2/3 for sprite global offsets?
+	// scrollregs 4/5 for layer at 80000 (frontmost?)
+	// scrollregs 6/7 for layer at a0000 (backmost)
+	int global_x_offset = 128;
+
+	m_tilemap_8x8_fg->set_scrollx(0, global_x_offset-(m_scrollregs[4]));
+	m_tilemap_8x8_fg->set_scrolly(0, -(m_scrollregs[5]));
+	m_tilemap_8x8_mg->set_scrollx(0, global_x_offset-(m_scrollregs[0]));
+	m_tilemap_8x8_mg->set_scrolly(0, -(m_scrollregs[1]));
+	m_tilemap_16x16_bg->set_scrollx(0, global_x_offset-(m_scrollregs[6]));
+	m_tilemap_16x16_bg->set_scrolly(0, -(m_scrollregs[7])); // ugly, but based on other Modular games, probably correct!
 
 	m_tilemap_16x16_bg->draw(screen, bitmap, cliprect, 0, 0);
 	m_tilemap_8x8_mg->draw(screen, bitmap, cliprect, 0, 0);
 	m_tilemap_8x8_fg->draw(screen, bitmap, cliprect, 0, 0);
 
-	// TODO, convert to device, share between Modualar System games
+	int spritexoffset = m_scrollregs[2] & 0xfff;
+	if (spritexoffset & 0x800)
+		spritexoffset -= 0x1000;
+
+	// TODO, convert to device, share between Modular System games
 	const int NUM_SPRITES = 0x200;
-	const int X_EXTRA_OFFSET = 126;
+	const int X_EXTRA_OFFSET = global_x_offset + spritexoffset;
+	// m_scrollregs[3] would be sprite y offset?
 
 	for (int i = NUM_SPRITES - 2; i >= 0; i -= 2)
 	{
@@ -228,16 +239,7 @@ void xorworld_ms_state::xorworld_ms_map(address_map &map)
 	map(0x090000, 0x091fff).ram().w(FUNC(xorworld_ms_state::videoram8x8_mg_w)).share("videoram_8x8mg");
 	map(0x0a0000, 0x0a1fff).ram().w(FUNC(xorworld_ms_state::videoram16x16_bg_w)).share("videoram16x16bg");
 
-	// almost certainly the video regs (scroll etc.)
-//	map(0x0c0000, 0x0c0001).noprw(); // startup
-//	map(0x0c0002, 0x0c0003).nopw(); // startup
-//	map(0x0c0004, 0x0c0005).nopw(); // startup
-//	map(0x0c0006, 0x0c0007).nopw(); // startup
-//	map(0x0c0008, 0x0c0009).noprw(); // startup
-//	map(0x0c000a, 0x0c000b).noprw(); // startup
-//	map(0x0c000c, 0x0c000d).nopw(); // startup
-//	map(0x0c000e, 0x0c000f).noprw(); // quite often
-	map(0x0c0000, 0x0c000f).ram().share("videoregs");
+	map(0x0c0000, 0x0c000f).ram().share("scrollregs");
 
 	map(0x100000, 0x1007ff).ram().share("spriteram");
 	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
@@ -405,14 +407,17 @@ void xorworld_ms_state::xorworld_ms(machine_config &config)
 	// Sound hardware
 	Z80(config, m_soundcpu, 16_MHz_XTAL/4);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &xorworld_ms_state::sound_map);
-	m_soundcpu->set_periodic_int(FUNC(xorworld_ms_state::nmi_line_pulse), attotime::from_hz(60*64));
+	m_soundcpu->set_periodic_int(FUNC(xorworld_ms_state::nmi_line_pulse), attotime::from_hz(2500));
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_soundcpu, INPUT_LINE_IRQ0);
 
 	SPEAKER(config, "mono").front_center();
 
-	YM3812(config, "ymsnd", XTAL(16'000'000)/4).add_route(ALL_OUTPUTS, "mono", 0.80);
+	YM3812(config, m_ymsnd, XTAL(16'000'000) / 4);
+	m_ymsnd->add_route(ALL_OUTPUTS, "mono", 0.80);
+	// YM3812 does not set the IRQ line, so can't be driving tempo
+	//m_ymsnd->irq_handler().set(FUNC(xorworld_ms_state::ym_irq));
 
 	MSM5205(config, m_msm, XTAL(384'000));
 	m_msm->vck_legacy_callback().set(FUNC(xorworld_ms_state::msm5205_int));
