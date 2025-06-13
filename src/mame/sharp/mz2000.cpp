@@ -47,7 +47,7 @@ class mz2000_state : public driver_device
 public:
 	mz2000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_cass(*this, "cassette")
+		, m_cassette(*this, "cassette")
 		, m_floppy(nullptr)
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
@@ -66,6 +66,7 @@ public:
 	{ }
 
 	void mz2000(machine_config &config);
+	void mz2200(machine_config &config);
 	void mz80b(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(boot_reset_cb);
@@ -79,7 +80,7 @@ protected:
 private:
 	static void floppy_formats(format_registration &fr);
 
-	required_device<cassette_image_device> m_cass;
+	required_device<cassette_image_device> m_cassette;
 
 	floppy_image_device *m_floppy;
 
@@ -725,11 +726,11 @@ uint8_t mz2000_state::ppi_portb_r()
 	*/
 	uint8_t res = 0x80;
 
-	if(m_cass->get_image() != nullptr)
+	if(m_cassette->get_image() != nullptr)
 	{
-		res |= (m_cass->input() > 0.0038) ? 0x40 : 0x00;
-		res |= ((m_cass->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY) ? 0x00 : 0x20;
-		res |= (m_cass->get_position() >= m_cass->get_length()) ? 0x08 : 0x00;
+		res |= (m_cassette->input() > 0.0038) ? 0x40 : 0x00;
+		res |= ((m_cassette->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY) ? 0x00 : 0x20;
+		res |= (m_cassette->get_position() >= m_cassette->get_length()) ? 0x08 : 0x00;
 	}
 	else
 		res |= 0x20;
@@ -781,14 +782,14 @@ void mz2000_state::ppi_porta_w(uint8_t data)
 
 	if((m_tape_ctrl & 0x08) == 0 && data & 0x08) // stop
 	{
-		m_cass->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
-		m_cass->change_state(CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
+		m_cassette->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+		m_cassette->change_state(CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
 	}
 
 	if((m_tape_ctrl & 0x04) == 0 && data & 0x04) // play
 	{
-		m_cass->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
-		m_cass->change_state(CASSETTE_PLAY,CASSETTE_MASK_UISTATE);
+		m_cassette->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+		m_cassette->change_state(CASSETTE_PLAY,CASSETTE_MASK_UISTATE);
 	}
 
 	if((m_tape_ctrl & 0x02) == 0 && data & 0x02)
@@ -953,14 +954,13 @@ void mz2000_state::mz2000(machine_config &config)
 
 	SOFTWARE_LIST(config, "flop_list").set_original("mz2000_flop");
 
-	CASSETTE(config, m_cass);
-	m_cass->set_formats(mz700_cassette_formats);
-	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
-	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
-	m_cass->set_interface("mz_cass");
+	CASSETTE(config, m_cassette);
+	m_cassette->set_formats(mz700_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
+	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->set_interface("mz_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("mz2000_cass");
-	SOFTWARE_LIST(config, "cass_list2").set_original("mz2200_cass");
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -977,6 +977,12 @@ void mz2000_state::mz2000(machine_config &config)
 	// TODO: supposedly MZ-1E18 / MZ-1R12 options do this, but only MZ-800 reads $f8-$fa from IPL?
 	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", "bin,dat", attotime::from_seconds(1)));
 	snapshot.set_load_callback(FUNC(mz2000_state::snapshot_cb));
+}
+
+void mz2000_state::mz2200(machine_config &config)
+{
+	mz2000(config);
+	SOFTWARE_LIST(config, "cass_list2").set_original("mz2200_cass");
 }
 
 // TODO: significantly different memory model and video output (PIO-3039)
@@ -1022,4 +1028,4 @@ ROM_END
 
 COMP( 1981, mz80b,  0,      0,      mz80b,   mz80be, mz2000_state, empty_init, "Sharp", "MZ-80B",  MACHINE_NOT_WORKING )
 COMP( 1982, mz2000, 0,      0,      mz2000,  mz80bj, mz2000_state, empty_init, "Sharp", "MZ-2000", MACHINE_NOT_WORKING )
-COMP( 1982, mz2200, mz2000, 0,      mz2000,  mz80bj, mz2000_state, empty_init, "Sharp", "MZ-2200", MACHINE_NOT_WORKING )
+COMP( 1982, mz2200, mz2000, 0,      mz2200,  mz80bj, mz2000_state, empty_init, "Sharp", "MZ-2200", MACHINE_NOT_WORKING )
