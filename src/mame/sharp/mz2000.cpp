@@ -19,6 +19,7 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
 #include "imagedev/floppy.h"
+#include "imagedev/snapquik.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/rp5c15.h"
@@ -148,6 +149,8 @@ private:
 //	void mz2000_opcodes(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(ipl_timer_reset_cb);
+
+	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 };
 
 void mz2000_state::video_start()
@@ -895,6 +898,22 @@ static void mz2000_floppies(device_slot_interface &device)
 	device.option_add("35dd", FLOPPY_35_DD);
 }
 
+SNAPSHOT_LOAD_MEMBER(mz2000_state::snapshot_cb)
+{
+	if (image.length() > 0x10000)
+		return std::make_pair(image_error::INVALIDLENGTH, std::string());
+
+	std::vector<uint8_t> snapshot(image.length());
+	image.fread(&snapshot[0], image.length());
+
+	std::copy(std::begin(snapshot), std::end(snapshot), m_work_ram.get());
+
+	m_ipl_view.disable();
+	m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+
+	return std::make_pair(std::error_condition(), std::string());
+}
+
 void mz2000_state::mz2000(machine_config &config)
 {
 	/* basic machine hardware */
@@ -954,6 +973,10 @@ void mz2000_state::mz2000(machine_config &config)
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_mz2000);
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);
+
+	// TODO: supposedly MZ-1E18 / MZ-1R12 options do this, but only MZ-800 reads $f8-$fa from IPL?
+	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", "bin,dat", attotime::from_seconds(1)));
+	snapshot.set_load_callback(FUNC(mz2000_state::snapshot_cb));
 }
 
 // TODO: significantly different memory model and video output (PIO-3039)
