@@ -23,10 +23,15 @@
     VOLANTE MODULAR: (small sub-board) Logic for the driving wheel.
 
     TODO:
-    - sound implementation may not be totally correct (although regular Modular sound seems completely unused)
-    - wheel support
-	- dipswitches
-	- identify unimplemented video registers
+    - Sound implementation may not be totally correct (although regular Modular sound seems
+	  completely unused)
+    - Wheel support
+	- Dipswitches
+	- Identify unimplemented video registers
+	- What is the point in the 'overlay' ROM? it contains a valid boot vector, unlike the
+	  main program ROMs, but otherwise doesn't work with this hardware setup.  A similar
+	  program exists on the glass prototype (probably to communicate with the dev hardware)
+	  but that had RAM instead of program ROM for the rest of the game.
 
 ***************************************************************************************************/
 
