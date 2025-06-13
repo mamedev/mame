@@ -210,11 +210,11 @@ void choose_image(device_image_interface &device, HWND owner, REFCLSID class_id,
 
 
 consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
-	disasmbasewin_info(debugger, true, "Debug", nullptr),
+	sourcewin_info(debugger, true, "Debug", nullptr),
 	m_current_cpu(nullptr),
 	m_devices_menu(nullptr)
 {
-	if (!window() || !m_views[VIEW_IDX_DISASM])
+	if (!window() || !m_views[VIEW_IDX_SOURCE] || !m_views[VIEW_IDX_DISASM])
 		goto cleanup;
 
 	// create the views
@@ -288,12 +288,15 @@ consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
 
 	// mark the edit box as the default focus and set it
 	editwin_info::set_default_focus();
+
+	hide_src_window();
 	return;
 
 cleanup:
 	m_views[VIEW_IDX_CONSOLE].reset();
 	m_views[VIEW_IDX_STATE].reset();
 	m_views[VIEW_IDX_DISASM].reset();
+	m_views[VIEW_IDX_SOURCE].reset();
 }
 
 
@@ -358,6 +361,7 @@ void consolewin_info::recompute_children()
 	conrect.right = parent.right - EDGE_WIDTH;
 
 	// set the bounds of things
+	set_srcwnd_bounds(disrect);
 	m_views[VIEW_IDX_DISASM]->set_bounds(disrect);
 	m_views[VIEW_IDX_STATE]->set_bounds(regrect);
 	m_views[VIEW_IDX_CONSOLE]->set_bounds(conrect);
@@ -367,7 +371,7 @@ void consolewin_info::recompute_children()
 
 void consolewin_info::update_menu()
 {
-	disasmbasewin_info::update_menu();
+	sourcewin_info::update_menu();
 
 	if (m_devices_menu)
 	{
@@ -461,6 +465,8 @@ void consolewin_info::update_menu()
 	CheckMenuItem(menu, ID_GROUP_WINDOWS, MF_BYCOMMAND | (debugger().get_group_windows_setting() ? MF_CHECKED : MF_UNCHECKED));
 	CheckMenuItem(menu, ID_LIGHT_BACKGROUND, MF_BYCOMMAND | ((ui_metrics::THEME_LIGHT_BACKGROUND == metrics().get_color_theme()) ? MF_CHECKED : MF_UNCHECKED));
 	CheckMenuItem(menu, ID_DARK_BACKGROUND, MF_BYCOMMAND | ((ui_metrics::THEME_DARK_BACKGROUND == metrics().get_color_theme()) ? MF_CHECKED : MF_UNCHECKED));
+	CheckMenuItem(menu, ID_SHOW_SOURCE, MF_BYCOMMAND | (m_views[VIEW_IDX_SOURCE]->is_visible() ? MF_CHECKED : MF_UNCHECKED));
+	CheckMenuItem(menu, ID_SHOW_DISASM, MF_BYCOMMAND | (m_views[VIEW_IDX_DISASM]->is_visible() ? MF_CHECKED : MF_UNCHECKED));
 }
 
 
@@ -537,15 +543,28 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 		case ID_DARK_BACKGROUND:
 			debugger().set_color_theme(ui_metrics::THEME_DARK_BACKGROUND);
 			return true;
+		case ID_SHOW_SOURCE:
+			if (show_src_window())
+			{
+				m_views[VIEW_IDX_DISASM]->hide();
+				machine().debug_view().update_all(DVT_SOURCE);
+			}
+			return true;
+		case ID_SHOW_DISASM:
+			hide_src_window();
+			m_views[VIEW_IDX_DISASM]->show();
+			machine().debug_view().update_all(DVT_DISASSEMBLY);
+			return true;
 		}
 	}
-	return disasmbasewin_info::handle_command(wparam, lparam);
+
+	return sourcewin_info::handle_command(wparam, lparam);
 }
 
 
 void consolewin_info::save_configuration_to_node(util::xml::data_node &node)
 {
-	disasmbasewin_info::save_configuration_to_node(node);
+	sourcewin_info::save_configuration_to_node(node);
 	node.set_attribute_int(ATTR_WINDOW_TYPE, WINDOW_TYPE_CONSOLE);
 }
 

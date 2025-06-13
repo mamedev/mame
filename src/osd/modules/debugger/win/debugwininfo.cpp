@@ -595,7 +595,7 @@ LRESULT debugwin_info::window_proc(UINT message, WPARAM wparam, LPARAM lparam)
 			// figure out which view we are hovering over
 			GetCursorPos(&point);
 			ScreenToClient(m_wnd, &point);
-			HWND const child = ChildWindowFromPoint(m_wnd, point);
+			HWND const child = ChildWindowFromPointEx(m_wnd, point, CWP_SKIPINVISIBLE);
 			if (child)
 			{
 				for (viewnum = 0; viewnum < MAX_VIEWS; viewnum++)
