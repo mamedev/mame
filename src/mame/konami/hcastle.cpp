@@ -150,11 +150,11 @@ TILE_GET_INFO_MEMBER(hcastle_state::get_tile_info)
 	int attr = m_pf_videoram[Which][tile_index];
 	int tile = m_pf_videoram[Which][tile_index + 0x400];
 	int color = attr & 0x7;
-	int bank =  ((attr & 0x80) >> 7) |
-				((attr >> (bit0 + 2)) & 0x02) |
-				((attr >> (bit1 + 1)) & 0x04) |
-				((attr >> (bit2    )) & 0x08) |
-				((attr >> (bit3 - 1)) & 0x10);
+	int bank = ((attr >> (bit0 + 3)) & 0x01) |
+			((attr >> (bit1 + 2)) & 0x02) |
+			((attr >> (bit2 + 1)) & 0x04) |
+			((attr >> (bit3 + 0)) & 0x08);
+	bank = ((attr & 0x80) >> 7) | (bank << 1);
 
 	tileinfo.set(0,
 			tile + bank * 0x100 + m_pf_bankbase[Which],

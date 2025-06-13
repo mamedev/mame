@@ -56,8 +56,8 @@ outputs:
 control registers
 000:          scroll x (low 8 bits)
 001: -------x scroll x (high bit)
-     ------x- enable rowscroll? (combatsc)
-     -----x-- unknown (flak attack)
+     ------x- enable row/colscroll instead of normal scroll (combatsc)
+     -----x-- if above is enabled: 0 = rowscroll, 1 = colscroll
      ----x--- this probably selects an alternate screen layout used in combat
               school where tilemap #2 is overlayed on front and doesn't scroll.
               The 32 lines of the front layer can be individually turned on or
@@ -117,9 +117,11 @@ control registers
      ------x- irq enable
      -----x-- firq enable
      ----x--- flip screen
-     ---x---- unknown (contra, labyrunr)
+     ---x---- nmi frequency (0 = 8 times per frame, 1 = 4 times)
 
 TODO:
+- Move more functionality from drivers to this device, like interrupts, and
+  of course the actual tilemaps
 - As noted above, the maximum number of 64-pixel sprite blocks is 264. MAME
   doesn't emulate partial sprites at the end of the spritelist. Is's not
   expected any game relies on this.
@@ -196,11 +198,11 @@ void k007121_device::ctrl_w(offs_t offset, uint8_t data)
 	assert(offset < 8);
 
 	// associated tilemap(s) should be marked dirty if any of these registers changed
-	static const uint8_t dirtymask[8] = { 0x00, 0x00, 0x00, 0x01, 0xff, 0xff, 0x30, 0x00 };
+	static const uint8_t dirtymask[8] = { 0x00, 0x00, 0x00, 0x01, 0xff, 0xff, 0x3f, 0x00 };
 	if ((data ^ m_ctrlram[offset]) & dirtymask[offset] && !m_dirtytiles_cb.isnull())
 		m_dirtytiles_cb();
 
-	if (offset == 7)
+	if (offset == 7 && BIT(data ^ m_ctrlram[offset], 3))
 	{
 		m_flipscreen = BIT(data, 3);
 		m_flipscreen_cb(BIT(data, 3));
