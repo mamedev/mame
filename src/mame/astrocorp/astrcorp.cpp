@@ -50,6 +50,8 @@ Year + Game                PCB ID                    CPU                Video   
 14  Magic Bomb (BR.71A)    P1                        ASTRO V102PX-014?  ASTRO V07      ASTRO ROHS BA21C00009 JF13022              Encrypted
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+Note: ASTRO F01 is a QuickLogic pASIC 3 FPGA (die-marked as QL3161A/1999).
+
 - astoneag, magibomb, winbingo, etc.: to initialize EEPROM (and self test in some games), keep keyout (W) pressed during boot.
   Needs ticket (or reserve switch) and hopper lines to be 0 though (disconnected?).
 - magibomb: sets with a "game count" option, when set to "yes", display the number of games played by the current player.
