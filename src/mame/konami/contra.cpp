@@ -147,6 +147,7 @@ Notes:
 #include "cpu/m6809/hd6309.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/gen_latch.h"
+#include "machine/watchdog.h"
 #include "sound/ymopm.h"
 #include "video/bufsprite.h"
 
@@ -469,7 +470,7 @@ void contra_state::main_map(address_map &map)
 	map(0x0018, 0x0018).w(FUNC(contra_state::coin_counter_w));
 	map(0x001a, 0x001a).w(FUNC(contra_state::sh_irqtrigger_w));
 	map(0x001c, 0x001c).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x001e, 0x001e).nopw(); // ?
+	map(0x001e, 0x001e).rw("watchdog", FUNC(watchdog_timer_device::reset_r), FUNC(watchdog_timer_device::reset_w));
 	map(0x0060, 0x0067).w(m_k007121[1], FUNC(k007121_device::ctrl_w));
 
 	map(0x0c00, 0x0cff).ram().w(m_palette, FUNC(palette_device::write_indirect)).share("palette");
@@ -601,6 +602,8 @@ void contra_state::contra(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &contra_state::sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(6000)); // enough for the sound CPU to read all commands
+
+	WATCHDOG_TIMER(config, "watchdog");
 
 	KONAMI_007452_MATH(config, "k007452");
 
