@@ -206,6 +206,23 @@ private:
 	required_device<i2cmem_device> m_i2cmem;
 };
 
+class spg2xx_game_lpetshop_state : public spg2xx_game_state
+{
+public:
+	spg2xx_game_lpetshop_state(const machine_config &mconfig, device_type type, const char *tag) :
+		spg2xx_game_state(mconfig, type, tag),
+		m_i2cmem(*this, "i2cmem")
+	{ }
+
+	void lpetshop(machine_config &config);
+
+private:
+	uint16_t porta_r();
+	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+
+	required_device<i2cmem_device> m_i2cmem;
+};
+
 class spg2xx_game_gssytts_state : public spg2xx_game_state
 {
 public:
@@ -417,14 +434,15 @@ private:
 	required_device<i2cmem_device> m_i2cmem;
 };
 
-class spg2xx_game_whacmole_state : public spg2xx_game_state
+class spg2xx_game_hasbro_93lc66_state : public spg2xx_game_state
 {
 public:
-	spg2xx_game_whacmole_state(const machine_config &mconfig, device_type type, const char *tag) :
+	spg2xx_game_hasbro_93lc66_state(const machine_config &mconfig, device_type type, const char *tag) :
 		spg2xx_game_state(mconfig, type, tag),
 		m_eeprom(*this, "eeprom")
 	{ }
 
+	void mylpony(machine_config &config);
 	void whacmole(machine_config &config);
 
 private:

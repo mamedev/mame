@@ -1108,6 +1108,11 @@ ROM_START( hhgc319 )
 	ROM_LOAD( "s29gl128n10tfi01.u3", 0x000000, 0x1000000, CRC(4b51125f) SHA1(bab3981ae1652cf6620c7c6769a6729a1e4d588f) )
 ROM_END
 
+ROM_START( 168pcase )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "25q32.u7", 0x000000, 0x400000, CRC(98e8e97a) SHA1(fd516ef2819a597130f5f7ace9a7838cb99ab08a) )
+ROM_END
+
 ROM_START( vibes240 )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
 	// wouldn't read consistently
@@ -1329,6 +1334,9 @@ CONS( 201?, hkb502,   0,      0,  vt36x_4mb, vt369, vt36x_state, empty_init, "<u
 CONS( 201?, hkb502a,  hkb502, 0,  vt36x_4mb, vt369, vt36x_state, empty_init, "<unknown>", "HKB-502 268-in-1 (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 // similar to above, fewer games in menu
 CONS( 2021, unk128vt, 0,      0,  vt36x_4mb, vt369, vt36x_state, empty_init, "<unknown>", "unknown VT369 based 128-in-1 (GC31-369-20210702-V2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
+// case was for an iPhone 11, but seems to be available for many different phones
+CONS( 202?, 168pcase, 0,      0,  vt36x_4mb, vt369, vt36x_state, empty_init, "<unknown>", "Diier-D-10 168-in-1 phone case", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // uses a LCD with resolution of 160x128 (image scaled to fit for some games, others run natively at 160x128)
 // contains a protection chip, command 80 XX returns a byte

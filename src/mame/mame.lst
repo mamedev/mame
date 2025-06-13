@@ -35394,6 +35394,7 @@ dgun2573a
 dgunl3201
 dgunl3202
 fcpocket
+lxpcli
 lxpcsp
 matet100
 matet220
@@ -35403,6 +35404,7 @@ myaass
 rminitv
 
 @source:nintendo/nes_vt369_vtunknown.cpp
+168pcase
 240in1ar
 bittboy
 denv150
@@ -35672,6 +35674,7 @@ wrecking
 
 @source:nintendo/vt1682.cpp
 110dance
+anpncpc
 cmpmx10
 cmpmx11
 dance555
@@ -40148,6 +40151,7 @@ genesis_tmss
 laseract
 laseractj
 mahg156
+mdhh100
 megacd
 megacd2
 megacd2j
@@ -40190,6 +40194,8 @@ mdtvp1j
 mdtvp2j
 mdtvp3j
 msi_sf2
+mympac
+mypac
 ra145
 rad_gen1
 rad_gen2
@@ -46561,6 +46567,7 @@ anpanbd
 anpanm15
 bk139in1
 bkrankp
+lxcyrace
 prailpls
 
 @source:tvgames/generalplus_gpl16250_spi_direct.cpp
@@ -46571,6 +46578,7 @@ bfmpac
 bfpacman
 bfspyhnt
 bftetris
+punirune
 siddr
 wiwcs
 
@@ -46648,6 +46656,7 @@ sstarkar
 hyprscan
 jak_bbh
 jak_bbsf
+prail07
 zonefamf
 
 @source:tvgames/spg29x_lexibook_jg7425.cpp
@@ -46695,9 +46704,11 @@ jjstrip
 jouet
 knd
 lexiart
+lpetshop
 lxairjet
 lxspidaj
 mattelcs
+mylpony
 ordentv
 pballpup
 prail
@@ -46925,6 +46936,7 @@ dphh8630
 mc_cb203
 pg118
 ragc153
+retro150
 rhhc152
 supreme
 toumapet
@@ -47115,6 +47127,7 @@ xavbowlj
 xavbox
 xavjmat
 xavmusic
+xavpkjr
 xavtenni
 
 @source:ultimachine/rambo.cpp
