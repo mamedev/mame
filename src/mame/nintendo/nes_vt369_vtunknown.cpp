@@ -853,6 +853,13 @@ ROM_START( lxcmcyba ) // all games selectable
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
+ROM_START( lxcmcybt ) // all games selectable
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "batman.bin", 0x00000, 0x4000000, CRC(9f8f15ce) SHA1(396122ce68008e9c8f35b98f5246e8dc7725df17) )
+
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
+ROM_END
+
 ROM_START( lxcmcypp ) // all games selectable
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	// marked 512mbit, possible A22 / A23 are swapped as they were marked on the board in a different way.
@@ -1207,8 +1214,9 @@ CONS( 2012, lxcmcydp,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty
 CONS( 2014, lxcmcycr,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Cars", MACHINE_NOT_WORKING )
 CONS( 2018, lxcmcypj,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - PJ Masks", MACHINE_NOT_WORKING )
 CONS( 2014, lxcmcyba,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Barbie (JL2365BB)", MACHINE_NOT_WORKING )
-// the data order is swapped for this one, maybe other internal differences?
+// the data order is swapped for these
 CONS( 2018, lxcmcypp,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Paw Patrol", MACHINE_NOT_WORKING )
+CONS( 2020, lxcmcybt,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Batman", MACHINE_NOT_WORKING )
 
 CONS( 200?, lxccminn,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Console Colour - Minnie Mouse", MACHINE_NOT_WORKING )
 CONS( 200?, lxccplan,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Console Colour - Disney's Planes", MACHINE_NOT_WORKING )
