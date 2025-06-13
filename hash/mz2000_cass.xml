@@ -5,7 +5,7 @@ license:CC0-1.0
 -->
 
 
-<softwarelist name="mz2000_cass" description="MZ-2000 cassettes">
+<softwarelist name="mz2000_cass" description="Sharp MZ-2000 cassettes">
 
 	<software name="mz1z001">
 		<description>BASIC MZ-1Z001 v1.0c</description>

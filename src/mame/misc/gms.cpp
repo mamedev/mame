@@ -599,10 +599,12 @@ void gms_2layers_state::hgly_mem(address_map &map)
 	map(0xf00000, 0xf00001).w(FUNC(gms_2layers_state::hgly_eeprom_w));
 }
 
-void gms_2layers_state::smatch03_mem(address_map &map) // TODO: everything
+// TODO: everything. All ranges need to be verified. It also writes at various addresses in the 0x800000-0x860000 range.
+void gms_2layers_state::smatch03_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x700000, 0x70ffff).ram(); // ok
+
 	map(0x300000, 0x300001).w(FUNC(gms_2layers_state::reels_toggle_w));
 	map(0x600000, 0x600001).rw(FUNC(gms_2layers_state::dipsw_matrix_r), FUNC(gms_2layers_state::input_matrix_w));
 	map(0x608000, 0x608001).portr("IN1").w(FUNC(gms_2layers_state::tilebank_w)); // ok

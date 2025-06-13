@@ -2954,6 +2954,65 @@ ROM_START( rocknms )
 	ROM_LOAD( "sound20", 0x5000000, 0x0400000, CRC(dd5e9680) SHA1(5a2826641ad75757ce4a583e0ea901d54d20ffca)  ) // bank 6
 ROM_END
 
+ROM_START( rocknms10 )
+	ROM_REGION( 0x100000, "maincpu", 0 )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "mast_prg1", 0x000001, 0x80000, BAD_DUMP CRC(c36674f8) SHA1(8aeb19fcd6f786c9d76a72abee4b607d29fb7d56) ) // not dumped for this version
+	ROM_LOAD16_BYTE( "mast_prg0", 0x000000, 0x80000, BAD_DUMP CRC(69382065) SHA1(2d528c2954556d440e790db209a2e3563580296a) ) // not dumped for this version
+
+	ROM_REGION( 0x100000, "sub", 0 )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "rtdxsub.vj-98344_7.1.ver1.0.ic65", 0x000001, 0x80000, CRC(31aff145) SHA1(3902c017dafefaccc103e1c39aa798d97977dff7) )
+	ROM_LOAD16_BYTE( "rtdxsub.vj-98344_7.4.ver1.0.ic59", 0x000000, 0x80000, CRC(4382f0ac) SHA1(88dc5ba26f77d859dba9bca83121b5cd6c54e724) )
+
+	ROM_REGION( 0x0800000, "sprite", 0 )  /* 8x8x8 (Sprites) */
+	ROM_LOAD32_WORD( "mast_spr1", 0x000002, 0x400000, BAD_DUMP CRC(520152dc) SHA1(619a55352c0dab914f6188d66272a24495b5d1d4)  ) // not dumped for this version
+	ROM_LOAD32_WORD( "mast_spr0", 0x000000, 0x400000, BAD_DUMP CRC(1caad02a) SHA1(00c3fc849d1f633874fee30f7d0caf0c62735c50)  ) // not dumped for this version
+
+	ROM_REGION( 0x200000, "tiles_bg", 0 )   /* 16x16x8 (Background) */
+	ROM_LOAD16_WORD( "mast_back", 0x000000, 0x200000, BAD_DUMP CRC(1ca30e3f) SHA1(763c9dd287c186b6ca8ecb88c3ce29d68fea9179)  ) // not dumped for this version
+
+	ROM_REGION( 0x200000, "tiles_rot", 0 )   /* 16x16x8 (Rotation) */
+	ROM_LOAD( "mast_rot", 0x000000, 0x200000, BAD_DUMP CRC(1f29b622) SHA1(aab6aafb98fa732266675daa63dc4c0d2084bcbd)  ) // not dumped for this version
+
+	ROM_REGION( 0x080000, "tiles_fg", 0 )   /* 8x8x8 (Foreground) */
+	ROM_LOAD( "mast_front", 0x000000, 0x080000, BAD_DUMP CRC(a4717579) SHA1(cf28c0f19713ebf9f8fd5d55d654c1cd2e8cd73d)  ) // not dumped for this version
+
+	ROM_REGION( 0x800000, "sub_sprite", 0 )   /* 8x8x8 (Sprites) */
+	ROM_LOAD32_WORD( "slav_spr1", 0x000002, 0x400000, CRC(35ff26d5) SHA1(7d885006b024caaea6a85909abbf24706822ab55) )
+	ROM_LOAD32_WORD( "slav_spr0", 0x000000, 0x400000, CRC(0ab5f497) SHA1(caf0818578a3cc20fcfeabce93ffd471701af31c) )
+
+	ROM_REGION( 0x200000, "sub_tiles_bg", 0 )   /* 16x16x8 (Background) */
+	ROM_LOAD16_WORD( "rtdxsub.vj-98344_7.13.ver1.0.ic10", 0x000000, 0x200000, CRC(f0a28e32) SHA1(517b98dee6ec201bab02a3c81b0937ed462a626e) )
+
+	ROM_REGION( 0x200000, "sub_tiles_rot", 0 )   /* 16x16x8 (Rotation) */
+	ROM_LOAD( "rtdxsub.vj-98344_7.6.ver1.0.ic38", 0x000000, 0x200000, CRC(886f33c0) SHA1(975983323fcc524abf8ff66cf7e28f02464f028a) )
+
+	ROM_REGION( 0x080000, "sub_tiles_fg", 0 )   /* 8x8x8 (Foreground) */
+	ROM_LOAD( "rtdxsub.vj-98344_7.10.ver1.0.ic19", 0x000000, 0x080000,  CRC(b65734a7) SHA1(80190e260ed32cb3355f0604722b85eb659483d0) )
+
+	ROM_REGION( 0x6400000, "ymz", ROMREGION_ERASEFF )   /* Samples - not dumped for this version */
+	ROM_LOAD( "sound00", 0x0000000, 0x0400000, BAD_DUMP CRC(8bafae71) SHA1(db74accd4bc1bfeb4a3341a0fd572b81287f1278)  ) // COMMON AREA
+	ROM_LOAD( "sound01", 0x0400000, 0x0400000, BAD_DUMP CRC(eec0589b) SHA1(f54c1c7e7741100a1398ebd45aef4755171d9965)  ) // bank 0
+	ROM_LOAD( "sound02", 0x0800000, 0x0400000, BAD_DUMP CRC(564aa972) SHA1(b19e960fd79647e5bcca509982c9887decb92bc6)  ) // bank 0
+	ROM_LOAD( "sound03", 0x0c00000, 0x0400000, BAD_DUMP CRC(940302d0) SHA1(b28c2bb1a9b8cea0b6963ffa5d3ac26d90b0bffc)  ) // bank 0
+	ROM_LOAD( "sound04", 0x1000000, 0x0400000, BAD_DUMP CRC(766db7f8) SHA1(41cfcac2e8d4307f75c56d57431b841e6d64b23c)  ) // bank 1
+	ROM_LOAD( "sound05", 0x1400000, 0x0400000, BAD_DUMP CRC(3a3002f9) SHA1(27b24b8a34a0b919e051e81a10e87aa300b11d8f)  ) // bank 1
+	ROM_LOAD( "sound06", 0x1800000, 0x0400000, BAD_DUMP CRC(06b04df9) SHA1(4bfc7c05843b4533f238f5360230cb71d7a66d56)  ) // bank 1
+	ROM_LOAD( "sound07", 0x1c00000, 0x0400000, BAD_DUMP CRC(da74305e) SHA1(9dfb744f36ac8b3661006921dc482e941711f389)  ) // bank 2
+	ROM_LOAD( "sound08", 0x2000000, 0x0400000, BAD_DUMP CRC(b5a0aa48) SHA1(2deb2c1c97c259f5e79e9dc3cd8859548549a189)  ) // bank 2
+	ROM_LOAD( "sound09", 0x2400000, 0x0400000, BAD_DUMP CRC(0fd4a088) SHA1(5c1ea8a14dee7ee885ce0c86fb463741599db44d)  ) // bank 2
+	ROM_LOAD( "sound10", 0x2800000, 0x0400000, BAD_DUMP CRC(33c89e53) SHA1(7d216f5db6b30c9b05a9a77030498ff68ae6fbad)  ) // bank 3
+	ROM_LOAD( "sound11", 0x2c00000, 0x0400000, BAD_DUMP CRC(f9256a3f) SHA1(a3ec0845497d349c97222a1f986c252c8ca781e7)  ) // bank 3
+	ROM_LOAD( "sound12", 0x3000000, 0x0400000, BAD_DUMP CRC(b0a09f3e) SHA1(d2e37eb935d7ef7e887ff79a49bc11da11c31f3c)  ) // bank 3
+	ROM_LOAD( "sound13", 0x3400000, 0x0400000, BAD_DUMP CRC(d5cee673) SHA1(85194c73c43b69bccbcc895f147d5251bb039c2a)  ) // bank 4
+	ROM_LOAD( "sound14", 0x3800000, 0x0400000, BAD_DUMP CRC(b394aa8a) SHA1(68541d5d98e2d59d6a3096f0c10b74b6f5803722)  ) // bank 4
+	ROM_LOAD( "sound15", 0x3c00000, 0x0400000, BAD_DUMP CRC(6c791501) SHA1(8c67f070651493d6f7a2ef7b8a5f9e12c0181f67)  ) // bank 4
+	ROM_LOAD( "sound16", 0x4000000, 0x0400000, BAD_DUMP CRC(fe80159e) SHA1(b6a980d4f62dfeaa6f51a99518aa4d483fe338e5)  ) // bank 5
+	ROM_LOAD( "sound17", 0x4400000, 0x0400000, BAD_DUMP CRC(142c1159) SHA1(dfabbe69119c84040d6368561e93514ce7bb91db)  ) // bank 5
+	ROM_LOAD( "sound18", 0x4800000, 0x0400000, BAD_DUMP CRC(cc595d85) SHA1(5f725771d79e71d62b64bb18e2a51b839a6e4c7f)  ) // bank 5
+	ROM_LOAD( "sound19", 0x4c00000, 0x0400000, BAD_DUMP CRC(82b085a3) SHA1(5a5f2ed90d659bbad710c23b9df2a7dbb3c9acfe)  ) // bank 6
+	ROM_LOAD( "sound20", 0x5000000, 0x0400000, BAD_DUMP CRC(dd5e9680) SHA1(5a2826641ad75757ce4a583e0ea901d54d20ffca)  ) // bank 6
+ROM_END
+
 
 /***************************************************************************
 
@@ -3363,6 +3422,7 @@ GAME( 1999, rockn,     0,        rockn,    rockn,     rockn_state,    init_rockn
 GAME( 1999, rockna,    rockn,    rockn,    rockn,     rockn_state,    init_rockn,   ROT270,                    "Jaleco",                      "Rock'n Tread (Japan, alternate)",           MACHINE_SUPPORTS_SAVE )
 GAME( 1999, rockn2,    0,        rockn2,   rockn,     rockn_state,    init_rockn2,  ROT270,                    "Jaleco",                      "Rock'n Tread 2 (Japan)",                    MACHINE_SUPPORTS_SAVE )
 GAME( 1999, rocknms,   0,        rocknms,  rocknms,   rocknms_state,  init_rocknms, ROT0,                      "Jaleco",                      "Rock'n MegaSession (Japan)",                MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, rocknms10, rocknms,  rocknms,  rocknms,   rocknms_state,  init_rocknms, ROT0,                      "Jaleco",                      "Rock'n MegaSession (Japan, ver 1.0)",       MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, rockn3,    0,        rockn2,   rockn,     rockn_state,    init_rockn3,  ROT270,                    "Jaleco",                      "Rock'n 3 (Japan)",                          MACHINE_SUPPORTS_SAVE )
 GAME( 2000, rockn4,    0,        rockn2,   rockn,     rockn_state,    init_rockn3,  ROT270,                    "Jaleco / PCCWJ",              "Rock'n 4 (Japan, prototype)",               MACHINE_SUPPORTS_SAVE )
 

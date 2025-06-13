@@ -23,7 +23,7 @@
 #include "machine/rescap.h"
 #include "machine/timer.h"
 #include "sound/va_eg.h"
-//#include "video/hd61603.h"
+#include "video/hd61602.h"
 #include "video/pwm.h"
 
 #include "roland_tr707.lh"
@@ -45,48 +45,7 @@ namespace {
 class roland_tr707_state : public driver_device
 {
 public:
-	roland_tr707_state(const machine_config &mconfig, device_type type, const char *tag) ATTR_COLD
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu")
-		, m_cartslot(*this, "cartslot")
-		, m_mac(*this, "mac")
-		, m_led_matrix(*this, "led_matrix")
-		, m_key_switches(*this, "KEY%u", 0U)
-		, m_cart_led(*this, "led_cart")
-		, m_leds(4)
-		, m_tapesync_in(*this, "TAPESYNC")
-		, m_dinsync_in(*this, "DINSYNC")
-		, m_dinsync_config(*this, "DINSYNC_CONFIG")
-		, m_dinsync_out(*this, "DINSYNC_OUT_%u", 0U)
-		, m_tempo_timer(*this, "tempo_clock")
-		, m_tempo_restart_timer(*this, "tempo_restart_timer")
-		, m_tempo_ff(*this, "tempo_flipflop")
-		, m_tempo_trimmer(*this, "TM1")
-		, m_tempo_knob(*this, "TEMPO")
-		, m_accent_adc_rc(*this, "accent_adc_rc_network")
-		, m_accent_adc_timer(*this, "accent_adc_timer")
-		, m_accent_adc_ff(*this, "accent_adc_flipflop")
-		, m_accent_trimmer_series(*this, "TM2")
-		, m_accent_trimmer_parallel(*this, "TM3")
-		, m_accent_level(*this, "SLIDER_1")
-		, m_layout_727(*this, "is727")
-		, m_is_727(false)
-		, m_cart_bank(0)
-		, m_key_led_row(0xff)
-		, m_tempo_source(0xff)
-		, m_midi_rxd_bit(true)  // Initial value is high, for serial "idle".
-	{
-		constexpr const char *LED_NAME_SUFFIXES[4][6] =
-		{
-			{"1", "2", "3", "4", "scale_1", "scale_2"},
-			{"5", "6", "7", "8", "scale_3", "scale_4"},
-			{"9", "10", "11", "12", "group_1", "group_2"},
-			{"13", "14", "15", "16", "group_3", "group_4"},
-		};
-		for (int i = 0; i < 4; ++i)
-			for (int j = 0; j < 6; ++j)
-				m_leds[i].push_back(output_finder<>(*this, std::string("led_") + LED_NAME_SUFFIXES[i][j]));
-	}
+	roland_tr707_state(const machine_config &mconfig, device_type type, const char *tag) ATTR_COLD;
 
 	void tr707(machine_config &config);
 	void tr727(machine_config &config);
@@ -115,6 +74,26 @@ private:
 		ACCENT_FLIPFLOP_CLR_ASSERT,
 	};
 
+	struct seg_output  // Reference to an LCD segment output.
+	{
+		enum seg_type
+		{
+			NONE = 0,
+			TRIANGLE,
+			TRACK,
+			TEXT,
+			DOT,
+			DIGIT,
+		};
+
+		seg_output() : seg_output(NONE, 0, 0) {}
+		seg_output(enum seg_type _type, offs_t _x, offs_t _y = 0) : type(_type), x(_x), y(_y) {}
+
+		enum seg_type type;
+		offs_t x;
+		offs_t y;
+	};
+
 	static double discharge_t(double r, double c, double v);
 
 	u8 key_scan_r();
@@ -125,6 +104,10 @@ private:
 	u8 ga_trigger_r(offs_t offset);
 	void ga_trigger_w(offs_t offset, u8 data);
 	void voice_select_w(u8 data);
+
+	u8 lcd_reset_r();
+	void lcd_seg_w(offs_t offset, u64 data);
+	void lcd_seg_outputs_w(offs_t offset, u8 data);
 
 	int cart_connected_r() const;
 	u8 cart_r(offs_t offset);
@@ -157,6 +140,14 @@ private:
 	output_finder<> m_cart_led;  // D325 (GL9NP2) dual LED (red & green).
 	std::vector<std::vector<output_finder<>>> m_leds;
 
+	required_device<hd61602_device> m_lcdc;
+	required_device<pwm_display_device> m_lcd_pwm;
+	output_finder<10> m_seg_triangle;
+	output_finder<4> m_seg_track;
+	output_finder<7> m_seg_text;
+	output_finder<16, 10> m_seg_dot;
+	output_finder<3> m_seg_digit;
+
 	required_ioport m_tapesync_in;
 	required_ioport m_dinsync_in;
 	required_ioport m_dinsync_config;
@@ -177,6 +168,7 @@ private:
 
 	output_finder<> m_layout_727;
 	bool m_is_727;  // Configuration. Not needed in save state.
+	std::vector<std::vector<seg_output>> m_seg_map;  // Configuration.
 
 	u8 m_cart_bank;  // IC27 (40H174), Q5.
 	u8 m_key_led_row;  // P60-P63.
@@ -189,6 +181,143 @@ private:
 	static constexpr const double NEG_THRESH_4584 = 2.1;
 	static constexpr const double POS_THRESH_4584 = 2.7;
 };
+
+roland_tr707_state::roland_tr707_state(const machine_config &mconfig, device_type type, const char *tag)
+	: driver_device(mconfig, type, tag)
+	, m_maincpu(*this, "maincpu")
+	, m_cartslot(*this, "cartslot")
+	, m_mac(*this, "mac")
+	, m_led_matrix(*this, "led_matrix")
+	, m_key_switches(*this, "KEY%u", 0U)
+	, m_cart_led(*this, "led_cart")
+	, m_leds(4)
+	, m_lcdc(*this, "lcdc")
+	, m_lcd_pwm(*this, "lcd_pwm")
+	, m_seg_triangle(*this, "seg_triangle_%u", 1U)
+	, m_seg_track(*this, "seg_track_%u", 1U)
+	, m_seg_text(*this, "seg_text_%u", 1U)
+	, m_seg_dot(*this, "seg_dot_%u_%u", 1U, 1U)
+	, m_seg_digit(*this, "seg_digit_%u", 1U)
+	, m_tapesync_in(*this, "TAPESYNC")
+	, m_dinsync_in(*this, "DINSYNC")
+	, m_dinsync_config(*this, "DINSYNC_CONFIG")
+	, m_dinsync_out(*this, "DINSYNC_OUT_%u", 0U)
+	, m_tempo_timer(*this, "tempo_clock")
+	, m_tempo_restart_timer(*this, "tempo_restart_timer")
+	, m_tempo_ff(*this, "tempo_flipflop")
+	, m_tempo_trimmer(*this, "TM1")
+	, m_tempo_knob(*this, "TEMPO")
+	, m_accent_adc_rc(*this, "accent_adc_rc_network")
+	, m_accent_adc_timer(*this, "accent_adc_timer")
+	, m_accent_adc_ff(*this, "accent_adc_flipflop")
+	, m_accent_trimmer_series(*this, "TM2")
+	, m_accent_trimmer_parallel(*this, "TM3")
+	, m_accent_level(*this, "SLIDER_1")
+	, m_layout_727(*this, "is727")
+	, m_is_727(false)
+	, m_seg_map(hd61602_device::NCOM, std::vector<seg_output>(hd61602_device::NSEG))  // 4x51 LCD segments.
+	, m_cart_bank(0)
+	, m_key_led_row(0xff)
+	, m_tempo_source(0xff)
+	, m_midi_rxd_bit(true)  // Initial value is high, for serial "idle".
+{
+	// Initalize LED outputs.
+
+	constexpr const char *LED_NAME_SUFFIXES[4][6] =
+	{
+		{"1", "2", "3", "4", "scale_1", "scale_2"},
+		{"5", "6", "7", "8", "scale_3", "scale_4"},
+		{"9", "10", "11", "12", "group_1", "group_2"},
+		{"13", "14", "15", "16", "group_3", "group_4"},
+	};
+	for (int i = 0; i < 4; ++i)
+		for (int j = 0; j < 6; ++j)
+			m_leds[i].push_back(output_finder<>(*this, std::string("led_") + LED_NAME_SUFFIXES[i][j]));
+
+
+	// Build a mapping (m_seg_map) from the LCD controller's rows and columns (
+	// "com" and "seg" in hd61602 parlance) to the corresponding outputs.
+
+	for (int i = 0; i < 4; ++i)
+		m_seg_map[3 - i][50] = seg_output(seg_output::TRACK, i);
+
+	constexpr const std::tuple<int, int> SEG_TRIANGLES[10] =
+	{
+		{0, 48},  // cymbal
+		{1, 48},  // hi hat
+		{2, 48},  // hcp / tamb
+		{3, 48},  // rim / cowbell
+		{3, 47},  // hi tom
+		{2, 47},  // mid tom
+		{1, 47},  // low tom
+		{0, 47},  // snare drum
+		{0, 46},  // bass drum
+		{1, 46},  // accent
+	};
+	for (int i = 0; i < 10; ++i)
+	{
+		const std::tuple<int, int> &seg = SEG_TRIANGLES[i];
+		m_seg_map[std::get<0>(seg)][std::get<1>(seg)] = seg_output(seg_output::TRIANGLE, i);
+	}
+
+	constexpr const std::tuple<int, int> SEG_TEXT[7] =
+	{
+		{0, 44},  // tempo
+		{0, 40},  // measure
+		{3, 46},  // track play
+		{2, 46},  // track write
+		{3, 49},  // pattern play
+		{2, 49},  // step write
+		{1, 49},  // tap write
+	};
+	for (int i = 0; i < 7; ++i)
+	{
+		const std::tuple<int, int> &seg = SEG_TEXT[i];
+		m_seg_map[std::get<0>(seg)][std::get<1>(seg)] = seg_output(seg_output::TEXT, i);
+	}
+
+	constexpr const std::tuple<int, int> SEG_DIGIT[3][7] =
+	{
+		{ {0, 45}, {1, 44}, {2, 44}, {3, 44}, {3, 45}, {1, 45}, {2, 45} },
+		{ {0, 43}, {1, 42}, {2, 42}, {3, 42}, {3, 43}, {1, 43}, {2, 43} },
+		{ {0, 41}, {1, 40}, {2, 40}, {3, 40}, {3, 41}, {1, 41}, {2, 41} },
+	};
+	for (int i = 0; i < 3; ++i)
+	{
+		for (int j = 0; j < 7; ++j)
+		{
+			const std::tuple<int, int> &seg = SEG_DIGIT[i][j];
+			m_seg_map[std::get<0>(seg)][std::get<1>(seg)] = seg_output(seg_output::DIGIT, i, j);
+		}
+	}
+
+	// Segment addresses (row.col aka com.seg) for the 10x16 matrix of dots.
+	// "0.0 .. 3.0" means "0.0 1.0 2.0 3.0" and similar for the decreasing
+	// cases susch as "3.1 .. 0.1".
+
+	//  cymbal   0.0  .. 3.0  3.1  .. 0.1  0.20 .. 3.20 3.21 .. 0.21
+	//  hat:     0.2  .. 3.2  3.3  .. 0.3  0.22 .. 3.22 3.23 .. 0.23
+	//  hcp:     0.4  .. 3.4  3.5  .. 0.5  0.24 .. 3.24 3.25 .. 0.25
+	//  rim:     0.6  .. 3.6  3.7  .. 0.7  0.26 .. 3.26 3.27 .. 0.27
+	//  hi tom:  0.8  .. 3.8  3.9  .. 0.9  0.28 .. 3.28 3.29 .. 0.29
+	//  mid tom: 0.10 .. 3.10 3.11 .. 0.11 0.30 .. 3.30 3.31 .. 0.31
+	//  low tom: 0.12 .. 3.12 3.13 .. 0.13 0.32 .. 3.32 3.33 .. 0.33
+	//  snare:   0.14 .. 3.14 3.15 .. 0.15 0.34 .. 3.34 3.35 .. 0.35
+	//  bass:    0.16 .. 3.16 3.17 .. 0.17 0.36 .. 3.36 3.37 .. 0.37
+	//  accent:  0.18 .. 3.18 3.19 .. 0.19 0.38 .. 3.38 3.39 .. 0.39
+
+	// Map each row.col to an x.y output position, based on the table above.
+	for (int i = 0; i < 4; ++i)
+	{
+		for (int j = 0; j < 10; ++j)
+		{
+			m_seg_map[i][2 * j] = seg_output(seg_output::DOT, i, j);
+			m_seg_map[3 - i][2 * j + 1] = seg_output(seg_output::DOT, i + 4, j);
+			m_seg_map[i][2 * j + 20] = seg_output(seg_output::DOT, i + 8, j);
+			m_seg_map[3 - i][2 * j + 21] = seg_output(seg_output::DOT, i + 12, j);
+		}
+	}
+}
 
 void roland_tr707_state::machine_start()
 {
@@ -203,6 +332,12 @@ void roland_tr707_state::machine_start()
 	for (std::vector<output_finder<>> &led_row : m_leds)
 		for (output_finder<> &led_output : led_row)
 			led_output.resolve();
+
+	m_seg_triangle.resolve();
+	m_seg_track.resolve();
+	m_seg_text.resolve();
+	m_seg_dot.resolve();
+	m_seg_digit.resolve();
 }
 
 void roland_tr707_state::machine_reset()
@@ -284,6 +419,38 @@ void roland_tr707_state::voice_select_w(u8 data)
 {
 	// Bits D0-D5.
 	LOGMASKED(LOG_TRIGGER, "Voice selected: %02x\n", data);
+}
+
+u8 roland_tr707_state::lcd_reset_r()
+{
+	if (!machine().side_effects_disabled())
+		m_lcdc->reset_counter_strobe();
+	return 0x00;  // Data bus pulled low.
+}
+
+void roland_tr707_state::lcd_seg_w(offs_t offset, u64 data)
+{
+	m_lcd_pwm->matrix(1 << offset, data);
+}
+
+void roland_tr707_state::lcd_seg_outputs_w(offs_t offset, u8 data)
+{
+	const seg_output &seg = m_seg_map[offset & 0x3f][offset >> 6];
+	switch (seg.type)
+	{
+		case seg_output::TRIANGLE: m_seg_triangle[seg.x] = data;   break;
+		case seg_output::TRACK:    m_seg_track[seg.x] = data;      break;
+		case seg_output::TEXT:     m_seg_text[seg.x] = data;       break;
+		case seg_output::DOT:      m_seg_dot[seg.x][seg.y] = data; break;
+		case seg_output::DIGIT:
+		{
+			const u8 bit = BIT(data, 0) << seg.y;
+			const u8 mask = 0x7f ^ (1 << seg.y);
+			m_seg_digit[seg.x] = (m_seg_digit[seg.x] & mask) | bit;
+			break;
+		}
+		default: break;
+	}
 }
 
 int roland_tr707_state::cart_connected_r() const
@@ -405,7 +572,11 @@ void roland_tr707_state::update_internal_tempo_timer(bool cap_reset)
 	constexpr const double KNOB_MAX = RES_M(1);  // VR301.
 
 	// Using 100.0 - x, so that larger values result in higher tempo.
-	const double knob_r = KNOB_MAX * (100.0 - m_tempo_knob->read()) / 100.0;
+	// The tempo potentiometer has a "C" (inverse audio) taper, wired such that
+	// turning it clockwise reduces the resistance. Treating the input as a
+	// position (a value increase corresponds to a resistance decrease),
+	// results in an "A" (audio) taper wrt the position.
+	const double knob_r = KNOB_MAX * RES_AUDIO_POT_LAW((100.0 - m_tempo_knob->read()) / 100.0);
 	const double trimmer_r = TRIMMER_MAX * (100.0 - m_tempo_trimmer->read()) / 100.0;
 	const double r = R318 + trimmer_r + knob_r;
 	const double period = discharge_t(r, C10, NEG_THRESH_4584);
@@ -550,7 +721,7 @@ void roland_tr707_state::mem_map(address_map &map)
 	map.unmap_value_low();  // Data bus pulled low by RA301.
 	map(0x0000, 0x0000).mirror(0x7ff).unmaprw();
 	map(0x0800, 0x0800).mirror(0x7ff).r(FUNC(roland_tr707_state::key_scan_r));
-	//map(0x1000, 0x1000).mirror(0xfff).rw("lcdd", FUNC(hd61602_device::ready_r), FUNC(hd61602_device::write));
+	map(0x1000, 0x1000).mirror(0xfff).r(FUNC(roland_tr707_state::lcd_reset_r)).w(m_lcdc, FUNC(hd61602_device::data_w));
 	map(0x2000, 0x27ff).ram().share("nvram1");
 	map(0x2800, 0x2fff).ram().share("nvram2");
 	map(0x3000, 0x3fff).rw(FUNC(roland_tr707_state::cart_r), FUNC(roland_tr707_state::cart_w));
@@ -603,7 +774,7 @@ static INPUT_PORTS_START(tr707)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Group C") PORT_CODE(KEYCODE_C)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Group D") PORT_CODE(KEYCODE_V)
 
-	PORT_START("TEMPO")  // Tempo knob, VR301, 1M (EWH-LNAF20C16).
+	PORT_START("TEMPO")  // Tempo knob, VR301, 1M(C) (EWH-LNAF20C16, inverse audio taper).
 	PORT_ADJUSTER(50, "Tempo") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(roland_tr707_state::tempo_pots_adjusted), 0)
 
 	PORT_START("VOLUME")  // Master volume slider, VR212, 50K(B) (S3028, dual-gang).
@@ -645,15 +816,16 @@ static INPUT_PORTS_START(tr707)
 		 PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(roland_tr707_state::accent_pots_adjusted), 0)
 
 	PORT_START("DINSYNC_CONFIG")
-	PORT_CONFNAME(0x01, 0x00, "DIN sync input cable connected")
+	PORT_CONFNAME(0x01, 0x01, "DIN sync input cable connected")
 	PORT_CONFSETTING(0x00, DEF_STR(No))
 	PORT_CONFSETTING(0x01, DEF_STR(Yes))
 
 	PORT_START("DINSYNC")  // SYNC socket (J4). Bit numbers map to `enum dinsync_index`.
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("SYNC start/stop")  // Pin 1.
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("SYNC tempo")  // Pin 3. 24 cloks per quarter note.
+	// SYNC start needs to be active for SYNC tempo to have an effect.
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("SYNC start/stop") PORT_CODE(KEYCODE_B)  // Pin 1.
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("SYNC tempo") PORT_CODE(KEYCODE_M)  // Pin 3. 24 cloks per quarter note.
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(roland_tr707_state::sync_input_changed), 0)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("SYNC Continue")  // Pin 5.
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("SYNC Continue") PORT_CODE(KEYCODE_N)  // Pin 5.
 
 	PORT_START("TAPESYNC")  // TAPE LOAD / SYNC IN socket (J5).
 	// Input connected to a filter (C30, R43, C31, R47), followed by a
@@ -714,9 +886,12 @@ void roland_tr707_state::tr707(machine_config &config)
 	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(FUNC(roland_tr707_state::midi_rxd_w));
 	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
 
-	//HD61602(config, "lcdd");
-
 	GENERIC_CARTSLOT(config, m_cartslot, generic_plain_slot, nullptr, "tr707_cart");
+
+	HD61602(config, m_lcdc);
+	m_lcdc->write_segs().set(FUNC(roland_tr707_state::lcd_seg_w));
+	PWM_DISPLAY(config, m_lcd_pwm).set_size(hd61602_device::NCOM, hd61602_device::NSEG);
+	m_lcd_pwm->output_x().set(FUNC(roland_tr707_state::lcd_seg_outputs_w));
 
 	PWM_DISPLAY(config, m_led_matrix).set_size(4, 6);
 	m_led_matrix->output_x().set(FUNC(roland_tr707_state::led_outputs_w));
@@ -766,5 +941,5 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1985, tr707, 0, 0, tr707, tr707, roland_tr707_state, empty_init, "Roland", "TR-707 Rhythm Composer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-SYST(1985, tr727, 0, 0, tr727, tr707, roland_tr707_state, empty_init, "Roland", "TR-727 Rhythm Composer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1985, tr707, 0, 0, tr707, tr707, roland_tr707_state, empty_init, "Roland", "TR-707 Rhythm Composer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)
+SYST(1985, tr727, 0, 0, tr727, tr707, roland_tr707_state, empty_init, "Roland", "TR-727 Rhythm Composer", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE)

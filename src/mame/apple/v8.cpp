@@ -47,9 +47,6 @@
 #define VERBOSE (0)
 #include "logmacro.h"
 
-static constexpr u32 C7M  = 7833600;
-static constexpr u32 C15M = (C7M * 2);
-
 //**************************************************************************
 //  DEVICE DEFINITIONS
 //**************************************************************************
@@ -86,7 +83,7 @@ void v8_device::map(address_map &map)
 
 	map(0x500000, 0x501fff).rw(FUNC(v8_device::mac_via_r), FUNC(v8_device::mac_via_w));
 	map(0x514000, 0x515fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write));
-	map(0x524000, 0x525fff).rw(FUNC(v8_device::dac_r), FUNC(v8_device::dac_w));
+	map(0x524000, 0x525fff).rw(m_ariel, FUNC(ariel_device::read), FUNC(ariel_device::write));
 	map(0x526000, 0x527fff).rw(m_pseudovia, FUNC(pseudovia_device::read), FUNC(pseudovia_device::write));
 
 	map(0x540000, 0x5bffff).rw(FUNC(v8_device::vram_r), FUNC(v8_device::vram_w));
@@ -104,9 +101,7 @@ void v8_device::device_add_mconfig(machine_config &config)
 	m_screen->screen_vblank().set(m_pseudovia, FUNC(pseudovia_device::slot_irq_w<0x40>));
 	config.set_default_layout(layout_monitors);
 
-	PALETTE(config, m_palette).set_entries(256);
-
-	R65NC22(config, m_via1, C7M / 10);
+	R65NC22(config, m_via1, 15.6672_MHz_XTAL / 20);
 	m_via1->readpa_handler().set(FUNC(v8_device::via_in_a));
 	m_via1->readpb_handler().set(FUNC(v8_device::via_in_b));
 	m_via1->writepa_handler().set(FUNC(v8_device::via_out_a));
@@ -114,18 +109,20 @@ void v8_device::device_add_mconfig(machine_config &config)
 	m_via1->cb2_handler().set(FUNC(v8_device::via_out_cb2));
 	m_via1->irq_handler().set(FUNC(v8_device::via1_irq));
 
-	ASC(config, m_asc, C15M, asc_device::asc_type::V8);
+	ASC(config, m_asc, 15.6672_MHz_XTAL, asc_device::asc_type::V8);
 	m_asc->irqf_callback().set(m_pseudovia, FUNC(pseudovia_device::asc_irq_w));
 	m_asc->add_route(0, tag(), 1.0, 0);
 	m_asc->add_route(1, tag(), 1.0, 1);
 
-	APPLE_PSEUDOVIA(config, m_pseudovia, C15M);
+	APPLE_PSEUDOVIA(config, m_pseudovia, 15.6672_MHz_XTAL);
 	m_pseudovia->writepb_handler().set(FUNC(v8_device::via2_pb_w));
 	m_pseudovia->readconfig_handler().set(FUNC(v8_device::via2_config_r));
 	m_pseudovia->writeconfig_handler().set(FUNC(v8_device::via2_config_w));
 	m_pseudovia->readvideo_handler().set(FUNC(v8_device::via2_video_config_r));
 	m_pseudovia->writevideo_handler().set(FUNC(v8_device::via2_video_config_w));
 	m_pseudovia->irq_callback().set(FUNC(v8_device::via2_irq));
+
+	ARIEL(config, m_ariel, 0);
 }
 
 //-------------------------------------------------
@@ -142,7 +139,7 @@ v8_device::v8_device(const machine_config &mconfig, device_type type, const char
 	device_sound_interface(mconfig, *this),
 	m_maincpu(*this, finder_base::DUMMY_TAG),
 	m_screen(*this, "screen"),
-	m_palette(*this, "palette"),
+	m_ariel(*this, "ramdac"),
 	m_asc(*this, "asc"),
 	m_pseudovia(*this, "pseudovia"),
 	m_overlay(false),
@@ -179,15 +176,9 @@ void v8_device::device_start()
 	save_item(NAME(m_via2_interrupt));
 	save_item(NAME(m_scc_interrupt));
 	save_item(NAME(m_last_taken_interrupt));
-	save_item(NAME(m_pal_address));
-	save_item(NAME(m_pal_idx));
-	save_item(NAME(m_pal_control));
-	save_item(NAME(m_pal_colkey));
 	save_item(NAME(m_config));
 	save_item(NAME(m_video_config));
 	save_item(NAME(m_overlay));
-
-	m_pal_address = m_pal_idx = m_pal_control = m_pal_colkey = 0;
 }
 
 //-------------------------------------------------
@@ -493,58 +484,6 @@ void v8_device::vram_w(offs_t offset, u32 data, u32 mem_mask)
 	COMBINE_DATA(&m_vram[offset]);
 }
 
-u8 v8_device::dac_r(offs_t offset)
-{
-	switch (offset)
-	{
-	case 2:
-		return m_pal_control;
-
-	default:
-		return 0;
-	}
-}
-
-void v8_device::dac_w(offs_t offset, u8 data)
-{
-	switch (offset)
-	{
-	case 0:
-		m_pal_address = data;
-		m_pal_idx = 0;
-		break;
-
-	case 1:
-		switch (m_pal_idx)
-		{
-		case 0:
-			m_palette->set_pen_red_level(m_pal_address, data);
-			break;
-		case 1:
-			m_palette->set_pen_green_level(m_pal_address, data);
-			break;
-		case 2:
-			m_palette->set_pen_blue_level(m_pal_address, data);
-			break;
-		}
-		m_pal_idx++;
-		if (m_pal_idx == 3)
-		{
-			m_pal_idx = 0;
-			m_pal_address++;
-		}
-		break;
-
-	case 2:
-		m_pal_control = data;
-		break;
-
-	case 3:
-		m_pal_colkey = data;
-		break;
-	}
-}
-
 u32 v8_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int hres, vres;
@@ -567,7 +506,7 @@ u32 v8_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const 
 		break;
 	}
 
-	const pen_t *pens = m_palette->pens();
+	const pen_t *pens = m_ariel->pens();
 
 	switch (m_video_config & 7)
 	{
@@ -690,7 +629,7 @@ void eagle_device::device_add_mconfig(machine_config &config)
 	v8_device::device_add_mconfig(config);
 	m_screen->set_raw(15.6672_MHz_XTAL, 704, 0, 512, 370, 0, 342);
 
-	ASC(config.replace(), m_asc, C15M, asc_device::asc_type::EAGLE);
+	ASC(config.replace(), m_asc, 15.6672_MHz_XTAL, asc_device::asc_type::EAGLE);
 	m_asc->add_route(0, tag(), 1.0, 0);
 	m_asc->add_route(1, tag(), 1.0, 1);
 	m_asc->irqf_callback().set(m_pseudovia, FUNC(pseudovia_device::asc_irq_w));
@@ -765,12 +704,12 @@ void spice_device::device_add_mconfig(machine_config &config)
 	v8_device::device_add_mconfig(config);
 	m_screen->set_raw(15.6672_MHz_XTAL, 640, 0, 512, 407, 0, 384);
 
-	ASC(config.replace(), m_asc, C15M, asc_device::asc_type::SONORA);
+	ASC(config.replace(), m_asc, 15.6672_MHz_XTAL, asc_device::asc_type::SONORA);
 	m_asc->add_route(0, tag(), 1.0, 0);
 	m_asc->add_route(1, tag(), 1.0, 1);
 	m_asc->irqf_callback().set(m_pseudovia, FUNC(pseudovia_device::asc_irq_w));
 
-	SWIM2(config, m_fdc, C15M);
+	SWIM2(config, m_fdc, 15.6672_MHz_XTAL);
 	m_fdc->devsel_cb().set(FUNC(spice_device::devsel_w));
 	m_fdc->phases_cb().set(FUNC(spice_device::phases_w));
 
@@ -817,7 +756,7 @@ u32 spice_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 	hres = 512;
 	vres = 384;
 
-	const pen_t *pens = m_palette->pens();
+	const pen_t *pens = m_ariel->pens();
 	switch (m_video_config & 7)
 	{
 	case 0: // 1bpp
@@ -1008,7 +947,7 @@ u32 tinkerbell_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	hres = 640;
 	vres = 480;
 
-	const pen_t *pens = m_palette->pens();
+	const pen_t *pens = m_ariel->pens();
 	switch (m_video_config & 7)
 	{
 	case 0: // 1bpp

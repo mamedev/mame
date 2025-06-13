@@ -20,6 +20,8 @@ public:
 	// default 60MHz clock (divided by 2 for DSP core clock, and then by 1248 for sample rate)
 	qsound_hle_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock = 60'000'000);
 
+	static auto parent_rom_device_type(); // QSOUND
+
 	void qsound_w(offs_t offset, uint8_t data);
 	uint8_t qsound_r();
 

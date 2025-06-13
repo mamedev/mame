@@ -396,19 +396,6 @@ ppcar
 ssfindo
 tetfight
 
-@source:acorn/z88.cpp
-z88
-z88ch
-z88de
-z88dk
-z88es
-z88fi
-z88fr
-z88it
-z88no
-z88se
-z88tr
-
 @source:act/apricot.cpp
 apricot
 apricotxi
@@ -1519,6 +1506,7 @@ winbingo
 winbingoa
 wwitch
 zoo
+zulu
 
 @source:astrocorp/astropc.cpp
 blackbd
@@ -18870,6 +18858,7 @@ wrallymp
 
 @source:gaelco/xorworld.cpp
 xorworld
+xorworlda
 
 @source:gaelco/xorworld_ms.cpp
 xorwldms
@@ -20686,6 +20675,7 @@ happyskl
 iqblocka
 iqblockf
 jking103a
+jking105us
 jking200pr
 jking302us
 lhzb
@@ -20709,6 +20699,7 @@ spkrform
 starzan
 tarzan
 tarzan103m
+tarzan106fa
 tarzan202fa
 tarzana
 tarzanb
@@ -20747,6 +20738,7 @@ extradrw
 fruitpar
 fruitpar206us
 gonefsh2
+jhg3d
 jking02
 klxyj102cn
 klxyj104cn
@@ -20773,6 +20765,7 @@ sdwx
 slqz3
 tct2p
 tripslot
+tshs
 xypdk
 zhongguo
 
@@ -20804,12 +20797,16 @@ tripfev108us
 wldfruit
 
 @source:igs/igs_m036.cpp
+cjbq
 cjddzsp
 cjdh2
 cjdh2a
 cjdh2b
 cjdh2c
 cjdh2d
+cjgdy
+dahuaxy
+huoqilin
 igsm312
 jhzb
 jxry
@@ -20818,11 +20815,13 @@ lhtb
 lhzb3in1
 lhzbgqb
 mghammer
+mjzhizun
 qhzb
 slqzsp
 super70s
 sydh
 xyddz
+xydn
 
 @source:igs/igspoker.cpp
 chleague
@@ -22486,6 +22485,7 @@ rockn3
 rockn4
 rockna
 rocknms
+rocknms10
 step3
 stepstag
 tetrisp2
@@ -35394,6 +35394,7 @@ dgun2573a
 dgunl3201
 dgunl3202
 fcpocket
+lxpcli
 lxpcsp
 matet100
 matet220
@@ -35403,6 +35404,7 @@ myaass
 rminitv
 
 @source:nintendo/nes_vt369_vtunknown.cpp
+168pcase
 240in1ar
 bittboy
 denv150
@@ -35672,6 +35674,7 @@ wrecking
 
 @source:nintendo/vt1682.cpp
 110dance
+anpncpc
 cmpmx10
 cmpmx11
 dance555
@@ -40148,6 +40151,7 @@ genesis_tmss
 laseract
 laseractj
 mahg156
+mdhh100
 megacd
 megacd2
 megacd2j
@@ -40190,6 +40194,8 @@ mdtvp1j
 mdtvp2j
 mdtvp3j
 msi_sf2
+mympac
+mypac
 ra145
 rad_gen1
 rad_gen2
@@ -42780,6 +42786,19 @@ zx97
 
 @source:sinclair/specnext.cpp
 tbblue
+
+@source:sinclair/z88.cpp
+z88
+z88ch
+z88de
+z88dk
+z88es
+z88fi
+z88fr
+z88it
+z88no
+z88se
+z88tr
 
 @source:skeleton/600cat.cpp
 600cat
@@ -46548,6 +46567,7 @@ anpanbd
 anpanm15
 bk139in1
 bkrankp
+lxcyrace
 prailpls
 
 @source:tvgames/generalplus_gpl16250_spi_direct.cpp
@@ -46558,6 +46578,7 @@ bfmpac
 bfpacman
 bfspyhnt
 bftetris
+punirune
 siddr
 wiwcs
 
@@ -46635,6 +46656,7 @@ sstarkar
 hyprscan
 jak_bbh
 jak_bbsf
+prail07
 zonefamf
 
 @source:tvgames/spg29x_lexibook_jg7425.cpp
@@ -46649,8 +46671,10 @@ zone3d
 ablkickb
 abltenni
 anpantv
+backybbs
 ban_krkk
 ban_tam2
+barbpet
 carled99
 comil
 ddr33v
@@ -46673,15 +46697,18 @@ guitarfv
 guitarss
 guitarssa
 hotwhl2p
+hotwhls
 itvphone
 jeuint
 jjstrip
 jouet
 knd
 lexiart
+lpetshop
 lxairjet
 lxspidaj
 mattelcs
+mylpony
 ordentv
 pballpup
 prail
@@ -46690,6 +46717,7 @@ rad_fb2
 rad_jib
 rad_skat
 rad_skatp
+rocksock
 senspeed
 senwfit
 swclone
@@ -46704,6 +46732,7 @@ vtechtvsgr
 vtechtvssp
 wfart
 wfcentro
+whacmole
 wordlnch
 
 @source:tvgames/spg2xx_digimake.cpp
@@ -46813,13 +46842,15 @@ mysptqvc
 mgt20in1
 
 @source:tvgames/spg2xx_pdc.cpp
-pdc100
-pdc50
-pdc200
-pdc40t
-pdc150t
-tmntpdc
 dorapdc
+ouipdc
+pdc30p
+pdc40t
+pdc50
+pdc100
+pdc150t
+pdc200
+tmntpdc
 vjpp2
 
 @source:tvgames/spg2xx_playvision.cpp
@@ -46905,6 +46936,7 @@ dphh8630
 mc_cb203
 pg118
 ragc153
+retro150
 rhhc152
 supreme
 toumapet
@@ -47095,6 +47127,7 @@ xavbowlj
 xavbox
 xavjmat
 xavmusic
+xavpkjr
 xavtenni
 
 @source:ultimachine/rambo.cpp

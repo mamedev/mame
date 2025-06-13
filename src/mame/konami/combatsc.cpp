@@ -5,8 +5,6 @@
 "Combat School" (also known as "Boot Camp") - (Konami GX611)
 
 TODO:
-- Ugly text flickering in various places, namely the text when you finish level 1.
-  This is due of completely busted sprite limit hook-up. (check k007121.cpp and MT #00185)
 - understand how the trackball really works for clone sets.
 - it seems that to get correct target colors in firing range III we have to
   use the WRONG lookup table (the one for tiles instead of the one for
@@ -127,6 +125,7 @@ Dip location and recommended settings verified with the US manual
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/ymopn.h"
+
 #include "speaker.h"
 
 
@@ -135,6 +134,29 @@ Dip location and recommended settings verified with the US manual
  *  Memory handlers
  *
  *************************************/
+
+void combatsc_state::pf_control_w(offs_t offset, uint8_t data)
+{
+	m_k007121[m_video_circuit]->ctrl_w(offset, data);
+}
+
+template <uint8_t Which>
+void combatsc_state::flipscreen_w(int state)
+{
+	const uint32_t flip = state ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0;
+
+	m_bg_tilemap[Which]->set_flip(flip);
+	if (Which == 0)
+		m_textlayer->set_flip(flip);
+}
+
+template <uint8_t Which>
+void combatsc_state::dirtytiles()
+{
+	m_bg_tilemap[Which]->mark_all_dirty();
+	if (Which == 0)
+		m_textlayer->mark_all_dirty();
+}
 
 void combatsc_base_state::vreg_w(uint8_t data)
 {
@@ -188,11 +210,6 @@ void combatsc_state::bankselect_w(uint8_t data)
 		m_mainbank->set_entry(8 + (data & 1));
 }
 
-void combatscb_state::io_w(offs_t offset, uint8_t data)
-{
-	m_io_ram[offset] = data;
-}
-
 void combatscb_state::bankselect_w(uint8_t data)
 {
 	if (data & 0x40)
@@ -227,6 +244,12 @@ void combatscb_state::bankselect_w(uint8_t data)
 	}
 }
 
+void combatscb_state::io_w(offs_t offset, uint8_t data)
+{
+	m_io_ram[offset] = data;
+}
+
+
 /****************************************************************************/
 
 void combatsc_state::coin_counter_w(uint8_t data)
@@ -243,9 +266,9 @@ uint8_t combatsc_state::trackball_r(offs_t offset)
 {
 	if (offset == 0)
 	{
-		int i, dir[4];
+		int dir[4];
 
-		for (i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++)
 		{
 			uint8_t curr = m_track_ports[i].read_safe(0xff);
 
@@ -671,11 +694,11 @@ void combatscb_state::machine_reset()
 void combatsc_state::combatsc(machine_config &config)
 {
 	// basic machine hardware
-	HD6309E(config, m_maincpu, 24_MHz_XTAL / 8);  // HD63C09E, 3 MHz?
+	HD6309E(config, m_maincpu, 24_MHz_XTAL / 8); // HD63C09E, 3 MHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &combatsc_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(combatsc_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, 3579545);   // 3.579545 MHz??? (no such XTAL on board!)
+	Z80(config, m_audiocpu, 3579545); // 3.579545 MHz??? (no such XTAL on board!)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &combatsc_state::sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(1200));
@@ -686,20 +709,23 @@ void combatsc_state::combatsc(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-//  m_screen->set_refresh_hz(60);
-//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-//  m_screen->set_size(32*8, 32*8);
-//  m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
-	m_screen->set_raw(XTAL(24'000'000)/3, 528, 0, 256, 256, 16, 240); // not accurate, assuming same to other Konami games (59.17)
+	m_screen->set_raw(24_MHz_XTAL / 3, 512, 0, 256, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(combatsc_state::screen_update));
 	m_screen->set_palette(m_palette);
+	m_screen->screen_vblank().set(m_k007121[0], FUNC(k007121_device::sprites_buffer));
+	m_screen->screen_vblank().append(m_k007121[1], FUNC(k007121_device::sprites_buffer));
 
 	PALETTE(config, m_palette, FUNC(combatsc_state::palette));
 	m_palette->set_format(palette_device::xBGR_555, 8 * 16 * 16, 128);
 	m_palette->set_endianness(ENDIANNESS_LITTLE);
 
 	K007121(config, m_k007121[0], 0, m_palette, gfx_combatsc_1);
+	m_k007121[0]->set_flipscreen_cb().set(FUNC(combatsc_state::flipscreen_w<0>));
+	m_k007121[0]->set_dirtytiles_cb(FUNC(combatsc_state::dirtytiles<0>));
+
 	K007121(config, m_k007121[1], 0, m_palette, gfx_combatsc_2);
+	m_k007121[1]->set_flipscreen_cb().set(FUNC(combatsc_state::flipscreen_w<1>));
+	m_k007121[1]->set_dirtytiles_cb(FUNC(combatsc_state::dirtytiles<1>));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
