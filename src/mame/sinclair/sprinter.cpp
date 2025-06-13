@@ -46,7 +46,7 @@ TODO:
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "bus/rs232/hlemouse.h"
 #include "bus/rs232/rs232.h"
-#include "bus/spectrum/zxbus.h"
+#include "bus/spectrum/zxbus/bus.h"
 #include "cpu/z80/z84c015.h"
 #include "machine/ds128x.h"
 #include "machine/input_merger.h"

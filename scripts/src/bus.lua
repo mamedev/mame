@@ -4943,19 +4943,19 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/spectrum/zxbus.h,BUSES["ZXBUS"] = true
+--@src/devices/bus/spectrum/zxbus/bus.h,BUSES["ZXBUS"] = true
 ---------------------------------------------------
 
 if (BUSES["ZXBUS"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/bus/spectrum/zxbus.cpp",
-		MAME_DIR .. "src/devices/bus/spectrum/zxbus.h",
-		MAME_DIR .. "src/devices/bus/spectrum/nemoide.cpp",
-		MAME_DIR .. "src/devices/bus/spectrum/nemoide.h",
-		MAME_DIR .. "src/devices/bus/spectrum/neogs.cpp",
-		MAME_DIR .. "src/devices/bus/spectrum/neogs.h",
-		MAME_DIR .. "src/devices/bus/spectrum/smuc.cpp",
-		MAME_DIR .. "src/devices/bus/spectrum/smuc.h",
+		MAME_DIR .. "src/devices/bus/spectrum/zxbus/bus.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/zxbus/bus.h",
+		MAME_DIR .. "src/devices/bus/spectrum/zxbus/nemoide.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/zxbus/nemoide.h",
+		MAME_DIR .. "src/devices/bus/spectrum/zxbus/neogs.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/zxbus/neogs.h",
+		MAME_DIR .. "src/devices/bus/spectrum/zxbus/smuc.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/zxbus/smuc.h",
 	}
 end
 
