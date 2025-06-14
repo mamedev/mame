@@ -536,5 +536,5 @@ ROM_END
 // make use of them, instead opting for their own, so which really came first?
 
 // due to this being almost an entirely different piece of code on entirely different hardware it isn't set as a clone of xorworld
-GAME( 1990, xorwldms,  0,        xorworld_ms, xorworld_ms, xorworld_ms_state, init_xorworld_ms, ROT0, "Gaelco", "Xor World (Modular System, prototype, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1990, xorwldmsa, xorwldms, xorworld_ms, xorworld_ms, xorworld_ms_state, init_xorworld_ms, ROT0, "Gaelco", "Xor World (Modular System, prototype, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1990, xorwldms,  0,        xorworld_ms, xorworld_ms, xorworld_ms_state, init_xorworld_ms, ROT0, "Gaelco", "Xor World (Modular System, prototype, set 1)", MACHINE_IMPERFECT_SOUND )
+GAME( 1990, xorwldmsa, xorwldms, xorworld_ms, xorworld_ms, xorworld_ms_state, init_xorworld_ms, ROT0, "Gaelco", "Xor World (Modular System, prototype, set 2)", MACHINE_IMPERFECT_SOUND )
