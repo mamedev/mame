@@ -368,13 +368,14 @@ void z100_state::machine_start()
 	save_item(NAME(m_start_addr));
 	save_item(NAME(m_vidint_enable));
 	save_item(NAME(m_memory_ctrl));
-	save_pointer(NAME(m_gvram), 0x30000);
 	save_pointer(NAME(m_parity), parity_size);
 }
 
 void z100_state::video_start()
 {
 	m_gvram = make_unique_clear<u8[]>(0x30000);
+
+	save_pointer(NAME(m_gvram), 0x30000);
 
 	m_vidint_enable = false;
 }
