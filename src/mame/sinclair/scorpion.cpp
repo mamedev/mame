@@ -5,7 +5,7 @@
 #include "beta_m.h"
 #include "spec128.h"
 
-#include "bus/spectrum/zxbus.h"
+#include "bus/spectrum/zxbus/bus.h"
 #include "machine/timer.h"
 #include "sound/ay8910.h"
 #include "speaker.h"

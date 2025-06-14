@@ -62,11 +62,6 @@ DEFINE_DEVICE_TYPE(RSP, rsp_device, "rsp", "Nintendo & SGI Reality Signal Proces
 #define ZERO        3
 #define CLIP2       4
 
-#define SLICE_H             3
-#define SLICE_M             2
-#define SLICE_L             1
-#define SLICE_LL            0
-
 #define WRITEBACK_RESULT() memcpy(m_v[VDREG].s, vres, sizeof(uint16_t) * 8);
 
 static const int vector_elements_2[16][8] =
@@ -265,7 +260,7 @@ void rsp_device::device_start()
 	for (int regIdx = 0; regIdx < 32; regIdx++)
 		m_r[regIdx] = 0;
 
-	for(auto & elem : m_v)
+	for (auto & elem : m_v)
 	{
 		elem.d[0] = 0;
 		elem.d[1] = 0;
@@ -284,7 +279,7 @@ void rsp_device::device_start()
 	m_vector_busy = false;
 	m_paired_busy = false;
 
-	for(auto & elem : m_accum)
+	for (auto & elem : m_accum)
 	{
 		elem.q = 0;
 	}
@@ -294,6 +289,35 @@ void rsp_device::device_start()
 	m_sr = RSP_STATUS_HALT;
 	m_step_count = 0;
 
+	// register for savestates
+	save_item(NAME(m_pc));
+	save_item(NAME(m_r));
+	save_item(NAME(m_ideduct));
+	save_item(NAME(m_scalar_busy));
+	save_item(NAME(m_vector_busy));
+	save_item(NAME(m_paired_busy));
+
+	save_item(NAME(m_sr));
+	save_item(NAME(m_step_count));
+	save_item(NAME(m_ppc));
+	save_item(NAME(m_nextpc));
+
+	save_item(NAME(m_vres));
+	save_item(NAME(m_accum));
+	save_item(NAME(m_vcarry));
+	save_item(NAME(m_vcompare));
+	save_item(NAME(m_vclip1));
+	save_item(NAME(m_vzero));
+	save_item(NAME(m_vclip2));
+
+    for (int i = 0; i < std::size(m_v); i++)
+		save_item(NAME(m_v[i].d), i);
+
+	save_item(NAME(m_reciprocal_res));
+	save_item(NAME(m_reciprocal_high));
+	save_item(NAME(m_dp_allowed));
+
+	// register state for debugger
 	state_add( RSP_PC,      "PC", m_pc).callimport().callexport().formatstr("%08X");
 	state_add( RSP_R0,      "R0", m_r[0]).formatstr("%08X");
 	state_add( RSP_R1,      "R1", m_r[1]).formatstr("%08X");
@@ -528,15 +552,15 @@ void rsp_device::device_reset()
 
 uint16_t rsp_device::SATURATE_ACCUM(int accum, int slice, uint16_t negative, uint16_t positive)
 {
-	if ((int16_t)m_accum[accum].w[SLICE_H] < 0)
+	if ((int16_t)m_accum[accum].w.h3 < 0)
 	{
-		if ((uint16_t)m_accum[accum].w[SLICE_H] != 0xffff)
+		if ((uint16_t)m_accum[accum].w.h3 != 0xffff)
 		{
 			return negative;
 		}
 		else
 		{
-			if ((int16_t)m_accum[accum].w[SLICE_M] >= 0)
+			if ((int16_t)m_accum[accum].w.h2 >= 0)
 			{
 				return negative;
 			}
@@ -544,24 +568,24 @@ uint16_t rsp_device::SATURATE_ACCUM(int accum, int slice, uint16_t negative, uin
 			{
 				if (slice == 0)
 				{
-					return m_accum[accum].w[SLICE_L];
+					return m_accum[accum].w.h;
 				}
 				else if (slice == 1)
 				{
-					return m_accum[accum].w[SLICE_M];
+					return m_accum[accum].w.h2;
 				}
 			}
 		}
 	}
 	else
 	{
-		if ((uint16_t)m_accum[accum].w[SLICE_H] != 0)
+		if ((uint16_t)m_accum[accum].w.h3 != 0)
 		{
 			return positive;
 		}
 		else
 		{
-			if ((int16_t)m_accum[accum].w[SLICE_M] < 0)
+			if ((int16_t)m_accum[accum].w.h2 < 0)
 			{
 				return positive;
 			}
@@ -569,11 +593,11 @@ uint16_t rsp_device::SATURATE_ACCUM(int accum, int slice, uint16_t negative, uin
 			{
 				if (slice == 0)
 				{
-					return m_accum[accum].w[SLICE_L];
+					return m_accum[accum].w.h;
 				}
 				else
 				{
-					return m_accum[accum].w[SLICE_M];
+					return m_accum[accum].w.h2;
 				}
 			}
 		}
@@ -610,19 +634,19 @@ void rsp_device::handle_vector_ops(uint32_t op)
 				if (s1 == -32768 && s2 == -32768)
 				{
 					// overflow
-					m_accum[i].w[SLICE_H] = 0;
-					m_accum[i].w[SLICE_M] = -32768;
-					m_accum[i].w[SLICE_L] = -32768;
+					m_accum[i].w.h3 = 0;
+					m_accum[i].w.h2 = -32768;
+					m_accum[i].w.h = -32768;
 					vres[i] = 0x7fff;
 				}
 				else
 				{
 					int64_t r =  s1 * s2 * 2;
 					r += 0x8000;    // rounding ?
-					m_accum[i].w[SLICE_H] = (r < 0) ? 0xffff : 0; // Sign-extend to 48-bit
-					m_accum[i].w[SLICE_M] = (int16_t)(r >> 16);
-					m_accum[i].w[SLICE_L] = (uint16_t)r;
-					vres[i] = m_accum[i].w[SLICE_M];
+					m_accum[i].w.h3 = (r < 0) ? 0xffff : 0; // Sign-extend to 48-bit
+					m_accum[i].w.h2 = (int16_t)(r >> 16);
+					m_accum[i].w.h = (uint16_t)r;
+					vres[i] = m_accum[i].w.h2;
 				}
 			}
 			WRITEBACK_RESULT();
@@ -645,21 +669,21 @@ void rsp_device::handle_vector_ops(uint32_t op)
 				int64_t r = s1 * s2 * 2;
 				r += 0x8000;    // rounding ?
 
-				m_accum[i].w[SLICE_H] = (uint16_t)(r >> 32);
-				m_accum[i].w[SLICE_M] = (uint16_t)(r >> 16);
-				m_accum[i].w[SLICE_L] = (uint16_t)r;
+				m_accum[i].w.h3 = (uint16_t)(r >> 32);
+				m_accum[i].w.h2 = (uint16_t)(r >> 16);
+				m_accum[i].w.h = (uint16_t)r;
 
 				if (r < 0)
 				{
 					vres[i] = 0;
 				}
-				else if (((int16_t)m_accum[i].w[SLICE_H] ^ (int16_t)m_accum[i].w[SLICE_M]) < 0)
+				else if (((int16_t)m_accum[i].w.h3 ^ (int16_t)m_accum[i].w.h2) < 0)
 				{
 					vres[i] = -1;
 				}
 				else
 				{
-					vres[i] = m_accum[i].w[SLICE_M];
+					vres[i] = m_accum[i].w.h2;
 				}
 			}
 			WRITEBACK_RESULT();
@@ -683,11 +707,11 @@ void rsp_device::handle_vector_ops(uint32_t op)
 				uint32_t s2 = m_v[VS2REG].w[VEC_EL_2(EL, i)];
 				uint32_t r = s1 * s2;
 
-				m_accum[i].w[SLICE_H] = 0;
-				m_accum[i].w[SLICE_M] = 0;
-				m_accum[i].w[SLICE_L] = (uint16_t)(r >> 16);
+				m_accum[i].w.h3 = 0;
+				m_accum[i].w.h2 = 0;
+				m_accum[i].w.h = (uint16_t)(r >> 16);
 
-				vres[i] = m_accum[i].w[SLICE_L];
+				vres[i] = m_accum[i].w.h;
 			}
 			WRITEBACK_RESULT();
 			break;
@@ -710,11 +734,11 @@ void rsp_device::handle_vector_ops(uint32_t op)
 				int32_t s2 = m_v[VS2REG].w[VEC_EL_2(EL, i)];   // not sign-extended
 				int32_t r =  s1 * s2;
 
-				m_accum[i].w[SLICE_H] = (r < 0) ? 0xffff : 0;      // sign-extend to 48-bit
-				m_accum[i].w[SLICE_M] = (int16_t)(r >> 16);
-				m_accum[i].w[SLICE_L] = (uint16_t)r;
+				m_accum[i].w.h3 = (r < 0) ? 0xffff : 0;      // sign-extend to 48-bit
+				m_accum[i].w.h2 = (int16_t)(r >> 16);
+				m_accum[i].w.h = (uint16_t)r;
 
-				vres[i] = m_accum[i].w[SLICE_M];
+				vres[i] = m_accum[i].w.h2;
 			}
 			WRITEBACK_RESULT();
 			break;
@@ -737,11 +761,11 @@ void rsp_device::handle_vector_ops(uint32_t op)
 				int32_t s2 = m_v[VS2REG].s[VEC_EL_2(EL, i)];
 				int32_t r = s1 * s2;
 
-				m_accum[i].w[SLICE_H] = (r < 0) ? 0xffff : 0;      // sign-extend to 48-bit
-				m_accum[i].w[SLICE_M] = (int16_t)(r >> 16);
-				m_accum[i].w[SLICE_L] = (uint16_t)(r);
+				m_accum[i].w.h3 = (r < 0) ? 0xffff : 0;      // sign-extend to 48-bit
+				m_accum[i].w.h2 = (int16_t)(r >> 16);
+				m_accum[i].w.h = (uint16_t)(r);
 
-				vres[i] = m_accum[i].w[SLICE_L];
+				vres[i] = m_accum[i].w.h;
 			}
 			WRITEBACK_RESULT();
 			break;
@@ -764,9 +788,9 @@ void rsp_device::handle_vector_ops(uint32_t op)
 				int32_t s2 = m_v[VS2REG].s[VEC_EL_2(EL, i)];
 				int32_t r = s1 * s2;
 
-				m_accum[i].w[SLICE_H] = (int16_t)(r >> 16);
-				m_accum[i].w[SLICE_M] = (uint16_t)(r);
-				m_accum[i].w[SLICE_L] = 0;
+				m_accum[i].w.h3 = (int16_t)(r >> 16);
+				m_accum[i].w.h2 = (uint16_t)(r);
+				m_accum[i].w.h = 0;
 
 				if (r < -32768) r = -32768;
 				if (r >  32767) r = 32767;
@@ -792,17 +816,17 @@ void rsp_device::handle_vector_ops(uint32_t op)
 				int32_t s2 = m_v[VS2REG].s[VEC_EL_2(EL, i)];
 				int32_t r = s1 * s2;
 
-				uint64_t q = (uint64_t)(uint16_t)m_accum[i].w[SLICE_LL];
-				q |= (((uint64_t)(uint16_t)m_accum[i].w[SLICE_L]) << 16);
-				q |= (((uint64_t)(uint16_t)m_accum[i].w[SLICE_M]) << 32);
-				q |= (((uint64_t)(uint16_t)m_accum[i].w[SLICE_H]) << 48);
+				uint64_t q = (uint64_t)(uint16_t)m_accum[i].w.l;
+				q |= (((uint64_t)(uint16_t)m_accum[i].w.h) << 16);
+				q |= (((uint64_t)(uint16_t)m_accum[i].w.h2) << 32);
+				q |= (((uint64_t)(uint16_t)m_accum[i].w.h3) << 48);
 
 				q += (int64_t)(r) << 17;
 
-				m_accum[i].w[SLICE_LL] = (uint16_t)q;
-				m_accum[i].w[SLICE_L] = (uint16_t)(q >> 16);
-				m_accum[i].w[SLICE_M] = (uint16_t)(q >> 32);
-				m_accum[i].w[SLICE_H] = (uint16_t)(q >> 48);
+				m_accum[i].w.l = (uint16_t)q;
+				m_accum[i].w.h = (uint16_t)(q >> 16);
+				m_accum[i].w.h2 = (uint16_t)(q >> 32);
+				m_accum[i].w.h3 = (uint16_t)(q >> 48);
 
 				vres[i] = SATURATE_ACCUM(i, 1, 0x8000, 0x7fff);
 			}
@@ -823,32 +847,32 @@ void rsp_device::handle_vector_ops(uint32_t op)
 				int32_t s1 = m_v[VS1REG].s[i];
 				int32_t s2 = m_v[VS2REG].s[VEC_EL_2(EL, i)];
 				int32_t r1 = s1 * s2;
-				uint32_t r2 = m_accum[i].w[SLICE_L] + ((uint16_t)r1 * 2);
-				uint32_t r3 = m_accum[i].w[SLICE_M] + (uint16_t)((r1 >> 16) * 2) + (uint16_t)(r2 >> 16);
+				uint32_t r2 = m_accum[i].w.h + ((uint16_t)r1 * 2);
+				uint32_t r3 = m_accum[i].w.h2 + (uint16_t)((r1 >> 16) * 2) + (uint16_t)(r2 >> 16);
 
-				m_accum[i].w[SLICE_L] = (uint16_t)r2;
-				m_accum[i].w[SLICE_M] = (uint16_t)r3;
-				m_accum[i].w[SLICE_H] += (uint16_t)(r3 >> 16) + (uint16_t)(r1 >> 31);
+				m_accum[i].w.h = (uint16_t)r2;
+				m_accum[i].w.h2 = (uint16_t)r3;
+				m_accum[i].w.h3 += (uint16_t)(r3 >> 16) + (uint16_t)(r1 >> 31);
 
-				if ((int16_t)m_accum[i].w[SLICE_H] < 0)
+				if ((int16_t)m_accum[i].w.h3 < 0)
 				{
 					vres[i] = 0;
 				}
 				else
 				{
-					if (m_accum[i].w[SLICE_H] != 0)
+					if (m_accum[i].w.h3 != 0)
 					{
 						vres[i] = 0xffff;
 					}
 					else
 					{
-						if ((int16_t)m_accum[i].w[SLICE_M] < 0)
+						if ((int16_t)m_accum[i].w.h2 < 0)
 						{
 							vres[i] = 0xffff;
 						}
 						else
 						{
-							vres[i] = m_accum[i].w[SLICE_M];
+							vres[i] = m_accum[i].w.h2;
 						}
 					}
 				}
@@ -873,12 +897,12 @@ void rsp_device::handle_vector_ops(uint32_t op)
 				uint32_t s1 = m_v[VS1REG].w[i];
 				uint32_t s2 = m_v[VS2REG].w[VEC_EL_2(EL, i)];
 				uint32_t r1 = s1 * s2;
-				uint32_t r2 = m_accum[i].w[SLICE_L] + (r1 >> 16);
-				uint32_t r3 = m_accum[i].w[SLICE_M] + (r2 >> 16);
+				uint32_t r2 = m_accum[i].w.h + (r1 >> 16);
+				uint32_t r3 = m_accum[i].w.h2 + (r2 >> 16);
 
-				m_accum[i].w[SLICE_L] = (uint16_t)r2;
-				m_accum[i].w[SLICE_M] = (uint16_t)r3;
-				m_accum[i].w[SLICE_H] += (int16_t)(r3 >> 16);
+				m_accum[i].w.h = (uint16_t)r2;
+				m_accum[i].w.h2 = (uint16_t)r3;
+				m_accum[i].w.h3 += (int16_t)(r3 >> 16);
 
 				vres[i] = SATURATE_ACCUM(i, 0, 0x0000, 0xffff);
 			}
@@ -902,14 +926,14 @@ void rsp_device::handle_vector_ops(uint32_t op)
 				uint32_t s1 = m_v[VS1REG].s[i];
 				uint32_t s2 = m_v[VS2REG].w[VEC_EL_2(EL, i)];   // not sign-extended
 				uint32_t r1 = s1 * s2;
-				uint32_t r2 = (uint16_t)m_accum[i].w[SLICE_L] + (uint16_t)(r1);
-				uint32_t r3 = (uint16_t)m_accum[i].w[SLICE_M] + (r1 >> 16) + (r2 >> 16);
+				uint32_t r2 = (uint16_t)m_accum[i].w.h + (uint16_t)(r1);
+				uint32_t r3 = (uint16_t)m_accum[i].w.h2 + (r1 >> 16) + (r2 >> 16);
 
-				m_accum[i].w[SLICE_L] = (uint16_t)r2;
-				m_accum[i].w[SLICE_M] = (uint16_t)r3;
-				m_accum[i].w[SLICE_H] += (uint16_t)(r3 >> 16);
+				m_accum[i].w.h = (uint16_t)r2;
+				m_accum[i].w.h2 = (uint16_t)r3;
+				m_accum[i].w.h3 += (uint16_t)(r3 >> 16);
 				if ((int32_t)r1 < 0)
-					m_accum[i].w[SLICE_H] -= 1;
+					m_accum[i].w.h3 -= 1;
 
 				vres[i] = SATURATE_ACCUM(i, 1, 0x8000, 0x7fff);
 			}
@@ -933,16 +957,16 @@ void rsp_device::handle_vector_ops(uint32_t op)
 				int32_t s1 = m_v[VS1REG].w[i];     // not sign-extended
 				int32_t s2 = m_v[VS2REG].s[VEC_EL_2(EL, i)];
 
-				uint64_t q = (uint64_t)m_accum[i].w[SLICE_LL];
-				q |= (((uint64_t)m_accum[i].w[SLICE_L]) << 16);
-				q |= (((uint64_t)m_accum[i].w[SLICE_M]) << 32);
-				q |= (((uint64_t)m_accum[i].w[SLICE_H]) << 48);
+				uint64_t q = (uint64_t)m_accum[i].w.l;
+				q |= (((uint64_t)m_accum[i].w.h) << 16);
+				q |= (((uint64_t)m_accum[i].w.h2) << 32);
+				q |= (((uint64_t)m_accum[i].w.h3) << 48);
 				q += (int64_t)(s1*s2) << 16;
 
-				m_accum[i].w[SLICE_LL] = (uint16_t)q;
-				m_accum[i].w[SLICE_L] = (uint16_t)(q >> 16);
-				m_accum[i].w[SLICE_M] = (uint16_t)(q >> 32);
-				m_accum[i].w[SLICE_H] = (uint16_t)(q >> 48);
+				m_accum[i].w.l = (uint16_t)q;
+				m_accum[i].w.h = (uint16_t)(q >> 16);
+				m_accum[i].w.h2 = (uint16_t)(q >> 32);
+				m_accum[i].w.h3 = (uint16_t)(q >> 48);
 
 				vres[i] = SATURATE_ACCUM(i, 0, 0x0000, 0xffff);
 			}
@@ -967,12 +991,12 @@ void rsp_device::handle_vector_ops(uint32_t op)
 				int32_t s1 = m_v[VS1REG].s[i];
 				int32_t s2 = m_v[VS2REG].s[VEC_EL_2(EL, i)];
 
-				int32_t accum = (uint32_t)(uint16_t)m_accum[i].w[SLICE_M];
-				accum |= ((uint32_t)((uint16_t)m_accum[i].w[SLICE_H])) << 16;
+				int32_t accum = (uint32_t)(uint16_t)m_accum[i].w.h2;
+				accum |= ((uint32_t)((uint16_t)m_accum[i].w.h3)) << 16;
 				accum += s1 * s2;
 
-				m_accum[i].w[SLICE_H] = (uint16_t)(accum >> 16);
-				m_accum[i].w[SLICE_M] = (uint16_t)accum;
+				m_accum[i].w.h3 = (uint16_t)(accum >> 16);
+				m_accum[i].w.h2 = (uint16_t)accum;
 
 				vres[i] = SATURATE_ACCUM(i, 1, 0x8000, 0x7fff);
 			}
@@ -997,7 +1021,7 @@ void rsp_device::handle_vector_ops(uint32_t op)
 				int32_t s2 = m_v[VS2REG].s[VEC_EL_2(EL, i)];
 				int32_t r = s1 + s2 + BIT(m_vcarry, i);
 
-				m_accum[i].w[SLICE_L] = (int16_t)r;
+				m_accum[i].w.h = (int16_t)r;
 
 				if (r > 32767) r = 32767;
 				if (r < -32768) r = -32768;
@@ -1026,7 +1050,7 @@ void rsp_device::handle_vector_ops(uint32_t op)
 				int32_t s2 = m_v[VS2REG].s[VEC_EL_2(EL, i)];
 				int32_t r = s1 - s2 - BIT(m_vcarry, i);
 
-				m_accum[i].w[SLICE_L] = (int16_t)r;
+				m_accum[i].w.h = (int16_t)r;
 
 				if (r > 32767) r = 32767;
 				if (r < -32768) r = -32768;
@@ -1074,7 +1098,7 @@ void rsp_device::handle_vector_ops(uint32_t op)
 					vres[i] = 0;
 				}
 
-				m_accum[i].w[SLICE_L] = vres[i];
+				m_accum[i].w.h = vres[i];
 			}
 			WRITEBACK_RESULT();
 			break;
@@ -1101,7 +1125,7 @@ void rsp_device::handle_vector_ops(uint32_t op)
 				int32_t r = s1 + s2;
 
 				vres[i] = (int16_t)r;
-				m_accum[i].w[SLICE_L] = (int16_t)r;
+				m_accum[i].w.h = (int16_t)r;
 
 				if (r & 0xffff0000)
 				{
@@ -1133,7 +1157,7 @@ void rsp_device::handle_vector_ops(uint32_t op)
 				int32_t r = s1 - s2;
 
 				vres[i] = (int16_t)(r);
-				m_accum[i].w[SLICE_L] = (uint16_t)r;
+				m_accum[i].w.h = (uint16_t)r;
 
 				if ((uint16_t)r != 0)
 				{
@@ -1163,7 +1187,7 @@ void rsp_device::handle_vector_ops(uint32_t op)
 				{
 					for (int i = 0; i < 8; i++)
 					{
-						m_v[VDREG].w[i] = m_accum[i].w[SLICE_H];
+						m_v[VDREG].w[i] = m_accum[i].w.h3;
 					}
 					break;
 				}
@@ -1171,7 +1195,7 @@ void rsp_device::handle_vector_ops(uint32_t op)
 				{
 					for (int i = 0; i < 8; i++)
 					{
-						m_v[VDREG].w[i] = m_accum[i].w[SLICE_M];
+						m_v[VDREG].w[i] = m_accum[i].w.h2;
 					}
 					break;
 				}
@@ -1179,7 +1203,7 @@ void rsp_device::handle_vector_ops(uint32_t op)
 				{
 					for (int i = 0; i < 8; i++)
 					{
-						m_v[VDREG].w[i] = m_accum[i].w[SLICE_L];
+						m_v[VDREG].w[i] = m_accum[i].w.h;
 					}
 					break;
 				}
@@ -1228,7 +1252,7 @@ void rsp_device::handle_vector_ops(uint32_t op)
 					vres[i] = s2;
 				}
 
-				m_accum[i].w[SLICE_L] = vres[i];
+				m_accum[i].w.h = vres[i];
 			}
 
 			m_vzero = 0;
@@ -1264,7 +1288,7 @@ void rsp_device::handle_vector_ops(uint32_t op)
 				{
 					vres[i] = s2;
 				}
-				m_accum[i].w[SLICE_L] = vres[i];
+				m_accum[i].w.h = vres[i];
 			}
 
 			m_vzero = 0;
@@ -1301,7 +1325,7 @@ void rsp_device::handle_vector_ops(uint32_t op)
 					vres[i] = s2;
 				}
 
-				m_accum[i].w[SLICE_L] = vres[i];
+				m_accum[i].w.h = vres[i];
 			}
 
 			m_vzero = 0;
@@ -1338,7 +1362,7 @@ void rsp_device::handle_vector_ops(uint32_t op)
 					vres[i] = s2;
 				}
 
-				m_accum[i].w[SLICE_L] = vres[i];
+				m_accum[i].w.h = vres[i];
 			}
 
 			m_vzero = 0;
@@ -1367,11 +1391,11 @@ void rsp_device::handle_vector_ops(uint32_t op)
 					{
 						if (BIT(m_vcompare, i)) // vcc_lo
 						{
-							m_accum[i].w[SLICE_L] = -(uint16_t)s2;
+							m_accum[i].w.h = -(uint16_t)s2;
 						}
 						else
 						{
-							m_accum[i].w[SLICE_L] = s1;
+							m_accum[i].w.h = s1;
 						}
 					}
 					else
@@ -1380,12 +1404,12 @@ void rsp_device::handle_vector_ops(uint32_t op)
 						{
 							if (((uint32_t)(uint16_t)(s1) + (uint32_t)(uint16_t)(s2)) > 0x10000)
 							{
-								m_accum[i].w[SLICE_L] = s1;
+								m_accum[i].w.h = s1;
 								m_vcompare &= ~(1 << i);
 							}
 							else
 							{
-								m_accum[i].w[SLICE_L] = -(uint16_t)s2;
+								m_accum[i].w.h = -(uint16_t)s2;
 								m_vcompare |= 1 << i;
 							}
 						}
@@ -1393,12 +1417,12 @@ void rsp_device::handle_vector_ops(uint32_t op)
 						{
 							if (((uint32_t)(uint16_t)(s1) + (uint32_t)(uint16_t)(s2)) != 0)
 							{
-								m_accum[i].w[SLICE_L] = s1;
+								m_accum[i].w.h = s1;
 								m_vcompare &= ~(1 << i);
 							}
 							else
 							{
-								m_accum[i].w[SLICE_L] = -(uint16_t)s2;
+								m_accum[i].w.h = -(uint16_t)s2;
 								m_vcompare |= 1 << i;
 							}
 						}
@@ -1410,29 +1434,29 @@ void rsp_device::handle_vector_ops(uint32_t op)
 					{
 						if (BIT(m_vclip2, i)) // vcc_hi
 						{
-							m_accum[i].w[SLICE_L] = s2;
+							m_accum[i].w.h = s2;
 						}
 						else
 						{
-							m_accum[i].w[SLICE_L] = s1;
+							m_accum[i].w.h = s1;
 						}
 					}
 					else
 					{
 						if (((int32_t)(uint16_t)s1 - (int32_t)(uint16_t)s2) >= 0)
 						{
-							m_accum[i].w[SLICE_L] = s2;
+							m_accum[i].w.h = s2;
 							m_vclip2 |= 1 << i;
 						}
 						else
 						{
-							m_accum[i].w[SLICE_L] = s1;
+							m_accum[i].w.h = s1;
 							m_vclip2 &= ~(1 << i);
 						}
 					}
 				}
 
-				vres[i] = m_accum[i].w[SLICE_L];
+				vres[i] = m_accum[i].w.h;
 			}
 
 			m_vzero = 0;
@@ -1521,7 +1545,7 @@ void rsp_device::handle_vector_ops(uint32_t op)
 					m_vclip1 |= 1 << i;
 				}
 
-				m_accum[i].w[SLICE_L] = vres[i];
+				m_accum[i].w.h = vres[i];
 			}
 			WRITEBACK_RESULT();
 			break;
@@ -1555,12 +1579,12 @@ void rsp_device::handle_vector_ops(uint32_t op)
 					}
 					if ((s1 + s2) <= 0)
 					{
-						m_accum[i].w[SLICE_L] = ~(uint16_t)s2;
+						m_accum[i].w.h = ~(uint16_t)s2;
 						m_vcompare |= 1 << i;
 					}
 					else
 					{
-						m_accum[i].w[SLICE_L] = s1;
+						m_accum[i].w.h = s1;
 					}
 				}
 				else
@@ -1571,16 +1595,16 @@ void rsp_device::handle_vector_ops(uint32_t op)
 					}
 					if ((s1 - s2) >= 0)
 					{
-						m_accum[i].w[SLICE_L] = s2;
+						m_accum[i].w.h = s2;
 						m_vclip2 |= 1 << i;
 					}
 					else
 					{
-						m_accum[i].w[SLICE_L] = s1;
+						m_accum[i].w.h = s1;
 					}
 				}
 
-				vres[i] = m_accum[i].w[SLICE_L];
+				vres[i] = m_accum[i].w.h;
 			}
 			WRITEBACK_RESULT();
 			break;
@@ -1606,7 +1630,7 @@ void rsp_device::handle_vector_ops(uint32_t op)
 					vres[i] = m_v[VS2REG].s[VEC_EL_2(EL, i)];
 				}
 
-				m_accum[i].w[SLICE_L] = vres[i];
+				m_accum[i].w.h = vres[i];
 			}
 			WRITEBACK_RESULT();
 			break;
@@ -1624,7 +1648,7 @@ void rsp_device::handle_vector_ops(uint32_t op)
 			for (int i = 0; i < 8; i++)
 			{
 				vres[i] = m_v[VS1REG].w[i] & m_v[VS2REG].w[VEC_EL_2(EL, i)];
-				m_accum[i].w[SLICE_L] = vres[i];
+				m_accum[i].w.h = vres[i];
 			}
 			WRITEBACK_RESULT();
 			break;
@@ -1642,7 +1666,7 @@ void rsp_device::handle_vector_ops(uint32_t op)
 			for (int i = 0; i < 8; i++)
 			{
 				vres[i] = ~(m_v[VS1REG].w[i] & m_v[VS2REG].w[VEC_EL_2(EL, i)]);
-				m_accum[i].w[SLICE_L] = vres[i];
+				m_accum[i].w.h = vres[i];
 			}
 			WRITEBACK_RESULT();
 			break;
@@ -1660,7 +1684,7 @@ void rsp_device::handle_vector_ops(uint32_t op)
 			for (int i = 0; i < 8; i++)
 			{
 				vres[i] = m_v[VS1REG].w[i] | m_v[VS2REG].w[VEC_EL_2(EL, i)];
-				m_accum[i].w[SLICE_L] = vres[i];
+				m_accum[i].w.h = vres[i];
 			}
 			WRITEBACK_RESULT();
 			break;
@@ -1678,7 +1702,7 @@ void rsp_device::handle_vector_ops(uint32_t op)
 			for (int i = 0; i < 8; i++)
 			{
 				vres[i] = ~(m_v[VS1REG].w[i] | m_v[VS2REG].w[VEC_EL_2(EL, i)]);
-				m_accum[i].w[SLICE_L] = vres[i];
+				m_accum[i].w.h = vres[i];
 			}
 			WRITEBACK_RESULT();
 			break;
@@ -1696,7 +1720,7 @@ void rsp_device::handle_vector_ops(uint32_t op)
 			for (int i = 0; i < 8; i++)
 			{
 				vres[i] = m_v[VS1REG].w[i] ^ m_v[VS2REG].w[VEC_EL_2(EL, i)];
-				m_accum[i].w[SLICE_L] = vres[i];
+				m_accum[i].w.h = vres[i];
 			}
 			WRITEBACK_RESULT();
 			break;
@@ -1714,7 +1738,7 @@ void rsp_device::handle_vector_ops(uint32_t op)
 			for (int i = 0; i < 8; i++)
 			{
 				vres[i] = ~(m_v[VS1REG].w[i] ^ m_v[VS2REG].w[VEC_EL_2(EL, i)]);
-				m_accum[i].w[SLICE_L] = vres[i];
+				m_accum[i].w.h = vres[i];
 			}
 			WRITEBACK_RESULT();
 			break;
@@ -1737,7 +1761,7 @@ void rsp_device::handle_vector_ops(uint32_t op)
 				vres[i] = 0;
 				uint16_t e1 = m_v[VS1REG].w[i];
 				uint16_t e2 = m_v[VS2REG].w[VEC_EL_2(EL, i)];
-				m_accum[i].w[SLICE_L] = e1 + e2;
+				m_accum[i].w.h = e1 + e2;
 			}
 			WRITEBACK_RESULT();
 			break;
@@ -1796,7 +1820,7 @@ void rsp_device::handle_vector_ops(uint32_t op)
 
 			for (int i = 0; i < 8; i++)
 			{
-				m_accum[i].w[SLICE_L] = m_v[VS2REG].w[VEC_EL_2(EL, i)];
+				m_accum[i].w.h = m_v[VS2REG].w[VEC_EL_2(EL, i)];
 			}
 			break;
 		}
@@ -1871,7 +1895,7 @@ void rsp_device::handle_vector_ops(uint32_t op)
 
 			for (int i = 0; i < 8; i++)
 			{
-				m_accum[i].w[SLICE_L] = m_v[VS2REG].w[VEC_EL_2(EL, i)];
+				m_accum[i].w.h = m_v[VS2REG].w[VEC_EL_2(EL, i)];
 			}
 			break;
 		}
@@ -1890,7 +1914,7 @@ void rsp_device::handle_vector_ops(uint32_t op)
 
 			for (int i = 0; i < 8; i++)
 			{
-				m_accum[i].w[SLICE_L] = m_v[VS2REG].w[VEC_EL_2(EL, i)];
+				m_accum[i].w.h = m_v[VS2REG].w[VEC_EL_2(EL, i)];
 			}
 
 			m_v[VDREG].s[VS1REG & 7] = (int16_t)(m_reciprocal_res >> 16);
@@ -1909,7 +1933,7 @@ void rsp_device::handle_vector_ops(uint32_t op)
 			m_v[VDREG].w[VS1REG & 7] = m_v[VS2REG].w[VEC_EL_2(EL, VS1REG & 7)];
 			for (int i = 0; i < 8; i++)
 			{
-				m_accum[i].w[SLICE_L] = m_v[VS2REG].w[i];
+				m_accum[i].w.h = m_v[VS2REG].w[i];
 			}
 			break;
 		}
@@ -1969,7 +1993,7 @@ void rsp_device::handle_vector_ops(uint32_t op)
 
 			for (int i = 0; i < 8; i++)
 			{
-				m_accum[i].w[SLICE_L] = m_v[VS2REG].w[VEC_EL_2(EL, i)];
+				m_accum[i].w.h = m_v[VS2REG].w[VEC_EL_2(EL, i)];
 			}
 
 			break;
@@ -2048,7 +2072,7 @@ void rsp_device::handle_vector_ops(uint32_t op)
 
 			for (int i = 0; i < 8; i++)
 			{
-				m_accum[i].w[SLICE_L] = m_v[VS2REG].w[VEC_EL_2(EL, i)];
+				m_accum[i].w.h = m_v[VS2REG].w[VEC_EL_2(EL, i)];
 			}
 
 			break;
@@ -2068,7 +2092,7 @@ void rsp_device::handle_vector_ops(uint32_t op)
 
 			for (int i = 0; i < 8; i++)
 			{
-				m_accum[i].w[SLICE_L] = m_v[VS2REG].w[VEC_EL_2(EL, i)];
+				m_accum[i].w.h = m_v[VS2REG].w[VEC_EL_2(EL, i)];
 			}
 
 			m_v[VDREG].s[VS1REG & 7] = (int16_t)(m_reciprocal_res >> 16);    // store high part
@@ -2103,7 +2127,7 @@ void rsp_device::handle_vector_ops(uint32_t op)
 				vres[i] = 0;
 				uint16_t e1 = m_v[VS1REG].w[i];
 				uint16_t e2 = m_v[VS2REG].w[VEC_EL_2(EL, i)];
-				m_accum[i].w[SLICE_L] = e1 + e2;
+				m_accum[i].w.h = e1 + e2;
 			}
 			WRITEBACK_RESULT();
 			break;
@@ -2123,7 +2147,7 @@ void rsp_device::handle_vector_ops(uint32_t op)
 			for (int i = 0; i < 8; i++)
 			{
 				vres[i] = m_v[VS1REG].w[i];
-				m_accum[i].w[SLICE_L] = 0;
+				m_accum[i].w.h = 0;
 			}
 			WRITEBACK_RESULT();
 			break;

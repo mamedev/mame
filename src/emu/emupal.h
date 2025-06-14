@@ -214,6 +214,7 @@ public:
 	enum xrgb_444_t     { xRGB_444, xxxxRRRRGGGGBBBB };
 	enum xrbg_444_t     { xRBG_444, xxxxRRRRBBBBGGGG };
 	enum xbrg_444_t     { xBRG_444, xxxxBBBBRRRRGGGG };
+	enum xgrb_444_t     { xGRB_444, xxxxGGGGRRRRBBBB };
 	enum xbgr_444_t     { xBGR_444, xxxxBBBBGGGGRRRR };
 	enum rgbx_444_t     { RGBx_444, RRRRGGGGBBBBxxxx };
 	enum grbx_444_t     { GRBx_444, GGGGRRRRBBBBxxxx };
@@ -302,6 +303,7 @@ public:
 	palette_device &set_format(xrgb_444_t, u32 entries);
 	palette_device &set_format(xrbg_444_t, u32 entries);
 	palette_device &set_format(xbrg_444_t, u32 entries);
+	palette_device &set_format(xgrb_444_t, u32 entries);
 	palette_device &set_format(xbgr_444_t, u32 entries);
 	palette_device &set_format(rgbx_444_t, u32 entries);
 	palette_device &set_format(grbx_444_t, u32 entries);

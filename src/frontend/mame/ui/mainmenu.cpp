@@ -126,7 +126,7 @@ void menu_main::populate()
 
 	item_append(_("menu-main", "System Information"), 0, (void *)GAME_INFO);
 
-	if (ui().found_machine_warnings())
+	if (ui().machine_info().has_warnings())
 		item_append(_("menu-main", "Warning Information"), 0, (void *)WARN_INFO);
 
 	for (device_image_interface &image : image_interface_enumerator(machine().root_device()))
@@ -161,11 +161,15 @@ void menu_main::populate()
 	if (network_interface_enumerator(machine().root_device()).first() != nullptr)
 		item_append(_("menu-main", "Network Devices"), 0, (void*)NETWORK_DEVICES);
 
-	item_append(_("menu-main", "Audio Mixer"), 0, (void *)AUDIO_MIXER);
+	if (!machine().sound().no_sound() && sound_interface_enumerator(machine().root_device()).first() != nullptr)
+	{
+		item_append(_("menu-main", "Audio Mixer"), 0, (void *)AUDIO_MIXER);
 
-	item_append(_("menu-main", "Audio Effects"), 0, (void *)AUDIO_EFFECTS);
+		item_append(_("menu-main", "Audio Effects"), 0, (void *)AUDIO_EFFECTS);
+	}
 
-	item_append(_("menu-main", "Slider Controls"), 0, (void *)SLIDERS);
+	if (!ui().get_slider_list().empty())
+		item_append(_("menu-main", "Slider Controls"), 0, (void *)SLIDERS);
 
 	item_append(_("menu-main", "Video Options"), 0, (void *)VIDEO_TARGETS);
 

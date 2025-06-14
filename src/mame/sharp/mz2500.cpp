@@ -1,40 +1,41 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
-/********************************************************************************************************************************
+/**************************************************************************************************
 
-    Sharp MZ-2500 (c) 1985 Sharp Corporation
+Sharp MZ-2500 (c) 1985 Sharp Corporation
 
-    driver by Angelo Salese
 
-    Computer box contains 2 floppy drives on the right, and a front-loading cassette player on the left.
-    Keyboard is separate, and the key layout is very similar to the fm7.
+Computer box contains 2 floppy drives on the right, and a front-loading cassette player on the left.
+Keyboard is separate, and the key layout is very similar to the fm7.
 
-    TODO:
-    - Kanji text is cutted in half when font_size is 1 / interlace is disabled, different ROM used? (check Back to the Future);
-    - Implement external ROM hook-up;
-    - Add remaining missing peripherals, SIO, HDD and w1300a network;
-    - FDC loading without the IPLPRO doesn't work at all, why?
-    - reverse / blanking tvram attributes;
-    - clean-ups! ^^'
+TODO:
+- Kanji text is cutted in half when font_size is 1 / interlace is disabled, different ROM used?
+  (check Back to the Future);
+- Add remaining missing peripherals, SIO, HDD and w1300a network;
+- reverse / blanking tvram attributes;
+- FDC loading without the IPLPRO doesn't work at all, is it for MZ-2000/MZ-2200?
+- Implement backward compatibility with MZ-2000/MZ-2200;
+- Implement expansion box unit;
 
-    per-game/program specific TODO:
-    - Dust Box vol. 1-3: they die with text garbage, might be bad dumps;
-    - Dust Box vol. 4: window effect transition is bugged;
-    - Dust Box vol. n: three items returns "purple" text, presumably HW failures (DFJustin: joystick "digital", mouse "not installed", HDD "not installed");
-    - LayDock: hangs at title screen due of a PIT bug (timer irq dies for whatever reason);
-    - Moon Child: needs mixed 3+3bpp tvram supported, kludged for now (not a real test case);
-    - Moon Child: window masking doesn't mask bottom part of the screen?
-    - Moon Child: appears to be a network / system link game, obviously doesn't work with current MAME framework;
-    - Marchen Veil I: doesn't load if you try to run it directly, it does if you load another game first (for example Mappy) then do a soft reset;
-    - Mugen no Shinzou II - The Prince of Darkness: dies on IPLPRO loading, presumably a wd17xx core bug;
-    - Multiplan: random hangs/crashes after you set the RTC, sometimes it loads properly;
-    - Murder Club: has lots of CG artifacts, FDC issue?
-    - Orrbit 3: floppy issue makes it to throw a game over as soon as you start a game;
-    - Penguin Kun Wars: has a bug with window effects ("Push space or trigger" msg on the bottom"), needs investigation;
-    - Sound Gal Music Editor: wants a "master disk", that apparently isn't available;
-    - Yukar K2 (normal version): moans about something, DFJustin: "please put the system disk back to normal", disk write-protected?
+TODO per-game/program specific (move to mz2500_flop):
+- Dust Box vol. 1-3: they die with text garbage, might be bad dumps;
+- Dust Box vol. 4: window effect transition is bugged;
+- Dust Box vol. n: three items returns "purple" text, presumably HW failures (DFJustin: joystick
+"digital", mouse "not installed", HDD "not installed");
+- LayDock: hangs at title screen due of a PIT bug (timer irq dies for whatever reason);
+- Moon Child: needs mixed 3+3bpp tvram supported, kludged for now (not a real test case);
+- Moon Child: window masking doesn't mask bottom part of the screen?
+- Moon Child: appears to be a network / system link game, obviously doesn't work with current MAME framework;
+- Marchen Veil I: doesn't load if you try to run it directly, it does if you load another game first (for example Mappy) then do a soft reset;
+- Mugen no Shinzou II - The Prince of Darkness: dies on IPLPRO loading, presumably a wd17xx core bug;
+- Multiplan: random hangs/crashes after you set the RTC, sometimes it loads properly;
+- Murder Club: has lots of CG artifacts, FDC issue?
+- Orrbit 3: floppy issue makes it to throw a game over as soon as you start a game;
+- Penguin Kun Wars: has a bug with window effects ("Push space or trigger" msg on the bottom"), needs investigation;
+- Sound Gal Music Editor: wants a "master disk", that apparently isn't available;
+- Yukar K2 (normal version): moans about something, DFJustin: "please put the system disk back to normal", disk write-protected?
 
-********************************************************************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "mz2500.h"
@@ -1765,7 +1766,9 @@ void mz2500_state::mz2500_rtc_alarm_irq(int state)
 
 static void mz2500_floppies(device_slot_interface &device)
 {
-	device.option_add("dd", FLOPPY_35_DD);
+	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("3ssdd", FLOPPY_3_SSDD);
+	device.option_add("35dd", FLOPPY_35_DD);
 }
 
 void mz2500_state::mz2500(machine_config &config)
@@ -1811,10 +1814,13 @@ void mz2500_state::mz2500(machine_config &config)
 	MSX_GENERAL_PURPOSE_PORT(config, m_joy[0], msx_general_purpose_port_devices, "joystick");
 	MSX_GENERAL_PURPOSE_PORT(config, m_joy[1], msx_general_purpose_port_devices, "joystick");
 
-	for (auto &fd : m_floppy)
-		FLOPPY_CONNECTOR(config, fd, mz2500_floppies, "dd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, "fdc:0", mz2500_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:1", mz2500_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:2", mz2500_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, "fdc:3", mz2500_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
-	SOFTWARE_LIST(config, "flop_list").set_original("mz2500");
+	SOFTWARE_LIST(config, "flop_list").set_original("mz2500_flop");
+	SOFTWARE_LIST(config, "flop_list2").set_compatible("mz2000_flop");
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1825,7 +1831,6 @@ void mz2500_state::mz2500(machine_config &config)
 	PALETTE(config, m_palette, FUNC(mz2500_state::mz2500_palette), 0x200);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mz2500);
-
 
 	SPEAKER(config, "mono").front_center();
 

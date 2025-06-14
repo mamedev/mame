@@ -112,8 +112,6 @@ private:
 
 	devcb_read8 m_excsr_handler;
 	devcb_write8 m_excsw_handler;
-
-	bool m_dummy_save = false; // needed for save-state support
 };
 
 

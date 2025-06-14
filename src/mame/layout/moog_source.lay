@@ -1146,7 +1146,7 @@ copyright-holders:m1macrophage
 		<element ref="text_mod_rate">
 			<bounds x="90" y="303" width="26" height="7"/>
 		</element>
-		<element ref="led">
+		<element ref="led" name="mod_rate_led">
 			<bounds x="118" y="304" width="8" height="8"/>
 		</element>
 		<element ref="text_pitch">

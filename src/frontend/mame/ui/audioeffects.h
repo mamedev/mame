@@ -31,8 +31,21 @@ protected:
 	virtual void menu_deactivated() override;
 
 private:	
+	enum { RS_TYPE, RS_LATENCY, RS_LENGTH, RS_PHASES };
+
 	virtual void populate() override;
 	virtual bool handle(event const *ev) override;
+
+	u32 flag_type() const;
+	u32 flag_lat() const;
+	u32 flag_length() const;
+	u32 flag_phases() const;
+
+	static double change_f(const double *table, double value, int change);
+	static u32 change_u32(const u32 *table, u32 value, int change);
+
+	static std::string format_lat(double latency);
+	static std::string format_u32(u32 val);
 };
 
 } // namespace ui

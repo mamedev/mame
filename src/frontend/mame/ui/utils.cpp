@@ -680,7 +680,7 @@ class working_machine_filter_impl : public simple_filter_impl_base<machine_filte
 public:
 	working_machine_filter_impl(machine_filter_data const &data, char const *value, util::core_file *file, unsigned indent) { }
 
-	virtual bool apply(ui_system_info const &system) const override { return !(system.driver->flags & machine_flags::NOT_WORKING); }
+	virtual bool apply(ui_system_info const &system) const override { return !(system.driver->type.emulation_flags() & device_t::flags::NOT_WORKING); }
 };
 
 
@@ -743,7 +743,7 @@ class save_machine_filter_impl : public simple_filter_impl_base<machine_filter, 
 public:
 	save_machine_filter_impl(machine_filter_data const &data, char const *value, util::core_file *file, unsigned indent) { }
 
-	virtual bool apply(ui_system_info const &system) const override { return system.driver->flags & machine_flags::SUPPORTS_SAVE; }
+	virtual bool apply(ui_system_info const &system) const override { return !(system.driver->type.emulation_flags() & device_t::flags::SAVE_UNSUPPORTED); }
 };
 
 

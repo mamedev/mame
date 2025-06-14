@@ -102,6 +102,7 @@ public:
 		m_maincpu(*this, I8088_TAG),
 		m_ieee488(*this, IEEE488_TAG),
 		m_pic(*this, I8259A_TAG),
+		m_pit(*this, I8253_TAG),
 		m_upd7201(*this, UPD7201_TAG),
 		m_ssda(*this, MC6852_TAG),
 		m_via1(*this, M6522_1_TAG),
@@ -138,6 +139,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ieee488_device> m_ieee488;
 	required_device<pic8259_device> m_pic;
+	required_device<pit8253_device> m_pit;
 	required_device<upd7201_device> m_upd7201;
 	required_device<mc6852_device> m_ssda;
 	required_device<via6522_device> m_via1;
@@ -188,9 +190,6 @@ private:
 	MC6845_UPDATE_ROW( crtc_update_row );
 	MC6845_BEGIN_UPDATE( crtc_begin_update );
 
-	void mux_serial_b_w(int state);
-	void mux_serial_a_w(int state);
-
 	void victor9k_palette(palette_device &palette) const;
 
 	// video state
@@ -228,7 +227,7 @@ void victor9k_state::victor9k_mem(address_map &map)
 	map(0x00000, 0x1ffff).ram();
 	map(0x20000, 0xdffff).noprw();
 	map(0xe0000, 0xe0001).mirror(0x7f00).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0xe0020, 0xe0023).mirror(0x7f00).rw(I8253_TAG, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0xe0020, 0xe0023).mirror(0x7f00).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0xe0040, 0xe0043).mirror(0x7f00).rw(m_upd7201, FUNC(upd7201_device::cd_ba_r), FUNC(upd7201_device::cd_ba_w));
 	map(0xe8000, 0xe8000).mirror(0x7f00).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0xe8001, 0xe8001).mirror(0x7f00).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
@@ -356,14 +355,6 @@ void victor9k_state::vert_w(int state)
 {
 	m_via2->write_pa7(state);
 	m_pic->ir7_w(state);
-}
-
-void victor9k_state::mux_serial_b_w(int state)
-{
-}
-
-void victor9k_state::mux_serial_a_w(int state)
-{
 }
 
 //-------------------------------------------------
@@ -770,13 +761,15 @@ void victor9k_state::victor9k(machine_config &config)
 	PIC8259(config, m_pic, 0);
 	m_pic->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	pit8253_device &pit(PIT8253(config, I8253_TAG, 0));
-	pit.set_clk<0>(2500000);
-	pit.out_handler<0>().set(FUNC(victor9k_state::mux_serial_b_w));
-	pit.set_clk<1>(2500000);
-	pit.out_handler<1>().set(FUNC(victor9k_state::mux_serial_a_w));
-	pit.set_clk<2>(100000);
-	pit.out_handler<2>().set(I8259A_TAG, FUNC(pic8259_device::ir2_w));
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(15_MHz_XTAL / 12);
+	m_pit->out_handler<0>().set(m_upd7201, FUNC(upd7201_device::rxca_w));
+	m_pit->out_handler<0>().append(m_upd7201, FUNC(upd7201_device::txca_w));
+	m_pit->set_clk<1>(15_MHz_XTAL / 12);
+	m_pit->out_handler<1>().set(m_upd7201, FUNC(upd7201_device::rxcb_w));
+	m_pit->out_handler<1>().append(m_upd7201, FUNC(upd7201_device::txcb_w));
+	m_pit->set_clk<2>(125000);
+	m_pit->out_handler<2>().set(I8259A_TAG, FUNC(pic8259_device::ir2_w));
 
 	UPD7201(config, m_upd7201, 15_MHz_XTAL / 6);
 	m_upd7201->out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));

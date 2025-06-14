@@ -29,21 +29,20 @@ comments refer to Board 3, unless otherwise noted.
 
 This driver attempts to accurately emulate the digital and digital-analog
 interface of the synthesizer, including all analog behavior that is relevant to
-the firmware. There are still some TODOs left to fully achieve this goal. There
-is no attempt to emulate the analogue audio circuit. The driver includes an
+the firmware. The analog audio circuit is not emulated. The driver includes an
 interactive layout, and is intended as an educational tool.
-
-TODO:
-- Emulation of MOD input to the CPU.
-- Emulation of envelope generator timing.
-- Cassette input/output.
 */
 
 #include "emu.h"
 
+#include "nl_source.h"
+
 #include "cpu/z80/z80.h"
+#include "machine/netlist.h"
 #include "machine/nvram.h"
 #include "machine/rescap.h"
+#include "machine/timer.h"
+#include "sound/va_eg.h"
 
 #include "moog_source.lh"
 
@@ -52,6 +51,9 @@ TODO:
 #define LOG_ENCODER             (1U << 3)
 #define LOG_KEYBOARD            (1U << 4)
 #define LOG_CV_KEYBOARD_APPROX  (1U << 5)
+#define LOG_LFO                 (1U << 6)
+#define LOG_LFO_TIMER           (1U << 7)
+#define LOG_CONTOUR             (1U << 8)
 
 #define VERBOSE (LOG_GENERAL | LOG_CV)
 //#define LOG_OUTPUT_FUNC osd_printf_info
@@ -66,17 +68,25 @@ constexpr const char NVRAM_TAG[] = "nvram";
 class source_state : public driver_device
 {
 public:
+	static constexpr feature_type unemulated_features() { return feature::TAPE; }
+
 	source_state(const machine_config &mconfig, device_type type, const char *tag) ATTR_COLD
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, MAINCPU_TAG)
+		, m_contour(*this, "contour_%d", 0)
+		, m_contour_rate(*this, "source_nl:cntr_rate_%d", 0)
+		, m_contour_range(*this, "contour_range_%d",0)
+		, m_lfo_timer(*this, "lfo_timer")
+		, m_lfo_rate(*this, "source_nl:lfo_rate")
+		, m_lfo_range(*this, "lfo_range")
 		, m_octave_io(*this, "octave_buttons")
 		, m_button_a_io(*this, "button_group_a_%d", 0U)
 		, m_button_b_io(*this, "button_group_b_%d", 0U)
 		, m_keyboard_io(*this, "keyboard_oct_%d", 1U)
 		, m_encoder(*this, "incremental_controller")
 		, m_trigger_io(*this, "trigger_in")
-		, m_contour_peaked_io(*this, "contour_peaked")
 		, m_octave_led(*this, "octave_led_%d")
+		, m_lfo_rate_led(*this, "mod_rate_led")
 		, m_program_display(*this, "program_digit_%d")
 		, m_edit_display(*this, "edit_digit_%d")
 		, m_edit_led(*this, "edit_led")
@@ -87,7 +97,7 @@ public:
 		, m_lfo_to_osc(*this, "lfo_to_osc")
 		, m_lfo_shape(*this, "lfo_shape")
 		, m_trigger_out(*this, "trigger_out")
-		, m_cv(static_cast<int>(CV::SIZE), -1)
+		, m_cv(int(CV::SIZE), 0)
 	{}
 
 	void source(machine_config &config) ATTR_COLD;
@@ -110,6 +120,7 @@ private:
 	void cassette_w(u8 data);
 	void cv_w(offs_t offset, u8 data);
 
+	bool contour_peaked(const va_rc_eg_device &eg) const;
 	float get_keyboard_v() const;
 	u8 keyboard_r();
 	u8 buttons_r(const required_ioport_array<6> &button_io, const char *name) const;
@@ -117,19 +128,35 @@ private:
 	u8 buttons_b_r();
 	u8 encoder_r();
 
+	template<int Which> NETDEV_ANALOG_CALLBACK_MEMBER(contour_cv_changed);
+	template<int Which> TIMER_CALLBACK_MEMBER(update_contour);
+
+	NETDEV_ANALOG_CALLBACK_MEMBER(lfo_cv_changed);
+	TIMER_CALLBACK_MEMBER(update_lfo_timer);
+	TIMER_DEVICE_CALLBACK_MEMBER(lfo_timer_tick);
+
 	void memory_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<z80_device> m_maincpu;
+
+	required_device_array<va_rc_eg_device, 2> m_contour;
+	required_device_array<netlist_mame_analog_input_device, 2> m_contour_rate;
+	required_ioport_array<2> m_contour_range;
+
+	required_device<timer_device> m_lfo_timer;
+	required_device<netlist_mame_analog_input_device> m_lfo_rate;
+	required_ioport m_lfo_range;
+
 	required_ioport m_octave_io;
 	required_ioport_array<6> m_button_a_io;
 	required_ioport_array<6> m_button_b_io;
 	required_ioport_array<4> m_keyboard_io;
 	required_ioport m_encoder;
 	required_ioport m_trigger_io;
-	required_ioport m_contour_peaked_io;
 
 	output_finder<2> m_octave_led;
+	output_finder<> m_lfo_rate_led;
 	output_finder<2> m_program_display;
 	output_finder<2> m_edit_display;
 	output_finder<> m_edit_led;
@@ -144,8 +171,17 @@ private:
 	bool m_octave_hi = true;  // `true` due to internal pullups of 74LS367 and 7404.
 	u8 m_button_row_latch = 0xff;
 	bool m_encoder_incr = false;
+	bool m_lfo_state = false;  // Square output of the LFO. -14V (false) to 14V (true).
 
+	float m_lfo_cc = 0;  // Control current into the LFO OTA.
+	std::array<float, 2> m_contour_cc = { 0, 0 };  // Control currents into the EG OTAs.
 	std::vector<float> m_cv;
+
+	enum contour_type
+	{
+		FILTER_CONTOUR = 0,
+		LOUDNESS_CONTOUR
+	};
 
 	// All MUXes are CD4051B.
 	// Component designations refer to board 2 (synthesizer board).
@@ -167,7 +203,7 @@ private:
 		FILTER_CONTOUR_LEVEL,
 		OCT_1,
 		GLIDE,
-		LOUDNESS_COUNTOUR_LEVEL,
+		LOUDNESS_CONTOUR_LEVEL,
 		OSC_2,
 		NOISE,
 		UNUSED,  // Sampled in (C22, U10A), but not used.
@@ -177,7 +213,7 @@ private:
 		EMPHASIS,
 		NOT_CONNECTED,  // U5, Y1 (pin 14) is not connected.
 		AMT,  // Filter contout amount.
-		RATE,  // Modulation (LFO) rate.
+		MOD_RATE,  // Modulation (LFO) rate.
 		KEYBOARD_APPROX,
 		KEYBOARD_CV,
 		FILTER_CONTOUR_RATE,
@@ -186,7 +222,10 @@ private:
 		SIZE
 	};
 
+	static constexpr const float VMINUS = -15;  // In Volts.
 	static constexpr const float MAX_CV = 10;  // In Volts.
+	static constexpr const float CA3080_VABC = VMINUS + 0.7;  // 1 diode drop above -15.
+	static constexpr const float CONTOUR_C = CAP_U(0.047);  // C57 (filter), C56 (loudness).
 	static constexpr const u8 PATTERNS_7447[16] =
 	{
 		0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07,
@@ -363,7 +402,7 @@ void source_state::cv_w(offs_t offset, u8 data)
 	// Z80 A3,A4 select which MUX to enable via decoder 74LS155.
 	// The fourth output of the decoder is not connected. There are 3 muxes.
 
-	if (offset >= static_cast<int>(CV::SIZE))
+	if (offset >= offs_t(CV::SIZE))
 		return;
 
 	const float cv = MAX_CV * data / 255.0F;
@@ -371,11 +410,73 @@ void source_state::cv_w(offs_t offset, u8 data)
 		return;
 	m_cv[offset] = cv;
 
-	if (offset == static_cast<int>(CV::KEYBOARD_APPROX))
-		LOGMASKED(LOG_CV_KEYBOARD_APPROX,
-				  "CV %d: 0x%02x, %f\n", offset, data, cv);
+	switch (offset)
+	{
+		case offs_t(CV::MOD_RATE):
+			m_lfo_rate->write(cv);
+			break;
+		case offs_t(CV::LOUDNESS_CONTOUR_RATE):
+			m_contour_rate[LOUDNESS_CONTOUR]->write(cv);
+			break;
+		case offs_t(CV::LOUDNESS_CONTOUR_LEVEL):
+			machine().scheduler().synchronize(timer_expired_delegate(FUNC(source_state::update_contour<LOUDNESS_CONTOUR>), this));
+			break;
+		case offs_t(CV::FILTER_CONTOUR_RATE):
+			m_contour_rate[FILTER_CONTOUR]->write(cv);
+			break;
+		case offs_t(CV::FILTER_CONTOUR_LEVEL):
+			machine().scheduler().synchronize(timer_expired_delegate(FUNC(source_state::update_contour<FILTER_CONTOUR>), this));
+			break;
+	}
+
+	if (offset == offs_t(CV::KEYBOARD_APPROX))
+		LOGMASKED(LOG_CV_KEYBOARD_APPROX, "CV %d: 0x%02x, %f\n", offset, data, cv);
 	else
 		LOGMASKED(LOG_CV, "CV %d: 0x%02x, %f\n", offset, data, cv);
+}
+
+bool source_state::contour_peaked(const va_rc_eg_device &eg) const
+{
+	// The peak detector circuits for the filter and loudness contour generators
+	// are identical. They are located on board 2, and based on an LM393 comparator
+	// (U41B and U41A respectively). The threshold is set to ~9.984V, with a
+	// +-0.005V hysteresis. The EG output is connected to the inverting input.
+	// The comparator output is 0V when the EG output is above the threshold, and
+	// 5V otherwise (open collector output pulled to 5V via 10K resistors, R193
+	// and R190 respectively).
+
+	static constexpr const float R192 = RES_M(4.7);  // R188 for loudness EG.
+	static constexpr const float R191 = RES_K(10);   // R189 for loudness EG.
+	static constexpr const float RISING_THRESHOLD = 5 * RES_VOLTAGE_DIVIDER(R191, R192) + 5;
+	static constexpr const float FALLING_THRESHOLD = 10 * RES_VOLTAGE_DIVIDER(R191, R192);
+	static_assert(RISING_THRESHOLD > FALLING_THRESHOLD);
+
+	const float eg_v = eg.get_v();
+	if (eg_v > RISING_THRESHOLD)
+	{
+		return true;
+	}
+	else if (eg_v < FALLING_THRESHOLD)
+	{
+		return false;
+	}
+	else  // eg_v is within the hysteresis range.
+	{
+		// Proper emulation of hysteresis would require a streaming (or otherwise
+		// stateful) comparator. But a heuristic tailored to this use case works
+		// fine: if the EG voltage is falling, assume we hit the 'rising' threshold
+		// in the past, so the 'falling' threshold is the active one.
+
+		// This heuristic will pick the wrong threshold if a key is released while
+		// the EG is within the hysteresis range. But that should be rare (the
+		// hysteresis range is ~0.01V), and inconsequential. The difference in
+		// thresholds is very small, and the firmware is the one that initiates
+		// the EG release and is probably ignoring this input until the next
+		// attack.
+
+		const float future_eg_v = eg.get_v(machine().time() + attotime::from_msec(1));
+		return future_eg_v < eg_v;
+	}
 }
 
 float source_state::get_keyboard_v() const
@@ -445,19 +546,15 @@ u8 source_state::keyboard_r()
 	// firmware does a binary search by checking the result of the comparison
 	// and updating the "KYBD APPROX" CV accordingly.
 	// TODO: Compute keyboard voltage in an input callback.
-	static constexpr const int KB_APPROX_INDEX =
-		static_cast<int>(CV::KEYBOARD_APPROX);
-	const u8 d0 = (get_keyboard_v() >= m_cv[KB_APPROX_INDEX]) ? 1 : 0;
+	const u8 d0 = (get_keyboard_v() >= m_cv[int(CV::KEYBOARD_APPROX)]) ? 1 : 0;
 
-	// D1, D2: Loudness and Filter contour peaks.
-	// D1 <- U32, FILT CNTR <- S22-11: 0 when envolope reaches almost 10V
-	//       (with some hysteresis).
-	// D2 <- U32, LOUD CNTR <- S22-10: 0 when envelope reaches almost 10V
-	//       (with some hysteresis).
-	// TODO: Treating as inputs for now, until contour timing is emulated.
-	const u8 contour_peaked = m_contour_peaked_io->read();
-	const u8 d1 = BIT(contour_peaked, 0);
-	const u8 d2 = BIT(contour_peaked, 1);
+	// D1 - Filter contour peak reached (active low).
+	// D1 <- U32, FILT CNTR <- S22-11 <- Comparator (U41B, LM393).
+	const u8 d1 = contour_peaked(*m_contour[FILTER_CONTOUR]) ? 0 : 1;
+
+	// D2 - Loudness contour peak reached (active low).
+	// D2 <- U32, LOUD CNTR <- S22-10 <- Comparator (U41A, LM393).
+	const u8 d2 = contour_peaked(*m_contour[LOUDNESS_CONTOUR]) ? 0 : 1;
 
 	// D3: Octave. <- U32, OCT (P34-2 (octave 0 button) and P34-1 (octave +1
 	//                button) via U2B and U2C).
@@ -466,8 +563,12 @@ u8 source_state::keyboard_r()
 	// D4 <- J1-4, CASSETTE IN (through "cassette return" circuit and U18D).
 	const u8 d4 = 1;  // TODO: Implement.
 
-	// D5 <- U32, MOD (->P34-5) 1 when s22-5 low, otherwise 0.
-	const u8 d5 = 0;  // TODO: Implement.
+	// D5 <- U32 D5 <- MOD.
+	// The square wave output of the LFO (~ -14V - 14V, connection S33-5) is
+	// inverted and level-shifted by Q5, R85, R86. The emitter of Q4 (signal
+	// name "MOD") is connected to U32's D5, and to the cathode of the "MOD
+	// RATE" LED (connection P34-5).
+	const u8 d5 = m_lfo_state ? 0 : 1;
 
 	// D6 <- J2-5, S-TRIG IN, through U18C, pulled up by R23 and protected by
 	//       R22.
@@ -489,7 +590,7 @@ u8 source_state::buttons_r(
 	for (int i = 0; i < 6; ++i)
 	{
 		if (!BIT(m_button_row_latch, i))
-			pressed |= static_cast<u8>(~button_io[i]->read() & 0xff);
+			pressed |= u8(~button_io[i]->read() & 0xff);
 	}
 	// Bits 6 and 7 are not connected to the button input and pulled high.
 	pressed |= 0xc0;
@@ -524,6 +625,138 @@ u8 source_state::encoder_r()
 	if (!machine().side_effects_disabled())
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 	return m_encoder_incr ? 1 : 0;
+}
+
+template<int Which> NETDEV_ANALOG_CALLBACK_MEMBER(source_state::contour_cv_changed)
+{
+	// The control current (Iabc) into each envelope generator ("contour") CA3080
+	// is determined by a voltage-to-exponential-current converter (see relevant
+	// netlist).
+
+	// This callback is invoked by the netlist simulation when the control current
+	// changes. This happens when the firmware sets a new (dis)charge rate, or if
+	// the "range" trimmer is adjusted.
+
+	static_assert(Which == FILTER_CONTOUR || Which == LOUDNESS_CONTOUR);
+	static constexpr const char *CONTOUR_NAME = (Which == FILTER_CONTOUR) ? "Filter" : "Loudness";
+	static constexpr const int RATE_CV_INDEX =
+		(Which == FILTER_CONTOUR) ? int(CV::FILTER_CONTOUR_RATE) : int(CV::LOUDNESS_CONTOUR_RATE);
+
+	// The netlist outputs a voltage. Convert it to a current.
+	m_contour_cc[Which] = (data - CA3080_VABC) / RES_K(10);  // R198 for filter, R186 for loudness.
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(source_state::update_contour<Which>), this));
+
+	LOGMASKED(LOG_CONTOUR, "%s contour CC: %f uA, rate CV: %f, range trimmer: %d\n",
+	          CONTOUR_NAME, m_contour_cc[Which] * 1e6F, m_cv[RATE_CV_INDEX], m_contour_range[Which]->read());
+}
+
+// Must be called with machine().scheduler().synchronize(...), to ensure the EG
+// updates use the global time.
+template<int Which> TIMER_CALLBACK_MEMBER(source_state::update_contour)
+{
+	// Each of the voltage-controlled envelope generators (called "contours" on
+	// the schematic) are based on a CA3080 OTA configured as a current-controlled
+	// resistor. This configuration is explained in the first 10 minutes of
+	// https://www.youtube.com/watch?v=pTHHzFsa4Ss
+
+	// The OTA (dis)charges a capacitor to the level set by the firmware.
+	// Charge rate is controlled by the Iabc current into the OTA, which is
+	// also contrlled by the firmware (see contour_cv_changed()).
+
+	static_assert(Which == FILTER_CONTOUR || Which == LOUDNESS_CONTOUR);
+	static constexpr const char *CONTOUR_NAME = (Which == FILTER_CONTOUR) ? "Filter" : "Loudness";
+	static constexpr const int LEVEL_CV_INDEX =
+		(Which == FILTER_CONTOUR) ? int(CV::FILTER_CONTOUR_LEVEL) : int(CV::LOUDNESS_CONTOUR_LEVEL);
+
+	// All componets are on board 2. All resistors have 1% tolerance.
+	//                           Filter contour          Loudness contour
+	static constexpr const float R196 = RES_K(18.2);  // R183
+	static constexpr const float R197 = RES_R(100);   // R184
+	static constexpr const float R195 = RES_K(20);    // R187
+	static constexpr const float R194 = RES_R(100);   // R182
+
+	// Voltage dividers at the OTA's + and - inputs.
+	static constexpr const float OTA_DIVIDER_PLUS = RES_VOLTAGE_DIVIDER(R196, R197);
+	static constexpr const float OTA_DIVIDER_MINUS = RES_VOLTAGE_DIVIDER(R195, R194);
+
+	if (m_contour_cc[Which] <= 0)
+	{
+		// The netlist solver might transiently send negative values.
+		LOG("%s EG received a non-positive control current. Skipping update.\n", CONTOUR_NAME);
+		return;
+	}
+
+	// Ideal OTA transconductance at room temparature.
+	const float g = 19.2F * m_contour_cc[Which];
+	// Note the sligh difference in the calculations below, compared to the video
+	// linked above, due to the resistive dividers at the two OTA inputs not
+	// being identical.
+	const float effective_r = 1.0F / (g * OTA_DIVIDER_MINUS);
+	m_contour[Which]->set_r(effective_r);
+
+	const float level_cv = m_cv[LEVEL_CV_INDEX];  // 0V - 10V.
+	const float target_v = level_cv * OTA_DIVIDER_PLUS / OTA_DIVIDER_MINUS;  // 0V - ~10.98V.
+	m_contour[Which]->set_target_v(target_v);
+
+	LOGMASKED(LOG_CONTOUR, "%s EG update - Level CV: %f, target_v: %f, R: %f, tau: %f\n",
+	          CONTOUR_NAME, level_cv, target_v, effective_r, effective_r * CONTOUR_C);
+}
+
+NETDEV_ANALOG_CALLBACK_MEMBER(source_state::lfo_cv_changed)
+{
+	// The calculation of the LFO control current is very similar to that of the
+	// EGs. See contour_cv_changed().
+	m_lfo_cc = (data - CA3080_VABC) / RES_K(10);  // R227
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(source_state::update_lfo_timer), this));
+	LOGMASKED(LOG_LFO, "LFO CC: %f uA, rate CV: %f, range trimmer: %d\n",
+	          m_lfo_cc * 1e6F, m_cv[int(CV::MOD_RATE)], m_lfo_range->read());
+}
+
+TIMER_CALLBACK_MEMBER(source_state::update_lfo_timer)
+{
+	// The LFO ("MOD OSC" in the schematic) is a triangle core oscillator based
+	// on a CA3080 OTA (U49). The OTA's Iabc is determined by a voltage-to-exponential-current
+	// converter, whose voltage is set by the firmware.
+	// The OTA is configured to (dis)charges the capacitor (C58) with a constant
+	// current, resulting in a triangle wave (-/+ ~1.5V). The oscillator also
+	// produces a square wave (-/+ ~14V) as part of its operation.
+
+	// All components on board 2.
+	static constexpr const float R219 = RES_K(100);
+	static constexpr const float R220 = RES_K(12);
+	static constexpr const float C58 = CAP_U(0.33);
+
+	// Approximate max magnitude of opamp output, according to schematic (supply voltage is 15V).
+	static constexpr const float V_PEAK_SQUARE = 14;
+	static constexpr const float V_PEAK_TRIANGLE = V_PEAK_SQUARE * RES_VOLTAGE_DIVIDER(R219, R220);  // ~1.5V
+
+	// The differential input at the OTA will be +/- V_PEAK_TRIANGLE. This is well
+	// beyond the "linear" range (-/+ ~10-20mV), so the output current will be
+	// saturated to (almost) +/- Iabc (m_lfo_cc).
+	const float i_out = m_lfo_cc;
+
+	// Time it takes to charge the capacitor from -V_PEAK_TRIANGLE to +V_PEAK_TRIANGLE
+	// with a constant current. This is the half-period of the LFO, which is what
+	// we need for our timer.
+	const float t_half = 2 * V_PEAK_TRIANGLE * C58 / i_out;
+
+	// Continue from the current position in the cycle.
+	const double t_remaining = t_half * m_lfo_timer->remaining().as_double() / m_lfo_timer->period().as_double();
+
+	if (i_out > 0)
+		m_lfo_timer->adjust(attotime::from_double(t_remaining), 0, attotime::from_double(t_half));
+	else
+		m_lfo_timer->reset();
+
+	LOGMASKED(LOG_LFO, "LFO frequency updated - Icharge: %f uA, t_remaining: %f, t_half: %f, f: %f\n",
+	          i_out * 1e6F, t_remaining, t_half, 1.0F / (2.0F * t_half));
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(source_state::lfo_timer_tick)
+{
+	m_lfo_state = !m_lfo_state;
+	m_lfo_rate_led = !m_lfo_state;  // LED (LED 3, board 5) is active low.
+	LOGMASKED(LOG_LFO_TIMER, "LFO Timer ticked: %d\n", m_lfo_state);
 }
 
 void source_state::memory_map(address_map &map)
@@ -585,6 +818,7 @@ void source_state::io_map(address_map &map)
 void source_state::machine_start()
 {
 	m_octave_led.resolve();
+	m_lfo_rate_led.resolve();
 	m_program_display.resolve();
 	m_edit_display.resolve();
 	m_edit_led.resolve();
@@ -599,12 +833,25 @@ void source_state::machine_start()
 	save_item(NAME(m_octave_hi));
 	save_item(NAME(m_button_row_latch));
 	save_item(NAME(m_encoder_incr));
+	save_item(NAME(m_lfo_state));
+	save_item(NAME(m_lfo_cc));
+	save_item(NAME(m_contour_cc));
 	save_item(NAME(m_cv));
 }
 
 void source_state::machine_reset()
 {
 	update_octave_leds();
+	update_contour<FILTER_CONTOUR>(0);
+	update_contour<LOUDNESS_CONTOUR>(0);
+	update_lfo_timer(0);
+
+	// If an input port has its default value at startup, its write callback will
+	// not be invoked. Ensure the netlist inputs are initialized even in that
+	// scenario.
+	subdevice<netlist_mame_analog_input_device>("source_nl:cntr_range_0")->write(m_contour_range[0]->read());
+	subdevice<netlist_mame_analog_input_device>("source_nl:cntr_range_1")->write(m_contour_range[1]->read());
+	subdevice<netlist_mame_analog_input_device>("source_nl:lfo_range")->write(m_lfo_range->read());
 }
 
 void source_state::source(machine_config &config)
@@ -617,7 +864,29 @@ void source_state::source(machine_config &config)
 
 	NVRAM(config, NVRAM_TAG, nvram_device::DEFAULT_ALL_0);  // 2x6514: U27, U28.
 
+	VA_RC_EG(config, m_contour[FILTER_CONTOUR]).set_c(CONTOUR_C);  // C57 (Board 2).
+	VA_RC_EG(config, m_contour[LOUDNESS_CONTOUR]).set_c(CONTOUR_C);  // C56 (Board 2).
+	TIMER(config, m_lfo_timer).configure_generic(FUNC(source_state::lfo_timer_tick));
+
 	config.set_default_layout(layout_moog_source);
+
+
+	NETLIST_CPU(config, "source_nl", netlist::config::DEFAULT_CLOCK()).set_source(NETLIST_NAME(moogsource));
+
+	NETLIST_ANALOG_INPUT(config, "source_nl:cntr_range_0", "R201.DIAL");
+	NETLIST_ANALOG_INPUT(config, m_contour_rate[FILTER_CONTOUR], "FLT_CNTR_RATE.IN");
+	NETLIST_ANALOG_OUTPUT(config, "source_nl:cntr_cv_0")
+		.set_params("FLT_CNTR_CV", FUNC(source_state::contour_cv_changed<FILTER_CONTOUR>));
+
+	NETLIST_ANALOG_INPUT(config, "source_nl:cntr_range_1", "R179.DIAL");
+	NETLIST_ANALOG_INPUT(config,  m_contour_rate[LOUDNESS_CONTOUR], "LOUD_CNTR_RATE.IN");
+	NETLIST_ANALOG_OUTPUT(config, "source_nl:cntr_cv_1")
+		.set_params("LOUD_CNTR_CV", FUNC(source_state::contour_cv_changed<LOUDNESS_CONTOUR>));
+
+	NETLIST_ANALOG_INPUT(config, "source_nl:lfo_range", "R223.DIAL");
+	NETLIST_ANALOG_INPUT(config, m_lfo_rate, "MOD_RATE.IN");
+	NETLIST_ANALOG_OUTPUT(config, "source_nl:lfo_cv")
+		.set_params("MOD_CV", FUNC(source_state::lfo_cv_changed));
 }
 
 DECLARE_INPUT_CHANGED_MEMBER(source_state::octave_button_pressed)
@@ -818,10 +1087,15 @@ INPUT_PORTS_START(source)
 	PORT_START("trigger_in")  // External trigger input (see keyboard_r()).
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("S TRIG IN") PORT_CODE(KEYCODE_T)
 
-	// TODO: User can control when contours peak, until those are emulated.
-	PORT_START("contour_peaked")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Filter Contour Peaked") PORT_CODE(KEYCODE_Z)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Loudness Contour Peaked") PORT_CODE(KEYCODE_X)
+	PORT_START("contour_range_0")  // R201 (Board 2), 100K trimpot.
+	PORT_ADJUSTER(50, "FILTER_CONTOUR_RANGE") NETLIST_ANALOG_PORT_CHANGED("source_nl", "cntr_range_0")
+
+	PORT_START("contour_range_1")  // R179 (Board 2), 100K trimpot.
+	PORT_ADJUSTER(50, "LOUDNESS_CONTOUR_RANGE") NETLIST_ANALOG_PORT_CHANGED("source_nl", "cntr_range_1")
+
+	PORT_START("lfo_range")  // R223 (Board 2), 100K trimpot.
+	// A default of 0 takes us the closest to the advertised highest LFO frequency of 30 Hz.
+	PORT_ADJUSTER(0, "LFO RANGE") NETLIST_ANALOG_PORT_CHANGED("source_nl", "lfo_range")
 INPUT_PORTS_END
 
 // It seems like the Source was launched with firmware Revision 2.2.

@@ -238,8 +238,41 @@ hardware.  Between gains and effects there is a fair chance saturation
 can be avoided later in the chain.
 
 
+3.4 Timing
+~~~~~~~~~~
 
-3.4 Gain management
+.. code-block:: C++
+
+    u32 sample_rate() const;
+    attotime sample_period() const;
+
+    u64 start_index() const;
+    u64 end_index() const;
+    attotime start_time() const;
+    attotime end_time() const;
+
+    attotime sample_to_time(u64 index) const;
+
+``sample_rate`` gives the current sample rate of the stream and
+``sample_period`` the corresponding duration.
+
+Within a call to the update callback, ``start_index`` gives the number
+(starting at zero at system power on) and ``start_time`` the time of
+the first sample to compute in the update.  ``end_index`` and
+``end_time`` correspondingly indicate one past the last sample to
+update, or in other words the first sample of the next update call.
+Outside of an update callback, they all point to the first sample of
+the next update call.
+
+Finally ``sample_to_time`` allows to convert from a sample number to a
+time.
+
+Note that in case of change of sample rate sample numbers are
+recalculated to end up as if the stream had had the new rate from the
+start.  And the times will still be such that sample 0 is at time 0.
+
+
+3.5 Gain management
 ~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: C++
@@ -261,7 +294,7 @@ This is similar to the device gain control, with a twist: apply
 multiplies the current gain by the given value.
 
 
-3.5 Misc. actions
+3.6 Misc. actions
 ~~~~~~~~~~~~~~~~~
 
 .. code-block:: C++

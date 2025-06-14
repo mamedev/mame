@@ -63,28 +63,35 @@ void r800_device::device_validity_check(validity_checker &valid) const
 
 
 /***************************************************************
- * adjust cycle count by n T-states
- ***************************************************************/
-#define T(icount) { m_icount -= icount; }
-
-/***************************************************************
  * SLL  r8
  ***************************************************************/
 u8 r800_device::r800_sll(u8 value)
 {
-	const u8 c = (value & 0x80) ? CF : 0;
 	const u8 res = u8(value << 1);
-	set_f(SZP[res] | c);
+	{
+		QT = 0;
+		m_f.s_val = m_f.z_val = res;
+		m_f.pv_val = !0;
+		m_f.yx_val = res;
+		m_f.h_val = m_f.n = 0;
+		m_f.c = value & 0x80;
+	}
+
 	return res;
 }
 
 void r800_device::mulub(u8 value)
 {
-	const u16 res = A * value;
-	HL = res;
-	const u8 c = (H) ? CF : 0;
-	const u8 z = (res) ? 0 : ZF;
-	set_f((F & (HF|NF)) | z | c);
+	HL = A * value;
+	{
+		QT = 0;
+		// keep HN
+		m_f.s_val = 0;
+		m_f.z_val = HL != 0;
+		m_f.pv_val = !0;
+		m_f.yx_val = 0;
+		m_f.c = H;
+	}
 }
 
 void r800_device::muluw(u16 value)
@@ -92,9 +99,15 @@ void r800_device::muluw(u16 value)
 	const u32 res = HL * value;
 	DE = res >> 16;
 	HL = res & 0xffff;
-	const u8 c = (DE) ? CF : 0;
-	const u8 z = (res) ? 0 : ZF;
-	set_f((F & (HF|NF)) | z | c);
+	{
+		QT = 0;
+		// keep HN
+		m_f.s_val = 0;
+		m_f.z_val = res != 0;
+		m_f.pv_val = !0;
+		m_f.yx_val = 0;
+		m_f.c = DE;
+	}
 }
 
 void r800_device::execute_run()

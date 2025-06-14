@@ -2343,14 +2343,13 @@ void pc9801_state::pc9801_sasi(machine_config &config)
 void pc9801vm_state::cdrom_headphones(device_t *device)
 {
 	cdda_device *cdda = device->subdevice<cdda_device>("cdda");
-	cdda->add_route(0, "^^lheadphone", 1.0);
-	cdda->add_route(1, "^^rheadphone", 1.0);
+	cdda->add_route(0, "^^headphone", 1.0, 0);
+	cdda->add_route(1, "^^headphone", 1.0, 1);
 }
 
 void pc9801vm_state::pc9801_ide(machine_config &config)
 {
-	SPEAKER(config, "lheadphone").front_left();
-	SPEAKER(config, "rheadphone").front_right();
+	SPEAKER(config, "headphone", 2).front();
 	ATA_INTERFACE(config, m_ide[0]).options(ata_devices, "hdd", nullptr, false);
 	m_ide[0]->irq_handler().set("ideirq", FUNC(input_merger_device::in_w<0>));
 	ATA_INTERFACE(config, m_ide[1]).options(pc9801_atapi_devices, "pc98_cd", nullptr, false);

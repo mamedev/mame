@@ -21,7 +21,7 @@
 namespace osd::debugger::win {
 
 memorywin_info::memorywin_info(debugger_windows_interface &debugger) :
-	editwin_info(debugger, false, "Memory", nullptr),
+	editwin_info(debugger, false, 0 /* view index */, "Memory", nullptr),
 	m_combownd(nullptr)
 {
 	if (!window())

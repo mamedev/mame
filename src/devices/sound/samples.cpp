@@ -12,11 +12,12 @@ for tape loops and similar.
 
 TODO:
 - Only supports single channel samples!
-- When mame.ini samplerate is close to the loaded sample(s) samplerate,
-  (eg. 48000, with 44100Hz samples), things can sound quite bad. This is
-  more an issue in sound.cpp resampler, not this device.
 - Maybe this should be part of the presentation layer (artwork etc.)
   with samples specified in .lay files instead of in drivers?
+- Unless it's an infinitely looping sample, start_raw() is not compatible
+  with savestates. Save state right after start_raw(), load state later,
+  and the sample won't be playing.
+- No need for set_volume, can just use set_output_gain, but it's harmless.
 
 ***************************************************************************/
 
@@ -54,7 +55,6 @@ samples_device::samples_device(const machine_config &mconfig, const char *tag, d
 samples_device::samples_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
-	, m_samples_start_cb(*this)
 	, m_channels(0)
 	, m_names(nullptr)
 {
@@ -87,10 +87,11 @@ void samples_device::start(uint8_t channel, uint32_t samplenum, bool loop)
 	chan.source = (sample.data.size() > 0) ? &sample.data[0] : nullptr;
 	chan.source_num = (chan.source_len > 0) ? samplenum : -1;
 	chan.source_len = sample.data.size();
-	chan.pos = 0;
+	chan.pos = 0.0;
 	chan.basefreq = sample.frequency;
 	chan.curfreq = sample.frequency;
 	chan.loop = loop;
+	chan.stream->set_sample_rate(sample.frequency);
 }
 
 
@@ -111,10 +112,11 @@ void samples_device::start_raw(uint8_t channel, const int16_t *sampledata, uint3
 	chan.source = sampledata;
 	chan.source_num = -1;
 	chan.source_len = samples;
-	chan.pos = 0;
+	chan.pos = 0.0;
 	chan.basefreq = frequency;
 	chan.curfreq = frequency;
 	chan.loop = loop;
+	chan.stream->set_sample_rate(frequency);
 }
 
 
@@ -123,14 +125,14 @@ void samples_device::start_raw(uint8_t channel, const int16_t *sampledata, uint3
 //  a sample
 //-------------------------------------------------
 
-void samples_device::set_frequency(uint8_t channel, uint32_t freq)
+void samples_device::set_frequency(uint8_t channel, uint32_t frequency)
 {
 	assert(channel < m_channels);
 
 	// force an update before we start
 	channel_t &chan = m_channel[channel];
 	chan.stream->update();
-	chan.curfreq = freq;
+	chan.curfreq = frequency;
 }
 
 
@@ -142,8 +144,6 @@ void samples_device::set_frequency(uint8_t channel, uint32_t freq)
 void samples_device::set_volume(uint8_t channel, float volume)
 {
 	assert(channel < m_channels);
-
-	// force an update before we start
 	set_output_gain(channel, volume);
 }
 
@@ -158,6 +158,7 @@ void samples_device::pause(uint8_t channel, bool pause)
 
 	// force an update before we start
 	channel_t &chan = m_channel[channel];
+	chan.stream->update();
 	chan.paused = pause;
 }
 
@@ -172,6 +173,7 @@ void samples_device::stop(uint8_t channel)
 
 	// force an update before we start
 	channel_t &chan = m_channel[channel];
+	chan.stream->update();
 	chan.source = nullptr;
 	chan.source_num = -1;
 }
@@ -235,28 +237,29 @@ void samples_device::device_start()
 	m_channel.resize(m_channels);
 	for (int channel = 0; channel < m_channels; channel++)
 	{
+		// placeholder, changed to sample SR at start()
+		const uint32_t rate = machine().sample_rate();
+
 		// initialize channel
 		channel_t &chan = m_channel[channel];
-		chan.stream = stream_alloc(0, 1, SAMPLE_RATE_OUTPUT_ADAPTIVE);
+		chan.stream = stream_alloc(0, 1, rate);
 		chan.source = nullptr;
 		chan.source_num = -1;
-		chan.pos = 0;
-		chan.loop = 0;
-		chan.paused = 0;
+		chan.pos = 0.0;
+		chan.basefreq = rate;
+		chan.curfreq = rate;
+		chan.loop = false;
+		chan.paused = false;
 
 		// register with the save state system
 		save_item(NAME(chan.source_num), channel);
 		save_item(NAME(chan.source_len), channel);
 		save_item(NAME(chan.pos), channel);
+		save_item(NAME(chan.basefreq), channel);
+		save_item(NAME(chan.curfreq), channel);
 		save_item(NAME(chan.loop), channel);
 		save_item(NAME(chan.paused), channel);
 	}
-
-	// initialize any custom handlers
-	m_samples_start_cb.resolve();
-
-	if (!m_samples_start_cb.isnull())
-		m_samples_start_cb();
 }
 
 
@@ -287,6 +290,7 @@ void samples_device::device_post_load()
 			sample_t &sample = m_sample[chan.source_num];
 			chan.source = &sample.data[0];
 			chan.source_len = sample.data.size();
+			chan.basefreq = sample.frequency;
 			if (sample.data.empty())
 				chan.source_num = -1;
 		}
@@ -307,6 +311,10 @@ void samples_device::device_post_load()
 				chan.source_num = -1;
 			}
 		}
+
+		// adjust sample rate if necessary
+		if (chan.source != nullptr)
+			chan.stream->set_sample_rate(chan.basefreq);
 	}
 }
 
@@ -334,13 +342,13 @@ void samples_device::sound_stream_update(sound_stream &stream)
 
 				for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 				{
-					// do a linear interp on the sample
+					// do a linear interpolation on the sample
 					double pos_floor = floor(chan.pos);
 					double frac = chan.pos - pos_floor;
 					int32_t ipos = int32_t(pos_floor);
 
 					sound_stream::sample_t sample1 = sound_stream::sample_t(sample[ipos++]);
-					sound_stream::sample_t sample2 = sound_stream::sample_t(sample[(ipos + 1) % chan.source_len]);
+					sound_stream::sample_t sample2 = sound_stream::sample_t(sample[ipos % chan.source_len]);
 					stream.put(0, sampindex, sample_scale * ((1.0 - frac) * sample1 + frac * sample2));
 
 					// advance

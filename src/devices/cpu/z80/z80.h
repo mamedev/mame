@@ -18,7 +18,7 @@ enum
 enum
 {
 	Z80_PC = STATE_GENPC, Z80_SP = 1,
-	Z80_A, Z80_B, Z80_C, Z80_D, Z80_E, Z80_H, Z80_L,
+	Z80_A, Z80_F, Z80_B, Z80_C, Z80_D, Z80_E, Z80_H, Z80_L,
 	Z80_AF, Z80_BC, Z80_DE, Z80_HL,
 	Z80_IX, Z80_IY, Z80_AF2, Z80_BC2, Z80_DE2, Z80_HL2,
 	Z80_R, Z80_I, Z80_IM, Z80_IFF1, Z80_IFF2, Z80_HALT,
@@ -54,6 +54,8 @@ protected:
 	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void device_pre_save() override ATTR_COLD { m_af.b.l = get_f(); }
+	virtual void device_post_load() override ATTR_COLD { set_f(m_af.b.l); }
 
 	// device_execute_interface implementation
 	virtual bool cpu_is_interruptible() const override { return true; }
@@ -77,7 +79,8 @@ protected:
 
 	void illegal_1();
 	void illegal_2();
-	u8 flags_szyxc(u16 value);
+	template <u8 Bit, bool State> void set_service_attention() { static_assert(Bit < 8, "out of range bit index"); if (State) m_service_attention |= (1 << Bit); else m_service_attention &= ~(1 << Bit); };
+	template <u8 Bit> bool get_service_attention() { static_assert(Bit < 8, "out of range bit index"); return m_service_attention & (1 << Bit); };
 
 	void halt();
 	void leave_halt();
@@ -112,7 +115,6 @@ protected:
 	u8 res(int bit, u8 value);
 	u8 set(int bit, u8 value);
 	void ei();
-	void set_f(u8 f);
 	void block_io_interrupted_flags();
 
 	virtual u8 data_read(u16 addr);
@@ -137,6 +139,16 @@ protected:
 	devcb_write_line m_halt_cb;
 	devcb_write_line m_busack_cb;
 
+	static constexpr u8 SA_BUSRQ         = 0;
+	static constexpr u8 SA_BUSACK        = 1;
+	static constexpr u8 SA_NMI_PENDING   = 2;
+	static constexpr u8 SA_IRQ_ON        = 3;
+	static constexpr u8 SA_HALT          = 4;
+	static constexpr u8 SA_AFTER_EI      = 5;
+	static constexpr u8 SA_AFTER_LDAIR   = 6;
+	static constexpr u8 SA_NSC800_IRQ_ON = 7;
+	u8 m_service_attention; // bitmap for required handling in service step
+
 	PAIR16       m_prvpc;
 	PAIR16       m_pc;
 	PAIR16       m_sp;
@@ -151,28 +163,50 @@ protected:
 	PAIR16       m_bc2;
 	PAIR16       m_de2;
 	PAIR16       m_hl2;
-	u8           m_qtemp;
-	u8           m_q;
 	u8           m_r;
 	u8           m_r2;
-	u8           m_iff1;
-	u8           m_iff2;
+	bool         m_iff1;
+	bool         m_iff2;
 	u8           m_halt;
 	u8           m_im;
 	u8           m_i;
-	u8           m_nmi_state;          // nmi pin state
-	bool         m_nmi_pending;        // nmi pending
-	u8           m_irq_state;          // irq pin state
-	int          m_wait_state;         // wait pin state
-	int          m_busrq_state;        // bus request pin state
-	u8           m_busack_state;       // bus acknowledge pin state
-	bool         m_after_ei;           // are we in the EI shadow?
-	bool         m_after_ldair;        // same, but for LD A,I or LD A,R
+	u8           m_nmi_state;    // nmi pin state
+	u8           m_irq_state;    // irq pin state
+	int          m_wait_state;   // wait pin state
+	int          m_busrq_state;  // bus request pin state
+	u8           m_busack_state; // bus acknowledge pin state
 	u16          m_ea;
+
+	struct
+	{
+		u8 s_val;  // bit 7, other bits = don't care
+		u8 z_val;  // 0 or not 0
+		u8 yx_val; // bit 5 for Y, bit 3 for X, other bits = don't care
+		u8 h_val;  // bit 4, other bits = don't care
+		u8 pv_val; // overflow case set in the way that pv() returns desired value
+		bool n;
+		bool c;
+
+		u8 q;      // CCF/SCF YX mask
+		u8 qtemp;
+
+		u8 s() const { return s_val & 0x80; }
+		u8 z() const { return z_val ? 0 : 0x40; }
+		u8 yx() const { return yx_val & 0x28; }
+		u8 h() const { return h_val & 0x10; }
+		u8 pv() const {
+			u8 val = pv_val;
+			val ^= val >> 4;
+			val ^= val << 2;
+			val ^= val >> 1;
+			return ~val & 0x04;
+		}
+	} m_f;
+	u8 get_f();
+	void set_f(u8 f);
 
 	int          m_icount;
 	int          m_tmp_irq_vector;
-	PAIR16       m_shared_addr;
 	PAIR16       m_shared_data;
 	PAIR16       m_shared_data2;
 	u8           m_rtemp;
@@ -181,13 +215,6 @@ protected:
 	u8 m_m1_cycles;
 	u8 m_memrq_cycles;
 	u8 m_iorq_cycles;
-
-	static bool tables_initialised;
-	static u8 SZ[0x100];       // zero and sign flags
-	static u8 SZ_BIT[0x100];   // zero, sign and parity/overflow (=zero) flags for BIT opcode
-	static u8 SZP[0x100];      // zero, sign and parity flags
-	static u8 SZHV_inc[0x100]; // zero, sign, half carry and overflow flags INC r8
-	static u8 SZHV_dec[0x100]; // zero, sign, half carry and overflow flags DEC r8
 };
 
 DECLARE_DEVICE_TYPE(Z80, z80_device)

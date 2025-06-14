@@ -35,7 +35,7 @@ TODO:
 #include "emu.h"
 #include "tsconf.h"
 
-#include "bus/spectrum/zxbus.h"
+#include "bus/spectrum/zxbus/bus.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "speaker.h"
@@ -320,7 +320,7 @@ void tsconf_state::tsconf(machine_config &config)
 		.add_route(1, "speakers", 0.25, 1)
 		.add_route(2, "speakers", 0.50, 1);
 
-	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.75);;
+	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "mono", 0.75);
 
 	PALETTE(config, "palette", palette_device::BLACK, 256);
 	m_screen->set_raw(14_MHz_XTAL / 2, 448, with_hblank(0), 448, 320, with_vblank(0), 320);

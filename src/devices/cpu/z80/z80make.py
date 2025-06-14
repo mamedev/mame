@@ -29,7 +29,11 @@ class IndStr:
         return not self.str
 
     def has_indent(self):
-        return self.indent != ''
+        return self.indent != '' or self.str[0] == "{" or self.str[0] == "}"
+
+    def strip_indent(self, n):
+        if self.indent != '':
+            self.indent = self.indent[n:]
 
     def replace(self, new):
         self.str = new
@@ -77,7 +81,7 @@ class Opcode:
         for i in range(0, len(self.source)):
             il = self.source[i]
             if not has_steps or not step_switch:
-                il.indent = ""
+                il.strip_indent(1)
             line = il.line()
             tokens = line.split()
             last_line = i + 1 == len(self.source)
@@ -137,14 +141,17 @@ class Opcode:
             print("\t\t}", file=f)
 
 class Macro:
-    def __init__(self, name, arg_name = None):
+    def __init__(self, name, arg_names = None):
         self.name = name
         self.source = []
-        self.arg_name = arg_name
+        self.arg_names = arg_names
 
-    def apply(self, arg):
-        if self.arg_name is not None:
-            return [ r.replace(self.arg_name, arg) for r in self.source ]
+    def apply(self, args):
+        if self.arg_names is not None:
+            src = self.source
+            for i, arg in enumerate(args.split(",")):
+                src = [ r.replace(self.arg_names[i], arg) for r in src ]
+            return src
         else:
             return self.source
 
@@ -180,16 +187,16 @@ class OpcodeList:
                 # New opcode
                 tokens = line.split()
                 if tokens[0] == "macro":
-                    arg_name = None
+                    arg_names = None
                     if len(tokens) > 2:
-                        arg_name = tokens[2]
+                        arg_names = tokens[2:]
                     nnames = tokens[1].split(":")
                     if len(nnames) == 2:
-                        inf = Macro(nnames[1], arg_name)
+                        inf = Macro(nnames[1], arg_names)
                         if nnames[0] == self.gen:
                             self.macros[nnames[1]] = inf
                     else:
-                        inf = Macro(nnames[0], arg_name)
+                        inf = Macro(nnames[0], arg_names)
                         if None == self.gen:
                             if nnames[0] in self.macros:
                                 sys.stderr.write("Replacing macro: %s\n" % nnames[0])
@@ -236,14 +243,14 @@ class OpcodeList:
             line_toc = line_toc[2:]
             line = " ".join(line_toc)
         for i in range(times):
-            if line_toc[0] == 'call':
-                name = line_toc[1]
-                arg = None
-                if len(line_toc) > 2:
-                    arg = line_toc[2]
+            if line_toc[0].startswith('@'):
+                name = line_toc[0][1:]
+                args = None
+                if len(line_toc) > 1:
+                    args = " ".join(line_toc[1:])
                 if name in self.macros:
                     macro = self.macros[name]
-                    ([out.extend(self.pre_process(il)) for il in macro.apply(arg)])
+                    ([out.extend(self.pre_process(il)) for il in macro.apply(args)])
                 else:
                     sys.stderr.write("Macro not found %s\n" % name)
                     out.append(iline.with_str("... %s" % name))
@@ -260,21 +267,22 @@ class OpcodeList:
 
         for prefix in sorted(prefixes):
             is_rop = prefix == 'ff'
+            opc_switch = not is_rop
             if prefix_switch:
                 print("case 0x%s:" % (prefix), file=f)
                 print("{", file=f)
-            if not is_rop:
+            if opc_switch:
                 print("\tswitch (u8(m_ref >> 8)) // opcode", file=f)
                 print("\t{", file=f)
             for opc in self.opcode_info[prefix]:
                 # reenter loop only process steps > 0
                 if not reenter or opc.with_steps():
-                    if not is_rop:
+                    if opc_switch:
                         print("\tcase 0x%s:" % (opc.code), file=f)
                     opc.save_dasm(step_switch=reenter, f=f)
                     print("\t\tcontinue;", file=f)
                     print("", file=f)
-            if not is_rop:
+            if opc_switch:
                 print("\t}", file=f)
 
             if prefix_switch:
@@ -295,6 +303,7 @@ class OpcodeList:
         print("", file=f)
         print("bool interrupted = true;", file=f)
         print("while (u8(m_ref) != 0x00) {", file=f)
+        print("// slow re-enter", file=f)
         print("\t// workaround to simulate main loop behavior where continue statement relays on having it set after", file=f)
         print("\tif (!interrupted) {", file=f)
         print("\t\tm_ref = 0xffff00;", file=f)
@@ -305,19 +314,17 @@ class OpcodeList:
         self.switch_prefix(self.opcode_info.keys(), reenter=True, f=f)
         print("", file=f)
         print('assert((void("switch statement above must cover all possible cases!"), false));', file=f)
-        print("}", file=f)
-        print("", file=f)
+        print("} // end: slow", file=f)
         print("if (m_ref != 0xffff00) goto process;", file=f)
         print("", file=f)
-        print("while (true) {", file=f)
-        print("", file=f)
-        print("\t\t// unwrapped ff prefix", file=f)
+        print("while (true) { // fast process", file=f)
+        print("\t\t// rop: unwrapped ff prefix", file=f)
         self.switch_prefix(['ff'], reenter=False, f=f)
         print("", file=f)
         print("process:", file=f)
         self.switch_prefix(self.opcode_info.keys() - ['ff'], reenter=False, f=f)
-        print("", file=f)
-        print("} // while (true)", file=f)
+        print("} // end: fast", file=f)
+        print('assert((void("unreachable!"), false));', file=f)
 
 def main(argv):
     if len(argv) != 3 and len(argv) != 4:

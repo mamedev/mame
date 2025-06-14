@@ -397,8 +397,8 @@ void maclc_state::maclc_base(machine_config &config)
 	m_v8->set_rom_tag("bootrom");
 	m_v8->hdsel_callback().set(FUNC(maclc_state::hdsel_w));
 	m_v8->hmmu_enable_callback().set(FUNC(maclc_state::set_hmmu));
-	m_v8->add_route(0, m_dfac, 1.0);
-	m_v8->add_route(1, m_dfac, 1.0);
+	m_v8->add_route(0, m_dfac, 1.0, 0);
+	m_v8->add_route(1, m_dfac, 1.0, 1);
 
 	nubus_device &nubus(NUBUS(config, "pds", 0));
 	nubus.set_space(m_maincpu, AS_PROGRAM);
@@ -569,8 +569,8 @@ void maclc_state::macclas2(machine_config &config)
 	m_v8->pb4_callback().set(m_egret, FUNC(egret_device::set_via_full));
 	m_v8->pb5_callback().set(m_egret, FUNC(egret_device::set_sys_session));
 	m_v8->cb2_callback().set(m_egret, FUNC(egret_device::set_via_data));
-	m_v8->add_route(0, m_dfac, 1.0);
-	m_v8->add_route(1, m_dfac, 1.0);
+	m_v8->add_route(0, m_dfac, 1.0, 0);
+	m_v8->add_route(1, m_dfac, 1.0, 1);
 
 	// Classic II doesn't have an LC PDS slot (and its ROM has the Slot Manager disabled)
 	config.device_remove("pds");

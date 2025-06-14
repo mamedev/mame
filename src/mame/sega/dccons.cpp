@@ -370,8 +370,8 @@ void dc_cons_state::gdrom_config(device_t *device)
 {
 	cdda_device *cdda = device->subdevice<cdda_device>("cdda");
 	cdda->audio_end_cb().set(*device, FUNC(gdrom_device::cdda_end_mark_cb));
-	cdda->add_route(0, "^^aica", 1.0);
-	cdda->add_route(1, "^^aica", 1.0);
+	cdda->add_route(0, "^^aica", 1.0, 0);
+	cdda->add_route(1, "^^aica", 1.0, 1);
 }
 
 void dc_cons_state::dc_base(machine_config &config)

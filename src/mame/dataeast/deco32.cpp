@@ -2233,6 +2233,8 @@ void dragngun_state::lockload(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, "sound_irq_merger").output_handler().set_inputline("audiocpu", INPUT_LINE_IRQ0);
 
+	config.set_maximum_quantum(attotime::from_hz(6000));  // to improve main<->audio comms
+
 	DECO_IRQ(config, m_deco_irq, 0);
 	m_deco_irq->set_screen_tag(m_screen);
 	m_deco_irq->lightgun1_callback().set_ioport("LIGHT0_Y");
@@ -2240,8 +2242,6 @@ void dragngun_state::lockload(machine_config &config)
 	m_deco_irq->raster2_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<0>));
 	m_deco_irq->vblank_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<1>));
 	m_deco_irq->lightgun_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<2>));
-
-	config.set_maximum_quantum(attotime::from_hz(6000));  // to improve main<->audio comms
 
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
@@ -2318,6 +2318,8 @@ void tattass_state::tattass(machine_config &config)
 	ARM(config, m_maincpu, 28000000/4); // unconfirmed
 	m_maincpu->set_addrmap(AS_PROGRAM, &tattass_state::tattass_map);
 	m_maincpu->set_vblank_int("screen", FUNC(deco32_state::irq0_line_assert));
+
+	config.set_maximum_quantum(attotime::from_hz(6000));  // to improve main<->audio comms
 
 	EEPROM_93C76_8BIT(config, m_eeprom);
 

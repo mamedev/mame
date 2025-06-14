@@ -804,7 +804,7 @@ void namco_audio_device::sound_stream_update(sound_stream &stream)
 						if (voice->noise_state)
 							stream.add_int(0, i, noise_data, 32768);
 						else
-							stream.add_int(1, i, -noise_data, 32768);
+							stream.add_int(0, i, -noise_data, 32768);
 
 						if (hold)
 						{

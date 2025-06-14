@@ -329,8 +329,6 @@ private:
 	required_device<mixer_device> m_right_out;
 
 	bool m_midi_rxd_bit = true; // Start high for serial idle.
-	u8 m_digit_latch_inv = 0x00;
-	u8 m_digit_mask = 0x00;
 
 	enum
 	{
@@ -354,8 +352,7 @@ void midiverb_state::digit_select_w(u8 data)
 	// The digit select signals (bit 0 and 1) are active-low. They connect to
 	// the base of PNP transistors (2N4403, Q4 and Q3 for DS1 and DS2
 	// respectively). When low, power is connected to the MAN4710 anode inputs.
-	m_digit_mask = ~data & 0x03;
-	m_digit_device->matrix(m_digit_mask, m_digit_latch_inv);
+	m_digit_device->write_my(~data & 0x03);
 }
 
 void midiverb_state::digit_latch_w(u8 data)
@@ -367,8 +364,7 @@ void midiverb_state::digit_latch_w(u8 data)
 
 	// Inverting because segment LEDs are active-low, but pwm_display_device
 	// expects active-high.
-	m_digit_latch_inv = ~descrambled & 0x7f;
-	m_digit_device->matrix(m_digit_mask, m_digit_latch_inv);
+	m_digit_device->write_mx(~descrambled & 0x7f);
 }
 
 void midiverb_state::digit_out_update_w(offs_t offset, u8 data)
@@ -528,8 +524,6 @@ void midiverb_state::machine_start()
 {
 	m_digit_out.resolve();
 	save_item(NAME(m_midi_rxd_bit));
-	save_item(NAME(m_digit_latch_inv));
-	save_item(NAME(m_digit_mask));
 }
 
 void midiverb_state::machine_reset()

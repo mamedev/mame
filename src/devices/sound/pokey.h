@@ -128,9 +128,9 @@ public:
 
 	template <unsigned N> auto pot_r() { return m_pot_r_cb[N].bind(); }
 	auto allpot_r() { return m_allpot_r_cb.bind(); }
-	auto serin_r() { return m_serin_r_cb.bind(); }
-	auto serout_w() { return m_serout_w_cb.bind(); }
 	auto irq_w() { return m_irq_w_cb.bind(); }
+	auto sod_w() { return m_sod_w_cb.bind(); }
+	auto oclk_w() { return m_oclk_w_cb.bind(); }
 
 	/* k543210 = k5 ... k0 returns bit0: kr1, bit1: kr2 */
 	/* all are, in contrast to actual hardware, ACTIVE_HIGH */
@@ -141,7 +141,7 @@ public:
 	void write(offs_t offset, uint8_t data);
 
 	void sid_w(int state); // pin 24
-	void serin_ready(int after);
+	void bclk_w(int state); // pin 26
 
 	// analog output configuration
 	void set_output_rc(double r, double c, double v)
@@ -251,6 +251,8 @@ private:
 	void vol_init();
 
 	inline void process_channel(int ch);
+	void process_serin();
+	void process_serout();
 	void pokey_potgo();
 	char *audc2str(int val);
 	char *audctl2str(int val);
@@ -274,9 +276,9 @@ private:
 
 	devcb_read8::array<8> m_pot_r_cb;
 	devcb_read8 m_allpot_r_cb;
-	devcb_read8 m_serin_r_cb;
-	devcb_write8 m_serout_w_cb;
 	devcb_write_line m_irq_w_cb;
+	devcb_write_line m_sod_w_cb;
+	devcb_write_line m_oclk_w_cb;
 
 	kb_cb_delegate m_keyboard_r;
 
@@ -295,6 +297,13 @@ private:
 	uint8_t m_kbd_cnt;
 	uint8_t m_kbd_latch;
 	uint8_t m_kbd_state;
+
+	uint16_t m_serin_shift;
+	uint16_t m_serout_shift;
+	bool m_ser_iclk;
+	bool m_ser_oclk;
+	bool m_serout_full;
+	bool m_sod_twotone;
 
 	attotime m_clock_period;
 

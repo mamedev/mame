@@ -123,6 +123,12 @@ void st0016_cpu_device::device_reset()
 			break;
 
 			case 2: // Crown Poker
+				screen().set_visible_area(8,42*8-1,0,29*8-1);
+				m_spr_dx = 4;
+				m_spr_dy = 4;
+			break;
+
+			case 3: // Dream Crown
 				screen().set_visible_area(8,42*8-1,0,30*8-1);
 				m_spr_dx = 4;
 			break;
@@ -664,8 +670,8 @@ void st0016_cpu_device::draw_bgmap(bitmap_ind16 &bitmap, const rectangle &clipre
 					code = m_spriteram[i] + 256 * m_spriteram[i + 1];
 					color = m_spriteram[i + 2] & 0x3f;
 
-					flipx = m_spriteram[i + 3] & 0x80;
-					flipy = m_spriteram[i + 3] & 0x40;
+					flipx = m_spriteram[i + 3] & 0x80; // crownpkr test mode doesn't seem to agree with this
+					flipy = m_spriteram[i + 3] & 0x40; // "
 
 					if (priority)
 					{
@@ -694,6 +700,7 @@ void st0016_cpu_device::draw_bgmap(bitmap_ind16 &bitmap, const rectangle &clipre
 							if (!flipy) { drawypos = ypos + yloop; }
 							else { drawypos = (ypos + 8 - 1) - yloop; }
 							destline = &bitmap.pix(drawypos);
+							// destline = &bitmap.pix(drawypos ^ 0x07); // hack for dcrown test mode
 
 							for (xloop = 0; xloop < 8; xloop++)
 							{

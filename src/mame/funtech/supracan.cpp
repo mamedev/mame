@@ -295,19 +295,28 @@ int supracan_state::get_tilemap_region(int layer)
 {
 	// TODO: anything that refers to 2bpp region (2) can actually be layer 1bpp selectable too
 	// From layer mode bit 7?
-	switch(layer)
+	switch (layer)
 	{
-		case 0:
-			static const int layer0_mode[8] = { 2, 1, 0, 1, 0, 0, 0, 0 };
-			return layer0_mode[m_gfx_mode & 7];
-		case 1:
-			static const int layer1_mode[8] = { 2, 1, 1, 1, 2, 2, 2, 2 };
-			return layer1_mode[m_gfx_mode & 7];
-		case 2:
-			return 2;
-		case 3:
-			static const int s_roz_mode_lut[4] = { 4, 2, 1, 0 };
-			return s_roz_mode_lut[m_roz_mode & 3];
+	case 0:
+	{
+		static const int layer0_mode[8] = { 2, 1, 0, 1, 0, 0, 0, 0 };
+		return layer0_mode[m_gfx_mode & 7];
+	}
+
+	case 1:
+	{
+		static const int layer1_mode[8] = { 2, 1, 1, 1, 2, 2, 2, 2 };
+		return layer1_mode[m_gfx_mode & 7];
+	}
+
+	case 2:
+		return 2;
+
+	case 3:
+	{
+		static const int s_roz_mode_lut[4] = { 4, 2, 1, 0 };
+		return s_roz_mode_lut[m_roz_mode & 3];
+	}
 	}
 
 	// TODO: 4th layer at $f00160 (gfx mode 0 only, ignored for everything else)
@@ -774,7 +783,8 @@ void supracan_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &maskmap, bi
 
 	// ysizes are normally setting +1, except on higher ranges where values are higher
 	// TODO: check on real HW
-	static const int ysizes_table[16] = {
+	static const int ysizes_table[16] =
+	{
 		1, 2, 3, 4, 5, 6, 7, 8, 9,
 		// 0x9: speedyd intro dash frame, speedyd bonus stages, boomzoo intro
 		// 11 would be more logical for former, except it will break latter and
@@ -913,7 +923,7 @@ void supracan_state::mark_active_tilemap_all_dirty(int layer)
 	int ysize = 0;
 
 	int which_tilemap_size = get_tilemap_dimensions(xsize, ysize, layer);
-//  for (int i=0;i<4;i++)
+//  for (int i = 0; i < 4; i++)
 //    tilemap_mark_all_tiles_dirty(m_tilemap_sizes[layer][i]);
 	m_tilemap_sizes[layer][which_tilemap_size]->mark_all_dirty();
 }
@@ -1686,33 +1696,33 @@ void supracan_state::update_frc_state()
 
 		// HACK: handle case by case until we resolve the equation
 		// (particularly with variable frequencies)
-		switch(m_frc_control & 0xf)
+		switch (m_frc_control & 0xf)
 		{
-			// speedyd: sets this up to 0xa0d6 / 0x0000 at boot, then goes 0xa200 0x013a
-			// - dictates a very slow timer (pinpoint for what);
-			// - would give massive slowdowns during gameplay if too many fires;
-			case 0:
-				m_frc_timer->adjust(attotime::from_hz(1));
-				break;
+		// speedyd: sets this up to 0xa0d6 / 0x0000 at boot, then goes 0xa200 0x013a
+		// - dictates a very slow timer (pinpoint for what);
+		// - would give massive slowdowns during gameplay if too many fires;
+		case 0:
+			m_frc_timer->adjust(attotime::from_hz(1));
+			break;
 
-			// magipool: sets 0xa201 / 0x0104 at startup, sometimes flips frequency to 0x0046
-			// - causes a crash at boot if too fast;
-			// - takes roughly 6 seconds for a title screen individual kanji to move right-to-left;
-			case 1:
-				m_frc_timer->adjust(m_maincpu->cycles_to_attotime(1024 * period), 0);
-				break;
+		// magipool: sets 0xa201 / 0x0104 at startup, sometimes flips frequency to 0x0046
+		// - causes a crash at boot if too fast;
+		// - takes roughly 6 seconds for a title screen individual kanji to move right-to-left;
+		case 1:
+			m_frc_timer->adjust(m_maincpu->cycles_to_attotime(1024 * period), 0);
+			break;
 
-			// gamblord: sets 0xa20f normally, plays with frequency register a lot.
-			// - takes ~13 seconds for title screen to complete animation;
-			// - takes ~1 second for character screen to switch;
-			// - during gameplay sometimes switches to 0xa200 / 0xffff;
-			case 0xf:
-				m_frc_timer->adjust(m_maincpu->cycles_to_attotime(8192 * period), 0);
-				break;
+		// gamblord: sets 0xa20f normally, plays with frequency register a lot.
+		// - takes ~13 seconds for title screen to complete animation;
+		// - takes ~1 second for character screen to switch;
+		// - during gameplay sometimes switches to 0xa200 / 0xffff;
+		case 0xf:
+			m_frc_timer->adjust(m_maincpu->cycles_to_attotime(8192 * period), 0);
+			break;
 
-			default:
-				popmessage("Attempt to fire up FRC with %04x %04x", m_frc_control, m_frc_frequency);
-				break;
+		default:
+			popmessage("Attempt to fire up FRC with %04x %04x", m_frc_control, m_frc_frequency);
+			break;
 		}
 	}
 	else
@@ -2084,7 +2094,8 @@ void supracan_state::video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	case 0x26/2: m_sprite_flags = data; LOGMASKED(LOG_SPRITES, "sprite_flags = %04x\n", data); break;
 
 	/* Tilemap 0 */
-	case 0x100/2: {
+	case 0x100/2:
+	{
 		m_tilemap_flags[0] = data;
 		LOGMASKED(LOG_TILEMAP0, "tilemap_flags[0] = %04x\n", data);
 		update_tilemap_flags(0);
@@ -2099,7 +2110,8 @@ void supracan_state::video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	case 0x10e/2: m_tilemap_lineselect_addr[0] = data; break;
 
 	/* Tilemap 1 */
-	case 0x120/2: {
+	case 0x120/2:
+	{
 		m_tilemap_flags[1] = data;
 		LOGMASKED(LOG_TILEMAP1, "tilemap_flags[1] = %04x\n", data);
 		update_tilemap_flags(1);
@@ -2114,7 +2126,8 @@ void supracan_state::video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	case 0x12e/2: m_tilemap_lineselect_addr[1] = data; break;
 
 	/* Tilemap 2 */
-	case 0x140/2: {
+	case 0x140/2:
+	{
 		m_tilemap_flags[2] = data;
 		LOGMASKED(LOG_TILEMAP2, "tilemap_flags[2] = %04x\n", data);
 		update_tilemap_flags(2);
@@ -2129,7 +2142,8 @@ void supracan_state::video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	case 0x14e/2: m_tilemap_lineselect_addr[2] = data; break;
 
 	/* ROZ */
-	case 0x180/2: {
+	case 0x180/2:
+	{
 		m_roz_mode = data;
 		LOGMASKED(LOG_ROZ, "roz_mode = %04x\n", data);
 		//update_tilemap_flags(ROZ_LAYER_NUMBER);
@@ -2334,18 +2348,24 @@ static const gfx_layout supracan_gfx2bpp =
 	8*16
 };
 
-static const uint32_t xtexlayout_xoffset[64] = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,
-												24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,
-												45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63 };
+static const uint32_t xtexlayout_xoffset[64] =
+{
+	0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,
+	24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,
+	44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63
+};
 
-static const uint32_t xtexlayout_yoffset[64] = {  0*64,1*64,2*64,3*64,4*64,5*64,6*64,7*64,8*64,
-												9*64,10*64,11*64,12*64,13*64,14*64,15*64,
-												16*64,17*64,18*64,19*64,20*64,21*64,22*64,23*64,
-												24*64,25*64,26*64,27*64,28*64,29*64,30*64,31*64,
-												32*64,33*64,34*64,35*64,36*64,37*64,38*64,39*64,
-												40*64,41*64,42*64,43*64,44*64,45*64,46*64,47*64,
-												48*64,49*64,50*64,51*64,52*64,53*64,54*64,55*64,
-												56*64,57*64,58*64,59*64,60*64,61*64,62*64,63*64 };
+static const uint32_t xtexlayout_yoffset[64] =
+{
+	0*64,1*64,2*64,3*64,4*64,5*64,6*64,7*64,
+	8*64,9*64,10*64,11*64,12*64,13*64,14*64,15*64,
+	16*64,17*64,18*64,19*64,20*64,21*64,22*64,23*64,
+	24*64,25*64,26*64,27*64,28*64,29*64,30*64,31*64,
+	32*64,33*64,34*64,35*64,36*64,37*64,38*64,39*64,
+	40*64,41*64,42*64,43*64,44*64,45*64,46*64,47*64,
+	48*64,49*64,50*64,51*64,52*64,53*64,54*64,55*64,
+	56*64,57*64,58*64,59*64,60*64,61*64,62*64,63*64
+};
 
 static const gfx_layout supracan_gfx1bpp =
 {

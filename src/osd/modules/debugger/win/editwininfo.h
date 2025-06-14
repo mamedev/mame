@@ -23,7 +23,7 @@ namespace osd::debugger::win {
 class editwin_info : public debugwin_info
 {
 public:
-	editwin_info(debugger_windows_interface &debugger, bool is_main_console, LPCSTR title, WNDPROC handler);
+	editwin_info(debugger_windows_interface &debugger, bool is_main_console, int viewidx, LPCSTR title, WNDPROC handler);
 	virtual ~editwin_info();
 
 	virtual bool restore_field(HWND wnd) override;
@@ -55,6 +55,7 @@ private:
 	static LRESULT CALLBACK static_edit_proc(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam);
 
 	HWND                    m_editwnd;
+	int                     m_viewidx;
 	std::string             m_edit_defstr;
 	WNDPROC                 m_original_editproc;
 	history_deque           m_history;

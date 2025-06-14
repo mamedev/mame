@@ -40,7 +40,7 @@ Hardware notes:
 - TSI S14001A + speech ROM
 - I/O with 8255 PPI and bunch of TTL
 - 8*8 magnet sensors, 11 buttons, 8*(8+1) LEDs + 4*7seg LEDs
-- module slot and printer port
+- module slot and printer port (600 baud, 7 data bits, 1 stop bit, no parity)
 
 *: In West Germany, some distributors released it with overclocked CPUs,
 advertised as 3.2, 3.6, or 4MHz. Unmodified EAS PCB photos show only a 3MHz XTAL.
@@ -99,6 +99,7 @@ version of Prestige, it only works on level A3 or higher.
 
 #include "bus/generic/carts.h"
 #include "bus/generic/slot.h"
+#include "bus/rs232/rs232.h"
 #include "cpu/m6502/r65c02.h"
 #include "machine/clock.h"
 #include "machine/i8255.h"
@@ -129,6 +130,7 @@ public:
 		fidel_clockdiv_state(mconfig, type, tag),
 		m_ppi8255(*this, "ppi8255"),
 		m_rombank(*this, "rombank"),
+		m_rs232(*this, "rs232"),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
 		m_dac(*this, "dac"),
@@ -158,6 +160,7 @@ protected:
 	// devices/pointers
 	optional_device<i8255_device> m_ppi8255;
 	optional_memory_bank m_rombank;
+	required_device<rs232_port_device> m_rs232;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
 	required_device<dac_1bit_device> m_dac;
@@ -282,7 +285,8 @@ void elite_state::ppi_porta_w(u8 data)
 	m_speech->data_w(data & 0x3f);
 	m_speech->start_w(BIT(data, 6));
 
-	// d7: printer? (black wire to LED pcb)
+	// d7: printer port data
+	m_rs232->write_txd(BIT(~data, 7));
 }
 
 void elite_state::ppi_portc_w(u8 data)
@@ -308,7 +312,7 @@ void elite_state::ppi_portc_w(u8 data)
 
 u8 elite_state::ppi_portb_r()
 {
-	// d0: printer? white wire from LED pcb
+	// d0: printer busy?
 	u8 data = 1;
 
 	// d1: S14001A busy pin
@@ -482,6 +486,8 @@ void elite_state::pc(machine_config &config)
 	auto &irq_clock(CLOCK(config, "irq_clock", 38.4_kHz_XTAL/64)); // through 4060 IC, 600Hz
 	irq_clock.set_pulse_width(attotime::from_nsec(13700)); // active for 13.7us
 	irq_clock.signal_handler().set_inputline(m_maincpu, M6502_IRQ_LINE);
+
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::MAGNETS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));

@@ -60,15 +60,15 @@ Super World Stadium 2000 (SS01/VER.A3)   (C) Namco,        2000  COH-700     SYS
 Super World Stadium 2001 (SS11/VER.A2)   (C) Namco,        2001  COH-716     SYSTEM12 MOTHER(C)  SYSTEM12 F2M5    KC061
 Tenkomori Shooting (TKM1/VER.A1)         (C) Namco,        1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC036
 Tenkomori Shooting (TKM2/VER.A1)         (C) Namco,        1998  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M4F6    KC036
-Tekken 3 (TET1/VER.A)                    (C) Namco,        1996  COH-700     SYSTEM12 MOTHER     SYSTEM12 M8F2F   KC006
-Tekken 3 (TET2/VER.A)                    (C) Namco,        1996  COH-700     SYSTEM12 MOTHER     SYSTEM12 M8F2F   KC006
-Tekken 3 (TET3/VER.A)                    (C) Namco,        1996  COH-700     SYSTEM12 MOTHER     SYSTEM12 M8F2F   KC006
-Tekken 3 (TET3/VER.B)                    (C) Namco,        1996  COH-700     SYSTEM12 MOTHER     SYSTEM12 M8F2F   KC006
-Tekken 3 (TET2/VER.C)                    (C) Namco,        1996  COH-700     SYSTEM12 MOTHER     SYSTEM12 M8F2F   KC006
-Tekken 3 (TET2/VER.D)                    (C) Namco,        1996  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F2F   KC006
-Tekken 3 (TET3/VER.D)                    (C) Namco,        1996  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F2F   KC006
-Tekken 3 (TET1/VER.E1)                   (C) Namco,        1996  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F2F   KC006
-Tekken 3 (TET2/VER.E1)                   (C) Namco,        1996  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F2F   KC006
+Tekken 3 (TET1/VER.A)                    (C) Namco,        1997  COH-700     SYSTEM12 MOTHER     SYSTEM12 M8F2F   KC006
+Tekken 3 (TET2/VER.A)                    (C) Namco,        1997  COH-700     SYSTEM12 MOTHER     SYSTEM12 M8F2F   KC006
+Tekken 3 (TET3/VER.A)                    (C) Namco,        1997  COH-700     SYSTEM12 MOTHER     SYSTEM12 M8F2F   KC006
+Tekken 3 (TET3/VER.B)                    (C) Namco,        1997  COH-700     SYSTEM12 MOTHER     SYSTEM12 M8F2F   KC006
+Tekken 3 (TET2/VER.C)                    (C) Namco,        1997  COH-700     SYSTEM12 MOTHER     SYSTEM12 M8F2F   KC006
+Tekken 3 (TET2/VER.D)                    (C) Namco,        1997  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F2F   KC006
+Tekken 3 (TET3/VER.D)                    (C) Namco,        1997  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F2F   KC006
+Tekken 3 (TET1/VER.E1)                   (C) Namco,        1997  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F2F   KC006
+Tekken 3 (TET2/VER.E1)                   (C) Namco,        1997  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F2F   KC006
 Tekken Tag Tournament (TEG3/VER.C1)      (C) Namco,        1999  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F4    KC044
 Tekken Tag Tournament (TEG3/VER.B)       (C) Namco,        1999  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F4    KC044
 Toukon Retsuden 3 (TR1/VER.A)            (C) Namco,        1997  COH-700     SYSTEM12 MOTHER(B)  SYSTEM12 M8F2F   KC019
@@ -3588,15 +3588,15 @@ ROM_END
 
 
 //    YEAR  NAME        PARENT    MACHINE   INPUT     CLASS                   INIT        ROT   COMPANY            FULLNAME, FLAGS
-GAME( 1996, tekken3,    0,        coh700,   tekken3,  namcos12_state,         empty_init, ROT0, "Namco",           "Tekken 3 (World, TET2/VER.E1)", 0 ) /* KC006 */
-GAME( 1996, tekken3a,   tekken3,  coh700,   tekken3,  namcos12_state,         empty_init, ROT0, "Namco",           "Tekken 3 (World, TET2/VER.A)", 0 ) /* KC006 */
-GAME( 1996, tekken3b,   tekken3,  coh700,   tekken3,  namcos12_state,         empty_init, ROT0, "Namco",           "Tekken 3 (World, TET2/VER.B)", 0 ) /* KC006 */
-GAME( 1996, tekken3c,   tekken3,  coh700,   tekken3,  namcos12_state,         empty_init, ROT0, "Namco",           "Tekken 3 (World, TET2/VER.C)", 0 ) /* KC006 */
-GAME( 1996, tekken3d,   tekken3,  coh700,   tekken3,  namcos12_state,         empty_init, ROT0, "Namco",           "Tekken 3 (World, TET2/VER.D)", 0 ) /* KC006 */
-GAME( 1996, tekken3ua,  tekken3,  coh700,   tekken3,  namcos12_state,         empty_init, ROT0, "Namco",           "Tekken 3 (US, TET3/VER.A)", 0 ) /* KC006 */
-GAME( 1996, tekken3ud,  tekken3,  coh700,   tekken3,  namcos12_state,         empty_init, ROT0, "Namco",           "Tekken 3 (US, TET3/VER.D)", 0 ) /* KC006 */
-GAME( 1996, tekken3ja,  tekken3,  coh700,   tekken3,  namcos12_state,         empty_init, ROT0, "Namco",           "Tekken 3 (Japan, TET1/VER.A)", 0 ) /* KC006 */
-GAME( 1996, tekken3je1, tekken3,  coh700,   tekken3,  namcos12_state,         empty_init, ROT0, "Namco",           "Tekken 3 (Japan, TET1/VER.E1)", 0 ) /* KC006 */
+GAME( 1997, tekken3,    0,        coh700,   tekken3,  namcos12_state,         empty_init, ROT0, "Namco",           "Tekken 3 (World, TET2/VER.E1)", 0 ) /* KC006 */
+GAME( 1997, tekken3a,   tekken3,  coh700,   tekken3,  namcos12_state,         empty_init, ROT0, "Namco",           "Tekken 3 (World, TET2/VER.A)", 0 ) /* KC006 */
+GAME( 1997, tekken3b,   tekken3,  coh700,   tekken3,  namcos12_state,         empty_init, ROT0, "Namco",           "Tekken 3 (World, TET2/VER.B)", 0 ) /* KC006 */
+GAME( 1997, tekken3c,   tekken3,  coh700,   tekken3,  namcos12_state,         empty_init, ROT0, "Namco",           "Tekken 3 (World, TET2/VER.C)", 0 ) /* KC006 */
+GAME( 1997, tekken3d,   tekken3,  coh700,   tekken3,  namcos12_state,         empty_init, ROT0, "Namco",           "Tekken 3 (World, TET2/VER.D)", 0 ) /* KC006 */
+GAME( 1997, tekken3ua,  tekken3,  coh700,   tekken3,  namcos12_state,         empty_init, ROT0, "Namco",           "Tekken 3 (US, TET3/VER.A)", 0 ) /* KC006 */
+GAME( 1997, tekken3ud,  tekken3,  coh700,   tekken3,  namcos12_state,         empty_init, ROT0, "Namco",           "Tekken 3 (US, TET3/VER.D)", 0 ) /* KC006 */
+GAME( 1997, tekken3ja,  tekken3,  coh700,   tekken3,  namcos12_state,         empty_init, ROT0, "Namco",           "Tekken 3 (Japan, TET1/VER.A)", 0 ) /* KC006 */
+GAME( 1997, tekken3je1, tekken3,  coh700,   tekken3,  namcos12_state,         empty_init, ROT0, "Namco",           "Tekken 3 (Japan, TET1/VER.E1)", 0 ) /* KC006 */
 GAME( 1997, lbgrande,   0,        coh700,   lbgrande, namcos12_state,         empty_init, ROT0, "Namco",           "Libero Grande (World, LG2/VER.A)", 0 ) /* KC014 */
 GAME( 1997, toukon3,    0,        coh700,   lbgrande, namcos12_state,         empty_init, ROT0, "Namco / Tomy",    "Shin Nihon Pro Wrestling Toukon Retsuden 3 Arcade Edition (Japan, TR1/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC019 */
 GAME( 1998, soulclbr,   0,        coh700,   namcos12, namcos12_state,         empty_init, ROT0, "Namco",           "Soul Calibur (World, SOC12/VER.A2)", 0 ) /* KC020 */

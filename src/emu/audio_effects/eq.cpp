@@ -23,6 +23,8 @@ audio_effect_eq::audio_effect_eq(u32 sample_rate, audio_effect *def) : audio_eff
 		m_db[band] = 0;
 	}
 
+	m_band_mask = 0;
+
 	reset_mode();
 	reset_low_shelf();
 	reset_high_shelf();
@@ -120,6 +122,9 @@ void audio_effect_eq::config_load(util::xml::data_node const *ef_node)
 		} else
 			reset_db(band);
 	}
+
+	for(u32 i = 0; i != BANDS; i++)
+		build_filter(i);		
 }
 
 void audio_effect_eq::config_save(util::xml::data_node *ef_node) const
@@ -203,6 +208,11 @@ void audio_effect_eq::set_high_shelf(bool active)
 
 void audio_effect_eq::build_filter(u32 band)
 {
+	if(m_db[band] == 0)
+		m_band_mask &= ~(1 << band);
+	else
+		m_band_mask |= 1 << band;
+
 	if(band == 0 && m_low_shelf) {
 		build_low_shelf(band);
 		return;
@@ -305,7 +315,7 @@ void audio_effect_eq::build_peak(u32 band)
 
 void audio_effect_eq::apply(const emu::detail::output_buffer_flat<sample_t> &src, emu::detail::output_buffer_flat<sample_t> &dest)
 {
-	if(m_mode == 0) {
+	if(m_mode == 0 || !m_band_mask) {
 		copy(src, dest);
 		return;
 	}

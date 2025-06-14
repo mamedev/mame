@@ -1527,8 +1527,8 @@ void lua_engine::initialize()
 				}
 				return rot;
 			});
-	game_driver_type["not_working"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::NOT_WORKING) != 0; });
-	game_driver_type["supports_save"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::SUPPORTS_SAVE) != 0; });
+	game_driver_type["not_working"] = sol::property([] (game_driver const &driver) { return (driver.type.emulation_flags() & device_t::flags::NOT_WORKING) != 0; });
+	game_driver_type["supports_save"] = sol::property([] (game_driver const &driver) { return (driver.type.emulation_flags() & device_t::flags::SAVE_UNSUPPORTED) == 0; });
 	game_driver_type["no_cocktail"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::NO_COCKTAIL) != 0; });
 	game_driver_type["is_bios_root"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::IS_BIOS_ROOT) != 0; });
 	game_driver_type["requires_artwork"] = sol::property([] (game_driver const &driver) { return (driver.flags & machine_flags::REQUIRES_ARTWORK) != 0; });
@@ -2110,7 +2110,7 @@ void lua_engine::initialize()
 			luaL_pushresultsize(&buff, size);
 			return sol::make_reference(s, sol::stack_reference(s, -1));
 		};
-	video_type["speed_factor"] = sol::property(&video_manager::speed_factor);
+	video_type["speed_factor"] = sol::property(&video_manager::speed_factor, &video_manager::set_speed_factor);
 	video_type["throttled"] = sol::property(&video_manager::throttled, &video_manager::set_throttled);
 	video_type["throttle_rate"] = sol::property(&video_manager::throttle_rate, &video_manager::set_throttle_rate);
 	video_type["frameskip"] = sol::property(&video_manager::frameskip, &video_manager::set_frameskip);

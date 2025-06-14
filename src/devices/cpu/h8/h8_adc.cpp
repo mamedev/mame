@@ -157,9 +157,9 @@ void h8_adc_device::notify_standby(int state)
 
 void h8_adc_device::conversion_wait(bool first, bool poweron, u64 current_time)
 {
-	if(current_time)
+	if(current_time) {
 		m_next_event = current_time + conversion_time(first, poweron);
-	else {
+	} else {
 		m_next_event = m_cpu->total_cycles() + conversion_time(first, poweron);
 		m_cpu->internal_update();
 	}
@@ -185,8 +185,9 @@ void h8_adc_device::sampling()
 	if(m_mode & DUAL) {
 		buffer_value(m_channel, 0);
 		buffer_value(m_channel+1, 1);
-	} else
+	} else {
 		buffer_value(m_channel);
+	}
 }
 
 void h8_adc_device::start_conversion()
@@ -224,7 +225,7 @@ void h8_adc_device::timeout(u64 current_time)
 
 	if(m_mode & ROTATE) {
 		if(m_channel != m_end_channel) {
-			m_channel++;
+			m_channel = (m_channel + 1) & 7;
 			sampling();
 			conversion_wait(false, false, current_time);
 			return;
@@ -467,10 +468,12 @@ void h8_adc_2655_device::mode_update()
 		if(m_adcr & 0x04) {
 			m_mode |= DUAL;
 			m_end_channel = (m_adcsr & 6)+1;
-		} else
+		} else {
 			m_end_channel = m_adcsr & 7;
-	} else
+		}
+	} else {
 		m_start_channel = m_end_channel = m_adcsr & 7;
+	}
 }
 
 void h8_adc_2655_device::do_buffering(int buffer)

@@ -32,7 +32,7 @@ void m50dass_device::device_start()
 
 void m50dass_device::device_add_mconfig(machine_config &config)
 {
-	Z80(config, m_maincpu, 8_MHz_XTAL / 2); // Z0840004PSC, divider not verified
+	Z80(config, m_maincpu, 8_MHz_XTAL / 2).set_disable(); // Z0840004PSC, divider not verified
 
 	SPEAKER(config, "mono").front_center();
 	YM2413(config, m_ym2413, 8_MHz_XTAL / 2).add_route(ALL_OUTPUTS, "mono", 0.8); // divider and configuration unknown

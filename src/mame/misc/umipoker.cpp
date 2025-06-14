@@ -15,8 +15,13 @@
 
     TODO:
     - Verify clocks (XTALs are 14.3181 and 2.000MHz)
+    - Hopper support
 
-    TMP68HC000-16 + z80 + YM3812 + OKI6295
+    NOTE:
+    - without default NVRAM, vparadis2 stops at
+      'renewal is necessary' screen.
+
+    TMP68HC000-16 + Z80 + YM3812 + OKI6295
 
 ***************************************************************************/
 
@@ -613,6 +618,139 @@ static INPUT_PORTS_START( saiyukip )
 	PORT_DIPSETTING(    0x8000, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( vparadis2 )
+	PORT_START("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // no effect in test mode
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // "
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_GAMBLE_HIGH ) // BIG
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_GAMBLE_BET )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_GAMBLE_LOW ) // SMALL
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // no effect in test mode
+
+	PORT_START("IN1")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // no effect in test mode
+
+	PORT_START("IN2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // no effect in test mode
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // "
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // "
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // "
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_COIN4 )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_COIN3 )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // no effect in test mode
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // "
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // "
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // "
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_OTHER ) // TODO: hopper out
+	PORT_SERVICE_NO_TOGGLE( 0x4000, IP_ACTIVE_HIGH )
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SERVICE1 )
+
+	// definitions as per test mode
+	PORT_START("DSW1-2")
+	PORT_DIPNAME( 0x0007, 0x0000, "Slot Haitou Set" ) PORT_DIPLOCATION("DSW1:!1,!2,!3") // Haitou should mean payout
+	PORT_DIPSETTING(      0x0000, "Type A" )
+	PORT_DIPSETTING(      0x0001, "Type B" )
+	PORT_DIPSETTING(      0x0002, "Type C" )
+	PORT_DIPSETTING(      0x0003, "Type D" )
+	PORT_DIPSETTING(      0x0004, "Type E" )
+	PORT_DIPSETTING(      0x0005, "Type F" )
+	PORT_DIPSETTING(      0x0006, "Type G" )
+	PORT_DIPSETTING(      0x0007, "Type H" )
+	PORT_DIPNAME( 0x0018, 0x0000, "Double-Up" ) PORT_DIPLOCATION("DSW1:!4,!5")
+	PORT_DIPSETTING(      0x0000, "Level 1" )
+	PORT_DIPSETTING(      0x0008, "Level 2" )
+	PORT_DIPSETTING(      0x0010, "Level 3" )
+	PORT_DIPSETTING(      0x0018, "Level 4" )
+	PORT_DIPNAME( 0x0020, 0x0000, "FMode Round Span" ) PORT_DIPLOCATION("DSW1:!6")
+	PORT_DIPSETTING(      0x0000, "Short" )
+	PORT_DIPSETTING(      0x0020, "Long" )
+	PORT_DIPNAME( 0x0040, 0x0000, "FMode Set" ) PORT_DIPLOCATION("DSW1:!7")
+	PORT_DIPSETTING(      0x0000, "Loop" )
+	PORT_DIPSETTING(      0x0040, "Random" )
+	PORT_DIPNAME( 0x0080, 0x0000, "Play Game Rate" ) PORT_DIPLOCATION("DSW1:!8")
+	PORT_DIPSETTING(      0x0000, "1" )
+	PORT_DIPSETTING(      0x0080, "10" )
+
+	PORT_DIPNAME( 0x0300, 0x0000, "Bet Max" ) PORT_DIPLOCATION("DSW2:!1,!2")
+	PORT_DIPSETTING(      0x0000, "20" )
+	PORT_DIPSETTING(      0x0100, "60" )
+	PORT_DIPSETTING(      0x0200, "100" )
+	PORT_DIPSETTING(      0x0300, "200" )
+	PORT_DIPNAME( 0x1c00, 0x0000, "Game Limit" ) PORT_DIPLOCATION("DSW2:!3,!4,!5")
+	PORT_DIPSETTING(      0x0000, "1000" )
+	PORT_DIPSETTING(      0x0400, "3000" )
+	PORT_DIPSETTING(      0x0800, "5000" )
+	PORT_DIPSETTING(      0x0c00, "10000" )
+	PORT_DIPSETTING(      0x1000, "15000" )
+	PORT_DIPSETTING(      0x1400, "20000" )
+	PORT_DIPSETTING(      0x1800, "25000" )
+	PORT_DIPSETTING(      0x1c00, "30000" )
+	PORT_DIPNAME( 0x2000, 0x0000, "Limit Over Type" ) PORT_DIPLOCATION("DSW2:!6")
+	PORT_DIPSETTING(      0x0000, "Stop" )
+	PORT_DIPSETTING(      0x2000, "Over" )
+	PORT_DIPNAME( 0x4000, 0x0000, "Use Out Counter" ) PORT_DIPLOCATION("DSW2:!7")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x0000, "Panel Type" ) PORT_DIPLOCATION("DSW2:!8")
+	PORT_DIPSETTING(      0x0000,  DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x8000, "Extra" )
+
+	PORT_START("DSW3-4")
+	PORT_DIPNAME( 0x0007, 0x0000, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("DSW3:!1,!2,!3")
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0x0003, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(      0x0004, "1 Coin/20 Credits" )
+	PORT_DIPSETTING(      0x0005, "1 Coin/25 Credits" )
+	PORT_DIPSETTING(      0x0006, "1 Coin/50 Credits" )
+	PORT_DIPSETTING(      0x0007, "1 Coin/100 Credits" )
+	PORT_DIPNAME( 0x0038, 0x0000, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("DSW3:!4,!5,!6")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0008, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(      0x0010, "1 Coin/20 Credits" )
+	PORT_DIPSETTING(      0x0018, "1 Coin/50 Credits" )
+	PORT_DIPSETTING(      0x0020, "1 Coin/100 Credits" )
+	PORT_DIPSETTING(      0x0028, "1 Coin/200 Credits" )
+	PORT_DIPSETTING(      0x0030, "1 Coin/500 Credits" )
+	PORT_DIPSETTING(      0x0038, "1 Coin/1000 Credits" )
+	PORT_DIPNAME( 0x00c0, 0x0000, "Coin D" ) PORT_DIPLOCATION("DSW3:!7,!8") // Yes, no coin C setting
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0040, "1 Coin/25 Credits" )
+	PORT_DIPSETTING(      0x0080, "1 Coin/50 Credits" )
+	PORT_DIPSETTING(      0x00c0, "1 Coin/100 Credits" )
+
+	PORT_DIPNAME( 0x0300, 0x0000, "Hopper Connect" ) PORT_DIPLOCATION("DSW4:!1,!2")
+	PORT_DIPSETTING(      0x0000, "Off 1" )
+	PORT_DIPSETTING(      0x0100, "Medal 1" )
+	PORT_DIPSETTING(      0x0200, "Off 2" )
+	PORT_DIPSETTING(      0x0300, "Medal 2" )
+	PORT_DIPNAME( 0x1c00, 0x0000, "Hopper Medal 1 Rate" ) PORT_DIPLOCATION("DSW4:!3,!4,!5")
+	PORT_DIPSETTING(      0x0000, "1" )
+	PORT_DIPSETTING(      0x0400, "5" )
+	PORT_DIPSETTING(      0x0800, "10" )
+	PORT_DIPSETTING(      0x0c00, "20" )
+	PORT_DIPSETTING(      0x1000, "25" )
+	PORT_DIPSETTING(      0x1400, "50" )
+	PORT_DIPSETTING(      0x1800, "100" )
+	PORT_DIPSETTING(      0x1c00, "200" )
+	PORT_DIPNAME( 0xe000, 0x0000, "Hopper Medal 2 Rate" ) PORT_DIPLOCATION("DSW4:!6,!7,!8")
+	PORT_DIPSETTING(      0x0000, "10" )
+	PORT_DIPSETTING(      0x2000, "50" )
+	PORT_DIPSETTING(      0x4000, "100" )
+	PORT_DIPSETTING(      0x6000, "300" )
+	PORT_DIPSETTING(      0x8000, "500" )
+	PORT_DIPSETTING(      0xa000, "1000" )
+	PORT_DIPSETTING(      0xc000, "2000" )
+	PORT_DIPSETTING(      0xe000, "3000" )
+INPUT_PORTS_END
+
 
 static GFXDECODE_START( gfx_umipoker )
 	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x4_planar, 0, 0x40)
@@ -736,6 +874,28 @@ ROM_START( saiyukip )
 	ROM_CONTINUE(             0x000000, 0x040000 )
 ROM_END
 
+ROM_START( vparadis2 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "vp8.u61", 0x00000, 0x20000, CRC(90fdd735) SHA1(45cf9f4cba66edd504fdb6bb80ca55a718258001) )
+	ROM_LOAD16_BYTE( "vp7.u60", 0x00001, 0x20000, CRC(8142c769) SHA1(d40321f0b0186b87b7c3502919e094afd279b7d7) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "vp6.u8", 0x00000, 0x10000, CRC(97b37149) SHA1(592e5f451d3417961c64b49a32eb863fc9d7d9b9) ) // 11xxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "vp1.u39", 0x00000, 0x20000, CRC(6c969a60) SHA1(b9ef74840f88de23e97e3ef26f8a478187e8cdf1) )
+	ROM_LOAD( "vp2.u40", 0x20000, 0x20000, CRC(cd915bad) SHA1(37752f94cc0edbca666b8a6f231513e1e9ac3eeb) )
+	ROM_LOAD( "vp3.u41", 0x40000, 0x20000, CRC(383e74ad) SHA1(662c57756df43ef6455b0bf56c3e170bd7dd8733) )
+	ROM_LOAD( "vp4.u42", 0x60000, 0x20000, CRC(7bdeba05) SHA1(3add05d409caf4474bd2912a97109e00e6711827) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "vp5.u17", 0x00000, 0x40000, CRC(3826a230) SHA1(f55c565dc105dfb11668936ca86b1b84d0dd1610) )
+	ROM_IGNORE(                   0x40000 ) // 1ST AND 2ND HALF IDENTICAL
+
+	ROM_REGION( 0x4000, "nvram", 0 ) // to bypass license expiration
+	ROM_LOAD( "nvram", 0x0000, 0x4000, CRC(64836e23) SHA1(75a4dd1f69f9c02b8ad560241ccc8765613a7a3e) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -743,7 +903,8 @@ ROM_END
 *              Game Drivers               *
 ******************************************/
 
-//     YEAR  NAME       PARENT    MACHINE    INPUT     STATE           INIT        ROT   COMPANY                  FULLNAME                                         FLAGS                   LAYOUT
-GAME(  1997, umipoker,  0,        umipoker,  umipoker, umipoker_state, empty_init, ROT0, "World Station Co.,LTD", "Umi de Poker / Marine Paradise (Japan, newer)", MACHINE_SUPPORTS_SAVE )                      // title screen is toggleable thru a dsw
-GAME(  1997, umipokera, umipoker, umipoker,  umipoker, umipoker_state, empty_init, ROT0, "World Station Co.,LTD", "Umi de Poker / Marine Paradise (Japan, older)", MACHINE_SUPPORTS_SAVE )                      // title screen is toggleable thru a dsw
-GAMEL( 1998, saiyukip,  0,        saiyukip,  saiyukip, saiyukip_state, empty_init, ROT0, "World Station Co.,LTD", "Slot Poker Saiyuki (Japan)",                    MACHINE_SUPPORTS_SAVE,  layout_saiyukip )
+//     YEAR  NAME       PARENT    MACHINE    INPUT      STATE           INIT        ROT   COMPANY                  FULLNAME                                         FLAGS                   LAYOUT
+GAME(  1997, umipoker,  0,        umipoker,  umipoker,  umipoker_state, empty_init, ROT0, "World Station Co.,LTD", "Umi de Poker / Marine Paradise (Japan, newer)", MACHINE_SUPPORTS_SAVE )                      // title screen is toggleable thru a dsw
+GAME(  1997, umipokera, umipoker, umipoker,  umipoker,  umipoker_state, empty_init, ROT0, "World Station Co.,LTD", "Umi de Poker / Marine Paradise (Japan, older)", MACHINE_SUPPORTS_SAVE )                      // title screen is toggleable thru a dsw
+GAMEL( 1998, saiyukip,  0,        saiyukip,  saiyukip,  saiyukip_state, empty_init, ROT0, "World Station Co.,LTD", "Slot Poker Saiyuki (Japan)",                    MACHINE_SUPPORTS_SAVE,  layout_saiyukip )
+GAME(  2005, vparadis2, 0,        umipoker,  vparadis2, umipoker_state, empty_init, ROT0, "Paradise",              "Victory Paradise II (V9)",                      MACHINE_SUPPORTS_SAVE )

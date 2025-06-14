@@ -11,41 +11,20 @@
 
 #include <osdepend.h>
 
-#include <cstdint>
 #include <array>
-#include <vector>
+#include <cstdint>
 #include <string>
+#include <vector>
 
 #define OSD_SOUND_PROVIDER   "sound"
 
 class sound_module
 {
 public:
-	virtual ~sound_module() = default;
+	virtual ~sound_module();
 
 	virtual uint32_t get_generation() { return 1; }
-	virtual osd::audio_info get_information() {
-		osd::audio_info result;
-		result.m_generation = 1;
-		result.m_default_sink = 1;
-		result.m_default_source = 0;
-		result.m_nodes.resize(1);
-		result.m_nodes[0].m_name = "";
-		result.m_nodes[0].m_id = 1;
-		result.m_nodes[0].m_rate.m_default_rate = 0; // Magic value meaning "use configured sample rate"
-		result.m_nodes[0].m_rate.m_min_rate = 0;
-		result.m_nodes[0].m_rate.m_max_rate = 0;
-		result.m_nodes[0].m_sinks = 2;
-		result.m_nodes[0].m_sources = 0;
-		result.m_nodes[0].m_port_names.push_back("L");
-		result.m_nodes[0].m_port_names.push_back("R");
-		result.m_nodes[0].m_port_positions.emplace_back(std::array<double, 3>({ -0.2, 0.0, 1.0 }));
-		result.m_nodes[0].m_port_positions.emplace_back(std::array<double, 3>({  0.2, 0.0, 1.0 }));
-		result.m_streams.resize(1);
-		result.m_streams[0].m_id = 1;
-		result.m_streams[0].m_node = 1;
-		return result;
-	}
+	virtual osd::audio_info get_information();
 	virtual bool external_per_channel_volume() { return false; }
 	virtual bool split_streams_per_source() { return false; }
 
@@ -56,21 +35,36 @@ public:
 	virtual void stream_sink_update(uint32_t id, const int16_t *buffer, int samples_this_frame) {}
 	virtual void stream_source_update(uint32_t id, int16_t *buffer, int samples_this_frame) {}
 
+	virtual void begin_update() {}
+	virtual void end_update() {}
+
 protected:
 	class abuffer {
 	public:
-		abuffer(uint32_t channels) : m_channels(channels), m_last_sample(channels, 0) {}
-		void get(int16_t *data, uint32_t samples);
+		abuffer(uint32_t channels) noexcept;
+		void get(int16_t *data, uint32_t samples) noexcept;
 		void push(const int16_t *data, uint32_t samples);
-		uint32_t channels() const { return m_channels; }
+		void clear() noexcept { m_used_buffers = 0; }
+		uint32_t channels() const noexcept { return m_channels; }
+		uint32_t available() const noexcept;
 
 	private:
 		struct buffer {
 			uint32_t m_cpos;
 			std::vector<int16_t> m_data;
+
+			buffer() noexcept = default;
+			buffer(const buffer &) = default;
+			buffer(buffer &&) noexcept = default;
+			buffer &operator=(const buffer &) = default;
+			buffer &operator=(buffer &&) noexcept = default;
 		};
 
+		void pop_buffer() noexcept;
+		buffer &push_buffer();
+
 		uint32_t m_channels;
+		uint32_t m_used_buffers;
 		std::vector<int16_t> m_last_sample;
 		std::vector<buffer> m_buffers;
 	};

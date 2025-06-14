@@ -5,7 +5,7 @@
 
 #include "isa.h"
 
-#include "bus/spectrum/zxbus.h"
+#include "bus/spectrum/zxbus/bus.h"
 
 class zxbus_adapter_device: public device_t, public device_isa8_card_interface
 {

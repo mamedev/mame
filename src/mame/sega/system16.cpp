@@ -2823,11 +2823,11 @@ ROM_START( wb3bble )  /*  Appears to be a pre-system 16 bootleg with encryption 
 	ROM_LOAD16_BYTE( "epr12093.b4", 0x60001, 0x010000, CRC(4891e7bb) SHA1(1be04fcabe9bfa8cf746263a5bcca67902a021a0) ) // 12- ic71
 	ROM_LOAD16_BYTE( "epr12097.b8", 0x60000, 0x010000, CRC(e645902c) SHA1(497cfcf6c25cc2e042e16dbcb1963d2223def15a) ) // 16- ic103
 
-	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU */
+	ROM_REGION( 0x10000, "soundcpu", 0 )
 	ROM_LOAD( "a-1 ic68", 0x0000, 0x8000, CRC(8321eb0b) SHA1(61cf95833c0aa38e35fc18db39d4ec74e4aaf01e) )
 
-	ROM_REGION( 0x1000, "mcu", 0 ) /* MCU code */
-	ROM_LOAD( "d8749h.mcu", 0x0000, 0x1000, NO_DUMP )
+	ROM_REGION( 0x800, "mcu", 0 )
+	ROM_LOAD( "d8749h.mcu", 0x000, 0x800, CRC(4d4fa98d) SHA1(3c1500e7d008232a0eac8394a8d077e159aa43d1) )
 ROM_END
 
 /******************************

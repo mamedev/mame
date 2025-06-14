@@ -26,6 +26,7 @@ TODO:
 #include "z80dasm.h"
 
 #include "z80.inc"
+#include <cstdio>
 
 #define LOG_INT   (1U << 1) // z80.lst
 #define LOG_UNDOC (1U << 2)
@@ -34,12 +35,32 @@ TODO:
 #include "logmacro.h"
 
 
-bool z80_device::tables_initialised = false;
-u8 z80_device::SZ[] = {};       // zero and sign flags
-u8 z80_device::SZ_BIT[] = {};   // zero, sign and parity/overflow (=zero) flags for BIT opcode
-u8 z80_device::SZP[] = {};      // zero, sign and parity flags
-u8 z80_device::SZHV_inc[] = {}; // zero, sign, half carry and overflow flags INC r8
-u8 z80_device::SZHV_dec[] = {}; // zero, sign, half carry and overflow flags DEC r8
+/***************************************************************
+ * Flag helpers (for eg. POP/PUSH AF, EX AF,AF')
+ ***************************************************************/
+u8 z80_device::get_f()
+{
+	u8 f = 0;
+	f |= m_f.s();
+	f |= m_f.z();
+	f |= m_f.yx();
+	f |= m_f.h();
+	f |= m_f.pv();
+	f |= m_f.n ? NF : 0;
+	f |= m_f.c ? CF : 0;
+	return f;
+}
+
+void z80_device::set_f(u8 f)
+{
+	m_f.s_val  = f;
+	m_f.z_val  = !(f & ZF);
+	m_f.yx_val = f;
+	m_f.h_val  = f;
+	m_f.pv_val = !(f & PF);
+	m_f.n      = f & NF;
+	m_f.c      = f & CF;
+}
 
 
 /***************************************************************
@@ -50,6 +71,7 @@ void z80_device::halt()
 	if (!m_halt)
 	{
 		m_halt = 1;
+		set_service_attention<SA_HALT, 1>();
 		m_halt_cb(1);
 	}
 }
@@ -62,6 +84,7 @@ void z80_device::leave_halt()
 	if (m_halt)
 	{
 		m_halt = 0;
+		set_service_attention<SA_HALT, 0>();
 		m_halt_cb(0);
 	}
 }
@@ -110,7 +133,14 @@ u8 z80_device::arg_read()
 void z80_device::inc(u8 &r)
 {
 	++r;
-	set_f((F & CF) | SZHV_inc[r]);
+	{
+		QT = 0;
+		// keep C
+		m_f.s_val = m_f.z_val = m_f.yx_val = r;
+		m_f.pv_val = r != 0x80;
+		m_f.h_val = (r & 0x0f) == 0x00 ? HF : 0;
+		m_f.n = 0;
+	}
 }
 
 /***************************************************************
@@ -119,7 +149,14 @@ void z80_device::inc(u8 &r)
 void z80_device::dec(u8 &r)
 {
 	--r;
-	set_f((F & CF) | SZHV_dec[r]);
+	{
+		QT = 0;
+		// keep C
+		m_f.s_val = m_f.z_val = m_f.yx_val = r;
+		m_f.pv_val = r != 0x7f;
+		m_f.h_val = (r & 0x0f) == 0x0f ? HF : 0;
+		m_f.n = 1;
+	}
 }
 
 /***************************************************************
@@ -128,7 +165,13 @@ void z80_device::dec(u8 &r)
 void z80_device::rlca()
 {
 	A = (A << 1) | (A >> 7);
-	set_f((F & (SF | ZF | PF)) | (A & (YF | XF | CF)));
+	{
+		QT = 0;
+		// keep SZP
+		m_f.yx_val = A;
+		m_f.h_val = m_f.n = 0;
+		m_f.c = A & 0x01;
+	}
 }
 
 /***************************************************************
@@ -136,9 +179,15 @@ void z80_device::rlca()
  ***************************************************************/
 void z80_device::rrca()
 {
-	set_f((F & (SF | ZF | PF)) | (A & CF));
-	A = (A >> 1) | (A << 7);
-	F |= (A & (YF | XF));
+	const u8 a0 = A;
+	A = (a0 >> 1) | (a0 << 7);
+	{
+		QT = 0;
+		// keep SZP
+		m_f.yx_val = A;
+		m_f.h_val = m_f.n = 0;
+		m_f.c = a0 & 0x01;
+	}
 }
 
 /***************************************************************
@@ -146,9 +195,14 @@ void z80_device::rrca()
  ***************************************************************/
 void z80_device::rla()
 {
-	u8 res = (A << 1) | (F & CF);
-	u8 c = (A & 0x80) ? CF : 0;
-	set_f((F & (SF | ZF | PF)) | c | (res & (YF | XF)));
+	u8 res = (A << 1) + m_f.c;
+	{
+		QT = 0;
+		// keep SZP
+		m_f.yx_val = res;
+		m_f.h_val = m_f.n = 0;
+		m_f.c = A & 0x80;
+	}
 	A = res;
 }
 
@@ -157,9 +211,14 @@ void z80_device::rla()
  ***************************************************************/
 void z80_device::rra()
 {
-	u8 res = (A >> 1) | (F << 7);
-	u8 c = (A & 0x01) ? CF : 0;
-	set_f((F & (SF | ZF | PF)) | c | (res & (YF | XF)));
+	u8 res = (m_f.c << 7) | (A >> 1);
+	{
+		QT = 0;
+		// keep SZP
+		m_f.yx_val = res;
+		m_f.h_val = m_f.n = 0;
+		m_f.c = A & 0x01;
+	}
 	A = res;
 }
 
@@ -169,10 +228,14 @@ void z80_device::rra()
 void z80_device::add_a(u8 value)
 {
 	const u16 res = A + value;
-	u8 f = (((A ^ res) & (value ^ res)) >> 5) & VF;
-	f |= flags_szyxc(res);
-	f |= ((A & 0x0f) + (value & 0x0f)) & HF;
-	set_f(f);
+	{
+		QT = 0;
+		m_f.s_val = m_f.z_val = m_f.yx_val = res;
+		m_f.c = res & 0x100;
+		m_f.h_val = (A & 0x0f) + (value & 0x0f);
+		m_f.pv_val = !((A ^ res) & (value ^ res) & 0x80);
+		m_f.n = 0;
+	}
 	A = res;
 }
 
@@ -181,13 +244,16 @@ void z80_device::add_a(u8 value)
  ***************************************************************/
 void z80_device::adc_a(u8 value)
 {
-	const int c = F & CF;
+	const int c = m_f.c;
 	const u16 res = A + value + c;
-	u8 f = (((A ^ res) & (value ^ res)) >> 5) & VF;
-	f |= flags_szyxc(res);
-	f |= ((A & 0x0f) + (value & 0x0f) + c) & HF;
-
-	set_f(f);
+	{
+		QT = 0;
+		m_f.s_val = m_f.z_val = m_f.yx_val = res;
+		m_f.c = res & 0x100;
+		m_f.h_val = (A & 0x0f) + (value & 0x0f) + c;
+		m_f.pv_val = !((A ^ res) & (value ^ res) & 0x80);
+		m_f.n = 0;
+	}
 	A = res;
 }
 
@@ -197,11 +263,14 @@ void z80_device::adc_a(u8 value)
 void z80_device::sub_a(u8 value)
 {
 	const u16 res = A - value;
-	u8 f = (((A ^ value) & (A ^ res)) >> 5) & VF;
-	f |= NF | flags_szyxc(res);
-	f |= ((A & 0x0f) - (value & 0x0f)) & HF;
-
-	set_f(f);
+	{
+		QT = 0;
+		m_f.s_val = m_f.z_val = m_f.yx_val = res;
+		m_f.c = res & 0x100;
+		m_f.h_val = (A & 0x0f) - (value & 0x0f);
+		m_f.pv_val = !((A ^ value) & (A ^ res) & 0x80);
+		m_f.n = 1;
+	}
 	A = res;
 }
 
@@ -210,13 +279,16 @@ void z80_device::sub_a(u8 value)
  ***************************************************************/
 void z80_device::sbc_a(u8 value)
 {
-	const int c = F & CF;
+	const int c = m_f.c;
 	const u16 res = A - value - c;
-	u8 f = (((A ^ value) & (A ^ res)) >> 5) & VF;
-	f |= NF | flags_szyxc(res);
-	f |= ((A & 0x0f) - (value & 0x0f) - c) & HF;
-
-	set_f(f);
+	{
+		QT = 0;
+		m_f.s_val = m_f.z_val = m_f.yx_val = res;
+		m_f.c = res & 0x100;
+		m_f.h_val = (A & 0x0f) - (value & 0x0f) - c;
+		m_f.pv_val = !((A ^ value) & (A ^ res) & 0x80);
+		m_f.n = 1;
+	}
 	A = res;
 }
 
@@ -236,18 +308,23 @@ void z80_device::neg()
 void z80_device::daa()
 {
 	u8 a = A;
-	if (F & NF)
+	if (m_f.n)
 	{
-		if ((F&HF) | ((A&0xf)>9)) a-=6;
-		if ((F&CF) | (A>0x99)) a-=0x60;
+		if (m_f.h() || ((A & 0xf) > 9)) a -= 6;
+		if (m_f.c || (A > 0x99)) a -= 0x60;
 	}
 	else
 	{
-		if ((F&HF) | ((A&0xf)>9)) a+=6;
-		if ((F&CF) | (A>0x99)) a+=0x60;
+		if (m_f.h() || ((A & 0xf) > 9)) a += 6;
+		if (m_f.c || (A > 0x99)) a += 0x60;
 	}
-
-	set_f((F&(CF|NF)) | (A>0x99) | ((A^a)&HF) | SZP[a]);
+	{
+		QT = 0;
+		// keep N
+		m_f.s_val = m_f.z_val = m_f.pv_val = m_f.yx_val = a;
+		m_f.h_val = A ^ a;
+		m_f.c = m_f.c || A > 0x99;
+	}
 	A = a;
 }
 
@@ -257,7 +334,12 @@ void z80_device::daa()
 void z80_device::and_a(u8 value)
 {
 	A &= value;
-	set_f(SZP[A] | HF);
+	{
+		QT = 0;
+		m_f.s_val = m_f.z_val = m_f.pv_val = m_f.yx_val = A;
+		m_f.n = m_f.c = 0;
+		m_f.h_val = HF;
+	}
 }
 
 /***************************************************************
@@ -266,7 +348,11 @@ void z80_device::and_a(u8 value)
 void z80_device::or_a(u8 value)
 {
 	A |= value;
-	set_f(SZP[A]);
+	{
+		QT = 0;
+		m_f.s_val = m_f.z_val = m_f.pv_val = m_f.yx_val = A;
+		m_f.h_val = m_f.n = m_f.c = 0;
+	}
 }
 
 /***************************************************************
@@ -275,7 +361,11 @@ void z80_device::or_a(u8 value)
 void z80_device::xor_a(u8 value)
 {
 	A ^= value;
-	set_f(SZP[A]);
+	{
+		QT = 0;
+		m_f.s_val = m_f.z_val = m_f.pv_val = m_f.yx_val = A;
+		m_f.h_val = m_f.n = m_f.c = 0;
+	}
 }
 
 /***************************************************************
@@ -284,11 +374,15 @@ void z80_device::xor_a(u8 value)
 void z80_device::cp(u8 value)
 {
 	const u16 res = A - value;
-	u8 f = (((A ^ value) & (A ^ res)) >> 5) & VF;
-	f |= NF | flags_szyxc(res);
-	f |= ((A & 0x0f) - (value & 0x0f)) & HF;
-
-	set_f((f & ~(YF | XF)) | (value & (YF | XF)));
+	{
+		QT = 0;
+		m_f.s_val = m_f.z_val = res;
+		m_f.yx_val = value;
+		m_f.c = res & 0x100;
+		m_f.h_val = (A & 0x0f) - (value & 0x0f);
+		m_f.pv_val = !((A ^ value) & (A ^ res) & 0x80);
+		m_f.n = 1;
+	}
 }
 
 /***************************************************************
@@ -307,10 +401,14 @@ void z80_device::exx()
  ***************************************************************/
 u8 z80_device::rlc(u8 value)
 {
-	unsigned res = value;
-	unsigned c = (res & 0x80) ? CF : 0;
-	res = ((res << 1) | (res >> 7)) & 0xff;
-	set_f(SZP[res] | c);
+	const u8 res = ((value << 1) | (value >> 7)) & 0xff;
+	{
+		QT = 0;
+		m_f.s_val = m_f.z_val = m_f.pv_val = m_f.yx_val = res;
+		m_f.h_val = m_f.n = 0;
+		m_f.c = value & 0x80;
+	}
+
 	return res;
 }
 
@@ -319,10 +417,14 @@ u8 z80_device::rlc(u8 value)
  ***************************************************************/
 u8 z80_device::rrc(u8 value)
 {
-	unsigned res = value;
-	unsigned c = (res & 0x01) ? CF : 0;
-	res = ((res >> 1) | (res << 7)) & 0xff;
-	set_f(SZP[res] | c);
+	const u8 res = ((value >> 1) | (value << 7)) & 0xff;
+	{
+		QT = 0;
+		m_f.s_val = m_f.z_val = m_f.pv_val = m_f.yx_val = res;
+		m_f.h_val = m_f.n = 0;
+		m_f.c = value & 0x01;
+	}
+
 	return res;
 }
 
@@ -331,10 +433,14 @@ u8 z80_device::rrc(u8 value)
  ***************************************************************/
 u8 z80_device::rl(u8 value)
 {
-	unsigned res = value;
-	unsigned c = (res & 0x80) ? CF : 0;
-	res = ((res << 1) | (F & CF)) & 0xff;
-	set_f(SZP[res] | c);
+	const u8 res = ((value << 1) + m_f.c) & 0xff;
+	{
+		QT = 0;
+		m_f.s_val = m_f.z_val = m_f.pv_val = m_f.yx_val = res;
+		m_f.h_val = m_f.n = 0;
+		m_f.c = value & 0x80;
+	}
+
 	return res;
 }
 
@@ -343,10 +449,14 @@ u8 z80_device::rl(u8 value)
  ***************************************************************/
 u8 z80_device::rr(u8 value)
 {
-	unsigned res = value;
-	unsigned c = (res & 0x01) ? CF : 0;
-	res = ((res >> 1) | (F << 7)) & 0xff;
-	set_f(SZP[res] | c);
+	const u8 res = ((value >> 1) | (m_f.c << 7)) & 0xff;
+	{
+		QT = 0;
+		m_f.s_val = m_f.z_val = m_f.pv_val = m_f.yx_val = res;
+		m_f.h_val = m_f.n = 0;
+		m_f.c = value & 0x01;
+	}
+
 	return res;
 }
 
@@ -355,10 +465,14 @@ u8 z80_device::rr(u8 value)
  ***************************************************************/
 u8 z80_device::sla(u8 value)
 {
-	unsigned res = value;
-	unsigned c = (res & 0x80) ? CF : 0;
-	res = (res << 1) & 0xff;
-	set_f(SZP[res] | c);
+	const u8 res = (value << 1) & 0xff;
+	{
+		QT = 0;
+		m_f.s_val = m_f.z_val = m_f.pv_val = m_f.yx_val = res;
+		m_f.h_val = m_f.n = 0;
+		m_f.c = value & 0x80;
+	}
+
 	return res;
 }
 
@@ -367,10 +481,14 @@ u8 z80_device::sla(u8 value)
  ***************************************************************/
 u8 z80_device::sra(u8 value)
 {
-	unsigned res = value;
-	unsigned c = (res & 0x01) ? CF : 0;
-	res = ((res >> 1) | (res & 0x80)) & 0xff;
-	set_f(SZP[res] | c);
+	const u8 res = ((value >> 1) | (value & 0x80)) & 0xff;
+	{
+		QT = 0;
+		m_f.s_val = m_f.z_val = m_f.pv_val = m_f.yx_val = res;
+		m_f.h_val = m_f.n = 0;
+		m_f.c = value & 0x01;
+	}
+
 	return res;
 }
 
@@ -379,10 +497,14 @@ u8 z80_device::sra(u8 value)
  ***************************************************************/
 u8 z80_device::sll(u8 value)
 {
-	unsigned res = value;
-	unsigned c = (res & 0x80) ? CF : 0;
-	res = ((res << 1) | 0x01) & 0xff;
-	set_f(SZP[res] | c);
+	const u8 res = ((value << 1) | 0x01) & 0xff;
+	{
+		QT = 0;
+		m_f.s_val = m_f.z_val = m_f.pv_val = m_f.yx_val = res;
+		m_f.h_val = m_f.n = 0;
+		m_f.c = value & 0x80;
+	}
+
 	return res;
 }
 
@@ -391,10 +513,14 @@ u8 z80_device::sll(u8 value)
  ***************************************************************/
 u8 z80_device::srl(u8 value)
 {
-	unsigned res = value;
-	unsigned c = (res & 0x01) ? CF : 0;
-	res = (res >> 1) & 0xff;
-	set_f(SZP[res] | c);
+	const u8 res = (value >> 1) & 0xff;
+	{
+		QT = 0;
+		m_f.s_val = m_f.z_val = m_f.pv_val = m_f.yx_val = res;
+		m_f.h_val = m_f.n = 0;
+		m_f.c = value & 0x01;
+	}
+
 	return res;
 }
 
@@ -403,7 +529,11 @@ u8 z80_device::srl(u8 value)
  ***************************************************************/
 void z80_device::bit(int bit, u8 value)
 {
-	set_f((F & CF) | HF | (SZ_BIT[value & (1 << bit)] & ~(YF | XF)) | (value & (YF | XF)));
+	QT = 0;
+	m_f.s_val = m_f.z_val = m_f.pv_val = value & (1 << bit);
+	m_f.h_val = HF;
+	m_f.n = 0;
+	m_f.yx_val = value;
 }
 
 /***************************************************************
@@ -411,7 +541,11 @@ void z80_device::bit(int bit, u8 value)
  ***************************************************************/
 void z80_device::bit_hl(int bit, u8 value)
 {
-	set_f((F & CF) | HF | (SZ_BIT[value & (1 << bit)] & ~(YF | XF)) | (WZ_H & (YF | XF)));
+	QT = 0;
+	m_f.s_val = m_f.z_val = m_f.pv_val = value & (1 << bit);
+	m_f.h_val = HF;
+	m_f.n = 0;
+	m_f.yx_val = WZ_H;
 }
 
 /***************************************************************
@@ -419,7 +553,11 @@ void z80_device::bit_hl(int bit, u8 value)
  ***************************************************************/
 void z80_device::bit_xy(int bit, u8 value)
 {
-	set_f((F & CF) | HF | (SZ_BIT[value & (1 << bit)] & ~(YF | XF)) | ((m_ea >> 8) & (YF | XF)));
+	QT = 0;
+	m_f.s_val = m_f.z_val = m_f.pv_val = value & (1 << bit);
+	m_f.h_val = HF;
+	m_f.n = 0;
+	m_f.yx_val = m_ea >> 8;
 }
 
 /***************************************************************
@@ -440,26 +578,28 @@ u8 z80_device::set(int bit, u8 value)
 
 void z80_device::block_io_interrupted_flags()
 {
-	F &= ~(YF | XF);
-	F |= (PC >> 8) & (YF | XF);
-	if (F & CF)
+	m_f.yx_val = PC >> 8;
+
+	const u8 pv_old = m_f.pv();
+	if (m_f.c)
 	{
-		F &= ~HF;
+		m_f.h_val = 0;
 		if (TDAT8 & 0x80)
 		{
-			F ^= (SZP[(B - 1) & 0x07] ^ PF) & PF;
-			if ((B & 0x0f) == 0x00) F |= HF;
+			m_f.pv_val = (B - 1) & 0x07;
+			if ((B & 0x0f) == 0x00) m_f.h_val = HF;
 		}
 		else
 		{
-			F ^= (SZP[(B + 1) & 0x07] ^ PF) & PF;
-			if ((B & 0x0f) == 0x0f) F |= HF;
+			m_f.pv_val = (B + 1) & 0x07;
+			if ((B & 0x0f) == 0x0f) m_f.h_val = HF;
 		}
 	}
 	else
 	{
-		F ^=(SZP[B & 0x07] ^ PF) & PF;
+		m_f.pv_val = B & 0x07;
 	}
+	m_f.pv_val = (pv_old ^ m_f.pv()) & PF;
 }
 
 /***************************************************************
@@ -468,13 +608,7 @@ void z80_device::block_io_interrupted_flags()
 void z80_device::ei()
 {
 	m_iff1 = m_iff2 = 1;
-	m_after_ei = true;
-}
-
-void z80_device::set_f(u8 f)
-{
-	QT = 0;
-	F = f;
+	set_service_attention<SA_AFTER_EI, 1>();
 }
 
 void z80_device::illegal_1()
@@ -487,14 +621,6 @@ void z80_device::illegal_2()
 {
 	LOGMASKED(LOG_UNDOC, "ill. opcode $ed $%02x\n",
 			m_opcodes.read_byte((PC - 1) & 0xffff));
-}
-
-u8 z80_device::flags_szyxc(u16 value)
-{
-	u8 f = value & (SF | YF | XF);  // SF + undocumented flag bits 5+3
-	f |= u8(value) ? 0 : ZF;
-	f |= (value >> 8) & CF;
-	return f;
 }
 
 
@@ -515,29 +641,6 @@ void z80_device::device_validity_check(validity_checker &valid) const
 
 void z80_device::device_start()
 {
-	if (!tables_initialised)
-	{
-		for (int i = 0; i < 256; i++)
-		{
-			int p = 0;
-			for (int b = 0; b < 8; b++)
-				p += BIT(i, b);
-			SZ[i] = i ? i & SF : ZF;
-			SZ[i] |= (i & (YF | XF));         // undocumented flag bits 5+3
-			SZ_BIT[i] = i ? i & SF : ZF | PF;
-			SZ_BIT[i] |= (i & (YF | XF));     // undocumented flag bits 5+3
-			SZP[i] = SZ[i] | ((p & 1) ? 0 : PF);
-			SZHV_inc[i] = SZ[i];
-			if (i == 0x80) SZHV_inc[i] |= VF;
-			if ((i & 0x0f) == 0x00) SZHV_inc[i] |= HF;
-			SZHV_dec[i] = SZ[i] | NF;
-			if (i == 0x7f) SZHV_dec[i] |= VF;
-			if ((i & 0x0f) == 0x0f) SZHV_dec[i] |= HF;
-		}
-
-		tables_initialised = true;
-	}
-
 	save_item(NAME(PRVPC));
 	save_item(NAME(PC));
 	save_item(NAME(SP));
@@ -562,16 +665,13 @@ void z80_device::device_start()
 	save_item(NAME(m_im));
 	save_item(NAME(m_i));
 	save_item(NAME(m_nmi_state));
-	save_item(NAME(m_nmi_pending));
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_wait_state));
 	save_item(NAME(m_busrq_state));
 	save_item(NAME(m_busack_state));
-	save_item(NAME(m_after_ei));
-	save_item(NAME(m_after_ldair));
 	save_item(NAME(m_ea));
+	save_item(NAME(m_service_attention));
 	save_item(NAME(m_tmp_irq_vector));
-	save_item(NAME(m_shared_addr.w));
 	save_item(NAME(m_shared_data.w));
 	save_item(NAME(m_shared_data2.w));
 	save_item(NAME(m_rtemp));
@@ -582,6 +682,9 @@ void z80_device::device_start()
 	PC = 0;
 	SP = 0;
 	AF = 0;
+	set_f(0);
+	Q = 0;
+	QT = 0;
 	BC = 0;
 	DE = 0;
 	HL = 0;
@@ -592,8 +695,6 @@ void z80_device::device_start()
 	m_bc2.w = 0;
 	m_de2.w = 0;
 	m_hl2.w = 0;
-	QT = 0;
-	Q = 0;
 	R = 0;
 	R2 = 0;
 	m_iff1 = 0;
@@ -602,14 +703,12 @@ void z80_device::device_start()
 	m_im = 0;
 	m_i = 0;
 	m_nmi_state = 0;
-	m_nmi_pending = false;
 	m_irq_state = 0;
 	m_wait_state = 0;
 	m_busrq_state = 0;
 	m_busack_state = 0;
-	m_after_ei = false;
-	m_after_ldair = false;
 	m_ea = 0;
+	m_service_attention = 0;
 	m_rtemp = 0;
 
 	space(AS_PROGRAM).cache(m_args);
@@ -618,7 +717,7 @@ void z80_device::device_start()
 	space(AS_IO).specific(m_io);
 
 	IX = IY = 0xffff; // IX and IY are FFFF after a reset!
-	set_f(ZF);        // Zero flag is set
+	m_f.z_val = 0; // Zero flag is set
 
 	// set up the state table
 	state_add(STATE_GENPC,     "PC",        m_pc.w).callimport();
@@ -626,13 +725,14 @@ void z80_device::device_start()
 	state_add(Z80_SP,          "SP",        SP);
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  F).noshow().formatstr("%8s");
 	state_add(Z80_A,           "A",         A).noshow();
+	state_add(Z80_F,           "F",         F).noshow().callimport().callexport();
 	state_add(Z80_B,           "B",         B).noshow();
 	state_add(Z80_C,           "C",         C).noshow();
 	state_add(Z80_D,           "D",         D).noshow();
 	state_add(Z80_E,           "E",         E).noshow();
 	state_add(Z80_H,           "H",         H).noshow();
 	state_add(Z80_L,           "L",         L).noshow();
-	state_add(Z80_AF,          "AF",        AF);
+	state_add(Z80_AF,          "AF",        AF).callimport().callexport();
 	state_add(Z80_BC,          "BC",        BC);
 	state_add(Z80_DE,          "DE",        DE);
 	state_add(Z80_HL,          "HL",        HL);
@@ -662,16 +762,17 @@ void z80_device::device_reset()
 	leave_halt();
 
 	m_ref = 0xffff00;
-	PC = 0x0000;
+	PC = 0;
 	WZ = PC;
 	m_i = 0;
 	m_r = 0;
 	m_r2 = 0;
-	m_nmi_pending = false;
-	m_after_ei = false;
-	m_after_ldair = false;
 	m_iff1 = 0;
 	m_iff2 = 0;
+
+	set_service_attention<SA_NMI_PENDING, 0>();
+	set_service_attention<SA_AFTER_EI, 0>();
+	set_service_attention<SA_AFTER_LDAIR, 0>();
 }
 
 /****************************************************************************
@@ -688,12 +789,16 @@ void z80_device::execute_set_input(int inputnum, int state)
 	{
 	case Z80_INPUT_LINE_BUSRQ:
 		m_busrq_state = state;
+		if (state != CLEAR_LINE)
+			set_service_attention<SA_BUSRQ, 1>();
+		else
+			set_service_attention<SA_BUSRQ, 0>();
 		break;
 
 	case INPUT_LINE_NMI:
 		// mark an NMI pending on the rising edge
 		if (m_nmi_state == CLEAR_LINE && state != CLEAR_LINE)
-			m_nmi_pending = true;
+			set_service_attention<SA_NMI_PENDING, 1>();
 		m_nmi_state = state;
 		break;
 
@@ -702,6 +807,10 @@ void z80_device::execute_set_input(int inputnum, int state)
 		m_irq_state = state;
 		if (daisy_chain_present())
 			m_irq_state = (daisy_update_irq_state() == ASSERT_LINE) ? ASSERT_LINE : m_irq_state;
+		if (state != CLEAR_LINE)
+			set_service_attention<SA_IRQ_ON, 1>();
+		else
+			set_service_attention<SA_IRQ_ON, 0>();
 
 		// the main execute loop will take the interrupt
 		break;
@@ -728,10 +837,14 @@ void z80_device::state_import(const device_state_entry &entry)
 	case STATE_GENPC:
 		m_prvpc = m_pc;
 		m_ref = 0xffff00;
-		m_after_ei = false;
-		m_after_ldair = false;
+		set_service_attention<SA_AFTER_EI, 0>();
+		if (HAS_LDAIR_QUIRK)
+			set_service_attention<SA_AFTER_LDAIR, 0>();
 		break;
 
+	case Z80_F: case Z80_AF:
+		set_f(F);
+		break;
 	case Z80_R:
 		m_r = m_rtemp & 0x7f;
 		m_r2 = m_rtemp & 0x80;
@@ -746,6 +859,9 @@ void z80_device::state_export(const device_state_entry &entry)
 {
 	switch (entry.index())
 	{
+	case Z80_F: case Z80_AF:
+		F = get_f();
+		break;
 	case Z80_R:
 		m_rtemp = (m_r & 0x7f) | (m_r2 & 0x80);
 		break;
@@ -760,16 +876,18 @@ void z80_device::state_string_export(const device_state_entry &entry, std::strin
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
+		{
 			str = string_format("%c%c%c%c%c%c%c%c",
-				F & 0x80 ? 'S':'.',
-				F & 0x40 ? 'Z':'.',
-				F & 0x20 ? 'Y':'.',
-				F & 0x10 ? 'H':'.',
-				F & 0x08 ? 'X':'.',
-				F & 0x04 ? 'P':'.',
-				F & 0x02 ? 'N':'.',
-				F & 0x01 ? 'C':'.');
-			break;
+				m_f.s()         ? 'S':'.',
+				m_f.z()         ? 'Z':'.',
+				m_f.yx() & 0x20 ? 'Y':'.',
+				m_f.h()         ? 'H':'.',
+				m_f.yx() & 0x08 ? 'X':'.',
+				m_f.pv()        ? 'P':'.',
+				m_f.n           ? 'N':'.',
+				m_f.c           ? 'C':'.');
+		}
+		break;
 	}
 }
 

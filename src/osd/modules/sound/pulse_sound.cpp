@@ -6,7 +6,7 @@
 
     PulseAudio interface.
 
-*******************************************************************c********/
+***************************************************************************/
 
 #include "sound_module.h"
 #include "modules/osdmodule.h"
@@ -130,7 +130,7 @@ const sound_pulse::position_info sound_pulse::position_infos[] = {
 	{ PA_CHANNEL_POSITION_REAR_LEFT,    { -0.2,  0.0, -0.5 } },
 	{ PA_CHANNEL_POSITION_REAR_RIGHT,   {  0.2,  0.0, -0.5 } },
 	{ PA_CHANNEL_POSITION_REAR_CENTER,  {  0.0,  0.0, -0.5 } },
-	{ PA_CHANNEL_POSITION_MAX,          {  0.0,  0.0,  0.0 } }
+	{ PA_CHANNEL_POSITION_MAX,          {  0.0,  0.0, 10.0 } }
 };
 
 
@@ -152,7 +152,6 @@ void sound_pulse::generic_pa_error(const char *msg, int err)
 
 void sound_pulse::context_notify()
 {
-	fprintf(stderr, "context notify\n");
 	pa_context_state state = pa_context_get_state(m_context);
 	if(state == PA_CONTEXT_READY) {
 		pa_context_subscribe(m_context, PA_SUBSCRIPTION_MASK_ALL, nullptr, this);
@@ -173,7 +172,6 @@ void sound_pulse::stream_notify(stream_info *stream)
 {
 	pa_stream_state state = pa_stream_get_state(stream->m_stream);
 
-	fprintf(stderr, "stream notify\n");
 	if(state == PA_STREAM_READY || state == PA_STREAM_FAILED || state == PA_STREAM_TERMINATED) {
 		m_wait_stream = false;
 		pa_threaded_mainloop_signal(m_mainloop, 0);
@@ -216,7 +214,6 @@ void sound_pulse::server_info(const pa_server_info *i)
 {
 	m_default_audio_sink = i->default_sink_name;
 	m_default_audio_source = i->default_source_name;
-	fprintf(stderr, "defaults %s %s\n", i->default_sink_name, i->default_source_name);
 	m_generation++;
 	if(m_wait_init) {
 		m_wait_init = false;
@@ -243,7 +240,6 @@ void sound_pulse::source_info(const pa_source_info *i, int eol)
 		return;
 	}
 
-	fprintf(stderr, "new source %d (%s)\n", i->index, i->description);
 	m_node_osdid_to_id[m_node_current_id] = i->index;
 	auto &node = m_nodes.emplace(i->index, node_info(this, i->index, m_node_current_id++, AREC, i->name, i->description)).first->second;
 
@@ -274,8 +270,6 @@ void sound_pulse::sink_info_new(const pa_sink_info *i, int eol)
 		return;
 	}
 
-	fprintf(stderr, "new sink %d (%s)\n", i->index, i->description);
-	fprintf(stderr, "rate %d\n", i->sample_spec.rate);
 	m_node_osdid_to_id[m_node_current_id] = i->index;
 	auto &node = m_nodes.emplace(i->index, node_info(this, i->index, m_node_current_id++, APLAY, i->name, i->description)).first->second;
 
@@ -312,13 +306,11 @@ void sound_pulse::sink_input_info_change(stream_info *stream, const pa_sink_inpu
 	for(uint32_t port = 0; port != stream->m_channels; port++)
 		stream->m_volumes[port] = pa_sw_volume_to_dB(i->volume.values[port]);
 
-	fprintf(stderr, "change stream %d/%d sink=%s [%f %f]\n", stream->m_osdid, stream->m_pulse_id, stream->m_target_node->m_desc.c_str(), stream->m_volumes[0], stream->m_volumes[1]);
 	m_generation++;
 }
 
 void sound_pulse::i_sink_input_info_change(pa_context *, const pa_sink_input_info *i, int eol, void *self)
 {
-	fprintf(stderr, "i_sink_input_info_change %p %d\n", i, eol);
 	stream_info *stream = static_cast<stream_info *>(self);
 	stream->m_pulse->sink_input_info_change(stream, i, eol);
 }
@@ -326,22 +318,19 @@ void sound_pulse::i_sink_input_info_change(pa_context *, const pa_sink_input_inf
 void sound_pulse::context_subscribe(pa_subscription_event_type_t t, uint32_t idx)
 {
 	// This is called with the thread locked
-	static const char *const evt[] = { "sink", "source", "sink-input", "source-output", "module", "client", "cache", "server", "autoload", "card" };
-	static const char *const evt2[] = { "new", "change", "remove" };
 	switch(int(t)) {
 	case PA_SUBSCRIPTION_EVENT_REMOVE | PA_SUBSCRIPTION_EVENT_SINK:
 	case PA_SUBSCRIPTION_EVENT_REMOVE | PA_SUBSCRIPTION_EVENT_SOURCE: {
 		auto si = m_nodes.find(idx);
 		if(si == m_nodes.end())
 			break;
-		fprintf(stderr, "removing %s\n", si->second.m_desc.c_str());
 		for(auto &istream : m_streams)
 			if(istream.second.m_target_node == &si->second)
 				istream.second.m_target_node = nullptr;
 		m_nodes.erase(si);
 		m_generation++;
 		break;
-	}		
+	}
 
 	case PA_SUBSCRIPTION_EVENT_NEW | PA_SUBSCRIPTION_EVENT_SINK:
 		pa_context_get_sink_info_by_index(m_context, idx, i_sink_info_new, this);
@@ -367,7 +356,7 @@ void sound_pulse::context_subscribe(pa_subscription_event_type_t t, uint32_t idx
 	}
 
 	default:
-		fprintf(stderr, "event %s %s  %d\n", evt2[t>>4], evt[t&15], idx);
+		break;
 	}
 }
 
@@ -400,6 +389,9 @@ int sound_pulse::init(osd_interface &osd, osd_options const &options)
 	if(m_generation >= 0x80000000)
 		return 1;
 
+	if(options.audio_latency() > 0.0f)
+		osd_printf_verbose("Sound: %s module does not support audio_latency option\n", name());
+
 	return 0;
 }
 
@@ -422,6 +414,7 @@ osd::audio_info sound_pulse::get_information()
 	uint32_t node = 0;
 	for(auto &inode : m_nodes) {
 		result.m_nodes[node].m_name = inode.second.m_desc;
+		result.m_nodes[node].m_display_name = inode.second.m_desc;
 		result.m_nodes[node].m_id = inode.second.m_osdid;
 		result.m_nodes[node].m_rate = inode.second.m_rate;
 		result.m_nodes[node].m_sinks = inode.second.m_sink_port_count;
@@ -489,7 +482,6 @@ uint32_t sound_pulse::stream_sink_open(uint32_t node, std::string name, uint32_t
 	stream.m_pulse_id = pa_stream_get_index(stream.m_stream);
 	m_stream_pulse_id_to_osdid[stream.m_pulse_id] = id;
 
-	fprintf(stderr, "stream id %d\n", stream.m_pulse_id);
 	pa_threaded_mainloop_unlock(m_mainloop);
 
 	return id;
@@ -536,6 +528,13 @@ void sound_pulse::exit()
 
 	pa_context_unref(m_context);
 	pa_threaded_mainloop_free(m_mainloop);
+
+	m_nodes.clear();
+	m_node_osdid_to_id.clear();
+	m_streams.clear();
+	m_stream_pulse_id_to_osdid.clear();
+	m_default_audio_sink = "";
+	m_default_audio_source = "";
 }
 
 #else

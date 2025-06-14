@@ -232,7 +232,12 @@ uint16_t md_boot_state::barek3mba_r() // missing PIC dump, simulated for now
 		return 0x0300;
 
 	if (m_maincpu->pc() == 0x4dc34)
-		return 0x0ff0; // TODO: fix this, should probably read coin inputs, as is gives 9 credits at start up
+		return 0x0201 ^ (BIT(ioport("COINS")->read(), 0) << 9); // TODO: fix this, should probably read coin inputs, as is gives 9 credits at start up
+
+	// handshake flag for previous command
+	// TODO: timing should be faster than PORT_IMPULSE(1)
+	if (m_maincpu->pc() == 0x4dc5a)
+		return BIT(ioport("COINS")->read(), 0) ^ 1;
 
 	logerror("barek3mba_r : %06x\n", m_maincpu->pc());
 	return 0x0000;
@@ -899,6 +904,14 @@ INPUT_PORTS_START( barek3 )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
 INPUT_PORTS_END
 
+INPUT_PORTS_START( barek3a )
+	PORT_INCLUDE( barek3 )
+
+	PORT_MODIFY("COINS")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x00fe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+INPUT_PORTS_END
+
 INPUT_PORTS_START( bk3ssrmb )
 	PORT_INCLUDE( md_common )
 
@@ -1430,7 +1443,7 @@ GAME( 1993, aladmdb,   0,        md_boot_mcu, aladmdb,  md_boot_mcu_state, init_
 GAME( 1993, sonic2mb,  0,        md_bootleg,  sonic2mb, md_boot_state,     init_sonic2mb, ROT0, "bootleg / Sega", "Sonic The Hedgehog 2 (bootleg of Mega Drive version)", 0 ) // Flying wires going through the empty PIC space aren't completely understood
 GAME( 1993, sonic3mb,  0,        md_bootleg,  sonic3mb, md_sonic3bl_state, init_sonic3mb, ROT0, "bootleg / Sega", "Sonic The Hedgehog 3 (bootleg of Mega Drive version)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // undumped PIC
 GAME( 1994, barek2mb,  0,        md_boot_mcu, barek2,   md_boot_mcu_state, init_megadrij, ROT0, "bootleg / Sega", "Bare Knuckle II (bootleg of Mega Drive version)",      0 ) // PCB labeled "BK-059"
-GAME( 1994, barek3mba, barek3mb, megadrvb,    barek3,   md_boot_state,     init_barek3a,  ROT0, "bootleg / Sega", "Bare Knuckle III (bootleg of Mega Drive version)",     MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // undumped PIC
+GAME( 1994, barek3mba, barek3mb, megadrvb,    barek3a,  md_boot_state,     init_barek3a,  ROT0, "bootleg / Sega", "Bare Knuckle III (bootleg of Mega Drive version)",     MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // undumped PIC
 GAME( 1993, twinktmb,  0,        md_bootleg,  twinktmb, md_boot_state,     init_twinktmb, ROT0, "bootleg / Sega", "Twinkle Tale (bootleg of Mega Drive version)",         MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // Needs PIC decap or simulation
 GAME( 1993, jparkmb,   0,        md_boot_mcu, jparkmb,  md_boot_mcu_state, init_megadrij, ROT0, "bootleg / Sega", "Jurassic Park (bootleg of Mega Drive version)",        0 ) // PCB labeled "JPA-028"
 

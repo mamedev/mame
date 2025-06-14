@@ -554,7 +554,15 @@ ROM_START( lyon32 ) // V207 AE64 5805
 	BAVARIA_BOARD_ROM()
 ROM_END
 
-ROM_START( lyon16 ) // V207 EC82 5805
+ROM_START( lyon16 ) // V209 DEE0 5805
+	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE("lyon_16bit_even_v_209", 0x00000, 0x10000, CRC(a8b91d0d) SHA1(ba9d5ce827250a044c8f317dbc7cb536a6f521b5) )
+	ROM_LOAD16_BYTE("lyon_16bit_odd_v_209",  0x00001, 0x10000, CRC(a335753f) SHA1(32604f00ab54da884425cb19fdc9c03f793ee521) )
+
+	BAVARIA_BOARD_ROM()
+ROM_END
+
+ROM_START( lyon16a ) // V207 EC82 5805
 	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("lyon_16bit_even_v_207", 0x00000, 0x10000, CRC(497bd41a) SHA1(3ffefeeac694f49997c10d248ec6a7aa932898a4) )
 	ROM_LOAD16_BYTE("lyon_16bit_odd_v_207",  0x00001, 0x10000, CRC(f9de3f54) SHA1(4060e29566d2f40122ccde3c1f84c94a9c1ed54f) )
@@ -622,7 +630,7 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE INPUT   CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1988, alm32,   0,      0,      alm32,  alm32,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Almeria 32 Bit", MACHINE_SUPPORTS_SAVE ) // 0.12 or 0.121?
+SYST( 1988, alm32,   0,      0,      alm32,  alm32,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Almeria 32 Bit (v0.12?)", MACHINE_SUPPORTS_SAVE ) // 0.12 or 0.121?
 SYST( 1988, alm16,   alm32,  0,      alm16,  alm16,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Almeria 16 Bit (v0.13)", MACHINE_SUPPORTS_SAVE )
 SYST( 1988, alm16a,  alm32,  0,      alm16,  alm16,  mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Almeria 16 Bit (v0.121)", MACHINE_SUPPORTS_SAVE )
 
@@ -631,8 +639,9 @@ SYST( 1989, port32a, port32, 0,      port32, port32, mmodular_state, empty_init,
 SYST( 1989, port32b, port32, 0,      port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 32 Bit (v1.01)", MACHINE_SUPPORTS_SAVE )
 SYST( 1989, port16,  port32, 0,      port16, port16, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Portorose 16 Bit (v1.01)", MACHINE_SUPPORTS_SAVE )
 
-SYST( 1990, lyon32,  0,      0,      port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Lyon 32 Bit", MACHINE_SUPPORTS_SAVE )
-SYST( 1990, lyon16,  lyon32, 0,      port16, port16, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Lyon 16 Bit", MACHINE_SUPPORTS_SAVE )
+SYST( 1990, lyon32,  0,      0,      port32, port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Lyon 32 Bit (v2.07)", MACHINE_SUPPORTS_SAVE )
+SYST( 1990, lyon16,  lyon32, 0,      port16, port16, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Lyon 16 Bit (v2.09)", MACHINE_SUPPORTS_SAVE )
+SYST( 1990, lyon16a, lyon32, 0,      port16, port16, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Lyon 16 Bit (v2.07)", MACHINE_SUPPORTS_SAVE )
 
 SYST( 1991, van32,   0,      0,      van32,  port32, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Vancouver 32 Bit", MACHINE_SUPPORTS_SAVE )
 SYST( 1991, van16,   van32,  0,      van16,  port16, mmodular_state, empty_init, "Hegener + Glaser", "Mephisto Vancouver 16 Bit", MACHINE_SUPPORTS_SAVE )
