@@ -31,10 +31,10 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 
+#include "machine/gen_latch.h"
+
 #include "sound/msm5205.h"
 #include "sound/ymopl.h"
-
-#include "machine/gen_latch.h"
 
 #include "emupal.h"
 #include "screen.h"
