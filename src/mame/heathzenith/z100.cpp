@@ -352,6 +352,11 @@ private:
 
 void z100_state::machine_start()
 {
+
+	u32 parity_size = m_ram.bytes() / 32;
+
+	m_parity = make_unique_clear<u32[]>(parity_size);
+
 	save_item(NAME(m_kbd_col));
 	save_item(NAME(m_vram_enable));
 	save_item(NAME(m_vram_64k));
@@ -363,8 +368,8 @@ void z100_state::machine_start()
 	save_item(NAME(m_start_addr));
 	save_item(NAME(m_vidint_enable));
 	save_item(NAME(m_memory_ctrl));
-
-	m_parity = make_unique_clear<u32[]>(m_ram.bytes() / 32);
+	save_pointer(NAME(m_gvram), 0x30000);
+	save_pointer(NAME(m_parity), parity_size);
 }
 
 void z100_state::video_start()
@@ -779,13 +784,13 @@ INPUT_PORTS_START( z100 )
 	PORT_DIPNAME( 0x08, 0x00, "Auto-boot" )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x10, 0x00, "Not used" )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "Not used" )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Not used" )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x00, "Video vertical scan frequency" )
