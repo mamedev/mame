@@ -274,7 +274,7 @@ void gaelco_state::oki_map(address_map &map)
 void xorwflat_state::sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0xc000, 0xd000).ram();
+	map(0xc000, 0xcfff).ram();
 	map(0xf800, 0xffff).ram();
 }
 
@@ -282,8 +282,8 @@ void xorwflat_state::sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 
-	map(0xc0, 0xc0).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x88, 0x89).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
+	map(0xc0, 0xc0).r("soundlatch", FUNC(generic_latch_8_device::read));
 }
 
 /*************************************
@@ -940,7 +940,6 @@ void xorwflat_state::xorwflat(machine_config &config)
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	// what is the sound hardware? there was no sample ROM, so probably YM of some kind
 	YM3812(config, "ymsnd", 4'000'000).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
