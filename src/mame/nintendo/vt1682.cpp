@@ -735,6 +735,27 @@ private:
 	required_ioport m_io_p1;
 };
 
+class vt1682_anpncpc_state : public vt1682_lxts3_state
+{
+public:
+	vt1682_anpncpc_state(const machine_config& mconfig, device_type type, const char* tag) :
+		vt1682_lxts3_state(mconfig, type, tag)
+	{ }
+
+	void anpncpc(machine_config& config);
+
+protected:
+	virtual void clear_sound_reset_line() override
+	{
+		vt_vt1682_state::clear_sound_reset_line();
+		m_soundcpu->set_state_int(M6502_S, 0x1f0+3);
+	}
+
+private:
+	uint8_t iof_i2c_r() { return m_seeprom->read_sda() ? 0x6 : 0x2; }
+	void iof_i2c_w(uint8_t data) { m_seeprom->write_scl(BIT(data, 1)); m_seeprom->write_sda(BIT(data, 2)); }
+};
+
 class vt1682_mx10_state : public vt_vt1682_state
 {
 public:
@@ -2796,12 +2817,13 @@ void vt_vt1682_state::vt1682_2106_enable_regs_w(uint8_t data)
 {
 	// COMR6 is used for banking
 	LOGMASKED(LOG_OTHER, "%s: vt1682_2106_enable_regs_w writing: %02x (scpurn:%1x scpuon:%1x spion:%1x uarton:%1x tvon:%1x lcdon:%1x)\n", machine().describe_context(), data,
-		(data & 0x20) >> 5, (data & 0x10) >> 4, (data & 0x08) >> 3, (data & 0x04) >> 2, (data & 0x02) >> 1, (data & 0x01));
+		BIT(data, 5), BIT(data, 4), BIT(data, 3), BIT(data, 2), BIT(data, 1), BIT(data, 0));
 	m_2106_enable_reg = data;
 
-	if (data & 0x20)
+	if (BIT(data, 5))
 	{
-		clear_sound_reset_line();
+		if (m_scpu_is_in_reset)
+			clear_sound_reset_line();
 	}
 	else
 	{
@@ -6247,6 +6269,16 @@ void vt1682_lxts3_state::vt1682_24c02(machine_config& config)
 	I2C_24C02(config, m_seeprom);
 }
 
+void vt1682_anpncpc_state::anpncpc(machine_config& config)
+{
+	vt1682_lxts3(config);
+
+	m_io->portf_in().set(FUNC(vt1682_anpncpc_state::iof_i2c_r));
+	m_io->portf_out().set(FUNC(vt1682_anpncpc_state::iof_i2c_w));
+
+	I2C_24C64(config, m_seeprom);
+}
+
 void vt1682_mx10_state::mx10(machine_config& config)
 {
 	vt_vt1682_ntscbase(config);
@@ -6526,7 +6558,7 @@ ROM_START( anpncpc )
 	ROM_REGION( 0x2000000, "mainrom", ROMREGION_ERASE00 )
 	ROM_LOAD( "s29gl064a10tfir3.u12", 0x00000, 0x800000, CRC(7a801dd5) SHA1(1c956939ed62069564e1d008cbfe405e0a067092) )
 
-	ROM_REGION( 0x2000, "i2cmem", ROMREGION_ERASE00 ) // probably just settings / profiles, remove later if so
+	ROM_REGION( 0x2000, "seeprom", ROMREGION_ERASE00 ) // probably just settings / profiles, remove later if so
 	ROM_LOAD( "l24c64.u5", 0x00000, 0x2000, CRC(968f8234) SHA1(6fb961a06892e4a577f78b3687c428b8e1c4c7d3) )
 ROM_END
 
@@ -6640,7 +6672,7 @@ CONS( 200?, icb_dp,   0,  0,   vt1682_lxts3, icb,   vt1682_lxts3_state, regular_
 CONS( 200?, gm235upc,  0,  0,  gm235upc, gm235upc, vt1682_dance_state, regular_init, "TimeTop", "Ultimate Pocket Console GM-235", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
 // "Anpanman Color PC" (アンパンマンカラーパソコン)
-CONS( 2009, anpncpc,   0,  0,  vt1682_lxts3,   anpncpc, vt1682_lxts3_state, regular_init,  "Bandai", "Anpanman Color PC (Japan)", MACHINE_NOT_WORKING )
+CONS( 2009, anpncpc,   0,  0,  anpncpc, anpncpc, vt1682_anpncpc_state, regular_init,  "Bandai", "Anpanman Color PC (Japan)", MACHINE_NOT_WORKING )
 
 // as with others the cmpmx10 and cmpmx11 have minor offset issues in some games, you can see it easily in Jewel Master
 // 2007 is the copyright date shown on all the games, but the unit could have been released later
