@@ -96,8 +96,10 @@ public:
 
 	void xorwflat(machine_config &config) ATTR_COLD;
 
-private:
+protected:
 	virtual void video_start() override ATTR_COLD;
+
+private:
 	void xorwflat_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_audiocpu;
@@ -116,9 +118,10 @@ public:
 
 	void bigkarnk(machine_config &config) ATTR_COLD;
 
-private:
+protected:
 	virtual void video_start() override ATTR_COLD;
 
+private:
 	// devices
 	required_device<cpu_device> m_audiocpu;
 	required_device<generic_latch_8_device> m_soundlatch;
@@ -167,9 +170,10 @@ public:
 
 	void thoop(machine_config &config) ATTR_COLD;
 
-private:
+protected:
 	virtual void video_start() override ATTR_COLD;
 
+private:
 	void thoop_map(address_map &map) ATTR_COLD;
 };
 
