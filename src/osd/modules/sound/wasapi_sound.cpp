@@ -153,11 +153,13 @@ private:
 		std::thread                 m_thread;
 		CRITICAL_SECTION            m_critical_section;
 		abuffer                     m_buffer;
+		std::vector<int16_t>        m_underflow_fill;
 		audio_client_ptr            m_client;
 		audio_render_client_ptr     m_render;
 		audio_capture_client_ptr    m_capture;
 		UINT32                      m_buffer_frames;
-		UINT32                      m_minimum_frames;
+		UINT32                      m_minimum_headroom;
+		bool                        m_underflowing;
 		std::atomic<bool>           m_exiting;
 	};
 
@@ -193,7 +195,7 @@ private:
 			co_task_wave_format_ptr &mix_format,
 			WAVEFORMATEXTENSIBLE &format);
 
-	void cleanup_task();
+	void housekeeping_task();
 
 	mm_device_enumerator_ptr    m_device_enum;
 	std::wstring                m_default_sink_id;
@@ -210,9 +212,10 @@ private:
 	uint32_t                    m_next_stream_id = 1;
 
 	stream_info_vector          m_zombie_streams;
-	std::condition_variable     m_cleanup_condition;
-	std::thread                 m_cleanup_thread;
-	std::mutex                  m_cleanup_mutex;
+	std::vector<std::wstring>   m_updated_devices;
+	std::condition_variable     m_housekeeping_condition;
+	std::thread                 m_housekeeping_thread;
+	std::mutex                  m_housekeeping_mutex;
 
 	float                       m_audio_latency = 0.0F;
 	uint32_t                    m_generation = 1;
@@ -264,9 +267,11 @@ sound_wasapi::stream_info::stream_info(
 	m_host(host),
 	m_event(std::move(event)),
 	m_buffer(channels),
+	m_underflow_fill(channels, 0U),
 	m_client(std::move(client)),
 	m_buffer_frames(buffer_frames),
-	m_minimum_frames(std::min(buffer_frames, UINT32(rate / 100))),
+	m_minimum_headroom(std::max<UINT32>(lround(host.m_audio_latency * rate), buffer_frames)),
+	m_underflowing(true),
 	m_exiting(false)
 {
 	info.m_node = node.m_id;
@@ -377,9 +382,9 @@ void sound_wasapi::stream_info::purge()
 			stream_lock.unlock();
 			device_lock.unlock();
 
-			std::lock_guard cleanup_lock(m_host.m_cleanup_mutex);
+			std::lock_guard housekeeping_lock(m_host.m_housekeeping_mutex);
 			m_host.m_zombie_streams.emplace_back(std::move(our_pointer));
-			m_host.m_cleanup_condition.notify_one();
+			m_host.m_housekeeping_condition.notify_one();
 		}
 	}
 	EnterCriticalSection(&m_critical_section);
@@ -406,17 +411,34 @@ void sound_wasapi::stream_info::render_task()
 
 			if (SUCCEEDED(result))
 			{
-				auto const available = m_buffer.available();
-				auto const space = m_buffer_frames - padding;
-				UINT32 const maximum = std::min<UINT32>(available, space);
-				locked = std::max<UINT32>(maximum, (padding < m_minimum_frames) ? (m_minimum_frames - padding) : 0U);
+				locked = m_buffer_frames - padding;
 				if (locked)
 					result = m_render->GetBuffer(locked, &data);
 			}
 
 			if (SUCCEEDED(result) && locked)
 			{
-				m_buffer.get(reinterpret_cast<int16_t *>(data), locked);
+				auto const available = m_buffer.available();
+				auto *samples = reinterpret_cast<int16_t *>(data);
+				if (!m_underflowing)
+				{
+					m_buffer.get(samples, locked);
+					if (available < locked)
+					{
+						m_underflowing = true;
+						m_buffer.get(m_underflow_fill.data(), 1);
+					}
+				}
+				else if (available >= m_minimum_headroom)
+				{
+					m_buffer.get(samples, locked);
+					m_underflowing = false;
+				}
+				else
+				{
+					for (UINT32 i = 0; locked > i; ++i, samples += m_buffer.channels())
+						std::copy_n(m_underflow_fill.data(), m_buffer.channels(), samples);
+				}
 				result = m_render->ReleaseBuffer(locked, 0);
 			}
 
@@ -499,7 +521,7 @@ int sound_wasapi::init(osd_interface &osd, osd_options const &options)
 	HRESULT result;
 
 	// get relevant options
-	m_audio_latency = options.audio_latency();
+	m_audio_latency = options.audio_latency() * 20e-3F;
 	if (m_audio_latency == 0.0F)
 		m_audio_latency = 0.03F;
 	m_audio_latency = std::clamp(m_audio_latency, 0.01F, 1.0F);
@@ -659,7 +681,8 @@ int sound_wasapi::init(osd_interface &osd, osd_options const &options)
 	}
 
 	// start a thread to clean up removed streams
-	m_cleanup_thread = std::thread([] (sound_wasapi *self) { self->cleanup_task(); }, this);
+	m_updated_devices.reserve(m_device_info.size() * 4); // hopefully avoid reallocations
+	m_housekeeping_thread = std::thread([] (sound_wasapi *self) { self->housekeeping_task(); }, this);
 
 	return 0;
 
@@ -678,17 +701,18 @@ void sound_wasapi::exit()
 		m_endpoint_notifications = false;
 	}
 
-	if (m_cleanup_thread.joinable())
+	if (m_housekeeping_thread.joinable())
 	{
 		{
-			std::lock_guard cleanup_lock(m_cleanup_mutex);
+			std::lock_guard housekeeping_lock(m_housekeeping_mutex);
 			m_exiting = true;
-			m_cleanup_condition.notify_all();
+			m_housekeeping_condition.notify_all();
 		}
-		m_cleanup_thread.join();
+		m_housekeeping_thread.join();
 		m_exiting = false;
 	}
 
+	m_updated_devices.clear();
 	m_zombie_streams.clear();
 	m_stream_info.clear();
 	m_device_info.clear();
@@ -762,7 +786,7 @@ uint32_t sound_wasapi::stream_sink_open(uint32_t node, std::string name, uint32_
 		result = client->Initialize(
 				AUDCLNT_SHAREMODE_SHARED,
 				stream_flags,
-				lround(m_audio_latency * 1e4F), // 100 ns units
+				10 * 10'000, // 10 ms in 100 ns units - it'll give a bigger buffer
 				0,
 				&format.Format,
 				nullptr);
@@ -848,7 +872,7 @@ uint32_t sound_wasapi::stream_sink_open(uint32_t node, std::string name, uint32_
 		// make sure we have space to add it and clean it up before consuming an ID
 		std::lock_guard stream_lock(m_stream_mutex);
 		{
-			std::lock_guard cleanup_lock(m_cleanup_mutex);
+			std::lock_guard housekeeping_lock(m_housekeeping_mutex);
 			m_zombie_streams.reserve(m_zombie_streams.size() + m_stream_info.size() + 1);
 		}
 		m_stream_info.reserve(m_stream_info.size() + 1);
@@ -980,7 +1004,7 @@ uint32_t sound_wasapi::stream_source_open(uint32_t node, std::string name, uint3
 		// make sure we have space to add it and clean it up before consuming an ID
 		std::lock_guard stream_lock(m_stream_mutex);
 		{
-			std::lock_guard cleanup_lock(m_cleanup_mutex);
+			std::lock_guard housekeeping_lock(m_housekeeping_mutex);
 			m_zombie_streams.reserve(m_zombie_streams.size() + m_stream_info.size() + 1);
 		}
 		m_stream_info.reserve(m_stream_info.size() + 1);
@@ -1313,23 +1337,11 @@ HRESULT sound_wasapi::OnPropertyValueChanged(LPCWSTR pwstrDeviceId, PROPERTYKEY 
 		}
 		else if (PKEY_AudioEngine_DeviceFormat == key)
 		{
-			std::lock_guard device_lock(m_device_mutex);
-			std::wstring_view device_id(pwstrDeviceId);
-			auto const pos = find_device(device_id);
-
-			if ((m_device_info.end() != pos) && (pos->device_id == device_id))
-			{
-				// if we don't purge the streams ourselves, they'll get fatal errors anyway
-				remove_device(pos);
-				add_device(find_device(device_id), pwstrDeviceId);
-			}
-			else
-			{
-				// deal with devices added with the format property empty and updated later
-				HRESULT const result = add_device(pos, pwstrDeviceId);
-				if (FAILED(result))
-					return result;
-			}
+			// not safe to lock the device mutex here at all
+			std::wstring device_id(pwstrDeviceId);
+			std::lock_guard housekeeping_lock(m_housekeeping_mutex);
+			m_updated_devices.emplace_back(std::move(device_id));
+			m_housekeeping_condition.notify_one();
 		}
 		return S_OK;
 	}
@@ -1487,7 +1499,7 @@ HRESULT sound_wasapi::remove_device(device_info_vector_iterator pos)
 				stream_info_ptr stream = std::move(*it);
 				it = m_stream_info.erase(it);
 				{
-					std::lock_guard cleanup_lock(m_cleanup_mutex);
+					std::lock_guard housekeeping_lock(m_housekeeping_mutex);
 					m_zombie_streams.emplace_back(std::move(stream));
 				}
 			}
@@ -1499,8 +1511,8 @@ HRESULT sound_wasapi::remove_device(device_info_vector_iterator pos)
 	}
 	if (purged_streams)
 	{
-		std::lock_guard cleanup_lock(m_cleanup_mutex);
-		m_cleanup_condition.notify_one();
+		std::lock_guard housekeeping_lock(m_housekeeping_mutex);
+		m_housekeeping_condition.notify_one();
 	}
 
 	m_device_info.erase(pos);
@@ -1594,22 +1606,52 @@ bool sound_wasapi::activate_audio_client(
 }
 
 
-void sound_wasapi::cleanup_task()
+void sound_wasapi::housekeeping_task()
 {
 	// clean up removed streams on a separate thread
-	std::unique_lock cleanup_lock(m_cleanup_mutex);
+	std::unique_lock housekeeping_lock(m_housekeeping_mutex);
 	while (!m_exiting || !m_zombie_streams.empty())
 	{
-		if (m_zombie_streams.empty())
-			m_cleanup_condition.wait(cleanup_lock);
+		if (m_zombie_streams.empty() && m_updated_devices.empty())
+			m_housekeeping_condition.wait(housekeeping_lock);
+
+		while (!m_exiting && !m_updated_devices.empty())
+		{
+			std::wstring const device_id(std::move(m_updated_devices.front()));
+			m_updated_devices.erase(m_updated_devices.begin());
+			for (auto it = m_updated_devices.begin(); m_updated_devices.end() != it; )
+			{
+				if (device_id == *it)
+					it = m_updated_devices.erase(it);
+				else
+					++it;
+			}
+			housekeeping_lock.unlock();
+			{
+				std::lock_guard device_lock(m_device_mutex);
+				auto const pos = find_device(device_id);
+				if ((m_device_info.end() != pos) && (pos->device_id == device_id))
+				{
+					// if we don't purge the streams ourselves, they'll get fatal errors anyway
+					remove_device(pos);
+					add_device(find_device(device_id), device_id.c_str());
+				}
+				else
+				{
+					// deal with devices added with the format property empty and updated later
+					add_device(pos, device_id.c_str());
+				}
+			}
+			housekeeping_lock.lock();
+		}
 
 		while (!m_zombie_streams.empty())
 		{
 			stream_info_ptr stream(std::move(m_zombie_streams.back()));
 			m_zombie_streams.pop_back();
-			cleanup_lock.unlock();
+			housekeeping_lock.unlock();
 			stream.reset();
-			cleanup_lock.lock();
+			housekeeping_lock.lock();
 		}
 	}
 }

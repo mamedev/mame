@@ -30,7 +30,9 @@ Year + Game                                    PCB        CPU    Sound          
 99  Tarzan (V109C)                             NO-0248-1  Z180   U6295           IGS031 IGS025         Battery
 00  Chaoji Da Manguan 2 - Jiaqiang Ban (V100C) NO-0271    68000  K668            IGS031 IGS025         Battery
 00? Jungle King (V103A)                        NO-0230-1  Z180   U6295           IGS031 IGS025 (N9)    Battery
+00? Jungle King (V105US)                       NO-0230-1  Z180   U6295           IGS031 IGS025 (Z9)    Battery
 00? Super Tarzan (V100I)                       NO-0230-1  Z180   K668            IGS031 IGS025         Battery
+00? Tarzan (V106FA)                            NO-0230-1  Z180   K668            IGS031 IGS025 (Z9)    Battery
 00? Happy Skill (V611IT)                       NO-0281    Z180   K668            IGS031 IGS025         Battery
 00? Champion Poker 2 (V100A)                   unreadable Z180   M6295           IGS031 IGS025         Battery
 00? Super Poker (V100xD03) / Formosa           NO-0187    Z180   K668    U3567   IGS017 IGS025         Battery
@@ -6261,6 +6263,24 @@ ROM_START( jking103a )
 	ROM_LOAD( "jking103a_string.key", 0x00, 0xec, BAD_DUMP CRC(8d288f5e) SHA1(19c184600d80838ef04be8ab29c93d91cf3161c9) ) // TODO: check this
 ROM_END
 
+ROM_START( jking105us )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "j_k_v-105us.u9", 0x00000, 0x40000, CRC(96dac1e9) SHA1(56164a3d6df425b992d22bb91be0023e72c04a52) )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "igs_a2104_cg_v110.u3", 0x00000, 0x400000, CRC(dcbff16f) SHA1(2bf77ef4448c26124c8d8d18bb7ffe4105cfa940) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
+	// empty u2
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "igs_t2105_cg_v110.u11", 0x00000, 0x80000, CRC(1d4be260) SHA1(6374c61735144b3ff54d5e490f26adac4a10b14d) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "igs_s2102.u8", 0x00000, 0x80000, CRC(90dda82d) SHA1(67fbc1e8d76b85e124136e2f1df09c8b6c5a8f97) )
+
+	ROM_REGION( 0xec, "igs_string", 0 )
+	ROM_LOAD( "jking105us_string.key", 0x00, 0xec, BAD_DUMP CRC(8d288f5e) SHA1(19c184600d80838ef04be8ab29c93d91cf3161c9) ) // TODO: check this
+ROM_END
+
 // IGS PCB NO-0230-1 (IGS025 without original sticker)
 ROM_START( tarzan103m )
 	ROM_REGION( 0x40000, "maincpu", 0 )
@@ -6283,6 +6303,24 @@ ROM_START( tarzan103m )
 
 	ROM_REGION( 0xec, "igs_string", 0 )
 	ROM_LOAD( "tarzan103m_string.key", 0x00, 0xec, CRC(b33f5050) SHA1(900d3c48944dbdd95d9e48d74c355e82e00ac012) )
+ROM_END
+
+ROM_START( tarzan106fa )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "t_z_v-106fa.u9", 0x00000, 0x40000, CRC(588caceb) SHA1(5fe9c3679edb921b3e031b05a6fb683a8b02fc44) )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "igs_a2104_cg_v110.u3", 0x00000, 0x400000, CRC(dcbff16f) SHA1(2bf77ef4448c26124c8d8d18bb7ffe4105cfa940) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
+	// empty u2
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "igs_t2105_cg_v110.u11", 0x00000, 0x80000, CRC(1d4be260) SHA1(6374c61735144b3ff54d5e490f26adac4a10b14d) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "igs_s2102.u8", 0x00000, 0x80000, CRC(90dda82d) SHA1(67fbc1e8d76b85e124136e2f1df09c8b6c5a8f97) )
+
+	ROM_REGION( 0xec, "igs_string", 0 )
+	ROM_LOAD( "tarzan106fa_string.key", 0x00, 0xec, BAD_DUMP CRC(8d288f5e) SHA1(19c184600d80838ef04be8ab29c93d91cf3161c9) ) // TODO: check this
 ROM_END
 
 
@@ -6436,8 +6474,10 @@ GAME ( 1999,  tarzanb,     tarzanc,  tarzan,     tarzan,      igs017_state, init
 GAME ( 2000,  sdmg2p,      0,        sdmg2p,     sdmg2p,      igs017_state, init_sdmg2p,     ROT0, "IGS", "Maque Wangchao / Chaoji Da Manguan 2 - Jiaqiang Ban (China, V100C)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 麻雀王朝 / 超級大滿貫 2 -加強版 protection kicks in after starting game, hopper isn't hooked up correctly
 GAMEL( 2000?, starzan,     0,        starzan,    starzan,     igs017_state, init_starzan,    ROT0, "IGS (G.F. Gioca license)", "Super Tarzan (Italy, V100I)",                   0, layout_igsslot )
 GAMEL( 2000?, jking103a,   starzan,  starzan,    starzan,     igs017_state, init_jking103a,  ROT0, "IGS", "Jungle King (V103A)",                                                0, layout_igsslot )
+GAMEL( 2000?, jking105us,  starzan,  starzan,    tarzan202fa, igs017_state, init_jking103a,  ROT0, "IGS", "Jungle King (V105US)",                                               0, layout_igsslot )
 GAMEL( 1999,  jking200pr,  starzan,  starzan,    tarzan202fa, igs017_state, init_jking200pr, ROT0, "IGS", "Jungle King (V200PR)",                                               0, layout_igsslot )
 GAME ( 1999?, tarzan103m,  tarzanc,  starzan,    tarzan103m,  igs017_state, init_starzan,    ROT0, "IGS", "Tarzan (V103M)",                                                     0 )
+GAMEL( 1999?, tarzan106fa, tarzanc,  starzan,    tarzan202fa, igs017_state, init_jking103a,  ROT0, "IGS", "Tarzan (V106FA)",                                                    0, layout_igsslot  )
 GAMEL( 1999?, tarzan202fa, tarzanc,  starzan,    tarzan202fa, igs017_state, init_jking103a,  ROT0, "IGS", "Tarzan (V202FA)",                                                    0, layout_igsslot  )
 GAMEL( 2000?, happyskl,    0,        happyskl,   happyskl,    igs017_state, init_happyskl,   ROT0, "IGS", "Happy Skill (Italy, V611IT)",                                        0, layout_igspoker )
 GAMEL( 2000?, cpoker2,     0,        cpoker2,    cpoker2,     igs017_state, init_cpoker2,    ROT0, "IGS", "Champion Poker 2 (V100A)",                                           0, layout_igspoker )

@@ -18,6 +18,7 @@ public:
 	{ }
 
 	void superxavix_i2c_jmat(machine_config &config);
+	void superxavix_i2c_jmat_24c64(machine_config &config);
 
 	void init_xavmusic();
 

@@ -1443,7 +1443,7 @@ void mame_ui_manager::draw_fps_counter(render_container &container)
 			machine().video().speed_text(),
 			0.0f, 0.0f, 1.0f,
 			ui::text_layout::text_justify::RIGHT, ui::text_layout::word_wrapping::WORD,
-			OPAQUE_, rgb_t::white(), rgb_t::black(), nullptr, nullptr);
+			OPAQUE_, colors().text_color(), colors().background_color(), nullptr, nullptr);
 }
 
 
@@ -1459,7 +1459,7 @@ void mame_ui_manager::draw_profiler(render_container &container)
 			text,
 			0.0f, 0.0f, 1.0f,
 			ui::text_layout::text_justify::LEFT, ui::text_layout::word_wrapping::WORD,
-			OPAQUE_, rgb_t::white(), rgb_t::black(), nullptr, nullptr);
+			OPAQUE_, colors().text_color(), colors().background_color(), nullptr, nullptr);
 }
 
 

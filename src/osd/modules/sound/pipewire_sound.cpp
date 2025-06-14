@@ -497,6 +497,9 @@ int sound_pipewire::init(osd_interface &osd, osd_options const &options)
 	if(!m_core)
 		return 1;
 
+	if(options.audio_latency() > 0.0f)
+		osd_printf_verbose("Sound: %s module does not support audio_latency option\n", name());
+
 	pw_core_add_listener(m_core, &m_core_listener, &core_events, this);
 
 	m_registry = pw_core_get_registry(m_core, PW_VERSION_REGISTRY, 0);

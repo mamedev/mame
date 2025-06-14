@@ -137,6 +137,7 @@ function stream_sink_update (
 		}
 	}
 };
+
 function tick (event) {
 	//Find all output channels:
 	for (var bufferCount = 0, buffers = []; bufferCount < 2; ++bufferCount) {

@@ -393,7 +393,7 @@ void atari_fdc_device::clr_serin(int ser_delay)
 	m_serin_chksum = 0;
 	m_serin_offs = 0;
 	m_serin_count = 0;
-	m_pokey->serin_ready(ser_delay * 40);
+	m_serin_timer->adjust(ser_delay * attotime::from_hz(3'579'545 / 2 / 40));
 }
 
 void atari_fdc_device::add_serin(uint8_t data, int with_checksum)
@@ -663,36 +663,42 @@ void atari_fdc_device::a800_serial_write()
 	}
 }
 
-uint8_t atari_fdc_device::serin_r()
+TIMER_CALLBACK_MEMBER(atari_fdc_device::serin_ready)
 {
-	int data = 0x00;
-	int ser_delay = 0;
+	transmit_register_setup(m_serin_buff[m_serin_offs]);
+	if (VERBOSE_SERIAL)
+		logerror("atari serin[$%04x] -> $%02x\n", m_serin_offs, m_serin_buff[m_serin_offs]);
+}
 
+void atari_fdc_device::tra_callback()
+{
+	m_a8sio->data_in_w(transmit_register_get_data_bit());
+}
+
+void atari_fdc_device::tra_complete()
+{
 	if (m_serin_count)
 	{
-		data = m_serin_buff[m_serin_offs];
-		ser_delay = 2 * 40;
+		int ser_delay = 2;
 		if (m_serin_offs < 3)
 		{
-			ser_delay = 4 * 40;
+			ser_delay = 4;
 			if (m_serin_offs < 2)
-				ser_delay = 200 * 40;
+				ser_delay = 200;
 		}
 		m_serin_offs++;
 		if (--m_serin_count == 0)
 			m_serin_offs = 0;
 		else
-			m_pokey->serin_ready(ser_delay);
+			m_serin_timer->adjust(ser_delay * attotime::from_hz(3'579'545 / 2 / 40));
 	}
-
-	if (VERBOSE_SERIAL)
-		logerror("atari serin[$%04x] -> $%02x; delay %d\n", m_serin_offs, data, ser_delay);
-
-	return data;
 }
 
-void atari_fdc_device::serout_w(uint8_t data)
+void atari_fdc_device::rcv_complete()
 {
+	receive_register_extract();
+	uint8_t data = get_received_char();
+
 	/* ignore serial commands if no floppy image is specified */
 	if( !m_drv[0].image )
 		return;
@@ -710,7 +716,7 @@ void atari_fdc_device::serout_w(uint8_t data)
 			/* exclusive or written checksum with calculated */
 			m_serout_chksum ^= data;
 			/* if the attention line is high, this should be data */
-			if (m_pia->irq_b_state())
+			if (m_command)
 				a800_serial_write();
 		}
 		else
@@ -720,8 +726,14 @@ void atari_fdc_device::serout_w(uint8_t data)
 	}
 }
 
-void atari_fdc_device::pia_cb2_w(int state)
+void atari_fdc_device::data_out_w(int state)
 {
+	rx_w(state);
+}
+
+void atari_fdc_device::command_w(int state)
+{
+	m_command = state;
 	if (!state)
 	{
 		clr_serout(4); /* expect 4 command bytes + checksum */
@@ -740,13 +752,13 @@ static const floppy_interface atari_floppy_interface =
 	"floppy_5_25"
 };
 
-DEFINE_DEVICE_TYPE(ATARI_FDC, atari_fdc_device, "atari_fdc", "Atari FDC")
+DEFINE_DEVICE_TYPE(ATARI_FDC, atari_fdc_device, "atari_fdc", "Atari FDC (HLE)")
 
 atari_fdc_device::atari_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ATARI_FDC, tag, owner, clock),
+	device_serial_interface(mconfig, *this),
+	device_a8sio_card_interface(mconfig, *this),
 	m_floppy(*this, "floppy%u", 0U),
-	m_pokey(*this, "^pokey"),
-	m_pia(*this, "^pia"),
 	m_serout_count(0),
 	m_serout_offs(0),
 	m_serout_chksum(0),
@@ -754,7 +766,8 @@ atari_fdc_device::atari_fdc_device(const machine_config &mconfig, const char *ta
 	m_serin_count(0),
 	m_serin_offs(0),
 	m_serin_chksum(0),
-	m_serin_delay(0)
+	m_serin_delay(0),
+	m_command(false)
 {
 }
 
@@ -771,6 +784,23 @@ void atari_fdc_device::device_start()
 
 	for (auto &floppy : m_floppy)
 		floppy->floppy_install_load_proc(_atari_load_proc);
+
+	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_2);
+	set_rcv_rate(19230);
+	set_tra_rate(19230);
+
+	m_serin_timer = timer_alloc(FUNC(atari_fdc_device::serin_ready), this);
+
+	save_item(NAME(m_serout_count));
+	save_item(NAME(m_serout_offs));
+	save_item(NAME(m_serout_buff));
+	save_item(NAME(m_serout_chksum));
+	save_item(NAME(m_serin_count));
+	save_item(NAME(m_serin_offs));
+	save_item(NAME(m_serin_buff));
+	save_item(NAME(m_serin_chksum));
+	save_item(NAME(m_serin_delay));
+	save_item(NAME(m_command));
 }
 
 //-------------------------------------------------

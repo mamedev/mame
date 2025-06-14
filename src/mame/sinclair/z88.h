@@ -6,8 +6,8 @@
  *
  ****************************************************************************/
 
-#ifndef MAME_ACORN_Z88_H
-#define MAME_ACORN_Z88_H
+#ifndef MAME_SINCLAIR_Z88_H
+#define MAME_SINCLAIR_Z88_H
 
 #pragma once
 
@@ -92,4 +92,4 @@ private:
 	memory_view m_boot_view;
 };
 
-#endif // MAME_ACORN_Z88_H
+#endif // MAME_SINCLAIR_Z88_H

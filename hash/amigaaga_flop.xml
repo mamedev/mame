@@ -85,7 +85,7 @@ Some animations seems too fast
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<notes><![CDATA[
-Boots to a purple and blue flickering screen, [FDC] dsksync (fixed)
+Boots to a purple and blue flickering screen, [FDC] dsksync (DDFSTRT/DDFSTOP issue?)
 [keyboard] eats inputs on copy protection screens
 ]]></notes>
 		<info name="usage" value="Requires AGA, sports manual copy protection" />

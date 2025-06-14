@@ -45,8 +45,8 @@
 
 *******************************************************************************************/
 
-#ifndef MAME_BUS_SPECTRUM_ZXBUS_H
-#define MAME_BUS_SPECTRUM_ZXBUS_H
+#ifndef MAME_BUS_SPECTRUM_ZXBUS_BUS_H
+#define MAME_BUS_SPECTRUM_ZXBUS_BUS_H
 
 #pragma once
 
@@ -130,4 +130,4 @@ protected:
 void zxbus_cards(device_slot_interface &device);
 void zxbus_gmx_cards(device_slot_interface &device);
 
-#endif // MAME_BUS_SPECTRUM_ZXBUS_H
+#endif // MAME_BUS_SPECTRUM_ZXBUS_BUS_H

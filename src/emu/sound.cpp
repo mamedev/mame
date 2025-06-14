@@ -205,27 +205,31 @@ template<typename S> void emu::detail::output_buffer_flat<S>::set_history(u32 hi
 
 template<typename S> void emu::detail::output_buffer_flat<S>::resample(u32 previous_rate, u32 next_rate, attotime sync_time, attotime now)
 {
-	if(!m_write_position)
-		return;
-
 	auto si = [](attotime time, u32 rate) -> s64 {
 		return time.m_seconds * rate + muldivu_64(time.m_attoseconds, rate, ATTOSECONDS_PER_SECOND);
 	};
 
-	auto cv = [](u32 source_rate, u32 dest_rate, s64 time) -> std::pair<s64, double> {
-		s64 sec = time / source_rate;
-		s64 prem = time % source_rate;
-		double nrem = double(prem * dest_rate) / double(source_rate);
-		s64 cyc = s64(nrem);
-		return std::make_pair(sec * dest_rate + cyc, nrem - cyc);
-	};
+	if(!m_write_position || !previous_rate) {
+		m_sync_position = 0;
+		m_sync_sample = si(sync_time, next_rate);
+		m_write_position = si(now, next_rate) - m_sync_sample;
+		m_history = 0;
+		for(u32 channel = 0; channel != m_channels; channel++)
+			std::fill(m_buffer[channel].begin(), m_buffer[channel].begin() + m_write_position, 0);
+		return;
+	}
+
+	if(!next_rate) {
+		m_write_position = m_sync_position = 0;
+		return;
+	}
 
 	// Compute what will be the new start, sync and write positions (if it fits)
 	s64 nsync = si(sync_time, next_rate);
 	s64 nwrite = si(now, next_rate);
 	s64 pbase = m_sync_sample - m_sync_position; // Beware, pbase can be negative at startup due to history size
-	auto [nbase, nbase_dec] = cv(previous_rate, next_rate, pbase < 0 ? 0 : pbase);
-	nbase += 1;
+	u64 nbase = (pbase <= 0) ? 0 : muldivupu_64(pbase, next_rate, previous_rate);
+
 	if(nbase > nsync)
 		nbase = nsync;
 
@@ -236,11 +240,13 @@ template<typename S> void emu::detail::output_buffer_flat<S>::resample(u32 previ
 			fatalerror("Stream buffer too small, can't proceed, rate change %d -> %d, space=%d\n", previous_rate, next_rate, space);
 	}
 
-	auto [ppos, pdec] = cv(next_rate, previous_rate, nbase);
-	if(ppos < pbase || ppos > pbase + m_write_position)
+	u64 ppos = muldivu_64(nbase, previous_rate, next_rate);
+	if(ppos > pbase + m_write_position)
 		fatalerror("Something went very wrong, ppos=%d, pbase=%d, pbase+wp=%d\n", ppos, pbase, pbase + m_write_position);
 
 	double step = double(previous_rate) / double(next_rate);
+	double pdec = double(nbase % next_rate) * next_rate / previous_rate;
+	pdec -= floor(pdec);
 	u32 pindex = ppos - pbase;
 	u32 nend = nwrite - nbase;
 
@@ -291,7 +297,7 @@ sound_manager::effect_step::effect_step(u32 buffer_size, u32 channels) : m_buffe
 sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 sample_rate, stream_update_delegate callback, sound_stream_flags flags) :
 	m_device(device),
 	m_output_buffer(0, outputs),
-	m_sample_rate(sample_rate == SAMPLE_RATE_INPUT_ADAPTIVE || sample_rate == SAMPLE_RATE_OUTPUT_ADAPTIVE || sample_rate == SAMPLE_RATE_ADAPTIVE ? 0 : sample_rate),
+	m_sample_rate((sample_rate == SAMPLE_RATE_INPUT_ADAPTIVE || sample_rate == SAMPLE_RATE_OUTPUT_ADAPTIVE || sample_rate == SAMPLE_RATE_ADAPTIVE) ? 0 : sample_rate),
 	m_input_count(inputs),
 	m_output_count(outputs),
 	m_input_adaptive(sample_rate == SAMPLE_RATE_INPUT_ADAPTIVE || sample_rate == SAMPLE_RATE_ADAPTIVE),
@@ -487,7 +493,7 @@ bool sound_stream::try_solving_frequency()
 		if(!freqbw && !freqfw)
 			return false;
 
-		m_sample_rate = freqfw > freqbw ? freqfw : freqbw;
+		m_sample_rate = (freqfw > freqbw) ? freqfw : freqbw;
 		return true;
 	}
 }
@@ -673,7 +679,9 @@ sound_manager::sound_manager(running_machine &machine) :
 	m_machine(machine),
 	m_update_timer(nullptr),
 	m_last_sync_time(attotime::zero),
+#ifndef SOUND_DISABLE_THREADING
 	m_effects_thread(nullptr),
+#endif
 	m_effects_done(false),
 	m_master_gain(1.0),
 	m_muted(0),
@@ -708,12 +716,14 @@ sound_manager::sound_manager(running_machine &machine) :
 
 sound_manager::~sound_manager()
 {
+#ifndef SOUND_DISABLE_THREADING
 	if(m_effects_thread) {
 		m_effects_done = true;
 		m_effects_condition.notify_all();
 		m_effects_thread->join();
 		m_effects_thread = nullptr;
 	}
+#endif
 }
 
 sound_stream *sound_manager::stream_alloc(device_t &device, u32 inputs, u32 outputs, u32 sample_rate, stream_update_delegate callback, sound_stream_flags flags)
@@ -736,8 +746,13 @@ void sound_manager::before_devices_init()
 
 void sound_manager::postload()
 {
+#ifndef SOUND_DISABLE_THREADING
 	std::unique_lock<std::mutex> dlock(m_effects_data_mutex);
+#endif
 	m_effects_prev_time = m_effects_cur_time = machine().time();
+
+	rebuild_all_resamplers();
+	rebuild_all_stream_resamplers();
 }
 
 void sound_manager::after_devices_init()
@@ -865,11 +880,12 @@ void sound_manager::after_devices_init()
 
 	m_effects_done = false;
 
+#ifndef SOUND_DISABLE_THREADING
 	if(m_nosound_mode)
 		m_effects_thread = nullptr;
 	else
-		m_effects_thread = std::make_unique<std::thread>(
-														 [this]{ run_effects(); });
+		m_effects_thread = std::make_unique<std::thread>([this]{ run_effects(); });
+#endif
 }
 
 
@@ -882,7 +898,7 @@ void sound_manager::input_get(int id, sound_stream &stream)
 	u64 dest_end_pos = dest_start_pos + dest_samples;
 	u32 skip = stream.output_count();
 
-	
+
 	for(const auto &step : m_microphones[id].m_input_mixing_steps) {
 		if(step.m_mode == mixing_step::CLEAR || step.m_mode == mixing_step::COPY)
 				fatalerror("Impossible step encountered in input\n");
@@ -947,6 +963,7 @@ void sound_manager::output_push(int id, sound_stream &stream)
 
 void sound_manager::run_effects()
 {
+#ifndef SOUND_DISABLE_THREADING
 	std::unique_lock<std::mutex> dlock(m_effects_data_mutex);
 	for(;;) {
 		m_effects_condition.wait(dlock);
@@ -954,7 +971,7 @@ void sound_manager::run_effects()
 			return;
 
 		std::unique_lock<std::mutex> lock(m_effects_mutex);
-
+#endif
 		// Copy the data to the effects threads, expanding as needed
 		// when -speed is in use
 		double sf = machine().video().speed_factor();
@@ -1005,8 +1022,9 @@ void sound_manager::run_effects()
 				eb.commit(dest_index);
 			}
 		}
-
+#ifndef SOUND_DISABLE_THREADING
 		dlock.unlock();
+#endif
 
 		// Apply the effects
 		for(auto &si : m_speakers)
@@ -1055,7 +1073,7 @@ void sound_manager::run_effects()
 					}
 					break;
 				}
-					
+
 				case mixing_step::ADD: {
 					float gain = 32768 * step.m_linear_volume * m_master_gain;
 					for(u32 sample = 0; sample != source_samples; sample++) {
@@ -1090,9 +1108,11 @@ void sound_manager::run_effects()
 				machine().osd().sound_stream_sink_update(stream.m_id, stream.m_buffer.data(), stream.m_samples);
 
 		machine().osd().sound_end_update();
+#ifndef SOUND_DISABLE_THREADING
 
 		dlock.lock();
 	}
+#endif
 }
 
 std::string sound_manager::effect_chain_tag(s32 index) const
@@ -1165,7 +1185,9 @@ void sound_manager::stop_recording()
 
 void sound_manager::mute(bool mute, u8 reason)
 {
+#ifndef SOUND_DISABLE_THREADING
 	std::unique_lock<std::mutex> lock(m_effects_mutex);
+#endif
 	if(mute)
 		m_muted |= reason;
 	else
@@ -1239,13 +1261,15 @@ void sound_manager::config_load(config_type cfg_type, config_level cfg_level, ut
 	case config_type::DEFAULT: {
 		// In the global config, get the default effect chain configuration
 
-		util::xml::data_node const *efl_node = parentnode->get_child("default_audio_effects");
+		util::xml::data_node const *efl_node = parentnode->get_child("audio_effects");
 		if(efl_node) {
 			for(util::xml::data_node const *ef_node = efl_node->get_child("effect"); ef_node != nullptr; ef_node = ef_node->get_next_sibling("effect")) {
 				unsigned int id = ef_node->get_attribute_int("step", 0);
 				std::string type = ef_node->get_attribute_string("type", "");
-				if(id >= 1 && id <= m_default_effects.size() && audio_effect::effect_names[m_default_effects[id-1]->type()] == type)
+				if(id >= 1 && id <= m_default_effects.size() && audio_effect::effect_names[m_default_effects[id-1]->type()] == type) {
 					m_default_effects[id-1]->config_load(ef_node);
+					default_effect_changed(id-1);
+				}
 			}
 		}
 
@@ -1344,7 +1368,7 @@ void sound_manager::config_save(config_type cfg_type, util::xml::data_node *pare
 
 	case config_type::DEFAULT: {
 		// In the global config, save the default effect chain configuration
-		util::xml::data_node *const efl_node = parentnode->add_child("default_audio_effects", nullptr);
+		util::xml::data_node *const efl_node = parentnode->add_child("audio_effects", nullptr);
 		for(u32 ei = 0; ei != m_default_effects.size(); ei++) {
 			const audio_effect *e = m_default_effects[ei].get();
 			util::xml::data_node *const ef_node = efl_node->add_child("effect", nullptr);
@@ -1981,7 +2005,9 @@ std::vector<u32> sound_manager::find_channel_mapping(const std::array<double, 3>
 
 void sound_manager::update_osd_streams()
 {
+#ifndef SOUND_DISABLE_THREADING
 	std::unique_lock<std::mutex> lock(m_effects_mutex);
+#endif
 	auto current_input_streams = std::move(m_osd_input_streams);
 	auto current_output_streams = std::move(m_osd_output_streams);
 	m_osd_input_streams.clear();
@@ -2471,8 +2497,8 @@ void sound_manager::mapping_update()
 					port_count = node.m_sources;
 				for(uint32_t port = 0; port != port_count; port++)
 					LOG_OUTPUT_FUNC("      %s %s [%g %g %g]\n",
-							port < node.m_sinks ? port < node.m_sources ? "<>" : ">" : "<",
-							node.m_port_names[port].c_str(),
+							(port < node.m_sinks) ? ((port < node.m_sources) ? "<>" : ">") : "<",
+							node.m_port_names[port],
 							node.m_port_positions[port][0],
 							node.m_port_positions[port][1],
 							node.m_port_positions[port][2]);
@@ -2576,7 +2602,9 @@ void sound_manager::streams_update()
 {
 	attotime now = machine().time();
 	{
+#ifndef SOUND_DISABLE_THREADING
 		std::unique_lock<std::mutex> dlock(m_effects_data_mutex);
+#endif
 		for(auto &si : m_speakers)
 			si.m_buffer.sync();
 
@@ -2585,7 +2613,11 @@ void sound_manager::streams_update()
 
 		for(sound_stream *stream : m_ordered_streams)
 			stream->update_nodeps();
+#ifndef SOUND_DISABLE_THREADING
 		m_effects_condition.notify_all();
+#else
+		run_effects();
+#endif
 	}
 
 
@@ -2668,7 +2700,7 @@ void sound_manager::rebuild_all_stream_resamplers()
 		if(step.m_mode != mixing_step::CLEAR) {
 			auto &stream = m_osd_output_streams[step.m_osd_index];
 			if(stream.m_resampler)
-				m_speakers[step.m_device_index].m_effects.back().m_buffer.set_history(stream.m_resampler->history_size());			
+				m_speakers[step.m_device_index].m_effects.back().m_buffer.set_history(stream.m_resampler->history_size());
 		}
 }
 
@@ -2686,7 +2718,9 @@ void sound_manager::rebuild_all_resamplers()
 void sound_manager::set_resampler_type(u32 type)
 {
 	if(type != m_resampler_type) {
+#ifndef SOUND_DISABLE_THREADING
 		std::unique_lock<std::mutex> lock(m_effects_mutex);
+#endif
 		m_resampler_type = type;
 		rebuild_all_resamplers();
 		rebuild_all_stream_resamplers();
@@ -2696,7 +2730,9 @@ void sound_manager::set_resampler_type(u32 type)
 void sound_manager::set_resampler_hq_latency(double latency)
 {
 	if(latency != m_resampler_hq_latency) {
+#ifndef SOUND_DISABLE_THREADING
 		std::unique_lock<std::mutex> lock(m_effects_mutex);
+#endif
 		m_resampler_hq_latency = latency;
 		rebuild_all_resamplers();
 		rebuild_all_stream_resamplers();
@@ -2706,7 +2742,9 @@ void sound_manager::set_resampler_hq_latency(double latency)
 void sound_manager::set_resampler_hq_length(u32 length)
 {
 	if(length != m_resampler_hq_length) {
+#ifndef SOUND_DISABLE_THREADING
 		std::unique_lock<std::mutex> lock(m_effects_mutex);
+#endif
 		m_resampler_hq_length = length;
 		rebuild_all_resamplers();
 		rebuild_all_stream_resamplers();
@@ -2716,7 +2754,9 @@ void sound_manager::set_resampler_hq_length(u32 length)
 void sound_manager::set_resampler_hq_phases(u32 phases)
 {
 	if(phases != m_resampler_hq_phases) {
+#ifndef SOUND_DISABLE_THREADING
 		std::unique_lock<std::mutex> lock(m_effects_mutex);
+#endif
 		m_resampler_hq_phases = phases;
 		rebuild_all_resamplers();
 		rebuild_all_stream_resamplers();

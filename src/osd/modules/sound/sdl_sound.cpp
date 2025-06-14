@@ -95,17 +95,29 @@ int sound_sdl::init(osd_interface &osd, const osd_options &options)
 	char const *const audio_driver = SDL_GetCurrentAudioDriver();
 	osd_printf_verbose("Audio: Driver is %s\n", audio_driver ? audio_driver : "not initialized");
 
+	if(options.audio_latency() > 0.0f)
+		osd_printf_verbose("Audio: %s module does not support audio_latency option\n", name());
+
 	// Capture is not implemented in SDL2, and the enumeration
 	// interface is different in SDL3
-	int dev_count = SDL_GetNumAudioDevices(0);
+	const int dev_count = SDL_GetNumAudioDevices(0);
 	for(int i=0; i != dev_count; i++) {
 		SDL_AudioSpec spec;
-		const char *name = SDL_GetAudioDeviceName(i, 0);
-		int err = SDL_GetAudioDeviceSpec(i, 0, &spec);
+		const char *const name = SDL_GetAudioDeviceName(i, 0);
+#if SDL_VERSION_ATLEAST(2, 0, 16)
+		const int err = SDL_GetAudioDeviceSpec(i, 0, &spec);
+#else
+		// seems to be no way to get the device's native format before SDL 2.0.16, just fall back to 48kHz stereo
+		const int err = 0;
+		spec.freq = 48'000;
+		spec.channels = 2;
+#endif
 		if(!err)
 			m_devices.emplace_back(name, spec.freq, spec.channels);
 	}
-	char *def_name;
+	m_default_sink = 0;
+#if SDL_VERSION_ATLEAST(2, 24, 0)
+	char *def_name = nullptr;
 	SDL_AudioSpec def_spec;
 	if(!SDL_GetDefaultAudioInfo(&def_name, &def_spec, 0)) {
 		uint32_t idx;
@@ -114,8 +126,8 @@ int sound_sdl::init(osd_interface &osd, const osd_options &options)
 			m_devices.emplace_back(def_name, def_spec.freq, def_spec.channels, true);
 		m_default_sink = idx+1;
 		SDL_free(def_name);
-	} else
-		m_default_sink = 0;
+	}
+#endif
 	return 0;
 }
 

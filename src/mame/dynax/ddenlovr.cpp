@@ -4837,6 +4837,108 @@ static INPUT_PORTS_START( ddenlovr )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( mjxysl )
+	// DIP switch locations based on input test
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )  // pay
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_SERVICE(0x04, IP_ACTIVE_LOW)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )    // analyzer
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // data clear
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )          // note
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_INCLUDE( mahjong_matrix_2p_bet_wup )
+
+	PORT_START("DSW1")
+	MAHJONG_PAYOUT_RATE(0, "DIP1:1,2,3,4")
+	PORT_DIPNAME( 0x30, 0x30, "Odds Rate" )              PORT_DIPLOCATION("DIP1:5,6")
+	PORT_DIPSETTING(    0x20, "1 2 3 4 6 8 10 15" )
+	PORT_DIPSETTING(    0x30, "1 2 4 8 12 16 24 32" )
+	PORT_DIPSETTING(    0x00, "1 2 3 5 8 15 30 50" )
+	PORT_DIPSETTING(    0x10, "1 2 3 5 10 25 50 100" )
+	PORT_DIPNAME( 0xc0, 0x40, "Maximum Bet" )            PORT_DIPLOCATION("DIP1:7,8")
+	PORT_DIPSETTING(    0xc0, "1" )
+	PORT_DIPSETTING(    0x80, "5" )
+	PORT_DIPSETTING(    0x40, "10" )
+	PORT_DIPSETTING(    0x00, "20" )
+
+	PORT_START("DSW2")
+	MAHJONG_COINAGE(0, "DIP2:1,2" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Minimum Bet" )            PORT_DIPLOCATION("DIP2:3,4")
+	PORT_DIPSETTING(    0x0c, "1" )
+	PORT_DIPSETTING(    0x08, "2" )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DIP2:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DIP2:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DIP2:7" )
+	PORT_DIPNAME( 0x80, 0x00, "Last Chance" )            PORT_DIPLOCATION("DIP2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+
+	PORT_START("DSW3")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "DIP3:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "DIP3:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DIP3:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DIP3:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DIP3:5" )
+	PORT_DIPNAME( 0x20, 0x00, "Auto Reach" )             PORT_DIPLOCATION("DIP3:6")
+	PORT_DIPSETTING(    0x20, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x40, 0x00, "Don Den Button" )         PORT_DIPLOCATION("DIP3:7")
+	PORT_DIPSETTING(    0x40, "Start" )
+	PORT_DIPSETTING(    0x00, "Flip Flop" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DIP3:8" )
+
+	PORT_START("DSW4")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR(Demo_Sounds) )     PORT_DIPLOCATION("DIP4:1")
+	PORT_DIPSETTING(    0x01, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x02, 0x00, "In-Game Music" )          PORT_DIPLOCATION("DIP4:2")
+	PORT_DIPSETTING(    0x02, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x0c, 0x00, "Gals" )                   PORT_DIPLOCATION("DIP4:3,4")
+	PORT_DIPSETTING(    0x0c, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x08, "Dressed" )
+	PORT_DIPSETTING(    0x04, "Underwear" )
+	PORT_DIPSETTING(    0x00, "Nude" )
+	PORT_DIPNAME( 0x10, 0x00, "Gal Voice" )              PORT_DIPLOCATION("DIP4:5")
+	PORT_DIPSETTING(    0x10, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DIP4:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DIP4:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DIP4:8" )
+
+	PORT_START("DSW5")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "DIP1:9" )
+	MAHJONG_NOTE_CREDITS(1, "DIP1:10", "DSW2", 0)
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DIP2:9" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DIP2:10" )
+	PORT_DIPNAME( 0x10, 0x10, "Game Type" )              PORT_DIPLOCATION("DIP3:9")
+	PORT_DIPSETTING(    0x10, "Credits" )
+	PORT_DIPSETTING(    0x00, "Points" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DIP3:10" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DIP4:9" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Controls) )        PORT_DIPLOCATION("DIP4:10")
+	PORT_DIPSETTING(    0x80, "Mahjong Panel" )
+	PORT_DIPSETTING(    0x80, DEF_STR(Joystick) )        // TODO: not supported
+
+	PORT_START("BET")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("HOPPER")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( nettoqc )
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
@@ -6491,7 +6593,6 @@ static INPUT_PORTS_START( mjgnight )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
 
@@ -11271,6 +11372,21 @@ ROM_START( mjdchuka )
 	ROM_LOAD( "1.1b", 0x00000, 0x80000, CRC(9759c65e) SHA1(cf098c07616b6d2a2ba10ff6ae0006442b675326) )
 ROM_END
 
+ROM_START( mjxysl ) // 麻将 幸运神龙 (Májiàng Xìngyùn Shénlóng)
+	ROM_REGION( 0x80000, "maincpu", 0 )  // Z80 Code
+	ROM_LOAD( "b.5b", 0x00000, 0x80000, CRC(3b0761c9) SHA1(cb9cf9dc693c2ac9b91ee21db51c9b279412340e) )
+
+	ROM_REGION( 0x200000, "blitter", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "c.11c", 0x000000, 0x080000, CRC(83bfc841) SHA1(36547e737244f95004c598adeb46cebce9ab3231) )
+	ROM_LOAD16_BYTE( "d.11a", 0x000001, 0x080000, CRC(1bf6220a) SHA1(ea18fdf6e1298a3b4c91fbf6219b1edcfecaeca3) )
+	ROM_LOAD16_BYTE( "e.12c", 0x100000, 0x020000, CRC(bec823ac) SHA1(2c82c376618fe937e3b7e0fef357f10dbbae00ae) )
+	ROM_LOAD16_BYTE( "f.12a", 0x100001, 0x020000, CRC(a1030162) SHA1(25f3c27d8197d6c1a801219aec7c8dbad214892d) )
+	// 13c and 13a not populated
+
+	ROM_REGION( 0x80000, "oki", 0 )  // samples
+	ROM_LOAD( "a.1b", 0x00000, 0x80000, CRC(ce32dcbc) SHA1(89a96e34d05b97f74b9427303316486e6aae3e6d) )
+ROM_END
+
 
 /***************************************************************************
 
@@ -12728,6 +12844,8 @@ GAME( 1995, ddenlovj,    0,        ddenlovj,  ddenlovj,   ddenlovr_state, empty_
 GAME( 1995, ddenlovrk,   ddenlovj, ddenlovrk, ddenlovr,   ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Don Den Lover Vol. 1 - Heukbaeg-euro Jeonghaja (Korea)",         MACHINE_NO_COCKTAIL  )
 GAME( 1995, ddenlovrb,   ddenlovj, ddenlovr,  ddenlovr,   ddenlovr_state, empty_init,    ROT0, "bootleg",                                     "Don Den Lover Vol. 1 - Heukbaeg-euro Jeonghaja (Korea, bootleg)", MACHINE_NO_COCKTAIL  )
 GAME( 1996, ddenlovr,    ddenlovj, ddenlovr,  ddenlovr,   ddenlovr_state, empty_init,    ROT0, "Dynax",                                       "Don Den Lover Vol. 1 (Hong Kong)",                               MACHINE_NO_COCKTAIL  )
+
+GAME( 1996, mjxysl,      0,        mjchuuka,  mjxysl,     hanakanz_state, empty_init,    ROT0, "Dynax",                                       "Majiang Xingyun Shenlong (China, D121)",                         MACHINE_NO_COCKTAIL  )
 
 GAME( 1996, hanakanz,    0,        hanakanz,  hanakanz,   hanakanz_state, empty_init,    ROT0, "Dynax",                                       "Hana Kanzashi (Japan)",                                          MACHINE_NO_COCKTAIL  )
 GAME( 1997, kotbinyo,    hanakanz, kotbinyo,  kotbinyo,   hanakanz_state, empty_init,    ROT0, "Dynax / Shinwhajin",                          "Kkotbinyeo (Korea)",                                             MACHINE_NO_COCKTAIL  )

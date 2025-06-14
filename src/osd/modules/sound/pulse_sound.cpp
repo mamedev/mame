@@ -389,6 +389,9 @@ int sound_pulse::init(osd_interface &osd, osd_options const &options)
 	if(m_generation >= 0x80000000)
 		return 1;
 
+	if(options.audio_latency() > 0.0f)
+		osd_printf_verbose("Sound: %s module does not support audio_latency option\n", name());
+
 	return 0;
 }
 

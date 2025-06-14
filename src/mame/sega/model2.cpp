@@ -18,8 +18,7 @@
     TODO (per-game issues)
     - daytona: car glasses doesn't get loaded during gameplay;
     - doa, doaa: corrupted sound, eventually becomes silent;
-    - dynamcopc: corrupts palette for 2d (most likely unrelated with the lack of DSP);
-    - fvipers, schamp: rasterizer has issues displaying some characters @see video/model2.cpp
+    - dynamcopc: corrupts palette for 2d;
     - fvipers: enables timers, but then irq register is empty, hence it crashes with an "interrupt halt" at POST (regression);
     - hpyagu98: stops with 'Error #1' message during boot. Also writes to the 0x600000-0x62ffff range in main CPU program map
     - lastbrnx: uses external DMA port 0 for uploading SHARC program, hook-up might not be 100% right;
@@ -495,8 +494,8 @@ u32 model2_tgp_state::copro_sincos_r(offs_t offset)
 {
 	offs_t ang = m_copro_sincos_base + offset * 0x4000;
 	offs_t index = ang & 0x3fff;
-	if(ang & 0x4000)
-		index ^= 0x3fff;
+	if (ang & 0x4000)
+		index = std::min(0x4000 - (int)index, 0x3fff);
 	u32 result = m_copro_tgp_tables[index];
 	if(ang & 0x8000)
 		result ^= 0x80000000;
@@ -1423,7 +1422,7 @@ void model2b_state::model2b_crx_mem(address_map &map)
 	map(0x00980000, 0x00980003).rw(FUNC(model2b_state::copro_ctl1_r), FUNC(model2b_state::copro_ctl1_w));
 	map(0x00980008, 0x0098000b).w(FUNC(model2b_state::geo_ctl1_w));
 	map(0x00980014, 0x00980017).r(FUNC(model2b_state::copro_status_r));
-	//map(0x00980008, 0x0098000b).w(FUNC(model2b_state::geo_sharc_ctl1_w));
+	map(0x00980020, 0x00980023).noprw();	// bank control reg - used during SHARC program upload, all games just set this to 0
 
 	map(0x009c0000, 0x009cffff).rw(FUNC(model2b_state::model2_serial_r), FUNC(model2b_state::model2_serial_w));
 

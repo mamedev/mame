@@ -116,13 +116,50 @@ static INPUT_PORTS_START( jak_dond )
 	PORT_BIT( 0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( spg2xx_jpdy )
+	PORT_INCLUDE( spg2xx_jakks )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_NAME("Joypad Up")
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_NAME("Joypad Down")
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_NAME("Joypad Left")
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("Joypad Right")
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(1) PORT_NAME("P1 Answer")
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(2) PORT_NAME("P2 Answer")
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(3) PORT_NAME("P3 Answer")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Menu / Pause")
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( jak_spd3 )
 	PORT_INCLUDE( spg2xx_jakks )
 
 	PORT_MODIFY("P1")
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("C Button")
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("Menu / Pause")
+
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( spg2xx_avtr )
+	PORT_INCLUDE( spg2xx_jakks )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(1) PORT_NAME("A Button")
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(1) PORT_NAME("B Button")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( spg2xx_xmen )
+	PORT_INCLUDE( spg2xx_jakks )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(1) PORT_NAME("A Button")
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(1) PORT_NAME("B Button")
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON3 )        PORT_PLAYER(1) PORT_NAME("X Button")
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON4 )        PORT_PLAYER(1) PORT_NAME("Menu / Pause")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( jak_supm )
 	PORT_START("P1")
@@ -350,6 +387,12 @@ static INPUT_PORTS_START( spg2xx_ntoonsc )
 	PORT_BIT( 0xfff0, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( spg2xx_1vs )
+	PORT_INCLUDE( spg2xx_jakks )
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON3 )        PORT_PLAYER(1) PORT_NAME("C Button")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Menu / Pause")
+INPUT_PORTS_END
 
 void jakks_state::base_config(machine_config& config)
 {
@@ -481,9 +524,7 @@ ROM_END
 
 ROM_START( jak_wall )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "walle.bin", 0x000000, 0x400000, BAD_DUMP CRC(bd554cba) SHA1(6cd06a036ab12e7b0e1fd8003db873b0bb783868) )
-	// both of these dumps are bad, but in slightly different ways, note the random green pixels around the text (bad data is reported in secret test mode)
-	//ROM_LOAD16_WORD_SWAP( "walle.bin", 0x000000, 0x400000, BAD_DUMP CRC(6bc90b16) SHA1(184d72de059057aae7800da510fcf05ed1da9ec9))
+	ROM_LOAD16_WORD_SWAP( "jakkwalle.u3", 0x000000, 0x400000, CRC(bf9b0a7a) SHA1(d998d940c8a80b32d535120e58fddb3e414ef455) )
 ROM_END
 
 ROM_START( jak_potc )
@@ -504,6 +545,11 @@ ROM_END
 ROM_START( jak_hm1m )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "jakkshmoiam.u4", 0x000000, 0x400000, CRC(38f0ec0c) SHA1(15458aa3de77776a9e3419073a8af7f92e403b6e) )
+ROM_END
+
+ROM_START( jak_avtr )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakksavatar.u2", 0x000000, 0x400000, CRC(e6f3fd64) SHA1(fe364eab4fb8d729a9c1c6a640779e54ad34fb24) )
 ROM_END
 
 ROM_START( jak_supm )
@@ -603,6 +649,11 @@ ROM_START( jak_dwa )
 	ROM_LOAD16_WORD_SWAP( "jakksdorawa.u3", 0x000000, 0x200000, CRC(fd519d3a) SHA1(a68a0dca5b722d83258c452a1c9243d4e9cb9de0) )
 ROM_END
 
+ROM_START( jak_5thg )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakks5thgrader.u2", 0x000000, 0x200000, CRC(d460d360) SHA1(b6547a5ba93b40dcd7c993c4dfc917c1f415f4f0) )
+ROM_END
+
 ROM_START( jak_gdg )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "jakksgodiegogo.u4", 0x000000, 0x200000, CRC(eaffbf9f) SHA1(7a415b817c8fed44569e1b66a42e80de9a81d4de) )
@@ -628,9 +679,42 @@ ROM_START( jak_dond )
 	ROM_LOAD16_WORD_SWAP( "jakksdond.u4", 0x000000, 0x200000, CRC(0ae0706f) SHA1(6144190d126b36378c05b6e0a633ab2b53b3fa39) )
 ROM_END
 
+ROM_START( jak_1vs )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	// byte 0xb5a27 originally gave 0xff with consistent reads (but bytesum was wrong)
+	// with different settings gave 0xfe and consistent reads (bytesum in header matches)
+	// ingame checksum screen seems to be broken (gives black screen after calculating)
+	ROM_LOAD16_WORD_SWAP( "jakks1vs100.u3", 0x000000, 0x200000, CRC(4a8cdedf) SHA1(e6d035262d9b022e9cd19f2322ba6ef1a1db7b38) )
+ROM_END
+
+ROM_START( jak_jpdy )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakksjeopardy.u2", 0x000000, 0x200000, CRC(6ccf00b7) SHA1(51e6fe60f3169e52d03f46469923253231a7262e) )
+ROM_END
+
 ROM_START( jak_hmbb )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "jakkhmbobw.bin", 0x000000, 0x800000, CRC(4e72cbf9) SHA1(efcec76da39c8373e8ef769c4fa0a35d379896d8) )
+ROM_END
+
+ROM_START( jak_xmen )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakkxmen.u3", 0x000000, 0x400000, CRC(f4383dca) SHA1(9850782e498ab0036850aa1f8926299c658a6099) )
+ROM_END
+
+ROM_START( jak_xmenp )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "xmen.bin", 0x000000, 0x400000, CRC(1fa271e0) SHA1(c32652e9eddf82ab496e3609f8fa444e447fb509) )
+ROM_END
+
+ROM_START( jak_dwmn )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "dreamworks.bin", 0x000000, 0x400000, CRC(3ae9f786) SHA1(46451be3af459fbdb75d1155b3817543afe183d5) )
+ROM_END
+
+ROM_START( jak_dwmno )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "dw_spg300_test.bin", 0x000000, 0x400000, CRC(1ca2817b) SHA1(39ae519457c102c4420fae3699b2db0557ef1cf5) )
 ROM_END
 
 } // anonymous namespace
@@ -638,16 +722,16 @@ ROM_END
 
 // Pre-GameKey units
 
-CONS( 2004, jak_batm, 0, 0, spg2xx_jakks,  batman,        jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "The Batman (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-
-// you could link 2 pads of this together for 2 player mode as you could with WWE (feature not emulated)
-CONS( 2004, jak_mk,   0, 0, mk,     mk,     jakks_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse", "Mortal Kombat (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2004, jak_batm, 0, 0, spg2xx_jakks,  batman,        jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "The Batman (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
 
 // this is an older unit than the jak_mpac Game Key Ready set and features no GameKey branding
-CONS( 2004, jak_mpacw, 0,         0, jakks_mpac, jak_mpac,   jakks_state, empty_init, "JAKKS Pacific Inc / Namco / HotGen Ltd",      "Ms. Pac-Man Collection 7-in-1 (JAKKS Pacific TV Game) (wireless, 18 AUG 2004 A)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2004, jak_mpacq, jak_mpacw, 0, jakks_mpac, jak_mpac,   jakks_state, empty_init, "JAKKS Pacific Inc / Namco / HotGen Ltd",      "Ms. Pac-Man Collection 7-in-1 (JAKKS Pacific TV Game) (QVC version, 12 JUL 2004 A)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2004, jak_mpacw, 0,         0, jakks_mpac, jak_mpac,   jakks_state, empty_init, "JAKKS Pacific Inc / Namco / HotGen Ltd",      "Ms. Pac-Man Collection 7-in-1 (JAKKS Pacific TV Game) (wireless, 18 AUG 2004 A)", MACHINE_IMPERFECT_SOUND )
+CONS( 2004, jak_mpacq, jak_mpacw, 0, jakks_mpac, jak_mpac,   jakks_state, empty_init, "JAKKS Pacific Inc / Namco / HotGen Ltd",      "Ms. Pac-Man Collection 7-in-1 (JAKKS Pacific TV Game) (QVC version, 12 JUL 2004 A)", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2004, jak_mpaco, jak_mpac,  0, jakks_mpaco, jak_mpaco,   jakks_state, empty_init, "JAKKS Pacific Inc / Namco / HotGen Ltd",      "Ms. Pac-Man Collection 5-in-1 (JAKKS Pacific TV Game) (01 APR 2004 A)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2004, jak_mpaco, jak_mpac,  0, jakks_mpaco, jak_mpaco,   jakks_state, empty_init, "JAKKS Pacific Inc / Namco / HotGen Ltd",      "Ms. Pac-Man Collection 5-in-1 (JAKKS Pacific TV Game) (01 APR 2004 A)", MACHINE_IMPERFECT_SOUND )
+
+// you could link 2 pads of this together for 2 player mode as you could with WWE (feature not emulated)
+CONS( 2004, jak_mk,   0, 0, mk,     mk,     jakks_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse", "Mortal Kombat (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
 
 // Post-GameKey units (all of these still have GameKey references in the code even if the physical connector was no longer present on the PCB)
 
@@ -662,7 +746,7 @@ CONS( 2004, jak_mpaco, jak_mpac,  0, jakks_mpaco, jak_mpaco,   jakks_state, empt
 // spg2xx_jakks_tvtouch.cpp
 CONS( 2007, jak_sbjd, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "SpongeBob SquarePants Jellyfish Dodge (JAKKS Pacific TV Game) (Apr 5 2007)", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2008, jak_wall, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "Wall-E (JAKKS Pacific TV Game) (Dec 18 2007 11:34:25)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2008, jak_wall, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "Wall-E (JAKKS Pacific TV Game) (Dec 18 2007 11:34:25)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2007, jak_potc, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "Pirates of the Caribbean - Islands of Fortune (JAKKS Pacific TV Game) (Jun 1 2007 12:34:28)", MACHINE_IMPERFECT_SOUND )
 
@@ -680,13 +764,11 @@ CONS( 2006, jak_spac, 0, 0, spg2xx_jakks,  jak_mpac,      jakks_state, empty_ini
 
 CONS( 2008, jak_rapm, 0, 0, jakks_rapm,    jak_rapm,      jakks_state, empty_init, "JAKKS Pacific Inc / Namco / HotGen Ltd", "Retro Arcade featuring Pac-Man (20 AUG 2008 A SKU N)", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2007, jak_spd3, 0, 0, spg2xx_jakks,  jak_spd3,      jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Spider-Man 3 (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
-
-CONS( 2007, jak_cind, 0, 0, spg2xx_jakks,  spg2xx_pacg,   jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Cinderella - Once Upon a Midnight (JAKKS Pacific TV Game) (Aug 29 2007 11:15:55)", MACHINE_IMPERFECT_SOUND )
-
 CONS( 2007, jak_slpb, 0, 0, spg2xx_jakks,  spg2xx_pacg,   jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",  "Sleeping Beauty - Tales of Enchantment (JAKKS Pacific TV Game) (Sep 17 2007 14:45:02)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2007, jak_hm1m, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",  "Hannah Montana - One in a Million (JAKKS Pacific TV Game) (Aug 13 2007 15:42:29)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2006, jak_avtr, 0, 0, spg2xx_jakks,  spg2xx_avtr,   jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",  "Avatar: The Last Airbender - Book One Challenges (JAKKS Pacific TV Game) (06 Jun 2006 A)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2007, jak_hmbb, 0, 0, spg2xx_hmbb,   spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",  "Hannah Montana - Best of Both Worlds (JAKKS Pacific TV Game) (Aug 17 2007 22:47:47)", MACHINE_IMPERFECT_SOUND )
 
@@ -694,13 +776,10 @@ CONS( 2007, jak_hmbb, 0, 0, spg2xx_hmbb,   spg2xx_jakks,  jakks_state, empty_ini
 // test mode combination isn't the usual HotGen one, but can be accessed by setting a breakpoint at 0xa6ba and setting r2 to 0x0a - TODO: figure out combination so version can be checked against an NTSC unit.
 CONS( 2006, jak_sesa, 0, 0, jakks_sesa,    spg2xx_sesa,   jakks_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",  "Sesame Street Beat (JAKKS Pacific TV Game) (Aug 23 2006 19:12:03, PAL/UK)", MACHINE_IMPERFECT_SOUND )
 
+
 CONS( 2005, jak_powr, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Power Rangers S.P.D. (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2006, jak_pix,  0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Disney Pixar Classics (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
-
-CONS( 2007, jak_hsm,  0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "High School Musical (JAKKS Pacific TV Game) (Dec 19 2007 17:08:20)", MACHINE_IMPERFECT_SOUND )
-
-CONS( 2007, jak_ctah, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "The Cheetah Girls - Passport to Fame (JAKKS Pacific TV Game) (Aug 1 2007 10:32:50)", MACHINE_IMPERFECT_SOUND )
 
 // menu sounds don't work until you go into a game (work after a reset, bad default initializations?)
 CONS( 2006, jak_shrk, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Dreamworks Shrek / Over The Hedge (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
@@ -711,8 +790,29 @@ CONS( 2006, jak_ntsc, 0, 0, spg2xx_jakks,  spg2xx_ntoonsc,jakks_state, empty_ini
 
 CONS( 2006, jak_dpma, 0, 0, spg2xx_dpma,  spg2xx_dpma,    jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Disney Princess Magical Adventures (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
 
+CONS( 2007, jak_hsm,  0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "High School Musical (JAKKS Pacific TV Game) (Dec 19 2007 17:08:20)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2007, jak_ctah, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "The Cheetah Girls - Passport to Fame (JAKKS Pacific TV Game) (Aug 1 2007 10:32:50)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2007, jak_spd3, 0, 0, spg2xx_jakks,  jak_spd3,      jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Spider-Man 3 (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2007, jak_cind, 0, 0, spg2xx_jakks,  spg2xx_pacg,   jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Cinderella - Once Upon a Midnight (JAKKS Pacific TV Game) (Aug 29 2007 11:15:55)", MACHINE_IMPERFECT_SOUND )
+
 CONS( 2007, jak_dwa,  0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Dora the Explorer - Dora's World Adventure! (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2007, jak_5thg, 0, 0, spg2xx_jakks,  spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Handheld Games",  "Are You Smarter than a 5th Grader? (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2006, jak_jpdy, 0, 0, spg2xx_jakks,  spg2xx_jpdy,   jakks_state, empty_init, "JAKKS Pacific Inc / 5000ft, Inc",  "Jeopardy! (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
 
 CONS( 2006, jak_gdg,  0, 0, spg2xx_dpma,   spg2xx_gdg,    jakks_state, empty_init, "JAKKS Pacific Inc / 1st Playable Productions",  "Go Diego Go! (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2006, jak_dond, 0, 0, spg2xx_jakks,  jak_dond,      jakks_state, empty_init, "JAKKS Pacific Inc / Pronto Games",    "Deal or No Deal (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
+CONS( 2006, jak_dond, 0, 0, spg2xx_jakks,  jak_dond,      jakks_state, init_crc,   "JAKKS Pacific Inc / Pronto Games",    "Deal or No Deal (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2007, jak_1vs,  0, 0, spg2xx_jakks,  spg2xx_1vs,    jakks_state, init_crc,   "JAKKS Pacific Inc / Pronto Games",    "1 Vs 100 (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
+
+CONS( 2005, jak_xmen, 0,        0, spg2xx_jakks,  spg2xx_xmen,  jakks_state, empty_init, "JAKKS Pacific Inc / Amaze Entertainment",     "X-Men - Mutant Reign (JAKKS Pacific TV Game)", MACHINE_IMPERFECT_SOUND )
+CONS( 2005, jak_xmenp,jak_xmen, 0, spg2xx_jakks,  spg2xx_xmen,  jakks_state, empty_init, "JAKKS Pacific Inc / Amaze Entertainment",     "X-Men - Mutant Reign (JAKKS Pacific TV Game, prototype)", MACHINE_IMPERFECT_SOUND )
+
+// Dreamworks Movie Night was never manufactured
+CONS( 2006, jak_dwmn, 0,        0, spg2xx_jakks, spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Amaze Entertainment",      "Dreamworks Movie Night (JAKKS Pacific TV Game, Oct 18 2006, prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, jak_dwmno,jak_dwmn, 0, spg2xx_jakks, spg2xx_jakks,  jakks_state, empty_init, "JAKKS Pacific Inc / Amaze Entertainment",      "Dreamworks Movie Night (JAKKS Pacific TV Game, Apr 24 2006, test program)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

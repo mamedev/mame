@@ -199,6 +199,21 @@ void vt3xx_soc_base_device::alu_w(offs_t offset, u8 data)
 	}
 }
 
+void vt3xx_soc_base_device::highres_sprite_dma_w(u8 data)
+{
+	// is this correct? the rtvgc300 / rtvgc300fz don't appear to transfer the
+	// sprite data from main RAM to sprite RAM in any other way.
+	//
+	// do the high res sprites use their own spriteram, or does this go to the
+	// standard PPU spriteram?
+
+	for (int i = 0; i < 0x200; i++)
+	{
+		u8 read_data = m_maincpu->space(AS_PROGRAM).read_byte((data << 8) + i);
+		m_ppu->set_spriteram_value(i, read_data);
+	}
+}
+
 void vt3xx_soc_base_device::vt369_map(address_map &map)
 {
 	map(0x0000, 0x1fff).ram(); // 8k RAM?
@@ -257,6 +272,8 @@ void vt3xx_soc_base_device::vt369_map(address_map &map)
 	// 0x411a RS232 TX data
 	// 0x411b RS232 RX data
 	map(0x411c, 0x411c).w(FUNC(vt3xx_soc_base_device::vt369_411c_bank6000_enable_w));
+	map(0x411d, 0x411d).w(FUNC(vt3xx_soc_base_device::vt369_411d_w));
+	map(0x411e, 0x411e).w(FUNC(vt3xx_soc_base_device::vt369_411e_w));
 
 	// 412d
 
@@ -288,6 +305,8 @@ void vt3xx_soc_base_device::vt369_map(address_map &map)
 	map(0x41b0, 0x41bf).r(FUNC(vt3xx_soc_base_device::vt369_41bx_r)).w(FUNC(vt3xx_soc_base_device::vt369_41bx_w));
 
 	map(0x41e6, 0x41e6).w(FUNC(vt3xx_soc_base_device::extra_io_41e6_w)); // banking on red5mam
+
+	map(0x4201, 0x4201).w(FUNC(vt3xx_soc_base_device::highres_sprite_dma_w));
 
 	// 4304
 
@@ -548,6 +567,22 @@ void vt3xx_soc_base_device::vt369_411c_bank6000_enable_w(offs_t offset, u8 data)
 	m_bank6000_enable = data;
 }
 
+void vt3xx_soc_base_device::vt369_411d_w(offs_t offset, u8 data)
+{
+	// controls chram access and mapper emulation modes in later models
+	// also written by rtvgc300 and rtvgc300fz (with the same value as 411e)
+	// when external banking is needed?
+	logerror("%s: vt369_411d_w  %02x\n", machine().describe_context(), data);
+	m_411d = data;
+	update_banks();
+}
+
+void vt3xx_soc_base_device::vt369_411e_w(offs_t offset, u8 data)
+{
+	logerror("%s: vt369_411e_w (%02x) (external bankswitch + more?)\n", machine().describe_context(), data);
+	m_411e_write_cb(data); 
+}
+
 
 void vt3xx_soc_base_device::vt369_4112_bank6000_select_w(offs_t offset, u8 data)
 {
@@ -744,13 +779,6 @@ void vt369_soc_introm_noswap_device::device_start()
 	m_encryption_allowed = false;
 }
 
-void vt369_soc_introm_noswap_device::vtfp_411d_w(u8 data)
-{
-	// controls chram access and mapper emulation modes in later models
-	logerror("vtfp_411d_w  %02x\n", data);
-	m_411d = data;
-	update_banks();
-}
 
 u8 vt369_soc_introm_noswap_device::vthh_414a_r()
 {
@@ -766,7 +794,6 @@ void vt369_soc_introm_noswap_device::vt369_introm_map(address_map &map)
 	map(0x1000, 0x1fff).r(FUNC(vt369_soc_introm_noswap_device::read_internal));
 
 	map(0x414a, 0x414a).r(FUNC(vt369_soc_introm_noswap_device::vthh_414a_r));
-	map(0x411d, 0x411d).w(FUNC(vt369_soc_introm_noswap_device::vtfp_411d_w));
 
 	map(0x4169, 0x4169).w(FUNC(vt369_soc_introm_noswap_device::encryption_4169_w));
 }

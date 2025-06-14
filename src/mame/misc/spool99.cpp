@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese, David Haywood
-/*******************************************************************************************
+/**************************************************************************************************
 
 Super Pool 99 (c) 1998 Electronic Projects
 
@@ -8,26 +8,24 @@ driver by David Haywood and Angelo Salese
 
 A rip-off of other famous gambling games (Namely C.M.C. and Funworld games)
 
-Notes:
--At start-up a Test Hardware with RAM NG msg pops up.Do a soft reset and keep pressed start
- and service 1 buttons until the RAM init msg appears.
--There's a "(c) 1993 Hi-Tech software" string in the program roms,this is actually the Z80 C
- compiler used for doing this game.
--On the 0.31 version program rom,starting from 0xacf6 the following string is present:
- "EP V31 PIPPO BELLISSIMA TI AMO" (translated: "beautiful Pippo I love you",the beautiful word
- is actually used as a female gender adverb). While the pippo name is a common joke for naming
- printfs variables for newbie programmers,I'll let others interpret what it means the rest...
--vcarn: tries to write a nop at 0x744, if it succeeds it glitches the text when you win. This means that
- the ROM can be written only at the first 0x100 bytes on this HW.
-
 TODO:
--spool99: EEPROM barely hooked up, enough to let this to boot but it doesn't save settings
-          at the moment;
--spool99: An "input BAD" msg pops up at start-up,probably because there are inputs not yet hooked up.
--spool99: Visible area might be wrong (384x240),but this doesn't even have a cross-hatch test,so I
-          need a snapshot from the original thing...
+- spool99: throws "INPUT BAD" at startup;
+- visible area needs confirming for both games;
+- how HW writes to $0-$ff, is this missing a memory_view overlay?
 
-============================================================================================
+Notes:
+- At start-up a Test Hardware with RAM NG msg pops up.Do a soft reset and keep pressed start
+ and service 1 buttons until the RAM init msg appears.
+- There's a "(c) 1993 Hi-Tech software" string in the program roms,this is actually the Z80 C
+  compiler used for doing this game.
+- On the 0.31 version program rom,starting from 0xacf6 the following string is present:
+  "EP V31 PIPPO BELLISSIMA TI AMO" (translated: "beautiful Pippo I love you",the beautiful word
+  is actually used as a female gender adverb). While the pippo name is a common joke for naming
+  printfs variables for newbie programmers,I'll let others interpret what it means the rest...
+- vcarn: tries to write a nop at 0x744, if it succeeds it glitches the text when you win.
+  This means that the ROM can be written only at the first 0x100 bytes on this HW.
+
+===================================================================================================
 
 Year    1998
 Manufacturer Electronic Projects
@@ -89,11 +87,12 @@ Note
 1x red led
 1x battery
 
-*******************************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
+#include "machine/nvram.h"
 #include "sound/okim6295.h"
 #include "emupal.h"
 #include "screen.h"
@@ -250,7 +249,7 @@ void spool99_state::spool99_map(address_map &map)
 
 	map(0xb000, 0xb3ff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 
-	map(0xb800, 0xdfff).ram();
+	map(0xb800, 0xdfff).ram().share("nvram");
 	map(0xe000, 0xefff).ram().w(FUNC(spool99_state::vram_w)).share("vram");
 	map(0xf000, 0xffff).ram().w(FUNC(spool99_state::cram_w)).share("cram");
 }
@@ -297,7 +296,7 @@ void spool99_state::vcarn_map(address_map &map)
 
 	map(0xa800, 0xabff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 
-	map(0xb000, 0xdfff).ram();
+	map(0xb000, 0xdfff).ram().share("nvram");
 //  map(0xdf00, 0xdfff).rw(FUNC(spool99_state::vcarn_io_r), FUNC(spool99_state::vcarn_io_w)).share("vcarn_io");
 	map(0xe000, 0xefff).ram().w(FUNC(spool99_state::vram_w)).share("vram");
 	map(0xf000, 0xffff).ram().w(FUNC(spool99_state::cram_w)).share("cram");
@@ -389,7 +388,7 @@ void spool99_state::spool99(machine_config &config)
 	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 0x200);
 
 	EEPROM_93C46_16BIT(config, "eeprom");
-
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	SPEAKER(config, "speaker", 2).front();
 
@@ -481,4 +480,4 @@ GAME( 1998, spool99,    0,        spool99,    spool99, spool99_state, init_spool
 GAME( 1998, spool99a,   spool99,  spool99,    spool99, spool99_state, init_spool99, ROT0, "Electronic Projects", "Super Pool 99 (Version 0.33)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, spool99b,   spool99,  spool99,    spool99, spool99_state, init_spool99, ROT0, "Electronic Projects", "Super Pool 99 (Version 0.31)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, spool99c,   spool99,  spool99,    spool99, spool99_state, init_spool99, ROT0, "Electronic Projects", "Super Pool 99 (Version 0.26)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998, vcarn,      0,        vcarn,      spool99, spool99_state, init_spool99, ROT0, "Electronic Projects", "Video Carnival 1999 / Super Royal Card (Version 0.11)", MACHINE_SUPPORTS_SAVE ) //MAME screen says '98, PCB screen says '99?
+GAME( 1998?, vcarn,     0,        vcarn,      spool99, spool99_state, init_spool99, ROT0, "Electronic Projects", "Video Carnival 1999 / Super Royal Card (Version 0.11)", MACHINE_SUPPORTS_SAVE ) // claims '98, '99 printed on PCB

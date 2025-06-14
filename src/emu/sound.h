@@ -50,6 +50,10 @@
     By default, the inputs will have been resampled to match the output
     sample rate, unless otherwise specified.
 
+    SOUND_DISABLE_THREADING if to be defined when your environment does
+    not support threads (e.g. emscripten).  The effects suddendly become
+    costly then though.
+
 ***************************************************************************/
 
 #pragma once
@@ -63,9 +67,13 @@
 
 #include "wavwrite.h"
 #include "interface/audio.h"
+
+#ifndef SOUND_DISABLE_THREADING
 #include <mutex>
 #include <thread>
 #include <condition_variable>
+#endif
+
 
 //**************************************************************************
 //  CONSTANTS
@@ -641,10 +649,13 @@ private:
 	std::vector<mixing_step> m_output_mixing_steps; // actions to take to fill the osd streams buffers
 	std::vector<config_mapping> m_configs; // mapping user configuration
 
+#ifndef SOUND_DISABLE_THREADING
 	std::mutex                      m_effects_mutex;
 	std::mutex                      m_effects_data_mutex;
 	std::condition_variable         m_effects_condition;
 	std::unique_ptr<std::thread>    m_effects_thread;
+#endif
+
 	std::vector<std::unique_ptr<audio_effect>> m_default_effects;
 	bool m_effects_done;
 	attotime m_effects_prev_time, m_effects_cur_time;

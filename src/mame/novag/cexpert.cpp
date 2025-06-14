@@ -105,7 +105,7 @@ void cexpert_state::mux_w(u8 data)
 
 void cexpert_state::control_w(u8 data)
 {
-	// d0-d2: clock/printer?
+	// d0-d2: clock?
 
 	// d3: enable beeper
 	m_beeper->set_state(BIT(data, 3));
@@ -136,6 +136,7 @@ u8 cexpert_state::input2_r()
 		if (BIT(m_inp_mux, i))
 			data |= m_inputs[i]->read() << 6;
 
+	// d0-d2: printer
 	// other: ?
 	return ~data;
 }
@@ -149,8 +150,8 @@ u8 cexpert_state::input2_r()
 void cexpert_state::main_map(address_map &map)
 {
 	map(0x0000, 0x0fff).ram().share("nvram");
-	map(0x1000, 0x1000).nopw(); // accessory?
-	map(0x1100, 0x1100).nopw(); // "
+	map(0x1000, 0x1000).nopw(); // printer
+	map(0x1100, 0x1100).nopw(); // printer
 	map(0x1200, 0x1200).rw(FUNC(cexpert_state::input2_r), FUNC(cexpert_state::mux_w));
 	map(0x1300, 0x1300).rw(FUNC(cexpert_state::input1_r), FUNC(cexpert_state::control_w));
 	map(0x1800, 0xffff).rom();
