@@ -25,7 +25,7 @@ public:
 		, m_ata(*this, "ata")
 	{ }
 
-	virtual void map_shadow_io(address_map &map) override ATTR_COLD;
+	virtual void shadow_io_map(address_map &map) override ATTR_COLD;
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -33,8 +33,6 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	void map_io(address_map &map) ATTR_COLD {}
-
 	void port_ffba_w(offs_t offset, u8 data);
 	u8 ata_r(offs_t offset);
 	void ata_w(offs_t offset, u8 data);
@@ -83,7 +81,7 @@ void smuc_device::ata_w(offs_t offset, u8 data)
 		m_ata->cs0_w(ata_offset, ata_data);
 }
 
-void smuc_device::map_shadow_io(address_map &map)
+void smuc_device::shadow_io_map(address_map &map)
 {
 	map(0x18a2, 0x18a2).mirror(0x4718) //     5fba | 0x011xxx101xx010 | Version: 2
 		.lr8(NAME([]() { return 0x40; }));
@@ -125,8 +123,6 @@ void smuc_device::device_start()
 	save_item(NAME(m_port_7fba_data));
 	save_item(NAME(m_port_ffba_data));
 	save_item(NAME(m_ide_hi));
-
-	m_zxbus->install_device(0x0000, 0xffff, *this, &smuc_device::map_io);
 }
 
 void smuc_device::device_reset()
