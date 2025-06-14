@@ -18,7 +18,6 @@
 #include "k051733.h"
 
 #include "cpu/m6809/hd6309.h"
-#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/k007232.h"
 
@@ -36,7 +35,6 @@ public:
 	fastlane_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
-		m_rowscroll(*this, "rowscroll"),
 		m_videoram(*this, "videoram%u", 1U),
 		m_spriteram(*this, "spriteram"),
 		m_prgbank(*this, "prgbank"),
@@ -56,7 +54,6 @@ private:
 	required_device<cpu_device> m_maincpu;
 
 	// memory pointers
-	required_shared_ptr<uint8_t> m_rowscroll;
 	required_shared_ptr_array<uint8_t, 2> m_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_memory_bank m_prgbank;
@@ -79,9 +76,7 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 	void bankswitch_w(uint8_t data);
-
 	template <uint8_t Which> uint8_t k007232_r(offs_t offset);
 	template <uint8_t Which> void k007232_w(offs_t offset, uint8_t data);
 	template <uint8_t Which> void volume_callback(uint8_t data);
@@ -113,9 +108,9 @@ void fastlane_state::palette(palette_device &palette) const
 template <uint8_t Which>
 TILE_GET_INFO_MEMBER(fastlane_state::get_tile_info)
 {
-	uint8_t ctrl_3 = m_k007121->ctrlram_r(3);
-	uint8_t ctrl_4 = m_k007121->ctrlram_r(4);
-	uint8_t ctrl_5 = m_k007121->ctrlram_r(5);
+	uint8_t ctrl_3 = m_k007121->ctrl_r(3);
+	uint8_t ctrl_4 = m_k007121->ctrl_r(4);
+	uint8_t ctrl_5 = m_k007121->ctrl_r(5);
 	int attr = m_videoram[Which][tile_index];
 	int code = m_videoram[Which][tile_index + 0x400];
 	int bit0 = (ctrl_5 >> 0) & 0x03;
@@ -149,8 +144,6 @@ void fastlane_state::video_start()
 
 	m_layer[0] = &machine().tilemap().create(*m_k007121, tilemap_get_info_delegate(*this, FUNC(fastlane_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_layer[1] = &machine().tilemap().create(*m_k007121, tilemap_get_info_delegate(*this, FUNC(fastlane_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-
-	m_layer[0]->set_scroll_rows(32);
 }
 
 
@@ -195,13 +188,8 @@ uint32_t fastlane_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	clip[1] &= cliprect;
 
 	// set scroll registers
-	int scrollx = m_k007121->ctrlram_r(0);
-	int scrolly = m_k007121->ctrlram_r(2);
-
-	for (int i = 0; i < 32; i++)
-		m_layer[0]->set_scrollx(i, m_rowscroll[i] + scrollx - 40);
-
-	m_layer[0]->set_scrolly(0, scrolly);
+	m_layer[0]->set_scrollx(0, m_k007121->ctrl_r(0) - 40);
+	m_layer[0]->set_scrolly(0, m_k007121->ctrl_r(2));
 
 	// draw the graphics
 	m_layer[0]->draw(screen, bitmap, clip[0], 0, 0);
@@ -209,20 +197,6 @@ uint32_t fastlane_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_layer[1]->draw(screen, bitmap, clip[1], 0, 0);
 
 	return 0;
-}
-
-
-TIMER_DEVICE_CALLBACK_MEMBER(fastlane_state::interrupt)
-{
-	int scanline = param;
-
-	// vblank irq
-	if (scanline == 240 && m_k007121->ctrlram_r(7) & 0x02)
-		m_maincpu->set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
-
-	// timer (8 times per frame)
-	if ((scanline & 0x1f) == 0x10 && m_k007121->ctrlram_r(7) & 0x01)
-		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -258,7 +232,7 @@ void fastlane_state::k007232_w(offs_t offset, uint8_t data)
 void fastlane_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x0007).w(m_k007121, FUNC(k007121_device::ctrl_w));
-	map(0x0020, 0x005f).ram().share(m_rowscroll);
+	map(0x0020, 0x005f).rw(m_k007121, FUNC(k007121_device::scroll_r), FUNC(k007121_device::scroll_w));
 	map(0x0800, 0x0800).portr("DSW3");
 	map(0x0801, 0x0801).portr("P2");
 	map(0x0802, 0x0802).portr("P1");
@@ -367,7 +341,6 @@ void fastlane_state::fastlane(machine_config &config)
 	// basic machine hardware
 	HD6309E(config, m_maincpu, XTAL(24'000'000) / 8); // HD63C09EP, 3 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &fastlane_state::prg_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(fastlane_state::interrupt), "screen", 0, 1);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
@@ -376,11 +349,12 @@ void fastlane_state::fastlane(machine_config &config)
 	m_screen->set_raw(24_MHz_XTAL / 3, 512, 0, 280, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(fastlane_state::screen_update));
 	m_screen->set_palette(m_palette);
-	m_screen->screen_vblank().set(m_k007121, FUNC(k007121_device::sprites_buffer));
 
 	PALETTE(config, m_palette, FUNC(fastlane_state::palette)).set_format(palette_device::xBGR_555, 1024*16, 0x400);
 
-	K007121(config, m_k007121, 0, m_palette, gfx_fastlane);
+	K007121(config, m_k007121, 0, gfx_fastlane, m_palette, m_screen);
+	m_k007121->set_irq_cb().set_inputline(m_maincpu, HD6309_IRQ_LINE);
+	m_k007121->set_nmi_cb().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_k007121->set_flipscreen_cb().set(FUNC(fastlane_state::flipscreen_w));
 	m_k007121->set_dirtytiles_cb(FUNC(fastlane_state::dirtytiles));
 

@@ -90,7 +90,7 @@ void combatscb_state::palette(palette_device &palette) const
 
 TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info0)
 {
-	uint8_t ctrl_6 = m_k007121[0]->ctrlram_r(6);
+	uint8_t ctrl_6 = m_k007121[0]->ctrl_r(6);
 	uint8_t attributes = m_videoram[0][tile_index];
 	int bank = 4 * ((m_vreg & 0x0f) - 1);
 	int number, color;
@@ -120,7 +120,7 @@ TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info0)
 
 TILE_GET_INFO_MEMBER(combatsc_state::get_tile_info1)
 {
-	uint8_t ctrl_6 = m_k007121[1]->ctrlram_r(6);
+	uint8_t ctrl_6 = m_k007121[1]->ctrl_r(6);
 	uint8_t attributes = m_videoram[1][tile_index];
 	int bank = 4 * ((m_vreg >> 4) - 1);
 	int number, color;
@@ -301,7 +301,7 @@ void combatsc_base_state::videoview1_w(offs_t offset, uint8_t data)
 void combatsc_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int circuit, bitmap_ind8 &priority_bitmap, uint32_t pri_mask)
 {
 	k007121_device *k007121 = circuit ? m_k007121[1] : m_k007121[0];
-	int base_color = (circuit * 4) * 16 + (k007121->ctrlram_r(6) & 0x10) * 2;
+	int base_color = (circuit * 4) * 16 + (k007121->ctrl_r(6) & 0x10) * 2;
 
 	k007121->sprites_draw(bitmap, cliprect, base_color, 0, 0, priority_bitmap, pri_mask);
 }
@@ -309,32 +309,32 @@ void combatsc_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 uint32_t combatsc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if (m_k007121[0]->ctrlram_r(1) & 0x02)
+	if (m_k007121[0]->ctrl_r(1) & 0x02)
 	{
 		m_bg_tilemap[0]->set_scroll_rows(32);
 		for (int i = 0; i < 32; i++)
-			m_bg_tilemap[0]->set_scrollx(i, m_scrollram[0][i]);
+			m_bg_tilemap[0]->set_scrollx(i, m_k007121[0]->scroll_r(i) | ((m_k007121[0]->scroll_r(i | 0x20) & 1) << 8));
 	}
 	else
 	{
 		m_bg_tilemap[0]->set_scroll_rows(1);
-		m_bg_tilemap[0]->set_scrollx(0, m_k007121[0]->ctrlram_r(0) | ((m_k007121[0]->ctrlram_r(1) & 0x01) << 8));
+		m_bg_tilemap[0]->set_scrollx(0, m_k007121[0]->ctrl_r(0) | ((m_k007121[0]->ctrl_r(1) & 0x01) << 8));
 	}
 
-	if (m_k007121[1]->ctrlram_r(1) & 0x02)
+	if (m_k007121[1]->ctrl_r(1) & 0x02)
 	{
 		m_bg_tilemap[1]->set_scroll_rows(32);
 		for (int i = 0; i < 32; i++)
-			m_bg_tilemap[1]->set_scrollx(i, m_scrollram[1][i]);
+			m_bg_tilemap[1]->set_scrollx(i, m_k007121[1]->scroll_r(i) | ((m_k007121[1]->scroll_r(i | 0x20) & 1) << 8));
 	}
 	else
 	{
 		m_bg_tilemap[1]->set_scroll_rows(1);
-		m_bg_tilemap[1]->set_scrollx(0, m_k007121[1]->ctrlram_r(0) | ((m_k007121[1]->ctrlram_r(1) & 0x01) << 8));
+		m_bg_tilemap[1]->set_scrollx(0, m_k007121[1]->ctrl_r(0) | ((m_k007121[1]->ctrl_r(1) & 0x01) << 8));
 	}
 
-	m_bg_tilemap[0]->set_scrolly(0, m_k007121[0]->ctrlram_r(2));
-	m_bg_tilemap[1]->set_scrolly(0, m_k007121[1]->ctrlram_r(2));
+	m_bg_tilemap[0]->set_scrolly(0, m_k007121[0]->ctrl_r(2));
+	m_bg_tilemap[1]->set_scrolly(0, m_k007121[1]->ctrl_r(2));
 
 	screen.priority().fill(0, cliprect);
 
@@ -364,29 +364,28 @@ uint32_t combatsc_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		m_bg_tilemap[1]->draw(screen, bitmap, cliprect, 0, 8);
 	}
 
-	//if (m_k007121[0]->ctrlram_r(1) & 0x08)
+	//if (m_k007121[0]->ctrl_r(1) & 0x08)
 	{
 		rectangle clip;
 		clip = cliprect;
 
 		for (int i = 0; i < 32; i++)
 		{
-			// scrollram [0x20]-[0x3f]: char enable (presumably bit 0 only)
+			// scrollram [0x20]-[0x3f]: char enable
 			uint8_t base_scroll = m_k007121[0]->flipscreen() ? (0x3f - i) : (0x20 + i);
-			auto slot = m_scroll_view.entry();
-			if (m_scrollram[*slot][base_scroll] == 0)
+			if (!BIT(m_k007121[0]->scroll_r(base_scroll), 0))
 				continue;
 
 			clip.min_y = i * 8;
 			clip.max_y = clip.min_y + 7;
 
 			// bit 3 of reg [1] selects if tiles are opaque or have transparent pen.
-			m_textlayer->draw(screen, bitmap, clip, m_k007121[0]->ctrlram_r(1) & 0x08 ? TILEMAP_DRAW_OPAQUE : 0, 0);
+			m_textlayer->draw(screen, bitmap, clip, m_k007121[0]->ctrl_r(1) & 0x08 ? TILEMAP_DRAW_OPAQUE : 0, 0);
 		}
 	}
 
 	// chop the extreme columns if necessary
-	if (m_k007121[0]->ctrlram_r(3) & 0x40)
+	if (m_k007121[0]->ctrl_r(3) & 0x40)
 	{
 		rectangle clip;
 

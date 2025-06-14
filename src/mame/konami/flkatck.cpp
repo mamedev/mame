@@ -31,6 +31,7 @@ TODO:
 #include "sound/k007232.h"
 #include "sound/ymopm.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
@@ -95,7 +96,6 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(interrupt);
 	void bankswitch_w(uint8_t data);
 	uint8_t ls138_r(offs_t offset);
 	void ls138_w(offs_t offset, uint8_t data);
@@ -115,11 +115,11 @@ private:
 
 TILE_GET_INFO_MEMBER(flkatck_state::get_tile_info_a)
 {
-	uint8_t ctrl_0 = m_k007121->ctrlram_r(0);
-	uint8_t ctrl_2 = m_k007121->ctrlram_r(2);
-	uint8_t ctrl_3 = m_k007121->ctrlram_r(3);
-	uint8_t ctrl_4 = m_k007121->ctrlram_r(4);
-	uint8_t ctrl_5 = m_k007121->ctrlram_r(5);
+	uint8_t ctrl_0 = m_k007121->ctrl_r(0);
+	uint8_t ctrl_2 = m_k007121->ctrl_r(2);
+	uint8_t ctrl_3 = m_k007121->ctrl_r(3);
+	uint8_t ctrl_4 = m_k007121->ctrl_r(4);
+	uint8_t ctrl_5 = m_k007121->ctrl_r(5);
 	int attr = m_vram[tile_index];
 	int code = m_vram[tile_index + 0x400];
 	int bit0 = (ctrl_5 >> 0) & 0x03;
@@ -214,8 +214,8 @@ uint32_t flkatck_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	clip[1] &= cliprect;
 
 	// set scroll registers
-	int scrollx = m_k007121->ctrlram_r(0);
-	int scrolly = m_k007121->ctrlram_r(2);
+	int scrollx = m_k007121->ctrl_r(0);
+	int scrolly = m_k007121->ctrl_r(2);
 
 	if (!scrollx && !scrolly)
 		machine().tilemap().mark_all_dirty();
@@ -231,13 +231,6 @@ uint32_t flkatck_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-// machine
-INTERRUPT_GEN_MEMBER(flkatck_state::interrupt)
-{
-	if (m_k007121->ctrlram_r(7) & 0x02)
-		device.execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
-}
 
 void flkatck_state::bankswitch_w(uint8_t data)
 {
@@ -293,7 +286,7 @@ void flkatck_state::ls138_w(offs_t offset, uint8_t data)
 void flkatck_state::main_map(address_map &map)
 {
 	map(0x0000, 0x0007).w(m_k007121, FUNC(k007121_device::ctrl_w));
-	map(0x0020, 0x005f).ram(); // rowscroll?
+	map(0x0020, 0x005f).rw(m_k007121, FUNC(k007121_device::scroll_r), FUNC(k007121_device::scroll_w));
 	map(0x0400, 0x041f).rw(FUNC(flkatck_state::ls138_r), FUNC(flkatck_state::ls138_w)); // inputs, DIPS, bankswitch, counters, sound command
 	map(0x0800, 0x0bff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
 	map(0x1000, 0x1fff).ram().share(m_spriteram);
@@ -389,7 +382,6 @@ void flkatck_state::flkatck(machine_config &config)
 	// basic machine hardware
 	HD6309E(config, m_maincpu, 24_MHz_XTAL / 8); // HD63C09EP, 3MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &flkatck_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(flkatck_state::interrupt));
 
 	Z80(config, m_audiocpu, 3.579545_MHz_XTAL); // NEC D780C-1
 	m_audiocpu->set_addrmap(AS_PROGRAM, &flkatck_state::sound_map);
@@ -405,11 +397,11 @@ void flkatck_state::flkatck(machine_config &config)
 	screen.set_raw(24_MHz_XTAL / 3, 512, 0, 280, 264, 16, 240);
 	screen.set_screen_update(FUNC(flkatck_state::screen_update));
 	screen.set_palette("palette");
-	screen.screen_vblank().set(m_k007121, FUNC(k007121_device::sprites_buffer));
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 512).set_endianness(ENDIANNESS_LITTLE);
 
-	K007121(config, m_k007121, 0, "palette", gfx_flkatck);
+	K007121(config, m_k007121, 0, gfx_flkatck, "palette", "screen");
+	m_k007121->set_irq_cb().set_inputline(m_maincpu, HD6309_IRQ_LINE);
 	m_k007121->set_flipscreen_cb().set(FUNC(flkatck_state::flipscreen_w));
 	m_k007121->set_dirtytiles_cb(FUNC(flkatck_state::dirtytiles));
 
