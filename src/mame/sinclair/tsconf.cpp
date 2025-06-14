@@ -37,7 +37,7 @@ TODO:
 #include "tsconf.h"
 
 #include "bus/spectrum/ay/slot.h"
-#include "bus/spectrum/zxbus.h"
+#include "bus/spectrum/zxbus/bus.h"
 #include "cpu/z80/z80.h"
 #include "speaker.h"
 

@@ -80,6 +80,9 @@ public:
 	void busrq_w(int state) { busrq = state; }; // TODO stop Z80
 	int busak_r() { return busrq && BIT(irq_enable, 6); };
 
+	uint8_t mem_r(offs_t offset) { return m_space->read_byte(offset); };
+	void mem_w(offs_t offset, uint8_t data) { m_space->write_byte(offset, data); };
+
 protected:
 	template <uint8_t First> void set_gpio_names() { }
 
@@ -114,6 +117,7 @@ private:
 	emu_timer *timer = nullptr;
 	required_device<mie_jvs_device> jvs;
 	optional_ioport_array<8> gpio_port;
+	address_space* m_space;
 
 	uint32_t tbuf[TBUF_SIZE]{};
 	uint32_t control = 0, lreg = 0, jvs_rpos = 0;

@@ -3264,6 +3264,10 @@ if (BUSES["NUBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/nubus/quadralink.h",
 		MAME_DIR .. "src/devices/bus/nubus/laserview.cpp",
 		MAME_DIR .. "src/devices/bus/nubus/laserview.h",
+		MAME_DIR .. "src/devices/bus/nubus/enetnbtp.cpp",
+		MAME_DIR .. "src/devices/bus/nubus/enetnbtp.h",
+		MAME_DIR .. "src/devices/bus/nubus/enetlc.cpp",
+		MAME_DIR .. "src/devices/bus/nubus/enetlc.h",
 		MAME_DIR .. "src/devices/bus/nubus/supermac.cpp",
 		MAME_DIR .. "src/devices/bus/nubus/supermac.h",
 		MAME_DIR .. "src/devices/bus/nubus/thunder4gx.cpp",
@@ -3276,6 +3280,16 @@ if (BUSES["NUBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/nubus/pds30_sigmalview.h",
 		MAME_DIR .. "src/devices/bus/nubus/pds30_30hr.cpp",
 		MAME_DIR .. "src/devices/bus/nubus/pds30_30hr.h",
+		MAME_DIR .. "src/devices/bus/nubus/pwrbkduo/cards.cpp",
+		MAME_DIR .. "src/devices/bus/nubus/pwrbkduo/cards.h",
+		MAME_DIR .. "src/devices/bus/nubus/pwrbkduo/duodock.cpp",
+		MAME_DIR .. "src/devices/bus/nubus/pwrbkduo/duodock.h",
+		MAME_DIR .. "src/devices/bus/nubus/pwrbkduo/ethernetudock.cpp",
+		MAME_DIR .. "src/devices/bus/nubus/pwrbkduo/ethernetudock.h",
+		MAME_DIR .. "src/devices/bus/nubus/pwrbkduo/floppydock.cpp",
+		MAME_DIR .. "src/devices/bus/nubus/pwrbkduo/floppydock.h",
+		MAME_DIR .. "src/devices/bus/nubus/pwrbkduo/pwrbkduo.cpp",
+		MAME_DIR .. "src/devices/bus/nubus/pwrbkduo/pwrbkduo.h",
 	}
 end
 
@@ -4943,19 +4957,19 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/spectrum/zxbus.h,BUSES["ZXBUS"] = true
+--@src/devices/bus/spectrum/zxbus/bus.h,BUSES["ZXBUS"] = true
 ---------------------------------------------------
 
 if (BUSES["ZXBUS"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/bus/spectrum/zxbus.cpp",
-		MAME_DIR .. "src/devices/bus/spectrum/zxbus.h",
-		MAME_DIR .. "src/devices/bus/spectrum/nemoide.cpp",
-		MAME_DIR .. "src/devices/bus/spectrum/nemoide.h",
-		MAME_DIR .. "src/devices/bus/spectrum/neogs.cpp",
-		MAME_DIR .. "src/devices/bus/spectrum/neogs.h",
-		MAME_DIR .. "src/devices/bus/spectrum/smuc.cpp",
-		MAME_DIR .. "src/devices/bus/spectrum/smuc.h",
+		MAME_DIR .. "src/devices/bus/spectrum/zxbus/bus.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/zxbus/bus.h",
+		MAME_DIR .. "src/devices/bus/spectrum/zxbus/nemoide.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/zxbus/nemoide.h",
+		MAME_DIR .. "src/devices/bus/spectrum/zxbus/neogs.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/zxbus/neogs.h",
+		MAME_DIR .. "src/devices/bus/spectrum/zxbus/smuc.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/zxbus/smuc.h",
 	}
 end
 

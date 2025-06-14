@@ -6032,6 +6032,10 @@ static INPUT_PORTS_START( mx10 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( anpncpc )
+	PORT_START("IN0")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
 
 // this controller code is just designed to feed the games with data they're happy with, it probably has no grounds in reality
 // as I don't know how they really work.  presumably wireless with timeouts, sending signals for brief periods that need to be
@@ -6552,6 +6556,28 @@ ROM_START( gm235upc )
 	// also has RAM
 ROM_END
 
+ROM_START( anpncpc )
+	ROM_REGION( 0x2000000, "mainrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "s29gl064a10tfir3.u12", 0x00000, 0x800000, CRC(7a801dd5) SHA1(1c956939ed62069564e1d008cbfe405e0a067092) )
+
+	ROM_REGION( 0x2000, "i2cmem", ROMREGION_ERASE00 ) // probably just settings / profiles, remove later if so
+	ROM_LOAD( "l24c64.u5", 0x00000, 0x2000, CRC(968f8234) SHA1(6fb961a06892e4a577f78b3687c428b8e1c4c7d3) )
+ROM_END
+
+ROM_START( cmpmx10 )
+	ROM_REGION( 0x4000000, "mainrom", ROMREGION_ERASE00 )
+	// despite V1682 being able to access 32Mbytes natively, this is split into 2 4Mbyte banks with external banking
+	// the 2nd bank contains an (unused) menu for a 6-in-1
+	ROM_LOAD( "classicmaxpocket_vertical.u3", 0x000000, 0x400000, CRC(9d3614f9) SHA1(e5de00b23eb1a2d39c524f5b5aed3b1cda44efce) )
+	ROM_CONTINUE(0x2000000,0x400000)
+ROM_END
+
+ROM_START( cmpmx11 )
+	ROM_REGION( 0x4000000, "mainrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "cmpmx11.bin", 0x000000, 0x800000, CRC(e1f3590b) SHA1(f78f7fc4f9a4474b5a9717dfbfc3199a5bc994ba) )
+	// this set doesn't use external banking, and expects the 8Mbytes to map straight
+ROM_END
+
 } // anonymous namespace
 
 
@@ -6647,19 +6673,8 @@ CONS( 200?, icb_dp,   0,  0,   vt1682_lxts3, icb,   vt1682_lxts3_state, regular_
 // needs IO ports on sound CPU side, needs write access to space for RAM (inputs are 'mini-keyboard' style)
 CONS( 200?, gm235upc,  0,  0,  gm235upc, gm235upc, vt1682_dance_state, regular_init, "TimeTop", "Ultimate Pocket Console GM-235", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
-ROM_START( cmpmx10 )
-	ROM_REGION( 0x4000000, "mainrom", ROMREGION_ERASE00 )
-	// despite V1682 being able to access 32Mbytes natively, this is split into 2 4Mbyte banks with external banking
-	// the 2nd bank contains an (unused) menu for a 6-in-1
-	ROM_LOAD( "classicmaxpocket_vertical.u3", 0x000000, 0x400000, CRC(9d3614f9) SHA1(e5de00b23eb1a2d39c524f5b5aed3b1cda44efce) )
-	ROM_CONTINUE(0x2000000,0x400000)
-ROM_END
-
-ROM_START( cmpmx11 )
-	ROM_REGION( 0x4000000, "mainrom", ROMREGION_ERASE00 )
-	ROM_LOAD( "cmpmx11.bin", 0x000000, 0x800000, CRC(e1f3590b) SHA1(f78f7fc4f9a4474b5a9717dfbfc3199a5bc994ba) )
-	// this set doesn't use external banking, and expects the 8Mbytes to map straight
-ROM_END
+// "Anpanman Color PC" (アンパンマンカラーパソコン)
+CONS( 2009, anpncpc,   0,  0,  vt1682_lxts3,   anpncpc, vt1682_lxts3_state, regular_init,  "Bandai", "Anpanman Color PC (Japan)", MACHINE_NOT_WORKING )
 
 // as with others the cmpmx10 and cmpmx11 have minor offset issues in some games, you can see it easily in Jewel Master
 // 2007 is the copyright date shown on all the games, but the unit could have been released later

@@ -34,7 +34,7 @@ TODO:
 #include "glukrs.h"
 
 #include "bus/spectrum/ay/slot.h"
-#include "bus/spectrum/zxbus.h"
+#include "bus/spectrum/zxbus/bus.h"
 #include "machine/pckeybrd.h"
 #include "machine/spi_sdcard.h"
 #include "machine/timer.h"

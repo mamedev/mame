@@ -394,6 +394,7 @@ Notes:
 
 #include "emu.h"
 #include "cpu/sh/sh4.h"
+#include "cpu/arm7/arm7.h"
 #include "screen.h"
 #include "speaker.h"
 #include "315-6154.h"
@@ -423,6 +424,11 @@ public:
 		, m_mie(*this, "mie")
 		, m_eeprom(*this, "main_eeprom")
 		, m_rombd_eeprom(*this, "rombd_eeprom")
+		, m_main_ram(*this, "main_ram")
+		, m_slave_ram(*this, "slave_ram")
+		, m_arm0(*this, "arm0")
+		, m_aica0(*this, "aica0")
+		, m_aica0_ram(*this, "aica0_ram")
 	{ }
 
 	void hikaru(machine_config &config);
@@ -430,12 +436,15 @@ public:
 private:
 	virtual void video_start() override ATTR_COLD;
 	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 	void sh4_map_main(address_map &map) ATTR_COLD;
 	void sh4_io_main(address_map& map) ATTR_COLD;
 	void sh4_map_slave(address_map &map) ATTR_COLD;
 	void sh4_io_slave(address_map& map) ATTR_COLD;
 	void pci_map(address_map& map) ATTR_COLD;
+	void aica0_map(address_map& map) ATTR_COLD;
+	void arm0_map(address_map& map) ATTR_COLD;
 
 	uint32_t screen_update_hikaru(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -446,10 +455,24 @@ private:
 	required_device<mie_device> m_mie;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<x76f100_device> m_rombd_eeprom;
+	required_shared_ptr<uint64_t> m_main_ram;
+	required_shared_ptr<uint64_t> m_slave_ram;
+	required_device<cpu_device> m_arm0;
+	required_device<aica_device> m_aica0;
+	required_shared_ptr<uint16_t> m_aica0_ram;
 
 	address_space* space_main_sh4;
 	address_space* space_slave_sh4;
 	address_space* space_6154;
+
+	uint16_t aica0ram_r(offs_t offset);
+	void aica0ram_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint32_t arm0_aica_r(offs_t offset);
+	void arm0_aica_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	uint32_t aica0_reg_r(offs_t offset, uint32_t mem_mask);
+	void aica0_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	void arm0_irq(int state);
+	u8 m_arm0rst;
 
 	uint64_t main_io_r();
 	uint64_t slave_io_r();
@@ -458,10 +481,12 @@ private:
 
 	void irq_update();
 	//void gpu_irq(int state);
+	void szk_irq(int state);
 
 	u32 m_irq_pending;
 	u32 m_irq_mask;
 public:
+	void init_hikaru();
 	int mie_b_r();
 	void mie_c_w(int state);
 	void mie_f_w(int state);
@@ -478,10 +503,68 @@ void hikaru_state::machine_start()
 	space_6154 = &m_315_6154->space(sega_315_6154_device::AS_PCI_MEMORY);
 }
 
+void hikaru_state::machine_reset()
+{
+	m_arm0rst = 1;
+	m_arm0->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+}
+
 uint32_t hikaru_state::screen_update_hikaru(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
+
+// ugly trampolines, AICA needs to be devicefied
+uint32_t hikaru_state::aica0_reg_r(offs_t offset, uint32_t mem_mask)
+{
+	if (offset == 0x2c00 / 4)
+		return m_arm0rst;
+	return m_aica0->read(offset * 2);
+}
+void hikaru_state::aica0_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	if (offset == (0x2c00 / 4))
+	{
+		if (ACCESSING_BITS_0_7)
+		{
+			m_arm0rst = data & 1;
+			m_arm0->set_input_line(INPUT_LINE_RESET, m_arm0rst ? ASSERT_LINE : CLEAR_LINE);
+		}
+	}
+	m_aica0->write(offset * 2, data, 0xffff);
+}
+uint32_t hikaru_state::arm0_aica_r(offs_t offset)
+{
+	return m_aica0->read(offset * 2) & 0xffff;
+}
+void hikaru_state::arm0_aica_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	m_aica0->write(offset * 2, data, mem_mask & 0xffff);
+}
+uint16_t hikaru_state::aica0ram_r(offs_t offset)
+{
+	return m_aica0_ram[offset];
+}
+void hikaru_state::aica0ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_aica0_ram[offset]);
+}
+void hikaru_state::arm0_irq(int state)
+{
+	m_arm0->set_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+}
+void hikaru_state::arm0_map(address_map& map)
+{
+	map.unmap_value_high();
+	map(0x00000000, 0x007fffff).rw(FUNC(hikaru_state::aica0ram_r), FUNC(hikaru_state::aica0ram_w));
+	map(0x00800000, 0x00807fff).rw(FUNC(hikaru_state::arm0_aica_r), FUNC(hikaru_state::arm0_aica_w));
+}
+void hikaru_state::aica0_map(address_map& map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x7fffff).ram().share("aica0_ram");
+}
+//
 
 // main SH4 port A
 // 0 - /IRL3 Slave SH4
@@ -544,6 +627,16 @@ void hikaru_state::gpu_irq(int state)
 	irq_update();
 }
 #endif
+
+void hikaru_state::szk_irq(int state)
+{
+	if (state)
+		m_irq_pending |= 0x10;
+	else
+		m_irq_pending &= ~0x10;
+
+	irq_update();
+}
 
 int hikaru_state::mie_b_r()
 {
@@ -631,7 +724,7 @@ static INPUT_PORTS_START( hikaru_common )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("mie_eeprom", FUNC(eeprom_serial_93cxx_device::di_write))
 //	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("mie_eeprom", FUNC(eeprom_serial_93cxx_device::org_write)) // not implemented 8/16 bit mode switch
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("mie_eeprom", FUNC(eeprom_serial_93cxx_device::cs_write))
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_MEMBER(FUNC(hikaru_state::mie_f_w))
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_MEMBER(FUNC(hikaru_state::mie_f_w))
 
 	PORT_START("MIE.6")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mie_eeprom", FUNC(eeprom_serial_93cxx_device::do_read))
@@ -717,31 +810,33 @@ INPUT_PORTS_END
 
 void hikaru_state::pci_map(address_map& map)
 {
-	//const char* t = tag();
 	// master bridge "Local Bus" area
 //	map(0x00000000, 0x001fffff).rom();   // boot ROM
 	map(0x00400000, 0x007fffff).mirror(0x80000000).noprw(); // r/w trigger "OKBCS" line to PLD between Antarctic and Africa, purpose unknown
 	map(0x00800000, 0x0081ffff).mirror(0x80000000).m(m_mie, FUNC(mie_device::mie_port)).umask16(0x00ff);
-	map(0x00820000, 0x0083ffff).mirror(0x80000000).m(m_mie, FUNC(mie_device::mie_map)).umask16(0x00ff);
+	map(0x00820000, 0x0083ffff).mirror(0x80000000).rw(m_mie, FUNC(mie_device::mem_r), FUNC(mie_device::mem_w)).umask16(0x00ff);
 	map(0x00c00000, 0x00c0ffff).mirror(0x80000000).ram().share("^nvram");
 	map(0x02000000, 0x02ffffff).mirror(0x80000000).lrw32(
 		NAME([this](offs_t offset) { return (!m_mie->busak_r() << 8) | 0x600; }),
 		NAME([this](offs_t offset, u32 data) { m_mie->busrq_w(BIT(data, 8)); })
 	);
 //	map(0x0a000000, 0x0a0fffff).rw();    // optional ROMBD-specific security
-//  map(0x0c000000, 0x0cffffff).rw();    // onboard AICA + RAM
+	map(0x0c700000, 0x0c707fff).rw(tag(), FUNC(hikaru_state::aica0_reg_r), FUNC(hikaru_state::aica0_reg_w));
+	map(0x0c710000, 0x0c71000f).rw("^aicartc0", FUNC(aicartc_device::read), FUNC(aicartc_device::write)).umask32(0x0000ffff);
+	map(0x0c800000, 0x0cffffff).rw(tag(), FUNC(hikaru_state::aica0ram_r), FUNC(hikaru_state::aica0ram_w));
 //  map(0x0d000000, 0x0dffffff).rw();    // optional AICA + RAM
 //  map(0x0e000000, 0x0effffff).rw();    // optional Communication Board
     map(0x10000000, 0x13ffffff).mirror(0x80000000).rom().region("^user1", 0);
     map(0x14000000, 0x14ffffff).lrw32(
 		NAME([this](offs_t offset) { return m_rombd_eeprom->read_sda(); }),
 		NAME([this](offs_t offset, u32 data) {
-			m_rombd_eeprom->write_cs(BIT(data, 2));
-			m_rombd_eeprom->write_rst(BIT(data, 3));
+			m_rombd_eeprom->write_cs(!BIT(data, 2));
+			m_rombd_eeprom->write_rst(!BIT(data, 3));
 			m_rombd_eeprom->write_scl(BIT(data, 1));
 			m_rombd_eeprom->write_sda(BIT(data, 0));
 			})
 	);
+	map(0x18000000, 0x1fffffff).nopr(); // suppress log, boot looking for ROM board 1st in this area
     map(0x20000000, 0x2fffffff).mirror(0x80000000).rom().region("^user2", 0);
 
 // bridge mapped RAMs
@@ -794,7 +889,7 @@ void hikaru_state::sh4_map_main(address_map &map)
 	map(0x00000000, 0x03ffffff).rw(m_315_6154, FUNC(sega_315_6154_device::aperture_r<2>), FUNC(sega_315_6154_device::aperture_w<2>));
 	map(0x00000000, 0x001fffff).rom().region("maincpu", 0);
 	map(0x04000000, 0x040000ff).rw(m_315_6154, FUNC(sega_315_6154_device::registers_r), FUNC(sega_315_6154_device::registers_w));
-	map(0x0c000000, 0x0dffffff).ram();
+	map(0x0c000000, 0x0dffffff).ram().share("main_ram");
 	map(0x14000000, 0x17ffffff).rw(m_315_6154, FUNC(sega_315_6154_device::aperture_r<0>), FUNC(sega_315_6154_device::aperture_w<0>));
 	map(0x18000000, 0x1bffffff).rw(m_315_6154, FUNC(sega_315_6154_device::aperture_r<1>), FUNC(sega_315_6154_device::aperture_w<1>));
 }
@@ -804,7 +899,7 @@ void hikaru_state::sh4_map_slave(address_map &map)
 	map(0x00000000, 0x03ffffff).rw(s_315_6154, FUNC(sega_315_6154_device::aperture_r<2>), FUNC(sega_315_6154_device::aperture_w<2>));
 	map(0x00000000, 0x001fffff).rom().region("maincpu", 0);
 	map(0x04000000, 0x040000ff).rw(s_315_6154, FUNC(sega_315_6154_device::registers_r), FUNC(sega_315_6154_device::registers_w));
-	map(0x0c000000, 0x0dffffff).ram();
+	map(0x0c000000, 0x0dffffff).ram().share("slave_ram");
 	map(0x10000000, 0x103fffff).lrw64(
 		NAME([this](offs_t offset) { return space_6154->read_qword(0x48000000 + (offset << 3)); }),
 		NAME([this](offs_t offset, uint64_t data, uint64_t mem_mask) { space_6154->write_qword(0x48000000 + (offset << 3), data, mem_mask); })
@@ -830,7 +925,7 @@ void hikaru_state::hikaru(machine_config &config)
     m_maincpu->set_sh4_clock(CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &hikaru_state::sh4_map_main);
     m_maincpu->set_addrmap(AS_IO, &hikaru_state::sh4_io_main);
-	m_maincpu->set_force_no_drc(true);
+//	m_maincpu->set_force_no_drc(true);
 //  m_maincpu->set_vblank_int("screen", FUNC(hikaru_state::vblank));
 
 	SH7091(config, m_slave, CPU_CLOCK);
@@ -846,7 +941,7 @@ void hikaru_state::hikaru(machine_config &config)
 	m_slave->set_sh4_clock(CPU_CLOCK);
 	m_slave->set_addrmap(AS_PROGRAM, &hikaru_state::sh4_map_slave);
 	m_slave->set_addrmap(AS_IO, &hikaru_state::sh4_io_slave);
-	m_slave->set_force_no_drc(true);
+//	m_slave->set_force_no_drc(true);
 
 	PCI_ROOT(config, "pci0", 0);
 	SEGA315_6154(config, m_315_6154, 0);
@@ -883,13 +978,27 @@ void hikaru_state::hikaru(machine_config &config)
 	screen.set_visarea(0, 640-1, 0, 480-1);
 	screen.set_screen_update(FUNC(hikaru_state::screen_update_hikaru));
 
-//  SPEAKER(config, "speaker").front();
+	SPEAKER(config, "speaker", 2).front();
 
-//  67.7376MHz(2*33.8688MHz), div 3 for audio block
-//  AICA(config, "aica", (XTAL(33'868'800)*2)/3).add_route(0, "speaker", 1.0).add_route(1, "speaker", 1.0);
+	ARM7(config, m_arm0, ((XTAL(33'868'800) * 2) / 3) / 8);
+	m_arm0->set_addrmap(AS_PROGRAM, &hikaru_state::arm0_map);
 
-//  33.8688MHz on Board
-//  AICA(config, "aica_pcb", (XTAL(33'868'800)*2)/3).add_route(0, "speaker", 1.0).add_route(1, "speaker", 1.0); // AICA PCB
+	AICA(config, m_aica0, (XTAL(33'868'800) * 2) / 3);
+	m_aica0->irq().set(FUNC(hikaru_state::arm0_irq));
+	m_aica0->main_irq().set(FUNC(hikaru_state::szk_irq));
+	m_aica0->set_addrmap(0, &hikaru_state::aica0_map);
+	m_aica0->add_route(0, "speaker", 1.0, 0);
+	m_aica0->add_route(1, "speaker", 1.0, 1);
+
+	AICARTC(config, "aicartc0", XTAL(32'768));
+}
+
+void hikaru_state::init_hikaru()
+{
+	m_maincpu->sh2drc_set_options(SH2DRC_STRICT_VERIFY | SH2DRC_STRICT_PCREL);
+	m_maincpu->sh2drc_add_fastram(0x0c000000, 0x0dffffff, false, m_main_ram);
+	m_slave->sh2drc_set_options(SH2DRC_STRICT_VERIFY | SH2DRC_STRICT_PCREL);
+	m_slave->sh2drc_add_fastram(0x0c000000, 0x0dffffff, false, m_slave_ram);
 }
 
 
@@ -912,9 +1021,15 @@ void hikaru_state::hikaru(machine_config &config)
 // bios 2 is SAMURAI boot rom 0.84 / 1999/07/22
 // bios 3 is SAMURAI boot rom 0.74 / 1999/5/01 Development version, have options to change country, SCSI ID, boot into debugger mode (will wait for commands from host via SCSI).
 
+#define HIKARU_EEPROM \
+	ROM_REGION( 0x80, "main_eeprom", 0) \
+	ROM_LOAD( "93c46.ic115", 0, 0x80, CRC(737dc714) SHA1(852a90319ac2e787b94a4fc769424b79afbaaf9d) ) \
+	ROM_REGION( 0x84, "rombd_eeprom", 0) \
+	ROM_LOAD( "x76f100.ic85", 0, 0x84, BAD_DUMP CRC(194c6c18) SHA1(6c2de7dae32bef855d9bc556568c3a170f54caa5) )
 
 ROM_START( hikaru )
 	HIKARU_BIOS
+	HIKARU_EEPROM
 
 	ROM_REGION32_LE( 0x4000000, "user1", ROMREGION_ERASE00)
 	ROM_REGION32_LE( 0x10000000, "user2", ROMREGION_ERASE00)
@@ -923,6 +1038,7 @@ ROM_END
 
 ROM_START( airtrix )
 	HIKARU_BIOS
+	HIKARU_EEPROM
 
 	ROM_REGION32_LE( 0x4000000, "user1", ROMREGION_ERASE00)
 	ROM_LOAD32_WORD( "epr-23601a.ic29", 0x0000000, 0x0400000, CRC(cd3ccc05) SHA1(49de32d3588511f37486aff900773453739d706d) )
@@ -959,6 +1075,7 @@ ROM_END
 
 ROM_START( airtrixo )
 	HIKARU_BIOS
+	HIKARU_EEPROM
 
 	ROM_REGION32_LE(0x4000000, "user1", ROMREGION_ERASE00)
 	ROM_LOAD32_WORD( "epr-23601.ic29", 0x0000000, 0x0400000, CRC(e0c642cb) SHA1(f04f8e13cc46d462c79ecebcded7dee9b3500bdc) )
@@ -982,6 +1099,7 @@ ROM_END
 
 ROM_START( pharrier )
 	HIKARU_BIOS
+	HIKARU_EEPROM
 
 	ROM_REGION32_LE( 0x4000000, "user1", ROMREGION_ERASE00)
 	ROM_LOAD32_WORD("epr-23565a.ic29", 0x0000000, 0x0400000, CRC(ca9af8a7) SHA1(e7d6badc03ec5833ee89e49dd389ee19b45da29c) )
@@ -1018,6 +1136,7 @@ ROM_END
 
 ROM_START( swracer )
 	HIKARU_BIOS
+	HIKARU_EEPROM
 
 	ROM_REGION32_LE( 0x4000000, "user1", ROMREGION_ERASE00)
 	ROM_LOAD32_WORD("epr-23174.ic29", 0x0000000, 0x0400000, CRC(eae62b46) SHA1(f1458072b002d64bbb7c43c582e3191e8031e19a) )
@@ -1070,6 +1189,7 @@ ROM_END
 
 ROM_START( braveff )
 	HIKARU_BIOS
+	HIKARU_EEPROM
 
 	ROM_REGION32_LE( 0x4000000, "user1", ROMREGION_ERASE00)
 	ROM_LOAD32_WORD( "epr-21994.ic29", 0x0000000, 0x200000, CRC(31b0a754) SHA1(b49c998a15fbc790b780ed6665a56681d4edd369) )
@@ -1113,6 +1233,7 @@ ROM_END
 
 ROM_START( sgnascar )
 	HIKARU_BIOS
+	HIKARU_EEPROM
 
 	ROM_REGION32_LE( 0x4000000, "user1", ROMREGION_ERASE00)
 	ROM_LOAD32_WORD( "epr-23485a.ic35", 0x000000, 0x400000, CRC(1072f531) SHA1(ca07a8bfb7247e4aec57e18cb091d24dcef666c1) )
@@ -1144,6 +1265,7 @@ ROM_END
 
 ROM_START( sgnascaro )
 	HIKARU_BIOS
+	HIKARU_EEPROM
 
 	ROM_REGION32_LE( 0x4000000, "user1", ROMREGION_ERASE00)
 	ROM_LOAD32_WORD( "epr-23485.ic35", 0x000000, 0x400000, CRC(13b44fbf) SHA1(73416fa7b671ec5c96f0b084a427ff701bf6c399) )
@@ -1177,6 +1299,7 @@ ROM_END
 // Development ROM board type, looks same as Type 2/837-13403/171-7640B but have ZIF sockets instead of Mask ROMs and socketed 315-5881 chip.
 ROM_START( hikcheck )
 	HIKARU_BIOS
+	HIKARU_EEPROM
 
 	ROM_REGION32_LE( 0x4000000, "user1", 0)
 	// Flash ROM module, label:
@@ -1207,12 +1330,12 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2000, hikaru,    0,        hikaru, hikaru, hikaru_state, empty_init, ROT0, "Sega",            "Hikaru BIOS", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT )
-GAME( 1999, braveff,   hikaru,   hikaru, hikaru, hikaru_state, empty_init, ROT0, "Sega",            "Brave Firefighters", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-GAME( 2000, airtrix,   hikaru,   hikaru, hikaru, hikaru_state, empty_init, ROT0, "Sega",            "Air Trix (Rev A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-GAME( 2000, airtrixo,  airtrix,  hikaru, hikaru, hikaru_state, empty_init, ROT0, "Sega",            "Air Trix (original)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-GAME( 2000, hikcheck,  hikaru,   hikaru, hikaru, hikaru_state, empty_init, ROT0, "Sega",            "Hikaru Check ROM Board", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-GAME( 2000, sgnascar,  hikaru,   hikaru, hikaru, hikaru_state, empty_init, ROT0, "Sega / Electronic Arts", "NASCAR Arcade (Rev A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-GAME( 2000, sgnascaro, sgnascar, hikaru, hikaru, hikaru_state, empty_init, ROT0, "Sega / Electronic Arts", "NASCAR Arcade (original)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-GAME( 2000, pharrier,  hikaru,   hikaru, hikaru, hikaru_state, empty_init, ROT0, "Sega",            "Planet Harriers (Rev A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-GAME( 2000, swracer,   hikaru,   hikaru, hikaru, hikaru_state, empty_init, ROT0, "Sega",            "Star Wars: Racer Arcade", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, hikaru,    0,        hikaru, hikaru, hikaru_state, init_hikaru, ROT0, "Sega",            "Hikaru BIOS", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT )
+GAME( 1999, braveff,   hikaru,   hikaru, hikaru, hikaru_state, init_hikaru, ROT0, "Sega",            "Brave Firefighters", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, airtrix,   hikaru,   hikaru, hikaru, hikaru_state, init_hikaru, ROT0, "Sega",            "Air Trix (Rev A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, airtrixo,  airtrix,  hikaru, hikaru, hikaru_state, init_hikaru, ROT0, "Sega",            "Air Trix (original)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, hikcheck,  hikaru,   hikaru, hikaru, hikaru_state, init_hikaru, ROT0, "Sega",            "Hikaru Check ROM Board", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, sgnascar,  hikaru,   hikaru, hikaru, hikaru_state, init_hikaru, ROT0, "Sega / Electronic Arts", "NASCAR Arcade (Rev A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, sgnascaro, sgnascar, hikaru, hikaru, hikaru_state, init_hikaru, ROT0, "Sega / Electronic Arts", "NASCAR Arcade (original)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, pharrier,  hikaru,   hikaru, hikaru, hikaru_state, init_hikaru, ROT0, "Sega",            "Planet Harriers (Rev A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, swracer,   hikaru,   hikaru, hikaru, hikaru_state, init_hikaru, ROT0, "Sega",            "Star Wars: Racer Arcade", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )

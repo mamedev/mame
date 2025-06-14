@@ -107,20 +107,51 @@ void nubus_device::device_start()
 			m_space->install_write_handler(0x90000000, 0xefffffff, emu::rw_delegate(*this, FUNC(nubus_device::bus_memory_w<0x90000000>)));
 			m_space->install_read_handler(0xf9000000, 0xfeffffff, emu::rw_delegate(*this, FUNC(nubus_device::bus_memory_r<0xf9000000>)));
 			m_space->install_write_handler(0xf9000000, 0xfeffffff, emu::rw_delegate(*this, FUNC(nubus_device::bus_memory_w<0xf9000000>)));
+
+			// NuBus mappings
+			// RAM
+			this->space(AS_DATA).install_read_handler(0x00000000, 0x3fffffff, emu::rw_delegate(*this, FUNC(nubus_device::host_memory_r<0x00000000>)));
+			this->space(AS_DATA).install_write_handler(0x00000000, 0x3fffffff, emu::rw_delegate(*this, FUNC(nubus_device::host_memory_w<0x00000000>)));
+			// I/O
+			this->space(AS_DATA).install_read_handler(0xf0000000, 0xf07fffff, emu::rw_delegate(*this, FUNC(nubus_device::host_memory_r<0x50000000>)));
+			this->space(AS_DATA).install_write_handler(0xf0000000, 0xf07fffff, emu::rw_delegate(*this, FUNC(nubus_device::host_memory_w<0x50000000>)));
+			// ROM
+			this->space(AS_DATA).install_read_handler(0xf0800000, 0xf0ffffff, emu::rw_delegate(*this, FUNC(nubus_device::host_memory_r<0x40000000>)));
+			this->space(AS_DATA).install_write_handler(0xf0800000, 0xf0ffffff, emu::rw_delegate(*this, FUNC(nubus_device::host_memory_w<0x40000000>)));
+
 			break;
 
 		case nubus_mode_t::QUADRA_DAFB:
-			m_space->install_read_handler(0xa0000000, 0xefffffff, emu::rw_delegate(*this, FUNC(nubus_device::bus_memory_r<0x90000000>)));
-			m_space->install_write_handler(0xa0000000, 0xefffffff, emu::rw_delegate(*this, FUNC(nubus_device::bus_memory_w<0x90000000>)));
-			m_space->install_read_handler(0xfa000000, 0xfeffffff, emu::rw_delegate(*this, FUNC(nubus_device::bus_memory_r<0xf9000000>)));
-			m_space->install_write_handler(0xfa000000, 0xfeffffff, emu::rw_delegate(*this, FUNC(nubus_device::bus_memory_w<0xf9000000>)));
+			m_space->install_read_handler(0xa0000000, 0xefffffff, emu::rw_delegate(*this, FUNC(nubus_device::bus_memory_r<0xa0000000>)));
+			m_space->install_write_handler(0xa0000000, 0xefffffff, emu::rw_delegate(*this, FUNC(nubus_device::bus_memory_w<0xa0000000>)));
+			m_space->install_read_handler(0xfa000000, 0xfeffffff, emu::rw_delegate(*this, FUNC(nubus_device::bus_memory_r<0xfa000000>)));
+			m_space->install_write_handler(0xfa000000, 0xfeffffff, emu::rw_delegate(*this, FUNC(nubus_device::bus_memory_w<0xfa000000>)));
+
+			this->space(AS_DATA).install_read_handler(0x00000000, 0x3fffffff, emu::rw_delegate(*this, FUNC(nubus_device::host_memory_r<0x00000000>)));
+			this->space(AS_DATA).install_write_handler(0x00000000, 0x3fffffff, emu::rw_delegate(*this, FUNC(nubus_device::host_memory_w<0x00000000>)));
 			break;
 
+		// Original LC PDS omits A28, A29, and A30 so in 32-bit mode, 0xfxxxxxxx addresses appear here as 0x8xxxxxxx.
+		// In 24-bit mode, we will see addresses of the form 0x00exxxxxx.
 		case nubus_mode_t::LC_PDS:
-			m_space->install_read_handler(0x80e00000, 0x80ffffff, emu::rw_delegate(*this, FUNC(nubus_device::bus_memory_r<0x80e00000>)));
-			m_space->install_write_handler(0x80e00000, 0x80ffffff, emu::rw_delegate(*this, FUNC(nubus_device::bus_memory_w<0x80e00000>)));
+			m_space->install_read_handler(0x80000000, 0x80ffffff, emu::rw_delegate(*this, FUNC(nubus_device::bus_memory_r<0x80000000>)));
+			m_space->install_write_handler(0x80000000, 0x80ffffff, emu::rw_delegate(*this, FUNC(nubus_device::bus_memory_w<0x80000000>)));
 			m_space->install_read_handler(0x00e00000, 0x00efffff, emu::rw_delegate(*this, FUNC(nubus_device::bus_memory_r<0x80e00000>)));
 			m_space->install_write_handler(0x00e00000, 0x00efffff, emu::rw_delegate(*this, FUNC(nubus_device::bus_memory_w<0x80e00000>)));
+
+			this->space(AS_DATA).install_read_handler(0x00000000, 0x009fffff, emu::rw_delegate(*this, FUNC(nubus_device::host_memory_r<0x00000000>)));
+			this->space(AS_DATA).install_write_handler(0x00000000, 0x009fffff, emu::rw_delegate(*this, FUNC(nubus_device::host_memory_w<0x00000000>)));
+			break;
+
+		// LC III and later PDS is very similar to SE/30, and allows phantom slotting to $C, $D, and $E
+		case nubus_mode_t::LC32_PDS:
+			m_space->install_read_handler(0xc0000000, 0xefffffff, emu::rw_delegate(*this, FUNC(nubus_device::bus_memory_r<0xc0000000>)));
+			m_space->install_write_handler(0xc0000000, 0xefffffff, emu::rw_delegate(*this, FUNC(nubus_device::bus_memory_w<0xc0000000>)));
+			m_space->install_read_handler(0xfc000000, 0xfeffffff, emu::rw_delegate(*this, FUNC(nubus_device::bus_memory_r<0xfc000000>)));
+			m_space->install_write_handler(0xfc000000, 0xfeffffff, emu::rw_delegate(*this, FUNC(nubus_device::bus_memory_w<0xfc000000>)));
+
+			this->space(AS_DATA).install_read_handler(0x00000000, 0x3fffffff, emu::rw_delegate(*this, FUNC(nubus_device::host_memory_r<0x00000000>)));
+			this->space(AS_DATA).install_write_handler(0x00000000, 0x3fffffff, emu::rw_delegate(*this, FUNC(nubus_device::host_memory_w<0x00000000>)));
 			break;
 
 		case nubus_mode_t::SE30:
@@ -128,6 +159,9 @@ void nubus_device::device_start()
 			m_space->install_write_handler(0x90000000, 0xdfffffff, emu::rw_delegate(*this, FUNC(nubus_device::bus_memory_w<0x90000000>)));
 			m_space->install_read_handler(0xf9000000, 0xfdffffff, emu::rw_delegate(*this, FUNC(nubus_device::bus_memory_r<0xf9000000>)));
 			m_space->install_write_handler(0xf9000000, 0xfdffffff, emu::rw_delegate(*this, FUNC(nubus_device::bus_memory_w<0xf9000000>)));
+
+			this->space(AS_DATA).install_read_handler(0x00000000, 0x3fffffff, emu::rw_delegate(*this, FUNC(nubus_device::host_memory_r<0x00000000>)));
+			this->space(AS_DATA).install_write_handler(0x00000000, 0x3fffffff, emu::rw_delegate(*this, FUNC(nubus_device::host_memory_w<0x00000000>)));
 			break;
 	}
 }
@@ -136,6 +170,21 @@ void nubus_device::add_nubus_card(device_nubus_card_interface &card)
 {
 	m_device_list.emplace_back(card);
 }
+
+template <u32 Base>
+u32 nubus_device::host_memory_r(offs_t offset, u32 mem_mask)
+{
+	return m_space->read_dword(Base + (offset * 4), mem_mask);
+}
+
+template <u32 Base>
+void nubus_device::host_memory_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	m_space->write_dword(Base + (offset * 4), data, mem_mask);
+}
+
+template u32    nubus_device::host_memory_r<0x00000000>(offs_t offset, u32 mem_mask);
+template void   nubus_device::host_memory_w<0x00000000>(offs_t offset, u32 data, u32 mem_mask);
 
 template <u32 Base>
 u32 nubus_device::bus_memory_r(offs_t offset, u32 mem_mask)
@@ -149,20 +198,27 @@ void nubus_device::bus_memory_w(offs_t offset, u32 data, u32 mem_mask)
 	this->space(AS_DATA).write_dword(Base + (offset * 4), data, mem_mask);
 }
 
-template u32 nubus_device::bus_memory_r<0x90000000>(offs_t offset, u32 mem_mask);
-template void     nubus_device::bus_memory_w<0x90000000>(offs_t offset, u32 data, u32 mem_mask);
-template u32 nubus_device::bus_memory_r<0xf9000000>(offs_t offset, u32 mem_mask);
-template void     nubus_device::bus_memory_w<0xf9000000>(offs_t offset, u32 data, u32 mem_mask);
+template u32    nubus_device::bus_memory_r<0x90000000>(offs_t offset, u32 mem_mask);
+template void   nubus_device::bus_memory_w<0x90000000>(offs_t offset, u32 data, u32 mem_mask);
+template u32    nubus_device::bus_memory_r<0xc0000000>(offs_t offset, u32 mem_mask);
+template void   nubus_device::bus_memory_w<0xc0000000>(offs_t offset, u32 data, u32 mem_mask);
+template u32    nubus_device::bus_memory_r<0xf9000000>(offs_t offset, u32 mem_mask);
+template void   nubus_device::bus_memory_w<0xf9000000>(offs_t offset, u32 data, u32 mem_mask);
 
-template u32 nubus_device::bus_memory_r<0xa0000000>(offs_t offset, u32 mem_mask);
-template void     nubus_device::bus_memory_w<0xa0000000>(offs_t offset, u32 data, u32 mem_mask);
-template u32 nubus_device::bus_memory_r<0xfa000000>(offs_t offset, u32 mem_mask);
-template void     nubus_device::bus_memory_w<0xfa000000>(offs_t offset, u32 data, u32 mem_mask);
+template u32    nubus_device::bus_memory_r<0xa0000000>(offs_t offset, u32 mem_mask);
+template void   nubus_device::bus_memory_w<0xa0000000>(offs_t offset, u32 data, u32 mem_mask);
+template u32    nubus_device::bus_memory_r<0xfa000000>(offs_t offset, u32 mem_mask);
+template void   nubus_device::bus_memory_w<0xfa000000>(offs_t offset, u32 data, u32 mem_mask);
 
-template u32 nubus_device::bus_memory_r<0x00e00000>(offs_t offset, u32 mem_mask);
-template void     nubus_device::bus_memory_w<0x00e00000>(offs_t offset, u32 data, u32 mem_mask);
-template u32 nubus_device::bus_memory_r<0x80e00000>(offs_t offset, u32 mem_mask);
-template void     nubus_device::bus_memory_w<0x80e00000>(offs_t offset, u32 data, u32 mem_mask);
+template u32    nubus_device::bus_memory_r<0xfc000000>(offs_t offset, u32 mem_mask);
+template void   nubus_device::bus_memory_w<0xfc000000>(offs_t offset, u32 data, u32 mem_mask);
+
+template u32    nubus_device::bus_memory_r<0x00e00000>(offs_t offset, u32 mem_mask);
+template void   nubus_device::bus_memory_w<0x00e00000>(offs_t offset, u32 data, u32 mem_mask);
+template u32    nubus_device::bus_memory_r<0x80000000>(offs_t offset, u32 mem_mask);
+template void   nubus_device::bus_memory_w<0x80000000>(offs_t offset, u32 data, u32 mem_mask);
+template u32    nubus_device::bus_memory_r<0x80e00000>(offs_t offset, u32 mem_mask);
+template void   nubus_device::bus_memory_w<0x80e00000>(offs_t offset, u32 data, u32 mem_mask);
 
 template <typename R, typename W>
 void nubus_device::install_device(offs_t start, offs_t end, R rhandler, W whandler, u32 mask)

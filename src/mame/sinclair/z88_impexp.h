@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Sandro Ronco
 
-#ifndef MAME_ACORN_Z88_IMPEXP_H
-#define MAME_ACORN_Z88_IMPEXP_H
+#ifndef MAME_SINCLAIR_Z88_IMPEXP_H
+#define MAME_SINCLAIR_Z88_IMPEXP_H
 
 #pragma once
 
@@ -68,4 +68,4 @@ private:
 
 DECLARE_DEVICE_TYPE(Z88_IMPEXP, z88_impexp_device)
 
-#endif // MAME_ACORN_Z88_IMPEXP_H
+#endif // MAME_SINCLAIR_Z88_IMPEXP_H

@@ -15,13 +15,27 @@
 ***************************************************************************/
 
 #include "emu.h"
+
+#ifndef QSOUND_LLE
+#define QSOUND_LLE
+#endif
+
 #include "qsoundhle.h"
 
-#define QSOUND_SKIP_OVERRIDE
 #include "qsound.h"
 
 #include <algorithm>
 #include <limits>
+
+//-------------------------------------------------
+//  parent_rom_device_type - get parent device type
+//  for ROM search
+//-------------------------------------------------
+
+inline auto qsound_hle_device::parent_rom_device_type()
+{
+	return &QSOUND;
+}
 
 // device type definition
 DEFINE_DEVICE_TYPE(QSOUND_HLE, qsound_hle_device, "qsound_hle", "QSound (HLE)")
@@ -60,16 +74,6 @@ qsound_hle_device::qsound_hle_device(const machine_config &mconfig, const char *
 const tiny_rom_entry *qsound_hle_device::device_rom_region() const
 {
 	return ROM_NAME( qsound_hle );
-}
-
-//-------------------------------------------------
-//  parent_rom_device_type - get parent device type
-//  for ROM search
-//-------------------------------------------------
-
-auto qsound_hle_device::parent_rom_device_type()
-{
-	return &QSOUND;
 }
 
 //-------------------------------------------------

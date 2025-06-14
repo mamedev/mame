@@ -2,6 +2,9 @@
 <!--
 license:CC0-1.0
 copyright-holders:m1macrophage
+
+The layouts for the tr707 and tr727 are very similar. The `is727` output controls
+the visibility and style of elements that differ between the two.
 -->
 <mamelayout version="2">
 	<element name="script_warning" defstate="1">
@@ -127,26 +130,69 @@ copyright-holders:m1macrophage
 	<element name="lcd_section_grid">
 		<image><data><![CDATA[
 			<rect fill="#4a5454" width="268" height="134" rx="4" ry="4"/>
-			<rect fill="#b8c2c4" width="266" height="132" rx="3" ry="3" x="1" y="1" />
+			<rect fill="#b8c2c4" width="266" height="132" rx="3" ry="3" x="1" y="1"/>
 		]]></data></image>
 	</element>
 	<element name="lcd_section_tempo">
 		<image><data><![CDATA[
 			<rect fill="#4a5454" width="104" height="64" rx="4" ry="4"/>
-			<rect fill="#b8c2c4" width="102" height="62" rx="3" ry="3" x="1" y="1" />
+			<rect fill="#b8c2c4" width="102" height="62" rx="3" ry="3" x="1" y="1"/>
 		]]></data></image>
 	</element>
 	<element name="lcd_section_track">
 		<image><data><![CDATA[
 			<rect fill="#4a5454" width="160" height="24" rx="4" ry="4"/>
-			<rect fill="#b8c2c4" width="158" height="22" rx="3" ry="3" x="1" y="1" />
+			<rect fill="#b8c2c4" width="158" height="22" rx="3" ry="3" x="1" y="1"/>
 		]]></data></image>
 	</element>
 	<element name="lcd_section_mode">
 		<image><data><![CDATA[
 			<rect fill="#4a5454" width="160" height="38" rx="4" ry="4"/>
-			<rect fill="#b8c2c4" width="158" height="36" rx="3" ry="3" x="1" y="1" />
+			<rect fill="#b8c2c4" width="158" height="36" rx="3" ry="3" x="1" y="1"/>
 		]]></data></image>
+	</element>
+
+	<element name="seg_triangle">
+		<image state="1"><data><![CDATA[<polygon fill="#12120f" fill-opacity="0.8" points="0,0 5,3 0,6"/>]]></data></image>
+	</element>
+	<element name="seg_dot">
+		<disk state="1"><color red="0.07" green="0.07" blue="0.06" alpha="0.7"/></disk>
+	</element>
+	<element name="seg_digit">
+		<led7seg><color red="0.07" green="0.07" blue="0.06" alpha="0.7"/></led7seg>
+	</element>
+	<element name="seg_tempo">
+		<text state="1" string="TEMPO" align="1"><color red="0.07" green="0.07" blue="0.06" alpha="0.8"/></text>
+	</element>
+	<element name="seg_measure">
+		<text state="1" string="MEASURE" align="1"><color red="0.07" green="0.07" blue="0.06" alpha="0.8"/></text>
+	</element>
+	<element name="seg_track_1">
+		<text state="1" string="I"><color red="0.07" green="0.07" blue="0.06" alpha="0.8"/></text>
+	</element>
+	<element name="seg_track_2">
+		<text state="1" string="II"><color red="0.07" green="0.07" blue="0.06" alpha="0.8"/></text>
+	</element>
+	<element name="seg_track_3">
+		<text state="1" string="III"><color red="0.07" green="0.07" blue="0.06" alpha="0.8"/></text>
+	</element>
+	<element name="seg_track_4">
+		<text state="1" string="IV"><color red="0.07" green="0.07" blue="0.06" alpha="0.8"/></text>
+	</element>
+	<element name="seg_track_play">
+		<text state="1" string="TRACK PLAY" align="1"><color red="0.07" green="0.07" blue="0.06" alpha="0.8"/></text>
+	</element>
+	<element name="seg_track_write">
+		<text state="1" string="TRACK WRITE" align="1"><color red="0.07" green="0.07" blue="0.06" alpha="0.8"/></text>
+	</element>
+	<element name="seg_pattern_play">
+		<text state="1" string="PATTERN PLAY" align="1"><color red="0.07" green="0.07" blue="0.06" alpha="0.8"/></text>
+	</element>
+	<element name="seg_step_write">
+		<text state="1" string="STEP WRITE" align="1"><color red="0.07" green="0.07" blue="0.06" alpha="0.8"/></text>
+	</element>
+	<element name="seg_tap_write">
+		<text state="1" string="TAP WRITE" align="1"><color red="0.07" green="0.07" blue="0.06" alpha="0.8"/></text>
 	</element>
 
 
@@ -365,60 +411,15 @@ copyright-holders:m1macrophage
 
 	<!-- Drum pad legend elements -->
 
-	<element name="txt_shiftpad_1">
-		<text string="1">
-			<color state="0" red="0.17" green="0.19" blue="0.20"/>
-			<color state="1" red="0.95" green="0.95" blue="0.90"/>
-		</text>
-	</element>
-	<element name="txt_shiftpad_2">
-		<text string="2">
-			<color state="0" red="0.17" green="0.19" blue="0.20"/>
-			<color state="1" red="0.95" green="0.95" blue="0.90"/>
-		</text>
-	</element>
-	<element name="txt_shiftpad_3">
-		<text string="3">
-			<color state="0" red="0.17" green="0.19" blue="0.20"/>
-			<color state="1" red="0.95" green="0.95" blue="0.90"/>
-		</text>
-	</element>
-	<element name="txt_shiftpad_4">
-		<text string="4">
-			<color state="0" red="0.17" green="0.19" blue="0.20"/>
-			<color state="1" red="0.95" green="0.95" blue="0.90"/>
-		</text>
-	</element>
-	<element name="txt_shiftpad_5">
-		<text string="5">
-			<color state="0" red="0.17" green="0.19" blue="0.20"/>
-			<color state="1" red="0.95" green="0.95" blue="0.90"/>
-		</text>
-	</element>
-	<element name="txt_shiftpad_6">
-		<text string="6">
-			<color state="0" red="0.17" green="0.19" blue="0.20"/>
-			<color state="1" red="0.95" green="0.95" blue="0.90"/>
-		</text>
-	</element>
-	<element name="txt_shiftpad_7">
-		<text string="7">
-			<color state="0" red="0.17" green="0.19" blue="0.20"/>
-			<color state="1" red="0.95" green="0.95" blue="0.90"/>
-		</text>
-	</element>
-	<element name="txt_shiftpad_8">
-		<text string="8">
-			<color state="0" red="0.17" green="0.19" blue="0.20"/>
-			<color state="1" red="0.95" green="0.95" blue="0.90"/>
-		</text>
-	</element>
-	<element name="txt_shiftpad_9">
-		<text string="9">
-			<color state="0" red="0.17" green="0.19" blue="0.20"/>
-			<color state="1" red="0.95" green="0.95" blue="0.90"/>
-		</text>
-	</element>
+	<repeat count="9">
+		<param name="i" start="1" increment="1"/>
+		<element name="txt_shiftpad_~i~">
+			<text string="~i~">
+				<color state="0" red="0.17" green="0.19" blue="0.20"/>
+				<color state="1" red="0.95" green="0.95" blue="0.90"/>
+			</text>
+		</element>
+	</repeat>
 	<element name="txt_shiftpad_10">
 		<text string="0">
 			<color state="0" red="0.17" green="0.19" blue="0.20"/>
@@ -586,17 +587,45 @@ copyright-holders:m1macrophage
 			<param name="i" start="1" increment="1"/>
 			<param name="txt_y" start="183" increment="12"/>
 			<param name="line_y" start="186" increment="12"/>
+			<param name="dot_y" start="183" increment="12"/>
 			<param name="separator_y" start="180" increment="12"/>
+
 			<element ref="lcd_txt_voice_~i~" name="is727"><bounds x="428" y="~txt_y~" width="58" height="8"/></element>
 			<element ref="lcd_line"><bounds x="488" y="~line_y~" width="186" height="1"/></element>
 			<element ref="lcd_line"><bounds x="424" y="~separator_y~" width="64" height="1"/></element>
+
+			<element ref="seg_triangle" name="seg_triangle_~i~"><bounds x="413" y="~dot_y~" width="6" height="7"/></element>
+			<repeat count="16">
+				<param name="j" start="1" increment="1"/>
+				<param name="x" start="495" increment="11"/>
+				<element ref="seg_dot" name="seg_dot_~j~_~i~"><bounds x="~x~" y="~dot_y~" width="7" height="7"/></element>
+			</repeat>
 		</repeat>
 
 		<element ref="lcd_section_tempo"><bounds x="407" y="307" width="104" height="64"/></element>
+		<element ref="seg_tempo" name="seg_text_1"><bounds x="421" y="313" width="30" height="10"/></element>
+		<element ref="seg_measure" name="seg_text_2"><bounds x="455" y="313" width="40" height="10"/></element>
+		<repeat count="3">
+			<param name="i" start="1" increment="1"/>
+			<param name="x" start="416" increment="30"/>
+			<element ref="seg_digit" name="seg_digit_~i~"><bounds x="~x~" y="330" width="24" height="34"/></element>
+		</repeat>
+
 		<element ref="lcd_section_track"><bounds x="515" y="307" width="160" height="24"/></element>
 		<element ref="lcd_txt_track"><bounds x="519" y="313" width="44" height="11"/></element>
+		<repeat count="4">
+			<param name="i" start="1" increment="1"/>
+			<param name="x" start="584" increment="22"/>
+			<element ref="seg_track_~i~" name="seg_track_~i~"><bounds x="~x~" y="310" width="20" height="20"/></element>
+		</repeat>
+
 		<element ref="lcd_section_mode"><bounds x="515" y="333" width="160" height="38"/></element>
-		<element ref="lcd_txt_mode"><bounds x="519" y="336" width="30" height="10"/></element>
+		<element ref="lcd_txt_mode"><bounds x="519" y="335" width="70" height="10"/></element>
+		<element ref="seg_track_play" name="seg_text_3"><bounds x="519" y="347" width="70" height="10"/></element>
+		<element ref="seg_track_write" name="seg_text_4"><bounds x="519" y="359" width="70" height="10"/></element>
+		<element ref="seg_pattern_play" name="seg_text_5"><bounds x="595" y="335" width="70" height="10"/></element>
+		<element ref="seg_step_write" name="seg_text_6"><bounds x="595" y="347" width="70" height="10"/></element>
+		<element ref="seg_tap_write" name="seg_text_7"><bounds x="595" y="359" width="70" height="10"/></element>
 
 
 		<!-- Mixer -->

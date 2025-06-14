@@ -32,7 +32,7 @@
 #include "specnext_sprites.h"
 #include "specnext_tiles.h"
 
-#include "bus/spectrum/zxbus.h"
+#include "bus/spectrum/zxbus/bus.h"
 #include "cpu/z80/z80n.h"
 #include "machine/i2cmem.h"
 #include "machine/spi_sdcard.h"

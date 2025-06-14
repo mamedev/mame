@@ -647,6 +647,7 @@ public:
 	superxavix_state(const machine_config &mconfig, device_type type, const char *tag)
 		: xavix_state(mconfig, type, tag)
 		, m_xavix2002io(*this, "xavix2002io")
+		, m_allow_superxavix_extra_rom_sprites(true)
 		, m_sx_crtc_1(*this, "sx_crtc_1")
 		, m_sx_crtc_2(*this, "sx_crtc_2")
 		, m_sx_plt_loc(*this, "sx_plt_loc")
@@ -675,6 +676,8 @@ protected:
 	required_device<xavix2002_io_device> m_xavix2002io;
 
 	virtual void get_tile_pixel_dat(uint8_t &dat, int bpp) override;
+
+	bool m_allow_superxavix_extra_rom_sprites; // config does not need saving
 
 private:
 	void ext_segment_regs_w(offs_t offset, uint8_t data);
@@ -768,6 +771,7 @@ public:
 		m_i2cmem(*this, "i2cmem")
 	{ }
 
+	void superxavix_i2c_24c64(machine_config &config);
 	void superxavix_i2c_24c16(machine_config &config);
 	void superxavix_i2c_24c08(machine_config &config);
 	void superxavix_i2c_24c04(machine_config &config);

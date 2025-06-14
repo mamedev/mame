@@ -471,8 +471,8 @@ void maciifx_state::maciifx(machine_config &config)
 	sccpic.hint_callback().set(FUNC(maciifx_state::oss_interrupt<7>));
 
 	m_scc->out_int_callback().set("sccpic", FUNC(applepic_device::pint_w));
-	m_scc->out_wreqa_callback().set("sccpic", FUNC(applepic_device::reqa_w));
-	m_scc->out_wreqb_callback().set("sccpic", FUNC(applepic_device::reqb_w));
+	m_scc->out_wreqa_callback().set("sccpic", FUNC(applepic_device::reqa_w)).invert();
+	m_scc->out_wreqb_callback().set("sccpic", FUNC(applepic_device::reqb_w)).invert();
 
 	applepic_device &swimpic(APPLEPIC(config, "swimpic", C15M));
 	swimpic.prd_callback().set(m_fdc, FUNC(applefdintf_device::read));

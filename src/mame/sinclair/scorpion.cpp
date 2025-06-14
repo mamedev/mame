@@ -6,7 +6,7 @@
 #include "spec128.h"
 
 #include "bus/spectrum/ay/slot.h"
-#include "bus/spectrum/zxbus.h"
+#include "bus/spectrum/zxbus/bus.h"
 #include "machine/timer.h"
 #include "speaker.h"
 
