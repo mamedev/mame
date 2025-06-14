@@ -105,6 +105,7 @@ private:
 	required_device<cpu_device> m_audiocpu;
 
 	void sound_map(address_map &map);
+	void sound_io_map(address_map &map);
 };
 
 class bigkarnk_state : public gaelco_state
@@ -154,7 +155,7 @@ protected:
 
 	void vram_encrypted_w(offs_t offset, u16 data, u16 mem_mask);
 	void encrypted_w(offs_t offset, u16 data, u16 mem_mask);
-		
+
 	u32 screen_update_squash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void squash_map(address_map &map) ATTR_COLD;

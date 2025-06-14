@@ -125,7 +125,7 @@ private:
 
 	void celint2k_palette(palette_device &palette) const;
 
-	void port_e0_w(uint8_t data);
+	[[maybe_unused]] void port_e0_w(uint8_t data);
 	uint8_t pa_data_r();
 	void pa_data_w(uint8_t data);
 	uint8_t pb_data_r();
@@ -260,14 +260,14 @@ void celint2k_state::pc_data_w(uint8_t data)
 		//switch (data & 0x70)
 		//{
 		//case 0x70:
-		//	m_bank_rom->set_entry(0);
-		//	break;
+		//  m_bank_rom->set_entry(0);
+		//  break;
 		//default:
-		//	m_bank_rom->set_entry((data >> 4) & 7);
-		//	break;
+		//  m_bank_rom->set_entry((data >> 4) & 7);
+		//  break;
 		//}
 		//if ((data >> 4) < 7)
-		//	m_bank_rom->set_entry(data >> 4);
+		//  m_bank_rom->set_entry(data >> 4);
 		break;
 	default:
 		logerror("%s pc_data_w: %02x | %02x unknown bank\n", machine().describe_context(), m_pc_data_out, m_pc_ctrl);

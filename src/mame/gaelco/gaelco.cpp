@@ -206,22 +206,23 @@ void gaelco_state::maniacsq_map(address_map &map)
 
 void xorwflat_state::xorwflat_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom();                                                           
-	map(0x100000, 0x101fff).ram().w(FUNC(xorwflat_state::vram_w)).share(m_videoram);            
-	map(0x102000, 0x103fff).ram();                                                             
-	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");  
-	map(0x440000, 0x440fff).ram().share(m_spriteram);                         
-	map(0x441000, 0x441007).ram();	// writes a few things to 0x44100x on startup
+	map(0x000000, 0x0fffff).rom();
+	map(0x100000, 0x101fff).ram().w(FUNC(xorwflat_state::vram_w)).share(m_videoram);
+	map(0x102000, 0x103fff).ram();
+	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
+	map(0x440000, 0x440fff).ram().share(m_spriteram);
+	map(0x441000, 0x441007).ram();  // writes a few things to 0x44100x on startup
 
-	map(0x700000, 0x700001).portr("DSW2"); // maybe
-	map(0x700002, 0x700003).portr("DSW1");
-	map(0x700004, 0x700005).portr("P1"); // OK?
-	map(0x700006, 0x700007).portr("P2"); // OK?
+	map(0x700000, 0x700001).portr("DSW1");
+	map(0x700002, 0x700003).portr("DSW2");
+	map(0x700004, 0x700005).portr("P1");
+	map(0x700006, 0x700007).portr("P2");
 
-	map(0x700010, 0x700017).ram().share(m_vregs);                                     
-	map(0x70001c, 0x70001d).w(FUNC(xorwflat_state::irqack_w));                       
+	map(0x700010, 0x700017).ram().share(m_vregs);
+	map(0x70001b, 0x70001b).w("soundlatch", FUNC(generic_latch_8_device::write));
+	map(0x70001c, 0x70001d).nopr().w(FUNC(xorwflat_state::irqack_w));
 
-	map(0xff0000, 0xffffff).ram();  
+	map(0xff0000, 0xffffff).ram();
 }
 
 
@@ -272,8 +273,17 @@ void gaelco_state::oki_map(address_map &map)
 
 void xorwflat_state::sound_map(address_map &map)
 {
-	map(0x0000, 0xd7ff).rom();        
-	map(0xf800, 0xffff).ram();               
+	map(0x0000, 0x7fff).rom();
+	map(0xc000, 0xd000).ram();
+	map(0xf800, 0xffff).ram();
+}
+
+void xorwflat_state::sound_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+
+	map(0xc0, 0xc0).r("soundlatch", FUNC(generic_latch_8_device::read));
+	map(0x88, 0x89).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
 }
 
 /*************************************
@@ -397,56 +407,54 @@ static INPUT_PORTS_START( xorwflat )
 	PORT_INCLUDE( gaelco )
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:8")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:6")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:5")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:8,7,6")
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_7C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_8C ) )
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:5,4,3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off) ) // it emits the coin in sound, but it doesn't coin up
+	PORT_DIPSETTING(    0x08, DEF_STR( 8C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 7C_1C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x28, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x38, DEF_STR( 2C_1C ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:7")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:6")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:5")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:4")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:3")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:2")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:1")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW2:1" )
 INPUT_PORTS_END
 
 
@@ -907,12 +915,15 @@ void gaelco_state::maniacsq(machine_config &config)
 void xorwflat_state::xorwflat(machine_config &config)
 {
 	// Basic machine hardware - guessed, no PCB available
-	M68000(config, m_maincpu, 12000000);
+	M68000(config, m_maincpu, 12'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &xorwflat_state::xorwflat_map);
 	m_maincpu->set_vblank_int("screen", FUNC(xorwflat_state::irq6_line_assert));
 
-	Z80(config, m_audiocpu, 4000000);
+	Z80(config, m_audiocpu, 4'000'000);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &xorwflat_state::sound_map);
+	m_audiocpu->set_addrmap(AS_IO, &xorwflat_state::sound_io_map);
+
+	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline("audiocpu", 0);
 
 	// Video hardware - guessed, no PCB available
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -930,6 +941,7 @@ void xorwflat_state::xorwflat(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	// what is the sound hardware? there was no sample ROM, so probably YM of some kind
+	YM3812(config, "ymsnd", 4'000'000).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void squash_state::squash(machine_config &config)
@@ -1835,10 +1847,10 @@ GAME( 199?, sltpcyclf, sltpcycl, maniacsq, sltpcycld, gaelco_state,  empty_init,
 
 GAME( 199?, sltpstepb, sltpstep, maniacsq, sltpcycld, gaelco_state,  empty_init, ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, older hardware, ver. 1.0, checksum 8E5A)", MACHINE_NOT_WORKING )
 GAME( 199?, sltpstepc, sltpstep, maniacsq, sltpcycld, gaelco_state,  empty_init, ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, older hardware, ver. 1.0, checksum 8BF3)", MACHINE_NOT_WORKING )
-GAME( 1996, sltpstepd, sltpstep, maniacsq, sltpcycld, gaelco_state,  empty_init, ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, older hardware, ver. 1.0, checksum 6D94)", MACHINE_NOT_WORKING ) // 2/Jul/1996	.
+GAME( 1996, sltpstepd, sltpstep, maniacsq, sltpcycld, gaelco_state,  empty_init, ROT0, "Salter Fitness / Gaelco", "Pro Stepper Tele Cardioline (Salter fitness stepper, older hardware, ver. 1.0, checksum 6D94)", MACHINE_NOT_WORKING ) // 2/Jul/1996  .
 
 /* Not 100% sure it belongs here, but fairly close. Boots at least but video regs seem incorrect, and sound hardware is different.
    Set was being marked as from a 'flat' PCB, which is how the gaelco.cpp family of boards is referred to.
    Intentionally not set as a clone due to it being a significantly different codebase / hardware type. */
-GAME( 1990, xorwflat,  0,        xorwflat, xorwflat, xorwflat_state, empty_init, ROT0, "Gaelco", "Xor World (different hardware, ver 1.1, checksum 3333BA, prototype)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, xorwflata, xorwflat, xorwflat, xorwflat, xorwflat_state, empty_init, ROT0, "Gaelco", "Xor World (different hardware, ver 1.1, checksum 333462, prototype)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // 14/Nov/1990
+GAME( 1990, xorwflat,  0,        xorwflat, xorwflat, xorwflat_state, empty_init, ROT0, "Gaelco", "Xor World (different hardware, ver 1.1, checksum 3333BA, prototype)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, xorwflata, xorwflat, xorwflat, xorwflat, xorwflat_state, empty_init, ROT0, "Gaelco", "Xor World (different hardware, ver 1.1, checksum 333462, prototype)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 14/Nov/1990
