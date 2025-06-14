@@ -13,9 +13,9 @@ NOTES:
 #include "emu.h"
 #include "atm.h"
 
+#include "bus/spectrum/ay/slot.h"
 #include "bus/ata/atapicdr.h"
 #include "bus/ata/hdd.h"
-#include "sound/ay8910.h"
 
 #define LOG_MEM   (1U << 1)
 #define LOG_VIDEO (1U << 2)
@@ -381,8 +381,8 @@ void atm_state::atm_io(address_map &map)
 	map(0x00fd, 0x00fd).mirror(0xff00).w(FUNC(atm_state::atm_port_7ffd_w));
 
 	map(0xfadf, 0xfadf).mirror(0x0500).nopr(); // TODO 0xfadf, 0xfbdf, 0xffdf Kempston Mouse
-	map(0x8000, 0x8000).mirror(0x3ffd).w("ay8912", FUNC(ay8910_device::data_w));
-	map(0xc000, 0xc000).mirror(0x3ffd).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
+	map(0x8000, 0x8000).mirror(0x3ffd).w("ay_slot", FUNC(ay_slot_device::data_w));
+	map(0xc000, 0xc000).mirror(0x3ffd).rw("ay_slot", FUNC(ay_slot_device::data_r), FUNC(ay_slot_device::address_w));
 
 	// PORTS: Shadow
 	map(0x0000, 0xffff).view(m_io_view);

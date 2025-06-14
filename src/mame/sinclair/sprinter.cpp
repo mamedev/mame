@@ -1934,11 +1934,12 @@ void sprinter_state::sprinter(machine_config &config)
 
 	SPEAKER(config, "speakers", 2).front();
 
-	ay8910_device &ay8910(AY8910(config.replace(), "ay8912", X_SP / 24));
-	ay8910.add_route(0, "speakers", 0.50, 0);
-	ay8910.add_route(1, "speakers", 0.25, 0);
-	ay8910.add_route(1, "speakers", 0.25, 1);
-	ay8910.add_route(2, "speakers", 0.50, 1);
+	config.device_remove("ay_slot");
+	AY8910(config, "ay8912", X_SP / 24)
+		.add_route(0, "speakers", 0.50, 0)
+		.add_route(1, "speakers", 0.25, 0)
+		.add_route(1, "speakers", 0.25, 1)
+		.add_route(2, "speakers", 0.50, 1);
 
 	DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "speakers", 0.5, 0);
 	DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "speakers", 0.5, 1);
