@@ -63,6 +63,7 @@
 #include "vt1682_alu.h"
 #include "vt1682_timer.h"
 #include "machine/bankdev.h"
+#include "machine/i2cmem.h"
 #include "machine/timer.h"
 #include "sound/dac.h"
 #include "emupal.h"
@@ -113,6 +114,7 @@ public:
 		m_bank(*this, "cartbank"),
 		m_screen(*this, "screen"),
 		m_soundcpu(*this, "soundcpu"),
+		m_seeprom(*this, "seeprom"),
 		m_soundcpu_timer_a_dev(*this, "snd_timera_dev"),
 		m_soundcpu_timer_b_dev(*this, "snd_timerb_dev"),
 		m_system_timer_dev(*this, "sys_timer_dev"),
@@ -150,6 +152,7 @@ protected:
 	required_memory_bank m_bank;
 	required_device<screen_device> m_screen;
 	required_device<cpu_device> m_soundcpu;
+	optional_device<i2cmem_device> m_seeprom;
 
 	void soundcpu_timera_irq(int state);
 	void soundcpu_timerb_irq(int state);
@@ -373,8 +376,6 @@ private:
 	void vt1682_202e_w(uint8_t data);
 	uint8_t vt1682_2030_r();
 	void vt1682_2030_w(uint8_t data);
-
-	uint8_t io_ef_r() { return 0x00; }
 
 	/* Video Helpers */
 
@@ -717,6 +718,7 @@ public:
 	{ }
 
 	void vt1682_lxts3(machine_config& config);
+	void vt1682_24c02(machine_config& config);
 	void vt1682_unk1682(machine_config& config);
 
 	void unk1682_init();
@@ -725,6 +727,9 @@ public:
 
 protected:
 	uint8_t uio_porta_r();
+
+	uint8_t iof_i2c_r() { return m_seeprom->read_sda() ? 0xc : 0x8; }
+	void iof_i2c_w(uint8_t data) { m_seeprom->write_sda(BIT(data, 2)); m_seeprom->write_scl(BIT(data, 3)); }
 
 private:
 	required_ioport m_io_p1;
@@ -3372,30 +3377,6 @@ void vt_vt1682_state::vt1682_211c_regs_ext2421_w(uint8_t data)
 */
 
 /*
-    Address 0x211e WRITE (MAIN CPU)
-
-    0x80 - ADCEN
-    0x40 - ADCS1
-    0x20 - ADCS0
-    0x10 - (unused)
-    0x08 - IOFOEN3
-    0x04 - IOFOEN2
-    0x02 - IOFOEN1
-    0x01 - IOFOEN0
-
-    Address 0x211e READ (MAIN CPU)
-
-    0x80 - ADC DATA:7
-    0x40 - ADC DATA:6
-    0x20 - ADC DATA:5
-    0x10 - ADC DATA:4
-    0x08 - ADC DATA:3
-    0x04 - ADC DATA:2
-    0x02 - ADC DATA:1
-    0x01 - ADC DATA:0
-*/
-
-/*
     Address 0x211f r/w (MAIN CPU)
 
     0x80 - VGCEN
@@ -4054,32 +4035,6 @@ void vt_vt1682_state::vt1682_212c_prng_seed_w(uint8_t data)
     0x04 - UIOB ATTRIBUTE
     0x02 - UIOB ATTRIBUTE
     0x01 - UIOB ATTRIBUTE
-*/
-
-/*
-    Address 0x214c r/w (MAIN CPU)
-
-    0x80 - (unused)
-    0x40 - (unused)
-    0x20 - Keychange Enable
-    0x10 - Keychange Enable
-    0x08 - IOFEN
-    0x04 - (unused)
-    0x02 - (unused)
-    0x01 - IOEOEN
-*/
-
-/*
-    Address 0x214d r/w (MAIN CPU)
-
-    0x80 - IOF:3
-    0x40 - IOF:2
-    0x20 - IOF:1
-    0x10 - IOF:0
-    0x08 - IOE:3
-    0x04 - IOE:2
-    0x02 - IOE:1
-    0x01 - IOE:0
 */
 
 
@@ -5428,7 +5383,7 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 	// 211b UART
 	map(0x211c, 0x211c).w(FUNC(vt_vt1682_state::vt1682_211c_regs_ext2421_w));
 	// 211d misc enable regs
-	// 211e ADC
+	map(0x211e, 0x211e).rw(m_io, FUNC(vrt_vt1682_io_device::vt1682_211e_adc_data_r), FUNC(vrt_vt1682_io_device::vt1682_211e_adconfig_w));
 	// 211f voice gain
 	// 2120 sleep period
 	// 2121 misc interrupt masks / clears
@@ -5460,7 +5415,8 @@ void vt_vt1682_state::vt_vt1682_map(address_map &map)
 	map(0x214a, 0x214a).rw(m_uio, FUNC(vrt_vt1682_uio_device::inteact_214a_uio_b_direction_r), FUNC(vrt_vt1682_uio_device::inteact_214a_uio_b_direction_w));
 	map(0x214b, 0x214b).rw(m_uio, FUNC(vrt_vt1682_uio_device::inteact_214b_uio_b_attribute_r), FUNC(vrt_vt1682_uio_device::inteact_214b_uio_b_attribute_w));
 
-	map(0x214d, 0x214d).r(FUNC(vt_vt1682_state::io_ef_r));
+	map(0x214c, 0x214c).rw(m_io, FUNC(vrt_vt1682_io_device::vt1682_214c_ioefconfig_r),FUNC(vrt_vt1682_io_device::vt1682_214c_ioefconfig_w));
+	map(0x214d, 0x214d).rw(m_io, FUNC(vrt_vt1682_io_device::vt1682_214d_io_ef_r),FUNC(vrt_vt1682_io_device::vt1682_214d_io_ef_w));
 
 	// 3000-3fff internal ROM if enabled
 	map(0x4000, 0x7fff).r(FUNC(vt_vt1682_state::rom_4000_to_7fff_r));
@@ -6281,6 +6237,16 @@ void vt1682_lxts3_state::vt1682_lxts3(machine_config& config)
 	m_uio->porta_in().set(FUNC(vt1682_lxts3_state::uio_porta_r));
 }
 
+void vt1682_lxts3_state::vt1682_24c02(machine_config& config)
+{
+	vt1682_lxts3(config);
+
+	m_io->portf_in().set(FUNC(vt1682_lxts3_state::iof_i2c_r));
+	m_io->portf_out().set(FUNC(vt1682_lxts3_state::iof_i2c_w));
+
+	I2C_24C02(config, m_seeprom);
+}
+
 void vt1682_mx10_state::mx10(machine_config& config)
 {
 	vt_vt1682_ntscbase(config);
@@ -6653,10 +6619,10 @@ CONS( 200?, dance555,  0,  0,  vt1682_exsportp,   dance555, vt1682_exsport_state
 
 // manual explicitly states it has NTSC output only (unit can be connected to a TV) and both Ranning Horse + Explosion (Bomberman) are the NTSC versions
 // has 21.477 Mhz XTAL
-CONS( 200?, njp60in1,  0,  0,   vt1682_lxts3, njp60in1, vt1682_lxts3_state, njp60in1_init, "<unknown>", "NJ Pocket 60-in-1 handheld 'X zero' (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
+CONS( 200?, njp60in1,  0,  0,   vt1682_24c02, njp60in1, vt1682_lxts3_state, njp60in1_init, "<unknown>", "NJ Pocket 60-in-1 handheld 'X zero' (NTSC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
 
 // fewer than 268 games, there are repeats
-CONS( 200?, pgs268,  0,  0,   vt1682_lxts3, njp60in1, vt1682_lxts3_state, pgs268_init, "<unknown>", "Portable Game Station 268-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
+CONS( 200?, pgs268,  0,  0,   vt1682_24c02, njp60in1, vt1682_lxts3_state, pgs268_init, "<unknown>", "Portable Game Station 268-in-1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND)
 
 // this appears to be related to the NJ Pocket, claims 101-in-1 but has some duplicates.
 // Like the 'Wow Wireless gaming' it incorrectly mixes the PAL version of 'Ranning Horse' with the NTSC version of 'Bomberman', it has no TV output.
