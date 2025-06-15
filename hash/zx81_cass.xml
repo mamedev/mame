@@ -5757,7 +5757,7 @@ Defender: not working
 		<part name="cass2" interface="zx81_cass">
 			<feature name="part_id" value="Q-Reg"/>
 			<dataarea name="cass" size="3016">
-				<rom name="Q-REG (198X) [Anónimo].tzx" size="3016" crc="41a86955" sha1="2c55f9bd32096b0fc09f28f19fa0dea497fe57fb"/>
+				<rom name="Q-REG (198X).tzx" size="3016" crc="41a86955" sha1="2c55f9bd32096b0fc09f28f19fa0dea497fe57fb"/>
 			</dataarea>
 		</part>
 		<part name="cass3" interface="zx81_cass">
