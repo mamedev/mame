@@ -183,16 +183,7 @@ void ghostb_state::ghostb_bank_w(u8 data)
 	if (!m_secclr)
 		m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 
-	if (m_nmigate.found())
-		m_nmigate->in_w<0>(BIT(data, 1));
-	else
-	{
-		// Ghostbusters needs to acknowledge/disable NMIs in a different way
-		m_nmi_enable = BIT(data, 1);
-		if (!m_nmi_enable)
-			m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	}
-
+	m_nmigate->in_w<0>(BIT(data, 1));
 	flip_screen_set(BIT(data, 3));
 }
 
@@ -1925,8 +1916,7 @@ void ghostb_state::machine_reset()
 	lastmisn_state::machine_reset();
 
 	// reset clears LS273 latch, which disables NMI
-	if (m_nmigate.found())
-		ghostb_bank_w(0);
+	ghostb_bank_w(0);
 }
 
 
@@ -2229,9 +2219,11 @@ void ghostb_state::ghostb(machine_config &config)
 	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(ghostb_state::screen_update_ghostb));
 	m_screen->screen_vblank().set(FUNC(ghostb_state::screen_vblank));
-	m_screen->screen_vblank().append([this] (int state) { if (state && m_nmi_enable) m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE); });
+	m_screen->screen_vblank().append(m_nmigate, FUNC(input_merger_device::in_w<1>));
 	m_screen->screen_vblank().append_inputline(m_mcu, MCS51_INT0_LINE);
 	m_screen->set_palette(m_palette);
+
+	INPUT_MERGER_ALL_HIGH(config, m_nmigate).output_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ghostb);
 	DECO_RMC3(config, m_palette, 0, 1024); // xxxxBBBBGGGGRRRR with custom weighting

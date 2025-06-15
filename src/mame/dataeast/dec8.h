@@ -250,7 +250,6 @@ private:
 	void garyoret_map(address_map &map) ATTR_COLD;
 
 	bool m_secclr = false;
-	bool m_nmi_enable = false;
 
 	emu_timer *m_6502_timer = nullptr;
 	emu_timer *m_i8751_timer = nullptr;
