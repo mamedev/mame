@@ -1211,7 +1211,7 @@ static INPUT_PORTS_START( ghostb )
 //  PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 //  PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 //  PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 //  PORT_DIPLOCATION("SW1:3") // Manual says 'Must Be Off'. Note: Turning on 3+4+5+8 does nothing on real hardware.
 	PORT_DIPUNUSED( 0x04, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW1:4") // Manual says 'Must Be Off'. See note
 	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )                       PORT_DIPLOCATION("SW1:5") // Manual says 'Must Be Off'. See note

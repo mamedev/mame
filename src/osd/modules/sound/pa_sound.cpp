@@ -8,9 +8,6 @@
 
 ***************************************************************************/
 
-#include "emu.h"
-#include "ui/uimain.h"
-
 #include "sound_module.h"
 
 #include "modules/osdmodule.h"
@@ -88,7 +85,6 @@ private:
 
 	uint32_t m_stream_id;
 	float m_audio_latency;
-	running_machine *m_machine;
 
 	int stream_callback(stream_info *stream, const void *input, void *output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags);
 	static int s_stream_callback(const void *input, void *output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void *userData);
@@ -115,7 +111,7 @@ int sound_pa::init(osd_interface &osd, osd_options const &options)
 		{  0.0,  0.0, -0.5 },
 		{ -0.2,  0.0,  0.0 },
 		{  0.2,  0.0,  0.0 },
-		{  0.0,  0.0, -1.0 },
+		{  0.0,  0.0, 10.0 },
 	};
 
 	static const uint32_t positions[9][9] = {
@@ -143,6 +139,7 @@ int sound_pa::init(osd_interface &osd, osd_options const &options)
 		const PaHostApiInfo *ai = Pa_GetHostApiInfo(di->hostApi);
 		auto &node = m_info.m_nodes[dev];
 		node.m_name = util::string_format("%s: %s", ai->name, di->name);
+		node.m_display_name = util::string_format("%s: %s", ai->name, di->name);
 		node.m_id = dev + 1;
 		node.m_rate.m_default_rate = node.m_rate.m_min_rate = node.m_rate.m_max_rate = di->defaultSampleRate;
 		node.m_sinks = di->maxOutputChannels;
@@ -162,8 +159,7 @@ int sound_pa::init(osd_interface &osd, osd_options const &options)
 	m_info.m_default_source = dc(Pa_GetDefaultInputDevice());
 
 	m_stream_id = 1;
-	m_audio_latency = options.audio_latency();
-	m_machine = &downcast<osd_common_t &>(osd).machine();
+	m_audio_latency = options.audio_latency() * 20e-3;
 
 	return 0;
 }
@@ -171,6 +167,7 @@ int sound_pa::init(osd_interface &osd, osd_options const &options)
 void sound_pa::exit()
 {
 	Pa_Terminate();
+	m_info.m_nodes.clear();
 }
 
 uint32_t sound_pa::get_generation()
@@ -207,10 +204,7 @@ uint32_t sound_pa::stream_sink_open(uint32_t node, std::string name, uint32_t ra
 	if(!err)
 		err = Pa_StartStream(si->second.m_stream);
 	if(err) {
-		if((err == paUnanticipatedHostError || err == paInvalidDevice || err == paDeviceUnavailable) && m_machine->ui().is_menu_active())
-			m_machine->popmessage("PortAudio conflicting device: %s", m_info.m_nodes[node-1].m_name);
-		else
-			osd_printf_error("PortAudio error: %s: %s\n", m_info.m_nodes[node-1].m_name, Pa_GetErrorText(err));
+		osd_printf_error("PortAudio error: %s: %s\n", m_info.m_nodes[node-1].m_name, Pa_GetErrorText(err));
 		lock.unlock();
 		stream_close(id);
 		return 0;
@@ -240,10 +234,7 @@ uint32_t sound_pa::stream_source_open(uint32_t node, std::string name, uint32_t 
 	if(!err)
 		err = Pa_StartStream(si->second.m_stream);
 	if(err) {
-		if((err == paUnanticipatedHostError || err == paInvalidDevice || err == paDeviceUnavailable) && m_machine->ui().is_menu_active())
-			m_machine->popmessage("PortAudio conflicting device: %s", m_info.m_nodes[node-1].m_name);
-		else
-			osd_printf_error("PortAudio error: %s: %s\n", m_info.m_nodes[node-1].m_name, Pa_GetErrorText(err));
+		osd_printf_error("PortAudio error: %s: %s\n", m_info.m_nodes[node-1].m_name, Pa_GetErrorText(err));
 		lock.unlock();
 		stream_close(id);
 		return 0;

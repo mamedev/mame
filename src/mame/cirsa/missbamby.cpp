@@ -348,6 +348,13 @@ ROM_END
   |                                  ULN2003A  ULN2003A                  |
   |                ____                               ____               |
   |_______________|    |_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|    |______________|
+
+ The same exact ROM contents, but with a different arrangement, were found on a straight clone (also same layout) of the
+ Mini Super Fruits PCB (blue PCB with no markings, Toshiba TMP8085AP, 6.144 MHz xtal, AMD P8212, NEC D8155C, GI AY-3-8910,
+ battery, etc.). The ROMs were labeled as "LP" (Lucky Player?) and had the following hashes:
+   lp_c-100a.bin [0x1000] CRC(437ce010) SHA1(14f8448a854204b604e5c90e218832f916985397) SUM(06e4)
+   lp_c-100b.bin [0x1000] CRC(11cdc2e5) SHA1(4b5d87f7b85c9c948714f7b82a06b48ca9cb440b) SUM(035b)
+   lp_c-100c.bin [0x1000] CRC(b7c55fc2) SHA1(2dfcc35821971c27178522afe9db1d18e12b3a42) SUM(e769)
 */
 ROM_START( multy )
 	ROM_REGION(0x4000, "maincpu", 0)

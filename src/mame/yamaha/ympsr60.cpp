@@ -672,8 +672,7 @@ void psr60_state::psr_common(machine_config &config)
 	m_bbd_mixer->add_route(0, m_postbbd_rc, 1.0);
 
 	MN3204P(config, m_bbd);
-	m_bbd->add_route(0, m_bbd_mixer, 0.5);
-	m_bbd->add_route(1, m_bbd_mixer, 0.5);
+	m_bbd->add_route(0, m_bbd_mixer, 1.0);
 
 	FILTER_BIQUAD(config, m_ic204b);
 	m_ic204b->opamp_sk_lowpass_setup(RES_K(22), RES_K(22), RES_M(999.9), RES_R(0.001), CAP_U(0.0068), CAP_P(82));

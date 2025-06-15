@@ -20,11 +20,24 @@ struct audio_rate_range {
 	uint32_t m_default_rate;
 	uint32_t m_min_rate;
 	uint32_t m_max_rate;
+
+	uint32_t resolve(uint32_t rate) const {
+		if(m_max_rate == 0)
+			return rate;
+		if(rate >= m_min_rate && rate <= m_max_rate)
+			return rate;
+		if(m_default_rate != 0)
+			return m_default_rate;
+		if(rate < m_min_rate)
+			return m_min_rate;
+		return m_max_rate;
+	}
 };
 
 struct audio_info {
 	struct node_info {
 		std::string m_name;
+		std::string m_display_name;
 		uint32_t m_id;
 		audio_rate_range m_rate;
 		std::vector<std::string> m_port_names;
@@ -39,6 +52,8 @@ struct audio_info {
 		node_info(node_info &&) = default;
 		node_info &operator=(const node_info &) = default;
 		node_info &operator=(node_info &&) = default;
+
+		uint32_t resolve_rate(uint32_t rate) const { return m_rate.resolve(rate); }
 	};
 
 	struct stream_info {

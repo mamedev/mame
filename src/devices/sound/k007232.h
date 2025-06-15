@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria
+// copyright-holders:Nicola Salmoria, Hiromitsu Shioya
 /*********************************************************/
 /*    Konami PCM controller                              */
 /*********************************************************/
@@ -45,15 +45,13 @@ protected:
 	address_space_config m_data_config;
 
 private:
-	static constexpr unsigned PCM_MAX = 2;      /* Channels per chip */
-
 	// internal state
 	memory_access<17, 0, 0, ENDIANNESS_LITTLE>::cache m_cache;
 	optional_region_ptr<u8> m_rom;
 
 	struct channel_t
 	{
-		u8           vol[2]; /* volume for the left and right channel */
+		u8           vol[2]; // volume for the left and right channel
 		u32          addr;
 		int          counter;
 		u32          start;
@@ -64,11 +62,10 @@ private:
 
 	u8 read_rom_default(offs_t offset) { return m_rom[(m_bank + (offset & 0x1ffff)) & (m_rom.length() - 1)]; }
 	inline u8 read_sample(int channel, u32 addr) { m_bank = m_channel[channel].bank; return m_cache.read_byte(addr & 0x1ffff); }
+	void start(int ch);
 
-	channel_t     m_channel[PCM_MAX]; // 2 channels
-
-	u8            m_wreg[0x10]; /* write data */
-
+	channel_t     m_channel[2]; // 2 channels
+	u8            m_wreg[0x10]; // write data
 	u32           m_pcmlimit;
 	u32           m_bank;
 

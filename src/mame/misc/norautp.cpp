@@ -5916,7 +5916,7 @@ ROM_START( tpoker2b )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1993_micro_mfg_turbo-2_u39-014_us_utbk_022190.u39", 0x0000, 0x8000, CRC(543149fe) SHA1(beb61a27c2797341e23e020e754d63fde3b4fbb2) )
 
-	ROM_REGION( 0x0800,  "mcu", 0 ) // 68705 MCU
+	ROM_REGION( 0x0800,  "mcu", 0 )  // 68705 MCU
 	ROM_LOAD( "1993_micro_mfg_tp2_01_u35_ic4_16228_022194.u35", 0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x1000,  "gfx", 0 )
@@ -5937,7 +5937,7 @@ ROM_START( tpoker2c )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "turbo-2_u39-015_uscpn8k_021990.u39", 0x0000, 0x8000, CRC(1149bb41) SHA1(5320abafafb612643479e9ac682a523ed76bcda1) )
 
-	ROM_REGION( 0x0800,  "mcu", 0 ) // 68705 MCU
+	ROM_REGION( 0x0800,  "mcu", 0 )  // 68705 MCU
 	ROM_LOAD( "tp2-01_u35-ic4_9862_051997.u35", 0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x0800,  "gfx", 0 )
@@ -5951,8 +5951,8 @@ ROM_START( tpoker2d )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "turbo-2_u39-012_us_uc8k_060989_27c256.u39", 0x0000, 0x8000, CRC(ac70f2dd) SHA1(a4264d3a0ac39e0f46b2ee594d519eef2442a3b1) )
 
-	ROM_REGION( 0x0800,  "mcu", 0 ) // 68705 MCU
-	ROM_LOAD( "turbo-2_u39-012_us_uc8k_060989_27c256.u39", 0x0000, 0x0800, NO_DUMP )
+	ROM_REGION( 0x0800,  "mcu", 0 )  // 68705 MCU
+	ROM_LOAD( "tp2.u35", 0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x1000,  "gfx", 0 )
 	ROM_LOAD( "turbo_poker_char_rom_2732a.u30", 0x0000, 0x1000, CRC(6df86e08) SHA1(a451f71db7b59500b99207234ef95793afc11f03) )

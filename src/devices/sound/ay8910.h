@@ -5,8 +5,6 @@
 
 #pragma once
 
-#define ALL_8910_CHANNELS -1
-
 /* Internal resistance at Volume level 7. */
 
 #define AY8910_INTERNAL_RESISTANCE  (356)
@@ -108,7 +106,6 @@ public:
 	// bc1=a0, bc2=a1
 	void write_bc1_bc2(offs_t offset, u8 data);
 
-	void set_volume(int channel,int volume);
 	void ay_set_clock(int clock);
 
 	struct ay_ym_param

@@ -10,11 +10,13 @@
 
 #pragma once
 
-#include "machine/gen_latch.h"
 #include "k007452.h"
+#include "k007121.h"
+
+#include "machine/gen_latch.h"
 #include "sound/msm5205.h"
 #include "sound/upd7759.h"
-#include "k007121.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -33,8 +35,7 @@ public:
 		m_track_ports(*this, {"TRACK0_Y", "TRACK0_X", "TRACK1_Y", "TRACK1_X"}),
 		m_mainbank(*this, "mainbank"),
 		m_video_view(*this, "video_view")
-	{
-	}
+	{ }
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -42,15 +43,12 @@ protected:
 
 	// memory pointers
 	required_shared_ptr_array<uint8_t, 2> m_videoram;
-	std::unique_ptr<uint8_t[]> m_spriteram[2];
 
 	// video-related
 	tilemap_t *m_bg_tilemap[2]{};
 	tilemap_t *m_textlayer = nullptr;
 	uint8_t m_priority = 0U;
-
 	uint8_t m_vreg = 0U;
-	uint8_t m_video_circuit = 0U; // 0 or 1
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -77,10 +75,9 @@ public:
 		m_k007121(*this, "k007121_%u", 1U),
 		m_k007452(*this, "k007452"),
 		m_upd7759(*this, "upd"),
-		m_scrollram(*this, "scrollram%u", 0U),
+		m_pf_view(*this, "pf_view"),
 		m_scroll_view(*this, "scrollview")
-	{
-	}
+	{ }
 
 	void combatsc(machine_config &config);
 
@@ -95,31 +92,33 @@ private:
 	required_device_array<k007121_device, 2> m_k007121;
 	required_device<k007452_device> m_k007452;
 	required_device<upd7759_device> m_upd7759;
-	required_shared_ptr_array<uint8_t, 2> m_scrollram;
+	memory_view m_pf_view;
 	memory_view m_scroll_view;
-
-	bool m_textflip = false;
 
 	// misc
 	uint8_t m_pos[4]{};
 	uint8_t m_sign[4]{};
 
+	template <uint8_t Which> void flipscreen_w(int state);
+	template <uint8_t Which> void dirtytiles();
 	void bankselect_w(uint8_t data);
+
 	void coin_counter_w(uint8_t data);
 	uint8_t trackball_r(offs_t offset);
 	uint8_t unk_r();
 	void sh_irqtrigger_w(uint8_t data);
-	void pf_control_w(offs_t offset, uint8_t data);
 	uint8_t busy_r();
 	void play_w(uint8_t data);
 	void voice_reset_w(uint8_t data);
 	void portA_w(uint8_t data);
+
 	TILE_GET_INFO_MEMBER(get_tile_info0);
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	TILE_GET_INFO_MEMBER(get_text_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *source, int circuit, bitmap_ind8 &priority_bitmap, uint32_t pri_mask);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int circuit, bitmap_ind8 &priority_bitmap, uint32_t pri_mask);
+
 	void main_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
 };
@@ -134,8 +133,7 @@ public:
 		m_soundbank(*this, "soundbank"),
 		m_io_ram(*this, "io_ram", 0x4000, ENDIANNESS_BIG),
 		m_bank_io_view(*this, "bank_io_view")
-	{
-	}
+	{ }
 
 	void combatscb(machine_config &config);
 
@@ -158,12 +156,14 @@ private:
 	void bankselect_w(uint8_t data);
 	void msm_w(uint8_t data);
 	void sound_irq_ack(uint8_t data);
+
 	TILE_GET_INFO_MEMBER(get_tile_info0);
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	TILE_GET_INFO_MEMBER(get_text_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *source, int circuit);
+
 	void main_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
 };

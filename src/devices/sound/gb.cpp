@@ -2,44 +2,21 @@
 // copyright-holders:Wilbert Pol, Anthony Kruize
 // thanks-to:Shay Green
 /**************************************************************************************
-* Game Boy sound emulation (c) Anthony Kruize (trandor@labyrinth.net.au)
-*
-* Anyways, sound on the Game Boy consists of 4 separate 'channels'
-*   Sound1 = Quadrangular waves with SWEEP and ENVELOPE functions  (NR10,11,12,13,14)
-*   Sound2 = Quadrangular waves with ENVELOPE functions (NR21,22,23,24)
-*   Sound3 = Wave patterns from WaveRAM (NR30,31,32,33,34)
-*   Sound4 = White noise with an envelope (NR41,42,43,44)
-*
-* Each sound channel has 2 modes, namely ON and OFF...  whoa
-*
-* These tend to be the two most important equations in
-* converting between Hertz and GB frequency registers:
-* (Sounds will have a 2.4% higher frequency on Super GB.)
-*       gb = 2048 - (131072 / Hz)
-*       Hz = 131072 / (2048 - gb)
-*
-* Changes:
-*
-*   10/2/2002       AK - Preliminary sound code.
-*   13/2/2002       AK - Added a hack for mode 4, other fixes.
-*   23/2/2002       AK - Use lookup tables, added sweep to mode 1. Re-wrote the square
-*                        wave generation.
-*   13/3/2002       AK - Added mode 3, better lookup tables, other adjustments.
-*   15/3/2002       AK - Mode 4 can now change frequencies.
-*   31/3/2002       AK - Accidently forgot to handle counter/consecutive for mode 1.
-*    3/4/2002       AK - Mode 1 sweep can still occur if shift is 0.  Don't let frequency
-*                        go past the maximum allowed value. Fixed Mode 3 length table.
-*                        Slight adjustment to Mode 4's period table generation.
-*    5/4/2002       AK - Mode 4 is done correctly, using a polynomial counter instead
-*                        of being a total hack.
-*    6/4/2002       AK - Slight tweak to mode 3's frequency calculation.
-*   13/4/2002       AK - Reset envelope value when sound is initialized.
-*   21/4/2002       AK - Backed out the mode 3 frequency calculation change.
-*                        Merged init functions into gameboy_sound_w().
-*   14/5/2002       AK - Removed magic numbers in the fixed point math.
-*   12/6/2002       AK - Merged SOUNDx structs into one SOUND struct.
-*  26/10/2002       AK - Finally fixed channel 3!
-* xx/4-5/2016       WP - Rewrote sound core. Most of the code is not optimized yet.
+Game Boy sound emulation (c) Anthony Kruize (trandor@labyrinth.net.au)
+
+Anyways, sound on the Game Boy consists of 4 separate 'channels'
+  Sound1 = Quadrangular waves with SWEEP and ENVELOPE functions  (NR10,11,12,13,14)
+  Sound2 = Quadrangular waves with ENVELOPE functions (NR21,22,23,24)
+  Sound3 = Wave patterns from WaveRAM (NR30,31,32,33,34)
+  Sound4 = White noise with an envelope (NR41,42,43,44)
+
+Each sound channel has 2 modes, namely ON and OFF...  whoa
+
+These tend to be the two most important equations in
+converting between Hertz and GB frequency registers:
+(Sounds will have a 2.4% higher frequency on Super GB.)
+      gb = 2048 - (131072 / Hz)
+      Hz = 131072 / (2048 - gb)
 
 TODO:
 - Implement different behavior of CGB-02.
@@ -122,6 +99,11 @@ void gameboy_sound_device::device_start()
 	m_channel = stream_alloc(0, 2, SAMPLE_RATE_OUTPUT_ADAPTIVE);
 	m_timer = timer_alloc(FUNC(gameboy_sound_device::timer_callback), this);
 	m_timer->adjust(clocks_to_attotime(FRAME_CYCLES/128), 0, clocks_to_attotime(FRAME_CYCLES/128));
+
+	// initialise just enough to avoid uninitialised memory errors on initial reset
+	// TODO: choose values that will guarantee the initial apu_power_off will produce the correct state
+	m_snd_control.on = false;
+	std::fill(std::begin(m_snd_regs), std::end(m_snd_regs), 0);
 
 	save_item(NAME(m_last_updated));
 	save_item(NAME(m_snd_regs));

@@ -18,8 +18,7 @@
     TODO (per-game issues)
     - daytona: car glasses doesn't get loaded during gameplay;
     - doa, doaa: corrupted sound, eventually becomes silent;
-    - dynamcopc: corrupts palette for 2d (most likely unrelated with the lack of DSP);
-    - fvipers, schamp: rasterizer has issues displaying some characters @see video/model2.cpp
+    - dynamcopc: corrupts palette for 2d;
     - fvipers: enables timers, but then irq register is empty, hence it crashes with an "interrupt halt" at POST (regression);
     - hpyagu98: stops with 'Error #1' message during boot. Also writes to the 0x600000-0x62ffff range in main CPU program map
     - lastbrnx: uses external DMA port 0 for uploading SHARC program, hook-up might not be 100% right;
@@ -495,8 +494,8 @@ u32 model2_tgp_state::copro_sincos_r(offs_t offset)
 {
 	offs_t ang = m_copro_sincos_base + offset * 0x4000;
 	offs_t index = ang & 0x3fff;
-	if(ang & 0x4000)
-		index ^= 0x3fff;
+	if (ang & 0x4000)
+		index = std::min(0x4000 - (int)index, 0x3fff);
 	u32 result = m_copro_tgp_tables[index];
 	if(ang & 0x8000)
 		result ^= 0x80000000;
@@ -1423,7 +1422,7 @@ void model2b_state::model2b_crx_mem(address_map &map)
 	map(0x00980000, 0x00980003).rw(FUNC(model2b_state::copro_ctl1_r), FUNC(model2b_state::copro_ctl1_w));
 	map(0x00980008, 0x0098000b).w(FUNC(model2b_state::geo_ctl1_w));
 	map(0x00980014, 0x00980017).r(FUNC(model2b_state::copro_status_r));
-	//map(0x00980008, 0x0098000b).w(FUNC(model2b_state::geo_sharc_ctl1_w));
+	map(0x00980020, 0x00980023).noprw();	// bank control reg - used during SHARC program upload, all games just set this to 0
 
 	map(0x009c0000, 0x009cffff).rw(FUNC(model2b_state::model2_serial_r), FUNC(model2b_state::model2_serial_w));
 
@@ -1843,6 +1842,74 @@ INPUT_PORTS_START( vf2 )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_PLAYER(2) PORT_NAME("P2 Guard")
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
+
+template <unsigned N> ioport_value model2a_airwlkrs_state::start_in_r() {
+	return BIT(m_start_in->read(), N + m_key_matrix * 2);
+}
+
+INPUT_PORTS_START( airwlkrs )
+	PORT_INCLUDE(model2crx)
+
+	// replace regular mapping for 4 players support
+	PORT_MODIFY("IN1")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_MODIFY("IN2")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_MODIFY("IN0")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(model2a_airwlkrs_state::start_in_r<0>))
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(model2a_airwlkrs_state::start_in_r<1>))
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_COIN3)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_COIN4)
+
+	PORT_START("IN_START")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_START1)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_START2)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_START3)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_START4)
+
+	PORT_START("IN_P1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_PLAYER(1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2)        PORT_PLAYER(1)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON3)        PORT_PLAYER(1)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_PLAYER(1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_PLAYER(1)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(1)
+
+	PORT_START("IN_P2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_PLAYER(2)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2)        PORT_PLAYER(2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON3)        PORT_PLAYER(2)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_PLAYER(2)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_PLAYER(2)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(2)
+
+	PORT_START("IN_P3")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_PLAYER(3)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2)        PORT_PLAYER(3)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON3)        PORT_PLAYER(3)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_PLAYER(3)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_PLAYER(3)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(3)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(3)
+
+	PORT_START("IN_P4")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_PLAYER(4)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2)        PORT_PLAYER(4)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON3)        PORT_PLAYER(4)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_PLAYER(4)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_PLAYER(4)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(4)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_PLAYER(4)
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( manxtt )
 	PORT_INCLUDE(model2crx)
@@ -2528,7 +2595,7 @@ void model2_state::model2_scsp(machine_config &config)
 /* original Model 2 */
 void model2o_state::model2o(machine_config &config)
 {
-	I960(config, m_maincpu, 50_MHz_XTAL / 2);
+	I80960KB(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2o_state::model2o_mem);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(model2_state::model2_interrupt), "screen", 0, 1);
@@ -2679,7 +2746,7 @@ void model2o_state::vcop(machine_config &config)
 /* 2A-CRX */
 void model2a_state::model2a(machine_config &config)
 {
-	I960(config, m_maincpu, 50_MHz_XTAL / 2);
+	I80960KB(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2a_state::model2a_crx_mem);
 	TIMER(config, "scantimer").configure_scanline(FUNC(model2_state::model2_interrupt), "screen", 0, 1);
 
@@ -2712,6 +2779,22 @@ void model2a_state::model2a(machine_config &config)
 	SEGA_BILLBOARD(config, m_billboard, 0);
 
 	config.set_default_layout(layout_segabill);
+}
+
+void model2a_airwlkrs_state::airwlkrs(machine_config &config)
+{
+	model2a_state::model2a(config);
+
+	// P3 / P4 support routes input sides depending on content of port F
+	// this implicitly fallback to regular handling when cabinet is set in two players mode
+	sega_315_5649_device &io(*subdevice<sega_315_5649_device>("io"));
+	io.in_pc_callback().set([this] () {
+		return m_player_in[m_key_matrix * 2]->read();
+	});
+	io.in_pd_callback().set([this] () {
+		return m_player_in[m_key_matrix * 2 + 1]->read();
+	});
+	io.out_pf_callback().set([this] (u8 data) { m_key_matrix = BIT(data, 7); });
 }
 
 void model2a_state::manxtt(machine_config &config)
@@ -2799,7 +2882,7 @@ void model2a_state::zeroguna(machine_config &config)
 /* 2B-CRX */
 void model2b_state::model2b(machine_config &config)
 {
-	I960(config, m_maincpu, 50_MHz_XTAL / 2);
+	I80960KB(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2b_state::model2b_crx_mem);
 
 	TIMER(config, "scantimer", 0).configure_scanline(FUNC(model2_state::model2_interrupt), "screen", 0, 1);
@@ -2954,7 +3037,7 @@ void model2b_state::zerogun(machine_config &config)
 /* 2C-CRX */
 void model2c_state::model2c(machine_config &config)
 {
-	I960(config, m_maincpu, 50_MHz_XTAL / 2);
+	I80960KB(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2c_state::model2c_crx_mem);
 	TIMER(config, "scantimer").configure_scanline(FUNC(model2c_state::model2c_interrupt), "screen", 0, 1);
 
@@ -7538,7 +7621,7 @@ GAME( 1997, zeroguna,   zerogun,  zeroguna,     zerogun,   model2a_state, init_z
 GAME( 1997, zerogunaj,  zerogun,  zeroguna,     zerogun,   model2a_state, init_zerogun,  ROT0, "Psikyo", "Zero Gunner (Japan, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, motoraid,   0,        manxtt,       motoraid,  model2a_state, empty_init,    ROT0, "Sega",   "Motor Raid - Twin", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1997, motoraiddx, motoraid, manxtt,       motoraid,  model2a_state, empty_init,    ROT0, "Sega",   "Motor Raid - Twin/DX", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, airwlkrs,   0,        model2a,      vf2,       model2a_state, empty_init,    ROT0, "Data East Corporation", "Air Walkers", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, airwlkrs,   0,        airwlkrs,     airwlkrs,  model2a_airwlkrs_state, empty_init,    ROT0, "Data East Corporation", "Air Walkers", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1998, dynamcop,   0,        model2a_5881, dynamcop,  model2a_state, empty_init,    ROT0, "Sega",   "Dynamite Cop (Export, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, dyndeka2,   dynamcop, model2a_5881, dynamcop,  model2a_state, empty_init,    ROT0, "Sega",   "Dynamite Deka 2 (Japan, Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, pltkidsa,   pltkids,  model2a_5881, pltkids,   model2a_state, init_pltkids,  ROT0, "Psikyo", "Pilot Kids (Model 2A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )

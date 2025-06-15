@@ -23,6 +23,8 @@ void nn71003f_device::device_start()
 	save_item(NAME(m_ss));
 	save_item(NAME(m_sclk));
 	save_item(NAME(m_mosi));
+
+	stream_alloc(0, 2, 48000);
 }
 
 void nn71003f_device::device_reset()

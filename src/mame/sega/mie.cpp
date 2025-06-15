@@ -34,7 +34,7 @@ void mie_device::mie_map(address_map &map)
 	map(0x7003, 0x7003).rw(FUNC(mie_device::lreg_r), FUNC(mie_device::lreg_w)).mirror(0x07c0);
 	map(0x7004, 0x7023).rw(FUNC(mie_device::tbuf_r), FUNC(mie_device::tbuf_w)).mirror(0x07c0);
 	map(0x7024, 0x703f).r(FUNC(mie_device::read_00)).mirror(0x07c0);
-	map(0x7800, 0x7fff).r(FUNC(mie_device::read_78xx));
+	map(0x7800, 0x7fff).ram();
 	map(0x8000, 0xffff).ram();
 }
 
@@ -90,6 +90,7 @@ void mie_device::device_start()
 {
 	maple_device::device_start();
 	timer = timer_alloc(FUNC(mie_device::update_irq_reply), this);
+	m_space = &cpu->space(AS_PROGRAM);
 
 	save_item(NAME(gpiodir));
 	save_item(NAME(gpio_val));
@@ -187,12 +188,12 @@ uint8_t mie_device::read_00()
 	return 0x00;
 }
 
-uint8_t mie_device::read_78xx(offs_t offset)
-{
+//uint8_t mie_device::read_78xx(offs_t offset)
+//{
 	// Internal rom tests (7800) & 80 and jumps to 8010 if non-zero
 	// What we return is what a memdump sees on a naomi2 board
-	return offset & 4 ? 0xff : 0x00;
-}
+//	return offset & 4 ? 0xff : 0x00;
+//}
 
 uint8_t mie_device::gpio_r(offs_t offset)
 {
@@ -216,7 +217,12 @@ uint8_t mie_device::gpiodir_r()
 
 void mie_device::gpiodir_w(uint8_t data)
 {
+	// refresh output ports if direction changed
+	u8 r_to_w = (data ^ gpiodir) & ~data;
 	gpiodir = data;
+	for (unsigned i = 0; i < 7; i++)
+		if (BIT(r_to_w, i) && gpio_port[i])
+			gpio_port[i]->write(gpio_val[i], 0xff);
 }
 
 uint8_t mie_device::adc_r()

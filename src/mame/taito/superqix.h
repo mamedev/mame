@@ -28,12 +28,6 @@ public:
 		, m_ay1(*this, "ay1")
 	{ }
 
-	void init_perestro();
-	void init_sqix();
-	void init_sqixr0();
-	void init_pbillian();
-	void init_hotsmash();
-
 	TILE_GET_INFO_MEMBER(sqix_get_bg_tile_info);
 
 protected:
@@ -88,6 +82,10 @@ public:
 		, m_ay2(*this, "ay2")
 	{
 	}
+
+	void init_perestro();
+	void init_sqix();
+	void init_sqixr0();
 
 	void sqix(machine_config &config);
 	void sqix_8031(machine_config &config);
@@ -157,6 +155,9 @@ public:
 	{
 	}
 
+	void init_pbillian();
+	void init_hotsmash();
+
 	void pbillian(machine_config &config);
 	void pbillianb(machine_config &config);
 
@@ -177,8 +178,6 @@ private:
 	void pbillian_0410_w(u8 data);
 
 	void vblank_irq(int state);
-
-	SAMPLES_START_CB_MEMBER(pbillian_sh_start);
 
 	TILE_GET_INFO_MEMBER(pb_get_bg_tile_info);
 

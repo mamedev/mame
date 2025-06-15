@@ -29,6 +29,7 @@ public:
 
 	auto read_bg() { return m_read_bg.bind(); }
 	auto read_sp() { return m_read_sp.bind(); }
+	auto read_onespace() { return m_read_onespace.bind(); }
 	auto read_onespace_with_relative() { return m_read_onespace_with_relative.bind(); }
 
 	void set_palette_mode(vtxx_pal_mode pmode) { m_pal_mode = pmode; }
@@ -72,8 +73,9 @@ public:
 	u8 get_extended_modes_enable() { return m_extended_modes_enable; }
 	u8 get_extended_modes2_enable() { return m_extended_modes2_enable; }
 
+	u8 get_newvid_1c() { return m_newvid_1c; }
+	u8 get_newvid_1d() { return m_newvid_1d; }
 	bool is_v3xx_extended_mode() { return (m_newvid_1e == 0x00) ? false : true; }
-	bool get_newvid_1d() { return m_newvid_1d; }
 
 	u16 get_newmode_tilebase() { return m_tilebases_2x[0] | (m_tilebases_2x[1] << 8); }
 	u16 get_newmode_spritebase() { return m_tilebases_2x[2] | (m_tilebases_2x[3] << 8); }
@@ -117,18 +119,22 @@ protected:
 
 	devcb_read8 m_read_bg;
 	devcb_read8 m_read_sp;
+	devcb_read8 m_read_onespace;
 	devcb_read8 m_read_onespace_with_relative;
 
 	int32_t m_read_bg4_bg3;
 
 	int m_whichpixel;
 
+	u8 m_newvid_1b;
 	u8 m_newvid_1c;
 	u8 m_newvid_1d;
 	u8 m_newvid_1e;
 	u8 m_tilebases_2x[4];
 
 	u8 m_vt3xx_palette[0x400];
+
+	static constexpr unsigned YUV444_COLOR = (0x40 * 8);
 private:
 
 	u8 m_extra_sprite_bits;
@@ -139,13 +145,31 @@ private:
 	void init_vtxx_rgb555_palette_tables();
 	void init_vtxx_rgb444_palette_tables();
 
-	static constexpr unsigned YUV444_COLOR = (0x40 * 8);
 };
 
 class ppu_vt03pal_device : public ppu_vt03_device {
 public:
 	ppu_vt03pal_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
 };
+
+class ppu_vt32_device : public ppu_vt03_device {
+public:
+	ppu_vt32_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
+	ppu_vt32_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
+	void m_newvid_1b_w(u8 data);
+	void m_newvid_1c_w(u8 data);
+	void m_newvid_1d_w(u8 data);
+
+private:
+	virtual void draw_background(u8 *line_priority) override;
+};
+
+class ppu_vt32pal_device : public ppu_vt32_device {
+public:
+	ppu_vt32pal_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
+};
+
 
 class ppu_vt3xx_device : public ppu_vt03_device {
 public:
@@ -181,6 +205,10 @@ private:
 
 	offs_t recalculate_offsets_8x8x4packed_tile(int address, int va34);
 	offs_t recalculate_offsets_8x8x8packed_tile(int address, int va34);
+	offs_t recalculate_offsets_16x16x8packed_hires_tile(int address, int va34);
+
+	void draw_sprites_standard_res(u8* line_priority);
+	void draw_sprites_high_res(u8* line_priority);
 
 	void draw_extended_sprite_pixel_low(bitmap_rgb32& bitmap, int pixel_data, int pixel, int xpos, int pal, int bpp, u8* line_priority);
 	void draw_extended_sprite_pixel_high(bitmap_rgb32& bitmap, int pixel_data, int pixel, int xpos, int pal, int bpp, u8* line_priority);
@@ -192,6 +220,9 @@ private:
 
 DECLARE_DEVICE_TYPE(PPU_VT03,    ppu_vt03_device)
 DECLARE_DEVICE_TYPE(PPU_VT03PAL, ppu_vt03pal_device)
+
+DECLARE_DEVICE_TYPE(PPU_VT32, ppu_vt32_device)
+DECLARE_DEVICE_TYPE(PPU_VT32PAL, ppu_vt32pal_device)
 
 DECLARE_DEVICE_TYPE(PPU_VT3XX,    ppu_vt3xx_device)
 

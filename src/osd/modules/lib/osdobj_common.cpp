@@ -144,21 +144,11 @@ const options_entry osd_options::s_option_entries[] =
 
 	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "OSD SOUND OPTIONS" },
 	{ OSDOPTION_SOUND,                           OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "sound output method: " },
-	{ OSDOPTION_AUDIO_LATENCY "(0.0-0.5)",       "0.0",            core_options::option_type::FLOAT,     "audio latency in seconds, 0.0 for default (increase to reduce glitches, decrease for responsiveness)" },
+	{ OSDOPTION_AUDIO_LATENCY ";alat(0.0-50.0)", "0.0",            core_options::option_type::FLOAT,     "audio latency, 0 for default (increase to reduce glitches, decrease for responsiveness)" },
 
 #ifdef SDLMAME_MACOSX
 	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "CoreAudio-SPECIFIC OPTIONS" },
 	{ OSDOPTION_AUDIO_OUTPUT,                    OSDOPTVAL_AUTO,   core_options::option_type::STRING,    "audio output device" },
-	{ OSDOPTION_AUDIO_EFFECT "0",                OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 0" },
-	{ OSDOPTION_AUDIO_EFFECT "1",                OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 1" },
-	{ OSDOPTION_AUDIO_EFFECT "2",                OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 2" },
-	{ OSDOPTION_AUDIO_EFFECT "3",                OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 3" },
-	{ OSDOPTION_AUDIO_EFFECT "4",                OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 4" },
-	{ OSDOPTION_AUDIO_EFFECT "5",                OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 5" },
-	{ OSDOPTION_AUDIO_EFFECT "6",                OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 6" },
-	{ OSDOPTION_AUDIO_EFFECT "7",                OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 7" },
-	{ OSDOPTION_AUDIO_EFFECT "8",                OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 8" },
-	{ OSDOPTION_AUDIO_EFFECT "9",                OSDOPTVAL_NONE,   core_options::option_type::STRING,    "AudioUnit effect 9" },
 #endif
 
 	{ nullptr,                                   nullptr,          core_options::option_type::HEADER,    "OSD MIDI OPTIONS" },
@@ -253,7 +243,7 @@ void osd_common_t::register_options()
 #endif
 	REGISTER_MODULE(m_mod_man, RENDERER_NONE);
 
-	REGISTER_MODULE(m_mod_man, SOUND_DSOUND);
+	REGISTER_MODULE(m_mod_man, SOUND_WASAPI);
 	REGISTER_MODULE(m_mod_man, SOUND_XAUDIO2);
 	REGISTER_MODULE(m_mod_man, SOUND_COREAUDIO);
 	REGISTER_MODULE(m_mod_man, SOUND_JS);
@@ -552,6 +542,15 @@ void osd_common_t::sound_stream_source_update(uint32_t id, int16_t *buffer, int 
 	m_sound->stream_source_update(id, buffer, samples_this_frame);
 }
 
+void osd_common_t::sound_begin_update()
+{
+	m_sound->begin_update();
+}
+
+void osd_common_t::sound_end_update()
+{
+	m_sound->end_update();
+}
 
 
 

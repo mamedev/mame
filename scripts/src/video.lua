@@ -57,6 +57,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/ariel.h,VIDEOS["ARIEL"] = true
+--------------------------------------------------
+
+if (VIDEOS["ARIEL"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/ariel.cpp",
+		MAME_DIR .. "src/devices/video/ariel.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/atirage.h,VIDEOS["ATIRAGE"] = true
 --------------------------------------------------
 
@@ -352,6 +364,18 @@ if (VIDEOS["HD61202"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/hd61202.cpp",
 		MAME_DIR .. "src/devices/video/hd61202.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/hd61602.h,VIDEOS["HD61602"] = true
+--------------------------------------------------
+
+if (VIDEOS["HD61602"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/hd61602.cpp",
+		MAME_DIR .. "src/devices/video/hd61602.h",
 	}
 end
 

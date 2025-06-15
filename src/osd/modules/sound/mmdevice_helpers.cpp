@@ -261,7 +261,7 @@ HRESULT populate_audio_node_info(
 			channel_names.emplace_back(util::string_format("Channel %u", i + 1));
 			++i;
 		}
-		channel_positions.resize(format->nChannels, std::array<double, 3>{ 0.0, 0.0, 1.0 });
+		channel_positions.resize(format->nChannels, std::array<double, 3>{ 0.0, 0.0, 0.0 });
 	}
 	catch (std::bad_alloc const &)
 	{
@@ -272,7 +272,8 @@ HRESULT populate_audio_node_info(
 	try
 	{
 		device_id = device_id_w.get();
-		info.m_name = std::move(device_name);
+		info.m_name = osd::text::from_wstring(device_id);
+		info.m_display_name = std::move(device_name);
 		info.m_rate.m_default_rate = format->nSamplesPerSec;
 		info.m_rate.m_min_rate = format->nSamplesPerSec;
 		info.m_rate.m_max_rate = format->nSamplesPerSec;

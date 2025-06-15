@@ -2154,7 +2154,7 @@ ROM_START( endurobl )
 
 	ROM_REGION( 0x20000, "pcm", 0 ) // Sega PCM sound data
 	ROM_LOAD( "epr-7762.ic5", 0x00000, 0x8000, CRC(bc0c4d12) SHA1(3de71bde4c23e3c31984f20fc4bc7e221354c56f) )
-	ROM_LOAD( "epr-7763.ic6", 0x10000, 0x8000, CRC(627b3c8c) SHA1(806fe7dce619ad19c09178061be4607d2beba14d) )
+	ROM_LOAD( "epr-7763.ic6", 0x08000, 0x8000, CRC(627b3c8c) SHA1(806fe7dce619ad19c09178061be4607d2beba14d) )
 
 	ROM_REGION( 0x2000, "sprites:zoom", 0 ) // zoom table
 	ROM_LOAD( "epr-6844.ic123", 0x0000, 0x2000, CRC(e3ec7bd6) SHA1(feec0fe664e16fac0fde61cf64b401b9b0575323) )

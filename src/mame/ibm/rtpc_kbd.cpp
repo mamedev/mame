@@ -44,7 +44,7 @@
  */
 
 #include "emu.h"
-#include "kbd.h"
+#include "rtpc_kbd.h"
 
 #include "sound/spkrdev.h"
 #include "speaker.h"

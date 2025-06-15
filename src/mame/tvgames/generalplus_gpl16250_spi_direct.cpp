@@ -218,6 +218,12 @@ ROM_START( siddr )
 	ROM_LOAD16_WORD_SWAP( "ddr-toy.bin", 0x0000, 0x400000, CRC(873cbcc8) SHA1(bdd3d12adb1284991a3f8aaa8e451e3a55931267) )
 ROM_END
 
+
+ROM_START( punirune )
+	ROM_REGION16_BE(0x800000, "maincpu:spidirect", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "25l64.ic103", 0x0000, 0x800000, CRC(0737edc0) SHA1(fce19d91a0522a75e676197fb18645b8c6a273b8) )
+ROM_END
+
 void generalplus_gpspi_direct_game_state::init_fif()
 {
 	uint16_t* spirom16 = (uint16_t*)memregion("maincpu:spidirect")->base();
@@ -250,6 +256,10 @@ CONS(2017, bfgalaga, 0, 0, generalplus_gpspi_direct, bfmpac, generalplus_gpspi_d
 CONS(2018, bfdigdug, 0, 0, generalplus_gpspi_direct, bfmpac, generalplus_gpspi_direct_game_state, init_fif, "Basic Fun", "Dig Dug (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2019, bfspyhnt, 0, 0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, init_fif, "Basic Fun", "Spy Hunter (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2019, bftetris, 0, 0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, init_fif, "Basic Fun", "Tetris (mini arcade)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+// unclear if colour matches, but there are multiple generations of these at least
+// uses PUNIRUNZU_MAIN_V3 pcb, uses a GPL95101 series chip, might not fit here but does run direct from SPI
+CONS(2021, punirune, 0, 0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Takara Tomy", "Punirunes (Europe, pastel blue)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // probably not identical hardware, encryption is different, but it does seem to still be a 'direct access' SPI ROM case
 CONS(201?, siddr,    0, 0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, init_siddr, "Super Impulse", "Dance Dance Revolution - Broadwalk Arcade", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

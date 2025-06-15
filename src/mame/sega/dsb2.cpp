@@ -13,6 +13,9 @@ Sega Digital Sound Board 2
 
 #include <algorithm>
 
+#define VERBOSE 0
+#include "logmacro.h"
+
 DEFINE_DEVICE_TYPE(DSB2, dsb2_device, "dsb2_device", "Sega 68k-based Digital Sound Board 2")
 
 dsb2_device::dsb2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -43,7 +46,7 @@ void dsb2_device::dsb2_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom().region("mpegcpu", 0);
 	map(0xc00000, 0xc00003).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
-//	map(0xd00001) system control?
+	map(0xd00001, 0xd00001).w(FUNC(dsb2_device::system_control_w));
 //	map(0xd20001) flsbeats reads here
 //	map(0xe00001) acknowledge FIFO writes?
 	map(0xe00003, 0xe00003).w(FUNC(dsb2_device::fifo_w));
@@ -122,6 +125,11 @@ void dsb2_device::output_txd(int state)
 TIMER_CALLBACK_MEMBER(dsb2_device::timer_irq_cb)
 {
 	m_ourcpu->set_input_line(2, HOLD_LINE);
+}
+
+void dsb2_device::system_control_w(offs_t offset, u8 data)
+{
+	LOG("$d00001: write %02x\n", data);
 }
 
 void dsb2_device::fifo_w(offs_t offset, u8 data)

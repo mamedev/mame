@@ -249,10 +249,7 @@ void m6809_base_device::device_start()
 
 void m6809_base_device::device_reset()
 {
-	m_nmi_line = false;
 	m_nmi_asserted = false;
-	m_firq_line = false;
-	m_irq_line = false;
 	m_lds_encountered = false;
 	m_free_run = false;
 

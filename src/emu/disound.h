@@ -95,7 +95,7 @@ public:
 
 	void set_sound_hook(bool enable) { m_sound_hook = enable; }
 	bool get_sound_hook() const { return m_sound_hook; }
-	
+
 protected:
 	// configuration access
 	std::vector<sound_route> &routes() { return m_route_list; }

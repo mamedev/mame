@@ -338,7 +338,7 @@ Audio Effects menu
 This menu allows to configure the audio effects that are applied to
 the speaker outputs between the speaker device and the audio mixer.
 In other words, the output channels as seen in the audio mixer are the
-outputs of the effect chains.  Each speaker has an independant effect
+outputs of the effect chains.  Each speaker has an independent effect
 chain applied.
 
 The chain itself is not configurable it is always in order:
@@ -409,7 +409,7 @@ The parameters are:
 * Threshold: level at which the amplification fully stops.
 
 * Channel link: at 100 all channels of the same speaker are amplified
-  identically, at 0 they are fully independant, intermediate values
+  identically, at 0 they are fully independent, intermediate values
   have intermediate behaviour.
 
 * Feedback: allows to loop back some of the output to the input.

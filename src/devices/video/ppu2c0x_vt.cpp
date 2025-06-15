@@ -21,6 +21,9 @@
 DEFINE_DEVICE_TYPE(PPU_VT03, ppu_vt03_device, "ppu_vt03", "VT03 PPU (NTSC)")
 DEFINE_DEVICE_TYPE(PPU_VT03PAL, ppu_vt03pal_device, "ppu_vt03pal", "VT03 PPU (PAL)")
 
+DEFINE_DEVICE_TYPE(PPU_VT32, ppu_vt32_device, "ppu_vt32", "VT32 PPU (NTSC)")
+DEFINE_DEVICE_TYPE(PPU_VT32PAL, ppu_vt32pal_device, "ppu_vt32pal", "VT32 PPU (PAL)")
+
 DEFINE_DEVICE_TYPE(PPU_VT3XX, ppu_vt3xx_device, "ppu_vt3xx", "VT3XX PPU (NTSC)")
 
 ppu_vt03_device::ppu_vt03_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock) :
@@ -29,6 +32,7 @@ ppu_vt03_device::ppu_vt03_device(const machine_config& mconfig, device_type type
 	m_is_50hz(false),
 	m_read_bg(*this, 0),
 	m_read_sp(*this, 0),
+	m_read_onespace(*this, 0),
 	m_read_onespace_with_relative(*this, 0)
 {
 }
@@ -48,6 +52,24 @@ ppu_vt03pal_device::ppu_vt03pal_device(const machine_config& mconfig, const char
 	m_is_50hz = true;
 }
 
+ppu_vt32_device::ppu_vt32_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock) :
+	ppu_vt03_device(mconfig, type, tag, owner, clock)
+{
+}
+
+ppu_vt32_device::ppu_vt32_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+	ppu_vt32_device(mconfig, PPU_VT32, tag, owner, clock)
+{
+}
+
+ppu_vt32pal_device::ppu_vt32pal_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+	ppu_vt32_device(mconfig, PPU_VT32PAL, tag, owner, clock)
+{
+	m_scanlines_per_frame = PAL_SCANLINES_PER_FRAME;
+	m_vblank_first_scanline = VBLANK_FIRST_SCANLINE_PALC;
+	m_is_pal = true;
+	m_is_50hz = true;
+}
 
 u8 ppu_vt03_device::palette_read(offs_t offset)
 {
@@ -219,7 +241,8 @@ void ppu_vt03_device::device_start()
 	init_vtxx_rgb555_palette_tables();
 	init_vtxx_rgb444_palette_tables();
 
-	// for VT3xx
+	// for VT3xx / VT32 (may have different meanings on each though)
+	save_item(NAME(m_newvid_1b));
 	save_item(NAME(m_newvid_1c));
 	save_item(NAME(m_newvid_1d));
 	save_item(NAME(m_newvid_1e));
@@ -249,6 +272,7 @@ void ppu_vt03_device::device_reset()
 	m_read_bg4_bg3 = 0;
 
 	// for VT3xx
+	m_newvid_1b = 0x00;
 	m_newvid_1c = 0x00;
 	m_newvid_1d = 0x00;
 	m_newvid_1e = 0x00;
@@ -575,6 +599,92 @@ void ppu_vt03_device::videobank0_extra_w(offs_t offset, u8 data) { m_videobank0_
 /* 201e read gun 2 read x (older VT chipsets) */
 /* 201f read gun 2 read y (older VT chipsets) */
 
+void ppu_vt32_device::m_newvid_1b_w(u8 data) { logerror("%s: m_newvid_1b_w %02x\n", machine().describe_context(), data); m_newvid_1b = data; }
+void ppu_vt32_device::m_newvid_1c_w(u8 data) { logerror("%s: m_newvid_1c_w %02x\n", machine().describe_context(), data); m_newvid_1c = data; }
+void ppu_vt32_device::m_newvid_1d_w(u8 data) { logerror("%s: m_newvid_1d_w %02x\n", machine().describe_context(), data); m_newvid_1d = data; }
+
+void ppu_vt32_device::draw_background(u8* line_priority)
+{
+	if (get_newvid_1c() == 0x2e)
+	{
+		// strange custom mode, feels more like a vt369 mode
+		// tiles use 16x16x8 packed data
+
+		// determine where in the nametable to start drawing from
+		// based on the current scanline and scroll regs
+		const u8  scroll_x_coarse = m_refresh_data & 0x001f;
+		const u8  scroll_y_coarse = (m_refresh_data & 0x03c0) >> 5;
+		// m_refresh_data & 0x0020 in this case would be the top/bottom of the tile
+
+		const u16 nametable = (m_refresh_data & 0x0c00) >> 1;
+		const u8  scroll_y_fine = (m_refresh_data & 0x7000) >> 12;
+
+		int x = scroll_x_coarse >> 1;// &~1;
+
+		int tile_index = (nametable | 0x2000) + scroll_y_coarse * 16;
+
+		int start_x = ((((scroll_x_coarse & 1) << 3) + m_x_fine) ^ 0x0f) - 0xf;
+		u32* dest = &m_bitmap.pix(m_scanline, start_x);
+
+		m_tilecount = 0;
+
+		// draw the 15 or 16 tiles that make up a line
+		while (m_tilecount < 17)
+		{
+			const int index1 = tile_index + (x * 2);
+			int page2 = readbyte(index1);
+			page2 |= (readbyte(index1 + 1) & 0x03) << 8; // index+1 is colour data? and extra tile bits
+
+			if (start_x < VISIBLE_SCREEN_WIDTH)
+			{
+				int gfx_address = page2 * 0x100;
+				// this should probably go through the standard video banking?
+				gfx_address += m_videobank0[0x5] * 0x800;
+				gfx_address += m_videobank1 * 0x8000;
+
+				gfx_address += scroll_y_fine * 16;
+				gfx_address += ((m_refresh_data & 0x0020) >> 5) * 0x80;
+
+				for (int i = 0; i < 16; i++)
+				{
+					u8 pix = m_read_onespace(gfx_address + i);
+					if ((start_x + i) >= 0 && (start_x + i) < VISIBLE_SCREEN_WIDTH)
+					{
+						u32 palval;
+
+						if (pix & 0x80)
+							palval = (m_vt3xx_palette[pix & 0x7f] & 0x3f) | ((m_vt3xx_palette[(pix & 0x7f) + 0x80] & 0x3f) << 6);
+						else
+							palval = (m_vt3xx_palette[(pix & 0x7f) + 0x100] & 0x3f) | ((m_vt3xx_palette[(pix & 0x7f) + 0x180] & 0x3f) << 6);
+
+						// apply colour emphasis (does it really exist here?) (we haven't calculated any colours for it, so ths has no effect)
+						palval |= ((m_regs[PPU_CONTROL1] & PPU_CONTROL1_COLOR_EMPHASIS) << 7);
+
+						*dest = m_vtpens_rgb444[palval & 0x7fff];
+						if (pix)
+							line_priority[start_x + i] |= 0x02;
+					}
+					dest++;
+				}
+				start_x += 16;
+				x++;
+				if (x > 15)
+				{
+					x = 0;
+					tile_index ^= 0x200;
+				}
+
+			}
+			m_tilecount++;
+		}
+	}
+	else
+	{
+		ppu2c0x_device::draw_background(line_priority);
+	}
+}
+
+
 ppu_vt3xx_device::ppu_vt3xx_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
 	ppu_vt03_device(mconfig, PPU_VT3XX, tag, owner, clock)
 {
@@ -732,6 +842,21 @@ offs_t ppu_vt3xx_device::recalculate_offsets_8x8x8packed_tile(int address, int v
 	return finaladdr + finaloffset;
 }
 
+offs_t ppu_vt3xx_device::recalculate_offsets_16x16x8packed_hires_tile(int address, int va34)
+{
+	int finaladdr = get_newmode_tilebase() * 0x2000;
+	int colorbits = get_m_read_bg4_bg3();
+	int tileline = address & 0x0007;
+	int tileplane = address & 0x0008;
+	int tilenum = (address & 0x0ff0) >> 4;
+	int finaloffset = tilenum * 0x100;
+	finaloffset += tileline * 0x20; // 0x10 are the odd lines, we currently only fetch even as we're pretending these are 8x8
+	finaloffset += va34; // 3 bits
+	finaloffset += tileplane; // 1 bit
+	finaloffset += colorbits * 0x10000;
+	return finaladdr + finaloffset;
+}
+
 void ppu_vt3xx_device::read_tile_plane_data(int address, int color)
 {
 	if (!m_newvid_1e)
@@ -741,26 +866,48 @@ void ppu_vt3xx_device::read_tile_plane_data(int address, int color)
 	else
 	{
 		m_read_bg4_bg3 = color;
-
 		m_whichpixel = 0;
 
-		if ((m_newvid_1c & 0x03) == 0x02)
+		// used by the rtvgc300 / rtvgc300fz menus, and also 'image match' in lxcmcysp
+		if (m_newvid_1c & 0x04) // high resolution mode
 		{
-			m_planebuf[0] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 0) & 0x1fff, 0));
-			m_planebuf[1] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 8) & 0x1fff, 0));
-			m_planebuf[2] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 0) & 0x1fff, 1));
-			m_planebuf[3] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 8) & 0x1fff, 1));
-			m_planebuf[4] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 0) & 0x1fff, 2));
-			m_planebuf[5] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 8) & 0x1fff, 2));
-			m_planebuf[6] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 0) & 0x1fff, 3));
-			m_planebuf[7] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 8) & 0x1fff, 3));
+			m_planebuf[0] = m_read_onespace_with_relative(recalculate_offsets_16x16x8packed_hires_tile((address + 0) & 0x1fff, 0));
+			m_planebuf[1] = m_read_onespace_with_relative(recalculate_offsets_16x16x8packed_hires_tile((address + 8) & 0x1fff, 0));
+			m_planebuf[2] = m_read_onespace_with_relative(recalculate_offsets_16x16x8packed_hires_tile((address + 0) & 0x1fff, 1));
+			m_planebuf[3] = m_read_onespace_with_relative(recalculate_offsets_16x16x8packed_hires_tile((address + 8) & 0x1fff, 1));
+			m_planebuf[4] = m_read_onespace_with_relative(recalculate_offsets_16x16x8packed_hires_tile((address + 0) & 0x1fff, 2));
+			m_planebuf[5] = m_read_onespace_with_relative(recalculate_offsets_16x16x8packed_hires_tile((address + 8) & 0x1fff, 2));
+			m_planebuf[6] = m_read_onespace_with_relative(recalculate_offsets_16x16x8packed_hires_tile((address + 0) & 0x1fff, 3));
+			m_planebuf[7] = m_read_onespace_with_relative(recalculate_offsets_16x16x8packed_hires_tile((address + 8) & 0x1fff, 3));
+			m_planebuf[8] = m_read_onespace_with_relative(recalculate_offsets_16x16x8packed_hires_tile((address + 0) & 0x1fff, 4));
+			m_planebuf[9] = m_read_onespace_with_relative(recalculate_offsets_16x16x8packed_hires_tile((address + 8) & 0x1fff, 4));
+			m_planebuf[10] = m_read_onespace_with_relative(recalculate_offsets_16x16x8packed_hires_tile((address + 0) & 0x1fff, 5));
+			m_planebuf[11] = m_read_onespace_with_relative(recalculate_offsets_16x16x8packed_hires_tile((address + 8) & 0x1fff, 5));
+			m_planebuf[12] = m_read_onespace_with_relative(recalculate_offsets_16x16x8packed_hires_tile((address + 0) & 0x1fff, 6));
+			m_planebuf[13] = m_read_onespace_with_relative(recalculate_offsets_16x16x8packed_hires_tile((address + 8) & 0x1fff, 6));
+			m_planebuf[14] = m_read_onespace_with_relative(recalculate_offsets_16x16x8packed_hires_tile((address + 0) & 0x1fff, 7));
+			m_planebuf[15] = m_read_onespace_with_relative(recalculate_offsets_16x16x8packed_hires_tile((address + 8) & 0x1fff, 7));
 		}
 		else
 		{
-			m_planebuf[0] = m_read_onespace_with_relative(recalculate_offsets_8x8x4packed_tile((address + 0) & 0x1fff, 0));
-			m_planebuf[1] = m_read_onespace_with_relative(recalculate_offsets_8x8x4packed_tile((address + 8) & 0x1fff, 0));
-			m_planebuf[2] = m_read_onespace_with_relative(recalculate_offsets_8x8x4packed_tile((address + 0) & 0x1fff, 1));
-			m_planebuf[3] = m_read_onespace_with_relative(recalculate_offsets_8x8x4packed_tile((address + 8) & 0x1fff, 1));
+			if ((m_newvid_1c & 0x03) == 0x02)
+			{
+				m_planebuf[0] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 0) & 0x1fff, 0));
+				m_planebuf[1] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 8) & 0x1fff, 0));
+				m_planebuf[2] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 0) & 0x1fff, 1));
+				m_planebuf[3] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 8) & 0x1fff, 1));
+				m_planebuf[4] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 0) & 0x1fff, 2));
+				m_planebuf[5] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 8) & 0x1fff, 2));
+				m_planebuf[6] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 0) & 0x1fff, 3));
+				m_planebuf[7] = m_read_onespace_with_relative(recalculate_offsets_8x8x8packed_tile((address + 8) & 0x1fff, 3));
+			}
+			else
+			{
+				m_planebuf[0] = m_read_onespace_with_relative(recalculate_offsets_8x8x4packed_tile((address + 0) & 0x1fff, 0));
+				m_planebuf[1] = m_read_onespace_with_relative(recalculate_offsets_8x8x4packed_tile((address + 8) & 0x1fff, 0));
+				m_planebuf[2] = m_read_onespace_with_relative(recalculate_offsets_8x8x4packed_tile((address + 0) & 0x1fff, 1));
+				m_planebuf[3] = m_read_onespace_with_relative(recalculate_offsets_8x8x4packed_tile((address + 8) & 0x1fff, 1));
+			}
 		}
 	}
 }
@@ -773,38 +920,55 @@ void ppu_vt3xx_device::shift_tile_plane_data(u8& pix)
 	}
 	else
 	{
-		if ((m_newvid_1c & 0x03) == 0x02)
+		if (m_newvid_1c & 0x04) // high resolution mode
 		{
-			// 8x8x8 non-planar mode
+			// we currently pretend this is 8x8, not 16x16
 			switch (m_whichpixel)
 			{
-			case 0: pix = m_planebuf[0]; break;
-			case 1: pix = m_planebuf[2]; break;
-			case 2: pix = m_planebuf[4]; break;
-			case 3: pix = m_planebuf[6]; break;
-			case 4: pix = m_planebuf[1]; break;
-			case 5: pix = m_planebuf[3]; break;
-			case 6: pix = m_planebuf[5]; break;
-			case 7: pix = m_planebuf[7]; break;
+				case 0: pix = m_planebuf[0]; break;
+				case 1: pix = m_planebuf[4]; break;
+				case 2: pix = m_planebuf[8]; break;
+				case 3: pix = m_planebuf[12]; break;
+				case 4: pix = m_planebuf[1]; break;
+				case 5: pix = m_planebuf[5]; break;
+				case 6: pix = m_planebuf[9]; break;
+				case 7: pix = m_planebuf[13]; break;
 			}
 		}
 		else
 		{
-			// extended modes
-			// 8x8x4 non-planar mode
-			switch (m_whichpixel)
+			if ((m_newvid_1c & 0x03) == 0x02)
 			{
-			case 0: pix = (m_planebuf[0] >> 0) & 0xf; break;
-			case 1: pix = (m_planebuf[0] >> 4) & 0xf; break;
-			case 2: pix = (m_planebuf[2] >> 0) & 0xf; break;
-			case 3: pix = (m_planebuf[2] >> 4) & 0xf; break;
-			case 4: pix = (m_planebuf[1] >> 0) & 0xf; break;
-			case 5: pix = (m_planebuf[1] >> 4) & 0xf; break;
-			case 6: pix = (m_planebuf[3] >> 0) & 0xf; break;
-			case 7: pix = (m_planebuf[3] >> 4) & 0xf; break;
+				// 8x8x8 non-planar mode
+				switch (m_whichpixel)
+				{
+				case 0: pix = m_planebuf[0]; break;
+				case 1: pix = m_planebuf[2]; break;
+				case 2: pix = m_planebuf[4]; break;
+				case 3: pix = m_planebuf[6]; break;
+				case 4: pix = m_planebuf[1]; break;
+				case 5: pix = m_planebuf[3]; break;
+				case 6: pix = m_planebuf[5]; break;
+				case 7: pix = m_planebuf[7]; break;
+				}
+			}
+			else
+			{
+				// extended modes
+				// 8x8x4 non-planar mode
+				switch (m_whichpixel)
+				{
+				case 0: pix = (m_planebuf[0] >> 0) & 0xf; break;
+				case 1: pix = (m_planebuf[0] >> 4) & 0xf; break;
+				case 2: pix = (m_planebuf[2] >> 0) & 0xf; break;
+				case 3: pix = (m_planebuf[2] >> 4) & 0xf; break;
+				case 4: pix = (m_planebuf[1] >> 0) & 0xf; break;
+				case 5: pix = (m_planebuf[1] >> 4) & 0xf; break;
+				case 6: pix = (m_planebuf[3] >> 0) & 0xf; break;
+				case 7: pix = (m_planebuf[3] >> 4) & 0xf; break;
+				}
 			}
 		}
-
 		m_whichpixel++;
 	}
 }
@@ -881,6 +1045,270 @@ inline u8 ppu_vt3xx_device::get_pixel_data(u8* spritepatternbuf, int bpp, int pi
 	return pixel_data;
 }
 
+void ppu_vt3xx_device::draw_sprites_high_res(u8* line_priority)
+{
+	// high res sprite mode uses an entirely different format (and possibly different spriteram)
+	for (int spritenum = 0x00; spritenum < 0x40; spritenum++)
+	{
+		int ypos = m_spriteram[(spritenum * 8) + 0];
+		int tilenum = m_spriteram[(spritenum * 8) + 1];
+		tilenum |= m_spriteram[(spritenum * 8) + 2] << 8;
+		int bpp = m_spriteram[(spritenum * 8) + 3] & 0x80;
+		int width = m_spriteram[(spritenum * 8) + 3] & 0x30;
+		int height = m_spriteram[(spritenum * 8) + 3] & 0x0c;
+		int pal = m_spriteram[(spritenum * 8) + 6] & 0x3f;
+		//int flipx = m_spriteram[(spritenum * 8) + 6] & 0x40;
+		//int flipy = m_spriteram[(spritenum * 8) + 6] & 0x80;
+		int xpos = m_spriteram[(spritenum * 8) + 7];
+
+		if (bpp)
+			bpp = 8;
+		else
+			bpp = 4;
+
+		//flipx = flipx >> 6;
+		//flipy = flipy >> 7;
+
+		width = width >> 4;
+		width = 4 << width;
+		height = height >> 2;
+		height = 4 << height;
+
+		//if (m_scanline == 128)
+		//	logerror("high res sprite %d xpos %02x ypos %02x tile %04x pal %02x xsize %d ysize %d bpp %d flipx %d flipy %d\n", spritenum, xpos, ypos, tilenum, pal, width, height, bpp, flipx, flipy);
+
+		// if the sprite isn't visible, skip it
+		if ((ypos + height <= m_scanline) || (ypos > m_scanline))
+			continue;
+
+		// compute the character's line to draw 
+		const int sprite_line = m_scanline - ypos;
+
+		int pattern_offset;
+		if (bpp == 4)
+		{
+			pattern_offset = tilenum * (2 * height * width);
+			pattern_offset += sprite_line * (2 * width);
+		}
+		else
+		{
+			pattern_offset = tilenum * (4 * height * width);
+			pattern_offset += sprite_line * (4 * width);
+		}
+
+		pattern_offset += get_newmode_spritebase() * 0x2000;
+
+		for (int pixel = 0; pixel < width; pixel++)
+		{
+			u8 pixel_data;
+
+			if (bpp == 4)
+			{
+				/*
+				pixel_data = m_read_onespace_with_relative(pattern_offset + (pixel >> 1));
+				if (pixel & 1)
+					pixel_data >>= 4;
+				else
+					pixel_data &= 0xf;
+				*/
+				// we're pretending this isn't high-res so skipping pixels
+				pixel_data = m_read_onespace_with_relative(pattern_offset + pixel);
+				pixel_data &= 0xf;
+			}
+			else
+			{
+				//pixel_data = m_read_onespace_with_relative(pattern_offset + pixel);
+				// we're pretending this isn't high-res so skipping pixels
+				pixel_data = m_read_onespace_with_relative(pattern_offset + (pixel * 2));
+			}
+
+			if (xpos + pixel >= 0)
+			{
+				if (pixel_data) // opaque check
+				{
+					if ((xpos + pixel) < VISIBLE_SCREEN_WIDTH)
+					{
+						const rgb_t palval = get_pen_value(pixel_data, bpp, pal);
+						m_bitmap.pix(m_scanline, xpos + pixel) = palval;
+					}
+				}
+			}
+		}
+
+	}
+}
+
+void ppu_vt3xx_device::draw_sprites_standard_res(u8* line_priority)
+{
+	/*
+
+	+ 0x000    yyyy yyyy   y = ypos
+	+ 0x080    tttt tttt   t = tile number
+
+	for new format 0  (m_newvid_1d & 0x08 set)
+	+ 0x100    YXpT TTpp   Y = negative Y pos    X = negative X pos    T = high tile number    p = palette
+
+	for new format 1  (m_newvid_1d & 0x08 not set)
+	+ 0x100    fFzT TTpp   f = yflip    F = xflip    T = high tile number    p = palette    z = priority
+
+	+ 0x180    xxxx xxxx   x = xpos
+
+	*/
+
+	// new style sprites
+	for (int spritenum = 0x00; spritenum < 0x80; spritenum++)
+	{
+		const bool is_new_format = m_newvid_1e & 0x04;
+
+		// old packed spriteram format
+		int ypos_table = 0x000;
+		int	xpos_table = 0x003;
+		int	tilenum_table = 0x001;
+		int	extra_table = 0x002;
+		int	table_step = 4;
+
+		// new expanded spriteram format
+		if (m_newvid_1e & 0x04)
+		{
+			ypos_table = 0x000;
+			xpos_table = 0x180;
+			tilenum_table = 0x080;
+			extra_table = 0x100;
+			table_step = 1;
+		}
+
+		const int sprite_table_offset = spritenum * table_step;
+		int pri = 0;
+		int ypos = m_spriteram[ypos_table + sprite_table_offset];
+		int xpos = m_spriteram[xpos_table + sprite_table_offset];
+		int tilenum = m_spriteram[tilenum_table + sprite_table_offset];
+		tilenum |= (m_spriteram[extra_table + sprite_table_offset] & 0x1c) << 6;
+
+		int pal = m_spriteram[extra_table + sprite_table_offset] & 0x03;
+
+		if (m_newvid_1d & 0x08) // format 0
+		{
+			pal |= (m_spriteram[extra_table + sprite_table_offset] & 0x20) >> 3;
+			if (m_spriteram[extra_table + sprite_table_offset] & 0x40)
+			{
+				xpos = -0x100 + xpos; // allows for partially offscreen sprites?
+			}
+
+			// TODO: verify
+			if (m_spriteram[extra_table + sprite_table_offset] & 0x80)
+			{
+				ypos = -0x100 + ypos;
+			}
+		}
+		else // format 1
+		{
+			pri = (m_spriteram[extra_table + sprite_table_offset] & 0x20) >> 5;
+		}
+
+		int height, width, bpp, alt_16_handling;
+
+		if (is_new_format)
+		{
+			height = 16;
+			width = 8;
+			bpp = 8;
+			alt_16_handling = false;
+
+			if (m_newvid_1d & 0x02)
+			{
+				width = 16;
+				bpp = 4;
+			}
+
+			// testing with lxcmcysp later games in the list
+			// 12 09 0f -- 'alt_16_handling'
+			// 22 09 0f -- some games, works
+			// 12 0f 0f -- menu, works
+			// 12 0b 0f -- hercules in red5mam, still broken
+			if ((!(m_newvid_1d & 0x04)) && (m_newvid_1c & 0x10))
+			{
+				alt_16_handling = true;
+				bpp = 4;
+			}
+		}
+		else
+		{
+			// use the old size register in this mode? monster jump in lxcmcysp at least sets it
+			height = (m_regs[PPU_CONTROL0] & PPU_CONTROL0_SPRITE_SIZE) ? 16 : 8;
+			width = 8;
+			bpp = 8;
+			alt_16_handling = false;
+
+			// 12 0f 0b -- tetrtin
+			if ((m_newvid_1c == 0x12) && (m_newvid_1d == 0x0f) && (m_newvid_1e == 0x0b))
+			{
+				// this seems to disagree with only using the old height register in this mode
+				bpp = 4;
+				width = 16;
+				height = 16;
+			}
+		}
+
+		// if the sprite isn't visible, skip it
+		if ((ypos + height <= m_scanline) || (ypos > m_scanline))
+			continue;
+
+		// compute the character's line to draw 
+		const int sprite_line = m_scanline - ypos;
+
+		// a 16 pixel wide sprite (packed format), at 4bpp, requires 8 bytes for a single line
+		// at 16 pixels high it requires 128 bytes for a whole tile
+
+		// sprites can be 8 pixels wide and 8bpp, or 16 pixels wide and 4bpp?
+		int index1;
+
+		if (bpp == 4)
+		{
+			if (alt_16_handling)
+				index1 = tilenum * 32;
+			else
+				index1 = tilenum * 128;
+		}
+		else
+		{
+			index1 = tilenum * 64; // why? a 16 wide 4bpp sprite takes up the same number of bytes as an 8 wide 8bpp sprite
+		}
+
+		int pattern_offset;
+
+		if (alt_16_handling)
+			pattern_offset = index1 + sprite_line * 4;
+		else
+			pattern_offset = index1 + sprite_line * 8;
+
+		pattern_offset += get_newmode_spritebase() * 0x2000;
+
+		u8 spritepatternbuf[8];
+		for (int i = 0; i < 8; i++)
+			spritepatternbuf[i] = m_read_onespace_with_relative(pattern_offset + i);
+
+		if (pri)
+		{
+			for (int pixel = 0; pixel < width; pixel++)
+			{
+				u8 pixel_data = get_pixel_data(spritepatternbuf, bpp, pixel);
+				if (xpos + pixel >= 0)
+					draw_extended_sprite_pixel_low(m_bitmap, pixel_data, pixel, xpos, pal, bpp, line_priority);
+			}
+		}
+		else
+		{
+			for (int pixel = 0; pixel < width; pixel++)
+			{
+				u8 pixel_data = get_pixel_data(spritepatternbuf, bpp, pixel);
+				if (xpos + pixel >= 0)
+					draw_extended_sprite_pixel_high(m_bitmap, pixel_data, pixel, xpos, pal, bpp, line_priority);
+			}
+
+		}
+	}
+}
+
 void ppu_vt3xx_device::draw_sprites(u8* line_priority)
 {
 	if (!m_newvid_1e)
@@ -889,172 +1317,13 @@ void ppu_vt3xx_device::draw_sprites(u8* line_priority)
 	}
 	else
 	{
-		/*
-
-		+ 0x000    yyyy yyyy   y = ypos
-		+ 0x080    tttt tttt   t = tile number
-
-		for new format 0  (m_newvid_1d & 0x08 set)
-		+ 0x100    YXpT TTpp   Y = negative Y pos    X = negative X pos    T = high tile number    p = palette
-
-		for new format 1  (m_newvid_1d & 0x08 not set)
-		+ 0x100    fFzT TTpp   f = yflip    F = xflip    T = high tile number    p = palette    z = priority
-
-		+ 0x180    xxxx xxxx   x = xpos
-
-		*/
-
-		// new style sprites
-		for (int spritenum = 0x00; spritenum < 0x80; spritenum++)
+		if (m_newvid_1c & 0x04) // high resolution mode
 		{
-			const bool is_new_format = m_newvid_1e & 0x04;
-
-			// old packed spriteram format
-			int ypos_table = 0x000;
-			int	xpos_table = 0x003;
-			int	tilenum_table = 0x001;
-			int	extra_table = 0x002;
-			int	table_step = 4;
-
-			// new expanded spriteram format
-			if (m_newvid_1e & 0x04)
-			{
-				ypos_table = 0x000;
-				xpos_table = 0x180;
-				tilenum_table = 0x080;
-				extra_table = 0x100;
-				table_step = 1;
-			}
-
-			const int sprite_table_offset = spritenum * table_step;
-			int pri = 0;
-			int ypos = m_spriteram[ypos_table + sprite_table_offset];
-			int xpos = m_spriteram[xpos_table + sprite_table_offset];
-			int tilenum = m_spriteram[tilenum_table + sprite_table_offset];
-			tilenum |= (m_spriteram[extra_table + sprite_table_offset] & 0x1c) << 6;
-
-			int pal = m_spriteram[extra_table + sprite_table_offset] & 0x03;
-
-			if (m_newvid_1d & 0x08) // format 0
-			{
-				pal |= (m_spriteram[extra_table + sprite_table_offset] & 0x20) >> 3;
-				if (m_spriteram[extra_table + sprite_table_offset] & 0x40)
-				{
-					xpos = -0x100 + xpos; // allows for partially offscreen sprites?
-				}
-
-				// TODO: verify
-				if (m_spriteram[extra_table + sprite_table_offset] & 0x80)
-				{
-					ypos = -0x100 + ypos;
-				}
-			}
-			else // format 1
-			{
-				pri = (m_spriteram[extra_table + sprite_table_offset] & 0x20) >> 5;
-			}
-
-			int height, width, bpp, alt_16_handling;
-
-			if (is_new_format)
-			{
-				height = 16;
-				width = 8;
-				bpp = 8;
-				alt_16_handling = false;
-
-				if (m_newvid_1d & 0x02)
-				{
-					width = 16;
-					bpp = 4;
-				}
-
-				// testing with lxcmcysp later games in the list
-				// 12 09 0f -- 'alt_16_handling'
-				// 22 09 0f -- some games, works
-				// 12 0f 0f -- menu, works
-				// 12 0b 0f -- hercules in red5mam, still broken
-				if ((!(m_newvid_1d & 0x04)) && (m_newvid_1c & 0x10))
-				{
-					alt_16_handling = true;
-					bpp = 4;
-				}
-			}
-			else
-			{
-				// use the old size register in this mode? monster jump in lxcmcysp at least sets it
-				height = (m_regs[PPU_CONTROL0] & PPU_CONTROL0_SPRITE_SIZE) ? 16 : 8;
-				width = 8;
-				bpp = 8;
-				alt_16_handling = false;
-
-				// 12 0f 0b -- tetrtin
-				if ((m_newvid_1c == 0x12) && (m_newvid_1d == 0x0f) && (m_newvid_1e == 0x0b))
-				{
-					// this seems to disagree with only using the old height register in this mode
-					bpp = 4;
-					width = 16;
-					height = 16;
-				}
-			}
-
-			// if the sprite isn't visible, skip it
-			if ((ypos + height <= m_scanline) || (ypos > m_scanline))
-				continue;
-
-			// compute the character's line to draw 
-			const int sprite_line = m_scanline - ypos;
-
-			// a 16 pixel wide sprite (packed format), at 4bpp, requires 8 bytes for a single line
-			// at 16 pixels high it requires 128 bytes for a whole tile
-
-			// sprites can be 8 pixels wide and 8bpp, or 16 pixels wide and 4bpp?
-			int index1;
-
-			if (bpp == 4)
-			{
-				if (alt_16_handling)
-					index1 = tilenum * 32;
-				else
-					index1 = tilenum * 128;
-			}
-			else
-			{
-				index1 = tilenum * 64; // why? a 16 wide 4bpp sprite takes up the same number of bytes as an 8 wide 8bpp sprite
-			}
-
-			int pattern_offset;
-
-			if (alt_16_handling)
-				pattern_offset = index1 + sprite_line * 4;
-			else
-				pattern_offset = index1 + sprite_line * 8;
-
-			pattern_offset += get_newmode_spritebase() * 0x2000;
-
-			u8 spritepatternbuf[8];
-			for (int i = 0; i < 8; i++)
-				spritepatternbuf[i] = m_read_onespace_with_relative(pattern_offset + i);
-	
-			if (pri)
-			{
-				for (int pixel = 0; pixel < width; pixel++)
-				{
-					u8 pixel_data = get_pixel_data(spritepatternbuf, bpp, pixel);
-					if (xpos + pixel >= 0)
-						draw_extended_sprite_pixel_low(m_bitmap, pixel_data, pixel, xpos, pal, bpp, line_priority);
-				}
-			}
-			else
-			{
-				for (int pixel = 0; pixel < width; pixel++)
-				{
-					u8 pixel_data = get_pixel_data(spritepatternbuf, bpp, pixel);
-					if (xpos + pixel >= 0)
-						draw_extended_sprite_pixel_high(m_bitmap, pixel_data, pixel, xpos, pal, bpp, line_priority);
-				}
-
-			}
+			draw_sprites_high_res(line_priority);
+		}
+		else
+		{
+			draw_sprites_standard_res(line_priority);
 		}
 	}
 }

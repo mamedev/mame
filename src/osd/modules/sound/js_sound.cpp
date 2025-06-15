@@ -27,14 +27,12 @@ public:
 	virtual int init(osd_interface &osd, const osd_options &options) { return 0; }
 	virtual void exit() { }
 
-	// sound_module
-
 	virtual void stream_sink_update(uint32_t, const int16_t *buffer, int samples_this_frame)
 	{
 		EM_ASM_ARGS(
 				{
 					// Forward audio stream update on to JS backend implementation.
-					jsmame_steam_update($1, $2);
+					jsmame_stream_sink_update($0, $1);
 				},
 				(unsigned int)buffer,
 				samples_this_frame);

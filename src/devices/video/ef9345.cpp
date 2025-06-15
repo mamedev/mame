@@ -156,7 +156,7 @@ void ef9345_device::device_start()
 	save_item(NAME(m_dor));
 	save_item(NAME(m_ror));
 	save_item(NAME(m_block));
-	save_item(NAME(m_blink));
+	save_item(NAME(m_blink_phase));
 	save_item(NAME(m_latchc0));
 	save_item(NAME(m_latchm));
 	save_item(NAME(m_latchi));
@@ -174,7 +174,7 @@ void ef9345_device::device_reset()
 	m_state = 0;
 	m_bf = 0;
 	m_block = 0;
-	m_blink = 0;
+	m_blink_phase = 0;
 	m_latchc0 = 0;
 	m_latchm = 0;
 	m_latchi = 0;
@@ -202,7 +202,10 @@ TIMER_CALLBACK_MEMBER(ef9345_device::clear_busy_flag)
 
 TIMER_CALLBACK_MEMBER(ef9345_device::blink_tick)
 {
-	m_blink = !m_blink;
+	// 11 -> 10 -> 01 -> 00 -> repeats...
+	// left bit = flashing characters toggle (0.5 Hz)
+	// right bit = flashing cursor toggle (1 Hz)
+	m_blink_phase = (m_blink_phase + 3) & 0x3;
 }
 
 
@@ -408,66 +411,94 @@ uint16_t ef9345_device::indexblock(uint16_t x, uint16_t y)
 	return 0x40 * j + i;
 }
 
+// applies the insert, flash, conceal and negative attributes,
+// considering whether the cursor is on this character or not.
+std::tuple<uint8_t, uint8_t, bool> ef9345_device::makecolors(uint8_t c0, uint8_t c1, bool insert, bool flash, bool conceal, bool negative, bool cursor)
+{
+	uint8_t tmp, c_compl_mask = 0;
+	bool underline = false;
+
+	if (negative)
+	{
+		tmp = c1;
+		c1 = c0;
+		c0 = tmp;
+	}
+
+	if (cursor)
+	{
+		switch (m_mat & 0x70)
+		{
+		case 0x40:                  //00 = fixed complemented
+			c_compl_mask = 0x7;
+			break;
+		case 0x50:                  //01 = fixed underlined
+			underline = true;
+			break;
+		case 0x60:                  //10 = flash complemented
+			if (m_blink_phase & 0x1)
+				c_compl_mask = 0x7;
+			break;
+		case 0x70:                  //11 = flash underlined
+			if (m_blink_phase & 0x1)
+				underline = true;
+			break;
+		}
+	}
+
+	switch (m_pat & 0x30)           //insert mode
+	{
+	case 0x00: // inlay
+		if (insert)
+			c0 = 0, c1 = (c1 ^ c_compl_mask) | 0x8;
+		else
+			c0 = c1 = 0;
+		break;
+	case 0x10: // boxing
+		if (insert)
+			c0 = (c0 ^ c_compl_mask) | 0x8, c1 = (c1 ^ c_compl_mask) | 0x8;
+		else
+			c0 = c1 = 0;
+		break;
+	case 0x20: // character mark
+		if (insert)
+			c0 = (c0 ^ c_compl_mask) | 0x8, c1 = (c1 ^ c_compl_mask) | 0x8;
+		else
+			c0 = c0 ^ c_compl_mask, c1 = c1 ^ c_compl_mask;
+		break;
+	case 0x30: // active area mark
+		c0 = (c0 ^ c_compl_mask) | 0x8, c1 = (c1 ^ c_compl_mask) | 0x8;
+		break;
+	}
+
+	// Note: flashing characters blink on the opposite phase if negative.
+	if ((flash && (m_pat & 0x40) && negative == !!(m_blink_phase & 0x2)) ||
+	    (conceal && (m_pat & 0x08)))
+	{
+		c1 = c0; // make foreground same as background
+	}
+
+	return std::make_tuple(c0, c1, underline);
+}
+
 // draw bichrome character (40 columns)
-void ef9345_device::bichrome40(uint8_t type, uint16_t address, uint8_t dial, uint16_t iblock, uint16_t x, uint16_t y, uint8_t c0, uint8_t c1, uint8_t insert, uint8_t flash, uint8_t conceal, uint8_t negative, uint8_t underline)
+void ef9345_device::bichrome40(uint8_t type, uint16_t address, uint8_t dial, uint16_t iblock, uint16_t x, uint16_t y, uint8_t c0, uint8_t c1, bool insert, bool flash, bool conceal, bool negative, bool underline)
 {
 	uint16_t i;
 	uint8_t pix[80];
 
-	if (m_variant == EF9345_MODE::TYPE_TS9347)
-	{
-		c0 = 0;
-	}
-
-	if (flash && m_pat & 0x40 && m_blink)
-		c1 = c0;                    //flash
-	if (conceal && m_pat & 0x08)
-		c1 = c0;                    //conceal
-	if (negative)                   //negative
-	{
-		i = c1;
-		c1 = c0;
-		c0 = i;
-	}
-
-	if ((m_pat & 0x30) == 0x30)
-		insert = 0;                 //active area mark
-	if (insert == 0)
-		c1 += 8;                    //foreground color
-	if ((m_pat & 0x30) == 0x00)
-		insert = 1;                 //insert mode
-	if (insert == 0)
-		c0 += 8;                    //background color
-
-	//draw the cursor
+	// test if the cursor is on this character
 	i = (m_registers[6] & 0x1f);
 	if (i < 8)
 		i &= 1;
+	if (dial > 0 && (dial & 0x05) == 0) // dial = 2, 8, 10 (right side)
+		iblock++;
+	bool cursor = iblock == 0x40 * i + (m_registers[7] & 0x3f);
 
-	if (iblock == 0x40 * i + (m_registers[7] & 0x3f))   //cursor position
-	{
-		switch(m_mat & 0x70)
-		{
-		case 0x40:                  //00 = fixed complemented
-			c0 = (23 - c0) & 15;
-			c1 = (23 - c1) & 15;
-			break;
-		case 0x50:                  //01 = fixed underlined
-			underline = 1;
-			break;
-		case 0x60:                  //10 = flash complemented
-			if (m_blink)
-			{
-				c0 = (23 - c0) & 15;
-				c1 = (23 - c1) & 15;
-			}
-			break;
-		case 0x70:                  //11 = flash underlined
-			if (m_blink)
-				underline = 1;
-			break;
-		}
-	}
+	bool cursor_underline;
+	std::tie(c0, c1, cursor_underline) = makecolors(c0, c1, insert, flash, conceal, negative, cursor);
+	if ((type & 7) != 2 && (type & 7) != 3) // no underline cursor if semi-gr.
+		underline |= cursor_underline;
 
 	// generate the pixel table
 	for(i = 0; i < 40; i+=4)
@@ -552,38 +583,31 @@ void ef9345_device::quadrichrome40(uint8_t c, uint8_t b, uint8_t a, uint16_t x, 
 }
 
 // draw bichrome character (80 columns)
-void ef9345_device::bichrome80(uint8_t c, uint8_t a, uint16_t x, uint16_t y, uint8_t cursor)
+void ef9345_device::bichrome80(uint8_t c, uint8_t a, uint16_t x, uint16_t y, bool cursor)
 {
 	uint8_t c0, c1, pix[60];
 	uint16_t i, j, d;
 
+	bool insert = BIT(m_dor, (a & 1) ? 7 : 3);      //insert = DOR7/DOR3
 	c1 = (a & 1) ? (m_dor >> 4) & 7 : m_dor & 7;    //foreground color = DOR
 	c0 =  m_mat & 7;                                //background color = MAT
 
 	switch(c & 0x80)
 	{
 	case 0: //alphanumeric G0 set
+	{
 		//A0: D = color set
 		//A1: U = underline
 		//A2: F = flash
 		//A3: N = negative
 		//C0-6: character code
+		bool underline = (a & 2) >> 1;
+		bool flash = (a & 4) >> 2;
+		bool negative = (a & 8) >> 3;
 
-		if ((a & 4) && (m_pat & 0x40) && (m_blink))
-			c1 = c0;    //flash
-		if (a & 8)      //negative
-		{
-			i = c1;
-			c1 = c0;
-			c0 = i;
-		}
-
-		if ((cursor == 0x40) || ((cursor == 0x60) && m_blink))
-		{
-			i = c1;
-			c1 = c0;
-			c0 = i;
-		}
+		bool cursor_underline;
+		std::tie(c0, c1, cursor_underline) = makecolors(c0, c1, insert, flash, false, negative, cursor);
+		underline ^= cursor_underline;
 
 		d = ((c & 0x7f) >> 2) * 0x40 + (c & 0x03);  //char position
 
@@ -595,14 +619,19 @@ void ef9345_device::bichrome80(uint8_t c, uint8_t a, uint16_t x, uint16_t y, uin
 		}
 
 		//draw the underline
-		if ((a & 2) || (cursor == 0x50) || ((cursor == 0x70) && m_blink))
+		if (underline)
 			memset(&pix[54], c1, 6);
-
 		break;
+	}
 	default: //dedicated mosaic set
+	{
 		//A0: D = color set
 		//A1-3: 3 blocks de 6 pixels
 		//C0-6: 7 blocks de 6 pixels
+
+		bool cursor_underline;
+		std::tie(c0, c1, cursor_underline) = makecolors(c0, c1, insert, false, false, false, cursor);
+
 		pix[ 0] = (c & 0x01) ? c1 : c0;
 		pix[ 3] = (c & 0x02) ? c1 : c0;
 		pix[12] = (c & 0x04) ? c1 : c0;
@@ -623,7 +652,11 @@ void ef9345_device::bichrome80(uint8_t c, uint8_t a, uint16_t x, uint16_t y, uin
 		for(i = 0; i < 60; i += 3)
 			pix[i + 2] = pix[i + 1] = pix[i];
 
+		//draw the underline
+		if (cursor_underline)
+			memset(&pix[54], c1, 6);
 		break;
+	}
 	}
 
 	draw_char_80(pix, x, y);
@@ -718,19 +751,16 @@ void ef9345_device::makechar_24x40(uint16_t x, uint16_t y)
 void ef9345_device::makechar_12x80(uint16_t x, uint16_t y)
 {
 	uint16_t iblock = indexblock(x, y);
-	//draw the cursor
-	uint8_t cursor = 0;
-	uint8_t b = BIT(m_registers[7], 7);
+	bool cursor_odd = BIT(m_registers[7], 7);
 
+	//test if the cursor is on one of the two characters that we are rendering.
 	uint8_t i = (m_registers[6] & 0x1f);
 	if (i < 8)
 		i &= 1;
+	bool cursor = iblock == 0x40 * i + (m_registers[7] & 0x3f);
 
-	if (iblock == 0x40 * i + (m_registers[7] & 0x3f))   //cursor position
-		cursor = m_mat & 0x70;
-
-	bichrome80(m_videoram->read_byte(m_block + iblock), (m_videoram->read_byte(m_block + iblock + 0x1000) >> 4) & 0x0f, 2 * x + 1, y + 1, b ? 0 : cursor);
-	bichrome80(m_videoram->read_byte(m_block + iblock + 0x0800), m_videoram->read_byte(m_block + iblock + 0x1000) & 0x0f, 2 * x + 2, y + 1, b ? cursor : 0);
+	bichrome80(m_videoram->read_byte(m_block + iblock), (m_videoram->read_byte(m_block + iblock + 0x1000) >> 4) & 0x0f, 2 * x + 1, y + 1, cursor && !cursor_odd);
+	bichrome80(m_videoram->read_byte(m_block + iblock + 0x0800), m_videoram->read_byte(m_block + iblock + 0x1000) & 0x0f, 2 * x + 2, y + 1, cursor && cursor_odd);
 }
 
 void ef9345_device::draw_border(uint16_t line)

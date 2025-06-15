@@ -8,9 +8,9 @@
 
 // these games were ported to unSP hardware at some point, generalplus_gpl162xx_lcdtype.cpp
 
-// BIOS calls are made very frequently to the firmware (undumped for bbl380).
-// The most common call ($6058 in bbl380, $6062 in ragc153 & dphh8630) seems to involve downloading a snippet of code from SPI and executing it from RAM at $0300.
-// A variant of this call ($60d2 in bbl380, $60e3 in ragc153 & dphh8630) is invoked with jsr.
+// BIOS calls are made very frequently to the firmware (undumped for some sets).
+// The most common call ($6058 in bbl380, $6074 in mc_cb203, $6062 in ragc153 & dphh8630, $6052 in pg118 & toumapet) seems to involve downloading a snippet of code from SPI and executing it from RAM at $0300.
+// A variant of this call ($60d2 in bbl380, $60ed in mc_cb203, $60e3 in ragc153 & dphh8630, $60de in pg118 & toumapet) is invoked with jsr.
 // For these calls, a 24-bit starting address is specified in $82:$81:$80, and the length in bytes is twice the number specified in $84:$83.
 // There is a configurable XOR specified in $99 on ragc153 & dphh8630.
 // $6003 performs a table lookup, depositing a sequence of data at $008e.
@@ -359,6 +359,15 @@ ROM_START(arcade10)
 	ROM_LOAD("25q40.bin", 0x000000, 0x080000, CRC(62784666) SHA1(ba1a4abed0a41b2fb3868543306243e68ea6b2e1))
 ROM_END
 
+ROM_START(retro150)
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF)
+	// might not be correct for this set, as it doesn't boot
+	ROM_LOAD("st2x_internal.bin", 0x002000, 0x002000, BAD_DUMP CRC(f4dc1fc2) SHA1(bbc11539c48eb612ebae50da45e03b6fde440941)) // internal OTPROM BIOS, dumped from dgun2953 PCB, 6000-7fff range
+
+	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
+	ROM_LOAD("p25d32sh.u2", 0x000000, 0x400000, CRC(294290aa) SHA1(078892b2bb10e347ed07273bafed486e0f52c909) )
+ROM_END
+
 ROM_START(supreme)
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("st2x_internal.bin", 0x002000, 0x002000, BAD_DUMP CRC(f4dc1fc2) SHA1(bbc11539c48eb612ebae50da45e03b6fde440941)) // internal OTPROM BIOS, dumped from dgun2953 PCB, 6000-7fff range
@@ -369,7 +378,7 @@ ROM_END
 
 ROM_START(pg118)
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("st2x_internal.bin", 0x002000, 0x002000, BAD_DUMP CRC(f4dc1fc2) SHA1(bbc11539c48eb612ebae50da45e03b6fde440941)) // internal OTPROM BIOS, dumped from dgun2953 PCB, 6000-7fff range
+	ROM_LOAD("st2x_internal.bin", 0x002000, 0x002000, BAD_DUMP CRC(f4dc1fc2) SHA1(bbc11539c48eb612ebae50da45e03b6fde440941)) // internal OTPROM BIOS, dumped from dgun2953 PCB (not right for this set), 6000-7fff range
 
 	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
 	ROM_LOAD("25vq32.bin", 0x000000, 0x400000, CRC(e99f1621) SHA1(f907c36a1a884d892331b7de294a8fd58f7bf9d5) )
@@ -377,7 +386,7 @@ ROM_END
 
 ROM_START(toumapet)
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD("st2x_internal.bin", 0x002000, 0x002000, BAD_DUMP CRC(f4dc1fc2) SHA1(bbc11539c48eb612ebae50da45e03b6fde440941)) // internal OTPROM BIOS, dumped from dgun2953 PCB, 6000-7fff range
+	ROM_LOAD("st2x_internal.bin", 0x002000, 0x002000, BAD_DUMP CRC(f4dc1fc2) SHA1(bbc11539c48eb612ebae50da45e03b6fde440941)) // internal OTPROM BIOS, dumped from dgun2953 PCB (not right for this set), 6000-7fff range
 
 	ROM_REGION(0x800000, "spi", ROMREGION_ERASEFF)
 	ROM_LOAD("p25d32sh.bin", 0x000000, 0x400000, CRC(25498f00) SHA1(c5c410e29f540d7f1fd4bbb333467f8a3eaccc15) )
@@ -412,4 +421,6 @@ CONS( 201?, supreme,       0,       0,      bbl380,   bbl380, bbl380_state, empt
 CONS( 2019, pg118,         0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Pocket Game / Game Computer", "Pocket Game 118-in-1 / Game Computer 118-in-1", MACHINE_NOT_WORKING )
 // also has the 0xE4 XOR, also doesn't currently boot
 CONS( 2021, toumapet,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Shenzhen Shiji New Technology", "Tou ma Pet", MACHINE_NOT_WORKING )
+// for the UK market, but does't boot either
+CONS( 201?, retro150,      0,       0,      bbl380,   bbl380, bbl380_state, empty_init, "Red5", "Retro Arcade Game Controller (150-in-1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 

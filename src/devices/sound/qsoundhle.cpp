@@ -15,10 +15,27 @@
 ***************************************************************************/
 
 #include "emu.h"
+
+#ifndef QSOUND_LLE
+#define QSOUND_LLE
+#endif
+
 #include "qsoundhle.h"
+
+#include "qsound.h"
 
 #include <algorithm>
 #include <limits>
+
+//-------------------------------------------------
+//  parent_rom_device_type - get parent device type
+//  for ROM search
+//-------------------------------------------------
+
+inline auto qsound_hle_device::parent_rom_device_type()
+{
+	return &QSOUND;
+}
 
 // device type definition
 DEFINE_DEVICE_TYPE(QSOUND_HLE, qsound_hle_device, "qsound_hle", "QSound (HLE)")
@@ -47,6 +64,16 @@ qsound_hle_device::qsound_hle_device(const machine_config &mconfig, const char *
 	, m_dsp_rom(*this, "dsp")
 	, m_data_latch(0)
 {
+}
+
+//-------------------------------------------------
+//  rom_region - return a pointer to the device's
+//  internal ROM region
+//-------------------------------------------------
+
+const tiny_rom_entry *qsound_hle_device::device_rom_region() const
+{
+	return ROM_NAME( qsound_hle );
 }
 
 //-------------------------------------------------
@@ -134,16 +161,6 @@ void qsound_hle_device::device_start()
 	save_item(NAME(m_ready_flag));
 	save_item(NAME(m_data_latch));
 	save_item(NAME(m_out));
-}
-
-//-------------------------------------------------
-//  rom_region - return a pointer to the device's
-//  internal ROM region
-//-------------------------------------------------
-
-const tiny_rom_entry *qsound_hle_device::device_rom_region() const
-{
-	return ROM_NAME( qsound_hle );
 }
 
 //-------------------------------------------------
@@ -265,7 +282,7 @@ void qsound_hle_device::init_register_map()
 
 int16_t qsound_hle_device::read_sample(uint16_t bank, uint16_t address)
 {
-	bank &= 0x7FFF;
+	bank &= 0x7fff;
 	const uint32_t rom_addr = (bank << 16) | (address << 0);
 	const uint8_t sample_data = read_byte(rom_addr);
 	return (int16_t)(sample_data << 8); // bit0-7 is tied to ground

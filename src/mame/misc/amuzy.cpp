@@ -47,7 +47,7 @@
 *** YB4004-0 - Yubi Zumou Senshuken   - 指ずもう選手権
 *** YC4004-0 - Dekopin Janken         - デコピンじゃんけん
 *** YD4004-0 - Tsuna Hiki Champ       - つなひきチャンプ
-*** YE4004-0 - Chanbara Kids          - チャンバラキッズ
+    YE4004-0 - Chanbara Kids          - チャンバラキッズ
 *** YF4004-0 - Baba Nuki Shiyouze!    - ばばぬきしようぜ!
 *** YG4004-0 - Gachinko Ude Zumou     - ガチンコ腕ずもう
 *** YH4004-0 - Jarinko Kenshi         - じゃりんこ拳士
@@ -528,7 +528,19 @@ ROM_START( katori ) // HA9020-0
 	ROM_LOAD( "mx29lv160.u3", 0x000000, 0x200000, CRC(f57c33f6) SHA1(3d5dd858e94156c4c7b1f6b8934b0f7667fd66ad) ) // 1xxxxxxxxxxxxxxxxxxxx = 0x00
 ROM_END
 
+ROM_START( cbkids )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "mbm29f400ta.u1", 0x000000, 0x080000, BAD_DUMP CRC(21052f87) SHA1(b6cb2bf704abc0f5298b3f8f91398c9f4b47a7eb) ) // always gives a different read
+
+	ROM_REGION( 0x1000000, "oki", ROMREGION_ERASEFF )
+	ROM_LOAD( "mbm29f016a.u2", 0x000000, 0x200000, CRC(7faf5c9f) SHA1(c080de0eb6500bca995c23c0f348dc44696e6966) )
+
+	ROM_REGION( 0x200000, "gfx", 0 )
+	ROM_LOAD( "mx29lv160db.u3", 0x000000, 0x200000, CRC(6971d7cf) SHA1(81206a6f54180965570ccfc830083b582764aeb8) )
+ROM_END
+
 }   // anonymous namespace
+
 
 GAME( 2005, boobood,   0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Boo Boo Donpatchi (Japan, ver 1.01)",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2005, dojokkot,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Dojokko Tsukami (Japan, ver 1.02)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
@@ -540,6 +552,7 @@ GAME( 2005, wanpunch,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Co
 GAME( 2005, zenponta,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Zenigata Ponta (Japan, ver 1.02)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2006, amhbattl,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Acchi Muite Hoi Battle (Japan, ver 1.04)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2006, wanpakup,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Wanpaku Pirates (Japan, ver 1.00)",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2007, cbkids,    0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Chanbara Kids (Japan)",                    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2007, docchift,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Docchi Fighter (Japan, ver 1.02)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2007, itazurac,  0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Itazura Cockroach (Japan, ver 1.02)",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2007, wwdash,    0, amuzy, amuzy, amuzy_state, empty_init, ROT0, "Amuzy Corporation", "Wan Wan Dash (Japan, ver 1.01)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -8,7 +8,11 @@
     NT7502 LCD controller
 
     TODO:
-    - busy flag
+    - add a callback for outputting com/seg pins (in theory, the chip doesn't
+      require a raster screen, and can be used for eg. a 7seg panel)
+    - screen update callback shouldn't have any business with internal state
+      of the chip, such as m_start_line
+	- busy flag
 
 ***************************************************************************/
 
