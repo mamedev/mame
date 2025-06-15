@@ -482,6 +482,14 @@ ROM_START(jak_s500)
 	ROM_LOAD16_WORD_SWAP("spbwheel.bin", 0x000000, 0x800000, CRC(6ba1d335) SHA1(1bb3e4d02c7b35dd4d336971c6a9f82071cc6ce1) )
 ROM_END
 
+ROM_START(jak_swcl)
+	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP("jakksclonewars.bin", 0x000000, 0x800000, CRC(549bb326) SHA1(992a60321580a4e014801d401b3a7ee000d2b465) )
+ROM_END
+
 ROM_START(jak_smwm)
 	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
 	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
@@ -641,6 +649,7 @@ CONS(2012, paccon,   0, 0, gpl16250_romram, paccon, paccon_game_state, init_wrls
 
 CONS(2008, lazertag, 0, 0, gpl16250_romram, jak_s500, lazertag_game_state, init_wrlshunt, "Tiger Electronics", "Lazer Tag Video Game Module", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
+CONS(2009, jak_swcl, 0, 0, gpl16250_romram, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "Star Wars: The Clone Wars - Republic Squadron (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2009, jak_s500, 0, 0, gpl16250_romram, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "SpongeBob SquarePants Bikini Bottom 500 (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2009, jak_smwm, 0, 0, gpl16250_romram, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "Spider-Man Web Master (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2010, jak_pf,   0, 0, gpl16250_romram, jak_s500, jak_pf_game_state,   init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "Phineas and Ferb: Best Game Ever! (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // build date is 2009, but onscreen display is 2010
