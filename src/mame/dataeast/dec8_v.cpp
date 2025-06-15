@@ -281,9 +281,6 @@ VIDEO_START_MEMBER(ghostb_state,ghostb)
 	m_fix_tilemap->set_transparent_pen(0);
 
 	m_game_uses_priority = 0;
-
-	m_nmi_enable = false;
-	save_item(NAME(m_nmi_enable));
 }
 
 
