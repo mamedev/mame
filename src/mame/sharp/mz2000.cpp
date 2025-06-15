@@ -7,10 +7,9 @@ Sharp MZ-80B/MZ-2000/MZ-2200
 
 TODO:
 - find common points between other MZ machines;
-- cassette programs that are bigger than 8kb fails to load;
+- Cassette loads aren't consistant, several games wants a slower clock;
 - implement remaining video capabilities
 - add 80b compatibility support;
-- Vosque (color): keyboard doesn't work properly;
 
 **************************************************************************************************/
 
@@ -38,10 +37,6 @@ TODO:
 
 namespace {
 
-// TODO: was 4 MHz, but otherwise cassette won't work due of a bug with MZF support
-#define MASTER_CLOCK 17.73447_MHz_XTAL  / 5
-
-
 class mz2000_state : public driver_device
 {
 public:
@@ -56,7 +51,7 @@ public:
 		, m_floppy1(*this, "fdc:1")
 		, m_floppy2(*this, "fdc:2")
 		, m_floppy3(*this, "fdc:3")
-		, m_pit8253(*this, "pit")
+		, m_pit(*this, "pit")
 		, m_beeper(*this, "beeper")
 		, m_region_chargen(*this, "chargen")
 		, m_io_keys(*this, {"KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7", "KEY8", "KEY9", "KEYA", "KEYB", "KEYC", "KEYD", "UNUSED", "UNUSED"})
@@ -91,7 +86,7 @@ private:
 	required_device<floppy_connector> m_floppy1;
 	required_device<floppy_connector> m_floppy2;
 	required_device<floppy_connector> m_floppy3;
-	required_device<pit8253_device> m_pit8253;
+	required_device<pit8253_device> m_pit;
 	required_device<beep_device> m_beeper;
 	std::unique_ptr<uint8_t[]> m_work_ram;
 	std::unique_ptr<uint8_t[]> m_tvram;
@@ -119,7 +114,9 @@ private:
 
 	uint8_t m_porta_latch;
 	uint8_t m_tape_ctrl;
+	bool m_wait_state, m_hblank_state;
 	emu_timer *m_ipl_reset_timer = nullptr;
+	emu_timer *m_hblank_timer = nullptr;
 
 	template <unsigned N> void work_ram_w(offs_t offset, u8 data);
 	template <unsigned N> u8 work_ram_r(offs_t offset);
@@ -134,11 +131,8 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint8_t fdc_r(offs_t offset);
 	void fdc_w(offs_t offset, uint8_t data);
-	uint8_t ppi_porta_r();
 	uint8_t ppi_portb_r();
-	uint8_t ppi_portc_r();
 	void ppi_porta_w(uint8_t data);
-	void ppi_portb_w(uint8_t data);
 	void ppi_portc_w(uint8_t data);
 	void pio_porta_w(uint8_t data);
 	uint8_t pio_portb_r();
@@ -150,6 +144,7 @@ private:
 //	void mz2000_opcodes(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(ipl_timer_reset_cb);
+	TIMER_CALLBACK_MEMBER(hblank_cb);
 
 	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 };
@@ -161,6 +156,8 @@ void mz2000_state::video_start()
 
 	save_pointer(NAME(m_tvram), 0x1000);
 	save_pointer(NAME(m_gvram), 0x10000);
+
+
 }
 
 // TODO: modernize
@@ -284,10 +281,25 @@ template <unsigned N> uint8_t mz2000_state::work_ram_r(offs_t offset)
 
 		if (page_mem == 0xd && m_vram_overlay_select == 1)
 		{
+			if (!m_hblank_state && !machine().side_effects_disabled())
+			{
+				m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+				m_maincpu->defer_access();
+				m_wait_state = true;
+				return 0xff;
+			}
 			return m_tvram[offset & 0xfff];
 		}
 		else if (page_mem >= 0xc && m_vram_overlay_select == 0)
 		{
+			if (!m_hblank_state && !machine().side_effects_disabled())
+			{
+				m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+				m_maincpu->defer_access();
+				m_wait_state = true;
+				return 0xff;
+			}
+
 			return gvram_r(offset & 0x3fff);
 		}
 	}
@@ -303,11 +315,27 @@ template <unsigned N> void mz2000_state::work_ram_w(offs_t offset, uint8_t data)
 
 		if (page_mem == 0xd && m_vram_overlay_select == 1)
 		{
+			if (!m_hblank_state && !machine().side_effects_disabled())
+			{
+				m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+				m_maincpu->defer_access();
+				m_wait_state = true;
+				return;
+			}
+
 			m_tvram[offset & 0xfff] = data;
 			return;
 		}
 		else if (page_mem >= 0xc && m_vram_overlay_select == 0)
 		{
+			if (!m_hblank_state && !machine().side_effects_disabled())
+			{
+				m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+				m_maincpu->defer_access();
+				m_wait_state = true;
+				return;
+			}
+
 			gvram_w(offset & 0x3fff, data);
 			return;
 		}
@@ -356,17 +384,19 @@ void mz2000_state::floppy_side_w(uint8_t data)
 
 void mz2000_state::timer_w(uint8_t data)
 {
-	m_pit8253->write_gate0(1);
-	m_pit8253->write_gate1(1);
-	m_pit8253->write_gate0(0);
-	m_pit8253->write_gate1(0);
-	m_pit8253->write_gate0(1);
-	m_pit8253->write_gate1(1);
+	m_pit->write_gate0(1);
+	m_pit->write_gate1(1);
+	m_pit->write_gate0(0);
+	m_pit->write_gate1(0);
+	m_pit->write_gate0(1);
+	m_pit->write_gate1(1);
 }
 
 void mz2000_state::tvram_attr_w(uint8_t data)
 {
 	m_tvram_attr = data;
+	if (BIT(data, 3))
+		popmessage("Priority control high");
 }
 
 void mz2000_state::gvram_mask_w(uint8_t data)
@@ -399,7 +429,7 @@ void mz2000_state::mz80b_io(address_map &map)
 	map(0xdc, 0xdc).w(FUNC(mz2000_state::floppy_select_w));
 	map(0xdd, 0xdd).w(FUNC(mz2000_state::floppy_side_w));
 	map(0xe0, 0xe3).rw("i8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xe4, 0xe7).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0xe4, 0xe7).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0xe8, 0xeb).rw("z80pio_1", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0xf0, 0xf3).w(FUNC(mz2000_state::timer_w));
 //  map(0xf4, 0xf4).w(FUNC(mz2000_state::vram_bank_w));
@@ -413,6 +443,160 @@ void mz2000_state::mz2000_io(address_map &map)
 	map(0xf5, 0xf5).w(FUNC(mz2000_state::tvram_attr_w));
 	map(0xf6, 0xf6).w(FUNC(mz2000_state::gvram_mask_w));
 	map(0xf7, 0xf7).w(FUNC(mz2000_state::gvram_bank_w));
+}
+
+/*
+ * x--- ---- break key
+ * -x-- ---- read tape data
+ * --x- ---- no tape signal
+ * ---x ---- no tape write signal
+ * ---- x--- end of tape reached
+ * ---- ---x "blank" control
+ */
+uint8_t mz2000_state::ppi_portb_r()
+{
+	uint8_t res = m_io_keys[3]->read() & 0x80;
+
+	if(m_cassette->get_image() != nullptr)
+	{
+		res |= (m_cassette->input() > 0.0038) ? 0x40 : 0x00;
+		res |= ((m_cassette->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY) ? 0x10 : 0x30;
+		res |= (m_cassette->get_position() >= m_cassette->get_length()) ? 0x08 : 0x00;
+	}
+	else
+		res |= 0x30;
+
+	res |= (m_screen->vblank()) ? 0x00 : 0x01;
+
+	return res;
+}
+
+/*
+ * All tape control are enabled thru a 0->1 transition
+ * x--- ---- tape "APSS"
+ * -x-- ---- tape "APLAY"
+ * --x- ---- tape "AREW"
+ * ---x ---- reverse video
+ * ---- x--- tape stop
+ * ---- -x-- tape play
+ * ---- --x- tape ff
+ * ---- ---x tape rewind
+ */
+void mz2000_state::ppi_porta_w(uint8_t data)
+{
+	if((m_tape_ctrl & 0x80) == 0 && data & 0x80)
+	{
+		//popmessage("Tape APSS control");
+	}
+
+	if((m_tape_ctrl & 0x40) == 0 && data & 0x40)
+	{
+		//popmessage("Tape APLAY control");
+	}
+
+	if((m_tape_ctrl & 0x20) == 0 && data & 0x20)
+	{
+		//popmessage("Tape AREW control");
+	}
+
+	//if (BIT(data, 4))
+	//	popmessage("Reverse video");
+
+	if((m_tape_ctrl & 0x08) == 0 && data & 0x08) // stop
+	{
+		m_cassette->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+		m_cassette->change_state(CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
+	}
+
+	if((m_tape_ctrl & 0x04) == 0 && data & 0x04) // play
+	{
+		m_cassette->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+		m_cassette->change_state(CASSETTE_PLAY,CASSETTE_MASK_UISTATE);
+	}
+
+	if((m_tape_ctrl & 0x02) == 0 && data & 0x02)
+	{
+		//popmessage("Tape FF control");
+	}
+
+	if((m_tape_ctrl & 0x01) == 0 && data & 0x01)
+	{
+		//popmessage("Tape Rewind control");
+	}
+
+	m_tape_ctrl = data;
+}
+
+/*
+ * x--- ---- tape data write
+ * -x-- ---- tape rec
+ * --x- ---- tape ?
+ * ---x ---- tape eject
+ * ---- x--- 1->0 transition = IPL start
+ * ---- -x-- beeper state
+ * ---- --x- 0->1 transition = Work RAM reset
+ */
+void mz2000_state::ppi_portc_w(uint8_t data)
+{
+	//logerror("C W %02x\n",data);
+
+	if(BIT(m_old_portc, 3) != BIT(data, 3))
+	{
+		logerror("PIO PC: IPL reset %s\n", BIT(data, 3) ? "stopped" : "started");
+		m_ipl_reset_timer->adjust(!BIT(data, 3) ? attotime::from_hz(100) : attotime::never);
+	}
+
+	if(!BIT(m_old_portc, 1) && BIT(data, 1))
+	{
+		logerror("PIO PC: Work RAM reset\n");
+		m_ipl_view.disable();
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+	}
+
+	m_beeper->set_state(data & 0x04);
+
+	m_old_portc = data;
+}
+
+void mz2000_state::pio_porta_w(uint8_t data)
+{
+	m_vram_overlay_enable = BIT(data, 7);
+	m_vram_overlay_select = BIT(data, 6);
+	//logerror("PIO PA vram %s %02x\n", m_vram_overlay_enable ? "select" : "disable", BIT(data, 6));
+//	if (BIT(data, 7))
+//	{
+//		m_vram_view.select(BIT(data, 6));
+//	}
+//	else
+//	{
+//		m_vram_view.disable();
+//	}
+
+	m_width80 = ((data & 0x20) >> 5);
+	m_key_mux = data & 0x1f;
+
+	m_porta_latch = data;
+}
+
+uint8_t mz2000_state::pio_portb_r()
+{
+	if(((m_key_mux & 0x10) == 0x00) || ((m_key_mux & 0x0f) == 0x0f)) //status read
+	{
+		int res,i;
+
+		res = 0xff;
+		for(i = 0; i < 0xe; i++)
+			res &= m_io_keys[i]->read();
+
+		return res;
+	}
+
+	return m_io_keys[m_key_mux & 0xf]->read();
+}
+
+uint8_t mz2000_state::pio_porta_r()
+{
+	return m_porta_latch;
 }
 
 /*
@@ -694,6 +878,7 @@ void mz2000_state::machine_start()
 	// m_vram_view.disable();
 
 	m_ipl_reset_timer = timer_alloc(FUNC(mz2000_state::ipl_timer_reset_cb), this);
+	m_hblank_timer = timer_alloc(FUNC(mz2000_state::hblank_cb), this);
 }
 
 void mz2000_state::machine_reset()
@@ -702,186 +887,11 @@ void mz2000_state::machine_reset()
 
 	m_ipl_reset_timer->adjust(attotime::never);
 	m_beeper->set_state(0);
+	m_hblank_timer->adjust(m_screen->time_until_pos(0, 0), true);
 
 	m_color_mode = m_io_config->read() & 1;
 	m_has_fdc = (m_io_config->read() & 2) >> 1;
 	m_hi_mode = (m_io_config->read() & 4) >> 2;
-}
-
-uint8_t mz2000_state::ppi_porta_r()
-{
-	logerror("A R\n");
-	return 0xff;
-}
-
-uint8_t mz2000_state::ppi_portb_r()
-{
-	/*
-	x--- ---- break key
-	-x-- ---- read tape data
-	--x- ---- no tape signal
-	---x ---- no tape write signal
-	---- x--- end of tape reached
-	---- ---x "blank" control
-	*/
-	uint8_t res = 0x80;
-
-	if(m_cassette->get_image() != nullptr)
-	{
-		res |= (m_cassette->input() > 0.0038) ? 0x40 : 0x00;
-		res |= ((m_cassette->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY) ? 0x00 : 0x20;
-		res |= (m_cassette->get_position() >= m_cassette->get_length()) ? 0x08 : 0x00;
-	}
-	else
-		res |= 0x20;
-
-	res |= (m_screen->vblank()) ? 0x00 : 0x01;
-
-	return res;
-}
-
-uint8_t mz2000_state::ppi_portc_r()
-{
-	logerror("C R\n");
-	return 0xff;
-}
-
-void mz2000_state::ppi_porta_w(uint8_t data)
-{
-	/*
-	These are enabled thru a 0->1 transition
-	x--- ---- tape "APSS"
-	-x-- ---- tape "APLAY"
-	--x- ---- tape "AREW"
-	---x ---- reverse video
-	---- x--- tape stop
-	---- -x-- tape play
-	---- --x- tape ff
-	---- ---x tape rewind
-	*/
-
-	if((m_tape_ctrl & 0x80) == 0 && data & 0x80)
-	{
-		//logerror("Tape APSS control\n");
-	}
-
-	if((m_tape_ctrl & 0x40) == 0 && data & 0x40)
-	{
-		//logerror("Tape APLAY control\n");
-	}
-
-	if((m_tape_ctrl & 0x20) == 0 && data & 0x20)
-	{
-		//logerror("Tape AREW control\n");
-	}
-
-	if((m_tape_ctrl & 0x10) == 0 && data & 0x10)
-	{
-		//logerror("reverse video control\n");
-	}
-
-	if((m_tape_ctrl & 0x08) == 0 && data & 0x08) // stop
-	{
-		m_cassette->change_state(CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
-		m_cassette->change_state(CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
-	}
-
-	if((m_tape_ctrl & 0x04) == 0 && data & 0x04) // play
-	{
-		m_cassette->change_state(CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
-		m_cassette->change_state(CASSETTE_PLAY,CASSETTE_MASK_UISTATE);
-	}
-
-	if((m_tape_ctrl & 0x02) == 0 && data & 0x02)
-	{
-		//logerror("Tape FF control\n");
-	}
-
-	if((m_tape_ctrl & 0x01) == 0 && data & 0x01)
-	{
-		//logerror("Tape Rewind control\n");
-	}
-
-	m_tape_ctrl = data;
-}
-
-void mz2000_state::ppi_portb_w(uint8_t data)
-{
-	//logerror("B W %02x\n",data);
-
-	// ...
-}
-
-void mz2000_state::ppi_portc_w(uint8_t data)
-{
-	/*
-	    x--- ---- tape data write
-	    -x-- ---- tape rec
-	    --x- ---- tape ?
-	    ---x ---- tape open
-	    ---- x--- 1->0 transition = IPL start
-	    ---- -x-- beeper state
-	    ---- --x- 0->1 transition = Work RAM reset
-	*/
-	//logerror("C W %02x\n",data);
-
-	if(BIT(m_old_portc, 3) != BIT(data, 3))
-	{
-		logerror("PIO PC: IPL reset %s\n", BIT(data, 3) ? "stopped" : "started");
-		m_ipl_reset_timer->adjust(!BIT(data, 3) ? attotime::from_hz(100) : attotime::never);
-	}
-
-	if(!BIT(m_old_portc, 1) && BIT(data, 1))
-	{
-		logerror("PIO PC: Work RAM reset\n");
-		m_ipl_view.disable();
-		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
-	}
-
-	m_beeper->set_state(data & 0x04);
-
-	m_old_portc = data;
-}
-
-void mz2000_state::pio_porta_w(uint8_t data)
-{
-	m_vram_overlay_enable = BIT(data, 7);
-	m_vram_overlay_select = BIT(data, 6);
-	//logerror("PIO PA vram %s %02x\n", m_vram_overlay_enable ? "select" : "disable", BIT(data, 6));
-//	if (BIT(data, 7))
-//	{
-//		m_vram_view.select(BIT(data, 6));
-//	}
-//	else
-//	{
-//		m_vram_view.disable();
-//	}
-
-	m_width80 = ((data & 0x20) >> 5);
-	m_key_mux = data & 0x1f;
-
-	m_porta_latch = data;
-}
-
-uint8_t mz2000_state::pio_portb_r()
-{
-	if(((m_key_mux & 0x10) == 0x00) || ((m_key_mux & 0x0f) == 0x0f)) //status read
-	{
-		int res,i;
-
-		res = 0xff;
-		for(i = 0; i < 0xe; i++)
-			res &= m_io_keys[i]->read();
-
-		return res;
-	}
-
-	return m_io_keys[m_key_mux & 0xf]->read();
-}
-
-uint8_t mz2000_state::pio_porta_r()
-{
-	return m_porta_latch;
 }
 
 
@@ -912,23 +922,43 @@ SNAPSHOT_LOAD_MEMBER(mz2000_state::snapshot_cb)
 	m_ipl_view.disable();
 	m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 
+	m_cassette->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	m_cassette->change_state(CASSETTE_STOPPED, CASSETTE_MASK_UISTATE);
+
 	return std::make_pair(std::error_condition(), std::string());
 }
 
+TIMER_CALLBACK_MEMBER(mz2000_state::hblank_cb)
+{
+	m_hblank_state = param;
+
+	if (m_wait_state)
+	{
+		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
+		m_wait_state = false;
+	}
+
+	const int next_x = param ? 0 : 640;
+	const int next_y = (m_screen->vpos() + param) % m_screen->height();
+
+	//printf("%d %d = %d\n", m_screen->hpos(), m_screen->vpos(), param);
+
+	m_hblank_timer->adjust(m_screen->time_until_pos(next_y, next_x), !param);
+}
+
+// TODO: verify all clocks
 void mz2000_state::mz2000(machine_config &config)
 {
-	/* basic machine hardware */
+	constexpr XTAL MASTER_CLOCK = XTAL(24'000'000) / 6;
+
 	Z80(config, m_maincpu, MASTER_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mz2000_state::mz2000_map);
 	m_maincpu->set_addrmap(AS_IO, &mz2000_state::mz2000_io);
 //	m_maincpu->set_addrmap(AS_OPCODES, &mz2000_state::mz2000_opcodes);
 
 	i8255_device &ppi(I8255(config, "i8255_0"));
-	ppi.in_pa_callback().set(FUNC(mz2000_state::ppi_porta_r));
 	ppi.out_pa_callback().set(FUNC(mz2000_state::ppi_porta_w));
 	ppi.in_pb_callback().set(FUNC(mz2000_state::ppi_portb_r));
-	ppi.out_pb_callback().set(FUNC(mz2000_state::ppi_portb_w));
-	ppi.in_pc_callback().set(FUNC(mz2000_state::ppi_portc_r));
 	ppi.out_pc_callback().set(FUNC(mz2000_state::ppi_portc_w));
 
 	z80pio_device& pio(Z80PIO(config, "z80pio_1", MASTER_CLOCK));
@@ -936,11 +966,12 @@ void mz2000_state::mz2000(machine_config &config)
 	pio.out_pa_callback().set(FUNC(mz2000_state::pio_porta_w));
 	pio.in_pb_callback().set(FUNC(mz2000_state::pio_portb_r));
 
-	/* TODO: clocks aren't known */
-	PIT8253(config, m_pit8253, 0);
-	m_pit8253->set_clk<0>(31250);
-	m_pit8253->set_clk<1>(31250); // needed by mz2000_flop:gfxedit to boot
-	m_pit8253->set_clk<2>(31250);
+	PIT8253(config, m_pit, 0);
+	m_pit->set_clk<0>(MASTER_CLOCK / 128); // 31'250
+	// 1 sec, needed by mz2000_flop:gfxedit/mz2000_cass:vosque2k
+	m_pit->out_handler<0>().set(m_pit, FUNC(pit8253_device::write_clk1));
+	// 12h AM/PM clock
+	m_pit->out_handler<1>().set(m_pit, FUNC(pit8253_device::write_clk2));
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, "beeper", 4096).add_route(ALL_OUTPUTS,"mono",0.15);
@@ -964,10 +995,7 @@ void mz2000_state::mz2000(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	m_screen->set_size(640, 480);
-	m_screen->set_visarea(0, 640-1, 0, 400-1);
+	m_screen->set_raw(XTAL(14'318'181) * 2, 456 * 2, 0, 640, 262 * 2, 0, 200 * 2); // TODO: unverified
 	m_screen->set_screen_update(FUNC(mz2000_state::screen_update));
 	m_screen->set_palette(m_palette);
 
