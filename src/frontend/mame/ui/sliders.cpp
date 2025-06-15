@@ -75,7 +75,7 @@ bool menu_sliders::handle(event const *ev)
 			// decrease value
 			case IPT_UI_LEFT:
 				if (alt_pressed && shift_pressed)
-					increment = -1;
+					increment = (slider->incval > 100) ? -(slider->incval / 100) : -1;
 				else if (alt_pressed)
 					increment = -(curvalue - slider->minval);
 				else if (shift_pressed)
@@ -89,7 +89,7 @@ bool menu_sliders::handle(event const *ev)
 			// increase value
 			case IPT_UI_RIGHT:
 				if (alt_pressed && shift_pressed)
-					increment = 1;
+					increment = (slider->incval > 100) ? (slider->incval / 100) : 1;
 				else if (alt_pressed)
 					increment = slider->maxval - curvalue;
 				else if (shift_pressed)
