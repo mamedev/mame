@@ -35408,6 +35408,7 @@ myaass
 rminitv
 
 @source:nintendo/nes_vt369_vtunknown.cpp
+36pcase
 168pcase
 240in1ar
 bittboy
@@ -35432,6 +35433,7 @@ lxccplan
 lxcmc250
 lxcmcy
 lxcmcyba
+lxcmcybt
 lxcmcycr
 lxcmcydp
 lxcmcyfz
@@ -46558,6 +46560,7 @@ lazertag
 jak_s500
 jak_sinv
 jak_smwm
+jak_swcl
 jak_pf
 jak_prft
 jak_tink

@@ -172,6 +172,7 @@ public:
 	void vt36x_swap_512kb(machine_config& config);
 
 	void vt36x_altswap(machine_config& config);
+	void vt36x_altswap_2mb(machine_config& config);
 	void vt36x_altswap_4mb(machine_config& config);
 	void vt36x_altswap_16mb(machine_config& config);
 	void vt36x_altswap_32mb_4banks_red5mam(machine_config& config);
@@ -537,6 +538,12 @@ void vt36x_state::vt36x_altswap(machine_config &config)
 	m_soc->force_bad_dma();
 }
 
+void vt36x_state::vt36x_altswap_2mb(machine_config &config)
+{
+	vt36x_altswap(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_2mbyte);
+}
+
 void vt36x_state::vt36x_altswap_4mb(machine_config &config)
 {
 	vt36x_altswap(config);
@@ -853,6 +860,13 @@ ROM_START( lxcmcyba ) // all games selectable
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
+ROM_START( lxcmcybt ) // all games selectable
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "batman.bin", 0x00000, 0x4000000, CRC(9f8f15ce) SHA1(396122ce68008e9c8f35b98f5246e8dc7725df17) )
+
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
+ROM_END
+
 ROM_START( lxcmcypp ) // all games selectable
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	// marked 512mbit, possible A22 / A23 are swapped as they were marked on the board in a different way.
@@ -917,6 +931,12 @@ ROM_START( nubsupmf )
 	ROM_REGION( 0x400000, "mainrom", 0 )
 	ROM_LOAD( "w25q32fv.bin", 0x00000, 0x400000,  CRC(5ca234b2) SHA1(3eba3e690f68116fd3e5e914f8bd16b1dc2c0bc4) )
 ROM_END
+
+ROM_START( 36pcase )
+	ROM_REGION( 0x200000, "mainrom", 0 )
+	ROM_LOAD( "25q16.ic3", 0x00000, 0x200000, CRC(a8edb73e) SHA1(1028656530e411607ffa3b63788b42e41bf971d7) )
+ROM_END
+
 
 ROM_START( unk2019hh )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
@@ -1207,8 +1227,9 @@ CONS( 2012, lxcmcydp,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty
 CONS( 2014, lxcmcycr,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Cars", MACHINE_NOT_WORKING )
 CONS( 2018, lxcmcypj,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - PJ Masks", MACHINE_NOT_WORKING )
 CONS( 2014, lxcmcyba,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Barbie (JL2365BB)", MACHINE_NOT_WORKING )
-// the data order is swapped for this one, maybe other internal differences?
+// the data order is swapped for these
 CONS( 2018, lxcmcypp,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Paw Patrol", MACHINE_NOT_WORKING )
+CONS( 2020, lxcmcybt,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Batman", MACHINE_NOT_WORKING )
 
 CONS( 200?, lxccminn,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Console Colour - Minnie Mouse", MACHINE_NOT_WORKING )
 CONS( 200?, lxccplan,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Console Colour - Disney's Planes", MACHINE_NOT_WORKING )
@@ -1275,6 +1296,9 @@ CONS( 200?, gcs2mgp,   0,  0,  vt36x_altswap_16mb, vt369_rot, vt36x_state, empty
 CONS( 201?, 240in1ar,  0,  0,  vt36x_altswap_32mb_4banks_red5mam, vt369, vt36x_state, empty_init, "Thumbs Up", "Mini Arcade Machine (Thumbs Up, 240IN1ARC)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
 // portable fan + famiclone combo handheld, very similar to 240in1ar
 CONS( 2020, nubsupmf,   0,      0,  vt36x_altswap_4mb, vt369, vt36x_state, empty_init, "<unknown>", "NubSup Mini Game Fan", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
+// protected?
+CONS( 202?, 36pcase,    0,      0,  vt36x_altswap_2mb, vt369, vt36x_state, empty_init, "<unknown>", "36-in-1 Classic Games phone case", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 
 /*****************************************************************************
