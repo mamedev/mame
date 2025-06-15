@@ -1362,7 +1362,9 @@ MUSIC
 		<description>Blitz Balle</description>
 		<year>1984</year>
 		<publisher>Sprites</publisher>
+		<info name="author" value="Philippe Wettstein" />
 		<info name="language" value="French" />
+		<info name="serial" value="ZX 006" />
 		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="15948">
