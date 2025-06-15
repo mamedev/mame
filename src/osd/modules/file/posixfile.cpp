@@ -367,7 +367,7 @@ bool osd_get_physical_drive_geometry(const char *filename, uint32_t *cylinders, 
 //  osd_stat
 //============================================================
 
-std::unique_ptr<osd::directory::entry> osd_stat(const std::string &path)
+osd::directory::entry::ptr osd_stat(const std::string &path)
 {
 #if defined(__APPLE__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__bsdi__) || defined(__DragonFly__) || defined(__HAIKU__) || defined(_WIN32) || defined(SDLMAME_NO64BITIO) || defined(__ANDROID__)
 	struct stat st;
@@ -395,7 +395,7 @@ std::unique_ptr<osd::directory::entry> osd_stat(const std::string &path)
 	result->size = std::uint64_t(std::make_unsigned_t<decltype(st.st_size)>(st.st_size));
 	result->last_modified = std::chrono::system_clock::from_time_t(st.st_mtime);
 
-	return std::unique_ptr<osd::directory::entry>(result);
+	return osd::directory::entry::ptr(result);
 }
 
 

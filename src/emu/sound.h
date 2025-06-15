@@ -50,6 +50,10 @@
     By default, the inputs will have been resampled to match the output
     sample rate, unless otherwise specified.
 
+    SOUND_DISABLE_THREADING if to be defined when your environment does
+    not support threads (e.g. emscripten).  The effects suddendly become
+    costly then though.
+
 ***************************************************************************/
 
 #pragma once
@@ -63,9 +67,13 @@
 
 #include "wavwrite.h"
 #include "interface/audio.h"
+
+#ifndef SOUND_DISABLE_THREADING
 #include <mutex>
 #include <thread>
 #include <condition_variable>
+#endif
+
 
 //**************************************************************************
 //  CONSTANTS
@@ -258,9 +266,9 @@ public:
 	void add_int(s32 output, s32 index, s32 sample, s32 max) { add(output, index, double(sample)/max); }
 
 	// fill part of the view with the given value
-	void fill(s32 output, sample_t value, s32 start, s32 count) { std::fill(m_output_buffer.ptrw(output, start), m_output_buffer.ptrw(output, start+count), value); }
-	void fill(s32 output, sample_t value, s32 start) { std::fill(m_output_buffer.ptrw(output, start), m_output_buffer.ptrw(output, samples()), value); }
-	void fill(s32 output, sample_t value) { std::fill(m_output_buffer.ptrw(output, 0), m_output_buffer.ptrw(output, samples()), value); }
+	void fill(s32 output, sample_t value, s32 start, s32 count) { std::fill(m_output_buffer.ptrw(output, start), m_output_buffer.ptrw(output, start) + count, value); }
+	void fill(s32 output, sample_t value, s32 start) { std::fill(m_output_buffer.ptrw(output, start), m_output_buffer.ptrw(output, 0) + samples(), value); }
+	void fill(s32 output, sample_t value) { std::fill(m_output_buffer.ptrw(output, 0), m_output_buffer.ptrw(output, 0) + samples(), value); }
 
 	// copy data from the input
 	void copy(s32 output, s32 input, s32 start, s32 count) { std::copy(m_input_buffer[input].begin() + start, m_input_buffer[input].begin() + start + count, m_output_buffer.ptrw(output, start)); }
@@ -298,7 +306,6 @@ private:
 
 		route_fw(sound_stream *target, int input, int output) : m_target(target), m_input(input), m_output(output) {}
 	};
-
 
 	// perform most of the initialization here
 	void init();
@@ -411,6 +418,7 @@ public:
 	running_machine &machine() const { return m_machine; }
 	const std::vector<std::unique_ptr<sound_stream>> &streams() const { return m_stream_list; }
 	int unique_id() { return m_unique_id++; }
+	bool no_sound() const { return m_nosound_mode; }
 
 	const typename osd::audio_info &get_osd_info() const { return m_osd_info; }
 	const std::vector<mapping> &get_mappings() const { return m_mappings; }
@@ -502,9 +510,11 @@ private:
 		sound_stream *m_stream;
 		u32 m_channels;
 		u32 m_first_output;
+		double m_speed_phase;
 
 		emu::detail::output_buffer_flat<sample_t> m_buffer;
-		
+		emu::detail::output_buffer_flat<sample_t> m_effects_buffer;
+
 		std::vector<effect_step> m_effects;
 
 		speaker_info(speaker_device &dev, u32 rate, u32 first_output);
@@ -530,6 +540,7 @@ private:
 		bool m_is_channel_mapping;
 		sound_io_device *m_dev;
 		std::vector<float> m_volumes;
+		const audio_resampler *m_resampler;
 
 		osd_stream(u32 node, std::string node_name, u32 channels, u32 rate, bool is_system_default, sound_io_device *dev) :
 			m_id(0),
@@ -540,7 +551,8 @@ private:
 			m_unused_channels_mask(util::make_bitmask<u32>(channels)),
 			m_is_system_default(is_system_default),
 			m_is_channel_mapping(false),
-			m_dev(dev)
+			m_dev(dev),
+			m_resampler(nullptr)
 		{ }
 	};
 
@@ -553,12 +565,10 @@ private:
 	};
 
 	struct osd_output_stream : public osd_stream {
-		u64 m_last_sync;
 		u32 m_samples;
 		std::vector<s16> m_buffer;
 		osd_output_stream(u32 node, std::string node_name, u32 channels, u32 rate, bool is_system_default, sound_io_device *dev) :
 			osd_stream(node, node_name, channels, rate, is_system_default, dev),
-			m_last_sync(0),
 			m_samples(0),
 			m_buffer(channels*rate, 0)
 		{ }
@@ -599,6 +609,7 @@ private:
 	void update_osd_input();
 	void speakers_update(attotime endtime);
 	void rebuild_all_resamplers();
+	void rebuild_all_stream_resamplers();
 	void run_effects();
 
 	u64 rate_and_time_to_index(attotime time, u32 sample_rate) const;
@@ -638,11 +649,16 @@ private:
 	std::vector<mixing_step> m_output_mixing_steps; // actions to take to fill the osd streams buffers
 	std::vector<config_mapping> m_configs; // mapping user configuration
 
+#ifndef SOUND_DISABLE_THREADING
 	std::mutex                      m_effects_mutex;
+	std::mutex                      m_effects_data_mutex;
 	std::condition_variable         m_effects_condition;
 	std::unique_ptr<std::thread>    m_effects_thread;
+#endif
+
 	std::vector<std::unique_ptr<audio_effect>> m_default_effects;
 	bool m_effects_done;
+	attotime m_effects_prev_time, m_effects_cur_time;
 
 	float m_master_gain;
 

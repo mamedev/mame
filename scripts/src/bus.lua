@@ -44,6 +44,8 @@ if (BUSES["A800"]~=null) then
 		MAME_DIR .. "src/devices/bus/a800/atari810.h",
 		MAME_DIR .. "src/devices/bus/a800/atari1050.cpp",
 		MAME_DIR .. "src/devices/bus/a800/atari1050.h",
+		MAME_DIR .. "src/devices/bus/a800/atarifdc.cpp",
+		MAME_DIR .. "src/devices/bus/a800/atarifdc.h",
 		MAME_DIR .. "src/devices/bus/a800/cassette.cpp",
 		MAME_DIR .. "src/devices/bus/a800/cassette.h",
 		MAME_DIR .. "src/devices/bus/a800/a800_slot.cpp",
@@ -2903,6 +2905,8 @@ if (BUSES["VME"]~=null) then
 		MAME_DIR .. "src/devices/bus/vme/tp880v.h",
 		MAME_DIR .. "src/devices/bus/vme/tp881v.cpp",
 		MAME_DIR .. "src/devices/bus/vme/tp881v.h",
+		MAME_DIR .. "src/devices/bus/vme/tsvme104.cpp",
+		MAME_DIR .. "src/devices/bus/vme/tsvme104.h",
 	}
 end
 
@@ -3260,6 +3264,10 @@ if (BUSES["NUBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/nubus/quadralink.h",
 		MAME_DIR .. "src/devices/bus/nubus/laserview.cpp",
 		MAME_DIR .. "src/devices/bus/nubus/laserview.h",
+		MAME_DIR .. "src/devices/bus/nubus/enetnbtp.cpp",
+		MAME_DIR .. "src/devices/bus/nubus/enetnbtp.h",
+		MAME_DIR .. "src/devices/bus/nubus/enetlc.cpp",
+		MAME_DIR .. "src/devices/bus/nubus/enetlc.h",
 		MAME_DIR .. "src/devices/bus/nubus/supermac.cpp",
 		MAME_DIR .. "src/devices/bus/nubus/supermac.h",
 		MAME_DIR .. "src/devices/bus/nubus/thunder4gx.cpp",
@@ -3272,6 +3280,16 @@ if (BUSES["NUBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/nubus/pds30_sigmalview.h",
 		MAME_DIR .. "src/devices/bus/nubus/pds30_30hr.cpp",
 		MAME_DIR .. "src/devices/bus/nubus/pds30_30hr.h",
+		MAME_DIR .. "src/devices/bus/nubus/pwrbkduo/cards.cpp",
+		MAME_DIR .. "src/devices/bus/nubus/pwrbkduo/cards.h",
+		MAME_DIR .. "src/devices/bus/nubus/pwrbkduo/duodock.cpp",
+		MAME_DIR .. "src/devices/bus/nubus/pwrbkduo/duodock.h",
+		MAME_DIR .. "src/devices/bus/nubus/pwrbkduo/ethernetudock.cpp",
+		MAME_DIR .. "src/devices/bus/nubus/pwrbkduo/ethernetudock.h",
+		MAME_DIR .. "src/devices/bus/nubus/pwrbkduo/floppydock.cpp",
+		MAME_DIR .. "src/devices/bus/nubus/pwrbkduo/floppydock.h",
+		MAME_DIR .. "src/devices/bus/nubus/pwrbkduo/pwrbkduo.cpp",
+		MAME_DIR .. "src/devices/bus/nubus/pwrbkduo/pwrbkduo.h",
 	}
 end
 
@@ -4925,19 +4943,19 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/spectrum/zxbus.h,BUSES["ZXBUS"] = true
+--@src/devices/bus/spectrum/zxbus/bus.h,BUSES["ZXBUS"] = true
 ---------------------------------------------------
 
 if (BUSES["ZXBUS"]~=null) then
 	files {
-		MAME_DIR .. "src/devices/bus/spectrum/zxbus.cpp",
-		MAME_DIR .. "src/devices/bus/spectrum/zxbus.h",
-		MAME_DIR .. "src/devices/bus/spectrum/nemoide.cpp",
-		MAME_DIR .. "src/devices/bus/spectrum/nemoide.h",
-		MAME_DIR .. "src/devices/bus/spectrum/neogs.cpp",
-		MAME_DIR .. "src/devices/bus/spectrum/neogs.h",
-		MAME_DIR .. "src/devices/bus/spectrum/smuc.cpp",
-		MAME_DIR .. "src/devices/bus/spectrum/smuc.h",
+		MAME_DIR .. "src/devices/bus/spectrum/zxbus/bus.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/zxbus/bus.h",
+		MAME_DIR .. "src/devices/bus/spectrum/zxbus/nemoide.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/zxbus/nemoide.h",
+		MAME_DIR .. "src/devices/bus/spectrum/zxbus/neogs.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/zxbus/neogs.h",
+		MAME_DIR .. "src/devices/bus/spectrum/zxbus/smuc.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/zxbus/smuc.h",
 	}
 end
 
@@ -5446,20 +5464,6 @@ if (BUSES["MULTIBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/multibus/robotron_k7070.h",
 		MAME_DIR .. "src/devices/bus/multibus/robotron_k7071.cpp",
 		MAME_DIR .. "src/devices/bus/multibus/robotron_k7071.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/bus/rtpc/kbd_con.h,BUSES["RTPC_KBD"] = true
----------------------------------------------------
-
-if (BUSES["RTPC_KBD"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/bus/rtpc/kbd_con.cpp",
-		MAME_DIR .. "src/devices/bus/rtpc/kbd_con.h",
-		MAME_DIR .. "src/devices/bus/rtpc/kbd.cpp",
-		MAME_DIR .. "src/devices/bus/rtpc/kbd.h",
 	}
 end
 

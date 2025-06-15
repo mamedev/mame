@@ -177,14 +177,6 @@ code at z80:0093:
 #include "speaker.h"
 
 
-SAMPLES_START_CB_MEMBER(hotsmash_state::pbillian_sh_start)
-{
-	// convert 8-bit unsigned samples to 8-bit signed
-	m_samplebuf = std::make_unique<int16_t[]>(m_samples_region.length());
-	for (unsigned i = 0; i < m_samples_region.length(); i++)
-		m_samplebuf[i] = s8(m_samples_region[i] ^ 0x80) * 256;
-}
-
 void hotsmash_state::pbillian_sample_trigger_w(u8 data)
 {
 	//logerror("sample trigger write of %02x\n", data);
@@ -195,7 +187,8 @@ void hotsmash_state::pbillian_sample_trigger_w(u8 data)
 	while ((end < m_samples_region.length()) && (m_samples_region[end] != 0xff))
 		end++;
 
-	m_samples->start_raw(0, m_samplebuf.get() + start, end - start, (XTAL(12'000'000)/3072).value()); // needs verification, could be 2048 and 4096 alternating every sample
+	// needs verification, could be 2048 and 4096 alternating every sample
+	m_samples->start_raw(0, m_samplebuf.get() + start, end - start, (XTAL(12'000'000)/3072).value());
 }
 
 /**************************************************************************
@@ -1475,7 +1468,6 @@ void hotsmash_state::pbillian(machine_config &config)
 
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(1);
-	m_samples->set_samples_start_callback(FUNC(hotsmash_state::pbillian_sh_start));
 	m_samples->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
@@ -1757,17 +1749,17 @@ ROM_START( perestro )
 	ROM_LOAD( "rom3a.bin",       0x00000, 0x10000, CRC(7a2a563f) SHA1(e3654091b858cc80ec1991281447fc3622a0d4f9) )
 ROM_END
 
-void superqix_state_base::init_sqix()
+void superqix_state::init_sqix()
 {
 	m_invert_coin_lockout = true;
 }
 
-void superqix_state_base::init_sqixr0()
+void superqix_state::init_sqixr0()
 {
 	m_invert_coin_lockout = false;
 }
 
-void superqix_state_base::init_perestro()
+void superqix_state::init_perestro()
 {
 	uint8_t *src;
 	int len;
@@ -1829,12 +1821,17 @@ void superqix_state_base::init_perestro()
 	}
 }
 
-void superqix_state_base::init_pbillian()
+void hotsmash_state::init_pbillian()
 {
 	m_invert_p2_spinner = false;
+
+	// convert 8-bit unsigned samples to 8-bit signed
+	m_samplebuf = std::make_unique<int16_t[]>(m_samples_region.length());
+	for (unsigned i = 0; i < m_samples_region.length(); i++)
+		m_samplebuf[i] = s8(m_samples_region[i] ^ 0x80) * 256;
 }
 
-void superqix_state_base::init_hotsmash()
+void hotsmash_state::init_hotsmash()
 {
 	m_invert_p2_spinner = true;
 }

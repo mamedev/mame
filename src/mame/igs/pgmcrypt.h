@@ -62,5 +62,6 @@ void cjddzlf_decrypt(running_machine &machine) ATTR_COLD;
 void cjtljp_decrypt(running_machine& machine) ATTR_COLD;
 void mxsqy_decrypt(running_machine& machine) ATTR_COLD;
 void qiji6_decrypt(running_machine& machine) ATTR_COLD;
+void mjzb_decrypt(running_machine& machine) ATTR_COLD;
 
 #endif // MAME_IGS_PGMCRYPT_H

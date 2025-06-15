@@ -1233,20 +1233,6 @@ end
 
 
 ---------------------------------------------------
--- WAVE file (used for cassette)
---@src/devices/sound/wave.h,SOUNDS["WAVE"] = true
----------------------------------------------------
-
-if (SOUNDS["WAVE"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/sound/wave.cpp",
-		MAME_DIR .. "src/devices/sound/wave.h",
-	}
-end
-
-
-
----------------------------------------------------
 -- Yamaha FM synthesizers
 --@src/devices/sound/ym2154.h,SOUNDS["YM2154"] = true
 --@src/devices/sound/ymopm.h,SOUNDS["YM2151"] = true

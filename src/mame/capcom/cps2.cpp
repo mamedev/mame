@@ -630,10 +630,8 @@ Stephh's inputs notes (based on some tests on the "parent" set) :
 #include "cps2comm.h"
 #include "cps2crypt.h"
 
-#include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
-#include "sound/okim6295.h"
 #include "sound/qsound.h"
 
 #include "speaker.h"

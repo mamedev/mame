@@ -75,21 +75,21 @@ public:
 		m_soc(*this, "soc")
 	{ }
 
-	void nes_vt_pal_1mb(machine_config& config);
-	void nes_vt_pal_2mb(machine_config& config);
-	void nes_vt_pal_4mb(machine_config& config);
-	void nes_vt_pal_8mb(machine_config& config);
-	void nes_vt_pal_16mb(machine_config& config);
+	void nes_vt_pal_1mb(machine_config& config) ATTR_COLD;
+	void nes_vt_pal_2mb(machine_config& config) ATTR_COLD;
+	void nes_vt_pal_4mb(machine_config& config) ATTR_COLD;
+	void nes_vt_pal_8mb(machine_config& config) ATTR_COLD;
+	void nes_vt_pal_16mb(machine_config& config) ATTR_COLD;
 
-	void nes_vt_512kb(machine_config& config);
-	void nes_vt_1mb(machine_config& config);
-	void nes_vt_2mb(machine_config& config);
-	void nes_vt_4mb(machine_config& config);
-	void nes_vt_8mb(machine_config& config);
-	void nes_vt_16mb(machine_config& config);
-	void nes_vt_32mb(machine_config& config);
+	void nes_vt_512kb(machine_config& config) ATTR_COLD;
+	void nes_vt_1mb(machine_config& config) ATTR_COLD;
+	void nes_vt_2mb(machine_config& config) ATTR_COLD;
+	void nes_vt_4mb(machine_config& config) ATTR_COLD;
+	void nes_vt_8mb(machine_config& config) ATTR_COLD;
+	void nes_vt_16mb(machine_config& config) ATTR_COLD;
+	void nes_vt_32mb(machine_config& config) ATTR_COLD;
 
-	void nes_vt_1mb_majkon(machine_config& config);
+	void nes_vt_1mb_majkon(machine_config& config) ATTR_COLD;
 
 	void vt_external_space_map_32mbyte(address_map &map) ATTR_COLD;
 	void vt_external_space_map_16mbyte(address_map &map) ATTR_COLD;
@@ -101,8 +101,9 @@ public:
 
 	void vt_external_space_map_1mbyte_majkon(address_map &map) ATTR_COLD;
 
-	void init_protpp();
-	void init_gamezn2();
+	void init_protpp() ATTR_COLD;
+	void init_gamezn2() ATTR_COLD;
+	void init_hs36in1() ATTR_COLD;
 
 protected:
 	required_device<nes_vt02_vt03_soc_device> m_soc;
@@ -116,15 +117,15 @@ public:
 		nes_vt_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt_vh2009(machine_config& config);
-	void nes_vt_vh2009_pal(machine_config& config);
-	void nes_vt_vh2009_1mb(machine_config& config);
-	void nes_vt_vh2009_2mb(machine_config& config);
-	void nes_vt_vh2009_pal_2mb(machine_config& config);
-	void nes_vt_vh2009_4mb(machine_config& config);
-	void nes_vt_vh2009_8mb(machine_config& config);
+	void nes_vt_vh2009(machine_config& config) ATTR_COLD;
+	void nes_vt_vh2009_pal(machine_config& config) ATTR_COLD;
+	void nes_vt_vh2009_1mb(machine_config& config) ATTR_COLD;
+	void nes_vt_vh2009_2mb(machine_config& config) ATTR_COLD;
+	void nes_vt_vh2009_pal_2mb(machine_config& config) ATTR_COLD;
+	void nes_vt_vh2009_4mb(machine_config& config) ATTR_COLD;
+	void nes_vt_vh2009_8mb(machine_config& config) ATTR_COLD;
 
-	void nes_vt_senwld_512kb(machine_config& config);
+	void nes_vt_senwld_512kb(machine_config& config) ATTR_COLD;
 
 protected:
 	void vt_external_space_map_senwld_512kbyte(address_map &map) ATTR_COLD;
@@ -137,7 +138,7 @@ public:
 		nes_vt_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt_pjoy_4mb(machine_config& config);
+	void nes_vt_pjoy_4mb(machine_config& config) ATTR_COLD;
 };
 
 class nes_vt_waixing_state : public nes_vt_state
@@ -147,9 +148,9 @@ public:
 		nes_vt_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt_waixing_512kb(machine_config& config);
-	void nes_vt_waixing_512kb_rasterhack(machine_config& config);
-	void nes_vt_waixing_2mb(machine_config& config);
+	void nes_vt_waixing_512kb(machine_config& config) ATTR_COLD;
+	void nes_vt_waixing_512kb_rasterhack(machine_config& config) ATTR_COLD;
+	void nes_vt_waixing_2mb(machine_config& config) ATTR_COLD;
 };
 
 class nes_vt_waixing_alt_state : public nes_vt_waixing_state
@@ -159,8 +160,8 @@ public:
 		nes_vt_waixing_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt_waixing_alt_4mb(machine_config& config);
-	void nes_vt_waixing_alt_pal_8mb(machine_config& config);
+	void nes_vt_waixing_alt_4mb(machine_config& config) ATTR_COLD;
+	void nes_vt_waixing_alt_pal_8mb(machine_config& config) ATTR_COLD;
 };
 
 class nes_vt_waixing_alt_sporzpp_state : public nes_vt_waixing_alt_state
@@ -170,8 +171,8 @@ public:
 		nes_vt_waixing_alt_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt_waixing_alt_4mb_sporzpp(machine_config& config);
-	void nes_vt_pal_4mb_sporzbxa(machine_config& config);
+	void nes_vt_waixing_alt_4mb_sporzpp(machine_config& config) ATTR_COLD;
+	void nes_vt_pal_4mb_sporzbxa(machine_config& config) ATTR_COLD;
 
 private:
 	uint8_t in1_r() override
@@ -213,8 +214,8 @@ public:
 		nes_vt_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt_hummer_2mb(machine_config& config);
-	void nes_vt_hummer_4mb(machine_config& config);
+	void nes_vt_hummer_2mb(machine_config& config) ATTR_COLD;
+	void nes_vt_hummer_4mb(machine_config& config) ATTR_COLD;
 };
 
 class nes_vt_sp69_state : public nes_vt_state
@@ -224,7 +225,7 @@ public:
 		nes_vt_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt_4mb_sp69(machine_config& config);
+	void nes_vt_4mb_sp69(machine_config& config) ATTR_COLD;
 };
 
 class nes_vt_ablping_state : public nes_vt_state
@@ -234,8 +235,8 @@ public:
 		nes_vt_state(mconfig, type, tag)
 	{ }
 
-	void nes_vt_2mb_ablping(machine_config& config);
-	void nes_vt_2mb_vfootbal(machine_config& config);
+	void nes_vt_2mb_ablping(machine_config& config) ATTR_COLD;
+	void nes_vt_2mb_vfootbal(machine_config& config) ATTR_COLD;
 
 private:
 	uint8_t ablping_extraio_r();
@@ -252,7 +253,7 @@ public:
 		m_plunger(*this, "PLUNGER")
 	{ }
 
-	void nes_vt_waixing_alt_4mb_sporzpp(machine_config& config);
+	void nes_vt_waixing_alt_4mb_sporzpp(machine_config& config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -587,10 +588,9 @@ void nes_vt_state::nes_vt_pal_16mb(machine_config& config)
 
 void nes_vt_waixing_state::nes_vt_waixing_512kb(machine_config &config)
 {
-	NES_VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
+	NES_VT02_VT03_SOC_WAIXING(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_waixing_state::vt_external_space_map_512kbyte);
-	m_soc->set_201x_descramble(0x3, 0x2, 0x7, 0x6, 0x5, 0x4);
 }
 
 void nes_vt_waixing_state::nes_vt_waixing_512kb_rasterhack(machine_config &config)
@@ -602,38 +602,37 @@ void nes_vt_waixing_state::nes_vt_waixing_512kb_rasterhack(machine_config &confi
 
 void nes_vt_waixing_state::nes_vt_waixing_2mb(machine_config &config)
 {
-	NES_VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
+	NES_VT02_VT03_SOC_WAIXING(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_waixing_state::vt_external_space_map_2mbyte);
-	m_soc->set_201x_descramble(0x3, 0x2, 0x7, 0x6, 0x5, 0x4);
 }
 
 void nes_vt_waixing_alt_state::nes_vt_waixing_alt_4mb(machine_config &config)
 {
-	NES_VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
+	NES_VT02_VT03_SOC_WAIXING(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_waixing_state::vt_external_space_map_4mbyte);
-	m_soc->set_201x_descramble(0x3, 0x2, 0x7, 0x6, 0x5, 0x4);
-	m_soc->set_8000_scramble(0x5, 0x4, 0x3, 0x2, 0x7, 0x6, 0x7, 0x8);
+	m_soc->set_8000_scramble(0x3, 0x2, 0x1, 0x0, 0x5, 0x4);
+	//m_soc->set_8006_scramble(0x7, 0x8); // this is the default config in the SoC device
 }
 
 void nes_vt_waixing_alt_state::nes_vt_waixing_alt_pal_8mb(machine_config &config)
 {
-	NES_VT02_VT03_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
+	NES_VT02_VT03_SOC_WAIXING_PAL(config, m_soc, PAL_APU_CLOCK);
 	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_waixing_alt_state::vt_external_space_map_8mbyte);
-	m_soc->set_201x_descramble(0x3, 0x2, 0x7, 0x6, 0x5, 0x4);
-	m_soc->set_8000_scramble(0x5, 0x4, 0x3, 0x2, 0x7, 0x6, 0x7, 0x8);
+	m_soc->set_8000_scramble(0x3, 0x2, 0x1, 0x0, 0x5, 0x4);
+	//m_soc->set_8006_scramble(0x7, 0x8); // this is the default config in the SoC device;
 }
 
 void nes_vt_waixing_alt_sporzpp_state::nes_vt_waixing_alt_4mb_sporzpp(machine_config& config)
 {
-	NES_VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
+	NES_VT02_VT03_SOC_WAIXING(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_ablping_state::vt_external_space_map_4mbyte);
-	m_soc->set_201x_descramble(0x3, 0x2, 0x7, 0x6, 0x5, 0x4);
-	m_soc->set_8000_scramble(0x5, 0x4, 0x3, 0x2, 0x7, 0x6, 0x7, 0x8);
+	m_soc->set_8000_scramble(0x3, 0x2, 0x1, 0x0, 0x5, 0x4);
+	//m_soc->set_8006_scramble(0x7, 0x8); // this is the default config in the SoC device
 }
 
 void nes_vt_waixing_alt_sporzpp_state::nes_vt_pal_4mb_sporzbxa(machine_config& config)
@@ -645,11 +644,11 @@ void nes_vt_waixing_alt_sporzpp_state::nes_vt_pal_4mb_sporzbxa(machine_config& c
 
 void nes_vt_hum_state::nes_vt_hummer_2mb(machine_config& config)
 {
-	NES_VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
+	NES_VT02_VT03_SOC_HUMMER(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_sp69_state::vt_external_space_map_2mbyte);
-	m_soc->set_201x_descramble(0x7, 0x6, 0x5, 0x4, 0x2, 0x3);
-	m_soc->set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8);
+	//m_soc->set_8000_scramble(0x4, 0x5, 0x0, 0x1, 0x2, 0x3); // this is the default config in the SoC device
+	//m_soc->set_8006_scramble(0x7, 0x8); // this is the default config in the SoC device
 }
 
 void nes_vt_hum_state::nes_vt_hummer_4mb(machine_config& config)
@@ -663,29 +662,28 @@ void nes_vt_pjoy_state::nes_vt_pjoy_4mb(machine_config &config)
 	NES_VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_sp69_state::vt_external_space_map_4mbyte);
-	m_soc->set_201x_descramble(0x2, 0x3, 0x4, 0x5, 0x6, 0x7);
-	m_soc->set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x8, 0x7);
+	//m_soc->set_8000_scramble(0x4, 0x5, 0x0, 0x1, 0x2, 0x3); // this is the default config in the SoC device
+	m_soc->set_8006_scramble(0x8, 0x7);
 	m_soc->set_410x_scramble(0x8, 0x7);
 }
 
 
 void nes_vt_sp69_state::nes_vt_4mb_sp69(machine_config& config)
 {
-	NES_VT02_VT03_SOC(config, m_soc, NTSC_APU_CLOCK);
+	NES_VT02_VT03_SOC_SPORTS(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_sp69_state::vt_external_space_map_4mbyte);
-	m_soc->set_201x_descramble(0x4, 0x7, 0x2, 0x6, 0x5, 0x3);
-	m_soc->set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8);
+	//m_soc->set_8000_scramble(0x4, 0x5, 0x0, 0x1, 0x2, 0x3); // this is the default config in the SoC device
+	//m_soc->set_8006_scramble(0x7, 0x8);  // this is the default config in the SoC device
 }
 
 void nes_vt_ablping_state::nes_vt_2mb_ablping(machine_config &config)
 {
-	NES_VT02_VT03_SOC_PAL(config, m_soc, PAL_APU_CLOCK);
+	NES_VT02_VT03_SOC_SPORTS_PAL(config, m_soc, PAL_APU_CLOCK);
 	configure_soc(m_soc);
-
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt_ablping_state::vt_external_space_map_2mbyte);
-	m_soc->set_201x_descramble(0x4, 0x7, 0x2, 0x6, 0x5, 0x3);
-	m_soc->set_8000_scramble(0x6, 0x7, 0x2, 0x3, 0x4, 0x5, 0x7, 0x8);
+	//m_soc->set_8000_scramble(0x4, 0x5, 0x0, 0x1, 0x2, 0x3); // this is the default config in the SoC device
+	//m_soc->set_8006_scramble(0x7, 0x8); // this is the default config in the SoC device
 
 	m_soc->extra_read_2_callback().set(FUNC(nes_vt_ablping_state::ablping_extraio_r));
 	m_soc->extra_read_3_callback().set(FUNC(nes_vt_ablping_state::ablping_extraio_r));
@@ -1057,6 +1055,16 @@ ROM_END
 ROM_START( sen101 )
 	ROM_REGION( 0x400000, "mainrom", 0 )
 	ROM_LOAD( "101n1.bin", 0x00000, 0x400000, CRC(b03e1824) SHA1(c9ac4e16220414c1aa679133191140ced9986e9c) )
+ROM_END
+
+ROM_START( hs36red )
+	ROM_REGION( 0x200000, "mainrom", 0 ) // address and data lines swapped
+	ROM_LOAD( "mx29lv160cb.u3", 0x00000, 0x200000, CRC(318a81bb) SHA1(8b207e6a5fca53cbf383b79ff570fcdb89639fa3) )
+ROM_END
+
+ROM_START( hs36blk )
+	ROM_REGION( 0x200000, "mainrom", 0 ) // address and data lines swapped
+	ROM_LOAD( "mx29lv160cbtc.u3", 0x00000, 0x200000, CRC(b5cf91a0) SHA1(399f015fb0580c90928e7f3d73810cc4b6cc70d9) )
 ROM_END
 
 ROM_START( mc_dg101 )
@@ -1431,6 +1439,29 @@ void nes_vt_state::init_gamezn2()
 	}
 }
 
+void nes_vt_state::init_hs36in1()
+{
+	u8 *src = memregion("mainrom")->base();
+	int len = memregion("mainrom")->bytes();
+
+	std::vector<u8> buffer(len);
+	{
+		for (int i = 0; i < len; i++)
+		{
+			// TODO: check if uppermost address lines shouldn't be swapped
+			// A16-A7 swap should be OK for hs36red, but is it also good for hs36blk?
+			int newaddr = bitswap<21>(i, 20, 19, 18, 17, 16,
+				15, 7, 9, 10,
+				11, 12, 8, 13,
+				14, 6, 5, 4,
+				3, 2, 1, 0);
+
+			buffer[i] = bitswap<8>(src[newaddr], 7, 6, 4, 5, 3, 1, 2, 0);
+		}
+		std::copy(buffer.begin(), buffer.end(), &src[0]);
+	}
+}
+
 } // anonymous namespace
 
 
@@ -1553,6 +1584,7 @@ CONS( 200?, mc_138cb,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty
 // doesn't boot, bad dump
 CONS( 201?, cbrs8,      0,        0,  nes_vt_16mb,    nes_vt, nes_vt_state, empty_init, "CoolBoy", "CoolBoy RS-8 168 in 1", MACHINE_NOT_WORKING )
 
+// doesn't boot, might be VT369, ROM verified on 2 units
 CONS( 201?, rfcp168,    0,        0,  nes_vt_16mb,    nes_vt, nes_vt_state, empty_init, "<unknown>",   "Retro FC Plus 168 in 1 Handheld", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // "RETRO_FC_V3.5"  (doesn't boot, ends up in weeds after jumping to bank with no code, dump not verified)
 
 CONS( 200?, gprnrs1,    0,        0,  nes_vt_8mb,    nes_vt, nes_vt_state, empty_init, "<unknown>", "Game Prince RS-1", MACHINE_IMPERFECT_GRAPHICS )
@@ -1571,6 +1603,10 @@ CONS( 2006, dbdancem,   0,        0,  nes_vt_2mb, dbdancem, nes_vt_state, empty_
 // Some games aren't what they claim to be, Warpman is Soccer for example.
 // Senario had another 101 unit with different games (not JungleTac or NES bootlegs) it might be the same as the dreamGEAR 101 below
 CONS( 2009, sen101,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "Senario", "101 Games in 1 (Senario, NES/Famicom bootlegs)", MACHINE_IMPERFECT_GRAPHICS )
+
+// possibly designed by wellminds (M350 etc.)
+CONS( 2010, hs36red,  0,        0,  nes_vt_2mb,    nes_vt, nes_vt_state, init_hs36in1, "HengSheng", "HengSheng 36-in-1 (Red pad)", MACHINE_NOT_WORKING )
+CONS( 2010, hs36blk,  0,        0,  nes_vt_2mb,    nes_vt, nes_vt_state, init_hs36in1, "HengSheng", "HengSheng 36-in-1 (Black pad)", MACHINE_NOT_WORKING )
 
 // unsorted, these were all in nes.xml listed as ONE BUS systems
 CONS( 200?, mc_dg101,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "dreamGEAR", "dreamGEAR 101 in 1", MACHINE_IMPERFECT_GRAPHICS ) // dreamGear, but no enhanced games?

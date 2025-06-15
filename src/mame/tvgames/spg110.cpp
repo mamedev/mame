@@ -16,8 +16,6 @@
 
         assumed:
         JAKKS EA Sports (NHL 95 + Madden 95) (US)
-        JAKKS Bob the Builder
-        JAKKS Disney (original release)
 
 *******************************************************************************/
 
@@ -52,6 +50,8 @@ public:
 
 	ioport_value plunger_r();
 
+	void init_crc();
+
 protected:
 	required_device<spg110_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -65,6 +65,7 @@ public:
 	spg110_easports_game_state(const machine_config &mconfig, device_type type, const char *tag) :
 		spg110_game_state(mconfig, type, tag)
 	{ }
+	void easports(machine_config &config);
 	void easports_pal(machine_config &config);
 
 private:
@@ -539,6 +540,12 @@ void spg110_game_state::spg110_base_pal(machine_config &config)
 }
 
 
+void spg110_easports_game_state::easports(machine_config &config)
+{
+	spg110_base(config);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+}
+
 void spg110_easports_game_state::easports_pal(machine_config &config)
 {
 	spg110_base_pal(config);
@@ -582,12 +589,54 @@ void spg110_sstarkar_game_state::sstarkar(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list").set_original("singingstarkaraoke_cart");
 }
 
+void spg110_game_state::init_crc()
+{
+	// several games have a byte sum checksum listed at the start of ROM, this little helper function logs what it should match.
+	const int length = memregion("maincpu")->bytes();
+	const uint8_t* rom = memregion("maincpu")->base();
+	int checksum_start = 0x10; // start at 0x10 because the 'checksum' text itself should not be checksummed
+	uint32_t checksum = 0x00000000;
+	for (int i = checksum_start; i < length; i++)
+	{
+		checksum += rom[i];
+	}
+
+	logerror("Calculated Byte Sum of bytes from %02x to 0x%08x is %08x)\n", checksum_start, length - 1, checksum);
+}
 
 ROM_START( jak_capb )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "classicarcadepinball.bin", 0x000000, 0x200000, CRC(b643dab0) SHA1(f57d546758ba442e28b5f0f48b3819b2fc2eb7f7) )
 ROM_END
 
+ROM_START( jak_sbdd )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	// header lists checksum (bytesum) as 05472c55, calculated (minus 0x10 byte header) gives 05472c17 (off by 0x3e, so there could be a bad byte or two)
+	ROM_LOAD16_WORD_SWAP( "pineapple.u2", 0x000000, 0x100000, BAD_DUMP CRC(8a815acc) SHA1(6b174617b4c099c5c41fadb35e6cb1a8207045eb) )
+ROM_END
+
+ROM_START( jak_blue )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	// checksum matches header
+	ROM_LOAD16_WORD_SWAP( "jakksbluesroom.u1", 0x000000, 0x100000, CRC(797b10f4) SHA1(3389fb940b67bebc4ce8976c9d67335787b2ecb3) )
+ROM_END
+
+ROM_START( jak_dood )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	// The checksum does *NOT* match the header here 03547c9a calculated, 0355a1ac in header  which means the checksum
+	// is off by 00012512 so is unlikely to be flipped bits
+	// The ROM also seems to abruptly end in the middle of a sound sample, but there is definitely no higher address
+	// line connected (the CPU glob was entirely removed to check)
+	// It seems most likely the game was just over 1Mbyte but the additonal data wasn't needed, so it got chopped down
+	// without the checksum being corrected.
+	ROM_LOAD16_WORD_SWAP( "jakksteledoodle.u2", 0x000000, 0x100000, CRC(ddc623a9) SHA1(92f72747c99f37525a6565e9587b357d629c560c) )
+ROM_END
+
+ROM_START( jak_ssmo )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	// checksum matches header
+	ROM_LOAD16_WORD_SWAP( "jakkssillymakeover.u2", 0x000000, 0x100000, CRC(80cf7b10) SHA1(493b257eff0d479889bb5944ce8e7676f15639a4) )
+ROM_END
 
 ROM_START( jak_spdmo )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
@@ -604,6 +653,22 @@ ROM_START( jak_bobb )
 	ROM_LOAD16_WORD_SWAP( "bob.bin", 0x000000, 0x400000, CRC(16b0b39f) SHA1(43a45e5346d108a9ec1b672fa727e97722b4eaa1) )
 ROM_END
 
+ROM_START( jak_bobbo )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakksbobfeb2006.bin", 0x000000, 0x400000, CRC(206712c4) SHA1(be07662e1776ebe6ea31c69d09e1d08c0886bb49) )
+ROM_END
+
+
+ROM_START( jak_thom )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakksthomasus.u3", 0x000000, 0x400000, CRC(f43d5d12) SHA1(863a1cf08bc45f7bca7db7e2aae45071ac25adfa) )
+ROM_END
+
+ROM_START( jak_thomp )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakksthomasuk.u3", 0x000000, 0x400000, CRC(2bbfa218) SHA1(d13d7d093c962d04f2c84571cceacf87e3768a78) )
+ROM_END
+
 ROM_START( easports )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "ea.u3", 0x000000, 0x400000, CRC(d750089e) SHA1(426f04c3d841103d434a892561db55ade684db54) )
@@ -615,6 +680,25 @@ ROM_START( easports )
 	// selecting a game. Provide a default (at least for now)
 	// Random default fills, All 1, or All 0 do not work in this case
 	ROM_LOAD( "nvram", 0x000000, 0x20000, CRC(bfcbd206) SHA1(0f5b730679762547a0658c2cd0d4fa5169b857af) )
+ROM_END
+
+
+ROM_START( easportsu )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "ea.u2", 0x000000, 0x400000, CRC(ca896683) SHA1(0d655e8a5e07e1259c358328fdc9f0084709ecc3) )
+ROM_END
+
+
+ROM_START( jak_wpt )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakk_worldpokertour.bin", 0x000000, 0x200000, CRC(6eac3bae) SHA1(80bf3ec0e0aa26b4bac72c1828939a18b7750f29) )
+
+	// also has an LCD display on the unit, is the display driven by the main program, or something else?
+ROM_END
+
+ROM_START( jak_diso )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "jakksdisneyred.u2", 0x000000, 0x200000, CRC(e88e117f) SHA1(0d5ffc831d47e46e72657d1b6bbd6ca18f76b2aa) )
 ROM_END
 
 
@@ -650,11 +734,32 @@ ROM_END
 // JAKKS Pacific Inc TV games
 CONS( 2004, jak_capb,  0,        0, spg110_base, jak_capb,  spg110_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",      "Classic Arcade Pinball (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2004, jak_spdmo, jak_spdm, 0, spg110_base, jak_spdmo, spg110_game_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse", "Spider-Man (JAKKS Pacific TV Game) (older hardware, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // this is the smaller more 'square' style joystick that was originally released before the GameKey slot was added.
-CONS( 2004, jak_spdmoa,jak_spdm, 0, spg110_base, jak_spdmo, spg110_game_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse", "Spider-Man (JAKKS Pacific TV Game) (older hardware, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // this is the resdesigned stick, but before the GameKey release
+CONS( 2004, jak_spdmo, jak_spdm, 0, spg110_base, jak_spdmo, spg110_game_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse", "Spider-Man (JAKKS Pacific TV Game) (SPG110 hardware, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // this is the smaller more 'square' style joystick that was originally released before the GameKey slot was added.
+CONS( 2004, jak_spdmoa,jak_spdm, 0, spg110_base, jak_spdmo, spg110_game_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse", "Spider-Man (JAKKS Pacific TV Game) (SPG110 hardware, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // this is the redesigned stick, but before the GameKey release
+
+CONS( 2004, jak_wpt,  0,         0, spg110_base, jak_spdmo, spg110_game_state, init_crc, "JAKKS Pacific Inc / Digital Eclipse", "World Poker Tour (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 2004, jak_diso, jak_disn,  0, spg110_base, jak_spdmo, spg110_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Disney (JAKKS Pacific TV Game) (SPG110 hardware, 28 MAY 2004 A)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+// ROM bytesum is off by 0x3e, so likely a bad byte
+// sound doesn't work properly after a few initial sounds (expected, SPG110 emulation issues)
+// fill position in the 'Color Me Spongy' mini-game is completely wrong, maybe dump issue, maybe SPG110/unSP issue.
+CONS( 2004, jak_sbdd,  0,        0, spg110_base, jak_spdmo, spg110_game_state, init_crc, "JAKKS Pacific Inc", "SpongeBob SquarePants Dilly Dabbler (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 2004, jak_blue,  0,        0, spg110_base, jak_spdmo, spg110_game_state, init_crc, "JAKKS Pacific Inc", "Blue's Room: Coloring With Blue (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2004, jak_dood,  0,        0, spg110_base, jak_spdmo, spg110_game_state, init_crc, "JAKKS Pacific Inc", "Tele-Doodle (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2004, jak_ssmo,  0,        0, spg110_base, jak_spdmo, spg110_game_state, init_crc, "JAKKS Pacific Inc", "Super Silly Makeover (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
 
 // has Game-Key strings in test mode even if there were no SPG110 Game-Key units at all
-CONS( 2006, jak_bobb,  0,        0, spg110_base, jak_bobb,  spg110_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Bob the Builder - Project: Build It (JAKKS Pacific TV Game) (JUN 2 2006 14:42:01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, jak_bobb,  0,        0, spg110_base, jak_bobb,  spg110_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Bob the Builder - Project: Build It (JAKKS Pacific TV Game) (Jun  2 2006 14:42:01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // UK?
+CONS( 2006, jak_bobbo, jak_bobb, 0, spg110_base, jak_bobb,  spg110_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Bob the Builder - Project: Build It (JAKKS Pacific TV Game) (Feb 28 2006 10:48:40)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // US?
+
+CONS( 2006, jak_thom,  0,        0, spg110_base,     jak_bobb,  spg110_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Thomas & Friends - Right on Time (JAKKS Pacific TV Game) (Jun 28 2006 18:24:37) (US, NTSC)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2006, jak_thomp, jak_thom, 0, spg110_base_pal, jak_bobb,  spg110_game_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd", "Thomas & Friends - Right on Time (JAKKS Pacific TV Game) (Jun 28 2006 18:01:22) (UK, PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // PAL versions have different voices
+// another version of Thomas & Friends (with a different screen layout, no map in the corner) also exists
+// https://www.youtube.com/watch?v=PfEELfnXaXE
+// is it an earlier version, or an SPG2xx port that loses the map for some reason?
 
 // this was sold by SDW Games for the US market, ROM not yet verified to be the same, also appears in some multigames?
 CONS( 2003, conyteni,  0,        0, spg110_base, conyteni,  spg110_game_state, empty_init, "Conny",      "TV Virtual Tennis", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // needs motion inputs, and video fixes, setting to PAL
@@ -670,4 +775,4 @@ CONS( 200?, conyfght,  0,        0, spg110_base, conyteni,  spg110_game_state, e
 CONS( 200?, sstarkar,  0,        0, sstarkar, conyteni,  spg110_sstarkar_game_state, empty_init, "Taikee",      "Singing Star Karaoke (World) / Karao Kids (Spain)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // "ItsMagical" brand from Imaginarium
 
 CONS( 2004, easports,  0,        0, easports_pal, easports,  spg110_easports_game_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse",      "EA Sports Classics: NHL 95 & FIFA Soccer 96 (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-// US release has Madden instead of FIFA
+CONS( 2004, easportsu, easports, 0, easports,     easports,  spg110_easports_game_state, empty_init, "JAKKS Pacific Inc / Digital Eclipse",      "EA Sports Classics: NHL 95 & Madden 95 (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

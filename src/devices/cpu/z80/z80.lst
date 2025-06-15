@@ -25,25 +25,24 @@ macro   rm_reg   %addr
 	@nomreq_addr %addr
 
 macro   rm16   %addr
-	@rm %addr
-	TDAT_H = TDAT_L;
-	@rm %addr+1
-	using std::swap;
-	swap(TDAT_H, TDAT_L);
+	m_memrq_cycles !! TDAT_L = data_read(%addr);
+	m_memrq_cycles !! TDAT_H = data_read(%addr+1);
 
 macro   wm   %addr
 	m_memrq_cycles !! data_write(%addr, TDAT8);
 
 macro   wm16   %addr
-	@wm %addr
-	TDAT8 = TDAT_H;
-	@wm %addr+1
+	m_memrq_cycles !! data_write(%addr, TDAT_L);
+	m_memrq_cycles !! data_write(%addr+1, TDAT_H);
 
-macro   wm16_sp %d16
+macro   wm_sp %d
 	SP--;
-	m_memrq_cycles !! stack_write(SP, (%d16) >> 8);
-	SP--;
-	m_memrq_cycles !! stack_write(SP, %d16);
+	m_memrq_cycles !! stack_write(SP, %d);
+
+
+macro   wm16_sp %dd
+	@wm_sp %dd >> 8
+	@wm_sp %dd
 
 macro   rop
 	m_m1_cycles-2 !! TDAT8 = opcode_read();
@@ -53,25 +52,25 @@ macro   rop
 	PC++;
 	R++;
 	Q = QT;
-	QT = YF | XF;
+	QT = YXF;
 
 macro   r800:rop
 	m_m1_cycles !! TDAT8 = opcode_read();
 	PC++;
 	R++;
 	Q = QT;
-	QT = YF | XF;
+	QT = YXF;
 
 macro   arg
 	m_memrq_cycles !! TDAT8 = arg_read();
 	PC++;
 
-macro   arg16
-	@arg
-	TDAT_H = TDAT_L;
-	@arg
-	using std::swap;
-	swap(TDAT_H, TDAT_L);
+macro   arg16 %dd
+	m_memrq_cycles !! TDAT_L = arg_read();
+	PC++;
+	m_memrq_cycles !! TDAT_H = arg_read();
+	PC++;
+	%dd = TDAT;
 
 macro   eax
 	@arg
@@ -94,37 +93,31 @@ macro   push   %d16
 	@wm16_sp %d16
 
 macro   jp
-	@arg16
-	PC = TDAT;
+	@arg16 PC
 	WZ = PC;
 
 macro   t6a84:jp
-	@arg16
-	PC = TDAT;
+	@arg16 PC
 	WZ = PC;
 	paged_jump();
 
-macro   jp_cond
-	if (TDAT8) {
-		@arg16
-		PC = TDAT;
+macro   jp_cond   %cond
+	if (%cond) {
+		@arg16 PC
 		WZ = PC;
 	} else {
 		// implicit do PC += 2
-		@arg16
-		WZ = TDAT;
+		@arg16 WZ
 	}
 
-macro   t6a84:jp_cond
-	if (TDAT8) {
-		@arg16
-		PC = TDAT;
+macro   t6a84:jp_cond   %cond
+	if (%cond) {
+		@arg16 PC
 		WZ = PC;
 		paged_jump();
 	} else {
 		// implicit do PC += 2
-		@arg16
-		WZ = TDAT;
+		@arg16 WZ
 	}
 
 macro   jr
@@ -146,40 +139,37 @@ macro   r800:jr
 	PC += (s8)TDAT8;
 	WZ = PC;
 
-macro   jr_cond
-	if (TDAT8) {
+macro   jr_cond   %cond
+	if (%cond) {
 		@jr
 	} else {
 		@arg
 	}
 
 macro   arg16_call
-	@arg16
-	m_ea = TDAT;
+	@arg16 m_ea
 	@nomreq_addr PC-1
 	WZ = m_ea;
 	@wm16_sp PC
 	PC = m_ea;
 
 macro   r800:arg16_call
-	@arg16
-	m_ea = TDAT;
+	@arg16 m_ea
 	@nomreq_addr PC-1
 	WZ = m_ea;
 	@wm16_sp PC
 	PC = m_ea;
 
-macro   call_cond
-	if (TDAT8) {
+macro   call_cond   %cond
+	if (%cond) {
 		@arg16_call
 	} else {
-		@arg16
-		WZ = TDAT;
+		@arg16 WZ
 	}
 
-macro   ret_cond
+macro   ret_cond   %cond
 	@nomreq_ir 1
-	if (TDAT8) {
+	if (%cond) {
 		@pop
 		PC = TDAT;
 		WZ = PC;
@@ -232,13 +222,27 @@ macro   r800:ld_r_a
 macro   ld_a_r
 	@nomreq_ir 1
 	A = (m_r & 0x7f) | m_r2;
-	set_f((F & CF) | SZ[A] | (m_iff2 << 2));
+	{
+		QT = 0;
+		// keep C
+		m_f.s_val = m_f.z_val = A;
+		m_f.yx_val = A;
+		m_f.h_val = m_f.n = 0;
+		m_f.pv_val = !m_iff2;
+	}
 	if (HAS_LDAIR_QUIRK)
 		set_service_attention<SA_AFTER_LDAIR, 1>();
 
 macro   r800:ld_a_r
 	A = (m_r & 0x7f) | m_r2;
-	set_f((F & CF) | SZ[A] | (m_iff2 << 2));
+	{
+		QT = 0;
+		// keep C
+		m_f.s_val = m_f.z_val = A;
+		m_f.yx_val = A;
+		m_f.h_val = m_f.n = 0;
+		m_f.pv_val = !m_iff2;
+	}
 	if (HAS_LDAIR_QUIRK)
 		set_service_attention<SA_AFTER_LDAIR, 1>();
 
@@ -252,13 +256,27 @@ macro   r800:ld_i_a
 macro   ld_a_i
 	@nomreq_ir 1
 	A = m_i;
-	set_f((F & CF) | SZ[A] | (m_iff2 << 2));
+	{
+		QT = 0;
+		// keep C
+		m_f.s_val = m_f.z_val = A;
+		m_f.yx_val = A;
+		m_f.h_val = m_f.n = 0;
+		m_f.pv_val = !m_iff2;
+	}
 	if (HAS_LDAIR_QUIRK)
 		set_service_attention<SA_AFTER_LDAIR, 1>();
 
 macro   r800:ld_a_i
 	A = m_i;
-	set_f((F & CF) | SZ[A] | (m_iff2 << 2));
+	{
+		QT = 0;
+		// keep C
+		m_f.s_val = m_f.z_val = A;
+		m_f.yx_val = A;
+		m_f.h_val = m_f.n = 0;
+		m_f.pv_val = !m_iff2;
+	}
 	if (HAS_LDAIR_QUIRK)
 		set_service_attention<SA_AFTER_LDAIR, 1>();
 
@@ -275,7 +293,13 @@ macro   rrd
 	TDAT8 = (TDAT8 >> 4) | (A << 4);
 	@wm HL
 	A = (A & 0xf0) | (TDAT_H & 0x0f);
-	set_f((F & CF) | SZP[A]);
+	{
+		QT = 0;
+		// keep C
+		m_f.s_val = m_f.z_val = m_f.pv_val = A;
+		m_f.yx_val = A;
+		m_f.h_val = m_f.n = 0;
+	}
 
 macro   rld
 	@rm HL
@@ -285,64 +309,116 @@ macro   rld
 	TDAT8 = (TDAT8 << 4) | (A & 0x0f);
 	@wm HL
 	A = (A & 0xf0) | (TDAT_H >> 4);
-	set_f((F & CF) | SZP[A]);
+	{
+		QT = 0;
+		// keep C
+		m_f.s_val = m_f.z_val = m_f.pv_val = A;
+		m_f.yx_val = A;
+		m_f.h_val = m_f.n = 0;
+	}
 
-macro   ex_sp   %d16
+macro   ex_sp   %dd
 	@pop
 	@nomreq_addr SP-1
-	@wm16_sp %d16
-	%d16 = TDAT;
+	@wm16_sp %dd
+	%dd = TDAT;
 	2 * @nomreq_addr SP
 	WZ = TDAT;
 
-macro   add16
+macro   add16   %dd1 %dd2
 {
 	@nomreq_ir 7
-	u32 res = TDAT + TDAT2;
-	WZ = TDAT + 1;
-	set_f((F & (SF | ZF | VF)) | (((TDAT ^ res ^ TDAT2) >> 8) & HF) | ((res >> 16) & CF) | ((res >> 8) & (YF | XF)));
-	TDAT = (u16)res;
+	const u32 res = %dd1 + %dd2;
+	WZ = %dd1 + 1;
+	{
+		QT = 0;
+		// keep szv
+		m_f.yx_val = res >> 8;
+		m_f.h_val = (%dd1 ^ res ^ %dd2) >> 8;
+		m_f.n = 0;
+		m_f.c = res & 0x10000;
+	}
+	%dd1 = (u16)res;
 }
 
-macro   r800:add16
+macro   r800:add16   %dd1 %dd2
 {
-	u32 res = TDAT + TDAT2;
-	WZ = TDAT + 1;
-	set_f((F & (SF | ZF | VF)) | (((TDAT ^ res ^ TDAT2) >> 8) & HF) | ((res >> 16) & CF) | ((res >> 8) & (YF | XF)));
-	TDAT = (u16)res;
+	const u32 res = %dd1 + %dd2;
+	WZ = %dd1 + 1;
+	{
+		QT = 0;
+		// keep szv
+		m_f.yx_val = res >> 8;
+		m_f.h_val = (%dd1 ^ res ^ %dd2) >> 8;
+		m_f.n = 0;
+		m_f.c = res & 0x10000;
+	}
+	%dd1 = (u16)res;
 }
 
-macro   adc_hl
+macro   adc_hl   %dd
 {
 	@nomreq_ir 7
-	u32 res = HL + TDAT + (F & CF);
+	const u32 res = HL + %dd + m_f.c;
 	WZ = HL + 1;
-	set_f((((HL ^ res ^ TDAT) >> 8) & HF) | ((res >> 16) & CF) | ((res >> 8) & (SF | YF | XF)) | ((res & 0xffff) ? 0 : ZF) | (((TDAT ^ HL ^ 0x8000) & (TDAT ^ res) & 0x8000) >> 13));
+	{
+		QT = 0;
+		m_f.s_val = m_f.z_val = ((res & 0x8000) >> 8) | (u16(res) != 0);
+		m_f.yx_val = res >> 8;
+		m_f.h_val = (HL ^ res ^ %dd) >> 8;
+		m_f.pv_val = !((%dd ^ HL ^ 0x8000) & (%dd ^ res) & 0x8000);
+		m_f.n = 0;
+		m_f.c = res & 0x10000;
+	}
 	HL = (u16)res;
 }
 
-macro   r800:adc_hl
+macro   r800:adc_hl   %dd
 {
-	u32 res = HL + TDAT + (F & CF);
+	u32 res = HL + %dd + m_f.c;
 	WZ = HL + 1;
-	set_f((((HL ^ res ^ TDAT) >> 8) & HF) | ((res >> 16) & CF) | ((res >> 8) & (SF | YF | XF)) | ((res & 0xffff) ? 0 : ZF) | (((TDAT ^ HL ^ 0x8000) & (TDAT ^ res) & 0x8000) >> 13));
+	{
+		QT = 0;
+		m_f.s_val = m_f.z_val = ((res & 0x8000) >> 8) | (u16(res) != 0);
+		m_f.yx_val = res >> 8;
+		m_f.h_val = (HL ^ res ^ %dd) >> 8;
+		m_f.pv_val = !((%dd ^ HL ^ 0x8000) & (%dd ^ res) & 0x8000);
+		m_f.n = 0;
+		m_f.c = res & 0x10000;
+	}
 	HL = (u16)res;
 }
 
-macro   sbc_hl
+macro   sbc_hl   %dd
 {
 	@nomreq_ir 7
-	u32 res = HL - TDAT - (F & CF);
+	u32 res = HL - %dd - m_f.c;
 	WZ = HL + 1;
-	set_f((((HL ^ res ^ TDAT) >> 8) & HF) | NF | ((res >> 16) & CF) | ((res >> 8) & (SF | YF | XF)) | ((res & 0xffff) ? 0 : ZF) | (((TDAT ^ HL) & (HL ^ res) & 0x8000) >> 13));
+	{
+		QT = 0;
+		m_f.s_val = m_f.z_val = ((res & 0x8000) >> 8) | (u16(res) != 0);
+		m_f.yx_val = res >> 8;
+		m_f.h_val = (HL ^ res ^ %dd) >> 8;
+		m_f.pv_val = !((%dd ^ HL) & (HL ^ res) & 0x8000);
+		m_f.n = 1;
+		m_f.c = res & 0x10000;
+	}
 	HL = (u16)res;
 }
 
-macro   r800:sbc_hl
+macro   r800:sbc_hl   %dd
 {
-	u32 res = HL - TDAT - (F & CF);
+	u32 res = HL - %dd - m_f.c;
 	WZ = HL + 1;
-	set_f((((HL ^ res ^ TDAT) >> 8) & HF) | NF | ((res >> 16) & CF) | ((res >> 8) & (SF | YF | XF)) | ((res & 0xffff) ? 0 : ZF) | (((TDAT ^ HL) & (HL ^ res) & 0x8000) >> 13));
+	{
+		QT = 0;
+		m_f.s_val = m_f.z_val = ((res & 0x8000) >> 8) | (u16(res) != 0);
+		m_f.yx_val = res >> 8;
+		m_f.h_val = (HL ^ res ^ %dd) >> 8;
+		m_f.pv_val = !((%dd ^ HL) & (HL ^ res) & 0x8000);
+		m_f.n = 1;
+		m_f.c = res & 0x10000;
+	}
 	HL = (u16)res;
 }
 
@@ -350,68 +426,72 @@ macro   ldi
 	@rm HL
 	@wm DE
 	2 * @nomreq_addr DE
-	set_f(F & (SF | ZF | CF));
-	if ((A + TDAT8) & 0x02)
-		F |= YF;
-	if ((A + TDAT8) & 0x08)
-		F |= XF;
 	HL++;
 	DE++;
 	BC--;
-	if (BC)
-		F |= VF;
+	{
+		QT = 0;
+		// keep SZC
+		m_f.yx_val = ((A + TDAT8) << 4) | ((A + TDAT8) & 0x0f);
+		m_f.h_val = m_f.n = 0;
+		m_f.pv_val = !BC;
+	}
 
 macro   r800:ldi
 	@rm HL
 	@wm DE
 	@nomreq_addr DE
-	set_f(F & (SF | ZF | CF));
-	if ((A + TDAT8) & 0x02)
-		F |= YF;
-	if ((A + TDAT8) & 0x08)
-		F |= XF;
 	HL++;
 	DE++;
 	BC--;
-	if (BC)
-		F |= VF;
+	{
+		QT = 0;
+		// keep SZC
+		m_f.yx_val = ((A + TDAT8) << 4) | ((A + TDAT8) & 0x0f);
+		m_f.h_val = m_f.n = 0;
+		m_f.pv_val = !BC;
+	}
 
 macro   cpi
 {
 	@rm HL
 	5 * @nomreq_addr HL
-	u8 res = A - TDAT8;
 	WZ++;
 	HL++;
 	BC--;
-	set_f((F & CF) | (SZ[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF);
-	if (F & HF)
-		res -= 1;
-	if (res & 0x02)
-		F |= YF;
-	if (res & 0x08)
-		F |= XF;
-	if (BC)
-		F |= VF;
+	u8 res = A - TDAT8;
+	{
+		QT = 0;
+		// keep C
+		m_f.s_val = m_f.z_val = res;
+		m_f.h_val = A ^ TDAT8 ^ res;
+		if (m_f.h())
+			res -= 1;
+		m_f.yx_val = (res << 4) | (res & 0x0f);
+		m_f.pv_val = !BC;
+		m_f.n = 1;
+	}
 }
 
 macro   r800:cpi
 {
 	@rm HL
 	@nomreq_addr HL
-	u8 res = A - TDAT8;
 	WZ++;
 	HL++;
 	BC--;
-	set_f((F & CF) | (SZ[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF);
-	if (F & HF)
-		res -= 1;
-	if (res & 0x02)
-		F |= YF;
-	if (res & 0x08)
-		F |= XF;
-	if (BC)
-		F |= VF;
+	u8 res = A - TDAT8;
+	{
+		QT = 0;
+		// keep C
+		m_f.s_val = m_f.z_val = res;
+		m_f.h_val = A ^ TDAT8 ^ res;
+		if (m_f.h())
+			res -= 1;
+		m_f.yx_val = (res << 4) | (res & 0x0f);
+		m_f.pv_val = !BC;
+		m_f.n = 1;
+	}
 }
 
 macro   ini
@@ -422,13 +502,16 @@ macro   ini
 	B--;
 	@wm HL
 	HL++;
-	set_f(SZ[B]);
-	unsigned t = (unsigned)((C + 1) & 0xff) + (unsigned)TDAT8;
-	if (TDAT8 & SF)
-		F |= NF;
-	if (t & 0x100)
-		F |= HF | CF;
-	F |= SZP[(u8)(t & 0x07) ^ B] & PF;
+	const u16 t = ((C + 1) & 0xff) + TDAT8;
+	{
+		QT = 0;
+		m_f.s_val = m_f.z_val = B;
+		m_f.yx_val = B;
+		m_f.h_val = t >> 4;
+		m_f.pv_val = (t & 0x07) ^ B;
+		m_f.n = TDAT8 & SF;
+		m_f.c = t & 0x100;
+	}
 }
 
 macro   r800:ini
@@ -438,13 +521,16 @@ macro   r800:ini
 	B--;
 	@wm HL
 	HL++;
-	set_f(SZ[B]);
-	unsigned t = (unsigned)((C + 1) & 0xff) + (unsigned)TDAT8;
-	if (TDAT8 & SF)
-		F |= NF;
-	if (t & 0x100)
-		F |= HF | CF;
-	F |= SZP[(u8)(t & 0x07) ^ B] & PF;
+	const u16 t = ((C + 1) & 0xff) + TDAT8;
+	{
+		QT = 0;
+		m_f.s_val = m_f.z_val = B;
+		m_f.yx_val = B;
+		m_f.h_val = t >> 4;
+		m_f.pv_val = (t & 0x07) ^ B;
+		m_f.n = TDAT8 & SF;
+		m_f.c = t & 0x100;
+	}
 }
 
 macro   outi
@@ -455,13 +541,16 @@ macro   outi
 	WZ = BC + 1;
 	@out BC
 	HL++;
-	set_f(SZ[B]);
-	unsigned t = (unsigned)L + (unsigned)TDAT8;
-	if (TDAT8 & SF)
-		F |= NF;
-	if (t & 0x100)
-		F |= HF | CF;
-	F |= SZP[(u8)(t & 0x07) ^ B] & PF;
+	const u16 t = L + TDAT8;
+	{
+		QT = 0;
+		m_f.s_val = m_f.z_val = B;
+		m_f.yx_val = B;
+		m_f.h_val = t >> 4;
+		m_f.pv_val = (t & 0x07) ^ B;
+		m_f.n = TDAT8 & SF;
+		m_f.c = t & 0x100;
+	}
 }
 
 macro   r800:outi
@@ -471,13 +560,16 @@ macro   r800:outi
 	WZ = BC + 1;
 	@out BC
 	HL++;
-	set_f(SZ[B]);
-	unsigned t = (unsigned)L + (unsigned)TDAT8;
-	if (TDAT8 & SF)
-		F |= NF;
-	if (t & 0x100)
-		F |= HF | CF;
-	F |= SZP[(u8)(t & 0x07) ^ B] & PF;
+	const u16 t = L + TDAT8;
+	{
+		QT = 0;
+		m_f.s_val = m_f.z_val = B;
+		m_f.yx_val = B;
+		m_f.h_val = t >> 4;
+		m_f.pv_val = (t & 0x07) ^ B;
+		m_f.n = TDAT8 & SF;
+		m_f.c = t & 0x100;
+	}
 }
 
 macro   ldd
@@ -485,16 +577,16 @@ macro   ldd
 	@rm HL
 	@wm DE
 	2 * @nomreq_addr DE
-	set_f(F & (SF | ZF | CF));
-	if ((A + TDAT8) & 0x02)
-		F |= YF;
-	if ((A + TDAT8) & 0x08)
-		F |= XF;
 	HL--;
 	DE--;
 	BC--;
-	if (BC)
-		F |= VF;
+	{
+		QT = 0;
+		// keep SZC
+		m_f.yx_val = ((A + TDAT8) << 4) | ((A + TDAT8) & 0x0f);
+		m_f.h_val = m_f.n = 0;
+		m_f.pv_val = !BC;
+	}
 }
 
 macro   r800:ldd
@@ -502,54 +594,58 @@ macro   r800:ldd
 	@rm HL
 	@wm DE
 	@nomreq_addr DE
-	set_f(F & (SF | ZF | CF));
-	if ((A + TDAT8) & 0x02)
-		F |= YF;
-	if ((A + TDAT8) & 0x08)
-		F |= XF;
 	HL--;
 	DE--;
 	BC--;
-	if (BC)
-		F |= VF;
+	{
+		QT = 0;
+		// keep SZC
+		m_f.yx_val = ((A + TDAT8) << 4) | ((A + TDAT8) & 0x0f);
+		m_f.h_val = m_f.n = 0;
+		m_f.pv_val = !BC;
+	}
 }
 
 macro   cpd
 {
 	@rm HL
 	5 * @nomreq_addr HL
-	u8 res = A - TDAT8;
 	WZ--;
 	HL--;
 	BC--;
-	set_f((F & CF) | (SZ[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF);
-	if (F & HF)
-		res -= 1;
-	if (res & 0x02)
-		F |= YF;
-	if (res & 0x08)
-		F |= XF;
-	if (BC)
-		F |= VF;
+	u8 res = A - TDAT8;
+	{
+		QT = 0;
+		// keep C
+		m_f.s_val = m_f.z_val = res;
+		m_f.h_val = A ^ TDAT8 ^ res;
+		if (m_f.h())
+			res -= 1;
+		m_f.yx_val = (res << 4) | (res & 0x0f);
+		m_f.pv_val = !BC;
+		m_f.n = 1;
+	}
 }
 
 macro   r800:cpd
 {
 	@rm HL
 	@nomreq_addr HL
-	u8 res = A - TDAT8;
 	WZ--;
 	HL--;
 	BC--;
-	set_f((F & CF) | (SZ[res]&~(YF|XF)) | ((A^TDAT8^res)&HF) | NF);
-	if (F & HF)
-		res -= 1;
-	if (res & 0x02)
-		F |= YF;
-	if (res & 0x08)
-		F |= XF;
-	if (BC)
-		F |= VF;
+	u8 res = A - TDAT8;
+	{
+		QT = 0;
+		// keep C
+		m_f.s_val = m_f.z_val = res;
+		m_f.h_val = A ^ TDAT8 ^ res;
+		if (m_f.h())
+			res -= 1;
+		m_f.yx_val = (res << 4) | (res & 0x0f);
+		m_f.pv_val = !BC;
+		m_f.n = 1;
+	}
 }
 
 macro   ind
@@ -560,13 +656,16 @@ macro   ind
 	B--;
 	@wm HL
 	HL--;
-	set_f(SZ[B]);
-	unsigned t = ((unsigned)(C - 1) & 0xff) + (unsigned)TDAT8;
-	if (TDAT8 & SF)
-		F |= NF;
-	if (t & 0x100)
-		F |= HF | CF;
-	F |= SZP[(u8)(t & 0x07) ^ B] & PF;
+	const u16 t = ((C - 1) & 0xff) + TDAT8;
+	{
+		QT = 0;
+		m_f.s_val = m_f.z_val = B;
+		m_f.yx_val = B;
+		m_f.h_val = t >> 4;
+		m_f.pv_val = (t & 0x07) ^ B;
+		m_f.n = TDAT8 & SF;
+		m_f.c = t & 0x100;
+	}
 }
 
 macro   r800:ind
@@ -576,13 +675,16 @@ macro   r800:ind
 	B--;
 	@wm HL
 	HL--;
-	set_f(SZ[B]);
-	unsigned t = ((unsigned)(C - 1) & 0xff) + (unsigned)TDAT8;
-	if (TDAT8 & SF)
-		F |= NF;
-	if (t & 0x100)
-		F |= HF | CF;
-	F |= SZP[(u8)(t & 0x07) ^ B] & PF;
+	const u16 t = ((C - 1) & 0xff) + TDAT8;
+	{
+		QT = 0;
+		m_f.s_val = m_f.z_val = B;
+		m_f.yx_val = B;
+		m_f.h_val = t >> 4;
+		m_f.pv_val = (t & 0x07) ^ B;
+		m_f.n = TDAT8 & SF;
+		m_f.c = t & 0x100;
+	}
 }
 
 macro   outd
@@ -593,13 +695,16 @@ macro   outd
 	WZ = BC - 1;
 	@out BC
 	HL--;
-	set_f(SZ[B]);
-	unsigned t = (unsigned)L + (unsigned)TDAT8;
-	if (TDAT8 & SF)
-		F |= NF;
-	if (t & 0x100)
-		F |= HF | CF;
-	F |= SZP[(u8)(t & 0x07) ^ B] & PF;
+	const u16 t = L + TDAT8;
+	{
+		QT = 0;
+		m_f.s_val = m_f.z_val = B;
+		m_f.yx_val = B;
+		m_f.h_val = t >> 4;
+		m_f.pv_val = (t & 0x07) ^ B;
+		m_f.n = TDAT8 & SF;
+		m_f.c = t & 0x100;
+	}
 }
 
 macro   r800:outd
@@ -609,13 +714,16 @@ macro   r800:outd
 	WZ = BC - 1;
 	@out BC
 	HL--;
-	set_f(SZ[B]);
-	unsigned t = (unsigned)L + (unsigned)TDAT8;
-	if (TDAT8 & SF)
-		F |= NF;
-	if (t & 0x100)
-		F |= HF | CF;
-	F |= SZP[(u8)(t & 0x07) ^ B] & PF;
+	const u16 t = L + TDAT8;
+	{
+		QT = 0;
+		m_f.s_val = m_f.z_val = B;
+		m_f.yx_val = B;
+		m_f.h_val = t >> 4;
+		m_f.pv_val = (t & 0x07) ^ B;
+		m_f.n = TDAT8 & SF;
+		m_f.c = t & 0x100;
+	}
 }
 
 macro   ldir
@@ -624,8 +732,7 @@ macro   ldir
 		5 * @nomreq_addr DE
 		PC -= 2;
 		WZ = PC + 1;
-		F &= ~(YF | XF);
-		F |= (PC >> 8) & (YF | XF);
+		m_f.yx_val = PC >> 8;
 	}
 
 macro   r800:ldir
@@ -634,28 +741,25 @@ macro   r800:ldir
 		@nomreq_addr DE
 		PC -= 2;
 		WZ = PC + 1;
-		F &= ~(YF | XF);
-		F |= (PC >> 8) & (YF | XF);
+		m_f.yx_val = PC >> 8;
 	}
 
 macro   cpir
 	@cpi
-	if (BC != 0 && !(F & ZF)) {
+	if (BC != 0 && !m_f.z()) {
 		5 * @nomreq_addr HL
 		PC -= 2;
 		WZ = PC + 1;
-		F &= ~(YF | XF);
-		F |= (PC >> 8) & (YF | XF);
+		m_f.yx_val = PC >> 8;
 	}
 
 macro   r800:cpir
 	@cpi
 	@nomreq_addr HL
-	if (BC != 0 && !(F & ZF)) {
+	if (BC != 0 && !m_f.z()) {
 		PC -= 2;
 		WZ = PC + 1;
-		F &= ~(YF | XF);
-		F |= (PC >> 8) & (YF | XF);
+		m_f.yx_val = PC >> 8;
 	}
 
 macro   inir
@@ -703,8 +807,7 @@ macro   lddr
 		5 * @nomreq_addr DE
 		PC -= 2;
 		WZ = PC + 1;
-		F &= ~(YF | XF);
-		F |= (PC >> 8) & (YF | XF);
+		m_f.yx_val = PC >> 8;
 	}
 
 macro   r800:lddr
@@ -713,28 +816,25 @@ macro   r800:lddr
 		@nomreq_addr DE
 		PC -= 2;
 		WZ = PC + 1;
-		F &= ~(YF | XF);
-		F |= (PC >> 8) & (YF | XF);
+		m_f.yx_val = PC >> 8;
 	}
 
 macro   cpdr
 	@cpd
-	if (BC != 0 && !(F & ZF)) {
+	if (BC != 0 && !m_f.z()) {
 		5 * @nomreq_addr HL
 		PC -= 2;
 		WZ = PC + 1;
-		F &= ~(YF | XF);
-		F |= (PC >> 8) & (YF | XF);
+		m_f.yx_val = PC >> 8;
 	}
 
 macro   r800:cpdr
 	@cpd
 	@nomreq_addr HL /* suspected wrong. must be inside if? */
-	if (BC != 0 && !(F & ZF)) {
+	if (BC != 0 && !m_f.z()) {
 		PC -= 2;
 		WZ = PC + 1;
-		F &= ~(YF | XF);
-		F |= (PC >> 8) & (YF | XF);
+		m_f.yx_val = PC >> 8;
 	}
 
 macro   indr
@@ -788,7 +888,7 @@ macro   take_nmi
 	leave_halt();
 	if (HAS_LDAIR_QUIRK)
 		// reset parity flag after LD A,I or LD A,R
-		if (get_service_attention<SA_AFTER_LDAIR>()) F &= ~PF;
+		if (get_service_attention<SA_AFTER_LDAIR>()) m_f.pv_val = !0;
 	m_iff1 = 0;
 	m_r++;
 	+ 5
@@ -879,7 +979,7 @@ macro   take_interrupt
 	WZ = PC;
 	if (HAS_LDAIR_QUIRK)
 		// reset parity flag after LD A,I or LD A,R
-		if (get_service_attention<SA_AFTER_LDAIR>()) F &= ~PF;
+		if (get_service_attention<SA_AFTER_LDAIR>()) m_f.pv_val = !0;
 
 macro   check_interrupts
 	if (get_service_attention<SA_NMI_PENDING>()) {
@@ -896,7 +996,7 @@ macro   z80n:check_interrupts
 			m_out_nextreg_cb(0xc3, m_pc.b.h);
 		}
 		@take_nmi
-	} else if (m_irq_state != CLEAR_LINE && m_iff1 && !get_service_attention<SA_AFTER_EI>()) {
+	} else if (m_irq_state != CLEAR_LINE && m_iff1 && !get_service_attention<SA_AFTER_EI>()) { // SA_IRQ_ON
 		@take_interrupt
 	}
 
@@ -923,7 +1023,7 @@ macro   nsc800_take_interrupt
 	WZ = PC;
 	if (HAS_LDAIR_QUIRK)
 		// reset parity flag after LD A,I or LD A,R
-		if (get_service_attention<SA_AFTER_LDAIR>()) F &= ~PF;
+		if (get_service_attention<SA_AFTER_LDAIR>()) m_f.pv_val = !0;
 
 macro   nsc800:check_interrupts
 	if (get_service_attention<SA_NMI_PENDING>()) {
@@ -3179,10 +3279,7 @@ dd08	# DB   DD
 	@jump 0008
 
 dd09	# ADD  IX,BC
-	TDAT = IX;
-	TDAT2 = BC;
-	@add16
-	IX = TDAT;
+	@add16 IX, BC
 
 dd0a	# DB   DD
 	illegal_1();
@@ -3245,10 +3342,7 @@ dd18	# DB   DD
 	@jump 0018
 
 dd19	# ADD  IX,DE
-	TDAT = IX;
-	TDAT2 = DE;
-	@add16
-	IX = TDAT;
+	@add16 IX, DE
 
 dd1a	# DB   DD
 	illegal_1();
@@ -3279,12 +3373,10 @@ dd20	# DB   DD
 	@jump 0020
 
 dd21	# LD   IX,w
-	@arg16
-	IX = TDAT;
+	@arg16 IX
 
 dd22	# LD   (w),IX
-	@arg16
-	m_ea = TDAT;
+	@arg16 m_ea
 	TDAT = IX;
 	@wm16 m_ea
 	WZ = m_ea + 1;
@@ -3312,14 +3404,10 @@ dd28	# DB   DD
 	@jump 0028
 
 dd29	# ADD  IX,IX
-	TDAT = IX;
-	TDAT2 = IX;
-	@add16
-	IX = TDAT;
+	@add16 IX, IX
 
 dd2a	# LD   IX,(w)
-	@arg16
-	m_ea = TDAT;
+	@arg16 m_ea
 	@rm16 m_ea
 	IX = TDAT;
 	WZ = m_ea + 1;
@@ -3387,10 +3475,7 @@ dd38	# DB   DD
 	@jump 0038
 
 dd39	# ADD  IX,SP
-	TDAT = IX;
-	TDAT2 = SP;
-	@add16
-	IX = TDAT;
+	@add16 IX, SP
 
 dd3a	# DB   DD
 	illegal_1();
@@ -4226,10 +4311,7 @@ fd08	# DB   FD
 	@jump 0008
 
 fd09	# ADD  IY,BC
-	TDAT = IY;
-	TDAT2 = BC;
-	@add16
-	IY = TDAT;
+	@add16 IY, BC
 
 fd0a	# DB   FD
 	illegal_1();
@@ -4292,10 +4374,7 @@ fd18	# DB   FD
 	@jump 0018
 
 fd19	# ADD  IY,DE
-	TDAT = IY;
-	TDAT2 = DE;
-	@add16
-	IY = TDAT;
+	@add16 IY, DE
 
 fd1a	# DB   FD
 	illegal_1();
@@ -4326,12 +4405,10 @@ fd20	# DB   FD
 	@jump 0020
 
 fd21	# LD   IY,w
-	@arg16
-	IY = TDAT;
+	@arg16 IY
 
 fd22	# LD   (w),IY
-	@arg16
-	m_ea = TDAT;
+	@arg16 m_ea
 	TDAT = IY;
 	@wm16 m_ea
 	WZ = m_ea + 1;
@@ -4359,14 +4436,10 @@ fd28	# DB   FD
 	@jump 0028
 
 fd29	# ADD  IY,IY
-	TDAT = IY;
-	TDAT2 = IY;
-	@add16
-	IY = TDAT;
+	@add16 IY, IY
 
 fd2a	# LD   IY,(w)
-	@arg16
-	m_ea = TDAT;
+	@arg16 m_ea
 	@rm16 m_ea
 	IY = TDAT;
 	WZ = m_ea + 1;
@@ -4434,10 +4507,7 @@ fd38	# DB   FD
 	@jump 0038
 
 fd39	# ADD  IY,SP
-	TDAT = IY;
-	TDAT2 = SP;
-	@add16
-	IY = TDAT;
+	@add16 IY, SP
 
 fd3a	# DB   FD
 	illegal_1();
@@ -5430,8 +5500,14 @@ ed3f	# DB   ED
 
 ed40	# IN   B,(C)
 	@in BC
+	{
+		QT = 0;
+		// keep C
+		m_f.s_val = m_f.z_val = m_f.pv_val = TDAT8;
+		m_f.yx_val = TDAT8;
+		m_f.h_val = m_f.n = 0;
+	}
 	B = TDAT8;
-	set_f((F & CF) | SZP[B]);
 	WZ = BC + 1;
 
 ed41	# OUT  (C),B
@@ -5440,12 +5516,10 @@ ed41	# OUT  (C),B
 	WZ = BC + 1;
 
 ed42	# SBC  HL,BC
-	TDAT = BC;
-	@sbc_hl
+	@sbc_hl BC
 
 ed43	# LD   (w),BC
-	@arg16
-	m_ea = TDAT;
+	@arg16 m_ea
 	TDAT = BC;
 	@wm16 m_ea
 	WZ = m_ea + 1;
@@ -5464,8 +5538,14 @@ ed47	# LD   i,A
 
 ed48	# IN   C,(C)
 	@in BC
+	{
+		QT = 0;
+		// keep C
+		m_f.s_val = m_f.z_val = m_f.pv_val = TDAT8;
+		m_f.yx_val = TDAT8;
+		m_f.h_val = m_f.n = 0;
+	}
 	C = TDAT8;
-	set_f((F & CF) | SZP[C]);
 	WZ = BC + 1;
 
 ed49	# OUT  (C),C
@@ -5474,12 +5554,10 @@ ed49	# OUT  (C),C
 	WZ = BC + 1;
 
 ed4a	# ADC  HL,BC
-	TDAT = BC;
-	@adc_hl
+	@adc_hl BC
 
 ed4b	# LD   BC,(w)
-	@arg16
-	m_ea = TDAT;
+	@arg16 m_ea
 	@rm16 m_ea
 	BC = TDAT;
 	WZ = m_ea + 1;
@@ -5498,8 +5576,14 @@ ed4f	# LD   r,A
 
 ed50	# IN   D,(C)
 	@in BC
+	{
+		QT = 0;
+		// keep C
+		m_f.s_val = m_f.z_val = m_f.pv_val = TDAT8;
+		m_f.yx_val = TDAT8;
+		m_f.h_val = m_f.n = 0;
+	}
 	D = TDAT8;
-	set_f((F & CF) | SZP[D]);
 	WZ = BC + 1;
 
 ed51	# OUT  (C),D
@@ -5508,12 +5592,10 @@ ed51	# OUT  (C),D
 	WZ = BC + 1;
 
 ed52	# SBC  HL,DE
-	TDAT = DE;
-	@sbc_hl
+	@sbc_hl DE
 
 ed53	# LD   (w),DE
-	@arg16
-	m_ea = TDAT;
+	@arg16 m_ea
 	TDAT = DE;
 	@wm16 m_ea
 	WZ = m_ea + 1;
@@ -5532,8 +5614,14 @@ ed57	# LD   A,i
 
 ed58	# IN   E,(C)
 	@in BC
+	{
+		QT = 0;
+		// keep C
+		m_f.s_val = m_f.z_val = m_f.pv_val = TDAT8;
+		m_f.yx_val = TDAT8;
+		m_f.h_val = m_f.n = 0;
+	}
 	E = TDAT8;
-	set_f((F & CF) | SZP[E]);
 	WZ = BC + 1;
 
 ed59	# OUT  (C),E
@@ -5542,12 +5630,10 @@ ed59	# OUT  (C),E
 	WZ = BC + 1;
 
 ed5a	# ADC  HL,DE
-	TDAT = DE;
-	@adc_hl
+	@adc_hl DE
 
 ed5b	# LD   DE,(w)
-	@arg16
-	m_ea = TDAT;
+	@arg16 m_ea
 	@rm16 m_ea
 	DE = TDAT;
 	WZ = m_ea + 1;
@@ -5566,8 +5652,14 @@ ed5f	# LD   A,r
 
 ed60	# IN   H,(C)
 	@in BC
+	{
+		QT = 0;
+		// keep C
+		m_f.s_val = m_f.z_val = m_f.pv_val = TDAT8;
+		m_f.yx_val = TDAT8;
+		m_f.h_val = m_f.n = 0;
+	}
 	H = TDAT8;
-	set_f((F & CF) | SZP[H]);
 	WZ = BC + 1;
 
 ed61	# OUT  (C),H
@@ -5576,12 +5668,10 @@ ed61	# OUT  (C),H
 	WZ = BC + 1;
 
 ed62	# SBC  HL,HL
-	TDAT = HL;
-	@sbc_hl
+	@sbc_hl HL
 
 ed63	# LD   (w),HL
-	@arg16
-	m_ea = TDAT;
+	@arg16 m_ea
 	TDAT = HL;
 	@wm16 m_ea
 	WZ = m_ea + 1;
@@ -5600,8 +5690,14 @@ ed67	# RRD  (HL)
 
 ed68	# IN   L,(C)
 	@in BC
+	{
+		QT = 0;
+		// keep C
+		m_f.s_val = m_f.z_val = m_f.pv_val = TDAT8;
+		m_f.yx_val = TDAT8;
+		m_f.h_val = m_f.n = 0;
+	}
 	L = TDAT8;
-	set_f((F & CF) | SZP[L]);
 	WZ = BC + 1;
 
 ed69	# OUT  (C),L
@@ -5610,12 +5706,10 @@ ed69	# OUT  (C),L
 	WZ = BC + 1;
 
 ed6a	# ADC  HL,HL
-	TDAT = HL;
-	@adc_hl
+	@adc_hl HL
 
 ed6b	# LD   HL,(w)
-	@arg16
-	m_ea = TDAT;
+	@arg16 m_ea
 	@rm16 m_ea
 	HL = TDAT;
 	WZ = m_ea + 1;
@@ -5634,7 +5728,13 @@ ed6f	# RLD  (HL)
 
 ed70	# IN   0,(C)
 	@in BC
-	set_f((F & CF) | SZP[TDAT8]);
+	{
+		QT = 0;
+		// keep C
+		m_f.s_val = m_f.z_val = m_f.pv_val = TDAT8;
+		m_f.yx_val = TDAT8;
+		m_f.h_val = m_f.n = 0;
+	}
 	WZ = BC + 1;
 
 ed71	# OUT  (C),0
@@ -5643,12 +5743,10 @@ ed71	# OUT  (C),0
 	WZ = BC + 1;
 
 ed72	# SBC  HL,SP
-	TDAT = SP;
-	@sbc_hl
+	@sbc_hl SP
 
 ed73	# LD   (w),SP
-	@arg16
-	m_ea = TDAT;
+	@arg16 m_ea
 	TDAT = SP;
 	@wm16 m_ea
 	WZ = m_ea + 1;
@@ -5667,8 +5765,14 @@ ed77	# DB   ED,77
 
 ed78	# IN   A,(C)
 	@in BC
+	{
+		QT = 0;
+		// keep C
+		m_f.s_val = m_f.z_val = m_f.pv_val = TDAT8;
+		m_f.yx_val = TDAT8;
+		m_f.h_val = m_f.n = 0;
+	}
 	A = TDAT8;
-	set_f((F & CF) | SZP[A]);
 	WZ = BC + 1;
 
 ed79	# OUT  (C),A
@@ -5677,12 +5781,10 @@ ed79	# OUT  (C),A
 	WZ = BC + 1;
 
 ed7a	# ADC  HL,SP
-	TDAT = SP;
-	@adc_hl
+	@adc_hl SP
 
 ed7b	# LD   SP,(w)
-	@arg16
-	m_ea = TDAT;
+	@arg16 m_ea
 	@rm16 m_ea
 	SP = TDAT;
 	WZ = m_ea + 1;
@@ -6090,8 +6192,7 @@ edff	# DB   ED
 0000	# NOP
 
 0001	# LD BC,w
-	@arg16
-	BC = TDAT;
+	@arg16 BC
 
 0002	# LD (BC),A
 	TDAT8 = A;
@@ -6117,14 +6218,13 @@ edff	# DB   ED
 	rlca();
 
 0008	# EX   AF,AF'
+	F = get_f();
 	using std::swap;
 	swap(m_af, m_af2);
+	set_f(F);
 
 0009	# ADD  HL,BC
-	TDAT = HL;
-	TDAT2 = BC;
-	@add16
-	HL = TDAT;
+	@add16 HL, BC
 
 000a	# LD   A,(BC)
 	@rm BC
@@ -6150,12 +6250,10 @@ edff	# DB   ED
 
 0010	# DJNZ o
 	@nomreq_ir 1
-	TDAT8 = --B;
-	@jr_cond
+	@jr_cond --B
 
 0011	# LD   DE,w
-	@arg16
-	DE = TDAT;
+	@arg16 DE
 
 0012	# LD (DE),A
 	TDAT8 = A;
@@ -6184,10 +6282,7 @@ edff	# DB   ED
 	@jr
 
 0019	# ADD  HL,DE
-	TDAT = HL;
-	TDAT2 = DE;
-	@add16
-	HL = TDAT;
+	@add16 HL, DE
 
 001a	# LD   A,(DE)
 	@rm DE
@@ -6212,16 +6307,13 @@ edff	# DB   ED
 	rra();
 
 0020	# JR   NZ,o
-	TDAT8 = !(F & ZF);
-	@jr_cond
+	@jr_cond !m_f.z()
 
 0021	# LD   HL,w
-	@arg16
-	HL = TDAT;
+	@arg16 HL
 
 0022	# LD   (w),HL
-	@arg16
-	m_ea = TDAT;
+	@arg16 m_ea
 	TDAT = HL;
 	@wm16 m_ea
 	WZ = m_ea + 1;
@@ -6244,18 +6336,13 @@ edff	# DB   ED
 	daa();
 
 0028	# JR   Z,o
-	TDAT8 = F & ZF;
-	@jr_cond
+	@jr_cond m_f.z()
 
 0029	# ADD  HL,HL
-	TDAT = HL;
-	TDAT2 = HL;
-	@add16
-	HL = TDAT;
+	@add16 HL, HL
 
 002a	# LD   HL,(w)
-	@arg16
-	m_ea = TDAT;
+	@arg16 m_ea
 	@rm16 m_ea
 	HL = TDAT;
 	WZ = m_ea + 1;
@@ -6276,19 +6363,21 @@ edff	# DB   ED
 
 002f	# CPL
 	A ^= 0xff;
-	set_f((F & (SF | ZF | PF | CF)) | HF | NF | (A & (YF | XF)));
+	{
+		// keep SZPC
+		m_f.yx_val = A;
+		m_f.h_val = HF;
+		m_f.n = 1;
+	}
 
 0030	# JR   NC,o
-	TDAT8 = !(F & CF);
-	@jr_cond
+	@jr_cond !m_f.c
 
 0031	# LD   SP,w
-	@arg16
-	SP = TDAT;
+	@arg16 SP
 
 0032	# LD   (w),A
-	@arg16
-	m_ea = TDAT;
+	@arg16 m_ea
 	TDAT8 = A;
 	@wm m_ea
 	WZ_L = (m_ea + 1) & 0xFF;
@@ -6313,21 +6402,22 @@ edff	# DB   ED
 	@wm HL
 
 0037	# SCF
-	set_f((F & (SF | ZF | PF)) | CF | (((F & Q) | A) & (YF | XF)));
+{
+	QT = 0;
+	// keep SZP
+	m_f.yx_val = (m_f.yx_val & Q) | A;
+	m_f.h_val = m_f.n = 0;
+	m_f.c = 1;
+}
 
 0038	# JR   C,o
-	TDAT8 = F & CF;
-	@jr_cond
+	@jr_cond m_f.c
 
 0039	# ADD  HL,SP
-	TDAT = HL;
-	TDAT2 = SP;
-	@add16
-	HL = TDAT;
+	@add16 HL, SP
 
 003a	# LD   A,(w)
-	@arg16
-	m_ea = TDAT;
+	@arg16 m_ea
 	@rm m_ea
 	A = TDAT8;
 	WZ = m_ea + 1;
@@ -6347,7 +6437,14 @@ edff	# DB   ED
 	A = TDAT8;
 
 003f	# CCF
-	set_f(((F & (SF | ZF | PF | CF)) ^ CF) | ((F & CF) << 4) | (((F & Q) | A) & (YF | XF)));
+{
+	QT = 0;
+	// keep SZP
+	m_f.yx_val = (m_f.yx_val & Q) | A;
+	m_f.h_val = m_f.c << 4;
+	m_f.n = 0;
+	m_f.c = !m_f.c;
+}
 
 0040	# LD   B,B
 
@@ -6749,23 +6846,20 @@ edff	# DB   ED
 	cp(A);
 
 00c0	# RET  NZ
-	TDAT8 = !(F & ZF);
-	@ret_cond
+	@ret_cond !m_f.z()
 
 00c1	# POP  BC
 	@pop
 	BC = TDAT;
 
 00c2	# JP   NZ,a
-	TDAT8 = !(F & ZF);
-	@jp_cond
+	@jp_cond !m_f.z()
 
 00c3	# JP   a
 	@jp
 
 00c4	# CALL NZ,a
-	TDAT8 = !(F & ZF);
-	@call_cond
+	@call_cond !m_f.z()
 
 00c5	# PUSH BC
 	@push BC
@@ -6778,8 +6872,7 @@ edff	# DB   ED
 	@rst 0x00
 
 00c8	# RET  Z
-	TDAT8 = (F & ZF);
-	@ret_cond
+	@ret_cond m_f.z()
 
 00c9	# RET
 	@pop
@@ -6787,16 +6880,14 @@ edff	# DB   ED
 	WZ = PC;
 
 00ca	# JP   Z,a
-	TDAT8 = F & ZF;
-	@jp_cond
+	@jp_cond m_f.z()
 
 00cb	# **** CB xx
 	@rop
 	@jump_prefixed 0xcb
 
 00cc	# CALL Z,a
-	TDAT8 = F & ZF;
-	@call_cond
+	@call_cond m_f.z()
 
 00cd	# CALL a
 	@arg16_call
@@ -6809,16 +6900,14 @@ edff	# DB   ED
 	@rst 0x08
 
 00d0	# RET  NC
-	TDAT8 = !(F & CF);
-	@ret_cond
+	@ret_cond !m_f.c
 
 00d1	# POP  DE
 	@pop
 	DE = TDAT;
 
 00d2	# JP   NC,a
-	TDAT8 = !(F & CF);
-	@jp_cond
+	@jp_cond !m_f.c
 
 00d3	# OUT  (n),A
 	@arg
@@ -6829,8 +6918,7 @@ edff	# DB   ED
 	WZ_H = A;
 
 00d4	# CALL NC,a
-	TDAT8 = !(F & CF);
-	@call_cond
+	@call_cond !m_f.c
 
 00d5	# PUSH DE
 	@push DE
@@ -6843,15 +6931,13 @@ edff	# DB   ED
 	@rst 0x10
 
 00d8	# RET  C
-	TDAT8 = (F & CF);
-	@ret_cond
+	@ret_cond m_f.c
 
 00d9	# EXX
 	exx();
 
 00da	# JP   C,a
-	TDAT8 = F & CF;
-	@jp_cond
+	@jp_cond m_f.c
 
 00db	# IN   A,(n)
 	@arg
@@ -6861,8 +6947,7 @@ edff	# DB   ED
 	WZ = TDAT2 + 1;
 
 00dc	# CALL C,a
-	TDAT8 = F & CF;
-	@call_cond
+	@call_cond m_f.c
 
 00dd	# **** DD xx
 	@rop
@@ -6876,23 +6961,20 @@ edff	# DB   ED
 	@rst 0x18
 
 00e0	# RET  PO
-	TDAT8 = !(F & PF);
-	@ret_cond
+	@ret_cond !m_f.pv()
 
 00e1	# POP  HL
 	@pop
 	HL = TDAT;
 
 00e2	# JP   PO,a
-	TDAT8 = !(F & PF);
-	@jp_cond
+	@jp_cond !m_f.pv()
 
 00e3	# EX   HL,(SP)
 	@ex_sp HL
 
 00e4	# CALL PO,a
-	TDAT8 = !(F & PF);
-	@call_cond
+	@call_cond !m_f.pv()
 
 00e5	# PUSH HL
 	@push HL
@@ -6905,23 +6987,20 @@ edff	# DB   ED
 	@rst 0x20
 
 00e8	# RET  PE
-	TDAT8 = (F & PF);
-	@ret_cond
+	@ret_cond m_f.pv()
 
 00e9	# JP   (HL)
 	PC = HL;
 
 00ea	# JP   PE,a
-	TDAT8 = F & PF;
-	@jp_cond
+	@jp_cond m_f.pv()
 
 00eb	# EX   DE,HL
 	using std::swap;
 	swap(DE, HL);
 
 00ec	# CALL PE,a
-	TDAT8 = F & PF;
-	@call_cond
+	@call_cond m_f.pv()
 
 00ed	# **** ED xx
 	@rop
@@ -6935,26 +7014,26 @@ edff	# DB   ED
 	@rst 0x28
 
 00f0	# RET  P
-	TDAT8 = !(F & SF);
-	@ret_cond
+	@ret_cond !m_f.s()
 
 00f1	# POP  AF
 	@pop
-	AF = TDAT;
+	A = TDAT_H;
+	set_f(TDAT_L);
 
 00f2	# JP   P,a
-	TDAT8 = !(F & SF);
-	@jp_cond
+	@jp_cond !m_f.s()
 
 00f3	# DI
 	m_iff1 = m_iff2 = 0;
 
 00f4	# CALL P,a
-	TDAT8 = !(F & SF);
-	@call_cond
+	@call_cond !m_f.s()
 
 00f5	# PUSH AF
-	@push AF
+	@nomreq_ir 1
+	@wm_sp A
+	@wm_sp get_f()
 
 00f6	# OR   n
 	@arg
@@ -6964,23 +7043,20 @@ edff	# DB   ED
 	@rst 0x30
 
 00f8	# RET  M
-	TDAT8 = (F & SF);
-	@ret_cond
+	@ret_cond m_f.s()
 
 00f9	# LD   SP,HL
 	@nomreq_ir 2
 	SP = HL;
 
 00fa	# JP   M,a
-	TDAT8 = F & SF;
-	@jp_cond
+	@jp_cond m_f.s()
 
 00fb	# EI
 	ei();
 
 00fc	# CALL M,a
-	TDAT8 = F & SF;
-	@call_cond
+	@call_cond m_f.s()
 
 00fd	# **** FD xx
 	@rop
@@ -8905,15 +8981,15 @@ z80n:ed33	# add bc,a
 	BC += A;
 
 z80n:ed34	# add hl,**
-	@arg16
+	@arg16 TDAT
 	HL += TDAT;
 
 z80n:ed35	# add de,**
-	@arg16
+	@arg16 TDAT
 	DE += TDAT;
 
 z80n:ed36	# add bc,**
-	@arg16
+	@arg16 TDAT
 	BC += TDAT;
 
 z80n:ed8a	# push **
@@ -8928,7 +9004,7 @@ z80n:ed90	# outinb
 	HL++;
 
 z80n:ed91	# nextreg *,*
-	@arg16
+	@arg16 TDAT
 	m_out_nextreg_cb(TDAT_L, TDAT_H);
 
 z80n:ed92	# nextreg *,a

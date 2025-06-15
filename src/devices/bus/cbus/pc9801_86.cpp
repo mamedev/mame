@@ -377,6 +377,7 @@ void pc9801_86_device::io_map(address_map &map)
 					, BIT(data, 6) ? 16 : 8
 					// 3 = stereo, 2 Left only, 1 Right only, 0 = No PCM output
 					, (data >> 4) & 3
+					// TODO: unknown purpose, normally 2, apparently set by AVSDRV differently
 					, data & 3
 				);
 			}

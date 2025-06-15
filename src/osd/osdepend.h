@@ -6,7 +6,7 @@
 
     OS-dependent code interface.
 
-*******************************************************************c********/
+***************************************************************************/
 #ifndef MAME_OSD_OSDEPEND_H
 #define MAME_OSD_OSDEPEND_H
 
@@ -89,6 +89,8 @@ public:
 	virtual void sound_stream_sink_update(uint32_t id, const int16_t *buffer, int samples_this_frame) = 0;
 	virtual void sound_stream_source_update(uint32_t id, int16_t *buffer, int samples_this_frame) = 0;
 	virtual void sound_stream_set_volumes(uint32_t id, const std::vector<float> &db) = 0;
+	virtual void sound_begin_update() = 0;
+	virtual void sound_end_update() = 0;
 
 	// input overridables
 	virtual void customize_input_type_list(std::vector<input_type_entry> &typelist) = 0;

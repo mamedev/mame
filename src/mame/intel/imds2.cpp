@@ -97,7 +97,7 @@ namespace {
 #define IPC_XTAL_Y2     8_MHz_XTAL
 
 // Y1 oscillator of IPC board: 19.6608 MHz
-#define IPC_XTAL_Y1     19.6608_MHz_XTAL
+static constexpr auto IPC_XTAL_Y1 = 19.6608_MHz_XTAL;
 
 class imds2_state : public driver_device
 {
@@ -308,9 +308,9 @@ void imds2_state::imds2(machine_config &config)
 	m_ioc->master_intr_cb().set(m_ipclocpic, FUNC(pic8259_device::ir6_w));
 	m_ioc->parallel_int_cb().set(m_ipclocpic, FUNC(pic8259_device::ir5_w));
 
-	MULTIBUS(config, m_bus, 9'830'400);
+	MULTIBUS(config, m_bus, IPC_XTAL_Y1 / 2);
 	m_bus->xack_cb().set(FUNC(imds2_state::xack));
-	MULTIBUS_SLOT(config, m_slot, m_bus, imds2_cards, nullptr, false); // FIXME: isbc202
+	MULTIBUS_SLOT(config, m_slot, m_bus, imds2_cards, nullptr, false, (IPC_XTAL_Y1 / 2).value()); // FIXME: isbc202
 }
 
 void imds2_state::xack(int state)

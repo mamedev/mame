@@ -15,6 +15,7 @@
 #include "divtlb.h"
 
 #include "i386dasm.h"
+#include <algorithm>
 
 #define INPUT_LINE_A20      1
 #define INPUT_LINE_SMI      2
@@ -1035,7 +1036,7 @@ protected:
 	void i386_bound_r32_m32_m32();
 	void i386_retf32();
 	void i386_retf_i32();
-	void i386_load_far_pointer32(int s);
+	bool i386_load_far_pointer32(int s);
 	void i386_lds32();
 	void i386_lss32();
 	void i386_les32();

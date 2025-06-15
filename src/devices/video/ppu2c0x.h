@@ -32,7 +32,6 @@
 /* constant definitions */
 #define VISIBLE_SCREEN_WIDTH         (32*8) /* Visible screen width */
 #define VISIBLE_SCREEN_HEIGHT        (30*8) /* Visible screen height */
-#define SPRITERAM_SIZE          0x100   /* spriteram size */
 
 ///*************************************************************************
 //  TYPE DEFINITIONS
@@ -79,6 +78,8 @@ public:
 	auto int_callback() { return m_int_callback.bind(); }
 
 	void spriteram_dma(address_space &space, const u8 page);
+	void set_spriteram_value(offs_t offset, u8 data) { m_spriteram[offset] = data; }
+
 	void render(bitmap_rgb32 &bitmap, bool flipx, bool flipy, int sx, int sy, const rectangle &cliprect);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -160,6 +161,8 @@ protected:
 	rgb_t nespal_to_RGB(int color_intensity, int color_num, int color_emphasis, bool is_pal_or_dendy);
 	virtual void init_palette_tables();
 
+	virtual void write_to_spriteram_with_increment(u8 data);
+
 	virtual void read_tile_plane_data(int address, int color);
 	virtual void shift_tile_plane_data(u8 &pix);
 	virtual void draw_tile_pixel(u8 pix, int color, u32 back_pen, u32 *&dest);
@@ -197,7 +200,7 @@ protected:
 	int                         m_vblank_first_scanline;  /* the very first scanline where VBLANK occurs */
 
 	// used in rendering
-	u8 m_planebuf[2];
+	u8 m_planebuf[16]; // temp buffer used for fetching tile data
 	s32                    m_scanline;         /* scanline count */
 	std::unique_ptr<u8[]>  m_spriteram;           /* sprite ram */
 
@@ -215,6 +218,8 @@ protected:
 	bool                        m_toggle;               /* used to latch hi-lo scroll */
 	s32                         m_tilecount;            /* MMC5 can change attributes to subsets of the 34 visible tiles */
 	latch_delegate              m_latch;
+
+	u16                         m_spriteramsize;
 
 	u8 readbyte(offs_t address);
 

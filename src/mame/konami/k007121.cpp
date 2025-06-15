@@ -11,10 +11,20 @@ a single 64x32 one, or one of them can be moved to the side of screen, giving
 a high score display suitable for vertical games.
 The chip also generates clock and interrupt signals suitable for a 6809.
 It uses 0x2000 bytes of static RAM for the tilemaps and sprite lists, and two
-64kx4bit DRAMs, presumably as a double frame buffer. The maximum addressable
+64kx4bit DRAMs, for color LUT data for sprites. The maximum addressable
 ROM is 0x80000 bytes (addressed 16 bits at a time). Tile and sprite data both
 come from the same ROM space. Like the 005885, external circuitry can cause
 tiles and sprites to be fetched from different ROMs (used by Haunted Castle).
+
+The chip will render a maximum of 264 64-pixel sprite blocks, presumably one
+per scanline. There is no limit on the number of sprites, including per-scanline,
+other than bumping into the 264 sprite block limit. Games often append 17
+off-screen 32x32 sprites after their active sprite list so they bump into the
+block limit and avoid having to fully clear out all old sprites. If a large
+sprite were to straddle the 264 limit, it would only draw the available sprite
+blocks, top to bottom. As soon as it hits the limit, it stops drawing the rest
+of the sprite. For example, 263 8x8 sprites and 1 32x32 sprite, it would draw
+the latter partial sprite with a width of 32 and a height of 2.
 
 Two 256x4 lookup PROMs are also used to increase the color combinations.
 All tilemap / sprite priority handling is done internally and the chip exports
@@ -45,9 +55,9 @@ outputs:
 
 control registers
 000:          scroll x (low 8 bits)
-001: -------x scroll x (high bit)
-     ------x- enable rowscroll? (combatsc)
-     -----x-- unknown (flak attack)
+001: -------x scroll x (high bit, if tilemap width > 256)
+     ------x- enable row/colscroll instead of normal scroll (combatsc)
+     -----x-- if above is enabled: 0 = rowscroll, 1 = colscroll
      ----x--- this probably selects an alternate screen layout used in combat
               school where tilemap #2 is overlayed on front and doesn't scroll.
               The 32 lines of the front layer can be individually turned on or
@@ -57,7 +67,7 @@ control registers
      ------x- unknown (contra)
      -----x-- might be sprite / tilemap priority (0 = sprites have priority)
               (combat school, contra, haunted castle(0/1), labyrunr)
-     ----x--- selects sprite buffer (and makes a copy to a private buffer?)
+     ----x--- selects sprite ram bank/offset (0 = 0x0, 1 = 0x800)
      ---x---- screen layout selector:
               when this is set, 5 columns are added on the left of the screen
               (that means 5 rows at the top for vertical games), and the
@@ -73,9 +83,6 @@ control registers
      -x------ Chops away the leftmost and rightmost columns, switching the
               visible area from 256 to 240 pixels. This is used by combatsc on
               the scrolling stages, and by labyrunr on the title screen.
-              At first I thought that this enabled an extra bank of 0x40
-              sprites, needed by combatsc, but labyrunr proves that this is not
-              the case
      x------- unknown (contra)
 004: ----xxxx bits 9-12 of the tile code. Only the bits enabled by the following
               mask are actually used, and replace the ones selected by register
@@ -110,17 +117,27 @@ control registers
      ------x- irq enable
      -----x-- firq enable
      ----x--- flip screen
-     ---x---- unknown (contra, labyrunr)
+     ---x---- nmi frequency (0 = 8 times per frame, 1 = 4 times)
+
+TODO:
+- Move tilemap(s) emulation from drivers to this device.
+- As noted above, the maximum number of 64-pixel sprite blocks is 264. MAME
+  doesn't emulate partial sprites at the end of the spritelist. Is's not
+  expected any game relies on this.
+
+BTANB:
+- Some games don't take the internal 1-frame sprite lag (due to framebuffer) into
+  account, see for example the ground turrets in Flak Attack, confirmed on PCB
+  video. Other games, eg. Contra and Labyrinth Runner are fine.
 
 */
 
 #include "emu.h"
 #include "k007121.h"
 #include "konami_helper.h"
-#include "tilemap.h"
 
-#define VERBOSE 0
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+#include "screen.h"
+#include "tilemap.h"
 
 
 DEFINE_DEVICE_TYPE(K007121, k007121_device, "k007121", "K007121 Sprite/Tilemap Controller")
@@ -128,7 +145,14 @@ DEFINE_DEVICE_TYPE(K007121, k007121_device, "k007121", "K007121 Sprite/Tilemap C
 k007121_device::k007121_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K007121, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this)
+	, device_video_interface(mconfig, *this)
 	, m_flipscreen(false)
+	, m_spriteram(nullptr)
+	, m_flipscreen_cb(*this)
+	, m_irq_cb(*this)
+	, m_firq_cb(*this)
+	, m_nmi_cb(*this)
+	, m_dirtytiles_cb(*this)
 {
 }
 
@@ -138,8 +162,19 @@ k007121_device::k007121_device(const machine_config &mconfig, const char *tag, d
 
 void k007121_device::device_start()
 {
+	m_dirtytiles_cb.resolve();
+
 	save_item(NAME(m_ctrlram));
+	save_item(NAME(m_scrollram));
 	save_item(NAME(m_flipscreen));
+	save_item(NAME(m_sprites_buffer));
+
+	memset(m_ctrlram, 0, sizeof(m_ctrlram));
+	memset(m_scrollram, 0, sizeof(m_scrollram));
+	memset(m_sprites_buffer, 0, sizeof(m_sprites_buffer));
+
+	m_scanline_timer = timer_alloc(FUNC(k007121_device::scanline), this);
+	m_scanline_timer->adjust(screen().time_until_pos(0), 0);
 }
 
 //-------------------------------------------------
@@ -148,10 +183,8 @@ void k007121_device::device_start()
 
 void k007121_device::device_reset()
 {
-	m_flipscreen = false;
-
 	for (int i = 0; i < 8; i++)
-		m_ctrlram[i] = 0;
+		ctrl_w(i, 0);
 }
 
 
@@ -159,28 +192,33 @@ void k007121_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-uint8_t k007121_device::ctrlram_r(offs_t offset)
-{
-	assert(offset < 8);
-
-	return m_ctrlram[offset];
-}
-
-
 void k007121_device::ctrl_w(offs_t offset, uint8_t data)
 {
-	assert(offset < 8);
+	offset &= 7;
 
-	switch (offset)
+	// associated tilemap(s) should be marked dirty if any of these registers changed
+	static const uint8_t dirtymask[8] = { 0x00, 0x00, 0x00, 0x01, 0xff, 0xff, 0x3f, 0x00 };
+	if ((data ^ m_ctrlram[offset]) & dirtymask[offset] && !m_dirtytiles_cb.isnull())
+		m_dirtytiles_cb();
+
+	if (offset == 7)
 	{
-	case 6:
-		// palette bank change
-		if ((m_ctrlram[offset] & 0x30) != (data & 0x30))
-			machine().tilemap().mark_all_dirty();
-		break;
-	case 7:
-		m_flipscreen = BIT(data, 3);
-		break;
+		// clear interrupts
+		if (BIT(~data & m_ctrlram[7], 1))
+			m_irq_cb(0);
+
+		if (BIT(~data & m_ctrlram[7], 2))
+			m_firq_cb(0);
+
+		if (BIT(~data & m_ctrlram[7], 0))
+			m_nmi_cb(0);
+
+		// flipscreen
+		if (BIT(data ^ m_ctrlram[7], 3))
+		{
+			m_flipscreen = BIT(data, 3);
+			m_flipscreen_cb(BIT(data, 3));
+		}
 	}
 
 	m_ctrlram[offset] = data;
@@ -189,10 +227,6 @@ void k007121_device::ctrl_w(offs_t offset, uint8_t data)
 /*
  * Sprite Format
  * ------------------
- *
- * There are 0x40 sprites, each one using 5 bytes. However the number of
- * sprites can be increased to 0x80 with a control register (Combat School
- * sets it on and off during the game).
  *
  * Byte | Bit(s)   | Use
  * -----+-76543210-+----------------
@@ -211,21 +245,54 @@ void k007121_device::ctrl_w(offs_t offset, uint8_t data)
  */
 
 void k007121_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect,
-		const uint8_t *source, int base_color, int global_x_offset, int bank_base, bitmap_ind8 &priority_bitmap, uint32_t pri_mask)
+		int base_color, int global_x_offset, int bank_base, bitmap_ind8 &priority_bitmap, uint32_t pri_mask)
 {
-	// TODO: sprite limit is supposed to be per-line! (check MT #00185)
-	int num = 0x40;
-	//num = (m_ctrlram[0x03] & 0x40) ? 0x80 : 0x40; // WRONG!!! (needed by combatsc)
+	// maximum number of 64-pixel sprite blocks that can be drawn
+	constexpr int MAX_SPRITE_BLOCKS = 264;
+	constexpr int SPRITE_FORMAT_SIZE = 5;
 
-	int inc = 5;
-	// when using priority buffer, draw front to back
-	if (pri_mask != (uint32_t)-1)
+	assert(MAX_SPRITE_BLOCKS < 0x199); // floor(0x800 / SPRITE_FORMAT_SIZE)
+
+	const uint8_t *source = m_sprites_buffer;
+
+	// determine number of sprites that will be drawn
+	int num_sprites = 0;
+	int sprite_blocks = 0;
+	while (sprite_blocks < MAX_SPRITE_BLOCKS)
 	{
-		source += (num - 1)*inc;
+		int attr = source[(num_sprites * SPRITE_FORMAT_SIZE) + 4];
+		switch (attr & 0xe)
+		{
+			case 0x06:
+			default:
+				sprite_blocks += 1;
+				break;
+
+			case 0x02:
+			case 0x04:
+				sprite_blocks += 2;
+				break;
+
+			case 0x00:
+				sprite_blocks += 4;
+				break;
+
+			case 0x08:
+				sprite_blocks += 16;
+				break;
+		}
+		num_sprites++;
+	}
+
+	int inc = SPRITE_FORMAT_SIZE;
+	// when using priority buffer, draw front to back
+	if (pri_mask != uint32_t(~0))
+	{
+		source += (num_sprites - 1) * inc;
 		inc = -inc;
 	}
 
-	for (int i = 0; i < num; i++)
+	for (int i = 0; i < num_sprites; i++)
 	{
 		int number = source[0];
 		int sprite_bank = source[1] & 0x0f;
@@ -237,12 +304,13 @@ void k007121_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprec
 		int color = base_color + ((source[1] & 0xf0) >> 4);
 		int width, height;
 		int transparent_mask;
-		static const int x_offset[4] = {0x0,0x1,0x4,0x5};
-		static const int y_offset[4] = {0x0,0x2,0x8,0xa};
+		static const int x_offset[4] = { 0x0, 0x1, 0x4, 0x5 };
+		static const int y_offset[4] = { 0x0, 0x2, 0x8, 0xa };
 		int flipx, flipy, destx, desty;
 
 		if (attr & 0x01) sx -= 256;
 		if (sy >= 240) sy -= 256;
+		sx += global_x_offset;
 
 		number += ((sprite_bank & 0x3) << 8) + ((attr & 0xc0) << 4);
 		number = number << 2;
@@ -262,14 +330,14 @@ void k007121_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprec
 				width = height = 1;
 				break;
 
-			case 0x04:
-				width = 1; height = 2;
-				number &= ~2;
-				break;
-
 			case 0x02:
 				width = 2; height = 1;
 				number &= ~1;
+				break;
+
+			case 0x04:
+				width = 1; height = 2;
+				number &= ~2;
 				break;
 
 			case 0x00:
@@ -306,18 +374,18 @@ void k007121_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprec
 				{
 					flipx = xflip;
 					flipy = yflip;
-					destx = global_x_offset + sx + x * 8;
+					destx = sx + x * 8;
 					desty = sy + y * 8;
 				}
 
-				if (pri_mask != (uint32_t)-1)
+				if (pri_mask != uint32_t(~0))
 				{
 					gfx(0)->prio_transmask(bitmap,cliprect,
 							number + x_offset[ex] + y_offset[ey],
 							color,
-							flipx,flipy,
-							destx,desty,
-							priority_bitmap,pri_mask,
+							flipx, flipy,
+							destx, desty,
+							priority_bitmap, pri_mask,
 							transparent_mask);
 				}
 				else
@@ -325,8 +393,8 @@ void k007121_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprec
 					gfx(0)->transmask(bitmap,cliprect,
 							number + x_offset[ex] + y_offset[ey],
 							color,
-							flipx,flipy,
-							destx,desty,
+							flipx, flipy,
+							destx, desty,
 							transparent_mask);
 				}
 			}
@@ -334,4 +402,53 @@ void k007121_device::sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprec
 
 		source += inc;
 	}
+}
+
+void k007121_device::sprites_buffer()
+{
+	if (!m_spriteram)
+		return;
+
+	const uint8_t *source = m_spriteram;
+
+	// There is 0x1000 sprite ram, which is broken up into 2 0x800 banks.
+	// The following control bit determines which bank is used.
+	if (BIT(m_ctrlram[3], 3))
+		source += 0x800;
+
+	// It's actually a framebuffer, but it's sufficient to just buffer the sprite list.
+	memcpy(m_sprites_buffer, source, sizeof(m_sprites_buffer));
+}
+
+
+/*****************************************************************************
+    INTERRUPTS
+*****************************************************************************/
+
+TIMER_CALLBACK_MEMBER(k007121_device::scanline)
+{
+	int scanline = param;
+
+	// NMI 8 or 4 times per frame
+	const uint8_t nmi_mask = 0x10 << BIT(m_ctrlram[7], 4);
+	if (BIT(m_ctrlram[7], 0) && (scanline & ((nmi_mask << 1) - 1)) == nmi_mask)
+		m_nmi_cb(1);
+
+	// vblank
+	if (scanline == 240)
+	{
+		if (BIT(m_ctrlram[7], 2))
+			m_firq_cb(1);
+
+		if (BIT(m_ctrlram[7], 1))
+			m_irq_cb(1);
+
+		sprites_buffer();
+	}
+
+	scanline += 16;
+	if (scanline >= screen().height())
+		scanline = 0;
+
+	m_scanline_timer->adjust(screen().time_until_pos(scanline), scanline);
 }

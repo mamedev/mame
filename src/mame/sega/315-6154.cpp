@@ -22,7 +22,7 @@ void sega_315_6154_device::device_start()
 	pci_host_device::device_start();
 	set_spaces(&space(AS_PCI_MEMORY));
 	// never unmap addresses lower than start
-	memory_window_start = 0x80000000;
+	memory_window_start = 0xc0000000;
 	memory_window_end =   0xffffffff;
 	memory_offset = 0;
 
@@ -36,6 +36,7 @@ void sega_315_6154_device::device_start()
 	save_item(NAME(m_bases));
 	save_item(NAME(m_useconfig_14x));
 	save_item(NAME(m_useconfig_18x));
+	save_item(NAME(m_mode));
 }
 
 void sega_315_6154_device::device_reset()
@@ -70,6 +71,9 @@ void sega_315_6154_device::regenerate_config_mapping()
 
 u32 sega_315_6154_device::registers_r(offs_t offset)
 {
+	if (offset == 0)
+		return m_mode;
+
 	return m_registers[offset];
 }
 

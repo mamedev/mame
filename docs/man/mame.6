@@ -907,7 +907,7 @@ Split full screen image across monitors. Default is OFF (\-nouseallheads).
 .SS Sound options
 .\" *******************************************************
 .TP
-.B \-sound\fR [\fIsdl\fR|\fIportaudio\fR|\fIcoreaudio\fR|\fIdsound\fR|\fIxaudio2\fR|\fInone\fR]
+.B \-sound\fR [\fIsdl\fR|\fIportaudio\fR|\fIcoreaudio\fR|\fIwasapi\fR|\fIxaudio2\fR|\fInone\fR]
 Specifies which sound subsystem to use for audio output:
 .br
 \fBsdl\fR  uses the Simple DirectMedia Layer audio output system
@@ -916,17 +916,18 @@ Specifies which sound subsystem to use for audio output:
 \fBportaudio\fR  uses the PortAudio library which supports low-latency
 output and multiple audio APIs.
 .br
-\fBcoreaudio\fR  uses the Core Audio API which supports low-latency
-output and AudioUnit effects (only available on macOS).
+\fBcoreaudio\fR  uses the CoreAudio API (supports AudioUnit effects, only
+available on macOS).
 .br
-\fBdsound\fR  uses the DirectSound API (only available on Windows).
+\fBwasapi\fR  uses the Windows Audio Session API (WASAPI) (only available
+on Windows).
 .br
-\fBxaudio2\fR  uses the XAudio2 API which supports low-latency output
-(only available on Windows).
+\fBxaudio2\fR  uses the XAudio2 API (does not support sound input, only
+available on Windows).
 .br
 \fBnone\fR  produces no audio output.
 .br
-Default is 'dsound' on Windows, 'coreaudio' on macOS or 'sdl' on other
+Default is 'wasapi' on Windows, 'coreaudio' on macOS or 'sdl' on other
 platforms.
 .TP
 .B \-samplerate, \-srf \fIvalue
@@ -938,10 +939,6 @@ cause higher audio quality but slower emulation speed. The default is
 .B \-[no]samples
 Use samples if available. The default is ON (\-samples).
 .TP
-.B \-[no]compressor
-Enable audio compressor. It temporarily reduces the overall volume when
-the audio output is overdriven. The default is ON (\-compressor).
-.TP
 .B \-volume, \-vol \fIvalue
 Sets the startup volume. It can later be changed with the user interface
 (see Keys section). The volume is in dB: e.g.,
@@ -950,13 +947,12 @@ Sets the startup volume. It can later be changed with the user interface
 .\" SDL specific
 .\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 .TP
-.B \-audio_latency \fIvalue
+.B \-audio_latency, \-alat \fIvalue
 This controls the amount of latency built into the audio streaming.
-The exact behavior depends on the selected audio output module (see
-the \-sound option).  Smaller values provide less audio delay while
-requiring better system performance.  Higher values increase audio
-delay but may help avoid buffer under-runs and audio interruptions.
-The default is 1.
+Smaller values provide less audio delay while requiring better system
+performance.  Higher values increase audio delay but may help avoid
+buffer under-runs and audio interruptions.  The default is 0 and will
+pick a sane duration.
 .\"
 .\" *******************************************************
 .SS Input options

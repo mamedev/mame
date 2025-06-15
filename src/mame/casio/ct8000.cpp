@@ -432,7 +432,6 @@ void ct8000_state::p7b_w(u8 data)
 	// mute is applied to mixed/filtered 931 output before the stereo chorus
 	const double gain = BIT(data, 3) ? 1.0 : 0.0;
 	m_mixer->set_input_gain(0, gain);
-	m_mixer->set_input_gain(1, gain);
 }
 
 //**************************************************************************

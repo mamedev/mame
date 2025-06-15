@@ -151,6 +151,13 @@ TILEMAP_MAPPER_MEMBER(deco_bac06_device::tile_shape0_scan)
 
 TILEMAP_MAPPER_MEMBER(deco_bac06_device::tile_shape1_scan)
 {
+	// TODO: bandit ending wants this arrangement for truck layer at [2]
+//	if ((m_pf_control_0[0] & 2) == 0)
+//	{
+//		int col_mask = num_cols - 1;
+//		return (row & 0xf) + ((col_mask - (col & col_mask)) << 4) + ((row & 0xf0) << 5);
+//	}
+
 	//if (m_pf_control_0[0] & 2) // Needs testing on real hardware, not used by any game
 	//  return (row & 0xf) + ((col & 0x1f) << 4) + ((col & 0xf0) << 5);
 	return (col & 0xf) + ((row & 0x1f) << 4) + ((col & 0xf0) << 5);

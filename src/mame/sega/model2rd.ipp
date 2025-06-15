@@ -145,8 +145,8 @@ void MODEL2_FUNC_NAME(int32_t scanline, const extent_t& extent, const m2_poly_ex
 	float dvoz = extent.param[2].dpdx;
 	int     x;
 
-	tex_x_mask  = tex_width - 1;
-	tex_y_mask  = tex_height - 1;
+	tex_x_mask  = (tex_mirr_x ? (tex_width * 2) : tex_width) - 1;
+	tex_y_mask  = (tex_mirr_y ? (tex_height * 2) : tex_height) - 1;
 
 	colorbase = state->m_palram[(colorbase + 0x1000)] & 0x7fff;
 
@@ -172,11 +172,11 @@ void MODEL2_FUNC_NAME(int32_t scanline, const extent_t& extent, const m2_poly_ex
 		u2 = (u >> 8) & tex_x_mask;
 		v2 = (v >> 8) & tex_y_mask;
 
-		if ( tex_mirr_x )
-			u2 = ( tex_width - 1 ) - u2;
+		if (tex_mirr_x && u2 >= tex_width)
+			u2 = (tex_width * 2 - 1) - u2;
 
-		if ( tex_mirr_y )
-			v2 = ( tex_height - 1 ) - v2;
+		if (tex_mirr_y && v2 >= tex_height)
+			v2 = (tex_height * 2 - 1) - v2;
 
 		t = get_texel( tex_x, tex_y, u2, v2, sheet );
 

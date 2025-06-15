@@ -1,44 +1,27 @@
 // license:LGPL-2.1+
 // copyright-holders:David Haywood, Angelo Salese, Olivier Galibert, Mariusz Wojcieszek, R. Belmont
-/************************************************************************************************************************
+/**************************************************************************************************
 
-    stv.cpp
+stv.cpp
 
-    ST-V hardware
-    This file contains all game specific overrides
+TODO:
+- vfremix: https://mametesters.org/view.php?id=4445
 
-    TODO:
-    - clean this up!
-    - Properly emulate the protection chips, used by several games
+- colmns97: https://mametesters.org/view.php?id=4187 extremely illegal SCU DMA transfers targeting
+  SCSP area, saturn:columns port has no problem with those.
 
-    (per-game issues)
-    - stress: accesses the Sound Memory Expansion Area (0x05a80000-0x05afffff), unknown purpose;
+- smleague / finlarch: it randomly hangs / crashes, it works if you use a ridiculous
+  set_maximum_quantum() number, might need strict SH-2 synching or it's actually a m68k comms issue.
 
-    - smleague / finlarch: it randomly hangs / crashes, it works if you use a ridiculous set_maximum_quantum() number,
-      might need strict SH-2 synching or it's actually a m68k comms issue.
+- danchih / danchiq: currently hangs randomly (regression).
 
-    - groovef: ugly back screen color, caused by incorrect usage of the Color Calculation function.
+- stress: accesses the Sound Memory Expansion Area (0x05a80000-0x05afffff), unknown purpose if any;
 
-    - myfairld: Apparently this game gives a black screen (either test mode and in-game mode), but let it wait for about
-      10 seconds and the game will load everything. This is because of a hellishly slow m68k sub-routine located at 54c2.
-      Likely to not be a bug but an in-game design issue.
+- critcrsh: 2 digits 7-seg LED stuck on hi-score during gameplay, has optional ticket dispenser;
+  Reference video: https://www.youtube.com/watch?v=O9PyIKdSFnU
 
-    - danchih / danchiq: currently hangs randomly (regression).
 
-    - vfremix: when you play as Akira, there is a problem with third match: game doesn't upload all textures
-      and tiles and doesn't enable display, although gameplay is normal - wait a while to get back
-      to title screen after losing a match (fixed?)
-
-    - vfremix: various problems with SCU DSP: Jeffry causes a black screen hang. Akira's kick sometimes
-      sends the opponent out of the ring from whatever position.
-
-    - critcrsh: has a 2 digits 7-seg LED. The current implementation works in test mode, but during gameplay it's stuck
-      on the day's best score, while according to reports it should update the number of critters you have crushed.
-      At the end of the round it outputs the number of crushed critters. Also needs ticket dispenser hookup (redemption
-      is disabled by the game by default, but can be turned on in test menu).
-      Reference video: https://www.youtube.com/watch?v=O9PyIKdSFnU
-
-************************************************************************************************************************/
+***************************************************************************************************/
 
 #include "emu.h"
 #include "stv.h"
@@ -3175,6 +3158,20 @@ ROM_START( micrombc ) // set to 1p
 	ROM_LOAD( "micrombc.nv", 0x0000, 0x0080, CRC(6e89815f) SHA1(4478f614fb61859f4ee7bf55462f737387887e6f) )
 ROM_END
 
+ROM_START( chalgolf ) // set to 1p
+	STV_BIOS
+
+	ROM_REGION32_BE( 0x3000000, "cart", ROMREGION_ERASE00 ) /* SH2 code */
+	ROM_LOAD16_WORD_SWAP( "ic22.bin",     0x0200000, 0x200000, CRC(1d887acc) SHA1(11a35c22c5ac71fc15470e0792f426c8735b854d) )
+	ROM_LOAD16_WORD_SWAP( "ic24.bin",     0x0400000, 0x200000, CRC(6091ee88) SHA1(ef26245a30196bccbc472aa377611e855ded76d0) )
+	ROM_LOAD16_WORD_SWAP( "ic26.bin",     0x0600000, 0x200000, CRC(aff38d56) SHA1(0b4429d8940d0b84af06f24b051ad667ec389fb9) )
+	ROM_LOAD16_WORD_SWAP( "ic28.bin",     0x0800000, 0x200000, CRC(571cc8da) SHA1(cf469c8ed15f7e760519a6e4c15cd76644ff253b) )
+	ROM_LOAD16_WORD_SWAP( "ic30.bin",     0x0a00000, 0x200000, CRC(a67eabb0) SHA1(80d93b18779c7ab46917f5947838817a38ddb1c2) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", ROMREGION_ERASE00 ) // preconfigured to 1 player
+	ROM_LOAD( "chalgolf.nv", 0x0000, 0x0080, CRC(6e89815f) SHA1(4478f614fb61859f4ee7bf55462f737387887e6f) )
+ROM_END
+
 ROM_START( choroqhr ) // set to 1p
 	STV_BIOS
 
@@ -3938,7 +3935,7 @@ GAME( 1996, stvbios,   0,       stv_slot, stv,      stv_state,   init_stv,      
 GAME( 1998, astrass,   stvbios, stv_5881, stv6b,    stv_state,   init_astrass,    ROT0,   "Sunsoft",                      "Astra SuperStars (J 980514 V1.002)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1995, bakubaku,  stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Baku Baku Animal (J 950407 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, batmanfr,  stvbios, batmanfr, batmanfr, stv_state,   init_batmanfr,   ROT0,   "Acclaim",                      "Batman Forever (JUE 960507 V1.000)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, colmns97,  stvbios, stv,      stv,      stv_state,   init_colmns97,   ROT0,   "Sega",                         "Columns '97 (JET 961209 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, colmns97,  stvbios, stv,      stv,      stv_state,   init_colmns97,   ROT0,   "Sega",                         "Columns '97 (JET 961209 V1.000)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1997, cotton2,   stvbios, stv,      stv,      stv_state,   init_cotton2,    ROT0,   "Success",                      "Cotton 2 (JUET 970902 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, cottonbm,  stvbios, stv,      stv,      stv_state,   init_cottonbm,   ROT0,   "Success",                      "Cotton Boomerang (JUET 980709 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAMEL(1995, critcrsh,  stvbios, critcrsh, critcrsh, stv_state,   init_stv,        ROT0,   "Sega",                         "Critter Crusher (EA 951204 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS, layout_critcrsh )
@@ -4049,6 +4046,7 @@ GAME( 1998, twsoc98,   twcup98, stv_5881, stv,      stv_state,   init_twcup98,  
 GAME( 1996, magzun,    stvbios, magzun,   stv,      stv_state,   init_magzun,     ROT0,   "Sega",                         "Magical Zunou Power (J 961031 V1.000)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_MICROPHONE )
 GAME( 1998, yattrmnp,  stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Yatterman Plus (J 981006 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // needs emulation of the medal specific hardware
 GAME( 1998, choroqhr,  stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega / Takara",                "Choro Q Hyper Racing 5 (J 981230 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, chalgolf,  stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Challenge Golf (J 990326 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, fanzonem,  stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Fantasy Zone (medal game, REV.A) (J 990202 V1.000)", MACHINE_NOT_WORKING ) // require SH2's SCI serial port emulated, to communicate with coin/medal-related I/O board
 GAME( 2000, sackids,   stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Soreyuke Anpanman Crayon Kids (J 001026 V1.000)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2001, dfeverg,   stvbios, stv,      stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Dancing Fever Gold (J 000821 V2.001)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
@@ -4056,18 +4054,3 @@ GAME( 2001, dfeverg,   stvbios, stv,      stv,      stv_state,   init_stv,      
 /* CD games */
 GAME( 1995, sfish2,    0,       stvcd,    stv,      stv_state,   init_stv_us,     ROT0,   "Sega",                         "Sport Fishing 2 (UET 951106 V1.10e)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
 GAME( 1995, sfish2j,   sfish2,  stvcd,    stv,      stv_state,   init_stv,        ROT0,   "Sega",                         "Sport Fishing 2 (J 951201 V1.100)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
-
-/*
-This is the known list of undumped ST-V games:
-    Kiss Off (US version of mausuke)
-    Baku Baku (US version of Baku Baku Animal,dunno if it exists for the ST-V)
-    Sport Fishing
-    Aroma Club
-    Movie Club
-    Name Club (other versions)
-    Print Club 2 (other versions)
-    Youen Denshi Mahjong Yuugi Gal Jan
-    NBA Action (?)
-    Quiz Omaeni Pipon Cho! (?)
-Others may exist as well...
-*/

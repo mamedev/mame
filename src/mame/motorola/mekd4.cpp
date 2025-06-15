@@ -251,7 +251,6 @@ FS 0 to F
 #include "machine/input_merger.h"
 #include "machine/mc14411.h"
 #include "machine/timer.h"
-#include "sound/wave.h"
 #include "video/pwm.h"
 
 // MEK68R2

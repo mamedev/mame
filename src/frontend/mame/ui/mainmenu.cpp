@@ -161,10 +161,14 @@ void menu_main::populate()
 	if (network_interface_enumerator(machine().root_device()).first() != nullptr)
 		item_append(_("menu-main", "Network Devices"), 0, (void*)NETWORK_DEVICES);
 
-	item_append(_("menu-main", "Audio Mixer"), 0, (void *)AUDIO_MIXER);
+	if (!machine().sound().no_sound() && sound_interface_enumerator(machine().root_device()).first() != nullptr)
+	{
+		item_append(_("menu-main", "Audio Mixer"), 0, (void *)AUDIO_MIXER);
 
-	item_append(_("menu-main", "Audio Effects"), 0, (void *)AUDIO_EFFECTS);
+		item_append(_("menu-main", "Audio Effects"), 0, (void *)AUDIO_EFFECTS);
+	}
 
+	// FIXME: should also check for OSD sliders (same for tilde menu)
 	if (!ui().get_slider_list().empty())
 		item_append(_("menu-main", "Slider Controls"), 0, (void *)SLIDERS);
 
@@ -198,7 +202,7 @@ void menu_main::populate()
 
 	item_append(menu_item_type::SEPARATOR);
 
-//  item_append(_("menu-main", "Quit from System"), 0, (void *)QUIT_GAME);
+//  item_append(_("menu-main", "Quit From System"), 0, (void *)QUIT_GAME);
 
 	if (machine_phase::INIT == m_phase)
 	{

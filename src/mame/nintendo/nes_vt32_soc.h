@@ -20,32 +20,49 @@
 class nes_vt32_soc_device : public nes_vt09_soc_device
 {
 public:
-	nes_vt32_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	nes_vt32_soc_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
 
 protected:
-	nes_vt32_soc_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock);
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	nes_vt32_soc_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock);
 
 	virtual void device_add_mconfig(machine_config& config) override ATTR_COLD;
 
-	void nes_vt_fp_map(address_map &map) ATTR_COLD;
+	void nes_vt32_soc_map(address_map &map) ATTR_COLD;
 
-	uint8_t vtfp_4119_r();
-	void vtfp_411e_encryption_state_w(uint8_t data);
-	void vtfp_412c_extbank_w(uint8_t data);
-	uint8_t vtfp_412d_r();
-	void vtfp_4242_w(uint8_t data);
-	void vtfp_4a00_w(uint8_t data);
-	void vtfp_411d_w(uint8_t data);
-	uint8_t vthh_414a_r();
+	virtual void scrambled_8000_w(u16 offset, u8 data) override;
+
+	u8 read_onespace_bus(offs_t offset);
+
+	u8 vtfp_4119_r();
+	void vtfp_411e_encryption_state_w(u8 data);
+	void vtfp_412c_extbank_w(u8 data);
+	u8 vtfp_412d_r();
+	void vtfp_4242_w(u8 data);
+	void vtfp_4a00_w(u8 data);
+	void vtfp_411d_w(u8 data);
+	u8 vthh_414a_r();
+	virtual u8 spr_r(offs_t offset) override;
+	virtual u8 chr_r(offs_t offset) override;
+
+private:
+	u8 vt32_palette_r(offs_t offset);
+	void vt32_palette_w(offs_t offset, u8 data);
+
+	int m_ppu_chr_data_scramble;
 };
 
 class nes_vt32_soc_pal_device : public nes_vt32_soc_device
 {
 public:
-	nes_vt32_soc_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock);
+	nes_vt32_soc_pal_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
 
 protected:
 	virtual void device_add_mconfig(machine_config& config) override ATTR_COLD;
+
+	virtual void do_pal_timings_and_ppu_replacement(machine_config& config) override;
 };
 
 

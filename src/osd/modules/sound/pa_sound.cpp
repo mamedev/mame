@@ -1,12 +1,12 @@
 // license:BSD-3-Clause
-// copyright-holders:intealls, R.Belmont
+// copyright-holders:O. Galibert
 /***************************************************************************
 
     pa_sound.c
 
     PortAudio interface.
 
-*******************************************************************c********/
+***************************************************************************/
 
 #include "sound_module.h"
 
@@ -18,26 +18,12 @@
 #include "osdcore.h"
 
 #include <portaudio.h>
-
-#include <algorithm>
-#include <atomic>
-#include <climits>
-#include <cmath>
-#include <fstream>
-#include <iostream>
-#include <sstream>
-
-#ifdef _WIN32
-#include "pa_win_wasapi.h"
-#endif
-
+#include <mutex>
+#include <map>
 
 namespace osd {
 
 namespace {
-
-#define LOG_FILE   "pa.log"
-#define LOG_BUFCNT 0
 
 class sound_pa : public osd_module, public sound_module
 {
@@ -50,406 +36,277 @@ public:
 	virtual int init(osd_interface &osd, osd_options const &options) override;
 	virtual void exit() override;
 
-	// sound_module
+	// Sadly, according to the documentation, "Some platforms don't
+	// support opening multiple streams on the same device.".  And
+	// there doesn't seem to be a way to test for it.  So we're stuck
+	// with the lowest level of osd support.
 
-	virtual void stream_sink_update(uint32_t, const s16 *buffer, int samples_this_frame) override;
+	// In addition, the hotplug branch has been stagnant since 2016,
+	// no idea if it will ever be completed and merged.  Meanwhile, no
+	// device hotplugging for you.
+
+	virtual bool external_per_channel_volume() override { return false; }
+	virtual bool split_streams_per_source() override { return false; }
+
+	virtual uint32_t get_generation() override;
+	virtual osd::audio_info get_information() override;
+	virtual uint32_t stream_sink_open(uint32_t node, std::string name, uint32_t rate) override;
+	virtual uint32_t stream_source_open(uint32_t node, std::string name, uint32_t rate) override;
+	virtual void stream_close(uint32_t id) override;
+	virtual void stream_sink_update(uint32_t id, const int16_t *buffer, int samples_this_frame) override;
+	virtual void stream_source_update(uint32_t id, int16_t *buffer, int samples_this_frame) override;
 
 private:
-	// Lock free SPSC ring buffer
-	template <typename T>
-	struct audio_buffer {
-		T*               buf;
-		int              size;
-		int              reserve;
-		std::atomic<int> playpos, writepos;
+	struct stream_info {
+		sound_pa *m_manager;
+		PaStream *m_stream;
+		uint32_t m_channels;
+		uint32_t m_id;
+		uint32_t m_devid;
+		abuffer m_buffer;
 
-		audio_buffer(int size, int reserve) : size(size + reserve), reserve(reserve) {
-			playpos = writepos = 0;
-			buf = new T[this->size];
-		}
-
-		~audio_buffer() { delete[] buf; }
-
-		int count() {
-			int diff = writepos - playpos;
-			return diff < 0 ? size + diff : diff;
-		}
-
-		void increment_writepos(int n) {
-			writepos.store((writepos + n) % size);
-		}
-
-		int write(const T* src, int n) {
-			n = std::min<int>(n, size - reserve - count());
-
-			if (writepos + n > size) {
-				memcpy(buf + writepos, src, sizeof(T) * (size - writepos));
-				memcpy(buf, src + (size - writepos), sizeof(T) * (n - (size - writepos)));
-			} else {
-				memcpy(buf + writepos, src, sizeof(T) * n);
-			}
-
-			increment_writepos(n);
-
-			return n;
-		}
-
-		void increment_playpos(int n) {
-			playpos.store((playpos + n) % size);
-		}
-
-		int read(T* dst, int n) {
-			n = std::min<int>(n, count());
-
-			if (playpos + n > size) {
-				std::memcpy(dst, buf + playpos, sizeof(T) * (size - playpos));
-				std::memcpy(dst + (size - playpos), buf, sizeof(T) * (n - (size - playpos)));
-			} else {
-				std::memcpy(dst, buf + playpos, sizeof(T) * n);
-			}
-
-			increment_playpos(n);
-
-			return n;
-		}
-
-		int clear(int n) {
-			n = std::min<int>(n, size - reserve - count());
-
-			if (writepos + n > size) {
-				std::memset(buf + writepos, 0, sizeof(T) * (size - writepos));
-				std::memset(buf, 0, sizeof(T) * (n - (size - writepos)));
-			} else {
-				std::memset(buf + writepos, 0, sizeof(T) * n);
-			}
-
-			increment_writepos(n);
-
-			return n;
-		}
+		stream_info(sound_pa *manager, uint32_t channels, uint32_t id, uint32_t devid) :
+			m_manager(manager), m_stream(nullptr), m_channels(channels), m_id(id), m_devid(devid), m_buffer(channels)
+		{ }
 	};
 
-	enum
-	{
-		LATENCY_MIN = 0,
-		LATENCY_MAX = 5,
-	};
+	osd::audio_info m_info;
 
-	int                 callback(s16* output_buffer, size_t number_of_frames);
-	static int          _callback(const void*,
-								  void *output_buffer,
-								  unsigned long number_of_frames,
-								  const PaStreamCallbackTimeInfo*,
-								  PaStreamCallbackFlags,
-								  void *arg) { return static_cast<sound_pa*> (arg)->
-									callback((s16*) output_buffer, number_of_frames * 2); }
+	// Used when the structure changes but we're certain the stream callbacks won't be hit.
+	// In our case, that means closure callback changing the streams structure.
+	std::mutex m_gen_mutex;
 
-	PaDeviceIndex       list_get_devidx(const char* api_str, const char* device_str);
+	// Used when the stream callbacks need to be protected.
+	// In our case, when audio buffers are manipulated on a running stream.
+	// There is no real need to have one per stream.
+	std::mutex m_stream_mutex;
 
-	PaStream*           m_pa_stream;
-	PaError             err;
+	std::map<uint32_t, stream_info> m_streams;
 
-	int                 m_sample_rate;
-	int                 m_audio_latency;
+	uint32_t m_stream_id;
+	float m_audio_latency;
 
-	audio_buffer<s16>*  m_ab;
+	int stream_callback(stream_info *stream, const void *input, void *output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags);
+	static int s_stream_callback(const void *input, void *output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void *userData);
 
-	std::atomic<bool>   m_has_underflowed;
-	std::atomic<bool>   m_has_overflowed;
-	unsigned            m_underflows;
-	unsigned            m_overflows;
-
-	int                 m_skip_threshold; // this many samples in the buffer ~1 second in a row count as an overflow
-	osd_ticks_t         m_osd_ticks;
-	osd_ticks_t         m_skip_threshold_ticks;
-	osd_ticks_t         m_osd_tps;
-	int                 m_buffer_min_ct;
-
-#if LOG_BUFCNT
-	std::stringstream   m_log;
-#endif
+	void stream_finished_callback(stream_info *stream);
+	static void s_stream_finished_callback(void *userData);
 };
 
 int sound_pa::init(osd_interface &osd, osd_options const &options)
 {
-	m_sample_rate = options.sample_rate();
-	if (!m_sample_rate)
-		return 0;
+	// Portaudio does not seem to have any information w.r.t
+	// channel positioning, so we'll use the sdl conventions.
 
-	PaStreamParameters   stream_params;
-	const PaStreamInfo*  stream_info;
-	const PaHostApiInfo* api_info;
-	const PaDeviceInfo*  device_info;
+	enum { FL, FR, FC, LFE, BL, BR, BC, SL, SR, AUX };
+	static const char *const posname[10] = { "FL", "FR", "FC", "LFE", "BL", "BR", "BC", "SL", "SR", "AUX" };
 
-	unsigned long        frames_per_callback = paFramesPerBufferUnspecified;
-	double               callback_interval;
+	static const std::array<double, 3> pos3d[10] = {
+		{ -0.2,  0.0,  1.0 },
+		{  0.2,  0.0,  1.0 },
+		{  0.0,  0.0,  1.0 },
+		{  0.0, -0.5,  1.0 },
+		{ -0.2,  0.0, -0.5 },
+		{  0.2,  0.0, -0.5 },
+		{  0.0,  0.0, -0.5 },
+		{ -0.2,  0.0,  0.0 },
+		{  0.2,  0.0,  0.0 },
+		{  0.0,  0.0, 10.0 },
+	};
 
-	m_underflows            = 0;
-	m_overflows             = 0;
-	m_has_overflowed        = false;
-	m_has_underflowed       = false;
-	m_osd_ticks             = 0;
-	m_skip_threshold_ticks  = 0;
-	m_osd_tps               = osd_ticks_per_second();
-	m_buffer_min_ct         = INT_MAX;
-	m_audio_latency         = std::clamp<int>(options.audio_latency(), LATENCY_MIN, LATENCY_MAX);
+	static const uint32_t positions[9][9] = {
+		{ FC },
+		{ FL, FR },
+		{ FL, FR, LFE },
+		{ FL, FR, BL, BR },
+		{ FL, FR, LFE, BL, BR },
+		{ FL, FR, FC, LFE, BL, BR },
+		{ FL, FR, FC, LFE, BC, SL, SR },
+		{ FL, FR, FC, LFE, BL, BR, SL, SR },
+		{ FL, FR, AUX, AUX, AUX, AUX, AUX, AUX, AUX }, // pa over alsa emulation of pipewire or pulse is a mess...
+	};
 
-	try {
-		m_ab = new audio_buffer<s16>(m_sample_rate, 2);
-	} catch (std::bad_alloc&) {
-		osd_printf_error("PortAudio: Unable to allocate audio buffer, sound is disabled\n");
-		goto error;
+	PaError err = Pa_Initialize();
+	if(err) {
+		osd_printf_error("PortAudio error: %s\n", Pa_GetErrorText(err));
+		return 1;
 	}
 
-	err = Pa_Initialize();
+	m_info.m_generation = 1;
+	m_info.m_nodes.resize(Pa_GetDeviceCount());
+	for(PaDeviceIndex dev = 0; dev != Pa_GetDeviceCount(); dev++) {
+		const PaDeviceInfo *di = Pa_GetDeviceInfo(dev);
+		const PaHostApiInfo *ai = Pa_GetHostApiInfo(di->hostApi);
+		auto &node = m_info.m_nodes[dev];
+		node.m_name = util::string_format("%s: %s", ai->name, di->name);
+		node.m_display_name = util::string_format("%s: %s", ai->name, di->name);
+		node.m_id = dev + 1;
+		node.m_rate.m_default_rate = node.m_rate.m_min_rate = node.m_rate.m_max_rate = di->defaultSampleRate;
+		node.m_sinks = di->maxOutputChannels;
+		node.m_sources = di->maxInputChannels;
 
-	if (err != paNoError) goto pa_error;
-
-	stream_params.device = list_get_devidx(options.pa_api(), options.pa_device());
-
-	stream_params.channelCount = 2;
-	stream_params.sampleFormat = paInt16;
-	stream_params.hostApiSpecificStreamInfo = NULL;
-
-	device_info = Pa_GetDeviceInfo(stream_params.device);
-
-	// 0 = use default
-	stream_params.suggestedLatency = options.pa_latency() ? options.pa_latency() : device_info->defaultLowOutputLatency;
-
-#ifdef _WIN32
-	PaWasapiStreamInfo wasapi_stream_info;
-
-	// if requested latency is less than 20 ms, we need to use exclusive mode
-	if (Pa_GetHostApiInfo(device_info->hostApi)->type == paWASAPI && stream_params.suggestedLatency < 0.020)
-	{
-		wasapi_stream_info.size = sizeof(PaWasapiStreamInfo);
-		wasapi_stream_info.hostApiType = paWASAPI;
-		wasapi_stream_info.flags = paWinWasapiExclusive;
-		wasapi_stream_info.version = 1;
-
-		stream_params.hostApiSpecificStreamInfo = &wasapi_stream_info;
-
-		// for latencies lower than ~16 ms, we need to use event mode
-		if (stream_params.suggestedLatency < 0.016)
-		{
-			// only way to control output latency with event mode
-			frames_per_callback = stream_params.suggestedLatency * m_sample_rate;
-
-			// needed for event mode to work
-			stream_params.suggestedLatency = 0;
+		int channels = std::max(di->maxInputChannels, di->maxOutputChannels);
+		int index = std::min(channels, 9) - 1;
+		for(uint32_t port = 0; port != channels; port++) {
+			uint32_t pos = positions[index][std::min(8U, port)];
+			node.m_port_names.push_back(posname[pos]);
+			node.m_port_positions.push_back(pos3d[pos]);
 		}
 	}
-#endif
 
-	err = Pa_OpenStream(&m_pa_stream,
-						NULL,
-						&stream_params,
-						m_sample_rate,
-						frames_per_callback,
-						paClipOff,
-						_callback,
-						this);
+	auto dc = [](PaDeviceIndex dev) -> int { return dev == paNoDevice ? 0 : dev+1; };
+	m_info.m_default_sink = dc(Pa_GetDefaultOutputDevice());
+	m_info.m_default_source = dc(Pa_GetDefaultInputDevice());
 
-	if (err != paNoError) goto pa_error;
-
-	stream_info = Pa_GetStreamInfo(m_pa_stream);
-	api_info = Pa_GetHostApiInfo(device_info->hostApi);
-
-	// in milliseconds
-	callback_interval = static_cast<double>(stream_info->outputLatency) * 1000.0;
-
-	// clamp to a probable figure
-	callback_interval = std::min<double>(callback_interval, 20.0);
-
-	if (m_audio_latency == 0)
-	{
-		// very-low-latency mode (set audio_latency to 0); pa_latency controls allowable audio jitter
-		m_skip_threshold = (options.pa_latency() ? options.pa_latency() : device_info->defaultLowOutputLatency) * m_sample_rate * 2 + 0.5f;
-	}
-	else
-	{
-		// set the best guess callback interval to allowed count, each audio_latency step > 1 adds 20 ms
-		m_skip_threshold = ((std::max<double>(callback_interval, 10.0) + (m_audio_latency - 1) * 20.0) / 1000.0) * m_sample_rate * 2 + 0.5f;
-	}
-
-	osd_printf_verbose("PortAudio: Using device \"%s\" on API \"%s\"\n", device_info->name, api_info->name);
-	osd_printf_verbose("PortAudio: Sample rate is %0.0f Hz, device output latency is %0.2f ms\n",
-		stream_info->sampleRate, stream_info->outputLatency * 1000.0);
-	osd_printf_verbose("PortAudio: Allowed additional buffering latency is %0.2f ms/%d frames\n",
-		(m_skip_threshold / 2.0) / (m_sample_rate / 1000.0), m_skip_threshold / 2);
-
-	err = Pa_StartStream(m_pa_stream);
-
-	if (err != paNoError) goto pa_error;
+	m_stream_id = 1;
+	m_audio_latency = options.audio_latency() * 20e-3;
 
 	return 0;
-
-pa_error:
-	delete m_ab;
-	osd_printf_error("PortAudio error: %s\n", Pa_GetErrorText(err));
-	Pa_Terminate();
-error:
-	m_sample_rate = 0;
-	return -1;
-}
-
-PaDeviceIndex sound_pa::list_get_devidx(const char* api_str, const char* device_str)
-{
-	PaDeviceIndex selected_devidx = -1;
-
-	for (PaHostApiIndex api_idx = 0; api_idx < Pa_GetHostApiCount(); api_idx++)
-	{
-		const PaHostApiInfo *api_info = Pa_GetHostApiInfo(api_idx);
-
-		osd_printf_verbose("PortAudio: API %s has %d devices\n", api_info->name, api_info->deviceCount);
-
-		for (int api_devidx = 0; api_devidx < api_info->deviceCount; api_devidx++)
-		{
-			PaDeviceIndex devidx = Pa_HostApiDeviceIndexToDeviceIndex(api_idx, api_devidx);
-			const PaDeviceInfo *device_info = Pa_GetDeviceInfo(devidx);
-
-			// specified API and device is found
-			if (!strcmp(api_str, api_info->name) && !strcmp(device_str, device_info->name))
-				selected_devidx = devidx;
-
-			// if specified device cannot be found, use the default device of the specified API
-			if (!strcmp(api_str, api_info->name) && api_devidx == api_info->deviceCount - 1 && selected_devidx == -1)
-				selected_devidx = api_info->defaultOutputDevice;
-
-			osd_printf_verbose("PortAudio: %s: \"%s\"%s\n",
-				api_info->name, device_info->name, api_info->defaultOutputDevice == devidx ? " (default)" : "");
-		}
-	}
-
-	if (selected_devidx < 0)
-	{
-		osd_printf_verbose("PortAudio: Unable to find specified API or device or none set, reverting to default\n");
-		return Pa_GetDefaultOutputDevice();
-	}
-
-	return selected_devidx;
-}
-
-int sound_pa::callback(s16* output_buffer, size_t number_of_samples)
-{
-	int buf_ct = m_ab->count();
-
-	if (buf_ct >= number_of_samples)
-	{
-		m_ab->read(output_buffer, number_of_samples);
-
-		// keep track of the minimum buffer count, skip samples adaptively to respect the audio_latency setting
-		buf_ct -= number_of_samples;
-
-		if (buf_ct < m_buffer_min_ct)
-			m_buffer_min_ct = buf_ct;
-
-		// if we are below the threshold, reset the counter
-		if (buf_ct < m_skip_threshold)
-			m_skip_threshold_ticks = m_osd_ticks;
-
-		// if we have been above the set threshold for ~1 second, skip forward
-		if (m_osd_ticks - m_skip_threshold_ticks > m_osd_tps)
-		{
-			if (m_audio_latency == 0)
-			{
-				// in very-low-latency mode, always skip forward the whole way
-				// to prevent input from appearing delayed (due to sound cues getting delayed)
-				m_ab->increment_playpos(m_buffer_min_ct);
-				//osd_printf_verbose("PortAudio: skip ahead %d samples\n", m_buffer_min_ct);
-				m_has_overflowed = true;
-			}
-			else
-			{
-				int adjust = m_buffer_min_ct - m_skip_threshold / 2;
-
-				// if adjustment is less than two milliseconds, don't bother
-				if (adjust / 2 > m_sample_rate / 500) {
-					m_ab->increment_playpos(adjust);
-					m_has_overflowed = true;
-				}
-			}
-
-			m_skip_threshold_ticks = m_osd_ticks;
-			m_buffer_min_ct = INT_MAX;
-		}
-	}
-	else
-	{
-		m_ab->read(output_buffer, buf_ct);
-		std::memset(output_buffer + buf_ct, 0, (number_of_samples - buf_ct) * sizeof(s16));
-
-		// if stream_sink_update has been called, note the underflow
-		if (m_osd_ticks)
-			m_has_underflowed = true;
-
-		m_skip_threshold_ticks = m_osd_ticks;
-	}
-
-	return paContinue;
-}
-
-void sound_pa::stream_sink_update(uint32_t, const s16 *buffer, int samples_this_frame)
-{
-	if (!m_sample_rate)
-		return;
-
-#if LOG_BUFCNT
-	if (m_log.good())
-		m_log << m_ab->count() << std::endl;
-#endif
-
-	if (m_has_underflowed)
-	{
-		m_underflows++;
-		// add some silence to prevent immediate underflows
-		m_ab->clear(m_skip_threshold / 4);
-		m_has_underflowed = false;
-	}
-
-	if (m_has_overflowed)
-	{
-		m_overflows++;
-		m_has_overflowed = false;
-	}
-
-	m_ab->write(buffer, samples_this_frame * 2);
-
-	// for determining buffer overflows, take the sample here instead of in the callback
-	m_osd_ticks = osd_ticks();
 }
 
 void sound_pa::exit()
 {
-	if (!m_sample_rate)
-		return;
-
-#if LOG_BUFCNT
-	std::ofstream m_logfile(LOG_FILE);
-
-	if (m_log.good() && m_logfile.is_open()) {
-		m_logfile << m_log.str();
-		m_logfile.close();
-	}
-
-	if (!m_log.good() || m_logfile.fail())
-		osd_printf_error("PortAudio: Error writing log.\n");
-#endif
-
-	err = Pa_StopStream(m_pa_stream);  if (err != paNoError) goto error;
-	err = Pa_CloseStream(m_pa_stream); if (err != paNoError) goto error;
-
-	error:
-	if (err != paNoError)
-		osd_printf_error("PortAudio error: %s\n", Pa_GetErrorText(err));
-
 	Pa_Terminate();
-
-	delete m_ab;
-
-	if (m_overflows || m_underflows)
-		osd_printf_verbose("Sound: overflows=%d underflows=%d\n", m_overflows, m_underflows);
+	m_info.m_nodes.clear();
 }
+
+uint32_t sound_pa::get_generation()
+{
+	std::unique_lock<std::mutex> lock(m_gen_mutex);
+	return m_info.m_generation;
+}
+
+osd::audio_info sound_pa::get_information()
+{
+	std::unique_lock<std::mutex> lock(m_gen_mutex);
+	return m_info;
+}
+
+uint32_t sound_pa::stream_sink_open(uint32_t node, std::string name, uint32_t rate)
+{
+	std::unique_lock<std::mutex> lock(m_gen_mutex);
+	if(node < 1 || node > m_info.m_nodes.size())
+		return 0;
+
+	uint32_t id = m_stream_id ++;
+	auto si = m_streams.emplace(id, stream_info(this, m_info.m_nodes[node-1].m_sinks, id, node)).first;
+
+	PaStreamParameters op;
+	op.device = node - 1;
+	op.channelCount = m_info.m_nodes[node-1].m_sinks;
+	op.sampleFormat = paInt16;
+	op.suggestedLatency = (m_audio_latency > 0.0f) ? m_audio_latency : Pa_GetDeviceInfo(node - 1)->defaultLowOutputLatency;
+	op.hostApiSpecificStreamInfo = nullptr;
+
+	PaError err = Pa_OpenStream(&si->second.m_stream, nullptr, &op, rate, paFramesPerBufferUnspecified, 0, s_stream_callback, &si->second);
+	if(!err)
+		err = Pa_SetStreamFinishedCallback(si->second.m_stream, s_stream_finished_callback);
+	if(!err)
+		err = Pa_StartStream(si->second.m_stream);
+	if(err) {
+		osd_printf_error("PortAudio error: %s: %s\n", m_info.m_nodes[node-1].m_name, Pa_GetErrorText(err));
+		lock.unlock();
+		stream_close(id);
+		return 0;
+	}
+	return id;
+}
+
+uint32_t sound_pa::stream_source_open(uint32_t node, std::string name, uint32_t rate)
+{
+	std::unique_lock<std::mutex> lock(m_gen_mutex);
+	if(node < 1 || node > m_info.m_nodes.size())
+		return 0;
+
+	uint32_t id = m_stream_id ++;
+	auto si = m_streams.emplace(id, stream_info(this, m_info.m_nodes[node-1].m_sources, id, node)).first;
+
+	PaStreamParameters ip;
+	ip.device = node - 1;
+	ip.channelCount = m_info.m_nodes[node-1].m_sources;
+	ip.sampleFormat = paInt16;
+	ip.suggestedLatency = (m_audio_latency > 0.0f) ? m_audio_latency : Pa_GetDeviceInfo(node - 1)->defaultLowInputLatency;
+	ip.hostApiSpecificStreamInfo = nullptr;
+
+	PaError err = Pa_OpenStream(&si->second.m_stream, &ip, nullptr, rate, paFramesPerBufferUnspecified, 0, s_stream_callback, &si->second);
+	if(!err)
+		err = Pa_SetStreamFinishedCallback(si->second.m_stream, s_stream_finished_callback);
+	if(!err)
+		err = Pa_StartStream(si->second.m_stream);
+	if(err) {
+		osd_printf_error("PortAudio error: %s: %s\n", m_info.m_nodes[node-1].m_name, Pa_GetErrorText(err));
+		lock.unlock();
+		stream_close(id);
+		return 0;
+	}
+	return id;
+}
+
+void sound_pa::stream_close(uint32_t id)
+{
+	std::unique_lock<std::mutex> lock(m_gen_mutex);
+	auto si = m_streams.find(id);
+	if(si == m_streams.end())
+		return;
+	if(auto *s = si->second.m_stream; s) {
+		lock.unlock();
+		Pa_CloseStream(s);
+	}
+	else
+		m_streams.erase(si);
+}
+
+void sound_pa::stream_sink_update(uint32_t id, const int16_t *buffer, int samples_this_frame)
+{
+	std::unique_lock<std::mutex> lock(m_gen_mutex);
+	std::unique_lock<std::mutex> slock(m_stream_mutex);
+	auto si = m_streams.find(id);
+	if(si == m_streams.end())
+		return;
+	si->second.m_buffer.push(buffer, samples_this_frame);
+}
+
+void sound_pa::stream_source_update(uint32_t id, int16_t *buffer, int samples_this_frame)
+{
+	std::unique_lock<std::mutex> lock(m_gen_mutex);
+	std::unique_lock<std::mutex> slock(m_stream_mutex);
+	auto si = m_streams.find(id);
+	if(si == m_streams.end())
+		return;
+	si->second.m_buffer.get(buffer, samples_this_frame);
+}
+
+int sound_pa::stream_callback(stream_info *stream, const void *input, void *output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags)
+{
+	std::unique_lock<std::mutex> slock(m_stream_mutex);
+	if(output)
+		stream->m_buffer.get((int16_t *)output, frameCount);
+	if(input)
+		stream->m_buffer.push((const int16_t *)input, frameCount);
+	return 0;
+}
+
+int sound_pa::s_stream_callback(const void *input, void *output, unsigned long frameCount, const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags, void *userData)
+{
+	stream_info *si = (stream_info *)userData;
+	return si->m_manager->stream_callback(si, input, output, frameCount, timeInfo, statusFlags);
+}
+
+void sound_pa::stream_finished_callback(stream_info *stream)
+{
+	std::unique_lock<std::mutex> lock(m_gen_mutex);
+	auto si = m_streams.find(stream->m_id);
+	if(si == m_streams.end())
+		return;
+	m_streams.erase(si);
+}
+
+void sound_pa::s_stream_finished_callback(void *userData)
+{
+	stream_info *si = (stream_info *)userData;
+	return si->m_manager->stream_finished_callback(si);
+}
+
 
 } // anonymous namespace
 

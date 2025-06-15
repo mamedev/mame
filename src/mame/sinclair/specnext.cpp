@@ -32,7 +32,7 @@
 #include "specnext_sprites.h"
 #include "specnext_tiles.h"
 
-#include "bus/spectrum/zxbus.h"
+#include "bus/spectrum/zxbus/bus.h"
 #include "cpu/z80/z80n.h"
 #include "machine/i2cmem.h"
 #include "machine/spi_sdcard.h"
@@ -1452,7 +1452,7 @@ u8 specnext_state::reg_r(offs_t nr_register)
 		break;
 	case 0x8e:
 		port_253b_dat = (BIT(m_port_dffd_data, 0) << 7) | (BIT(m_port_7ffd_data, 0, 3) << 4) | (1 << 3) | (BIT(m_port_1ffd_data, 0) << 2)
-			| (BIT(m_port_1ffd_data, 2) << 1) | ((BIT(m_port_7ffd_data, 4) && !BIT(m_port_1ffd_data, 0)) || (BIT(m_port_1ffd_data, 1) && BIT(m_port_1ffd_data, 0)));;
+			| (BIT(m_port_1ffd_data, 2) << 1) | ((BIT(m_port_7ffd_data, 4) && !BIT(m_port_1ffd_data, 0)) || (BIT(m_port_1ffd_data, 1) && BIT(m_port_1ffd_data, 0)));
 		break;
 	case 0x8f:
 		port_253b_dat = (0b000000 << 2) | m_nr_8f_mapping_mode;
@@ -3527,4 +3527,4 @@ ROM_END
 } // Anonymous namespace
 
 /*    YEAR   NAME     PARENT    COMPAT  MACHINE  INPUT      CLASS            INIT         COMPANY                                            FULLNAME                     FLAGS */
-COMP( 2017,  tbblue,  spec128,  0,      tbblue,  specnext,  specnext_state,  empty_init,  "SpecNext Ltd., Victor Trucco, Fabio Belavenuto",  "ZX Spectrum Next: TBBlue",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 2017,  tbblue,  spec128,  0,      tbblue,  specnext,  specnext_state,  empty_init,  "SpecNext Ltd., Victor Trucco, Fabio Belavenuto",  "ZX Spectrum Next: TBBlue",  MACHINE_SUPPORTS_SAVE )

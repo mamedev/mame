@@ -104,7 +104,7 @@ protected:
 	void sm530_common(machine_config &config, u16 width, u16 height);
 
 	void sm510_dualh(machine_config &config, u16 leftwidth, u16 leftheight, u16 rightwidth, u16 rightheight);
-	[[maybe_unused]] void sm510_tripleh(machine_config &config, u16 leftwidth, u16 leftheight, u16 middlewidth, u16 middleheight, u16 rightwidth, u16 rightheight);
+	void sm511_tripleh(machine_config &config, u16 leftwidth, u16 leftheight, u16 middlewidth, u16 middleheight, u16 rightwidth, u16 rightheight);
 	void dualv_common(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight);
 	void sm510_dualv(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight);
 	void sm511_dualv(machine_config &config, u16 topwidth, u16 topheight, u16 botwidth, u16 botheight);

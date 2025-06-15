@@ -37,10 +37,14 @@
  The UM611024AK-20 is a '128K X 8BIT HIGH SPEED CMOS SRAM' so likely the video RAM
  http://www.datasheetcatalog.com/datasheets_pdf/U/T/6/1/UT611024.shtml
 
+ There is another version with the Dallas DS5002FP replaced with a PIC16C54, but using
+ the same data and OKI ROMs.
+
 */
 
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
+#include "cpu/pic16c5x/pic16c5x.h"
 #include "machine/nvram.h"
 #include "sound/okim6295.h"
 #include "emupal.h"
@@ -62,6 +66,7 @@ public:
 	{ }
 
 	void goldart(machine_config& config);
+	void goldartp(machine_config& config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -69,7 +74,7 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	required_device<ds5002fp_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_region_ptr<uint8_t> m_data;
 	required_ioport m_io_in0;
@@ -323,7 +328,7 @@ void goldart_state::machine_reset()
 
 void goldart_state::goldart(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	ds5002fp_device &maincpu(DS5002FP(config, "maincpu", 32_MHz_XTAL / 2));
 	maincpu.set_addrmap(AS_PROGRAM, &goldart_state::main_prgmap);
 	maincpu.set_addrmap(AS_IO, &goldart_state::main_datamap);
@@ -334,7 +339,7 @@ void goldart_state::goldart(machine_config &config)
 
 	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -345,7 +350,29 @@ void goldart_state::goldart(machine_config &config)
 
 	PALETTE(config, m_palette, palette_device::BLACK, 256);
 
-	/* sound hardware */
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+
+	OKIM6295(config, "oki", 32_MHz_XTAL / 32, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
+}
+
+void goldart_state::goldartp(machine_config &config)
+{
+	// basic machine hardware
+	PIC16C54(config, "maincpu", 12'000'000); // Unknown clock
+
+	// video hardware
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	screen.set_size(256*2, 512);
+	screen.set_visarea(0, (192*2)-1, 0, 288-1);
+	screen.set_screen_update(FUNC(goldart_state::screen_update));
+	screen.set_palette("palette");
+
+	PALETTE(config, m_palette, palette_device::BLACK, 256);
+
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	OKIM6295(config, "oki", 32_MHz_XTAL / 32, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
@@ -363,7 +390,7 @@ void goldart_state::goldart(machine_config &config)
 
 
 ROM_START( goldart )
-	ROM_REGION( 0x8000, "sram", 0 ) /* DS5002FP code */
+	ROM_REGION( 0x8000, "sram", 0 ) // DS5002FP code
 	ROM_LOAD( "ds5002fp_sram.bin", 0x00000, 0x8000, BAD_DUMP CRC(cd2bf151) SHA1(6f601cef86493fc2db181c93b17949b982149b0e) )
 
 	ROM_REGION( 0x100, "maincpu:internal", ROMREGION_ERASE00 )
@@ -372,14 +399,46 @@ ROM_START( goldart )
 	DS5002FP_SET_CRCR( 0x80 )
 
 	ROM_REGION( 0x80000, "data", 0 )
-	ROM_LOAD( "u11_e_262.bin", 0x00000, 0x80000, CRC(325551e0) SHA1(4fe8d71d448de3f8a9b5751bad6e90d2e556cb8f) )
+	ROM_LOAD( "u11_e_262.u11", 0x00000, 0x80000, CRC(325551e0) SHA1(4fe8d71d448de3f8a9b5751bad6e90d2e556cb8f) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
-	ROM_LOAD( "u6_e.bin", 0x00000, 0x80000, CRC(dd9dc689) SHA1(11871ba815372c06f8b1367d2897c37953db7bdd) )
+	ROM_LOAD( "u6_e.u6", 0x00000, 0x80000, CRC(dd9dc689) SHA1(11871ba815372c06f8b1367d2897c37953db7bdd) )
 ROM_END
 
-ROM_START( goldartp )
-	ROM_REGION( 0x8000, "sram", 0 ) /* DS5002FP code */
+ROM_START( goldartfr )
+	ROM_REGION( 0x8000, "sram", 0 ) // DS5002FP code
+	ROM_LOAD( "ds5002fp_sram.bin", 0x00000, 0x8000, BAD_DUMP CRC(cd2bf151) SHA1(6f601cef86493fc2db181c93b17949b982149b0e) )
+
+	ROM_REGION( 0x100, "maincpu:internal", ROMREGION_ERASE00 )
+	DS5002FP_SET_MON( 0x79 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
+
+	ROM_REGION( 0x80000, "data", 0 )
+	ROM_LOAD( "francia_dianas_794c_26-2-96_27c040.u11", 0x00000, 0x80000, CRC(0d9c7d2c) SHA1(616652d5d07454293d00807a94c072f059528ed7) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "dianas_so_fra_27c040.u6", 0x00000, 0x80000, CRC(727ce7b7) SHA1(533290aa97e33124a7697d72a9a108f0ab503ac5) )
+ROM_END
+
+ROM_START( goldartgr )
+	ROM_REGION( 0x8000, "sram", 0 ) // DS5002FP code
+	ROM_LOAD( "ds5002fp_sram.bin", 0x00000, 0x8000, BAD_DUMP CRC(cd2bf151) SHA1(6f601cef86493fc2db181c93b17949b982149b0e) )
+
+	ROM_REGION( 0x100, "maincpu:internal", ROMREGION_ERASE00 )
+	DS5002FP_SET_MON( 0x79 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
+
+	ROM_REGION( 0x80000, "data", 0 )
+	ROM_LOAD( "alema_diana_26-2-96_27c040.u11", 0x00000, 0x80000, CRC(f0119b2b) SHA1(f60c77e9352fdb8e6c00fd347d6af634da6f5ae3) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "dianas_son_aleman_15-2-95_27c4001.u6", 0x00000, 0x80000, CRC(fd494229) SHA1(41c2f9f185987510863116a95dc4f7cd6b6bb17c) )
+ROM_END
+
+ROM_START( goldartpt )
+	ROM_REGION( 0x8000, "sram", 0 ) // DS5002FP code
 	ROM_LOAD( "ds5002fp_sram.bin", 0x00000, 0x8000, BAD_DUMP CRC(cd2bf151) SHA1(6f601cef86493fc2db181c93b17949b982149b0e) )
 
 	ROM_REGION( 0x100, "maincpu:internal", ROMREGION_ERASE00 )
@@ -394,8 +453,132 @@ ROM_START( goldartp )
 	ROM_LOAD( "p-262.u6", 0x00000, 0x80000, CRC(4177e78b) SHA1(1099568b97a08c33a7da1bf46fc106f25af15e90) )
 ROM_END
 
+ROM_START( goldartuk )
+	ROM_REGION( 0x8000, "sram", 0 ) // DS5002FP code
+	ROM_LOAD( "ds5002fp_sram.bin", 0x00000, 0x8000, BAD_DUMP CRC(cd2bf151) SHA1(6f601cef86493fc2db181c93b17949b982149b0e) )
+
+	ROM_REGION( 0x100, "maincpu:internal", ROMREGION_ERASE00 )
+	DS5002FP_SET_MON( 0x79 )
+	DS5002FP_SET_RPCTL( 0x00 )
+	DS5002FP_SET_CRCR( 0x80 )
+
+	ROM_REGION( 0x80000, "data", 0 )
+	ROM_LOAD( "g.b_diana_5017_26-2-96_27c040.u11", 0x00000, 0x80000, CRC(efd8bfc1) SHA1(d4d01a5d6d618ed2ecabc959a88eb14b1bbf6241) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "diana_so_uk_257a_26-7_27c040.u6", 0x00000, 0x80000, CRC(a93afb8b) SHA1(c7a5fc4e74a0743ffc729ec3214f318141a82cc0) )
+ROM_END
+
+// PIC16C54-based sets
+
+ROM_START( goldartp )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "m-vg_17919_pic16c54.bin", 0x00000, 0x2000, CRC(9f27564b) SHA1(2a45188cbb6475a466c5813afb0eaabf070d90ec) )
+
+	ROM_REGION( 0x80000, "data", 0 )
+	ROM_LOAD( "u11_e_262.u11", 0x00000, 0x80000, CRC(325551e0) SHA1(4fe8d71d448de3f8a9b5751bad6e90d2e556cb8f) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "u6_e.u6", 0x00000, 0x80000, CRC(dd9dc689) SHA1(11871ba815372c06f8b1367d2897c37953db7bdd) )
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "e_645b_gal16v8.bin",  0x000, 0x117, CRC(52545c28) SHA1(7967cd26f83d6bb437f6899dce2985f374787022) )
+	ROM_LOAD( "e_645c_gal16v8.bin",  0x000, 0x117, CRC(05fd5d56) SHA1(67b33728914900fed9af2e280ca394659c7006e7) )
+	ROM_LOAD( "e_645d_gal16v8.bin",  0x000, 0x117, CRC(6fd3c1ce) SHA1(36de47497b7f5751da3555d2051e96e78d1ca04b) )
+	ROM_LOAD( "i_645c_gal16v8.bin",  0x000, 0x117, CRC(64dc7a3c) SHA1(c2be029ef886a5865ecd85f5efd03a8e059c9168) )
+	ROM_LOAD( "m_p3138_gal16v8.bin", 0x000, 0x117, CRC(909dab7b) SHA1(e9f4bb239fa7843743e85e236ae0c744784a3b3f) )
+	ROM_LOAD( "m_p3238_gal16v8.bin", 0x000, 0x117, CRC(e9e538d9) SHA1(9ea73a903a06111843fe64ae55cb29ee88803334) )
+ROM_END
+
+ROM_START( goldartpfr )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "m-vg_17919_pic16c54.bin", 0x00000, 0x2000, CRC(9f27564b) SHA1(2a45188cbb6475a466c5813afb0eaabf070d90ec) )
+
+	ROM_REGION( 0x80000, "data", 0 )
+	ROM_LOAD( "francia_dianas_794c_26-2-96_27c040.u11", 0x00000, 0x80000, CRC(0d9c7d2c) SHA1(616652d5d07454293d00807a94c072f059528ed7) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "dianas_so_fra_27c040.u6", 0x00000, 0x80000, CRC(727ce7b7) SHA1(533290aa97e33124a7697d72a9a108f0ab503ac5) )
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "e_645b_gal16v8.bin",  0x000, 0x117, CRC(52545c28) SHA1(7967cd26f83d6bb437f6899dce2985f374787022) )
+	ROM_LOAD( "e_645c_gal16v8.bin",  0x000, 0x117, CRC(05fd5d56) SHA1(67b33728914900fed9af2e280ca394659c7006e7) )
+	ROM_LOAD( "e_645d_gal16v8.bin",  0x000, 0x117, CRC(6fd3c1ce) SHA1(36de47497b7f5751da3555d2051e96e78d1ca04b) )
+	ROM_LOAD( "i_645c_gal16v8.bin",  0x000, 0x117, CRC(64dc7a3c) SHA1(c2be029ef886a5865ecd85f5efd03a8e059c9168) )
+	ROM_LOAD( "m_p3138_gal16v8.bin", 0x000, 0x117, CRC(909dab7b) SHA1(e9f4bb239fa7843743e85e236ae0c744784a3b3f) )
+	ROM_LOAD( "m_p3238_gal16v8.bin", 0x000, 0x117, CRC(e9e538d9) SHA1(9ea73a903a06111843fe64ae55cb29ee88803334) )
+ROM_END
+
+ROM_START( goldartpgr )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "m-vg_17919_pic16c54.bin", 0x00000, 0x2000, CRC(9f27564b) SHA1(2a45188cbb6475a466c5813afb0eaabf070d90ec) )
+
+	ROM_REGION( 0x80000, "data", 0 )
+	ROM_LOAD( "alema_diana_26-2-96_27c040.u11", 0x00000, 0x80000, CRC(f0119b2b) SHA1(f60c77e9352fdb8e6c00fd347d6af634da6f5ae3) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "dianas_son_aleman_15-2-95_27c4001.u6", 0x00000, 0x80000, CRC(fd494229) SHA1(41c2f9f185987510863116a95dc4f7cd6b6bb17c) )
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "e_645b_gal16v8.bin",  0x000, 0x117, CRC(52545c28) SHA1(7967cd26f83d6bb437f6899dce2985f374787022) )
+	ROM_LOAD( "e_645c_gal16v8.bin",  0x000, 0x117, CRC(05fd5d56) SHA1(67b33728914900fed9af2e280ca394659c7006e7) )
+	ROM_LOAD( "e_645d_gal16v8.bin",  0x000, 0x117, CRC(6fd3c1ce) SHA1(36de47497b7f5751da3555d2051e96e78d1ca04b) )
+	ROM_LOAD( "i_645c_gal16v8.bin",  0x000, 0x117, CRC(64dc7a3c) SHA1(c2be029ef886a5865ecd85f5efd03a8e059c9168) )
+	ROM_LOAD( "m_p3138_gal16v8.bin", 0x000, 0x117, CRC(909dab7b) SHA1(e9f4bb239fa7843743e85e236ae0c744784a3b3f) )
+	ROM_LOAD( "m_p3238_gal16v8.bin", 0x000, 0x117, CRC(e9e538d9) SHA1(9ea73a903a06111843fe64ae55cb29ee88803334) )
+ROM_END
+
+ROM_START( goldartppt )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "m-vg_17919_pic16c54.bin", 0x00000, 0x2000, CRC(9f27564b) SHA1(2a45188cbb6475a466c5813afb0eaabf070d90ec) )
+
+	ROM_REGION( 0x80000, "data", 0 )
+	ROM_LOAD( "p-262.u11", 0x00000, 0x80000, CRC(fa6537b0) SHA1(a4c3ac8f5139b18f0688beaa374c75a6f0aabcd2) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "p-262.u6", 0x00000, 0x80000, CRC(4177e78b) SHA1(1099568b97a08c33a7da1bf46fc106f25af15e90) )
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "e_645b_gal16v8.bin",  0x000, 0x117, CRC(52545c28) SHA1(7967cd26f83d6bb437f6899dce2985f374787022) )
+	ROM_LOAD( "e_645c_gal16v8.bin",  0x000, 0x117, CRC(05fd5d56) SHA1(67b33728914900fed9af2e280ca394659c7006e7) )
+	ROM_LOAD( "e_645d_gal16v8.bin",  0x000, 0x117, CRC(6fd3c1ce) SHA1(36de47497b7f5751da3555d2051e96e78d1ca04b) )
+	ROM_LOAD( "i_645c_gal16v8.bin",  0x000, 0x117, CRC(64dc7a3c) SHA1(c2be029ef886a5865ecd85f5efd03a8e059c9168) )
+	ROM_LOAD( "m_p3138_gal16v8.bin", 0x000, 0x117, CRC(909dab7b) SHA1(e9f4bb239fa7843743e85e236ae0c744784a3b3f) )
+	ROM_LOAD( "m_p3238_gal16v8.bin", 0x000, 0x117, CRC(e9e538d9) SHA1(9ea73a903a06111843fe64ae55cb29ee88803334) )
+ROM_END
+
+ROM_START( goldartpuk )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "m-vg_17919_pic16c54.bin", 0x00000, 0x2000, CRC(9f27564b) SHA1(2a45188cbb6475a466c5813afb0eaabf070d90ec) )
+
+	ROM_REGION( 0x80000, "data", 0 )
+	ROM_LOAD( "g.b_diana_5017_26-2-96_27c040.u11", 0x00000, 0x80000, CRC(efd8bfc1) SHA1(d4d01a5d6d618ed2ecabc959a88eb14b1bbf6241) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "diana_so_uk_257a_26-7_27c040.u6", 0x00000, 0x80000, CRC(a93afb8b) SHA1(c7a5fc4e74a0743ffc729ec3214f318141a82cc0) )
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "e_645b_gal16v8.bin",  0x000, 0x117, CRC(52545c28) SHA1(7967cd26f83d6bb437f6899dce2985f374787022) )
+	ROM_LOAD( "e_645c_gal16v8.bin",  0x000, 0x117, CRC(05fd5d56) SHA1(67b33728914900fed9af2e280ca394659c7006e7) )
+	ROM_LOAD( "e_645d_gal16v8.bin",  0x000, 0x117, CRC(6fd3c1ce) SHA1(36de47497b7f5751da3555d2051e96e78d1ca04b) )
+	ROM_LOAD( "i_645c_gal16v8.bin",  0x000, 0x117, CRC(64dc7a3c) SHA1(c2be029ef886a5865ecd85f5efd03a8e059c9168) )
+	ROM_LOAD( "m_p3138_gal16v8.bin", 0x000, 0x117, CRC(909dab7b) SHA1(e9f4bb239fa7843743e85e236ae0c744784a3b3f) )
+	ROM_LOAD( "m_p3238_gal16v8.bin", 0x000, 0x117, CRC(e9e538d9) SHA1(9ea73a903a06111843fe64ae55cb29ee88803334) )
+ROM_END
+
+
 } // Anonymous namespace
 
+//    YEAR, NAME,       PARENT,  MACHINE,  INPUT,   CLASS,         INIT,       ROT,  COMPANY,             FULLNAME
 
-GAME( 1994, goldart,       0,        goldart,     goldart,      goldart_state, empty_init, ROT0, "Covielsa / Gaelco",   "Goldart (Spain)",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1994, goldartp,      goldart,  goldart,     goldart,      goldart_state, empty_init, ROT0, "Covielsa / Gaelco",   "Goldart (Portugal)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1994, goldart,    0,       goldart,  goldart, goldart_state, empty_init, ROT0, "Gaelco / Covielsa", "Goldart (Spain)",                    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1994, goldartfr,  goldart, goldart,  goldart, goldart_state, empty_init, ROT0, "Gaelco / Jeutel",   "Goldart (France, Covielsa license)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1994, goldartgr,  goldart, goldart,  goldart, goldart_state, empty_init, ROT0, "Gaelco / Covielsa", "Goldart (Germany)",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1994, goldartpt,  goldart, goldart,  goldart, goldart_state, empty_init, ROT0, "Gaelco / Covielsa", "Goldart (Portugal)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1994, goldartuk,  goldart, goldart,  goldart, goldart_state, empty_init, ROT0, "Gaelco / Covielsa", "Goldart (United Kingdom)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+
+GAME( 199?, goldartp,   goldart, goldartp, goldart, goldart_state, empty_init, ROT0, "Gaelco / Covielsa", "Goldart (PIC16C54, Spain)",                    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, goldartpfr, goldart, goldartp, goldart, goldart_state, empty_init, ROT0, "Gaelco / Jeutel",   "Goldart (PIC16C54, France, Covielsa license)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, goldartpgr, goldart, goldartp, goldart, goldart_state, empty_init, ROT0, "Gaelco / Covielsa", "Goldart (PIC16C54, Germany)",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, goldartppt, goldart, goldartp, goldart, goldart_state, empty_init, ROT0, "Gaelco / Covielsa", "Goldart (PIC16C54, Portugal)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, goldartpuk, goldart, goldartp, goldart, goldart_state, empty_init, ROT0, "Gaelco / Covielsa", "Goldart (PIC16C54, United Kingdom)",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

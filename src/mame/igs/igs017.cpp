@@ -20,7 +20,8 @@ Year + Game                                    PCB        CPU    Sound          
 97  Manguan Daheng (V123T1)                    NO-0252    68000  M6295           IGS031 IGS025 IGS???* Battery
 98  Genius 6 (V110F)                           NO-0131-4  Z180   K668    U3567   IGS017 IGS003c        Battery
 98  Long Hu Zhengba 2 (set 1)                  NO-0206    68000  K668            IGS031 IGS025 IGS022* Battery
-98  Long Hu Zhengba 2 (VS105M)                 NO-0182-2  68000  M6295           IGS031 IGS025 IGS022  Battery
+98  Long Hu Zhengba 2 (VS210M)                 NO-0218-2  68000  K668            IGS031 IGS025 IGS029  Battery
+98  Long Hu Zhengba (VS105M)                   NO-0182-2  68000  M6295           IGS031 IGS025 IGS022  Battery
 98  Shuang Long Qiang Zhu 2 VS (VS203J)        NO-0207    68000  K668            IGS031 IGS025 IGS022  Battery
 98  Manguan Caishen (V103CS)                   NO-0192-1  68000  K668            IGS017 IGS025 IGS029  Battery
 98  Manguan Caishen (V106CS)                   NO-0208    68000  M6295           IGS031 IGS025 IGS029  Battery
@@ -29,7 +30,9 @@ Year + Game                                    PCB        CPU    Sound          
 99  Tarzan (V109C)                             NO-0248-1  Z180   U6295           IGS031 IGS025         Battery
 00  Chaoji Da Manguan 2 - Jiaqiang Ban (V100C) NO-0271    68000  K668            IGS031 IGS025         Battery
 00? Jungle King (V103A)                        NO-0230-1  Z180   U6295           IGS031 IGS025 (N9)    Battery
+00? Jungle King (V105US)                       NO-0230-1  Z180   U6295           IGS031 IGS025 (Z9)    Battery
 00? Super Tarzan (V100I)                       NO-0230-1  Z180   K668            IGS031 IGS025         Battery
+00? Tarzan (V106FA)                            NO-0230-1  Z180   K668            IGS031 IGS025 (Z9)    Battery
 00? Happy Skill (V611IT)                       NO-0281    Z180   K668            IGS031 IGS025         Battery
 00? Champion Poker 2 (V100A)                   unreadable Z180   M6295           IGS031 IGS025         Battery
 00? Super Poker (V100xD03) / Formosa           NO-0187    Z180   K668    U3567   IGS017 IGS025         Battery
@@ -694,6 +697,7 @@ public:
 	void init_jking302us() ATTR_COLD;
 	void init_lhzb2() ATTR_COLD;
 	void init_lhzb2a() ATTR_COLD;
+	void init_lhzb2b() ATTR_COLD;
 	void init_mgcs() ATTR_COLD;
 	void init_mgcsa() ATTR_COLD;
 	void init_mgcsb() ATTR_COLD;
@@ -704,6 +708,7 @@ public:
 	void init_sdmg2754cb() ATTR_COLD;
 	void init_sdmg2p() ATTR_COLD;
 	void init_slqz2() ATTR_COLD;
+	void init_slqz2b() ATTR_COLD;
 	void init_spkrform() ATTR_COLD;
 	void init_starzan() ATTR_COLD;
 	void init_tarzan() ATTR_COLD;
@@ -1920,6 +1925,75 @@ void igs017_state::init_lhzb2a()
 //  m_igs_string->dump("lhzb2a_string.key", 0x6e11c, 0x6e030, true); // same data as lhzb2
 }
 
+// lhzb2a
+
+void igs017_state::init_lhzb2b() // TODO: possibly not 100% correct
+{
+	const int rom_size = memregion("maincpu")->bytes();
+	u16 * const rom = (u16 *)memregion("maincpu")->base();
+
+	for (int i = 0; i < rom_size / 2; i++)
+	{
+		u16 x = rom[i];
+
+		// bit 0 xor layer
+		if (i & 0x20/2)
+		{
+			if (i & 0x02/2)
+			{
+				x ^= 0x0001;
+			}
+		}
+
+		if (!(i & 0x4000/2))
+		{
+			if (!(i & 0x300/2))
+			{
+				x ^= 0x0001;
+			}
+		}
+
+		// bit 10 xor layer
+
+		if (i & 0x8000/2)
+		{
+			if (!(i & 0x2000/2))
+			{
+				if (!(i & 0x800/2))
+				{
+					if (!(i & 0x200/2))
+						if (i & 0x100/2)
+							if (i & 0x40/2)
+								x ^= 0x0400;
+				}
+				else
+					if (i & 0x100/2)
+						if (i & 0x40/2)
+							x ^= 0x0400;
+			}
+		}
+		else
+		{
+			if (!(i & 0x800/2))
+			{
+				if (!(i & 0x200/2))
+					if (i & 0x040/2)
+						x ^= 0x0400;
+			}
+			else
+				if (i & 0x040/2)
+					x ^= 0x0400;
+		}
+
+		rom[i] = x;
+	}
+
+	m_igs017_igs031->lhzb2_decrypt_tiles();
+	m_igs017_igs031->lhzb2_decrypt_sprites();
+
+//  m_igs_string->dump("lhzb2b_string.key", 0x6e11c, 0x6e030, true);
+}
+
 
 // slqz2
 
@@ -2000,6 +2074,81 @@ void igs017_state::init_slqz2()
 				if (!(i & 0x100/2))
 				{
 					if (i & 0x40/2)
+					{
+						x ^= 0x4000;
+					}
+				}
+			}
+		}
+
+		rom[i] = x;
+	}
+
+	m_igs017_igs031->slqz2_decrypt_tiles();
+	m_igs017_igs031->lhzb2_decrypt_sprites();
+
+//  slqz2_patch_rom();
+
+//  m_igs_string->dump("slqz2_string.key", 0x7b214, 0x7b128, true);
+}
+
+void igs017_state::init_slqz2b()
+{
+	const int rom_size = memregion("maincpu")->bytes();
+	u16 * const rom = (u16 *)memregion("maincpu")->base();
+
+	for (int i = 0; i < rom_size / 2; i++)
+	{
+		u16 x = rom[i];
+
+		// bit 0 xor layer
+
+		if (i & 0x20/2)
+		{
+			if (i & 0x02/2)
+			{
+				x ^= 0x0001;
+			}
+		}
+
+		if (!(i & 0x4000/2))
+		{
+			if (!(i & 0x300/2))
+			{
+				x ^= 0x0001;
+			}
+		}
+
+		// bit 14 xor layer
+
+		if (!(i & 0x800/2))
+		{
+			if (i & 0x1000/2)
+			{
+				if (i & 0x200/2)
+				{
+					if (!(i & 0x100/2))
+						{
+							if (!(i & 0x40/2))
+							{
+								x ^= 0x4000;
+							}
+						}
+					else
+					{
+						x ^= 0x4000;
+					}
+				}
+			}
+			else
+			{
+				if (i & 0x100/2)
+				{
+					x ^= 0x4000;
+				}
+				else
+				{
+					if (!(i & 0x40/2))
 					{
 						x ^= 0x4000;
 					}
@@ -5545,6 +5694,25 @@ ROM_START( lhzb2a )
 	ROM_LOAD( "lhzb2_string.key", 0x00, 0xec, CRC(c964dc35) SHA1(81036e0dfa9abad123701ae8939d0d5b6f91b015) )
 ROM_END
 
+ROM_START( lhzb2b ) // IGS PCB N0-0218-2 (has IGS025 stickered M3, IGS029, 2 banks of 8 switches)
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "p-4096", 0x00000, 0x80000, CRC(46bbef6e) SHA1(45cc9de0515adcbc1de6732191511ff5ce3391ca) )
+
+	ROM_REGION( 0x10000, "igs022", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD16_WORD_SWAP( "m1101.u6", 0x000000, 0x400000, CRC(0114e9d1) SHA1(5b16170d3cd8b8e1662c949b7234fbdd2ca927f7) ) // FIXED BITS (0xxxxxxxxxxxxxxx)
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD16_WORD_SWAP( "m1103.u8", 0x00000, 0x80000, CRC(4d3776b4) SHA1(fa9b311b1a6ad56e136b66d090bc62ed5003b2f2) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "s1102.u23", 0x00000, 0x80000, CRC(51ffe245) SHA1(849011b186096add657ab20d49d260ec23363ef3) )
+
+	ROM_REGION( 0xec, "igs_string", 0 )
+	ROM_LOAD( "lhzb2_string.key", 0x00, 0xec, CRC(c964dc35) SHA1(81036e0dfa9abad123701ae8939d0d5b6f91b015) )
+ROM_END
+
 /*
 PCB NO-0182-2
 IGS025 sticker is D2
@@ -5639,6 +5807,26 @@ Notes:
 ROM_START( slqz2 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "p1100.u28", 0x00000, 0x80000, CRC(0b8e5c9e) SHA1(16572bd1163bba4da8a76b10649d2f71e50ad369) )
+
+	ROM_REGION( 0x10000, "igs022", 0 )
+	ROM_LOAD( "m1103.u12", 0x00000, 0x10000, CRC(9f3b8d65) SHA1(5ee1ad025474399c2826f21d970e76f25d0fa1fd) ) // INTERNATIONAL GAMES SYSTEM CO.,LTD
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD16_WORD_SWAP( "m1101.u4", 0x000000, 0x400000, CRC(0114e9d1) SHA1(5b16170d3cd8b8e1662c949b7234fbdd2ca927f7) ) // FIXED BITS (0xxxxxxxxxxxxxxx)
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "text.u6", 0x00000, 0x80000, CRC(40d21adf) SHA1(18b202d6330ac89026bec2c9c8224b52540dd48d) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "s1102.u20", 0x00000, 0x80000, CRC(51ffe245) SHA1(849011b186096add657ab20d49d260ec23363ef3) ) // = s1102.u23 Long Hu Zhengba 2
+
+	ROM_REGION( 0xec, "igs_string", 0 )
+	ROM_LOAD( "slqz2_string.key", 0x00, 0xec, CRC(5ca22f9d) SHA1(a795415016fdcb6329623786dc992ac7b0877ddf) )
+ROM_END
+
+ROM_START( slqz2b ) // IGS PCB NO-0207
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "slqz2.u28", 0x00000, 0x80000, CRC(63be02a3) SHA1(973a2de12852b533dd6dfb00c96e6760ddc4a430) )
 
 	ROM_REGION( 0x10000, "igs022", 0 )
 	ROM_LOAD( "m1103.u12", 0x00000, 0x10000, CRC(9f3b8d65) SHA1(5ee1ad025474399c2826f21d970e76f25d0fa1fd) ) // INTERNATIONAL GAMES SYSTEM CO.,LTD
@@ -6075,6 +6263,24 @@ ROM_START( jking103a )
 	ROM_LOAD( "jking103a_string.key", 0x00, 0xec, BAD_DUMP CRC(8d288f5e) SHA1(19c184600d80838ef04be8ab29c93d91cf3161c9) ) // TODO: check this
 ROM_END
 
+ROM_START( jking105us )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "j_k_v-105us.u9", 0x00000, 0x40000, CRC(96dac1e9) SHA1(56164a3d6df425b992d22bb91be0023e72c04a52) )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "igs_a2104_cg_v110.u3", 0x00000, 0x400000, CRC(dcbff16f) SHA1(2bf77ef4448c26124c8d8d18bb7ffe4105cfa940) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
+	// empty u2
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "igs_t2105_cg_v110.u11", 0x00000, 0x80000, CRC(1d4be260) SHA1(6374c61735144b3ff54d5e490f26adac4a10b14d) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "igs_s2102.u8", 0x00000, 0x80000, CRC(90dda82d) SHA1(67fbc1e8d76b85e124136e2f1df09c8b6c5a8f97) )
+
+	ROM_REGION( 0xec, "igs_string", 0 )
+	ROM_LOAD( "jking105us_string.key", 0x00, 0xec, BAD_DUMP CRC(8d288f5e) SHA1(19c184600d80838ef04be8ab29c93d91cf3161c9) ) // TODO: check this
+ROM_END
+
 // IGS PCB NO-0230-1 (IGS025 without original sticker)
 ROM_START( tarzan103m )
 	ROM_REGION( 0x40000, "maincpu", 0 )
@@ -6097,6 +6303,24 @@ ROM_START( tarzan103m )
 
 	ROM_REGION( 0xec, "igs_string", 0 )
 	ROM_LOAD( "tarzan103m_string.key", 0x00, 0xec, CRC(b33f5050) SHA1(900d3c48944dbdd95d9e48d74c355e82e00ac012) )
+ROM_END
+
+ROM_START( tarzan106fa )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "t_z_v-106fa.u9", 0x00000, 0x40000, CRC(588caceb) SHA1(5fe9c3679edb921b3e031b05a6fb683a8b02fc44) )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "igs_a2104_cg_v110.u3", 0x00000, 0x400000, CRC(dcbff16f) SHA1(2bf77ef4448c26124c8d8d18bb7ffe4105cfa940) ) // FIXED BITS (xxxxxxx0xxxxxxxx)
+	// empty u2
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD( "igs_t2105_cg_v110.u11", 0x00000, 0x80000, CRC(1d4be260) SHA1(6374c61735144b3ff54d5e490f26adac4a10b14d) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "igs_s2102.u8", 0x00000, 0x80000, CRC(90dda82d) SHA1(67fbc1e8d76b85e124136e2f1df09c8b6c5a8f97) )
+
+	ROM_REGION( 0xec, "igs_string", 0 )
+	ROM_LOAD( "tarzan106fa_string.key", 0x00, 0xec, BAD_DUMP CRC(8d288f5e) SHA1(19c184600d80838ef04be8ab29c93d91cf3161c9) ) // TODO: check this
 ROM_END
 
 
@@ -6239,8 +6463,10 @@ GAME ( 1998,  lhzb,        0,        lhzb2,      lhzb,        igs017_state, init
 GAME ( 1998,  lhzba,       lhzb,     lhzb2,      lhzb,        igs017_state, init_lhzb2,      ROT0, "IGS", "Long Hu Zhengba (China, VS105M, set 2)",                             MACHINE_UNEMULATED_PROTECTION ) // 龙虎争霸, finish IGS022 protection
 GAME ( 1998,  lhzb2,       0,        lhzb2,      lhzb2,       igs017_state, init_lhzb2,      ROT0, "IGS", "Long Hu Zhengba 2 (China, set 1)",                                   MACHINE_UNEMULATED_PROTECTION ) // 龙虎争霸2, finish IGS022 protection
 GAME ( 1998,  lhzb2a,      lhzb2,    lhzb2a,     lhzb2a,      igs017_state, init_lhzb2a,     ROT0, "IGS", "Long Hu Zhengba 2 (China, VS221M)",                                  0 ) // 龙虎争霸2
-GAME ( 1998,  slqz2,       0,        slqz2,      slqz2,       igs017_state, init_slqz2,      ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, VS203J)",                         MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, finish IGS022 protection
-GAME ( 1998,  slqz2a,      slqz2,    slqz2,      slqz2,       igs017_state, init_slqz2,      ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, set 2)",                          MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, misses program ROM dump, finish IGS022 protection
+GAME ( 1998,  lhzb2b,      lhzb2,    lhzb2,      lhzb2,       igs017_state, init_lhzb2b,     ROT0, "IGS", "Long Hu Zhengba 2 (China, VS210M)",                                  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME ( 1998,  slqz2,       0,        slqz2,      slqz2,       igs017_state, init_slqz2,      ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, VS203J, set 1)",                  MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, finish IGS022 protection
+GAME ( 1998,  slqz2a,      slqz2,    slqz2,      slqz2,       igs017_state, init_slqz2,      ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, unknown version)",                MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, misses program ROM dump, finish IGS022 protection
+GAME ( 1998,  slqz2b,      slqz2,    slqz2,      slqz2,       igs017_state, init_slqz2b,     ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, VS203J, set 2)",                  MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, finish IGS022 protection
 GAME ( 1999,  tarzanc,     0,        tarzan,     tarzan,      igs017_state, init_tarzanc,    ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V109C, set 1)",                      0 ) // 泰山闯天关
 GAME ( 1999,  tarzan,      tarzanc,  tarzan,     tarzan,      igs017_state, init_tarzan,     ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V109C, set 2)",                      MACHINE_NOT_WORKING ) // missing sprites and sound rom, imperfect tiles decryption
 GAME ( 1999,  tarzana,     tarzanc,  tarzan,     tarzan,      igs017_state, init_tarzana,    ROT0, "IGS", "Tarzan (V107)",                                                      MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // missing IGS029 protection, missing sprites and sound rom
@@ -6248,8 +6474,10 @@ GAME ( 1999,  tarzanb,     tarzanc,  tarzan,     tarzan,      igs017_state, init
 GAME ( 2000,  sdmg2p,      0,        sdmg2p,     sdmg2p,      igs017_state, init_sdmg2p,     ROT0, "IGS", "Maque Wangchao / Chaoji Da Manguan 2 - Jiaqiang Ban (China, V100C)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 麻雀王朝 / 超級大滿貫 2 -加強版 protection kicks in after starting game, hopper isn't hooked up correctly
 GAMEL( 2000?, starzan,     0,        starzan,    starzan,     igs017_state, init_starzan,    ROT0, "IGS (G.F. Gioca license)", "Super Tarzan (Italy, V100I)",                   0, layout_igsslot )
 GAMEL( 2000?, jking103a,   starzan,  starzan,    starzan,     igs017_state, init_jking103a,  ROT0, "IGS", "Jungle King (V103A)",                                                0, layout_igsslot )
+GAMEL( 2000?, jking105us,  starzan,  starzan,    tarzan202fa, igs017_state, init_jking103a,  ROT0, "IGS", "Jungle King (V105US)",                                               0, layout_igsslot )
 GAMEL( 1999,  jking200pr,  starzan,  starzan,    tarzan202fa, igs017_state, init_jking200pr, ROT0, "IGS", "Jungle King (V200PR)",                                               0, layout_igsslot )
 GAME ( 1999?, tarzan103m,  tarzanc,  starzan,    tarzan103m,  igs017_state, init_starzan,    ROT0, "IGS", "Tarzan (V103M)",                                                     0 )
+GAMEL( 1999?, tarzan106fa, tarzanc,  starzan,    tarzan202fa, igs017_state, init_jking103a,  ROT0, "IGS", "Tarzan (V106FA)",                                                    0, layout_igsslot  )
 GAMEL( 1999?, tarzan202fa, tarzanc,  starzan,    tarzan202fa, igs017_state, init_jking103a,  ROT0, "IGS", "Tarzan (V202FA)",                                                    0, layout_igsslot  )
 GAMEL( 2000?, happyskl,    0,        happyskl,   happyskl,    igs017_state, init_happyskl,   ROT0, "IGS", "Happy Skill (Italy, V611IT)",                                        0, layout_igspoker )
 GAMEL( 2000?, cpoker2,     0,        cpoker2,    cpoker2,     igs017_state, init_cpoker2,    ROT0, "IGS", "Champion Poker 2 (V100A)",                                           0, layout_igspoker )

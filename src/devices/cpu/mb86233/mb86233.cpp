@@ -12,7 +12,7 @@
 
   The 86232 has 512 32-bits dwords of triple-port memory (1 write, 2
   read).  The 86233/86234 have instead two normal (1 read, 1 write,
-  non-simultaneous) independant ram banks, one of 256 dwords and one
+  non-simultaneous) independent ram banks, one of 256 dwords and one
   of 512.
 
   The ram banks are mapped at 0x000-0x0ff and 0x200-0x3ff (proven by

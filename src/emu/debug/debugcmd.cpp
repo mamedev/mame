@@ -452,13 +452,13 @@ void debugger_commands::execute_help(const std::vector<std::string_view> &params
 
 void debugger_commands::execute_print(const std::vector<std::string_view> &params)
 {
-	/* validate the other parameters */
+	// validate the other parameters
 	u64 values[MAX_COMMAND_PARAMS];
 	for (int i = 0; i < params.size(); i++)
 		if (!m_console.validate_number_parameter(params[i], values[i]))
 			return;
 
-	/* then print each one */
+	// then print each one
 	for (int i = 0; i < params.size(); i++)
 		m_console.printf("%X", values[i]);
 	m_console.printf("\n");
@@ -680,7 +680,7 @@ void debugger_commands::execute_index_command(std::vector<std::string_view> cons
 
 void debugger_commands::execute_printf(const std::vector<std::string_view> &params)
 {
-	/* then do a printf */
+	// then do a printf
 	std::ostringstream buffer;
 	if (mini_printf(buffer, params))
 		m_console.printf("%s\n", std::move(buffer).str());
@@ -693,7 +693,7 @@ void debugger_commands::execute_printf(const std::vector<std::string_view> &para
 
 void debugger_commands::execute_logerror(const std::vector<std::string_view> &params)
 {
-	/* then do a printf */
+	// then do a printf
 	std::ostringstream buffer;
 	if (mini_printf(buffer, params))
 		m_machine.logerror("%s", std::move(buffer).str());
@@ -706,7 +706,7 @@ void debugger_commands::execute_logerror(const std::vector<std::string_view> &pa
 
 void debugger_commands::execute_tracelog(const std::vector<std::string_view> &params)
 {
-	/* then do a printf */
+	// then do a printf
 	std::ostringstream buffer;
 	if (mini_printf(buffer, params))
 		m_console.get_visible_cpu()->debug()->trace_printf("%s", std::move(buffer).str());
@@ -789,7 +789,7 @@ void debugger_commands::execute_do(const std::vector<std::string_view> &params)
 
 void debugger_commands::execute_step(const std::vector<std::string_view> &params)
 {
-	/* if we have a parameter, use it */
+	// if we have a parameter, use it
 	u64 steps = 1;
 	if (params.size() > 0 && !m_console.validate_number_parameter(params[0], steps))
 		return;
@@ -804,7 +804,7 @@ void debugger_commands::execute_step(const std::vector<std::string_view> &params
 
 void debugger_commands::execute_over(const std::vector<std::string_view> &params)
 {
-	/* if we have a parameter, use it */
+	// if we have a parameter, use it
 	u64 steps = 1;
 	if (params.size() > 0 && !m_console.validate_number_parameter(params[0], steps))
 		return;
@@ -831,7 +831,7 @@ void debugger_commands::execute_go(const std::vector<std::string_view> &params)
 {
 	u64 addr = ~0;
 
-	/* if we have a parameter, use it instead */
+	// if we have a parameter, use it instead
 	if (params.size() > 0 && !m_console.validate_number_parameter(params[0], addr))
 		return;
 
@@ -858,7 +858,7 @@ void debugger_commands::execute_go_interrupt(const std::vector<std::string_view>
 {
 	u64 irqline = -1;
 
-	/* if we have a parameter, use it instead */
+	// if we have a parameter, use it instead
 	if (params.size() > 0 && !m_console.validate_number_parameter(params[0], irqline))
 		return;
 
@@ -873,7 +873,7 @@ void debugger_commands::execute_go_exception(const std::vector<std::string_view>
 {
 	u64 exception = -1;
 
-	/* if we have a parameter, use it instead */
+	// if we have a parameter, use it instead
 	if (params.size() > 0 && !m_console.validate_number_parameter(params[0], exception))
 		return;
 
@@ -893,7 +893,7 @@ void debugger_commands::execute_go_time(const std::vector<std::string_view> &par
 {
 	u64 milliseconds = -1;
 
-	/* if we have a parameter, use it instead */
+	// if we have a parameter, use it instead
 	if (params.size() > 0 && !m_console.validate_number_parameter(params[0], milliseconds))
 		return;
 
@@ -2119,7 +2119,7 @@ void debugger_commands::execute_saveregion(const std::vector<std::string_view> &
 	if ((length <= 0) || ((length + offset) >= region->bytes()))
 		length = region->bytes() - offset;
 
-	/* open the file */
+	// open the file
 	std::string const filename(params[0]);
 	FILE *f = fopen(filename.c_str(), "wb");
 	if (!f)
@@ -3434,7 +3434,7 @@ void debugger_commands::execute_dasm(const std::vector<std::string_view> &params
 		offset = next_offset;
 	}
 
-	/* write the data */
+	// write the data
 	std::string fname(params[0]);
 	std::ofstream f(fname);
 	if (!f.good())
@@ -3749,14 +3749,14 @@ void debugger_commands::execute_pcatmem(int spacenum, const std::vector<std::str
 
 void debugger_commands::execute_snap(const std::vector<std::string_view> &params)
 {
-	/* if no params, use the default behavior */
+	// if no params, use the default behavior
 	if (params.empty())
 	{
 		m_machine.video().save_active_screen_snapshots();
 		m_console.printf("Saved snapshot\n");
 	}
 
-	/* otherwise, we have to open the file ourselves */
+	// otherwise, we have to open the file ourselves
 	else
 	{
 		u64 scrnum = 0;
@@ -3909,58 +3909,83 @@ void debugger_commands::execute_memdump(const std::vector<std::string_view> &par
 
 void debugger_commands::execute_symlist(const std::vector<std::string_view> &params)
 {
-	const char *namelist[1000];
+	device_t *cpu = nullptr;
 	symbol_table *symtable;
-	int count = 0;
 
-	if (!params.empty())
+	// default to CPU "0" if none specified
+	if (!m_console.validate_cpu_parameter(params.empty() ? "0" : params[0], cpu))
 	{
-		// validate parameters
-		device_t *cpu;
-		if (!m_console.validate_cpu_parameter(params[0], cpu))
-			return;
-		symtable = &cpu->debug()->symtable();
-		m_console.printf("CPU '%s' symbols:\n", cpu->tag());
+		if (!params.empty())
+			return; // explicitly specified CPU is invalid
+
+		// somehow CPU "0" is invalid, so just stick with global symbol table
+		symtable = &m_machine.debugger().cpu().global_symtable();
 	}
 	else
 	{
-		symtable = &m_machine.debugger().cpu().global_symtable();
-		m_console.printf("Global symbols:\n");
+		symtable = &cpu->debug()->symtable();
 	}
 
-	// gather names for all symbols
-	for (auto &entry : symtable->entries())
+	// unknown tag if CPU is invalid
+	const char *cpu_tag = cpu ? cpu->tag() : ":?";
+
+	// traverse symbol_table parent chain, printing each table's symbols in its own block
+	for (; symtable != nullptr; symtable = symtable->parent())
 	{
-		// only display "register" type symbols
-		if (!entry.second->is_function())
+		// skip globals if user explicitly requested CPU
+		if (symtable->type() == symbol_table::BUILTIN_GLOBALS && !params.empty())
+			continue;
+
+		if (symtable->entries().size() == 0)
+			continue;
+
+		std::vector<const char *> namelist;
+
+		// print heading for table
+		switch (symtable->type())
 		{
-			namelist[count++] = entry.second->name();
-			if (count >= std::size(namelist))
-				break;
+		case symbol_table::CPU_STATE:
+			m_console.printf("\n**** CPU '%s' symbols ****\n", cpu_tag);
+			break;
+		case symbol_table::BUILTIN_GLOBALS:
+			m_console.printf("\n**** Global symbols ****\n");
+			break;
+		default:
+			assert(!"Unrecognized symbol table type");
+		}
+
+		// gather names for all relevant symbols
+		for (auto &entry : symtable->entries())
+		{
+			// ignore built-in function symbols
+			if (!entry.second->is_function())
+			{
+				namelist.push_back(entry.second->name());
+			}
+		}
+
+		// sort the symbols
+		std::sort(
+				namelist.begin(),
+				namelist.end(),
+				[] (const char *item1, const char *item2) { return strcmp(item1, item2) < 0; });
+
+		// iterate over symbols and print them
+		for (const char * symname : namelist)
+		{
+			symbol_entry const *const entry = symtable->find(symname);
+			assert(entry != nullptr);
+			m_console.printf("%s = %X", symname, entry->value());
+			if (!entry->is_lval())
+				m_console.printf("  (read-only)");
+			m_console.printf("\n");
 		}
 	}
-
-	// sort the symbols
-	if (count > 1)
+	if (params.empty())
 	{
-		std::sort(
-				&namelist[0],
-				&namelist[count],
-				[] (const char *item1, const char *item2) { return strcmp(item1, item2) < 0; });
-	}
-
-	// iterate over symbols and print out relevant ones
-	for (int symnum = 0; symnum < count; symnum++)
-	{
-		symbol_entry const *const entry = symtable->find(namelist[symnum]);
-		assert(entry != nullptr);
-		u64 value = entry->value();
-
-		// only display "register" type symbols
-		m_console.printf("%s = %X", namelist[symnum], value);
-		if (!entry->is_lval())
-			m_console.printf("  (read-only)");
-		m_console.printf("\n");
+		m_console.printf(
+			"\nTo view the symbols for a particular CPU, try symlist <cpu>,\n"
+			"where <cpu> is the ID number or tag for a CPU.\n");
 	}
 }
 

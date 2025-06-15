@@ -159,7 +159,7 @@ public:
 		, m_oki(*this, "oki")
 	{ }
 
-	void trocana(machine_config &config);
+	void trocana(machine_config &config) ATTR_COLD;
 
 private:
 	void adpcm_control_w(u8 data);
@@ -176,9 +176,9 @@ public:
 		: nmkmedal_state(mconfig, type, tag)
 	{ }
 
-	void drail(machine_config &config);
-	void hpierrot(machine_config &config);
-	void sweethrt(machine_config &config);
+	void drail(machine_config &config) ATTR_COLD;
+	void hpierrot(machine_config &config) ATTR_COLD;
+	void sweethrt(machine_config &config) ATTR_COLD;
 
 private:
 	void drail_mem_map(address_map &map) ATTR_COLD;
@@ -193,7 +193,7 @@ public:
 		: nmkmedal_state(mconfig, type, tag)
 	{ }
 
-	void omatsuri(machine_config &config);
+	void omatsuri(machine_config &config) ATTR_COLD;
 
 private:
 	void mem_map(address_map &map) ATTR_COLD;
@@ -409,6 +409,14 @@ ROM_END
 
 ROM_START( hpierrot )
 	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "v987271.u44", 0x00000, 0x10000, CRC(728df19d) SHA1(0996fca7598ac6c77d1d1b73b8de750fc1fb475d) ) // 1xxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "sound.u27", 0x00000, 0x80000, CRC(fb6b4361) SHA1(7aaecf55efe219cb0b5eb93fee329b8e6ce0b307) )
+ROM_END
+
+ROM_START( hpierrota )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "v8210.u44", 0x00000, 0x10000, CRC(313d5d07) SHA1(2802c88a21a311d552e8f2bd9e588ca7450f695d) ) // 1xxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -468,12 +476,13 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1995, drail,      0, drail,    trocana, hpierrot_state, empty_init, ROT0, "NTC / NMK",  "Dream Rail",                                MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // NMK LTD, N.T.C., H07051, V39, TEST2, V07  strings
-GAME( 1996, trocana,    0, trocana,  trocana, trocana_state,  empty_init, ROT0, "NTC / NMK",  "Trocana",                                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // NMK LTD, NTC LTD, V96313 strings
-GAME( 1996, hpierrot,   0, hpierrot, trocana, hpierrot_state, empty_init, ROT0, "NTC / NMK",  "Happy Pierrot",                             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // NTC LTD, NMK LTD, V96821 strings
-GAME( 1996, sweethrt,   0, sweethrt, trocana, hpierrot_state, empty_init, ROT0, "NMK",        "Sweetheart",                                MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // NMK LTD, V96B29° strings
-GAME( 1998, draillov,   0, omatsuri, trocana, omatsuri_state, empty_init, ROT0, "NTC / NMK",  "Dream Rail Lovely",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // LOVELY D_RAIL LOVELY NMK LTD DR_LOLÙ MT155 \T2\V0° V98B27° UPRIGHT_PCB223_150CAP strings
-GAME( 1998, plpittashi, 0, omatsuri, trocana, omatsuri_state, empty_init, ROT0, "NMK",        "Love Pi Chan (Power Link)",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // NMK LTD, V98622°, LOVE PI, CHAN strings (title taken from string, very probably wrong)
-GAME( 1998, sluster2,   0, drail,    trocana, hpierrot_state, empty_init, ROT0, "NMK",        "Super Luster II",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // NMK LTD, H10072,·V040P, V98727 strings
-GAME( 1999, omatsuri,   0, omatsuri, trocana, omatsuri_state, empty_init, ROT0, "NMK / Sega", "Shimura Ken no Bakatono-sama Ooedomatsuri", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // NMK LTD, V99422 strings. Cabinet has NMK logo, manual has Sega logo
-GAME( 1999, pldoraemon, 0, omatsuri, trocana, omatsuri_state, empty_init, ROT0, "NMK",        "Doraemon (Power Link)",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // NMK LTD, V99204°, DORAMON (sic), STEPPING_PCB200_CAP75 strings
+GAME( 1995, drail,      0,        drail,    trocana, hpierrot_state, empty_init, ROT0, "NTC / NMK",  "Dream Rail",                                MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // NMK LTD, N.T.C., H07051, V39, TEST2, V07  strings
+GAME( 1996, trocana,    0,        trocana,  trocana, trocana_state,  empty_init, ROT0, "NTC / NMK",  "Trocana",                                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // NMK LTD, NTC LTD, V96313 strings
+GAME( 1996, hpierrot,   0,        hpierrot, trocana, hpierrot_state, empty_init, ROT0, "NTC / NMK",  "Happy Pierrot (V987271)",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // NTC LTD, NMK LTD, V98727 strings
+GAME( 1996, hpierrota,  hpierrot, hpierrot, trocana, hpierrot_state, empty_init, ROT0, "NTC / NMK",  "Happy Pierrot (V968210)",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // NTC LTD, NMK LTD, V96821 strings
+GAME( 1996, sweethrt,   0,        sweethrt, trocana, hpierrot_state, empty_init, ROT0, "NMK",        "Sweetheart",                                MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // NMK LTD, V96B29° strings
+GAME( 1998, draillov,   0,        omatsuri, trocana, omatsuri_state, empty_init, ROT0, "NTC / NMK",  "Dream Rail Lovely",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // LOVELY D_RAIL LOVELY NMK LTD DR_LOLÙ MT155 \T2\V0° V98B27° UPRIGHT_PCB223_150CAP strings
+GAME( 1998, plpittashi, 0,        omatsuri, trocana, omatsuri_state, empty_init, ROT0, "NMK",        "Love Pi Chan (Power Link)",                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // NMK LTD, V98622°, LOVE PI, CHAN strings (title taken from string, very probably wrong)
+GAME( 1998, sluster2,   0,        drail,    trocana, hpierrot_state, empty_init, ROT0, "NMK",        "Super Luster II",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // NMK LTD, H10072,·V040P, V98727 strings
+GAME( 1999, omatsuri,   0,        omatsuri, trocana, omatsuri_state, empty_init, ROT0, "NMK / Sega", "Shimura Ken no Bakatono-sama Ooedomatsuri", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // NMK LTD, V99422 strings. Cabinet has NMK logo, manual has Sega logo
+GAME( 1999, pldoraemon, 0,        omatsuri, trocana, omatsuri_state, empty_init, ROT0, "NMK",        "Doraemon (Power Link)",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // NMK LTD, V99204°, DORAMON (sic), STEPPING_PCB200_CAP75 strings

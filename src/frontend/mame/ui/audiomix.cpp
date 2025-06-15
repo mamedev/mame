@@ -87,7 +87,7 @@ bool menu_audio_mixer::handle(event const *ev)
 		u32 default_osd_id = m_current_selection.m_dev->is_output() ? info.m_default_sink : info.m_default_source;
 		for(node_index = default_osd_id == 0 ? 0 : 0xffffffff; node_index != info.m_nodes.size(); node_index++) {
 			node_id = node_index == 0xffffffff ? 0 : info.m_nodes[node_index].m_id;
-			u32 guest_channel_count = m_current_selection.m_dev->inputs();
+			u32 guest_channel_count = m_current_selection.m_dev->is_output() ? m_current_selection.m_dev->inputs() : m_current_selection.m_dev->outputs();
 			u32 node_channel_count = 0;
 			if(node_index == 0xffffffff) {
 				for(u32 i = 0; i != info.m_nodes.size(); i++)
@@ -97,7 +97,6 @@ bool menu_audio_mixer::handle(event const *ev)
 					}
 			} else
 				node_channel_count = m_current_selection.m_dev->is_output() ? info.m_nodes[node_index].m_sinks : info.m_nodes[node_index].m_sources;
-
 			for(guest_channel = 0; guest_channel != guest_channel_count; guest_channel ++)
 				for(node_channel = 0; node_channel != node_channel_count; node_channel ++)
 					if(channel_mapping_available(m_current_selection.m_dev, guest_channel, node_id, node_channel))
@@ -281,7 +280,7 @@ bool menu_audio_mixer::handle(event const *ev)
 			else
 				m_current_selection.m_db -= 1.0f;
 
-			m_current_selection.m_db = floorf(m_current_selection.m_db * 10.0f) / 10.0f;
+			m_current_selection.m_db = floorf(m_current_selection.m_db * 10.0f + 0.5f) / 10.0f;
 			m_current_selection.m_db = std::clamp(m_current_selection.m_db, -96.0f, 12.0f);
 
 			if(m_current_selection.m_maptype == MT_FULL) {
@@ -303,7 +302,7 @@ bool menu_audio_mixer::handle(event const *ev)
 			if(m_current_selection.m_maptype != MT_CHANNEL)
 				return false;
 
-			u32 guest_channel_count = m_current_selection.m_dev->inputs();
+			u32 guest_channel_count = m_current_selection.m_dev->is_output() ? m_current_selection.m_dev->inputs() : m_current_selection.m_dev->outputs();
 			if(guest_channel_count == 1)
 				return false;
 			u32 guest_channel = m_current_selection.m_guest_channel;
@@ -422,7 +421,7 @@ bool menu_audio_mixer::handle(event const *ev)
 			else
 				m_current_selection.m_db += 1.0f;
 
-			m_current_selection.m_db = floorf(m_current_selection.m_db * 10.0f) / 10.0f;
+			m_current_selection.m_db = floorf(m_current_selection.m_db * 10.0f + 0.5f) / 10.0f;
 			m_current_selection.m_db = std::clamp(m_current_selection.m_db, -96.0f, 12.0f);
 
 			if(m_current_selection.m_maptype == MT_FULL) {
@@ -444,7 +443,7 @@ bool menu_audio_mixer::handle(event const *ev)
 			if(m_current_selection.m_maptype != MT_CHANNEL)
 				return false;
 
-			u32 guest_channel_count = m_current_selection.m_dev->inputs();
+			u32 guest_channel_count = m_current_selection.m_dev->is_output() ? m_current_selection.m_dev->inputs() : m_current_selection.m_dev->outputs();
 			if(guest_channel_count == 1)
 				return false;
 			u32 guest_channel = m_current_selection.m_guest_channel;
@@ -583,7 +582,7 @@ void menu_audio_mixer::populate()
 		item_append(omap.m_dev->tag(), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
 		for(const auto &nmap : omap.m_node_mappings) {
 			const auto &node = find_node(nmap.m_node);
-			std::string lnode = nmap.m_is_system_default || node->m_name == "" ? "[default]" : node->m_name;
+			std::string lnode = nmap.m_is_system_default ? "[default]" : node->m_display_name;
 			if(!omap.m_dev->is_output() && node->m_sinks)
 				lnode = util::string_format("Monitor of %s", lnode);
 			if(curline == cursel_line && m_current_group == GRP_NODE)
@@ -604,7 +603,7 @@ void menu_audio_mixer::populate()
 			if(curline == cursel_line && m_current_group == GRP_GUEST_CHANNEL)
 				guest_channel = u8"\u25c4" + guest_channel + u8"\u25ba";
 
-			std::string lnode = cmap.m_is_system_default || node->m_name == "" ? "[default]" : node->m_name;
+			std::string lnode = cmap.m_is_system_default ? "[default]" : node->m_display_name;
 			if(!omap.m_dev->is_output() && node->m_sinks)
 				lnode = util::string_format("Monitor of %s", lnode);
 			if(curline == cursel_line && m_current_group == GRP_NODE)
