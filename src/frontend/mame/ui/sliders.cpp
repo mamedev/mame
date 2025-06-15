@@ -60,6 +60,14 @@ bool menu_sliders::handle(event const *ev)
 		}
 	}
 
+	// make sure menu won't be hidden when re-entering it
+	if (!m_menuless_mode && m_hidden && ev->iptkey == IPT_UI_MENU)
+	{
+		m_hidden = false;
+		set_process_flags(PROCESS_LR_REPEAT);
+		return true;
+	}
+
 	// handle keys if there is a valid item selected
 	if (ev->itemref && (ev->item->type() == menu_item_type::SLIDER))
 	{
