@@ -210,6 +210,7 @@ void menu_sliders::populate()
 	}
 
 	item_append(menu_item_type::SEPARATOR);
+	bool separator = true;
 
 	// add OSD options
 	std::vector<menu_item> osd_sliders = machine().osd().get_slider_list();
@@ -230,7 +231,12 @@ void menu_sliders::populate()
 		{
 			item_append(item);
 		}
+
+		separator = item.type() == menu_item_type::SEPARATOR;
 	}
+
+	if (!separator)
+		item_append(menu_item_type::SEPARATOR);
 
 	// reselect last slider used in menuless mode
 	if (m_menuless_mode)
