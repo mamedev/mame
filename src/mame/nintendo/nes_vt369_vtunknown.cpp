@@ -172,6 +172,7 @@ public:
 	void vt36x_swap_512kb(machine_config& config);
 
 	void vt36x_altswap(machine_config& config);
+	void vt36x_altswap_2mb(machine_config& config);
 	void vt36x_altswap_4mb(machine_config& config);
 	void vt36x_altswap_16mb(machine_config& config);
 	void vt36x_altswap_32mb_4banks_red5mam(machine_config& config);
@@ -535,6 +536,12 @@ void vt36x_state::vt36x_altswap(machine_config &config)
 	configure_soc(m_soc);
 	m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB);
 	m_soc->force_bad_dma();
+}
+
+void vt36x_state::vt36x_altswap_2mb(machine_config &config)
+{
+	vt36x_altswap(config);
+	m_soc->set_addrmap(AS_PROGRAM, &vt36x_state::vt_external_space_map_2mbyte);
 }
 
 void vt36x_state::vt36x_altswap_4mb(machine_config &config)
@@ -925,6 +932,12 @@ ROM_START( nubsupmf )
 	ROM_LOAD( "w25q32fv.bin", 0x00000, 0x400000,  CRC(5ca234b2) SHA1(3eba3e690f68116fd3e5e914f8bd16b1dc2c0bc4) )
 ROM_END
 
+ROM_START( 36pcase )
+	ROM_REGION( 0x200000, "mainrom", 0 )
+	ROM_LOAD( "25q16.ic3", 0x00000, 0x200000, CRC(a8edb73e) SHA1(1028656530e411607ffa3b63788b42e41bf971d7) )
+ROM_END
+
+
 ROM_START( unk2019hh )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
 	ROM_LOAD( "fgb2019.bin", 0x00000, 0x1000000, CRC(7ef130d5) SHA1(00f45974494707fdac78153b13d8cfb503716ad0) )
@@ -1283,6 +1296,9 @@ CONS( 200?, gcs2mgp,   0,  0,  vt36x_altswap_16mb, vt369_rot, vt36x_state, empty
 CONS( 201?, 240in1ar,  0,  0,  vt36x_altswap_32mb_4banks_red5mam, vt369, vt36x_state, empty_init, "Thumbs Up", "Mini Arcade Machine (Thumbs Up, 240IN1ARC)", MACHINE_NOT_WORKING ) // 128Mbyte ROM, must be externally banked or different addressing scheme
 // portable fan + famiclone combo handheld, very similar to 240in1ar
 CONS( 2020, nubsupmf,   0,      0,  vt36x_altswap_4mb, vt369, vt36x_state, empty_init, "<unknown>", "NubSup Mini Game Fan", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
+// protected?
+CONS( 202?, 36pcase,    0,      0,  vt36x_altswap_2mb, vt369, vt36x_state, empty_init, "<unknown>", "36-in-1 Classic Games phone case", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 
 /*****************************************************************************
