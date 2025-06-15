@@ -235,7 +235,7 @@ protected:
 
 	void screen_vblank(int state);
 
-	optional_device<input_merger_device> m_nmigate;
+	required_device<input_merger_device> m_nmigate;
 
 private:
 	TILE_GET_INFO_MEMBER(get_ghostb_fix_tile_info);

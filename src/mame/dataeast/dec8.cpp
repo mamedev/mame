@@ -1940,13 +1940,9 @@ void csilver_state::machine_reset()
 }
 
 
-// DECO video CRTC, unverified
 void dec8_state_base::set_screen_raw_params(machine_config &config)
 {
-//  m_screen->set_refresh_hz(58);
-//  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(529)); // 58Hz, 529us Vblank duration
-//  m_screen->set_size(32*8, 32*8);
-//  m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	// DECO video CRTC, matches PCB measurements
 	m_screen->set_raw(12_MHz_XTAL / 2, 384, 0, 256, 272, 8, 248);
 }
 
