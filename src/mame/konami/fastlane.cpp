@@ -59,7 +59,7 @@ private:
 	required_memory_bank m_prgbank;
 
 	// video-related
-	tilemap_t *m_layer[2];
+	tilemap_t *m_tilemap[2];
 
 	// devices
 	required_device_array<k007232_device, 2> m_k007232;
@@ -142,8 +142,10 @@ void fastlane_state::video_start()
 {
 	m_k007121->set_spriteram(m_spriteram);
 
-	m_layer[0] = &machine().tilemap().create(*m_k007121, tilemap_get_info_delegate(*this, FUNC(fastlane_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_layer[1] = &machine().tilemap().create(*m_k007121, tilemap_get_info_delegate(*this, FUNC(fastlane_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap[0] = &machine().tilemap().create(*m_k007121, tilemap_get_info_delegate(*this, FUNC(fastlane_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap[1] = &machine().tilemap().create(*m_k007121, tilemap_get_info_delegate(*this, FUNC(fastlane_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+
+	m_tilemap[1]->set_transparent_pen(0);
 }
 
 
@@ -157,7 +159,7 @@ template <uint8_t Which>
 void fastlane_state::vram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[Which][offset] = data;
-	m_layer[Which]->mark_tile_dirty(offset & 0x3ff);
+	m_tilemap[Which]->mark_tile_dirty(offset & 0x3ff);
 }
 
 
@@ -169,6 +171,8 @@ void fastlane_state::vram_w(offs_t offset, uint8_t data)
 
 uint32_t fastlane_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	bitmap.fill(0x10, cliprect);
+
 	// compute clipping
 	rectangle clip[2];
 	clip[0] = clip[1] = screen.visible_area();
@@ -188,13 +192,13 @@ uint32_t fastlane_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	clip[1] &= cliprect;
 
 	// set scroll registers
-	m_layer[0]->set_scrollx(0, m_k007121->ctrl_r(0) - 40);
-	m_layer[0]->set_scrolly(0, m_k007121->ctrl_r(2));
+	m_tilemap[0]->set_scrollx(0, m_k007121->ctrl_r(0) - 40);
+	m_tilemap[0]->set_scrolly(0, m_k007121->ctrl_r(2));
 
 	// draw the graphics
-	m_layer[0]->draw(screen, bitmap, clip[0], 0, 0);
-	m_k007121->sprites_draw(bitmap, cliprect, 0, m_k007121->flipscreen() ? 16 : 40, 0, screen.priority(), (uint32_t)-1);
-	m_layer[1]->draw(screen, bitmap, clip[1], 0, 0);
+	m_tilemap[0]->draw(screen, bitmap, clip[0], 0, 0);
+	m_k007121->sprites_draw(bitmap, clip[0], 0, m_k007121->flipscreen() ? 16 : 40, 0, screen.priority(), (uint32_t)-1);
+	m_tilemap[1]->draw(screen, bitmap, clip[1], 0, 0);
 
 	return 0;
 }
@@ -339,7 +343,7 @@ void fastlane_state::machine_start()
 void fastlane_state::fastlane(machine_config &config)
 {
 	// basic machine hardware
-	HD6309E(config, m_maincpu, XTAL(24'000'000) / 8); // HD63C09EP, 3 MHz
+	HD6309E(config, m_maincpu, 24_MHz_XTAL / 8); // HD63C09EP, 3 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &fastlane_state::prg_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
@@ -363,12 +367,12 @@ void fastlane_state::fastlane(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	K007232(config, m_k007232[0], XTAL(3'579'545));
+	K007232(config, m_k007232[0], 3.579545_MHz_XTAL);
 	m_k007232[0]->port_write().set(FUNC(fastlane_state::volume_callback<0>));
 	m_k007232[0]->add_route(0, "mono", 0.50);
 	m_k007232[0]->add_route(1, "mono", 0.50);
 
-	K007232(config, m_k007232[1], XTAL(3'579'545));
+	K007232(config, m_k007232[1], 3.579545_MHz_XTAL);
 	m_k007232[1]->port_write().set(FUNC(fastlane_state::volume_callback<1>));
 	m_k007232[1]->add_route(0, "mono", 0.50);
 	m_k007232[1]->add_route(1, "mono", 0.50);

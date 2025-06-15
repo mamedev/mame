@@ -61,7 +61,7 @@ private:
 	required_memory_bank m_mainbank;
 
 	// video-related
-	tilemap_t *m_layer[2]{};
+	tilemap_t *m_tilemap[2]{};
 
 	void palette(palette_device &palette) const;
 	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_tile_info);
@@ -150,13 +150,13 @@ void labyrunr_state::video_start()
 {
 	m_k007121->set_spriteram(m_spriteram);
 
-	m_layer[0] = &machine().tilemap().create(*m_k007121, tilemap_get_info_delegate(*this, FUNC(labyrunr_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_layer[1] = &machine().tilemap().create(*m_k007121, tilemap_get_info_delegate(*this, FUNC(labyrunr_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap[0] = &machine().tilemap().create(*m_k007121, tilemap_get_info_delegate(*this, FUNC(labyrunr_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap[1] = &machine().tilemap().create(*m_k007121, tilemap_get_info_delegate(*this, FUNC(labyrunr_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	m_layer[0]->set_transparent_pen(0);
-	m_layer[1]->set_transparent_pen(0);
+	m_tilemap[0]->set_transparent_pen(0);
+	m_tilemap[1]->set_transparent_pen(0);
 
-	m_layer[0]->set_scroll_cols(32);
+	m_tilemap[0]->set_scroll_cols(32);
 }
 
 
@@ -179,8 +179,9 @@ uint32_t labyrunr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 {
 	uint8_t ctrl_0 = m_k007121->ctrl_r(0);
 
+	const int bgpen = (m_k007121->ctrl_r(6) & 0x30) * 2 + 16;
+	bitmap.fill(bgpen << 4, cliprect);
 	screen.priority().fill(0, cliprect);
-	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	const rectangle &visarea = screen.visible_area();
 
@@ -205,24 +206,23 @@ uint32_t labyrunr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		clip[1] &= cliprect;
 
 		// set scroll registers
-		m_layer[0]->set_scrollx(0, ctrl_0 - 40);
-		m_layer[1]->set_scrollx(0, 0);
+		m_tilemap[0]->set_scrollx(0, ctrl_0 - 40);
+		m_tilemap[1]->set_scrollx(0, 0);
 
 		for (int i = 0; i < 32; i++)
 		{
 			// enable colscroll
 			if (m_k007121->ctrl_r(1) & 2)
-				m_layer[0]->set_scrolly((i + 2) & 0x1f, m_k007121->scroll_r(i));
+				m_tilemap[0]->set_scrolly((i + 2) & 0x1f, m_k007121->scroll_r(i));
 			else
-				m_layer[0]->set_scrolly((i + 2) & 0x1f, m_k007121->ctrl_r(2));
+				m_tilemap[0]->set_scrolly((i + 2) & 0x1f, m_k007121->ctrl_r(2));
 		}
 
 		// draw the graphics
-		m_layer[0]->draw(screen, bitmap, clip[0], TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_CATEGORY(0), 0);
-		draw_sprites(bitmap, cliprect, screen.priority());
-		m_layer[0]->draw(screen, bitmap, clip[0], TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_CATEGORY(1), 0);
-		// we ignore the transparency because layer1 is drawn only at the top of the screen also covering sprites
-		m_layer[1]->draw(screen, bitmap, clip[1], TILEMAP_DRAW_OPAQUE, 0);
+		m_tilemap[0]->draw(screen, bitmap, clip[0], TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_CATEGORY(0), 0);
+		draw_sprites(bitmap, clip[0], screen.priority());
+		m_tilemap[0]->draw(screen, bitmap, clip[0], TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_CATEGORY(1), 0);
+		m_tilemap[1]->draw(screen, bitmap, clip[1], 0, 0);
 	}
 	else
 	{
@@ -272,23 +272,23 @@ uint32_t labyrunr_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			clip[i] &= cliprect;
 		}
 
-		m_layer[0]->set_scrollx(0, ctrl_0 - 40);
-		m_layer[1]->set_scrollx(0, ctrl_0 - 40);
+		m_tilemap[0]->set_scrollx(0, ctrl_0 - 40);
+		m_tilemap[1]->set_scrollx(0, ctrl_0 - 40);
 
 		// draw the graphics
-		m_layer[0]->draw(screen, bitmap, clip[0], TILEMAP_DRAW_CATEGORY(0), 0);
+		m_tilemap[0]->draw(screen, bitmap, clip[0], TILEMAP_DRAW_CATEGORY(0), 0);
 		if (use_clip2[0])
-			m_layer[0]->draw(screen, bitmap, clip[2], TILEMAP_DRAW_CATEGORY(0), 0);
+			m_tilemap[0]->draw(screen, bitmap, clip[2], TILEMAP_DRAW_CATEGORY(0), 0);
 
 		draw_sprites(bitmap, cliprect, screen.priority());
 
-		m_layer[0]->draw(screen, bitmap, clip[0], TILEMAP_DRAW_CATEGORY(1), 0);
+		m_tilemap[0]->draw(screen, bitmap, clip[0], TILEMAP_DRAW_CATEGORY(1), 0);
 		if (use_clip2[0])
-			m_layer[0]->draw(screen, bitmap, clip[2], TILEMAP_DRAW_CATEGORY(1), 0);
+			m_tilemap[0]->draw(screen, bitmap, clip[2], TILEMAP_DRAW_CATEGORY(1), 0);
 
-		m_layer[1]->draw(screen, bitmap, clip[1], 0, 0);
+		m_tilemap[1]->draw(screen, bitmap, clip[1], 0, 0);
 		if (use_clip2[1])
-			m_layer[1]->draw(screen, bitmap, clip[2], 0, 0);
+			m_tilemap[1]->draw(screen, bitmap, clip[2], 0, 0);
 	}
 
 	return 0;
@@ -311,7 +311,7 @@ template <uint8_t Which>
 void labyrunr_state::vram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[Which][offset] = data;
-	m_layer[Which]->mark_tile_dirty(offset & 0x3ff);
+	m_tilemap[Which]->mark_tile_dirty(offset & 0x3ff);
 }
 
 void labyrunr_state::prg_map(address_map &map)
@@ -437,7 +437,7 @@ void labyrunr_state::labyrunr(machine_config &config)
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(labyrunr_state::palette));
-	m_palette->set_format(palette_device::xBGR_555, 2*8*16*16, 128);
+	m_palette->set_format(palette_device::xBGR_555, 8*16*16, 128);
 
 	K007121(config, m_k007121, 0, gfx_labyrunr, m_palette, "screen");
 	m_k007121->set_irq_cb().set_inputline(m_maincpu, HD6309_IRQ_LINE);
@@ -450,7 +450,7 @@ void labyrunr_state::labyrunr(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ym2203_device &ym1(YM2203(config, "ym1", 3000000));
+	ym2203_device &ym1(YM2203(config, "ym1", 24_MHz_XTAL / 8));
 	ym1.port_a_read_callback().set_ioport("DSW1");
 	ym1.port_b_read_callback().set_ioport("DSW2");
 	ym1.add_route(0, "mono", 0.40);
@@ -458,7 +458,7 @@ void labyrunr_state::labyrunr(machine_config &config)
 	ym1.add_route(2, "mono", 0.40);
 	ym1.add_route(3, "mono", 0.80);
 
-	ym2203_device &ym2(YM2203(config, "ym2", 3000000));
+	ym2203_device &ym2(YM2203(config, "ym2", 24_MHz_XTAL / 8));
 	ym2.port_b_read_callback().set_ioport("DSW3");
 	ym2.add_route(0, "mono", 0.40);
 	ym2.add_route(1, "mono", 0.40);

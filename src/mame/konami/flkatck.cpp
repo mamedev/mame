@@ -72,7 +72,7 @@ private:
 	required_memory_bank m_mainbank;
 
 	// video-related
-	tilemap_t *m_k007121_tilemap[2];
+	tilemap_t *m_tilemap[2];
 
 	// misc
 	required_ioport m_coin;
@@ -149,10 +149,7 @@ TILE_GET_INFO_MEMBER(flkatck_state::get_tile_info_b)
 	int attr = m_vram[tile_index + 0x800];
 	int code = m_vram[tile_index + 0xc00];
 
-	tileinfo.set(0,
-			code,
-			(attr & 0x0f) + 16,
-			0);
+	tileinfo.set(0, code, (attr & 0x0f) + 16, 0);
 }
 
 
@@ -166,8 +163,10 @@ void flkatck_state::video_start()
 {
 	m_k007121->set_spriteram(m_spriteram);
 
-	m_k007121_tilemap[0] = &machine().tilemap().create(*m_k007121, tilemap_get_info_delegate(*this, FUNC(flkatck_state::get_tile_info_a)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_k007121_tilemap[1] = &machine().tilemap().create(*m_k007121, tilemap_get_info_delegate(*this, FUNC(flkatck_state::get_tile_info_b)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap[0] = &machine().tilemap().create(*m_k007121, tilemap_get_info_delegate(*this, FUNC(flkatck_state::get_tile_info_a)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap[1] = &machine().tilemap().create(*m_k007121, tilemap_get_info_delegate(*this, FUNC(flkatck_state::get_tile_info_b)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+
+	m_tilemap[1]->set_transparent_pen(0);
 }
 
 
@@ -181,9 +180,9 @@ void flkatck_state::vram_w(offs_t offset, uint8_t data)
 {
 	m_vram[offset] = data;
 	if (offset & 0x800) // score
-		m_k007121_tilemap[1]->mark_tile_dirty(offset & 0x3ff);
+		m_tilemap[1]->mark_tile_dirty(offset & 0x3ff);
 	else
-		m_k007121_tilemap[0]->mark_tile_dirty(offset & 0x3ff);
+		m_tilemap[0]->mark_tile_dirty(offset & 0x3ff);
 }
 
 
@@ -195,6 +194,8 @@ void flkatck_state::vram_w(offs_t offset, uint8_t data)
 
 uint32_t flkatck_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	bitmap.fill(0x100, cliprect);
+
 	// compute clipping
 	rectangle clip[2];
 	clip[0] = clip[1] = screen.visible_area();
@@ -220,13 +221,13 @@ uint32_t flkatck_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	if (!scrollx && !scrolly)
 		machine().tilemap().mark_all_dirty();
 
-	m_k007121_tilemap[0]->set_scrollx(0, scrollx - 40);
-	m_k007121_tilemap[0]->set_scrolly(0, scrolly);
+	m_tilemap[0]->set_scrollx(0, scrollx - 40);
+	m_tilemap[0]->set_scrolly(0, scrolly);
 
 	// draw the graphics
-	m_k007121_tilemap[0]->draw(screen, bitmap, clip[0], 0, 0);
-	m_k007121->sprites_draw(bitmap, cliprect, 0, m_k007121->flipscreen() ? 16 : 40, 0, screen.priority(), (uint32_t)-1);
-	m_k007121_tilemap[1]->draw(screen, bitmap, clip[1], 0, 0);
+	m_tilemap[0]->draw(screen, bitmap, clip[0], 0, 0);
+	m_k007121->sprites_draw(bitmap, clip[0], 0, m_k007121->flipscreen() ? 16 : 40, 0, screen.priority(), (uint32_t)-1);
+	m_tilemap[1]->draw(screen, bitmap, clip[1], 0, 0);
 
 	return 0;
 }
@@ -410,14 +411,16 @@ void flkatck_state::flkatck(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	YM2151(config, "ymsnd", 3.579545_MHz_XTAL).add_route(0, "speaker", 1.0, 0).add_route(0, "speaker", 1.0, 1);
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL));
+	ymsnd.add_route(0, "speaker", 0.60, 0);
+	ymsnd.add_route(1, "speaker", 0.60, 1);
 
 	K007232(config, m_k007232, 3.579545_MHz_XTAL);
 	m_k007232->port_write().set(FUNC(flkatck_state::volume_callback));
-	m_k007232->add_route(0, "speaker", 0.50, 0);
-	m_k007232->add_route(0, "speaker", 0.50, 1);
-	m_k007232->add_route(1, "speaker", 0.50, 0);
-	m_k007232->add_route(1, "speaker", 0.50, 1);
+	m_k007232->add_route(0, "speaker", 0.30, 0);
+	m_k007232->add_route(0, "speaker", 0.30, 1);
+	m_k007232->add_route(1, "speaker", 0.30, 0);
+	m_k007232->add_route(1, "speaker", 0.30, 1);
 }
 
 

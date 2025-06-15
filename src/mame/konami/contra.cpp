@@ -149,7 +149,6 @@ Notes:
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ymopm.h"
-#include "video/bufsprite.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -330,6 +329,7 @@ void contra_state::video_start()
 	m_tilemap[2] = &machine().tilemap().create(*m_k007121[0], tilemap_get_info_delegate(*this, FUNC(contra_state::get_tx_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_tilemap[0]->set_transparent_pen(0);
+	m_tilemap[2]->set_transparent_pen(0);
 }
 
 
@@ -385,6 +385,9 @@ void contra_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 
 uint32_t contra_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	const int bgpen = (m_k007121[1]->ctrl_r(6) & 0x30) * 2 + 16;
+	bitmap.fill(0x800 | bgpen << 4, cliprect);
+
 	// compute clipping
 	rectangle clip[2];
 	clip[0] = clip[1] = screen.visible_area();
@@ -417,8 +420,8 @@ uint32_t contra_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	// draw the graphics
 	m_tilemap[1]->draw(screen, bitmap, clip[0], 0 ,0);
 	m_tilemap[0]->draw(screen, bitmap, clip[0], 0 ,0);
-	draw_sprites<0>(bitmap, cliprect, screen.priority());
-	draw_sprites<1>(bitmap, cliprect, screen.priority());
+	draw_sprites<0>(bitmap, clip[0], screen.priority());
+	draw_sprites<1>(bitmap, clip[0], screen.priority());
 	m_tilemap[2]->draw(screen, bitmap, clip[1], 0 ,0);
 
 	return 0;

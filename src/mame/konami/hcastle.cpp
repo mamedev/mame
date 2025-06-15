@@ -27,7 +27,6 @@ BTANB: some awkward priorities, eg:
 #include "sound/k007232.h"
 #include "sound/k051649.h"
 #include "sound/ymopl.h"
-#include "video/bufsprite.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -437,7 +436,7 @@ void hcastle_state::hcastle(machine_config &config)
 	KONAMI(config, m_maincpu, 24_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &hcastle_state::main_map);
 
-	Z80(config, m_audiocpu, 3579545);
+	Z80(config, m_audiocpu, 3.579545_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &hcastle_state::sound_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
@@ -464,16 +463,16 @@ void hcastle_state::hcastle(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	K007232(config, m_k007232, 3579545);
+	K007232(config, m_k007232, 3.579545_MHz_XTAL);
 	m_k007232->port_write().set(FUNC(hcastle_state::volume_callback));
 	m_k007232->add_route(0, "mono", 0.44);
 	m_k007232->add_route(1, "mono", 0.50);
 
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", 3579545));
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", 3.579545_MHz_XTAL));
 	ymsnd.irq_handler().set_inputline("audiocpu", INPUT_LINE_NMI); // from schematic; NMI handler is just a retn
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.70);
 
-	K051649(config, "k051649", 3579545).add_route(ALL_OUTPUTS, "mono", 0.45);
+	K051649(config, "k051649", 3.579545_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.45);
 }
 
 /***************************************************************************/
