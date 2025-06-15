@@ -15,7 +15,6 @@
     - codec sound
     - expansion bus
         - Z80 card
-        - Winchester DMA card (Xebec S1410 + Tandon TM502/TM603SE)
         - RAM cards
         - clock cards
     - floppy 8048
@@ -25,10 +24,12 @@
 #include "emu.h"
 
 #include "victor9k_fdc.h"
+#include "victor9k_hdc.h"
 #include "victor9k_kb.h"
 
 #include "bus/centronics/ctronics.h"
 #include "bus/ieee488/ieee488.h"
+#include "bus/nscsi/s1410.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
 #include "imagedev/floppy.h"
@@ -115,6 +116,8 @@ public:
 		m_cvsd_filter2(*this, "cvsd_filter2"),
 		m_kb(*this, KB_TAG),
 		m_fdc(*this, "fdc"),
+		m_scsibus(*this, "scsi"),
+		m_hdc(*this, "scsi:7:v9kdmaib"),
 		m_centronics(*this, "centronics"),
 		m_rs232a(*this, RS232_A_TAG),
 		m_rs232b(*this, RS232_B_TAG),
@@ -152,6 +155,8 @@ private:
 	optional_device<filter_biquad_device> m_cvsd_filter2;
 	required_device<victor_9000_keyboard_device> m_kb;
 	required_device<victor_9000_fdc_device> m_fdc;
+	required_device<nscsi_bus_device> m_scsibus;
+	required_device<victor_9000_hdc_device> m_hdc;
 	required_device<centronics_device> m_centronics;
 	required_device<rs232_port_device> m_rs232a;
 	required_device<rs232_port_device> m_rs232b;
@@ -186,6 +191,8 @@ private:
 	void kbdata_w(int state);
 	void vert_w(int state);
 
+	uint8_t hd_dma_r(offs_t offset);
+	void hd_dma_w(offs_t offset, uint8_t data);
 
 	MC6845_UPDATE_ROW( crtc_update_row );
 	MC6845_BEGIN_UPDATE( crtc_begin_update );
@@ -209,6 +216,8 @@ private:
 	int m_kbackctl;
 
 	void update_kback();
+
+	static void scsi_devices(device_slot_interface &device);
 
 	void victor9k_mem(address_map &map) ATTR_COLD;
 };
@@ -238,6 +247,7 @@ void victor9k_state::victor9k_mem(address_map &map)
 	map(0xe80a0, 0xe80af).mirror(0x7f00).rw(m_fdc, FUNC(victor_9000_fdc_device::cs5_r), FUNC(victor_9000_fdc_device::cs5_w));
 	map(0xe80c0, 0xe80cf).mirror(0x7f00).rw(m_fdc, FUNC(victor_9000_fdc_device::cs6_r), FUNC(victor_9000_fdc_device::cs6_w));
 	map(0xe80e0, 0xe80ef).mirror(0x7f00).rw(m_fdc, FUNC(victor_9000_fdc_device::cs7_r), FUNC(victor_9000_fdc_device::cs7_w));
+	map(0xef300, 0xef3ff).rw(m_hdc, FUNC(victor_9000_hdc_device::read), FUNC(victor_9000_hdc_device::write));
 	map(0xf0000, 0xf0fff).mirror(0x1000).ram().share("video_ram");
 	map(0xf8000, 0xf9fff).mirror(0x6000).rom().region(I8088_TAG, 0);
 }
@@ -621,6 +631,18 @@ void victor9k_state::fdc_irq_w(int state)
 	m_pic->ir3_w(m_ssda_irq || m_via1_irq || m_via3_irq || m_fdc_irq);
 }
 
+uint8_t victor9k_state::hd_dma_r(offs_t offset)
+{
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	return program.read_byte(offset);
+}
+
+void victor9k_state::hd_dma_w(offs_t offset, uint8_t data)
+{
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	program.write_byte(offset, data);
+}
+
 //**************************************************************************
 //  MACHINE INITIALIZATION
 //**************************************************************************
@@ -710,6 +732,11 @@ void victor9k_state::machine_reset()
 //-------------------------------------------------
 //  machine_config( victor9k )
 //-------------------------------------------------
+
+void victor9k_state::scsi_devices(device_slot_interface &device)
+{
+	device.option_add("harddisk", NSCSI_S1410);
+}
 
 void victor9k_state::victor9k(machine_config &config)
 {
@@ -828,6 +855,25 @@ void victor9k_state::victor9k(machine_config &config)
 	m_fdc->irq_wr_callback().set(FUNC(victor9k_state::fdc_irq_w));
 	m_fdc->syn_wr_callback().set(I8259A_TAG, FUNC(pic8259_device::ir0_w)).invert();
 	m_fdc->lbrdy_wr_callback().set_inputline(I8088_TAG, INPUT_LINE_TEST).invert();
+
+	NSCSI_BUS(config, m_scsibus);
+	NSCSI_CONNECTOR(config, "scsi:0", scsi_devices, "harddisk", false);
+	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:2", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:3", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:4", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:5", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:7").option_set("v9kdmaib", VICTOR_9000_HDC).machine_config(
+		[this](device_t *device)
+		{
+			victor_9000_hdc_device &victor9k_hdc(downcast<victor_9000_hdc_device &>(*device));
+
+			device->set_clock(15_MHz_XTAL / 3);
+			victor9k_hdc.irq_handler().append(m_pic, FUNC(pic8259_device::ir4_w));
+			victor9k_hdc.dma_read().set(*this, FUNC(victor9k_state::hd_dma_r));
+			victor9k_hdc.dma_write().set(*this, FUNC(victor9k_state::hd_dma_w));
+		});
 
 	RAM(config, m_ram).set_default_size("128K").set_extra_options("128K,256K,512K,640K,768K,896K");
 

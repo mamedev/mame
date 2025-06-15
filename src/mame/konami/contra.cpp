@@ -149,7 +149,6 @@ Notes:
 #include "machine/gen_latch.h"
 #include "machine/watchdog.h"
 #include "sound/ymopm.h"
-#include "video/bufsprite.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -211,7 +210,6 @@ private:
 	template <uint8_t Which> void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(interrupt);
 	void bankswitch_w(uint8_t data);
 	void sh_irqtrigger_w(uint8_t data);
 	void sirq_clear_w(uint8_t data);
@@ -269,10 +267,10 @@ void contra_state::palette(palette_device &palette) const
 template <uint8_t Which>
 TILE_GET_INFO_MEMBER(contra_state::get_tile_info)
 {
-	uint8_t ctrl_3 = m_k007121[Which]->ctrlram_r(3);
-	uint8_t ctrl_4 = m_k007121[Which]->ctrlram_r(4);
-	uint8_t ctrl_5 = m_k007121[Which]->ctrlram_r(5);
-	uint8_t ctrl_6 = m_k007121[Which]->ctrlram_r(6);
+	uint8_t ctrl_3 = m_k007121[Which]->ctrl_r(3);
+	uint8_t ctrl_4 = m_k007121[Which]->ctrl_r(4);
+	uint8_t ctrl_5 = m_k007121[Which]->ctrl_r(5);
+	uint8_t ctrl_6 = m_k007121[Which]->ctrl_r(6);
 	int attr = m_cram[Which][tile_index];
 	int bit0 = (ctrl_5 >> 0) & 0x03;
 	int bit1 = (ctrl_5 >> 2) & 0x03;
@@ -295,8 +293,8 @@ TILE_GET_INFO_MEMBER(contra_state::get_tile_info)
 
 TILE_GET_INFO_MEMBER(contra_state::get_tx_tile_info)
 {
-	uint8_t ctrl_5 = m_k007121[0]->ctrlram_r(5);
-	uint8_t ctrl_6 = m_k007121[0]->ctrlram_r(6);
+	uint8_t ctrl_5 = m_k007121[0]->ctrl_r(5);
+	uint8_t ctrl_6 = m_k007121[0]->ctrl_r(6);
 	int attr = m_cram[2][tile_index];
 	int bit0 = (ctrl_5 >> 0) & 0x03;
 	int bit1 = (ctrl_5 >> 2) & 0x03;
@@ -331,6 +329,7 @@ void contra_state::video_start()
 	m_tilemap[2] = &machine().tilemap().create(*m_k007121[0], tilemap_get_info_delegate(*this, FUNC(contra_state::get_tx_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_tilemap[0]->set_transparent_pen(0);
+	m_tilemap[2]->set_transparent_pen(0);
 }
 
 
@@ -378,7 +377,7 @@ void contra_state::dirtytiles()
 template <uint8_t Which>
 void contra_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap)
 {
-	int base_color = (m_k007121[Which]->ctrlram_r(6) & 0x30) * 2;
+	int base_color = (m_k007121[Which]->ctrl_r(6) & 0x30) * 2;
 	int global_x_offset = m_k007121[Which]->flipscreen() ? 16 : 40;
 
 	m_k007121[Which]->sprites_draw(bitmap, cliprect, base_color, global_x_offset, 0, priority_bitmap, (uint32_t)-1);
@@ -386,6 +385,9 @@ void contra_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 
 uint32_t contra_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	const int bgpen = (m_k007121[1]->ctrl_r(6) & 0x30) * 2 + 16;
+	bitmap.fill(0x800 | bgpen << 4, cliprect);
+
 	// compute clipping
 	rectangle clip[2];
 	clip[0] = clip[1] = screen.visible_area();
@@ -405,10 +407,10 @@ uint32_t contra_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	clip[1] &= cliprect;
 
 	// set scroll registers
-	uint8_t ctrl_1_0 = m_k007121[0]->ctrlram_r(0);
-	uint8_t ctrl_1_2 = m_k007121[0]->ctrlram_r(2);
-	uint8_t ctrl_2_0 = m_k007121[1]->ctrlram_r(0);
-	uint8_t ctrl_2_2 = m_k007121[1]->ctrlram_r(2);
+	uint8_t ctrl_1_0 = m_k007121[0]->ctrl_r(0);
+	uint8_t ctrl_1_2 = m_k007121[0]->ctrl_r(2);
+	uint8_t ctrl_2_0 = m_k007121[1]->ctrl_r(0);
+	uint8_t ctrl_2_2 = m_k007121[1]->ctrl_r(2);
 
 	m_tilemap[0]->set_scrollx(0, ctrl_1_0 - 40);
 	m_tilemap[0]->set_scrolly(0, ctrl_1_2);
@@ -418,19 +420,13 @@ uint32_t contra_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	// draw the graphics
 	m_tilemap[1]->draw(screen, bitmap, clip[0], 0 ,0);
 	m_tilemap[0]->draw(screen, bitmap, clip[0], 0 ,0);
-	draw_sprites<0>(bitmap, cliprect, screen.priority());
-	draw_sprites<1>(bitmap, cliprect, screen.priority());
+	draw_sprites<0>(bitmap, clip[0], screen.priority());
+	draw_sprites<1>(bitmap, clip[0], screen.priority());
 	m_tilemap[2]->draw(screen, bitmap, clip[1], 0 ,0);
 
 	return 0;
 }
 
-
-INTERRUPT_GEN_MEMBER(contra_state::interrupt)
-{
-	if (m_k007121[0]->ctrlram_r(7) & 0x02)
-		device.execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);
-}
 
 void contra_state::bankswitch_w(uint8_t data)
 {
@@ -470,7 +466,9 @@ void contra_state::main_map(address_map &map)
 	map(0x001a, 0x001a).w(FUNC(contra_state::sh_irqtrigger_w));
 	map(0x001c, 0x001c).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x001e, 0x001e).rw("watchdog", FUNC(watchdog_timer_device::reset_r), FUNC(watchdog_timer_device::reset_w));
+	map(0x0020, 0x005f).rw(m_k007121[0], FUNC(k007121_device::scroll_r), FUNC(k007121_device::scroll_w));
 	map(0x0060, 0x0067).w(m_k007121[1], FUNC(k007121_device::ctrl_w));
+	map(0x0080, 0x00bf).rw(m_k007121[1], FUNC(k007121_device::scroll_r), FUNC(k007121_device::scroll_w));
 
 	map(0x0c00, 0x0cff).ram().w(m_palette, FUNC(palette_device::write_indirect)).share("palette");
 
@@ -596,7 +594,6 @@ void contra_state::contra(machine_config &config)
 	// basic machine hardware
 	HD6309E(config, m_maincpu, 24_MHz_XTAL / 8); // (HD63C09EP)
 	m_maincpu->set_addrmap(AS_PROGRAM, &contra_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(contra_state::interrupt));
 
 	MC6809E(config, m_audiocpu, 3.579545_MHz_XTAL / 2); // (HD68B09EP)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &contra_state::sound_map);
@@ -612,20 +609,19 @@ void contra_state::contra(machine_config &config)
 	m_screen->set_raw(24_MHz_XTAL / 3, 512, 0, 280, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(contra_state::screen_update));
 	m_screen->set_palette(m_palette);
-	m_screen->screen_vblank().set(m_k007121[0], FUNC(k007121_device::sprites_buffer));
-	m_screen->screen_vblank().append(m_k007121[1], FUNC(k007121_device::sprites_buffer));
 
 	PALETTE(config, m_palette, FUNC(contra_state::palette));
 	m_palette->set_format(palette_device::xBGR_555, 2 * 8 * 16 * 16);
 	m_palette->set_indirect_entries(128);
 	m_palette->set_endianness(ENDIANNESS_LITTLE);
 
-	K007121(config, m_k007121[0], 0, m_palette, gfx_contra_1);
+	K007121(config, m_k007121[0], 0, gfx_contra_1, m_palette, m_screen);
+	m_k007121[0]->set_irq_cb().set_inputline(m_maincpu, HD6309_IRQ_LINE);
 	m_k007121[0]->set_flipscreen_cb().set(FUNC(contra_state::flipscreen_w<0>));
 	m_k007121[0]->set_flipscreen_cb().append(FUNC(contra_state::flipscreen_w<2>));
 	m_k007121[0]->set_dirtytiles_cb(FUNC(contra_state::dirtytiles<0>));
 
-	K007121(config, m_k007121[1], 0, m_palette, gfx_contra_2);
+	K007121(config, m_k007121[1], 0, gfx_contra_2, m_palette, m_screen);
 	m_k007121[1]->set_flipscreen_cb().set(FUNC(contra_state::flipscreen_w<1>));
 	m_k007121[1]->set_dirtytiles_cb(FUNC(contra_state::dirtytiles<1>));
 

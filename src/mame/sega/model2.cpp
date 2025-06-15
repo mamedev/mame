@@ -2595,7 +2595,7 @@ void model2_state::model2_scsp(machine_config &config)
 /* original Model 2 */
 void model2o_state::model2o(machine_config &config)
 {
-	I960(config, m_maincpu, 50_MHz_XTAL / 2);
+	I80960KB(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2o_state::model2o_mem);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(model2_state::model2_interrupt), "screen", 0, 1);
@@ -2746,7 +2746,7 @@ void model2o_state::vcop(machine_config &config)
 /* 2A-CRX */
 void model2a_state::model2a(machine_config &config)
 {
-	I960(config, m_maincpu, 50_MHz_XTAL / 2);
+	I80960KB(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2a_state::model2a_crx_mem);
 	TIMER(config, "scantimer").configure_scanline(FUNC(model2_state::model2_interrupt), "screen", 0, 1);
 
@@ -2882,7 +2882,7 @@ void model2a_state::zeroguna(machine_config &config)
 /* 2B-CRX */
 void model2b_state::model2b(machine_config &config)
 {
-	I960(config, m_maincpu, 50_MHz_XTAL / 2);
+	I80960KB(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2b_state::model2b_crx_mem);
 
 	TIMER(config, "scantimer", 0).configure_scanline(FUNC(model2_state::model2_interrupt), "screen", 0, 1);
@@ -3037,7 +3037,7 @@ void model2b_state::zerogun(machine_config &config)
 /* 2C-CRX */
 void model2c_state::model2c(machine_config &config)
 {
-	I960(config, m_maincpu, 50_MHz_XTAL / 2);
+	I80960KB(config, m_maincpu, 50_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &model2c_state::model2c_crx_mem);
 	TIMER(config, "scantimer").configure_scanline(FUNC(model2c_state::model2c_interrupt), "screen", 0, 1);
 

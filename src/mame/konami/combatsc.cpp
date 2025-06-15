@@ -45,6 +45,32 @@ Credits:
 
 Memory Maps (preliminary):
 
+****************************
+* Combat School (Original) *
+****************************
+
+0000-005f   Video Registers (banked)
+0400-0407   input ports
+0408        coin counters
+0410        bankswitch control
+0600-06ff   palette
+0800-1fff   RAM
+2000-2fff   Video RAM (banked)
+3000-3fff   Object RAM (banked)
+4000-7fff   Banked Area + IO + Video Registers
+8000-ffff   ROM
+
+SOUND CPU:
+----------
+0000-8000   ROM
+8000-87ff   RAM
+9000        uPD7759
+b000        uPD7759
+c000        uPD7759
+d000        soundlatch read
+e000-e001   YM2203
+
+
 ***************************
 * Combat School (bootleg) *
 ***************************
@@ -72,49 +98,19 @@ a000        soundlatch?
 a800        OKIM5205?
 fffc-ffff   ???
 
+Notes about the sound system of the bootleg:
+---------------------------------------------
+The positions 0x87f0-0x87ff are very important, it
+does work similar to a semaphore (same as a lot of
+vblank bits). For example in the init code, it writes
+zero to 0x87fa, then it waits until it'll be different
+to zero, but it isn't written by this cpu. (shareram?)
+I have tried to put here a K007232 chip, but it didn't
+work.
 
-        Notes about the sound system of the bootleg:
-        ---------------------------------------------
-        The positions 0x87f0-0x87ff are very important, it
-        does work similar to a semaphore (same as a lot of
-        vblank bits). For example in the init code, it writes
-        zero to 0x87fa, then it waits until it'll be different
-        to zero, but it isn't written by this cpu. (shareram?)
-        I have tried to put here a K007232 chip, but it didn't
-        work.
+Sound chips: OKI M5205 & YM2203
 
-        Sound chips: OKI M5205 & YM2203
-
-        We are using the other sound hardware for now.
-
-****************************
-* Combat School (Original) *
-****************************
-
-0000-005f   Video Registers (banked)
-0400-0407   input ports
-0408        coin counters
-0410        bankswitch control
-0600-06ff   palette
-0800-1fff   RAM
-2000-2fff   Video RAM (banked)
-3000-3fff   Object RAM (banked)
-4000-7fff   Banked Area + IO + Video Registers
-8000-ffff   ROM
-
-SOUND CPU:
-----------
-0000-8000   ROM
-8000-87ff   RAM
-9000        uPD7759
-b000        uPD7759
-c000        uPD7759
-d000        soundlatch read
-e000-e001   YM2203
-
-
-2008-08:
-Dip location and recommended settings verified with the US manual
+We are using the other sound hardware for now.
 
 ***************************************************************************/
 
@@ -134,11 +130,6 @@ Dip location and recommended settings verified with the US manual
  *  Memory handlers
  *
  *************************************/
-
-void combatsc_state::pf_control_w(offs_t offset, uint8_t data)
-{
-	m_k007121[m_video_circuit]->ctrl_w(offset, data);
-}
 
 template <uint8_t Which>
 void combatsc_state::flipscreen_w(int state)
@@ -171,37 +162,21 @@ void combatsc_base_state::vreg_w(uint8_t data)
 	}
 }
 
-void combatscb_state::priority_w(uint8_t data)
-{
-	if (data & 0x40)
-	{
-		m_video_circuit = 1;
-		m_video_view.select(1);
-	}
-	else
-	{
-		m_video_circuit = 0;
-		m_video_view.select(0);
-	}
-
-	m_priority = data & 0x20;
-}
-
 void combatsc_state::bankselect_w(uint8_t data)
 {
-	m_priority = data & 0x20;
+	m_priority = BIT(data, 5);
 
 	if (data & 0x40)
 	{
-		m_video_circuit = 1;
-		m_video_view.select(1);
+		m_pf_view.select(1);
 		m_scroll_view.select(1);
+		m_video_view.select(1);
 	}
 	else
 	{
-		m_video_circuit = 0;
-		m_video_view.select(0);
+		m_pf_view.select(0);
 		m_scroll_view.select(0);
+		m_video_view.select(0);
 	}
 
 	if (data & 0x10)
@@ -212,18 +187,9 @@ void combatsc_state::bankselect_w(uint8_t data)
 
 void combatscb_state::bankselect_w(uint8_t data)
 {
-	if (data & 0x40)
-	{
-		m_video_circuit = 1;
-		m_video_view.select(1);
-	}
-	else
-	{
-		m_video_circuit = 0;
-		m_video_view.select(0);
-	}
+	m_video_view.select(BIT(data, 6));
 
-	data = data & 0x1f;
+	data &= 0x1f;
 
 	if (data != m_bank_select)
 	{
@@ -242,6 +208,12 @@ void combatscb_state::bankselect_w(uint8_t data)
 		else
 			m_bank_io_view.disable();
 	}
+}
+
+void combatscb_state::priority_w(uint8_t data)
+{
+	m_priority = BIT(data, 5);
+	m_video_view.select(BIT(data, 6));
 }
 
 void combatscb_state::io_w(offs_t offset, uint8_t data)
@@ -335,12 +307,14 @@ uint8_t combatsc_state::unk_r()
 
 void combatsc_state::main_map(address_map &map)
 {
-	map(0x0000, 0x0007).w(FUNC(combatsc_state::pf_control_w));
+	map(0x0000, 0x0007).view(m_pf_view);
+	m_pf_view[0](0x0000, 0x0007).w(m_k007121[0], FUNC(k007121_device::ctrl_w));
+	m_pf_view[1](0x0000, 0x0007).w(m_k007121[1], FUNC(k007121_device::ctrl_w));
+
 	map(0x001f, 0x001f).r(FUNC(combatsc_state::unk_r));
 	map(0x0020, 0x005f).view(m_scroll_view);
-	m_scroll_view[0](0x0020, 0x005f).ram().share(m_scrollram[0]);
-	m_scroll_view[1](0x0020, 0x005f).ram().share(m_scrollram[1]);
-//  map(0x0060, 0x00ff).writeonly();                 // RAM
+	m_scroll_view[0](0x0020, 0x005f).rw(m_k007121[0], FUNC(k007121_device::scroll_r), FUNC(k007121_device::scroll_w));
+	m_scroll_view[1](0x0020, 0x005f).rw(m_k007121[1], FUNC(k007121_device::scroll_r), FUNC(k007121_device::scroll_w));
 
 	map(0x0200, 0x0207).rw("k007452", FUNC(k007452_device::read), FUNC(k007452_device::write));
 
@@ -348,7 +322,7 @@ void combatsc_state::main_map(address_map &map)
 	map(0x0401, 0x0401).portr("DSW3");
 	map(0x0402, 0x0402).portr("DSW1");
 	map(0x0403, 0x0403).portr("DSW2");
-	map(0x0404, 0x0407).r(FUNC(combatsc_state::trackball_r));           // 1P & 2P controls / trackball
+	map(0x0404, 0x0407).r(FUNC(combatsc_state::trackball_r)); // 1P & 2P controls / trackball
 	map(0x0408, 0x0408).w(FUNC(combatsc_state::coin_counter_w));
 	map(0x040c, 0x040c).w(FUNC(combatsc_state::vreg_w));
 	map(0x0410, 0x0410).nopr().w(FUNC(combatsc_state::bankselect_w)); // read is clr a (discarded)
@@ -642,7 +616,6 @@ void combatsc_base_state::machine_start()
 
 	save_item(NAME(m_priority));
 	save_item(NAME(m_vreg));
-	save_item(NAME(m_video_circuit));
 }
 
 void combatsc_state::machine_start()
@@ -696,7 +669,6 @@ void combatsc_state::combatsc(machine_config &config)
 	// basic machine hardware
 	HD6309E(config, m_maincpu, 24_MHz_XTAL / 8); // HD63C09E, 3 MHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &combatsc_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(combatsc_state::irq0_line_hold));
 
 	Z80(config, m_audiocpu, 3579545); // 3.579545 MHz??? (no such XTAL on board!)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &combatsc_state::sound_map);
@@ -712,18 +684,17 @@ void combatsc_state::combatsc(machine_config &config)
 	m_screen->set_raw(24_MHz_XTAL / 3, 512, 0, 256, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(combatsc_state::screen_update));
 	m_screen->set_palette(m_palette);
-	m_screen->screen_vblank().set(m_k007121[0], FUNC(k007121_device::sprites_buffer));
-	m_screen->screen_vblank().append(m_k007121[1], FUNC(k007121_device::sprites_buffer));
 
 	PALETTE(config, m_palette, FUNC(combatsc_state::palette));
 	m_palette->set_format(palette_device::xBGR_555, 8 * 16 * 16, 128);
 	m_palette->set_endianness(ENDIANNESS_LITTLE);
 
-	K007121(config, m_k007121[0], 0, m_palette, gfx_combatsc_1);
+	K007121(config, m_k007121[0], 0, gfx_combatsc_1, m_palette, m_screen);
+	m_k007121[0]->set_irq_cb().set_inputline(m_maincpu, HD6309_IRQ_LINE);
 	m_k007121[0]->set_flipscreen_cb().set(FUNC(combatsc_state::flipscreen_w<0>));
 	m_k007121[0]->set_dirtytiles_cb(FUNC(combatsc_state::dirtytiles<0>));
 
-	K007121(config, m_k007121[1], 0, m_palette, gfx_combatsc_2);
+	K007121(config, m_k007121[1], 0, gfx_combatsc_2, m_palette, m_screen);
 	m_k007121[1]->set_flipscreen_cb().set(FUNC(combatsc_state::flipscreen_w<1>));
 	m_k007121[1]->set_dirtytiles_cb(FUNC(combatsc_state::dirtytiles<1>));
 
@@ -732,7 +703,7 @@ void combatsc_state::combatsc(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", 3000000));
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 24_MHz_XTAL / 8));
 	ymsnd.port_a_write_callback().set(FUNC(combatsc_state::portA_w));
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.20);
 

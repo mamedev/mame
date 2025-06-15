@@ -23,9 +23,16 @@
     VOLANTE MODULAR: (small sub-board) Logic for the driving wheel.
 
     TODO:
-    - priorities aren't understood
-    - sound implementation may not be totally correct
-    - wheel support
+    - Sound implementation may not be totally correct (although regular Modular sound seems
+	  completely unused)
+    - Wheel support
+	- Dipswitches
+	- Identify unimplemented video registers
+	- What is the point in the 'overlay' ROM? it contains a valid boot vector, unlike the
+	  main program ROMs, but otherwise doesn't work with this hardware setup.  A similar
+	  program exists on the glass prototype (probably to communicate with the dev hardware)
+	  but that had RAM instead of program ROM for the rest of the game.
+
 ***************************************************************************************************/
 
 #include "emu.h"
@@ -91,6 +98,7 @@ private:
 	tilemap_t *m_bg_tilemap = nullptr;
 	tilemap_t *m_bg2_tilemap = nullptr;
 
+	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
@@ -135,6 +143,7 @@ TILE_GET_INFO_MEMBER(wrally_ms_state::get_bg_tile_info)
 	int fx = (attr & 0xc0) >> 6;
 
 	tileinfo.set(2, code & 0xfff, attr & 0x1f, TILE_FLIPYX(fx));
+	tileinfo.category = (attr & 0x0020) >> 5;
 }
 
 void wrally_ms_state::bg_w(offs_t offset, u16 data, u16 mem_mask)
@@ -148,8 +157,8 @@ TILE_GET_INFO_MEMBER(wrally_ms_state::get_bg2_tile_info)
 	u16 code = m_bg2_vram[tile_index * 2];
 	u16 attr = m_bg2_vram[(tile_index * 2) + 1];
 	int fx = (attr & 0xc0) >> 6;
-
-	tileinfo.set(1, code & 0x1fff, attr & 0x1f, TILE_FLIPYX(fx)); // some valid road gfx drawn from here
+	tileinfo.set(1, code & 0x1fff, attr & 0x1f, TILE_FLIPYX(fx));
+	//tileinfo.category = (attr & 0x0020) >> 5; // not used on this layer?
 }
 
 void wrally_ms_state::bg2_w(offs_t offset, u16 data, u16 mem_mask)
@@ -169,30 +178,13 @@ void wrally_ms_state::video_start()
 //  m_bg2_tilemap->set_transparent_pen(0);
 }
 
-u32 wrally_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void wrally_ms_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	// are these using the correct reg pairs?
-	m_bg_tilemap->set_scrollx(0, 80-(m_scrollregs[0]));
-	m_bg_tilemap->set_scrolly(0, -m_scrollregs[1]);
-
-	m_bg2_tilemap->set_scrollx(0, 80-(m_scrollregs[6]));
-	m_bg2_tilemap->set_scrolly(0, -m_scrollregs[7]);
-
-	// what are m_scrollregs 2,3 and 4,5?
-	// one is probably tx scroll, the other priority control
-
-	m_tx_tilemap->set_scrollx(0, 80);
-	m_tx_tilemap->set_scrolly(0, 0);
-
-	m_bg2_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-
 	// TODO, convert to device, share between Modular System games
 	const int NUM_SPRITES = 0x200;
 	const int X_EXTRA_OFFSET = 78;
 
-	for (int i = NUM_SPRITES - 2; i >= 0; i -= 2)
+	for (int i = 0; i < NUM_SPRITES; i += 2)
 	{
 		gfx_element* gfx = m_gfxdecode->gfx(3);
 
@@ -220,9 +212,43 @@ u32 wrally_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 
 		int flipx = (attr1 & 0x0040);
 		int flipy = (attr1 & 0x0080);
+		int col = (attr2 & 0x0f00) >> 8;
 
-		gfx->transpen(bitmap, cliprect, tile, (attr2 & 0x0f00) >> 8, flipx, flipy, xpos - 16 - X_EXTRA_OFFSET, ypos - 16, 15);
+		int pri_mask;
+		if (col & 8)
+			pri_mask = 0xf0;
+		else
+			pri_mask = 0x00;
+
+		gfx->prio_transpen(bitmap, cliprect, tile, col, flipx, flipy, xpos - 16 - X_EXTRA_OFFSET, ypos - 16, screen.priority(),	pri_mask, 15);
 	}
+}
+
+u32 wrally_ms_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	screen.priority().fill(0, cliprect);
+	bitmap.fill(0, cliprect);
+
+	// are these using the correct reg pairs?
+	m_bg_tilemap->set_scrollx(0, 80-(m_scrollregs[0]));
+	m_bg_tilemap->set_scrolly(0, -m_scrollregs[1]);
+
+	m_bg2_tilemap->set_scrollx(0, 80-(m_scrollregs[6]));
+	m_bg2_tilemap->set_scrolly(0, -m_scrollregs[7]);
+
+	// what are m_scrollregs 2,3 and 4,5?
+	// one is probably tx scroll, the other priority control (or not?)
+
+	m_tx_tilemap->set_scrollx(0, 80);
+	m_tx_tilemap->set_scrolly(0, 0);
+
+	m_bg2_tilemap->draw(screen, bitmap, cliprect, 0, 1);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0), 2);
+	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1), 4);
+
+	draw_sprites(screen, bitmap, cliprect);
+
+	m_tx_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	return 0;
 }
@@ -296,53 +322,53 @@ static INPUT_PORTS_START( wrally_ms )
 
 	PORT_START("DSW1")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x0100, 0x0100, "DSW1" )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1c00, 0x1c00, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:3,4,5")
+	PORT_DIPSETTING(      0x0800, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(      0x1800, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x1400, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0c00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_3C ) )
+	PORT_DIPSETTING(      0x1c00, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0xe000, 0xe000, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:6,7,8")
+	PORT_DIPSETTING(      0xe000, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_4C ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(      0x6000, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0xa000, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0xc000, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( 1C_6C ) )
 
 	PORT_START("DSW2")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_SERVICE( 0x0100, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x0200, 0x0200, "DSW2" )
+	PORT_SERVICE_DIPLOC(  0x0100, IP_ACTIVE_LOW, "SW2:1" )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x0000, "Control Type" ) // currently locks up after a few seconds of gameplay with wheel
+	PORT_DIPNAME( 0x2000, 0x0000, "Control Type" ) PORT_DIPLOCATION("SW2:6") // currently locks up after a few seconds of gameplay with wheel
 	PORT_DIPSETTING(      0x2000, "Wheel" )
 	PORT_DIPSETTING(      0x0000, "Joystick" )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -564,4 +590,4 @@ ROM_END
 } // anonymous namespace
 
 // World Rally was originally developed using the Modular System, so this isn't a bootleg, it's the original development version
-GAME( 1992, wrallymp, wrally, wrally_ms, wrally_ms, wrally_ms_state, init_wrally_ms, ROT0, "Gaelco", "World Rallye Championship (prototype on Modular System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // 23/11/1992
+GAME( 1992, wrallymp, wrally, wrally_ms, wrally_ms, wrally_ms_state, init_wrally_ms, ROT0, "Gaelco", "World Rallye Championship (prototype on Modular System, 23 Nov 1992)", 0 ) // 23/11/1992
