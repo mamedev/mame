@@ -107,8 +107,10 @@ public:
 
 	virtual std::error_condition flush() noexcept override
 	{
-		// shouldn't be any userspace buffers on the file handle
-		return std::error_condition();
+		if (!FlushFileBuffers(m_handle))
+			return win_error_to_error_condition(GetLastError());
+		else
+			return std::error_condition();
 	}
 
 private:
