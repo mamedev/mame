@@ -5,29 +5,29 @@
 Skeleton driver for NSM/Löwen ST25 platform of gambling machines
 Infos can be found at https://wiki.goldserie.de/index.php?title=Spiel_und_System_Modul_25
 
- NSM STE25.1 216575A
+  NSM STE25.1 216575A/1012
   ___________________________________________________________________________________
- |                                                        XTAL       SERIAL         |
- | .            TL7705ACP               ______________  16.000 MHz                  |
- | .                                   | NEC V25     |                ___________   |
- | .                                   | D70322L-8   |                |74HC123N |   |
- | .                                   |             |                ___________   |
- | .                                   |             |                |D43256B  |   |
+ |                 __________                             XTAL       SERIAL         |
+ | .              |TL7705ACP|           ______________  16.000 MHz                  |
+ | .               __________          | NEC V25     |                ___________   |
+ | .              |74HCT574 |          | D70322L-8   |                |74HC123N |   |
+ | .               __________          |             |                ____________  |
+ | .              |74HCT245N|          |             |                |V62C518256|  |
  | .                                   |_____________|                              |
  | .           ___________               __________   __________   _____________    |
- | .          |74HC32N   |              |         |  |         |  | Spiel und   |   |
+ | .          |74HC32N   |              |74HC138N |  |74HC04N  |  | Spiel und   |   |
  | .           ___________   __________  __________   __________  | System      |   |
- |     RST    |74HC08N   |  |74HC368B1| |         |  |74HCT21N |  | Modul       |   |
+ |     RST    |74HC08N   |  |74HC368B1| |74AS138N |  |74HCT21N |  | Modul       |   |
  | .           ___________               __________   __________  | ROM Module  |   |
- | .          |74HC00N                  |74HC4050N|  |         |  |             |   |
- | .                                                              |             |   |
- | .                                                              |             |   |
- | .                                                              |_____________|   |
- |              SERVICE                                            __________       |
+ | .          |74HC00N   |              |74HC4050N|  |74HC04N  |  | [SCC2592AC] |   |
+ | .           ___________                                        |             |   |
+ | .          |74HC32N   |                                XTAL    | [M27C4001 ] |   |
+ | .                                                    3.686MHz  |_____________|   |
+ |             +SERVICE+                                           __________       |
  |                                                                | OKI     |       |
  |                                                                | M6376   |       |
- |                                                                |__________       |
- | .                 VOL                                                            |
+ |                                 TDA2005                        |__________       |
+ | .                 VOL         __HEATSINK__                                       |
  | .                                                                                |
  |__________________________________________________________________________________|
 
@@ -49,6 +49,7 @@ Infos can be found at https://wiki.goldserie.de/index.php?title=Spiel_und_System
 #include "emu.h"
 
 #include "cpu/nec/v25.h"
+#include "machine/mc68681.h"
 #include "machine/timekpr.h"
 #include "sound/okim6376.h"
 
@@ -118,6 +119,8 @@ void st25_state::st25(machine_config &config)
 
 
 	M48T02(config, "m48t18", 0); // ST M48T18-150PC1
+
+	SCN2681(config, "uart", 3.6864_MHz_XTAL); // Philips SCC2692AC1N28
 
 	// Sound hardware
 
