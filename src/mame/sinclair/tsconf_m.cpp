@@ -359,8 +359,25 @@ void tsconf_state::draw_sprites(screen_device &screen_d, bitmap_rgb32 &bitmap, c
 
 }
 
+u8 tsconf_state::ram_bank_read(u8 bank, offs_t offset)
+{
+	if (!machine().side_effects_disabled() && ((m_regs[SYS_CONFIG] & 3) == 2)) // 14Mhz
+	{
+		const offs_t addr = PAGE4K(m_regs[PAGE0 + bank]) + offset;
+		if (!(m_regs[CACHE_CONFIG] & (1 << bank)) || (m_cache_line_addr != (addr | 1)))
+		{
+			m_cache_line_addr = addr | 1;
+			m_maincpu->adjust_icount(-2);
+		}
+	}
+
+	return reinterpret_cast<u8 *>(m_bank_ram[bank]->base())[offset];
+}
+
 void tsconf_state::ram_bank_write(u8 bank, offs_t offset, u8 data)
 {
+	m_cache_line_addr = 0;
+
 	if (BIT(m_regs[FMAPS], 4))
 	{
 		offs_t machine_addr = PAGE4K(bank) + offset;
