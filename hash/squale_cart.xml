@@ -6,6 +6,17 @@ license:CC0-1.0
 
 <softwarelist name="squale_cart" description="Squale cartridges">
 
+	<software name="sqbasicsq" cloneof="sqbasic">
+		<description>Squale BASIC (Squash)</description>
+		<year>1985</year>
+		<publisher>SIROS</publisher>
+		<part name="cart" interface="squale_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="Squale_Basic_V2_37_01_01_85.bin" size="32768" crc="d41e32d3" sha1="86665927e407f57147e8dcc2f68bb4dfc7db92dc" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sqbasic">
 		<description>Squale BASIC</description>
 		<year>1985</year>
