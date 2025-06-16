@@ -391,6 +391,12 @@ ROM_START( lxpcli )
 	ROM_LOAD( "s29gl512n11tfi02.u2", 0x00000, 0x4000000, CRC(9df963c6) SHA1(e5cc7b48c31b761bb74b3e5e1563a16a0cefa272) )
 ROM_END
 
+ROM_START( rfcp168 )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "winbond_w29gl128c.bin", 0x00000, 0x1000000, CRC(d11caf71) SHA1(64b269cee30a51549a2d0491bbeed07751771559) ) // ROM verified on 2 units
+	ROM_RELOAD( 0x1000000, 0x1000000 )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -410,6 +416,9 @@ CONS( 201?, dgunl3202, 0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empt
 // many of the games don't work or have scrambled graphics, it writes 0xc0 to vtfp_411e_encryption_state_w in such cases
 CONS( 201?, myaass,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init, "dreamGEAR", "My Arcade All Star Stadium - Pocket Player (307-in-1)", MACHINE_NOT_WORKING )
 CONS( 201?, myaasa,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init, "dreamGEAR", "My Arcade All Star Arena - Pocket Player (307-in-1)", MACHINE_NOT_WORKING )
+
+// doesn't boot, ends up in weeds after jumping to bank with no code, lots of accesses to $42xx
+CONS( 201?, rfcp168,   0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "Retro FC Plus 168 in 1 Handheld", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // "RETRO_FC_V3.5"
 
 
 // Some games (eg F22) are scrambled like in myaass

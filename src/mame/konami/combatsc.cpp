@@ -681,7 +681,7 @@ void combatsc_state::combatsc(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(24_MHz_XTAL / 3, 512, 0, 256, 264, 16, 240);
+	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0, 256, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(combatsc_state::screen_update));
 	m_screen->set_palette(m_palette);
 

@@ -43,7 +43,7 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	void buffer_spriteram16_w(u8 data);
+	void buffer_spriteram16_w(u8 data = 0);
 	void main_irq_on_w(u8 data);
 	void main_irq_off_w(u8 data);
 	void sub_irq_on_w(u8 data);
@@ -223,6 +223,7 @@ protected:
 	virtual void i8751_hi_w(u8 data) override;
 	void gondo_i8751_hi_w(u8 data);
 	void ghostb_bank_w(u8 data);
+	void gondo_bank_w(u8 data);
 	void gondo_scroll_w(offs_t offset, u8 data);
 	void mcu_to_main_w(u8 data);
 	void sound_w(u8 data);
@@ -235,7 +236,7 @@ protected:
 
 	void screen_vblank(int state);
 
-	optional_device<input_merger_device> m_nmigate;
+	required_device<input_merger_device> m_nmigate;
 
 private:
 	TILE_GET_INFO_MEMBER(get_ghostb_fix_tile_info);
@@ -250,7 +251,7 @@ private:
 	void garyoret_map(address_map &map) ATTR_COLD;
 
 	bool m_secclr = false;
-	bool m_nmi_enable = false;
+	u8 m_ghostb_bank = 0;
 
 	emu_timer *m_6502_timer = nullptr;
 	emu_timer *m_i8751_timer = nullptr;

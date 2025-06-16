@@ -81,6 +81,29 @@ RAND USR 16530
 		</part>
 	</software>
 
+	<software name="1ksptrio">
+		<description>1K Supertrio</description>
+		<year>1981</year>
+		<publisher>Macronics Software</publisher>
+		<notes><![CDATA[
+BREAKOUT
+	LOAD "B"
+	GOTO 100
+SPACE INVADERS
+	LOAD "V1"
+	GOTO 100
+MUSIC
+	LOAD "M1"
+	RUN
+]]></notes>
+		<info name="language" value="English" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="2722">
+				<rom name="ZX81 1K Supertrio.tzx" size="2722" crc="6b7cf66b" sha1="8952e6b2d59a0e8a2a412a2f785f751a2b31d2d0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="1kwonders">
 		<description>1k Wonders</description>
 		<year>198?</year>
@@ -117,6 +140,20 @@ RAND USR 16530
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="1165">
 				<rom name="1KZXChess(Artic).A.ChessQueen.tzx" size="1165" crc="9c750652" sha1="ed848d9bd69311536da64c0414f7ae2ec9316622"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2dimensao">
+		<description>2ª Dimensão</description>
+		<year>198?</year>
+		<publisher>SoftKristian</publisher>
+		<info name="alt_title" value="Segunda Dimensão" />
+		<info name="language" value="Portuguese (Brazil)" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Space Invader + Asteroid"/>
+			<dataarea name="cass" size="7647">
+				<rom name="2aDimensao.tzx" size="7647" crc="228c9f85" sha1="e24c5674cd157849ab25f22349642be1285451ad"/>
 			</dataarea>
 		</part>
 	</software>
@@ -897,6 +934,44 @@ RAND USR 16530
 		</part>
 	</software>
 
+	<software name="amisterio">
+		<description>Aventura &amp; Mistério</description>
+		<year>198?</year>
+		<publisher>Ciberne Software</publisher>
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Sabotagem"/>
+			<dataarea name="cass" size="8039">
+				<rom name="sabotagem.p" size="8039" crc="4d457878" sha1="9de82cdda7fd873eb42406fae308c78980384c08"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="O Aventureiro"/>
+			<dataarea name="cass" size="14532">
+				<rom name="aventureiro.p" size="14532" crc="eed48f90" sha1="191237ca3c653004f782ce8d9613e9506b8a5b68"/>
+			</dataarea>
+		</part>
+		<part name="cass3" interface="zx81_cass">
+			<feature name="part_id" value="Mazogs"/>
+			<dataarea name="cass" size="12831">
+				<rom name="mazogs.p" size="12831" crc="3567c9af" sha1="6509b6d72a5fa252553924e136799781036558eb"/>
+			</dataarea>
+		</part>
+		<part name="cass4" interface="zx81_cass">
+			<feature name="part_id" value="Pirâmide Inca"/>
+			<dataarea name="cass" size="8860">
+				<rom name="piramide.p" size="8860" crc="019926de" sha1="80b403a0454905d0a5a8bf7be345ef62400cffbd"/>
+			</dataarea>
+		</part>
+		<part name="cass5" interface="zx81_cass">
+			<feature name="part_id" value="USS Enterprise"/>
+			<dataarea name="cass" size="10705">
+				<rom name="enterprise.p" size="10705" crc="9b1ebfa7" sha1="7d8ffe6502ea523c5f58b4fb5f83131c9e3ca397"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="backgamm">
 		<description>Backgammon and Dice</description>
 		<year>1982</year>
@@ -1084,6 +1159,44 @@ RAND USR 16530
 		</part>
 	</software>
 
+	<software name="bichocia">
+		<description>Bichos &amp; Cia</description>
+		<year>198?</year>
+		<publisher>Ciberne Software</publisher>
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Casca a Cobra"/>
+			<dataarea name="cass" size="14292">
+				<rom name="casca.p" size="14292" crc="4415dfad" sha1="57cad14edbe90b76df461ae9a815d8baf65aa539"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Crazy Kong"/>
+			<dataarea name="cass" size="8229">
+				<rom name="crazkong.p" size="8229" crc="2013eb53" sha1="96324c64ddb37a633651148799950f01aadb8003"/>
+			</dataarea>
+		</part>
+		<part name="cass3" interface="zx81_cass">
+			<feature name="part_id" value="Sucuri"/>
+			<dataarea name="cass" size="4659">
+				<rom name="sucuri.p" size="4659" crc="55d224b7" sha1="49c2699444a68a80d49cc8e685b4fbd900f0a08f"/>
+			</dataarea>
+		</part>
+		<part name="cass4" interface="zx81_cass">
+			<feature name="part_id" value="Frogger"/>
+			<dataarea name="cass" size="10638">
+				<rom name="frogger.p" size="10638" crc="caae72dc" sha1="7e7308fbeae6868f5fe0fbe2ce8fd4496cfabee7"/>
+			</dataarea>
+		</part>
+		<part name="cass5" interface="zx81_cass">
+			<feature name="part_id" value="Centopeia"/>
+			<dataarea name="cass" size="9441">
+				<rom name="centopei.p" size="9441" crc="435bf8b0" sha1="6ba7be7d865466005f02aeb7aaa7479d63c86bae"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bigflapatt">
 		<description>Bigflap Attack</description>
 		<year>1982</year>
@@ -1249,7 +1362,9 @@ RAND USR 16530
 		<description>Blitz Balle</description>
 		<year>1984</year>
 		<publisher>Sprites</publisher>
+		<info name="author" value="Philippe Wettstein" />
 		<info name="language" value="French" />
+		<info name="serial" value="ZX 006" />
 		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="15948">
@@ -1709,19 +1824,6 @@ RAND USR 16530
 		</part>
 	</software>
 
-	<software name="cedriccl">
-		<description>Cedric the Clown (type-in, Sinclair User № 17 - August 1983)</description>
-		<year>1983</year>
-		<publisher>ECC Publications</publisher>
-		<info name="language" value="English" />
-		<info name="usage" value="16K; type RUN after loading the program" />
-		<part name="cass1" interface="zx81_cass">
-			<dataarea name="cass" size="4391">
-				<rom name="Cedric the Clown.tzx" size="4391" crc="2aebfcac" sha1="4fb13393fe2e98a0224f21af22ada29b2c1bb2b4"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="centipede">
 		<description>Centipede</description>
 		<year>1982</year>
@@ -2060,6 +2162,44 @@ RAND USR 16530
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="7665">
 				<rom name="CollectorsRecordingSystem.tzx" size="7665" crc="1a89b64d" sha1="7fb6cf85c4a0e47a2ad78f5f4371deeebadcb923"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="combate">
+		<description>Combate</description>
+		<year>198?</year>
+		<publisher>Ciberne Software</publisher>
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Night Gunner"/>
+			<dataarea name="cass" size="5470">
+				<rom name="night.p" size="5470" crc="76bddb25" sha1="e92bb3d690f1c73eea2b61fbf8aa292bf8312341"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Polaris"/>
+			<dataarea name="cass" size="11609">
+				<rom name="polaris.p" size="11609" crc="d70e9051" sha1="1350b605e9185aae2a8f25f8868cf68e69ae7ae1"/>
+			</dataarea>
+		</part>
+		<part name="cass3" interface="zx81_cass">
+			<feature name="part_id" value="Alerta Vermelho"/>
+			<dataarea name="cass" size="7940">
+				<rom name="alerta.p" size="7940" crc="909a245e" sha1="8f60e8a56d3263ada9deac25a8bae94b34d79556"/>
+			</dataarea>
+		</part>
+		<part name="cass4" interface="zx81_cass">
+			<feature name="part_id" value="Duelo"/>
+			<dataarea name="cass" size="4321">
+				<rom name="duelo.p" size="4321" crc="c12ab5a7" sha1="0c51f9a7841ce8be45e25ca7b6a96cdd87d053da"/>
+			</dataarea>
+		</part>
+		<part name="cass5" interface="zx81_cass">
+			<feature name="part_id" value="Scramble"/>
+			<dataarea name="cass" size="5128">
+				<rom name="scramble.p" size="5128" crc="61967662" sha1="3b344aa06f4ce9180a840ff24d3ff030d50db3f1"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2424,6 +2564,32 @@ RAND USR 16530
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="7680">
 				<rom name="DCoder.A.tzx" size="7680" crc="1684ba79" sha1="39f16bb21b52c566218f38aa07b1951e38c0f8bd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="defens3d">
+		<description>Defensor 3D</description>
+		<year>198?</year>
+		<publisher>Ciberne Software</publisher>
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Defensor 3D"/>
+			<dataarea name="cass" size="11857">
+				<rom name="defensor3d.p" size="11857" crc="124df64c" sha1="44df5caad5030e520348c95928809b13a1d21d59"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Q'Bert"/>
+			<dataarea name="cass" size="11323">
+				<rom name="qbert.p" size="11323" crc="82e764b1" sha1="31f943652d7d82e5e2d8d96b2f5a55ccc8f470ef"/>
+			</dataarea>
+		</part>
+		<part name="cass3" interface="zx81_cass">
+			<feature name="part_id" value="Assalto"/>
+			<dataarea name="cass" size="8834">
+				<rom name="assalto.p" size="8834" crc="ce2c79ac" sha1="f2fc74684b5f0eb62908c81a1164127cb05edad4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3016,6 +3182,18 @@ RAND USR 16530
 			<feature name="part_id" value="TFOX"/>
 			<dataarea name="cass" size="5214">
 				<rom name="FastOneThe.A.2.TFOX.tzx" size="5214" crc="a02d25de" sha1="83dfe8ea5fff08ac58ddb93f0ae1014bc88b3e08"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fghtpilot" supported="no">
+		<description>Fighter Pilot</description>
+		<year>1981</year>
+		<publisher>Digital Integration</publisher>
+		<info name="language" value="English" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="9789">
+				<rom name="Fighter Pilot (Digital Integration).tzx" size="9789" crc="aaf0cfca" sha1="727870a93eec4448af2e587814103cdf9290caa2"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4474,6 +4652,19 @@ RAND USR 16530
 		</part>
 	</software>
 
+	<software name="hognomes_a" cloneof="hognomes">
+		<description>House of Gnomes (alt)</description>
+		<year>198?</year>
+		<publisher>Bug-Byte</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="15056">
+				<rom name="House of Gnomes - Alternate.tzx" size="15056" crc="9e7eabf8" sha1="b5eda95bc90a2b6e37c1d8c6f38e79f9d643ca76"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hrg70">
 		<description>HRG 7.0</description>
 		<year>1983</year>
@@ -5088,6 +5279,24 @@ Defender: not working
 		</part>
 	</software>
 
+	<software name="kludobttl">
+		<description>Kludo + Battleships</description>
+		<year>1983</year>
+		<publisher>Meow Micros</publisher>
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Side A - Kludo"/>
+			<dataarea name="cass" size="10214">
+				<rom name="Kludo - Battleships - Side A.tzx" size="10214" crc="f45b6785" sha1="48ec551da8849c86054fce6e35a8ac270062964a"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Side B - Battleships"/>
+			<dataarea name="cass" size="8428">
+				<rom name="Kludo - Battleships - Side B.tzx" size="8428" crc="982dc117" sha1="0b7d7164acc72a5ab0f7b81b20875a27d4bebf0b"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="knightqu">
 		<description>The Knights Quest</description>
 		<year>1983</year>
@@ -5536,6 +5745,37 @@ Defender: not working
 		</part>
 	</software>
 
+	<software name="matemat2">
+		<description>Matemática II</description>
+		<year>198?</year>
+		<publisher>LOG</publisher>
+		<info name="language" value="Portuguese" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Newton"/>
+			<dataarea name="cass" size="4887">
+				<rom name="Newton.p" size="4887" crc="b6105f06" sha1="39b2577fe762acc84d3e83bf4dde96e0c1a69e32"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Q-Reg"/>
+			<dataarea name="cass" size="3016">
+				<rom name="Q-REG (198X).tzx" size="3016" crc="41a86955" sha1="2c55f9bd32096b0fc09f28f19fa0dea497fe57fb"/>
+			</dataarea>
+		</part>
+		<part name="cass3" interface="zx81_cass">
+			<feature name="part_id" value="Lagrange"/>
+			<dataarea name="cass" size="4130">
+				<rom name="Lagrange.tzx" size="4130" crc="4fc00d98" sha1="13f526c779d6e2e3fecb503a7d35d323b00fd1d1"/>
+			</dataarea>
+		</part>
+		<part name="cass4" interface="zx81_cass">
+			<feature name="part_id" value="Integ. Simpson"/>
+			<dataarea name="cass" size="1625">
+				<rom name="Integ. Simpson.p" size="1625" crc="d16e94f6" sha1="955bfe804bffb726cd220375f03c54773047150d"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="maths1">
 		<description>Mathematics 1</description>
 		<year>1982</year>
@@ -5698,6 +5938,38 @@ Defender: not working
 		</part>
 	</software>
 
+	<software name="merc7mar">
+		<description>Mercador dos Sete Mares</description>
+		<year>198?</year>
+		<publisher>Ciberne Software</publisher>
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Mercador dos Sete Mares"/>
+			<dataarea name="cass" size="13995">
+				<rom name="MercadorDosSeteMares.p" size="13995" crc="a0ac79d6" sha1="844f275459aca7d3fb679d74b63334d7389de683"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Corrida Maluca"/>
+			<dataarea name="cass" size="4468">
+				<rom name="CorridaMaluca.p" size="4468" crc="135254a2" sha1="e7c9d54630a40876395e6a61f7c5c865f4788958"/>
+			</dataarea>
+		</part>
+		<part name="cass3" interface="zx81_cass">
+			<feature name="part_id" value="Pinball - Play"/>
+			<dataarea name="cass" size="14228">
+				<rom name="Pinball1.p" size="14228" crc="9c2d152d" sha1="bcfdfc6151a9af2c11e66bac067cda74aff29ee1"/>
+			</dataarea>
+		</part>
+		<part name="cass4" interface="zx81_cass">
+			<feature name="part_id" value="Pinball - Table Creation"/>
+			<dataarea name="cass" size="13526">
+				<rom name="Pinball2.p" size="13526" crc="0ebbd0ee" sha1="42042fd1c5adb103a992f822aa7ca0ab0c4a80d4"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mervenus">
 		<description>Merchant of Venus</description>
 		<year>1983</year>
@@ -5821,6 +6093,18 @@ Defender: not working
 			<feature name="part_id" value="Blockade"/>
 			<dataarea name="cass" size="2357">
 				<rom name="blockade.p" size="2357" crc="9c224a70" sha1="24ba78d09644d426517ed694ae3c693b61042191"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="midway">
+		<description>Midway</description>
+		<year>1983</year>
+		<publisher>SoftKristian</publisher>
+		<info name="language" value="Portuguese (Brazil)" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="12401">
+				<rom name="midway.p" size="12401" crc="8c368030" sha1="4ad8f3d0e8d6eb39809f4e21db7bf5dc1fc4eb8e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -6448,6 +6732,19 @@ Defender: not working
 		</part>
 	</software>
 
+	<software name="othello_roy">
+		<description>Othello (Roy Eastwood)</description>
+		<year>198?</year>
+		<publisher>Roy Eastwood</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="type RUN after loading the tape" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="4799">
+				<rom name="Othello (Roy Eastwood).tzx" size="4799" crc="5dffb896" sha1="159d9b1e1e14b0bb6ba1807b07a7e538aeee184b"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pacrabbt">
 		<description>Pac Rabbit</description>
 		<year>1983</year>
@@ -6527,6 +6824,44 @@ Defender: not working
 			<feature name="part_id" value="Bomber"/>
 			<dataarea name="cass" size="2397">
 				<rom name="PatrouilleDeLEspace.B.Bomber.tzx" size="2397" crc="6b38e0ab" sha1="0800181140382d84ac7bc3e0a37901717dc4e8e2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pgalactic">
+		<description>Patrulha Galática</description>
+		<year>198?</year>
+		<publisher>Ciberne Software</publisher>
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Nave Mãe"/>
+			<dataarea name="cass" size="9592">
+				<rom name="navemae.p" size="9592" crc="fc07cb32" sha1="333fb210735517fddd563f2f732307089d574e42"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Galática"/>
+			<dataarea name="cass" size="10150">
+				<rom name="galactica.p" size="10150" crc="80f3f9e5" sha1="0488716ffa99a80fd86e31283b6c7263131ae333"/>
+			</dataarea>
+		</part>
+		<part name="cass3" interface="zx81_cass">
+			<feature name="part_id" value="Fungos Mutantes"/>
+			<dataarea name="cass" size="9099">
+				<rom name="fungosm.p" size="9099" crc="361e38bf" sha1="71482b50d155e2970cdc4f1b387b47ca53c3056b"/>
+			</dataarea>
+		</part>
+		<part name="cass4" interface="zx81_cass">
+			<feature name="part_id" value="SOS Vega III"/>
+			<dataarea name="cass" size="7684">
+				<rom name="sosvega3.p" size="7684" crc="4c9396a9" sha1="9643033e31f7494b56a1f453196b86b6325effec"/>
+			</dataarea>
+		</part>
+		<part name="cass5" interface="zx81_cass">
+			<feature name="part_id" value="Perseguidor"/>
+			<dataarea name="cass" size="3594">
+				<rom name="perseguidor.p" size="3594" crc="5282b633" sha1="06f5e290d3a38d6617b2a903164b3f5d58abdf35"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7266,6 +7601,18 @@ Defender: not working
 		</part>
 	</software>
 
+	<software name="vegas">
+		<description>Retorno dos Vegas</description>
+		<year>198?</year>
+		<publisher>Plan-Soft</publisher>
+		<info name="language" value="Portuguese (Brazil)" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="15699">
+				<rom name="vegas.p" size="15699" crc="e7cd0a7d" sha1="0dd00ae1dbff7f7846f4a42042c85a34612d4107"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="reversi">
 		<description>Reversi also known as Othello</description>
 		<year>1982</year>
@@ -7297,6 +7644,19 @@ Defender: not working
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="15820">
 				<rom name="Rigel.p" size="15820" crc="033b8038" sha1="edc2f6a8e680df5bfe9e6b49209554323ff3a482"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="roadhog">
+		<description>Road Hog</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="type RUN after loading the tape" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="1737">
+				<rom name="Road Hog.tzx" size="1737" crc="7ec54731" sha1="cadf6666cc529359d6df987b4a43b96e87cfe91d"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7496,6 +7856,36 @@ Defender: not working
 		</part>
 	</software>
 
+	<software name="seawolfn" cloneof="seawolf">
+		<description>Sea Wolf (newer)</description>
+		<year>1983</year>
+		<publisher>Stephen Hartley Computing</publisher>
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="9732">
+				<rom name="SeaWolf(Newer).tzx" size="9732" crc="9e1b515b" sha1="b55b9b06c9805d2253335d4f61a6ae43bbe9ffe4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="selva">
+		<description>Selva</description>
+		<year>198?</year>
+		<publisher>Plan-Soft</publisher>
+		<info name="language" value="Portuguese (Brazil)" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Selva"/>
+			<dataarea name="cass" size="15403">
+				<rom name="selva.p" size="15403" crc="99e1ba2a" sha1="8fcb55fc2d8a6312b36720afa229ba6251f4f3fa"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Programa Brinde"/>
+			<dataarea name="cass" size="1896">
+				<rom name="nome.p" size="1896" crc="9561d02c" sha1="ca5f16beb66675b73f4171165ca7abb9642b7b51"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="serpents">
 		<description>Serpents Tomb</description>
 		<year>1983</year>
@@ -7505,17 +7895,6 @@ Defender: not working
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="24375">
 				<rom name="Serpents Tomb.tzx" size="24375" crc="a7c78853" sha1="24bdf3f4d021b67836d007b729de41e4eeb0bfbb"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="seawolfn" cloneof="seawolf">
-		<description>Sea Wolf (newer)</description>
-		<year>1983</year>
-		<publisher>Stephen Hartley Computing</publisher>
-		<part name="cass1" interface="zx81_cass">
-			<dataarea name="cass" size="9732">
-				<rom name="SeaWolf(Newer).tzx" size="9732" crc="9e1b515b" sha1="b55b9b06c9805d2253335d4f61a6ae43bbe9ffe4"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8084,6 +8463,32 @@ Defender: not working
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="15469">
 				<rom name="StrategyFootball.tzx" size="15469" crc="432f9356" sha1="4add01b5f9e3ddf8f19a686ad91385d4dece1bbd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="subespaco">
+		<description>Subespaço</description>
+		<year>198?</year>
+		<publisher>Ciberne Software</publisher>
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Subespaço"/>
+			<dataarea name="cass" size="8804">
+				<rom name="Subespaco.p" size="8804" crc="1ae450e5" sha1="a95c3c4c5c37fe527036a818fbd6a6852cc897a2"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Cavernas de Marte"/>
+			<dataarea name="cass" size="16158">
+				<rom name="CavernasDeMarte.p" size="16158" crc="19b49e79" sha1="8c7b5826decd44a39222a58819e70e2074a9dead"/>
+			</dataarea>
+		</part>
+		<part name="cass3" interface="zx81_cass">
+			<feature name="part_id" value="Comboio Espacial"/>
+			<dataarea name="cass" size="8788">
+				<rom name="ComboioEspacial.p" size="8788" crc="ba170c16" sha1="ff0d8666401460e93844f78275ed83145a53f1bd"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8871,6 +9276,37 @@ Defender: not working
 		</part>
 	</software>
 
+	<software name="tdimensao">
+		<description>Terceira Dimensão</description>
+		<year>198?</year>
+		<publisher>SoftKristian</publisher>
+		<info name="language" value="Portuguese (Brazil)" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Terceira Dimensão"/>
+			<dataarea name="cass" size="11881">
+				<rom name="3D Defender.p" size="11881" crc="ded0d8c7" sha1="14b334a4cb91262475e8f18502d7a6e3f882da75"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Fungalóides II"/>
+			<dataarea name="cass" size="9179">
+				<rom name="fungaloids.p" size="9179" crc="f6493175" sha1="591e45a6f430723ccaf7e9e5b68f9e4086f8d659"/>
+			</dataarea>
+		</part>
+		<part name="cass3" interface="zx81_cass">
+			<feature name="part_id" value="Super Penetrador I"/>
+			<dataarea name="cass" size="4967">
+				<rom name="penetrador1.p" size="4967" crc="7ffb9ed6" sha1="2b846432b9171538d63bdb2e13fcd39ee73a5629"/>
+			</dataarea>
+		</part>
+		<part name="cass4" interface="zx81_cass">
+			<feature name="part_id" value="Super Penetrador II"/>
+			<dataarea name="cass" size="4940">
+				<rom name="penetrador2.p" size="4940" crc="48503834" sha1="b12172ff512f6852ed4fa2e8676f6034fa47b845"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="throwall">
 		<description>Thro' The Wall also Scramble</description>
 		<year>1982</year>
@@ -8956,9 +9392,24 @@ Defender: not working
 	</software>
 
 	<software name="trader">
-		<description>Trader</description>
+		<description>Trader (jewel case)</description>
+		<year>1982</year>
+		<publisher>Pixel Productions</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="49639">
+				<rom name="Trader(Jewel).tzx" size="49639" crc="01e4ec2a" sha1="0082993bf62f04b69581990f052786daeea5620c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trader_qs" cloneof="trader">
+		<description>Trader (Quicksilva)</description>
 		<year>1982</year>
 		<publisher>Quicksilva</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="49461">
 				<rom name="Trader.tzx" size="49461" crc="41c24497" sha1="37fd173296fb68815ca87544977b354c44a54d9e"/>
@@ -8966,13 +9417,15 @@ Defender: not working
 		</part>
 	</software>
 
-	<software name="traderjwl" cloneof="trader">
-		<description>Trader (Jewel)</description>
+	<software name="trader_tr" cloneof="trader">
+		<description>Trader (Trimp)</description>
 		<year>1982</year>
-		<publisher>Pixel Productions</publisher>
+		<publisher>Trimp</publisher>
+		<info name="language" value="Danish" />
+		<info name="usage" value="16K" />
 		<part name="cass1" interface="zx81_cass">
-			<dataarea name="cass" size="49639">
-				<rom name="Trader(Jewel).tzx" size="49639" crc="01e4ec2a" sha1="0082993bf62f04b69581990f052786daeea5620c"/>
+			<dataarea name="cass" size="49550">
+				<rom name="Trader(Trimp).tzx" size="49550" crc="f032cbca" sha1="539f6ba9ac853cae19cbcb4b6af1052448106374"/>
 			</dataarea>
 		</part>
 	</software>
@@ -8985,18 +9438,6 @@ Defender: not working
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="7030">
 				<rom name="Traffic.tzx" size="7030" crc="be09c247" sha1="44626d460f9c918c4bc9e0611737b50215c73a3c"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="treahunt">
-		<description>Treasure Hunt (type-in)</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="type RUN after loading the tape" />
-		<part name="cass1" interface="zx81_cass">
-			<dataarea name="cass" size="6892">
-				<rom name="Treasure Hunt.tzx" size="6892" crc="54cbbb1f" sha1="7fd9116ee1a1d24b79e9e39b44d3deee4ffbc7e9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9112,6 +9553,32 @@ Defender: not working
 		</part>
 	</software>
 
+	<software name="valkirie">
+		<description>Valkirie</description>
+		<year>198?</year>
+		<publisher>Ciberne Software</publisher>
+		<info name="language" value="Portuguese (Brazil)" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Valkirie"/>
+			<dataarea name="cass" size="15966">
+				<rom name="valkirie.p" size="15966" crc="24d2aacd" sha1="57041ca62b82ed37880327535e902bc2b6430589"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Guerrilha Cósmica"/>
+			<dataarea name="cass" size="5377">
+				<rom name="gcosm.p" size="5377" crc="c448fd05" sha1="1e8a6f04ea96aa5209eaab325b4584b49da6ccdb"/>
+			</dataarea>
+		</part>
+		<part name="cass3" interface="zx81_cass">
+			<feature name="part_id" value="Zor"/>
+			<dataarea name="cass" size="9925">
+				<rom name="zor.p" size="9925" crc="605b06ec" sha1="a4d0f9555aac1dd28fa3680c422408e95ca28463"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="varanaly">
 		<description>Variance Analyzer</description>
 		<year>198?</year>
@@ -9130,6 +9597,37 @@ Defender: not working
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="12101">
 				<rom name="VectorMathematics.tzx" size="12101" crc="c33b86ba" sha1="b82230bcc7f57f7b1f12720d82440031135be44b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="veloeste">
+		<description>Velho Oeste</description>
+		<year>198?</year>
+		<publisher>SoftKristian</publisher>
+		<info name="language" value="Portuguese (Brazil)" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Night Gunner"/>
+			<dataarea name="cass" size="5126">
+				<rom name="ngunner.p" size="5126" crc="63d690be" sha1="6162bab0eb66183627e988a0f26f3f69ec107dab"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Compositor"/>
+			<dataarea name="cass" size="3878">
+				<rom name="compositor.p" size="3878" crc="06946db4" sha1="cf5d6fb69bb5e1b205f7d12a261a25a264db8693"/>
+			</dataarea>
+		</part>
+		<part name="cass3" interface="zx81_cass">
+			<feature name="part_id" value="Duelo Mortal"/>
+			<dataarea name="cass" size="4343">
+				<rom name="duelo.p" size="4343" crc="fdaaf933" sha1="e635502dfc31466ad403220130f937594ea9acfb"/>
+			</dataarea>
+		</part>
+		<part name="cass4" interface="zx81_cass">
+			<feature name="part_id" value="Túmulo Azteca"/>
+			<dataarea name="cass" size="9613">
+				<rom name="azteca.p" size="9613" crc="b51834f0" sha1="7499e73bbf37a1ef38fb47ef42d6afb6c75a9861"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9219,6 +9717,19 @@ Defender: not working
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="12767">
 				<rom name="Viewtext(US).tzx" size="12767" crc="83f14397" sha1="eb0996ddb294a42c133b0c301958bdaa3b5f4a1a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cassino">
+		<description>Visita ao Ca$$ino</description>
+		<year>1982</year>
+		<publisher>SoftKristian</publisher>
+		<info name="language" value="Portuguese (Brazil)" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Caça-Níqueis / Black-Jack / Roleta / Perseguição Fatal"/>
+			<dataarea name="cass" size="15386">
+				<rom name="cassino.p" size="15386" crc="a9099df1" sha1="1c7ad8ab3fba9e9adda1e444ed47e5a84afb300e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -9569,6 +10080,25 @@ Defender: not working
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="3923">
 				<rom name="Zaraks.tzx" size="3923" crc="4466c390" sha1="d4d0575f849ed626a6d2b02cc3d64660980694c5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zaxxon">
+		<description>Zaxxon</description>
+		<year>1984</year>
+		<publisher>Plan-Soft</publisher>
+		<info name="language" value="Portuguese (Brazil)" />
+		<part name="cass1" interface="zx81_cass">
+			<feature name="part_id" value="Introduction"/>
+			<dataarea name="cass" size="7513">
+				<rom name="zaxi.p" size="7513" crc="3749343c" sha1="214eebb4fd8207d9cac2b5478ce1e7f36542fd57"/>
+			</dataarea>
+		</part>
+		<part name="cass2" interface="zx81_cass">
+			<feature name="part_id" value="Game"/>
+			<dataarea name="cass" size="15402">
+				<rom name="zaxxon.p" size="15402" crc="9f1bfc41" sha1="f2bd52dcb5bc21a9023c149c459802e444b87d13"/>
 			</dataarea>
 		</part>
 	</software>
@@ -10203,6 +10733,184 @@ Defender: not working
 		</part>
 	</software>
 
+	<software name="zx81ppack2">
+		<description>ZX81 Program Pack 2</description>
+		<year>198?</year>
+		<publisher>Bug-Byte</publisher>
+		<notes>OXO / Pontoon / Bio-Rtythms / Fruit Machine</notes>
+		<info name="language" value="English" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="16780">
+				<rom name="ZX81 Program Pack 2.tzx" size="16780" crc="7c8c0035" sha1="5483bb2a4bb943c95adec80fb0d976784b66952a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zx81ppack4">
+		<description>ZX81 Program Pack 4</description>
+		<year>198?</year>
+		<publisher>Bug-Byte</publisher>
+		<info name="language" value="English" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="7935">
+				<rom name="ZX81 Program Pack 4.tzx" size="7935" crc="e0e17cc2" sha1="3a0be79e4cd4df4b197c60a165656b6cb656d6d2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zx81ppack5">
+		<description>ZX81 Program Pack 5</description>
+		<year>198?</year>
+		<publisher>Bug-Byte</publisher>
+		<info name="language" value="English" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="11492">
+				<rom name="ZX81 Program Pack 5.tzx" size="11492" crc="b259a2cb" sha1="4e411eb79d1122e3c0d7eb028f37f0cc73d95197"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zx81ppack6">
+		<description>ZX81 Program Pack 6</description>
+		<year>198?</year>
+		<publisher>Bug-Byte</publisher>
+		<notes>3-D Noughts and Crosses / Mars Rescue</notes>
+		<info name="language" value="English" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="13053">
+				<rom name="ZX81 Program Pack 6.tzx" size="13053" crc="c13c5460" sha1="4762d6a88ff2f633d966aa16bdc3717fc2982545"/>
+			</dataarea>
+		</part>
+	</software>
+
+
+<!-- Type-ins -->
+
+	<software name="avselva">
+		<description>Aventuras na Selva (type-in, Micro Sistemas Nº 23 - Agosto 1983)</description>
+		<year>1983</year>
+		<publisher>Análise, Teleprocessamento e Informática Editora</publisher>
+		<info name="developer" value="Renato Degiovani" />
+		<info name="language" value="Portuguese (Brazil)" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="14526">
+				<rom name="aventura.p" size="14526" crc="4802cd38" sha1="78f6ca6bc1138edfc0f2e59546ead50b18912dd8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cedriccl">
+		<description>Cedric the Clown (type-in, Sinclair User № 17 - August 1983)</description>
+		<year>1983</year>
+		<publisher>ECC Publications</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K; type RUN after loading the program" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="4391">
+				<rom name="Cedric the Clown.tzx" size="4391" crc="2aebfcac" sha1="4fb13393fe2e98a0224f21af22ada29b2c1bb2b4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="darts">
+		<description>Darts (type-in)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="type RUN after loading the program" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="3589">
+				<rom name="Darts.tzx" size="3589" crc="c502beab" sha1="d7471eeeffd7a5ca04dda0d87ee1ad9784a6a0f7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kongjump">
+		<description>Kong Jump (type-in, Your Computer Vol. 3 № 6 - June 1983)</description>
+		<year>1983</year>
+		<publisher>IPC Magazines</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="type RUN after loading the program" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="3484">
+				<rom name="Kong Jump.tzx" size="3484" crc="e3d0b107" sha1="0bde870b7afb18b7257a3077bdddeb92ff8e7360"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="madmaze">
+		<description>Mad Maze (type-in, Sunclair User № 11 - February 1983)</description>
+		<year>1983</year>
+		<publisher>ECC Publications</publisher>
+		<info name="usage" value="type RUN after loading the tape" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="2853">
+				<rom name="Mad Maze.tzx" size="2853" crc="e01faf7c" sha1="abffd5aa2ddbe1c4161c4c4db12035dbec6dce62"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="meteors2">
+		<description>Meteors II (type-in)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="type RUN after loading the tape" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="3637">
+				<rom name="Meteors II.tzx" size="3637" crc="a7d0e860" sha1="1345b179e82b91a2db79e024a40427b3abc31935"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="onfinal">
+		<description>On Final (type-in, The ZX Collection - Winter 1984)</description>
+		<year>1984</year>
+		<publisher>Argus Specialist Publications</publisher>
+		<info name="language" value="English" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="5548">
+				<rom name="On Final.tzx" size="5548" crc="de2d6712" sha1="d5e2c5a33aca5a15f541ad1aa208b80e5c88244c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pilottyp">
+		<description>Pilot (type-in)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="language" value="English" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="6279">
+				<rom name="Pilot.tzx" size="6279" crc="39f98172" sha1="43a1f665ba1d65321b72f8683d55c97173879315"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="treahunt">
+		<description>Treasure Hunt (type-in)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="type RUN after loading the tape" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="6892">
+				<rom name="Treasure Hunt.tzx" size="6892" crc="54cbbb1f" sha1="7fd9116ee1a1d24b79e9e39b44d3deee4ffbc7e9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="unipattern">
+		<description>Universal Patterner (type-in, Sinclair Programs № 1 - May/June 1982)</description>
+		<year>1982</year>
+		<publisher>ECC Publications</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K, type RUN after loading the tape" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="1768">
+				<rom name="Patterner.tzx" size="1768" crc="666a5263" sha1="72aaed4637b4683ade928762c535e5ad528475bf"/>
+			</dataarea>
+		</part>
+	</software>
+
 
 <!-- Homebrews -->
 
@@ -10360,6 +11068,19 @@ Defender: not working
 		<part name="cass1" interface="zx81_cass">
 			<dataarea name="cass" size="7225">
 				<rom name="cacorm.p" size="7225" crc="c45b7e70" sha1="17032d1bdc87ed9dc899be0b0ca4335eae751756"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="captbdge1">
+		<description>Captain on the Bridge - Episode 1: Sinclair Maru?</description>
+		<year>2025</year>
+		<publisher>Warp 8-bit Games</publisher>
+		<info name="language" value="English" />
+		<info name="usage" value="16K" />
+		<part name="cass1" interface="zx81_cass">
+			<dataarea name="cass" size="15679">
+				<rom name="COTB_GAME_EP01.tzx" size="15679" crc="d96fb8b0" sha1="3fc9276d1aa23b32e0e3a910eaed4d54577302d7"/>
 			</dataarea>
 		</part>
 	</software>
