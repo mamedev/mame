@@ -867,6 +867,13 @@ ROM_START( lxcmcybt ) // all games selectable
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
+ROM_START( lxcmcydp2 ) // all games selectable
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "dp150.bin", 0x00000, 0x4000000, CRC(dce19f81) SHA1(e74190d5eea4c31ec0cdcc374b988db2dc1d37c6) )
+
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
+ROM_END
+
 ROM_START( lxcmcypp ) // all games selectable
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	// marked 512mbit, possible A22 / A23 are swapped as they were marked on the board in a different way.
@@ -1219,17 +1226,18 @@ CONS( 2012, lexi30,  0,0,  vt36x_8mb, vt369_rot, vt36x_state, empty_init, "Lexib
 CONS( 2012, lxccatv,   0,  0,  vt36x_32mb, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade TV - 120 in 1 (JL2370)", MACHINE_NOT_WORKING ) // 32MByte ROM, 2011 on case, 2012 on PCB
 
 // All Lexibook units below have 64Mbyte ROMs, must be externally banked, or different addressing scheme
-CONS( 2012, lxcmcysp,  0,  0,  vt36x_32mb_2banks_lexi, vt369_rot, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Marvel Ultimate Spider-Man (120-in-1)", MACHINE_NOT_WORKING | ROT270) // renders vertically, but screen stretches it to horizontal
+CONS( 2012, lxcmcysp,  0,  0,  vt36x_32mb_2banks_lexi, vt369_rot, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Spider-Man (120-in-1)", MACHINE_NOT_WORKING | ROT270) // renders vertically, but screen stretches it to horizontal
 CONS( 200?, lxcmc250,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - 250-in-1 (JL2375)", MACHINE_NOT_WORKING )
 CONS( 200?, lxcmcysw,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Star Wars Rebels", MACHINE_NOT_WORKING )
 CONS( 200?, lxcmcyfz,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Frozen", MACHINE_NOT_WORKING )
-CONS( 2012, lxcmcydp,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Disney Princess", MACHINE_NOT_WORKING )
+CONS( 2012, lxcmcydp,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Disney Princess (120-in-1)", MACHINE_NOT_WORKING )
 CONS( 2014, lxcmcycr,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Cars", MACHINE_NOT_WORKING )
 CONS( 2018, lxcmcypj,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - PJ Masks", MACHINE_NOT_WORKING )
 CONS( 2014, lxcmcyba,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Barbie (JL2365BB)", MACHINE_NOT_WORKING )
 // the data order is swapped for these
 CONS( 2018, lxcmcypp,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Paw Patrol", MACHINE_NOT_WORKING )
 CONS( 2020, lxcmcybt,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Batman", MACHINE_NOT_WORKING )
+CONS( 2014, lxcmcydp2, 0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, init_lxcmcypp, "Lexibook", "Compact Cyber Arcade - Disney Princess (150-in-1)", MACHINE_NOT_WORKING )
 
 CONS( 200?, lxccminn,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Console Colour - Minnie Mouse", MACHINE_NOT_WORKING )
 CONS( 200?, lxccplan,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Console Colour - Disney's Planes", MACHINE_NOT_WORKING )
