@@ -394,7 +394,7 @@ void s11b_state::s11b_jokerz(machine_config &config)
 	m_cvsd_filter2->add_route(ALL_OUTPUTS, m_ps88, (0.25*4.0), 1);
 	m_pia34->ca2_handler().set(m_ps88, FUNC(pinsnd88_device::resetq_w));
 	m_ps88->syncq_cb().set(m_pia34, FUNC(pia6821_device::ca1_w)); // the sync connection comes from sound connector pin 16 to MCA1, not the usual pin 12 to MCB1
-	SPEAKER(config, "cabinet").front_floor(); // the cabinet speaker is aimed down underneath the pinball table itself
+	SPEAKER(config, "cabinet").set_position(0, 0.0, -0.5, 1.0); // the cabinet speaker is aimed down underneath the pinball table itself
 	SPEAKER(config, "backbox").front_center(); // the backbox speakers are roughly level with the user, but farther in front of them than the cabinet
 	m_ps88->add_route(0, "cabinet", 1.0);
 	m_ps88->add_route(1, "backbox", 1.0);

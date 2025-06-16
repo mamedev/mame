@@ -6,6 +6,8 @@
 #ifndef MAME_EMU_AUDIO_EFFECTS_AEFFECT_H
 #define MAME_EMU_AUDIO_EFFECTS_AEFFECT_H
 
+#include "speaker.h"
+
 class audio_effect
 {
 public:
@@ -21,9 +23,9 @@ public:
 
 	static const char *const effect_names[COUNT];
 
-	static audio_effect *create(int type, u32 sample_rate, audio_effect *def = nullptr);
+	static audio_effect *create(int type, speaker_device *speaker, u32 sample_rate, audio_effect *def = nullptr);
 
-	audio_effect(u32 sample_rate, audio_effect *def) : m_default(def), m_sample_rate(sample_rate) {}
+	audio_effect(speaker_device *speaker, u32 sample_rate, audio_effect *def) : m_default(def), m_speaker(speaker), m_channels(speaker ? speaker->channels() : 0), m_sample_rate(sample_rate) {}
 	virtual ~audio_effect() = default;
 
 	void copy(const emu::detail::output_buffer_flat<sample_t> &src, emu::detail::output_buffer_flat<sample_t> &dest) const;
@@ -37,7 +39,8 @@ public:
 
 protected:
 	audio_effect *m_default;
-	u32 m_sample_rate;
+	speaker_device *m_speaker;
+	u32 m_channels, m_sample_rate;
 };
 
 #endif

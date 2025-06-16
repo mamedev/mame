@@ -13,8 +13,11 @@
 // [Zölzer 2011] "DAFX: Digital Audio Effects", Udo Zölzer, Second Edition, Wiley publishing, 2011 (Table 2.2)
 
 
-audio_effect_filter::audio_effect_filter(u32 sample_rate, audio_effect *def) : audio_effect(sample_rate, def)
+audio_effect_filter::audio_effect_filter(speaker_device *speaker, u32 sample_rate, audio_effect *def) :
+	audio_effect(speaker, sample_rate, def)
 {
+	m_history.resize(m_channels);
+
 	// Minimal init to avoid using uninitialized values when reset_*
 	// recomputes filters
 	m_fl = m_fh = 1000;
@@ -159,11 +162,8 @@ void audio_effect_filter::apply(const emu::detail::output_buffer_flat<sample_t> 
 
 	u32 samples = src.available_samples();
 	dest.prepare_space(samples);
-	u32 channels = src.channels();
-	if(m_history.empty())
-		m_history.resize(channels);
 
-	for(u32 channel = 0; channel != channels; channel++) {
+	for(u32 channel = 0; channel != m_channels; channel++) {
 		const sample_t *srcd = src.ptrs(channel, 0);
 		sample_t *destd = dest.ptrw(channel, 0);
 		for(u32 sample = 0; sample != samples; sample++) {

@@ -599,7 +599,7 @@ void menu_audio_mixer::populate()
 		}
 		for(const auto &cmap : omap.m_channel_mappings) {
 			const auto &node = find_node(cmap.m_node);
-			std::string guest_channel = omap.m_dev->get_position_name(cmap.m_guest_channel);
+			std::string guest_channel = omap.m_dev->get_position(cmap.m_guest_channel).name();
 			if(curline == cursel_line && m_current_group == GRP_GUEST_CHANNEL)
 				guest_channel = u8"\u25c4" + guest_channel + u8"\u25ba";
 

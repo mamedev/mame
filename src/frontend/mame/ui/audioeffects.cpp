@@ -15,6 +15,7 @@
 #include "audio_effect_compressor.h"
 #include "audio_effect_eq.h"
 #include "audio_effect_filter.h"
+#include "audio_effect_reverb.h"
 
 #include "ui/ui.h"
 
@@ -105,6 +106,10 @@ bool menu_audio_effects::handle(event const *ev)
 
 		case audio_effect::FILTER:
 			menu::stack_push<menu_audio_effect_filter>(ui(), container(), chain, entry, eff);
+			break;
+
+		case audio_effect::REVERB:
+			menu::stack_push<menu_audio_effect_reverb>(ui(), container(), chain, entry, eff);
 			break;
 		}
 		return true;
