@@ -742,10 +742,10 @@ void mcd212_device::draw_cursor(uint32_t *scanline)
 	if (!(m_cursor_control & CURCNT_EN))
 		return; // Cursor is Disabled
 
-	const bool invert = BIT(m_cursor_control, CURCNT_BLKC_SHIFT);
 	uint8_t color_index = m_cursor_control & CURCNT_COLOR;
 	if (m_blink_active)
 	{
+		const bool invert = BIT(m_cursor_control, CURCNT_BLKC_SHIFT);
 		if (!invert)
 			return; // Normal Blink
 		else
