@@ -145,6 +145,32 @@ private:
 
 /***************************************************************************
 
+  Initialization
+
+***************************************************************************/
+
+void circusc_state::machine_start()
+{
+	save_item(NAME(m_spritebank));
+	save_item(NAME(m_sn_latch));
+	save_item(NAME(m_irq_mask));
+}
+
+void circusc_state::machine_reset()
+{
+	m_sn_latch = 0;
+}
+
+void circusc_state::video_start()
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(circusc_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap->set_scroll_cols(32);
+}
+
+
+
+/***************************************************************************
+
   Convert the color PROMs into a more useable format.
 
   Circus Charlie has one 32x8 palette PROM and two 256x4 lookup table PROMs
@@ -242,48 +268,6 @@ TILE_GET_INFO_MEMBER(circusc_state::get_tile_info)
 
 /***************************************************************************
 
-  Start the video hardware emulation.
-
-***************************************************************************/
-
-void circusc_state::video_start()
-{
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(circusc_state::get_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-
-	m_bg_tilemap->set_scroll_cols(32);
-
-	save_item(NAME(m_spritebank));
-}
-
-
-
-/***************************************************************************
-
-  Memory handlers
-
-***************************************************************************/
-
-void circusc_state::videoram_w(offs_t offset, uint8_t data)
-{
-	m_videoram[offset] = data;
-	m_bg_tilemap->mark_tile_dirty(offset);
-}
-
-void circusc_state::colorram_w(offs_t offset, uint8_t data)
-{
-	m_colorram[offset] = data;
-	m_bg_tilemap->mark_tile_dirty(offset);
-}
-
-void circusc_state::spritebank_w(int state)
-{
-	m_spritebank = state;
-}
-
-
-
-/***************************************************************************
-
   Display refresh
 
 ***************************************************************************/
@@ -332,17 +316,44 @@ uint32_t circusc_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-
-void circusc_state::machine_start()
+void circusc_state::vblank(int state)
 {
-	save_item(NAME(m_sn_latch));
-	save_item(NAME(m_irq_mask));
+	if (!state)
+		return;
+
+	if (m_irq_mask)
+		m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+
+	// sprites are framebuffered
+	size_t size = m_spriteram->bytes() / 2;
+	m_spriteram->copy(m_spritebank ? size : 0, size);
 }
 
-void circusc_state::machine_reset()
+
+
+/***************************************************************************
+
+  Memory handlers
+
+***************************************************************************/
+
+void circusc_state::videoram_w(offs_t offset, uint8_t data)
 {
-	m_sn_latch = 0;
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
+
+void circusc_state::colorram_w(offs_t offset, uint8_t data)
+{
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
+}
+
+void circusc_state::spritebank_w(int state)
+{
+	m_spritebank = state;
+}
+
 
 uint8_t circusc_state::sh_timer_r()
 {
@@ -411,6 +422,14 @@ void circusc_state::irq_mask_w(int state)
 		m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
+
+
+/***************************************************************************
+
+  Address maps
+
+***************************************************************************/
+
 void circusc_state::main_map(address_map &map)
 {
 	map(0x0000, 0x0007).mirror(0x03f8).w("mainlatch", FUNC(ls259_device::write_d0));
@@ -442,6 +461,12 @@ void circusc_state::sound_map(address_map &map)
 }
 
 
+
+/***************************************************************************
+
+  Input ports
+
+***************************************************************************/
 
 static INPUT_PORTS_START( circusc )
 	PORT_START("SYSTEM")
@@ -535,11 +560,11 @@ INPUT_PORTS_END
 
 
 
-static GFXDECODE_START( gfx_circusc )
-	GFXDECODE_ENTRY( "tiles",   0, gfx_8x8x4_packed_msb,       0, 16 )
-	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_packed_msb, 16*16, 16 )
-GFXDECODE_END
+/***************************************************************************
 
+  Discrete sound
+
+***************************************************************************/
 
 static const discrete_mixer_desc circusc_mixer_desc =
 {
@@ -571,18 +596,18 @@ static DISCRETE_SOUND_START( circusc_discrete )
 	DISCRETE_OUTPUT(NODE_20, 10.0 )
 DISCRETE_SOUND_END
 
-void circusc_state::vblank(int state)
-{
-	if (!state)
-		return;
 
-	if (m_irq_mask)
-		m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 
-	// sprites are framebuffered
-	size_t size = m_spriteram->bytes() / 2;
-	m_spriteram->copy(m_spritebank ? size : 0, size);
-}
+/***************************************************************************
+
+  Machine configuration
+
+***************************************************************************/
+
+static GFXDECODE_START( gfx_circusc )
+	GFXDECODE_ENTRY( "tiles",   0, gfx_8x8x4_packed_msb,       0, 16 )
+	GFXDECODE_ENTRY( "sprites", 0, gfx_16x16x4_packed_msb, 16*16, 16 )
+GFXDECODE_END
 
 void circusc_state::circusc(machine_config &config)
 {
@@ -633,7 +658,7 @@ void circusc_state::circusc(machine_config &config)
 
 /***************************************************************************
 
-  Game driver(s)
+  ROM definitions
 
 ***************************************************************************/
 
@@ -819,6 +844,13 @@ ROM_END
 
 } // anonymous namespace
 
+
+
+/***************************************************************************
+
+  Game drivers
+
+***************************************************************************/
 
 GAME( 1984, circusc,  0,       circusc, circusc, circusc_state, empty_init, ROT90, "Konami",                   "Circus Charlie (level select, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, circusc2, circusc, circusc, circusc, circusc_state, empty_init, ROT90, "Konami",                   "Circus Charlie (level select, set 2)", MACHINE_SUPPORTS_SAVE )
