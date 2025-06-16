@@ -35,6 +35,21 @@
 #include <sys/conf.h>
 #endif
 
+/*
+ * Buffer size for the slave name returned by openpty(): according to the Linux
+ * man page "Nobody knows how much space should be reserved for name", and the
+ * FreeBSD man page advises to use ptsname(3) instead.
+ *
+ * Hence, in case OS does have PATH_MAX use that as size for the buffer
+ * (it should be enough); in case there is no PATH_MAX, use a large enough size
+ * that hopefully should be always large enough.
+ */
+#ifdef PATH_MAX
+# define OPENPTY_PATH_MAX PATH_MAX
+#else
+# define OPENPTY_PATH_MAX 8192
+#endif
+
 
 namespace {
 #if defined(__APPLE__)
@@ -155,7 +170,7 @@ std::error_condition posix_open_ptty(std::uint32_t openflags, osd_file::ptr &fil
 	::cfmakeraw(&tios); // TODO: this is a non-standard BSDism - should set flags some other way
 
 	int masterfd = -1, slavefd = -1;
-	char slavepath[PATH_MAX];
+	char slavepath[OPENPTY_PATH_MAX];
 	if (::openpty(&masterfd, &slavefd, slavepath, &tios, nullptr) < 0)
 		return std::error_condition(errno, std::generic_category());
 #endif
