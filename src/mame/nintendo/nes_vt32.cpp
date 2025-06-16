@@ -392,8 +392,9 @@ ROM_START( lxpcli )
 ROM_END
 
 ROM_START( rfcp168 )
-	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
 	ROM_LOAD( "winbond_w29gl128c.bin", 0x00000, 0x1000000, CRC(d11caf71) SHA1(64b269cee30a51549a2d0491bbeed07751771559) ) // ROM verified on 2 units
+	ROM_RELOAD( 0x1000000, 0x1000000 )
 ROM_END
 
 } // anonymous namespace
