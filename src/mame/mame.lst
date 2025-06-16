@@ -35339,7 +35339,6 @@ polmega
 ppgc200g
 protpp
 pumpactv
-rfcp168
 sen101
 senwld
 silv35
@@ -35405,6 +35404,7 @@ matet220
 matet300
 myaasa
 myaass
+rfcp168
 rminitv
 
 @source:nintendo/nes_vt369_vtunknown.cpp
