@@ -100,7 +100,7 @@ static const char *sMacChannelLabels[sMacChannelCount] =
 // Copying the core's convention, left is X = -0.2, center is X = 0.0, and right is X = 0.2.
 // Front Z is 1.0, back Z is -0.5, top Y is 0.5, and bottom Y is -0.5.
 // "Surround" channels are at X = -0.4 (left) and 0.4 (right).
-static const std::array<double,3> sChannelPositions[sMacChannelCount] =
+static const osd::channel_position sChannelPositions[sMacChannelCount] =
 {
 	osd::channel_position::UNKNOWN, // unused
 	osd::channel_position::FL, // Front Left
