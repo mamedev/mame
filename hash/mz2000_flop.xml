@@ -11,7 +11,7 @@ license:CC0-1.0
 -->
 
 
-<softwarelist name="mz2000_flop" description="MZ-2000 disk images">
+<softwarelist name="mz2000_flop" description="Sharp MZ-2000 disk images">
 
 <!-- Software below is all made by Toshio Fukui, since we currently have no access to dumps of official software -->
 	<software name="cpm22">
@@ -111,7 +111,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="gfxedit">
+	<software name="gfxedit" supported="yes">
 		<description>Graphic Editor III "Art Magic"</description>
 		<year>200?</year>
 		<publisher>Toshio Fukui</publisher>
@@ -122,7 +122,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="brave">
+	<software name="brave" supported="yes">
 		<description>Brave</description>
 		<year>200?</year>
 		<publisher>Toshio Fukui</publisher>
@@ -133,10 +133,11 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="lilas">
+	<software name="lilas" supported="yes">
 		<description>Lilas</description>
 		<year>200?</year>
 		<publisher>Toshio Fukui</publisher>
+		<info name="usage" value="Type ADV on CPM prompt" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="lilascmp.d88" size="348848" crc="ac570829" sha1="15e927727d3498660c1dc3f3ea55409aad4eeef8"/>
@@ -144,10 +145,15 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="dosprog1">
+	<software name="dosprog1" supported="partial">
 		<description>TF-DOS Programs 1</description>
 		<year>200?</year>
 		<publisher>Toshio Fukui</publisher>
+		<notes><![CDATA[
+SPACE MOUSE: works
+CHR-EDITOR: charset screen editor
+S.L.ADV-2,CG-30: wants to record a tape?
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="cdosprg1.d88" size="348848" crc="7176ce03" sha1="2ee08c47c4071e03d942ed166253382d0d380780"/>
@@ -155,10 +161,15 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="dosprog2">
+	<software name="dosprog2" supported="partial">
 		<description>TF-DOS Programs 2</description>
 		<year>200?</year>
 		<publisher>Toshio Fukui</publisher>
+		<notes><![CDATA[
+RADER PUCK MAN: works
+RADER SNAKY: works, sometimes enemies "hops" player head (verify), radar is offset (verify)
+STAR FIRE: works
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="cdosprg2.d88" size="348848" crc="4f0a38c6" sha1="fafaee86a65883b7270ff247802220777468c9fc"/>
@@ -166,11 +177,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-<!-- This requires BASIC... -->
-	<software name="basprog">
+	<software name="basprog" supported="no">
 		<description>Sharp BASIC Programs 1</description>
 		<year>200?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Requires Disk BASIC
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="sbasprg1.d88" size="348848" crc="c92c42ca" sha1="c87a02c9ba94b70f26727b018b82ecb9bfe4c41a"/>

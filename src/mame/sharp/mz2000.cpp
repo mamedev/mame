@@ -1078,7 +1078,7 @@ void mz2000_state::mz2000(machine_config &config)
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("mz_cass");
 
-	SOFTWARE_LIST(config, "cass_list").set_original("mz2000_cass");
+	SOFTWARE_LIST(config, "cass_list").set_original("mz2000_cass").set_filter("MONO");
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -1097,7 +1097,7 @@ void mz2000_state::mz2000(machine_config &config)
 void mz2200_state::mz2200(machine_config &config)
 {
 	mz2000(config);
-	SOFTWARE_LIST(config, "cass_list2").set_original("mz2200_cass");
+	SOFTWARE_LIST(config.replace(), "cass_list").set_original("mz2000_cass").set_filter("COLOR");
 
 	PALETTE(config.replace(), m_palette, palette_device::BRG_3BIT);
 }
