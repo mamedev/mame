@@ -71,12 +71,12 @@ void dec8_state_base::buffer_spriteram16_w(u8 data)
 		m_buffered_spriteram16[i] = spriteram[(i * 2) + 1] | (spriteram[(i * 2) + 0] << 8);
 }
 
-// Only used by ghostb, gondo, garyoret, other games can control buffering
+// Only used by gondo, garyoret, other games can control buffering
 void ghostb_state::screen_vblank(int state)
 {
 	// rising edge
 	if (state)
-		buffer_spriteram16_w(0);
+		buffer_spriteram16_w();
 }
 
 u8 dec8_mcu_state_base::i8751_hi_r()
@@ -168,12 +168,11 @@ void oscar_state::bank_w(u8 data)
 	m_mainbank->set_entry(data & m_bank_mask);
 }
 
-// Used by Ghostbusters, Meikyuu Hunter G & Gondomania
 void ghostb_state::ghostb_bank_w(u8 data)
 {
 	/* Bit 0: SECCLR - acknowledge interrupt from I8751
 	   Bit 1: NMI enable/disable
-	   Bit 2: Not connected according to schematics
+	   Bit 2: Sprite DMA
 	   Bit 3: Screen flip
 	   Bits 4-7: Bank switch
 	*/
@@ -183,8 +182,19 @@ void ghostb_state::ghostb_bank_w(u8 data)
 	if (!m_secclr)
 		m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 
+	if (BIT(data & ~m_ghostb_bank, 2))
+		buffer_spriteram16_w();
+
 	m_nmigate->in_w<0>(BIT(data, 1));
 	flip_screen_set(BIT(data, 3));
+
+	m_ghostb_bank = data;
+}
+
+void ghostb_state::gondo_bank_w(u8 data)
+{
+	// Bit 2: Not connected according to schematics
+	ghostb_bank_w(data & ~0x04);
 }
 
 void csilver_state::control_w(u8 data)
@@ -409,7 +419,7 @@ void gondo_state::gondo_map(address_map &map)
 	map(0x380f, 0x380f).portr("IN2");
 	map(0x3810, 0x3810).w(FUNC(gondo_state::sound_w));
 	map(0x3818, 0x382f).w(FUNC(gondo_state::gondo_scroll_w));
-	map(0x3830, 0x3830).w(FUNC(gondo_state::ghostb_bank_w));
+	map(0x3830, 0x3830).w(FUNC(gondo_state::gondo_bank_w));
 	map(0x3838, 0x3838).r(FUNC(gondo_state::i8751_hi_r));
 	map(0x3839, 0x3839).r(FUNC(gondo_state::i8751_lo_r));
 	map(0x383a, 0x383a).w(FUNC(gondo_state::gondo_i8751_hi_w));
@@ -433,7 +443,7 @@ void ghostb_state::garyoret_map(address_map &map)
 	map(0x380b, 0x380b).portr("IN0");
 	map(0x3810, 0x3810).w(FUNC(ghostb_state::sound_w));
 	map(0x3818, 0x382f).w(FUNC(ghostb_state::gondo_scroll_w));
-	map(0x3830, 0x3830).w(FUNC(ghostb_state::ghostb_bank_w));
+	map(0x3830, 0x3830).w(FUNC(ghostb_state::gondo_bank_w));
 	map(0x3838, 0x3838).w(FUNC(ghostb_state::gondo_i8751_hi_w));
 	map(0x3839, 0x3839).w(FUNC(ghostb_state::i8751_lo_w));
 	map(0x383a, 0x383a).r(FUNC(ghostb_state::i8751_hi_r));
@@ -1023,11 +1033,11 @@ static INPUT_PORTS_START( gondo )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("COIN") // hooked up on the i8751
 	// Low 4 bits not connected on schematics
@@ -1909,6 +1919,7 @@ void ghostb_state::machine_start()
 	m_i8751_timer = timer_alloc(FUNC(ghostb_state::mcu_irq_clear), this);
 
 	save_item(NAME(m_secclr));
+	save_item(NAME(m_ghostb_bank));
 }
 
 void ghostb_state::machine_reset()
@@ -2214,7 +2225,6 @@ void ghostb_state::ghostb(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(ghostb_state::screen_update_ghostb));
-	m_screen->screen_vblank().set(FUNC(ghostb_state::screen_vblank));
 	m_screen->screen_vblank().append(m_nmigate, FUNC(input_merger_device::in_w<1>));
 	m_screen->screen_vblank().append_inputline(m_mcu, MCS51_INT0_LINE);
 	m_screen->set_palette(m_palette);
