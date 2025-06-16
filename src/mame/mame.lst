@@ -32828,6 +32828,9 @@ supertr3
 tripdraw
 trivquiz
 
+@source:misc/stc3910.cpp
+executel
+
 @source:misc/stop.cpp
 stop
 

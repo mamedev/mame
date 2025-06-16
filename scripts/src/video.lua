@@ -777,6 +777,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/mr9735.h,VIDEOS["MR9735"] = true
+--------------------------------------------------
+
+if (VIDEOS["MR9735"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/mr9735.cpp",
+		MAME_DIR .. "src/devices/video/mr9735.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/msm6222b.h,VIDEOS["MSM6222B"] = true
 --------------------------------------------------
 
