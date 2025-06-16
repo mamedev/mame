@@ -108,7 +108,7 @@ void korgtriton_state::machine_reset()
 	m_scu_hack_data_idx = 0;
 
 	std::fill(std::begin(m_tgl), std::end(m_tgl), 0);
-	std::fill(std::begin(m_lcdcio), std::end(m_lcdio), 0);
+	std::fill(std::begin(m_lcdcio), std::end(m_lcdcio), 0);
 }
 
 void korgtriton_state::map(address_map &map)
