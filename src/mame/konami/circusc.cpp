@@ -64,6 +64,7 @@ This bug is due to 380_r02.6h, it differs from 380_q02.6h by 2 bytes, at
 #include "sound/dac.h"
 #include "sound/discrete.h"
 #include "sound/sn76496.h"
+#include "video/bufsprite.h"
 #include "video/resnet.h"
 
 #include "emupal.h"
@@ -79,17 +80,17 @@ class circusc_state : public driver_device
 public:
 	circusc_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_scroll(*this, "scroll"),
-		m_colorram(*this, "colorram"),
-		m_videoram(*this, "videoram"),
-		m_spriteram(*this, "spriteram%u", 1U),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_sn(*this, "sn%u", 1U),
 		m_dac(*this, "dac"),
 		m_discrete(*this, "fltdisc"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_spriteram(*this, "spriteram"),
+		m_colorram(*this, "colorram"),
+		m_videoram(*this, "videoram"),
+		m_scroll(*this, "scroll")
 	{ }
 
 	void circusc(machine_config &config);
@@ -100,19 +101,6 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	// memory pointers
-	required_shared_ptr<uint8_t> m_scroll;
-	required_shared_ptr<uint8_t> m_colorram;
-	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr_array<uint8_t, 2> m_spriteram;
-
-	// video-related
-	tilemap_t *m_bg_tilemap = nullptr;
-	bool m_spritebank = false;
-
-	// sound-related
-	uint8_t m_sn_latch = 0U;
-
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -121,6 +109,19 @@ private:
 	required_device<discrete_device> m_discrete;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<buffered_spriteram8_device> m_spriteram;
+
+	// memory pointers
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_scroll;
+
+	// video-related
+	tilemap_t *m_bg_tilemap = nullptr;
+	bool m_spritebank = false;
+
+	// sound-related
+	uint8_t m_sn_latch = 0U;
 
 	bool m_irq_mask = false;
 
@@ -135,7 +136,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void vblank_irq(int state);
+	void vblank(int state);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void main_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
@@ -289,9 +290,9 @@ void circusc_state::spritebank_w(int state)
 
 void circusc_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *sr = m_spritebank ? m_spriteram[0] : m_spriteram[1];
+	uint8_t *sr = m_spriteram->buffer();
 
-	for (int offs = 0; offs < m_spriteram[0].bytes(); offs += 4)
+	for (int offs = 0; offs < m_spriteram->bytes() / 2; offs += 4)
 	{
 		int const code = sr[offs + 0] + 8 * (sr[offs + 1] & 0x20);
 		int const color = sr[offs + 1] & 0x0f;
@@ -327,6 +328,7 @@ uint32_t circusc_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 1, 0);
 	draw_sprites(bitmap, cliprect);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
 	return 0;
 }
 
@@ -425,8 +427,7 @@ void circusc_state::main_map(address_map &map)
 	map(0x2000, 0x2fff).ram();
 	map(0x3000, 0x33ff).ram().w(FUNC(circusc_state::colorram_w)).share(m_colorram);
 	map(0x3400, 0x37ff).ram().w(FUNC(circusc_state::videoram_w)).share(m_videoram);
-	map(0x3800, 0x38ff).ram().share(m_spriteram[1]);
-	map(0x3900, 0x39ff).ram().share(m_spriteram[0]);
+	map(0x3800, 0x39ff).ram().share("spriteram");
 	map(0x3a00, 0x3fff).ram();
 	map(0x6000, 0xffff).rom();
 }
@@ -541,14 +542,16 @@ GFXDECODE_END
 
 
 static const discrete_mixer_desc circusc_mixer_desc =
-	{DISC_MIXER_IS_RESISTOR,
-		{RES_K(2.2), RES_K(2.2), RES_K(10)},
-		{0,0,0}, // no variable resistors
-		{0,0,0}, // no node capacitors
-		0, RES_K(1),
-		CAP_U(0.1),
-		CAP_U(0.47),
-		0, 1};
+{
+	DISC_MIXER_IS_RESISTOR,
+	{ RES_K(2.2), RES_K(2.2), RES_K(10) },
+	{ 0, 0, 0 }, // no variable resistors
+	{ 0, 0, 0 }, // no node capacitors
+	0, RES_K(1),
+	CAP_U(0.1),
+	CAP_U(0.47),
+	0, 1
+};
 
 static DISCRETE_SOUND_START( circusc_discrete )
 	DISCRETE_INPUTX_STREAM(NODE_01, 0, 1.0, 0)
@@ -568,10 +571,17 @@ static DISCRETE_SOUND_START( circusc_discrete )
 	DISCRETE_OUTPUT(NODE_20, 10.0 )
 DISCRETE_SOUND_END
 
-void circusc_state::vblank_irq(int state)
+void circusc_state::vblank(int state)
 {
-	if (state && m_irq_mask)
+	if (!state)
+		return;
+
+	if (m_irq_mask)
 		m_maincpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
+
+	// sprites are framebuffered
+	size_t size = m_spriteram->bytes() / 2;
+	m_spriteram->copy(m_spritebank ? size : 0, size);
 }
 
 void circusc_state::circusc(machine_config &config)
@@ -594,11 +604,13 @@ void circusc_state::circusc(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &circusc_state::sound_map);
 
 	// video hardware
+	BUFFERED_SPRITERAM8(config, m_spriteram);
+
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(18.432_MHz_XTAL / 3, 384, 0, 256, 264, 16, 240);
 	screen.set_screen_update(FUNC(circusc_state::screen_update));
 	screen.set_palette(m_palette);
-	screen.screen_vblank().set(FUNC(circusc_state::vblank_irq));
+	screen.screen_vblank().set(FUNC(circusc_state::vblank));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_circusc);
 	PALETTE(config, m_palette, FUNC(circusc_state::palette), 16*16 + 16*16, 32);
