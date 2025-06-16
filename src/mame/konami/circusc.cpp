@@ -308,7 +308,6 @@ void circusc_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 			flipy = !flipy;
 		}
 
-
 		m_gfxdecode->gfx(1)->transmask(bitmap, cliprect,
 				code, color,
 				flipx, flipy,
@@ -356,9 +355,7 @@ uint8_t circusc_state::sh_timer_r()
 	 * Can be shortened to:
 	 */
 
-	int const clock = m_audiocpu->total_cycles() >> 9;
-
-	return clock & 0x1e;
+	return m_audiocpu->total_cycles() >> 9 & 0x1e;
 }
 
 void circusc_state::sh_irqtrigger_w(uint8_t data)
@@ -417,11 +414,11 @@ void circusc_state::main_map(address_map &map)
 	map(0x0000, 0x0007).mirror(0x03f8).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0x0400, 0x0400).mirror(0x03ff).w("watchdog", FUNC(watchdog_timer_device::reset_w)); // WDOG
 	map(0x0800, 0x0800).mirror(0x03ff).w("soundlatch", FUNC(generic_latch_8_device::write)); // SOUND DATA
-	map(0x0c00, 0x0c00).mirror(0x03ff).w(FUNC(circusc_state::sh_irqtrigger_w));    // SOUND-ON causes interrupt on audio CPU
+	map(0x0c00, 0x0c00).mirror(0x03ff).w(FUNC(circusc_state::sh_irqtrigger_w)); // SOUND-ON causes interrupt on audio CPU
 	map(0x1000, 0x1000).mirror(0x03fc).portr("SYSTEM");
 	map(0x1001, 0x1001).mirror(0x03fc).portr("P1");
 	map(0x1002, 0x1002).mirror(0x03fc).portr("P2");
-	map(0x1003, 0x1003).mirror(0x03fc).nopr();              // unpopulated DIPSW
+	map(0x1003, 0x1003).mirror(0x03fc).nopr(); // unpopulated DIPSW
 	map(0x1400, 0x1400).mirror(0x03ff).portr("DSW1");
 	map(0x1800, 0x1800).mirror(0x03ff).portr("DSW2");
 	map(0x1c00, 0x1c00).mirror(0x03ff).writeonly().share(m_scroll); // VGAP
@@ -452,7 +449,7 @@ static INPUT_PORTS_START( circusc )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )    // SW7 of 8 on unpopulated DIPSW 3
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) // SW7 of 8 on unpopulated DIPSW 3
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -546,15 +543,14 @@ GFXDECODE_END
 static const discrete_mixer_desc circusc_mixer_desc =
 	{DISC_MIXER_IS_RESISTOR,
 		{RES_K(2.2), RES_K(2.2), RES_K(10)},
-		{0,0,0},    // no variable resistors
-		{0,0,0},  // no node capacitors
+		{0,0,0}, // no variable resistors
+		{0,0,0}, // no node capacitors
 		0, RES_K(1),
 		CAP_U(0.1),
 		CAP_U(0.47),
 		0, 1};
 
 static DISCRETE_SOUND_START( circusc_discrete )
-
 	DISCRETE_INPUTX_STREAM(NODE_01, 0, 1.0, 0)
 	DISCRETE_INPUTX_STREAM(NODE_02, 1, 1.0, 0)
 	DISCRETE_INPUTX_STREAM(NODE_03, 2, 2.0, 0) // DAC 0..32767, multiply by 2
@@ -570,7 +566,6 @@ static DISCRETE_SOUND_START( circusc_discrete )
 	DISCRETE_MIXER3(NODE_20, 1, NODE_10, NODE_11, NODE_12, &circusc_mixer_desc)
 
 	DISCRETE_OUTPUT(NODE_20, 10.0 )
-
 DISCRETE_SOUND_END
 
 void circusc_state::vblank_irq(int state)
@@ -582,7 +577,7 @@ void circusc_state::vblank_irq(int state)
 void circusc_state::circusc(machine_config &config)
 {
 	// basic machine hardware
-	KONAMI1(config, m_maincpu, 2'048'000);        // 2 MHz?
+	KONAMI1(config, m_maincpu, 18.432_MHz_XTAL / 12);
 	m_maincpu->set_addrmap(AS_PROGRAM, &circusc_state::main_map);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 2C
@@ -595,15 +590,12 @@ void circusc_state::circusc(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 8);
 
-	Z80(config, m_audiocpu, XTAL(14'318'181) / 4);
+	Z80(config, m_audiocpu, 14.318181_MHz_XTAL / 4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &circusc_state::sound_map);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_raw(18.432_MHz_XTAL / 3, 384, 0, 256, 264, 16, 240);
 	screen.set_screen_update(FUNC(circusc_state::screen_update));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(circusc_state::vblank_irq));
@@ -616,11 +608,11 @@ void circusc_state::circusc(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	SN76496(config, m_sn[0], XTAL(14'318'181) / 8).add_route(0, "fltdisc", 1.0, 0);
+	SN76496(config, m_sn[0], 14.318181_MHz_XTAL / 8).add_route(0, "fltdisc", 1.0, 0);
+	SN76496(config, m_sn[1], 14.318181_MHz_XTAL / 8).add_route(0, "fltdisc", 1.0, 1);
 
-	SN76496(config, m_sn[1], XTAL(14'318'181) / 8).add_route(0, "fltdisc", 1.0, 1);
-
-	DAC_8BIT_R2R(config, "dac", 0).set_output_range(0, 1).add_route(0, "fltdisc", 1.0, 2); // ls374.7g + r44+r45+r47+r48+r50+r56+r57+r58+r59 (20k) + r46+r49+r51+r52+r53+r54+r55 (10k) + upc324.3h
+	// ls374.7g + r44+r45+r47+r48+r50+r56+r57+r58+r59 (20k) + r46+r49+r51+r52+r53+r54+r55 (10k) + upc324.3h
+	DAC_8BIT_R2R(config, "dac", 0).set_output_range(0, 1).add_route(0, "fltdisc", 1.0, 2);
 
 	DISCRETE(config, m_discrete, circusc_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
