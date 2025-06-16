@@ -246,6 +246,7 @@ void victor9k_state::victor9k_mem(address_map &map)
 	map(0xe80a0, 0xe80af).rw(m_fdc, FUNC(victor_9000_fdc_device::cs5_r), FUNC(victor_9000_fdc_device::cs5_w));
 	map(0xe80c0, 0xe80cf).rw(m_fdc, FUNC(victor_9000_fdc_device::cs6_r), FUNC(victor_9000_fdc_device::cs6_w));
 	map(0xe80e0, 0xe80ef).rw(m_fdc, FUNC(victor_9000_fdc_device::cs7_r), FUNC(victor_9000_fdc_device::cs7_w));
+	map(0xef300, 0xef3ff).rw(m_hdc, FUNC(victor_9000_hdc_device::read), FUNC(victor_9000_hdc_device::write));
 	map(0xf0000, 0xf0fff).mirror(0x1000).ram().share("video_ram");
 	map(0xf8000, 0xf9fff).mirror(0x6000).rom().region(I8088_TAG, 0);
 }
