@@ -2,9 +2,9 @@
 // copyright-holders:Vas Crabb
 /******************************************************************************
 
-    tvochken_card.cpp
+    9h0-0008_card.cpp
 
-    Sega TV Ocha-ken barcode card loader
+    Sega Toys 9H0-0008 barcode card loader
 
     TODO:
     * Decode barcode from the scan so it doesn't need to be in a software
@@ -13,7 +13,8 @@
 *******************************************************************************/
 
 #include "emu.h"
-#include "tvochken_card.h"
+
+#include "9h0-0008_card.h"
 
 #include "rendutil.h"
 #include "softlist_dev.h"
@@ -24,27 +25,33 @@
 #include <sstream>
 
 
-DEFINE_DEVICE_TYPE(TVOCHKEN_CARD, tvochken_card_device, "tvochken_card", "Sega TV Ocha-Ken barcode card")
+DEFINE_DEVICE_TYPE(SEGA_9H0_0008_CARD, sega_9h0_0008_card_device, "sega_9h0_0008_card", "Sega Toys 9H0-0008 barcode card")
 
 
-tvochken_card_device::tvochken_card_device(
+sega_9h0_0008_card_device::sega_9h0_0008_card_device(
 		machine_config const &mconfig,
 		char const *tag,
 		device_t *owner,
 		u32 clock)
-	: device_t(mconfig, TVOCHKEN_CARD, tag, owner, clock)
+	: sega_9h0_0008_card_device(mconfig, SEGA_9H0_0008_CARD, tag, owner, clock)
+{
+}
+
+
+sega_9h0_0008_card_device::sega_9h0_0008_card_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: sega_9h0_0008_iox_slot_device(mconfig, type, tag, owner, clock)
 	, device_image_interface(mconfig, *this)
 	, m_barcode(0)
 {
 }
 
 
-tvochken_card_device::~tvochken_card_device()
+sega_9h0_0008_card_device::~sega_9h0_0008_card_device()
 {
 }
 
 
-std::pair<std::error_condition, std::string> tvochken_card_device::call_load()
+std::pair<std::error_condition, std::string> sega_9h0_0008_card_device::call_load()
 {
 	memory_region *cardrgn;
 	if (loaded_through_softlist())
@@ -106,7 +113,7 @@ std::pair<std::error_condition, std::string> tvochken_card_device::call_load()
 		// TODO: support reading barcode from image
 		m_barcode = 0;
 		osd_printf_warning(
-				"%s: TV Ocha-Ken barcodes are only supported for software list items.\n",
+				"%s: Sega Toys 9H0-0008 barcodes are only supported for software list items.\n",
 				tag());
 	}
 
@@ -137,7 +144,7 @@ std::pair<std::error_condition, std::string> tvochken_card_device::call_load()
 }
 
 
-void tvochken_card_device::call_unload()
+void sega_9h0_0008_card_device::call_unload()
 {
 	memory_region *const cardrgn = memregion("card");
 	if (cardrgn)
@@ -147,11 +154,12 @@ void tvochken_card_device::call_unload()
 }
 
 
-void tvochken_card_device::device_start()
+void sega_9h0_0008_card_device::device_start()
 {
 }
 
-software_list_loader const &tvochken_card_device::get_software_list_loader() const
+
+software_list_loader const &sega_9h0_0008_card_device::get_software_list_loader() const
 {
 	return rom_software_list_loader::instance();
 }

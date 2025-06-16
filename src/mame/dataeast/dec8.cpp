@@ -71,12 +71,14 @@ void dec8_state_base::buffer_spriteram16_w(u8 data)
 		m_buffered_spriteram16[i] = spriteram[(i * 2) + 1] | (spriteram[(i * 2) + 0] << 8);
 }
 
-// Only used by gondo, garyoret, other games can control buffering
-void ghostb_state::screen_vblank(int state)
+// Only used by gondo, garyoret, ghostb, meikyuh
+void ghostb_state::buffer_spriteram_w(int state)
 {
 	// rising edge
-	if (state)
-		buffer_spriteram16_w();
+	if (!m_buffer_strobe && state)
+		buffer_spriteram16_w(0);
+
+	m_buffer_strobe = bool(state);
 }
 
 u8 dec8_mcu_state_base::i8751_hi_r()
@@ -168,11 +170,11 @@ void oscar_state::bank_w(u8 data)
 	m_mainbank->set_entry(data & m_bank_mask);
 }
 
-void ghostb_state::ghostb_bank_w(u8 data)
+void ghostb_state::gondo_bank_w(u8 data)
 {
 	/* Bit 0: SECCLR - acknowledge interrupt from I8751
 	   Bit 1: NMI enable/disable
-	   Bit 2: Sprite DMA
+	   Bit 2: Not connected according to schematics
 	   Bit 3: Screen flip
 	   Bits 4-7: Bank switch
 	*/
@@ -182,19 +184,16 @@ void ghostb_state::ghostb_bank_w(u8 data)
 	if (!m_secclr)
 		m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 
-	if (BIT(data & ~m_ghostb_bank, 2))
-		buffer_spriteram16_w();
-
 	m_nmigate->in_w<0>(BIT(data, 1));
 	flip_screen_set(BIT(data, 3));
-
-	m_ghostb_bank = data;
 }
 
-void ghostb_state::gondo_bank_w(u8 data)
+void ghostb_state::ghostb_bank_w(u8 data)
 {
-	// Bit 2: Not connected according to schematics
-	ghostb_bank_w(data & ~0x04);
+	gondo_bank_w(data);
+
+	// Bit 2: Sprite DMA (see gondo_scroll_w for gondo/garyoret)
+	buffer_spriteram_w(BIT(data, 2));
 }
 
 void csilver_state::control_w(u8 data)
@@ -204,7 +203,7 @@ void csilver_state::control_w(u8 data)
 	    Bit 0x10 - Always set(?)
 	    Bit 0x20 - Unused.
 	    Bit 0x40 - Unused.
-	    Bit 0x80 - Hold subcpu reset line high if clear, else low?  (Not needed anyway)
+	    Bit 0x80 - Hold subcpu reset line high if clear, else low? (Not needed anyway)
 	*/
 	m_mainbank->set_entry(data & m_bank_mask);
 }
@@ -1919,7 +1918,7 @@ void ghostb_state::machine_start()
 	m_i8751_timer = timer_alloc(FUNC(ghostb_state::mcu_irq_clear), this);
 
 	save_item(NAME(m_secclr));
-	save_item(NAME(m_ghostb_bank));
+	save_item(NAME(m_buffer_strobe));
 }
 
 void ghostb_state::machine_reset()
@@ -2105,8 +2104,7 @@ void gondo_state::gondo(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(gondo_state::screen_update_gondo));
-	m_screen->screen_vblank().set(FUNC(gondo_state::screen_vblank));
-	m_screen->screen_vblank().append(m_nmigate, FUNC(input_merger_device::in_w<1>));
+	m_screen->screen_vblank().set(m_nmigate, FUNC(input_merger_device::in_w<1>));
 	m_screen->screen_vblank().append_inputline(m_mcu, MCS51_INT0_LINE);
 	m_screen->set_palette(m_palette);
 
@@ -2162,8 +2160,7 @@ void ghostb_state::garyoret(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(ghostb_state::screen_update_garyoret));
-	m_screen->screen_vblank().set(FUNC(ghostb_state::screen_vblank));
-	m_screen->screen_vblank().append(m_nmigate, FUNC(input_merger_device::in_w<1>));
+	m_screen->screen_vblank().set(m_nmigate, FUNC(input_merger_device::in_w<1>));
 	m_screen->screen_vblank().append_inputline(m_mcu, MCS51_INT0_LINE);
 	m_screen->set_palette(m_palette);
 
@@ -2225,7 +2222,7 @@ void ghostb_state::ghostb(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	set_screen_raw_params(config);
 	m_screen->set_screen_update(FUNC(ghostb_state::screen_update_ghostb));
-	m_screen->screen_vblank().append(m_nmigate, FUNC(input_merger_device::in_w<1>));
+	m_screen->screen_vblank().set(m_nmigate, FUNC(input_merger_device::in_w<1>));
 	m_screen->screen_vblank().append_inputline(m_mcu, MCS51_INT0_LINE);
 	m_screen->set_palette(m_palette);
 

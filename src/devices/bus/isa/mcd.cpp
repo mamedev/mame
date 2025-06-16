@@ -8,10 +8,27 @@
 #include "coreutil.h"
 #include "multibyte.h"
 
+#define VERBOSE 0
+#include "logmacro.h"
+
 void mcd_isa_device::map(address_map &map)
 {
 	map(0x0, 0x0).rw(FUNC(mcd_isa_device::data_r), FUNC(mcd_isa_device::cmd_w));
 	map(0x1, 0x1).rw(FUNC(mcd_isa_device::flag_r), FUNC(mcd_isa_device::reset_w));
+}
+
+std::pair<std::error_condition, std::string> mcd_isa_device::call_load()
+{
+	auto ret = cdrom_image_device::call_load();
+	m_change = true;
+	m_stat &= ~STAT_OPEN;
+	return ret;
+}
+
+void mcd_isa_device::call_unload()
+{
+	cdrom_image_device::call_unload();
+	m_stat |= STAT_OPEN;
 }
 
 //**************************************************************************
@@ -81,6 +98,7 @@ void mcd_isa_device::device_reset()
 bool mcd_isa_device::read_sector(bool first)
 {
 	uint32_t lba = cdrom_file::msf_to_lba(m_readmsf);
+	LOG("read %x\n", lba);
 	if(m_drvmode == DRV_MODE_CDDA)
 	{
 		if(m_cdrom_handle->get_track_type(m_cdrom_handle->get_track(lba)) == cdrom_file::CD_TRACK_AUDIO)
@@ -268,12 +286,13 @@ void mcd_isa_device::cmd_w(uint8_t data)
 	m_cmdbuf_count = 1;
 	m_cmdbuf[0] = m_cdrom_handle ? (STAT_READY | (m_change ? STAT_CHANGE : 0)) : 0;
 	m_data = false;
+	LOG("cmd %x\n", data);
 	switch(data)
 	{
 		case CMD_GET_INFO:
 			if(m_cdrom_handle)
 			{
-				uint32_t first = cdrom_file::lba_to_msf(150), last = cdrom_file::lba_to_msf(m_cdrom_handle->get_track_start(0xaa));
+				uint32_t first = cdrom_file::lba_to_msf(150), last = cdrom_file::lba_to_msf(m_cdrom_handle->get_track_start(0xaa) + 150);
 				m_cmdbuf[1] = 1;
 				m_cmdbuf[2] = dec_2_bcd(m_cdrom_handle->get_last_track());
 				put_u24be(&m_cmdbuf[3], last);

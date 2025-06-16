@@ -240,6 +240,10 @@ void tsconf_state::machine_reset()
 
 	m_keyboard->write(0xff);
 	while (m_keyboard->read() != 0) { /* invalidate buffer */ }
+
+	u16 const *const cram_init = &memregion("cram_init")->as_u16();
+	for (auto i = 0; i < 0x100; i++)
+		cram_write16(i << 1, cram_init[i]); // init color RAM
 }
 
 void tsconf_state::device_post_load()
@@ -302,7 +306,7 @@ void tsconf_state::tsconf(machine_config &config)
 	ZXBUS_SLOT(config, "zxbus1", 0, "zxbus", zxbus_cards, nullptr);
 	//ZXBUS_SLOT(config, "zxbus2", 0, "zxbus", zxbus_cards, nullptr);
 
-	m_ram->set_default_size("4096K");
+	m_ram->set_default_size("4096K").set_default_value(0x00); // must be random but 0x00 behaves better than 0xff in tested software
 
 	GLUKRS(config, m_glukrs);
 
@@ -355,6 +359,9 @@ ROM_START(tsconf)
 
 	ROM_SYSTEM_BIOS(1, "v2407", "Update 24.07.28")
 	ROMX_LOAD("ts-bios.240728.rom", 0, 0x10000, CRC(19f8ad7b) SHA1(9cee82d4a6212686358a50b0fd5a2981b3323ab6), ROM_BIOS(1))
+
+	ROM_REGION(0x200, "cram_init", ROMREGION_ERASEFF)
+	ROM_LOAD( "cram-init.bin", 0, 0x200, CRC(8b96ffb7) SHA1(4dbd22f4312251e922911a01526cbfba77a122fc))
 ROM_END
 
 //    YEAR  NAME    PARENT      COMPAT  MACHINE     INPUT       CLASS           INIT        COMPANY             FULLNAME                            FLAGS
