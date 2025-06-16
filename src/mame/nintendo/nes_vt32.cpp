@@ -397,6 +397,12 @@ ROM_START( rfcp168 )
 	ROM_RELOAD( 0x1000000, 0x1000000 )
 ROM_END
 
+ROM_START( g9_666 )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "666in1.u1", 0x00000, 0x1000000, CRC(e3a98465) SHA1(dfec3e74e36aef9bfa57ec530c37642015569dc5) )
+	ROM_RELOAD( 0x1000000, 0x1000000 )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -419,6 +425,9 @@ CONS( 201?, myaasa,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empt
 
 // doesn't boot, ends up in weeds after jumping to bank with no code, lots of accesses to $42xx
 CONS( 201?, rfcp168,   0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "Retro FC Plus 168 in 1 Handheld", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // "RETRO_FC_V3.5"
+
+// many duplicates, real game count to be confirmed, doesn't boot, encrypted?
+CONS( 202?, g9_666,   0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "G9 Game Box 666 Games", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 
 // Some games (eg F22) are scrambled like in myaass
