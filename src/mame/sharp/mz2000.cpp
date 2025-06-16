@@ -6,10 +6,14 @@
 Sharp MZ-80B/MZ-2000/MZ-2200
 
 TODO:
-- find common points between other MZ machines;
+- find common points with other MZ machines;
 - Cassette loads aren't consistant, several games wants a slower clock;
-- implement remaining video capabilities
+- implement remaining video capabilities;
 - add 80b compatibility support;
+
+Notes:
+- Memory controller: Sharp LZ90D02
+- Video controlller: Sharp LZ90D01
 
 **************************************************************************************************/
 
@@ -42,21 +46,21 @@ class mz2000_state : public driver_device
 public:
 	mz2000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_cassette(*this, "cassette")
-		, m_floppy(nullptr)
 		, m_maincpu(*this, "maincpu")
-		, m_screen(*this, "screen")
+		, m_cassette(*this, "cassette")
 		, m_fdc(*this, "fdc")
 		, m_floppy0(*this, "fdc:0")
 		, m_floppy1(*this, "fdc:1")
 		, m_floppy2(*this, "fdc:2")
 		, m_floppy3(*this, "fdc:3")
+		, m_floppy(nullptr)
 		, m_pit(*this, "pit")
 		, m_beeper(*this, "beeper")
+		, m_screen(*this, "screen")
+		, m_palette(*this, "palette")
 		, m_region_chargen(*this, "chargen")
 		, m_io_keys(*this, {"KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7", "KEY8", "KEY9", "KEYA", "KEYB", "KEYC", "KEYD", "UNUSED", "UNUSED"})
 		, m_io_config(*this, "CONFIG")
-		, m_palette(*this, "palette")
 		, m_ipl_view(*this, "ipl_view")
 	{ }
 
@@ -75,205 +79,199 @@ protected:
 private:
 	static void floppy_formats(format_registration &fr);
 
-	required_device<cassette_image_device> m_cassette;
-
-	floppy_image_device *m_floppy;
-
 	required_device<cpu_device> m_maincpu;
-	required_device<screen_device> m_screen;
+	required_device<cassette_image_device> m_cassette;
 	required_device<mb8877_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<floppy_connector> m_floppy2;
 	required_device<floppy_connector> m_floppy3;
+	floppy_image_device *m_floppy;
 	required_device<pit8253_device> m_pit;
 	required_device<beep_device> m_beeper;
-	std::unique_ptr<uint8_t[]> m_work_ram;
-	std::unique_ptr<uint8_t[]> m_tvram;
-	std::unique_ptr<uint8_t[]> m_gvram;
+	std::unique_ptr<u8[]> m_work_ram;
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+	std::unique_ptr<u8[]> m_tvram;
+	std::unique_ptr<u8[]> m_gvram;
 	required_memory_region m_region_chargen;
 	required_ioport_array<16> m_io_keys;
 	required_ioport m_io_config;
-	required_device<palette_device> m_palette;
 	memory_view m_ipl_view;
 
-	uint8_t m_vram_overlay_enable, m_vram_overlay_select;
+	u8 m_vram_overlay_enable, m_vram_overlay_select;
 
-	uint8_t m_gvram_bank;
+	u8 m_gvram_bank;
 
-	uint8_t m_key_mux;
+	u8 m_key_mux;
 
-	uint8_t m_old_portc;
-	uint8_t m_width80;
-	uint8_t m_tvram_attr;
-	uint8_t m_gvram_mask;
+	u8 m_old_portc;
+	u8 m_width80;
+	u8 m_tvram_attr;
+	u8 m_gvram_mask;
 
-	uint8_t m_color_mode;
-	uint8_t m_has_fdc;
-	uint8_t m_hi_mode;
+	u8 m_color_mode;
+	u8 m_has_fdc;
 
-	uint8_t m_porta_latch;
-	uint8_t m_tape_ctrl;
+	u8 m_porta_latch;
+	u8 m_tape_ctrl;
+	bool m_vgate;
 	bool m_wait_state, m_hblank_state;
 	emu_timer *m_ipl_reset_timer = nullptr;
 	emu_timer *m_hblank_timer = nullptr;
 
 	template <unsigned N> void work_ram_w(offs_t offset, u8 data);
 	template <unsigned N> u8 work_ram_r(offs_t offset);
+	void tvram_w(offs_t offset, u8 data);
+	u8 tvram_r(offs_t offset);
 	void gvram_w(offs_t offset, u8 data);
 	u8 gvram_r(offs_t offset);
-	void gvram_bank_w(uint8_t data);
-	void floppy_select_w(uint8_t data);
-	void floppy_side_w(uint8_t data);
-	void timer_w(uint8_t data);
-	void tvram_attr_w(uint8_t data);
-	void gvram_mask_w(uint8_t data);
+	void gvram_bank_w(u8 data);
+	void floppy_select_w(u8 data);
+	void floppy_side_w(u8 data);
+	void timer_w(u8 data);
+	void tvram_attr_w(u8 data);
+	void gvram_mask_w(u8 data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint8_t fdc_r(offs_t offset);
-	void fdc_w(offs_t offset, uint8_t data);
-	uint8_t ppi_portb_r();
-	void ppi_porta_w(uint8_t data);
-	void ppi_portc_w(uint8_t data);
-	void pio_porta_w(uint8_t data);
-	uint8_t pio_portb_r();
-	uint8_t pio_porta_r();
+	u8 fdc_r(offs_t offset);
+	void fdc_w(offs_t offset, u8 data);
+	u8 ppi_portb_r();
+	void ppi_porta_w(u8 data);
+	void ppi_portc_w(u8 data);
+	void pio_porta_w(u8 data);
+	u8 pio_portb_r();
+	u8 pio_porta_r();
 
 	void mz2000_io(address_map &map) ATTR_COLD;
 	void mz2000_map(address_map &map) ATTR_COLD;
 	void mz80b_io(address_map &map) ATTR_COLD;
-//	void mz2000_opcodes(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(ipl_timer_reset_cb);
 	TIMER_CALLBACK_MEMBER(hblank_cb);
 
 	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
+
+	void draw_graphics_layer(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_text_layer(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	bitmap_ind16 m_text_bitmap;
+	bitmap_ind16 m_graphic_bitmap;
 };
 
 void mz2000_state::video_start()
 {
-	m_tvram = std::make_unique<uint8_t[]>(0x1000);
-	m_gvram = std::make_unique<uint8_t[]>(0x10000);
+	m_tvram = std::make_unique<u8[]>(0x1000);
+	m_gvram = std::make_unique<u8[]>(0x10000);
 
 	save_pointer(NAME(m_tvram), 0x1000);
 	save_pointer(NAME(m_gvram), 0x10000);
 
-
+	m_screen->register_screen_bitmap(m_text_bitmap);
+	m_screen->register_screen_bitmap(m_graphic_bitmap);
 }
 
-// TODO: modernize
-uint32_t mz2000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void mz2000_state::draw_graphics_layer(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *gfx_data = m_region_chargen->base();
-	int x,y,xi,yi;
-	uint8_t x_size;
-	uint32_t count;
-
-	count = 0;
-
-	for(y = 0; y < 200; y++)
+	for (unsigned y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		for(x = 0; x < 640; x+=8)
-		{
-			for(xi = 0; xi < 8; xi++)
-			{
-				u8 pen;
-				pen  = ((m_gvram[count + 0x4000] >> (xi)) & 1) ? 1 : 0; //B
-				pen |= ((m_gvram[count + 0x8000] >> (xi)) & 1) ? 2 : 0; //R
-				pen |= ((m_gvram[count + 0xc000] >> (xi)) & 1) ? 4 : 0; //G
-				pen &= m_gvram_mask;
+		const u16 gfx_offset = y * 80;
+		auto *const dst = &bitmap.pix(y);
 
-				bitmap.pix(y*2+0, x+xi) = m_palette->pen(pen);
-				bitmap.pix(y*2+1, x+xi) = m_palette->pen(pen);
+		for (unsigned x = cliprect.min_x; x <= cliprect.max_x; x += 8)
+		{
+			const u8 x_offset = x >> 3;
+			const u8 gfx_b = m_gvram[gfx_offset + x_offset + 0x4000];
+			const u8 gfx_r = m_gvram[gfx_offset + x_offset + 0x8000];
+			const u8 gfx_g = m_gvram[gfx_offset + x_offset + 0xc000];
+
+			for (unsigned xi = 0; xi < 8; xi ++)
+			{
+				const u8 pen = (BIT(gfx_b, xi) << 0) | (BIT(gfx_r, xi) << 1) | (BIT(gfx_g, xi) << 2);
+
+				dst[x + xi] = m_palette->pen(pen & m_gvram_mask);
 			}
-			count++;
 		}
 	}
+}
 
-	x_size = (m_width80 + 1) * 40;
+void mz2000_state::draw_text_layer(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	const u8 color = m_tvram_attr & 7;
+	const u8 x_size = (m_width80 + 1) * 40;
+	const u8 x_inc = m_width80 ? 8 : 16;
+	const u8 x_shift = m_width80 ? 0 : 1;
+	u8 *gfx_data = m_region_chargen->base();
 
-	for(y = 0; y < 25; y++)
+	for (unsigned y = cliprect.min_y; y <= cliprect.max_y; y ++)
 	{
-		for(x = 0; x < x_size; x++)
+		const u16 tile_offset = (y >> 3) * x_size;
+		auto *const dst = &bitmap.pix(y);
+
+		for (unsigned x = cliprect.min_x; x <= cliprect.max_x; x += x_inc)
 		{
-			uint8_t tile = m_tvram[y*x_size+x];
-			uint8_t color = m_tvram_attr & 7;
+			const u8 x_offset = x >> (3 + x_shift);
+			const u8 tile = m_tvram[tile_offset + x_offset];
 
-			for(yi = 0; yi < 8 * (m_hi_mode+1); yi++)
+			for (unsigned xi = 0; xi < x_inc; xi ++)
 			{
-				for(xi = 0; xi < 8; xi++)
-				{
-					int pen;
-					int res_x,res_y;
-					uint16_t tile_offset;
+				const u8 pen = (BIT(gfx_data[tile * 8 + (y & 7)], (7 - (xi >> x_shift)))) ? color : 0;
 
-					res_x = x * 8 + xi;
-					res_y = y * (8 *(m_hi_mode+1)) + yi;
-
-					if(res_x > 640-1 || res_y > (200*(m_hi_mode+1))-1)
-						continue;
-
-					tile_offset = tile * (8 * (m_hi_mode + 1)) + yi + (m_hi_mode * 0x800);
-
-					pen = ((gfx_data[tile_offset] >> (7-xi)) & 1) ? color : -1;
-
-					if(pen != -1)
-					{
-						if(m_hi_mode)
-						{
-							if(m_width80 == 0)
-							{
-								bitmap.pix(res_y, res_x*2+0) = m_palette->pen(pen);
-								bitmap.pix(res_y, res_x*2+1) = m_palette->pen(pen);
-							}
-							else
-							{
-								bitmap.pix(res_y, res_x) = m_palette->pen(pen);
-							}
-						}
-						else
-						{
-							if(m_width80 == 0)
-							{
-								bitmap.pix(res_y*2+0, res_x*2+0) = m_palette->pen(pen);
-								bitmap.pix(res_y*2+0, res_x*2+1) = m_palette->pen(pen);
-								bitmap.pix(res_y*2+1, res_x*2+0) = m_palette->pen(pen);
-								bitmap.pix(res_y*2+1, res_x*2+1) = m_palette->pen(pen);
-							}
-							else
-							{
-								bitmap.pix(res_y*2+0, res_x) = m_palette->pen(pen);
-								bitmap.pix(res_y*2+1, res_x) = m_palette->pen(pen);
-							}
-						}
-					}
-				}
+				dst[x + xi] = m_palette->pen(pen);
 			}
 		}
+	}
+}
+
+
+uint32_t mz2000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	if (m_vgate)
+	{
+		bitmap.fill(0, cliprect);
+		return 0;
+	}
+
+	draw_text_layer(m_text_bitmap, cliprect);
+	draw_graphics_layer(m_graphic_bitmap, cliprect);
+
+	// if bit 3 high then graphic layer has priority over text
+	if (BIT(m_tvram_attr, 3))
+	{
+		copybitmap(bitmap, m_text_bitmap, 0, 0, 0, 0, cliprect);
+		copybitmap_trans(bitmap, m_graphic_bitmap, 0, 0, 0, 0, cliprect, 0);
+	}
+	else
+	{
+		copybitmap(bitmap, m_graphic_bitmap, 0, 0, 0, 0, cliprect);
+		copybitmap_trans(bitmap, m_text_bitmap, 0, 0, 0, 0, cliprect, 0);
 	}
 
 	return 0;
 }
 
-uint8_t mz2000_state::gvram_r(offs_t offset)
+u8 mz2000_state::tvram_r(offs_t offset) { return m_tvram[offset]; }
+void mz2000_state::tvram_w(offs_t offset, u8 data) { m_tvram[offset] = data; }
+
+u8 mz2000_state::gvram_r(offs_t offset)
 {
 	if (!m_gvram_bank)
 		return 0xff;
 	return m_gvram[offset + m_gvram_bank * 0x4000];
 }
 
-void mz2000_state::gvram_w(offs_t offset, uint8_t data)
+void mz2000_state::gvram_w(offs_t offset, u8 data)
 {
 	if (!m_gvram_bank)
 		return;
 	m_gvram[offset + m_gvram_bank * 0x4000] = data;
 }
 
-void mz2000_state::gvram_bank_w(uint8_t data)
+void mz2000_state::gvram_bank_w(u8 data)
 {
 	m_gvram_bank = data & 3;
 }
 
-template <unsigned N> uint8_t mz2000_state::work_ram_r(offs_t offset)
+template <unsigned N> u8 mz2000_state::work_ram_r(offs_t offset)
 {
 	if (m_vram_overlay_enable)
 	{
@@ -284,18 +282,18 @@ template <unsigned N> uint8_t mz2000_state::work_ram_r(offs_t offset)
 			if (!m_hblank_state && !machine().side_effects_disabled())
 			{
 				m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
-				m_maincpu->defer_access();
+				m_maincpu->retry_access();
 				m_wait_state = true;
 				return 0xff;
 			}
-			return m_tvram[offset & 0xfff];
+			return tvram_r(offset & 0xfff);
 		}
 		else if (page_mem >= 0xc && m_vram_overlay_select == 0)
 		{
 			if (!m_hblank_state && !machine().side_effects_disabled())
 			{
 				m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
-				m_maincpu->defer_access();
+				m_maincpu->retry_access();
 				m_wait_state = true;
 				return 0xff;
 			}
@@ -307,7 +305,7 @@ template <unsigned N> uint8_t mz2000_state::work_ram_r(offs_t offset)
 	return m_work_ram[offset];
 }
 
-template <unsigned N> void mz2000_state::work_ram_w(offs_t offset, uint8_t data)
+template <unsigned N> void mz2000_state::work_ram_w(offs_t offset, u8 data)
 {
 	if (m_vram_overlay_enable)
 	{
@@ -318,12 +316,12 @@ template <unsigned N> void mz2000_state::work_ram_w(offs_t offset, uint8_t data)
 			if (!m_hblank_state && !machine().side_effects_disabled())
 			{
 				m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
-				m_maincpu->defer_access();
+				m_maincpu->retry_access();
 				m_wait_state = true;
 				return;
 			}
 
-			m_tvram[offset & 0xfff] = data;
+			tvram_w(offset & 0xfff, data);
 			return;
 		}
 		else if (page_mem >= 0xc && m_vram_overlay_select == 0)
@@ -331,7 +329,7 @@ template <unsigned N> void mz2000_state::work_ram_w(offs_t offset, uint8_t data)
 			if (!m_hblank_state && !machine().side_effects_disabled())
 			{
 				m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
-				m_maincpu->defer_access();
+				m_maincpu->retry_access();
 				m_wait_state = true;
 				return;
 			}
@@ -344,7 +342,7 @@ template <unsigned N> void mz2000_state::work_ram_w(offs_t offset, uint8_t data)
 	m_work_ram[offset] = data;
 }
 
-uint8_t mz2000_state::fdc_r(offs_t offset)
+u8 mz2000_state::fdc_r(offs_t offset)
 {
 	if(m_has_fdc)
 		return m_fdc->read(offset) ^ 0xff;
@@ -352,13 +350,13 @@ uint8_t mz2000_state::fdc_r(offs_t offset)
 	return 0xff;
 }
 
-void mz2000_state::fdc_w(offs_t offset, uint8_t data)
+void mz2000_state::fdc_w(offs_t offset, u8 data)
 {
 	if(m_has_fdc)
 		m_fdc->write(offset, data ^ 0xff);
 }
 
-void mz2000_state::floppy_select_w(uint8_t data)
+void mz2000_state::floppy_select_w(u8 data)
 {
 	switch (data & 0x03)
 	{
@@ -376,13 +374,13 @@ void mz2000_state::floppy_select_w(uint8_t data)
 		m_floppy->mon_w(!BIT(data, 7));
 }
 
-void mz2000_state::floppy_side_w(uint8_t data)
+void mz2000_state::floppy_side_w(u8 data)
 {
 	if (m_floppy)
 		m_floppy->ss_w(BIT(data, 0));
 }
 
-void mz2000_state::timer_w(uint8_t data)
+void mz2000_state::timer_w(u8 data)
 {
 	m_pit->write_gate0(1);
 	m_pit->write_gate1(1);
@@ -392,16 +390,16 @@ void mz2000_state::timer_w(uint8_t data)
 	m_pit->write_gate1(1);
 }
 
-void mz2000_state::tvram_attr_w(uint8_t data)
+void mz2000_state::tvram_attr_w(u8 data)
 {
 	m_tvram_attr = data;
-	if (BIT(data, 3))
-		popmessage("Priority control high");
+	m_screen->update_partial(m_screen->vpos());
 }
 
-void mz2000_state::gvram_mask_w(uint8_t data)
+void mz2000_state::gvram_mask_w(u8 data)
 {
 	m_gvram_mask = data;
+	m_screen->update_partial(m_screen->vpos());
 }
 
 void mz2000_state::mz2000_map(address_map &map)
@@ -425,14 +423,22 @@ void mz2000_state::mz80b_io(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff);
+//  map(0xb4, 0xb4) I/O Data PIO-3039 palette control
+//  map(0xb8, 0xbb) MZ-1R13 Kanji ROM
+//  map(0xd0, 0xd3) quick disk SIO
+//  map(0xd4, 0xd7) MZ-1M01 PIO for 16-bit board
 	map(0xd8, 0xdb).rw(FUNC(mz2000_state::fdc_r), FUNC(mz2000_state::fdc_w));
 	map(0xdc, 0xdc).w(FUNC(mz2000_state::floppy_select_w));
 	map(0xdd, 0xdd).w(FUNC(mz2000_state::floppy_side_w));
-	map(0xe0, 0xe3).rw("i8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
+//  map(0xde, 0xde) floppy density register
+	map(0xe0, 0xe3).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xe4, 0xe7).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0xe8, 0xeb).rw("z80pio_1", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0xe8, 0xeb).rw("pio", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
 	map(0xf0, 0xf3).w(FUNC(mz2000_state::timer_w));
-//  map(0xf4, 0xf4).w(FUNC(mz2000_state::vram_bank_w));
+//  map(0xf4, 0xf7).w(FUNC(mz2000_state::vram_bank_w));
+//  map(0xf8, 0xfa) MZ-1R12 SRAM
+//  map(0xfe, 0xfe) printer (w) strobe/reset (r) status
+//  map(0xff, 0xff) printer data
 }
 
 void mz2000_state::mz2000_io(address_map &map)
@@ -453,9 +459,9 @@ void mz2000_state::mz2000_io(address_map &map)
  * ---- x--- end of tape reached
  * ---- ---x "blank" control
  */
-uint8_t mz2000_state::ppi_portb_r()
+u8 mz2000_state::ppi_portb_r()
 {
-	uint8_t res = m_io_keys[3]->read() & 0x80;
+	u8 res = m_io_keys[3]->read() & 0x80;
 
 	if(m_cassette->get_image() != nullptr)
 	{
@@ -482,7 +488,7 @@ uint8_t mz2000_state::ppi_portb_r()
  * ---- --x- tape ff
  * ---- ---x tape rewind
  */
-void mz2000_state::ppi_porta_w(uint8_t data)
+void mz2000_state::ppi_porta_w(u8 data)
 {
 	if((m_tape_ctrl & 0x80) == 0 && data & 0x80)
 	{
@@ -536,7 +542,7 @@ void mz2000_state::ppi_porta_w(uint8_t data)
  * ---- -x-- beeper state
  * ---- --x- 0->1 transition = Work RAM reset
  */
-void mz2000_state::ppi_portc_w(uint8_t data)
+void mz2000_state::ppi_portc_w(u8 data)
 {
 	//logerror("C W %02x\n",data);
 
@@ -553,12 +559,14 @@ void mz2000_state::ppi_portc_w(uint8_t data)
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	}
 
-	m_beeper->set_state(data & 0x04);
+	m_beeper->set_state(BIT(data, 2));
+
+	m_vgate = !!(BIT(data, 0));
 
 	m_old_portc = data;
 }
 
-void mz2000_state::pio_porta_w(uint8_t data)
+void mz2000_state::pio_porta_w(u8 data)
 {
 	m_vram_overlay_enable = BIT(data, 7);
 	m_vram_overlay_select = BIT(data, 6);
@@ -578,7 +586,7 @@ void mz2000_state::pio_porta_w(uint8_t data)
 	m_porta_latch = data;
 }
 
-uint8_t mz2000_state::pio_portb_r()
+u8 mz2000_state::pio_portb_r()
 {
 	if(((m_key_mux & 0x10) == 0x00) || ((m_key_mux & 0x0f) == 0x0f)) //status read
 	{
@@ -594,7 +602,7 @@ uint8_t mz2000_state::pio_portb_r()
 	return m_io_keys[m_key_mux & 0xf]->read();
 }
 
-uint8_t mz2000_state::pio_porta_r()
+u8 mz2000_state::pio_porta_r()
 {
 	return m_porta_latch;
 }
@@ -765,9 +773,6 @@ static INPUT_PORTS_START( mz80be ) // European keyboard
 	PORT_CONFNAME( 0x02, 0x02, "Floppy Device" )
 	PORT_CONFSETTING( 0x00, DEF_STR( No ) )
 	PORT_CONFSETTING( 0x02, DEF_STR( Yes ) )
-	PORT_CONFNAME( 0x04, 0x04, "High Resolution" )
-	PORT_CONFSETTING( 0x00, DEF_STR( No ) )
-	PORT_CONFSETTING( 0x04, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mz80bj ) // Japanese keyboard (kana, no RVS)
@@ -845,30 +850,30 @@ static const gfx_layout charlayout_8x8 =
 	256,
 	1,
 	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	{ STEP8(0, 1) },
+	{ STEP8(0, 8) },
 	8*8
 };
 
-static const gfx_layout charlayout_8x16 =
-{
-	8, 16,
-	256,
-	1,
-	{ 0 },
-	{ STEP8(0,1) },
-	{ STEP16(0,8) },
-	8*16
-};
+//static const gfx_layout charlayout_8x16 =
+//{
+//	8, 16,
+//	256,
+//	1,
+//	{ 0 },
+//	{ STEP8(0,1) },
+//	{ STEP16(0,8) },
+//	8*16
+//};
 
 static GFXDECODE_START( gfx_mz2000 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, charlayout_8x8, 0, 1 )
-	GFXDECODE_ENTRY( "chargen", 0x0800, charlayout_8x16, 0, 1 )
+//	GFXDECODE_ENTRY( "chargen", 0x0800, charlayout_8x16, 0, 1 )
 GFXDECODE_END
 
 void mz2000_state::machine_start()
 {
-	m_work_ram = make_unique_clear<uint8_t[]>(0x10000);
+	m_work_ram = make_unique_clear<u8[]>(0x10000);
 	save_pointer(NAME(m_work_ram), 0x10000);
 	save_item(NAME(m_vram_overlay_enable));
 	save_item(NAME(m_vram_overlay_select));
@@ -891,7 +896,6 @@ void mz2000_state::machine_reset()
 
 	m_color_mode = m_io_config->read() & 1;
 	m_has_fdc = (m_io_config->read() & 2) >> 1;
-	m_hi_mode = (m_io_config->read() & 4) >> 2;
 }
 
 
@@ -914,7 +918,7 @@ SNAPSHOT_LOAD_MEMBER(mz2000_state::snapshot_cb)
 	if (image.length() > 0x10000)
 		return std::make_pair(image_error::INVALIDLENGTH, std::string());
 
-	std::vector<uint8_t> snapshot(image.length());
+	std::vector<u8> snapshot(image.length());
 	image.fread(&snapshot[0], image.length());
 
 	std::copy(std::begin(snapshot), std::end(snapshot), m_work_ram.get());
@@ -956,12 +960,12 @@ void mz2000_state::mz2000(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &mz2000_state::mz2000_io);
 //	m_maincpu->set_addrmap(AS_OPCODES, &mz2000_state::mz2000_opcodes);
 
-	i8255_device &ppi(I8255(config, "i8255_0"));
+	i8255_device &ppi(I8255(config, "ppi"));
 	ppi.out_pa_callback().set(FUNC(mz2000_state::ppi_porta_w));
 	ppi.in_pb_callback().set(FUNC(mz2000_state::ppi_portb_r));
 	ppi.out_pc_callback().set(FUNC(mz2000_state::ppi_portc_w));
 
-	z80pio_device& pio(Z80PIO(config, "z80pio_1", MASTER_CLOCK));
+	z80pio_device &pio(Z80PIO(config, "pio", MASTER_CLOCK));
 	pio.in_pa_callback().set(FUNC(mz2000_state::pio_porta_r));
 	pio.out_pa_callback().set(FUNC(mz2000_state::pio_porta_w));
 	pio.in_pb_callback().set(FUNC(mz2000_state::pio_portb_r));
@@ -995,7 +999,7 @@ void mz2000_state::mz2000(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(XTAL(14'318'181) * 2, 456 * 2, 0, 640, 262 * 2, 0, 200 * 2); // TODO: unverified
+	m_screen->set_raw(XTAL(14'318'181), 456 * 2, 0, 640, 262, 0, 200); // TODO: unverified
 	m_screen->set_screen_update(FUNC(mz2000_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -1025,7 +1029,7 @@ ROM_START( mz80b )
 	ROM_REGION( 0x800, "ipl", 0 )
 	ROM_LOAD( "ipl.rom",  0x0000, 0x0800, CRC(80beeec0) SHA1(d2b8167cc77ad023a807198993cb5e7a94c9e19e) )
 
-	ROM_REGION( 0x1800, "chargen", 0 )
+	ROM_REGION( 0x800, "chargen", 0 )
 	ROM_LOAD( "mzfont.rom", 0x0000, 0x0800, CRC(0631efc3) SHA1(99b206af5c9845995733d877e9e93e9681b982a8) )
 ROM_END
 
@@ -1033,22 +1037,22 @@ ROM_START( mz2000 )
 	ROM_REGION( 0x800, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "mz20ipl.bin",0x0000, 0x0800, CRC(d7ccf37f) SHA1(692814ffc2cf50fa8bf9e30c96ebe4a9ee536a86))
 
-	ROM_REGION( 0x1800, "chargen", 0 )
+	ROM_REGION( 0x800, "chargen", 0 )
 //  ROM_LOAD( "mzfont.rom", 0x0000, 0x0800, BAD_DUMP CRC(0631efc3) SHA1(99b206af5c9845995733d877e9e93e9681b982a8) ) //original has JP characters
 	/* these are hand-crafted roms, converted from bmps floating around the net */
 	ROM_LOAD( "font.bin",    0x0000, 0x0800, BAD_DUMP CRC(6ae6ce8e) SHA1(6adcdab9e4647429dd8deb73146264746b5eccda) )
-	ROM_LOAD( "font400.bin", 0x0800, 0x1000, BAD_DUMP CRC(56c5d2bc) SHA1(fea655ff5eedacf8978fa3c185485db44376e24d) )
+//	ROM_LOAD( "font400.bin", 0x0800, 0x1000, BAD_DUMP CRC(56c5d2bc) SHA1(fea655ff5eedacf8978fa3c185485db44376e24d) )
 ROM_END
 
 ROM_START( mz2200 )
 	ROM_REGION( 0x800, "ipl", 0 )
 	ROM_LOAD( "mz2200ipl.bin", 0x0000, 0x0800, CRC(476801e8) SHA1(6b1f0620945c5492475ea1694bd09a3fcf88549d) )
 
-	ROM_REGION( 0x1800, "chargen", 0 )
+	ROM_REGION( 0x800, "chargen", 0 )
 //  ROM_LOAD( "mzfont.rom", 0x0000, 0x0800, BAD_DUMP CRC(0631efc3) SHA1(99b206af5c9845995733d877e9e93e9681b982a8) ) //original has JP characters
 	/* these are hand-crafted roms, converted from bmps floating around the net */
 	ROM_LOAD( "font.bin",    0x0000, 0x0800, BAD_DUMP CRC(6ae6ce8e) SHA1(6adcdab9e4647429dd8deb73146264746b5eccda) )
-	ROM_LOAD( "font400.bin", 0x0800, 0x1000, BAD_DUMP CRC(56c5d2bc) SHA1(fea655ff5eedacf8978fa3c185485db44376e24d) )
+//	ROM_LOAD( "font400.bin", 0x0800, 0x1000, BAD_DUMP CRC(56c5d2bc) SHA1(fea655ff5eedacf8978fa3c185485db44376e24d) )
 ROM_END
 
 } // anonymous namespace
