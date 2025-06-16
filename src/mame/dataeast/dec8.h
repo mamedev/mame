@@ -222,9 +222,9 @@ protected:
 
 	virtual void i8751_hi_w(u8 data) override;
 	void gondo_i8751_hi_w(u8 data);
-	void ghostb_bank_w(u8 data);
-	void gondo_bank_w(u8 data);
 	void gondo_scroll_w(offs_t offset, u8 data);
+	void gondo_bank_w(u8 data);
+	void ghostb_bank_w(u8 data);
 	void mcu_to_main_w(u8 data);
 	void sound_w(u8 data);
 
@@ -234,7 +234,7 @@ protected:
 	TILE_GET_INFO_MEMBER(get_gondo_fix_tile_info);
 	TILE_GET_INFO_MEMBER(get_gondo_tile_info);
 
-	void screen_vblank(int state);
+	void buffer_spriteram_w(int state);
 
 	required_device<input_merger_device> m_nmigate;
 
@@ -251,7 +251,7 @@ private:
 	void garyoret_map(address_map &map) ATTR_COLD;
 
 	bool m_secclr = false;
-	u8 m_ghostb_bank = 0;
+	bool m_buffer_strobe = false;
 
 	emu_timer *m_6502_timer = nullptr;
 	emu_timer *m_i8751_timer = nullptr;
