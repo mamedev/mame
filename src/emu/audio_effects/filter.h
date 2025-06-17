@@ -22,15 +22,15 @@ public:
 
 	void set_lowpass_active(bool active);
 	void set_highpass_active(bool active);
-	void set_fl(float f);
-	void set_fh(float f);
+	void set_fl(u32 f);
+	void set_fh(u32 f);
 	void set_ql(float q);
 	void set_qh(float q);
 
 	bool lowpass_active() const  { return m_lowpass_active; }
 	bool highpass_active() const { return m_highpass_active; }
-	float fl() const { return m_fl; }
-	float fh() const { return m_fh; }
+	u32 fl() const { return m_fl; }
+	u32 fh() const { return m_fh; }
 	float ql() const { return m_ql; }
 	float qh() const { return m_qh; }
 
@@ -67,7 +67,8 @@ private:
 	bool m_isset_fl, m_isset_fh, m_isset_ql, m_isset_qh;
 
 	bool m_lowpass_active, m_highpass_active;
-	float m_fl, m_fh, m_ql, m_qh;
+	u32 m_fl, m_fh;
+	float m_ql, m_qh;
 	std::array<filter, 2> m_filter;
 	std::vector<std::array<history, 3>> m_history;
 
