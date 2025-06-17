@@ -1534,7 +1534,7 @@ GAME( 1991, mastboyid,   mastboy, mastboy, mastboy, mastboy_state, empty_init, R
 
 GAME( 1991, mastboyiol,  mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco (Playmark license)", "Master Boy Olympic (Italy, set 1, checksum 77A8)", MACHINE_SUPPORTS_SAVE ) // 18-Oct-1992
 
-GAME( 1991, mastboyitst, mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco", "Master Boy (Italy, test version, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mastboyitst, mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco", "Master Boy (Italy, test version)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1992, mastboyiv2,  mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco (Playmark license)", "Master Boy Version II (Italy, set 1, checksum 618F)", MACHINE_SUPPORTS_SAVE ) // 27-Oct-1992
 GAME( 1992, mastboyiv2a, mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco (Playmark license)", "Master Boy Version II (Italy, set 2, checksum 629B)", MACHINE_SUPPORTS_SAVE ) // 27-Oct-1992. No text on license box at boot
