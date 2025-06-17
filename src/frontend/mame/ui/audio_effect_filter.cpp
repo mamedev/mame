@@ -33,8 +33,9 @@ menu_audio_effect_filter::~menu_audio_effect_filter()
 
 u32 menu_audio_effect_filter::decrement_f(u32 f, bool alt_pressed, bool ctrl_pressed, bool shift_pressed)
 {
+	const u32 min = std::min(FH_MIN, FL_MIN);
 	if(alt_pressed)
-		return FH_MIN;
+		return min;
 
 	// pseudo-logarithmic scale
 	u32 incval;
@@ -58,13 +59,14 @@ u32 menu_audio_effect_filter::decrement_f(u32 f, bool alt_pressed, bool ctrl_pre
 		f += incval - f % incval;
 
 	f -= incval;
-	return (f < FH_MIN) ? FH_MIN : f;
+	return (f < min) ? min : f;
 }
 
 u32 menu_audio_effect_filter::increment_f(u32 f, bool alt_pressed, bool ctrl_pressed, bool shift_pressed)
 {
+	const u32 max = std::max(FH_MAX, FL_MAX);
 	if(alt_pressed)
-		return FL_MAX;
+		return max;
 
 	// pseudo-logarithmic scale
 	u32 incval;
@@ -88,7 +90,7 @@ u32 menu_audio_effect_filter::increment_f(u32 f, bool alt_pressed, bool ctrl_pre
 		f -= f % incval;
 
 	f += incval;
-	return (f > FL_MAX) ? FL_MAX : f;
+	return (f > max) ? max : f;
 }
 
 float menu_audio_effect_filter::decrement_q(float q, bool alt_pressed, bool ctrl_pressed)
