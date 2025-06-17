@@ -32,7 +32,7 @@ const audio_effect_reverb::preset audio_effect_reverb::presets[] = {
 	{ "Live",                   0, 12000,  90, 20, 20, 2,   80,  25,  9000, 25,  1.5, 90, 30, 15, 60 },
 	{ "Long Reverb 12s",        0, 16000, 100, 25, 25, 1,   20,  80, 10000,  0, 12,   90, 10, 30, 20 },
 	{ "Long Reverb 30s",        0, 16000, 100, 25, 25, 1,   20,  80,  9000,  0, 30,   90, 10, 30, 20 },
-	{ "Medium Room (Default)",  0,  8000,  80, 30, 30, 0.5, 40,  57,  8000,  8,  0.6, 90, 10, 30, 20 },
+	{ "Medium Room",            0,  8000,  80, 30, 30, 0.5, 40,  57,  8000,  8,  0.6, 90, 10, 30, 20 },
 	{ "Medium Room Bright",     0, 16000,  80, 30, 30, 0.5, 40,  52, 16000,  8,  0.6, 90, 10, 30, 20 },
 	{ "Medium Room Dark",       0,  3600,  80, 30, 30, 1,   20,  65,  3600,  8,  0.8, 90, 10, 30, 20 },
 	{ "Medium Room Drum",       0,  6500,  80, 25, 25, 1,   20,  25,  6500, 12,  0.6, 85, 10, 25, 25 },
@@ -220,18 +220,20 @@ void audio_effect_reverb::load_preset(u32 id)
 	set_early_to_late_level(p.early_to_late_level);
 }
 
-const audio_effect_reverb::preset *audio_effect_reverb::find_preset(std::string name)
+u32 audio_effect_reverb::find_preset(std::string name)
 {
 	for(u32 id=0; id != preset_count(); id++)
 		if(preset_name(id) == name)
-			return &presets[id];
-	return nullptr;
+			return id;
+	return 0;
 }
 
 audio_effect_reverb::audio_effect_reverb(speaker_device *speaker, u32 sample_rate, audio_effect *def) :
 	audio_effect(speaker, sample_rate, def)
 {
-	m_default_preset = find_preset("Medium Room (Default)");
+	m_default_preset_id = find_preset("Medium Room");
+	m_default_preset = &presets[m_default_preset_id];
+	assert(m_default_preset_id > 0);
 
 	m_early_lpf_h.resize(m_channels);
 	m_early_hpf_h.resize(m_channels);
@@ -1230,7 +1232,7 @@ audio_effect_reverb::sample_t audio_effect_reverb::delay::get(u32 tap) const
 // final result built similarly.
 
 
-//   Allpass variant without modulation or decay.
+// Allpass variant without modulation or decay.
 
 void audio_effect_reverb::allpass::clear()
 {
@@ -1259,7 +1261,7 @@ audio_effect_reverb::sample_t audio_effect_reverb::allpass::process(sample_t inp
 }
 
 
-//   Allpass variant with modulation, no decay.
+// Allpass variant with modulation, no decay.
 
 void audio_effect_reverb::allpass_m::clear()
 {
@@ -1293,7 +1295,7 @@ audio_effect_reverb::sample_t audio_effect_reverb::allpass_m::process(sample_t i
 }
 
 
-//   Allpass variant with modulation and decay.
+// Allpass variant with modulation and decay.
 
 void audio_effect_reverb::allpass_md::clear()
 {
@@ -1333,7 +1335,7 @@ audio_effect_reverb::sample_t audio_effect_reverb::allpass_md::process(sample_t 
 }
 
 
-//   Allpass variant with dual buffer, decay and taps
+// Allpass variant with dual buffer, decay and taps
 
 void audio_effect_reverb::allpass2::clear()
 {
@@ -1415,7 +1417,7 @@ audio_effect_reverb::sample_t audio_effect_reverb::allpass2::process(sample_t in
 }
 
 
-//   Allpass variant with triple buffer, decay, taps and modulation for the first buffer delay
+// Allpass variant with triple buffer, decay, taps and modulation for the first buffer delay
 
 void audio_effect_reverb::allpass3m::clear()
 {

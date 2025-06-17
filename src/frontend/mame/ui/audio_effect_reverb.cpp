@@ -302,6 +302,12 @@ bool menu_audio_effect_reverb::handle(event const *ev)
 
 	case IPT_UI_CLEAR: {
 		switch(uintptr_t(ev->itemref)) {
+		case PRESET:
+			m_preset = m_effect->default_preset();
+			m_effect->load_preset(m_preset);
+			reset(reset_options::REMEMBER_POSITION);
+			return true;
+
 		case MODE:
 			m_effect->reset_mode();
 			if(m_chain == 0xffff)
@@ -576,7 +582,7 @@ void menu_audio_effect_reverb::populate()
 {
 	item_append(_(audio_effect::effect_names[audio_effect::REVERB]), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
 	item_append(_("Mode"), m_effect->mode() ? _("Active") : _("Bypass"), flag_mode(), (void *)MODE);
-	item_append(_("Load preset"), audio_effect_reverb::preset_name(m_preset), flag_preset(), (void *)PRESET);
+	item_append(_("Load preset"), string_format("%s%s", audio_effect_reverb::preset_name(m_preset), m_preset == m_effect->default_preset() ? _(" (Default)") : ""), flag_preset(), (void *)PRESET);
 	item_append(_("Dry level"), format_percent(m_effect->dry_level()), flag_percent(m_effect->dry_level(), m_effect->isset_dry_level()), (void *)DRYL);
 	item_append(_("Stereo width"), format_percent(m_effect->stereo_width()), flag_percent(m_effect->stereo_width(), m_effect->isset_stereo_width()), (void *)SW);
 
