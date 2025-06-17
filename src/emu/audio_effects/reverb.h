@@ -95,6 +95,7 @@ public:
 	static u32 early_tap_setup_count();
 	static const char *early_tap_setup_name(u32 id);
 
+	u32 current_preset();
 	void load_preset(u32 id);
 
 private:

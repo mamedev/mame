@@ -20,6 +20,7 @@
 //
 
 const audio_effect_reverb::preset audio_effect_reverb::presets[] = {
+	{ "Custom",                 0,     0,   0,  0,  0, 0,    0,   0,     0,  0,  0,    0,  0,  0,  0 },
 	{ "Echo Chamber",           0, 12000, 100, 30, 30, 2,   80,  20,  9000, 10,  4,   90, 10, 30, 20 },
 	{ "Large Room",             0,  8000,  90, 45, 45, 0.5, 40,  64,  8000, 12,  1.2, 90, 10, 30, 20 },
 	{ "Large Room Bright",      0, 16000,  90, 45, 45, 0.5, 40,  59, 16000, 12,  1.2, 90, 10, 30, 20 },
@@ -31,7 +32,7 @@ const audio_effect_reverb::preset audio_effect_reverb::presets[] = {
 	{ "Live",                   0, 12000,  90, 20, 20, 2,   80,  25,  9000, 25,  1.5, 90, 30, 15, 60 },
 	{ "Long Reverb 12s",        0, 16000, 100, 25, 25, 1,   20,  80, 10000,  0, 12,   90, 10, 30, 20 },
 	{ "Long Reverb 30s",        0, 16000, 100, 25, 25, 1,   20,  80,  9000,  0, 30,   90, 10, 30, 20 },
-	{ "Medium Room",            0,  8000,  80, 30, 30, 0.5, 40,  57,  8000,  8,  0.6, 90, 10, 30, 20 },
+	{ "Medium Room (Default)",  0,  8000,  80, 30, 30, 0.5, 40,  57,  8000,  8,  0.6, 90, 10, 30, 20 },
 	{ "Medium Room Bright",     0, 16000,  80, 30, 30, 0.5, 40,  52, 16000,  8,  0.6, 90, 10, 30, 20 },
 	{ "Medium Room Dark",       0,  3600,  80, 30, 30, 1,   20,  65,  3600,  8,  0.8, 90, 10, 30, 20 },
 	{ "Medium Room Drum",       0,  6500,  80, 25, 25, 1,   20,  25,  6500, 12,  0.6, 85, 10, 25, 25 },
@@ -168,8 +169,38 @@ const char *audio_effect_reverb::early_tap_setup_name(u32 id)
 	return tap_maps[id].name;
 }
 
+u32 audio_effect_reverb::current_preset()
+{
+	for(u32 id=0; id != preset_count(); id++) {
+		const preset &p = presets[id];
+
+		if(m_early_tap_setup != p.early_tap_setup) continue;
+		if(m_early_damping != p.early_damping) continue;
+		if(m_stereo_width != p.stereo_width) continue;
+		if(m_early_room_size != p.early_room_size) continue;
+		if(m_late_room_size != p.late_room_size) continue;
+		if(m_late_spin != p.late_spin) continue;
+		if(m_late_wander != p.late_wander) continue;
+		if(m_late_diffusion != p.late_diffusion) continue;
+		if(m_late_damping != p.late_damping) continue;
+		if(m_late_predelay != p.late_predelay) continue;
+		if(m_late_global_decay != p.late_global_decay) continue;
+		if(m_dry_level != p.dry_level) continue;
+		if(m_early_level != p.early_level) continue;
+		if(m_late_level != p.late_level) continue;
+		if(m_early_to_late_level != p.early_to_late_level) continue;
+
+		return id;
+	}
+
+	return 0;
+}
+
 void audio_effect_reverb::load_preset(u32 id)
 {
+	if(id == 0)
+		return;
+
 	const preset &p = presets[id];
 
 	set_early_tap_setup(p.early_tap_setup);
@@ -191,16 +222,16 @@ void audio_effect_reverb::load_preset(u32 id)
 
 const audio_effect_reverb::preset *audio_effect_reverb::find_preset(std::string name)
 {
-	for(u32 i=0; i != preset_count(); i++)
-		if(preset_name(i) == name)
-			return &presets[i];
+	for(u32 id=0; id != preset_count(); id++)
+		if(preset_name(id) == name)
+			return &presets[id];
 	return nullptr;
 }
 
 audio_effect_reverb::audio_effect_reverb(speaker_device *speaker, u32 sample_rate, audio_effect *def) :
 	audio_effect(speaker, sample_rate, def)
 {
-	m_default_preset = find_preset("Medium Room");
+	m_default_preset = find_preset("Medium Room (Default)");
 
 	m_early_lpf_h.resize(m_channels);
 	m_early_hpf_h.resize(m_channels);

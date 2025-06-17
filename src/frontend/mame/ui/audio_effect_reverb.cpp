@@ -21,8 +21,8 @@ menu_audio_effect_reverb::menu_audio_effect_reverb(mame_ui_manager &mui, render_
 {
 	m_chain = chain;
 	m_entry = entry;
-	m_preset = 0;
 	m_effect = static_cast<audio_effect_reverb *>(effect);
+	m_preset = m_effect->current_preset();
 	set_heading(util::string_format("%s #%u", chain == 0xffff ? _("Default") : machine().sound().effect_chain_tag(chain), entry+1));
 	set_process_flags(PROCESS_LR_REPEAT | PROCESS_LR_ALWAYS);
 }
@@ -579,7 +579,7 @@ void menu_audio_effect_reverb::populate()
 	item_append(_("Load preset"), audio_effect_reverb::preset_name(m_preset), flag_preset(), (void *)PRESET);
 	item_append(_("Dry level"), format_percent(m_effect->dry_level()), flag_percent(m_effect->dry_level(), m_effect->isset_dry_level()), (void *)DRYL);
 	item_append(_("Stereo width"), format_percent(m_effect->stereo_width()), flag_percent(m_effect->stereo_width(), m_effect->isset_stereo_width()), (void *)SW);
-	
+
 	item_append(_("Early Reflections"), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
 	item_append(_("Room size"), format_percent(m_effect->early_room_size()), flag_percent(m_effect->early_room_size(), m_effect->isset_early_room_size()), (void *)ERS);
 	item_append(_("Tap setup"), audio_effect_reverb::early_tap_setup_name(m_effect->early_tap_setup()), flag_tap_setup(), (void *)ETAP);
