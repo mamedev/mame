@@ -422,7 +422,7 @@ bool menu_audio_effect_reverb::handle(event const *ev)
 
 std::string menu_audio_effect_reverb::format_percent(double val)
 {
-	return util::string_format("%d%", u32(val));
+	return util::string_format("%d%%", u32(val));
 }
 
 std::string menu_audio_effect_reverb::format_freq(double val)
