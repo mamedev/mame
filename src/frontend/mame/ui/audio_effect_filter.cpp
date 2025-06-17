@@ -33,9 +33,8 @@ menu_audio_effect_filter::~menu_audio_effect_filter()
 
 u32 menu_audio_effect_filter::decrement_f(u32 f, bool alt_pressed, bool ctrl_pressed, bool shift_pressed)
 {
-	const u32 min = 20;
 	if(alt_pressed)
-		return min;
+		return FH_MIN;
 
 	// pseudo-logarithmic scale
 	u32 incval;
@@ -59,14 +58,13 @@ u32 menu_audio_effect_filter::decrement_f(u32 f, bool alt_pressed, bool ctrl_pre
 		f += incval - f % incval;
 
 	f -= incval;
-	return (f < min) ? min : f;
+	return (f < FH_MIN) ? FH_MIN : f;
 }
 
 u32 menu_audio_effect_filter::increment_f(u32 f, bool alt_pressed, bool ctrl_pressed, bool shift_pressed)
 {
-	const u32 max = 20000;
 	if(alt_pressed)
-		return max;
+		return FL_MAX;
 
 	// pseudo-logarithmic scale
 	u32 incval;
@@ -90,7 +88,7 @@ u32 menu_audio_effect_filter::increment_f(u32 f, bool alt_pressed, bool ctrl_pre
 		f -= f % incval;
 
 	f += incval;
-	return (f > max) ? max : f;
+	return (f > FL_MAX) ? FL_MAX : f;
 }
 
 float menu_audio_effect_filter::decrement_q(float q, bool alt_pressed, bool ctrl_pressed)
@@ -136,7 +134,7 @@ bool menu_audio_effect_filter::handle(event const *ev)
 
 		case F | HP: {
 			u32 f = decrement_f(m_effect->fh(), alt_pressed, ctrl_pressed, shift_pressed);
-			f = std::clamp(f, 20U, 5000U);
+			f = std::clamp(f, FH_MIN, FH_MAX);
 			m_effect->set_fh(f);
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
@@ -162,7 +160,7 @@ bool menu_audio_effect_filter::handle(event const *ev)
 
 		case F | LP: {
 			u32 f = decrement_f(m_effect->fl(), alt_pressed, ctrl_pressed, shift_pressed);
-			f = std::clamp(f, 100U, 20000U);
+			f = std::clamp(f, FL_MIN, FL_MAX);
 			m_effect->set_fl(f);
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
@@ -193,7 +191,7 @@ bool menu_audio_effect_filter::handle(event const *ev)
 
 		case F | HP: {
 			u32 f = increment_f(m_effect->fh(), alt_pressed, ctrl_pressed, shift_pressed);
-			f = std::clamp(f, 20U, 5000U);
+			f = std::clamp(f, FH_MIN, FH_MAX);
 			m_effect->set_fh(f);
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
@@ -219,7 +217,7 @@ bool menu_audio_effect_filter::handle(event const *ev)
 
 		case F | LP: {
 			u32 f = increment_f(m_effect->fl(), alt_pressed, ctrl_pressed, shift_pressed);
-			f = std::clamp(f, 100U, 20000U);
+			f = std::clamp(f, FL_MIN, FL_MAX);
 			m_effect->set_fl(f);
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
@@ -291,7 +289,7 @@ bool menu_audio_effect_filter::handle(event const *ev)
 
 std::string menu_audio_effect_filter::format_fh(u32 f)
 {
-	return (f <= 20) ? _("DC removal") : util::string_format("%dHz", f);
+	return (f <= FH_MIN) ? _("DC removal") : util::string_format("%dHz", f);
 }
 
 std::string menu_audio_effect_filter::format_fl(u32 f)
@@ -322,9 +320,9 @@ u32 menu_audio_effect_filter::flag_fh() const
 	if(!m_effect->isset_fh())
 		flag |= FLAG_INVERT;
 	u32 f = m_effect->fh();
-	if(f > 20)
+	if(f > FH_MIN)
 		flag |= FLAG_LEFT_ARROW;
-	if(f < 5000)
+	if(f < FH_MAX)
 		flag |= FLAG_RIGHT_ARROW;
 	return flag;
 }
@@ -360,9 +358,9 @@ u32 menu_audio_effect_filter::flag_fl() const
 	if(!m_effect->isset_fl())
 		flag |= FLAG_INVERT;
 	u32 f = m_effect->fl();
-	if(f > 100)
+	if(f > FL_MIN)
 		flag |= FLAG_LEFT_ARROW;
-	if(f < 20000)
+	if(f < FL_MAX)
 		flag |= FLAG_RIGHT_ARROW;
 	return flag;
 }
