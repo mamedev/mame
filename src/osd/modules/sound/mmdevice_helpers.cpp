@@ -235,7 +235,7 @@ HRESULT populate_audio_node_info(
 
 	// set up channel info
 	std::vector<std::string> channel_names;
-	std::vector<std::array<double, 3> > channel_positions;
+	std::vector<osd::channel_position> channel_positions;
 	try
 	{
 		channel_names.reserve(format->nChannels);
@@ -261,7 +261,7 @@ HRESULT populate_audio_node_info(
 			channel_names.emplace_back(util::string_format("Channel %u", i + 1));
 			++i;
 		}
-		channel_positions.resize(format->nChannels, std::array<double, 3>{ 0.0, 0.0, 0.0 });
+		channel_positions.resize(format->nChannels, osd::channel_position::UNKNOWN);
 	}
 	catch (std::bad_alloc const &)
 	{
