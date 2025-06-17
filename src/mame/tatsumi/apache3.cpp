@@ -13,6 +13,7 @@
 #include "emu.h"
 #include "tatsumi.h"
 
+#include "cpu/m68000/m68000.h"
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
 #include "machine/adc0808.h"
@@ -28,6 +29,7 @@ class apache3_state : public tatsumi_state
 public:
 	apache3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: tatsumi_state(mconfig, type, tag)
+		, m_subcpu(*this, "sub")
 		, m_subcpu2(*this, "sub2")
 		, m_apache3_g_ram(*this, "apache3_g_ram")
 		, m_apache3_z80_ram(*this, "apache3_z80_ram")
@@ -68,6 +70,7 @@ private:
 	void draw_sky(bitmap_rgb32 &bitmap, const rectangle &cliprect, int palette_base, int start_offset);
 	[[maybe_unused]] void draw_ground(bitmap_rgb32 &dst, const rectangle &cliprect);
 
+	required_device<m68000_base_device> m_subcpu;
 	required_device<cpu_device> m_subcpu2;
 
 	required_shared_ptr<uint16_t> m_apache3_g_ram;

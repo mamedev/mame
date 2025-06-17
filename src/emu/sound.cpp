@@ -308,7 +308,8 @@ sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 sample
 	m_sync_timer(nullptr),
 	m_callback(std::move(callback))
 {
-	sound_assert(outputs > 0 || inputs > 0);
+	if(inputs == 0 && outputs == 0)
+		fatalerror("Device %s requiring to create a stream without inputs or outputs\n", device.tag());
 
 	// create a name
 	m_name = m_device.name();
@@ -854,7 +855,7 @@ void sound_manager::after_devices_init()
 
 	// Create the default effect chain
 	for(u32 effect = 0; effect != audio_effect::COUNT; effect++)
-		m_default_effects.emplace_back(audio_effect::create(effect, machine().sample_rate(), nullptr));
+		m_default_effects.emplace_back(audio_effect::create(effect, nullptr, machine().sample_rate(), nullptr));
 
 	// Inventory speakers and microphones
 	m_outputs_count = 0;
@@ -862,7 +863,7 @@ void sound_manager::after_devices_init()
 		dev.set_id(m_speakers.size());
 		m_speakers.emplace_back(speaker_info(dev, machine().sample_rate(), m_outputs_count));
 		for(u32 effect = 0; effect != audio_effect::COUNT; effect++)
-			m_speakers.back().m_effects[effect].m_effect.reset(audio_effect::create(effect, machine().sample_rate(), m_default_effects[effect].get()));
+			m_speakers.back().m_effects[effect].m_effect.reset(audio_effect::create(effect, &dev, machine().sample_rate(), m_default_effects[effect].get()));
 		m_outputs_count += dev.inputs();
 	}
 
@@ -1980,17 +1981,24 @@ void sound_manager::generate_mapping()
 
 // Find where to map a sound_io channel into a node's channels depending on their positions
 
-std::vector<u32> sound_manager::find_channel_mapping(const std::array<double, 3> &position, const osd::audio_info::node_info *node)
+std::vector<u32> sound_manager::find_channel_mapping(const osd::channel_position &pos, const osd::audio_info::node_info *node)
 {
 	std::vector<u32> result;
-	if(position[0] == 0 && position[1] == 0 && position[2] == 0)
+	if(pos.is_lfe()) {
+		for(u32 port = 0; port != node->m_port_positions.size(); port++)
+			if(node->m_port_positions[port].is_lfe())
+				result.push_back(port);
 		return result;
+	}
+	if(pos.is_onreq())
+		return result;
+
 	double best_dist = -1;
 	for(u32 port = 0; port != node->m_port_positions.size(); port++)
-		if(sound_io_device::mapping_allowed(node->m_port_positions[port])) {
-			double dx = position[0] - node->m_port_positions[port][0];
-			double dy = position[1] - node->m_port_positions[port][1];
-			double dz = position[2] - node->m_port_positions[port][2];
+		if(!node->m_port_positions[port].is_onreq() && !node->m_port_positions[port].is_lfe()) {
+			double dx = pos.m_x - node->m_port_positions[port].m_z;
+			double dy = pos.m_y - node->m_port_positions[port].m_y;
+			double dz = pos.m_z - node->m_port_positions[port].m_z;
 			double dist = dx*dx + dy*dy + dz*dz;
 			if(best_dist == -1 || dist < best_dist) {
 				best_dist = dist;
@@ -2496,12 +2504,10 @@ void sound_manager::mapping_update()
 				if(port_count < node.m_sources)
 					port_count = node.m_sources;
 				for(uint32_t port = 0; port != port_count; port++)
-					LOG_OUTPUT_FUNC("      %s %s [%g %g %g]\n",
-							(port < node.m_sinks) ? ((port < node.m_sources) ? "<>" : ">") : "<",
-							node.m_port_names[port],
-							node.m_port_positions[port][0],
-							node.m_port_positions[port][1],
-							node.m_port_positions[port][2]);
+					LOG_OUTPUT_FUNC("      %s %s [%s]\n",
+							port < node.m_sinks ? port < node.m_sources ? "<>" : ">" : "<",
+							node.m_port_names[port].c_str(),
+							node.m_port_positions[port].name());
 			}
 			LOG_OUTPUT_FUNC("- streams:\n");
 			for(const auto &stream : m_osd_info.m_streams) {

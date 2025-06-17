@@ -182,20 +182,28 @@ Notes:
 
 #define LOG_PPC_TO_TLCS_COMMANDS    (1U << 1)
 #define LOG_TLCS_TO_PPC_COMMANDS    (1U << 2)
+#define LOG_PPC_TLCS				(LOG_PPC_TO_TLCS_COMMANDS | LOG_TLCS_TO_PPC_COMMANDS)
 #define LOG_VIDEO_REG_1_RD          (1U << 3)
 #define LOG_VIDEO_REG_2_RD          (1U << 4)
 #define LOG_VIDEO_REG_UNK_RD        (1U << 5)
+#define LOG_VIDEO_REG_RD            (LOG_VIDEO_REG_1_RD | LOG_VIDEO_REG_2_RD | LOG_VIDEO_REG_UNK_RD)
 #define LOG_VIDEO_REG_1_WR          (1U << 6)
 #define LOG_VIDEO_REG_2_WR          (1U << 7)
 #define LOG_VIDEO_REG_UNK_WR        (1U << 8)
+#define LOG_VIDEO_REG_WR            (LOG_VIDEO_REG_1_WR | LOG_VIDEO_REG_2_WR | LOG_VIDEO_REG_UNK_WR)
+#define LOG_VIDEO_REG				(LOG_VIDEO_REG_RD | LOG_VIDEO_REG_WR)
 #define LOG_VIDEO_CHIP_UNK_RD       (1U << 9)
 #define LOG_VIDEO_CHIP_UNK_WR       (1U << 10)
+#define LOG_VIDEO_CHIP_UNK          (LOG_VIDEO_CHIP_UNK_RD | LOG_VIDEO_CHIP_UNK_WR)
 #define LOG_DIRECT_FIFO             (1U << 11)
 #define LOG_TNL_FIFO                (1U << 12)
 #define LOG_RTC_UNK_RD              (1U << 13)
 #define LOG_RTC_UNK_WR              (1U << 14)
+#define LOG_RTC						(LOG_RTC_UNK_RD | LOG_RTC_UNK_WR)
 #define LOG_VIDEO_MEM_UNK_RD        (1U << 15)
 #define LOG_VIDEO_MEM_UNK_WR        (1U << 16)
+#define LOG_VIDEO_MEM_UNK			(LOG_VIDEO_MEM_UNK_RD | LOG_VIDEO_MEM_UNK_WR)
+#define LOG_ALL						(LOG_PPC_TLCS | LOG_VIDEO_REG | LOG_VIDEO_CHIP_UNK | LOG_DIRECT_FIFO | LOG_TNL_FIFO | LOG_RTC | LOG_VIDEO_MEM_UNK)
 
 #define VERBOSE (0)
 
@@ -537,6 +545,7 @@ struct taitotz_polydata
 	u32 texture;
 	u32 alpha;
 	u32 flags;
+	bool addblend;
 	int diffuse_r, diffuse_g, diffuse_b;
 	int ambient_r, ambient_g, ambient_b;
 	int specular_r, specular_g, specular_b;
@@ -677,6 +686,8 @@ public:
 	void draw_scanline(s32 scanline, const extent_t &extent, const taitotz_polydata &extradata, int threadid);
 
 	void push_tnl_fifo(u32 data);
+	void process_direct_verts(const u32 *header, const u32 *vert_data, const int num_verts);
+	void flush_direct_poly_fifo();
 	void push_direct_poly_fifo(u32 data);
 
 	void render_tnl_object(u32 address, float scale, u8 alpha);
@@ -745,6 +756,7 @@ private:
 	u32 m_direct_fifo[64]{};
 	int m_tnl_fifo_ptr = 0;
 	int m_direct_fifo_ptr = 0;
+	int m_direct_fifo_block_count = 0;
 
 	static const float DOT3_TEX_TABLE[32];
 };
@@ -844,8 +856,9 @@ void taitotz_renderer::draw_scanline_noz(s32 scanline, const extent_t &extent, c
 	float const dv = extent.param[POLY_V].dpdx;
 
 	u32 *texram = &m_texture[extradata.texture * 0x1000];
-
-	int shift = 16;     // TODO: subtexture
+	u32 alpha = extradata.alpha & 0x1f;
+	u32 alpha_enable = extradata.alpha & 0x80;
+	const bool addblend = extradata.addblend;
 
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
@@ -854,13 +867,40 @@ void taitotz_renderer::draw_scanline_noz(s32 scanline, const extent_t &extent, c
 
 		u32 addr = generate_texel_address(iu, iv);
 
-		u32 texel = (texram[addr] >> shift) & 0xffff;
-		if (!(texel & 0x8000))
+		u32 texel0 = texram[addr] & 0xffff;
+		u32 texel1 = (texram[addr] >> 16) & 0xffff;
+		if (!BIT(texel0, 15))
 		{
-			int r = (texel & 0x7c00) << 9;
-			int g = (texel & 0x03e0) << 6;
-			int b = (texel & 0x001f) << 3;
-			fb[x] = 0xff000000 | r | g | b;
+			s32 r = (texel1 & 0x7c00) >> 7;
+			r |= (r >> 5);
+			s32 g = (texel1 & 0x03e0) >> 2;
+			g |= (g >> 5);
+			s32 b = (texel1 & 0x001f) << 3;
+			b |= (b >> 5);
+
+			if (addblend)
+			{
+				// additive blending
+				s32 sr = (fb[x] >> 16) & 0xff;
+				s32 sg = (fb[x] >>  8) & 0xff;
+				s32 sb = fb[x] & 0xff;
+				r = std::clamp(r + sr, 0, 255);
+				g = std::clamp(g + sg, 0, 255);
+				b = std::clamp(b + sb, 0, 255);
+			}
+			else if (alpha_enable && alpha < 0x1f)
+			{
+				// alpha blending
+				s32 sr = (fb[x] >> 16) & 0xff;
+				s32 sg = (fb[x] >>  8) & 0xff;
+				s32 sb = fb[x] & 0xff;
+				s32 a = alpha + 1;
+				r = ((r * a) >> 5) + ((sr * (32 - a)) >> 5);
+				g = ((g * a) >> 5) + ((sg * (32 - a)) >> 5);
+				b = ((b * a) >> 5) + ((sb * (32 - a)) >> 5);
+			}
+
+			fb[x] = 0xff000000 | (r << 16) | (g << 8) | b;
 		}
 
 		u += du;
@@ -890,15 +930,15 @@ void taitotz_renderer::draw_scanline(s32 scanline, const extent_t &extent, const
 	u32 *const texram = &m_texture[extradata.texture * 0x1000];
 	u32 alpha = extradata.alpha & 0x1f;
 	u32 alpha_enable = extradata.alpha & 0x80;
+	bool addblend = extradata.addblend;
 
 	VECTOR3 view = { -0.0f, -0.0f, -1.0f };
 
 	// TODO: these might get swapped around, the color texture doesn't always seem to be tex0
-	static constexpr int TEX_SHIFTS[4][2] = { { 16, 0 }, { 16, 0 }, { 16, 0 }, { 0, 16 } };
+	static constexpr int TEX_SHIFTS[4][2] = { { 16, 0 }, { 16, 0 }, { 16, 0 }, { 16, 0 } };
 	int texmode = extradata.flags & 3;
 	int tex0_shift = TEX_SHIFTS[texmode][0];
 	int tex1_shift = TEX_SHIFTS[texmode][1];
-
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
 		if (ooz > zb[x])
@@ -906,8 +946,8 @@ void taitotz_renderer::draw_scanline(s32 scanline, const extent_t &extent, const
 			float z = 1.0f / ooz;
 			float u = uoz * z;
 			float v = voz * z;
-			int iu = (int)(u) & 0x3f;
-			int iv = (int)(v) & 0x3f;
+			s32 iu = (s32)(u) & 0x3f;
+			s32 iv = (s32)(v) & 0x3f;
 
 			u32 addr = generate_texel_address(iu, iv);
 
@@ -916,9 +956,9 @@ void taitotz_renderer::draw_scanline(s32 scanline, const extent_t &extent, const
 			if (!(texel0 & 0x8000))
 			{
 				// extract texel0 RGB
-				int r0 = (texel0 & 0x7c00) >> 7;
-				int g0 = (texel0 & 0x03e0) >> 2;
-				int b0 = (texel0 & 0x001f) << 3;
+				s32 r0 = (texel0 & 0x7c00) >> 7;
+				s32 g0 = (texel0 & 0x03e0) >> 2;
+				s32 b0 = (texel0 & 0x001f) << 3;
 
 				if (ENABLE_LIGHTING)
 				{
@@ -956,8 +996,8 @@ void taitotz_renderer::draw_scanline(s32 scanline, const extent_t &extent, const
 					half[2] *= l;
 
 					// calculate specularity
-					const int specular = (int)(pow(clamp_pos(dot_product_vec3(normal, half)), m_specular_power) * m_specular_intensity);
-					const int intensity = (int)(dot * m_diffuse_intensity);
+					const s32 specular = (s32)(pow(clamp_pos(dot_product_vec3(normal, half)), m_specular_power) * m_specular_intensity);
+					const s32 intensity = (s32)(dot * m_diffuse_intensity);
 
 					// apply lighting
 					r0 = ((r0 * intensity * extradata.diffuse_r) >> 16) + ((r0 * extradata.ambient_r) >> 8) + ((specular * extradata.specular_r) >> 8);
@@ -972,26 +1012,22 @@ void taitotz_renderer::draw_scanline(s32 scanline, const extent_t &extent, const
 				if (texmode == 2)
 				{
 					// extract texel0 RGB
-					int r0 = (texel0 & 0x7c00) >> 7;
-					int g0 = (texel0 & 0x03e0) >> 2;
-					int b0 = (texel0 & 0x001f) << 3;
+					s32 r0 = (texel0 & 0x7c00) >> 7;
+					s32 g0 = (texel0 & 0x03e0) >> 2;
+					s32 b0 = (texel0 & 0x001f) << 3;
 
 					// fetch texture1
 					u32 texel1 = (texel >> tex1_shift) & 0xffff;
 
 					if (!(texel1 & 0x8000))
 					{
-						int sr = (fb[x] >> 16) & 0xff;
-						int sg = (fb[x] >>  8) & 0xff;
-						int sb = fb[x] & 0xff;
+						s32 sr = (fb[x] >> 16) & 0xff;
+						s32 sg = (fb[x] >>  8) & 0xff;
+						s32 sb = fb[x] & 0xff;
 
-						sr += r0;
-						sg += g0;
-						sb += b0;
-
-						if (sr > 255) sr = 255;
-						if (sg > 255) sg = 255;
-						if (sb > 255) sb = 255;
+						sr = std::clamp(r0 + sr, 0, 255);
+						sg = std::clamp(g0 + sg, 0, 255);
+						sb = std::clamp(b0 + sb, 0, 255);
 
 						// write to framebuffer
 						fb[x] = 0xff000000 | (sr << 16) | (sg << 8) | sb;
@@ -1002,20 +1038,20 @@ void taitotz_renderer::draw_scanline(s32 scanline, const extent_t &extent, const
 					// TEXEL0: RGB alpha levels
 					// TEXEL1: RGB color
 
-					int r0 = (texel0 >> 10) & 0x1f;
-					int g0 = (texel0 >> 5) & 0x1f;
-					int b0 = texel0 & 0x1f;
+					s32 r0 = (texel0 >> 10) & 0x1f;
+					s32 g0 = (texel0 >> 5) & 0x1f;
+					s32 b0 = texel0 & 0x1f;
 
 					// fetch texture1
 					u32 texel1 = (texel >> tex1_shift) & 0xffff;
 
-					int r1 = (texel1 & 0x7c00) >> 7;
-					int g1 = (texel1 & 0x03e0) >> 2;
-					int b1 = (texel1 & 0x001f) << 3;
+					s32 r1 = (texel1 & 0x7c00) >> 7;
+					s32 g1 = (texel1 & 0x03e0) >> 2;
+					s32 b1 = (texel1 & 0x001f) << 3;
 
-					int sr = (fb[x] >> 16) & 0xff;
-					int sg = (fb[x] >>  8) & 0xff;
-					int sb = fb[x] & 0xff;
+					s32 sr = (fb[x] >> 16) & 0xff;
+					s32 sg = (fb[x] >>  8) & 0xff;
+					s32 sb = fb[x] & 0xff;
 
 					r0 = ((r1 * (31 - r0)) >> 5) + ((sr * r0) >> 5);
 					g0 = ((g1 * (31 - g0)) >> 5) + ((sg * g0) >> 5);
@@ -1027,9 +1063,9 @@ void taitotz_renderer::draw_scanline(s32 scanline, const extent_t &extent, const
 				else if (texmode == 0)
 				{
 					// extract texel0 RGB
-					int r0 = (texel0 & 0x7c00) >> 7;
-					int g0 = (texel0 & 0x03e0) >> 2;
-					int b0 = (texel0 & 0x001f) << 3;
+					s32 r0 = (texel0 & 0x7c00) >> 7;
+					s32 g0 = (texel0 & 0x03e0) >> 2;
+					s32 b0 = (texel0 & 0x001f) << 3;
 
 					// write to framebuffer
 					fb[x] = 0xff000000 | (r0 << 16) | (g0 << 8) | b0;
@@ -1037,20 +1073,43 @@ void taitotz_renderer::draw_scanline(s32 scanline, const extent_t &extent, const
 				else
 				{
 					// polygon alpha blending
-					if (alpha_enable && alpha < 0x1f)
+
+					// fetch texture1
+					u32 texel1 = (texel >> tex1_shift) & 0xffff;
+					s32 r1 = (texel1 & 0x7c00) >> 7;
+					s32 g1 = (texel1 & 0x03e0) >> 2;
+					s32 b1 = (texel1 & 0x001f) << 3;
+
+					r0 = std::clamp(r0 + r1, 0, 255);
+					g0 = std::clamp(g0 + g1, 0, 255);
+					b0 = std::clamp(b0 + b1, 0, 255);
+
+					if (!(texel1 & 0x8000))
 					{
-						int sr = (fb[x] >> 16) & 0xff;
-						int sg = (fb[x] >>  8) & 0xff;
-						int sb = fb[x] & 0xff;
-						int a = alpha + 1;
-						r0 = ((r0 * a) >> 5) + ((sr * (31 - a)) >> 5);
-						g0 = ((g0 * a) >> 5) + ((sg * (31 - a)) >> 5);
-						b0 = ((b0 * a) >> 5) + ((sb * (31 - a)) >> 5);
+						if (addblend)
+						{
+							s32 sr = (fb[x] >> 16) & 0xff;
+							s32 sg = (fb[x] >>  8) & 0xff;
+							s32 sb = fb[x] & 0xff;
+
+							sr = std::clamp(r0 + sr, 0, 255);
+							sg = std::clamp(g0 + sg, 0, 255);
+							sb = std::clamp(b0 + sb, 0, 255);
+						}
+						else if (alpha_enable && alpha < 0x1f)
+						{
+							s32 sr = (fb[x] >> 16) & 0xff;
+							s32 sg = (fb[x] >>  8) & 0xff;
+							s32 sb = fb[x] & 0xff;
+							s32 a = alpha + 1;
+							r0 = ((r0 * a) >> 5) + ((sr * (31 - a)) >> 5);
+							g0 = ((g0 * a) >> 5) + ((sg * (31 - a)) >> 5);
+							b0 = ((b0 * a) >> 5) + ((sb * (31 - a)) >> 5);
+						}
+
+						// write to framebuffer
+						fb[x] = 0xff000000 | (r0 << 16) | (g0 << 8) | b0;
 					}
-
-
-					// write to framebuffer
-					fb[x] = 0xff000000 | (r0 << 16) | (g0 << 8) | b0;
 				}
 			}
 
@@ -1193,6 +1252,7 @@ void taitotz_renderer::setup_viewport(int x, int y, int width, int height, int c
 
 void taitotz_renderer::render_tnl_object(u32 address, float scale, u8 alpha)
 {
+	//m_state.machine().logerror("Rendering TNL object from %08x\n", address << 2);
 	u32 *src = &m_screen_ram[address];
 	vertex_t v[10];
 
@@ -1204,7 +1264,9 @@ void taitotz_renderer::render_tnl_object(u32 address, float scale, u8 alpha)
 
 		int num_verts;
 
-		if (src[index] & 0x10000000)
+		//m_state.machine().logerror("Value at %08x: %08x\n", (address + index) << 2, src[index]);
+
+		if (src[index] & 0x10000000 || src[index] == 0)
 			end = true;
 
 		if (src[index] & 0x01000000)
@@ -1214,10 +1276,11 @@ void taitotz_renderer::render_tnl_object(u32 address, float scale, u8 alpha)
 
 		int texture = src[index] & 0x7ff;
 		int tex_switch = (src[index+3] >> 26) & 0x3;
+		bool addblend = false;//!BIT(src[index+2], 26);
 
 		index += 4;
 
-		for (int i=0; i < num_verts; i++)
+		for (int i = 0; i < num_verts; i++)
 		{
 			// texture coords
 			u8 tu = src[index] >> 8;
@@ -1273,6 +1336,7 @@ void taitotz_renderer::render_tnl_object(u32 address, float scale, u8 alpha)
 
 		extra.texture = texture;
 		extra.alpha = alpha;
+		extra.addblend = addblend;
 		extra.flags = tex_switch;
 		extra.diffuse_r = 0xff;
 		extra.diffuse_g = 0xff;
@@ -1333,43 +1397,105 @@ void taitotz_renderer::push_tnl_fifo(u32 data)
 		u32 alpha = m_tnl_fifo[2];
 		render_tnl_object(m_tnl_fifo[0] & 0x1fffff, scale, alpha);
 
-//      printf("TNL FIFO: %08X, %f, %08X, %08X\n", m_tnl_fifo[0], u2f(m_tnl_fifo[1]), m_tnl_fifo[2], m_tnl_fifo[3]);
 		m_tnl_fifo_ptr = 0;
 	}
 }
 
-void taitotz_renderer::push_direct_poly_fifo(u32 data)
+void taitotz_renderer::process_direct_verts(const u32 *header, const u32 *vert_data, const int num_verts)
 {
-	m_direct_fifo[m_direct_fifo_ptr] = data;
-	m_direct_fifo_ptr++;
+	vertex_t v[8];
+	taitotz_polydata &extra = object_data().next();
 
-	int num_verts = ((m_direct_fifo[0] >> 8) & 7) + 1;
-	int expected_size = 4 + num_verts * 4;
-	if (m_direct_fifo_ptr >= expected_size)
+	char printbuf[1024];
+	int bufpos = 0;
+	if (false)
 	{
-		vertex_t v[8];
-		taitotz_polydata &extra = object_data().next();
+		bufpos = sprintf(printbuf, "Direct: [%08x %08x %08x %08x] ", header[0], header[1], header[2], header[3]);
+	}
 
-		int index = 4;
-		for (int i = 0; i < num_verts; i++)
+	int index = 0;
+	for (int i = 0; i < num_verts; i++, index += 4)
+	{
+		v[i].x = (vert_data[index] >> 16) & 0xffff;
+		v[i].y = vert_data[index] & 0xffff;
+		v[i].p[POLY_U] = (vert_data[index + 2] >> 20) & 0xfff;
+		v[i].p[POLY_V] = (vert_data[index + 2] >> 4) & 0xfff;
+		//u16 z = m_direct_fifo[index+1] & 0xffff;
+		if (false)
 		{
-			v[i].x = (m_direct_fifo[index + 0] >> 16) & 0xffff;
-			v[i].y = m_direct_fifo[index + 0] & 0xffff;
-			v[i].p[POLY_U] = (m_direct_fifo[index + 2] >> 20) & 0xfff;
-			v[i].p[POLY_V] = (m_direct_fifo[index + 2] >> 4) & 0xfff;
-			//u16 z = m_direct_fifo[index+1] & 0xffff;
-
-			index += 4;
+			if (i < (num_verts - 1))
+			{
+				bufpos += sprintf(&printbuf[bufpos], "%08x %08x %08x %08x - ", vert_data[index], vert_data[index + 1], vert_data[index + 2], vert_data[index + 3]);
+			}
+			else
+			{
+				bufpos += sprintf(&printbuf[bufpos], "%08x %08x %08x %08x", vert_data[index], vert_data[index + 1], vert_data[index + 2], vert_data[index + 3]);
+			}
 		}
+	}
 
-		extra.texture = m_direct_fifo[1] & 0x7ff;
+	if (false)
+	{
+		m_state.machine().logerror("%s\n", printbuf);
+	}
 
+	extra.texture = m_direct_fifo[1] & 0x7ff;
+	extra.alpha = header[0] & 0xff;
+	extra.addblend = false;//!BIT(header[2], 2);
+
+	if (num_verts >= 3)
+	{
 		for (int i = 2; i < num_verts; i++)
 		{
 			render_triangle<3>(m_cliprect, render_delegate(&taitotz_renderer::draw_scanline_noz, this), v[0], v[i-1], v[i]);
 		}
+	}
+}
 
-		m_direct_fifo_ptr = 0;
+void taitotz_renderer::flush_direct_poly_fifo()
+{
+	int fifo_idx = 4;
+	int num_verts = 0;
+	u32 vert_data[8*4] = {};
+	u32 header[4];
+	memcpy(header, &m_direct_fifo[0], sizeof(u32) * 4);
+	while (fifo_idx < m_direct_fifo_ptr)
+	{
+		if ((m_direct_fifo[fifo_idx] >> 16) == 0xff80)
+		{
+			process_direct_verts(header, vert_data, num_verts);
+			num_verts = 0;
+			memcpy(header, &m_direct_fifo[fifo_idx], sizeof(u32) * 4);
+		}
+		else
+		{
+			memcpy(&vert_data[num_verts * 4], &m_direct_fifo[fifo_idx], sizeof(u32) * 4);
+			num_verts++;
+		}
+		fifo_idx += 4;
+	}
+
+	if (num_verts > 0)
+	{
+		process_direct_verts(header, vert_data, num_verts);
+	}
+	m_direct_fifo_ptr = 0;
+}
+
+void taitotz_renderer::push_direct_poly_fifo(u32 data)
+{
+	m_direct_fifo[m_direct_fifo_ptr++] = data;
+	m_direct_fifo_block_count++;
+
+	if (m_direct_fifo_block_count == 4)
+	{
+		m_direct_fifo_block_count = 0;
+		if (m_direct_fifo[m_direct_fifo_ptr - 4] == 0 && m_direct_fifo[m_direct_fifo_ptr - 3] == 0 &&
+			m_direct_fifo[m_direct_fifo_ptr - 2] == 0 && m_direct_fifo[m_direct_fifo_ptr - 1] == 0)
+		{
+			m_direct_fifo_ptr -= 4;
+			flush_direct_poly_fifo();
+		}
 	}
 }
 
@@ -1497,11 +1623,11 @@ u32 taitotz_state::video_reg_r(u32 reg)
 		if (subreg < 0x10)
 		{
 			data = m_video_unk_reg[subreg];
-			LOGMASKED(LOG_VIDEO_REG_2_RD, "%s: video_reg_r: reg %08x: %08x\n", machine().describe_context(), reg, data);
+			LOGMASKED(LOG_VIDEO_REG_2_RD, "%s: video_reg_r: subreg %08x: %08x\n", machine().describe_context(), reg, data);
 		}
 		else
 		{
-			LOGMASKED(LOG_VIDEO_REG_2_RD, "%s: video_reg_r: unhandled reg %08x: %08x\n", machine().describe_context(), reg, data);
+			LOGMASKED(LOG_VIDEO_REG_2_RD, "%s: video_reg_r: unhandled subreg %08x: %08x\n", machine().describe_context(), reg, data);
 		}
 		return data;
 	}
@@ -1558,7 +1684,7 @@ void taitotz_state::video_reg_w(u32 reg, u32 data)
 		if (subreg < 0x10)
 		{
 			m_video_unk_reg[subreg] = data;
-			LOGMASKED(LOG_VIDEO_REG_2_WR, "%s: video_reg_w: reg %08x = %08x\n", machine().describe_context(), reg, data);
+			LOGMASKED(LOG_VIDEO_REG_2_WR, "%s: video_reg_w: subreg %08x = %08x\n", machine().describe_context(), reg, data);
 		}
 		else
 		{
@@ -1721,23 +1847,15 @@ void taitotz_state::video_fifo_w(offs_t offset, u64 data, u64 mem_mask)
 	else if (command == 0x1)
 	{
 		// Direct Polygon FIFO
-		LOGMASKED(LOG_DIRECT_FIFO, "%s: Direct polygon FIFO write: %08x%08x & %08x%08x\n", machine().describe_context(), (u32)(data >> 32), (u32)data, (u32)(mem_mask >> 32), (u32)mem_mask);
+		//LOGMASKED(LOG_DIRECT_FIFO, "%s: Direct polygon FIFO write: %08x%08x & %08x%08x\n", machine().describe_context(), (u32)(data >> 32), (u32)data, (u32)(mem_mask >> 32), (u32)mem_mask);
 		if (ACCESSING_BITS_32_63)
 		{
-			if (m_video_fifo_ptr >= 8)
-			{
-				m_renderer->push_direct_poly_fifo((u32)(data >> 32));
-				LOGMASKED(LOG_DIRECT_FIFO, "%s: push_direct_poly_fifo: %08x [%d]\n", machine().describe_context(), (u32)(data >> 32), m_renderer->direct_fifo_ptr());
-			}
+			m_renderer->push_direct_poly_fifo((u32)(data >> 32));
 			m_video_fifo_ptr++;
 		}
 		if (ACCESSING_BITS_0_31)
 		{
-			if (m_video_fifo_ptr >= 8)
-			{
-				m_renderer->push_direct_poly_fifo((u32)data);
-				LOGMASKED(LOG_DIRECT_FIFO, "%s: push_direct_poly_fifo: %08x [%d]\n", machine().describe_context(), (u32)data, m_renderer->direct_fifo_ptr());
-			}
+			m_renderer->push_direct_poly_fifo((u32)data);
 			m_video_fifo_ptr++;
 		}
 	}
@@ -1769,18 +1887,10 @@ void taitotz_state::video_fifo_w(offs_t offset, u64 data, u64 mem_mask)
 		LOGMASKED(LOG_DIRECT_FIFO, "%s: Unknown FIFO write: %08x%08x & %08x%08x\n", machine().describe_context(), (u32)(data >> 32), (u32)data, (u32)(mem_mask >> 32), (u32)mem_mask);
 		if (ACCESSING_BITS_32_63)
 		{
-			if (m_video_fifo_ptr >= 8)
-			{
-				printf("FIFO write with cmd %02X: %08X\n", command, (u32)(data >> 32));
-			}
 			m_video_fifo_ptr++;
 		}
 		if (ACCESSING_BITS_0_31)
 		{
-			if (m_video_fifo_ptr >= 8)
-			{
-				printf("FIFO write with cmd %02X: %08X\n", command, (u32)data);
-			}
 			m_video_fifo_ptr++;
 		}
 	}

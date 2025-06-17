@@ -41,30 +41,32 @@ DECLARE_DEVICE_TYPE(MICROPHONE, microphone_device)
 class sound_io_device : public device_t, public device_sound_interface
 {
 public:
+
 	virtual ~sound_io_device();
 
 	// configuration helpers
 	sound_io_device &set_position(u32 channel, double x, double y, double z);
-	sound_io_device &front_center(u32 channel = 0)        { return set_position(channel,  0.0,  0.0,  1.0); }
-	sound_io_device &front_left(u32 channel = 0)          { return set_position(channel, -0.2,  0.0,  1.0); }
-	sound_io_device &front_floor(u32 channel = 0)         { return set_position(channel,  0.0, -0.5,  1.0); }
-	sound_io_device &front_right(u32 channel = 0)         { return set_position(channel,  0.2,  0.0,  1.0); }
-	sound_io_device &rear_center(u32 channel = 0)         { return set_position(channel,  0.0,  0.0, -0.5); }
-	sound_io_device &rear_left(u32 channel = 0)           { return set_position(channel, -0.2,  0.0, -0.5); }
-	sound_io_device &rear_right(u32 channel = 0)          { return set_position(channel,  0.2,  0.0, -0.5); }
-	sound_io_device &headrest_center(u32 channel = 0)     { return set_position(channel,  0.0,  0.0, -0.1); }
-	sound_io_device &headrest_left(u32 channel = 0)       { return set_position(channel, -0.1,  0.0, -0.1); }
-	sound_io_device &headrest_right(u32 channel = 0)      { return set_position(channel,  0.1,  0.0, -0.1); }
-	sound_io_device &seat(u32 channel = 0)                { return set_position(channel,  0.0, -0.5,  0.0); }
-	sound_io_device &backrest(u32 channel = 0)            { return set_position(channel,  0.0, -0.2,  0.1); }
-	sound_io_device &unknown(u32 channel = 0)             { return set_position(channel,  0.0,  0.0,  0.0); }
-	sound_io_device &map_on_request_only(u32 channel = 0) { return set_position(channel,  0.0,  0.0, 10.0); }
+	sound_io_device &set_position(u32 channel, const osd::channel_position &pos);
+	sound_io_device &front_center(u32 channel = 0)        { return set_position(channel, osd::channel_position::FC); }
+	sound_io_device &front_left(u32 channel = 0)          { return set_position(channel, osd::channel_position::FL); }
+	sound_io_device &front_right(u32 channel = 0)         { return set_position(channel, osd::channel_position::FR); }
+	sound_io_device &rear_center(u32 channel = 0)         { return set_position(channel, osd::channel_position::RC); }
+	sound_io_device &rear_left(u32 channel = 0)           { return set_position(channel, osd::channel_position::RL); }
+	sound_io_device &rear_right(u32 channel = 0)          { return set_position(channel, osd::channel_position::RR); }
+	sound_io_device &headrest_center(u32 channel = 0)     { return set_position(channel, osd::channel_position::HC); }
+	sound_io_device &headrest_left(u32 channel = 0)       { return set_position(channel, osd::channel_position::HL); }
+	sound_io_device &headrest_right(u32 channel = 0)      { return set_position(channel, osd::channel_position::RC); }
+	sound_io_device &backrest(u32 channel = 0)            { return set_position(channel, osd::channel_position::BACKREST); }
+	sound_io_device &unknown(u32 channel = 0)             { return set_position(channel, osd::channel_position::UNKNOWN); }
+	sound_io_device &map_on_request_only(u32 channel = 0) { return set_position(channel, osd::channel_position::ONREQ);   }
+	sound_io_device &lfe(u32 channel = 0)                 { return set_position(channel, osd::channel_position::LFE);     }
+
 	sound_io_device &front()                              { return front_left(0).front_right(1); }
 	sound_io_device &rear()                               { return rear_left(0).rear_right(1); }
 	sound_io_device &corners()                            { return front_left(0).front_right(1).rear_left(2).rear_right(3); }
+
 	int channels() const { return m_positions.size(); }
-	std::array<double, 3> get_position(u32 channel) const { return m_positions[channel]; }
-	std::string get_position_name(u32 channel) const;
+	const osd::channel_position &get_position(u32 channel) const { return m_positions[channel]; }
 
 	virtual bool is_output() const = 0;
 	void set_id(int id) { m_id = id; }
@@ -72,20 +74,9 @@ public:
 
 	sound_stream *stream() const { return m_stream; }
 
-	static bool mapping_allowed(const std::array<double, 3> &position) {
-		return position[0] != 0 || position[1] != 0 || position[2] != 10.0;
-	}
-
 protected:
-	struct position_name_mapping {
-		double m_x, m_y, m_z;
-		const char *m_name;
-	};
-
-	static const position_name_mapping position_name_mappings[];
-
 	// configuration state
-	std::vector<std::array<double, 3>> m_positions;
+	std::vector<osd::channel_position> m_positions;
 	sound_stream *m_stream;
 	int m_id;
 

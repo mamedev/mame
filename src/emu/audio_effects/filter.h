@@ -11,7 +11,7 @@
 class audio_effect_filter : public audio_effect
 {
 public:
-	audio_effect_filter(u32 sample_rate, audio_effect *def);
+	audio_effect_filter(speaker_device *speaker, u32 sample_rate, audio_effect *def);
 	virtual ~audio_effect_filter() = default;
 
 	virtual int type() const override { return FILTER; }

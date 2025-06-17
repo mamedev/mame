@@ -2171,7 +2171,7 @@ void seattle_state::sfrush(machine_config &config)
 
 	// 5 Channel output (4 Channel input connected to Quad Amp PCB)
 	SPEAKER(config, "speaker", 4).corners();
-	//SPEAKER(config, "subwoofer").seat(); Not implemented, Quad Amp PCB output;
+	//SPEAKER(config, "subwoofer").lfe(); Not implemented, Quad Amp PCB output;
 
 	ATARI_CAGE_SEATTLE(config, m_cage, 0);
 	m_cage->set_speedup(0x5236);
@@ -2201,7 +2201,7 @@ void seattle_state::sfrushrk(machine_config &config)
 
 	// 5 Channel output (4 Channel input connected to Quad Amp PCB)
 	SPEAKER(config, "speaker", 4).corners();
-	//SPEAKER(config, "subwoofer").seat(); Not implemented, Quad Amp PCB output;
+	//SPEAKER(config, "subwoofer").lfe(); Not implemented, Quad Amp PCB output;
 
 	ATARI_CAGE_SEATTLE(config, m_cage, 0);
 	m_cage->set_speedup(0x5329);

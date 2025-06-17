@@ -2468,7 +2468,6 @@ void tmnt2_state::lgtnfght(machine_config &config)
 	K053260(config, m_k053260, XTAL(3'579'545));
 	m_k053260->add_route(0, "speaker", 0.70, 0);
 	m_k053260->add_route(1, "speaker", 0.70, 1);
-	m_k053260->sh1_cb().set(FUNC(tmnt2_state::z80_nmi_w));
 }
 
 void tmnt2_state::blswhstl(machine_config &config)

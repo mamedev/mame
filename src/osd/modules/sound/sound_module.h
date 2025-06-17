@@ -63,6 +63,7 @@ protected:
 		void pop_buffer() noexcept;
 		buffer &push_buffer();
 
+		int32_t m_delta, m_delta2;
 		uint32_t m_channels;
 		uint32_t m_used_buffers;
 		std::vector<int16_t> m_last_sample;
