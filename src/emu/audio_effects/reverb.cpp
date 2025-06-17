@@ -6,7 +6,14 @@
 #include "xmlfile.h"
 
 #include <cmath>
-#include <math.h>
+
+#ifndef M_LN2
+#define M_LN2 0.69314718055994530942
+#endif
+
+#ifndef M_SQRT2
+#define M_SQRT2 1.41421356237309504880
+#endif
 
 // This is a reimplementation of the "RoomReverb" by ElephantDSP.com/Christian Voigt
 // which is itself built from early reflection and Progenitor 2 from Freeverb3.
