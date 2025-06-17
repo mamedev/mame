@@ -10,350 +10,350 @@ license:CC0-1.0
 		<year>2005</year>
 		<publisher>Sega Toys</publisher>
 		<info name="alt_title" value="テレビとお茶札 お茶犬『ほっ』と生活"/>
-		<part name="card1" interface="tvochken_card">
+		<part name="card1" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 1"/>
 			<feature name="barcode" value="0x900a"/>
 			<dataarea name="card" size="0x4f1749">
 				<rom name="0 - 0001.png" size="0x4f1749" crc="c5432bb7" sha1="375fb553245e88d37977f6a831ede72cf7c94eb8"/>
 			</dataarea>
 		</part>
-		<part name="card2" interface="tvochken_card">
+		<part name="card2" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 2"/>
 			<feature name="barcode" value="0xa05a"/>
 			<dataarea name="card" size="0x4df6f0">
 				<rom name="0 - 0002.png" size="0x4df6f0" crc="6c83c38a" sha1="616a796615423e1eaa05a2637cd606d5816c7f01"/>
 			</dataarea>
 		</part>
-		<part name="card3" interface="tvochken_card">
+		<part name="card3" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 3"/>
 			<feature name="barcode" value="0xb0aa"/>
 			<dataarea name="card" size="0x4f220b">
 				<rom name="0 - 0003.png" size="0x4f220b" crc="a14f9d50" sha1="a3bce401fe3c70bef046addb4cbc31c5e0f04f0f"/>
 			</dataarea>
 		</part>
-		<part name="card4" interface="tvochken_card">
+		<part name="card4" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 4"/>
 			<feature name="barcode" value="0x90ca"/>
 			<dataarea name="card" size="0x4f1602">
 				<rom name="0 - 0004.png" size="0x4f1602" crc="1c124ccf" sha1="840a3ee78ae0995b9b9fa9428da18d0ecd293f88"/>
 			</dataarea>
 		</part>
-		<part name="card5" interface="tvochken_card">
+		<part name="card5" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 5"/>
 			<feature name="barcode" value="0x910a"/>
 			<dataarea name="card" size="0x505a3a">
 				<rom name="0 - 0005.png" size="0x505a3a" crc="c7190bb3" sha1="e4d1307971c053fc7ad98b6b8bea19a639c88084"/>
 			</dataarea>
 		</part>
-		<part name="card6" interface="tvochken_card">
+		<part name="card6" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 6"/>
 			<feature name="barcode" value="0x914a"/>
 			<dataarea name="card" size="0x50cbd4">
 				<rom name="0 - 0006.png" size="0x50cbd4" crc="0ef3b099" sha1="b736179f3b34b8301b32f2f6ded732634c9c0f76"/>
 			</dataarea>
 		</part>
-		<part name="card7" interface="tvochken_card">
+		<part name="card7" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 7"/>
 			<feature name="barcode" value="0x918a"/>
 			<dataarea name="card" size="0x4da934">
 				<rom name="0 - 0007.png" size="0x4da934" crc="66e119c6" sha1="d3ddc0bc4bea354e767ff6cc9cf152ce84bd2b24"/>
 			</dataarea>
 		</part>
-		<part name="card8" interface="tvochken_card">
+		<part name="card8" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 8"/>
 			<feature name="barcode" value="0x91ca"/>
 			<dataarea name="card" size="0x4eff47">
 				<rom name="0 - 0008.png" size="0x4eff47" crc="df475cf6" sha1="26ed60fb032b41464cc93582ab51b05ec61abf5c"/>
 			</dataarea>
 		</part>
-		<part name="card9" interface="tvochken_card">
+		<part name="card9" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 9"/>
 			<feature name="barcode" value="0x920a"/>
 			<dataarea name="card" size="0x4f423e">
 				<rom name="0 - 0009.png" size="0x4f423e" crc="d3f5b52c" sha1="157ec2a13e90381c5348352aafeffeb63f453f9c"/>
 			</dataarea>
 		</part>
-		<part name="card10" interface="tvochken_card">
+		<part name="card10" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 10"/>
 			<feature name="barcode" value="0xa25a"/>
 			<dataarea name="card" size="0x58a781">
 				<rom name="0 - 0010.png" size="0x58a781" crc="dfae4f5e" sha1="515cd302381d9dcbefa69adaaa4c8bc13b661877"/>
 			</dataarea>
 		</part>
-		<part name="card11" interface="tvochken_card">
+		<part name="card11" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 11"/>
 			<feature name="barcode" value="0x928a"/>
 			<dataarea name="card" size="0x5b058b">
 				<rom name="0 - 0011.png" size="0x5b058b" crc="5bb62726" sha1="6199c01eb5fcc7de7fe90e89f3ee7140705caeba"/>
 			</dataarea>
 		</part>
-		<part name="card12" interface="tvochken_card">
+		<part name="card12" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 12"/>
 			<feature name="barcode" value="0x92ca"/>
 			<dataarea name="card" size="0x5a279b">
 				<rom name="0 - 0012.png" size="0x5a279b" crc="b5d1111e" sha1="8b05ce9c1f74563ab9735645a5eb89a3cada74a5"/>
 			</dataarea>
 		</part>
-		<part name="card13" interface="tvochken_card">
+		<part name="card13" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 13"/>
 			<feature name="barcode" value="0xa312"/>
 			<dataarea name="card" size="0x4dc9ad">
 				<rom name="0 - 0013.png" size="0x4dc9ad" crc="707edf49" sha1="e7deac18147217e8128b5d8c440fc605c530da81"/>
 			</dataarea>
 		</part>
-		<part name="card14" interface="tvochken_card">
+		<part name="card14" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 14"/>
 			<feature name="barcode" value="0x934a"/>
 			<dataarea name="card" size="0x4ce76b">
 				<rom name="0 - 0014.png" size="0x4ce76b" crc="5c3ec4c2" sha1="a4954ed1710a87ee673d3a15b6dfdf5af46e80d6"/>
 			</dataarea>
 		</part>
-		<part name="card15" interface="tvochken_card">
+		<part name="card15" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 15"/>
 			<feature name="barcode" value="0x938a"/>
 			<dataarea name="card" size="0x531c9f">
 				<rom name="0 - 0015.png" size="0x531c9f" crc="3507b23e" sha1="ea12fa59718cdbbef6d7728e555176b76692c89b"/>
 			</dataarea>
 		</part>
-		<part name="card16" interface="tvochken_card">
+		<part name="card16" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 16"/>
 			<feature name="barcode" value="0x93ca"/>
 			<dataarea name="card" size="0x5506d3">
 				<rom name="0 - 0016.png" size="0x5506d3" crc="6c3b995c" sha1="9f63ffa5ffec951af65dfb5ce432f13b0e1bd92b"/>
 			</dataarea>
 		</part>
-		<part name="card17" interface="tvochken_card">
+		<part name="card17" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 17"/>
 			<feature name="barcode" value="0xa41a"/>
 			<dataarea name="card" size="0x50cfbd">
 				<rom name="0 - 0017.png" size="0x50cfbd" crc="a3cdf730" sha1="89035eeb714f45cac2ef0c9e8ee86d5ba50d04bb"/>
 			</dataarea>
 		</part>
-		<part name="card18" interface="tvochken_card">
+		<part name="card18" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 18"/>
 			<feature name="barcode" value="0x944a"/>
 			<dataarea name="card" size="0x4c9ed3">
 				<rom name="0 - 0018.png" size="0x4c9ed3" crc="8a0eaeb4" sha1="27131d1a642a27cea5ae1bb0c57fcd20d7e46f28"/>
 			</dataarea>
 		</part>
-		<part name="card19" interface="tvochken_card">
+		<part name="card19" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 19"/>
 			<feature name="barcode" value="0x948a"/>
 			<dataarea name="card" size="0x4e43a3">
 				<rom name="0 - 0019.png" size="0x4e43a3" crc="425cfb05" sha1="e62e0ae7da3aa45afc5d7744277288df32925b96"/>
 			</dataarea>
 		</part>
-		<part name="card20" interface="tvochken_card">
+		<part name="card20" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 20"/>
 			<feature name="barcode" value="0xb4da"/>
 			<dataarea name="card" size="0x4a67a5">
 				<rom name="0 - 0020.png" size="0x4a67a5" crc="1b3ddf36" sha1="f89981193f4a0f5438a8a4d05b29bba5832712f2"/>
 			</dataarea>
 		</part>
-		<part name="card21" interface="tvochken_card">
+		<part name="card21" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 21"/>
 			<feature name="barcode" value="0xb512"/>
 			<dataarea name="card" size="0x595884">
 				<rom name="0 - 0021.png" size="0x595884" crc="812535ac" sha1="0e88309e4629e352542e0f77c282add67d9e0eff"/>
 			</dataarea>
 		</part>
-		<part name="card22" interface="tvochken_card">
+		<part name="card22" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 22"/>
 			<feature name="barcode" value="0xa55a"/>
 			<dataarea name="card" size="0x59e757">
 				<rom name="0 - 0022.png" size="0x59e757" crc="a3af7a1e" sha1="2ce48f5948d2b4aed80cff97e4443fb377a0dc75"/>
 			</dataarea>
 		</part>
-		<part name="card23" interface="tvochken_card">
+		<part name="card23" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 23"/>
 			<feature name="barcode" value="0x958a"/>
 			<dataarea name="card" size="0x5845cc">
 				<rom name="0 - 0023.png" size="0x5845cc" crc="7962f20b" sha1="1cdb601803881b6161818902253d3e2d5c0676ca"/>
 			</dataarea>
 		</part>
-		<part name="card24" interface="tvochken_card">
+		<part name="card24" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 24"/>
 			<feature name="barcode" value="0x95ca"/>
 			<dataarea name="card" size="0x4cbaec">
 				<rom name="0 - 0024.png" size="0x4cbaec" crc="3fb7395c" sha1="2e9631bc27edc15e5be25c22a81f6f51fc1c6f20"/>
 			</dataarea>
 		</part>
-		<part name="card25" interface="tvochken_card">
+		<part name="card25" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 25"/>
 			<feature name="barcode" value="0x960a"/>
 			<dataarea name="card" size="0x57375d">
 				<rom name="0 - 0025.png" size="0x57375d" crc="b6dc9acd" sha1="fff3ebbea33f7261ae8ae4d4c7c3847b9cf3f88a"/>
 			</dataarea>
 		</part>
-		<part name="card26" interface="tvochken_card">
+		<part name="card26" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 26"/>
 			<feature name="barcode" value="0x964a"/>
 			<dataarea name="card" size="0x583f9c">
 				<rom name="0 - 0026.png" size="0x583f9c" crc="46033178" sha1="ef265ce7fafa88cebe4d8c199687e58b0a1375a3"/>
 			</dataarea>
 		</part>
-		<part name="card27" interface="tvochken_card">
+		<part name="card27" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 27"/>
 			<feature name="barcode" value="0xb69a"/>
 			<dataarea name="card" size="0x586407">
 				<rom name="0 - 0027.png" size="0x586407" crc="2278b79b" sha1="911200fd9b2662e60849ad8d0d818ffc77166815"/>
 			</dataarea>
 		</part>
-		<part name="card28" interface="tvochken_card">
+		<part name="card28" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 28"/>
 			<feature name="barcode" value="0x96ca"/>
 			<dataarea name="card" size="0x4e0094">
 				<rom name="0 - 0028.png" size="0x4e0094" crc="4ecefa48" sha1="8bb7c0e2a1f117e7c1c205fb6f68dd3b79d3608f"/>
 			</dataarea>
 		</part>
-		<part name="card29" interface="tvochken_card">
+		<part name="card29" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 29"/>
 			<feature name="barcode" value="0x970a"/>
 			<dataarea name="card" size="0x58ee04">
 				<rom name="0 - 0029.png" size="0x58ee04" crc="52cadc27" sha1="820a47efb41e1e52e3a0e75b8550983e2890fe23"/>
 			</dataarea>
 		</part>
-		<part name="card30" interface="tvochken_card">
+		<part name="card30" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 30"/>
 			<feature name="barcode" value="0x974a"/>
 			<dataarea name="card" size="0x59ffec">
 				<rom name="0 - 0030.png" size="0x59ffec" crc="0bedfd6a" sha1="781cd0be18c3a29015317ace95e3749182a9c5e5"/>
 			</dataarea>
 		</part>
-		<part name="card31" interface="tvochken_card">
+		<part name="card31" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 31"/>
 			<feature name="barcode" value="0x978a"/>
 			<dataarea name="card" size="0x52a465">
 				<rom name="0 - 0031.png" size="0x52a465" crc="6f1fb6df" sha1="430c170759010daa72318bd6bac07637fb03ac66"/>
 			</dataarea>
 		</part>
-		<part name="card32" interface="tvochken_card">
+		<part name="card32" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 32"/>
 			<feature name="barcode" value="0x97ca"/>
 			<dataarea name="card" size="0x5794b4">
 				<rom name="0 - 0032.png" size="0x5794b4" crc="0bd168a3" sha1="63eb11961046c3c382e695f0cf8292f2dbba0861"/>
 			</dataarea>
 		</part>
-		<part name="card33" interface="tvochken_card">
+		<part name="card33" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 33"/>
 			<feature name="barcode" value="0x980a"/>
 			<dataarea name="card" size="0x4b665e">
 				<rom name="0 - 0033.png" size="0x4b665e" crc="03cf3ac0" sha1="55d58cb97d5f464982d3cba4915a78e50110dc28"/>
 			</dataarea>
 		</part>
-		<part name="card34" interface="tvochken_card">
+		<part name="card34" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 34"/>
 			<feature name="barcode" value="0x984a"/>
 			<dataarea name="card" size="0x5992ff">
 				<rom name="0 - 0034.png" size="0x5992ff" crc="4c1c285c" sha1="cde5d284ffa9a9a44c88529692e5bc9f6fffb0c7"/>
 			</dataarea>
 		</part>
-		<part name="card35" interface="tvochken_card">
+		<part name="card35" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 35"/>
 			<feature name="barcode" value="0xa892"/>
 			<dataarea name="card" size="0x523acd">
 				<rom name="0 - 0035.png" size="0x523acd" crc="612aa0c0" sha1="b302fbad590fb8db3624884614c9a8bd8108acac"/>
 			</dataarea>
 		</part>
-		<part name="card36" interface="tvochken_card">
+		<part name="card36" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 36"/>
 			<feature name="barcode" value="0xa8da"/>
 			<dataarea name="card" size="0x5213b6">
 				<rom name="0 - 0036.png" size="0x5213b6" crc="befc985e" sha1="d1caa434da81b2d1e0773d5edc147800c6d48b7a"/>
 			</dataarea>
 		</part>
-		<part name="card37" interface="tvochken_card">
+		<part name="card37" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 37"/>
 			<feature name="barcode" value="0xa91a"/>
 			<dataarea name="card" size="0x4ff7ee">
 				<rom name="0 - 0037.png" size="0x4ff7ee" crc="eb1b4883" sha1="b5a36c627f224dd7d1d6953ac68dcd3ec055950c"/>
 			</dataarea>
 		</part>
-		<part name="card38" interface="tvochken_card">
+		<part name="card38" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 38"/>
 			<feature name="barcode" value="0xa952"/>
 			<dataarea name="card" size="0x519ced">
 				<rom name="0 - 0038.png" size="0x519ced" crc="ccc3807c" sha1="1834dea6b2246452b54b0f0136539e9b87cc85d1"/>
 			</dataarea>
 		</part>
-		<part name="card39" interface="tvochken_card">
+		<part name="card39" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 39"/>
 			<feature name="barcode" value="0x998a"/>
 			<dataarea name="card" size="0x5322d6">
 				<rom name="0 - 0039.png" size="0x5322d6" crc="e38dba54" sha1="e42c4a29a384f177bbf3658a8f28306985d5cb78"/>
 			</dataarea>
 		</part>
-		<part name="card40" interface="tvochken_card">
+		<part name="card40" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 40"/>
 			<feature name="barcode" value="0xb9da"/>
 			<dataarea name="card" size="0x4e717c">
 				<rom name="0 - 0040.png" size="0x4e717c" crc="d5222fa8" sha1="32f55c769f00e44beff9539241ab974bb94ebe98"/>
 			</dataarea>
 		</part>
-		<part name="card41" interface="tvochken_card">
+		<part name="card41" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 41"/>
 			<feature name="barcode" value="0xaa1a"/>
 			<dataarea name="card" size="0x512de5">
 				<rom name="0 - 0041.png" size="0x512de5" crc="5d763c3c" sha1="eb7e09b68e77bfe92fe2699c8c2010f9e7ea0dfb"/>
 			</dataarea>
 		</part>
-		<part name="card42" interface="tvochken_card">
+		<part name="card42" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 42"/>
 			<feature name="barcode" value="0x9a4a"/>
 			<dataarea name="card" size="0x500827">
 				<rom name="0 - 0042.png" size="0x500827" crc="b4413674" sha1="f2255d47156f7fb45043517928b1afa86cc2c8b8"/>
 			</dataarea>
 		</part>
-		<part name="card43" interface="tvochken_card">
+		<part name="card43" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 43"/>
 			<feature name="barcode" value="0x9a8a"/>
 			<dataarea name="card" size="0x516bd5">
 				<rom name="0 - 0043.png" size="0x516bd5" crc="04c35610" sha1="e7867e16ad3acdb5459059381880aceb11935475"/>
 			</dataarea>
 		</part>
-		<part name="card44" interface="tvochken_card">
+		<part name="card44" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 44"/>
 			<feature name="barcode" value="0x9aca"/>
 			<dataarea name="card" size="0x51e8b7">
 				<rom name="0 - 0044.png" size="0x51e8b7" crc="5e5cde23" sha1="67161d59ae158286c86f0800366206daa8ff080e"/>
 			</dataarea>
 		</part>
-		<part name="card45" interface="tvochken_card">
+		<part name="card45" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 45"/>
 			<feature name="barcode" value="0xab12"/>
 			<dataarea name="card" size="0x51a367">
 				<rom name="0 - 0045.png" size="0x51a367" crc="2d06e5d6" sha1="7d82cbbb0cff2ad1710dfb025ff5517dd3fb6321"/>
 			</dataarea>
 		</part>
-		<part name="card46" interface="tvochken_card">
+		<part name="card46" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 46"/>
 			<feature name="barcode" value="0xab52"/>
 			<dataarea name="card" size="0x509b6a">
 				<rom name="0 - 0046.png" size="0x509b6a" crc="91b3cf44" sha1="7be818e4dbfa9ea8bad46270edb71fa899be6aa6"/>
 			</dataarea>
 		</part>
-		<part name="card47" interface="tvochken_card">
+		<part name="card47" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 47"/>
 			<feature name="barcode" value="0xbba2"/>
 			<dataarea name="card" size="0x50b36f">
 				<rom name="0 - 0047.png" size="0x50b36f" crc="106f037e" sha1="eb2a5d056b5f19c53233765c813cdfb53746f30b"/>
 			</dataarea>
 		</part>
-		<part name="card48" interface="tvochken_card">
+		<part name="card48" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 48"/>
 			<feature name="barcode" value="0xabd2"/>
 			<dataarea name="card" size="0x5073bd">
 				<rom name="0 - 0048.png" size="0x5073bd" crc="f4f2efeb" sha1="07774d7bde672d5b40142448691689edafe63421"/>
 			</dataarea>
 		</part>
-		<part name="card49" interface="tvochken_card">
+		<part name="card49" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 49"/>
 			<feature name="barcode" value="0x9c0a"/>
 			<dataarea name="card" size="0x521ed6">
 				<rom name="0 - 0049.png" size="0x521ed6" crc="0cf9a850" sha1="b92be28de3c8284d75045b161a37e8eb52c16e83"/>
 			</dataarea>
 		</part>
-		<part name="card50" interface="tvochken_card">
+		<part name="card50" interface="sega_9h0_0008_card">
 			<feature name="part_id" value="Card 50"/>
 			<feature name="barcode" value="0x9c4a"/>
 			<dataarea name="card" size="0x4f7f34">

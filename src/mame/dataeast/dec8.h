@@ -43,7 +43,7 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	void buffer_spriteram16_w(u8 data = 0);
+	void buffer_spriteram16_w(u8 data);
 	void main_irq_on_w(u8 data);
 	void main_irq_off_w(u8 data);
 	void sub_irq_on_w(u8 data);
@@ -79,7 +79,7 @@ protected:
 	required_shared_ptr<u8> m_videoram;
 	optional_shared_ptr<u8> m_bg_ram;
 
-	std::unique_ptr<u16[]> m_buffered_spriteram16; // for the mxc06 sprite chip emulation (oscar, cobra)
+	std::unique_ptr<u16[]> m_buffered_spriteram16;
 
 	// video-related
 	tilemap_t *m_bg_tilemap = nullptr;
@@ -99,8 +99,7 @@ protected:
 	dec8_mcu_state_base(const machine_config &mconfig, device_type type, const char *tag) :
 		dec8_state_base(mconfig, type, tag),
 		m_mcu(*this, "mcu")
-	{
-	}
+	{ }
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
@@ -131,8 +130,7 @@ class srdarwin_state : public dec8_mcu_state_base
 public:
 	srdarwin_state(const machine_config &mconfig, device_type type, const char *tag) :
 		dec8_mcu_state_base(mconfig, type, tag)
-	{
-	}
+	{ }
 
 	void srdarwin(machine_config &config);
 	void srdarwinb(machine_config &config);
@@ -164,8 +162,7 @@ public:
 	lastmisn_state(const machine_config &mconfig, device_type type, const char *tag) :
 		dec8_mcu_state_base(mconfig, type, tag),
 		m_spritegen_krn(*this, "spritegen_krn")
-	{
-	}
+	{ }
 
 	void lastmisn(machine_config &config);
 	void shackled(machine_config &config);
@@ -207,8 +204,7 @@ public:
 	ghostb_state(const machine_config &mconfig, device_type type, const char *tag) :
 		lastmisn_state(mconfig, type, tag),
 		m_nmigate(*this, "nmigate")
-	{
-	}
+	{ }
 
 	void garyoret(machine_config &config);
 	void ghostb(machine_config &config);
@@ -222,9 +218,9 @@ protected:
 
 	virtual void i8751_hi_w(u8 data) override;
 	void gondo_i8751_hi_w(u8 data);
-	void ghostb_bank_w(u8 data);
-	void gondo_bank_w(u8 data);
 	void gondo_scroll_w(offs_t offset, u8 data);
+	void gondo_bank_w(u8 data);
+	void ghostb_bank_w(u8 data);
 	void mcu_to_main_w(u8 data);
 	void sound_w(u8 data);
 
@@ -234,7 +230,7 @@ protected:
 	TILE_GET_INFO_MEMBER(get_gondo_fix_tile_info);
 	TILE_GET_INFO_MEMBER(get_gondo_tile_info);
 
-	void screen_vblank(int state);
+	void buffer_spriteram_w(int state);
 
 	required_device<input_merger_device> m_nmigate;
 
@@ -251,7 +247,7 @@ private:
 	void garyoret_map(address_map &map) ATTR_COLD;
 
 	bool m_secclr = false;
-	u8 m_ghostb_bank = 0;
+	bool m_buffer_strobe = false;
 
 	emu_timer *m_6502_timer = nullptr;
 	emu_timer *m_i8751_timer = nullptr;
@@ -265,8 +261,7 @@ public:
 		ghostb_state(mconfig, type, tag),
 		m_analog_io(*this, "AN%u", 0U),
 		m_in_io(*this, "IN%u", 0U)
-	{
-	}
+	{ }
 
 	void gondo(machine_config &config);
 
@@ -293,8 +288,7 @@ public:
 	oscar_state(const machine_config &mconfig, device_type type, const char *tag) :
 		dec8_state_base(mconfig, type, tag),
 		m_spritegen_mxc(*this, "spritegen_mxc")
-	{
-	}
+	{ }
 
 	void cobracom(machine_config &config);
 	void oscar(machine_config &config);
@@ -333,8 +327,7 @@ public:
 		lastmisn_state(mconfig, type, tag),
 		m_msm(*this, "msm"),
 		m_soundbank(*this, "soundbank")
-	{
-	}
+	{ }
 
 	void csilver(machine_config &config);
 
