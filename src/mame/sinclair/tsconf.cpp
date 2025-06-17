@@ -35,6 +35,7 @@ TODO:
 #include "emu.h"
 #include "tsconf.h"
 
+#include "bus/rs232/rs232.h"
 #include "bus/spectrum/zxbus/bus.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
@@ -85,6 +86,14 @@ void tsconf_state::tsconf_io(address_map &map)
 	map(0x001f, 0x001f).mirror(0xff00).r(FUNC(tsconf_state::tsconf_port_xx1f_r));
 	map(0x0057, 0x0057).mirror(0xff00).rw(FUNC(tsconf_state::tsconf_port_57_zctr_r), FUNC(tsconf_state::tsconf_port_57_zctr_w)); // spi config
 	map(0x0077, 0x0077).mirror(0xff00).rw(FUNC(tsconf_state::tsconf_port_77_zctr_r), FUNC(tsconf_state::tsconf_port_77_zctr_w)); // spi data
+
+	// RS-232
+	map(0x00ef, 0x00ef).mirror(0xff00).rw(m_uart, FUNC(tsconf_rs232_device::dr_r), FUNC(tsconf_rs232_device::dr_w)); // 0x00ef..0xbfef
+	map(0xc0ef, 0xc0ef).mirror(0x3f00).unmaprw();
+	map(0xc0ef, 0xc0ef).select(0x0f00)
+		.lr8(NAME([this](offs_t offset) -> u8 { return m_uart->reg_r(offset >> 8); }))
+		.lw8(NAME([this](offs_t offset, u8 data) { m_uart->reg_w(offset >> 8, data); }));
+
 	map(0x00fe, 0x00fe).select(0xff00).rw(FUNC(tsconf_state::spectrum_ula_r), FUNC(tsconf_state::tsconf_ula_w));
 	map(0x00af, 0x00af).select(0xff00).rw(FUNC(tsconf_state::tsconf_port_xxaf_r), FUNC(tsconf_state::tsconf_port_xxaf_w));
 	map(0xfadf, 0xfadf).lr8(NAME([this]() -> u8 { return 0x80 | (m_io_mouse[2]->read() & 0x07); }));
@@ -236,6 +245,10 @@ void tsconf_state::machine_reset()
 
 	m_keyboard->write(0xff);
 	while (m_keyboard->read() != 0) { /* invalidate buffer */ }
+
+	u16 const *const cram_init = &memregion("cram_init")->as_u16();
+	for (auto i = 0; i < 0x100; i++)
+		cram_write16(i << 1, cram_init[i]); // init color RAM
 }
 
 void tsconf_state::device_post_load()
@@ -286,11 +299,18 @@ void tsconf_state::tsconf(machine_config &config)
 	m_sdcard->set_prefer_sdhc();
 	m_sdcard->spi_miso_callback().set(FUNC(tsconf_state::tsconf_spi_miso_w));
 
+	TSCONF_RS232(config, m_uart, XTAL(11'059'200));
+	m_uart->out_txd_callback().set("rs232", FUNC(rs232_port_device::write_txd));
+	m_uart->out_rts_callback().set("rs232", FUNC(rs232_port_device::write_rts));
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_uart, FUNC(tsconf_rs232_device::rxd_w));
+	rs232.cts_handler().set(m_uart, FUNC(tsconf_rs232_device::cts_w));
+
 	zxbus_device &zxbus(ZXBUS(config, "zxbus", 0));
 	ZXBUS_SLOT(config, "zxbus1", 0, zxbus, zxbus_cards, nullptr);
 	//ZXBUS_SLOT(config, "zxbus2", 0, zxbus, zxbus_cards, nullptr);
 
-	m_ram->set_default_size("4096K");
+	m_ram->set_default_size("4096K").set_default_value(0x00); // must be random but 0x00 behaves better than 0xff in tested software
 
 	GLUKRS(config, m_glukrs);
 
@@ -346,6 +366,9 @@ ROM_START(tsconf)
 
 	ROM_SYSTEM_BIOS(1, "v2407", "Update 24.07.28")
 	ROMX_LOAD("ts-bios.240728.rom", 0, 0x10000, CRC(19f8ad7b) SHA1(9cee82d4a6212686358a50b0fd5a2981b3323ab6), ROM_BIOS(1))
+
+	ROM_REGION(0x200, "cram_init", ROMREGION_ERASEFF)
+	ROM_LOAD( "cram-init.bin", 0, 0x200, CRC(8b96ffb7) SHA1(4dbd22f4312251e922911a01526cbfba77a122fc))
 ROM_END
 
 //    YEAR  NAME    PARENT      COMPAT  MACHINE     INPUT       CLASS           INIT        COMPANY             FULLNAME                            FLAGS

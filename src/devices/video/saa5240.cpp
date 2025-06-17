@@ -404,9 +404,6 @@ int saa5240_device::calc_parity(uint8_t data)
 
 void saa5240_device::process_control_character(uint8_t data)
 {
-	m_hold_clear = false;
-	m_hold_off = false;
-
 	switch (data)
 	{
 	case ALPHA_RED:
@@ -417,7 +414,6 @@ void saa5240_device::process_control_character(uint8_t data)
 	case ALPHA_CYAN:
 	case ALPHA_WHITE:
 		m_graphics = false;
-		m_hold_clear = true;
 		m_fg = data & 0x07;
 		set_next_chartype();
 		break;
@@ -437,8 +433,8 @@ void saa5240_device::process_control_character(uint8_t data)
 
 	case NORMAL_HEIGHT:
 	case DOUBLE_HEIGHT:
-		m_double_height = !!(data & 1);
-		if (m_double_height) m_double_height_prev_row = true;
+		m_dbl_height = !!(data & 1);
+		if (m_dbl_height) m_dbl_height_prev_row = true;
 		break;
 
 	case GRAPHICS_RED:
@@ -480,7 +476,7 @@ void saa5240_device::process_control_character(uint8_t data)
 		break;
 
 	case RELEASE_GRAPHICS:
-		m_hold_off = true;
+		m_hold_char = false;
 		break;
 	}
 }
@@ -638,14 +634,18 @@ uint16_t saa5240_device::get_rom_data(uint8_t data, offs_t row)
 
 void saa5240_device::get_character_data(uint8_t data)
 {
-	m_double_height_old = m_double_height;
+	bool const dbl_height_prev = m_dbl_height;
+	bool const flash_prev      = m_flash;
+	bool const graphics_prev   = m_graphics;
+	bool const hold_char_prev  = m_hold_char;
+
 	m_prev_col = m_fg;
 	m_curr_chartype = m_next_chartype;
 
 	if (data < 0x20)
 	{
 		process_control_character(data);
-		if (m_hold_char && m_double_height == m_double_height_old)
+		if (graphics_prev && (hold_char_prev || m_hold_char) && m_dbl_height == dbl_height_prev)
 		{
 			data = m_held_char;
 			if (data >= 0x40 && data < 0x60) data = 0x20;
@@ -653,34 +653,35 @@ void saa5240_device::get_character_data(uint8_t data)
 		}
 		else
 		{
+			m_held_char = 0x20;
 			data = 0x20;
 		}
 	}
 	else if (m_graphics)
 	{
-		m_held_char = data;
-		m_held_chartype = m_curr_chartype;
+		if (data & 0x20)
+		{
+			m_held_char = data;
+			m_held_chartype = m_curr_chartype;
+		}
+	}
+	else
+	{
+		m_held_char = 0x20;
 	}
 
 	offs_t ra = m_ra;
-	if (m_double_height_old)
+	if (dbl_height_prev)
 	{
 		ra >>= 1;
-		if (m_double_height_bottom_row) ra += 10;
+		if (m_dbl_height_bottom_row) ra += 10;
 	}
 
-	if (m_flash && (m_frame_count > 38)) data = 0x20;
-	if (m_double_height_bottom_row && !m_double_height) data = 0x20;
+	if (flash_prev && (m_frame_count > 38))
+		data = 0x20;
 
-	if (m_hold_off)
-	{
-		m_hold_char = false;
-		m_held_char = 32;
-	}
-	if (m_hold_clear)
-	{
-		m_held_char = 32;
-	}
+	if (m_dbl_height_bottom_row && !m_dbl_height)
+		data = 0x20;
 
 	if (m_curr_chartype == ALPHANUMERIC || !BIT(data, 5))
 		m_char_data = get_rom_data(data, ra);
@@ -699,10 +700,10 @@ void saa5240_device::vcs_w(int state)
 	{
 		if (!m_ra)
 		{
-			if (m_double_height_bottom_row)
-				m_double_height_bottom_row = false;
+			if (m_dbl_height_bottom_row)
+				m_dbl_height_bottom_row = false;
 			else
-				m_double_height_bottom_row = m_double_height_prev_row;
+				m_dbl_height_bottom_row = m_dbl_height_prev_row;
 		}
 
 		m_fg = 7;
@@ -715,8 +716,8 @@ void saa5240_device::vcs_w(int state)
 		m_held_char = 0x20;
 		m_next_chartype = ALPHANUMERIC;
 		m_held_chartype = ALPHANUMERIC;
-		m_double_height = false;
-		m_double_height_prev_row = false;
+		m_dbl_height = false;
+		m_dbl_height_prev_row = false;
 		m_bit = 11;
 	}
 }

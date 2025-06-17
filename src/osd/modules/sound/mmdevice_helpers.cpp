@@ -48,25 +48,25 @@ char const *const f_speaker_names[] ={
 		"TBC",      // SPEAKER_TOP_BACK_CENTER
 		"TBR" };    // SPEAKER_TOP_BACK_RIGHT
 
-std::array<double, 3> const f_speaker_positions[] = {
-		{ -0.2,  0.0,  1.0 },   // SPEAKER_FRONT_LEFT
-		{  0.2,  0.0,  1.0 },   // SPEAKER_FRONT_RIGHT
-		{  0.0,  0.0,  1.0 },   // SPEAKER_FRONT_CENTER
-		{  0.0, -0.5,  1.0 },   // SPEAKER_LOW_FREQUENCY
-		{ -0.2,  0.0, -0.5 },   // SPEAKER_BACK_LEFT
-		{  0.2,  0.0, -0.5 },   // SPEAKER_BACK_RIGHT
-		{ -0.1,  0.0,  1.0 },   // SPEAKER_FRONT_LEFT_OF_CENTER
-		{  0.1,  0.0,  1.0 },   // SPEAKER_FRONT_RIGHT_OF_CENTER
-		{  0.0,  0.0, -0.5 },   // SPEAKER_BACK_CENTER
-		{ -0.2,  0.0,  0.0 },   // SPEAKER_SIDE_LEFT
-		{  0.2,  0.0,  0.0 },   // SPEAKER_SIDE_RIGHT
-		{  0.0,  0.5,  0.0 },   // SPEAKER_TOP_CENTER
-		{ -0.2,  0.5,  1.0 },   // SPEAKER_TOP_FRONT_LEFT
-		{  0.0,  0.5,  1.0 },   // SPEAKER_TOP_FRONT_CENTER
-		{  0.2,  0.5,  1.0 },   // SPEAKER_TOP_FRONT_RIGHT
-		{ -0.2,  0.5, -0.5 },   // SPEAKER_TOP_BACK_LEFT
-		{  0.0,  0.5, -0.5 },   // SPEAKER_TOP_BACK_CENTER
-		{  0.2,  0.5, -0.5 } }; // SPEAKER_TOP_BACK_RIGHT
+osd::channel_position const f_speaker_positions[] = {
+		osd::channel_position::FL,                   // SPEAKER_FRONT_LEFT
+		osd::channel_position::FR,                   // SPEAKER_FRONT_RIGHT
+		osd::channel_position::FC,                   // SPEAKER_FRONT_CENTER
+		osd::channel_position::LFE,                  // SPEAKER_LOW_FREQUENCY
+		osd::channel_position::RL,                   // SPEAKER_BACK_LEFT
+		osd::channel_position::RR,                   // SPEAKER_BACK_RIGHT
+		osd::channel_position( -0.1,  0.0,  1.0 ),   // SPEAKER_FRONT_LEFT_OF_CENTER
+		osd::channel_position(  0.1,  0.0,  1.0 ),   // SPEAKER_FRONT_RIGHT_OF_CENTER
+		osd::channel_position::RC,                   // SPEAKER_BACK_CENTER
+		osd::channel_position( -0.2,  0.0,  0.0 ),   // SPEAKER_SIDE_LEFT
+		osd::channel_position(  0.2,  0.0,  0.0 ),   // SPEAKER_SIDE_RIGHT
+		osd::channel_position(  0.0,  0.5,  0.0 ),   // SPEAKER_TOP_CENTER
+		osd::channel_position( -0.2,  0.5,  1.0 ),   // SPEAKER_TOP_FRONT_LEFT
+		osd::channel_position(  0.0,  0.5,  1.0 ),   // SPEAKER_TOP_FRONT_CENTER
+		osd::channel_position(  0.2,  0.5,  1.0 ),   // SPEAKER_TOP_FRONT_RIGHT
+		osd::channel_position( -0.2,  0.5, -0.5 ),   // SPEAKER_TOP_BACK_LEFT
+		osd::channel_position(  0.0,  0.5, -0.5 ),   // SPEAKER_TOP_BACK_CENTER
+		osd::channel_position(  0.2,  0.5, -0.5 ) }; // SPEAKER_TOP_BACK_RIGHT
 
 } // anonymous namespace
 
@@ -235,7 +235,7 @@ HRESULT populate_audio_node_info(
 
 	// set up channel info
 	std::vector<std::string> channel_names;
-	std::vector<std::array<double, 3> > channel_positions;
+	std::vector<osd::channel_position> channel_positions;
 	try
 	{
 		channel_names.reserve(format->nChannels);
@@ -261,7 +261,7 @@ HRESULT populate_audio_node_info(
 			channel_names.emplace_back(util::string_format("Channel %u", i + 1));
 			++i;
 		}
-		channel_positions.resize(format->nChannels, std::array<double, 3>{ 0.0, 0.0, 0.0 });
+		channel_positions.resize(format->nChannels, osd::channel_position::UNKNOWN);
 	}
 	catch (std::bad_alloc const &)
 	{

@@ -630,7 +630,7 @@ void warriorb_state::darius2d(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
-	SPEAKER(config, "subwoofer").seat();
+	SPEAKER(config, "subwoofer").lfe();
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16_MHz_XTAL / 2));
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);

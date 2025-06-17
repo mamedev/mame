@@ -30,8 +30,8 @@ osd::audio_info sound_module::get_information()
 	result.m_nodes[0].m_sources = 0;
 	result.m_nodes[0].m_port_names.emplace_back("L");
 	result.m_nodes[0].m_port_names.emplace_back("R");
-	result.m_nodes[0].m_port_positions.emplace_back(std::array<double, 3>({ -0.2, 0.0, 1.0 }));
-	result.m_nodes[0].m_port_positions.emplace_back(std::array<double, 3>({  0.2, 0.0, 1.0 }));
+	result.m_nodes[0].m_port_positions.emplace_back(osd::channel_position::FL);
+	result.m_nodes[0].m_port_positions.emplace_back(osd::channel_position::FR);
 	result.m_streams.resize(1);
 	result.m_streams[0].m_id = 1;
 	result.m_streams[0].m_node = 1;
@@ -40,13 +40,18 @@ osd::audio_info sound_module::get_information()
 
 sound_module::abuffer::abuffer(uint32_t channels) noexcept : m_channels(channels), m_used_buffers(0), m_last_sample(channels, 0)
 {
+	m_delta = 0;
+	m_delta2 = 0;
 }
 
 void sound_module::abuffer::get(int16_t *data, uint32_t samples) noexcept
 {
+	m_delta -= samples;
+	m_delta2 -= samples;
 	uint32_t pos = 0;
 	while(pos != samples) {
 		if(!m_used_buffers) {
+			m_delta2 += samples - pos;
 			while(pos != samples) {
 				std::copy_n(m_last_sample.data(), m_channels, data);
 				data += m_channels;
@@ -74,10 +79,13 @@ void sound_module::abuffer::get(int16_t *data, uint32_t samples) noexcept
 		pos += avail;
 		data += avail * m_channels;
 	}
+	//	printf("# %d %d\n", m_delta, m_delta2);
 }
 
 void sound_module::abuffer::push(const int16_t *data, uint32_t samples)
 {
+	m_delta += samples;
+	m_delta2 += samples;
 	auto &buf = push_buffer();
 	buf.m_cpos = 0;
 	buf.m_data.resize(samples * m_channels);
@@ -85,6 +93,8 @@ void sound_module::abuffer::push(const int16_t *data, uint32_t samples)
 	std::copy_n(data + ((samples - 1) * m_channels), m_channels, m_last_sample.data());
 
 	if(m_used_buffers > 10) {
+		for(uint32_t i=0; i != m_used_buffers-10; i++)
+			m_delta2 -= (m_buffers[i].m_data.size()/m_channels - m_buffers[i].m_cpos);
 		// If there are way too many buffers, drop some so only 10 are left (roughly 0.2s)
 		for(unsigned i = 0; 10 > i; ++i) {
 			using std::swap;
@@ -95,8 +105,10 @@ void sound_module::abuffer::push(const int16_t *data, uint32_t samples)
 		// If there are too many buffers, remove five samples per buffer
 		// to slowly resync to reduce latency (4 seconds to
 		// compensate one buffer, roughly)
+		m_delta2 -= std::max<uint32_t>(samples / 200, 1);
 		buf.m_cpos = std::max<uint32_t>(samples / 200, 1);
 	}
+	//	printf("# %d %d\n", m_delta, m_delta2);
 }
 
 uint32_t sound_module::abuffer::available() const noexcept

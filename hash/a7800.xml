@@ -2669,8 +2669,8 @@ almost nothing like the prototype.
 		</part>
 	</software>
 
-<!-- This is unplayable. After the game starts it shows the first intro screen and starts again. Emulation issue or bad dump? -->
-	<software name="towertopu" cloneof="towertop" supported="no">
+<!--  right difficulty set to "B - LEFT POSITION" cycles through levels, not a bug -->
+	<software name="towertopu" cloneof="towertop">
 		<description>Tower Toppler (NTSC)</description>
 		<year>1988</year>
 		<publisher>Atari / U.S. Gold</publisher>
@@ -2687,6 +2687,7 @@ almost nothing like the prototype.
 		</part>
 	</software>
 
+<!--  right difficulty set to "B - LEFT POSITION" cycles through levels, not a bug -->
 	<software name="towertop">
 		<description>Tower Toppler (PAL)</description>
 		<year>1988</year>

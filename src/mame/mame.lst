@@ -18655,6 +18655,8 @@ thoopb
 thoopna
 thoopnna
 thoopnnaa
+xorwflat
+xorwflata
 
 @source:gaelco/gaelco2.cpp
 aligator
@@ -18777,10 +18779,12 @@ mastboy
 mastboya
 mastboyb
 mastboyc
+mastboyd
 mastboyi
 mastboyia
 mastboyib
 mastboyic
+mastboyid
 mastboyiol
 mastboyitst
 mastboyiv2
@@ -18861,8 +18865,8 @@ xorworld
 xorworlda
 
 @source:gaelco/xorworld_ms.cpp
-xorworldm
-xorworldma
+xorwldms
+xorwldmsa
 
 @source:galaxian/dambustr.cpp
 dambustr
@@ -25574,6 +25578,9 @@ korgm1ex
 korgm1p1
 korgm1r
 korgm1rex
+
+@source:korg/korgtriton.cpp
+korgtriton
 
 @source:korg/korgws.cpp
 korgwsad
@@ -32821,6 +32828,9 @@ supertr3
 tripdraw
 trivquiz
 
+@source:misc/stc3910.cpp
+executel
+
 @source:misc/stop.cpp
 stop
 
@@ -35335,7 +35345,6 @@ polmega
 ppgc200g
 protpp
 pumpactv
-rfcp168
 sen101
 senwld
 silv35
@@ -35401,6 +35410,7 @@ matet220
 matet300
 myaasa
 myaass
+rfcp168
 rminitv
 
 @source:nintendo/nes_vt369_vtunknown.cpp
@@ -47811,6 +47821,7 @@ snotec
 snotecex
 snotecu
 snotecug
+snotecut
 
 @source:vtech/primusex.cpp
 primusex

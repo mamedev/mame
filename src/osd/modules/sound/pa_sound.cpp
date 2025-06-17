@@ -101,17 +101,17 @@ int sound_pa::init(osd_interface &osd, osd_options const &options)
 	enum { FL, FR, FC, LFE, BL, BR, BC, SL, SR, AUX };
 	static const char *const posname[10] = { "FL", "FR", "FC", "LFE", "BL", "BR", "BC", "SL", "SR", "AUX" };
 
-	static const std::array<double, 3> pos3d[10] = {
-		{ -0.2,  0.0,  1.0 },
-		{  0.2,  0.0,  1.0 },
-		{  0.0,  0.0,  1.0 },
-		{  0.0, -0.5,  1.0 },
-		{ -0.2,  0.0, -0.5 },
-		{  0.2,  0.0, -0.5 },
-		{  0.0,  0.0, -0.5 },
-		{ -0.2,  0.0,  0.0 },
-		{  0.2,  0.0,  0.0 },
-		{  0.0,  0.0, 10.0 },
+	static const osd::channel_position pos3d[10] = {
+		osd::channel_position::FL,
+		osd::channel_position::FR,
+		osd::channel_position::FC,
+		osd::channel_position::LFE,
+		osd::channel_position::RL,
+		osd::channel_position::RR,
+		osd::channel_position::RC,
+		osd::channel_position(-0.2,  0.0,  0.0),
+		osd::channel_position( 0.2,  0.0,  0.0),
+		osd::channel_position::ONREQ
 	};
 
 	static const uint32_t positions[9][9] = {

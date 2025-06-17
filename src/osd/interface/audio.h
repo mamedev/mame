@@ -16,6 +16,57 @@
 
 namespace osd {
 
+struct channel_position {
+	// Special positions
+
+	// Position is unknown, placed in the middle
+	static const struct channel_position UNKNOWN;
+
+	// This channel should only be mapped explicitely through a channel mapping (on request)
+	static const struct channel_position ONREQ;
+
+	// This channel is a LFE
+	static const struct channel_position LFE;
+
+
+	// Standard positions
+	static const struct channel_position FC;
+	static const struct channel_position FL;
+	static const struct channel_position FR;
+	static const struct channel_position RC;
+	static const struct channel_position RL;
+	static const struct channel_position RR;
+	static const struct channel_position HC;
+	static const struct channel_position HL;
+	static const struct channel_position HR;
+	static const struct channel_position BACKREST;
+
+	double m_x, m_y, m_z;
+
+	bool is_lfe() const;
+	bool is_onreq() const;
+	bool is_unknown() const;
+
+	channel_position() : channel_position(UNKNOWN) {}
+	channel_position(double x, double y, double z) : m_x(x), m_y(y), m_z(z) {}
+	channel_position(const channel_position &pos) : m_x(pos.m_x), m_y(pos.m_y), m_z(pos.m_z) {}
+
+	bool operator == (const channel_position &pos) const {
+		return pos.m_x == m_x && pos.m_y == m_y && pos.m_z == m_z;
+	}
+
+	std::string name() const;
+};
+
+namespace detail {
+struct position_name_mapping {
+	struct channel_position m_pos;
+	const char *m_name;
+};
+
+extern const position_name_mapping position_name_mappings[];
+};
+
 struct audio_rate_range {
 	uint32_t m_default_rate;
 	uint32_t m_min_rate;
@@ -41,7 +92,7 @@ struct audio_info {
 		uint32_t m_id;
 		audio_rate_range m_rate;
 		std::vector<std::string> m_port_names;
-		std::vector<std::array<double, 3> > m_port_positions;
+		std::vector<channel_position> m_port_positions;
 		uint32_t m_sinks;
 		uint32_t m_sources;
 

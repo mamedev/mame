@@ -903,7 +903,7 @@ void atarigt_state::atarigt_stereo(machine_config &config)
 	// based on dedicated cabinet configuration;
 	// 'universal' kit supports mono and stereo, with/without subwoofer.
 	SPEAKER(config, "speaker", 2).front();
-	SPEAKER(config, "subwoofer").front_floor(); // Next to the coin door at dedicated cabinet, just silence for now (not implemented)
+	SPEAKER(config, "subwoofer").lfe(); // Next to the coin door at dedicated cabinet, just silence for now (not implemented)
 
 	// TODO: correct? sound board has only 1 DAC populated.
 	m_cage->add_route(0, "speaker", 1.0, 1);
@@ -925,7 +925,7 @@ void atarigt_state::tmek(machine_config &config)
 
 	// 5 Channel output (4 Channel input connected to Quad Amp PCB)
 	SPEAKER(config, "speaker", 4).front().headrest_left(2).headrest_right(3);
-	//SPEAKER(config, "subwoofer").seat(); Not implemented, Quad Amp PCB output;
+	//SPEAKER(config, "subwoofer").lfe(); Not implemented, Quad Amp PCB output;
 
 	m_cage->set_speedup(0x4fad);
 	m_cage->add_route(0, "speaker", 1.0, 1); // Foward Right

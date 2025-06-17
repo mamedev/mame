@@ -1696,9 +1696,9 @@ void lua_engine::initialize()
 					{
 						auto pos = iodev->get_position(channel);
 						auto table = sol().create_table();
-						table[1] = pos[0];
-						table[2] = pos[1];
-						table[3] = pos[2];
+						table[1] = pos.m_x;
+						table[2] = pos.m_y;
+						table[3] = pos.m_z;
 						pos_table[channel+1] = table;
 					}
 				return pos_table;
@@ -1710,7 +1710,7 @@ void lua_engine::initialize()
 				auto *iodev = dynamic_cast<sound_io_device *>(&dev.device());
 				if (iodev)
 					for(int channel=0; channel != iodev->channels(); channel++)
-						pos_table[channel+1] = iodev->get_position_name(channel);
+						pos_table[channel+1] = iodev->get_position(channel).name();
 				return pos_table;
 			});
 

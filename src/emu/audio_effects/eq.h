@@ -13,7 +13,7 @@ class audio_effect_eq : public audio_effect
 public:
 	enum { BANDS = 5 };
 
-	audio_effect_eq(u32 sample_rate, audio_effect *def);
+	audio_effect_eq(speaker_device *speaker, u32 sample_rate, audio_effect *def);
 	virtual ~audio_effect_eq() = default;
 
 	virtual int type() const override { return EQ; }

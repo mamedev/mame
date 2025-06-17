@@ -2,13 +2,13 @@
 // copyright-holders:Vas Crabb
 /******************************************************************************
 
-    tvochken_card.h
+    9h0-0008_card.h
 
-    Sega TV Ocha-ken barcode card loader
+    Sega Toys 9H0-0008 barcode card loader
 
 *******************************************************************************/
-#ifndef MAME_SEGA_TVOCHKEN_CARD_H
-#define MAME_SEGA_TVOCHKEN_CARD_H
+#ifndef MAME_SEGA_9H0_0008_CARD_H
+#define MAME_SEGA_9H0_0008_CARD_H
 
 #pragma once
 
@@ -16,12 +16,23 @@
 #include <system_error>
 #include <utility>
 
+#include "9h0-0008_iox.h"
 
-class tvochken_card_device : public device_t, public device_image_interface
+class sega_9h0_0008_card_device : public sega_9h0_0008_iox_slot_device, public device_image_interface
 {
 public:
-	tvochken_card_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
-	virtual ~tvochken_card_device();
+	// construction/destruction
+	template <typename T>
+	sega_9h0_0008_card_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt, bool const fixed)
+		: sega_9h0_0008_card_device(mconfig, tag, owner, 0)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(fixed);
+	}
+	sega_9h0_0008_card_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
+	virtual ~sega_9h0_0008_card_device();
 
 	// device_image_interface implementation
 	virtual std::pair<std::error_condition, std::string> call_load() override ATTR_COLD;
@@ -30,14 +41,16 @@ public:
 	virtual bool is_writeable() const noexcept override { return false; }
 	virtual bool is_creatable() const noexcept override { return false; }
 	virtual bool is_reset_on_load() const noexcept override { return false; }
-	virtual char const *image_interface() const noexcept override { return "tvochken_card"; }
+	virtual char const *image_interface() const noexcept override { return "sega_9h0_0008_card"; }
 	virtual char const *file_extensions() const noexcept override { return "png,jpg,bmp"; } // loose media not supported yet
 	virtual char const *image_type_name() const noexcept override { return "card"; }
 	virtual char const *image_brief_type_name() const noexcept override { return "crd"; }
 
-	u16 barcode() const noexcept { return m_barcode; }
+	virtual u16 data() const noexcept override { return m_barcode; }
 
 protected:
+	sega_9h0_0008_card_device(machine_config const &mconfig, device_type type, char const *tag, device_t *owner, u32 clock);
+
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
@@ -49,6 +62,6 @@ private:
 };
 
 
-DECLARE_DEVICE_TYPE(TVOCHKEN_CARD, tvochken_card_device)
+DECLARE_DEVICE_TYPE(SEGA_9H0_0008_CARD, sega_9h0_0008_card_device)
 
-#endif // MAME_SEGA_TVOCHKEN_CARD_H
+#endif // MAME_SEGA_9H0_0008_CARD_H

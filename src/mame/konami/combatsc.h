@@ -10,11 +10,13 @@
 
 #pragma once
 
-#include "machine/gen_latch.h"
 #include "k007452.h"
+#include "k007121.h"
+
+#include "machine/gen_latch.h"
 #include "sound/msm5205.h"
 #include "sound/upd7759.h"
-#include "k007121.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -46,9 +48,7 @@ protected:
 	tilemap_t *m_bg_tilemap[2]{};
 	tilemap_t *m_textlayer = nullptr;
 	uint8_t m_priority = 0U;
-
 	uint8_t m_vreg = 0U;
-	uint8_t m_video_circuit = 0U; // 0 or 1
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -75,7 +75,7 @@ public:
 		m_k007121(*this, "k007121_%u", 1U),
 		m_k007452(*this, "k007452"),
 		m_upd7759(*this, "upd"),
-		m_scrollram(*this, "scrollram%u", 0U),
+		m_pf_view(*this, "pf_view"),
 		m_scroll_view(*this, "scrollview")
 	{ }
 
@@ -92,14 +92,13 @@ private:
 	required_device_array<k007121_device, 2> m_k007121;
 	required_device<k007452_device> m_k007452;
 	required_device<upd7759_device> m_upd7759;
-	required_shared_ptr_array<uint8_t, 2> m_scrollram;
+	memory_view m_pf_view;
 	memory_view m_scroll_view;
 
 	// misc
 	uint8_t m_pos[4]{};
 	uint8_t m_sign[4]{};
 
-	void pf_control_w(offs_t offset, uint8_t data);
 	template <uint8_t Which> void flipscreen_w(int state);
 	template <uint8_t Which> void dirtytiles();
 	void bankselect_w(uint8_t data);

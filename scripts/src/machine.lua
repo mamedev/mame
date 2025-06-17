@@ -907,6 +907,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/ay34592.h,MACHINES["AY34592"] = true
+---------------------------------------------------
+
+if (MACHINES["AY34592"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ay34592.cpp",
+		MAME_DIR .. "src/devices/machine/ay34592.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/bankdev.h,MACHINES["BANKDEV"] = true
 ---------------------------------------------------
 
