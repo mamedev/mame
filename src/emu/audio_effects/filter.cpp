@@ -228,7 +228,10 @@ void audio_effect_filter::build_highpass()
 		return;
 	}
 
-    float K = tan(M_PI*m_fh/m_sample_rate);
+	float sr = m_sample_rate;
+	float fh = std::clamp(m_fh, 1.0f, sr/2.0f - 1.0f);
+
+    float K = tan(M_PI*fh/sr);
 	float K2 = K*K;
 	float Q = m_qh;
 
@@ -248,7 +251,10 @@ void audio_effect_filter::build_lowpass()
 		return;
 	}
 
-    float K = tan(M_PI*m_fl/m_sample_rate);
+	float sr = m_sample_rate;
+	float fl = std::clamp(m_fl, 1.0f, sr/2.0f - 1.0f);
+
+    float K = tan(M_PI*fl/sr);
 	float K2 = K*K;
 	float Q = m_ql;
 
