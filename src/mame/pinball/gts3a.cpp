@@ -41,7 +41,7 @@ ToDo:
 - Only one video plane is emulated, needs to be understood. Various gfx elements missing.
 - There's an undumped GAL 16V8-25L on the DMD board (position U8)
 - Strikes n Spares: sound, needs 2 DMD screens.
-- Brooks & Dunn: roms are missing. Program was not finished, game will never work.
+- Brooks & Dunn: ROMs are missing. Program was not finished, game will never work.
 
 *****************************************************************************************************/
 
@@ -1188,6 +1188,29 @@ ROM_START(smbpv)
 	ROM_LOAD("yrom1.bin", 0x8000, 0x8000, CRC(e1379106) SHA1(10c46bad7cbae528716c5ba0709bb1fd3574a0a8))
 ROM_END
 
+/* Earlier than 'smbpv'. Lacks adjustments #57 and #58. It also defaults to 24 max. credits in German and Spanish setting.
+   Has Spanish instead of French texts, and shows "VIFICO" instead of "GAME OVER" in attract mode. */ 
+ROM_START(smbpva)
+	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD("gprom_27c512.u2", 0x0000, 0x10000, CRC(d2db2f09) SHA1(6327812d352fecde3a4e63b36fea923c4586da74)) // Same as "smbp" but changing the string 'LES GAGNANTS DISENT "NON" A LA DROGUE' to 'SERVICIO TECNICO DE VIFICO 95/2238827'
+
+	ROM_REGION(0x80000, "dmdcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("dsprom2_27c20.u3", 0x00000, 0x40000, CRC(8bc709e3) SHA1(84b56255a05a48cd416ed5ef096dd6324b87652b))
+	ROM_RELOAD( 0x40000, 0x40000)
+
+	ROM_REGION(0x10000, "p7sound:audiocpu", ROMREGION_ERASEFF)
+	ROM_LOAD("drom1_27c256.k2", 0x8000, 0x8000, CRC(6f1d0a3e) SHA1(c7f665d79b9073f28f90debde16cafa9ab57a47c))
+
+	ROM_REGION(0x100000, "p7sound:oki", ROMREGION_ERASEFF)
+	ROM_LOAD("arom1_27c20.u4", 0x00000, 0x40000, CRC(e9cef116) SHA1(5f710bc24e1a168f296a22417aebecbde3bfaa5c))
+	ROM_RELOAD(0x40000, 0x40000)
+	ROM_LOAD("arom2_27c20.u5", 0x80000, 0x40000, CRC(0acdfd49) SHA1(0baabd32b546842bc5c76a61b509b558677b50f9))
+	ROM_RELOAD(0xc0000, 0x40000)
+
+	ROM_REGION(0x10000, "p7sound:speechcpu", ROMREGION_ERASEFF)
+	ROM_LOAD("yrom1_27c256.k3", 0x8000, 0x8000, CRC(e1379106) SHA1(10c46bad7cbae528716c5ba0709bb1fd3574a0a8))
+ROM_END
+
 /*-------------------------------------------------------------------
 / Super Mario Brothers Mushroom World (N105)
 /-------------------------------------------------------------------*/
@@ -1406,7 +1429,8 @@ GAME(1992,  smbp,       0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Got
 GAME(1992,  smbpa,      smbp,     p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Super Mario Brothers (pinball, set 2)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 GAME(1992,  smbpb,      smbp,     p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Super Mario Brothers (pinball, set 3)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 GAME(1992,  smbpc,      smbp,     p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Super Mario Brothers (pinball, set 4)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
-GAME(1992,  smbpv,      smbp,     p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb (Vifico license)", "Super Mario Brothers (pinball, Spanish)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE ) // Missing the Spanish display ROM
+GAME(1992,  smbpv,      smbp,     p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb (Vifico license)", "Super Mario Brothers (pinball, Spanish, set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE ) // Missing the Spanish display ROM
+GAME(1992,  smbpva,     smbp,     p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb (Vifico license)", "Super Mario Brothers (pinball, Spanish, set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 GAME(1992,  smbmush,    0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Super Mario Brothers Mushroom World",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 GAME(1992,  cueball,    0,        p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Cue Ball Wizard",                            MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
 GAME(1992,  cueballa,   cueball,  p7, gts3a, gts3a_state, init_gts3a, ROT0, "Gottlieb", "Cue Ball Wizard (rev. 2)",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE )
