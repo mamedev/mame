@@ -96,7 +96,7 @@ public:
 	static const char *early_tap_setup_name(u32 id);
 
 	u32 default_preset() { return m_default_preset_id; }
-	u32 current_preset();
+	u32 find_current_preset();
 	void load_preset(u32 id);
 
 private:

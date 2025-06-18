@@ -169,7 +169,7 @@ const char *audio_effect_reverb::early_tap_setup_name(u32 id)
 	return tap_maps[id].name;
 }
 
-u32 audio_effect_reverb::current_preset()
+u32 audio_effect_reverb::find_current_preset()
 {
 	for(u32 id=0; id != preset_count(); id++) {
 		const preset &p = presets[id];
