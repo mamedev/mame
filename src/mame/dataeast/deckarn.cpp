@@ -18,15 +18,36 @@ deco_karnovsprites_device::deco_karnovsprites_device(const machine_config &mconf
 
 void deco_karnovsprites_device::device_start()
 {
-	m_flip_screen = false;
 	m_colpri_cb.resolve();
 
 	save_item(NAME(m_flip_screen));
 }
 
-void deco_karnovsprites_device::device_reset()
-{
-}
+
+// Sprite format:
+/*
+
+  fedcba98 76543210
+0 x....... ........ hide?
+0 ....x... ........ size 16x32
+0 .......x xxxxxxxx y
+
+1 ........ x....... must be 0 for 16x32 sprite to work right
+1 ........ ..x..... y zoom
+1 ........ ...x.... must be 1 for 16x32 sprite to work right
+1 ........ .....x.. flip x
+1 ........ ......x. flip y
+1 ........ .......x hide?
+
+2 .......x xxxxxxxx x
+
+3 xxxx.... ........ colour
+3 ....xxxx xxxxxxxx code
+
+data1 bits 4 and 7 are weird sprite code masks, and can cause glitches with 16x32 sprites.
+The y zoom flag isn't used by any games.
+
+*/
 
 void deco_karnovsprites_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, const u16 *spriteram, int size)
 {
@@ -38,7 +59,7 @@ void deco_karnovsprites_device::draw_sprites(screen_device &screen, bitmap_ind16
 	for (int offs = start; offs != end; offs += inc)
 	{
 		const u16 data0 = spriteram[offs];
-		if (!(data0 & 0x8000))
+		if (!BIT(data0, 15))
 			continue;
 
 		int y = data0 & 0x1ff;
@@ -54,31 +75,32 @@ void deco_karnovsprites_device::draw_sprites(screen_device &screen, bitmap_ind16
 		const u16 data1 = spriteram[offs + 1];
 
 		/* the 8-bit implementation had this.  illustrated by enemy projectile explosions in Shackled being left on screen. */
-		if ((data1 & 0x1) == 0)
+		if (!BIT(data1, 0))
 			continue;
 
-		const bool extra = (data1 & 0x10) ? 1 : 0;
-		int fy = data1 & 0x2;
-		int fx = data1 & 0x4;
+		const bool extra = BIT(data0, 11);
+		int fy = BIT(data1, 1);
+		int fx = BIT(data1, 2);
 
 		if (extra)
 		{
-			y = y + 16;
+			y += 16;
 			sprite &= 0xffe; // taken from 8-bit version
 		}
 
 		/* Convert the co-ords..*/
-		x = (x + 16) % 0x200;
-		y = (y + 16) % 0x200;
+		x = (x + 16) & 0x1ff;
+		y = (y + 16) & 0x1ff;
 		x = 256 - x;
 		y = 256 - y;
 		if (m_flip_screen)
 		{
 			y = 240 - y;
 			x = 240 - x;
-			if (fx) fx = 0; else fx = 1;
-			if (fy) fy = 0; else fy = 1;
-			if (extra) y = y - 16;
+			fx = !fx;
+			fy = !fy;
+			if (extra)
+				y -= 16;
 		}
 
 		/* Y Flip determines order of multi-sprite */
@@ -86,34 +108,40 @@ void deco_karnovsprites_device::draw_sprites(screen_device &screen, bitmap_ind16
 		if (extra && fy)
 		{
 			sprite2 = sprite;
-			sprite++;
+			sprite |= 1;
 		}
 		else
-			sprite2 = sprite + 1;
+			sprite2 = sprite | 1;
 
 		if (priority)
 		{
-			gfx(0)->prio_transpen(bitmap,cliprect,
-					sprite,
-					colour,fx,fy,x,y,screen.priority(),pri_mask,0);
+			gfx(0)->prio_transpen(bitmap, cliprect,
+					sprite, colour,
+					fx, fy, x, y,
+					screen.priority(), pri_mask, 0);
 
 			/* 1 more sprite drawn underneath */
 			if (extra)
-				gfx(0)->prio_transpen(bitmap,cliprect,
-					sprite2,
-					colour,fx,fy,x,y+16,screen.priority(),pri_mask,0);
+			{
+				gfx(0)->prio_transpen(bitmap, cliprect,
+						sprite2, colour,
+						fx, fy, x, y + 16,
+						screen.priority(), pri_mask, 0);
+			}
 		}
 		else
 		{
 			gfx(0)->transpen(bitmap,cliprect,
-					sprite,
-					colour,fx,fy,x,y,0);
+					sprite, colour,
+					fx, fy, x, y, 0);
 
 			/* 1 more sprite drawn underneath */
 			if (extra)
-				gfx(0)->transpen(bitmap,cliprect,
-					sprite2,
-					colour,fx,fy,x,y+16,0);
+			{
+				gfx(0)->transpen(bitmap, cliprect,
+						sprite2, colour,
+						fx, fy, x, y + 16, 0);
+			}
 		}
 	}
 }
