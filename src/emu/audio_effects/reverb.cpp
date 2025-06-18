@@ -329,6 +329,11 @@ audio_effect_reverb::audio_effect_reverb(speaker_device *speaker, u32 sample_rat
 	set_late_diffusion_2(0.312);
 	set_late_diffusion_3(0.406);
 	set_late_diffusion_4(0.250);
+    set_late_decay_0(0.237);
+    set_late_decay_1(0.938);
+    set_late_decay_2(0.844);
+    set_late_decay_3(0.906);
+    set_late_decay_f(1.000);
 	m_late_crossfeed = 0.4;
 	set_late_bass_allpass(150, 4);
 	set_late_damping_2(500, 2);
@@ -645,7 +650,7 @@ void audio_effect_reverb::reset_mode()
 {
 	audio_effect_reverb *d = static_cast<audio_effect_reverb *>(m_default);
 	m_isset_mode = false;
-	m_mode = d ? d->mode() : 1;
+	m_mode = d ? d->mode() : 0;
 }
 
 void audio_effect_reverb::reset_early_tap_setup()

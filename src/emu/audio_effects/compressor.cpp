@@ -256,7 +256,7 @@ void audio_effect_compressor::reset_mode()
 {
 	audio_effect_compressor *d = static_cast<audio_effect_compressor *>(m_default);
 	m_isset_mode = false;
-	m_mode = d ? d->mode() : 1;
+	m_mode = d ? d->mode() : 0;
 }
 
 void audio_effect_compressor::reset_attack()
