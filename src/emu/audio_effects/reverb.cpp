@@ -496,6 +496,36 @@ void audio_effect_reverb::default_changed()
 		return;
 	if(!m_isset_mode)
 		reset_mode();
+	if(!m_isset_early_tap_setup)
+		reset_early_tap_setup();
+	if(!m_isset_early_damping)
+		reset_early_damping();
+	if(!m_isset_stereo_width)
+		reset_stereo_width();
+	if(!m_isset_early_room_size)
+		reset_early_room_size();
+	if(!m_isset_late_room_size)
+		reset_late_room_size();
+	if(!m_isset_late_spin)
+		reset_late_spin();
+	if(!m_isset_late_wander)
+		reset_late_wander();
+	if(!m_isset_late_diffusion)
+		reset_late_diffusion();
+	if(!m_isset_late_damping)
+		reset_late_damping();
+	if(!m_isset_late_predelay)
+		reset_late_predelay();
+	if(!m_isset_late_global_decay)
+		reset_late_global_decay();
+	if(!m_isset_dry_level)
+		reset_dry_level();
+	if(!m_isset_early_level)
+		reset_early_level();
+	if(!m_isset_late_level)
+		reset_late_level();
+	if(!m_isset_early_to_late_level)
+		reset_early_to_late_level();
 }
 
 void audio_effect_reverb::set_mode(u32 mode)

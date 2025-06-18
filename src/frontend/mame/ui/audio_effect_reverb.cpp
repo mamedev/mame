@@ -44,6 +44,8 @@ bool menu_audio_effect_reverb::handle(event const *ev)
 	case IPT_UI_SELECT:
 		if(uintptr_t(ev->itemref) == PRESET) {
 			m_effect->load_preset(m_preset);
+			if(m_chain == 0xffff)
+				machine().sound().default_effect_changed(m_entry);
 			reset(reset_options::REMEMBER_POSITION);
 			return true;
 		}
