@@ -34,6 +34,7 @@ void bbc_tube_cms6809_device::tube_cms6809_mem(address_map &map)
 	map(0x0000, 0xffff).ram();
 	map(0xef00, 0xef0f).m(m_via[1], FUNC(via6522_device::map));
 	map(0xf000, 0xffff).rom().region("boot", 0);
+	map(0xfc00, 0xfdff).lrw8(NAME([this](offs_t offset) { return m_bus->read(offset | 0xfc00); }), NAME([this](offs_t offset, uint8_t data) { m_bus->write(offset | 0xfc00, data); }));
 }
 
 //-------------------------------------------------
@@ -52,10 +53,12 @@ ROM_END
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
-void bbc_tube_cms6809_device::device_add_mconfig(machine_config& config)
+void bbc_tube_cms6809_device::device_add_mconfig(machine_config &config)
 {
-	MC6809(config, m_maincpu, 4_MHz_XTAL / 4);
+	MC6809(config, m_maincpu, 4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &bbc_tube_cms6809_device::tube_cms6809_mem);
+
+	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
 
 	MOS6522(config, m_via[0], 4_MHz_XTAL / 4);
 	m_via[0]->writepb_handler().set(m_via[1], FUNC(via6522_device::write_pa));
@@ -67,7 +70,18 @@ void bbc_tube_cms6809_device::device_add_mconfig(machine_config& config)
 	m_via[1]->writepb_handler().set(m_via[0], FUNC(via6522_device::write_pa));
 	m_via[1]->ca2_handler().set(m_via[0], FUNC(via6522_device::write_cb1));
 	m_via[1]->cb2_handler().set(m_via[0], FUNC(via6522_device::write_ca1));
-	m_via[1]->irq_handler().set_inputline(m_maincpu, M6809_IRQ_LINE);
+	m_via[1]->irq_handler().set(m_irqs, FUNC(input_merger_device::in_w<0>));
+
+	/* 7 Slot Backplane */
+	ACORN_BUS(config, m_bus, 0);
+	m_bus->out_irq_callback().set(m_irqs, FUNC(input_merger_device::in_w<1>));
+	m_bus->out_nmi_callback().set_inputline(m_maincpu, M6809_FIRQ_LINE);
+	ACORN_BUS_SLOT(config, "bus1", m_bus, cms_bus_devices, nullptr);
+	ACORN_BUS_SLOT(config, "bus2", m_bus, cms_bus_devices, nullptr);
+	ACORN_BUS_SLOT(config, "bus3", m_bus, cms_bus_devices, nullptr);
+	ACORN_BUS_SLOT(config, "bus4", m_bus, cms_bus_devices, nullptr);
+	ACORN_BUS_SLOT(config, "bus5", m_bus, cms_bus_devices, nullptr);
+	ACORN_BUS_SLOT(config, "bus6", m_bus, cms_bus_devices, nullptr);
 
 	//SOFTWARE_LIST(config, "flop_ls_6809").set_original("bbc_flop_6809").set_filter("CMS");
 }
@@ -94,6 +108,8 @@ bbc_tube_cms6809_device::bbc_tube_cms6809_device(const machine_config &mconfig, 
 	, device_bbc_tube_interface(mconfig, *this)
 	, m_maincpu(*this, "maincpu")
 	, m_via(*this, "via%u", 0)
+	, m_irqs(*this, "irqs")
+	, m_bus(*this, "bus")
 {
 }
 

@@ -12,8 +12,12 @@
 #pragma once
 
 #include "tube.h"
+
+#include "bus/acorn/bus.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6522via.h"
+#include "machine/input_merger.h"
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -21,16 +25,14 @@
 
 // ======================> bbc_tube_cms6809_device
 
-class bbc_tube_cms6809_device :
-	public device_t,
-	public device_bbc_tube_interface
+class bbc_tube_cms6809_device : public device_t, public device_bbc_tube_interface
 {
 public:
 	// construction/destruction
 	bbc_tube_cms6809_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	// device-level overrides
+	// device_t overrides
 	virtual void device_start() override ATTR_COLD;
 
 	// optional information overrides
@@ -43,6 +45,8 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device_array<via6522_device, 2> m_via;
+	required_device<input_merger_device> m_irqs;
+	required_device<acorn_bus_device> m_bus;
 
 	void tube_cms6809_mem(address_map &map) ATTR_COLD;
 };

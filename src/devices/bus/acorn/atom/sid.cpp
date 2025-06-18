@@ -6,17 +6,35 @@
 
 **********************************************************************/
 
-
 #include "emu.h"
 #include "sid.h"
+
+#include "sound/mos6581.h"
 #include "speaker.h"
 
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
+namespace {
 
-DEFINE_DEVICE_TYPE(ATOM_SID, atom_sid_device, "atom_sid", "AtomSID")
+class atom_sid_device : public device_t, public device_acorn_bus_interface
+{
+public:
+	atom_sid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, ATOM_SID, tag, owner, clock)
+		, device_acorn_bus_interface(mconfig, *this)
+		, m_sid(*this, "sid6581")
+	{
+	}
+
+protected:
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+private:
+	required_device<mos6581_device> m_sid;
+};
 
 
 //-------------------------------------------------
@@ -31,22 +49,6 @@ void atom_sid_device::device_add_mconfig(machine_config &config)
 }
 
 
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  atom_sid_device - constructor
-//-------------------------------------------------
-
-atom_sid_device::atom_sid_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ATOM_SID, tag, owner, clock)
-	, device_acorn_bus_interface(mconfig, *this)
-	, m_sid(*this, "sid6581")
-{
-}
-
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -55,5 +57,10 @@ void atom_sid_device::device_start()
 {
 	address_space &space = m_bus->memspace();
 
-	space.install_readwrite_handler(0xbdc0, 0xbddf, read8sm_delegate(*m_sid, FUNC(mos6581_device::read)), write8sm_delegate(*m_sid, FUNC(mos6581_device::write)));
+	space.install_readwrite_handler(0xbdc0, 0xbddf, emu::rw_delegate(*m_sid, FUNC(mos6581_device::read)), emu::rw_delegate(*m_sid, FUNC(mos6581_device::write)));
 }
+
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(ATOM_SID, device_acorn_bus_interface, atom_sid_device, "atom_sid", "AtomSID")
