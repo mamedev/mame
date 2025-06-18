@@ -21,8 +21,8 @@ audio_effect_eq::audio_effect_eq(speaker_device *speaker, u32 sample_rate, audio
 	// recomputes filters
 
 	for(u32 band = 0; band != BANDS; band++) {
-		m_q[band] = 0.7;
 		m_f[band] = 1000;
+		m_q[band] = 0.7;
 		m_db[band] = 0;
 	}
 
@@ -32,8 +32,8 @@ audio_effect_eq::audio_effect_eq(speaker_device *speaker, u32 sample_rate, audio
 	reset_low_shelf();
 	reset_high_shelf();
 	for(u32 band = 0; band != BANDS; band++) {
-		reset_q(band);
 		reset_f(band);
+		reset_q(band);
 		reset_db(band);
 	}
 }
@@ -45,20 +45,20 @@ void audio_effect_eq::reset_mode()
 	m_mode = d ? d->mode() : 1;
 }
 
-void audio_effect_eq::reset_q(u32 band)
-{
-	audio_effect_eq *d = static_cast<audio_effect_eq *>(m_default);
-	m_isset_q[band] = false;
-	m_q[band] = d ? d->q(band) : 0.7;
-	build_filter(band);
-}
-
 void audio_effect_eq::reset_f(u32 band)
 {
 	static const u32 defs[BANDS] = { 80, 200, 500, 3200, 8000 };
 	audio_effect_eq *d = static_cast<audio_effect_eq *>(m_default);
 	m_isset_f[band] = false;
 	m_f[band] = d ? d->f(band) : defs[band];
+	build_filter(band);
+}
+
+void audio_effect_eq::reset_q(u32 band)
+{
+	audio_effect_eq *d = static_cast<audio_effect_eq *>(m_default);
+	m_isset_q[band] = false;
+	m_q[band] = d ? d->q(band) : 0.7;
 	build_filter(band);
 }
 
@@ -107,17 +107,17 @@ void audio_effect_eq::config_load(util::xml::data_node const *ef_node)
 		reset_high_shelf();
 
 	for(u32 band = 0; band != BANDS; band++) {
+		if(ef_node->has_attribute(util::string_format("f%d", band+1).c_str())) {
+			m_f[band] = ef_node->get_attribute_int(util::string_format("f%d", band+1).c_str(), 0);
+			m_isset_f[band] = true;
+		} else
+			reset_f(band);
+
 		if(ef_node->has_attribute(util::string_format("q%d", band+1).c_str())) {
 			m_q[band] = ef_node->get_attribute_float(util::string_format("q%d", band+1).c_str(), 0);
 			m_isset_q[band] = true;
 		} else
 			reset_q(band);
-
-		if(ef_node->has_attribute(util::string_format("f%d", band+1).c_str())) {
-			m_f[band] = ef_node->get_attribute_float(util::string_format("f%d", band+1).c_str(), 0);
-			m_isset_f[band] = true;
-		} else
-			reset_f(band);
 
 		if(ef_node->has_attribute(util::string_format("db%d", band+1).c_str())) {
 			m_db[band] = ef_node->get_attribute_float(util::string_format("db%d", band+1).c_str(), 0);
@@ -127,7 +127,7 @@ void audio_effect_eq::config_load(util::xml::data_node const *ef_node)
 	}
 
 	for(u32 i = 0; i != BANDS; i++)
-		build_filter(i);		
+		build_filter(i);
 }
 
 void audio_effect_eq::config_save(util::xml::data_node *ef_node) const
@@ -139,10 +139,10 @@ void audio_effect_eq::config_save(util::xml::data_node *ef_node) const
 	if(m_isset_high_shelf)
 		ef_node->set_attribute_int("high_shelf", m_high_shelf);
 	for(u32 band = 0; band != BANDS; band++) {
+		if(m_isset_f[band])
+			ef_node->set_attribute_int(util::string_format("f%d", band+1).c_str(), m_f[band]);
 		if(m_isset_q[band])
 			ef_node->set_attribute_float(util::string_format("q%d", band+1).c_str(), m_q[band]);
-		if(m_isset_f[band])
-			ef_node->set_attribute_float(util::string_format("f%d", band+1).c_str(), m_f[band]);
 		if(m_isset_db[band])
 			ef_node->set_attribute_float(util::string_format("db%d", band+1).c_str(), m_db[band]);
 	}
@@ -159,10 +159,10 @@ void audio_effect_eq::default_changed()
 	if(!m_isset_high_shelf)
 		reset_high_shelf();
 	for(u32 band = 0; band != BANDS; band++) {
-		if(!m_isset_q[band])
-			reset_q(band);
 		if(!m_isset_f[band])
 			reset_f(band);
+		if(!m_isset_q[band])
+			reset_q(band);
 		if(!m_isset_db[band])
 			reset_db(band);
 	}
@@ -174,17 +174,17 @@ void audio_effect_eq::set_mode(u32 mode)
 	m_mode = mode;
 }
 
+void audio_effect_eq::set_f(u32 band, u32 f)
+{
+	m_isset_f[band] = true;
+	m_f[band] = f;
+	build_filter(band);
+}
+
 void audio_effect_eq::set_q(u32 band, float q)
 {
 	m_isset_q[band] = true;
 	m_q[band] = q;
-	build_filter(band);
-}
-
-void audio_effect_eq::set_f(u32 band, float f)
-{
-	m_isset_f[band] = true;
-	m_f[band] = f;
 	build_filter(band);
 }
 
@@ -235,8 +235,11 @@ void audio_effect_eq::build_low_shelf(u32 band)
 		return;
 	}
 
+	float sr = m_sample_rate;
+	float f = std::clamp(float(m_f[band]), 1.0f, sr/2.0f - 1.0f);
+
 	float V = pow(10, abs(m_db[band])/20);
-    float K = tan(M_PI*m_f[band]/m_sample_rate);
+    float K = tan(M_PI*f/sr);
 	float K2 = K*K;
 
 	if(m_db[band] > 0) {
@@ -264,8 +267,11 @@ void audio_effect_eq::build_high_shelf(u32 band)
 		return;
 	}
 
+	float sr = m_sample_rate;
+	float f = std::clamp(float(m_f[band]), 1.0f, sr/2.0f - 1.0f);
+
 	float V = pow(10, m_db[band]/20);
-    float K = tan(M_PI*m_f[band]/m_sample_rate);
+    float K = tan(M_PI*f/sr);
 	float K2 = K*K;
 
 	if(m_db[band] > 0) {
@@ -293,8 +299,11 @@ void audio_effect_eq::build_peak(u32 band)
 		return;
 	}
 
+	float sr = m_sample_rate;
+	float f = std::clamp(float(m_f[band]), 1.0f, sr/2.0f - 1.0f);
+
 	float V = pow(10, m_db[band]/20);
-    float K = tan(M_PI*m_f[band]/m_sample_rate);
+    float K = tan(M_PI*f/sr);
 	float K2 = K*K;
 	float Q = m_q[band];
 
