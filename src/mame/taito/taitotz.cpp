@@ -180,9 +180,11 @@ Notes:
 #include "video/poly.h"
 #include "screen.h"
 
+#include <algorithm>
+
 #define LOG_PPC_TO_TLCS_COMMANDS    (1U << 1)
 #define LOG_TLCS_TO_PPC_COMMANDS    (1U << 2)
-#define LOG_PPC_TLCS				(LOG_PPC_TO_TLCS_COMMANDS | LOG_TLCS_TO_PPC_COMMANDS)
+#define LOG_PPC_TLCS                (LOG_PPC_TO_TLCS_COMMANDS | LOG_TLCS_TO_PPC_COMMANDS)
 #define LOG_VIDEO_REG_1_RD          (1U << 3)
 #define LOG_VIDEO_REG_2_RD          (1U << 4)
 #define LOG_VIDEO_REG_UNK_RD        (1U << 5)
@@ -191,7 +193,7 @@ Notes:
 #define LOG_VIDEO_REG_2_WR          (1U << 7)
 #define LOG_VIDEO_REG_UNK_WR        (1U << 8)
 #define LOG_VIDEO_REG_WR            (LOG_VIDEO_REG_1_WR | LOG_VIDEO_REG_2_WR | LOG_VIDEO_REG_UNK_WR)
-#define LOG_VIDEO_REG				(LOG_VIDEO_REG_RD | LOG_VIDEO_REG_WR)
+#define LOG_VIDEO_REG               (LOG_VIDEO_REG_RD | LOG_VIDEO_REG_WR)
 #define LOG_VIDEO_CHIP_UNK_RD       (1U << 9)
 #define LOG_VIDEO_CHIP_UNK_WR       (1U << 10)
 #define LOG_VIDEO_CHIP_UNK          (LOG_VIDEO_CHIP_UNK_RD | LOG_VIDEO_CHIP_UNK_WR)
@@ -199,11 +201,11 @@ Notes:
 #define LOG_TNL_FIFO                (1U << 12)
 #define LOG_RTC_UNK_RD              (1U << 13)
 #define LOG_RTC_UNK_WR              (1U << 14)
-#define LOG_RTC						(LOG_RTC_UNK_RD | LOG_RTC_UNK_WR)
+#define LOG_RTC                     (LOG_RTC_UNK_RD | LOG_RTC_UNK_WR)
 #define LOG_VIDEO_MEM_UNK_RD        (1U << 15)
 #define LOG_VIDEO_MEM_UNK_WR        (1U << 16)
-#define LOG_VIDEO_MEM_UNK			(LOG_VIDEO_MEM_UNK_RD | LOG_VIDEO_MEM_UNK_WR)
-#define LOG_ALL						(LOG_PPC_TLCS | LOG_VIDEO_REG | LOG_VIDEO_CHIP_UNK | LOG_DIRECT_FIFO | LOG_TNL_FIFO | LOG_RTC | LOG_VIDEO_MEM_UNK)
+#define LOG_VIDEO_MEM_UNK           (LOG_VIDEO_MEM_UNK_RD | LOG_VIDEO_MEM_UNK_WR)
+#define LOG_ALL                     (LOG_PPC_TLCS | LOG_VIDEO_REG | LOG_VIDEO_CHIP_UNK | LOG_DIRECT_FIFO | LOG_TNL_FIFO | LOG_RTC | LOG_VIDEO_MEM_UNK)
 
 #define VERBOSE (0)
 
@@ -1198,7 +1200,7 @@ int taitotz_renderer::clip_polygon(const vertex_t *v, int num_vertices, PLANE cp
 
 		previ = i;
 	}
-	memcpy(&vout[0], &clipv[0], sizeof(vout[0]) * clip_verts);
+	std::copy_n(clipv, clip_verts, vout);
 	return clip_verts;
 }
 
@@ -1458,18 +1460,18 @@ void taitotz_renderer::flush_direct_poly_fifo()
 	int num_verts = 0;
 	u32 vert_data[8*4] = {};
 	u32 header[4];
-	memcpy(header, &m_direct_fifo[0], sizeof(u32) * 4);
+	std::copy_n(m_direct_fifo, std::size(header), header);
 	while (fifo_idx < m_direct_fifo_ptr)
 	{
 		if ((m_direct_fifo[fifo_idx] >> 16) == 0xff80)
 		{
 			process_direct_verts(header, vert_data, num_verts);
 			num_verts = 0;
-			memcpy(header, &m_direct_fifo[fifo_idx], sizeof(u32) * 4);
+			std::copy_n(m_direct_fifo + fifo_idx, std::size(header), header);
 		}
 		else
 		{
-			memcpy(&vert_data[num_verts * 4], &m_direct_fifo[fifo_idx], sizeof(u32) * 4);
+			std::copy_n(m_direct_fifo + fifo_idx, 4, &vert_data[num_verts * 4]);
 			num_verts++;
 		}
 		fifo_idx += 4;

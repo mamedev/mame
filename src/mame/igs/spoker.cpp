@@ -2321,7 +2321,7 @@ ROM_END
 
 // IGS PCB NO-0171-4. HD64180RP6, 12 MHz XTAL, Altera MAX EPM3256AQC208-10, I8255,
 // File KC89C72 (AY8910 compatible), U6295, 3 banks of 8 switches
-// All ROM labels prepend 新金皇冠 (Xīn Jīn Huáng Guàn)
+// All ROM labels prepend 新金皇冠 (Xīn Jīn Huángguàn)
 ROM_START( xjinhuang )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "u30.u30", 0x00000, 0x20000, CRC(7c8a7ffe) SHA1(caf5f1e8272e4fd60f72597749d801c04547b1be) )
@@ -2605,7 +2605,7 @@ GAME( 1996,  spk114it,      spk306us, spoker,   spk114it, spoker_state,   init_s
 GAME( 1996,  spk102ua,      spk306us, spokeru,  spk102ua, spokeru_state,  init_spokeru,       ROT0,  "IGS",       "Super Poker (v102UA)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1996,  spk102u,       spk306us, spoker,   spk102ua, spoker_state,   init_spk100,        ROT0,  "IGS",       "Super Poker (v102U)",              MACHINE_SUPPORTS_SAVE )
 GAME( 1996,  spk100,        spk306us, spoker,   spk100,   spoker_state,   init_spk100,        ROT0,  "IGS",       "Super Poker (v100)",               MACHINE_SUPPORTS_SAVE )
-GAME( 1997,  xjinhuang,     0,        xjinhuang,spoker,   xjinhuang_state,init_xjinhuang,     ROT0,  "IGS",       "Xin Jin Huang Guan (V400CN)",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // wrong GFX decode, memory map incomplete
+GAME( 1997,  xjinhuang,     0,        xjinhuang,spoker,   xjinhuang_state,init_xjinhuang,     ROT0,  "IGS",       "Xin Jin Huangguan (V400CN)",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // wrong GFX decode, memory map incomplete
 GAME( 1993?, 3super8,       0,        _3super8, 3super8,  spoker_state,   init_3super8,       ROT0,  "<unknown>", "3 Super 8 (Italy)",                MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // ROMs are badly dumped
 GAME( 1997,  jbell,         0,        jb,       jb,       jb_state,       init_spokeru,       ROT0,  "IGS",       "Jingle Bell (v200US)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1995,  jinhulu2,      0,        jinhulu2, jinhulu2, jinhulu2_state, init_jinhulu2,      ROT0,  "IGS",       "Jin Hu Lu II (v412GS)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // tries to link to something?
