@@ -127,7 +127,10 @@
 #include "emu.h"
 #include "tatsumi.h"
 
+#include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/cxd1095.h"
+#include "machine/gen_latch.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -139,6 +142,7 @@ class cyclwarr_state : public tatsumi_state
 public:
 	cyclwarr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: tatsumi_state(mconfig, type, tag)
+		, m_subcpu(*this, "sub")
 		, m_soundlatch(*this, "soundlatch")
 		, m_master_ram(*this, "master_ram")
 		, m_slave_ram(*this, "slave_ram")
@@ -185,6 +189,7 @@ private:
 	void slave_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
 
+	required_device<cpu_device> m_subcpu;
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	required_shared_ptr<uint16_t> m_master_ram;

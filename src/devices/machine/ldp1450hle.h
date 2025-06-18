@@ -1,4 +1,5 @@
 // license:BSD-3-Clause
+// copyright-holders:J.Wallace
 
 /*************************************************************************
 
@@ -50,7 +51,7 @@ protected:
 	// laserdisc_device implementation
 	virtual void player_vsync(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override;
 	virtual s32 player_update(const vbi_metadata &vbi, int fieldnum, const attotime &curtime) override;
-	virtual void player_overlay(bitmap_yuy16 &bitmap) override { }
+	virtual void player_overlay(bitmap_yuy16 &bitmap) override;
 
 	// device_serial_interface implementation
 	virtual void rcv_complete() override;
@@ -59,6 +60,12 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(process_vbi_data);
 	TIMER_CALLBACK_MEMBER(process_queue);
+
+	// internal overlay helpers
+	void overlay_draw_group(bitmap_yuy16 &bitmap, const uint8_t *text, int start, int xstart, int ystart, int mode);
+	void overlay_draw_char(bitmap_yuy16 &bitmap, uint8_t ch, float xstart, int ystart, int char_width, int char_height);
+	void overlay_fill(bitmap_yuy16 &bitmap, uint8_t yval, uint8_t cr, uint8_t cb);
+	bitmap_yuy16 osd_char_gen(uint8_t idx);
 
 private:
 	enum player_command : u16
@@ -98,6 +105,7 @@ private:
 		CMD_FRAME_SET           =0x55,
 		CMD_CLEAR_ALL           =0x56,
 		CMD_ADDR_INQ            =0x60,
+		CMD_MOTOR_ON            =0x62,
 		CMD_STATUS_INQ          =0x67,
 		CMD_CHAPTER_SET         =0x69,
 		CMD_USER_INDEX_CTRL     =0x80,
@@ -186,13 +194,15 @@ private:
 	u32            m_speed_accum;
 	u32            m_curr_frame;
 
-	u8             m_user_index_x;
-	u8             m_user_index_y;
-	u8             m_user_index_mode;
-	u8             m_user_index_char_idx;
-	u8             m_user_index_window_idx;
-	char           m_user_index_chars[32];
-
+	bool           m_user_index_flag;
+	u8             m_user_index_x=0;
+	u8             m_user_index_y=0;
+	u8             m_user_index_mode=0;
+	u8             m_user_index_char_idx=0;
+	u8             m_user_index_window_idx=0;
+	u8	           m_user_index_chars[32];
+	bitmap_yuy16   m_osd_font[96];
+	
 };
 
 #endif // MAME_MACHINE_LDP1450HLE_H

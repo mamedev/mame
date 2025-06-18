@@ -821,14 +821,6 @@ void tsconf_state::tsconf_spi_miso_w(u8 data)
 	m_zctl_di |= data;
 }
 
-void tsconf_state::tsconf_ay_address_w(u8 data)
-{
-	if ((m_mod_ay->read() == 1) && ((data & 0xfe) == 0xfe))
-		m_ay_selected = data & 1;
-	else
-		m_ay[m_ay_selected]->address_w(data);
-}
-
 IRQ_CALLBACK_MEMBER(tsconf_state::irq_vector)
 {
 	u8 vector = 0xff;

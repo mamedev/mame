@@ -42,7 +42,7 @@ private:
 	virtual void populate() override;
 	virtual bool handle(event const *ev) override;
 
-	static std::string format_f(float f);
+	static std::string format_f(u32 f);
 	static std::string format_q(float q);
 	static std::string format_db(float db);
 	u32 flag_mode() const;

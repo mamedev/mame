@@ -58,6 +58,8 @@ static constexpr uint8_t bank_reset_val[2][8] =
 
 void mz2500_state::video_start()
 {
+	std::fill(std::begin(m_cg_reg), std::end(m_cg_reg), 0);
+
 }
 
 /*

@@ -76,6 +76,10 @@ private:
 	bool                    m_has_keyboard;
 	bool                    m_has_test_switch;
 	bool                    m_has_analog;
+
+	// media loading issues
+	bool                    m_media_warnings;
+	bool                    m_severe_media_warnings;
 };
 
 

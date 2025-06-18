@@ -3,18 +3,22 @@
 // thanks-to: Tomasz Slanina
 /**************************************************************************************************
 
-Sharp MZ-80B/MZ-2000/MZ-2200
+Sharp MZ-80B/MZ-2000/MZ-2200 B-series
 
 TODO:
-- find common points with other MZ machines;
-- Cassette loads aren't consistant, several games wants a slower clock;
-- implement remaining video capabilities;
+- Cassette loads aren't consistant, several SWs wants a slower clock.
+  Original recording tapes looks very different compared to .mzt et al, may warrant a major
+  normalization work;
+- Emulate MZ-1U01 expansion unit bus slot (common with other MZ machines);
 - add 80b compatibility support;
+- MZ-1R12 option wants a specific IPL ROM revision, with "(/: S-RAM or ROM)" option listed.
+  cfr. https://www.youtube.com/watch?v=MBeyqqqOFiY startup.
 
 Notes:
 - Memory controller Sharp LZ90D02, video controlller Sharp LZ90D01
-- MZ-2000 has built-in monochrome monitor, while MZ-2200 is standalone. It is TBD if former has
-  a RGB connector that allows color as well;
+- MZ-2000 has built-in monochrome monitor, while MZ-2200 is standalone. Color board for both is
+  given by installing an MZ-1R01, former has jack connection for separate monitor
+  cfr. https://www.youtube.com/watch?v=vgdUj-tUvCU
 - MZ-80B is the odd one: its normally monochrome but has a specific (incompatible) color board
   named PIO-3039;
 
@@ -28,10 +32,9 @@ Notes:
 #include "imagedev/snapquik.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
-#include "machine/rp5c15.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80pio.h"
-#include "sound/beep.h"
+#include "sound/spkrdev.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -61,7 +64,7 @@ public:
 		, m_floppy3(*this, "fdc:3")
 		, m_floppy(nullptr)
 		, m_pit(*this, "pit")
-		, m_beeper(*this, "beeper")
+		, m_dac1bit(*this, "dac1bit")
 		, m_io_keys(*this, {"KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7", "KEY8", "KEY9", "KEYA", "KEYB", "KEYC", "KEYD", "UNUSED", "UNUSED"})
 		, m_io_config(*this, "CONFIG")
 		, m_ipl_view(*this, "ipl_view")
@@ -90,6 +93,9 @@ protected:
 	u8 m_width80;
 	u8 m_tvram_attr;
 	u8 m_gvram_mask;
+	u8 m_back_color_mask;
+
+	virtual void set_palette_bank();
 
 private:
 	static void floppy_formats(format_registration &fr);
@@ -102,25 +108,27 @@ private:
 	required_device<floppy_connector> m_floppy3;
 	floppy_image_device *m_floppy;
 	required_device<pit8253_device> m_pit;
-	required_device<beep_device> m_beeper;
+	required_device<speaker_sound_device> m_dac1bit;
 	std::unique_ptr<u8[]> m_work_ram;
 	required_ioport_array<16> m_io_keys;
 	required_ioport m_io_config;
 	memory_view m_ipl_view;
 
-	u8 m_vram_overlay_enable, m_vram_overlay_select;
 	u8 m_video_reverse;
 	u8 m_gvram_bank;
+	u8 m_back_color;
 	bool m_vgate;
+
+	u8 m_vram_overlay_enable, m_vram_overlay_select;
 
 	u8 m_key_mux;
 
 	u8 m_old_portc;
+	u8 m_porta_latch;
+	u8 m_tape_ctrl;
 
 	u8 m_has_fdc;
 
-	u8 m_porta_latch;
-	u8 m_tape_ctrl;
 	bool m_wait_state, m_hblank_state;
 	emu_timer *m_ipl_reset_timer = nullptr;
 	emu_timer *m_hblank_timer = nullptr;
@@ -132,6 +140,7 @@ private:
 	void gvram_w(offs_t offset, u8 data);
 	u8 gvram_r(offs_t offset);
 	void gvram_bank_w(u8 data);
+	void back_color_w(u8 data);
 	void floppy_select_w(u8 data);
 	void floppy_side_w(u8 data);
 	void timer_w(u8 data);
@@ -156,7 +165,6 @@ private:
 
 	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 
-	void palette_init(palette_device &palette) const;
 
 	bitmap_ind16 m_text_bitmap;
 	bitmap_ind16 m_graphic_bitmap;
@@ -167,13 +175,17 @@ class mz2200_state : public mz2000_state
 public:
 	mz2200_state(const machine_config &mconfig, device_type type, const char *tag)
 		: mz2000_state(mconfig, type, tag)
-	{}
+	{ }
 
 	void mz2200(machine_config &config);
 
 protected:
+	virtual void video_start() override ATTR_COLD;
+
 	virtual void draw_graphics_layer(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
 	virtual void draw_text_layer(bitmap_ind16 &bitmap, const rectangle &cliprect) override;
+
+	virtual void set_palette_bank() override { };
 };
 
 
@@ -181,22 +193,41 @@ void mz2000_state::video_start()
 {
 	m_tvram = std::make_unique<u8[]>(0x1000);
 	m_gvram = std::make_unique<u8[]>(0x10000);
+	// back color register doesn't apply to monochrome monitor
+	m_back_color_mask = 0;
 
 	save_pointer(NAME(m_tvram), 0x1000);
 	save_pointer(NAME(m_gvram), 0x10000);
+	save_item(NAME(m_width80));
+	save_item(NAME(m_tvram_attr));
+	save_item(NAME(m_gvram_mask));
+	save_item(NAME(m_video_reverse));
+	save_item(NAME(m_gvram_bank));
+	save_item(NAME(m_back_color));
+	save_item(NAME(m_vgate));
 
 	m_screen->register_screen_bitmap(m_text_bitmap);
 	m_screen->register_screen_bitmap(m_graphic_bitmap);
+
+	m_video_reverse = 0;
+	set_palette_bank();
+}
+
+void mz2200_state::video_start()
+{
+	mz2000_state::video_start();
+	m_back_color_mask = 7;
 }
 
 /*
  * MZ-2000 (monochrome)
  */
 
-void mz2000_state::palette_init(palette_device &palette) const
+void mz2000_state::set_palette_bank()
 {
-	palette.set_pen_color(0, rgb_t(0, 0, 0));
-	palette.set_pen_color(1, rgb_t(0, 255, 0));
+	m_palette->set_pen_color(m_video_reverse ^ 0, rgb_t(0, 0, 0));
+	m_palette->set_pen_color(m_video_reverse ^ 1, rgb_t(0, 255, 0));
+	m_screen->update_partial(m_screen->vpos());
 }
 
 void mz2000_state::draw_graphics_layer(bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -217,7 +248,7 @@ void mz2000_state::draw_graphics_layer(bitmap_ind16 &bitmap, const rectangle &cl
 			{
 				const u8 pen = BIT(gfx_b, xi) || BIT(gfx_r, xi) || BIT(gfx_g, xi);
 
-				dst[x + xi] = m_palette->pen(pen ^ m_video_reverse);
+				dst[x + xi] = m_palette->pen(pen);
 			}
 		}
 	}
@@ -245,7 +276,7 @@ void mz2000_state::draw_text_layer(bitmap_ind16 &bitmap, const rectangle &clipre
 			{
 				const u8 pen = BIT(gfx_data[tile * 8 + (y & 7)], (7 - (xi >> x_shift)));
 
-				dst[x + xi] = m_palette->pen(pen ^ m_video_reverse);
+				dst[x + xi] = m_palette->pen(pen);
 			}
 		}
 	}
@@ -311,9 +342,11 @@ void mz2200_state::draw_text_layer(bitmap_ind16 &bitmap, const rectangle &clipre
 
 uint32_t mz2000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	// mz2000_cass:harvestc uses this extensively
+	bitmap.fill(m_back_color, cliprect);
+
 	if (m_vgate)
 	{
-		bitmap.fill(0, cliprect);
 		return 0;
 	}
 
@@ -323,12 +356,12 @@ uint32_t mz2000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	// if bit 3 high then graphic layer has priority over text
 	if (BIT(m_tvram_attr, 3))
 	{
-		copybitmap(bitmap, m_text_bitmap, 0, 0, 0, 0, cliprect);
+		copybitmap_trans(bitmap, m_text_bitmap, 0, 0, 0, 0, cliprect, 0);
 		copybitmap_trans(bitmap, m_graphic_bitmap, 0, 0, 0, 0, cliprect, 0);
 	}
 	else
 	{
-		copybitmap(bitmap, m_graphic_bitmap, 0, 0, 0, 0, cliprect);
+		copybitmap_trans(bitmap, m_graphic_bitmap, 0, 0, 0, 0, cliprect, 0);
 		copybitmap_trans(bitmap, m_text_bitmap, 0, 0, 0, 0, cliprect, 0);
 	}
 
@@ -454,7 +487,7 @@ void mz2000_state::floppy_select_w(u8 data)
 
 	m_fdc->set_floppy(m_floppy);
 
-	// todo: bit 2 is connected to something too...
+	// TODO: bit 2 is connected to something too...
 
 	if (m_floppy)
 		m_floppy->mon_w(!BIT(data, 7));
@@ -474,6 +507,12 @@ void mz2000_state::timer_w(u8 data)
 	m_pit->write_gate1(0);
 	m_pit->write_gate0(1);
 	m_pit->write_gate1(1);
+}
+
+void mz2000_state::back_color_w(u8 data)
+{
+	m_back_color = data & m_back_color_mask;
+	m_screen->update_partial(m_screen->vpos());
 }
 
 void mz2000_state::tvram_attr_w(u8 data)
@@ -532,6 +571,7 @@ void mz2000_state::mz2000_io(address_map &map)
 	map.unmap_value_high();
 	map.global_mask(0xff);
 	mz80b_io(map);
+	map(0xf4, 0xf4).w(FUNC(mz2000_state::back_color_w));
 	map(0xf5, 0xf5).w(FUNC(mz2000_state::tvram_attr_w));
 	map(0xf6, 0xf6).w(FUNC(mz2000_state::gvram_mask_w));
 	map(0xf7, 0xf7).w(FUNC(mz2000_state::gvram_bank_w));
@@ -591,7 +631,12 @@ void mz2000_state::ppi_porta_w(u8 data)
 		//popmessage("Tape AREW control");
 	}
 
-	m_video_reverse = !BIT(data, 4);
+	if (BIT(m_tape_ctrl, 4) != BIT(data, 4))
+	{
+		m_video_reverse = !BIT(data, 4);
+		set_palette_bank();
+	}
+
 	//if (BIT(data, 4))
 	//	popmessage("Reverse video");
 
@@ -626,7 +671,7 @@ void mz2000_state::ppi_porta_w(u8 data)
  * --x- ---- tape ?
  * ---x ---- tape eject
  * ---- x--- 1->0 transition = IPL start
- * ---- -x-- beeper state
+ * ---- -x-- DAC1BIT state
  * ---- --x- 0->1 transition = Work RAM reset
  */
 void mz2000_state::ppi_portc_w(u8 data)
@@ -646,7 +691,7 @@ void mz2000_state::ppi_portc_w(u8 data)
 		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	}
 
-	m_beeper->set_state(BIT(data, 2));
+	m_dac1bit->level_w(BIT(data, 2));
 
 	m_vgate = !!(BIT(data, 0));
 
@@ -961,6 +1006,12 @@ void mz2000_state::machine_start()
 	save_pointer(NAME(m_work_ram), 0x10000);
 	save_item(NAME(m_vram_overlay_enable));
 	save_item(NAME(m_vram_overlay_select));
+	save_item(NAME(m_key_mux));
+	save_item(NAME(m_old_portc));
+	save_item(NAME(m_porta_latch));
+	save_item(NAME(m_tape_ctrl));
+	save_item(NAME(m_wait_state));
+	save_item(NAME(m_hblank_state));
 
 	m_vram_overlay_enable = 0;
 	m_vram_overlay_select = 0;
@@ -975,7 +1026,7 @@ void mz2000_state::machine_reset()
 	m_ipl_view.select(0);
 
 	m_ipl_reset_timer->adjust(attotime::never);
-	m_beeper->set_state(0);
+	m_dac1bit->level_w(0);
 	m_hblank_timer->adjust(m_screen->time_until_pos(0, 0), true);
 
 	m_has_fdc = (m_io_config->read() & 2) >> 1;
@@ -1061,8 +1112,9 @@ void mz2000_state::mz2000(machine_config &config)
 	m_pit->out_handler<1>().set(m_pit, FUNC(pit8253_device::write_clk2));
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, "beeper", 4096).add_route(ALL_OUTPUTS,"mono",0.15);
+	SPEAKER_SOUND(config, m_dac1bit).add_route(ALL_OUTPUTS,"mono", 0.15);
 
+	// TODO: MB8866 for MZ-80B
 	MB8877(config, m_fdc, 1_MHz_XTAL);
 
 	FLOPPY_CONNECTOR(config, "fdc:0", mz2000_floppies, "525dd", mz2000_state::floppy_formats).enable_sound(true);
@@ -1082,14 +1134,16 @@ void mz2000_state::mz2000(machine_config &config)
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(XTAL(14'318'181), 456 * 2, 0, 640, 262, 0, 200); // TODO: unverified
+	// TODO: unverified, 60 Hz/15.75 kHz according to MZ-80B service manual
+	m_screen->set_raw(XTAL(14'318'181), 910, 0, 640, 262, 0, 200);
 	m_screen->set_screen_update(FUNC(mz2000_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_mz2000);
-	PALETTE(config, m_palette, FUNC(mz2000_state::palette_init), 2);
+	PALETTE(config, m_palette).set_entries(2);
 
-	// TODO: supposedly MZ-1E18 / MZ-1R12 options do this, but only MZ-800 reads $f8-$fa from IPL?
+	// TODO: placeholder for actual MZ-1E18 / MZ-1R12 options.
+	// mz800 actually reads $f8-$fa from IPL
 	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", "bin,dat", attotime::from_seconds(1)));
 	snapshot.set_load_callback(FUNC(mz2000_state::snapshot_cb));
 }

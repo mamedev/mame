@@ -1155,7 +1155,7 @@ void dendego_state::dendego(machine_config &config)
 	m_screen->set_screen_update(FUNC(dendego_state::screen_update_dendego));
 
 	/* sound hardware */
-	SPEAKER(config, "vibration").seat();
+	SPEAKER(config, "vibration").lfe();
 
 	/* clock frequency & pin 7 not verified */
 	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "vibration", 0.20);

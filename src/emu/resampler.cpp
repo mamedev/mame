@@ -182,10 +182,8 @@ audio_resampler_hq::audio_resampler_hq(u32 fs, u32 ft, float latency, u32 max_or
 	for(u32 i = 0; i != m_phases; i++)
 		m_coefficients[i].resize(m_order_per_lane, 0.0);
 
-	// Select the filter cutoff.  Keep it in audible range.
+	// Select the filter cutoff.
 	double cutoff = std::min(fs/2.0, ft/2.0);
-	if(cutoff > 20000)
-		cutoff = 20000;
 
 	// Compute the filter and send the coefficients to the appropriate phase
 	auto set_filter = [this](u32 i, float v) { m_coefficients[i % m_phases][i / m_phases] = v; };

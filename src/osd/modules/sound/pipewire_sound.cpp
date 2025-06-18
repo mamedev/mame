@@ -53,7 +53,7 @@ public:
 private:
 	struct position_info {
 		uint32_t m_position;
-		std::array<double, 3> m_coords;
+		osd::channel_position m_coords;
 	};
 
 	static const position_info position_infos[];
@@ -73,7 +73,7 @@ private:
 		uint32_t m_sinks, m_sources;
 		std::vector<uint32_t> m_position_codes;
 		std::vector<std::string> m_port_names;
-		std::vector<std::array<double, 3>> m_positions;
+		std::vector<osd::channel_position> m_positions;
 
 		osd::audio_rate_range m_rate;
 		bool m_has_s16;
@@ -165,16 +165,16 @@ private:
 // Try to more or less map to speaker.h positions
 
 const sound_pipewire::position_info sound_pipewire::position_infos[] = {
-	{ SPA_AUDIO_CHANNEL_MONO,    {  0.0,  0.0,  1.0 } },
-	{ SPA_AUDIO_CHANNEL_FL,      { -0.2,  0.0,  1.0 } },
-	{ SPA_AUDIO_CHANNEL_FR,      {  0.2,  0.0,  1.0 } },
-	{ SPA_AUDIO_CHANNEL_FC,      {  0.0,  0.0,  1.0 } },
-	{ SPA_AUDIO_CHANNEL_LFE,     {  0.0, -0.5,  1.0 } },
-	{ SPA_AUDIO_CHANNEL_RL,      { -0.2,  0.0, -0.5 } },
-	{ SPA_AUDIO_CHANNEL_RR,      {  0.2,  0.0, -0.5 } },
-	{ SPA_AUDIO_CHANNEL_RC,      {  0.0,  0.0, -0.5 } },
-	{ SPA_AUDIO_CHANNEL_AUX0,    {  0.0,  0.0, 10.0 } },
-	{ SPA_AUDIO_CHANNEL_UNKNOWN, {  0.0,  0.0,  0.0 } }
+	{ SPA_AUDIO_CHANNEL_MONO,    osd::channel_position::FC },
+	{ SPA_AUDIO_CHANNEL_FL,      osd::channel_position::FL },
+	{ SPA_AUDIO_CHANNEL_FR,      osd::channel_position::FR },
+	{ SPA_AUDIO_CHANNEL_FC,      osd::channel_position::FC },
+	{ SPA_AUDIO_CHANNEL_LFE,     osd::channel_position::LFE },
+	{ SPA_AUDIO_CHANNEL_RL,      osd::channel_position::RL },
+	{ SPA_AUDIO_CHANNEL_RR,      osd::channel_position::RR },
+	{ SPA_AUDIO_CHANNEL_RC,      osd::channel_position::RC },
+	{ SPA_AUDIO_CHANNEL_AUX0,    osd::channel_position::ONREQ },
+	{ SPA_AUDIO_CHANNEL_UNKNOWN, osd::channel_position::UNKNOWN }
 
 };
 

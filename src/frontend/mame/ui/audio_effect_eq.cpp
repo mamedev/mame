@@ -42,7 +42,7 @@ std::pair<u32, u32> menu_audio_effect_eq::find_f(u32 band) const
 	u32 variant = band == 0 ? 0 : band < 4 ? 1 : 2;
 	u32 bi = 0;
 	s32 dt = 40000;
-	s32 f = s32(m_effect->f(band) + 0.5);
+	s32 f = m_effect->f(band);
 	for(u32 index = 1; freqs[variant][index]; index++) {
 		s32 d1 = f - freqs[variant][index];
 		if(d1 < 0)
@@ -93,7 +93,7 @@ bool menu_audio_effect_eq::handle(event const *ev)
 				machine().sound().default_effect_changed(m_entry);
 			reset(reset_options::REMEMBER_POSITION);
 			return true;
-			
+
 		case F:
 			change_f(band, -1);
 			reset(reset_options::REMEMBER_POSITION);
@@ -144,7 +144,7 @@ bool menu_audio_effect_eq::handle(event const *ev)
 				machine().sound().default_effect_changed(m_entry);
 			reset(reset_options::REMEMBER_POSITION);
 			return true;
-			
+
 		case F:
 			change_f(band, +1);
 			reset(reset_options::REMEMBER_POSITION);
@@ -194,7 +194,7 @@ bool menu_audio_effect_eq::handle(event const *ev)
 				machine().sound().default_effect_changed(m_entry);
 			reset(reset_options::REMEMBER_POSITION);
 			return true;
-			
+
 		case F:
 			m_effect->reset_f(band);
 			reset(reset_options::REMEMBER_POSITION);
@@ -222,9 +222,9 @@ bool menu_audio_effect_eq::handle(event const *ev)
 	return false;
 }
 
-std::string menu_audio_effect_eq::format_f(float f)
+std::string menu_audio_effect_eq::format_f(u32 f)
 {
-	return f >= 1000 ? util::string_format("%.1fkHz", f/1000) : util::string_format("%.0fHz", f);
+	return f >= 1000 ? util::string_format("%.1fkHz", f/1000.0f) : util::string_format("%dHz", f);
 }
 
 std::string menu_audio_effect_eq::format_q(float q)
@@ -319,26 +319,26 @@ void menu_audio_effect_eq::populate()
 	item_append(_("Low band mode"), m_effect->low_shelf() ? _("Shelf") : _("Peak"), flag_low_shelf(), (void *)uintptr_t(SHELF | (0 << 16)));
 	item_append(_("Low band freq."), format_f(m_effect->f(0)), flag_f(0), (void *)uintptr_t(F | (0 << 16)));
 	if(!m_effect->low_shelf())
-		item_append(_("Low band Q"),    format_q(m_effect->q(0)), flag_q(0), (void *)uintptr_t(Q | (0 << 16)));
+		item_append(_("Low band Q"), format_q(m_effect->q(0)), flag_q(0), (void *)uintptr_t(Q | (0 << 16)));
 	item_append(_("Low band dB"), format_db(m_effect->db(0)), flag_db(0), (void *)uintptr_t(DB | (0 << 16)));
 
 	item_append(_("Lo mid band freq."), format_f(m_effect->f(1)), flag_f(1), (void *)uintptr_t(F | (1 << 16)));
-	item_append(_("Lo mid band Q"),    format_q(m_effect->q(1)), flag_q(1), (void *)uintptr_t(Q | (1 << 16)));
+	item_append(_("Lo mid band Q"), format_q(m_effect->q(1)), flag_q(1), (void *)uintptr_t(Q | (1 << 16)));
 	item_append(_("Lo mid band dB"), format_db(m_effect->db(1)), flag_db(1), (void *)uintptr_t(DB | (1 << 16)));
 
 	item_append(_("Mid band freq."), format_f(m_effect->f(2)), flag_f(2), (void *)uintptr_t(F | (2 << 16)));
-	item_append(_("Mid band Q"),    format_q(m_effect->q(2)), flag_q(2), (void *)uintptr_t(Q | (2 << 16)));
+	item_append(_("Mid band Q"), format_q(m_effect->q(2)), flag_q(2), (void *)uintptr_t(Q | (2 << 16)));
 	item_append(_("Mid band dB"), format_db(m_effect->db(2)), flag_db(2), (void *)uintptr_t(DB | (2 << 16)));
 
 	item_append(_("Hi mid band freq."), format_f(m_effect->f(3)), flag_f(3), (void *)uintptr_t(F | (3 << 16)));
-	item_append(_("Hi mid band Q"),    format_q(m_effect->q(3)), flag_q(3), (void *)uintptr_t(Q | (3 << 16)));
+	item_append(_("Hi mid band Q"), format_q(m_effect->q(3)), flag_q(3), (void *)uintptr_t(Q | (3 << 16)));
 	item_append(_("Hi mid band dB"), format_db(m_effect->db(3)), flag_db(3), (void *)uintptr_t(DB | (3 << 16)));
 
 
 	item_append(_("High band mode"), m_effect->high_shelf() ? _("Shelf") : _("Peak"), flag_high_shelf(), (void *)uintptr_t(SHELF | (4 << 16)));
 	item_append(_("High band freq."), format_f(m_effect->f(4)), flag_f(4), (void *)uintptr_t(F | (4 << 16)));
 	if(!m_effect->high_shelf())
-		item_append(_("High band Q"),    format_q(m_effect->q(4)), flag_q(4), (void *)uintptr_t(Q | (4 << 16)));
+		item_append(_("High band Q"), format_q(m_effect->q(4)), flag_q(4), (void *)uintptr_t(Q | (4 << 16)));
 	item_append(_("High band dB"), format_db(m_effect->db(4)), flag_db(4), (void *)uintptr_t(DB | (4 << 16)));
 	item_append(menu_item_type::SEPARATOR);
 }

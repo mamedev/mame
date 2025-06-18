@@ -19,6 +19,7 @@
 #include "emu.h"
 #include "tatsumi.h"
 
+#include "cpu/m68000/m68000.h"
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
@@ -35,6 +36,7 @@ class roundup5_state : public tatsumi_state
 public:
 	roundup5_state(const machine_config &mconfig, device_type type, const char *tag)
 		: tatsumi_state(mconfig, type, tag)
+		, m_subcpu(*this, "sub")
 		, m_vregs(*this, "vregs")
 		, m_bg_scrollx(*this, "bg_scrollx")
 		, m_bg_scrolly(*this, "bg_scrolly")
@@ -68,6 +70,8 @@ private:
 
 	void draw_road(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_landscape(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t type);
+
+	required_device<cpu_device> m_subcpu;
 
 	required_shared_ptr<uint16_t> m_vregs;
 	required_shared_ptr<uint16_t> m_bg_scrollx;

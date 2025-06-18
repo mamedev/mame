@@ -2,11 +2,17 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
+
+BASIC-M25 caveats (needed for Dust Box and unk* disks):
+- files is the equivalent of DIR in DOS env
+- chdir swaps current directory (not cd), going back one level is chdir ".."
+- BTX files are executables
+
 -->
 
 <softwarelist name="mz2500_flop" description="Sharp MZ-2500 disk images">
 
-	<!-- Game disks -->
+<!-- !Game disks -->
 
 	<software name="simulwar">
 		<description>Aoki Ookami to Shiroki Mejika - Simulation War Game</description>
@@ -657,12 +663,15 @@ license:CC0-1.0
 	</software>
 
 
-	<!-- Program disks -->
+<!-- !Program disks -->
 
-	<software name="basicv1">
+	<software name="basicv1" supported="partial">
 		<description>BASIC-M25 (6Z002) V1.0A</description>
 		<year>1985</year>
 		<publisher>Sharp</publisher>
+		<notes><![CDATA[
+Various utilities, not extensively tested
+]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -671,10 +680,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="basicv2">
+	<software name="basicv2" supported="partial">
 		<description>BASIC-M25 (6Z002) V2.0B</description>
-		<year>1985</year>
+		<year>1987?</year>
 		<publisher>Sharp</publisher>
+		<notes><![CDATA[
+Various utilities, not extensively tested
+]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -708,9 +720,9 @@ license:CC0-1.0
 	</software>
 
 	<software name="pcpm">
-		<description>Personal CP/M (V1.0A)</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<description>Personal CP/M (MZ-6Z001 V1.0A)</description>
+		<year>1985</year>
+		<publisher>Digital Research / Sharp</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -719,7 +731,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="telephona" cloneof="telephon">
+	<software name="telephona" cloneof="telephon" supported="no">
 		<description>Telephone Soft (6Z006) V1.1A</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -731,7 +743,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="telephon">
+	<software name="telephon" supported="no">
 		<description>Telephone Soft (6Z006) V2.0B</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -802,13 +814,16 @@ license:CC0-1.0
 	</software>
 
 
-<!-- Misc. dumps (non master disks) -->
+<!-- !Misc. dumps (non master disks) -->
 
-	<software name="unk1">
-		<description>Unknown Disk 1 (SMALLC)</description>
+	<software name="unk1" supported="partial">
+		<description>Small-C Compiler</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
+		<info name="usage" value="CP/M formatted disk" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
 				<rom name="unk1.d88" size="697008" crc="84c9309d" sha1="c06d7bc6691bbdac574433665b15596888bddc03"/>
@@ -816,11 +831,14 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="unk2">
+	<software name="unk2" supported="no">
 		<description>Unknown Disk 2 (MZ-1E30)</description>
-		<year>198?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-
+		<year>1987</year>
+		<publisher>Sharp?</publisher>
+		<notes><![CDATA[
+Contains HDD formatting utilities
+]]></notes>
+		<info name="usage" value="BASIC formatted disk" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
 				<rom name="unk2.d88" size="697008" crc="0cc720f5" sha1="fc1c27fabb53046dd273ebdd8db832e4700cdb30"/>
@@ -828,11 +846,15 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="unk3">
+	<software name="unk3" supported="partial">
 		<description>Unknown Disk 3 (SB02)</description>
-		<year>198?</year>
+		<year>1991?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-
+		<notes><![CDATA[
+Contains misc coverdisc games and utilities
+Not extensively tested
+]]></notes>
+		<info name="usage" value="BASIC formatted disk" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="784048">
 				<rom name="unk3.d88" size="784048" crc="bafe3fd2" sha1="02b2ae5e964cb0a130f70962e913b2de3603dbec"/>
@@ -840,11 +862,14 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="unk4">
+	<software name="unk4" supported="no">
 		<description>Unknown Disk 4 (SB03)</description>
-		<year>198?</year>
+		<year>1991?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-
+		<notes><![CDATA[
+Contains misc coverdisc BGMs, loading any of them will throw BASIC errors (missing MML engine?)
+]]></notes>
+		<info name="usage" value="BASIC formatted disk" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
 				<rom name="unk4.d88" size="697008" crc="d6d1de04" sha1="b72f0b17fdf52bd8d08a09a719dab668e11a2bee"/>
@@ -852,11 +877,14 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="unk5">
-		<description>Unknown Disk 5 (??)</description>
+	<software name="unk5" supported="partial">
+		<description>Turbo Pascal (V3.0)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-
+		<notes><![CDATA[
+Not extensively tested
+]]></notes>
+		<info name="usage" value="CP/M formatted disk" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
 				<rom name="unk5.d88" size="697008" crc="32e63f6d" sha1="c491a548db9bc7aee66c56069c99453b598f1300"/>
@@ -864,10 +892,13 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="unk6">
+	<software name="unk6" supported="no">
 		<description>Unknown Disk 6 (Brown)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+"Unable to identify image file format"
+]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697009">
@@ -875,6 +906,5 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-
 
 </softwarelist>
