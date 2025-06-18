@@ -149,7 +149,7 @@ http://www.z88forever.org.uk/zxplus3e/
 #include "emu.h"
 #include "specpls3.h"
 
-#include "sound/ay8910.h"
+#include "bus/spectrum/ay/slot.h"
 
 #include "screen.h"
 #include "softlist_dev.h"
@@ -320,13 +320,13 @@ The function decodes the ports appropriately */
 void specpls3_state::plus3_io(address_map &map)
 {
 	map(0x0000, 0xffff).rw(m_exp, FUNC(spectrum_expansion_slot_device::iorq_r), FUNC(spectrum_expansion_slot_device::iorq_w));
-	map(0x0000, 0x0000).rw(FUNC(specpls3_state::spectrum_ula_r), FUNC(specpls3_state::spectrum_ula_w)).select(0xfffe);
-	map(0x4000, 0x4000).w(FUNC(specpls3_state::port_7ffd_w)).select(0x3ffd);
-	map(0x8000, 0x8000).w("ay8912", FUNC(ay8910_device::data_w)).mirror(0x3ffd);
-	map(0xc000, 0xc000).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)).mirror(0x3ffd);
-	map(0x1000, 0x1000).w(FUNC(specpls3_state::port_1ffd_w)).select(0x0ffd);
-	map(0x2000, 0x2000).r(FUNC(specpls3_state::port_2ffd_r)).mirror(0x0ffd);
-	map(0x3000, 0x3000).rw(FUNC(specpls3_state::port_3ffd_r), FUNC(specpls3_state::port_3ffd_w)).select(0x0ffd);
+	map(0x0000, 0x0000).select(0xfffe).rw(FUNC(specpls3_state::spectrum_ula_r), FUNC(specpls3_state::spectrum_ula_w));
+	map(0x4000, 0x4000).select(0x3ffd).w(FUNC(specpls3_state::port_7ffd_w));
+	map(0x8000, 0x8000).mirror(0x3ffd).w("ay_slot", FUNC(ay_slot_device::data_w));
+	map(0xc000, 0xc000).mirror(0x3ffd).rw("ay_slot", FUNC(ay_slot_device::data_r), FUNC(ay_slot_device::address_w));
+	map(0x1000, 0x1000).select(0x0ffd).w(FUNC(specpls3_state::port_1ffd_w));
+	map(0x2000, 0x2000).mirror(0x0ffd).r(FUNC(specpls3_state::port_2ffd_r));
+	map(0x3000, 0x3000).select(0x0ffd).rw(FUNC(specpls3_state::port_3ffd_r), FUNC(specpls3_state::port_3ffd_w));
 }
 
 void specpls3_state::plus3_mem(address_map &map)

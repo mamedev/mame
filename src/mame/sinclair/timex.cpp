@@ -149,10 +149,9 @@ http://www.z88forever.org.uk/zxplus3e/
 #include "emu.h"
 #include "timex.h"
 
+#include "bus/spectrum/ay/slot.h"
 #include "beta_m.h"
-
 #include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
 
 #include "screen.h"
 #include "softlist_dev.h"
@@ -160,8 +159,8 @@ http://www.z88forever.org.uk/zxplus3e/
 #include "formats/tzx_cas.h"
 
 
-/****************************************************************************************************/
-/* TS2048 specific functions */
+//**************************************************************************************************
+// TS2048 specific functions
 
 
 u8 ts2068_state::port_f4_r()
@@ -526,11 +525,11 @@ void ts2068_state::ts2068_update_memory()
 
 void ts2068_state::ts2068_io(address_map &map)
 {
-	map(0xf4, 0xf4).rw(FUNC(ts2068_state::port_f4_r), FUNC(ts2068_state::port_f4_w)).mirror(0xff00);
-	map(0xf5, 0xf5).w("ay8912", FUNC(ay8910_device::address_w)).mirror(0xff00);
-	map(0xf6, 0xf6).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w)).mirror(0xff00);
-	map(0xfe, 0xfe).rw(FUNC(ts2068_state::spectrum_ula_r), FUNC(ts2068_state::spectrum_ula_w)).select(0xff00);
-	map(0xff, 0xff).rw(FUNC(ts2068_state::port_ff_r), FUNC(ts2068_state::port_ff_w)).mirror(0xff00);
+	map(0xf4, 0xf4).mirror(0xff00).rw(FUNC(ts2068_state::port_f4_r), FUNC(ts2068_state::port_f4_w));
+	map(0xf5, 0xf5).mirror(0xff00).w("ay_slot", FUNC(ay_slot_device::address_w));
+	map(0xf6, 0xf6).mirror(0xff00).rw("ay_slot", FUNC(ay_slot_device::data_r), FUNC(ay_slot_device::data_w));
+	map(0xfe, 0xfe).select(0xff00).rw(FUNC(ts2068_state::spectrum_ula_r), FUNC(ts2068_state::spectrum_ula_w));
+	map(0xff, 0xff).mirror(0xff00).rw(FUNC(ts2068_state::port_ff_r), FUNC(ts2068_state::port_ff_w));
 }
 
 void ts2068_state::ts2068_mem(address_map &map)
@@ -560,8 +559,8 @@ void ts2068_state::machine_reset()
 }
 
 
-/****************************************************************************************************/
-/* TC2048 specific functions */
+//**************************************************************************************************
+// TC2048 specific functions
 
 
 void tc2048_state::port_ff_w(offs_t offset, uint8_t data)
@@ -572,8 +571,8 @@ void tc2048_state::port_ff_w(offs_t offset, uint8_t data)
 
 void tc2048_state::tc2048_io(address_map &map)
 {
-	map(0x00, 0x00).rw(FUNC(tc2048_state::spectrum_ula_r), FUNC(tc2048_state::spectrum_ula_w)).select(0xfffe);
-	map(0xff, 0xff).rw(FUNC(tc2048_state::port_ff_r), FUNC(tc2048_state::port_ff_w)).mirror(0xff00);
+	map(0x00, 0x00).select(0xfffe).rw(FUNC(tc2048_state::spectrum_ula_r), FUNC(tc2048_state::spectrum_ula_w));
+	map(0xff, 0xff).mirror(0xff00).rw(FUNC(tc2048_state::port_ff_r), FUNC(tc2048_state::port_ff_w));
 }
 
 void tc2048_state::tc2048_mem(address_map &map)
@@ -660,18 +659,18 @@ DEVICE_IMAGE_LOAD_MEMBER( ts2068_state::cart_load )
 }
 
 
-/* F4 Character Displayer - tc2048 code is inherited from the spectrum */
+// F4 Character Displayer - tc2048 code is inherited from the spectrum
 static const gfx_layout ts2068_charlayout =
 {
-	8, 8,                   /* 8 x 8 characters */
-	96,                 /* 96 characters */
-	1,                  /* 1 bits per pixel */
-	{ 0 },                  /* no bitplanes */
-	/* x offsets */
+	8, 8,                   // 8 x 8 characters
+	96,                 // 96 characters
+	1,                  // 1 bits per pixel
+	{ 0 },                  // no bitplanes
+	// x offsets
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	/* y offsets */
+	// y offsets
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8                 /* every char takes 8 bytes */
+	8*8                 // every char takes 8 bytes
 };
 
 static GFXDECODE_START( gfx_ts2068 )
@@ -682,30 +681,31 @@ void ts2068_state::ts2068(machine_config &config)
 {
 	spectrum_128(config);
 
-	Z80(config.replace(), m_maincpu, XTAL(14'112'000) / 4);        /* From Schematic; 3.528 MHz */
+	Z80(config.replace(), m_maincpu, XTAL(14'112'000) / 4); // From Schematic; 3.528 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &ts2068_state::ts2068_mem);
 	m_maincpu->set_addrmap(AS_IO, &ts2068_state::ts2068_io);
 	m_maincpu->set_vblank_int("screen", FUNC(ts2068_state::spec_interrupt));
 	config.set_maximum_quantum(attotime::from_hz(60));
 
-	/* video hardware */
+	// video hardware
 	// timings not confirmed! now same as spec128 but doubled for hires
 	m_screen->set_raw(XTAL(14'112'000) / 2, 456 * 2, 311, {get_screen_area().left() - TS2068_LEFT_BORDER, get_screen_area().right() + TS2068_RIGHT_BORDER, get_screen_area().top() - TS2068_TOP_BORDER, get_screen_area().bottom() + TS2068_BOTTOM_BORDER});
 	m_screen->set_refresh_hz(60);
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_ts2068);
 
-	/* sound */
-	AY8912(config.replace(), "ay8912", XTAL(14'112'000) / 8).add_route(ALL_OUTPUTS, "mono", 0.25);        /* From Schematic; 1.764 MHz */
+	// sound
+	AY_SLOT(config.replace(), "ay_slot", XTAL(14'112'000) / 8, default_ay_slot_devices, "ay_ay8912") // From Schematic; 1.764 MHz
+		.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	/* cartridge */
+	// cartridge
 	GENERIC_CARTSLOT(config, "dockslot", generic_plain_slot, "timex_cart", "dck,bin").set_device_load(FUNC(ts2068_state::cart_load));
 
-	/* Software lists */
+	// Software lists
 	SOFTWARE_LIST(config, "cart_list").set_original("timex_dock");
 	SOFTWARE_LIST(config, "cass_list_t").set_original("timex_cass");
 
-	/* internal ram */
+	// internal ram
 	m_ram->set_default_size("48K");
 }
 
@@ -726,15 +726,15 @@ void tc2048_state::tc2048(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &tc2048_state::tc2048_mem);
 	m_maincpu->set_addrmap(AS_IO, &tc2048_state::tc2048_io);
 
-	/* video hardware */
+	// video hardware
 	// timings not confirmed! now same as spec48 but doubled for hires
 	m_screen->set_raw(X1 / 2, 448 * 2, 312, {get_screen_area().left() - TS2068_LEFT_BORDER, get_screen_area().right() + TS2068_RIGHT_BORDER, get_screen_area().top() - TS2068_TOP_BORDER, get_screen_area().bottom() + TS2068_BOTTOM_BORDER});
 	m_screen->set_refresh_hz(50);
 
-	/* internal ram */
+	// internal ram
 	m_ram->set_default_size("48K");
 
-	/* Software lists */
+	// Software lists
 	SOFTWARE_LIST(config, "cass_list_t").set_original("timex_cass");
 }
 
