@@ -1896,9 +1896,10 @@ cmmb162
 cmmb103
 
 @source:atari/cops.cpp
-cops
-copsuk
-revlatns
+cops                            // (c) 1994
+copsuk                          // (c) 1994 (Nova/Deith Leisure)
+revlatns                        // (c) 1991
+visnqust                        // (c) 1992 (Kramer/Nova)
 
 @source:atari/copsnrob.cpp
 copsnrob
