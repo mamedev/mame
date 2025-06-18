@@ -520,9 +520,9 @@ double menu_audio_effect_reverb::change_freq(double val, bool inc, bool shift, b
 	double step = alt ? 16000 : ctrl ? 20 : shift ? 1 : 5;
 	if(val >= 10000)
 		step *= 100;
-	else if(val >= 500)
+	else if(val >= 5000)
 		step *= 50;
-	else if(val >= 250)
+	else if(val >= 2500)
 		step *= 20;
 	else if(val >= 1000)
 		step *= 10;

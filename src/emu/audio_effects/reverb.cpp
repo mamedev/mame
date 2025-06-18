@@ -363,91 +363,91 @@ void audio_effect_reverb::config_load(util::xml::data_node const *ef_node)
 		reset_mode();
 
 	if(ef_node->has_attribute("early_tap_setup")) {
-		m_mode = ef_node->get_attribute_float("early_tap_setup", 0);
+		m_early_tap_setup = ef_node->get_attribute_float("early_tap_setup", 0);
 		m_isset_early_tap_setup = true;
 	} else
 		reset_early_tap_setup();
 
 	if(ef_node->has_attribute("early_damping")) {
-		m_mode = ef_node->get_attribute_float("early_damping", 0);
+		m_early_damping = ef_node->get_attribute_float("early_damping", 0);
 		m_isset_early_damping = true;
 	} else
 		reset_early_damping();
 
 	if(ef_node->has_attribute("stereo_width")) {
-		m_mode = ef_node->get_attribute_float("stereo_width", 0);
+		m_stereo_width = ef_node->get_attribute_float("stereo_width", 0);
 		m_isset_stereo_width = true;
 	} else
 		reset_stereo_width();
 
 	if(ef_node->has_attribute("early_room_size")) {
-		m_mode = ef_node->get_attribute_float("early_room_size", 0);
+		m_early_room_size = ef_node->get_attribute_float("early_room_size", 0);
 		m_isset_early_room_size = true;
 	} else
 		reset_early_room_size();
 
 	if(ef_node->has_attribute("late_room_size")) {
-		m_mode = ef_node->get_attribute_float("late_room_size", 0);
+		m_late_room_size = ef_node->get_attribute_float("late_room_size", 0);
 		m_isset_late_room_size = true;
 	} else
 		reset_late_room_size();
 
 	if(ef_node->has_attribute("late_spin")) {
-		m_mode = ef_node->get_attribute_float("late_spin", 0);
+		m_late_spin = ef_node->get_attribute_float("late_spin", 0);
 		m_isset_late_spin = true;
 	} else
 		reset_late_spin();
 
 	if(ef_node->has_attribute("late_wander")) {
-		m_mode = ef_node->get_attribute_float("late_wander", 0);
+		m_late_wander = ef_node->get_attribute_float("late_wander", 0);
 		m_isset_late_wander = true;
 	} else
 		reset_late_wander();
 
 	if(ef_node->has_attribute("late_diffusion")) {
-		m_mode = ef_node->get_attribute_float("late_diffusion", 0);
+		m_late_diffusion = ef_node->get_attribute_float("late_diffusion", 0);
 		m_isset_late_diffusion = true;
 	} else
 		reset_late_diffusion();
 
 	if(ef_node->has_attribute("late_damping")) {
-		m_mode = ef_node->get_attribute_float("late_damping", 0);
+		m_late_damping = ef_node->get_attribute_float("late_damping", 0);
 		m_isset_late_damping = true;
 	} else
 		reset_late_damping();
 
 	if(ef_node->has_attribute("late_predelay")) {
-		m_mode = ef_node->get_attribute_float("late_predelay", 0);
+		m_late_predelay = ef_node->get_attribute_float("late_predelay", 0);
 		m_isset_late_predelay = true;
 	} else
 		reset_late_predelay();
 
 	if(ef_node->has_attribute("late_global_decay")) {
-		m_mode = ef_node->get_attribute_float("late_global_decay", 0);
+		m_late_global_decay = ef_node->get_attribute_float("late_global_decay", 0);
 		m_isset_late_global_decay = true;
 	} else
 		reset_late_global_decay();
 
 	if(ef_node->has_attribute("dry_level")) {
-		m_mode = ef_node->get_attribute_float("dry_level", 0);
+		m_dry_level = ef_node->get_attribute_float("dry_level", 0);
 		m_isset_dry_level = true;
 	} else
 		reset_dry_level();
 
 	if(ef_node->has_attribute("early_level")) {
-		m_mode = ef_node->get_attribute_float("early_level", 0);
+		m_early_level = ef_node->get_attribute_float("early_level", 0);
 		m_isset_early_level = true;
 	} else
 		reset_early_level();
 
 	if(ef_node->has_attribute("late_level")) {
-		m_mode = ef_node->get_attribute_float("late_level", 0);
+		m_late_level = ef_node->get_attribute_float("late_level", 0);
 		m_isset_late_level = true;
 	} else
 		reset_late_level();
 
 	if(ef_node->has_attribute("early_to_late_level")) {
-		m_mode = ef_node->get_attribute_float("early_to_late_level", 0);
+		m_early_to_late_level = ef_node->get_attribute_float("early_to_late_level", 0);
 		m_isset_early_to_late_level = true;
 	} else
 		reset_early_to_late_level();
@@ -1558,7 +1558,6 @@ audio_effect_reverb::sample_t audio_effect_reverb::comb::process(sample_t input,
 
 
 
-
 // Pink noise generator
 
 void audio_effect_reverb::pink::clear()
@@ -1643,6 +1642,7 @@ u32 audio_effect_reverb::find_prime(u32 value)
 
 	return value;
 }
+
 
 // The complete effect implementation
 
