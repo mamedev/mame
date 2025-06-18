@@ -2766,7 +2766,7 @@ ROM_START( cclimber )
 	ROM_LOAD( "cclimber.pr3", 0x0040, 0x0020, CRC(71317756) SHA1(1195f0a037e379cc1a3c0314cb746f5cd2bffe50) )
 
 	ROM_REGION( 0x0020, "decryption_prom", 0 ) // in CPU block along with Z80, 74LS241 and 74LS00
-	ROM_LOAD( "dm7052.cpu", 0x0000, 0x0020, CRC(751c3325) SHA1(edce2bc883996c1d72dc6c1c9f62799b162d415a) )
+	ROM_LOAD( "dm7052.cpu", 0x0000, 0x0020, CRC(f4179117) SHA1(a2acd492733768889e321a2d4516118164ed9a25) )
 
 	ROM_REGION( 0x2000, "cclimber_audio:samples", 0 )
 	ROM_LOAD( "cc13",         0x0000, 0x1000, CRC(e0042f75) SHA1(86cb31b110742a0f7ae33052c88f42d00deb5468) )
