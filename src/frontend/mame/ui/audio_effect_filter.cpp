@@ -34,7 +34,7 @@ menu_audio_effect_filter::~menu_audio_effect_filter()
 u32 menu_audio_effect_filter::decrement_f(u32 f, bool alt_pressed, bool ctrl_pressed, bool shift_pressed)
 {
 	const u32 min = std::min(FH_MIN, FL_MIN);
-	if(alt_pressed)
+	if(!shift_pressed && alt_pressed)
 		return min;
 
 	// pseudo-logarithmic scale
@@ -50,12 +50,16 @@ u32 menu_audio_effect_filter::decrement_f(u32 f, bool alt_pressed, bool ctrl_pre
 	else
 		incval = 1000;
 
-	if(ctrl_pressed)
-		incval *= 10;
+	if(shift_pressed && alt_pressed)
+		incval /= 100;
 	else if(shift_pressed)
 		incval /= 10;
+	else if(ctrl_pressed)
+		incval *= 10;
 
-	if(f % incval)
+	if(incval <= 1)
+		incval = 1;
+	else if(f % incval)
 		f += incval - f % incval;
 
 	f -= incval;
@@ -65,7 +69,7 @@ u32 menu_audio_effect_filter::decrement_f(u32 f, bool alt_pressed, bool ctrl_pre
 u32 menu_audio_effect_filter::increment_f(u32 f, bool alt_pressed, bool ctrl_pressed, bool shift_pressed)
 {
 	const u32 max = std::max(FH_MAX, FL_MAX);
-	if(alt_pressed)
+	if(!shift_pressed && alt_pressed)
 		return max;
 
 	// pseudo-logarithmic scale
@@ -81,12 +85,16 @@ u32 menu_audio_effect_filter::increment_f(u32 f, bool alt_pressed, bool ctrl_pre
 	else
 		incval = 10;
 
-	if(ctrl_pressed)
-		incval *= 10;
+	if(shift_pressed && alt_pressed)
+		incval /= 100;
 	else if(shift_pressed)
 		incval /= 10;
+	else if(ctrl_pressed)
+		incval *= 10;
 
-	if(f % incval)
+	if(incval <= 1)
+		incval = 1;
+	else if(f % incval)
 		f -= f % incval;
 
 	f += incval;
@@ -136,8 +144,7 @@ bool menu_audio_effect_filter::handle(event const *ev)
 
 		case F | HP: {
 			u32 f = decrement_f(m_effect->fh(), alt_pressed, ctrl_pressed, shift_pressed);
-			f = std::clamp(f, FH_MIN, FH_MAX);
-			m_effect->set_fh(f);
+			m_effect->set_fh(std::clamp(f, FH_MIN, FH_MAX));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
 			reset(reset_options::REMEMBER_POSITION);
@@ -162,8 +169,7 @@ bool menu_audio_effect_filter::handle(event const *ev)
 
 		case F | LP: {
 			u32 f = decrement_f(m_effect->fl(), alt_pressed, ctrl_pressed, shift_pressed);
-			f = std::clamp(f, FL_MIN, FL_MAX);
-			m_effect->set_fl(f);
+			m_effect->set_fl(std::clamp(f, FL_MIN, FL_MAX));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
 			reset(reset_options::REMEMBER_POSITION);
@@ -193,8 +199,7 @@ bool menu_audio_effect_filter::handle(event const *ev)
 
 		case F | HP: {
 			u32 f = increment_f(m_effect->fh(), alt_pressed, ctrl_pressed, shift_pressed);
-			f = std::clamp(f, FH_MIN, FH_MAX);
-			m_effect->set_fh(f);
+			m_effect->set_fh(std::clamp(f, FH_MIN, FH_MAX));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
 			reset(reset_options::REMEMBER_POSITION);
@@ -219,8 +224,7 @@ bool menu_audio_effect_filter::handle(event const *ev)
 
 		case F | LP: {
 			u32 f = increment_f(m_effect->fl(), alt_pressed, ctrl_pressed, shift_pressed);
-			f = std::clamp(f, FL_MIN, FL_MAX);
-			m_effect->set_fl(f);
+			m_effect->set_fl(std::clamp(f, FL_MIN, FL_MAX));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
 			reset(reset_options::REMEMBER_POSITION);
