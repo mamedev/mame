@@ -1185,6 +1185,7 @@ void audio_effect_reverb::dccut::prepare(double cutoff, u32 sample_rate)
 void audio_effect_reverb::dccuth::clear()
 {
 	m_y1 = 0;
+	m_y2 = 0;
 }
 
 audio_effect_reverb::sample_t audio_effect_reverb::dccut::process(dccuth &h, sample_t x0)
