@@ -435,6 +435,8 @@ fashiong
 fashiong2
 fstation
 funlddlx
+funlddlx2
+funlddlx4
 quickjac
 skattv
 skattva
@@ -456,10 +458,19 @@ glucksstern
 juwel
 karoas
 kniffi
+supermultib
 
 @source:adp/stellafr.cpp
+action
+allfred
+grandhand
+kleopatra
+multimulti
 st_ohla
 st_vulkn
+taipan
+turbosun
+sunny
 
 @source:agat/agat.cpp
 agat7
