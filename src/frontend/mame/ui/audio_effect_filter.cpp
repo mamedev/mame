@@ -138,7 +138,7 @@ bool menu_audio_effect_filter::handle(event const *ev)
 			m_effect->reset_all();
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			reset(reset_options::REMEMBER_REF);
 			return true;
 		}
 		break;
