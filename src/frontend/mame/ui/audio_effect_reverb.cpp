@@ -41,15 +41,25 @@ bool menu_audio_effect_reverb::handle(event const *ev)
 	bool shift_pressed = machine().input().code_pressed(KEYCODE_LSHIFT) || machine().input().code_pressed(KEYCODE_RSHIFT);
 
 	switch(ev->iptkey) {
-	case IPT_UI_SELECT:
-		if(uintptr_t(ev->itemref) == PRESET) {
+	case IPT_UI_SELECT: {
+		switch(uintptr_t(ev->itemref)) {
+		case PRESET:
 			m_effect->load_preset(m_preset);
+			if(m_chain == 0xffff)
+				machine().sound().default_effect_changed(m_entry);
+			reset(reset_options::REMEMBER_POSITION);
+			return true;
+
+		case RESET_ALL:
+			m_effect->reset_all();
+			m_preset = m_effect->find_current_preset();
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
 			reset(reset_options::REMEMBER_POSITION);
 			return true;
 		}
 		break;
+	}
 
 	case IPT_UI_LEFT: {
 		switch(uintptr_t(ev->itemref)) {
@@ -599,6 +609,7 @@ void menu_audio_effect_reverb::populate()
 	item_append(_("Spin"), format_spin(m_effect->late_spin()), flag_spin(m_effect->late_spin(), m_effect->isset_late_spin()), (void *)LSPIN);
 	item_append(_("Level"), format_percent(m_effect->late_level()), flag_percent(m_effect->late_level(), m_effect->isset_late_level()), (void *)LL);
 	item_append(menu_item_type::SEPARATOR);
+	item_append(_("Reset All"), 0, (void *)RESET_ALL);
 }
 
 void menu_audio_effect_reverb::recompute_metrics(uint32_t width, uint32_t height, float aspect)

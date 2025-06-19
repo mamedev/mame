@@ -49,6 +49,7 @@ public:
 	void reset_db(u32 band);
 	void reset_low_shelf();
 	void reset_high_shelf();
+	void reset_all();
 
 private:
 	struct history {

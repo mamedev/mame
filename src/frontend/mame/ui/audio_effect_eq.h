@@ -32,7 +32,7 @@ protected:
 	virtual void menu_deactivated() override;
 
 private:
-	enum { MODE = 1, SHELF, F, Q, DB };
+	enum { MODE = 1, SHELF, F, Q, DB, RESET_ALL };
 
 	static const u32 freqs[3][43];
 

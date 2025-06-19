@@ -19,7 +19,6 @@ audio_effect_eq::audio_effect_eq(speaker_device *speaker, u32 sample_rate, audio
 
 	// Minimal init to avoid using uninitialized values when reset_*
 	// recomputes filters
-
 	for(u32 band = 0; band != BANDS; band++) {
 		m_f[band] = 1000;
 		m_q[band] = 0.7;
@@ -28,14 +27,7 @@ audio_effect_eq::audio_effect_eq(speaker_device *speaker, u32 sample_rate, audio
 
 	m_band_mask = 0;
 
-	reset_mode();
-	reset_low_shelf();
-	reset_high_shelf();
-	for(u32 band = 0; band != BANDS; band++) {
-		reset_f(band);
-		reset_q(band);
-		reset_db(band);
-	}
+	reset_all();
 }
 
 void audio_effect_eq::reset_mode()
@@ -84,6 +76,18 @@ void audio_effect_eq::reset_high_shelf()
 	m_isset_high_shelf = false;
 	m_high_shelf = d ? d->high_shelf() : true;
 	build_filter(BANDS-1);
+}
+
+void audio_effect_eq::reset_all()
+{
+	reset_mode();
+	reset_low_shelf();
+	reset_high_shelf();
+	for(u32 band = 0; band != BANDS; band++) {
+		reset_f(band);
+		reset_q(band);
+		reset_db(band);
+	}
 }
 
 void audio_effect_eq::config_load(util::xml::data_node const *ef_node)

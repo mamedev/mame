@@ -340,22 +340,7 @@ audio_effect_reverb::audio_effect_reverb(speaker_device *speaker, u32 sample_rat
 	m_late_bass_boost = 0.1;
 
 	// Variables
-	reset_mode();
-	reset_early_tap_setup();
-	reset_early_damping();
-	reset_stereo_width();
-	reset_early_room_size();
-	reset_late_room_size();
-	reset_late_spin();
-	reset_late_wander();
-	reset_late_diffusion();
-	reset_late_damping();
-	reset_late_predelay();
-	reset_late_global_decay();
-	reset_dry_level();
-	reset_early_level();
-	reset_late_level();
-	reset_early_to_late_level();
+	reset_all();
 }
 
 
@@ -771,6 +756,26 @@ void audio_effect_reverb::reset_early_to_late_level()
 	m_isset_early_to_late_level = false;
 	m_early_to_late_level = d ? d->early_to_late_level() : m_default_preset->early_to_late_level;
 	commit_early_to_late_level();
+}
+
+void audio_effect_reverb::reset_all()
+{
+	reset_mode();
+	reset_early_tap_setup();
+	reset_early_damping();
+	reset_stereo_width();
+	reset_early_room_size();
+	reset_late_room_size();
+	reset_late_spin();
+	reset_late_wander();
+	reset_late_diffusion();
+	reset_late_damping();
+	reset_late_predelay();
+	reset_late_global_decay();
+	reset_dry_level();
+	reset_early_level();
+	reset_late_level();
+	reset_early_to_late_level();
 }
 
 

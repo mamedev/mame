@@ -33,7 +33,7 @@ protected:
 
 private:
 	enum {
-		MODE,
+		MODE = 1,
 		ATTACK,
 		RELEASE,
 		RATIO,
@@ -45,7 +45,8 @@ private:
 		FEEDBACK,
 		INERTIA,
 		INERTIA_DECAY,
-		CEILING
+		CEILING,
+		RESET_ALL
 	};
 
 	u16 m_chain, m_entry;

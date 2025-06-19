@@ -41,6 +41,17 @@ bool menu_audio_effect_compressor::handle(event const *ev)
 	bool shift_pressed = machine().input().code_pressed(KEYCODE_LSHIFT) || machine().input().code_pressed(KEYCODE_RSHIFT);
 
 	switch(ev->iptkey) {
+	case IPT_UI_SELECT: {
+		if(uintptr_t(ev->itemref) == RESET_ALL) {
+			m_effect->reset_all();
+			if(m_chain == 0xffff)
+				machine().sound().default_effect_changed(m_entry);
+			reset(reset_options::REMEMBER_POSITION);
+			return true;
+		}
+		break;
+	}
+
 	case IPT_UI_LEFT: {
 		switch(uintptr_t(ev->itemref)) {
 		case MODE:
@@ -395,8 +406,8 @@ void menu_audio_effect_compressor::populate()
 	item_append(_("Inertia decay"), format_2dec(m_effect->inertia_decay()), flag_lim(m_effect->inertia_decay(), 0.8, 0.96, m_effect->isset_inertia_decay()), (void *)INERTIA_DECAY);
 	item_append(_("Ceiling"), format_2dec(m_effect->ceiling()), flag_lim(m_effect->ceiling(), 0, 1, m_effect->isset_ceiling()), (void *)CEILING);
 
-
 	item_append(menu_item_type::SEPARATOR);
+	item_append(_("Reset All"), 0, (void *)RESET_ALL);
 }
 
 void menu_audio_effect_compressor::recompute_metrics(uint32_t width, uint32_t height, float aspect)

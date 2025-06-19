@@ -133,6 +133,17 @@ bool menu_audio_effect_filter::handle(event const *ev)
 	bool shift_pressed = machine().input().code_pressed(KEYCODE_LSHIFT) || machine().input().code_pressed(KEYCODE_RSHIFT);
 
 	switch(ev->iptkey) {
+	case IPT_UI_SELECT: {
+		if(uintptr_t(ev->itemref) == RESET_ALL) {
+			m_effect->reset_all();
+			if(m_chain == 0xffff)
+				machine().sound().default_effect_changed(m_entry);
+			reset(reset_options::REMEMBER_POSITION);
+			return true;
+		}
+		break;
+	}
+
 	case IPT_UI_LEFT: {
 		switch(uintptr_t(ev->itemref)) {
 		case ACTIVE | HP:
@@ -396,6 +407,7 @@ void menu_audio_effect_filter::populate()
 	item_append(_("Lowpass Q"), format_q(m_effect->ql()), flag_ql(), (void *)(Q | LP));
 
 	item_append(menu_item_type::SEPARATOR);
+	item_append(_("Reset All"), 0, (void *)RESET_ALL);
 }
 
 void menu_audio_effect_filter::recompute_metrics(uint32_t width, uint32_t height, float aspect)

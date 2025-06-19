@@ -32,7 +32,7 @@ protected:
 	virtual void menu_deactivated() override;
 
 private:
-	enum { ACTIVE = 1, F = 2, Q = 3, HP = 0, LP = 8 };
+	enum { ACTIVE = 1, F = 2, Q = 3, HP = 0, LP = 8, RESET_ALL = 0xff };
 
 	static constexpr u32 FH_MIN = 20;
 	static constexpr u32 FH_MAX = 5000;

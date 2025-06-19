@@ -33,23 +33,27 @@ protected:
 
 private:
 	enum {
-		MODE,
+		MODE = 1,
 		PRESET,
 		DRYL,
-		EL,
-		LL,
-		E2LL,
 		SW,
-		EDAMP,
+
 		ERS,
 		ETAP,
-		LDAMP,
-		LDIFF,
-		LPDELAY,
+		EDAMP,
+		EL,
+
 		LRS,
+		LDAMP,
+		LPDELAY,
+		LDIFF,
+		LWANDER,
 		LDECAY,
 		LSPIN,
-		LWANDER
+		LL,
+		E2LL,
+
+		RESET_ALL
 	};
 
 	u16 m_chain, m_entry;

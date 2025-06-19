@@ -23,12 +23,7 @@ audio_effect_filter::audio_effect_filter(speaker_device *speaker, u32 sample_rat
 	m_fl = m_fh = 1000;
 	m_ql = m_qh = 0.7;
 
-	reset_lowpass_active();
-	reset_highpass_active();
-	reset_fl();
-	reset_fh();
-	reset_ql();
-	reset_qh();
+	reset_all();
 }
 
 void audio_effect_filter::reset_lowpass_active()
@@ -77,6 +72,16 @@ void audio_effect_filter::reset_qh()
 	m_isset_qh = false;
 	m_qh = d ? d->qh() : 0.7;
 	build_highpass();
+}
+
+void audio_effect_filter::reset_all()
+{
+	reset_lowpass_active();
+	reset_highpass_active();
+	reset_fl();
+	reset_fh();
+	reset_ql();
+	reset_qh();
 }
 
 void audio_effect_filter::config_load(util::xml::data_node const *ef_node)

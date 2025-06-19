@@ -47,6 +47,7 @@ public:
 	void reset_fh();
 	void reset_ql();
 	void reset_qh();
+	void reset_all();
 
 private:
 	struct history {

@@ -89,6 +89,7 @@ public:
 	void reset_early_level();
 	void reset_late_level();
 	void reset_early_to_late_level();
+	void reset_all();
 
 	static u32 preset_count();
 	static const char *preset_name(u32 id);
