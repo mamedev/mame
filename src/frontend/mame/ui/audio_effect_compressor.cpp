@@ -58,7 +58,7 @@ bool menu_audio_effect_compressor::handle(event const *ev)
 			return true;
 
 		case RELEASE:
-			m_effect->set_release(max(0, m_effect->release() - (alt_pressed ? 10000 : ctrl_pressed ? 1000 : shift_pressed ? 10 : 100)));
+			m_effect->set_release(max(0, m_effect->release() - ((alt_pressed && !shift_pressed) ? 10000 : ctrl_pressed ? 1000 : (shift_pressed && alt_pressed) ? 1 : shift_pressed ? 10 : 100)));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
 			reset(reset_options::REMEMBER_POSITION);
@@ -86,7 +86,7 @@ bool menu_audio_effect_compressor::handle(event const *ev)
 			return true;
 
 		case CONVEXITY:
-			m_effect->set_convexity(max(-2, m_effect->convexity() - (alt_pressed ? 10000 : ctrl_pressed ? 1 : shift_pressed ? 0.02 : 0.1)));
+			m_effect->set_convexity(max(-2, m_effect->convexity() - (alt_pressed ? 10000 : ctrl_pressed ? 0.5 : shift_pressed ? 0.01 : 0.1)));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
 			reset(reset_options::REMEMBER_POSITION);
@@ -100,35 +100,35 @@ bool menu_audio_effect_compressor::handle(event const *ev)
 			return true;
 
 		case CHANNEL_LINK:
-			m_effect->set_channel_link(max(0, m_effect->channel_link() - (alt_pressed ? 10000 : ctrl_pressed ? 0.2 : shift_pressed ? 0.02 : 0.1)));
+			m_effect->set_channel_link(max(0, m_effect->channel_link() - (alt_pressed ? 10000 : ctrl_pressed ? 0.5 : shift_pressed ? 0.01 : 0.1)));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
 			reset(reset_options::REMEMBER_POSITION);
 			return true;
 
 		case FEEDBACK:
-			m_effect->set_feedback(max(0, m_effect->feedback() - (alt_pressed ? 10000 : ctrl_pressed ? 0.2 : shift_pressed ? 0.02 : 0.1)));
+			m_effect->set_feedback(max(0, m_effect->feedback() - (alt_pressed ? 10000 : ctrl_pressed ? 0.5 : shift_pressed ? 0.01 : 0.1)));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
 			reset(reset_options::REMEMBER_POSITION);
 			return true;
 
 		case INERTIA:
-			m_effect->set_inertia(max(-1, m_effect->inertia() - (alt_pressed ? 10000 : ctrl_pressed ? 0.5 : shift_pressed ? 0.02 : 0.1)));
+			m_effect->set_inertia(max(-1, m_effect->inertia() - (alt_pressed ? 10000 : ctrl_pressed ? 0.5 : shift_pressed ? 0.01 : 0.1)));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
 			reset(reset_options::REMEMBER_POSITION);
 			return true;
 
 		case INERTIA_DECAY:
-			m_effect->set_inertia_decay(max(0.8, m_effect->inertia_decay() - (alt_pressed ? 10000 : ctrl_pressed ? 0.05 : shift_pressed ? 0.01 : 0.02)));
+			m_effect->set_inertia_decay(max(0.8, m_effect->inertia_decay() - (alt_pressed ? 10000 : ctrl_pressed ? 0.05 : 0.01)));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
 			reset(reset_options::REMEMBER_POSITION);
 			return true;
 
 		case CEILING:
-			m_effect->set_ceiling(max(0.3, m_effect->ceiling() - (alt_pressed ? 10000 : ctrl_pressed ? 1 : shift_pressed ? 0.1 : 0.5)));
+			m_effect->set_ceiling(max(0.3, m_effect->ceiling() - (alt_pressed ? 10000 : ctrl_pressed ? 0.5 : shift_pressed ? 0.01 : 0.1)));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
 			reset(reset_options::REMEMBER_POSITION);
@@ -154,7 +154,7 @@ bool menu_audio_effect_compressor::handle(event const *ev)
 			return true;
 
 		case RELEASE:
-			m_effect->set_release(min(3000, m_effect->release() + (alt_pressed ? 10000 : ctrl_pressed ? 1000 : shift_pressed ? 10 : 100)));
+			m_effect->set_release(min(3000, m_effect->release() + ((alt_pressed && !shift_pressed) ? 10000 : ctrl_pressed ? 1000 : (shift_pressed && alt_pressed) ? 1 : shift_pressed ? 10 : 100)));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
 			reset(reset_options::REMEMBER_POSITION);
@@ -182,7 +182,7 @@ bool menu_audio_effect_compressor::handle(event const *ev)
 			return true;
 
 		case CONVEXITY:
-			m_effect->set_convexity(min(2, m_effect->convexity() + (alt_pressed ? 10000 : ctrl_pressed ? 1 : shift_pressed ? 0.02 : 0.1)));
+			m_effect->set_convexity(min(2, m_effect->convexity() + (alt_pressed ? 10000 : ctrl_pressed ? 0.5 : shift_pressed ? 0.01 : 0.1)));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
 			reset(reset_options::REMEMBER_POSITION);
@@ -196,35 +196,35 @@ bool menu_audio_effect_compressor::handle(event const *ev)
 			return true;
 
 		case CHANNEL_LINK:
-			m_effect->set_channel_link(min(1, m_effect->channel_link() + (alt_pressed ? 10000 : ctrl_pressed ? 0.2 : shift_pressed ? 0.02 : 0.1)));
+			m_effect->set_channel_link(min(1, m_effect->channel_link() + (alt_pressed ? 10000 : ctrl_pressed ? 0.5 : shift_pressed ? 0.01 : 0.1)));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
 			reset(reset_options::REMEMBER_POSITION);
 			return true;
 
 		case FEEDBACK:
-			m_effect->set_feedback(min(1, m_effect->feedback() + (alt_pressed ? 10000 : ctrl_pressed ? 0.2 : shift_pressed ? 0.02 : 0.1)));
+			m_effect->set_feedback(min(1, m_effect->feedback() + (alt_pressed ? 10000 : ctrl_pressed ? 0.5 : shift_pressed ? 0.01 : 0.1)));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
 			reset(reset_options::REMEMBER_POSITION);
 			return true;
 
 		case INERTIA:
-			m_effect->set_inertia(min(0.3, m_effect->inertia() + (alt_pressed ? 10000 : ctrl_pressed ? 0.5 : shift_pressed ? 0.02 : 0.1)));
+			m_effect->set_inertia(min(0.3, m_effect->inertia() + (alt_pressed ? 10000 : ctrl_pressed ? 0.5 : shift_pressed ? 0.01 : 0.1)));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
 			reset(reset_options::REMEMBER_POSITION);
 			return true;
 
 		case INERTIA_DECAY:
-			m_effect->set_inertia_decay(min(0.96, m_effect->inertia_decay() + (alt_pressed ? 10000 : ctrl_pressed ? 0.05 : shift_pressed ? 0.01 : 0.02)));
+			m_effect->set_inertia_decay(min(0.96, m_effect->inertia_decay() + (alt_pressed ? 10000 : ctrl_pressed ? 0.05 : 0.01)));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
 			reset(reset_options::REMEMBER_POSITION);
 			return true;
 
 		case CEILING:
-			m_effect->set_ceiling(min(3, m_effect->ceiling() + (alt_pressed ? 10000 : ctrl_pressed ? 1 : shift_pressed ? 0.1 : 0.5)));
+			m_effect->set_ceiling(min(3, m_effect->ceiling() + (alt_pressed ? 10000 : ctrl_pressed ? 0.5 : shift_pressed ? 0.01 : 0.1)));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
 			reset(reset_options::REMEMBER_POSITION);
@@ -383,17 +383,17 @@ void menu_audio_effect_compressor::populate()
 	item_append(_("Mode"), m_effect->mode() ? _("Active") : _("Bypass"), flag_mode(), (void *)MODE);
 	item_append(_("Attack"), format_nodec(m_effect->attack()), flag_lim(m_effect->attack(), 0, 300, m_effect->isset_attack()), (void *)ATTACK);
 	item_append(_("Release"), format_nodec(m_effect->release()), flag_lim(m_effect->release(), 0, 3000, m_effect->isset_release()), (void *)RELEASE);
-	item_append(_("Ratio"), format_nodec(m_effect->ratio()), flag_lim(m_effect->ratio(), 1, 20, m_effect->isset_ratio()), (void *)RATIO);
+	item_append(_("Ratio"), format_1dec(m_effect->ratio()), flag_lim(m_effect->ratio(), 1, 20, m_effect->isset_ratio()), (void *)RATIO);
 
 	item_append(_("Input gain"), format_db(m_effect->input_gain()), flag_lim(m_effect->input_gain(), -12, 24, m_effect->isset_input_gain()), (void *)INPUT_GAIN);
 	item_append(_("Output gain"), format_db(m_effect->output_gain()), flag_lim(m_effect->output_gain(), -12, 24, m_effect->isset_output_gain()), (void *)OUTPUT_GAIN);
 	item_append(_("Convexity"), format_2dec(m_effect->convexity()), flag_lim(m_effect->convexity(), -2, 2, m_effect->isset_convexity()), (void *)CONVEXITY);
 	item_append(_("Threshold"), format_nodec(m_effect->threshold()), flag_lim(m_effect->threshold(), -60, 6, m_effect->isset_threshold()), (void *)THRESHOLD);
-	item_append(_("Channel link"), format_1dec(m_effect->channel_link()), flag_lim(m_effect->channel_link(), 0, 1, m_effect->isset_channel_link()), (void *)CHANNEL_LINK);
-	item_append(_("Feedback"), format_1dec(m_effect->feedback()), flag_lim(m_effect->feedback(), 0, 1, m_effect->isset_feedback()), (void *)FEEDBACK);
+	item_append(_("Channel link"), format_2dec(m_effect->channel_link()), flag_lim(m_effect->channel_link(), 0, 1, m_effect->isset_channel_link()), (void *)CHANNEL_LINK);
+	item_append(_("Feedback"), format_2dec(m_effect->feedback()), flag_lim(m_effect->feedback(), 0, 1, m_effect->isset_feedback()), (void *)FEEDBACK);
 	item_append(_("Inertia"), format_2dec(m_effect->inertia()), flag_lim(m_effect->inertia(), -1, 3, m_effect->isset_inertia()), (void *)INERTIA);
 	item_append(_("Inertia decay"), format_2dec(m_effect->inertia_decay()), flag_lim(m_effect->inertia_decay(), 0.8, 0.96, m_effect->isset_inertia_decay()), (void *)INERTIA_DECAY);
-	item_append(_("Ceiling"), format_1dec(m_effect->ceiling()), flag_lim(m_effect->ceiling(), 0, 1, m_effect->isset_ceiling()), (void *)CEILING);
+	item_append(_("Ceiling"), format_2dec(m_effect->ceiling()), flag_lim(m_effect->ceiling(), 0, 1, m_effect->isset_ceiling()), (void *)CEILING);
 
 
 	item_append(menu_item_type::SEPARATOR);
