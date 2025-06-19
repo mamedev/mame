@@ -401,14 +401,15 @@ u32 menu_audio_effect_filter::flag_ql() const
 
 void menu_audio_effect_filter::populate()
 {
-	item_append(_(audio_effect::effect_names[audio_effect::FILTER]), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
-	item_append(_("Highpass"), m_effect->highpass_active() ? _("Active") : _("Bypass"), flag_highpass_active(), (void *)(ACTIVE | HP));
-	item_append(_("Highpass cutoff"), format_fh(m_effect->fh()), flag_fh(), (void *)(F | HP));
-	item_append(_("Highpass Q"), format_q(m_effect->qh()), flag_qh(), (void *)(Q | HP));
+	item_append(_("High-pass Filter"), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
+	item_append(_("Mode"), m_effect->highpass_active() ? _("Active") : _("Bypass"), flag_highpass_active(), (void *)(ACTIVE | HP));
+	item_append(_("Cutoff frequency"), format_fh(m_effect->fh()), flag_fh(), (void *)(F | HP));
+	item_append(_("Q factor"), format_q(m_effect->qh()), flag_qh(), (void *)(Q | HP));
 
-	item_append(_("Lowpass"), m_effect->lowpass_active() ? _("Active") : _("Bypass"), flag_lowpass_active(), (void *)(ACTIVE | LP));
-	item_append(_("Lowpass cutoff"), format_fl(m_effect->fl()), flag_fl(), (void *)(F | LP));
-	item_append(_("Lowpass Q"), format_q(m_effect->ql()), flag_ql(), (void *)(Q | LP));
+	item_append(_("Low-pass Filter"), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
+	item_append(_("Mode"), m_effect->lowpass_active() ? _("Active") : _("Bypass"), flag_lowpass_active(), (void *)(ACTIVE | LP));
+	item_append(_("Cutoff frequency"), format_fl(m_effect->fl()), flag_fl(), (void *)(F | LP));
+	item_append(_("Q factor"), format_q(m_effect->ql()), flag_ql(), (void *)(Q | LP));
 
 	item_append(menu_item_type::SEPARATOR);
 	item_append(_("Reset All"), 0, (void *)RESET_ALL);

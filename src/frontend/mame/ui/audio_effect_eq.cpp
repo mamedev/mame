@@ -398,29 +398,36 @@ void menu_audio_effect_eq::populate()
 {
 	item_append(_(audio_effect::effect_names[audio_effect::EQ]), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
 	item_append(_("Mode"), m_effect->mode() ? _("5-Band EQ") : _("Bypass"), flag_mode(), (void *)MODE);
-	item_append(_("Low band mode"), m_effect->low_shelf() ? _("Shelf") : _("Peak"), flag_low_shelf(), (void *)uintptr_t(SHELF | (0 << 16)));
-	item_append(_("Low band freq."), format_f(m_effect->f(0)), flag_f(0), (void *)uintptr_t(F | (0 << 16)));
+
+	item_append(_("Low Band"), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
+	item_append(_("Mode"), m_effect->low_shelf() ? _("Shelf") : _("Peak"), flag_low_shelf(), (void *)uintptr_t(SHELF | (0 << 16)));
+	item_append(_("Frequency"), format_f(m_effect->f(0)), flag_f(0), (void *)uintptr_t(F | (0 << 16)));
 	if(!m_effect->low_shelf())
-		item_append(_("Low band Q"), format_q(m_effect->q(0)), flag_q(0), (void *)uintptr_t(Q | (0 << 16)));
-	item_append(_("Low band dB"), format_db(m_effect->db(0)), flag_db(0), (void *)uintptr_t(DB | (0 << 16)));
+		item_append(_("Q factor"), format_q(m_effect->q(0)), flag_q(0), (void *)uintptr_t(Q | (0 << 16)));
+	item_append(_("Gain"), format_db(m_effect->db(0)), flag_db(0), (void *)uintptr_t(DB | (0 << 16)));
 
-	item_append(_("Lo mid band freq."), format_f(m_effect->f(1)), flag_f(1), (void *)uintptr_t(F | (1 << 16)));
-	item_append(_("Lo mid band Q"), format_q(m_effect->q(1)), flag_q(1), (void *)uintptr_t(Q | (1 << 16)));
-	item_append(_("Lo mid band dB"), format_db(m_effect->db(1)), flag_db(1), (void *)uintptr_t(DB | (1 << 16)));
+	item_append(_("Low Mid Band"), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
+	item_append(_("Frequency"), format_f(m_effect->f(1)), flag_f(1), (void *)uintptr_t(F | (1 << 16)));
+	item_append(_("Q factor"), format_q(m_effect->q(1)), flag_q(1), (void *)uintptr_t(Q | (1 << 16)));
+	item_append(_("Gain"), format_db(m_effect->db(1)), flag_db(1), (void *)uintptr_t(DB | (1 << 16)));
 
-	item_append(_("Mid band freq."), format_f(m_effect->f(2)), flag_f(2), (void *)uintptr_t(F | (2 << 16)));
-	item_append(_("Mid band Q"), format_q(m_effect->q(2)), flag_q(2), (void *)uintptr_t(Q | (2 << 16)));
-	item_append(_("Mid band dB"), format_db(m_effect->db(2)), flag_db(2), (void *)uintptr_t(DB | (2 << 16)));
+	item_append(_("Mid Band"), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
+	item_append(_("Frequency"), format_f(m_effect->f(2)), flag_f(2), (void *)uintptr_t(F | (2 << 16)));
+	item_append(_("Q factor"), format_q(m_effect->q(2)), flag_q(2), (void *)uintptr_t(Q | (2 << 16)));
+	item_append(_("Gain"), format_db(m_effect->db(2)), flag_db(2), (void *)uintptr_t(DB | (2 << 16)));
 
-	item_append(_("Hi mid band freq."), format_f(m_effect->f(3)), flag_f(3), (void *)uintptr_t(F | (3 << 16)));
-	item_append(_("Hi mid band Q"), format_q(m_effect->q(3)), flag_q(3), (void *)uintptr_t(Q | (3 << 16)));
-	item_append(_("Hi mid band dB"), format_db(m_effect->db(3)), flag_db(3), (void *)uintptr_t(DB | (3 << 16)));
+	item_append(_("High Mid Band"), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
+	item_append(_("Frequency"), format_f(m_effect->f(3)), flag_f(3), (void *)uintptr_t(F | (3 << 16)));
+	item_append(_("Q factor"), format_q(m_effect->q(3)), flag_q(3), (void *)uintptr_t(Q | (3 << 16)));
+	item_append(_("Gain"), format_db(m_effect->db(3)), flag_db(3), (void *)uintptr_t(DB | (3 << 16)));
 
-	item_append(_("High band mode"), m_effect->high_shelf() ? _("Shelf") : _("Peak"), flag_high_shelf(), (void *)uintptr_t(SHELF | (4 << 16)));
-	item_append(_("High band freq."), format_f(m_effect->f(4)), flag_f(4), (void *)uintptr_t(F | (4 << 16)));
+	item_append(_("High Band"), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
+	item_append(_("Mode"), m_effect->high_shelf() ? _("Shelf") : _("Peak"), flag_high_shelf(), (void *)uintptr_t(SHELF | (4 << 16)));
+	item_append(_("Frequency"), format_f(m_effect->f(4)), flag_f(4), (void *)uintptr_t(F | (4 << 16)));
 	if(!m_effect->high_shelf())
-		item_append(_("High band Q"), format_q(m_effect->q(4)), flag_q(4), (void *)uintptr_t(Q | (4 << 16)));
-	item_append(_("High band dB"), format_db(m_effect->db(4)), flag_db(4), (void *)uintptr_t(DB | (4 << 16)));
+		item_append(_("Q factor"), format_q(m_effect->q(4)), flag_q(4), (void *)uintptr_t(Q | (4 << 16)));
+	item_append(_("Gain"), format_db(m_effect->db(4)), flag_db(4), (void *)uintptr_t(DB | (4 << 16)));
+
 	item_append(menu_item_type::SEPARATOR);
 	item_append(_("Reset All"), 0, (void *)RESET_ALL);
 }
