@@ -28,7 +28,7 @@ public:
 		, device_memory_interface(mconfig, *this)
 		, device_bbc_1mhzbus_interface(mconfig, *this)
 		, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0, address_map_constructor(FUNC(bbc_beebex_device::beebex_map), this))
-		, m_bus(*this, "bus", 0U)
+		, m_bus(*this, "bus%u", 0U)
 		, m_latch(0)
 	{ }
 
