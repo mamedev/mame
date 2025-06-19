@@ -46362,6 +46362,9 @@ emma2
 @source:trainer/instruct.cpp
 instruct
 
+@source:trainer/mac3.cpp
+mac3
+
 @source:trainer/mcg85.cpp
 mcg85
 
