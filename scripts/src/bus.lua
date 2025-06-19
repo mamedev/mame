@@ -728,6 +728,8 @@ if (BUSES["BBC_1MHZBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/autoprom.h",
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/barrybox.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/barrybox.h",
+		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/beebex.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/beebex.h",
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/beebopl.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/beebopl.h",
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/beebsid.cpp",
