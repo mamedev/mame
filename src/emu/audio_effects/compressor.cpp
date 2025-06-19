@@ -312,7 +312,7 @@ void audio_effect_compressor::reset_channel_link()
 {
 	audio_effect_compressor *d = static_cast<audio_effect_compressor *>(m_default);
 	m_isset_channel_link = false;
-	m_channel_link = d ? d->channel_link() : 100;
+	m_channel_link = d ? d->channel_link() : 1;
 }
 
 void audio_effect_compressor::reset_feedback()

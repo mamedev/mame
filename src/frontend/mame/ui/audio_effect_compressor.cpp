@@ -100,7 +100,7 @@ bool menu_audio_effect_compressor::handle(event const *ev)
 			return true;
 
 		case CHANNEL_LINK:
-			m_effect->set_channel_link(max(0, m_effect->channel_link() - (alt_pressed ? 10000 : ctrl_pressed ? 20 : shift_pressed ? 1 : 5)));
+			m_effect->set_channel_link(max(0, m_effect->channel_link() - (alt_pressed ? 10000 : ctrl_pressed ? 0.2 : shift_pressed ? 0.02 : 0.1)));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
 			reset(reset_options::REMEMBER_POSITION);
@@ -196,7 +196,7 @@ bool menu_audio_effect_compressor::handle(event const *ev)
 			return true;
 
 		case CHANNEL_LINK:
-			m_effect->set_channel_link(min(100, m_effect->channel_link() + (alt_pressed ? 10000 : ctrl_pressed ? 20 : shift_pressed ? 1 : 5)));
+			m_effect->set_channel_link(min(1, m_effect->channel_link() + (alt_pressed ? 10000 : ctrl_pressed ? 0.2 : shift_pressed ? 0.02 : 0.1)));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
 			reset(reset_options::REMEMBER_POSITION);
@@ -389,7 +389,7 @@ void menu_audio_effect_compressor::populate()
 	item_append(_("Output gain"), format_db(m_effect->output_gain()), flag_lim(m_effect->output_gain(), -12, 24, m_effect->isset_output_gain()), (void *)OUTPUT_GAIN);
 	item_append(_("Convexity"), format_2dec(m_effect->convexity()), flag_lim(m_effect->convexity(), -2, 2, m_effect->isset_convexity()), (void *)CONVEXITY);
 	item_append(_("Threshold"), format_nodec(m_effect->threshold()), flag_lim(m_effect->threshold(), -60, 6, m_effect->isset_threshold()), (void *)THRESHOLD);
-	item_append(_("Channel link"), format_nodec(m_effect->channel_link()), flag_lim(m_effect->channel_link(), 0, 100, m_effect->isset_channel_link()), (void *)CHANNEL_LINK);
+	item_append(_("Channel link"), format_1dec(m_effect->channel_link()), flag_lim(m_effect->channel_link(), 0, 1, m_effect->isset_channel_link()), (void *)CHANNEL_LINK);
 	item_append(_("Feedback"), format_1dec(m_effect->feedback()), flag_lim(m_effect->feedback(), 0, 1, m_effect->isset_feedback()), (void *)FEEDBACK);
 	item_append(_("Inertia"), format_2dec(m_effect->inertia()), flag_lim(m_effect->inertia(), -1, 3, m_effect->isset_inertia()), (void *)INERTIA);
 	item_append(_("Inertia decay"), format_2dec(m_effect->inertia_decay()), flag_lim(m_effect->inertia_decay(), 0.8, 0.96, m_effect->isset_inertia_decay()), (void *)INERTIA_DECAY);
