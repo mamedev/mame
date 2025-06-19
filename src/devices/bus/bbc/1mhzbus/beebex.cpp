@@ -82,22 +82,22 @@ void bbc_beebex_device::device_add_mconfig(machine_config &config)
 	ACORN_BUS(config, m_bus[0], DERIVED_CLOCK(1, 1));
 	m_bus[0]->out_irq_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_1mhzbus_slot_device::irq_w));
 	m_bus[0]->out_nmi_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_1mhzbus_slot_device::nmi_w));
-	ACORN_BUS_SLOT(config, "slot", m_bus[0], eurocube_bus_devices, "cubio_r");
+	ACORN_BUS_SLOT(config, "slot1", m_bus[0], eurocube_bus_devices, "cubio_r");
 
 	ACORN_BUS(config, m_bus[1], DERIVED_CLOCK(1, 1));
 	m_bus[1]->out_irq_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_1mhzbus_slot_device::irq_w));
 	m_bus[1]->out_nmi_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_1mhzbus_slot_device::nmi_w));
-	ACORN_BUS_SLOT(config, "slot", m_bus[1], eurocube_bus_devices, nullptr);
+	ACORN_BUS_SLOT(config, "slot2", m_bus[1], eurocube_bus_devices, nullptr);
 
 	ACORN_BUS(config, m_bus[2], DERIVED_CLOCK(1, 1));
 	m_bus[2]->out_irq_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_1mhzbus_slot_device::irq_w));
 	m_bus[2]->out_nmi_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_1mhzbus_slot_device::nmi_w));
-	ACORN_BUS_SLOT(config, "slot", m_bus[2], eurocube_bus_devices, nullptr);
+	ACORN_BUS_SLOT(config, "slot3", m_bus[2], eurocube_bus_devices, nullptr);
 
 	ACORN_BUS(config, m_bus[3], DERIVED_CLOCK(1, 1));
 	m_bus[3]->out_irq_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_1mhzbus_slot_device::irq_w));
 	m_bus[3]->out_nmi_callback().set(DEVICE_SELF_OWNER, FUNC(bbc_1mhzbus_slot_device::nmi_w));
-	ACORN_BUS_SLOT(config, "slot", m_bus[3], eurocube_bus_devices, nullptr);
+	ACORN_BUS_SLOT(config, "slot4", m_bus[3], eurocube_bus_devices, nullptr);
 }
 
 
