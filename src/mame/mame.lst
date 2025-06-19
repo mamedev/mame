@@ -476,9 +476,9 @@ kleopatra
 multimulti
 st_ohla
 st_vulkn
+sunny
 taipan
 turbosun
-sunny
 
 @source:agat/agat.cpp
 agat7
@@ -33627,6 +33627,9 @@ sspanic
 @source:namco/dkmb.cpp
 dkmb
 
+@source:namco/ds5000.cpp
+ds5000
+
 @source:namco/gal3.cpp
 gal3
 
@@ -38145,6 +38148,7 @@ pb_l5
 pb_p4
 
 @source:pinball/s11b.cpp
+bcats_f1
 bcats_g4
 bcats_l2
 bcats_l5
@@ -45202,6 +45206,7 @@ contcircu
 contcircua
 dblaxle
 dblaxleu
+dblaxleua
 dblaxleul
 enforce
 enforcej

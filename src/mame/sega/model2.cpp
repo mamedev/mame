@@ -28,7 +28,7 @@
               bypass it by entering then exiting service mode;
     - sgt24h: first turn in easy reverse course has ugly rendered mountain in background;
     - srallyc: some 3d elements doesn't show up properly (tree models, last hill in course 1 is often black colored);
-	- stcc: no collision detection with enemy cars, sometimes enemy cars glitch out and disappear altogether;
+    - stcc: no collision detection with enemy cars, sometimes enemy cars glitch out and disappear altogether;
     - vcop: sound dies at enter initial screen (i.e. after played the game once) (untested);
     - vstriker: stadium ads have terrible colors (they uses the wrong color table, @see video/model2rd.hxx)
 
@@ -1422,7 +1422,7 @@ void model2b_state::model2b_crx_mem(address_map &map)
 	map(0x00980000, 0x00980003).rw(FUNC(model2b_state::copro_ctl1_r), FUNC(model2b_state::copro_ctl1_w));
 	map(0x00980008, 0x0098000b).w(FUNC(model2b_state::geo_ctl1_w));
 	map(0x00980014, 0x00980017).r(FUNC(model2b_state::copro_status_r));
-	map(0x00980020, 0x00980023).noprw();	// bank control reg - used during SHARC program upload, all games just set this to 0
+	map(0x00980020, 0x00980023).noprw();    // bank control reg - used during SHARC program upload, all games just set this to 0
 
 	map(0x009c0000, 0x009cffff).rw(FUNC(model2b_state::model2_serial_r), FUNC(model2b_state::model2_serial_w));
 
@@ -5738,6 +5738,9 @@ ROM_START( overrev ) /* Over Rev Revision A, Model 2C, Sega game ID# 836-13277 O
 	ROM_LOAD32_WORD( "mpr-20001.27",  0x000000, 0x200000, CRC(6ca236aa) SHA1(b3cb89fadb42afed13be4f229d7158dee487978a) )
 	ROM_LOAD32_WORD( "mpr-20000.25",  0x000002, 0x200000, CRC(894d8ded) SHA1(9bf7c754a29eef47fa49b5567980601895127306) )
 
+	ROM_REGION( 0x20000, "cpu4", 0) // Communication program
+	ROM_LOAD16_WORD_SWAP( "epr-18643.7",  0x000000, 0x020000, CRC(7166fca7) SHA1(f5d02906b64bb2fd1af8e3772c1b01a4e006c060) )
+
 	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
 	ROM_LOAD16_WORD_SWAP( "epr-20002.31", 0x000000, 0x080000, CRC(7efb069e) SHA1(30b1bbaf348d6a6b9ee2fdf82a0749baa025e0bf) )
 
@@ -5754,11 +5757,13 @@ The set below has been found labeled as:
 Main board ID# 837-10854-02-91
  Sega Game ID# 836-12788
  ROM board ID# 836-12789
+COMM board ID# 836-12344
 
 As well as:
 Main board ID# 837-10854-02-91
  Sega Game ID# 836-13274 OVER REV
  ROM board ID# 836-13275
+COMM board ID# 836-12344
 
 These ID numbers have been verified on multiple board sets for both revision A and revision B program ROMs
 */
@@ -5782,6 +5787,9 @@ ROM_START( overrevb ) /* Over Rev Revision B, Model 2B */
 	ROM_REGION( 0x400000, "textures", 0 ) // Textures
 	ROM_LOAD32_WORD( "mpr-20001.27",  0x000000, 0x200000, CRC(6ca236aa) SHA1(b3cb89fadb42afed13be4f229d7158dee487978a) )
 	ROM_LOAD32_WORD( "mpr-20000.25",  0x000002, 0x200000, CRC(894d8ded) SHA1(9bf7c754a29eef47fa49b5567980601895127306) )
+
+	ROM_REGION( 0x20000, "cpu4", 0) // Communication program
+	ROM_LOAD16_WORD_SWAP( "epr-18643.7",  0x000000, 0x020000, CRC(7166fca7) SHA1(f5d02906b64bb2fd1af8e3772c1b01a4e006c060) )
 
 	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
 	ROM_LOAD16_WORD_SWAP( "epr-20002.31", 0x000000, 0x080000, CRC(7efb069e) SHA1(30b1bbaf348d6a6b9ee2fdf82a0749baa025e0bf) )
@@ -5811,6 +5819,9 @@ ROM_START( overrevba ) /* Over Rev Revision A, Model 2B */
 	ROM_REGION( 0x400000, "textures", 0 ) // Textures
 	ROM_LOAD32_WORD( "mpr-20001.27",  0x000000, 0x200000, CRC(6ca236aa) SHA1(b3cb89fadb42afed13be4f229d7158dee487978a) )
 	ROM_LOAD32_WORD( "mpr-20000.25",  0x000002, 0x200000, CRC(894d8ded) SHA1(9bf7c754a29eef47fa49b5567980601895127306) )
+
+	ROM_REGION( 0x20000, "cpu4", 0) // Communication program
+	ROM_LOAD16_WORD_SWAP( "epr-18643.7",  0x000000, 0x020000, CRC(7166fca7) SHA1(f5d02906b64bb2fd1af8e3772c1b01a4e006c060) )
 
 	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
 	ROM_LOAD16_WORD_SWAP( "epr-20002.31", 0x000000, 0x080000, CRC(7efb069e) SHA1(30b1bbaf348d6a6b9ee2fdf82a0749baa025e0bf) )
