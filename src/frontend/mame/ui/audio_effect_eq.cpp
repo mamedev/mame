@@ -164,8 +164,8 @@ bool menu_audio_effect_eq::handle(event const *ev)
 		case Q: {
 			float q = m_effect->q(band);
 			q = (int(q*10 + 0.5) + 1) / 10.0;
-			if(q > 12)
-				q = 12;
+			if(q > 10)
+				q = 10;
 			m_effect->set_q(band, q);
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
@@ -303,9 +303,9 @@ u32 menu_audio_effect_eq::flag_q(u32 band) const
 	if(!m_effect->isset_q(band))
 		flag |= FLAG_INVERT;
 	float q = m_effect->q(band);
-	if(q < 10)
-		flag |= FLAG_LEFT_ARROW;
 	if(q > 0.1)
+		flag |= FLAG_LEFT_ARROW;
+	if(q < 10)
 		flag |= FLAG_RIGHT_ARROW;
 	return flag;
 }
@@ -316,9 +316,9 @@ u32 menu_audio_effect_eq::flag_db(u32 band) const
 	if(!m_effect->isset_db(band))
 		flag |= FLAG_INVERT;
 	float db = m_effect->db(band);
-	if(db < 12)
-		flag |= FLAG_LEFT_ARROW;
 	if(db > -12)
+		flag |= FLAG_LEFT_ARROW;
+	if(db < 12)
 		flag |= FLAG_RIGHT_ARROW;
 	return flag;
 }

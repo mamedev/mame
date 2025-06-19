@@ -457,6 +457,40 @@ std::string menu_audio_effect_reverb::format_spin(double val)
 	return util::string_format("%3.2fHz", val);
 }
 
+u32 menu_audio_effect_reverb::flag_mode() const
+{
+	u32 flag = 0;
+	if(!m_effect->isset_mode())
+		flag |= FLAG_INVERT;
+	if(m_effect->mode())
+		flag |= FLAG_LEFT_ARROW;
+	else
+		flag |= FLAG_RIGHT_ARROW;
+	return flag;
+}
+
+u32 menu_audio_effect_reverb::flag_tap_setup() const
+{
+	u32 flag = 0;
+	if(!m_effect->isset_early_tap_setup())
+		flag |= FLAG_INVERT;
+	if(m_effect->early_tap_setup() != 0)
+		flag |= FLAG_LEFT_ARROW;
+	if(m_effect->early_tap_setup() != audio_effect_reverb::early_tap_setup_count() - 1)
+		flag |= FLAG_RIGHT_ARROW;
+	return flag;
+}
+
+u32 menu_audio_effect_reverb::flag_preset() const
+{
+	u32 flag = 0;
+	if(m_preset != 0)
+		flag |= FLAG_LEFT_ARROW;
+	if(m_preset != audio_effect_reverb::preset_count() - 1)
+		flag |= FLAG_RIGHT_ARROW;
+	return flag;
+}
+
 u32 menu_audio_effect_reverb::flag_percent(double val, bool isset)
 {
 	u32 flag = 0;
@@ -595,14 +629,14 @@ void menu_audio_effect_reverb::populate()
 	item_append(_("Early Reflections"), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
 	item_append(_("Room size"), format_percent(m_effect->early_room_size()), flag_percent(m_effect->early_room_size(), m_effect->isset_early_room_size()), (void *)ERS);
 	item_append(_("Tap setup"), audio_effect_reverb::early_tap_setup_name(m_effect->early_tap_setup()), flag_tap_setup(), (void *)ETAP);
-	item_append(_("Damping"), format_freq(m_effect->early_damping()), flag_percent(m_effect->early_damping(), m_effect->isset_early_damping()), (void *)EDAMP);
+	item_append(_("Damping"), format_freq(m_effect->early_damping()), flag_freq(m_effect->early_damping(), m_effect->isset_early_damping()), (void *)EDAMP);
 	item_append(_("Level"), format_percent(m_effect->early_level()), flag_percent(m_effect->early_level(), m_effect->isset_early_level()), (void *)EL);
 	item_append(_("Send to Late"), format_percent(m_effect->early_to_late_level()), flag_percent(m_effect->early_to_late_level(), m_effect->isset_early_to_late_level()), (void *)E2LL);
 
 	item_append(_("Late Reflections"), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
 	item_append(_("Room size"), format_percent(m_effect->late_room_size()), flag_percent(m_effect->late_room_size(), m_effect->isset_late_room_size()), (void *)LRS);
-	item_append(_("Damping"), format_freq(m_effect->late_damping()), flag_percent(m_effect->late_damping(), m_effect->isset_late_damping()), (void *)LDAMP);
-	item_append(_("Pre-delay"), format_ms(m_effect->late_predelay()), flag_percent(m_effect->late_predelay(), m_effect->isset_late_predelay()), (void *)LPDELAY);
+	item_append(_("Damping"), format_freq(m_effect->late_damping()), flag_freq(m_effect->late_damping(), m_effect->isset_late_damping()), (void *)LDAMP);
+	item_append(_("Pre-delay"), format_ms(m_effect->late_predelay()), flag_ms(m_effect->late_predelay(), m_effect->isset_late_predelay()), (void *)LPDELAY);
 	item_append(_("Diffusion"), format_percent(m_effect->late_diffusion()), flag_percent(m_effect->late_diffusion(), m_effect->isset_late_diffusion()), (void *)LDIFF);
 	item_append(_("Wander"), format_percent(m_effect->late_wander()), flag_percent(m_effect->late_wander(), m_effect->isset_late_wander()), (void *)LWANDER);
 	item_append(_("Decay"), format_decay(m_effect->late_global_decay()), flag_decay(m_effect->late_global_decay(), m_effect->isset_late_global_decay()), (void *)LDECAY);
@@ -631,38 +665,4 @@ void menu_audio_effect_reverb::menu_deactivated()
 {
 }
 
-
-u32 menu_audio_effect_reverb::flag_mode() const
-{
-	u32 flag = 0;
-	if(!m_effect->isset_mode())
-		flag |= FLAG_INVERT;
-	if(m_effect->mode())
-		flag |= FLAG_LEFT_ARROW;
-	else
-		flag |= FLAG_RIGHT_ARROW;
-	return flag;
-}
-
-u32 menu_audio_effect_reverb::flag_tap_setup() const
-{
-	u32 flag = 0;
-	if(!m_effect->isset_early_tap_setup())
-		flag |= FLAG_INVERT;
-	if(m_effect->early_tap_setup() != 0)
-		flag |= FLAG_LEFT_ARROW;
-	if(m_effect->early_tap_setup() != audio_effect_reverb::early_tap_setup_count() - 1)
-		flag |= FLAG_RIGHT_ARROW;
-	return flag;
-}
-
-u32 menu_audio_effect_reverb::flag_preset() const
-{
-	u32 flag = 0;
-	if(m_preset != 0)
-		flag |= FLAG_LEFT_ARROW;
-	if(m_preset != audio_effect_reverb::preset_count() - 1)
-		flag |= FLAG_RIGHT_ARROW;
-	return flag;
-}
 }

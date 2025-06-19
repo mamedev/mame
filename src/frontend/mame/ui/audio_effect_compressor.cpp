@@ -402,9 +402,9 @@ void menu_audio_effect_compressor::populate()
 	item_append(_("Threshold"), format_nodec(m_effect->threshold()), flag_lim(m_effect->threshold(), -60, 6, m_effect->isset_threshold()), (void *)THRESHOLD);
 	item_append(_("Channel link"), format_2dec(m_effect->channel_link()), flag_lim(m_effect->channel_link(), 0, 1, m_effect->isset_channel_link()), (void *)CHANNEL_LINK);
 	item_append(_("Feedback"), format_2dec(m_effect->feedback()), flag_lim(m_effect->feedback(), 0, 1, m_effect->isset_feedback()), (void *)FEEDBACK);
-	item_append(_("Inertia"), format_2dec(m_effect->inertia()), flag_lim(m_effect->inertia(), -1, 3, m_effect->isset_inertia()), (void *)INERTIA);
+	item_append(_("Inertia"), format_2dec(m_effect->inertia()), flag_lim(m_effect->inertia(), -1, 0.3, m_effect->isset_inertia()), (void *)INERTIA);
 	item_append(_("Inertia decay"), format_2dec(m_effect->inertia_decay()), flag_lim(m_effect->inertia_decay(), 0.8, 0.96, m_effect->isset_inertia_decay()), (void *)INERTIA_DECAY);
-	item_append(_("Ceiling"), format_2dec(m_effect->ceiling()), flag_lim(m_effect->ceiling(), 0, 1, m_effect->isset_ceiling()), (void *)CEILING);
+	item_append(_("Ceiling"), format_2dec(m_effect->ceiling()), flag_lim(m_effect->ceiling(), 0.3, 3, m_effect->isset_ceiling()), (void *)CEILING);
 
 	item_append(menu_item_type::SEPARATOR);
 	item_append(_("Reset All"), 0, (void *)RESET_ALL);
