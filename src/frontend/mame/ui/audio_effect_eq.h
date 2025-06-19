@@ -34,7 +34,7 @@ protected:
 private:
 	enum { MODE = 1, SHELF, F, Q, DB, RESET_ALL = 0xff };
 
-	static const u32 freqs[3][43];
+	static const u32 freq_limits[5][2];
 
 	u16 m_chain, m_entry;
 	audio_effect_eq *m_effect;
@@ -52,8 +52,10 @@ private:
 	u32 flag_q(u32 band) const;
 	u32 flag_db(u32 band) const;
 
-	std::pair<u32, u32> find_f(u32 band) const;
-	void change_f(u32 band, s32 direction);
+	u32 decrement_f(u32 band, bool alt_pressed, bool ctrl_pressed, bool shift_pressed);
+	u32 increment_f(u32 band, bool alt_pressed, bool ctrl_pressed, bool shift_pressed);
+	float change_q(u32 band, bool inc, bool alt_pressed, bool ctrl_pressed, bool shift_pressed);
+	float change_db(u32 band, bool inc, bool alt_pressed, bool ctrl_pressed, bool shift_pressed);
 };
 
 } // namespace ui

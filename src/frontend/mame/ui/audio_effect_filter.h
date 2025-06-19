@@ -57,8 +57,8 @@ private:
 
 	u32 decrement_f(u32 f, bool alt_pressed, bool ctrl_pressed, bool shift_pressed);
 	u32 increment_f(u32 f, bool alt_pressed, bool ctrl_pressed, bool shift_pressed);
-	float decrement_q(float q, bool alt_pressed, bool ctrl_pressed);
-	float increment_q(float q, bool alt_pressed, bool ctrl_pressed);
+	float decrement_q(float q, bool alt_pressed, bool ctrl_pressed, bool shift_pressed);
+	float increment_q(float q, bool alt_pressed, bool ctrl_pressed, bool shift_pressed);
 };
 
 } // namespace ui
