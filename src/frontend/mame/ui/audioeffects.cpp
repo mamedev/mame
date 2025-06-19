@@ -28,6 +28,7 @@ menu_audio_effects::menu_audio_effects(mame_ui_manager &mui, render_container &c
 	: menu(mui, container)
 {
 	set_heading(_("Audio Effects"));
+	set_process_flags(PROCESS_LR_REPEAT);
 }
 
 menu_audio_effects::~menu_audio_effects()

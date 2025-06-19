@@ -24,7 +24,7 @@ menu_audio_effect_reverb::menu_audio_effect_reverb(mame_ui_manager &mui, render_
 	m_effect = static_cast<audio_effect_reverb *>(effect);
 	m_preset = m_effect->find_current_preset();
 	set_heading(util::string_format("%s #%u", chain == 0xffff ? _("Default") : machine().sound().effect_chain_tag(chain), entry+1));
-	set_process_flags(PROCESS_LR_REPEAT | PROCESS_LR_ALWAYS);
+	set_process_flags(PROCESS_LR_REPEAT);
 }
 
 menu_audio_effect_reverb::~menu_audio_effect_reverb()
