@@ -213,7 +213,6 @@ Notes:
 
 #include "logmacro.h"
 
-
 /*
     Interesting mem areas
 
@@ -756,8 +755,8 @@ private:
 	u32 m_reg_10000100 = 0;
 	u32 m_reg_10000101 = 0;
 
-	u32 m_tnl_fifo[64]{};
-	u32 m_direct_fifo[64]{};
+	u32 m_tnl_fifo[128]{};
+	u32 m_direct_fifo[128]{};
 	int m_tnl_fifo_ptr = 0;
 	int m_direct_fifo_ptr = 0;
 	int m_direct_fifo_block_count = 0;
@@ -1374,6 +1373,7 @@ void taitotz_renderer::draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 void taitotz_renderer::push_tnl_fifo(u32 data)
 {
+	//m_state.machine().logerror("T&L: %08x\n", data);
 	m_tnl_fifo[m_tnl_fifo_ptr] = data;
 	m_tnl_fifo_ptr++;
 
@@ -1407,6 +1407,10 @@ void taitotz_renderer::push_tnl_fifo(u32 data)
 
 void taitotz_renderer::process_direct_verts(const u32 *header, const u32 *vert_data, const int num_verts)
 {
+	//m_state.machine().logerror("Processing %d direct verts\n", num_verts);
+	if (num_verts == 0)
+		return;
+
 	vertex_t v[8];
 	taitotz_polydata &extra = object_data().next();
 
@@ -1458,11 +1462,11 @@ void taitotz_renderer::process_direct_verts(const u32 *header, const u32 *vert_d
 
 void taitotz_renderer::flush_direct_poly_fifo()
 {
-	int fifo_idx = 4;
+	int fifo_idx = 0;
 	int num_verts = 0;
 	u32 vert_data[8*4] = {};
 	u32 header[4];
-	std::copy_n(m_direct_fifo, std::size(header), header);
+	bool in_packet = false;
 	while (fifo_idx < m_direct_fifo_ptr)
 	{
 		if ((m_direct_fifo[fifo_idx] >> 16) == 0xff80)
@@ -1470,8 +1474,9 @@ void taitotz_renderer::flush_direct_poly_fifo()
 			process_direct_verts(header, vert_data, num_verts);
 			num_verts = 0;
 			std::copy_n(m_direct_fifo + fifo_idx, std::size(header), header);
+			in_packet = true;
 		}
-		else
+		else if (in_packet)
 		{
 			std::copy_n(m_direct_fifo + fifo_idx, 4, &vert_data[num_verts * 4]);
 			num_verts++;
@@ -1488,6 +1493,7 @@ void taitotz_renderer::flush_direct_poly_fifo()
 
 void taitotz_renderer::push_direct_poly_fifo(u32 data)
 {
+	//m_state.machine().logerror("Direct: %08x\n", data);
 	m_direct_fifo[m_direct_fifo_ptr++] = data;
 	m_direct_fifo_block_count++;
 
@@ -1614,6 +1620,7 @@ u32 taitotz_state::video_reg_r(u32 reg)
 		if (reg == 0x10000105)      // Gets spammed a lot. Probably a status register.
 		{
 			m_reg105 ^= 0xffffffff;
+			LOGMASKED(LOG_VIDEO_CHIP_UNK_RD, "%s: video_reg_r: 0x10000105 read: %08x\n", machine().describe_context(), m_reg105);
 			return m_reg105;
 		}
 
@@ -1722,6 +1729,7 @@ u64 taitotz_state::video_chip_r(offs_t offset, u64 mem_mask)
 		{
 		case 0x14:
 			r |= 0xff;      // more busy flags? (value & 0x11ff == 0xff expected)
+			LOGMASKED(LOG_VIDEO_CHIP_UNK_RD, "%s: video_chip_r: 0x14 read: %08x%08x & %08x%08x\n", machine().describe_context(), (u32)(r >> 32), (u32)r, (u32)(mem_mask >> 32), (u32)mem_mask);
 			break;
 
 		default:
@@ -1740,6 +1748,7 @@ u64 taitotz_state::video_chip_r(offs_t offset, u64 mem_mask)
 
 		case 0x10:
 			r |= 0x000000ff00000000ULL;      // busy flags? landhigh expects this
+			LOGMASKED(LOG_VIDEO_CHIP_UNK_RD, "%s: video_chip_r: 0x10 read: %08x%08x & %08x%08x\n", machine().describe_context(), (u32)(r >> 32), (u32)r, (u32)(mem_mask >> 32), (u32)mem_mask);
 			break;
 
 		default:
