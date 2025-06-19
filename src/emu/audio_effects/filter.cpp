@@ -21,7 +21,7 @@ audio_effect_filter::audio_effect_filter(speaker_device *speaker, u32 sample_rat
 	// Minimal init to avoid using uninitialized values when reset_*
 	// recomputes filters
 	m_fl = m_fh = 1000;
-	m_ql = m_qh = 0.7;
+	m_ql = m_qh = DEFAULT_Q;
 
 	reset_all();
 }
@@ -54,7 +54,7 @@ void audio_effect_filter::reset_ql()
 {
 	audio_effect_filter *d = static_cast<audio_effect_filter *>(m_default);
 	m_isset_ql = false;
-	m_ql = d ? d->ql() : 0.7;
+	m_ql = d ? d->ql() : DEFAULT_Q;
 	build_lowpass();
 }
 
@@ -70,7 +70,7 @@ void audio_effect_filter::reset_qh()
 {
 	audio_effect_filter *d = static_cast<audio_effect_filter *>(m_default);
 	m_isset_qh = false;
-	m_qh = d ? d->qh() : 0.7;
+	m_qh = d ? d->qh() : DEFAULT_Q;
 	build_highpass();
 }
 

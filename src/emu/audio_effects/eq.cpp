@@ -21,7 +21,7 @@ audio_effect_eq::audio_effect_eq(speaker_device *speaker, u32 sample_rate, audio
 	// recomputes filters
 	for(u32 band = 0; band != BANDS; band++) {
 		m_f[band] = 1000;
-		m_q[band] = 0.7;
+		m_q[band] = DEFAULT_Q;
 		m_db[band] = 0;
 	}
 
@@ -50,7 +50,7 @@ void audio_effect_eq::reset_q(u32 band)
 {
 	audio_effect_eq *d = static_cast<audio_effect_eq *>(m_default);
 	m_isset_q[band] = false;
-	m_q[band] = d ? d->q(band) : 0.7;
+	m_q[band] = d ? d->q(band) : DEFAULT_Q;
 	build_filter(band);
 }
 
