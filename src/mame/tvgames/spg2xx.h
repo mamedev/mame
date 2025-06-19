@@ -464,6 +464,14 @@ public:
 
 	void smartcycle(machine_config &config);
 
+	u16 unknown_random_r()
+	{
+		if (!machine().side_effects_disabled())
+			return machine().rand();
+		else
+			return 0;
+	}
+
 private:
 	virtual void machine_start() override ATTR_COLD;
 

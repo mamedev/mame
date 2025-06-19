@@ -485,6 +485,31 @@ static INPUT_PORTS_START( spg2xx ) // base structure for easy debugging / figuri
 	PORT_DIPSETTING(      0x8000, "8000" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( smartcyc )
+	PORT_START("P1")
+	// lower bits are related to steering position?
+	PORT_BIT( 0x007f, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(spg2xx_game_smartcycle_state::unknown_random_r))
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) // needs to be held for test mode
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Top Left")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Top Right")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Bottom Left") // needs to be held for test mode
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Bottom Middle")
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Bottom Right") // needs to be held for test mode
+
+	PORT_START("P2")
+	// maybe unused
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(spg2xx_game_smartcycle_state::unknown_random_r))
+
+	PORT_START("P3")
+	// maybe unused
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(spg2xx_game_smartcycle_state::unknown_random_r))
+
+	// A / B in test mode coming from elsewhere?
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( lpetshop )
 	PORT_START("P1")
 	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -3144,4 +3169,4 @@ CONS( 2007, lpetshop,   0,        0, lpetshop,  lpetshop,  spg2xx_game_lpetshop_
 
 CONS( 2005, barbpet,    0,        0, spg2xx,    barbpet,   spg2xx_game_state,               empty_init, "Mattel",                                              "Barbie: I Love Pets - Pet Rescue", MACHINE_IMPERFECT_SOUND )
 
-CONS( 200?, smartcyc,   0,        0, smartcycle, spg2xx,   spg2xx_game_smartcycle_state,    empty_init, "Fisher Price",                                        "Smart Cycle", MACHINE_NOT_WORKING )
+CONS( 200?, smartcyc,   0,        0, smartcycle, smartcyc, spg2xx_game_smartcycle_state,    empty_init, "Fisher Price",                                        "Smart Cycle", MACHINE_NOT_WORKING )
