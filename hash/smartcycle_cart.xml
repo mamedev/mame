@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<softwarelist name="smartcycle_cart" description="Fisher Price Smart Cycle cartridges">
+
+	<software name="sc0308" supported="no">
+		<description>Discover the Dinosaurs (0308)</description>
+		<year>2006</year>
+		<publisher>Fisher Price</publisher>
+		<part name="cart" interface="smartcycle_cart">
+			<dataarea name="rom" size="0x800000"> <!-- no checksum in header -->
+				<rom name="0308.bin" size="0x800000" crc="110fac64" sha1="7a318b2757898a3d7db1d79dbd0b0aed29dc39c1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sc0608" supported="no">
+		<description>Learning Adventure (0608)</description>
+		<year>2006</year>
+		<publisher>Fisher Price</publisher>
+		<part name="cart" interface="smartcycle_cart">
+			<dataarea name="rom" size="0x800000"> <!-- checksum in header matches -->
+				<rom name="0608.bin" size="0x800000" crc="167b2069" sha1="af5056db116020fd3096794a6166f0f13184a5df"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sc1410" supported="no">
+		<description>Smart Cycle (1410)</description>
+		<year>2006</year>
+		<publisher>Fisher Price</publisher>
+		<part name="cart" interface="smartcycle_cart">
+			<dataarea name="rom" size="0x800000"> <!-- checksum in header matches -->
+				<rom name="1410.bin" size="0x800000" crc="01eccc39" sha1="33cf330c3523343ec857a779a22d498215cb2362"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sc2108" supported="no">
+		<description>Smart Cycle (2108)</description>
+		<year>2006</year>
+		<publisher>Fisher Price</publisher>
+		<part name="cart" interface="smartcycle_cart">
+			<dataarea name="rom" size="0x800000"> <!-- checksum in header matches -->
+				<rom name="2108.bin" size="0x800000" crc="050c1806" sha1="0ac208781ef2172a1a3c6a974825d5f80e3ef291"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
