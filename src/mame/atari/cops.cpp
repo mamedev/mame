@@ -23,6 +23,8 @@
 
     TODO: There are probably more ROMs for Revelations and related, the disc
     contains full data for a memory based quiz
+    Vision Quest currently requires a soft reset on the POWERING UP instruction to boot, we may be
+	missing something in the initialisation.
 
     BTANB for Revelations:
     Game options cannot be adjusted, any attempt to do so resets the machine (seen on real hardware)
@@ -842,6 +844,9 @@ ROM_START( visnqust )
 
 	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "visionquest", 0, BAD_DUMP SHA1(d5039c5390894faeb48098216e892e6fb4bb7ca2))  //one disc, no correction, old method
+
+	ROM_REGION( 0x2000, "nvram", 0 )
+	ROM_LOAD( "default_nvram", 0x0000, 0x2000, CRC(8a422121) SHA1 (3f05f7b4c8b9627fdf34cb25d3e1d2d587ae3b30) )
 ROM_END
 
 } // Anonymous namespace
