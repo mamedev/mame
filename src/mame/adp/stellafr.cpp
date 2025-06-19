@@ -100,6 +100,18 @@ Connectors:
 
 namespace {
 
+enum
+{
+	PORT_1_OP0  = 1 << 0,
+	PORT_1_OP1  = 1 << 1, 
+	PORT_1_OP2  = 1 << 2,
+	PORT_1_OP3  = 1 << 3,
+	PORT_1_OP4  = 1 << 4,
+	PORT_1_LED0 = 1 << 5,
+	PORT_1_LED1 = 1 << 6,
+	PORT_1_SPA  = 1 << 7,
+};
+
 class stellafr_state : public driver_device
 {
 public:
@@ -108,10 +120,14 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_duart(*this, "duart"),
 		m_nvram(*this, "nvram"),
-		m_digits(*this, "digit%u", 0U)
+		m_digits(*this, "digit%u", 0U),
+		m_leds(*this, "led_%u", 0U)
 	{ }
 
 	void stellafr(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void write_8000c1(uint8_t data);
@@ -128,8 +144,8 @@ private:
 	required_device<mc68681_device> m_duart;
 	required_device<nvram_device> m_nvram;
 	output_finder<8> m_digits;
+	output_finder<2> m_leds;
 };
-
 
 void stellafr_state::write_8000c1(uint8_t data)
 {
@@ -146,6 +162,12 @@ void stellafr_state::write_800101(uint8_t data)
 
 void stellafr_state::duart_output_w(uint8_t data)
 {
+	logerror("68C write: %02X \n", data);
+	logerror("LED0 write: %d \n", BIT(data, PORT_1_LED0));
+	logerror("LED1 write: %d \n", BIT(data, PORT_1_LED1));
+	logerror("SPA write: %d \n", BIT(data, PORT_1_SPA));
+	m_leds[0] = BIT(0x00, PORT_1_LED0);
+	m_leds[1] = BIT(0xFF, PORT_1_LED1);
 }
 
 void stellafr_state::ay8910_portb_w(uint8_t data)
@@ -170,6 +192,11 @@ void stellafr_state::fc7_map(address_map &map)
 	map(0xfffff5, 0xfffff5).r(m_duart, FUNC(mc68681_device::get_irq_vector));
 }
 
+void stellafr_state::machine_start()
+{
+	m_digits.resolve();
+	m_leds.resolve();
+}
 
 static INPUT_PORTS_START( stellafr )
 	PORT_START("IN0")
