@@ -388,7 +388,7 @@ void audio_effect_compressor::apply(const emu::detail::output_buffer_flat<sample
 			float slewed_signal = m_slewed_signal[channel];
 			if(input_db > slewed_signal)
 				slewed_signal = attack_coefficient * (slewed_signal - input_db) + input_db;
-			else
+			else if(m_release >= 0)
 				slewed_signal = release_coefficient * (slewed_signal - input_db) + input_db;
 
 			m_input_samples[channel] = input_db;
