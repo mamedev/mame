@@ -199,7 +199,7 @@ bool menu_audio_effects::handle(event const *ev)
 
 std::string menu_audio_effects::format_lat(double latency)
 {
-	return util::string_format("%3.1fms", 1000*latency);
+	return util::string_format("%3.1f ms", 1000 * latency);
 }
 
 std::string menu_audio_effects::format_u32(u32 val)

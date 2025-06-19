@@ -361,7 +361,7 @@ std::string menu_audio_effect_compressor::format_2dec(float val)
 
 std::string menu_audio_effect_compressor::format_db(float val)
 {
-	return util::string_format("%gdB", val);
+	return util::string_format("%g dB", val);
 }
 
 u32 menu_audio_effect_compressor::flag_mode() const

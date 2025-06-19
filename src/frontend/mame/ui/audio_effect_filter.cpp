@@ -310,12 +310,12 @@ bool menu_audio_effect_filter::handle(event const *ev)
 
 std::string menu_audio_effect_filter::format_fh(u32 f)
 {
-	return (f <= FH_MIN) ? _("DC removal") : util::string_format("%dHz", f);
+	return (f <= FH_MIN) ? _("DC removal") : util::string_format("%d Hz", f);
 }
 
 std::string menu_audio_effect_filter::format_fl(u32 f)
 {
-	return util::string_format("%dHz", f);
+	return util::string_format("%d Hz", f);
 }
 
 std::string menu_audio_effect_filter::format_q(float q)

@@ -439,22 +439,22 @@ std::string menu_audio_effect_reverb::format_percent(double val)
 
 std::string menu_audio_effect_reverb::format_freq(double val)
 {
-	return util::string_format("%dHz", u32(val+0.5));
+	return util::string_format("%d Hz", u32(val + 0.5));
 }
 
 std::string menu_audio_effect_reverb::format_ms(double val)
 {
-	return util::string_format("%5.1fms", val);
+	return util::string_format("%5.1f ms", val);
 }
 
 std::string menu_audio_effect_reverb::format_decay(double val)
 {
-	return util::string_format("%5.2fs", val);
+	return util::string_format("%5.2f s", val);
 }
 
 std::string menu_audio_effect_reverb::format_spin(double val)
 {
-	return util::string_format("%3.2fHz", val);
+	return util::string_format("%3.2f Hz", val);
 }
 
 u32 menu_audio_effect_reverb::flag_mode() const

@@ -306,7 +306,7 @@ bool menu_audio_effect_eq::handle(event const *ev)
 
 std::string menu_audio_effect_eq::format_f(u32 f)
 {
-	return util::string_format("%dHz", f);
+	return util::string_format("%d Hz", f);
 }
 
 std::string menu_audio_effect_eq::format_q(float q)
@@ -316,7 +316,7 @@ std::string menu_audio_effect_eq::format_q(float q)
 
 std::string menu_audio_effect_eq::format_db(float db)
 {
-	return util::string_format("%gdB", db);
+	return util::string_format("%g dB", db);
 }
 
 u32 menu_audio_effect_eq::flag_mode() const
