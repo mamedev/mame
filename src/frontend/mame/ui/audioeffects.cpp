@@ -86,7 +86,6 @@ bool menu_audio_effects::handle(event const *ev)
 		10, 20, 30, 40, 50, 75, 100, 200, 300, 400, 500, 1000, 0
 	};
 
-
 	if(!ev)
 		return false;
 
@@ -94,6 +93,8 @@ bool menu_audio_effects::handle(event const *ev)
 	case IPT_UI_SELECT: {
 		u16 chain = (uintptr_t(ev->itemref)) >> 16;
 		u16 entry = (uintptr_t(ev->itemref)) & 0xffff;
+		if(entry & 0xf000)
+			return false;
 		audio_effect *eff = chain == 0xffff ? machine().sound().default_effect_chain()[entry] : machine().sound().effect_chain(chain)[entry];
 		switch(eff->type()) {
 		case audio_effect::COMPRESSOR:
