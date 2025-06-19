@@ -35419,6 +35419,7 @@ dgun2573a
 dgunl3201
 dgunl3202
 fcpocket
+g9_666
 lxpcli
 lxpcsp
 matet100
@@ -35430,6 +35431,7 @@ rfcp168
 rminitv
 
 @source:nintendo/nes_vt369_vtunknown.cpp
+36pcase
 168pcase
 240in1ar
 bittboy
@@ -35454,12 +35456,15 @@ lxccplan
 lxcmc250
 lxcmcy
 lxcmcyba
+lxcmcybt
 lxcmcycr
 lxcmcydp
+lxcmcydpn
 lxcmcyfz
 lxcmcypj
 lxcmcypp
 lxcmcysp
+lxcmcyspn
 lxcmcysw
 lxcyber
 matet10
@@ -46575,16 +46580,17 @@ smartfps
 tkmag220
 
 @source:tvgames/generalplus_gpl16250_romram.cpp
-paccon
-lazertag
+jak_pf
+jak_prft
 jak_s500
 jak_sinv
 jak_smwm
-jak_pf
-jak_prft
+jak_swcl
+jak_ths
 jak_tink
 jak_totm
-jak_ths
+lazertag
+paccon
 tomycar
 wrlshunt
 
@@ -47122,6 +47128,7 @@ anpanmdx
 apmj2009
 ban_bkgj
 ban_dn1j
+ban_gkrj
 ban_kksj
 ban_ult
 ban_utmj

@@ -360,6 +360,9 @@ uint16_t jak_s500_game_state::porta_r()
 	uint16_t data = m_io[0]->read();
 	logerror("%s: Port A Read: %04x\n", machine().describe_context(), data);
 
+	// these are debug helpers to access the test modes while we don't have the
+	// secret codes / controls mapped properly
+
 	//address_space& mem = m_maincpu->space(AS_PROGRAM);
 
 	//if (mem.read_word(0x22b408) == 0x4846)
@@ -368,11 +371,14 @@ uint16_t jak_s500_game_state::porta_r()
 	//if (mem.read_word(0x236271) == 0x4846)
 	//  mem.write_word(0x236271, 0x4840);    // jak_totm force service mode
 
-	//if (mem.read_word(0x22D6F7) == 0x4846)
-	//  mem.write_word(0x22D6F7, 0x4840);    // jak_pf force service mode
+	//if (mem.read_word(0x22d6f7) == 0x4846)
+	//  mem.write_word(0x22d6f7, 0x4840);    // jak_pf force service mode
 
-	//if (mem.read_word(0x23E295) == 0x4846)
-	//  mem.write_word(0x23E295, 0x4840);    // jak_smwm force service mode
+	//if (mem.read_word(0x23e295) == 0x4846)
+	//  mem.write_word(0x23e295, 0x4840);    // jak_smwm force service mode
+
+	//if (mem.read_word(0x22e92e) == 0x4646)
+	//  mem.write_word(0x22e92e, 0x4640);    // jak_swcl force service mode
 
 	return data;
 }
@@ -480,6 +486,14 @@ ROM_START(jak_s500)
 
 	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP("spbwheel.bin", 0x000000, 0x800000, CRC(6ba1d335) SHA1(1bb3e4d02c7b35dd4d336971c6a9f82071cc6ce1) )
+ROM_END
+
+ROM_START(jak_swcl)
+	//ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 ) // not on this model? (or at least not this size, as CS base is different)
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP("jakksclonewars.bin", 0x000000, 0x800000, CRC(549bb326) SHA1(992a60321580a4e014801d401b3a7ee000d2b465) )
 ROM_END
 
 ROM_START(jak_smwm)
@@ -641,13 +655,17 @@ CONS(2012, paccon,   0, 0, gpl16250_romram, paccon, paccon_game_state, init_wrls
 
 CONS(2008, lazertag, 0, 0, gpl16250_romram, jak_s500, lazertag_game_state, init_wrlshunt, "Tiger Electronics", "Lazer Tag Video Game Module", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
-CONS(2009, jak_s500, 0, 0, gpl16250_romram, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "SpongeBob SquarePants Bikini Bottom 500 (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2009, jak_smwm, 0, 0, gpl16250_romram, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "Spider-Man Web Master (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2010, jak_pf,   0, 0, gpl16250_romram, jak_s500, jak_pf_game_state,   init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "Phineas and Ferb: Best Game Ever! (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // build date is 2009, but onscreen display is 2010
-CONS(200?, jak_totm, 0, 0, gpl16250_romram, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "Toy Story - Toys on the Move (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // Toys on the Move has ISSI 404A
+CONS(2009, jak_swcl, 0, 0, gpl16250_romram, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "Star Wars: The Clone Wars - Republic Squadron (JAKKS Pacific TV Motion Game) (May 6 2009 12:53:31)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2009, jak_s500, 0, 0, gpl16250_romram, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "SpongeBob SquarePants Bikini Bottom 500 (JAKKS Pacific TV Motion Game) (Apr 16 2009 15:11:17)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2009, jak_smwm, 0, 0, gpl16250_romram, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "Spider-Man Web Master (JAKKS Pacific TV Motion Game) (Apr 23 2009 17:10:04)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2010, jak_pf,   0, 0, gpl16250_romram, jak_s500, jak_pf_game_state,   init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "Phineas and Ferb: Best Game Ever! (JAKKS Pacific TV Motion Game) (Sep 16 2009 17:36:00)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // build date is 2009, but onscreen display is 2010
+CONS(2009, jak_totm, 0, 0, gpl16250_romram, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / HotGen Ltd",          "Toy Story - Toys on the Move (JAKKS Pacific TV Motion Game) (Dec 24 2009 17:34:29)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // Toys on the Move has ISSI 404A
+
 CONS(2009, jak_prft, 0, 0, gpl16250_romram, jak_s500, jak_prft_game_state, init_wrlshunt, "JAKKS Pacific Inc / Santa Cruz Games",    "Power Rangers Force In Time (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2009, jak_tink, 0, 0, gpl16250_romram, jak_s500, jak_prft_game_state, init_wrlshunt, "JAKKS Pacific Inc / Santa Cruz Games",    "Tinker Bell and the Lost Treasure (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
 CONS(2009, jak_ths,  0, 0, gpl16250_romram, jak_ths,  jak_s500_game_state, init_ths,      "JAKKS Pacific Inc / Super Happy Fun Fun", "Triple Header Sports (JAKKS Pacific TV Motion Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
 CONS(2011, jak_sinv, 0, 0, gpl16250_romram, jak_s500, jak_s500_game_state, init_wrlshunt, "JAKKS Pacific Inc / Code Mystics",        "Retro Arcade featuring Space Invaders (JAKKS Pacific TV Game)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 CONS(2011, wrlshunt, 0, 0, gpl16250_romram, wrlshunt, wrlshunt_game_state, init_wrlshunt, "Hamy / Kids Station Toys Inc", "Wireless Hunting Video Game System", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

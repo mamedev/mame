@@ -320,6 +320,21 @@ static INPUT_PORTS_START( ban_ult )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( ban_gkr )
+	PORT_INCLUDE(xavix)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::read_sda))
+
+	PORT_MODIFY("EX1")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(superxavix_i2c_bowl_state::unknown_random_r))
+
+	PORT_MODIFY("EX2")
+	PORT_DIPNAME( 0x80, 0x80, "Demo Mode" ) // bypasses calibration screen
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( xavixp )
 	PORT_INCLUDE(xavix)
 
@@ -624,6 +639,13 @@ void superxavix_i2c_state::superxavix_i2c_24c02(machine_config &config)
 	I2C_24C02(config, "i2cmem", 0);
 }
 
+void superxavix_i2c_state::superxavix_i2c_24c02_4mb(machine_config &config)
+{
+	superxavix_i2c_24c02(config);
+	m_maincpu->set_addrmap(6, &superxavix_i2c_state::xavix_4mb_extbus_map);
+}
+
+
 
 void superxavix_i2c_state::superxavix_i2c_mrangbat(machine_config &config)
 {
@@ -824,6 +846,11 @@ ROM_START( ban_ult )
 	ROM_LOAD("ultraman.u1", 0x000000, 0x800000,CRC(bc2a94fb) SHA1(4dc81089ac2afc1c9496a49ffd778213bb4a12bd) )
 ROM_END
 
+ROM_START( ban_gkrj )
+	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
+	ROM_LOAD("gkrj.u2", 0x000000, 0x400000, CRC(d9ffe41a) SHA1(18583e1b5d9eb89e0364bd84b14f89bbe9640b19) )
+ROM_END
+
 ROM_START( ban_bkgj )
 	ROM_REGION( 0x400000, "bios", ROMREGION_ERASE00)
 	ROM_LOAD("bkgj.u2", 0x000000, 0x400000, CRC(a59ce23c) SHA1(d2a6be9e46f3cfc3cf798bf1f76732eee909c93b) )
@@ -994,6 +1021,9 @@ CONS( 2006, ban_utmj, 0, 0, superxavix_i2c_24c02,    xavix_i2c,  superxavix_i2c_
 
 // Let's!TVプレイ なりきりファイト ウルトラマン 撃て！必殺光線！！
 CONS( 2006, ban_ult, 0, 0, superxavix_i2c_24c02,    ban_ult,  superxavix_i2c_bowl_state, init_no_timer, "Bandai / SSD Company LTD",  "Let's! TV Play Narikiri Fight Ultraman - Ute! Hissatsu Kousen!! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// Let’s!TVプレイ ゲキワザ習得 ゲキレンジャー スーパーゲキレンジャーへの道
+CONS( 2007, ban_gkrj, 0, 0, superxavix_i2c_24c02_4mb,    ban_gkr,  superxavix_i2c_bowl_state, init_no_timer, "Bandai / SSD Company LTD",  "Let's! TV Play Gekiwaza Shuutoku Gekiranger - Super Gekiranger-e no Michi (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // それいけトーマス ソドー島のなかまたち
 CONS( 2005, tmy_thom, 0, 0, superxavix_i2c_24c04,    xavix_i2c,  superxavix_i2c_state, init_xavix, "Tomy / SSD Company LTD",   "Soreike Thomas - Sodor Tou no Nakamatachi / Thomas & Friends on the Island of Sodor (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
