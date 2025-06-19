@@ -38,26 +38,26 @@ namespace {
 
 enum
 {
-	PORT_1_COL0 = 1 << 0,
-	PORT_1_COL1 = 1 << 1, 
-	PORT_1_COL2 = 1 << 2,
-	PORT_1_NC3  = 1 << 3,
-	PORT_1_ROW0 = 1 << 4,
-	PORT_1_ROW1 = 1 << 5,
-	PORT_1_ROW2 = 1 << 6,
-	PORT_1_NC7  = 1 << 7,
+	PORT_1_COL0,
+	PORT_1_COL1,
+	PORT_1_COL2,
+	PORT_1_NC3,
+	PORT_1_ROW0,
+	PORT_1_ROW1,
+	PORT_1_ROW2,
+	PORT_1_NC7
 };
 
 enum
 {
-	PORT_3_RXD  = 1 << 0,
-	PORT_3_TXD  = 1 << 1,
-	PORT_3_INT0 = 1 << 2,
-	PORT_3_INT1 = 1 << 3,
-	PORT_3_SDA  = 1 << 4,
-	PORT_3_SCL  = 1 << 5,
-	PORT_3_WR   = 1 << 6,
-	PORT_3_RD   = 1 << 7,
+	PORT_3_RXD,
+	PORT_3_TXD,
+	PORT_3_INT0,
+	PORT_3_INT1,
+	PORT_3_SDA,
+	PORT_3_SCL,
+	PORT_3_WR,
+	PORT_3_RD
 };
 
 class servicet_state : public driver_device
@@ -185,31 +185,21 @@ void servicet_state::port1_w(uint8_t data)
 uint8_t servicet_state::port3_r()
 {
 	uint8_t data = m_port3;
-	
-	// Read SDA line from I2C EEPROM
-	bool sda_state = m_i2cmem->read_sda();
-	if (sda_state)
-		data |= PORT_3_SDA;
-	else
-		data &= ~PORT_3_SDA;
+
+	uint8_t sda = m_i2cmem->read_sda();
+
+	// Clear bit 4 (SDA) and insert actual value from EEPROM
+	data = (data & ~(1 << PORT_3_SDA)) | (sda << PORT_3_SDA);
+
 	return data;
 }
 
 void servicet_state::port3_w(uint8_t data)
 {
-	uint8_t changed = m_port3 ^ data;
 	m_port3 = data;
-	
-	// Handle I2C signals to EEPROM
-	if (changed & (PORT_3_SDA | PORT_3_SCL))
-	{
-		bool scl = (data & PORT_3_SCL) != 0;
-		bool sda = (data & PORT_3_SDA) != 0;
-		
-		// Update I2C EEPROM signals
-		m_i2cmem->write_scl(scl);
-		m_i2cmem->write_sda(sda);
-	}
+
+	m_i2cmem->write_sda(BIT(data, PORT_3_SDA));
+	m_i2cmem->write_scl(BIT(data, PORT_3_SCL));
 }
 
 uint8_t servicet_state::bus_r(offs_t offset)
