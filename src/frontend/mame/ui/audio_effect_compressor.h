@@ -59,7 +59,6 @@ private:
 	static std::string format_2dec(float val);
 	static std::string format_db(float val);
 	u32 flag_mode() const;
-	u32 flag_release() const;
 	static u32 flag_lim(float value, float min, float max, bool isset);
 	static float max(float a, float b) { return a > b ? a : b; }
 	static float min(float a, float b) { return a < b ? a : b; }

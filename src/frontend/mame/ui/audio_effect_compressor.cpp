@@ -58,12 +58,7 @@ bool menu_audio_effect_compressor::handle(event const *ev)
 			return true;
 
 		case RELEASE:
-			if(alt_pressed)
-				m_effect->set_release(0);
-			else if(m_effect->release() < 0)
-				m_effect->set_release(3000);
-			else
-				m_effect->set_release(max(0, m_effect->release() - (ctrl_pressed ? 1000 : shift_pressed ? 10 : 100)));
+			m_effect->set_release(max(0, m_effect->release() - (alt_pressed ? 10000 : ctrl_pressed ? 1000 : shift_pressed ? 10 : 100)));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
 			reset(reset_options::REMEMBER_POSITION);
@@ -159,10 +154,7 @@ bool menu_audio_effect_compressor::handle(event const *ev)
 			return true;
 
 		case RELEASE:
-			if(alt_pressed || m_effect->release() == 3000)
-				m_effect->set_release(-1);
-			else if(m_effect->release() >= 0)
-				m_effect->set_release(min(3000, m_effect->release() + (ctrl_pressed ? 1000 : shift_pressed ? 10 : 100)));
+			m_effect->set_release(min(3000, m_effect->release() + (alt_pressed ? 10000 : ctrl_pressed ? 1000 : shift_pressed ? 10 : 100)));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
 			reset(reset_options::REMEMBER_POSITION);
@@ -373,18 +365,6 @@ u32 menu_audio_effect_compressor::flag_mode() const
 	return flag;
 }
 
-u32 menu_audio_effect_compressor::flag_release() const
-{
-	u32 flag = 0;
-	if(!m_effect->isset_release())
-		flag |= FLAG_INVERT;
-	if(m_effect->release() != 0)
-		flag |= FLAG_LEFT_ARROW;
-	if(m_effect->release() >= 0)
-		flag |= FLAG_RIGHT_ARROW;
-	return flag;
-}
-
 u32 menu_audio_effect_compressor::flag_lim(float value, float min, float max, bool isset)
 {
 	u32 flag = 0;
@@ -402,7 +382,7 @@ void menu_audio_effect_compressor::populate()
 	item_append(_(audio_effect::effect_names[audio_effect::COMPRESSOR]), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
 	item_append(_("Mode"), m_effect->mode() ? _("Active") : _("Bypass"), flag_mode(), (void *)MODE);
 	item_append(_("Attack"), format_nodec(m_effect->attack()), flag_lim(m_effect->attack(), 0, 300, m_effect->isset_attack()), (void *)ATTACK);
-	item_append(_("Release"), (m_effect->release() < 0) ? _("Infinite") : format_nodec(m_effect->release()), flag_release(), (void *)RELEASE);
+	item_append(_("Release"), format_nodec(m_effect->release()), flag_lim(m_effect->release(), 0, 3000, m_effect->isset_release()), (void *)RELEASE);
 	item_append(_("Ratio"), format_nodec(m_effect->ratio()), flag_lim(m_effect->ratio(), 1, 20, m_effect->isset_ratio()), (void *)RATIO);
 
 	item_append(_("Input gain"), format_db(m_effect->input_gain()), flag_lim(m_effect->input_gain(), -12, 24, m_effect->isset_input_gain()), (void *)INPUT_GAIN);
