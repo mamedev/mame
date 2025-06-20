@@ -113,8 +113,8 @@ float menu_audio_effect_filter::decrement_q(float q, bool alt_pressed, bool ctrl
 	if(alt_pressed)
 		return min;
 
-	int incval = ctrl_pressed ? -100 : shift_pressed ? -1 : -10;
-	q = (int(q * 100.0f + 0.5f) + incval) / 100.0f;
+	float incval = ctrl_pressed ? -1 : shift_pressed ? -0.01f : -0.1f;
+	q = roundf((q + incval) * 100.0f) / 100.0f;
 	return (q < min) ? min : q;
 }
 
@@ -124,8 +124,8 @@ float menu_audio_effect_filter::increment_q(float q, bool alt_pressed, bool ctrl
 	if(alt_pressed)
 		return max;
 
-	int incval = ctrl_pressed ? 100 : shift_pressed ? 1 : 10;
-	q = (int(q * 100.0f + 0.5f) + incval) / 100.0f;
+	float incval = ctrl_pressed ? 1 : shift_pressed ? 0.01f : 0.1f;
+	q = roundf((q + incval) * 100.0f) / 100.0f;
 	return (q > max) ? max : q;
 }
 
@@ -355,7 +355,7 @@ u32 menu_audio_effect_filter::flag_qh() const
 	u32 flag = 0;
 	if(!m_effect->isset_qh())
 		flag |= FLAG_INVERT;
-	u32 q = m_effect->qh() * 100.0f + 0.5f;
+	u32 q = roundf(m_effect->qh() * 100.0f);
 	if(q > 10)
 		flag |= FLAG_LEFT_ARROW;
 	if(q < 1000)
@@ -393,7 +393,7 @@ u32 menu_audio_effect_filter::flag_ql() const
 	u32 flag = 0;
 	if(!m_effect->isset_ql())
 		flag |= FLAG_INVERT;
-	u32 q = m_effect->ql() * 100.0f + 0.5f;
+	u32 q = roundf(m_effect->ql() * 100.0f);
 	if(q > 10)
 		flag |= FLAG_LEFT_ARROW;
 	if(q < 1000)

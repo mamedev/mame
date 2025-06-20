@@ -119,23 +119,23 @@ u32 menu_audio_effect_eq::increment_f(u32 band, bool alt_pressed, bool ctrl_pres
 
 float menu_audio_effect_eq::change_q(u32 band, bool inc, bool alt_pressed, bool ctrl_pressed, bool shift_pressed)
 {
-	int incval = alt_pressed ? 10000 : ctrl_pressed ? 100 : shift_pressed ? 1 : 10;
+	float incval = alt_pressed ? 10000 : ctrl_pressed ? 1 : shift_pressed ? 0.01f : 0.1f;
 	if(!inc)
 		incval = -incval;
 
 	float q = m_effect->q(band);
-	q = (int(q * 100.0f + 0.5f) + incval) / 100.0f;
+	q = roundf((q + incval) * 100.0f) / 100.0f;
 	return std::clamp(q, 0.1f, 10.0f);
 }
 
 float menu_audio_effect_eq::change_db(u32 band, bool inc, bool alt_pressed, bool ctrl_pressed, bool shift_pressed)
 {
-	int incval = alt_pressed ? 10000 : ctrl_pressed ? 60 : shift_pressed ? 1 : 10;
+	float incval = alt_pressed ? 10000 : ctrl_pressed ? 6 : shift_pressed ? 0.1f : 1;
 	if(!inc)
 		incval = -incval;
 
 	float db = m_effect->db(band);
-	db = (int(db * 10.0f + ((db < 0.0f) ? -0.5f : 0.5f)) + incval) / 10.0f;
+	db = roundf((db + incval) * 10.0f) / 10.0f;
 	return std::clamp(db, -12.0f, 12.0f);
 }
 
@@ -375,7 +375,7 @@ u32 menu_audio_effect_eq::flag_q(u32 band) const
 	u32 flag = 0;
 	if(!m_effect->isset_q(band))
 		flag |= FLAG_INVERT;
-	u32 q = m_effect->q(band) * 100.0f + 0.5f;
+	u32 q = roundf(m_effect->q(band) * 100.0f);
 	if(q > 10)
 		flag |= FLAG_LEFT_ARROW;
 	if(q < 1000)
@@ -388,7 +388,7 @@ u32 menu_audio_effect_eq::flag_db(u32 band) const
 	u32 flag = 0;
 	if(!m_effect->isset_db(band))
 		flag |= FLAG_INVERT;
-	s32 db = m_effect->db(band) * 10.0f + 0.5f;
+	s32 db = roundf(m_effect->db(band) * 10.0f);
 	if(db > -120)
 		flag |= FLAG_LEFT_ARROW;
 	if(db < 120)
