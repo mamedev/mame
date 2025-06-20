@@ -641,6 +641,11 @@ void mz2500_state::bank_data_w(u8 data)
 	m_bank_addr&=7;
 }
 
+void mz2500_state::bank_mode_w(u8 data)
+{
+	// TODO: controls memory banking for MZ-2000/MZ-80B compatibility
+}
+
 void mz2500_state::kanji_bank_w(u8 data)
 {
 	m_kanji_bank = data;
@@ -1234,7 +1239,7 @@ void mz2500_state::z80_io(address_map &map)
 {
 //  map(0x60, 0x63).mirror(0xff00).w(FUNC(mz2500_state::w3100a_w));
 //  map(0x63, 0x63).mirror(0xff00).r(FUNC(mz2500_state::w3100a_r));
-//  map(0x98, 0x99) ADPCM, unknown type, custom from expansion unit?
+//  map(0x98, 0x99) Y8950 ADPCM, from MZ-1E35 expansion unit
 	map(0xa0, 0xa3).mirror(0xff00).rw("z80sio", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
 //  map(0xa4, 0xa5).rw(FUNC(mz2500_state::sasi_r), FUNC(mz2500_state::sasi_w));
 	map(0xa8, 0xa8).select(0xff00).w(FUNC(mz2500_state::rom_w));
@@ -1245,7 +1250,7 @@ void mz2500_state::z80_io(address_map &map)
 //  map(0xb0, 0xb3).rw(FUNC(mz2500_state::sio_r), FUNC(mz2500_state::sio_w));
 	map(0xb4, 0xb4).mirror(0xff00).rw(FUNC(mz2500_state::bank_addr_r), FUNC(mz2500_state::bank_addr_w));
 	map(0xb5, 0xb5).mirror(0xff00).rw(FUNC(mz2500_state::bank_data_r), FUNC(mz2500_state::bank_data_w));
-	map(0xb7, 0xb7).mirror(0xff00).nopw();
+	map(0xb7, 0xb7).mirror(0xff00).w(FUNC(mz2500_state::bank_mode_w));
 	map(0xb8, 0xb9).mirror(0xff00).rw(FUNC(mz2500_state::kanji_r), FUNC(mz2500_state::kanji_w));
 	map(0xbc, 0xbc).mirror(0xff00).r(FUNC(mz2500_state::bplane_latch_r)).w(FUNC(mz2500_state::cg_addr_w));
 	map(0xbd, 0xbd).mirror(0xff00).r(FUNC(mz2500_state::rplane_latch_r)).w(FUNC(mz2500_state::cg_data_w));
@@ -1273,8 +1278,28 @@ void mz2500_state::z80_io(address_map &map)
 }
 
 
-// TODO: generalize in device (mostly same as other MZ machines)
+INPUT_CHANGED_MEMBER(mz2500_state::boot_reset_cb)
+{
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+}
+
+INPUT_CHANGED_MEMBER(mz2500_state::ipl_reset_cb)
+{
+	machine().schedule_soft_reset();
+}
+
+TIMER_CALLBACK_MEMBER(mz2500_state::ipl_timer_reset_cb)
+{
+	logerror("IPL reset kicked in\n");
+	machine().schedule_soft_reset();
+}
+
 static INPUT_PORTS_START( mz2500 )
+	PORT_START("FRONT_PANEL")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mz2500_state::boot_reset_cb), 0) PORT_NAME("Boot Reset")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mz2500_state::ipl_reset_cb), 0) PORT_NAME("IPL Reset")
+
+	// TODO: generalize keyboard in device (mostly same as other MZ machines)
 	PORT_START("KEY0")
 	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
 	PORT_BIT(0x02,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F2") PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2))
@@ -1481,32 +1506,27 @@ void mz2500_state::machine_start()
 	/* TODO: gfx[4] crashes as per now */
 	m_gfxdecode->set_gfx(3, std::make_unique<gfx_element>(m_palette, mz2500_pcg_layout_1bpp, m_pcg_ram.get(), 0, 0x10, 0));
 	m_gfxdecode->set_gfx(4, std::make_unique<gfx_element>(m_palette, mz2500_pcg_layout_3bpp, m_pcg_ram.get(), 0, 4, 0));
-}
 
-void mz2500_state::machine_reset()
-{
-	uint32_t i;
-
-	reset_banks(IPL_RESET);
-
-	//m_irq_vector[0] = 0xef; /* RST 28h - vblank */
+	std::fill(std::begin(m_cgram), std::end(m_cgram), 0x00);
+	std::fill(std::begin(m_irq_pending), std::end(m_irq_pending), 0);
+	std::fill(std::begin(m_irq_mask), std::end(m_irq_mask), 0);
 
 	m_text_col_size = 0;
 	m_text_font_reg = 0;
 
-	/* clear CG RAM */
-	for(i=0;i<0x20000;i++)
-		m_cgram[i] = 0x00;
-
-	/* disable IRQ */
-	for(i=0;i<4;i++)
-	{
-		m_irq_mask[i] = 0;
-		m_irq_pending[i] = 0;
-	}
 	m_kanji_bank = 0;
 
 	m_cg_clear_flag = 0;
+
+	m_ipl_reset_timer = timer_alloc(FUNC(mz2500_state::ipl_timer_reset_cb), this);
+}
+
+void mz2500_state::machine_reset()
+{
+	m_bank_addr = 0;
+	reset_banks(IPL_RESET);
+
+	m_ipl_reset_timer->adjust(attotime::never);
 
 	m_beeper->set_state(0);
 
@@ -1625,19 +1645,19 @@ void mz2500_state::ppi_portc_w(u8 data)
 	---- ---x screen mask
 	*/
 
-	/* work RAM reset */
-	if((m_old_portc & 0x02) == 0x00 && (data & 0x02))
+	if(BIT(m_old_portc, 3) != BIT(data, 3))
 	{
-		reset_banks(WRAM_RESET);
-		/* correct? */
-		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+		logerror("PIO PC: IPL reset %s\n", BIT(data, 3) ? "stopped" : "started");
+		// TODO: timing
+		m_ipl_reset_timer->adjust(!BIT(data, 3) ? attotime::from_hz(100) : attotime::never);
 	}
 
-	/* bit 2 is speaker */
-
-	/* IPL reset */
-	if((m_old_portc & 0x08) == 0x00 && (data & 0x08))
-		reset_banks(IPL_RESET);
+	if(!BIT(m_old_portc, 1) && BIT(data, 1))
+	{
+		logerror("PIO PC: Work RAM reset\n");
+		reset_banks(WRAM_RESET);
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+	}
 
 	m_old_portc = data;
 

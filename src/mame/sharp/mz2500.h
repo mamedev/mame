@@ -53,6 +53,9 @@ public:
 
 	void mz2500(machine_config &config);
 
+	DECLARE_INPUT_CHANGED_MEMBER(boot_reset_cb);
+	DECLARE_INPUT_CHANGED_MEMBER(ipl_reset_cb);
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -78,6 +81,8 @@ private:
 	u8 *m_dic_rom = nullptr;
 	u8 *m_phone_rom = nullptr;
 	u8 *m_iplpro_rom = nullptr;
+
+	emu_timer *m_ipl_reset_timer = nullptr;
 
 	u8 m_bank_val[8]{};
 	u8 m_bank_addr = 0;
@@ -129,6 +134,7 @@ private:
 	void bank_addr_w(u8 data);
 	u8 bank_data_r();
 	void bank_data_w(u8 data);
+	void bank_mode_w(u8 data);
 	void kanji_bank_w(u8 data);
 	void dictionary_bank_w(u8 data);
 	u8 crtc_hvblank_r();
@@ -160,6 +166,8 @@ private:
 	u8 kanji_pcg_r(offs_t offset);
 	void kanji_pcg_w(offs_t offset, u8 data);
 	u8 dict_rom_r(offs_t offset);
+
+	TIMER_CALLBACK_MEMBER(ipl_timer_reset_cb);
 
 	u8 cg_latch_compare();
 	virtual void machine_start() override ATTR_COLD;

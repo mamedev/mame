@@ -165,7 +165,6 @@ private:
 
 	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 
-
 	bitmap_ind16 m_text_bitmap;
 	bitmap_ind16 m_graphic_bitmap;
 };
@@ -681,6 +680,7 @@ void mz2000_state::ppi_portc_w(u8 data)
 	if(BIT(m_old_portc, 3) != BIT(data, 3))
 	{
 		logerror("PIO PC: IPL reset %s\n", BIT(data, 3) ? "stopped" : "started");
+		// TODO: timing
 		m_ipl_reset_timer->adjust(!BIT(data, 3) ? attotime::from_hz(100) : attotime::never);
 	}
 
