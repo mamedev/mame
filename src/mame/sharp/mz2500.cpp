@@ -4,7 +4,6 @@
 
 Sharp MZ-2500 (c) 1985 Sharp Corporation
 
-
 Computer box contains 2 floppy drives on the right, and a front-loading cassette player on the left.
 Keyboard is separate, and the key layout is very similar to the fm7.
 
@@ -13,8 +12,8 @@ TODO:
   (check Back to the Future);
 - Add remaining missing peripherals, SIO, HDD and w1300a network;
 - reverse / blanking tvram attributes;
-- FDC loading without the IPLPRO doesn't work at all, is it for MZ-2000/MZ-2200?
-- Implement backward compatibility with MZ-2000/MZ-2200;
+- Crashes with IPLPRO disabled, why?
+- Implement backward compatibility with MZ-2000/MZ-80B;
 - Implement expansion box unit;
 
 TODO per-game/program specific (move to mz2500_flop):
@@ -48,13 +47,13 @@ TODO per-game/program specific (move to mz2500_flop):
 #define WRAM_RESET 0
 #define IPL_RESET 1
 
-static constexpr uint8_t bank_reset_val[2][8] =
+static constexpr u8 bank_reset_val[2][8] =
 {
 	{ 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07 },
 	{ 0x34, 0x35, 0x36, 0x37, 0x04, 0x05, 0x06, 0x07 }
 };
 
-/* video stuff*/
+/* video stuff */
 
 void mz2500_state::video_start()
 {
@@ -73,7 +72,7 @@ void mz2500_state::video_start()
 */
 
 /* helper function, to draw stuff without getting crazy with height / width conditions :) */
-void mz2500_state::mz2500_draw_pixel(bitmap_ind16 &bitmap,int x,int y,uint16_t  pen,uint8_t width,uint8_t height)
+void mz2500_state::draw_pixel(bitmap_ind16 &bitmap,int x,int y,uint16_t  pen,u8 width,u8 height)
 {
 	if(width && height)
 	{
@@ -98,12 +97,12 @@ void mz2500_state::mz2500_draw_pixel(bitmap_ind16 &bitmap,int x,int y,uint16_t  
 
 void mz2500_state::draw_80x25(bitmap_ind16 &bitmap,const rectangle &cliprect,uint16_t map_addr)
 {
-	uint8_t *vram = m_tvram;
+	u8 *vram = m_tvram;
 	int x,y,count,xi,yi;
-	uint8_t *gfx_data;
-	uint8_t y_step;
-	uint8_t s_y;
-	uint8_t y_height;
+	u8 *gfx_data;
+	u8 y_step;
+	u8 s_y;
+	u8 y_height;
 
 	count = (map_addr & 0x7ff);
 
@@ -148,7 +147,7 @@ void mz2500_state::draw_80x25(bitmap_ind16 &bitmap,const rectangle &cliprect,uin
 			{
 				for(xi=0;xi<8;xi++)
 				{
-					uint8_t pen_bit[3],pen;
+					u8 pen_bit[3],pen;
 					int res_x,res_y;
 
 					res_x = x*8+xi;
@@ -174,7 +173,7 @@ void mz2500_state::draw_80x25(bitmap_ind16 &bitmap,const rectangle &cliprect,uin
 					if(pen)
 					{
 						if((res_y) >= 0 && (res_y) < 200*y_step)
-							mz2500_draw_pixel(bitmap,res_x,res_y,pen+(m_pal_select ? 0x00 : 0x10),0,0);
+							draw_pixel(bitmap,res_x,res_y,pen+(m_pal_select ? 0x00 : 0x10),0,0);
 					}
 				}
 			}
@@ -187,12 +186,12 @@ void mz2500_state::draw_80x25(bitmap_ind16 &bitmap,const rectangle &cliprect,uin
 
 void mz2500_state::draw_40x25(bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,uint16_t map_addr)
 {
-	uint8_t *vram = m_tvram;
+	u8 *vram = m_tvram;
 	int x,y,count,xi,yi;
-	uint8_t *gfx_data;
-	uint8_t y_step;
-	uint8_t s_y;
-	uint8_t y_height;
+	u8 *gfx_data;
+	u8 y_step;
+	u8 s_y;
+	u8 y_height;
 
 	count = (((plane * 0x400) + map_addr) & 0x7ff);
 
@@ -238,7 +237,7 @@ void mz2500_state::draw_40x25(bitmap_ind16 &bitmap,const rectangle &cliprect,int
 			{
 				for(xi=0;xi<8;xi++)
 				{
-					uint8_t pen_bit[3],pen;
+					u8 pen_bit[3],pen;
 					int res_x,res_y;
 
 					res_x = x*8+xi;
@@ -264,7 +263,7 @@ void mz2500_state::draw_40x25(bitmap_ind16 &bitmap,const rectangle &cliprect,int
 					if(pen)
 					{
 						if((res_y) >= 0 && (res_y) < 200*y_step)
-							mz2500_draw_pixel(bitmap,res_x,res_y,pen+(m_pal_select ? 0x00 : 0x10),m_scr_x_size == 640,0);
+							draw_pixel(bitmap,res_x,res_y,pen+(m_pal_select ? 0x00 : 0x10),m_scr_x_size == 640,0);
 					}
 				}
 			}
@@ -278,8 +277,8 @@ void mz2500_state::draw_40x25(bitmap_ind16 &bitmap,const rectangle &cliprect,int
 void mz2500_state::draw_cg4_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri)
 {
 	uint32_t count;
-	uint8_t *vram = m_cgram;
-	uint8_t pen,pen_bit[2];
+	u8 *vram = m_cgram;
+	u8 pen,pen_bit[2];
 	int x,y,xi,pen_i;
 	int res_x,res_y;
 
@@ -308,7 +307,7 @@ void mz2500_state::draw_cg4_screen(bitmap_ind16 &bitmap,const rectangle &cliprec
 
 				{
 					//if(pri == ((m_clut256[pen] & 0x100) >> 8))
-					mz2500_draw_pixel(bitmap,res_x,res_y,pen,0,0);
+					draw_pixel(bitmap,res_x,res_y,pen,0,0);
 				}
 			}
 			count++;
@@ -319,15 +318,15 @@ void mz2500_state::draw_cg4_screen(bitmap_ind16 &bitmap,const rectangle &cliprec
 void mz2500_state::draw_cg16_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,int x_size,int pri)
 {
 	uint32_t count;
-	uint8_t *vram = m_cgram; //TODO
-	uint8_t pen,pen_bit[4];
+	u8 *vram = m_cgram; //TODO
+	u8 pen,pen_bit[4];
 	int x,y,xi,pen_i;
 	uint32_t wa_reg;
-	uint8_t s_x;
-	uint8_t base_mask;
+	u8 s_x;
+	u8 base_mask;
 	int res_x,res_y;
-	uint8_t cg_interlace;
-	uint8_t pen_mask;
+	u8 cg_interlace;
+	u8 pen_mask;
 
 	base_mask = (x_size == 640) ? 0x3f : 0x1f;
 
@@ -363,7 +362,7 @@ void mz2500_state::draw_cg16_screen(bitmap_ind16 &bitmap,const rectangle &clipre
 					pen |= pen_bit[pen_i];
 
 				if(pri == ((m_clut16[pen] & 0x10) >> 4) && m_clut16[pen] != 0x00 && pen_mask) //correct?
-					mz2500_draw_pixel(bitmap,res_x,res_y,(m_clut16[pen] & 0x0f)+0x10,(x_size == 320 && m_scr_x_size == 640),cg_interlace == 2);
+					draw_pixel(bitmap,res_x,res_y,(m_clut16[pen] & 0x0f)+0x10,(x_size == 320 && m_scr_x_size == 640),cg_interlace == 2);
 			}
 			count++;
 			count&=((base_mask<<8) | 0xff);
@@ -376,14 +375,14 @@ void mz2500_state::draw_cg16_screen(bitmap_ind16 &bitmap,const rectangle &clipre
 void mz2500_state::draw_cg256_screen(bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,int pri)
 {
 	uint32_t count;
-	uint8_t *vram = m_cgram;
-	uint8_t pen,pen_bit[8];
+	u8 *vram = m_cgram;
+	u8 pen,pen_bit[8];
 	int x,y,xi,pen_i;
 	uint32_t wa_reg;
-	uint8_t s_x;
-	uint8_t base_mask;
+	u8 s_x;
+	u8 base_mask;
 	int res_x,res_y;
-	uint8_t cg_interlace;
+	u8 cg_interlace;
 
 	base_mask = 0x3f; //no x_size == 640
 
@@ -420,7 +419,7 @@ void mz2500_state::draw_cg256_screen(bitmap_ind16 &bitmap,const rectangle &clipr
 					pen |= pen_bit[pen_i];
 
 				if(pri == ((m_clut256[pen] & 0x100) >> 8))
-					mz2500_draw_pixel(bitmap,res_x,res_y,(m_clut256[pen] & 0xff)+0x100,m_scr_x_size == 640,cg_interlace == 2);
+					draw_pixel(bitmap,res_x,res_y,(m_clut256[pen] & 0xff)+0x100,m_scr_x_size == 640,cg_interlace == 2);
 			}
 			count++;
 			count&=((base_mask<<8) | 0xff);
@@ -501,7 +500,7 @@ void mz2500_state::draw_cg_screen(bitmap_ind16 &bitmap,const rectangle &cliprect
 	}
 }
 
-uint32_t mz2500_state::screen_update_mz2500(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mz2500_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->pen(0), cliprect); //TODO: correct?
 
@@ -518,7 +517,7 @@ uint32_t mz2500_state::screen_update_mz2500(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-void mz2500_state::mz2500_reconfigure_screen()
+void mz2500_state::crtc_reconfigure_screen()
 {
 	rectangle visarea;
 
@@ -564,7 +563,7 @@ void mz2500_state::mz2500_reconfigure_screen()
 			case 2: x_offs = 72; break;
 			case 3: x_offs = 88; break;
 		}
-		//printf("%d %d %d\n",x_offs,(m_text_reg[7] & 0x7f) * 8,(m_text_reg[8] & 0x7f)* 8);
+		//logerror("%d %d %d\n",x_offs,(m_text_reg[7] & 0x7f) * 8,(m_text_reg[8] & 0x7f)* 8);
 
 		y_offs = (m_monitor_type) ? 76 : 34;
 
@@ -587,11 +586,11 @@ void mz2500_state::mz2500_reconfigure_screen()
 	}
 }
 
-uint8_t mz2500_state::mz2500_cg_latch_compare()
+u8 mz2500_state::cg_latch_compare()
 {
-	uint8_t compare_val = m_cg_reg[0x07] & 0xf;
-	uint8_t pix_val;
-	uint8_t res;
+	u8 compare_val = m_cg_reg[0x07] & 0xf;
+	u8 pix_val;
+	u8 res;
 	uint16_t i;
 	res = 0;
 
@@ -605,20 +604,20 @@ uint8_t mz2500_state::mz2500_cg_latch_compare()
 	return res;
 }
 
-uint8_t mz2500_state::mz2500_bank_addr_r()
+u8 mz2500_state::bank_addr_r()
 {
 	return m_bank_addr;
 }
 
-void mz2500_state::mz2500_bank_addr_w(uint8_t data)
+void mz2500_state::bank_addr_w(u8 data)
 {
-//  printf("%02x\n",data);
+//  logerror("%02x\n",data);
 	m_bank_addr = data & 7;
 }
 
-uint8_t mz2500_state::mz2500_bank_data_r()
+u8 mz2500_state::bank_data_r()
 {
-	uint8_t res;
+	u8 res;
 
 	res = m_bank_val[m_bank_addr];
 
@@ -628,13 +627,13 @@ uint8_t mz2500_state::mz2500_bank_data_r()
 	return res;
 }
 
-void mz2500_state::mz2500_bank_data_w(uint8_t data)
+void mz2500_state::bank_data_w(u8 data)
 {
 	m_bank_val[m_bank_addr] = data & 0x3f;
 	m_rambank[m_bank_addr]->set_bank(m_bank_val[m_bank_addr]);
 
 //  if((data*2) >= 0x70)
-//  printf("%s %02x\n",bank_name[m_bank_addr],m_bank_val[m_bank_addr]*2);
+//  logerror("%s %02x\n",bank_name[m_bank_addr],m_bank_val[m_bank_addr]*2);
 
 //  membank(bank_name[m_bank_addr])->set_base(&m_main_ram[m_bank_val[m_bank_addr]*0x2000]);
 
@@ -642,20 +641,20 @@ void mz2500_state::mz2500_bank_data_w(uint8_t data)
 	m_bank_addr&=7;
 }
 
-void mz2500_state::mz2500_kanji_bank_w(uint8_t data)
+void mz2500_state::kanji_bank_w(u8 data)
 {
 	m_kanji_bank = data;
 }
 
-void mz2500_state::mz2500_dictionary_bank_w(uint8_t data)
+void mz2500_state::dictionary_bank_w(u8 data)
 {
 	m_dic_bank = data;
 }
 
 /* 0xf4 - 0xf7 all returns vblank / hblank states */
-uint8_t mz2500_state::mz2500_crtc_hvblank_r()
+u8 mz2500_state::crtc_hvblank_r()
 {
-	uint8_t vblank_bit, hblank_bit;
+	u8 vblank_bit, hblank_bit;
 
 	vblank_bit = m_screen->vblank() ? 0 : 1;
 	hblank_bit = m_screen->hblank() ? 0 : 2;
@@ -687,9 +686,9 @@ TVRAM / CRTC registers
 [0x0f] ---- x--- sets monitor type interlace / progressive
 */
 
-uint8_t mz2500_state::pal_256_param(int index, int param)
+u8 mz2500_state::pal_256_param(int index, int param)
 {
-	uint8_t val = 0;
+	u8 val = 0;
 
 	switch(param & 3)
 	{
@@ -702,7 +701,7 @@ uint8_t mz2500_state::pal_256_param(int index, int param)
 	return val;
 }
 
-void mz2500_state::mz2500_tv_crtc_w(offs_t offset, uint8_t data)
+void mz2500_state::tv_crtc_w(offs_t offset, u8 data)
 {
 	switch(offset)
 	{
@@ -711,7 +710,7 @@ void mz2500_state::mz2500_tv_crtc_w(offs_t offset, uint8_t data)
 			m_text_reg[m_text_reg_index] = data;
 
 			#if 0
-			//printf("[%02x] <- %02x\n",m_text_reg_index,data);
+			//logerror("[%02x] <- %02x\n",m_text_reg_index,data);
 			popmessage("(%02x %02x) (%02x %02x %02x %02x) (%02x %02x %02x) (%02x %02x %02x %02x)"
 			,m_text_reg[0] & ~0x1e,m_text_reg[3]
 			,m_text_reg[4],m_text_reg[5],m_text_reg[6],m_text_reg[7]
@@ -721,12 +720,12 @@ void mz2500_state::mz2500_tv_crtc_w(offs_t offset, uint8_t data)
 			#endif
 			//popmessage("%d %02x %d %02x %d %d",m_text_reg[3],m_text_reg[4],m_text_reg[5],m_text_reg[6],m_text_reg[7]*8,m_text_reg[8]*8);
 
-			mz2500_reconfigure_screen();
+			crtc_reconfigure_screen();
 
 			if(m_text_reg_index == 0x0a) // set 256 color palette
 			{
 				int i,r,g,b;
-				uint8_t b_param,r_param,g_param;
+				u8 b_param,r_param,g_param;
 
 				b_param = (data & 0x03) >> 0;
 				r_param = (data & 0x0c) >> 2;
@@ -759,7 +758,7 @@ void mz2500_state::mz2500_tv_crtc_w(offs_t offset, uint8_t data)
 				---- xxxx clut number
 				*/
 				m_clut16[m_text_reg_index & 0xf] = data & 0x1f;
-				//printf("%02x -> [%02x]\n",m_text_reg[m_text_reg_index],m_text_reg_index);
+				//logerror("%02x -> [%02x]\n",m_text_reg[m_text_reg_index],m_text_reg_index);
 
 				{
 					int i;
@@ -777,15 +776,15 @@ void mz2500_state::mz2500_tv_crtc_w(offs_t offset, uint8_t data)
 		case 3:
 			/* Font size reg */
 			m_text_font_reg = data & 1;
-			mz2500_reconfigure_screen();
+			crtc_reconfigure_screen();
 			break;
 	}
 }
 
-void mz2500_state::mz2500_irq_sel_w(uint8_t data)
+void mz2500_state::irq_sel_w(u8 data)
 {
 	m_irq_sel = data;
-	//printf("%02x\n",m_irq_sel);
+	//logerror("%02x\n",m_irq_sel);
 	// activeness is trusted, see Tower of Druaga
 	m_irq_mask[0] = (data & 0x08); //CRTC
 	m_irq_mask[1] = (data & 0x04); //i8253
@@ -793,7 +792,7 @@ void mz2500_state::mz2500_irq_sel_w(uint8_t data)
 	m_irq_mask[3] = (data & 0x01); //RP5c15
 }
 
-void mz2500_state::mz2500_irq_data_w(uint8_t data)
+void mz2500_state::irq_data_w(u8 data)
 {
 	if(m_irq_sel & 0x80)
 		m_irq_vector[0] = data; //CRTC
@@ -807,7 +806,7 @@ void mz2500_state::mz2500_irq_data_w(uint8_t data)
 //  popmessage("%02x %02x %02x %02x",m_irq_vector[0],m_irq_vector[1],m_irq_vector[2],m_irq_vector[3]);
 }
 
-void mz2500_state::floppy_select_w(uint8_t data)
+void mz2500_state::floppy_select_w(u8 data)
 {
 	m_selected_floppy = m_floppy[(data & 0x03) ^ m_fdc_reverse]->get_device();
 	m_fdc->set_floppy(m_selected_floppy);
@@ -816,30 +815,18 @@ void mz2500_state::floppy_select_w(uint8_t data)
 		m_selected_floppy->mon_w(!BIT(data, 7));
 }
 
-void mz2500_state::floppy_side_w(uint8_t data)
+void mz2500_state::floppy_side_w(u8 data)
 {
 	if (m_selected_floppy)
 		m_selected_floppy->ss_w(BIT(data, 0));
 }
 
-void mz2500_state::floppy_dden_w(uint8_t data)
+void mz2500_state::floppy_dden_w(u8 data)
 {
 	m_fdc->dden_w(BIT(data, 0));
 }
 
-void mz2500_state::mz2500_map(address_map &map)
-{
-	map(0x0000, 0x1fff).m(m_rambank[0], FUNC(address_map_bank_device::amap8));
-	map(0x2000, 0x3fff).m(m_rambank[1], FUNC(address_map_bank_device::amap8));
-	map(0x4000, 0x5fff).m(m_rambank[2], FUNC(address_map_bank_device::amap8));
-	map(0x6000, 0x7fff).m(m_rambank[3], FUNC(address_map_bank_device::amap8));
-	map(0x8000, 0x9fff).m(m_rambank[4], FUNC(address_map_bank_device::amap8));
-	map(0xa000, 0xbfff).m(m_rambank[5], FUNC(address_map_bank_device::amap8));
-	map(0xc000, 0xdfff).m(m_rambank[6], FUNC(address_map_bank_device::amap8));
-	map(0xe000, 0xffff).m(m_rambank[7], FUNC(address_map_bank_device::amap8));
-}
-
-uint8_t mz2500_state::rmw_r(offs_t offset)
+u8 mz2500_state::rmw_r(offs_t offset)
 {
 	// TODO: correct?
 	if(m_cg_reg[0x0e] == 0x3)
@@ -853,12 +840,12 @@ uint8_t mz2500_state::rmw_r(offs_t offset)
 	plane = m_cg_reg[0x07] & 3;
 
 	if(m_cg_reg[0x07] & 0x10)
-		return mz2500_cg_latch_compare();
+		return cg_latch_compare();
 
 	return m_cg_latch[plane];
 }
 
-void mz2500_state::rmw_w(offs_t offset, uint8_t data)
+void mz2500_state::rmw_w(offs_t offset, u8 data)
 {
 	// TODO: correct?
 	if(m_cg_reg[0x0e] == 0x3)
@@ -912,18 +899,20 @@ void mz2500_state::rmw_w(offs_t offset, uint8_t data)
 	}
 }
 
-uint8_t mz2500_state::kanji_pcg_r(offs_t offset)
+u8 mz2500_state::kanji_pcg_r(offs_t offset)
 {
-	if(m_kanji_bank & 0x80) //kanji ROM
+	// kanji ROM
+	if(m_kanji_bank & 0x80)
 		return m_kanji_rom[(offset & 0x7ff)+((m_kanji_bank & 0x7f)*0x800)];
 
-	//PCG RAM
+	// PCG RAM
 	return m_pcg_ram[offset];
 }
 
-void mz2500_state::kanji_pcg_w(offs_t offset, uint8_t data)
+void mz2500_state::kanji_pcg_w(offs_t offset, u8 data)
 {
-	if((m_kanji_bank & 0x80) == 0) ////PCG RAM
+	// PCG RAM
+	if((m_kanji_bank & 0x80) == 0)
 	{
 		m_pcg_ram[offset] = data;
 		if((offset & 0x1800) == 0x0000)
@@ -934,59 +923,35 @@ void mz2500_state::kanji_pcg_w(offs_t offset, uint8_t data)
 	// kanji ROM is read only
 }
 
-uint8_t mz2500_state::dict_rom_r(offs_t offset)
+u8 mz2500_state::dict_rom_r(offs_t offset)
 {
 	return m_dic_rom[(offset & 0x1fff) + ((m_dic_bank & 0x1f)*0x2000)];
 }
 
-/*
-    memory map:
-    0x00000-0x3ffff Work RAM
-    0x40000-0x5ffff CG RAM
-    0x60000-0x67fff "Read modify write" area (related to the CG RAM) (0x30-0x33)
-    0x68000-0x6ffff IPL ROM (0x34-0x37)
-    0x70000-0x71fff TVRAM (0x38)
-    0x72000-0x73fff Kanji ROM / PCG RAM (banked) (0x39)
-    0x74000-0x75fff Dictionary ROM (banked) (0x3a)
-    0x76000-0x77fff NOP (0x3b)
-    0x78000-0x7ffff Phone ROM (0x3c-0x3f)
-*/
-void mz2500_state::mz2500_bank_window_map(address_map &map)
+u8 mz2500_state::rom_r(offs_t offset)
 {
-	map(0x00000,0x3ffff).ram().share("wram");
-	map(0x40000,0x5ffff).ram().share("cgram");
-	map(0x60000,0x67fff).rw(FUNC(mz2500_state::rmw_r),FUNC(mz2500_state::rmw_w));
-	map(0x68000,0x6ffff).rom().region("ipl", 0);
-	map(0x70000,0x71fff).ram().share("tvram");
-	map(0x72000,0x73fff).rw(FUNC(mz2500_state::kanji_pcg_r),FUNC(mz2500_state::kanji_pcg_w));
-	map(0x74000,0x75fff).r(FUNC(mz2500_state::dict_rom_r));
-	map(0x78000,0x7ffff).rom().region("phone", 0);
-}
-
-uint8_t mz2500_state::mz2500_rom_r()
-{
-	m_lrom_index = (m_maincpu->state_int(Z80_B));
+	m_lrom_index = (offset >> 8) & 0xff;
 
 	m_rom_index = (m_rom_index & 0xffff00) | (m_lrom_index & 0xff);
 
 	return m_iplpro_rom[m_rom_index];
 }
 
-void mz2500_state::mz2500_rom_w(uint8_t data)
+void mz2500_state::rom_w(offs_t offset, u8 data)
 {
-	m_hrom_index = (m_maincpu->state_int(Z80_B));
+	m_hrom_index = (offset >> 8) & 0xff;
 
 	m_rom_index = (data << 8) | (m_rom_index & 0x0000ff) | ((m_hrom_index & 0xff)<<16);
-	//printf("%02x\n",data);
+	//logerror("%02x\n",data);
 }
 
 /* sets 16 color entries out of 4096 possible combinations */
-void mz2500_state::palette4096_io_w(uint8_t data)
+void mz2500_state::palette4096_io_w(offs_t offset, u8 data)
 {
-	uint8_t pal_index;
-	uint8_t pal_entry;
+	u8 pal_index;
+	u8 pal_entry;
 
-	pal_index = m_maincpu->state_int(Z80_B);
+	pal_index = (offset >> 8) & 0xff;
 	pal_entry = (pal_index & 0x1e) >> 1;
 
 	if(pal_index & 1)
@@ -1000,20 +965,20 @@ void mz2500_state::palette4096_io_w(uint8_t data)
 	m_palette->set_pen_color(pal_entry+0x10, pal4bit(m_pal[pal_entry].r), pal4bit(m_pal[pal_entry].g), pal4bit(m_pal[pal_entry].b));
 }
 
-uint8_t mz2500_state::mz2500_bplane_latch_r()
+u8 mz2500_state::bplane_latch_r()
 {
 	if(m_cg_reg[7] & 0x10)
-		return mz2500_cg_latch_compare();
+		return cg_latch_compare();
 	else
 		return m_cg_latch[0];
 }
 
 
-uint8_t mz2500_state::mz2500_rplane_latch_r()
+u8 mz2500_state::rplane_latch_r()
 {
 	if(m_cg_reg[0x07] & 0x10)
 	{
-		uint8_t vblank_bit;
+		u8 vblank_bit;
 
 		vblank_bit = m_screen->vblank() ? 0 : 0x80 | m_cg_clear_flag;
 
@@ -1023,12 +988,12 @@ uint8_t mz2500_state::mz2500_rplane_latch_r()
 		return m_cg_latch[1];
 }
 
-uint8_t mz2500_state::mz2500_gplane_latch_r()
+u8 mz2500_state::gplane_latch_r()
 {
 	return m_cg_latch[2];
 }
 
-uint8_t mz2500_state::mz2500_iplane_latch_r()
+u8 mz2500_state::iplane_latch_r()
 {
 	return m_cg_latch[3];
 }
@@ -1063,12 +1028,12 @@ uint8_t mz2500_state::mz2500_iplane_latch_r()
 0x18: CG color masking
 */
 
-void mz2500_state::mz2500_cg_addr_w(uint8_t data)
+void mz2500_state::cg_addr_w(u8 data)
 {
 	m_cg_reg_index = data;
 }
 
-void mz2500_state::mz2500_cg_data_w(uint8_t data)
+void mz2500_state::cg_data_w(u8 data)
 {
 	m_cg_reg[m_cg_reg_index & 0x1f] = data;
 
@@ -1081,7 +1046,7 @@ void mz2500_state::mz2500_cg_data_w(uint8_t data)
 	if((m_cg_reg_index & 0x1f) == 0x05 && (m_cg_reg[0x05] & 0xc0) == 0x80) //clear bitmap buffer
 	{
 		uint32_t i;
-		uint8_t *vram = m_cgram;
+		u8 *vram = m_cgram;
 		uint32_t layer_bank;
 
 		layer_bank = (m_cg_reg[0x0e] & 0x80) ? 0x10000 : 0x00000;
@@ -1111,14 +1076,14 @@ void mz2500_state::mz2500_cg_data_w(uint8_t data)
 	}
 
 	{
-		mz2500_reconfigure_screen();
+		crtc_reconfigure_screen();
 	}
 
 	if(m_cg_reg_index & 0x80) //enable auto-inc
 		m_cg_reg_index = (m_cg_reg_index & 0xfc) | ((m_cg_reg_index + 1) & 0x03);
 }
 
-void mz2500_state::timer_w(uint8_t data)
+void mz2500_state::timer_w(u8 data)
 {
 	m_pit->write_gate0(1);
 	m_pit->write_gate1(1);
@@ -1129,9 +1094,9 @@ void mz2500_state::timer_w(uint8_t data)
 }
 
 
-uint8_t mz2500_state::mz2500_joystick_r()
+u8 mz2500_state::joystick_r()
 {
-	uint8_t res,dir_en,in_r;
+	u8 res,dir_en,in_r;
 
 	res = 0xff;
 	in_r = ~m_joy[BIT(m_joy_mode, 6)]->read();
@@ -1157,7 +1122,7 @@ uint8_t mz2500_state::mz2500_joystick_r()
 	return res;
 }
 
-void mz2500_state::mz2500_joystick_w(uint8_t data)
+void mz2500_state::joystick_w(u8 data)
 {
 	m_joy_mode = data;
 	m_joy[0]->pin_6_w(BIT(data, 0));
@@ -1169,38 +1134,38 @@ void mz2500_state::mz2500_joystick_w(uint8_t data)
 }
 
 
-uint8_t mz2500_state::mz2500_kanji_r(offs_t offset)
+u8 mz2500_state::kanji_r(offs_t offset)
 {
-	printf("Read from kanji 2 ROM\n");
+	logerror("Read from kanji 2 ROM\n");
 
 	return m_kanji2_rom[(m_kanji_index << 1) | (offset & 1)];
 }
 
-void mz2500_state::mz2500_kanji_w(offs_t offset, uint8_t data)
+void mz2500_state::kanji_w(offs_t offset, u8 data)
 {
 	(offset & 1) ? (m_kanji_index = (data << 8) | (m_kanji_index & 0xff)) : (m_kanji_index = (data & 0xff) | (m_kanji_index & 0xff00));
 }
 
-uint8_t mz2500_state::rp5c15_8_r()
+u8 mz2500_state::rp5c15_8_r(offs_t offset)
 {
-	uint8_t rtc_index = (m_maincpu->state_int(Z80_B));
+	u8 rtc_index = (offset >> 8) & 0xff;
 
 	return m_rtc->read(rtc_index);
 }
 
-void mz2500_state::rp5c15_8_w(uint8_t data)
+void mz2500_state::rp5c15_8_w(offs_t offset, u8 data)
 {
-	uint8_t rtc_index = (m_maincpu->state_int(Z80_B));
+	u8 rtc_index = (offset >> 8) & 0xff;
 
 	m_rtc->write(rtc_index, data);
 }
 
 
-uint8_t mz2500_state::mz2500_emm_data_r()
+u8 mz2500_state::emm_data_r(offs_t offset)
 {
-	uint8_t emm_lo_index;
+	u8 emm_lo_index;
 
-	emm_lo_index = (m_maincpu->state_int(Z80_B));
+	emm_lo_index = (offset >> 8) & 0xff;
 
 	m_emm_offset = (m_emm_offset & 0xffff00) | (emm_lo_index & 0xff);
 
@@ -1210,20 +1175,20 @@ uint8_t mz2500_state::mz2500_emm_data_r()
 	return 0xff;
 }
 
-void mz2500_state::mz2500_emm_addr_w(uint8_t data)
+void mz2500_state::emm_address_w(offs_t offset, u8 data)
 {
-	uint8_t emm_hi_index;
+	u8 emm_hi_index;
 
-	emm_hi_index = (m_maincpu->state_int(Z80_B));
+	emm_hi_index = (offset >> 8) & 0xff;
 
 	m_emm_offset = ((emm_hi_index & 0xff) << 16) | ((data & 0xff) << 8) | (m_emm_offset & 0xff);
 }
 
-void mz2500_state::mz2500_emm_data_w(uint8_t data)
+void mz2500_state::emm_data_w(offs_t offset, u8 data)
 {
-	uint8_t emm_lo_index;
+	u8 emm_lo_index;
 
-	emm_lo_index = (m_maincpu->state_int(Z80_B));
+	emm_lo_index = (offset >> 8) & 0xff;
 
 	m_emm_offset = (m_emm_offset & 0xffff00) | (emm_lo_index & 0xff);
 
@@ -1231,49 +1196,84 @@ void mz2500_state::mz2500_emm_data_w(uint8_t data)
 		m_emm_ram[m_emm_offset] = data;
 }
 
-void mz2500_state::mz2500_io(address_map &map)
+void mz2500_state::z80_map(address_map &map)
 {
-	map.global_mask(0xff);
-//  map(0x60, 0x63).w(FUNC(mz2500_state::w3100a_w));
-//  map(0x63, 0x63).r(FUNC(mz2500_state::w3100a_r));
-//  map(0x98, 0x99) ADPCM, unknown type, custom?
-	map(0xa0, 0xa3).rw("z80sio", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
-//  map(0xa4, 0xa5).rw(FUNC(mz2500_state::sasi_r), FUNC(mz2500_state::sasi_w));
-	map(0xa8, 0xa8).w(FUNC(mz2500_state::mz2500_rom_w));
-	map(0xa9, 0xa9).r(FUNC(mz2500_state::mz2500_rom_r));
-	map(0xac, 0xac).w(FUNC(mz2500_state::mz2500_emm_addr_w));
-	map(0xad, 0xad).r(FUNC(mz2500_state::mz2500_emm_data_r)).w(FUNC(mz2500_state::mz2500_emm_data_w));
-	map(0xae, 0xae).w(FUNC(mz2500_state::palette4096_io_w));
-//  map(0xb0, 0xb3).rw(FUNC(mz2500_state::sio_r), FUNC(mz2500_state::sio_w));
-	map(0xb4, 0xb4).rw(FUNC(mz2500_state::mz2500_bank_addr_r), FUNC(mz2500_state::mz2500_bank_addr_w));
-	map(0xb5, 0xb5).rw(FUNC(mz2500_state::mz2500_bank_data_r), FUNC(mz2500_state::mz2500_bank_data_w));
-	map(0xb7, 0xb7).nopw();
-	map(0xb8, 0xb9).rw(FUNC(mz2500_state::mz2500_kanji_r), FUNC(mz2500_state::mz2500_kanji_w));
-	map(0xbc, 0xbc).r(FUNC(mz2500_state::mz2500_bplane_latch_r)).w(FUNC(mz2500_state::mz2500_cg_addr_w));
-	map(0xbd, 0xbd).r(FUNC(mz2500_state::mz2500_rplane_latch_r)).w(FUNC(mz2500_state::mz2500_cg_data_w));
-	map(0xbe, 0xbe).r(FUNC(mz2500_state::mz2500_gplane_latch_r));
-	map(0xbf, 0xbf).r(FUNC(mz2500_state::mz2500_iplane_latch_r));
-	map(0xc6, 0xc6).w(FUNC(mz2500_state::mz2500_irq_sel_w));
-	map(0xc7, 0xc7).w(FUNC(mz2500_state::mz2500_irq_data_w));
-	map(0xc8, 0xc9).rw("ym", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
-//  map(0xca, 0xca).rw(FUNC(mz2500_state::voice_r), FUNC(mz2500_state::voice_w));
-	map(0xcc, 0xcc).rw(FUNC(mz2500_state::rp5c15_8_r), FUNC(mz2500_state::rp5c15_8_w));
-	map(0xce, 0xce).w(FUNC(mz2500_state::mz2500_dictionary_bank_w));
-	map(0xcf, 0xcf).w(FUNC(mz2500_state::mz2500_kanji_bank_w));
-	map(0xd8, 0xdb).rw(m_fdc, FUNC(mb8876_device::read), FUNC(mb8876_device::write));
-	map(0xdc, 0xdc).w(FUNC(mz2500_state::floppy_select_w));
-	map(0xdd, 0xdd).w(FUNC(mz2500_state::floppy_side_w));
-	map(0xde, 0xde).w(FUNC(mz2500_state::floppy_dden_w));
-	map(0xe0, 0xe3).rw("i8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0xe4, 0xe7).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0xe8, 0xeb).rw("z80pio_1", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
-	map(0xef, 0xef).rw(FUNC(mz2500_state::mz2500_joystick_r), FUNC(mz2500_state::mz2500_joystick_w));
-	map(0xf0, 0xf3).w(FUNC(mz2500_state::timer_w));
-	map(0xf4, 0xf7).r(FUNC(mz2500_state::mz2500_crtc_hvblank_r)).w(FUNC(mz2500_state::mz2500_tv_crtc_w));
-//  map(0xf8, 0xf9).rw(FUNC(mz2500_state::extrom_r), FUNC(mz2500_state::extrom_w));
+	map(0x0000, 0x1fff).m(m_rambank[0], FUNC(address_map_bank_device::amap8));
+	map(0x2000, 0x3fff).m(m_rambank[1], FUNC(address_map_bank_device::amap8));
+	map(0x4000, 0x5fff).m(m_rambank[2], FUNC(address_map_bank_device::amap8));
+	map(0x6000, 0x7fff).m(m_rambank[3], FUNC(address_map_bank_device::amap8));
+	map(0x8000, 0x9fff).m(m_rambank[4], FUNC(address_map_bank_device::amap8));
+	map(0xa000, 0xbfff).m(m_rambank[5], FUNC(address_map_bank_device::amap8));
+	map(0xc000, 0xdfff).m(m_rambank[6], FUNC(address_map_bank_device::amap8));
+	map(0xe000, 0xffff).m(m_rambank[7], FUNC(address_map_bank_device::amap8));
 }
 
-/* Input ports */
+void mz2500_state::bank_window_map(address_map &map)
+{
+	// 0x00-0x1f
+	map(0x00000, 0x3ffff).ram().share("wram");
+	// 0x20-0x2f
+	map(0x40000, 0x5ffff).ram().share("cgram");
+	// 0x30-0x33
+	map(0x60000, 0x67fff).rw(FUNC(mz2500_state::rmw_r),FUNC(mz2500_state::rmw_w));
+	// 0x34-0x37
+	map(0x68000, 0x6ffff).rom().region("ipl", 0);
+	// 0x38
+	map(0x70000, 0x71fff).ram().share("tvram");
+	// 0x39
+	map(0x72000, 0x73fff).rw(FUNC(mz2500_state::kanji_pcg_r),FUNC(mz2500_state::kanji_pcg_w));
+	// 0x3a
+	map(0x74000, 0x75fff).r(FUNC(mz2500_state::dict_rom_r));
+	// 0x3b
+//	map(0x76000, 0x77fff).noprw();
+	// 0x3c-0x3f
+	map(0x78000, 0x7ffff).rom().region("phone", 0);
+}
+
+void mz2500_state::z80_io(address_map &map)
+{
+//  map(0x60, 0x63).mirror(0xff00).w(FUNC(mz2500_state::w3100a_w));
+//  map(0x63, 0x63).mirror(0xff00).r(FUNC(mz2500_state::w3100a_r));
+//  map(0x98, 0x99) ADPCM, unknown type, custom from expansion unit?
+	map(0xa0, 0xa3).mirror(0xff00).rw("z80sio", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
+//  map(0xa4, 0xa5).rw(FUNC(mz2500_state::sasi_r), FUNC(mz2500_state::sasi_w));
+	map(0xa8, 0xa8).select(0xff00).w(FUNC(mz2500_state::rom_w));
+	map(0xa9, 0xa9).select(0xff00).r(FUNC(mz2500_state::rom_r));
+	map(0xac, 0xac).select(0xff00).w(FUNC(mz2500_state::emm_address_w));
+	map(0xad, 0xad).select(0xff00).r(FUNC(mz2500_state::emm_data_r)).w(FUNC(mz2500_state::emm_data_w));
+	map(0xae, 0xae).select(0xff00).w(FUNC(mz2500_state::palette4096_io_w));
+//  map(0xb0, 0xb3).rw(FUNC(mz2500_state::sio_r), FUNC(mz2500_state::sio_w));
+	map(0xb4, 0xb4).mirror(0xff00).rw(FUNC(mz2500_state::bank_addr_r), FUNC(mz2500_state::bank_addr_w));
+	map(0xb5, 0xb5).mirror(0xff00).rw(FUNC(mz2500_state::bank_data_r), FUNC(mz2500_state::bank_data_w));
+	map(0xb7, 0xb7).mirror(0xff00).nopw();
+	map(0xb8, 0xb9).mirror(0xff00).rw(FUNC(mz2500_state::kanji_r), FUNC(mz2500_state::kanji_w));
+	map(0xbc, 0xbc).mirror(0xff00).r(FUNC(mz2500_state::bplane_latch_r)).w(FUNC(mz2500_state::cg_addr_w));
+	map(0xbd, 0xbd).mirror(0xff00).r(FUNC(mz2500_state::rplane_latch_r)).w(FUNC(mz2500_state::cg_data_w));
+	map(0xbe, 0xbe).mirror(0xff00).r(FUNC(mz2500_state::gplane_latch_r));
+	map(0xbf, 0xbf).mirror(0xff00).r(FUNC(mz2500_state::iplane_latch_r));
+	map(0xc6, 0xc6).mirror(0xff00).w(FUNC(mz2500_state::irq_sel_w));
+	map(0xc7, 0xc7).mirror(0xff00).w(FUNC(mz2500_state::irq_data_w));
+	map(0xc8, 0xc9).mirror(0xff00).rw("ym", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
+//  map(0xca, 0xca).mirror(0xff00).rw(FUNC(mz2500_state::voice_r), FUNC(mz2500_state::voice_w));
+	map(0xcc, 0xcc).select(0xff00).rw(FUNC(mz2500_state::rp5c15_8_r), FUNC(mz2500_state::rp5c15_8_w));
+	map(0xce, 0xce).mirror(0xff00).w(FUNC(mz2500_state::dictionary_bank_w));
+	map(0xcf, 0xcf).mirror(0xff00).w(FUNC(mz2500_state::kanji_bank_w));
+	map(0xd8, 0xdb).mirror(0xff00).rw(m_fdc, FUNC(mb8876_device::read), FUNC(mb8876_device::write));
+	map(0xdc, 0xdc).mirror(0xff00).w(FUNC(mz2500_state::floppy_select_w));
+	map(0xdd, 0xdd).mirror(0xff00).w(FUNC(mz2500_state::floppy_side_w));
+	map(0xde, 0xde).mirror(0xff00).w(FUNC(mz2500_state::floppy_dden_w));
+	map(0xe0, 0xe3).mirror(0xff00).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0xe4, 0xe7).mirror(0xff00).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0xe8, 0xeb).mirror(0xff00).rw("pio", FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
+	map(0xef, 0xef).mirror(0xff00).rw(FUNC(mz2500_state::joystick_r), FUNC(mz2500_state::joystick_w));
+	map(0xf0, 0xf3).mirror(0xff00).w(FUNC(mz2500_state::timer_w));
+	map(0xf4, 0xf7).mirror(0xff00).r(FUNC(mz2500_state::crtc_hvblank_r)).w(FUNC(mz2500_state::tv_crtc_w));
+//  map(0xf8, 0xf9).?(0xff00).rw(FUNC(mz2500_state::extrom_r), FUNC(mz2500_state::extrom_w));
+//	map(0xfe, 0xff).mirror(0xff00) printer
+}
+
+
+// TODO: generalize in device (mostly same as other MZ machines)
 static INPUT_PORTS_START( mz2500 )
 	PORT_START("KEY0")
 	PORT_BIT(0x01,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
@@ -1431,7 +1431,7 @@ static INPUT_PORTS_START( mz2500 )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-void mz2500_state::reset_banks(uint8_t type)
+void mz2500_state::reset_banks(u8 type)
 {
 	int i;
 
@@ -1466,11 +1466,11 @@ static const gfx_layout mz2500_pcg_layout_3bpp =
 
 void mz2500_state::machine_start()
 {
-	m_pcg_ram = make_unique_clear<uint8_t[]>(0x2000);
+	m_pcg_ram = make_unique_clear<u8[]>(0x2000);
 	m_ipl_rom = memregion("ipl")->base();
 	m_kanji_rom = memregion("kanji")->base();
 	m_kanji2_rom = memregion("kanji2")->base();
-	m_emm_ram = make_unique_clear<uint8_t[]>(0x100000);
+	m_emm_ram = make_unique_clear<u8[]>(0x100000);
 	m_dic_rom = memregion("dictionary")->base();
 	m_phone_rom = memregion("phone")->base();
 	m_iplpro_rom = memregion("iplpro")->base();
@@ -1512,7 +1512,7 @@ void mz2500_state::machine_reset()
 
 //  m_monitor_type = ioport("DSW1")->read() & 0x40 ? 1 : 0;
 
-	mz2500_joystick_w(0x3f); // LS273 reset
+	joystick_w(0x3f); // LS273 reset
 }
 
 static const gfx_layout mz2500_cg_layout =
@@ -1558,7 +1558,7 @@ static GFXDECODE_START( gfx_mz2500 )
 //  GFXDECODE_ENTRY("pcg", 0, mz2500_pcg_layout_3bpp, 0, 4)
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(mz2500_state::mz2500_vbl)
+INTERRUPT_GEN_MEMBER(mz2500_state::vblank_cb)
 {
 	if(m_irq_mask[0])
 	{
@@ -1568,7 +1568,7 @@ INTERRUPT_GEN_MEMBER(mz2500_state::mz2500_vbl)
 	m_cg_clear_flag = 0;
 }
 
-IRQ_CALLBACK_MEMBER(mz2500_state::mz2500_irq_ack)
+IRQ_CALLBACK_MEMBER(mz2500_state::irq_ack_cb)
 {
 	int i;
 	for(i=0;i<4;i++)
@@ -1583,40 +1583,40 @@ IRQ_CALLBACK_MEMBER(mz2500_state::mz2500_irq_ack)
 	return 0;
 }
 
-uint8_t mz2500_state::mz2500_porta_r()
+u8 mz2500_state::ppi_porta_r()
 {
 	logerror("PPI PORTA R\n");
 
 	return 0xff;
 }
 
-uint8_t mz2500_state::mz2500_portb_r()
+u8 mz2500_state::ppi_portb_r()
 {
-	uint8_t vblank_bit;
+	u8 vblank_bit;
 
 	vblank_bit = m_screen->vblank() ? 0 : 1; //Guess: NOBO wants this bit to be high/low
 
 	return 0xfe | vblank_bit;
 }
 
-uint8_t mz2500_state::mz2500_portc_r()
+u8 mz2500_state::ppi_portc_r()
 {
 	logerror("PPI PORTC R\n");
 
 	return 0xff;
 }
 
-void mz2500_state::mz2500_porta_w(uint8_t data)
+void mz2500_state::ppi_porta_w(u8 data)
 {
 	logerror("PPI PORTA W %02x\n",data);
 }
 
-void mz2500_state::mz2500_portb_w(uint8_t data)
+void mz2500_state::ppi_portb_w(u8 data)
 {
 	logerror("PPI PORTB W %02x\n",data);
 }
 
-void mz2500_state::mz2500_portc_w(uint8_t data)
+void mz2500_state::ppi_portc_w(u8 data)
 {
 	/*
 	---- x--- 0->1 transition = IPL reset
@@ -1649,21 +1649,21 @@ void mz2500_state::mz2500_portc_w(uint8_t data)
 		logerror("PPI PORTC W %02x\n",data & ~0x0f);
 }
 
-void mz2500_state::mz2500_pio1_porta_w(uint8_t data)
+void mz2500_state::pio_porta_w(u8 data)
 {
-//  printf("%02x\n",data);
+//  logerror("%02x\n",data);
 
 	if(m_prev_col_val != ((data & 0x20) >> 5))
 	{
 		m_text_col_size = ((data & 0x20) >> 5);
 		m_prev_col_val = m_text_col_size;
-		mz2500_reconfigure_screen();
+		crtc_reconfigure_screen();
 	}
 	m_key_mux = data & 0x1f;
 }
 
 
-uint8_t mz2500_state::mz2500_pio1_porta_r()
+u8 mz2500_state::pio_porta_r()
 {
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3",
 											"KEY4", "KEY5", "KEY6", "KEY7",
@@ -1688,19 +1688,12 @@ uint8_t mz2500_state::mz2500_pio1_porta_r()
 	return ioport(keynames[m_key_mux & 0xf])->read();
 }
 
-#if 0
-uint8_t mz2500_state::mz2500_pio1_portb_r()
-{
-	return m_pio_latchb;
-}
-#endif
-
-uint8_t mz2500_state::opn_porta_r()
+u8 mz2500_state::opn_porta_r()
 {
 	return m_ym_porta;
 }
 
-void mz2500_state::opn_porta_w(uint8_t data)
+void mz2500_state::opn_porta_w(u8 data)
 {
 	/*
 	---- x--- mouse select
@@ -1714,7 +1707,7 @@ void mz2500_state::opn_porta_w(uint8_t data)
 	m_ym_porta = data;
 }
 
-void mz2500_state::mz2500_palette(palette_device &palette) const
+void mz2500_state::palette_init(palette_device &palette) const
 {
 	for (int i = 0; i < 0x200; i++)
 		palette.set_pen_color(i,pal1bit(0),pal1bit(0),pal1bit(0));
@@ -1758,9 +1751,9 @@ void mz2500_state::pit8253_clk0_irq(int state)
 	}
 }
 
-void mz2500_state::mz2500_rtc_alarm_irq(int state)
+void mz2500_state::rtc_alarm_irq(int state)
 {
-	/* TODO: doesn't work yet */
+	// TODO: doesn't work yet
 //  if(m_irq_mask[3] && state & 1)
 //      m_maincpu->set_input_line_and_vector(0, HOLD_LINE,drvm_irq_vector[3]); // Z80
 }
@@ -1775,35 +1768,34 @@ static void mz2500_floppies(device_slot_interface &device)
 
 void mz2500_state::mz2500(machine_config &config)
 {
-	/* basic machine hardware */
 	Z80(config, m_maincpu, 24_MHz_XTAL / 4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mz2500_state::mz2500_map);
-	m_maincpu->set_addrmap(AS_IO, &mz2500_state::mz2500_io);
-	m_maincpu->set_vblank_int("screen", FUNC(mz2500_state::mz2500_vbl));
-	m_maincpu->set_irq_acknowledge_callback(FUNC(mz2500_state::mz2500_irq_ack));
+	m_maincpu->set_addrmap(AS_PROGRAM, &mz2500_state::z80_map);
+	m_maincpu->set_addrmap(AS_IO, &mz2500_state::z80_io);
+	m_maincpu->set_vblank_int("screen", FUNC(mz2500_state::vblank_cb));
+	m_maincpu->set_irq_acknowledge_callback(FUNC(mz2500_state::irq_ack_cb));
 
 	for (int bank = 0; bank < 8; bank++)
 	{
-		ADDRESS_MAP_BANK(config, m_rambank[bank]).set_map(&mz2500_state::mz2500_bank_window_map).set_options(ENDIANNESS_LITTLE, 8, 16+3, 0x2000);
+		ADDRESS_MAP_BANK(config, m_rambank[bank]).set_map(&mz2500_state::bank_window_map).set_options(ENDIANNESS_LITTLE, 8, 16+3, 0x2000);
 	}
 
-	i8255_device &ppi(I8255(config, "i8255_0"));
-	ppi.in_pa_callback().set(FUNC(mz2500_state::mz2500_porta_r));
-	ppi.out_pa_callback().set(FUNC(mz2500_state::mz2500_porta_w));
-	ppi.in_pb_callback().set(FUNC(mz2500_state::mz2500_portb_r));
-	ppi.out_pb_callback().set(FUNC(mz2500_state::mz2500_portb_w));
-	ppi.in_pc_callback().set(FUNC(mz2500_state::mz2500_portc_r));
-	ppi.out_pc_callback().set(FUNC(mz2500_state::mz2500_portc_w));
+	i8255_device &ppi(I8255(config, "ppi"));
+	ppi.in_pa_callback().set(FUNC(mz2500_state::ppi_porta_r));
+	ppi.out_pa_callback().set(FUNC(mz2500_state::ppi_porta_w));
+	ppi.in_pb_callback().set(FUNC(mz2500_state::ppi_portb_r));
+	ppi.out_pb_callback().set(FUNC(mz2500_state::ppi_portb_w));
+	ppi.in_pc_callback().set(FUNC(mz2500_state::ppi_portc_r));
+	ppi.out_pc_callback().set(FUNC(mz2500_state::ppi_portc_w));
 
-	z80pio_device& pio(Z80PIO(config, "z80pio_1", 24_MHz_XTAL / 4));
-	pio.in_pa_callback().set(FUNC(mz2500_state::mz2500_pio1_porta_r));
-	pio.out_pa_callback().set(FUNC(mz2500_state::mz2500_pio1_porta_w));
-	pio.in_pb_callback().set(FUNC(mz2500_state::mz2500_pio1_porta_r));
+	z80pio_device& pio(Z80PIO(config, "pio", 24_MHz_XTAL / 4));
+	pio.in_pa_callback().set(FUNC(mz2500_state::pio_porta_r));
+	pio.out_pa_callback().set(FUNC(mz2500_state::pio_porta_w));
+	pio.in_pb_callback().set(FUNC(mz2500_state::pio_porta_r));
 
 	Z80SIO(config, "z80sio", 24_MHz_XTAL / 4);
 
 	RP5C15(config, m_rtc, 32.768_kHz_XTAL);
-	m_rtc->alarm().set(FUNC(mz2500_state::mz2500_rtc_alarm_irq));
+	m_rtc->alarm().set(FUNC(mz2500_state::rtc_alarm_irq));
 
 	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(24_MHz_XTAL / 768);
@@ -1824,13 +1816,12 @@ void mz2500_state::mz2500(machine_config &config)
 	SOFTWARE_LIST(config, "flop_list").set_original("mz2500_flop");
 	SOFTWARE_LIST(config, "flop_list2").set_compatible("mz2000_flop");
 
-	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(42.954545_MHz_XTAL / 2, 640+108, 0, 640, 480, 0, 200); //unknown clock / divider
-	m_screen->set_screen_update(FUNC(mz2500_state::screen_update_mz2500));
+	m_screen->set_screen_update(FUNC(mz2500_state::screen_update));
 	m_screen->set_palette(m_palette);
 
-	PALETTE(config, m_palette, FUNC(mz2500_state::mz2500_palette), 0x200);
+	PALETTE(config, m_palette, FUNC(mz2500_state::palette_init), 0x200);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mz2500);
 
@@ -1850,12 +1841,11 @@ void mz2500_state::mz2500(machine_config &config)
 
 
 
-/* ROM definition */
 ROM_START( mz2500 )
 	ROM_REGION( 0x08000, "ipl", 0 )
 	ROM_LOAD( "ipl.rom", 0x00000, 0x8000, CRC(7a659f20) SHA1(ccb3cfdf461feea9db8d8d3a8815f7e345d274f7) )
 
-	/* this is probably an hand made ROM, will be removed in the end ...*/
+	// hand made?
 	ROM_REGION( 0x1000, "cgrom", 0 )
 	ROM_LOAD( "cg.rom", 0x0000, 0x0800, CRC(a082326f) SHA1(dfa1a797b2159838d078650801c7291fa746ad81) )
 
@@ -1879,7 +1869,7 @@ ROM_START( mz2520 )
 	ROM_REGION( 0x08000, "ipl", 0 )
 	ROM_LOAD( "ipl2520.rom", 0x00000, 0x8000, CRC(0a126eb2) SHA1(faf71236b3ad82d30184adea951d43d10ced663d) )
 
-	/* this is probably an hand made ROM, will be removed in the end ...*/
+	// hand made?
 	ROM_REGION( 0x1000, "cgrom", 0 )
 	ROM_LOAD( "cg.rom", 0x0000, 0x0800, CRC(a082326f) SHA1(dfa1a797b2159838d078650801c7291fa746ad81) )
 
@@ -1899,7 +1889,7 @@ ROM_START( mz2520 )
 	ROM_LOAD( "phone.rom", 0x00000, 0x4000, CRC(8e49e4dc) SHA1(2589f0c95028037a41ca32a8fd799c5f085dab51) )
 ROM_END
 
-/* Driver */
+
 
 COMP( 1985, mz2500, 0,      0, mz2500, mz2500, mz2500_state, empty_init, "Sharp", "MZ-2500", MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1985, mz2520, mz2500, 0, mz2500, mz2500, mz2500_state, empty_init, "Sharp", "MZ-2520", MACHINE_IMPERFECT_GRAPHICS ) // looks a stripped down version of the regular MZ-2500, with only two floppies drives and no cassette interface
+COMP( 1985, mz2520, mz2500, 0, mz2500, mz2500, mz2500_state, empty_init, "Sharp", "MZ-2520", MACHINE_IMPERFECT_GRAPHICS ) // stripped down version of the regular MZ-2500, no MZ-2000/MZ-80B compatability and no cassette interface
