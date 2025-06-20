@@ -280,6 +280,7 @@ protected:
 		, m_analog(*this, "AN%u", 0U)
 		, m_ports(*this, "IN%u", 0)
 		, m_pcb_digit(*this, "pcbdigit%u", 0U)
+		, m_pcb_output(*this, "pcboutput%u", 0U)
 		, m_cg_view(*this, "cg_view")
 	{ }
 
@@ -304,7 +305,8 @@ protected:
 	optional_memory_bank_array<2> m_cgboard_bank;
 	optional_ioport_array<4> m_analog;
 	required_ioport_array<4> m_ports;
-	output_finder<3> m_pcb_digit;
+	output_finder<2> m_pcb_digit;
+	output_finder<1> m_pcb_output;
 	memory_view m_cg_view;
 
 	emu_timer *m_sound_irq_timer = nullptr;
@@ -442,7 +444,7 @@ void gticlub_base_state::sysreg_w(offs_t offset, uint8_t data)
 
 		case 2:
 			// GTI club drive commands
-			m_pcb_digit[offset] = data;
+			m_pcb_output[0] = data;
 			break;
 
 		case 3:
@@ -505,6 +507,7 @@ void gticlub_base_state::soundtimer_count_w(uint16_t data)
 void gticlub_base_state::machine_start()
 {
 	m_pcb_digit.resolve();
+	m_pcb_output.resolve();
 
 	// set conservative DRC options
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);

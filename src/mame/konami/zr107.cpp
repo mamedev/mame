@@ -225,6 +225,7 @@ public:
 		m_eepromout(*this, "EEPROMOUT"),
 		m_analog(*this, "ANALOG%u", 1U),
 		m_pcb_digit(*this, "pcbdigit%u", 0U)
+		m_pcb_output(*this, "pcboutput%u", 0U)
 	{ }
 
 	void zr107(machine_config &config);
@@ -251,7 +252,8 @@ protected:
 	required_ioport_array<5> m_in;
 	required_ioport m_out4, m_eepromout;
 	optional_ioport_array<3> m_analog;
-	output_finder<3> m_pcb_digit;
+	output_finder<2> m_pcb_digit;
+	output_finder<1> m_pcb_output;
 
 	int32_t m_ccu_vcth = 0;
 	int32_t m_ccu_vctl = 0;
@@ -404,7 +406,7 @@ void zr107_state::sysreg_w(offs_t offset, uint8_t data)
 
 		case 2: // Parallel data register
 			LOGSYSREG("Parallel data = %02X\n", data);
-			m_pcb_digit[offset] = data;
+			m_pcb_output[0] = data;
 			break;
 
 		case 3: // System Register 0
@@ -492,6 +494,7 @@ void zr107_state::ccu_w(uint32_t data)
 void zr107_state::machine_start()
 {
 	m_pcb_digit.resolve();
+	m_pcb_output.resolve();
 
 	// set conservative DRC options
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
