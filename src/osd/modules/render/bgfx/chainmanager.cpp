@@ -738,7 +738,7 @@ void chain_manager::load_config(util::xml::data_node const &windownode)
 	if (explicit_chains)
 	{
 		osd_printf_verbose(
-				"BGFX: Ignoring chain selection from window 0 configuration due to explicitly specified chains\n",
+				"BGFX: Ignoring chain selection from window %d configuration due to explicitly specified chains\n",
 				m_window_index);
 	}
 	else
