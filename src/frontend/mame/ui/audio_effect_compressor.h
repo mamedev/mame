@@ -55,10 +55,10 @@ private:
 	virtual void populate() override;
 	virtual bool handle(event const *ev) override;
 
-	static std::string format_nodec(float val);
-	static std::string format_1dec(float val);
 	static std::string format_2dec(float val);
 	static std::string format_db(float val);
+	static std::string format_ms(float val);
+	static std::string format_ratio(float val);
 	u32 flag_mode() const;
 	static u32 flag_lim(float value, float min, float max, bool isset);
 	static float max(float a, float b) { return a > b ? a : b; }
