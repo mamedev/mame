@@ -1939,8 +1939,8 @@ void segaxbd_smgp_fd1094_state::device_add_mconfig(machine_config &config)
 	m_iochip[0]->out_portb_cb().set(FUNC(segaxbd_state::smgp_motor_w));
 
 	// sound hardware
-	SPEAKER(config, "rearleft").front_left();
-	SPEAKER(config, "rearright").front_right();
+	SPEAKER(config, "rearleft").rear_left();
+	SPEAKER(config, "rearright").rear_right();
 
 	segapcm_device &pcm2(SEGAPCM(config, "pcm2", SOUND_CLOCK/4));
 	pcm2.set_bank(segapcm_device::BANK_512);
@@ -1984,8 +1984,8 @@ void segaxbd_smgp_state::device_add_mconfig(machine_config &config)
 	m_iochip[0]->out_portb_cb().set(FUNC(segaxbd_state::smgp_motor_w));
 
 	// sound hardware
-	SPEAKER(config, "rearleft").front_left();
-	SPEAKER(config, "rearright").front_right();
+	SPEAKER(config, "rearleft").rear_left();
+	SPEAKER(config, "rearright").rear_right();
 
 	segapcm_device &pcm2(SEGAPCM(config, "pcm2", SOUND_CLOCK/4));
 	pcm2.set_bank(segapcm_device::BANK_512);
