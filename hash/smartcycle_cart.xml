@@ -4,6 +4,33 @@
 license:CC0-1.0
 -->
 
+<!--
+
+Some undumped titles include
+
+SpongeBob - Ocean Adventure (2 different label designs exist?)
+Thomas & Friends
+Hot Wheels - Pedal to the Metal
+Sesame Street - A Happy Healthy Day
+Dora the Explorer - Friendship Adventure
+Learning Adventure (there are Yellow and Blue carts, are they the same? which is dumped)
+Learning Adventure Extreme (Red cart)
+Go Diego Go - The Great Dinosaur Adventure
+Go Diego Go - Animal Rescue
+Barbie Fairytopia
+Toy Story
+Cars 2
+Green Lantern
+Planet Heroes
+Bob the Builder
+
+NOTE: There also seems to be a version of the Smart Cycle using newer hardware, which is fully 3D capable
+      It is not clear if there was a separate line of cartridges for that (and if so, could some of the
+	  above be for it instead)
+
+-->
+
+
 <softwarelist name="smartcycle_cart" description="Fisher Price Smart Cycle cartridges">
 
 	<software name="sc0308" supported="no">
@@ -29,7 +56,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="sc1410" supported="no">
-		<description>Smart Cycle (1410)</description>
+		<description>The Penguins of Madagascar (1410)</description>
 		<year>2006</year>
 		<publisher>Fisher Price</publisher>
 		<part name="cart" interface="smartcycle_cart">
@@ -40,7 +67,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="sc2108" supported="no">
-		<description>Smart Cycle (2108)</description>
+		<description>Scooby-Doo! (2108)</description>
 		<year>2006</year>
 		<publisher>Fisher Price</publisher>
 		<part name="cart" interface="smartcycle_cart">
