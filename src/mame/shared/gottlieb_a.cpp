@@ -688,14 +688,18 @@ void gottlieb_sound_r2_device::device_start()
 {
 	gottlieb_sound_p4_device::device_start();
 
-	// disable the non-speech CPU for cobram3
-	if (m_cobram3_mod)
-		m_dcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-
 	// register for save states
 	save_item(NAME(m_sp0250_latch));
 }
 
+void gottlieb_sound_r2_device::device_reset()
+{
+	gottlieb_sound_p4_device::device_reset();
+
+	// disable the non-speech CPU for cobram3
+	if (m_cobram3_mod)
+		m_dcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+}
 
 
 //**************************************************************************
