@@ -139,6 +139,23 @@ static INPUT_PORTS_START( tongzi )
 INPUT_PORTS_END
 
 
+static const gfx_layout gfx_8x8x16 =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	8,
+	{ STEP8(0, 2) },
+	{ STEP8(0, 8*2) },
+	{ STEP8(0, 8*8*2) },
+	8*8*16
+};
+
+// TODO: enough to see something, probably needs adjustments
+static GFXDECODE_START( gfx )
+	GFXDECODE_ENTRY( "tiles", 0, gfx_8x8x16, 0, 1 )
+GFXDECODE_END
+
+
 void sterz80_state::tongzi(machine_config &config)
 {
 	// basic machine hardware
@@ -159,6 +176,8 @@ void sterz80_state::tongzi(machine_config &config)
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(sterz80_state::screen_update));
 
+	GFXDECODE(config, "gfxdecode", "palette", gfx);
+
 	PALETTE(config, "palette").set_entries(0x100); // TODO
 
 	// sound hardware
@@ -172,7 +191,7 @@ ROM_START( tongzi )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "3.u2", 0x00000, 0x20000, CRC(8f394f91) SHA1(e49c682cb819885334c1f25d5221e3f59c21a7e2) ) // encrypted
 
-	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_REGION( 0x400000, "tiles", 0 )
 	ROM_LOAD( "1.u6", 0x000000, 0x200000, CRC(e885dcc9) SHA1(ea4a72eec7b65cb668c5abb64347426192bd0f86) )
 	ROM_LOAD( "2.u5", 0x200000, 0x200000, CRC(a7c11185) SHA1(96c9479802db0594845b2b282553c73406b84bb0) )
 
