@@ -398,7 +398,7 @@ u32 menu_audio_effect_eq::flag_db(u32 band) const
 
 void menu_audio_effect_eq::populate()
 {
-	item_append(_("Mode"), m_effect->mode() ? _("5-Band EQ") : _("Bypass"), flag_mode(), (void *)MODE);
+	item_append(_("Mode"), m_effect->mode() ? _("Active") : _("Bypass"), flag_mode(), (void *)MODE);
 
 	item_append(_("Low Band"), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
 	item_append(_("Mode"), m_effect->low_shelf() ? _("Shelf") : _("Peak"), flag_low_shelf(), (void *)uintptr_t(SHELF | (0 << 16)));

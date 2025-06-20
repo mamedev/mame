@@ -26,7 +26,6 @@ audio_effect_eq::audio_effect_eq(speaker_device *speaker, u32 sample_rate, audio
 	}
 
 	m_band_mask = 0;
-
 	reset_all();
 }
 
@@ -215,7 +214,7 @@ void audio_effect_eq::set_high_shelf(bool active)
 
 void audio_effect_eq::build_filter(u32 band)
 {
-	if(m_db[band] == 0)
+	if(s32(roundf(m_db[band] * 10.0f)) == 0)
 		m_band_mask &= ~(1 << band);
 	else
 		m_band_mask |= 1 << band;
@@ -234,7 +233,7 @@ void audio_effect_eq::build_filter(u32 band)
 void audio_effect_eq::build_low_shelf(u32 band)
 {
 	auto &fi = m_filter[band];
-    if(m_db[band] == 0) {
+    if(!BIT(m_band_mask, band)) {
 		fi.clear();
 		return;
 	}
@@ -266,7 +265,7 @@ void audio_effect_eq::build_low_shelf(u32 band)
 void audio_effect_eq::build_high_shelf(u32 band)
 {
 	auto &fi = m_filter[band];
-    if(m_db[band] == 0) {
+    if(!BIT(m_band_mask, band)) {
 		fi.clear();
 		return;
 	}
@@ -298,7 +297,7 @@ void audio_effect_eq::build_high_shelf(u32 band)
 void audio_effect_eq::build_peak(u32 band)
 {
 	auto &fi = m_filter[band];
-    if(m_db[band] == 0) {
+    if(!BIT(m_band_mask, band)) {
 		fi.clear();
 		return;
 	}
