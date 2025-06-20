@@ -23,7 +23,9 @@ menu_audio_effect_reverb::menu_audio_effect_reverb(mame_ui_manager &mui, render_
 	m_entry = entry;
 	m_effect = static_cast<audio_effect_reverb *>(effect);
 	m_preset = m_effect->find_current_preset();
-	set_heading(util::string_format("%s #%u", chain == 0xffff ? _("Default") : machine().sound().effect_chain_tag(chain), entry+1));
+	set_heading(util::string_format("%s (%s)",
+			_(audio_effect::effect_names[audio_effect::REVERB]),
+			chain == 0xffff ? _("Default") : machine().sound().effect_chain_tag(chain)));
 	set_process_flags(PROCESS_LR_REPEAT);
 }
 
@@ -620,7 +622,6 @@ double menu_audio_effect_reverb::change_spin(double val, bool inc, bool shift, b
 
 void menu_audio_effect_reverb::populate()
 {
-	item_append(_(audio_effect::effect_names[audio_effect::REVERB]), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
 	item_append(_("Mode"), m_effect->mode() ? _("Active") : _("Bypass"), flag_mode(), (void *)MODE);
 	item_append(_("Load preset"), util::string_format("%s%s", audio_effect_reverb::preset_name(m_preset), m_preset == m_effect->default_preset() ? _(" (Default)") : ""), flag_preset(), (void *)PRESET);
 	item_append(_("Dry level"), format_percent(m_effect->dry_level()), flag_percent(m_effect->dry_level(), m_effect->isset_dry_level()), (void *)DRYL);
