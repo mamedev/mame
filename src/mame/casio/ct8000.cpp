@@ -287,7 +287,8 @@ void ct8000_state::ctfk1(machine_config &config)
 //**************************************************************************
 void ct8000_state::driver_start()
 {
-	m_bbd_timer = timer_alloc(FUNC(ct8000_state::bbd_tick), this);
+	if (m_bbd)
+		m_bbd_timer = timer_alloc(FUNC(ct8000_state::bbd_tick), this);
 
 	m_bank->configure_entries(0, 2, memregion("bankrom")->base(), 0x800);
 
@@ -313,7 +314,8 @@ void ct8000_state::driver_start()
 
 void ct8000_state::driver_reset()
 {
-	bbd_setup_next_tick();	
+	if (m_bbd)
+		bbd_setup_next_tick();	
 }
 
 //**************************************************************************

@@ -573,8 +573,8 @@ void digitalker_device::sound_stream_update(sound_stream &stream)
 				}
 				m_pitch_pos = pp;
 			}
-
-		}
+		} else
+			break;
 	}
 }
 
