@@ -731,6 +731,14 @@ ROM_START( xavmusic )
 	ROM_LOAD( "u3", 0x0000000, 0x0800000, CRC(977c956f) SHA1(debc086d0cf6c391002ad163e7bfaa2f010cc8f5) )
 ROM_END
 
+ROM_START( xavcheck )
+	ROM_REGION( 0x0800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "jmscj_1.u2", 0x0000000, 0x0800000, CRC(65c62d04) SHA1(eb3616576b5523b337b58b72514508bb484f9d41) )
+
+	ROM_REGION( 0x0800000, "extra", ROMREGION_ERASE00 )
+	ROM_LOAD( "jmscj_2.u3", 0x0000000, 0x0800000, CRC(c6ff7906) SHA1(0a5541eedea485aa86093e1bfcc996f503cc6dd7) )
+ROM_END
+
 ROM_START( xavpkjr )
 	ROM_REGION( 0x0800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "tc58fvm6b5b.u2", 0x0000000, 0x0800000, CRC(82a32ede) SHA1(a555662b05925126ebc94ae6e4e13c1cfc3c86e0) )
@@ -975,6 +983,7 @@ CONS( 2004, xavbassf, 0,       0, superxavix_i2c_24c08, xavix_i2c,  superxavix_i
 CONS( 2005, xavjmat,  0,       0, superxavix_i2c_jmat_24c64,  xavix_jmat, superxavix_i2c_jmat_state, init_xavmusic, "SSD Company LTD",         "Jackie Chan J-Mat Fitness (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 2005, xavaero,  xavjmat, 0, superxavix_i2c_jmat_24c64,  xavix_jmat, superxavix_i2c_jmat_state, init_xavmusic, "SSD Company LTD",         "XaviX Aerostep (XaviXPORT, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 2007, xavmusic, 0,       0, superxavix_i2c_jmat_24c64,  xavix,      superxavix_i2c_jmat_state, init_xavmusic, "SSD Company LTD",         "XaviX Music & Circuit (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, xavcheck, 0,       0, superxavix_i2c_jmat_24c64,  xavix_jmat, superxavix_i2c_jmat_state, init_xavmusic, "SSD Company LTD",         "XaviX Aero Check & Balance (XaviXPORT, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // xavpkjr has U6 = S-35390A REAL-TIME CLOCK
 CONS( 2007, xavpkjr,  0, 0, superxavix_i2c_jmat_24c64, xavix, superxavix_i2c_jmat_state,      init_xavix,    "SSD Company LTD",         "PowerKIDS Jr. (XaviXPORT, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
