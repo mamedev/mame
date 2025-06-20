@@ -3143,6 +3143,42 @@ ROM_END
 
 ROM_START( pbobble2x )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* 68020 code */
+	ROM_LOAD32_BYTE("e10-29.20",   0x000000, 0x40000, CRC(f1e9ad3f) SHA1(8689d85f30e075d21e4be01a2a097a850a921c47) )
+	ROM_LOAD32_BYTE("e10-28.19",   0x000001, 0x40000, CRC(412a3602) SHA1(d754e6ac886676d2c1eb52de3a727894f316e6b5) )
+	ROM_LOAD32_BYTE("e10-27.18",   0x000002, 0x40000, CRC(88cc0b5c) SHA1(bb08a7b8b37356376052ed03f8515677811823c0) )
+	ROM_LOAD32_BYTE("e10-33.ic17", 0x000003, 0x40000, CRC(b5710aa9) SHA1(5692cfe1da2b5d7a1c2ba94f505256e599a45805) )
+
+	ROM_REGION( 0x200000, "sprites" , 0) /* Sprites */
+	ROM_LOAD16_BYTE("e10-02.rom", 0x000000, 0x100000, CRC(c0564490) SHA1(cbe9f880192c08f4d1db21d5ba14073b97e5f1d3) )
+	ROM_LOAD16_BYTE("e10-01.rom", 0x000001, 0x100000, CRC(8c26ff49) SHA1(cbb514c061106003d2ae2b6c43958b24feaad656) )
+
+	EMPTY_SPRITE_HIDATA(0x100000)
+
+	ROM_REGION( 0x200000, "tilemap" , 0) /* Tiles */
+	ROM_LOAD32_WORD("e10-07.rom", 0x000000, 0x100000, CRC(dcb3c29b) SHA1(b80c3a8ce53d696c57675e654c9927ef8687759e) )
+	ROM_LOAD32_WORD("e10-06.rom", 0x000002, 0x100000, CRC(1b0f20e2) SHA1(66b44d059c2896abac2f0e7fc932489dee440ba0) )
+
+	ROM_REGION( 0x100000, "tilemap_hi", 0 )
+	ROM_LOAD       ("e10-05.rom", 0x000000, 0x100000, CRC(81266151) SHA1(aa3b144f32995425db97efce440e234a3c7a6715) )
+
+	ROM_REGION( 0x180000, "taito_en:audiocpu", 0 ) /* 68000 sound CPU */
+	ROM_LOAD16_BYTE("e10-30.32", 0x100000, 0x40000, CRC(bb090c1e) SHA1(af2ff23d6f9bd56c25530cb9bf9f452b6f5210f5) )
+	ROM_LOAD16_BYTE("e10-31.33", 0x100001, 0x40000, CRC(f4b88d65) SHA1(c74dcb4bed979039fad1d5c7528c14ce4db1d5ec) )
+
+	ROM_REGION16_BE( 0x800000, "taito_en:ensoniq", ROMREGION_ERASE00 ) // V2: 4 banks, only 2 populated
+	ROM_LOAD16_BYTE("e10-04.rom", 0x000000, 0x200000, CRC(5c0862a6) SHA1(f916f63b8629239e3221e1e231e1b39962ef38ba) )    // C8 C9 CA CB
+	ROM_LOAD16_BYTE("e10-03.rom", 0x400000, 0x200000, CRC(46d68ac8) SHA1(ad014e9f0d458308014959ca6823077f581ab088) )    // CC CD CE CF
+
+	ROM_REGION( 0x0a00, "plds", 0 )
+	ROM_LOAD("pal16l8a-d77-09.bin",   0x0000, 0x0104, CRC(b371532b) SHA1(7f875f380e69d14326a036a09d2fda7554b73664) )
+	ROM_LOAD("pal16l8a-d77-10.bin",   0x0200, 0x0104, CRC(42f59227) SHA1(1f0db7489b49c00603ea51d130c9dfc237545390) )
+	ROM_LOAD("palce16v8q-d77-11.bin", 0x0400, 0x0117, CRC(eacc294e) SHA1(90679d523d90c1f8d2ecbd7b6fac2861f94cf107) )
+	ROM_LOAD("palce16v8q-d77-12.bin", 0x0600, 0x0117, CRC(e9920cfe) SHA1(58b73fe65f118d57fdce56d781593fc70c797f1b) )
+	ROM_LOAD("palce16v8q-d77-14.bin", 0x0800, 0x0117, CRC(7427e777) SHA1(e692cedb13e5bc02edc4b25e9dcea51e6715de85) )
+ROM_END
+
+ROM_START( pbobble2xj )
+	ROM_REGION( 0x200000, "maincpu", 0 ) /* 68020 code */
 	ROM_LOAD32_BYTE("e10-29.20", 0x000000, 0x40000, CRC(f1e9ad3f) SHA1(8689d85f30e075d21e4be01a2a097a850a921c47) )
 	ROM_LOAD32_BYTE("e10-28.19", 0x000001, 0x40000, CRC(412a3602) SHA1(d754e6ac886676d2c1eb52de3a727894f316e6b5) )
 	ROM_LOAD32_BYTE("e10-27.18", 0x000002, 0x40000, CRC(88cc0b5c) SHA1(bb08a7b8b37356376052ed03f8515677811823c0) )
@@ -4706,7 +4742,8 @@ GAME( 1995, pbobble2,   0,        f3,      f3, taito_f3_state, init_pbobbl2p, RO
 GAME( 1995, pbobble2o,  pbobble2, f3,      f3, taito_f3_state, init_pbobble2, ROT0,   "Taito Corporation Japan",   "Puzzle Bobble 2 (Ver 2.2O 1995/07/20)", 0 )
 GAME( 1995, pbobble2j,  pbobble2, f3,      f3, taito_f3_state, init_pbobble2, ROT0,   "Taito Corporation",         "Puzzle Bobble 2 (Ver 2.2J 1995/07/20)", 0 )
 GAME( 1995, pbobble2u,  pbobble2, f3,      f3, taito_f3_state, init_pbobble2, ROT0,   "Taito America Corporation", "Bust-A-Move Again (Ver 2.3A 1995/07/31)", 0 )
-GAME( 1995, pbobble2x,  pbobble2, f3,      f3, taito_f3_state, init_pbobbl2x, ROT0,   "Taito Corporation",         "Puzzle Bobble 2X (Ver 2.2J 1995/11/11)", 0 )
+GAME( 1995, pbobble2x,  pbobble2, f3,      f3, taito_f3_state, init_pbobbl2x, ROT0,   "Taito Corporation",         "Puzzle Bobble 2X (Ver 2.2O 1995/11/11)", 0 )
+GAME( 1995, pbobble2xj, pbobble2, f3,      f3, taito_f3_state, init_pbobbl2x, ROT0,   "Taito Corporation",         "Puzzle Bobble 2X (Ver 2.2J 1995/11/11)", 0 )
 GAME( 1995, gekiridn,   0,        f3,      f3, taito_f3_state, init_gekirido, ROT270, "Taito Corporation",         "Gekirindan (Ver 2.3O 1995/09/21)", 0 )
 GAME( 1995, gekiridnj,  gekiridn, f3,      f3, taito_f3_state, init_gekirido, ROT270, "Taito Corporation",         "Gekirindan (Ver 2.3J 1995/09/21)", 0 )
 GAME( 1995, tcobra2,    0,        f3,      f3, taito_f3_state, init_ktiger2,  ROT270, "Taito Corporation Japan",   "Twin Cobra II (Ver 2.1O 1995/11/30)", 0 )
