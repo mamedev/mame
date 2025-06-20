@@ -39,7 +39,7 @@ void audio_effect_eq::reset_mode()
 
 void audio_effect_eq::reset_f(u32 band)
 {
-	static const u32 defs[BANDS] = { 80, 200, 500, 3200, 8000 };
+	static const u32 defs[BANDS] = { 100, 330, 1000, 3300, 10000 };
 	audio_effect_eq *d = static_cast<audio_effect_eq *>(m_default);
 	m_isset_f[band] = false;
 	m_f[band] = d ? d->f(band) : defs[band];
