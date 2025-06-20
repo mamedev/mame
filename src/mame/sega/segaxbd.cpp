@@ -600,7 +600,7 @@ TIMER_CALLBACK_MEMBER(segaxbd_state::scanline_tick)
 	int next_scanline = (scanline + 1) % 262;
 
 	// clock the timer with V0
-	m_cmptimer_1->exck_w(scanline % 2);
+	m_cmptimer_1->exck_w(scanline & 1);
 
 	// set VBLANK on scanline 223
 	if (scanline == 223)

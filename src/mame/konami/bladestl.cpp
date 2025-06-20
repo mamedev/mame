@@ -39,7 +39,6 @@
 #include "cpu/m6809/hd6309.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/gen_latch.h"
-#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/flt_rc.h"
 #include "sound/upd7759.h"
@@ -105,7 +104,7 @@ private:
 	void speech_ctrl_w(uint8_t data);
 	void palette(palette_device &palette) const;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	void vblank_w(int state);
 	void tile_callback(int layer, uint32_t bank, uint32_t &code, uint32_t &color, uint8_t &flags);
 	void sprite_callback(uint32_t &code, uint32_t &color);
 
@@ -178,15 +177,10 @@ uint32_t bladestl_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(bladestl_state::scanline)
+void bladestl_state::vblank_w(int state)
 {
-	int const scanline = param;
-
-	if (scanline == 240 && m_k007342->is_int_enabled()) // vblank-out irq
+	if (state && m_k007342->is_int_enabled())
 		m_maincpu->set_input_line(HD6309_FIRQ_LINE, HOLD_LINE);
-
-	if (scanline == 0) // vblank-in or timer irq
-		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 /*************************************
@@ -423,11 +417,10 @@ void bladestl_state::machine_reset()
 void bladestl_state::bladestl(machine_config &config)
 {
 	// basic machine hardware
-	HD6309E(config, m_maincpu, XTAL(24'000'000) / 8); // divider not verified (from 007342 custom)
+	HD6309E(config, m_maincpu, 24_MHz_XTAL / 8); // divider not verified (from 007342 custom)
 	m_maincpu->set_addrmap(AS_PROGRAM, &bladestl_state::main_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(bladestl_state::scanline), "screen", 0, 1);
 
-	MC6809E(config, m_audiocpu, XTAL(24'000'000) / 16);
+	MC6809E(config, m_audiocpu, 24_MHz_XTAL / 16);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &bladestl_state::sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
@@ -436,12 +429,11 @@ void bladestl_state::bladestl(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 256, 264, 16, 240);
 	screen.set_screen_update(FUNC(bladestl_state::screen_update));
 	screen.set_palette("palette");
+	screen.screen_vblank().set(FUNC(bladestl_state::vblank_w));
+	screen.screen_vblank().append("k051733", FUNC(k051733_device::nmiclock_w));
 
 	PALETTE(config, "palette", FUNC(bladestl_state::palette)).set_format(palette_device::xBGR_555, 32 + 16*16, 32+16);
 
@@ -454,7 +446,8 @@ void bladestl_state::bladestl(machine_config &config)
 	m_k007420->set_bank_limit(0x3ff);
 	m_k007420->set_sprite_callback(FUNC(bladestl_state::sprite_callback));
 
-	K051733(config, "k051733", 0);
+	k051733_device &k051733(K051733(config, "k051733", 24_MHz_XTAL / 2));
+	k051733.set_nmi_cb().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	// sound hardware
 	/* the initialization order is important, the port callbacks being
@@ -467,7 +460,7 @@ void bladestl_state::bladestl(machine_config &config)
 
 	UPD7759(config, m_upd7759).add_route(ALL_OUTPUTS, "mono", 0.60);
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(24'000'000) / 8));
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 24_MHz_XTAL / 8));
 	ymsnd.port_a_write_callback().set(m_upd7759, FUNC(upd775x_device::port_w));
 	ymsnd.port_b_write_callback().set(FUNC(bladestl_state::port_b_w));
 	ymsnd.add_route(0, "filter1", 0.45);

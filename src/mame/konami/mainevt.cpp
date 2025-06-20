@@ -135,21 +135,12 @@ public:
 
 	void devstors(machine_config &config);
 
-protected:
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-
 private:
-	// misc
-	uint8_t m_nmi_enable = 0;
-
-	void nmienable_w(uint8_t data);
 	void sh_irqcontrol_w(uint8_t data);
 	void sh_bankswitch_w(uint8_t data);
 	INTERRUPT_GEN_MEMBER(sound_timer_irq);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void vblank_w(int state);
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
 
@@ -243,18 +234,6 @@ uint32_t devstors_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), 0, 0);
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0);
 	return 0;
-}
-
-
-void devstors_state::nmienable_w(uint8_t data)
-{
-	m_nmi_enable = data;
-}
-
-void devstors_state::vblank_w(int state)
-{
-	if (state && m_nmi_enable)
-		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 
@@ -398,7 +377,6 @@ void devstors_state::main_map(address_map &map)
 	map(0x1f98, 0x1f98).portr("DSW3");
 	map(0x1f9b, 0x1f9b).portr("DSW2");
 	map(0x1fa0, 0x1fbf).rw("k051733", FUNC(k051733_device::read), FUNC(k051733_device::write));
-	map(0x1fb2, 0x1fb2).w(FUNC(devstors_state::nmienable_w));
 
 	map(0x4000, 0x5dff).ram();
 	map(0x5e00, 0x5fff).ram().w("palette", FUNC(palette_device::write8)).share("palette");
@@ -601,18 +579,6 @@ void mainevt_state::machine_reset()
 	sh_irqcontrol_w(0);
 }
 
-void devstors_state::machine_start()
-{
-	base_state::machine_start();
-
-	save_item(NAME(m_nmi_enable));
-}
-
-void devstors_state::machine_reset()
-{
-	m_nmi_enable = 0;
-}
-
 INTERRUPT_GEN_MEMBER(mainevt_state::sound_timer_irq)
 {
 	if (m_sound_irq_mask)
@@ -633,15 +599,11 @@ void mainevt_state::mainevt(machine_config &config)
 
 	Z80(config, m_audiocpu, 3.579545_MHz_XTAL);  /* 3.579545 MHz */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &mainevt_state::sound_map);
-	m_audiocpu->set_periodic_int(FUNC(mainevt_state::sound_timer_irq), attotime::from_hz(8 * 60));  // ???
+	m_audiocpu->set_periodic_int(FUNC(mainevt_state::sound_timer_irq), attotime::from_hz(8 * 60)); // ???
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-//  screen.set_refresh_hz(60);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-//  screen.set_size(64*8, 32*8);
-//  screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1);
-	screen.set_raw(XTAL(24'000'000) / 3, 528, 14 * 8, (64 - 14) * 8, 256, 16, 240); // same hardware as Devastators so assume 59.17
+	screen.set_raw(24_MHz_XTAL / 3, 512, 14 * 8, (64 - 14) * 8, 264, 16, 240); // same hardware as Devastators so assume 59.17
 	screen.set_screen_update(FUNC(mainevt_state::screen_update));
 	screen.set_palette("palette");
 
@@ -685,14 +647,10 @@ void devstors_state::devstors(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-//  screen.set_refresh_hz(60);
-//  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-//  screen.set_size(64*8, 32*8);
-//  screen.set_visarea(13*8, (64-13)*8-1, 2*8, 30*8-1);
-	screen.set_raw(XTAL(24'000'000) / 3, 528, 13 * 8, (64 - 13) * 8, 256, 16, 240); // measured 59.17
+	screen.set_raw(24_MHz_XTAL / 3, 512, 13 * 8, (64 - 13) * 8, 264, 16, 240); // measured 59.17
 	screen.set_screen_update(FUNC(devstors_state::screen_update));
 	screen.set_palette("palette");
-	screen.screen_vblank().set(FUNC(devstors_state::vblank_w));
+	screen.screen_vblank().set("k051733", FUNC(k051733_device::nmiclock_w));
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 256).enable_shadows();
 
@@ -707,7 +665,8 @@ void devstors_state::devstors(machine_config &config)
 	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(devstors_state::sprite_callback));
 
-	K051733(config, "k051733", 0);
+	k051733_device &k051733(K051733(config, "k051733", 24_MHz_XTAL / 2));
+	k051733.set_nmi_cb().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

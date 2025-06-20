@@ -23,6 +23,9 @@ Memory map(preliminary):
 0a-0b W X pos of obj1
 0c-0d W Y pos of obj2
 0e-0f W X pos of obj2
+
+10-11 W NMI timer (triggers NMI on overflow)
+12    W NMI enable (bit 0)
 13    W unknown
 
 07    R collision (0x80 = no, 0x00 = yes)
@@ -48,7 +51,6 @@ writes to 0x2f84-0x2f85, waits a little, and then reads from 0x2f84.
 $7af3:
 (R) 0x2f86: unknown. Only uses bit 0.
 
-
 Devastators:
 ------------
 $6ce8:
@@ -64,10 +66,9 @@ reads from 0x0006, and only uses bit 1.
 
 DEFINE_DEVICE_TYPE(K051733, k051733_device, "k051733", "K051733 Protection")
 
-k051733_device::k051733_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, K051733, tag, owner, clock),
-	//m_ram[0x20],
-	m_rng(0)
+k051733_device::k051733_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, K051733, tag, owner, clock),
+	m_nmi_cb(*this)
 {
 }
 
@@ -77,8 +78,14 @@ k051733_device::k051733_device(const machine_config &mconfig, const char *tag, d
 
 void k051733_device::device_start()
 {
+	m_nmi_clock = 0;
+
 	save_item(NAME(m_ram));
 	save_item(NAME(m_rng));
+	save_item(NAME(m_nmi_clock));
+	save_item(NAME(m_nmi_timer));
+
+	m_nmi_clear = timer_alloc(FUNC(k051733_device::nmi_clear), this);
 }
 
 //-------------------------------------------------
@@ -87,11 +94,13 @@ void k051733_device::device_start()
 
 void k051733_device::device_reset()
 {
-	for (int i = 0; i < 0x20; i++)
-		m_ram[i] = 0;
+	memset(m_ram, 0, sizeof(m_ram));
 
 	m_rng = 0;
+	m_nmi_timer = 0;
+	m_nmi_cb(0);
 }
+
 
 /*****************************************************************************
     DEVICE HANDLERS
@@ -99,6 +108,7 @@ void k051733_device::device_reset()
 
 void k051733_device::write(offs_t offset, uint8_t data)
 {
+	offset &= 0x1f;
 	LOG("%s: write %02x to 051733 address %02x\n", machine().describe_context(), data, offset);
 
 	m_ram[offset] = data;
@@ -125,6 +135,8 @@ static int k051733_int_sqrt(uint32_t op)
 
 uint8_t k051733_device::read(offs_t offset)
 {
+	offset &= 0x1f;
+
 	int const op1 = (m_ram[0x00] << 8) | m_ram[0x01];
 	int const op2 = (m_ram[0x02] << 8) | m_ram[0x03];
 	int const op3 = (m_ram[0x04] << 8) | m_ram[0x05];
@@ -148,7 +160,7 @@ uint8_t k051733_device::read(offs_t offset)
 			else
 				return 0xff;
 
-		/* this is completely unverified */
+		// this is completely unverified
 		case 0x02:
 			if (op2)
 				return (op1 % op2) >> 8;
@@ -166,14 +178,14 @@ uint8_t k051733_device::read(offs_t offset)
 			return k051733_int_sqrt(op3 << 16) & 0xff;
 
 		case 0x06:
-			{
-				uint8_t const rng = m_rng + m_ram[0x13];
-				if (!machine().side_effects_disabled())
-					m_rng = rng;
-				return rng; //RNG read, used by Chequered Flag for differentiate cars, implementation is a raw guess
-			}
+		{
+			uint8_t const rng = m_rng + m_ram[0x13];
+			if (!machine().side_effects_disabled())
+				m_rng = rng;
+			return rng; // RNG read, used by Chequered Flag for differentiate cars, implementation is a raw guess
+		}
 
-		case 0x07: /* note: Chequered Flag definitely wants all these bits to be enabled */
+		case 0x07: // note: Chequered Flag definitely wants all these bits to be enabled
 			if (xobj1c + rad < xobj2c)
 				return 0xff;
 			else if (xobj2c + rad < xobj1c)
@@ -185,7 +197,7 @@ uint8_t k051733_device::read(offs_t offset)
 			else
 				return 0;
 
-		case 0x0e: /* best guess */
+		case 0x0e: // best guess
 			return (xobj2c - xobj1c) >> 8;
 		case 0x0f:
 			return (xobj2c - xobj1c) & 0xff;
@@ -193,4 +205,26 @@ uint8_t k051733_device::read(offs_t offset)
 		default:
 			return m_ram[offset];
 	}
+}
+
+
+/*****************************************************************************
+    INTERRUPTS
+*****************************************************************************/
+
+void k051733_device::nmiclock_w(int state)
+{
+	if (!m_nmi_clock && state && !m_nmi_timer--)
+	{
+		if (BIT(m_ram[0x12], 0))
+		{
+			// pulse NMI for 4 clocks
+			m_nmi_cb(1);
+			m_nmi_clear->adjust(attotime::from_ticks(4, clock()));
+		}
+
+		m_nmi_timer = (m_ram[0x10] << 8) | m_ram[0x11];
+	}
+
+	m_nmi_clock = state;
 }

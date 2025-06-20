@@ -474,7 +474,7 @@ void chqflag_state::chqflag(machine_config &config)
 	m_k051316[1]->set_wrap(1);
 	m_k051316[1]->set_zoom_callback(FUNC(chqflag_state::zoom_callback_2));
 
-	K051733(config, "k051733", 0);
+	K051733(config, "k051733", 24_MHz_XTAL / 2);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();
