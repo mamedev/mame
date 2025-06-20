@@ -399,6 +399,8 @@ void menu_audio_effect_compressor::populate()
 	item_append(_("Release"), format_ms(m_effect->release()), flag_lim(m_effect->release(), 0, 3000, m_effect->isset_release()), (void *)RELEASE);
 	item_append(_("Input gain"), format_db(m_effect->input_gain()), flag_lim(m_effect->input_gain(), -12, 24, m_effect->isset_input_gain()), (void *)INPUT_GAIN);
 	item_append(_("Output gain"), format_db(m_effect->output_gain()), flag_lim(m_effect->output_gain(), -12, 24, m_effect->isset_output_gain()), (void *)OUTPUT_GAIN);
+
+	item_append(menu_item_type::SEPARATOR);
 	item_append(_("Convexity"), format_2dec(m_effect->convexity()), flag_lim(m_effect->convexity(), -2, 2, m_effect->isset_convexity()), (void *)CONVEXITY);
 	item_append(_("Channel link"), format_2dec(m_effect->channel_link()), flag_lim(m_effect->channel_link(), 0, 1, m_effect->isset_channel_link()), (void *)CHANNEL_LINK);
 	item_append(_("Feedback"), format_2dec(m_effect->feedback()), flag_lim(m_effect->feedback(), 0, 1, m_effect->isset_feedback()), (void *)FEEDBACK);
