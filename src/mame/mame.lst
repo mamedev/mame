@@ -383,6 +383,14 @@ ertictaca
 ertictacb
 poizone
 
+@source:acorn/eurocube.cpp
+eurobeeb1
+eurobeeb2
+eurobeeb3m
+eurobeeb3c
+eurocube09
+eurocube65
+
 @source:acorn/riscpc.cpp
 a7000
 a7000p
@@ -435,6 +443,8 @@ fashiong
 fashiong2
 fstation
 funlddlx
+funlddlx2
+funlddlx4
 quickjac
 skattv
 skattva
@@ -456,10 +466,19 @@ glucksstern
 juwel
 karoas
 kniffi
+supermultib
 
 @source:adp/stellafr.cpp
+action
+allfred
+grandhand
+kleopatra
+multimulti
 st_ohla
 st_vulkn
+sunny
+taipan
+turbosun
 
 @source:agat/agat.cpp
 agat7
@@ -1896,9 +1915,10 @@ cmmb162
 cmmb103
 
 @source:atari/cops.cpp
-cops
-copsuk
-revlatns
+cops                            // (c) 1994
+copsuk                          // (c) 1994 (Nova/Deith Leisure)
+revlatns                        // (c) 1991
+visnqust                        // (c) 1992 (Kramer/Nova)
 
 @source:atari/copsnrob.cpp
 copsnrob
@@ -17617,6 +17637,7 @@ polluxn
 popbingo
 primella
 rshark
+rsharka
 sadari
 superx
 superxm
@@ -20687,6 +20708,7 @@ lhzba
 lhzb2
 lhzb2a
 lhzb2b
+lhzb2c
 mgcs
 mgcsa
 mgcsb
@@ -20954,6 +20976,7 @@ kov2p200
 kov2p202
 kov2p203
 kov2p204
+kovbl
 kovgsyx
 kovlsjb
 kovlsjba
@@ -20961,6 +20984,7 @@ kovlsqh
 kovlsqh2
 kovplus
 kovplusa
+kovplusbl
 kovqhsgs
 kovsgqyz
 kovsgqyza
@@ -21077,6 +21101,7 @@ spk201ua
 spk203us
 spk205us
 spk306us
+xjinhuang
 zuanshiw
 
 @source:igt/drw80pkr.cpp
@@ -32432,7 +32457,6 @@ psattack
 bazooka
 bazookabr
 dpatrol
-dpatrola
 gametree
 knightar
 
@@ -33602,6 +33626,9 @@ sspanic
 
 @source:namco/dkmb.cpp
 dkmb
+
+@source:namco/ds5000.cpp
+ds5000
 
 @source:namco/gal3.cpp
 gal3
@@ -35403,6 +35430,7 @@ dgun2573a
 dgunl3201
 dgunl3202
 fcpocket
+g9_666
 lxpcli
 lxpcsp
 matet100
@@ -35414,6 +35442,7 @@ rfcp168
 rminitv
 
 @source:nintendo/nes_vt369_vtunknown.cpp
+36pcase
 168pcase
 240in1ar
 bittboy
@@ -35438,12 +35467,15 @@ lxccplan
 lxcmc250
 lxcmcy
 lxcmcyba
+lxcmcybt
 lxcmcycr
 lxcmcydp
+lxcmcydpn
 lxcmcyfz
 lxcmcypj
 lxcmcypp
 lxcmcysp
+lxcmcyspn
 lxcmcysw
 lxcyber
 matet10
@@ -37629,6 +37661,7 @@ smbpa
 smbpb
 smbpc
 smbpv
+smbpva
 snspares
 snspares1
 snspares2
@@ -38115,6 +38148,7 @@ pb_l5
 pb_p4
 
 @source:pinball/s11b.cpp
+bcats_f1
 bcats_g4
 bcats_l2
 bcats_l5
@@ -45172,6 +45206,7 @@ contcircu
 contcircua
 dblaxle
 dblaxleu
+dblaxleua
 dblaxleul
 enforce
 enforcej
@@ -45291,7 +45326,6 @@ dendego3
 landhigh
 landhigha
 pwrshovl
-pwrshovla
 raizpin
 raizpinj
 styphp
@@ -46333,6 +46367,9 @@ emma2
 @source:trainer/instruct.cpp
 instruct
 
+@source:trainer/mac3.cpp
+mac3
+
 @source:trainer/mcg85.cpp
 mcg85
 
@@ -46559,16 +46596,17 @@ smartfps
 tkmag220
 
 @source:tvgames/generalplus_gpl16250_romram.cpp
-paccon
-lazertag
+jak_pf
+jak_prft
 jak_s500
 jak_sinv
 jak_smwm
-jak_pf
-jak_prft
+jak_swcl
+jak_ths
 jak_tink
 jak_totm
-jak_ths
+lazertag
+paccon
 tomycar
 wrlshunt
 
@@ -47106,6 +47144,7 @@ anpanmdx
 apmj2009
 ban_bkgj
 ban_dn1j
+ban_gkrj
 ban_kksj
 ban_ult
 ban_utmj

@@ -11,10 +11,10 @@
     where the laserdisc audio is muted.
 
     The different games here have subtly different control PCBs. COPS has an Atari
-    part number (58-12B), while Revelations simply refers to a Lasermax control PCB
+    part number (58-12B), while Revelations and Vision Quest simply refers to a Lasermax control PCB
     (Lasermax being the consumer name for the LDP series).
     COPS, Street Viper and all other Nova Productions laserdisc games run on forms of this
-    hardware.
+    hardware, with Vision Quest being the earliest we emulate.
 
     NOTES: To init NVRAM on Revelations at first boot, turn the refill key (R) and press any button.
     A and B adjust date/time (clock is not Y2K compliant), C selects.
@@ -22,10 +22,9 @@
     Let it boot up to REFILL mode, and then turn the refill key off.
 
     TODO: There are probably more ROMs for Revelations and related, the disc
-    contains full data for a non-payout US release of the game called 'Vision Quest'.
-    However, the Vision Quest Laserdisc for the USA is slightly different, with
-    Revelations specific data seemingly replaced with black level.
-    We have a disc image for Vision Quest in full, but no ROM
+    contains full data for a memory based quiz
+    Vision Quest currently requires a soft reset on the POWERING UP instruction to boot, we may be
+	missing something in the initialisation.
 
     BTANB for Revelations:
     Game options cannot be adjusted, any attempt to do so resets the machine (seen on real hardware)
@@ -45,6 +44,7 @@
 #include "machine/meters.h"
 #include "machine/msm6242.h"
 #include "machine/nvram.h"
+#include "machine/mos6551.h"
 #include "machine/r65c52.h"
 #include "machine/watchdog.h"
 #include "sound/sn76496.h"
@@ -53,6 +53,7 @@
 
 #include "cops.lh"
 #include "revlatns.lh"
+#include "visnqust.lh"
 
 #define LOG_CDROM   (1U << 1)
 
@@ -64,6 +65,7 @@ namespace {
 
 #define MAIN_CLOCK 4_MHz_XTAL
 #define DACIA_CLOCK 3.6864_MHz_XTAL
+#define ACIA_CLOCK 1.8432_MHz_XTAL
 
 class cops_state : public driver_device
 {
@@ -75,6 +77,7 @@ public:
 		, m_sn(*this, "snsnd")
 		, m_ld(*this, "laserdisc")
 		, m_dacia(*this, "dacia")
+		, m_acia(*this, "acia")
 		, m_watchdog(*this, "watchdog")
 		, m_meters(*this, "meters")
 		, m_switches(*this, "SW%u", 0U)
@@ -87,12 +90,17 @@ public:
 	{ }
 
 	void revlatns(machine_config &config);
+	void visnqust(machine_config &config);
 	void base(machine_config &config);
+	void acia_comms(machine_config &config);
+	void dacia_comms(machine_config &config);
 	void cops(machine_config &config);
 	void cops_map(address_map &map) ATTR_COLD;
 	void revlatns_map(address_map &map) ATTR_COLD;
+	void visnqust_map(address_map &map) ATTR_COLD;
 
 	void init_cops();
+	void init_vquest();
 
 protected:
 	// driver_device overrides
@@ -111,6 +119,7 @@ private:
 	uint8_t io2_r(offs_t offset);
 	void acia1_irq(int state);
 	void acia2_irq(int state);
+	void vqacia_irq(int state);
 	void dacia_irq();
 	void via1_irq(int state);
 	void via2_irq(int state);
@@ -127,7 +136,8 @@ private:
 	required_shared_ptr<uint8_t> m_nvram;
 	required_device<sn76489_device> m_sn;
 	required_device<sony_ldp1450hle_device> m_ld;
-	required_device<r65c52_device> m_dacia;
+	optional_device<r65c52_device> m_dacia;
+	optional_device<mos6551_device> m_acia;
 	required_device<watchdog_timer_device> m_watchdog;
 	optional_device<meters_device> m_meters;
 
@@ -184,13 +194,25 @@ uint8_t cops_state::cdrom_data_r()
 
 /*************************************
  *
+ * 6551 ACIA - IRQ is normal
+ *
+ *************************************/
+void cops_state::vqacia_irq(int state)
+{
+	m_acia1_irq = state;
+	dacia_irq();
+}
+
+
+/*************************************
+ *
  * 6552 DACIA - IRQs are inverted
  *
  *************************************/
 
 void cops_state::acia1_irq(int state)
 {
-	m_acia1_irq =! state;
+	m_acia1_irq = !state;
 	dacia_irq();
 }
 
@@ -202,6 +224,7 @@ void cops_state::acia2_irq(int state)
 
 inline void cops_state::dacia_irq()
 {
+	logerror("IRQ %x\n", m_acia1_irq);
 	m_maincpu->set_input_line(INPUT_LINE_NMI, (m_acia1_irq | m_acia2_irq) ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -231,10 +254,11 @@ uint8_t cops_state::io1_cops_r(offs_t offset)
 
 uint8_t cops_state::io1_r(offs_t offset)
 {
+	// logerror("io1_r, offset = %03x\n", offset);
 	switch( offset & 0x0f )
 	{
-		case 0x01:  /* SW0 */
-			return m_switches[0]->read();
+		// case 0x01:  /* SW0 */
+		// 	return m_switches[0]->read();
 		case 0x07: /* WOP7 - watchdog*/
 			return 1;
 		case 0x08:  /* SW0 */
@@ -301,6 +325,7 @@ void cops_state::io1_cops_w(offs_t offset, uint8_t data)
 			break;
 		case 0x07: /* WOP7 - watchdog*/
 			m_watchdog->reset_w(data);
+
 			break;
 		default:
 			logerror("Unknown io1_w, offset = %03x, data = %02x\n", offset, data);
@@ -526,6 +551,17 @@ void cops_state::revlatns_map(address_map &map)
 	map(0xe000, 0xffff).bankr("sysbank1");
 }
 
+void cops_state::visnqust_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram().share(m_nvram);
+	map(0x2000, 0x9fff).rom().region("program", 0);
+	map(0xa000, 0xafff).rw(FUNC(cops_state::io1_r), FUNC(cops_state::io1_w));
+	map(0xb000, 0xb00f).m("via6522_1", FUNC(via6522_device::map));
+	map(0xc000, 0xc00f).noprw(); //Still writes to RTC, but doesn't seem to use it
+	map(0xd000, 0xd003).m(m_acia, FUNC(mos6551_device::map));
+	map(0xe000, 0xffff).bankr("sysbank1");
+}
+
 static INPUT_PORTS_START( cops )
 	PORT_START("SW0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Switch A") PORT_CODE(KEYCODE_A) PORT_IMPULSE(1)
@@ -585,6 +621,38 @@ static INPUT_PORTS_START( revlatns )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) //Left floating, games will fail to boot if this is low
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( visnqust )
+	PORT_START("SW0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("A")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("C")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) //COIN5
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_IMPULSE(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 ) // COIN6
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("B")
+
+	PORT_START("SW1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("*")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_INTERLOCK) PORT_NAME("Back Door") PORT_CODE(KEYCODE_W) PORT_TOGGLE
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("SW2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
 void cops_state::machine_start()
 {
 	m_digits.resolve();
@@ -627,20 +695,35 @@ void cops_state::base(machine_config &config)
 
 	SPEAKER(config, "mspeaker").front_center();
 
-	R65C52(config, m_dacia, DACIA_CLOCK);
-	m_dacia->txd1_handler().set("laserdisc", FUNC(sony_ldp1450hle_device::rx_w));
-	m_dacia->irq1_handler().set(FUNC(cops_state::acia1_irq));
-	m_dacia->irq2_handler().set(FUNC(cops_state::acia2_irq));
-
 	SN76489(config, m_sn, MAIN_CLOCK/2);
 	m_sn->add_route(ALL_OUTPUTS, "mspeaker", 0.30);
 
 	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_msec(1600));
 }
 
+void cops_state::acia_comms(machine_config &config)
+{
+	MOS6551(config, m_acia, 0).set_xtal(ACIA_CLOCK);
+	m_acia->txd_handler().set("laserdisc", FUNC(sony_ldp1450hle_device::rx_w));
+	m_acia->rts_handler().set("acia", FUNC(mos6551_device::write_cts));
+	m_acia->irq_handler().set(FUNC(cops_state::vqacia_irq));
+	m_ld->serial_tx().set("acia", FUNC(mos6551_device::write_rxd));
+}
+
+void cops_state::dacia_comms(machine_config &config)
+{
+	R65C52(config, m_dacia, DACIA_CLOCK);
+	m_dacia->txd1_handler().set("laserdisc", FUNC(sony_ldp1450hle_device::rx_w));
+	m_dacia->rts1_handler().set("dacia", FUNC(r65c52_device::write_cts1));
+	m_dacia->irq1_handler().set(FUNC(cops_state::acia1_irq));
+	m_dacia->irq2_handler().set(FUNC(cops_state::acia2_irq));
+	m_ld->serial_tx().set("dacia", FUNC(r65c52_device::write_rxd1));
+}
+
 void cops_state::cops(machine_config &config)
 {
 	base(config);
+	dacia_comms(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &cops_state::cops_map);
 
@@ -663,9 +746,9 @@ void cops_state::cops(machine_config &config)
 void cops_state::revlatns(machine_config &config)
 {
 	base(config);
+	dacia_comms(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &cops_state::revlatns_map);
-
 
 	/* via */
 	via6522_device &via1(MOS6522(config, "via6522_1", MAIN_CLOCK/4));
@@ -677,12 +760,28 @@ void cops_state::revlatns(machine_config &config)
 
 	bacta_datalogger_device &bacta(BACTA_DATALOGGER(config, "bacta", 0));
 
-	m_dacia->txd1_handler().set("laserdisc", FUNC(sony_ldp1450hle_device::rx_w));
 	m_dacia->txd2_handler().set("bacta", FUNC(bacta_datalogger_device::write_txd));
 
 	bacta.rxd_handler().set("dacia", FUNC(r65c52_device::write_rxd2));
 
 	MSM6242(config, "rtc", 32.768_kHz_XTAL);
+}
+
+void cops_state::visnqust(machine_config &config)
+{
+	base(config);
+	acia_comms(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &cops_state::visnqust_map);
+
+	/* via */
+	via6522_device &via1(MOS6522(config, "via6522_1", MAIN_CLOCK/4));
+	via1.irq_handler().set(FUNC(cops_state::via1_irq));
+	via1.writepb_handler().set(FUNC(cops_state::via1_b_w));
+	via1.cb1_handler().set(FUNC(cops_state::via1_cb1_w));
+
+	METERS(config, m_meters, 0).set_number(2);
+
 }
 
 /***************************************************************************
@@ -733,9 +832,27 @@ ROM_START( revlatns )
 	ROM_LOAD( "default_nvram", 0x0000, 0x2000, CRC(339f4e00) SHA1(3d5e4be30e3b21d3e34b2fa97d9ef19f597890eb) )
 ROM_END
 
+ROM_START( visnqust )
+	ROM_REGION( 0x8000, "program", 0 )
+	ROM_LOAD( "visionquest.u33", 0x0000, 0x8000, CRC(12cef48f) SHA1(32e8b1dd6664d34a4531a5775166e05547a7d438) )
+
+	ROM_REGION( 0x8000, "system", 0 )
+	ROM_LOAD( "visionquest.u14", 0x0000, 0x2000, CRC(561ee492) SHA1(751226145b21c836dbbaf4868c516355f6f13df3) )
+	ROM_RELOAD(0x2000, 0x2000)
+	ROM_RELOAD(0x4000, 0x2000)
+	ROM_RELOAD(0x6000, 0x2000)
+
+	DISK_REGION( "laserdisc" )
+	DISK_IMAGE_READONLY( "visionquest", 0, BAD_DUMP SHA1(d5039c5390894faeb48098216e892e6fb4bb7ca2))  //one disc, no correction, old method
+
+	ROM_REGION( 0x2000, "nvram", 0 )
+	ROM_LOAD( "default_nvram", 0x0000, 0x2000, CRC(8a422121) SHA1 (3f05f7b4c8b9627fdf34cb25d3e1d2d587ae3b30) )
+ROM_END
+
 } // Anonymous namespace
 
 
-GAMEL( 1994, cops,     0,    cops,     cops,     cops_state, init_cops, ROT0, "Atari Games",                           "Cops (USA)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_cops )
-GAMEL( 1994, copsuk,   cops, cops,     cops,     cops_state, init_cops, ROT0, "Nova Productions Ltd./ Deith Leisure",  "Cops (UK)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_cops )
-GAMEL( 1991, revlatns, 0,    revlatns, revlatns, cops_state, init_cops, ROT0, "Nova Productions Ltd.",                 "Revelations", MACHINE_SUPPORTS_SAVE, layout_revlatns )
+GAMEL( 1994, cops,     0,    cops,     cops,     cops_state, init_cops, ROT0, "Atari Games",                           		 "Cops (USA)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_cops )
+GAMEL( 1994, copsuk,   cops, cops,     cops,     cops_state, init_cops, ROT0, "Nova Productions Ltd./ Deith Leisure",  		 "Cops (UK)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_cops )
+GAMEL( 1991, revlatns, 0,    revlatns, revlatns, cops_state, init_cops, ROT0, "Nova Productions Ltd.",                 		 "Revelations", MACHINE_SUPPORTS_SAVE, layout_revlatns )
+GAMEL( 1992, visnqust, 0,    visnqust, visnqust, cops_state, init_cops, ROT0, "Kramer Manufacturing / Nova Productions Ltd.","Vision Quest", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_visnqust )

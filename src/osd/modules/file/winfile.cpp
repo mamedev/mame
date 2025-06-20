@@ -107,8 +107,20 @@ public:
 
 	virtual std::error_condition flush() noexcept override
 	{
-		// shouldn't be any userspace buffers on the file handle
+		// The file handle buffers data which the OS flushes to disk cache
+		// periodically.  The trouble with calling FlushFileBuffers here is that
+		// it also forces the data and metadata caches to be flushed to storage,
+		// which can cause performance issues.  The real solution would be to
+		// rewrite this class to use FILE_FLAG_NO_BUFFERING, which would require
+		// it to do its own buffering and only perform sector-aligned I/O.
+#if 0
+		if (!FlushFileBuffers(m_handle))
+			return win_error_to_error_condition(GetLastError());
+		else
+			return std::error_condition();
+#else
 		return std::error_condition();
+#endif
 	}
 
 private:

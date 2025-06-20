@@ -16,19 +16,7 @@ audio_effect_compressor::audio_effect_compressor(speaker_device *speaker, u32 sa
 	m_output_samples.resize(m_channels, 0);
 	m_inertia_velocity.resize(m_channels, 0);
 
-	reset_mode();
-	reset_attack();
-	reset_release();
-	reset_ratio();
-	reset_input_gain();
-	reset_output_gain();
-	reset_convexity();
-	reset_threshold();
-	reset_channel_link();
-	reset_feedback();
-	reset_inertia();
-	reset_inertia_decay();
-	reset_ceiling();
+	reset_all();
 }
 
 void audio_effect_compressor::config_load(util::xml::data_node const *ef_node)
@@ -256,7 +244,7 @@ void audio_effect_compressor::reset_mode()
 {
 	audio_effect_compressor *d = static_cast<audio_effect_compressor *>(m_default);
 	m_isset_mode = false;
-	m_mode = d ? d->mode() : 1;
+	m_mode = d ? d->mode() : 0;
 }
 
 void audio_effect_compressor::reset_attack()
@@ -312,7 +300,7 @@ void audio_effect_compressor::reset_channel_link()
 {
 	audio_effect_compressor *d = static_cast<audio_effect_compressor *>(m_default);
 	m_isset_channel_link = false;
-	m_channel_link = d ? d->channel_link() : 100;
+	m_channel_link = d ? d->channel_link() : 1;
 }
 
 void audio_effect_compressor::reset_feedback()
@@ -341,6 +329,23 @@ void audio_effect_compressor::reset_ceiling()
 	audio_effect_compressor *d = static_cast<audio_effect_compressor *>(m_default);
 	m_isset_ceiling = false;
 	m_ceiling = d ? d->ceiling() : 1;
+}
+
+void audio_effect_compressor::reset_all()
+{
+	reset_mode();
+	reset_attack();
+	reset_release();
+	reset_ratio();
+	reset_input_gain();
+	reset_output_gain();
+	reset_convexity();
+	reset_threshold();
+	reset_channel_link();
+	reset_feedback();
+	reset_inertia();
+	reset_inertia_decay();
+	reset_ceiling();
 }
 
 double audio_effect_compressor::db_to_value(double db)

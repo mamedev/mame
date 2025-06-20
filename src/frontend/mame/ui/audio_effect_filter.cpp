@@ -16,10 +16,6 @@
 #include "ui/ui.h"
 
 namespace ui {
-const u32 menu_audio_effect_filter::freqs[2][38] = {
-	{ 0, 20, 22, 24, 26, 28, 30, 32, 36, 40, 45, 50, 56, 63, 70, 80, 90, 100, 110, 125, 140, 160, 180, 200, 225, 250, 280, 315, 355, 400, 450, 500, 560, 630, 700, 800, 900, 1000 },
-	{ 0, 1000, 1100, 1200, 1400, 1600, 1800, 2000, 2200, 2500, 2800, 3200, 3600, 4000, 4500, 5000, 5600, 6300, 7000, 8000, 9000, 10000, 11000, 12000, 14000, 16000, 18000, 20000 },
-};
 
 menu_audio_effect_filter::menu_audio_effect_filter(mame_ui_manager &mui, render_container &container, u16 chain, u16 entry, audio_effect *effect)
 	: menu(mui, container)
@@ -27,44 +23,110 @@ menu_audio_effect_filter::menu_audio_effect_filter(mame_ui_manager &mui, render_
 	m_chain = chain;
 	m_entry = entry;
 	m_effect = static_cast<audio_effect_filter *>(effect);
-	set_heading(util::string_format("%s #%u", chain == 0xffff ? _("Default") : machine().sound().effect_chain_tag(chain), entry+1));
-	set_process_flags(PROCESS_LR_REPEAT | PROCESS_LR_ALWAYS);
+	set_heading(util::string_format("%s (%s)",
+			_(audio_effect::effect_names[audio_effect::FILTER]),
+			chain == 0xffff ? _("Default") : machine().sound().effect_chain_tag(chain)));
+	set_process_flags(PROCESS_LR_REPEAT);
 }
 
 menu_audio_effect_filter::~menu_audio_effect_filter()
 {
 }
 
-std::pair<u32, u32> menu_audio_effect_filter::find_f(bool lp) const
+u32 menu_audio_effect_filter::decrement_f(u32 f, bool alt_pressed, bool ctrl_pressed, bool shift_pressed)
 {
-	u32 variant = lp ? 1 : 0;
-	u32 bi = 0;
-	s32 dt = 40000;
-	s32 f = s32((lp ? m_effect->fl() : m_effect->fh()) + 0.5);
-	for(u32 index = 1; freqs[variant][index]; index++) {
-		s32 d1 = f - freqs[variant][index];
-		if(d1 < 0)
-			d1 = -d1;
-		if(d1 < dt) {
-			dt = d1;
-			bi = index;
-		}
-	}
-	return std::make_pair(variant, bi);
+	const u32 min = std::min(FH_MIN, FL_MIN);
+	if(!shift_pressed && alt_pressed)
+		return min;
+
+	// pseudo-logarithmic scale
+	u32 incval;
+	if(f <= 100)
+		incval = 10;
+	else if(f <= 500)
+		incval = 50;
+	else if(f <= 1000)
+		incval = 100;
+	else if(f <= 2500)
+		incval = 250;
+	else if(f <= 5000)
+		incval = 500;
+	else
+		incval = 1000;
+
+	if(shift_pressed && alt_pressed)
+		incval /= 100;
+	else if(shift_pressed)
+		incval /= 10;
+	else if(ctrl_pressed)
+		incval *= 10;
+
+	if(incval <= 1)
+		incval = 1;
+	else if(f % incval)
+		f += incval - f % incval;
+
+	f -= incval;
+	return (f < min) ? min : f;
 }
 
-void menu_audio_effect_filter::change_f(bool lp, s32 direction)
+u32 menu_audio_effect_filter::increment_f(u32 f, bool alt_pressed, bool ctrl_pressed, bool shift_pressed)
 {
-	auto [variant, bi] = find_f(lp);
-	bi += direction;
-	if(!freqs[variant][bi])
-		bi -= direction;
-	if(lp)
-		m_effect->set_fl(freqs[variant][bi]);
+	const u32 max = std::max(FH_MAX, FL_MAX);
+	if(!shift_pressed && alt_pressed)
+		return max;
+
+	// pseudo-logarithmic scale
+	u32 incval;
+	if(f >= 5000)
+		incval = 1000;
+	else if(f >= 2500)
+		incval = 500;
+	else if(f >= 1000)
+		incval = 250;
+	else if(f >= 500)
+		incval = 100;
+	else if(f >= 100)
+		incval = 50;
 	else
-		m_effect->set_fh(freqs[variant][bi]);
-	if(m_chain == 0xffff)
-		machine().sound().default_effect_changed(m_entry);
+		incval = 10;
+
+	if(shift_pressed && alt_pressed)
+		incval /= 100;
+	else if(shift_pressed)
+		incval /= 10;
+	else if(ctrl_pressed)
+		incval *= 10;
+
+	if(incval <= 1)
+		incval = 1;
+	else if(f % incval)
+		f -= f % incval;
+
+	f += incval;
+	return (f > max) ? max : f;
+}
+
+float menu_audio_effect_filter::decrement_q(float q, bool alt_pressed, bool ctrl_pressed, bool shift_pressed)
+{
+	const float min = 0.1f;
+	if(alt_pressed)
+		return min;
+
+	float incval = ctrl_pressed ? -1 : shift_pressed ? -0.01f : -0.1f;
+	q = roundf((q + incval) * 100.0f) / 100.0f;
+	return (q < min) ? min : q;
+}
+
+float menu_audio_effect_filter::increment_q(float q, bool alt_pressed, bool ctrl_pressed, bool shift_pressed)
+{
+	const float max = 10.0f;
+	if(alt_pressed)
+		return max;
+
+	float incval = ctrl_pressed ? 1 : shift_pressed ? 0.01f : 0.1f;
+	q = roundf((q + incval) * 100.0f) / 100.0f;
+	return (q > max) ? max : q;
 }
 
 bool menu_audio_effect_filter::handle(event const *ev)
@@ -72,7 +134,22 @@ bool menu_audio_effect_filter::handle(event const *ev)
 	if(!ev)
 		return false;
 
+	bool alt_pressed = machine().input().code_pressed(KEYCODE_LALT) || machine().input().code_pressed(KEYCODE_RALT);
+	bool ctrl_pressed = machine().input().code_pressed(KEYCODE_LCONTROL) || machine().input().code_pressed(KEYCODE_RCONTROL);
+	bool shift_pressed = machine().input().code_pressed(KEYCODE_LSHIFT) || machine().input().code_pressed(KEYCODE_RSHIFT);
+
 	switch(ev->iptkey) {
+	case IPT_UI_SELECT: {
+		if(uintptr_t(ev->itemref) == RESET_ALL) {
+			m_effect->reset_all();
+			if(m_chain == 0xffff)
+				machine().sound().default_effect_changed(m_entry);
+			reset(reset_options::REMEMBER_REF);
+			return true;
+		}
+		break;
+	}
+
 	case IPT_UI_LEFT: {
 		switch(uintptr_t(ev->itemref)) {
 		case ACTIVE | HP:
@@ -82,16 +159,17 @@ bool menu_audio_effect_filter::handle(event const *ev)
 			reset(reset_options::REMEMBER_POSITION);
 			return true;
 
-		case F | HP:
-			change_f(false, -1);
+		case F | HP: {
+			u32 f = decrement_f(m_effect->fh(), alt_pressed, ctrl_pressed, shift_pressed);
+			m_effect->set_fh(std::clamp(f, FH_MIN, FH_MAX));
+			if(m_chain == 0xffff)
+				machine().sound().default_effect_changed(m_entry);
 			reset(reset_options::REMEMBER_POSITION);
 			return true;
+		}
 
 		case Q | HP: {
-			float q = m_effect->qh();
-			q = (int(q*10 + 0.5) - 1) / 10.0;
-			if(q < 0.1)
-				q = 0.1;
+			float q = decrement_q(m_effect->qh(), alt_pressed, ctrl_pressed, shift_pressed);
 			m_effect->set_qh(q);
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
@@ -106,16 +184,17 @@ bool menu_audio_effect_filter::handle(event const *ev)
 			reset(reset_options::REMEMBER_POSITION);
 			return true;
 
-		case F | LP:
-			change_f(true, -1);
+		case F | LP: {
+			u32 f = decrement_f(m_effect->fl(), alt_pressed, ctrl_pressed, shift_pressed);
+			m_effect->set_fl(std::clamp(f, FL_MIN, FL_MAX));
+			if(m_chain == 0xffff)
+				machine().sound().default_effect_changed(m_entry);
 			reset(reset_options::REMEMBER_POSITION);
 			return true;
+		}
 
 		case Q | LP: {
-			float q = m_effect->ql();
-			q = (int(q*10 + 0.5) - 1) / 10.0;
-			if(q < 0.1)
-				q = 0.1;
+			float q = decrement_q(m_effect->ql(), alt_pressed, ctrl_pressed, shift_pressed);
 			m_effect->set_ql(q);
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
@@ -135,16 +214,17 @@ bool menu_audio_effect_filter::handle(event const *ev)
 			reset(reset_options::REMEMBER_POSITION);
 			return true;
 
-		case F | HP:
-			change_f(false, +1);
+		case F | HP: {
+			u32 f = increment_f(m_effect->fh(), alt_pressed, ctrl_pressed, shift_pressed);
+			m_effect->set_fh(std::clamp(f, FH_MIN, FH_MAX));
+			if(m_chain == 0xffff)
+				machine().sound().default_effect_changed(m_entry);
 			reset(reset_options::REMEMBER_POSITION);
 			return true;
+		}
 
 		case Q | HP: {
-			float q = m_effect->qh();
-			q = (int(q*10 + 0.5) + 1) / 10.0;
-			if(q > 10)
-				q = 10;
+			float q = increment_q(m_effect->qh(), alt_pressed, ctrl_pressed, shift_pressed);
 			m_effect->set_qh(q);
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
@@ -159,16 +239,17 @@ bool menu_audio_effect_filter::handle(event const *ev)
 			reset(reset_options::REMEMBER_POSITION);
 			return true;
 
-		case F | LP:
-			change_f(true, +1);
+		case F | LP: {
+			u32 f = increment_f(m_effect->fl(), alt_pressed, ctrl_pressed, shift_pressed);
+			m_effect->set_fl(std::clamp(f, FL_MIN, FL_MAX));
+			if(m_chain == 0xffff)
+				machine().sound().default_effect_changed(m_entry);
 			reset(reset_options::REMEMBER_POSITION);
 			return true;
+		}
 
 		case Q | LP: {
-			float q = m_effect->ql();
-			q = (int(q*10 + 0.5) + 1) / 10.0;
-			if(q > 10)
-				q = 10;
+			float q = increment_q(m_effect->ql(), alt_pressed, ctrl_pressed, shift_pressed);
 			m_effect->set_ql(q);
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
@@ -229,14 +310,19 @@ bool menu_audio_effect_filter::handle(event const *ev)
 	return false;
 }
 
-std::string menu_audio_effect_filter::format_f(float f)
+std::string menu_audio_effect_filter::format_fh(u32 f)
 {
-	return f >= 1000 ? util::string_format("%.1fkHz", f/1000) : util::string_format("%.0fHz", f);
+	return (f <= FH_MIN) ? _("DC removal") : util::string_format("%d Hz", f);
+}
+
+std::string menu_audio_effect_filter::format_fl(u32 f)
+{
+	return util::string_format("%d Hz", f);
 }
 
 std::string menu_audio_effect_filter::format_q(float q)
 {
-	return util::string_format("%.1f", q);
+	return util::string_format("%.2f", q);
 }
 
 u32 menu_audio_effect_filter::flag_highpass_active() const
@@ -256,10 +342,10 @@ u32 menu_audio_effect_filter::flag_fh() const
 	u32 flag = 0;
 	if(!m_effect->isset_fh())
 		flag |= FLAG_INVERT;
-	auto [variant, bi] = find_f(false);
-	if(freqs[variant][bi-1])
+	u32 f = m_effect->fh();
+	if(f > FH_MIN)
 		flag |= FLAG_LEFT_ARROW;
-	if(freqs[variant][bi+1])
+	if(f < FH_MAX)
 		flag |= FLAG_RIGHT_ARROW;
 	return flag;
 }
@@ -269,10 +355,10 @@ u32 menu_audio_effect_filter::flag_qh() const
 	u32 flag = 0;
 	if(!m_effect->isset_qh())
 		flag |= FLAG_INVERT;
-	float q = m_effect->qh();
-	if(q > 0.1)
+	u32 q = roundf(m_effect->qh() * 100.0f);
+	if(q > 10)
 		flag |= FLAG_LEFT_ARROW;
-	if(q < 10)
+	if(q < 1000)
 		flag |= FLAG_RIGHT_ARROW;
 	return flag;
 }
@@ -294,10 +380,10 @@ u32 menu_audio_effect_filter::flag_fl() const
 	u32 flag = 0;
 	if(!m_effect->isset_fl())
 		flag |= FLAG_INVERT;
-	auto [variant, bi] = find_f(true);
-	if(freqs[variant][bi-1])
+	u32 f = m_effect->fl();
+	if(f > FL_MIN)
 		flag |= FLAG_LEFT_ARROW;
-	if(freqs[variant][bi+1])
+	if(f < FL_MAX)
 		flag |= FLAG_RIGHT_ARROW;
 	return flag;
 }
@@ -307,26 +393,28 @@ u32 menu_audio_effect_filter::flag_ql() const
 	u32 flag = 0;
 	if(!m_effect->isset_ql())
 		flag |= FLAG_INVERT;
-	float q = m_effect->ql();
-	if(q > 0.1)
+	u32 q = roundf(m_effect->ql() * 100.0f);
+	if(q > 10)
 		flag |= FLAG_LEFT_ARROW;
-	if(q < 10)
+	if(q < 1000)
 		flag |= FLAG_RIGHT_ARROW;
 	return flag;
 }
 
 void menu_audio_effect_filter::populate()
 {
-	item_append(_(audio_effect::effect_names[audio_effect::FILTER]), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
-	item_append(_("Highpass (DC removal)"), m_effect->highpass_active() ? _("Active") : _("Bypass"), flag_highpass_active(), (void *)(ACTIVE | HP));
-	item_append(_("Highpass cutoff"), format_f(m_effect->fh()), flag_fh(), (void *)(F | HP)); 
-	item_append(_("Highpass Q"), format_q(m_effect->qh()), flag_qh(), (void *)(Q | HP)); 
+	item_append(_("High-pass Filter"), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
+	item_append(_("Mode"), m_effect->highpass_active() ? _("Active") : _("Bypass"), flag_highpass_active(), (void *)(ACTIVE | HP));
+	item_append(_("Cutoff frequency"), format_fh(m_effect->fh()), flag_fh(), (void *)(F | HP));
+	item_append(_("Q factor"), format_q(m_effect->qh()), flag_qh(), (void *)(Q | HP));
 
-	item_append(_("Lowpass"), m_effect->lowpass_active() ? _("Active") : _("Bypass"), flag_lowpass_active(), (void *)(ACTIVE | LP));
-	item_append(_("Lowpass cutoff"), format_f(m_effect->fl()), flag_fl(), (void *)(F | LP)); 
-	item_append(_("Lowpass Q"), format_q(m_effect->ql()), flag_ql(), (void *)(Q | LP)); 
+	item_append(_("Low-pass Filter"), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
+	item_append(_("Mode"), m_effect->lowpass_active() ? _("Active") : _("Bypass"), flag_lowpass_active(), (void *)(ACTIVE | LP));
+	item_append(_("Cutoff frequency"), format_fl(m_effect->fl()), flag_fl(), (void *)(F | LP));
+	item_append(_("Q factor"), format_q(m_effect->ql()), flag_ql(), (void *)(Q | LP));
 
 	item_append(menu_item_type::SEPARATOR);
+	item_append(_("Reset All"), 0, (void *)RESET_ALL);
 }
 
 void menu_audio_effect_filter::recompute_metrics(uint32_t width, uint32_t height, float aspect)

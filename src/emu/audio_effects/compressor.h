@@ -75,6 +75,7 @@ public:
 	void reset_inertia();
 	void reset_inertia_decay();
 	void reset_ceiling();
+	void reset_all();
 
 private:
 	u32 m_mode;
@@ -112,7 +113,7 @@ private:
 	std::vector<float> m_inertia_velocity;
 
 	static double db_to_value(double db);
-	static double value_to_db(double value);	
+	static double value_to_db(double value);
 };
 
 #endif

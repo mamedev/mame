@@ -32,9 +32,12 @@ protected:
 	virtual void menu_deactivated() override;
 
 private:
-	enum { ACTIVE = 1, F = 2, Q = 3, HP = 0, LP = 8 };
+	enum { ACTIVE = 1, F = 2, Q = 3, HP = 0, LP = 8, RESET_ALL = 0xff };
 
-	static const u32 freqs[2][38];
+	static constexpr u32 FH_MIN = 20;
+	static constexpr u32 FH_MAX = 5000;
+	static constexpr u32 FL_MIN = 100;
+	static constexpr u32 FL_MAX = 20000;
 
 	u16 m_chain, m_entry;
 	audio_effect_filter *m_effect;
@@ -42,7 +45,8 @@ private:
 	virtual void populate() override;
 	virtual bool handle(event const *ev) override;
 
-	static std::string format_f(float f);
+	static std::string format_fh(u32 f);
+	static std::string format_fl(u32 f);
 	static std::string format_q(float q);
 	u32 flag_highpass_active() const;
 	u32 flag_fh() const;
@@ -51,8 +55,10 @@ private:
 	u32 flag_fl() const;
 	u32 flag_ql() const;
 
-	std::pair<u32, u32> find_f(bool lp) const;
-	void change_f(bool lp, s32 direction);
+	u32 decrement_f(u32 f, bool alt_pressed, bool ctrl_pressed, bool shift_pressed);
+	u32 increment_f(u32 f, bool alt_pressed, bool ctrl_pressed, bool shift_pressed);
+	float decrement_q(float q, bool alt_pressed, bool ctrl_pressed, bool shift_pressed);
+	float increment_q(float q, bool alt_pressed, bool ctrl_pressed, bool shift_pressed);
 };
 
 } // namespace ui

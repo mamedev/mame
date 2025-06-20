@@ -30,7 +30,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 -->
 
 
-	<software name="007rcng">
+	<software name="007rcng_us" cloneof="007rcng">
 		<!--
 		redump.org/disc/633
 		<rom name="007 Racing (USA).cue" size="82" crc="5c58d484" sha1="f74c52098f149c91f066b17e9000d5a059ec4405"/>
@@ -50,7 +50,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		</part>
 	</software>
 
-	<software name="007tnd">
+	<software name="007tnd_us" cloneof="007tnd">
 		<!--
 		redump.org/disc/830
 		<rom name="007 - Tomorrow Never Dies (USA).cue" size="97" crc="dc22c9e3" sha1="55b145bd5563c4b62cf3fadeda704340824c7b55"/>
@@ -69,7 +69,7 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		</part>
 	</software>
 
-	<software name="007twine">
+	<software name="007twine_us" cloneof="007twine">
 		<!--
 		redump.org/disc/2387
 		<rom name="007 - The World Is Not Enough (USA).cue" size="101" crc="adc163bd" sha1="1e4a0731b245ab3419a5e0f23cb1001e1f1e7613"/>
@@ -283,6 +283,26 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="2Xtreme (USA)" sha1="81e5c9f63798bb785555ef6bd2a89ee8172c7860"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="fifa2k2w_us" cloneof="fifa2k2w">
+		<!--
+		http://redump.org/disc/7292/
+		<rom name="2002 FIFA World Cup (USA) (En,Es).cue" size="99" crc="ce349b32" sha1="57df3eb3cfcd44be5f422c13ad181b53460dfe90"/>
+		<rom name="2002 FIFA World Cup (USA) (En,Es).bin" size="514612896" crc="472333bc" sha1="720c8613669d684be002e1f454acc532a98eb241"/>
+		-->
+		<description>2002 FIFA World Cup (USA)</description>
+		<year>2002</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Electronic Arts"/>
+		<info name="language" value="English/Spanish" />
+		<info name="serial" value="SLUS-01449"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="2002 FIFA World Cup (USA) (En,Es)" sha1="204157e6df9f49254be01dcd181981a5fc172659"/>
 			</diskarea>
 		</part>
 	</software>
@@ -680,83 +700,85 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		</part>
 	</software>
 
-	<!-- boot OK -->
-	<software name="aircombt">
+	<software name="aircombt_us" cloneof="aircombt">
 		<!--
-		Original images (Redump)
-		<rom name="Air Combat (USA).cue" size="6975" crc="6cb0aaa1" sha1="6bb0056c230defaa52bc56e86c0f3c00e114b7d6"/>
-		<rom name="Air Combat (USA) (Track 01).bin" size="106249248" crc="719f2efa" sha1="fba261a0ca69bed3018d00e89a74aa2921cffd51"/>
-		<rom name="Air Combat (USA) (Track 02).bin" size="36738240" crc="e6604b54" sha1="f2868a668beeb5b709afac84d14555fd50372041"/>
-		<rom name="Air Combat (USA) (Track 03).bin" size="28652064" crc="b18c652d" sha1="62fc6f4574f6cd05412460bffa8a6c71d68f90eb"/>
-		<rom name="Air Combat (USA) (Track 04).bin" size="27024480" crc="fd6529d3" sha1="632313b0e7de9d4f87ffe853f65943b8fe15ebfc"/>
-		<rom name="Air Combat (USA) (Track 05).bin" size="28993104" crc="f71fe9c4" sha1="1c924e33b0183ed0e4f7213dfba903a6ff7b7cfe"/>
-		<rom name="Air Combat (USA) (Track 06).bin" size="13373472" crc="fd8c35df" sha1="70d8b090774191b5e22cc265fdfd4b9bb476a155"/>
-		<rom name="Air Combat (USA) (Track 07).bin" size="21010416" crc="7937b637" sha1="198e26e3c16495ed00ff27004ea75c0183fff163"/>
-		<rom name="Air Combat (USA) (Track 08).bin" size="29425872" crc="e84043cf" sha1="72daa305a67a920909dcb18af4e6c9e6abf10204"/>
-		<rom name="Air Combat (USA) (Track 09).bin" size="31634400" crc="70e129c6" sha1="909b416fcbb83a7c590cc97ad0309464de167b30"/>
-		<rom name="Air Combat (USA) (Track 10).bin" size="26391792" crc="73ac9def" sha1="21d8cf0dfceecc17ecb958b6bf9799895f87cef2"/>
-		<rom name="Air Combat (USA) (Track 11).bin" size="21946512" crc="de0fa43e" sha1="0fc0b8580200d4e72b37f3f2778163f108844fab"/>
-		<rom name="Air Combat (USA) (Track 12).bin" size="15066912" crc="b067eb09" sha1="df716bba8ef894eb57792879229b2019622aa59b"/>
-		<rom name="Air Combat (USA) (Track 13).bin" size="15172752" crc="59efad88" sha1="7b79eb67e3205623653ebdfb30f5aae411f91de3"/>
-		<rom name="Air Combat (USA) (Track 14).bin" size="2253216" crc="6325eb0a" sha1="4c297ef440556ea34bfccd9bd5af31bdf4484d26"/>
-		<rom name="Air Combat (USA) (Track 15).bin" size="12103392" crc="9e063251" sha1="4de8924fbd50846dfac165daa1961b40dd8517c6"/>
-		<rom name="Air Combat (USA) (Track 16).bin" size="2471952" crc="4058386a" sha1="a6268a8d77d1238d3ebbb859031a826ed53e72a3"/>
-		<rom name="Air Combat (USA) (Track 17).bin" size="21417312" crc="4e808c90" sha1="6b7380ab04dc0b3e6a465e94abf4ad2f626b4bf8"/>
-		<rom name="Air Combat (USA) (Track 18).bin" size="26709312" crc="101c6976" sha1="e8828fa899d1946bd1ea69ccd65547ddd373ddf8"/>
-		<rom name="Air Combat (USA) (Track 19).bin" size="9175152" crc="dbd916ca" sha1="fed3c81ab2046787b4020531d92f46fac7f0ae1c"/>
-		<rom name="Air Combat (USA) (Track 20).bin" size="16061808" crc="1bf98118" sha1="078e39531684272903d3eb4aafdd31b989675fd2"/>
-		<rom name="Air Combat (USA) (Track 21).bin" size="2775360" crc="6c254834" sha1="4baa057175777ac899032192ccbc39295b20f40a"/>
-		<rom name="Air Combat (USA) (Track 22).bin" size="1147776" crc="8aae87d1" sha1="cf7dd4c7cd35476ded88f604e85ee9236ba2e3da"/>
-		<rom name="Air Combat (USA) (Track 23).bin" size="2105040" crc="eb78944b" sha1="c9576bdc8bdf73f256808a883e6b7daaa6c66556"/>
-		<rom name="Air Combat (USA) (Track 24).bin" size="1147776" crc="11133ce5" sha1="11fa285e225a93063890481d81fb3d2e96335683"/>
-		<rom name="Air Combat (USA) (Track 25).bin" size="1846320" crc="7f3709ac" sha1="1d04eefcd5c0178e38c72f587f51cf8aaf611d05"/>
-		<rom name="Air Combat (USA) (Track 26).bin" size="1192464" crc="9bcb2928" sha1="ee5d4369f95d106faa045ae6b8898e26265bb5b8"/>
-		<rom name="Air Combat (USA) (Track 27).bin" size="1150128" crc="b3735a67" sha1="1966f4a4aefd7e2462476acbd4ad86aef53146ea"/>
-		<rom name="Air Combat (USA) (Track 28).bin" size="2243808" crc="a2f89695" sha1="2eb425b4265de08e6ed5971628dc099acc734291"/>
-		<rom name="Air Combat (USA) (Track 29).bin" size="1514688" crc="aeda8a6b" sha1="9f48166062a4e29f548a1231e8cb50e1d251d1c2"/>
-		<rom name="Air Combat (USA) (Track 30).bin" size="2907072" crc="d7e9dbbc" sha1="6a55683bec61d0ea4abdd1ca443b3a5b6d67f9e7"/>
-		<rom name="Air Combat (USA) (Track 31).bin" size="2145024" crc="07116b29" sha1="677391b7f58e9bf22caa38726cf0ce7971bc296a"/>
-		<rom name="Air Combat (USA) (Track 32).bin" size="1147776" crc="4567d162" sha1="63cfce6a894f361d11484f7d0d3f717e53c0beae"/>
-		<rom name="Air Combat (USA) (Track 33).bin" size="1161888" crc="2dc65e7c" sha1="b1a50baf0bcbf510fb4f858ecfaa41c110294aa7"/>
-		<rom name="Air Combat (USA) (Track 34).bin" size="2036832" crc="e73d96e3" sha1="1ce2f0ed5c83e5feb0ce03c6219c59cbbb7c8427"/>
-		<rom name="Air Combat (USA) (Track 35).bin" size="1190112" crc="e7c897cc" sha1="2316f0988e96166980504896f36184f3afcb47fa"/>
-		<rom name="Air Combat (USA) (Track 36).bin" size="1698144" crc="64c1b3c7" sha1="c6813c2db55175d28462298b0a2cb21afa19a1b8"/>
-		<rom name="Air Combat (USA) (Track 37).bin" size="4370016" crc="6c5117e0" sha1="6a2dea25522ef46de2b65d8dc1ba45491149f233"/>
-		<rom name="Air Combat (USA) (Track 38).bin" size="1147776" crc="5f560df7" sha1="1e63a3c893c10557dfba70d5bccacd34c7cf4b95"/>
-		<rom name="Air Combat (USA) (Track 39).bin" size="1333584" crc="5953a590" sha1="2d2afb9a8ffb6bbb62864b0cc6e2c9b7acb7b0cd"/>
-		<rom name="Air Combat (USA) (Track 40).bin" size="1851024" crc="ddced3a7" sha1="250a1a449dafd96ff915e2797ca039874b7dc1d5"/>
-		<rom name="Air Combat (USA) (Track 41).bin" size="1147776" crc="e9473517" sha1="795d09fb292b7c598988eb7fb7182d08d68ac8d8"/>
-		<rom name="Air Combat (USA) (Track 42).bin" size="1147776" crc="d3dba64b" sha1="7a4cc713157994a3b90b853d0e6c33cd0c24cae1"/>
-		<rom name="Air Combat (USA) (Track 43).bin" size="4235952" crc="4c1f8962" sha1="2b1a3c8f76e68d3d423b81b1ac26797a442e20a0"/>
-		<rom name="Air Combat (USA) (Track 44).bin" size="2330832" crc="2ac449a1" sha1="d107d3290e203b01a72cea241d39fc4d877f08b1"/>
-		<rom name="Air Combat (USA) (Track 45).bin" size="1147776" crc="1a8dd5bd" sha1="822a999f89d6d8bd001c0cb7f25ef368ee7059a9"/>
-		<rom name="Air Combat (USA) (Track 46).bin" size="1183056" crc="14949216" sha1="f373b8ef003f56b69e63b382158b9593757f7436"/>
-		<rom name="Air Combat (USA) (Track 47).bin" size="3229296" crc="5e4a84d8" sha1="7d8e75995fd4dcea4ae728345636cc37ae076ecf"/>
-		<rom name="Air Combat (USA) (Track 48).bin" size="1147776" crc="f803e31c" sha1="bc64abb228025b6d15e7b458ac0aa13e800a71bc"/>
-		<rom name="Air Combat (USA) (Track 49).bin" size="2613072" crc="49e4e3f3" sha1="94756a349674ca84c1166ab099cf728a64320762"/>
-		<rom name="Air Combat (USA) (Track 50).bin" size="1147776" crc="95f930a9" sha1="3b760c45abad3b385d6adf21da0fd946f494d502"/>
-		<rom name="Air Combat (USA) (Track 51).bin" size="1905120" crc="c773efa2" sha1="d6785861aa3f8cbb923c572bdf29c6637ca5398e"/>
-		<rom name="Air Combat (USA) (Track 52).bin" size="1350048" crc="db8c1eef" sha1="aa78a1bea5c8d94b9be3ad440b37c0d793c0e860"/>
-		<rom name="Air Combat (USA) (Track 53).bin" size="1147776" crc="7f9cec6f" sha1="251603cb0b437cdc2bee48f6872b1083cdd48238"/>
-		<rom name="Air Combat (USA) (Track 54).bin" size="1147776" crc="83e91720" sha1="0a41ee59aaf610dce3108a4822372781acf3f677"/>
-		<rom name="Air Combat (USA) (Track 55).bin" size="1150128" crc="c0f1a962" sha1="d4923027288040fde405470d9f9a1b3eaf767519"/>
-		<rom name="Air Combat (USA) (Track 56).bin" size="1150128" crc="0301987b" sha1="fb871082c45b47315948f35e5e72a13b2feb05c6"/>
-		<rom name="Air Combat (USA) (Track 57).bin" size="1178352" crc="dbf35e36" sha1="29ec4551096c038436f92962983d453f5aba3d75"/>
-		<rom name="Air Combat (USA) (Track 58).bin" size="2196768" crc="b64928fa" sha1="10e7395f83b758fdfe49cc99e815ee637d2241c8"/>
-		<rom name="Air Combat (USA) (Track 59).bin" size="1190112" crc="d45922f7" sha1="6acf92b0c350db98beafac389d51602deb4d539b"/>
-		<rom name="Air Combat (USA) (Track 60).bin" size="1484112" crc="5e029cf7" sha1="69ce8ef6ae3b043d3417b0bd0fdf3ca3c8bc4a58"/>
-		<rom name="Air Combat (USA) (Track 61).bin" size="3532704" crc="3389aac7" sha1="7cecef95f3affa36dcb05166e5a02de54ecdf336"/>
-		<rom name="Air Combat (USA) (Track 62).bin" size="2100336" crc="b15ec2c2" sha1="ba80e7e73aa3f6c43084ce4f9e7c316018692cd9"/>
-		<rom name="Air Combat (USA) (Track 63).bin" size="42796992" crc="df07e201" sha1="56cbbf607b9f3c4fe620bb6f6a84349a349a755a"/>
+		http://redump.org/disc/2997
+		<rom name="Air Combat (USA).cue" size="6975" crc="6cb0aaa1" md5="ca0eeaac6ffd9061df6fb281631663d3" sha1="6bb0056c230defaa52bc56e86c0f3c00e114b7d6"/>
+		<rom name="Air Combat (USA) (Track 01).bin" size="106249248" crc="719f2efa" md5="5a6e6a68e85925596983799278a5fec6" sha1="fba261a0ca69bed3018d00e89a74aa2921cffd51"/>
+		<rom name="Air Combat (USA) (Track 02).bin" size="36738240" crc="e6604b54" md5="8de4f55b6c6a00d0afc3bdecacd8e243" sha1="f2868a668beeb5b709afac84d14555fd50372041"/>
+		<rom name="Air Combat (USA) (Track 03).bin" size="28652064" crc="b18c652d" md5="3244e6e93e44f5a879a26cb420fb68c1" sha1="62fc6f4574f6cd05412460bffa8a6c71d68f90eb"/>
+		<rom name="Air Combat (USA) (Track 04).bin" size="27024480" crc="fd6529d3" md5="7299d6de5f1e8a5a1a6b8ff6202a50b3" sha1="632313b0e7de9d4f87ffe853f65943b8fe15ebfc"/>
+		<rom name="Air Combat (USA) (Track 05).bin" size="28993104" crc="f71fe9c4" md5="82c049afed8be6bdbc03a8db7ed116e0" sha1="1c924e33b0183ed0e4f7213dfba903a6ff7b7cfe"/>
+		<rom name="Air Combat (USA) (Track 06).bin" size="13373472" crc="fd8c35df" md5="68dca330de2f16b7c0d3d00390634454" sha1="70d8b090774191b5e22cc265fdfd4b9bb476a155"/>
+		<rom name="Air Combat (USA) (Track 07).bin" size="21010416" crc="7937b637" md5="596ebd01751fff991b3370469de67bd3" sha1="198e26e3c16495ed00ff27004ea75c0183fff163"/>
+		<rom name="Air Combat (USA) (Track 08).bin" size="29425872" crc="e84043cf" md5="045fd745da52a4ba0967b68725a33536" sha1="72daa305a67a920909dcb18af4e6c9e6abf10204"/>
+		<rom name="Air Combat (USA) (Track 09).bin" size="31634400" crc="70e129c6" md5="fdeb5dab0336e391a237fa7be42c53af" sha1="909b416fcbb83a7c590cc97ad0309464de167b30"/>
+		<rom name="Air Combat (USA) (Track 10).bin" size="26391792" crc="73ac9def" md5="413f8d58119c4cb270a5c05ce034d924" sha1="21d8cf0dfceecc17ecb958b6bf9799895f87cef2"/>
+		<rom name="Air Combat (USA) (Track 11).bin" size="21946512" crc="de0fa43e" md5="f8c06321f407d8201410546048a1ead5" sha1="0fc0b8580200d4e72b37f3f2778163f108844fab"/>
+		<rom name="Air Combat (USA) (Track 12).bin" size="15066912" crc="b067eb09" md5="a07aab1aae50baeca1959f3e57ddec80" sha1="df716bba8ef894eb57792879229b2019622aa59b"/>
+		<rom name="Air Combat (USA) (Track 13).bin" size="15172752" crc="59efad88" md5="e139dd24fa12a7b75325d3a218d84098" sha1="7b79eb67e3205623653ebdfb30f5aae411f91de3"/>
+		<rom name="Air Combat (USA) (Track 14).bin" size="2253216" crc="6325eb0a" md5="3d425e1782087faf1ef13d8345948ce8" sha1="4c297ef440556ea34bfccd9bd5af31bdf4484d26"/>
+		<rom name="Air Combat (USA) (Track 15).bin" size="12103392" crc="9e063251" md5="52c05bb4fd205c6872d221c92060ee77" sha1="4de8924fbd50846dfac165daa1961b40dd8517c6"/>
+		<rom name="Air Combat (USA) (Track 16).bin" size="2471952" crc="4058386a" md5="ff2d34a17607f3d5b2a8320061e853ff" sha1="a6268a8d77d1238d3ebbb859031a826ed53e72a3"/>
+		<rom name="Air Combat (USA) (Track 17).bin" size="21417312" crc="4e808c90" md5="e71bcb8c1a078e96fcda98d105e798ad" sha1="6b7380ab04dc0b3e6a465e94abf4ad2f626b4bf8"/>
+		<rom name="Air Combat (USA) (Track 18).bin" size="26709312" crc="101c6976" md5="5ece0636ba2e4ad60977f09dca5b1564" sha1="e8828fa899d1946bd1ea69ccd65547ddd373ddf8"/>
+		<rom name="Air Combat (USA) (Track 19).bin" size="9175152" crc="dbd916ca" md5="3e8d2b94e0cbad99568327d3f3eb1b23" sha1="fed3c81ab2046787b4020531d92f46fac7f0ae1c"/>
+		<rom name="Air Combat (USA) (Track 20).bin" size="16061808" crc="1bf98118" md5="464ab71da52ef46d528ec0ba6e04e4ac" sha1="078e39531684272903d3eb4aafdd31b989675fd2"/>
+		<rom name="Air Combat (USA) (Track 21).bin" size="2775360" crc="6c254834" md5="a26d8cbb052f355558e232e79e4bf260" sha1="4baa057175777ac899032192ccbc39295b20f40a"/>
+		<rom name="Air Combat (USA) (Track 22).bin" size="1147776" crc="8aae87d1" md5="4c2aace802c88df9eca3ce9ee701e6d8" sha1="cf7dd4c7cd35476ded88f604e85ee9236ba2e3da"/>
+		<rom name="Air Combat (USA) (Track 23).bin" size="2105040" crc="eb78944b" md5="bc87cbe8e822dbee50d26361fe23bcaa" sha1="c9576bdc8bdf73f256808a883e6b7daaa6c66556"/>
+		<rom name="Air Combat (USA) (Track 24).bin" size="1147776" crc="11133ce5" md5="f575da9ffd5c392c6e078b9e1dfa27ad" sha1="11fa285e225a93063890481d81fb3d2e96335683"/>
+		<rom name="Air Combat (USA) (Track 25).bin" size="1846320" crc="7f3709ac" md5="20604cae6e4330f3af0a9f96e3512181" sha1="1d04eefcd5c0178e38c72f587f51cf8aaf611d05"/>
+		<rom name="Air Combat (USA) (Track 26).bin" size="1192464" crc="9bcb2928" md5="4a3dcce198a5002f9e0f52d82e04d725" sha1="ee5d4369f95d106faa045ae6b8898e26265bb5b8"/>
+		<rom name="Air Combat (USA) (Track 27).bin" size="1150128" crc="b3735a67" md5="e617e1b52ffd2e902880407af1e8a305" sha1="1966f4a4aefd7e2462476acbd4ad86aef53146ea"/>
+		<rom name="Air Combat (USA) (Track 28).bin" size="2243808" crc="a2f89695" md5="ebf55b9969eca86f5b18166d4f134532" sha1="2eb425b4265de08e6ed5971628dc099acc734291"/>
+		<rom name="Air Combat (USA) (Track 29).bin" size="1514688" crc="aeda8a6b" md5="af52fd6bec907312b906d21dc572a401" sha1="9f48166062a4e29f548a1231e8cb50e1d251d1c2"/>
+		<rom name="Air Combat (USA) (Track 30).bin" size="2907072" crc="d7e9dbbc" md5="3e5347b67f7de5808edd03b9ad7f0664" sha1="6a55683bec61d0ea4abdd1ca443b3a5b6d67f9e7"/>
+		<rom name="Air Combat (USA) (Track 31).bin" size="2145024" crc="07116b29" md5="9c4cc30b7db4d6263aa7a62fa7b0857a" sha1="677391b7f58e9bf22caa38726cf0ce7971bc296a"/>
+		<rom name="Air Combat (USA) (Track 32).bin" size="1147776" crc="4567d162" md5="32f183699fa023280cbb63fca908e9ac" sha1="63cfce6a894f361d11484f7d0d3f717e53c0beae"/>
+		<rom name="Air Combat (USA) (Track 33).bin" size="1161888" crc="2dc65e7c" md5="3539c113697d8962bc283686f19b064b" sha1="b1a50baf0bcbf510fb4f858ecfaa41c110294aa7"/>
+		<rom name="Air Combat (USA) (Track 34).bin" size="2036832" crc="e73d96e3" md5="42e8510e1285ae9238ad58d4f26d660e" sha1="1ce2f0ed5c83e5feb0ce03c6219c59cbbb7c8427"/>
+		<rom name="Air Combat (USA) (Track 35).bin" size="1190112" crc="e7c897cc" md5="cc2404caa3222f551b02671036cea05b" sha1="2316f0988e96166980504896f36184f3afcb47fa"/>
+		<rom name="Air Combat (USA) (Track 36).bin" size="1698144" crc="64c1b3c7" md5="18a4671e840e9638bdd1d447d07ff25e" sha1="c6813c2db55175d28462298b0a2cb21afa19a1b8"/>
+		<rom name="Air Combat (USA) (Track 37).bin" size="4370016" crc="6c5117e0" md5="1887ae272c1450f35dc57aeb33e03831" sha1="6a2dea25522ef46de2b65d8dc1ba45491149f233"/>
+		<rom name="Air Combat (USA) (Track 38).bin" size="1147776" crc="5f560df7" md5="f3e4fc59fd886f5380023f445cde2453" sha1="1e63a3c893c10557dfba70d5bccacd34c7cf4b95"/>
+		<rom name="Air Combat (USA) (Track 39).bin" size="1333584" crc="5953a590" md5="c608afe251543fb6461bd8a29acbbc33" sha1="2d2afb9a8ffb6bbb62864b0cc6e2c9b7acb7b0cd"/>
+		<rom name="Air Combat (USA) (Track 40).bin" size="1851024" crc="ddced3a7" md5="566029534c7989c3cb8d1104cfdae78d" sha1="250a1a449dafd96ff915e2797ca039874b7dc1d5"/>
+		<rom name="Air Combat (USA) (Track 41).bin" size="1147776" crc="e9473517" md5="4de41de86194d53a12196eb56da2f01f" sha1="795d09fb292b7c598988eb7fb7182d08d68ac8d8"/>
+		<rom name="Air Combat (USA) (Track 42).bin" size="1147776" crc="d3dba64b" md5="d0f762913872a992f8a7baafde804a99" sha1="7a4cc713157994a3b90b853d0e6c33cd0c24cae1"/>
+		<rom name="Air Combat (USA) (Track 43).bin" size="4235952" crc="4c1f8962" md5="de754075b17b9b94efc25634f57df53a" sha1="2b1a3c8f76e68d3d423b81b1ac26797a442e20a0"/>
+		<rom name="Air Combat (USA) (Track 44).bin" size="2330832" crc="2ac449a1" md5="e18472edbcc74217df332a9a38d2f207" sha1="d107d3290e203b01a72cea241d39fc4d877f08b1"/>
+		<rom name="Air Combat (USA) (Track 45).bin" size="1147776" crc="1a8dd5bd" md5="888ec9aaa6a99e3bf386796ed4550a8d" sha1="822a999f89d6d8bd001c0cb7f25ef368ee7059a9"/>
+		<rom name="Air Combat (USA) (Track 46).bin" size="1183056" crc="14949216" md5="e1653296ff2f104cef7a5e5e8a8c29cc" sha1="f373b8ef003f56b69e63b382158b9593757f7436"/>
+		<rom name="Air Combat (USA) (Track 47).bin" size="3229296" crc="5e4a84d8" md5="6402f93e8e40012f8348ed611158007b" sha1="7d8e75995fd4dcea4ae728345636cc37ae076ecf"/>
+		<rom name="Air Combat (USA) (Track 48).bin" size="1147776" crc="f803e31c" md5="385814b2a9830060671be1be01ff6495" sha1="bc64abb228025b6d15e7b458ac0aa13e800a71bc"/>
+		<rom name="Air Combat (USA) (Track 49).bin" size="2613072" crc="49e4e3f3" md5="396757d89e95d6e269c96dfdea00058e" sha1="94756a349674ca84c1166ab099cf728a64320762"/>
+		<rom name="Air Combat (USA) (Track 50).bin" size="1147776" crc="95f930a9" md5="8261a86e1ce9cc7fb20c59ed7d8327a7" sha1="3b760c45abad3b385d6adf21da0fd946f494d502"/>
+		<rom name="Air Combat (USA) (Track 51).bin" size="1905120" crc="c773efa2" md5="828057e2f9f973713053e09c1a18718b" sha1="d6785861aa3f8cbb923c572bdf29c6637ca5398e"/>
+		<rom name="Air Combat (USA) (Track 52).bin" size="1350048" crc="db8c1eef" md5="c508564ff0873865f624d370a72ace90" sha1="aa78a1bea5c8d94b9be3ad440b37c0d793c0e860"/>
+		<rom name="Air Combat (USA) (Track 53).bin" size="1147776" crc="7f9cec6f" md5="b9cc695f7c458bcba090c3b9defe1034" sha1="251603cb0b437cdc2bee48f6872b1083cdd48238"/>
+		<rom name="Air Combat (USA) (Track 54).bin" size="1147776" crc="83e91720" md5="7d6d8853d198a4682b53b0605611ce9c" sha1="0a41ee59aaf610dce3108a4822372781acf3f677"/>
+		<rom name="Air Combat (USA) (Track 55).bin" size="1150128" crc="c0f1a962" md5="e1e9acb9a592a9a3daa2bb7274e842e8" sha1="d4923027288040fde405470d9f9a1b3eaf767519"/>
+		<rom name="Air Combat (USA) (Track 56).bin" size="1150128" crc="0301987b" md5="92e34be99cff756958928b5a1ab649c9" sha1="fb871082c45b47315948f35e5e72a13b2feb05c6"/>
+		<rom name="Air Combat (USA) (Track 57).bin" size="1178352" crc="dbf35e36" md5="980dcfef6a44b4d8e02d581e54ca2510" sha1="29ec4551096c038436f92962983d453f5aba3d75"/>
+		<rom name="Air Combat (USA) (Track 58).bin" size="2196768" crc="b64928fa" md5="63a794ba9d01a8f13569c1b3dcf55c10" sha1="10e7395f83b758fdfe49cc99e815ee637d2241c8"/>
+		<rom name="Air Combat (USA) (Track 59).bin" size="1190112" crc="d45922f7" md5="a2807622d03c58636b43d1e1c0cd017b" sha1="6acf92b0c350db98beafac389d51602deb4d539b"/>
+		<rom name="Air Combat (USA) (Track 60).bin" size="1484112" crc="5e029cf7" md5="274b15533f85d58e11f39533ee4788c7" sha1="69ce8ef6ae3b043d3417b0bd0fdf3ca3c8bc4a58"/>
+		<rom name="Air Combat (USA) (Track 61).bin" size="3532704" crc="3389aac7" md5="d8cb581c3d0091b714d6fa1319226c3a" sha1="7cecef95f3affa36dcb05166e5a02de54ecdf336"/>
+		<rom name="Air Combat (USA) (Track 62).bin" size="2100336" crc="b15ec2c2" md5="9c515b65a2123ad80a1dc070b41fd297" sha1="ba80e7e73aa3f6c43084ce4f9e7c316018692cd9"/>
+		<rom name="Air Combat (USA) (Track 63).bin" size="42796992" crc="df07e201" md5="e39f4fc9326ac17019c63547665beb5b" sha1="56cbbf607b9f3c4fe620bb6f6a84349a349a755a"/>
 		-->
 		<description>Air Combat (USA)</description>
 		<year>1995</year>
 		<publisher>Namco Hometek</publisher>
+		<info name="developer" value="Namco"/>
+		<info name="language" value="English"/>
+		<info name="release" value="19950913"/>
 		<info name="serial" value="SLUS-00001"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="air combat (usa)" sha1="856d309f1fd764a56fe911a50754d015478914c3"/>
+				<disk name="Air Combat (USA)" sha1="a93e9efb44d7151761ad69240b67cefa19292cc0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -9178,23 +9200,6 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="fifa soccer 2002 (usa) (en,es)" sha1="51a3fa513693c6090497a690f197161f340b2845"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="fifa2k2w">
-		<!-- Original images (Redump)
-		<rom name="2002 FIFA World Cup (USA) (En,Es).cue" size="99" crc="ce349b32" sha1="57df3eb3cfcd44be5f422c13ad181b53460dfe90"/>
-		<rom name="2002 FIFA World Cup (USA) (En,Es).bin" size="514612896" crc="472333bc" sha1="720c8613669d684be002e1f454acc532a98eb241"/>
-		-->
-		<description>2002 FIFA World Cup (USA)</description>
-		<year>2002</year>
-		<publisher>Electronic Arts</publisher>
-		<info name="serial" value="SLUS-01449"/>
-		<sharedfeat name="compatibility" value="NTSC-U"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="2002 fifa world cup (usa) (en,es)" sha1="94ed77c9560169b79a0ea310e4c0e8f3919a0055"/>
 			</diskarea>
 		</part>
 	</software>
@@ -23698,19 +23703,22 @@ For an overview of US PS1 discs that have not been dumped and added to redump's 
 		</part>
 	</software>
 
-	<software name="smurfrac">
-		<!-- Original images (Redump)
+	<software name="smurfrac_us" cloneof="smurfrac">
+		<!--
+		http://redump.org/disc/7497
 		<rom name="Smurf Racer! (USA) (En,Fr,Es).cue" size="95" crc="cb1eef81" sha1="71192eb409ecf87c41c64795a8943ddd2d00052d"/>
 		<rom name="Smurf Racer! (USA) (En,Fr,Es).bin" size="250480944" crc="42fcf35f" sha1="37a12b2791b2b433fa867f65197c056c5bfb48e1"/>
 		-->
 		<description>Smurf Racer! (USA)</description>
 		<year>2001</year>
-		<publisher>Infogrames</publisher>
+		<publisher> Infogrames</publisher>
+		<info name="developer" value="Artificial Mind + Movement"/>
+		<info name="language" value="English/French/Spanish" />
 		<info name="serial" value="SLUS-01359"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="smurf racer (usa) (en,fr,es)" sha1="aeffba07550a52ae5a3540bb92eddddfa0655f65"/>
+				<disk name="Smurf Racer (USA) (En,Fr,Es)" sha1="2552c9f065582ad4959d46d022d1a714d8d5e27c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -37871,6 +37879,89 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<software name="acecombt" cloneof="aircombt">
+		<!--
+		http://redump.org/disc/1691/
+		<rom name="Ace Combat (Japan).cue" size="7101" crc="a7a2d0f4" sha1="9230a58f78ddfe09a72cbeba40c447dd845b5501"/>
+		<rom name="Ace Combat (Japan) (Track 01).bin" size="106138704" crc="e57e6e46" sha1="3563f0a9a5c5dec04588347214483f7e8af2cd8e"/>
+		<rom name="Ace Combat (Japan) (Track 02).bin" size="36738240" crc="e6604b54" sha1="f2868a668beeb5b709afac84d14555fd50372041"/>
+		<rom name="Ace Combat (Japan) (Track 03).bin" size="28652064" crc="b18c652d" sha1="62fc6f4574f6cd05412460bffa8a6c71d68f90eb"/>
+		<rom name="Ace Combat (Japan) (Track 04).bin" size="27024480" crc="fd6529d3" sha1="632313b0e7de9d4f87ffe853f65943b8fe15ebfc"/>
+		<rom name="Ace Combat (Japan) (Track 05).bin" size="28993104" crc="f71fe9c4" sha1="1c924e33b0183ed0e4f7213dfba903a6ff7b7cfe"/>
+		<rom name="Ace Combat (Japan) (Track 06).bin" size="13373472" crc="fd8c35df" sha1="70d8b090774191b5e22cc265fdfd4b9bb476a155"/>
+		<rom name="Ace Combat (Japan) (Track 07).bin" size="21010416" crc="7937b637" sha1="198e26e3c16495ed00ff27004ea75c0183fff163"/>
+		<rom name="Ace Combat (Japan) (Track 08).bin" size="29425872" crc="e84043cf" sha1="72daa305a67a920909dcb18af4e6c9e6abf10204"/>
+		<rom name="Ace Combat (Japan) (Track 09).bin" size="31634400" crc="70e129c6" sha1="909b416fcbb83a7c590cc97ad0309464de167b30"/>
+		<rom name="Ace Combat (Japan) (Track 10).bin" size="26391792" crc="73ac9def" sha1="21d8cf0dfceecc17ecb958b6bf9799895f87cef2"/>
+		<rom name="Ace Combat (Japan) (Track 11).bin" size="21946512" crc="de0fa43e" sha1="0fc0b8580200d4e72b37f3f2778163f108844fab"/>
+		<rom name="Ace Combat (Japan) (Track 12).bin" size="15066912" crc="b067eb09" sha1="df716bba8ef894eb57792879229b2019622aa59b"/>
+		<rom name="Ace Combat (Japan) (Track 13).bin" size="15172752" crc="59efad88" sha1="7b79eb67e3205623653ebdfb30f5aae411f91de3"/>
+		<rom name="Ace Combat (Japan) (Track 14).bin" size="2253216" crc="6325eb0a" sha1="4c297ef440556ea34bfccd9bd5af31bdf4484d26"/>
+		<rom name="Ace Combat (Japan) (Track 15).bin" size="12103392" crc="9e063251" sha1="4de8924fbd50846dfac165daa1961b40dd8517c6"/>
+		<rom name="Ace Combat (Japan) (Track 16).bin" size="2471952" crc="4058386a" sha1="a6268a8d77d1238d3ebbb859031a826ed53e72a3"/>
+		<rom name="Ace Combat (Japan) (Track 17).bin" size="21417312" crc="4e808c90" sha1="6b7380ab04dc0b3e6a465e94abf4ad2f626b4bf8"/>
+		<rom name="Ace Combat (Japan) (Track 18).bin" size="26709312" crc="101c6976" sha1="e8828fa899d1946bd1ea69ccd65547ddd373ddf8"/>
+		<rom name="Ace Combat (Japan) (Track 19).bin" size="9175152" crc="dbd916ca" sha1="fed3c81ab2046787b4020531d92f46fac7f0ae1c"/>
+		<rom name="Ace Combat (Japan) (Track 20).bin" size="16061808" crc="1bf98118" sha1="078e39531684272903d3eb4aafdd31b989675fd2"/>
+		<rom name="Ace Combat (Japan) (Track 21).bin" size="2775360" crc="6c254834" sha1="4baa057175777ac899032192ccbc39295b20f40a"/>
+		<rom name="Ace Combat (Japan) (Track 22).bin" size="1147776" crc="8aae87d1" sha1="cf7dd4c7cd35476ded88f604e85ee9236ba2e3da"/>
+		<rom name="Ace Combat (Japan) (Track 23).bin" size="2105040" crc="eb78944b" sha1="c9576bdc8bdf73f256808a883e6b7daaa6c66556"/>
+		<rom name="Ace Combat (Japan) (Track 24).bin" size="1147776" crc="11133ce5" sha1="11fa285e225a93063890481d81fb3d2e96335683"/>
+		<rom name="Ace Combat (Japan) (Track 25).bin" size="1846320" crc="7f3709ac" sha1="1d04eefcd5c0178e38c72f587f51cf8aaf611d05"/>
+		<rom name="Ace Combat (Japan) (Track 26).bin" size="1192464" crc="9bcb2928" sha1="ee5d4369f95d106faa045ae6b8898e26265bb5b8"/>
+		<rom name="Ace Combat (Japan) (Track 27).bin" size="1150128" crc="b3735a67" sha1="1966f4a4aefd7e2462476acbd4ad86aef53146ea"/>
+		<rom name="Ace Combat (Japan) (Track 28).bin" size="2243808" crc="a2f89695" sha1="2eb425b4265de08e6ed5971628dc099acc734291"/>
+		<rom name="Ace Combat (Japan) (Track 29).bin" size="1514688" crc="aeda8a6b" sha1="9f48166062a4e29f548a1231e8cb50e1d251d1c2"/>
+		<rom name="Ace Combat (Japan) (Track 30).bin" size="2907072" crc="d7e9dbbc" sha1="6a55683bec61d0ea4abdd1ca443b3a5b6d67f9e7"/>
+		<rom name="Ace Combat (Japan) (Track 31).bin" size="2145024" crc="07116b29" sha1="677391b7f58e9bf22caa38726cf0ce7971bc296a"/>
+		<rom name="Ace Combat (Japan) (Track 32).bin" size="1147776" crc="4567d162" sha1="63cfce6a894f361d11484f7d0d3f717e53c0beae"/>
+		<rom name="Ace Combat (Japan) (Track 33).bin" size="1161888" crc="2dc65e7c" sha1="b1a50baf0bcbf510fb4f858ecfaa41c110294aa7"/>
+		<rom name="Ace Combat (Japan) (Track 34).bin" size="2036832" crc="e73d96e3" sha1="1ce2f0ed5c83e5feb0ce03c6219c59cbbb7c8427"/>
+		<rom name="Ace Combat (Japan) (Track 35).bin" size="1190112" crc="e7c897cc" sha1="2316f0988e96166980504896f36184f3afcb47fa"/>
+		<rom name="Ace Combat (Japan) (Track 36).bin" size="1698144" crc="64c1b3c7" sha1="c6813c2db55175d28462298b0a2cb21afa19a1b8"/>
+		<rom name="Ace Combat (Japan) (Track 37).bin" size="4370016" crc="6c5117e0" sha1="6a2dea25522ef46de2b65d8dc1ba45491149f233"/>
+		<rom name="Ace Combat (Japan) (Track 38).bin" size="1147776" crc="5f560df7" sha1="1e63a3c893c10557dfba70d5bccacd34c7cf4b95"/>
+		<rom name="Ace Combat (Japan) (Track 39).bin" size="1333584" crc="5953a590" sha1="2d2afb9a8ffb6bbb62864b0cc6e2c9b7acb7b0cd"/>
+		<rom name="Ace Combat (Japan) (Track 40).bin" size="1851024" crc="ddced3a7" sha1="250a1a449dafd96ff915e2797ca039874b7dc1d5"/>
+		<rom name="Ace Combat (Japan) (Track 41).bin" size="1147776" crc="e9473517" sha1="795d09fb292b7c598988eb7fb7182d08d68ac8d8"/>
+		<rom name="Ace Combat (Japan) (Track 42).bin" size="1147776" crc="d3dba64b" sha1="7a4cc713157994a3b90b853d0e6c33cd0c24cae1"/>
+		<rom name="Ace Combat (Japan) (Track 43).bin" size="4235952" crc="4c1f8962" sha1="2b1a3c8f76e68d3d423b81b1ac26797a442e20a0"/>
+		<rom name="Ace Combat (Japan) (Track 44).bin" size="2330832" crc="2ac449a1" sha1="d107d3290e203b01a72cea241d39fc4d877f08b1"/>
+		<rom name="Ace Combat (Japan) (Track 45).bin" size="1147776" crc="1a8dd5bd" sha1="822a999f89d6d8bd001c0cb7f25ef368ee7059a9"/>
+		<rom name="Ace Combat (Japan) (Track 46).bin" size="1183056" crc="14949216" sha1="f373b8ef003f56b69e63b382158b9593757f7436"/>
+		<rom name="Ace Combat (Japan) (Track 47).bin" size="3229296" crc="5e4a84d8" sha1="7d8e75995fd4dcea4ae728345636cc37ae076ecf"/>
+		<rom name="Ace Combat (Japan) (Track 48).bin" size="1147776" crc="f803e31c" sha1="bc64abb228025b6d15e7b458ac0aa13e800a71bc"/>
+		<rom name="Ace Combat (Japan) (Track 49).bin" size="2613072" crc="49e4e3f3" sha1="94756a349674ca84c1166ab099cf728a64320762"/>
+		<rom name="Ace Combat (Japan) (Track 50).bin" size="1147776" crc="95f930a9" sha1="3b760c45abad3b385d6adf21da0fd946f494d502"/>
+		<rom name="Ace Combat (Japan) (Track 51).bin" size="1905120" crc="c773efa2" sha1="d6785861aa3f8cbb923c572bdf29c6637ca5398e"/>
+		<rom name="Ace Combat (Japan) (Track 52).bin" size="1350048" crc="db8c1eef" sha1="aa78a1bea5c8d94b9be3ad440b37c0d793c0e860"/>
+		<rom name="Ace Combat (Japan) (Track 53).bin" size="1147776" crc="7f9cec6f" sha1="251603cb0b437cdc2bee48f6872b1083cdd48238"/>
+		<rom name="Ace Combat (Japan) (Track 54).bin" size="1147776" crc="83e91720" sha1="0a41ee59aaf610dce3108a4822372781acf3f677"/>
+		<rom name="Ace Combat (Japan) (Track 55).bin" size="1150128" crc="c0f1a962" sha1="d4923027288040fde405470d9f9a1b3eaf767519"/>
+		<rom name="Ace Combat (Japan) (Track 56).bin" size="1150128" crc="0301987b" sha1="fb871082c45b47315948f35e5e72a13b2feb05c6"/>
+		<rom name="Ace Combat (Japan) (Track 57).bin" size="1178352" crc="dbf35e36" sha1="29ec4551096c038436f92962983d453f5aba3d75"/>
+		<rom name="Ace Combat (Japan) (Track 58).bin" size="2196768" crc="b64928fa" sha1="10e7395f83b758fdfe49cc99e815ee637d2241c8"/>
+		<rom name="Ace Combat (Japan) (Track 59).bin" size="1190112" crc="d45922f7" sha1="6acf92b0c350db98beafac389d51602deb4d539b"/>
+		<rom name="Ace Combat (Japan) (Track 60).bin" size="1484112" crc="5e029cf7" sha1="69ce8ef6ae3b043d3417b0bd0fdf3ca3c8bc4a58"/>
+		<rom name="Ace Combat (Japan) (Track 61).bin" size="3532704" crc="3389aac7" sha1="7cecef95f3affa36dcb05166e5a02de54ecdf336"/>
+		<rom name="Ace Combat (Japan) (Track 62).bin" size="2100336" crc="b15ec2c2" sha1="ba80e7e73aa3f6c43084ce4f9e7c316018692cd9"/>
+		<rom name="Ace Combat (Japan) (Track 63).bin" size="42796992" crc="df07e201" sha1="56cbbf607b9f3c4fe620bb6f6a84349a349a755a"/>
+		-->
+		<description>Ace Combat (Japan)</description>
+		<year>1995</year>
+		<publisher>Namco Hometek</publisher>
+		<info name="developer" value="Namco"/>
+		<info name="language" value="Japanese"/>
+		<info name="release" value="19950630"/>
+		<info name="serial" value="SLPS-00061, SLPS-91005"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Ace Combat (Japan)" sha1="24246f8d7ec82fed76abfa12b8f49e49c5900bf9"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- boot OK -->
 	<software name="acid">
 		<!--
@@ -41638,23 +41729,45 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<!-- boot OK -->
+	<software name="darkseed">
+		<!--
+		http://redump.org/disc/1640
+		<rom name="Darkseed (Japan).cue" size="82" crc="362cf7d6" sha1="588ba9424ce50e166ec7e0b468f9fec87c7cab18"/>
+		<rom name="Darkseed (Japan).bin" size="67723488" crc="1d33c82d" sha1="c82fc8ab1e92d1837b05cf3dd81ff949f91fc695"/>
+		-->
+		<description>Darkseed (Japan)</description>
+		<year>1995</year>
+		<publisher>GaGa Communications</publisher>
+		<info name="developer" value="Cyberdreams"/>
+		<info name="language" value="Japanese" />
+		<info name="release" value="19951027"/>
+		<info name="serial" value="SLPS-00108"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Darkseed (Japan)" sha1="5595b5644fe5eed7955f95f95bff352e3779e373"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="darksed2">
 		<!--
-		Unknown source
-		<rom name="Darkseed II (Japan) [SLPS-00938].bin" size="496504848" crc="1633f553" sha1="08d2212dffa2592c380bd3671ab619ec73b8c2aa"/>
-		<rom name="Darkseed II (Japan) [SLPS-00938].cue" size="96" crc="e04a1215" sha1="ec10f863545005f23c5b5e3c8d2ca4fd0a02e5b2"/>
+		http://redump.org/disc/13946
+		<rom name="Dark Seed II (Japan).cue" size="86" crc="c588daa2" sha1="38ea9419248d65565f0fa98544b37df40ca0ea94"/>
+		<rom name="Dark Seed II (Japan).bin" size="496504848" crc="1633f553" sha1="08d2212dffa2592c380bd3671ab619ec73b8c2aa"/>
 		-->
 		<description>Darkseed II (Japan)</description>
 		<year>1997</year>
 		<publisher>B-Factory</publisher>
-		<info name="serial" value="SLPS-00938" />
-		<info name="release" value="19970918" />
 		<info name="alt_title" value="ダークシードII"/>
+		<info name="developer" value="Aim at Entertainment"/>
+		<info name="language" value="Japanese" />
+		<info name="release" value="19970918" />
+		<info name="serial" value="SLPS-00938" />
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="darkseed ii (japan) [slps-00938]" sha1="9f64263d63331bdeef8706a670683556669dd18d" status="baddump"/>
+				<disk name="Dark Seed II (Japan)" sha1="2b633602eae2000c295ae7aec769c891ba2e20bc"/>
 			</diskarea>
 		</part>
 	</software>
@@ -57492,6 +57605,37 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<software name="ttycoon_jp" cloneof="ttycoon">
+		<!--
+		http://redump.org/disc/7918
+		<rom name="Transport Tycoon 3D - SL Kara Hajimeyou!! (Japan).cue" size="1566" crc="d2603384" sha1="10fe0343fd0e20e18fd502beb32246f48d2cdf11"/>
+		<rom name="Transport Tycoon 3D - SL Kara Hajimeyou!! (Japan) (Track 01).bin" size="52242624" crc="9ce74ec3" sha1="a41ead073c5641f9ac87eb9dc87469bd775300e0"/>
+		<rom name="Transport Tycoon 3D - SL Kara Hajimeyou!! (Japan) (Track 02).bin" size="42858144" crc="3233248e" sha1="571ac211fca70fdf95d8981688664217d889144e"/>
+		<rom name="Transport Tycoon 3D - SL Kara Hajimeyou!! (Japan) (Track 03).bin" size="43008672" crc="57aed47c" sha1="849e7b29f769060594407e6a727d0e0f0c088098"/>
+		<rom name="Transport Tycoon 3D - SL Kara Hajimeyou!! (Japan) (Track 04).bin" size="40470864" crc="d1000a47" sha1="d69f8fa48646b5d5e459f3100cfb8651617dd619"/>
+		<rom name="Transport Tycoon 3D - SL Kara Hajimeyou!! (Japan) (Track 05).bin" size="43262688" crc="84cba52d" sha1="dd05eb6fcf5a453b25452cbb6645e76884922019"/>
+		<rom name="Transport Tycoon 3D - SL Kara Hajimeyou!! (Japan) (Track 06).bin" size="44382240" crc="1321fedb" sha1="4871a6f90709e029f82615c89a9b50c3b415589d"/>
+		<rom name="Transport Tycoon 3D - SL Kara Hajimeyou!! (Japan) (Track 07).bin" size="41103552" crc="554771fb" sha1="3d812fe5e9ce422b8c9b5da5934c2294870822ab"/>
+		<rom name="Transport Tycoon 3D - SL Kara Hajimeyou!! (Japan) (Track 08).bin" size="40414416" crc="5482d255" sha1="4a03aa86c8b528d68996fdb32ddc0383450a7ba5"/>
+		<rom name="Transport Tycoon 3D - SL Kara Hajimeyou!! (Japan) (Track 09).bin" size="42178416" crc="1b533fa3" sha1="af1f32695ef3aa4e4469243c433309de6793db73"/>
+		<rom name="Transport Tycoon 3D - SL Kara Hajimeyou!! (Japan) (Track 10).bin" size="46353216" crc="a7be7787" sha1="65fb31bcc92b4fe84815ebe1735cf2cf93345bec"/>
+		<rom name="Transport Tycoon 3D - SL Kara Hajimeyou!! (Japan) (Track 11).bin" size="41573952" crc="b7ca085c" sha1="aa38d004457b9689a385e9eceb3450c73b78bb08"/>
+		-->
+		<description>Transport Tycoon 3D: SL Kara Hajimeyou!! (Japan)</description>
+		<year>1998</year>
+		<publisher>Ocean</publisher>
+		<info name="developer" value="MicroProse / Digital Amusement"/>
+		<info name="language" value="Japanese"/>
+		<info name="release" value="19980806"/>
+		<info name="serial" value="SLPS-00694"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Transport Tycoon 3D - SL Kara Hajimeyou (Japan)" sha1="d89014b41550799753f54d3f70fb81687cbf3618" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- boot OK -->
 	<software name="tripuzz">
 		<!--
@@ -59640,7 +59784,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 
 	<!-- Redump PAL (Europe) -->
 
-	<software name="007tnd_eu" cloneof="007tnd">
+	<software name="007tnd">
 		<!--
 		redump.org/disc/967
 		<rom name="007 - Tomorrow Never Dies (Europe).cue" size="100" crc="765606dd" sha1="fd5f043ce416db55a16a72ea4cd7b408aef20f2f"/>
@@ -59697,7 +59841,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="007twine_eu" cloneof="007twine">
+	<software name="007twine">
 		<!--
 		redump.org/disc/968
 		<rom name="007 - The World Is Not Enough (Europe).cue" size="104" crc="7d9fe2b7" sha1="b46ef39f671f819d7077d38b401d251ebbb208fd"/>
@@ -59793,7 +59937,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
-	<software name="007rcng_eu" cloneof="007rcng">
+	<software name="007rcng">
 		<!--
 		redump.org/disc/6858
 		<rom name="007 Racing (Europe).cue" size="85" crc="74722fc6" sha1="db19e66b47df3b885c8a43d177524eb72cbbb9e8"/>
@@ -59853,6 +59997,110 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<software name="fifa2k2w">
+		<!--
+		http://redump.org/disc/1219
+		<rom name="2002 FIFA World Cup (Europe) (En,Sv).cue" size="102" crc="0f104a50" sha1="d30e080e0c3d4f8e1f969b17a06b100ec21c1a96"/>
+		<rom name="2002 FIFA World Cup (Europe) (En,Sv).bin" size="514107216" crc="8034c7ff" sha1="845aa8143ba57a60e61ac91d456d1b22668905d9"/>
+		-->
+		<description>2002 FIFA World Cup (Europe)</description>
+		<year>2002</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Electronic Arts"/>
+		<info name="language" value="English/Swedish" />
+		<info name="serial" value="SLES-03830"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="2002 FIFA World Cup (Europe) (En,Sv)" sha1="3c4cbddb353bbbe3374dad7c3991be0f4fce347f"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="fifa2k2w_fr" cloneof="fifa2k2w">
+		<!--
+		http://redump.org/disc/27688
+		<rom name="2002 FIFA World Cup (France).cue" size="94" crc="faa22c68" sha1="e3ad4658dee0ba8f31f742f7308be397f3f2a23f"/>
+		<rom name="2002 FIFA World Cup (France).bin" size="518470176" crc="a1803d25" sha1="600dad6316b61f395e0bf8d237279db7e293147f"/>
+		-->
+		<description>2002 FIFA World Cup (France)</description>
+		<year>2002</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="alt_title" value="Coupe du Monde FIFA 2002"/>
+		<info name="developer" value="Electronic Arts"/>
+		<info name="language" value="French" />
+		<info name="serial" value="SLES-03831"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="2002 FIFA World Cup (France)" sha1="e48dbd8c5a8a6e06da397a916d998b2dd7e43c52"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="fifa2k2w_de" cloneof="fifa2k2w">
+		<!--
+		http://redump.org/disc/7583
+		<rom name="2002 FIFA World Cup (Germany).cue" size="95" crc="276c65df" sha1="0c07d0ff4504548c20609b2fd4b1799e16353e38"/>
+		<rom name="2002 FIFA World Cup (Germany).bin" size="618284352" crc="2b2c62ab" sha1="4c218395a8d58401a25ba361f9148da939361f32"/>
+		-->
+		<description>2002 FIFA World Cup (Germany)</description>
+		<year>2002</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="alt_title" value="FIFA Fussball Weltmeisterschaft 2002"/>
+		<info name="developer" value="Electronic Arts"/>
+		<info name="language" value="German" />
+		<info name="serial" value="SLES-03832"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="2002 FIFA World Cup (Germany)" sha1="75bcfbcbc5f1f3305dc55ae1fcf3b3083c228f04"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="fifa2k2w_it" cloneof="fifa2k2w">
+		<!--
+		http://redump.org/disc/28026
+		<rom name="2002 FIFA World Cup (Italy).cue" size="93" crc="dd742bf0" sha1="0f4816f9d97e6a9079649206305d2cd599871a89"/>
+		<rom name="2002 FIFA World Cup (Italy).bin" size="532488096" crc="6e470a92" sha1="cb559e708f26d3e17f1463ca84d0b21ef2cc803d"/>
+		-->
+		<description>2002 FIFA World Cup (Italy)</description>
+		<year>2002</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="alt_title" value="Mondiali FIFA 2002"/>
+		<info name="developer" value="Electronic Arts"/>
+		<info name="language" value="Italian" />
+		<info name="serial" value="SLES-03833"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="2002 FIFA World Cup (Italy)" sha1="0e052599aa43113d8d511081a6601fa82b0b12f0"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="fifa2k2w_es" cloneof="fifa2k2w">
+		<!--
+		http://redump.org/disc/29392
+		<rom name="2002 FIFA World Cup (Spain).cue" size="93" crc="8030da28" sha1="66aa099ce4aad0ef3df9fbd65d315de3eb3554a3"/>
+		<rom name="2002 FIFA World Cup (Spain).bin" size="561695232" crc="43b5dcb3" sha1="2bc8097d8306b35e69c293f604dc088f44508c3a"/>
+		-->
+		<description>2002 FIFA World Cup (Spain)</description>
+		<year>2002</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="alt_title" value="Mundial FIFA 2002"/>
+		<info name="developer" value="Electronic Arts"/>
+		<info name="language" value="Spanish" />
+		<info name="serial" value="SLES-03834"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="2002 FIFA World Cup (Spain)" sha1="c77f499bc26d4e2ddc8f4a6cd9d0607d8cce09db"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="2xtreme">
 		<!--
 		http://redump.org/disc/504/
@@ -59876,6 +60124,26 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="2Xtreme (Europe)" sha1="9db4941bc3c8fc43022a4b6f992f9245ce51509a"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="smurfrac">
+		<!--
+		http://redump.org/disc/6260
+		<rom name="3, 2, 1, Smurf! My First Racing Game (Europe) (En,Fr,De,Es,It,Nl).cue" size="131" crc="f564283d" sha1="45b800c86b31bcf7904138f457d4432ae68c74e5"/>
+		<rom name="3, 2, 1, Smurf! My First Racing Game (Europe) (En,Fr,De,Es,It,Nl).bin" size="250916064" crc="f17c2a33" sha1="50ea49e56a815f42899d5cebed38483e822244d4"/>
+		-->
+		<description>3, 2, 1, Smurf! My First Racing Game (Europe)</description>
+		<year>2001</year>
+		<publisher> Infogrames</publisher>
+		<info name="developer" value="Artificial Mind + Movement"/>
+		<info name="language" value="Dutch/English/French/German/Italian/Spanish" />
+		<info name="serial" value="SLES-03120"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="3, 2, 1, Smurf My First Racing Game (Europe) (En,Fr,De,Es,It,Nl)" sha1="4ec0f3c19c735742afdb69bf0222451b2e702b28"/>
 			</diskarea>
 		</part>
 	</software>
@@ -60163,6 +60431,171 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		</part>
 	</software>
 
+	<software name="aircombt">
+		<!--
+		http://redump.org/disc/929
+		<rom name="Air Combat (Europe).cue" size="7164" crc="a76704ae" sha1="166d9b3f8eb411ff33c806b01cae1890b3a48e85"/>
+		<rom name="Air Combat (Europe) (Track 01).bin" size="106968960" crc="f59696b1" sha1="834f181b0463f36ef7efc6cc0f50fb7d98d6086c"/>
+		<rom name="Air Combat (Europe) (Track 02).bin" size="36738240" crc="e6604b54" sha1="f2868a668beeb5b709afac84d14555fd50372041"/>
+		<rom name="Air Combat (Europe) (Track 03).bin" size="28652064" crc="b18c652d" sha1="62fc6f4574f6cd05412460bffa8a6c71d68f90eb"/>
+		<rom name="Air Combat (Europe) (Track 04).bin" size="27024480" crc="fd6529d3" sha1="632313b0e7de9d4f87ffe853f65943b8fe15ebfc"/>
+		<rom name="Air Combat (Europe) (Track 05).bin" size="28993104" crc="f71fe9c4" sha1="1c924e33b0183ed0e4f7213dfba903a6ff7b7cfe"/>
+		<rom name="Air Combat (Europe) (Track 06).bin" size="13373472" crc="fd8c35df" sha1="70d8b090774191b5e22cc265fdfd4b9bb476a155"/>
+		<rom name="Air Combat (Europe) (Track 07).bin" size="21010416" crc="7937b637" sha1="198e26e3c16495ed00ff27004ea75c0183fff163"/>
+		<rom name="Air Combat (Europe) (Track 08).bin" size="29425872" crc="e84043cf" sha1="72daa305a67a920909dcb18af4e6c9e6abf10204"/>
+		<rom name="Air Combat (Europe) (Track 09).bin" size="31634400" crc="70e129c6" sha1="909b416fcbb83a7c590cc97ad0309464de167b30"/>
+		<rom name="Air Combat (Europe) (Track 10).bin" size="26391792" crc="73ac9def" sha1="21d8cf0dfceecc17ecb958b6bf9799895f87cef2"/>
+		<rom name="Air Combat (Europe) (Track 11).bin" size="21946512" crc="de0fa43e" sha1="0fc0b8580200d4e72b37f3f2778163f108844fab"/>
+		<rom name="Air Combat (Europe) (Track 12).bin" size="15066912" crc="b067eb09" sha1="df716bba8ef894eb57792879229b2019622aa59b"/>
+		<rom name="Air Combat (Europe) (Track 13).bin" size="15172752" crc="59efad88" sha1="7b79eb67e3205623653ebdfb30f5aae411f91de3"/>
+		<rom name="Air Combat (Europe) (Track 14).bin" size="2253216" crc="6325eb0a" sha1="4c297ef440556ea34bfccd9bd5af31bdf4484d26"/>
+		<rom name="Air Combat (Europe) (Track 15).bin" size="12103392" crc="9e063251" sha1="4de8924fbd50846dfac165daa1961b40dd8517c6"/>
+		<rom name="Air Combat (Europe) (Track 16).bin" size="2471952" crc="4058386a" sha1="a6268a8d77d1238d3ebbb859031a826ed53e72a3"/>
+		<rom name="Air Combat (Europe) (Track 17).bin" size="21417312" crc="4e808c90" sha1="6b7380ab04dc0b3e6a465e94abf4ad2f626b4bf8"/>
+		<rom name="Air Combat (Europe) (Track 18).bin" size="26709312" crc="101c6976" sha1="e8828fa899d1946bd1ea69ccd65547ddd373ddf8"/>
+		<rom name="Air Combat (Europe) (Track 19).bin" size="9175152" crc="dbd916ca" sha1="fed3c81ab2046787b4020531d92f46fac7f0ae1c"/>
+		<rom name="Air Combat (Europe) (Track 20).bin" size="16061808" crc="1bf98118" sha1="078e39531684272903d3eb4aafdd31b989675fd2"/>
+		<rom name="Air Combat (Europe) (Track 21).bin" size="2775360" crc="6c254834" sha1="4baa057175777ac899032192ccbc39295b20f40a"/>
+		<rom name="Air Combat (Europe) (Track 22).bin" size="1147776" crc="8aae87d1" sha1="cf7dd4c7cd35476ded88f604e85ee9236ba2e3da"/>
+		<rom name="Air Combat (Europe) (Track 23).bin" size="2105040" crc="eb78944b" sha1="c9576bdc8bdf73f256808a883e6b7daaa6c66556"/>
+		<rom name="Air Combat (Europe) (Track 24).bin" size="1147776" crc="11133ce5" sha1="11fa285e225a93063890481d81fb3d2e96335683"/>
+		<rom name="Air Combat (Europe) (Track 25).bin" size="1846320" crc="7f3709ac" sha1="1d04eefcd5c0178e38c72f587f51cf8aaf611d05"/>
+		<rom name="Air Combat (Europe) (Track 26).bin" size="1192464" crc="9bcb2928" sha1="ee5d4369f95d106faa045ae6b8898e26265bb5b8"/>
+		<rom name="Air Combat (Europe) (Track 27).bin" size="1150128" crc="b3735a67" sha1="1966f4a4aefd7e2462476acbd4ad86aef53146ea"/>
+		<rom name="Air Combat (Europe) (Track 28).bin" size="2243808" crc="a2f89695" sha1="2eb425b4265de08e6ed5971628dc099acc734291"/>
+		<rom name="Air Combat (Europe) (Track 29).bin" size="1514688" crc="aeda8a6b" sha1="9f48166062a4e29f548a1231e8cb50e1d251d1c2"/>
+		<rom name="Air Combat (Europe) (Track 30).bin" size="2907072" crc="d7e9dbbc" sha1="6a55683bec61d0ea4abdd1ca443b3a5b6d67f9e7"/>
+		<rom name="Air Combat (Europe) (Track 31).bin" size="2145024" crc="07116b29" sha1="677391b7f58e9bf22caa38726cf0ce7971bc296a"/>
+		<rom name="Air Combat (Europe) (Track 32).bin" size="1147776" crc="4567d162" sha1="63cfce6a894f361d11484f7d0d3f717e53c0beae"/>
+		<rom name="Air Combat (Europe) (Track 33).bin" size="1161888" crc="2dc65e7c" sha1="b1a50baf0bcbf510fb4f858ecfaa41c110294aa7"/>
+		<rom name="Air Combat (Europe) (Track 34).bin" size="2036832" crc="e73d96e3" sha1="1ce2f0ed5c83e5feb0ce03c6219c59cbbb7c8427"/>
+		<rom name="Air Combat (Europe) (Track 35).bin" size="1190112" crc="e7c897cc" sha1="2316f0988e96166980504896f36184f3afcb47fa"/>
+		<rom name="Air Combat (Europe) (Track 36).bin" size="1698144" crc="64c1b3c7" sha1="c6813c2db55175d28462298b0a2cb21afa19a1b8"/>
+		<rom name="Air Combat (Europe) (Track 37).bin" size="4370016" crc="6c5117e0" sha1="6a2dea25522ef46de2b65d8dc1ba45491149f233"/>
+		<rom name="Air Combat (Europe) (Track 38).bin" size="1147776" crc="5f560df7" sha1="1e63a3c893c10557dfba70d5bccacd34c7cf4b95"/>
+		<rom name="Air Combat (Europe) (Track 39).bin" size="1333584" crc="5953a590" sha1="2d2afb9a8ffb6bbb62864b0cc6e2c9b7acb7b0cd"/>
+		<rom name="Air Combat (Europe) (Track 40).bin" size="1851024" crc="ddced3a7" sha1="250a1a449dafd96ff915e2797ca039874b7dc1d5"/>
+		<rom name="Air Combat (Europe) (Track 41).bin" size="1147776" crc="e9473517" sha1="795d09fb292b7c598988eb7fb7182d08d68ac8d8"/>
+		<rom name="Air Combat (Europe) (Track 42).bin" size="1147776" crc="d3dba64b" sha1="7a4cc713157994a3b90b853d0e6c33cd0c24cae1"/>
+		<rom name="Air Combat (Europe) (Track 43).bin" size="4235952" crc="4c1f8962" sha1="2b1a3c8f76e68d3d423b81b1ac26797a442e20a0"/>
+		<rom name="Air Combat (Europe) (Track 44).bin" size="2330832" crc="2ac449a1" sha1="d107d3290e203b01a72cea241d39fc4d877f08b1"/>
+		<rom name="Air Combat (Europe) (Track 45).bin" size="1147776" crc="1a8dd5bd" sha1="822a999f89d6d8bd001c0cb7f25ef368ee7059a9"/>
+		<rom name="Air Combat (Europe) (Track 46).bin" size="1183056" crc="14949216" sha1="f373b8ef003f56b69e63b382158b9593757f7436"/>
+		<rom name="Air Combat (Europe) (Track 47).bin" size="3229296" crc="5e4a84d8" sha1="7d8e75995fd4dcea4ae728345636cc37ae076ecf"/>
+		<rom name="Air Combat (Europe) (Track 48).bin" size="1147776" crc="f803e31c" sha1="bc64abb228025b6d15e7b458ac0aa13e800a71bc"/>
+		<rom name="Air Combat (Europe) (Track 49).bin" size="2613072" crc="49e4e3f3" sha1="94756a349674ca84c1166ab099cf728a64320762"/>
+		<rom name="Air Combat (Europe) (Track 50).bin" size="1147776" crc="95f930a9" sha1="3b760c45abad3b385d6adf21da0fd946f494d502"/>
+		<rom name="Air Combat (Europe) (Track 51).bin" size="1905120" crc="c773efa2" sha1="d6785861aa3f8cbb923c572bdf29c6637ca5398e"/>
+		<rom name="Air Combat (Europe) (Track 52).bin" size="1350048" crc="db8c1eef" sha1="aa78a1bea5c8d94b9be3ad440b37c0d793c0e860"/>
+		<rom name="Air Combat (Europe) (Track 53).bin" size="1147776" crc="7f9cec6f" sha1="251603cb0b437cdc2bee48f6872b1083cdd48238"/>
+		<rom name="Air Combat (Europe) (Track 54).bin" size="1147776" crc="83e91720" sha1="0a41ee59aaf610dce3108a4822372781acf3f677"/>
+		<rom name="Air Combat (Europe) (Track 55).bin" size="1150128" crc="c0f1a962" sha1="d4923027288040fde405470d9f9a1b3eaf767519"/>
+		<rom name="Air Combat (Europe) (Track 56).bin" size="1150128" crc="0301987b" sha1="fb871082c45b47315948f35e5e72a13b2feb05c6"/>
+		<rom name="Air Combat (Europe) (Track 57).bin" size="1178352" crc="dbf35e36" sha1="29ec4551096c038436f92962983d453f5aba3d75"/>
+		<rom name="Air Combat (Europe) (Track 58).bin" size="2196768" crc="b64928fa" sha1="10e7395f83b758fdfe49cc99e815ee637d2241c8"/>
+		<rom name="Air Combat (Europe) (Track 59).bin" size="1190112" crc="d45922f7" sha1="6acf92b0c350db98beafac389d51602deb4d539b"/>
+		<rom name="Air Combat (Europe) (Track 60).bin" size="1484112" crc="5e029cf7" sha1="69ce8ef6ae3b043d3417b0bd0fdf3ca3c8bc4a58"/>
+		<rom name="Air Combat (Europe) (Track 61).bin" size="3532704" crc="3389aac7" sha1="7cecef95f3affa36dcb05166e5a02de54ecdf336"/>
+		<rom name="Air Combat (Europe) (Track 62).bin" size="2100336" crc="b15ec2c2" sha1="ba80e7e73aa3f6c43084ce4f9e7c316018692cd9"/>
+		<rom name="Air Combat (Europe) (Track 63).bin" size="42796992" crc="df07e201" sha1="56cbbf607b9f3c4fe620bb6f6a84349a349a755a"/>
+		-->
+		<description>Air Combat (Europe)</description>
+		<year>1995</year>
+		<publisher>Namco</publisher>
+		<info name="developer" value="Namco"/>
+		<info name="language" value="English"/>
+		<info name="serial" value="SCES-00007"/>
+		<info name="release" value="19951010"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Air Combat (Europe)" sha1="6bc7f13a00f67fbb95930133fc8ba995e3210488"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="aircombt_a" cloneof="aircombt">
+		<!--
+		http://redump.org/disc/15771
+		<rom name="Air Combat (Europe) (EDC).cue" size="7542" crc="abbbca9e" sha1="6509de37b7338511b30b49aba87ee858abb27a94"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 01).bin" size="106968960" crc="41d03f71" sha1="ee99101b8468966919169fe1172c032397761c49"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 02).bin" size="36738240" crc="f6c605d4" sha1="e4baf5fd8fddbf6f32f4591a4683ca8af9079837"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 03).bin" size="28652064" crc="0f6701d5" sha1="3145cf3d0941a1e77e0571e044eb2d6f24a60313"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 04).bin" size="27024480" crc="cf61aa8c" sha1="d5b398a93051ac439c27d8d90536340e35cc5340"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 05).bin" size="28993104" crc="ea1cd5bf" sha1="8bd55b8169ec0196a8d7bd1d4b0882ac259ffc5a"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 06).bin" size="13373472" crc="6aa8fd26" sha1="da9105bf61487f097213e890dfe983e6615f1885"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 07).bin" size="21010416" crc="eb04f063" sha1="faacbae8645e145df304b79f4dfcc1e242dac8b5"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 08).bin" size="29425872" crc="11b28580" sha1="08c543621cc771ade7bca8df22c4f02126db3720"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 09).bin" size="31634400" crc="b61e737e" sha1="5c6d5df4939d65b0abbae7c82a756dd38c32dc48"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 10).bin" size="26391792" crc="cb74a154" sha1="eb923566aaaa5472405cd4ee790daf35d171a8de"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 11).bin" size="21946512" crc="3cd15eb4" sha1="dacb4eca0cae0b524f5730826593225c71b24420"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 12).bin" size="15066912" crc="3d35b1d1" sha1="d941c6a80c6ac5128598e7f24030ace374a24936"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 13).bin" size="15172752" crc="d87bad30" sha1="ef5183602a4dbab15026c4ea4eae7d2b410280c9"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 14).bin" size="2253216" crc="3c7d513d" sha1="8e4679d2df38e9c72ea4ce45933d847c86d1d951"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 15).bin" size="12103392" crc="84470724" sha1="6ab473fae0527795e5d847483aed86ede62f150c"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 16).bin" size="2471952" crc="60b6e445" sha1="107cd28bae69d7b88c399f9e67a9484948b47a63"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 17).bin" size="21417312" crc="d3762ce9" sha1="8006e3729b39ce27ae71ed09030637781431feb5"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 18).bin" size="26709312" crc="411e09bc" sha1="cbe1962a23ba60f481f1dbc480642b9ab2cdfbd4"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 19).bin" size="9175152" crc="a9eaf5e0" sha1="656bdf71b7454f47446bb69de42adef61568774e"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 20).bin" size="16061808" crc="b4966391" sha1="90a4f48da841a2a891c73f275d13c3f2ca7e9fcd"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 21).bin" size="2775360" crc="7c786180" sha1="8f538d7f8eebac5b8343c0f3f683f5ee9aa1d910"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 22).bin" size="1147776" crc="d8202a47" sha1="1a5ef326ddc7db0ef9f0b4e4403c674eed10a334"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 23).bin" size="2105040" crc="2c256d18" sha1="cc96c7211612d1c3563c04b1070bcc425dec3b6c"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 24).bin" size="1147776" crc="78b4214f" sha1="83f409e81eb1c205a1688c9926cf7023e1c7f6c6"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 25).bin" size="1846320" crc="e3de689d" sha1="f3909d4697b8745449f3988d7d8149908c2c9dda"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 26).bin" size="1192464" crc="fd4c36a0" sha1="3a649da59fcf05ab98a45bde2375897a542fd807"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 27).bin" size="1150128" crc="b8bbd8a3" sha1="01f559f021dec45ec29a587047ff1b1717b51c41"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 28).bin" size="2243808" crc="df6f9331" sha1="2c1bcd2f0cc738c255eafa407b3e717aefaf3807"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 29).bin" size="1514688" crc="58f7ce79" sha1="33c7dc9d3477a66a4ccacaa6bffdad45726b7429"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 30).bin" size="2907072" crc="da3e15ad" sha1="a3cec882f90d67cc465a7f086d8959c8a9e63dbc"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 31).bin" size="2145024" crc="7bd50570" sha1="8dfe2829d134dc6d27c212cc0e1d17f5703f06f7"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 32).bin" size="1147776" crc="1bb1abed" sha1="7a867faf60112d095b12d157bd51357ac0567c09"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 33).bin" size="1161888" crc="26592556" sha1="d1d47a7ef6a6897d8344ddcd384cce8eca2c2794"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 34).bin" size="2036832" crc="55862c53" sha1="3c8e4e026d1ed223e3a7f4fc9fbed772adb2583c"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 35).bin" size="1190112" crc="f2d28286" sha1="5f2f952949e8c1b9975c4b476018052129094f37"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 36).bin" size="1698144" crc="fd183aef" sha1="7c90d79a83f39da81f3e42d184c0ad1c82a8e681"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 37).bin" size="4370016" crc="52b5129f" sha1="2a45b42b9b9979883a8f32e6a4d483bff5657059"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 38).bin" size="1147776" crc="48404490" sha1="1e81abe3251e81725b696c5400bda42387a92b01"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 39).bin" size="1333584" crc="144c010f" sha1="3f365e9bd4ef45e1379fdfba5e4323d320e712be"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 40).bin" size="1851024" crc="dfaf557b" sha1="69723c4d6e446caf1f2dd44d5a927f4d8f5370c0"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 41).bin" size="1147776" crc="5319e9ad" sha1="886f2f974ec9d221755be9b394dba1dc16ed2c8e"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 42).bin" size="1147776" crc="36297c54" sha1="37628ba6cfa1b4e3198562bec8bc2c38f4cab1d6"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 43).bin" size="4235952" crc="3c1ffc3d" sha1="ae96df9a4e79c226700ac0ff6032542152e0df48"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 44).bin" size="2330832" crc="5dd8dc38" sha1="a379551448e5b0b5c2d0d5da1b21946b8851a5e8"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 45).bin" size="1147776" crc="fcc81032" sha1="4652a93deae63b2028c41215937adaedd3e61545"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 46).bin" size="1183056" crc="e8e5a26b" sha1="0d171cd5e0decb1fe614983e1cced4a6d332727d"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 47).bin" size="3229296" crc="a995bc5e" sha1="2ed4d54a459a75606e941119ddfa017b6d1de42c"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 48).bin" size="1147776" crc="f99be18a" sha1="058dc8fd19f259723dc803da101afca7925ec840"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 49).bin" size="2613072" crc="a22b6fc7" sha1="298f0379f054a553276851a5b15de323c32c59e3"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 50).bin" size="1147776" crc="70902137" sha1="bfbc5d8e3d6431623992db76c60c4e230d283fbc"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 51).bin" size="1905120" crc="3d3d6a8e" sha1="a694f3951dcdedf5f73044ac9dc5c986f93aab81"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 52).bin" size="1350048" crc="369de36f" sha1="7200b9bc866352ea58f1b3d64ba93fb42790b6fe"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 53).bin" size="1147776" crc="a2ff2935" sha1="fc412daaec9276612f17a7a85f8a3ec02b8bf872"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 54).bin" size="1147776" crc="5f9c111d" sha1="9b69afd05692db3461a8c771896ef566bcbf2f0d"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 55).bin" size="1150128" crc="e329791d" sha1="9baa63630768f235785c306cd46368435c396fb4"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 56).bin" size="1150128" crc="0b11133c" sha1="cbe7fa6d9bc0f07c14062ea41683076f554aaa00"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 57).bin" size="1178352" crc="32813fc0" sha1="8cd9a9a22c20be8c829173841d6e81a61993310f"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 58).bin" size="2196768" crc="a9f48da4" sha1="5ca366743fd4c6853622c9a438b63a48382e0b60"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 59).bin" size="1190112" crc="c64ba9c2" sha1="043c3b75f8f3b00179d010f22ccd010806bed3e2"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 60).bin" size="1484112" crc="9861cdae" sha1="43592e0985dac93a71479470318bb6304abf7c12"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 61).bin" size="3532704" crc="8cc6941f" sha1="7473f2433a19b1a3561a4f163148c47f37d50e64"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 62).bin" size="2100336" crc="7d423523" sha1="2d5cc1e3e8ffa44789f305517b5d5adcba39fc31"/>
+		<rom name="Air Combat (Europe) (EDC) (Track 63).bin" size="42796992" crc="bfdf8a56" sha1="7d5b95a36a5194f6391dd57a234a515db2e671da"/>
+		-->
+		<description>Air Combat (Europe) (EDC)</description>
+		<year>1995</year>
+		<publisher>Namco</publisher>
+		<info name="developer" value="Namco"/>
+		<info name="language" value="English"/>
+		<info name="serial" value="SCES-00007#"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Air Combat (Europe) (EDC)" sha1="850c846a275f1183d9afd6b1ff537c5f4e5b9730"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- http://redump.org/disc/1036/ -->
 	<!-- Came bundled with releases of "Crash Bandicoot" and "Tekken 2" -->
 	<software name="acrels96">
@@ -60192,6 +60625,35 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="beatmania (europe)" sha1="c517b30a53c6f2a00bd811cae6d929b665ac7b11"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="bedlam" supported="no">
+		<!--
+		http://redump.org/disc/1034
+		<rom name="Bedlam (Europe) (En,Fr,De,Es,It,Nl).cue" size="1014" crc="6e0a59d3" sha1="a94120a4812030448734fefe32f25adde66d021c"/>
+		<rom name="Bedlam (Europe) (En,Fr,De,Es,It,Nl) (Track 1).bin" size="82157712" crc="725f01ad" sha1="c01f8bd0b5b08b2b8b006fea7d04abb826ed07ff"/>
+		<rom name="Bedlam (Europe) (En,Fr,De,Es,It,Nl) (Track 2).bin" size="37025184" crc="511ba896" sha1="659ff970996b9aa9f0a4c017ee8ce3502d79e33d"/>
+		<rom name="Bedlam (Europe) (En,Fr,De,Es,It,Nl) (Track 3).bin" size="39758208" crc="d3fb5919" sha1="35f80dce49039423acd82164f9fda28cf697bc15"/>
+		<rom name="Bedlam (Europe) (En,Fr,De,Es,It,Nl) (Track 4).bin" size="37702560" crc="bb3c9155" sha1="f01186ff6d3783a281d59b0fc05392ddcd8648cb"/>
+		<rom name="Bedlam (Europe) (En,Fr,De,Es,It,Nl) (Track 5).bin" size="38422272" crc="71dcd79b" sha1="fb4357096df7bce7c958bdd78003820862087532"/>
+		<rom name="Bedlam (Europe) (En,Fr,De,Es,It,Nl) (Track 6).bin" size="36980496" crc="d5e42319" sha1="7898473bec6f7cbb77f482deb6cdc42d0e66ad31"/>
+		<rom name="Bedlam (Europe) (En,Fr,De,Es,It,Nl) (Track 7).bin" size="37815456" crc="97aae9e0" sha1="27aac3c90aa09fe2ca26695b408a88ccea0a6f19"/>
+		<rom name="Bedlam (Europe) (En,Fr,De,Es,It,Nl) (Track 8).bin" size="36420720" crc="89871b70" sha1="64e4472de2d9c50db2676abf5c23c720ea25a599"/>
+		-->
+		<description>Bedlam (Europe)</description>
+		<year>1997</year>
+		<publisher>GT Interactive</publisher>
+		<notes>Scrambled graphics</notes>
+		<info name="developer" value="Mirage Technologies"/>
+		<info name="language" value="Dutch/English/French/German/Italian/Spanish" />
+		<info name="release" value="19970407" />
+		<info name="serial" value="SLES-00334"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Bedlam (Europe) (En,Fr,De,Es,It,Nl)" sha1="489738e7bb291244442d8cbd6800701f93f0e515"/>
 			</diskarea>
 		</part>
 	</software>

@@ -33,6 +33,7 @@
     Some type of link feature?
   - Other games in jinhulu2_state have machine translated DIP definitions which
     could use improving and hopper isn't implemented yet.
+  - xjinhuang needs GFX decode and memory map improvements.
 
 ***************************************************************************/
 
@@ -160,6 +161,23 @@ protected:
 
 private:
 	void program_map(address_map &map) ATTR_COLD;
+};
+
+class xjinhuang_state : public spokeru_state
+{
+public:
+	using spokeru_state::spokeru_state;
+
+	void xjinhuang(machine_config &config) ATTR_COLD;
+
+	void init_xjinhuang() ATTR_COLD;
+
+protected:
+	virtual void video_start() override ATTR_COLD;
+
+private:
+	void program_map(address_map &map) ATTR_COLD;
+	void portmap(address_map &map) ATTR_COLD;
 };
 
 class jinhulu2_state : public spokeru_state
@@ -306,6 +324,11 @@ void spoker_state::video_start()
 void spokeru_state::video_start()
 {
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(spokeru_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+}
+
+void xjinhuang_state::video_start() // TODO
+{
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(xjinhuang_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
 void jinhulu2_state::video_start()
@@ -573,6 +596,13 @@ void spokeru_state::program_map(address_map &map)
 	map(0x0f000, 0x0ffff).ram().share("nvram");
 }
 
+void xjinhuang_state::program_map(address_map &map)
+{
+	map(0x00000, 0x0dfff).rom();
+	map(0x0e000, 0x0ffff).ram().share("nvram");
+	map(0x10000, 0x1ffff).rom();
+}
+
 void spoker_state::spoker_portmap(address_map &map)
 {
 	map(0x0000, 0x003f).ram(); // Z180 internal regs
@@ -610,6 +640,19 @@ void spokeru_state::portmap(address_map &map)
 	map(0x50c0, 0x50c0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x7000, 0x77ff).ram().w(FUNC(spokeru_state::fg_tile_w)).share(m_fg_tile_ram);
 	map(0x7800, 0x7fff).ram().w(FUNC(spokeru_state::fg_color_w)).share(m_fg_color_ram);
+}
+
+void xjinhuang_state::portmap(address_map &map) // TODO: verify everything
+{
+	map(0x0000, 0x003f).ram(); // Z180 internal regs
+	map(0x2000, 0x23ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0x2400, 0x27ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0x5000, 0x5fff).ram().w(FUNC(xjinhuang_state::fg_tile_w)).share(m_fg_tile_ram);
+	map(0x6480, 0x6483).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));    // NMI and coins (w), service (r), coins (r)
+	map(0x64a1, 0x64a1).portr("BUTTONS1");
+	//map(0x64b0, 0x64b1).w("ymsnd", FUNC(ym2413_device::write));
+	map(0x64b0, 0x64b0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x7000, 0x7fff).ram().w(FUNC(xjinhuang_state::fg_color_w)).share(m_fg_color_ram);
 }
 
 void jinhulu2_state::portmap(address_map &map)
@@ -1665,6 +1708,20 @@ void spokeru_state::spokeru(machine_config &config)
 }
 
 
+void xjinhuang_state::xjinhuang(machine_config &config)
+{
+	spoker(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &xjinhuang_state::program_map);
+	m_maincpu->set_addrmap(AS_IO, &xjinhuang_state::portmap);
+
+	subdevice<i8255_device>("ppi8255_0")->out_pa_callback().remove();
+	subdevice<i8255_device>("ppi8255_0")->out_pc_callback().set(FUNC(xjinhuang_state::nmi_video_leds_w));
+
+	config.device_remove("ppi8255_1");
+}
+
+
 void jinhulu2_state::jinhulu2(machine_config &config)
 {
 	spokeru(config);
@@ -2262,6 +2319,25 @@ ROM_START( sleyuan2 )
 	ROM_LOAD( "rom.u12", 0x00000, 0x20000, CRC(1aeb078c) SHA1(9b8a256f51e66733c4ec30b451ca0711ed02318e) )
 ROM_END
 
+// IGS PCB NO-0171-4. HD64180RP6, 12 MHz XTAL, Altera MAX EPM3256AQC208-10, I8255,
+// File KC89C72 (AY8910 compatible), U6295, 3 banks of 8 switches
+// All ROM labels prepend 新金皇冠 (Xīn Jīn Huángguàn)
+ROM_START( xjinhuang )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "u30.u30", 0x00000, 0x20000, CRC(7c8a7ffe) SHA1(caf5f1e8272e4fd60f72597749d801c04547b1be) )
+
+	ROM_REGION( 0xc0000, "gfx1", 0 )
+	ROM_LOAD( "u44.u44", 0x00000, 0x40000, CRC(9ea4bf06) SHA1(300c9d1b2ccfe96580d0c4015bc4c22e21f04941) )
+	ROM_LOAD( "u45.u45", 0x40000, 0x40000, CRC(cb78683e) SHA1(6b74c36fde6f0be2c0da1861db031c0294271a42) )
+	ROM_LOAD( "u46.u46", 0x80000, 0x40000, CRC(4762b49e) SHA1(0e124c2dbb64d20d53c81e6a6eae432760e50398) )
+
+	ROM_REGION( 0x30000, "gfx2", 0 )
+	ROM_FILL( 0x0000, 0x30000, 0xff ) // filling the whole bank
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "u34.u34", 0x00000, 0x40000, CRC(1250998d) SHA1(57f81bc6661f1cfe94fd44ccf8b7bdd064521816) )
+ROM_END
+
 /***************************************************************************
                               Driver Init
 ***************************************************************************/
@@ -2455,6 +2531,19 @@ void spoker_state::init_spk120in()
 	}
 }
 
+void xjinhuang_state::init_xjinhuang()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (int a = 0; a < 0x20000; a++)
+	{
+		rom[a] ^= 0x02;
+		if ((a & 0x0060) != 0x0020) rom[a] ^= 0x20;
+		if ((a & 0x1208) == 0x1208) rom[a] ^= 0x02;
+		if (((a & 0x0101) == 0x0101) || ((a & 0x05a1) == 0x05a0) || ((a & 0x05a0) == 0x04a0)) rom[a] ^= 0x01;
+	}
+}
+
 void spoker_state::init_3super8()
 {
 	uint8_t *rom = memregion("maincpu")->base();
@@ -2516,6 +2605,7 @@ GAME( 1996,  spk114it,      spk306us, spoker,   spk114it, spoker_state,   init_s
 GAME( 1996,  spk102ua,      spk306us, spokeru,  spk102ua, spokeru_state,  init_spokeru,       ROT0,  "IGS",       "Super Poker (v102UA)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1996,  spk102u,       spk306us, spoker,   spk102ua, spoker_state,   init_spk100,        ROT0,  "IGS",       "Super Poker (v102U)",              MACHINE_SUPPORTS_SAVE )
 GAME( 1996,  spk100,        spk306us, spoker,   spk100,   spoker_state,   init_spk100,        ROT0,  "IGS",       "Super Poker (v100)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1997,  xjinhuang,     0,        xjinhuang,spoker,   xjinhuang_state,init_xjinhuang,     ROT0,  "IGS",       "Xin Jin Huangguan (V400CN)",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // wrong GFX decode, memory map incomplete
 GAME( 1993?, 3super8,       0,        _3super8, 3super8,  spoker_state,   init_3super8,       ROT0,  "<unknown>", "3 Super 8 (Italy)",                MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // ROMs are badly dumped
 GAME( 1997,  jbell,         0,        jb,       jb,       jb_state,       init_spokeru,       ROT0,  "IGS",       "Jingle Bell (v200US)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1995,  jinhulu2,      0,        jinhulu2, jinhulu2, jinhulu2_state, init_jinhulu2,      ROT0,  "IGS",       "Jin Hu Lu II (v412GS)",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // tries to link to something?

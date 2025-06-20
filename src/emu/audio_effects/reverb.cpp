@@ -20,6 +20,7 @@
 //
 
 const audio_effect_reverb::preset audio_effect_reverb::presets[] = {
+	{ "Custom",                 0,     0,   0,  0,  0, 0,    0,   0,     0,  0,  0,    0,  0,  0,  0 },
 	{ "Echo Chamber",           0, 12000, 100, 30, 30, 2,   80,  20,  9000, 10,  4,   90, 10, 30, 20 },
 	{ "Large Room",             0,  8000,  90, 45, 45, 0.5, 40,  64,  8000, 12,  1.2, 90, 10, 30, 20 },
 	{ "Large Room Bright",      0, 16000,  90, 45, 45, 0.5, 40,  59, 16000, 12,  1.2, 90, 10, 30, 20 },
@@ -168,8 +169,38 @@ const char *audio_effect_reverb::early_tap_setup_name(u32 id)
 	return tap_maps[id].name;
 }
 
+u32 audio_effect_reverb::find_current_preset()
+{
+	for(u32 id=0; id != preset_count(); id++) {
+		const preset &p = presets[id];
+
+		if(m_early_tap_setup != p.early_tap_setup) continue;
+		if(m_early_damping != p.early_damping) continue;
+		if(m_stereo_width != p.stereo_width) continue;
+		if(m_early_room_size != p.early_room_size) continue;
+		if(m_late_room_size != p.late_room_size) continue;
+		if(m_late_spin != p.late_spin) continue;
+		if(m_late_wander != p.late_wander) continue;
+		if(m_late_diffusion != p.late_diffusion) continue;
+		if(m_late_damping != p.late_damping) continue;
+		if(m_late_predelay != p.late_predelay) continue;
+		if(m_late_global_decay != p.late_global_decay) continue;
+		if(m_dry_level != p.dry_level) continue;
+		if(m_early_level != p.early_level) continue;
+		if(m_late_level != p.late_level) continue;
+		if(m_early_to_late_level != p.early_to_late_level) continue;
+
+		return id;
+	}
+
+	return 0;
+}
+
 void audio_effect_reverb::load_preset(u32 id)
 {
+	if(id == 0)
+		return;
+
 	const preset &p = presets[id];
 
 	set_early_tap_setup(p.early_tap_setup);
@@ -189,18 +220,20 @@ void audio_effect_reverb::load_preset(u32 id)
 	set_early_to_late_level(p.early_to_late_level);
 }
 
-const audio_effect_reverb::preset *audio_effect_reverb::find_preset(std::string name)
+u32 audio_effect_reverb::find_preset(std::string name)
 {
-	for(u32 i=0; i != preset_count(); i++)
-		if(preset_name(i) == name)
-			return &presets[i];
-	return nullptr;
+	for(u32 id=0; id != preset_count(); id++)
+		if(preset_name(id) == name)
+			return id;
+	return 0;
 }
 
 audio_effect_reverb::audio_effect_reverb(speaker_device *speaker, u32 sample_rate, audio_effect *def) :
 	audio_effect(speaker, sample_rate, def)
 {
-	m_default_preset = find_preset("Medium Room");
+	m_default_preset_id = find_preset("Medium Room");
+	m_default_preset = &presets[m_default_preset_id];
+	assert(m_default_preset_id > 0);
 
 	m_early_lpf_h.resize(m_channels);
 	m_early_hpf_h.resize(m_channels);
@@ -296,28 +329,18 @@ audio_effect_reverb::audio_effect_reverb(speaker_device *speaker, u32 sample_rat
 	set_late_diffusion_2(0.312);
 	set_late_diffusion_3(0.406);
 	set_late_diffusion_4(0.250);
+    set_late_decay_0(0.237);
+    set_late_decay_1(0.938);
+    set_late_decay_2(0.844);
+    set_late_decay_3(0.906);
+    set_late_decay_f(1.000);
 	m_late_crossfeed = 0.4;
 	set_late_bass_allpass(150, 4);
 	set_late_damping_2(500, 2);
 	m_late_bass_boost = 0.1;
 
 	// Variables
-	reset_mode();
-	reset_early_tap_setup();
-	reset_early_damping();
-	reset_stereo_width();
-	reset_early_room_size();
-	reset_late_room_size();
-	reset_late_spin();
-	reset_late_wander();
-	reset_late_diffusion();
-	reset_late_damping();
-	reset_late_predelay();
-	reset_late_global_decay();
-	reset_dry_level();
-	reset_early_level();
-	reset_late_level();
-	reset_early_to_late_level();
+	reset_all();
 }
 
 
@@ -330,91 +353,91 @@ void audio_effect_reverb::config_load(util::xml::data_node const *ef_node)
 		reset_mode();
 
 	if(ef_node->has_attribute("early_tap_setup")) {
-		m_mode = ef_node->get_attribute_float("early_tap_setup", 0);
+		m_early_tap_setup = ef_node->get_attribute_float("early_tap_setup", 0);
 		m_isset_early_tap_setup = true;
 	} else
 		reset_early_tap_setup();
 
 	if(ef_node->has_attribute("early_damping")) {
-		m_mode = ef_node->get_attribute_float("early_damping", 0);
+		m_early_damping = ef_node->get_attribute_float("early_damping", 0);
 		m_isset_early_damping = true;
 	} else
 		reset_early_damping();
 
 	if(ef_node->has_attribute("stereo_width")) {
-		m_mode = ef_node->get_attribute_float("stereo_width", 0);
+		m_stereo_width = ef_node->get_attribute_float("stereo_width", 0);
 		m_isset_stereo_width = true;
 	} else
 		reset_stereo_width();
 
 	if(ef_node->has_attribute("early_room_size")) {
-		m_mode = ef_node->get_attribute_float("early_room_size", 0);
+		m_early_room_size = ef_node->get_attribute_float("early_room_size", 0);
 		m_isset_early_room_size = true;
 	} else
 		reset_early_room_size();
 
 	if(ef_node->has_attribute("late_room_size")) {
-		m_mode = ef_node->get_attribute_float("late_room_size", 0);
+		m_late_room_size = ef_node->get_attribute_float("late_room_size", 0);
 		m_isset_late_room_size = true;
 	} else
 		reset_late_room_size();
 
 	if(ef_node->has_attribute("late_spin")) {
-		m_mode = ef_node->get_attribute_float("late_spin", 0);
+		m_late_spin = ef_node->get_attribute_float("late_spin", 0);
 		m_isset_late_spin = true;
 	} else
 		reset_late_spin();
 
 	if(ef_node->has_attribute("late_wander")) {
-		m_mode = ef_node->get_attribute_float("late_wander", 0);
+		m_late_wander = ef_node->get_attribute_float("late_wander", 0);
 		m_isset_late_wander = true;
 	} else
 		reset_late_wander();
 
 	if(ef_node->has_attribute("late_diffusion")) {
-		m_mode = ef_node->get_attribute_float("late_diffusion", 0);
+		m_late_diffusion = ef_node->get_attribute_float("late_diffusion", 0);
 		m_isset_late_diffusion = true;
 	} else
 		reset_late_diffusion();
 
 	if(ef_node->has_attribute("late_damping")) {
-		m_mode = ef_node->get_attribute_float("late_damping", 0);
+		m_late_damping = ef_node->get_attribute_float("late_damping", 0);
 		m_isset_late_damping = true;
 	} else
 		reset_late_damping();
 
 	if(ef_node->has_attribute("late_predelay")) {
-		m_mode = ef_node->get_attribute_float("late_predelay", 0);
+		m_late_predelay = ef_node->get_attribute_float("late_predelay", 0);
 		m_isset_late_predelay = true;
 	} else
 		reset_late_predelay();
 
 	if(ef_node->has_attribute("late_global_decay")) {
-		m_mode = ef_node->get_attribute_float("late_global_decay", 0);
+		m_late_global_decay = ef_node->get_attribute_float("late_global_decay", 0);
 		m_isset_late_global_decay = true;
 	} else
 		reset_late_global_decay();
 
 	if(ef_node->has_attribute("dry_level")) {
-		m_mode = ef_node->get_attribute_float("dry_level", 0);
+		m_dry_level = ef_node->get_attribute_float("dry_level", 0);
 		m_isset_dry_level = true;
 	} else
 		reset_dry_level();
 
 	if(ef_node->has_attribute("early_level")) {
-		m_mode = ef_node->get_attribute_float("early_level", 0);
+		m_early_level = ef_node->get_attribute_float("early_level", 0);
 		m_isset_early_level = true;
 	} else
 		reset_early_level();
 
 	if(ef_node->has_attribute("late_level")) {
-		m_mode = ef_node->get_attribute_float("late_level", 0);
+		m_late_level = ef_node->get_attribute_float("late_level", 0);
 		m_isset_late_level = true;
 	} else
 		reset_late_level();
 
 	if(ef_node->has_attribute("early_to_late_level")) {
-		m_mode = ef_node->get_attribute_float("early_to_late_level", 0);
+		m_early_to_late_level = ef_node->get_attribute_float("early_to_late_level", 0);
 		m_isset_early_to_late_level = true;
 	} else
 		reset_early_to_late_level();
@@ -463,6 +486,36 @@ void audio_effect_reverb::default_changed()
 		return;
 	if(!m_isset_mode)
 		reset_mode();
+	if(!m_isset_early_tap_setup)
+		reset_early_tap_setup();
+	if(!m_isset_early_damping)
+		reset_early_damping();
+	if(!m_isset_stereo_width)
+		reset_stereo_width();
+	if(!m_isset_early_room_size)
+		reset_early_room_size();
+	if(!m_isset_late_room_size)
+		reset_late_room_size();
+	if(!m_isset_late_spin)
+		reset_late_spin();
+	if(!m_isset_late_wander)
+		reset_late_wander();
+	if(!m_isset_late_diffusion)
+		reset_late_diffusion();
+	if(!m_isset_late_damping)
+		reset_late_damping();
+	if(!m_isset_late_predelay)
+		reset_late_predelay();
+	if(!m_isset_late_global_decay)
+		reset_late_global_decay();
+	if(!m_isset_dry_level)
+		reset_dry_level();
+	if(!m_isset_early_level)
+		reset_early_level();
+	if(!m_isset_late_level)
+		reset_late_level();
+	if(!m_isset_early_to_late_level)
+		reset_early_to_late_level();
 }
 
 void audio_effect_reverb::set_mode(u32 mode)
@@ -582,7 +635,7 @@ void audio_effect_reverb::reset_mode()
 {
 	audio_effect_reverb *d = static_cast<audio_effect_reverb *>(m_default);
 	m_isset_mode = false;
-	m_mode = d ? d->mode() : 1;
+	m_mode = d ? d->mode() : 0;
 }
 
 void audio_effect_reverb::reset_early_tap_setup()
@@ -703,6 +756,26 @@ void audio_effect_reverb::reset_early_to_late_level()
 	m_isset_early_to_late_level = false;
 	m_early_to_late_level = d ? d->early_to_late_level() : m_default_preset->early_to_late_level;
 	commit_early_to_late_level();
+}
+
+void audio_effect_reverb::reset_all()
+{
+	reset_mode();
+	reset_early_tap_setup();
+	reset_early_damping();
+	reset_stereo_width();
+	reset_early_room_size();
+	reset_late_room_size();
+	reset_late_spin();
+	reset_late_wander();
+	reset_late_diffusion();
+	reset_late_damping();
+	reset_late_predelay();
+	reset_late_global_decay();
+	reset_dry_level();
+	reset_early_level();
+	reset_late_level();
+	reset_early_to_late_level();
 }
 
 
@@ -1117,6 +1190,7 @@ void audio_effect_reverb::dccut::prepare(double cutoff, u32 sample_rate)
 void audio_effect_reverb::dccuth::clear()
 {
 	m_y1 = 0;
+	m_y2 = 0;
 }
 
 audio_effect_reverb::sample_t audio_effect_reverb::dccut::process(dccuth &h, sample_t x0)
@@ -1199,7 +1273,7 @@ audio_effect_reverb::sample_t audio_effect_reverb::delay::get(u32 tap) const
 // final result built similarly.
 
 
-//   Allpass variant without modulation or decay.
+// Allpass variant without modulation or decay.
 
 void audio_effect_reverb::allpass::clear()
 {
@@ -1228,7 +1302,7 @@ audio_effect_reverb::sample_t audio_effect_reverb::allpass::process(sample_t inp
 }
 
 
-//   Allpass variant with modulation, no decay.
+// Allpass variant with modulation, no decay.
 
 void audio_effect_reverb::allpass_m::clear()
 {
@@ -1262,7 +1336,7 @@ audio_effect_reverb::sample_t audio_effect_reverb::allpass_m::process(sample_t i
 }
 
 
-//   Allpass variant with modulation and decay.
+// Allpass variant with modulation and decay.
 
 void audio_effect_reverb::allpass_md::clear()
 {
@@ -1302,7 +1376,7 @@ audio_effect_reverb::sample_t audio_effect_reverb::allpass_md::process(sample_t 
 }
 
 
-//   Allpass variant with dual buffer, decay and taps
+// Allpass variant with dual buffer, decay and taps
 
 void audio_effect_reverb::allpass2::clear()
 {
@@ -1384,7 +1458,7 @@ audio_effect_reverb::sample_t audio_effect_reverb::allpass2::process(sample_t in
 }
 
 
-//   Allpass variant with triple buffer, decay, taps and modulation for the first buffer delay
+// Allpass variant with triple buffer, decay, taps and modulation for the first buffer delay
 
 void audio_effect_reverb::allpass3m::clear()
 {
@@ -1525,7 +1599,6 @@ audio_effect_reverb::sample_t audio_effect_reverb::comb::process(sample_t input,
 
 
 
-
 // Pink noise generator
 
 void audio_effect_reverb::pink::clear()
@@ -1610,6 +1683,7 @@ u32 audio_effect_reverb::find_prime(u32 value)
 
 	return value;
 }
+
 
 // The complete effect implementation
 

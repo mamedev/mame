@@ -777,6 +777,7 @@ public:
 	void superxavix_i2c_24c04(machine_config &config);
 	void superxavix_i2c_24c04_4mb(machine_config &config);
 	void superxavix_i2c_24c02(machine_config &config);
+	void superxavix_i2c_24c02_4mb(machine_config &config);
 	void superxavix_i2c_mrangbat(machine_config& config);
 
 protected:

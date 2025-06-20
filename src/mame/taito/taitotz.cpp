@@ -172,17 +172,21 @@ Notes:
 */
 
 #include "emu.h"
+
 #include "bus/ata/ataintf.h"
 #include "bus/ata/hdd.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/tlcs900/tmp95c063.h"
 #include "machine/nvram.h"
 #include "video/poly.h"
+
 #include "screen.h"
+
+#include <algorithm>
 
 #define LOG_PPC_TO_TLCS_COMMANDS    (1U << 1)
 #define LOG_TLCS_TO_PPC_COMMANDS    (1U << 2)
-#define LOG_PPC_TLCS				(LOG_PPC_TO_TLCS_COMMANDS | LOG_TLCS_TO_PPC_COMMANDS)
+#define LOG_PPC_TLCS                (LOG_PPC_TO_TLCS_COMMANDS | LOG_TLCS_TO_PPC_COMMANDS)
 #define LOG_VIDEO_REG_1_RD          (1U << 3)
 #define LOG_VIDEO_REG_2_RD          (1U << 4)
 #define LOG_VIDEO_REG_UNK_RD        (1U << 5)
@@ -191,7 +195,7 @@ Notes:
 #define LOG_VIDEO_REG_2_WR          (1U << 7)
 #define LOG_VIDEO_REG_UNK_WR        (1U << 8)
 #define LOG_VIDEO_REG_WR            (LOG_VIDEO_REG_1_WR | LOG_VIDEO_REG_2_WR | LOG_VIDEO_REG_UNK_WR)
-#define LOG_VIDEO_REG				(LOG_VIDEO_REG_RD | LOG_VIDEO_REG_WR)
+#define LOG_VIDEO_REG               (LOG_VIDEO_REG_RD | LOG_VIDEO_REG_WR)
 #define LOG_VIDEO_CHIP_UNK_RD       (1U << 9)
 #define LOG_VIDEO_CHIP_UNK_WR       (1U << 10)
 #define LOG_VIDEO_CHIP_UNK          (LOG_VIDEO_CHIP_UNK_RD | LOG_VIDEO_CHIP_UNK_WR)
@@ -199,16 +203,15 @@ Notes:
 #define LOG_TNL_FIFO                (1U << 12)
 #define LOG_RTC_UNK_RD              (1U << 13)
 #define LOG_RTC_UNK_WR              (1U << 14)
-#define LOG_RTC						(LOG_RTC_UNK_RD | LOG_RTC_UNK_WR)
+#define LOG_RTC                     (LOG_RTC_UNK_RD | LOG_RTC_UNK_WR)
 #define LOG_VIDEO_MEM_UNK_RD        (1U << 15)
 #define LOG_VIDEO_MEM_UNK_WR        (1U << 16)
-#define LOG_VIDEO_MEM_UNK			(LOG_VIDEO_MEM_UNK_RD | LOG_VIDEO_MEM_UNK_WR)
-#define LOG_ALL						(LOG_PPC_TLCS | LOG_VIDEO_REG | LOG_VIDEO_CHIP_UNK | LOG_DIRECT_FIFO | LOG_TNL_FIFO | LOG_RTC | LOG_VIDEO_MEM_UNK)
+#define LOG_VIDEO_MEM_UNK           (LOG_VIDEO_MEM_UNK_RD | LOG_VIDEO_MEM_UNK_WR)
+#define LOG_ALL                     (LOG_PPC_TLCS | LOG_VIDEO_REG | LOG_VIDEO_CHIP_UNK | LOG_DIRECT_FIFO | LOG_TNL_FIFO | LOG_RTC | LOG_VIDEO_MEM_UNK)
 
 #define VERBOSE (0)
 
 #include "logmacro.h"
-
 
 /*
     Interesting mem areas
@@ -752,8 +755,8 @@ private:
 	u32 m_reg_10000100 = 0;
 	u32 m_reg_10000101 = 0;
 
-	u32 m_tnl_fifo[64]{};
-	u32 m_direct_fifo[64]{};
+	u32 m_tnl_fifo[128]{};
+	u32 m_direct_fifo[128]{};
 	int m_tnl_fifo_ptr = 0;
 	int m_direct_fifo_ptr = 0;
 	int m_direct_fifo_block_count = 0;
@@ -1198,7 +1201,7 @@ int taitotz_renderer::clip_polygon(const vertex_t *v, int num_vertices, PLANE cp
 
 		previ = i;
 	}
-	memcpy(&vout[0], &clipv[0], sizeof(vout[0]) * clip_verts);
+	std::copy_n(clipv, clip_verts, vout);
 	return clip_verts;
 }
 
@@ -1370,6 +1373,7 @@ void taitotz_renderer::draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 void taitotz_renderer::push_tnl_fifo(u32 data)
 {
+	//m_state.machine().logerror("T&L: %08x\n", data);
 	m_tnl_fifo[m_tnl_fifo_ptr] = data;
 	m_tnl_fifo_ptr++;
 
@@ -1403,6 +1407,10 @@ void taitotz_renderer::push_tnl_fifo(u32 data)
 
 void taitotz_renderer::process_direct_verts(const u32 *header, const u32 *vert_data, const int num_verts)
 {
+	//m_state.machine().logerror("Processing %d direct verts\n", num_verts);
+	if (num_verts == 0)
+		return;
+
 	vertex_t v[8];
 	taitotz_polydata &extra = object_data().next();
 
@@ -1454,22 +1462,23 @@ void taitotz_renderer::process_direct_verts(const u32 *header, const u32 *vert_d
 
 void taitotz_renderer::flush_direct_poly_fifo()
 {
-	int fifo_idx = 4;
+	int fifo_idx = 0;
 	int num_verts = 0;
 	u32 vert_data[8*4] = {};
 	u32 header[4];
-	memcpy(header, &m_direct_fifo[0], sizeof(u32) * 4);
+	bool in_packet = false;
 	while (fifo_idx < m_direct_fifo_ptr)
 	{
 		if ((m_direct_fifo[fifo_idx] >> 16) == 0xff80)
 		{
 			process_direct_verts(header, vert_data, num_verts);
 			num_verts = 0;
-			memcpy(header, &m_direct_fifo[fifo_idx], sizeof(u32) * 4);
+			std::copy_n(m_direct_fifo + fifo_idx, std::size(header), header);
+			in_packet = true;
 		}
-		else
+		else if (in_packet)
 		{
-			memcpy(&vert_data[num_verts * 4], &m_direct_fifo[fifo_idx], sizeof(u32) * 4);
+			std::copy_n(m_direct_fifo + fifo_idx, 4, &vert_data[num_verts * 4]);
 			num_verts++;
 		}
 		fifo_idx += 4;
@@ -1484,6 +1493,7 @@ void taitotz_renderer::flush_direct_poly_fifo()
 
 void taitotz_renderer::push_direct_poly_fifo(u32 data)
 {
+	//m_state.machine().logerror("Direct: %08x\n", data);
 	m_direct_fifo[m_direct_fifo_ptr++] = data;
 	m_direct_fifo_block_count++;
 
@@ -1610,6 +1620,7 @@ u32 taitotz_state::video_reg_r(u32 reg)
 		if (reg == 0x10000105)      // Gets spammed a lot. Probably a status register.
 		{
 			m_reg105 ^= 0xffffffff;
+			LOGMASKED(LOG_VIDEO_CHIP_UNK_RD, "%s: video_reg_r: 0x10000105 read: %08x\n", machine().describe_context(), m_reg105);
 			return m_reg105;
 		}
 
@@ -1718,6 +1729,7 @@ u64 taitotz_state::video_chip_r(offs_t offset, u64 mem_mask)
 		{
 		case 0x14:
 			r |= 0xff;      // more busy flags? (value & 0x11ff == 0xff expected)
+			LOGMASKED(LOG_VIDEO_CHIP_UNK_RD, "%s: video_chip_r: 0x14 read: %08x%08x & %08x%08x\n", machine().describe_context(), (u32)(r >> 32), (u32)r, (u32)(mem_mask >> 32), (u32)mem_mask);
 			break;
 
 		default:
@@ -1736,6 +1748,7 @@ u64 taitotz_state::video_chip_r(offs_t offset, u64 mem_mask)
 
 		case 0x10:
 			r |= 0x000000ff00000000ULL;      // busy flags? landhigh expects this
+			LOGMASKED(LOG_VIDEO_CHIP_UNK_RD, "%s: video_chip_r: 0x10 read: %08x%08x & %08x%08x\n", machine().describe_context(), (u32)(r >> 32), (u32)r, (u32)(mem_mask >> 32), (u32)mem_mask);
 			break;
 
 		default:
@@ -2929,30 +2942,6 @@ ROM_START( pwrshovl )
 	DISK_IMAGE( "pwrshovl", 0, SHA1(360f63b39f645851c513b4644fb40601b9ba1412) )
 ROM_END
 
-ROM_START( pwrshovla )
-	ROM_REGION64_BE( 0x100000, "user1", 0 )
-	TAITOTZ_BIOS_V111A
-
-	ROM_REGION16_LE( 0x40000, "io_cpu", 0 )
-	ROM_LOAD16_BYTE( "e74-04++.ic14", 0x000000, 0x020000, CRC(ef21a261) SHA1(7398826dbf48014b9c7e9454f978f3e419ebc64b) ) // actually labeled E74-04**
-	ROM_LOAD16_BYTE( "e74-05++.ic15", 0x000001, 0x020000, CRC(2466217d) SHA1(dc814da3a1679cff001f179d3c1641af985a6490) ) // actually labeled E74-05**
-
-	ROM_REGION( 0x10000, "sound_cpu", 0 ) // Undumped internal ROM
-	ROM_LOAD( "e68-01.ic7", 0x000000, 0x010000, NO_DUMP )
-
-	ROM_REGION16_LE( 0x20000, "io_cpu2", 0 ) // another TMP95C063F, not hooked up yet
-	ROM_LOAD( "e74-06.ic2", 0x000000, 0x020000, CRC(cd4a99d3) SHA1(ea280e05a68308c1c5f1fc0ee8a25b33923df635) ) // located on the I/O PCB
-
-	ROM_REGION( 0x20000, "oki1", 0 )
-	ROM_LOAD( "e74-07.ic6", 0x000000, 0x020000, CRC(ca5baccc) SHA1(4594b7a6232b912d698fff053f7e3f51d8e1bfb6) ) // located on the I/O PCB
-
-	ROM_REGION( 0x20000, "oki2", 0 )
-	ROM_LOAD( "e74-08.ic8", 0x000000, 0x020000, CRC(ca5baccc) SHA1(4594b7a6232b912d698fff053f7e3f51d8e1bfb6) ) // located on the I/O PCB
-
-	DISK_REGION( "ata:0:hdd" )
-	DISK_IMAGE( "power shovel ver.2.07j", 0, SHA1(05410d4b4972262ef93400b02f21dd17d10b1c5e) )
-ROM_END
-
 ROM_START( raizpin )
 	ROM_REGION64_BE( 0x100000, "user1", 0 )
 	TAITOTZ_BIOS_V152
@@ -3027,7 +3016,6 @@ GAME( 1999, batlgear,  taitotz,  taitotz,  batlgr2,  taitotz_state, init_batlgea
 GAME( 1999, landhigh,  taitotz,  landhigh, landhigh, taitotz_state, init_landhigh, ROT0, "Taito", "Landing High Japan (Ver 2.01 OK)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1999, landhigha, landhigh, landhigh, landhigh, taitotz_state, init_landhigha,ROT0, "Taito", "Landing High Japan (Ver 2.02 O)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1999, pwrshovl,  taitotz,  taitotz,  pwrshovl, taitotz_state, init_pwrshovl, ROT0, "Taito", "Power Shovel ni Norou!! - Power Shovel Simulator (Ver 2.07 J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 1999/8/5 19:13:35
-GAME( 1999, pwrshovla, pwrshovl, taitotz,  pwrshovl, taitotz_state, init_pwrshovl, ROT0, "Taito", "Power Shovel ni Norou!! - Power Shovel Simulator (Ver 2.07 J, alt)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // seem to be some differences in drive content, but identifies as the same revision, is it just user data changes??
 GAME( 2000, batlgr2,   taitotz,  taitotz,  batlgr2,  taitotz_state, init_batlgr2,  ROT0, "Taito", "Battle Gear 2 (Ver 2.04 J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NODEVICE_LAN )
 GAME( 2000, batlgr2a,  batlgr2,  taitotz,  batlgr2,  taitotz_state, init_batlgr2a, ROT0, "Taito", "Battle Gear 2 (Ver 2.01 J, Side by Side cabinet)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NODEVICE_LAN ) // "BATTLE GEAR2(S)" on test menu
 GAME( 2000, dendego3,  taitotz,  taitotz,  dendego3, taitotz_state, init_dendego3, ROT0, "Taito", "Densha de GO 3! Tsukin-hen (Ver 2.03 J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 2001/01/27 09:52:56

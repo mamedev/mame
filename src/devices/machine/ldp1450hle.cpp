@@ -1,4 +1,5 @@
 // license:BSD-3-Clause
+// copyright-holders:J.Wallace
 
 /*************************************************************************
 
@@ -12,7 +13,7 @@
 
     To do:
 
-        * On-screen display support (we just popmessage the data)
+        * On-screen display support needs aligning with real hardware
         * Better CLV support
         * Chapter-search support
         * Repeat support (we only store the command)
@@ -23,12 +24,13 @@
           - Leadout Symbol
           - OSD
           - Status Requests
-          - UI text display (Nova games, DL2 need this)
         * Repeat behaviour for reverse play should restart in reverse
         * Delay timing of queue is a guess based on LDP1000A guide
         * Not all features are fully hooked up
         * Still step back and forth in Time Traveler glitches
           - (level select doesn't stay in place)
+		* resizing, positioning of OSD bitmaps is not optimal
+		  - 16x16 is supported, but native size and location may be wrong
 *************************************************************************/
 
 #include "emu.h"
@@ -47,7 +49,7 @@
 #define LOG_ALL                 (LOG_COMMAND_BYTES | LOG_COMMANDS | LOG_COMMAND_BUFFERS | LOG_REPLY_BYTES | LOG_SEARCHES | LOG_STOPS | LOG_SQUELCHES | LOG_FRAMES)
 
 
-#define VERBOSE 0
+#define VERBOSE (LOG_COMMANDS)
 
 #include "logmacro.h"
 
@@ -89,6 +91,244 @@ sony_ldp1450hle_device::sony_ldp1450hle_device(const machine_config &mconfig, co
 	, m_speed_accum(0)
 	, m_curr_frame(0)
 {
+}
+
+static const u8 text_size[0x04] =
+{
+	16,
+	32,
+	48,
+	64
+};
+
+// bitmaps for the characters
+static const u16 text_bitmap[0x60][0x10] =
+{
+	{ 0 },
+	{ 0 },
+	{ 0 },
+	{ 0 },
+	{ 0 },
+	{ 0 },
+	{ 0 },
+	{ 0 }, 
+	{ 0 },
+	{ 0 },
+	{ 0 },
+	{ 0 },
+	{ 0 },
+	{ 0 },
+	{ 0 },
+	{ 0 },
+	{ 0 },
+	{ 0 },
+	{ 0 },
+	{ 0 },
+	{ 0 },
+	{ 0 },
+	{ 0 },
+	{ 0 },
+	{ 0 },
+	{ 0 },
+	{ 0 },
+	{ 0 },
+	{ 0 },
+	{ 0 },
+	{ 0 },
+	{ 0 },
+	{ 0 },																	  									    // <space>
+	{0x0000,0x0000,0x00c0,0x00c0,0x00c0,0x00c0,0x00c0,0x00c0,0x00c0,0x00c0,0x00c0,0x00c0,0x0000,0x0000,0x00c0,0x00c0},// !
+	{ 0 },
+	{ 0 },
+	{ 0 },
+	{ 0 },
+	{0x0000,0x0000,0x00f0,0x01f8,0x039c,0x038c,0x01cc,0x00fc,0x30fc,0x3878,0x1cf8,0x0fcc,0x0786,0x0787,0x3ffe,0x3cfc}, // &
+	{0x0000,0x0000,0x03c0,0x03c0,0x0300,0x0380,0x01c0,0x00c0,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000}, // '
+	{0x0000,0x0000,0x3000,0x3800,0x1c00,0x0c00,0x0c00,0x0c00,0x0c00,0x0c00,0x0c00,0x0c00,0x0c00,0x1c00,0x3800,0x3000}, // (
+	{0x0000,0x0000,0x00c0,0x01c0,0x0380,0x0300,0x0300,0x0300,0x0300,0x0300,0x0300,0x0300,0x0300,0x0380,0x01c0,0x00c0}, // )
+	{0x0000,0x0000,0x0000,0x0000,0x0c00,0x0c00,0xccc0,0xedc0,0x7f80,0x3f00,0x3f00,0x7f80,0xedc0,0xccc0,0x0c00,0x0c00}, // *
+	{0x0000,0x0000,0x0000,0x0000,0x0300,0x0300,0x0300,0x0300,0x3ff0,0x3ff0,0x0300,0x0300,0x0300,0x0300,0x0000,0x0000}, // +
+	{0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x03c0,0x03c0,0x0300,0x0380,0x01c0,0x00c0}, // ,
+	{0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x1ff8,0x1ff8,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000}, // -
+	{0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x03c0,0x03c0,0x03c0,0x03c0}, // .
+	{0x0000,0x0000,0xc000,0xe000,0x7000,0x3800,0x1c00,0x0e00,0x0700,0x0380,0x01c0,0x00e0,0x0070,0x0038,0x001c,0x000c}, // /
+	{0x0000,0x0000,0x3fc0,0x7fe0,0xe070,0xc030,0xc030,0xc030,0xc030,0xc030,0xc030,0xc030,0xc030,0xe070,0x7fe0,0x3fc0}, // 0
+	{0x0000,0x0000,0x0c00,0x0c00,0x0fc0,0x0fc0,0x0c00,0x0c00,0x0c00,0x0c00,0x0c00,0x0c00,0x0c00,0x0c00,0x0c00,0x0c00}, // 1
+	{0x0000,0x0000,0x0ff0,0x1ff8,0x381c,0x300c,0x3000,0x3800,0x1fc0,0x0fe0,0x0070,0x0038,0x001c,0x000c,0x3ffc,0x3ffc}, // 2
+	{0x0000,0x0000,0x0ff0,0x1ff8,0x381c,0x300c,0x3000,0x3800,0x1fc0,0x1fc0,0x3800,0x3000,0x300c,0x381c,0x1ff8,0x0ff0}, // 3
+	{0x0000,0x0000,0x0f00,0x0f80,0x0dc0,0x0ce0,0x0c70,0x0c38,0x0c1c,0x0c0c,0x0c0c,0x0c0c,0x3ffc,0x3ffc,0x0c00,0x0c00}, // 4
+	{0x0000,0x0000,0x3ffc,0x3ffc,0x000c,0x000c,0x0ffc,0x1ffc,0x3800,0x3000,0x3000,0x3000,0x300c,0x381c,0x1ff8,0x0ff0}, // 5
+	{0x0000,0x0000,0x0ff0,0x1ff8,0x381c,0x300c,0x000c,0x000c,0x0ffc,0x1ffc,0x300c,0x300c,0x300c,0x381c,0x1ff8,0x0ff0}, // 6
+	{0x0000,0x0000,0x3ffc,0x3ffc,0x3000,0x3800,0x1c00,0x0e00,0x0700,0x0300,0x0300,0x0300,0x0300,0x0300,0x0300,0x0300}, // 7
+	{0x0000,0x0000,0x0ff0,0x1ff8,0x381c,0x300c,0x300c,0x381c,0x1ff8,0x1ff8,0x381c,0x300c,0x300c,0x381c,0x1ff8,0x0ff0}, // 8
+	{0x0000,0x0000,0x0ff0,0x1ff8,0x381c,0x300c,0x300c,0x301c,0x3ff8,0x3ff0,0x3000,0x3000,0x300c,0x381c,0x1ff8,0x0ff0}, // 9
+	{0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0180,0x0180,0x0000,0x0000,0x0180,0x0180,0x0000,0x0000,0x0000,0x0000}, // :
+	{ 0 },                                  
+	{ 0 },                                  
+	{0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x1ff8,0x1ff8,0x0000,0x1ff8,0x1ff8,0x0000,0x0000,0x0000,0x0000}, // =
+	{ 0 },                                  
+	{0x0000,0x0000,0x0ff0,0x1ff8,0x381c,0x300c,0x3000,0x3800,0x1c00,0x0e00,0x0700,0x0300,0x0000,0x0000,0x0300,0x0300}, // ?
+	{ 0 },                                  
+	{0x0000,0x0000,0x03c0,0x07e0,0x0e70,0x1c38,0x381c,0x300c,0x300c,0x300c,0x3ffc,0x3ffc,0x300c,0x300c,0x300c,0x300c}, // A
+	{0x0000,0x0000,0x1ffe,0x3ffe,0x7018,0x6018,0x6018,0x7018,0x3ff8,0x3ff8,0x7018,0x6018,0x6018,0x7018,0x3ffe,0x1ffe}, // B
+	{0x0000,0x0000,0x3fc0,0x7fe0,0xe070,0xc030,0x0030,0x0030,0x0030,0x0030,0x0030,0x0030,0xc030,0xe070,0x7fe0,0x3fc0}, // C
+	{0x0000,0x0000,0x1ffe,0x3ffe,0x7018,0x6018,0x6018,0x6018,0x6018,0x6018,0x6018,0x6018,0x6018,0x7018,0x3ffe,0x1ffe}, // D
+	{0x0000,0x0000,0x3ffc,0x3ffc,0x000c,0x000c,0x000c,0x000c,0x0ffc,0x0ffc,0x000c,0x000c,0x000c,0x000c,0x3ffc,0x3ffc}, // E
+	{0x0000,0x0000,0x3ffc,0x3ffc,0x000c,0x000c,0x000c,0x000c,0x0ffc,0x0ffc,0x000c,0x000c,0x000c,0x000c,0x000c,0x000c}, // F
+	{0x0000,0x0000,0x3fc0,0x7fe0,0xe070,0xc030,0x0030,0x0030,0xfc30,0xfc30,0xc030,0xc030,0xc030,0xe070,0x7fe0,0x3fc0}, // G
+	{0x0000,0x0000,0x300c,0x300c,0x300c,0x300c,0x300c,0x300c,0x3ffc,0x3ffc,0x300c,0x300c,0x300c,0x300c,0x300c,0x300c}, // H
+	{0x0000,0x0000,0x07e0,0x07e0,0x0180,0x0180,0x0180,0x0180,0x0180,0x0180,0x0180,0x0180,0x0180,0x0180,0x07e0,0x07e0}, // I
+	{0x0000,0x0000,0x3f00,0x3f00,0x0c00,0x0c00,0x0c00,0x0c00,0x0c00,0x0c00,0x0c0c,0x0c0c,0x0c0c,0x0e1c,0x07f8,0x03f0}, // J
+	{0x0000,0x0000,0x300c,0x380c,0x1c0c,0x0e0c,0x070c,0x038c,0x01fc,0x01fc,0x038c,0x070c,0x0e0c,0x1c0c,0x380c,0x300c}, // K
+	{0x0000,0x0000,0x000c,0x000c,0x000c,0x000c,0x000c,0x000c,0x000c,0x000c,0x000c,0x000c,0x000c,0x000c,0x3ffc,0x3ffc}, // L
+	{0x0000,0x0000,0x6006,0x6006,0x781e,0x7c3e,0x6e76,0x67e6,0x63c6,0x6186,0x6186,0x6186,0x6006,0x6006,0x6006,0x6006}, // M
+	{0x0000,0x0000,0x300c,0x300c,0x301c,0x303c,0x307c,0x30ec,0x31cc,0x338c,0x370c,0x3e0c,0x3c0c,0x380c,0x300c,0x300c}, // N
+	{0x0000,0x0000,0x3fc0,0x7fe0,0xe070,0xc030,0xc030,0xc030,0xc030,0xc030,0xc030,0xc030,0xc030,0xe070,0x7fe0,0x3fc0}, // O
+	{0x0000,0x0000,0x0ffc,0x1ffc,0x380c,0x300c,0x300c,0x380c,0x1ffc,0x0ffc,0x000c,0x000c,0x000c,0x000c,0x000c,0x000c}, // P
+	{0x0000,0x0000,0x0ff0,0x1ff8,0x381c,0x300c,0x300c,0x300c,0x300c,0x300c,0x330c,0x3f0c,0x1e0c,0x1e1c,0x3ff8,0x33f0}, // Q
+	{0x0000,0x0000,0x0ffc,0x1ffc,0x380c,0x300c,0x300c,0x380c,0x1ffc,0x0ffc,0x030c,0x070c,0x0e0c,0x1c0c,0x380c,0x300c}, // R
+	{0x0000,0x0000,0x0ff0,0x1ff8,0x381c,0x300c,0x000c,0x001c,0x0ff8,0x1ff0,0x3800,0x3000,0x300c,0x381c,0x1ff8,0x0ff0}, // S
+	{0x0000,0x0000,0x7ffe,0x7ffe,0x0180,0x0180,0x0180,0x0180,0x0180,0x0180,0x0180,0x0180,0x0180,0x0180,0x0180,0x0180}, // T
+	{0x0000,0x0000,0x300c,0x300c,0x300c,0x300c,0x300c,0x300c,0x300c,0x300c,0x300c,0x300c,0x300c,0x300c,0x1ff8,0x0ff0}, // U
+	{0x0000,0x0000,0x300c,0x300c,0x300c,0x300c,0x300c,0x300c,0x300c,0x300c,0x300c,0x381c,0x1c38,0x0e70,0x07e0,0x03c0}, // V
+	{0x0000,0x0000,0x6006,0x6006,0x6006,0x6006,0x6006,0x6186,0x6186,0x6186,0x6186,0x63c6,0x67e6,0x7e7e,0x3c3c,0x1818}, // W
+	{0x0000,0x0000,0x6006,0x700e,0x381c,0x1c38,0x0e70,0x07e0,0x03c0,0x03c0,0x07e0,0x0e70,0x1c38,0x381c,0x700e,0x6006}, // X
+	{0x0000,0x0000,0x6006,0x700e,0x381c,0x1c38,0x0e70,0x07e0,0x03c0,0x0180,0x0180,0x0180,0x0180,0x0180,0x0180,0x0180}, // Y
+	{0x0000,0x0000,0x3ffc,0x3ffc,0x1c00,0x0e00,0x0700,0x0380,0x01c0,0x00e0,0x0070,0x0038,0x001c,0x000c,0x3ffc,0x3ffc}, // Z
+	{ 0 },                                  // 
+	{ 0 },                                  // 
+	{ 0 },                                  // 
+	{ 0 },                                  // 
+	{0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x1ff8,0x1ff8,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000,0x0000}, // -
+};
+
+#define OVERLAY_PIXEL_WIDTH             1+(1.3f / 720.0f)
+#define OVERLAY_PIXEL_HEIGHT            1
+
+//-------------------------------------------------
+//  overlay_draw_group - draw a single group of
+//  characters
+//-------------------------------------------------
+
+void sony_ldp1450hle_device::overlay_fill(bitmap_yuy16 &bitmap, uint8_t yval, uint8_t cr, uint8_t cb)
+{
+	uint16_t color0 = (yval << 8) | cb;
+	uint16_t color1 = (yval << 8) | cr;
+
+	// write 32 bits of color (2 pixels at a time)
+	for (int y = 0; y < bitmap.height(); y++)
+	{
+		uint16_t *dest = &bitmap.pix(y);
+		for (int x = 0; x < bitmap.width() / 2; x++)
+		{
+			*dest++ = color0;
+			*dest++ = color1;
+		}
+	}
+}
+
+void sony_ldp1450hle_device::overlay_draw_group(bitmap_yuy16 &bitmap, const uint8_t *text, int start, int xstart, int ystart, int mode)
+{
+	u8 char_width = text_size[m_user_index_mode & 0x03];
+
+	u8 char_height = text_size[(m_user_index_mode >> 2) & 0x03];
+
+	float xstart_normalised = (bitmap.width()/2/ 64) * xstart;
+	float ystart_normalised = (bitmap.height()/ 64) * ystart;
+
+	if (m_user_index_mode & 0x80) //blue screen
+	{
+		overlay_fill(bitmap, 0x28, 0x6d, 0xf0);
+	}
+
+	u8 count;
+	if (m_user_index_mode & 0x10) // 3 line mode
+	{
+		LOGMASKED(LOG_COMMANDS, "3 Line\n");
+		int x = 0;
+		for (int y = 0; y < 3; y++)
+		{
+			bool eos = false;
+			for (int char_idx = x; char_idx < (x+10); char_idx++)
+			{
+				if (text[char_idx] == 0x1a || eos)
+				{
+					eos = true;
+					x -= 9;// adjust pointer to account for the + 10 we do automatically
+					break;
+				}
+				else
+				{
+					overlay_draw_char(bitmap, text[char_idx], xstart_normalised + (char_width  * (char_idx %10)), ystart_normalised + (y*char_height), char_width, char_height);
+				}
+			}
+			x += 10;
+		}
+	}
+	else
+	{
+		count = 0x20 - start;
+		LOGMASKED(LOG_COMMANDS, "1 Line\n");
+
+		for (int x = start; x < count; x++)
+		{
+			if (text[x] == 0x1a)
+			{
+				break;
+			}
+			else
+			{
+				overlay_draw_char(bitmap, text[x], xstart_normalised + ((char_width) * x), ystart_normalised, char_width, char_height);
+			}
+		}
+	}
+}	
+
+
+//-------------------------------------------------
+//  overlay_draw_char - draw a single character
+//  of the text overlay
+//-------------------------------------------------
+
+void sony_ldp1450hle_device::overlay_draw_char(bitmap_yuy16 &bitmap, uint8_t ch, float xstart, int ystart, int char_width, int char_height)
+{
+
+	// m_user_index_mode >> 5 & 0x04: 0,2 = normal, 1 = 1px shadow, 3 = grey box 
+	uint16_t black = 0x0080;
+
+	u8 modeval= (m_user_index_mode >> 5) & 0x04;
+	
+	for (u32 y = 0; y < char_height; y++)
+	{
+		for (u8 x = 0; x < char_width; x++)
+		{
+			u32 xmin = xstart + x;
+			for (u32 yy = 0; yy < OVERLAY_PIXEL_HEIGHT; yy++)
+			{
+
+				for (u32 xx = 0; xx < OVERLAY_PIXEL_WIDTH; xx++)
+				{
+					if (modeval==0x03)
+					{
+						//fill with grey	
+					}
+
+					if (m_osd_font[ch].pix(y,x) != black)
+					{	
+						bitmap.pix(ystart + (y + 1) * OVERLAY_PIXEL_HEIGHT + yy, xmin+xx) = m_osd_font[ch].pix(y,x);
+					}
+				}
+			}
+		}
+	}
+}
+
+void sony_ldp1450hle_device::player_overlay(bitmap_yuy16 &bitmap)
+{
+	if (m_user_index_flag)
+	{
+		overlay_draw_group(bitmap, m_user_index_chars, m_user_index_window_idx, m_user_index_x, m_user_index_y, m_user_index_mode);		
+	}
 }
 
 
@@ -148,93 +388,109 @@ void sony_ldp1450hle_device::add_command_byte(u8 command)
 {
 	switch (m_submode)
 	{
-	case SUBMODE_USER_INDEX:
-		switch (command)
+		case SUBMODE_USER_INDEX:
 		{
-		case 0x00:
-			m_submode = SUBMODE_USER_INDEX_MODE_1;
-			queue_reply(0x0a, 4.3);
-			break;
-		case 0x01:
-			m_submode = SUBMODE_USER_INDEX_STRING_1;
-			queue_reply(0x0a, 4.3);
-			break;
-		case 0x02:
-			m_submode = SUBMODE_USER_INDEX_WINDOW;
-			queue_reply(0x0a, 4.3);
-			break;
-		}
-		break;
-
-	case SUBMODE_USER_INDEX_MODE_1:
-		m_user_index_x = (command & 0x3f);
-		m_submode = SUBMODE_USER_INDEX_MODE_2;
-		queue_reply(0x0a, 4.3);
-		break;
-
-	case SUBMODE_USER_INDEX_MODE_2:
-		m_user_index_y = (command & 0x3f);
-		m_submode = SUBMODE_USER_INDEX_MODE_3;
-		queue_reply(0x0a, 4.3);
-		break;
-
-	case SUBMODE_USER_INDEX_MODE_3:
-		m_user_index_mode = command;
-		m_submode = SUBMODE_NORMAL;
-		queue_reply(0x0a, 4.3);
-		break;
-
-	case SUBMODE_USER_INDEX_STRING_1:
-		m_user_index_char_idx = (command & 0x1f);
-		m_submode = SUBMODE_USER_INDEX_STRING_2;
-		queue_reply(0x0a, 4.3);
-		break;
-
-	case SUBMODE_USER_INDEX_STRING_2:
-		m_user_index_chars[m_user_index_char_idx] = (char)(command & 0x5f);
-		if (command == 0x1a)
-		{
-			m_submode = SUBMODE_NORMAL;
-		}
-		else
-		{
-			m_user_index_char_idx++;
-			if (m_user_index_char_idx > 32)
+			switch (command)
 			{
-				m_user_index_char_idx = 0;
+				case 0x00:
+				{
+					m_submode = SUBMODE_USER_INDEX_MODE_1;
+					queue_reply(0x0a, 4.3);
+					break;
+				}
+				case 0x01:
+				{
+					m_submode = SUBMODE_USER_INDEX_STRING_1;
+					queue_reply(0x0a, 4.3);
+					break;
+				}
+				case 0x02:
+				{
+					m_submode = SUBMODE_USER_INDEX_WINDOW;
+					queue_reply(0x0a, 4.3);
+					break;
+				}
 			}
+			break;
 		}
-		queue_reply(0x0a, 4.3);
-		break;
+		case SUBMODE_USER_INDEX_MODE_1:
+		{
+			m_user_index_x = (command & 0x3f);
 
-	case SUBMODE_USER_INDEX_WINDOW:
-		m_user_index_window_idx = (command & 0x1f);
-		m_submode = SUBMODE_NORMAL;
-		queue_reply(0x0a, 4.3);
-		break;
+			LOGMASKED(LOG_COMMANDS, "User Index X: %02x\n", m_user_index_x);
+
+			m_submode = SUBMODE_USER_INDEX_MODE_2;
+			queue_reply(0x0a, 4.3);
+			break;
+		}
+		case SUBMODE_USER_INDEX_MODE_2:
+		{
+			m_user_index_y = (command & 0x3f);
+			LOGMASKED(LOG_COMMANDS, "User Index Y: %02x\n", m_user_index_y);
+			m_submode = SUBMODE_USER_INDEX_MODE_3;
+			queue_reply(0x0a, 4.3);
+			break;
+		}
+		case SUBMODE_USER_INDEX_MODE_3:
+		{
+			m_user_index_mode = command;
+			LOGMASKED(LOG_COMMANDS, "User Index Mode: %02x\n", m_user_index_mode);
+			m_submode = SUBMODE_NORMAL;
+			queue_reply(0x0a, 4.3);
+			break;
+		}
+		case SUBMODE_USER_INDEX_STRING_1:
+		{
+			m_user_index_char_idx = (command & 0x1f);
+			LOGMASKED(LOG_COMMANDS, "User Index Charpos: %02x\n", m_user_index_char_idx);
+			m_submode = SUBMODE_USER_INDEX_STRING_2;
+			queue_reply(0x0a, 4.3);
+			break;
+		}
+		case SUBMODE_USER_INDEX_STRING_2:
+		{
+			m_user_index_chars[m_user_index_char_idx] = (command);
+			LOGMASKED(LOG_COMMANDS, "User Index char idx %x: %02x ('%c')\n", m_user_index_char_idx, command, command);
+
+			if (command == 0x1a)
+			{
+				m_submode = SUBMODE_NORMAL;
+			}
+			else
+			{
+				m_user_index_char_idx++;
+				if (m_user_index_char_idx > 32)
+				{
+					m_user_index_char_idx = 0;
+				}
+			}
+			queue_reply(0x0a, 4.3);
+			break;
+		}
+		case SUBMODE_USER_INDEX_WINDOW:
+		{
+			m_user_index_window_idx = (command & 0x1f);
+			LOGMASKED(LOG_COMMANDS, "User Index Window idx: %02x\n", m_user_index_window_idx);
+			m_submode = SUBMODE_NORMAL;
+			queue_reply(0x0a, 4.3);
+			break;
+		}
 
 	default:
 		if (command >= 0x30 && command <=0x39)
 		{
-			if (m_mode == MODE_SEARCH_CMD || m_mode == MODE_REPEAT_CMD_MARK || m_mode == MODE_REPEAT_CMD_REPS || m_mode == MODE_MS_FORWARD || m_mode == MODE_MS_REVERSE)
+			// Reset flags
+			if (m_cmd_buffer == -2)
 			{
-				// Reset flags
-				if (m_cmd_buffer == -2)
-				{
-					m_cmd_buffer = 0;
-				}
+				m_cmd_buffer = 0;
+			}
 
-				if (m_cmd_buffer != 0)
-				{
-					m_cmd_buffer *= 10;
-				}
-				m_cmd_buffer += (command - 0x30);
-				queue_reply(0x0a, 4.3);
-			}
-			else
+			if (m_cmd_buffer != 0)
 			{
-					queue_reply(0x0b, 4.3);
+				m_cmd_buffer *= 10;
 			}
+			m_cmd_buffer += (command - 0x30);
+			queue_reply(0x0a, 4.3);
 		}
 		else
 		{
@@ -451,16 +707,18 @@ void sony_ldp1450hle_device::add_command_byte(u8 command)
 
 			case CMD_CLEAR_ALL:
 				m_cmd_buffer = 0;
-				m_search_frame = 0;
+				m_search_frame = m_curr_frame;
 				m_search_chapter = 0;
 				m_repeat_chapter_start = 0;
 				m_repeat_frame_start = 0;
 				m_repeat_chapter_end = 0;
 				m_repeat_frame_end = 0;
 				m_repeat_repetitions = 0;
+
 				m_speed = m_base_speed;
-				m_mode = MODE_STILL;
-				queue_reply(0x0a, 5.5);
+				m_submode = SUBMODE_NORMAL;
+				m_mode = MODE_PLAY;
+				queue_reply(0x0a, 5.5);	
 				break;
 
 			case CMD_CH1_ON:
@@ -536,6 +794,11 @@ void sony_ldp1450hle_device::add_command_byte(u8 command)
 				}
 				break;
 
+			case CMD_MOTOR_ON:
+				//Presume we're already running
+				queue_reply(0x0b, 0.4);
+				break;
+
 			case CMD_STATUS_INQ:
 				{
 					u8 status_buffer[5] = { 0x80, 0x00, 0x10, 0x00, 0xff};
@@ -558,13 +821,18 @@ void sony_ldp1450hle_device::add_command_byte(u8 command)
 				break;
 
 			case CMD_USER_INDEX_ON:
-				popmessage("X %x Y %x M%x T%s (Start %x)", m_user_index_x, m_user_index_y, m_user_index_mode, m_user_index_chars,m_user_index_window_idx);
-				queue_reply(0x0a, 0.4);
-				break;
+				{
+					m_user_index_flag = true;
+					queue_reply(0x0a, 0.4);
+					break;
+				}
 
 			case CMD_USER_INDEX_OFF:
-				queue_reply(0x0a, 0.4);
-				break;
+				{
+					m_user_index_flag = false;
+					queue_reply(0x0a, 0.4);
+					break;
+				}
 
 			default:
 				popmessage("no implementation cmd %x", command);
@@ -573,6 +841,7 @@ void sony_ldp1450hle_device::add_command_byte(u8 command)
 			}
 		}
 		LOGMASKED(LOG_SEARCHES, "Command %x\n", command);
+
 	}
 }
 
@@ -627,6 +896,35 @@ void sony_ldp1450hle_device::update_video_enable()
 }
 
 
+bitmap_yuy16 sony_ldp1450hle_device::osd_char_gen(uint8_t idx)
+{
+	uint16_t white = 0xeb80;
+	uint16_t black = 0x0080;
+
+	// iterate over pixels
+	const u16 *chdataptr = &text_bitmap[idx][0];
+
+	bitmap_yuy16 char_bmp = bitmap_yuy16(16,16);
+	for (u8 y = 0; y < 16; y++)
+	{
+		u16 chdata = *chdataptr++;
+
+		for (u8 x = 0; x < 16; x++, chdata >>= 1)
+		{
+			if (chdata & 0x01)
+			{
+				char_bmp.pix(y, x) = white;
+			}
+			else
+			{
+				char_bmp.pix(y, x) = black;
+			}
+		}
+	}
+	return char_bmp;
+}
+
+
 //-------------------------------------------------
 //  device_start - device initialization
 //-------------------------------------------------
@@ -669,6 +967,21 @@ void sony_ldp1450hle_device::device_start()
 	save_item(NAME(m_repeat_chapter_end));
 	save_item(NAME(m_repeat_frame_start));
 	save_item(NAME(m_repeat_frame_end));
+
+	save_item(NAME(m_user_index_flag));
+	save_item(NAME(m_user_index_x));
+	save_item(NAME(m_user_index_y));
+	save_item(NAME(m_user_index_mode));
+	save_item(NAME(m_user_index_char_idx));
+	save_item(NAME(m_user_index_window_idx));
+	save_item(NAME(m_user_index_chars));
+
+
+	for (u8 chr_idx = 0; chr_idx < 96; chr_idx ++)
+	{
+		m_osd_font[chr_idx] = osd_char_gen(chr_idx);
+	}	
+
 }
 
 
@@ -715,6 +1028,7 @@ void sony_ldp1450hle_device::device_reset()
 	m_base_speed = 60;
 	m_speed = m_base_speed;
 	m_speed_accum = 0;
+	m_user_index_flag = false;
 
 	video_enable(true);
 	set_audio_squelch(true, true);
@@ -740,10 +1054,10 @@ TIMER_CALLBACK_MEMBER(sony_ldp1450hle_device::process_vbi_data)
 			m_curr_frame = bcd_to_literal(line & 0x7ffff);
 
 		LOGMASKED(LOG_FRAMES, "Current frame is %d (VBI 16: %06x, VBI 17: %06x, VBI 18: %06x, VBI 1718: %06x\n", m_curr_frame,
-				get_field_code(LASERDISC_CODE_LINE16, false),
-				get_field_code(LASERDISC_CODE_LINE17, false),
-				get_field_code(LASERDISC_CODE_LINE18, false),
-				line);
+			get_field_code(LASERDISC_CODE_LINE16, false),
+			get_field_code(LASERDISC_CODE_LINE17, false),
+			get_field_code(LASERDISC_CODE_LINE18, false),
+			line);
 
 		if (m_mode != MODE_STILL && m_mode != MODE_PAUSE)
 		{

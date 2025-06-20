@@ -89,12 +89,15 @@ public:
 	void reset_early_level();
 	void reset_late_level();
 	void reset_early_to_late_level();
+	void reset_all();
 
 	static u32 preset_count();
 	static const char *preset_name(u32 id);
 	static u32 early_tap_setup_count();
 	static const char *early_tap_setup_name(u32 id);
 
+	u32 default_preset() { return m_default_preset_id; }
+	u32 find_current_preset();
 	void load_preset(u32 id);
 
 private:
@@ -152,7 +155,7 @@ private:
 		sample_t process(sample_t value) { push(value); return get(0); }
 		delay() { clear(); }
 	};
-		
+
 	struct iir1h {
 		sample_t m_y1;
 		void clear();
@@ -341,8 +344,6 @@ private:
 	bool m_isset_late_level;
 	bool m_isset_early_to_late_level;
 
-
-
 	std::vector<ch_type_t> m_ch_type;
 	std::vector<int> m_ch_pair;
 
@@ -390,6 +391,7 @@ private:
 	u32 m_early_xdelays_dist;
 
 	const preset *m_default_preset;
+	u32 m_default_preset_id;
 
 	void commit_early_tap_setup();
 	void commit_early_damping();
@@ -431,7 +433,7 @@ private:
 	void set_late_bass_allpass(double cutoff, double bw);
 	void set_late_spin_to_wander(double value);
 
-	static const preset *find_preset(std::string name);
+	static u32 find_preset(std::string name);
 
 	static bool is_prime(u32 value);
 	static u32 find_prime(u32 v);

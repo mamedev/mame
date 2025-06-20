@@ -64,6 +64,24 @@ constexpr std::pair<device_t::feature_type, char const *> FEATURE_NAMES[] = {
 		{ device_t::feature::LAN,           N_p("emulation-feature",    "LAN")                  },
 		{ device_t::feature::WAN,           N_p("emulation-feature",    "WAN")                  } };
 
+bool has_media_warnings(machine_config const &config)
+{
+	if (!config.root_device().has_running_machine())
+		return false;
+
+	auto &romload(config.root_device().machine().rom_load());
+	return (romload.warnings() > 0) || (romload.knownbad() > 0);
+}
+
+bool has_severe_media_warnings(machine_config const &config)
+{
+	if (!config.root_device().has_running_machine())
+		return false;
+
+	auto &romload(config.root_device().machine().rom_load());
+	return romload.presentbad() > 0;
+}
+
 void get_general_warnings(
 		std::ostream &buf,
 		running_machine &machine,
@@ -268,6 +286,8 @@ machine_static_info::machine_static_info(const ui_options &options, machine_conf
 	, m_has_keyboard(false)
 	, m_has_test_switch(false)
 	, m_has_analog(false)
+	, m_media_warnings(has_media_warnings(config))
+	, m_severe_media_warnings(has_severe_media_warnings(config))
 {
 	ioport_list local_ports;
 	std::ostringstream sink;
@@ -305,11 +325,13 @@ machine_static_info::machine_static_info(const ui_options &options, machine_conf
 	if (config.root_device().has_running_machine())
 	{
 		for (render_target const &target : config.root_device().machine().render().targets())
+		{
 			if (!target.hidden() && target.external_artwork())
 			{
 				m_flags &= ~::machine_flags::REQUIRES_ARTWORK;
 				break;
 			}
+		}
 	}
 
 	// unemulated trumps imperfect when aggregating (always be pessimistic)
@@ -337,12 +359,13 @@ machine_static_info::machine_static_info(const ui_options &options, machine_conf
 
 //-------------------------------------------------
 //  has_warnings - returns true if the system has
-//  issues that warrant a yellow/red message
+//  issues that warrant a message
 //-------------------------------------------------
 
 bool machine_static_info::has_warnings() const noexcept
 {
 	return
+			m_media_warnings ||
 			(machine_flags() & (MACHINE_ERRORS | MACHINE_WARNINGS | MACHINE_BTANB)) ||
 			(emulation_flags() & DEVICE_ERRORS) ||
 			unemulated_features() ||
@@ -359,6 +382,7 @@ bool machine_static_info::has_warnings() const noexcept
 bool machine_static_info::has_severe_warnings() const noexcept
 {
 	return
+			m_severe_media_warnings ||
 			(machine_flags() & MACHINE_ERRORS) ||
 			(emulation_flags() & DEVICE_ERRORS) ||
 			(unemulated_features() & (device_t::feature::PROTECTION | device_t::feature::GRAPHICS | device_t::feature::SOUND)) ||

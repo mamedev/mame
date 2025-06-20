@@ -21,14 +21,9 @@ audio_effect_filter::audio_effect_filter(speaker_device *speaker, u32 sample_rat
 	// Minimal init to avoid using uninitialized values when reset_*
 	// recomputes filters
 	m_fl = m_fh = 1000;
-	m_ql = m_qh = 0.7;
+	m_ql = m_qh = DEFAULT_Q;
 
-	reset_lowpass_active();
-	reset_highpass_active();
-	reset_fl();
-	reset_fh();
-	reset_ql();
-	reset_qh();
+	reset_all();
 }
 
 void audio_effect_filter::reset_lowpass_active()
@@ -59,7 +54,7 @@ void audio_effect_filter::reset_ql()
 {
 	audio_effect_filter *d = static_cast<audio_effect_filter *>(m_default);
 	m_isset_ql = false;
-	m_ql = d ? d->ql() : 0.7;
+	m_ql = d ? d->ql() : DEFAULT_Q;
 	build_lowpass();
 }
 
@@ -67,7 +62,7 @@ void audio_effect_filter::reset_fh()
 {
 	audio_effect_filter *d = static_cast<audio_effect_filter *>(m_default);
 	m_isset_fh = false;
-	m_fh = d ? d->fh() : 40;
+	m_fh = d ? d->fh() : 20;
 	build_highpass();
 }
 
@@ -75,8 +70,18 @@ void audio_effect_filter::reset_qh()
 {
 	audio_effect_filter *d = static_cast<audio_effect_filter *>(m_default);
 	m_isset_qh = false;
-	m_qh = d ? d->qh() : 0.7;
+	m_qh = d ? d->qh() : DEFAULT_Q;
 	build_highpass();
+}
+
+void audio_effect_filter::reset_all()
+{
+	reset_lowpass_active();
+	reset_highpass_active();
+	reset_fl();
+	reset_fh();
+	reset_ql();
+	reset_qh();
 }
 
 void audio_effect_filter::config_load(util::xml::data_node const *ef_node)
@@ -88,7 +93,7 @@ void audio_effect_filter::config_load(util::xml::data_node const *ef_node)
 		reset_lowpass_active();
 
 	if(ef_node->has_attribute("fl")) {
-		m_fl = ef_node->get_attribute_float("fl", 0);
+		m_fl = ef_node->get_attribute_int("fl", 0);
 		m_isset_fl = true;
 	} else
 		reset_fl();
@@ -106,7 +111,7 @@ void audio_effect_filter::config_load(util::xml::data_node const *ef_node)
 		reset_highpass_active();
 
 	if(ef_node->has_attribute("fh")) {
-		m_fh = ef_node->get_attribute_float("fh", 0);
+		m_fh = ef_node->get_attribute_int("fh", 0);
 		m_isset_fh = true;
 	} else
 		reset_fh();
@@ -126,13 +131,13 @@ void audio_effect_filter::config_save(util::xml::data_node *ef_node) const
 	if(m_isset_lowpass_active)
 		ef_node->set_attribute_int("lowpass_active", m_lowpass_active);
 	if(m_isset_fl)
-		ef_node->set_attribute_float("fl", m_fl);
+		ef_node->set_attribute_int("fl", m_fl);
 	if(m_isset_ql)
 		ef_node->set_attribute_float("ql", m_ql);
 	if(m_isset_highpass_active)
 		ef_node->set_attribute_int("highpass_active", m_highpass_active);
 	if(m_isset_fh)
-		ef_node->set_attribute_float("fh", m_fh);
+		ef_node->set_attribute_int("fh", m_fh);
 	if(m_isset_qh)
 		ef_node->set_attribute_float("qh", m_qh);
 }
@@ -175,7 +180,6 @@ void audio_effect_filter::apply(const emu::detail::output_buffer_flat<sample_t> 
 	}
 
 	dest.commit(samples);
-
 }
 
 void audio_effect_filter::set_lowpass_active(bool active)
@@ -192,14 +196,14 @@ void audio_effect_filter::set_highpass_active(bool active)
 	build_highpass();
 }
 
-void audio_effect_filter::set_fl(float f)
+void audio_effect_filter::set_fl(u32 f)
 {
 	m_isset_fl = true;
 	m_fl = f;
 	build_lowpass();
 }
 
-void audio_effect_filter::set_fh(float f)
+void audio_effect_filter::set_fh(u32 f)
 {
 	m_isset_fh = true;
 	m_fh = f;
@@ -222,13 +226,19 @@ void audio_effect_filter::set_qh(float q)
 
 void audio_effect_filter::build_highpass()
 {
+	if(m_fh > m_fl)
+		set_fl(m_fh);
+
 	auto &fi = m_filter[0];
     if(!m_highpass_active) {
 		fi.clear();
 		return;
 	}
 
-    float K = tan(M_PI*m_fh/m_sample_rate);
+	float sr = m_sample_rate;
+	float fh = std::clamp(float(m_fh), 1.0f, sr/2.0f - 1.0f);
+
+    float K = tan(M_PI*fh/sr);
 	float K2 = K*K;
 	float Q = m_qh;
 
@@ -242,13 +252,19 @@ void audio_effect_filter::build_highpass()
 
 void audio_effect_filter::build_lowpass()
 {
+	if(m_fl < m_fh)
+		set_fh(m_fl);
+
 	auto &fi = m_filter[1];
     if(!m_lowpass_active) {
 		fi.clear();
 		return;
 	}
 
-    float K = tan(M_PI*m_fl/m_sample_rate);
+	float sr = m_sample_rate;
+	float fl = std::clamp(float(m_fl), 1.0f, sr/2.0f - 1.0f);
+
+    float K = tan(M_PI*fl/sr);
 	float K2 = K*K;
 	float Q = m_ql;
 
@@ -259,4 +275,3 @@ void audio_effect_filter::build_lowpass()
 	fi.m_a1 = 2*Q*(K2-1)/d;
 	fi.m_a2 = (K2*Q - K + Q)/d;
 }
-
