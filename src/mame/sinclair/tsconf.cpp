@@ -28,7 +28,6 @@ FAQ-RUS: https://forum.tslabs.info/viewtopic.php?f=35&t=157
     ROM: https://github.com/tslabs/zx-evo/blob/master/pentevo/rom/bin/ts-bios.rom (validated on: 2021-12-14)
 
 TODO:
-- Ram cache
 - VDos
 
  ****************************************************************************/
@@ -71,13 +70,13 @@ TILE_GET_INFO_MEMBER(tsconf_state::get_tile_info_16c)
 
 void tsconf_state::tsconf_mem(address_map &map)
 {
-	map(0x0000, 0x3fff).bankr(m_bank_ram[0]).w(FUNC(tsconf_state::tsconf_bank_w<0>));
+	map(0x0000, 0x3fff).rw(FUNC(tsconf_state::tsconf_ram_bank_r<0>), FUNC(tsconf_state::tsconf_bank_w<0>));
 	map(0x0000, 0x3fff).view(m_bank0_rom);
 	m_bank0_rom[0](0x0000, 0x3fff).bankr(m_bank_rom[0]);
 
-	map(0x4000, 0x7fff).bankr(m_bank_ram[1]).w(FUNC(tsconf_state::tsconf_bank_w<1>));
-	map(0x8000, 0xbfff).bankr(m_bank_ram[2]).w(FUNC(tsconf_state::tsconf_bank_w<2>));
-	map(0xc000, 0xffff).bankr(m_bank_ram[3]).w(FUNC(tsconf_state::tsconf_bank_w<3>));
+	map(0x4000, 0x7fff).rw(FUNC(tsconf_state::tsconf_ram_bank_r<1>), FUNC(tsconf_state::tsconf_bank_w<1>));
+	map(0x8000, 0xbfff).rw(FUNC(tsconf_state::tsconf_ram_bank_r<2>), FUNC(tsconf_state::tsconf_bank_w<2>));
+	map(0xc000, 0xffff).rw(FUNC(tsconf_state::tsconf_ram_bank_r<3>), FUNC(tsconf_state::tsconf_bank_w<3>));
 }
 
 void tsconf_state::tsconf_io(address_map &map)
@@ -116,12 +115,6 @@ void tsconf_state::tsconf_switch(address_map &map)
 	map(0x0000, 0x3fff).r(FUNC(tsconf_state::beta_neutral_r)); // Overlap with next because we want real addresses on the 3e00-3fff range
 	map(0x3d00, 0x3dff).r(FUNC(tsconf_state::beta_enable_r));
 	map(0x4000, 0xffff).r(FUNC(tsconf_state::beta_disable_r));
-}
-
-template <u8 Bank>
-void tsconf_state::tsconf_bank_w(offs_t offset, u8 data)
-{
-	tsconf_state::ram_bank_write(Bank, offset, data);
 }
 
 static const gfx_layout spectrum_charlayout =
@@ -185,7 +178,8 @@ void tsconf_state::machine_start()
 	m_bank_ram[0]->configure_entries(0, m_ram->size() / 0x4000, m_ram->pointer(), 0x4000);
 
 	save_item(NAME(m_int_mask));
-	save_pointer(NAME(m_regs), 0x100);
+	save_item(NAME(m_regs));
+	save_item(NAME(m_cache_line_addr));
 	save_item(NAME(m_zctl_di));
 	save_item(NAME(m_zctl_cs));
 	save_item(NAME(m_port_f7_ext));
@@ -199,6 +193,7 @@ void tsconf_state::machine_reset()
 	m_int_mask = 0;
 
 	m_bank0_rom.select(0);
+	m_cache_line_addr = -1;
 
 	m_glukrs->disable();
 

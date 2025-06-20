@@ -196,9 +196,9 @@ private:
 	void tsconf_mem(address_map &map) ATTR_COLD;
 	void tsconf_switch(address_map &map) ATTR_COLD;
 
-	u8 mem_bank_read(u8 bank, offs_t offset);
-	template <u8 Bank>
-	void tsconf_bank_w(offs_t offset, u8 data);
+	template <u8 Bank> u8 tsconf_ram_bank_r(offs_t offset) { return ram_bank_read(Bank, offset); };
+	template <u8 Bank> void tsconf_bank_w(offs_t offset, u8 data) { ram_bank_write(Bank, offset, data); };
+	u8 ram_bank_read(u8 bank, offs_t offset);
 	void ram_bank_write(u8 bank, offs_t offset, u8 data);
 	void ram_page_write(u8 page, offs_t offset, u8 data);
 	void cram_write(u16 offset, u8 data);
@@ -215,6 +215,7 @@ private:
 	memory_view m_bank0_rom;
 	memory_share_array_creator<u8, 2> m_tiles_raw;
 	memory_share_creator<u8> m_sprites_raw;
+	u16 m_cache_line_addr; // u13
 
 	required_device<at_keyboard_device> m_keyboard;
 	required_ioport_array<3> m_io_mouse;
