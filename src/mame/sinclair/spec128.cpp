@@ -238,6 +238,13 @@ void spectrum_128_state::spectrum_128_port_7ffd_w(offs_t offset, uint8_t data)
 	m_exp->iorq_w(offset | 1, data);
 }
 
+void spectrum_128_state::bank3_set_page(u8 page)
+{
+	m_port_7ffd_data &= 0xf8;
+	m_port_7ffd_data |= page & 0x07;
+	spectrum_128_update_memory();
+}
+
 void spectrum_128_state::spectrum_128_update_memory()
 {
 	m_bank_rom[0]->set_entry(BIT(m_port_7ffd_data, 4));
@@ -344,6 +351,15 @@ INPUT_PORTS_END
 INPUT_PORTS_START( spec_plus )
 	PORT_INCLUDE( spec128 )
 	PORT_INCLUDE( spec_plus_joys )
+
+	PORT_START("MOD_DMA")
+	PORT_CONFNAME( 0x03, 0x00, "DMA")
+	PORT_CONFSETTING(    0x00, DEF_STR( No ))
+	PORT_CONFSETTING(    0x01, "UA858D")
+	PORT_CONFSETTING(    0x03, "Zilog")
+	PORT_CONFNAME( 0x04, 0x00, "DMA Port") PORT_CONDITION("MOD_DMA", 0x01, EQUALS, 0x01)
+	PORT_CONFSETTING(    0x00, "11: MB02+")
+	PORT_CONFSETTING(    0x04, "107: DATAGEAR")
 INPUT_PORTS_END
 
 void spectrum_128_state::machine_start()
@@ -374,6 +390,15 @@ void spectrum_128_state::machine_reset()
 	// set initial ram config
 	m_port_7ffd_data = 0;
 	spectrum_128_update_memory();
+
+	const u8 mod_dma = m_mod_dma.read_safe(0);
+	if (mod_dma & 1)
+	{
+		m_dma->set_dma_mode(mod_dma & 2 ? z80dma_device::dma_mode::ZILOG : z80dma_device::dma_mode::UA858D);
+
+		const u8 port = mod_dma & 4 ? 0x6b : 0x0b;
+		m_maincpu->space(AS_IO).install_readwrite_handler(port, port, 0, 0xff00, 0, read8smo_delegate(*m_dma, FUNC(z80dma_device::read)), write8smo_delegate(*m_dma, FUNC(z80dma_device::write)));
+	}
 }
 
 bool spectrum_128_state::is_vram_write(offs_t offset) {
@@ -419,8 +444,17 @@ void spectrum_128_state::spectrum_128(machine_config &config)
 	m_maincpu->set_m1_map(&spectrum_128_state::spectrum_128_fetch);
 	m_maincpu->set_vblank_int("screen", FUNC(spectrum_128_state::spec_interrupt));
 	m_maincpu->nomreq_cb().set(FUNC(spectrum_128_state::spectrum_nomreq));
+	m_maincpu->busack_cb().set(m_dma, FUNC(z80dma_device::bai_w));
 
 	config.set_maximum_quantum(attotime::from_hz(60));
+
+	Z80DMA(config, m_dma, X1_128_SINCLAIR / 10);
+	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	m_dma->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_dma->in_mreq_callback().set([this](offs_t offset) { return m_program.read_byte(offset); });
+	m_dma->out_mreq_callback().set([this](offs_t offset, u8 data) { m_program.write_byte(offset, data); });
+	m_dma->in_iorq_callback().set([this](offs_t offset) { return m_io.read_byte(offset); });
+	m_dma->out_iorq_callback().set([this](offs_t offset, u8 data) { m_io.write_byte(offset, data); });
 
 	// video hardware
 	rectangle visarea = { get_screen_area().left() - SPEC_LEFT_BORDER, get_screen_area().right() + SPEC_RIGHT_BORDER,

@@ -13,14 +13,18 @@
 
 #include "spectrum.h"
 
+#include "machine/z80dma.h"
+
 
 class spectrum_128_state : public spectrum_state
 {
 public:
 	spectrum_128_state(const machine_config &mconfig, device_type type, const char *tag) :
-		spectrum_state(mconfig, type, tag),
-		m_bank_rom(*this, "bank_rom%u", 0U),
-		m_bank_ram(*this, "bank_ram%u", 0U)
+		spectrum_state(mconfig, type, tag)
+		, m_bank_rom(*this, "bank_rom%u", 0U)
+		, m_bank_ram(*this, "bank_ram%u", 0U)
+		, m_dma(*this, "dma_ext")
+		, m_mod_dma(*this, "MOD_DMA")
 	{ }
 
 	void spectrum_128(machine_config &config);
@@ -35,6 +39,7 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
+	virtual void bank3_set_page(u8 page) override;
 	virtual void spectrum_128_update_memory() override;
 	virtual rectangle get_screen_area() override;
 
@@ -57,6 +62,10 @@ private:
 	void spectrum_128_io(address_map &map) ATTR_COLD;
 	void spectrum_128_mem(address_map &map) ATTR_COLD;
 	void spectrum_128_fetch(address_map &map) ATTR_COLD;
+
+	optional_device<z80dma_device> m_dma;
+
+	optional_ioport m_mod_dma;
 };
 
 #define X1_128_AMSTRAD  35'469'000       // Main clock (Amstrad 128K model, +2A?)

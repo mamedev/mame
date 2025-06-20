@@ -201,7 +201,13 @@ DEFINE_DEVICE_TYPE(PC_KBD_MICROSOFT_NATURAL, pc_kbd_microsoft_natural_device, "k
 
 ROM_START( microsoft_natural )
 	ROM_REGION(0x1000, "ms_natrl_cpu", 0)
-	ROM_LOAD("natural.bin", 0x0000, 0x1000, CRC(aa8243ab) SHA1(72134882a5c03e785db07cc54dfb7572c0a730d9))
+	ROM_DEFAULT_BIOS("orig")
+
+	ROM_SYSTEM_BIOS(0, "orig", "Original")
+	ROMX_LOAD("natural.bin", 0x0000, 0x1000, CRC(aa8243ab) SHA1(72134882a5c03e785db07cc54dfb7572c0a730d9), ROM_BIOS(0))
+
+	ROM_SYSTEM_BIOS(1, "sp2k", "Sprinter 2k Fix")
+	ROMX_LOAD("natural-sp2k.bin", 0x0000, 0x1000, CRC(16c21ab2) SHA1(72c6ebe8fd88a81a6c9622ff968ad2d0eb04a629), ROM_BIOS(1))
 ROM_END
 
 

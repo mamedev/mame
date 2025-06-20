@@ -55,13 +55,13 @@ void tsconf_state::tsconf_update_bank0()
 	if (!NW0_MAP)
 	{
 		/* ROM: 0-SYS, 1-DOS, 2-128, 3-48 */
-		page0 = m_beta->started() && m_beta->is_active() ? ROM128 : (0x02 | ROM128);
-		page0 |= (m_regs[PAGE0] & 0xfc);
+		page0 &= 0xfc;
+		page0 |= m_beta->dos_r() ? ROM128 : (0x02 | ROM128);
 	}
 
-	if (W0_RAM)
+	if (W0_RAM || m_beta->vdos_r())
 	{
-		m_bank_ram[0]->set_entry(page0);
+		m_bank_ram[0]->set_entry(m_beta->vdos_r() ? 0xff : page0);
 		m_bank0_rom.disable();
 	}
 	else
@@ -69,6 +69,12 @@ void tsconf_state::tsconf_update_bank0()
 		m_bank_rom[0]->set_entry(page0 & 0x1f);
 		m_bank0_rom.select(0);
 	}
+}
+
+void tsconf_state::update_io(int dos)
+{
+	m_io_shadow_view.select(dos ? 1 : 0);
+	tsconf_update_bank0();
 }
 
 void tsconf_state::tsconf_update_video_mode()
@@ -399,8 +405,10 @@ void tsconf_state::ram_bank_write(u8 bank, offs_t offset, u8 data)
 		}
 	}
 
-	if (bank > 0 || (W0_WE && W0_RAM))
+	if (bank > 0 || W0_WE)
 		ram_page_write(m_regs[PAGE0 + bank], offset, data);
+	else if (!bank && m_beta->vdos_r())
+		ram_page_write(0xff, offset, data);
 }
 
 static int tiles_offset_to_raw(int t_offset)
@@ -496,9 +504,12 @@ void tsconf_state::sfile_write16(offs_t offset, u16 data)
 }
 
 u8 tsconf_state::tsconf_port_xx1f_r(offs_t offset) {
-	return m_beta->started() && m_beta->is_active()
-			? m_beta->status_r()
-			: 0x00; // TODO kempston read
+	return 0x00; // TODO kempston read
+}
+
+void tsconf_state::bank3_set_page(u8 page)
+{
+	tsconf_port_xxaf_w(PAGE3 << 8, page);
 }
 
 void tsconf_state::tsconf_port_7ffd_w(u8 data)
@@ -719,12 +730,15 @@ void tsconf_state::tsconf_port_xxaf_w(offs_t port, u8 data)
 		update_frame_timer();
 		break;
 
+	case FDD_VIRT:
+		m_beta->io_forced_w(BIT(data, 7));
+		m_beta->fddvirt_w(data & 0x0f);
+		break;
+
 	case FMAPS:
 	case TS_CONFIG:
 	case INT_MASK:
 	case CACHE_CONFIG:
-	// TODO
-	case FDD_VIRT:
 		break;
 
 	default:
@@ -899,7 +913,7 @@ INTERRUPT_GEN_MEMBER(tsconf_state::tsconf_vblank_interrupt)
 
 void tsconf_state::dma_ready(int line)
 {
-	if (BIT(m_regs[INT_MASK], 2))
+	if (BIT(m_regs[INT_MASK], 2) && !(m_beta->vdos_r() || m_update_on_m1))
 	{
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 		m_int_mask |= 4;
@@ -908,7 +922,7 @@ void tsconf_state::dma_ready(int line)
 
 TIMER_CALLBACK_MEMBER(tsconf_state::irq_frame)
 {
-	if (BIT(m_regs[INT_MASK], 0))
+	if (BIT(m_regs[INT_MASK], 0) && !(m_beta->vdos_r() || m_update_on_m1))
 	{
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 		m_irq_off_timer->adjust(attotime::from_ticks(32, m_maincpu->unscaled_clock()));
@@ -918,7 +932,7 @@ TIMER_CALLBACK_MEMBER(tsconf_state::irq_frame)
 
 TIMER_CALLBACK_MEMBER(tsconf_state::irq_scanline)
 {
-	if (BIT(m_regs[INT_MASK], 1))
+	if (BIT(m_regs[INT_MASK], 1) && !(m_beta->vdos_r() || m_update_on_m1))
 	{
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 		m_int_mask |= 2;
@@ -977,6 +991,11 @@ TIMER_CALLBACK_MEMBER(tsconf_state::irq_scanline)
 
 u8 tsconf_state::beta_neutral_r(offs_t offset)
 {
+	if (!machine().side_effects_disabled() && m_update_on_m1)
+	{
+		m_update_on_m1 = false;
+		m_beta->on_m1_w();
+	}
 	return m_program.read_byte(offset);
 }
 
@@ -984,13 +1003,14 @@ u8 tsconf_state::beta_enable_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 	{
-		if (!W0_RAM && m_bank_rom[0]->entry() == 3)
+		if (m_update_on_m1)
 		{
-			if (m_beta->started() && !m_beta->is_active())
-			{
-				m_beta->enable();
-				tsconf_update_bank0();
-			}
+			m_update_on_m1 = false;
+			m_beta->on_m1_w();
+		}
+		if (ROM128 && !NW0_MAP)
+		{
+			m_beta->enable_w(1);
 		}
 	}
 	return m_program.read_byte(offset + 0x3d00);
@@ -1000,11 +1020,12 @@ u8 tsconf_state::beta_disable_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 	{
-		if (m_beta->started() && m_beta->is_active())
+		if (m_update_on_m1)
 		{
-			m_beta->disable();
-			tsconf_update_bank0();
+			m_update_on_m1 = false;
+			m_beta->on_m1_w();
 		}
+		m_beta->enable_w(0);
 	}
 	return m_program.read_byte(offset + 0x4000);
 }
