@@ -161,7 +161,7 @@ std::error_condition posix_open_ptty(std::uint32_t openflags, osd_file::ptr &fil
 	tios.c_lflag = 0;
 
 	int masterfd = -1, slavefd = -1;
-#if defined(TTY_NAME_MAX) && 0
+#if defined(TTY_NAME_MAX)
 	// TTY_NAME_MAX and ptsname_r were added to Open Group Base Specifications Issue 8
 	if (::openpty(&masterfd, &slavefd, nullptr, &tios, nullptr) < 0)
 		return std::error_condition(errno, std::generic_category());
