@@ -311,6 +311,11 @@ sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 sample
 	if(inputs == 0 && outputs == 0)
 		fatalerror("Device %s requiring to create a stream without inputs or outputs\n", device.tag());
 
+	if(inputs == 0)
+		m_input_adaptive = false;
+	if(outputs == 0)
+		m_output_adaptive = false;
+
 	// create a name
 	m_name = m_device.name();
 	m_name += " '";
