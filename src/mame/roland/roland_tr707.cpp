@@ -47,11 +47,11 @@
     * No time-multiplexing of the DAC across 8 voices. Using 8 DACs for now.
     * BPFs for bass, snare and toms change their response curve based on
       signal amplitude. The way the circuit is designed might also add distortion.
-      This is effect is not modeled.
+      This effect is not modeled.
     * Diodes in some of the EGs might shape the decay curve. These are not modeled.
     * Some uncertainty about the hat EG circuit. See update_hat_eg().
 
-    This driver is based on the TR-707 services notes, and is intended as an
+    This driver is based on the TR-707 service notes, and is intended as an
     educational tool.
 ****************************************************************************/
 
@@ -135,12 +135,11 @@ struct component_config
 	const u8 xck2_input;  // 0: A, 1: B, 2: C, 3: D.
 
 	// Envelope generator discharge resistors.
-	// Comments in parens apply to the TR727.
-	const double R95;   // BD (BONGO)
-	const double R102;  // SD (HCON)
-	const double R82;   // RIM/COW (AGOGO)
-	const double R91;   // HCP/TAMB (CABAS/MARA)
-	const double R73;   // RIDE (STAR CHIME)
+	const double R95;
+	const double R102;
+	const double R82;
+	const double R91;
+	const double R73;
 
 	// Mixer channel pan resistors.
 	const double R203;
@@ -265,7 +264,7 @@ private:
 	static constexpr const double VBE = 0.6;  // BJT base-emitter voltage drop.
 	static constexpr const u16 MAX_CYMBAL_COUNTER = 0x8000;
 
-	static filter_biquad_device::biquad_params bpf_rc(double r1, double r2, double c1, double c2, bool crrc);
+	static filter_biquad_device::biquad_params rc_bpf(double r1, double r2, double c1, double c2, bool crrc);
 	static double mux_dac_v(double v_eg, u8 data);
 
 	void advance_sample_w(offs_t offset, u16 data);
@@ -274,7 +273,7 @@ private:
 	void update_master_volume();
 	void update_mix(int channel);
 
-	// Component configuration. Not needed in save state.
+
 	const component_config m_comps;
 
 	required_memory_region m_mux_samples;  // IC34, IC35
@@ -340,7 +339,7 @@ tr707_audio_device::tr707_audio_device(const machine_config &mconfig, const char
 }
 
 tr707_audio_device::tr707_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: tr707_audio_device(mconfig, tag, owner, component_config{0, 1, 1, 1, 1})
+	: tr707_audio_device(mconfig, tag, owner, TR707_COMPONENTS)
 {
 }
 
@@ -490,15 +489,15 @@ void tr707_audio_device::device_add_mconfig(machine_config &config)
 	// Two voices, each with their own ROM, address counter, 6-bit DAC, HPF,
 	// single-transistor VCA, and amplitude EG.
 
-	constexpr const double CYMBAL_HPF_SCALE = RES_VOLTAGE_DIVIDER(RES_K(22), RES_R(470));  // [R59, R60], [R63, R64].
+	constexpr const double CYMBAL_HPF_SCALE = RES_VOLTAGE_DIVIDER(RES_K(22), RES_R(470));  // [R59, R60], [R63, R64]
 	constexpr const double CYMBAL_VCA_V2I_SCALE = 0.0043;  // Converts from input voltage to output current.
-	constexpr const double CYMBAL_VCA_SCALE = -CYMBAL_VCA_V2I_SCALE * RES_K(10);  // [R62, R65]. inverting op-amp.
+	constexpr const double CYMBAL_VCA_SCALE = -CYMBAL_VCA_V2I_SCALE * RES_K(10);  // [R62, R65], inverting op-amp.
 
 	const std::array<double, CV_COUNT> CYMBAL_EG_R =
 	{
 		// R58 is 47K in the schematic, but that causes a very quick decay.
 		// Using 470K, which matches R61 used in the ride cymbal voice below.
-		RES_K(470),  // R58 (47K in the schematic).
+		RES_K(470),  // R58
 		RES_2_PARALLEL(/*R61*/RES_K(470), m_comps.R73),
 	};
 
@@ -506,12 +505,12 @@ void tr707_audio_device::device_add_mconfig(machine_config &config)
 	{
 		DAC_6BIT_R2R(config, m_cymbal_dac[i]).set_output_range(0, VCC);
 		FILTER_RC(config, m_cymbal_hpf[i]);
-		m_cymbal_hpf[i]->set_rc(filter_rc_device::HIGHPASS, RES_R(470), 0, 0, CAP_U(1));  // ~339 Hz. [R63, R64], [C35, C34].
+		m_cymbal_hpf[i]->set_rc(filter_rc_device::HIGHPASS, RES_R(470), 0, 0, CAP_U(1));  // ~339 Hz, [R63, R64], [C35, C34]
 		m_cymbal_dac[i]->add_route(0, m_cymbal_hpf[i], CYMBAL_HPF_SCALE);
 
-		VA_RC_EG(config, m_cymbal_eg[i]).set_r(CYMBAL_EG_R[i]).set_c(CAP_U(1));  // [C50, C49].
+		VA_RC_EG(config, m_cymbal_eg[i]).set_r(CYMBAL_EG_R[i]).set_c(CAP_U(1));  // [C50, C49]
 		VA_VCA(config, m_cymbal_vca[i]).configure_streaming_cv(true);   // 2SD1469R [Q14, Q15]
-		// V2I converter is based on an-omap in inverting configuration.
+		// V2I converter is based on an op-amp in inverting configuration.
 		m_cymbal_hpf[i]->add_route(0, m_cymbal_vca[i], CYMBAL_VCA_SCALE, 0);
 		m_cymbal_eg[i]->add_route(0, m_cymbal_vca[i], 1.0 / VCC, 1);
 	}
@@ -519,17 +518,17 @@ void tr707_audio_device::device_add_mconfig(machine_config &config)
 
 	/*** Mixer section ***/
 
-	// Each of the voices above is processed by a band-pass filter (BPF) with
-	// a custom tuning per voice, an inverting op-amp with the volume slider
-	// as the feedback resistor, and a ~15.9 KHz RC low-pass filter (LPF).
-	// Following the LPF, each voice is mixed by resistors into the left and
-	// right channels, for a fixed pan setting per voice.
+	// Each voice is processed by a band-pass filter (BPF) with a custom tuning
+	// per voice, an inverting op-amp with the volume slider as the feedback
+	// resistor, and a ~15.9 KHz RC low-pass filter (LPF). Following the LPF,
+	// each voice is mixed by dedicated resistors into the left and right
+	// channels, for a fixed pan setting per voice.
 	// Each voice has its own output, which also follows the LPF. If the voice
 	// output is connected, the voice won't be mixed into the left and right
 	// channels.
 
-	constexpr const double R_MAX_MASTER_VOLUME = RES_K(50);  // VR212a, VR212b.
-	constexpr const double R_MAX_CHANNEL_VOLUME = RES_K(50);  // VR202-VR211.
+	constexpr const double R_MAX_MASTER_VOLUME = RES_K(50);  // VR212a, VR212b
+	constexpr const double R_MAX_CHANNEL_VOLUME = RES_K(50);  // VR202-VR211
 
 	const std::array<double, MC_COUNT> r_mix_left =
 	{
@@ -583,7 +582,7 @@ void tr707_audio_device::device_add_mconfig(machine_config &config)
 		{/*R248*/RES_K(10), m_comps.R249,      /*C232*/CAP_P(470), m_comps.C231},
 	}};
 
-	const std::array<device_sound_interface *, MC_COUNT> voice_outputs =
+	const std::array<device_sound_interface *, MC_COUNT> voices =
 	{
 		m_mux_vca[MV_BASS],
 		m_mux_vca[MV_SNARE],
@@ -602,8 +601,8 @@ void tr707_audio_device::device_add_mconfig(machine_config &config)
 	for (int i = 0; i < MC_COUNT; ++i)
 	{
 		FILTER_BIQUAD(config, m_voice_bpf[i]);
-		m_voice_bpf[i]->setup(bpf_rc(bpf_comps[i][0], bpf_comps[i][1], bpf_comps[i][2], bpf_comps[i][3], false));
-		voice_outputs[i]->add_route(0, m_voice_bpf[i], 1.0);
+		m_voice_bpf[i]->setup(rc_bpf(bpf_comps[i][0], bpf_comps[i][1], bpf_comps[i][2], bpf_comps[i][3], false));
+		voices[i]->add_route(0, m_voice_bpf[i], 1.0);
 
 		FILTER_VOLUME(config, m_level[i]);
 		m_voice_bpf[i]->add_route(0, m_level[i], -R_MAX_CHANNEL_VOLUME / bpf_comps[i][1]);  // Inverting op-amp.
@@ -622,8 +621,8 @@ void tr707_audio_device::device_add_mconfig(machine_config &config)
 	// making it to the left and right output sockets.
 	auto &left_bpf = FILTER_BIQUAD(config, "left_out_bpf");
 	auto &right_bpf = FILTER_BIQUAD(config, "right_out_bpf");
-	left_bpf.setup(bpf_rc(RES_K(1), RES_K(47), CAP_U(10), CAP_U(0.01), true));  // R114, R112, C79, C76.
-	right_bpf.setup(bpf_rc(RES_K(1), RES_K(47), CAP_U(10), CAP_U(0.01), true));  // R113, R111, C80, C77.
+	left_bpf.setup(rc_bpf(RES_K(1), RES_K(47), CAP_U(10), CAP_U(0.01), true));  // R114, R112, C79, C76
+	right_bpf.setup(rc_bpf(RES_K(1), RES_K(47), CAP_U(10), CAP_U(0.01), true));  // R113, R111, C80, C77
 	m_left_mixer->add_route(0, left_bpf, 1.0);
 	m_right_mixer->add_route(0, right_bpf, 1.0);
 
@@ -669,7 +668,7 @@ void tr707_audio_device::device_reset()
 //              |      |
 //             GND    GND
 // TODO: move to sound/flt_biquad.
-filter_biquad_device::biquad_params tr707_audio_device::bpf_rc(double r1, double r2, double c1, double c2, bool crrc)
+filter_biquad_device::biquad_params tr707_audio_device::rc_bpf(double r1, double r2, double c1, double c2, bool crrc)
 {
 	// BPF transfer function: H(s) = (A * s) / (s ^ 2 + B * s + C)
 	// In the C-R-R-C configuration, we have:
@@ -753,7 +752,7 @@ void tr707_audio_device::advance_sample_w(offs_t offset, u16 data)
 	if (!m_mac_c && c)  // Positive edge of C output.
 	{
 		// Cymbal timing is actually controlled by output B, which is divided by
-		// 2 by a flipflop. But C is also B divided by 2, so using it here for
+		// 2 by a flipflop. But C is also B divided by 2, so using C here for
 		// convenience.
 		for (int i = 0; i < CV_COUNT; ++i)
 		{
@@ -776,16 +775,15 @@ void tr707_audio_device::update_hat_eg()
 	// wrong. It would keep the EG constantly triggered. This emulation assumes
 	// it is connected to the hat trigger signal.
 	//
-	// 2) The schematic shows two capacitors (C70 and C71) separated by a resistor
-	// (R127). This setup would result in a slower attack, the EG would only each
-	// a fraction of its max value, and the hat volume would be very low.
-	// Furthermore, C70 isn't really functional in this setup.
+	// 2) The schematic shows two capacitors (C70 and C71) separated by a
+	// resistor (R127). This setup would result in a slower attack, the EG would
+	// only reach a fraction of its max value, and the hat volume would be very
+	// low. Furthermore, C70 isn't really functional in this setup.
 	// This emulation ignores C71, which leaves C70 as the only capacitor, and
 	// makes the EG behave similar to the other ones in this drum machine.
 	//
 	// 3) Diode D12 (engaged for the closed hat sound) will probably slow down
-	// the EG decay, especially when it reaches a lower level. The effect of
-	// D12 is not emulated.
+	// the EG decay as it reaches lower levels. This effect is not emulated.
 
 	double r_discharge = RES_2_PARALLEL(RES_K(220), RES_M(1));  // R124, R126
 	if (m_hat_is_closed)
