@@ -432,6 +432,7 @@ void fz1_state::fz10m(machine_config &config)
 	m_io[1]->in_pc_callback().set(FUNC(fz1_state::keys_r));
 
 	UPD72065(config, m_fdc, 16_MHz_XTAL / 4);
+	m_fdc->set_select_lines_connected(false);
 	// WP/TS pin is only used for write protect signal; firmware requires TS low even for DSHD disks
 	m_fdc->set_ts_line_connected(false);
 
@@ -517,6 +518,7 @@ void fz1_state::machine_start()
 	m_ram_bank->space().install_ram(0, m_ram->mask(), m_ram->pointer());
 
 	m_fdc->set_rate(500000);
+	m_fdc->set_floppy(m_floppy->get_device());
 
 	save_item(NAME(m_key_sel));
 	save_item(NAME(m_adc_sel));
