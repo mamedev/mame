@@ -442,8 +442,8 @@ void fatman_state::fatman(machine_config &config)
 	m_maincpu->port_out_cb<3>().set(FUNC(fatman_state::vcf_ar_release_w)).bit(1);
 	m_maincpu->port_out_cb<3>().append(FUNC(fatman_state::cv_mux_w)).mask(0x30);  // Bits 4, 5.
 
-	VA_RC_EG(config, m_vca_adsr).set_c(C19);
-	VA_RC_EG(config, m_vcf_ar).set_c(C22);
+	VA_RC_EG(config, m_vca_adsr).disable_streaming().set_c(C19);
+	VA_RC_EG(config, m_vcf_ar).disable_streaming().set_c(C22);
 
 	midi_port_device &midi_in(MIDI_PORT(config, "mdin", midiin_slot, "midiin"));
 	MIDI_PORT(config, "mdthru", midiout_slot, "midiout");
