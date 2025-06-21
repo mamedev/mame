@@ -28,6 +28,9 @@
 #include "bus/nscsi/hd.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/nec/v5x.h"
+#include "formats/fz1_dsk.h"
+#include "formats/hxchfe_dsk.h"
+#include "imagedev/floppy.h"
 #include "machine/bankdev.h"
 #include "machine/mb87030.h"
 #include "machine/i8255.h"
@@ -54,6 +57,8 @@ public:
 		, m_io(*this, "io%u", 0u)
 		, m_kbd(*this, "kbd")
 		, m_lcdc(*this, "lcdc")
+		, m_fdc(*this, "fdc")
+		, m_floppy(*this, "fdc:0")
 		, m_keys(*this, "SC%u", 0u)
 		, m_analog(*this, "AN%u", 0u)
 		, m_led(*this, "led%u", 0u)
@@ -62,6 +67,9 @@ public:
 	void fz1(machine_config &config);
 	void fz10m(machine_config &config);
 	void fz20m(machine_config &config);
+
+	u8 fdc_irq_r() { return m_fdc->get_irq() ? 1 : 0; }
+	void fdc_control_w(u8 data);
 
 	void keys_w(u8 val) { m_key_sel = val; }
 	u8 keys_r();
@@ -102,7 +110,10 @@ private:
 	required_device_array<i8255_device, 2> m_io;
 	optional_device<msm6200_device> m_kbd;
 	required_device<hd44352_device> m_lcdc;
-	
+
+	required_device<upd72065_device> m_fdc;
+	required_device<floppy_connector> m_floppy;
+
 	required_ioport_array<4> m_keys;
 	optional_ioport_array<8> m_analog;
 
@@ -164,13 +175,13 @@ static INPUT_PORTS_START(fz10m)
 	PORT_BIT(0x08, IP_ACTIVE_LOW,  IPT_CUSTOM) // ADC ready
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(fz1_state::cont49_r))
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(fz1_state::sync49_r))
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_CUSTOM) // TODO
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) // TODO: FDC interrupt
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_CUSTOM) // parallel port IRQ
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_MEMBER(FUNC(fz1_state::fdc_irq_r))
 
 	PORT_START("IO2_PA")
 	PORT_BIT(0x03, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_MEMBER(FUNC(fz1_state::keys_w));
 	PORT_BIT(0x1c, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_MEMBER(FUNC(fz1_state::adc_sel_w));
-	PORT_BIT(0xe0, IP_ACTIVE_HIGH, IPT_OUTPUT) // TODO: floppy control
+	PORT_BIT(0xe0, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_MEMBER(FUNC(fz1_state::fdc_control_w));
 
 	PORT_START("IO2_PB")
 	PORT_BIT(0x3f, IP_ACTIVE_HIGH, IPT_OUTPUT) PORT_WRITE_LINE_DEVICE_MEMBER("ram_bank", FUNC(address_map_bank_device::set_bank));
@@ -345,7 +356,7 @@ void fz1_state::fz10m_io_map(address_map &map)
 {
 	// 0x00-07: GAA
 	// 0x08-0f: GAB
-	map(0x10, 0x13).mirror(0x04).m("fdc", FUNC(upd72065_device::map)).umask16(0x00ff);
+	map(0x10, 0x13).mirror(0x04).m(m_fdc, FUNC(upd72065_device::map)).umask16(0x00ff);
 	map(0x18, 0x1f).rw(m_io[0], FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x20, 0x27).rw(m_io[1], FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x60, 0x67).r(FUNC(fz1_state::adc_latch_r));
@@ -373,6 +384,19 @@ void fz1_state::fz20m_io_map(address_map &map)
 void fz1_state::subcpu_map(address_map &map)
 {
 	map(0x00, 0xff).rw(m_kbd, FUNC(msm6200_device::read), FUNC(msm6200_device::write));
+}
+
+/**************************************************************************/
+static void fz1_floppies(device_slot_interface &device)
+{
+	device.option_add("35hd", PANA_JU_386);
+}
+
+/**************************************************************************/
+static void floppy_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_FZ1_FORMAT);
+	fr.add(FLOPPY_HFE_FORMAT);
 }
 
 /**************************************************************************/
@@ -407,7 +431,12 @@ void fz1_state::fz10m(machine_config &config)
 	m_io[1]->out_pb_callback().set_ioport("IO2_PB");
 	m_io[1]->in_pc_callback().set(FUNC(fz1_state::keys_r));
 
-	UPD72065(config, "fdc", 16_MHz_XTAL / 4);
+	UPD72065(config, m_fdc, 16_MHz_XTAL / 4);
+	m_fdc->set_select_lines_connected(false);
+	// WP/TS pin is only used for write protect signal; firmware requires TS low even for DSHD disks
+	m_fdc->set_ts_line_connected(false);
+
+	FLOPPY_CONNECTOR(config, m_floppy, fz1_floppies, "35hd", floppy_formats); // leave sound off because drive motor is almost always running
 
 	HD44352(config, m_lcdc, 2_MHz_XTAL); // actually HD44350 + 2x HD44251
 
@@ -488,6 +517,9 @@ void fz1_state::machine_start()
 
 	m_ram_bank->space().install_ram(0, m_ram->mask(), m_ram->pointer());
 
+	m_fdc->set_rate(500000);
+	m_fdc->set_floppy(m_floppy->get_device());
+
 	save_item(NAME(m_key_sel));
 	save_item(NAME(m_adc_sel));
 	save_item(NAME(m_adc_value));
@@ -506,6 +538,19 @@ void fz1_state::machine_reset()
 	m_lcd_nibble = 0;
 	m_lcd_data = 0;
 	m_lcd_data_phase = 0;
+}
+
+/**************************************************************************/
+void fz1_state::fdc_control_w(u8 data)
+{
+	m_fdc->tc_w(BIT(data, 0));
+
+	auto *dev = m_floppy->get_device();
+	if (dev)
+	{
+		dev->mon_w(BIT(~data, 1));
+		dev->inuse_w(BIT(data, 2));
+	}
 }
 
 /**************************************************************************/
