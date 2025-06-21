@@ -23434,20 +23434,14 @@ void cmaster_state::init_tonypok()
 void goldstar_state::init_super9()
 {
 	uint8_t *src = memregion("gfx1")->base();
+
 	for (int i = 0; i < 0x20000; i++)
-	{
-//      src[i] = bitswap<8>(src[i], 7, 4, 2, 1, 6, 5, 3, 0);
-//      src[i] = bitswap<8>(src[i], 7, 3, 2, 6, 1, 5, 4, 0);
-		src[i] = bitswap<8>(src[i], 7, 3, 2, 6, 5, 1, 4, 0);
-	}
+		src[i] = bitswap<8>(src[i], 7, 3, 6, 2, 5, 1, 4, 0);
 
 	uint8_t *src2 = memregion("gfx2")->base();
+
 	for (int i = 0; i < 0x8000; i++)
-	{
-//      src2[i] = bitswap<8>(src2[i], 7, 4, 2, 1, 6, 5, 3, 0);
-//      src2[i] = bitswap<8>(src2[i], 7, 3, 2, 6, 1, 5, 4, 0);
-		src2[i] = bitswap<8>(src2[i], 3, 7, 6, 2, 5, 1, 0, 4);  // endianess
-	}
+		src2[i] = bitswap<8>(src2[i], 3, 7, 6, 2, 5, 1, 0, 4);
 }
 
 
