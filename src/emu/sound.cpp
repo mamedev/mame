@@ -2001,7 +2001,7 @@ std::vector<u32> sound_manager::find_channel_mapping(const osd::channel_position
 	double best_dist = -1;
 	for(u32 port = 0; port != node->m_port_positions.size(); port++)
 		if(!node->m_port_positions[port].is_onreq() && !node->m_port_positions[port].is_lfe()) {
-			double dx = pos.m_x - node->m_port_positions[port].m_z;
+			double dx = pos.m_x - node->m_port_positions[port].m_x;
 			double dy = pos.m_y - node->m_port_positions[port].m_y;
 			double dz = pos.m_z - node->m_port_positions[port].m_z;
 			double dist = dx*dx + dy*dy + dz*dz;
