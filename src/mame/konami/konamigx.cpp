@@ -105,7 +105,6 @@
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "sound/k054539.h"
-//#include "machine/k056230.h"
 #include "sound/k056800.h"
 #include "sound/okim6295.h"
 #include "speaker.h"
@@ -1085,8 +1084,8 @@ void konamigx_state::gx_type1_map(address_map &map)
 void konamigx_state::racinfrc_map(address_map &map)
 {
 	gx_type1_map(map);
-	map(0xdc0000, 0xdc1fff).ram();         // 056230 RAM?
-	map(0xdd0000, 0xdd00ff).nopr().nopw(); // 056230 regs?
+	map(0xdc0000, 0xdc1fff).rw(m_k056230, FUNC(k056230_device::ram_r), FUNC(k056230_device::ram_w));
+	map(0xdd0000, 0xdd00ff).m(m_k056230, FUNC(k056230_device::regs_map));
 }
 
 void konamigx_state::gx_type2_map(address_map &map)
@@ -1917,6 +1916,9 @@ void konamigx_state::racinfrc(machine_config &config)
 
 	adc0834_device &adc(ADC0834(config, "adc0834", 0));
 	adc.set_input_callback(FUNC(konamigx_state::adc0834_callback));
+
+	K056230(config, m_k056230, 0U);
+	m_k056230->irq_cb().set_inputline(m_maincpu, M68K_IRQ_5);
 }
 
 void konamigx_state::gxtype3(machine_config &config)
@@ -4201,8 +4203,8 @@ GAME( 1994, konamigx,  0,        konamigx_bios, common,   konamigx_state, init_k
    needs the ROZ layer to be playable
    --------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/
 
-GAME( 1994, racinfrc,  konamigx, racinfrc,      racinfrc, konamigx_state, init_posthack, ROT0, "Konami", "Racin' Force (ver EAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
-GAME( 1994, racinfrcu, racinfrc, racinfrc,      racinfrc, konamigx_state, init_posthack, ROT0, "Konami", "Racin' Force (ver UAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
+GAME( 1994, racinfrc,  konamigx, racinfrc,      racinfrc, konamigx_state, init_posthack, ROT0, "Konami", "Racin' Force (ver EAC)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1994, racinfrcu, racinfrc, racinfrc,      racinfrc, konamigx_state, init_posthack, ROT0, "Konami", "Racin' Force (ver UAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 
 GAME( 1994, opengolf,  konamigx, opengolf,      opengolf, konamigx_state, init_posthack, ROT0, "Konami", "Konami's Open Golf Championship (ver EAE)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING  )
 GAME( 1994, opengolf2, opengolf, opengolf,      opengolf, konamigx_state, init_posthack, ROT0, "Konami", "Konami's Open Golf Championship (ver EAD)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING  )
