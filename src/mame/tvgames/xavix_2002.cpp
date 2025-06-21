@@ -821,6 +821,11 @@ ROM_START( ban_ordj )
 	ROM_LOAD( "ordj.u2", 0x000000, 0x800000, CRC(78fbb00f) SHA1(797b5495e292c36c003300ed18547e5643056149) )
 ROM_END
 
+ROM_START( ban_um2j )
+	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "um2j.u1", 0x000000, 0x800000, CRC(88ea8e50) SHA1(b7507985a05335b6c07584bbb9ec2bd7f65ffe19) )
+ROM_END
+
 ROM_START( ban_dn1j )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	ROM_LOAD( "dn1j.u2", 0x000000, 0x800000, CRC(0a0cef0f) SHA1(c83a2635a969b3c686dbc599a37f8b7496b0c6a1) )
@@ -1030,6 +1035,9 @@ CONS( 2006, ban_utmj, 0, 0, superxavix_i2c_24c02,    xavix_i2c,  superxavix_i2c_
 
 // Let's!TVプレイ なりきりファイト ウルトラマン 撃て！必殺光線！！
 CONS( 2006, ban_ult, 0, 0, superxavix_i2c_24c02,    ban_ult,  superxavix_i2c_bowl_state, init_no_timer, "Bandai / SSD Company LTD",  "Let's! TV Play Narikiri Fight Ultraman - Ute! Hissatsu Kousen!! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+
+// Let's!TVプレイ 体感大怪獣バトル あやつれ!ウルトラ大怪獣!
+CONS( 2007, ban_um2j, 0, 0, superxavix_i2c_24c04,    ban_gkr,  superxavix_i2c_state, init_no_timer, "Bandai / SSD Company LTD",   "Let's! TV Play Taikan Daikaijuu Battle: Ayatsure! Ultra Daikaijuu! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // Let’s!TVプレイ ゲキワザ習得 ゲキレンジャー スーパーゲキレンジャーへの道
 CONS( 2007, ban_gkrj, 0, 0, superxavix_i2c_24c02_4mb,    ban_gkr,  superxavix_i2c_bowl_state, init_no_timer, "Bandai / SSD Company LTD",  "Let's! TV Play Gekiwaza Shuutoku Gekiranger - Super Gekiranger-e no Michi (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
