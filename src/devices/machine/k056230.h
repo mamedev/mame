@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:Fabio Priuli
+// copyright-holders:Fabio Priuli, Ariane Fugmann
 /***************************************************************************
 
-    Konami 056230 LAN controller skeleton device
+    Konami 056230 LAN controller device
 
 ***************************************************************************/
 
@@ -20,8 +20,8 @@ public:
 
 	auto irq_cb() { return m_irq_cb.bind(); }
 
-	u32 ram_r(offs_t offset, u32 mem_mask = ~0);
-	void ram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u8 ram_r(offs_t offset);
+	void ram_w(offs_t offset, u8 data);
 
 	virtual void regs_map(address_map &map) ATTR_COLD;
 
@@ -33,7 +33,7 @@ protected:
 	virtual void device_stop() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	memory_share_creator<u32> m_ram;
+	memory_share_creator<u8> m_ram;
 
 	devcb_write_line m_irq_cb;
 	bool m_irq_enable;

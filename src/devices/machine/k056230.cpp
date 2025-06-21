@@ -2,7 +2,7 @@
 // copyright-holders:Fabio Priuli, Ariane Fugmann
 /**************************************************************************************************
 
-Konami IC 056230 (LANC)
+Konami IC 056230 (LANC) / KS40011
 
 Device Notes:
 -The custom IC itself
@@ -440,7 +440,7 @@ DEFINE_DEVICE_TYPE(K056230_VIPER, k056230_viper_device, "k056230_viper", "Konami
 
 k056230_device::k056230_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock),
-	m_ram(*this, "lanc_ram", 0x800U * 4, ENDIANNESS_BIG),
+	m_ram(*this, "lanc_ram", 0x2000U, ENDIANNESS_BIG),
 	m_irq_cb(*this)
 {
 }
@@ -571,20 +571,20 @@ void k056230_device::regs_map(address_map &map)
 	);
 }
 
-u32 k056230_device::ram_r(offs_t offset, u32 mem_mask)
+u8 k056230_device::ram_r(offs_t offset)
 {
-	const auto lanc_ram = util::big_endian_cast<const u32>(m_ram.target());
-	u32 data = lanc_ram[offset & 0x7ff];
+	const auto lanc_ram = (u8*)m_ram.target();
+	u8 data = lanc_ram[offset & 0x1fff];
 	if (!machine().side_effects_disabled())
-		LOGMASKED(LOG_RAM_READS, "%s: Network RAM read [%04x (%03x)]: %08x & %08x\n", machine().describe_context(), offset << 2, (offset & 0x7ff) << 2, data, mem_mask);
+		LOGMASKED(LOG_RAM_READS, "%s: Network RAM read [%04x (%04x)]: %02x\n", machine().describe_context(), offset, offset & 0x1fff, data);
 	return data;
 }
 
-void k056230_device::ram_w(offs_t offset, u32 data, u32 mem_mask)
+void k056230_device::ram_w(offs_t offset, u8 data)
 {
-	const auto lanc_ram = util::big_endian_cast<u32>(m_ram.target());
-	LOGMASKED(LOG_RAM_WRITES, "%s: Network RAM write [%04x (%03x)] = %08x & %08x\n", machine().describe_context(), offset << 2, (offset & 0x7ff) << 2, data, mem_mask);
-	COMBINE_DATA(&lanc_ram[offset & 0x7ff]);
+	const auto lanc_ram = (u8*)m_ram.target();
+	LOGMASKED(LOG_RAM_WRITES, "%s: Network RAM write [%04x (%04x)] = %02x\n", machine().describe_context(), offset, offset & 0x1fff, data);
+	lanc_ram[offset & 0x1fff] = data;
 }
 
 void k056230_device::set_irq(int state)
@@ -694,15 +694,9 @@ void k056230_device::comm_tick()
 						{
 							// save message to ram
 							unsigned frame_start = idx * 0x0100;
-							unsigned frame_offset = 0;
-							u32 frame_data = 0;
 
-							for (unsigned i = 0; i < frame_size; i += 4)
-							{
-								frame_offset = (frame_start + i) / 4;
-								frame_data = get_u32be(&m_buffer[i + 1]);
-								ram_w(frame_offset, frame_data, 0xffffffff);
-							}
+							const auto lanc_ram = (u8*)m_ram.target();
+							std::copy_n(&m_buffer[1], frame_size, &lanc_ram[frame_start]);
 
 							// forward message to other nodes
 							send_frame(data_size);
@@ -744,16 +738,9 @@ void k056230_device::comm_send(u8 idx, unsigned frame_size, unsigned data_size)
 {
 	unsigned frame_start = idx * 0x100;
 
-	unsigned frame_offset = 0;
-	u32 frame_data = 0;
-
 	m_buffer[0] = idx;
-	for (unsigned i = 0; i < frame_size; i += 4)
-	{
-		frame_offset = (frame_start + i) / 4;
-		frame_data = ram_r(frame_offset, 0xffffffff);
-		put_u32be(&m_buffer[i + 1], frame_data);
-	}
+	const auto lanc_ram = (u8*)m_ram.target();
+	std::copy_n(&lanc_ram[frame_start], frame_size, &m_buffer[1]);
 
 	send_frame(data_size);
 }
