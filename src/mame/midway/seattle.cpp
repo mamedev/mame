@@ -2853,7 +2853,7 @@ ROM_START( hyprdriv )
 ROM_END
 
 
-ROM_START( hyprdriv31 )
+ROM_START( hyprdriv131 )
 	ROM_REGION16_LE( 0x10000, "dcs", 0 ) // ADSP-2115 data Version 1.02
 	ROM_LOAD16_BYTE( "seattle.snd", 0x000000, 0x8000, BAD_DUMP CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )
 
@@ -2867,7 +2867,7 @@ ROM_START( hyprdriv31 )
 	ROM_LOAD( "hyprdrve.u32", 0x000000, 0x80000, CRC(3e18cb80) SHA1(b18cc4253090ee1d65d72a7ec0c426ed08c4f238) )  // Boot Rom Version 9.
 
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd" ) // Version 1.31  Oct 21 1998  14:16:44
-	DISK_IMAGE( "hyprdriv31", 0, SHA1(1c4746bfa39f9395a111f0cc6cbea678b69b9976) )
+	DISK_IMAGE( "hyprdriv131", 0, SHA1(24473e702a1f38ff563cac0b85360d89929a685d) )
 ROM_END
 
 
@@ -3051,12 +3051,12 @@ GAMEL( 1998, vaportrx,   0,        vaportrx,  vaportrx, seattle_state, init_vapo
 GAMEL( 1998, vaportrxp,  vaportrx, vaportrx,  vaportrx, seattle_state, init_vaportrx, ROT0, "Atari Games",  "Vapor TRX (GUTS Apr 10 1998 / MAIN Apr 10 1998)", MACHINE_SUPPORTS_SAVE, layout_vaportrx )
 
 // Midway
-GAME(  1997, biofreak,   0,        biofreak,  biofreak, seattle_state, init_biofreak, ROT0, "Midway Games", "Bio F.R.E.A.K.S (prototype, boot ROM 0.1i)", MACHINE_SUPPORTS_SAVE )
-GAME(  1997, blitz,      0,        blitz,     blitz,    seattle_state, init_blitz,    ROT0, "Midway Games", "NFL Blitz (ver 1.21, Dec 5 1997)", MACHINE_SUPPORTS_SAVE )
-GAME(  1998, blitz99,    0,        blitz99,   blitz99,  seattle_state, init_blitz99,  ROT0, "Midway Games", "NFL Blitz '99 (ver 1.30, Sep 22 1998)", MACHINE_SUPPORTS_SAVE )
-GAME(  1998, blitz99a,   blitz99,  blitz99,   blitz99,  seattle_state, init_blitz99,  ROT0, "Midway Games", "NFL Blitz '99 (ver 1.2, Aug 28 1998)", MACHINE_SUPPORTS_SAVE )
-GAME(  1999, blitz2k,    0,        blitz2k,   blitz99,  seattle_state, init_blitz2k,  ROT0, "Midway Games", "NFL Blitz 2000 Gold Edition (ver 1.2, Sep 22 1999)", MACHINE_SUPPORTS_SAVE )
-GAME(  1998, carnevil,   0,        carnevil,  carnevil, seattle_state, init_carnevil, ROT0, "Midway Games", "CarnEvil (v1.0.3)", MACHINE_SUPPORTS_SAVE )
-GAME(  1998, carnevil1,  carnevil, carnevil,  carnevil, seattle_state, init_carnevil, ROT0, "Midway Games", "CarnEvil (v1.0.1)", MACHINE_SUPPORTS_SAVE )
-GAMEL( 1998, hyprdriv,   0,        hyprdriv,  hyprdriv, seattle_state, init_hyprdriv, ROT0, "Midway Games", "Hyperdrive (ver 1.40, Oct 23 1998)", MACHINE_SUPPORTS_SAVE, layout_hyprdriv )
-GAMEL( 1998, hyprdriv31, hyprdriv, hyprdriv,  hyprdriv, seattle_state, init_hyprdriv, ROT0, "Midway Games", "Hyperdrive (ver 1.31, Oct 21 1998)", MACHINE_SUPPORTS_SAVE, layout_hyprdriv )
+GAME(  1997, biofreak,    0,        biofreak,  biofreak, seattle_state, init_biofreak, ROT0, "Midway Games", "Bio F.R.E.A.K.S (prototype, boot ROM 0.1i)", MACHINE_SUPPORTS_SAVE )
+GAME(  1997, blitz,       0,        blitz,     blitz,    seattle_state, init_blitz,    ROT0, "Midway Games", "NFL Blitz (ver 1.21, Dec 5 1997)", MACHINE_SUPPORTS_SAVE )
+GAME(  1998, blitz99,     0,        blitz99,   blitz99,  seattle_state, init_blitz99,  ROT0, "Midway Games", "NFL Blitz '99 (ver 1.30, Sep 22 1998)", MACHINE_SUPPORTS_SAVE )
+GAME(  1998, blitz99a,    blitz99,  blitz99,   blitz99,  seattle_state, init_blitz99,  ROT0, "Midway Games", "NFL Blitz '99 (ver 1.2, Aug 28 1998)", MACHINE_SUPPORTS_SAVE )
+GAME(  1999, blitz2k,     0,        blitz2k,   blitz99,  seattle_state, init_blitz2k,  ROT0, "Midway Games", "NFL Blitz 2000 Gold Edition (ver 1.2, Sep 22 1999)", MACHINE_SUPPORTS_SAVE )
+GAME(  1998, carnevil,    0,        carnevil,  carnevil, seattle_state, init_carnevil, ROT0, "Midway Games", "CarnEvil (v1.0.3)", MACHINE_SUPPORTS_SAVE )
+GAME(  1998, carnevil1,   carnevil, carnevil,  carnevil, seattle_state, init_carnevil, ROT0, "Midway Games", "CarnEvil (v1.0.1)", MACHINE_SUPPORTS_SAVE )
+GAMEL( 1998, hyprdriv,    0,        hyprdriv,  hyprdriv, seattle_state, init_hyprdriv, ROT0, "Midway Games", "Hyperdrive (ver 1.40, Oct 23 1998)", MACHINE_SUPPORTS_SAVE, layout_hyprdriv )
+GAMEL( 1998, hyprdriv131, hyprdriv, hyprdriv,  hyprdriv, seattle_state, init_hyprdriv, ROT0, "Midway Games", "Hyperdrive (ver 1.31, Oct 21 1998)", MACHINE_SUPPORTS_SAVE, layout_hyprdriv )
