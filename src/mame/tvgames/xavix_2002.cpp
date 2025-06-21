@@ -1036,7 +1036,8 @@ CONS( 2006, ban_utmj, 0, 0, superxavix_i2c_24c02,    xavix_i2c,  superxavix_i2c_
 // Let's!TVプレイ なりきりファイト ウルトラマン 撃て！必殺光線！！
 CONS( 2006, ban_ult, 0, 0, superxavix_i2c_24c02,    ban_ult,  superxavix_i2c_bowl_state, init_no_timer, "Bandai / SSD Company LTD",  "Let's! TV Play Narikiri Fight Ultraman - Ute! Hissatsu Kousen!! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2007, ban_um2j, 0, 0, superxavix_i2c_24c04,    ban_gkr,  superxavix_i2c_state, init_no_timer, "Bandai / SSD Company LTD",   "Let's! TV Play Ultraman 2 (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+// Let's!TVプレイ 体感大怪獣バトル あやつれ!ウルトラ大怪獣!
+CONS( 2007, ban_um2j, 0, 0, superxavix_i2c_24c04,    ban_gkr,  superxavix_i2c_state, init_no_timer, "Bandai / SSD Company LTD",   "Let's! TV Play Taikan Daikaijuu Battle: Ayatsure! Ultra Daikaijuu! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // Let’s!TVプレイ ゲキワザ習得 ゲキレンジャー スーパーゲキレンジャーへの道
 CONS( 2007, ban_gkrj, 0, 0, superxavix_i2c_24c02_4mb,    ban_gkr,  superxavix_i2c_bowl_state, init_no_timer, "Bandai / SSD Company LTD",  "Let's! TV Play Gekiwaza Shuutoku Gekiranger - Super Gekiranger-e no Michi (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
