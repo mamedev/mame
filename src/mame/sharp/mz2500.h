@@ -16,7 +16,7 @@
 #include "machine/wd_fdc.h"
 #include "machine/z80sio.h"
 #include "machine/z80pio.h"
-#include "sound/beep.h"
+#include "sound/spkrdev.h"
 #include "sound/ymopn.h"
 #include "machine/bankdev.h"
 #include "emupal.h"
@@ -38,7 +38,7 @@ public:
 		, m_screen(*this, "screen")
 		, m_rtc(*this, RP5C15_TAG)
 		, m_pit(*this, "pit")
-		, m_beeper(*this, "beeper")
+		, m_dac1bit(*this, "dac1bit")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_fdc(*this, "fdc")
 		, m_floppy(*this, "fdc:%u", 0U)
@@ -61,7 +61,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<rp5c15_device> m_rtc;
 	required_device<pit8253_device> m_pit;
-	required_device<beep_device> m_beeper;
+	required_device<speaker_sound_device> m_dac1bit;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<mb8876_device> m_fdc;
 	required_device_array<floppy_connector, 4> m_floppy;

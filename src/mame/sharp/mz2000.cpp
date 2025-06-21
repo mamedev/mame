@@ -1112,7 +1112,7 @@ void mz2000_state::mz2000(machine_config &config)
 	m_pit->out_handler<1>().set(m_pit, FUNC(pit8253_device::write_clk2));
 
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_dac1bit).add_route(ALL_OUTPUTS,"mono", 0.15);
+	SPEAKER_SOUND(config, m_dac1bit).add_route(ALL_OUTPUTS, "mono", 0.15);
 
 	// TODO: MB8866 for MZ-80B
 	MB8877(config, m_fdc, 1_MHz_XTAL);
