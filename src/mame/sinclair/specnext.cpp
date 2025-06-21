@@ -2403,11 +2403,15 @@ void specnext_state::map_fetch(address_map &map)
 			Fell like side effects check must be ignored here,
 			because doesn't matter who reset this lines and such
 			approach gives better experience in debugger UI. */
-			do_m1(offset);
+			u8 data = do_m1(offset);
 			m_divmmc_delayed_check = 0;
-		}
 
-		return m_program.read_byte(offset);
+			return data;
+		}
+		else
+		{
+			return m_program.read_byte(offset);
+		}
 	}));
 	map(0x0000, 0x0000).select(0x0038).lr8(NAME([this](offs_t offset)
 	{
