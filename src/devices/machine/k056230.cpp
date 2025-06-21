@@ -22,7 +22,6 @@ TODO:
 #include "k056230.h"
 
 #include "emuopts.h"
-#include "multibyte.h"
 
 #include "asio.h"
 
