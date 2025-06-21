@@ -26,7 +26,6 @@ protected:
 private:
 	// internal state
 	uint8_t m_ram[0x20];
-	uint8_t m_rng;
 
 	uint8_t m_nmi_clock;
 	uint16_t m_nmi_timer;
@@ -34,6 +33,7 @@ private:
 
 	devcb_write_line m_nmi_cb;
 
+	inline uint32_t uint_sqrt(uint32_t op);
 	TIMER_CALLBACK_MEMBER(nmi_clear) { m_nmi_cb(0); }
 };
 
