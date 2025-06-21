@@ -273,7 +273,7 @@ int k053247_device::k053246_is_irq_enabled(void)
 template<class BitmapClass>
 void k053247_device::k053247_sprites_draw_common(BitmapClass &bitmap, const rectangle &cliprect)
 {
-#define NUM_SPRITES 256
+	static constexpr int NUM_SPRITES = 256;
 
 	int code, color, x, y, shadow, shdmask, count, temp, primask;
 
@@ -410,7 +410,6 @@ void k053247_device::k053247_sprites_draw_common(BitmapClass &bitmap, const rect
 				primask,shadow,drawmode_table,shadowmode_table,shdmask
 				);
 	} // end of sprite-list loop
-#undef NUM_SPRITES
 }
 
 void k053247_device::k053247_sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect)

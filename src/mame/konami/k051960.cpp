@@ -388,7 +388,8 @@ void k051960_device::k051937_w(offs_t offset, u8 data)
 
 void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int min_priority, int max_priority )
 {
-#define NUM_SPRITES 128
+	static constexpr int NUM_SPRITES = 128;
+
 	int offs, pri_code;
 	int sortedlist[NUM_SPRITES];
 	uint8_t drawmode_table[256];
@@ -404,10 +405,11 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 	{
 		if (m_ram[offs] & 0x80)
 		{
+			pri_code = m_ram[offs] & 0x7f;
 			if (max_priority == -1) /* draw front to back when using priority buffer */
-				sortedlist[(m_ram[offs] & 0x7f) ^ 0x7f] = offs;
-			else
-				sortedlist[m_ram[offs] & 0x7f] = offs;
+				pri_code ^= 0x7f;
+
+			sortedlist[pri_code] = offs;
 		}
 	}
 
@@ -570,5 +572,4 @@ if (machine().input().code_pressed(KEYCODE_D))
 	}
 }
 #endif
-#undef NUM_SPRITES
 }
