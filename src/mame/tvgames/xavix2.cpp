@@ -773,6 +773,13 @@ ROM_START( epo_dtcj )
 	// SEEPROM is a AT24C04 at u4
 ROM_END
 
+ROM_START( epo_sskj )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "sskj.u2", 0x000000, 0x800000, CRC(3344b2fc) SHA1(cda27bd1c7d6ccdb6da06cd837aa9cde5a58e5e4) )
+
+	// SEEPROM is a AT24C04 at u4
+ROM_END
+
 ROM_START( domfitad )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "xpfitnessadventure.bin", 0x000000, 0x1000000, CRC(a7917081) SHA1(95ae5dc6e64a78ae060cb0e61d8b0af34a93c4ce) )
@@ -797,6 +804,8 @@ CONS( 2006, epo_dabj, 0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / S
 // ドラえもん 体感タケコプター! 空とぶ大冒険
 CONS( 2006, epo_dtcj, 0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company LTD", "Doraemon Taikan Take-copter! Sora Tobu Daibouken (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
+// SASUKE サスケ＆筋肉バトル!!スポーツマンNO.1決定戦
+CONS( 2006, epo_sskj, 0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company LTD", "Sasuke & Kinniku Battle!! Sportsman No. 1 Ketteisen (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // These are for the 'Domyos Interactive System' other Domyos Interactive System games can be found in xavix.cpp (the SoC is inside the cartridge, base acts as a 'TV adapter' only)
 
