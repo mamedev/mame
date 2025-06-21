@@ -16,24 +16,6 @@ TODO:
 - Implement backward compatibility with MZ-2000/MZ-80B;
 - Implement expansion box unit;
 
-TODO per-game/program specific (move to mz2500_flop):
-- Dust Box vol. 1-3: they die with text garbage, might be bad dumps;
-- Dust Box vol. 4: window effect transition is bugged;
-- Dust Box vol. n: three items returns "purple" text, presumably HW failures (DFJustin: joystick
-"digital", mouse "not installed", HDD "not installed");
-- LayDock: hangs at title screen due of a PIT bug (timer irq dies for whatever reason);
-- Moon Child: needs mixed 3+3bpp tvram supported, kludged for now (not a real test case);
-- Moon Child: window masking doesn't mask bottom part of the screen?
-- Moon Child: appears to be a network / system link game, obviously doesn't work with current MAME framework;
-- Marchen Veil I: doesn't load if you try to run it directly, it does if you load another game first (for example Mappy) then do a soft reset;
-- Mugen no Shinzou II - The Prince of Darkness: dies on IPLPRO loading, presumably a wd17xx core bug;
-- Multiplan: random hangs/crashes after you set the RTC, sometimes it loads properly;
-- Murder Club: has lots of CG artifacts, FDC issue?
-- Orrbit 3: floppy issue makes it to throw a game over as soon as you start a game;
-- Penguin Kun Wars: has a bug with window effects ("Push space or trigger" msg on the bottom"), needs investigation;
-- Sound Gal Music Editor: wants a "master disk", that apparently isn't available;
-- Yukar K2 (normal version): moans about something, DFJustin: "please put the system disk back to normal", disk write-protected?
-
 **************************************************************************************************/
 
 #include "emu.h"
@@ -1237,6 +1219,7 @@ void mz2500_state::bank_window_map(address_map &map)
 
 void mz2500_state::z80_io(address_map &map)
 {
+	map.unmap_value_high();
 //  map(0x60, 0x63).mirror(0xff00).w(FUNC(mz2500_state::w3100a_w));
 //  map(0x63, 0x63).mirror(0xff00).r(FUNC(mz2500_state::w3100a_r));
 //  map(0x98, 0x99) Y8950 ADPCM, from MZ-1E35 expansion unit
@@ -1260,6 +1243,8 @@ void mz2500_state::z80_io(address_map &map)
 	map(0xc7, 0xc7).mirror(0xff00).w(FUNC(mz2500_state::irq_data_w));
 	map(0xc8, 0xc9).mirror(0xff00).rw("ym", FUNC(ym2203_device::read), FUNC(ym2203_device::write));
 //  map(0xca, 0xca).mirror(0xff00).rw(FUNC(mz2500_state::voice_r), FUNC(mz2500_state::voice_w));
+	// MZ-1E26
+	map(0xca, 0xca).mirror(0xff00).lr8(NAME([] () { return 0x30; }));
 	map(0xcc, 0xcc).select(0xff00).rw(FUNC(mz2500_state::rp5c15_8_r), FUNC(mz2500_state::rp5c15_8_w));
 	map(0xce, 0xce).mirror(0xff00).w(FUNC(mz2500_state::dictionary_bank_w));
 	map(0xcf, 0xcf).mirror(0xff00).w(FUNC(mz2500_state::kanji_bank_w));
