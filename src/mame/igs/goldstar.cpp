@@ -10574,7 +10574,6 @@ void goldstar_state::super9(machine_config &config)
 	// basic machine hardware
 	Z80(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &goldstar_state::super9_map);
-	m_maincpu->set_addrmap(AS_IO, &goldstar_state::goldstar_readport);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
