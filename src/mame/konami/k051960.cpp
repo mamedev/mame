@@ -349,7 +349,7 @@ void k051960_device::k051937_w(offs_t offset, u8 data)
 	}
 	else
 	{
-	//logerror("%s: write %02x to unknown 051937 address %x\n", m_maincpu->pc(), data, offset);
+		//logerror("%s: write %02x to unknown 051937 address %x\n", m_maincpu->pc(), data, offset);
 	}
 }
 

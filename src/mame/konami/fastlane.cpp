@@ -7,7 +7,7 @@
     Driver by Manuel Abadia <emumanu+mame@gmail.com>
 
     TODO:
-        - verify that sound is correct (volume and bank switching)
+    - verify that sound is correct (volume and bank switching)
 
 ***************************************************************************/
 
