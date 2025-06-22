@@ -23,12 +23,9 @@ Memory map(preliminary):
 0a-0b W X pos of obj1
 0c-0d W Y pos of obj2
 0e-0f W X pos of obj2
+07    R collision flags
 
-07    R collision (0xff = no, 0x00 = yes)
-0a-0b R unknown (chequered flag), might just read back X pos
-0e-0f R unknown (chequered flag), might just read back X pos
-
-10-1f R mirror of 00-0f
+08-1f R mirror of 00-07
 
 10-11 W NMI timer (triggers NMI on overflow)
 12    W NMI enable (bit 0)
@@ -83,6 +80,7 @@ void k051733_device::device_start()
 	m_nmi_clock = 0;
 
 	save_item(NAME(m_ram));
+	save_item(NAME(m_lfsr));
 	save_item(NAME(m_nmi_clock));
 	save_item(NAME(m_nmi_timer));
 
@@ -97,6 +95,7 @@ void k051733_device::device_reset()
 {
 	memset(m_ram, 0, sizeof(m_ram));
 
+	m_lfsr = 0x1ff;
 	m_nmi_timer = 0;
 	m_nmi_cb(0);
 }
@@ -106,16 +105,13 @@ void k051733_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-void k051733_device::write(offs_t offset, uint8_t data)
+void k051733_device::clock_lfsr()
 {
-	offset &= 0x1f;
-	LOG("%s: write %02x to 051733 address %02x\n", machine().describe_context(), data, offset);
-
-	m_ram[offset] = data;
+	const int feedback = BIT(m_lfsr, 1) ^ BIT(m_lfsr, 8) ^ BIT(m_lfsr, 12);
+	m_lfsr = m_lfsr << 1 | feedback;
 }
 
-
-inline uint32_t k051733_device::uint_sqrt(uint32_t op)
+uint32_t k051733_device::uint_sqrt(uint32_t op)
 {
 	uint32_t i = 0x8000;
 	uint32_t step = 0x4000;
@@ -123,7 +119,7 @@ inline uint32_t k051733_device::uint_sqrt(uint32_t op)
 	while (step)
 	{
 		if (i * i == op)
-			return i;
+			break;
 		else if (i * i > op)
 			i -= step;
 		else
@@ -135,7 +131,10 @@ inline uint32_t k051733_device::uint_sqrt(uint32_t op)
 
 uint8_t k051733_device::read(offs_t offset)
 {
-	offset &= 0x0f;
+	offset &= 0x07;
+
+	if (!machine().side_effects_disabled())
+		clock_lfsr();
 
 	uint16_t const op1 = (m_ram[0x00] << 8) | m_ram[0x01];
 	uint16_t const op2 = (m_ram[0x02] << 8) | m_ram[0x03];
@@ -177,28 +176,52 @@ uint8_t k051733_device::read(offs_t offset)
 			return uint_sqrt(op3 << 16) & 0xff;
 
 		case 0x06:
-			return machine().rand() & 0xff;
+			return m_lfsr >> 2;
 
-		case 0x07: // note: Chequered Flag definitely wants all these bits to be enabled
-			if (xobj1c + rad < xobj2c)
+		case 0x07:
+			// note: Chequered Flag definitely wants all these bits to be enabled
+			if (abs(xobj1c - xobj2c) > rad || abs(yobj1c - yobj2c) > rad)
 				return 0xff;
-			else if (xobj2c + rad < xobj1c)
-				return 0xff;
-			else if (yobj1c + rad < yobj2c)
-				return 0xff;
-			else if (yobj2c + rad < yobj1c)
-				return 0xff;
+
+			else if (yobj1c > yobj2c)
+			{
+				if (xobj1c == xobj2c)
+					return 0x06;
+				else if (xobj1c > xobj2c)
+					return 0x00;
+				else
+					return 0x04;
+			}
+			else if (yobj1c < yobj2c)
+			{
+				if (xobj1c == xobj2c)
+					return 0x02;
+				else if (xobj1c > xobj2c)
+					return 0x01;
+				else
+					return 0x05;
+			}
 			else
-				return 0;
-
-		case 0x0e: // best guess
-			return (xobj2c - xobj1c) >> 8;
-		case 0x0f:
-			return (xobj2c - xobj1c) & 0xff;
-
-		default:
-			return m_ram[offset];
+			{
+				if (xobj1c == xobj2c)
+					return 0x00;
+				else if (xobj1c > xobj2c)
+					return 0x00;
+				else
+					return 0x04;
+			}
 	}
+
+	return 0;
+}
+
+void k051733_device::write(offs_t offset, uint8_t data)
+{
+	offset &= 0x1f;
+	LOG("%s: write %02x to 051733 address %02x\n", machine().describe_context(), data, offset);
+
+	m_ram[offset] = data;
+	clock_lfsr();
 }
 
 
