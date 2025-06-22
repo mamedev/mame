@@ -385,6 +385,7 @@ private:
 	std::unique_ptr<uint8_t[]> m_eeprom;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(screen_scanline);
+	void sci_int_w(int state);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -562,7 +563,7 @@ void namcos21_state::winrun_master_map(address_map &map)
 	map(0x800000, 0x87ffff).rom().region("data", 0);
 	map(0x900000, 0x90ffff).ram().share("sharedram");
 	map(0xa00000, 0xa00fff).rw(FUNC(namcos21_state::dpram_word_r), FUNC(namcos21_state::dpram_word_w));
-	map(0xb00000, 0xb03fff).rw(m_sci, FUNC(namco_c139_device::ram_r), FUNC(namco_c139_device::ram_w));
+	map(0xb00000, 0xb03fff).m(m_sci, FUNC(namco_c139_device::data_map));
 	map(0xb80000, 0xb8000f).m(m_sci, FUNC(namco_c139_device::regs_map));
 }
 
@@ -575,7 +576,7 @@ void namcos21_state::winrun_slave_map(address_map &map)
 	map(0x800000, 0x87ffff).rom().region("data", 0);
 	map(0x900000, 0x90ffff).ram().share("sharedram");
 	map(0xa00000, 0xa00fff).rw(FUNC(namcos21_state::dpram_word_r), FUNC(namcos21_state::dpram_word_w));
-	map(0xb00000, 0xb03fff).rw(m_sci, FUNC(namco_c139_device::ram_r), FUNC(namco_c139_device::ram_w));
+	map(0xb00000, 0xb03fff).m(m_sci, FUNC(namco_c139_device::data_map));
 	map(0xb80000, 0xb8000f).m(m_sci, FUNC(namco_c139_device::regs_map));
 }
 
@@ -869,6 +870,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos21_state::screen_scanline)
 		m_gpu_intc->pos_irq_trigger();
 }
 
+void namcos21_state::sci_int_w(int state)
+{
+	m_master_intc->sci_irq_trigger();
+	m_slave_intc->sci_irq_trigger();
+	m_gpu_intc->sci_irq_trigger();
+}
+
 void namcos21_state::configure_c148_standard(machine_config &config)
 {
 	NAMCO_C148(config, m_master_intc, 0, m_maincpu, true);
@@ -903,7 +911,9 @@ void namcos21_state::winrun(machine_config &config)
 
 	configure_c148_standard(config);
 	NAMCO_C148(config, m_gpu_intc, 0, "gpu", false);
-	NAMCO_C139(config, m_sci, 0);
+
+	NAMCO_C139(config, m_sci, 0U);
+	m_sci->irq_cb().set(FUNC(namcos21_state::sci_int_w));
 
 	config.set_maximum_quantum(attotime::from_hz(6000)); /* 100 CPU slices per frame */
 
