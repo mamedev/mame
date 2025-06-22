@@ -358,6 +358,7 @@ public:
 	void jkrmast_portmap(address_map &map) ATTR_COLD;
 	void pkrmast_portmap(address_map &map) ATTR_COLD;
 	void ramdac_map(address_map &map) ATTR_COLD;
+	void super7_map(address_map &map) ATTR_COLD;
 	void super9_map(address_map &map) ATTR_COLD;
 	void wcat3_map(address_map &map) ATTR_COLD;
 	void wcherry_map(address_map &map) ATTR_COLD;
@@ -2126,6 +2127,28 @@ void goldstar_state::cm_map(address_map &map)
 	map(0xfc80, 0xffff).ram();
 }
 
+void goldstar_state::super7_map(address_map &map)
+{
+	map(0x0000, 0xcfff).rom().nopw();
+
+	map(0xd000, 0xdfff).ram().share("nvram"); // double the size if compared to cmaster
+
+	map(0xe000, 0xe7ff).ram().w(FUNC(goldstar_state::fg_vidram_w)).share("fg_vidram");
+	map(0xe800, 0xefff).ram().w(FUNC(goldstar_state::fg_atrram_w)).share("fg_atrram");
+
+	map(0xf000, 0xf1ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0xf200, 0xf3ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xf400, 0xf5ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xf600, 0xf7ff).ram();
+
+	map(0xf800, 0xf87f).ram().share("reel1_scroll");
+	map(0xf880, 0xf9ff).ram();
+	map(0xfa00, 0xfa7f).ram().share("reel2_scroll");
+	map(0xfa80, 0xfbff).ram();
+	map(0xfc00, 0xfc7f).ram().share("reel3_scroll");
+	map(0xfc80, 0xffff).ram();
+}
+
 void goldstar_state::jkrmast_map(address_map &map)
 {
 	map(0x0000, 0xcfff).rom().nopw();
@@ -2258,10 +2281,16 @@ void cmaster_state::cm_portmap(address_map &map)
 
 void cmaster_state::super7_portmap(address_map &map)
 {
-	cm_portmap(map);
-
-	map(0x02, 0x03).unmaprw();
+	map.global_mask(0xff);
 	map(0x03, 0x03).w("aysnd", FUNC(ay8910_device::address_w));
+	map(0x04, 0x04).portr("IN0");
+	map(0x05, 0x05).portr("IN1");
+	map(0x06, 0x06).portr("IN2");
+	map(0x10, 0x10).w(FUNC(cmaster_state::outport0_w));
+	map(0x11, 0x11).w(FUNC(cmaster_state::cm_coincount_w));
+	map(0x12, 0x12).w(FUNC(cmaster_state::p1_lamps_w));
+	map(0x13, 0x13).w(FUNC(cmaster_state::background_col_w));
+	map(0x14, 0x14).w(FUNC(cmaster_state::girl_scroll_w));
 	map(0x81, 0x81).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x82, 0x82).w("aysnd", FUNC(ay8910_device::data_w));
 }
@@ -3728,6 +3757,75 @@ static INPUT_PORTS_START( cmasterh )
 	PORT_DIPNAME( 0x01, 0x01, "Enable stats menu" ) PORT_DIPLOCATION("DSW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+INPUT_PORTS_END
+
+// only 2 banks of 8 switches
+static INPUT_PORTS_START( super7 ) // TODO: verify everything
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_NAME("Stop 3 / Big")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Stop 1 / D-UP")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SLOT_STOP_ALL ) PORT_NAME("Bet / Stop All")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Stop 2 / Small / Info")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start")
+
+	PORT_INCLUDE( cmv4_coins )
+
+	PORT_INCLUDE( cmv4_service )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x07, 0x07, "Main Game Pay Rate" ) PORT_DIPLOCATION("DSW2:1,2,3")
+	PORT_DIPSETTING(    0x00, "45%" )
+	PORT_DIPSETTING(    0x04, "50%" )
+	PORT_DIPSETTING(    0x02, "55%" )
+	PORT_DIPSETTING(    0x01, "65%" )
+	PORT_DIPSETTING(    0x06, "60%" )
+	PORT_DIPSETTING(    0x05, "70%" )
+	PORT_DIPSETTING(    0x03, "75%" )
+	PORT_DIPSETTING(    0x07, "80%" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cmast91 )
@@ -10880,9 +10978,14 @@ void cmaster_state::cmv4zg(machine_config &config)
 
 void cmaster_state::super7(machine_config &config)
 {
-	chryangl(config);
+	cmv4zg(config);
 
+	m_maincpu->set_addrmap(AS_PROGRAM, &cmaster_state::super7_map);
 	m_maincpu->set_addrmap(AS_IO, &cmaster_state::super7_portmap);
+	m_maincpu->set_addrmap(AS_OPCODES, &cmaster_state::chryangl_decrypted_opcodes_map);
+
+	subdevice<ay8910_device>("aysnd")->port_a_read_callback().set_ioport("DSW1");
+	subdevice<ay8910_device>("aysnd")->port_b_read_callback().set_ioport("DSW2");
 }
 
 void cmaster_state::cmast91(machine_config &config)
@@ -12635,36 +12738,34 @@ ROM_START( super7 )
 	// first 0x8000 opcodes & data encrypted, 0x8000 - 0x93ff only opcodes encrypted, 0x9400 onwards unencrypted?
 	ROM_LOAD( "27c512_1", 0x00000, 0x10000, CRC(ddfa6fe7) SHA1(0d86ec5029afd565e039fe84f7001b2dc77c919c) )
 
-	ROM_REGION( 0x40000, "gfx1", 0 )  // very similar to most cmv4 sets, but differently arranged
-	ROM_LOAD( "27c010_2",      0x20000, 0x8000, CRC(9636d785) SHA1(8f851aae0b05ad909c48cf94142ab927145da464) )
-	ROM_CONTINUE(              0x10000, 0x8000 )
-	ROM_CONTINUE(              0x30000, 0x8000 )
-	ROM_CONTINUE(              0x00000, 0x8000 )
-	ROM_COPY( "gfx1", 0x20000, 0x28000, 0x8000)
-	ROM_COPY( "gfx1", 0x10000, 0x18000, 0x8000)
-	ROM_COPY( "gfx1", 0x30000, 0x38000, 0x8000)
-	ROM_COPY( "gfx1", 0x00000, 0x08000, 0x8000)
-
-	ROM_REGION( 0x40000, "graphics", 0 )
-	ROM_LOAD( "27c010_3",          0x18000, 0x8000, CRC(a6db1162) SHA1(05019166526b0797e3eca8b72d90c325573b3d74) )
-	ROM_CONTINUE(                  0x08000, 0x8000 )
-	ROM_CONTINUE(                  0x38000, 0x8000 )
-	ROM_CONTINUE(                  0x28000, 0x8000 )
-	ROM_COPY( "graphics", 0x28000, 0x20000, 0x8000)
-	ROM_COPY( "graphics", 0x18000, 0x10000, 0x8000)
-	ROM_COPY( "graphics", 0x38000, 0x30000, 0x8000)
-	ROM_COPY( "graphics", 0x08000, 0x00000, 0x8000)
+	ROM_REGION( 0x18000, "gfx1", 0 )  // very similar to most cmv4 sets, but differently arranged
+	ROM_LOAD( "27c010_2", 0x10000, 0x8000, CRC(9636d785) SHA1(8f851aae0b05ad909c48cf94142ab927145da464) )
+	ROM_CONTINUE(         0x08000, 0x8000 )
+	ROM_CONTINUE(         0x00000, 0x8000 ) // 0xff filled, overwrite
+	ROM_CONTINUE(         0x00000, 0x8000 )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_COPY( "graphics", 0x0e000, 0x00000, 0x2000 )
-	ROM_COPY( "graphics", 0x1e000, 0x02000, 0x2000 )
-	ROM_COPY( "graphics", 0x2e000, 0x04000, 0x2000 )
-	ROM_COPY( "graphics", 0x3e000, 0x06000, 0x2000 )
+	ROM_LOAD( "27c010_3", 0x2000, 0x2000, CRC(a6db1162) SHA1(05019166526b0797e3eca8b72d90c325573b3d74) )
+	ROM_CONTINUE(         0x2000, 0x2000 )
+	ROM_CONTINUE(         0x2000, 0x2000 )
+	ROM_CONTINUE(         0x2000, 0x2000 )
+	ROM_CONTINUE(         0x0000, 0x2000 )
+	ROM_CONTINUE(         0x0000, 0x2000 )
+	ROM_CONTINUE(         0x0000, 0x2000 )
+	ROM_CONTINUE(         0x0000, 0x2000 )
+	ROM_CONTINUE(         0x6000, 0x2000 )
+	ROM_CONTINUE(         0x6000, 0x2000 )
+	ROM_CONTINUE(         0x6000, 0x2000 )
+	ROM_CONTINUE(         0x6000, 0x2000 )
+	ROM_CONTINUE(         0x4000, 0x2000 )
+	ROM_CONTINUE(         0x4000, 0x2000 )
+	ROM_CONTINUE(         0x4000, 0x2000 )
+	ROM_CONTINUE(         0x4000, 0x2000 )
 
 	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )  // no girls ROM
 
 	ROM_REGION( 0x800, "proms", 0 )  // RGB generation
-	ROM_LOAD( "82s191an.bin",  0x000, 0x800, CRC(ec546abe) SHA1(1bd92c0715ec1821fa977a67499dc8971deec9c7) )
+	ROM_LOAD( "82s191an.bin", 0x000, 0x800, BAD_DUMP CRC(d54dda1d) SHA1(c3053cc412bb3b15f5ae7c58c593bd63a6ec4c80) ) // hand-fixed, original dump had address bit 6 stuck
 
 	ROM_REGION( 0x100, "proms2", 0 )
 	ROM_LOAD( "82s137an.bin",  0x000, 0x100, CRC(92975789) SHA1(4a85d169db5e298ee201fe7d4b9964b1df16992e) )
@@ -23678,10 +23779,6 @@ void cmaster_state::init_tcl()
 
 void cmaster_state::init_super7()
 {
-/*  possibly incomplete decryption. Game appears to work with clean NVRAM,
-    but stops with 'scheda da inizializzare" (PCB to be initialized)
-    message with NVRAM present
-*/
 	uint8_t *rom = memregion("maincpu")->base();
 
 	for (int a = 0; a < 0x8000; a++)
@@ -23702,12 +23799,12 @@ void cmaster_state::init_super7()
 	}
 
 	for (int a = 0x9000; a < 0x9400; a++)
-		m_decrypted_opcodes[a] = bitswap<8>(rom[a] ^ 0x62, 4, 5, 3, 6, 7, 0, 2, 1);  // TODO: bit 5 and 4 might be swapped
+		m_decrypted_opcodes[a] = bitswap<8>(rom[a] ^ 0x62, 5, 4, 3, 6, 7, 0, 2, 1);
 
 	for (int a = 0x9400; a < 0xf000; a++)
 		m_decrypted_opcodes[a] = rom[a];
 
-	// try to rearrange PROM contents to what MAME expects. TODO: still doesn't work
+	// rearrange PROM contents to what MAME expects
 	uint8_t *proms = memregion("proms")->base();
 
 	for (int i = 0; i < 0x100; i++)
@@ -23717,6 +23814,8 @@ void cmaster_state::init_super7()
 		proms[i] = bits74;
 		proms[i + 0x100] = bits30;
 	}
+
+	m_palette->update();
 }
 
 void cmaster_state::init_animalhs()
@@ -23864,7 +23963,7 @@ GAMEL( 1991, cmasterl,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4
 GAMEL( 1991, cutyline,   0,        cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cuty Line (ver.1.01)",                        0,                 layout_cmasterb )
 GAMEL( 1991, cutylinea,  cutyline, cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Cuty Line (LC-88 bootleg, ver.8.05C)",        MACHINE_NOT_WORKING, layout_cmasterb ) // needs correct memory map
 GAMEL( 1991, cutylineb,  cutyline, cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Cuty Line (LC-88 bootleg, ver.7C.14)",        MACHINE_NOT_WORKING, layout_cmasterb ) // needs correct memory map
-GAMEL( 199?, super7,     cmaster,  super7,   cmaster,  cmaster_state,  init_super7,    ROT0, "bootleg",           "Super Seven",                                 MACHINE_NOT_WORKING, layout_cmasterb ) // bad palette, no reels, decryption might be missing something, too
+GAMEL( 199?, super7,     cmaster,  super7,   super7,   cmaster_state,  init_super7,    ROT0, "bootleg",           "Super Seven (ver. 2.3)",                      MACHINE_NOT_WORKING, layout_cmasterb ) // inputs / outputs needs verifying
 GAME ( 199?, wcat3a,     wcat3,    chryangl, cmaster,  cmaster_state,  init_wcat3a,    ROT0, "E.A.I.",            "Wild Cat 3 (CMV4 hardware)",                  MACHINE_NOT_WORKING ) // does not boot. Wrong decryption, wrong machine or wrong what?
 GAMEL( 199?, ll3,        cmaster,  cm,       cmasterb, cmaster_state,  init_ll3,       ROT0, "bootleg",           "Lucky Line III",                              MACHINE_NOT_WORKING, layout_cmasterb )  // not looked at yet
 GAMEL( 199?, cmfb55,     cmaster,  cmfb55,   cmaster,  cmaster_state,  init_palnibbles,ROT0, "bootleg",           "Cherry Master (bootleg, Game FB55 Ver.2)",    MACHINE_NOT_WORKING, layout_cmv4 ) // inputs not done
