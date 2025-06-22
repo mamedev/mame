@@ -24,7 +24,6 @@
     Known bugs:
         * pdrift & clones lock up issues after m68k rewrite, TAS opcode?
           Perfect quantum or changing IRQ2 timing won't fix it, see MT8783.
-        * pdriftl's comms don't work
 
 ****************************************************************************
 
@@ -811,66 +810,21 @@ void segaybd_state::sound_portmap(address_map &map)
 //  LINK BOARD
 //**************************************************************************
 
-void segaybd_state::mb8421_intl(int state)
+uint16_t segaybd_state::pdriftl_excs_r(offs_t offset)
 {
-	// shared ram interrupt request from linkcpu side
-	// unused?
+	return 0xff00 | m_ybdcomm->ex_r(offset);
 }
 
-void segaybd_state::mb8421_intr(int state)
+void segaybd_state::pdriftl_excs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	// shared ram interrupt request from maincpu side
-	m_linkcpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xef); // Z80 - RST $28
+	m_ybdcomm->ex_w(offset, data & 0xff);
 }
 
-
-uint16_t segaybd_state::link_r()
-{
-	return machine().rand();
-}
-
-uint16_t segaybd_state::link2_r()
-{
-	return 0x0000;
-}
-
-void segaybd_state::link2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	data &= mem_mask;
-	logerror("link2_w %04x\n", data);
-}
 
 void segaybd_state::main_map_link(address_map &map)
 {
 	main_map(map);
-	map(0x190000, 0x190fff).rw("mb8421", FUNC(mb8421_device::left_r), FUNC(mb8421_device::left_w)).umask16(0x00ff);
-	map(0x191000, 0x191001).r(FUNC(segaybd_state::link_r));
-	map(0x192000, 0x192001).rw(FUNC(segaybd_state::link2_r), FUNC(segaybd_state::link2_w));
-}
-
-
-void segaybd_state::link_map(address_map &map)
-{
-	map.unmap_value_high();
-	map(0x0000, 0x0fff).rom();
-	map(0x2000, 0x3fff).ram(); // 0x2000-0x2*** maybe shared with other boards?
-	map(0x4000, 0x47ff).rw("mb8421", FUNC(mb8421_device::right_r), FUNC(mb8421_device::right_w));
-}
-
-#if 0
-uint8_t segaybd_state::link_portc0_r()
-{
-	return 0xf8;
-}
-#endif
-
-void segaybd_state::link_portmap(address_map &map)
-{
-	map.unmap_value_high();
-	map.global_mask(0xff);
-
-	map(0x40, 0x40).portr("LinkID_DSW1");
-	map(0xc0, 0xc0).portr("LinkID_DSW2");
+	map(0x190000, 0x193fff).rw(FUNC(segaybd_state::pdriftl_excs_r), FUNC(segaybd_state::pdriftl_excs_w));
 }
 
 
@@ -1259,65 +1213,6 @@ static INPUT_PORTS_START( pdriftl )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 6C_1C ) )
 	PORT_DIPSETTING(    0x00, "Free Play (if Coin A too) or 1/1" )
-
-	PORT_START("LinkID_DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  // Affects how the z80 access memory at 0x2000-0x2***
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("LinkID_DSW2")
-	PORT_DIPNAME( 0x0f, 0x01, "Cabinet ID" )
-	PORT_DIPSETTING(    0x00, "0" )
-	PORT_DIPSETTING(    0x01, "1" ) // accessed unmapped areas if stand-alone isn't setup properly?
-	PORT_DIPSETTING(    0x02, "2" )
-	PORT_DIPSETTING(    0x03, "3" )
-	PORT_DIPSETTING(    0x04, "4" )
-	PORT_DIPSETTING(    0x05, "5" )
-	PORT_DIPSETTING(    0x06, "6" )
-	PORT_DIPSETTING(    0x07, "7" )
-	PORT_DIPSETTING(    0x08, "8" )
-	PORT_DIPSETTING(    0x09, "9" )
-	PORT_DIPSETTING(    0x0a, "10" )
-	PORT_DIPSETTING(    0x0b, "11" )
-	// enabled for debugging
-	PORT_DIPSETTING(    0x0c, "12 (invalid)" )
-	PORT_DIPSETTING(    0x0d, "13 (invalid)" )
-	PORT_DIPSETTING(    0x0e, "14 (invalid)" )
-	PORT_DIPSETTING(    0x0f, "15 (invalid)" )
-
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Communication Mode" )
-	PORT_DIPSETTING(    0x80, "Master/Slave" )
-	PORT_DIPSETTING(    0x00, "Stand-Alone" )
 INPUT_PORTS_END
 
 
@@ -1511,13 +1406,7 @@ void segaybd_state::yboard_link(machine_config &config)
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &segaybd_state::main_map_link);
 
-	Z80(config, m_linkcpu, XTAL(16'000'000)/2); // 8 Mhz
-	m_linkcpu->set_addrmap(AS_PROGRAM, &segaybd_state::link_map);
-	m_linkcpu->set_addrmap(AS_IO, &segaybd_state::link_portmap);
-
-	mb8421_device &mb8421(MB8421(config, "mb8421"));
-	mb8421.intl_callback().set(FUNC(segaybd_state::mb8421_intl));
-	mb8421.intr_callback().set(FUNC(segaybd_state::mb8421_intr));
+	SEGA_YBOARD_COMM(config, m_ybdcomm, 0U);
 }
 
 void segaybd_state::yboard_deluxe(machine_config &config)
@@ -3200,7 +3089,7 @@ GAMEL(1988, pdrifte,   pdrift,   yboard,        pdrifte,  segaybd_state, init_pd
 GAMEL(1988, pdriftj,   pdrift,   yboard,        pdriftj,  segaybd_state, init_pdrift,  ROT0,   "Sega", "Power Drift (Japan, Rev C)", MACHINE_SUPPORTS_SAVE, layout_pdrift )
 GAMEL(1988, pdriftjb,  pdrift,   yboard,        pdriftj,  segaybd_state, init_pdrift,  ROT0,   "Sega", "Power Drift (Japan, Rev B)", MACHINE_SUPPORTS_SAVE, layout_pdrift )
 
-GAMEL(1988, pdriftl,   0,        yboard_link,   pdriftl,  segaybd_state, init_pdrift,  ROT0,   "Sega", "Power Drift - Link Version (Japan, Rev A)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN, layout_pdrift )
+GAMEL(1988, pdriftl,   0,        yboard_link,   pdriftl,  segaybd_state, init_pdrift,  ROT0,   "Sega", "Power Drift - Link Version (Japan, Rev A)", MACHINE_SUPPORTS_SAVE , layout_pdrift )
 
 GAME( 1991, rchase,    0,        yboard,        rchase,   segaybd_state, init_rchase,  ROT0,   "Sega", "Rail Chase (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, rchasej,   rchase,   yboard,        rchase,   segaybd_state, init_rchase,  ROT0,   "Sega", "Rail Chase (Japan)", MACHINE_SUPPORTS_SAVE )
