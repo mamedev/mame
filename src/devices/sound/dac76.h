@@ -33,8 +33,8 @@
     signal by a current-to-voltage converter (I2V) consisting of an op-amp and
     two resistors.
 
-	Iref can either be provided as a stream by connecting a second input, or
-	as a fixed value by using `set_fixed_iref()`.
+	Iref can either be provided as a stream by connecting an input, or as a
+	fixed value by using `set_fixed_iref()`.
 
 ***************************************************************************/
 
@@ -67,8 +67,8 @@ public:
 	void configure_voltage_output(float i2v_r_pos, float i2v_r_neg);
 
 	// Fixed reference current.
-	// Ignored when a second input is connected. Iref will be obtained from
-	// input stream 1 in this case.
+	// Ignored when an input is connected. Iref will be obtained from input
+	// stream 0 in this case.
 	void set_fixed_iref(float iref);
 
 	// chord
