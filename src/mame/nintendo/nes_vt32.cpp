@@ -409,7 +409,7 @@ ROM_END
 void nes_vt32_unk_state::init_g9_666()
 {
 	uint8_t *romdata = memregion("mainrom")->base();
-	for (offs_t i = 0; i < 0x200000; i += 2)
+	for (offs_t i = 0; i < 0x2000000; i += 2)
 	{
 		uint16_t w = get_u16le(&romdata[i]);
 		put_u16le(&romdata[i], (w & 0xf9f9) | (w & 0x0600) >> 8 | (w & 0x0006) << 8);
@@ -439,7 +439,7 @@ CONS( 201?, myaasa,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empt
 // doesn't boot, ends up in weeds after jumping to bank with no code, lots of accesses to $42xx
 CONS( 201?, rfcp168,   0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "Retro FC Plus 168 in 1 Handheld", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // "RETRO_FC_V3.5"
 
-// many duplicates, real game count to be confirmed, games fail to load or have graphical issues
+// many duplicates, real game count to be confirmed, graphical issues in some games
 CONS( 202?, g9_666,   0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, init_g9_666, "<unknown>", "G9 Game Box 666 Games", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 
