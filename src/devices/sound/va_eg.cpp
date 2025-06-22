@@ -14,7 +14,6 @@ va_rc_eg_device::va_rc_eg_device(const machine_config &mconfig, const char *tag,
 	: device_t(mconfig, VA_RC_EG, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)
-	, m_streaming(true)
 	// Initialize to a valid state.
 	, m_r(RES_M(1))
 	, m_c(CAP_U(1))
@@ -22,12 +21,6 @@ va_rc_eg_device::va_rc_eg_device(const machine_config &mconfig, const char *tag,
 	, m_v_start(0)
 	, m_v_end(0)
 {
-}
-
-va_rc_eg_device &va_rc_eg_device::disable_streaming()
-{
-	m_streaming = false;
-	return *this;
 }
 
 va_rc_eg_device &va_rc_eg_device::set_r(float r)
@@ -118,8 +111,11 @@ attotime va_rc_eg_device::get_dt(float v) const
 
 void va_rc_eg_device::device_start()
 {
-	if (m_streaming)
+	if (get_sound_requested_outputs() > 0)
 		m_stream = stream_alloc(0, 1, SAMPLE_RATE_OUTPUT_ADAPTIVE);
+	else
+		m_stream = nullptr;
+
 	save_item(NAME(m_r));
 	save_item(NAME(m_c));
 	save_item(NAME(m_rc_inv));
@@ -131,7 +127,6 @@ void va_rc_eg_device::device_start()
 
 void va_rc_eg_device::sound_stream_update(sound_stream &stream)
 {
-	assert(m_streaming);
 	assert(stream.input_count() == 0 && stream.output_count() == 1);
 	attotime t = stream.start_time();
 

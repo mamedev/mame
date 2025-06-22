@@ -33,6 +33,9 @@
     signal by a current-to-voltage converter (I2V) consisting of an op-amp and
     two resistors.
 
+	Iref can either be provided as a stream by connecting an input, or as a
+	fixed value by using `set_fixed_iref()`.
+
 ***************************************************************************/
 
 #ifndef MAME_SOUND_DAC76_H
@@ -52,13 +55,8 @@ public:
 	// construction/destruction
 	dac76_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// When streaming is enabled, the Iref will be obtained from the input sound
-	// stream. Otherwise, the value set with `set_fixed_iref` will be used.
-	void configure_streaming_iref(bool streaming_iref);
-
 	// By default, the control current (Iref) is treated as normalized ([0, 1],
 	// defaults to 1), and the sound output is normalized to [-1, 1].
-	//
 	// When in "voltage output" mode, Iref (fixed or streaming) should be the
 	// current flowing into pin 11, and the output will be a voltage stream.
 	// `r_pos` is the feedback resistor of the I2V, which is also connected to
@@ -68,7 +66,9 @@ public:
 	// the "+" input.
 	void configure_voltage_output(float i2v_r_pos, float i2v_r_neg);
 
-	// Reference current. Ignored when streaming Iref mode is enabled.
+	// Fixed reference current.
+	// Ignored when an input is connected. Iref will be obtained from input
+	// stream 0 in this case.
 	void set_fixed_iref(float iref);
 
 	// chord
@@ -100,7 +100,6 @@ private:
 	sound_stream *m_stream;
 
 	// configuration
-	bool m_streaming_iref;
 	bool m_voltage_output;
 	float m_r_pos;
 	float m_r_neg;

@@ -864,8 +864,8 @@ void source_state::source(machine_config &config)
 
 	NVRAM(config, NVRAM_TAG, nvram_device::DEFAULT_ALL_0);  // 2x6514: U27, U28.
 
-	VA_RC_EG(config, m_contour[FILTER_CONTOUR]).disable_streaming().set_c(CONTOUR_C);  // C57 (Board 2).
-	VA_RC_EG(config, m_contour[LOUDNESS_CONTOUR]).disable_streaming().set_c(CONTOUR_C);  // C56 (Board 2).
+	VA_RC_EG(config, m_contour[FILTER_CONTOUR]).set_c(CONTOUR_C);  // C57 (Board 2).
+	VA_RC_EG(config, m_contour[LOUDNESS_CONTOUR]).set_c(CONTOUR_C);  // C56 (Board 2).
 	TIMER(config, m_lfo_timer).configure_generic(FUNC(source_state::lfo_timer_tick));
 
 	config.set_default_layout(layout_moog_source);

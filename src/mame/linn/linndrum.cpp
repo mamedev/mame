@@ -576,7 +576,7 @@ void linndrum_audio_device::device_add_mconfig(machine_config &config)
 
 	TIMER(config, m_hat_trigger_timer).configure_generic(FUNC(linndrum_audio_device::hat_trigger_timer_tick));  // LM556 (U37B).
 	VA_RC_EG(config, m_hat_eg).set_c(HAT_C22);
-	VA_VCA(config, m_hat_vca).configure_streaming_cv(true).configure_cem3360_linear_cv();
+	VA_VCA(config, m_hat_vca).configure_cem3360_linear_cv();
 	m_mux_volume[MV_HAT]->add_route(0, m_hat_vca, 1.0, 0);
 	m_hat_eg->add_route(0, m_hat_vca, HAT_EG2CV_SCALER, 1);
 
