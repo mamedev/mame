@@ -100,7 +100,6 @@ private:
 	sound_stream *m_stream;
 
 	// configuration
-	bool m_streaming_iref;
 	bool m_voltage_output;
 	float m_r_pos;
 	float m_r_neg;
