@@ -13,6 +13,7 @@
 #include "segaic16.h"
 #include "segaic16_road.h"
 #include "sega16sp.h"
+#include "xbdcomm.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/mcs51.h"
@@ -73,8 +74,6 @@ protected:
 	void main_map(address_map &map) ATTR_COLD;
 	void smgp_airdrive_map(address_map &map) ATTR_COLD;
 	void smgp_airdrive_portmap(address_map &map) ATTR_COLD;
-	void smgp_comm_map(address_map &map) ATTR_COLD;
-	void smgp_comm_portmap(address_map &map) ATTR_COLD;
 	void smgp_sound2_map(address_map &map) ATTR_COLD;
 	void smgp_sound2_portmap(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
@@ -112,6 +111,7 @@ protected:
 	required_device<segaic16_video_device> m_segaic16vid;
 	required_device<segaic16_road_device> m_segaic16road;
 	required_shared_ptr<uint16_t> m_subram0;
+	optional_device<sega_xbdcomm_device> m_xbdcomm;
 
 	// configuration
 	bool            m_adc_reverse[8]{};
