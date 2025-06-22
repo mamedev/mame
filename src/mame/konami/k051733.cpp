@@ -91,20 +91,10 @@ void k051733_device::clock_lfsr()
 
 u32 k051733_device::u32_sqrt(u32 op)
 {
-	u32 i = 0x8000;
-	u32 step = 0x4000;
-
-	while (step)
-	{
-		if (i * i == op)
-			break;
-		else if (i * i > op)
-			i -= step;
-		else
-			i += step;
-		step >>= 1;
-	}
-	return i & ~1;
+	if (op)
+		return u32(sqrt(op)) & ~1;
+	else
+		return 0;
 }
 
 u8 k051733_device::read(offs_t offset)
