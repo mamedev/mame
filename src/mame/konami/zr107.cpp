@@ -224,7 +224,7 @@ public:
 		m_out4(*this, "OUT4"),
 		m_eepromout(*this, "EEPROMOUT"),
 		m_analog(*this, "ANALOG%u", 1U),
-		m_pcb_digit(*this, "pcbdigit%u", 0U)
+		m_pcb_digit(*this, "pcbdigit%u", 0U),
 		m_pcb_output(*this, "pcboutput%u", 0U)
 	{ }
 
