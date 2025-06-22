@@ -436,10 +436,10 @@ CONS( 201?, dgunl3202, 0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empt
 CONS( 201?, myaass,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init, "dreamGEAR", "My Arcade All Star Stadium - Pocket Player (307-in-1)", MACHINE_NOT_WORKING )
 CONS( 201?, myaasa,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init, "dreamGEAR", "My Arcade All Star Arena - Pocket Player (307-in-1)", MACHINE_NOT_WORKING )
 
-// doesn't boot, ends up in weeds after jumping to bank with no code, lots of accesses to $42xx
+// doesn't boot, ends up in weeds after jumping to bank with no code, lots of accesses to $42xx (could this be a different SoC?)
 CONS( 201?, rfcp168,   0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "Retro FC Plus 168 in 1 Handheld", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // "RETRO_FC_V3.5"
 
-// many duplicates, real game count to be confirmed, graphical issues in some games
+// many duplicates, real game count to be confirmed, graphical issues in some games, lots of accesses to $42xx
 CONS( 202?, g9_666,   0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, init_g9_666, "<unknown>", "G9 Game Box 666 Games", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 
