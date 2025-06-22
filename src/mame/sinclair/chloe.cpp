@@ -958,11 +958,18 @@ void chloe_state::chloe(machine_config &config)
 
 ROM_START(chloe)
 	ROM_REGION(0xc000, "maincpu", ROMREGION_ERASEFF)
+	ROM_DEFAULT_BIOS("v101b")
 
-	// SE/OS 1.0
-	ROM_LOAD( "10_boot.rom", 0x0000, 0x4000, CRC(efbfe46e) SHA1(f5a86b56955661f72fa416e7e644de0b3afe6509))
-	ROM_LOAD( "10_basic_42.rom", 0x4000, 0x4000, CRC(c6273eaa) SHA1(f09a26c50f5cfe454e4d56c920cdcc62bc4f90cb))
-	ROM_LOAD( "10_dos_31.rom", 0x8000, 0x2000, CRC(67dfef09) SHA1(ba9616494071dfe65834d7db657e0d3bcce0b732))
+	ROM_SYSTEM_BIOS(0, "v10", "System 1.0") // 05.01.2024 - SE/OS 1.0
+	ROMX_LOAD( "10_boot.rom", 0x0000, 0x4000, CRC(efbfe46e) SHA1(f5a86b56955661f72fa416e7e644de0b3afe6509), ROM_BIOS(0))
+	ROMX_LOAD( "10_basic_42.rom", 0x4000, 0x4000, CRC(c6273eaa) SHA1(f09a26c50f5cfe454e4d56c920cdcc62bc4f90cb), ROM_BIOS(0))
+	ROMX_LOAD( "10_dos_31.rom", 0x8000, 0x2000, CRC(67dfef09) SHA1(ba9616494071dfe65834d7db657e0d3bcce0b732), ROM_BIOS(0))
+
+	// SE/OS 1.1
+	ROM_SYSTEM_BIOS(1, "v101b", "System 1.0.1b") // 05.xx.2024 - SE/OS 1.0.1b
+	ROMX_LOAD( "101_boot.rom", 0x0000, 0x4000, CRC(26c57f5a) SHA1(6680aaeac288c688f0400080faf07214959d5a1c), ROM_BIOS(1))
+	ROMX_LOAD( "101_basic_42.rom", 0x4000, 0x4000, CRC(0f8658ba) SHA1(b6975e66c029165a39a1ee85ebec50c8e7f4ec1e), ROM_BIOS(1))
+	ROMX_LOAD( "10_dos_31.rom", 0x8000, 0x2000, CRC(67dfef09) SHA1(ba9616494071dfe65834d7db657e0d3bcce0b732), ROM_BIOS(1))
 ROM_END
 
 } // Anonymous namespace

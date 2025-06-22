@@ -41,7 +41,7 @@ DEFINE_DEVICE_TYPE(ISA8_COM, isa8_com_device, "isa_com", "Communications Adapter
 
 void isa8_com_device::device_add_mconfig(machine_config &config)
 {
-	ins8250_device &uart0(INS8250(config, "uart_0", XTAL(1'843'200)));
+	ns16550_device &uart0(NS16550(config, "uart_0", XTAL(1'843'200)));
 	uart0.out_tx_callback().set("serport0", FUNC(rs232_port_device::write_txd));
 	uart0.out_dtr_callback().set("serport0", FUNC(rs232_port_device::write_dtr));
 	uart0.out_rts_callback().set("serport0", FUNC(rs232_port_device::write_rts));
@@ -118,7 +118,7 @@ isa8_com_device::isa8_com_device(const machine_config &mconfig, device_type type
 void isa8_com_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x03f8, 0x03ff, read8sm_delegate(*subdevice<ins8250_uart_device>("uart_0"), FUNC(ins8250_device::ins8250_r)), write8sm_delegate(*subdevice<ins8250_uart_device>("uart_0"), FUNC(ins8250_device::ins8250_w)));
+	m_isa->install_device(0x03e8, 0x03ef, read8sm_delegate(*subdevice<ins8250_uart_device>("uart_0"), FUNC(ins8250_device::ins8250_r)), write8sm_delegate(*subdevice<ins8250_uart_device>("uart_0"), FUNC(ins8250_device::ins8250_w)));
 	m_isa->install_device(0x02f8, 0x02ff, read8sm_delegate(*subdevice<ins8250_uart_device>("uart_1"), FUNC(ins8250_device::ins8250_r)), write8sm_delegate(*subdevice<ins8250_uart_device>("uart_1"), FUNC(ins8250_device::ins8250_w)));
 //  m_isa->install_device(0x03e8, 0x03ef, read8sm_delegate(*subdevice<ins8250_uart_device>("uart_2"), FUNC(ins8250_device::ins8250_r)), write8sm_delegate(*subdevice<ins8250_uart_device>("uart_2"), FUNC(ins8250_device::ins8250_w)));
 //  m_isa->install_device(0x02e8, 0x02ef, read8sm_delegate(*subdevice<ins8250_uart_device>("uart_3"), FUNC(ins8250_device::ins8250_r)), write8sm_delegate(*subdevice<ins8250_uart_device>("uart_3"), FUNC(ins8250_device::ins8250_w)));
