@@ -16,7 +16,7 @@ Memory map(preliminary):
 00-01 R operand 1 / operand 2
 02-03 R operand 1 % operand 2
 04-05 R sqrt(operand 3 << 16)
-06    R random number
+06    R random number (LFSR)
 
 06-07 W distance for collision check
 08-09 W Y pos of obj1
@@ -32,28 +32,6 @@ Memory map(preliminary):
 13    W unknown
 
 Other addresses are unknown or unused.
-
-Fast Lane:
-----------
-$9def:
-This routine is called only after a collision.
-(R) 0x0006: unknown. Only bits 0-3 are used.
-
-Blades of Steel:
-----------------
-$ac2f:
-(R) 0x2f86: unknown. Only uses bit 0.
-
-$a5de:
-writes to 0x2f84-0x2f85, waits a little, and then reads from 0x2f84.
-
-$7af3:
-(R) 0x2f86: unknown. Only uses bit 0.
-
-Devastators:
-------------
-$6ce8:
-reads from 0x0006, and only uses bit 1.
 */
 
 #include "emu.h"
@@ -95,7 +73,7 @@ void k051733_device::device_reset()
 {
 	memset(m_ram, 0, sizeof(m_ram));
 
-	m_lfsr = 0x1ff;
+	m_lfsr = 0xff;
 	m_nmi_timer = 0;
 	m_nmi_cb(0);
 }
@@ -133,6 +111,7 @@ uint8_t k051733_device::read(offs_t offset)
 {
 	offset &= 0x07;
 
+	uint8_t const lfsr = m_lfsr & 0xff;
 	if (!machine().side_effects_disabled())
 		clock_lfsr();
 
@@ -176,7 +155,7 @@ uint8_t k051733_device::read(offs_t offset)
 			return uint_sqrt(op3 << 16) & 0xff;
 
 		case 0x06:
-			return m_lfsr >> 2;
+			return lfsr;
 
 		case 0x07:
 			// note: Chequered Flag definitely wants all these bits to be enabled
