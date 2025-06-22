@@ -455,7 +455,7 @@ void tr707_audio_device::device_add_mconfig(machine_config &config)
 	{
 		VA_RC_EG(config, m_mux_eg[i]).set_r(MUX_EG_R[i]).set_c(CAP_U(0.047));  // [C48, C52-55, C57-58]
 		DAC08(config, m_mux_dac[i]);
-		VA_VCA(config, m_mux_vca[i]).configure_streaming_cv(true);
+		VA_VCA(config, m_mux_vca[i]);
 		m_mux_dac[i]->add_route(0, m_mux_vca[i], 1.0, 0);
 		m_mux_eg[i]->add_route(0, m_mux_vca[i], mux_dac_scale, 1);
 	}
@@ -479,7 +479,7 @@ void tr707_audio_device::device_add_mconfig(machine_config &config)
 	m_mux_vca[MV_HI_HAT]->add_route(0, hat_hpf, HAT_HPF_SCALE, 0);
 
 	VA_RC_EG(config, m_hat_eg).set_c(CAP_U(1));  // C71
-	auto &hat_vca = VA_VCA(config, "hat_vca").configure_streaming_cv(true);  // 2SD1469R, Q32
+	auto &hat_vca = VA_VCA(config, "hat_vca");  // 2SD1469R, Q32
 	hat_hpf.add_route(0, hat_vca, HAT_VCA_SCALE, 0);
 	m_hat_eg->add_route(0, hat_vca, 1.0 / VCC, 1);
 
@@ -509,7 +509,7 @@ void tr707_audio_device::device_add_mconfig(machine_config &config)
 		m_cymbal_dac[i]->add_route(0, m_cymbal_hpf[i], CYMBAL_HPF_SCALE);
 
 		VA_RC_EG(config, m_cymbal_eg[i]).set_r(CYMBAL_EG_R[i]).set_c(CAP_U(1));  // [C50, C49]
-		VA_VCA(config, m_cymbal_vca[i]).configure_streaming_cv(true);   // 2SD1469R [Q14, Q15]
+		VA_VCA(config, m_cymbal_vca[i]);  // 2SD1469R [Q14, Q15]
 		// V2I converter is based on an op-amp in inverting configuration.
 		m_cymbal_hpf[i]->add_route(0, m_cymbal_vca[i], CYMBAL_VCA_SCALE, 0);
 		m_cymbal_eg[i]->add_route(0, m_cymbal_vca[i], 1.0 / VCC, 1);
