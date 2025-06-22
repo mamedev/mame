@@ -73,6 +73,7 @@ public:
 	void iei_w(int state) { m_iei = state; interrupt_check(); }
 	void rdy_w(int state);
 	void wait_w(int state) { m_wait = state; }
+	void waits_extra_w(int count) { m_waits_extra += count; }
 	void bai_w(int state);
 
 protected:
@@ -161,6 +162,7 @@ private:
 	u8  m_reset_pointer;
 
 	int  m_wait;
+	int  m_waits_extra;
 	int  m_busrq_ack;
 	bool m_is_pulse;
 	u8   m_latch;
