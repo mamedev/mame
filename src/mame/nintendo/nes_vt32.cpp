@@ -15,6 +15,7 @@
 #include "nes_vt369_vtunknown_soc.h"
 #include "nes_vt32_soc.h"
 
+#include "multibyte.h"
 
 namespace {
 
@@ -98,6 +99,8 @@ public:
 	void nes_vt32_4x16mb(machine_config& config);
 
 	void nes_vt32_pal_32mb(machine_config& config);
+
+	void init_g9_666();
 
 private:
 	uint8_t vt_rom_banked_r(offs_t offset);
@@ -403,6 +406,16 @@ ROM_START( g9_666 )
 	ROM_RELOAD( 0x1000000, 0x1000000 )
 ROM_END
 
+void nes_vt32_unk_state::init_g9_666()
+{
+	uint8_t *romdata = memregion("mainrom")->base();
+	for (offs_t i = 0; i < 0x200000; i += 2)
+	{
+		uint16_t w = get_u16le(&romdata[i]);
+		put_u16le(&romdata[i], (w & 0xf9f9) | (w & 0x0600) >> 8 | (w & 0x0006) << 8);
+	}
+}
+
 } // anonymous namespace
 
 
@@ -426,8 +439,8 @@ CONS( 201?, myaasa,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empt
 // doesn't boot, ends up in weeds after jumping to bank with no code, lots of accesses to $42xx
 CONS( 201?, rfcp168,   0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "Retro FC Plus 168 in 1 Handheld", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // "RETRO_FC_V3.5"
 
-// many duplicates, real game count to be confirmed, doesn't boot, encrypted?
-CONS( 202?, g9_666,   0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "G9 Game Box 666 Games", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+// many duplicates, real game count to be confirmed, games fail to load or have graphical issues
+CONS( 202?, g9_666,   0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, init_g9_666, "<unknown>", "G9 Game Box 666 Games", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 
 // Some games (eg F22) are scrambled like in myaass
