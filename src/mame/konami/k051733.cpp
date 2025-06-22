@@ -43,7 +43,7 @@ Other addresses are unknown or unused.
 
 DEFINE_DEVICE_TYPE(K051733, k051733_device, "k051733", "Konami 051733 math chip")
 
-k051733_device::k051733_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+k051733_device::k051733_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, K051733, tag, owner, clock),
 	m_nmi_cb(*this)
 {
@@ -89,10 +89,10 @@ void k051733_device::clock_lfsr()
 	m_lfsr = m_lfsr << 1 | feedback;
 }
 
-uint32_t k051733_device::uint_sqrt(uint32_t op)
+u32 k051733_device::u32_sqrt(u32 op)
 {
-	uint32_t i = 0x8000;
-	uint32_t step = 0x4000;
+	u32 i = 0x8000;
+	u32 step = 0x4000;
 
 	while (step)
 	{
@@ -107,23 +107,23 @@ uint32_t k051733_device::uint_sqrt(uint32_t op)
 	return i & ~1;
 }
 
-uint8_t k051733_device::read(offs_t offset)
+u8 k051733_device::read(offs_t offset)
 {
 	offset &= 0x07;
 
-	uint8_t const lfsr = m_lfsr & 0xff;
+	u8 const lfsr = m_lfsr & 0xff;
 	if (!machine().side_effects_disabled())
 		clock_lfsr();
 
-	uint16_t const op1 = (m_ram[0x00] << 8) | m_ram[0x01];
-	uint16_t const op2 = (m_ram[0x02] << 8) | m_ram[0x03];
-	uint16_t const op3 = (m_ram[0x04] << 8) | m_ram[0x05];
+	u16 const op1 = (m_ram[0x00] << 8) | m_ram[0x01];
+	u16 const op2 = (m_ram[0x02] << 8) | m_ram[0x03];
+	u16 const op3 = (m_ram[0x04] << 8) | m_ram[0x05];
 
-	uint16_t const rad = (m_ram[0x06] << 8) | m_ram[0x07];
-	uint16_t const yobj1c = (m_ram[0x08] << 8) | m_ram[0x09];
-	uint16_t const xobj1c = (m_ram[0x0a] << 8) | m_ram[0x0b];
-	uint16_t const yobj2c = (m_ram[0x0c] << 8) | m_ram[0x0d];
-	uint16_t const xobj2c = (m_ram[0x0e] << 8) | m_ram[0x0f];
+	u16 const rad = (m_ram[0x06] << 8) | m_ram[0x07];
+	u16 const yobj1c = (m_ram[0x08] << 8) | m_ram[0x09];
+	u16 const xobj1c = (m_ram[0x0a] << 8) | m_ram[0x0b];
+	u16 const yobj2c = (m_ram[0x0c] << 8) | m_ram[0x0d];
+	u16 const xobj2c = (m_ram[0x0e] << 8) | m_ram[0x0f];
 
 	switch (offset)
 	{
@@ -150,9 +150,9 @@ uint8_t k051733_device::read(offs_t offset)
 				return op1 & 0xff;
 
 		case 0x04:
-			return uint_sqrt(op3 << 16) >> 8;
+			return u32_sqrt(op3 << 16) >> 8;
 		case 0x05:
-			return uint_sqrt(op3 << 16) & 0xff;
+			return u32_sqrt(op3 << 16) & 0xff;
 
 		case 0x06:
 			return lfsr;
@@ -194,7 +194,7 @@ uint8_t k051733_device::read(offs_t offset)
 	return 0;
 }
 
-void k051733_device::write(offs_t offset, uint8_t data)
+void k051733_device::write(offs_t offset, u8 data)
 {
 	offset &= 0x1f;
 	LOG("%s: write %02x to 051733 address %02x\n", machine().describe_context(), data, offset);
