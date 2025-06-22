@@ -16,10 +16,6 @@ Notes:
 
 - Devastators: sprite zooming for the planes in level 2 is particularly bad.
 
-- Devastators: title screen white backdrop is always supposed to flicker,
-  it currently does that only from second/fourth attract cycles (supposed to
-  always flicker from PCB video);
-
 - HTOTAL is actually 384 (/4 divider for pixel clock, 64 HBLANK clocks),
   but gfx hardware emulation doesn't play along nicely
 

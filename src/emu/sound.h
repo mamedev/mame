@@ -82,7 +82,7 @@
 // special sample-rate values
 constexpr u32 SAMPLE_RATE_INPUT_ADAPTIVE = 0xffffffff;
 constexpr u32 SAMPLE_RATE_OUTPUT_ADAPTIVE = 0xfffffffe;
-constexpr u32 SAMPLE_RATE_ADAPTIVE  = 0xfffffffd;
+constexpr u32 SAMPLE_RATE_ADAPTIVE = 0xfffffffd;
 
 
 using stream_update_delegate = delegate<void (sound_stream &stream)>;
@@ -243,7 +243,7 @@ public:
 	void put_int_clamp(s32 output, s32 index, s32 sample, s32 maxclamp) { put_int(output, index, std::clamp(sample, -maxclamp, maxclamp-1), maxclamp); }
 
 	// safely add a sample to the buffer
-	void add(s32 output, s32 index, sample_t sample)  { *m_output_buffer.ptrw(output, index) += sample; }
+	void add(s32 output, s32 index, sample_t sample) { *m_output_buffer.ptrw(output, index) += sample; }
 
 	// add a sample to the buffer, converting from an integer with the given maximum
 	void add_int(s32 output, s32 index, s32 sample, s32 max) { add(output, index, double(sample)/max); }
@@ -582,7 +582,7 @@ private:
 	void update(s32);
 
 	// handle mixing mapping update if needed
-	static std::vector<u32> find_channel_mapping(const osd::channel_position  &pos, const osd::audio_info::node_info *node);
+	static std::vector<u32> find_channel_mapping(const osd::channel_position &pos, const osd::audio_info::node_info *node);
 	void startup_cleanups();
 	void streams_update();
 	template<bool is_output, typename S> void apply_osd_changes(std::vector<S> &streams);
@@ -614,7 +614,6 @@ private:
 	void internal_config_remove_sound_io_channel_connection_default(sound_io_device *dev, u32 guest_channel, u32 node_channel);
 	void internal_config_set_volume_sound_io_channel_connection_node(sound_io_device *dev, u32 guest_channel, std::string name, u32 node_channel, float db);
 	void internal_config_set_volume_sound_io_channel_connection_default(sound_io_device *dev, u32 guest_channel, u32 node_channel, float db);
-
 
 	// internal state
 	running_machine &m_machine;            // reference to the running machine

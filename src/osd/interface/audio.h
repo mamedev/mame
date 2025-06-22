@@ -20,26 +20,25 @@ struct channel_position {
 	// Special positions
 
 	// Position is unknown, placed in the middle
-	static const struct channel_position UNKNOWN;
+	static const channel_position UNKNOWN;
 
 	// This channel should only be mapped explicitely through a channel mapping (on request)
-	static const struct channel_position ONREQ;
+	static const channel_position ONREQ;
 
 	// This channel is a LFE
-	static const struct channel_position LFE;
-
+	static const channel_position LFE;
 
 	// Standard positions
-	static const struct channel_position FC;
-	static const struct channel_position FL;
-	static const struct channel_position FR;
-	static const struct channel_position RC;
-	static const struct channel_position RL;
-	static const struct channel_position RR;
-	static const struct channel_position HC;
-	static const struct channel_position HL;
-	static const struct channel_position HR;
-	static const struct channel_position BACKREST;
+	static const channel_position FC;
+	static const channel_position FL;
+	static const channel_position FR;
+	static const channel_position RC;
+	static const channel_position RL;
+	static const channel_position RR;
+	static const channel_position HC;
+	static const channel_position HL;
+	static const channel_position HR;
+	static const channel_position BACKREST;
 
 	double m_x, m_y, m_z;
 
@@ -57,6 +56,22 @@ struct channel_position {
 
 	std::string name() const;
 };
+
+// initialize channel positions
+inline const channel_position channel_position::UNKNOWN  = { 0.0, 0.0, 0.0 };
+inline const channel_position channel_position::ONREQ    = { 0.0, 0.0,10.0 };
+inline const channel_position channel_position::LFE      = { 0.0, 0.0,11.0 };
+
+inline const channel_position channel_position::FC       = { 0.0, 0.0, 1.0 };
+inline const channel_position channel_position::FL       = {-0.2, 0.0, 1.0 };
+inline const channel_position channel_position::FR       = { 0.2, 0.0, 1.0 };
+inline const channel_position channel_position::RC       = { 0.0, 0.0,-0.5 };
+inline const channel_position channel_position::RL       = {-0.2, 0.0,-0.5 };
+inline const channel_position channel_position::RR       = { 0.2, 0.0,-0.5 };
+inline const channel_position channel_position::HC       = { 0.0, 0.0,-0.1 };
+inline const channel_position channel_position::HL       = {-0.1, 0.0,-0.1 };
+inline const channel_position channel_position::HR       = { 0.1, 0.0,-0.1 };
+inline const channel_position channel_position::BACKREST = { 0.0,-0.2, 0.1 };
 
 namespace detail {
 struct position_name_mapping {

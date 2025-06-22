@@ -28,45 +28,49 @@ namespace {
 
 using mm_endpoint_ptr = Microsoft::WRL::ComPtr<IMMEndpoint>;
 
-char const *const f_speaker_names[] ={
-		"FL",       // SPEAKER_FRONT_LEFT
-		"FR",       // SPEAKER_FRONT_RIGHT
-		"FC",       // SPEAKER_FRONT_CENTER
-		"LFE",      // SPEAKER_LOW_FREQUENCY
-		"BL",       // SPEAKER_BACK_LEFT
-		"BR",       // SPEAKER_BACK_RIGHT
-		"FCL",      // SPEAKER_FRONT_LEFT_OF_CENTER
-		"FCR",      // SPEAKER_FRONT_RIGHT_OF_CENTER
-		"BC",       // SPEAKER_BACK_CENTER
-		"SL",       // SPEAKER_SIDE_LEFT
-		"SR",       // SPEAKER_SIDE_RIGHT
-		"TC",       // SPEAKER_TOP_CENTER
-		"TFL",      // SPEAKER_TOP_FRONT_LEFT
-		"TFC",      // SPEAKER_TOP_FRONT_CENTER
-		"TFR",      // SPEAKER_TOP_FRONT_RIGHT
-		"TBL",      // SPEAKER_TOP_BACK_LEFT
-		"TBC",      // SPEAKER_TOP_BACK_CENTER
-		"TBR" };    // SPEAKER_TOP_BACK_RIGHT
+char const *const f_speaker_names[] =
+{
+	"FL",  // SPEAKER_FRONT_LEFT
+	"FR",  // SPEAKER_FRONT_RIGHT
+	"FC",  // SPEAKER_FRONT_CENTER
+	"LFE", // SPEAKER_LOW_FREQUENCY
+	"BL",  // SPEAKER_BACK_LEFT
+	"BR",  // SPEAKER_BACK_RIGHT
+	"FCL", // SPEAKER_FRONT_LEFT_OF_CENTER
+	"FCR", // SPEAKER_FRONT_RIGHT_OF_CENTER
+	"BC",  // SPEAKER_BACK_CENTER
+	"SL",  // SPEAKER_SIDE_LEFT
+	"SR",  // SPEAKER_SIDE_RIGHT
+	"TC",  // SPEAKER_TOP_CENTER
+	"TFL", // SPEAKER_TOP_FRONT_LEFT
+	"TFC", // SPEAKER_TOP_FRONT_CENTER
+	"TFR", // SPEAKER_TOP_FRONT_RIGHT
+	"TBL", // SPEAKER_TOP_BACK_LEFT
+	"TBC", // SPEAKER_TOP_BACK_CENTER
+	"TBR"  // SPEAKER_TOP_BACK_RIGHT
+};
 
-osd::channel_position const f_speaker_positions[] = {
-		osd::channel_position::FL,                   // SPEAKER_FRONT_LEFT
-		osd::channel_position::FR,                   // SPEAKER_FRONT_RIGHT
-		osd::channel_position::FC,                   // SPEAKER_FRONT_CENTER
-		osd::channel_position::LFE,                  // SPEAKER_LOW_FREQUENCY
-		osd::channel_position::RL,                   // SPEAKER_BACK_LEFT
-		osd::channel_position::RR,                   // SPEAKER_BACK_RIGHT
-		osd::channel_position( -0.1,  0.0,  1.0 ),   // SPEAKER_FRONT_LEFT_OF_CENTER
-		osd::channel_position(  0.1,  0.0,  1.0 ),   // SPEAKER_FRONT_RIGHT_OF_CENTER
-		osd::channel_position::RC,                   // SPEAKER_BACK_CENTER
-		osd::channel_position( -0.2,  0.0,  0.0 ),   // SPEAKER_SIDE_LEFT
-		osd::channel_position(  0.2,  0.0,  0.0 ),   // SPEAKER_SIDE_RIGHT
-		osd::channel_position(  0.0,  0.5,  0.0 ),   // SPEAKER_TOP_CENTER
-		osd::channel_position( -0.2,  0.5,  1.0 ),   // SPEAKER_TOP_FRONT_LEFT
-		osd::channel_position(  0.0,  0.5,  1.0 ),   // SPEAKER_TOP_FRONT_CENTER
-		osd::channel_position(  0.2,  0.5,  1.0 ),   // SPEAKER_TOP_FRONT_RIGHT
-		osd::channel_position( -0.2,  0.5, -0.5 ),   // SPEAKER_TOP_BACK_LEFT
-		osd::channel_position(  0.0,  0.5, -0.5 ),   // SPEAKER_TOP_BACK_CENTER
-		osd::channel_position(  0.2,  0.5, -0.5 ) }; // SPEAKER_TOP_BACK_RIGHT
+osd::channel_position const f_speaker_positions[] =
+{
+	osd::channel_position::FL,                 // SPEAKER_FRONT_LEFT
+	osd::channel_position::FR,                 // SPEAKER_FRONT_RIGHT
+	osd::channel_position::FC,                 // SPEAKER_FRONT_CENTER
+	osd::channel_position::LFE,                // SPEAKER_LOW_FREQUENCY
+	osd::channel_position::RL,                 // SPEAKER_BACK_LEFT
+	osd::channel_position::RR,                 // SPEAKER_BACK_RIGHT
+	osd::channel_position( -0.1,  0.0,  1.0 ), // SPEAKER_FRONT_LEFT_OF_CENTER
+	osd::channel_position(  0.1,  0.0,  1.0 ), // SPEAKER_FRONT_RIGHT_OF_CENTER
+	osd::channel_position::RC,                 // SPEAKER_BACK_CENTER
+	osd::channel_position( -0.2,  0.0,  0.0 ), // SPEAKER_SIDE_LEFT
+	osd::channel_position(  0.2,  0.0,  0.0 ), // SPEAKER_SIDE_RIGHT
+	osd::channel_position(  0.0,  0.5,  0.0 ), // SPEAKER_TOP_CENTER
+	osd::channel_position( -0.2,  0.5,  1.0 ), // SPEAKER_TOP_FRONT_LEFT
+	osd::channel_position(  0.0,  0.5,  1.0 ), // SPEAKER_TOP_FRONT_CENTER
+	osd::channel_position(  0.2,  0.5,  1.0 ), // SPEAKER_TOP_FRONT_RIGHT
+	osd::channel_position( -0.2,  0.5, -0.5 ), // SPEAKER_TOP_BACK_LEFT
+	osd::channel_position(  0.0,  0.5, -0.5 ), // SPEAKER_TOP_BACK_CENTER
+	osd::channel_position(  0.2,  0.5, -0.5 )  // SPEAKER_TOP_BACK_RIGHT
+};
 
 } // anonymous namespace
 
