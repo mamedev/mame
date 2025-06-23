@@ -580,7 +580,7 @@ public:
 	void mbstar(machine_config &config);
 	void flam7_tw(machine_config &config);
 	void animalw(machine_config &config);
-	//void magodds_map(address_map &map) ATTR_COLD;
+	void animalwa(machine_config &config);
 
 protected:
 	TILE_GET_INFO_MEMBER(get_magical_fg_tile_info);
@@ -601,6 +601,7 @@ private:
 	void magodds_map(address_map &map) ATTR_COLD;
 	void luckybar_map(address_map &map) ATTR_COLD;
 	void animalw_map(address_map &map) ATTR_COLD;
+	void animalwa_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -2546,6 +2547,14 @@ void wingco_state::animalw_map(address_map &map)
 	map(0xc000, 0xcfff).rom().region("maincpu", 0x4000);
 	map(0xd000, 0xdfff).rom().region("maincpu", 0x5000);
 	map(0xe000, 0xefff).rom().region("maincpu", 0x3000);
+}
+
+void wingco_state::animalwa_map(address_map &map)
+{
+	lucky8_map(map);
+
+	map(0xc000, 0xcfff).rom().region("maincpu", 0x6000);
+	map(0xd000, 0xdfff).rom().region("maincpu", 0x7000);
 }
 
 void wingco_state::nd8lines_map(address_map &map)
@@ -11155,6 +11164,13 @@ void wingco_state::animalw(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::animalw_map);
 }
 
+void wingco_state::animalwa(machine_config &config)
+{
+	lucky8(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::animalwa_map);
+}
+
 void wingco_state::super972(machine_config &config)
 {
 	lucky8(config);
@@ -15461,23 +15477,52 @@ ROM_START( animalw ) // big CPU block marked GPS Game Power System
 	ROM_LOAD( "rom9.u91",  0x0000, 0x8000, CRC(beaeafe5) SHA1(58c9ab7559a346d55dbd679b583abd1ebe2d9fae) )
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "rom7.u22",  0x00000, 0x8000, CRC(4b7613da) SHA1(7a0384f24f8fb5e8722b559b7b82d922ed781139) )
 	ROM_LOAD( "rom5.u21",  0x08000, 0x8000, CRC(dfae0bd4) SHA1(b64cf45e1a0ab14995b4e0cc3d5931d81192d5cf) )
 	ROM_LOAD( "rom6.u20",  0x10000, 0x8000, CRC(fd214376) SHA1(5c9227a4aafe3a6119ee197f53fd067ab215acd1) )
-	ROM_LOAD( "rom7.u22",  0x00000, 0x8000, CRC(4b7613da) SHA1(7a0384f24f8fb5e8722b559b7b82d922ed781139) )
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_LOAD( "rom1.u24",  0x4000, 0x2000, CRC(87303bc8) SHA1(7ba0d9127c743ebbd273dad7d1010ccfd8848163) )
+	ROM_LOAD( "rom4.u26",  0x0000, 0x2000, CRC(cff7c18b) SHA1(bb99be34a04623063916127ab0b1cdbe649f4609) )
 	ROM_IGNORE(                    0x6000 )
 	ROM_LOAD( "rom2.u25",  0x2000, 0x2000, CRC(5342ec28) SHA1(7188f36cc55fc202f06b35f201cfe01d2ad60fc1) )
 	ROM_IGNORE(                    0x6000 )
-	ROM_LOAD( "rom3.u23",  0x6000, 0x2000, CRC(7d366bcf) SHA1(b3b208ff9433efe62510352b98861d03673c53b4) )
+	ROM_LOAD( "rom1.u24",  0x4000, 0x2000, CRC(87303bc8) SHA1(7ba0d9127c743ebbd273dad7d1010ccfd8848163) )
 	ROM_IGNORE(                    0x6000 )
-	ROM_LOAD( "rom4.u26",  0x0000, 0x2000, CRC(cff7c18b) SHA1(bb99be34a04623063916127ab0b1cdbe649f4609) )
+	ROM_LOAD( "rom3.u23",  0x6000, 0x2000, CRC(7d366bcf) SHA1(b3b208ff9433efe62510352b98861d03673c53b4) )
 	ROM_IGNORE(                    0x6000 )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "82s129.u28", 0x0000, 0x0100, CRC(14f47fc9) SHA1(fda1bd524e6281a47e9ca348b1b13de25242ef04) )
 	ROM_LOAD( "82s129.u27", 0x0100, 0x0100, CRC(58ec5baf) SHA1(79f29c26c2747f3baeb0fe309d4e0f1eb01c6a79) )
+
+	ROM_REGION( 0x40, "proms2", 0 )
+	ROM_LOAD( "dm74s288.u68", 0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "82s129.u51",  0x0000, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "dm74s288.u69", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+ROM_END
+
+ROM_START( animalwa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "rom9.u91",  0x0000, 0x8000, CRC(1a2edd86) SHA1(562975eda8e01beb97a48b78b069d8f426e63713) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "rom7.u22",  0x00000, 0x8000, CRC(5b06e957) SHA1(f8499eec69079588b6d6dc4d486bd8b089be8795) )
+	ROM_LOAD( "rom5.u21",  0x08000, 0x8000, CRC(9476e7a8) SHA1(b89812becc3d0f57fc3307f6bb744137c84c6040) )
+	ROM_LOAD( "rom6.u20",  0x10000, 0x8000, CRC(8a06e104) SHA1(b0a3489554d56f1785feb9fed82853d32ba1c69e) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "rom4.u26",  0x0000, 0x2000, CRC(ff6189c1) SHA1(372e54856d249f94f4a2421a555b6c1493b3e741) )
+	ROM_LOAD( "rom2.u25",  0x2000, 0x2000, CRC(3f8361d6) SHA1(798f71d70176ba8108112d8d3ac722a347092673) )
+	ROM_LOAD( "rom1.u24",  0x4000, 0x2000, CRC(fc7d367b) SHA1(8bc4daec5391ff114a50d9a306680f75fcbf22e5) )
+	ROM_LOAD( "rom3.u23",  0x6000, 0x2000, CRC(c5b0899b) SHA1(6a6db13b2da45481450d72b49c7f21a68371ac32) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.u28", 0x0000, 0x0100, CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
+	ROM_LOAD( "82s129.u27", 0x0100, 0x0100, CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
 
 	ROM_REGION( 0x40, "proms2", 0 )
 	ROM_LOAD( "dm74s288.u68", 0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
@@ -24041,6 +24086,7 @@ GAME(  198?, ladylinre,  ladylinr, ladylinrb,ladylinr, goldstar_state, init_lady
 GAME ( 1992?,wcat,       0,        wcat3,    lucky8b,  wingco_state,   init_wcat,      ROT0, "Excel",             "Wild Cat",                                                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // needs correct GFX ROMs, I/O, etc
 GAME(  1995, wcat3,      0,        wcat3,    lucky8,   wingco_state,   init_wcat3,     ROT0, "E.A.I.",            "Wild Cat 3",                                               MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS ) // decryption partially wrong, needs soft resets before running. Bad PROM decode
 GAMEL( 199?, animalw,    0,        animalw,  animalw,  wingco_state,   empty_init,     ROT0, "GPS",               "Animal Wonders (ver A900 66)",                             MACHINE_NOT_WORKING,   layout_lucky8 )    // inputs / DIPs need to be checked
+GAMEL( 199?, animalwa,   animalw,  animalwa, animalw,  wingco_state,   empty_init,     ROT0, "bootleg (Bigico)",  "Animal Wonders (ver A900, Bicigo bootleg)",                MACHINE_NOT_WORKING,   layout_lucky8 )    // doesn't boot
 GAMEL( 199?, animalwbl,  animalw,  lucky8,   animalw,  wingco_state,   empty_init,     ROT0, "bootleg",           "Animal Wonders (ver A900, bootleg)",                       MACHINE_NOT_WORKING,   layout_lucky8 )    // inputs / DIPs need to be checked
 GAMEL( 1989, cb2,        0,        lucky8,   lucky8,   wingco_state,   init_cb2,       ROT0, "Dyna",              "Cherry Bonus II (V2.00 06/01)",                            MACHINE_NOT_WORKING,   layout_lucky8 )    // I/O need to be checked, seems reasonably working
 GAMEL( 1990, cbaai,      0,        lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "bootleg (A.A.I.)",  "Cherry Bonus (A.A.I. bootleg)",                            MACHINE_NOT_WORKING,   layout_lucky8 )    // jumps to 0xf430 but there's nothing there?

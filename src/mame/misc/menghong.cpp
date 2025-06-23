@@ -629,6 +629,22 @@ ROM_START( pljh2 ) // this PCB has an Amazon-LF
 	ROM_REGION( 0x0100, "pic_data", ROMREGION_ERASEFF )
 ROM_END
 
+// 挖坑 (Wākēng)
+ROM_START( wakeng )
+	ROM_REGION32_LE( 0x1000000, "flash", ROMREGION_ERASEFF )
+	ROM_LOAD( "rom.u19", 0x000000, 0x400000, CRC(87dd8b60) SHA1(1bd2c2cd644242c0f876f313db6779f3dc465f1d) )
+	ROM_LOAD( "rom.u18", 0x400000, 0x400000, CRC(d5d6b3af) SHA1(a260259c0d86a73bf53291fd5e41b66e96c75b0c) )
+	ROM_LOAD( "rom.u17", 0x800000, 0x400000, CRC(2fe34e5a) SHA1(cd9874292432007b4d47aee7bd6f871d05645719) )
+
+	ROM_REGION( 0x0400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "rom.u13", 0x000000, 0x0200000, CRC(96654161) SHA1(882c8ce446f302ac3de9d38edfc9c2beb9751775) ) // 1xxxxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x4280, "pic", 0 )
+	ROM_LOAD("key-02", 0x000000, 0x4280, NO_DUMP )
+
+	ROM_REGION( 0x0100, "pic_data", ROMREGION_ERASEFF )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -640,3 +656,4 @@ GAME( 2005,  jpddz,     0,        crzyddz2, crzyddz2, menghong_state, empty_init
 GAME( 2005,  jpddza,    jpddz,    crzyddz2, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Jipin Dou Dizhu (set 2)",  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // this one doesn't
 GAME( 2005,  sandayi,   0,        crzyddz2, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "San Da Yi",                MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 200?,  pljh2,     0,        crzyddz2, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Piaoliang Jinhua 2",       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2006,  wakeng,    0,        crzyddz2, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Wakeng",                   MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
