@@ -209,11 +209,9 @@ void chqflag_state::chqflag_vreg_w(uint8_t data)
 	 *
 	 * TODO: true values aren't known, also shadow_factors table probably scales towards zero instead (game doesn't use those)
 	 */
-	const double shadow_factors[4] = {0.8, 1.0, 1.33, 1.66};
+	const double shadow_factors[4] = { 0.8, 1.0, 1.33, 1.66 };
 	uint8_t shadow_value = BIT(data, 3);
 	uint8_t shadow_setting = BIT(data, 7);
-
-	m_k051960->set_shadow_inv(shadow_setting);
 
 	m_palette->set_shadow_factor(shadow_factors[(shadow_setting << 1) | shadow_value]);
 
@@ -222,16 +220,6 @@ void chqflag_state::chqflag_vreg_w(uint8_t data)
 		m_last_vreg = shadow_setting;
 		update_background_shadows(shadow_setting);
 	}
-
-	#if 0
-	if ((data & 0x80) != m_last_vreg)
-	{
-		m_last_vreg = data & 0x80;
-
-		/* only affect the background */
-		update_background_shadows(data);
-	}
-	#endif
 
 	//if ((data & 0xf8) && (data & 0xf8) != 0x88)
 	//  popmessage("chqflag_vreg_w %02x",data);

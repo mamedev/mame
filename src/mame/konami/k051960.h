@@ -13,7 +13,7 @@ enum
 };
 
 
-#define K051960_CB_MEMBER(_name)   void _name(int *code, int *color, int *priority, bool *shadow)
+#define K051960_CB_MEMBER(_name) void _name(int *code, int *color, int *priority, bool *shadow)
 
 
 class k051960_device : public device_t, public device_gfx_interface, public device_video_interface
@@ -38,7 +38,6 @@ public:
 	// static configuration
 	template <typename... T> void set_sprite_callback(T &&... args) { m_k051960_cb.set(std::forward<T>(args)...); }
 	void set_plane_order(int order);
-	void set_shadow_inv(bool inv);
 
 	/*
 	The callback is passed:
@@ -88,7 +87,6 @@ private:
 	uint8_t m_romoffset;
 	bool    m_spriteflip, m_readroms;
 	uint8_t m_shadow_config;
-	bool    m_inv_shadow;
 	bool    m_nmi_enabled;
 
 	int k051960_fetchromdata( int byte );
