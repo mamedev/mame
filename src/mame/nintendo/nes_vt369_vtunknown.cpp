@@ -1264,7 +1264,7 @@ CONS( 2014, lxcmcyspn, 0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, init_
 
 // JL1895 models, Cyber Arcade Pocket.  This make strange use of the LCDC, the menus are vertical (so must be copied to the LCD rotated) but the games are horizontal as usual
 CONS( 201?, lxcypkdp,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Cyber Arcade Pocket - Disney Princess (JL1895DP)", MACHINE_NOT_WORKING )
-CONS( 201?, lxcypksp,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Cyber Arcade Pocket - Spider-Man", MACHINE_NOT_WORKING )
+CONS( 201?, lxcypksp,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Cyber Arcade Pocket - Spider-Man (JL1895SP-2)", MACHINE_NOT_WORKING )
 
 CONS( 200?, lxccminn,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Console Colour - Minnie Mouse (JL2800MN)", MACHINE_NOT_WORKING )
 CONS( 200?, lxccplan,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Console Colour - Disney's Planes (JL2800PL)", MACHINE_NOT_WORKING )
