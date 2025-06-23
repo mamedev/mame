@@ -105,8 +105,8 @@ u8 k051733_device::read(offs_t offset)
 	if (!machine().side_effects_disabled())
 		clock_lfsr();
 
-	u16 const op1 = (m_ram[0x00] << 8) | m_ram[0x01];
-	u16 const op2 = (m_ram[0x02] << 8) | m_ram[0x03];
+	s16 const op1 = (m_ram[0x00] << 8) | m_ram[0x01];
+	s16 const op2 = (m_ram[0x02] << 8) | m_ram[0x03];
 	u16 const op3 = (m_ram[0x04] << 8) | m_ram[0x05];
 
 	u16 const rad = (m_ram[0x06] << 8) | m_ram[0x07];
