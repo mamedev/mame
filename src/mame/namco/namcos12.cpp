@@ -3126,6 +3126,29 @@ ROM_START( tekken3ja )
 	ROM_LOAD( "tet1wave1.4",              0x0400000, 0x400000, CRC(ffeba79f) SHA1(941412bbe9d0305d9a23c224c1bb774c4321f6df) )
 ROM_END
 
+ROM_START( tekken3jd )
+	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 )
+	ROM_LOAD16_BYTE( "tet1verd.2e",       0x0000000, 0x200000, CRC(8a2e5ed5) SHA1(f06aa6eceffa30359c93811bc70e34eb3d85b3c5) )
+	ROM_LOAD16_BYTE( "tet1verd.2j",       0x0000001, 0x200000, CRC(fd2128f7) SHA1(c8be7101538c26b6eb1a8fe901549457be8d05b9) )
+
+	ROM_REGION32_LE( 0x1c00000, "bankedroms", 0 )
+	ROM_LOAD16_BYTE( "tet1rom0l.6",       0x0000000, 0x400000, CRC(2886bb32) SHA1(08ad9da2df25ad8c933a812ac238c81135072929) )
+	ROM_LOAD16_BYTE( "tet1rom0u.9",       0x0000001, 0x400000, CRC(c5705b92) SHA1(20df20c8d18eb4712d565a3df9a8d9270dee6aaa) )
+	ROM_LOAD16_BYTE( "tet1rom1l.7",       0x0800000, 0x400000, CRC(0397d283) SHA1(ebafcd14cdb2601214129a84fc6830846f5cd274) )
+	ROM_LOAD16_BYTE( "tet1rom1u.10",      0x0800001, 0x400000, CRC(502ba5cd) SHA1(19c1282245c6dbfc945c0bd0f3918968c3e5c3ed) )
+	ROM_LOAD16_BYTE( "tet1rom2l.8",       0x1000000, 0x400000, CRC(e03b1c24) SHA1(8579b95a8fd06b7d2893ff88b228fd794162dff1) )
+	ROM_LOAD16_BYTE( "tet1rom2u.11",      0x1000001, 0x400000, CRC(75eb2ab3) SHA1(dee43884e542391903f6aaae2c166e7921a86fb4) )
+	ROM_LOAD16_BYTE( "tet1fl3l.12",       0x1800000, 0x200000, CRC(45513073) SHA1(8a36f58ee2d292b50e00c6bf275f9def358032d8) )
+	ROM_LOAD16_BYTE( "tet1fl3u.13",       0x1800001, 0x200000, CRC(1917d993) SHA1(cabc44514a3e62a18a7f8f883603241447d6948b) )
+
+	ROM_REGION( 0x0080000, "sub", 0 )
+	ROM_LOAD16_WORD_SWAP( "tet1verd.11s", 0x0000000, 0x080000, CRC(b13d88a9) SHA1(944d35203bbb7155a296ff37daa426b42f8e2b6b) ) // Specific to Ver D.
+
+	ROM_REGION( 0x1000000, "c352", 0 )
+	ROM_LOAD( "tet1wave0.5",              0x0000000, 0x400000, CRC(77ba7975) SHA1(fe9434dcf0fb232c85efaaae1b4b13d36099620a) )
+	ROM_LOAD( "tet1wave1.4",              0x0400000, 0x400000, CRC(ffeba79f) SHA1(941412bbe9d0305d9a23c224c1bb774c4321f6df) )
+ROM_END
+
 ROM_START( tekken3je1 )
 	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 )
 	ROM_LOAD16_BYTE( "tet1vere1.2e",      0x0000000, 0x200000, CRC(8b01113b) SHA1(45fdfd58293641ed16bc59c633a85a9cf64ccbaf) )
@@ -3596,6 +3619,7 @@ GAME( 1997, tekken3d,   tekken3,  coh700,   tekken3,  namcos12_state,         em
 GAME( 1997, tekken3ua,  tekken3,  coh700,   tekken3,  namcos12_state,         empty_init, ROT0, "Namco",           "Tekken 3 (US, TET3/VER.A)", 0 ) /* KC006 */
 GAME( 1997, tekken3ud,  tekken3,  coh700,   tekken3,  namcos12_state,         empty_init, ROT0, "Namco",           "Tekken 3 (US, TET3/VER.D)", 0 ) /* KC006 */
 GAME( 1997, tekken3ja,  tekken3,  coh700,   tekken3,  namcos12_state,         empty_init, ROT0, "Namco",           "Tekken 3 (Japan, TET1/VER.A)", 0 ) /* KC006 */
+GAME( 1997, tekken3jd,  tekken3,  coh700,   tekken3,  namcos12_state,         empty_init, ROT0, "Namco",           "Tekken 3 (Japan, TET1/VER.D)", 0 ) /* KC006 */
 GAME( 1997, tekken3je1, tekken3,  coh700,   tekken3,  namcos12_state,         empty_init, ROT0, "Namco",           "Tekken 3 (Japan, TET1/VER.E1)", 0 ) /* KC006 */
 GAME( 1997, lbgrande,   0,        coh700,   lbgrande, namcos12_state,         empty_init, ROT0, "Namco",           "Libero Grande (World, LG2/VER.A)", 0 ) /* KC014 */
 GAME( 1997, toukon3,    0,        coh700,   lbgrande, namcos12_state,         empty_init, ROT0, "Namco / Tomy",    "Shin Nihon Pro Wrestling Toukon Retsuden 3 Arcade Edition (Japan, TR1/VER.A)", MACHINE_IMPERFECT_GRAPHICS ) /* KC019 */
