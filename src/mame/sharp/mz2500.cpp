@@ -915,23 +915,6 @@ u8 mz2500_state::dict_rom_r(offs_t offset)
 	return m_dic_rom[(offset & 0x1fff) + ((m_dic_bank & 0x1f)*0x2000)];
 }
 
-u8 mz2500_state::rom_r(offs_t offset)
-{
-	m_lrom_index = (offset >> 8) & 0xff;
-
-	m_rom_index = (m_rom_index & 0xffff00) | (m_lrom_index & 0xff);
-
-	return m_iplpro_rom[m_rom_index];
-}
-
-void mz2500_state::rom_w(offs_t offset, u8 data)
-{
-	m_hrom_index = (offset >> 8) & 0xff;
-
-	m_rom_index = (data << 8) | (m_rom_index & 0x0000ff) | ((m_hrom_index & 0xff)<<16);
-	//logerror("%02x\n",data);
-}
-
 /* sets 16 color entries out of 4096 possible combinations */
 void mz2500_state::palette4096_io_w(offs_t offset, u8 data)
 {
@@ -1147,42 +1130,6 @@ void mz2500_state::rp5c15_8_w(offs_t offset, u8 data)
 	m_rtc->write(rtc_index, data);
 }
 
-
-u8 mz2500_state::emm_data_r(offs_t offset)
-{
-	u8 emm_lo_index;
-
-	emm_lo_index = (offset >> 8) & 0xff;
-
-	m_emm_offset = (m_emm_offset & 0xffff00) | (emm_lo_index & 0xff);
-
-	if(m_emm_offset < 0x100000) //emm max size
-		return m_emm_ram[m_emm_offset];
-
-	return 0xff;
-}
-
-void mz2500_state::emm_address_w(offs_t offset, u8 data)
-{
-	u8 emm_hi_index;
-
-	emm_hi_index = (offset >> 8) & 0xff;
-
-	m_emm_offset = ((emm_hi_index & 0xff) << 16) | ((data & 0xff) << 8) | (m_emm_offset & 0xff);
-}
-
-void mz2500_state::emm_data_w(offs_t offset, u8 data)
-{
-	u8 emm_lo_index;
-
-	emm_lo_index = (offset >> 8) & 0xff;
-
-	m_emm_offset = (m_emm_offset & 0xffff00) | (emm_lo_index & 0xff);
-
-	if(m_emm_offset < 0x100000) //emm max size
-		m_emm_ram[m_emm_offset] = data;
-}
-
 void mz2500_state::z80_map(address_map &map)
 {
 	map(0x0000, 0x1fff).m(m_rambank[0], FUNC(address_map_bank_device::amap8));
@@ -1222,13 +1169,12 @@ void mz2500_state::z80_io(address_map &map)
 	map.unmap_value_high();
 //  map(0x60, 0x63).mirror(0xff00).w(FUNC(mz2500_state::w3100a_w));
 //  map(0x63, 0x63).mirror(0xff00).r(FUNC(mz2500_state::w3100a_r));
-//  map(0x98, 0x99) Y8950 ADPCM, from MZ-1E35 expansion unit
+//  map(0x98, 0x99) MZ-1E35 ADPCM
 	map(0xa0, 0xa3).mirror(0xff00).rw("z80sio", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
-//  map(0xa4, 0xa5).rw(FUNC(mz2500_state::sasi_r), FUNC(mz2500_state::sasi_w));
-	map(0xa8, 0xa8).select(0xff00).w(FUNC(mz2500_state::rom_w));
-	map(0xa9, 0xa9).select(0xff00).r(FUNC(mz2500_state::rom_r));
-	map(0xac, 0xac).select(0xff00).w(FUNC(mz2500_state::emm_address_w));
-	map(0xad, 0xad).select(0xff00).r(FUNC(mz2500_state::emm_data_r)).w(FUNC(mz2500_state::emm_data_w));
+//  map(0xa4, 0xa5) MZ-1E30 SASI
+//  map(0xa8, 0xa9) ^
+//  map(0xac, 0xac) MZ-1R37 EMM
+//  map(0xad, 0xad) ^
 	map(0xae, 0xae).select(0xff00).w(FUNC(mz2500_state::palette4096_io_w));
 //  map(0xb0, 0xb3).rw(FUNC(mz2500_state::sio_r), FUNC(mz2500_state::sio_w));
 	map(0xb4, 0xb4).mirror(0xff00).rw(FUNC(mz2500_state::bank_addr_r), FUNC(mz2500_state::bank_addr_w));
@@ -1482,13 +1428,10 @@ void mz2500_state::machine_start()
 	m_ipl_rom = memregion("ipl")->base();
 	m_kanji_rom = memregion("kanji")->base();
 	m_kanji2_rom = memregion("kanji2")->base();
-	m_emm_ram = make_unique_clear<u8[]>(0x100000);
 	m_dic_rom = memregion("dictionary")->base();
 	m_phone_rom = memregion("phone")->base();
-	m_iplpro_rom = memregion("iplpro")->base();
 
 	save_pointer(NAME(m_pcg_ram), 0x2000);
-	save_pointer(NAME(m_emm_ram), 0x100000);
 
 	m_gfxdecode->set_gfx(3, std::make_unique<gfx_element>(m_palette, pcg_layout_1bpp, m_pcg_ram.get(), 0, 0x10, 0));
 	m_gfxdecode->set_gfx(4, std::make_unique<gfx_element>(m_palette, pcg_layout_3bpp, m_pcg_ram.get(), 0, 4, 0));
@@ -1819,9 +1762,6 @@ void mz2500_state::mz2500(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:2", mz2500_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:3", mz2500_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
-	SOFTWARE_LIST(config, "flop_list").set_original("mz2500_flop");
-	SOFTWARE_LIST(config, "flop_list2").set_compatible("mz2000_flop");
-
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(42.954545_MHz_XTAL / 2, 640+108, 0, 640, 480, 0, 200); //unknown clock / divider
 	m_screen->set_screen_update(FUNC(mz2500_state::screen_update));
@@ -1843,6 +1783,16 @@ void mz2500_state::mz2500(machine_config &config)
 	ym.add_route(3, "mono", 0.50);
 
 	SPEAKER_SOUND(config, m_dac1bit).add_route(ALL_OUTPUTS, "mono", 0.50);
+
+	// MZ-1U09, built-in 2 slots
+	for (unsigned i = 0; i < 2; i++)
+	{
+		MZ80_EXP_SLOT(config, m_exp[i], mz2500_exp_devices, nullptr);
+		m_exp[i]->set_iospace(m_maincpu, AS_IO);
+	}
+
+	SOFTWARE_LIST(config, "flop_list").set_original("mz2500_flop");
+	SOFTWARE_LIST(config, "flop_list2").set_compatible("mz2000_flop");
 }
 
 
@@ -1864,9 +1814,6 @@ ROM_START( mz2500 )
 	ROM_REGION( 0x40000, "dictionary", 0 )
 	ROM_LOAD( "dict.rom", 0x00000, 0x40000, CRC(aa957c2b) SHA1(19a5ba85055f048a84ed4e8d471aaff70fcf0374) )
 
-	ROM_REGION( 0x8000, "iplpro", ROMREGION_ERASEFF )
-	ROM_LOAD( "sasi.rom", 0x00000, 0x8000, CRC(a7bf39ce) SHA1(3f4a237fc4f34bac6fe2bbda4ce4d16d42400081) )
-
 	ROM_REGION( 0x8000, "phone", ROMREGION_ERASEFF )
 	ROM_LOAD( "phone.rom", 0x00000, 0x4000, CRC(8e49e4dc) SHA1(2589f0c95028037a41ca32a8fd799c5f085dab51) )
 ROM_END
@@ -1887,9 +1834,6 @@ ROM_START( mz2520 )
 
 	ROM_REGION( 0x40000, "dictionary", 0 )
 	ROM_LOAD( "dict.rom", 0x00000, 0x40000, CRC(aa957c2b) SHA1(19a5ba85055f048a84ed4e8d471aaff70fcf0374) )
-
-	ROM_REGION( 0x8000, "iplpro", ROMREGION_ERASEFF )
-	ROM_LOAD( "sasi.rom", 0x00000, 0x8000, CRC(a7bf39ce) SHA1(3f4a237fc4f34bac6fe2bbda4ce4d16d42400081) )
 
 	ROM_REGION( 0x8000, "phone", ROMREGION_ERASEFF )
 	ROM_LOAD( "phone.rom", 0x00000, 0x4000, CRC(8e49e4dc) SHA1(2589f0c95028037a41ca32a8fd799c5f085dab51) )

@@ -2170,6 +2170,23 @@ if (BUSES["MTX"]~=null) then
 	}
 end
 
+---------------------------------------------------
+--
+--@src/devices/bus/mz80/mz80_exp.h,BUSES["MZ80"] = true
+---------------------------------------------------
+
+if (BUSES["MZ80"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/mz80/mz1e30.cpp",
+		MAME_DIR .. "src/devices/bus/mz80/mz1e30.h",
+		MAME_DIR .. "src/devices/bus/mz80/mz1e35.cpp",
+		MAME_DIR .. "src/devices/bus/mz80/mz1e35.h",
+		MAME_DIR .. "src/devices/bus/mz80/mz1r37.cpp",
+		MAME_DIR .. "src/devices/bus/mz80/mz1r37.h",
+		MAME_DIR .. "src/devices/bus/mz80/mz80_exp.cpp",
+		MAME_DIR .. "src/devices/bus/mz80/mz80_exp.h",
+	}
+end
 
 ---------------------------------------------------
 --

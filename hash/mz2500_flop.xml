@@ -497,17 +497,15 @@ Moans about missing Master Disk after title screen
 		</part>
 	</software>
 
-	<software name="dustbx01" supported="no">
+	<software name="dustbx01" supported="partial">
 		<description>Dust Box Vol. 1 - '90/4</description>
 		<year>1990</year>
 		<publisher>&lt;coverdisk&gt;</publisher>
-		<notes><![CDATA[
-"Data error in 290", falls back to BASIC prompt, keeps pushing NL control char to output
-]]></notes>
+		<info name="usage" value="Incompatible with MZ-1E30 bios 0 (crashes at startup)" />
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
-				<rom name="dust box vol 1.d88" size="697008" crc="170fc283" sha1="d67798df7b07ff69afa6d58872d315d1ab7eaab8" status="baddump" />
+				<rom name="dust box vol 1.d88" size="697008" crc="170fc283" sha1="d67798df7b07ff69afa6d58872d315d1ab7eaab8" />
 			</dataarea>
 		</part>
 	</software>
@@ -516,9 +514,7 @@ Moans about missing Master Disk after title screen
 		<description>Dust Box Vol. 2</description>
 		<year>1990</year>
 		<publisher>&lt;coverdisk&gt;</publisher>
-		<notes><![CDATA[
-Hangs on title screen with stuck note
-]]></notes>
+		<info name="usage" value="Incompatible with MZ-1E30 bios 0 (crashes at startup)" />
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -527,17 +523,15 @@ Hangs on title screen with stuck note
 		</part>
 	</software>
 
-	<software name="dustbx03" supported="no">
+	<software name="dustbx03" supported="partial">
 		<description>Dust Box Vol. 3 - '90/9</description>
 		<year>1990</year>
 		<publisher>&lt;coverdisk&gt;</publisher>
-		<notes><![CDATA[
-"Data error in 270", falls back to BASIC prompt, keeps pushing NL control char to output
-]]></notes>
+		<info name="usage" value="Incompatible with MZ-1E30 bios 0 (crashes at startup)" />
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
-				<rom name="dust box vol 3.d88" size="697008" crc="84e61343" sha1="721d2369a268ddef97a363f35ed7bbb4974ae79b" status="baddump" />
+				<rom name="dust box vol 3.d88" size="697008" crc="84e61343" sha1="721d2369a268ddef97a363f35ed7bbb4974ae79b" />
 			</dataarea>
 		</part>
 	</software>

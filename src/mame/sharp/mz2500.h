@@ -9,6 +9,7 @@
 #pragma once
 
 #include "bus/msx/ctrl/ctrl.h"
+#include "bus/mz80/mz80_exp.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
@@ -49,6 +50,7 @@ public:
 		, m_tvram(*this, "tvram")
 		, m_cgram(*this, "cgram")
 		, m_wram(*this, "wram")
+		, m_exp(*this, "exp%u", 0U)
 	{ }
 
 	void mz2500(machine_config &config);
@@ -72,15 +74,14 @@ private:
 	required_shared_ptr<u8> m_tvram;
 	required_shared_ptr<u8> m_cgram;
 	required_shared_ptr<u8> m_wram;
+	required_device_array<mz80_exp_slot_device, 2> m_exp;
 
 	u8 *m_ipl_rom = nullptr;
 	u8 *m_kanji_rom = nullptr;
 	u8 *m_kanji2_rom = nullptr;
 	std::unique_ptr<u8[]> m_pcg_ram;
-	std::unique_ptr<u8[]> m_emm_ram;
 	u8 *m_dic_rom = nullptr;
 	u8 *m_phone_rom = nullptr;
-	u8 *m_iplpro_rom = nullptr;
 
 	emu_timer *m_ipl_reset_timer = nullptr;
 
@@ -117,13 +118,9 @@ private:
 	int m_scr_x_size = 0;
 	int m_scr_y_size = 0;
 	u8 m_cg_clear_flag = 0;
-	uint32_t m_rom_index = 0;
-	u8 m_hrom_index = 0;
-	u8 m_lrom_index = 0;
 	struct { u8 r = 0, g = 0, b = 0; } m_pal[16];
 	u8 m_joy_mode = 0;
 	uint16_t m_kanji_index = 0;
-	uint32_t m_emm_offset = 0;
 	u8 m_old_portc = 0;
 	u8 m_prev_col_val = 0;
 	u8 m_pio_latchb = 0;
@@ -141,8 +138,6 @@ private:
 	void tv_crtc_w(offs_t offset, u8 data);
 	void irq_sel_w(u8 data);
 	void irq_data_w(u8 data);
-	u8 rom_r(offs_t offset);
-	void rom_w(offs_t offset, u8 data);
 	void palette4096_io_w(offs_t offset, u8 data);
 	u8 bplane_latch_r();
 	u8 rplane_latch_r();
@@ -157,9 +152,6 @@ private:
 	void kanji_w(offs_t offset, u8 data);
 	u8 rp5c15_8_r(offs_t offset);
 	void rp5c15_8_w(offs_t offset, u8 data);
-	u8 emm_data_r(offs_t offset);
-	void emm_address_w(offs_t offset, u8 data);
-	void emm_data_w(offs_t offset, u8 data);
 
 	u8 rmw_r(offs_t offset);
 	void rmw_w(offs_t offset, u8 data);
