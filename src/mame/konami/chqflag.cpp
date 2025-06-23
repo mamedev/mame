@@ -85,7 +85,7 @@ protected:
 private:
 	/* misc */
 	int m_k051316_readroms = 0;
-	int m_last_vreg = 0;
+	int m_last_vreg = 0xff;
 	int m_analog_ctrl = 0;
 
 	/* devices */
@@ -99,7 +99,6 @@ private:
 
 	/* memory pointers */
 	required_memory_bank m_rombank;
-	void update_background_shadows(uint8_t data);
 
 	required_ioport_array<2> m_analog_input;
 	output_finder<> m_start_lamp;
@@ -203,23 +202,26 @@ void chqflag_state::chqflag_vreg_w(uint8_t data)
 	 * 0x80 is used when rain shows up (which should be white/highlighted)
 	 * 0x88 is for when night shows up (max amount of highlight)
 	 * 0x08 is used at dawn after 0x88 state
-	 * The shadow part looks ugly when rain starts/ends pouring (-> black colored with a setting of 0x00),
 	 * the reference shows dimmed background when this event occurs,
 	 * might be actually disabling the shadow here (-> setting 1.0f instead).
 	 *
 	 * TODO: true values aren't known, also shadow_factors table probably scales towards zero instead (game doesn't use those)
 	 */
-	const double shadow_factors[4] = { 0.8, 1.2, 1.4, 1.6 };
-	uint8_t shadow_value = BIT(data, 3);
-	uint8_t shadow_setting = BIT(data, 7);
 
-	m_palette->set_shadow_factor(shadow_factors[(shadow_setting << 1) | shadow_value]);
-
-	if (shadow_setting != m_last_vreg)
+	if ((data ^ m_last_vreg) & 0x88)
 	{
-		m_last_vreg = shadow_setting;
-		update_background_shadows(shadow_setting);
+		const double bg_brightness[4] = { 1.0, 0.9, 0.8, 0.7 };
+		const double highlight_factor[4] = { 1.1, 1.15, 1.25, 1.4 };
+		const int index = BIT(data, 3) | (BIT(data, 7) << 1);
+
+		for (int i = 512; i < 1024; i++)
+			m_palette->set_pen_contrast(i, bg_brightness[index]);
+
+		m_palette->set_shadow_factor(0.8); // only index 0 used?
+		m_palette->set_highlight_factor(highlight_factor[index]);
 	}
+
+	m_last_vreg = data;
 
 	//if ((data & 0xf8) && (data & 0xf8) != 0x88)
 	//  popmessage("chqflag_vreg_w %02x",data);
@@ -401,17 +403,9 @@ void chqflag_state::machine_start()
 void chqflag_state::machine_reset()
 {
 	m_k051316_readroms = 0;
-	m_last_vreg = 0;
 	m_analog_ctrl = 0;
-	update_background_shadows(0);
-}
 
-inline void chqflag_state::update_background_shadows(uint8_t data)
-{
-	double brt = (data & 1) ? 0.8 : 1.0;
-
-	for (int i = 512; i < 1024; i++)
-		m_palette->set_pen_contrast(i, brt);
+	chqflag_vreg_w(0);
 }
 
 void chqflag_state::chqflag(machine_config &config)
@@ -439,11 +433,13 @@ void chqflag_state::chqflag(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 	m_palette->enable_shadows();
+	m_palette->enable_hilights();
 
 	K051960(config, m_k051960, 0);
 	m_k051960->set_palette(m_palette);
 	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(chqflag_state::sprite_callback));
+	m_k051960->k051937_shadow_mode().set(m_palette, FUNC(palette_device::set_shadow_mode));
 	m_k051960->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 	m_k051960->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 

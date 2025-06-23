@@ -144,6 +144,7 @@ k051960_device::k051960_device(const machine_config &mconfig, const char *tag, d
 	, m_sprite_rom(*this, DEVICE_SELF)
 	, m_scanline_timer(nullptr)
 	, m_k051960_cb(*this)
+	, m_shadow_config_cb(*this)
 	, m_irq_handler(*this)
 	, m_firq_handler(*this)
 	, m_nmi_handler(*this)
@@ -335,6 +336,9 @@ void k051960_device::k051937_w(offs_t offset, u8 data)
 			logerror("%s: %02x to 051937 address %x\n", machine().describe_context(), data, offset);
 
 		m_shadow_config = data & 0x07;
+
+		// callback for setting palette shadow mode
+		m_shadow_config_cb(m_shadow_config & 1);
 	}
 	else if (offset >= 2 && offset < 5)
 	{

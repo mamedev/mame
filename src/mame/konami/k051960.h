@@ -31,9 +31,9 @@ public:
 	k051960_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto irq_handler() { return m_irq_handler.bind(); }
-
 	auto nmi_handler() { return m_nmi_handler.bind(); }
 
+	auto k051937_shadow_mode() { return m_shadow_config_cb.bind(); }
 
 	// static configuration
 	template <typename... T> void set_sprite_callback(T &&... args) { m_k051960_cb.set(std::forward<T>(args)...); }
@@ -77,6 +77,7 @@ private:
 	emu_timer *m_scanline_timer;
 
 	sprite_delegate m_k051960_cb;
+	devcb_write_line m_shadow_config_cb;
 
 	devcb_write_line m_irq_handler;
 	// TODO: is this even used by anything?
