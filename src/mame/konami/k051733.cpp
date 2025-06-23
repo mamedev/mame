@@ -110,10 +110,10 @@ u8 k051733_device::read(offs_t offset)
 	u16 const op3 = (m_ram[0x04] << 8) | m_ram[0x05];
 
 	u16 const rad = (m_ram[0x06] << 8) | m_ram[0x07];
-	u16 const yobj1c = (m_ram[0x08] << 8) | m_ram[0x09];
-	u16 const xobj1c = (m_ram[0x0a] << 8) | m_ram[0x0b];
-	u16 const yobj2c = (m_ram[0x0c] << 8) | m_ram[0x0d];
-	u16 const xobj2c = (m_ram[0x0e] << 8) | m_ram[0x0f];
+	u16 const y1 = (m_ram[0x08] << 8) | m_ram[0x09];
+	u16 const x1 = (m_ram[0x0a] << 8) | m_ram[0x0b];
+	u16 const y2 = (m_ram[0x0c] << 8) | m_ram[0x0d];
+	u16 const x2 = (m_ram[0x0e] << 8) | m_ram[0x0f];
 
 	switch (offset)
 	{
@@ -148,37 +148,50 @@ u8 k051733_device::read(offs_t offset)
 			return lfsr;
 
 		case 0x07:
-			// note: Chequered Flag definitely wants all these bits to be enabled
-			if (abs(xobj1c - xobj2c) > rad || abs(yobj1c - yobj2c) > rad)
+		{
+			const int dx = x2 - x1;
+			const int dy = y2 - y1;
+
+			// note: Chequered Flag definitely wants all these bits to be set
+			if (abs(dx) > rad || abs(dy) > rad)
 				return 0xff;
 
-			else if (yobj1c > yobj2c)
+			// octant angle
+			if (y1 >= y2)
 			{
-				if (xobj1c == xobj2c)
-					return 0x06;
-				else if (xobj1c > xobj2c)
-					return 0x00;
+				if (x1 >= x2)
+				{
+					if (dy >= dx)
+						return 0x00;
+					else
+						return 0x06;
+				}
 				else
-					return 0x04;
-			}
-			else if (yobj1c < yobj2c)
-			{
-				if (xobj1c == xobj2c)
-					return 0x02;
-				else if (xobj1c > xobj2c)
-					return 0x01;
-				else
-					return 0x05;
+				{
+					if (dy >= -dx)
+						return 0x04;
+					else
+						return 0x07;
+				}
 			}
 			else
 			{
-				if (xobj1c == xobj2c)
-					return 0x00;
-				else if (xobj1c > xobj2c)
-					return 0x00;
+				if (x1 >= x2)
+				{
+					if (dy > -dx)
+						return 0x02;
+					else
+						return 0x01;
+				}
 				else
-					return 0x04;
+				{
+					if (dy > dx)
+						return 0x03;
+					else
+						return 0x05;
+				}
 			}
+		}
 	}
 
 	return 0;

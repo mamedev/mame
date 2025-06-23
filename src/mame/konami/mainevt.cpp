@@ -11,8 +11,7 @@ Notes:
 - Schematics show a palette/work RAM bank selector, but this doesn't seem
   to be used?
 
-- Devastators: has player-trench collision detection issues, player isn't
-  supposed to go through them.
+- Devastators: can't shoot the watchtowers on the left side, protection?
 
 - Devastators: sprite zooming for the planes in level 2 is particularly bad.
 
