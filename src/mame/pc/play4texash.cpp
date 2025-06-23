@@ -78,7 +78,7 @@ ROM_START(play4texash)
 
 	ROM_REGION(0x50000, "plds", 0)
 	ROM_LOAD("15-02_lc4256v.u4.jed", 0x00000, 0x2d182, CRC(954e2812) SHA1(573b17d85058512ace9a50cfee510580e6bf7d23)) // Lattice ispMACH LC4256V. Not converted to BIN because jedutil does not support it
-	ROM_LOAD("81-lc4384v.u31",       0x00000, 0x4be4d, CRC(c4ded582) SHA1(d24e10301338207f8342963b9330820994fb05de)) // Lattice ispMACH LC4384V. Not converted to BIN because jedutil does not support it
+	ROM_LOAD("81-lc4384v.u31.jed",   0x00000, 0x4be4d, CRC(c4ded582) SHA1(d24e10301338207f8342963b9330820994fb05de)) // Lattice ispMACH LC4384V. Not converted to BIN because jedutil does not support it
 
 	DISK_REGION("ide:0:hdd")
 	DISK_IMAGE("sleic_play_4_texas_holdem_v2.1.4_12-00314", 0, SHA1(6cbf515ee80a68c98a13be02b17c9d306f4e1445)) // Transcend CompactFlash 133x 1GB
