@@ -12,9 +12,11 @@ TODO:
   (check Back to the Future);
 - Add remaining missing peripherals, SIO, HDD and w1300a network;
 - reverse / blanking tvram attributes;
-- Crashes with IPLPRO disabled, why?
 - Implement backward compatibility with MZ-2000/MZ-80B;
 - Implement expansion box unit;
+- Remaining SIO ports (DA-25 and DE-9);
+- mouse: missing select line from OPN Port A;
+- dustbx**: cannot detect mouse reliably from bootstrap, works in main menu regardless;
 
 **************************************************************************************************/
 
@@ -1130,6 +1132,38 @@ void mz2500_state::rp5c15_8_w(offs_t offset, u8 data)
 	m_rtc->write(rtc_index, data);
 }
 
+template <unsigned N> u8 mz2500_state::sio_access_r(address_space &space, offs_t offset)
+{
+	if (N != m_sio_access_bit)
+		return space.unmap();
+	return m_sio->ba_cd_r(offset);
+}
+
+template <unsigned N> void mz2500_state::sio_access_w(address_space &space, offs_t offset, u8 data)
+{
+	if (N == m_sio_access_bit)
+		m_sio->ba_cd_w(offset, data);
+}
+
+/*
+ * x--- ---- Select SIO port (0) $a0-$a3 (1) $b0-$b3
+ * --xx x--- Baud rate for Ch. A
+ * ---- -xxx Baud rate for Ch. B
+ * ---- -000 307'000 Hz / 19200 bps
+ * ...
+ * ---- -111 2400 Hz / 150 bps
+ */
+void mz2500_state::sio_setup_w(u8 data)
+{
+	m_sio_access_bit = !!(BIT(data, 7));
+
+	attotime serial_clock_a = attotime::from_hz((4'000'000 / 13) / (1 << ((data >> 3) & 7)));
+	attotime serial_clock_b = attotime::from_hz((4'000'000 / 13) / (1 << ((data >> 0) & 7)));
+
+	m_sio_timer[0]->adjust(serial_clock_a, 0, serial_clock_a);
+	m_sio_timer[1]->adjust(serial_clock_b, 0, serial_clock_b);
+}
+
 void mz2500_state::z80_map(address_map &map)
 {
 	map(0x0000, 0x1fff).m(m_rambank[0], FUNC(address_map_bank_device::amap8));
@@ -1170,7 +1204,8 @@ void mz2500_state::z80_io(address_map &map)
 //  map(0x60, 0x63).mirror(0xff00).w(FUNC(mz2500_state::w3100a_w));
 //  map(0x63, 0x63).mirror(0xff00).r(FUNC(mz2500_state::w3100a_r));
 //  map(0x98, 0x99) MZ-1E35 ADPCM
-	map(0xa0, 0xa3).mirror(0xff00).rw("z80sio", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
+	map(0xa0, 0xa3).mirror(0xff00).rw(FUNC(mz2500_state::sio_access_r<0>), FUNC(mz2500_state::sio_access_w<0>));
+	map(0xb0, 0xb3).mirror(0xff00).rw(FUNC(mz2500_state::sio_access_r<1>), FUNC(mz2500_state::sio_access_w<1>));
 //  map(0xa4, 0xa5) MZ-1E30 SASI
 //  map(0xa8, 0xa9) ^
 //  map(0xac, 0xac) MZ-1R37 EMM
@@ -1192,6 +1227,7 @@ void mz2500_state::z80_io(address_map &map)
 	// MZ-1E26
 	map(0xca, 0xca).mirror(0xff00).lr8(NAME([] () { return 0x30; }));
 	map(0xcc, 0xcc).select(0xff00).rw(FUNC(mz2500_state::rp5c15_8_r), FUNC(mz2500_state::rp5c15_8_w));
+	map(0xcd, 0xcd).mirror(0xff00).w(FUNC(mz2500_state::sio_setup_w));
 	map(0xce, 0xce).mirror(0xff00).w(FUNC(mz2500_state::dictionary_bank_w));
 	map(0xcf, 0xcf).mirror(0xff00).w(FUNC(mz2500_state::kanji_bank_w));
 	map(0xd8, 0xdb).mirror(0xff00).rw(m_fdc, FUNC(mb8876_device::read), FUNC(mb8876_device::write));
@@ -1448,6 +1484,9 @@ void mz2500_state::machine_start()
 	m_cg_clear_flag = 0;
 
 	m_ipl_reset_timer = timer_alloc(FUNC(mz2500_state::ipl_timer_reset_cb), this);
+
+	m_sio_timer[0] = timer_alloc(FUNC(mz2500_state::sio_clock_cb<0>), this);
+	m_sio_timer[1] = timer_alloc(FUNC(mz2500_state::sio_clock_cb<1>), this);
 }
 
 void mz2500_state::machine_reset()
@@ -1457,6 +1496,7 @@ void mz2500_state::machine_reset()
 
 	m_ipl_reset_timer->adjust(attotime::never);
 
+	m_sio_access_bit = false;
 	m_dac1bit->level_w(0);
 
 //  m_monitor_type = ioport("DSW1")->read() & 0x40 ? 1 : 0;
@@ -1715,9 +1755,39 @@ static void mz2500_floppies(device_slot_interface &device)
 	device.option_add("35dd", FLOPPY_35_DD);
 }
 
+static void mouse_devices(device_slot_interface &device)
+{
+	device.option_add("x68k", X68K_MOUSE);
+}
+
+template <unsigned N> TIMER_CALLBACK_MEMBER(mz2500_state::sio_clock_cb)
+{
+	if (N)
+	{
+		m_sio->rxtxcb_w(0);
+		m_sio->rxtxcb_w(1);
+	}
+	else
+	{
+		m_sio->rxca_w(0);
+		m_sio->rxca_w(1);
+		m_sio->txca_w(0);
+		m_sio->txca_w(1);
+	}
+}
+
+
+static const z80_daisy_config daisy_chain[] =
+{
+//  { "pio" },
+	{ "sio" },
+	{ nullptr }
+};
+
 void mz2500_state::mz2500(machine_config &config)
 {
 	Z80(config, m_maincpu, 24_MHz_XTAL / 4);
+	m_maincpu->set_daisy_config(daisy_chain);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mz2500_state::z80_map);
 	m_maincpu->set_addrmap(AS_IO, &mz2500_state::z80_io);
 	m_maincpu->set_vblank_int("screen", FUNC(mz2500_state::vblank_cb));
@@ -1741,7 +1811,11 @@ void mz2500_state::mz2500(machine_config &config)
 	pio.out_pa_callback().set(FUNC(mz2500_state::pio_porta_w));
 	pio.in_pb_callback().set(FUNC(mz2500_state::pio_porta_r));
 
-	Z80SIO(config, "z80sio", 24_MHz_XTAL / 4);
+	Z80SIO(config, m_sio, 24_MHz_XTAL / 4);
+
+	rs232_port_device &mouse(RS232_PORT(config, "mouse_port", mouse_devices, "x68k"));
+	mouse.rxd_handler().set(m_sio, FUNC(z80sio_device::rxb_w));
+	m_sio->out_dtrb_callback().set(mouse, FUNC(rs232_port_device::write_rts));
 
 	RP5C15(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->alarm().set(FUNC(mz2500_state::rtc_alarm_irq));

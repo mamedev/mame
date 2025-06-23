@@ -11,6 +11,7 @@
 #include "bus/msx/ctrl/ctrl.h"
 #include "bus/mz80/mz80_exp.h"
 #include "cpu/z80/z80.h"
+#include "machine/bankdev.h"
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/rp5c15.h"
@@ -19,11 +20,12 @@
 #include "machine/z80pio.h"
 #include "sound/spkrdev.h"
 #include "sound/ymopn.h"
-#include "machine/bankdev.h"
 #include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
 #include "speaker.h"
+
+#include "x68k_mouse.h"
 
 //#include "imagedev/cassette.h"
 #include "imagedev/floppy.h"
@@ -50,6 +52,7 @@ public:
 		, m_tvram(*this, "tvram")
 		, m_cgram(*this, "cgram")
 		, m_wram(*this, "wram")
+		, m_sio(*this, "sio")
 		, m_exp(*this, "exp%u", 0U)
 	{ }
 
@@ -59,7 +62,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(ipl_reset_cb);
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<rp5c15_device> m_rtc;
 	required_device<pit8253_device> m_pit;
@@ -74,6 +77,7 @@ private:
 	required_shared_ptr<u8> m_tvram;
 	required_shared_ptr<u8> m_cgram;
 	required_shared_ptr<u8> m_wram;
+	required_device<z80sio_device> m_sio;
 	required_device_array<mz80_exp_slot_device, 2> m_exp;
 
 	u8 *m_ipl_rom = nullptr;
@@ -84,6 +88,7 @@ private:
 	u8 *m_phone_rom = nullptr;
 
 	emu_timer *m_ipl_reset_timer = nullptr;
+	emu_timer *m_sio_timer[2]{};
 
 	u8 m_bank_val[8]{};
 	u8 m_bank_addr = 0;
@@ -126,6 +131,7 @@ private:
 	u8 m_pio_latchb = 0;
 	u8 m_ym_porta = 0;
 	u8 m_screen_enable = 0;
+	bool m_sio_access_bit;
 
 	u8 bank_addr_r();
 	void bank_addr_w(u8 data);
@@ -152,6 +158,9 @@ private:
 	void kanji_w(offs_t offset, u8 data);
 	u8 rp5c15_8_r(offs_t offset);
 	void rp5c15_8_w(offs_t offset, u8 data);
+	template <unsigned N> u8 sio_access_r(address_space &space, offs_t offset);
+	template <unsigned N> void sio_access_w(address_space &space, offs_t offset, u8 data);
+	void sio_setup_w(u8 data);
 
 	u8 rmw_r(offs_t offset);
 	void rmw_w(offs_t offset, u8 data);
@@ -160,6 +169,7 @@ private:
 	u8 dict_rom_r(offs_t offset);
 
 	TIMER_CALLBACK_MEMBER(ipl_timer_reset_cb);
+	template <unsigned N> TIMER_CALLBACK_MEMBER(sio_clock_cb);
 
 	u8 cg_latch_compare();
 	virtual void machine_start() override ATTR_COLD;
