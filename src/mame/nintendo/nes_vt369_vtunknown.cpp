@@ -896,6 +896,13 @@ ROM_START( lxcypkdp ) // all games selectable
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
+ROM_START( lxcypksp ) // all games selectable
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "pocketspiderman.u2", 0x00000, 0x4000000, CRC(3e1af689) SHA1(e2ca78c35cd6d827928cf284ea3dcf8b397d347c) )
+
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
+ROM_END
+
 ROM_START( lxcmc250 ) // all games selectable
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	// sub-board was marked for 2GB capacity (A0-A26 address lines), but only address lines A0-A24 are connected to the chip
@@ -1257,6 +1264,7 @@ CONS( 2014, lxcmcyspn, 0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, init_
 
 // JL1895 models, Cyber Arcade Pocket.  This make strange use of the LCDC, the menus are vertical (so must be copied to the LCD rotated) but the games are horizontal as usual
 CONS( 201?, lxcypkdp,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Cyber Arcade Pocket - Disney Princess (JL1895DP)", MACHINE_NOT_WORKING )
+CONS( 201?, lxcypksp,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Cyber Arcade Pocket - Spider-Man (JL1895SP-2)", MACHINE_NOT_WORKING )
 
 CONS( 200?, lxccminn,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Console Colour - Minnie Mouse (JL2800MN)", MACHINE_NOT_WORKING )
 CONS( 200?, lxccplan,  0,  0,  vt36x_32mb_2banks_lexi, vt369, vt36x_state, empty_init,    "Lexibook", "Console Colour - Disney's Planes (JL2800PL)", MACHINE_NOT_WORKING )
@@ -1272,11 +1280,11 @@ CONS( 2017, rtvgc300fz,0,  0,  vt36x_32mb_2banks_lexi300, vt369, vt36x_state, em
 /* The following are also confirmed to be NES/VT derived units, most having a standard set of games with a handful of lazy graphic mods thrown in to fit the unit theme
 
     (handheld units, use standard AAA batteries)
-    Lexibook Compact Cyber Arcade - Batman
     Lexibook Compact Cyber Arcade - Finding Dory
 
     (handheld units, use standard AAA batteries, smaller display)
-    Lexibook Compact Cyber Arcade Pocket - Spiderman (may be what the dump above is)
+    Lexibook Compact Cyber Arcade Pocket - Paw Patrol
+    Lexibook Compact Cyber Arcade Pocket - Frozen
 
     (Handheld units, but different form factor to Compact Cyber Arcade, charged via USB, different menus)
     Lexibook Console Colour - Barbie
