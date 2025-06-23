@@ -202,16 +202,15 @@ void chqflag_state::chqflag_vreg_w(uint8_t data)
 	 * 0x80 is used when rain shows up (which should be white/highlighted)
 	 * 0x88 is for when night shows up (max amount of highlight)
 	 * 0x08 is used at dawn after 0x88 state
-	 * the reference shows dimmed background when this event occurs,
-	 * might be actually disabling the shadow here (-> setting 1.0f instead).
+	 * During rain and night, the reference shows a dimmed background as well.
 	 *
 	 * TODO: true values aren't known, also shadow_factors table probably scales towards zero instead (game doesn't use those)
 	 */
 
 	if ((data ^ m_last_vreg) & 0x88)
 	{
-		const double bg_brightness[4] = { 1.0, 0.9, 0.8, 0.7 };
-		const double highlight_factor[4] = { 1.1, 1.15, 1.25, 1.4 };
+		const double bg_brightness[4] = { 1.0, 1.0, 0.75, 0.75 };
+		const double highlight_factor[4] = { 1.1, 1.15, 1.25, 1.40 };
 		const int index = BIT(data, 3) | (BIT(data, 7) << 1);
 
 		for (int i = 512; i < 1024; i++)
