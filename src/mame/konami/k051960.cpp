@@ -42,7 +42,7 @@ memory map:
            bit 2 = disable shadows for pen 0x0f (priority over bit 1)
            Devastators and MIA set bit 1.
            Ultraman sets the register to 0x0f.
-           Chequered Flag sets bit 0 when background should be dimmed.
+           Chequered Flag sets bit 0 when shadows should be highlights.
            Both Ultraman and Chequered Flag disagree with inverting shadow for
            all pens, so this flag is not emulated (the way described above).
 002-003 W  selects the portion of the gfx ROMs to be read.

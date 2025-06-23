@@ -209,7 +209,7 @@ void chqflag_state::chqflag_vreg_w(uint8_t data)
 	 *
 	 * TODO: true values aren't known, also shadow_factors table probably scales towards zero instead (game doesn't use those)
 	 */
-	const double shadow_factors[4] = { 0.8, 1.0, 1.33, 1.66 };
+	const double shadow_factors[4] = { 0.8, 1.2, 1.4, 1.6 };
 	uint8_t shadow_value = BIT(data, 3);
 	uint8_t shadow_setting = BIT(data, 7);
 
