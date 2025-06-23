@@ -915,12 +915,14 @@ void tmnt_state::mia(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "mono", 1.0).add_route(1, "mono", 1.0);
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545)));
+	ymsnd.add_route(0, "mono", 0.75);
+	ymsnd.add_route(1, "mono", 0.75);
 
 	K007232(config, m_k007232, XTAL(3'579'545));
 	m_k007232->port_write().set(FUNC(tmnt_state::volume_callback));
-	m_k007232->add_route(0, "mono", 0.20);
-	m_k007232->add_route(1, "mono", 0.20);
+	m_k007232->add_route(0, "mono", 0.15);
+	m_k007232->add_route(1, "mono", 0.15);
 }
 
 MACHINE_RESET_MEMBER(tmnt_state,tmnt)
@@ -980,18 +982,20 @@ void tmnt_state::tmnt(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "mono", 1.0).add_route(1, "mono", 1.0);
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545)));
+	ymsnd.add_route(0, "mono", 0.40);
+	ymsnd.add_route(1, "mono", 0.40);
 
 	K007232(config, m_k007232, XTAL(3'579'545));
 	m_k007232->port_write().set(FUNC(tmnt_state::volume_callback));
-	m_k007232->add_route(0, "mono", 0.33);
-	m_k007232->add_route(1, "mono", 0.33);
+	m_k007232->add_route(0, "mono", 0.15);
+	m_k007232->add_route(1, "mono", 0.15);
 
-	UPD7759(config, "upd", XTAL(640'000)).add_route(ALL_OUTPUTS, "mono", 0.60);
+	UPD7759(config, "upd", XTAL(640'000)).add_route(ALL_OUTPUTS, "mono", 0.30);
 
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(1); /* 1 channel for the title music */
-	m_samples->add_route(ALL_OUTPUTS, "mono", 0.5);
+	m_samples->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 void tmnt_state::tmntucbl(machine_config &config)
