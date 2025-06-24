@@ -34,11 +34,6 @@ protected:
 private:
 	enum { ACTIVE = 1, F = 2, Q = 3, HP = 0, LP = 8, RESET_ALL = 0xff };
 
-	static constexpr u32 FH_MIN = 20;
-	static constexpr u32 FH_MAX = 5000;
-	static constexpr u32 FL_MIN = 100;
-	static constexpr u32 FL_MAX = 20000;
-
 	u16 m_chain, m_entry;
 	audio_effect_filter *m_effect;
 

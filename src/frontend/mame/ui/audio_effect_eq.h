@@ -26,15 +26,11 @@ public:
 	virtual ~menu_audio_effect_eq() override;
 
 protected:
-	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
-	virtual void custom_render(uint32_t flags, void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 	virtual void menu_activated() override;
 	virtual void menu_deactivated() override;
 
 private:
 	enum { MODE = 1, SHELF, F, Q, DB, RESET_ALL = 0xff };
-
-	static const u32 freq_limits[5][2];
 
 	u16 m_chain, m_entry;
 	audio_effect_eq *m_effect;

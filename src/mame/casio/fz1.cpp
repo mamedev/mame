@@ -2,23 +2,23 @@
 // copyright-holders:Devin Acker
 
 /*
-	Driver for Casio FZ-1 and FZ-10M/20M samplers
+    Driver for Casio FZ-1 and FZ-10M/20M samplers
 
-	Custom sound + video hardware consists of:
+    Custom sound + video hardware consists of:
 
-	- GAA (uPD65081G-012): address generator for sample RAM
-	- GAB (uPD65042G-052): timing generator for PCM interrupt and sample/hold signals
-	- GAS (uPD65012G-074): bus arbiter & DRAM refresh signal generator
-	- GAX (MB653121): demultiplexes sample RAM output to two DACs
-	- 4x MB87186 DCF/DCA (two inputs/outputs each)
-	- GAL (uPD65012G-046): generates data & strobe signals for LCD controller
-	- HD44350 LCD controller + 2x HD44251 segment drivers
+    - GAA (uPD65081G-012): address generator for sample RAM
+    - GAB (uPD65042G-052): timing generator for PCM interrupt and sample/hold signals
+    - GAS (uPD65012G-074): bus arbiter & DRAM refresh signal generator
+    - GAX (MB653121): demultiplexes sample RAM output to two DACs
+    - 4x MB87186 DCF/DCA (two inputs/outputs each)
+    - GAL (uPD65012G-046): generates data & strobe signals for LCD controller
+    - HD44350 LCD controller + 2x HD44251 segment drivers
 
-	Floppy drive: Panasonic JU-386 @ 360 rpm
-	Disk format: 2HD, 80 tracks * 8 sectors * 1024 bytes
+    Floppy drive: Panasonic JU-386 @ 360 rpm
+    Disk format: 2HD, 80 tracks * 8 sectors * 1024 bytes
 
-	A good deal of hardware and programming info is available courtesy of Rainer Buchty:
-	http://www.buchty.net/casio/
+    A good deal of hardware and programming info is available courtesy of Rainer Buchty:
+    http://www.buchty.net/casio/
 */
 
 #include "emu.h"
@@ -28,8 +28,6 @@
 #include "bus/nscsi/hd.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/nec/v5x.h"
-#include "formats/fz1_dsk.h"
-#include "formats/hxchfe_dsk.h"
 #include "imagedev/floppy.h"
 #include "machine/bankdev.h"
 #include "machine/mb87030.h"
@@ -42,6 +40,10 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include "formats/fz1_dsk.h"
+#include "formats/hxchfe_dsk.h"
+
 
 namespace {
 
@@ -193,10 +195,10 @@ static INPUT_PORTS_START(fz10m)
 
 	PORT_START("AN5")
 	PORT_BIT(0xff, 0xff, IPT_POSITIONAL_V) PORT_NAME("Master Volume") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_PLAYER(2) PORT_CODE_DEC(JOYCODE_Y_DOWN_SWITCH) PORT_CODE_INC(JOYCODE_Y_UP_SWITCH)
-		
+
 	PORT_START("AN6")
 	PORT_BIT(0xff, 0x80, IPT_POSITIONAL_V) PORT_NAME("Value") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_CODE_DEC(JOYCODE_Y_DOWN_SWITCH) PORT_CODE_INC(JOYCODE_Y_UP_SWITCH)
-		
+
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(fz1)
@@ -328,7 +330,7 @@ static INPUT_PORTS_START(fz1)
 
 	PORT_START("kbd:VELOCITY")
 	PORT_BIT(0x3f, 0x3f, IPT_POSITIONAL_V) PORT_NAME("Key Velocity") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_PLAYER(7) PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH) PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH)
-		
+
 	PORT_START("AN1")
 	PORT_BIT(0xff, 0xff, IPT_POSITIONAL_V) PORT_NAME("Volume Pedal") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_PLAYER(6) PORT_CODE_DEC(JOYCODE_Y_DOWN_SWITCH) PORT_CODE_INC(JOYCODE_Y_UP_SWITCH)
 
@@ -337,10 +339,10 @@ static INPUT_PORTS_START(fz1)
 
 	PORT_START("AN3")
 	PORT_BIT(0xff, 0x00, IPT_POSITIONAL_V) PORT_NAME("Modulation Wheel") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_PLAYER(4) PORT_CODE_DEC(JOYCODE_Y_DOWN_SWITCH) PORT_CODE_INC(JOYCODE_Y_UP_SWITCH)
-		
+
 	PORT_START("AN4")
 	PORT_BIT(0xff, 0x7f, IPT_PADDLE)       PORT_NAME("Pitch Wheel") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_MINMAX(0x00, 0xff) PORT_PLAYER(3) PORT_CODE_DEC(JOYCODE_Y_DOWN_SWITCH) PORT_CODE_INC(JOYCODE_Y_UP_SWITCH)
-		
+
 INPUT_PORTS_END
 
 /**************************************************************************/

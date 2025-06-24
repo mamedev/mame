@@ -230,7 +230,7 @@ void audio_effect_filter::build_highpass()
 		set_fl(m_fh);
 
 	auto &fi = m_filter[0];
-    if(!m_highpass_active) {
+	if(!m_highpass_active) {
 		fi.clear();
 		return;
 	}
@@ -238,7 +238,7 @@ void audio_effect_filter::build_highpass()
 	float sr = m_sample_rate;
 	float fh = std::clamp(float(m_fh), 1.0f, sr/2.0f - 1.0f);
 
-    float K = tan(M_PI*fh/sr);
+	float K = tan(M_PI*fh/sr);
 	float K2 = K*K;
 	float Q = m_qh;
 
@@ -256,7 +256,7 @@ void audio_effect_filter::build_lowpass()
 		set_fh(m_fl);
 
 	auto &fi = m_filter[1];
-    if(!m_lowpass_active) {
+	if(!m_lowpass_active) {
 		fi.clear();
 		return;
 	}
@@ -264,7 +264,7 @@ void audio_effect_filter::build_lowpass()
 	float sr = m_sample_rate;
 	float fl = std::clamp(float(m_fl), 1.0f, sr/2.0f - 1.0f);
 
-    float K = tan(M_PI*fl/sr);
+	float K = tan(M_PI*fl/sr);
 	float K2 = K*K;
 	float Q = m_ql;
 

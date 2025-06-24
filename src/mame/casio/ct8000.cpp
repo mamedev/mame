@@ -137,7 +137,7 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(bbd_tick);
 	void bbd_setup_next_tick();
-	
+
 	emu_timer *m_bbd_timer;
 
 	u16 m_key_select;
@@ -315,7 +315,7 @@ void ct8000_state::driver_start()
 void ct8000_state::driver_reset()
 {
 	if (m_bbd)
-		bbd_setup_next_tick();	
+		bbd_setup_next_tick();
 }
 
 //**************************************************************************

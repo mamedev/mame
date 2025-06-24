@@ -671,6 +671,33 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 				return HANDLER_CANCEL;
 			}
 
+			ui_event event;
+			while (machine().ui_input().pop_event(&event))
+			{
+				if (event.target)
+				{
+					switch (event.event_type)
+					{
+					case ui_event::type::NONE:
+					case ui_event::type::WINDOW_FOCUS:
+					case ui_event::type::WINDOW_DEFOCUS:
+					case ui_event::type::MOUSE_WHEEL:
+						break;
+
+					case ui_event::type::POINTER_UPDATE:
+						// exit on primary button down
+						if (BIT(event.pointer_pressed, 0) && (1 == event.pointer_clicks))
+							return HANDLER_CANCEL;
+						break;
+
+					case ui_event::type::POINTER_LEAVE:
+					case ui_event::type::POINTER_ABORT:
+					case ui_event::type::IME_CHAR:
+						break;
+					}
+				}
+			}
+
 			return 0;
 		};
 	set_handler(ui_callback_type::GENERAL, handler_callback_func(&mame_ui_manager::handler_ingame, this));
@@ -799,6 +826,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 		// clear the input memory and wait for all keys to be released
 		poller.reset();
 		while (poller.poll() != INPUT_CODE_INVALID) { }
+		machine().ui_input().reset();
 
 		if (m_handler_callback_type == ui_callback_type::MODAL)
 		{

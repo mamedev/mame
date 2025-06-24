@@ -10,22 +10,25 @@
 
 #include "emu.h"
 #include "ui/audio_effect_reverb.h"
-#include "audio_effects/aeffect.h"
-#include "audio_effects/reverb.h"
 
 #include "ui/ui.h"
 
+#include "audio_effects/aeffect.h"
+#include "audio_effects/reverb.h"
+
 namespace ui {
+
 menu_audio_effect_reverb::menu_audio_effect_reverb(mame_ui_manager &mui, render_container &container, u16 chain, u16 entry, audio_effect *effect)
 	: menu(mui, container)
 {
 	m_chain = chain;
 	m_entry = entry;
-	m_effect = static_cast<audio_effect_reverb *>(effect);
+	m_effect = dynamic_cast<audio_effect_reverb *>(effect);
 	m_preset = m_effect->find_current_preset();
-	set_heading(util::string_format("%s (%s)",
-			_(audio_effect::effect_names[audio_effect::REVERB]),
-			chain == 0xffff ? _("Default") : machine().sound().effect_chain_tag(chain)));
+	set_heading(util::string_format(
+			(chain == 0xffff) ? _("menu-aeffect-heading", "%1$s (default)") : _("menu-aeffect-heading", "%1$s (%2$s)"),
+			_("audio-effect", audio_effect::effect_names[audio_effect::REVERB]),
+			(chain == 0xffff) ? "" : machine().sound().effect_chain_tag(chain)));
 	set_process_flags(PROCESS_LR_REPEAT);
 }
 
@@ -43,7 +46,7 @@ bool menu_audio_effect_reverb::handle(event const *ev)
 	bool shift_pressed = machine().input().code_pressed(KEYCODE_LSHIFT) || machine().input().code_pressed(KEYCODE_RSHIFT);
 
 	switch(ev->iptkey) {
-	case IPT_UI_SELECT: {
+	case IPT_UI_SELECT:
 		switch(uintptr_t(ev->itemref)) {
 		case PRESET:
 			m_effect->load_preset(m_preset);
@@ -61,7 +64,6 @@ bool menu_audio_effect_reverb::handle(event const *ev)
 			return true;
 		}
 		break;
-	}
 
 	case IPT_UI_LEFT: {
 		switch(uintptr_t(ev->itemref)) {
@@ -69,111 +71,132 @@ bool menu_audio_effect_reverb::handle(event const *ev)
 			m_effect->set_mode(0);
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(_("menu-aeffect-reverb", "Bypass"));
+			ev->item->set_flags(flag_mode());
 			return true;
 
 		case PRESET:
-			if(m_preset != 0)
-				m_preset --;
-			reset(reset_options::REMEMBER_POSITION);
+			if(m_preset != 0) {
+				m_preset--;
+				auto const preset_name = _("audio-reverb-preset", audio_effect_reverb::preset_name(m_preset));
+				if (m_preset == m_effect->default_preset())
+					ev->item->set_subtext(util::string_format(_("menu-aeffect-reverb", "%1$s (default)"), preset_name));
+				else
+					ev->item->set_subtext(preset_name);
+				ev->item->set_flags(flag_preset());
+			}
 			return true;
 
 		case DRYL:
 			m_effect->set_dry_level(change_percent(m_effect->dry_level(), false, shift_pressed, ctrl_pressed, alt_pressed));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_percent(m_effect->dry_level()));
+			ev->item->set_flags(flag_percent(m_effect->dry_level(), m_effect->isset_dry_level()));
 			return true;
 
 		case EL:
 			m_effect->set_early_level(change_percent(m_effect->early_level(), false, shift_pressed, ctrl_pressed, alt_pressed));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_percent(m_effect->early_level()));
+			ev->item->set_flags(flag_percent(m_effect->early_level(), m_effect->isset_early_level()));
 			return true;
 
 		case LL:
 			m_effect->set_late_level(change_percent(m_effect->late_level(), false, shift_pressed, ctrl_pressed, alt_pressed));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_percent(m_effect->late_level()));
+			ev->item->set_flags(flag_percent(m_effect->late_level(), m_effect->isset_late_level()));
 			return true;
 
 		case E2LL:
 			m_effect->set_early_to_late_level(change_percent(m_effect->early_to_late_level(), false, shift_pressed, ctrl_pressed, alt_pressed));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_percent(m_effect->early_to_late_level()));
+			ev->item->set_flags(flag_percent(m_effect->early_to_late_level(), m_effect->isset_early_to_late_level()));
 			return true;
 
 		case ERS:
 			m_effect->set_early_room_size(change_percent(m_effect->early_room_size(), false, shift_pressed, ctrl_pressed, alt_pressed));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_percent(m_effect->early_room_size()));
+			ev->item->set_flags(flag_percent(m_effect->early_room_size(), m_effect->isset_early_room_size()));
 			return true;
 
 		case LRS:
 			m_effect->set_late_room_size(change_percent(m_effect->late_room_size(), false, shift_pressed, ctrl_pressed, alt_pressed));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_percent(m_effect->late_room_size()));
+			ev->item->set_flags(flag_percent(m_effect->late_room_size(), m_effect->isset_late_room_size()));
 			return true;
 
 		case SW:
 			m_effect->set_stereo_width(change_percent(m_effect->stereo_width(), false, shift_pressed, ctrl_pressed, alt_pressed));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_percent(m_effect->stereo_width()));
+			ev->item->set_flags(flag_percent(m_effect->stereo_width(), m_effect->isset_stereo_width()));
 			return true;
 
 		case LDIFF:
 			m_effect->set_late_diffusion(change_percent(m_effect->late_diffusion(), false, shift_pressed, ctrl_pressed, alt_pressed));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_percent(m_effect->late_diffusion()));
+			ev->item->set_flags(flag_percent(m_effect->late_diffusion(), m_effect->isset_late_diffusion()));
 			return true;
 
 		case LWANDER:
 			m_effect->set_late_wander(change_percent(m_effect->late_wander(), false, shift_pressed, ctrl_pressed, alt_pressed));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_percent(m_effect->late_wander()));
+			ev->item->set_flags(flag_percent(m_effect->late_wander(), m_effect->isset_late_wander()));
 			return true;
 
 		case EDAMP:
 			m_effect->set_early_damping(change_freq(m_effect->early_damping(), false, shift_pressed, ctrl_pressed, alt_pressed));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_freq(m_effect->early_damping()));
+			ev->item->set_flags(flag_freq(m_effect->early_damping(), m_effect->isset_early_damping()));
 			return true;
 
 		case LDAMP:
 			m_effect->set_late_damping(change_freq(m_effect->late_damping(), false, shift_pressed, ctrl_pressed, alt_pressed));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_freq(m_effect->late_damping()));
+			ev->item->set_flags(flag_freq(m_effect->late_damping(), m_effect->isset_late_damping()));
 			return true;
 
 		case LPDELAY:
 			m_effect->set_late_predelay(change_ms(m_effect->late_predelay(), false, shift_pressed, ctrl_pressed, alt_pressed));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_ms(m_effect->late_predelay()));
+			ev->item->set_flags(flag_ms(m_effect->late_predelay(), m_effect->isset_late_predelay()));
 			return true;
 
 		case LDECAY:
 			m_effect->set_late_global_decay(change_decay(m_effect->late_global_decay(), false, shift_pressed, ctrl_pressed, alt_pressed));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_decay(m_effect->late_global_decay()));
+			ev->item->set_flags(flag_decay(m_effect->late_global_decay(), m_effect->isset_late_global_decay()));
 			return true;
 
 		case LSPIN:
 			m_effect->set_late_spin(change_spin(m_effect->late_spin(), false, shift_pressed, ctrl_pressed, alt_pressed));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_spin(m_effect->late_spin()));
+			ev->item->set_flags(flag_spin(m_effect->late_spin(), m_effect->isset_late_spin()));
 			return true;
 
 		case ETAP:
@@ -181,7 +204,8 @@ bool menu_audio_effect_reverb::handle(event const *ev)
 				m_effect->set_early_tap_setup(m_effect->early_tap_setup() - 1);
 				if(m_chain == 0xffff)
 					machine().sound().default_effect_changed(m_entry);
-				reset(reset_options::REMEMBER_POSITION);
+				ev->item->set_subtext(audio_effect_reverb::early_tap_setup_name(m_effect->early_tap_setup()));
+				ev->item->set_flags(flag_tap_setup());
 			}
 			return true;
 		}
@@ -194,111 +218,132 @@ bool menu_audio_effect_reverb::handle(event const *ev)
 			m_effect->set_mode(1);
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(_("menu-aeffect-reverb", "Active"));
+			ev->item->set_flags(flag_mode());
 			return true;
 
 		case PRESET:
-			if(m_preset != audio_effect_reverb::preset_count() - 1)
-				m_preset ++;
-			reset(reset_options::REMEMBER_POSITION);
+			if(m_preset != audio_effect_reverb::preset_count() - 1) {
+				m_preset++;
+				auto const preset_name = _("audio-reverb-preset", audio_effect_reverb::preset_name(m_preset));
+				if (m_preset == m_effect->default_preset())
+					ev->item->set_subtext(util::string_format(_("menu-aeffect-reverb", "%1$s (default)"), preset_name));
+				else
+					ev->item->set_subtext(preset_name);
+				ev->item->set_flags(flag_preset());
+			}
 			return true;
 
 		case DRYL:
 			m_effect->set_dry_level(change_percent(m_effect->dry_level(), true, shift_pressed, ctrl_pressed, alt_pressed));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_percent(m_effect->dry_level()));
+			ev->item->set_flags(flag_percent(m_effect->dry_level(), m_effect->isset_dry_level()));
 			return true;
 
 		case EL:
 			m_effect->set_early_level(change_percent(m_effect->early_level(), true, shift_pressed, ctrl_pressed, alt_pressed));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_percent(m_effect->early_level()));
+			ev->item->set_flags(flag_percent(m_effect->early_level(), m_effect->isset_early_level()));
 			return true;
 
 		case LL:
 			m_effect->set_late_level(change_percent(m_effect->late_level(), true, shift_pressed, ctrl_pressed, alt_pressed));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_percent(m_effect->late_level()));
+			ev->item->set_flags(flag_percent(m_effect->late_level(), m_effect->isset_late_level()));
 			return true;
 
 		case E2LL:
 			m_effect->set_early_to_late_level(change_percent(m_effect->early_to_late_level(), true, shift_pressed, ctrl_pressed, alt_pressed));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_percent(m_effect->early_to_late_level()));
+			ev->item->set_flags(flag_percent(m_effect->early_to_late_level(), m_effect->isset_early_to_late_level()));
 			return true;
 
 		case ERS:
 			m_effect->set_early_room_size(change_percent(m_effect->early_room_size(), true, shift_pressed, ctrl_pressed, alt_pressed));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_percent(m_effect->early_room_size()));
+			ev->item->set_flags(flag_percent(m_effect->early_room_size(), m_effect->isset_early_room_size()));
 			return true;
 
 		case LRS:
 			m_effect->set_late_room_size(change_percent(m_effect->late_room_size(), true, shift_pressed, ctrl_pressed, alt_pressed));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_percent(m_effect->late_room_size()));
+			ev->item->set_flags(flag_percent(m_effect->late_room_size(), m_effect->isset_late_room_size()));
 			return true;
 
 		case SW:
 			m_effect->set_stereo_width(change_percent(m_effect->stereo_width(), true, shift_pressed, ctrl_pressed, alt_pressed));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_percent(m_effect->stereo_width()));
+			ev->item->set_flags(flag_percent(m_effect->stereo_width(), m_effect->isset_stereo_width()));
 			return true;
 
 		case LDIFF:
 			m_effect->set_late_diffusion(change_percent(m_effect->late_diffusion(), true, shift_pressed, ctrl_pressed, alt_pressed));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_percent(m_effect->late_diffusion()));
+			ev->item->set_flags(flag_percent(m_effect->late_diffusion(), m_effect->isset_late_diffusion()));
 			return true;
 
 		case LWANDER:
 			m_effect->set_late_wander(change_percent(m_effect->late_wander(), true, shift_pressed, ctrl_pressed, alt_pressed));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_percent(m_effect->late_wander()));
+			ev->item->set_flags(flag_percent(m_effect->late_wander(), m_effect->isset_late_wander()));
 			return true;
 
 		case EDAMP:
 			m_effect->set_early_damping(change_freq(m_effect->early_damping(), true, shift_pressed, ctrl_pressed, alt_pressed));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_freq(m_effect->early_damping()));
+			ev->item->set_flags(flag_freq(m_effect->early_damping(), m_effect->isset_early_damping()));
 			return true;
 
 		case LDAMP:
 			m_effect->set_late_damping(change_freq(m_effect->late_damping(), true, shift_pressed, ctrl_pressed, alt_pressed));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_freq(m_effect->late_damping()));
+			ev->item->set_flags(flag_freq(m_effect->late_damping(), m_effect->isset_late_damping()));
 			return true;
 
 		case LPDELAY:
 			m_effect->set_late_predelay(change_ms(m_effect->late_predelay(), true, shift_pressed, ctrl_pressed, alt_pressed));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_ms(m_effect->late_predelay()));
+			ev->item->set_flags(flag_ms(m_effect->late_predelay(), m_effect->isset_late_predelay()));
 			return true;
 
 		case LDECAY:
 			m_effect->set_late_global_decay(change_decay(m_effect->late_global_decay(), true, shift_pressed, ctrl_pressed, alt_pressed));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_decay(m_effect->late_global_decay()));
+			ev->item->set_flags(flag_decay(m_effect->late_global_decay(), m_effect->isset_late_global_decay()));
 			return true;
 
 		case LSPIN:
 			m_effect->set_late_spin(change_spin(m_effect->late_spin(), true, shift_pressed, ctrl_pressed, alt_pressed));
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_spin(m_effect->late_spin()));
+			ev->item->set_flags(flag_spin(m_effect->late_spin(), m_effect->isset_late_spin()));
 			return true;
 
 		case ETAP:
@@ -306,7 +351,8 @@ bool menu_audio_effect_reverb::handle(event const *ev)
 				m_effect->set_early_tap_setup(m_effect->early_tap_setup() + 1);
 				if(m_chain == 0xffff)
 					machine().sound().default_effect_changed(m_entry);
-				reset(reset_options::REMEMBER_POSITION);
+				ev->item->set_subtext(audio_effect_reverb::early_tap_setup_name(m_effect->early_tap_setup()));
+				ev->item->set_flags(flag_tap_setup());
 			}
 			return true;
 		}
@@ -320,112 +366,140 @@ bool menu_audio_effect_reverb::handle(event const *ev)
 			m_effect->reset_mode();
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(m_effect->mode() ? _("menu-aeffect-reverb", "Active") : _("menu-aeffect-reverb", "Bypass"));
+			ev->item->set_flags(flag_mode());
+			return true;
+
+		case PRESET:
+			if(m_preset != m_effect->default_preset()) {
+				m_preset = m_effect->default_preset();
+				auto const preset_name = _("audio-reverb-preset", audio_effect_reverb::preset_name(m_preset));
+				if (m_preset == m_effect->default_preset())
+					ev->item->set_subtext(util::string_format(_("menu-aeffect-reverb", "%1$s (default)"), preset_name));
+				else
+					ev->item->set_subtext(preset_name);
+				ev->item->set_flags(flag_preset());
+			}
 			return true;
 
 		case DRYL:
 			m_effect->reset_dry_level();
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_percent(m_effect->dry_level()));
+			ev->item->set_flags(flag_percent(m_effect->dry_level(), m_effect->isset_dry_level()));
 			return true;
 
 		case EL:
 			m_effect->reset_early_level();
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_percent(m_effect->early_level()));
+			ev->item->set_flags(flag_percent(m_effect->early_level(), m_effect->isset_early_level()));
 			return true;
 
 		case LL:
 			m_effect->reset_late_level();
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_percent(m_effect->late_level()));
+			ev->item->set_flags(flag_percent(m_effect->late_level(), m_effect->isset_late_level()));
 			return true;
 
 		case E2LL:
 			m_effect->reset_early_to_late_level();
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_percent(m_effect->early_to_late_level()));
+			ev->item->set_flags(flag_percent(m_effect->early_to_late_level(), m_effect->isset_early_to_late_level()));
 			return true;
 
 		case ERS:
 			m_effect->reset_early_room_size();
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_percent(m_effect->early_room_size()));
+			ev->item->set_flags(flag_percent(m_effect->early_room_size(), m_effect->isset_early_room_size()));
 			return true;
 
 		case LRS:
 			m_effect->reset_late_room_size();
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_percent(m_effect->late_room_size()));
+			ev->item->set_flags(flag_percent(m_effect->late_room_size(), m_effect->isset_late_room_size()));
 			return true;
 
 		case SW:
 			m_effect->reset_stereo_width();
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_percent(m_effect->stereo_width()));
+			ev->item->set_flags(flag_percent(m_effect->stereo_width(), m_effect->isset_stereo_width()));
 			return true;
 
 		case LDIFF:
 			m_effect->reset_late_diffusion();
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_percent(m_effect->late_diffusion()));
+			ev->item->set_flags(flag_percent(m_effect->late_diffusion(), m_effect->isset_late_diffusion()));
 			return true;
 
 		case LWANDER:
 			m_effect->reset_late_wander();
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_percent(m_effect->late_wander()));
+			ev->item->set_flags(flag_percent(m_effect->late_wander(), m_effect->isset_late_wander()));
 			return true;
 
 		case EDAMP:
 			m_effect->reset_early_damping();
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_freq(m_effect->early_damping()));
+			ev->item->set_flags(flag_freq(m_effect->early_damping(), m_effect->isset_early_damping()));
 			return true;
 
 		case LDAMP:
 			m_effect->reset_late_damping();
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_freq(m_effect->late_damping()));
+			ev->item->set_flags(flag_freq(m_effect->late_damping(), m_effect->isset_late_damping()));
 			return true;
 
 		case LPDELAY:
 			m_effect->reset_late_predelay();
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_ms(m_effect->late_predelay()));
+			ev->item->set_flags(flag_ms(m_effect->late_predelay(), m_effect->isset_late_predelay()));
 			return true;
 
 		case LDECAY:
 			m_effect->reset_late_global_decay();
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_decay(m_effect->late_global_decay()));
+			ev->item->set_flags(flag_decay(m_effect->late_global_decay(), m_effect->isset_late_global_decay()));
 			return true;
 
 		case LSPIN:
 			m_effect->reset_late_spin();
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_spin(m_effect->late_spin()));
+			ev->item->set_flags(flag_spin(m_effect->late_spin(), m_effect->isset_late_spin()));
 			return true;
 
 		case ETAP:
 			m_effect->reset_early_tap_setup();
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(audio_effect_reverb::early_tap_setup_name(m_effect->early_tap_setup()));
+			ev->item->set_flags(flag_tap_setup());
 			return true;
 		}
 		break;
@@ -436,27 +510,27 @@ bool menu_audio_effect_reverb::handle(event const *ev)
 
 std::string menu_audio_effect_reverb::format_percent(double val)
 {
-	return util::string_format("%d%%", u32(val));
+	return util::string_format(_("menu-aeffect-reverb", "%1$d%%"), u32(val));
 }
 
 std::string menu_audio_effect_reverb::format_freq(double val)
 {
-	return util::string_format("%d Hz", u32(val + 0.5));
+	return util::string_format(_("menu-aeffect-reverb", "%1$d Hz"), u32(val + 0.5));
 }
 
-std::string menu_audio_effect_reverb::format_ms(double val)
+std::string menu_audio_effect_reverb::format_ms(float val)
 {
-	return util::string_format("%5.1f ms", val);
+	return util::string_format(_("menu-aeffect-reverb", "%1$5.1f ms"), val);
 }
 
-std::string menu_audio_effect_reverb::format_decay(double val)
+std::string menu_audio_effect_reverb::format_decay(float val)
 {
-	return util::string_format("%5.2f s", val);
+	return util::string_format(_("menu-aeffect-reverb", "%1$5.2f s"), val);
 }
 
 std::string menu_audio_effect_reverb::format_spin(double val)
 {
-	return util::string_format("%3.2f Hz", val);
+	return util::string_format(_("menu-aeffect-reverb", "%1$3.2f Hz"), val);
 }
 
 u32 menu_audio_effect_reverb::flag_mode() const
@@ -498,9 +572,9 @@ u32 menu_audio_effect_reverb::flag_percent(double val, bool isset)
 	u32 flag = 0;
 	if(!isset)
 		flag |= FLAG_INVERT;
-	if(val > 0)
+	if(val > 0.0)
 		flag |= FLAG_LEFT_ARROW;
-	if(val < 100)
+	if(val < 100.0)
 		flag |= FLAG_RIGHT_ARROW;
 	return flag;
 }
@@ -510,33 +584,33 @@ u32 menu_audio_effect_reverb::flag_freq(double val, bool isset)
 	u32 flag = 0;
 	if(!isset)
 		flag |= FLAG_INVERT;
-	if(val > 100)
+	if(val > 100.0)
 		flag |= FLAG_LEFT_ARROW;
-	if(val < 16000)
+	if(val < 16000.0)
 		flag |= FLAG_RIGHT_ARROW;
 	return flag;
 }
 
-u32 menu_audio_effect_reverb::flag_ms(double val, bool isset)
+u32 menu_audio_effect_reverb::flag_ms(float val, bool isset)
 {
 	u32 flag = 0;
 	if(!isset)
 		flag |= FLAG_INVERT;
-	if(val > 0)
+	if(val > 0.0f)
 		flag |= FLAG_LEFT_ARROW;
-	if(val < 200)
+	if(val < 200.0f)
 		flag |= FLAG_RIGHT_ARROW;
 	return flag;
 }
 
-u32 menu_audio_effect_reverb::flag_decay(double val, bool isset)
+u32 menu_audio_effect_reverb::flag_decay(float val, bool isset)
 {
 	u32 flag = 0;
 	if(!isset)
 		flag |= FLAG_INVERT;
-	if(val > 0.1)
+	if(val > 0.1f)
 		flag |= FLAG_LEFT_ARROW;
-	if(val < 30)
+	if(val < 30.0f)
 		flag |= FLAG_RIGHT_ARROW;
 	return flag;
 }
@@ -546,9 +620,9 @@ u32 menu_audio_effect_reverb::flag_spin(double val, bool isset)
 	u32 flag = 0;
 	if(!isset)
 		flag |= FLAG_INVERT;
-	if(val > 0)
+	if(val > 0.0)
 		flag |= FLAG_LEFT_ARROW;
-	if(val < 5)
+	if(val < 5.0)
 		flag |= FLAG_RIGHT_ARROW;
 	return flag;
 }
@@ -622,29 +696,33 @@ double menu_audio_effect_reverb::change_spin(double val, bool inc, bool shift, b
 
 void menu_audio_effect_reverb::populate()
 {
-	item_append(_("Mode"), m_effect->mode() ? _("Active") : _("Bypass"), flag_mode(), (void *)MODE);
-	item_append(_("Load preset"), util::string_format("%s%s", audio_effect_reverb::preset_name(m_preset), m_preset == m_effect->default_preset() ? _(" (Default)") : ""), flag_preset(), (void *)PRESET);
-	item_append(_("Dry level"), format_percent(m_effect->dry_level()), flag_percent(m_effect->dry_level(), m_effect->isset_dry_level()), (void *)DRYL);
-	item_append(_("Stereo width"), format_percent(m_effect->stereo_width()), flag_percent(m_effect->stereo_width(), m_effect->isset_stereo_width()), (void *)SW);
+	item_append(_("menu-aeffect-reverb", "Mode"), m_effect->mode() ? _("menu-aeffect-reverb", "Active") : _("menu-aeffect-reverb", "Bypass"), flag_mode(), (void *)MODE);
+	auto const preset_name = _("audio-reverb-preset", audio_effect_reverb::preset_name(m_preset));
+	if (m_preset == m_effect->default_preset())
+		item_append(_("menu-aeffect-reverb", "Load preset"), util::string_format(_("menu-aeffect-reverb", "%1$s (default)"), preset_name), flag_preset(), (void *)PRESET);
+	else
+		item_append(_("menu-aeffect-reverb", "Load preset"), preset_name, flag_preset(), (void *)PRESET);
+	item_append(_("menu-aeffect-reverb", "Dry level"), format_percent(m_effect->dry_level()), flag_percent(m_effect->dry_level(), m_effect->isset_dry_level()), (void *)DRYL);
+	item_append(_("menu-aeffect-reverb", "Stereo width"), format_percent(m_effect->stereo_width()), flag_percent(m_effect->stereo_width(), m_effect->isset_stereo_width()), (void *)SW);
 
-	item_append(_("Early Reflections"), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
-	item_append(_("Room size"), format_percent(m_effect->early_room_size()), flag_percent(m_effect->early_room_size(), m_effect->isset_early_room_size()), (void *)ERS);
-	item_append(_("Tap setup"), audio_effect_reverb::early_tap_setup_name(m_effect->early_tap_setup()), flag_tap_setup(), (void *)ETAP);
-	item_append(_("Damping"), format_freq(m_effect->early_damping()), flag_freq(m_effect->early_damping(), m_effect->isset_early_damping()), (void *)EDAMP);
-	item_append(_("Level"), format_percent(m_effect->early_level()), flag_percent(m_effect->early_level(), m_effect->isset_early_level()), (void *)EL);
-	item_append(_("Send to Late"), format_percent(m_effect->early_to_late_level()), flag_percent(m_effect->early_to_late_level(), m_effect->isset_early_to_late_level()), (void *)E2LL);
+	item_append(_("menu-aeffect-reverb", "Early Reflections"), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
+	item_append(_("menu-aeffect-reverb", "Room size"), format_percent(m_effect->early_room_size()), flag_percent(m_effect->early_room_size(), m_effect->isset_early_room_size()), (void *)ERS);
+	item_append(_("menu-aeffect-reverb", "Tap setup"), audio_effect_reverb::early_tap_setup_name(m_effect->early_tap_setup()), flag_tap_setup(), (void *)ETAP);
+	item_append(_("menu-aeffect-reverb", "Damping"), format_freq(m_effect->early_damping()), flag_freq(m_effect->early_damping(), m_effect->isset_early_damping()), (void *)EDAMP);
+	item_append(_("menu-aeffect-reverb", "Level"), format_percent(m_effect->early_level()), flag_percent(m_effect->early_level(), m_effect->isset_early_level()), (void *)EL);
+	item_append(_("menu-aeffect-reverb", "Send to Late"), format_percent(m_effect->early_to_late_level()), flag_percent(m_effect->early_to_late_level(), m_effect->isset_early_to_late_level()), (void *)E2LL);
 
-	item_append(_("Late Reflections"), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
-	item_append(_("Room size"), format_percent(m_effect->late_room_size()), flag_percent(m_effect->late_room_size(), m_effect->isset_late_room_size()), (void *)LRS);
-	item_append(_("Damping"), format_freq(m_effect->late_damping()), flag_freq(m_effect->late_damping(), m_effect->isset_late_damping()), (void *)LDAMP);
-	item_append(_("Pre-delay"), format_ms(m_effect->late_predelay()), flag_ms(m_effect->late_predelay(), m_effect->isset_late_predelay()), (void *)LPDELAY);
-	item_append(_("Diffusion"), format_percent(m_effect->late_diffusion()), flag_percent(m_effect->late_diffusion(), m_effect->isset_late_diffusion()), (void *)LDIFF);
-	item_append(_("Wander"), format_percent(m_effect->late_wander()), flag_percent(m_effect->late_wander(), m_effect->isset_late_wander()), (void *)LWANDER);
-	item_append(_("Decay"), format_decay(m_effect->late_global_decay()), flag_decay(m_effect->late_global_decay(), m_effect->isset_late_global_decay()), (void *)LDECAY);
-	item_append(_("Spin"), format_spin(m_effect->late_spin()), flag_spin(m_effect->late_spin(), m_effect->isset_late_spin()), (void *)LSPIN);
-	item_append(_("Level"), format_percent(m_effect->late_level()), flag_percent(m_effect->late_level(), m_effect->isset_late_level()), (void *)LL);
+	item_append(_("menu-aeffect-reverb", "Late Reflections"), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
+	item_append(_("menu-aeffect-reverb", "Room size"), format_percent(m_effect->late_room_size()), flag_percent(m_effect->late_room_size(), m_effect->isset_late_room_size()), (void *)LRS);
+	item_append(_("menu-aeffect-reverb", "Damping"), format_freq(m_effect->late_damping()), flag_freq(m_effect->late_damping(), m_effect->isset_late_damping()), (void *)LDAMP);
+	item_append(_("menu-aeffect-reverb", "Pre-delay"), format_ms(m_effect->late_predelay()), flag_ms(m_effect->late_predelay(), m_effect->isset_late_predelay()), (void *)LPDELAY);
+	item_append(_("menu-aeffect-reverb", "Diffusion"), format_percent(m_effect->late_diffusion()), flag_percent(m_effect->late_diffusion(), m_effect->isset_late_diffusion()), (void *)LDIFF);
+	item_append(_("menu-aeffect-reverb", "Wander"), format_percent(m_effect->late_wander()), flag_percent(m_effect->late_wander(), m_effect->isset_late_wander()), (void *)LWANDER);
+	item_append(_("menu-aeffect-reverb", "Decay"), format_decay(m_effect->late_global_decay()), flag_decay(m_effect->late_global_decay(), m_effect->isset_late_global_decay()), (void *)LDECAY);
+	item_append(_("menu-aeffect-reverb", "Spin"), format_spin(m_effect->late_spin()), flag_spin(m_effect->late_spin(), m_effect->isset_late_spin()), (void *)LSPIN);
+	item_append(_("menu-aeffect-reverb", "Level"), format_percent(m_effect->late_level()), flag_percent(m_effect->late_level(), m_effect->isset_late_level()), (void *)LL);
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_("Reset All"), 0, (void *)RESET_ALL);
+	item_append(_("menu-aeffect-reverb", "Reset All"), 0, (void *)RESET_ALL);
 }
 
 void menu_audio_effect_reverb::recompute_metrics(uint32_t width, uint32_t height, float aspect)

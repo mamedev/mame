@@ -47,19 +47,19 @@ public:
 	// configuration helpers
 	sound_io_device &set_position(u32 channel, double x, double y, double z);
 	sound_io_device &set_position(u32 channel, const osd::channel_position &pos);
-	sound_io_device &front_center(u32 channel = 0)        { return set_position(channel, osd::channel_position::FC); }
-	sound_io_device &front_left(u32 channel = 0)          { return set_position(channel, osd::channel_position::FL); }
-	sound_io_device &front_right(u32 channel = 0)         { return set_position(channel, osd::channel_position::FR); }
-	sound_io_device &rear_center(u32 channel = 0)         { return set_position(channel, osd::channel_position::RC); }
-	sound_io_device &rear_left(u32 channel = 0)           { return set_position(channel, osd::channel_position::RL); }
-	sound_io_device &rear_right(u32 channel = 0)          { return set_position(channel, osd::channel_position::RR); }
-	sound_io_device &headrest_center(u32 channel = 0)     { return set_position(channel, osd::channel_position::HC); }
-	sound_io_device &headrest_left(u32 channel = 0)       { return set_position(channel, osd::channel_position::HL); }
-	sound_io_device &headrest_right(u32 channel = 0)      { return set_position(channel, osd::channel_position::RC); }
-	sound_io_device &backrest(u32 channel = 0)            { return set_position(channel, osd::channel_position::BACKREST); }
-	sound_io_device &unknown(u32 channel = 0)             { return set_position(channel, osd::channel_position::UNKNOWN); }
-	sound_io_device &map_on_request_only(u32 channel = 0) { return set_position(channel, osd::channel_position::ONREQ);   }
-	sound_io_device &lfe(u32 channel = 0)                 { return set_position(channel, osd::channel_position::LFE);     }
+	sound_io_device &front_center(u32 channel = 0)        { return set_position(channel, osd::channel_position::FC()); }
+	sound_io_device &front_left(u32 channel = 0)          { return set_position(channel, osd::channel_position::FL()); }
+	sound_io_device &front_right(u32 channel = 0)         { return set_position(channel, osd::channel_position::FR()); }
+	sound_io_device &rear_center(u32 channel = 0)         { return set_position(channel, osd::channel_position::RC()); }
+	sound_io_device &rear_left(u32 channel = 0)           { return set_position(channel, osd::channel_position::RL()); }
+	sound_io_device &rear_right(u32 channel = 0)          { return set_position(channel, osd::channel_position::RR()); }
+	sound_io_device &headrest_center(u32 channel = 0)     { return set_position(channel, osd::channel_position::HC()); }
+	sound_io_device &headrest_left(u32 channel = 0)       { return set_position(channel, osd::channel_position::HL()); }
+	sound_io_device &headrest_right(u32 channel = 0)      { return set_position(channel, osd::channel_position::RC()); }
+	sound_io_device &backrest(u32 channel = 0)            { return set_position(channel, osd::channel_position::BACKREST()); }
+	sound_io_device &unknown(u32 channel = 0)             { return set_position(channel, osd::channel_position::UNKNOWN()); }
+	sound_io_device &map_on_request_only(u32 channel = 0) { return set_position(channel, osd::channel_position::ONREQ());   }
+	sound_io_device &lfe(u32 channel = 0)                 { return set_position(channel, osd::channel_position::LFE());     }
 
 	sound_io_device &front()                              { return front_left(0).front_right(1); }
 	sound_io_device &rear()                               { return rear_left(0).rear_right(1); }

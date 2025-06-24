@@ -65,8 +65,8 @@ private:
 
 	static std::string format_percent(double val);
 	static std::string format_freq(double val);
-	static std::string format_ms(double val);
-	static std::string format_decay(double val);
+	static std::string format_ms(float val);
+	static std::string format_decay(float val);
 	static std::string format_spin(double val);
 
 	u32 flag_mode() const;
@@ -75,8 +75,8 @@ private:
 
 	static u32 flag_percent(double val, bool isset);
 	static u32 flag_freq(double val, bool isset);
-	static u32 flag_ms(double val, bool isset);
-	static u32 flag_decay(double val, bool isset);
+	static u32 flag_ms(float val, bool isset);
+	static u32 flag_decay(float val, bool isset);
 	static u32 flag_spin(double val, bool isset);
 
 	static double change_percent(double val, bool inc, bool shift, bool ctrl, bool alt);
