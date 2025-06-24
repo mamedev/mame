@@ -28,16 +28,16 @@ void deco_karnovsprites_device::device_start()
 /*
 
   fedcba98 76543210
-0 x....... ........ hide?
+0 x....... ........ show?
 0 ....x... ........ size 16x32
 0 .......x xxxxxxxx y
 
 1 ........ x....... must be 0 for 16x32 sprite to work right
-1 ........ ..x..... y zoom
+1 ........ ..x..... y zoom (size is still 16x16 or 16x32)
 1 ........ ...x.... must be 1 for 16x32 sprite to work right
 1 ........ .....x.. flip x
 1 ........ ......x. flip y
-1 ........ .......x hide?
+1 ........ .......x show?
 
 2 .......x xxxxxxxx x
 
@@ -74,7 +74,7 @@ void deco_karnovsprites_device::draw_sprites(screen_device &screen, bitmap_ind16
 
 		const u16 data1 = spriteram[offs + 1];
 
-		/* the 8-bit implementation had this.  illustrated by enemy projectile explosions in Shackled being left on screen. */
+		// the 8-bit implementation had this, illustrated by enemy projectile explosions in Shackled being left on screen
 		if (!BIT(data1, 0))
 			continue;
 
@@ -88,7 +88,7 @@ void deco_karnovsprites_device::draw_sprites(screen_device &screen, bitmap_ind16
 			sprite &= 0xffe; // taken from 8-bit version
 		}
 
-		/* Convert the co-ords..*/
+		// convert the coords
 		x = (x + 16) & 0x1ff;
 		y = (y + 16) & 0x1ff;
 		x = 256 - x;
@@ -103,7 +103,7 @@ void deco_karnovsprites_device::draw_sprites(screen_device &screen, bitmap_ind16
 				y -= 16;
 		}
 
-		/* Y Flip determines order of multi-sprite */
+		// y flip determines order of multi-sprite
 		int sprite2;
 		if (extra && fy)
 		{
@@ -120,7 +120,7 @@ void deco_karnovsprites_device::draw_sprites(screen_device &screen, bitmap_ind16
 					fx, fy, x, y,
 					screen.priority(), pri_mask, 0);
 
-			/* 1 more sprite drawn underneath */
+			// 1 more sprite drawn underneath
 			if (extra)
 			{
 				gfx(0)->prio_transpen(bitmap, cliprect,
@@ -135,7 +135,7 @@ void deco_karnovsprites_device::draw_sprites(screen_device &screen, bitmap_ind16
 					sprite, colour,
 					fx, fy, x, y, 0);
 
-			/* 1 more sprite drawn underneath */
+			// 1 more sprite drawn underneath
 			if (extra)
 			{
 				gfx(0)->transpen(bitmap, cliprect,
