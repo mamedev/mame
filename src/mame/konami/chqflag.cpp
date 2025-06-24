@@ -432,7 +432,7 @@ void chqflag_state::chqflag(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 	m_palette->enable_shadows();
-	m_palette->enable_hilights();
+	m_palette->enable_highlights();
 
 	K051960(config, m_k051960, 0);
 	m_k051960->set_palette(m_palette);

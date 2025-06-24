@@ -845,7 +845,7 @@ void tmnt_state::cuebrick(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 	m_palette->set_membits(8);
 	m_palette->enable_shadows();
-	m_palette->enable_hilights();
+	m_palette->enable_highlights();
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -895,7 +895,7 @@ void tmnt_state::mia(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 	m_palette->set_membits(8);
 	m_palette->enable_shadows();
-	m_palette->enable_hilights();
+	m_palette->enable_highlights();
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,mia)
 
@@ -962,7 +962,7 @@ void tmnt_state::tmnt(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 	m_palette->set_membits(8);
 	m_palette->enable_shadows();
-	m_palette->enable_hilights();
+	m_palette->enable_highlights();
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,tmnt)
 
