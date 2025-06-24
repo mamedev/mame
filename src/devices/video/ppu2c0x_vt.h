@@ -188,7 +188,7 @@ public:
 
 	u8 spritehigh_2008_r() { return m_2008_spritehigh; }
 	void spritehigh_2008_w(u8 data) { m_2008_spritehigh = data; logerror("%s: spritehigh_2008_w %02x\n", machine().describe_context(), data); }
- 
+
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;

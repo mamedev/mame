@@ -1246,7 +1246,7 @@ void pc9801us_state::pc9801us_io(address_map &map)
 		NAME([this] (offs_t offset) { return m_sdip->read((offset >> 8) + 4); }),
 		NAME([this] (offs_t offset, u8 data) { m_sdip->write((offset >> 8) + 4, data); })
 	);
-//	map(0x8f1f, 0x8f1f).w(m_sdip, FUNC(pc98_sdip_device::bank_w));
+//  map(0x8f1f, 0x8f1f).w(m_sdip, FUNC(pc98_sdip_device::bank_w));
 }
 
 void pc9801bx_state::pc9801bx2_map(address_map &map)
@@ -2639,8 +2639,8 @@ void pc9801us_state::pc9801fs(machine_config &config)
 
 	pit_clock_config(config, xtal / 4);
 
-//	PC98_119_KBD(config.replace(), m_keyb, 0);
-//	m_keyb->rxd_callback().set("sio_kbd", FUNC(i8251_device::write_rxd));
+//  PC98_119_KBD(config.replace(), m_keyb, 0);
+//  m_keyb->rxd_callback().set("sio_kbd", FUNC(i8251_device::write_rxd));
 
 	PC98_SDIP(config, "sdip", 0);
 }

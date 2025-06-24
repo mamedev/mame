@@ -363,7 +363,7 @@ void tr707_audio_device::voice_select_w(u8 data)
 	update_hat_eg();
 
 	LOGMASKED(LOG_TRIGGER, "Voice selected: %02x. Bass: %d, snare: %d, rim/cow: %d, hcp/tamb: %d, hat closed: %d\n",
-	          data, m_bass_variation, m_snare_variation, m_rimshot_cowbell, m_handclap_tambourine, m_hat_is_closed);
+			  data, m_bass_variation, m_snare_variation, m_rimshot_cowbell, m_handclap_tambourine, m_hat_is_closed);
 }
 
 void tr707_audio_device::voice_trigger_w(u16 data)
@@ -1353,7 +1353,7 @@ void roland_tr707_state::update_internal_tempo_timer(bool cap_reset)
 
 	m_tempo_timer->adjust(attotime::from_double(remaining), 0, attotime::from_double(period));
 	LOGMASKED(LOG_TEMPO, "Update tempo timer. R: %f, T: %f, Rem: %f, F: %f, BPM: %f\n",
-	          r, period, remaining, 1.0 / period, 60.0 / period / 24 / 2);
+			  r, period, remaining, 1.0 / period, 60.0 / period / 24 / 2);
 }
 
 void roland_tr707_state::internal_tempo_clock_cb(int state)
@@ -1437,7 +1437,7 @@ void roland_tr707_state::update_accent_adc()
 	m_maincpu->set_input_line(HD6301_IRQ2_LINE, irq2);
 
 	LOGMASKED(LOG_ACCENT, "Update accent ADC - R: %f, V: %f, dt: %f, irq2: %d\n",
-	          r, target_v, dt.as_double(), irq2);
+			  r, target_v, dt.as_double(), irq2);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(roland_tr707_state::accent_adc_timer_tick)

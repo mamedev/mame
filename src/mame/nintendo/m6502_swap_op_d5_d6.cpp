@@ -113,9 +113,9 @@ uint8_t rp2a03_core_swap_op_d5_d6::mi_decrypt::descramble(uint8_t op)
 	{
 		switch (m_whichcrypt)
 		{
-		case 0:	return bitswap<8>(op, 7, 5, 6, 4, 3, 2, 1, 0); break; // most sets (d5/d6 swap)
-		case 1:	return bitswap<8>(op, 7, 6, 5, 1, 3, 2, 4, 0); break; // red5mam/dgun2593/gcs2mgp/240in1ar
-		case 2:	return bitswap<8>(op, 7, 6, 4, 5, 3, 2, 1, 0); break; // vibes240
+		case 0: return bitswap<8>(op, 7, 5, 6, 4, 3, 2, 1, 0); break; // most sets (d5/d6 swap)
+		case 1: return bitswap<8>(op, 7, 6, 5, 1, 3, 2, 4, 0); break; // red5mam/dgun2593/gcs2mgp/240in1ar
+		case 2: return bitswap<8>(op, 7, 6, 4, 5, 3, 2, 1, 0); break; // vibes240
 		}
 	}
 

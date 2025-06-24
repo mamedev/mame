@@ -745,7 +745,7 @@ void ppu_vt3xx_device::lcdc_regs_w(offs_t offset, u8 data)
 	//
 	// of note lxcmcysp (which has a vertical screen squashed to horizontal) writes different
 	// config values here compared to the natively horizontal versions
-	// 
+	//
 	// the real devices scale the higher res images to the lower LCD, dropping pixels
 	logerror("%s: ppu_vt3xx_device::lcdc_regs_w %d %02x\n", machine().describe_context(), offset, data);
 	m_204x_screenregs[offset] = data;
@@ -1078,13 +1078,13 @@ void ppu_vt3xx_device::draw_sprites_high_res(u8* line_priority)
 		height = 4 << height;
 
 		//if (m_scanline == 128)
-		//	logerror("high res sprite %d xpos %02x ypos %02x tile %04x pal %02x xsize %d ysize %d bpp %d flipx %d flipy %d\n", spritenum, xpos, ypos, tilenum, pal, width, height, bpp, flipx, flipy);
+		//  logerror("high res sprite %d xpos %02x ypos %02x tile %04x pal %02x xsize %d ysize %d bpp %d flipx %d flipy %d\n", spritenum, xpos, ypos, tilenum, pal, width, height, bpp, flipx, flipy);
 
 		// if the sprite isn't visible, skip it
 		if ((ypos + height <= m_scanline) || (ypos > m_scanline))
 			continue;
 
-		// compute the character's line to draw 
+		// compute the character's line to draw
 		const int sprite_line = m_scanline - ypos;
 
 		int pattern_offset;
@@ -1110,9 +1110,9 @@ void ppu_vt3xx_device::draw_sprites_high_res(u8* line_priority)
 				/*
 				pixel_data = m_read_onespace_with_relative(pattern_offset + (pixel >> 1));
 				if (pixel & 1)
-					pixel_data >>= 4;
+				    pixel_data >>= 4;
 				else
-					pixel_data &= 0xf;
+				    pixel_data &= 0xf;
 				*/
 				// we're pretending this isn't high-res so skipping pixels
 				pixel_data = m_read_onespace_with_relative(pattern_offset + pixel);
@@ -1165,10 +1165,10 @@ void ppu_vt3xx_device::draw_sprites_standard_res(u8* line_priority)
 
 		// old packed spriteram format
 		int ypos_table = 0x000;
-		int	xpos_table = 0x003;
-		int	tilenum_table = 0x001;
-		int	extra_table = 0x002;
-		int	table_step = 4;
+		int xpos_table = 0x003;
+		int tilenum_table = 0x001;
+		int extra_table = 0x002;
+		int table_step = 4;
 
 		// new expanded spriteram format
 		if (m_newvid_1e & 0x04)
@@ -1256,7 +1256,7 @@ void ppu_vt3xx_device::draw_sprites_standard_res(u8* line_priority)
 		if ((ypos + height <= m_scanline) || (ypos > m_scanline))
 			continue;
 
-		// compute the character's line to draw 
+		// compute the character's line to draw
 		const int sprite_line = m_scanline - ypos;
 
 		// a 16 pixel wide sprite (packed format), at 4bpp, requires 8 bytes for a single line

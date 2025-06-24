@@ -200,9 +200,9 @@ private:
 	u8             m_user_index_mode=0;
 	u8             m_user_index_char_idx=0;
 	u8             m_user_index_window_idx=0;
-	u8	           m_user_index_chars[32];
+	u8             m_user_index_chars[32];
 	bitmap_yuy16   m_osd_font[96];
-	
+
 };
 
 #endif // MAME_MACHINE_LDP1450HLE_H

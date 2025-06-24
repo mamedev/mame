@@ -192,7 +192,7 @@ uint8_t mie_device::read_00()
 //{
 	// Internal rom tests (7800) & 80 and jumps to 8010 if non-zero
 	// What we return is what a memdump sees on a naomi2 board
-//	return offset & 4 ? 0xff : 0x00;
+//  return offset & 4 ? 0xff : 0x00;
 //}
 
 uint8_t mie_device::gpio_r(offs_t offset)

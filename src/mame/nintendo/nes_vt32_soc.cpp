@@ -270,7 +270,7 @@ void nes_vt32_soc_device::vt32_palette_w(offs_t offset, u8 data)
 		// also store an unmodified copy of the data written (no mirroring etc.) for rendering use
 		// it isn't clear how the hardware does this
 		m_ppu->vt3xx_extended_palette_w(offset, data);
-	}	
+	}
 }
 
 void nes_vt32_soc_device::device_start()

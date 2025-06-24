@@ -30,7 +30,7 @@ public:
 	O(vtsetdbk_imp);
 	O(vtgetdbk_imp);
 
-	O(vtldabank_abx);	
+	O(vtldabank_abx);
 	O(vtldabank_idy);
 	O(vtadcx_aba);
 

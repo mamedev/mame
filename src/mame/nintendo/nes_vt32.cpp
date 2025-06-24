@@ -226,8 +226,8 @@ void nes_vt32_base_state::configure_soc(nes_vt02_vt03_soc_device* soc)
 }
 
 // TODO: these should be in the SoC devices - upper_412d_r gets read, compared against, and another register written based on the result (maybe detecting SoC type?)
-uint8_t nes_vt32_base_state::upper_412c_r() { logerror("%s: nes_vt32_base_state:upper_412c_r\n", machine().describe_context());	return 0x00; }
-uint8_t nes_vt32_base_state::upper_412d_r() { logerror("%s: nes_vt32_base_state:upper_412d_r\n", machine().describe_context());	return 0x00; }
+uint8_t nes_vt32_base_state::upper_412c_r() { logerror("%s: nes_vt32_base_state:upper_412c_r\n", machine().describe_context()); return 0x00; }
+uint8_t nes_vt32_base_state::upper_412d_r() { logerror("%s: nes_vt32_base_state:upper_412d_r\n", machine().describe_context()); return 0x00; }
 void nes_vt32_base_state::upper_412c_w(uint8_t data) { logerror("%s: nes_vt32_base_state:upper_412c_w %02x\n", machine().describe_context(), data); }
 
 

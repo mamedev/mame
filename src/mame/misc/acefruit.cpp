@@ -254,15 +254,15 @@ void acefruit_state::sound_w(uint8_t data)
 {
 	/* TODO:
 	PCB pictures suggest that the sound hardware has the part numbers scraped
- 	off.  There's a 14 pin package that looks involved.
+	off.  There's a 14 pin package that looks involved.
 
 	Pin 36 10V on P2 seems to go to possibly a low voltage reset circuit
- 	(mentioned in the manual) at the top left of the board H 13.
+	(mentioned in the manual) at the top left of the board H 13.
 
 	Pin 35 (sound output) seems to go to the TIP120 transistor at position F2 on
- 	the board.  The emitter is connected to ground, and the collector goes to
-  	pin 35 of P2. The base is connected to pin 8 of the 14 pin IC located at H3
-   	on the board near the crystal via the 1K resistor just above the transistor.
+	the board.  The emitter is connected to ground, and the collector goes to
+	pin 35 of P2. The base is connected to pin 8 of the 14 pin IC located at H3
+	on the board near the crystal via the 1K resistor just above the transistor.
 
 	7048 maybe?
 
@@ -646,7 +646,7 @@ void acefruit_state::init_sidewndr()
 
 ROM_START( flshback )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "h9.bin",    	0x000000, 0x000800, CRC(158717a1) SHA1(8dd498853e5e74aafb52bb1dd3fcf07a387c3fb3) )
+	ROM_LOAD( "h9.bin",     0x000000, 0x000800, CRC(158717a1) SHA1(8dd498853e5e74aafb52bb1dd3fcf07a387c3fb3) )
 	ROM_LOAD( "h10.bin",    0x000800, 0x000800, CRC(1f35df6e) SHA1(b371b6bc34d082a4740af34b2f285a2f3c6fd5e6) )
 	ROM_LOAD( "h11.bin",    0x001000, 0x000800, CRC(7db05abe) SHA1(81d01569050b4145f9f30075b0f7164873734b23) )
 	ROM_LOAD( "h12.bin",    0x001800, 0x000800, CRC(5506468a) SHA1(00c0188f227e9be109bf512295798f0059f73216) )

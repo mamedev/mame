@@ -57,27 +57,27 @@ private:
 	 */
 	enum {
 		// Register address offsets
-		R_CONTROL		= 0x00,
-		R_DATA			= 0x10,
-		R_STATUS		= 0x20,
-		R_ADDR_L		= 0x80,
-		R_ADDR_M		= 0xa0,
-		R_ADDR_H		= 0xc0,
+		R_CONTROL       = 0x00,
+		R_DATA          = 0x10,
+		R_STATUS        = 0x20,
+		R_ADDR_L        = 0x80,
+		R_ADDR_M        = 0xa0,
+		R_ADDR_H        = 0xc0,
 
 		// Control register bit fields
-		R_C_DMAON_VALUE	= 0x01,
-		R_C_LOCKOUT		= 0x02,
-		R_C_DMAON_LATCH	= 0x04,
-		R_C_WMODE		= 0x08,
-		R_C_SELECT		= 0x10,
-		R_C_RESET		= 0x20,
+		R_C_DMAON_VALUE = 0x01,
+		R_C_LOCKOUT     = 0x02,
+		R_C_DMAON_LATCH = 0x04,
+		R_C_WMODE       = 0x08,
+		R_C_SELECT      = 0x10,
+		R_C_RESET       = 0x20,
 
 		// Status register bit fields
-		R_S_INP			= 0x01,
-		R_S_CMD			= 0x02,
-		R_S_BSY			= 0x04,
-		R_S_REQ			= 0x08,
-		R_S_MSG			= 0x10,
+		R_S_INP         = 0x01,
+		R_S_CMD         = 0x02,
+		R_S_BSY         = 0x04,
+		R_S_REQ         = 0x08,
+		R_S_MSG         = 0x10,
 	};
 
 	TIMER_CALLBACK_MEMBER(ctrl_change_handler);

@@ -657,58 +657,58 @@ void hikaru_state::mie_f_w(int state)
 }
 
 /* MIE GPIO ports:
-	A not populated DIPSW 6
-	B pending IRQs (active high)
-	  0 - INT0 ANT_INT
-	  1 - PortF 4
-	  2 - PortF 5
-	  3 - PortF 6
-	  4 - INT1 SZK_INT (AICA)
-	  5 - INT2 CN4_INT
-	  6 - INT3 CN3_INT0
-	  7 - INT4 CN3_INT1
-	C INT_MASK, for main SH4 IRL2, 1=enabled,
-	  0 - INT0 (ANT_INT)
-	  1 - portF 4
-	  2 - portF 5
-	  3 - portF 6
-	  4 - INT1 SZK_INT (AICA)
-	  5 - INT2 CN4_INT
-	  6 - INT3 CN3_INT0
-	  7 - INT4 CN3_INT1
-	D Reset (active low) and clock control
-	  0 - System Reset
-	  1 - GP_RES (all GPU ASICs reset)
-	  2 - Slave SH4 Reset
-	  3 - CN4_RES
-	  4 - PCI1_RES (Eurasia)
-	  5 - SND_RES
-	  6 - V S0, video clock PLL control
-	  7 - V S1, video clock PLL control
-	E LEDs and GPU JTAG
-	  0-3 - LEDs 7-10
-	  4 - TRST
-	  5 - TDO
-	  6 - TMS
-	  7 - TCK
-	F
-	  0 - 93C46 SK
-	  1 - 93C46 DI
-	  2 - 93C46 ORG
-	  3 - 93C46 CS
-	  4 - PortF 4 interrupt
-	  5 - PortF 5 interrupt
-	  6 - PortF 6 interrupt
-	  7 - GPU JTAG control, 0 - port E, 1 - external
-	G
-	  0 - 93C46 DO
-	  1 - 
-	  2 - /Test SW7
-	  3 - /Service SW8
-	  4 - FAN2 sensor
-	  5 - FAN1 sensor (not populated)
-	  6 - FAN0 sensor (not populated)
-	  7 - GPU JTAG chain TDO input
+    A not populated DIPSW 6
+    B pending IRQs (active high)
+      0 - INT0 ANT_INT
+      1 - PortF 4
+      2 - PortF 5
+      3 - PortF 6
+      4 - INT1 SZK_INT (AICA)
+      5 - INT2 CN4_INT
+      6 - INT3 CN3_INT0
+      7 - INT4 CN3_INT1
+    C INT_MASK, for main SH4 IRL2, 1=enabled,
+      0 - INT0 (ANT_INT)
+      1 - portF 4
+      2 - portF 5
+      3 - portF 6
+      4 - INT1 SZK_INT (AICA)
+      5 - INT2 CN4_INT
+      6 - INT3 CN3_INT0
+      7 - INT4 CN3_INT1
+    D Reset (active low) and clock control
+      0 - System Reset
+      1 - GP_RES (all GPU ASICs reset)
+      2 - Slave SH4 Reset
+      3 - CN4_RES
+      4 - PCI1_RES (Eurasia)
+      5 - SND_RES
+      6 - V S0, video clock PLL control
+      7 - V S1, video clock PLL control
+    E LEDs and GPU JTAG
+      0-3 - LEDs 7-10
+      4 - TRST
+      5 - TDO
+      6 - TMS
+      7 - TCK
+    F
+      0 - 93C46 SK
+      1 - 93C46 DI
+      2 - 93C46 ORG
+      3 - 93C46 CS
+      4 - PortF 4 interrupt
+      5 - PortF 5 interrupt
+      6 - PortF 6 interrupt
+      7 - GPU JTAG control, 0 - port E, 1 - external
+    G
+      0 - 93C46 DO
+      1 -
+      2 - /Test SW7
+      3 - /Service SW8
+      4 - FAN2 sensor
+      5 - FAN1 sensor (not populated)
+      6 - FAN0 sensor (not populated)
+      7 - GPU JTAG chain TDO input
 */
 
 static INPUT_PORTS_START( hikaru_common )
@@ -722,7 +722,7 @@ static INPUT_PORTS_START( hikaru_common )
 	PORT_START("MIE.5")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("mie_eeprom", FUNC(eeprom_serial_93cxx_device::clk_write))
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("mie_eeprom", FUNC(eeprom_serial_93cxx_device::di_write))
-//	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("mie_eeprom", FUNC(eeprom_serial_93cxx_device::org_write)) // not implemented 8/16 bit mode switch
+//  PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("mie_eeprom", FUNC(eeprom_serial_93cxx_device::org_write)) // not implemented 8/16 bit mode switch
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("mie_eeprom", FUNC(eeprom_serial_93cxx_device::cs_write))
 	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_MEMBER(FUNC(hikaru_state::mie_f_w))
 
@@ -811,7 +811,7 @@ INPUT_PORTS_END
 void hikaru_state::pci_map(address_map& map)
 {
 	// master bridge "Local Bus" area
-//	map(0x00000000, 0x001fffff).rom();   // boot ROM
+//  map(0x00000000, 0x001fffff).rom();   // boot ROM
 	map(0x00400000, 0x007fffff).mirror(0x80000000).noprw(); // r/w trigger "OKBCS" line to PLD between Antarctic and Africa, purpose unknown
 	map(0x00800000, 0x0081ffff).mirror(0x80000000).m(m_mie, FUNC(mie_device::mie_port)).umask16(0x00ff);
 	map(0x00820000, 0x0083ffff).mirror(0x80000000).rw(m_mie, FUNC(mie_device::mem_r), FUNC(mie_device::mem_w)).umask16(0x00ff);
@@ -820,14 +820,14 @@ void hikaru_state::pci_map(address_map& map)
 		NAME([this](offs_t offset) { return (!m_mie->busak_r() << 8) | 0x600; }),
 		NAME([this](offs_t offset, u32 data) { m_mie->busrq_w(BIT(data, 8)); })
 	);
-//	map(0x0a000000, 0x0a0fffff).rw();    // optional ROMBD-specific security
+//  map(0x0a000000, 0x0a0fffff).rw();    // optional ROMBD-specific security
 	map(0x0c700000, 0x0c707fff).rw(tag(), FUNC(hikaru_state::aica0_reg_r), FUNC(hikaru_state::aica0_reg_w));
 	map(0x0c710000, 0x0c71000f).rw("^aicartc0", FUNC(aicartc_device::read), FUNC(aicartc_device::write)).umask32(0x0000ffff);
 	map(0x0c800000, 0x0cffffff).rw(tag(), FUNC(hikaru_state::aica0ram_r), FUNC(hikaru_state::aica0ram_w));
 //  map(0x0d000000, 0x0dffffff).rw();    // optional AICA + RAM
 //  map(0x0e000000, 0x0effffff).rw();    // optional Communication Board
-    map(0x10000000, 0x13ffffff).mirror(0x80000000).rom().region("^user1", 0);
-    map(0x14000000, 0x14ffffff).lrw32(
+	map(0x10000000, 0x13ffffff).mirror(0x80000000).rom().region("^user1", 0);
+	map(0x14000000, 0x14ffffff).lrw32(
 		NAME([this](offs_t offset) { return m_rombd_eeprom->read_sda(); }),
 		NAME([this](offs_t offset, u32 data) {
 			m_rombd_eeprom->write_cs(!BIT(data, 2));
@@ -837,7 +837,7 @@ void hikaru_state::pci_map(address_map& map)
 			})
 	);
 	map(0x18000000, 0x1fffffff).nopr(); // suppress log, boot looking for ROM board 1st in this area
-    map(0x20000000, 0x2fffffff).mirror(0x80000000).rom().region("^user2", 0);
+	map(0x20000000, 0x2fffffff).mirror(0x80000000).rom().region("^user2", 0);
 
 // bridge mapped RAMs
 	map(0x40000000, 0x41ffffff).lrw32(
@@ -853,25 +853,25 @@ void hikaru_state::pci_map(address_map& map)
 
 // PCI
 
-// 	Antarctic ASIC 17C3:11DB (315-6083) 3D GPU Command Processor (CP), connected to slave bridge PCI port B (66MHz)
-// 	BAR0
-// 	map(0x00000000, 0x000000ff).rw();  // control/status registers, note: not clear how exactly it works as it clashing with boot ROM area
-// 	BAR1
-//	map(0x04000000, 0x043fffff).ram(); // texture bank 0, IC41 Australia ASIC internal
-//	map(0x06000000, 0x063fffff).ram(); // texture bank 1, IC42 Australia ASIC internal
+//  Antarctic ASIC 17C3:11DB (315-6083) 3D GPU Command Processor (CP), connected to slave bridge PCI port B (66MHz)
+//  BAR0
+//  map(0x00000000, 0x000000ff).rw();  // control/status registers, note: not clear how exactly it works as it clashing with boot ROM area
+//  BAR1
+//  map(0x04000000, 0x043fffff).ram(); // texture bank 0, IC41 Australia ASIC internal
+//  map(0x06000000, 0x063fffff).ram(); // texture bank 1, IC42 Australia ASIC internal
 
 //  Eurasia ASIC 17C7:11DB (315-6087) 2D GPU, connected to master bridge PCI port C (33MHz)
-// 	BAR0
+//  BAR0
 //  map(0xf2000000, 0xf2000023).rw();  // control, interrupts, status registers
 //  map(0xf2000080, 0xf20000d3).rw();  // CRTC config
 //  map(0xf2000100, 0xf2000103).rw();  // display 0/1 enable
 //  map(0xf2000180, 0xf20001bf).rw();  // display 0 layers registers
 //  map(0xf2000200, 0xf200023f).rw();  // display 1 layers registers
-// 	BAR1
+//  BAR1
 //  map(0xf2040000, 0xf204000f).rw();  // blitter/DMA registers
-// 	BAR2
+//  BAR2
 //  map(0xf2080000, 0xf208000?);       // unused/unknown
-// 	BAR3
+//  BAR3
 //  map(0xf3000000, 0xf37fffff).ram(); // video RAM (frame buffers and layers bitmaps)
 }
 
@@ -913,19 +913,19 @@ void hikaru_state::hikaru(machine_config &config)
 {
 	/* basic machine hardware */
 	SH7091(config, m_maincpu, CPU_CLOCK);
-    m_maincpu->set_md(0, 1);
-    m_maincpu->set_md(1, 0);
-    m_maincpu->set_md(2, 1);
-    m_maincpu->set_md(3, 0);
-    m_maincpu->set_md(4, 0);
-    m_maincpu->set_md(5, 1);
-    m_maincpu->set_md(6, 0);
-    m_maincpu->set_md(7, 1);
-    m_maincpu->set_md(8, 0);
-    m_maincpu->set_sh4_clock(CPU_CLOCK);
+	m_maincpu->set_md(0, 1);
+	m_maincpu->set_md(1, 0);
+	m_maincpu->set_md(2, 1);
+	m_maincpu->set_md(3, 0);
+	m_maincpu->set_md(4, 0);
+	m_maincpu->set_md(5, 1);
+	m_maincpu->set_md(6, 0);
+	m_maincpu->set_md(7, 1);
+	m_maincpu->set_md(8, 0);
+	m_maincpu->set_sh4_clock(CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &hikaru_state::sh4_map_main);
-    m_maincpu->set_addrmap(AS_IO, &hikaru_state::sh4_io_main);
-//	m_maincpu->set_force_no_drc(true);
+	m_maincpu->set_addrmap(AS_IO, &hikaru_state::sh4_io_main);
+//  m_maincpu->set_force_no_drc(true);
 //  m_maincpu->set_vblank_int("screen", FUNC(hikaru_state::vblank));
 
 	SH7091(config, m_slave, CPU_CLOCK);
@@ -941,7 +941,7 @@ void hikaru_state::hikaru(machine_config &config)
 	m_slave->set_sh4_clock(CPU_CLOCK);
 	m_slave->set_addrmap(AS_PROGRAM, &hikaru_state::sh4_map_slave);
 	m_slave->set_addrmap(AS_IO, &hikaru_state::sh4_io_slave);
-//	m_slave->set_force_no_drc(true);
+//  m_slave->set_force_no_drc(true);
 
 	PCI_ROOT(config, "pci0", 0);
 	SEGA315_6154(config, m_315_6154, 0);

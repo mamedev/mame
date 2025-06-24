@@ -580,7 +580,7 @@ void vt3xx_soc_base_device::vt369_411d_w(offs_t offset, u8 data)
 void vt3xx_soc_base_device::vt369_411e_w(offs_t offset, u8 data)
 {
 	logerror("%s: vt369_411e_w (%02x) (external bankswitch + more?)\n", machine().describe_context(), data);
-	m_411e_write_cb(data); 
+	m_411e_write_cb(data);
 }
 
 

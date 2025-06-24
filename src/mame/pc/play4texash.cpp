@@ -56,7 +56,7 @@ INPUT_PORTS_END
 
 void play4texash_state::play4texash(machine_config &config)
 {
-	PENTIUM4(config, m_maincpu, 100'000'000); // Intel Atom N270 SLB73, 1.6 GHz / 512 / 533 
+	PENTIUM4(config, m_maincpu, 100'000'000); // Intel Atom N270 SLB73, 1.6 GHz / 512 / 533
 	m_maincpu->set_addrmap(AS_PROGRAM, &play4texash_state::play4texash_map);
 	m_maincpu->set_addrmap(AS_IO, &play4texash_state::play4texash_io);
 
