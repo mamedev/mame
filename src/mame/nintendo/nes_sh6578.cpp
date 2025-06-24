@@ -752,6 +752,11 @@ ROM_START( dancmix3 )
 	ROM_LOAD( "e28f008sa.u5", 0x00000, 0x100000, CRC(faf6480c) SHA1(68bf79910e091443aecc7bf256cd5378a04c550e) )
 ROM_END
 
+ROM_START( mousekid )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "mousekid.ic2", 0x00000, 0x100000, CRC(465d5b5a) SHA1(a27f01ccc7b741b51ea4a9e4455dc4cee4420a89) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -785,6 +790,9 @@ CONS( 2004?, dgun806,    0,  0,  nes_sh6578, nes_sh6578, nes_sh6578_max10in1_sta
 CONS( 1997, bandgpad,    0,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Bandai", "Multi Game Player Gamepad", MACHINE_NOT_WORKING )
 
 CONS( 1997, bandggcn,    0,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Bandai", "Go! Go! Connie-chan! Asobou Mouse", MACHINE_NOT_WORKING )
+
+// uses a mouse and buttons (no keyboard)
+CONS( 1997, mousekid,    0,  0,  nes_sh6578,     bancook, nes_sh6578_cjz_state, init_nes_sh6578, "Tomy", "Mouse Kids (Japan)", MACHINE_NOT_WORKING )
 
 // おジャ魔女どれみのTVでマジカルクッキング
 CONS( 2001, bancook,     0,  0,  nes_sh6578,     bancook,    nes_sh6578_cjz_state, init_nes_sh6578, "Bandai", "Ojamajo Doremi no TV de Magical Cooking (Japan)", MACHINE_NOT_WORKING )
