@@ -661,7 +661,10 @@ void menu_audio_mixer::populate()
 	if(cursel_line == 0xffffffff)
 		cursel_line = 0;
 
-	if(m_reset_selection.m_maptype == MT_INTERNAL)
+	if(!m_reset_item)
+		m_reset_item = (m_selections[0].m_maptype == MT_NONE) ? ITM_ADD_FULL : ITM_GUEST_CHANNEL;
+
+	else if(m_reset_selection.m_maptype == MT_INTERNAL)
 		cursel_line = 0xffffffff;
 
 	if((cursel_line < m_selections.size()) && (m_selections[cursel_line].m_maptype == MT_FULL)) {
@@ -671,10 +674,30 @@ void menu_audio_mixer::populate()
 
 	// (Re)build the menu
 	uint32_t cursel = 0;
+
+	auto const add_routes = [this, &cursel] ()
+			{
+				item_append(
+						_("menu-audiomix", "Add new full route"),
+						0,
+						reinterpret_cast<void *>(((cursel + 1) << 3) | ITM_ADD_FULL));
+				item_append(
+						_("menu-audiomix", "Add new channel route"),
+						0,
+						reinterpret_cast<void *>(((cursel + 1) << 3) | ITM_ADD_CHANNEL));
+			};
+
 	for(const auto &omap : mapping) {
 		item_append(omap.m_dev->tag(), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
+		bool first = true;
 		for(const auto &nmap : omap.m_node_mappings) {
 			const auto &node = find_node(nmap.m_node);
+
+			if(first) {
+				first = false;
+				add_routes();
+			}
+			item_append(menu_item_type::SEPARATOR);
 
 			item_append(
 					omap.m_dev->is_output() ? _("menu-audiomix", "Output") : _("menu-audiomix", "Input"),
@@ -699,12 +722,17 @@ void menu_audio_mixer::populate()
 					_("menu-audiomix", "Remove this route"),
 					0,
 					reinterpret_cast<void *>(((cursel + 1) << 3) | ITM_REMOVE));
-			item_append(menu_item_type::SEPARATOR);
 
 			++cursel;
 		}
 		for(const auto &cmap : omap.m_channel_mappings) {
 			const auto &node = find_node(cmap.m_node);
+
+			if(first) {
+				first = false;
+				add_routes();
+			}
+			item_append(menu_item_type::SEPARATOR);
 
 			item_append(
 					omap.m_dev->is_output() ? _("menu-audiomix", "Output") : _("menu-audiomix", "Input"),
@@ -734,21 +762,13 @@ void menu_audio_mixer::populate()
 					_("menu-audiomix", "Remove this route"),
 					0,
 					reinterpret_cast<void *>(((cursel + 1) << 3) | ITM_REMOVE));
-			item_append(menu_item_type::SEPARATOR);
 
 			++cursel;
 		}
-		if(omap.m_node_mappings.empty() && omap.m_channel_mappings.empty())
+		if(omap.m_node_mappings.empty() && omap.m_channel_mappings.empty()) {
+			add_routes();
 			++cursel;
-
-		item_append(
-				util::string_format(_("menu-audiomix", "Add %1$s full route"), omap.m_dev->tag()),
-				0,
-				reinterpret_cast<void *>((cursel << 3) | ITM_ADD_FULL));
-		item_append(
-				util::string_format(_("menu-audiomix", "Add %1$s channel route"), omap.m_dev->tag()),
-				0,
-				reinterpret_cast<void *>((cursel << 3) | ITM_ADD_CHANNEL));
+		}
 	}
 
 	item_append(menu_item_type::SEPARATOR);

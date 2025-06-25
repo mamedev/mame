@@ -327,15 +327,15 @@ or input and adjust the volume from -96 dB (quietest) to +12 dB (loudest).  Fo
 channel routes, you can also select the individual emulated channel and host
 channel.  Select **Remove this route** to remove a route.
 
-Select **Add <device> full route** to add a new full route to that group.  If
+Select **Add new full route** to add a new full route to that group.  If
 possible, it will be added and the menu highlight will move to the newly added
 route.  If routes between the highlighted device and every host output/input
 already exist, no route will be added.
 
-Select **Add <device> channel route* to add a new channel route to that group.
-If possible, it will be added and the menu highlight will move to the newly
-added route.  If routes between all channels for the highlighted device and
-every host output/input channel already exist, no route will be added.
+Select **Add new channel route* to add a new channel route to that group.  If
+possible, it will be added and the menu highlight will move to the newly added
+route.  If routes between all channels for the highlighted device and every
+host output/input channel already exist, no route will be added.
 
 Some sound modules allow channel assignments and volumes to be controlled using
 an external mixer interface (for example the PipeWire module for Linux has this
@@ -373,7 +373,7 @@ by output device chains.  When editing the **Default** chain, you can restore
 the built-in default value for a parameter by pressing the UI Clear key
 (Del/Delete/Forward Delete on the keyboard by default).
 
-The Audio Events menu also allows you to configure the algorithm used for audio
+The Audio Effects menu also allows you to configure the algorithm used for audio
 sample rate conversion.  The default **LoFi** algorithm has modest CPU
 requirements.  The **HQ** algorithm provides higher quality sample rate
 conversion at the expense of requiring substantially higher CPU performance.
@@ -391,7 +391,7 @@ low-pass filter can simulate the poor high-frequency response typical of many
 arcade cabinets and television sets.
 
 The Q factor controls how sharp the transition from the stop band to the
-passband is.  Higher factors provide a sharper transition.  Values over 0.7
+passband is.  Higher factors provide a sharper transition.  Values over 0.71
 cause the filter to amplify frequencies close to the cutoff frequency, which
 may be surprising or undesirable.
 
