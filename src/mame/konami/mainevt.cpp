@@ -11,8 +11,6 @@ Notes:
 - Schematics show a palette/work RAM bank selector, but this doesn't seem
   to be used?
 
-- Devastators: sprite zooming for the planes in level 2 is particularly bad.
-
 - HTOTAL is actually 384 (/4 divider for pixel clock, 64 HBLANK clocks),
   but gfx hardware emulation doesn't play along nicely
 
