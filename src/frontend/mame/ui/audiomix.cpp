@@ -38,7 +38,7 @@ enum {
 	ITM_NODE,
 	ITM_NODE_CHANNEL,
 	ITM_DB,
-	ITM_DELETE,
+	ITM_REMOVE,
 	ITM_ADD_FULL,
 	ITM_ADD_CHANNEL
 };
@@ -137,8 +137,8 @@ bool menu_audio_mixer::handle(event const *ev)
 			return false;
 
 		switch(current_item) {
-		case ITM_DELETE:
-			return delete_route(current_item - 1, *current_selection);
+		case ITM_REMOVE:
+			return remove_route(current_item - 1, *current_selection);
 
 		case ITM_ADD_FULL:
 			return add_full(*current_selection);
@@ -312,7 +312,7 @@ found:
 }
 
 
-bool menu_audio_mixer::delete_route(uint32_t cursel_index, select_entry &current_selection)
+bool menu_audio_mixer::remove_route(uint32_t cursel_index, select_entry &current_selection)
 {
 	if(current_selection.m_maptype == MT_FULL) {
 		if(current_selection.m_node == 0)
@@ -693,9 +693,9 @@ void menu_audio_mixer::populate()
 					((nmap.m_db > -96.0f) ? FLAG_LEFT_ARROW : 0) | ((nmap.m_db < 12.0f) ? FLAG_RIGHT_ARROW : 0),
 					reinterpret_cast<void *>(((cursel + 1) << 3) | ITM_DB));
 			item_append(
-					_("menu-audiomix", "Delete route"),
+					_("menu-audiomix", "Remove this route"),
 					0,
-					reinterpret_cast<void *>(((cursel + 1) << 3) | ITM_DELETE));
+					reinterpret_cast<void *>(((cursel + 1) << 3) | ITM_REMOVE));
 			item_append(menu_item_type::SEPARATOR);
 
 			++cursel;
@@ -728,9 +728,9 @@ void menu_audio_mixer::populate()
 					((cmap.m_db > -96.0f) ? FLAG_LEFT_ARROW : 0) | ((cmap.m_db < 12.0f) ? FLAG_RIGHT_ARROW : 0),
 					reinterpret_cast<void *>(((cursel + 1) << 3) | ITM_DB));
 			item_append(
-					_("menu-audiomix", "Delete route"),
+					_("menu-audiomix", "Remove this route"),
 					0,
-					reinterpret_cast<void *>(((cursel + 1) << 3) | ITM_DELETE));
+					reinterpret_cast<void *>(((cursel + 1) << 3) | ITM_REMOVE));
 			item_append(menu_item_type::SEPARATOR);
 
 			++cursel;
@@ -739,11 +739,11 @@ void menu_audio_mixer::populate()
 			++cursel;
 
 		item_append(
-				_("menu-audiomix", "Add new full route"),
+				util::string_format(_("menu-audiomix", "Add %1$s full route"), omap.m_dev->tag()),
 				0,
 				reinterpret_cast<void *>((cursel << 3) | ITM_ADD_FULL));
 		item_append(
-				_("menu-audiomix", "Add new channel route"),
+				util::string_format(_("menu-audiomix", "Add %1$s channel route"), omap.m_dev->tag()),
 				0,
 				reinterpret_cast<void *>((cursel << 3) | ITM_ADD_CHANNEL));
 	}

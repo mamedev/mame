@@ -60,7 +60,7 @@ private:
 
 	bool add_full(select_entry &current_selection);
 	bool add_channel(select_entry &current_selection);
-	bool delete_route(uint32_t cursel_index, select_entry &current_selection);
+	bool remove_route(uint32_t cursel_index, select_entry &current_selection);
 	bool set_prev_guest_channel(select_entry &current_selection);
 	bool set_next_guest_channel(select_entry &current_selection);
 	bool set_prev_node(select_entry &current_selection);
