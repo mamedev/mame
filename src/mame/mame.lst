@@ -35313,21 +35313,22 @@ m82
 @source:nintendo/nes_sh6578.cpp
 6578cjz1
 6578cjz2
+ablwikid
 bancook
-bandgpad
 bandggcn
+bandgpad
 bb6578
 cpatrolm
 dancmix3
-ts_handy11
-ablwikid
+dgun806
+max10in1
 maxx5in1
 maxx6in1
-max10in1
 mousekid
-vsmaxx25
+soulbird
+ts_handy11
 vsmaxx15
-dgun806
+vsmaxx25
 
 @source:nintendo/nes_vt02_vt03.cpp
 88in1joy
@@ -47014,6 +47015,7 @@ shtscore
 teleshi
 teleship
 trkfldch
+trkfldchj
 
 @source:tvgames/tvgame.cpp
 tvgame

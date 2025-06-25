@@ -687,6 +687,11 @@ ROM_START( bancook )
 	ROM_LOAD( "mx27c8000.ic2", 0x00000, 0x100000, CRC(865bef26) SHA1(82820eac162a2b4b4b5da894df4bfc5521d4f89b) )
 ROM_END
 
+ROM_START( soulbird )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "soulbird.ic1", 0x00000, 0x100000, CRC(44262c9e) SHA1(0484a1e52a0cbe29a7cfc8603b5584cfb878d276) )
+ROM_END
+
 ROM_START( ts_handy11 )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tvplaypowercontroller.bin", 0x00000, 0x100000, CRC(9c7fe9ff) SHA1(c872e91ca835b66c9dd3b380e8374b51f12bcae0) ) // 29LV008B
@@ -796,6 +801,10 @@ CONS( 1997, mousekid,    0,  0,  nes_sh6578,     bancook, nes_sh6578_cjz_state, 
 
 // おジャ魔女どれみのTVでマジカルクッキング
 CONS( 2001, bancook,     0,  0,  nes_sh6578,     bancook,    nes_sh6578_cjz_state, init_nes_sh6578, "Bandai", "Ojamajo Doremi no TV de Magical Cooking (Japan)", MACHINE_NOT_WORKING )
+
+// lots of bad gfx, maybe SH6578 issues, maybe some address lines in the wrong order
+CONS( 2001, soulbird,     0,  0,  nes_sh6578,     bancook,    nes_sh6578_cjz_state, init_nes_sh6578, "Bandai", "Soul Bird (Japan)", MACHINE_NOT_WORKING )
+
 
 CONS( 200?, cpatrolm,    0,  0,  nes_sh6578_pal, nes_sh6578, nes_sh6578_state, init_nes_sh6578, "TimeTop", "City Patrolman", MACHINE_NOT_WORKING )
 
