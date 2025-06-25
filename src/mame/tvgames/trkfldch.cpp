@@ -1743,7 +1743,8 @@ The following were also available (via the Download service?)
 
 
 CONS( 2007, trkfldch,  0,          0,  trkfldch, trkfldch,trkfldch_state,      empty_init,    "Konami",                                     "Track & Field Challenge", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-CONS( 2007, trkfldchj, trkfldch,   0,  trkfldch, trkfldch,trkfldch_state,      empty_init,    "Konami",                                     "Track & Field Challenge (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+// 走れ!とべ!投げろ! ハイパースポーツチャレンジ
+CONS( 2007, trkfldchj, trkfldch,   0,  trkfldch, trkfldch,trkfldch_state,      empty_init,    "Konami",                                     "Hashire! Tobe! Nagero! Hyper Sports Challenge (Japan)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 CONS( 2006, my1stddr,  0,          0,  trkfldch, my1stddr,trkfldch_state,      empty_init,    "Konami",                                     "My First Dance Dance Revolution (US)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Japan version has different songs
 
