@@ -88,6 +88,7 @@ private:
 	u8 m_spriterombank[3];
 	u8 m_romoffset;
 	bool m_spriteflip;
+	bool m_sprites_busy;
 	bool m_sprites_disabled;
 	bool m_readroms;
 	u8 m_shadow_config;

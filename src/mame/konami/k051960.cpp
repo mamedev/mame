@@ -24,7 +24,7 @@ The 051960 can also generate IRQ, FIRQ and NMI signals.
 memory map:
 000-007 is for the 051937, but also seen by the 051960
 400-7ff is 051960 only
-000     R  bit 0 = active display flag
+000     R  bit 0 = busy flag for sprite processing (does not toggle if bit 4 is set)
                    aliens waits for it to be 0 before starting to copy sprite data
                    thndrx2 needs it to pulse for the startup checks to succeed
 000     W  bit 0 = irq acknowledge
@@ -149,6 +149,7 @@ k051960_device::k051960_device(const machine_config &mconfig, const char *tag, d
 	, m_nmi_handler(*this)
 	, m_romoffset(0)
 	, m_spriteflip(false)
+	, m_sprites_busy(false)
 	, m_sprites_disabled(false)
 	, m_readroms(false)
 	, m_shadow_config(0)
@@ -211,6 +212,7 @@ void k051960_device::device_start()
 	// register for save states
 	save_item(NAME(m_romoffset));
 	save_item(NAME(m_spriteflip));
+	save_item(NAME(m_sprites_busy));
 	save_item(NAME(m_sprites_disabled));
 	save_item(NAME(m_readroms));
 	save_item(NAME(m_shadow_config));
@@ -228,6 +230,7 @@ void k051960_device::device_reset()
 {
 	m_romoffset = 0;
 	m_spriteflip = false;
+	m_sprites_busy = false;
 	m_sprites_disabled = false;
 	m_readroms = false;
 	m_shadow_config = 0;
@@ -257,8 +260,14 @@ TIMER_CALLBACK_MEMBER( k051960_device::scanline_callback )
 
 		// copy sprites to framebuffer, unless sprite processing was disabled
 		if (!m_sprites_disabled)
+		{
+			m_sprites_busy = true;
 			memcpy(m_buffer, m_ram, sizeof(m_buffer));
+		}
 	}
+
+	if (y == 0)
+		m_sprites_busy = false;
 
 	// wait for next line
 	m_scanline_timer->adjust(screen().time_until_pos(y + 1));
@@ -309,7 +318,7 @@ u8 k051960_device::k051937_r(offs_t offset)
 	if (m_readroms && offset >= 4 && offset < 8)
 		return k051960_fetchromdata(offset & 3);
 	else if (offset == 0)
-		return screen().vblank();
+		return m_sprites_busy ? 1 : 0;
 
 	//logerror("%s: read unknown 051937 address %x\n", m_maincpu->pc(), offset);
 	return 0;
