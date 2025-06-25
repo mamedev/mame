@@ -226,9 +226,6 @@ void audio_effect_filter::set_qh(float q)
 
 void audio_effect_filter::build_highpass()
 {
-	if(m_fh > m_fl)
-		set_fl(m_fh);
-
 	auto &fi = m_filter[0];
 	if(!m_highpass_active) {
 		fi.clear();
@@ -252,9 +249,6 @@ void audio_effect_filter::build_highpass()
 
 void audio_effect_filter::build_lowpass()
 {
-	if(m_fl < m_fh)
-		set_fh(m_fl);
-
 	auto &fi = m_filter[1];
 	if(!m_lowpass_active) {
 		fi.clear();

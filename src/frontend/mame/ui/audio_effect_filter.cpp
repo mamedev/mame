@@ -202,10 +202,17 @@ bool menu_audio_effect_filter::handle(event const *ev)
 		case F | LP: {
 			u32 f = decrement_f(m_effect->fl(), alt_pressed, ctrl_pressed, shift_pressed);
 			m_effect->set_fl(std::clamp(f, FL_MIN, FL_MAX));
+			const bool notch = m_effect->fl() < m_effect->fh();
+			if(notch)
+				m_effect->set_fh(m_effect->fl());
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			ev->item->set_subtext(format_fl(m_effect->fl()));
-			ev->item->set_flags(flag_fl());
+			if(!notch) {
+				ev->item->set_subtext(format_fl(m_effect->fl()));
+				ev->item->set_flags(flag_fl());
+			}
+			else
+				reset(reset_options::REMEMBER_POSITION);
 			return true;
 		}
 
@@ -235,10 +242,17 @@ bool menu_audio_effect_filter::handle(event const *ev)
 		case F | HP: {
 			u32 f = increment_f(m_effect->fh(), alt_pressed, ctrl_pressed, shift_pressed);
 			m_effect->set_fh(std::clamp(f, FH_MIN, FH_MAX));
+			const bool notch = m_effect->fh() > m_effect->fl();
+			if(notch)
+				m_effect->set_fl(m_effect->fh());
 			if(m_chain == 0xffff)
 				machine().sound().default_effect_changed(m_entry);
-			ev->item->set_subtext(format_fh(m_effect->fh()));
-			ev->item->set_flags(flag_fh());
+			if(!notch) {
+				ev->item->set_subtext(format_fh(m_effect->fh()));
+				ev->item->set_flags(flag_fh());
+			}
+			else
+				reset(reset_options::REMEMBER_POSITION);
 			return true;
 		}
 
