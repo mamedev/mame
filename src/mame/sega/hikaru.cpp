@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood, MetalliC
+// thanks-to: Stefano Teso, Wind, DreamZzz, CaH4e3
 /* Sega Hikaru / 'Samurai' */
 
 /*
@@ -398,6 +399,7 @@ Notes:
 #include "screen.h"
 #include "speaker.h"
 #include "315-6154.h"
+#include "315-5881_crypt.h"
 #include "machine/eepromser.h"
 #include "machine/x76f100.h"
 #include "machine/nvram.h"
@@ -429,9 +431,14 @@ public:
 		, m_arm0(*this, "arm0")
 		, m_aica0(*this, "aica0")
 		, m_aica0_ram(*this, "aica0_ram")
+		, m_arm1(*this, "arm1")
+		, m_aica1(*this, "aica1")
+		, m_aica1_ram(*this, "aica1_ram")
+		, m_crypt(*this, "segam2crypt")
 	{ }
 
 	void hikaru(machine_config &config);
+	void hikaru_5881(machine_config& config);
 
 private:
 	virtual void video_start() override ATTR_COLD;
@@ -442,9 +449,13 @@ private:
 	void sh4_io_main(address_map& map) ATTR_COLD;
 	void sh4_map_slave(address_map &map) ATTR_COLD;
 	void sh4_io_slave(address_map& map) ATTR_COLD;
-	void pci_map(address_map& map) ATTR_COLD;
+	void localbus_map(address_map& map) ATTR_COLD;
+	void localbus_map_5881(address_map& map) ATTR_COLD;
+
 	void aica0_map(address_map& map) ATTR_COLD;
 	void arm0_map(address_map& map) ATTR_COLD;
+	void aica1_map(address_map& map) ATTR_COLD;
+	void arm1_map(address_map& map) ATTR_COLD;
 
 	uint32_t screen_update_hikaru(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -457,9 +468,15 @@ private:
 	required_device<x76f100_device> m_rombd_eeprom;
 	required_shared_ptr<uint64_t> m_main_ram;
 	required_shared_ptr<uint64_t> m_slave_ram;
+
 	required_device<cpu_device> m_arm0;
 	required_device<aica_device> m_aica0;
 	required_shared_ptr<uint16_t> m_aica0_ram;
+	required_device<cpu_device> m_arm1;
+	required_device<aica_device> m_aica1;
+	required_shared_ptr<uint16_t> m_aica1_ram;
+
+	optional_device<sega_315_5881_crypt_device> m_crypt;
 
 	address_space* space_main_sh4;
 	address_space* space_slave_sh4;
@@ -473,6 +490,14 @@ private:
 	void aica0_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 	void arm0_irq(int state);
 	u8 m_arm0rst;
+	uint16_t aica1ram_r(offs_t offset);
+	void aica1ram_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint32_t arm1_aica_r(offs_t offset);
+	void arm1_aica_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	uint32_t aica1_reg_r(offs_t offset, uint32_t mem_mask);
+	void aica1_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	void arm1_irq(int state);
+	u8 m_arm1rst;
 
 	uint64_t main_io_r();
 	uint64_t slave_io_r();
@@ -482,6 +507,8 @@ private:
 	void irq_update();
 	//void gpu_irq(int state);
 	void szk_irq(int state);
+
+	uint16_t prot_ram_r(uint32_t addr);
 
 	u32 m_irq_pending;
 	u32 m_irq_mask;
@@ -506,7 +533,9 @@ void hikaru_state::machine_start()
 void hikaru_state::machine_reset()
 {
 	m_arm0rst = 1;
+	m_arm1rst = 1;
 	m_arm0->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_arm1->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 uint32_t hikaru_state::screen_update_hikaru(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -563,6 +592,56 @@ void hikaru_state::aica0_map(address_map& map)
 {
 	map.unmap_value_high();
 	map(0x000000, 0x7fffff).ram().share("aica0_ram");
+}
+
+uint32_t hikaru_state::aica1_reg_r(offs_t offset, uint32_t mem_mask)
+{
+	if (offset == 0x2c00 / 4)
+		return m_arm1rst;
+	return m_aica1->read(offset * 2);
+}
+void hikaru_state::aica1_reg_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	if (offset == (0x2c00 / 4))
+	{
+		if (ACCESSING_BITS_0_7)
+		{
+			m_arm1rst = data & 1;
+			m_arm1->set_input_line(INPUT_LINE_RESET, m_arm1rst ? ASSERT_LINE : CLEAR_LINE);
+		}
+	}
+	m_aica1->write(offset * 2, data, 0xffff);
+}
+uint32_t hikaru_state::arm1_aica_r(offs_t offset)
+{
+	return m_aica1->read(offset * 2) & 0xffff;
+}
+void hikaru_state::arm1_aica_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	m_aica1->write(offset * 2, data, mem_mask & 0xffff);
+}
+uint16_t hikaru_state::aica1ram_r(offs_t offset)
+{
+	return m_aica1_ram[offset];
+}
+void hikaru_state::aica1ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_aica1_ram[offset]);
+}
+void hikaru_state::arm1_irq(int state)
+{
+	m_arm1->set_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+}
+void hikaru_state::arm1_map(address_map& map)
+{
+	map.unmap_value_high();
+	map(0x00000000, 0x007fffff).rw(FUNC(hikaru_state::aica1ram_r), FUNC(hikaru_state::aica1ram_w));
+	map(0x00800000, 0x00807fff).rw(FUNC(hikaru_state::arm1_aica_r), FUNC(hikaru_state::arm1_aica_w));
+}
+void hikaru_state::aica1_map(address_map& map)
+{
+	map.unmap_value_high();
+	map(0x000000, 0x7fffff).ram().share("aica1_ram");
 }
 //
 
@@ -808,25 +887,26 @@ static INPUT_PORTS_START( hikaru )
 	PORT_BIT( 0x07ff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-void hikaru_state::pci_map(address_map& map)
+void hikaru_state::localbus_map(address_map& map)
 {
 	// master bridge "Local Bus" area
 //  map(0x00000000, 0x001fffff).rom();   // boot ROM
-	map(0x00400000, 0x007fffff).mirror(0x80000000).noprw(); // r/w trigger "OKBCS" line to PLD between Antarctic and Africa, purpose unknown
-	map(0x00800000, 0x0081ffff).mirror(0x80000000).m(m_mie, FUNC(mie_device::mie_port)).umask16(0x00ff);
-	map(0x00820000, 0x0083ffff).mirror(0x80000000).rw(m_mie, FUNC(mie_device::mem_r), FUNC(mie_device::mem_w)).umask16(0x00ff);
-	map(0x00c00000, 0x00c0ffff).mirror(0x80000000).ram().share("^nvram");
-	map(0x02000000, 0x02ffffff).mirror(0x80000000).lrw32(
+	map(0x00400000, 0x007fffff).noprw(); // r/w trigger "OKB_CS" line to PLD between Antarctic and Africa, purpose unknown
+	map(0x00800000, 0x0081ffff).m(m_mie, FUNC(mie_device::mie_port)).umask16(0x00ff);
+	map(0x00820000, 0x0083ffff).rw(m_mie, FUNC(mie_device::mem_r), FUNC(mie_device::mem_w)).umask16(0x00ff);
+	map(0x00c00000, 0x00c0ffff).ram().share("^nvram");
+	map(0x02000000, 0x02ffffff).lrw32(
 		NAME([this](offs_t offset) { return (!m_mie->busak_r() << 8) | 0x600; }),
 		NAME([this](offs_t offset, u32 data) { m_mie->busrq_w(BIT(data, 8)); })
 	);
-//  map(0x0a000000, 0x0a0fffff).rw();    // optional ROMBD-specific security
 	map(0x0c700000, 0x0c707fff).rw(tag(), FUNC(hikaru_state::aica0_reg_r), FUNC(hikaru_state::aica0_reg_w));
 	map(0x0c710000, 0x0c71000f).rw("^aicartc0", FUNC(aicartc_device::read), FUNC(aicartc_device::write)).umask32(0x0000ffff);
 	map(0x0c800000, 0x0cffffff).rw(tag(), FUNC(hikaru_state::aica0ram_r), FUNC(hikaru_state::aica0ram_w));
-//  map(0x0d000000, 0x0dffffff).rw();    // optional AICA + RAM
+	map(0x0d700000, 0x0d707fff).rw(tag(), FUNC(hikaru_state::aica1_reg_r), FUNC(hikaru_state::aica1_reg_w));
+	map(0x0d710000, 0x0d71000f).rw("^aicartc1", FUNC(aicartc_device::read), FUNC(aicartc_device::write)).umask32(0x0000ffff);
+	map(0x0d800000, 0x0dffffff).rw(tag(), FUNC(hikaru_state::aica1ram_r), FUNC(hikaru_state::aica1ram_w));
 //  map(0x0e000000, 0x0effffff).rw();    // optional Communication Board
-	map(0x10000000, 0x13ffffff).mirror(0x80000000).rom().region("^user1", 0);
+	map(0x10000000, 0x13ffffff).rom().region("^user1", 0);
 	map(0x14000000, 0x14ffffff).lrw32(
 		NAME([this](offs_t offset) { return m_rombd_eeprom->read_sda(); }),
 		NAME([this](offs_t offset, u32 data) {
@@ -837,7 +917,7 @@ void hikaru_state::pci_map(address_map& map)
 			})
 	);
 	map(0x18000000, 0x1fffffff).nopr(); // suppress log, boot looking for ROM board 1st in this area
-	map(0x20000000, 0x2fffffff).mirror(0x80000000).rom().region("^user2", 0);
+	map(0x20000000, 0x2fffffff).rom().region("^user2", 0);
 
 // bridge mapped RAMs
 	map(0x40000000, 0x41ffffff).lrw32(
@@ -873,6 +953,19 @@ void hikaru_state::pci_map(address_map& map)
 //  map(0xf2080000, 0xf208000?);       // unused/unknown
 //  BAR3
 //  map(0xf3000000, 0xf37fffff).ram(); // video RAM (frame buffers and layers bitmaps)
+}
+
+uint16_t hikaru_state::prot_ram_r(uint32_t addr)
+{
+	u16 val = space_6154->read_word(0x0a000000 + (addr & 0x7fff) * 2);
+	return (val >> 8) | (val << 8);
+}
+
+void hikaru_state::localbus_map_5881(address_map& map)
+{
+	localbus_map(map);
+	map(0x0a000000, 0x0a00ffff).ram().share("^protram");
+	map(0x0a010000, 0x0a01000f).m(m_crypt, FUNC(sega_315_5881_crypt_device::iomap_le));
 }
 
 void hikaru_state::sh4_io_main(address_map& map)
@@ -945,12 +1038,14 @@ void hikaru_state::hikaru(machine_config &config)
 
 	PCI_ROOT(config, "pci0", 0);
 	SEGA315_6154(config, m_315_6154, 0);
-	m_315_6154->set_addrmap(sega_315_6154_device::AS_PCI_MEMORY, &hikaru_state::pci_map);
+	m_315_6154->set_addrmap(sega_315_6154_device::AS_PCI_MEMORY, &hikaru_state::localbus_map);
 	m_315_6154->set_mode(sega_315_6154_device::MODE_MASTER);
+	m_315_6154->irq1_callback().set_inputline(m_maincpu, SH4_IRL1);
 	PCI_ROOT(config, "pci1", 0);
 	SEGA315_6154(config, s_315_6154, 0);
-	s_315_6154->set_addrmap(sega_315_6154_device::AS_PCI_MEMORY, &hikaru_state::pci_map);
+	s_315_6154->set_addrmap(sega_315_6154_device::AS_PCI_MEMORY, &hikaru_state::localbus_map);
 	s_315_6154->set_mode(sega_315_6154_device::MODE_SLAVE);
+	s_315_6154->irq1_callback().set_inputline(m_slave, SH4_IRL1);
 
 	MAPLE_DC(config, "maple", 0, m_maincpu); // TODO: get rid of this, there is no any Maple-host in Hikaru
 
@@ -991,6 +1086,28 @@ void hikaru_state::hikaru(machine_config &config)
 	m_aica0->add_route(1, "speaker", 1.0, 1);
 
 	AICARTC(config, "aicartc0", XTAL(32'768));
+
+	ARM7(config, m_arm1, ((XTAL(33'868'800) * 2) / 3) / 8);
+	m_arm1->set_addrmap(AS_PROGRAM, &hikaru_state::arm1_map);
+
+	AICA(config, m_aica1, (XTAL(33'868'800) * 2) / 3);
+	m_aica1->irq().set(FUNC(hikaru_state::arm1_irq));
+	m_aica1->main_irq().set(FUNC(hikaru_state::szk_irq));
+	m_aica1->set_addrmap(0, &hikaru_state::aica1_map);
+	m_aica1->add_route(0, "speaker", 1.0, 0);
+	m_aica1->add_route(1, "speaker", 1.0, 1);
+
+	AICARTC(config, "aicartc1", XTAL(32'768));
+}
+
+void hikaru_state::hikaru_5881(machine_config& config)
+{
+	hikaru(config);
+	m_315_6154->set_addrmap(sega_315_6154_device::AS_PCI_MEMORY, &hikaru_state::localbus_map_5881);
+	s_315_6154->set_addrmap(sega_315_6154_device::AS_PCI_MEMORY, &hikaru_state::localbus_map_5881);
+
+	SEGA315_5881_CRYPT(config, m_crypt, 0);
+	m_crypt->set_read_cb(FUNC(hikaru_state::prot_ram_r));
 }
 
 void hikaru_state::init_hikaru()
@@ -1070,7 +1187,7 @@ ROM_START( airtrix )
 	/* ic66 unpopulated */
 
 	// 834-14149   2000     317-0294-COM   Hikaru
-	ROM_PARAMETER( ":rom_board:segam2crypt:key", "291b02c7" )
+	ROM_PARAMETER( ":segam2crypt:key", "291b02c7" )
 ROM_END
 
 ROM_START( airtrixo )
@@ -1093,7 +1210,7 @@ ROM_START( airtrixo )
 	ROM_LOAD32_WORD( "mpr-23580.ic50" , 0x6000002, 0x1000000, CRC(d260f39c) SHA1(e5cdf399defaaa7dbcee62f7ab64b898c28d8f7d) )
 
 	// 834-14149   2000     317-0294-COM   Hikaru
-	ROM_PARAMETER( ":rom_board:segam2crypt:key", "291b02c7" )
+	ROM_PARAMETER( ":segam2crypt:key", "291b02c7" )
 ROM_END
 
 
@@ -1104,12 +1221,12 @@ ROM_START( pharrier )
 	ROM_REGION32_LE( 0x4000000, "user1", ROMREGION_ERASE00)
 	ROM_LOAD32_WORD("epr-23565a.ic29", 0x0000000, 0x0400000, CRC(ca9af8a7) SHA1(e7d6badc03ec5833ee89e49dd389ee19b45da29c) )
 	ROM_LOAD32_WORD("epr-23566a.ic30", 0x0000002, 0x0400000, CRC(aad0057c) SHA1(c18c0f1797432c74dc21bcd806cb5760916e4936) )
-	ROM_LOAD32_WORD("epr-23567.ic31",  0x0800000, 0x0400000, CRC(f0e3dcdc) SHA1(422978a13e39f439da54e43a65dcad1a5b1f2f27) )
-	ROM_LOAD32_WORD("epr-23568.ic32",  0x0800002, 0x0400000, CRC(6eee734c) SHA1(0941761b1690ad4eeac0bf682459992c6f38a930) )
-	ROM_LOAD32_WORD("epr-23569.ic33",  0x1000000, 0x0400000, CRC(867c7064) SHA1(5cf0d88a1c739ba69b33f1ba3a0e5544331f63f3) )
-	ROM_LOAD32_WORD("epr-23570.ic34",  0x1000002, 0x0400000, CRC(556ff58b) SHA1(7eb527aee823d037d1045d850427efa42d5da787) )
-	ROM_LOAD32_WORD("epr-23571.ic35",  0x1800000, 0x0400000, CRC(5a75fa92) SHA1(b5e0c8c995ecc954b74d5eb36f3ae2a732a5986b) )
-	ROM_LOAD32_WORD("epr-23572.ic36",  0x1800002, 0x0400000, CRC(46054067) SHA1(449800bdc2c40c76aed9bc5e7e8831d8f03ef286) )
+	ROM_LOAD32_WORD("epr-23567.ic31",  0x1000000, 0x0400000, CRC(f0e3dcdc) SHA1(422978a13e39f439da54e43a65dcad1a5b1f2f27) )
+	ROM_LOAD32_WORD("epr-23568.ic32",  0x1000002, 0x0400000, CRC(6eee734c) SHA1(0941761b1690ad4eeac0bf682459992c6f38a930) )
+	ROM_LOAD32_WORD("epr-23569.ic33",  0x2000000, 0x0400000, CRC(867c7064) SHA1(5cf0d88a1c739ba69b33f1ba3a0e5544331f63f3) )
+	ROM_LOAD32_WORD("epr-23570.ic34",  0x2000002, 0x0400000, CRC(556ff58b) SHA1(7eb527aee823d037d1045d850427efa42d5da787) )
+	ROM_LOAD32_WORD("epr-23571.ic35",  0x3000000, 0x0400000, CRC(5a75fa92) SHA1(b5e0c8c995ecc954b74d5eb36f3ae2a732a5986b) )
+	ROM_LOAD32_WORD("epr-23572.ic36",  0x3000002, 0x0400000, CRC(46054067) SHA1(449800bdc2c40c76aed9bc5e7e8831d8f03ef286) )
 
 	/* ROM board using 128M TSOP48 mask ROMs */
 	ROM_REGION32_LE( 0x10000000, "user2", ROMREGION_ERASE00)
@@ -1131,7 +1248,7 @@ ROM_START( pharrier )
 	ROM_LOAD32_WORD( "mpr-23564.ic66", 0xe000002, 0x1000000, CRC(255724b6) SHA1(1b382fad165831de3f2e39352c031146759dfc69) )
 
 	// 834-14144   2001     317-0297-COM   Hikaru
-	ROM_PARAMETER( ":rom_board:segam2crypt:key", "2912c68a" )
+	ROM_PARAMETER( ":segam2crypt:key", "2912c68a" )
 ROM_END
 
 ROM_START( swracer )
@@ -1141,8 +1258,8 @@ ROM_START( swracer )
 	ROM_REGION32_LE( 0x4000000, "user1", ROMREGION_ERASE00)
 	ROM_LOAD32_WORD("epr-23174.ic29", 0x0000000, 0x0400000, CRC(eae62b46) SHA1(f1458072b002d64bbb7c43c582e3191e8031e19a) )
 	ROM_LOAD32_WORD("epr-23175.ic30", 0x0000002, 0x0400000, CRC(b92da060) SHA1(dd9ecbd0977aef7629441ff45f4ad807b2408603) )
-	ROM_LOAD32_WORD("epr-23176.ic31", 0x0800000, 0x0400000, CRC(2f2824a7) SHA1(a375719e3cababab5b33d00d8696c7cd62c5af30) )
-	ROM_LOAD32_WORD("epr-23177.ic32", 0x0800002, 0x0400000, CRC(7a5e3f0f) SHA1(e8ca00cfaaa9be4f9d269e4d8f6bcbbd7de8f6d6) )
+	ROM_LOAD32_WORD("epr-23176.ic31", 0x1000000, 0x0400000, CRC(2f2824a7) SHA1(a375719e3cababab5b33d00d8696c7cd62c5af30) )
+	ROM_LOAD32_WORD("epr-23177.ic32", 0x1000002, 0x0400000, CRC(7a5e3f0f) SHA1(e8ca00cfaaa9be4f9d269e4d8f6bcbbd7de8f6d6) )
 	/* ic33 unpopulated */
 	/* ic34 unpopulated */
 	/* ic35 unpopulated */
@@ -1184,7 +1301,7 @@ ROM_START( swracer )
 	ROM_LOAD32_WORD("mpr-23117.ic68s" , 0xf000002, 0x0800000, CRC(9d4d3529) SHA1(66008445629681ebf2f26b3f181d8524a8576d2f))
 
 	// 834-14002   2001     317-0277-COM   Hikaru
-	ROM_PARAMETER( ":rom_board:segam2crypt:key", "2903dad5" )
+	ROM_PARAMETER( ":segam2crypt:key", "2903dad5" )
 ROM_END
 
 ROM_START( braveff )
@@ -1194,10 +1311,10 @@ ROM_START( braveff )
 	ROM_REGION32_LE( 0x4000000, "user1", ROMREGION_ERASE00)
 	ROM_LOAD32_WORD( "epr-21994.ic29", 0x0000000, 0x200000, CRC(31b0a754) SHA1(b49c998a15fbc790b780ed6665a56681d4edd369) )
 	ROM_LOAD32_WORD( "epr-21995.ic30", 0x0000002, 0x200000, CRC(bcccb56b) SHA1(6e7a69934e5b47495ae8e90c57759573bc519d24) )
-	ROM_LOAD32_WORD( "epr-21996.ic31", 0x0800000, 0x200000, CRC(a8f88e17) SHA1(dbbd2a73335c740bcf2ff9680c575841af29b340) )
-	ROM_LOAD32_WORD( "epr-21997.ic32", 0x0800002, 0x200000, CRC(36641a7f) SHA1(37931bde1ddebef61fa6d8caca3cb67328fd0b90) )
-	ROM_LOAD32_WORD( "epr-21998.ic33", 0x1000000, 0x200000, CRC(bd1df696) SHA1(fd937894763fab5cb50f33c40f8047e0d3adc93b) )
-	ROM_LOAD32_WORD( "epr-21999.ic34", 0x1000002, 0x200000, CRC(9425eee0) SHA1(0f6a23163022bbd7ec54dd638094f3e317a87919) )
+	ROM_LOAD32_WORD( "epr-21996.ic31", 0x1000000, 0x200000, CRC(a8f88e17) SHA1(dbbd2a73335c740bcf2ff9680c575841af29b340) )
+	ROM_LOAD32_WORD( "epr-21997.ic32", 0x1000002, 0x200000, CRC(36641a7f) SHA1(37931bde1ddebef61fa6d8caca3cb67328fd0b90) )
+	ROM_LOAD32_WORD( "epr-21998.ic33", 0x2000000, 0x200000, CRC(bd1df696) SHA1(fd937894763fab5cb50f33c40f8047e0d3adc93b) )
+	ROM_LOAD32_WORD( "epr-21999.ic34", 0x2000002, 0x200000, CRC(9425eee0) SHA1(0f6a23163022bbd7ec54dd638094f3e317a87919) )
 	/* ic35 unpopulated */
 	/* ic36 unpopulated */
 
@@ -1228,7 +1345,7 @@ ROM_START( braveff )
 	ROM_LOAD32_WORD( "mpr-22022.ic59s", 0xb000000, 0x800000, CRC(abd3d888) SHA1(9654c3a38feab46b4983a602831fb29cccdd0526) )
 	ROM_LOAD32_WORD( "mpr-22023.ic60s", 0xb000002, 0x800000, CRC(07f00869) SHA1(92282d09d72d3e65a91128e06bb0d4426bb90be5) )
 
-	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1" ) // 315-5881 not populated
+	ROM_PARAMETER( ":segam2crypt:key", "-1" ) // 315-5881 not populated
 ROM_END
 
 ROM_START( sgnascar )
@@ -1324,18 +1441,18 @@ ROM_START( hikcheck )
 	ROM_REGION32_LE( 0x10000000, "user2", ROMREGION_ERASE00)
 
 	// 315-5881 populated, have no 317-xxxx stamp, key is unknown.
-	ROM_PARAMETER( ":rom_board:segam2crypt:key", "-1" )
+	ROM_PARAMETER( ":segam2crypt:key", "-1" )
 ROM_END
 
 } // anonymous namespace
 
 
-GAME( 2000, hikaru,    0,        hikaru, hikaru, hikaru_state, init_hikaru, ROT0, "Sega",            "Hikaru BIOS", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT )
-GAME( 1999, braveff,   hikaru,   hikaru, hikaru, hikaru_state, init_hikaru, ROT0, "Sega",            "Brave Firefighters", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-GAME( 2000, airtrix,   hikaru,   hikaru, hikaru, hikaru_state, init_hikaru, ROT0, "Sega",            "Air Trix (Rev A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-GAME( 2000, airtrixo,  airtrix,  hikaru, hikaru, hikaru_state, init_hikaru, ROT0, "Sega",            "Air Trix (original)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-GAME( 2000, hikcheck,  hikaru,   hikaru, hikaru, hikaru_state, init_hikaru, ROT0, "Sega",            "Hikaru Check ROM Board", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-GAME( 2000, sgnascar,  hikaru,   hikaru, hikaru, hikaru_state, init_hikaru, ROT0, "Sega / Electronic Arts", "NASCAR Arcade (Rev A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-GAME( 2000, sgnascaro, sgnascar, hikaru, hikaru, hikaru_state, init_hikaru, ROT0, "Sega / Electronic Arts", "NASCAR Arcade (original)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-GAME( 2000, pharrier,  hikaru,   hikaru, hikaru, hikaru_state, init_hikaru, ROT0, "Sega",            "Planet Harriers (Rev A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-GAME( 2000, swracer,   hikaru,   hikaru, hikaru, hikaru_state, init_hikaru, ROT0, "Sega",            "Star Wars: Racer Arcade", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, hikaru,    0,        hikaru,      hikaru, hikaru_state, init_hikaru, ROT0, "Sega",            "Hikaru BIOS", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT )
+GAME( 1999, braveff,   hikaru,   hikaru,      hikaru, hikaru_state, init_hikaru, ROT0, "Sega",            "Brave Firefighters", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, airtrix,   hikaru,   hikaru_5881, hikaru, hikaru_state, init_hikaru, ROT0, "Sega",            "Air Trix (Rev A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, airtrixo,  airtrix,  hikaru_5881, hikaru, hikaru_state, init_hikaru, ROT0, "Sega",            "Air Trix (original)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, hikcheck,  hikaru,   hikaru_5881, hikaru, hikaru_state, init_hikaru, ROT0, "Sega",            "Hikaru Check ROM Board", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, sgnascar,  hikaru,   hikaru,      hikaru, hikaru_state, init_hikaru, ROT0, "Sega / Electronic Arts", "NASCAR Arcade (Rev A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, sgnascaro, sgnascar, hikaru,      hikaru, hikaru_state, init_hikaru, ROT0, "Sega / Electronic Arts", "NASCAR Arcade (original)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, pharrier,  hikaru,   hikaru_5881, hikaru, hikaru_state, init_hikaru, ROT0, "Sega",            "Planet Harriers (Rev A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+GAME( 2000, swracer,   hikaru,   hikaru_5881, hikaru, hikaru_state, init_hikaru, ROT0, "Sega",            "Star Wars: Racer Arcade", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
