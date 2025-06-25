@@ -629,8 +629,11 @@ void menu_audio_mixer::populate()
 	}
 
 	// If there's nothing, get out of there
-	if(m_selections.empty())
+	if(m_selections.empty()) {
+		item_append(_("menu-audiomix", "[mappings not initialized]"), FLAG_DISABLE, nullptr);
+		item_append(menu_item_type::SEPARATOR);
 		return;
+	}
 
 	// Find the line of the current selection, if any.
 	// Otherwise default to the first line
