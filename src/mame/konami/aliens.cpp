@@ -307,7 +307,7 @@ void aliens_state::aliens(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(24'000'000) / 3, 528, 112, 400, 256, 16, 240); // measured 59.17
+	screen.set_raw(XTAL(24'000'000) / 3, 512, 112, 400, 264, 16, 240); // measured 59.17
 //  6MHz dotclock is more realistic, however needs drawing updates. replace when ready
 //  screen.set_raw(XTAL(24'000'000) / 4, 396, hbend, hbstart, 256, 16, 240);
 	screen.set_screen_update(FUNC(aliens_state::screen_update));

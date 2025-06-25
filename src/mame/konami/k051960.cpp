@@ -136,11 +136,10 @@ GFXDECODE_MEMBER( k051960_device::gfxinfo_gradius3 )
 GFXDECODE_END
 
 
-k051960_device::k051960_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+k051960_device::k051960_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, K051960, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, gfxinfo)
 	, device_video_interface(mconfig, *this)
-	, m_ram(nullptr)
 	, m_sprite_rom(*this, DEVICE_SELF)
 	, m_scanline_timer(nullptr)
 	, m_k051960_cb(*this)
@@ -150,6 +149,7 @@ k051960_device::k051960_device(const machine_config &mconfig, const char *tag, d
 	, m_nmi_handler(*this)
 	, m_romoffset(0)
 	, m_spriteflip(false)
+	, m_sprites_disabled(false)
 	, m_readroms(false)
 	, m_shadow_config(0)
 	, m_nmi_enabled(false)
@@ -205,16 +205,19 @@ void k051960_device::device_start()
 	if (VERBOSE && !(palette().shadows_enabled()))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
-	m_ram = make_unique_clear<uint8_t[]>(0x400);
+	memset(m_ram, 0, sizeof(m_ram));
+	memset(m_buffer, 0, sizeof(m_buffer));
 
 	// register for save states
 	save_item(NAME(m_romoffset));
 	save_item(NAME(m_spriteflip));
+	save_item(NAME(m_sprites_disabled));
 	save_item(NAME(m_readroms));
 	save_item(NAME(m_shadow_config));
 	save_item(NAME(m_nmi_enabled));
 	save_item(NAME(m_spriterombank));
-	save_pointer(NAME(m_ram), 0x400);
+	save_item(NAME(m_ram));
+	save_item(NAME(m_buffer));
 }
 
 //-------------------------------------------------
@@ -225,13 +228,12 @@ void k051960_device::device_reset()
 {
 	m_romoffset = 0;
 	m_spriteflip = false;
+	m_sprites_disabled = false;
 	m_readroms = false;
 	m_shadow_config = 0;
 	m_nmi_enabled = false;
 
-	m_spriterombank[0] = 0;
-	m_spriterombank[1] = 0;
-	m_spriterombank[2] = 0;
+	memset(m_spriterombank, 0, sizeof(m_spriterombank));
 }
 
 
@@ -241,8 +243,8 @@ void k051960_device::device_reset()
 
 TIMER_CALLBACK_MEMBER( k051960_device::scanline_callback )
 {
-	// range 0..255
-	uint8_t y = screen().vpos();
+	// range 0..255, or 264?
+	u8 y = screen().vpos();
 
 	// 32v
 	if ((y % 32 == 0) && m_nmi_enabled)
@@ -250,13 +252,19 @@ TIMER_CALLBACK_MEMBER( k051960_device::scanline_callback )
 
 	// vblank
 	if (y == 240)
+	{
 		m_irq_handler(ASSERT_LINE);
+
+		// copy sprites to framebuffer, unless sprite processing was disabled
+		if (!m_sprites_disabled)
+			memcpy(m_buffer, m_ram, sizeof(m_buffer));
+	}
 
 	// wait for next line
 	m_scanline_timer->adjust(screen().time_until_pos(y + 1));
 }
 
-int k051960_device::k051960_fetchromdata( int byte )
+int k051960_device::k051960_fetchromdata(int byte)
 {
 	int code, color, pri, off1, addr;
 	bool shadow;
@@ -301,7 +309,7 @@ u8 k051960_device::k051937_r(offs_t offset)
 	if (m_readroms && offset >= 4 && offset < 8)
 		return k051960_fetchromdata(offset & 3);
 	else if (offset == 0)
-		return screen().vblank() ? 1 : 0; // vblank?
+		return screen().vblank();
 
 	//logerror("%s: read unknown 051937 address %x\n", m_maincpu->pc(), offset);
 	return 0;
@@ -325,6 +333,7 @@ void k051960_device::k051937_w(offs_t offset, u8 data)
 		m_spriteflip = BIT(data, 3);
 
 		/* bit 4 used by Devastators and TMNT, to protect sprite RAM from corruption during updates ? */
+		m_sprites_disabled = BIT(data, 4);
 
 		/* bit 5 = enable gfx ROM reading */
 		m_readroms = BIT(data, 5);
@@ -389,7 +398,7 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 
 	int offs, pri_code;
 	int sortedlist[NUM_SPRITES];
-	uint8_t drawmode_table[256];
+	u8 drawmode_table[256];
 
 	memset(drawmode_table, DRAWMODE_SOURCE, sizeof(drawmode_table));
 	drawmode_table[0] = DRAWMODE_NONE;
@@ -400,9 +409,9 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 	/* prebuild a sorted table */
 	for (offs = 0; offs < 0x400; offs += 8)
 	{
-		if (m_ram[offs] & 0x80)
+		if (m_buffer[offs] & 0x80)
 		{
-			pri_code = m_ram[offs] & 0x7f;
+			pri_code = m_buffer[offs] & 0x7f;
 			if (max_priority == -1) /* draw front to back when using priority buffer */
 				pri_code ^= 0x7f;
 
@@ -433,8 +442,8 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 		if (offs == -1)
 			continue;
 
-		code = m_ram[offs + 2] + ((m_ram[offs + 1] & 0x1f) << 8);
-		color = m_ram[offs + 3] & 0xff;
+		code = m_buffer[offs + 2] + ((m_buffer[offs + 1] & 0x1f) << 8);
+		color = m_buffer[offs + 3] & 0xff;
 		pri = 0;
 		shadow = !BIT(m_shadow_config, 2) && (BIT(m_shadow_config, 1) || BIT(color, 7));
 		m_k051960_cb(&code, &color, &pri, &shadow);
@@ -443,7 +452,7 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 			if (pri < min_priority || pri > max_priority)
 				continue;
 
-		size = (m_ram[offs + 1] & 0xe0) >> 5;
+		size = (m_buffer[offs + 1] & 0xe0) >> 5;
 		w = width[size];
 		h = height[size];
 
@@ -454,15 +463,18 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 		if (w >= 8) code &= ~0x10;
 		if (h >= 8) code &= ~0x20;
 
-		ox = (256 * m_ram[offs + 6] + m_ram[offs + 7]) & 0x01ff;
-		oy = 256 - ((256 * m_ram[offs + 4] + m_ram[offs + 5]) & 0x01ff);
-		flipx = m_ram[offs + 6] & 0x02;
-		flipy = m_ram[offs + 4] & 0x02;
+		ox = (256 * m_buffer[offs + 6] + m_buffer[offs + 7]) & 0x01ff;
+		oy = 256 - ((256 * m_buffer[offs + 4] + m_buffer[offs + 5]) & 0x01ff);
+		flipx = m_buffer[offs + 6] & 0x02;
+		flipy = m_buffer[offs + 4] & 0x02;
 
-		zoomx = (m_ram[offs + 6] & 0xfc) >> 2;
+		// X zoom is linear, 128x128 factors are accurate compared to PCB, but
+		// off-by-1 at several places for smaller sprite sizes.
+		zoomx = (m_buffer[offs + 6] & 0xfc) >> 2;
 		zoomx = 0x10000 / 128 * (128 - zoomx);
 
-		// zoom y is not linear, it can't be expressed as an exponential function
+		// Y zoom is not linear, it can't be expressed as an exponential function.
+		// These values were visually obtained from Devastators.
 		static const u8 zoomy_table[0x40] =
 		{
 			0x00, 0x01, 0x03, 0x05, 0x07, 0x09, 0x0a, 0x0c,
@@ -475,10 +487,10 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 			0x3b, 0x3c, 0x3c, 0x3d, 0x3d, 0x3e, 0x3e, 0x3f
 		};
 
-		zoomy = (m_ram[offs + 4] & 0xfc) >> 2;
+		zoomy = (m_buffer[offs + 4] & 0xfc) >> 2;
 		zoomy = 128 - zoomy_table[zoomy];
 
-		// rounded up for each sprite height
+		// accumulated rounding up for each sprite height
 		for (int i = 0; i < 3; i++)
 			if (h <= (1 << i)) zoomy = (zoomy + 1) / 2;
 
@@ -548,7 +560,7 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 					int c = code;
 
 					sx = ox + ((zoomx * x + (1 << 11)) >> 12);
-					zw = (ox + ((zoomx * (x+1) + (1 << 11)) >> 12)) - sx;
+					zw = (ox + ((zoomx * (x + 1) + (1 << 11)) >> 12)) - sx;
 					if (flipx)
 						c += xoffset[(w - 1 - x)];
 					else

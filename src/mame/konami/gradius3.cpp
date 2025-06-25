@@ -282,7 +282,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(gradius3_state::gradius3_sub_scanline)
 	if(scanline == 240 && m_irqBmask & 1) // vblank-out irq
 		m_subcpu->set_input_line(1, HOLD_LINE);
 
-	if(scanline ==  16 && m_irqBmask & 2) // sprite end DMA irq
+	if(scanline == 16 && m_irqBmask & 2) // sprite end DMA irq
 		m_subcpu->set_input_line(2, HOLD_LINE);
 }
 
@@ -455,7 +455,6 @@ void gradius3_state::machine_reset()
 	m_irqAen = 0;
 	m_irqBmask = 0;
 	m_priority = 0;
-
 }
 
 void gradius3_state::gradius3(machine_config &config)

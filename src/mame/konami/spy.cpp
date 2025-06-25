@@ -8,6 +8,9 @@
 
     driver by Nicola Salmoria
 
+    BTANB:
+    - sprites lag by 1 frame, I'm saying this since it looks nicer on on old
+      MAME versions. However, the 1 frame lag is accurate when compared to PCB.
 
     Revisions:
 
