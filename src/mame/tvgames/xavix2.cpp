@@ -749,9 +749,16 @@ void domyos_state::config(machine_config& config)
 	I2C_24C64(config, m_i2cmem);
 }
 
-ROM_START( ltv_naru )
+ROM_START( ban_naru )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "naruto.bin", 0x000000, 0x800000, CRC(e3465ad2) SHA1(13e3d2de5d5a084635cab158f3639a1ea73265dc) )
+ROM_END
+
+ROM_START( ban_bldj )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "bldj.u2", 0x000000, 0x800000, CRC(aa865fe3) SHA1(2f5f4809a07a2f5671f81aa22e379c11c43943a0) )
+
+	// 24c04 at u3
 ROM_END
 
 ROM_START( ban_db2j )
@@ -793,10 +800,12 @@ ROM_END
 } // anonymous namespace
 
 // Let's!TVプレイ　ＮＡＲＵＴＯ－ナルト－ 忍者体感～だってばよ～ / バンダイ / 日本
-CONS( 2006, ltv_naru, 0, 0, config, naruto, naruto_state, empty_init, "Bandai / SSD Company LTD", "Let's TV Play Naruto (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, ban_naru, 0, 0, config, naruto, naruto_state, empty_init, "Bandai / SSD Company LTD", "Let's! TV Play Play Naruto (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+CONS( 2006, ban_bldj, 0, 0, config, naruto, naruto_state, empty_init, "Bandai / SSD Company LTD", "Let's! TV Play Blue Dragon (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // Let's!TVプレイ　ドラゴンボールＺ　バトル体感かめはめ波２～オッスおめぇ悟空 天下一武道会～
-CONS( 2006, ban_db2j, 0, 0, config, naruto, naruto_state, empty_init, "Bandai / SSD Company LTD", "Let's TV Play Dragon Ball Z Battle Experience Kamehameha 2 ~Ossu Ome Goku Tenkaichi Budokai~ (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, ban_db2j, 0, 0, config, naruto, naruto_state, empty_init, "Bandai / SSD Company LTD", "Let's! TV Play Dragon Ball Z Battle Experience Kamehameha 2 ~Ossu Ome Goku Tenkaichi Budokai~ (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // テレビであそぼう!まなぼう! 超脳力あいうえお図鑑
 CONS( 2006, epo_dabj, 0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company LTD", "TV de Asobou! Manabou! Chou Nouryoku AIUEO Zukan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
