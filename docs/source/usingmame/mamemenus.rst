@@ -332,7 +332,7 @@ possible, it will be added and the menu highlight will move to the newly added
 route.  If routes between the highlighted device and every host output/input
 already exist, no route will be added.
 
-Select **Add new channel route* to add a new channel route to that group.  If
+Select **Add new channel route** to add a new channel route to that group.  If
 possible, it will be added and the menu highlight will move to the newly added
 route.  If routes between all channels for the highlighted device and every
 host output/input channel already exist, no route will be added.
