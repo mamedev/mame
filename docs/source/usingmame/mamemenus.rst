@@ -327,18 +327,15 @@ or input and adjust the volume from -96 dB (quietest) to +12 dB (loudest).  Fo
 channel routes, you can also select the individual emulated channel and host
 channel.  Select **Delete route** to delete a route.
 
-To add a full route, highlight a menu item for the emulated device you want to
-add the route for and press the UI Audio add full mapping key (F on the keyboard
-by default).  If possible, a full route will be added and the menu highlight
-will move to the newly added route.  If routes between the highlighted device
-and every host output/input already exist, no route will be added.
+Select **Add new full route** to add a new full route to that group.  If
+possible, it will be added and the menu highlight will move to the newly added
+route.  If routes between the highlighted device and every host output/input
+already exist, no route will be added.
 
-To add a channel route, highlight a menu item for the emulated device you want
-to add the route for and press the UI Audio add channel mapping key (C on the
-keyboard by default).  If possible, a channel route will be added and the menu
-highlight will move to the newly added route.  If routes between all channels
-for the highlighted device and every host output/input channel already exist, no
-route will be added.
+Select **Add new channel route* to add a new channel route to that group.  If
+possible, it will be added and the menu highlight will move to the newly added
+route.  If routes between all channels for the highlighted device and every host
+output/input channel already exist, no route will be added.
 
 Some sound modules allow channel assignments and volumes to be controlled using
 an external mixer interface (for example the PipeWire module for Linux has this

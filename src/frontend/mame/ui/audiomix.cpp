@@ -739,11 +739,11 @@ void menu_audio_mixer::populate()
 			++cursel;
 
 		item_append(
-				_("menu-audiomix", "Add a full route"),
+				_("menu-audiomix", "Add new full route"),
 				0,
 				reinterpret_cast<void *>((cursel << 3) | ITM_ADD_FULL));
 		item_append(
-				_("menu-audiomix", "Add a channel route"),
+				_("menu-audiomix", "Add new channel route"),
 				0,
 				reinterpret_cast<void *>((cursel << 3) | ITM_ADD_CHANNEL));
 	}
