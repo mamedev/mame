@@ -249,7 +249,7 @@ void konamigx_state::wipezbuf(int noshadow)
 
 void konamigx_state::set_brightness(int layer)
 {
-	const uint8_t bri_mode = (m_k055555->K055555_read_register(K55_VBRI) >> layer * 2) & 0b11;
+	const uint8_t bri_mode = (m_k055555->K055555_read_register(K55_VBRI) >> layer * 2) & 0x03;
 	const uint8_t new_brightness = bri_mode ? m_brightness[bri_mode - 1] : 0xff;
 
 	if (m_current_brightness != new_brightness)
@@ -584,12 +584,12 @@ void konamigx_state::konamigx_mixer(screen_device &screen, bitmap_rgb32 &bitmap,
 
 		/*
 		    default sort order:
-		    fedcba9876543210fedcba9876543210
-		    xxxxxxxx------------------------ (priority)
-		    --------xxxxxxxx---------------- (zcode)
-		    ----------------xxxxxxxx-------- (offset)
-		    ------------------------xxxx---- (shadow mode)
-		    ----------------------------xxxx (shadow code)
+		    fedcba98 76543210 fedcba98 76543210
+		    xxxxxxxx -------- -------- -------- (priority)
+		    -------- xxxxxxxx -------- -------- (zcode)
+		    -------- -------- xxxxxxxx -------- (offset)
+		    -------- -------- -------- xxxx---- (shadow mode)
+		    -------- -------- -------- ------xx (shadow code)
 		*/
 		if (add_solid)
 		{
@@ -653,7 +653,7 @@ void konamigx_state::konamigx_mixer_draw(
 			}
 			color &= K055555_COLORMASK;
 
-			if (drawmode >= 4) m_palette->set_shadow_mode(order & 0x0f);
+			if (drawmode >= 4) m_palette->set_shadow_mode(order & 0x03);
 
 			if (!(mixerflags & GXMIX_NOZBUF))
 			{
@@ -698,17 +698,18 @@ void konamigx_state::gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 
 		set_brightness(layer);
 
 		const uint8_t layer2 = layer << 1;
-		const uint8_t j = mixerflags >> layer2 & 0b11;
+		const uint8_t j = mixerflags >> layer2 & 3;
 
 		// keep internal and external mix codes separated, so the external mix code can be applied to category 1 tiles
 		uint8_t mix_mode_internal = 0;
 		uint8_t mix_mode_external = 0;
 
-		if (j == GXMIX_BLEND_FORCE) mix_mode_internal = mixerflags >> (layer2 + 16) & 0b11; // hack
+		if (j == GXMIX_BLEND_FORCE)
+			mix_mode_internal = mixerflags >> (layer2 + 16) & 3; // hack
 		else
 		{
-			const uint8_t v_inmix_on_layer = m_vmixon >> layer2 & 0b11;
-			const uint8_t v_inmix_layer = m_vinmix >> layer2 & 0b11;
+			const uint8_t v_inmix_on_layer = m_vmixon >> layer2 & 3;
+			const uint8_t v_inmix_layer = m_vinmix >> layer2 & 3;
 			const uint8_t tile_mix_code = uint32_t(mixerflags) >> 30;
 
 			mix_mode_internal = v_inmix_layer & v_inmix_on_layer;
@@ -1039,7 +1040,7 @@ K056832_CB_MEMBER(konamigx_state::type2_tile_callback)
 
 K056832_CB_MEMBER(konamigx_state::salmndr2_tile_callback)
 {
-	const uint8_t mix_code = attr >> 4 & 0b11;
+	const uint8_t mix_code = attr >> 4 & 3;
 	if (mix_code)
 	{
 		*priority = 1;
@@ -1054,7 +1055,7 @@ K056832_CB_MEMBER(konamigx_state::salmndr2_tile_callback)
 
 K056832_CB_MEMBER(konamigx_state::alpha_tile_callback)
 {
-	const uint8_t mix_code = attr >> 6 & 0b11;
+	const uint8_t mix_code = attr >> 6 & 3;
 	if (mix_code)
 	{
 		*priority = 1;

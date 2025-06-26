@@ -1851,5 +1851,5 @@ GAME( 1996, sltpstepd, sltpstep, maniacsq, sltpcycld, gaelco_state,  empty_init,
 /* Not 100% sure it belongs here, but fairly close. Boots at least but video regs seem incorrect, and sound hardware is different.
    Set was being marked as from a 'flat' PCB, which is how the gaelco.cpp family of boards is referred to.
    Intentionally not set as a clone due to it being a significantly different codebase / hardware type. */
-GAME( 1990, xorwflat,  0,        xorwflat, xorwflat, xorwflat_state, empty_init, ROT0, "Gaelco", "Xor World (different hardware, ver 1.1, checksum 3333BA, prototype)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1990, xorwflata, xorwflat, xorwflat, xorwflat, xorwflat_state, empty_init, ROT0, "Gaelco", "Xor World (different hardware, ver 1.1, checksum 333462, prototype)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 14/Nov/1990
+GAME( 1990, xorwflat,  0,        xorwflat, xorwflat, xorwflat_state, empty_init, ROT0, "Gaelco", "Xor World (different hardware, ver 1.1, checksum 3333BA, prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, xorwflata, xorwflat, xorwflat, xorwflat, xorwflat_state, empty_init, ROT0, "Gaelco", "Xor World (different hardware, ver 1.1, checksum 333462, prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // 14/Nov/1990

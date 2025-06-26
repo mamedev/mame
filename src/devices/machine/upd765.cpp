@@ -189,6 +189,7 @@ upd765_family_device::upd765_family_device(const machine_config &mconfig, device
 	ready_polled(true),
 	select_connected(true),
 	select_multiplexed(true),
+	ts_connected(true),
 	has_dor(true),
 	external_ready(false),
 	recalibrate_steps(77),
@@ -209,6 +210,11 @@ void upd765_family_device::set_ready_line_connected(bool _ready)
 void upd765_family_device::set_select_lines_connected(bool _select)
 {
 	select_connected = _select;
+}
+
+void upd765_family_device::set_ts_line_connected(bool ts)
+{
+	ts_connected = ts;
 }
 
 void ps2_fdc_device::set_mode(mode_t _mode)
@@ -1600,10 +1606,14 @@ uint8_t upd765_family_device::get_st3(floppy_info &fi)
 	if(fi.ready)
 		st3 |= ST3_RY;
 	if(fi.dev)
+	{
 		st3 |=
 			(fi.dev->wpt_r() ? ST3_WP : 0x00) |
-			(fi.dev->trk00_r() ? 0x00 : ST3_T0) |
-			(fi.dev->twosid_r() ? 0x00 : ST3_TS);
+			(fi.dev->trk00_r() ? 0x00 : ST3_T0);
+
+		if (ts_connected)
+			st3 |= (fi.dev->twosid_r() ? 0x00 : ST3_TS);
+	}
 	return st3;
 }
 

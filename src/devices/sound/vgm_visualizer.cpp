@@ -739,7 +739,7 @@ void vgmviz_device::draw_waveform(bitmap_rgb32 &bitmap)
 		bitmap.pix(CHANNEL_HEIGHT + 1 + CHANNEL_CENTER, x) = MED_GRAY;
 
 		const float raw_l = m_audio_buf[1 - m_audio_fill_index][0][((int)m_history_length + 1 + x) % FFT_LENGTH];
-		const int sample_l = (int)((raw_l - 0.5f) * (CHANNEL_HEIGHT - 1));
+		const int sample_l = std::clamp((int)((raw_l - 0.5f) * (CHANNEL_HEIGHT - 1)), -CHANNEL_CENTER, CHANNEL_CENTER);
 		const int dy_l = (sample_l == 0) ? 0 : ((sample_l < 0) ? -1 : 1);
 		const int endy_l = CHANNEL_CENTER;
 		int y = endy_l - sample_l;
@@ -750,7 +750,7 @@ void vgmviz_device::draw_waveform(bitmap_rgb32 &bitmap)
 		} while(y != endy_l);
 
 		const float raw_r = m_audio_buf[1 - m_audio_fill_index][1][((int)m_history_length + 1 + x) % FFT_LENGTH];
-		const int sample_r = (int)((raw_r - 0.5f) * (CHANNEL_HEIGHT - 1));
+		const int sample_r = std::clamp((int)((raw_r - 0.5f) * (CHANNEL_HEIGHT - 1)), -CHANNEL_CENTER, CHANNEL_CENTER);
 		const int dy_r = (sample_r == 0) ? 0 : ((sample_r < 0) ? -1 : 1);
 		const int endy_r = CHANNEL_HEIGHT + 1 + CHANNEL_CENTER;
 		y = endy_r - sample_r;

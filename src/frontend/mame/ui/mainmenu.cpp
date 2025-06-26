@@ -12,8 +12,8 @@
 #include "ui/mainmenu.h"
 
 #include "ui/about.h"
-#include "ui/audiomix.h"
 #include "ui/audioeffects.h"
+#include "ui/audiomix.h"
 #include "ui/barcode.h"
 #include "ui/cheatopt.h"
 #include "ui/confswitch.h"

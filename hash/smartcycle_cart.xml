@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<!--
+
+Some undumped titles include
+
+SpongeBob - Ocean Adventure (2 different label designs exist?)
+Thomas & Friends
+Hot Wheels - Pedal to the Metal
+Sesame Street - A Happy Healthy Day
+Dora the Explorer - Friendship Adventure
+Learning Adventure (there are Yellow and Blue carts, are they the same? which is dumped)
+Learning Adventure Extreme (Red cart)
+Go Diego Go - The Great Dinosaur Adventure
+Go Diego Go - Animal Rescue
+Barbie Fairytopia
+Toy Story
+Cars 2
+Green Lantern
+Planet Heroes
+Bob the Builder
+
+NOTE: There is also a newer version of the Smart Cycle with 3D games, this however requires
+      you to use an Android tablet and download the games from the store, rather than having
+	  dedicated hardware and cartridges.
+
+-->
+
+
+<softwarelist name="smartcycle_cart" description="Fisher Price Smart Cycle cartridges">
+
+	<software name="sc0308" supported="no">
+		<description>Discover the Dinosaurs (0308)</description>
+		<year>2006</year>
+		<publisher>Fisher Price</publisher>
+		<part name="cart" interface="smartcycle_cart">
+			<dataarea name="rom" size="0x800000"> <!-- no checksum in header -->
+				<rom name="0308.bin" size="0x800000" crc="110fac64" sha1="7a318b2757898a3d7db1d79dbd0b0aed29dc39c1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sc0608" supported="no">
+		<description>Learning Adventure (0608)</description>
+		<year>2006</year>
+		<publisher>Fisher Price</publisher>
+		<part name="cart" interface="smartcycle_cart">
+			<dataarea name="rom" size="0x800000"> <!-- checksum in header matches -->
+				<rom name="0608.bin" size="0x800000" crc="167b2069" sha1="af5056db116020fd3096794a6166f0f13184a5df"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sc1410" supported="no">
+		<description>The Penguins of Madagascar (1410)</description>
+		<year>2006</year>
+		<publisher>Fisher Price</publisher>
+		<part name="cart" interface="smartcycle_cart">
+			<dataarea name="rom" size="0x800000"> <!-- checksum in header matches -->
+				<rom name="1410.bin" size="0x800000" crc="01eccc39" sha1="33cf330c3523343ec857a779a22d498215cb2362"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sc2108" supported="no">
+		<description>Scooby-Doo! (2108)</description>
+		<year>2006</year>
+		<publisher>Fisher Price</publisher>
+		<part name="cart" interface="smartcycle_cart">
+			<dataarea name="rom" size="0x800000"> <!-- checksum in header matches -->
+				<rom name="2108.bin" size="0x800000" crc="050c1806" sha1="0ac208781ef2172a1a3c6a974825d5f80e3ef291"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

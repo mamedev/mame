@@ -156,13 +156,10 @@ private:
 	bool m_separated;
 	bool m_flash;
 	bool m_boxed;
-	bool m_double_height;
-	bool m_double_height_old;
-	bool m_double_height_bottom_row;
-	bool m_double_height_prev_row;
+	bool m_dbl_height;
+	bool m_dbl_height_bottom_row;
+	bool m_dbl_height_prev_row;
 	bool m_hold_char;
-	bool m_hold_clear;
-	bool m_hold_off;
 	int m_frame_count;
 
 	// internal helpers

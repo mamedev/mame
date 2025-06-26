@@ -600,7 +600,7 @@ TIMER_CALLBACK_MEMBER(segaxbd_state::scanline_tick)
 	int next_scanline = (scanline + 1) % 262;
 
 	// clock the timer with V0
-	m_cmptimer_1->exck_w(scanline % 2);
+	m_cmptimer_1->exck_w(scanline & 1);
 
 	// set VBLANK on scanline 223
 	if (scanline == 223)
@@ -1757,13 +1757,13 @@ void segaxbd_state::xboard_base_mconfig(machine_config &config)
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", SOUND_CLOCK/4));
 	ymsnd.irq_handler().set_inputline(m_soundcpu, 0);
-	ymsnd.add_route(0, "speaker", 0.43, 0);
-	ymsnd.add_route(1, "speaker", 0.43, 1);
+	ymsnd.add_route(0, "speaker", 0.15, 0);
+	ymsnd.add_route(1, "speaker", 0.15, 1);
 
 	segapcm_device &pcm(SEGAPCM(config, "pcm", SOUND_CLOCK/4));
 	pcm.set_bank(segapcm_device::BANK_512);
-	pcm.add_route(0, "speaker", 1.0, 0);
-	pcm.add_route(1, "speaker", 1.0, 1);
+	pcm.add_route(0, "speaker", 0.35, 0);
+	pcm.add_route(1, "speaker", 0.35, 1);
 }
 
 
@@ -1865,8 +1865,8 @@ void segaxbd_lastsurv_fd1094_state::device_add_mconfig(machine_config &config)
 
 	// sound hardware - ym2151 stereo is reversed
 	subdevice<ym2151_device>("ymsnd")->reset_routes();
-	subdevice<ym2151_device>("ymsnd")->add_route(0, "speaker", 0.43, 1);
-	subdevice<ym2151_device>("ymsnd")->add_route(1, "speaker", 0.43, 0);
+	subdevice<ym2151_device>("ymsnd")->add_route(0, "speaker", 0.15, 1);
+	subdevice<ym2151_device>("ymsnd")->add_route(1, "speaker", 0.15, 0);
 }
 
 void segaxbd_new_state::sega_lastsurv_fd1094(machine_config &config)
@@ -1894,8 +1894,8 @@ void segaxbd_lastsurv_state::device_add_mconfig(machine_config &config)
 
 	// sound hardware - ym2151 stereo is reversed
 	subdevice<ym2151_device>("ymsnd")->reset_routes();
-	subdevice<ym2151_device>("ymsnd")->add_route(0, "speaker", 0.43, 1);
-	subdevice<ym2151_device>("ymsnd")->add_route(1, "speaker", 0.43, 0);
+	subdevice<ym2151_device>("ymsnd")->add_route(0, "speaker", 0.15, 1);
+	subdevice<ym2151_device>("ymsnd")->add_route(1, "speaker", 0.15, 0);
 }
 
 void segaxbd_new_state::sega_lastsurv(machine_config &config)
@@ -1939,13 +1939,12 @@ void segaxbd_smgp_fd1094_state::device_add_mconfig(machine_config &config)
 	m_iochip[0]->out_portb_cb().set(FUNC(segaxbd_state::smgp_motor_w));
 
 	// sound hardware
-	SPEAKER(config, "rearleft").front_left();
-	SPEAKER(config, "rearright").front_right();
+	SPEAKER(config, "rear", 2).rear();
 
 	segapcm_device &pcm2(SEGAPCM(config, "pcm2", SOUND_CLOCK/4));
 	pcm2.set_bank(segapcm_device::BANK_512);
-	pcm2.add_route(0, "rearleft", 1.0);
-	pcm2.add_route(1, "rearright", 1.0);
+	pcm2.add_route(0, "rear", 0.35, 0);
+	pcm2.add_route(1, "rear", 0.35, 1);
 }
 
 void segaxbd_new_state::sega_smgp_fd1094(machine_config &config)
@@ -1984,13 +1983,12 @@ void segaxbd_smgp_state::device_add_mconfig(machine_config &config)
 	m_iochip[0]->out_portb_cb().set(FUNC(segaxbd_state::smgp_motor_w));
 
 	// sound hardware
-	SPEAKER(config, "rearleft").front_left();
-	SPEAKER(config, "rearright").front_right();
+	SPEAKER(config, "rear", 2).rear();
 
 	segapcm_device &pcm2(SEGAPCM(config, "pcm2", SOUND_CLOCK/4));
 	pcm2.set_bank(segapcm_device::BANK_512);
-	pcm2.add_route(0, "rearleft", 1.0);
-	pcm2.add_route(1, "rearright", 1.0);
+	pcm2.add_route(0, "rear", 0.35, 0);
+	pcm2.add_route(1, "rear", 0.35, 1);
 }
 
 void segaxbd_new_state::sega_smgp(machine_config &config)

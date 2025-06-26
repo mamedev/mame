@@ -383,6 +383,14 @@ ertictaca
 ertictacb
 poizone
 
+@source:acorn/eurocube.cpp
+eurobeeb1
+eurobeeb2
+eurobeeb3m
+eurobeeb3c
+eurocube09
+eurocube65
+
 @source:acorn/riscpc.cpp
 a7000
 a7000p
@@ -435,6 +443,8 @@ fashiong
 fashiong2
 fstation
 funlddlx
+funlddlx2
+funlddlx4
 quickjac
 skattv
 skattva
@@ -456,10 +466,19 @@ glucksstern
 juwel
 karoas
 kniffi
+supermultib
 
 @source:adp/stellafr.cpp
+action
+allfred
+grandhand
+kleopatra
+multimulti
 st_ohla
 st_vulkn
+sunny
+taipan
+turbosun
 
 @source:agat/agat.cpp
 agat7
@@ -1896,9 +1915,10 @@ cmmb162
 cmmb103
 
 @source:atari/cops.cpp
-cops
-copsuk
-revlatns
+cops                            // (c) 1994
+copsuk                          // (c) 1994 (Nova/Deith Leisure)
+revlatns                        // (c) 1991
+visnqust                        // (c) 1992 (Kramer/Nova)
 
 @source:atari/copsnrob.cpp
 copsnrob
@@ -17617,6 +17637,7 @@ polluxn
 popbingo
 primella
 rshark
+rsharka
 sadari
 superx
 superxm
@@ -17680,6 +17701,7 @@ mjmywrldt
 mjreach1
 mjreach1a
 mjschuka
+mjswacad
 mjtenho
 mjxysl
 mmpanic
@@ -20413,6 +20435,8 @@ animalhsa
 animalhsb
 animalhsc
 animalw
+animalwa
+animalwbl
 aplan
 bingowng
 bingownga
@@ -20687,6 +20711,7 @@ lhzba
 lhzb2
 lhzb2a
 lhzb2b
+lhzb2c
 mgcs
 mgcsa
 mgcsb
@@ -20954,6 +20979,7 @@ kov2p200
 kov2p202
 kov2p203
 kov2p204
+kovbl
 kovgsyx
 kovlsjb
 kovlsjba
@@ -20961,6 +20987,7 @@ kovlsqh
 kovlsqh2
 kovplus
 kovplusa
+kovplusbl
 kovqhsgs
 kovsgqyz
 kovsgqyza
@@ -21077,6 +21104,7 @@ spk201ua
 spk203us
 spk205us
 spk306us
+xjinhuang
 zuanshiw
 
 @source:igt/drw80pkr.cpp
@@ -25578,6 +25606,11 @@ korgm1ex
 korgm1p1
 korgm1r
 korgm1rex
+
+@source:korg/korgtriton.cpp
+korgtriton
+korgtritona
+korgtritonb
 
 @source:korg/korgws.cpp
 korgwsad
@@ -31590,6 +31623,7 @@ menghong
 menghonga
 pljh2
 sandayi
+wakeng
 
 @source:misc/meyc8080.cpp
 casbjack
@@ -32429,7 +32463,6 @@ psattack
 bazooka
 bazookabr
 dpatrol
-dpatrola
 gametree
 knightar
 
@@ -32824,6 +32857,9 @@ supertr2
 supertr3
 tripdraw
 trivquiz
+
+@source:misc/stc3910.cpp
+executel
 
 @source:misc/stop.cpp
 stop
@@ -33597,6 +33633,9 @@ sspanic
 @source:namco/dkmb.cpp
 dkmb
 
+@source:namco/ds5000.cpp
+ds5000
+
 @source:namco/gal3.cpp
 gal3
 
@@ -34025,6 +34064,7 @@ tekken3b
 tekken3c
 tekken3d
 tekken3ja
+tekken3jd
 tekken3je1
 tekken3ua
 tekken3ud
@@ -35339,7 +35379,6 @@ polmega
 ppgc200g
 protpp
 pumpactv
-rfcp168
 sen101
 senwld
 silv35
@@ -35398,6 +35437,7 @@ dgun2573a
 dgunl3201
 dgunl3202
 fcpocket
+g9_666
 lxpcli
 lxpcsp
 matet100
@@ -35405,9 +35445,11 @@ matet220
 matet300
 myaasa
 myaass
+rfcp168
 rminitv
 
 @source:nintendo/nes_vt369_vtunknown.cpp
+36pcase
 168pcase
 240in1ar
 bittboy
@@ -35432,14 +35474,19 @@ lxccplan
 lxcmc250
 lxcmcy
 lxcmcyba
+lxcmcybt
 lxcmcycr
 lxcmcydp
+lxcmcydpn
 lxcmcyfz
 lxcmcypj
 lxcmcypp
 lxcmcysp
+lxcmcyspn
 lxcmcysw
 lxcyber
+lxcypkdp
+lxcypksp
 matet10
 matetsl
 mc_cb280
@@ -37623,6 +37670,7 @@ smbpa
 smbpb
 smbpc
 smbpv
+smbpva
 snspares
 snspares1
 snspares2
@@ -38109,6 +38157,7 @@ pb_l5
 pb_p4
 
 @source:pinball/s11b.cpp
+bcats_f1
 bcats_g4
 bcats_l2
 bcats_l5
@@ -45166,6 +45215,7 @@ contcircu
 contcircua
 dblaxle
 dblaxleu
+dblaxleua
 dblaxleul
 enforce
 enforcej
@@ -45285,7 +45335,6 @@ dendego3
 landhigh
 landhigha
 pwrshovl
-pwrshovla
 raizpin
 raizpinj
 styphp
@@ -46327,6 +46376,9 @@ emma2
 @source:trainer/instruct.cpp
 instruct
 
+@source:trainer/mac3.cpp
+mac3
+
 @source:trainer/mcg85.cpp
 mcg85
 
@@ -46556,16 +46608,17 @@ smartfps
 tkmag220
 
 @source:tvgames/generalplus_gpl16250_romram.cpp
-paccon
-lazertag
+jak_pf
+jak_prft
 jak_s500
 jak_sinv
 jak_smwm
-jak_pf
-jak_prft
+jak_swcl
+jak_ths
 jak_tink
 jak_totm
-jak_ths
+lazertag
+paccon
 tomycar
 wrlshunt
 
@@ -46727,6 +46780,7 @@ rad_skatp
 rocksock
 senspeed
 senwfit
+smartcyc
 swclone
 tiktokmm
 tmntbftc
@@ -47077,6 +47131,7 @@ domfitad
 dombikec
 epo_dabj
 epo_dtcj
+epo_sskj
 
 @source:tvgames/xavix_2000.cpp
 ban_omt
@@ -47103,18 +47158,20 @@ anpanmdx
 apmj2009
 ban_bkgj
 ban_dn1j
+ban_gkrj
 ban_kksj
+ban_ordj
 ban_ult
 ban_utmj
-epo_ntpj
-epo_rgfj
-ban_ordj
+ban_um2j
 domdance
 domfitch
 domfitex
 domstepc
 doradraw
 epo_doka
+epo_ntpj
+epo_rgfj
 epo_tfit
 maxheart
 mrangbat
@@ -47132,6 +47189,7 @@ xavbassf
 xavbowl
 xavbowlj
 xavbox
+xavcheck
 xavjmat
 xavmusic
 xavpkjr

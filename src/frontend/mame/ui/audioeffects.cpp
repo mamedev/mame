@@ -10,23 +10,26 @@
 
 #include "emu.h"
 #include "ui/audioeffects.h"
-#include "audio_effects/aeffect.h"
 
-#include "audio_effect_compressor.h"
-#include "audio_effect_eq.h"
-#include "audio_effect_filter.h"
-
+#include "ui/audio_effect_compressor.h"
+#include "ui/audio_effect_eq.h"
+#include "ui/audio_effect_filter.h"
+#include "ui/audio_effect_reverb.h"
 #include "ui/ui.h"
 
-#include "osdepend.h"
+#include "audio_effects/aeffect.h"
+
 #include "speaker.h"
+
+#include "osdepend.h"
 
 namespace ui {
 
 menu_audio_effects::menu_audio_effects(mame_ui_manager &mui, render_container &container)
 	: menu(mui, container)
 {
-	set_heading(_("Audio Effects"));
+	set_heading(_("menu-aeffect", "Audio Effects"));
+	set_process_flags(PROCESS_LR_REPEAT);
 }
 
 menu_audio_effects::~menu_audio_effects()
@@ -85,7 +88,6 @@ bool menu_audio_effects::handle(event const *ev)
 		10, 20, 30, 40, 50, 75, 100, 200, 300, 400, 500, 1000, 0
 	};
 
-
 	if(!ev)
 		return false;
 
@@ -93,6 +95,8 @@ bool menu_audio_effects::handle(event const *ev)
 	case IPT_UI_SELECT: {
 		u16 chain = (uintptr_t(ev->itemref)) >> 16;
 		u16 entry = (uintptr_t(ev->itemref)) & 0xffff;
+		if(entry & 0xf000)
+			return false;
 		audio_effect *eff = chain == 0xffff ? machine().sound().default_effect_chain()[entry] : machine().sound().effect_chain(chain)[entry];
 		switch(eff->type()) {
 		case audio_effect::COMPRESSOR:
@@ -105,6 +109,10 @@ bool menu_audio_effects::handle(event const *ev)
 
 		case audio_effect::FILTER:
 			menu::stack_push<menu_audio_effect_filter>(ui(), container(), chain, entry, eff);
+			break;
+
+		case audio_effect::REVERB:
+			menu::stack_push<menu_audio_effect_reverb>(ui(), container(), chain, entry, eff);
 			break;
 		}
 		return true;
@@ -119,17 +127,20 @@ bool menu_audio_effects::handle(event const *ev)
 
 		case RS_LATENCY:
 			machine().sound().set_resampler_hq_latency(0.005);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_lat(machine().sound().resampler_hq_latency()));
+			ev->item->set_flags(flag_lat());
 			return true;
 
 		case RS_LENGTH:
 			machine().sound().set_resampler_hq_length(400);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_u32(machine().sound().resampler_hq_length()));
+			ev->item->set_flags(flag_length());
 			return true;
 
 		case RS_PHASES:
 			machine().sound().set_resampler_hq_phases(200);
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_u32(machine().sound().resampler_hq_phases()));
+			ev->item->set_flags(flag_phases());
 			return true;
 		}
 		break;
@@ -144,17 +155,20 @@ bool menu_audio_effects::handle(event const *ev)
 
 		case RS_LATENCY:
 			machine().sound().set_resampler_hq_latency(change_f(latencies, machine().sound().resampler_hq_latency(), -1));
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_lat(machine().sound().resampler_hq_latency()));
+			ev->item->set_flags(flag_lat());
 			return true;
 
 		case RS_LENGTH:
 			machine().sound().set_resampler_hq_length(change_u32(lengths, machine().sound().resampler_hq_length(), -1));
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_u32(machine().sound().resampler_hq_length()));
+			ev->item->set_flags(flag_length());
 			return true;
 
 		case RS_PHASES:
 			machine().sound().set_resampler_hq_phases(change_u32(phases, machine().sound().resampler_hq_phases(), -1));
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_u32(machine().sound().resampler_hq_phases()));
+			ev->item->set_flags(flag_phases());
 			return true;
 		}
 		break;
@@ -169,17 +183,20 @@ bool menu_audio_effects::handle(event const *ev)
 
 		case RS_LATENCY:
 			machine().sound().set_resampler_hq_latency(change_f(latencies, machine().sound().resampler_hq_latency(), 1));
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_lat(machine().sound().resampler_hq_latency()));
+			ev->item->set_flags(flag_lat());
 			return true;
 
 		case RS_LENGTH:
 			machine().sound().set_resampler_hq_length(change_u32(lengths, machine().sound().resampler_hq_length(), 1));
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_u32(machine().sound().resampler_hq_length()));
+			ev->item->set_flags(flag_length());
 			return true;
 
 		case RS_PHASES:
 			machine().sound().set_resampler_hq_phases(change_u32(phases, machine().sound().resampler_hq_phases(), 1));
-			reset(reset_options::REMEMBER_POSITION);
+			ev->item->set_subtext(format_u32(machine().sound().resampler_hq_phases()));
+			ev->item->set_flags(flag_phases());
 			return true;
 		}
 		break;
@@ -192,12 +209,12 @@ bool menu_audio_effects::handle(event const *ev)
 
 std::string menu_audio_effects::format_lat(double latency)
 {
-	return util::string_format("%3.1fms", 1000*latency);
+	return util::string_format(_("menu-aeffect", "%1$3.1f ms"), 1000 * latency);
 }
 
 std::string menu_audio_effects::format_u32(u32 val)
 {
-	return util::string_format("%u", val);
+	return util::string_format(_("menu-aeffect", "%u"), val);
 }
 
 u32 menu_audio_effects::flag_type() const
@@ -260,16 +277,16 @@ void menu_audio_effects::populate()
 		for(u32 e = 0; e != eff.size(); e++)
 			item_append(_(audio_effect::effect_names[eff[e]->type()]), 0, (void *)intptr_t((chain << 16) | e));
 	}
-	item_append(_("Default"), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
+	item_append(_("menu-aeffect", "Default"), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
 	auto eff = sound.default_effect_chain();
 	for(u32 e = 0; e != eff.size(); e++)
-		item_append(_(audio_effect::effect_names[eff[e]->type()]), 0, (void *)intptr_t((0xffff << 16) | e));
+		item_append(_("audio-effect", audio_effect::effect_names[eff[e]->type()]), 0, (void *)intptr_t((0xffff << 16) | e));
 
-	item_append(_("Resampler"), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
-	item_append(_("Type"), sound.resampler_type_names(sound.resampler_type()), flag_type(), (void *)RS_TYPE);
-	item_append(_("HQ latency"), format_lat(sound.resampler_hq_latency()), flag_lat(), (void *)RS_LATENCY);
-	item_append(_("HQ filter max size"), format_u32(sound.resampler_hq_length()), flag_length(), (void *)RS_LENGTH);
-	item_append(_("HQ filter max phases"), format_u32(sound.resampler_hq_phases()), flag_phases(), (void *)RS_PHASES);
+	item_append(_("menu-aeffect", "Resampler"), FLAG_UI_HEADING | FLAG_DISABLE, nullptr);
+	item_append(_("menu-aeffect", "Type"), sound.resampler_type_names(sound.resampler_type()), flag_type(), (void *)RS_TYPE);
+	item_append(_("menu-aeffect", "HQ latency"), format_lat(sound.resampler_hq_latency()), flag_lat(), (void *)RS_LATENCY);
+	item_append(_("menu-aeffect", "HQ filter max size"), format_u32(sound.resampler_hq_length()), flag_length(), (void *)RS_LENGTH);
+	item_append(_("menu-aeffect", "HQ filter max phases"), format_u32(sound.resampler_hq_phases()), flag_phases(), (void *)RS_PHASES);
 	item_append(menu_item_type::SEPARATOR);
 }
 

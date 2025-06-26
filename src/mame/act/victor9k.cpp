@@ -17,7 +17,6 @@
         - Z80 card
         - RAM cards
         - clock cards
-    - floppy 8048
 
 */
 
@@ -235,18 +234,18 @@ void victor9k_state::victor9k_mem(address_map &map)
 {
 	map(0x00000, 0x1ffff).ram();
 	map(0x20000, 0xdffff).noprw();
-	map(0xe0000, 0xe0001).mirror(0x7f00).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
-	map(0xe0020, 0xe0023).mirror(0x7f00).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-	map(0xe0040, 0xe0043).mirror(0x7f00).rw(m_upd7201, FUNC(upd7201_device::cd_ba_r), FUNC(upd7201_device::cd_ba_w));
-	map(0xe8000, 0xe8000).mirror(0x7f00).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
-	map(0xe8001, 0xe8001).mirror(0x7f00).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0xe8020, 0xe802f).mirror(0x7f00).m(m_via1, FUNC(via6522_device::map));
-	map(0xe8040, 0xe804f).mirror(0x7f00).m(m_via2, FUNC(via6522_device::map));
-	map(0xe8060, 0xe8061).mirror(0x7f00).rw(m_ssda, FUNC(mc6852_device::read), FUNC(mc6852_device::write));
-	map(0xe8080, 0xe808f).mirror(0x7f00).m(m_via3, FUNC(via6522_device::map));
-	map(0xe80a0, 0xe80af).mirror(0x7f00).rw(m_fdc, FUNC(victor_9000_fdc_device::cs5_r), FUNC(victor_9000_fdc_device::cs5_w));
-	map(0xe80c0, 0xe80cf).mirror(0x7f00).rw(m_fdc, FUNC(victor_9000_fdc_device::cs6_r), FUNC(victor_9000_fdc_device::cs6_w));
-	map(0xe80e0, 0xe80ef).mirror(0x7f00).rw(m_fdc, FUNC(victor_9000_fdc_device::cs7_r), FUNC(victor_9000_fdc_device::cs7_w));
+	map(0xe0000, 0xe0001).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0xe0020, 0xe0023).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0xe0040, 0xe0043).rw(m_upd7201, FUNC(upd7201_device::cd_ba_r), FUNC(upd7201_device::cd_ba_w));
+	map(0xe8000, 0xe8000).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
+	map(0xe8001, 0xe8001).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0xe8020, 0xe802f).m(m_via1, FUNC(via6522_device::map));
+	map(0xe8040, 0xe804f).m(m_via2, FUNC(via6522_device::map));
+	map(0xe8060, 0xe8061).rw(m_ssda, FUNC(mc6852_device::read), FUNC(mc6852_device::write));
+	map(0xe8080, 0xe808f).m(m_via3, FUNC(via6522_device::map));
+	map(0xe80a0, 0xe80af).rw(m_fdc, FUNC(victor_9000_fdc_device::cs5_r), FUNC(victor_9000_fdc_device::cs5_w));
+	map(0xe80c0, 0xe80cf).rw(m_fdc, FUNC(victor_9000_fdc_device::cs6_r), FUNC(victor_9000_fdc_device::cs6_w));
+	map(0xe80e0, 0xe80ef).rw(m_fdc, FUNC(victor_9000_fdc_device::cs7_r), FUNC(victor_9000_fdc_device::cs7_w));
 	map(0xef300, 0xef3ff).rw(m_hdc, FUNC(victor_9000_hdc_device::read), FUNC(victor_9000_hdc_device::write));
 	map(0xf0000, 0xf0fff).mirror(0x1000).ram().share("video_ram");
 	map(0xf8000, 0xf9fff).mirror(0x6000).rom().region(I8088_TAG, 0);

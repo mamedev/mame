@@ -698,6 +698,7 @@ public:
 	void init_lhzb2() ATTR_COLD;
 	void init_lhzb2a() ATTR_COLD;
 	void init_lhzb2b() ATTR_COLD;
+	void init_lhzb2c() ATTR_COLD;
 	void init_mgcs() ATTR_COLD;
 	void init_mgcsa() ATTR_COLD;
 	void init_mgcsb() ATTR_COLD;
@@ -1925,9 +1926,9 @@ void igs017_state::init_lhzb2a()
 //  m_igs_string->dump("lhzb2a_string.key", 0x6e11c, 0x6e030, true); // same data as lhzb2
 }
 
-// lhzb2a
+// lhzb2b
 
-void igs017_state::init_lhzb2b() // TODO: possibly not 100% correct
+void igs017_state::init_lhzb2b()
 {
 	const int rom_size = memregion("maincpu")->bytes();
 	u16 * const rom = (u16 *)memregion("maincpu")->base();
@@ -1957,7 +1958,7 @@ void igs017_state::init_lhzb2b() // TODO: possibly not 100% correct
 
 		if (i & 0x8000/2)
 		{
-			if (!(i & 0x2000/2))
+			if (i & 0x2000/2)
 			{
 				if (!(i & 0x800/2))
 				{
@@ -1994,6 +1995,68 @@ void igs017_state::init_lhzb2b() // TODO: possibly not 100% correct
 //  m_igs_string->dump("lhzb2b_string.key", 0x6e11c, 0x6e030, true);
 }
 
+// lhzb2c
+
+void igs017_state::init_lhzb2c()
+{
+	const int rom_size = memregion("maincpu")->bytes();
+	u16 * const rom = (u16 *)memregion("maincpu")->base();
+
+	for (int i = 0; i < rom_size / 2; i++)
+	{
+		u16 x = rom[i];
+
+		// bit 0 xor layer
+		if (i & 0x20/2)
+		{
+			if (i & 0x02/2)
+			{
+				x ^= 0x0001;
+			}
+		}
+
+		if (!(i & 0x4000/2))
+		{
+			if (!(i & 0x300/2))
+			{
+				x ^= 0x0001;
+			}
+		}
+
+		// bit 5 xor layer
+
+		if (i & 0x4000/2)
+		{
+			if (i & 0x8000/2)
+			{
+				if (!(i & 0x2000/2))
+				{
+					if (i & 0x200/2)
+					{
+						if (!(i & 0x40/2) || (i & 0x800/2))
+						{
+							x ^= 0x0020;
+						}
+					}
+				}
+			}
+			else
+			{
+				if (!(i & 0x40/2) || (i & 0x800/2))
+				{
+					x ^= 0x0020;
+				}
+			}
+		}
+
+		rom[i] = x;
+	}
+
+	m_igs017_igs031->lhzb2_decrypt_tiles();
+	m_igs017_igs031->lhzb2_decrypt_sprites();
+
+//  m_igs_string->dump("lhzb2c_string.key", 0x6e11c, 0x6e030, true);
+}
 
 // slqz2
 
@@ -5713,6 +5776,26 @@ ROM_START( lhzb2b ) // IGS PCB N0-0218-2 (has IGS025 stickered M3, IGS029, 2 ban
 	ROM_LOAD( "lhzb2_string.key", 0x00, 0xec, CRC(c964dc35) SHA1(81036e0dfa9abad123701ae8939d0d5b6f91b015) )
 ROM_END
 
+// VS220M: only the program ROM was provided
+ROM_START( lhzb2c )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "janan409", 0x00000, 0x80000, CRC(a52e954c) SHA1(b574ea8ba7956a24514c8e87238bcf587df3331b) )
+
+	ROM_REGION( 0x10000, "igs022", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD16_WORD_SWAP( "m1101.u6", 0x000000, 0x400000, CRC(0114e9d1) SHA1(5b16170d3cd8b8e1662c949b7234fbdd2ca927f7) ) // FIXED BITS (0xxxxxxxxxxxxxxx)
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD16_WORD_SWAP( "m1103.u8", 0x00000, 0x80000, CRC(4d3776b4) SHA1(fa9b311b1a6ad56e136b66d090bc62ed5003b2f2) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "s1102.u23", 0x00000, 0x80000, CRC(51ffe245) SHA1(849011b186096add657ab20d49d260ec23363ef3) )
+
+	ROM_REGION( 0xec, "igs_string", 0 )
+	ROM_LOAD( "lhzb2c_string.key", 0x00, 0xec, BAD_DUMP CRC(c964dc35) SHA1(81036e0dfa9abad123701ae8939d0d5b6f91b015) ) // TODO: should be correct, but verify
+ROM_END
+
 /*
 PCB NO-0182-2
 IGS025 sticker is D2
@@ -6464,6 +6547,7 @@ GAME ( 1998,  lhzba,       lhzb,     lhzb2,      lhzb,        igs017_state, init
 GAME ( 1998,  lhzb2,       0,        lhzb2,      lhzb2,       igs017_state, init_lhzb2,      ROT0, "IGS", "Long Hu Zhengba 2 (China, set 1)",                                   MACHINE_UNEMULATED_PROTECTION ) // 龙虎争霸2, finish IGS022 protection
 GAME ( 1998,  lhzb2a,      lhzb2,    lhzb2a,     lhzb2a,      igs017_state, init_lhzb2a,     ROT0, "IGS", "Long Hu Zhengba 2 (China, VS221M)",                                  0 ) // 龙虎争霸2
 GAME ( 1998,  lhzb2b,      lhzb2,    lhzb2,      lhzb2,       igs017_state, init_lhzb2b,     ROT0, "IGS", "Long Hu Zhengba 2 (China, VS210M)",                                  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME ( 1998,  lhzb2c,      lhzb2,    lhzb2a,     lhzb2a,      igs017_state, init_lhzb2c,     ROT0, "IGS", "Long Hu Zhengba 2 (China, VS220M)",                                  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME ( 1998,  slqz2,       0,        slqz2,      slqz2,       igs017_state, init_slqz2,      ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, VS203J, set 1)",                  MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, finish IGS022 protection
 GAME ( 1998,  slqz2a,      slqz2,    slqz2,      slqz2,       igs017_state, init_slqz2,      ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, unknown version)",                MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, misses program ROM dump, finish IGS022 protection
 GAME ( 1998,  slqz2b,      slqz2,    slqz2,      slqz2,       igs017_state, init_slqz2b,     ROT0, "IGS", "Shuang Long Qiang Zhu 2 VS (China, VS203J, set 2)",                  MACHINE_UNEMULATED_PROTECTION ) // 双龙抢珠, finish IGS022 protection

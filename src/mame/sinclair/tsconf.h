@@ -19,7 +19,6 @@
 #include "beta_m.h"
 #include "machine/pckeybrd.h"
 #include "machine/spi_sdcard.h"
-#include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "tilemap.h"
 
@@ -44,8 +43,6 @@ public:
 		, m_cram(*this, "cram")
 		, m_sfile(*this, "sfile")
 		, m_dac(*this, "dac")
-		, m_ay(*this, "ay%u", 0U)
-		, m_mod_ay(*this, "MOD_AY")
 	{
 	}
 
@@ -189,7 +186,6 @@ private:
 	void tsconf_spi_miso_w(u8 data);
 	u8 tsconf_port_f7_r(offs_t offset);
 	void tsconf_port_f7_w(offs_t offset, u8 data);
-	void tsconf_ay_address_w(u8 data);
 
 	void tsconf_update_bank0();
 	u8 beta_neutral_r(offs_t offset);
@@ -200,9 +196,9 @@ private:
 	void tsconf_mem(address_map &map) ATTR_COLD;
 	void tsconf_switch(address_map &map) ATTR_COLD;
 
-	u8 mem_bank_read(u8 bank, offs_t offset);
-	template <u8 Bank>
-	void tsconf_bank_w(offs_t offset, u8 data);
+	template <u8 Bank> u8 tsconf_ram_bank_r(offs_t offset) { return ram_bank_read(Bank, offset); };
+	template <u8 Bank> void tsconf_bank_w(offs_t offset, u8 data) { ram_bank_write(Bank, offset, data); };
+	u8 ram_bank_read(u8 bank, offs_t offset);
 	void ram_bank_write(u8 bank, offs_t offset, u8 data);
 	void ram_page_write(u8 page, offs_t offset, u8 data);
 	void cram_write(u16 offset, u8 data);
@@ -219,6 +215,7 @@ private:
 	memory_view m_bank0_rom;
 	memory_share_array_creator<u8, 2> m_tiles_raw;
 	memory_share_creator<u8> m_sprites_raw;
+	u16 m_cache_line_addr; // u13
 
 	required_device<at_keyboard_device> m_keyboard;
 	required_ioport_array<3> m_io_mouse;
@@ -242,9 +239,6 @@ private:
 	std::vector<sprite_data> m_sprites_cache;
 
 	required_device<dac_byte_interface> m_dac;
-	required_device_array<ym2149_device, 2> m_ay;
-	u8 m_ay_selected;
-	required_ioport m_mod_ay;
 };
 
 /*----------- defined in drivers/tsconf.c -----------*/

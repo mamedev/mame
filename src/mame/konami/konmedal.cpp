@@ -1162,7 +1162,7 @@ void konmedal_state::shuriboy(machine_config &config)
 
 	PALETTE(config, m_palette, FUNC(konmedal_state::konmedal_palette)).set_format(palette_device::xRGB_444, 256); // not verified
 	//m_palette->enable_shadows();
-	//m_palette->enable_hilights();
+	//m_palette->enable_highlights();
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);

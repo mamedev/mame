@@ -2,29 +2,76 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
--->
 
+There are three known methods to run cassette tapes:
+1. from IPL, strike 'C'
+2. from BASIC, LOAD, <CR> at filename prompt
+3. if above throws an error 18 then MON -> L -> <CR> at filename prompt
+
+Some SW may require 1Z002 instead of 1Z001.
+
+It is unknown if there's a 4th method involving a missing Hu-BASIC image,
+a few unlisted entries seems to indicate that way.
+
+TODO:
+- Refine sharedfeat, mostly around games that are non-functional with monochrome monitor;
+
+-->
 
 <softwarelist name="mz2000_cass" description="Sharp MZ-2000 cassettes">
 
-	<software name="mz1z001">
+<!-- !Operating Systems -->
+
+	<software name="mz1z001" supported="no">
 		<description>BASIC MZ-1Z001 v1.0c</description>
 		<year>1982</year>
 		<publisher>Sharp</publisher>
 		<part name="cass1" interface="mz_cass">
-			<dataarea name="cass" size="26752">
-				<rom name="mz-1z001.mzt" size="19675" crc="1324490f" sha1="88e19a54011f2ab2a7a882302bcb98c03338a739" status="baddump" />
+			<dataarea name="cass" size="19675">
+				<rom name="mz-1z001.mzt" size="19675" crc="1324490f" sha1="88e19a54011f2ab2a7a882302bcb98c03338a739" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="mz1z002">
+	<software name="mz1z002" supported="no">
 		<description>BASIC MZ-1Z002 v1.0a</description>
 		<year>1982</year>
 		<publisher>Sharp</publisher>
 		<part name="cass1" interface="mz_cass">
-			<dataarea name="cass" size="26752">
-				<rom name="mz-1z002.mzt" size="23911" crc="1b2bd21d" sha1="c116b54abb4aac0cc32d000be287a10bf832e6ee" status="baddump" />
+			<dataarea name="cass" size="23911">
+				<rom name="mz-1z002.mzt" size="23911" crc="1b2bd21d" sha1="c116b54abb4aac0cc32d000be287a10bf832e6ee" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- !Games -->
+
+	<software name="bombrman" supported="no">
+		<description>Bomber Man</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<info name="serial" value="WB-1003"/>
+		<info name="alt_title" value="爆弾男"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="3944464">
+				<rom name="wb-1003.wav" size="3944464" crc="da852425" sha1="03c5b8694b7482c6af696fef5338d05c3d86c70e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cnonball" supported="no">
+		<description>Cannon Ball</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<notes><![CDATA[
+CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
+]]></notes>
+		<info name="usage" value="IPL" />
+		<info name="serial" value="WB-1001"/>
+		<info name="alt_title" value="キャノンボール"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1386284">
+				<rom name="wb-1001.wav" size="1386284" crc="461ce2f5" sha1="8d859095b18ac5aab348a205f3734340e6b5290b" />
 			</dataarea>
 		</part>
 	</software>
@@ -33,9 +80,10 @@ license:CC0-1.0
 		<description>Harvest (Color?)</description>
 		<year>19??</year>
 		<publisher>マイクロネット (Micronet)</publisher>
+		<sharedfeat name="compatibility" value="COLOR"/>
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="47808">
-				<rom name="harvest_color.mzt" size="47808" crc="7e50de6f" sha1="646450d817f3b27ced3a5f34d62d76e1d29bff57"/>
+				<rom name="harvest_color.mzt" size="47808" crc="7e50de6f" sha1="646450d817f3b27ced3a5f34d62d76e1d29bff57" />
 			</dataarea>
 		</part>
 	</software>
@@ -46,7 +94,57 @@ license:CC0-1.0
 		<publisher>マイクロネット (Micronet)</publisher>
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="47808">
-				<rom name="harvest_green.mzt" size="47808" crc="fe0b6a0b" sha1="5ba88252496cc12a1f9807b36a664aa32d7dc1a4"/>
+				<rom name="harvest_green.mzt" size="47808" crc="fe0b6a0b" sha1="5ba88252496cc12a1f9807b36a664aa32d7dc1a4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="help" supported="no">
+		<description>Help!</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<notes><![CDATA[
+CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
+]]></notes>
+		<info name="serial" value="WB-1009"/>
+		<info name="usage" value="IPL"/>
+		<sharedfeat name="compatibility" value="COLOR"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1489708">
+				<rom name="wb-1009.wav" size="1489708" crc="523985e0" sha1="f4a0f20d698caf5dd597ea17b59e5a351f49f1f2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hitsujai" supported="no">
+		<description>Hitsuja~i!</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<notes><![CDATA[
+CHECK SUM ERROR
+]]></notes>
+		<info name="serial" value="WB-1007"/>
+		<info name="alt_title" value="ひつじゃ～い!"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1887532">
+				<rom name="wb-1007.wav" size="1887532" crc="6fc27604" sha1="d3031ad40cb5c4bfc4a7afd8ddd7a16bbf345e70" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hiyokof" supported="no">
+		<description>Hiyoko Fighter</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<notes><![CDATA[
+CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
+]]></notes>
+		<info name="serial" value="WB-1005"/>
+		<info name="alt_title" value="ヒヨコファイター"/>
+		<info name="usage" value="IPL"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1566764">
+				<rom name="wb-1005.wav" size="1566764" crc="08c2d4a3" sha1="1325773c7f640c1f86186c1d5608cdff7995d007" />
 			</dataarea>
 		</part>
 	</software>
@@ -59,7 +157,7 @@ license:CC0-1.0
 		<publisher>キャリーラボ (Carry Lab)</publisher>
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="3676194">
-				<rom name="jelda.wav" size="3676194" crc="5812e3f2" sha1="d751932064f53a764b756846393526dd511f5cff"/>
+				<rom name="jelda.wav" size="3676194" crc="5812e3f2" sha1="d751932064f53a764b756846393526dd511f5cff" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -72,18 +170,88 @@ license:CC0-1.0
 		<publisher>キャリーラボ (Carry Lab)</publisher>
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="6435154">
-				<rom name="jelda2.wav" size="6435154" crc="b7d61f11" sha1="8ff3932682e70f74f5d542059450e1a83b987c6a"/>
+				<rom name="jelda2.wav" size="6435154" crc="b7d61f11" sha1="8ff3932682e70f74f5d542059450e1a83b987c6a" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mj05" supported="no">
+		<description>MJ-05</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<notes><![CDATA[
+Loading error, boots with Z80 clock set at 3.2 MHz (80%)
+]]></notes>
+		<info name="serial" value="WB-1008"/>
+		<info name="usage" value="IPL"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="6366398">
+				<rom name="wb-1008.wav" size="6366398" crc="d7335aad" sha1="a26dd12e064b02d18ba673bb4633762aa38cca09" />
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="powrfail" supported="no">
+		<description>Power Fail</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<notes><![CDATA[
+CHECK SUM ERROR
+]]></notes>
+		<info name="serial" value="WB-1004"/>
+		<info name="alt_title" value="パワーフェイル"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="2145580">
+				<rom name="wb-1004.wav" size="2145580" crc="eecf0e2a" sha1="8263a0ba92c6e9f3d94fed0d7005591841d4d826" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="thespidr" supported="no">
+		<description>The Spider</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<notes><![CDATA[
+CHECK SUM ERROR
+]]></notes>
+		<info name="serial" value="WB-1006"/>
+		<info name="alt_title" value="ザ・スパイダー"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="3149100">
+				<rom name="wb-1006.wav" size="3149100" crc="eec8674f" sha1="231d55c6cbb48fe88676fec31f014c6002788b5f" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="sstream" supported="no">
 		<description>Star Stream</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<notes><![CDATA[
+CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
+]]></notes>
+		<info name="usage" value="IPL" />
+		<sharedfeat name="compatibility" value="COLOR"/>
 		<part name="cass1" interface="mz_cass">
-			<dataarea name="cass" size="26752">
-				<rom name="star stream.mzt" size="21248" crc="28e2db60" sha1="f309b5803e8e5241301f2e738d00d0975bbfc00f"/>
+			<dataarea name="cass" size="21248">
+				<rom name="star stream.mzt" size="21248" crc="28e2db60" sha1="f309b5803e8e5241301f2e738d00d0975bbfc00f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vegecrsh">
+		<description>Vegetable Crash</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<notes><![CDATA[
+CHECK SUM ERROR
+]]></notes>
+		<info name="serial" value="WB-1002"/>
+		<info name="alt_title" value="ベジタブルクラッシュ"/>
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1233964">
+				<rom name="wb-1002.wav" size="1233964" crc="953f5d0e" sha1="527f9bfef1fd0a923ce982ef971602c86820c26b" />
 			</dataarea>
 		</part>
 	</software>
@@ -91,13 +259,13 @@ license:CC0-1.0
 	<software name="vosque2k" supported="no">
 		<description>Vosque 2000</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<!-- TODO: from title, check spelling on tape cover -->
+		<publisher>d.B Soft</publisher>
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="26752">
 				<rom name="vosque2000.mzt" size="26752" crc="56f9000e" sha1="93319cecc92ffe7305ff1b8ecb26d0fd2db3bd47"/>
 			</dataarea>
 		</part>
 	</software>
-
 
 </softwarelist>

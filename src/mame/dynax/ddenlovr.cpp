@@ -12788,6 +12788,33 @@ ROM_START( hnrose )
 	ROM_LOAD( "00801.2a", 0x000000, 0x200000, CRC(3e9f7a5a) SHA1(c4d79d250fbff7922b19da4029529e2d0d1a1a0f) ) // 1xxxxxxxxxxxxxxxxxxxx = 0xFF
 ROM_END
 
+
+/***************************************************************************
+
+Mahjong Sweet Academy
+
+Techno-Top, Limited
+
+TTL.0030 sticker
+
+Has 4 banks of 10 DIP switches
+
+***************************************************************************/
+
+ROM_START( mjswacad )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "01002_2.5b", 0x00000, 0x80000, CRC(dfb1e304) SHA1(98eae32bce63223871f17dacb9dc5b0f4e484a14) )
+
+	ROM_REGION( 0x800000, "blitter", 0 )
+	ROM_LOAD( "01003.7b",  0x000000, 0x200000, CRC(1df7a355) SHA1(3122570a845bb046936e8296423636281b39cc4a) )
+	ROM_LOAD( "01004.8b",  0x200000, 0x200000, CRC(198904d4) SHA1(d34a297cd08c227767808dfa695573ef596022c9) )
+	ROM_LOAD( "01005.9b",  0x400000, 0x200000, CRC(4dbcf7cf) SHA1(8bf4eaff1a280b2d5bf1221dc516647936e146d7) )
+	ROM_LOAD( "01006.11b", 0x600000, 0x200000, CRC(d407e19c) SHA1(a63ac099ad9fb6b7e1ea8b3a8785c94d961284a6) )
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "01001.2b", 0x000000, 0x200000, CRC(4b84f45c) SHA1(2ad92b15986d88d4c9254f43ce251a0ebd90a48b) ) // 1xxxxxxxxxxxxxxxxxxxx = 0xFF
+ROM_END
+
 } // anonymous namespace
 
 
@@ -12882,7 +12909,9 @@ GAME( 2000, jongteia,    jongtei,  jongteia,  jongtei,    hanakanz_state, empty_
 
 GAME( 2000, mjgnight,    0,        mjgnight,  mjgnight,   hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Gorgeous Night (Japan, TSM003-01)",                      MACHINE_NO_COCKTAIL  )
 
-GAME( 2000, hnrose,      0,        hnrose,    hnrose,     hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Hanafuda Night Rose (Japan, TSM008-04)",                         MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL  )
+GAME( 2000, hnrose,      0,        hnrose,    hnrose,     hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Hanafuda Night Rose (Japan, TSM008-04)",                         MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL )
+
+GAME( 2000, mjswacad,    0,        mjgnight,  mjgnight,   hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Sweet Academy (Japan, TSM010-002)",                      MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL ) // needs verifying of inputs, outputs (DIP sheet available)
 
 GAME( 2000, jongoh,      0,        jongoh,    seljan2,    ddenlovr_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Jongoh (Japan, TTL800-03-04)",                           MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL ) // needs verifying of inputs, outputs
 

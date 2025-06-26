@@ -647,7 +647,7 @@ template<int Which> NETDEV_ANALOG_CALLBACK_MEMBER(source_state::contour_cv_chang
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(source_state::update_contour<Which>), this));
 
 	LOGMASKED(LOG_CONTOUR, "%s contour CC: %f uA, rate CV: %f, range trimmer: %d\n",
-	          CONTOUR_NAME, m_contour_cc[Which] * 1e6F, m_cv[RATE_CV_INDEX], m_contour_range[Which]->read());
+			  CONTOUR_NAME, m_contour_cc[Which] * 1e6F, m_cv[RATE_CV_INDEX], m_contour_range[Which]->read());
 }
 
 // Must be called with machine().scheduler().synchronize(...), to ensure the EG
@@ -699,7 +699,7 @@ template<int Which> TIMER_CALLBACK_MEMBER(source_state::update_contour)
 	m_contour[Which]->set_target_v(target_v);
 
 	LOGMASKED(LOG_CONTOUR, "%s EG update - Level CV: %f, target_v: %f, R: %f, tau: %f\n",
-	          CONTOUR_NAME, level_cv, target_v, effective_r, effective_r * CONTOUR_C);
+			  CONTOUR_NAME, level_cv, target_v, effective_r, effective_r * CONTOUR_C);
 }
 
 NETDEV_ANALOG_CALLBACK_MEMBER(source_state::lfo_cv_changed)
@@ -709,7 +709,7 @@ NETDEV_ANALOG_CALLBACK_MEMBER(source_state::lfo_cv_changed)
 	m_lfo_cc = (data - CA3080_VABC) / RES_K(10);  // R227
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(source_state::update_lfo_timer), this));
 	LOGMASKED(LOG_LFO, "LFO CC: %f uA, rate CV: %f, range trimmer: %d\n",
-	          m_lfo_cc * 1e6F, m_cv[int(CV::MOD_RATE)], m_lfo_range->read());
+			  m_lfo_cc * 1e6F, m_cv[int(CV::MOD_RATE)], m_lfo_range->read());
 }
 
 TIMER_CALLBACK_MEMBER(source_state::update_lfo_timer)
@@ -749,7 +749,7 @@ TIMER_CALLBACK_MEMBER(source_state::update_lfo_timer)
 		m_lfo_timer->reset();
 
 	LOGMASKED(LOG_LFO, "LFO frequency updated - Icharge: %f uA, t_remaining: %f, t_half: %f, f: %f\n",
-	          i_out * 1e6F, t_remaining, t_half, 1.0F / (2.0F * t_half));
+			  i_out * 1e6F, t_remaining, t_half, 1.0F / (2.0F * t_half));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(source_state::lfo_timer_tick)

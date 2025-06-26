@@ -7,21 +7,16 @@
 #include "compressor.h"
 #include "xmlfile.h"
 
-audio_effect_compressor::audio_effect_compressor(u32 sample_rate, audio_effect *def) : audio_effect(sample_rate, def)
+audio_effect_compressor::audio_effect_compressor(speaker_device *speaker, u32 sample_rate, audio_effect *def) :
+	audio_effect(speaker, sample_rate, def)
 {
-	reset_mode();
-	reset_attack();
-	reset_release();
-	reset_ratio();
-	reset_input_gain();
-	reset_output_gain();
-	reset_convexity();
-	reset_threshold();
-	reset_channel_link();
-	reset_feedback();
-	reset_inertia();
-	reset_inertia_decay();
-	reset_ceiling();
+	m_slewed_signal.resize(m_channels, -200);
+	m_gain_reduction.resize(m_channels, 0);
+	m_input_samples.resize(m_channels, 0);
+	m_output_samples.resize(m_channels, 0);
+	m_inertia_velocity.resize(m_channels, 0);
+
+	reset_all();
 }
 
 void audio_effect_compressor::config_load(util::xml::data_node const *ef_node)
@@ -249,7 +244,7 @@ void audio_effect_compressor::reset_mode()
 {
 	audio_effect_compressor *d = static_cast<audio_effect_compressor *>(m_default);
 	m_isset_mode = false;
-	m_mode = d ? d->mode() : 1;
+	m_mode = d ? d->mode() : 0;
 }
 
 void audio_effect_compressor::reset_attack()
@@ -305,7 +300,7 @@ void audio_effect_compressor::reset_channel_link()
 {
 	audio_effect_compressor *d = static_cast<audio_effect_compressor *>(m_default);
 	m_isset_channel_link = false;
-	m_channel_link = d ? d->channel_link() : 100;
+	m_channel_link = d ? d->channel_link() : 1;
 }
 
 void audio_effect_compressor::reset_feedback()
@@ -336,6 +331,23 @@ void audio_effect_compressor::reset_ceiling()
 	m_ceiling = d ? d->ceiling() : 1;
 }
 
+void audio_effect_compressor::reset_all()
+{
+	reset_mode();
+	reset_attack();
+	reset_release();
+	reset_ratio();
+	reset_input_gain();
+	reset_output_gain();
+	reset_convexity();
+	reset_threshold();
+	reset_channel_link();
+	reset_feedback();
+	reset_inertia();
+	reset_inertia_decay();
+	reset_ceiling();
+}
+
 double audio_effect_compressor::db_to_value(double db)
 {
 	if(db <= -1000)
@@ -362,23 +374,14 @@ void audio_effect_compressor::apply(const emu::detail::output_buffer_flat<sample
 	}
 
 	u32 samples = src.available_samples();
-	u32 channels = src.channels();
 	dest.prepare_space(samples);
-
-	if(m_slewed_signal.empty()) {
-		m_slewed_signal.resize(channels, -200);
-		m_gain_reduction.resize(channels, 0);
-		m_input_samples.resize(channels, 0);
-		m_output_samples.resize(channels, 0);
-		m_inertia_velocity.resize(channels, 0);
-	}
 
 	double attack_coefficient = exp(-1/(m_sample_rate * m_attack / 1000));
 	double release_coefficient = exp(-1/(m_sample_rate * m_release / 1000));
 	double m_inertia_decay_coefficient = 0.99 + m_inertia_decay * 0.01;
 
 	for(u32 sample = 0; sample != samples; sample ++) {
-		for(u32 channel = 0; channel != channels; channel ++) {
+		for(u32 channel = 0; channel != m_channels; channel ++) {
 			double input_db = value_to_db(std::abs(*src.ptrs(channel, sample))) + m_input_gain + std::abs(m_output_samples[channel]) * m_feedback;
 			m_output_samples[channel] = 0;
 
@@ -432,11 +435,11 @@ void audio_effect_compressor::apply(const emu::detail::output_buffer_flat<sample
 		}
 
 		double max_gain = m_gain_reduction[0];
-		for(u32 channel = 1; channel < channels; channel++)
+		for(u32 channel = 1; channel != m_channels; channel++)
 			if(m_gain_reduction[channel] > max_gain)
 				max_gain = m_gain_reduction[channel];
 
-		for(u32 channel = 0; channel != channels; channel ++) {
+		for(u32 channel = 0; channel != m_channels; channel ++) {
 			m_gain_reduction[channel] = max_gain * m_channel_link + m_gain_reduction[channel] * (1 - m_channel_link);
 			double output_sample = db_to_value(m_input_samples[channel] - m_gain_reduction[channel]);
 			if(*src.ptrs(channel, sample) < 0)

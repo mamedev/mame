@@ -510,7 +510,7 @@ void bishi_state::bishi(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_888, 4096);
 	m_palette->enable_shadows();
-	m_palette->enable_hilights();
+	m_palette->enable_highlights();
 
 	K056832(config, m_k056832, 0);
 	m_k056832->set_tile_callback(FUNC(bishi_state::tile_callback));

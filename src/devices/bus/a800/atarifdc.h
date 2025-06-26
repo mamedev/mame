@@ -7,8 +7,6 @@
 #include "a8sio.h"
 
 #include "imagedev/flopdrv.h"
-#include "machine/6821pia.h"
-#include "sound/pokey.h"
 #include "diserial.h"
 
 class atari_fdc_device : public device_t, public device_serial_interface, public device_a8sio_card_interface

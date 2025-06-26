@@ -33,11 +33,11 @@ TODO:
 #include "atm.h"
 #include "glukrs.h"
 
+#include "bus/spectrum/ay/slot.h"
 #include "bus/spectrum/zxbus/bus.h"
 #include "machine/pckeybrd.h"
 #include "machine/spi_sdcard.h"
 #include "machine/timer.h"
-#include "sound/ay8910.h"
 #include "speaker.h"
 
 #define LOG_MEM   (1U << 1)
@@ -65,8 +65,6 @@ public:
 		, m_sdcard(*this, "sdcard")
 		, m_keyboard(*this, "pc_keyboard")
 		, m_io_mouse(*this, "mouse_input%u", 1U)
-		, m_ay(*this, "ay%u", 0U)
-		, m_mod_ay(*this, "MOD_AY")
 	{ }
 
 	void pentevo(machine_config &config);
@@ -90,7 +88,6 @@ private:
 	u8 pentevo_port_1nbd_r(offs_t offset);
 	void pentevo_port_1nbd_w(offs_t offset, u8 data);
 
-	void ay_address_w(u8 data);
 	void spi_port_77_w(offs_t offset, u8 data);
 	u8 spi_port_57_r(offs_t offset);
 	void spi_port_57_w(offs_t offset, u8 data);
@@ -124,10 +121,6 @@ private:
 	required_device<spi_sdcard_device> m_sdcard;
 	required_device<at_keyboard_device> m_keyboard;
 	required_ioport_array<3> m_io_mouse;
-	required_device_array<ym2149_device, 2> m_ay;
-
-	u8 m_ay_selected;
-	required_ioport m_mod_ay;
 
 	u8 m_port_bf_data;
 	u8 m_port_eff7_data;
@@ -345,14 +338,6 @@ void pentevo_state::pentevo_port_1nbd_w(offs_t offset, u8 data)
 	}
 	else if (opt == 0x03)
 		m_beta_drive_virtual = data & 0x0f;
-}
-
-void pentevo_state::ay_address_w(u8 data)
-{
-	if ((m_mod_ay->read() == 1) && ((data & 0xfe) == 0xfe))
-		m_ay_selected = data & 1;
-	else
-		m_ay[m_ay_selected]->address_w(data);
 }
 
 INTERRUPT_GEN_MEMBER(pentevo_state::pentevo_interrupt)
@@ -601,9 +586,8 @@ void pentevo_state::pentevo_io(address_map &map)
 	map(0x00be, 0x00be).select(0xff00).lw8(NAME([this](offs_t offset) { m_nmi_active_flip_countdown = 2; }));
 
 	// AY
-	map(0x8000, 0x8000).mirror(0x3ffd).lw8(NAME([this](u8 data) { return m_ay[m_ay_selected]->data_w(data); }));
-	map(0xc000, 0xc000).mirror(0x3ffd).lr8(NAME([this]() { return m_ay[m_ay_selected]->data_r(); }))
-		.w(FUNC(pentevo_state::ay_address_w));
+	map(0x8000, 0x8000).mirror(0x3ffd).w("ay_slot", FUNC(ay_slot_device::data_w));
+	map(0xc000, 0xc000).mirror(0x3ffd).rw("ay_slot", FUNC(ay_slot_device::data_r), FUNC(ay_slot_device::address_w));
 
 	// HDD: NEMO
 	map(0x0010, 0x0010).select(0xffe0).lrw8(NAME([this](offs_t offset) { return nemo_ata_r(offset >> 5); })
@@ -699,7 +683,6 @@ void pentevo_state::machine_start()
 	save_item(NAME(m_nmi_active_flip_countdown));
 	save_item(NAME(m_zctl_di));
 	save_item(NAME(m_zctl_cs));
-	save_item(NAME(m_ay_selected));
 
 	init_mem_write();
 }
@@ -718,7 +701,6 @@ void pentevo_state::machine_reset()
 	m_gluk_ext = 0xff;
 	m_zctl_cs = 1;
 	m_zctl_di = 0xff;
-	m_ay_selected = 0;
 
 	m_keyboard->write(0xff);
 	while (m_keyboard->read() != 0) { /* invalidate buffer */ }
@@ -744,11 +726,6 @@ INPUT_PORTS_START( pentevo )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("Left mouse button") PORT_CODE(MOUSECODE_BUTTON1)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("Right mouse button") PORT_CODE(MOUSECODE_BUTTON2)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_NAME("Middle mouse button") PORT_CODE(MOUSECODE_BUTTON3)
-
-	PORT_START("MOD_AY")
-	PORT_CONFNAME(0x01, 0x00, "AY MOD")
-	PORT_CONFSETTING(0x00, "Single")
-	PORT_CONFSETTING(0x01, "TurboSound")
 INPUT_PORTS_END
 
 void pentevo_state::pentevo(machine_config &config)
@@ -770,13 +747,7 @@ void pentevo_state::pentevo(machine_config &config)
 
 	SPEAKER(config, "speakers", 2).front();
 
-	config.device_remove("ay8912");
-	YM2149(config, m_ay[0], 14_MHz_XTAL / 8)
-		.add_route(0, "speakers", 0.50, 0)
-		.add_route(1, "speakers", 0.25, 0)
-		.add_route(1, "speakers", 0.25, 1)
-		.add_route(2, "speakers", 0.50, 1);
-	YM2149(config, m_ay[1], 14_MHz_XTAL / 8)
+	AY_SLOT(config.replace(), "ay_slot", 14_MHz_XTAL / 8, default_ay_slot_devices, "ay_ym2149")
 		.add_route(0, "speakers", 0.50, 0)
 		.add_route(1, "speakers", 0.25, 0)
 		.add_route(1, "speakers", 0.25, 1)

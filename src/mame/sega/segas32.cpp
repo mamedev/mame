@@ -2278,16 +2278,16 @@ void segas32_state::device_add_mconfig(machine_config &config)
 
 	ym3438_device &ym1(YM3438(config, "ym1", MASTER_CLOCK/4));
 	ym1.irq_handler().set(FUNC(segas32_state::ym3438_irq_handler));
-	ym1.add_route(0, "speaker", 0.40, 0);
-	ym1.add_route(1, "speaker", 0.40, 1);
+	ym1.add_route(0, "speaker", 0.30, 0);
+	ym1.add_route(1, "speaker", 0.30, 1);
 
 	ym3438_device &ym2(YM3438(config, "ym2", MASTER_CLOCK/4));
-	ym2.add_route(0, "speaker", 0.40, 0);
-	ym2.add_route(1, "speaker", 0.40, 1);
+	ym2.add_route(0, "speaker", 0.30, 0);
+	ym2.add_route(1, "speaker", 0.30, 1);
 
 	rf5c68_device &rfsnd(RF5C68(config, "rfsnd", 50_MHz_XTAL/4)); // ASSP (RF)5C105 or Sega 315-5476A
-	rfsnd.add_route(0, "speaker", 0.55, 0);
-	rfsnd.add_route(1, "speaker", 0.55, 1);
+	rfsnd.add_route(0, "speaker", 0.40, 0);
+	rfsnd.add_route(1, "speaker", 0.40, 1);
 	rfsnd.set_addrmap(0, &segas32_state::rf5c68_map);
 
 	S32COMM(config, m_s32comm, 0);
@@ -2606,17 +2606,19 @@ void sega_multi32_state::device_add_mconfig(machine_config &config)
 	screen2.set_screen_update(FUNC(segas32_state::screen_update_multi32_right));
 
 	/* sound hardware */
-	SPEAKER(config, "speaker", 2).front();
+	/* Two mono speakers in separate cabinets */
+	SPEAKER(config, "sleft").front_center();
+	SPEAKER(config, "sright").front_center();
 
 	ym3438_device &ymsnd(YM3438(config, "ymsnd", MASTER_CLOCK/4));
 	ymsnd.irq_handler().set(FUNC(segas32_state::ym3438_irq_handler));
-	ymsnd.add_route(1, "speaker", 0.40, 0);
-	ymsnd.add_route(0, "speaker", 0.40, 1);
+	ymsnd.add_route(1, "sleft", 0.15);
+	ymsnd.add_route(0, "sright", 0.15);
 
 	MULTIPCM(config, m_multipcm, MULTI32_CLOCK/4);
 	m_multipcm->set_addrmap(0, &sega_multi32_state::multipcm_map);
-	m_multipcm->add_route(1, "speaker", 1.0, 0);
-	m_multipcm->add_route(0, "speaker", 1.0, 1);
+	m_multipcm->add_route(1, "sleft", 0.35);
+	m_multipcm->add_route(0, "sright", 0.35);
 
 	S32COMM(config, m_s32comm, 0);
 }

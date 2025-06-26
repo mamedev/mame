@@ -23,16 +23,16 @@ class sound_module
 public:
 	virtual ~sound_module();
 
-	virtual uint32_t get_generation() { return 1; }
-	virtual osd::audio_info get_information();
+	virtual uint32_t get_generation() = 0;
+	virtual osd::audio_info get_information() = 0;
 	virtual bool external_per_channel_volume() { return false; }
 	virtual bool split_streams_per_source() { return false; }
 
-	virtual uint32_t stream_sink_open(uint32_t node, std::string name, uint32_t rate) { return 1; }
+	virtual uint32_t stream_sink_open(uint32_t node, std::string name, uint32_t rate) = 0;
 	virtual uint32_t stream_source_open(uint32_t node, std::string name, uint32_t rate) { return 0; }
 	virtual void stream_set_volumes(uint32_t id, const std::vector<float> &db) {}
-	virtual void stream_close(uint32_t id) {}
-	virtual void stream_sink_update(uint32_t id, const int16_t *buffer, int samples_this_frame) {}
+	virtual void stream_close(uint32_t id) = 0;
+	virtual void stream_sink_update(uint32_t id, const int16_t *buffer, int samples_this_frame) = 0;
 	virtual void stream_source_update(uint32_t id, int16_t *buffer, int samples_this_frame) {}
 
 	virtual void begin_update() {}
@@ -63,6 +63,7 @@ protected:
 		void pop_buffer() noexcept;
 		buffer &push_buffer();
 
+		int32_t m_delta, m_delta2;
 		uint32_t m_channels;
 		uint32_t m_used_buffers;
 		std::vector<int16_t> m_last_sample;

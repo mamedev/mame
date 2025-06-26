@@ -37,6 +37,7 @@
 
 
 namespace {
+
 #if defined(__APPLE__)
 char const *const posix_ptty_identifier  = "/dev/pty";
 #else
@@ -149,18 +150,90 @@ std::error_condition posix_open_ptty(std::uint32_t openflags, osd_file::ptr &fil
 		::close(masterfd);
 		return err;
 	}
-#else
-	struct termios tios;
-	std::memset(&tios, 0, sizeof(tios));
-	::cfmakeraw(&tios); // TODO: this is a non-standard BSDism - should set flags some other way
-
-	int masterfd = -1, slavefd = -1;
-	char slavepath[PATH_MAX];
-	if (::openpty(&masterfd, &slavefd, slavepath, &tios, nullptr) < 0)
-		return std::error_condition(errno, std::generic_category());
-#endif
 
 	::close(slavefd);
+#else // (defined(sun) || defined(__sun)) && (defined(__SVR4) || defined(__svr4__))
+	struct termios tios;
+	std::memset(&tios, 0, sizeof(tios));
+	tios.c_iflag = 0;
+	tios.c_oflag = 0;
+	tios.c_cflag = CS8;
+	tios.c_lflag = 0;
+
+	int masterfd = -1, slavefd = -1;
+#if defined(TTY_NAME_MAX)
+	// TTY_NAME_MAX and ptsname_r were added to Open Group Base Specifications Issue 8
+	if (::openpty(&masterfd, &slavefd, nullptr, &tios, nullptr) < 0)
+		return std::error_condition(errno, std::generic_category());
+
+	::close(slavefd);
+
+	char slavepath[TTY_NAME_MAX + 1];
+	auto const result = ::ptsname_r(masterfd, slavepath, std::size(slavepath));
+	if (result == -1)
+	{
+		// pre-standard implementations of ptsname_r (e.g. FreeBSD, Tru64, HP-UX) return -1 and set errno
+		std::error_condition err(errno, std::generic_category());
+		::close(masterfd);
+		return err;
+	}
+	else if (result != 0)
+	{
+		::close(masterfd);
+		return std::error_condition(result, std::generic_category());
+	}
+#elif defined(__linux__) || defined(__FreeBSD__)
+	// ptsname_r is present but there's no maximum length defined
+	if (::openpty(&masterfd, &slavefd, nullptr, &tios, nullptr) < 0)
+		return std::error_condition(errno, std::generic_category());
+
+	::close(slavefd);
+
+	std::vector<char> slavepath_storage;
+	try
+	{
+#if defined(PATH_MAX)
+		constexpr unsigned STARTING_SIZE = PATH_MAX;
+#else // defined PATH_MAX
+		constexpr unsigned STARTING_SIZE = 8192;
+#endif // defined PATH_MAX
+		int result;
+		do
+		{
+			if (slavepath_storage.empty())
+				slavepath_storage.resize(STARTING_SIZE);
+			else
+				slavepath_storage.resize(slavepath_storage.size() * 2);
+			result = ptsname_r(masterfd, slavepath_storage.data(), slavepath_storage.size());
+			if (result == -1)
+				result = errno; // pre-standard ptsname_r returns -1 and sets errno
+		}
+		while (result == ERANGE);
+		if (result != 0)
+		{
+			::close(masterfd);
+			return std::error_condition(result, std::generic_category());
+		}
+	}
+	catch (...)
+	{
+		::close(masterfd);
+		return std::errc::not_enough_memory;
+	}
+	char const *const slavepath = slavepath_storage.data();
+#else
+	// using openpty with a non-null slave path is considered unsafe
+#if defined(PATH_MAX)
+	char slavepath[PATH_MAX];
+#else // defined PATH_MAX
+	char slavepath[8192];
+#endif // defined PATH_MAX
+	if (::openpty(&masterfd, &slavefd, slavepath, &tios, nullptr) < 0)
+		return std::error_condition(errno, std::generic_category());
+
+	::close(slavefd);
+#endif
+#endif // (defined(sun) || defined(__sun)) && (defined(__SVR4) || defined(__svr4__))
 
 	int const oldflags = ::fcntl(masterfd, F_GETFL, 0);
 	if (oldflags < 0)

@@ -101,17 +101,17 @@ int sound_pa::init(osd_interface &osd, osd_options const &options)
 	enum { FL, FR, FC, LFE, BL, BR, BC, SL, SR, AUX };
 	static const char *const posname[10] = { "FL", "FR", "FC", "LFE", "BL", "BR", "BC", "SL", "SR", "AUX" };
 
-	static const std::array<double, 3> pos3d[10] = {
-		{ -0.2,  0.0,  1.0 },
-		{  0.2,  0.0,  1.0 },
-		{  0.0,  0.0,  1.0 },
-		{  0.0, -0.5,  1.0 },
-		{ -0.2,  0.0, -0.5 },
-		{  0.2,  0.0, -0.5 },
-		{  0.0,  0.0, -0.5 },
-		{ -0.2,  0.0,  0.0 },
-		{  0.2,  0.0,  0.0 },
-		{  0.0,  0.0, 10.0 },
+	static const osd::channel_position pos3d[10] = {
+		osd::channel_position::FL(),
+		osd::channel_position::FR(),
+		osd::channel_position::FC(),
+		osd::channel_position::LFE(),
+		osd::channel_position::RL(),
+		osd::channel_position::RR(),
+		osd::channel_position::RC(),
+		osd::channel_position(-0.2,  0.0,  0.0),
+		osd::channel_position( 0.2,  0.0,  0.0),
+		osd::channel_position::ONREQ()
 	};
 
 	static const uint32_t positions[9][9] = {
@@ -138,12 +138,15 @@ int sound_pa::init(osd_interface &osd, osd_options const &options)
 		const PaDeviceInfo *di = Pa_GetDeviceInfo(dev);
 		const PaHostApiInfo *ai = Pa_GetHostApiInfo(di->hostApi);
 		auto &node = m_info.m_nodes[dev];
-		node.m_name = util::string_format("%s: %s", ai->name, di->name);
-		node.m_display_name = util::string_format("%s: %s", ai->name, di->name);
 		node.m_id = dev + 1;
 		node.m_rate.m_default_rate = node.m_rate.m_min_rate = node.m_rate.m_max_rate = di->defaultSampleRate;
 		node.m_sinks = di->maxOutputChannels;
 		node.m_sources = di->maxInputChannels;
+
+		node.m_name = util::string_format("%s: %s", ai->name, di->name);
+		node.m_name.erase(std::remove(node.m_name.begin(), node.m_name.end(), '\r'), node.m_name.end());
+		node.m_name.erase(std::remove(node.m_name.begin(), node.m_name.end(), '\n'), node.m_name.end());
+		node.m_display_name = node.m_name;
 
 		int channels = std::max(di->maxInputChannels, di->maxOutputChannels);
 		int index = std::min(channels, 9) - 1;
@@ -204,7 +207,7 @@ uint32_t sound_pa::stream_sink_open(uint32_t node, std::string name, uint32_t ra
 	if(!err)
 		err = Pa_StartStream(si->second.m_stream);
 	if(err) {
-		osd_printf_error("PortAudio error: %s: %s\n", m_info.m_nodes[node-1].m_name, Pa_GetErrorText(err));
+		osd_printf_error("PortAudio error: %s: %s\n", m_info.m_nodes[node-1].m_display_name, Pa_GetErrorText(err));
 		lock.unlock();
 		stream_close(id);
 		return 0;
@@ -234,7 +237,7 @@ uint32_t sound_pa::stream_source_open(uint32_t node, std::string name, uint32_t 
 	if(!err)
 		err = Pa_StartStream(si->second.m_stream);
 	if(err) {
-		osd_printf_error("PortAudio error: %s: %s\n", m_info.m_nodes[node-1].m_name, Pa_GetErrorText(err));
+		osd_printf_error("PortAudio error: %s: %s\n", m_info.m_nodes[node-1].m_display_name, Pa_GetErrorText(err));
 		lock.unlock();
 		stream_close(id);
 		return 0;

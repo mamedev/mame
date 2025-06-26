@@ -317,11 +317,11 @@ void cps2000_state::cps2000(machine_config &config)
 	// UPD932(config, "upd932a", 4.9468_MHz_XTAL);
 	// UPD932(config, "upd932b", 4.9468_MHz_XTAL);
 
-	DAC_1BIT(config, "bass").add_route(0, "bass_vca", 1.0);
+	DAC_1BIT(config, "bass").add_route(0, "bass_vca", 1.0, 0);
 	m_maincpu->co0_func().set("bass", FUNC(dac_1bit_device::write));
 
-	VA_RC_EG(config, m_bass_env).set_c(CAP_U(3.3)).add_route(0, "bass_vca", 1.0 / 5);
-	VA_VCA(config, "bass_vca").configure_streaming_cv(true).add_route(0, "bass_rc1", 1.0);
+	VA_RC_EG(config, m_bass_env).set_c(CAP_U(3.3)).add_route(0, "bass_vca", 1.0 / 5, 1);
+	VA_VCA(config, "bass_vca").add_route(0, "bass_rc1", 1.0);
 
 	FILTER_RC(config, "bass_rc1").set_lowpass(RES_K(47), CAP_N(47)).add_route(0, "bass_rc2", 1.0);
 	FILTER_RC(config, "bass_rc2").set_lowpass(RES_K(22), CAP_N(47))

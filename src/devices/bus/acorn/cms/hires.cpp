@@ -8,17 +8,43 @@
 
 **********************************************************************/
 
-
 #include "emu.h"
 #include "hires.h"
+
+#include "machine/timer.h"
+#include "video/ef9365.h"
 #include "screen.h"
 
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
+namespace {
 
-DEFINE_DEVICE_TYPE(CMS_HIRES, cms_hires_device, "cms_hires", "CMS High Resolution Colour Graphics Card")
+class cms_hires_device : public device_t, public device_acorn_bus_interface
+{
+public:
+	cms_hires_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, CMS_HIRES, tag, owner, clock)
+		, device_acorn_bus_interface(mconfig, *this)
+		, m_gdp(*this, "ef9366")
+		, m_flash_state(0)
+	{
+	}
+
+protected:
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+private:
+	required_device<ef9365_device> m_gdp;
+
+	TIMER_DEVICE_CALLBACK_MEMBER(flash_rate);
+	void colour_reg_w(uint8_t data);
+
+	bool m_flash_state;
+};
 
 
 //-------------------------------------------------
@@ -27,12 +53,11 @@ DEFINE_DEVICE_TYPE(CMS_HIRES, cms_hires_device, "cms_hires", "CMS High Resolutio
 
 void cms_hires_device::device_add_mconfig(machine_config &config)
 {
-	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_size(512, 312);
-	m_screen->set_visarea(0, 512 - 1, 0, 256 - 1);
-	m_screen->set_refresh_hz(50);
-	m_screen->set_screen_update("ef9366", FUNC(ef9365_device::screen_update));
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_size(512, 312);
+	screen.set_visarea(0, 512 - 1, 0, 256 - 1);
+	screen.set_refresh_hz(50);
+	screen.set_screen_update("ef9366", FUNC(ef9365_device::screen_update));
 	PALETTE(config, "palette").set_entries(16);
 
 	TIMER(config, "flash_rate").configure_periodic(FUNC(cms_hires_device::flash_rate), attotime::from_hz(3)); // from 555 timer (4.7uF, 100K, 470R)
@@ -45,24 +70,6 @@ void cms_hires_device::device_add_mconfig(machine_config &config)
 }
 
 
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  cms_hires_device - constructor
-//-------------------------------------------------
-
-cms_hires_device::cms_hires_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, CMS_HIRES, tag, owner, clock)
-	, device_acorn_bus_interface(mconfig, *this)
-	, m_screen(*this, "screen")
-	, m_gdp(*this, "ef9366")
-	, m_flash_state(0)
-{
-}
-
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -71,8 +78,8 @@ void cms_hires_device::device_start()
 {
 	address_space &space = m_bus->memspace();
 
-	space.install_readwrite_handler(0xfc10, 0xfc1f, read8sm_delegate(*m_gdp, FUNC(ef9365_device::data_r)), write8sm_delegate(*m_gdp, FUNC(ef9365_device::data_w)));
-	space.install_write_handler(0xfc20, 0xfc2f, write8smo_delegate(*this, FUNC(cms_hires_device::colour_reg_w)));
+	space.install_readwrite_handler(0xfc10, 0xfc1f, emu::rw_delegate(*m_gdp, FUNC(ef9365_device::data_r)), emu::rw_delegate(*m_gdp, FUNC(ef9365_device::data_w)));
+	space.install_write_handler(0xfc20, 0xfc2f, emu::rw_delegate(*this, FUNC(cms_hires_device::colour_reg_w)));
 
 	save_item(NAME(m_flash_state));
 }
@@ -113,3 +120,8 @@ void cms_hires_device::colour_reg_w(uint8_t data)
 {
 	m_gdp->set_color_filler(data & 0x0f);
 }
+
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(CMS_HIRES, device_acorn_bus_interface, cms_hires_device, "cms_hires", "CMS High Resolution Colour Graphics Card")

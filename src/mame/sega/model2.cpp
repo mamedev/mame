@@ -28,7 +28,7 @@
               bypass it by entering then exiting service mode;
     - sgt24h: first turn in easy reverse course has ugly rendered mountain in background;
     - srallyc: some 3d elements doesn't show up properly (tree models, last hill in course 1 is often black colored);
-	- stcc: no collision detection with enemy cars, sometimes enemy cars glitch out and disappear altogether;
+    - stcc: no collision detection with enemy cars, sometimes enemy cars glitch out and disappear altogether;
     - vcop: sound dies at enter initial screen (i.e. after played the game once) (untested);
     - vstriker: stadium ads have terrible colors (they uses the wrong color table, @see video/model2rd.hxx)
 
@@ -964,41 +964,20 @@ void model2_state::model2_check_irqack_state(u32 data)
 	}
 }
 
-/* TODO: rewrite this part. It's a 8251-compatible chip */
-u32 model2_state::model2_serial_r(offs_t offset, u32 mem_mask)
+u8 model2_state::model2_serial_r(offs_t offset)
 {
-	if (offset == 0)
-	{
-		u32 result = 0;
-		if (ACCESSING_BITS_0_7 && (offset == 0))
-			result |= m_uart->data_r();
-		if (ACCESSING_BITS_16_23 && (offset == 0))
-			result |= m_uart->status_r() << 16;
-		return result;
-	}
-
-	return 0xffffffff;
+	return m_uart->data_r();
 }
 
 
-void model2_state::model2_serial_w(offs_t offset, u32 data, u32 mem_mask)
+void model2_state::model2_serial_w(offs_t offset, u8 data)
 {
-	if (ACCESSING_BITS_0_7 && (offset == 0))
-	{
-		m_uart->data_w(data & 0xff);
+	m_uart->data_w(data);
 
-		if (m_scsp.found())
-		{
-			m_scsp->midi_in(data&0xff);
-
-			// give the 68k time to notice
-			// TODO: 40 usecs is too much for Sky Target
-			m_maincpu->spin_until_time(attotime::from_usec(10));
-		}
-	}
-	if (ACCESSING_BITS_16_23 && (offset == 0))
+	if (m_scsp.found())
 	{
-		m_uart->control_w((data >> 16) & 0xff);
+		// TODO: make the SCSP receive the data via the USART device
+		m_scsp->midi_in(data);
 	}
 }
 
@@ -1286,7 +1265,6 @@ void model2_tgp_state::model2_tgp_mem(address_map &map)
 
 	map(0x00980000, 0x00980003).rw(FUNC(model2_tgp_state::copro_ctl1_r), FUNC(model2_tgp_state::copro_ctl1_w));
 	map(0x00980008, 0x0098000b).w(FUNC(model2_tgp_state::geo_ctl1_w));
-	map(0x009c0000, 0x009cffff).rw(FUNC(model2_tgp_state::model2_serial_r), FUNC(model2_tgp_state::model2_serial_w));
 
 	map(0x12000000, 0x121fffff).ram().w(FUNC(model2o_state::tex0_w)).mirror(0x200000).share("textureram0").flags(i960_cpu_device::BURST);   // texture RAM 0
 	map(0x12400000, 0x125fffff).ram().w(FUNC(model2o_state::tex1_w)).mirror(0x200000).share("textureram1").flags(i960_cpu_device::BURST);   // texture RAM 1
@@ -1301,7 +1279,7 @@ void model2o_state::model2o_mem(address_map &map)
 	map(0x00220000, 0x0023ffff).rom().region("maincpu", 0x20000).flags(i960_cpu_device::BURST);
 	map(0x00980004, 0x00980007).r(FUNC(model2o_state::fifo_control_2o_r));
 	map(0x01c00000, 0x01c00fff).rw("dpram", FUNC(mb8421_device::right_r), FUNC(mb8421_device::right_w)).umask32(0x00ff00ff); // 2k*8-bit dual port ram
-	map(0x01c80000, 0x01c80003).rw(FUNC(model2o_state::model2_serial_r), FUNC(model2o_state::model2_serial_w));
+	map(0x01c80000, 0x01c80003).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 }
 
 /* Daytona "To The MAXX" PIC protection simulation */
@@ -1389,7 +1367,8 @@ void model2a_state::model2a_crx_mem(address_map &map)
 	map(0x00200000, 0x0023ffff).ram().flags(i960_cpu_device::BURST);
 	map(0x01c00000, 0x01c0001f).rw("io", FUNC(sega_315_5649_device::read), FUNC(sega_315_5649_device::write)).umask32(0x00ff00ff);
 	map(0x01c00040, 0x01c00043).nopw();
-	map(0x01c80000, 0x01c80003).rw(FUNC(model2a_state::model2_serial_r), FUNC(model2a_state::model2_serial_w));
+	map(0x01c80000, 0x01c80001).rw(FUNC(model2a_state::model2_serial_r), FUNC(model2a_state::model2_serial_w)).umask16(0x00ff);
+	map(0x01c80002, 0x01c80003).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w)).umask16(0x00ff);
 }
 
 void model2a_state::model2a_5881_mem(address_map &map)
@@ -1422,9 +1401,10 @@ void model2b_state::model2b_crx_mem(address_map &map)
 	map(0x00980000, 0x00980003).rw(FUNC(model2b_state::copro_ctl1_r), FUNC(model2b_state::copro_ctl1_w));
 	map(0x00980008, 0x0098000b).w(FUNC(model2b_state::geo_ctl1_w));
 	map(0x00980014, 0x00980017).r(FUNC(model2b_state::copro_status_r));
-	map(0x00980020, 0x00980023).noprw();	// bank control reg - used during SHARC program upload, all games just set this to 0
+	map(0x00980020, 0x00980023).noprw();    // bank control reg - used during SHARC program upload, all games just set this to 0
 
-	map(0x009c0000, 0x009cffff).rw(FUNC(model2b_state::model2_serial_r), FUNC(model2b_state::model2_serial_w));
+	map(0x009c0000, 0x009c0003).rw(FUNC(model2b_state::model2_serial_r), FUNC(model2b_state::model2_serial_w)).umask32(0x000000ff);
+	map(0x009c0004, 0x009c0007).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w)).umask32(0x000000ff);
 
 	map(0x11000000, 0x110fffff).ram().share("textureram0").flags(i960_cpu_device::BURST); // texture RAM 0 (2b/2c)
 	map(0x11100000, 0x111fffff).ram().share("textureram0").flags(i960_cpu_device::BURST); // texture RAM 0 (2b/2c)
@@ -1435,7 +1415,6 @@ void model2b_state::model2b_crx_mem(address_map &map)
 
 	map(0x01c00000, 0x01c0001f).rw("io", FUNC(sega_315_5649_device::read), FUNC(sega_315_5649_device::write)).umask32(0x00ff00ff);
 	map(0x01c00040, 0x01c00043).nopw();
-	map(0x01c80000, 0x01c80003).rw(FUNC(model2b_state::model2_serial_r), FUNC(model2b_state::model2_serial_w));
 }
 
 void model2b_state::model2b_5881_mem(address_map &map)
@@ -1464,7 +1443,6 @@ void model2c_state::model2c_crx_mem(address_map &map)
 	map(0x00980000, 0x00980003).rw(FUNC(model2c_state::copro_ctl1_r), FUNC(model2c_state::copro_ctl1_w));
 	map(0x00980008, 0x0098000b).w(FUNC(model2c_state::geo_ctl1_w));
 	map(0x00980014, 0x00980017).r(FUNC(model2c_state::copro_status_r));
-	map(0x009c0000, 0x009cffff).rw(FUNC(model2c_state::model2_serial_r), FUNC(model2c_state::model2_serial_w));
 
 	map(0x11000000, 0x111fffff).ram().share("textureram0").flags(i960_cpu_device::BURST); // texture RAM 0 (2b/2c)
 	map(0x11200000, 0x113fffff).ram().share("textureram1").flags(i960_cpu_device::BURST); // texture RAM 1 (2b/2c)
@@ -1472,7 +1450,8 @@ void model2c_state::model2c_crx_mem(address_map &map)
 	map(0x12800000, 0x1281ffff).rw(FUNC(model2c_state::lumaram_r), FUNC(model2c_state::lumaram_w)).umask32(0x0000ffff).flags(i960_cpu_device::BURST); // polygon "luma" RAM
 
 	map(0x01c00000, 0x01c0001f).rw("io", FUNC(sega_315_5649_device::read), FUNC(sega_315_5649_device::write)).umask32(0x00ff00ff);
-	map(0x01c80000, 0x01c80003).rw(FUNC(model2c_state::model2_serial_r), FUNC(model2c_state::model2_serial_w));
+	map(0x01c80000, 0x01c80001).rw(FUNC(model2c_state::model2_serial_r), FUNC(model2c_state::model2_serial_w)).umask16(0x00ff);
+	map(0x01c80002, 0x01c80003).rw(m_uart, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w)).umask16(0x00ff);
 }
 
 void model2c_state::model2c_5881_mem(address_map &map)
@@ -5738,6 +5717,9 @@ ROM_START( overrev ) /* Over Rev Revision A, Model 2C, Sega game ID# 836-13277 O
 	ROM_LOAD32_WORD( "mpr-20001.27",  0x000000, 0x200000, CRC(6ca236aa) SHA1(b3cb89fadb42afed13be4f229d7158dee487978a) )
 	ROM_LOAD32_WORD( "mpr-20000.25",  0x000002, 0x200000, CRC(894d8ded) SHA1(9bf7c754a29eef47fa49b5567980601895127306) )
 
+	ROM_REGION( 0x20000, "cpu4", 0) // Communication program
+	ROM_LOAD16_WORD_SWAP( "epr-18643.7",  0x000000, 0x020000, CRC(7166fca7) SHA1(f5d02906b64bb2fd1af8e3772c1b01a4e006c060) )
+
 	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
 	ROM_LOAD16_WORD_SWAP( "epr-20002.31", 0x000000, 0x080000, CRC(7efb069e) SHA1(30b1bbaf348d6a6b9ee2fdf82a0749baa025e0bf) )
 
@@ -5754,11 +5736,13 @@ The set below has been found labeled as:
 Main board ID# 837-10854-02-91
  Sega Game ID# 836-12788
  ROM board ID# 836-12789
+COMM board ID# 836-12344
 
 As well as:
 Main board ID# 837-10854-02-91
  Sega Game ID# 836-13274 OVER REV
  ROM board ID# 836-13275
+COMM board ID# 836-12344
 
 These ID numbers have been verified on multiple board sets for both revision A and revision B program ROMs
 */
@@ -5782,6 +5766,9 @@ ROM_START( overrevb ) /* Over Rev Revision B, Model 2B */
 	ROM_REGION( 0x400000, "textures", 0 ) // Textures
 	ROM_LOAD32_WORD( "mpr-20001.27",  0x000000, 0x200000, CRC(6ca236aa) SHA1(b3cb89fadb42afed13be4f229d7158dee487978a) )
 	ROM_LOAD32_WORD( "mpr-20000.25",  0x000002, 0x200000, CRC(894d8ded) SHA1(9bf7c754a29eef47fa49b5567980601895127306) )
+
+	ROM_REGION( 0x20000, "cpu4", 0) // Communication program
+	ROM_LOAD16_WORD_SWAP( "epr-18643.7",  0x000000, 0x020000, CRC(7166fca7) SHA1(f5d02906b64bb2fd1af8e3772c1b01a4e006c060) )
 
 	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
 	ROM_LOAD16_WORD_SWAP( "epr-20002.31", 0x000000, 0x080000, CRC(7efb069e) SHA1(30b1bbaf348d6a6b9ee2fdf82a0749baa025e0bf) )
@@ -5811,6 +5798,9 @@ ROM_START( overrevba ) /* Over Rev Revision A, Model 2B */
 	ROM_REGION( 0x400000, "textures", 0 ) // Textures
 	ROM_LOAD32_WORD( "mpr-20001.27",  0x000000, 0x200000, CRC(6ca236aa) SHA1(b3cb89fadb42afed13be4f229d7158dee487978a) )
 	ROM_LOAD32_WORD( "mpr-20000.25",  0x000002, 0x200000, CRC(894d8ded) SHA1(9bf7c754a29eef47fa49b5567980601895127306) )
+
+	ROM_REGION( 0x20000, "cpu4", 0) // Communication program
+	ROM_LOAD16_WORD_SWAP( "epr-18643.7",  0x000000, 0x020000, CRC(7166fca7) SHA1(f5d02906b64bb2fd1af8e3772c1b01a4e006c060) )
 
 	ROM_REGION( 0x080000, "audiocpu", 0 ) // Sound program
 	ROM_LOAD16_WORD_SWAP( "epr-20002.31", 0x000000, 0x080000, CRC(7efb069e) SHA1(30b1bbaf348d6a6b9ee2fdf82a0749baa025e0bf) )

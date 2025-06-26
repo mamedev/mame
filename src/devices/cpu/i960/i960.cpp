@@ -480,7 +480,7 @@ void i960_cpu_device::take_interrupt(int vector, int lvl)
 	}
 
 	SP = (SP + 63) & ~63;
-	SP += 64;	// add padding to prevent buffer underflow when saving processor state
+	SP += 64;   // add padding to prevent buffer underflow when saving processor state
 
 	do_call(IRQV, 7, SP);
 
