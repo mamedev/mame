@@ -707,7 +707,13 @@ ROM_END
 
 ROM_START( soulbird )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "soulbird.ic1", 0x00000, 0x100000, CRC(44262c9e) SHA1(0484a1e52a0cbe29a7cfc8603b5584cfb878d276) )
+	/*
+	data at 10000 matches 20000, matches 30000
+	data at 50000 matches 60000, matches 70000
+	data at 90000 matches a0000, matches b0000
+	so there's some interference problem with A16?
+	*/
+	ROM_LOAD( "soulbird.ic1", 0x00000, 0x100000, BAD_DUMP CRC(44262c9e) SHA1(0484a1e52a0cbe29a7cfc8603b5584cfb878d276) )
 ROM_END
 
 ROM_START( ts_handy11 )
