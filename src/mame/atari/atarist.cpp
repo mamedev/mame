@@ -1410,7 +1410,7 @@ void st_state::common(machine_config &config)
 	acia_clock.signal_handler().append(m_acia[1], FUNC(acia6850_device::write_rxc));
 
 	// cartridge
-	
+
 	STCART_CONNECTOR(config, m_cart, stcart_intf, nullptr);
 
 	// software lists

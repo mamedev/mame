@@ -20,10 +20,6 @@ class va_vca_device : public device_t, public device_sound_interface
 public:
 	va_vca_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) ATTR_COLD;
 
-	// When streaming is enabled, the CV will be obtained from input 1 of the
-	// sound stream. Otherwise, the value set with `set_fixed_cv` will be used.
-	va_vca_device &configure_streaming_cv(bool use_streaming_cv);
-
 	// By default, the CV will be treated as a typical gain (output = cv * input)
 	// The configure_*() functions below might change this.
 
@@ -32,7 +28,9 @@ public:
 	// streaming) should be the voltage at the Vc pin.
 	va_vca_device &configure_cem3360_linear_cv();
 
-	// Ignored when streaming CVs are enabled.
+	// Fixed control value.
+	// Ignored when a second input is connected. CV will be obtained from
+	// input stream 1 in this case.
 	void set_fixed_cv(float cv);
 
 protected:
@@ -44,7 +42,6 @@ private:
 
 	// Configuration. No need to include in save state.
 	sound_stream *m_stream;
-	bool m_has_cv_stream;
 	float m_min_cv;
 	float m_max_cv;
 	float m_cv_scale;

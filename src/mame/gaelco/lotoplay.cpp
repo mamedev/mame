@@ -35,6 +35,7 @@
 
 #include "emu.h"
 #include "cpu/m6805/m68705.h"
+#include "cpu/pic16c5x/pic16c5x.h"
 
 namespace
 {
@@ -50,9 +51,10 @@ public:
 
 	void lotoplay_p3(machine_config &config);
 	void lotoplay_p5(machine_config &config);
+	void lotoplay_pic(machine_config &config);
 
 protected:
-	required_device<m68705p_device> m_maincpu;
+	required_device<cpu_device> m_maincpu;
 };
 
 INPUT_PORTS_START(lotoplay)
@@ -66,6 +68,11 @@ void lotoplay_state::lotoplay_p3(machine_config &config)
 void lotoplay_state::lotoplay_p5(machine_config &config)
 {
 	M68705P5(config, m_maincpu, 3'579'545); // MC68705P5S, unknown clock
+}
+
+void lotoplay_state::lotoplay_pic(machine_config &config)
+{
+	PIC16C54(config, m_maincpu, 3'000'000); // PIC16C54, unknown clock
 }
 
 // Sets with MC68705 MCU.
@@ -90,10 +97,16 @@ ROM_START(lotoplayc)
 	ROM_LOAD("miv_00_68705p5s.bin",                  0x0000, 0x0800, CRC(67b1d2fc) SHA1(98ea18d4f55faef369a8fd701f936efab3cd084f))
 ROM_END
 
+ROM_START(lotoplayp)
+	ROM_REGION(0x1fff, "maincpu", 0)
+	ROM_LOAD("loto_play_ff46_pic16c54.bin",          0x0000, 0x1fff, CRC(8840349d) SHA1(e9dcc572c7b577618ddda06be1538be69eb15584))
+ROM_END
+
 } // anonymous namespace
 
-//    YEAR   NAME       PARENT    MACHINE      INPUT     CLASS           INIT        ROT   COMPANY              FULLNAME              FLAGS
-GAME( 1988?, lotoplay,  0,        lotoplay_p3, lotoplay, lotoplay_state, empty_init, ROT0, "Gaelco / Covielsa", "Loto-Play (set 1)",  MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-GAME( 1988?, lotoplaya, lotoplay, lotoplay_p3, lotoplay, lotoplay_state, empty_init, ROT0, "Gaelco / Covielsa", "Loto-Play (set 2)",  MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-GAME( 1988?, lotoplayb, lotoplay, lotoplay_p3, lotoplay, lotoplay_state, empty_init, ROT0, "Gaelco / Covielsa", "Loto-Play (set 3)",  MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
-GAME( 1988?, lotoplayc, lotoplay, lotoplay_p5, lotoplay, lotoplay_state, empty_init, ROT0, "Gaelco / Covielsa", "Loto-Play (set 4)",  MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+//    YEAR   NAME       PARENT    MACHINE       INPUT     CLASS           INIT        ROT   COMPANY              FULLNAME                FLAGS
+GAME( 1988?, lotoplay,  0,        lotoplay_p3,  lotoplay, lotoplay_state, empty_init, ROT0, "Gaelco / Covielsa", "Loto-Play (set 1)",    MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+GAME( 1988?, lotoplaya, lotoplay, lotoplay_p3,  lotoplay, lotoplay_state, empty_init, ROT0, "Gaelco / Covielsa", "Loto-Play (set 2)",    MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+GAME( 1988?, lotoplayb, lotoplay, lotoplay_p3,  lotoplay, lotoplay_state, empty_init, ROT0, "Gaelco / Covielsa", "Loto-Play (set 3)",    MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+GAME( 1988?, lotoplayc, lotoplay, lotoplay_p5,  lotoplay, lotoplay_state, empty_init, ROT0, "Gaelco / Covielsa", "Loto-Play (set 4)",    MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+GAME( 1990?, lotoplayp, lotoplay, lotoplay_pic, lotoplay, lotoplay_state, empty_init, ROT0, "Gaelco / Covielsa", "Loto-Play (PIC16C54)", MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )

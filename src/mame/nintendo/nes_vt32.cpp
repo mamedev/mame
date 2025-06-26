@@ -15,6 +15,7 @@
 #include "nes_vt369_vtunknown_soc.h"
 #include "nes_vt32_soc.h"
 
+#include "multibyte.h"
 
 namespace {
 
@@ -98,6 +99,8 @@ public:
 	void nes_vt32_4x16mb(machine_config& config);
 
 	void nes_vt32_pal_32mb(machine_config& config);
+
+	void init_g9_666();
 
 private:
 	uint8_t vt_rom_banked_r(offs_t offset);
@@ -223,8 +226,8 @@ void nes_vt32_base_state::configure_soc(nes_vt02_vt03_soc_device* soc)
 }
 
 // TODO: these should be in the SoC devices - upper_412d_r gets read, compared against, and another register written based on the result (maybe detecting SoC type?)
-uint8_t nes_vt32_base_state::upper_412c_r() { logerror("%s: nes_vt32_base_state:upper_412c_r\n", machine().describe_context());	return 0x00; }
-uint8_t nes_vt32_base_state::upper_412d_r() { logerror("%s: nes_vt32_base_state:upper_412d_r\n", machine().describe_context());	return 0x00; }
+uint8_t nes_vt32_base_state::upper_412c_r() { logerror("%s: nes_vt32_base_state:upper_412c_r\n", machine().describe_context()); return 0x00; }
+uint8_t nes_vt32_base_state::upper_412d_r() { logerror("%s: nes_vt32_base_state:upper_412d_r\n", machine().describe_context()); return 0x00; }
 void nes_vt32_base_state::upper_412c_w(uint8_t data) { logerror("%s: nes_vt32_base_state:upper_412c_w %02x\n", machine().describe_context(), data); }
 
 
@@ -383,9 +386,35 @@ ROM_END
 
 ROM_START( lxpcsp )
 	ROM_REGION( 0x4000000, "mainrom", 0 )
-	// standard flash ROM
 	ROM_LOAD( "s29gl512n11tfi02.u2", 0x00000, 0x4000000, CRC(113e22f2) SHA1(c57184131db3f3c82d09d7757f0977223698f62c) )
 ROM_END
+
+ROM_START( lxpcli )
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "s29gl512n11tfi02.u2", 0x00000, 0x4000000, CRC(9df963c6) SHA1(e5cc7b48c31b761bb74b3e5e1563a16a0cefa272) )
+ROM_END
+
+ROM_START( rfcp168 )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "winbond_w29gl128c.bin", 0x00000, 0x1000000, CRC(d11caf71) SHA1(64b269cee30a51549a2d0491bbeed07751771559) ) // ROM verified on 2 units
+	ROM_RELOAD( 0x1000000, 0x1000000 )
+ROM_END
+
+ROM_START( g9_666 )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "666in1.u1", 0x00000, 0x1000000, CRC(e3a98465) SHA1(dfec3e74e36aef9bfa57ec530c37642015569dc5) )
+	ROM_RELOAD( 0x1000000, 0x1000000 )
+ROM_END
+
+void nes_vt32_unk_state::init_g9_666()
+{
+	uint8_t *romdata = memregion("mainrom")->base();
+	for (offs_t i = 0; i < 0x2000000; i += 2)
+	{
+		uint16_t w = get_u16le(&romdata[i]);
+		put_u16le(&romdata[i], (w & 0xf9f9) | (w & 0x0600) >> 8 | (w & 0x0006) << 8);
+	}
+}
 
 } // anonymous namespace
 
@@ -407,6 +436,12 @@ CONS( 201?, dgunl3202, 0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empt
 CONS( 201?, myaass,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init, "dreamGEAR", "My Arcade All Star Stadium - Pocket Player (307-in-1)", MACHINE_NOT_WORKING )
 CONS( 201?, myaasa,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init, "dreamGEAR", "My Arcade All Star Arena - Pocket Player (307-in-1)", MACHINE_NOT_WORKING )
 
+// doesn't boot, ends up in weeds after jumping to bank with no code, lots of accesses to $42xx (could this be a different SoC?)
+CONS( 201?, rfcp168,   0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "Retro FC Plus 168 in 1 Handheld", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // "RETRO_FC_V3.5"
+
+// many duplicates, real game count to be confirmed, graphical issues in some games, lots of accesses to $42xx
+CONS( 202?, g9_666,   0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, init_g9_666, "<unknown>", "G9 Game Box 666 Games", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
 
 // Some games (eg F22) are scrambled like in myaass
 // These use a 16x16x8bpp packed tile mode for the main menu which seems more like a VT3xx feature, but VT3xx extended video regs not written?
@@ -420,5 +455,6 @@ CONS( 2021, matet100,  0,        0,  nes_vt32_32mb,      nes_vt32, nes_vt32_unk_
 // Use DIP switch to select console or cartridge, as cartridge is fake and just toggles a GPIO
 CONS( 2016, fcpocket,  0,  0,  nes_vt32_4x16mb,   nes_vt32_fp, nes_vt32_unk_state, empty_init, "<unknown>",   "FC Pocket 600 in 1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )  // has external banking (2x 32mbyte banks)
 
-// uses VT32 style encryption at least, boots in this driver but shows garbage
+// aside from the boot screens these have no theming and all contain a barely disguised bootleg version of Nintendo's Pinball in the Games section
 CONS( 2020, lxpcsp,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console - Marvel Spider-Man", MACHINE_NOT_WORKING )
+CONS( 2020, lxpcli,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console - Lilo & Stitch", MACHINE_NOT_WORKING )

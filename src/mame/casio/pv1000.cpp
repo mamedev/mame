@@ -73,6 +73,8 @@ void pv1000_sound_device::device_start()
 void pv1000_sound_device::voice_w(offs_t offset, uint8_t data)
 {
 	offset &= 0x03;
+	m_sh_channel->update();
+
 	switch (offset)
 	{
 	case 0x03:

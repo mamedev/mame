@@ -1711,7 +1711,7 @@ void williams_state::sinistar_cockpit(machine_config &config)
 
 	// additional sound hardware
 	SPEAKER(config, "rspeaker").rear_center();
-	MC1408(config, "rdac").add_route(ALL_OUTPUTS, "rspeaker", 0.25, 1); // unknown DAC
+	MC1408(config, "rdac").add_route(ALL_OUTPUTS, "rspeaker", 0.25); // unknown DAC
 
 	// pia
 	INPUT_MERGER_ANY_HIGH(config, "soundirq_b").output_handler().set_inputline("soundcpu_b", M6808_IRQ_LINE);

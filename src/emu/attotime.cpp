@@ -113,43 +113,51 @@ attotime &attotime::operator/=(u32 factor)
 
 const char *attotime::as_string(int precision) const
 {
-	static char buffers[8][30];
+	static char buffers[8][32];
 	static int nextbuf;
 	char *buffer = &buffers[nextbuf++ % 8][0];
 
+	attotime t = *this;
+	const char *sign = "";
+	if (t < attotime::zero)
+	{
+		t = attotime::zero - t;
+		sign = "-";
+	}
+
 	// special case: never
 	if (*this == never)
-		snprintf(buffer, 30, "%-*s", precision, "(never)");
+		snprintf(buffer, 32, "%-*s", precision, "(never)");
 
 	// case 1: we want no precision; seconds only
 	else if (precision == 0)
-		snprintf(buffer, 30, "%d", m_seconds);
+		snprintf(buffer, 32, "%s%d", sign, t.seconds());
 
 	// case 2: we want 9 or fewer digits of precision
 	else if (precision <= 9)
 	{
-		u32 upper = m_attoseconds / ATTOSECONDS_PER_SECOND_SQRT;
+		u32 upper = t.attoseconds() / ATTOSECONDS_PER_SECOND_SQRT;
 		int temp = precision;
 		while (temp < 9)
 		{
 			upper /= 10;
 			temp++;
 		}
-		snprintf(buffer, 30, "%d.%0*d", m_seconds, precision, upper);
+		snprintf(buffer, 32, "%s%d.%0*d", sign, t.seconds(), precision, upper);
 	}
 
 	// case 3: more than 9 digits of precision
 	else
 	{
 		u32 lower;
-		u32 upper = divu_64x32_rem(m_attoseconds, ATTOSECONDS_PER_SECOND_SQRT, lower);
+		u32 upper = divu_64x32_rem(t.attoseconds(), ATTOSECONDS_PER_SECOND_SQRT, lower);
 		int temp = precision;
 		while (temp < 18)
 		{
 			lower /= 10;
 			temp++;
 		}
-		snprintf(buffer, 30, "%d.%09d%0*d", m_seconds, upper, precision - 9, lower);
+		snprintf(buffer, 32, "%s%d.%09d%0*d", sign, t.seconds(), upper, precision - 9, lower);
 	}
 	return buffer;
 }
@@ -163,10 +171,11 @@ std::string attotime::to_string() const
 {
 	attotime t = *this;
 	const char *sign = "";
-	if(t.seconds() < 0) {
-		t = attotime::zero-t;
+	if (t < attotime::zero)
+	{
+		t = attotime::zero - t;
 		sign = "-";
 	}
 	int nsec = t.attoseconds() / ATTOSECONDS_PER_NANOSECOND;
-	return util::string_format("%s%04d.%03d,%03d,%03d", sign, int(t.seconds()), nsec/1000000, (nsec/1000)%1000, nsec % 1000);
+	return util::string_format("%s%04d.%03d,%03d,%03d", sign, int(t.seconds()), nsec / 1000000, (nsec / 1000) % 1000, nsec % 1000);
 }

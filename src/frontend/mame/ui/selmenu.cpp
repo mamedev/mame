@@ -3879,12 +3879,15 @@ std::string menu_select_launch::make_system_audit_fail_text(media_auditor const 
 	{
 		str << "System media audit failed:\n";
 		auditor.summarize(nullptr, &str);
-		osd_printf_info(str.str());
+		osd_printf_info(std::move(str).str());
 		str.str("");
 	}
-	str << _("Required ROM/disk images for the selected system are missing or incorrect. Please acquire the correct files or select a different system.\n\n");
+	if ((media_auditor::NOTFOUND != summary) && !auditor.records().empty())
+		str << _("The following ROM/disk images required for the selected system are missing or incorrect:\n\n");
+	else
+		str << _("Required ROM/disk images for the selected system are missing or incorrect.\n\n");
 	make_audit_fail_text(str, auditor, summary);
-	return str.str();
+	return std::move(str).str();
 }
 
 
@@ -3893,14 +3896,17 @@ std::string menu_select_launch::make_software_audit_fail_text(media_auditor cons
 	std::ostringstream str;
 	if (!auditor.records().empty())
 	{
-		str << "System media audit failed:\n";
+		str << "Software media audit failed:\n";
 		auditor.summarize(nullptr, &str);
-		osd_printf_info(str.str());
+		osd_printf_info(std::move(str).str());
 		str.str("");
 	}
-	str << _("Required ROM/disk images for the selected software are missing or incorrect. Please acquire the correct files or select a different software item.\n\n");
+	if ((media_auditor::NOTFOUND != summary) && !auditor.records().empty())
+		str << _("The following ROM/disk images required for the selected software are missing or incorrect:\n\n");
+	else
+		str << _("Required ROM/disk images for the selected software are missing or incorrect.\n\n");
 	make_audit_fail_text(str, auditor, summary);
-	return str.str();
+	return std::move(str).str();
 }
 
 

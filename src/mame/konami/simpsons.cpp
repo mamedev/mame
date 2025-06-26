@@ -660,7 +660,7 @@ void simpsons_state::simpsons(machine_config &config)
 	screen.set_screen_update(FUNC(simpsons_state::screen_update));
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows().enable_hilights();
+	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows().enable_highlights();
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_xy_offset(-96, -16);

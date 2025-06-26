@@ -153,8 +153,8 @@ resulting mess can be seen in the F4 viewer display.
 #include "emu.h"
 #include "spec128.h"
 
+#include "bus/spectrum/ay/slot.h"
 #include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
 
 #include "screen.h"
 
@@ -271,8 +271,8 @@ void spectrum_128_state::spectrum_128_io(address_map &map)
 	map(0x0000, 0x0000).select(0xfffe).rw(FUNC(spectrum_128_state::spectrum_ula_r), FUNC(spectrum_128_state::spectrum_ula_w));
 	map(0x0001, 0x0001).select(0xfffe).rw(FUNC(spectrum_128_state::spectrum_port_r), FUNC(spectrum_128_state::spectrum_port_w));
 	map(0x0001, 0x0001).select(0x7ffc).w(FUNC(spectrum_128_state::spectrum_128_port_7ffd_w));   // (A15 | A1) == 0, note: reading from this port does write to it by value from data bus
-	map(0x8000, 0x8000).mirror(0x3ffd).w("ay8912", FUNC(ay8910_device::data_w));
-	map(0xc000, 0xc000).mirror(0x3ffd).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
+	map(0x8000, 0x8000).mirror(0x3ffd).w("ay_slot", FUNC(ay_slot_device::data_w));
+	map(0xc000, 0xc000).mirror(0x3ffd).rw("ay_slot", FUNC(ay_slot_device::data_r), FUNC(ay_slot_device::address_w));
 }
 
 void spectrum_128_state::spectrum_128_mem(address_map &map)
@@ -430,7 +430,8 @@ void spectrum_128_state::spectrum_128(machine_config &config)
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(spec128);
 
 	// sound hardware
-	AY8912(config, "ay8912", X1_128_SINCLAIR / 20).add_route(ALL_OUTPUTS, "mono", 0.25);
+	AY_SLOT(config, "ay_slot", X1_128_SINCLAIR / 20, default_ay_slot_devices, "ay_ay8912")
+		.add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// expansion port
 	SPECTRUM_EXPANSION_SLOT(config.replace(), m_exp, spec128_expansion_devices, nullptr);

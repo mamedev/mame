@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 //============================================================
 //
-//  minifile.c - Minimal core file access functions
+//  stdfile.cpp - Minimal core file access functions
 //
 //============================================================
 
@@ -14,6 +14,7 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <limits>
 #include <string>
 
@@ -222,27 +223,34 @@ int osd_uchar_from_osdchar(char32_t *uchar, const char *osdchar, size_t count) n
 //  osd_stat
 //============================================================
 
-osd_directory_entry *osd_stat(const std::string &path)
+osd::directory::entry::ptr osd_stat(const std::string &path)
 {
-	osd_directory_entry *result = nullptr;
-
 	// create an osd_directory_entry; be sure to make sure that the caller can
 	// free all resources by just freeing the resulting osd_directory_entry
-	result = (osd_directory_entry *)malloc(sizeof(*result) + path.length() + 1);
-	strcpy((char *)(result + 1), path.c_str());
-	result->name = (char *)(result + 1);
+	auto const result = reinterpret_cast<osd::directory::entry *>(
+			::operator new(
+				sizeof(osd::directory::entry) + path.length() + 1,
+				std::align_val_t(alignof(osd::directory::entry)),
+				std::nothrow));
+	if (!result) return nullptr;
+	new (result) osd::directory::entry;
+
+	auto const resultname = reinterpret_cast<char *>(result) + sizeof(*result);
+	std::strcpy(resultname, path.c_str());
+	result->name = resultname;
 	result->type = ENTTYPE_NONE;
 	result->size = 0;
 
-	FILE *f = std::fopen(path.c_str(), "rb");
-	if (f != nullptr)
+	FILE *const f = std::fopen(path.c_str(), "rb");
+	if (f)
 	{
 		std::fseek(f, 0, SEEK_END);
 		result->type = ENTTYPE_FILE;
 		result->size = std::ftell(f);
 		std::fclose(f);
 	}
-	return result;
+
+	return osd::directory::entry::ptr(result);
 }
 
 

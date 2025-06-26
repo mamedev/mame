@@ -124,17 +124,21 @@ K051960_CB_MEMBER(gradius3_state::sprite_callback)
 {
 	enum { sprite_colorbase = 256 / 16 };
 
-	#define L0 GFX_PMASK_1
-	#define L1 GFX_PMASK_2
-	#define L2 GFX_PMASK_4
 	static const int primask[2][4] =
 	{
-		{ L0|L2, L0, L0|L2, L0|L1|L2 },
-		{ L1|L2, L2, 0,     L0|L1|L2 }
+		{
+			GFX_PMASK_1 | GFX_PMASK_4,
+			GFX_PMASK_1,
+			GFX_PMASK_1 | GFX_PMASK_4,
+			GFX_PMASK_1 | GFX_PMASK_2 | GFX_PMASK_4
+		},
+		{
+			GFX_PMASK_2 | GFX_PMASK_4,
+			GFX_PMASK_4,
+			0,
+			GFX_PMASK_1 | GFX_PMASK_2 | GFX_PMASK_4
+		}
 	};
-	#undef L0
-	#undef L1
-	#undef L2
 
 	int pri = ((*color & 0x60) >> 5);
 
@@ -282,7 +286,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(gradius3_state::gradius3_sub_scanline)
 	if(scanline == 240 && m_irqBmask & 1) // vblank-out irq
 		m_subcpu->set_input_line(1, HOLD_LINE);
 
-	if(scanline ==  16 && m_irqBmask & 2) // sprite end DMA irq
+	if(scanline == 16 && m_irqBmask & 2) // sprite end DMA irq
 		m_subcpu->set_input_line(2, HOLD_LINE);
 }
 
@@ -455,7 +459,6 @@ void gradius3_state::machine_reset()
 	m_irqAen = 0;
 	m_irqBmask = 0;
 	m_priority = 0;
-
 }
 
 void gradius3_state::gradius3(machine_config &config)

@@ -142,10 +142,10 @@ ROM_START( bbddz )
 	ROM_LOAD( "u13", 0x000000, 0x200000, CRC(1ee033bb) SHA1(14ab0702e17add44dfc82ce21dd5a37c05a1b2a2) ) // 29f1611
 
 	ROM_REGION( 0x80000, "oki", 0 )
-	ROM_LOAD( "u9", 0x00000, 0x80000, NO_DUMP ) // 29f040
+	ROM_LOAD( "u9", 0x00000, 0x80000, CRC(249b1a34) SHA1(94af1a9c64fb7d06a7510d527c176b2fa6845885) ) // 29f040
 
-	ROM_REGION( 0x80, "eeprom", ROMREGION_ERASE00 )
-	ROM_LOAD( "93c46", 0x00, 0x80, NO_DUMP )
+	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_LOAD( "93c46", 0x00, 0x80, CRC(b4c229f0) SHA1(632cd6749ed9c4564258b2487d27f10785639653) )
 ROM_END
 
 // 斗地主Ⅱ (Dòu Dìzhǔ II). All labels prepend 斗地主Ⅱ to what's below
@@ -162,7 +162,7 @@ ROM_START( ddz2 )
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "4.u23", 0x00000, 0x40000, CRC(e089cf82) SHA1(567736b1418b86ea35e29fb9f8a408436c8a03c8) )
 
-	ROM_REGION( 0x80, "eeprom", ROMREGION_ERASE00 )
+	ROM_REGION( 0x80, "eeprom", 0 )
 	ROM_LOAD( "93c46", 0x00, 0x80, CRC(3228fc88) SHA1(6679cf740ffbdb1aef485c2a3218030947f63ba4) )
 ROM_END
 
@@ -181,8 +181,9 @@ ROM_START( djddz )
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "4.u23", 0x00000, 0x80000, CRC(249b1a34) SHA1(94af1a9c64fb7d06a7510d527c176b2fa6845885) ) // 27c040
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // this dump comes from the PCB with 顶级100分 labels
-	ROM_LOAD( "93c46", 0x00, 0x80, CRC(bed2d363) SHA1(7e0c0d4c47274a87024e3e5cd74bc883b7d46415) )
+	ROM_REGION( 0x80, "eeprom", 0 ) // keeping dumps from both PCBs for now, until it can be determined if they are useful or just user data
+	ROM_LOAD( "93c46",   0x00, 0x80, CRC(bed2d363) SHA1(7e0c0d4c47274a87024e3e5cd74bc883b7d46415) ) // this dump comes from the PCB with 顶级100分 labels
+	ROM_LOAD( "93c46_2", 0x00, 0x80, CRC(43c87f6c) SHA1(1e9ed6033cacd5412de7d236392f626abd1e2eb8) ) // this dump comes from the PCB with 顶级斗地主 labels
 ROM_END
 
 // 漂亮金花 (Piàoliang Jīnhuā). All labels prepend 漂亮金花 to what's below

@@ -761,7 +761,7 @@ void metalmx_state::metalmx(machine_config &config)
 	// TODO: copied from atarigt.cpp; Same configurations as T-Mek?
 	// 5 Channel output (4 Channel input connected to Quad Amp PCB)
 	SPEAKER(config, "speaker", 4).front().headrest_left(2).headrest_right(3);
-	//SPEAKER(config, "subwoofer").seat(); Not implemented, Quad Amp PCB output;
+	//SPEAKER(config, "subwoofer").lfe(); Not implemented, Quad Amp PCB output;
 
 	ATARI_CAGE(config, m_cage, 0);
 	m_cage->set_speedup(0); // TODO: speedup address

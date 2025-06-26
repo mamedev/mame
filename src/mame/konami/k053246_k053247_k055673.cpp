@@ -273,7 +273,7 @@ int k053247_device::k053246_is_irq_enabled(void)
 template<class BitmapClass>
 void k053247_device::k053247_sprites_draw_common(BitmapClass &bitmap, const rectangle &cliprect)
 {
-#define NUM_SPRITES 256
+	static constexpr int NUM_SPRITES = 256;
 
 	int code, color, x, y, shadow, shdmask, count, temp, primask;
 
@@ -290,12 +290,11 @@ void k053247_device::k053247_sprites_draw_common(BitmapClass &bitmap, const rect
 
 	/*
 	    safeguard older drivers missing any of the following video attributes:
-
 	    VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS
 	*/
 	if (palette().shadows_enabled())
 	{
-		if (sizeof(typename BitmapClass::pixel_t) == 4 && (palette().hilights_enabled()))
+		if (sizeof(typename BitmapClass::pixel_t) == 4 && (palette().highlights_enabled()))
 			shdmask = 3; // enable all shadows and highlights
 		else
 			shdmask = 0; // enable default shadows
@@ -407,10 +406,8 @@ void k053247_device::k053247_sprites_draw_common(BitmapClass &bitmap, const rect
 				/* gx only */
 				0, 0, 0, 0,
 				/* non-gx only */
-				primask,shadow,drawmode_table,shadowmode_table,shdmask
-				);
+				primask,shadow,drawmode_table,shadowmode_table,shdmask);
 	} // end of sprite-list loop
-#undef NUM_SPRITES
 }
 
 void k053247_device::k053247_sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -826,7 +823,7 @@ void k053247_device::device_start()
 	{
 		if (screen().format() == BITMAP_FORMAT_RGB32)
 		{
-			if (!palette().shadows_enabled() || !palette().hilights_enabled())
+			if (!palette().shadows_enabled() || !palette().highlights_enabled())
 				popmessage("driver missing SHADOWS or HIGHLIGHTS flag");
 		}
 		else

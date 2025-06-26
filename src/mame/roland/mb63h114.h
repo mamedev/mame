@@ -23,8 +23,16 @@ public:
 	// device type constructor
 	mb63h114_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	// write16 callback.
+	// - offset: Output pins DCBA. Pins CBA hold the current counter.
+	// - data: The current counter's 13-bit value.
+	auto counter_cb() { return m_counter_func.bind(); }
+
 	// CPU write handler
 	void xst_w(u8 data);
+
+	// Clock inputs for the 8 counters.
+	void xck_w(u8 data);
 
 protected:
 	// device-specific overrides
@@ -32,7 +40,19 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	// TODO
+	TIMER_CALLBACK_MEMBER(timer_tick);
+
+	static constexpr const int COUNTERS = 8;
+	static constexpr const int MAX_COUNT = 0x1fff;
+
+	devcb_write16 m_counter_func;
+	emu_timer *m_timer;
+
+	u8 m_xst;  // Last XST input.
+	u8 m_xck;  // Last XCK input.
+	u8 m_active_counter;  // Outputs C, B, A.
+	u8 m_d;  // Output D.
+	std::array<u16, COUNTERS> m_counters;
 };
 
 

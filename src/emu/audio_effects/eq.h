@@ -13,7 +13,7 @@ class audio_effect_eq : public audio_effect
 public:
 	enum { BANDS = 5 };
 
-	audio_effect_eq(u32 sample_rate, audio_effect *def);
+	audio_effect_eq(speaker_device *speaker, u32 sample_rate, audio_effect *def);
 	virtual ~audio_effect_eq() = default;
 
 	virtual int type() const override { return EQ; }
@@ -23,34 +23,37 @@ public:
 	virtual void default_changed() override;
 
 	void set_mode(u32 mode);
+	void set_f(u32 band, u32 f);
 	void set_q(u32 band, float q);
-	void set_f(u32 band, float f);
 	void set_db(u32 band, float db);
 	void set_low_shelf(bool active);
 	void set_high_shelf(bool active);
 
 	u32 mode() const         { return m_mode; }
+	u32 f(u32 band) const    { return m_f[band]; }
 	float q(u32 band) const  { return m_q[band]; }
-	float f(u32 band) const  { return m_f[band]; }
 	float db(u32 band) const { return m_db[band]; }
 	bool low_shelf() const   { return m_low_shelf; }
 	bool high_shelf() const  { return m_high_shelf; }
 
 	bool isset_mode() const       { return m_isset_mode; }
-	bool isset_q(u32 band) const  { return m_isset_q[band]; }
 	bool isset_f(u32 band) const  { return m_isset_f[band]; }
+	bool isset_q(u32 band) const  { return m_isset_q[band]; }
 	bool isset_db(u32 band) const { return m_isset_db[band]; }
 	bool isset_low_shelf() const  { return m_isset_low_shelf; }
 	bool isset_high_shelf() const { return m_isset_high_shelf; }
 
 	void reset_mode();
-	void reset_q(u32 band);
 	void reset_f(u32 band);
+	void reset_q(u32 band);
 	void reset_db(u32 band);
 	void reset_low_shelf();
 	void reset_high_shelf();
+	void reset_all();
 
 private:
+	static constexpr float DEFAULT_Q = 0.7071068f;
+
 	struct history {
 		float m_v0, m_v1, m_v2;
 		history() { m_v0 = m_v1 = m_v2 = 0; }
@@ -66,7 +69,8 @@ private:
 	};
 
 	u32 m_mode, m_band_mask;
-	float m_q[BANDS], m_f[BANDS], m_db[BANDS];
+	u32 m_f[BANDS];
+	float m_q[BANDS], m_db[BANDS];
 	bool m_low_shelf, m_high_shelf;
 	std::array<filter, BANDS> m_filter;
 	std::vector<std::array<history, BANDS+1>> m_history;

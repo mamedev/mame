@@ -822,14 +822,24 @@ void intellec4_state::intellec4_program_memory(address_map &map)
   Common machine configuration
 ----------------------------------*/
 
-DEVICE_INPUT_DEFAULTS_START(tty)
+DEVICE_INPUT_DEFAULTS_START(terminal)
 	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD",    0x00ff, RS232_BAUD_110)
 	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD",    0x00ff, RS232_BAUD_110)
 	DEVICE_INPUT_DEFAULTS("RS232_DATABITS",  0x00ff, RS232_DATABITS_8)
 	DEVICE_INPUT_DEFAULTS("RS232_PARITY",    0x00ff, RS232_PARITY_NONE)
 	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS",  0x00ff, RS232_STOPBITS_2)
-	DEVICE_INPUT_DEFAULTS("TERM_CONF",       0x01c0, 0x0000)
-	DEVICE_INPUT_DEFAULTS("FLOW_CONTROL",    0x0001, 0x0000)
+	DEVICE_INPUT_DEFAULTS("TERM_CONF",       0x0040, 0x0000) // auto CR on LF off
+	DEVICE_INPUT_DEFAULTS("TERM_CONF",       0x0080, 0x0000) // auto LF on CR off
+	DEVICE_INPUT_DEFAULTS("TERM_CONF",       0x0100, 0x0000) // local echo off
+DEVICE_INPUT_DEFAULTS_END
+
+DEVICE_INPUT_DEFAULTS_START(null_modem)
+	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD",    0x00ff, RS232_BAUD_110)
+	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD",    0x00ff, RS232_BAUD_110)
+	DEVICE_INPUT_DEFAULTS("RS232_DATABITS",  0x00ff, RS232_DATABITS_8)
+	DEVICE_INPUT_DEFAULTS("RS232_PARITY",    0x00ff, RS232_PARITY_NONE)
+	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS",  0x00ff, RS232_STOPBITS_2)
+	DEVICE_INPUT_DEFAULTS("FLOW_CONTROL",    0x0007, 0x0000) // no flow control
 DEVICE_INPUT_DEFAULTS_END
 
 void intellec4_state::intellec4(machine_config &config)
@@ -851,8 +861,8 @@ void intellec4_state::intellec4(machine_config &config)
 	INTEL_IMM6_76(config, m_prom_programmer, 0);
 
 	RS232_PORT(config, m_tty, default_rs232_devices, "terminal");
-	m_tty->set_option_device_input_defaults("terminal",   DEVICE_INPUT_DEFAULTS_NAME(tty));
-	m_tty->set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(tty));
+	m_tty->set_option_device_input_defaults("terminal",   DEVICE_INPUT_DEFAULTS_NAME(terminal));
+	m_tty->set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(null_modem));
 
 	INTELLEC4_UNIV_BUS(config, m_bus, 518000. / 7);
 	m_bus->set_rom_space(m_program_banks, AS_PROGRAM);

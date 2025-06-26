@@ -72,14 +72,17 @@ private:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<input_merger_device> m_soundnmi;
 
-	int8_t m_bank[3] = {};
+	uint8_t m_irq_enabled;
+	uint8_t m_bank[3] = { };
 
 	void sound_nmi_enable_w(uint8_t data);
-	void gfxctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void shadows_w(uint8_t data);
+	void gfxctrl_w(uint8_t data);
+	void irq_enable_w(uint8_t data);
+	void vblank_irq(int state);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	template <uint8_t Which> K051316_CB_MEMBER(zoom_callback);
 	K051960_CB_MEMBER(sprite_callback);
+
 	void main_map(address_map &map) ATTR_COLD;
 	void sound_io_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
@@ -123,53 +126,56 @@ K051316_CB_MEMBER(ultraman_state::zoom_callback)
 
 ***************************************************************************/
 
-void ultraman_state::gfxctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void ultraman_state::gfxctrl_w(uint8_t data)
 {
-	if (ACCESSING_BITS_0_7)
+	/*  bit 0: enable wraparound for scr #1
+	    bit 1: msb of code for scr #1
+	    bit 2: enable wraparound for scr #2
+	    bit 3: msb of code for scr #2
+	    bit 4: enable wraparound for scr #3
+	    bit 5: msb of code for scr #3
+	    bit 6: coin counter 1
+	    bit 7: coin counter 2 */
+
+	m_k051316[0]->wraparound_enable(data & 0x01);
+
+	if (m_bank[0] != ((data & 0x02) >> 1))
 	{
-		/*  bit 0: enable wraparound for scr #1
-		    bit 1: msb of code for scr #1
-		    bit 2: enable wraparound for scr #2
-		    bit 3: msb of code for scr #2
-		    bit 4: enable wraparound for scr #3
-		    bit 5: msb of code for scr #3
-		    bit 6: coin counter 1
-		    bit 7: coin counter 2 */
-
-		m_k051316[0]->wraparound_enable(data & 0x01);
-
-		if (m_bank[0] != ((data & 0x02) >> 1))
-		{
-			m_bank[0] = (data & 0x02) >> 1;
-			m_k051316[0]->mark_tmap_dirty();
-		}
-
-		m_k051316[1]->wraparound_enable(data & 0x04);
-
-		if (m_bank[1] != ((data & 0x08) >> 3))
-		{
-			m_bank[1] = (data & 0x08) >> 3;
-			m_k051316[1]->mark_tmap_dirty();
-		}
-
-		m_k051316[2]->wraparound_enable(data & 0x10);
-
-		if (m_bank[2] != ((data & 0x20) >> 5))
-		{
-			m_bank[2] = (data & 0x20) >> 5;
-			m_k051316[2]->mark_tmap_dirty();
-		}
-
-		machine().bookkeeping().coin_counter_w(0, data & 0x40);
-		machine().bookkeeping().coin_counter_w(1, data & 0x80);
+		m_bank[0] = (data & 0x02) >> 1;
+		m_k051316[0]->mark_tmap_dirty();
 	}
+
+	m_k051316[1]->wraparound_enable(data & 0x04);
+
+	if (m_bank[1] != ((data & 0x08) >> 3))
+	{
+		m_bank[1] = (data & 0x08) >> 3;
+		m_k051316[1]->mark_tmap_dirty();
+	}
+
+	m_k051316[2]->wraparound_enable(data & 0x10);
+
+	if (m_bank[2] != ((data & 0x20) >> 5))
+	{
+		m_bank[2] = (data & 0x20) >> 5;
+		m_k051316[2]->mark_tmap_dirty();
+	}
+
+	machine().bookkeeping().coin_counter_w(0, data & 0x40);
+	machine().bookkeeping().coin_counter_w(1, data & 0x80);
 }
 
-void ultraman_state::shadows_w(uint8_t data)
+void ultraman_state::irq_enable_w(uint8_t data)
 {
-	m_k051960->set_shadow_inv(BIT(data, 7));
+	m_irq_enabled = BIT(data, 7);
+	if (!m_irq_enabled)
+		m_maincpu->set_input_line(4, CLEAR_LINE);
+}
 
-	LOGSHADOWS("shadows_w: %02x\n", data);
+void ultraman_state::vblank_irq(int state)
+{
+	if (state && m_irq_enabled)
+		m_maincpu->set_input_line(4, ASSERT_LINE);
 }
 
 
@@ -207,8 +213,8 @@ void ultraman_state::main_map(address_map &map)
 	map(0x1c0004, 0x1c0005).portr("P2");
 	map(0x1c0006, 0x1c0007).portr("DSW1");
 	map(0x1c0008, 0x1c0009).portr("DSW2");
-	map(0x1c0011, 0x1c0011).w(FUNC(ultraman_state::shadows_w));
-	map(0x1c0018, 0x1c0019).w(FUNC(ultraman_state::gfxctrl_w)); // counters + gfx ctrl
+	map(0x1c0011, 0x1c0011).w(FUNC(ultraman_state::irq_enable_w));
+	map(0x1c0019, 0x1c0019).w(FUNC(ultraman_state::gfxctrl_w)); // counters + gfx ctrl
 	map(0x1c0021, 0x1c0021).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x1c0029, 0x1c0029).w(m_soundnmi, FUNC(input_merger_device::in_set<0>));
 	map(0x1c0030, 0x1c0031).w("watchdog", FUNC(watchdog_timer_device::reset16_w));
@@ -330,14 +336,14 @@ INPUT_PORTS_END
 
 void ultraman_state::machine_start()
 {
+	save_item(NAME(m_irq_enabled));
 	save_item(NAME(m_bank));
 }
 
 void ultraman_state::machine_reset()
 {
-	m_bank[0] = -1;
-	m_bank[1] = -1;
-	m_bank[2] = -1;
+	gfxctrl_w(0);
+	irq_enable_w(0);
 
 	m_soundnmi->in_w<0>(0);
 }
@@ -347,7 +353,6 @@ void ultraman_state::ultraman(machine_config &config)
 	// basic machine hardware
 	M68000(config, m_maincpu, 24'000'000 / 2); // 12 MHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &ultraman_state::main_map);
-	m_maincpu->set_vblank_int("screen", FUNC(ultraman_state::irq4_line_hold));
 
 	Z80(config, m_audiocpu, 24'000'000 / 6); // 4 MHz?
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ultraman_state::sound_map);
@@ -367,6 +372,7 @@ void ultraman_state::ultraman(machine_config &config)
 	screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1 );
 	screen.set_screen_update(FUNC(ultraman_state::screen_update));
 	screen.set_palette("palette");
+	screen.screen_vblank().set(FUNC(ultraman_state::vblank_irq));
 
 	auto &palette(PALETTE(config, "palette"));
 	palette.set_format(palette_device::xRGB_555, 8192);

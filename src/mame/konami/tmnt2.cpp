@@ -2396,7 +2396,7 @@ void tmnt2_state::punkshot(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 	m_palette->enable_shadows();
-	m_palette->enable_hilights();
+	m_palette->enable_highlights();
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);
@@ -2444,7 +2444,7 @@ void tmnt2_state::lgtnfght(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 	m_palette->enable_shadows();
-	m_palette->enable_hilights();
+	m_palette->enable_highlights();
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt2_state,lgtnfght)
 
@@ -2468,7 +2468,6 @@ void tmnt2_state::lgtnfght(machine_config &config)
 	K053260(config, m_k053260, XTAL(3'579'545));
 	m_k053260->add_route(0, "speaker", 0.70, 0);
 	m_k053260->add_route(1, "speaker", 0.70, 1);
-	m_k053260->sh1_cb().set(FUNC(tmnt2_state::z80_nmi_w));
 }
 
 void tmnt2_state::blswhstl(machine_config &config)
@@ -2498,7 +2497,7 @@ void tmnt2_state::blswhstl(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 	m_palette->enable_shadows();
-	m_palette->enable_hilights();
+	m_palette->enable_highlights();
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt2_state, blswhstl)
 
@@ -2561,7 +2560,7 @@ void glfgreat_state::glfgreat(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 	m_palette->enable_shadows();
-	m_palette->enable_hilights();
+	m_palette->enable_highlights();
 
 	MCFG_VIDEO_START_OVERRIDE(glfgreat_state,glfgreat)
 
@@ -2625,7 +2624,7 @@ void prmrsocr_state::prmrsocr(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 	m_palette->enable_shadows();
-	m_palette->enable_hilights();
+	m_palette->enable_highlights();
 
 	MCFG_VIDEO_START_OVERRIDE(prmrsocr_state,prmrsocr)
 
@@ -2684,7 +2683,7 @@ void tmnt2_state::tmnt2(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 	m_palette->enable_shadows();
-	m_palette->enable_hilights();
+	m_palette->enable_highlights();
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt2_state,lgtnfght)
 
@@ -2737,7 +2736,7 @@ void tmnt2_state::ssriders(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 	m_palette->enable_shadows();
-	m_palette->enable_hilights();
+	m_palette->enable_highlights();
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt2_state,lgtnfght)
 
@@ -2798,7 +2797,7 @@ void sunsetbl_state::sunsetbl(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 	m_palette->enable_shadows();
-	m_palette->enable_hilights();
+	m_palette->enable_highlights();
 
 	MCFG_VIDEO_START_OVERRIDE(sunsetbl_state,lgtnfght)
 
@@ -2844,7 +2843,7 @@ void tmnt2_state::thndrx2(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 	m_palette->enable_shadows();
-	m_palette->enable_hilights();
+	m_palette->enable_highlights();
 
 	K052109(config, m_k052109, 0);
 	m_k052109->set_palette(m_palette);

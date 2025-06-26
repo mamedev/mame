@@ -71,7 +71,7 @@ private:
 	mpeg_command_t m_command;
 	mpeg_player_t m_player;
 
-
+	void system_control_w(offs_t offset, u8 data);
 	void fifo_w(offs_t offset, u8 data);
 };
 

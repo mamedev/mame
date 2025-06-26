@@ -79,7 +79,7 @@
 
     3) (optional) set shadow darkness or highlight brightness by
         set_shadow_factor(0.0-1.0) or
-        _set_highlight_factor(1.0-n.n)
+        set_highlight_factor(1.0-n.n)
 
     4) before calling drawgfx use
         palette_set_shadow_mode(0) to arm shadows or
@@ -341,7 +341,7 @@ public:
 	palette_device &set_entries(u32 entries, u32 indirect) { m_entries = entries; m_indirect_entries = indirect; return *this; }
 	palette_device &set_indirect_entries(u32 entries) { m_indirect_entries = entries; return *this; }
 	palette_device &enable_shadows() { m_enable_shadows = true; return *this; }
-	palette_device &enable_hilights() { m_enable_hilights = true; return *this; }
+	palette_device &enable_highlights() { m_enable_highlights = true; return *this; }
 	template <typename T> palette_device &set_prom_region(T &&region) { m_prom_region.set_tag(std::forward<T>(region)); return *this; }
 
 	// palette RAM accessors
@@ -384,7 +384,7 @@ protected:
 	virtual u32 palette_entries() const noexcept override { return m_entries; }
 	virtual u32 palette_indirect_entries() const noexcept override { return m_indirect_entries; }
 	virtual bool palette_shadows_enabled() const noexcept override { return m_enable_shadows; }
-	virtual bool palette_hilights_enabled() const noexcept override { return m_enable_hilights; }
+	virtual bool palette_highlights_enabled() const noexcept override { return m_enable_highlights; }
 
 	// generic palette init routines
 	void palette_init_all_black(palette_device &palette);
@@ -411,7 +411,7 @@ private:
 	u32                 m_entries;              // number of entries in the palette
 	u32                 m_indirect_entries;     // number of indirect colors in the palette
 	bool                m_enable_shadows;       // are shadows enabled?
-	bool                m_enable_hilights;      // are hilights enabled?
+	bool                m_enable_highlights;    // are highlights enabled?
 	int                 m_membits;              // width of palette RAM, if different from native
 	bool                m_membits_supplied;     // true if membits forced in static config
 	endianness_t        m_endianness;           // endianness of palette RAM, if different from native

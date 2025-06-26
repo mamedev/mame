@@ -226,6 +226,8 @@ public:
 	virtual void sound_stream_close(uint32_t id) override;
 	virtual void sound_stream_sink_update(uint32_t id, const int16_t *buffer, int samples_this_frame) override;
 	virtual void sound_stream_source_update(uint32_t id, int16_t *buffer, int samples_this_frame) override;
+	virtual void sound_begin_update() override;
+	virtual void sound_end_update() override;
 
 	// input overridables
 	virtual void customize_input_type_list(std::vector<input_type_entry> &typelist) override;

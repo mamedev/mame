@@ -1246,6 +1246,23 @@ ROM_START( ronjana ) // the Z180 internal ROM wasn't extracted from this PCB. Us
 	ROM_LOAD( "eagle_6.j1", 0x00000, 0x40000, CRC(8197034d) SHA1(b501dc7a27b1faad1361c309afd726da14b8b5f5) )
 ROM_END
 
+ROM_START( janmu ) // 5019 8009-A PCB
+	ROM_REGION( 0x24000, "maincpu", 0 )
+	ROM_LOAD( "9.1l",                       0x00000, 0x20000, CRC(970e7e78) SHA1(1d7372323e5b57f2dfdfa166e389023f00a3067a) )
+	ROM_LOAD( "9009 1990.12 l-13 janmu.1r", 0x00000, 0x04000, NO_DUMP ) //overlapped internal ROM
+
+	ROM_REGION( 0xa0000, "janshivdp", 0 )
+	ROM_LOAD( "eagle_1.1a", 0x000000, 0x20000, CRC(47ff0a55) SHA1(404ce1de03e1850250ff0fc3c80365e6166403ee) )
+	ROM_LOAD( "eagle_2.1b", 0x020000, 0x20000, CRC(bbf08fbe) SHA1(a0cd603d71e73a9eeae82473a539e8056619f72a) )
+	ROM_LOAD( "eagle_3.1d", 0x040000, 0x20000, CRC(6f74ea6e) SHA1(16788151c98dc660a3d8bb70f298e4f20c66537e) )
+	ROM_LOAD( "eagle_4.1e", 0x060000, 0x20000, CRC(9e4c34db) SHA1(576622d156be5296e994b154fa2263b5647c2841) )
+	ROM_LOAD( "eagle_5.1h", 0x080000, 0x20000, CRC(0dbb1801) SHA1(c07c7525102184c5b42cfb6b79907e48bf0eb459) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "7.1j", 0x00000, 0x20000, CRC(0916ba15) SHA1(db1fe3e19ecf2da565cc397679164d9d614a4ed8) )
+	ROM_LOAD( "8.2j", 0x20000, 0x20000, CRC(e8c26032) SHA1(e0b6e86a435bed668ac6503f28a23d63f89a4b31) )
+ROM_END
+
 uint8_t pinkiri8_state::ronjan_prot_r()
 {
 	static const char wing_str[6] = { 'W', 'I', 'N', 'G', '8', '9' };
@@ -1294,4 +1311,5 @@ GAME( 1994,  ronjana,  ronjans, ronjan,   ronjan,   pinkiri8_state, empty_init, 
 GAME( 1994,  ronjans,  0,       ronjan,   ronjan,   pinkiri8_state, empty_init, ROT0, "Wing Co., Ltd", "Ron Jan Super (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 'SUPER' flashes in the middle of the screen
 GAME( 1994,  ronjansa, ronjans, ronjan,   ronjan,   pinkiri8_state, empty_init, ROT0, "Wing Co., Ltd", "Ron Jan Super (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // possibly Super or not, needs internal ROM dump
 GAME( 1994,  ronjansb, ronjans, ronjan,   ronjan,   pinkiri8_state, empty_init, ROT0, "Wing Co., Ltd", "Ron Jan Super (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // "
+GAME( 1990,  janmu,    0,       ronjan,   ronjan,   pinkiri8_state, empty_init, ROT0, "Wing Co., Ltd", "Jan Mu",                MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // needs internal ROM dump
 GAME( 1994,  pinkiri8, 0,       pinkiri8, pinkiri8, pinkiri8_state, empty_init, ROT0, "Alta",          "Pinkiri 8",             MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

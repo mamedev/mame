@@ -58,7 +58,7 @@
   force the graphics bug if a special value hardcoded in NVRAM doesn't
   match the expected.
 
-  $1da3.......$1dd6  ; loops to paint the title/logo on screen. 
+  $1da3.......$1dd6  ; loops to paint the title/logo on screen.
 
   then...
 
@@ -82,7 +82,7 @@
 ************************************************************************
 
   Updates:
-  
+
   [2025-05]
 
   - Fix color bipolar PROM decode and palette calculation,
@@ -92,7 +92,7 @@
      with harcoded critical values/registers needed to get
      the games working.
   - Workaround that fix the titles corruption for both
-     carrera and bsebman sets.  
+     carrera and bsebman sets.
   - Inputs and DIP switches.
   - Fix alantin colors, based on the real game screenshots.
   - Changed bsebman description to:
@@ -284,7 +284,7 @@ static INPUT_PORTS_START( carrera )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	
+
 	PORT_START("IN3")   // Port 3
 	PORT_DIPNAME( 0x01, 0x01, "3" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -350,19 +350,19 @@ static INPUT_PORTS_START( carrera )
 	PORT_DIPNAME( 0x08, 0x00, "Playing Graphics" )      PORT_DIPLOCATION("IN5:4")
 	PORT_DIPSETTING(    0x08, "Bricks" )
 	PORT_DIPSETTING(    0x00, "Fruits" )
-	
+
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )      PORT_DIPLOCATION("IN5:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )      PORT_DIPLOCATION("IN5:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	
+
 	PORT_DIPNAME( 0x40, 0x40, "Game Mode" )             PORT_DIPLOCATION("IN5:7")
 	PORT_DIPSETTING(    0x40, "Gamble" )
 	PORT_DIPSETTING(    0x00, "Amusement" )
 
-    // this one displays numbers over the game area
+	// this one displays numbers over the game area
 	PORT_DIPNAME( 0x80, 0x80, "Debug?" )                PORT_DIPLOCATION("IN5:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )

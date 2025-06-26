@@ -35,8 +35,8 @@
 #include "spectrum.h"
 #include "timex.h"
 
+#include "bus/spectrum/ay/slot.h"
 #include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
 
 #include "ui/uimain.h"
 
@@ -2300,15 +2300,15 @@ void spectrum_state::setup_z80(const uint8_t *snapdata, uint32_t snapsize)
 
 		if ((z80_type == SPECTRUM_Z80_SNAPSHOT_128K) || ((z80_type == SPECTRUM_Z80_SNAPSHOT_TS2068) && !strcmp(machine().system().name,"ts2068")))
 		{
-			ay8910_device *ay8912 = subdevice<ay8910_device>("ay8912");
+			ay_slot_device *ay = subdevice<ay_slot_device>("ay_slot");
 
 			// Only set up sound registers for 128K machine or TS2068!
 			for (i = 0; i < 16; i++)
 			{
-				ay8912->address_w(i);
-				ay8912->data_w(snapdata[39 + i]);
+				ay->address_w(i);
+				ay->data_w(snapdata[39 + i]);
 			}
-			ay8912->address_w(snapdata[38]);
+			ay->address_w(snapdata[38]);
 		}
 
 		if (z80_type == SPECTRUM_Z80_SNAPSHOT_48K)

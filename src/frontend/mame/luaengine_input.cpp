@@ -468,7 +468,7 @@ void lua_engine::initialize_input(sol::table &emu)
 
 	auto input_class_type = sol().registry().new_usertype<input_class>("input_class", sol::no_constructor);
 	input_class_type["name"] = sol::property(&input_class::name);
-	input_class_type["enabled"] = sol::property(&input_class::enabled);
+	input_class_type["enabled"] = sol::property(&input_class::enabled, &input_class::enable);
 	input_class_type["multi"] = sol::property(&input_class::multi);
 	input_class_type["devices"] = sol::property(
 			[this] (input_class &devclass)

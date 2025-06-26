@@ -250,12 +250,12 @@
 
 #include "cpu/z180/hd647180x.h"
 
-#include "sound/saa1099.h"
-#include "sound/msm5205.h"
-
 #include "machine/74259.h"
 #include "machine/bankdev.h"
 #include "machine/eeprompar.h"
+
+#include "sound/saa1099.h"
+#include "sound/msm5205.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -823,6 +823,54 @@ ROM_START( mastboyc )
 	ROM_LOAD( "gal16v8-25.ic84", 0x000, 0x117, NO_DUMP )
 ROM_END
 
+ROM_START( mastboyd )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "boy_programa_espana_19-2-92_d92627_27c512.bin", 0x0000, 0x4000, CRC(e46deb17) SHA1(7cf317df9f4a0c88865b5d8059d341051d08aad5) )
+	ROM_IGNORE(                                                        0xc000 )
+	ROM_LOAD( "3.ic77",                                        0x4000, 0x4000, CRC(64a712ba) SHA1(a8318fa6f5b3fe1aaff4cef07aced927e3503542) ) // data (1ST AND 2ND HALF IDENTICAL)
+	ROM_CONTINUE(                                              0x4000, 0x4000 )
+	ROM_CONTINUE(                                              0x4000, 0x4000 )
+	ROM_CONTINUE(                                              0x4000, 0x4000 ) // only the last 16kb matters
+
+	ROM_REGION( 0x10000, "vrom", ROMREGION_INVERT ) // ROM accessed by the video chip
+	ROM_LOAD( "04.bin", 0x00000, 0x10000, CRC(565932f4) SHA1(4b184aa445b5671072031ad4a2ccb13868d6d3a4) )
+
+	ROM_REGION( 0x200000, "bankedrom", 0 ) // banked data - 8 banks, 6 'question' slots
+	ROM_LOAD( "01.bin", 0x00000, 0x40000, CRC(36755831) SHA1(706fba5fc765502774643bfef8a3c9d2c01eb01b) ) // 99% gfx
+	ROM_LOAD( "02.bin", 0x40000, 0x20000, CRC(69cf6b7c) SHA1(a7bdc62051d09636dcd54db102706a9b42465e63) ) // data
+	ROM_RELOAD(         0x60000, 0x20000 ) // 128kb ROMs are mirrored
+
+/*  SOCIALES - GEOGRAFIA ESP. 110691 7659 0412
+    SOCIALES - HISTORIA       110691 7635 0428
+    ESPECTACULOS - CINE       110691 7455 0318
+    CIENCIAS - GENERAL        110691 7482 0347  */
+	ROM_LOAD( "05.bin", 0x080000, 0x020000, CRC(394cb674) SHA1(1390c666772f1e1e2da8866b960a3d24dc660e68) ) // questions
+	ROM_RELOAD(         0x0a0000, 0x020000 ) // 128kb ROMs are mirrored
+
+/*  SOCIALES - GEOGRAFIA MUN. 110691 7054 0513
+    VARIOS - CULTURA GENERAL  110691 7419 0352 */
+	ROM_LOAD( "06.bin", 0x0c0000, 0x020000, CRC(aace7120) SHA1(5655b56a7c241bc7908081088042601174c0a0b2) ) // questions
+	ROM_RELOAD(         0x0e0000, 0x020000 ) // 128kb ROMs are mirrored
+
+/*  DEPORTES - GENERAL        011091 9700 1045 */
+	ROM_LOAD( "07.bin", 0x100000, 0x020000, CRC(6618b002) SHA1(79942350da335a3362b6fc43527b6568ce134ceb) ) // questions
+	ROM_RELOAD(         0x120000, 0x020000 ) // 128kb ROMs are mirrored
+
+/*  VARIOS - CULTURA GENERAL  041091 5970 0585
+    VARIOS - CULTURA GENERAL  061091 5300 0245
+    CIENCIAS - GENERAL        041091 5630 0275 */
+	ROM_LOAD( "08.bin", 0x140000, 0x020000, CRC(6a4870dd) SHA1(f8ca94a5bc4ba3f512767901e4ae3579c2c6355a) ) // questions
+	ROM_RELOAD(         0x160000, 0x020000 ) // 128kb ROMs are mirrored
+
+	//                  0x180000 to 0x1bffff EMPTY
+	//                  0x1c0000 to 0x1fffff EMPTY
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "gal16v8-25.ic32", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8-25.ic49", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8-25.ic84", 0x000, 0x117, NO_DUMP )
+ROM_END
+
 ROM_START( mastboyv2 )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "hd647180_sp_v2.bin",     0x0000, 0x4000, CRC(f4c4ae83) SHA1(b131dcf1e4f2a274aed515054d43b316628a3c58) ) // game code is internal to the CPU!
@@ -1024,16 +1072,17 @@ ROM_END
 
 // Italian sets
 
-/* The internal ROM should be different on the (v1) Italian sets, as it indexes the wrong strings on the startup screens,
-   showing MARK instead of PLAY MARK etc. So, marked as BAD_DUMP on these sets */
+/* The internal ROM for the (v1) Italian sets wasn't trojaned, instead it came from a ROM from the Gaelco archives.
+   So, marked as BAD_DUMP on these sets as a precaution, although it could very well be correct */
 
 ROM_START( mastboyi )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "hd647180_i.bin", 0x0000, 0x4000, BAD_DUMP CRC(75716dd1) SHA1(9b14b9b889b29b6022a3815de95487fb6a720d7a) ) // game code is internal to the CPU!
-	ROM_LOAD( "3-mem-a.ic77",   0x4000, 0x4000, CRC(3ee33282) SHA1(26371e3bb436869461e9870409b69aa9fb1845d6) ) // sound data? (+ 1 piece of) 1ST AND 2ND HALF IDENTICAL
-	ROM_CONTINUE(               0x4000, 0x4000 )
-	ROM_CONTINUE(               0x4000, 0x4000 )
-	ROM_CONTINUE(               0x4000, 0x4000 ) // only the last 16kb matters
+	ROM_LOAD( "mboy_programa_italia_18-3-92_27c512.bin", 0x0000, 0x4000, BAD_DUMP CRC(4137cf86) SHA1(1746b92a90f69fc9cf23c9ce59593d6a3254a17e) )
+	ROM_IGNORE(                                          0xc000 )
+	ROM_LOAD( "3-mem-a.ic77",                    0x4000, 0x4000, CRC(3ee33282) SHA1(26371e3bb436869461e9870409b69aa9fb1845d6) ) // sound data? (+ 1 piece of) 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(                                0x4000, 0x4000 )
+	ROM_CONTINUE(                                0x4000, 0x4000 )
+	ROM_CONTINUE(                                0x4000, 0x4000 ) // only the last 16kb matters
 
 	ROM_REGION( 0x10000, "vrom", ROMREGION_INVERT ) // ROM accessed by the video chip
 	ROM_LOAD( "4.ic91", 0x00000, 0x10000, CRC(858d7b27) SHA1(b0ddf49df5665003f3616d67f7fc27408433483b) )
@@ -1073,11 +1122,12 @@ ROM_END
 // Only one of the question ROMs differs from 'mastboyi' (minor wording / spelling changes in most cases).
 ROM_START( mastboyia )
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "hd647180_i.bin", 0x0000, 0x4000, BAD_DUMP CRC(75716dd1) SHA1(9b14b9b889b29b6022a3815de95487fb6a720d7a) ) // game code is internal to the CPU!
-	ROM_LOAD( "3-mem-a.ic77",   0x4000, 0x4000, CRC(3ee33282) SHA1(26371e3bb436869461e9870409b69aa9fb1845d6) ) // sound data? (+ 1 piece of) 1ST AND 2ND HALF IDENTICAL
-	ROM_CONTINUE(               0x4000, 0x4000 )
-	ROM_CONTINUE(               0x4000, 0x4000 )
-	ROM_CONTINUE(               0x4000, 0x4000 ) // only the last 16kb matters
+	ROM_LOAD( "mboy_programa_italia_18-3-92_27c512.bin", 0x0000, 0x4000, BAD_DUMP CRC(4137cf86) SHA1(1746b92a90f69fc9cf23c9ce59593d6a3254a17e) )
+	ROM_IGNORE(                                          0xc000 )
+	ROM_LOAD( "3-mem-a.ic77",                    0x4000, 0x4000, CRC(3ee33282) SHA1(26371e3bb436869461e9870409b69aa9fb1845d6) ) // sound data? (+ 1 piece of) 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(                                0x4000, 0x4000 )
+	ROM_CONTINUE(                                0x4000, 0x4000 )
+	ROM_CONTINUE(                                0x4000, 0x4000 ) // only the last 16kb matters
 
 	ROM_REGION( 0x10000, "vrom", ROMREGION_INVERT ) // ROM accessed by the video chip
 	ROM_LOAD( "4.ic91", 0x00000, 0x10000, CRC(858d7b27) SHA1(b0ddf49df5665003f3616d67f7fc27408433483b) )
@@ -1206,6 +1256,50 @@ ROM_START( mastboyic )
 	ROM_LOAD( "19_domande-rom.ic96", 0x180000, 0x020000, CRC(146c46f9) SHA1(a6b09ffb98146ed2eb67a9d43465abc076758d60) )
 	ROM_RELOAD(                      0x1a0000, 0x020000 ) // 128kb ROMs are mirrored
 
+	//                  0x1c0000 to 0x1fffff EMPTY
+
+	ROM_REGION( 0x117, "plds", 0 )
+	ROM_LOAD( "gal16v8-25.ic32", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8-25.ic49", 0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "gal16v8-25.ic84", 0x000, 0x117, NO_DUMP )
+ROM_END
+
+ROM_START( mastboyid )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "mboy_programa_italia_18-3-92_27c512.bin",        0x0000, 0x4000, CRC(4137cf86) SHA1(1746b92a90f69fc9cf23c9ce59593d6a3254a17e) )
+	ROM_IGNORE(                                                         0xc000 )
+	ROM_LOAD( "mboy_tablas_sin_play_italia_18-3-92_27c512.bin", 0x4000, 0x4000, CRC(20450b48) SHA1(296999780b62e54687fff22e2acea94733a4ffea) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_CONTINUE(                                               0x4000, 0x4000 )
+	ROM_CONTINUE(                                               0x4000, 0x4000 )
+	ROM_CONTINUE(                                               0x4000, 0x4000 ) // only the last 16kb matters
+
+	ROM_REGION( 0x10000, "vrom", ROMREGION_INVERT ) // ROM accessed by the video chip
+	ROM_LOAD( "4.ic91", 0x00000, 0x10000, CRC(858d7b27) SHA1(b0ddf49df5665003f3616d67f7fc27408433483b) )
+
+	ROM_REGION( 0x200000, "bankedrom", 0 ) // question data - 6 sockets
+	ROM_LOAD( "1-mem-c.ic75", 0x00000, 0x40000, CRC(7c7b1cc5) SHA1(73ad7bdb61d1f99ce09ef3a5a3ae0f1e72364eee) ) // 99% gfx
+	ROM_LOAD( "2-mem-b.ic76", 0x40000, 0x20000, CRC(87015c18) SHA1(a16bf2707ce847da0923662796195b75719a6d77) ) // data
+	ROM_RELOAD(               0x60000, 0x20000 ) // 128kb ROMs are mirrored
+
+/*  TEMPO LIBERO - HOBBY GIOCHI 011091 5457 0300
+    SCIENZA - NATURA            011091 5657 0400
+    SPORT - MONDIALI-90         011091 5999 0212
+    MUSICA - AUTORI CANZONI     011091 5496 0314 */
+	ROM_LOAD( "5-rom.ic95",   0x080000, 0x020000, CRC(adc07f12) SHA1(2e0b46ac5884ad459bc354f56ff384ff1932f147) )
+	ROM_RELOAD(               0x0a0000, 0x020000 ) // 128kb ROMs are mirrored
+
+/*  SPORT- GENERALE             011091 5294 0713
+    SPETTACOLO - CINE-TV        011091 5657 0400 */
+	ROM_LOAD( "6-rom.ic96",   0x0c0000, 0x020000, CRC(2c52cb1e) SHA1(d58f21c09bd3983497f74ab6c5a37977d9e30f0c) )
+	ROM_RELOAD(               0x0e0000, 0x020000 ) // 128kb ROMs are mirrored
+
+/*  SCIENZA - STORIA            011091 5430 0375
+    SCIENZA - GEOGRAFIA         011091 5010 0565 */
+	ROM_LOAD( "7-rom.ic97",   0x100000, 0x020000, CRC(7818408f) SHA1(2a69688b6cda5baf2a45966dd86f10b2fcd54b66) )
+	ROM_RELOAD(               0x120000, 0x020000 ) // 128kb ROMs are mirrored
+
+	//                  0x140000 to 0x17ffff EMPTY
+	//                  0x180000 to 0x1bffff EMPTY
 	//                  0x1c0000 to 0x1fffff EMPTY
 
 	ROM_REGION( 0x117, "plds", 0 )
@@ -1422,6 +1516,7 @@ GAME( 1991, mastboy,     0,       mastboy, mastboy, mastboy_state, empty_init, R
 GAME( 1991, mastboya,    mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco", "Master Boy (Spain, set 2, checksum E5AD)", MACHINE_SUPPORTS_SAVE ) // No text on license box at boot
 GAME( 1991, mastboyb,    mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco", "Master Boy (Spain, set 3, checksum 6070)", MACHINE_SUPPORTS_SAVE ) // 27-Nov-1992
 GAME( 1991, mastboyc,    mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco", "Master Boy (Spain, set 4, checksum CC6D)", MACHINE_SUPPORTS_SAVE ) // 23-Oct-1992
+GAME( 1991, mastboyd,    mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco", "Master Boy (Spain, set 5, checksum DF11)", MACHINE_SUPPORTS_SAVE ) // 19-Feb-1992
 
 GAME( 1992, mastboyol,   mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco", "Master Boy Olympic (Spain, set 1, checksum 7309)", MACHINE_SUPPORTS_SAVE ) // 18-Oct-1992
 GAME( 1992, mastboyola,  mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco", "Master Boy Olympic (Spain, set 2, checksum 741B)", MACHINE_SUPPORTS_SAVE ) // 18-Oct-1992. No text on license box at boot
@@ -1435,6 +1530,7 @@ GAME( 1991, mastboyi,    mastboy, mastboy, mastboy, mastboy_state, empty_init, R
 GAME( 1991, mastboyia,   mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco (Playmark license)", "Master Boy (Italy, set 2, checksum E7C5)", MACHINE_SUPPORTS_SAVE ) // Same checksum as 'mastboyi', only the questions are different
 GAME( 1991, mastboyib,   mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco (Playmark license)", "Master Boy (Italy, set 3, checksum 6918)", MACHINE_SUPPORTS_SAVE ) // 27-Oct-1992
 GAME( 1991, mastboyic,   mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco (Playmark license)", "Master Boy (Italy, set 4, checksum 680C)", MACHINE_SUPPORTS_SAVE ) // 27-Oct-1992
+GAME( 1991, mastboyid,   mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco (Playmark license)", "Master Boy (Italy, set 4, checksum E84C)", MACHINE_SUPPORTS_SAVE ) // 18-Mar-1992
 
 GAME( 1991, mastboyiol,  mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco (Playmark license)", "Master Boy Olympic (Italy, set 1, checksum 77A8)", MACHINE_SUPPORTS_SAVE ) // 18-Oct-1992
 

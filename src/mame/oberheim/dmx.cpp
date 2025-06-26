@@ -299,7 +299,6 @@ void dmx_voice_card_device::device_add_mconfig(machine_config &config)
 	if (has_decay())
 	{
 		VA_RC_EG(config, m_eg).set_c(m_config.c3);
-		m_dac->configure_streaming_iref(true);
 		m_eg->add_route(0, m_dac, 1.0);
 	}
 

@@ -1493,13 +1493,13 @@ void segaybd_state::yboard(machine_config &config)
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", SOUND_CLOCK/8));
 	ymsnd.irq_handler().set_inputline(m_soundcpu, 0);
-	ymsnd.add_route(0, "speaker", 0.43, 0);
-	ymsnd.add_route(1, "speaker", 0.43, 1);
+	ymsnd.add_route(0, "speaker", 0.30, 0);
+	ymsnd.add_route(1, "speaker", 0.30, 1);
 
 	segapcm_device &pcm(SEGAPCM(config, "pcm", SOUND_CLOCK/8));
 	pcm.set_bank(segapcm_device::BANK_12M | segapcm_device::BANK_MASKF8);
-	pcm.add_route(0, "speaker", 1.0, 0);
-	pcm.add_route(1, "speaker", 1.0, 1);
+	pcm.add_route(0, "speaker", 0.70, 0);
+	pcm.add_route(1, "speaker", 0.70, 1);
 }
 
 

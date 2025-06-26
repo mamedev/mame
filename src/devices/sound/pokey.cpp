@@ -78,7 +78,7 @@
  *  - optional non-indexing pokey update functions.
  *
  *  TODO:  liberatr clipping
- *  TODO:  bit-level serial I/O instead of fake byte read/write handlers
+ *  TODO:  external clock modes for serial I/O
  *
  *
  *****************************************************************************/
@@ -105,6 +105,8 @@
 #define VERBOSE_POLY    (1U << 3)
 #define VERBOSE_RAND    (1U << 4)
 #define VERBOSE_IRQ     (1U << 5)
+#define VERBOSE_SERIN   (1U << 6)
+#define VERBOSE_SEROUT  (1U << 7)
 #define VERBOSE         (0)
 
 #include "logmacro.h"
@@ -118,6 +120,10 @@
 #define LOG_RAND(...) LOGMASKED(VERBOSE_RAND, __VA_ARGS__)
 
 #define LOG_IRQ(...) LOGMASKED(VERBOSE_IRQ, __VA_ARGS__)
+
+#define LOG_SERIN(...) LOGMASKED(VERBOSE_SERIN, __VA_ARGS__)
+
+#define LOG_SEROUT(...) LOGMASKED(VERBOSE_SEROUT, __VA_ARGS__)
 
 #define CHAN1   0
 #define CHAN2   1
@@ -159,14 +165,16 @@
 #define SK_FRAME    0x80    /* serial framing error */
 #define SK_KBERR    0x40    /* keyboard overrun error - pokey documentation states *some bit as IRQST */
 #define SK_OVERRUN  0x20    /* serial overrun error - pokey documentation states *some bit as IRQST */
-#define SK_SERIN    0x10    /* serial input high */
+#define SK_SERIN    0x10    /* serial data input low */
 #define SK_SHIFT    0x08    /* shift key pressed */
 #define SK_KEYBD    0x04    /* keyboard key pressed */
-#define SK_SEROUT   0x02    /* serial output active */
+#define SK_BUSY     0x02    /* serial input shift register busy */
 
 /* SKCTL (W/D20F) */
 #define SK_BREAK    0x80    /* serial out break signal */
-#define SK_BPS      0x70    /* bits per second */
+#define SK_OCLK     0x60    /* serial out clock mode */
+#define SK_ICLK     0x30    /* serial in clock mode */
+#define SK_ASYNC    0x10    /* asynchronous receive mode */
 #define SK_TWOTONE  0x08    /* Two tone mode */
 #define SK_PADDLE   0x04    /* fast paddle a/d conversion */
 #define SK_RESET    0x03    /* reset serial/keyboard interface */
@@ -201,9 +209,9 @@ pokey_device::pokey_device(const machine_config &mconfig, const char *tag, devic
 	m_stream(nullptr),
 	m_pot_r_cb(*this, 0),
 	m_allpot_r_cb(*this, 0),
-	m_serin_r_cb(*this, 0),
-	m_serout_w_cb(*this),
 	m_irq_w_cb(*this),
+	m_sod_w_cb(*this),
+	m_oclk_w_cb(*this),
 	m_keyboard_r(*this),
 	m_output_type(LEGACY_LINEAR),
 	m_serout_ready_timer(nullptr),
@@ -280,6 +288,13 @@ void pokey_device::device_start()
 	m_old_raw_inval = true;
 	m_kbd_state = 0;
 
+	m_serin_shift = 1;
+	m_serout_shift = 1;
+	m_serout_full = false;
+	m_ser_iclk = true;
+	m_ser_oclk = false;
+	m_sod_twotone = false;
+
 	/* reset more internal state */
 	std::fill(std::begin(m_clock_cnt), std::end(m_clock_cnt), 0);
 	std::fill(std::begin(m_POTx), std::end(m_POTx), 0);
@@ -318,6 +333,13 @@ void pokey_device::device_start()
 	save_item(NAME(m_kbd_cnt));
 	save_item(NAME(m_kbd_latch));
 	save_item(NAME(m_kbd_state));
+
+	save_item(NAME(m_serin_shift));
+	save_item(NAME(m_serout_shift));
+	save_item(NAME(m_serout_full));
+	save_item(NAME(m_ser_iclk));
+	save_item(NAME(m_ser_oclk));
+	save_item(NAME(m_sod_twotone));
 
 	// State support
 
@@ -390,6 +412,7 @@ void pokey_device::device_clock_changed()
 
 TIMER_CALLBACK_MEMBER(pokey_device::serout_ready_irq)
 {
+	m_IRQST &= ~IRQ_SEROC;
 	if (m_IRQEN & IRQ_SEROR)
 	{
 		m_IRQST |= IRQ_SEROR;
@@ -400,6 +423,7 @@ TIMER_CALLBACK_MEMBER(pokey_device::serout_ready_irq)
 
 TIMER_CALLBACK_MEMBER(pokey_device::serout_complete_irq)
 {
+	// Completion flag is set regardless of IRQEN
 	m_IRQST |= IRQ_SEROC;
 	if (m_IRQEN & IRQ_SEROC)
 	{
@@ -410,7 +434,18 @@ TIMER_CALLBACK_MEMBER(pokey_device::serout_complete_irq)
 
 TIMER_CALLBACK_MEMBER(pokey_device::serin_ready_irq)
 {
-	if (m_IRQEN & IRQ_SERIN)
+	// Check stop bit for framing error
+	if (!(m_serin_shift & (1 << 9)))
+		m_SKSTAT |= SK_FRAME;
+	m_SERIN = (m_serin_shift >> 1) & 0xff;
+	LOG_SERIN("SERIN received %02x%s\n", m_SERIN, (m_serin_shift & (1 << 9)) ? "" : " with framing error");
+
+	if (m_IRQST & IRQ_SERIN)
+	{
+		m_SKSTAT |= SK_OVERRUN;
+		LOG_IRQ("POKEY SERIN overrun\n");
+	}
+	else if (m_IRQEN & IRQ_SERIN)
 	{
 		m_IRQST |= IRQ_SERIN;
 		LOG_IRQ("POKEY SERIN IRQ raised\n");
@@ -572,6 +607,9 @@ void pokey_device::step_pot()
 
 void pokey_device::step_one_clock()
 {
+	bool toggle_iclk = false;
+	bool toggle_oclk = false;
+
 	if (m_SKCTL & SK_RESET)
 	{
 		/* Clocks only count if we are not in a reset */
@@ -614,7 +652,11 @@ void pokey_device::step_one_clock()
 		if ((!(m_AUDCTL & CH1_HICLK)) && (clock_triggered[base_clock]))
 			m_channel[CHAN1].inc_chan(*this, 1);
 
-		if ((m_AUDCTL & CH3_HICLK) && (clock_triggered[CLK_1]))
+		bool async_reset = (m_SKCTL & SK_ASYNC) && !(m_SKSTAT & (SK_BUSY | SK_SERIN));
+		if (async_reset)
+			m_ser_iclk = true; // kludge needed for mid-bit sampling
+
+		if ((m_AUDCTL & CH3_HICLK) && (clock_triggered[CLK_1]) && !async_reset)
 		{
 			if (m_AUDCTL & CH34_JOINED)
 				m_channel[CHAN3].inc_chan(*this, 7);
@@ -622,15 +664,28 @@ void pokey_device::step_one_clock()
 				m_channel[CHAN3].inc_chan(*this, 4);
 		}
 
-		if ((!(m_AUDCTL & CH3_HICLK)) && (clock_triggered[base_clock]))
+		if ((!(m_AUDCTL & CH3_HICLK)) && (clock_triggered[base_clock]) && !async_reset)
 			m_channel[CHAN3].inc_chan(*this, 1);
 
 		if (clock_triggered[base_clock])
 		{
 			if (!(m_AUDCTL & CH12_JOINED))
+			{
+				if (m_channel[CHAN2].m_counter == 0xff && (m_SKCTL & SK_OCLK) == 0x60)
+					toggle_oclk = true;
 				m_channel[CHAN2].inc_chan(*this, 1);
-			if (!(m_AUDCTL & CH34_JOINED))
+			}
+			if (!(m_AUDCTL & CH34_JOINED) && !async_reset)
+			{
+				if (m_channel[CHAN4].m_counter == 0xff)
+				{
+					if ((m_SKCTL & SK_ICLK) != 0)
+						toggle_iclk = true;
+					if ((m_SKCTL & SK_OCLK) && (m_SKCTL & SK_OCLK) != 0x60)
+						toggle_oclk = true;
+				}
 				m_channel[CHAN4].inc_chan(*this, 1);
+			}
 		}
 
 		/* Potentiometer handling */
@@ -645,7 +700,16 @@ void pokey_device::step_one_clock()
 	if (m_channel[CHAN3].check_borrow())
 	{
 		if (m_AUDCTL & CH34_JOINED)
+		{
+			if (m_channel[CHAN4].m_counter == 0xff)
+			{
+				if ((m_SKCTL & SK_ICLK) != 0)
+					toggle_iclk = true;
+				if ((m_SKCTL & SK_OCLK) != 0 && (m_SKCTL & SK_OCLK) != 0x60)
+					toggle_oclk = true;
+			}
 			m_channel[CHAN4].inc_chan(*this, 1);
+		}
 		else
 			m_channel[CHAN3].reset_channel();
 
@@ -678,16 +742,33 @@ void pokey_device::step_one_clock()
 	{
 		m_channel[CHAN1].reset_channel();
 		m_old_raw_inval = true;
+
+		m_sod_twotone = !m_sod_twotone;
+		m_sod_w_cb(!m_sod_twotone);
 	}
 
 	if (m_channel[CHAN1].check_borrow())
 	{
 		if (m_AUDCTL & CH12_JOINED)
+		{
+			if (m_channel[CHAN2].m_counter == 0xff && (m_SKCTL & SK_OCLK) == 0x60)
+				toggle_oclk = true;
 			m_channel[CHAN2].inc_chan(*this, 1);
+		}
 		else
+		{
 			m_channel[CHAN1].reset_channel();
 
-		// TODO: If two-tone is enabled *and* serial output == 1 then reset the channel 2 timer.
+			// If two-tone is enabled *and* serial output == 1 then reset the channel 2 timer.
+			if ((m_SKCTL & SK_TWOTONE) && ((m_IRQST & IRQ_SEROC) ? !(m_SKCTL & SK_BREAK) : m_serout_shift & 1))
+			{
+				m_channel[CHAN2].reset_channel();
+				m_old_raw_inval = true;
+
+				m_sod_twotone = !m_sod_twotone;
+				m_sod_w_cb(!m_sod_twotone);
+			}
+		}
 
 		process_channel(CHAN1);
 	}
@@ -716,6 +797,22 @@ void pokey_device::step_one_clock()
 
 		m_old_raw_inval = false;
 		m_out_raw = sum;
+	}
+
+	if (toggle_iclk)
+	{
+		m_ser_iclk = !m_ser_iclk;
+		if (!m_ser_iclk)
+			process_serin();
+	}
+
+	if (toggle_oclk && (m_serout_full || !(m_IRQST & IRQ_SEROC)))
+	{
+		m_ser_oclk = !m_ser_oclk;
+		if (m_ser_oclk)
+			process_serout();
+		else
+			m_oclk_w_cb(0);
 	}
 }
 
@@ -856,8 +953,6 @@ uint8_t pokey_device::read(offs_t offset)
 		break;
 
 	case SERIN_C:
-		if (!m_serin_r_cb.isunset())
-			m_SERIN = m_serin_r_cb(offset);
 		data = m_SERIN;
 		LOG("%s: POKEY SERIN  $%02x\n", machine().describe_context(), data);
 		break;
@@ -981,21 +1076,8 @@ void pokey_device::write_internal(offs_t offset, uint8_t data)
 
 	case SEROUT_C:
 		LOG("%s: POKEY SEROUT $%02x\n", machine().describe_context(), data);
-		// TODO: convert to real serial comms, fix timings
-		// SEROC (1) serial out in progress (0) serial out complete
-		// in progress status is necessary for a800 telelnk2 to boot
-		m_IRQST &= ~IRQ_SEROC;
-
-		m_serout_w_cb(offset, data);
-		m_SKSTAT |= SK_SEROUT;
-		/*
-		 * These are arbitrary values, tested with some custom boot
-		 * loaders from Ballblazer and Escape from Fractalus
-		 * The real times are unknown
-		 */
-		m_serout_ready_timer->adjust(attotime::from_usec(200));
-		/* 10 bits (assumption 1 start, 8 data and 1 stop bit) take how long? */
-		m_serout_complete_timer->adjust(attotime::from_usec(2000));
+		m_SEROUT = data;
+		m_serout_full = true;
 		break;
 
 	case IRQEN_C:
@@ -1045,7 +1127,14 @@ void pokey_device::write_internal(offs_t offset, uint8_t data)
 			m_clock_cnt[0] = 0;
 			m_clock_cnt[1] = 0;
 			m_clock_cnt[2] = 0;
-			/* FIXME: Serial port reset ! */
+
+			// Reset serial port
+			m_serin_shift = 1;
+			m_serout_shift = 1;
+			m_serout_full = false;
+			m_oclk_w_cb(0);
+			m_SKSTAT &= ~SK_BUSY;
+			m_serout_complete_timer->adjust(attotime::zero);
 		}
 		if (!(data & SK_KEYSCAN))
 		{
@@ -1053,6 +1142,17 @@ void pokey_device::write_internal(offs_t offset, uint8_t data)
 			m_kbd_cnt = 0;
 			m_kbd_state = 0;
 		}
+		if ((data & SK_ICLK) == 0)
+			m_ser_iclk = true;
+		if ((data & SK_OCLK) == 0)
+			m_ser_oclk = false;
+		if ((data & SK_ASYNC) && !(m_SKSTAT & SK_BUSY))
+		{
+			m_channel[CHAN3].reset_channel();
+			m_channel[CHAN4].reset_channel();
+		}
+		if (!(m_SKSTAT & SK_BUSY) && !(data & SK_TWOTONE))
+			m_sod_w_cb((data & SK_BREAK) ? 0 : 1);
 		m_old_raw_inval = true;
 		break;
 	}
@@ -1069,19 +1169,20 @@ void pokey_device::write_internal(offs_t offset, uint8_t data)
 
 void pokey_device::sid_w(int state)
 {
+	// Note: all bits in SKSTAT are negated
 	if (state)
-	{
-		m_SKSTAT |= SK_SERIN;
-	}
-	else
 	{
 		m_SKSTAT &= ~SK_SERIN;
 	}
+	else
+	{
+		m_SKSTAT |= SK_SERIN;
+	}
 }
 
-void pokey_device::serin_ready(int after)
+void pokey_device::bclk_w(int state)
 {
-	m_serin_ready_timer->adjust(m_clock_period * after, 0);
+	// TODO
 }
 
 //-------------------------------------------------
@@ -1101,6 +1202,67 @@ inline void pokey_device::process_channel(int ch)
 		else
 			m_channel[ch].m_output = (m_poly17[m_p17] & 1);
 		m_old_raw_inval = true;
+	}
+}
+
+void pokey_device::process_serin()
+{
+	if (m_SKSTAT & SK_BUSY)
+	{
+		// Shift in from SID
+		LOG_SERIN("SERIN receiving %d bit @ %s\n", !(m_SKSTAT & SK_SERIN), machine().time().to_string());
+		m_serin_shift >>= 1;
+		if (!(m_SKSTAT & SK_SERIN))
+			m_serin_shift |= 1 << 9;
+
+		// Check whether shifting has finished
+		if (m_serin_shift & 1)
+		{
+			m_SKSTAT &= ~SK_BUSY;
+			m_serin_ready_timer->adjust(attotime::zero);
+		}
+	}
+	else
+	{
+		// Begin shifting when SID is sampled low
+		if (m_SKSTAT & SK_SERIN)
+		{
+			LOG_SERIN("SERIN receiving start bit @ %s\n", machine().time().to_string());
+			m_serin_shift = 1 << 9;
+			m_SKSTAT |= SK_BUSY;
+		}
+	}
+}
+
+void pokey_device::process_serout()
+{
+	if (m_serout_shift == 1)
+	{
+		if (m_serout_full)
+		{
+			// Output start bit and reload the shift register
+			LOG_SEROUT("SEROUT transmitting start bit of %02x @ %s\n", m_SEROUT, machine().time().to_string());
+			if (!(m_SKCTL & SK_TWOTONE))
+				m_sod_w_cb(0);
+			m_oclk_w_cb(1);
+			m_serout_shift = (m_SEROUT << 1) | (1 << 9);
+			m_serout_full = false;
+			m_serout_ready_timer->adjust(attotime::zero);
+		}
+		else
+		{
+			if (!(m_SKCTL & SK_TWOTONE) && (m_SKCTL & SK_BREAK))
+				m_sod_w_cb(0);
+			m_serout_complete_timer->adjust(attotime::zero);
+		}
+	}
+	else
+	{
+		m_serout_shift >>= 1;
+		LOG_SEROUT("SEROUT transmitting %d bit @ %s\n", m_serout_shift & 1, machine().time().to_string());
+		if (!(m_SKCTL & SK_TWOTONE))
+			m_sod_w_cb(m_serout_shift & 1);
+		m_oclk_w_cb(1);
 	}
 }
 

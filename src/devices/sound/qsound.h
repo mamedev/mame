@@ -68,7 +68,9 @@ private:
 
 DECLARE_DEVICE_TYPE(QSOUND, qsound_device)
 
-#if !defined(QSOUND_LLE) // && 0
+// alias QSOUND to QSOUND_HLE by default
+// define QSOUND_LLE to use the DSP emulation
+#if !defined(QSOUND_LLE)
 #include "qsoundhle.h"
 #define qsound_device qsound_hle_device
 #define QSOUND QSOUND_HLE

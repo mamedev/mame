@@ -45,7 +45,7 @@ public:
 private:
 	struct position_info {
 		pa_channel_position_t m_position;
-		std::array<double, 3> m_coords;
+		osd::channel_position m_coords;
 	};
 
 	static const position_info position_infos[];
@@ -61,7 +61,7 @@ private:
 		// Audio node info
 		std::vector<pa_channel_position_t> m_position_codes;
 		std::vector<std::string> m_position_names;
-		std::vector<std::array<double, 3>> m_positions;
+		std::vector<osd::channel_position> m_positions;
 		uint32_t m_sink_port_count, m_source_port_count;
 
 		osd::audio_rate_range m_rate;
@@ -122,15 +122,15 @@ private:
 // Try to more or less map to speaker.h positions
 
 const sound_pulse::position_info sound_pulse::position_infos[] = {
-	{ PA_CHANNEL_POSITION_MONO,         {  0.0,  0.0,  1.0 } },
-	{ PA_CHANNEL_POSITION_FRONT_LEFT,   { -0.2,  0.0,  1.0 } },
-	{ PA_CHANNEL_POSITION_FRONT_RIGHT,  {  0.2,  0.0,  1.0 } },
-	{ PA_CHANNEL_POSITION_FRONT_CENTER, {  0.0,  0.0,  1.0 } },
-	{ PA_CHANNEL_POSITION_LFE,          {  0.0, -0.5,  1.0 } },
-	{ PA_CHANNEL_POSITION_REAR_LEFT,    { -0.2,  0.0, -0.5 } },
-	{ PA_CHANNEL_POSITION_REAR_RIGHT,   {  0.2,  0.0, -0.5 } },
-	{ PA_CHANNEL_POSITION_REAR_CENTER,  {  0.0,  0.0, -0.5 } },
-	{ PA_CHANNEL_POSITION_MAX,          {  0.0,  0.0,  0.0 } }
+	{ PA_CHANNEL_POSITION_MONO,         osd::channel_position::FC() },
+	{ PA_CHANNEL_POSITION_FRONT_LEFT,   osd::channel_position::FL() },
+	{ PA_CHANNEL_POSITION_FRONT_RIGHT,  osd::channel_position::FR() },
+	{ PA_CHANNEL_POSITION_FRONT_CENTER, osd::channel_position::FC() },
+	{ PA_CHANNEL_POSITION_LFE,          osd::channel_position::LFE() },
+	{ PA_CHANNEL_POSITION_REAR_LEFT,    osd::channel_position::RL() },
+	{ PA_CHANNEL_POSITION_REAR_RIGHT,   osd::channel_position::RR() },
+	{ PA_CHANNEL_POSITION_REAR_CENTER,  osd::channel_position::RC() },
+	{ PA_CHANNEL_POSITION_MAX,          osd::channel_position::ONREQ() },
 };
 
 
@@ -330,7 +330,7 @@ void sound_pulse::context_subscribe(pa_subscription_event_type_t t, uint32_t idx
 		m_nodes.erase(si);
 		m_generation++;
 		break;
-	}		
+	}
 
 	case PA_SUBSCRIPTION_EVENT_NEW | PA_SUBSCRIPTION_EVENT_SINK:
 		pa_context_get_sink_info_by_index(m_context, idx, i_sink_info_new, this);
@@ -389,6 +389,9 @@ int sound_pulse::init(osd_interface &osd, osd_options const &options)
 	if(m_generation >= 0x80000000)
 		return 1;
 
+	if(options.audio_latency() > 0.0f)
+		osd_printf_verbose("Sound: %s module does not support audio_latency option\n", name());
+
 	return 0;
 }
 
@@ -411,6 +414,7 @@ osd::audio_info sound_pulse::get_information()
 	uint32_t node = 0;
 	for(auto &inode : m_nodes) {
 		result.m_nodes[node].m_name = inode.second.m_desc;
+		result.m_nodes[node].m_display_name = inode.second.m_desc;
 		result.m_nodes[node].m_id = inode.second.m_osdid;
 		result.m_nodes[node].m_rate = inode.second.m_rate;
 		result.m_nodes[node].m_sinks = inode.second.m_sink_port_count;
@@ -524,6 +528,13 @@ void sound_pulse::exit()
 
 	pa_context_unref(m_context);
 	pa_threaded_mainloop_free(m_mainloop);
+
+	m_nodes.clear();
+	m_node_osdid_to_id.clear();
+	m_streams.clear();
+	m_stream_pulse_id_to_osdid.clear();
+	m_default_audio_sink = "";
+	m_default_audio_source = "";
 }
 
 #else

@@ -194,8 +194,8 @@ protected:
 	void irq_ack_w(u32 data);
 	u32 irq_enable_r();
 	void irq_enable_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	u32 model2_serial_r(offs_t offset, u32 mem_mask = ~0);
-	void model2_serial_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u8 model2_serial_r(offs_t offset);
+	void model2_serial_w(offs_t offset, u8 data);
 	void horizontal_sync_w(u16 data);
 	void vertical_sync_w(u16 data);
 	u32 doa_prot_r(offs_t offset, u32 mem_mask = ~0);
@@ -490,6 +490,25 @@ private:
 	required_device<sega_billboard_device> m_billboard;
 };
 
+class model2a_airwlkrs_state : public model2a_state
+{
+public:
+	model2a_airwlkrs_state(const machine_config &mconfig, device_type type, const char *tag)
+		: model2a_state(mconfig, type, tag),
+		  m_player_in(*this, "IN_P%u", 1U),
+		  m_start_in(*this, "IN_START")
+	{}
+
+	void airwlkrs(machine_config &config);
+
+	template <unsigned N> ioport_value start_in_r();
+
+private:
+	required_ioport_array<4> m_player_in;
+	required_ioport m_start_in;
+	u8 m_key_matrix;
+};
+
 /*****************************
  *
  * Model 2B
@@ -615,9 +634,15 @@ struct m2_poly_extra_data
 
 static inline u16 get_texel( u32 base_x, u32 base_y, int x, int y, u32 *sheet )
 {
-	u32  baseoffs = ((base_y/2)*512)+(base_x/2);
-	u32  texeloffs = ((y/2)*512)+(x/2);
-	u32  offset = baseoffs + texeloffs;
+	int x2 = base_x + x;
+	int y2 = base_y + y;
+	if (x2 >= 1024)
+	{
+		// texture sheets are mapped as 2048x1024 but stored in RAM as 1024x2048
+		x2 -= 1024;
+		y2 ^= 1024;
+	}
+	u32  offset = ((y2 / 2) * 512) + (x2 / 2);
 	u32  texel = sheet[offset>>1];
 
 	if ( offset & 1 )

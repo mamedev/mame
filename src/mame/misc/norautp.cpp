@@ -4805,7 +4805,7 @@ ROM_END
   Different to the cleco shitty stuff
 
 */
-ROM_START( gtipokrba )  //   
+ROM_START( gtipokrba )  //
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "88_2732a.u12", 0x0000, 0x1000, CRC(e78a10d7) SHA1(e0ac382b02a1fc490b5d08344a20f2eaa3899002) )
 	ROM_LOAD( "88_2732a.u18", 0x1000, 0x1000, CRC(4c3c5b15) SHA1(0584c0a6b52465686967f98ea3bd86c22b5bd526) )
@@ -5639,7 +5639,7 @@ ROM_END
 ROM_START( krampcb9 )  // norusa42
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "nosticker_db_27c256.u12", 0x0000, 0x8000, CRC(32e0b8ab) SHA1(8055231b8911a7bc519f8204f8b0045958ef84f2) )
-	
+
 	ROM_REGION( 0x1000, "gfx",0 )
 	ROM_LOAD( "u31_2732a.u31", 0x0000, 0x1000, CRC(d0291d61) SHA1(4db617f1683bd07b0e124a0566691535f56b66de) )
 
@@ -5650,7 +5650,7 @@ ROM_END
 ROM_START( topdraw )  // norusa36
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "nosticker_db_am27c256.u12", 0x0000, 0x8000, CRC(e451df9c) SHA1(30a2c42d87301df5fb82a59326c9754007737325) )
-	
+
 	ROM_REGION( 0x1000, "gfx",0 )
 	ROM_LOAD( "u-31_top_draw_2732a.u31", 0x0000, 0x1000, CRC(d0291d61) SHA1(4db617f1683bd07b0e124a0566691535f56b66de) )
 
@@ -5661,7 +5661,7 @@ ROM_END
 ROM_START( topdrawa )  // norusa38
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "nosticker_db_m27c256.u12", 0x0000, 0x8000, CRC(38bfabf6) SHA1(afe1f962c7546b8fb891953efbdf68a11e8dd45a) )
-	
+
 	ROM_REGION( 0x1000, "gfx",0 )
 	ROM_LOAD( "nosticker_m2732a.u31", 0x0000, 0x1000, CRC(d0291d61) SHA1(4db617f1683bd07b0e124a0566691535f56b66de) )
 
@@ -5672,7 +5672,7 @@ ROM_END
 ROM_START( topdrawb )  // norusa40
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "nosticker_db_m27c256.u12", 0x0000, 0x8000, CRC(8e195061) SHA1(ed25fe65b164e048c3ba5078a7e443b696141807) )
-	
+
 	ROM_REGION( 0x1000, "gfx",0 )
 	ROM_LOAD( "nosticker_2732a.u31", 0x0000, 0x1000, CRC(d0291d61) SHA1(4db617f1683bd07b0e124a0566691535f56b66de) )
 
@@ -5685,7 +5685,7 @@ ROM_END
 ROM_START( topdrawba )  // norusa48
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xx_db_nm27c256.u12", 0x0000, 0x8000, CRC(8e195061) SHA1(ed25fe65b164e048c3ba5078a7e443b696141807) )
-	
+
 	ROM_REGION( 0x1000, "gfx",0 )
 	ROM_LOAD( "top_draw_u-31_bucks.u31", 0x0000, 0x1000, CRC(d0291d61) SHA1(4db617f1683bd07b0e124a0566691535f56b66de) )
 
@@ -5703,7 +5703,7 @@ ROM_END
   Looks generic noraut hardware, but with one daughterboard
   having a program ROM, a MCU, a PLD, and a Dallas or MK48Z02
 
-*/  
+*/
 ROM_START(tpoker1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "nosticker_db_27256.ic2", 0x0000, 0x8000, CRC(55eb90a8) SHA1(9460cb028f3186c7c09c18db1b413088812e7eef) )
@@ -5916,7 +5916,7 @@ ROM_START( tpoker2b )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1993_micro_mfg_turbo-2_u39-014_us_utbk_022190.u39", 0x0000, 0x8000, CRC(543149fe) SHA1(beb61a27c2797341e23e020e754d63fde3b4fbb2) )
 
-	ROM_REGION( 0x0800,  "mcu", 0 ) // 68705 MCU
+	ROM_REGION( 0x0800,  "mcu", 0 )  // 68705 MCU
 	ROM_LOAD( "1993_micro_mfg_tp2_01_u35_ic4_16228_022194.u35", 0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x1000,  "gfx", 0 )
@@ -5937,7 +5937,7 @@ ROM_START( tpoker2c )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "turbo-2_u39-015_uscpn8k_021990.u39", 0x0000, 0x8000, CRC(1149bb41) SHA1(5320abafafb612643479e9ac682a523ed76bcda1) )
 
-	ROM_REGION( 0x0800,  "mcu", 0 ) // 68705 MCU
+	ROM_REGION( 0x0800,  "mcu", 0 )  // 68705 MCU
 	ROM_LOAD( "tp2-01_u35-ic4_9862_051997.u35", 0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x0800,  "gfx", 0 )
@@ -5951,8 +5951,8 @@ ROM_START( tpoker2d )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "turbo-2_u39-012_us_uc8k_060989_27c256.u39", 0x0000, 0x8000, CRC(ac70f2dd) SHA1(a4264d3a0ac39e0f46b2ee594d519eef2442a3b1) )
 
-	ROM_REGION( 0x0800,  "mcu", 0 ) // 68705 MCU
-	ROM_LOAD( "turbo-2_u39-012_us_uc8k_060989_27c256.u39", 0x0000, 0x0800, NO_DUMP )
+	ROM_REGION( 0x0800,  "mcu", 0 )  // 68705 MCU
+	ROM_LOAD( "tp2.u35", 0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x1000,  "gfx", 0 )
 	ROM_LOAD( "turbo_poker_char_rom_2732a.u30", 0x0000, 0x1000, CRC(6df86e08) SHA1(a451f71db7b59500b99207234ef95793afc11f03) )

@@ -11,11 +11,12 @@
 #endif
 
 
-DEFINE_DEVICE_TYPE(I960, i960_cpu_device, "i960kb", "Intel i960KB")
+DEFINE_DEVICE_TYPE(I80960KA, i80960ka_device, "i80960ka", "Intel 80960KA")
+DEFINE_DEVICE_TYPE(I80960KB, i80960kb_device, "i80960kb", "Intel 80960KB")
 
 
-i960_cpu_device::i960_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, I960, tag, owner, clock)
+i960_cpu_device::i960_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_stalled(false), m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
 	, m_rcache_pos(0), m_SAT(0), m_PRCB(0), m_PC(0), m_AC(0), m_IP(0), m_PIP(0), m_ICR(0), m_immediate_irq(0)
 	, m_immediate_vector(0), m_immediate_pri(0), m_icount(0)
@@ -26,6 +27,16 @@ i960_cpu_device::i960_cpu_device(const machine_config &mconfig, const char *tag,
 
 	for (int i = 0; i <I960_RCACHE_SIZE; i++)
 		std::fill(std::begin(m_rcache[i]), std::end(m_rcache[i]), 0);
+}
+
+i80960ka_device::i80960ka_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i960_cpu_device(mconfig, I80960KA, tag, owner, clock)
+{
+}
+
+i80960kb_device::i80960kb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i960_cpu_device(mconfig, I80960KB, tag, owner, clock)
+{
 }
 
 
@@ -469,7 +480,7 @@ void i960_cpu_device::take_interrupt(int vector, int lvl)
 	}
 
 	SP = (SP + 63) & ~63;
-	SP += 64;	// add padding to prevent buffer underflow when saving processor state
+	SP += 64;   // add padding to prevent buffer underflow when saving processor state
 
 	do_call(IRQV, 7, SP);
 
@@ -1157,7 +1168,8 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 				m_icount--;
 				t1 = get_1_ri(opcode);
 				t2 = get_2_ri(opcode);
-				set_ri(opcode, (t2 & 0x80000000) | (t1 >= 32 ? 0 : (t2<<t1) & 0x7fffffff)); // sign is preserved
+				// TODO: on later models, sign is always preserved even upon overflow
+				set_ri(opcode, t1 >= 32 ? 0 : t2<<t1);
 				break;
 
 			default:
