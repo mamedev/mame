@@ -195,6 +195,7 @@ public:
 	void init_tct2p() ATTR_COLD;
 	void init_xypdk() ATTR_COLD;
 	void init_ccly() ATTR_COLD;
+	void init_tswxp() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -3793,13 +3794,33 @@ ROM_START( jhg3d ) // IGS PCB-0376-01-FS. 3 banks of 8 switches. 1 PPI.
 	ROM_LOAD( "v-445cn.u8", 0x00000, 0x80000, CRC(9d503a1f) SHA1(8ead38738386c2f7e375bd56eea2262173715c9c) )
 
 	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
-	ROM_LOAD( "u16", 0x00000, 0x20000, BAD_DUMP CRC(29f75a96) SHA1(4d1d92b98f17b02761bceede6f8997e1936a74eb ) )
+	ROM_LOAD( "u16", 0x00000, 0x20000, BAD_DUMP CRC(29f75a96) SHA1(4d1d92b98f17b02761bceede6f8997e1936a74eb) )
 
 	ROM_REGION( 0x200000, "igs017_igs031:sprites", 0 )
 	ROM_LOAD( "cg_u21.u21", 0x000000, 0x200000, CRC(1e1c243a) SHA1(441e837fc806160182d019b9719f40a85327ba12) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "v-445cn.u20 ", 0x00000, 0x40000, CRC(e6aac74d) SHA1(b8f88b894383cd3eab4b00a20b74ee84dea61672) )
+ROM_END
+
+// 泰山五线 加强版 (Tàishān Wǔxiàn Jiāqiáng Bǎn)
+ROM_START( tswxp ) // IGS PCB-0489-17-FM-1. 2 banks of 8 switches (1 unpopulated). 1 PPI.
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	// Internal rom of IGS027A ARM based MCU
+	ROM_LOAD( "j2_027a.u20", 0x0000, 0x4000, CRC(17ec400b) SHA1(45a5e1fcf9a3ef07f4e24dbfd09d135cf291cd50) )
+
+	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "u17", 0x000000, 0x200000, CRC(49457ac2) SHA1(b3c29b65acc59d65a6b15146e4bf132ab533c1c4) ) // 11xxxxxxxxxxxxxxxxxxx = 0x00
+
+	ROM_REGION( 0x200000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD16_WORD_SWAP( "u23", 0x000000, 0x200000, CRC(0bc3c59c) SHA1(834a11a6ff1a6077755918b8d75eeefe7d23022d) ) // 11xxxxxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "u29", 0x000000, 0x200000, CRC(660c7219) SHA1(cdb47552b1dc490096d0a0b92b2b4b42f8030335) ) // FIXED BITS (xxxxxxxx0xxxxxxx)
+	ROM_RELOAD(      0x200000, 0x200000 ) // game expects to read the ROM at this offset? Gameplay doesn't show missing GFX, so may be right size anyway
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "u4", 0x000000, 0x200000, CRC(2e392e51) SHA1(5ff901f8ab877674f3b68e38497babc0a7369a85) ) // 11xxxxxxxxxxxxxxxxxxx = 0xFF
 ROM_END
 
 
@@ -3989,14 +4010,12 @@ void igs_m027_state::init_jking02()
 void igs_m027_state::init_luckycrs()
 {
 	luckycrs_decrypt(machine());
-	//qlgs_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
 
 void igs_m027_state::init_olympic5()
 {
 	olympic5_decrypt(machine());
-	//qlgs_gfx_decrypt(machine());
 	pgm_create_dummy_internal_arm_region();
 }
 
@@ -4048,6 +4067,13 @@ void igs_m027_state::init_ccly()
 	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
 }
 
+void igs_m027_state::init_tswxp()
+{
+	tswxp_decrypt(machine());
+	m_igs017_igs031->sdwx_gfx_decrypt();
+	m_igs017_igs031->tarzan_decrypt_sprites(0, 0);
+}
+
 } // anonymous namespace
 
 
@@ -4093,6 +4119,7 @@ GAMEL( 2007, tripslot,      0,        tripslot,     tripslot,      igs_m027_stat
 GAMEL( 2005, ccly,          crzybugs, ccly,         ccly,          igs_m027_state, init_ccly,     ROT0, "IGS", "Chong Chong Leyuan (V100CN)", MACHINE_NOT_WORKING, layout_ccly )
 GAME(  2001, cjsxp,         0,        ccly,         ccly,          igs_m027_state, init_klxyj,    ROT0, "IGS", "Huangpai Zuqiu Plus / Chaoji Shuangxing Plus (V103CN)", MACHINE_NOT_WORKING ) // inputs, outputs, Oki ROM bank
 GAME(  2000, tshs,          0,        tshs,         ccly,          igs_m027_state, init_slqz3,    ROT0, "IGS", "Tian Sheng Hao Shou (V101CN)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // inputs, outputs, unemulated sound chips
+GAME(  2006, tswxp,         0,        tct2p,        tct2p,         igs_m027_state, init_tswxp,    ROT0, "IGS", "Taishan Wuxian Jiaqiang Ban (V101CN)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // inputs, outputs, Oki ROM bank
 // this has a 2nd 8255
 GAME(  2001, extradrw,      0,        extradrw,     base,          igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw (V100VE)", MACHINE_NOT_WORKING )
 // these have an IGS025 protection device instead of the 8255
