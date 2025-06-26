@@ -239,7 +239,7 @@ TIMER_CALLBACK_MEMBER(k051960_device::scanline_callback)
 	int scanline = param;
 
 	// NMI 8 times per frame
-	if ((scanline % 32 == 0) && BIT(m_control, 2))
+	if ((scanline & 0x1f) == 0x10 && BIT(m_control, 2))
 		m_nmi_handler(ASSERT_LINE);
 
 	// FIRQ is when?

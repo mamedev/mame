@@ -7,10 +7,9 @@
 
 Emulation by Bryan McPhail, mish@tendril.co.uk
 
-Notes:
+TODO:
 - Schematics show a palette/work RAM bank selector, but this doesn't seem
   to be used?
-
 - HTOTAL is actually 384 (/4 divider for pixel clock, 64 HBLANK clocks),
   but gfx hardware emulation doesn't play along nicely
 

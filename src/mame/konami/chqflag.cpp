@@ -2,19 +2,19 @@
 // copyright-holders:Nicola Salmoria, Manuel Abadia
 /***************************************************************************
 
-    Chequered Flag / Checkered Flag (GX717) (c) Konami 1988
+Chequered Flag / Checkered Flag (GX717) (c) Konami 1988
 
-    Main board: PWB(C)350761A
-    IO board:   PWB(C)450871A
+Main board: PWB(C)350761A
+IO board:   PWB(C)450871A
 
-    Notes:
-    - 007232 volume & panning control is almost certainly wrong;
-    - needs proper shadow/highlight factor values for sprites and tilemap;
-    - compared to references, emulation is a bit slower (around 2/3 seconds
-      behind on a full lap of stage 2);
-
-    2008-07
-    Dip locations and recommended settings verified with manual
+TODO:
+- 007232 volume & panning control is almost certainly wrong;
+- needs proper shadow/highlight factor values for sprites and tilemap;
+- compared to references, emulation is a bit slower (around 2/3 seconds
+  behind on a full lap of stage 2);
+- Hsync was measured 15.13 / 15.19khz but seems suspicious, it would mean
+  VTOTAL is 256? Also, HTOTAL is more likely 384 (6MHz pixel clock), but
+  gfx emulation needs to be updated 1st.
 
 ***************************************************************************/
 
@@ -410,10 +410,10 @@ void chqflag_state::machine_reset()
 void chqflag_state::chqflag(machine_config &config)
 {
 	/* basic machine hardware */
-	KONAMI(config, m_maincpu, XTAL(24'000'000)/2);    /* 052001 (verified on pcb) */
+	KONAMI(config, m_maincpu, 24_MHz_XTAL / 2); // 052001 (verified on pcb)
 	m_maincpu->set_addrmap(AS_PROGRAM, &chqflag_state::chqflag_map);
 
-	Z80(config, m_audiocpu, XTAL(3'579'545)); /* verified on pcb */
+	Z80(config, m_audiocpu, 3.579545_MHz_XTAL); // verified on pcb
 	m_audiocpu->set_addrmap(AS_PROGRAM, &chqflag_state::chqflag_sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
@@ -424,9 +424,7 @@ void chqflag_state::chqflag(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(24'000'000)/3, 528, 96, 400, 256, 16, 240); // measured Vsync 59.17hz Hsync 15.13 / 15.19khz
-//  6MHz dotclock is more realistic, however needs drawing updates. replace when ready
-//  screen.set_raw(XTAL(24'000'000)/4, 396, hbend, hbstart, 256, 16, 240);
+	screen.set_raw(24_MHz_XTAL / 3, 512, 96, 400, 264, 16, 240); // measured Vsync 59.17hz
 	screen.set_screen_update(FUNC(chqflag_state::screen_update_chqflag));
 	screen.set_palette(m_palette);
 
@@ -462,17 +460,17 @@ void chqflag_state::chqflag(machine_config &config)
 	GENERIC_LATCH_8(config, "soundlatch");
 	GENERIC_LATCH_8(config, "soundlatch2").data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545))); /* verified on pcb */
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL)); /* verified on pcb */
 	ymsnd.irq_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	ymsnd.add_route(0, "speaker", 1.00, 0);
 	ymsnd.add_route(1, "speaker", 1.00, 1);
 
-	K007232(config, m_k007232[0], XTAL(3'579'545)); /* verified on pcb */
+	K007232(config, m_k007232[0], 3.579545_MHz_XTAL); /* verified on pcb */
 	m_k007232[0]->port_write().set(FUNC(chqflag_state::volume_callback0));
 	m_k007232[0]->add_route(0, "speaker", 0.20, 0);
 	m_k007232[0]->add_route(1, "speaker", 0.20, 1);
 
-	K007232(config, m_k007232[1], XTAL(3'579'545)); /* verified on pcb */
+	K007232(config, m_k007232[1], 3.579545_MHz_XTAL); /* verified on pcb */
 	m_k007232[1]->port_write().set(FUNC(chqflag_state::volume_callback1));
 	m_k007232[1]->add_route(0, "speaker", 0.20, 0);
 	m_k007232[1]->add_route(0, "speaker", 0.20, 1);
