@@ -56,11 +56,11 @@ There are 3 or 4 76489AN chips driven by the Z80
 6000-7fff Sound data in
 8000-9fff Timer
 A000-Bfff Filters
-C000      Store Data that will go to one of the 76489AN
-C001      76489 #1 trigger
-C002      76489 #2 (optional) trigger
-C003      76489 #3 trigger
-C004      76489 #4 trigger
+C000      Store Data that will go to one of the 76489A
+C001      76489A #1 trigger
+C002      76489A #2 (optional) trigger
+C003      76489A #3 trigger
+C004      76489A #4 trigger
 
 ***************************************************************************/
 
@@ -405,24 +405,24 @@ uint8_t tp84_state::sh_timer_r()
 
 void tp84_state::filter_w(offs_t offset, uint8_t data)
 {
-	// 76489 #0
+	// 76489A #0
 	int C = 0;
 	if (BIT(offset, 3)) C +=  47000;    //  47000pF = 0.047uF
 	if (BIT(offset, 4)) C += 470000;    // 470000pF = 0.47uF
 	m_filter[0]->filter_rc_set_RC(filter_rc_device::LOWPASS_3R, 1000, 2200, 1000, CAP_P(C));
 
-	// 76489 #1 (optional)
+	// 76489A #1 (optional)
 	C = 0;
 	if (BIT(offset, 5)) C +=  47000;    //  47000pF = 0.047uF
 	if (BIT(offset, 6)) C += 470000;    // 470000pF = 0.47uF
 	//m_filter[1]->filter_rc_set_RC(filter_rc_device::LOWPASS_3R, 1000, 2200, 1000, CAP_P(C));
 
-	// 76489 #2
+	// 76489A #2
 	C = 0;
 	if (BIT(offset, 7)) C += 470000;    // 470000pF = 0.47uF
 	m_filter[1]->filter_rc_set_RC(filter_rc_device::LOWPASS_3R, 1000, 2200, 1000, CAP_P(C));
 
-	// 76489 #3
+	// 76489A #3
 	C = 0;
 	if (BIT(offset, 8)) C += 470000;    // 470000pF = 0.47uF
 	m_filter[2]->filter_rc_set_RC(filter_rc_device::LOWPASS_3R, 1000, 2200, 1000, CAP_P(C));
@@ -506,9 +506,9 @@ void tp84_state::audio_map(address_map &map)
 	map(0x8000, 0x8000).r(FUNC(tp84_state::sh_timer_r));
 	map(0xa000, 0xa1ff).w(FUNC(tp84_state::filter_w));
 	map(0xc000, 0xc000).nopw();
-	map(0xc001, 0xc001).w("y2404_1", FUNC(y2404_device::write));
-	map(0xc003, 0xc003).w("y2404_2", FUNC(y2404_device::write));
-	map(0xc004, 0xc004).w("y2404_3", FUNC(y2404_device::write));
+	map(0xc001, 0xc001).w("sn1", FUNC(sn76489a_device::write));
+	map(0xc003, 0xc003).w("sn2", FUNC(sn76489a_device::write));
+	map(0xc004, 0xc004).w("sn3", FUNC(sn76489a_device::write));
 }
 
 
@@ -633,11 +633,10 @@ void tp84_state::tp84(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	Y2404(config, "y2404_1", XTAL(14'318'181) / 8).add_route(ALL_OUTPUTS, "filter1", 0.75); // verified on PCB
-
-	Y2404(config, "y2404_2", XTAL(14'318'181) / 8).add_route(ALL_OUTPUTS, "filter2", 0.75); // verified on PCB
-
-	Y2404(config, "y2404_3", XTAL(14'318'181) / 8).add_route(ALL_OUTPUTS, "filter3", 0.75); // verified on PCB
+	// According to the schematics, part numbers scratched off
+	SN76489A(config, "sn1", XTAL(14'318'181) / 8).add_route(ALL_OUTPUTS, "filter1", 0.75); // clock verified on PCB
+	SN76489A(config, "sn2", XTAL(14'318'181) / 8).add_route(ALL_OUTPUTS, "filter2", 0.75); // clock verified on PCB
+	SN76489A(config, "sn3", XTAL(14'318'181) / 8).add_route(ALL_OUTPUTS, "filter3", 0.75); // clock verified on PCB
 
 	for (auto &filter : m_filter)
 		FILTER_RC(config, filter).add_route(ALL_OUTPUTS, "mono", 1.0);
