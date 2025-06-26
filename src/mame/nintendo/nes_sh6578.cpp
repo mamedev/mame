@@ -45,13 +45,22 @@ public:
 		m_screen(*this, "screen"),
 		m_apu(*this, "nesapu"),
 		m_timer(*this, "timer"),
-		m_in(*this, "IN%u", 0U)
+		m_in(*this, "IN%u", 0U),
+		m_ext(*this, "EXT")
 	{ }
 
 	void nes_sh6578(machine_config& config);
 	void nes_sh6578_pal(machine_config& config);
 
 	void init_nes_sh6578();
+
+	int unknown_random_r()
+	{
+		if (!machine().side_effects_disabled())
+			return machine().rand();
+		else
+			return 0;
+	}
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -140,6 +149,7 @@ private:
 	uint8_t m_previo;
 	uint8_t m_iolatch[2];
 	required_ioport_array<2> m_in;
+	required_ioport m_ext;
 };
 
 class nes_sh6578_abl_wikid_state : public nes_sh6578_state
@@ -163,18 +173,6 @@ public:
 protected:
 	virtual void extio_w(uint8_t data) override;
 	virtual void machine_reset() override ATTR_COLD;
-};
-
-class nes_sh6578_cjz_state : public nes_sh6578_state
-{
-public:
-	nes_sh6578_cjz_state(const machine_config& mconfig, device_type type, const char* tag) :
-		nes_sh6578_state(mconfig, type, tag)
-	{ }
-
-protected:
-	// TODO, work out the I/O and anything else specific to this machine
-	virtual uint8_t extio_r() override { return machine().rand(); }
 };
 
 uint8_t nes_sh6578_state::bank_r(int bank, uint16_t offset)
@@ -444,7 +442,7 @@ void nes_sh6578_abl_wikid_state::io_w(uint8_t data)
 uint8_t nes_sh6578_state::extio_r()
 {
 	logerror("%s: extio_r\n", machine().describe_context());
-	return 0x00;
+	return m_ext->read();
 }
 
 void nes_sh6578_state::extio_w(uint8_t data)
@@ -535,6 +533,9 @@ static INPUT_PORTS_START(nes_sh6578)
 
 	PORT_START("IN1")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("EXT")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(bancook)
@@ -543,6 +544,23 @@ static INPUT_PORTS_START(bancook)
 
 	PORT_START("IN1")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("EXT")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(nes_sh6578_state::unknown_random_r))
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(soulbird)
+	PORT_START("IN0")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("EXT")
+	PORT_BIT( 0x1f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )
 INPUT_PORTS_END
 
 
@@ -798,13 +816,13 @@ CONS( 1997, bandggcn,    0,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_state, i
 
 // uses a mouse and buttons (no keyboard)
 // テレビであそぼう! ミッキー&ミンニー マウスキッズ
-CONS( 1997, mousekid,    0,  0,  nes_sh6578,     bancook, nes_sh6578_cjz_state, init_nes_sh6578, "Tomy", "Terebi de Asobou! Mickey & Minnie Mouse Kids (Japan)", MACHINE_NOT_WORKING )
+CONS( 1997, mousekid,    0,  0,  nes_sh6578,     bancook, nes_sh6578_state, init_nes_sh6578, "Tomy", "Terebi de Asobou! Mickey & Minnie Mouse Kids (Japan)", MACHINE_NOT_WORKING )
 
 // おジャ魔女どれみのTVでマジカルクッキング
-CONS( 2001, bancook,     0,  0,  nes_sh6578,     bancook,    nes_sh6578_cjz_state, init_nes_sh6578, "Bandai", "Ojamajo Doremi no TV de Magical Cooking (Japan)", MACHINE_NOT_WORKING )
+CONS( 2001, bancook,     0,  0,  nes_sh6578,     bancook,    nes_sh6578_state, init_nes_sh6578, "Bandai", "Ojamajo Doremi no TV de Magical Cooking (Japan)", MACHINE_NOT_WORKING )
 
 // lots of bad gfx, maybe SH6578 issues, maybe some address lines in the wrong order
-CONS( 2001, soulbird,     0,  0,  nes_sh6578,     bancook,    nes_sh6578_cjz_state, init_nes_sh6578, "Bandai", "Hyakujuu Sentai Gaoranger: DX Soul Bird (Japan)", MACHINE_NOT_WORKING )
+CONS( 2001, soulbird,     0,  0,  nes_sh6578,     soulbird,    nes_sh6578_state, init_nes_sh6578, "Bandai", "Hyakujuu Sentai Gaoranger: DX Soul Bird (Japan)", MACHINE_NOT_WORKING )
 
 
 CONS( 200?, cpatrolm,    0,  0,  nes_sh6578_pal, nes_sh6578, nes_sh6578_state, init_nes_sh6578, "TimeTop", "City Patrolman", MACHINE_NOT_WORKING )
@@ -813,8 +831,8 @@ CONS( 200?, bb6578,      0,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_state, i
 
 // these don't boot much further than the timetop logo and a splash screen
 // 超级知识大富翁 (Chāojí Zhīshì Dà Fùwēng)
-CONS( 200?, 6578cjz1,     0,         0,  nes_sh6578,     nes_sh6578, nes_sh6578_cjz_state, init_nes_sh6578, "TimeTop", "Chaoji Zhishi Da Fuweng 1", MACHINE_NOT_WORKING )
-CONS( 200?, 6578cjz2,     0,         0,  nes_sh6578,     nes_sh6578, nes_sh6578_cjz_state, init_nes_sh6578, "TimeTop", "Chaoji Zhishi Da Fuweng 2", MACHINE_NOT_WORKING )
+CONS( 200?, 6578cjz1,     0,         0,  nes_sh6578,     bancook, nes_sh6578_state, init_nes_sh6578, "TimeTop", "Chaoji Zhishi Da Fuweng 1", MACHINE_NOT_WORKING )
+CONS( 200?, 6578cjz2,     0,         0,  nes_sh6578,     bancook, nes_sh6578_state, init_nes_sh6578, "TimeTop", "Chaoji Zhishi Da Fuweng 2", MACHINE_NOT_WORKING )
 
 // Super Moto 3 https://youtu.be/DR5Y_r6C_qk - has JungleTac copyrights intact, and appears to have the SH6578 versions of the games
 
