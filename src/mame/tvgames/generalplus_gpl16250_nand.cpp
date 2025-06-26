@@ -915,7 +915,7 @@ void generalplus_gpac800_game_state::nand_fc2016()
 	m_vectorbase = 0x6fe0;
 
 	m_initial_copy_words = 0x500000;
-	//m_maincpu->set_romtype(2);
+	m_maincpu->set_romtype(2);
 }
 
 // NAND dumps w/ internal bootstrap (and u'nSP 2.0 extended opcodes)  (have gpnandnand strings)

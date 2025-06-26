@@ -1282,11 +1282,11 @@ void sunplus_gcm394_base_device::internalrom_lower32_w(offs_t offset, uint16_t d
 {
 	if (m_boot_mode == 0)
 	{
-		//logerror("Whoopsie. CPU tried to write into internal ROM. Reseting.\n");
-		//sunplus_gcm394_base_device::device_reset();
+		logerror("Whoopsie. CPU tried to write into internal ROM. Reseting.\n");
+		sunplus_gcm394_base_device::device_reset();
 		
-		uint16_t* introm = (uint16_t*)m_internalrom->base();
-		introm[offset] = data;
+		// uint16_t* introm = (uint16_t*)m_internalrom->base();
+		// introm[offset] = data;
 	}
 }
 
@@ -1332,6 +1332,13 @@ uint16_t generalplus_gpac800_device::nand_7854_r()
 			else if (m_curblockaddr == 1)
 				data = 0x76;
 		}
+		else if (m_romtype == 2)
+		{
+			if (m_curblockaddr == 0)
+				data = 0x98;
+			else if (m_curblockaddr == 1)
+				data = 0xd1;
+		}
 		else
 		{
 			if (m_curblockaddr == 0)
@@ -1348,7 +1355,7 @@ uint16_t generalplus_gpac800_device::nand_7854_r()
 
 		return data;
 	}
-	else if (m_nandcommand == 0x00 || m_nandcommand == 0x01 || m_nandcommand  == 0x50)
+	else if (m_nandcommand == 0x00 || m_nandcommand == 0x01 || m_nandcommand  == 0x50 || m_nandcommand == 0x30)
 	{
 		//logerror("%s:sunplus_gcm394_base_device::nand_7854_r   READ DATA byte %d\n", machine().describe_context(), m_curblockaddr);
 
@@ -1559,7 +1566,7 @@ beambox sets things up with different values (ultimately stalls on some check, m
 [:maincpu] ':maincpu' (000460):sunplus_gcm394_base_device::unk_w @ 0x7888 (data 0x2492)
 [:maincpu] ':maincpu' (000462):sunplus_gcm394_base_device::unk_w @ 0x787e (data 0x2492)
 
-vbaby code is very differet, attempts to load NAND block manually, not with DMA
+vbaby code is very different, attempts to load NAND block manually, not with DMA
 
 */
 

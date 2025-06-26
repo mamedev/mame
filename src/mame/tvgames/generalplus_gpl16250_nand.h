@@ -50,7 +50,6 @@ protected:
 	virtual uint16_t cs1_r(offs_t offset) override;
 	virtual void cs1_w(offs_t offset, uint16_t data) override;
 
-private:
 	optional_region_ptr<uint8_t> m_nandregion;
 
 	void nand_create_stripped_region();
@@ -64,6 +63,8 @@ private:
 	int m_sdram_kwords;
 	int m_initial_copy_words;
 	int m_vectorbase = 0;
+
+private:
 };
 
 
