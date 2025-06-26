@@ -550,13 +550,13 @@ void ajax_state::volume_callback1(uint8_t data)
 void ajax_state::ajax(machine_config &config)
 {
 	// basic machine hardware
-	KONAMI(config, m_maincpu, XTAL(24'000'000) / 2);    // 052001 12/4 MHz
+	KONAMI(config, m_maincpu, 24_MHz_XTAL / 2); // 052001 12/4 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &ajax_state::main_map);
 
-	HD6309E(config, m_subcpu, 3000000); // ?
+	HD6309E(config, m_subcpu, 24_MHz_XTAL / 8); // ?
 	m_subcpu->set_addrmap(AS_PROGRAM, &ajax_state::sub_map);
 
-	Z80(config, m_audiocpu, 3579545);  // 3.58 MHz
+	Z80(config, m_audiocpu, 3.579545_MHz_XTAL); // 3.58 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ajax_state::sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
@@ -565,9 +565,7 @@ void ajax_state::ajax(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(24'000'000) / 3, 528, 108, 412, 256, 16, 240);
-//  6MHz dotclock is more realistic, however needs drawing updates. replace when ready
-//  screen.set_raw(XTAL(24'000'000)/4, 396, hbend, hbstart, 256, 16, 240);
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0+8, 320, 264, 16, 240);
 	screen.set_screen_update(FUNC(ajax_state::screen_update));
 	screen.set_palette(m_palette);
 
@@ -596,16 +594,18 @@ void ajax_state::ajax(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	YM2151(config, "ymsnd", 3579545).add_route(0, "speaker", 1.0, 0).add_route(1, "speaker", 1.0, 1);
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL));
+	ymsnd.add_route(0, "speaker", 1.0, 0);
+	ymsnd.add_route(1, "speaker", 1.0, 1);
 
-	K007232(config, m_k007232[0], 3579545);
+	K007232(config, m_k007232[0], 3.579545_MHz_XTAL);
 	m_k007232[0]->port_write().set(FUNC(ajax_state::volume_callback0));
 	m_k007232[0]->add_route(0, "speaker", 0.20, 0);
 	m_k007232[0]->add_route(0, "speaker", 0.20, 1);
 	m_k007232[0]->add_route(1, "speaker", 0.20, 0);
 	m_k007232[0]->add_route(1, "speaker", 0.20, 1);
 
-	K007232(config, m_k007232[1], 3579545);
+	K007232(config, m_k007232[1], 3.579545_MHz_XTAL);
 	m_k007232[1]->port_write().set(FUNC(ajax_state::volume_callback1));
 	m_k007232[1]->add_route(0, "speaker", 0.50, 0);
 	m_k007232[1]->add_route(1, "speaker", 0.50, 1);

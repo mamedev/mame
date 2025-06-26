@@ -12,9 +12,8 @@ TODO:
 - needs proper shadow/highlight factor values for sprites and tilemap;
 - compared to references, emulation is a bit slower (around 2/3 seconds
   behind on a full lap of stage 2);
-- Hsync was measured 15.13 / 15.19khz but seems suspicious, it would mean
-  VTOTAL is 256? Also, HTOTAL is more likely 384 (6MHz pixel clock), but
-  gfx emulation needs to be updated 1st.
+- hsync was measured 15.13 / 15.19khz but seems suspicious, it would mean
+  vtotal=256, htotal=396?
 
 ***************************************************************************/
 
@@ -409,7 +408,7 @@ void chqflag_state::machine_reset()
 
 void chqflag_state::chqflag(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	KONAMI(config, m_maincpu, 24_MHz_XTAL / 2); // 052001 (verified on pcb)
 	m_maincpu->set_addrmap(AS_PROGRAM, &chqflag_state::chqflag_map);
 
@@ -422,9 +421,9 @@ void chqflag_state::chqflag(machine_config &config)
 
 	ADC0804(config, "adc", RES_K(10), CAP_P(150)).vin_callback().set(FUNC(chqflag_state::analog_read_r));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(24_MHz_XTAL / 3, 512, 96, 400, 264, 16, 240); // measured Vsync 59.17hz
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 320-16, 264, 16, 240); // measured Vsync 59.17hz
 	screen.set_screen_update(FUNC(chqflag_state::screen_update_chqflag));
 	screen.set_palette(m_palette);
 
@@ -454,23 +453,23 @@ void chqflag_state::chqflag(machine_config &config)
 
 	K051733(config, "k051733", 24_MHz_XTAL / 2);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 	GENERIC_LATCH_8(config, "soundlatch2").data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL)); /* verified on pcb */
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL)); // verified on pcb
 	ymsnd.irq_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	ymsnd.add_route(0, "speaker", 1.00, 0);
 	ymsnd.add_route(1, "speaker", 1.00, 1);
 
-	K007232(config, m_k007232[0], 3.579545_MHz_XTAL); /* verified on pcb */
+	K007232(config, m_k007232[0], 3.579545_MHz_XTAL); // verified on pcb
 	m_k007232[0]->port_write().set(FUNC(chqflag_state::volume_callback0));
 	m_k007232[0]->add_route(0, "speaker", 0.20, 0);
 	m_k007232[0]->add_route(1, "speaker", 0.20, 1);
 
-	K007232(config, m_k007232[1], 3.579545_MHz_XTAL); /* verified on pcb */
+	K007232(config, m_k007232[1], 3.579545_MHz_XTAL); // verified on pcb
 	m_k007232[1]->port_write().set(FUNC(chqflag_state::volume_callback1));
 	m_k007232[1]->add_route(0, "speaker", 0.20, 0);
 	m_k007232[1]->add_route(0, "speaker", 0.20, 1);

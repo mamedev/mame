@@ -571,20 +571,17 @@ void spy_state::machine_reset()
 void spy_state::spy(machine_config &config)
 {
 	/* basic machine hardware */
-	MC6809E(config, m_maincpu, XTAL(24'000'000) / 8); // 3 MHz? (divided by 051961)
+	MC6809E(config, m_maincpu, 24_MHz_XTAL / 8); // 3 MHz? (divided by 051961)
 	m_maincpu->set_addrmap(AS_PROGRAM, &spy_state::main_map);
 
-	Z80(config, m_audiocpu, XTAL(3'579'545));
+	Z80(config, m_audiocpu, 3.579545_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &spy_state::sound_map); /* nmi by the sound chip */
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(13*8, (64-13)*8-1, 2*8, 30*8-1);
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0+8, 320-8, 264, 16, 240);
 	screen.set_screen_update(FUNC(spy_state::screen_update_spy));
 	screen.set_palette(m_palette);
 
@@ -607,15 +604,15 @@ void spy_state::spy(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", 3579545));
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", 3.579545_MHz_XTAL));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	K007232(config, m_k007232[0], 3579545);
+	K007232(config, m_k007232[0], 3.579545_MHz_XTAL);
 	m_k007232[0]->port_write().set(FUNC(spy_state::volume_callback<0>));
 	m_k007232[0]->add_route(ALL_OUTPUTS, "mono", 0.20);
 
-	K007232(config, m_k007232[1], 3579545);
+	K007232(config, m_k007232[1], 3.579545_MHz_XTAL);
 	m_k007232[1]->port_write().set(FUNC(spy_state::volume_callback<1>));
 	m_k007232[1]->add_route(ALL_OUTPUTS, "mono", 0.20);
 }

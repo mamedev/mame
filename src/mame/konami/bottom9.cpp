@@ -24,6 +24,7 @@
 #include "cpu/m6809/hd6309.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "machine/watchdog.h"
 #include "sound/k007232.h"
 #include "video/k051316.h"
@@ -87,7 +88,7 @@ private:
 	void nmi_enable_w(uint8_t data);
 	void sound_bank_w(uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(sound_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(sound_interrupt);
 	template <uint8_t Which> void volume_callback(uint8_t data);
 	K051316_CB_MEMBER(zoom_callback);
 	K052109_CB_MEMBER(tile_callback);
@@ -243,10 +244,13 @@ void bottom9_state::sh_irqtrigger_w(uint8_t data)
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
 }
 
-INTERRUPT_GEN_MEMBER(bottom9_state::sound_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(bottom9_state::sound_interrupt)
 {
-	if (m_nmienable)
-		device.execute().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+	int scanline = param;
+
+	// NMI 8 times per frame
+	if ((scanline & 0x1f) == 0x10 && m_nmienable)
+		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 void bottom9_state::nmi_enable_w(uint8_t data)
@@ -404,21 +408,18 @@ void bottom9_state::machine_reset()
 void bottom9_state::bottom9(machine_config &config)
 {
 	// basic machine hardware
-	HD6309E(config, m_maincpu, XTAL(24'000'000) / 8); // 63C09E
+	HD6309E(config, m_maincpu, 24_MHz_XTAL / 8); // 63C09E
 	m_maincpu->set_addrmap(AS_PROGRAM, &bottom9_state::main_map);
 
-	Z80(config, m_audiocpu, XTAL(3'579'545));
+	Z80(config, m_audiocpu, 3.579545_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &bottom9_state::audio_map);
-	m_audiocpu->set_periodic_int(FUNC(bottom9_state::sound_interrupt), attotime::from_hz(8 * 60));  // IRQ is triggered by the main CPU
+	TIMER(config, "scantimer").configure_scanline(FUNC(bottom9_state::sound_interrupt), "screen", 0, 1);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1);
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240);
 	screen.set_screen_update(FUNC(bottom9_state::screen_update));
 	screen.set_palette(m_palette);
 
@@ -445,12 +446,12 @@ void bottom9_state::bottom9(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	K007232(config, m_k007232[0], XTAL(3'579'545));
+	K007232(config, m_k007232[0], 3.579545_MHz_XTAL);
 	m_k007232[0]->port_write().set(FUNC(bottom9_state::volume_callback<0>));
 	m_k007232[0]->add_route(0, "mono", 0.40);
 	m_k007232[0]->add_route(1, "mono", 0.40);
 
-	K007232(config, m_k007232[1], XTAL(3'579'545));
+	K007232(config, m_k007232[1], 3.579545_MHz_XTAL);
 	m_k007232[1]->port_write().set(FUNC(bottom9_state::volume_callback<1>));
 	m_k007232[1]->add_route(0, "mono", 0.40);
 	m_k007232[1]->add_route(1, "mono", 0.40);

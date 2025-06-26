@@ -286,20 +286,18 @@ INPUT_PORTS_END
 void blockhl_state::blockhl(machine_config &config)
 {
 	// basic machine hardware
-	KONAMI(config, m_maincpu, XTAL(24'000'000) / 2); // Konami 052526
+	KONAMI(config, m_maincpu, 24_MHz_XTAL / 2); // Konami 052526
 	m_maincpu->set_addrmap(AS_PROGRAM, &blockhl_state::main_map);
 	m_maincpu->line().set(FUNC(blockhl_state::banking_callback));
 
-	Z80(config, m_audiocpu, XTAL(3'579'545));
+	Z80(config, m_audiocpu, 3.579545_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &blockhl_state::audio_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(24'000'000) / 3, 528, 112, 400, 256, 16, 240);
-//  6MHz dotclock is more realistic, however needs drawing updates. replace when ready
-//  screen.set_raw(XTAL(24'000'000) / 4, 396, hbend, hbstart, 256, 16, 240);
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240);
 	screen.set_screen_update(FUNC(blockhl_state::screen_update));
 	screen.set_palette("palette");
 
@@ -321,7 +319,9 @@ void blockhl_state::blockhl(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	YM2151(config, "ymsnd", XTAL(3'579'545)).add_route(0, "mono", 0.60).add_route(1, "mono", 0.60);
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL));
+	ymsnd.add_route(0, "mono", 0.60);
+	ymsnd.add_route(1, "mono", 0.60);
 }
 
 

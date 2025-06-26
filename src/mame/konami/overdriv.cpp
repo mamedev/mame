@@ -478,13 +478,13 @@ void overdriv_state::overdriv(machine_config &config)
 
 	K051316(config, m_k051316_1, 0);
 	m_k051316_1->set_palette("palette");
-	m_k051316_1->set_offsets(14, -1);
+	m_k051316_1->set_offsets(110, -1);
 	m_k051316_1->set_wrap(1);
 	m_k051316_1->set_zoom_callback(FUNC(overdriv_state::zoom_callback_1));
 
 	K051316(config, m_k051316_2, 0);
 	m_k051316_2->set_palette("palette");
-	m_k051316_2->set_offsets(15, 1);
+	m_k051316_2->set_offsets(111, 1);
 	m_k051316_2->set_zoom_callback(FUNC(overdriv_state::zoom_callback_2));
 
 	K053251(config, m_k053251, 0);

@@ -442,11 +442,11 @@ void _88games_state::machine_reset()
 void _88games_state::_88games(machine_config &config)
 {
 	// basic machine hardware
-	KONAMI(config, m_maincpu, 12000000); // ?
+	KONAMI(config, m_maincpu, 24_MHz_XTAL / 2); // ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &_88games_state::main_map);
 	m_maincpu->line().set(FUNC(_88games_state::banking_callback));
 
-	Z80(config, m_audiocpu, 3579545);
+	Z80(config, m_audiocpu, 3.579545_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &_88games_state::sound_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
@@ -455,10 +455,7 @@ void _88games_state::_88games(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(12*8, (64-12)*8-1, 2*8, 30*8-1);
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 320, 264, 16, 240);
 	screen.set_screen_update(FUNC(_88games_state::screen_update));
 	screen.set_palette("palette");
 
@@ -484,10 +481,11 @@ void _88games_state::_88games(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	YM2151(config, "ymsnd", 3579545).add_route(0, "mono", 0.75).add_route(1, "mono", 0.75);
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL));
+	ymsnd.add_route(0, "mono", 0.75);
+	ymsnd.add_route(1, "mono", 0.75);
 
 	UPD7759(config, m_upd7759[0]).add_route(ALL_OUTPUTS, "mono", 0.30);
-
 	UPD7759(config, m_upd7759[1]).add_route(ALL_OUTPUTS, "mono", 0.30);
 }
 

@@ -538,14 +538,14 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 						gfx(0)->prio_transtable(bitmap,cliprect,
 								c,color,
 								flipx,flipy,
-								sx & 0x1ff,sy,
+								(sx & 0x1ff) - 96, sy,
 								priority_bitmap,pri,
 								drawmode_table);
 					else
 						gfx(0)->transtable(bitmap,cliprect,
 								c,color,
 								flipx,flipy,
-								sx & 0x1ff,sy,
+								(sx & 0x1ff) - 96, sy,
 								drawmode_table);
 				}
 			}
@@ -579,7 +579,7 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 						gfx(0)->prio_zoom_transtable(bitmap,cliprect,
 								c,color,
 								flipx,flipy,
-								sx & 0x1ff,sy,
+								(sx & 0x1ff) - 96, sy,
 								(zw << 16) / 16,(zh << 16) / 16,
 								priority_bitmap,pri,
 								drawmode_table);
@@ -587,7 +587,7 @@ void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle
 						gfx(0)->zoom_transtable(bitmap,cliprect,
 								c,color,
 								flipx,flipy,
-								sx & 0x1ff,sy,
+								(sx & 0x1ff) - 96, sy,
 								(zw << 16) / 16,(zh << 16) / 16,
 								drawmode_table);
 				}
