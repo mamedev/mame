@@ -55,7 +55,7 @@ void sound_module::abuffer::get(int16_t *data, uint32_t samples) noexcept
 		pos += avail;
 		data += avail * m_channels;
 	}
-	//	printf("# %d %d\n", m_delta, m_delta2);
+	//  printf("# %d %d\n", m_delta, m_delta2);
 }
 
 void sound_module::abuffer::push(const int16_t *data, uint32_t samples)
@@ -84,7 +84,7 @@ void sound_module::abuffer::push(const int16_t *data, uint32_t samples)
 		m_delta2 -= std::max<uint32_t>(samples / 200, 1);
 		buf.m_cpos = std::max<uint32_t>(samples / 200, 1);
 	}
-	//	printf("# %d %d\n", m_delta, m_delta2);
+	//  printf("# %d %d\n", m_delta, m_delta2);
 }
 
 uint32_t sound_module::abuffer::available() const noexcept
