@@ -524,18 +524,4 @@ void k05324x_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 			}
 		}
 	}
-
-#if 0
-	if (machine().input().code_pressed(KEYCODE_D))
-	{
-		FILE *fp;
-		fp = fopen("SPRITE.DMP", "w+b");
-		if (fp)
-		{
-			fwrite(m_buffer, 0x800, 1, fp);
-			popmessage("saved");
-			fclose(fp);
-		}
-	}
-#endif
 }
