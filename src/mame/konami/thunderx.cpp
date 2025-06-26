@@ -1224,10 +1224,12 @@ ROM_END
 GAME( 1988, scontra,   0,        scontra,  scontra,  scontra_state,  empty_init, ROT90, "Konami", "Super Contra (set 1)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1988, scontraa,  scontra,  scontra,  scontra,  scontra_state,  empty_init, ROT90, "Konami", "Super Contra (set 2)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1988, scontraj,  scontra,  scontra,  scontra,  scontra_state,  empty_init, ROT90, "Konami", "Super Contra: Alien no Gyakushuu (Japan)", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1988, thunderx,  0,        thunderx, thunderx, thunderx_state, empty_init, ROT0,  "Konami", "Thunder Cross (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, thunderxa, thunderx, thunderx, thunderx, thunderx_state, empty_init, ROT0,  "Konami", "Thunder Cross (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, thunderxb, thunderx, thunderx, thunderx, thunderx_state, empty_init, ROT0,  "Konami", "Thunder Cross (set 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, thunderxj, thunderx, thunderx, thnderxj, thunderx_state, empty_init, ROT0,  "Konami", "Thunder Cross (Japan)", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1988, gbusters,  0,        gbusters, gbusters, scontra_state,  empty_init, ROT90, "Konami", "Gang Busters (set 1)",  MACHINE_SUPPORTS_SAVE ) // N02 & J03 program ROMs
 GAME( 1988, gbustersa, gbusters, gbusters, gbusters, scontra_state,  empty_init, ROT90, "Konami", "Gang Busters (set 2)",  MACHINE_SUPPORTS_SAVE ) // unknown region program ROMs
 GAME( 1988, crazycop,  gbusters, gbusters, gbusters, scontra_state,  empty_init, ROT90, "Konami", "Crazy Cop (Japan)",     MACHINE_SUPPORTS_SAVE ) // M02 & J03 program ROMs

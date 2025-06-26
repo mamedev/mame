@@ -124,17 +124,21 @@ K051960_CB_MEMBER(gradius3_state::sprite_callback)
 {
 	enum { sprite_colorbase = 256 / 16 };
 
-	#define L0 GFX_PMASK_1
-	#define L1 GFX_PMASK_2
-	#define L2 GFX_PMASK_4
 	static const int primask[2][4] =
 	{
-		{ L0|L2, L0, L0|L2, L0|L1|L2 },
-		{ L1|L2, L2, 0,     L0|L1|L2 }
+		{
+			GFX_PMASK_1 | GFX_PMASK_4,
+			GFX_PMASK_1,
+			GFX_PMASK_1 | GFX_PMASK_4,
+			GFX_PMASK_1 | GFX_PMASK_2 | GFX_PMASK_4
+		},
+		{
+			GFX_PMASK_2 | GFX_PMASK_4,
+			GFX_PMASK_4,
+			0,
+			GFX_PMASK_1 | GFX_PMASK_2 | GFX_PMASK_4
+		}
 	};
-	#undef L0
-	#undef L1
-	#undef L2
 
 	int pri = ((*color & 0x60) >> 5);
 

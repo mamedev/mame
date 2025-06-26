@@ -434,18 +434,18 @@ TIMER_CALLBACK_MEMBER(k007121_device::scanline)
 	if (BIT(m_ctrlram[7], 0) && (scanline & ((nmi_mask << 1) - 1)) == nmi_mask)
 		m_nmi_cb(1);
 
+	// FIRQ is when?
+
 	// vblank
 	if (scanline == 240)
 	{
-		if (BIT(m_ctrlram[7], 2))
-			m_firq_cb(1);
-
 		if (BIT(m_ctrlram[7], 1))
 			m_irq_cb(1);
 
 		sprites_buffer();
 	}
 
+	// wait for next line
 	scanline += 16;
 	if (scanline >= screen().height())
 		scanline = 0;

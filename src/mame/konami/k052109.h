@@ -26,11 +26,9 @@ public:
 	auto irq_handler() { return m_irq_handler.bind(); }
 	auto firq_handler() { return m_firq_handler.bind(); }
 	auto nmi_handler() { return m_nmi_handler.bind(); }
-	template <typename... T> void set_tile_callback(T &&... args) { m_k052109_cb.set(std::forward<T>(args)...); }
-	void set_char_ram(bool ram);
 
 	/*
-	The callback is passed:
+	The tile callback is passed:
 	- layer number (0 = FIX, 1 = A, 2 = B)
 	- bank (range 0-3, output of the pins CAB1 and CAB2)
 	- code (range 00-FF, output of the pins VC3-VC10)
@@ -44,6 +42,9 @@ public:
 	chip so it must not be set by the callback.
 	*/
 
+	template <typename... T> void set_tile_callback(T &&... args) { m_k052109_cb.set(std::forward<T>(args)...); }
+	void set_char_ram(bool ram);
+
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
 
@@ -52,8 +53,6 @@ public:
 	void tilemap_update();
 	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, uint32_t flags, uint8_t priority);
 	void mark_tilemap_dirty(uint8_t tmap_num);
-
-	void vblank_callback(screen_device &screen, bool state);
 
 	void set_xy_offset(int dx, int dy);
 
@@ -101,6 +100,8 @@ private:
 
 	void get_tile_info( tile_data &tileinfo, int tile_index, int layer, uint8_t *cram, uint8_t *vram1, uint8_t *vram2 );
 	void tileflip_reset();
+
+	void vblank_callback(screen_device &screen, bool state);
 };
 
 DECLARE_DEVICE_TYPE(K052109, k052109_device)
