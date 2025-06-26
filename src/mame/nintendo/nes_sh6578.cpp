@@ -20,6 +20,7 @@
 #include "screen.h"
 #include "speaker.h"
 #include "machine/bankdev.h"
+#include "machine/nvram.h"
 #include "machine/timer.h"
 
 #define LOG_DMA       (1U << 1)
@@ -137,6 +138,7 @@ private:
 
 	void rom_map(address_map &map) ATTR_COLD;
 	void nes_sh6578_map(address_map &map) ATTR_COLD;
+	void ppu_map(address_map &map);
 
 	//uint16_t get_tileaddress(uint8_t x, uint8_t y, bool ishigh);
 
@@ -632,6 +634,12 @@ uint32_t nes_sh6578_state::screen_update(screen_device& screen, bitmap_rgb32& bi
 	return m_ppu->screen_update(screen, bitmap, cliprect);
 }
 
+void nes_sh6578_state::ppu_map(address_map &map)
+{
+	map(0x8000, 0xffff).ram().share("nvram"); // machine specific? soulbird seems to expect fc00-fc7f to save at least
+}
+
+
 void nes_sh6578_state::nes_sh6578(machine_config& config)
 {
 	/* basic machine hardware */
@@ -643,6 +651,7 @@ void nes_sh6578_state::nes_sh6578(machine_config& config)
 	PPU_SH6578(config, m_ppu, RP2A03_NTSC_XTAL);
 	m_ppu->set_cpu_tag(m_maincpu);
 	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+	m_ppu->set_addrmap(AS_PROGRAM, &nes_sh6578_state::ppu_map);
 
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -654,6 +663,8 @@ void nes_sh6578_state::nes_sh6578(machine_config& config)
 	m_screen->set_screen_update(FUNC(nes_sh6578_state::screen_update));
 
 	TIMER(config, m_timer).configure_generic(FUNC(nes_sh6578_state::timer_expired));
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -821,7 +832,7 @@ CONS( 1997, mousekid,    0,  0,  nes_sh6578,     bancook, nes_sh6578_state, init
 // おジャ魔女どれみのTVでマジカルクッキング
 CONS( 2001, bancook,     0,  0,  nes_sh6578,     bancook,    nes_sh6578_state, init_nes_sh6578, "Bandai", "Ojamajo Doremi no TV de Magical Cooking (Japan)", MACHINE_NOT_WORKING )
 
-// there's no SEEPROM, should it store unlockables simply by having the battery keep RAM alive?
+// there's no SEEPROM, it appears to expect some of the RAM connected to the PPU to be battery backed
 CONS( 2001, soulbird,     0,  0,  nes_sh6578,     soulbird,    nes_sh6578_state, init_nes_sh6578, "Bandai", "Hyakujuu Sentai Gaoranger: DX Soul Bird (Japan)", 0 )
 
 CONS( 200?, cpatrolm,    0,  0,  nes_sh6578_pal, nes_sh6578, nes_sh6578_state, init_nes_sh6578, "TimeTop", "City Patrolman", MACHINE_NOT_WORKING )
