@@ -28,7 +28,7 @@ namespace {
 
 using mm_endpoint_ptr = Microsoft::WRL::ComPtr<IMMEndpoint>;
 
-char const *const f_speaker_names[] ={
+char const *const f_speaker_names[] = {
 		"FL",       // SPEAKER_FRONT_LEFT
 		"FR",       // SPEAKER_FRONT_RIGHT
 		"FC",       // SPEAKER_FRONT_CENTER
