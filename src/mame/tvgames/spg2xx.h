@@ -104,10 +104,12 @@ public:
 	{ }
 
 	void pballpup(machine_config &config);
+	void mpntbalt(machine_config &config);
 
 private:
 	uint16_t porta_r();
 	virtual void porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+	void porta_nobank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 };
