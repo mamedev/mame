@@ -707,13 +707,7 @@ ROM_END
 
 ROM_START( soulbird )
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 )
-	/*
-	data at 10000 matches 20000, matches 30000
-	data at 50000 matches 60000, matches 70000
-	data at 90000 matches a0000, matches b0000
-	so there's some interference problem with A16?
-	*/
-	ROM_LOAD( "soulbird.ic1", 0x00000, 0x100000, BAD_DUMP CRC(44262c9e) SHA1(0484a1e52a0cbe29a7cfc8603b5584cfb878d276) )
+	ROM_LOAD( "soulbird.ic1", 0x00000, 0x100000, CRC(307c7f95) SHA1(488ed8de5c22122581e89219889fe4f7e5d5bc96) )
 ROM_END
 
 ROM_START( ts_handy11 )
@@ -827,9 +821,8 @@ CONS( 1997, mousekid,    0,  0,  nes_sh6578,     bancook, nes_sh6578_state, init
 // おジャ魔女どれみのTVでマジカルクッキング
 CONS( 2001, bancook,     0,  0,  nes_sh6578,     bancook,    nes_sh6578_state, init_nes_sh6578, "Bandai", "Ojamajo Doremi no TV de Magical Cooking (Japan)", MACHINE_NOT_WORKING )
 
-// lots of bad gfx, maybe SH6578 issues, maybe some address lines in the wrong order
-CONS( 2001, soulbird,     0,  0,  nes_sh6578,     soulbird,    nes_sh6578_state, init_nes_sh6578, "Bandai", "Hyakujuu Sentai Gaoranger: DX Soul Bird (Japan)", MACHINE_NOT_WORKING )
-
+// there's no SEEPROM, should it store unlockables simply by having the battery keep RAM alive?
+CONS( 2001, soulbird,     0,  0,  nes_sh6578,     soulbird,    nes_sh6578_state, init_nes_sh6578, "Bandai", "Hyakujuu Sentai Gaoranger: DX Soul Bird (Japan)", 0 )
 
 CONS( 200?, cpatrolm,    0,  0,  nes_sh6578_pal, nes_sh6578, nes_sh6578_state, init_nes_sh6578, "TimeTop", "City Patrolman", MACHINE_NOT_WORKING )
 
