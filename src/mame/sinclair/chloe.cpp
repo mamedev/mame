@@ -908,16 +908,19 @@ void chloe_state::chloe(machine_config &config)
 	m_maincpu->set_memory_map(&chloe_state::map_mem);
 	m_maincpu->set_io_map(&chloe_state::map_io);
 	m_maincpu->set_vblank_int("screen", FUNC(chloe_state::chloe_interrupt));
+	//m_maincpu->busack_cb().set("dma", FUNC(dma_slot_device::bai_w));
 
 	ADDRESS_MAP_BANK(config, m_regs_map).set_map(&chloe_state::map_regs).set_options(ENDIANNESS_LITTLE, 8, 8, 0);
 
 	/*
-	???DMA(config, m_dma, 28_MHz_XTAL / 8);
-	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
-	m_dma->in_mreq_callback().set([this](offs_t offset) { return m_program.read_byte(offset); });
-	m_dma->out_mreq_callback().set([this](offs_t offset, u8 data) { m_program.write_byte(offset, data); });
-	m_dma->in_iorq_callback().set([this](offs_t offset) { return m_io.read_byte(offset); });
-	m_dma->out_iorq_callback().set([this](offs_t offset, u8 data) { m_io.write_byte(offset, data); });
+	???dma_slot_device &dma(DMA_SLOT(config.replace(), "dma", 28_MHz_XTAL / 8, default_dma_slot_devices, nullptr));
+	dma.set_io_space(m_maincpu, AS_IO);
+	dma.out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	dma.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	dma.in_mreq_callback().set([this](offs_t offset) { return m_program.read_byte(offset); });
+	dma.out_mreq_callback().set([this](offs_t offset, u8 data) { m_program.write_byte(offset, data); });
+	dma.in_iorq_callback().set([this](offs_t offset) { return m_io.read_byte(offset); });
+	dma.out_iorq_callback().set([this](offs_t offset, u8 data) { m_io.write_byte(offset, data); });
 	*/
 
 	SPI_SDCARD(config, m_sdcard, 0);

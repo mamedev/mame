@@ -4998,6 +4998,20 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/spectrum/dma/slot.h,BUSES["DMA"] = true
+---------------------------------------------------
+
+if (BUSES["DMA"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/spectrum/dma/slot.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/dma/slot.h",
+		MAME_DIR .. "src/devices/bus/spectrum/dma/cards.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/dma/cards.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/spectrum/zxbus/bus.h,BUSES["ZXBUS"] = true
 ---------------------------------------------------
 
