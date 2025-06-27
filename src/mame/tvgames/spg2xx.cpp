@@ -3184,9 +3184,9 @@ CONS( 2005, tmntmutm,   0,        0, tmntmutm,  tmntmutm,  spg2xx_game_tmntmutm_
 
 CONS( 2006, pballpup,   0,        0, pballpup,  pballpup,  spg2xx_game_pballpup_state, empty_init,    "Hasbro / Tiger Electronics",                             "Mission: Paintball Powered Up",                                         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2005, mpntbalt,   0,        0, mpntbalt,  mpntbalt,  spg2xx_game_pballpup_state, empty_init,    "Hasbro / Tiger Electronics",                             "Mission: Paintball Trainer",                                            MACHINE_NOT_WORKING )
+CONS( 2005, mpntbalt,   0,        0, mpntbalt,  mpntbalt,  spg2xx_game_pballpup_state, empty_init,    "Hasbro / Tiger Electronics",                             "Mission: Paintball Trainer",                                            MACHINE_IMPERFECT_SOUND )
 
-CONS( 2004, mpntball,   0,        0, mpntball,  mpntball,  spg2xx_game_pballpup_state, empty_init,    "Hasbro / Tiger Electronics",                             "Mission: Paintball",                                                    MACHINE_NOT_WORKING )
+CONS( 2004, mpntball,   0,        0, mpntball,  mpntball,  spg2xx_game_pballpup_state, empty_init,    "Hasbro / Tiger Electronics",                             "Mission: Paintball",                                                    MACHINE_IMPERFECT_SOUND )
 
 CONS( 2007, dreamlss,   0,        0, dreamlss,  dreamlss,  spg2xx_game_dreamlss_state, empty_init,    "Hasbro / Tiger Electronics",                             "Dream Life Superstar (Version 0.3, Mar 16 2007)",                       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
