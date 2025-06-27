@@ -862,16 +862,7 @@ protected:
 	//virtual void write_io1(uint8_t data, uint8_t direction) override;
 };
 
-class xavix_duelmast_state : public xavix_i2c_state
-{
-public:
-	xavix_duelmast_state(const machine_config &mconfig, device_type type, const char *tag)
-		: xavix_i2c_state(mconfig, type, tag)
-	{ }
 
-protected:
-	virtual uint8_t read_io1(uint8_t direction) override;
-};
 
 class xavix_i2c_tomshoot_state : public xavix_i2c_state
 {
@@ -1159,6 +1150,23 @@ protected:
 	virtual void write_io1(uint8_t data, uint8_t direction) override;
 
 	required_device<i2cmem_device> m_i2cmem;
+};
+
+class xavix_duelmast_state : public xavix_i2c_cart_state
+{
+public:
+	xavix_duelmast_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_i2c_cart_state(mconfig, type, tag)
+	{
+		m_cartlimit = 0x800000;
+	}
+
+	void duelmast(machine_config &config);
+
+protected:
+	virtual uint8_t read_io1(uint8_t direction) override;
+
+	virtual void xavix_extbus_map(address_map &map) override ATTR_COLD;
 };
 
 class xavix_popira2_cart_state : public xavix_cart_state
