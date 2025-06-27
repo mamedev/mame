@@ -190,32 +190,34 @@ void chqflag_state::chqflag_vreg_w(uint8_t data)
 	/* bit 4 = enable rom reading through K051316 #1 & #2 */
 	m_k051316_readroms = BIT(data, 4);
 
-	/* Bits 3-7 probably control palette dimming in a similar way to TMNT2/Sunset Riders, */
-	/* however I don't have enough evidence to determine the exact behaviour. */
-	/* Bits 3 and 7 are set in night stages, where the background should get darker and */
-	/* the headlight (which have the shadow bit set) become highlights */
-	/* Maybe one of the bits inverts the SHAD line while the other darkens the background. */
 	/*
-	 * Update according to a reference:
-	 * 0x00 is certainly shadow (car pit-in shadow when zoomed in/clouds before rain)
-	 * 0x80 is used when rain shows up (which should be white/highlighted)
-	 * 0x88 is for when night shows up (max amount of highlight)
-	 * 0x08 is used at dawn after 0x88 state
-	 * During rain and night, the reference shows a dimmed background as well.
-	 *
-	 * TODO: true values aren't known, also shadow_factors table probably scales towards zero instead (game doesn't use those)
-	 */
+	Bits 3,7 probably control palette dimming in a similar way to TMNT2/Sunset Riders,
+	however I don't have enough evidence to determine the exact behaviour.
+	Bits 3 and 7 are set in night stages, where the background should get darker and
+	the headlight (which has the shadow bit set) become highlights.
+	Maybe one of the bits inverts the SHAD line while the other darkens the background.
+
+	Update according to a reference:
+	0x00 is certainly shadow (car pit-in shadow when zoomed in/clouds before rain)
+	0x80 is used when rain shows up (which should be white/highlighted)
+	0x88 is for when night shows up (max amount of highlight)
+	0x08 is used at dawn after 0x88 state
+	During rain and night, the reference shows a dimmed background as well.
+
+	TODO: true values aren't known, also shadow_factors table probably scales towards zero
+	(game doesn't use those)
+	*/
 
 	if ((data ^ m_last_vreg) & 0x88)
 	{
 		const double bg_brightness[4] = { 1.0, 1.0, 0.75, 0.75 };
-		const double highlight_factor[4] = { 1.1, 1.15, 1.25, 1.40 };
+		const double highlight_factor[4] = { 1.1, 1.15, 1.25, 1.45 };
 		const int index = BIT(data, 3) | (BIT(data, 7) << 1);
 
 		for (int i = 512; i < 1024; i++)
 			m_palette->set_pen_contrast(i, bg_brightness[index]);
 
-		m_palette->set_shadow_factor(0.8); // only index 0 used?
+		m_palette->set_shadow_factor(0.75); // only index 0 used?
 		m_palette->set_highlight_factor(highlight_factor[index]);
 	}
 
@@ -348,10 +350,10 @@ static INPUT_PORTS_START( chqflag )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc", FUNC(adc0804_device::intr_r))
 
 	PORT_START("IN3")   /* Accelerator */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5)
+	PORT_BIT( 0xff, 0x38, IPT_PEDAL ) PORT_MINMAX(0x38,0xa0) PORT_SENSITIVITY(100) PORT_KEYDELTA(9)
 
 	PORT_START("IN4")   /* Driving wheel */
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xef) PORT_SENSITIVITY(80) PORT_KEYDELTA(8)
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x60,0xa0) PORT_SENSITIVITY(100) PORT_KEYDELTA(3)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( chqflagj )
@@ -446,6 +448,7 @@ void chqflag_state::chqflag(machine_config &config)
 
 	K051316(config, m_k051316[1], 0);
 	m_k051316[1]->set_palette(m_palette);
+	m_k051316[1]->set_offsets(7, 0);
 	m_k051316[1]->set_bpp(8);
 	m_k051316[1]->set_layermask(0xc0);
 	m_k051316[1]->set_wrap(1);
