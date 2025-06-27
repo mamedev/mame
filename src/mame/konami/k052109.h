@@ -53,7 +53,7 @@ public:
 	void set_rmrd_line(int state);
 	int get_rmrd_line();
 	void tilemap_update();
-	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, uint32_t flags, uint8_t priority);
+	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, uint32_t flags = 0, uint8_t priority = 0, uint8_t priority_mask = 0xff);
 	void mark_tilemap_dirty(uint8_t tmap_num);
 
 protected:
@@ -96,7 +96,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	TILE_GET_INFO_MEMBER(get_tile_info2);
 
-	void get_tile_info( tile_data &tileinfo, int tile_index, int layer, uint8_t *cram, uint8_t *vram1, uint8_t *vram2 );
+	void get_tile_info(tile_data &tileinfo, int tile_index, int layer, uint8_t *cram, uint8_t *vram1, uint8_t *vram2);
 	void tileflip_reset();
 
 	void vblank_callback(screen_device &screen, bool state);

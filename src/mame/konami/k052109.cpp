@@ -489,18 +489,18 @@ void k052109_device::write(offs_t offset, u8 data)
 	}
 }
 
-void k052109_device::set_rmrd_line( int state )
+void k052109_device::set_rmrd_line(int state)
 {
 	m_rmrd_line = state;
 }
 
-int k052109_device::get_rmrd_line( )
+int k052109_device::get_rmrd_line()
 {
 	return m_rmrd_line;
 }
 
 
-void k052109_device::tilemap_update( )
+void k052109_device::tilemap_update()
 {
 	int xscroll, yscroll, offs;
 
@@ -652,12 +652,12 @@ void k052109_device::tilemap_update( )
 #endif
 }
 
-void k052109_device::tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, uint32_t flags, uint8_t priority )
+void k052109_device::tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, uint32_t flags, uint8_t priority, uint8_t priority_mask)
 {
-	m_tilemap[tmap_num]->draw(screen, bitmap, cliprect, flags, priority);
+	m_tilemap[tmap_num]->draw(screen, bitmap, cliprect, flags, priority, priority_mask);
 }
 
-void k052109_device::mark_tilemap_dirty( uint8_t tmap_num )
+void k052109_device::mark_tilemap_dirty(uint8_t tmap_num)
 {
 	assert(tmap_num <= 2);
 	m_tilemap[tmap_num]->mark_all_dirty();
@@ -681,7 +681,7 @@ void k052109_device::mark_tilemap_dirty( uint8_t tmap_num )
   color RAM    ------xx  depends on external connections (usually banking, flip)
 */
 
-void k052109_device::get_tile_info( tile_data &tileinfo, int tile_index, int layer, uint8_t *cram, uint8_t *vram1, uint8_t *vram2 )
+void k052109_device::get_tile_info(tile_data &tileinfo, int tile_index, int layer, uint8_t *cram, uint8_t *vram1, uint8_t *vram2)
 {
 	int flipy = 0;
 	int code = vram1[tile_index] + 256 * vram2[tile_index];

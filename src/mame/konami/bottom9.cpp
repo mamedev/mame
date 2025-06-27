@@ -123,7 +123,7 @@ K051960_CB_MEMBER(bottom9_state::sprite_callback)
 
 	// bit 4 = priority over zoom (0 = have priority)
 	// bit 5 = priority over B (1 = have priority)
-	*priority = 0;
+	*priority = GFX_PMASK_4;
 	if ( *color & 0x10) *priority |= GFX_PMASK_1;
 	if (~*color & 0x20) *priority |= GFX_PMASK_2;
 
@@ -160,13 +160,15 @@ uint32_t bottom9_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	bitmap.fill(m_layer_colorbase[1], cliprect);
 	screen.priority().fill(0, cliprect);
 
-//  if (m_video_enable)
+	if (m_video_enable)
 	{
 		m_k051316->zoom_draw(screen, bitmap, cliprect, 0, 1);
-		m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, 0, 2);
+		m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, 0, 2, 2);
+		m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, 0, 4, 4);
+
 		m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), -1, -1);
-		m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, 0, 0);
 	}
+
 	return 0;
 }
 
@@ -234,6 +236,7 @@ void bottom9_state::_1f90_w(uint8_t data)
 	else
 	{
 		m_palette_view.select(0);
+
 		// bit 4 = enable 051316 ROM reading
 		m_k051316_view.select(BIT(data, 4));
 	}
@@ -241,7 +244,7 @@ void bottom9_state::_1f90_w(uint8_t data)
 
 void bottom9_state::sh_irqtrigger_w(uint8_t data)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(bottom9_state::sound_interrupt)
@@ -250,12 +253,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(bottom9_state::sound_interrupt)
 
 	// NMI 8 times per frame
 	if ((scanline & 0x1f) == 0x10 && m_nmienable)
-		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 void bottom9_state::nmi_enable_w(uint8_t data)
 {
-	m_nmienable = data;
+	m_nmienable = data & 1;
+
+	if (!m_nmienable)
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 void bottom9_state::sound_bank_w(uint8_t data)
@@ -318,19 +324,19 @@ static INPUT_PORTS_START( bottom9 )
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x07, 0x04, "Play Time" ) PORT_DIPLOCATION("SW2:1,2,3")
-	PORT_DIPSETTING(    0x07, "1'00" )
-	PORT_DIPSETTING(    0x06, "1'10" )
-	PORT_DIPSETTING(    0x05, "1'20" )
-	PORT_DIPSETTING(    0x04, "1'30" )
-	PORT_DIPSETTING(    0x03, "1'40" )
-	PORT_DIPSETTING(    0x02, "1'50" )
-	PORT_DIPSETTING(    0x01, "2'00" )
-	PORT_DIPSETTING(    0x00, "2'10" )
+	PORT_DIPSETTING(    0x07, "1:00" )
+	PORT_DIPSETTING(    0x06, "1:10" )
+	PORT_DIPSETTING(    0x05, "1:20" )
+	PORT_DIPSETTING(    0x04, "1:30" )
+	PORT_DIPSETTING(    0x03, "1:40" )
+	PORT_DIPSETTING(    0x02, "1:50" )
+	PORT_DIPSETTING(    0x01, "2:00" )
+	PORT_DIPSETTING(    0x00, "2:10" )
 	PORT_DIPNAME( 0x18, 0x08, "Bonus Time" ) PORT_DIPLOCATION("SW2:4,5")
-	PORT_DIPSETTING(    0x18, "00" )
-	PORT_DIPSETTING(    0x10, "20" )
-	PORT_DIPSETTING(    0x08, "30" )
-	PORT_DIPSETTING(    0x00, "40" )
+	PORT_DIPSETTING(    0x18, "0 Seconds" )
+	PORT_DIPSETTING(    0x10, "20 Seconds" )
+	PORT_DIPSETTING(    0x08, "30 Seconds" )
+	PORT_DIPSETTING(    0x00, "40 Seconds" )
 	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
@@ -343,7 +349,7 @@ static INPUT_PORTS_START( bottom9 )
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW3:1")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
@@ -371,10 +377,10 @@ static INPUT_PORTS_START( mstadium )
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x00, "4" )
 	PORT_DIPNAME( 0x0c, 0x08, "Play Inning Time" ) PORT_DIPLOCATION("SW2:3,4")
-	PORT_DIPSETTING(    0x0c, "6 Min" )
-	PORT_DIPSETTING(    0x08, "8 Min" )
-	PORT_DIPSETTING(    0x04, "10 Min" )
-	PORT_DIPSETTING(    0x00, "12 Min" )
+	PORT_DIPSETTING(    0x0c, "6 Minutes" )
+	PORT_DIPSETTING(    0x08, "8 Minutes" )
+	PORT_DIPSETTING(    0x04, "10 Minutes" )
+	PORT_DIPSETTING(    0x00, "12 Minutes" )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -399,10 +405,8 @@ void bottom9_state::machine_start()
 
 void bottom9_state::machine_reset()
 {
-	m_video_enable = 0;
-	m_palette_view.select(0);
-	m_k051316_view.select(0);
-	m_nmienable = 0;
+	nmi_enable_w(0);
+	_1f90_w(0);
 }
 
 void bottom9_state::bottom9(machine_config &config)

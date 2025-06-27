@@ -45,6 +45,10 @@ public:
 
 	void _88games(machine_config &config);
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
 private:
 	// video-related
 	bool          m_k88games_priority = false;
@@ -73,8 +77,6 @@ private:
 	void speech_msg_w(uint8_t data);
 	uint8_t k052109_051960_r(offs_t offset);
 	void k052109_051960_w(offs_t offset, uint8_t data);
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	K051316_CB_MEMBER(zoom_callback);
 	K052109_CB_MEMBER(tile_callback);
@@ -180,14 +182,11 @@ void _88games_state::k88games_5f84_w(uint8_t data)
 	m_zoomreadroms = BIT(data, 2);
 	if (!m_videobank)
 		m_k051316_view.select(m_zoomreadroms ? 1 : 0);
-
-	if (data & 0xf8)
-		popmessage("5f84 = %02x", data);
 }
 
 void _88games_state::sh_irqtrigger_w(uint8_t data)
 {
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 

@@ -185,9 +185,10 @@ uint32_t ajax_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	m_k052109->tilemap_update();
 
 	screen.priority().fill(0, cliprect);
-
 	bitmap.fill(m_palette->black_pen(), cliprect);
+
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, 0, 1);
+
 	if (m_priority)
 	{
 		// basic layer order is B, zoom, A, F
@@ -200,8 +201,10 @@ uint32_t ajax_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 		m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, 0, 2);
 		m_k051316->zoom_draw(screen, bitmap, cliprect, 0, 4);
 	}
+
 	m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), -1, -1);
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0);
+
 	return 0;
 }
 
