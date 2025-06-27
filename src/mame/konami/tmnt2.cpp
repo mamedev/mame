@@ -1101,7 +1101,7 @@ uint32_t tmnt2_state::screen_update_glfgreat(screen_device &screen, bitmap_ind16
 	// update color info and refresh tilemaps
 	static const int K053251_CI[3] = { k053251_device::CI2, k053251_device::CI3, k053251_device::CI4 };
 	int bg_colorbase = m_k053251->get_palette_index(k053251_device::CI0);
-	m_sprite_colorbase  = m_k053251->get_palette_index(k053251_device::CI1);
+	m_sprite_colorbase = m_k053251->get_palette_index(k053251_device::CI1);
 
 	for (int i = 0; i < 3; i++)
 	{
@@ -2395,13 +2395,13 @@ void tmnt2_state::punkshot(machine_config &config)
 	m_palette->enable_shadows();
 	m_palette->enable_highlights();
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(tmnt2_state::tmnt_tile_callback));
 	m_k052109->irq_handler().set_inputline(m_maincpu, M68K_IRQ_4);
 
-	K051960(config, m_k051960, 0);
+	K051960(config, m_k051960, 24_MHz_XTAL);
 	m_k051960->set_palette(m_palette);
 	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(tmnt2_state::punkshot_sprite_callback));
@@ -2444,13 +2444,13 @@ void tmnt2_state::lgtnfght(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt2_state,lgtnfght)
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(tmnt2_state::tmnt_tile_callback));
 	m_k052109->irq_handler().set_inputline(m_maincpu, M68K_IRQ_5);
 
-	K053245(config, m_k053245, 0);
+	K053245(config, m_k053245, 24_MHz_XTAL);
 	m_k053245->set_palette(m_palette);
 	m_k053245->set_sprite_callback(FUNC(tmnt2_state::lgtnfght_sprite_callback));
 
@@ -2496,13 +2496,13 @@ void tmnt2_state::blswhstl(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt2_state, blswhstl)
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(tmnt2_state::blswhstl_tile_callback));
 	m_k052109->irq_handler().set_inputline(m_maincpu, M68K_IRQ_4);
 
-	K053245(config, m_k053245, 0);
+	K053245(config, m_k053245, 24_MHz_XTAL);
 	m_k053245->set_palette(m_palette);
 	m_k053245->set_sprite_callback(FUNC(tmnt2_state::blswhstl_sprite_callback));
 
@@ -2557,13 +2557,13 @@ void glfgreat_state::glfgreat(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(glfgreat_state,glfgreat)
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(glfgreat_state::tmnt_tile_callback));
 	m_k052109->irq_handler().set_inputline(m_maincpu, M68K_IRQ_5);
 
-	K053245(config, m_k053245, 0);
+	K053245(config, m_k053245, 24_MHz_XTAL);
 	m_k053245->set_palette(m_palette);
 	m_k053245->set_sprite_callback(FUNC(glfgreat_state::lgtnfght_sprite_callback));
 
@@ -2618,13 +2618,13 @@ void prmrsocr_state::prmrsocr(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(prmrsocr_state,prmrsocr)
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(prmrsocr_state::tmnt_tile_callback));
 	m_k052109->irq_handler().set_inputline(m_maincpu, M68K_IRQ_5);
 
-	K053245(config, m_k053245, 0);
+	K053245(config, m_k053245, 24_MHz_XTAL);
 	m_k053245->set_palette(m_palette);
 	m_k053245->set_sprite_callback(FUNC(prmrsocr_state::prmrsocr_sprite_callback));
 
@@ -2674,13 +2674,13 @@ void tmnt2_state::tmnt2(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt2_state,lgtnfght)
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(tmnt2_state::tmnt_tile_callback));
 	m_k052109->irq_handler().set_inputline(m_maincpu, M68K_IRQ_4);
 
-	K053245(config, m_k053245, 0);
+	K053245(config, m_k053245, 24_MHz_XTAL);
 	m_k053245->set_palette(m_palette);
 	m_k053245->set_sprite_callback(FUNC(tmnt2_state::lgtnfght_sprite_callback));
 
@@ -2726,13 +2726,13 @@ void tmnt2_state::ssriders(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt2_state,lgtnfght)
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(tmnt2_state::tmnt_tile_callback));
 	m_k052109->irq_handler().set_inputline(m_maincpu, M68K_IRQ_4);
 
-	K053245(config, m_k053245, 0);
+	K053245(config, m_k053245, 24_MHz_XTAL);
 	m_k053245->set_palette(m_palette);
 	m_k053245->set_sprite_callback(FUNC(tmnt2_state::lgtnfght_sprite_callback));
 
@@ -2786,12 +2786,12 @@ void sunsetbl_state::sunsetbl(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(sunsetbl_state,lgtnfght)
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(sunsetbl_state::ssbl_tile_callback));
 
-	K053245(config, m_k053245, 0);
+	K053245(config, m_k053245, 24_MHz_XTAL);
 	m_k053245->set_palette(m_palette);
 	m_k053245->set_sprite_callback(FUNC(sunsetbl_state::lgtnfght_sprite_callback));
 
@@ -2827,13 +2827,13 @@ void tmnt2_state::thndrx2(machine_config &config)
 	m_palette->enable_shadows();
 	m_palette->enable_highlights();
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(tmnt2_state::tmnt_tile_callback));
 	m_k052109->irq_handler().set_inputline(m_maincpu, M68K_IRQ_4);
 
-	K051960(config, m_k051960, 0);
+	K051960(config, m_k051960, 24_MHz_XTAL);
 	m_k051960->set_palette(m_palette);
 	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(tmnt2_state::thndrx2_sprite_callback));

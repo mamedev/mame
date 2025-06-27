@@ -630,11 +630,11 @@ void vendetta_state::vendetta(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);
 	m_palette->enable_shadows();
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_tile_callback(FUNC(vendetta_state::vendetta_tile_callback));
 
-	K053246(config, m_k053246, 0);
+	K053246(config, m_k053246, 24_MHz_XTAL);
 	m_k053246->set_sprite_callback(FUNC(vendetta_state::sprite_callback));
 	m_k053246->set_config(NORMAL_PLANE_ORDER, -43, 6);
 	m_k053246->set_palette(m_palette);

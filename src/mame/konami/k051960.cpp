@@ -24,7 +24,7 @@ The 051960 can also generate IRQ, FIRQ and NMI signals.
 memory map:
 000-007 is for the 051937, but also seen by the 051960
 400-7ff is 051960 only
-000     R  bit 0 = busy flag for sprite processing (does not toggle if bit 4 is set)
+000     R  bit 0 = busy flag for sprite dma (does not toggle if bit 4 is set)
                    aliens waits for it to be 0 before starting to copy sprite data
                    thndrx2 needs it to pulse for the startup checks to succeed
 000     W  bit 0 = irq enable/acknowledge
@@ -150,7 +150,6 @@ k051960_device::k051960_device(const machine_config &mconfig, const char *tag, d
 	, m_romoffset(0)
 	, m_control(0)
 	, m_nmi_count(0)
-	, m_sprites_busy(false)
 	, m_shadow_config(0)
 {
 }
@@ -198,6 +197,8 @@ void k051960_device::device_start()
 	m_scanline_timer = timer_alloc(FUNC(k051960_device::scanline_callback), this);
 	m_scanline_timer->adjust(screen().time_until_pos(0), 0);
 
+	m_sprites_busy = timer_alloc(timer_expired_delegate());
+
 	decode_gfx();
 	gfx(0)->set_colors(palette().entries() / gfx(0)->depth());
 
@@ -211,7 +212,6 @@ void k051960_device::device_start()
 	save_item(NAME(m_romoffset));
 	save_item(NAME(m_control));
 	save_item(NAME(m_nmi_count));
-	save_item(NAME(m_sprites_busy));
 	save_item(NAME(m_shadow_config));
 	save_item(NAME(m_spriterombank));
 	save_item(NAME(m_ram));
@@ -228,7 +228,6 @@ void k051960_device::device_reset()
 		k051937_w(i, 0);
 
 	m_romoffset = 0;
-	m_sprites_busy = false;
 }
 
 
@@ -252,16 +251,21 @@ TIMER_CALLBACK_MEMBER(k051960_device::scanline_callback)
 		if (BIT(m_control, 0))
 			m_irq_handler(ASSERT_LINE);
 
-		// copy sprites to framebuffer, unless sprite processing was disabled
+		// do the sprite dma, unless sprite processing was disabled
 		if (!BIT(m_control, 4))
 		{
-			m_sprites_busy = true;
 			memcpy(m_buffer, m_ram, sizeof(m_buffer));
+
+			// count number of active sprites in the buffer
+			int active = 0;
+			for (int i = 0; i < sizeof(m_buffer); i += 8)
+				active += BIT(m_buffer[i], 7);
+
+			// 32 clocks per active sprite, around 18 clocks per inactive sprite
+			const u32 ticks = (active * 32) + (128 - active) * 18;
+			m_sprites_busy->adjust(attotime::from_ticks(ticks * 4, clock()));
 		}
 	}
-
-	if (scanline == 0)
-		m_sprites_busy = false;
 
 	// wait for next line
 	scanline += 8;
@@ -319,7 +323,7 @@ u8 k051960_device::k051937_r(offs_t offset)
 	if (BIT(m_control, 5) && offset & 4)
 		return k051960_fetchromdata(offset & 3);
 	else if (offset == 0)
-		return m_sprites_busy ? 1 : 0;
+		return m_sprites_busy->enabled() ? 1 : 0;
 
 	//logerror("%s: read unknown 051937 address %x\n", m_maincpu->pc(), offset);
 	return 0;
@@ -398,7 +402,7 @@ void k051960_device::k051937_w(offs_t offset, u8 data)
  * Note that Aliens also uses the shadow bit to select the second sprite bank.
  */
 
-void k051960_device::k051960_sprites_draw( bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int min_priority, int max_priority )
+void k051960_device::k051960_sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int min_priority, int max_priority)
 {
 	static constexpr int NUM_SPRITES = 128;
 

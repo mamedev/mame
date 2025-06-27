@@ -1161,7 +1161,7 @@ void konmedal_state::shuriboy(machine_config &config)
 	//m_palette->enable_shadows();
 	//m_palette->enable_highlights();
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(konmedal_state::shuriboy_tile_callback));

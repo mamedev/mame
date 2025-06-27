@@ -433,7 +433,7 @@ void chqflag_state::chqflag(machine_config &config)
 	m_palette->enable_shadows();
 	m_palette->enable_highlights();
 
-	K051960(config, m_k051960, 0);
+	K051960(config, m_k051960, 24_MHz_XTAL);
 	m_k051960->set_palette(m_palette);
 	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(chqflag_state::sprite_callback));
@@ -441,12 +441,12 @@ void chqflag_state::chqflag(machine_config &config)
 	m_k051960->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 	m_k051960->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	K051316(config, m_k051316[0], 0);
+	K051316(config, m_k051316[0], 24_MHz_XTAL / 2);
 	m_k051316[0]->set_palette(m_palette);
 	m_k051316[0]->set_offsets(7, 0);
 	m_k051316[0]->set_zoom_callback(FUNC(chqflag_state::zoom_callback_1));
 
-	K051316(config, m_k051316[1], 0);
+	K051316(config, m_k051316[1], 24_MHz_XTAL / 2);
 	m_k051316[1]->set_palette(m_palette);
 	m_k051316[1]->set_offsets(7, 0);
 	m_k051316[1]->set_bpp(8);

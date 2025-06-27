@@ -697,12 +697,12 @@ void xmen_state::base(machine_config &config)
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 2048).enable_shadows();
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette("palette");
 	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(xmen_state::tile_callback));
 
-	K053246(config, m_k053246, 0);
+	K053246(config, m_k053246, 24_MHz_XTAL);
 	m_k053246->set_sprite_callback(FUNC(xmen_state::sprite_callback));
 	m_k053246->set_config(NORMAL_PLANE_ORDER, -43, -2);
 	m_k053246->set_palette("palette");

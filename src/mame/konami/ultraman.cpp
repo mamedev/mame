@@ -375,22 +375,22 @@ void ultraman_state::ultraman(machine_config &config)
 	palette.set_format(palette_device::xRGB_555, 8192);
 	palette.enable_shadows();
 
-	K051960(config, m_k051960, 0);
+	K051960(config, m_k051960, 24_MHz_XTAL);
 	m_k051960->set_palette("palette");
 	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(ultraman_state::sprite_callback));
 
-	K051316(config, m_k051316[0], 0);
+	K051316(config, m_k051316[0], 24_MHz_XTAL / 2);
 	m_k051316[0]->set_palette("palette");
 	m_k051316[0]->set_offsets(8, 0);
 	m_k051316[0]->set_zoom_callback(FUNC(ultraman_state::zoom_callback<0>));
 
-	K051316(config, m_k051316[1], 0);
+	K051316(config, m_k051316[1], 24_MHz_XTAL / 2);
 	m_k051316[1]->set_palette("palette");
 	m_k051316[1]->set_offsets(8, 0);
 	m_k051316[1]->set_zoom_callback(FUNC(ultraman_state::zoom_callback<1>));
 
-	K051316(config, m_k051316[2], 0);
+	K051316(config, m_k051316[2], 24_MHz_XTAL / 2);
 	m_k051316[2]->set_palette("palette");
 	m_k051316[2]->set_offsets(8, 0);
 	m_k051316[2]->set_zoom_callback(FUNC(ultraman_state::zoom_callback<2>));

@@ -94,11 +94,13 @@ address lines), and then reading it from the 051962.
                     1 = 64 (actually 40) columns
            ---xx--- layer B row scroll
            --x----- layer B column scroll
-           suratk sets this register to 70 during the second boss to produce rotating star field, using X and Y scroll in the same time.
-           not emulated due to MAME's tilemaps restrictions, currently handled in hacky way.
+           suratk sets this register to 70 during the second boss to produce rotating star field,
+           using X and Y scroll in the same time. not emulated due to MAME's tilemaps restrictions,
+           currently handled in hacky way.
            glfgreat sets it to 30 when showing the leader board
-           mariorou sets it to 36 when ingame, while actually does per-row scroll for layer A and per-collumn scroll for layer B.
-           such usage not supported by current implementation, hacked in game driver instead.
+           mariorou sets it to 36 when ingame, while actually does per-row scroll for layer A and
+           per-column scroll for layer B. such usage not supported by current implementation,
+           hacked in game driver instead.
 1d00     : bits 0 & 1 might enable NMI and FIRQ, not sure
          : bit 2 = IRQ enable
 1d80     : ROM bank selector bits 0-3 = bank 0 bits 4-7 = bank 1
