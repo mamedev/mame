@@ -87,6 +87,7 @@ private:
 	u8 m_spriterombank[3];
 	u8 m_romoffset;
 	u8 m_control;
+	u8 m_nmi_count;
 	bool m_sprites_busy;
 	u8 m_shadow_config;
 
