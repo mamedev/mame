@@ -2036,17 +2036,26 @@ void spg2xx_game_pballpup_state::pballpup(machine_config &config)
 	EEPROM_93C66_16BIT(config, m_eeprom); // type?
 }
 
+TIMER_DEVICE_CALLBACK_MEMBER(spg2xx_game_pballpup_state::gun_irq)
+{
+	m_maincpu->extint_w(0, 1);
+}
+
+
 void spg2xx_game_pballpup_state::mpntball(machine_config &config)
 {
 	pballpup(config);
 	m_maincpu->porta_out().set(FUNC(spg2xx_game_pballpup_state::porta_nobank_w));
+
+	// the gun can track (even without the screen flash) so this must be tied to movement, or periodic
+	TIMER(config, "guntimer").configure_periodic(FUNC(spg2xx_game_pballpup_state::gun_irq), attotime::from_hz(1000));
+
 }
 
 void spg2xx_game_pballpup_state::mpntbalt(machine_config &config)
 {
-	pballpup(config);
+	mpntball(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &spg2xx_game_pballpup_state::mem_map_2m);
-	m_maincpu->porta_out().set(FUNC(spg2xx_game_pballpup_state::porta_nobank_w));
 }
 
 uint16_t spg2xx_game_swclone_state::porta_r()
@@ -2941,16 +2950,16 @@ ROM_START( mpntbalt )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "paintball.u1", 0x000000, 0x400000, CRC(888e140e) SHA1(2406cfe7d9e40f112b6f161aba4886472524157e) )
 
-	ROM_REGION16_BE( 0x200, "eeprom", ROMREGION_ERASE00 ) // probably just settings / unlocks / scores, either default or remove
-	ROM_LOAD16_WORD_SWAP( "93c66.u2", 0x000, 0x200, CRC(3b5cf033) SHA1(5ac730141d2f44da6a18ab1ccb540543bace7553) )
+	//ROM_REGION16_BE( 0x200, "eeprom", ROMREGION_ERASE00 ) // dumped, but just contains user profiles / settings
+	//ROM_LOAD16_WORD_SWAP( "93c66.u2", 0x000, 0x200, CRC(3b5cf033) SHA1(5ac730141d2f44da6a18ab1ccb540543bace7553) )
 ROM_END
 
 ROM_START( mpntball )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "missionpaintball.u1", 0x000000, 0x800000, CRC(3962731a) SHA1(f33e69c681fb69204cf04174f725ebae30da6a43) )
 
-	ROM_REGION16_BE( 0x200, "eeprom", ROMREGION_ERASE00 ) // probably just settings / unlocks / scores, either default or remove
-	ROM_LOAD16_WORD_SWAP( "93c66.u4", 0x000, 0x200, CRC(cb6b9c9f) SHA1(78f485ee9a1f724428d08e4e2e152e95485777bb) )
+	//ROM_REGION16_BE( 0x200, "eeprom", ROMREGION_ERASE00 ) // dumped, but just contains user profiles / settings
+	//ROM_LOAD16_WORD_SWAP( "93c66.u4", 0x000, 0x200, CRC(cb6b9c9f) SHA1(78f485ee9a1f724428d08e4e2e152e95485777bb) )
 ROM_END
 
 ROM_START( backybbs )
