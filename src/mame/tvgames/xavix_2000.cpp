@@ -294,6 +294,7 @@ void xavix_i2c_state::xavix2000_i2c_24c02(machine_config &config)
 void xavix_duelmast_state::xavix_extbus_map(address_map &map)
 {
 	map(0x000000, 0x7fffff).rw(FUNC(xavix_duelmast_state::cart_r), FUNC(xavix_duelmast_state::cart_w));
+	map(0x408000, 0x40ffff).ram(); // seems to expect RAM here (at least when cart is enabled)
 }
 
 void xavix_duelmast_state::duelmast(machine_config &config)
