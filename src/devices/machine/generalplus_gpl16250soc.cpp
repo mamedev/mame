@@ -1338,6 +1338,12 @@ uint16_t generalplus_gpac800_device::nand_7854_r()
 				data = 0x98;
 			else if (m_curblockaddr == 1)
 				data = 0xd1;
+			else if (m_curblockaddr == 2)
+				data = 0x80;
+			else if (m_curblockaddr == 3)
+				data = 0x15;
+			else if (m_curblockaddr == 4)
+				data = 0xf2;
 		}
 		else
 		{
@@ -1407,9 +1413,15 @@ void generalplus_gpac800_device::recalculate_calculate_effective_nand_address()
 		shift = 5;
 
 	if (m_nandcommand == 0x01)
+	{
 		page_offset = 256;
-	else if (m_nandcommand == 0x50)
-		page_offset = 512;
+	} else if (m_nandcommand == 0x50)
+	{
+		if (m_romtype == 2)
+			page_offset = 2048;
+		else
+			page_offset = 512;
+	}
 
 	uint32_t nandaddress = (m_nand_addr_high << 16) | m_nand_addr_low;
 
@@ -1417,7 +1429,10 @@ void generalplus_gpac800_device::recalculate_calculate_effective_nand_address()
 		nandaddress *= 2;
 
 	uint32_t page = type ? nandaddress : /*(m_nand_7850 & 0x4000) ?*/ nandaddress >> 8 /*: nandaddress >> 9*/;
-	m_effectiveaddress = (page * 528 + page_offset) << shift;
+	if (m_romtype == 2)
+		m_effectiveaddress = (page * 2112 + page_offset) << shift;
+	else
+		m_effectiveaddress = (page * 528 + page_offset) << shift;
 
 	logerror("%s: Requested address is %08x, translating to %08x\n", machine().describe_context(), nandaddress, m_effectiveaddress);
 }
