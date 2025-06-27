@@ -94,7 +94,7 @@ public:
 			m_current_stream_id = 0;
 	}
 
-	virtual void stream_sink_update(uint32_t, const int16_t *buffer, int samples_this_frame) override
+	virtual void stream_sink_update(uint32_t id, const int16_t *buffer, int samples_this_frame) override
 	{
 		if (id != m_current_stream_id)
 			return;
