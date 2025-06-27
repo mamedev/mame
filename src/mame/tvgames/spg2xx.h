@@ -105,6 +105,7 @@ public:
 
 	void pballpup(machine_config &config);
 	void mpntbalt(machine_config &config);
+	void mpntball(machine_config &config);
 
 private:
 	uint16_t porta_r();

@@ -1202,10 +1202,12 @@ static INPUT_PORTS_START( mpntbalt )
 	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P2")
-	PORT_BIT( 0x001f, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x000f, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON3 )
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON1 ) // trigger
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON2 ) // unknown, holding it causes a beep on startup
-	PORT_BIT( 0xff80, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON4 )
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P3")
 	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -2032,6 +2034,12 @@ void spg2xx_game_pballpup_state::pballpup(machine_config &config)
 	m_maincpu->gunx_in().set(FUNC(spg2xx_game_pballpup_state::base_gunx_r));
 
 	EEPROM_93C66_16BIT(config, m_eeprom); // type?
+}
+
+void spg2xx_game_pballpup_state::mpntball(machine_config &config)
+{
+	pballpup(config);
+	m_maincpu->porta_out().set(FUNC(spg2xx_game_pballpup_state::porta_nobank_w));
 }
 
 void spg2xx_game_pballpup_state::mpntbalt(machine_config &config)
@@ -2932,6 +2940,17 @@ ROM_END
 ROM_START( mpntbalt )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "paintball.u1", 0x000000, 0x400000, CRC(888e140e) SHA1(2406cfe7d9e40f112b6f161aba4886472524157e) )
+
+	ROM_REGION16_BE( 0x200, "eeprom", ROMREGION_ERASE00 ) // probably just settings / unlocks / scores, either default or remove
+	ROM_LOAD16_WORD_SWAP( "93c66.u2", 0x000, 0x200, CRC(3b5cf033) SHA1(5ac730141d2f44da6a18ab1ccb540543bace7553) )
+ROM_END
+
+ROM_START( mpntball )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "missionpaintball.u1", 0x000000, 0x800000, CRC(3962731a) SHA1(f33e69c681fb69204cf04174f725ebae30da6a43) )
+
+	ROM_REGION16_BE( 0x200, "eeprom", ROMREGION_ERASE00 ) // probably just settings / unlocks / scores, either default or remove
+	ROM_LOAD16_WORD_SWAP( "93c66.u4", 0x000, 0x200, CRC(cb6b9c9f) SHA1(78f485ee9a1f724428d08e4e2e152e95485777bb) )
 ROM_END
 
 ROM_START( backybbs )
@@ -3136,6 +3155,8 @@ CONS( 2005, tmntmutm,   0,        0, tmntmutm,  tmntmutm,  spg2xx_game_tmntmutm_
 CONS( 2006, pballpup,   0,        0, pballpup,  pballpup,  spg2xx_game_pballpup_state, empty_init,    "Hasbro / Tiger Electronics",                             "Mission: Paintball Powered Up",                                         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 2005, mpntbalt,   0,        0, mpntbalt,  mpntbalt,  spg2xx_game_pballpup_state, empty_init,    "Hasbro / Tiger Electronics",                             "Mission: Paintball Trainer",                                            MACHINE_NOT_WORKING )
+
+CONS( 2004, mpntball,   0,        0, mpntball,  mpntbalt,  spg2xx_game_pballpup_state, empty_init,    "Hasbro / Tiger Electronics",                             "Mission: Paintball",                                                    MACHINE_NOT_WORKING )
 
 CONS( 2007, dreamlss,   0,        0, dreamlss,  dreamlss,  spg2xx_game_dreamlss_state, empty_init,    "Hasbro / Tiger Electronics",                             "Dream Life Superstar (Version 0.3, Mar 16 2007)",                       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
