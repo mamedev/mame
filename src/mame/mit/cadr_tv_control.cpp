@@ -24,11 +24,23 @@ Implementation based on description of the operation, not schematics.
 #include "emu.h"
 #include "cadr_tv_control.h"
 
-#include "screen.h"
-
 
 //#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
+
+
+namespace {
+
+// Docs mention a 768x900 display, but this displays the entire screen.
+// CPT monitor was 768x896.
+static constexpr u16 SCREEN_WIDTH = 768;
+static constexpr u16 SCREEN_HEIGHT = 939;
+static constexpr u16 VIDEO_RAM_SIZE = 32 * 1024;
+static constexpr u16 VIDEO_RAM_MASK = VIDEO_RAM_SIZE - 1;
+static constexpr u16 SYNC_RAM_SIZE = 0x200; // Guess, noticed writes up to the 0x01xx range.
+static constexpr u16 SYNC_RAM_MASK = SYNC_RAM_SIZE - 1;
+
+} // anonymous namespace
 
 
 DEFINE_DEVICE_TYPE(CADR_TV_CONTROL, cadr_tv_control_device, "cadr_tv_control", "CADR TV Control")
@@ -57,7 +69,7 @@ uint32_t cadr_tv_control_device::screen_update(screen_device &screen, bitmap_rgb
 	const u32 black = 0x000000;
 	const u32 white = 0xffffff;
 
-	for (int y = 0; y < SCREEN_HEIGHT; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		const u16 line_start = y * (SCREEN_WIDTH / 32);
 

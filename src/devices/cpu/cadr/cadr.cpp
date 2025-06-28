@@ -31,6 +31,16 @@ DEFINE_DEVICE_TYPE(CADR, cadr_cpu_device, "cadr_cpu", "MIT CADR")
 #include "logmacro.h"
 
 
+namespace {
+
+static const u8 dispatch_mask[0x08] =
+{
+	0x00, 0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f
+};
+
+
+} // anonymous namespace
+
 enum
 {
 	CADR_DISPATCH_CONSTANT,
@@ -47,11 +57,6 @@ enum
 	CADR_VMA
 };
 
-
-const u8 cadr_cpu_device::dispatch_mask[0x08] =
-{
-	0x00, 0x01, 0x03, 0x07, 0x0f, 0x1f, 0x3f, 0x7f
-};
 
 
 cadr_cpu_device::cadr_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -499,7 +504,6 @@ void cadr_cpu_device::alu_operation(u32 &res, u32 &carry_out)
 		case 0x1d: // M+(M&~A) (C=0), M+(M&~A)+1 (C=1)
 		case 0x1e: // M+(M|~A) (C=0), M+(M|~A)+1 (C=1)
 			fatalerror("%x(%o): alu operation %02x not implemented", m_prev_pc, m_prev_pc, (m_ir >> 3) & 0x1f);
-			break;
 		}
 	}
 }
@@ -642,7 +646,6 @@ bool cadr_cpu_device::jump_condition(s32 a, s32 m)
 		case 0x07: condition = true; break;
 		default:
 			fatalerror("%x(%o): jump condition %02x not implemented", m_prev_pc, m_prev_pc, m_ir & 0x1f);
-			break;
 		}
 	}
 	else

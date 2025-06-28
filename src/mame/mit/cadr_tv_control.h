@@ -26,21 +26,11 @@ public:
 	void tv_control_w(offs_t offset, u32 data);
 
 protected:
-	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-	virtual void device_add_mconfig(machine_config &config) override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
-	// Docs mention a 768x900 display, but this displays the entire screen.
-	// CPT monitor was 768x896.
-	static constexpr u16 SCREEN_WIDTH = 768;
-	static constexpr u16 SCREEN_HEIGHT = 939; 
-	static constexpr u16 VIDEO_RAM_SIZE = 32 * 1024;
-	static constexpr u16 VIDEO_RAM_MASK = VIDEO_RAM_SIZE - 1;
-	static constexpr u16 SYNC_RAM_SIZE = 0x200; // Guess, noticed writes up to the 0x01xx range.
-	static constexpr u16 SYNC_RAM_MASK = SYNC_RAM_SIZE - 1;
-
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(tv_60hz_callback);
 

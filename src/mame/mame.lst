@@ -32774,13 +32774,13 @@ z80net                          // 1980 - Z80NE + LX388 Video Interface
 z80netb                         // 1980 - Z80NE + LX388 Video Interface + 16Kb BASIC
 z80netf                         // 1980 - Z80NE + LX.388 Video Interface + LX.390 FD Controller
 
+@source:mit/cadr.cpp
+cadr
+
 @source:mit/tx0.cpp
 tx0_64kw                        // April 1956 MIT TX-0 (64kw RAM)
 tx0_8kwo                        // 1959 MIT TX-0 (8kw RAM)
 tx0_8kw                         // 1962 MIT TX-0 (8kw RAM)
-
-@source:mit/cadr.cpp
-cadr
 
 @source:mits/altair.cpp
 al8800bt                        //

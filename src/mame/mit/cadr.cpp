@@ -92,12 +92,12 @@ private:
 
 void cadr_state::mem_map(address_map &map)
 {
-	// Xbus memory
+	// Xbus memory 0 - 16777777 / 000000 - 3bffff
 
 	// The system 100 boot program cannot handle more memory?
 	map(0x000000, 0x1fffff).ram(); // 128KB - ~4MB
 
-	// Xbus I/O
+	// Xbus I/O 17000000 - 17377777 / 3c0000 - 3dffff
 	//
 	// Devices mentioned in documentation:
 	// 17000000 - 17077777 / 3c0000 - 3c7fff - main tv screen
@@ -122,8 +122,18 @@ void cadr_state::mem_map(address_map &map)
 	map(0x3dfff8, 0x3dffff).rw(m_disk_controller, FUNC(cadr_disk_device::read), FUNC(cadr_disk_device::write));
 
 
-	// Unibus - 16 bit bus
+	// Unibus - 16 bit bus - 17400000 - 17777777 / 3e0000 - 3fffff
 
+	map(0x3e0000, 0x3fffff).lrw16(
+		NAME([] (offs_t offset) {
+			printf("Read unibus %08x\n", 0x3e0000 + offset);
+			return 0xffff;
+		}),
+		NAME([] (offs_t offset, u16 data) {
+			printf("Write unibus %08x %04x\n", 0x3e0000 + offset, data);
+		})
+
+	);
 	map(0x3ff420, 0x3ff43f).rw(m_iob, FUNC(cadr_iob_device::read), FUNC(cadr_iob_device::write)).umask32(0x0000ffff);
 
 	// 766000 - 766017 - diagnostic interface
@@ -166,9 +176,9 @@ void cadr_state::mem_map(address_map &map)
 	// to single step through debug statements.
 	//
 	// 3ff620 - 3ff626 - Debug/diagnostic interface to another machine
-	// 3ff620 - read or write the debuggee unibus location
-	// 3ff624 - Bit 17 of the debuggee Unibus address
-	// 3ff626 - Debuggee Unibus address to access (bits 1-16)
+	// 3ff620 / 766100 - read or write the debuggee unibus location
+	// 3ff624 / 766110 - Bit 17 of the debuggee Unibus address
+	// 3ff626 / 766114 - Debuggee Unibus address to access (bits 1-16)
 	//
 }
 

@@ -15,7 +15,6 @@ public:
 	void diag_w(offs_t offset, u16 data);
 
 protected:
-	// device_t overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -37,7 +36,6 @@ protected:
 private:
 	static constexpr u8 ADDRESS_BITS = 16;
 	static constexpr u8 EXTERNAL_ADDRESS_BITS = 24;
-	static const u8 dispatch_mask[0x08];
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;
@@ -80,7 +78,7 @@ private:
 	bool m_popj;
 	bool m_interrupt_pending;
 
-	void program_map(address_map &map);
+	void program_map(address_map &map) ATTR_COLD;
 	void write();
 	void read();
 	void execute_alu();

@@ -28,54 +28,13 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(mouse_changed);
 
 protected:
-	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-	virtual void device_add_mconfig(machine_config &config) override;
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual ioport_constructor device_input_ports() const override;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
-	static constexpr u16 IRQ_VECTOR_KEYBOARD = 0xb0;
-	static constexpr u16 IRQ_VECTOR_MOUSE = 0xb4;
-	static constexpr u16 IRQ_VECTOR_CHAOSNET = 0xb8;
-	static constexpr u16 IRQ_VECTOR_CLOCK = 0xbc;
-	static constexpr u16 IRQ_VECTOR_CHAOS_TRANSMIT = 0x100;
-	static constexpr u16 IRQ_VECTOR_CHAOS_RECEIVE = 0x104;
-
-	static constexpr int CSR_REMOTE_MOUSE_ENABLE_BIT = 0;
-	static constexpr int CSR_MOUSE_IRQ_ENABLE_BIT = 1;
-	static constexpr int CSR_KEYBOARD_IRQ_ENABLE_BIT = 2;
-	static constexpr int CSR_CLOCK_IRQ_ENABLE_BIT = 3;
-	static constexpr int CSR_MOUSE_READY_BIT = 4;
-	static constexpr u16 CSR_MOUSE_READY = 1 << CSR_MOUSE_READY_BIT;
-	static constexpr int CSR_KEYBOARD_READY_BIT = 5;
-	static constexpr u16 CSR_KEYBOARD_READY = 1 << CSR_KEYBOARD_READY_BIT;
-	static constexpr int CSR_CLOCK_READY_BIT = 6;
-	static constexpr u16 CSR_CLOCK_READY = 1 << CSR_CLOCK_READY_BIT;
-
-	static constexpr int CHAOSNET_TIMER_IRQ_ENABLE_BIT = 0;
-	static constexpr u16 CHAOSNET_TIMER_IRQ_ENABLE = 1 << CHAOSNET_TIMER_IRQ_ENABLE_BIT;
-	static constexpr int CHAOSNET_LOOPBACK_BIT = 1;
-	static constexpr u16 CHAOSNET_LOOKBACK = 1 << CHAOSNET_LOOPBACK_BIT;
-	static constexpr int CHAOSNET_ANY_DESTINATION_BIT = 2;
-	static constexpr u16 CHAOSNET_ANY_DESTINATION = 1 << CHAOSNET_ANY_DESTINATION_BIT;
-	static constexpr int CHAOSNET_RESET_RECEIVE_BIT = 3;
-	static constexpr int CHAOSNET_RECEIVE_IRQ_ENABLE_BIT = 4;
-	static constexpr u16 CHAOSNET_RECEIVE_IRQ_ENABLE = 1 << CHAOSNET_RECEIVE_IRQ_ENABLE_BIT;
-	static constexpr int CHAOSNET_TRANSMIT_IRQ_ENABLE_BIT = 5;
-	static constexpr u16 CHAOSNET_TRANSMIT_IRQ_ENABLE = 1 << CHAOSNET_TRANSMIT_IRQ_ENABLE_BIT;
-	static constexpr int CHAOSNET_TRANSMIT_ABORTED_BIT = 6;
-	static constexpr u16 CHAOSNET_TRANSMIT_ABORTED = 1 << CHAOSNET_TRANSMIT_ABORTED_BIT;
-	static constexpr int CHAOSNET_TRANSMIT_DONE_BIT = 7;
-	static constexpr u16 CHAOSNET_TRANSMIT_DONE = 1 << CHAOSNET_TRANSMIT_DONE_BIT;
-	static constexpr int CHAOSNET_RESET_TRANSMIT_BIT = 8;
-	static constexpr u16 CHAOSNET_LOST_COUNT = 0x1e00;
-	static constexpr int CHAOSNET_RESET_BIT = 13;
-	static constexpr u16 CHAOSNET_RESET = 1 << CHAOSNET_RESET_BIT;
-	static constexpr int CHAOSNET_RECEIVE_DONE_BIT = 15;
-	static constexpr u16 CHAOSNET_RECEIVE_DONE = 1 << CHAOSNET_RECEIVE_DONE_BIT;
-
 	static constexpr u16 CHAOS_BUFFER_SIZE = 512 / 2;
 
 	u8 mcu_bus_r();

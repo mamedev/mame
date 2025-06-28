@@ -111,14 +111,16 @@ TIMER_CALLBACK_MEMBER(cadr_disk_device::disk_done_callback)
 //                                   x Not active
 u32 cadr_disk_device::status_r()
 {
-	LOG("Disk Controller status read\n");
+	if (!machine().side_effects_disabled())
+		LOG("Disk Controller status read\n");
 	return m_status;
 }
 
 
 u32 cadr_disk_device::command_list_r()
 {
-	LOG("Disk Controller command list pointer read\n");
+	if (!machine().side_effects_disabled())
+		LOG("Disk Controller command list pointer read\n");
 	return m_clp;
 }
 
@@ -128,7 +130,8 @@ u32 cadr_disk_device::command_list_r()
 //            xxxxxx xxxxxxxx xxxxxxxx Address of the last memory reference
 u32 cadr_disk_device::memory_address_r()
 {
-	LOG("Disk Controller memory address read\n");
+	if (!machine().side_effects_disabled())
+		LOG("Disk Controller memory address read\n");
 	return m_last_memory_address;
 }
 
@@ -140,7 +143,8 @@ u32 cadr_disk_device::memory_address_r()
 //                            xxxxxxxx Block number
 u32 cadr_disk_device::disk_address_r()
 {
-	LOG("Disk Controller disk address read\n");
+	if (!machine().side_effects_disabled())
+		LOG("Disk Controller disk address read\n");
 	return (m_unit << 28) | (m_cyl << 16) | (m_head << 8) | m_block;
 }
 
@@ -149,7 +153,8 @@ u32 cadr_disk_device::disk_address_r()
 //                   xxxxxxxx xxxxxxxx Error bit position + 1
 u32 cadr_disk_device::error_correction_r()
 {
-	LOG("Disk Controller error correction read\n");
+	if (!machine().side_effects_disabled())
+		LOG("Disk Controller error correction read\n");
 	return 0;
 }
 
