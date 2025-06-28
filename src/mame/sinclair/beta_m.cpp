@@ -20,6 +20,26 @@ BUGS:
 #include "formats/trd_dsk.h"
 
 
+namespace {
+
+void floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add_pc_formats();
+	fr.add(FLOPPY_TRD_FORMAT);
+}
+
+void beta_disk_floppies(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+	device.option_add("525qd", FLOPPY_525_QD);
+	device.option_add("35hd", FLOPPY_35_HD);
+	device.option_add("35dd", FLOPPY_35_DD);
+}
+
+} // anonymous namespace
+
+
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -205,21 +225,6 @@ void beta_disk_device::motors_control()
 	}
 }
 
-void beta_disk_device::floppy_formats(format_registration &fr)
-{
-	fr.add_mfm_containers();
-	fr.add_pc_formats();
-	fr.add(FLOPPY_TRD_FORMAT);
-}
-
-static void beta_disk_floppies(device_slot_interface &device)
-{
-	device.option_add("525hd", FLOPPY_525_HD);
-	device.option_add("525qd", FLOPPY_525_QD);
-	device.option_add("35hd", FLOPPY_35_HD);
-	device.option_add("35dd", FLOPPY_35_DD);
-}
-
 
 ROM_START( beta_disk )
 	ROM_REGION( 0x60000, "beta", 0 )
@@ -312,7 +317,7 @@ void beta_disk_device::device_add_mconfig(machine_config &config)
 	KR1818VG93(config, m_wd179x, 8_MHz_XTAL / 8);
 	m_wd179x->hld_wr_callback().set(FUNC(beta_disk_device::fdc_hld_w));
 	for (auto &floppy : m_floppy)
-		FLOPPY_CONNECTOR(config, floppy, beta_disk_floppies, "525qd", beta_disk_device::floppy_formats).enable_sound(true);
+		FLOPPY_CONNECTOR(config, floppy, beta_disk_floppies, "525qd", floppy_formats).enable_sound(true);
 }
 
 //-------------------------------------------------
