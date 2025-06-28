@@ -17,24 +17,6 @@ public:
 
 	virtual u32 opcode_alignment() const override;
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
-
-
-private:
-	static constexpr u64 NOP_MASK = u64(0x7fffffffeffff);
-
-	static const char *const bool_op[0x10];
-	static const char *const arith_op[0x10];
-	static const char *const arith_op_c[0x10];
-	static const char *const mult_div_op[0x20];
-	static const char *const output_bus_control[0x04];
-	static const char *const q_control[0x04];
-	static const char *const rp[0x04];
-
-	void a_source(std::ostream &stream, u64 op);
-	void m_source(std::ostream &stream, u64 op);
-	void disassemble_alu_op(std::ostream &stream, u64 op);
-	void disassemble_destination(std::ostream &stream, u64 op);
-	void disassemble_condition(std::ostream &stream, u64 op);
 };
 
 #endif // MAME_CPU_CADR_CADR_DASM_H

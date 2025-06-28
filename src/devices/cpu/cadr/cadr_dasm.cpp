@@ -17,25 +17,11 @@ TODO:
 #include "cadr_dasm.h"
 
 
-const char *const cadr_disassembler::bool_op[0x10] =
-{
-	"SETZ",  "AND", "ANDCA", "SETM", "ANDCM", "SETA", "XOR",  "IOR",
-	"ANDCB", "EQV", "SETCA", "ORCA", "SETCM", "ORCM", "ORCB", "SETO"
-};
+namespace {
 
-const char *const cadr_disassembler::arith_op[0x10] =
-{
-	"-1",  "(M&A)-1", "(M&~A)-1",     "M-1",     "M|~A", "(M|~A)+(M&A)", "M-A-1",    "(M|~A)+M",
-	"M|A", "M+A",     "(M|A)+(M&~A)", "(M|A)+M", "M",    "M+(M&A)",      "M+(M|~A)", "M+M"
-};
+static constexpr u64 NOP_MASK = u64(0x7fffffffeffff);
 
-const char *const cadr_disassembler::arith_op_c[0x10] =
-{
-	"0",       "M&A",   "(M&~A)",         "M",         "(M|~A)+1", "(M|~A)+(M&A)+1", "M-A",        "(M|~A)+M+1",
-	"(M|A)+1", "M+A+1", "(M|A)+(M&~A)+1", "(M|A)+M+1", "M+1",      "M+(M&A)+1",      "M+(M|~A)+1", "M+M+1"
-};
-
-const char *const cadr_disassembler::mult_div_op[0x20] =
+static const char *const mult_div_op[0x20] =
 {
 	"mult-step", "div-step",      "unk", "unk", "unk", "rem-corr", "unk", "unk",
 	"unk",       "init-div-step", "unk", "unk", "unk", "unk",      "unk", "unk",
@@ -43,34 +29,29 @@ const char *const cadr_disassembler::mult_div_op[0x20] =
 	"unk",       "init-div-step", "unk", "unk", "unk", "unk",      "unk", "unk"
 };
 
-const char *const cadr_disassembler::output_bus_control[0x04] =
+static const char *const output_bus_control[0x04] =
 {
 	"ill ", "", ">> ", "<< "
 };
 
-const char *const cadr_disassembler::q_control[0x04] =
+static const char *const q_control[0x04] =
 {
 	"", "<<Q,", ">>Q,", "Q,"
 };
 
-const char *const cadr_disassembler::rp[0x04] =
+static const char *const rp[0x04] =
 {
 	"branch", "call", "return", "imem-write"
 };
 
 
-u32 cadr_disassembler::opcode_alignment() const
-{
-	return 1;
-}
-
-void cadr_disassembler::a_source(std::ostream &stream, u64 op)
+void a_source(std::ostream &stream, u64 op)
 {
 	util::stream_format(stream, "a[%o]", ((op >> 32) & 0x3ff));
 }
 
 
-void cadr_disassembler::m_source(std::ostream &stream, u64 op)
+void m_source(std::ostream &stream, u64 op)
 {
 	if (BIT(op, 31))
 	{
@@ -103,7 +84,8 @@ void cadr_disassembler::m_source(std::ostream &stream, u64 op)
 	}
 }
 
-void cadr_disassembler::disassemble_alu_op(std::ostream &stream, u64 op)
+
+void disassemble_alu_op(std::ostream &stream, u64 op)
 {
 	if (BIT(op, 8))
 	{
@@ -427,7 +409,8 @@ void cadr_disassembler::disassemble_alu_op(std::ostream &stream, u64 op)
 	}
 }
 
-void cadr_disassembler::disassemble_destination(std::ostream &stream, u64 op)
+
+void disassemble_destination(std::ostream &stream, u64 op)
 {
 	if (BIT(op, 25))
 	{
@@ -462,7 +445,8 @@ void cadr_disassembler::disassemble_destination(std::ostream &stream, u64 op)
 	}
 }
 
-void cadr_disassembler::disassemble_condition(std::ostream &stream, u64 op)
+
+void disassemble_condition(std::ostream &stream, u64 op)
 {
 	if (BIT(op, 5))
 	{
@@ -505,6 +489,16 @@ void cadr_disassembler::disassemble_condition(std::ostream &stream, u64 op)
 	}
 	stream << " ";
 }
+
+
+} // anonymous namespace
+
+
+u32 cadr_disassembler::opcode_alignment() const
+{
+	return 1;
+}
+
 
 offs_t cadr_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
