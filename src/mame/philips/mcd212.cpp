@@ -1209,6 +1209,8 @@ void mcd212_device::device_start()
 	save_item(NAME(m_mosaic_hold));
 	save_item(NAME(m_weight_factor[0]));
 	save_item(NAME(m_weight_factor[1]));
+	save_item(NAME(m_blink_time));
+	save_item(NAME(m_blink_active));
 
 	m_dca_timer = timer_alloc(FUNC(mcd212_device::dca_tick), this);
 	m_dca_timer->adjust(attotime::never);
