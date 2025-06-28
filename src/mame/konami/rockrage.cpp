@@ -400,17 +400,16 @@ void rockrage_state::rockrage(machine_config &config)
 	m_palette->set_endianness(ENDIANNESS_LITTLE);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, M6809_IRQ_LINE);
 
-	YM2151(config, "ymsnd", 3'579'545).add_route(0, "lspeaker", 0.30).add_route(1, "rspeaker", 0.30);
+	YM2151(config, "ymsnd", 3'579'545).add_route(0, "speaker", 0.30, 0).add_route(1, "speaker", 0.30, 1);
 
 	VLM5030(config, m_vlm, 3'579'545);
 	m_vlm->set_addrmap(0, &rockrage_state::vlm_map);
-	m_vlm->add_route(ALL_OUTPUTS, "lspeaker", 0.60);
-	m_vlm->add_route(ALL_OUTPUTS, "rspeaker", 0.60);
+	m_vlm->add_route(ALL_OUTPUTS, "speaker", 0.60, 0);
+	m_vlm->add_route(ALL_OUTPUTS, "speaker", 0.60, 1);
 }
 
 

@@ -46,9 +46,10 @@ TODO:
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "bus/rs232/hlemouse.h"
 #include "bus/rs232/rs232.h"
-#include "bus/spectrum/zxbus.h"
+#include "bus/spectrum/zxbus/bus.h"
 #include "cpu/z80/z84c015.h"
 #include "machine/ds128x.h"
+#include "machine/input_merger.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 
@@ -80,6 +81,7 @@ public:
 		: spectrum_128_state(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_isa(*this, "isa%u", 0U)
+		, m_irqs(*this, "irqs")
 		, m_rtc(*this, "rtc")
 		, m_ata(*this, "ata%u", 1U)
 		, m_beta(*this, BETA_DISK_TAG)
@@ -207,6 +209,7 @@ private:
 	u8 kbd_fe_r(offs_t offset);
 	void on_kbd_data(int state);
 
+	required_device<input_merger_device> m_irqs;
 	required_device<ds12885_device> m_rtc;
 	required_device_array<ata_interface_device, 2> m_ata;
 	required_device<beta_disk_device> m_beta;
@@ -220,13 +223,11 @@ private:
 	required_device<device_palette_interface> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 	tilemap_t *m_tilemap;
-	memory_region *m_rom;
 	memory_share_creator<u8> m_vram;
 	memory_share_creator<u8> m_fastram;
 	memory_bank_creator m_bank0_fastram;
 	memory_view m_bank_view0;
 	memory_view m_bank_view3;
-	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 	output_finder<> m_turbo_led;
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
@@ -295,7 +296,6 @@ private:
 	bool m_cbl_wae;
 	emu_timer *m_cbl_timer = nullptr;
 	emu_timer *m_acc_timer = nullptr;
-	bool m_hold_irq;
 };
 
 void sprinter_state::update_memory()
@@ -788,8 +788,7 @@ void sprinter_state::dcp_w(offs_t offset, u8 data)
 		else
 		{
 			rate = attotime::never;
-			if (m_hold_irq)
-				m_irq_off_timer->adjust(attotime::zero);
+			m_irqs->in_clear<2>();
 		}
 		m_cbl_timer->adjust(rate, 0, rate);
 		break;
@@ -908,7 +907,7 @@ void sprinter_state::accel_control_r(u8 data)
 				case 1: m_acc_dir = 0b00100101; break; // LD C,C % % fill by constant
 				case 2: m_acc_dir = 0b00001001; break; // LD D,D % % load count accelerator
 				case 3: m_acc_dir = 0b00010101; break; // LD E,E % % fill by constant VERTICAL
-				case 4: m_acc_dir = 0b01000001; break; // LD H,H % % duble byte fn
+				case 4: m_acc_dir = 0b01000001; break; // LD H,H % % double byte fn
 				case 5: m_acc_dir = 0b00100111; break; // LD L,L % % copy line
 				case 6: m_acc_dir = 0b00000000; break; // HALT
 				case 7: m_acc_dir = 0b00010111; break; // LD A,A % % copy line VERTICAL
@@ -1457,19 +1456,17 @@ void sprinter_state::machine_start()
 	save_item(NAME(m_cbl_cnt));
 	save_item(NAME(m_cbl_wa));
 	save_item(NAME(m_cbl_wae));
-	save_item(NAME(m_hold_irq));
 
 	m_beta->enable();
 
 	// reconfigure ROMs
-	m_rom = memregion("maincpu");
-	m_bank_rom[0]->configure_entries(0, m_rom->bytes() / 0x4000, m_rom->base(), 0x4000);
+	memory_region *rom = memregion("maincpu");
+	m_bank_rom[0]->configure_entries(0, rom->bytes() / 0x4000, rom->base(), 0x4000);
 	m_bank0_fastram->configure_entries(0, m_fastram.bytes() / 0x4000, m_fastram.target(), 0x4000);
 	for (auto i = 0; i < 4; i++)
 		m_bank_ram[i]->configure_entries(0, m_ram->size() / 0x4000, m_ram->pointer(), 0x4000);
 
 	m_dcp_location = m_ram->pointer() + (0x40 << 14);
-	m_maincpu->space(AS_PROGRAM).specific(m_program);
 
 	const u8 port_default[0x40] = {
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, // Cx - SYS PORTS COPIES
@@ -1517,7 +1514,6 @@ void sprinter_state::machine_reset()
 
 	m_cbl_xx = 0;
 	m_cbl_wa = 0;
-	m_hold_irq = 0;
 
 	m_ata_selected = 0;
 
@@ -1596,8 +1592,8 @@ void sprinter_state::video_start()
 static void sprinter_ata_devices(device_slot_interface &device)
 {
 	device.option_add("hdd", IDE_HARDDISK);
-	device.option_add("cdrom", ATAPI_FIXED_CDROM); // TODO must be ATAPI_CDROM
-	device.option_add("dvdrom", ATAPI_FIXED_DVDROM);
+	device.option_add("cdrom", ATAPI_CDROM);
+	device.option_add("dvdrom", ATAPI_DVDROM);
 }
 
 u8 sprinter_state::kbd_fe_r(offs_t offset)
@@ -1644,7 +1640,10 @@ void sprinter_state::on_kbd_data(int state)
 		m_kbd_data_cnt++;
 		m_kbd_data_cnt %= 11;
 		if (!m_kbd_data_cnt)
-			irq_on(0);
+		{
+			m_irqs->in_set<1>();
+			m_irq_off_timer->adjust(attotime::from_ticks(32, m_maincpu->unscaled_clock()));
+		}
 	}
 }
 
@@ -1660,20 +1659,17 @@ void sprinter_state::do_mem_wait(u8 cpu_taken = 0)
 
 TIMER_CALLBACK_MEMBER(sprinter_state::irq_on)
 {
-	if (!m_hold_irq)
-	{
-		m_joy1_ctrl = m_joy2_ctrl = 0;
-		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-		m_irq_off_timer->adjust(attotime::from_ticks(32, m_maincpu->unscaled_clock()));
-	}
+	m_irqs->in_set<0>();
+	m_irq_off_timer->adjust(attotime::from_ticks(32, m_maincpu->unscaled_clock()));
+
+	m_joy1_ctrl = m_joy2_ctrl = 0;
 	update_int(false);
 }
 
 TIMER_CALLBACK_MEMBER(sprinter_state::irq_off)
 {
-	m_irq_off_timer->reset(); // in case it's called from INT Ack, not by timer itself
-	m_hold_irq = 0;
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+	m_irqs->in_clear<0>(); // screen
+	m_irqs->in_clear<1>(); // keyboard
 }
 
 TIMER_CALLBACK_MEMBER(sprinter_state::cbl_tick)
@@ -1691,9 +1687,7 @@ TIMER_CALLBACK_MEMBER(sprinter_state::cbl_tick)
 	if (cbl_int_ena() && !(m_cbl_cnt & 0x7f))
 	{
 		m_cbl_wa = m_cbl_cnt ^ 0x80;
-		m_hold_irq = 1;
-		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-		m_irq_off_timer->reset();
+		m_irqs->in_set<2>();
 	}
 }
 
@@ -1709,7 +1703,7 @@ INPUT_PORTS_START( sprinter )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CAPS SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)  PORT_CHAR(UCHAR_SHIFT_1) PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("z    Z    :      LN       BEEP   COPY") PORT_CODE(KEYCODE_Z)      PORT_CHAR('z') PORT_CHAR('Z') PORT_CHAR(':')
 																	 PORT_CODE(KEYCODE_BACKSLASH)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("x    X    $      EXP      INK    CLEAR") PORT_CODE(KEYCODE_X)   PORT_CHAR('x') PORT_CHAR('X') PORT_CHAR(U'£')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("x    X    $      EXP      INK    CLEAR") PORT_CODE(KEYCODE_X)     PORT_CHAR('x') PORT_CHAR('X') PORT_CHAR('$')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("c    C    ?      LPRINT   PAPER  CONT") PORT_CODE(KEYCODE_C)      PORT_CHAR('c') PORT_CHAR('C') PORT_CHAR('?')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("v    V    /      LLIST    FLASH  CLS") PORT_CODE(KEYCODE_V)       PORT_CHAR('v') PORT_CHAR('V') PORT_CHAR('/')
 																	 PORT_CODE(KEYCODE_SLASH) PORT_CODE(KEYCODE_SLASH_PAD)
@@ -1825,10 +1819,10 @@ INPUT_PORTS_START( sprinter )
 
 
 	PORT_START("mouse_input1")
-	PORT_BIT(0xff, 0, IPT_MOUSE_X) PORT_SENSITIVITY(30)
+	PORT_BIT(0xff, 0, IPT_MOUSE_X) PORT_SENSITIVITY(60)
 
 	PORT_START("mouse_input2")
-	PORT_BIT(0xff, 0, IPT_MOUSE_Y) PORT_INVERT PORT_SENSITIVITY(30)
+	PORT_BIT(0xff, 0, IPT_MOUSE_Y) PORT_INVERT PORT_SENSITIVITY(60)
 
 	PORT_START("mouse_input3")
 	PORT_BIT(0xf8, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -1883,13 +1877,22 @@ void sprinter_state::sprinter(machine_config &config)
 
 	m_ram->set_default_size("64M");
 
+	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+
 	Z84C015(config.replace(), m_maincpu, X_SP / 12); // 3.5MHz default
 	m_maincpu->set_m1_map(&sprinter_state::map_fetch);
 	m_maincpu->set_memory_map(&sprinter_state::map_mem);
 	m_maincpu->set_io_map(&sprinter_state::map_io);
-	m_maincpu->nomreq_cb().set_nop();
 	m_maincpu->set_irq_acknowledge_callback(NAME([](device_t &, int){ return 0xff; }));
-	m_maincpu->irqack_cb().set(FUNC(sprinter_state::irq_off));
+	m_maincpu->irqack_cb().set(m_irqs, FUNC(input_merger_any_high_device::in_clear<2>));
+	m_maincpu->irqack_cb().append(m_irqs, FUNC(input_merger_any_high_device::in_clear<1>));
+	m_maincpu->irqack_cb().append(m_irqs, FUNC(input_merger_any_high_device::in_clear<0>));
+
+	DS12885(config, m_rtc, XTAL(32'768)); // should be DS12887A
+	ATA_INTERFACE(config, m_ata[0]).options(sprinter_ata_devices, "hdd", "hdd", false);
+	ATA_INTERFACE(config, m_ata[1]).options(sprinter_ata_devices, "hdd", "hdd", false);
+
+	BETA_DISK(config, m_beta, 0);
 
 	ISA8(config, m_isa[0], X_SP / 5);
 	m_isa[0]->set_custom_spaces();
@@ -1929,23 +1932,17 @@ void sprinter_state::sprinter(machine_config &config)
 	m_maincpu->zc_callback<0>().append(m_maincpu, FUNC(z84c015_device::txcb_w));
 	m_maincpu->zc_callback<2>().set(m_maincpu, FUNC(z84c015_device::trg3));
 
-	DS12885(config, m_rtc, XTAL(32'768)); // should be DS12887A
-	ATA_INTERFACE(config, m_ata[0]).options(sprinter_ata_devices, "hdd", "hdd", false);
-	ATA_INTERFACE(config, m_ata[1]).options(sprinter_ata_devices, "hdd", "hdd", false);
+	SPEAKER(config, "speakers", 2).front();
 
-	BETA_DISK(config, m_beta, 0);
+	config.device_remove("ay_slot");
+	AY8910(config, "ay8912", X_SP / 24)
+		.add_route(0, "speakers", 0.50, 0)
+		.add_route(1, "speakers", 0.25, 0)
+		.add_route(1, "speakers", 0.25, 1)
+		.add_route(2, "speakers", 0.50, 1);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-
-	ay8910_device &ay8910(AY8910(config.replace(), "ay8912", X_SP / 24));
-	ay8910.add_route(0, "lspeaker", 0.50);
-	ay8910.add_route(1, "lspeaker", 0.25);
-	ay8910.add_route(1, "rspeaker", 0.25);
-	ay8910.add_route(2, "rspeaker", 0.50);
-
-	DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5);
-	DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, "speakers", 0.5, 0);
+	DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, "speakers", 0.5, 1);
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_sprinter);
 }

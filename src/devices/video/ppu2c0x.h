@@ -32,7 +32,6 @@
 /* constant definitions */
 #define VISIBLE_SCREEN_WIDTH         (32*8) /* Visible screen width */
 #define VISIBLE_SCREEN_HEIGHT        (30*8) /* Visible screen height */
-#define SPRITERAM_SIZE          0x100   /* spriteram size */
 
 ///*************************************************************************
 //  TYPE DEFINITIONS
@@ -42,7 +41,8 @@
 
 class ppu2c0x_device :  public device_t,
 						public device_memory_interface,
-						public device_video_interface
+						public device_video_interface,
+						public device_palette_interface
 {
 public:
 	typedef device_delegate<void (int scanline, bool vblank, bool blanked)> scanline_delegate;
@@ -69,47 +69,19 @@ public:
 		// are non-rendering and non-vblank.
 	};
 
-	virtual uint8_t read(offs_t offset);
-	virtual void write(offs_t offset, uint8_t data);
-	virtual uint8_t palette_read(offs_t offset);
-	virtual void palette_write(offs_t offset, uint8_t data);
+	virtual u8 read(offs_t offset);
+	virtual void write(offs_t offset, u8 data);
+	virtual u8 palette_read(offs_t offset);
+	virtual void palette_write(offs_t offset, u8 data);
 
 	template <typename T> void set_cpu_tag(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
 	auto int_callback() { return m_int_callback.bind(); }
 
-	/* routines */
-	void apply_color_emphasis_and_clamp(bool is_pal_or_dendy, int color_emphasis, double& R, double& G, double& B);
-	rgb_t nespal_to_RGB(int color_intensity, int color_num, int color_emphasis, bool is_pal_or_dendy);
-	virtual void init_palette_tables();
+	void spriteram_dma(address_space &space, const u8 page);
+	void set_spriteram_value(offs_t offset, u8 data) { m_spriteram[offset] = data; }
 
-	virtual void read_tile_plane_data(int address, int color);
-	virtual void shift_tile_plane_data(uint8_t &pix);
-	virtual void draw_tile_pixel(uint8_t pix, int color, uint32_t back_pen, uint32_t *&dest);
-	virtual void draw_tile(uint8_t *line_priority, int color_byte, int color_bits, int address, int start_x, uint32_t back_pen, uint32_t *&dest);
-	virtual void draw_background( uint8_t *line_priority );
-	virtual void draw_back_pen(uint32_t* dst, int back_pen);
-	void draw_background_pen();
-
-	virtual void read_sprite_plane_data(int address);
-	virtual void make_sprite_pixel_data(uint8_t &pixel_data, int flipx);
-	virtual void draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_rgb32 &bitmap);
-	virtual bool is_spritepixel_opaque(int pixel_data, int color);
-	virtual void draw_sprite_pixel_low(bitmap_rgb32& bitmap, int pixel_data, int pixel, int sprite_xpos, int color, int sprite_index, uint8_t* line_priority);
-	virtual void draw_sprite_pixel_high(bitmap_rgb32& bitmap, int pixel_data, int pixel, int sprite_xpos, int color, int sprite_index, uint8_t* line_priority);
-	virtual void read_extra_sprite_bits(int sprite_index);
-
-	virtual int apply_sprite_pattern_page(int index1, int size);
-	virtual void draw_sprites(uint8_t *line_priority);
-	void render_scanline();
-	virtual void scanline_increment_fine_ycounter();
-	void update_visible_enabled_scanline();
-	void update_visible_disabled_scanline();
-	void update_visible_scanline();
-	void update_scanline();
-
-	void spriteram_dma(address_space &space, const uint8_t page);
-	void render(bitmap_rgb32 &bitmap, int flipx, int flipy, int sx, int sy, const rectangle &cliprect);
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void render(bitmap_rgb32 &bitmap, bool flipx, bool flipy, int sx, int sy, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	int get_current_scanline() { return m_scanline; }
 	template <typename... T> void set_scanline_callback(T &&... args) { m_scanline_callback_proc.set(std::forward<T>(args)...); m_scanline_callback_proc.resolve(); /* FIXME: if this is supposed to be set at config time, it should be resolved on start */ }
@@ -127,14 +99,12 @@ public:
 
 	//  void update_screen(bitmap_t &bitmap, const rectangle &cliprect);
 
-	uint16_t get_vram_dest();
-	void set_vram_dest(uint16_t dest);
-
-	void ppu2c0x(address_map &map) ATTR_COLD;
+	u16 get_vram_dest();
+	void set_vram_dest(u16 dest);
 
 	bool in_vblanking() { return (m_scanline >= m_vblank_first_scanline - 1); }
 protected:
-	ppu2c0x_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, uint32_t clock, address_map_constructor internal_map);
+	ppu2c0x_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock, address_map_constructor internal_map);
 
 	// registers definition
 	enum
@@ -172,7 +142,7 @@ protected:
 	};
 
 	// construction/destruction
-	ppu2c0x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	ppu2c0x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_config_complete() override;
@@ -180,9 +150,43 @@ protected:
 	// device_config_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 
+	virtual u32 palette_entries() const noexcept override { return 0x40 * 8; }
+
 	TIMER_CALLBACK_MEMBER(hblank_tick);
 	TIMER_CALLBACK_MEMBER(nmi_tick);
 	TIMER_CALLBACK_MEMBER(scanline_tick);
+
+	/* routines */
+	void apply_color_emphasis_and_clamp(bool is_pal_or_dendy, int color_emphasis, double& R, double& G, double& B);
+	rgb_t nespal_to_RGB(int color_intensity, int color_num, int color_emphasis, bool is_pal_or_dendy);
+	virtual void init_palette_tables();
+
+	virtual void write_to_spriteram_with_increment(u8 data);
+
+	virtual void read_tile_plane_data(int address, int color);
+	virtual void shift_tile_plane_data(u8 &pix);
+	virtual void draw_tile_pixel(u8 pix, int color, u32 back_pen, u32 *&dest);
+	virtual void draw_tile(u8 *line_priority, int color_byte, int color_bits, int address, int start_x, u32 back_pen, u32 *&dest);
+	virtual void draw_background( u8 *line_priority );
+	virtual void draw_back_pen(u32* dst, int back_pen);
+	void draw_background_pen();
+
+	virtual void read_sprite_plane_data(int address);
+	virtual void make_sprite_pixel_data(u8 &pixel_data, bool flipx);
+	virtual void draw_sprite_pixel(int sprite_xpos, int color, int pixel, u8 pixel_data, bitmap_rgb32 &bitmap);
+	virtual bool is_spritepixel_opaque(int pixel_data, int color);
+	virtual void draw_sprite_pixel_low(bitmap_rgb32& bitmap, int pixel_data, int pixel, int sprite_xpos, int color, int sprite_index, u8* line_priority);
+	virtual void draw_sprite_pixel_high(bitmap_rgb32& bitmap, int pixel_data, int pixel, int sprite_xpos, int color, int sprite_index, u8* line_priority);
+	virtual void read_extra_sprite_bits(int sprite_index);
+
+	virtual int apply_sprite_pattern_page(int index1, int size);
+	virtual void draw_sprites(u8 *line_priority);
+	void render_scanline();
+	virtual void scanline_increment_fine_ycounter();
+	void update_visible_enabled_scanline();
+	void update_visible_disabled_scanline();
+	void update_visible_scanline();
+	void update_scanline();
 
 	// address space configurations
 	const address_space_config      m_space_config;
@@ -196,47 +200,48 @@ protected:
 	int                         m_vblank_first_scanline;  /* the very first scanline where VBLANK occurs */
 
 	// used in rendering
-	uint8_t m_planebuf[2];
-	int                         m_scanline;         /* scanline count */
-	std::unique_ptr<uint8_t[]>  m_spriteram;           /* sprite ram */
+	u8 m_planebuf[16]; // temp buffer used for fetching tile data
+	s32                    m_scanline;         /* scanline count */
+	std::unique_ptr<u8[]>  m_spriteram;           /* sprite ram */
 
 	int m_videoram_addr_mask;
 	int m_global_refresh_mask;
 	int m_line_write_increment_large;
 	bool m_paletteram_in_ppuspace; // sh6578 doesn't have the palette in PPU space, so various side-effects don't apply
-	std::vector<uint8_t>        m_palette_ram;          /* shouldn't be in main memory! */
-	std::unique_ptr<bitmap_rgb32>                m_bitmap;          /* target bitmap */
-	int                         m_regs[PPU_MAX_REG];        /* registers */
-	int                         m_tile_page;            /* current tile page */
-	int                         m_back_color;           /* background color */
-	int                         m_refresh_data;         /* refresh-related */
-	int                         m_x_fine;               /* refresh-related */
-	int                         m_toggle;               /* used to latch hi-lo scroll */
-	int                         m_tilecount;            /* MMC5 can change attributes to subsets of the 34 visible tiles */
+	std::vector<u8>        m_palette_ram;          /* shouldn't be in main memory! */
+	bitmap_rgb32                m_bitmap;          /* target bitmap */
+	u8                          m_regs[PPU_MAX_REG];        /* registers */
+	u32                         m_tile_page;            /* current tile page */
+	u8                          m_back_color;           /* background color */
+	s32                         m_refresh_data;         /* refresh-related */
+	u8                          m_x_fine;               /* refresh-related */
+	bool                        m_toggle;               /* used to latch hi-lo scroll */
+	s32                         m_tilecount;            /* MMC5 can change attributes to subsets of the 34 visible tiles */
 	latch_delegate              m_latch;
 
-	uint8_t readbyte(offs_t address);
+	u16                         m_spriteramsize;
 
-	uint32_t m_nespens[0x40*8];
+	u8 readbyte(offs_t address);
+
+	void ppu2c0x(address_map &map) ATTR_COLD;
 
 private:
-	inline void writebyte(offs_t address, uint8_t data);
-	inline uint16_t apply_grayscale_and_emphasis(uint8_t color);
-
+	inline void writebyte(offs_t address, u8 data);
+	inline u16 apply_grayscale_and_emphasis(u8 color);
 
 	scanline_delegate           m_scanline_callback_proc;   /* optional scanline callback */
 	hblank_delegate             m_hblank_callback_proc; /* optional hblank callback */
 	vidaccess_delegate          m_vidaccess_callback_proc;  /* optional video access callback */
 	devcb_write_line            m_int_callback;         /* nmi access callback from interface */
 
-	int                         m_refresh_latch;        /* refresh-related */
-	int                         m_add;              /* vram increment amount */
-	int                         m_videomem_addr;        /* videomem address pointer */
-	int                         m_data_latch;           /* latched videomem data */
-	int                         m_buffered_data;
-	int                         m_sprite_page;          /* current sprite page */
-	int                         m_scan_scale;           /* scan scale */
-	int                         m_draw_phase;           /* MMC5 uses different regs for BG and OAM */
+	s32                         m_refresh_latch;        /* refresh-related */
+	s32                         m_add;              /* vram increment amount */
+	u32                         m_videomem_addr;        /* videomem address pointer */
+	u8                          m_data_latch;           /* latched videomem data */
+	u8                          m_buffered_data;
+	u32                         m_sprite_page;          /* current sprite page */
+	s32                         m_scan_scale;           /* scan scale */
+	s32                         m_draw_phase;           /* MMC5 uses different regs for BG and OAM */
 
 	// timers
 	emu_timer                   *m_hblank_timer;        /* hblank period at end of each scanline */
@@ -246,79 +251,81 @@ private:
 
 class ppu2c0x_rgb_device : public ppu2c0x_device {
 protected:
-	ppu2c0x_rgb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
+	ppu2c0x_rgb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock = 0);
 
 	virtual void init_palette_tables() override;
 
 private:
-	required_region_ptr<uint8_t> m_palette_data;
+	required_region_ptr<u8> m_palette_data;
 };
 
 class ppu2c02_device : public ppu2c0x_device {
 public:
-	ppu2c02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ppu2c02_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 class ppu2c03b_device : public ppu2c0x_rgb_device {
 public:
-	ppu2c03b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ppu2c03b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 class ppu2c04_device : public ppu2c0x_rgb_device {
 public:
-	ppu2c04_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ppu2c04_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 class ppu2c07_device : public ppu2c0x_device {
 public:
-	ppu2c07_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ppu2c07_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 class ppupalc_device : public ppu2c0x_device {
 public:
-	ppupalc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ppupalc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 class ppu2c05_01_device : public ppu2c0x_rgb_device {
 public:
-	ppu2c05_01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ppu2c05_01_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 class ppu2c05_02_device : public ppu2c0x_rgb_device {
 public:
-	ppu2c05_02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ppu2c05_02_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 class ppu2c05_03_device : public ppu2c0x_rgb_device {
 public:
-	ppu2c05_03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ppu2c05_03_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 class ppu2c05_04_device : public ppu2c0x_rgb_device {
 public:
-	ppu2c05_04_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ppu2c05_04_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 };
 
 class ppu2c04_clone_device : public ppu2c0x_device {
 public:
-	ppu2c04_clone_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	ppu2c04_clone_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	virtual uint8_t read(offs_t offset) override;
-	virtual void write(offs_t offset, uint8_t data) override;
-
-	virtual void draw_background(uint8_t *line_priority) override;
-	virtual void draw_sprite_pixel(int sprite_xpos, int color, int pixel, uint8_t pixel_data, bitmap_rgb32 &bitmap) override;
-	virtual void draw_sprites(uint8_t *line_priority) override;
-
-	virtual void init_palette_tables() override;
+	virtual u8 read(offs_t offset) override;
+	virtual void write(offs_t offset, u8 data) override;
 
 protected:
 	virtual void device_start() override ATTR_COLD;
 
-private:
-	required_region_ptr<uint8_t> m_palette_data;
+	virtual u32 palette_entries() const noexcept override { return 0x40 * 2; }
 
-	std::unique_ptr<uint8_t[]>   m_spritebuf; /* buffered sprite ram for next frame */
+	virtual void draw_background(u8 *line_priority) override;
+	virtual void draw_sprite_pixel(int sprite_xpos, int color, int pixel, u8 pixel_data, bitmap_rgb32 &bitmap) override;
+	virtual void draw_sprites(u8 *line_priority) override;
+
+	virtual void init_palette_tables() override;
+
+private:
+	required_region_ptr<u8> m_palette_data;
+
+	std::unique_ptr<u8[]>   m_spritebuf; /* buffered sprite ram for next frame */
 };
 
 // device type definition

@@ -273,7 +273,7 @@ int k053247_device::k053246_is_irq_enabled(void)
 template<class BitmapClass>
 void k053247_device::k053247_sprites_draw_common(BitmapClass &bitmap, const rectangle &cliprect)
 {
-#define NUM_SPRITES 256
+	static constexpr int NUM_SPRITES = 256;
 
 	int code, color, x, y, shadow, shdmask, count, temp, primask;
 
@@ -290,12 +290,11 @@ void k053247_device::k053247_sprites_draw_common(BitmapClass &bitmap, const rect
 
 	/*
 	    safeguard older drivers missing any of the following video attributes:
-
 	    VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS
 	*/
 	if (palette().shadows_enabled())
 	{
-		if (sizeof(typename BitmapClass::pixel_t) == 4 && (palette().hilights_enabled()))
+		if (sizeof(typename BitmapClass::pixel_t) == 4 && (palette().highlights_enabled()))
 			shdmask = 3; // enable all shadows and highlights
 		else
 			shdmask = 0; // enable default shadows
@@ -407,13 +406,8 @@ void k053247_device::k053247_sprites_draw_common(BitmapClass &bitmap, const rect
 				/* gx only */
 				0, 0, 0, 0,
 				/* non-gx only */
-				primask,shadow,drawmode_table,shadowmode_table,shdmask
-				);
-
-
-
+				primask,shadow,drawmode_table,shadowmode_table,shdmask);
 	} // end of sprite-list loop
-#undef NUM_SPRITES
 }
 
 void k053247_device::k053247_sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -441,445 +435,161 @@ void k053247_device::k053247_sprites_draw(bitmap_rgb32 &bitmap, const rectangle 
 
 void k053247_device::zdrawgfxzoom32GP(
 		bitmap_rgb32 &bitmap, const rectangle &cliprect,
-		u32 code, u32 color, int flipx, int flipy, int sx, int sy,
-		int scalex, int scaley, int alpha, int drawmode, int zcode, int pri, u8* gx_objzbuf, u8* gx_shdzbuf)
+		u32 code, u32 color, bool flipx, bool flipy, int sx, int sy,
+		int scalex, int scaley, int alpha, int drawmode, int zcode, u8 pri, u8* gx_objzbuf, u8* gx_shdzbuf)
 {
-#define FP     19
-#define FPONE  (1<<FP)
-#define FPHALF (1<<(FP-1))
-#define FPENT  0
+	constexpr u8 FP = 19; // 13.19 fixed point
 
-	// inner loop
-	const u8 *src_ptr;
-	int src_x;
-	int eax, ecx;
-	int src_fx, src_fdx;
-	int shdpen;
-	u8 z8 = 0, p8 = 0;
-	u8 *ozbuf_ptr;
-	u8 *szbuf_ptr;
-	const pen_t *pal_base;
-	const pen_t *shd_base;
-	u32 *dst_ptr;
-
-	// outter loop
-	int src_fby, src_fdy, src_fbx;
-	const u8 *src_base;
-	int dst_w, dst_h;
-
-	// one-time
-	int nozoom, granularity;
-	int src_fw, src_fh;
-	int dst_minx, dst_maxx, dst_miny, dst_maxy;
-	int dst_skipx, dst_skipy, dst_x, dst_y, dst_lastx, dst_lasty;
-	int src_pitch, dst_pitch;
-
-
-	// cull illegal and transparent objects
+	// cull objects with invalid scale
 	if (!scalex || !scaley) return;
 
 	// find shadow pens and cull invisible shadows
-	granularity = shdpen = m_gfx->granularity();
-	shdpen--;
+	const u16 granularity = m_gfx->granularity();
+	int shdpen = granularity - 1;
 
 	if (zcode >= 0)
 	{
-		if (drawmode == 5) { drawmode = 4; shdpen = 1; }
+		if (drawmode == 5)
+		{
+			drawmode = 4;
+			shdpen = 1;
+		}
 	}
-	else
-		if (drawmode >= 4) return;
+	else if (drawmode >= 4) return;
 
-	// alpha blend necessary?
+	// alpha blend check: cull if 0% opaque, or skip alpha blending if 100% opaque
 	if (drawmode & 2)
 	{
-		if (alpha <= 0) return;
-		if (alpha >= 255) drawmode &= ~2;
+		if (!alpha) return;
+		if (alpha == 255) drawmode &= ~2;
 	}
 
-	// fill internal data structure with default values
-	ozbuf_ptr  = gx_objzbuf;
-	szbuf_ptr  = gx_shdzbuf;
+	rectangle dst_rect = rectangle {sx, 0, sy, 0};
+	dst_rect.set_size(((scalex << 4) + 0x8000) >> 16, ((scaley << 4) + 0x8000) >> 16);
 
-	src_pitch = 16;
-	src_fw    = 16;
-	src_fh    = 16;
-	src_base  = m_gfx->get_data(code % m_gfx->elements());
+	// cull off-screen and zero height/width objects
+	if (dst_rect.left() > cliprect.right() || dst_rect.right() < cliprect.left()) return;
+	if (dst_rect.top() > cliprect.bottom() || dst_rect.bottom() < cliprect.top()) return;
+	if (!dst_rect.width() || !dst_rect.height()) return;
 
-	pal_base  = palette().pens() + m_gfx->colorbase() + (color % m_gfx->colors()) * granularity;
-	shd_base  = palette().shadow_table();
+	constexpr u8 src_size = 16;
+	const int src_stride_x = (src_size << FP) / dst_rect.width();
+	const int src_stride_y = (src_size << FP) / dst_rect.height();
 
-	dst_ptr   = &bitmap.pix(0);
-	dst_pitch = bitmap.rowpixels();
-	dst_minx  = cliprect.min_x;
-	dst_maxx  = cliprect.max_x;
-	dst_miny  = cliprect.min_y;
-	dst_maxy  = cliprect.max_y;
-	dst_x     = sx;
-	dst_y     = sy;
+	const int src_offset_x = std::max(cliprect.left() - dst_rect.left(), 0);
+	const int src_offset_y = std::max(cliprect.top() - dst_rect.top(), 0);
 
-	// cull off-screen objects
-	if (dst_x > dst_maxx || dst_y > dst_maxy) return;
-	nozoom = (scalex == 0x10000 && scaley == 0x10000);
-	if (nozoom)
+	const int src_base_x = src_offset_x * src_stride_x;
+	const int src_base_y = src_offset_y * src_stride_y;
+
+	// exclude dst_rect area outside cliprect
+	dst_rect &= cliprect;
+
+	// invert src x/y offsets if flip enabled
+	u8 flip_mask = 0;
+	if (flipx) flip_mask |= src_size - 1;
+	if (flipy) flip_mask |= (src_size - 1) << 4;
+
+	const int dst_pitch = bitmap.rowpixels();
+	u32 *dst_ptr = &bitmap.pix(0) + dst_rect.left() + dst_rect.top() * dst_pitch;
+
+	const u8 *src_base = m_gfx->get_data(code % m_gfx->elements());
+	const pen_t *pal_base = palette().pens() + m_gfx->colorbase() + (color % m_gfx->colors()) * granularity;
+
+	const int z_buffer_offset = (dst_rect.top() - cliprect.top()) * GX_ZBUFW + (dst_rect.left() - cliprect.left());
+	u8 *ozbuf_ptr = gx_objzbuf + z_buffer_offset;
+
+	const u8 z8 = (u8)zcode;
+
+	if (zcode < 0)
 	{
-		dst_h = dst_w = 16;
-		src_fdy = src_fdx = 1;
-	}
-	else
-	{
-		dst_w = ((scalex<<4)+0x8000)>>16;
-		dst_h = ((scaley<<4)+0x8000)>>16;
-		if (!dst_w || !dst_h) return;
+		// no shadow and z-buffering
 
-		src_fw <<= FP;
-		src_fh <<= FP;
-		src_fdx = src_fw / dst_w;
-		src_fdy = src_fh / dst_h;
-	}
-	dst_lastx = dst_x + dst_w - 1;
-	if (dst_lastx < dst_minx) return;
-	dst_lasty = dst_y + dst_h - 1;
-	if (dst_lasty < dst_miny) return;
-
-	// clip destination
-	dst_skipx = 0;
-	eax = dst_minx;  if ((eax -= dst_x) > 0) { dst_skipx = eax;  dst_w -= eax;  dst_x = dst_minx; }
-	eax = dst_lastx; if ((eax -= dst_maxx) > 0) dst_w -= eax;
-	dst_skipy = 0;
-	eax = dst_miny;  if ((eax -= dst_y) > 0) { dst_skipy = eax;  dst_h -= eax;  dst_y = dst_miny; }
-	eax = dst_lasty; if ((eax -= dst_maxy) > 0) dst_h -= eax;
-
-	// calculate zoom factors and clip source
-	if (nozoom)
-	{
-		if (!flipx) src_fbx = 0; else { src_fbx = src_fw - 1; src_fdx = -src_fdx; }
-		if (!flipy) src_fby = 0; else { src_fby = src_fh - 1; src_fdy = -src_fdy; src_pitch = -src_pitch; }
-	}
-	else
-	{
-		if (!flipx) src_fbx = FPENT; else { src_fbx = src_fw - FPENT - 1; src_fdx = -src_fdx; }
-		if (!flipy) src_fby = FPENT; else { src_fby = src_fh - FPENT - 1; src_fdy = -src_fdy; }
-	}
-	src_fbx += dst_skipx * src_fdx;
-	src_fby += dst_skipy * src_fdy;
-
-	// adjust insertion points and pre-entry constants
-	eax = (dst_y - dst_miny) * GX_ZBUFW + (dst_x - dst_minx) + dst_w;
-	z8 = (u8)zcode;
-	p8 = (u8)pri;
-	ozbuf_ptr += eax;
-	szbuf_ptr += eax << 1;
-	dst_ptr += dst_y * dst_pitch + dst_x + dst_w;
-	dst_w = -dst_w;
-
-	if (!nozoom)
-	{
-		ecx = src_fby;   src_fby += src_fdy;
-		ecx >>= FP;      src_fx = src_fbx;
-		src_x = src_fbx; src_fx += src_fdx;
-		ecx <<= 4;       src_ptr = src_base;
-		src_x >>= FP;    src_ptr += ecx;
-		ecx = dst_w;
-
-		if (zcode < 0) // no shadow and z-buffering
+		for (int y = 0; y < dst_rect.height(); ++y)
 		{
-			do {
-				do {
-					eax = src_ptr[src_x];
-					src_x = src_fx;
-					src_fx += src_fdx;
-					src_x >>= FP;
-					if (!eax || eax >= shdpen) continue;
-					dst_ptr [ecx] = pal_base[eax];
-				}
-				while (++ecx);
-
-				ecx = src_fby;   src_fby += src_fdy;
-				dst_ptr += dst_pitch;
-				ecx >>= FP;      src_fx = src_fbx;
-				src_x = src_fbx; src_fx += src_fdx;
-				ecx <<= 4;       src_ptr = src_base;
-				src_x >>= FP;    src_ptr += ecx;
-				ecx = dst_w;
-			}
-			while (--dst_h);
-		}
-		else
-		{
-			switch (drawmode)
+			for (int x = 0; x < dst_rect.width(); ++x)
 			{
-				case 0: // all pens solid
-					do {
-						do {
-							eax = src_ptr[src_x];
-							src_x = src_fx;
-							src_fx += src_fdx;
-							src_x >>= FP;
-							if (!eax || ozbuf_ptr[ecx] < z8) continue;
-							eax = pal_base[eax];
-							ozbuf_ptr[ecx] = z8;
-							dst_ptr [ecx] = eax;
-						}
-						while (++ecx);
-
-						ecx = src_fby;   src_fby += src_fdy;
-						ozbuf_ptr += GX_ZBUFW;
-						dst_ptr += dst_pitch;
-						ecx >>= FP;      src_fx = src_fbx;
-						src_x = src_fbx; src_fx += src_fdx;
-						ecx <<= 4;       src_ptr = src_base;
-						src_x >>= FP;    src_ptr += ecx;
-						ecx = dst_w;
-					}
-					while (--dst_h);
-					break;
-
-				case 1: // solid pens only
-					do {
-						do {
-							eax = src_ptr[src_x];
-							src_x = src_fx;
-							src_fx += src_fdx;
-							src_x >>= FP;
-							if (!eax || eax >= shdpen || ozbuf_ptr[ecx] < z8) continue;
-							eax = pal_base[eax];
-							ozbuf_ptr[ecx] = z8;
-							dst_ptr [ecx] = eax;
-						}
-						while (++ecx);
-
-						ecx = src_fby;   src_fby += src_fdy;
-						ozbuf_ptr += GX_ZBUFW;
-						dst_ptr += dst_pitch;
-						ecx >>= FP;      src_fx = src_fbx;
-						src_x = src_fbx; src_fx += src_fdx;
-						ecx <<= 4;       src_ptr = src_base;
-						src_x >>= FP;    src_ptr += ecx;
-						ecx = dst_w;
-					}
-					while (--dst_h);
-					break;
-
-				case 2: // all pens solid with alpha blending
-					do {
-						do {
-							eax = src_ptr[src_x];
-							src_x = src_fx;
-							src_fx += src_fdx;
-							src_x >>= FP;
-							if (!eax || ozbuf_ptr[ecx] < z8) continue;
-							ozbuf_ptr[ecx] = z8;
-
-							dst_ptr[ecx] = alpha_blend_r32(pal_base[eax], dst_ptr[ecx], alpha);
-						}
-						while (++ecx);
-
-						ecx = src_fby;   src_fby += src_fdy;
-						ozbuf_ptr += GX_ZBUFW;
-						dst_ptr += dst_pitch;
-						ecx >>= FP;      src_fx = src_fbx;
-						src_x = src_fbx; src_fx += src_fdx;
-						ecx <<= 4;       src_ptr = src_base;
-						src_x >>= FP;    src_ptr += ecx;
-						ecx = dst_w;
-					}
-					while (--dst_h);
-					break;
-
-				case 3: // solid pens only with alpha blending
-					do {
-						do {
-							eax = src_ptr[src_x];
-							src_x = src_fx;
-							src_fx += src_fdx;
-							src_x >>= FP;
-							if (!eax || eax >= shdpen || ozbuf_ptr[ecx] < z8) continue;
-							ozbuf_ptr[ecx] = z8;
-
-							dst_ptr[ecx] = alpha_blend_r32(pal_base[eax], dst_ptr[ecx], alpha);
-						}
-						while (++ecx);
-
-						ecx = src_fby;   src_fby += src_fdy;
-						ozbuf_ptr += GX_ZBUFW;
-						dst_ptr += dst_pitch;
-						ecx >>= FP;      src_fx = src_fbx;
-						src_x = src_fbx; src_fx += src_fdx;
-						ecx <<= 4;       src_ptr = src_base;
-						src_x >>= FP;    src_ptr += ecx;
-						ecx = dst_w;
-					}
-					while (--dst_h);
-					break;
-
-				case 4: // shadow pens only
-					do {
-						do {
-							eax = src_ptr[src_x];
-							src_x = src_fx;
-							src_fx += src_fdx;
-							src_x >>= FP;
-							if (eax < shdpen || szbuf_ptr[ecx*2] < z8 || szbuf_ptr[ecx*2+1] <= p8) continue;
-							rgb_t pix = dst_ptr[ecx];
-							szbuf_ptr[ecx*2] = z8;
-							szbuf_ptr[ecx*2+1] = p8;
-
-							// the shadow tables are 15-bit lookup tables which accept RGB15... lossy, nasty, yuck!
-							dst_ptr[ecx] = shd_base[pix.as_rgb15()];
-							//dst_ptr[ecx] =(eax>>3&0x001f);lend_r32(eax, 0x00000000, 128);
-						}
-						while (++ecx);
-
-						ecx = src_fby;   src_fby += src_fdy;
-						szbuf_ptr += (GX_ZBUFW<<1);
-						dst_ptr += dst_pitch;
-						ecx >>= FP;      src_fx = src_fbx;
-						src_x = src_fbx; src_fx += src_fdx;
-						ecx <<= 4;       src_ptr = src_base;
-						src_x >>= FP;    src_ptr += ecx;
-						ecx = dst_w;
-					}
-					while (--dst_h);
-					break;
-			}   // switch (drawmode)
-		}   // if (zcode < 0)
-	}   // if (!nozoom)
-	else
-	{
-		src_ptr = src_base + (src_fby<<4) + src_fbx;
-		src_fdy = src_fdx * dst_w + src_pitch;
-		ecx = dst_w;
-
-		if (zcode < 0) // no shadow and z-buffering
-		{
-			do {
-				do {
-					eax = *src_ptr;
-					src_ptr += src_fdx;
-					if (!eax || eax >= shdpen) continue;
-					dst_ptr[ecx] = pal_base[eax];
-				}
-				while (++ecx);
-
-				src_ptr += src_fdy;
-				dst_ptr += dst_pitch;
-				ecx = dst_w;
-			}
-			while (--dst_h);
-		}
-		else
-		{
-			switch (drawmode)
-			{
-				case 0: // all pens solid
-					do {
-						do {
-							eax = *src_ptr;
-							src_ptr += src_fdx;
-							if (!eax || ozbuf_ptr[ecx] < z8) continue;
-							eax = pal_base[eax];
-							ozbuf_ptr[ecx] = z8;
-							dst_ptr[ecx] = eax;
-						}
-						while (++ecx);
-
-						src_ptr += src_fdy;
-						ozbuf_ptr += GX_ZBUFW;
-						dst_ptr += dst_pitch;
-						ecx = dst_w;
-					}
-					while (--dst_h);
-					break;
-
-				case 1:  // solid pens only
-					do {
-						do {
-							eax = *src_ptr;
-							src_ptr += src_fdx;
-							if (!eax || eax >= shdpen || ozbuf_ptr[ecx] < z8) continue;
-							eax = pal_base[eax];
-							ozbuf_ptr[ecx] = z8;
-							dst_ptr[ecx] = eax;
-						}
-						while (++ecx);
-
-						src_ptr += src_fdy;
-						ozbuf_ptr += GX_ZBUFW;
-						dst_ptr += dst_pitch;
-						ecx = dst_w;
-					}
-					while (--dst_h);
-					break;
-
-				case 2: // all pens solid with alpha blending
-					do {
-						do {
-							eax = *src_ptr;
-							src_ptr += src_fdx;
-							if (!eax || ozbuf_ptr[ecx] < z8) continue;
-							ozbuf_ptr[ecx] = z8;
-
-							dst_ptr[ecx] = alpha_blend_r32(pal_base[eax], dst_ptr[ecx], alpha);
-						}
-						while (++ecx);
-
-						src_ptr += src_fdy;
-						ozbuf_ptr += GX_ZBUFW;
-						dst_ptr += dst_pitch;
-						ecx = dst_w;
-					}
-					while (--dst_h);
-					break;
-
-				case 3: // solid pens only with alpha blending
-					do {
-						do {
-							eax = *src_ptr;
-							src_ptr += src_fdx;
-							if (!eax || eax >= shdpen || ozbuf_ptr[ecx] < z8) continue;
-							ozbuf_ptr[ecx] = z8;
-
-							dst_ptr[ecx] = alpha_blend_r32(pal_base[eax], dst_ptr[ecx], alpha);
-						}
-						while (++ecx);
-
-						src_ptr += src_fdy;
-						ozbuf_ptr += GX_ZBUFW;
-						dst_ptr += dst_pitch;
-						ecx = dst_w;
-					}
-					while (--dst_h);
-					break;
-
-				case 4: // shadow pens only
-					do {
-						do {
-							eax = *src_ptr;
-							src_ptr += src_fdx;
-							if (eax < shdpen || szbuf_ptr[ecx*2] < z8 || szbuf_ptr[ecx*2+1] <= p8) continue;
-							rgb_t pix = dst_ptr[ecx];
-							szbuf_ptr[ecx*2] = z8;
-							szbuf_ptr[ecx*2+1] = p8;
-
-							// the shadow tables are 15-bit lookup tables which accept RGB15... lossy, nasty, yuck!
-							dst_ptr[ecx] = shd_base[pix.as_rgb15()];
-						}
-						while (++ecx);
-
-						src_ptr += src_fdy;
-						szbuf_ptr += (GX_ZBUFW<<1);
-						dst_ptr += dst_pitch;
-						ecx = dst_w;
-					}
-					while (--dst_h);
-					break;
+				const int x_off = (src_base_x + x * src_stride_x) >> FP;
+				const int y_off = (src_base_y + y * src_stride_y) >> FP;
+				const u8 pal_idx = src_base[(x_off + y_off * 16) ^ flip_mask];
+				if (!pal_idx || pal_idx >= shdpen) continue;
+				ozbuf_ptr[x + y * GX_ZBUFW] = z8;
+				dst_ptr[x + y * dst_pitch] = pal_base[pal_idx];
 			}
 		}
 	}
-#undef FP
-#undef FPONE
-#undef FPHALF
-#undef FPENT
+	else if (drawmode < 4)
+	{
+		// 0: all pens solid
+		// 1: solid pens only
+		// 2: all pens solid with alpha blending
+		// 3: solid pens only with alpha blending
+
+		for (int y = 0; y < dst_rect.height(); ++y)
+		{
+			for (int x = 0; x < dst_rect.width(); ++x)
+			{
+				const int x_off = (src_base_x + x * src_stride_x) >> FP;
+				const int y_off = (src_base_y + y * src_stride_y) >> FP;
+				const u8 pal_idx = src_base[(x_off + y_off * 16) ^ flip_mask];
+				if (!pal_idx || (drawmode & 0b01 && pal_idx >= shdpen) || ozbuf_ptr[x + y * GX_ZBUFW] < z8) continue;
+				ozbuf_ptr[x + y * GX_ZBUFW] = z8;
+
+				if ((drawmode & 0b10) == 0) // solid sprite
+				{
+					dst_ptr[x + y * dst_pitch] = pal_base[pal_idx];
+				}
+				else // alpha blended sprite
+				{
+					const u8 alpha_level = alpha;
+					const bool additive_mode = alpha & (1 << 8);
+					// mix_pri flips src & dst
+					// todo: find a game that exhibits this behavior
+					// const bool mix_pri = alpha & (1 << 9);
+
+					const u32 src = pal_base[pal_idx];
+					const u32 dst = dst_ptr[x + y * dst_pitch];
+
+					if (additive_mode)
+					{
+						// todo: improve additive blend calculation
+						const u32 temp = alpha_blend_r32(src, 0, alpha_level);
+						dst_ptr[x + y * dst_pitch] = add_blend_r32(dst, temp);
+					}
+					else
+					{
+						dst_ptr[x + y * dst_pitch] = alpha_blend_r32(dst, src, alpha_level);
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+		// 4: shadow pens only
+
+		const pen_t *shd_base = palette().shadow_table();
+		u8 *szbuf_ptr = gx_shdzbuf + z_buffer_offset * 2;
+
+		for (int y = 0; y < dst_rect.height(); ++y)
+		{
+			for (int x = 0; x < dst_rect.width(); ++x)
+			{
+				const int x_off = (src_base_x + x * src_stride_x) >> FP;
+				const int y_off = (src_base_y + y * src_stride_y) >> FP;
+				const u8 pal_idx = src_base[(x_off + y_off * 16) ^ flip_mask];
+				const int szbuf_offset = x * 2 + y * GX_ZBUFW * 2;
+				if (pal_idx < shdpen || szbuf_ptr[szbuf_offset] < z8 || szbuf_ptr[szbuf_offset + 1] <= pri) continue;
+				szbuf_ptr[szbuf_offset] = z8;
+				szbuf_ptr[szbuf_offset + 1] = pri;
+
+				rgb_t pix = dst_ptr[x + y * dst_pitch];
+				// the shadow tables are 15-bit lookup tables which accept RGB15... lossy, nasty, yuck!
+				dst_ptr[x + y * dst_pitch] = shd_base[pix.as_rgb15()];
+				//dst_ptr[ecx] =(eax>>3&0x001f);lend_r32(eax, 0x00000000, 128);
+			}
+		}
+	}
 }
 
 
@@ -984,8 +694,8 @@ void k055673_device::device_start()
 	switch (m_bpp)
 	{
 		case K055673_LAYOUT_GX:
-			size4 = (m_gfxrom.length()/(1024*1024))/5;
-			size4 *= 4*1024*1024;
+			size4 = (m_gfxrom.length() / 0x100000) / 5;
+			size4 *= 0x400000;
 			/* set the # of tiles based on the 4bpp section */
 			m_combined_gfx = std::make_unique<u16[]>(size4 * 5 / 2);
 			alt_k055673_rom = m_combined_gfx.get();
@@ -1113,7 +823,7 @@ void k053247_device::device_start()
 	{
 		if (screen().format() == BITMAP_FORMAT_RGB32)
 		{
-			if (!palette().shadows_enabled() || !palette().hilights_enabled())
+			if (!palette().shadows_enabled() || !palette().highlights_enabled())
 				popmessage("driver missing SHADOWS or HIGHLIGHTS flag");
 		}
 		else

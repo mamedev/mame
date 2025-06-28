@@ -204,7 +204,6 @@ public:
 	void show_menu();
 	virtual bool is_menu_active() override;
 	bool can_paste();
-	bool found_machine_warnings() const { return m_has_warnings; }
 	void image_handler_ingame();
 	void request_quit();
 	void set_pointer_activity_timeout(int target, std::chrono::steady_clock::duration timeout) noexcept;
@@ -314,7 +313,6 @@ private:
 	ui_options              m_ui_options;
 	ui_colors               m_ui_colors;
 	float                   m_target_font_height;
-	bool                    m_has_warnings;
 	bool                    m_unthrottle_mute;
 	bool                    m_image_display_enabled;
 
@@ -349,9 +347,10 @@ private:
 
 	// slider controls
 	int32_t slider_volume(std::string *str, int32_t newval);
-	int32_t slider_mixervol(int item, std::string *str, int32_t newval);
-	int32_t slider_panning(speaker_device &speaker, std::string *str, int32_t newval);
+	int32_t slider_devvol(device_sound_interface *snd, std::string *str, int32_t newval);
+	int32_t slider_devvol_chan(device_sound_interface *snd, int channel, std::string *str, int32_t newval);
 	int32_t slider_adjuster(ioport_field &field, std::string *str, int32_t newval);
+	int32_t slider_speed(std::string *str, int32_t newval);
 	int32_t slider_overclock(device_t &device, std::string *str, int32_t newval);
 	int32_t slider_refresh(screen_device &screen, std::string *str, int32_t newval);
 	int32_t slider_brightness(screen_device &screen, std::string *str, int32_t newval);

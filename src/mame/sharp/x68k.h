@@ -167,22 +167,13 @@ protected:
 	struct
 	{
 		uint8_t irqstatus = 0;
-		uint8_t fdcvector = 0;
-		uint8_t fddvector = 0;
-		uint8_t hdcvector = 0;
-		uint8_t prnvector = 0;
+		uint8_t vector = 0;
 	} m_ioc;
 	uint8_t m_ppi_portc = 0;
-	bool m_dmac_int = false;
-	bool m_mfp_int = false;
-	bool m_scc_int = false;
 	bool m_exp_irq2[2]{};
 	bool m_exp_irq4[2]{};
-	bool m_exp_nmi[2]{};
-	uint8_t m_current_ipl = 0;
 	int m_led_state = 0;
 	emu_timer* m_led_timer = nullptr;
-	unsigned char m_scc_prev = 0;
 	emu_timer* m_fdc_tc = nullptr;
 	emu_timer* m_adpcm_timer = nullptr;
 	emu_timer* m_bus_error_timer = nullptr;
@@ -209,13 +200,12 @@ protected:
 	uint8_t ppi_port_b_r();
 	uint8_t ppi_port_c_r();
 	void ppi_port_c_w(uint8_t data);
-	void fdc_irq(int state);
 	void ct_w(uint8_t data);
 	void adpcm_w(offs_t offset, uint8_t data);
-	void mfp_irq_callback(int state);
+
+	template <unsigned N> void ioc_irq(int state);
 
 	//dmac
-	void dma_irq(int state);
 	void dma_end(offs_t offset, uint8_t data);
 
 	void set_adpcm();
@@ -223,12 +213,11 @@ protected:
 	void fm_irq(int state);
 	template <int N> void irq2_line(int state);
 	template <int N> void irq4_line(int state);
-	template <int N> void nmi_line(int state);
 
 	void fdc_w(offs_t offset, uint16_t data);
 	uint16_t fdc_r(offs_t offset);
-	void ioc_w(offs_t offset, uint16_t data);
-	uint16_t ioc_r(offs_t offset);
+	void ioc_w(offs_t offset, uint8_t data);
+	uint8_t ioc_r(offs_t offset);
 	void sysport_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t sysport_r(offs_t offset);
 	void ppi_w(offs_t offset, uint16_t data);
@@ -256,11 +245,9 @@ protected:
 	uint16_t gvram_read(offs_t offset);
 	void gvram_write(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	void update_ipl();
 	uint8_t iack1();
 	uint8_t iack2();
 	uint8_t iack4();
-	uint8_t iack5();
 
 	void x68k_base_map(address_map &map) ATTR_COLD;
 	void x68k_map(address_map &map) ATTR_COLD;
@@ -300,7 +287,6 @@ public:
 	virtual void driver_start() override;
 
 protected:
-	void scsi_irq(int state);
 	void scsi_unknown_w(uint8_t data);
 
 	required_device<mb89352_device> m_scsictrl;

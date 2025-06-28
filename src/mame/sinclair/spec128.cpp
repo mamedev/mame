@@ -153,17 +153,17 @@ resulting mess can be seen in the F4 viewer display.
 #include "emu.h"
 #include "spec128.h"
 
+#include "bus/spectrum/ay/slot.h"
 #include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
 
 #include "screen.h"
 
 #include "formats/tzx_cas.h"
 
 
-/****************************************************************************************************/
-/* Spectrum 128 specific functions */
-
+/****************************************************************************
+ * Spectrum 128 specific functions
+ ****************************************************************************/
 void spectrum_128_state::video_start()
 {
 	spectrum_state::video_start();
@@ -180,7 +180,7 @@ uint8_t spectrum_128_state::spectrum_128_pre_opcode_fetch_r(offs_t offset)
 	   enable paged ROM and then fetches at 0700 to disable it
 	*/
 	m_exp->pre_opcode_fetch(offset);
-	uint8_t retval = m_maincpu->space(AS_PROGRAM).read_byte(offset);
+	uint8_t retval = m_program.read_byte(offset);
 	m_exp->post_opcode_fetch(offset);
 	return retval;
 }
@@ -205,6 +205,7 @@ template <u8 Bank> void spectrum_128_state::spectrum_128_ram_w(offs_t offset, u8
 
 	((u8*)m_bank_ram[Bank]->base())[offset] = data;
 }
+
 // Base 128 models typically don't share RAM in bank0. Reserved for extension in 256+.
 template void spectrum_128_state::spectrum_128_ram_w<0>(offs_t offset, u8 data);
 
@@ -216,23 +217,22 @@ template <u8 Bank> u8 spectrum_128_state::spectrum_128_ram_r(offs_t offset)
 	return ((u8*)m_bank_ram[Bank]->base())[offset];
 }
 
+// D0-D2: RAM page located at 0x0c000-0x0ffff
+//    D3: Screen select (screen 0 in ram page 5, screen 1 in ram page 7
+//    D4: ROM select - which rom paged into 0x0000-0x03fff
+//    D5: Disable paging
 void spectrum_128_state::spectrum_128_port_7ffd_w(offs_t offset, uint8_t data)
 {
 	if (is_contended(offset)) content_early();
 	content_early(1);
 
-	/* D0-D2: RAM page located at 0x0c000-0x0ffff */
-	/* D3 - Screen select (screen 0 in ram page 5, screen 1 in ram page 7 */
-	/* D4 - ROM select - which rom paged into 0x0000-0x03fff */
-	/* D5 - Disable paging */
-
-	/* disable paging? */
+	// disable paging?
 	if (m_port_7ffd_data & 0x20) return;
 
-	/* store new state */
+	// store new state
 	m_port_7ffd_data = data;
 
-	/* update memory */
+	// update memory
 	spectrum_128_update_memory();
 
 	m_exp->iorq_w(offset | 1, data);
@@ -241,7 +241,7 @@ void spectrum_128_state::spectrum_128_port_7ffd_w(offs_t offset, uint8_t data)
 void spectrum_128_state::spectrum_128_update_memory()
 {
 	m_bank_rom[0]->set_entry(BIT(m_port_7ffd_data, 4));
-	/* select ram at 0x0c000-0x0ffff */
+	// select ram at 0x0c000-0x0ffff
 	m_bank_ram[3]->set_entry(m_port_7ffd_data & 0x07);
 
 	m_screen->update_now();
@@ -271,8 +271,8 @@ void spectrum_128_state::spectrum_128_io(address_map &map)
 	map(0x0000, 0x0000).select(0xfffe).rw(FUNC(spectrum_128_state::spectrum_ula_r), FUNC(spectrum_128_state::spectrum_ula_w));
 	map(0x0001, 0x0001).select(0xfffe).rw(FUNC(spectrum_128_state::spectrum_port_r), FUNC(spectrum_128_state::spectrum_port_w));
 	map(0x0001, 0x0001).select(0x7ffc).w(FUNC(spectrum_128_state::spectrum_128_port_7ffd_w));   // (A15 | A1) == 0, note: reading from this port does write to it by value from data bus
-	map(0x8000, 0x8000).mirror(0x3ffd).w("ay8912", FUNC(ay8910_device::data_w));
-	map(0xc000, 0xc000).mirror(0x3ffd).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
+	map(0x8000, 0x8000).mirror(0x3ffd).w("ay_slot", FUNC(ay_slot_device::data_w));
+	map(0xc000, 0xc000).mirror(0x3ffd).rw("ay_slot", FUNC(ay_slot_device::data_r), FUNC(ay_slot_device::address_w));
 }
 
 void spectrum_128_state::spectrum_128_mem(address_map &map)
@@ -288,13 +288,74 @@ void spectrum_128_state::spectrum_128_fetch(address_map &map)
 	map(0x0000, 0xffff).r(FUNC(spectrum_128_state::spectrum_128_pre_opcode_fetch_r));
 }
 
+static INPUT_PORTS_START( spec_plus_joys )
+	PORT_START("JOY2") // 0xF7FE
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_8WAY PORT_PLAYER(2) PORT_CODE(JOYCODE_X_LEFT_SWITCH)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_8WAY PORT_PLAYER(2) PORT_CODE(JOYCODE_X_RIGHT_SWITCH)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_8WAY PORT_PLAYER(2) PORT_CODE(JOYCODE_Y_DOWN_SWITCH)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_8WAY PORT_PLAYER(2) PORT_CODE(JOYCODE_Y_UP_SWITCH)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_PLAYER(2) PORT_CODE(JOYCODE_BUTTON1)
+
+	PORT_START("JOY1") // 0xEFFE
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1)        PORT_PLAYER(1) PORT_CODE(JOYCODE_BUTTON1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)    PORT_8WAY PORT_PLAYER(1) PORT_CODE(JOYCODE_Y_UP_SWITCH)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN)  PORT_8WAY PORT_PLAYER(1) PORT_CODE(JOYCODE_Y_DOWN_SWITCH)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_8WAY PORT_PLAYER(1) PORT_CODE(JOYCODE_X_RIGHT_SWITCH)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT)  PORT_8WAY PORT_PLAYER(1) PORT_CODE(JOYCODE_X_LEFT_SWITCH)
+INPUT_PORTS_END
+
+/* These keys need not to be mapped in natural mode because Spectrum+ supports both these and the Spectrum sequences above.
+   Hence, we can simply keep using such sequences in natural keyboard emulation */
+INPUT_PORTS_START( spec128 )
+	PORT_INCLUDE( spectrum )
+
+	PORT_START("PLUS0") // Spectrum+ Keys (Same as CAPS + 1-5)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("EDIT") PORT_CODE(KEYCODE_INSERT)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CAPS LOCK") PORT_CODE(KEYCODE_CAPSLOCK)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("TRUE VID") PORT_CODE(KEYCODE_HOME)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("INV VID") PORT_CODE(KEYCODE_END)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Cursor Left") PORT_CODE(KEYCODE_LEFT)
+	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("PLUS1") // Spectrum+ Keys (Same as CAPS + 6-0)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DEL") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("GRAPH") PORT_CODE(KEYCODE_LALT)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Cursor Right") PORT_CODE(KEYCODE_RIGHT)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Cursor Up") PORT_CODE(KEYCODE_UP)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Cursor Down") PORT_CODE(KEYCODE_DOWN)
+	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("PLUS2") // Spectrum+ Keys (Same as CAPS + SPACE and CAPS + SYMBOL)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("BREAK") PORT_CODE(KEYCODE_PAUSE)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("EXT MODE") PORT_CODE(KEYCODE_LCONTROL)
+	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("PLUS3") // Spectrum+ Keys (Same as SYMBOL SHIFT + O/P)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("\"") PORT_CODE(KEYCODE_QUOTE)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(";") PORT_CODE(KEYCODE_COLON)
+	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("PLUS4") // Spectrum+ Keys (Same as SYMBOL SHIFT + N/M)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(".") PORT_CODE(KEYCODE_STOP)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(",") PORT_CODE(KEYCODE_COMMA)
+	PORT_BIT(0xf3, IP_ACTIVE_LOW, IPT_UNUSED)
+INPUT_PORTS_END
+
+INPUT_PORTS_START( spec_plus )
+	PORT_INCLUDE( spec128 )
+	PORT_INCLUDE( spec_plus_joys )
+INPUT_PORTS_END
+
 void spectrum_128_state::machine_start()
 {
 	spectrum_state::machine_start();
 
 	save_item(NAME(m_port_7ffd_data));
 
-	/* rom 0 is 128K rom, rom 1 is 48 BASIC */
+	m_maincpu->space(AS_PROGRAM).specific(m_program);
+	m_maincpu->space(AS_IO).specific(m_io);
+
+	// rom 0 is 128K rom, rom 1 is 48 BASIC
 	memory_region *rom = memregion("maincpu");
 	m_bank_rom[0]->configure_entries(0, 2, rom->base() + 0x10000, 0x4000);
 
@@ -302,15 +363,15 @@ void spectrum_128_state::machine_start()
 	for (auto i = 1; i < 4; i++)
 		m_bank_ram[i]->configure_entries(0, ram_entries, m_ram->pointer(), 0x4000);
 
-	m_bank_ram[1]->set_entry(ram_entries > 5 ? 5 : (ram_entries - 1)); /* Bank 5 is always in 0x4000 - 0x7fff */
-	m_bank_ram[2]->set_entry(2); /* Bank 2 is always in 0x8000 - 0xbfff */
+	m_bank_ram[1]->set_entry(ram_entries > 5 ? 5 : (ram_entries - 1)); // Bank 5 is always in 0x4000 - 0x7fff
+	m_bank_ram[2]->set_entry(2); // Bank 2 is always in 0x8000 - 0xbfff
 }
 
 void spectrum_128_state::machine_reset()
 {
 	spectrum_state::machine_reset();
 
-	/* set initial ram config */
+	// set initial ram config
 	m_port_7ffd_data = 0;
 	spectrum_128_update_memory();
 }
@@ -329,13 +390,13 @@ bool spectrum_128_state::is_contended(offs_t offset) {
 
 static const gfx_layout spectrum_charlayout =
 {
-	8, 8,           /* 8 x 8 characters */
-	96,             /* 96 characters */
-	1,              /* 1 bits per pixel */
-	{ 0 },          /* no bitplanes */
-	{STEP8(0, 1)},  /* x offsets */
-	{STEP8(0, 8)},  /* y offsets */
-	8*8             /* every char takes 8 bytes */
+	8, 8,           // 8 x 8 characters
+	96,             // 96 characters
+	1,              // 1 bits per pixel
+	{ 0 },          // no bitplanes
+	{STEP8(0, 1)},  // x offsets
+	{STEP8(0, 8)},  // y offsets
+	8*8             // every char takes 8 bytes
 };
 
 static GFXDECODE_START( spec128 )
@@ -361,23 +422,24 @@ void spectrum_128_state::spectrum_128(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(60));
 
-	/* video hardware */
+	// video hardware
 	rectangle visarea = { get_screen_area().left() - SPEC_LEFT_BORDER, get_screen_area().right() + SPEC_RIGHT_BORDER,
 		get_screen_area().top() - SPEC_TOP_BORDER, get_screen_area().bottom() + SPEC_BOTTOM_BORDER };
 	m_screen->set_raw(X1_128_SINCLAIR / 5, SPEC128_CYCLES_PER_LINE * 2, SPEC128_UNSEEN_LINES + SPEC_SCREEN_HEIGHT, visarea);
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(spec128);
 
-	/* sound hardware */
-	AY8912(config, "ay8912", X1_128_SINCLAIR / 20).add_route(ALL_OUTPUTS, "mono", 0.25);
+	// sound hardware
+	AY_SLOT(config, "ay_slot", X1_128_SINCLAIR / 20, default_ay_slot_devices, "ay_ay8912")
+		.add_route(ALL_OUTPUTS, "mono", 0.25);
 
-	/* expansion port */
+	// expansion port
 	SPECTRUM_EXPANSION_SLOT(config.replace(), m_exp, spec128_expansion_devices, nullptr);
 	m_exp->irq_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_exp->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_exp->fb_r_handler().set(FUNC(spectrum_128_state::floating_bus_r));
 
-	/* internal ram */
+	// internal ram
 	m_ram->set_default_size("128K");
 }
 

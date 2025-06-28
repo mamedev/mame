@@ -61,7 +61,7 @@ public:
 	void set_machine(running_machine *machine);
 	std::vector<std::string> const &get_menu() { return m_menu; }
 	void attach_notifiers();
-	void on_sound_update();
+	void on_sound_update(const std::map<std::string, std::vector<std::pair<const sound_stream::sample_t *, int>>> &sound);
 	void on_periodic();
 	bool on_missing_mandatory_image(const std::string &instance_name);
 	void on_machine_before_load_settings();
@@ -199,7 +199,7 @@ private:
 	void resume(s32 param);
 	void register_function(sol::function func, const char *id);
 	template <typename T> size_t enumerate_functions(const char *id, T &&callback);
-	bool execute_function(const char *id);
+	template <typename... Params> bool execute_function(const char *id, Params&&... args);
 	sol::object call_plugin(const std::string &name, sol::object in);
 
 	void close();

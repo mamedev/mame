@@ -459,17 +459,16 @@ void cdi_state::cdimono1_base(machine_config &config)
 	m_slave_hle->int_callback().set(m_maincpu, FUNC(scc68070_device::in2_w));
 
 	CDROM(config, m_cdrom);
-	m_cdrom->set_interface("cdi_cdrom");
+	m_cdrom->set_interface("cdrom");
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DMADAC(config, m_dmadac[0]);
-	m_dmadac[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_dmadac[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 
 	DMADAC(config, m_dmadac[1]);
-	m_dmadac[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_dmadac[1]->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 	MK48T08(config, "mk48t08");
 }
@@ -503,18 +502,18 @@ void cdi_state::cdimono2(machine_config &config)
 	M68HC05C8(config, m_servo, 4_MHz_XTAL);
 	M68HC05C8(config, m_slave, 4_MHz_XTAL);
 
-	CDROM(config, m_cdrom).set_interface("cdi_cdrom");
+	CDROM(config, m_cdrom).set_interface("cdrom");
 	SOFTWARE_LIST(config, "cd_list").set_original("cdi").set_filter("!DVC");
+	SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DMADAC(config, m_dmadac[0]);
-	m_dmadac[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_dmadac[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 
 	DMADAC(config, m_dmadac[1]);
-	m_dmadac[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_dmadac[1]->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 	MK48T08(config, "mk48t08");
 }
@@ -547,18 +546,18 @@ void cdi_state::cdi910(machine_config &config)
 	M68HC05C8(config, m_servo, 4_MHz_XTAL);
 	M68HC05C8(config, m_slave, 4_MHz_XTAL);
 
-	CDROM(config, "cdrom").set_interface("cdi_cdrom");
+	CDROM(config, "cdrom").set_interface("cdrom");
 	SOFTWARE_LIST(config, "cd_list").set_original("cdi").set_filter("!DVC");
+	SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DMADAC(config, m_dmadac[0]);
-	m_dmadac[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	m_dmadac[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 
 	DMADAC(config, m_dmadac[1]);
-	m_dmadac[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_dmadac[1]->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 	MK48T08(config, "mk48t08");
 }
@@ -573,6 +572,7 @@ void cdi_state::cdimono1(machine_config &config)
 	m_slave_hle->read_mousebtn().set_ioport("MOUSEBTN");
 
 	SOFTWARE_LIST(config, "cd_list").set_original("cdi").set_filter("!DVC");
+	SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");
 }
 
 void quizard_state::quizard(machine_config &config)
@@ -674,6 +674,11 @@ ROM_START( cdi490a )
 	// Philips CD-i - DVC card 22ER9141
 	ROM_LOAD16_BYTE( "fmv ffd9 p7308 r4.1 vmpeg.bin", 0x40000, 0x10000, CRC(30ba9273) SHA1(d8adca0627b356ced6131b9458ac1175e43e6548) )
 	ROM_LOAD16_BYTE( "fmv 4ba9 p7307 r4.1 vmpeg.bin", 0x40001, 0x10000, CRC(623edb1f) SHA1(4c6b11e28ad4c2f5c2e439f7910a783e0a79d1a9) )
+ROM_END
+
+ROM_START( gpi1200 )
+	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_LOAD16_WORD_SWAP( "gpi-1200k-1313.bin", 0x000000, 0x80000, CRC(dbd41615) SHA1(83929617a5c01551ee961aeb685295fcc0810f54) )
 ROM_END
 
 ROM_START( cdibios ) // for the quizard sets
@@ -906,6 +911,7 @@ CONS( 1991, cdimono1, 0,      0,      cdimono1, cdi,      cdi_state, empty_init,
 CONS( 1991, cdimono2, 0,      0,      cdimono2, cdimono2, cdi_state, empty_init, "Philips",    "CD-i (Mono-II) (NTSC)",   MACHINE_NOT_WORKING )
 CONS( 1991, cdi910,   0,      0,      cdi910,   cdimono2, cdi_state, empty_init, "Philips",    "CD-i 910-17P Mini-MMC (PAL)",   MACHINE_NOT_WORKING )
 CONS( 1991, cdi490a,  0,      0,      cdimono1, cdi,      cdi_state, empty_init, "Philips",    "CD-i 490",   MACHINE_NOT_WORKING )
+CONS( 1995, gpi1200,  0,      0,      cdimono1, cdi,      cdi_state, empty_init, "Goldstar",   "GPi 1200",   MACHINE_NOT_WORKING )
 
 // The Quizard games are retail CD-i units in a cabinet, with an additional JAMMA adapter and dongle for protection, hence being clones of the system.
 /*    YEAR  NAME         PARENT    MACHINE        INPUT     DEVICE          INIT         MONITOR     COMPANY         FULLNAME */

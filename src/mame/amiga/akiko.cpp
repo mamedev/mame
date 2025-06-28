@@ -55,8 +55,8 @@ void akiko_device::device_add_mconfig(machine_config &config)
 {
 	CDROM(config, m_cdrom).set_interface("cdrom");
 	CDDA(config, m_cdda);
-	m_cdda->add_route(0, ":lspeaker", 0.50);
-	m_cdda->add_route(1, ":rspeaker", 0.50);
+	m_cdda->add_route(0, ":speaker", 0.50, 0);
+	m_cdda->add_route(1, ":speaker", 0.50, 1);
 	m_cdda->set_cdrom_tag(m_cdrom);
 }
 

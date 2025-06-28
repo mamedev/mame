@@ -81,7 +81,7 @@ public:
 		, m_speaker(*this, "speaker")
 		, m_cassette(*this, "cassette")
 		, m_carts(*this, "slot%u", 1U)
-		, m_boot_bank(*this, "boot")
+		, m_boot_view(*this, "boot_view")
 		, m_keyboard(*this, "X%X", 0U)
 	{ }
 
@@ -113,8 +113,8 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 	required_device_array<iq151cart_slot_device, 5> m_carts;
-	required_memory_bank m_boot_bank;
-	required_ioport_array<8> m_keyboard;
+	memory_view m_boot_view;
+	required_ioport_array<9> m_keyboard;
 
 	uint8_t m_vblank_irq_state;
 	uint8_t m_cassette_clk;
@@ -159,7 +159,7 @@ uint8_t iq151_state::ppi_portc_r()
 	else
 	{
 		// kb read
-		data = ioport("X8")->read();
+		data = m_keyboard[8]->read();
 	}
 
 	return (data & 0xf0) | (m_cassette_data & 0x0f);
@@ -174,7 +174,10 @@ void iq151_state::ppi_portc_w(uint8_t data)
 
 void iq151_state::boot_bank_w(uint8_t data)
 {
-	m_boot_bank->set_entry(data & 1);
+	if (BIT(data, 0))
+		m_boot_view.disable();
+	else
+		m_boot_view.select(0);
 }
 
 
@@ -219,9 +222,11 @@ void iq151_state::iq151_mem(address_map &map)
 	map.unmap_value_high();
 	map(0x0000, 0xffff).rw(FUNC(iq151_state::cartslot_r), FUNC(iq151_state::cartslot_w));
 
-	map(0x0000, 0x07ff).bankrw("boot");
-	map(0x0800, 0x7fff).ram();
-	map(0xf000, 0xffff).rom();
+	map(0x0000, 0x7fff).ram();
+	map(0x0000, 0x07ff).view(m_boot_view);
+	m_boot_view[0](0x0000, 0x07ff).rom().region("maincpu", 0x0800);
+	//m_boot_view[0](0x0000, 0x07ff).nopw(); // TODO: write ignored when boot ROM is selected?
+	map(0xf000, 0xffff).rom().region("maincpu", 0x0000);
 }
 
 void iq151_state::iq151_io(address_map &map)
@@ -349,14 +354,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(iq151_state::cassette_timer)
 
 void iq151_state::machine_start()
 {
-	uint8_t *RAM = memregion("maincpu")->base();
-	m_boot_bank->configure_entry(0, RAM + 0xf800);
-	m_boot_bank->configure_entry(1, RAM + 0x0000);
 }
 
 void iq151_state::machine_reset()
 {
-	m_boot_bank->set_entry(0);
+	m_boot_view.select(0);
 
 	m_vblank_irq_state = 0;
 }
@@ -472,16 +474,16 @@ void iq151_state::iq151(machine_config &config)
 
 /* ROM definition */
 ROM_START( iq151 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE )
+	ROM_REGION( 0x1000, "maincpu", ROMREGION_ERASE )
 	/* A number of bios versions here. The load address is shown for each */
 	ROM_SYSTEM_BIOS( 0, "orig", "Original" )
-	ROMX_LOAD( "iq151_monitor_orig.rom", 0xf000, 0x1000, CRC(acd10268) SHA1(4d75c73f155ed4dc2ac51a9c22232f869cca95e2), ROM_BIOS(0))
+	ROMX_LOAD( "iq151_monitor_orig.rom", 0x0000, 0x1000, CRC(acd10268) SHA1(4d75c73f155ed4dc2ac51a9c22232f869cca95e2), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS( 1, "disasm", "Disassembler" )
-	ROMX_LOAD( "iq151_monitor_disasm.rom", 0xf000, 0x1000, CRC(45c2174e) SHA1(703e3271a124c3ef9330ae399308afd903316ab9), ROM_BIOS(1))
+	ROMX_LOAD( "iq151_monitor_disasm.rom", 0x0000, 0x1000, CRC(45c2174e) SHA1(703e3271a124c3ef9330ae399308afd903316ab9), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 2, "cpm", "CPM" )
-	ROMX_LOAD( "iq151_monitor_cpm.rom", 0xf000, 0x1000, CRC(26f57013) SHA1(4df396edc375dd2dd3c82c4d2affb4f5451066f1), ROM_BIOS(2))
+	ROMX_LOAD( "iq151_monitor_cpm.rom", 0x0000, 0x1000, CRC(26f57013) SHA1(4df396edc375dd2dd3c82c4d2affb4f5451066f1), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 3, "cpmold", "CPM (old)" )
-	ROMX_LOAD( "iq151_monitor_cpm_old.rom", 0xf000, 0x1000, CRC(6743e1b7) SHA1(ae4f3b1ba2511a1f91c4e8afdfc0e5aeb0fb3a42), ROM_BIOS(3))
+	ROMX_LOAD( "iq151_monitor_cpm_old.rom", 0x0000, 0x1000, CRC(6743e1b7) SHA1(ae4f3b1ba2511a1f91c4e8afdfc0e5aeb0fb3a42), ROM_BIOS(3))
 ROM_END
 
 } // anonymous namespace

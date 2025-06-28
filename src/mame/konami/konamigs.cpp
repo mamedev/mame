@@ -76,7 +76,7 @@ public:
 	void init_gsan();
 
 protected:
-	required_device<sh34_base_device> m_maincpu;
+	required_device<sh7709_device> m_maincpu;
 	required_device<ymz280b_device> m_ymz;
 	required_device<ata_interface_device> m_ata;
 	required_ioport m_rtc_r;
@@ -776,7 +776,6 @@ void gsan_state::main_map_common(address_map &map)
 	map(0x18000000, 0x18000001).rw("ymz", FUNC(ymz280b_device::read), FUNC(ymz280b_device::write));
 
 	map(0x1f000000, 0x1f000fff).ram(); // cache RAM-mode (SH3 internal), actually should be 7Fxxxxxx, but current SH3 core doesn't like 7Fxxxxxx
-	map(0xa0000000, 0xa000ffff).rom().region("maincpu", 0); // uncached mirror, otherwise no disassembly can bee seen in debugger (bug?)
 }
 void gsan_state::main_map(address_map &map)
 {
@@ -1039,7 +1038,7 @@ void gsan_state::gsan(machine_config &config)
 {
 	// basic machine hardware
 	// SH7709 is earlier version of SH7709S (cv1k), not exact same, have minor differences
-	SH3BE(config, m_maincpu, 32_MHz_XTAL * 2);
+	SH7709(config, m_maincpu, 32_MHz_XTAL * 2, ENDIANNESS_BIG);
 	m_maincpu->set_md(0, 0);
 	m_maincpu->set_md(1, 0);
 	m_maincpu->set_md(2, 0);

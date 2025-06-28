@@ -96,7 +96,7 @@ protected:
 	output_finder<8> m_cpua_out;
 
 	/* misc */
-	u16      m_cpua_ctrl;
+	u16      m_cpua_ctrl = 0;
 
 private:
 	u32 screen_update_bshark(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

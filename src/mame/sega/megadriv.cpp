@@ -441,21 +441,17 @@ uint16_t md_base_state::megadriv_68k_check_z80_bus(offs_t offset, uint16_t mem_m
 TIMER_CALLBACK_MEMBER(md_base_state::megadriv_z80_run_state)
 {
 	/* Is the z80 RESET line pulled? */
-	// TODO: Z80 /RESET
 	if (m_genz80.z80_is_reset)
 	{
-		m_z80snd->reset();
-		m_z80snd->suspend(SUSPEND_REASON_HALT, 1);
+		m_z80snd->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 		m_ymsnd->reset();
 	}
 	else
 	{
+		m_z80snd->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+
 		/* Check if z80 has the bus */
-		// TODO: Z80 /BUSREQ
-		if (m_genz80.z80_has_bus)
-			m_z80snd->resume(SUSPEND_REASON_HALT);
-		else
-			m_z80snd->suspend(SUSPEND_REASON_HALT, 1);
+		m_z80snd->set_input_line(Z80_INPUT_LINE_BUSRQ, m_genz80.z80_has_bus ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 
@@ -884,16 +880,15 @@ void md_base_state::md_ntsc(machine_config &config)
 	megadriv_ioports(config);
 
 	m_vdp->snd_irq().set(FUNC(md_base_state::vdp_sndirqline_callback_genesis_z80));
-	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	m_vdp->add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
+	m_vdp->add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	YM2612(config, m_ymsnd, MASTER_CLOCK_NTSC / 7); // 7.67 MHz
-	m_ymsnd->add_route(0, "lspeaker", 0.50);
-	m_ymsnd->add_route(1, "rspeaker", 0.50);
+	m_ymsnd->add_route(0, "speaker", 0.50, 0);
+	m_ymsnd->add_route(1, "speaker", 0.50, 1);
 }
 
 void md_base_state::md2_ntsc(machine_config &config)
@@ -902,8 +897,8 @@ void md_base_state::md2_ntsc(machine_config &config)
 
 	// Internalized YM3438 in VDP ASIC
 	YM3438(config.replace(), m_ymsnd, MASTER_CLOCK_NTSC / 7); // 7.67 MHz
-	m_ymsnd->add_route(0, "lspeaker", 0.50);
-	m_ymsnd->add_route(1, "rspeaker", 0.50);
+	m_ymsnd->add_route(0, "speaker", 0.50, 0);
+	m_ymsnd->add_route(1, "speaker", 0.50, 1);
 }
 
 /************ PAL hardware has a different master clock *************/
@@ -923,16 +918,15 @@ void md_base_state::md_pal(machine_config &config)
 	megadriv_ioports(config);
 
 	m_vdp->snd_irq().set(FUNC(md_base_state::vdp_sndirqline_callback_genesis_z80));
-	m_vdp->add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	m_vdp->add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	m_vdp->add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
+	m_vdp->add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	YM2612(config, m_ymsnd, MASTER_CLOCK_PAL / 7); // 7.67 MHz
-	m_ymsnd->add_route(0, "lspeaker", 0.50);
-	m_ymsnd->add_route(1, "rspeaker", 0.50);
+	m_ymsnd->add_route(0, "speaker", 0.50, 0);
+	m_ymsnd->add_route(1, "speaker", 0.50, 1);
 }
 
 void md_base_state::md2_pal(machine_config &config)
@@ -941,8 +935,8 @@ void md_base_state::md2_pal(machine_config &config)
 
 	// Internalized YM3438 in VDP ASIC
 	YM3438(config.replace(), m_ymsnd, MASTER_CLOCK_PAL / 7); /* 7.67 MHz */
-	m_ymsnd->add_route(0, "lspeaker", 0.50);
-	m_ymsnd->add_route(1, "rspeaker", 0.50);
+	m_ymsnd->add_route(0, "speaker", 0.50, 0);
+	m_ymsnd->add_route(1, "speaker", 0.50, 1);
 }
 
 

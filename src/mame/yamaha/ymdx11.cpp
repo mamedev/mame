@@ -117,13 +117,12 @@ void yamaha_dx11_state::dx11(machine_config &config)
 	lcdc.set_lcd_size(2, 16);
 	lcdc.set_pixel_update_cb(FUNC(yamaha_dx11_state::lcd_pixel_update));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2414_device &opz(YM2414(config, "opz", 3.579545_MHz_XTAL));
 	//opz.irq_handler().set_inputline(m_maincpu, hd6301y_cpu_device::IRQ2_LINE); // IRQ = P51
-	opz.add_route(0, "lspeaker", 0.60);
-	opz.add_route(1, "rspeaker", 0.60);
+	opz.add_route(0, "speaker", 0.60, 0);
+	opz.add_route(1, "speaker", 0.60, 1);
 }
 
 ROM_START(dx11)

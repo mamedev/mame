@@ -158,6 +158,11 @@ The lone LED is connected to digit 1 common
 
 All three of the above are called "segment H".
 
+Printer:
+--------
+It's the same printer port as VSC. It expects a baud rate of 600, 7 data bits,
+1 stop bit, and no parity.
+
 ================================================================================
 
 Elite Champion Challenger (ELITE)
@@ -210,6 +215,7 @@ that are on the board by clicking while holding ALT.
 
 #include "emu.h"
 
+#include "bus/rs232/rs232.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6821pia.h"
 #include "machine/clock.h"
@@ -295,7 +301,6 @@ protected:
 	void pia1_pa_w(u8 data);
 	void pia1_pb_w(u8 data);
 	u8 pia1_pb_r();
-	void pia1_ca2_w(int state);
 };
 
 void csc_state::machine_start()
@@ -488,7 +493,7 @@ void csc_state::pia1_pb_w(u8 data)
 
 u8 csc_state::pia1_pb_r()
 {
-	// d2: printer?
+	// d2: printer busy?
 	u8 data = 0x04;
 
 	// d3: S14001A busy pin
@@ -500,11 +505,6 @@ u8 csc_state::pia1_pb_r()
 
 	// d6,d7: language jumpers (hardwired)
 	return data | (*m_language << 6 & 0xc0);
-}
-
-void csc_state::pia1_ca2_w(int state)
-{
-	// printer?
 }
 
 
@@ -641,7 +641,9 @@ void csc_state::csc(machine_config &config)
 	m_pia[1]->readpb_handler().set(FUNC(csc_state::pia1_pb_r));
 	m_pia[1]->writepa_handler().set(FUNC(csc_state::pia1_pa_w));
 	m_pia[1]->writepb_handler().set(FUNC(csc_state::pia1_pb_w));
-	m_pia[1]->ca2_handler().set(FUNC(csc_state::pia1_ca2_w));
+	m_pia[1]->ca2_handler().set("rs232", FUNC(rs232_port_device::write_txd)).invert();
+
+	RS232_PORT(config, "rs232", default_rs232_devices, nullptr);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));

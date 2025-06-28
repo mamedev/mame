@@ -25,7 +25,8 @@ public:
 		PEAK,
 		LOWSHELF,
 		HIGHSHELF,
-		RAWPARAMS
+		RAWPARAMS,
+		HIGHPASS1P1Z
 	};
 
 	struct biquad_params
@@ -87,7 +88,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	void recalc();
@@ -100,9 +101,9 @@ private:
 	double         m_q;
 	double         m_gain;
 
-	stream_buffer::sample_t m_input;
+	sound_stream::sample_t m_input;
 	double m_w0, m_w1, m_w2; /* w[k], w[k-1], w[k-2], current and previous intermediate values */
-	stream_buffer::sample_t m_output;
+	sound_stream::sample_t m_output;
 	double m_a1, m_a2; /* digital filter coefficients, denominator */
 	double m_b0, m_b1, m_b2;  /* digital filter coefficients, numerator */
 };

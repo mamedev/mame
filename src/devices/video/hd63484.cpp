@@ -423,7 +423,7 @@ inline void hd63484_device::queue_w(uint8_t data)
 	else
 	{
 		// TODO what happen? somebody set us up the bomb
-		printf("FIFO?\n");
+		logerror("FIFO?\n");
 	}
 }
 
@@ -479,7 +479,7 @@ inline void hd63484_device::queue_r(uint8_t data)
 	else
 	{
 		// TODO what happen? somebody set us up the bomb
-		printf("FIFO?\n");
+		logerror("FIFO?\n");
 	}
 }
 
@@ -516,13 +516,13 @@ inline void hd63484_device::recompute_parameters()
 
 	if (LOG)
 	{
-		printf("HC %d HSW %d HDS %d HDW %d HWS %d HWW %d\n",m_hc,m_hsw,m_hds,m_hdw,m_hws,m_hww);
-		printf("VC %d VDS %d VSW %d VWS %d VWW %d\n",m_vc,m_vds,m_vsw,m_vws,m_vww);
-		printf("SP0 %d SP1 %d SP2 %d\n",m_sp[0],m_sp[1],m_sp[2]);
+		logerror("HC %d HSW %d HDS %d HDW %d HWS %d HWW %d\n",m_hc,m_hsw,m_hds,m_hdw,m_hws,m_hww);
+		logerror("VC %d VDS %d VSW %d VWS %d VWW %d\n",m_vc,m_vds,m_vsw,m_vws,m_vww);
+		logerror("SP0 %d SP1 %d SP2 %d\n",m_sp[0],m_sp[1],m_sp[2]);
 	}
 
 	int gai = (m_omr>>4) & 0x07;
-	if (gai > 3)    printf("unsupported GAI=%d\n", gai);
+	if (gai > 3)    logerror("unsupported GAI=%d\n", gai);
 	int acm = (m_omr & 0x08) ? 2 : 1;
 	int ppw = 16 / get_bpp();
 	int ppmc = ppw * (1 << gai) / acm;  // TODO: GAI > 3
@@ -923,7 +923,7 @@ uint16_t hd63484_device::command_rpr_exec()
 		case 0x0d: // Read Write Pointer L
 			return (m_rwp[m_rwp_dn] & 0x0fff) << 4;
 		default:
-			if(LOG) printf("Read %sx\n", wpr_regnames[m_cr & 0x1f]);
+			if(LOG) logerror("Read %sx\n", wpr_regnames[m_cr & 0x1f]);
 			return 0;
 	}
 }
@@ -983,7 +983,7 @@ void hd63484_device::command_wpr_exec()
 			m_rwp[m_rwp_dn] = (m_rwp[m_rwp_dn] & 0xff000) | ((m_pr[0] & 0xfff0) >> 4);
 			break;
 		default:
-			if(LOG) printf("%s -> %02x\n",wpr_regnames[m_cr & 0x1f],m_pr[0]);
+			if(LOG) logerror("%s -> %02x\n",wpr_regnames[m_cr & 0x1f],m_pr[0]);
 			break;
 	}
 }
@@ -1430,7 +1430,7 @@ void hd63484_device::process_fifo()
 	{
 		case COMMAND_INVALID:
 			if (CMD_LOG)    logerror("HD63484 '%s': <invalid %04x>\n", tag(), m_cr);
-			printf("HD63484 '%s' Invalid Command Byte %02x\n", tag(), m_cr);
+			logerror("HD63484 '%s' Invalid Command Byte %02x\n", tag(), m_cr);
 			m_sr |= HD63484_SR_CER; // command error
 			command_end_seq();
 			break;
@@ -1767,7 +1767,7 @@ void hd63484_device::process_fifo()
 			break;
 
 		default:
-			printf("%04x\n",m_cr);
+			logerror("%04x\n",m_cr);
 			fatalerror("stop!\n");
 	}
 }
@@ -1794,7 +1794,7 @@ uint16_t hd63484_device::video_registers_r(int offset)
 			break;
 
 		default:
-			if(LOG) printf("%s R\n",acrtc_regnames[m_ar/2]);
+			if(LOG) logerror("%s R\n",acrtc_regnames[m_ar/2]);
 			break;
 	}
 
@@ -1812,7 +1812,7 @@ void hd63484_device::video_registers_w(int offset)
 		case 0x00: // FIFO entry
 			queue_w((vreg_data & 0xff00) >> 8);
 			queue_w((vreg_data & 0x00ff) >> 0);
-			if(FIFO_LOG) printf("%s -> %04x\n",acrtc_regnames[m_ar/2],vreg_data);
+			if(FIFO_LOG) logerror("%s -> %04x\n",acrtc_regnames[m_ar/2],vreg_data);
 			process_fifo();
 			break;
 
@@ -1911,7 +1911,7 @@ void hd63484_device::video_registers_w(int offset)
 			break;
 
 		default:
-			if(LOG) printf("%s -> %04x\n",acrtc_regnames[m_ar/2],vreg_data);
+			if(LOG) logerror("%s -> %04x\n",acrtc_regnames[m_ar/2],vreg_data);
 			break;
 	}
 }

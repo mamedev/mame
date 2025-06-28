@@ -10,16 +10,46 @@
 
 **********************************************************************/
 
-
 #include "emu.h"
 #include "vdu40.h"
 
+#include "video/saa5050.h"
+#include "video/mc6845.h"
+#include "emupal.h"
+#include "screen.h"
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
 
-DEFINE_DEVICE_TYPE(ACORN_VDU40, acorn_vdu40_device, "acorn_vdu40", "Acorn 40 Column VDU Interface")
+namespace {
+
+class acorn_vdu40_device : public device_t, public device_acorn_bus_interface
+{
+public:
+	acorn_vdu40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, ACORN_VDU40, tag, owner, clock)
+		, device_acorn_bus_interface(mconfig, *this)
+		, m_videoram(*this, "videoram", 0x400, ENDIANNESS_LITTLE)
+		, m_crtc(*this, "mc6845")
+		, m_trom(*this, "saa5050")
+	{
+	}
+
+protected:
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+private:
+	MC6845_UPDATE_ROW(crtc_update_row);
+	void vsync_changed(int state);
+
+	memory_share_creator<uint8_t> m_videoram;
+	required_device<mc6845_device> m_crtc;
+	required_device<saa5050_device> m_trom;
+};
+
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -27,9 +57,9 @@ DEFINE_DEVICE_TYPE(ACORN_VDU40, acorn_vdu40_device, "acorn_vdu40", "Acorn 40 Col
 
 void acorn_vdu40_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(12_MHz_XTAL, 768, 132, 612, 311, 20, 270);
-	m_screen->set_screen_update("mc6845", FUNC(mc6845_device::screen_update));
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(12_MHz_XTAL, 768, 132, 612, 311, 20, 270);
+	screen.set_screen_update("mc6845", FUNC(mc6845_device::screen_update));
 
 	PALETTE(config, "palette").set_entries(8);
 
@@ -41,25 +71,6 @@ void acorn_vdu40_device::device_add_mconfig(machine_config &config)
 	m_crtc->set_update_row_callback(FUNC(acorn_vdu40_device::crtc_update_row));
 
 	SAA5050(config, m_trom, 12_MHz_XTAL / 2);
-	m_trom->set_screen_size(40, 25, 40);
-}
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  acorn_vdu40_device - constructor
-//-------------------------------------------------
-
-acorn_vdu40_device::acorn_vdu40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ACORN_VDU40, tag, owner, clock)
-	, device_acorn_bus_interface(mconfig, *this)
-	, m_screen(*this, "screen")
-	, m_crtc(*this, "mc6845")
-	, m_trom(*this, "saa5050")
-{
 }
 
 
@@ -69,8 +80,6 @@ acorn_vdu40_device::acorn_vdu40_device(const machine_config &mconfig, const char
 
 void acorn_vdu40_device::device_start()
 {
-	/* allocate m_videoram */
-	m_videoram = std::make_unique<uint8_t[]>(0x0400);
 }
 
 //-------------------------------------------------
@@ -80,10 +89,11 @@ void acorn_vdu40_device::device_start()
 void acorn_vdu40_device::device_reset()
 {
 	address_space &space = m_bus->memspace();
+	uint16_t m_blk0 = m_bus->blk0() << 12;
 
-	space.install_ram(0x0400, 0x07ff, m_videoram.get());
-	space.install_readwrite_handler(0x0800, 0x0800, read8smo_delegate(*m_crtc, FUNC(mc6845_device::status_r)), write8smo_delegate(*m_crtc, FUNC(mc6845_device::address_w)));
-	space.install_readwrite_handler(0x0801, 0x0801, read8smo_delegate(*m_crtc, FUNC(mc6845_device::register_r)), write8smo_delegate(*m_crtc, FUNC(mc6845_device::register_w)));
+	space.install_ram(m_blk0 | 0x0400, m_blk0 | 0x07ff, m_videoram);
+	space.install_readwrite_handler(m_blk0 | 0x0800, m_blk0 | 0x0800, emu::rw_delegate(*m_crtc, FUNC(mc6845_device::status_r)), emu::rw_delegate(*m_crtc, FUNC(mc6845_device::address_w)));
+	space.install_readwrite_handler(m_blk0 | 0x0801, m_blk0 | 0x0801, emu::rw_delegate(*m_crtc, FUNC(mc6845_device::register_r)), emu::rw_delegate(*m_crtc, FUNC(mc6845_device::register_w)));
 }
 
 
@@ -125,3 +135,8 @@ void acorn_vdu40_device::vsync_changed(int state)
 {
 	m_trom->dew_w(state);
 }
+
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(ACORN_VDU40, device_acorn_bus_interface, acorn_vdu40_device, "acorn_vdu40", "Acorn 40 Column VDU Interface")

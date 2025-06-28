@@ -48,7 +48,7 @@ st0016_cpu_device::st0016_cpu_device(const machine_config &mconfig, const char *
 	: z80_device(mconfig, ST0016_CPU, tag, owner, clock)
 	, device_gfx_interface(mconfig, *this, nullptr, "palette")
 	, device_video_interface(mconfig, *this, false)
-	, device_mixer_interface(mconfig, *this, 2)
+	, device_mixer_interface(mconfig, *this)
 	, m_io_space_config("io", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(st0016_cpu_device::cpu_internal_io_map), this))
 	, m_space_config("regs", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(st0016_cpu_device::cpu_internal_map), this))
 	, m_charam_space_config("charam", ENDIANNESS_LITTLE, 8, 21, 0, address_map_constructor(FUNC(st0016_cpu_device::charam_map), this))
@@ -122,6 +122,17 @@ void st0016_cpu_device::device_reset()
 				m_spr_dy = 8;
 			break;
 
+			case 2: // Crown Poker
+				screen().set_visible_area(8,42*8-1,0,29*8-1);
+				m_spr_dx = 4;
+				m_spr_dy = 4;
+			break;
+
+			case 3: // Dream Crown
+				screen().set_visible_area(8,42*8-1,0,30*8-1);
+				m_spr_dx = 4;
+			break;
+
 			case 4: // mayjinsen 1&2
 				screen().set_visible_area(0,32*8-1,0,28*8-1);
 			break;
@@ -145,8 +156,8 @@ void st0016_cpu_device::device_add_mconfig(machine_config &config)
 
 	st0016_device &stsnd(ST0016(config, "stsnd", DERIVED_CLOCK(1,1)));
 	stsnd.set_addrmap(0, &st0016_cpu_device::charam_map);
-	stsnd.add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
-	stsnd.add_route(1, *this, 1.0, AUTO_ALLOC_INPUT, 1);
+	stsnd.add_route(0, *this, 1.0, 0);
+	stsnd.add_route(1, *this, 1.0, 1);
 }
 
 
@@ -319,7 +330,7 @@ void st0016_cpu_device::vregs_w(offs_t offset, u8 data)
 	    $74 x--- ---- global flip screen
 	        -xx- ---- individual flip screen x/y
 	        i.e. Mayjinsen sets 0x80, other ST0016 games 0x60.
-	        TODO: Might also be paired with $70 & $75 (setted up by Mayjinsen).
+	        TODO: Might also be paired with $70 & $75 (set up by Mayjinsen).
 
 	    $a0 \
 	    $a1 - source address >> 1
@@ -659,8 +670,8 @@ void st0016_cpu_device::draw_bgmap(bitmap_ind16 &bitmap, const rectangle &clipre
 					code = m_spriteram[i] + 256 * m_spriteram[i + 1];
 					color = m_spriteram[i + 2] & 0x3f;
 
-					flipx = m_spriteram[i + 3] & 0x80;
-					flipy = m_spriteram[i + 3] & 0x40;
+					flipx = m_spriteram[i + 3] & 0x80; // crownpkr test mode doesn't seem to agree with this
+					flipy = m_spriteram[i + 3] & 0x40; // "
 
 					if (priority)
 					{
@@ -689,6 +700,7 @@ void st0016_cpu_device::draw_bgmap(bitmap_ind16 &bitmap, const rectangle &clipre
 							if (!flipy) { drawypos = ypos + yloop; }
 							else { drawypos = (ypos + 8 - 1) - yloop; }
 							destline = &bitmap.pix(drawypos);
+							// destline = &bitmap.pix(drawypos ^ 0x07); // hack for dcrown test mode
 
 							for (xloop = 0; xloop < 8; xloop++)
 							{

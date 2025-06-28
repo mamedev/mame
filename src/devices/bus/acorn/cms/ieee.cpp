@@ -6,16 +6,42 @@
 
 **********************************************************************/
 
-
 #include "emu.h"
 #include "ieee.h"
 
+#include "bus/ieee488/ieee488.h"
+#include "machine/tms9914.h"
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
 
-DEFINE_DEVICE_TYPE(CMS_IEEE, cms_ieee_device, "cms_ieee", "CMS IEEE Controller Board");
+namespace {
+
+class cms_ieee_device : public device_t, public device_acorn_bus_interface
+{
+public:
+	cms_ieee_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, CMS_IEEE, tag, owner, clock)
+		, device_acorn_bus_interface(mconfig, *this)
+		, m_ieee(*this, IEEE488_TAG)
+		, m_tms9914(*this, "hpib")
+	{
+	}
+
+protected:
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+private:
+	required_device<ieee488_device> m_ieee;
+	required_device<tms9914_device> m_tms9914;
+
+	void bus_irq_w(int state)
+	{
+		m_bus->irq_w(state);
+	}
+};
 
 
 //-------------------------------------------------
@@ -50,23 +76,6 @@ void cms_ieee_device::device_add_mconfig(machine_config &config)
 }
 
 
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  cms_ieee_device - constructor
-//-------------------------------------------------
-
-cms_ieee_device::cms_ieee_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, CMS_IEEE, tag, owner, clock)
-	, device_acorn_bus_interface(mconfig, *this)
-	, m_ieee(*this, IEEE488_TAG)
-	, m_tms9914(*this, "hpib")
-{
-}
-
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
@@ -75,15 +84,10 @@ void cms_ieee_device::device_start()
 {
 	address_space &space = m_bus->memspace();
 
-	space.install_readwrite_handler(0xfc60, 0xfc6f, read8sm_delegate(*m_tms9914, FUNC(tms9914_device::read)), write8sm_delegate(*m_tms9914, FUNC(tms9914_device::write)));
+	space.install_readwrite_handler(0xfc60, 0xfc6f, emu::rw_delegate(*m_tms9914, FUNC(tms9914_device::read)), emu::rw_delegate(*m_tms9914, FUNC(tms9914_device::write)));
 }
 
+} // anonymous namespace
 
-//**************************************************************************
-//  IMPLEMENTATION
-//**************************************************************************
 
-void cms_ieee_device::bus_irq_w(int state)
-{
-	m_bus->irq_w(state);
-}
+DEFINE_DEVICE_TYPE_PRIVATE(CMS_IEEE, device_acorn_bus_interface, cms_ieee_device, "cms_ieee", "CMS IEEE Controller Board");

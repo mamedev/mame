@@ -194,7 +194,7 @@ st11m_device::st11m_device(const machine_config &mconfig, const char *tag, devic
 
 void xt_hdc_device::device_start()
 {
-	m_buffer = std::make_unique<uint8_t[]>(256*512);   // maximum possible transfer
+	m_buffer = std::make_unique<uint8_t[]>(256 * 512); // maximum possible transfer
 	m_timer = timer_alloc(FUNC(xt_hdc_device::process_command), this);
 }
 
@@ -202,7 +202,7 @@ void xt_hdc_device::device_reset()
 {
 	m_drv = 0;
 	m_data_cnt = 0;
-	m_buffer_ptr = nullptr;
+	m_buffer_ptr = &m_buffer[0];
 	m_hdc_control = 0;
 	for (int i = 0; i < 2; i++)
 	{
@@ -221,7 +221,7 @@ void xt_hdc_device::device_reset()
 	}
 
 	m_csb = 0;
-	m_status = 0;
+	m_status = STA_COMMAND | STA_READY;
 	m_error = 0;
 }
 
@@ -310,7 +310,7 @@ int xt_hdc_device::get_lbasector()
  * implementation that threw the idea of "emulating the hardware" to the wind
  */
 
-int xt_hdc_device::dack_r()
+uint8_t xt_hdc_device::dack_r()
 {
 	harddisk_image_device *file = pc_hdc_file(m_drv);
 	if (!file)
@@ -354,7 +354,7 @@ int xt_hdc_device::dack_r()
 	return result;
 }
 
-int xt_hdc_device::dack_rs()
+uint8_t xt_hdc_device::dack_rs()
 {
 	logerror("%s dack_rs(%d %d)\n", machine().describe_context(), m_hdcdma_read, m_hdcdma_size);
 
@@ -383,7 +383,7 @@ int xt_hdc_device::dack_rs()
 
 
 
-void xt_hdc_device::dack_w(int data)
+void xt_hdc_device::dack_w(uint8_t data)
 {
 	harddisk_image_device *file = pc_hdc_file(m_drv);
 	if (!file)
@@ -423,7 +423,7 @@ void xt_hdc_device::dack_w(int data)
 
 
 
-void xt_hdc_device::dack_ws(int data)
+void xt_hdc_device::dack_ws(uint8_t data)
 {
 	*(m_hdcdma_dst++) = data;
 
@@ -829,6 +829,7 @@ void xt_hdc_device::select_w(uint8_t data)
 {
 	m_status &= ~STA_INTERRUPT;
 	m_status |= STA_SELECT;
+	m_status |= STA_READY;
 }
 
 

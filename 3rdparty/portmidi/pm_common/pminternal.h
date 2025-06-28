@@ -1,4 +1,4 @@
-/* pminternal.h -- header for interface implementations */
+/** @file pminternal.h header for PortMidi implementations */
 
 /* this file is included by files that implement library internals */
 /* Here is a guide to implementers:
@@ -17,6 +17,8 @@
      assumptions about pm_fns_type functions are given below.
  */
 
+/** @cond INTERNAL - add INTERNAL to Doxygen ENABLED_SECTIONS to include */
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -27,8 +29,10 @@ extern int pm_initialized; /* see note in portmidi.c */
 void *pm_alloc(size_t s);
 void pm_free(void *ptr);
 
-/* if an error occurs while opening or closing a midi stream, set these: */
-extern int pm_hosterror;
+/* if a host error (an error reported by the host MIDI API that is not
+ * mapped to a PortMidi error code) occurs in a synchronous operation 
+ * (i.e., not in a callback from another thread) set these: */
+extern int pm_hosterror;  /* boolean */
 extern char pm_hosterror_text[PM_HOST_ERROR_MSG_LEN];
  
 struct pm_internal_struct;
@@ -51,31 +55,30 @@ typedef PmTimestamp (*pm_synchronize_fn)(struct pm_internal_struct *midi);
    of the open fails */
 typedef PmError (*pm_open_fn)(struct pm_internal_struct *midi,
                               void *driverInfo);
+typedef PmError (*pm_create_fn)(int is_input, const char *name,
+                                void *driverInfo);
+typedef PmError (*pm_delete_fn)(PmDeviceID id);
 typedef PmError (*pm_abort_fn)(struct pm_internal_struct *midi);
 /* pm_close_fn should clean up all memory and close the device if any
    part of the close fails. */
 typedef PmError (*pm_close_fn)(struct pm_internal_struct *midi);
 typedef PmError (*pm_poll_fn)(struct pm_internal_struct *midi);
-typedef void (*pm_host_error_fn)(struct pm_internal_struct *midi, char * msg,
-                                 unsigned int len);
-typedef unsigned int (*pm_has_host_error_fn)(struct pm_internal_struct *midi);
+typedef unsigned int (*pm_check_host_error_fn)(struct pm_internal_struct *midi);
 
 typedef struct {
     pm_write_short_fn write_short; /* output short MIDI msg */
     pm_begin_sysex_fn begin_sysex; /* prepare to send a sysex message */
     pm_end_sysex_fn end_sysex; /* marks end of sysex message */
     pm_write_byte_fn write_byte; /* accumulate one more sysex byte */
-    pm_write_realtime_fn write_realtime; /* send real-time message within sysex */
+    pm_write_realtime_fn write_realtime; /* send real-time msg within sysex */
     pm_write_flush_fn write_flush; /* send any accumulated but unsent data */
-    pm_synchronize_fn synchronize; /* synchronize portmidi time to stream time */
+    pm_synchronize_fn synchronize; /* synchronize PM time to stream time */
     pm_open_fn open;   /* open MIDI device */
     pm_abort_fn abort; /* abort */
     pm_close_fn close; /* close device */
     pm_poll_fn poll;   /* read pending midi events into portmidi buffer */
-    pm_has_host_error_fn has_host_error; /* true when device has had host 
-                                            error message */
-    pm_host_error_fn host_error; /* provide text readable host error message
-                                    for device (clears and resets) */
+    pm_check_host_error_fn check_host_error; /* true when device has had host */
+          /* error; sets pm_hosterror and writes message to pm_hosterror_text */
 } pm_fns_node, *pm_fns_type;
 
 
@@ -83,23 +86,25 @@ typedef struct {
 extern pm_fns_node pm_none_dictionary;
 
 typedef struct {
-    PmDeviceInfo pub; /* some portmidi state also saved in here (for autmatic
-                         device closing (see PmDeviceInfo struct) */
-    void *descriptor; /* ID number passed to win32 multimedia API open */
-    void *internalDescriptor; /* points to PmInternal device, allows automatic 
-                                 device closing */
+    PmDeviceInfo pub; /* some portmidi state also saved in here (for automatic
+                         device closing -- see PmDeviceInfo struct) */
+    int deleted; /* is this is a deleted virtual device? */
+    void *descriptor; /* ID number passed to win32 multimedia API open, 
+                       * coreMIDI endpoint, etc., representing the device */
+    struct pm_internal_struct *pm_internal; /* points to PmInternal device */
+               /* when the device is open, allows automatic device closing */
     pm_fns_type dictionary;
 } descriptor_node, *descriptor_type;
 
 extern int pm_descriptor_max;
-extern descriptor_type descriptors;
-extern int pm_descriptor_index;
+extern descriptor_type pm_descriptors;
+extern int pm_descriptor_len;
 
 typedef uint32_t (*time_get_proc_type)(void *time_info);
 
 typedef struct pm_internal_struct {
-    int device_id; /* which device is open (index to descriptors) */
-    short write_flag; /* MIDI_IN, or MIDI_OUT */
+    int device_id; /* which device is open (index to pm_descriptors) */
+    short is_input; /* MIDI IN (true) or MIDI OUT (false) */
     
     PmTimeProcPtr time_proc; /* where to get the time */
     void *time_info; /* pass this to get_time() */
@@ -129,7 +134,7 @@ typedef struct pm_internal_struct {
     PmTimestamp now; /* set by PmWrite to current time */
     int first_message; /* initially true, used to run first synchronization */
     pm_fns_type dictionary; /* implementation functions */
-    void *descriptor; /* system-dependent state */
+    void *api_info; /* system-dependent state */
     /* the following are used to expedite sysex data */
     /* on windows, in debug mode, based on some profiling, these optimizations
      * cut the time to process sysex bytes from about 7.5 to 0.26 usec/byte,
@@ -138,7 +143,7 @@ typedef struct pm_internal_struct {
      */
     unsigned char *fill_base; /* addr of ptr to sysex data */
     uint32_t *fill_offset_ptr; /* offset of next sysex byte */
-    int32_t fill_length; /* how many sysex bytes to write */
+    uint32_t fill_length; /* how many sysex bytes to write */
 } PmInternal;
 
 
@@ -155,8 +160,11 @@ PmTimestamp none_synchronize(PmInternal *midi);
 PmError pm_fail_fn(PmInternal *midi);
 PmError pm_fail_timestamp_fn(PmInternal *midi, PmTimestamp timestamp);
 PmError pm_success_fn(PmInternal *midi);
-PmError pm_add_device(char *interf, char *name, int input, void *descriptor,
-                      pm_fns_type dictionary);
+PmError pm_add_interf(const char *interf, pm_create_fn create_fn,
+                      pm_delete_fn delete_fn);
+PmError pm_add_device(const char *interf, const char *name, int is_input,
+                      int is_virtual, void *descriptor, pm_fns_type dictionary);
+void pm_undo_add_device(int id);
 uint32_t pm_read_bytes(PmInternal *midi, const unsigned char *data, int len,
                            PmTimestamp timestamp);
 void pm_read_short(PmInternal *midi, PmEvent *event);
@@ -176,3 +184,4 @@ int pm_find_default_device(char *pattern, int is_input);
 }
 #endif
 
+/** @endcond */

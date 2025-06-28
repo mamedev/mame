@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "hd44352.h"
 
+#include "screen.h"
+
 #define     LCD_BYTE_INPUT          0x01
 #define     LCD_BYTE_OUTPUT         0x02
 #define     LCD_CHAR_OUTPUT         0x03
@@ -132,6 +134,11 @@ uint32_t hd44352_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	if (m_control_lines&0x80 && m_lcd_on)
 	{
 		for (int a=0; a<2; a++)
+		{
+			// drivers can be arranged as 96x64 or 192x32 when char width is 6
+			const unsigned sx = (a * 16 * cw) % screen.width();
+			const unsigned sy = (a * 32) % screen.height();
+
 			for (int py=0; py<4; py++)
 				for (int px=0; px<16; px++)
 					if (BIT(m_cursor_status, 4) && px == m_cursor_x && py == m_cursor_y && a == m_cursor_lcd)
@@ -142,7 +149,7 @@ uint32_t hd44352_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 							uint8_t d = compute_newval((m_cursor_status>>5) & 0x07, m_video_ram[a][py*16*cw + px*cw + c + m_scroll * 48], m_cursor[c]);
 							for (int b=0; b<8; b++)
 							{
-								bitmap.pix(py*8 + b, a*cw*16 + px*cw + c) = BIT(d, 7-b);
+								bitmap.pix(sy + py*8 + b, sx + px*cw + c) = BIT(d, 7-b);
 							}
 						}
 					}
@@ -153,10 +160,11 @@ uint32_t hd44352_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 							uint8_t d = m_video_ram[a][py*16*cw + px*cw + c + m_scroll * 48];
 							for (int b=0; b<8; b++)
 							{
-								bitmap.pix(py*8 + b, a*cw*16 + px*cw + c) = BIT(d, 7-b);
+								bitmap.pix(sy + py*8 + b, sx + px*cw + c) = BIT(d, 7-b);
 							}
 						}
 					}
+		}
 	}
 
 	return 0;

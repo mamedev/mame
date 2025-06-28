@@ -3787,12 +3787,11 @@ void namcos22_state::namcos22(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_namcos22);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	C352(config, m_c352, 49.152_MHz_XTAL/2, 288);
-	m_c352->add_route(0, "lspeaker", 1.0);
-	m_c352->add_route(1, "rspeaker", 1.0);
+	m_c352->add_route(0, "speaker", 1.0, 0);
+	m_c352->add_route(1, "speaker", 1.0, 1);
 }
 
 void namcos22_state::cybrcomm(machine_config &config)
@@ -3847,7 +3846,7 @@ void namcos22s_state::airco22b(machine_config &config)
 {
 	namcos22s(config);
 
-	SPEAKER(config, "bodysonic").backrest();
+	SPEAKER(config, "bodysonic").lfe();
 	m_c352->add_route(2, "bodysonic", 0.50); // to subwoofer behind back
 }
 
@@ -3893,7 +3892,7 @@ void namcos22s_state::tokyowar(machine_config &config)
 {
 	namcos22s(config);
 
-	SPEAKER(config, "vibration").seat();
+	SPEAKER(config, "vibration").lfe();
 	SPEAKER(config, "seat").headrest_center();
 
 	m_c352->add_route(2, "vibration", 0.5); // to "bass shaker"

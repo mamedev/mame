@@ -124,6 +124,7 @@ DEFINE_DEVICE_TYPE(EPSON_SD_680L, epson_sd_680l, "epson_sd_680l", "EPSON SD-680L
 
 // Panasonic 3.5" drive
 DEFINE_DEVICE_TYPE(PANA_JU_363, pana_ju_363, "pana_ju_363", "Panasonic JU-363 Flexible Disk Drive")
+DEFINE_DEVICE_TYPE(PANA_JU_386, pana_ju_386, "pana_ju_386", "Panasonic JU-386 Flexible Disk Drive")
 
 // Sony 3.5" drives
 DEFINE_DEVICE_TYPE(SONY_OA_D31V, sony_oa_d31v, "sony_oa_d31v", "Sony OA-D31V Micro Floppydisk Drive")
@@ -610,7 +611,10 @@ std::pair<std::error_condition, const floppy_image_format_t *> floppy_image_devi
 		}
 	}
 
-	return{ std::error_condition(), best_format };
+	if(best_format)
+		return{ std::error_condition(), best_format };
+	else
+		return{ image_error::INVALIDIMAGE, nullptr };
 }
 
 void floppy_image_device::init_floppy_load(bool write_supported)
@@ -1592,18 +1596,17 @@ void floppy_sound_device::step(int zone)
 //  sound_stream_update - update the sound stream
 //-------------------------------------------------
 
-void floppy_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void floppy_sound_device::sound_stream_update(sound_stream &stream)
 {
 	// We are using only one stream, unlike the parent class
 	// Also, there is no need for interpolation, as we only expect
 	// one sample rate of 44100 for all samples
 
 	int16_t out;
-	auto &samplebuffer = outputs[0];
 	int m_idx = 0;
 	int sampleend = 0;
 
-	for (int sampindex = 0; sampindex < samplebuffer.samples(); sampindex++)
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 	{
 		out = 0;
 
@@ -1697,7 +1700,7 @@ void floppy_sound_device::sound_stream_update(sound_stream &stream, std::vector<
 		}
 
 		// Write to the stream buffer
-		samplebuffer.put_int(sampindex, out, 32768);
+		stream.put_int(0, sampindex, out, 32768);
 	}
 }
 
@@ -2433,6 +2436,42 @@ void pana_ju_363::setup_characteristics()
 	add_variant(floppy_image::SSDD);
 	add_variant(floppy_image::DSDD);
 }
+
+
+//-------------------------------------------------
+//  3.5" Panasonic Flexible Disk Drive JU-386
+//
+//  track to track: 3 ms
+//  settling time: 15 ms
+//  motor start time: 300 ms
+//  transfer rate: 500 Kbits/s
+//  (can also be configured for 300 RPM @ 250 Kb/s with a jumper)
+//
+//-------------------------------------------------
+
+pana_ju_386::pana_ju_386(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, PANA_JU_386, tag, owner, clock)
+{
+}
+
+pana_ju_386::~pana_ju_386()
+{
+}
+
+void pana_ju_386::setup_characteristics()
+{
+	m_form_factor = floppy_image::FF_35;
+	m_tracks = 84;
+	m_sides = 2;
+	m_dskchg_writable = true;
+	set_rpm(360);
+
+	add_variant(floppy_image::SSSD);
+	add_variant(floppy_image::SSDD);
+	add_variant(floppy_image::DSDD);
+	add_variant(floppy_image::DSHD);
+}
+
 
 //-------------------------------------------------
 //  Sony OA-D31V

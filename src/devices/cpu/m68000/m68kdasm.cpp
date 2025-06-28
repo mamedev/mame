@@ -193,8 +193,7 @@ std::string m68k_disassembler::get_ea_mode_str(u16 instruction, u32 size)
 		{
 		/* program counter with displacement */
 			u16 temp_value = read_imm_16();
-			return util::string_format("(%s,PC) ; ($%x)", make_signed_hex_str_16(temp_value),
-									   (make_int_16(temp_value) + m_cpu_pc-2) & 0xffffffff);
+			return util::string_format("($%x,PC)", (make_int_16(temp_value) + m_cpu_pc-2) & 0xffffffff);
 		}
 		case 0x3b:
 		{
@@ -893,7 +892,7 @@ std::string m68k_disassembler::d68020_cas_8()
 	if(limit.first)
 		return limit.second;
 	u16 extension = read_imm_16();
-	return util::string_format("cas.b   D%d, D%d, %s; (2+)", extension&7, (extension>>8)&7, get_ea_mode_str_8(m_cpu_ir));
+	return util::string_format("cas.b   D%d, D%d, %s; (2+)", extension&7, (extension>>6)&7, get_ea_mode_str_8(m_cpu_ir));
 }
 
 std::string m68k_disassembler::d68020_cas_16()
@@ -902,7 +901,7 @@ std::string m68k_disassembler::d68020_cas_16()
 	if(limit.first)
 		return limit.second;
 	u16 extension = read_imm_16();
-	return util::string_format("cas.w   D%d, D%d, %s; (2+)", extension&7, (extension>>8)&7, get_ea_mode_str_16(m_cpu_ir));
+	return util::string_format("cas.w   D%d, D%d, %s; (2+)", extension&7, (extension>>6)&7, get_ea_mode_str_16(m_cpu_ir));
 }
 
 std::string m68k_disassembler::d68020_cas_32()
@@ -911,7 +910,7 @@ std::string m68k_disassembler::d68020_cas_32()
 	if(limit.first)
 		return limit.second;
 	u16 extension = read_imm_16();
-	return util::string_format("cas.l   D%d, D%d, %s; (2+)", extension&7, (extension>>8)&7, get_ea_mode_str_32(m_cpu_ir));
+	return util::string_format("cas.l   D%d, D%d, %s; (2+)", extension&7, (extension>>6)&7, get_ea_mode_str_32(m_cpu_ir));
 }
 
 std::string m68k_disassembler::d68020_cas2_16()

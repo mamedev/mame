@@ -136,7 +136,7 @@ public:
 		  m_a2common(*this, "a2common"),
 		  //      m_a2host(*this, "a2host"),
 		  m_gameio(*this, "gameio"),
-		  m_speaker(*this, "speaker"),
+		  m_speaker(*this, "speaker_sound"),
 		  m_upperbank(*this, A2GS_UPPERBANK_TAG),
 		  m_upperaux(*this, A2GS_AUXUPPER_TAG),
 		  m_upper00(*this, A2GS_00UPPER_TAG),
@@ -473,6 +473,7 @@ private:
 	u8 m_clkdata = 0, m_clock_control = 0;
 	u8 m_clock_frame = 0;
 
+	void lcrom_update();
 	void do_io(int offset);
 	u8 read_floatingbus();
 	void update_slotrom_banks();
@@ -1266,20 +1267,7 @@ void apple2gs_state::lc_update(int offset, bool writing)
 
 	if (m_lcram != old_lcram)
 	{
-		if (m_lcram)
-		{
-			m_lcbank.select(1);
-			m_lcaux.select(1);
-			m_lc00.select(1 + (m_romswitch ? 2 : 0));
-			m_lc01.select(1);
-		}
-		else
-		{
-			m_lcbank.select(0);
-			m_lcaux.select(0);
-			m_lc00.select(0 + (m_romswitch ? 2 : 0));
-			m_lc01.select(0);
-		}
+		lcrom_update();
 	}
 
 	#if 0
@@ -1289,6 +1277,24 @@ void apple2gs_state::lc_update(int offset, bool writing)
 			m_lcram2 ? 0x1000 : 0x0000,
 			m_altzp);
 	#endif
+}
+
+void apple2gs_state::lcrom_update()
+{
+	if (m_lcram)
+	{
+		m_lcbank.select(1);
+		m_lcaux.select(1);
+		m_lc00.select(1 + (m_romswitch ? 2 : 0));
+		m_lc01.select(1);
+	}
+	else
+	{
+		m_lcbank.select(0);
+		m_lcaux.select(0);
+		m_lc00.select(0 + (m_romswitch ? 2 : 0));
+		m_lc01.select(0);
+	}
 }
 
 // most softswitches don't care about read vs write, so handle them here
@@ -3412,6 +3418,7 @@ void apple2gs_state::adbmicro_p2_out(u8 data)
 		m_video->page2_w(false);
 		m_video->res_w(0);
 
+		lcrom_update();
 		auxbank_update();
 		update_slotrom_banks();
 	}
@@ -3826,16 +3833,15 @@ void apple2gs_state::apple2gs(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	ES5503(config, m_doc, A2GS_7M);
 	m_doc->set_channels(2);
 	m_doc->set_addrmap(0, &apple2gs_state::a2gs_es5503_map);
 	m_doc->irq_func().set(FUNC(apple2gs_state::doc_irq_w));
 	m_doc->adc_func().set(FUNC(apple2gs_state::doc_adc_read));
 	// IIgs Tech Node #19 says even channels are right, odd are left, and 80s/90s stereo cards followed that.
-	m_doc->add_route(0, "rspeaker", 1.0);
-	m_doc->add_route(1, "lspeaker", 1.0);
+	m_doc->add_route(0, "speaker", 1.0, 1);
+	m_doc->add_route(1, "speaker", 1.0, 0);
 
 	/* RAM */
 	RAM(config, m_ram).set_default_size("2M").set_extra_options("1M,3M,4M,5M,6M,7M,8M").set_default_value(0x00);

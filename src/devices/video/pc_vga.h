@@ -276,6 +276,7 @@ protected:
 			int state;
 			uint8_t color[0x300]; /* flat RGB triplets */
 			int dirty;
+			uint8_t loading[3];
 		} dac;
 
 		struct {

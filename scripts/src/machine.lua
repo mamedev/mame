@@ -583,6 +583,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/74610.h,MACHINES["TTL74610"] = true
+---------------------------------------------------
+
+if (MACHINES["TTL74610"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/74610.cpp",
+		MAME_DIR .. "src/devices/machine/74610.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/7474.h,MACHINES["TTL7474"] = true
 ---------------------------------------------------
 
@@ -890,6 +902,18 @@ if (MACHINES["AY31015"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/ay31015.cpp",
 		MAME_DIR .. "src/devices/machine/ay31015.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/ay34592.h,MACHINES["AY34592"] = true
+---------------------------------------------------
+
+if (MACHINES["AY34592"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/ay34592.cpp",
+		MAME_DIR .. "src/devices/machine/ay34592.h",
 	}
 end
 
@@ -2901,6 +2925,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/pseudovia.h,MACHINES["PSEUDOVIA"] = true
+---------------------------------------------------
+
+if (MACHINES["PSEUDOVIA"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/pseudovia.cpp",
+		MAME_DIR .. "src/devices/machine/pseudovia.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/psion_asic1.h,MACHINES["PSION_ASIC"] = true
 --@src/devices/machine/psion_asic2.h,MACHINES["PSION_ASIC"] = true
 --@src/devices/machine/psion_asic3.h,MACHINES["PSION_ASIC"] = true
@@ -3437,18 +3473,6 @@ if (MACHINES["SPG290"]~=null) then
 		MAME_DIR .. "src/devices/machine/spg290_i2c.h",
 		MAME_DIR .. "src/devices/machine/spg290_ppu.cpp",
 		MAME_DIR .. "src/devices/machine/spg290_ppu.h",
-	}
-end
-
----------------------------------------------------
---
---@src/devices/machine/stvcd.h,MACHINES["STVCD"] = true
----------------------------------------------------
-
-if (MACHINES["STVCD"]~=null) then
-	files {
-		MAME_DIR .. "src/devices/machine/stvcd.cpp",
-		MAME_DIR .. "src/devices/machine/stvcd.h",
 	}
 end
 

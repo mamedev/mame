@@ -37,7 +37,7 @@ ROM_END
 
 xt446_device::xt446_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, XT446, tag, owner, clock)
-	, device_mixer_interface(mconfig, *this, 2)
+	, device_mixer_interface(mconfig, *this)
 	, m_maincpu(*this, "maincpu")
 	, m_swp30(*this, "swp30")
 {
@@ -91,7 +91,7 @@ void xt446_device::device_add_mconfig(machine_config &config)
 
 	SWP30(config, m_swp30);
 	m_swp30->set_addrmap(AS_DATA, &xt446_device::swp30_map);
-	m_swp30->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
-	m_swp30->add_route(1, *this, 1.0, AUTO_ALLOC_INPUT, 1);
+	m_swp30->add_route(0, *this, 1.0, 0);
+	m_swp30->add_route(1, *this, 1.0, 1);
 }
 

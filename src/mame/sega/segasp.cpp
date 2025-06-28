@@ -94,7 +94,7 @@ Thomas: The Tank Engine                     ???-?????                 no        
 UNO the Medal (Medalink)                    837-14804    F*           ROM  JP     253-5508-0526J  AAFE-01G00225212, Satellite Medal
 Western Dream Gold (Medalink)               837-14699    F*           ROM  JP     253-5508-0473J  AAFE-xxxxxxxxxxx, Satellite Medal
 Yataimura Kingyosukui (1-player, Japan)     8340003      D            ROM  JP     253-5509-5151J  AAFE-01C68774814
-Yataimura Kingyosukui (4-player, China)     837-14875                 CF   EXP    253-5508-0563J  AAFE-xxxxxxxxxxx
+Yataimura Kingyosukui (4-player, China)     834000101    F          ROM/CF EXP    253-5509-5142E  AAFE-01D84514911
 Yataimura Shateki (1-player, Japan)         834000301    D            ROM  JP     253-5508-0628J  AAFE-01C37464814
 Unknown                                     834-14865                      JAP
 
@@ -250,7 +250,7 @@ uint64_t segasp_state::sp_io_r(offs_t offset, uint64_t mem_mask)
 void segasp_state::segasp_map(address_map &map)
 {
 	/* Area 0 */
-	map(0x00000000, 0x001fffff).mirror(0xa2000000).rom().region("maincpu", 0); // BIOS
+	map(0x00000000, 0x001fffff).mirror(0x02000000).rom().region("maincpu", 0); // BIOS
 
 	map(0x005f6800, 0x005f69ff).mirror(0x02000000).rw(FUNC(segasp_state::dc_sysctrl_r), FUNC(segasp_state::dc_sysctrl_w));
 	map(0x005f6c00, 0x005f6cff).mirror(0x02000000).m(m_maple, FUNC(maple_dc_device::amap));
@@ -500,7 +500,7 @@ ROM_START( bingogal )
 	ROM_PARAMETER( ":rom_board:id", "5502" )  // actually 8x 128Mbit FlashROMs
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
-	ROM_LOAD( "317-0513-jpn.ic15", 0, 0x800, BAD_DUMP CRC(778dc297) SHA1(a920ab31ea670cc5056c40baea3b832b7868bfe7) )
+	ROM_LOAD( "317-0513-jpn.ic15", 0, 0x800, CRC(599c5637) SHA1(ca066dd8e8c4277023f5f9753e527009b634119b) )
 ROM_END
 
 // This is installer of whole game machine.
@@ -522,7 +522,7 @@ ROM_START( bingogalo )
 	ROM_PARAMETER( ":rom_board:id", "5502" )  // actually 8x 128Mbit FlashROMs
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
-	ROM_LOAD( "317-0513-jpn.ic15", 0, 0x800, BAD_DUMP CRC(778dc297) SHA1(a920ab31ea670cc5056c40baea3b832b7868bfe7) )
+	ROM_LOAD( "317-0513-jpn.ic15", 0, 0x800, CRC(599c5637) SHA1(ca066dd8e8c4277023f5f9753e527009b634119b) )
 ROM_END
 
 // Also was dumped 837-14789 PCB, which uses 2x 512Mbit Flash ROMs. Game contents is the same as joined IC 62-64 dumps below.
@@ -783,6 +783,23 @@ ROM_START( shateki )
 	ROM_LOAD( "317-0628-jpn.ic15", 0, 0x800, CRC(c02f7424) SHA1(901e7f17a8e9e2e265ce4b2ec2cc56649ae57b17) )
 ROM_END
 
+ROM_START( spchecksrv )
+	SEGASP_BIOS
+	ROM_DEFAULT_BIOS( "v201" )
+	SEGASP_JP
+	SEGASP_MISC
+
+	// note: software tool is only 1MB in size, the rest is leftovers from Love&Berry Japan game, let's keep it until it's undumped
+	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASE)
+	ROM_LOAD( "ic62",  0x00000000, 0x4000000, CRC(dddd6d39) SHA1(e1eebd604f44b1dfb7dfb7c00283b4638204b996) )
+	ROM_LOAD( "ic63",  0x04000000, 0x4000000, CRC(4bce8ef2) SHA1(bcdd6968f666a1b350df5c050e65123ec3b83a77) )
+
+	ROM_PARAMETER( ":rom_board:id", "5502" )  // 2x 512Mbit FlashROMs
+
+	ROM_REGION( 0x800, "pic_readout", 0 )
+	ROM_LOAD( "317-0399-jpn.ic15", 0, 0x800, CRC(7d9d7193) SHA1(d0062a1357e4f9e6737d103d682665e238998c66) ) // all key bits is 1, is this equivalent of NAOMI DIMM's "zero key"?
+ROM_END
+
 ROM_START( tetgiant )
 	SEGASP_BIOS
 	ROM_DEFAULT_BIOS( "v201" )
@@ -1039,6 +1056,7 @@ GAME( 2007, mirworld,segasp,     segasp,    segasp, segasp_state, init_segasp, R
 GAME( 2007, ochaken, segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Ocha-Ken Hot Medal", GAME_FLAGS )
 GAME( 2009, puyomedal,segasp,    segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Puyo Puyo! The Medal Edition", GAME_FLAGS )
 GAME( 2010, shateki,segasp,      segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Yataimura Shateki (1-player, Japan, Ver 1.000)", GAME_FLAGS )
+GAME( 2005, spchecksrv,segasp,   segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "SystemSP Factory Check Server", GAME_FLAGS )
 GAME( 2009, tetgiant,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Tetris Giant / Tetris Dekaris (Ver.2.000)", GAME_FLAGS )
 GAME( 2009, unomedal,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "UNO the Medal", GAME_FLAGS )
 GAME( 2009, westdrmg,segasp,     segasp,    segasp, segasp_state, init_segasp, ROT0, "Sega", "Western Dream Gold", GAME_FLAGS )

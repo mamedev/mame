@@ -158,7 +158,7 @@
   01: Ubb (Substrate vias).                         10) CS2 (Chip select inputs: 12 bits CW).
   02: Udd (Supply voltage).                         11) CS2 (Chip select inputs: 12 bits CW).
   03: Uph (Programming voltage).                    12) Φ (Clock input).
-  04: STWL (Lenght of Control Word: 8/12 bits).     13) L (Programming signal output) (load).
+  04: STWL (Length of Control Word: 8/12 bits).     13) L (Programming signal output) (load).
   05: N/C.                                          14) Dq (Data output).
   06: /RES (Reset input).                           15) INV (Invert input signals).
   07: N/C.                                          16) REC (Data input control) (receive).
@@ -166,7 +166,7 @@
   09: CS3 (Chip select inputs: 8 or 12 bits CW).    18) Upi (Write voltage).
 
 
-  Since STWL is connected to GND, the control word is set to 8-bit lenght.
+  Since STWL is connected to GND, the control word is set to 8-bit length.
 
 
 

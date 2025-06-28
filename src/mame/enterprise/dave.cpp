@@ -192,7 +192,7 @@ device_memory_interface::space_config_vector dave_device::memory_space_config() 
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void dave_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void dave_device::sound_stream_update(sound_stream &stream)
 {
 	/* 0 = channel 0 left volume, 1 = channel 0 right volume,
 	 2 = channel 1 left volume, 3 = channel 1 right volume,
@@ -204,10 +204,7 @@ void dave_device::sound_stream_update(sound_stream &stream, std::vector<read_str
 
 	//logerror("sound update!\n");
 
-	auto &buffer1 = outputs[0];
-	auto &buffer2 = outputs[1];
-
-	for (int sampindex = 0; sampindex < buffer1.samples(); sampindex++)
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 	{
 		int vol[4];
 
@@ -265,8 +262,8 @@ void dave_device::sound_stream_update(sound_stream &stream, std::vector<read_str
 		left_volume = output_volumes[0] + output_volumes[2] + output_volumes[4] + output_volumes[6];
 		right_volume = output_volumes[1] + output_volumes[3] + output_volumes[5] + output_volumes[7];
 
-		buffer1.put_int(sampindex, left_volume, 32768 * 4);
-		buffer2.put_int(sampindex, right_volume, 32768 * 4);
+		stream.put_int(0, sampindex, left_volume, 32768 * 4);
+		stream.put_int(1, sampindex, right_volume, 32768 * 4);
 	}
 }
 

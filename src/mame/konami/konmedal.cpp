@@ -935,7 +935,7 @@ void konmedal_state::machine_reset()
 void konmedal_state::tsukande(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(14'318'181)/2); // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
+	Z80(config, m_maincpu, 14.318181_MHz_XTAL / 2); // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal_state::medal_main);
 	TIMER(config, "scantimer").configure_scanline(FUNC(konmedal_state::konmedal_scanline), "screen", 0, 1);
 
@@ -943,7 +943,7 @@ void konmedal_state::tsukande(machine_config &config)
 	m_nvram->set_custom_handler(FUNC(konmedal_state::medal_nvram_init));
 	HOPPER(config, "hopper", attotime::from_msec(100));
 
-	K053252(config, m_k053252, XTAL(14'318'181) / 2); // not verified
+	K053252(config, m_k053252, 14.318181_MHz_XTAL / 2); // not verified
 	m_k053252->int1_ack().set(FUNC(konmedal_state::vbl_ack_w));
 	m_k053252->int2_ack().set(FUNC(konmedal_state::nmi_ack_w));
 	m_k053252->int_time().set(FUNC(konmedal_state::ccu_int_time_w));
@@ -967,18 +967,17 @@ void konmedal_state::tsukande(machine_config &config)
 	m_k056832->set_palette(m_palette);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	YMZ280B(config, m_ymz, XTAL(16'934'400)); // 16.9344MHz xtal verified on PCB
-	m_ymz->add_route(0, "lspeaker", 1.0);
-	m_ymz->add_route(1, "rspeaker", 1.0);
+	YMZ280B(config, m_ymz, 16.9344_MHz_XTAL); // 16.9344MHz xtal verified on PCB
+	m_ymz->add_route(0, "speaker", 1.0, 0);
+	m_ymz->add_route(1, "speaker", 1.0, 1);
 }
 
 void konmedal_state::ddboy(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(14'318'181)/2); // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
+	Z80(config, m_maincpu, 14.318181_MHz_XTAL / 2); // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal_state::ddboy_main);
 	TIMER(config, "scantimer").configure_scanline(FUNC(konmedal_state::konmedal_scanline), "screen", 0, 1);
 
@@ -986,7 +985,7 @@ void konmedal_state::ddboy(machine_config &config)
 	m_nvram->set_custom_handler(FUNC(konmedal_state::medal_nvram_init));
 	HOPPER(config, "hopper", attotime::from_msec(100));
 
-	K053252(config, m_k053252, XTAL(14'318'181) / 2); // not verified
+	K053252(config, m_k053252, 14.318181_MHz_XTAL / 2); // not verified
 	m_k053252->int1_ack().set(FUNC(konmedal_state::vbl_ack_w));
 	m_k053252->int2_ack().set(FUNC(konmedal_state::nmi_ack_w));
 	m_k053252->int_time().set(FUNC(konmedal_state::ccu_int_time_w));
@@ -1011,10 +1010,10 @@ void konmedal_state::ddboy(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	OKIM6295(config, m_oki, XTAL(14'318'181)/14, okim6295_device::PIN7_HIGH);
+	OKIM6295(config, m_oki, 14.318181_MHz_XTAL / 14, okim6295_device::PIN7_HIGH);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	K051649(config, "k051649", XTAL(14'318'181)/4).add_route(ALL_OUTPUTS, "mono", 0.45);
+	K051649(config, "k051649", 14.318181_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 0.45);
 }
 
 void konmedal_state::chusenoh(machine_config &config)
@@ -1031,7 +1030,7 @@ void konmedal_state::chusenoh(machine_config &config)
 	screen.set_screen_update(FUNC(konmedal_state::screen_update_konmedal));
 	screen.set_palette(m_palette);
 
-	I8251(config, m_usart, XTAL(18'432'000)/8);
+	I8251(config, m_usart, 18.432_MHz_XTAL / 8);
 
 	// I have no idea how this division happens.  There is a 74F161 4-bit counter nearby which likely is involved.
 	clock_device &clk(CLOCK(config, "clock", 18.432_MHz_XTAL / 1920));  // this gives 9600 baud, which may or may not be right
@@ -1144,7 +1143,7 @@ void konmedal_state::mario_scrollhack_w(uint8_t data)
 void konmedal_state::shuriboy(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(24'000'000) / 4); // divisor unknown
+	Z80(config, m_maincpu, 24_MHz_XTAL / 4); // divisor unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal_state::shuriboy_main);
 	TIMER(config, "scantimer").configure_scanline(FUNC(konmedal_state::shuri_scanline), "screen", 0, 1);
 
@@ -1153,19 +1152,16 @@ void konmedal_state::shuriboy(machine_config &config)
 	HOPPER(config, "hopper", attotime::from_msec(100));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // everything not verified, just a placeholder
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(30));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(112, 400-1, 16, 240-1);
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240);
 	screen.set_screen_update(FUNC(konmedal_state::screen_update_shuriboy));
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(konmedal_state::konmedal_palette)).set_format(palette_device::xRGB_444, 256); // not verified
 	//m_palette->enable_shadows();
-	//m_palette->enable_hilights();
+	//m_palette->enable_highlights();
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(konmedal_state::shuriboy_tile_callback));
@@ -1175,9 +1171,9 @@ void konmedal_state::shuriboy(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	K051649(config, "k051649", XTAL(24'000'000) / 8).add_route(ALL_OUTPUTS, "mono", 0.45); // divisor unknown
+	K051649(config, "k051649", 24_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.45); // divisor unknown
 
-	UPD7759(config, m_upd7759, XTAL(640'000)).add_route(ALL_OUTPUTS, "mono", 0.60);
+	UPD7759(config, m_upd7759, 640_kHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.60);
 }
 
 void konmedal_state::fuusenpn(machine_config &config)

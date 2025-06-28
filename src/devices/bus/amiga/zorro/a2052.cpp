@@ -19,12 +19,12 @@
 //  DEVICE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(ZORRO_A2052, bus::amiga::zorro::a2052_device, "zorro_a2052", "CBM A2052 Fast Memory")
+DEFINE_DEVICE_TYPE(AMIGA_A2052, bus::amiga::zorro::a2052_device, "amiga_a2052", "Commodore A2052 RAM Expansion Card")
 
 namespace bus::amiga::zorro {
 
 a2052_device::a2052_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ZORRO_A2052, tag, owner, clock),
+	device_t(mconfig, AMIGA_A2052, tag, owner, clock),
 	device_zorro2_card_interface(mconfig, *this),
 	m_config(*this, "config"),
 	m_ram_size(0)
@@ -74,18 +74,18 @@ void a2052_device::autoconfig_base_address(offs_t address)
 	LOG("-> installing a2052\n");
 
 	// stop responding to default autoconfig
-	m_slot->space().unmap_readwrite(0xe80000, 0xe8007f);
+	m_zorro->space().unmap_readwrite(0xe80000, 0xe8007f);
 
 	// install access to the rom space
-	m_slot->space().install_ram(address, address + (m_ram_size << 20) - 1, m_ram.get());
+	m_zorro->space().install_ram(address, address + (m_ram_size << 20) - 1, m_ram.get());
 
 	// we're done
-	m_slot->cfgout_w(0);
+	m_zorro->cfgout_w(0);
 }
 
 void a2052_device::cfgin_w(int state)
 {
-	LOG("%s: configin_w (%d)\n", shortname(), state);
+	LOG("%s: cfgin_w (%d)\n", shortname(), state);
 
 	if (state == 0)
 	{
@@ -120,9 +120,9 @@ void a2052_device::cfgin_w(int state)
 		autoconfig_can_shutup(true); // ?
 
 		// install autoconfig handler
-		m_slot->space().install_readwrite_handler(0xe80000, 0xe8007f,
+		m_zorro->space().install_readwrite_handler(0xe80000, 0xe8007f,
 			read16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_read)),
-			write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffffffff);
+			write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffff);
 	}
 }
 

@@ -40,15 +40,11 @@ void xavix_sound_device::device_reset()
 }
 
 
-void xavix_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void xavix_sound_device::sound_stream_update(sound_stream &stream)
 {
-	// reset the output stream
-	outputs[0].fill(0);
-	outputs[1].fill(0);
-
 	int outpos = 0;
 	// loop while we still have samples to generate
-	int samples = outputs[0].samples();
+	int samples = stream.samples();
 	while (samples-- != 0)
 	{
 		for (int channel = 0; channel < 2; channel++)
@@ -81,7 +77,7 @@ void xavix_sound_device::sound_stream_update(sound_stream &stream, std::vector<r
 							*/
 						}
 
-						outputs[channel].add_int(outpos, sample * (m_voice[v].vol + 1), 32768);
+						stream.add_int(channel, outpos, sample * (m_voice[v].vol + 1), 32768);
 						m_voice[v].position[channel] += m_voice[v].rate;
 					}
 					else

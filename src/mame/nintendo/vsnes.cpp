@@ -2588,10 +2588,9 @@ void vs_dual_state::vsdual(machine_config &config)
 	m_ppu2->int_callback().set_inputline(m_subcpu, INPUT_LINE_NMI);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	maincpu.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	subcpu.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	SPEAKER(config, "speaker", 2).front();
+	maincpu.add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
+	subcpu.add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 
 	// watchdog resets system between 1.23s and 1.33s in hardware tests, exact timing unknown
 	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_msec(1300));

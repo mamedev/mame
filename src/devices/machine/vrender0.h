@@ -110,8 +110,7 @@ private:
 	required_device <palette_device> m_palette;
 	required_device <vr0video_device> m_vr0vid;
 	required_device <vr0sound_device> m_vr0snd;
-	required_device <speaker_device> m_lspeaker;
-	required_device <speaker_device> m_rspeaker;
+	required_device <speaker_device> m_speaker;
 	required_device_array <vr0uart_device, 2> m_uart;
 	required_shared_ptr <uint32_t> m_crtcregs;
 	std::unique_ptr<uint16_t []> m_textureram;

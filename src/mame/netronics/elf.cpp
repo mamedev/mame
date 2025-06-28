@@ -9,10 +9,6 @@
 /*
 
     TODO:
-    - Problem with DMA: open MAME debugger to see RAM, set LOAD, input a value,
-      and it will write twice. It is because set_input_line is delayed until
-      the CPU finished execute_run after sc_w.
-    - proper layout
     - add cassette I/O
 
 */
@@ -93,14 +89,14 @@ INPUT_CHANGED_MEMBER(elf2_state::load_w)
 {
 	/* DMAIN is reset while LOAD is off */
 	if (!newval)
-		m_maincpu->set_input_line(COSMAC_INPUT_LINE_DMAIN, CLEAR_LINE);
+		m_dmain = 0;
 }
 
 INPUT_CHANGED_MEMBER(elf2_state::input_w)
 {
 	/* assert DMAIN */
 	if (LOAD && !newval && ~m_sc & 2)
-		m_maincpu->set_input_line(COSMAC_INPUT_LINE_DMAIN, ASSERT_LINE);
+		m_dmain = 1;
 }
 
 static INPUT_PORTS_START( elf2 )
@@ -135,22 +131,17 @@ static INPUT_PORTS_START( elf2 )
 	PORT_START("SPECIAL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RUN") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("LOAD") PORT_CODE(KEYCODE_L) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(elf2_state::load_w), 0)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("M/P") PORT_CODE(KEYCODE_M) PORT_TOGGLE
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("MP") PORT_CODE(KEYCODE_M) PORT_TOGGLE
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("IN") PORT_CODE(KEYCODE_ENTER) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(elf2_state::input_w), 0)
 INPUT_PORTS_END
 
 /* CDP1802 Configuration */
 
-uint8_t elf2_state::dma_r()
-{
-	return m_data;
-}
-
 void elf2_state::sc_w(uint8_t data)
 {
 	/* DMAIN is reset while SC1 is high */
 	if (data & 2)
-		m_maincpu->set_input_line(COSMAC_INPUT_LINE_DMAIN, CLEAR_LINE);
+		m_dmain = 0;
 
 	m_sc = data;
 }
@@ -187,6 +178,7 @@ void elf2_state::machine_start()
 	/* register for state saving */
 	save_item(NAME(m_data));
 	save_item(NAME(m_sc));
+	save_item(NAME(m_dmain));
 }
 
 /* Machine Driver */
@@ -213,9 +205,10 @@ void elf2_state::elf2(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &elf2_state::elf2_io);
 	m_maincpu->wait_cb().set_ioport("SPECIAL").bit(1).invert();
 	m_maincpu->clear_cb().set_ioport("SPECIAL").bit(0);
+	m_maincpu->dma_in_cb().set([this]() { return m_dmain; });
 	m_maincpu->ef4_cb().set_ioport("SPECIAL").bit(3);
 	m_maincpu->q_cb().set_output("led0");
-	m_maincpu->dma_rd_cb().set(FUNC(elf2_state::dma_r));
+	m_maincpu->dma_rd_cb().set(FUNC(elf2_state::data_r));
 	m_maincpu->dma_wr_cb().set(m_vdc, FUNC(cdp1861_device::dma_w));
 	m_maincpu->sc_cb().set(FUNC(elf2_state::sc_w));
 

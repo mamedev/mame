@@ -1385,13 +1385,12 @@ void midzeus_state::midzeus(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
 	dcs.set_maincpu_tag(m_maincpu);
-	dcs.add_route(0, "rspeaker", 1.0);
-	dcs.add_route(1, "lspeaker", 1.0);
+	dcs.add_route(0, "speaker", 1.0, 1);
+	dcs.add_route(1, "speaker", 1.0, 0);
 
 	MIDWAY_IOASIC(config, m_ioasic, 0);
 	m_ioasic->in_port_cb<0>().set_ioport("DIPS");
@@ -1437,13 +1436,12 @@ void midzeus2_state::midzeus2(machine_config &config)
 	m_zeus->irq_callback().set(FUNC(midzeus2_state::zeus_irq));
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	dcs2_audio_2104_device &dcs(DCS2_AUDIO_2104(config, "dcs", 0));
 	dcs.set_maincpu_tag(m_maincpu);
-	dcs.add_route(0, "rspeaker", 1.0);
-	dcs.add_route(1, "lspeaker", 1.0);
+	dcs.add_route(0, "speaker", 1.0, 1);
+	dcs.add_route(1, "speaker", 1.0, 0);
 
 	M48T35(config, m_m48t35, 0);
 
@@ -1537,8 +1535,8 @@ ROM_END
 
 ROM_START( mk4b )
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  // sound data
-	ROM_LOAD16_BYTE( "mk4_l1.u2", 0x000000, 0x200000, CRC(daac8ab5) SHA1(b93aa205868212077a9b6ac8e93205e1ebf8c05e) ) // All sound ROMs were labeled as v1.0 & are M27C160 type
-	ROM_LOAD16_BYTE( "mk4_l1.u3", 0x400000, 0x200000, CRC(cb59413e) SHA1(f7e5c589a8f6a2e7dceee4881594e7403be4d4ad) )
+	ROM_LOAD16_BYTE( "mk4_l1.u2", 0x000000, 0x100000, CRC(5109f49d) SHA1(566f45ecdf81349c05fd42231c669614896a66c4) ) // All sound ROMs were labeled as v1.0, U2 was ROM type M27C800
+	ROM_LOAD16_BYTE( "mk4_l1.u3", 0x400000, 0x200000, CRC(cb59413e) SHA1(f7e5c589a8f6a2e7dceee4881594e7403be4d4ad) ) // ROMs U3 through U5 were ROM type M27C160
 	ROM_LOAD16_BYTE( "mk4_l1.u4", 0x800000, 0x200000, CRC(dee91696) SHA1(00a182a36a414744cd014fcfc53c2e1a66ab5189) )
 	ROM_LOAD16_BYTE( "mk4_l1.u5", 0xc00000, 0x200000, CRC(44d072be) SHA1(8a636c2801d799dfb84e69607ade76d2b49cf09f) )
 
@@ -1855,6 +1853,36 @@ ROM_START( crusnexod )
 	// U20 & U21 unpopulated
 ROM_END
 
+ROM_START( crusnexoe )
+	ROM_REGION16_LE( 0xc00000, "dcs", ROMREGION_ERASEFF )   // sound data
+	ROM_LOAD( "cruisn_exotica_u2_rev.1.0.u2", 0x000000, 0x200000, CRC(d2d54acf) SHA1(2b4d6fda30af807228bb281335939dfb6df9b530) )
+	ROM_RELOAD(             0x200000, 0x200000 )
+	ROM_LOAD( "cruisn_exotica_u3_rev.1.0.u3", 0x400000, 0x400000, CRC(28a3a13d) SHA1(8d7d641b883df089adefdd144229afef79db9e8a) )
+	ROM_LOAD( "cruisn_exotica_u4_rev.1.0.u4", 0x800000, 0x400000, CRC(213f7fd8) SHA1(8528d524a62bc41a8e3b39f0dbeeba33c862ee27) )
+	// U5 unpopulated
+
+	ROM_REGION( 0x1000, "pic", 0 ) // PIC16c57 Code
+	ROM_LOAD( "472_cruisn_exot_27.u53", 0x0000, 0x1000, CRC(7ff41d76) SHA1(13d23e634dc8d20fbee11a9c39923b7e54984672) ) // decapped but not hooked up
+
+	ROM_REGION32_LE( 0x0800000, "maindata", 0 )
+	ROM_LOAD32_WORD( "cruisin_exotica_u10_98bf_1-31-00_rev_1.0.u10", 0x0000000, 0x200000, CRC(0206492b) SHA1(d2275bf0c02a14db8d2af20f888a5b765cfc33e1) )
+	ROM_LOAD32_WORD( "cruisin_exotica_u11_db5a_1-31-00_rev_1.0.u11", 0x0000002, 0x200000, CRC(f0546f97) SHA1(442a6544f40207de628ef15b63f3c976ef297cfb) )
+	ROM_LOAD32_WORD( "cruisin_exotica_u12_8e33_1-31-00_rev_1.0.u12", 0x0400000, 0x200000, CRC(f129c6ba) SHA1(c4b6c39146312026c5207eb3b10400fa9a7df687) )
+	ROM_LOAD32_WORD( "cruisin_exotica_u13_2c9c_1-31-00_rev_1.0.u13", 0x0400002, 0x200000, CRC(b45c081f) SHA1(924236393cea569191966b2f61957bc37a21d334) )
+
+	ROM_REGION32_LE( 0x3000000, "bankeddata", 0 )
+	ROM_LOAD32_WORD( "cruisn_exotica_u14_rev.1.0.u14", 0x0000000, 0x400000, CRC(84452fc2) SHA1(06d87263f83ef079e6c5fb9de620e0135040c858) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u15_rev.1.0.u15", 0x0000002, 0x400000, CRC(b6aaebdb) SHA1(6ede6ea123be6a88d1ff38e90f059c9d1f822d6d) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u16_rev.1.0.u16", 0x0800000, 0x400000, CRC(aac6d2a5) SHA1(6c336520269d593b46b82414d9352a3f16955cc3) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u17_rev.1.0.u17", 0x0800002, 0x400000, CRC(71cf5404) SHA1(a6eed1a66fb4f4ddd749e4272a2cdb8e3e354029) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u22_rev.1.0.u22", 0x1000000, 0x400000, CRC(ad6dcda7) SHA1(5c9291753e1659f9adbe7e59fa2d0e030efae5bc) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u23_rev.1.0.u23", 0x1000002, 0x400000, CRC(1f103a68) SHA1(3b3acc63a461677cd424e75e7211fa6f063a37ef) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u24_rev.1.0.u24", 0x1800000, 0x400000, CRC(6312feef) SHA1(4113e4e5d39c99e8131d41a57c973df475b67d18) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u25_rev.1.0.u25", 0x1800002, 0x400000, CRC(b8277b16) SHA1(1355e87affd78e195906aedc9aed9e230374e2bf) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u18_rev.1.0.u18", 0x2000000, 0x400000, CRC(06efb00e) SHA1(fe4968220c854ee65a78323a44787cee394234a3) )
+	ROM_LOAD32_WORD( "cruisn_exotica_u19_rev.1.0.u19", 0x2000002, 0x400000, CRC(2e75bf61) SHA1(196c24814b873dc0e500bb2187ec54e4cae6a139) )
+	// U20 & U21 unpopulated
+ROM_END
 
 ROM_START( thegrid ) // Version 1.2 Program ROMs
 	ROM_REGION16_LE( 0xc00000, "dcs", ROMREGION_ERASEFF )   // sound data
@@ -1948,7 +1976,8 @@ GAMEL( 1999, crusnexoa,  crusnexo, crusnexo, crusnexo, crusnexo_state, empty_ini
 GAMEL( 1999, crusnexoaa, crusnexo, crusnexo, crusnexo, crusnexo_state, empty_init, ROT0, "Midway", "Cruis'n Exotica (version 2.0, alternate ROM format)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
 GAMEL( 1999, crusnexob,  crusnexo, crusnexo, crusnexo, crusnexo_state, empty_init, ROT0, "Midway", "Cruis'n Exotica (version 1.6)",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
 GAMEL( 1999, crusnexoc,  crusnexo, crusnexo, crusnexo, crusnexo_state, empty_init, ROT0, "Midway", "Cruis'n Exotica (version 1.3)",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
-GAMEL( 1999, crusnexod,  crusnexo, crusnexo, crusnexo, crusnexo_state, empty_init, ROT0, "Midway", "Cruis'n Exotica (version 1.0)",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo )
+GAMEL( 1999, crusnexod,  crusnexo, crusnexo, crusnexo, crusnexo_state, empty_init, ROT0, "Midway", "Cruis'n Exotica (version 1.0, build 8764)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo ) //  8-Feb-2000
+GAMEL( 1999, crusnexoe,  crusnexo, crusnexo, crusnexo, crusnexo_state, empty_init, ROT0, "Midway", "Cruis'n Exotica (version 1.0, build 8643)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_crusnexo ) // 31-Jan-2000
 GAME(  2000, thegrid,    0,        thegrid,  thegrid,  thegrid_state,  empty_init, ROT0, "Midway", "The Grid (version 1.2)",                              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 10/16/00
 GAME(  2000, thegrida,   thegrid,  thegrid,  thegrid,  thegrid_state,  empty_init, ROT0, "Midway", "The Grid (version 1.1)",                              MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 07/26/00
 GAME(  2000, thegridb,   thegrid,  thegrid,  thegrid,  thegrid_state,  empty_init, ROT0, "Midway", "The Grid (version 1.01)",                             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // 07/17/00

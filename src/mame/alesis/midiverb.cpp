@@ -2,15 +2,12 @@
 // copyright-holders:m1macrophage
 
 /*
-The Midiverb is a digital delay & reverb unit.
+The MIDIverb is a digital delay & reverb unit.
 
 The computer portion of the device is very simple. The firmware runs on a
 80C31 microcontroller. It reads the 4 buttons, drives the two 7-segment
 displays, and listens to MIDI for program changes. It also controls which
 program (effect) is running on the DSP.
-
-An interesting aspect of the Midiverb is its DSP, which is built out of discrete
-logic components. This runs custom microcode consisting of 4 instructions.
 
 The UI is very simple. The user can choose one of 63 effects by using the
 "up" and "down" buttons on the unit. The effect can also be set via MIDI
@@ -20,11 +17,17 @@ silence program is also enabled temporarily when switching between effects.
 Finally, there is a wet/dry control knob. For more information on the audio
 hardware, see midiverb_state::configure_audio().
 
+An interesting aspect of the MIDIverb is its DSP, which is built out of discrete
+logic components and runs custom microcode. Each microcode instruction consists
+of a 2-bit opcode and 14-bit RAM delta offset. The effects program makes up the
+top 6 bits of the microcode ROM address, and the DSP just loops over the 128
+instructions of each program. There are also pre-determined program counter
+addresses where specific functions are performed (e.g. ADC, DAC). For more info,
+see midiverb_dsp::sound_stream_update().
+
 This driver is based on https://www.youtube.com/watch?v=JNPpU08YZjk
 and https://www.youtube.com/watch?v=5DYbirWuBaU, and is intended as an
 educational tool.
-
-TODO: DSP emulation (coming soon).
 
 Usage notes:
 
@@ -34,22 +37,11 @@ MIDI is optional, and can be configured as follows:
 ./mame -listmidi  # List MIDI devices, physical or virtual (e.g. DAWs).
 ./mame -window midiverb -midiin "{midi device}"
 
-Audio inputs are emulated using MAME's sample playback mechanism.
-- Create a new directory `midiverb` under the `samples` MAME directory.
-- Copy the .wav files to be used as audio inputs into that directory. Use names:
-  left.wav and right.wav for the left and right input respectively. Note that
-  MAME does not support stereo .wav files, so they need to be separate. It is
-  also fine to just include one of the two files.
-- When the emulation is running, press Space to trigger the processing of those
-  files.
-- Look out for any errors, such as unsupported file format.
-- If there is distortion, adjust INPUT LEVEL (in the Slider Controls menu).
-- Use the "DRY/WET MIX" Slider Control to adjust the wet/dry ratio.
+Audio inputs are emulated using MAME's audio input capabilities.
 
-- At the moment, DSP emulation is mostly a passthrough. It just does a
-  12-bit quantization and causes a resampling at its lowish sample rate. But it
-  should still be possible to hear the difference between the dry and wet
-  signals, in part due to all the filtering stages.
+- Select your input through the audio mixer menu.  You can adjust level there too.
+
+- Use the "DRY/WET MIX" Slider Control to adjust the wet/dry ratio.
 */
 
 #include "emu.h"
@@ -61,50 +53,62 @@ Audio inputs are emulated using MAME's sample playback mechanism.
 #include "sound/flt_biquad.h"
 #include "sound/flt_rc.h"
 #include "sound/mixer.h"
-#include "sound/samples.h"
 #include "video/pwm.h"
 #include "speaker.h"
 
 #include "alesis_midiverb.lh"
 
 #define LOG_PROGRAM_CHANGE (1U << 1)
+#define LOG_DSP_EXECUTION  (1U << 2)
 
-#define VERBOSE (LOG_GENERAL | LOG_PROGRAM_CHANGE)
+#define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 
 #include "logmacro.h"
 
 // Emulation of the MIDIverb DSP circuit, built out of discrete logic
 // components.
-class midiverb_dsp : public device_t, public device_sound_interface
+class midiverb_dsp_device : public device_t, public device_sound_interface
 {
 public:
-	midiverb_dsp(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) ATTR_COLD;
+	midiverb_dsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) ATTR_COLD;
 
 	void program_select_w(u8 data);
 
 protected:
 	void device_start() override ATTR_COLD;
-	void sound_stream_update(sound_stream &stream, const std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs) override;
+	void sound_stream_update(sound_stream &stream) override;
 
 private:
+	u16 analog_to_digital(float sample) const;
+	float digital_to_analog(u16 sample) const;
+
+	required_memory_region m_microcode;
 	sound_stream *m_stream = nullptr;
+
+	// State
 	u8 m_program = 0;
+	u16 m_accum = 0;
+	u16 m_reg = 0;
+	u16 m_ram_offset = 0;
+	std::vector<u16> m_ram;  // 4 x TMS4416-15 (16K x 4bit). U14, U19, U22, U25.
 
 	static constexpr const int CLOCKS_PER_INSTRUCTION = 2;
 	static constexpr const int INSTRUCTIONS_PER_SAMPLE = 128;
 	static constexpr const float DAC_MAX_V = 4.8F;
 };
 
-DEFINE_DEVICE_TYPE(MIDIVERB_DSP, midiverb_dsp, "midiverb_dsp", "MIDIverb discrete DSP");
+DEFINE_DEVICE_TYPE(MIDIVERB_DSP, midiverb_dsp_device, "midiverb_dsp", "MIDIverb discrete DSP");
 
-midiverb_dsp::midiverb_dsp(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+midiverb_dsp_device::midiverb_dsp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MIDIVERB_DSP, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
+	, m_microcode(*this, ":dsp_microcode")
+	, m_ram(0x4000, 0)  // 16K
 {
 }
 
-void midiverb_dsp::program_select_w(u8 data)
+void midiverb_dsp_device::program_select_w(u8 data)
 {
 	const u8 new_program = data & 0x3f;
 	if (m_program == new_program)
@@ -112,10 +116,10 @@ void midiverb_dsp::program_select_w(u8 data)
 
 	m_stream->update();
 	m_program = new_program;
-	LOGMASKED(LOG_PROGRAM_CHANGE, "Program changed to: %d\n", m_program);
+	LOGMASKED(LOG_PROGRAM_CHANGE, "DSP: Program changed to: %d\n", m_program);
 }
 
-void midiverb_dsp::device_start()
+void midiverb_dsp_device::device_start()
 {
 	// The actual sample rate works out to 23,437.5 KHz. But stream_alloc takes
 	// a u32, and .value() will round it down to 23,437 KHz.
@@ -123,39 +127,155 @@ void midiverb_dsp::device_start()
 	m_stream = stream_alloc(1, 2, sample_clock.value());
 
 	save_item(NAME(m_program));
+	save_item(NAME(m_accum));
+	save_item(NAME(m_reg));
+	save_item(NAME(m_ram_offset));
+	save_item(NAME(m_ram));
 }
 
-void midiverb_dsp::sound_stream_update(sound_stream &stream, const std::vector<read_stream_view> &inputs, std::vector<write_stream_view> &outputs)
+#define LOG_DSP(...) \
+		do { \
+			if (sample_i < DEBUG_SAMPLES) \
+				LOGMASKED(LOG_DSP_EXECUTION, __VA_ARGS__); \
+		} while(0)
+
+void midiverb_dsp_device::sound_stream_update(sound_stream &stream)
 {
-	assert(inputs.size() == 1);
-	assert(outputs.size() == 2);
+	static constexpr const u8 MAX_PC = 0x7f;
+	static constexpr const int DEBUG_SAMPLES = 2;
+	static constexpr const char* const OP_NAME[4] =
+	{ "ADDHF", "LDHF ", "STPOS", "STNEG" };
 
-	const read_stream_view &in = inputs[0];
-	write_stream_view &left = outputs[0];
-	write_stream_view &right = outputs[1];
-	const int n = in.samples();
+	const int n = stream.samples();
+	const u16 rom_base = u16(m_program) << 8;
 
-	for (int i = 0; i < n; ++i)
+	for (int sample_i = 0; sample_i < n; ++sample_i)
 	{
-		// Analog-to-digital conversion is done with a 12-bit DAC+SAR.
-		// Note that samples in the stream are treated as voltages (see
-		// configure_audio()). Convert the voltage to the range: -/+1.
-		const float sample_in = std::clamp(in.get(i), -DAC_MAX_V, DAC_MAX_V) / DAC_MAX_V;
-		// Quantize to 12 bits, keeping in mind that the range is -1 - 1 (reason
-		// for "/ 2"), then convert to 13 bits ("* 2").
-		const s16 quantized = floorf(sample_in * ((1 << 12) / 2 - 1)) * 2;
-		assert(quantized > -4096 && quantized < 4096);
+		u16 rom_address = rom_base + 2 * (MAX_PC - 1);
+		for (u8 pc = 0; pc <= MAX_PC; ++pc)
+		{
+			// Each microcode instruction consists of two bytes. A 2-bit opcode
+			// and a 14-bit RAM offset. Microcode execution is pipelined:
+			// - The RAM offset in each instruction gets added to the current
+			//   RAM address *after* the execution of the instruction, so it
+			//   affects the RAM access of the next instruction.
+			// - The 2-bit opcode being executed comes from the *previous*
+			//   instruction in ROM.
+			// - The "program counter" (whose value is used for some control
+			//   signals, see below) leads the instruction currently being
+			//   executed.
 
-		// TODO: Implement DSP logic (coming soon).
+			const u8 op = m_microcode->as_u8(rom_address + 1) >> 6;
+			rom_address = rom_base + 2 * ((pc + MAX_PC) & MAX_PC);
+			const u8 ram_row = m_microcode->as_u8(rom_address);
+			const u8 ram_col = m_microcode->as_u8(rom_address + 1) & 0x3f;
+			const u16 ram_offset_delta = (u16(ram_col) << 8) | ram_row;
 
-		// Digital-to-analog conversion uses the 12-bit DAC and 1 extra bit
-		// (LSB), for a total of 13 bits. The extra bit is implemented by
-		// conditionally injecting extra current into the current-to-voltage
-		// converter that follows the DAC.
-		const float sample_out = DAC_MAX_V * float(quantized) / ((1 << 13) / 2 - 1);
-		left.put(i, sample_out);
-		right.put(i, sample_out);
+			// Control signals. Names match those in:
+			// https://www.youtube.com/watch?v=JNPpU08YZjk.
+			const bool mode_rc0 = (pc == 0);  // Read from ADC.
+			const bool ld_dac = (pc == 0x60 || pc == 0x70);  // Write to DAC.
+			const bool dac_left = (pc == 0x70);  // Route DAC to left (instead of right) channel.
+			const bool ld_dsp = !mode_rc0 && !ld_dac;  // Write to register.
+			const bool clear_acc = BIT(op, 0);  // Clear the accumulator.
+			const bool rd_r0 = (op == 0x02);  // Place register contents on the bus.
+			const bool rd_r1 = (op == 0x03);  // Place negated register contents on the bus.
+			const bool dram_w = BIT(op, 1) || mode_rc0;  // Write (instead of read) RAM.
+
+			u16 bus_value = 0;
+			int num_bus_writes = 0;
+			if (mode_rc0)
+			{
+				bus_value = analog_to_digital(stream.get(0, sample_i));
+				++num_bus_writes;
+			}
+			if (rd_r0)
+			{
+				bus_value = m_reg;
+				++num_bus_writes;
+			}
+			if (rd_r1)
+			{
+				bus_value = ~m_reg;
+				++num_bus_writes;
+			}
+			if (!dram_w)
+			{
+				bus_value = m_ram[m_ram_offset];
+				++num_bus_writes;
+			}
+			if (num_bus_writes == 0)
+				LOG("DSP microcode error: floating bus\n");
+			else if (num_bus_writes > 1)
+				LOG("DSP microcode error: bus conflict %d %d %d %d\n", mode_rc0, rd_r0, rd_r1, !dram_w);
+
+			if (dram_w)
+				m_ram[m_ram_offset] = bus_value;
+
+			if (ld_dac)
+			{
+				if (dac_left)
+					stream.put(0, sample_i, digital_to_analog(bus_value));
+				else
+					stream.put(1, sample_i, digital_to_analog(bus_value));
+			}
+
+			if (clear_acc)
+				m_accum = 0;
+
+			if (ld_dsp)
+			{
+				const u16 sign = BIT(bus_value, 15);
+				m_accum += ((sign << 15) | (bus_value >> 1)) + sign;
+				m_reg = m_accum;
+			}
+
+			LOG_DSP("%04X %02x - DSP OP: %d %s (%04x), A: %6d, R: %6d, bus: %6d, ram: %6d @ %04x",
+					rom_address, pc, op, OP_NAME[op], ram_offset_delta, m_accum,
+					m_reg, bus_value, m_ram[m_ram_offset], m_ram_offset);
+			if (mode_rc0)
+				LOG_DSP(" [ADC]");
+			if (ld_dac)
+			{
+				if (dac_left)
+					LOG_DSP(" [DAC LEFT]");
+				else
+					LOG_DSP(" [DAC RIGHT]");
+			}
+			LOG_DSP("\n");
+
+			m_ram_offset = (m_ram_offset + ram_offset_delta) & (m_ram.size() - 1);
+		}
+		LOG_DSP("\n");
 	}
+	LOGMASKED(LOG_DSP_EXECUTION, "\n");
+}
+
+u16 midiverb_dsp_device::analog_to_digital(float sample) const
+{
+	// Analog-to-digital conversion is done with a 12-bit DAC+SAR.
+	// Note that samples in the stream are treated as voltages (see
+	// configure_audio()). Convert the voltage to the range: -/+1.
+	const float transformed = std::clamp(sample, -DAC_MAX_V, DAC_MAX_V) / DAC_MAX_V;
+
+	// Quantize to 12 bits, keeping in mind that the range is -1 - 1 (reason
+	// for "/ 2"). Then convert to 13 bits ("* 2"). Bit 0 is always set ("+ 1).
+	const s16 quantized = floorf(transformed * ((1 << 12) / 2 - 1)) * 2 + 1;
+	assert(quantized > -4096 && quantized < 4096);
+
+	return static_cast<u16>(quantized);
+}
+
+float midiverb_dsp_device::digital_to_analog(u16 sample) const
+{
+	// Digital-to-analog conversion uses the 12-bit DAC and 1 extra bit
+	// (LSB), for a total of 13 bits. The extra bit is implemented by
+	// conditionally injecting extra current into the current-to-voltage
+	// converter that follows the DAC. There is also saturation logic to detect
+	// overflows and underflows, and set the DAC to the max or min value
+	// respectively.
+	const s16 saturated = std::clamp<s16>(static_cast<s16>(sample), -4095, 4095);
+	return DAC_MAX_V * float(saturated) / ((1 << 13) / 2 - 1);
 }
 
 namespace {
@@ -171,7 +291,6 @@ public:
 		, m_digit_device(*this, "pwm_digit_device")
 		, m_digit_out(*this, "digit_%d", 1U)
 		, m_mix(*this, "mix")
-		, m_input_level(*this, "audio_input_level")
 		, m_audio_in(*this, "audio_input")
 		, m_dsp(*this, "discrete_dsp")
 		, m_left_out(*this, "left_mixer_out")
@@ -182,8 +301,6 @@ public:
 	void midiverb(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(mix_changed);
-	DECLARE_INPUT_CHANGED_MEMBER(audio_input_play);
-	DECLARE_INPUT_CHANGED_MEMBER(audio_input_level);
 
 protected:
 	void machine_start() override ATTR_COLD;
@@ -197,7 +314,6 @@ private:
 	void digit_out_update_w(offs_t offset, u8 data);
 
 	void update_mix();
-	void update_audio_input_level();
 
 	void program_map(address_map &map) ATTR_COLD;
 	void external_memory_map(address_map &map) ATTR_COLD;
@@ -207,15 +323,12 @@ private:
 	required_device<pwm_display_device> m_digit_device;
 	output_finder<2> m_digit_out;  // 2 x MAN4710A (7-seg display), DS1 & DS2.
 	required_ioport m_mix;
-	required_ioport m_input_level;
-	required_device<samples_device> m_audio_in;
-	required_device<midiverb_dsp> m_dsp;
+	required_device<microphone_device> m_audio_in;
+	required_device<midiverb_dsp_device> m_dsp;
 	required_device<mixer_device> m_left_out;
 	required_device<mixer_device> m_right_out;
 
 	bool m_midi_rxd_bit = true; // Start high for serial idle.
-	u8 m_digit_latch_inv = 0x00;
-	u8 m_digit_mask = 0x00;
 
 	enum
 	{
@@ -239,8 +352,7 @@ void midiverb_state::digit_select_w(u8 data)
 	// The digit select signals (bit 0 and 1) are active-low. They connect to
 	// the base of PNP transistors (2N4403, Q4 and Q3 for DS1 and DS2
 	// respectively). When low, power is connected to the MAN4710 anode inputs.
-	m_digit_mask = ~data & 0x03;
-	m_digit_device->matrix(m_digit_mask, m_digit_latch_inv);
+	m_digit_device->write_my(~data & 0x03);
 }
 
 void midiverb_state::digit_latch_w(u8 data)
@@ -252,8 +364,7 @@ void midiverb_state::digit_latch_w(u8 data)
 
 	// Inverting because segment LEDs are active-low, but pwm_display_device
 	// expects active-high.
-	m_digit_latch_inv = ~descrambled & 0x7f;
-	m_digit_device->matrix(m_digit_mask, m_digit_latch_inv);
+	m_digit_device->write_mx(~descrambled & 0x7f);
 }
 
 void midiverb_state::digit_out_update_w(offs_t offset, u8 data)
@@ -275,13 +386,6 @@ void midiverb_state::update_mix()
 	m_right_out->set_input_gain(1, wet);
 }
 
-void midiverb_state::update_audio_input_level()
-{
-	const float gain = m_input_level->read() / 100.0F;
-	m_audio_in->set_output_gain(LEFT_CHANNEL, gain);
-	m_audio_in->set_output_gain(RIGHT_CHANNEL, gain);
-}
-
 void midiverb_state::program_map(address_map &map)
 {
 	// 2764 ROM has A0-A11 connected to the MCU, and A12 tied high. ROM /OE
@@ -295,26 +399,17 @@ void midiverb_state::external_memory_map(address_map &map)
 	map(0x0000, 0x0000).mirror(0xffff).w(FUNC(midiverb_state::digit_latch_w));
 }
 
-static const char *const midiverb_sample_names[] =
-{
-	"left",
-	"right",
-	nullptr
-};
-
 void midiverb_state::configure_audio(machine_config &config)
 {
 	static constexpr const double SK_R3 = RES_M(999.99);
 	static constexpr const double SK_R4 = RES_R(0.001);
 
-	// Audio input. Emulated with a "samples" device.
-	SAMPLES(config, m_audio_in);
-	m_audio_in->set_samples_names(midiverb_sample_names);
-	m_audio_in->set_channels(2);
+	// Audio input.
+	MICROPHONE(config, m_audio_in, 2).front();
 
 	// According to the user manual, input levels can be up to +6 dBV peak when
 	// a single input is connected, or 0 dBV when both are connected. 0 dBV
-	// means the input voltage can peak at +/- 1.414V. The Samples device
+	// means the input voltage can peak at +/- 1.414V. The microphone device
 	// returns samples in the range +/- 1. So we can just treat those as
 	// voltages.
 
@@ -411,33 +506,29 @@ void midiverb_state::configure_audio(machine_config &config)
 	// corresponding original (dry) channel, based on the position of a
 	// user-accessible, dual-gang potentiometer.
 	MIXER(config, m_left_out);
-	left_amp_in.add_route(0, m_left_out, 1.0);
-	left_sk_out.add_route(0, m_left_out, 1.0);
+	left_amp_in.add_route(0, m_left_out, 1.0, 0);
+	left_sk_out.add_route(0, m_left_out, 1.0, 1);
 	MIXER(config, m_right_out);
-	right_amp_in.add_route(0, m_right_out, 1.0);
-	right_sk_out.add_route(0, m_right_out, 1.0);
+	right_amp_in.add_route(0, m_right_out, 1.0, 0);
+	right_sk_out.add_route(0, m_right_out, 1.0, 1);
 
 	// Finally, the signals are attenuated to line level, undoing the ~5x
 	// amplification at the input.
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	const double output_gain = RES_VOLTAGE_DIVIDER(RES_K(2.4), RES_R(500));
-	m_left_out->add_route(ALL_OUTPUTS, "lspeaker", output_gain);
-	m_right_out->add_route(ALL_OUTPUTS, "rspeaker", output_gain);
+	m_left_out->add_route(ALL_OUTPUTS, "speaker", output_gain, 0);
+	m_right_out->add_route(ALL_OUTPUTS, "speaker", output_gain, 1);
 }
 
 void midiverb_state::machine_start()
 {
 	m_digit_out.resolve();
 	save_item(NAME(m_midi_rxd_bit));
-	save_item(NAME(m_digit_latch_inv));
-	save_item(NAME(m_digit_mask));
 }
 
 void midiverb_state::machine_reset()
 {
 	update_mix();
-	update_audio_input_level();
 }
 
 void midiverb_state::midiverb(machine_config &config)
@@ -447,7 +538,7 @@ void midiverb_state::midiverb(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &midiverb_state::external_memory_map);
 
 	m_maincpu->port_out_cb<1>().set(FUNC(midiverb_state::digit_select_w)).mask(0x03);  // P1.0-P1.1
-	m_maincpu->port_out_cb<1>().append(m_dsp, FUNC(midiverb_dsp::program_select_w)).rshift(2);  // P1.2-P1.7
+	m_maincpu->port_out_cb<1>().append(m_dsp, FUNC(midiverb_dsp_device::program_select_w)).rshift(2);  // P1.2-P1.7
 	m_maincpu->port_in_cb<3>().set(FUNC(midiverb_state::midi_rxd_r)).mask(0x01);  // P3.0
 	m_maincpu->port_in_cb<3>().append_ioport("buttons").lshift(2).mask(0x3c);  // P3.2-P3.5
 
@@ -470,19 +561,6 @@ DECLARE_INPUT_CHANGED_MEMBER(midiverb_state::mix_changed)
 	update_mix();
 }
 
-DECLARE_INPUT_CHANGED_MEMBER(midiverb_state::audio_input_play)
-{
-	if (newval == 0)
-		return;
-	m_audio_in->start(LEFT_CHANNEL, 0);
-	m_audio_in->start(RIGHT_CHANNEL, 1);
-}
-
-DECLARE_INPUT_CHANGED_MEMBER(midiverb_state::audio_input_level)
-{
-	update_audio_input_level();
-}
-
 INPUT_PORTS_START(midiverb)
 	PORT_START("buttons")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("MIDI CHANNEL") PORT_CODE(KEYCODE_C)
@@ -493,26 +571,19 @@ INPUT_PORTS_START(midiverb)
 	PORT_START("mix")  // MIX potentiometer at the back of the unit.
 	PORT_ADJUSTER(100, "DRY/WET MIX")
 		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(midiverb_state::mix_changed), 0)
-
-	// The following are not controls on the real unit.
-	// They control audio input.
-
-	PORT_START("audio_input_control")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("PLAY") PORT_CODE(KEYCODE_SPACE)
-		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(midiverb_state::audio_input_play), 0)
-
-	PORT_START("audio_input_level")
-	PORT_ADJUSTER(50, "INPUT LEVEL")
-		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(midiverb_state::audio_input_level), 0)
 INPUT_PORTS_END
 
 ROM_START(midiverb)
-	ROM_REGION(0x2000, MAINCPU_TAG, 0)
-	// U54. 2764 ROM.
+	ROM_REGION(0x2000, MAINCPU_TAG, 0)  // U54. 2764 ROM.
 	ROM_LOAD("mvop_4-7-86.u54", 0x000000, 0x002000, CRC(14d6596d) SHA1(c6dc579d8086556b2dd4909c8deb3c7006293816))
+
+	ROM_REGION(0x4000, "dsp_microcode", 0)  // U51, 27256, 32K ROM, but only 16K used.
+	ROM_LOAD("mvobj_2-6-86.u51", 0x000000, 0x004000, CRC(1aa25250) SHA1(ebd7ca265540c3420f4259d0eaefecaf6d95a1bf))
+	ROM_CONTINUE(0x000000, 0x004000)  // A14 (pin 27) tied to VCC. Only upper half used.
+	// Seems to have also shipped with a 27128 ROM (16K), with the same
+	// "MVOBJ 2-6-86" label.
 ROM_END
 
 }  // anonymous namespace
 
-SYST(1986, midiverb, 0, 0, midiverb, midiverb, midiverb_state, empty_init, "Alesis", "MIDIverb", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-
+SYST(1986, midiverb, 0, 0, midiverb, midiverb, midiverb_state, empty_init, "Alesis", "MIDIverb", MACHINE_SUPPORTS_SAVE)

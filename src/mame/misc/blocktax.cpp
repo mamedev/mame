@@ -85,8 +85,8 @@ void blocktax_state::blocktax(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(0*8, 32*8-1, 0*8, 32*8-1);
+	screen.set_size(64*8, 64*8);
+	screen.set_visarea(0*8, 384-1, 0*8, 240-1);
 	screen.set_screen_update(FUNC(blocktax_state::screen_update));
 	screen.set_palette("palette");
 
@@ -101,10 +101,10 @@ ROM_START( blocktax )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 ) // Internal MCU Flash
 	ROM_LOAD( "p89c51rd2hba.mcu", 0x00000, 0x10000, NO_DUMP )
 
-	ROM_REGION( 0x40000, "gfx1", 0 )
+	ROM_REGION( 0x40000, "gfx1", 0 ) // charset with 2048 pitch at 8bpp
 	ROM_LOAD( "4_ht27c020.bin", 0x00000, 0x40000, CRC(b43b91ff) SHA1(d5baad5819981d74aea2a142658af84b6445f324) )
 
-	ROM_REGION( 0x80000, "gfx2", 0 )
+	ROM_REGION( 0x80000, "gfx2", 0 ) // backgrounds with 512 pitch (384 valid)
 	ROM_LOAD( "2_ht27c020.bin", 0x00000, 0x40000, CRC(4800c3be) SHA1(befaf07a75fe57a910e0a89578bf352102ae773e) )
 	ROM_LOAD( "3_ht27c020.bin", 0x40000, 0x40000, CRC(ea1c66a2) SHA1(d10b9ca56d140235b6f31ab939613784f232caeb) )
 
@@ -121,6 +121,8 @@ ROM_START( unktax ) // PCB_V.1-2 BY TAX. At least this one has a 1 MHz resonator
 	ROM_LOAD( "2.bin", 0x40000, 0x40000, CRC(5ebd892b) SHA1(f5ae1f7c3593ed1f4dca795d16c16432e8d46607) )
 	ROM_LOAD( "3.bin", 0x80000, 0x40000, CRC(e4b9a3ce) SHA1(cab23255bf46d2d9e6b51fc04fee76e56808b2bf) )
 	ROM_LOAD( "4.bin", 0xc0000, 0x40000, CRC(295af91d) SHA1(de69afa8c3aadd2084c14ceeca8dd4eaf8d9187d) )
+
+	ROM_REGION( 0x80000, "gfx2", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "mb2-v5-05.04_baks.bin", 0x00000, 0x40000, CRC(a674ced5) SHA1(fa4cc593afbb4a9ec21e680d178fcceb111f4da9) ) // 1xxxxxxxxxxxxxxxxx = 0xFF

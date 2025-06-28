@@ -1110,11 +1110,10 @@ void midzunit_state::zunit(machine_config &config)
 	screen.set_palette(m_palette);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	WILLIAMS_NARC_SOUND(config, m_narc_sound);
-	m_narc_sound->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_narc_sound->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_narc_sound->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	m_narc_sound->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 }
 
 

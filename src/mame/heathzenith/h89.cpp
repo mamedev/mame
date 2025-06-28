@@ -45,7 +45,6 @@
 
 #include "bus/heathzenith/h19/tlb.h"
 #include "bus/heathzenith/h89/h89bus.h"
-#include "bus/heathzenith/h89/intr_cntrl.h"
 #include "bus/heathzenith/h89/cdr_fdc_880h.h"
 #include "bus/heathzenith/h89/h_88_3.h"
 #include "bus/heathzenith/h89/h_88_5.h"
@@ -55,6 +54,7 @@
 #include "bus/heathzenith/h89/we_pullup.h"
 #include "bus/heathzenith/h89/z_89_11.h"
 #include "bus/heathzenith/h89/z37_fdc.h"
+#include "bus/heathzenith/intr_cntrl/intr_cntrl.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/ins8250.h"

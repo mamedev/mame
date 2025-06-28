@@ -290,14 +290,13 @@ void goori_state::goori(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 0x2000);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	OKIM6295(config, m_oki, 16_MHz_XTAL/16, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
-	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 0.80);
-	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 0.80);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.80, 0);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.80, 1);
 
-	YM2151(config, "ymsnd", 3.579545_MHz_XTAL).add_route(0, "lspeaker", 0.40).add_route(1, "rspeaker", 0.40);
+	YM2151(config, "ymsnd", 3.579545_MHz_XTAL).add_route(0, "speaker", 0.40, 0).add_route(1, "speaker", 0.40, 1);
 }
 
 ROM_START( goori )
