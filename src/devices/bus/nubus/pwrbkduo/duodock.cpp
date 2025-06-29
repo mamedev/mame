@@ -33,11 +33,6 @@
     - NuBus slots: supported
     - Serial ports: supported
 
-    $1941B0 portrait & 16" 57.2832
-    $284A90 640x480        30.240
-    $284A90 VGA            25.175
-    $294A30 SVGA           36.0
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -49,6 +44,7 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68030.h"
 #include "machine/applefdintf.h"
+#include "machine/icd2053b.h"
 #include "machine/ncr5380.h"
 #include "machine/nscsi_bus.h"
 #include "machine/pseudovia.h"
@@ -106,6 +102,7 @@ protected:
 
 	required_device<pseudovia_device> m_pvia;
 	required_device<ariel_device> m_ramdac;
+	required_device<icd2053b_device> m_clockgen;
 	required_device<z80scc_device> m_scc;
 	required_region_ptr<u32> m_rom;
 	required_device<nscsi_bus_device> m_scsibus;
@@ -123,6 +120,9 @@ private:
 	void duodock_map(address_map &map) ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void recalc_crtc();
+	void pclock_w(u32 new_clock);
 
 	u16 swim_r(offs_t offset, u16 mem_mask);
 	void swim_w(offs_t offset, u16 data, u16 mem_mask);
@@ -155,7 +155,7 @@ private:
 	u8 m_vsc_regs[16];
 	u16 m_video_regs[0x80];
 	u32 m_hres, m_vres, m_htotal, m_vtotal, m_rowbytes;
-	XTAL m_pclock;
+	u32 m_pclock;
 	s32 m_drq;
 	u32 m_holding;
 	u8 m_holding_remaining;
@@ -193,13 +193,9 @@ static INPUT_PORTS_START(monitor_config)
 	PORT_CONFNAME(0x1ff, 0x06, "Monitor type")
 	PORT_CONFSETTING(0x01, u8"Mac Portrait Display (B&W 15\" 640\u00d7870)")    // "Full Page" or "Portrait"
 	PORT_CONFSETTING(0x02, u8"Mac RGB Display (12\" 512\u00d7384)")             // "Rubik" (modified IIgs AppleColor RGB)
-	PORT_CONFSETTING(0x04, u8"NTSC Monitor (512\u00d7384, 640\u00d7480)")
 	PORT_CONFSETTING(0x06, u8"Mac Hi-Res Display (12-14\" 640\u00d7480)")       // "High Res"
-	PORT_CONFSETTING(ext(0, 0, 0), "PAL Encoder (640\u00d7480, 768\u00d7576)")
-	PORT_CONFSETTING(ext(1, 1, 0), "NTSC Encoder (512\u00d7384, 640\u00d7480)")
-	PORT_CONFSETTING(ext(1, 1, 3), "640x480 VGA")
+	PORT_CONFSETTING(ext(1, 1, 3), "640x480 VGA")                               // Also 800x600 SVGA
 	PORT_CONFSETTING(ext(2, 3, 1), "832x624 16\" RGB")                          // "Goldfish" or "16 inch RGB"
-	PORT_CONFSETTING(ext(3, 0, 0), "PAL (640\u00d7480, 768\u00d7576)")
 INPUT_PORTS_END
 
 
@@ -224,7 +220,10 @@ void duodock_device::device_add_mconfig(machine_config &config)
 
 	ARIEL(config, m_ramdac, 0);
 
-	SCC8530(config, m_scc, 31.3344_MHz_XTAL / 4);
+	ICD2053B(config, m_clockgen, 15.6672_MHz_XTAL);
+	m_clockgen->clkout_changed().set(FUNC(duodock_device::pclock_w));
+
+	SCC8530(config, m_scc, 15.6672_MHz_XTAL / 2);
 	m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);
 	m_scc->out_txda_callback().set("printer", FUNC(rs232_port_device::write_txd));
 	m_scc->out_txdb_callback().set("modem", FUNC(rs232_port_device::write_txd));
@@ -286,6 +285,7 @@ duodock_device::duodock_device(const machine_config &mconfig, device_type type, 
 	device_pwrbkduo_card_interface(mconfig, *this),
 	m_pvia(*this, "pseudovia"),
 	m_ramdac(*this, "ramdac"),
+	m_clockgen(*this, "clockgen"),
 	m_scc(*this, "scc"),
 	m_rom(*this, "dock"),
 	m_scsibus(*this, "dscsi"),
@@ -300,7 +300,7 @@ duodock_device::duodock_device(const machine_config &mconfig, device_type type, 
 	m_htotal(800),
 	m_vtotal(525),
 	m_rowbytes(640),
-	m_pclock(30.24_MHz_XTAL),
+	m_pclock(30'240'000),
 	m_drq(0),
 	m_holding(0),
 	m_holding_remaining(0),
@@ -327,6 +327,7 @@ void duodock_device::device_start()
 	save_item(NAME(m_vres));
 	save_item(NAME(m_htotal));
 	save_item(NAME(m_vtotal));
+	save_item(NAME(m_pclock));
 	save_item(NAME(m_rowbytes));
 	save_item(NAME(m_drq));
 	save_item(NAME(m_holding));
@@ -475,14 +476,25 @@ void duodock_device::vidregs_w(offs_t offset, u16 data, u16 mem_mask)
 
 	if (offset == VSC_Depth)
 	{
-		m_hres = m_video_regs[VSC_HA] * 16;
-		m_htotal = (m_video_regs[VSC_HFP] + m_video_regs[VSC_HS] + m_video_regs[VSC_HBP] + m_video_regs[VSC_HA]) * 16;
-		m_vres = m_video_regs[VSC_VA];
-		m_vtotal = (m_video_regs[VSC_VFP] + m_video_regs[VSC_VS] + m_video_regs[VSC_VBP] + m_video_regs[VSC_VA]);
-		LOGMASKED(LOG_VIDEO, "hres %d vres %d htotal %d vtotal %d\n", m_hres, m_vres, m_htotal, m_vtotal);
-		rectangle visarea(0, m_hres - 1, 0, m_vres - 1);
-		m_screen->configure(m_htotal, m_vtotal, visarea, attotime::from_ticks(m_htotal * m_vtotal, 30.24_MHz_XTAL).as_attoseconds());
+		recalc_crtc();
 	}
+}
+
+void duodock_device::recalc_crtc()
+{
+	m_hres = m_video_regs[VSC_HA] * 16;
+	m_htotal = (m_video_regs[VSC_HFP] + m_video_regs[VSC_HS] + m_video_regs[VSC_HBP] + m_video_regs[VSC_HA]) * 16;
+	m_vres = m_video_regs[VSC_VA];
+	m_vtotal = (m_video_regs[VSC_VFP] + m_video_regs[VSC_VS] + m_video_regs[VSC_VBP] + m_video_regs[VSC_VA]);
+	LOGMASKED(LOG_VIDEO, "hres %d vres %d htotal %d vtotal %d pclock %d, %f Hz\n", m_hres, m_vres, m_htotal, m_vtotal, m_pclock, (double)((double)m_pclock / (double)(m_htotal*m_vtotal)));
+	rectangle visarea(0, m_hres - 1, 0, m_vres - 1);
+	m_screen->configure(m_htotal, m_vtotal, visarea, attotime::from_ticks(m_htotal * m_vtotal, m_pclock).as_attoseconds());
+}
+
+void duodock_device::pclock_w(u32 new_clock)
+{
+	m_pclock = new_clock;
+	recalc_crtc();
 }
 
 void duodock_device::vdac_w(offs_t offset, u8 data)
@@ -500,7 +512,8 @@ void duodock_device::vdac_w(offs_t offset, u8 data)
 
 void duodock_device::vidhandler_w(u8 data)
 {
-	LOGMASKED(LOG_VIDEO, "%02x to video GPIO (clock gen)\n", data);
+	m_clockgen->data_w(BIT(data, 6));
+	m_clockgen->clk_w(BIT(data, 5));
 }
 
 u32 duodock_device::vram_r(offs_t offset, u32 mem_mask)
