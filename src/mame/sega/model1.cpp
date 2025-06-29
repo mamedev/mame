@@ -946,9 +946,9 @@ void model1_state::model1_comm_mem(address_map &map)
 {
 	model1_mem(map);
 
-	map(0xb00000, 0xb00fff).rw(m_m1comm, FUNC(m1comm_device::share_r), FUNC(m1comm_device::share_w));
-	map(0xb01000, 0xb01000).rw(m_m1comm, FUNC(m1comm_device::cn_r), FUNC(m1comm_device::cn_w));
-	map(0xb01002, 0xb01002).rw(m_m1comm, FUNC(m1comm_device::fg_r), FUNC(m1comm_device::fg_w));
+	map(0xb00000, 0xb00fff).rw(m_m1comm, FUNC(sega_m1comm_device::share_r), FUNC(sega_m1comm_device::share_w));
+	map(0xb01000, 0xb01000).rw(m_m1comm, FUNC(sega_m1comm_device::cn_r), FUNC(sega_m1comm_device::cn_w));
+	map(0xb01002, 0xb01002).rw(m_m1comm, FUNC(sega_m1comm_device::fg_r), FUNC(sega_m1comm_device::fg_w));
 }
 
 static INPUT_PORTS_START( ioboard_dipswitches )
@@ -1784,7 +1784,7 @@ void model1_state::vr(machine_config &config)
 	ioboard.output_callback().set(FUNC(model1_state::vr_outputs_w));
 	ioboard.output_callback().append(FUNC(model1_state::gen_outputs_w));
 
-	M1COMM(config, "m1comm", 0).set_default_bios_tag("epr15112");
+	SEGA_MODEL1_COMM(config, m_m1comm, 0U).set_default_bios_tag("epr15112");
 }
 
 void model1_state::vformula(machine_config &config)
@@ -1801,7 +1801,7 @@ void model1_state::vformula(machine_config &config)
 	ioboard.output_callback().set(FUNC(model1_state::vr_outputs_w));
 	ioboard.output_callback().append(FUNC(model1_state::gen_outputs_w));
 
-	M1COMM(config, "m1comm", 0).set_default_bios_tag("epr15624");
+	SEGA_MODEL1_COMM(config, m_m1comm, 0U).set_default_bios_tag("epr15624");
 }
 
 void model1_state::swa(machine_config &config)
@@ -1848,7 +1848,7 @@ void model1_state::wingwar(machine_config &config)
 
 	config.set_default_layout(layout_model1io2);
 
-	M1COMM(config, "m1comm", 0).set_default_bios_tag("epr15112");
+	SEGA_MODEL1_COMM(config, m_m1comm, 0U).set_default_bios_tag("epr15112");
 }
 
 void model1_state::wingwar360(machine_config &config)
