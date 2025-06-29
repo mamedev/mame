@@ -1000,6 +1000,7 @@ void tilemap_t::draw_common(screen_device &screen, _BitmapClass &dest, const rec
 	configure_blit_parameters(blit, screen.priority(), cliprect, flags, priority, priority_mask);
 	assert(dest.cliprect().contains(cliprect));
 	assert(screen.cliprect().contains(cliprect) || blit.tilemap_priority_code == 0xff00);
+	const rectangle original_cliprect = blit.cliprect;
 
 	// flush the dirty state to all tiles as appropriate
 	realize_all_dirty_tiles();
@@ -1009,12 +1010,22 @@ void tilemap_t::draw_common(screen_device &screen, _BitmapClass &dest, const rec
 	u32 const xextent = visarea.right() + visarea.left() + 1; // x0 + x1 + 1 for calculating horizontal centre as (x0 + x1 + 1) >> 1
 	u32 const yextent = visarea.bottom() + visarea.top() + 1; // y0 + y1 + 1 for calculating vertical centre as (y0 + y1 + 1) >> 1
 
+	// cache row/colscroll
+	std::vector<s32> rowscroll(m_scrollrows);
+	std::vector<s32> colscroll(m_scrollcols);
+
+	for (int i = 0; i < m_scrollrows; i++)
+		rowscroll[i] = effective_rowscroll(i, xextent);
+
+	for (int i = 0; i < m_scrollcols; i++)
+		colscroll[i] = effective_colscroll(i, yextent);
+
 	// XY scrolling playfield
 	if (m_scrollrows == 1 && m_scrollcols == 1)
 	{
 		// iterate to handle wraparound
-		int scrollx = effective_rowscroll(0, xextent);
-		int scrolly = effective_colscroll(0, yextent);
+		int scrollx = rowscroll[0];
+		int scrolly = colscroll[0];
 		for (int ypos = scrolly - m_height; ypos <= blit.cliprect.bottom(); ypos += m_height)
 			for (int xpos = scrollx - m_width; xpos <= blit.cliprect.right(); xpos += m_width)
 				draw_instance(screen, dest, blit, xpos, ypos);
@@ -1023,29 +1034,22 @@ void tilemap_t::draw_common(screen_device &screen, _BitmapClass &dest, const rec
 	// scrolling rows + vertical scroll
 	else if (m_scrollcols == 1)
 	{
-		const rectangle original_cliprect = blit.cliprect;
-
 		// iterate over Y to handle wraparound
 		int rowheight = m_height / m_scrollrows;
-		int scrolly = effective_colscroll(0, yextent);
+		int scrolly = colscroll[0];
 		for (int ypos = scrolly - m_height; ypos <= original_cliprect.bottom(); ypos += m_height)
 		{
 			int const firstrow = std::max((original_cliprect.top() - ypos) / rowheight, 0);
 			int const lastrow = std::min((original_cliprect.bottom() - ypos) / rowheight, s32(m_scrollrows) - 1);
 
 			// iterate over rows in the tilemap
-			int nextrow;
-			for (int currow = firstrow; currow <= lastrow; currow = nextrow)
+			for (int currow = firstrow, nextrow = 0; currow <= lastrow; currow = nextrow)
 			{
 				// scan forward until we find a non-matching row
-				int scrollx = effective_rowscroll(currow, xextent);
+				int scrollx = rowscroll[currow];
 				for (nextrow = currow + 1; nextrow <= lastrow; nextrow++)
-					if (effective_rowscroll(nextrow, xextent) != scrollx)
+					if (rowscroll[nextrow] != scrollx)
 						break;
-
-				// skip if disabled
-				if (scrollx == TILE_LINE_DISABLED)
-					continue;
 
 				// update the cliprect just for this set of rows
 				blit.cliprect.sety(currow * rowheight + ypos, nextrow * rowheight - 1 + ypos);
@@ -1061,23 +1065,16 @@ void tilemap_t::draw_common(screen_device &screen, _BitmapClass &dest, const rec
 	// scrolling columns + horizontal scroll
 	else if (m_scrollrows == 1)
 	{
-		const rectangle original_cliprect = blit.cliprect;
-
 		// iterate over columns in the tilemap
-		int scrollx = effective_rowscroll(0, xextent);
+		int scrollx = rowscroll[0];
 		int colwidth = m_width / m_scrollcols;
-		int nextcol;
-		for (int curcol = 0; curcol < m_scrollcols; curcol = nextcol)
+		for (int curcol = 0, nextcol = 0; curcol < m_scrollcols; curcol = nextcol)
 		{
 			// scan forward until we find a non-matching column
-			int scrolly = effective_colscroll(curcol, yextent);
+			int scrolly = colscroll[curcol];
 			for (nextcol = curcol + 1; nextcol < m_scrollcols; nextcol++)
-				if (effective_colscroll(nextcol, yextent) != scrolly)
+				if (colscroll[nextcol] != scrolly)
 					break;
-
-			// skip if disabled
-			if (scrolly == TILE_LINE_DISABLED)
-				continue;
 
 			// iterate over X to handle wraparound
 			for (int xpos = scrollx - m_width; xpos <= original_cliprect.right(); xpos += m_width)
@@ -1089,6 +1086,58 @@ void tilemap_t::draw_common(screen_device &screen, _BitmapClass &dest, const rec
 				// iterate over Y to handle wraparound
 				for (int ypos = scrolly - m_height; ypos <= original_cliprect.bottom(); ypos += m_height)
 					draw_instance(screen, dest, blit, xpos, ypos);
+			}
+		}
+	}
+
+	// scrolling columns + scrolling rows (in that order)
+	else
+	{
+		int rowheight = m_height / m_scrollrows;
+		int colwidth = m_width / m_scrollcols;
+
+		// expand rowscroll table
+		rowscroll.resize(m_height * 2);
+
+		for (int i = m_scrollrows - 1; i >= 0; i--)
+		{
+			int val = rowscroll[i];
+			for (int j = 0; j < rowheight; j++)
+			{
+				int offs = i * rowheight + j;
+				rowscroll[offs + m_height] = rowscroll[offs] = val;
+			}
+		}
+
+		// iterate over columns in the tilemap
+		for (int curcol = 0; curcol < m_scrollcols; curcol++)
+		{
+			int scrolly = colscroll[curcol];
+
+			// iterate over scanlines in the tilemap
+			for (int curline = 0, nextline = 0; curline < m_height; curline = nextline)
+			{
+				// scan forward until we find a non-matching line
+				int scrollx = rowscroll[curline + scrolly];
+				for (nextline = curline + 1; nextline < m_height; nextline++)
+					if (rowscroll[nextline + scrolly] != scrollx)
+						break;
+
+				// iterate over X to handle wraparound
+				for (int xpos = scrollx - m_width; xpos <= original_cliprect.right(); xpos += m_width)
+				{
+					// iterate over Y to handle wraparound
+					for (int ypos = scrolly - m_height; ypos <= original_cliprect.bottom(); ypos += m_height)
+					{
+						// update the cliprect for this chunk
+						int xdest = (curcol * colwidth) + xpos;
+						blit.cliprect.setx(xdest, xdest + colwidth - 1);
+						blit.cliprect.sety(curline + ypos, nextline + ypos - 1);
+						blit.cliprect &= original_cliprect;
+
+						draw_instance(screen, dest, blit, xpos, ypos);
+					}
+				}
 			}
 		}
 	}
@@ -1113,9 +1162,9 @@ void tilemap_t::draw_roz_common(screen_device &screen, _BitmapClass &dest, const
 		u32 startx, u32 starty, int incxx, int incxy, int incyx, int incyy,
 		bool wraparound, u32 flags, u8 priority, u8 priority_mask)
 {
-// notes:
-// - startx and starty MUST be u32 for calculations to work correctly
-// - srcbim_width and height are assumed to be a power of 2 to speed up wraparound
+	// notes:
+	// - startx and starty MUST be u32 for calculations to work correctly
+	// - srcbim_width and height are assumed to be a power of 2 to speed up wraparound
 
 	// skip if disabled
 	if (!m_enable)

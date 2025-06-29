@@ -23,6 +23,7 @@ public:
 	k052109_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~k052109_device() {}
 
+	// configuration
 	auto irq_handler() { return m_irq_handler.bind(); }
 	auto firq_handler() { return m_firq_handler.bind(); }
 	auto nmi_handler() { return m_nmi_handler.bind(); }
@@ -45,16 +46,15 @@ public:
 	template <typename... T> void set_tile_callback(T &&... args) { m_k052109_cb.set(std::forward<T>(args)...); }
 	void set_char_ram(bool ram);
 
+	// public interface
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
 
 	void set_rmrd_line(int state);
 	int get_rmrd_line();
 	void tilemap_update();
-	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, uint32_t flags, uint8_t priority);
+	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, uint32_t flags = 0, uint8_t priority = 0, uint8_t priority_mask = 0xff);
 	void mark_tilemap_dirty(uint8_t tmap_num);
-
-	void set_xy_offset(int dx, int dy);
 
 protected:
 	// device-level overrides
@@ -84,8 +84,6 @@ private:
 	uint8_t    m_irq_enabled;
 	uint8_t    m_romsubbank, m_scrollctrl, m_addrmap;
 
-	int        m_dx, m_dy;
-
 	optional_region_ptr<uint8_t> m_char_rom;
 
 	tile_delegate m_k052109_cb;
@@ -98,7 +96,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	TILE_GET_INFO_MEMBER(get_tile_info2);
 
-	void get_tile_info( tile_data &tileinfo, int tile_index, int layer, uint8_t *cram, uint8_t *vram1, uint8_t *vram2 );
+	void get_tile_info(tile_data &tileinfo, int tile_index, int layer, uint8_t *cram, uint8_t *vram1, uint8_t *vram2);
 	void tileflip_reset();
 
 	void vblank_callback(screen_device &screen, bool state);

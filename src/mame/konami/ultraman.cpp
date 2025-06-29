@@ -351,10 +351,10 @@ void ultraman_state::machine_reset()
 void ultraman_state::ultraman(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 24'000'000 / 2); // 12 MHz?
+	M68000(config, m_maincpu, 24_MHz_XTAL / 2); // 12 MHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &ultraman_state::main_map);
 
-	Z80(config, m_audiocpu, 24'000'000 / 6); // 4 MHz?
+	Z80(config, m_audiocpu, 24_MHz_XTAL / 6); // 4 MHz?
 	m_audiocpu->set_addrmap(AS_PROGRAM, &ultraman_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &ultraman_state::sound_io_map);
 
@@ -366,10 +366,7 @@ void ultraman_state::ultraman(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(14*8, (64-14)*8-1, 2*8, 30*8-1 );
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240);
 	screen.set_screen_update(FUNC(ultraman_state::screen_update));
 	screen.set_palette("palette");
 	screen.screen_vblank().set(FUNC(ultraman_state::vblank_irq));
@@ -378,22 +375,22 @@ void ultraman_state::ultraman(machine_config &config)
 	palette.set_format(palette_device::xRGB_555, 8192);
 	palette.enable_shadows();
 
-	K051960(config, m_k051960, 0);
+	K051960(config, m_k051960, 24_MHz_XTAL);
 	m_k051960->set_palette("palette");
 	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(ultraman_state::sprite_callback));
 
-	K051316(config, m_k051316[0], 0);
+	K051316(config, m_k051316[0], 24_MHz_XTAL / 2);
 	m_k051316[0]->set_palette("palette");
 	m_k051316[0]->set_offsets(8, 0);
 	m_k051316[0]->set_zoom_callback(FUNC(ultraman_state::zoom_callback<0>));
 
-	K051316(config, m_k051316[1], 0);
+	K051316(config, m_k051316[1], 24_MHz_XTAL / 2);
 	m_k051316[1]->set_palette("palette");
 	m_k051316[1]->set_offsets(8, 0);
 	m_k051316[1]->set_zoom_callback(FUNC(ultraman_state::zoom_callback<1>));
 
-	K051316(config, m_k051316[2], 0);
+	K051316(config, m_k051316[2], 24_MHz_XTAL / 2);
 	m_k051316[2]->set_palette("palette");
 	m_k051316[2]->set_offsets(8, 0);
 	m_k051316[2]->set_zoom_callback(FUNC(ultraman_state::zoom_callback<2>));
@@ -403,7 +400,9 @@ void ultraman_state::ultraman(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	YM2151(config, "ymsnd", 24'000'000 / 6).add_route(0, "speaker", 1.0, 0).add_route(1, "speaker", 1.0, 1);
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 24_MHz_XTAL / 6));
+	ymsnd.add_route(0, "speaker", 1.0, 0);
+	ymsnd.add_route(1, "speaker", 1.0, 1);
 
 	okim6295_device &oki(OKIM6295(config, "oki", 1'056'000, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
 	oki.add_route(ALL_OUTPUTS, "speaker", 0.50, 0);

@@ -180,7 +180,7 @@ The three available regions are PAL, NTSC-U and NTSC-J or a combination such as 
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5978B-8/16"/>
-			<feature name="ic1" value="MPR-17336-SM"/> 
+			<feature name="ic1" value="MPR-17336-SM"/>
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="mpr-17336-sm.ic1" size="2097152" crc="e5a24999" sha1="d634e3f04672b8a01c3a6e13f8722d5cbbc6b900"/>
 			</dataarea>
@@ -3161,7 +3161,7 @@ Crashes after EA logo, requires better [VDP] irq handling
 		<description>Fever Pitch (Europe)</description>
 		<year>1995</year>
 		<publisher>U.S. Gold</publisher>
-		<info name="alt_title" value="Fever Pitch Soccer"/>	<!-- box title -->
+		<info name="alt_title" value="Fever Pitch Soccer"/> <!-- box title -->
 		<info name="language" value="English/French/German/Italian/Spanish"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-6329A"/>

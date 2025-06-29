@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood, MetalliC
+// copyright-holders:MetalliC
 // thanks-to: Stefano Teso, Wind, DreamZzz, CaH4e3
 /* Sega Hikaru / 'Samurai' */
 

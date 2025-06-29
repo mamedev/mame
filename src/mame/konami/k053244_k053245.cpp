@@ -405,6 +405,7 @@ void k05324x_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 		ox = m_buffer[offs+3] + spriteoffsX;
 		oy = m_buffer[offs+2];
 
+		ox -= 96;
 		ox += m_dx;
 		oy += m_dy;
 
