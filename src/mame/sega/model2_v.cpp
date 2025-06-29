@@ -634,10 +634,10 @@ void model2_state::model2_3d_process_triangle( raster_state *raster, u32 attr )
 	/* update the address */
 	raster->command_buffer[1] += tho * 4;
 
-	/* set the luma value of this quad */
+	/* set the luma value of this triangle */
 	object.luma = (raster->command_buffer[9] >> 15) & 0xff;
 
-	/* determine whether we can cull this quad */
+	/* determine whether we can cull this triangle */
 	cull = check_culling(raster,attr,min_z,max_z);
 
 	/* set the object's z value */
@@ -801,8 +801,9 @@ void model2_renderer::model2_3d_render(triangle *tri, const rectangle &cliprect)
 	vp &= cliprect;
 
 	extra.state = &m_state;
-	extra.lumabase = ((tri->texheader[1] & 0xff) << 7) + ((tri->luma >> 5) ^ 0x7);
+	extra.lumabase = (tri->texheader[1] & 0xff) << 7;
 	extra.colorbase = (tri->texheader[3] >> 6) & 0x3ff;
+	extra.luma = tri->luma;
 
 	if (renderer & 2)
 	{
@@ -2607,12 +2608,12 @@ void model2_state::video_start()
 	m_fbvramA = make_unique_clear<u16[]>(0x80000/2);
 	m_fbvramB = make_unique_clear<u16[]>(0x80000/2);
 
-	// convert (supposedly) 3d sRGB color space into linear
-	// TODO: might be slightly different algorithm (Daytona USA road/cars, VF2 character skins)
+	// convert color space; this works OK for most games
+	// real cabinets probably have their monitors calibrated depending on the game
+	// optimal settings for vf2, fvipers and schamp are bias 64, gain 51
 	for(int i=0;i<256;i++)
 	{
-		double raw_value;
-		raw_value = 255.0 * pow((double)(i) / 255.0,2.2);
+		double raw_value = std::max(((double)i - 64.0) * 255.0 / 191.0, 0.0);
 		m_gamma_table[i] = (u8)raw_value;
 //      printf("%02x: %02x %lf\n",i,m_gamma_table[i],raw_value);
 	}

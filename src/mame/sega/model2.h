@@ -629,6 +629,7 @@ struct m2_poly_extra_data
 	u32      texx, texy;
 	u8       texmirrorx;
 	u8       texmirrory;
+	u8       luma;
 };
 
 
