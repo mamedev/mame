@@ -159,7 +159,6 @@ private:
 	void shuri_bank_w(uint8_t data);
 	uint8_t shuri_irq_r();
 	void shuri_irq_w(uint8_t data);
-	void mario_scrollhack_w(uint8_t data);
 
 	void ddboy_main(address_map &map) ATTR_COLD;
 	void chusenoh_main(address_map &map) ATTR_COLD;
@@ -557,7 +556,6 @@ void konmedal_state::shuriboy_main(address_map &map)
 	map(0xa000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xffff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));
 	map(0xdd00, 0xdd00).rw(FUNC(konmedal_state::shuri_irq_r), FUNC(konmedal_state::shuri_irq_w));
-	map(0xdc80, 0xdc80).w(FUNC(konmedal_state::mario_scrollhack_w));
 }
 
 static INPUT_PORTS_START( konmedal )
@@ -1129,15 +1127,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(konmedal_state::shuri_scanline)
 	{
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	}
-}
-
-void konmedal_state::mario_scrollhack_w(uint8_t data)
-{
-	// Mario Roulette enable X and Y scroll in the same time for both layers, which is currently not supported by emulated K052109.
-	// here we hacky disable Y scroll for layer A and X scroll for layer B.
-	if (data == 0x36)
-		data = 0x22;
-	m_k052109->write(0x1c80, data);
 }
 
 void konmedal_state::shuriboy(machine_config &config)
