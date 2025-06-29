@@ -24,8 +24,6 @@
 
 #include "emu.h"
 #include "nes_vt369_vtunknown_soc.h"
-#include "nes_vt32_soc.h"
-
 
 namespace {
 
@@ -1151,11 +1149,6 @@ ROM_START( unk128vt )
 	ROM_LOAD( "w25q32.bin", 0x00000, 0x400000, CRC(35ccadf6) SHA1(80b25e374a097d1b9380b7e64013d7ac0d5aa2ca) )
 ROM_END
 
-ROM_START( hhgc319 )
-	ROM_REGION( 0x1000000, "mainrom", 0 )
-	ROM_LOAD( "s29gl128n10tfi01.u3", 0x000000, 0x1000000, CRC(4b51125f) SHA1(bab3981ae1652cf6620c7c6769a6729a1e4d588f) )
-ROM_END
-
 ROM_START( 168pcase )
 	ROM_REGION( 0x400000, "mainrom", 0 )
 	ROM_LOAD( "25q32.u7", 0x000000, 0x400000, CRC(98e8e97a) SHA1(fd516ef2819a597130f5f7ace9a7838cb99ab08a) )
@@ -1345,9 +1338,6 @@ CONS( 202?, 36pcase,    0,      0,  vt36x_altswap_2mb, vt369, vt36x_state, empty
 CONS( 2019, unk2019hh,  0,        0,  vt36x_16mb, vt369, vt36x_state, empty_init, "<unknown>", "unknown VTxx based GameBoy style handheld (2019 PCB)", MACHINE_NOT_WORKING )
 CONS( 2020, unk2020hh,  unk2019hh,0,  vt36x_16mb, vt369, vt36x_state, empty_init, "<unknown>", "unknown VTxx based GameBoy style handheld (2020 PCB)", MACHINE_NOT_WORKING )
 
-
-// unknown tech level, might be scrambled as default codebank/boot vectors don't seem valid, maybe bad dump
-CONS( 201?, hhgc319,  0,        0,  vt36x_16mb, vt369, vt36x_state, empty_init, "<unknown>", "Handheld Game Console 319-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // unknown tech, probably from 2021, probably VT369, ROM wouldn't read consistently
 CONS( 202?, vibes240, 0,        0,  vt36x_vibesswap_16mb, vt369, vt36x_state, empty_init, "<unknown>", "Vibes Retro Pocket Gamer 240-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )

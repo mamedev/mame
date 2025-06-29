@@ -83,6 +83,7 @@ public:
 		m_soc(*this, "soc")
 	{ }
 
+	void vt_external_space_map_16mbyte(address_map &map) ATTR_COLD;
 	void vt_external_space_map_32mbyte(address_map &map) ATTR_COLD;
 
 protected:
@@ -97,6 +98,7 @@ public:
 	{ }
 
 	void nes_vt32_fp(machine_config& config);
+	void nes_vt32_16mb(machine_config& config);
 	void nes_vt32_32mb(machine_config& config);
 	void nes_vt32_4x16mb(machine_config& config);
 
@@ -104,6 +106,7 @@ public:
 
 	void init_rfcp168();
 	void init_g9_666();
+	void init_hhgc319();
 
 private:
 	uint8_t vt_rom_banked_r(offs_t offset);
@@ -124,6 +127,11 @@ void nes_vt32_base_state::vtspace_w(offs_t offset, uint8_t data)
 }
 
 // VTxx can address 25-bit address space (32MB of ROM) so use maps with mirroring in depending on ROM size
+void nes_vt32_state::vt_external_space_map_16mbyte(address_map &map)
+{
+	map(0x0000000, 0x0ffffff).mirror(0x1000000).r(FUNC(nes_vt32_state::vt_rom_r));
+}
+
 void nes_vt32_state::vt_external_space_map_32mbyte(address_map &map)
 {
 	map(0x0000000, 0x1ffffff).r(FUNC(nes_vt32_state::vt_rom_r));
@@ -310,6 +318,12 @@ void nes_vt32_unk_state::nes_vt32_4x16mb(machine_config& config)
 	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_read_412d_callback().set(FUNC(nes_vt32_unk_state::fcpocket_412d_r));
 }
 
+void nes_vt32_unk_state::nes_vt32_16mb(machine_config& config)
+{
+	nes_vt32_fp(config);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt32_unk_state::vt_external_space_map_16mbyte);
+}
+
 void nes_vt32_unk_state::nes_vt32_32mb(machine_config& config)
 {
 	nes_vt32_fp(config);
@@ -398,21 +412,24 @@ ROM_START( lxpcli )
 ROM_END
 
 ROM_START( rfcp168 )
-	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
 	ROM_LOAD( "winbond_w29gl128c.bin", 0x00000, 0x1000000, CRC(d11caf71) SHA1(64b269cee30a51549a2d0491bbeed07751771559) ) // ROM verified on 2 units
-	ROM_RELOAD( 0x1000000, 0x1000000 )
 ROM_END
 
 ROM_START( g9_666 )
-	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
 	ROM_LOAD( "666in1.u1", 0x00000, 0x1000000, CRC(e3a98465) SHA1(dfec3e74e36aef9bfa57ec530c37642015569dc5) )
-	ROM_RELOAD( 0x1000000, 0x1000000 )
+ROM_END
+
+ROM_START( hhgc319 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "s29gl128n10tfi01.u3", 0x000000, 0x1000000, CRC(4b51125f) SHA1(bab3981ae1652cf6620c7c6769a6729a1e4d588f) )
 ROM_END
 
 void nes_vt32_unk_state::init_rfcp168()
 {
 	uint8_t *romdata = memregion("mainrom")->base();
-	for (offs_t i = 0; i < 0x2000000; i += 0x10000)
+	for (offs_t i = 0; i < 0x1000000; i += 0x10000)
 	{
 		// Swap A12 with A13 and A14 with A15
 		std::swap_ranges(&romdata[i + 0x1000], &romdata[i + 0x2000], &romdata[i + 0x2000]);
@@ -427,11 +444,25 @@ void nes_vt32_unk_state::init_rfcp168()
 void nes_vt32_unk_state::init_g9_666()
 {
 	uint8_t *romdata = memregion("mainrom")->base();
-	for (offs_t i = 0; i < 0x2000000; i += 2)
+	for (offs_t i = 0; i < 0x1000000; i += 2)
 	{
 		uint16_t w = get_u16le(&romdata[i]);
 		put_u16le(&romdata[i], (w & 0xf9f9) | (w & 0x0600) >> 8 | (w & 0x0006) << 8);
 	}
+}
+
+void nes_vt32_unk_state::init_hhgc319()
+{
+	init_rfcp168();
+
+	// Even more pairs of address and data lines to swap here...
+	uint8_t *romdata = memregion("mainrom")->base();
+	for (offs_t i = 0; i < 0x1000000; i += 0x800)
+		std::swap_ranges(&romdata[i + 0x200], &romdata[i + 0x400], &romdata[i + 0x400]);
+	for (offs_t i = 0; i < 0x1000000; i += 0x20)
+		std::swap_ranges(&romdata[i + 0x08], &romdata[i + 0x10], &romdata[i + 0x10]);
+	for (offs_t i = 0; i < 0x1000000; i += 2)
+		put_u16le(&romdata[i], bitswap<16>(get_u16le(&romdata[i]), 15, 14, 6, 5, 3, 2, 9, 8, 7, 13, 12, 4, 11, 10, 1, 0));
 }
 
 } // anonymous namespace
@@ -455,10 +486,13 @@ CONS( 201?, myaass,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empt
 CONS( 201?, myaasa,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init, "dreamGEAR", "My Arcade All Star Arena - Pocket Player (307-in-1)", MACHINE_NOT_WORKING )
 
 // lots of accesses to $42xx (could this be a different SoC?)
-CONS( 201?, rfcp168,   0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, init_rfcp168, "<unknown>", "Retro FC Plus 168 in 1 Handheld", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // "RETRO_FC_V3.5"
+CONS( 201?, rfcp168,  0,  0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, init_rfcp168, "<unknown>", "Retro FC Plus 168 in 1 Handheld", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // "RETRO_FC_V3.5"
 
 // many duplicates, real game count to be confirmed, graphical issues in some games, lots of accesses to $42xx
-CONS( 202?, g9_666,   0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, init_g9_666, "<unknown>", "G9 Game Box 666 Games", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 202?, g9_666,   0,  0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, init_g9_666, "<unknown>", "G9 Game Box 666 Games", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
+// lots of accesses to $42xx, highly scrambled
+CONS( 201?, hhgc319,  0,  0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, init_hhgc319, "<unknown>", "Handheld Game Console 319-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 
 // Some games (eg F22) are scrambled like in myaass
