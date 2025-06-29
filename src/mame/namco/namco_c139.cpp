@@ -73,13 +73,15 @@
 class namco_c139_device::context
 {
 public:
-	context() :
-	m_acceptor(m_ioctx),
-	m_sock_rx(m_ioctx),
-	m_sock_tx(m_ioctx),
-	m_timeout_tx(m_ioctx),
-	m_state_rx(0U),
-	m_state_tx(0U)
+	context(namco_c139_device &device) :
+		m_device(device),
+		m_acceptor(m_ioctx),
+		m_sock_rx(m_ioctx),
+		m_sock_tx(m_ioctx),
+		m_timeout_tx(m_ioctx),
+		m_stopping(false),
+		m_state_rx(0U),
+		m_state_tx(0U)
 	{
 	}
 
@@ -148,6 +150,7 @@ public:
 		m_ioctx.post(
 				[this] ()
 				{
+					m_stopping = true;
 					std::error_code err;
 					if (m_acceptor.is_open())
 						m_acceptor.close(err);
@@ -212,89 +215,132 @@ private:
 	class fifo
 	{
 	public:
-		unsigned write(uint8_t *buffer, unsigned data_size)
+		fifo() :
+			m_wp(0),
+			m_rp(0)
 		{
-			std::lock_guard<std::mutex> lock(m_mutex);
-			unsigned used = 0;
-			if (m_wp >= m_rp)
-			{
-				used = std::min<unsigned>(m_buffer.size() - m_wp, data_size);
-				std::copy_n(&buffer[0], used, &m_buffer[m_wp]);
-				m_wp = (m_wp + used) % m_buffer.size();
-			}
-			unsigned const block = std::min<unsigned>(data_size - used, m_rp - m_wp);
-			if (block)
-			{
-				std::copy_n(&buffer[used], block, &m_buffer[m_wp]);
-				used += block;
-				m_wp += block;
-			}
-			m_used += used;
-			return used;
 		}
 
-		unsigned read(uint8_t *buffer, unsigned data_size, bool peek)
+		unsigned write(uint8_t* buffer, unsigned data_size)
 		{
-			std::lock_guard<std::mutex> lock(m_mutex);
-			unsigned rp = m_rp;
-			unsigned used = 0;
-			if (rp >= m_wp)
+			unsigned current_rp = m_rp.load(std::memory_order_acquire);
+			unsigned current_wp = m_wp.load(std::memory_order_relaxed);
+
+			// calculate free space
+			unsigned data_free = (BUFFER_SIZE + current_rp - current_wp - 1) % BUFFER_SIZE;
+
+			// sanity checks
+			if (data_size > data_free)
+				return UINT_MAX;
+			if (data_size == 0)
+				return 0;
+
+			unsigned data_used = 0;
+
+			// first part (up to end)
+			unsigned block = std::min(data_size, BUFFER_SIZE - current_wp);
+			std::copy_n(&buffer[0], block, &m_buffer[current_wp]);
+			data_used += block;
+			current_wp = (current_wp + block) % BUFFER_SIZE;
+
+			// second part (from beginning, if wrapped)
+			if (data_used < data_size)
 			{
-				used = std::min<std::size_t>(m_buffer.size() - rp, data_size);
-				std::copy_n(&m_buffer[rp], used, &buffer[0]);
-				rp = (rp + used) % m_buffer.size();
+				block = data_size - data_used;
+				std::copy_n(&buffer[data_used], block, &m_buffer[current_wp]);
+				data_used += block;
+				current_wp += block;
 			}
-			unsigned const block = std::min<unsigned>(data_size - used, m_wp - rp);
-			if (block)
+
+			m_wp.store(current_wp, std::memory_order_release);
+			return data_used;
+		}
+
+		unsigned read(uint8_t* buffer, unsigned data_size, bool peek)
+		{
+			unsigned current_wp = m_wp.load(std::memory_order_acquire);
+			unsigned current_rp = m_rp.load(std::memory_order_relaxed);
+
+			// calculate available data
+			unsigned data_avail = (BUFFER_SIZE + current_wp - current_rp) % BUFFER_SIZE;
+
+			// sanity checks
+			if (data_size > data_avail)
+				return UINT_MAX;
+			if (data_size == 0)
+				return 0;
+
+			unsigned data_used = 0;
+
+			// first part (up to end)
+			unsigned block = std::min(data_size, BUFFER_SIZE - current_rp);
+			std::copy_n(&m_buffer[current_rp], block, &buffer[0]);
+			data_used += block;
+			current_rp = (current_rp + data_used) % BUFFER_SIZE;
+
+			// second part (from beginning, if wrapped)
+			if (data_used < data_size)
 			{
-				std::copy_n(&m_buffer[rp], block, &buffer[used]);
-				used += block;
-				rp += block;
+				block = data_size - data_used;
+				std::copy_n(&m_buffer[current_rp], block, &buffer[data_used]);
+				data_used += block;
+				current_rp += block;
 			}
 			if (!peek)
 			{
-				m_rp = (m_rp + used) % m_buffer.size();
-				m_used -= used;
+				m_rp.store(current_rp, std::memory_order_release);
 			}
-			return used;
+			return data_used;
 		}
 
 		void consume(unsigned data_size)
 		{
-			std::lock_guard<std::mutex> lock(m_mutex);
-			m_rp = (m_rp + data_size) % m_buffer.size();
-			m_used -= data_size;
+			unsigned current_wp = m_wp.load(std::memory_order_acquire);
+			unsigned current_rp = m_rp.load(std::memory_order_relaxed);
+
+			//  available data
+			unsigned data_avail = (BUFFER_SIZE + current_wp - current_rp) % BUFFER_SIZE;
+
+			// sanity check
+			if (data_size > data_avail)
+				data_size = data_avail;
+
+			current_rp = (current_rp + data_size) % BUFFER_SIZE;
+			m_rp.store(current_rp, std::memory_order_release);
 		}
 
 		unsigned used()
 		{
-			std::lock_guard<std::mutex> lock(m_mutex);
-			return m_used;
+			unsigned current_wp = m_wp.load(std::memory_order_acquire);
+			unsigned current_rp = m_rp.load(std::memory_order_acquire);
+			return (BUFFER_SIZE + current_wp - current_rp) % BUFFER_SIZE;
 		}
 
 		unsigned free()
 		{
-			std::lock_guard<std::mutex> lock(m_mutex);
-			return m_buffer.size() - m_used;
+			unsigned current_wp = m_wp.load(std::memory_order_acquire);
+			unsigned current_rp = m_rp.load(std::memory_order_acquire);
+			return (BUFFER_SIZE + current_rp - current_wp - 1 + BUFFER_SIZE) % BUFFER_SIZE;
 		}
 
 		void clear()
 		{
-			std::lock_guard<std::mutex> lock(m_mutex);
-			m_wp = m_rp = m_used = 0;
+			m_wp.store(0, std::memory_order_release);
+			m_rp.store(0, std::memory_order_release);
 		}
 
-
 	private:
-		unsigned m_wp = 0;
-		unsigned m_rp = 0;
-		unsigned m_used = 0;
-		std::array<uint8_t, 0x80000> m_buffer;
-		std::mutex m_mutex;
+		static constexpr unsigned BUFFER_SIZE = 0x80000;
+		std::atomic<unsigned> m_wp;
+		std::atomic<unsigned> m_rp;
+		std::array<uint8_t, BUFFER_SIZE> m_buffer;
 	};
 
 	void start_accept()
 	{
+		if (m_stopping)
+			return;
+
 		std::error_code err;
 		m_acceptor.open(m_localaddr->protocol(), err);
 		m_acceptor.set_option(asio::ip::tcp::acceptor::reuse_address(true));
@@ -341,6 +387,9 @@ private:
 
 	void start_connect()
 	{
+		if (m_stopping)
+			return;
+
 		std::error_code err;
 		if (m_sock_tx.is_open())
 			m_sock_tx.close(err);
@@ -388,6 +437,9 @@ private:
 
 	void start_send_tx()
 	{
+		if (m_stopping)
+			return;
+
 		unsigned used = m_fifo_tx.read(&m_buffer_tx[0], std::min<unsigned>(m_fifo_tx.used(), m_buffer_tx.size()), true);
 		m_sock_tx.async_write_some(
 				asio::buffer(&m_buffer_tx[0], used),
@@ -411,6 +463,9 @@ private:
 
 	void start_receive_rx()
 	{
+		if (m_stopping)
+			return;
+
 		m_sock_rx.async_read_some(
 				asio::buffer(m_buffer_rx),
 				[this] (std::error_code const &err, std::size_t length)
@@ -434,6 +489,8 @@ private:
 							m_sock_rx.close();
 							m_state_rx.store(0);
 							m_fifo_rx.clear();
+							start_accept();
+							return;
 						}
 						start_receive_rx();
 					}
@@ -445,10 +502,12 @@ private:
 	{
 		util::stream_format(
 				std::cerr,
-				"%s",
+				"[%s] %s",
+				m_device.tag(),
 				util::string_format(std::forward<Format>(fmt), std::forward<Params>(args)...));
 	}
 
+	namco_c139_device &m_device;
 	std::thread m_thread;
 	asio::io_context m_ioctx;
 	asio::executor_work_guard<asio::io_context::executor_type> m_work_guard{m_ioctx.get_executor()};
@@ -458,6 +517,7 @@ private:
 	asio::ip::tcp::socket m_sock_rx;
 	asio::ip::tcp::socket m_sock_tx;
 	asio::steady_timer m_timeout_tx;
+	bool m_stopping;
 	std::atomic_uint m_state_rx;
 	std::atomic_uint m_state_tx;
 	fifo m_fifo_rx;
@@ -536,7 +596,7 @@ void namco_c139_device::device_start()
 	m_tick_timer = timer_alloc(FUNC(namco_c139_device::tick_timer_callback), this);
 	m_tick_timer->adjust(attotime::never);
 
-	auto ctx = std::make_unique<context>();
+	auto ctx = std::make_unique<context>(*this);
 	m_context = std::move(ctx);
 	m_context->start();
 
@@ -571,7 +631,7 @@ void namco_c139_device::device_reset()
 	m_txblock = 0x00;
 	m_reg_f3 = 0x00;
 
-	m_tick_timer->adjust(attotime::from_hz(600),0,attotime::from_hz(600));
+	m_tick_timer->adjust(attotime::from_hz(800),0,attotime::from_hz(800));
 }
 
 void namco_c139_device::device_stop()
