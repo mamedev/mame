@@ -186,6 +186,7 @@ static void tzx_cas_get_blocks( const uint8_t *casdata, int caslen )
 		case 0x5A:
 			pos += 9;
 			break;
+		case 0x4b:
 		default:
 			datasize = get_u32le(&casdata[pos]);
 			pos += 4 + datasize;
@@ -293,6 +294,68 @@ static int tzx_cas_handle_block( int16_t **buffer, const uint8_t *bytes, int pau
 		int rest_pause_samples = millisec_to_samplecount(pause - 1);
 
 		wave_data = WAVE_LOW;
+		tzx_output_wave(buffer, rest_pause_samples);
+		size += rest_pause_samples;
+	}
+	return size;
+}
+
+static int tzx_handle_4b(int16_t **buffer, const uint8_t *bytes, uint32_t data_size, uint16_t pause_ms, uint16_t pilot, uint16_t pilot_num
+						, uint16_t zero, uint16_t one, uint8_t num_0, uint8_t num_1
+						, uint8_t leading_num, bool leading_bit, uint8_t trailing_num, bool trailing_bit, bool msb)
+{
+	const int pilot_samples = tcycles_to_samplecount(pilot);
+	const int bit0_samples = tcycles_to_samplecount(zero);
+	const int bit1_samples = tcycles_to_samplecount(one);
+	int size = 0;
+
+	// pilot
+	for ( ; pilot_num > 0; pilot_num--)
+	{
+		tzx_output_wave(buffer, pilot_samples);
+		size += pilot_samples;
+		toggle_wave_data();
+	}
+
+	// data
+	uint16_t data_common = 0;
+	for (uint8_t i = leading_num; i > 0; i--)
+	{
+		data_common <<= 1;
+		data_common |= leading_bit;
+	}
+	data_common <<= 8;
+	for (uint8_t i = trailing_num; i > 0; i--)
+	{
+		data_common <<= 1;
+		data_common |= trailing_bit;
+	}
+
+	for (int data_index = 0; data_index < data_size; data_index++)
+	{
+		uint16_t data = data_common;
+		data |= (msb ? bytes[data_index] : util::bitswap<8>(bytes[data_index], 0, 1, 2, 3, 4, 5, 6, 7)) << trailing_num;
+
+		for (uint16_t mask = (1 << (leading_num + 7 + trailing_num)); mask > 0; mask >>= 1)
+		{
+			const bool bit = data & mask;
+			int bit_samples = bit ? bit1_samples : bit0_samples;
+			for(uint8_t i = (bit ? num_1 : num_0); i > 0; i--)
+			{
+				tzx_output_wave(buffer, bit_samples);
+				size += bit_samples;
+				toggle_wave_data();
+			}
+		}
+	}
+
+	// pause
+	if (pause_ms > 0)
+	{
+		size += pause_one_millisec(buffer);
+		const int rest_pause_samples = millisec_to_samplecount(pause_ms - 1);
+
+		wave_data = WAVE_NULL;
 		tzx_output_wave(buffer, rest_pause_samples);
 		size += rest_pause_samples;
 	}
@@ -648,14 +711,14 @@ static int tzx_cas_do_work( int16_t **buffer )
 			break;
 		case 0x35:  /* Custom Info Block */
 			ascii_block_common_log("Custom Info Block", block_type);
-			for (data_size = 0; data_size < 10; data_size++)
+			for (data_size = 0; data_size < 0x10; data_size++)
 			{
 				LOG_FORMATS("%c", cur_block[1 + data_size]);
 			}
 			LOG_FORMATS(":\n");
-			text_size = get_u32le(&cur_block[11]);
+			text_size = get_u32le(&cur_block[0x11]);
 			for (data_size = 0; data_size < text_size; data_size++)
-				LOG_FORMATS("%c", cur_block[15 + data_size]);
+				LOG_FORMATS("%c", cur_block[0x15 + data_size]);
 			LOG_FORMATS("\n");
 			current_block++;
 			break;
@@ -732,6 +795,30 @@ static int tzx_cas_do_work( int16_t **buffer )
 
 				size += tzx_handle_generalized(buffer, &cur_block[19], pause_time, data_size, totp, npp, asp, totd, npd, asd);
 
+				current_block++;
+			}
+			break;
+
+		case 0x4b:  // TSX Data Block
+			{
+				data_size = get_u32le(&cur_block[1]) - 12;
+				pause_time = get_u16le(&cur_block[5]);
+				pilot = get_u16le(&cur_block[7]);
+				pilot_length = get_u16le(&cur_block[9]);
+				uint16_t zero = get_u16le(&cur_block[11]);
+				uint16_t one = get_u16le(&cur_block[13]);
+				bit0 = (cur_block[15] >> 4) ?: 16;
+				bit1 = (cur_block[15] & 0x0f) ?: 16;
+				uint8_t leading_num = util::BIT(cur_block[16], 6, 2);
+				bool leading_bit = util::BIT(cur_block[16], 5);
+				uint8_t trailing_num =  util::BIT(cur_block[16], 3, 2);
+				bool trailing_bit = util::BIT(cur_block[16], 2);
+				bool msb = util::BIT(cur_block[16], 0);
+
+				wave_data = WAVE_NULL;
+				size += tzx_handle_4b(buffer, &cur_block[17], data_size, pause_time, pilot, pilot_length
+									, zero, one, bit0, bit1
+									, leading_num, leading_bit, trailing_num, trailing_bit, msb);
 				current_block++;
 			}
 			break;
@@ -958,6 +1045,14 @@ const cassette_image::Format tzx_cassette_format =
 	nullptr
 };
 
+const cassette_image::Format tsx_cassette_format =
+{
+	"tsx",
+	tzx_cassette_identify,
+	tzx_cassette_load,
+	nullptr
+};
+
 static const cassette_image::Format tap_cassette_format =
 {
 	"tap,blk",
@@ -973,6 +1068,10 @@ static const cassette_image::Format cdt_cassette_format =
 	cdt_cassette_load,
 	nullptr
 };
+
+CASSETTE_FORMATLIST_START(tsx_cassette_formats)
+	CASSETTE_FORMAT(tsx_cassette_format)
+CASSETTE_FORMATLIST_END
 
 CASSETTE_FORMATLIST_START(tzx_cassette_formats)
 	CASSETTE_FORMAT(tzx_cassette_format)
