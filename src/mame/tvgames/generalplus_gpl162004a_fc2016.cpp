@@ -5,10 +5,12 @@
     Furby Connect uses GPL162004A SoC, which seems like a GPL16250's (GPAC1800's) brother
     Has NAND + SDRAM configuration, also has an SPI flash
     NAND has also FAT32 filesystem, and has GPspispisp header in its GameCode.bin file (why not GPnandnand?)
-	The bootstrap is quite needed in this situation. I think it finds GameCode.bin file from filesystem, and then copies all of it (to 0x50000)
-	The bootstrap is on SPI flash (https://github.com/swarley7/furbhax), but data in dump (which is provided on git repo) seems to not be unSP bytecode. (TODO: further investigation required!)
 	Currently, the task is to implement/get normal dump/investigate current dump, so it boots as it is and will be able to run 
-	In this state it seems like there is a problem with DMA or NAND. Most likely, the problem is with incorrect NAND formating, because current NAND is reformatted so GameCode will be from 0x0, which is incorrect.
+
+	The bootstrap is quite needed in this situation. I think it finds GameCode.bin file from filesystem, and then copies all of it (to 0x50000)
+	On June 24 development of bootloader (uBoot) for Furby Connect was started. It does these things fine.
+	In my opinion it's just better than typical MAME copy, because it is an actual bootloader, and more features can be added.
+	This file is to work with NAND with OOB (0x840), which is not widely foundable, but soon there will be tools to it
 
     --GeneralPlus GPL162004A-- --EtronTech EM639165TS-7G-- --Toshiba TC58BVG0S3HTA00-- --GeneralPlus GPR25L081B--
 */

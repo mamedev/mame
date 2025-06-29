@@ -881,7 +881,7 @@ void generalplus_gpac800_game_state::nand_vbaby()
 {
 	nand_init840();
 	m_initial_copy_words = 0x1000;
-	m_maincpu->set_romtype(2);
+	m_maincpu->set_romtype(3); //Was initially 2, after add of furby_connect was changed to 3
 }
 
 void generalplus_gpac800_game_state::nand_tsm()
@@ -906,15 +906,17 @@ void generalplus_gpac800_game_state::nand_beambox()
 
 void generalplus_gpac800_game_state::nand_fc2016()
 {
+	//m_initial_copy_words is 0x0, because it doesn't initially even copy, this thing is done by uBoot
+
 	m_sdram.resize(m_sdram_kwords);
 	m_sdram2.resize(0x10000);
 
-	m_nandblocksize = 0x800;
+	m_nandblocksize = 0x840;
 	m_nandblocksize_stripped = 0x800;
 
 	m_vectorbase = 0x6fe0;
 
-	m_initial_copy_words = 0x500000;
+	m_initial_copy_words = 0x0;
 	m_maincpu->set_romtype(2);
 }
 
