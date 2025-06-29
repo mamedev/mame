@@ -288,8 +288,6 @@ void tmnt_state::tmnt_decode_sample()
 
 ***************************************************************************/
 
-// Missing in Action
-
 K052109_CB_MEMBER(tmnt_state::mia_tile_callback)
 {
 	*flags = (*color & 0x04) ? TILE_FLIPX : 0;
@@ -850,7 +848,7 @@ void tmnt_state::cuebrick(machine_config &config)
 
 	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette(m_palette);
-	m_k052109->set_screen(nullptr);
+	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(tmnt_state::cuebrick_tile_callback));
 
 	K051960(config, m_k051960, 24_MHz_XTAL);
@@ -895,7 +893,7 @@ void tmnt_state::mia(machine_config &config)
 
 	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette(m_palette);
-	m_k052109->set_screen(nullptr);
+	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(tmnt_state::mia_tile_callback));
 
 	K051960(config, m_k051960, 24_MHz_XTAL);
@@ -957,7 +955,7 @@ void tmnt_state::tmnt(machine_config &config)
 
 	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette(m_palette);
-	m_k052109->set_screen(nullptr);
+	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback));
 
 	K051960(config, m_k051960, 24_MHz_XTAL);

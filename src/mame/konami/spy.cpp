@@ -90,6 +90,8 @@ private:
 	bool       m_video_enable = false;
 	int32_t    m_old_3f90 = -1;
 
+	static constexpr int m_layer_colorbase[3] = { 768 / 16, 0 / 16, 256 / 16 };
+
 	void bankswitch_w(uint8_t data);
 	void spy_3f90_w(uint8_t data);
 	void sh_irqtrigger_w(uint8_t data);
@@ -115,11 +117,9 @@ private:
 
 K052109_CB_MEMBER(spy_state::tile_callback)
 {
-	static const int layer_colorbase[] = { 768 / 16, 0 / 16, 256 / 16 };
-
 	*flags = (*color & 0x20) ? TILE_FLIPX : 0;
 	*code |= ((*color & 0x03) << 8) | ((*color & 0x10) << 6) | ((*color & 0x0c) << 9) | (bank << 13);
-	*color = layer_colorbase[layer] + ((*color & 0xc0) >> 6);
+	*color = m_layer_colorbase[layer] + ((*color & 0xc0) >> 6);
 }
 
 
@@ -155,15 +155,15 @@ uint32_t spy_state::screen_update_spy(screen_device &screen, bitmap_ind16 &bitma
 
 	screen.priority().fill(0, cliprect);
 
-	if (!m_video_enable)
-		bitmap.fill(768, cliprect); // ?
-	else
+	if (m_video_enable)
 	{
 		m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 1);
 		m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, 0, 2);
 		m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), -1, -1);
 		m_k052109->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0);
 	}
+	else
+		bitmap.fill(m_layer_colorbase[0] * 16, cliprect);
 
 	return 0;
 }

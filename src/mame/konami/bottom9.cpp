@@ -157,7 +157,7 @@ uint32_t bottom9_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	m_k052109->tilemap_update();
 
 	// note: FIX layer is not used
-	bitmap.fill(m_layer_colorbase[1], cliprect);
+	bitmap.fill(m_layer_colorbase[1] * 16, cliprect);
 	screen.priority().fill(0, cliprect);
 
 	if (m_video_enable)

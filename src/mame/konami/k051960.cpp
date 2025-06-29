@@ -141,15 +141,15 @@ k051960_device::k051960_device(const machine_config &mconfig, const char *tag, d
 	, device_gfx_interface(mconfig, *this, gfxinfo)
 	, device_video_interface(mconfig, *this)
 	, m_sprite_rom(*this, DEVICE_SELF)
-	, m_scanline_timer(nullptr)
 	, m_k051960_cb(*this)
 	, m_shadow_config_cb(*this)
 	, m_irq_handler(*this)
 	, m_firq_handler(*this)
 	, m_nmi_handler(*this)
+	, m_firq_scanline(nullptr)
+	, m_nmi_scanline(nullptr)
 	, m_romoffset(0)
 	, m_control(0)
-	, m_nmi_count(0)
 	, m_shadow_config(0)
 {
 }
@@ -190,12 +190,24 @@ void k051960_device::device_start()
 	if (!palette().device().started())
 		throw device_missing_dependencies();
 
+	// and register a callback for vblank state
+	screen().register_vblank_callback(vblank_state_delegate(&k051960_device::vblank_callback, this));
+
 	// bind callbacks
 	m_k051960_cb.resolve();
 
-	// allocate scanline timer and start at first scanline
-	m_scanline_timer = timer_alloc(FUNC(k051960_device::scanline_callback), this);
-	m_scanline_timer->adjust(screen().time_until_pos(0), 0);
+	// allocate scanline timers and start at first scanline
+	if (!m_firq_handler.isunset())
+	{
+		m_firq_scanline = timer_alloc(FUNC(k051960_device::firq_scanline), this);
+		m_firq_scanline->adjust(screen().time_until_pos(0), 0);
+	}
+
+	if (!m_nmi_handler.isunset())
+	{
+		m_nmi_scanline = timer_alloc(FUNC(k051960_device::nmi_scanline), this);
+		m_nmi_scanline->adjust(screen().time_until_pos(0), 0);
+	}
 
 	m_sprites_busy = timer_alloc(timer_expired_delegate());
 
@@ -211,7 +223,6 @@ void k051960_device::device_start()
 	// register for save states
 	save_item(NAME(m_romoffset));
 	save_item(NAME(m_control));
-	save_item(NAME(m_nmi_count));
 	save_item(NAME(m_shadow_config));
 	save_item(NAME(m_spriterombank));
 	save_item(NAME(m_ram));
@@ -235,44 +246,47 @@ void k051960_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-TIMER_CALLBACK_MEMBER(k051960_device::scanline_callback)
+void k051960_device::vblank_callback(screen_device &screen, bool state)
 {
-	int scanline = param;
+	if (!state)
+		return;
 
+	// vblank interrupt
+	if (BIT(m_control, 0))
+		m_irq_handler(ASSERT_LINE);
+
+	// do the sprite dma, unless sprite processing was disabled
+	if (!BIT(m_control, 4))
+	{
+		memcpy(m_buffer, m_ram, sizeof(m_buffer));
+
+		// count number of active sprites in the buffer
+		int active = 0;
+		for (int i = 0; i < sizeof(m_buffer); i += 8)
+			active += BIT(m_buffer[i], 7);
+
+		// 32 clocks per active sprite, around 18 clocks per inactive sprite
+		const u32 ticks = (active * 32) + (128 - active) * 18;
+		m_sprites_busy->adjust(attotime::from_ticks(ticks * 4, clock()));
+	}
+}
+
+TIMER_CALLBACK_MEMBER(k051960_device::firq_scanline)
+{
+	// FIRQ every other scanline
+	if (BIT(m_control, 1))
+		m_firq_handler(ASSERT_LINE);
+
+	m_firq_scanline->adjust(screen().time_until_pos(screen().vpos() + 2));
+}
+
+TIMER_CALLBACK_MEMBER(k051960_device::nmi_scanline)
+{
 	// NMI every 32 scanlines (not on 16V)
-	if ((++m_nmi_count & 3) == 3 && BIT(m_control, 2))
+	if (BIT(m_control, 2))
 		m_nmi_handler(ASSERT_LINE);
 
-	// FIRQ is when?
-
-	// vblank
-	if (scanline == 240)
-	{
-		if (BIT(m_control, 0))
-			m_irq_handler(ASSERT_LINE);
-
-		// do the sprite dma, unless sprite processing was disabled
-		if (!BIT(m_control, 4))
-		{
-			memcpy(m_buffer, m_ram, sizeof(m_buffer));
-
-			// count number of active sprites in the buffer
-			int active = 0;
-			for (int i = 0; i < sizeof(m_buffer); i += 8)
-				active += BIT(m_buffer[i], 7);
-
-			// 32 clocks per active sprite, around 18 clocks per inactive sprite
-			const u32 ticks = (active * 32) + (128 - active) * 18;
-			m_sprites_busy->adjust(attotime::from_ticks(ticks * 4, clock()));
-		}
-	}
-
-	// wait for next line
-	scanline += 8;
-	if (scanline >= screen().height())
-		scanline = 0;
-
-	m_scanline_timer->adjust(screen().time_until_pos(scanline), scanline);
+	m_nmi_scanline->adjust(screen().time_until_pos(screen().vpos() + 32));
 }
 
 u8 k051960_device::k051960_fetchromdata(offs_t offset)

@@ -95,13 +95,15 @@ address lines), and then reading it from the 051962.
            ---xx--- layer B row scroll
            --x----- layer B column scroll
            suratk sets this register to 0x70 during the second boss to produce a rotating star field,
-           using X and Y scroll at the same time. In MAME, the corners don't scroll, or is that normal?
-           It only modifies Y scroll 0x23-0x32 (no columns after that), or maybe bit 6 has a meaning.
+           using X and Y scroll at the same time. In MAME, the corners don't scroll, but on the PCB,
+           the effect definitely applies there (at least seen under the 2nd N of P2 INSERT COIN). The
+           game only modifies Y scroll 0x23-0x32, no columns after that. Maybe bit 6 has a meaning?
            glfgreat sets it to 0x30 when showing the leader board
            mariorou sets it to 0x36 when ingame, while actually does per-row scroll for layer A and
            per-column scroll for layer B.
-1d00     : bits 0 & 1 might enable NMI and FIRQ, not sure
-         : bit 2 = IRQ enable
+1d00     : bit 0 = NMI enable/acknowledge
+         : bit 1 = FIRQ enable/acknowledge
+         : bit 2 = IRQ enable/acknowledge
 1d80     : ROM bank selector bits 0-3 = bank 0 bits 4-7 = bank 1
 1e00     : ROM membank selector for ROM testing
 1e80     : bit 0 = flip screen (applies to tilemaps only, not sprites)
@@ -190,24 +192,17 @@ k052109_device::k052109_device(const machine_config &mconfig, const char *tag, d
 	m_tileflip_enable(0),
 	m_has_extra_video_ram(0),
 	m_rmrd_line(0),
-	m_irq_enabled(0),
+	m_irq_control(0),
 	m_romsubbank(0),
 	m_scrollctrl(0),
 	m_char_rom(*this, DEVICE_SELF),
 	m_k052109_cb(*this),
 	m_irq_handler(*this),
 	m_firq_handler(*this),
-	m_nmi_handler(*this)
+	m_nmi_handler(*this),
+	m_firq_scanline(nullptr),
+	m_nmi_scanline(nullptr)
 {
-}
-
-
-void k052109_device::set_char_ram(bool ram)
-{
-	if (ram)
-		set_info(gfxinfo_ram);
-	else
-		set_info(gfxinfo);
 }
 
 
@@ -220,23 +215,37 @@ void k052109_device::device_start()
 	// assumes it can make an address mask with m_char_rom.length() - 1
 	assert(!m_char_rom.found() || !(m_char_rom.length() & (m_char_rom.length() - 1)));
 
-	if (has_screen())
-	{
-		// make sure our screen is started
-		if (!screen().started())
-			throw device_missing_dependencies();
+	// make sure our screen is started
+	if (!screen().started())
+		throw device_missing_dependencies();
+	if (!palette().device().started())
+		throw device_missing_dependencies();
 
-		// and register a callback for vblank state
-		screen().register_vblank_callback(vblank_state_delegate(&k052109_device::vblank_callback, this));
-	}
+	// and register a callback for vblank state
+	screen().register_vblank_callback(vblank_state_delegate(&k052109_device::vblank_callback, this));
 
 	// resolve delegates
 	m_k052109_cb.resolve();
+
+	// allocate scanline timers and start at first scanline
+	if (!m_firq_handler.isunset())
+	{
+		m_firq_scanline = timer_alloc(FUNC(k052109_device::firq_scanline), this);
+		m_firq_scanline->adjust(screen().time_until_pos(0), 0);
+	}
+
+	if (!m_nmi_handler.isunset())
+	{
+		m_nmi_scanline = timer_alloc(FUNC(k052109_device::nmi_scanline), this);
+		m_nmi_scanline->adjust(screen().time_until_pos(0), 0);
+	}
 
 	decode_gfx();
 	gfx(0)->set_colors(palette().entries() / gfx(0)->depth());
 
 	m_ram = make_unique_clear<uint8_t[]>(0x6000);
+	memset(m_charrombank, 0, sizeof(m_charrombank));
+	memset(m_charrombank_2, 0, sizeof(m_charrombank_2));
 
 	m_colorram_F = &m_ram[0x0000];
 	m_colorram_A = &m_ram[0x0800];
@@ -266,7 +275,7 @@ void k052109_device::device_start()
 	save_item(NAME(m_charrombank_2));
 	save_item(NAME(m_has_extra_video_ram));
 	save_item(NAME(m_rmrd_line));
-	save_item(NAME(m_irq_enabled));
+	save_item(NAME(m_irq_control));
 	save_item(NAME(m_romsubbank));
 	save_item(NAME(m_scrollctrl));
 	save_item(NAME(m_addrmap));
@@ -279,11 +288,10 @@ void k052109_device::device_start()
 void k052109_device::device_reset()
 {
 	m_rmrd_line = CLEAR_LINE;
-	m_irq_enabled = 0;
-	m_romsubbank = 0;
-	m_scrollctrl = 0;
-	m_addrmap    = 0;
 	m_has_extra_video_ram = 0;
+
+	for (offs_t offset = 0x1c00; offset <= 0x1f00; offset += 0x80)
+		write(offset, 0);
 
 	for (int i = 0; i < 4; i++)
 	{
@@ -292,23 +300,32 @@ void k052109_device::device_reset()
 	}
 }
 
-//-------------------------------------------------
-//  device_post_load - device-specific postload
-//-------------------------------------------------
-
-void k052109_device::device_post_load()
-{
-	tileflip_reset();
-}
-
 /*****************************************************************************
     DEVICE HANDLERS
 *****************************************************************************/
 
 void k052109_device::vblank_callback(screen_device &screen, bool state)
 {
-	if (state && m_irq_enabled)
+	if (state && BIT(m_irq_control, 2))
 		m_irq_handler(ASSERT_LINE);
+}
+
+TIMER_CALLBACK_MEMBER(k052109_device::firq_scanline)
+{
+	// FIRQ every other scanline
+	if (BIT(m_irq_control, 1))
+		m_firq_handler(ASSERT_LINE);
+
+	m_firq_scanline->adjust(screen().time_until_pos(screen().vpos() + 2));
+}
+
+TIMER_CALLBACK_MEMBER(k052109_device::nmi_scanline)
+{
+	// NMI every 32 scanlines (not on 16V)
+	if (BIT(m_irq_control, 0))
+		m_nmi_handler(ASSERT_LINE);
+
+	m_nmi_scanline->adjust(screen().time_until_pos(screen().vpos() + 32));
 }
 
 u8 k052109_device::read(offs_t offset)
@@ -334,7 +351,7 @@ u8 k052109_device::read(offs_t offset)
 	}
 	else    /* Punk Shot and TMNT read from 0000-1fff, Aliens from 2000-3fff */
 	{
-		assert (m_char_rom.found());
+		assert(m_char_rom.found());
 
 		int code = (offset & 0x1fff) >> 5;
 		int color = m_romsubbank;
@@ -393,11 +410,17 @@ void k052109_device::write(offs_t offset, u8 data)
 		else if (offset == 0x1d00)
 		{
 			//logerror("%s: 052109 register 1d00 = %02x\n", machine().describe_context(), data);
-			/* bit 2 = irq enable */
-			/* the custom chip can also generate NMI and FIRQ, for use with a 6809 */
-			m_irq_enabled = data & 0x04;
-			if (!m_irq_enabled)
+			// clear interrupts
+			if (BIT(~data & m_irq_control, 0))
+				m_nmi_handler(CLEAR_LINE);
+
+			if (BIT(~data & m_irq_control, 1))
+				m_firq_handler(CLEAR_LINE);
+
+			if (BIT(~data & m_irq_control, 2))
 				m_irq_handler(CLEAR_LINE);
+
+			m_irq_control = data;
 		}
 		else if (offset == 0x1d80)
 		{
@@ -415,7 +438,7 @@ void k052109_device::write(offs_t offset, u8 data)
 
 				for (int i = 0; i < 0x1800; i++)
 				{
-					int bank = (m_ram[i]&0x0c) >> 2;
+					int bank = (m_ram[i] & 0x0c) >> 2;
 					if ((bank == 0 && (dirty & 1)) || (bank == 1 && (dirty & 2)))
 					{
 						m_tilemap[(i & 0x1800) >> 11]->mark_tile_dirty(i & 0x7ff);
@@ -484,16 +507,6 @@ void k052109_device::write(offs_t offset, u8 data)
 		}
 		//else logerror("%s: write %02x to unknown 052109 address %04x\n",machine().describe_context(),data,offset);
 	}
-}
-
-void k052109_device::set_rmrd_line(int state)
-{
-	m_rmrd_line = state;
-}
-
-int k052109_device::get_rmrd_line()
-{
-	return m_rmrd_line;
 }
 
 

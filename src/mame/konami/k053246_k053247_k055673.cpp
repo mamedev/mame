@@ -532,10 +532,10 @@ void k053247_device::zdrawgfxzoom32GP(
 				const int x_off = (src_base_x + x * src_stride_x) >> FP;
 				const int y_off = (src_base_y + y * src_stride_y) >> FP;
 				const u8 pal_idx = src_base[(x_off + y_off * 16) ^ flip_mask];
-				if (!pal_idx || (drawmode & 0b01 && pal_idx >= shdpen) || ozbuf_ptr[x + y * GX_ZBUFW] < z8) continue;
+				if (!pal_idx || (drawmode & 3 && pal_idx >= shdpen) || ozbuf_ptr[x + y * GX_ZBUFW] < z8) continue;
 				ozbuf_ptr[x + y * GX_ZBUFW] = z8;
 
-				if ((drawmode & 0b10) == 0) // solid sprite
+				if (!BIT(drawmode, 1)) // solid sprite
 				{
 					dst_ptr[x + y * dst_pitch] = pal_base[pal_idx];
 				}

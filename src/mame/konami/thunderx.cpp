@@ -192,6 +192,7 @@ K052109_CB_MEMBER(scontra_state::gbusters_tile_callback)
 	*color = layer_colorbase[layer] + ((*color & 0xe0) >> 5);
 }
 
+
 /***************************************************************************
 
   Callbacks for the K051960

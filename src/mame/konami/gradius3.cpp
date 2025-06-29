@@ -490,7 +490,7 @@ void gradius3_state::gradius3(machine_config &config)
 
 	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette("palette");
-	m_k052109->set_screen(nullptr);
+	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(gradius3_state::tile_callback));
 	m_k052109->set_char_ram(true);
 

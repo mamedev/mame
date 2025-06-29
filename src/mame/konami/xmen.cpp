@@ -699,7 +699,7 @@ void xmen_state::base(machine_config &config)
 
 	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette("palette");
-	m_k052109->set_screen(nullptr);
+	m_k052109->set_screen(m_screen);
 	m_k052109->set_tile_callback(FUNC(xmen_state::tile_callback));
 
 	K053246(config, m_k053246, 24_MHz_XTAL);
