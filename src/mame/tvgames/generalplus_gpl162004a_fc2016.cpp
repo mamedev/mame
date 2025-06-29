@@ -110,7 +110,7 @@ namespace {
 		ROM_LOAD16_WORD_SWAP( "spi.bin", 0x0000, 0x100000, CRC(cb819c04))
 	
 	 	ROM_REGION( 0x8400000, "nandrom", ROMREGION_ERASE00 )
-		ROM_LOAD( "nand.bin", 0x0000, 0x6d00000, CRC(b64b6db3)) // Toshiba TC58BVG0S3HTA00
+		ROM_LOAD( "nand.bin", 0x0000, 0x7068000, CRC(b64b6db3)) // Toshiba TC58BVG0S3HTA00
 	ROM_END
 		
 	} // anonymous namespace
