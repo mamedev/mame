@@ -638,7 +638,7 @@ void mb86235_device::decode_mulop(bool isfmul, uint32_t src1, uint32_t src2, uin
 		float f1 = u2f(src1);
 		float f2 = u2f(src2);
 		float res = f1 * f2;
-		FCLR(MN|MZ|MD);	// MV and MU are not reset
+		FCLR(MN|MZ|MD); // MV and MU are not reset
 		if (res < 0.0f) FSET(MN);
 		if (res == 0.0f) FSET(MZ);
 		if (std::isinf(res)) FSET(MV);
@@ -1310,12 +1310,12 @@ inline bool mb86235_device::decode_branch_jump(uint8_t which)
 	case 23: // OFE
 		return m_fifoout->is_empty();
 	case 24: // IF
-		return false;	// bit 33 of input FIFO; not used by Model 2
+		return false;   // bit 33 of input FIFO; not used by Model 2
 	default:
 		fatalerror("TGPx4: illegal decode_branch_jump mode %02x at pc=%03x\n", which, m_core->ppc);
 	}
 
-	
+
 	return false;
 }
 

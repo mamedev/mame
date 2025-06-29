@@ -17,6 +17,8 @@
 
 #include "multibyte.h"
 
+#include <algorithm>
+
 namespace {
 
 class nes_vt32_base_state : public driver_device
@@ -100,6 +102,7 @@ public:
 
 	void nes_vt32_pal_32mb(machine_config& config);
 
+	void init_rfcp168();
 	void init_g9_666();
 
 private:
@@ -406,6 +409,21 @@ ROM_START( g9_666 )
 	ROM_RELOAD( 0x1000000, 0x1000000 )
 ROM_END
 
+void nes_vt32_unk_state::init_rfcp168()
+{
+	uint8_t *romdata = memregion("mainrom")->base();
+	for (offs_t i = 0; i < 0x2000000; i += 0x10000)
+	{
+		// Swap A12 with A13 and A14 with A15
+		std::swap_ranges(&romdata[i + 0x1000], &romdata[i + 0x2000], &romdata[i + 0x2000]);
+		std::swap_ranges(&romdata[i + 0x4000], &romdata[i + 0x5000], &romdata[i + 0x8000]);
+		std::swap_ranges(&romdata[i + 0x5000], &romdata[i + 0x6000], &romdata[i + 0xa000]);
+		std::swap_ranges(&romdata[i + 0x6000], &romdata[i + 0x7000], &romdata[i + 0x9000]);
+		std::swap_ranges(&romdata[i + 0x7000], &romdata[i + 0x8000], &romdata[i + 0xb000]);
+		std::swap_ranges(&romdata[i + 0xd000], &romdata[i + 0xe000], &romdata[i + 0xe000]);
+	}
+}
+
 void nes_vt32_unk_state::init_g9_666()
 {
 	uint8_t *romdata = memregion("mainrom")->base();
@@ -436,8 +454,8 @@ CONS( 201?, dgunl3202, 0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empt
 CONS( 201?, myaass,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init, "dreamGEAR", "My Arcade All Star Stadium - Pocket Player (307-in-1)", MACHINE_NOT_WORKING )
 CONS( 201?, myaasa,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init, "dreamGEAR", "My Arcade All Star Arena - Pocket Player (307-in-1)", MACHINE_NOT_WORKING )
 
-// doesn't boot, ends up in weeds after jumping to bank with no code, lots of accesses to $42xx (could this be a different SoC?)
-CONS( 201?, rfcp168,   0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "Retro FC Plus 168 in 1 Handheld", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // "RETRO_FC_V3.5"
+// lots of accesses to $42xx (could this be a different SoC?)
+CONS( 201?, rfcp168,   0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, init_rfcp168, "<unknown>", "Retro FC Plus 168 in 1 Handheld", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // "RETRO_FC_V3.5"
 
 // many duplicates, real game count to be confirmed, graphical issues in some games, lots of accesses to $42xx
 CONS( 202?, g9_666,   0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, init_g9_666, "<unknown>", "G9 Game Box 666 Games", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )

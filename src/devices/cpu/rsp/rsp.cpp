@@ -310,7 +310,7 @@ void rsp_device::device_start()
 	save_item(NAME(m_vzero));
 	save_item(NAME(m_vclip2));
 
-    for (int i = 0; i < std::size(m_v); i++)
+	for (int i = 0; i < std::size(m_v); i++)
 		save_item(NAME(m_v[i].d), i);
 
 	save_item(NAME(m_reciprocal_res));

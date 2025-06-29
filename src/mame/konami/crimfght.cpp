@@ -433,11 +433,11 @@ ioport_value crimfght_state::system_r()
 void crimfght_state::crimfght(machine_config &config)
 {
 	// basic machine hardware
-	KONAMI(config, m_maincpu, XTAL(24'000'000)/2); // 052001 (verified on pcb)
+	KONAMI(config, m_maincpu, 24_MHz_XTAL / 2); // 052001 (verified on pcb)
 	m_maincpu->set_addrmap(AS_PROGRAM, &crimfght_state::main_map);
 	m_maincpu->line().set(FUNC(crimfght_state::banking_callback));
 
-	Z80(config, m_audiocpu, XTAL(3'579'545)); // verified on pcb
+	Z80(config, m_audiocpu, 3.579545_MHz_XTAL); // verified on pcb
 	m_audiocpu->set_addrmap(AS_PROGRAM, &crimfght_state::sound_map);
 	m_audiocpu->set_irq_acknowledge_callback(FUNC(crimfght_state::audiocpu_irq_ack));
 
@@ -445,21 +445,19 @@ void crimfght_state::crimfght(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(24'000'000)/3, 528, 96, 416, 256, 16, 240); // measured 59.17
-//  6MHz dotclock is more realistic, however needs drawing updates. replace when ready
-//  screen.set_raw(XTAL(24'000'000)/4, 396, hbend, hbstart, 256, 16, 240);
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 320, 264, 16, 240); // measured 59.17
 	screen.set_screen_update(FUNC(crimfght_state::screen_update));
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 512);
 	m_palette->enable_shadows();
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_screen(nullptr);
 	m_k052109->set_tile_callback(FUNC(crimfght_state::tile_callback));
 
-	K051960(config, m_k051960, 0);
+	K051960(config, m_k051960, 24_MHz_XTAL);
 	m_k051960->set_palette(m_palette);
 	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(crimfght_state::sprite_callback));
@@ -470,12 +468,12 @@ void crimfght_state::crimfght(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545)));  // verified on pcb
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL)); // verified on pcb
 	ymsnd.port_write_handler().set(FUNC(crimfght_state::ym2151_ct_w));
 	ymsnd.add_route(0, "speaker", 1.0, 0);
 	ymsnd.add_route(1, "speaker", 1.0, 1);
 
-	K007232(config, m_k007232, XTAL(3'579'545)); // verified on pcb
+	K007232(config, m_k007232, 3.579545_MHz_XTAL); // verified on pcb
 	m_k007232->port_write().set(FUNC(crimfght_state::volume_callback));
 	m_k007232->add_route(0, "speaker", 0.20, 0);
 	m_k007232->add_route(0, "speaker", 0.20, 1);

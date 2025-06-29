@@ -1530,7 +1530,7 @@ GAME( 1991, mastboyi,    mastboy, mastboy, mastboy, mastboy_state, empty_init, R
 GAME( 1991, mastboyia,   mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco (Playmark license)", "Master Boy (Italy, set 2, checksum E7C5)", MACHINE_SUPPORTS_SAVE ) // Same checksum as 'mastboyi', only the questions are different
 GAME( 1991, mastboyib,   mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco (Playmark license)", "Master Boy (Italy, set 3, checksum 6918)", MACHINE_SUPPORTS_SAVE ) // 27-Oct-1992
 GAME( 1991, mastboyic,   mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco (Playmark license)", "Master Boy (Italy, set 4, checksum 680C)", MACHINE_SUPPORTS_SAVE ) // 27-Oct-1992
-GAME( 1991, mastboyid,   mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco (Playmark license)", "Master Boy (Italy, set 4, checksum E84C)", MACHINE_SUPPORTS_SAVE ) // 18-Mar-1992
+GAME( 1991, mastboyid,   mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco (Playmark license)", "Master Boy (Italy, set 5, checksum E84C)", MACHINE_SUPPORTS_SAVE ) // 18-Mar-1992
 
 GAME( 1991, mastboyiol,  mastboy, mastboy, mastboy, mastboy_state, empty_init, ROT0, "Gaelco (Playmark license)", "Master Boy Olympic (Italy, set 1, checksum 77A8)", MACHINE_SUPPORTS_SAVE ) // 18-Oct-1992
 

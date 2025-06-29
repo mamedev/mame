@@ -362,14 +362,14 @@ void rollerg_state::rollerg(machine_config &config)
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_555, 1024).enable_shadows();
 
-	K053244(config, m_k053244, 0);
+	K053244(config, m_k053244, 24_MHz_XTAL);
 	m_k053244->set_palette("palette");
-	m_k053244->set_offsets(-3, -1);
+	m_k053244->set_offsets(12*8 - 3, -1);
 	m_k053244->set_sprite_callback(FUNC(rollerg_state::sprite_callback));
 
-	K051316(config, m_k051316, 0);
+	K051316(config, m_k051316, 24_MHz_XTAL / 2);
 	m_k051316->set_palette("palette");
-	m_k051316->set_offsets(22, 1);
+	m_k051316->set_offsets(14*8 + 6, 1);
 	m_k051316->set_zoom_callback(FUNC(rollerg_state::zoom_callback));
 
 	k053252_device &k053252(K053252(config, "k053252", 3'000'000 * 2));

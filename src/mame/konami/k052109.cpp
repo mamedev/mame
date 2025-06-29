@@ -94,11 +94,12 @@ address lines), and then reading it from the 051962.
                     1 = 64 (actually 40) columns
            ---xx--- layer B row scroll
            --x----- layer B column scroll
-           suratk sets this register to 70 during the second boss to produce rotating star field, using X and Y scroll in the same time.
-           not emulated due to MAME's tilemaps restrictions, currently handled in hacky way.
-           glfgreat sets it to 30 when showing the leader board
-           mariorou sets it to 36 when ingame, while actually does per-row scroll for layer A and per-collumn scroll for layer B.
-           such usage not supported by current implementation, hacked in game driver instead.
+           suratk sets this register to 0x70 during the second boss to produce a rotating star field,
+           using X and Y scroll at the same time. In MAME, the corners don't scroll, or is that normal?
+           It only modifies Y scroll 0x23-0x32 (no columns after that), or maybe bit 6 has a meaning.
+           glfgreat sets it to 0x30 when showing the leader board
+           mariorou sets it to 0x36 when ingame, while actually does per-row scroll for layer A and
+           per-column scroll for layer B.
 1d00     : bits 0 & 1 might enable NMI and FIRQ, not sure
          : bit 2 = IRQ enable
 1d80     : ROM bank selector bits 0-3 = bank 0 bits 4-7 = bank 1
@@ -192,8 +193,6 @@ k052109_device::k052109_device(const machine_config &mconfig, const char *tag, d
 	m_irq_enabled(0),
 	m_romsubbank(0),
 	m_scrollctrl(0),
-	m_dx(0),
-	m_dy(0),
 	m_char_rom(*this, DEVICE_SELF),
 	m_k052109_cb(*this),
 	m_irq_handler(*this),
@@ -257,12 +256,9 @@ void k052109_device::device_start()
 	m_tilemap[1]->set_transparent_pen(0);
 	m_tilemap[2]->set_transparent_pen(0);
 
-	m_tilemap[0]->set_scrolldx(m_dx, m_dx);
-	m_tilemap[1]->set_scrolldx(m_dx+6, m_dx+6);
-	m_tilemap[2]->set_scrolldx(m_dx+6, m_dx+6);
-	m_tilemap[0]->set_scrolldy(m_dy, m_dy);
-	m_tilemap[1]->set_scrolldy(m_dy, m_dy);
-	m_tilemap[2]->set_scrolldy(m_dy, m_dy);
+	m_tilemap[0]->set_scrolldx(-96, -96);
+	m_tilemap[1]->set_scrolldx(-90, -90);
+	m_tilemap[2]->set_scrolldx(-90, -90);
 
 	save_pointer(NAME(m_ram), 0x6000);
 	save_item(NAME(m_tileflip_enable));
@@ -308,12 +304,6 @@ void k052109_device::device_post_load()
 /*****************************************************************************
     DEVICE HANDLERS
 *****************************************************************************/
-
-void k052109_device::set_xy_offset(int dx, int dy)
-{
-	m_dx = dx;
-	m_dy = dy;
-}
 
 void k052109_device::vblank_callback(screen_device &screen, bool state)
 {
@@ -420,12 +410,10 @@ void k052109_device::write(offs_t offset, u8 data)
 
 			if (dirty)
 			{
-				int i;
-
 				m_charrombank[0] = data & 0x0f;
 				m_charrombank[1] = (data >> 4) & 0x0f;
 
-				for (i = 0; i < 0x1800; i++)
+				for (int i = 0; i < 0x1800; i++)
 				{
 					int bank = (m_ram[i]&0x0c) >> 2;
 					if ((bank == 0 && (dirty & 1)) || (bank == 1 && (dirty & 2)))
@@ -467,12 +455,10 @@ void k052109_device::write(offs_t offset, u8 data)
 
 			if (dirty)
 			{
-				int i;
-
 				m_charrombank[2] = data & 0x0f;
 				m_charrombank[3] = (data >> 4) & 0x0f;
 
-				for (i = 0; i < 0x1800; i++)
+				for (int i = 0; i < 0x1800; i++)
 				{
 					int bank = (m_ram[i] & 0x0c) >> 2;
 					if ((bank == 2 && (dirty & 1)) || (bank == 3 && (dirty & 2)))
@@ -500,20 +486,19 @@ void k052109_device::write(offs_t offset, u8 data)
 	}
 }
 
-void k052109_device::set_rmrd_line( int state )
+void k052109_device::set_rmrd_line(int state)
 {
 	m_rmrd_line = state;
 }
 
-int k052109_device::get_rmrd_line( )
+int k052109_device::get_rmrd_line()
 {
 	return m_rmrd_line;
 }
 
 
-void k052109_device::tilemap_update( )
+void k052109_device::tilemap_update()
 {
-	int xscroll, yscroll, offs;
 
 #if 0
 	popmessage("%x %x %x %x",
@@ -524,151 +509,105 @@ void k052109_device::tilemap_update( )
 	//popmessage("%x",m_addrmap);
 #endif
 
-	// note: this chip can do both per-column and per-row scroll in the same time, currently not emulated.
-
-	if ((m_scrollctrl & 0x03) == 0x02)
-	{
-		uint8_t *scrollram = &m_ram[0x1a00];
-
-		m_tilemap[1]->set_scroll_rows(32);
-		m_tilemap[1]->set_scroll_cols(1);
-		yscroll = m_ram[0x180c];
-		m_tilemap[1]->set_scrolly(0, yscroll);
-		yscroll /= 8;
-		for (offs = 0; offs < 32; offs++)
-		{
-			xscroll = scrollram[16 * offs + 0] + 256 * scrollram[16 * offs + 1];
-			m_tilemap[1]->set_scrollx((offs + yscroll) & 31, xscroll);
-		}
-	}
-	else if ((m_scrollctrl & 0x03) == 0x03)
-	{
-		uint8_t *scrollram = &m_ram[0x1a00];
-
-		m_tilemap[1]->set_scroll_rows(256);
-		m_tilemap[1]->set_scroll_cols(1);
-		yscroll = m_ram[0x180c];
-		m_tilemap[1]->set_scrolly(0, yscroll);
-		for (offs = 0; offs < 256; offs++)
-		{
-			xscroll = scrollram[2 * offs + 0] + 256 * scrollram[2 * offs + 1];
-			m_tilemap[1]->set_scrollx((offs + yscroll) & 0xff, xscroll);
-		}
-	}
-	else if ((m_scrollctrl & 0x04) == 0x04)
-	{
-		uint8_t *scrollram = &m_ram[0x1800];
-
-		m_tilemap[1]->set_scroll_rows(1);
-		m_tilemap[1]->set_scroll_cols(64);
-		xscroll = m_ram[0x1a00] + 256 * m_ram[0x1a01];
-		m_tilemap[1]->set_scrollx(0, xscroll);
-		xscroll /= 8;
-		for (offs = 0; offs < 64; offs++)
-		{
-			yscroll = scrollram[offs];
-			m_tilemap[1]->set_scrolly((offs + xscroll) & 63, yscroll);
-		}
-	}
-	else
-	{
-		uint8_t *scrollram = &m_ram[0x1a00];
-
-		m_tilemap[1]->set_scroll_rows(1);
-		m_tilemap[1]->set_scroll_cols(1);
-		xscroll = scrollram[0] + 256 * scrollram[1];
-		yscroll = m_ram[0x180c];
-		m_tilemap[1]->set_scrollx(0, xscroll);
-		m_tilemap[1]->set_scrolly(0, yscroll);
-	}
-
-	if ((m_scrollctrl & 0x18) == 0x10)
-	{
-		uint8_t *scrollram = &m_ram[0x3a00];
-
-		m_tilemap[2]->set_scroll_rows(32);
-		m_tilemap[2]->set_scroll_cols(1);
-		yscroll = m_ram[0x380c];
-		//
-		if (m_scrollctrl == 0x70) yscroll = m_ram[0x3823]; // hack for suratk 2nd boss rotating star field
-		//
-		m_tilemap[2]->set_scrolly(0, yscroll);
-		yscroll /= 8;
-		for (offs = 0; offs < 32; offs++)
-		{
-			xscroll = scrollram[16 * offs + 0] + 256 * scrollram[16 * offs + 1];
-			m_tilemap[2]->set_scrollx((offs + yscroll) & 31, xscroll);
-		}
-	}
-	else if ((m_scrollctrl & 0x18) == 0x18)
-	{
-		uint8_t *scrollram = &m_ram[0x3a00];
-
-		m_tilemap[2]->set_scroll_rows(256);
-		m_tilemap[2]->set_scroll_cols(1);
-		yscroll = m_ram[0x380c];
-		m_tilemap[2]->set_scrolly(0, yscroll);
-		for (offs = 0; offs < 256; offs++)
-		{
-			xscroll = scrollram[2 * offs + 0] + 256 * scrollram[2 * offs + 1];
-			m_tilemap[2]->set_scrollx((offs + yscroll) & 0xff, xscroll);
-		}
-	}
-	else if ((m_scrollctrl & 0x20) == 0x20)
-	{
-		uint8_t *scrollram = &m_ram[0x3800];
-
-		m_tilemap[2]->set_scroll_rows(1);
-		m_tilemap[2]->set_scroll_cols(64);
-		xscroll = m_ram[0x3a00] + 256 * m_ram[0x3a01];
-		m_tilemap[2]->set_scrollx(0, xscroll);
-		xscroll /= 8;
-		for (offs = 0; offs < 64; offs++)
-		{
-			yscroll = scrollram[offs];
-			m_tilemap[2]->set_scrolly((offs + xscroll) & 63, yscroll);
-		}
-	}
-	else
-	{
-		uint8_t *scrollram = &m_ram[0x3a00];
-
-		m_tilemap[2]->set_scroll_rows(1);
-		m_tilemap[2]->set_scroll_cols(1);
-		xscroll = scrollram[0] + 256 * scrollram[1];
-		yscroll = m_ram[0x380c];
-		m_tilemap[2]->set_scrollx(0, xscroll);
-		m_tilemap[2]->set_scrolly(0, yscroll);
-	}
-
 #if 0
+	// mixed scroll or unimplemented bits
 	if ((m_scrollctrl & 0x03) == 0x01 ||
 			(m_scrollctrl & 0x18) == 0x08 ||
 			((m_scrollctrl & 0x04) && (m_scrollctrl & 0x03)) ||
 			((m_scrollctrl & 0x20) && (m_scrollctrl & 0x18)) ||
 			(m_scrollctrl & 0xc0) != 0)
-		popmessage("scrollcontrol = %02x", m_scrollctrl);
+		popmessage("scrollcontrol = 0x%02x", m_scrollctrl);
+#endif
 
-	if (machine().input().code_pressed(KEYCODE_F))
+	for (int tmap = 0; tmap < 2; tmap++)
 	{
-		FILE *fp;
-		fp=fopen("TILE.DMP", "w+b");
-		if (fp)
+		uint8_t scrollctrl = m_scrollctrl >> (tmap * 3) & 7;
+
+		static int rows_table[4] = { 1, 1, 32, 256 };
+		int rows = rows_table[scrollctrl & 3];
+		int cols = BIT(scrollctrl, 2) ? 64 : 1;
+
+		const int tmap_mask = tmap ? 0x2000 : 0;
+		uint8_t *scrollram_y = &m_ram[0x1800 | tmap_mask];
+		uint8_t *scrollram_x = &m_ram[0x1a00 | tmap_mask];
+
+		const int t = tmap + 1;
+
+		// standard xy scroll
+		if (rows == 1 && cols == 1)
 		{
-			fwrite(m_ram, 0x6000, 1, fp);
-			popmessage("saved");
-			fclose(fp);
+			m_tilemap[t]->set_scroll_rows(1);
+			m_tilemap[t]->set_scroll_cols(1);
+
+			int xscroll = scrollram_x[0] + 256 * scrollram_x[1];
+			int yscroll = scrollram_y[12];
+			m_tilemap[t]->set_scrollx(0, xscroll);
+			m_tilemap[t]->set_scrolly(0, yscroll);
+		}
+
+		// rowscroll
+		else if (cols == 1)
+		{
+			m_tilemap[t]->set_scroll_rows(256);
+			m_tilemap[t]->set_scroll_cols(1);
+
+			int yscroll = scrollram_y[12];
+			m_tilemap[t]->set_scrolly(0, yscroll);
+
+			const int offs_mask = (rows == 256) ? 0xff : 0xf8;
+
+			for (int offs = 0; offs < 256; offs++)
+			{
+				int xscroll = scrollram_x[2 * (offs & offs_mask)] + 256 * scrollram_x[2 * (offs & offs_mask) + 1];
+				m_tilemap[t]->set_scrollx((offs + yscroll) & 0xff, xscroll);
+			}
+		}
+
+		// colscroll
+		else if (rows == 1)
+		{
+			m_tilemap[t]->set_scroll_rows(1);
+			m_tilemap[t]->set_scroll_cols(64);
+
+			int xscroll = scrollram_x[0] + 256 * scrollram_x[1];
+			m_tilemap[t]->set_scrollx(0, xscroll);
+			xscroll /= 8;
+
+			for (int offs = 0; offs < 64; offs++)
+			{
+				int yscroll = scrollram_y[offs];
+				m_tilemap[t]->set_scrolly((offs + xscroll) & 0x3f, yscroll);
+			}
+		}
+
+		// mixed scroll
+		else
+		{
+			m_tilemap[t]->set_scroll_rows(rows);
+			m_tilemap[t]->set_scroll_cols(64);
+
+			const int offs_step = (rows == 256) ? 2 : 16;
+
+			for (int offs = 0; offs < rows; offs++)
+			{
+				int xscroll = scrollram_x[offs_step * offs] + 256 * scrollram_x[offs_step * offs + 1];
+				m_tilemap[t]->set_scrollx(offs, xscroll);
+			}
+			for (int offs = 0; offs < 64; offs++)
+			{
+				int yscroll = scrollram_y[offs];
+				m_tilemap[t]->set_scrolly(offs, yscroll);
+			}
 		}
 	}
-#endif
 }
 
-void k052109_device::tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, uint32_t flags, uint8_t priority )
+void k052109_device::tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, uint32_t flags, uint8_t priority, uint8_t priority_mask)
 {
-	m_tilemap[tmap_num]->draw(screen, bitmap, cliprect, flags, priority);
+	m_tilemap[tmap_num]->draw(screen, bitmap, cliprect, flags, priority, priority_mask);
 }
 
-void k052109_device::mark_tilemap_dirty( uint8_t tmap_num )
+void k052109_device::mark_tilemap_dirty(uint8_t tmap_num)
 {
 	assert(tmap_num <= 2);
 	m_tilemap[tmap_num]->mark_all_dirty();
@@ -692,7 +631,7 @@ void k052109_device::mark_tilemap_dirty( uint8_t tmap_num )
   color RAM    ------xx  depends on external connections (usually banking, flip)
 */
 
-void k052109_device::get_tile_info( tile_data &tileinfo, int tile_index, int layer, uint8_t *cram, uint8_t *vram1, uint8_t *vram2 )
+void k052109_device::get_tile_info(tile_data &tileinfo, int tile_index, int layer, uint8_t *cram, uint8_t *vram1, uint8_t *vram2)
 {
 	int flipy = 0;
 	int code = vram1[tile_index] + 256 * vram2[tile_index];
@@ -719,11 +658,7 @@ void k052109_device::get_tile_info( tile_data &tileinfo, int tile_index, int lay
 	if (flipy && (m_tileflip_enable & 2))
 		flags |= TILE_FLIPY;
 
-	tileinfo.set(0,
-			code,
-			color,
-			flags);
-
+	tileinfo.set(0, code, color, flags);
 	tileinfo.category = priority;
 }
 

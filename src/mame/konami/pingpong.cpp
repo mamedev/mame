@@ -317,8 +317,8 @@ void pingpong_state::pingpong_map(address_map &map)
 	map(0x9003, 0x9052).ram().share(m_spriteram);
 	map(0x9053, 0x97ff).ram();
 	map(0xa000, 0xa000).w(FUNC(pingpong_state::coin_w));   // coin counters + irq enables
-	map(0xa200, 0xa200).nopw();        // SN76496 data latch
-	map(0xa400, 0xa400).w("snsnd", FUNC(sn76496_device::write));    // trigger read
+	map(0xa200, 0xa200).nopw();        // SN76489A data latch
+	map(0xa400, 0xa400).w("snsnd", FUNC(sn76489a_device::write));    // trigger read
 	map(0xa600, 0xa600).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 	map(0xa800, 0xa800).portr("SYSTEM");
 	map(0xa880, 0xa880).portr("INPUTS");
@@ -343,8 +343,8 @@ void pingpong_state::merlinmm_map(address_map &map)
 	map(0xa080, 0xa080).portr("IN1");
 	map(0xa100, 0xa100).portr("IN2");
 	map(0xa180, 0xa180).portr("IN3");
-	map(0xa200, 0xa200).nopw();        // SN76496 data latch
-	map(0xa400, 0xa400).w("snsnd", FUNC(sn76496_device::write));    // trigger read
+	map(0xa200, 0xa200).nopw();        // SN76489A data latch
+	map(0xa400, 0xa400).w("snsnd", FUNC(sn76489a_device::write));    // trigger read
 	map(0xa600, 0xa600).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 }
 
@@ -707,7 +707,7 @@ void pingpong_state::pingpong(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	SN76496(config, "snsnd", 18'432'000 / 8).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76489A(config, "snsnd", 18'432'000 / 8).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 // too fast!

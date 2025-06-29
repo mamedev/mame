@@ -2180,7 +2180,7 @@ void cmaster_state::jkrmast_map(address_map &map)
 	map(0xfa80, 0xfbff).ram();
 	map(0xfc00, 0xfc7f).ram().share(m_reel_scroll[2]);
 	map(0xfc80, 0xfdff).ram();
-	map(0xfe00, 0xffff).ram().share("bg_scroll");
+	map(0xfe00, 0xffff).ram().share(m_bg_scroll);
 }
 
 void cmaster_state::cmast92_map(address_map &map)
@@ -14054,6 +14054,11 @@ ROM_END
 
 ROM_START( cmast99 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
+	// this ROM loading is confirmed via ICE dump at reset
+	// however, ICE dump after 1 second shows that the 0x4000-0x4fff range gets overwritten with what's at 0x8000-0x8fff.
+	// ROM banking as protection? Couldn't spot any suspect writes to select it.
+	// there are however strange, apparently intentional writes in ROM ranges.
+	// see code at 0x332 and at 0x358, f.e.
 	ROM_LOAD( "cm99-041-8.u81", 0x0000, 0x1000, CRC(5fb0800e) SHA1(14d316b7b89340c5b5c9fdd0b43d5810513b74d6) )
 	ROM_CONTINUE(0x4000,0x1000)
 	ROM_CONTINUE(0x3000,0x1000)
@@ -14087,7 +14092,7 @@ ROM_START( cmast99 )
 
 	ROM_REGION( 0x800, "plds", ROMREGION_ERASE00 )
 	ROM_LOAD( "gal16v8d.f10",   0x000, 0x117, CRC(6655473e) SHA1(f7bdd98a5ec5d3fc53332c12ea81c03af02d561a) )
-	ROM_LOAD( "palce16v8h.e14", 0x200, 0x117, NO_DUMP ) // registered
+	ROM_LOAD( "palce16v8h.e14", 0x200, 0x117, CRC(4dbf87ec) SHA1(338d9fabba8928e25ca39fbe717c5e6ce35b7278) )
 	ROM_LOAD( "palce16v8h.f14", 0x400, 0x117, CRC(12a5e577) SHA1(ee5ea1afef775db3a9f848b5cc5384bc10b4e349) )
 	ROM_LOAD( "palce16v8h.g13", 0x600, 0x117, CRC(deee0b94) SHA1(3682affbe803ffa8b436346f159c3818d6714d1a) )
 ROM_END

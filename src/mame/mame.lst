@@ -20795,6 +20795,7 @@ slqz3
 tct2p
 tripslot
 tshs
+tswxp
 xypdk
 zhongguo
 
@@ -33635,6 +33636,9 @@ dkmb
 
 @source:namco/ds5000.cpp
 ds5000
+
+@source:namco/ds6000.cpp
+ds6000
 
 @source:namco/gal3.cpp
 gal3

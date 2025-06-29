@@ -509,7 +509,7 @@ void tail2nos_state::tail2nos(machine_config &config)
 	K051316(config, m_k051316, 0);
 	m_k051316->set_palette(m_palette);
 	m_k051316->set_bpp(-4);
-	m_k051316->set_offsets(-89, -14);
+	m_k051316->set_offsets(7, -14);
 	m_k051316->set_wrap(1);
 	m_k051316->set_zoom_callback(FUNC(tail2nos_state::zoom_callback));
 

@@ -798,33 +798,30 @@ void thunderx_state_base::machine_reset()
 void thunderx_state_base::common(machine_config &config)
 {
 	// basic machine hardware
-	KONAMI(config, m_maincpu, XTAL(24'000'000)/2); // 052001 (verified on PCB)
+	KONAMI(config, m_maincpu, 24_MHz_XTAL / 2); // 052001 (verified on PCB)
 	m_maincpu->set_addrmap(AS_PROGRAM, &thunderx_state_base::scontra_map);
 
-	Z80(config, m_audiocpu, XTAL(3'579'545)); // verified on PCB
+	Z80(config, m_audiocpu, 3.579545_MHz_XTAL); // verified on PCB
 	m_audiocpu->set_addrmap(AS_PROGRAM, &thunderx_state_base::thunderx_sound_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(59.17); // verified on PCB
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(12*8, (64-12)*8-1, 2*8, 30*8-1); // verified on scontra and thunderx PCBs
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 320, 264, 16, 240); // verified on scontra and thunderx PCBs
 	screen.set_screen_update(FUNC(thunderx_state_base::screen_update));
 	screen.set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 1024);
 	m_palette->enable_shadows();
 
-	K052109(config, m_k052109, 0); // 051961 on Super Contra and Thunder Cross schematics
+	K052109(config, m_k052109, 24_MHz_XTAL); // 051961 on Super Contra and Thunder Cross schematics
 	m_k052109->set_palette(m_palette);
 	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(thunderx_state_base::tile_callback));
 	m_k052109->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 
-	K051960(config, m_k051960, 0);
+	K051960(config, m_k051960, 24_MHz_XTAL);
 	m_k051960->set_palette(m_palette);
 	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(thunderx_state_base::sprite_callback));
@@ -834,7 +831,7 @@ void thunderx_state_base::common(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545))); /* verified on pcb */
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL)); /* verified on pcb */
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.5);
 }
 
@@ -856,7 +853,7 @@ void scontra_state::scontra(machine_config &config)
 
 	m_audiocpu->set_addrmap(AS_PROGRAM, &scontra_state::scontra_sound_map);
 
-	K007232(config, m_k007232, XTAL(3'579'545)); // verified on PCB
+	K007232(config, m_k007232, 3.579545_MHz_XTAL); // verified on PCB
 	m_k007232->port_write().set(FUNC(scontra_state::volume_callback));
 	m_k007232->add_route(ALL_OUTPUTS, "mono", 0.1);
 }

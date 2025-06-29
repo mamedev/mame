@@ -344,9 +344,6 @@ constexpr u8 TILE_FORCE_LAYER2 = TILEMAP_PIXEL_LAYER2; // force all pixels to be
 constexpr u32 TILEMAP_FLIPX = TILE_FLIPX;            // draw the tilemap horizontally flipped
 constexpr u32 TILEMAP_FLIPY = TILE_FLIPY;            // draw the tilemap vertically flipped
 
-// set this value for a scroll row/column to fully disable it
-constexpr u32 TILE_LINE_DISABLED = 0x80000000;
-
 // standard mappers
 enum tilemap_standard_mapper
 {

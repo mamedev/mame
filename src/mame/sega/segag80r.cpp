@@ -1828,7 +1828,7 @@ GAME( 1981, astrob1,   astrob,   astrob,   astrob,   segag80r_state, init_astrob
 GAME( 1981, astrobf,   astrob,   astrob,   astrob,   segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (French)",        0 )
 GAME( 1981, astrobg,   astrob,   astrob,   astrob,   segag80r_state, init_astrob,   ROT270, "Sega", "Astro Blaster (German)",        0 )
 GAME( 1981, 005,       0,        sega005,  005,      segag80r_state, init_005,      ROT270, "Sega", "005",                           MACHINE_IMPERFECT_SOUND )
-GAME( 1981, 005a,      005,      sega005,  005,      segag80r_state, init_005,      ROT270, "Sega", "005 (Earlier version?)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1981, 005a,      005,      sega005,  005,      segag80r_state, init_005,      ROT270, "Sega", "005 (earlier version?)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // basic G-80 system with individual background boards
 GAME( 1981, spaceod,   0,        spaceod,  spaceod,  segag80r_state, init_spaceod,  ROT270, "Sega", "Space Odyssey (version 2)", MACHINE_IMPERFECT_SOUND )
