@@ -102,14 +102,48 @@ namespace {
 
 enum
 {
-	PORT_1_OP0,
-	PORT_1_OP1,
-	PORT_1_OP2,
-	PORT_1_OP3,
-	PORT_1_OP4,
-	PORT_1_LED0,
-	PORT_1_LED1,
-	PORT_1_SPA
+	PORT_I_SDA,
+	PORT_I_COIN,
+	PORT_I_IP2, //bridged to IP5
+	PORT_I_MISO,
+	PORT_I_DOOR,
+	PORT_I_IP5
+};
+
+enum
+{
+	PORT_O_ALARM,
+	PORT_O_EN_COIN,
+	PORT_O_EN_SPK,
+	PORT_O_PROT_OD,
+	PORT_O_SCL,
+	PORT_O_LED0,
+	PORT_O_SDA,
+	PORT_O_SPZ
+};
+
+enum
+{
+	PORT_A_IO0,
+	PORT_A_IO1,
+	PORT_A_IO2,
+	PORT_A_IO3,
+	PORT_A_IO4,
+	PORT_A_IO5,
+	PORT_A_RESET,
+	PORT_A_DOOR_SIN
+};
+
+enum
+{
+	PORT_B_IO0,
+	PORT_B_IO1,
+	PORT_B_DAC,
+	PORT_B_COIN_AW,
+	PORT_B_RS485_OUT_EN,
+	PORT_B_RS485_IN_EN,
+	PORT_B_DOOR_SCK,
+	PORT_B_DOOR_SOUT
 };
 
 class stellafr_state : public driver_device
@@ -162,8 +196,8 @@ void stellafr_state::write_800101(uint8_t data)
 
 void stellafr_state::duart_output_w(uint8_t data)
 {
-	m_leds[0] = BIT(data, PORT_1_LED0);
-	m_leds[1] = BIT(data, PORT_1_LED1);
+	m_leds[0] = BIT(data, PORT_O_LED0);
+	m_leds[1] = BIT(data, PORT_O_SDA);
 }
 
 void stellafr_state::ay8910_portb_w(uint8_t data)
@@ -175,11 +209,12 @@ void stellafr_state::ay8910_portb_w(uint8_t data)
 void stellafr_state::mem_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();
-	map(0x8000c1, 0x8000c1).w(FUNC(stellafr_state::write_8000c1));
-	map(0x800101, 0x800101).rw(FUNC(stellafr_state::read_800101), FUNC(stellafr_state::write_800101));
-	map(0x800141, 0x800141).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
-	map(0x800143, 0x800143).w("aysnd", FUNC(ay8910_device::data_w));
-	map(0x800180, 0x80019f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
+	// controlled by U17 74HC138
+	map(0x8000c1, 0x8000c1).w(FUNC(stellafr_state::write_8000c1)); // Y3
+	map(0x800101, 0x800101).rw(FUNC(stellafr_state::read_800101), FUNC(stellafr_state::write_800101)); // Y4
+	map(0x800141, 0x800141).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)); // Y5
+	map(0x800143, 0x800143).w("aysnd", FUNC(ay8910_device::data_w)); // Y5
+	map(0x800180, 0x80019f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff); // Y6
 	map(0xff0000, 0xffffff).ram().share("nvram");
 }
 
