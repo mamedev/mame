@@ -32,6 +32,8 @@ protected:
 
 	void nes_vt32_soc_map(address_map &map) ATTR_COLD;
 
+	virtual void update_banks() override;
+
 	virtual void scrambled_8000_w(u16 offset, u8 data) override;
 
 	u8 read_onespace_bus(offs_t offset);
@@ -52,6 +54,9 @@ private:
 	void vt32_palette_w(offs_t offset, u8 data);
 
 	int m_ppu_chr_data_scramble;
+	u8 m_mmc1_shift_reg;
+	u8 m_mmc1_control;
+	u8 m_mmc1_prg_bank;
 };
 
 class nes_vt32_soc_pal_device : public nes_vt32_soc_device

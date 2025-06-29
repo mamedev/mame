@@ -204,6 +204,39 @@ u8 nes_vt32_soc_device::vthh_414a_r()
 }
 
 
+void nes_vt32_soc_device::update_banks()
+{
+	if ((m_411d & 0x03) == 0x01)
+	{
+		if (BIT(m_mmc1_control, 3))
+		{
+			if (BIT(m_mmc1_control, 2))
+			{
+				set_bankaddr(0, get_banks(m_mmc1_prg_bank << 1));
+				set_bankaddr(1, get_banks((m_mmc1_prg_bank << 1) | 1));
+				set_bankaddr(2, get_banks(0xfe));
+				set_bankaddr(3, get_banks(0xff));
+			}
+			else
+			{
+				set_bankaddr(0, get_banks(0x00));
+				set_bankaddr(1, get_banks(0x01));
+				set_bankaddr(2, get_banks(m_mmc1_prg_bank << 1));
+				set_bankaddr(3, get_banks((m_mmc1_prg_bank << 1) | 1));
+			}
+		}
+		else
+		{
+			set_bankaddr(0, get_banks((m_mmc1_prg_bank & 0x0e) << 1));
+			set_bankaddr(1, get_banks(((m_mmc1_prg_bank & 0x0e) << 1) | 1));
+			set_bankaddr(2, get_banks(((m_mmc1_prg_bank & 0x0e) << 1) | 2));
+			set_bankaddr(3, get_banks(((m_mmc1_prg_bank & 0x0e) << 1) | 3));
+		}
+	}
+	else
+		nes_vt09_soc_device::update_banks();
+}
+
 void nes_vt32_soc_device::scrambled_8000_w(u16 offset, u8 data)
 {
 	offset &= 0x7fff;
@@ -223,8 +256,52 @@ void nes_vt32_soc_device::scrambled_8000_w(u16 offset, u8 data)
 	}
 	else if ((m_411d & 0x03) == 0x01) // (VT32 only, not VT03/09)
 	{
-		//MMC1 compat, TODO
-		logerror("%s: vtxx_mmc1_8000_w real address: (%04x) translated address: (%04x) %02x\n", machine().describe_context(), addr, offset + 0x8000, data);
+		//MMC1 compat
+		if (BIT(data, 7))
+		{
+			logerror("%s: MMC1 reset\n", machine().describe_context());
+			m_mmc1_shift_reg = 1 << 4;
+			m_mmc1_control |= 0x0c;
+			update_banks();
+		}
+		else
+		{
+			bool mmc1_do_write = BIT(m_mmc1_shift_reg, 0);
+			m_mmc1_shift_reg = (m_mmc1_shift_reg >> 1) | (data & 0x01) << 4;
+			if (mmc1_do_write)
+			{
+				logerror("%s: MMC1 write (%04x) %02x\n", machine().describe_context(), addr, m_mmc1_shift_reg);
+				switch (offset & 0x6000)
+				{
+				case 0:
+					m_410x[0x6] = (m_mmc1_shift_reg & 0x03) ^ 0x02;
+					m_mmc1_control = m_mmc1_shift_reg;
+					update_banks();
+					break;
+
+				case 0x2000:
+					if (!BIT(m_mmc1_control, 4))
+						m_mmc1_shift_reg &= 0x1e;
+					m_ppu->set_videobank0_reg(4, m_mmc1_shift_reg << 2);
+					m_ppu->set_videobank0_reg(5, (m_mmc1_shift_reg << 2) + 2);
+					if (BIT(m_mmc1_control, 4))
+						break;
+					m_mmc1_shift_reg |= 1;
+					[[fall_through]];
+
+				case 0x4000:
+					for (int i = 0; i < 4; i++)
+						m_ppu->set_videobank0_reg(i, (m_mmc1_shift_reg << 2) + i);
+					break;
+
+				case 0x6000:
+					m_mmc1_prg_bank = m_mmc1_shift_reg;
+					update_banks();
+					break;
+				}
+				m_mmc1_shift_reg = 1 << 4;
+			}
+		}
 	}
 	else if ((m_411d & 0x03) == 0x02) // (VT32 only, not VT03/09)
 	{
@@ -278,12 +355,18 @@ void nes_vt32_soc_device::device_start()
 	nes_vt09_soc_device::device_start();
 	m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x3e00, 0x3fff, read8sm_delegate(*this, FUNC(nes_vt32_soc_device::vt32_palette_r)), write8sm_delegate(*this, FUNC(nes_vt32_soc_device::vt32_palette_w)));
 	save_item(NAME(m_ppu_chr_data_scramble));
+	save_item(NAME(m_mmc1_shift_reg));
+	save_item(NAME(m_mmc1_control));
+	save_item(NAME(m_mmc1_prg_bank));
 }
 
 void nes_vt32_soc_device::device_reset()
 {
 	nes_vt09_soc_device::device_reset();
 	m_ppu_chr_data_scramble = 0;
+	m_mmc1_shift_reg = 1 << 4;
+	m_mmc1_control = 0x0c;
+	m_mmc1_prg_bank = 0;
 }
 
 void nes_vt32_soc_device::nes_vt32_soc_map(address_map &map)

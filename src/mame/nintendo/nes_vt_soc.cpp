@@ -247,7 +247,7 @@ void nes_vt02_vt03_soc_device::device_reset()
 
 }
 
-u32 nes_vt02_vt03_soc_device::get_banks(u8 bnk)
+u32 nes_vt02_vt03_soc_device::get_banks(u8 bnk) const
 {
 	switch (m_410x[0xb] & 0x07)
 	{
