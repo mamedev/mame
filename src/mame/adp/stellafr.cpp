@@ -262,13 +262,13 @@ ROM_END
 
 } // anonymous namespace
 
-GAMEL(1993, action,    0,      stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Action",                MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(1994, grandhand, action, stellafr, stellafr, stellafr_state, empty_init, ROT0, "Stella", "Grand Hand",            MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(1994, st_vulkn,  action, stellafr, stellafr, stellafr_state, empty_init, ROT0, "Stella", "Vulkan",                MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(1995, multimulti,action, stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Multi Multi",           MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(1995, sunny,     action, stellafr, stellafr, stellafr_state, empty_init, ROT0, "Mega",   "Sunny",                 MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(1996, st_ohla,   action, stellafr, stellafr, stellafr_state, empty_init, ROT0, "Stella", "Oh La La",              MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(1998, allfred,   action, stellafr, stellafr, stellafr_state, empty_init, ROT0, "Stella", "Allfred",               MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(1998, taipan,    action, stellafr, stellafr, stellafr_state, empty_init, ROT0, "Nova",   "Tai Pan Money",         MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(199?, kleopatra, action, stellafr, stellafr, stellafr_state, empty_init, ROT0, "Stella", "Asterix und Kleopatra", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
-GAMEL(2001, turbosun,  action, stellafr, stellafr, stellafr_state, empty_init, ROT0, "Mega",   "Turbo Sunny",           MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1993, action,    0, stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Action",                MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1994, grandhand, 0, stellafr, stellafr, stellafr_state, empty_init, ROT0, "Stella", "Grand Hand",            MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1994, st_vulkn,  0, stellafr, stellafr, stellafr_state, empty_init, ROT0, "Stella", "Vulkan",                MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1995, multimulti,0, stellafr, stellafr, stellafr_state, empty_init, ROT0, "ADP",    "Multi Multi",           MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1995, sunny,     0, stellafr, stellafr, stellafr_state, empty_init, ROT0, "Mega",   "Sunny",                 MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1996, st_ohla,   0, stellafr, stellafr, stellafr_state, empty_init, ROT0, "Stella", "Oh La La",              MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1998, allfred,   0, stellafr, stellafr, stellafr_state, empty_init, ROT0, "Stella", "Allfred",               MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(1998, taipan,    0, stellafr, stellafr, stellafr_state, empty_init, ROT0, "Nova",   "Tai Pan Money",         MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(199?, kleopatra, 0, stellafr, stellafr, stellafr_state, empty_init, ROT0, "Stella", "Asterix und Kleopatra", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
+GAMEL(2001, turbosun,  0, stellafr, stellafr, stellafr_state, empty_init, ROT0, "Mega",   "Turbo Sunny",           MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_stellafr )
