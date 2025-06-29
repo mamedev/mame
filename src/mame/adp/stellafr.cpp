@@ -146,6 +146,44 @@ enum
 	PORT_B_DOOR_SOUT
 };
 
+// U1 and U5 handle outputs
+enum
+{
+	U1_1MA,
+	U1_2MA,
+	U1_ME,
+	U1_D3OUT,
+	U1_ANZ,
+	U1_MUX,
+	U1_ANZME2,
+	U1_MUX2
+};
+
+enum
+{
+	U5_ENM,
+	U5_ENME2,
+	U5_AW,
+	U5_AW2,
+	U5_ENSTANZ,
+	U5_MUXMA,
+	U5_EANZ2,
+	U5_EMUX2
+};
+
+// U10 handles inputs
+enum
+{
+	U10_OUTLI,
+	U10_OUTEMP,
+	U10_OUTMA,
+	U10_OUTST,
+	U10_OUTT,
+	U10_OUTT2,
+	U10_EMP2,
+	U10_LI2
+};
+
 class stellafr_state : public driver_device
 {
 public:
