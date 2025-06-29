@@ -287,7 +287,7 @@ void nes_vt32_soc_device::scrambled_8000_w(u16 offset, u8 data)
 					if (BIT(m_mmc1_control, 4))
 						break;
 					m_mmc1_shift_reg |= 1;
-					[[fall_through]];
+					[[fallthrough]];
 
 				case 0x4000:
 					for (int i = 0; i < 4; i++)
