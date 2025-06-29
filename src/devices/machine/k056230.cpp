@@ -40,13 +40,15 @@ TODO:
 class k056230_device::context
 {
 public:
-	context() :
-	m_acceptor(m_ioctx),
-	m_sock_rx(m_ioctx),
-	m_sock_tx(m_ioctx),
-	m_timeout_tx(m_ioctx),
-	m_state_rx(0U),
-	m_state_tx(0U)
+	context(k056230_device &device) :
+		m_device(device),
+		m_acceptor(m_ioctx),
+		m_sock_rx(m_ioctx),
+		m_sock_tx(m_ioctx),
+		m_timeout_tx(m_ioctx),
+		m_stopping(false),
+		m_state_rx(0U),
+		m_state_tx(0U)
 	{
 	}
 
@@ -56,47 +58,46 @@ public:
 		m_thread = std::thread(
 				[this] ()
 				{
-					LOG("k056230: network thread started\n");
+					LOG("network thread started\n");
 					try {
 						m_ioctx.run();
 					} catch (const std::exception& e) {
-						LOG("k056230: Exception in network thread: %s\n", e.what());
+						LOG("Exception in network thread: %s\n", e.what());
 					} catch (...) { // Catch any other unknown exceptions
-						LOG("k056230: Unknown exception in network thread\n");
+						LOG("Unknown exception in network thread\n");
 					}
-					LOG("k056230: network thread completed\n");
+					LOG("network thread completed\n");
 				});
 	}
 
 	void reset(std::string localhost, std::string localport, std::string remotehost, std::string remoteport)
 	{
-		std::error_code err;
-		asio::ip::tcp::resolver resolver(m_ioctx);
-
-		for (auto &&resolveIte : resolver.resolve(localhost, localport, asio::ip::tcp::resolver::flags::address_configured, err))
-		{
-			m_localaddr = resolveIte.endpoint();
-			LOG("k056230: localhost = %s\n", *m_localaddr);
-		}
-		if (err)
-		{
-			LOG("k056230: localhost resolve error: %s\n", err.message());
-		}
-
-		for (auto &&resolveIte : resolver.resolve(remotehost, remoteport, asio::ip::tcp::resolver::flags::address_configured, err))
-		{
-			m_remoteaddr = resolveIte.endpoint();
-			LOG("k056230: remotehost = %s\n", *m_remoteaddr);
-		}
-		if (err)
-		{
-			LOG("k056230: remotehost resolve error: %s\n", err.message());
-		}
-
 		m_ioctx.post(
-				[this] ()
+				[this, localhost = std::move(localhost), localport = std::move(localport), remotehost = std::move(remotehost), remoteport = std::move(remoteport)] ()
 				{
 					std::error_code err;
+					asio::ip::tcp::resolver resolver(m_ioctx);
+
+					for (auto &&resolveIte : resolver.resolve(localhost, localport, asio::ip::tcp::resolver::flags::address_configured, err))
+					{
+						m_localaddr = resolveIte.endpoint();
+						LOG("localhost = %s\n", *m_localaddr);
+					}
+					if (err)
+					{
+						LOG("localhost resolve error: %s\n", err.message());
+					}
+
+					for (auto &&resolveIte : resolver.resolve(remotehost, remoteport, asio::ip::tcp::resolver::flags::address_configured, err))
+					{
+						m_remoteaddr = resolveIte.endpoint();
+						LOG("remotehost = %s\n", *m_remoteaddr);
+					}
+					if (err)
+					{
+						LOG("remotehost resolve error: %s\n", err.message());
+					}
+
 					if (m_acceptor.is_open())
 						m_acceptor.close(err);
 					if (m_sock_rx.is_open())
@@ -116,6 +117,7 @@ public:
 		m_ioctx.post(
 				[this] ()
 				{
+					m_stopping = true;
 					std::error_code err;
 					if (m_acceptor.is_open())
 						m_acceptor.close(err);
@@ -161,7 +163,7 @@ public:
 
 		if (data_size > m_fifo_tx.free())
 		{
-			LOG("k056230: TX buffer overflow\n");
+			LOG("TX buffer overflow\n");
 			return UINT_MAX;
 		}
 
@@ -180,89 +182,132 @@ private:
 	class fifo
 	{
 	public:
-		unsigned write(uint8_t *buffer, unsigned data_size)
+		fifo() :
+			m_wp(0),
+			m_rp(0)
 		{
-			std::lock_guard<std::mutex> lock(m_mutex);
-			unsigned used = 0;
-			if (m_wp >= m_rp)
-			{
-				used = std::min<unsigned>(m_buffer.size() - m_wp, data_size);
-				std::copy_n(&buffer[0], used, &m_buffer[m_wp]);
-				m_wp = (m_wp + used) % m_buffer.size();
-			}
-			unsigned const block = std::min<unsigned>(data_size - used, m_rp - m_wp);
-			if (block)
-			{
-				std::copy_n(&buffer[used], block, &m_buffer[m_wp]);
-				used += block;
-				m_wp += block;
-			}
-			m_used += used;
-			return used;
 		}
 
-		unsigned read(uint8_t *buffer, unsigned data_size, bool peek)
+		unsigned write(uint8_t* buffer, unsigned data_size)
 		{
-			std::lock_guard<std::mutex> lock(m_mutex);
-			unsigned rp = m_rp;
-			unsigned used = 0;
-			if (rp >= m_wp)
+			unsigned current_rp = m_rp.load(std::memory_order_acquire);
+			unsigned current_wp = m_wp.load(std::memory_order_relaxed);
+
+			// calculate free space
+			unsigned data_free = (BUFFER_SIZE + current_rp - current_wp - 1) % BUFFER_SIZE;
+
+			// sanity checks
+			if (data_size > data_free)
+				return UINT_MAX;
+			if (data_size == 0)
+				return 0;
+
+			unsigned data_used = 0;
+
+			// first part (up to end)
+			unsigned block = std::min(data_size, BUFFER_SIZE - current_wp);
+			std::copy_n(&buffer[0], block, &m_buffer[current_wp]);
+			data_used += block;
+			current_wp = (current_wp + block) % BUFFER_SIZE;
+
+			// second part (from beginning, if wrapped)
+			if (data_used < data_size)
 			{
-				used = std::min<std::size_t>(m_buffer.size() - rp, data_size);
-				std::copy_n(&m_buffer[rp], used, &buffer[0]);
-				rp = (rp + used) % m_buffer.size();
+				block = data_size - data_used;
+				std::copy_n(&buffer[data_used], block, &m_buffer[current_wp]);
+				data_used += block;
+				current_wp += block;
 			}
-			unsigned const block = std::min<unsigned>(data_size - used, m_wp - rp);
-			if (block)
+
+			m_wp.store(current_wp, std::memory_order_release);
+			return data_used;
+		}
+
+		unsigned read(uint8_t* buffer, unsigned data_size, bool peek)
+		{
+			unsigned current_wp = m_wp.load(std::memory_order_acquire);
+			unsigned current_rp = m_rp.load(std::memory_order_relaxed);
+
+			// calculate available data
+			unsigned data_avail = (BUFFER_SIZE + current_wp - current_rp) % BUFFER_SIZE;
+
+			// sanity checks
+			if (data_size > data_avail)
+				return UINT_MAX;
+			if (data_size == 0)
+				return 0;
+
+			unsigned data_used = 0;
+
+			// first part (up to end)
+			unsigned block = std::min(data_size, BUFFER_SIZE - current_rp);
+			std::copy_n(&m_buffer[current_rp], block, &buffer[0]);
+			data_used += block;
+			current_rp = (current_rp + data_used) % BUFFER_SIZE;
+
+			// second part (from beginning, if wrapped)
+			if (data_used < data_size)
 			{
-				std::copy_n(&m_buffer[rp], block, &buffer[used]);
-				used += block;
-				rp += block;
+				block = data_size - data_used;
+				std::copy_n(&m_buffer[current_rp], block, &buffer[data_used]);
+				data_used += block;
+				current_rp += block;
 			}
 			if (!peek)
 			{
-				m_rp = (m_rp + used) % m_buffer.size();
-				m_used -= used;
+				m_rp.store(current_rp, std::memory_order_release);
 			}
-			return used;
+			return data_used;
 		}
 
 		void consume(unsigned data_size)
 		{
-			std::lock_guard<std::mutex> lock(m_mutex);
-			m_rp = (m_rp + data_size) % m_buffer.size();
-			m_used -= data_size;
+			unsigned current_wp = m_wp.load(std::memory_order_acquire);
+			unsigned current_rp = m_rp.load(std::memory_order_relaxed);
+
+			//  available data
+			unsigned data_avail = (BUFFER_SIZE + current_wp - current_rp) % BUFFER_SIZE;
+
+			// sanity check
+			if (data_size > data_avail)
+				data_size = data_avail;
+
+			current_rp = (current_rp + data_size) % BUFFER_SIZE;
+			m_rp.store(current_rp, std::memory_order_release);
 		}
 
 		unsigned used()
 		{
-			std::lock_guard<std::mutex> lock(m_mutex);
-			return m_used;
+			unsigned current_wp = m_wp.load(std::memory_order_acquire);
+			unsigned current_rp = m_rp.load(std::memory_order_acquire);
+			return (BUFFER_SIZE + current_wp - current_rp) % BUFFER_SIZE;
 		}
 
 		unsigned free()
 		{
-			std::lock_guard<std::mutex> lock(m_mutex);
-			return m_buffer.size() - m_used;
+			unsigned current_wp = m_wp.load(std::memory_order_acquire);
+			unsigned current_rp = m_rp.load(std::memory_order_acquire);
+			return (BUFFER_SIZE + current_rp - current_wp - 1 + BUFFER_SIZE) % BUFFER_SIZE;
 		}
 
 		void clear()
 		{
-			std::lock_guard<std::mutex> lock(m_mutex);
-			m_wp = m_rp = m_used = 0;
+			m_wp.store(0, std::memory_order_release);
+			m_rp.store(0, std::memory_order_release);
 		}
 
-
 	private:
-		unsigned m_wp = 0;
-		unsigned m_rp = 0;
-		unsigned m_used = 0;
-		std::array<uint8_t, 0x80000> m_buffer;
-		std::mutex m_mutex;
+		static constexpr unsigned BUFFER_SIZE = 0x80000;
+		std::atomic<unsigned> m_wp;
+		std::atomic<unsigned> m_rp;
+		std::array<uint8_t, BUFFER_SIZE> m_buffer;
 	};
 
 	void start_accept()
 	{
+		if (m_stopping)
+			return;
+
 		std::error_code err;
 		m_acceptor.open(m_localaddr->protocol(), err);
 		m_acceptor.set_option(asio::ip::tcp::acceptor::reuse_address(true));
@@ -280,7 +325,7 @@ private:
 							{
 								if (err)
 								{
-									LOG("k056230: RX error accepting - %d %s\n", err.value(), err.message());
+									LOG("RX error accepting - %d %s\n", err.value(), err.message());
 									std::error_code e;
 									m_acceptor.close(e);
 									m_state_rx.store(0);
@@ -288,7 +333,7 @@ private:
 								}
 								else
 								{
-									LOG("k056230: RX connection from %s\n", sock.remote_endpoint());
+									LOG("RX connection from %s\n", sock.remote_endpoint());
 									std::error_code e;
 									m_acceptor.close(e);
 									m_sock_rx = std::move(sock);
@@ -303,12 +348,15 @@ private:
 		}
 		if (err)
 		{
-			LOG("k056230: RX failed - %d %s\n", err.value(), err.message());
+			LOG("RX failed - %d %s\n", err.value(), err.message());
 		}
 	}
 
 	void start_connect()
 	{
+		if (m_stopping)
+			return;
+
 		std::error_code err;
 		if (m_sock_tx.is_open())
 			m_sock_tx.close(err);
@@ -346,7 +394,7 @@ private:
 						}
 						else
 						{
-							LOG("k056230: TX connection established\n");
+							LOG("TX connection established\n");
 							m_state_tx.store(2);
 						}
 					});
@@ -356,6 +404,9 @@ private:
 
 	void start_send_tx()
 	{
+		if (m_stopping)
+			return;
+
 		unsigned used = m_fifo_tx.read(&m_buffer_tx[0], std::min<unsigned>(m_fifo_tx.used(), m_buffer_tx.size()), true);
 		m_sock_tx.async_write_some(
 				asio::buffer(&m_buffer_tx[0], used),
@@ -364,7 +415,7 @@ private:
 					m_fifo_tx.consume(length);
 					if (err)
 					{
-						LOG("k056230: TX connection error: %s\n", err.message().c_str());
+						LOG("TX connection error: %s\n", err.message().c_str());
 						m_sock_tx.close();
 						m_state_tx.store(0);
 						m_fifo_tx.clear();
@@ -379,6 +430,9 @@ private:
 
 	void start_receive_rx()
 	{
+		if (m_stopping)
+			return;
+
 		m_sock_rx.async_read_some(
 				asio::buffer(m_buffer_rx),
 				[this] (std::error_code const &err, std::size_t length)
@@ -386,9 +440,9 @@ private:
 					if (err || !length)
 					{
 						if (err)
-							LOG("k056230: RX connection error: %s\n", err.message());
+							LOG("RX connection error: %s\n", err.message());
 						else
-							LOG("k056230: RX connection lost\n");
+							LOG("RX connection lost\n");
 						m_sock_rx.close();
 						m_state_rx.store(0);
 						m_fifo_rx.clear();
@@ -398,10 +452,12 @@ private:
 					{
 						if (UINT_MAX == m_fifo_rx.write(&m_buffer_rx[0], length))
 						{
-							LOG("k056230: RX buffer overflow\n");
+							LOG("RX buffer overflow\n");
 							m_sock_rx.close();
 							m_state_rx.store(0);
 							m_fifo_rx.clear();
+							start_accept();
+							return;
 						}
 						start_receive_rx();
 					}
@@ -413,10 +469,12 @@ private:
 	{
 		util::stream_format(
 				std::cerr,
-				"%s",
+				"[%s] %s",
+				m_device.tag(),
 				util::string_format(std::forward<Format>(fmt), std::forward<Params>(args)...));
 	}
 
+	k056230_device &m_device;
 	std::thread m_thread;
 	asio::io_context m_ioctx;
 	asio::executor_work_guard<asio::io_context::executor_type> m_work_guard{m_ioctx.get_executor()};
@@ -426,6 +484,7 @@ private:
 	asio::ip::tcp::socket m_sock_rx;
 	asio::ip::tcp::socket m_sock_tx;
 	asio::steady_timer m_timeout_tx;
+	bool m_stopping;
 	std::atomic_uint m_state_rx;
 	std::atomic_uint m_state_tx;
 	fifo m_fifo_rx;
@@ -454,7 +513,7 @@ void k056230_device::device_start()
 	m_tick_timer = timer_alloc(FUNC(k056230_device::tick_timer_callback), this);
 	m_tick_timer->adjust(attotime::never);
 
-	auto ctx = std::make_unique<context>();
+	auto ctx = std::make_unique<context>(*this);
 	m_context = std::move(ctx);
 	m_context->start();
 
