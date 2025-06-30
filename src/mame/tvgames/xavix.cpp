@@ -2976,7 +2976,7 @@ CONS( 2001, tak_gin,   0,          0,  xavix_2mb,        tak_gin,  xavix_state, 
 // ぽこぽこハンマーズ
 CONS( 2002, tak_hamr,  0,          0,  xavix_i2c_24c02_4mb,  tak_hamr, xavix_i2c_state,      init_xavix,    "Takara / SSD Company LTD",                     "Poko Poko Hammers (Japan)", MACHINE_IMPERFECT_SOUND )
 
-CONS( 2002, tak_beyu,  0,          0,  xavix_2mb,        xavix,    xavix_state,          init_xavix,    "Takara / Hasbro / SSD Company LTD",            "Beyblade Arcade Challenge 5-in-1 (US)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2003, tak_beyu,  0,          0,  xavix_2mb,        xavix,    xavix_state,          init_xavix,    "Takara / Hasbro / SSD Company LTD",            "Beyblade Arcade Challenge 5-in-1 (US)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 //ベイブレード　アルティメットシューター
 CONS( 2002, tak_beyb,  tak_beyu,   0,  xavix_2mb,        xavix,    xavix_state,          init_xavix,    "Takara / SSD Company LTD",                     "Beyblade Ultimate Shooter (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
