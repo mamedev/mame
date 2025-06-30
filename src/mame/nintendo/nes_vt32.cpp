@@ -457,6 +457,13 @@ void nes_vt32_unk_state::init_hhgc319()
 
 	// Even more pairs of address and data lines to swap here...
 	uint8_t *romdata = memregion("mainrom")->base();
+	for (offs_t i = 0; i < 0x1000000; i += 0x800000)
+	{
+		std::swap_ranges(&romdata[i + 0x080000], &romdata[i + 0x100000], &romdata[i + 0x400000]);
+		std::swap_ranges(&romdata[i + 0x180000], &romdata[i + 0x200000], &romdata[i + 0x500000]);
+		std::swap_ranges(&romdata[i + 0x280000], &romdata[i + 0x300000], &romdata[i + 0x600000]);
+		std::swap_ranges(&romdata[i + 0x380000], &romdata[i + 0x400000], &romdata[i + 0x700000]);
+	}
 	for (offs_t i = 0; i < 0x1000000; i += 0x800)
 		std::swap_ranges(&romdata[i + 0x200], &romdata[i + 0x400], &romdata[i + 0x400]);
 	for (offs_t i = 0; i < 0x1000000; i += 0x20)
