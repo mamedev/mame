@@ -270,11 +270,7 @@ void nes_vt32_fapocket_state::machine_reset()
 {
 	nes_vt32_unk_state::machine_reset();
 
-	// fapocket needs this, fcpocket instead reads the switch in software?
-	if (m_cartsel)
-		m_ahigh = (m_cartsel->read() == 0x01) ? (1 << 25) : 0x0;
-	else
-		m_ahigh = 0;
+	m_ahigh = 0;
 }
 
 void nes_vt32_base_state::configure_soc(nes_vt02_vt03_soc_device* soc)
@@ -441,9 +437,9 @@ static INPUT_PORTS_START( nes_vt32_fa )
 	PORT_INCLUDE(nes_vt32)
 
 	PORT_START("CARTSEL")
-	PORT_DIPNAME( 0x01, 0x00, "Cartridge Select" ) PORT_CODE(KEYCODE_3) PORT_TOGGLE
+	PORT_DIPNAME( 0x08, 0x00, "Cartridge Select" ) PORT_CODE(KEYCODE_3) PORT_TOGGLE
 	PORT_DIPSETTING(    0x00, "508-in-1" )
-	PORT_DIPSETTING(    0x01, "130-in-1" )
+	PORT_DIPSETTING(    0x08, "130-in-1" )
 INPUT_PORTS_END
 
 
