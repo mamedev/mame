@@ -903,7 +903,7 @@ inline void model2_state::model2_3d_project( triangle *tri )
 }
 
 /* 3D Rasterizer frame start: Resets frame variables */
-void model2_state::model2_3d_frame_start( void )
+void model2_state::model2_3d_frame_start()
 {
 	raster_state *raster = m_raster.get();
 
