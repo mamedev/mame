@@ -2630,14 +2630,6 @@ void model2_state::video_start()
 u32 model2_state::screen_update_model2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	//logerror("--- frame ---\n");
-	if (machine().video().skip_this_frame())
-	{
-		model2_3d_frame_start();
-		geo_parse();
-
-		return UPDATE_HAS_NOT_CHANGED;
-	}
-
 	bitmap.fill(m_palette->pen(0), cliprect);
 	m_sys24_bitmap.fill(0, cliprect);
 
