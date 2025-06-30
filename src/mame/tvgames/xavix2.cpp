@@ -822,7 +822,7 @@ CONS( 2006, epo_dtcj, 0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / S
 // SASUKE サスケ＆筋肉バトル!!スポーツマンNO.1決定戦
 CONS( 2006, epo_sskj, 0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company LTD", "Sasuke & Kinniku Battle!! Sportsman No. 1 Ketteisen (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-CONS( 2007, epo_pabj, 0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company LTD", "Terebi de Asobou! Manabou! Pooh-san to Issho: ABC Aiueo Zukan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2007, epo_pabj, 0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company LTD", "TV de Asobou! Manabou! Pooh-san to Issho: ABC AIUEO Zukan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // These are for the 'Domyos Interactive System' other Domyos Interactive System games can be found in xavix.cpp (the SoC is inside the cartridge, base acts as a 'TV adapter' only)
 
