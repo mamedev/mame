@@ -91,22 +91,22 @@ void ppu_vt03_device::palette_write(offs_t offset, u8 data)
 	}
 }
 
-u8 ppu_vt03_device::extended_modes_enable_r(offs_t offset) { return m_extended_modes_enable; }
-u8 ppu_vt03_device::extended_modes2_enable_r(offs_t offset) { return m_extended_modes2_enable; }
-u8 ppu_vt03_device::videobank0_0_r(offs_t offset) { return m_videobank0[0x0]; }
-u8 ppu_vt03_device::videobank0_1_r(offs_t offset) { return m_videobank0[0x1]; }
-u8 ppu_vt03_device::videobank0_2_r(offs_t offset) { return m_videobank0[0x2]; }
-u8 ppu_vt03_device::videobank0_3_r(offs_t offset) { return m_videobank0[0x3]; }
-u8 ppu_vt03_device::videobank0_4_r(offs_t offset) { return m_videobank0[0x4]; }
-u8 ppu_vt03_device::videobank0_5_r(offs_t offset) { return m_videobank0[0x5]; }
-u8 ppu_vt03_device::videobank1_r(offs_t offset) { return m_videobank1; }
-u8 ppu_vt03_device::unk_2019_r(offs_t offset) { return 0x00; } // unused?
-u8 ppu_vt03_device::videobank0_extra_r(offs_t offset) { return m_videobank0_extra; }
-u8 ppu_vt03_device::unk_201b_r(offs_t offset) { return 0x00; } // unused?
-u8 ppu_vt03_device::gun_x_r(offs_t offset) { return 0x00; }
-u8 ppu_vt03_device::gun_y_r(offs_t offset) { return 0x00; }
-u8 ppu_vt03_device::gun2_x_r(offs_t offset) { return 0x00; }
-u8 ppu_vt03_device::gun2_y_r(offs_t offset) { return 0x00; }
+u8 ppu_vt03_device::extended_modes_enable_r() { return m_extended_modes_enable; }
+u8 ppu_vt03_device::extended_modes2_enable_r() { return m_extended_modes2_enable; }
+u8 ppu_vt03_device::videobank0_0_r() { return m_videobank0[0x0]; }
+u8 ppu_vt03_device::videobank0_1_r() { return m_videobank0[0x1]; }
+u8 ppu_vt03_device::videobank0_2_r() { return m_videobank0[0x2]; }
+u8 ppu_vt03_device::videobank0_3_r() { return m_videobank0[0x3]; }
+u8 ppu_vt03_device::videobank0_4_r() { return m_videobank0[0x4]; }
+u8 ppu_vt03_device::videobank0_5_r() { return m_videobank0[0x5]; }
+u8 ppu_vt03_device::videobank1_r() { return m_videobank1; }
+u8 ppu_vt03_device::unk_2019_r() { return 0x00; } // unused?
+u8 ppu_vt03_device::videobank0_extra_r() { return m_videobank0_extra; }
+u8 ppu_vt03_device::unk_201b_r() { return 0x00; } // unused?
+u8 ppu_vt03_device::gun_x_r() { return 0x00; }
+u8 ppu_vt03_device::gun_y_r() { return 0x00; }
+u8 ppu_vt03_device::gun2_x_r() { return 0x00; }
+u8 ppu_vt03_device::gun2_y_r() { return 0x00; }
 
 
 void ppu_vt03_device::init_vtxx_rgb555_palette_tables()
@@ -569,7 +569,7 @@ u8 ppu_vt03_device::get_speva2_speva0()
 	return m_extra_sprite_bits;
 }
 
-void ppu_vt03_device::extended_modes_enable_w(offs_t offset, u8 data)
+void ppu_vt03_device::extended_modes_enable_w(u8 data)
 {
 	/*  7   : COLCOMP
 	    6   : UNUSED (8bpp enable on VT09?)
@@ -583,16 +583,16 @@ void ppu_vt03_device::extended_modes_enable_w(offs_t offset, u8 data)
 	m_extended_modes_enable = data;
 }
 
-void ppu_vt03_device::extended_modes2_enable_w(offs_t offset, u8 data) { m_extended_modes2_enable = data; }
-void ppu_vt03_device::videobank0_0_w(offs_t offset, u8 data) { m_videobank0[0x0] = data; }
-void ppu_vt03_device::videobank0_1_w(offs_t offset, u8 data) { m_videobank0[0x1] = data; }
-void ppu_vt03_device::videobank0_2_w(offs_t offset, u8 data) { m_videobank0[0x2] = data; }
-void ppu_vt03_device::videobank0_3_w(offs_t offset, u8 data) { m_videobank0[0x3] = data; }
-void ppu_vt03_device::videobank0_4_w(offs_t offset, u8 data) { m_videobank0[0x4] = data; }
-void ppu_vt03_device::videobank0_5_w(offs_t offset, u8 data) { m_videobank0[0x5] = data; }
-void ppu_vt03_device::videobank1_w(offs_t offset, u8 data) { m_videobank1 = data; }
-void ppu_vt03_device::gun_reset_w(offs_t offset, u8 data) { logerror("%s: gun_reset_w %02x\n", machine().describe_context(), data); }
-void ppu_vt03_device::videobank0_extra_w(offs_t offset, u8 data) { m_videobank0_extra = data; }
+void ppu_vt03_device::extended_modes2_enable_w(u8 data) { m_extended_modes2_enable = data; }
+void ppu_vt03_device::videobank0_0_w(u8 data) { m_videobank0[0x0] = data; }
+void ppu_vt03_device::videobank0_1_w(u8 data) { m_videobank0[0x1] = data; }
+void ppu_vt03_device::videobank0_2_w(u8 data) { m_videobank0[0x2] = data; }
+void ppu_vt03_device::videobank0_3_w(u8 data) { m_videobank0[0x3] = data; }
+void ppu_vt03_device::videobank0_4_w(u8 data) { m_videobank0[0x4] = data; }
+void ppu_vt03_device::videobank0_5_w(u8 data) { m_videobank0[0x5] = data; }
+void ppu_vt03_device::videobank1_w(u8 data) { m_videobank1 = data; }
+void ppu_vt03_device::gun_reset_w(u8 data) { logerror("%s: gun_reset_w %02x\n", machine().describe_context(), data); }
+void ppu_vt03_device::videobank0_extra_w(u8 data) { m_videobank0_extra = data; }
 /* 201b unused */
 /* 201c read gun read x (older VT chipsets) */
 /* 201d read gun read y (older VT chipsets) */

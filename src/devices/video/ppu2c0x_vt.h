@@ -34,34 +34,34 @@ public:
 
 	void set_palette_mode(vtxx_pal_mode pmode) { m_pal_mode = pmode; }
 
-	u8 extended_modes_enable_r(offs_t offset);
-	u8 extended_modes2_enable_r(offs_t offset);
-	u8 videobank0_0_r(offs_t offset);
-	u8 videobank0_1_r(offs_t offset);
-	u8 videobank0_2_r(offs_t offset);
-	u8 videobank0_3_r(offs_t offset);
-	u8 videobank0_4_r(offs_t offset);
-	u8 videobank0_5_r(offs_t offset);
-	u8 videobank1_r(offs_t offset);
-	u8 unk_2019_r(offs_t offset);
-	u8 videobank0_extra_r(offs_t offset);
-	u8 unk_201b_r(offs_t offset);
-	u8 gun_x_r(offs_t offset);
-	u8 gun_y_r(offs_t offset);
-	u8 gun2_x_r(offs_t offset);
-	u8 gun2_y_r(offs_t offset);
+	u8 extended_modes_enable_r();
+	u8 extended_modes2_enable_r();
+	u8 videobank0_0_r();
+	u8 videobank0_1_r();
+	u8 videobank0_2_r();
+	u8 videobank0_3_r();
+	u8 videobank0_4_r();
+	u8 videobank0_5_r();
+	u8 videobank1_r();
+	u8 unk_2019_r();
+	u8 videobank0_extra_r();
+	u8 unk_201b_r();
+	u8 gun_x_r();
+	u8 gun_y_r();
+	u8 gun2_x_r();
+	u8 gun2_y_r();
 
-	void extended_modes_enable_w(offs_t offset, u8 data);
-	void extended_modes2_enable_w(offs_t offset, u8 data);
-	void videobank0_0_w(offs_t offset, u8 data);
-	void videobank0_1_w(offs_t offset, u8 data);
-	void videobank0_2_w(offs_t offset, u8 data);
-	void videobank0_3_w(offs_t offset, u8 data);
-	void videobank0_4_w(offs_t offset, u8 data);
-	void videobank0_5_w(offs_t offset, u8 data);
-	void videobank1_w(offs_t offset, u8 data);
-	void gun_reset_w(offs_t offset, u8 data);
-	void videobank0_extra_w(offs_t offset, u8 data);
+	void extended_modes_enable_w(u8 data);
+	void extended_modes2_enable_w(u8 data);
+	void videobank0_0_w(u8 data);
+	void videobank0_1_w(u8 data);
+	void videobank0_2_w(u8 data);
+	void videobank0_3_w(u8 data);
+	void videobank0_4_w(u8 data);
+	void videobank0_5_w(u8 data);
+	void videobank1_w(u8 data);
+	void gun_reset_w(u8 data);
+	void videobank0_extra_w(u8 data);
 
 	virtual u8 palette_read(offs_t offset) override;
 	virtual void palette_write(offs_t offset, u8 data) override;
