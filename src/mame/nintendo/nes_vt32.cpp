@@ -12,7 +12,6 @@
  ***************************************************************************/
 
 #include "emu.h"
-#include "nes_vt369_vtunknown_soc.h"
 #include "nes_vt32_soc.h"
 
 #include "multibyte.h"

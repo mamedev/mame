@@ -71,10 +71,6 @@ protected:
 	void extbank_w(u8 data);
 	void extbank_red5mam_w(u8 data);
 
-	u8 upper_412c_r();
-	u8 upper_412d_r();
-	void upper_412c_w(u8 data);
-
 private:
 	/* Extra IO */
 	template <u8 NUM> u8 extrain_r();
@@ -87,9 +83,6 @@ public:
 		vt369_base_state(mconfig, type, tag),
 		m_soc(*this, "soc")
 	{ }
-
-	void vt369_4k_ram(machine_config& config);
-	void vt369_4k_ram_16mb(machine_config& config);
 
 	void vt_external_space_map_32mbyte(address_map &map) ATTR_COLD;
 	void vt_external_space_map_32mbyte_bank(address_map &map) ATTR_COLD;
@@ -339,48 +332,12 @@ void vt369_base_state::configure_soc(nes_vt02_vt03_soc_device* soc)
 	soc->extra_read_3_callback().set(FUNC(vt369_base_state::extrain_r<3>));
 }
 
-u8 vt369_base_state::upper_412c_r()
-{
-	logerror("%s: upper_412c_r\n", machine().describe_context());
-	return 0x00;
-}
-
-u8 vt369_base_state::upper_412d_r()
-{
-	logerror("%s: upper_412d_r\n", machine().describe_context());
-	return 0x00;
-}
-
-void vt369_base_state::upper_412c_w(u8 data)
-{
-	logerror("%s: upper_412c_w %02x\n", machine().describe_context(), data);
-}
-
-void vt369_state::vt369_4k_ram(machine_config &config)
-{
-	/* basic machine hardware */
-	NES_VT09_SOC(config, m_soc, NTSC_APU_CLOCK);
-	configure_soc(m_soc);
-
-	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_read_412c_callback().set(FUNC(vt369_state::upper_412c_r));
-	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_read_412d_callback().set(FUNC(vt369_state::upper_412d_r));
-	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_write_412c_callback().set(FUNC(vt369_state::upper_412c_w));
-}
-
-void vt369_state::vt369_4k_ram_16mb(machine_config &config)
-{
-	vt369_4k_ram(config);
-	m_soc->set_addrmap(AS_PROGRAM, &vt369_state::vt_external_space_map_16mbyte);
-}
-
 
 
 
 void vt36x_state::vt369_unk(machine_config &config)
 {
-	vt369_4k_ram(config);
-
-	VT3XX_SOC_UNK_DG(config.replace(), m_soc, NTSC_APU_CLOCK);
+	VT3XX_SOC_UNK_DG(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 	m_soc->force_bad_dma();
 }
@@ -401,9 +358,7 @@ void vt36x_state::vt369_unk_1mb(machine_config& config)
 // New mystery handheld architecture, VTxx derived
 void vt36x_state::vt36x(machine_config &config)
 {
-	vt369_4k_ram(config);
-
-	VT369_SOC_INTROM_NOSWAP(config.replace(), m_soc, NTSC_APU_CLOCK);
+	VT369_SOC_INTROM_NOSWAP(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 
 	m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB);
@@ -412,9 +367,7 @@ void vt36x_state::vt36x(machine_config &config)
 
 void vt36x_state::vt36x_swap(machine_config &config)
 {
-	vt369_4k_ram(config);
-
-	VT369_SOC_INTROM_SWAP(config.replace(), m_soc, NTSC_APU_CLOCK);
+	VT369_SOC_INTROM_SWAP(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 	m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB);
 	m_soc->force_bad_dma();
@@ -446,9 +399,7 @@ void vt36x_state::vt36x_swap_16mb(machine_config &config)
 
 void vt36x_state::vt36x_altswap(machine_config &config)
 {
-	vt369_4k_ram(config);
-
-	VT369_SOC_INTROM_ALTSWAP(config.replace(), m_soc, NTSC_APU_CLOCK);
+	VT369_SOC_INTROM_ALTSWAP(config, m_soc, NTSC_APU_CLOCK);
 	configure_soc(m_soc);
 	m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB);
 	m_soc->force_bad_dma();
