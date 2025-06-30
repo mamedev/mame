@@ -49,13 +49,15 @@ public:
 	void write_txc(int state);
 	void write_rxc(int state);
 
+    void write(offs_t offset, u8 data);
+
 private:
 	bool m_cts;
 	bool m_rxd;
 	bool m_rxc;
 	bool m_txc;
 
-    uint8_t m_command1, m_command2, m_command3, m_mode_byte, m_port1_control, m_interrupts;
+    uint8_t m_command1, m_command2, m_command3, m_mode, m_port1_control, m_interrupts;
 
     emu_timer *m_timers[5];
 
