@@ -243,8 +243,8 @@ inline void mb86235_device::set_alu_flagsd(uint32_t val)
 inline void mb86235_device::set_alu_flagsf(float val)
 {
 	FCLR(AN|AZ);
-	if (val < 0.0f) FSET(AN);
-	if (val == 0.0f) FSET(AZ);
+	if (val < 0.0F) FSET(AN);
+	if (val == 0.0F) FSET(AZ);
 }
 
 inline void mb86235_device::set_alu_flagsi(int val)
@@ -271,7 +271,7 @@ inline uint32_t mb86235_device::get_prx(uint8_t which)
 
 inline uint32_t mb86235_device::get_constfloat(uint8_t which)
 {
-	const float float_table[8] = { -1.0f, 0.0f, 0.5f, 1.0f, 1.5f, 2.0f, 3.0f, 5.0f };
+	const float float_table[8] = { -1.0F, 0.0F, 0.5F, 1.0F, 1.5F, 2.0F, 3.0F, 5.0F };
 	return f2u(float_table[which & 7]);
 }
 
@@ -368,10 +368,10 @@ inline void mb86235_device::decode_aluop(uint8_t opcode, uint32_t src1, uint32_t
 			if (opcode & 1)
 			{
 				FCLR(ZC);
-				if(d < 0.0f)
+				if(d < 0.0F)
 				{
 					FSET(ZC);
-					d = 0.0f;
+					d = 0.0F;
 				}
 			}
 
@@ -428,9 +428,9 @@ inline void mb86235_device::decode_aluop(uint8_t opcode, uint32_t src1, uint32_t
 		{
 			float f = u2f(src1);
 			FCLR(ZD);
-			if (f == 0.0f)
+			if (f == 0.0F)
 				FSET(ZD);
-			f = 1.0f / f;
+			f = 1.0F / f;
 			set_alu_flagsf(f);
 			set_alureg(dst_which, f2u(f));
 			break;
@@ -440,9 +440,9 @@ inline void mb86235_device::decode_aluop(uint8_t opcode, uint32_t src1, uint32_t
 		{
 			float f = u2f(src1);
 			FCLR(NR);
-			if (f <= 0.0f)
+			if (f <= 0.0F)
 				FSET(NR);
-			f = 1.0f / sqrtf(f);
+			f = 1.0F / sqrtf(f);
 			set_alu_flagsf(f);
 			set_alureg(dst_which, f2u(f));
 			break;
@@ -452,9 +452,9 @@ inline void mb86235_device::decode_aluop(uint8_t opcode, uint32_t src1, uint32_t
 		{
 			float f = u2f(src1);
 			FCLR(IL);
-			if(f <= 0.0f)
+			if(f <= 0.0F)
 				FSET(IL);
-			f = log(f) / 0.301030f; // log2
+			f = log(f) / 0.301030F; // log2
 			set_alu_flagsf(f);
 			set_alureg(dst_which, f2u(f));
 			break;
@@ -462,8 +462,8 @@ inline void mb86235_device::decode_aluop(uint8_t opcode, uint32_t src1, uint32_t
 
 		case 0x0d: // CIF
 		{
-			int v = (int)src1;
-			float f = (float)v;
+			int v = int(src1);
+			float f = float(v);
 			set_alu_flagsf(f);
 			set_alureg(dst_which,f2u(f));
 			break;
@@ -472,17 +472,17 @@ inline void mb86235_device::decode_aluop(uint8_t opcode, uint32_t src1, uint32_t
 		case 0x0e: // CFI
 		{
 			float f = u2f(src1);
-			int v = (int)f;
+			int v = int(f);
 			set_alu_flagsi(v);
-			set_alureg(dst_which, (uint32_t)v);
+			set_alureg(dst_which, uint32_t(v));
 			break;
 		}
 
 		case 0x0f: // CFIB
 		{
 			float f = u2f(src1);
-			uint32_t res = (uint32_t)f;
-			if (f < 0.0f)
+			uint32_t res = uint32_t(f);
+			if (f < 0.0F)
 			{
 				FSET(AU);
 				res=0;
@@ -505,8 +505,8 @@ inline void mb86235_device::decode_aluop(uint8_t opcode, uint32_t src1, uint32_t
 		case 0x12: // SUB
 		case 0x13: // SUBZ
 		{
-			int v1 = (((int)src1) << 0) >> 0;
-			int v2 = (((int)src2) << 0) >> 0;
+			int v1 = (int(src1) << 0) >> 0;
+			int v2 = (int(src2) << 0) >> 0;
 			int res;
 
 			if(opcode & 2)
@@ -524,14 +524,14 @@ inline void mb86235_device::decode_aluop(uint8_t opcode, uint32_t src1, uint32_t
 				}
 			}
 			set_alu_flagsi(res);
-			set_alureg(dst_which, (uint32_t)res);
+			set_alureg(dst_which, uint32_t(res));
 			break;
 		}
 
 		case 0x14: // CMP
 		{
-			int v1 = (((int)src1) << 0) >> 0;
-			int v2 = (((int)src2) << 0) >> 0;
+			int v1 = (int(src1) << 0) >> 0;
+			int v2 = (int(src2) << 0) >> 0;
 			int res = v2 - v1;
 			set_alu_flagsi(res);
 			break;
@@ -612,17 +612,17 @@ inline void mb86235_device::decode_aluop(uint8_t opcode, uint32_t src1, uint32_t
 
 		case 0x1e: // ASR
 		{
-			int res = ((((int)src1) << 0) >> 0) >> imm;
+			int res = ((int(src1) << 0) >> 0) >> imm;
 			set_alu_flagsi(res);
-			set_alureg(dst_which, (uint32_t)res);
+			set_alureg(dst_which, uint32_t(res));
 			break;
 		}
 
 		case 0x1f: // ASL
 		{
-			int res = ((((int)src1) << 0) >> 0) << imm;
+			int res = ((int(src1) << 0) >> 0) << imm;
 			set_alu_flagsi(res);
-			set_alureg(dst_which, (uint32_t)res);
+			set_alureg(dst_which, uint32_t(res));
 			break;
 		}
 
@@ -639,8 +639,8 @@ void mb86235_device::decode_mulop(bool isfmul, uint32_t src1, uint32_t src2, uin
 		float f2 = u2f(src2);
 		float res = f1 * f2;
 		FCLR(MN|MZ|MD); // MV and MU are not reset
-		if (res < 0.0f) FSET(MN);
-		if (res == 0.0f) FSET(MZ);
+		if (res < 0.0F) FSET(MN);
+		if (res == 0.0F) FSET(MZ);
 		if (std::isinf(res)) FSET(MV);
 		if (std::abs(res) < std::numeric_limits<float>::min()) FSET(MU);
 		if (std::isnan(res)) FSET(MD);
@@ -648,13 +648,13 @@ void mb86235_device::decode_mulop(bool isfmul, uint32_t src1, uint32_t src2, uin
 	}
 	else // MUL
 	{
-		int v1 = (int)src1;
-		int v2 = (int)src2;
+		int v1 = int(src1);
+		int v2 = int(src2);
 		int res = v1 * v2;
 		FCLR(MN|MZ);
 		if (res < 0) FSET(MN);
 		if (res == 0) FSET(MZ);
-		set_alureg(dst_which, (uint32_t)res);
+		set_alureg(dst_which, uint32_t(res));
 	}
 }
 
@@ -690,7 +690,7 @@ void mb86235_device::do_alu1(uint64_t op)
 	if (m_core->cur_fifo_state.has_stalled == true)
 		return;
 
-	if (op & (1ll << 41)) // ALU
+	if (BIT(op, 41)) // ALU
 	{
 		uint8_t aluop = GETAOP(op);
 		uint32_t alusrc1 = get_alureg(GETAI1(op),false);
@@ -935,9 +935,9 @@ void mb86235_device::do_alu2_trans1_1(uint64_t op)
 	uint8_t sr,dr;
 	uint32_t res;
 
-	if(op & (1ll<<26)) //External transfer
+	if(BIT(op, 26)) //External transfer
 	{
-		if(op & (1ll<<25)) // ext -> int
+		if(BIT(op, 25)) // ext -> int
 		{
 			uint32_t addr = m_core->eb+m_core->eo;
 			res = m_dataa.read_dword(addr);
@@ -1114,9 +1114,9 @@ void mb86235_device::do_alu1_trans1_2(uint64_t op)
 	uint8_t sr, dr;
 	uint32_t res;
 
-	if(op & 1ll<<38) // external transfer
+	if(BIT(op, 38)) // external transfer
 	{
-		if(op & 1ll<<37) // ext->int
+		if(BIT(op, 37)) // ext->int
 		{
 			uint32_t addr = m_core->eb+m_core->eo;
 			uint32_t res = m_dataa.read_dword(addr);
@@ -1256,10 +1256,10 @@ inline uint32_t mb86235_device::do_control_dst(uint64_t op)
 		addr = m_core->ar[(op >> 6) & 7];
 		break;
 	case 2:
-		addr = (op & 1ll << 11) ? m_core->ab[(op >> 6) & 7] : m_core->aa[(op >> 6) & 7];
+		addr = BIT(op, 11) ? m_core->ab[(op >> 6) & 7] : m_core->aa[(op >> 6) & 7];
 		break;
 	case 3:
-		addr = (op & 1ll << 11) ? m_core->mb[(op >> 6) & 7] : m_core->ma[(op >> 6) & 7];
+		addr = BIT(op, 11) ? m_core->mb[(op >> 6) & 7] : m_core->ma[(op >> 6) & 7];
 		break;
 	case 4:
 		addr = read_bus(false, op & 0x3ff);
@@ -1275,7 +1275,7 @@ inline uint32_t mb86235_device::do_control_dst(uint64_t op)
 		break;
 	}
 
-	if (op & 1ll << 12)
+	if (BIT(op, 12))
 	{
 		m_core->icount--;
 		return (m_core->pc + addr) & 0xfff;
@@ -1491,7 +1491,7 @@ void mb86235_device::do_alu_control(uint64_t op)
 	}
 
 	// do alu
-	if (op & (1ll << 63))
+	if (BIT(op, 63))
 		do_alu1(op);
 	else
 		do_alu2(op);

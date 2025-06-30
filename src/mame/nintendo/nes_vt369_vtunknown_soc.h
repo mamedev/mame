@@ -26,7 +26,7 @@ public:
 protected:
 	vt3xx_soc_base_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock);
 
-	virtual void device_add_mconfig(machine_config& config) override;
+	virtual void device_add_mconfig(machine_config& config) override ATTR_COLD;
 	void device_start() override ATTR_COLD;
 	void device_reset() override ATTR_COLD;
 
@@ -54,11 +54,11 @@ protected:
 
 	void highres_sprite_dma_w(u8 data);
 
-	void vt369_soundcpu_control_w(offs_t offset, u8 data);
-	void vt369_4112_bank6000_select_w(offs_t offset, u8 data);
-	void vt369_411c_bank6000_enable_w(offs_t offset, u8 data);
-	void vt369_411d_w(offs_t offset, u8 data);
-	void vt369_411e_w(offs_t offset, u8 data);
+	void vt369_soundcpu_control_w(u8 data);
+	void vt369_4112_bank6000_select_w(u8 data);
+	void vt369_411c_bank6000_enable_w(u8 data);
+	void vt369_411d_w(u8 data);
+	void vt369_411e_w(u8 data);
 	void vt369_relative_w(offs_t offset, u8 data);
 
 	u8 read_internal(offs_t offset);
@@ -128,8 +128,8 @@ public:
 protected:
 	vt369_soc_introm_noswap_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock);
 
-	virtual void device_start() override;
-	virtual void device_add_mconfig(machine_config& config) override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config& config) override ATTR_COLD;
 
 	void vt369_introm_map(address_map &map) ATTR_COLD;
 
@@ -163,7 +163,13 @@ public:
 	vt369_soc_introm_vibesswap_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
 
 protected:
-	virtual void device_start() override;
+	virtual void device_add_mconfig(machine_config& config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+
+private:
+	void vibes_411c_w(u8 data);
+
+	void nes_vt_vibes_map(address_map &map) ATTR_COLD;
 };
 
 class vt3xx_soc_unk_dg_device : public vt3xx_soc_base_device

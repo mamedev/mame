@@ -2636,7 +2636,7 @@ void invaders_state::io_map_noshift(address_map &map)
 	map(0x01, 0x01).mirror(0x04).portr("IN1");
 	map(0x02, 0x02).mirror(0x04).portr("IN2");
 
-	map(0x02, 0x02).nopw(); // galmonst has residual writes to this port
+	map(0x02, 0x02).nopw(); // galmonst has vestigial writes to this port
 	map(0x03, 0x03).w("soundboard", FUNC(invaders_audio_device::p1_w));
 	map(0x05, 0x05).w("soundboard", FUNC(invaders_audio_device::p2_w));
 	map(0x06, 0x06).w(m_watchdog, FUNC(watchdog_timer_device::reset_w));

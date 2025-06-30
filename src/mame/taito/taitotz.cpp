@@ -3012,13 +3012,13 @@ ROM_END
 
 
 GAME( 1999, taitotz,   0,        taitotz,  taitotz,  taitotz_state, empty_init,    ROT0, "Taito", "Type Zero BIOS", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_IS_BIOS_ROOT )
-GAME( 1999, batlgear,  taitotz,  taitotz,  batlgr2,  taitotz_state, init_batlgear, ROT0, "Taito", "Battle Gear (Ver 2.40 A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NODEVICE_LAN )
-GAME( 1999, landhigh,  taitotz,  landhigh, landhigh, taitotz_state, init_landhigh, ROT0, "Taito", "Landing High Japan (Ver 2.01 OK)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1999, landhigha, landhigh, landhigh, landhigh, taitotz_state, init_landhigha,ROT0, "Taito", "Landing High Japan (Ver 2.02 O)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1999, pwrshovl,  taitotz,  taitotz,  pwrshovl, taitotz_state, init_pwrshovl, ROT0, "Taito", "Power Shovel ni Norou!! - Power Shovel Simulator (Ver 2.07 J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 1999/8/5 19:13:35
-GAME( 2000, batlgr2,   taitotz,  taitotz,  batlgr2,  taitotz_state, init_batlgr2,  ROT0, "Taito", "Battle Gear 2 (Ver 2.04 J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NODEVICE_LAN )
-GAME( 2000, batlgr2a,  batlgr2,  taitotz,  batlgr2,  taitotz_state, init_batlgr2a, ROT0, "Taito", "Battle Gear 2 (Ver 2.01 J, Side by Side cabinet)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NODEVICE_LAN ) // "BATTLE GEAR2(S)" on test menu
-GAME( 2000, dendego3,  taitotz,  taitotz,  dendego3, taitotz_state, init_dendego3, ROT0, "Taito", "Densha de GO 3! Tsukin-hen (Ver 2.03 J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 2001/01/27 09:52:56
-GAME( 2001, styphp,    taitotz,  taitotz,  styphp,   taitotz_state, init_styphp,   ROT0, "Taito", "Stunt Typhoon Plus (Ver 2.04 J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002, raizpin,   taitotz,  taitotz,  taitotz,  taitotz_state, init_raizpin,  ROT0, "Taito", "Raizin Ping Pong (Ver 2.01 O)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 2002, raizpinj,  raizpin,  taitotz,  taitotz,  taitotz_state, init_raizpinj, ROT0, "Taito", "Raizin Ping Pong (Ver 2.01 J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1999, batlgear,  taitotz,  taitotz,  batlgr2,  taitotz_state, init_batlgear, ROT0, "Taito", "Battle Gear (VER.2.40A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NODEVICE_LAN )
+GAME( 1999, landhigh,  taitotz,  landhigh, landhigh, taitotz_state, init_landhigh, ROT0, "Taito", "Landing High Japan (VER.2.01OK)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1999, landhigha, landhigh, landhigh, landhigh, taitotz_state, init_landhigha,ROT0, "Taito", "Landing High Japan (VER.2.02O)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1999, pwrshovl,  taitotz,  taitotz,  pwrshovl, taitotz_state, init_pwrshovl, ROT0, "Taito", "Power Shovel ni Norou!! - Power Shovel Simulator (VER.2.07J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 1999/8/5 19:13:35
+GAME( 2000, batlgr2,   taitotz,  taitotz,  batlgr2,  taitotz_state, init_batlgr2,  ROT0, "Taito", "Battle Gear 2 (VER.2.04J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NODEVICE_LAN )
+GAME( 2000, batlgr2a,  batlgr2,  taitotz,  batlgr2,  taitotz_state, init_batlgr2a, ROT0, "Taito", "Battle Gear 2 (VER.2.01J, Side by Side conversion)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_NODEVICE_LAN ) // "BATTLE GEAR2(S)" on test menu
+GAME( 2000, dendego3,  taitotz,  taitotz,  dendego3, taitotz_state, init_dendego3, ROT0, "Taito", "Densha de GO 3! Tsukin-hen (VER.2.03J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 2001/01/27 09:52:56
+GAME( 2001, styphp,    taitotz,  taitotz,  styphp,   taitotz_state, init_styphp,   ROT0, "Taito", "Stunt Typhoon Plus (VER.2.04J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, raizpin,   taitotz,  taitotz,  taitotz,  taitotz_state, init_raizpin,  ROT0, "Taito", "Raizin Ping Pong (VER.2.01O)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, raizpinj,  raizpin,  taitotz,  taitotz,  taitotz_state, init_raizpinj, ROT0, "Taito", "Raizin Ping Pong (VER.2.01J)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

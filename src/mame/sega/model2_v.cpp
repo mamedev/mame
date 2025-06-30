@@ -903,7 +903,7 @@ inline void model2_state::model2_3d_project( triangle *tri )
 }
 
 /* 3D Rasterizer frame start: Resets frame variables */
-void model2_state::model2_3d_frame_start( void )
+void model2_state::model2_3d_frame_start()
 {
 	raster_state *raster = m_raster.get();
 
@@ -2551,7 +2551,7 @@ u32 *model2_state::geo_process_command( geo_state *geo, u32 opcode, u32 *input, 
 	return input;
 }
 
-void model2_state::geo_parse( void )
+void model2_state::geo_parse()
 {
 	u32  address = (m_geo_read_start_address & 0x1ffff)/4;
 	u32 *input = &m_bufferram[address];
@@ -2694,5 +2694,4 @@ void model2_state::tri_list_dump(FILE *dst)
 	fprintf( dst, "min_z = %04x, max_z = %04x\n", m_raster->min_z, m_raster->max_z );
 
 	fclose( dst );
-
 }

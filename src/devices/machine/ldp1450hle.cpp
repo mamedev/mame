@@ -296,7 +296,7 @@ void sony_ldp1450hle_device::overlay_draw_char(bitmap_yuy16 &bitmap, uint8_t ch,
 	// m_user_index_mode >> 5 & 0x04: 0,2 = normal, 1 = 1px shadow, 3 = grey box
 	uint16_t black = 0x0080;
 
-	u8 modeval= (m_user_index_mode >> 5) & 0x04;
+	u8 modeval = (m_user_index_mode >> 5) & 0x04;
 
 	for (u32 y = 0; y < char_height; y++)
 	{
@@ -308,8 +308,9 @@ void sony_ldp1450hle_device::overlay_draw_char(bitmap_yuy16 &bitmap, uint8_t ch,
 
 				for (u32 xx = 0; xx < OVERLAY_PIXEL_WIDTH; xx++)
 				{
-					if (modeval==0x03)
+					if (modeval == 0x03)
 					{
+						// FIXME: this is unreachable because modeval is masked with 0x04 above
 						//fill with grey
 					}
 
@@ -415,7 +416,7 @@ void sony_ldp1450hle_device::add_command_byte(u8 command)
 		}
 		case SUBMODE_USER_INDEX_MODE_1:
 		{
-			m_user_index_x = (command & 0x3f);
+			m_user_index_x = command & 0x3f;
 
 			LOGMASKED(LOG_COMMANDS, "User Index X: %02x\n", m_user_index_x);
 
@@ -425,7 +426,7 @@ void sony_ldp1450hle_device::add_command_byte(u8 command)
 		}
 		case SUBMODE_USER_INDEX_MODE_2:
 		{
-			m_user_index_y = (command & 0x3f);
+			m_user_index_y = command & 0x3f;
 			LOGMASKED(LOG_COMMANDS, "User Index Y: %02x\n", m_user_index_y);
 			m_submode = SUBMODE_USER_INDEX_MODE_3;
 			queue_reply(0x0a, 4.3);
@@ -441,7 +442,7 @@ void sony_ldp1450hle_device::add_command_byte(u8 command)
 		}
 		case SUBMODE_USER_INDEX_STRING_1:
 		{
-			m_user_index_char_idx = (command & 0x1f);
+			m_user_index_char_idx = command & 0x1f;
 			LOGMASKED(LOG_COMMANDS, "User Index Charpos: %02x\n", m_user_index_char_idx);
 			m_submode = SUBMODE_USER_INDEX_STRING_2;
 			queue_reply(0x0a, 4.3);
@@ -469,7 +470,7 @@ void sony_ldp1450hle_device::add_command_byte(u8 command)
 		}
 		case SUBMODE_USER_INDEX_WINDOW:
 		{
-			m_user_index_window_idx = (command & 0x1f);
+			m_user_index_window_idx = command & 0x1f;
 			LOGMASKED(LOG_COMMANDS, "User Index Window idx: %02x\n", m_user_index_window_idx);
 			m_submode = SUBMODE_NORMAL;
 			queue_reply(0x0a, 4.3);
@@ -1054,10 +1055,10 @@ TIMER_CALLBACK_MEMBER(sony_ldp1450hle_device::process_vbi_data)
 			m_curr_frame = bcd_to_literal(line & 0x7ffff);
 
 		LOGMASKED(LOG_FRAMES, "Current frame is %d (VBI 16: %06x, VBI 17: %06x, VBI 18: %06x, VBI 1718: %06x\n", m_curr_frame,
-			get_field_code(LASERDISC_CODE_LINE16, false),
-			get_field_code(LASERDISC_CODE_LINE17, false),
-			get_field_code(LASERDISC_CODE_LINE18, false),
-			line);
+				get_field_code(LASERDISC_CODE_LINE16, false),
+				get_field_code(LASERDISC_CODE_LINE17, false),
+				get_field_code(LASERDISC_CODE_LINE18, false),
+				line);
 
 		if (m_mode != MODE_STILL && m_mode != MODE_PAUSE)
 		{

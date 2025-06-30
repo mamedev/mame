@@ -93,6 +93,7 @@ void rp2a03_core_swap_op_d5_d6::device_start()
 {
 	mintf = std::make_unique<mi_decrypt>();
 	init();
+	save_item(downcast<mi_decrypt &>(*mintf).m_encryption_enabled, "m_encryption_enabled");
 }
 
 void rp2a03_core_swap_op_d5_d6::device_reset()

@@ -222,11 +222,11 @@ private:
 		SIZE
 	};
 
-	static constexpr const float VMINUS = -15;  // In Volts.
-	static constexpr const float MAX_CV = 10;  // In Volts.
-	static constexpr const float CA3080_VABC = VMINUS + 0.7;  // 1 diode drop above -15.
-	static constexpr const float CONTOUR_C = CAP_U(0.047);  // C57 (filter), C56 (loudness).
-	static constexpr const u8 PATTERNS_7447[16] =
+	static inline constexpr float VMINUS = -15;  // In Volts.
+	static inline constexpr float MAX_CV = 10;  // In Volts.
+	static inline constexpr float CA3080_VABC = VMINUS + 0.7;  // 1 diode drop above -15.
+	static inline constexpr float CONTOUR_C = CAP_U(0.047);  // C57 (filter), C56 (loudness).
+	static inline constexpr u8 PATTERNS_7447[16] =
 	{
 		0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07,
 		0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0x00,
@@ -445,10 +445,10 @@ bool source_state::contour_peaked(const va_rc_eg_device &eg) const
 	// 5V otherwise (open collector output pulled to 5V via 10K resistors, R193
 	// and R190 respectively).
 
-	static constexpr const float R192 = RES_M(4.7);  // R188 for loudness EG.
-	static constexpr const float R191 = RES_K(10);   // R189 for loudness EG.
-	static constexpr const float RISING_THRESHOLD = 5 * RES_VOLTAGE_DIVIDER(R191, R192) + 5;
-	static constexpr const float FALLING_THRESHOLD = 10 * RES_VOLTAGE_DIVIDER(R191, R192);
+	constexpr float R192 = RES_M(4.7);  // R188 for loudness EG.
+	constexpr float R191 = RES_K(10);   // R189 for loudness EG.
+	constexpr float RISING_THRESHOLD = 5 * RES_VOLTAGE_DIVIDER(R191, R192) + 5;
+	constexpr float FALLING_THRESHOLD = 10 * RES_VOLTAGE_DIVIDER(R191, R192);
 	static_assert(RISING_THRESHOLD > FALLING_THRESHOLD);
 
 	const float eg_v = eg.get_v();
@@ -483,10 +483,10 @@ float source_state::get_keyboard_v() const
 {
 	// *** Detect which key is pressed.
 
-	static constexpr const int OCTAVES = 4;
-	static constexpr const int KEYS_PER_OCTAVE = 12;
-	static constexpr const int KEYS = 3 * KEYS_PER_OCTAVE + 1;
-	static constexpr const int OCTAVE_KEYS[4] =
+	constexpr int OCTAVES = 4;
+	constexpr int KEYS_PER_OCTAVE = 12;
+	constexpr int KEYS = 3 * KEYS_PER_OCTAVE + 1;
+	constexpr int OCTAVE_KEYS[4] =
 	{
 		KEYS_PER_OCTAVE, KEYS_PER_OCTAVE, KEYS_PER_OCTAVE, 1
 	};
@@ -511,11 +511,11 @@ float source_state::get_keyboard_v() const
 
 	// *** Convert pressed key to a voltage.
 
-	static constexpr const float KEYBOARD_VREF = 8.24F;  // From schematic.
-	static constexpr const float RKEY = RES_R(100);
-	static constexpr const float R74 = RES_R(150);
-	static constexpr const float R76 = RES_K(220);
-	static constexpr const float R77 = RES_K(2.2);
+	constexpr float KEYBOARD_VREF = 8.24F;  // From schematic.
+	constexpr float RKEY = RES_R(100);
+	constexpr float R74 = RES_R(150);
+	constexpr float R76 = RES_K(220);
+	constexpr float R77 = RES_K(2.2);
 
 	float kb_voltage = 0;
 	if (pressed_key >= 0)
@@ -638,8 +638,8 @@ template<int Which> NETDEV_ANALOG_CALLBACK_MEMBER(source_state::contour_cv_chang
 	// the "range" trimmer is adjusted.
 
 	static_assert(Which == FILTER_CONTOUR || Which == LOUDNESS_CONTOUR);
-	static constexpr const char *CONTOUR_NAME = (Which == FILTER_CONTOUR) ? "Filter" : "Loudness";
-	static constexpr const int RATE_CV_INDEX =
+	constexpr const char *CONTOUR_NAME = (Which == FILTER_CONTOUR) ? "Filter" : "Loudness";
+	constexpr int RATE_CV_INDEX =
 		(Which == FILTER_CONTOUR) ? int(CV::FILTER_CONTOUR_RATE) : int(CV::LOUDNESS_CONTOUR_RATE);
 
 	// The netlist outputs a voltage. Convert it to a current.
@@ -664,20 +664,20 @@ template<int Which> TIMER_CALLBACK_MEMBER(source_state::update_contour)
 	// also contrlled by the firmware (see contour_cv_changed()).
 
 	static_assert(Which == FILTER_CONTOUR || Which == LOUDNESS_CONTOUR);
-	static constexpr const char *CONTOUR_NAME = (Which == FILTER_CONTOUR) ? "Filter" : "Loudness";
-	static constexpr const int LEVEL_CV_INDEX =
+	constexpr const char *CONTOUR_NAME = (Which == FILTER_CONTOUR) ? "Filter" : "Loudness";
+	constexpr int LEVEL_CV_INDEX =
 		(Which == FILTER_CONTOUR) ? int(CV::FILTER_CONTOUR_LEVEL) : int(CV::LOUDNESS_CONTOUR_LEVEL);
 
 	// All componets are on board 2. All resistors have 1% tolerance.
 	//                           Filter contour          Loudness contour
-	static constexpr const float R196 = RES_K(18.2);  // R183
-	static constexpr const float R197 = RES_R(100);   // R184
-	static constexpr const float R195 = RES_K(20);    // R187
-	static constexpr const float R194 = RES_R(100);   // R182
+	constexpr float R196 = RES_K(18.2);  // R183
+	constexpr float R197 = RES_R(100);   // R184
+	constexpr float R195 = RES_K(20);    // R187
+	constexpr float R194 = RES_R(100);   // R182
 
 	// Voltage dividers at the OTA's + and - inputs.
-	static constexpr const float OTA_DIVIDER_PLUS = RES_VOLTAGE_DIVIDER(R196, R197);
-	static constexpr const float OTA_DIVIDER_MINUS = RES_VOLTAGE_DIVIDER(R195, R194);
+	constexpr float OTA_DIVIDER_PLUS = RES_VOLTAGE_DIVIDER(R196, R197);
+	constexpr float OTA_DIVIDER_MINUS = RES_VOLTAGE_DIVIDER(R195, R194);
 
 	if (m_contour_cc[Which] <= 0)
 	{
@@ -722,13 +722,13 @@ TIMER_CALLBACK_MEMBER(source_state::update_lfo_timer)
 	// produces a square wave (-/+ ~14V) as part of its operation.
 
 	// All components on board 2.
-	static constexpr const float R219 = RES_K(100);
-	static constexpr const float R220 = RES_K(12);
-	static constexpr const float C58 = CAP_U(0.33);
+	constexpr float R219 = RES_K(100);
+	constexpr float R220 = RES_K(12);
+	constexpr float C58 = CAP_U(0.33);
 
 	// Approximate max magnitude of opamp output, according to schematic (supply voltage is 15V).
-	static constexpr const float V_PEAK_SQUARE = 14;
-	static constexpr const float V_PEAK_TRIANGLE = V_PEAK_SQUARE * RES_VOLTAGE_DIVIDER(R219, R220);  // ~1.5V
+	constexpr float V_PEAK_SQUARE = 14;
+	constexpr float V_PEAK_TRIANGLE = V_PEAK_SQUARE * RES_VOLTAGE_DIVIDER(R219, R220);  // ~1.5V
 
 	// The differential input at the OTA will be +/- V_PEAK_TRIANGLE. This is well
 	// beyond the "linear" range (-/+ ~10-20mV), so the output current will be
@@ -920,7 +920,7 @@ DECLARE_INPUT_CHANGED_MEMBER(source_state::octave_button_pressed)
 
 DECLARE_INPUT_CHANGED_MEMBER(source_state::encoder_moved)
 {
-	static constexpr const int WRAP_BUFFER = 10;
+	constexpr int WRAP_BUFFER = 10;
 	const bool overflowed = newval <= WRAP_BUFFER &&
 							oldval >= 240 - WRAP_BUFFER;
 	const bool underflowed = newval >= 240 - WRAP_BUFFER &&

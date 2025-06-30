@@ -26,7 +26,7 @@ DEFINE_DEVICE_TYPE(PPU_VT32PAL, ppu_vt32pal_device, "ppu_vt32pal", "VT32 PPU (PA
 
 DEFINE_DEVICE_TYPE(PPU_VT3XX, ppu_vt3xx_device, "ppu_vt3xx", "VT3XX PPU (NTSC)")
 
-ppu_vt03_device::ppu_vt03_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock) :
+ppu_vt03_device::ppu_vt03_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	ppu2c0x_device(mconfig, type, tag, owner, clock),
 	m_is_pal(false),
 	m_is_50hz(false),
@@ -37,13 +37,13 @@ ppu_vt03_device::ppu_vt03_device(const machine_config& mconfig, device_type type
 {
 }
 
-ppu_vt03_device::ppu_vt03_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+ppu_vt03_device::ppu_vt03_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	ppu_vt03_device(mconfig, PPU_VT03, tag, owner, clock)
 {
 }
 
 
-ppu_vt03pal_device::ppu_vt03pal_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+ppu_vt03pal_device::ppu_vt03pal_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	ppu_vt03_device(mconfig, PPU_VT03PAL, tag, owner, clock)
 {
 	m_scanlines_per_frame = PAL_SCANLINES_PER_FRAME;
@@ -52,17 +52,17 @@ ppu_vt03pal_device::ppu_vt03pal_device(const machine_config& mconfig, const char
 	m_is_50hz = true;
 }
 
-ppu_vt32_device::ppu_vt32_device(const machine_config& mconfig, device_type type, const char* tag, device_t* owner, u32 clock) :
+ppu_vt32_device::ppu_vt32_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	ppu_vt03_device(mconfig, type, tag, owner, clock)
 {
 }
 
-ppu_vt32_device::ppu_vt32_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+ppu_vt32_device::ppu_vt32_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	ppu_vt32_device(mconfig, PPU_VT32, tag, owner, clock)
 {
 }
 
-ppu_vt32pal_device::ppu_vt32pal_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+ppu_vt32pal_device::ppu_vt32pal_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	ppu_vt32_device(mconfig, PPU_VT32PAL, tag, owner, clock)
 {
 	m_scanlines_per_frame = PAL_SCANLINES_PER_FRAME;
@@ -91,22 +91,22 @@ void ppu_vt03_device::palette_write(offs_t offset, u8 data)
 	}
 }
 
-u8 ppu_vt03_device::extended_modes_enable_r(offs_t offset) { return m_extended_modes_enable; }
-u8 ppu_vt03_device::extended_modes2_enable_r(offs_t offset) { return m_extended_modes2_enable; }
-u8 ppu_vt03_device::videobank0_0_r(offs_t offset) { return m_videobank0[0x0]; }
-u8 ppu_vt03_device::videobank0_1_r(offs_t offset) { return m_videobank0[0x1]; }
-u8 ppu_vt03_device::videobank0_2_r(offs_t offset) { return m_videobank0[0x2]; }
-u8 ppu_vt03_device::videobank0_3_r(offs_t offset) { return m_videobank0[0x3]; }
-u8 ppu_vt03_device::videobank0_4_r(offs_t offset) { return m_videobank0[0x4]; }
-u8 ppu_vt03_device::videobank0_5_r(offs_t offset) { return m_videobank0[0x5]; }
-u8 ppu_vt03_device::videobank1_r(offs_t offset) { return m_videobank1; }
-u8 ppu_vt03_device::unk_2019_r(offs_t offset) { return 0x00; } // unused?
-u8 ppu_vt03_device::videobank0_extra_r(offs_t offset) { return m_videobank0_extra; }
-u8 ppu_vt03_device::unk_201b_r(offs_t offset) { return 0x00; } // unused?
-u8 ppu_vt03_device::gun_x_r(offs_t offset) { return 0x00; }
-u8 ppu_vt03_device::gun_y_r(offs_t offset) { return 0x00; }
-u8 ppu_vt03_device::gun2_x_r(offs_t offset) { return 0x00; }
-u8 ppu_vt03_device::gun2_y_r(offs_t offset) { return 0x00; }
+u8 ppu_vt03_device::extended_modes_enable_r() { return m_extended_modes_enable; }
+u8 ppu_vt03_device::extended_modes2_enable_r() { return m_extended_modes2_enable; }
+u8 ppu_vt03_device::videobank0_0_r() { return m_videobank0[0x0]; }
+u8 ppu_vt03_device::videobank0_1_r() { return m_videobank0[0x1]; }
+u8 ppu_vt03_device::videobank0_2_r() { return m_videobank0[0x2]; }
+u8 ppu_vt03_device::videobank0_3_r() { return m_videobank0[0x3]; }
+u8 ppu_vt03_device::videobank0_4_r() { return m_videobank0[0x4]; }
+u8 ppu_vt03_device::videobank0_5_r() { return m_videobank0[0x5]; }
+u8 ppu_vt03_device::videobank1_r() { return m_videobank1; }
+u8 ppu_vt03_device::unk_2019_r() { return 0x00; } // unused?
+u8 ppu_vt03_device::videobank0_extra_r() { return m_videobank0_extra; }
+u8 ppu_vt03_device::unk_201b_r() { return 0x00; } // unused?
+u8 ppu_vt03_device::gun_x_r() { return 0x00; }
+u8 ppu_vt03_device::gun_y_r() { return 0x00; }
+u8 ppu_vt03_device::gun2_x_r() { return 0x00; }
+u8 ppu_vt03_device::gun2_y_r() { return 0x00; }
 
 
 void ppu_vt03_device::init_vtxx_rgb555_palette_tables()
@@ -300,7 +300,7 @@ void ppu_vt03_device::read_sprite_plane_data(int address)
 	}
 }
 
-void ppu_vt03_device::make_sprite_pixel_data(u8& pixel_data, bool flipx)
+void ppu_vt03_device::make_sprite_pixel_data(u8 &pixel_data, bool flipx)
 {
 	ppu2c0x_device::make_sprite_pixel_data(pixel_data, flipx);
 
@@ -332,7 +332,7 @@ void ppu_vt03_device::make_sprite_pixel_data(u8& pixel_data, bool flipx)
 	}
 }
 
-void ppu_vt03_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, u8 pixel_data, bitmap_rgb32& bitmap)
+void ppu_vt03_device::draw_sprite_pixel(int sprite_xpos, int color, int pixel, u8 pixel_data, bitmap_rgb32 &bitmap)
 {
 	const bool is4bpp = BIT(m_extended_modes_enable, 2);
 	const bool is16pix = BIT(m_extended_modes_enable, 0);
@@ -392,7 +392,7 @@ void ppu_vt03_device::read_tile_plane_data(int address, int color)
 	}
 }
 
-void ppu_vt03_device::shift_tile_plane_data(u8& pix)
+void ppu_vt03_device::shift_tile_plane_data(u8 &pix)
 {
 	const bool is4bpp = BIT(m_extended_modes_enable, 1);
 
@@ -400,37 +400,21 @@ void ppu_vt03_device::shift_tile_plane_data(u8& pix)
 
 	if (is4bpp)
 	{
-		switch (m_whichpixel)
-		{
-		case 0: pix = (BIT(m_planebuf[0], 7) << 0) | (BIT(m_planebuf[1], 7) << 1) | (BIT(m_planebuf[2], 7) << 5) | (BIT(m_planebuf[3], 7) << 6); break;
-		case 1: pix = (BIT(m_planebuf[0], 6) << 0) | (BIT(m_planebuf[1], 6) << 1) | (BIT(m_planebuf[2], 6) << 5) | (BIT(m_planebuf[3], 6) << 6); break;
-		case 2: pix = (BIT(m_planebuf[0], 5) << 0) | (BIT(m_planebuf[1], 5) << 1) | (BIT(m_planebuf[2], 5) << 5) | (BIT(m_planebuf[3], 5) << 6); break;
-		case 3: pix = (BIT(m_planebuf[0], 4) << 0) | (BIT(m_planebuf[1], 4) << 1) | (BIT(m_planebuf[2], 4) << 5) | (BIT(m_planebuf[3], 4) << 6); break;
-		case 4: pix = (BIT(m_planebuf[0], 3) << 0) | (BIT(m_planebuf[1], 3) << 1) | (BIT(m_planebuf[2], 3) << 5) | (BIT(m_planebuf[3], 3) << 6); break;;
-		case 5: pix = (BIT(m_planebuf[0], 2) << 0) | (BIT(m_planebuf[1], 2) << 1) | (BIT(m_planebuf[2], 2) << 5) | (BIT(m_planebuf[3], 2) << 6); break;
-		case 6: pix = (BIT(m_planebuf[0], 1) << 0) | (BIT(m_planebuf[1], 1) << 1) | (BIT(m_planebuf[2], 1) << 5) | (BIT(m_planebuf[3], 1) << 6); break;
-		case 7: pix = (BIT(m_planebuf[0], 0) << 0) | (BIT(m_planebuf[1], 0) << 1) | (BIT(m_planebuf[2], 0) << 5) | (BIT(m_planebuf[3], 0) << 6); break;
-		}
+		pix = (BIT(m_planebuf[0], ~m_whichpixel & 0x07) << 0) |
+				(BIT(m_planebuf[1], ~m_whichpixel & 0x07) << 1) |
+				(BIT(m_planebuf[2], ~m_whichpixel & 0x07) << 5) |
+				(BIT(m_planebuf[3], ~m_whichpixel & 0x07) << 6);
 	}
 	else
 	{
-		switch (m_whichpixel)
-		{
-		case 0: pix = (BIT(m_planebuf[0], 7) << 0) | (BIT(m_planebuf[1], 7) << 1); break;
-		case 1: pix = (BIT(m_planebuf[0], 6) << 0) | (BIT(m_planebuf[1], 6) << 1); break;
-		case 2: pix = (BIT(m_planebuf[0], 5) << 0) | (BIT(m_planebuf[1], 5) << 1); break;
-		case 3: pix = (BIT(m_planebuf[0], 4) << 0) | (BIT(m_planebuf[1], 4) << 1); break;
-		case 4: pix = (BIT(m_planebuf[0], 3) << 0) | (BIT(m_planebuf[1], 3) << 1); break;
-		case 5: pix = (BIT(m_planebuf[0], 2) << 0) | (BIT(m_planebuf[1], 2) << 1); break;
-		case 6: pix = (BIT(m_planebuf[0], 1) << 0) | (BIT(m_planebuf[1], 1) << 1); break;
-		case 7: pix = (BIT(m_planebuf[0], 0) << 0) | (BIT(m_planebuf[1], 0) << 1); break;
-		}
+		pix = (BIT(m_planebuf[0], ~m_whichpixel & 0x07) << 0) |
+				(BIT(m_planebuf[1], ~m_whichpixel & 0x07) << 1);
 	}
 
 	m_whichpixel++;
 }
 
-void ppu_vt03_device::draw_back_pen(u32* dst, int back_pen)
+void ppu_vt03_device::draw_back_pen(u32 *dst, int back_pen)
 {
 	if (m_extended_modes_enable & 0x80)
 	{
@@ -517,7 +501,7 @@ void ppu_vt03_device::draw_tile_pixel_inner(u8 pen, u32 *dest)
 		}
 	}
 }
-void ppu_vt03_device::draw_tile_pixel(u8 pix, int color, u32 back_pen, u32*& dest)
+void ppu_vt03_device::draw_tile_pixel(u8 pix, int color, u32 back_pen, u32 *&dest)
 {
 	if (is_v3xx_extended_mode())
 	{
@@ -569,7 +553,7 @@ u8 ppu_vt03_device::get_speva2_speva0()
 	return m_extra_sprite_bits;
 }
 
-void ppu_vt03_device::extended_modes_enable_w(offs_t offset, u8 data)
+void ppu_vt03_device::extended_modes_enable_w(u8 data)
 {
 	/*  7   : COLCOMP
 	    6   : UNUSED (8bpp enable on VT09?)
@@ -583,16 +567,16 @@ void ppu_vt03_device::extended_modes_enable_w(offs_t offset, u8 data)
 	m_extended_modes_enable = data;
 }
 
-void ppu_vt03_device::extended_modes2_enable_w(offs_t offset, u8 data) { m_extended_modes2_enable = data; }
-void ppu_vt03_device::videobank0_0_w(offs_t offset, u8 data) { m_videobank0[0x0] = data; }
-void ppu_vt03_device::videobank0_1_w(offs_t offset, u8 data) { m_videobank0[0x1] = data; }
-void ppu_vt03_device::videobank0_2_w(offs_t offset, u8 data) { m_videobank0[0x2] = data; }
-void ppu_vt03_device::videobank0_3_w(offs_t offset, u8 data) { m_videobank0[0x3] = data; }
-void ppu_vt03_device::videobank0_4_w(offs_t offset, u8 data) { m_videobank0[0x4] = data; }
-void ppu_vt03_device::videobank0_5_w(offs_t offset, u8 data) { m_videobank0[0x5] = data; }
-void ppu_vt03_device::videobank1_w(offs_t offset, u8 data) { m_videobank1 = data; }
-void ppu_vt03_device::gun_reset_w(offs_t offset, u8 data) { logerror("%s: gun_reset_w %02x\n", machine().describe_context(), data); }
-void ppu_vt03_device::videobank0_extra_w(offs_t offset, u8 data) { m_videobank0_extra = data; }
+void ppu_vt03_device::extended_modes2_enable_w(u8 data) { m_extended_modes2_enable = data; }
+void ppu_vt03_device::videobank0_0_w(u8 data) { m_videobank0[0x0] = data; }
+void ppu_vt03_device::videobank0_1_w(u8 data) { m_videobank0[0x1] = data; }
+void ppu_vt03_device::videobank0_2_w(u8 data) { m_videobank0[0x2] = data; }
+void ppu_vt03_device::videobank0_3_w(u8 data) { m_videobank0[0x3] = data; }
+void ppu_vt03_device::videobank0_4_w(u8 data) { m_videobank0[0x4] = data; }
+void ppu_vt03_device::videobank0_5_w(u8 data) { m_videobank0[0x5] = data; }
+void ppu_vt03_device::videobank1_w(u8 data) { m_videobank1 = data; }
+void ppu_vt03_device::gun_reset_w(u8 data) { logerror("%s: gun_reset_w %02x\n", machine().describe_context(), data); }
+void ppu_vt03_device::videobank0_extra_w(u8 data) { m_videobank0_extra = data; }
 /* 201b unused */
 /* 201c read gun read x (older VT chipsets) */
 /* 201d read gun read y (older VT chipsets) */
@@ -603,7 +587,7 @@ void ppu_vt32_device::m_newvid_1b_w(u8 data) { logerror("%s: m_newvid_1b_w %02x\
 void ppu_vt32_device::m_newvid_1c_w(u8 data) { logerror("%s: m_newvid_1c_w %02x\n", machine().describe_context(), data); m_newvid_1c = data; }
 void ppu_vt32_device::m_newvid_1d_w(u8 data) { logerror("%s: m_newvid_1d_w %02x\n", machine().describe_context(), data); m_newvid_1d = data; }
 
-void ppu_vt32_device::draw_background(u8* line_priority)
+void ppu_vt32_device::draw_background(u8 *line_priority)
 {
 	if (get_newvid_1c() == 0x2e)
 	{
@@ -624,7 +608,7 @@ void ppu_vt32_device::draw_background(u8* line_priority)
 		int tile_index = (nametable | 0x2000) + scroll_y_coarse * 16;
 
 		int start_x = ((((scroll_x_coarse & 1) << 3) + m_x_fine) ^ 0x0f) - 0xf;
-		u32* dest = &m_bitmap.pix(m_scanline, start_x);
+		u32 *dest = &m_bitmap.pix(m_scanline, start_x);
 
 		m_tilecount = 0;
 
@@ -685,7 +669,7 @@ void ppu_vt32_device::draw_background(u8* line_priority)
 }
 
 
-ppu_vt3xx_device::ppu_vt3xx_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock) :
+ppu_vt3xx_device::ppu_vt3xx_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	ppu_vt03_device(mconfig, PPU_VT3XX, tag, owner, clock)
 {
 	m_spriteramsize = 0x200;
@@ -915,7 +899,7 @@ void ppu_vt3xx_device::read_tile_plane_data(int address, int color)
 	}
 }
 
-void ppu_vt3xx_device::shift_tile_plane_data(u8& pix)
+void ppu_vt3xx_device::shift_tile_plane_data(u8 &pix)
 {
 	if (!m_newvid_1e)
 	{
@@ -926,50 +910,20 @@ void ppu_vt3xx_device::shift_tile_plane_data(u8& pix)
 		if (m_newvid_1c & 0x04) // high resolution mode
 		{
 			// we currently pretend this is 8x8, not 16x16
-			switch (m_whichpixel)
-			{
-				case 0: pix = m_planebuf[0]; break;
-				case 1: pix = m_planebuf[4]; break;
-				case 2: pix = m_planebuf[8]; break;
-				case 3: pix = m_planebuf[12]; break;
-				case 4: pix = m_planebuf[1]; break;
-				case 5: pix = m_planebuf[5]; break;
-				case 6: pix = m_planebuf[9]; break;
-				case 7: pix = m_planebuf[13]; break;
-			}
+			pix = m_planebuf[((m_whichpixel & 0x03) << 2) | BIT(m_whichpixel, 2)];
 		}
 		else
 		{
 			if ((m_newvid_1c & 0x03) == 0x02)
 			{
 				// 8x8x8 non-planar mode
-				switch (m_whichpixel)
-				{
-				case 0: pix = m_planebuf[0]; break;
-				case 1: pix = m_planebuf[2]; break;
-				case 2: pix = m_planebuf[4]; break;
-				case 3: pix = m_planebuf[6]; break;
-				case 4: pix = m_planebuf[1]; break;
-				case 5: pix = m_planebuf[3]; break;
-				case 6: pix = m_planebuf[5]; break;
-				case 7: pix = m_planebuf[7]; break;
-				}
+				pix = m_planebuf[bitswap<3>(m_whichpixel, 1, 0, 2)];
 			}
 			else
 			{
 				// extended modes
 				// 8x8x4 non-planar mode
-				switch (m_whichpixel)
-				{
-				case 0: pix = (m_planebuf[0] >> 0) & 0xf; break;
-				case 1: pix = (m_planebuf[0] >> 4) & 0xf; break;
-				case 2: pix = (m_planebuf[2] >> 0) & 0xf; break;
-				case 3: pix = (m_planebuf[2] >> 4) & 0xf; break;
-				case 4: pix = (m_planebuf[1] >> 0) & 0xf; break;
-				case 5: pix = (m_planebuf[1] >> 4) & 0xf; break;
-				case 6: pix = (m_planebuf[3] >> 0) & 0xf; break;
-				case 7: pix = (m_planebuf[3] >> 4) & 0xf; break;
-				}
+				pix = (m_planebuf[bitswap<2>(m_whichpixel, 1, 2)] >> (BIT(m_whichpixel, 0) << 2)) & 0x0f;
 			}
 		}
 		m_whichpixel++;
@@ -994,7 +948,7 @@ inline rgb_t ppu_vt3xx_device::get_pen_value(int pixel_data, int bpp, int pal)
 	return rgb_t(palr << 3, palg << 3, palb << 3);
 }
 
-inline void ppu_vt3xx_device::draw_extended_sprite_pixel_low(bitmap_rgb32& bitmap, int pixel_data, int pixel, int xpos, int pal, int bpp, u8* line_priority)
+inline void ppu_vt3xx_device::draw_extended_sprite_pixel_low(bitmap_rgb32 &bitmap, int pixel_data, int pixel, int xpos, int pal, int bpp, u8 *line_priority)
 {
 	if (pixel_data) // opaque check
 	{
@@ -1012,7 +966,7 @@ inline void ppu_vt3xx_device::draw_extended_sprite_pixel_low(bitmap_rgb32& bitma
 	}
 }
 
-inline void ppu_vt3xx_device::draw_extended_sprite_pixel_high(bitmap_rgb32& bitmap, int pixel_data, int pixel, int xpos, int pal, int bpp, u8* line_priority)
+inline void ppu_vt3xx_device::draw_extended_sprite_pixel_high(bitmap_rgb32 &bitmap, int pixel_data, int pixel, int xpos, int pal, int bpp, u8 *line_priority)
 {
 	if (pixel_data) // opaque check
 	{
@@ -1030,7 +984,7 @@ inline void ppu_vt3xx_device::draw_extended_sprite_pixel_high(bitmap_rgb32& bitm
 	}
 }
 
-inline u8 ppu_vt3xx_device::get_pixel_data(u8* spritepatternbuf, int bpp, int pixel)
+inline u8 ppu_vt3xx_device::get_pixel_data(u8 *spritepatternbuf, int bpp, int pixel)
 {
 	u8 pixel_data;
 	if (bpp == 4)
@@ -1048,7 +1002,7 @@ inline u8 ppu_vt3xx_device::get_pixel_data(u8* spritepatternbuf, int bpp, int pi
 	return pixel_data;
 }
 
-void ppu_vt3xx_device::draw_sprites_high_res(u8* line_priority)
+void ppu_vt3xx_device::draw_sprites_high_res(u8 *line_priority)
 {
 	// high res sprite mode uses an entirely different format (and possibly different spriteram)
 	for (int spritenum = 0x00; spritenum < 0x40; spritenum++)
@@ -1141,7 +1095,7 @@ void ppu_vt3xx_device::draw_sprites_high_res(u8* line_priority)
 	}
 }
 
-void ppu_vt3xx_device::draw_sprites_standard_res(u8* line_priority)
+void ppu_vt3xx_device::draw_sprites_standard_res(u8 *line_priority)
 {
 	/*
 
@@ -1312,7 +1266,7 @@ void ppu_vt3xx_device::draw_sprites_standard_res(u8* line_priority)
 	}
 }
 
-void ppu_vt3xx_device::draw_sprites(u8* line_priority)
+void ppu_vt3xx_device::draw_sprites(u8 *line_priority)
 {
 	if (!m_newvid_1e)
 	{
