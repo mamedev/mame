@@ -681,6 +681,8 @@ void ts2068_state::ts2068(machine_config &config)
 {
 	spectrum_128(config);
 
+	config.device_remove("dma");
+
 	Z80(config.replace(), m_maincpu, XTAL(14'112'000) / 4); // From Schematic; 3.528 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &ts2068_state::ts2068_mem);
 	m_maincpu->set_addrmap(AS_IO, &ts2068_state::ts2068_io);

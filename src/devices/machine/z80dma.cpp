@@ -875,7 +875,7 @@ TIMER_CALLBACK_MEMBER(z80dma_device::rdy_write_callback)
 void z80dma_device::rdy_w(int state)
 {
 	LOG("Z80DMA RDY: %d Active High: %d\n", state, READY_ACTIVE_HIGH);
-	machine().scheduler().synchronize(timer_expired_delegate(FUNC(z80dma_device::rdy_write_callback),this), state);
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(z80dma_device::rdy_write_callback) ,this), state);
 }
 
 /****************************************************************************
@@ -884,4 +884,29 @@ void z80dma_device::rdy_w(int state)
 void z80dma_device::bai_w(int state)
 {
 	m_busrq_ack = state;
+}
+
+
+DEFINE_DEVICE_TYPE(UA858D, ua858d_device, "ua858d", "UA858D DMA Controller")
+
+ua858d_device::ua858d_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: z80dma_device(mconfig, UA858D, tag, owner, clock)
+{
+}
+
+void ua858d_device::write(u8 data)
+{
+	if ((m_num_follow == 0) && ((data & 0x83) == 0x80)) // WR3
+	{
+		LOG("UA858D WR3 %02x\n", data);
+		WR3 = data;
+		if (data & 0x08)
+			m_regs_follow[m_num_follow++] = GET_REGNUM(MASK_BYTE);
+		if (data & 0x10)
+			m_regs_follow[m_num_follow++] = GET_REGNUM(MATCH_BYTE);
+	}
+	else
+	{
+		z80dma_device::write(data);
+	}
 }

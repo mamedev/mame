@@ -154,6 +154,7 @@ resulting mess can be seen in the F4 viewer display.
 #include "spec128.h"
 
 #include "bus/spectrum/ay/slot.h"
+#include "bus/spectrum/dma/slot.h"
 #include "cpu/z80/z80.h"
 
 #include "screen.h"
@@ -352,9 +353,6 @@ void spectrum_128_state::machine_start()
 
 	save_item(NAME(m_port_7ffd_data));
 
-	m_maincpu->space(AS_PROGRAM).specific(m_program);
-	m_maincpu->space(AS_IO).specific(m_io);
-
 	// rom 0 is 128K rom, rom 1 is 48 BASIC
 	memory_region *rom = memregion("maincpu");
 	m_bank_rom[0]->configure_entries(0, 2, rom->base() + 0x10000, 0x4000);
@@ -419,6 +417,7 @@ void spectrum_128_state::spectrum_128(machine_config &config)
 	m_maincpu->set_m1_map(&spectrum_128_state::spectrum_128_fetch);
 	m_maincpu->set_vblank_int("screen", FUNC(spectrum_128_state::spec_interrupt));
 	m_maincpu->nomreq_cb().set(FUNC(spectrum_128_state::spectrum_nomreq));
+	m_maincpu->busack_cb().set("dma", FUNC(dma_slot_device::bai_w));
 
 	config.set_maximum_quantum(attotime::from_hz(60));
 
@@ -438,6 +437,15 @@ void spectrum_128_state::spectrum_128(machine_config &config)
 	m_exp->irq_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_exp->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_exp->fb_r_handler().set(FUNC(spectrum_128_state::floating_bus_r));
+
+	dma_slot_device &dma(DMA_SLOT(config.replace(), "dma", X1_128_SINCLAIR / 10, default_dma_slot_devices, nullptr));
+	dma.set_io_space(m_maincpu, AS_IO);
+	dma.out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	dma.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	dma.in_mreq_callback().set([this](offs_t offset) { return m_program.read_byte(offset); });
+	dma.out_mreq_callback().set([this](offs_t offset, u8 data) { m_program.write_byte(offset, data); });
+	dma.in_iorq_callback().set([this](offs_t offset) { return m_io.read_byte(offset); });
+	dma.out_iorq_callback().set([this](offs_t offset, u8 data) { m_io.write_byte(offset, data); });
 
 	// internal ram
 	m_ram->set_default_size("128K");
