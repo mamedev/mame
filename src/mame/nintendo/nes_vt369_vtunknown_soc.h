@@ -120,19 +120,6 @@ private:
 	required_device<dac_16bit_r2r_twos_complement_device> m_rightdac;
 };
 
-class vt3xx_soc_unk_bt_device : public vt3xx_soc_base_device
-{
-public:
-	vt3xx_soc_unk_bt_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
-
-protected:
-	virtual void device_add_mconfig(machine_config& config) override;
-
-	void nes_vt_bt_map(address_map &map) ATTR_COLD;
-
-	void vt03_412c_extbank_w(u8 data);
-};
-
 class vt369_soc_introm_noswap_device : public vt3xx_soc_base_device
 {
 public:
@@ -194,22 +181,6 @@ protected:
 	void vt03_411c_w(u8 data);
 };
 
-class vt3xx_soc_unk_fa_device : public vt3xx_soc_unk_dg_device
-{
-public:
-	vt3xx_soc_unk_fa_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
-
-protected:
-
-	virtual void device_add_mconfig(machine_config& config) override;
-
-	void nes_vt_fa_map(address_map &map) ATTR_COLD;
-
-	u8 vtfa_412c_r();
-	void vtfa_412c_extbank_w(u8 data);
-	void vtfp_4242_w(u8 data);
-};
-
 
 DECLARE_DEVICE_TYPE(VT3XX_SOC, vt3xx_soc_base_device)
 
@@ -218,9 +189,6 @@ DECLARE_DEVICE_TYPE(VT369_SOC_INTROM_SWAP,   vt369_soc_introm_swap_device)
 DECLARE_DEVICE_TYPE(VT369_SOC_INTROM_ALTSWAP,   vt369_soc_introm_altswap_device)
 DECLARE_DEVICE_TYPE(VT369_SOC_INTROM_VIBESSWAP,   vt369_soc_introm_vibesswap_device)
 
-DECLARE_DEVICE_TYPE(VT3XX_SOC_UNK_BT, vt3xx_soc_unk_bt_device)
-
 DECLARE_DEVICE_TYPE(VT3XX_SOC_UNK_DG, vt3xx_soc_unk_dg_device)
-DECLARE_DEVICE_TYPE(VT3XX_SOC_UNK_FA, vt3xx_soc_unk_fa_device)
 
 #endif // MAME_NINTENDO_NES_VT369_VTUNKNOWN_SOC_H

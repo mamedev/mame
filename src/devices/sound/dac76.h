@@ -33,8 +33,8 @@
     signal by a current-to-voltage converter (I2V) consisting of an op-amp and
     two resistors.
 
-	Iref can either be provided as a stream by connecting an input, or as a
-	fixed value by using `set_fixed_iref()`.
+    Iref can either be provided as a stream by connecting an input, or as a
+    fixed value by using `set_fixed_iref()`.
 
 ***************************************************************************/
 

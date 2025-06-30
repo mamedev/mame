@@ -102,16 +102,16 @@ static const char *sMacChannelLabels[sMacChannelCount] =
 // "Surround" channels are at X = -0.4 (left) and 0.4 (right).
 static const osd::channel_position sChannelPositions[sMacChannelCount] =
 {
-	osd::channel_position::UNKNOWN, // unused
-	osd::channel_position::FL, // Front Left
-	osd::channel_position::FR, // Front Right
-	osd::channel_position::FC, // Front Center
-	osd::channel_position::LFE, // Low Frequency Effects
-	osd::channel_position::RL, // Rear Left
-	osd::channel_position::RR, // Rear Right
+	osd::channel_position::UNKNOWN(), // unused
+	osd::channel_position::FL(), // Front Left
+	osd::channel_position::FR(), // Front Right
+	osd::channel_position::FC(), // Front Center
+	osd::channel_position::LFE(), // Low Frequency Effects
+	osd::channel_position::RL(), // Rear Left
+	osd::channel_position::RR(), // Rear Right
 	osd::channel_position( -0.1,  0.0,  1.0 ), // Front Left of Center
 	osd::channel_position(  0.1,  0.0,  1.0 ), // Front Right of Center
-	osd::channel_position::RC, // Rear Center
+	osd::channel_position::RC(), // Rear Center
 	osd::channel_position( -0.2,  0.0,  0.5 ), // Side Left
 	osd::channel_position(  0.2,  0.0,  0.5 ), // Side Right
 	osd::channel_position(  0.0,  0.5, -0.1 ), // Top Center
@@ -121,27 +121,27 @@ static const osd::channel_position sChannelPositions[sMacChannelCount] =
 	osd::channel_position( -0.2,  0.5, -0.5 ), // Top Rear Left
 	osd::channel_position(  0.2,  0.5, -0.5 ), // Top Rear Center
 	osd::channel_position(  0.2,  0.5, -0.5 ), // Top Rear Right
-	osd::channel_position::UNKNOWN, osd::channel_position::UNKNOWN,
-	osd::channel_position::UNKNOWN, osd::channel_position::UNKNOWN, osd::channel_position::UNKNOWN, osd::channel_position::UNKNOWN, osd::channel_position::UNKNOWN, osd::channel_position::UNKNOWN, osd::channel_position::UNKNOWN, osd::channel_position::UNKNOWN, osd::channel_position::UNKNOWN, osd::channel_position::UNKNOWN,
-	osd::channel_position::UNKNOWN, osd::channel_position::UNKNOWN,
+	osd::channel_position::UNKNOWN(), osd::channel_position::UNKNOWN(),
+	osd::channel_position::UNKNOWN(), osd::channel_position::UNKNOWN(), osd::channel_position::UNKNOWN(), osd::channel_position::UNKNOWN(), osd::channel_position::UNKNOWN(), osd::channel_position::UNKNOWN(), osd::channel_position::UNKNOWN(), osd::channel_position::UNKNOWN(), osd::channel_position::UNKNOWN(), osd::channel_position::UNKNOWN(),
+	osd::channel_position::UNKNOWN(), osd::channel_position::UNKNOWN(),
 	osd::channel_position( -0.4,  0.0, -0.5 ), // Rear Surround Left
 	osd::channel_position(  0.4,  0.0, -0.5 ), // Rear Surround Right
 	osd::channel_position( -0.4,  0.0,  1.0 ), // Left Wide
 	osd::channel_position(  0.4,  0.0,  1.0 ), // Right Wide
-	osd::channel_position::LFE, // Low Frequency Effects 2
-	osd::channel_position::HL, // Left Total
-	osd::channel_position::HR, // Right Total
-	osd::channel_position::FC, // Hearing Impaired
-	osd::channel_position::FC, // Narration
-	osd::channel_position::FC, // Mono
-	osd::channel_position::FC, // Dialog Centric Mix
-	osd::channel_position::HC, // Center Surround Direct
-	osd::channel_position::UNKNOWN, // Haptic
-	osd::channel_position::UNKNOWN, // unused
-	osd::channel_position::UNKNOWN, // unused
-	osd::channel_position::UNKNOWN, // unused
+	osd::channel_position::LFE(), // Low Frequency Effects 2
+	osd::channel_position::HL(), // Left Total
+	osd::channel_position::HR(), // Right Total
+	osd::channel_position::FC(), // Hearing Impaired
+	osd::channel_position::FC(), // Narration
+	osd::channel_position::FC(), // Mono
+	osd::channel_position::FC(), // Dialog Centric Mix
+	osd::channel_position::HC(), // Center Surround Direct
+	osd::channel_position::UNKNOWN(), // Haptic
+	osd::channel_position::UNKNOWN(), // unused
+	osd::channel_position::UNKNOWN(), // unused
+	osd::channel_position::UNKNOWN(), // unused
 	osd::channel_position( -0.2,  0.5,  0.0 ), // Left Top Middle
-	osd::channel_position::UNKNOWN, // unused
+	osd::channel_position::UNKNOWN(), // unused
 	osd::channel_position(  0.2,  0.5,  0.0 ), // Right Top Middle
 	osd::channel_position( -0.2,  0.5, -0.5 ), // Left Top Rear
 	osd::channel_position(  0.0,  0.5, -0.5 ), // Center Top Rear
@@ -153,7 +153,7 @@ static const osd::channel_position sChannelPositions[sMacChannelCount] =
 	osd::channel_position(  0.0, -0.5,  0.0 ), // Center Bottom
 	osd::channel_position( -0.4,  0.5, -0.1 ), // Left Top Surround
 	osd::channel_position(  0.4,  0.5, -0.1 ), // Right Top Surround
-	osd::channel_position::UNKNOWN, // Low Frequency Effects 3
+	osd::channel_position::UNKNOWN(), // Low Frequency Effects 3
 	osd::channel_position( -0.4,  0.0, -0.5 ), // Left Rear Surround
 	osd::channel_position(  0.4,  0.0, -0.5 ), // Right Rear Surround
 	osd::channel_position( -0.1,  0.0,  1.0 ), // Left Edge of Screen
@@ -1064,7 +1064,7 @@ void sound_coreaudio::build_device_list()
 						{
 							std::string chLabel = "Channel " + std::to_string(desc + 1);
 							node.m_port_names.push_back(chLabel);
-							node.m_port_positions.emplace_back(osd::channel_position::FC);
+							node.m_port_positions.emplace_back(osd::channel_position::FC());
 						}
 						else
 						{

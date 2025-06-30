@@ -10,13 +10,12 @@
     MAME driver by R. Belmont, Olivier Galibert, ElSemi and Angelo Salese.
 
     TODO:
-    - color gamma and Mip Mapping still needs to be properly sorted in the renderer;
+    - Mip Mapping still needs to be properly sorted in the renderer;
     - sound comms still needs some work (sometimes m68k doesn't get some commands or play them with a delay);
     - outputs and artwork (for gearbox indicators);
     - clean-ups;
 
     TODO (per-game issues)
-    - daytona: car glasses doesn't get loaded during gameplay;
     - doa, doaa: corrupted sound, eventually becomes silent;
     - dynamcopc: corrupts palette for 2d;
     - fvipers: enables timers, but then irq register is empty, hence it crashes with an "interrupt halt" at POST (regression);
@@ -26,11 +25,8 @@
                 (compute_fmul_avg, shift operation 0x11, ALU operation 0x89 (compute_favg));
     - manxtt: no escape from "active motion slider" tutorial (needs analog inputs),
               bypass it by entering then exiting service mode;
-    - sgt24h: first turn in easy reverse course has ugly rendered mountain in background;
-    - srallyc: some 3d elements doesn't show up properly (tree models, last hill in course 1 is often black colored);
     - stcc: no collision detection with enemy cars, sometimes enemy cars glitch out and disappear altogether;
     - vcop: sound dies at enter initial screen (i.e. after played the game once) (untested);
-    - vstriker: stadium ads have terrible colors (they uses the wrong color table, @see video/model2rd.hxx)
 
     Notes:
     - some analog games can be calibrated in service mode via volume control item ...

@@ -215,9 +215,9 @@
 
 #include "emu.h"
 
+#include "cpu/m6805/m68705.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
-#include "cpu/m6805/m68705.h"
 #include "machine/ds2401.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
@@ -270,14 +270,9 @@ public:
 		m_bg_vidram(*this, "bg_vidram"),
 		m_bg_atrram(*this, "bg_atrram"),
 		m_bg_scroll(*this, "bg_scroll"),
-		m_reel1_ram(*this, "reel1_ram"),
-		m_reel2_ram(*this, "reel2_ram"),
-		m_reel3_ram(*this, "reel3_ram"),
-		m_reel1_scroll(*this, "reel1_scroll"),
-		m_reel2_scroll(*this, "reel2_scroll"),
-		m_reel3_scroll(*this, "reel3_scroll"),
+		m_reel_ram(*this, "reel%u_ram", 1U),
+		m_reel_scroll(*this, "reel%u_scroll", 1U),
 		m_decrypted_opcodes(*this, "decrypted_opcodes"),
-		m_bgcolor(0),
 		m_maincpu(*this, "maincpu"),
 		m_ppi(*this, "ppi8255_%u", 0U),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -285,96 +280,31 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void protection_w(uint8_t data);
-	uint8_t protection_r();
-	void p1_lamps_w(uint8_t data);
-	void p2_lamps_w(uint8_t data);
-	void ncb3_port81_w(uint8_t data);
-	void cm_coincount_w(uint8_t data);
-	void fg_vidram_w(offs_t offset, uint8_t data);
-	void fg_atrram_w(offs_t offset, uint8_t data);
-	void bg_vidram_w(offs_t offset, uint8_t data);
-	void bg_atrram_w(offs_t offset, uint8_t data);
-	void goldstar_reel1_ram_w(offs_t offset, uint8_t data);
-	void goldstar_reel2_ram_w(offs_t offset, uint8_t data);
-	void goldstar_reel3_ram_w(offs_t offset, uint8_t data);
-	void goldstar_fa00_w(uint8_t data);
-	void ay8910_outputa_w(uint8_t data);
-	void ay8910_outputb_w(uint8_t data);
-	void init_chryangl();
-	void init_goldstar();
-	void init_jkrmast();
-	void init_pkrmast();
-	void init_crazybonb();
-	void init_wcherry();
-	void init_super9();
-	void init_ladylinrb();
-	void init_ladylinrc();
-	void init_ladylinrd();
-	void init_ladylinre();
-	void init_palnibbles();
-	DECLARE_VIDEO_START(goldstar);
-	void cm_palette(palette_device &palette) const;
-	DECLARE_VIDEO_START(cherrym);
-	DECLARE_VIDEO_START(jkrmast);
-	void lucky8_palette(palette_device &palette) const;
-	void nfm_palette(palette_device &palette) const;
-	template <bool Has_bg_tmap> uint32_t screen_update_goldstar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void ladylinr(machine_config &config);
-	void ladylinrb(machine_config &config);
-	void wcherry(machine_config &config);
-	void crazybon(machine_config &config);
-	void crazybonb(machine_config &config);
-	void jkrmast(machine_config &config);
-	void pkrmast(machine_config &config);
-	void moonlght(machine_config &config);
-	void kkotnoli(machine_config &config);
-	void super9(machine_config &config);
-	void goldfrui(machine_config &config);
-	void goldstar(machine_config &config);
-	void goldstbl(machine_config &config);
-	void feverch(machine_config &config);
-	void megaline(machine_config &config);
-	void bonusch_portmap(address_map &map) ATTR_COLD;
-	void feverch_portmap(address_map &map) ATTR_COLD;
-	void feverch_map(address_map &map) ATTR_COLD;
-	void cm_map(address_map &map) ATTR_COLD;
-	void crazybon_portmap(address_map &map) ATTR_COLD;
-	void flaming7_map(address_map &map) ATTR_COLD;
-	void goldstar_map(address_map &map) ATTR_COLD;
-	void goldstar_readport(address_map &map) ATTR_COLD;
-	void kkotnoli_map(address_map &map) ATTR_COLD;
-	void ladylinr_map(address_map &map) ATTR_COLD;
-	void lucky8_map(address_map &map) ATTR_COLD;
-	void common_decrypted_opcodes_map(address_map &map) ATTR_COLD;
-	void super972_decrypted_opcodes_map(address_map &map) ATTR_COLD;
-	void mbstar_map(address_map &map) ATTR_COLD;
-	void megaline_map(address_map &map) ATTR_COLD;
-	void megaline_portmap(address_map &map) ATTR_COLD;
-	void ncb3_readwriteport(address_map &map) ATTR_COLD;
-	void nfm_map(address_map &map) ATTR_COLD;
-	void jkrmast_map(address_map &map) ATTR_COLD;
-	void jkrmast_portmap(address_map &map) ATTR_COLD;
-	void pkrmast_portmap(address_map &map) ATTR_COLD;
-	void ramdac_map(address_map &map) ATTR_COLD;
-	void super7_map(address_map &map) ATTR_COLD;
-	void super9_map(address_map &map) ATTR_COLD;
-	void wcat3_map(address_map &map) ATTR_COLD;
-	void wcherry_map(address_map &map) ATTR_COLD;
-	void wcherry_readwriteport(address_map &map) ATTR_COLD;
+	void feverch(machine_config &config) ATTR_COLD;
+	void goldfrui(machine_config &config) ATTR_COLD;
+	void goldstar(machine_config &config) ATTR_COLD;
+	void goldstbl(machine_config &config) ATTR_COLD;
+	void ladylinr(machine_config &config) ATTR_COLD;
+	void ladylinrb(machine_config &config) ATTR_COLD;
+	void kkotnoli(machine_config &config) ATTR_COLD;
+	void megaline(machine_config &config) ATTR_COLD;
+	void moonlght(machine_config &config) ATTR_COLD;
+	void super9(machine_config &config) ATTR_COLD;
+	void wcherry(machine_config &config) ATTR_COLD;
+
+	void init_chryangl() ATTR_COLD;
+	void init_goldstar() ATTR_COLD;
+	void init_ladylinrb() ATTR_COLD;
+	void init_ladylinrc() ATTR_COLD;
+	void init_ladylinrd() ATTR_COLD;
+	void init_ladylinre() ATTR_COLD;
+	void init_super9() ATTR_COLD;
+	void init_wcherry() ATTR_COLD;
+
+	void init_palnibbles() ATTR_COLD;
 
 protected:
-	virtual void machine_start() override { m_lamps.resolve(); }
-	TILE_GET_INFO_MEMBER(get_goldstar_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_cherrym_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_cherrym_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_goldstar_reel1_tile_info);
-	TILE_GET_INFO_MEMBER(get_goldstar_reel2_tile_info);
-	TILE_GET_INFO_MEMBER(get_goldstar_reel3_tile_info);
-
-	uint8_t m_dataoffset = 0;
-
 	required_shared_ptr<uint8_t> m_fg_vidram;
 	required_shared_ptr<uint8_t> m_fg_atrram;
 
@@ -383,19 +313,19 @@ protected:
 
 	optional_shared_ptr<uint8_t> m_bg_scroll;
 
-	optional_shared_ptr<uint8_t> m_reel1_ram;
-	optional_shared_ptr<uint8_t> m_reel2_ram;
-	optional_shared_ptr<uint8_t> m_reel3_ram;
+	optional_shared_ptr_array<uint8_t, 3> m_reel_ram;
 
-	optional_shared_ptr<uint8_t> m_reel1_scroll;
-	optional_shared_ptr<uint8_t> m_reel2_scroll;
-	optional_shared_ptr<uint8_t> m_reel3_scroll;
+	optional_shared_ptr_array<uint8_t, 3> m_reel_scroll;
 
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
-	tilemap_t *m_reel1_tilemap = nullptr;
-	tilemap_t *m_reel2_tilemap = nullptr;
-	tilemap_t *m_reel3_tilemap = nullptr;
+	required_device<cpu_device> m_maincpu;
+	optional_device_array<i8255_device, 3> m_ppi;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	output_finder<16> m_lamps;
+
+	tilemap_t *m_reel_tilemap[3] {};
 
 	uint8_t m_bgcolor = 0;
 	tilemap_t *m_fg_tilemap = nullptr;
@@ -407,11 +337,44 @@ protected:
 	uint8_t m_reel_bank = 0U;
 	uint8_t m_tile_bank = 0U;
 
-	required_device<cpu_device> m_maincpu;
-	optional_device_array<i8255_device, 3> m_ppi;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
-	output_finder<16> m_lamps;
+	virtual void machine_start() override ATTR_COLD { m_lamps.resolve(); }
+	virtual void video_start() override ATTR_COLD;
+
+	void p1_lamps_w(uint8_t data);
+	void p2_lamps_w(uint8_t data);
+	void fg_vidram_w(offs_t offset, uint8_t data);
+	void fg_atrram_w(offs_t offset, uint8_t data);
+	void bg_vidram_w(offs_t offset, uint8_t data);
+	void bg_atrram_w(offs_t offset, uint8_t data);
+	template <uint8_t Which> void reel_ram_w(offs_t offset, uint8_t data);
+	void goldstar_fa00_w(uint8_t data);
+	void cm_palette(palette_device &palette) const ATTR_COLD;
+	void lucky8_palette(palette_device &palette) const ATTR_COLD;
+	template <bool Has_bg_tmap> uint32_t screen_update_goldstar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void common_decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void goldstar_map(address_map &map) ATTR_COLD;
+	void goldstar_readport(address_map &map) ATTR_COLD;
+	void super972_decrypted_opcodes_map(address_map &map) ATTR_COLD;
+
+	TILE_GET_INFO_MEMBER(get_goldstar_fg_tile_info);
+	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_reel_tile_info);
+
+private:
+	uint8_t m_dataoffset = 0;
+
+	void protection_w(uint8_t data);
+	uint8_t protection_r();
+
+	void feverch_map(address_map &map) ATTR_COLD;
+	void feverch_portmap(address_map &map) ATTR_COLD;
+	void kkotnoli_map(address_map &map) ATTR_COLD;
+	void ladylinr_map(address_map &map) ATTR_COLD;
+	void megaline_map(address_map &map) ATTR_COLD;
+	void megaline_portmap(address_map &map) ATTR_COLD;
+	void super9_map(address_map &map) ATTR_COLD;
+	void wcherry_map(address_map &map) ATTR_COLD;
+	void wcherry_readwriteport(address_map &map) ATTR_COLD;
 };
 
 
@@ -422,95 +385,141 @@ public:
 		goldstar_state(mconfig, type, tag)
 	{ }
 
+	void amaztsk(machine_config &config) ATTR_COLD;
+	void amcoe1(machine_config &config) ATTR_COLD;
+	void amcoe1a(machine_config &config) ATTR_COLD;
+	void amcoe2(machine_config &config) ATTR_COLD;
+	void animalhs(machine_config &config) ATTR_COLD;
+	void chryangl(machine_config &config) ATTR_COLD;
+	void cm(machine_config &config) ATTR_COLD;
+	void cmast91(machine_config &config) ATTR_COLD;
+	void cmast92(machine_config &config) ATTR_COLD;
+	void cmasterc(machine_config &config) ATTR_COLD;
+	void cmfb55(machine_config &config) ATTR_COLD;
+	void cmtetrisb(machine_config &config) ATTR_COLD;
+	void cmtetriskr(machine_config &config) ATTR_COLD;
+	void cmv4zg(machine_config &config) ATTR_COLD;
+	void crazybon(machine_config &config) ATTR_COLD;
+	void crazybonb(machine_config &config) ATTR_COLD;
+	void eldoradd(machine_config &config) ATTR_COLD;
+	void eldoraddoa(machine_config &config) ATTR_COLD;
+	void jkrmast(machine_config &config) ATTR_COLD;
+	void pkrmast(machine_config &config) ATTR_COLD;
+	void nfm(machine_config &config) ATTR_COLD;
+	void super7(machine_config &config) ATTR_COLD;
+
+	void init_animalhs() ATTR_COLD;
+	void init_chthree() ATTR_COLD;
+	void init_cll() ATTR_COLD;
+	void init_cm() ATTR_COLD;
+	void init_cmast91() ATTR_COLD;
+	void init_cmezspina() ATTR_COLD;
+	void init_cmpacmanb() ATTR_COLD;
+	void init_cmtetrisc() ATTR_COLD;
+	void init_cmtetrisd() ATTR_COLD;
+	void init_cmtetriskr() ATTR_COLD;
+	void init_cmv4() ATTR_COLD;
+	void init_crazybonb() ATTR_COLD;
+	void init_eldoraddoa() ATTR_COLD;
+	void init_fb2010() ATTR_COLD;
+	void init_hamhouse() ATTR_COLD;
+	void init_hamhouse9() ATTR_COLD;
+	void init_jkrmast() ATTR_COLD;
+	void init_ll3() ATTR_COLD;
+	void init_match133() ATTR_COLD;
+	void init_nfb96_a() ATTR_COLD;
+	void init_nfb96_b() ATTR_COLD;
+	void init_nfb96_c1() ATTR_COLD;
+	void init_nfb96_c1_2() ATTR_COLD;
+	void init_nfb96_c2() ATTR_COLD;
+	void init_nfb96_d() ATTR_COLD;
+	void init_nfb96_dk() ATTR_COLD;
+	void init_nfb96_g() ATTR_COLD;
+	void init_nfb96sea() ATTR_COLD;
+	void init_pkrmast() ATTR_COLD;
+	void init_po33() ATTR_COLD;
+	void init_rp35() ATTR_COLD;
+	void init_rp36() ATTR_COLD;
+	void init_rp36c3() ATTR_COLD;
+	void init_rp96sub() ATTR_COLD;
+	void init_schery97() ATTR_COLD;
+	void init_schery97a() ATTR_COLD;
+	void init_skill98() ATTR_COLD;
+	void init_super7() ATTR_COLD;
+	void init_tcl() ATTR_COLD;
+	void init_tonypok() ATTR_COLD;
+	template <uint8_t Xor_value> void init_tsk() ATTR_COLD;
+	void init_wcat3a() ATTR_COLD;
+
+protected:
+	virtual void video_start() override ATTR_COLD;
+
+	TILE_GET_INFO_MEMBER(get_cherrym_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_cherrym_bg_tile_info);
+
+private:
 	void outport0_w(uint8_t data);
 	void girl_scroll_w(uint8_t data);
 	void background_col_w(uint8_t data);
-
-	void init_cm();
-	void init_cmv4();
-	void init_tonypok();
-	void init_schery97();
-	void init_schery97a();
-	void init_skill98();
-	void init_po33();
-	void init_match133();
-	void init_nfb96_a();
-	void init_nfb96_b();
-	void init_nfb96_c1();
-	void init_nfb96_c1_2();
-	void init_nfb96_c2();
-	void init_nfb96_d();
-	void init_nfb96_dk();
-	void init_nfb96_g();
-	void init_nfb96sea();
-	void init_fb2010();
-	void init_rp35();
-	void init_rp36();
-	void init_rp36c3();
-	void init_rp96sub();
-	void init_tcl();
-	void init_super7();
-	void init_chthree();
-	void init_wcat3a();
-	void init_cmpacmanb();
-	void init_cmtetrisc();
-	void init_cmtetrisd();
-	void init_cmtetriskr();
-	void init_ll3();
-	void init_hamhouse();
-	void init_hamhouse9();
-	void init_cmast91();
-	void init_cll();
-	void init_animalhs();
-	void init_eldoraddoa();
-	void init_cmezspina();
-	template <uint8_t Xor_value> void init_tsk();
+	void coincount_w(uint8_t data);
 
 	uint32_t screen_update_amcoe1a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cmast91(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void cmast91_palette(palette_device &palette) const;
+	void cmast91_palette(palette_device &palette) const ATTR_COLD;
+	void nfm_palette(palette_device &palette) const ATTR_COLD;
 
-	void cm(machine_config &config);
-	void cmfb55(machine_config &config);
-	void cm97(machine_config &config);
-	void cmast91(machine_config &config);
-	void cmast92(machine_config &config);
-	void cmtetrisb(machine_config &config);
-	void cmtetriskr(machine_config &config);
-	void cmv4zg(machine_config &config);
-	void eldoradd(machine_config &config);
-	void cmasterc(machine_config &config);
-	void amcoe1a(machine_config &config);
-	void nfm(machine_config &config);
-	void amcoe2(machine_config &config);
-	void amcoe1(machine_config &config);
-	void chryangl(machine_config &config);
-	void super7(machine_config &config);
-	void animalhs(machine_config &config);
-	void eldoraddoa(machine_config &config);
-	void amaztsk(machine_config &config);
-	void animalhs_map(address_map &map) ATTR_COLD;
-	void animalhs_portmap(address_map &map) ATTR_COLD;
+	DECLARE_VIDEO_START(jkrmast);
+
 	void amcoe1_portmap(address_map &map) ATTR_COLD;
 	void amcoe2_portmap(address_map &map) ATTR_COLD;
+	void animalhs_map(address_map &map) ATTR_COLD;
+	void animalhs_portmap(address_map &map) ATTR_COLD;
+	void chryangl_decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void cm_map(address_map &map) ATTR_COLD;
 	void cm_portmap(address_map &map) ATTR_COLD;
-	void cm97_portmap(address_map &map) ATTR_COLD;
 	void cmast91_portmap(address_map &map) ATTR_COLD;
 	void cmast92_map(address_map &map) ATTR_COLD;
 	void cmast92_portmap(address_map &map) ATTR_COLD;
 	void cmtetrisb_portmap(address_map &map) ATTR_COLD;
 	void cmtetriskr_portmap(address_map &map) ATTR_COLD;
 	void cmv4zg_portmap(address_map &map) ATTR_COLD;
+	void crazybon_portmap(address_map &map) ATTR_COLD;
 	void eldoraddoa_portmap(address_map &map) ATTR_COLD;
+	void jkrmast_map(address_map &map) ATTR_COLD;
+	void jkrmast_portmap(address_map &map) ATTR_COLD;
+	void nfm_map(address_map &map) ATTR_COLD;
 	void nfm_portmap(address_map &map) ATTR_COLD;
+	void pkrmast_portmap(address_map &map) ATTR_COLD;
+	void super7_map(address_map &map) ATTR_COLD;
 	void super7_portmap(address_map &map) ATTR_COLD;
-	void chryangl_decrypted_opcodes_map(address_map &map) ATTR_COLD;
 
-protected:
 	// installed by various driver init handlers to get stuff to work
 	template <uint8_t V> uint8_t fixedval_r() { return V; }
 };
 
+class cmast97_state : public cmaster_state
+{
+public:
+	cmast97_state(const machine_config &mconfig, device_type type, const char *tag) :
+		cmaster_state(mconfig, type, tag),
+		m_gfx_view(*this, "gfx_view")
+	{ }
+
+	void cmast97(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void video_start() override ATTR_COLD;
+
+private:
+	memory_view m_gfx_view;
+
+	void cmast97_palette_init(palette_device &palette) const ATTR_COLD;
+	TILE_GET_INFO_MEMBER(get_cmast97_bg_tile_info);
+	uint32_t screen_update_cmast97(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void cmast97_map(address_map &map) ATTR_COLD;
+	void cmast97_portmap(address_map &map) ATTR_COLD;
+};
 
 class wingco_state : public goldstar_state
 {
@@ -522,12 +531,56 @@ public:
 		m_nvram(*this, "nvram")
 	{ }
 
+	void animalw(machine_config &config) ATTR_COLD;
+	void animalwa(machine_config &config) ATTR_COLD;
+	void bingowng(machine_config &config) ATTR_COLD;
+	void bingownga(machine_config &config) ATTR_COLD;
+	void flam7_tw(machine_config &config) ATTR_COLD;
+	void flam7_w4(machine_config &config) ATTR_COLD;
+	void flaming7(machine_config &config) ATTR_COLD;
+	void lucky8(machine_config &config) ATTR_COLD;
+	void lucky8f(machine_config &config) ATTR_COLD;
+	void lucky8k(machine_config &config) ATTR_COLD;
+	void lucky8p(machine_config &config) ATTR_COLD;
+	void luckybar(machine_config &config) ATTR_COLD;
+	void luckylad(machine_config &config) ATTR_COLD;
+	void magodds(machine_config &config) ATTR_COLD;
+	void mbstar(machine_config &config) ATTR_COLD;
+	void nd8lines(machine_config &config) ATTR_COLD;
+	void super972(machine_config &config) ATTR_COLD;
+	void wcat3(machine_config &config) ATTR_COLD;
+
+	void init_cb2() ATTR_COLD;
+	void init_flam7_tw() ATTR_COLD;
+	void init_flaming7() ATTR_COLD;
+	void init_lucky8a() ATTR_COLD;
+	void init_lucky8f() ATTR_COLD;
+	void init_lucky8l() ATTR_COLD;
+	void init_lucky8m() ATTR_COLD;
+	void init_lucky8n() ATTR_COLD;
+	void init_lucky8p() ATTR_COLD;
+	void init_magoddsc() ATTR_COLD;
+	void init_luckylad() ATTR_COLD;
+	void init_nd8lines() ATTR_COLD;
+	void init_super972() ATTR_COLD;
+	void init_wcat() ATTR_COLD;
+	void init_wcat3() ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+private:
+	DECLARE_VIDEO_START(bingowng);
+	DECLARE_VIDEO_START(magical);
+
 	void magodds_outb850_w(uint8_t data);
 	void magodds_outb860_w(uint8_t data);
 	void fl7w4_outc802_w(uint8_t data);
 	void system_outputa_w(uint8_t data);
 	void system_outputb_w(uint8_t data);
 	void system_outputc_w(uint8_t data);
+	void ay8910_outputa_w(uint8_t data);
+	void ay8910_outputb_w(uint8_t data);
 
 	// handlers for lucky bar MCU ports
 	uint8_t mcu_portb_r();
@@ -538,54 +591,15 @@ public:
 	uint8_t nvram_r(offs_t offset);
 	void nvram_w(offs_t offset, uint8_t data);
 
-	void init_cb2();
-	void init_lucky8a();
-	void init_lucky8f();
-	void init_lucky8l();
-	void init_lucky8m();
-	void init_lucky8n();
-	void init_lucky8p();
-	void init_magoddsc();
-	void init_flaming7();
-	void init_flam7_tw();
-	void init_luckylad();
-	void init_nd8lines();
-	void init_super972();
-	void init_wcat();
-	void init_wcat3();
-
-	DECLARE_VIDEO_START(bingowng);
-	DECLARE_VIDEO_START(magical);
-	void magodds_palette(palette_device &palette) const;
+	void magodds_palette(palette_device &palette) const ATTR_COLD;
 	uint32_t screen_update_bingowng(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_magical(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_mbstar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void masked_irq(int state);
 
-	void bingowng(machine_config &config);
-	void flaming7(machine_config &config);
-	void lucky8(machine_config &config);
-	void lucky8f(machine_config &config);
-	void lucky8k(machine_config &config);
-	void lucky8p(machine_config &config);
-	void luckylad(machine_config &config);
-	void luckybar(machine_config &config);
-	void nd8lines(machine_config &config);
-	void super972(machine_config &config);
-	void wcat3(machine_config &config);
-	void magodds(machine_config &config);
-	void flam7_w4(machine_config &config);
-	void bingownga(machine_config &config);
-	void mbstar(machine_config &config);
-	void flam7_tw(machine_config &config);
-	void animalw(machine_config &config);
-	void animalwa(machine_config &config);
-
-protected:
 	TILE_GET_INFO_MEMBER(get_magical_fg_tile_info);
 	//virtual void machine_start() override { goldstar_state::machine_start(); m_tile_bank = 0; }
-	virtual void machine_start() override;
 
 private:
 	optional_device<ds2401_device> m_fl7w4_id;
@@ -596,12 +610,16 @@ private:
 	uint8_t m_nmi_enable = 0U;
 	uint8_t m_vidreg = 0U;
 
-	void lucky8p_map(address_map &map) ATTR_COLD;
-	void nd8lines_map(address_map &map) ATTR_COLD;
-	void magodds_map(address_map &map) ATTR_COLD;
-	void luckybar_map(address_map &map) ATTR_COLD;
 	void animalw_map(address_map &map) ATTR_COLD;
 	void animalwa_map(address_map &map) ATTR_COLD;
+	void flaming7_map(address_map &map) ATTR_COLD;
+	void lucky8_map(address_map &map) ATTR_COLD;
+	void lucky8p_map(address_map &map) ATTR_COLD;
+	void luckybar_map(address_map &map) ATTR_COLD;
+	void magodds_map(address_map &map) ATTR_COLD;
+	void mbstar_map(address_map &map) ATTR_COLD;
+	void nd8lines_map(address_map &map) ATTR_COLD;
+	void wcat3_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -612,32 +630,36 @@ public:
 		goldstar_state(mconfig, type, tag)
 	{ }
 
-	void init_cb3();
-	void init_cb3c();
-	void init_cb3e();
-	void init_cb3f();
-	void init_cb3g();
-	void init_cherrys();
-	void init_chrygld();
-	void init_chry10();
+	void init_cb3() ATTR_COLD;
+	void init_cb3c() ATTR_COLD;
+	void init_cb3e() ATTR_COLD;
+	void init_cb3f() ATTR_COLD;
+	void init_cb3g() ATTR_COLD;
+	void init_cherrys() ATTR_COLD;
+	void init_chry10() ATTR_COLD;
+	void init_chrygld() ATTR_COLD;
 
-	void cherrys(machine_config &config);
-	void chryangla(machine_config &config);
-	void chrygld(machine_config &config);
-	void cb3c(machine_config &config);
-	void cb3e(machine_config &config);
-	void ncb3(machine_config &config);
-	void ncb3_map(address_map &map) ATTR_COLD;
+	void cb3c(machine_config &config) ATTR_COLD;
+	void cb3e(machine_config &config) ATTR_COLD;
+	void cherrys(machine_config &config) ATTR_COLD;
+	void chryangla(machine_config &config) ATTR_COLD;
+	void chrygld(machine_config &config) ATTR_COLD;
+	void ncb3(machine_config &config) ATTR_COLD;
+
+private:
+	void ncb3_port81_w(uint8_t data);
+
+	void do_blockswaps(uint8_t *rom) ATTR_COLD;
+	void dump_to_file(uint8_t *rom) ATTR_COLD;
+
+	uint8_t cb3_decrypt(uint8_t cipherText, uint16_t address) ATTR_COLD;
+	uint8_t cb3f_decrypt(uint8_t cipherText, uint16_t address) ATTR_COLD;
+	uint8_t chry10_decrypt(uint8_t cipherText) ATTR_COLD;
+
 	void chryangla_map(address_map &map) ATTR_COLD;
 	void chryangla_decrypted_opcodes_map(address_map &map) ATTR_COLD;
-
-protected:
-	void do_blockswaps(uint8_t *rom);
-	void dump_to_file(uint8_t *rom);
-
-	uint8_t cb3_decrypt(uint8_t cipherText, uint16_t address);
-	uint8_t cb3f_decrypt(uint8_t cipherText, uint16_t address);
-	uint8_t chry10_decrypt(uint8_t cipherText);
+	void ncb3_map(address_map &map) ATTR_COLD;
+	void ncb3_readwriteport(address_map &map) ATTR_COLD;
 };
 
 
@@ -646,88 +668,80 @@ class sanghopm_state : public goldstar_state
 public:
 	sanghopm_state(const machine_config &mconfig, device_type type, const char *tag) :
 		goldstar_state(mconfig, type, tag),
-		m_reel1_attrram(*this, "reel1_attrram"),
-		m_reel2_attrram(*this, "reel2_attrram"),
-		m_reel3_attrram(*this, "reel3_attrram")
+		m_reel_attrram(*this, "reel%u_attrram", 1U)
 	{ }
+
+	void star100(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void video_start() override ATTR_COLD;
+
+private:
+	required_shared_ptr_array<uint8_t, 3> m_reel_attrram;
 
 	void enable_w(uint8_t data);
 	void coincount_w(uint8_t data);
 
-	void reel1_attrram_w(offs_t offset, uint8_t data);
-	void reel2_attrram_w(offs_t offset, uint8_t data);
-	void reel3_attrram_w(offs_t offset, uint8_t data);
+	template <uint8_t Which> void reel_attrram_w(offs_t offset, uint8_t data);
 
-	DECLARE_VIDEO_START(sangho);
 	uint32_t screen_update_sangho(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void star100(machine_config &config);
+	void ramdac_map(address_map &map) ATTR_COLD;
 	void star100_map(address_map &map) ATTR_COLD;
 	void star100_readport(address_map &map) ATTR_COLD;
-protected:
+
+
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_reel1_tile_info);
-	TILE_GET_INFO_MEMBER(get_reel2_tile_info);
-	TILE_GET_INFO_MEMBER(get_reel3_tile_info);
-
-private:
-	required_shared_ptr<uint8_t> m_reel1_attrram;
-	required_shared_ptr<uint8_t> m_reel2_attrram;
-	required_shared_ptr<uint8_t> m_reel3_attrram;
+	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_reel_tile_info);
 };
 
 
-class unkch_state : public goldstar_state
+class unkch_state : public cmaster_state
 {
 public:
 	unkch_state(const machine_config &mconfig, device_type type, const char *tag) :
-		goldstar_state(mconfig, type, tag),
-		m_reel1_attrram(*this, "reel1_attrram"),
-		m_reel2_attrram(*this, "reel2_attrram"),
-		m_reel3_attrram(*this, "reel3_attrram"),
+		cmaster_state(mconfig, type, tag),
+		m_reel_attrram(*this, "reel%u_attrram", 1U),
 		m_ticket_dispenser(*this, "tickets")
 	{ }
+
+	void bonusch(machine_config &config) ATTR_COLD;
+	void rolling(machine_config &config) ATTR_COLD;
+	void unkch(machine_config &config) ATTR_COLD;
+
+	void init_unkch1() ATTR_COLD;
+	void init_unkch3() ATTR_COLD;
+	void init_unkch4() ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
+private:
+	required_shared_ptr_array<uint8_t, 3> m_reel_attrram;
+
+	optional_device<ticket_dispenser_device> m_ticket_dispenser;
+
+	uint8_t m_vblank_irq_enable = 0U;
+	uint8_t m_vidreg = 0U;
 
 	void coincount_w(uint8_t data);
 	void unkcm_0x02_w(uint8_t data);
 	void unkcm_0x03_w(uint8_t data);
 
-	void reel1_attrram_w(offs_t offset, uint8_t data);
-	void reel2_attrram_w(offs_t offset, uint8_t data);
-	void reel3_attrram_w(offs_t offset, uint8_t data);
+	template <uint8_t Which> void reel_attrram_w(offs_t offset, uint8_t data);
 
-	void init_unkch1();
-	void init_unkch3();
-	void init_unkch4();
-
-	DECLARE_VIDEO_START(unkch);
 	uint32_t screen_update_unkch(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void vblank_irq(int state);
 
-	void unkch(machine_config &config);
-	void bonusch(machine_config &config);
-	void rolling(machine_config &config);
-
 	void bonusch_map(address_map &map) ATTR_COLD;
+	void bonusch_portmap(address_map &map) ATTR_COLD;
 	void unkch_map(address_map &map) ATTR_COLD;
 	void unkch_portmap(address_map &map) ATTR_COLD;
 
-protected:
-	TILE_GET_INFO_MEMBER(get_reel1_tile_info);
-	TILE_GET_INFO_MEMBER(get_reel2_tile_info);
-	TILE_GET_INFO_MEMBER(get_reel3_tile_info);
-
-private:
-	required_shared_ptr<uint8_t> m_reel1_attrram;
-	required_shared_ptr<uint8_t> m_reel2_attrram;
-	required_shared_ptr<uint8_t> m_reel3_attrram;
-
-	uint8_t m_vblank_irq_enable = 0U;
-	uint8_t m_vidreg = 0U;
-
-	optional_device<ticket_dispenser_device> m_ticket_dispenser;
+	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_reel_tile_info);
 };
 
 
@@ -737,6 +751,17 @@ void wingco_state::machine_start()
 	m_tile_bank = 0;
 	m_nvram8 = std::make_unique<uint8_t[]>(0x800);
 	m_nvram->set_base(m_nvram8.get(),0x800);
+
+	save_item(NAME(m_nmi_enable));
+	save_item(NAME(m_vidreg));
+}
+
+void unkch_state::machine_start()
+{
+	cmaster_state::machine_start();
+
+	save_item(NAME(m_vblank_irq_enable));
+	save_item(NAME(m_vidreg));
 }
 
 
@@ -785,7 +810,7 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_goldstar_fg_tile_info)
 
 
 // colour / high tile bits are swapped around
-TILE_GET_INFO_MEMBER(goldstar_state::get_cherrym_fg_tile_info)
+TILE_GET_INFO_MEMBER(cmaster_state::get_cherrym_fg_tile_info)
 {
 	int const code = m_fg_vidram[tile_index];
 	int const attr = m_fg_atrram[tile_index];
@@ -796,7 +821,7 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_cherrym_fg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(goldstar_state::get_cherrym_bg_tile_info)
+TILE_GET_INFO_MEMBER(cmaster_state::get_cherrym_bg_tile_info)
 {
 	tileinfo.set(1,
 			m_bg_vidram[tile_index] | (m_reel_bank * 0x100),
@@ -804,96 +829,69 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_cherrym_bg_tile_info)
 			0);
 }
 
-void goldstar_state::goldstar_reel1_ram_w(offs_t offset, uint8_t data)
+template <uint8_t Which>
+void goldstar_state::reel_ram_w(offs_t offset, uint8_t data)
 {
-	m_reel1_ram[offset] = data;
-	m_reel1_tilemap->mark_tile_dirty(offset);
+	m_reel_ram[Which][offset] = data;
+	m_reel_tilemap[Which]->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(goldstar_state::get_goldstar_reel1_tile_info)
+template <uint8_t Which>
+TILE_GET_INFO_MEMBER(goldstar_state::get_reel_tile_info)
 {
 	tileinfo.set(1,
-			m_reel1_ram[tile_index] | (m_reel_bank * 0x100),
+			m_reel_ram[Which][tile_index] | (m_reel_bank * 0x100),
 			m_bgcolor,
 			0);
 }
 
-
-void goldstar_state::goldstar_reel2_ram_w(offs_t offset, uint8_t data)
+void goldstar_state::video_start()
 {
-	m_reel2_ram[offset] = data;
-	m_reel2_tilemap->mark_tile_dirty(offset);
-}
+	m_reel_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldstar_state::get_reel_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldstar_state::get_reel_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldstar_state::get_reel_tile_info<2>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 
-TILE_GET_INFO_MEMBER(goldstar_state::get_goldstar_reel2_tile_info)
-{
-	tileinfo.set(1,
-			m_reel2_ram[tile_index] | (m_reel_bank * 0x100),
-			m_bgcolor,
-			0);
-}
+	m_reel_tilemap[0]->set_scroll_cols(64);
+	m_reel_tilemap[1]->set_scroll_cols(64);
+	m_reel_tilemap[2]->set_scroll_cols(64);
 
-void goldstar_state::goldstar_reel3_ram_w(offs_t offset, uint8_t data)
-{
-	m_reel3_ram[offset] = data;
-	m_reel3_tilemap->mark_tile_dirty(offset);
-}
-
-TILE_GET_INFO_MEMBER(goldstar_state::get_goldstar_reel3_tile_info)
-{
-	tileinfo.set(1,
-			m_reel3_ram[tile_index] | (m_reel_bank * 0x100),
-			m_bgcolor,
-			0);
-}
-
-VIDEO_START_MEMBER(goldstar_state, goldstar)
-{
-	m_reel1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldstar_state::get_goldstar_reel1_tile_info)), TILEMAP_SCAN_ROWS, 8,32, 64, 8);
-	m_reel2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldstar_state::get_goldstar_reel2_tile_info)), TILEMAP_SCAN_ROWS, 8,32, 64, 8);
-	m_reel3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldstar_state::get_goldstar_reel3_tile_info)), TILEMAP_SCAN_ROWS, 8,32, 64, 8);
-
-	m_reel1_tilemap->set_scroll_cols(64);
-	m_reel2_tilemap->set_scroll_cols(64);
-	m_reel3_tilemap->set_scroll_cols(64);
-
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldstar_state::get_goldstar_fg_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldstar_state::get_goldstar_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
 	// is there an enable reg for this game?
 	m_enable_reg = 0x0b;
 }
 
-VIDEO_START_MEMBER(goldstar_state, cherrym)
+void cmaster_state::video_start()
 {
-	m_reel1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldstar_state::get_goldstar_reel1_tile_info)), TILEMAP_SCAN_ROWS, 8,32, 64, 8);
-	m_reel2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldstar_state::get_goldstar_reel2_tile_info)), TILEMAP_SCAN_ROWS, 8,32, 64, 8);
-	m_reel3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldstar_state::get_goldstar_reel3_tile_info)), TILEMAP_SCAN_ROWS, 8,32, 64, 8);
+	m_reel_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cmaster_state::get_reel_tile_info<0>)), TILEMAP_SCAN_ROWS, 8,32, 64, 8);
+	m_reel_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cmaster_state::get_reel_tile_info<1>)), TILEMAP_SCAN_ROWS, 8,32, 64, 8);
+	m_reel_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cmaster_state::get_reel_tile_info<2>)), TILEMAP_SCAN_ROWS, 8,32, 64, 8);
 
-	m_reel1_tilemap->set_scroll_cols(64);
-	m_reel2_tilemap->set_scroll_cols(64);
-	m_reel3_tilemap->set_scroll_cols(64);
+	m_reel_tilemap[0]->set_scroll_cols(64);
+	m_reel_tilemap[1]->set_scroll_cols(64);
+	m_reel_tilemap[2]->set_scroll_cols(64);
 
 	m_cmaster_girl_num = 0;
 	m_cmaster_girl_pal = 0;
 
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldstar_state::get_cherrym_fg_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cmaster_state::get_cherrym_fg_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 64, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
 	m_enable_reg = 0x0b;
 }
 
-VIDEO_START_MEMBER(goldstar_state, jkrmast)
+VIDEO_START_MEMBER(cmaster_state, jkrmast)
 {
-	VIDEO_START_CALL_MEMBER(cherrym);
+	cmaster_state::video_start();
 
-	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldstar_state::get_cherrym_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cmaster_state::get_cherrym_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 
 	m_bg_tilemap->set_scroll_cols(64);
 
-	m_reel1_tilemap->set_transparent_pen(0);
-	m_reel2_tilemap->set_transparent_pen(0);
-	m_reel3_tilemap->set_transparent_pen(0);
+	m_reel_tilemap[0]->set_transparent_pen(0);
+	m_reel_tilemap[1]->set_transparent_pen(0);
+	m_reel_tilemap[2]->set_transparent_pen(0);
 
 	save_item(NAME(m_reel_bank));
 }
@@ -903,9 +901,9 @@ void goldstar_state::goldstar_fa00_w(uint8_t data)
 	// bit 1 toggles continuously - might be irq enable or watchdog reset
 	// bit 2 selects background gfx color (I think)
 	m_bgcolor = (data & 0x04) >> 2;
-	m_reel1_tilemap->mark_all_dirty();
-	m_reel2_tilemap->mark_all_dirty();
-	m_reel3_tilemap->mark_all_dirty();
+	m_reel_tilemap[0]->mark_all_dirty();
+	m_reel_tilemap[1]->mark_all_dirty();
+	m_reel_tilemap[2]->mark_all_dirty();
 }
 
 
@@ -930,9 +928,9 @@ uint32_t goldstar_state::screen_update_goldstar(screen_device &screen, bitmap_rg
 	{
 		for (int i = 0; i < 64; i++)
 		{
-			m_reel1_tilemap->set_scrolly(i, m_reel1_scroll[i]);
-			m_reel2_tilemap->set_scrolly(i, m_reel2_scroll[i]);
-			m_reel3_tilemap->set_scrolly(i, m_reel3_scroll[i]);
+			m_reel_tilemap[0]->set_scrolly(i, m_reel_scroll[0][i]);
+			m_reel_tilemap[1]->set_scrolly(i, m_reel_scroll[1][i]);
+			m_reel_tilemap[2]->set_scrolly(i, m_reel_scroll[2][i]);
 		}
 
 		// are these hardcoded, or registers?
@@ -940,9 +938,9 @@ uint32_t goldstar_state::screen_update_goldstar(screen_device &screen, bitmap_rg
 		const rectangle visible2(0*8, (14+48)*8-1, 12*8, (12+7)*8-1);
 		const rectangle visible3(0*8, (14+48)*8-1, 20*8, (20+7)*8-1);
 
-		m_reel1_tilemap->draw(screen, bitmap, visible1, 0, 0);
-		m_reel2_tilemap->draw(screen, bitmap, visible2, 0, 0);
-		m_reel3_tilemap->draw(screen, bitmap, visible3, 0, 0);
+		m_reel_tilemap[0]->draw(screen, bitmap, visible1, 0, 0);
+		m_reel_tilemap[1]->draw(screen, bitmap, visible2, 0, 0);
+		m_reel_tilemap[2]->draw(screen, bitmap, visible3, 0, 0);
 	}
 
 	if (m_enable_reg & 0x04)
@@ -975,18 +973,18 @@ uint32_t cmaster_state::screen_update_cmast91(screen_device &screen, bitmap_rgb3
 	{
 		for (int i = 0; i < 64; i++)
 		{
-			m_reel1_tilemap->set_scrolly(i, m_reel1_scroll[i]);
-			m_reel2_tilemap->set_scrolly(i, m_reel2_scroll[i]);
-			m_reel3_tilemap->set_scrolly(i, m_reel3_scroll[i]);
+			m_reel_tilemap[0]->set_scrolly(i, m_reel_scroll[0][i]);
+			m_reel_tilemap[1]->set_scrolly(i, m_reel_scroll[1][i]);
+			m_reel_tilemap[2]->set_scrolly(i, m_reel_scroll[2][i]);
 		}
 
-		const rectangle visible1(0*8, (14+48)*8-1,  4*8,  (4+7)*8-1);   // same start for reel1
-		const rectangle visible2(0*8, (14+48)*8-1, 11*8, (12+7)*8-1);   // 4 pixels less for reel2
-		const rectangle visible3(0*8, (14+48)*8-1, 19*8, (19+7)*8-1);   // 8 pixels less for reel3
+		const rectangle visible1(0*8, (14+48)*8-1,  4*8,  (4+7)*8-1);   // same start for reel[0]
+		const rectangle visible2(0*8, (14+48)*8-1, 11*8, (12+7)*8-1);   // 4 pixels less for reel[1]
+		const rectangle visible3(0*8, (14+48)*8-1, 19*8, (19+7)*8-1);   // 8 pixels less for reel[2]
 
-		m_reel1_tilemap->draw(screen, bitmap, visible1, 0, 0);
-		m_reel2_tilemap->draw(screen, bitmap, visible2, 0, 0);
-		m_reel3_tilemap->draw(screen, bitmap, visible3, 0, 0);
+		m_reel_tilemap[0]->draw(screen, bitmap, visible1, 0, 0);
+		m_reel_tilemap[1]->draw(screen, bitmap, visible2, 0, 0);
+		m_reel_tilemap[2]->draw(screen, bitmap, visible3, 0, 0);
 	}
 
 	if (m_enable_reg & 0x04)
@@ -1062,9 +1060,9 @@ void cmaster_state::background_col_w(uint8_t data)
 	m_bgcolor = (data & 0x03) >> 0;
 	#endif
 
-	m_reel1_tilemap->mark_all_dirty();
-	m_reel2_tilemap->mark_all_dirty();
-	m_reel3_tilemap->mark_all_dirty();
+	m_reel_tilemap[0]->mark_all_dirty();
+	m_reel_tilemap[1]->mark_all_dirty();
+	m_reel_tilemap[2]->mark_all_dirty();
 }
 
 
@@ -1079,18 +1077,18 @@ uint32_t cmaster_state::screen_update_amcoe1a(screen_device &screen, bitmap_rgb3
 	{
 		for (int i = 0; i < 64; i++)
 		{
-			m_reel1_tilemap->set_scrolly(i, m_reel1_scroll[i]);
-			m_reel2_tilemap->set_scrolly(i, m_reel2_scroll[i]);
-			m_reel3_tilemap->set_scrolly(i, m_reel3_scroll[i]);
+			m_reel_tilemap[0]->set_scrolly(i, m_reel_scroll[0][i]);
+			m_reel_tilemap[1]->set_scrolly(i, m_reel_scroll[1][i]);
+			m_reel_tilemap[2]->set_scrolly(i, m_reel_scroll[2][i]);
 		}
 
 		rectangle const visible1(0*8, (14+48)*8-1,  4*8,  (4+6)*8-1);
 		rectangle const visible2(0*8, (14+48)*8-1, 10*8, (10+6)*8-1);
 		rectangle const visible3(0*8, (14+48)*8-1, 16*8, (16+6)*8-1);
 
-		m_reel1_tilemap->draw(screen, bitmap, visible1, 0, 0);
-		m_reel2_tilemap->draw(screen, bitmap, visible2, 0, 0);
-		m_reel3_tilemap->draw(screen, bitmap, visible3, 0, 0);
+		m_reel_tilemap[0]->draw(screen, bitmap, visible1, 0, 0);
+		m_reel_tilemap[1]->draw(screen, bitmap, visible2, 0, 0);
+		m_reel_tilemap[2]->draw(screen, bitmap, visible3, 0, 0);
 	}
 
 	if (m_enable_reg & 0x04)
@@ -1104,6 +1102,82 @@ uint32_t cmaster_state::screen_update_amcoe1a(screen_device &screen, bitmap_rgb3
 	return 0;
 }
 
+
+TILE_GET_INFO_MEMBER(cmast97_state::get_cmast97_bg_tile_info)
+{
+	int const code = m_bg_vidram[tile_index];
+	int const attr = m_bg_atrram[tile_index];
+
+	tileinfo.set(2,
+			code | (attr & 0x0f) << 8,
+			(attr & 0xf0) >> 4,
+			0);
+}
+
+void cmast97_state::video_start()
+{
+	m_reel_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cmast97_state::get_reel_tile_info<0>)), TILEMAP_SCAN_ROWS, 8,32, 64, 8);
+	m_reel_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cmast97_state::get_reel_tile_info<1>)), TILEMAP_SCAN_ROWS, 8,32, 64, 8);
+	m_reel_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cmast97_state::get_reel_tile_info<2>)), TILEMAP_SCAN_ROWS, 8,32, 64, 8);
+
+	m_reel_tilemap[0]->set_scroll_cols(64);
+	m_reel_tilemap[1]->set_scroll_cols(64);
+	m_reel_tilemap[2]->set_scroll_cols(64);
+
+	m_reel_tilemap[0]->set_transparent_pen(0);
+	m_reel_tilemap[1]->set_transparent_pen(0);
+	m_reel_tilemap[2]->set_transparent_pen(0);
+
+	m_cmaster_girl_num = 0;
+	m_cmaster_girl_pal = 0;
+
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cmast97_state::get_cherrym_fg_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 64, 32);
+	m_fg_tilemap->set_transparent_pen(0);
+	m_fg_tilemap->set_scrolly(0, -16);
+
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(cmast97_state::get_cmast97_bg_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 64, 32);
+}
+
+void cmast97_state::cmast97_palette_init(palette_device &palette) const
+{
+	// TODO: probably wrong
+	uint8_t const *const colours = memregion("proms")->base();
+	for (int i = 0; i < 0x200; i++)
+	{
+		uint8_t const data = colours[i];
+		palette.set_pen_color(i, pal3bit(data >> 0), pal3bit(data >> 3), pal2bit(data >> 6));
+	}
+}
+
+uint32_t cmast97_state::screen_update_cmast97(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(rgb_t::black(), cliprect);
+
+	if (!(m_enable_reg & 0x01))
+		return 0;
+
+	if (m_enable_reg & 0x02)
+		m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	if (m_enable_reg & 0x10)
+	{
+		for (int i = 0; i < 64; i++)
+		{
+			m_reel_tilemap[0]->set_scrolly(i, m_reel_scroll[0][i]);
+			m_reel_tilemap[1]->set_scrolly(i, m_reel_scroll[1][i]);
+			m_reel_tilemap[2]->set_scrolly(i, m_reel_scroll[2][i]);
+		}
+
+		m_reel_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
+		m_reel_tilemap[1]->draw(screen, bitmap, cliprect, 0, 0);
+		m_reel_tilemap[2]->draw(screen, bitmap, cliprect, 0, 0);
+	}
+
+	if (m_enable_reg & 0x08)
+		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	return 0;
+}
 
 
 TILE_GET_INFO_MEMBER(wingco_state::get_magical_fg_tile_info)
@@ -1120,9 +1194,9 @@ TILE_GET_INFO_MEMBER(wingco_state::get_magical_fg_tile_info)
 
 VIDEO_START_MEMBER(wingco_state, bingowng)
 {
-	m_reel1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wingco_state::get_goldstar_reel1_tile_info)), TILEMAP_SCAN_ROWS, 8,32, 64, 8);
+	m_reel_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wingco_state::get_reel_tile_info<0>)), TILEMAP_SCAN_ROWS, 8,32, 64, 8);
 
-	m_reel1_tilemap->set_scroll_cols(64);
+	m_reel_tilemap[0]->set_scroll_cols(64);
 
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wingco_state::get_goldstar_fg_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 64, 32);
 	m_fg_tilemap->set_transparent_pen(0);
@@ -1133,13 +1207,13 @@ VIDEO_START_MEMBER(wingco_state, bingowng)
 
 VIDEO_START_MEMBER(wingco_state, magical)
 {
-	m_reel1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wingco_state::get_goldstar_reel1_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	m_reel2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wingco_state::get_goldstar_reel2_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	m_reel3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wingco_state::get_goldstar_reel3_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wingco_state::get_reel_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wingco_state::get_reel_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wingco_state::get_reel_tile_info<2>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 
-	m_reel1_tilemap->set_scroll_cols(32);
-	m_reel2_tilemap->set_scroll_cols(32);
-	m_reel3_tilemap->set_scroll_cols(32);
+	m_reel_tilemap[0]->set_scroll_cols(32);
+	m_reel_tilemap[1]->set_scroll_cols(32);
+	m_reel_tilemap[2]->set_scroll_cols(32);
 
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(wingco_state::get_magical_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_fg_tilemap->set_transparent_pen(0);
@@ -1160,11 +1234,11 @@ uint32_t wingco_state::screen_update_bingowng(screen_device &screen, bitmap_rgb3
 	{
 		for (int i = 0; i < 64; i++)
 		{
-			m_reel1_tilemap->set_scrolly(i, m_reel1_scroll[i]);
+			m_reel_tilemap[0]->set_scrolly(i, m_reel_scroll[0][i]);
 		}
 
 		rectangle const visible1(0*8, (14+48)*8-1, 3*8, (4+7)*8-1);
-		m_reel1_tilemap->draw(screen, bitmap, visible1, 0, 0);
+		m_reel_tilemap[0]->draw(screen, bitmap, visible1, 0, 0);
 	}
 
 	if (m_enable_reg & 0x04)
@@ -1201,34 +1275,34 @@ uint32_t wingco_state::screen_update_magical(screen_device &screen, bitmap_rgb32
 		{
 			for (int i = 0; i < 32; i++)
 			{
-				m_reel1_tilemap->set_scrolly(i, m_reel1_scroll[i*2]);
-				m_reel2_tilemap->set_scrolly(i, m_reel2_scroll[i*2]);
-			//  m_reel3_tilemap->set_scrolly(i, m_reel3_scroll[i*2]);
+				m_reel_tilemap[0]->set_scrolly(i, m_reel_scroll[0][i*2]);
+				m_reel_tilemap[1]->set_scrolly(i, m_reel_scroll[1][i*2]);
+			//  m_reel_tilemap[2]->set_scrolly(i, m_reel_scroll[2][i*2]);
 			}
 
 			rectangle const visible1alt(0*8, (16+48)*8-1,  4*8,  16*8-1);
 			rectangle const visible2alt(0*8, (16+48)*8-1, 16*8,  28*8-1);
 
-			m_reel1_tilemap->draw(screen, bitmap, visible1alt, 0, 0);
-			m_reel2_tilemap->draw(screen, bitmap, visible2alt, 0, 0);
-			//m_reel3_tilemap->draw(screen, bitmap, &magical_visible3, 0, 0);
+			m_reel_tilemap[0]->draw(screen, bitmap, visible1alt, 0, 0);
+			m_reel_tilemap[1]->draw(screen, bitmap, visible2alt, 0, 0);
+			//m_reel_tilemap[2]->draw(screen, bitmap, &magical_visible3, 0, 0);
 		}
 		else
 		{
 			for (int i = 0; i < 32; i++)
 			{
-				m_reel1_tilemap->set_scrolly(i, m_reel1_scroll[i*2]);
-				m_reel2_tilemap->set_scrolly(i, m_reel2_scroll[i*2]);
-				m_reel3_tilemap->set_scrolly(i, m_reel3_scroll[i*2]);
+				m_reel_tilemap[0]->set_scrolly(i, m_reel_scroll[0][i*2]);
+				m_reel_tilemap[1]->set_scrolly(i, m_reel_scroll[1][i*2]);
+				m_reel_tilemap[2]->set_scrolly(i, m_reel_scroll[2][i*2]);
 			}
 
 			rectangle const visible1(0*8, (14+48)*8-1,  4*8,  (4+8)*8-1);
 			rectangle const visible2(0*8, (14+48)*8-1, 12*8, (12+8)*8-1);
 			rectangle const visible3(0*8, (14+48)*8-1, 20*8, (20+8)*8-1);
 
-			m_reel1_tilemap->draw(screen, bitmap, visible1, 0, 0);
-			m_reel2_tilemap->draw(screen, bitmap, visible2, 0, 0);
-			m_reel3_tilemap->draw(screen, bitmap, visible3, 0, 0);
+			m_reel_tilemap[0]->draw(screen, bitmap, visible1, 0, 0);
+			m_reel_tilemap[1]->draw(screen, bitmap, visible2, 0, 0);
+			m_reel_tilemap[2]->draw(screen, bitmap, visible3, 0, 0);
 		}
 	}
 
@@ -1250,9 +1324,9 @@ uint32_t wingco_state::screen_update_mbstar(screen_device &screen, bitmap_rgb32 
 	{
 		for (int i = 0; i < 64; i++)
 		{
-			m_reel1_tilemap->set_scrolly(i, m_reel1_scroll[i]);
-			m_reel2_tilemap->set_scrolly(i, m_reel2_scroll[i]);
-			m_reel3_tilemap->set_scrolly(i, m_reel3_scroll[i]);
+			m_reel_tilemap[0]->set_scrolly(i, m_reel_scroll[0][i]);
+			m_reel_tilemap[1]->set_scrolly(i, m_reel_scroll[1][i]);
+			m_reel_tilemap[2]->set_scrolly(i, m_reel_scroll[2][i]);
 		}
 
 		// are these hardcoded, or registers?
@@ -1260,9 +1334,9 @@ uint32_t wingco_state::screen_update_mbstar(screen_device &screen, bitmap_rgb32 
 		const rectangle visible2(0*8, (14+48)*8-1, 14*8, 32*8-1);  // seems to be the one used...
 		//const rectangle visible3(0*8, (14+48)*8-1,  4*8,  (4+7)*8-1);
 
-//      m_reel1_tilemap->draw(screen, bitmap, visible1, 0, 0);
-		m_reel2_tilemap->draw(screen, bitmap, visible2, 0, 0);
-//      m_reel3_tilemap->draw(screen, bitmap, visible3, 0, 0);
+//      m_reel_tilemap[0]->draw(screen, bitmap, visible1, 0, 0);
+		m_reel_tilemap[1]->draw(screen, bitmap, visible2, 0, 0);
+//      m_reel_tilemap[2]->draw(screen, bitmap, visible3, 0, 0);
 	}
 
 	if (m_enable_reg & 0x02)
@@ -1272,22 +1346,11 @@ uint32_t wingco_state::screen_update_mbstar(screen_device &screen, bitmap_rgb32 
 }
 
 
-void sanghopm_state::reel1_attrram_w(offs_t offset, uint8_t data)
+template <uint8_t Which>
+void sanghopm_state::reel_attrram_w(offs_t offset, uint8_t data)
 {
-	m_reel1_attrram[offset] = data;
-	m_reel1_tilemap->mark_tile_dirty(offset);
-}
-
-void sanghopm_state::reel2_attrram_w(offs_t offset, uint8_t data)
-{
-	m_reel2_attrram[offset] = data;
-	m_reel2_tilemap->mark_tile_dirty(offset);
-}
-
-void sanghopm_state::reel3_attrram_w(offs_t offset, uint8_t data)
-{
-	m_reel3_attrram[offset] = data;
-	m_reel3_tilemap->mark_tile_dirty(offset);
+	m_reel_attrram[Which][offset] = data;
+	m_reel_tilemap[Which]->mark_tile_dirty(offset);
 }
 
 
@@ -1313,32 +1376,11 @@ TILE_GET_INFO_MEMBER(sanghopm_state::get_bg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(sanghopm_state::get_reel1_tile_info)
+template <uint8_t Which>
+TILE_GET_INFO_MEMBER(sanghopm_state::get_reel_tile_info)
 {
-	int const code = m_reel1_ram[tile_index];
-	int const attr = m_reel1_attrram[tile_index];
-
-	tileinfo.set(1,
-			code | (attr & 0x0f) << 8,
-			(attr & 0x70) >> 4,
-			0);
-}
-
-TILE_GET_INFO_MEMBER(sanghopm_state::get_reel2_tile_info)
-{
-	int const code = m_reel2_ram[tile_index];
-	int const attr = m_reel2_attrram[tile_index];
-
-	tileinfo.set(1,
-			code | (attr & 0x0f) << 8,
-			(attr & 0x70) >> 4,
-			0);
-}
-
-TILE_GET_INFO_MEMBER(sanghopm_state::get_reel3_tile_info)
-{
-	int const code = m_reel3_ram[tile_index];
-	int const attr = m_reel3_attrram[tile_index];
+	int const code = m_reel_ram[Which][tile_index];
+	int const attr = m_reel_attrram[Which][tile_index];
 
 	tileinfo.set(1,
 			code | (attr & 0x0f) << 8,
@@ -1347,17 +1389,17 @@ TILE_GET_INFO_MEMBER(sanghopm_state::get_reel3_tile_info)
 }
 
 
-VIDEO_START_MEMBER(sanghopm_state, sangho)
+void sanghopm_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sanghopm_state::get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 
-	m_reel1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sanghopm_state::get_reel1_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	m_reel2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sanghopm_state::get_reel2_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	m_reel3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sanghopm_state::get_reel3_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sanghopm_state::get_reel_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sanghopm_state::get_reel_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sanghopm_state::get_reel_tile_info<2>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 
-	m_reel1_tilemap->set_scroll_cols(64);
-	m_reel2_tilemap->set_scroll_cols(64);
-	m_reel3_tilemap->set_scroll_cols(64);
+	m_reel_tilemap[0]->set_scroll_cols(64);
+	m_reel_tilemap[1]->set_scroll_cols(64);
+	m_reel_tilemap[2]->set_scroll_cols(64);
 
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sanghopm_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_fg_tilemap->set_transparent_pen(0);
@@ -1376,9 +1418,9 @@ uint32_t sanghopm_state::screen_update_sangho(screen_device &screen, bitmap_rgb3
 	{
 		for (int i = 0; i < 64; i++)
 		{
-			m_reel1_tilemap->set_scrolly(i, m_reel1_scroll[i]);
-			m_reel2_tilemap->set_scrolly(i, m_reel2_scroll[i]);
-			m_reel3_tilemap->set_scrolly(i, m_reel3_scroll[i]);
+			m_reel_tilemap[0]->set_scrolly(i, m_reel_scroll[0][i]);
+			m_reel_tilemap[1]->set_scrolly(i, m_reel_scroll[1][i]);
+			m_reel_tilemap[2]->set_scrolly(i, m_reel_scroll[2][i]);
 		}
 
 		// are these hardcoded, or registers?
@@ -1386,9 +1428,9 @@ uint32_t sanghopm_state::screen_update_sangho(screen_device &screen, bitmap_rgb3
 		rectangle const visible2(0*8, (15+48)*8-1, 12*8, (12+7)*8-1);
 		rectangle const visible3(0*8, (15+48)*8-1, 20*8, (20+7)*8-1);
 
-		m_reel1_tilemap->draw(screen, bitmap, visible1, 0, 0);
-		m_reel2_tilemap->draw(screen, bitmap, visible2, 0, 0);
-		m_reel3_tilemap->draw(screen, bitmap, visible3, 0, 0);
+		m_reel_tilemap[0]->draw(screen, bitmap, visible1, 0, 0);
+		m_reel_tilemap[1]->draw(screen, bitmap, visible2, 0, 0);
+		m_reel_tilemap[2]->draw(screen, bitmap, visible3, 0, 0);
 	}
 
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -1397,51 +1439,18 @@ uint32_t sanghopm_state::screen_update_sangho(screen_device &screen, bitmap_rgb3
 }
 
 
-void unkch_state::reel1_attrram_w(offs_t offset, uint8_t data)
+template <uint8_t Which>
+void unkch_state::reel_attrram_w(offs_t offset, uint8_t data)
 {
-	m_reel1_attrram[offset] = data;
-	m_reel1_tilemap->mark_tile_dirty(offset);
+	m_reel_attrram[Which][offset] = data;
+	m_reel_tilemap[Which]->mark_tile_dirty(offset);
 }
 
-void unkch_state::reel2_attrram_w(offs_t offset, uint8_t data)
+template <uint8_t Which>
+TILE_GET_INFO_MEMBER(unkch_state::get_reel_tile_info)
 {
-	m_reel2_attrram[offset] = data;
-	m_reel2_tilemap->mark_tile_dirty(offset);
-}
-
-void unkch_state::reel3_attrram_w(offs_t offset, uint8_t data)
-{
-	m_reel3_attrram[offset] = data;
-	m_reel3_tilemap->mark_tile_dirty(offset);
-}
-
-
-TILE_GET_INFO_MEMBER(unkch_state::get_reel1_tile_info)
-{
-	int const code = m_reel1_ram[tile_index];
-	int const attr = m_reel1_attrram[tile_index];
-
-	tileinfo.set(1,
-			code | (attr & 0x0f) << 8,
-			(attr & 0xf0) >> 4,
-			0);
-}
-
-TILE_GET_INFO_MEMBER(unkch_state::get_reel2_tile_info)
-{
-	int const code = m_reel2_ram[tile_index];
-	int const attr = m_reel2_attrram[tile_index];
-
-	tileinfo.set(1,
-			code | (attr & 0x0f) << 8,
-			(attr & 0xf0) >> 4,
-			0);
-}
-
-TILE_GET_INFO_MEMBER(unkch_state::get_reel3_tile_info)
-{
-	int const code = m_reel3_ram[tile_index];
-	int const attr = m_reel3_attrram[tile_index];
+	int const code = m_reel_ram[Which][tile_index];
+	int const attr = m_reel_attrram[Which][tile_index];
 
 	tileinfo.set(1,
 			code | (attr & 0x0f) << 8,
@@ -1450,15 +1459,15 @@ TILE_GET_INFO_MEMBER(unkch_state::get_reel3_tile_info)
 }
 
 
-VIDEO_START_MEMBER(unkch_state, unkch)
+void unkch_state::video_start()
 {
-	m_reel1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(unkch_state::get_reel1_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	m_reel2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(unkch_state::get_reel2_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
-	m_reel3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(unkch_state::get_reel3_tile_info)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(unkch_state::get_reel_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(unkch_state::get_reel_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
+	m_reel_tilemap[2] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(unkch_state::get_reel_tile_info<2>)), TILEMAP_SCAN_ROWS, 8, 32, 64, 8);
 
-	m_reel1_tilemap->set_scroll_cols(32);
-	m_reel2_tilemap->set_scroll_cols(32);
-	m_reel3_tilemap->set_scroll_cols(32);
+	m_reel_tilemap[0]->set_scroll_cols(32);
+	m_reel_tilemap[1]->set_scroll_cols(32);
+	m_reel_tilemap[2]->set_scroll_cols(32);
 
 	m_cmaster_girl_num = 0;
 	m_cmaster_girl_pal = 0;
@@ -1485,12 +1494,12 @@ uint32_t unkch_state::screen_update_unkch(screen_device &screen, bitmap_rgb32 &b
 		{
 			for (int i = 0; i < 32; i++)
 			{
-				m_reel1_tilemap->set_scrolly(i, -0x08 /*m_reel1_scroll[(i*2)+1]*/ );
-			//  m_reel2_tilemap->set_scrolly(i, m_reel2_scroll[(i*2)+1]);
-			//  m_reel3_tilemap->set_scrolly(i, m_reel3_scroll[(i*2)+1]);
+				m_reel_tilemap[0]->set_scrolly(i, -0x08 /*m_reel_scroll[0][(i*2)+1]*/ );
+			//  m_reel_tilemap[1]->set_scrolly(i, m_reel_scroll[1][(i*2)+1]);
+			//  m_reel_tilemap[2]->set_scrolly(i, m_reel_scroll[2][(i*2)+1]);
 			}
 
-			m_reel1_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+			m_reel_tilemap[0]->draw(screen, bitmap, cliprect, 0, 0);
 
 		}
 		// or draw the reels normally?
@@ -1498,18 +1507,18 @@ uint32_t unkch_state::screen_update_unkch(screen_device &screen, bitmap_rgb32 &b
 		{
 			for (int i= 0; i < 32; i++)
 			{
-				m_reel1_tilemap->set_scrolly(i, m_reel1_scroll[i*2]);
-				m_reel2_tilemap->set_scrolly(i, m_reel2_scroll[i*2]);
-				m_reel3_tilemap->set_scrolly(i, m_reel3_scroll[i*2]);
+				m_reel_tilemap[0]->set_scrolly(i, m_reel_scroll[0][i*2]);
+				m_reel_tilemap[1]->set_scrolly(i, m_reel_scroll[1][i*2]);
+				m_reel_tilemap[2]->set_scrolly(i, m_reel_scroll[2][i*2]);
 			}
 
 			const rectangle visible1(0*8, (14+48)*8-1,  3*8,  (3+7)*8-1);
 			const rectangle visible2(0*8, (14+48)*8-1, 10*8, (10+7)*8-1);
 			const rectangle visible3(0*8, (14+48)*8-1, 17*8, (17+7)*8-1);
 
-			m_reel1_tilemap->draw(screen, bitmap, visible1, 0, 0);
-			m_reel2_tilemap->draw(screen, bitmap, visible2, 0, 0);
-			m_reel3_tilemap->draw(screen, bitmap, visible3, 0, 0);
+			m_reel_tilemap[0]->draw(screen, bitmap, visible1, 0, 0);
+			m_reel_tilemap[1]->draw(screen, bitmap, visible2, 0, 0);
+			m_reel_tilemap[2]->draw(screen, bitmap, visible3, 0, 0);
 		}
 	}
 
@@ -1646,14 +1655,14 @@ void goldstar_state::goldstar_map(address_map &map)
 	map(0x0000, 0xb7ff).rom();
 	map(0xb800, 0xbfff).ram().share("nvram");
 	map(0xc000, 0xc7ff).rom();
-	map(0xc800, 0xcfff).ram().w(FUNC(goldstar_state::fg_vidram_w)).share("fg_vidram");
-	map(0xd000, 0xd7ff).ram().w(FUNC(goldstar_state::fg_atrram_w)).share("fg_atrram");
-	map(0xd800, 0xd9ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
-	map(0xe000, 0xe1ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
-	map(0xe800, 0xe9ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
-	map(0xf040, 0xf07f).ram().share("reel1_scroll");
-	map(0xf080, 0xf0bf).ram().share("reel2_scroll");
-	map(0xf0c0, 0xf0ff).ram().share("reel3_scroll");
+	map(0xc800, 0xcfff).ram().w(FUNC(goldstar_state::fg_vidram_w)).share(m_fg_vidram);
+	map(0xd000, 0xd7ff).ram().w(FUNC(goldstar_state::fg_atrram_w)).share(m_fg_atrram);
+	map(0xd800, 0xd9ff).ram().w(FUNC(goldstar_state::reel_ram_w<0>)).share(m_reel_ram[0]);
+	map(0xe000, 0xe1ff).ram().w(FUNC(goldstar_state::reel_ram_w<1>)).share(m_reel_ram[1]);
+	map(0xe800, 0xe9ff).ram().w(FUNC(goldstar_state::reel_ram_w<2>)).share(m_reel_ram[2]);
+	map(0xf040, 0xf07f).ram().share(m_reel_scroll[0]);
+	map(0xf080, 0xf0bf).ram().share(m_reel_scroll[1]);
+	map(0xf0c0, 0xf0ff).ram().share(m_reel_scroll[2]);
 
 	map(0xf800, 0xf800).portr("IN0");
 	map(0xf801, 0xf801).portr("IN1");    // Test Mode
@@ -1685,14 +1694,14 @@ void goldstar_state::super9_map(address_map &map)
 	map(0x0000, 0xb7ff).rom();
 	map(0xb800, 0xbfff).ram().share("nvram");
 	map(0xc000, 0xc7ff).rom();
-	map(0xc800, 0xcfff).ram().w(FUNC(goldstar_state::fg_vidram_w)).share("fg_vidram");
-	map(0xd000, 0xd7ff).ram().w(FUNC(goldstar_state::fg_atrram_w)).share("fg_atrram");
-	map(0xd800, 0xd9ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
-	map(0xe000, 0xe1ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
-	map(0xe800, 0xe9ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
-	map(0xf040, 0xf07f).ram().share("reel1_scroll");
-	map(0xf080, 0xf0bf).ram().share("reel2_scroll");
-	map(0xf0c0, 0xf0ff).ram().share("reel3_scroll");
+	map(0xc800, 0xcfff).ram().w(FUNC(goldstar_state::fg_vidram_w)).share(m_fg_vidram);
+	map(0xd000, 0xd7ff).ram().w(FUNC(goldstar_state::fg_atrram_w)).share(m_fg_atrram);
+	map(0xd800, 0xd9ff).ram().w(FUNC(goldstar_state::reel_ram_w<0>)).share(m_reel_ram[0]);
+	map(0xe000, 0xe1ff).ram().w(FUNC(goldstar_state::reel_ram_w<1>)).share(m_reel_ram[1]);
+	map(0xe800, 0xe9ff).ram().w(FUNC(goldstar_state::reel_ram_w<2>)).share(m_reel_ram[2]);
+	map(0xf040, 0xf07f).ram().share(m_reel_scroll[0]);
+	map(0xf080, 0xf0bf).ram().share(m_reel_scroll[1]);
+	map(0xf0c0, 0xf0ff).ram().share(m_reel_scroll[2]);
 
 	map(0xf800, 0xf800).portr("IN1");
 	map(0xf801, 0xf801).portr("IN2");    // Test Mode
@@ -1718,27 +1727,27 @@ void sanghopm_state::star100_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 
-	map(0xc800, 0xcfff).ram().w(FUNC(sanghopm_state::fg_vidram_w)).share("fg_vidram");    // videoram 1
-	map(0xd000, 0xd7ff).ram().w(FUNC(sanghopm_state::fg_atrram_w)).share("fg_atrram");    // atrram 1
+	map(0xc800, 0xcfff).ram().w(FUNC(sanghopm_state::fg_vidram_w)).share(m_fg_vidram);    // videoram 1
+	map(0xd000, 0xd7ff).ram().w(FUNC(sanghopm_state::fg_atrram_w)).share(m_fg_atrram);    // atrram 1
 
-	map(0xd800, 0xd83f).ram().share("reel1_scroll");
+	map(0xd800, 0xd83f).ram().share(m_reel_scroll[0]);
 	map(0xd840, 0xd9ff).ram();
-	map(0xda00, 0xda3f).ram().share("reel2_scroll");
+	map(0xda00, 0xda3f).ram().share(m_reel_scroll[1]);
 	map(0xda40, 0xdbff).ram();
-	map(0xdc00, 0xdc3f).ram().share("reel3_scroll");
+	map(0xdc00, 0xdc3f).ram().share(m_reel_scroll[2]);
 	map(0xdc40, 0xdfff).ram();
 
-	map(0xe000, 0xe1ff).ram().w(FUNC(sanghopm_state::goldstar_reel1_ram_w)).share("reel1_ram");
-	map(0xe200, 0xe3ff).ram().w(FUNC(sanghopm_state::goldstar_reel2_ram_w)).share("reel2_ram");
-	map(0xe400, 0xe5ff).ram().w(FUNC(sanghopm_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xe000, 0xe1ff).ram().w(FUNC(sanghopm_state::reel_ram_w<0>)).share(m_reel_ram[0]);
+	map(0xe200, 0xe3ff).ram().w(FUNC(sanghopm_state::reel_ram_w<1>)).share(m_reel_ram[1]);
+	map(0xe400, 0xe5ff).ram().w(FUNC(sanghopm_state::reel_ram_w<2>)).share(m_reel_ram[2]);
 
-	map(0xe600, 0xe7ff).ram().w(FUNC(sanghopm_state::bg_vidram_w)).share("bg_vidram");    // videoram 2
+	map(0xe600, 0xe7ff).ram().w(FUNC(sanghopm_state::bg_vidram_w)).share(m_bg_vidram);    // videoram 2
 
-	map(0xe800, 0xe9ff).ram().w(FUNC(sanghopm_state::reel1_attrram_w)).share("reel1_attrram");
-	map(0xea00, 0xebff).ram().w(FUNC(sanghopm_state::reel2_attrram_w)).share("reel2_attrram");
-	map(0xec00, 0xedff).ram().w(FUNC(sanghopm_state::reel3_attrram_w)).share("reel3_attrram");
+	map(0xe800, 0xe9ff).ram().w(FUNC(sanghopm_state::reel_attrram_w<0>)).share(m_reel_attrram[0]);
+	map(0xea00, 0xebff).ram().w(FUNC(sanghopm_state::reel_attrram_w<1>)).share(m_reel_attrram[1]);
+	map(0xec00, 0xedff).ram().w(FUNC(sanghopm_state::reel_attrram_w<2>)).share(m_reel_attrram[2]);
 
-	map(0xee00, 0xefff).ram().w(FUNC(sanghopm_state::bg_atrram_w)).share("bg_atrram");    // atrram 2
+	map(0xee00, 0xefff).ram().w(FUNC(sanghopm_state::bg_atrram_w)).share(m_bg_atrram);    // atrram 2
 
 	map(0xf000, 0xf7ff).ram().share("nvram");
 	map(0xf800, 0xffff).ram();
@@ -1831,7 +1840,7 @@ void sanghopm_state::star100_readport(address_map &map)
 
 */
 
-void goldstar_state::ramdac_map(address_map &map)
+void sanghopm_state::ramdac_map(address_map &map)
 {
 	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
 }
@@ -1943,7 +1952,7 @@ void goldstar_state::ramdac_map(address_map &map)
 */
 
 
-void goldstar_state::ncb3_port81_w(uint8_t data)
+void cb3_state::ncb3_port81_w(uint8_t data)
 {
 //  if (data!=0x00)
 //      popmessage("ncb3_port81_w %02x\n",data);
@@ -1955,14 +1964,14 @@ void cb3_state::ncb3_map(address_map &map)
 	map(0x0000, 0xb7ff).rom();
 	map(0xb800, 0xbfff).ram().share("nvram");
 	map(0xc000, 0xc7ff).rom();
-	map(0xc800, 0xcfff).ram().w(FUNC(cb3_state::fg_vidram_w)).share("fg_vidram");
-	map(0xd000, 0xd7ff).ram().w(FUNC(cb3_state::fg_atrram_w)).share("fg_atrram");
-	map(0xd800, 0xd9ff).ram().w(FUNC(cb3_state::goldstar_reel1_ram_w)).share("reel1_ram");
-	map(0xe000, 0xe1ff).ram().w(FUNC(cb3_state::goldstar_reel2_ram_w)).share("reel2_ram");
-	map(0xe800, 0xe9ff).ram().w(FUNC(cb3_state::goldstar_reel3_ram_w)).share("reel3_ram");
-	map(0xf040, 0xf07f).ram().share("reel1_scroll");
-	map(0xf080, 0xf0bf).ram().share("reel2_scroll");
-	map(0xf100, 0xf17f).ram().share("reel3_scroll"); // moved compared to goldstar
+	map(0xc800, 0xcfff).ram().w(FUNC(cb3_state::fg_vidram_w)).share(m_fg_vidram);
+	map(0xd000, 0xd7ff).ram().w(FUNC(cb3_state::fg_atrram_w)).share(m_fg_atrram);
+	map(0xd800, 0xd9ff).ram().w(FUNC(cb3_state::reel_ram_w<0>)).share(m_reel_ram[0]);
+	map(0xe000, 0xe1ff).ram().w(FUNC(cb3_state::reel_ram_w<1>)).share(m_reel_ram[1]);
+	map(0xe800, 0xe9ff).ram().w(FUNC(cb3_state::reel_ram_w<2>)).share(m_reel_ram[2]);
+	map(0xf040, 0xf07f).ram().share(m_reel_scroll[0]);
+	map(0xf080, 0xf0bf).ram().share(m_reel_scroll[1]);
+	map(0xf100, 0xf17f).ram().share(m_reel_scroll[2]); // moved compared to goldstar
 
 	map(0xf800, 0xf803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Input Ports
 	map(0xf810, 0xf813).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Input Ports
@@ -1980,14 +1989,14 @@ void cb3_state::chryangla_map(address_map &map) // most to be verified when the 
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xc7ff).ram().share("nvram");
-	map(0xc800, 0xcfff).ram().w(FUNC(cb3_state::fg_vidram_w)).share("fg_vidram");
-	map(0xd000, 0xd7ff).ram().w(FUNC(cb3_state::fg_atrram_w)).share("fg_atrram");
-	map(0xd800, 0xd9ff).ram().w(FUNC(cb3_state::goldstar_reel1_ram_w)).share("reel1_ram");
-	map(0xe000, 0xe1ff).ram().w(FUNC(cb3_state::goldstar_reel2_ram_w)).share("reel2_ram");
-	map(0xe800, 0xe9ff).ram().w(FUNC(cb3_state::goldstar_reel3_ram_w)).share("reel3_ram");
-	map(0xf040, 0xf07f).ram().share("reel1_scroll");
-	map(0xf080, 0xf0bf).ram().share("reel2_scroll");
-	map(0xf100, 0xf17f).ram().share("reel3_scroll"); // moved compared to goldstar
+	map(0xc800, 0xcfff).ram().w(FUNC(cb3_state::fg_vidram_w)).share(m_fg_vidram);
+	map(0xd000, 0xd7ff).ram().w(FUNC(cb3_state::fg_atrram_w)).share(m_fg_atrram);
+	map(0xd800, 0xd9ff).ram().w(FUNC(cb3_state::reel_ram_w<0>)).share(m_reel_ram[0]);
+	map(0xe000, 0xe1ff).ram().w(FUNC(cb3_state::reel_ram_w<1>)).share(m_reel_ram[1]);
+	map(0xe800, 0xe9ff).ram().w(FUNC(cb3_state::reel_ram_w<2>)).share(m_reel_ram[2]);
+	map(0xf040, 0xf07f).ram().share(m_reel_scroll[0]);
+	map(0xf080, 0xf0bf).ram().share(m_reel_scroll[1]);
+	map(0xf100, 0xf17f).ram().share(m_reel_scroll[2]); // moved compared to goldstar
 
 	map(0xf800, 0xf803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Input Ports
 	map(0xf810, 0xf813).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Input Ports
@@ -2003,19 +2012,19 @@ void cb3_state::chryangla_map(address_map &map) // most to be verified when the 
 
 void cb3_state::chryangla_decrypted_opcodes_map(address_map &map)
 {
-	map(0x0000, 0xffff).rom().share("decrypted_opcodes");
+	map(0x0000, 0xffff).rom().share(m_decrypted_opcodes);
 	map(0xf800, 0xffff).ram();
 }
 
-void goldstar_state::ncb3_readwriteport(address_map &map)
+void cb3_state::ncb3_readwriteport(address_map &map)
 {
 	map.global_mask(0xff);
-//  map(0x00, 0x00).r(FUNC(goldstar_state::ncb3_unkread_r));    // read from 0x00 when controls set 1 is used...
-//  map(0x02, 0x02).r(FUNC(goldstar_state::ncb3_unkread_r));    // read from 0x02 when controls set 2 is used...
-//  map(0x06, 0x06).r(FUNC(goldstar_state::ncb3_unkread_r));    // unknown...
-//  map(0x08, 0x08).r(FUNC(goldstar_state::ncb3_unkread_r));    // unknown...
+//  map(0x00, 0x00).r(FUNC(cb3_state::ncb3_unkread_r));    // read from 0x00 when controls set 1 is used...
+//  map(0x02, 0x02).r(FUNC(cb3_state::ncb3_unkread_r));    // read from 0x02 when controls set 2 is used...
+//  map(0x06, 0x06).r(FUNC(cb3_state::ncb3_unkread_r));    // unknown...
+//  map(0x08, 0x08).r(FUNC(cb3_state::ncb3_unkread_r));    // unknown...
 	map(0x10, 0x10).portr("DSW5");  // confirmed for ncb3
-	map(0x81, 0x81).w(FUNC(goldstar_state::ncb3_port81_w));  // ---> large writes.
+	map(0x81, 0x81).w(FUNC(cb3_state::ncb3_port81_w));  // ---> large writes.
 
 }
 
@@ -2057,14 +2066,14 @@ void goldstar_state::wcherry_map(address_map &map)
 	map(0xc000, 0xc7ff).rom();
 
 	// Video RAM and reels stuff are there just as placeholder, and obviously in wrong offset
-	map(0xc800, 0xcfff).ram().w(FUNC(goldstar_state::fg_vidram_w)).share("fg_vidram");
-	map(0xd000, 0xd7ff).ram().w(FUNC(goldstar_state::fg_atrram_w)).share("fg_atrram");
-	map(0xd800, 0xd9ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
-	map(0xe000, 0xe1ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
-	map(0xe800, 0xe9ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
-	map(0xf040, 0xf07f).ram().share("reel1_scroll");
-	map(0xf080, 0xf0bf).ram().share("reel2_scroll");
-	map(0xf0c0, 0xf0ff).ram().share("reel3_scroll");
+	map(0xc800, 0xcfff).ram().w(FUNC(goldstar_state::fg_vidram_w)).share(m_fg_vidram);
+	map(0xd000, 0xd7ff).ram().w(FUNC(goldstar_state::fg_atrram_w)).share(m_fg_atrram);
+	map(0xd800, 0xd9ff).ram().w(FUNC(goldstar_state::reel_ram_w<0>)).share(m_reel_ram[0]);
+	map(0xe000, 0xe1ff).ram().w(FUNC(goldstar_state::reel_ram_w<1>)).share(m_reel_ram[1]);
+	map(0xe800, 0xe9ff).ram().w(FUNC(goldstar_state::reel_ram_w<2>)).share(m_reel_ram[2]);
+	map(0xf040, 0xf07f).ram().share(m_reel_scroll[0]);
+	map(0xf080, 0xf0bf).ram().share(m_reel_scroll[1]);
+	map(0xf0c0, 0xf0ff).ram().share(m_reel_scroll[2]);
 
 	// Not really PPI's... They are emulated/simulated inside the CPLDs
 	map(0xf600, 0xf603).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Input Ports
@@ -2105,73 +2114,73 @@ void goldstar_state::wcherry_readwriteport(address_map &map)
 */
 
 
-void goldstar_state::cm_map(address_map &map)
+void cmaster_state::cm_map(address_map &map)
 {
 	map(0x0000, 0xcfff).rom().nopw();
 
 	map(0xd000, 0xd7ff).ram().share("nvram");
 	map(0xd800, 0xdfff).ram();
 
-	map(0xe000, 0xe7ff).ram().w(FUNC(goldstar_state::fg_vidram_w)).share("fg_vidram");
-	map(0xe800, 0xefff).ram().w(FUNC(goldstar_state::fg_atrram_w)).share("fg_atrram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(cmaster_state::fg_vidram_w)).share(m_fg_vidram);
+	map(0xe800, 0xefff).ram().w(FUNC(cmaster_state::fg_atrram_w)).share(m_fg_atrram);
 
-	map(0xf000, 0xf1ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
-	map(0xf200, 0xf3ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
-	map(0xf400, 0xf5ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xf000, 0xf1ff).ram().w(FUNC(cmaster_state::reel_ram_w<0>)).share(m_reel_ram[0]);
+	map(0xf200, 0xf3ff).ram().w(FUNC(cmaster_state::reel_ram_w<1>)).share(m_reel_ram[1]);
+	map(0xf400, 0xf5ff).ram().w(FUNC(cmaster_state::reel_ram_w<2>)).share(m_reel_ram[2]);
 	map(0xf600, 0xf7ff).ram();
 
-	map(0xf800, 0xf87f).ram().share("reel1_scroll");
+	map(0xf800, 0xf87f).ram().share(m_reel_scroll[0]);
 	map(0xf880, 0xf9ff).ram();
-	map(0xfa00, 0xfa7f).ram().share("reel2_scroll");
+	map(0xfa00, 0xfa7f).ram().share(m_reel_scroll[1]);
 	map(0xfa80, 0xfbff).ram();
-	map(0xfc00, 0xfc7f).ram().share("reel3_scroll");
+	map(0xfc00, 0xfc7f).ram().share(m_reel_scroll[2]);
 	map(0xfc80, 0xffff).ram();
 }
 
-void goldstar_state::super7_map(address_map &map)
+void cmaster_state::super7_map(address_map &map)
 {
 	map(0x0000, 0xcfff).rom().nopw();
 
 	map(0xd000, 0xdfff).ram().share("nvram"); // double the size if compared to cmaster
 
-	map(0xe000, 0xe7ff).ram().w(FUNC(goldstar_state::fg_vidram_w)).share("fg_vidram");
-	map(0xe800, 0xefff).ram().w(FUNC(goldstar_state::fg_atrram_w)).share("fg_atrram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(cmaster_state::fg_vidram_w)).share(m_fg_vidram);
+	map(0xe800, 0xefff).ram().w(FUNC(cmaster_state::fg_atrram_w)).share(m_fg_atrram);
 
-	map(0xf000, 0xf1ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
-	map(0xf200, 0xf3ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
-	map(0xf400, 0xf5ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xf000, 0xf1ff).ram().w(FUNC(cmaster_state::reel_ram_w<0>)).share(m_reel_ram[0]);
+	map(0xf200, 0xf3ff).ram().w(FUNC(cmaster_state::reel_ram_w<1>)).share(m_reel_ram[1]);
+	map(0xf400, 0xf5ff).ram().w(FUNC(cmaster_state::reel_ram_w<2>)).share(m_reel_ram[2]);
 	map(0xf600, 0xf7ff).ram();
 
-	map(0xf800, 0xf87f).ram().share("reel1_scroll");
+	map(0xf800, 0xf87f).ram().share(m_reel_scroll[0]);
 	map(0xf880, 0xf9ff).ram();
-	map(0xfa00, 0xfa7f).ram().share("reel2_scroll");
+	map(0xfa00, 0xfa7f).ram().share(m_reel_scroll[1]);
 	map(0xfa80, 0xfbff).ram();
-	map(0xfc00, 0xfc7f).ram().share("reel3_scroll");
+	map(0xfc00, 0xfc7f).ram().share(m_reel_scroll[2]);
 	map(0xfc80, 0xffff).ram();
 }
 
-void goldstar_state::jkrmast_map(address_map &map)
+void cmaster_state::jkrmast_map(address_map &map)
 {
 	map(0x0000, 0xcfff).rom().nopw();
 
 	map(0xd000, 0xd7ff).ram().share("nvram");
 	map(0xd800, 0xdfff).ram();
 
-	map(0xe000, 0xe7ff).ram().w(FUNC(goldstar_state::fg_vidram_w)).share("fg_vidram");
-	map(0xe800, 0xefff).ram().w(FUNC(goldstar_state::fg_atrram_w)).share("fg_atrram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(cmaster_state::fg_vidram_w)).share(m_fg_vidram);
+	map(0xe800, 0xefff).ram().w(FUNC(cmaster_state::fg_atrram_w)).share(m_fg_atrram);
 
-	map(0xf000, 0xf1ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
-	map(0xf200, 0xf3ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
-	map(0xf400, 0xf5ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
-	map(0xf600, 0xf7ff).ram().w(FUNC(goldstar_state::bg_vidram_w)).share("bg_vidram");
+	map(0xf000, 0xf1ff).ram().w(FUNC(cmaster_state::reel_ram_w<0>)).share(m_reel_ram[0]);
+	map(0xf200, 0xf3ff).ram().w(FUNC(cmaster_state::reel_ram_w<1>)).share(m_reel_ram[1]);
+	map(0xf400, 0xf5ff).ram().w(FUNC(cmaster_state::reel_ram_w<2>)).share(m_reel_ram[2]);
+	map(0xf600, 0xf7ff).ram().w(FUNC(cmaster_state::bg_vidram_w)).share(m_bg_vidram);
 
-	map(0xf800, 0xf87f).ram().share("reel1_scroll");
+	map(0xf800, 0xf87f).ram().share(m_reel_scroll[0]);
 	map(0xf880, 0xf9ff).ram();
-	map(0xfa00, 0xfa7f).ram().share("reel2_scroll");
+	map(0xfa00, 0xfa7f).ram().share(m_reel_scroll[1]);
 	map(0xfa80, 0xfbff).ram();
-	map(0xfc00, 0xfc7f).ram().share("reel3_scroll");
+	map(0xfc00, 0xfc7f).ram().share(m_reel_scroll[2]);
 	map(0xfc80, 0xfdff).ram();
-	map(0xfe00, 0xffff).ram().share("bg_scroll");
+	map(0xfe00, 0xffff).ram().share(m_bg_scroll);
 }
 
 void cmaster_state::cmast92_map(address_map &map)
@@ -2183,37 +2192,64 @@ void cmaster_state::cmast92_map(address_map &map)
 	// TODO: the following ranges are here only to avoid MAME crashing,
 	// should be removed and the newer GFX hardware should be emulated.
 
-	map(0xd000, 0xd7ff).ram().w(FUNC(goldstar_state::fg_vidram_w)).share("fg_vidram");
-	map(0xd800, 0xdfff).ram().w(FUNC(goldstar_state::fg_atrram_w)).share("fg_atrram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(cmaster_state::fg_vidram_w)).share(m_fg_vidram);
+	map(0xd800, 0xdfff).ram().w(FUNC(cmaster_state::fg_atrram_w)).share(m_fg_atrram);
 
-	map(0xf000, 0xf1ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
-	map(0xf200, 0xf3ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
-	map(0xf400, 0xf5ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xf000, 0xf1ff).ram().w(FUNC(cmaster_state::reel_ram_w<0>)).share(m_reel_ram[0]);
+	map(0xf200, 0xf3ff).ram().w(FUNC(cmaster_state::reel_ram_w<1>)).share(m_reel_ram[1]);
+	map(0xf400, 0xf5ff).ram().w(FUNC(cmaster_state::reel_ram_w<2>)).share(m_reel_ram[2]);
 
-	map(0xf800, 0xf87f).ram().share("reel1_scroll");
-	map(0xfa00, 0xfa7f).ram().share("reel2_scroll");
-	map(0xfc00, 0xfc7f).ram().share("reel3_scroll");
+	map(0xf800, 0xf87f).ram().share(m_reel_scroll[0]);
+	map(0xfa00, 0xfa7f).ram().share(m_reel_scroll[1]);
+	map(0xfc00, 0xfc7f).ram().share(m_reel_scroll[2]);
 }
 
-void goldstar_state::nfm_map(address_map &map)
+void cmast97_state::cmast97_map(address_map &map)
+{
+	map(0x0000, 0xcfff).rom().nopw();
+
+	map(0xd000, 0xd7ff).ram().share("nvram");
+	map(0xd800, 0xdfff).ram();
+
+	map(0xe000, 0xe7ff).ram().w(FUNC(cmast97_state::fg_vidram_w)).share(m_fg_vidram);
+	map(0xe800, 0xefff).ram().w(FUNC(cmast97_state::fg_atrram_w)).share(m_fg_atrram);
+
+	map(0xf000, 0xffff).view(m_gfx_view);
+	m_gfx_view[0](0xf000, 0xf7ff).ram().w(FUNC(cmast97_state::bg_vidram_w)).share(m_bg_vidram);
+	m_gfx_view[0](0xf800, 0xffff).ram().w(FUNC(cmast97_state::bg_atrram_w)).share(m_bg_atrram);
+
+	m_gfx_view[1](0xf000, 0xf1ff).ram().w(FUNC(cmast97_state::reel_ram_w<0>)).share(m_reel_ram[0]);
+	m_gfx_view[1](0xf200, 0xf3ff).ram().w(FUNC(cmast97_state::reel_ram_w<1>)).share(m_reel_ram[1]);
+	m_gfx_view[1](0xf400, 0xf5ff).ram().w(FUNC(cmast97_state::reel_ram_w<2>)).share(m_reel_ram[2]);
+	m_gfx_view[1](0xf600, 0xf7ff).ram();
+
+	m_gfx_view[1](0xf800, 0xf87f).ram().share(m_reel_scroll[0]);
+	m_gfx_view[1](0xf880, 0xf9ff).ram();
+	m_gfx_view[1](0xfa00, 0xfa7f).ram().share(m_reel_scroll[1]);
+	m_gfx_view[1](0xfa80, 0xfbff).ram();
+	m_gfx_view[1](0xfc00, 0xfc7f).ram().share(m_reel_scroll[2]);
+	m_gfx_view[1](0xfc80, 0xffff).ram();
+}
+
+void cmaster_state::nfm_map(address_map &map)
 {
 	map(0x0000, 0xd7ff).rom().nopw();
 
 	map(0xd800, 0xdfff).ram().share("nvram");
 
-	map(0xe000, 0xe7ff).ram().w(FUNC(goldstar_state::fg_vidram_w)).share("fg_vidram");
-	map(0xe800, 0xefff).ram().w(FUNC(goldstar_state::fg_atrram_w)).share("fg_atrram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(cmaster_state::fg_vidram_w)).share(m_fg_vidram);
+	map(0xe800, 0xefff).ram().w(FUNC(cmaster_state::fg_atrram_w)).share(m_fg_atrram);
 
-	map(0xf000, 0xf1ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
-	map(0xf200, 0xf3ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
-	map(0xf400, 0xf5ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xf000, 0xf1ff).ram().w(FUNC(cmaster_state::reel_ram_w<0>)).share(m_reel_ram[0]);
+	map(0xf200, 0xf3ff).ram().w(FUNC(cmaster_state::reel_ram_w<1>)).share(m_reel_ram[1]);
+	map(0xf400, 0xf5ff).ram().w(FUNC(cmaster_state::reel_ram_w<2>)).share(m_reel_ram[2]);
 	map(0xf600, 0xf7ff).ram();
 
-	map(0xf800, 0xf87f).ram().share("reel1_scroll");
+	map(0xf800, 0xf87f).ram().share(m_reel_scroll[0]);
 	map(0xf880, 0xf9ff).ram();
-	map(0xfa00, 0xfa7f).ram().share("reel2_scroll");
+	map(0xfa00, 0xfa7f).ram().share(m_reel_scroll[1]);
 	map(0xfa80, 0xfbff).ram();
-	map(0xfc00, 0xfc7f).ram().share("reel3_scroll");
+	map(0xfc00, 0xfc7f).ram().share(m_reel_scroll[2]);
 	map(0xfc80, 0xffff).ram();
 }
 
@@ -2221,19 +2257,19 @@ void cmaster_state::animalhs_map(address_map &map)
 {
 	map(0x0000, 0xb7ff).rom().nopw();
 
-	map(0xd000, 0xd7ff).ram().w(FUNC(goldstar_state::fg_vidram_w)).share("fg_vidram");
-	map(0xd800, 0xdfff).ram().w(FUNC(goldstar_state::fg_atrram_w)).share("fg_atrram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(cmaster_state::fg_vidram_w)).share(m_fg_vidram);
+	map(0xd800, 0xdfff).ram().w(FUNC(cmaster_state::fg_atrram_w)).share(m_fg_atrram);
 
-	map(0xe000, 0xe1ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
-	map(0xe200, 0xe3ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
-	map(0xe400, 0xe5ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xe000, 0xe1ff).ram().w(FUNC(cmaster_state::reel_ram_w<0>)).share(m_reel_ram[0]);
+	map(0xe200, 0xe3ff).ram().w(FUNC(cmaster_state::reel_ram_w<1>)).share(m_reel_ram[1]);
+	map(0xe400, 0xe5ff).ram().w(FUNC(cmaster_state::reel_ram_w<2>)).share(m_reel_ram[2]);
 	map(0xe600, 0xe7ff).ram();
 
-	map(0xe800, 0xe87f).ram().share("reel1_scroll");
+	map(0xe800, 0xe87f).ram().share(m_reel_scroll[0]);
 	map(0xe880, 0xe9ff).ram();
-	map(0xea00, 0xea7f).ram().share("reel2_scroll");
+	map(0xea00, 0xea7f).ram().share(m_reel_scroll[1]);
 	map(0xea80, 0xebff).ram();
-	map(0xec00, 0xec7f).ram().share("reel3_scroll");
+	map(0xec00, 0xec7f).ram().share(m_reel_scroll[2]);
 	map(0xec80, 0xefff).ram();
 
 	map(0xf000, 0xf7ff).ram().share("nvram");
@@ -2241,7 +2277,7 @@ void cmaster_state::animalhs_map(address_map &map)
 }
 
 
-void goldstar_state::cm_coincount_w(uint8_t data)
+void cmaster_state::coincount_w(uint8_t data)
 {
 /*  bits
   7654 3210
@@ -2274,7 +2310,7 @@ void cmaster_state::cm_portmap(address_map &map)
 	map(0x04, 0x07).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Inputs
 	map(0x08, 0x0b).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));  // DIP switches
 	map(0x10, 0x10).w(FUNC(cmaster_state::outport0_w));
-	map(0x11, 0x11).w(FUNC(cmaster_state::cm_coincount_w));
+	map(0x11, 0x11).w(FUNC(cmaster_state::coincount_w));
 	map(0x12, 0x12).w(FUNC(cmaster_state::p1_lamps_w));
 	map(0x13, 0x13).w(FUNC(cmaster_state::background_col_w));
 	map(0x14, 0x14).w(FUNC(cmaster_state::girl_scroll_w));
@@ -2288,7 +2324,7 @@ void cmaster_state::super7_portmap(address_map &map)
 	map(0x05, 0x05).portr("IN1");
 	map(0x06, 0x06).portr("IN2");
 	map(0x10, 0x10).w(FUNC(cmaster_state::outport0_w));
-	map(0x11, 0x11).w(FUNC(cmaster_state::cm_coincount_w));
+	map(0x11, 0x11).w(FUNC(cmaster_state::coincount_w));
 	map(0x12, 0x12).w(FUNC(cmaster_state::p1_lamps_w));
 	map(0x13, 0x13).w(FUNC(cmaster_state::background_col_w));
 	map(0x14, 0x14).w(FUNC(cmaster_state::girl_scroll_w));
@@ -2296,9 +2332,10 @@ void cmaster_state::super7_portmap(address_map &map)
 	map(0x82, 0x82).w("aysnd", FUNC(ay8910_device::data_w));
 }
 
-void cmaster_state::cm97_portmap(address_map &map)  // TODO: other reads/writes
+void cmast97_state::cmast97_portmap(address_map &map)  // TODO: other reads/writes
 {
 	map.global_mask(0xff);
+	map(0x00, 0x00).lw8(NAME([this] (uint8_t data) { m_enable_reg = data; m_gfx_view.select(BIT(m_enable_reg, 4)); } ));
 	map(0x01, 0x01).lw8(NAME([this] (uint8_t data) { m_tile_bank = (data & 0x0c) >> 2; if (data & 0xf3) logerror("unk tile bank w: %02x\n", data); }));
 	map(0x09, 0x09).r("aysnd", FUNC(ay8910_device::data_r));
 	map(0x0a, 0x0b).w("aysnd", FUNC(ay8910_device::data_address_w));
@@ -2322,7 +2359,7 @@ void cmaster_state::cmtetriskr_portmap(address_map &map)
 	map(0x09, 0x09).portr("DSW2");
 	map(0x0a, 0x0a).portr("DSW3");
 	map(0x10, 0x10).w(FUNC(cmaster_state::outport0_w));
-	map(0x11, 0x11).w(FUNC(cmaster_state::cm_coincount_w));
+	map(0x11, 0x11).w(FUNC(cmaster_state::coincount_w));
 	map(0x12, 0x12).w(FUNC(cmaster_state::p1_lamps_w));
 	map(0x13, 0x13).w(FUNC(cmaster_state::background_col_w));
 	map(0x14, 0x14).w(FUNC(cmaster_state::girl_scroll_w));
@@ -2339,7 +2376,7 @@ void cmaster_state::cmv4zg_portmap(address_map &map)
 	//map(0x08, 0x08).r(); // doesn't seem to affect settings
 	//map(0x09, 0x09).r(); // doesn't seem to affect settings. Maybe some kind of protection routine? See 0xb006 - b003f in dasm.
 	map(0x10, 0x10).w(FUNC(cmaster_state::outport0_w));
-	map(0x11, 0x11).w(FUNC(cmaster_state::cm_coincount_w));
+	map(0x11, 0x11).w(FUNC(cmaster_state::coincount_w));
 	map(0x12, 0x12).w(FUNC(cmaster_state::p1_lamps_w));
 	map(0x13, 0x13).w(FUNC(cmaster_state::background_col_w));
 	map(0x14, 0x14).w(FUNC(cmaster_state::girl_scroll_w));
@@ -2347,11 +2384,11 @@ void cmaster_state::cmv4zg_portmap(address_map &map)
 
 void cmaster_state::chryangl_decrypted_opcodes_map(address_map &map)
 {
-	map(0x0000, 0xffff).rom().share("decrypted_opcodes");
+	map(0x0000, 0xffff).rom().share(m_decrypted_opcodes);
 	map(0xf800, 0xffff).ram();
 }
 
-void goldstar_state::crazybon_portmap(address_map &map)
+void cmaster_state::crazybon_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 
@@ -2365,16 +2402,16 @@ void goldstar_state::crazybon_portmap(address_map &map)
 
 	map(0x20, 0x20).portr("DSW3-0");
 	map(0x21, 0x21).portr("DSW3-1");
-	map(0x22, 0x22).w(FUNC(goldstar_state::p1_lamps_w));
+	map(0x22, 0x22).w(FUNC(cmaster_state::p1_lamps_w));
 
-	map(0x24, 0x24).w(FUNC(goldstar_state::cm_coincount_w));
+	map(0x24, 0x24).w(FUNC(cmaster_state::coincount_w));
 	map(0x25, 0x25).portr("DSW1");
 	map(0x26, 0x26).portr("DSW2");
 
 	map(0xf0, 0xf0).nopw();  // Writing 0's and 1's constantly.  Watchdog feeder?
 }
 
-void goldstar_state::pkrmast_portmap(address_map &map)
+void cmaster_state::pkrmast_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 
@@ -2386,9 +2423,9 @@ void goldstar_state::pkrmast_portmap(address_map &map)
 
 	map(0x20, 0x20).portr("DSW1");
 	map(0x21, 0x21).portr("DSW2");
-	map(0x22, 0x22).portr("DSW3").w(FUNC(goldstar_state::p1_lamps_w));
+	map(0x22, 0x22).portr("DSW3").w(FUNC(cmaster_state::p1_lamps_w));
 
-	map(0x24, 0x24).portr("IN2").w(FUNC(goldstar_state::cm_coincount_w));
+	map(0x24, 0x24).portr("IN2").w(FUNC(cmaster_state::coincount_w));
 	map(0x25, 0x25).portr("IN0");
 	map(0x26, 0x26).portr("IN1");
 
@@ -2397,7 +2434,7 @@ void goldstar_state::pkrmast_portmap(address_map &map)
 	map(0xf0, 0xf0).nopw();  // Writing 0's and 1's constantly.  Watchdog feeder?
 }
 
-void goldstar_state::jkrmast_portmap(address_map &map)
+void cmaster_state::jkrmast_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x06, 0x06).portr("DSW1");
@@ -2476,7 +2513,7 @@ void cmaster_state::amcoe1_portmap(address_map &map)
 	map(0x04, 0x07).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Input Ports
 	map(0x08, 0x0b).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));  // DIP switches
 	map(0x10, 0x10).w(FUNC(cmaster_state::outport0_w));
-	map(0x11, 0x11).w(FUNC(cmaster_state::cm_coincount_w));
+	map(0x11, 0x11).w(FUNC(cmaster_state::coincount_w));
 	map(0x12, 0x12).w(FUNC(cmaster_state::p1_lamps_w));
 	map(0x13, 0x13).w(FUNC(cmaster_state::background_col_w));
 	map(0x20, 0x20).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -2490,7 +2527,7 @@ void cmaster_state::amcoe2_portmap(address_map &map)
 	map(0x04, 0x07).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Input Ports
 	map(0x08, 0x0b).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));  // DIP switches
 	map(0x10, 0x10).w(FUNC(cmaster_state::outport0_w));
-	map(0x11, 0x11).w(FUNC(cmaster_state::cm_coincount_w));
+	map(0x11, 0x11).w(FUNC(cmaster_state::coincount_w));
 	map(0x12, 0x12).w(FUNC(cmaster_state::p1_lamps_w));
 	map(0x13, 0x13).w(FUNC(cmaster_state::background_col_w));
 }
@@ -2502,26 +2539,26 @@ void cmaster_state::nfm_portmap(address_map &map)
 	map(0x17, 0x17).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
-void goldstar_state::lucky8_map(address_map &map)
+void wingco_state::lucky8_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram().share("nvram");
-	map(0x8800, 0x8fff).ram().w(FUNC(goldstar_state::fg_vidram_w)).share("fg_vidram");
-	map(0x9000, 0x97ff).ram().w(FUNC(goldstar_state::fg_atrram_w)).share("fg_atrram");
-	map(0x9800, 0x99ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
-	map(0xa000, 0xa1ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
-	map(0xa800, 0xa9ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
-	map(0xb040, 0xb07f).ram().share("reel1_scroll");
-	map(0xb080, 0xb0bf).ram().share("reel2_scroll");
-	map(0xb100, 0xb17f).ram().share("reel3_scroll");
+	map(0x8800, 0x8fff).ram().w(FUNC(wingco_state::fg_vidram_w)).share(m_fg_vidram);
+	map(0x9000, 0x97ff).ram().w(FUNC(wingco_state::fg_atrram_w)).share(m_fg_atrram);
+	map(0x9800, 0x99ff).ram().w(FUNC(wingco_state::reel_ram_w<0>)).share(m_reel_ram[0]);
+	map(0xa000, 0xa1ff).ram().w(FUNC(wingco_state::reel_ram_w<1>)).share(m_reel_ram[1]);
+	map(0xa800, 0xa9ff).ram().w(FUNC(wingco_state::reel_ram_w<2>)).share(m_reel_ram[2]);
+	map(0xb040, 0xb07f).ram().share(m_reel_scroll[0]);
+	map(0xb080, 0xb0bf).ram().share(m_reel_scroll[1]);
+	map(0xb100, 0xb17f).ram().share(m_reel_scroll[2]);
 
 	map(0xb800, 0xb803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Input Ports
 	map(0xb810, 0xb813).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Input Ports
 	map(0xb820, 0xb823).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Input/Output Ports
 	map(0xb830, 0xb830).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0xb840, 0xb840).w("aysnd", FUNC(ay8910_device::address_w));  // no sound... only use both ports for DSWs
-	map(0xb850, 0xb850).w(FUNC(goldstar_state::p1_lamps_w));
-	map(0xb860, 0xb860).w(FUNC(goldstar_state::p2_lamps_w));
+	map(0xb850, 0xb850).w(FUNC(wingco_state::p1_lamps_w));
+	map(0xb860, 0xb860).w(FUNC(wingco_state::p2_lamps_w));
 	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::write));  // sound
 	map(0xc000, 0xf7ff).rom();  // could be used by some sets like super972.
 	map(0xf800, 0xffff).ram();
@@ -2561,54 +2598,54 @@ void wingco_state::nd8lines_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram().share("nvram");
-	map(0x8800, 0x8fff).ram().w(FUNC(goldstar_state::fg_vidram_w)).share("fg_vidram");
-	map(0x9000, 0x97ff).ram().w(FUNC(goldstar_state::fg_atrram_w)).share("fg_atrram");
-	map(0x9800, 0x99ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
-	map(0xa000, 0xa1ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
-	map(0xa800, 0xa9ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
-	map(0xb040, 0xb07f).ram().share("reel1_scroll");
-	map(0xb080, 0xb0bf).ram().share("reel2_scroll");
-	map(0xb100, 0xb17f).ram().share("reel3_scroll");
+	map(0x8800, 0x8fff).ram().w(FUNC(wingco_state::fg_vidram_w)).share(m_fg_vidram);
+	map(0x9000, 0x97ff).ram().w(FUNC(wingco_state::fg_atrram_w)).share(m_fg_atrram);
+	map(0x9800, 0x99ff).ram().w(FUNC(wingco_state::reel_ram_w<0>)).share(m_reel_ram[0]);
+	map(0xa000, 0xa1ff).ram().w(FUNC(wingco_state::reel_ram_w<1>)).share(m_reel_ram[1]);
+	map(0xa800, 0xa9ff).ram().w(FUNC(wingco_state::reel_ram_w<2>)).share(m_reel_ram[2]);
+	map(0xb040, 0xb07f).ram().share(m_reel_scroll[0]);
+	map(0xb080, 0xb0bf).ram().share(m_reel_scroll[1]);
+	map(0xb100, 0xb17f).ram().share(m_reel_scroll[2]);
 	map(0xb800, 0xb803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xb810, 0xb813).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xb820, 0xb820).w(FUNC(wingco_state::system_outputc_w));
 	map(0xb830, 0xb830).portr("DSW1");
 	map(0xb840, 0xb840).portr("DSW3");
-	map(0xb850, 0xb850).w(FUNC(goldstar_state::p1_lamps_w));
-	map(0xb860, 0xb860).w(FUNC(goldstar_state::p2_lamps_w));
+	map(0xb850, 0xb850).w(FUNC(wingco_state::p1_lamps_w));
+	map(0xb860, 0xb860).w(FUNC(wingco_state::p2_lamps_w));
 	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489a_device::write)); // seems to write with swapped nibbles if compared to lucky8
 	map(0xf800, 0xffff).ram();
 }
 
 void goldstar_state::common_decrypted_opcodes_map(address_map &map)
 {
-	map(0x0000, 0x7fff).rom().share("decrypted_opcodes");
+	map(0x0000, 0x7fff).rom().share(m_decrypted_opcodes);
 }
 
 void goldstar_state::super972_decrypted_opcodes_map(address_map &map)
 {
-	map(0x0000, 0xffff).rom().share("decrypted_opcodes");
+	map(0x0000, 0xffff).rom().share(m_decrypted_opcodes);
 }
 
-void goldstar_state::flaming7_map(address_map &map)
+void wingco_state::flaming7_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram().share("nvram");
-	map(0x8800, 0x8fff).ram().w(FUNC(goldstar_state::fg_vidram_w)).share("fg_vidram");
-	map(0x9000, 0x97ff).ram().w(FUNC(goldstar_state::fg_atrram_w)).share("fg_atrram");
+	map(0x8800, 0x8fff).ram().w(FUNC(wingco_state::fg_vidram_w)).share(m_fg_vidram);
+	map(0x9000, 0x97ff).ram().w(FUNC(wingco_state::fg_atrram_w)).share(m_fg_atrram);
 
-	map(0x9800, 0x99ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
+	map(0x9800, 0x99ff).ram().w(FUNC(wingco_state::reel_ram_w<0>)).share(m_reel_ram[0]);
 //  map(0x9a00, 0x9fff).ram();
-	map(0xa000, 0xa1ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
+	map(0xa000, 0xa1ff).ram().w(FUNC(wingco_state::reel_ram_w<1>)).share(m_reel_ram[1]);
 //  map(0xa200, 0xa7ff).ram();
-	map(0xa800, 0xa9ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xa800, 0xa9ff).ram().w(FUNC(wingco_state::reel_ram_w<2>)).share(m_reel_ram[2]);
 //  map(0xaa00, 0xafff).ram();
 
 //  map(0xb000, 0xb03f).ram();
-	map(0xb040, 0xb07f).ram().share("reel1_scroll");
-	map(0xb080, 0xb0bf).ram().share("reel2_scroll");
+	map(0xb040, 0xb07f).ram().share(m_reel_scroll[0]);
+	map(0xb080, 0xb0bf).ram().share(m_reel_scroll[1]);
 //  map(0xb0c0, 0xb0ff).ram();
-	map(0xb100, 0xb17f).ram().share("reel3_scroll");
+	map(0xb100, 0xb17f).ram().share(m_reel_scroll[2]);
 	map(0xb180, 0xb7ff).ram();
 
 	map(0xb800, 0xb803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Input Ports (92)
@@ -2616,8 +2653,8 @@ void goldstar_state::flaming7_map(address_map &map)
 	map(0xb820, 0xb823).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Input/Output Ports (90)
 	map(0xb830, 0xb830).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0xb840, 0xb840).w("aysnd", FUNC(ay8910_device::address_w));  // no sound... only use both ports for DSWs
-	map(0xb850, 0xb850).w(FUNC(goldstar_state::p1_lamps_w));
-	map(0xb860, 0xb860).w(FUNC(goldstar_state::p2_lamps_w));
+	map(0xb850, 0xb850).w(FUNC(wingco_state::p1_lamps_w));
+	map(0xb860, 0xb860).w(FUNC(wingco_state::p2_lamps_w));
 	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::write));  // sound
 //  map(0xc000, 0xd3ff).ram();
 	map(0xf800, 0xffff).ram();
@@ -2652,26 +2689,26 @@ void goldstar_state::flaming7_map(address_map &map)
     AY8910 ports are OK.
 
 */
-void goldstar_state::mbstar_map(address_map &map)
+void wingco_state::mbstar_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram().share("nvram");
-	map(0x8800, 0x8fff).ram().w(FUNC(goldstar_state::fg_vidram_w)).share("fg_vidram");
-	map(0x9000, 0x97ff).ram().w(FUNC(goldstar_state::fg_atrram_w)).share("fg_atrram");
-	map(0x9800, 0x99ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
-	map(0xa000, 0xa1ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
-	map(0xa800, 0xa9ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
-	map(0xb040, 0xb07f).ram().share("reel1_scroll");
-	map(0xb080, 0xb0bf).ram().share("reel2_scroll");
-	map(0xb100, 0xb17f).ram().share("reel3_scroll");
+	map(0x8800, 0x8fff).ram().w(FUNC(wingco_state::fg_vidram_w)).share(m_fg_vidram);
+	map(0x9000, 0x97ff).ram().w(FUNC(wingco_state::fg_atrram_w)).share(m_fg_atrram);
+	map(0x9800, 0x99ff).ram().w(FUNC(wingco_state::reel_ram_w<0>)).share(m_reel_ram[0]);
+	map(0xa000, 0xa1ff).ram().w(FUNC(wingco_state::reel_ram_w<1>)).share(m_reel_ram[1]);
+	map(0xa800, 0xa9ff).ram().w(FUNC(wingco_state::reel_ram_w<2>)).share(m_reel_ram[2]);
+	map(0xb040, 0xb07f).ram().share(m_reel_scroll[0]);
+	map(0xb080, 0xb0bf).ram().share(m_reel_scroll[1]);
+	map(0xb100, 0xb17f).ram().share(m_reel_scroll[2]);
 
 	map(0xb800, 0xb803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Input Ports
 	map(0xb810, 0xb813).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Input Ports
 	map(0xb820, 0xb823).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Input/Output Ports
 	map(0xb830, 0xb830).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0xb840, 0xb840).w("aysnd", FUNC(ay8910_device::address_w));  // no sound... only use both ports for DSWs
-	map(0xb850, 0xb850).w(FUNC(goldstar_state::p1_lamps_w));
-	map(0xb860, 0xb860).w(FUNC(goldstar_state::p2_lamps_w));
+	map(0xb850, 0xb850).w(FUNC(wingco_state::p1_lamps_w));
+	map(0xb860, 0xb860).w(FUNC(wingco_state::p2_lamps_w));
 	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::write));  // sound
 	map(0xc000, 0xf7ff).rom();
 	map(0xf800, 0xffff).ram();
@@ -2709,14 +2746,14 @@ void wingco_state::magodds_map(address_map &map)
 	// where does the extra rom data map?? it seems like it should come straight
 	// after the existing rom, but it can't if this is a plain z80?
 	map(0x8000, 0x87ff).ram().share("nvram");
-	map(0x8800, 0x8fff).ram().w(FUNC(wingco_state::fg_vidram_w)).share("fg_vidram");
-	map(0x9000, 0x97ff).ram().w(FUNC(wingco_state::fg_atrram_w)).share("fg_atrram");
-	map(0x9800, 0x99ff).ram().w(FUNC(wingco_state::goldstar_reel1_ram_w)).share("reel1_ram");
-	map(0xa000, 0xa1ff).ram().w(FUNC(wingco_state::goldstar_reel2_ram_w)).share("reel2_ram");
-	map(0xa900, 0xaaff).ram().w(FUNC(wingco_state::goldstar_reel3_ram_w)).share("reel3_ram");  // +0x100 compared to lucky8
-	map(0xb040, 0xb07f).ram().share("reel1_scroll");
-	map(0xb080, 0xb0bf).ram().share("reel2_scroll");
-	map(0xb100, 0xb17f).ram().share("reel3_scroll");
+	map(0x8800, 0x8fff).ram().w(FUNC(wingco_state::fg_vidram_w)).share(m_fg_vidram);
+	map(0x9000, 0x97ff).ram().w(FUNC(wingco_state::fg_atrram_w)).share(m_fg_atrram);
+	map(0x9800, 0x99ff).ram().w(FUNC(wingco_state::reel_ram_w<0>)).share(m_reel_ram[0]);
+	map(0xa000, 0xa1ff).ram().w(FUNC(wingco_state::reel_ram_w<1>)).share(m_reel_ram[1]);
+	map(0xa900, 0xaaff).ram().w(FUNC(wingco_state::reel_ram_w<2>)).share(m_reel_ram[2]);  // +0x100 compared to lucky8
+	map(0xb040, 0xb07f).ram().share(m_reel_scroll[0]);
+	map(0xb080, 0xb0bf).ram().share(m_reel_scroll[1]);
+	map(0xb100, 0xb17f).ram().share(m_reel_scroll[2]);
 
 	map(0xb800, 0xb803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Input Ports
 	map(0xb810, 0xb813).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Input Ports
@@ -2733,14 +2770,14 @@ void goldstar_state::kkotnoli_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram();  // definitely no NVRAM
-	map(0x8800, 0x8fff).ram().w(FUNC(goldstar_state::fg_vidram_w)).share("fg_vidram");
-	map(0x9000, 0x97ff).ram().w(FUNC(goldstar_state::fg_atrram_w)).share("fg_atrram");
-	map(0x9800, 0x99ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
-	map(0xa000, 0xa1ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
-	map(0xa800, 0xa9ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
-	map(0xb040, 0xb07f).ram().share("reel1_scroll");
-	map(0xb080, 0xb0bf).ram().share("reel2_scroll");
-	map(0xb100, 0xb17f).ram().share("reel3_scroll");
+	map(0x8800, 0x8fff).ram().w(FUNC(goldstar_state::fg_vidram_w)).share(m_fg_vidram);
+	map(0x9000, 0x97ff).ram().w(FUNC(goldstar_state::fg_atrram_w)).share(m_fg_atrram);
+	map(0x9800, 0x99ff).ram().w(FUNC(goldstar_state::reel_ram_w<0>)).share(m_reel_ram[0]);
+	map(0xa000, 0xa1ff).ram().w(FUNC(goldstar_state::reel_ram_w<1>)).share(m_reel_ram[1]);
+	map(0xa800, 0xa9ff).ram().w(FUNC(goldstar_state::reel_ram_w<2>)).share(m_reel_ram[2]);
+	map(0xb040, 0xb07f).ram().share(m_reel_scroll[0]);
+	map(0xb080, 0xb0bf).ram().share(m_reel_scroll[1]);
+	map(0xb100, 0xb17f).ram().share(m_reel_scroll[2]);
 
 	map(0xb800, 0xb803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Input Ports
 	map(0xb810, 0xb813).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Input Ports
@@ -2773,14 +2810,14 @@ void goldstar_state::ladylinr_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram().share("nvram");
-	map(0x8800, 0x8fff).ram().w(FUNC(goldstar_state::fg_vidram_w)).share("fg_vidram");
-	map(0x9000, 0x97ff).ram().w(FUNC(goldstar_state::fg_atrram_w)).share("fg_atrram");
-	map(0x9800, 0x99ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
-	map(0xa000, 0xa1ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
-	map(0xa800, 0xa9ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
-	map(0xb040, 0xb07f).ram().share("reel1_scroll");
-	map(0xb080, 0xb0bf).ram().share("reel2_scroll");
-	map(0xb100, 0xb17f).ram().share("reel3_scroll");
+	map(0x8800, 0x8fff).ram().w(FUNC(goldstar_state::fg_vidram_w)).share(m_fg_vidram);
+	map(0x9000, 0x97ff).ram().w(FUNC(goldstar_state::fg_atrram_w)).share(m_fg_atrram);
+	map(0x9800, 0x99ff).ram().w(FUNC(goldstar_state::reel_ram_w<0>)).share(m_reel_ram[0]);
+	map(0xa000, 0xa1ff).ram().w(FUNC(goldstar_state::reel_ram_w<1>)).share(m_reel_ram[1]);
+	map(0xa800, 0xa9ff).ram().w(FUNC(goldstar_state::reel_ram_w<2>)).share(m_reel_ram[2]);
+	map(0xb040, 0xb07f).ram().share(m_reel_scroll[0]);
+	map(0xb080, 0xb0bf).ram().share(m_reel_scroll[1]);
+	map(0xb100, 0xb17f).ram().share(m_reel_scroll[2]);
 
 	map(0xb800, 0xb803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Input Ports
 	map(0xb810, 0xb813).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));  // DSW bank
@@ -2791,25 +2828,25 @@ void goldstar_state::ladylinr_map(address_map &map)
 	map(0xf800, 0xffff).ram();
 }
 
-void goldstar_state::wcat3_map(address_map &map)
+void wingco_state::wcat3_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x87ff).ram().share("nvram");
-	map(0x8800, 0x8fff).ram().w(FUNC(goldstar_state::fg_vidram_w)).share("fg_vidram");
-	map(0x9000, 0x97ff).ram().w(FUNC(goldstar_state::fg_atrram_w)).share("fg_atrram");
-	map(0x9800, 0x99ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
-	map(0xa000, 0xa1ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
-	map(0xa800, 0xa9ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
-	map(0xb040, 0xb07f).ram().share("reel1_scroll");
-	map(0xb080, 0xb0bf).ram().share("reel2_scroll");
-	map(0xb100, 0xb17f).ram().share("reel3_scroll");
+	map(0x8800, 0x8fff).ram().w(FUNC(wingco_state::fg_vidram_w)).share(m_fg_vidram);
+	map(0x9000, 0x97ff).ram().w(FUNC(wingco_state::fg_atrram_w)).share(m_fg_atrram);
+	map(0x9800, 0x99ff).ram().w(FUNC(wingco_state::reel_ram_w<0>)).share(m_reel_ram[0]);
+	map(0xa000, 0xa1ff).ram().w(FUNC(wingco_state::reel_ram_w<1>)).share(m_reel_ram[1]);
+	map(0xa800, 0xa9ff).ram().w(FUNC(wingco_state::reel_ram_w<2>)).share(m_reel_ram[2]);
+	map(0xb040, 0xb07f).ram().share(m_reel_scroll[0]);
+	map(0xb080, 0xb0bf).ram().share(m_reel_scroll[1]);
+	map(0xb100, 0xb17f).ram().share(m_reel_scroll[2]);
 
 	map(0xb800, 0xb803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Input Ports
 	map(0xb810, 0xb813).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Input Ports
 	map(0xb820, 0xb823).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Input/Output Ports
 	map(0xb830, 0xb830).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w));
 	map(0xb840, 0xb840).w("aysnd", FUNC(ay8910_device::address_w));  // no sound... only use both ports for DSWs
-	map(0xb850, 0xb850).w(FUNC(goldstar_state::p1_lamps_w));
+	map(0xb850, 0xb850).w(FUNC(wingco_state::p1_lamps_w));
 	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::write));  // sound
 //  map(0xc000, 0xc003).rw("ppi8255_3", FUNC(i8255_device::read), FUNC(i8255_device::write));  // another PPI initialized?
 	map(0xd000, 0xefff).rom();
@@ -2826,21 +2863,21 @@ void unkch_state::unkch_map(address_map &map)
 
 	map(0xd000, 0xd7ff).ram().share("nvram");
 
-	map(0xd840, 0xd87f).ram().share("reel1_scroll");
-	map(0xd880, 0xd8bf).ram().share("reel2_scroll");
-	map(0xd900, 0xd93f).ram().share("reel3_scroll");
+	map(0xd840, 0xd87f).ram().share(m_reel_scroll[0]);
+	map(0xd880, 0xd8bf).ram().share(m_reel_scroll[1]);
+	map(0xd900, 0xd93f).ram().share(m_reel_scroll[2]);
 	map(0xdfc0, 0xdfff).ram();
 
-	map(0xe000, 0xe7ff).ram().w(FUNC(unkch_state::fg_vidram_w)).share("fg_vidram");
-	map(0xe800, 0xefff).ram().w(FUNC(unkch_state::fg_atrram_w)).share("fg_atrram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(unkch_state::fg_vidram_w)).share(m_fg_vidram);
+	map(0xe800, 0xefff).ram().w(FUNC(unkch_state::fg_atrram_w)).share(m_fg_atrram);
 
-	map(0xf000, 0xf1ff).ram().w(FUNC(unkch_state::goldstar_reel1_ram_w)).share("reel1_ram");
-	map(0xf200, 0xf3ff).ram().w(FUNC(unkch_state::goldstar_reel2_ram_w)).share("reel2_ram");
-	map(0xf400, 0xf5ff).ram().w(FUNC(unkch_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xf000, 0xf1ff).ram().w(FUNC(unkch_state::reel_ram_w<0>)).share(m_reel_ram[0]);
+	map(0xf200, 0xf3ff).ram().w(FUNC(unkch_state::reel_ram_w<1>)).share(m_reel_ram[1]);
+	map(0xf400, 0xf5ff).ram().w(FUNC(unkch_state::reel_ram_w<2>)).share(m_reel_ram[2]);
 	map(0xf600, 0xf7ff).ram();
-	map(0xf800, 0xf9ff).ram().w(FUNC(unkch_state::reel1_attrram_w)).share("reel1_attrram");
-	map(0xfa00, 0xfbff).ram().w(FUNC(unkch_state::reel2_attrram_w)).share("reel2_attrram");
-	map(0xfc00, 0xfdff).ram().w(FUNC(unkch_state::reel3_attrram_w)).share("reel3_attrram");
+	map(0xf800, 0xf9ff).ram().w(FUNC(unkch_state::reel_attrram_w<0>)).share(m_reel_attrram[0]);
+	map(0xfa00, 0xfbff).ram().w(FUNC(unkch_state::reel_attrram_w<1>)).share(m_reel_attrram[1]);
+	map(0xfc00, 0xfdff).ram().w(FUNC(unkch_state::reel_attrram_w<2>)).share(m_reel_attrram[2]);
 	map(0xfe00, 0xffff).ram();
 }
 
@@ -2933,17 +2970,17 @@ void goldstar_state::megaline_map(address_map &map)
 {
 	map(0x0000, 0x9fff).rom();
 
-	map(0xd000, 0xd03f).ram().share("reel1_scroll");
-	map(0xd200, 0xd23f).ram().share("reel2_scroll");
-	map(0xd400, 0xd43f).ram().share("reel3_scroll");
+	map(0xd000, 0xd03f).ram().share(m_reel_scroll[0]);
+	map(0xd200, 0xd23f).ram().share(m_reel_scroll[1]);
+	map(0xd400, 0xd43f).ram().share(m_reel_scroll[2]);
 
-	map(0xd800, 0xd9ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
-	map(0xda00, 0xdbff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
-	map(0xdc00, 0xddff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xd800, 0xd9ff).ram().w(FUNC(goldstar_state::reel_ram_w<0>)).share(m_reel_ram[0]);
+	map(0xda00, 0xdbff).ram().w(FUNC(goldstar_state::reel_ram_w<1>)).share(m_reel_ram[1]);
+	map(0xdc00, 0xddff).ram().w(FUNC(goldstar_state::reel_ram_w<2>)).share(m_reel_ram[2]);
 	map(0xde00, 0xdfff).ram();
 
-	map(0xe000, 0xe7ff).ram().w(FUNC(goldstar_state::fg_vidram_w)).share("fg_vidram");
-	map(0xe800, 0xefff).ram().w(FUNC(goldstar_state::fg_atrram_w)).share("fg_atrram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(goldstar_state::fg_vidram_w)).share(m_fg_vidram);
+	map(0xe800, 0xefff).ram().w(FUNC(goldstar_state::fg_atrram_w)).share(m_fg_atrram);
 	map(0xf000, 0xf7ff).ram();
 	map(0xf800, 0xffff).ram();
 }
@@ -2977,22 +3014,22 @@ void unkch_state::bonusch_map(address_map &map)
 
 	map(0xd800, 0xdfff).ram();  //.share("nvram");
 
-	map(0xe000, 0xe7ff).ram().w(FUNC(unkch_state::fg_vidram_w)).share("fg_vidram");
-	map(0xe800, 0xefff).ram().w(FUNC(unkch_state::fg_atrram_w)).share("fg_atrram");
+	map(0xe000, 0xe7ff).ram().w(FUNC(unkch_state::fg_vidram_w)).share(m_fg_vidram);
+	map(0xe800, 0xefff).ram().w(FUNC(unkch_state::fg_atrram_w)).share(m_fg_atrram);
 
 // just placeholders
 
-	map(0xf000, 0xf1ff).ram().w(FUNC(unkch_state::goldstar_reel1_ram_w)).share("reel1_ram");
-	map(0xf200, 0xf3ff).ram().w(FUNC(unkch_state::goldstar_reel2_ram_w)).share("reel2_ram");
-	map(0xf400, 0xf5ff).ram().w(FUNC(unkch_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xf000, 0xf1ff).ram().w(FUNC(unkch_state::reel_ram_w<0>)).share(m_reel_ram[0]);
+	map(0xf200, 0xf3ff).ram().w(FUNC(unkch_state::reel_ram_w<1>)).share(m_reel_ram[1]);
+	map(0xf400, 0xf5ff).ram().w(FUNC(unkch_state::reel_ram_w<2>)).share(m_reel_ram[2]);
 
-	map(0xf640, 0xf67f).ram().share("reel1_scroll");
-	map(0xf680, 0xf6bf).ram().share("reel2_scroll");
-	map(0xf700, 0xf73f).ram().share("reel3_scroll");
+	map(0xf640, 0xf67f).ram().share(m_reel_scroll[0]);
+	map(0xf680, 0xf6bf).ram().share(m_reel_scroll[1]);
+	map(0xf700, 0xf73f).ram().share(m_reel_scroll[2]);
 
-	map(0xf800, 0xf9ff).ram().w(FUNC(unkch_state::reel1_attrram_w)).share("reel1_attrram");
-	map(0xfa00, 0xfbff).ram().w(FUNC(unkch_state::reel2_attrram_w)).share("reel2_attrram");
-	map(0xfc00, 0xfdff).ram().w(FUNC(unkch_state::reel3_attrram_w)).share("reel3_attrram");
+	map(0xf800, 0xf9ff).ram().w(FUNC(unkch_state::reel_attrram_w<0>)).share(m_reel_attrram[0]);
+	map(0xfa00, 0xfbff).ram().w(FUNC(unkch_state::reel_attrram_w<1>)).share(m_reel_attrram[1]);
+	map(0xfc00, 0xfdff).ram().w(FUNC(unkch_state::reel_attrram_w<2>)).share(m_reel_attrram[2]);
 }
 
 /* Bonus Chance W-8
@@ -3012,7 +3049,7 @@ void unkch_state::bonusch_map(address_map &map)
   60h = R
 
 */
-void goldstar_state::bonusch_portmap(address_map &map)
+void unkch_state::bonusch_portmap(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x10, 0x10).portr("IN0");
@@ -3030,17 +3067,17 @@ void goldstar_state::feverch_map(address_map &map)
 
 	map(0xc000, 0xc7ff).ram();
 	map(0xc800, 0xcfff).ram();
-	map(0xd000, 0xd7ff).ram().w(FUNC(goldstar_state::fg_vidram_w)).share("fg_vidram");
-	map(0xd800, 0xdfff).ram().w(FUNC(goldstar_state::fg_atrram_w)).share("fg_atrram");
+	map(0xd000, 0xd7ff).ram().w(FUNC(goldstar_state::fg_vidram_w)).share(m_fg_vidram);
+	map(0xd800, 0xdfff).ram().w(FUNC(goldstar_state::fg_atrram_w)).share(m_fg_atrram);
 
-	map(0xe000, 0xe1ff).ram().w(FUNC(goldstar_state::goldstar_reel1_ram_w)).share("reel1_ram");
-	map(0xe200, 0xe3ff).ram().w(FUNC(goldstar_state::goldstar_reel2_ram_w)).share("reel2_ram");
-	map(0xe400, 0xe5ff).ram().w(FUNC(goldstar_state::goldstar_reel3_ram_w)).share("reel3_ram");
+	map(0xe000, 0xe1ff).ram().w(FUNC(goldstar_state::reel_ram_w<0>)).share(m_reel_ram[0]);
+	map(0xe200, 0xe3ff).ram().w(FUNC(goldstar_state::reel_ram_w<1>)).share(m_reel_ram[1]);
+	map(0xe400, 0xe5ff).ram().w(FUNC(goldstar_state::reel_ram_w<2>)).share(m_reel_ram[2]);
 	map(0xe600, 0xe7ff).ram();
 
-	map(0xe800, 0xe83f).ram().share("reel1_scroll");
-	map(0xea00, 0xea3f).ram().share("reel2_scroll");
-	map(0xec00, 0xec3f).ram().share("reel3_scroll");
+	map(0xe800, 0xe83f).ram().share(m_reel_scroll[0]);
+	map(0xea00, 0xea3f).ram().share(m_reel_scroll[1]);
+	map(0xec00, 0xec3f).ram().share(m_reel_scroll[2]);
 
 	map(0xf000, 0xffff).ram();
 }
@@ -10470,7 +10507,7 @@ static GFXDECODE_START( gfx_cmfb55 )
 	GFXDECODE_ENTRY( "user1", 0, tiles128x128x4_layout,   128,  4 )
 GFXDECODE_END
 
-static const gfx_layout cm97_layout =
+static const gfx_layout cmast97_layout =
 {
 	8,8,
 	RGN_FRAC(1,1),
@@ -10481,7 +10518,7 @@ static const gfx_layout cm97_layout =
 	8*32
 };
 
-static const gfx_layout cm97_layout32 =
+static const gfx_layout cmast97_layout32 =
 	{
 	8,32,
 	RGN_FRAC(1,1),
@@ -10494,9 +10531,10 @@ static const gfx_layout cm97_layout32 =
 	32*32
 };
 
-static GFXDECODE_START( gfx_cm97 )
-	GFXDECODE_ENTRY( "gfx", 0,       cm97_layout,   0x0, 32 )
-	GFXDECODE_ENTRY( "gfx", 0x20000, cm97_layout32, 0x0, 32 )
+static GFXDECODE_START( gfx_cmast97 )
+	GFXDECODE_ENTRY( "gfx", 0,       cmast97_layout,   0x0, 16 )
+	GFXDECODE_ENTRY( "gfx", 0x20000, cmast97_layout32, 0x0, 16 )
+	GFXDECODE_ENTRY( "gfx", 0x40000, cmast97_layout,   0x0, 16 )
 GFXDECODE_END
 
 static const gfx_layout animalhs_tiles8x32_layout =
@@ -10543,14 +10581,14 @@ void wingco_state::system_outputc_w(uint8_t data)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-void goldstar_state::ay8910_outputa_w(uint8_t data)
+void wingco_state::ay8910_outputa_w(uint8_t data)
 {
-	//popmessage("ay8910_outputa_w %02x",data);
+	//popmessage("ay8910_outputa_w %02x", data);
 }
 
-void goldstar_state::ay8910_outputb_w(uint8_t data)
+void wingco_state::ay8910_outputb_w(uint8_t data)
 {
-	//popmessage("ay8910_outputb_w %02x",data);
+	//popmessage("ay8910_outputb_w %02x", data);
 }
 
 
@@ -10579,8 +10617,6 @@ void goldstar_state::goldstar(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_goldstar);
 	PALETTE(config, m_palette).set_format(palette_device::BGR_233, 256);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
-
-	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -10612,8 +10648,6 @@ void goldstar_state::goldstbl(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bl);
 	PALETTE(config, m_palette).set_format(palette_device::BGR_233, 256);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
-
-	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -10663,8 +10697,6 @@ void sanghopm_state::star100(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_VIDEO_START_OVERRIDE(sanghopm_state, sangho)
-
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	ay8910_device &aysnd(AY8910(config, "aysnd", AY_CLOCK));
@@ -10694,8 +10726,6 @@ void goldstar_state::super9(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_super9);
 	PALETTE(config, m_palette).set_format(palette_device::BGR_233, 256);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
-
-	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -10752,7 +10782,7 @@ void goldstar_state::lucky8_palette(palette_device &palette) const
 	}
 }
 
-void goldstar_state::nfm_palette(palette_device &palette) const
+void cmaster_state::nfm_palette(palette_device &palette) const
 {
 	// BBGGGRRR
 	uint8_t const *const colours = memregion("colours")->base();
@@ -10791,15 +10821,13 @@ void cb3_state::ncb3(machine_config &config)
 //  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar<false>));
+	screen.set_screen_update(FUNC(cb3_state::screen_update_goldstar<false>));
 	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ncb3);
-	PALETTE(config, m_palette, FUNC(goldstar_state::cm_palette), 256);
+	PALETTE(config, m_palette, FUNC(cb3_state::cm_palette), 256);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
-
-	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -10831,7 +10859,7 @@ void cb3_state::chryangla(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cb3_state::chryangla_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &cb3_state::chryangla_decrypted_opcodes_map);
 
-	m_palette->set_init(FUNC(goldstar_state::lucky8_palette));
+	m_palette->set_init(FUNC(cb3_state::lucky8_palette));
 }
 
 void cb3_state::chrygld(machine_config &config)
@@ -10878,8 +10906,6 @@ void goldstar_state::wcherry(machine_config &config)
 	PALETTE(config, m_palette, FUNC(goldstar_state::cm_palette), 256);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
-
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
@@ -10915,14 +10941,12 @@ void cmaster_state::cm(machine_config &config)
 //  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar<false>));
+	screen.set_screen_update(FUNC(cmaster_state::screen_update_goldstar<false>));
 	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cmbitmap);
-	PALETTE(config, m_palette, FUNC(goldstar_state::cm_palette), 256);
+	PALETTE(config, m_palette, FUNC(cmaster_state::cm_palette), 256);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
-
-	MCFG_VIDEO_START_OVERRIDE(goldstar_state, cherrym)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -10946,13 +10970,19 @@ void cmaster_state::cmfb55(machine_config &config)
 	m_gfxdecode->set_info(gfx_cmfb55);
 }
 
-void cmaster_state::cm97(machine_config &config)
+void cmast97_state::cmast97(machine_config &config)
 {
 	cm(config);
 
-	m_maincpu->set_addrmap(AS_IO, &cmaster_state::cm97_portmap);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cmast97_state::cmast97_map);
+	m_maincpu->set_addrmap(AS_IO, &cmast97_state::cmast97_portmap);
 
-	m_gfxdecode->set_info(gfx_cm97);
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(cmast97_state::screen_update_cmast97));
+
+	m_gfxdecode->set_info(gfx_cmast97);
+
+	m_palette->set_init(FUNC(cmast97_state::cmast97_palette_init));
+	m_palette->set_entries(512);
 
 	config.device_remove("ppi8255_0");
 	config.device_remove("ppi8255_1");
@@ -11022,8 +11052,6 @@ void cmaster_state::cmast91(machine_config &config)
 	PALETTE(config, m_palette, FUNC(cmaster_state::cmast91_palette), 256);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_VIDEO_START_OVERRIDE(cmaster_state, cherrym)
-
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	ay8910_device &aysnd(AY8910(config, "aysnd", AY_CLOCK));
@@ -11044,7 +11072,7 @@ void cmaster_state::eldoradd(machine_config &config)
 {
 	cmast92(config);
 
-	m_gfxdecode->set_info(gfx_cm97);  // TODO: wrong, needs correct decode
+	m_gfxdecode->set_info(gfx_cmast97);  // TODO: wrong, needs correct decode
 }
 
 
@@ -11084,14 +11112,12 @@ void wingco_state::lucky8(machine_config &config)
 //  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar<false>));
+	screen.set_screen_update(FUNC(wingco_state::screen_update_goldstar<false>));
 	screen.screen_vblank().set(FUNC(wingco_state::masked_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ncb3);
-	PALETTE(config, m_palette, FUNC(goldstar_state::lucky8_palette)).set_format(palette_device::BGR_233, 256);
+	PALETTE(config, m_palette, FUNC(wingco_state::lucky8_palette)).set_format(palette_device::BGR_233, 256);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
-
-	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -11101,8 +11127,8 @@ void wingco_state::lucky8(machine_config &config)
 	ym2149_device &aysnd(YM2149(config, "aysnd", AY_CLOCK));
 	aysnd.port_a_read_callback().set_ioport("DSW3");
 	aysnd.port_b_read_callback().set_ioport("DSW4");
-	aysnd.port_a_write_callback().set(FUNC(goldstar_state::ay8910_outputa_w));
-	aysnd.port_b_write_callback().set(FUNC(goldstar_state::ay8910_outputb_w));
+	aysnd.port_a_write_callback().set(FUNC(wingco_state::ay8910_outputa_w));
+	aysnd.port_b_write_callback().set(FUNC(wingco_state::ay8910_outputb_w));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
@@ -11225,7 +11251,7 @@ void wingco_state::bingowng(machine_config &config)
 	screen.screen_vblank().set(FUNC(wingco_state::masked_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ncb3);
-	PALETTE(config, m_palette, FUNC(goldstar_state::lucky8_palette), 256);
+	PALETTE(config, m_palette, FUNC(wingco_state::lucky8_palette), 256);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MCFG_VIDEO_START_OVERRIDE(wingco_state, bingowng)
@@ -11238,8 +11264,8 @@ void wingco_state::bingowng(machine_config &config)
 	ay8910_device &aysnd(AY8910(config, "aysnd", AY_CLOCK));
 	aysnd.port_a_read_callback().set_ioport("DSW3");
 	aysnd.port_b_read_callback().set_ioport("DSW4");
-	aysnd.port_a_write_callback().set(FUNC(goldstar_state::ay8910_outputa_w));
-	aysnd.port_b_write_callback().set(FUNC(goldstar_state::ay8910_outputb_w));
+	aysnd.port_a_write_callback().set(FUNC(wingco_state::ay8910_outputa_w));
+	aysnd.port_b_write_callback().set(FUNC(wingco_state::ay8910_outputb_w));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
@@ -11364,8 +11390,8 @@ void wingco_state::magodds(machine_config &config)
 	ay8910_device &aysnd(AY8910(config, "aysnd", AY_CLOCK));
 	aysnd.port_a_read_callback().set_ioport("DSW3");
 	aysnd.port_b_read_callback().set_ioport("DSW4");
-	aysnd.port_a_write_callback().set(FUNC(goldstar_state::ay8910_outputa_w));
-	aysnd.port_b_write_callback().set(FUNC(goldstar_state::ay8910_outputb_w));
+	aysnd.port_a_write_callback().set(FUNC(wingco_state::ay8910_outputa_w));
+	aysnd.port_b_write_callback().set(FUNC(wingco_state::ay8910_outputb_w));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.80);
 }
 
@@ -11401,8 +11427,6 @@ void goldstar_state::kkotnoli(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ncb3);
 	PALETTE(config, m_palette, FUNC(goldstar_state::lucky8_palette), 256);
 
-	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
-
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
@@ -11437,8 +11461,6 @@ void goldstar_state::ladylinr(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ncb3);
 	PALETTE(config, m_palette, FUNC(goldstar_state::lucky8_palette), 256);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
-
-	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -11487,14 +11509,12 @@ void wingco_state::wcat3(machine_config &config)
 //  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar<false>));
+	screen.set_screen_update(FUNC(wingco_state::screen_update_goldstar<false>));
 	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ncb3);
-	PALETTE(config, m_palette, FUNC(goldstar_state::lucky8_palette), 256);
+	PALETTE(config, m_palette, FUNC(wingco_state::lucky8_palette), 256);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
-
-	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -11504,8 +11524,8 @@ void wingco_state::wcat3(machine_config &config)
 	ay8910_device &aysnd(AY8910(config, "aysnd", AY_CLOCK));
 	aysnd.port_a_read_callback().set_ioport("DSW3");
 	aysnd.port_b_read_callback().set_ioport("DSW4");
-	aysnd.port_a_write_callback().set(FUNC(goldstar_state::ay8910_outputa_w));
-	aysnd.port_b_write_callback().set(FUNC(goldstar_state::ay8910_outputb_w));
+	aysnd.port_a_write_callback().set(FUNC(wingco_state::ay8910_outputa_w));
+	aysnd.port_b_write_callback().set(FUNC(wingco_state::ay8910_outputb_w));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
@@ -11534,14 +11554,12 @@ void cmaster_state::amcoe1(machine_config &config)
 //  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar<false>));
+	screen.set_screen_update(FUNC(cmaster_state::screen_update_goldstar<false>));
 	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cm);
-	PALETTE(config, m_palette, FUNC(goldstar_state::cm_palette), 256);
+	PALETTE(config, m_palette, FUNC(cmaster_state::cm_palette), 256);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
-
-	MCFG_VIDEO_START_OVERRIDE(goldstar_state, cherrym)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -11588,14 +11606,12 @@ void cmaster_state::amcoe2(machine_config &config)
 //  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar<false>));
+	screen.set_screen_update(FUNC(cmaster_state::screen_update_goldstar<false>));
 	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cm);
-	PALETTE(config, m_palette, FUNC(goldstar_state::cm_palette), 256);
+	PALETTE(config, m_palette, FUNC(cmaster_state::cm_palette), 256);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
-
-	MCFG_VIDEO_START_OVERRIDE(goldstar_state, cherrym)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -11654,8 +11670,6 @@ void unkch_state::unkch(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_unkch);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 512);
 
-	MCFG_VIDEO_START_OVERRIDE(unkch_state, unkch)
-
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	ay8910_device &aysnd(AY8910(config, "aysnd", AY_CLOCK));
@@ -11675,12 +11689,12 @@ void unkch_state::rolling(machine_config &config)
 }
 
 // hw unknown - should be somewhat similar to cm
-void goldstar_state::pkrmast(machine_config &config)
+void cmaster_state::pkrmast(machine_config &config)
 {
 	// basic machine hardware
 	Z80(config, m_maincpu, CPU_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &goldstar_state::cm_map);
-	m_maincpu->set_addrmap(AS_IO, &goldstar_state::pkrmast_portmap);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cmaster_state::cm_map);
+	m_maincpu->set_addrmap(AS_IO, &cmaster_state::pkrmast_portmap);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -11688,14 +11702,12 @@ void goldstar_state::pkrmast(machine_config &config)
 //  screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar<false>));
+	screen.set_screen_update(FUNC(cmaster_state::screen_update_goldstar<false>));
 	screen.screen_vblank().set_inputline(m_maincpu, 0, HOLD_LINE);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_pkrmast);
-	PALETTE(config, m_palette, FUNC(goldstar_state::cm_palette), 256);
+	PALETTE(config, m_palette, FUNC(cmaster_state::cm_palette), 256);
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
-
-	MCFG_VIDEO_START_OVERRIDE(goldstar_state, cherrym)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -11705,32 +11717,32 @@ void goldstar_state::pkrmast(machine_config &config)
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
-void goldstar_state::jkrmast(machine_config &config)
+void cmaster_state::jkrmast(machine_config &config)
 {
 	pkrmast(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &goldstar_state::jkrmast_map);
-	m_maincpu->set_addrmap(AS_IO, &goldstar_state::jkrmast_portmap);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cmaster_state::jkrmast_map);
+	m_maincpu->set_addrmap(AS_IO, &cmaster_state::jkrmast_portmap);
 
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(goldstar_state::screen_update_goldstar<true>));
-	MCFG_VIDEO_START_OVERRIDE(goldstar_state, jkrmast)
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(cmaster_state::screen_update_goldstar<true>));
+	MCFG_VIDEO_START_OVERRIDE(cmaster_state, jkrmast)
 
 	subdevice<ay8910_device>("aysnd")->port_a_read_callback().set_ioport("DSW3");
 	subdevice<ay8910_device>("aysnd")->port_b_read_callback().set_ioport("DSW4");
 }
 
-void goldstar_state::crazybon(machine_config &config)
+void cmaster_state::crazybon(machine_config &config)
 {
 	pkrmast(config);
 
-	m_maincpu->set_addrmap(AS_IO, &goldstar_state::crazybon_portmap);
+	m_maincpu->set_addrmap(AS_IO, &cmaster_state::crazybon_portmap);
 }
 
-void goldstar_state::crazybonb(machine_config &config)
+void cmaster_state::crazybonb(machine_config &config)
 {
 	pkrmast(config);
 
-	m_maincpu->set_addrmap(AS_OPCODES, &goldstar_state::super972_decrypted_opcodes_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &cmaster_state::super972_decrypted_opcodes_map);
 }
 
 void cmaster_state::animalhs(machine_config &config)
@@ -11777,8 +11789,6 @@ void goldstar_state::megaline(machine_config &config)
 	PALETTE(config, m_palette, FUNC(goldstar_state::lucky8_palette), 256);
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	MCFG_VIDEO_START_OVERRIDE(goldstar_state,goldstar)
-
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
@@ -11802,13 +11812,11 @@ void unkch_state::bonusch(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
-	screen.set_screen_update(FUNC(goldstar_state::screen_update_goldstar<false>));
+	screen.set_screen_update(FUNC(unkch_state::screen_update_goldstar<false>));
 	screen.screen_vblank().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_megaline);
-	PALETTE(config, m_palette, FUNC(goldstar_state::lucky8_palette), 256);
-
-	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
+	PALETTE(config, m_palette, FUNC(unkch_state::lucky8_palette), 256);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -11849,8 +11857,6 @@ void goldstar_state::feverch(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ncb3);
 	PALETTE(config, m_palette, FUNC(goldstar_state::cm_palette), 256);
-
-	MCFG_VIDEO_START_OVERRIDE(goldstar_state, goldstar)
 
 	SPEAKER(config, "mono").front_center();
 
@@ -14048,6 +14054,11 @@ ROM_END
 
 ROM_START( cmast99 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
+	// this ROM loading is confirmed via ICE dump at reset
+	// however, ICE dump after 1 second shows that the 0x4000-0x4fff range gets overwritten with what's at 0x8000-0x8fff.
+	// ROM banking as protection? Couldn't spot any suspect writes to select it.
+	// there are however strange, apparently intentional writes in ROM ranges.
+	// see code at 0x332 and at 0x358, f.e.
 	ROM_LOAD( "cm99-041-8.u81", 0x0000, 0x1000, CRC(5fb0800e) SHA1(14d316b7b89340c5b5c9fdd0b43d5810513b74d6) )
 	ROM_CONTINUE(0x4000,0x1000)
 	ROM_CONTINUE(0x3000,0x1000)
@@ -14081,7 +14092,7 @@ ROM_START( cmast99 )
 
 	ROM_REGION( 0x800, "plds", ROMREGION_ERASE00 )
 	ROM_LOAD( "gal16v8d.f10",   0x000, 0x117, CRC(6655473e) SHA1(f7bdd98a5ec5d3fc53332c12ea81c03af02d561a) )
-	ROM_LOAD( "palce16v8h.e14", 0x200, 0x117, NO_DUMP ) // registered
+	ROM_LOAD( "palce16v8h.e14", 0x200, 0x117, CRC(4dbf87ec) SHA1(338d9fabba8928e25ca39fbe717c5e6ce35b7278) )
 	ROM_LOAD( "palce16v8h.f14", 0x400, 0x117, CRC(12a5e577) SHA1(ee5ea1afef775db3a9f848b5cc5384bc10b4e349) )
 	ROM_LOAD( "palce16v8h.g13", 0x600, 0x117, CRC(deee0b94) SHA1(3682affbe803ffa8b436346f159c3818d6714d1a) )
 ROM_END
@@ -21877,7 +21888,7 @@ void goldstar_state::init_goldstar()
 	}
 }
 
-void goldstar_state::init_jkrmast()
+void cmaster_state::init_jkrmast()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -21906,7 +21917,7 @@ void goldstar_state::init_jkrmast()
 	init_palnibbles();
 }
 
-void goldstar_state::init_pkrmast()
+void cmaster_state::init_pkrmast()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -21958,7 +21969,7 @@ void goldstar_state::init_pkrmast()
 	init_palnibbles();
 }
 
-void goldstar_state::init_crazybonb()
+void cmaster_state::init_crazybonb()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
@@ -24019,10 +24030,10 @@ GAMEL( 199?, hamhouse,   cmaster,  cm,       cmaster,  cmaster_state,  init_hamh
 GAMEL( 199?, hamhouse9,  cmaster,  cm,       cmaster,  cmaster_state,  init_hamhouse9, ROT0, "bootleg",           "Hamburger House 9",                           MACHINE_NOT_WORKING, layout_cmaster ) // needs correct I/O
 
 GAMEL( 1991, tonypok,    0,        cm,       tonypok,  cmaster_state,  init_tonypok,   ROT0, "Corsica",           "Poker Master (Tony-Poker V3.A, hack?)",       0 ,                layout_tonypok )
-GAME(  1998, jkrmast,    0,        jkrmast,  jkrmast,  goldstar_state, init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master 2000 Special Edition (V515)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING ) // needs correct FG colors and controls
-GAME(  1998, jkrmasta,   jkrmast,  jkrmast,  jkrmast,  goldstar_state, init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master 2000 Special Edition (V512)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING ) // needs correct FG colors and controls
-GAME(  199?, pkrmast,    jkrmast,  pkrmast,  pkrmast,  goldstar_state, init_pkrmast,   ROT0, "Fun USA",           "Poker Master (ED-1993 set 1)",                MACHINE_NOT_WORKING ) // needs inputs / dips fixed, puts FUN USA 95H N/G  V2.20 in NVRAM
-GAME(  1993, pkrmasta,   jkrmast,  pkrmast,  pkrmast,  goldstar_state, init_pkrmast,   ROT0, "Fun USA",           "Poker Master (ED-1993 set 2)",                MACHINE_NOT_WORKING ) // needs inputs / dips fixed, puts PM93 JAN 29/1996 V1.52 in NVRAM
+GAME(  1998, jkrmast,    0,        jkrmast,  jkrmast,  cmaster_state,  init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master 2000 Special Edition (V515)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING ) // needs correct FG colors and controls
+GAME(  1998, jkrmasta,   jkrmast,  jkrmast,  jkrmast,  cmaster_state,  init_jkrmast,   ROT0, "Pick-A-Party USA",  "Joker Master 2000 Special Edition (V512)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING ) // needs correct FG colors and controls
+GAME(  199?, pkrmast,    jkrmast,  pkrmast,  pkrmast,  cmaster_state,  init_pkrmast,   ROT0, "Fun USA",           "Poker Master (ED-1993 set 1)",                MACHINE_NOT_WORKING ) // needs inputs / dips fixed, puts FUN USA 95H N/G  V2.20 in NVRAM
+GAME(  1993, pkrmasta,   jkrmast,  pkrmast,  pkrmast,  cmaster_state,  init_pkrmast,   ROT0, "Fun USA",           "Poker Master (ED-1993 set 2)",                MACHINE_NOT_WORKING ) // needs inputs / dips fixed, puts PM93 JAN 29/1996 V1.52 in NVRAM
 
 GAME(  199?, chthree,    cmaster,  cm,       cmaster,  cmaster_state,  init_chthree,   ROT0, "Promat",            "Channel Three",                               0 ) // hack of cmaster, still shows DYNA CM-1 V1.01 in book-keeping
 
@@ -24034,9 +24045,9 @@ GAME(  1991, eldoradd,   0,        eldoradd, cmast91,  cmaster_state,  empty_ini
 GAME(  1991, eldoraddo,  eldoradd, eldoradd, cmast91,  cmaster_state,  empty_init,     ROT0, "Dyna",              "El Dorado (V1.1TA)",                          MACHINE_NOT_WORKING ) // different GFX hw?
 GAME(  1991, eldoraddob, eldoradd, eldoradd, cmast91,  cmaster_state,  empty_init,     ROT0, "Dyna",              "El Dorado (V2.0D)",                           MACHINE_NOT_WORKING ) // different GFX hw?
 GAME(  1991, eldoraddoc, eldoradd, eldoradd, cmast91,  cmaster_state,  empty_init,     ROT0, "Dyna",              "El Dorado (V1.1J)",                           MACHINE_NOT_WORKING ) // different GFX hw?
-GAME(  1996, cmast97,    0,        cm97,     cmv801,   cmaster_state,  empty_init,     ROT0, "Dyna",              "Cherry Master '97 (V1.7, set 1)",             MACHINE_NOT_WORKING ) // fix prom decode, reels
-GAME(  1996, cmast97a,   cmast97,  cm97,     cmv801,   cmaster_state,  empty_init,     ROT0, "Dyna",              "Cherry Master '97 (V1.7, set 2)",             MACHINE_NOT_WORKING ) // fix prom decode, reels
-GAME(  1996, cmast97i,   cmast97,  cm97,     cmv801,   cmaster_state,  empty_init,     ROT0, "Dyna",              "Cheri Mondo '97 (V1.4I)",                     MACHINE_NOT_WORKING ) // fix prom decode, reels
+GAME(  1996, cmast97,    0,        cmast97,  cmv801,   cmast97_state,  empty_init,     ROT0, "Dyna",              "Cherry Master '97 (V1.7, set 1)",             MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING ) // fix prom decode / palette
+GAME(  1996, cmast97a,   cmast97,  cmast97,  cmv801,   cmast97_state,  empty_init,     ROT0, "Dyna",              "Cherry Master '97 (V1.7, set 2)",             MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING ) // fix prom decode / palette
+GAME(  1996, cmast97i,   cmast97,  cmast97,  cmv801,   cmast97_state,  empty_init,     ROT0, "Dyna",              "Cheri Mondo '97 (V1.4I)",                     MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING ) // fix prom decode / palette
 GAME(  1999, cmast99,    0,        cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master '99 (V9B.00)",                  MACHINE_NOT_WORKING )
 GAME(  1999, cmast99b,   cmast99,  cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Cherry Master '99 (V9B.00 bootleg / hack)",   MACHINE_NOT_WORKING )
 GAME(  1993, aplan,      0,        cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "WeaShing H.K.",     "A-Plan",                                      MACHINE_NOT_WORKING )
@@ -24235,9 +24246,9 @@ GAMEL( 198?, cmtetrisb,  cmtetris, cm,        cmtetris, cmaster_state,  init_cm,
 GAMEL( 198?, cmtetrisc,  cmtetris, cm,        cmtetris, cmaster_state,  init_cmtetrisc, ROT0, "<unknown>",               "Tetris + Cherry Master (Corsica, v8.01, encrypted)",                       0,                                              layout_cmpacman )
 GAMEL( 198?, cmtetriskr, cmtetris, cmtetriskr,cmtetris, cmaster_state,  init_cmtetriskr,ROT0, "<unknown>",               "Tetris + Global Money Fever (Corsica, v8.01, Korean bootleg)",             MACHINE_NOT_WORKING,                            layout_cmpacman ) // starts with coins already inserted in Tetris mode, need to press K/L to switch between games...
 GAMEL( 198?, cmtetrisd,  cmtetris, cm,        cmtetris, cmaster_state,  init_cmtetrisd, ROT0, "bootleg (Aidonis Games)", "Tetris + Cherry Master (Aidonis Games bootleg)",                           0,                                              layout_cmpacman ) // seems to have been hacked to run the slot game as default, see 0x8ba8
-GAMEL( 1997, crazybon,   0,        crazybon,  crazybon, goldstar_state, empty_init,     ROT0, "bootleg (Crazy Co.)",     "Crazy Bonus 2002 (Ver. 1, set 1)",                                         MACHINE_IMPERFECT_COLORS,                       layout_crazybon ) // Windows ME desktop... but not found the way to switch it.
-GAMEL( 1997, crazybona,  crazybon, crazybon,  crazybon, goldstar_state, empty_init,     ROT0, "bootleg (Crazy Co.)",     "Crazy Bonus 2002 (Ver. 1, set 2)",                                         MACHINE_IMPERFECT_COLORS,                       layout_crazybon )
-GAMEL( 1997, crazybonb,  crazybon, crazybonb, pkrmast,  goldstar_state, init_crazybonb, ROT0, "bootleg (TV Games)",      "Crazy Bonus 2002 (Ver. 1, set 3)",                                         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS, layout_crazybon ) // F.B. & POKER 94, VER.1 in NVRAM, decryption seems ok, possibly needs proper memory map
+GAMEL( 1997, crazybon,   0,        crazybon,  crazybon, cmaster_state,  empty_init,     ROT0, "bootleg (Crazy Co.)",     "Crazy Bonus 2002 (Ver. 1, set 1)",                                         MACHINE_IMPERFECT_COLORS,                       layout_crazybon ) // Windows ME desktop... but not found the way to switch it.
+GAMEL( 1997, crazybona,  crazybon, crazybon,  crazybon, cmaster_state,  empty_init,     ROT0, "bootleg (Crazy Co.)",     "Crazy Bonus 2002 (Ver. 1, set 2)",                                         MACHINE_IMPERFECT_COLORS,                       layout_crazybon )
+GAMEL( 1997, crazybonb,  crazybon, crazybonb, pkrmast,  cmaster_state,  init_crazybonb, ROT0, "bootleg (TV Games)",      "Crazy Bonus 2002 (Ver. 1, set 3)",                                         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS, layout_crazybon ) // F.B. & POKER 94, VER.1 in NVRAM, decryption seems ok, possibly needs proper memory map
 
 /* other possible stealth sets:
  - cmv4a    ---> see the 1fxx zone. put a bp in 1f9f to see the loop.

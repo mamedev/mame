@@ -2,19 +2,18 @@
 // copyright-holders:Nicola Salmoria, Manuel Abadia
 /***************************************************************************
 
-    Chequered Flag / Checkered Flag (GX717) (c) Konami 1988
+Chequered Flag / Checkered Flag (GX717) (c) Konami 1988
 
-    Main board: PWB(C)350761A
-    IO board:   PWB(C)450871A
+Main board: PWB(C)350761A
+IO board:   PWB(C)450871A
 
-    Notes:
-    - 007232 volume & panning control is almost certainly wrong;
-    - needs proper shadow/highlight factor values for sprites and tilemap;
-    - compared to references, emulation is a bit slower (around 2/3 seconds
-      behind on a full lap of stage 2);
-
-    2008-07
-    Dip locations and recommended settings verified with manual
+TODO:
+- 007232 volume & panning control is almost certainly wrong;
+- needs proper shadow/highlight factor values for sprites and tilemap;
+- compared to references, emulation is a bit slower (around 2/3 seconds
+  behind on a full lap of stage 2);
+- hsync was measured 15.13 / 15.19khz but seems suspicious, it would mean
+  vtotal=256, htotal=396?
 
 ***************************************************************************/
 
@@ -191,32 +190,34 @@ void chqflag_state::chqflag_vreg_w(uint8_t data)
 	/* bit 4 = enable rom reading through K051316 #1 & #2 */
 	m_k051316_readroms = BIT(data, 4);
 
-	/* Bits 3-7 probably control palette dimming in a similar way to TMNT2/Sunset Riders, */
-	/* however I don't have enough evidence to determine the exact behaviour. */
-	/* Bits 3 and 7 are set in night stages, where the background should get darker and */
-	/* the headlight (which have the shadow bit set) become highlights */
-	/* Maybe one of the bits inverts the SHAD line while the other darkens the background. */
 	/*
-	 * Update according to a reference:
-	 * 0x00 is certainly shadow (car pit-in shadow when zoomed in/clouds before rain)
-	 * 0x80 is used when rain shows up (which should be white/highlighted)
-	 * 0x88 is for when night shows up (max amount of highlight)
-	 * 0x08 is used at dawn after 0x88 state
-	 * During rain and night, the reference shows a dimmed background as well.
-	 *
-	 * TODO: true values aren't known, also shadow_factors table probably scales towards zero instead (game doesn't use those)
-	 */
+	Bits 3,7 probably control palette dimming in a similar way to TMNT2/Sunset Riders,
+	however I don't have enough evidence to determine the exact behaviour.
+	Bits 3 and 7 are set in night stages, where the background should get darker and
+	the headlight (which has the shadow bit set) become highlights.
+	Maybe one of the bits inverts the SHAD line while the other darkens the background.
+
+	Update according to a reference:
+	0x00 is certainly shadow (car pit-in shadow when zoomed in/clouds before rain)
+	0x80 is used when rain shows up (which should be white/highlighted)
+	0x88 is for when night shows up (max amount of highlight)
+	0x08 is used at dawn after 0x88 state
+	During rain and night, the reference shows a dimmed background as well.
+
+	TODO: true values aren't known, also shadow_factors table probably scales towards zero
+	(game doesn't use those)
+	*/
 
 	if ((data ^ m_last_vreg) & 0x88)
 	{
 		const double bg_brightness[4] = { 1.0, 1.0, 0.75, 0.75 };
-		const double highlight_factor[4] = { 1.1, 1.15, 1.25, 1.40 };
+		const double highlight_factor[4] = { 1.1, 1.15, 1.25, 1.45 };
 		const int index = BIT(data, 3) | (BIT(data, 7) << 1);
 
 		for (int i = 512; i < 1024; i++)
 			m_palette->set_pen_contrast(i, bg_brightness[index]);
 
-		m_palette->set_shadow_factor(0.8); // only index 0 used?
+		m_palette->set_shadow_factor(0.75); // only index 0 used?
 		m_palette->set_highlight_factor(highlight_factor[index]);
 	}
 
@@ -349,10 +350,10 @@ static INPUT_PORTS_START( chqflag )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc", FUNC(adc0804_device::intr_r))
 
 	PORT_START("IN3")   /* Accelerator */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5)
+	PORT_BIT( 0xff, 0x38, IPT_PEDAL ) PORT_MINMAX(0x38,0xa0) PORT_SENSITIVITY(100) PORT_KEYDELTA(9)
 
 	PORT_START("IN4")   /* Driving wheel */
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xef) PORT_SENSITIVITY(80) PORT_KEYDELTA(8)
+	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x60,0xa0) PORT_SENSITIVITY(100) PORT_KEYDELTA(3)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( chqflagj )
@@ -409,11 +410,11 @@ void chqflag_state::machine_reset()
 
 void chqflag_state::chqflag(machine_config &config)
 {
-	/* basic machine hardware */
-	KONAMI(config, m_maincpu, XTAL(24'000'000)/2);    /* 052001 (verified on pcb) */
+	// basic machine hardware
+	KONAMI(config, m_maincpu, 24_MHz_XTAL / 2); // 052001 (verified on pcb)
 	m_maincpu->set_addrmap(AS_PROGRAM, &chqflag_state::chqflag_map);
 
-	Z80(config, m_audiocpu, XTAL(3'579'545)); /* verified on pcb */
+	Z80(config, m_audiocpu, 3.579545_MHz_XTAL); // verified on pcb
 	m_audiocpu->set_addrmap(AS_PROGRAM, &chqflag_state::chqflag_sound_map);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
@@ -422,11 +423,9 @@ void chqflag_state::chqflag(machine_config &config)
 
 	ADC0804(config, "adc", RES_K(10), CAP_P(150)).vin_callback().set(FUNC(chqflag_state::analog_read_r));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(24'000'000)/3, 528, 96, 400, 256, 16, 240); // measured Vsync 59.17hz Hsync 15.13 / 15.19khz
-//  6MHz dotclock is more realistic, however needs drawing updates. replace when ready
-//  screen.set_raw(XTAL(24'000'000)/4, 396, hbend, hbstart, 256, 16, 240);
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 320-16, 264, 16, 240); // measured Vsync 59.17hz
 	screen.set_screen_update(FUNC(chqflag_state::screen_update_chqflag));
 	screen.set_palette(m_palette);
 
@@ -434,7 +433,7 @@ void chqflag_state::chqflag(machine_config &config)
 	m_palette->enable_shadows();
 	m_palette->enable_highlights();
 
-	K051960(config, m_k051960, 0);
+	K051960(config, m_k051960, 24_MHz_XTAL);
 	m_k051960->set_palette(m_palette);
 	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(chqflag_state::sprite_callback));
@@ -442,13 +441,14 @@ void chqflag_state::chqflag(machine_config &config)
 	m_k051960->irq_handler().set_inputline(m_maincpu, KONAMI_IRQ_LINE);
 	m_k051960->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	K051316(config, m_k051316[0], 0);
+	K051316(config, m_k051316[0], 24_MHz_XTAL / 2);
 	m_k051316[0]->set_palette(m_palette);
 	m_k051316[0]->set_offsets(7, 0);
 	m_k051316[0]->set_zoom_callback(FUNC(chqflag_state::zoom_callback_1));
 
-	K051316(config, m_k051316[1], 0);
+	K051316(config, m_k051316[1], 24_MHz_XTAL / 2);
 	m_k051316[1]->set_palette(m_palette);
+	m_k051316[1]->set_offsets(7, 0);
 	m_k051316[1]->set_bpp(8);
 	m_k051316[1]->set_layermask(0xc0);
 	m_k051316[1]->set_wrap(1);
@@ -456,23 +456,23 @@ void chqflag_state::chqflag(machine_config &config)
 
 	K051733(config, "k051733", 24_MHz_XTAL / 2);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 	GENERIC_LATCH_8(config, "soundlatch2").data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545))); /* verified on pcb */
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL)); // verified on pcb
 	ymsnd.irq_handler().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 	ymsnd.add_route(0, "speaker", 1.00, 0);
 	ymsnd.add_route(1, "speaker", 1.00, 1);
 
-	K007232(config, m_k007232[0], XTAL(3'579'545)); /* verified on pcb */
+	K007232(config, m_k007232[0], 3.579545_MHz_XTAL); // verified on pcb
 	m_k007232[0]->port_write().set(FUNC(chqflag_state::volume_callback0));
 	m_k007232[0]->add_route(0, "speaker", 0.20, 0);
 	m_k007232[0]->add_route(1, "speaker", 0.20, 1);
 
-	K007232(config, m_k007232[1], XTAL(3'579'545)); /* verified on pcb */
+	K007232(config, m_k007232[1], 3.579545_MHz_XTAL); // verified on pcb
 	m_k007232[1]->port_write().set(FUNC(chqflag_state::volume_callback1));
 	m_k007232[1]->add_route(0, "speaker", 0.20, 0);
 	m_k007232[1]->add_route(0, "speaker", 0.20, 1);

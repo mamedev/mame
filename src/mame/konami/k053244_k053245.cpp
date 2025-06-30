@@ -220,7 +220,8 @@ u8 k05324x_device::k053244_r(offs_t offset)
 	}
 	else if (offset == 0x06)
 	{
-		update_buffer();
+		if (!machine().side_effects_disabled())
+			update_buffer();
 		return 0;
 	}
 	else
@@ -404,6 +405,7 @@ void k05324x_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 		ox = m_buffer[offs+3] + spriteoffsX;
 		oy = m_buffer[offs+2];
 
+		ox -= 96;
 		ox += m_dx;
 		oy += m_dy;
 
@@ -452,7 +454,7 @@ void k05324x_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 				int c, fx, fy;
 
 				sx = ox + ((zoomx * x + (1 << 11)) >> 12);
-				zw = (ox + ((zoomx * (x+1) + (1 << 11)) >> 12)) - sx;
+				zw = (ox + ((zoomx * (x + 1) + (1 << 11)) >> 12)) - sx;
 				c = code;
 				if (mirrorx)
 				{
@@ -523,17 +525,4 @@ void k05324x_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 			}
 		}
 	}
-#if 0
-if (machine().input().code_pressed(KEYCODE_D))
-{
-	FILE *fp;
-	fp=fopen("SPRITE.DMP", "w+b");
-	if (fp)
-	{
-		fwrite(m_buffer, 0x800, 1, fp);
-		popmessage("saved");
-		fclose(fp);
-	}
-}
-#endif
 }

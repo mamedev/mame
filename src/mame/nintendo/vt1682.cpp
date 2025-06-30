@@ -77,7 +77,7 @@
 
 #define LOG_ALL           (LOG_DMA | LOG_VRAM_WRITES | LOG_SRAM_WRITES | LOG_OTHER)
 
-#define VERBOSE             (0)
+#define VERBOSE             (LOG_OTHER)
 #include "logmacro.h"
 
 
@@ -678,9 +678,10 @@ protected:
 private:
 
 	uint8_t m_previous_port_b;
-	int m_input_sense;
 	int m_input_pos;
 	int m_current_bank;
+
+	attotime m_transition_time;
 
 	required_ioport m_io_p1;
 	required_ioport m_io_p2;
@@ -5785,16 +5786,15 @@ void intec_interact_state::machine_start()
 	vt_vt1682_state::machine_start();
 
 	save_item(NAME(m_previous_port_b));
-	save_item(NAME(m_input_sense));
 	save_item(NAME(m_input_pos));
 	save_item(NAME(m_current_bank));
+	save_item(NAME(m_transition_time));
 }
 
 void intec_interact_state::machine_reset()
 {
 	vt_vt1682_state::machine_reset();
-	m_previous_port_b = 0x0;
-	m_input_sense = 0;
+	m_previous_port_b = 0xf;
 	m_input_pos = 0;
 	m_current_bank = 0;
 	if (m_bank)
@@ -6038,15 +6038,16 @@ uint8_t intec_interact_state::porta_r()
 	case 0x4: ret = m_io_p4->read(); break;
 	}
 
-	//LOGMASKED(LOG_OTHER, "%s: porta_r returning: %1x (INPUTS) (with input position %d)\n", machine().describe_context(), ret, m_input_pos);
+	LOGMASKED(LOG_OTHER, "%s: porta_r returning: %1x (INPUTS) (with input position %d)\n", machine().describe_context(), ret, m_input_pos);
 	return ret;
 }
 
 uint8_t intec_interact_state::portc_r()
 {
 	uint8_t ret = 0x0;
-	ret |= m_input_sense ^1;
-	//LOGMASKED(LOG_OTHER, "%s: portc_r returning: %1x (CONTROLLER INPUT SENSE)\n", machine().describe_context(), ret);
+	if (machine().time() >= m_transition_time + attotime::from_usec(100))
+		ret |= 1;
+	LOGMASKED(LOG_OTHER, "%s: portc_r returning: %1x (CONTROLLER INPUT SENSE) @ %s\n", machine().describe_context(), ret, machine().time().to_string());
 	return ret;
 }
 
@@ -6054,59 +6055,35 @@ void intec_interact_state::portb_w(uint8_t data)
 {
 	LOGMASKED(LOG_OTHER, "%s: portb_w writing: %1x\n", machine().describe_context(), data & 0xf);
 
-	if ((m_previous_port_b & 0x1) && (!(data & 0x1)))
+	if ((m_previous_port_b & 0x1) != (data & 0x1))
 	{
-		// 0x1 high -> low
-		LOGMASKED(LOG_OTHER, "high to low\n");
-
-		if (m_input_sense == 1)
+		if (data & 0x1)
 		{
-			m_input_pos++;
+			// 0x1 low -> high
+			LOGMASKED(LOG_OTHER, "low to high @ %s\n", machine().time().to_string());
 		}
 		else
 		{
-			m_input_sense = 1;
+			// 0x1 high -> low
+			LOGMASKED(LOG_OTHER, "high to low @ %s\n", machine().time().to_string());
 		}
-		LOGMASKED(LOG_OTHER, "input pos is %d\n", m_input_pos);
 
-	}
-	else if ((m_previous_port_b & 0x1) && (data & 0x1))
-	{
-		// 0x1 high -> high
-		LOGMASKED(LOG_OTHER, "high to high\n");
-		m_input_pos = 0;
-	}
-	else if ((!(m_previous_port_b & 0x1)) && (!(data & 0x1)))
-	{
-		// 0x1 low -> low
-		LOGMASKED(LOG_OTHER, "low to low\n");
-
-		if (m_input_sense == 1)
-		{
-			m_input_pos = 0;
-		}
-	}
-	else if ((!(m_previous_port_b & 0x1)) && (data & 0x1))
-	{
-		// 0x1 low -> high
-		LOGMASKED(LOG_OTHER, "low to high\n");
-
-		if (m_input_sense == 1)
+		attotime now = machine().time();
+		if (now < m_transition_time + attotime::from_usec(100))
 		{
 			m_input_pos++;
+			m_transition_time = now;
 		}
-
-		if (m_input_pos == 5)
+		else if (!(data & 0x1))
 		{
-			m_input_sense = 0;
+			m_input_pos = 0;
+			m_transition_time = now;
 		}
-
 		LOGMASKED(LOG_OTHER, "input pos is %d\n", m_input_pos);
-
 	}
 
 	m_previous_port_b = data;
-};
+}
 
 void vt1682_exsport_state::clock_joy2()
 {
@@ -6147,7 +6124,6 @@ void intec_interact_state::intech_interact(machine_config& config)
 	m_io->porta_in().set(FUNC(intec_interact_state::porta_r));
 	m_io->porta_out().set(FUNC(intec_interact_state::porta_w));
 
-	m_io->portb_in().set(FUNC(intec_interact_state::portb_r));
 	m_io->portb_out().set(FUNC(intec_interact_state::portb_w));
 
 	m_io->portc_in().set(FUNC(intec_interact_state::portc_r));

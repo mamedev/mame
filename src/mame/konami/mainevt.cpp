@@ -7,14 +7,9 @@
 
 Emulation by Bryan McPhail, mish@tendril.co.uk
 
-Notes:
+TODO:
 - Schematics show a palette/work RAM bank selector, but this doesn't seem
   to be used?
-
-- Devastators: sprite zooming for the planes in level 2 is particularly bad.
-
-- HTOTAL is actually 384 (/4 divider for pixel clock, 64 HBLANK clocks),
-  but gfx hardware emulation doesn't play along nicely
 
 Both games run on Konami's PWB351024A PCB
   The Main Event uses a uPD7759 + 640KHz resonator plus sample ROM, for
@@ -35,6 +30,7 @@ Both games run on Konami's PWB351024A PCB
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
+#include "machine/timer.h"
 #include "sound/k007232.h"
 #include "sound/upd7759.h"
 #include "sound/ymopm.h"
@@ -113,7 +109,7 @@ private:
 	void sh_irqcontrol_w(uint8_t data);
 	void sh_bankswitch_w(uint8_t data);
 	uint8_t sh_busy_r();
-	INTERRUPT_GEN_MEMBER(sound_timer_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(sound_timer_irq);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	K052109_CB_MEMBER(tile_callback);
@@ -135,7 +131,7 @@ public:
 private:
 	void sh_irqcontrol_w(uint8_t data);
 	void sh_bankswitch_w(uint8_t data);
-	INTERRUPT_GEN_MEMBER(sound_timer_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(sound_timer_irq);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	K052109_CB_MEMBER(tile_callback);
@@ -576,15 +572,21 @@ void mainevt_state::machine_reset()
 	sh_irqcontrol_w(0);
 }
 
-INTERRUPT_GEN_MEMBER(mainevt_state::sound_timer_irq)
+TIMER_DEVICE_CALLBACK_MEMBER(mainevt_state::sound_timer_irq)
 {
-	if (m_sound_irq_mask)
+	int scanline = param;
+
+	// 8 interrupts per frame
+	if ((scanline & 0x1f) == 0x10 && m_sound_irq_mask)
 		m_audiocpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
-INTERRUPT_GEN_MEMBER(devstors_state::sound_timer_irq)
+TIMER_DEVICE_CALLBACK_MEMBER(devstors_state::sound_timer_irq)
 {
-	if (m_sound_irq_mask)
+	int scanline = param;
+
+	// 4 interrupts per frame
+	if ((scanline & 0x3f) == 0x20 && m_sound_irq_mask)
 		m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -596,11 +598,11 @@ void mainevt_state::mainevt(machine_config &config)
 
 	Z80(config, m_audiocpu, 3.579545_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &mainevt_state::sound_map);
-	m_audiocpu->set_periodic_int(FUNC(mainevt_state::sound_timer_irq), attotime::from_hz(8 * 60)); // ???
+	TIMER(config, "scantimer").configure_scanline(FUNC(mainevt_state::sound_timer_irq), "screen", 0, 1);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(24_MHz_XTAL / 3, 512, 14 * 8, (64 - 14) * 8, 264, 16, 240); // same hardware as Devastators so assume 59.17
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240); // same hardware as Devastators so assume 59.17
 	screen.set_screen_update(FUNC(mainevt_state::screen_update));
 	screen.set_palette("palette");
 
@@ -640,11 +642,11 @@ void devstors_state::devstors(machine_config &config)
 
 	Z80(config, m_audiocpu, 3.579545_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &devstors_state::sound_map);
-	m_audiocpu->set_periodic_int(FUNC(devstors_state::sound_timer_irq), attotime::from_hz(4 * 60)); // ???
+	TIMER(config, "scantimer").configure_scanline(FUNC(devstors_state::sound_timer_irq), "screen", 0, 1);
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(24_MHz_XTAL / 3, 512, 15 * 8, (64 - 13) * 8, 264, 16, 240); // measured 59.17
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0+24, 320-8, 264, 16, 240); // measured 59.17
 	screen.set_screen_update(FUNC(devstors_state::screen_update));
 	screen.set_palette("palette");
 	screen.screen_vblank().set("k051733", FUNC(k051733_device::nmiclock_w));
@@ -670,7 +672,9 @@ void devstors_state::devstors(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	YM2151(config, "ymsnd", 3.579545_MHz_XTAL).add_route(0, "mono", 0.30).add_route(1, "mono", 0.30);
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL));
+	ymsnd.add_route(0, "mono", 0.30);
+	ymsnd.add_route(1, "mono", 0.30);
 
 	K007232(config, m_k007232, 3.579545_MHz_XTAL);
 	m_k007232->port_write().set(FUNC(devstors_state::volume_callback));

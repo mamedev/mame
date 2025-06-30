@@ -46,7 +46,7 @@ Notes:
                      Video Clock Input Pin 103 - 28.63636MHz
                      Another identical PCB has this chip marked "ADC Amazon-LF EISC" so these are 100% compatible.
            0260F8A - Renesas M30260F8AGP (TQFP44) (M16C/26A based microcontroller with internal 64K + 4K Flash ROM).
-                     Clock Input 8.000MHz.
+                     Clock Input 8.000MHz. (**)
               HY04 - rebadged DIP8 PIC - type unknown (*). PCB marked "SAM1"
                      Some chips are marked "SL01". Chip data is unique to each game but different
                      versions of the same game work ok with swapped HY04 or swapped main program EPROM.
@@ -80,6 +80,7 @@ Notes:
   7 High
   8 VCC
 
+** On some similar PCBs (f.e. wakeng) it's an M30262F8GP (LQFP48) with 12 MHz XTAL
 ****************************************************************************/
 
 #include "emu.h"

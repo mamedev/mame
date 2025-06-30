@@ -20795,6 +20795,7 @@ slqz3
 tct2p
 tripslot
 tshs
+tswxp
 xypdk
 zhongguo
 
@@ -33636,6 +33637,9 @@ dkmb
 @source:namco/ds5000.cpp
 ds5000
 
+@source:namco/ds6000.cpp
+ds6000
+
 @source:namco/gal3.cpp
 gal3
 
@@ -35434,37 +35438,42 @@ vsmaxtx2
 wfmotor
 
 @source:nintendo/nes_vt32.cpp
+bittboy
 dgun2573
 dgun2573a
 dgunl3201
 dgunl3202
+fapocket
 fcpocket
 g9_666
+hhgc319
 lxpcli
 lxpcsp
 matet100
 matet220
 matet300
+mc_hh210
 myaasa
 myaass
+q5_500in1
+retro400
 rfcp168
 rminitv
+unk2019hh
+unk2020hh
 
 @source:nintendo/nes_vt369_vtunknown.cpp
 36pcase
 168pcase
 240in1ar
-bittboy
 denv150
 dgun2561
 dgun2577
 dgun2593
 dvnimbus
 egame150
-fapocket
 gcs2mgp
 gtct885
-hhgc319
 hkb502
 hkb502a
 lexi30
@@ -35492,18 +35501,15 @@ lxcypksp
 matet10
 matetsl
 mc_cb280
-mc_hh210
 mog_m320
 myarccn
 nesvt270
 nubsupmf
 otrail
 pactin
-q5_500in1
 rbbrite
 rd5_240
 red5mam
-retro400
 rtvgc300
 rtvgc300fz
 sealvt
@@ -35512,8 +35518,6 @@ sy889
 tetrtin
 tup240
 unk128vt
-unk2019hh
-unk2020hh
 unkra200
 vibes240
 zonefusn

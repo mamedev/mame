@@ -288,8 +288,6 @@ void tmnt_state::tmnt_decode_sample()
 
 ***************************************************************************/
 
-// Missing in Action
-
 K052109_CB_MEMBER(tmnt_state::mia_tile_callback)
 {
 	*flags = (*color & 0x04) ? TILE_FLIPX : 0;
@@ -826,7 +824,7 @@ void tmnt_state::machine_reset()
 void tmnt_state::cuebrick(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 8000000);    /* 8 MHz */
+	M68000(config, m_maincpu, 8000000); /* 8 MHz */
 	m_maincpu->set_addrmap(AS_PROGRAM, &tmnt_state::cuebrick_main_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
@@ -834,10 +832,7 @@ void tmnt_state::cuebrick(machine_config &config)
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(13*8, (64-13)*8-1, 2*8, 30*8-1);
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0+8, 320-8, 264, 16, 240);
 	screen.set_screen_update(FUNC(tmnt_state::screen_update));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(tmnt_state::tmnt_vblank_w));
@@ -851,12 +846,12 @@ void tmnt_state::cuebrick(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,cuebrick)
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette(m_palette);
-	m_k052109->set_screen(nullptr);
+	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(tmnt_state::cuebrick_tile_callback));
 
-	K051960(config, m_k051960, 0);
+	K051960(config, m_k051960, 24_MHz_XTAL);
 	m_k051960->set_palette(m_palette);
 	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(tmnt_state::mia_sprite_callback));
@@ -865,7 +860,7 @@ void tmnt_state::cuebrick(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545)));
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL));
 	ymsnd.irq_handler().set_inputline(m_maincpu, M68K_IRQ_6);
 	ymsnd.add_route(0, "mono", 1.0);
 	ymsnd.add_route(1, "mono", 1.0);
@@ -874,20 +869,17 @@ void tmnt_state::cuebrick(machine_config &config)
 void tmnt_state::mia(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(24'000'000)/3);
+	M68000(config, m_maincpu, 24_MHz_XTAL / 3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tmnt_state::mia_main_map);
 
-	Z80(config, m_audiocpu, XTAL(3'579'545));
+	Z80(config, m_audiocpu, 3.579545_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &tmnt_state::mia_audio_map);
 
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(13*8, (64-13)*8-1, 2*8, 30*8-1);
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0+8, 320-8, 264, 16, 240);
 	screen.set_screen_update(FUNC(tmnt_state::screen_update));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(tmnt_state::tmnt_vblank_w));
@@ -899,12 +891,12 @@ void tmnt_state::mia(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,mia)
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette(m_palette);
-	m_k052109->set_screen(nullptr);
+	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(tmnt_state::mia_tile_callback));
 
-	K051960(config, m_k051960, 0);
+	K051960(config, m_k051960, 24_MHz_XTAL);
 	m_k051960->set_palette(m_palette);
 	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(tmnt_state::mia_sprite_callback));
@@ -915,11 +907,11 @@ void tmnt_state::mia(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545)));
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL));
 	ymsnd.add_route(0, "mono", 0.75);
 	ymsnd.add_route(1, "mono", 0.75);
 
-	K007232(config, m_k007232, XTAL(3'579'545));
+	K007232(config, m_k007232, 3.579545_MHz_XTAL);
 	m_k007232->port_write().set(FUNC(tmnt_state::volume_callback));
 	m_k007232->add_route(0, "mono", 0.15);
 	m_k007232->add_route(1, "mono", 0.15);
@@ -937,10 +929,10 @@ MACHINE_RESET_MEMBER(tmnt_state,tmnt)
 void tmnt_state::tmnt(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(24'000'000)/3);
+	M68000(config, m_maincpu, 24_MHz_XTAL / 3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tmnt_state::tmnt_main_map);
 
-	Z80(config, m_audiocpu, XTAL(3'579'545));
+	Z80(config, m_audiocpu, 3.579545_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &tmnt_state::tmnt_audio_map);
 
 	MCFG_MACHINE_RESET_OVERRIDE(tmnt_state,tmnt)
@@ -949,12 +941,7 @@ void tmnt_state::tmnt(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(12*8, (64-12)*8-1, 2*8, 30*8-1 );
-	// verified against real hardware
-
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 320, 264, 16, 240); // verified against real hardware
 	screen.set_screen_update(FUNC(tmnt_state::screen_update));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(tmnt_state::tmnt_vblank_w)); // NVBLK from 051962
@@ -966,12 +953,12 @@ void tmnt_state::tmnt(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(tmnt_state,tmnt)
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette(m_palette);
-	m_k052109->set_screen(nullptr);
+	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(tmnt_state::tmnt_tile_callback));
 
-	K051960(config, m_k051960, 0);
+	K051960(config, m_k051960, 24_MHz_XTAL);
 	m_k051960->set_palette(m_palette);
 	m_k051960->set_screen("screen");
 	m_k051960->set_sprite_callback(FUNC(tmnt_state::tmnt_sprite_callback));
@@ -982,16 +969,16 @@ void tmnt_state::tmnt(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(3'579'545)));
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 3.579545_MHz_XTAL));
 	ymsnd.add_route(0, "mono", 0.40);
 	ymsnd.add_route(1, "mono", 0.40);
 
-	K007232(config, m_k007232, XTAL(3'579'545));
+	K007232(config, m_k007232, 3.579545_MHz_XTAL);
 	m_k007232->port_write().set(FUNC(tmnt_state::volume_callback));
 	m_k007232->add_route(0, "mono", 0.15);
 	m_k007232->add_route(1, "mono", 0.15);
 
-	UPD7759(config, "upd", XTAL(640'000)).add_route(ALL_OUTPUTS, "mono", 0.30);
+	UPD7759(config, "upd", 640_kHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.30);
 
 	SAMPLES(config, m_samples);
 	m_samples->set_channels(1); /* 1 channel for the title music */
@@ -1004,7 +991,7 @@ void tmnt_state::tmntucbl(machine_config &config)
 
 	m_audiocpu->set_addrmap(AS_PROGRAM, &tmnt_state::tmntucbl_audio_map);
 
-	M68705R3(config, "mcu", XTAL(4'000'000)).set_disable(); // not dumped
+	M68705R3(config, "mcu", 4_MHz_XTAL).set_disable(); // not dumped
 
 	MSM5205(config, "msm", 384'000).add_route(ALL_OUTPUTS, "mono", 0.5); // TODO: hook up, frequency unknown
 

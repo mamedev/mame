@@ -47,8 +47,8 @@ void dsb2_device::dsb2_map(address_map &map)
 	map(0x000000, 0x01ffff).rom().region("mpegcpu", 0);
 	map(0xc00000, 0xc00003).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write)).umask16(0x00ff);
 	map(0xd00001, 0xd00001).w(FUNC(dsb2_device::system_control_w));
-//	map(0xd20001) flsbeats reads here
-//	map(0xe00001) acknowledge FIFO writes?
+//  map(0xd20001) flsbeats reads here
+//  map(0xe00001) acknowledge FIFO writes?
 	map(0xe00003, 0xe00003).w(FUNC(dsb2_device::fifo_w));
 	// MPEG status
 	map(0xe80001, 0xe80001).lr8(NAME([] () { return 0x01; }));
@@ -82,8 +82,8 @@ void dsb2_device::device_start()
 	save_item(NAME(m_mp_end));
 	save_item(NAME(m_mp_vol));
 	save_item(NAME(m_mp_pan));
-//	save_item(NAME(m_command));
-//	save_item(NAME(m_player));
+//  save_item(NAME(m_command));
+//  save_item(NAME(m_player));
 	save_item(NAME(m_lp_start));
 	save_item(NAME(m_lp_end));
 	save_item(NAME(m_start));
@@ -248,17 +248,17 @@ void dsb2_device::sound_stream_update(sound_stream &stream)
 			{
 				//if (m_mp_state == 2)
 				//{
-				//	if (m_mp_pos == m_lp_start * 8)
-				//	{
-				//		// We're looping on un-decodable crap, abort abort abort
-				//		m_mp_state = 0;
-				//	}
-				//	m_mp_pos = m_lp_start * 8;
+				//  if (m_mp_pos == m_lp_start * 8)
+				//  {
+				//      // We're looping on un-decodable crap, abort abort abort
+				//      m_mp_state = 0;
+				//  }
+				//  m_mp_pos = m_lp_start * 8;
 //
-				//	if (m_lp_end)
-				//	{
-				//		m_mp_end = m_lp_end;
-				//	}
+				//  if (m_lp_end)
+				//  {
+				//      m_mp_end = m_lp_end;
+				//  }
 				//}
 				//else
 				{

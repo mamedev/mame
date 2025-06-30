@@ -3096,7 +3096,7 @@ ROM_START( tekken3 )
 	ROM_LOAD16_BYTE( "tet1fl3u.13",       0x1800001, 0x200000, CRC(1917d993) SHA1(cabc44514a3e62a18a7f8f883603241447d6948b) )
 
 	ROM_REGION( 0x0080000, "sub", 0 )
-	ROM_LOAD16_WORD_SWAP( "tet1verb.11s", 0x0000000, 0x080000, CRC(c92b98d1) SHA1(8ae6fba8c5b6b9a2ab9541eac8553b282f35750d) ) /* No label but different than tet1vera.11s */
+	ROM_LOAD16_WORD_SWAP( "tet1verd.11s", 0x0000000, 0x080000, CRC(b13d88a9) SHA1(944d35203bbb7155a296ff37daa426b42f8e2b6b) ) // No label but newer than tet1verb.11s
 
 	ROM_REGION( 0x1000000, "c352", 0 )
 	ROM_LOAD( "tet1wave0.5",              0x0000000, 0x400000, CRC(77ba7975) SHA1(fe9434dcf0fb232c85efaaae1b4b13d36099620a) )
@@ -3115,11 +3115,11 @@ ROM_START( tekken3ja )
 	ROM_LOAD16_BYTE( "tet1rom1u.10",      0x0800001, 0x400000, CRC(502ba5cd) SHA1(19c1282245c6dbfc945c0bd0f3918968c3e5c3ed) )
 	ROM_LOAD16_BYTE( "tet1rom2l.8",       0x1000000, 0x400000, CRC(e03b1c24) SHA1(8579b95a8fd06b7d2893ff88b228fd794162dff1) )
 	ROM_LOAD16_BYTE( "tet1rom2u.11",      0x1000001, 0x400000, CRC(75eb2ab3) SHA1(dee43884e542391903f6aaae2c166e7921a86fb4) )
-	ROM_LOAD16_BYTE( "tet1verafl3l.12",   0x1800000, 0x200000, CRC(64fa1f83) SHA1(5bc8b4657826ead19827f63d04f67597970d5337) ) /* Specific to Ver A. */
-	ROM_LOAD16_BYTE( "tet1verafl3u.13",   0x1800001, 0x200000, CRC(32a2516b) SHA1(6f4e4fc1b11d17a867d3e7bdfdd351438390a5a2) ) /* Specific to Ver A. */
+	ROM_LOAD16_BYTE( "tet1verafl3l.12",   0x1800000, 0x200000, CRC(64fa1f83) SHA1(5bc8b4657826ead19827f63d04f67597970d5337) ) // Specific to Ver A.
+	ROM_LOAD16_BYTE( "tet1verafl3u.13",   0x1800001, 0x200000, CRC(32a2516b) SHA1(6f4e4fc1b11d17a867d3e7bdfdd351438390a5a2) ) // Specific to Ver A.
 
 	ROM_REGION( 0x0080000, "sub", 0 )
-	ROM_LOAD16_WORD_SWAP( "tet1vera.11s", 0x0000000, 0x080000, CRC(a74dfe7f) SHA1(854096a6f12ee9073fb1f38e41c8e6e0725a7521) ) /* Specific to Ver A. */
+	ROM_LOAD16_WORD_SWAP( "tet1vera.11s", 0x0000000, 0x080000, CRC(a74dfe7f) SHA1(854096a6f12ee9073fb1f38e41c8e6e0725a7521) ) // Specific to Ver A.
 
 	ROM_REGION( 0x1000000, "c352", 0 )
 	ROM_LOAD( "tet1wave0.5",              0x0000000, 0x400000, CRC(77ba7975) SHA1(fe9434dcf0fb232c85efaaae1b4b13d36099620a) )
@@ -3128,8 +3128,8 @@ ROM_END
 
 ROM_START( tekken3jd )
 	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 )
-	ROM_LOAD16_BYTE( "tet1verd.2e",       0x0000000, 0x200000, CRC(8a2e5ed5) SHA1(f06aa6eceffa30359c93811bc70e34eb3d85b3c5) )
-	ROM_LOAD16_BYTE( "tet1verd.2j",       0x0000001, 0x200000, CRC(fd2128f7) SHA1(c8be7101538c26b6eb1a8fe901549457be8d05b9) )
+	ROM_LOAD16_BYTE( "tet1verd.2e",      0x0000000, 0x200000, CRC(8a2e5ed5) SHA1(f06aa6eceffa30359c93811bc70e34eb3d85b3c5) )
+	ROM_LOAD16_BYTE( "tet1verd.2j",      0x0000001, 0x200000, CRC(fd2128f7) SHA1(c8be7101538c26b6eb1a8fe901549457be8d05b9) )
 
 	ROM_REGION32_LE( 0x1c00000, "bankedroms", 0 )
 	ROM_LOAD16_BYTE( "tet1rom0l.6",       0x0000000, 0x400000, CRC(2886bb32) SHA1(08ad9da2df25ad8c933a812ac238c81135072929) )
@@ -3142,7 +3142,7 @@ ROM_START( tekken3jd )
 	ROM_LOAD16_BYTE( "tet1fl3u.13",       0x1800001, 0x200000, CRC(1917d993) SHA1(cabc44514a3e62a18a7f8f883603241447d6948b) )
 
 	ROM_REGION( 0x0080000, "sub", 0 )
-	ROM_LOAD16_WORD_SWAP( "tet1verd.11s", 0x0000000, 0x080000, CRC(b13d88a9) SHA1(944d35203bbb7155a296ff37daa426b42f8e2b6b) ) // Specific to Ver D.
+	ROM_LOAD16_WORD_SWAP( "tet1verd.11s", 0x0000000, 0x080000, CRC(b13d88a9) SHA1(944d35203bbb7155a296ff37daa426b42f8e2b6b) ) // No label but newer than tet1verb.11s
 
 	ROM_REGION( 0x1000000, "c352", 0 )
 	ROM_LOAD( "tet1wave0.5",              0x0000000, 0x400000, CRC(77ba7975) SHA1(fe9434dcf0fb232c85efaaae1b4b13d36099620a) )
@@ -3165,7 +3165,7 @@ ROM_START( tekken3je1 )
 	ROM_LOAD16_BYTE( "tet1fl3u.13",       0x1800001, 0x200000, CRC(1917d993) SHA1(cabc44514a3e62a18a7f8f883603241447d6948b) )
 
 	ROM_REGION( 0x0080000, "sub", 0 )
-	ROM_LOAD16_WORD_SWAP( "tet1verb.11s", 0x0000000, 0x080000, CRC(c92b98d1) SHA1(8ae6fba8c5b6b9a2ab9541eac8553b282f35750d) ) /* No label but different than tet1vera.11s */
+	ROM_LOAD16_WORD_SWAP( "tet1verd.11s", 0x0000000, 0x080000, CRC(b13d88a9) SHA1(944d35203bbb7155a296ff37daa426b42f8e2b6b) ) // No label but newer than tet1verb.11s
 
 	ROM_REGION( 0x1000000, "c352", 0 )
 	ROM_LOAD( "tet1wave0.5",              0x0000000, 0x400000, CRC(77ba7975) SHA1(fe9434dcf0fb232c85efaaae1b4b13d36099620a) )
@@ -3184,11 +3184,11 @@ ROM_START( tekken3ua )
 	ROM_LOAD16_BYTE( "tet1rom1u.10",      0x0800001, 0x400000, CRC(502ba5cd) SHA1(19c1282245c6dbfc945c0bd0f3918968c3e5c3ed) )
 	ROM_LOAD16_BYTE( "tet1rom2l.8",       0x1000000, 0x400000, CRC(e03b1c24) SHA1(8579b95a8fd06b7d2893ff88b228fd794162dff1) )
 	ROM_LOAD16_BYTE( "tet1rom2u.11",      0x1000001, 0x400000, CRC(75eb2ab3) SHA1(dee43884e542391903f6aaae2c166e7921a86fb4) )
-	ROM_LOAD16_BYTE( "tet1verafl3l.12",   0x1800000, 0x200000, CRC(64fa1f83) SHA1(5bc8b4657826ead19827f63d04f67597970d5337) ) /* Specific to Ver A. */
-	ROM_LOAD16_BYTE( "tet1verafl3u.13",   0x1800001, 0x200000, CRC(32a2516b) SHA1(6f4e4fc1b11d17a867d3e7bdfdd351438390a5a2) ) /* Specific to Ver A. */
+	ROM_LOAD16_BYTE( "tet1verafl3l.12",   0x1800000, 0x200000, CRC(64fa1f83) SHA1(5bc8b4657826ead19827f63d04f67597970d5337) ) // Specific to Ver A.
+	ROM_LOAD16_BYTE( "tet1verafl3u.13",   0x1800001, 0x200000, CRC(32a2516b) SHA1(6f4e4fc1b11d17a867d3e7bdfdd351438390a5a2) ) // Specific to Ver A.
 
 	ROM_REGION( 0x0080000, "sub", 0 )
-	ROM_LOAD16_WORD_SWAP( "tet1vera.11s", 0x0000000, 0x080000, CRC(a74dfe7f) SHA1(854096a6f12ee9073fb1f38e41c8e6e0725a7521) ) /* Specific to Ver A. */
+	ROM_LOAD16_WORD_SWAP( "tet1vera.11s", 0x0000000, 0x080000, CRC(a74dfe7f) SHA1(854096a6f12ee9073fb1f38e41c8e6e0725a7521) ) // Specific to Ver A.
 
 	ROM_REGION( 0x1000000, "c352", 0 )
 	ROM_LOAD( "tet1wave0.5",              0x0000000, 0x400000, CRC(77ba7975) SHA1(fe9434dcf0fb232c85efaaae1b4b13d36099620a) )
@@ -3211,7 +3211,7 @@ ROM_START( tekken3ud )
 	ROM_LOAD16_BYTE( "tet1fl3u.13",       0x1800001, 0x200000, CRC(1917d993) SHA1(cabc44514a3e62a18a7f8f883603241447d6948b) )
 
 	ROM_REGION( 0x0080000, "sub", 0 )
-	ROM_LOAD16_WORD_SWAP( "tet1verb.11s", 0x0000000, 0x080000, CRC(c92b98d1) SHA1(8ae6fba8c5b6b9a2ab9541eac8553b282f35750d) ) /* No label but different than tet1vera.11s */
+	ROM_LOAD16_WORD_SWAP( "tet1verd.11s", 0x0000000, 0x080000, CRC(b13d88a9) SHA1(944d35203bbb7155a296ff37daa426b42f8e2b6b) ) // No label but newer than tet1verb.11s
 
 	ROM_REGION( 0x1000000, "c352", 0 )
 	ROM_LOAD( "tet1wave0.5",              0x0000000, 0x400000, CRC(77ba7975) SHA1(fe9434dcf0fb232c85efaaae1b4b13d36099620a) )
@@ -3230,11 +3230,11 @@ ROM_START( tekken3a )
 	ROM_LOAD16_BYTE( "tet1rom1u.10",      0x0800001, 0x400000, CRC(502ba5cd) SHA1(19c1282245c6dbfc945c0bd0f3918968c3e5c3ed) )
 	ROM_LOAD16_BYTE( "tet1rom2l.8",       0x1000000, 0x400000, CRC(e03b1c24) SHA1(8579b95a8fd06b7d2893ff88b228fd794162dff1) )
 	ROM_LOAD16_BYTE( "tet1rom2u.11",      0x1000001, 0x400000, CRC(75eb2ab3) SHA1(dee43884e542391903f6aaae2c166e7921a86fb4) )
-	ROM_LOAD16_BYTE( "tet1verafl3l.12",   0x1800000, 0x200000, CRC(64fa1f83) SHA1(5bc8b4657826ead19827f63d04f67597970d5337) ) /* Specific to Ver A. */
-	ROM_LOAD16_BYTE( "tet1verafl3u.13",   0x1800001, 0x200000, CRC(32a2516b) SHA1(6f4e4fc1b11d17a867d3e7bdfdd351438390a5a2) ) /* Specific to Ver A. */
+	ROM_LOAD16_BYTE( "tet1verafl3l.12",   0x1800000, 0x200000, CRC(64fa1f83) SHA1(5bc8b4657826ead19827f63d04f67597970d5337) ) // Specific to Ver A.
+	ROM_LOAD16_BYTE( "tet1verafl3u.13",   0x1800001, 0x200000, CRC(32a2516b) SHA1(6f4e4fc1b11d17a867d3e7bdfdd351438390a5a2) ) // Specific to Ver A.
 
 	ROM_REGION( 0x0080000, "sub", 0 )
-	ROM_LOAD16_WORD_SWAP( "tet1vera.11s", 0x0000000, 0x080000, CRC(a74dfe7f) SHA1(854096a6f12ee9073fb1f38e41c8e6e0725a7521) ) /* Specific to Ver A. */
+	ROM_LOAD16_WORD_SWAP( "tet1vera.11s", 0x0000000, 0x080000, CRC(a74dfe7f) SHA1(854096a6f12ee9073fb1f38e41c8e6e0725a7521) ) // Specific to Ver A.
 
 	ROM_REGION( 0x1000000, "c352", 0 )
 	ROM_LOAD( "tet1wave0.5",              0x0000000, 0x400000, CRC(77ba7975) SHA1(fe9434dcf0fb232c85efaaae1b4b13d36099620a) )
@@ -3257,7 +3257,7 @@ ROM_START( tekken3b )
 	ROM_LOAD16_BYTE( "tet1fl3u.13",       0x1800001, 0x200000, CRC(1917d993) SHA1(cabc44514a3e62a18a7f8f883603241447d6948b) )
 
 	ROM_REGION( 0x0080000, "sub", 0 )
-	ROM_LOAD16_WORD_SWAP( "tet1verb.11s", 0x0000000, 0x080000, CRC(c92b98d1) SHA1(8ae6fba8c5b6b9a2ab9541eac8553b282f35750d) ) /* No label but different than tet1vera.11s */
+	ROM_LOAD16_WORD_SWAP( "tet1verb.11s", 0x0000000, 0x080000, CRC(c92b98d1) SHA1(8ae6fba8c5b6b9a2ab9541eac8553b282f35750d) ) // No label but different than tet1vera.11s
 
 	ROM_REGION( 0x1000000, "c352", 0 )
 	ROM_LOAD( "tet1wave0.5",              0x0000000, 0x400000, CRC(77ba7975) SHA1(fe9434dcf0fb232c85efaaae1b4b13d36099620a) )
@@ -3280,7 +3280,7 @@ ROM_START( tekken3c )
 	ROM_LOAD16_BYTE( "tet1fl3u.13",       0x1800001, 0x200000, CRC(1917d993) SHA1(cabc44514a3e62a18a7f8f883603241447d6948b) )
 
 	ROM_REGION( 0x0080000, "sub", 0 )
-	ROM_LOAD16_WORD_SWAP( "tet1verb.11s", 0x0000000, 0x080000, CRC(c92b98d1) SHA1(8ae6fba8c5b6b9a2ab9541eac8553b282f35750d) ) /* No label but different than tet1vera.11s */
+	ROM_LOAD16_WORD_SWAP( "tet1verb.11s", 0x0000000, 0x080000, CRC(c92b98d1) SHA1(8ae6fba8c5b6b9a2ab9541eac8553b282f35750d) ) // No label but different than tet1vera.11s
 
 	ROM_REGION( 0x1000000, "c352", 0 )
 	ROM_LOAD( "tet1wave0.5",              0x0000000, 0x400000, CRC(77ba7975) SHA1(fe9434dcf0fb232c85efaaae1b4b13d36099620a) )
@@ -3303,7 +3303,7 @@ ROM_START( tekken3d )
 	ROM_LOAD16_BYTE( "tet1fl3u.13",       0x1800001, 0x200000, CRC(1917d993) SHA1(cabc44514a3e62a18a7f8f883603241447d6948b) )
 
 	ROM_REGION( 0x0080000, "sub", 0 )
-	ROM_LOAD16_WORD_SWAP( "tet1verb.11s", 0x0000000, 0x080000, CRC(c92b98d1) SHA1(8ae6fba8c5b6b9a2ab9541eac8553b282f35750d) ) /* No label but different than tet1vera.11s */
+	ROM_LOAD16_WORD_SWAP( "tet1verd.11s", 0x0000000, 0x080000, CRC(b13d88a9) SHA1(944d35203bbb7155a296ff37daa426b42f8e2b6b) ) // No label but newer than tet1verb.11s
 
 	ROM_REGION( 0x1000000, "c352", 0 )
 	ROM_LOAD( "tet1wave0.5",              0x0000000, 0x400000, CRC(77ba7975) SHA1(fe9434dcf0fb232c85efaaae1b4b13d36099620a) )
@@ -3312,7 +3312,7 @@ ROM_END
 
 ROM_START( tektagt )
 	ROM_REGION32_LE( 0x0400000, "maincpu:rom", 0 )
-	ROM_LOAD16_BYTE( "teg2verc1.2e",      0x0000000, 0x200000, CRC(c6da0717) SHA1(9e01ae64710d85eb9899d6fa6fd0a2152aee8c11) ) /* Modified to work with alt ROM board? */
+	ROM_LOAD16_BYTE( "teg2verc1.2e",      0x0000000, 0x200000, CRC(c6da0717) SHA1(9e01ae64710d85eb9899d6fa6fd0a2152aee8c11) ) // Modified to work with alt ROM board?
 	ROM_LOAD16_BYTE( "teg2verc1.2j",      0x0000001, 0x200000, CRC(25a1d2ff) SHA1(529a11a1bbb8655534d7ec371f1c09e9e387ed11) )
 
 	ROM_REGION32_LE( 0x3800000, "bankedroms", 0 )
@@ -3322,13 +3322,13 @@ ROM_START( tektagt )
 	ROM_LOAD32_WORD( "teg1_rom1o.ic14",   0x1000002, 0x800000, CRC(2434ceb6) SHA1(f19f1599acbd6fd48793a2ee5a500ca817d9df56) )
 	ROM_LOAD32_WORD( "teg1_rom2e.ic11",   0x2000000, 0x800000, CRC(6e5c3428) SHA1(e3cdb60a4445406877b2e273385f34bfb0974220) )
 	ROM_LOAD32_WORD( "teg1_rom2o.ic15",   0x2000002, 0x800000, CRC(21ce9dfa) SHA1(f27e8210ee236c327aa3e1ce4dd408abc6580a1b) )
-	ROM_LOAD32_BYTE( "flel.ic4",          0x3000000, 0x200000, CRC(88b3823c) SHA1(6f31acb642c57daccbfdb87b790037e261c8c73c) ) /* Flash ROMs with no labels */
+	ROM_LOAD32_BYTE( "flel.ic4",          0x3000000, 0x200000, CRC(88b3823c) SHA1(6f31acb642c57daccbfdb87b790037e261c8c73c) ) // Flash ROMs with no labels
 	ROM_LOAD32_BYTE( "fleu.ic5",          0x3000001, 0x200000, CRC(36df0867) SHA1(6bec8560ad4c122dc909daa83aa9089ba5b281f7) )
 	ROM_LOAD32_BYTE( "flol.ic6",          0x3000002, 0x200000, CRC(03a76765) SHA1(ae35ae28375f2a3e52d72b77ec09750c326cc269) )
 	ROM_LOAD32_BYTE( "flou.ic7",          0x3000003, 0x200000, CRC(6d6947d1) SHA1(2f307bc4070fadb510c0473bc91d917b2d845ca5) )
 
 	ROM_REGION( 0x0080000, "sub", 0 )
-	ROM_LOAD16_WORD_SWAP( "teg1.11s",     0x0000000, 0x080000, CRC(67d0c469) SHA1(da164702fc21b9f46a9e32c89e7b1d36070ddf79) ) /* No label for this one */
+	ROM_LOAD16_WORD_SWAP( "teg1.11s",     0x0000000, 0x080000, CRC(67d0c469) SHA1(da164702fc21b9f46a9e32c89e7b1d36070ddf79) ) // No label for this one
 
 	ROM_REGION( 0x1000000, "c352", 0 )
 	ROM_LOAD( "teg1_wave0.ic1",           0x0000000, 0x800000, CRC(4bd99104) SHA1(f76b0576cc28fe49d3c1c402988b933933e52e15) )
@@ -3372,7 +3372,7 @@ ROM_START( tektagtjb )
 	ROM_LOAD32_WORD( "teg1_rom1o.ic14",   0x1000002, 0x800000, CRC(2434ceb6) SHA1(f19f1599acbd6fd48793a2ee5a500ca817d9df56) )
 	ROM_LOAD32_WORD( "teg1_rom2e.ic11",   0x2000000, 0x800000, CRC(6e5c3428) SHA1(e3cdb60a4445406877b2e273385f34bfb0974220) )
 	ROM_LOAD32_WORD( "teg1_rom2o.ic15",   0x2000002, 0x800000, CRC(21ce9dfa) SHA1(f27e8210ee236c327aa3e1ce4dd408abc6580a1b) )
-	ROM_LOAD32_BYTE( "flel.ic4",          0x3000000, 0x200000, CRC(88b3823c) SHA1(6f31acb642c57daccbfdb87b790037e261c8c73c) ) /* Flash ROMs with no labels */
+	ROM_LOAD32_BYTE( "flel.ic4",          0x3000000, 0x200000, CRC(88b3823c) SHA1(6f31acb642c57daccbfdb87b790037e261c8c73c) ) // Flash ROMs with no labels
 	ROM_LOAD32_BYTE( "fleu.ic5",          0x3000001, 0x200000, CRC(36df0867) SHA1(6bec8560ad4c122dc909daa83aa9089ba5b281f7) )
 	ROM_LOAD32_BYTE( "flol.ic6",          0x3000002, 0x200000, CRC(03a76765) SHA1(ae35ae28375f2a3e52d72b77ec09750c326cc269) )
 	ROM_LOAD32_BYTE( "flou.ic7",          0x3000003, 0x200000, CRC(6d6947d1) SHA1(2f307bc4070fadb510c0473bc91d917b2d845ca5) )
@@ -3397,7 +3397,7 @@ ROM_START( tektagtjc1 )
 	ROM_LOAD32_WORD( "teg1_rom1o.ic14",   0x1000002, 0x800000, CRC(2434ceb6) SHA1(f19f1599acbd6fd48793a2ee5a500ca817d9df56) )
 	ROM_LOAD32_WORD( "teg1_rom2e.ic11",   0x2000000, 0x800000, CRC(6e5c3428) SHA1(e3cdb60a4445406877b2e273385f34bfb0974220) )
 	ROM_LOAD32_WORD( "teg1_rom2o.ic15",   0x2000002, 0x800000, CRC(21ce9dfa) SHA1(f27e8210ee236c327aa3e1ce4dd408abc6580a1b) )
-	ROM_LOAD32_BYTE( "flel.ic4",          0x3000000, 0x200000, CRC(88b3823c) SHA1(6f31acb642c57daccbfdb87b790037e261c8c73c) ) /* Flash ROMs with no labels */
+	ROM_LOAD32_BYTE( "flel.ic4",          0x3000000, 0x200000, CRC(88b3823c) SHA1(6f31acb642c57daccbfdb87b790037e261c8c73c) ) // Flash ROMs with no labels
 	ROM_LOAD32_BYTE( "fleu.ic5",          0x3000001, 0x200000, CRC(36df0867) SHA1(6bec8560ad4c122dc909daa83aa9089ba5b281f7) )
 	ROM_LOAD32_BYTE( "flol.ic6",          0x3000002, 0x200000, CRC(03a76765) SHA1(ae35ae28375f2a3e52d72b77ec09750c326cc269) )
 	ROM_LOAD32_BYTE( "flou.ic7",          0x3000003, 0x200000, CRC(6d6947d1) SHA1(2f307bc4070fadb510c0473bc91d917b2d845ca5) )
@@ -3422,13 +3422,13 @@ ROM_START( tektagtub )
 	ROM_LOAD32_WORD( "teg1_rom1o.ic14",   0x1000002, 0x800000, CRC(2434ceb6) SHA1(f19f1599acbd6fd48793a2ee5a500ca817d9df56) )
 	ROM_LOAD32_WORD( "teg1_rom2e.ic11",   0x2000000, 0x800000, CRC(6e5c3428) SHA1(e3cdb60a4445406877b2e273385f34bfb0974220) )
 	ROM_LOAD32_WORD( "teg1_rom2o.ic15",   0x2000002, 0x800000, CRC(21ce9dfa) SHA1(f27e8210ee236c327aa3e1ce4dd408abc6580a1b) )
-	ROM_LOAD32_BYTE( "flel.ic4",          0x3000000, 0x200000, CRC(88b3823c) SHA1(6f31acb642c57daccbfdb87b790037e261c8c73c) ) /* Flash ROMs with no labels */
+	ROM_LOAD32_BYTE( "flel.ic4",          0x3000000, 0x200000, CRC(88b3823c) SHA1(6f31acb642c57daccbfdb87b790037e261c8c73c) ) // Flash ROMs with no labels
 	ROM_LOAD32_BYTE( "fleu.ic5",          0x3000001, 0x200000, CRC(36df0867) SHA1(6bec8560ad4c122dc909daa83aa9089ba5b281f7) )
 	ROM_LOAD32_BYTE( "flol.ic6",          0x3000002, 0x200000, CRC(03a76765) SHA1(ae35ae28375f2a3e52d72b77ec09750c326cc269) )
 	ROM_LOAD32_BYTE( "flou.ic7",          0x3000003, 0x200000, CRC(6d6947d1) SHA1(2f307bc4070fadb510c0473bc91d917b2d845ca5) )
 
 	ROM_REGION( 0x0080000, "sub", 0 )
-	ROM_LOAD16_WORD_SWAP( "teg1.11s",     0x0000000, 0x080000, CRC(67d0c469) SHA1(da164702fc21b9f46a9e32c89e7b1d36070ddf79) ) /* No label for this one */
+	ROM_LOAD16_WORD_SWAP( "teg1.11s",     0x0000000, 0x080000, CRC(67d0c469) SHA1(da164702fc21b9f46a9e32c89e7b1d36070ddf79) ) // No label for this one
 
 	ROM_REGION( 0x1000000, "c352", 0 )
 	ROM_LOAD( "teg1_wave0.ic1",           0x0000000, 0x800000, CRC(4bd99104) SHA1(f76b0576cc28fe49d3c1c402988b933933e52e15) )
@@ -3447,13 +3447,13 @@ ROM_START( tektagtuc1 )
 	ROM_LOAD32_WORD( "teg1_rom1o.ic14",   0x1000002, 0x800000, CRC(2434ceb6) SHA1(f19f1599acbd6fd48793a2ee5a500ca817d9df56) )
 	ROM_LOAD32_WORD( "teg1_rom2e.ic11",   0x2000000, 0x800000, CRC(6e5c3428) SHA1(e3cdb60a4445406877b2e273385f34bfb0974220) )
 	ROM_LOAD32_WORD( "teg1_rom2o.ic15",   0x2000002, 0x800000, CRC(21ce9dfa) SHA1(f27e8210ee236c327aa3e1ce4dd408abc6580a1b) )
-	ROM_LOAD32_BYTE( "flel.ic4",          0x3000000, 0x200000, CRC(88b3823c) SHA1(6f31acb642c57daccbfdb87b790037e261c8c73c) ) /* Flash ROMs with no labels */
+	ROM_LOAD32_BYTE( "flel.ic4",          0x3000000, 0x200000, CRC(88b3823c) SHA1(6f31acb642c57daccbfdb87b790037e261c8c73c) ) // Flash ROMs with no labels
 	ROM_LOAD32_BYTE( "fleu.ic5",          0x3000001, 0x200000, CRC(36df0867) SHA1(6bec8560ad4c122dc909daa83aa9089ba5b281f7) )
 	ROM_LOAD32_BYTE( "flol.ic6",          0x3000002, 0x200000, CRC(03a76765) SHA1(ae35ae28375f2a3e52d72b77ec09750c326cc269) )
 	ROM_LOAD32_BYTE( "flou.ic7",          0x3000003, 0x200000, CRC(6d6947d1) SHA1(2f307bc4070fadb510c0473bc91d917b2d845ca5) )
 
 	ROM_REGION( 0x0080000, "sub", 0 )
-	ROM_LOAD16_WORD_SWAP( "teg1.11s",     0x0000000, 0x080000, CRC(67d0c469) SHA1(da164702fc21b9f46a9e32c89e7b1d36070ddf79) ) /* No label for this one */
+	ROM_LOAD16_WORD_SWAP( "teg1.11s",     0x0000000, 0x080000, CRC(67d0c469) SHA1(da164702fc21b9f46a9e32c89e7b1d36070ddf79) ) // No label for this one
 
 	ROM_REGION( 0x1000000, "c352", 0 )
 	ROM_LOAD( "teg1_wave0.ic1",           0x0000000, 0x800000, CRC(4bd99104) SHA1(f76b0576cc28fe49d3c1c402988b933933e52e15) )
@@ -3467,25 +3467,25 @@ ROM_START( tektagtc1a )
 
 	ROM_REGION32_LE( 0x3800000, "bankedroms", 0 )
 	ROM_LOAD32_WORD( "teg2roml0",         0x0000000, 0x400000, CRC(cf984e85) SHA1(4d8296998b5f225b3f20bfdcb092a64b6e1fa76e) )
-	ROM_LOAD32_WORD( "teg2roml00.ic13",   0x0000002, 0x400000, CRC(927723a5) SHA1(075aaca1700c9134496eb9a73cbe325ddc74eae1) ) /* located on the opposite side of the ROM PCB */
+	ROM_LOAD32_WORD( "teg2roml00.ic13",   0x0000002, 0x400000, CRC(927723a5) SHA1(075aaca1700c9134496eb9a73cbe325ddc74eae1) ) // located on the opposite side of the ROM PCB
 	ROM_LOAD32_WORD( "teg2romh0",         0x0800000, 0x400000, CRC(ea088657) SHA1(fbacca78832f68a310bafd06188d645e3424e0ed) )
 	ROM_LOAD32_WORD( "teg2romh00",        0x0800002, 0x400000, CRC(a85aa306) SHA1(07318133c7c48cb61590ed0eceb519a8cc1ca781) )
 	ROM_LOAD32_WORD( "teg2roml1",         0x1000000, 0x400000, CRC(8552f0ef) SHA1(45ed0dacdad94e708260a98b9cd47861543d2b7a) )
-	ROM_LOAD32_WORD( "teg2roml10.ic14",   0x1000002, 0x400000, CRC(13eb424b) SHA1(59d6c77136050de1e7250e6627636d5b178bb8a8) ) /* located on the opposite side of the ROM PCB */
+	ROM_LOAD32_WORD( "teg2roml10.ic14",   0x1000002, 0x400000, CRC(13eb424b) SHA1(59d6c77136050de1e7250e6627636d5b178bb8a8) ) // located on the opposite side of the ROM PCB
 	ROM_LOAD32_WORD( "teg2romh1",         0x1800000, 0x400000, CRC(86eb5abe) SHA1(66a3807a18d81e8291baf56533694f60e31a6367) )
 	ROM_LOAD32_WORD( "teg2romh10",        0x1800002, 0x400000, CRC(25131a87) SHA1(77fa236c4879a59323bc2dac26c195b7c47f812c) )
 	ROM_LOAD32_WORD( "teg2roml2",         0x2000000, 0x400000, CRC(abdfc6ca) SHA1(70033becd29ea15611be2fc099a43712181bcbec) )
-	ROM_LOAD32_WORD( "teg2roml20.ic15",   0x2000002, 0x400000, CRC(ed5ec7f7) SHA1(c91085a64ced95ee6618303987de61893e069742) ) /* located on the opposite side of the ROM PCB */
+	ROM_LOAD32_WORD( "teg2roml20.ic15",   0x2000002, 0x400000, CRC(ed5ec7f7) SHA1(c91085a64ced95ee6618303987de61893e069742) ) // located on the opposite side of the ROM PCB
 	ROM_LOAD32_WORD( "teg2romh2",         0x2800000, 0x400000, CRC(8c03b301) SHA1(f395a4685e2deb8f7e9afc18ce15fa0d392b0cfa) )
 	ROM_LOAD32_WORD( "teg2romh20",        0x2800002, 0x400000, CRC(c873c362) SHA1(d95451a7477b716c0d75ba04e1d8df3d8a4e10dd) )
-	ROM_LOAD32_WORD( "teg2rf4",           0x3000000, 0x400000, CRC(612f6a37) SHA1(bd9597ef802e3c46f891f0ef523a3e0b0fe22672) ) /* Different data?? Second half blank, all 0x00? */
-	ROM_LOAD32_WORD( "teg2rf6",           0x3000002, 0x400000, CRC(0c9292ce) SHA1(664c6ccf18042ed8ebc29b1781ae7454acb05ba1) ) /* Different data?? Second half blank, all 0x00? */
+	ROM_LOAD32_WORD( "teg2rf4",           0x3000000, 0x400000, CRC(612f6a37) SHA1(bd9597ef802e3c46f891f0ef523a3e0b0fe22672) ) // Different data?? Second half blank, all 0x00?
+	ROM_LOAD32_WORD( "teg2rf6",           0x3000002, 0x400000, CRC(0c9292ce) SHA1(664c6ccf18042ed8ebc29b1781ae7454acb05ba1) ) // Different data?? Second half blank, all 0x00?
 
 	ROM_REGION( 0x0080000, "sub", 0 )
-	ROM_LOAD16_WORD_SWAP( "teg1.11s",     0x0000000, 0x080000, CRC(67d0c469) SHA1(da164702fc21b9f46a9e32c89e7b1d36070ddf79) ) /* No label for this one */
+	ROM_LOAD16_WORD_SWAP( "teg1.11s",     0x0000000, 0x080000, CRC(67d0c469) SHA1(da164702fc21b9f46a9e32c89e7b1d36070ddf79) ) // No label for this one
 
 	ROM_REGION( 0x1000000, "c352", 0 )
-	ROM_LOAD( "teg2wavel0.ic12",          0x0000000, 0x400000, CRC(1865336f) SHA1(deda6d129daf709b0316f6260e67613fbf849e57) ) /* located on the opposite side of the ROM PCB */
+	ROM_LOAD( "teg2wavel0.ic12",          0x0000000, 0x400000, CRC(1865336f) SHA1(deda6d129daf709b0316f6260e67613fbf849e57) ) // located on the opposite side of the ROM PCB
 	ROM_LOAD( "teg2wavel1",               0x0400000, 0x400000, CRC(f5ab70e6) SHA1(cdb62d8eb92ca961be684caf768d1961d98ece22) )
 	ROM_LOAD( "teg2waveh0",               0x0800000, 0x400000, CRC(bc0325bf) SHA1(77059c300a9d53d0e97bb898a06c58076078d7d2) )
 	ROM_LOAD( "teg2waveh1",               0x0c00000, 0x400000, CRC(6c654921) SHA1(3849157b30b4b459956b823511551abda2e4b6e5) )

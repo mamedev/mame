@@ -28,19 +28,17 @@ class k051960_device : public device_t, public device_gfx_interface, public devi
 public:
 	using sprite_delegate = device_delegate<void (int *code, int *color, int *priority, bool *shadow)>;
 
-	k051960_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	k051960_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	// configuration
 	auto irq_handler() { return m_irq_handler.bind(); }
+	//auto firq_handler() { return m_firq_handler.bind(); } // unused
 	auto nmi_handler() { return m_nmi_handler.bind(); }
 
 	auto k051937_shadow_mode() { return m_shadow_config_cb.bind(); }
 
-	// static configuration
-	template <typename... T> void set_sprite_callback(T &&... args) { m_k051960_cb.set(std::forward<T>(args)...); }
-	void set_plane_order(int order);
-
 	/*
-	The callback is passed:
+	The sprite callback is passed:
 	- code (range 00-1FFF, output of the pins CA5-CA17)
 	- color (range 00-FF, output of the pins OC0-OC7). Note that most of the
 	  time COL7 seems to be "shadow", but not always (e.g. Aliens).
@@ -53,6 +51,10 @@ public:
 	  the game has special treatment (Aliens)
 	*/
 
+	template <typename... T> void set_sprite_callback(T &&... args) { m_k051960_cb.set(std::forward<T>(args)...); }
+	void set_plane_order(int order);
+
+	// public interface
 	u8 k051960_r(offs_t offset);
 	void k051960_w(offs_t offset, u8 data);
 
@@ -61,8 +63,6 @@ public:
 
 	void k051960_sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int min_priority, int max_priority);
 
-	TIMER_CALLBACK_MEMBER(scanline_callback);
-
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -70,27 +70,32 @@ protected:
 
 private:
 	// internal state
-	std::unique_ptr<uint8_t[]>   m_ram;
+	u8 m_ram[0x400];
+	u8 m_buffer[0x400];
 
-	required_region_ptr<uint8_t> m_sprite_rom;
-
-	emu_timer *m_scanline_timer;
+	required_region_ptr<u8> m_sprite_rom;
 
 	sprite_delegate m_k051960_cb;
 	devcb_write_line m_shadow_config_cb;
 
 	devcb_write_line m_irq_handler;
-	// TODO: is this even used by anything?
 	devcb_write_line m_firq_handler;
 	devcb_write_line m_nmi_handler;
 
-	uint8_t m_spriterombank[3];
-	uint8_t m_romoffset;
-	bool    m_spriteflip, m_readroms;
-	uint8_t m_shadow_config;
-	bool    m_nmi_enabled;
+	emu_timer *m_firq_scanline;
+	emu_timer *m_nmi_scanline;
 
-	int k051960_fetchromdata( int byte );
+	u8 m_spriterombank[3];
+	u8 m_romoffset;
+	u8 m_control;
+	emu_timer *m_sprites_busy;
+	u8 m_shadow_config;
+
+	u8 k051960_fetchromdata(offs_t offset);
+
+	void vblank_callback(screen_device &screen, bool state);
+	TIMER_CALLBACK_MEMBER(firq_scanline);
+	TIMER_CALLBACK_MEMBER(nmi_scanline);
 };
 
 DECLARE_DEVICE_TYPE(K051960, k051960_device)

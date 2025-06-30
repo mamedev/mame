@@ -53,13 +53,16 @@ Konami PWB 402218 boards
 
  Notes and TODOs:
  - Priorities not understood and wrong in places of GX-based games, apparently controlled by PROM
- - X/Y scroll effects not 100% handled by current K052109(TMNT tilemaps) emulation.
-   Mario Roulette issues currently "resolved" using hack.
  - Chusenoh keypad hardware is completely unknown.  It's presumed to hook up via the i8251.
 
 ***************************************************************************/
 
 #include "emu.h"
+
+#include "k054156_k054157_k056832.h"
+#include "k052109.h"
+#include "konami_helper.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/clock.h"
 #include "machine/i8251.h"
@@ -71,9 +74,7 @@ Konami PWB 402218 boards
 #include "sound/okim6295.h"
 #include "sound/upd7759.h"
 #include "sound/ymz280b.h"
-#include "k054156_k054157_k056832.h"
-#include "k052109.h"
-#include "konami_helper.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -155,11 +156,7 @@ private:
 	void k056832_b_w(offs_t offset, uint8_t data) { m_k056832->b_w(offset ^ 1, data); }
 
 	K052109_CB_MEMBER(shuriboy_tile_callback);
-	TIMER_DEVICE_CALLBACK_MEMBER(shuri_scanline);
 	void shuri_bank_w(uint8_t data);
-	uint8_t shuri_irq_r();
-	void shuri_irq_w(uint8_t data);
-	void mario_scrollhack_w(uint8_t data);
 
 	void ddboy_main(address_map &map) ATTR_COLD;
 	void chusenoh_main(address_map &map) ATTR_COLD;
@@ -184,7 +181,6 @@ private:
 
 	u8 m_control = 0;
 	u8 m_control2 = 0;
-	u8 m_shuri_irq = 0;
 	int m_ccu_int_time = 0;
 	int m_ccu_int_time_count = 0;
 	int m_avac = 0;
@@ -556,8 +552,6 @@ void konmedal_state::shuriboy_main(address_map &map)
 	m_scc_map[0](0x9800, 0x98ff).mirror(0x0700).m("k051649", FUNC(k051649_device::scc_map));
 	map(0xa000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xffff).rw(m_k052109, FUNC(k052109_device::read), FUNC(k052109_device::write));
-	map(0xdd00, 0xdd00).rw(FUNC(konmedal_state::shuri_irq_r), FUNC(konmedal_state::shuri_irq_w));
-	map(0xdc80, 0xdc80).w(FUNC(konmedal_state::mario_scrollhack_w));
 }
 
 static INPUT_PORTS_START( konmedal )
@@ -903,7 +897,6 @@ void konmedal_state::machine_start_common()
 	m_lamps.resolve();
 	save_item(NAME(m_control));
 	save_item(NAME(m_control2));
-	save_item(NAME(m_shuri_irq));
 	save_item(NAME(m_ccu_int_time));
 	save_item(NAME(m_ccu_int_time_count));
 }
@@ -926,7 +919,6 @@ void konmedal_state::machine_reset()
 {
 	m_control = 0;
 	m_control2 = 0;
-	m_shuri_irq = 0;
 	m_ccu_int_time_count = 0;
 	m_ccu_int_time = 31;
 	m_avac = 0;
@@ -935,7 +927,7 @@ void konmedal_state::machine_reset()
 void konmedal_state::tsukande(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(14'318'181)/2); // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
+	Z80(config, m_maincpu, 14.318181_MHz_XTAL / 2); // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal_state::medal_main);
 	TIMER(config, "scantimer").configure_scanline(FUNC(konmedal_state::konmedal_scanline), "screen", 0, 1);
 
@@ -943,7 +935,7 @@ void konmedal_state::tsukande(machine_config &config)
 	m_nvram->set_custom_handler(FUNC(konmedal_state::medal_nvram_init));
 	HOPPER(config, "hopper", attotime::from_msec(100));
 
-	K053252(config, m_k053252, XTAL(14'318'181) / 2); // not verified
+	K053252(config, m_k053252, 14.318181_MHz_XTAL / 2); // not verified
 	m_k053252->int1_ack().set(FUNC(konmedal_state::vbl_ack_w));
 	m_k053252->int2_ack().set(FUNC(konmedal_state::nmi_ack_w));
 	m_k053252->int_time().set(FUNC(konmedal_state::ccu_int_time_w));
@@ -969,7 +961,7 @@ void konmedal_state::tsukande(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();
 
-	YMZ280B(config, m_ymz, XTAL(16'934'400)); // 16.9344MHz xtal verified on PCB
+	YMZ280B(config, m_ymz, 16.9344_MHz_XTAL); // 16.9344MHz xtal verified on PCB
 	m_ymz->add_route(0, "speaker", 1.0, 0);
 	m_ymz->add_route(1, "speaker", 1.0, 1);
 }
@@ -977,7 +969,7 @@ void konmedal_state::tsukande(machine_config &config)
 void konmedal_state::ddboy(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(14'318'181)/2); // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
+	Z80(config, m_maincpu, 14.318181_MHz_XTAL / 2); // z84c0008pec 8mhz part, 14.31818Mhz xtal verified on PCB, divisor unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal_state::ddboy_main);
 	TIMER(config, "scantimer").configure_scanline(FUNC(konmedal_state::konmedal_scanline), "screen", 0, 1);
 
@@ -985,7 +977,7 @@ void konmedal_state::ddboy(machine_config &config)
 	m_nvram->set_custom_handler(FUNC(konmedal_state::medal_nvram_init));
 	HOPPER(config, "hopper", attotime::from_msec(100));
 
-	K053252(config, m_k053252, XTAL(14'318'181) / 2); // not verified
+	K053252(config, m_k053252, 14.318181_MHz_XTAL / 2); // not verified
 	m_k053252->int1_ack().set(FUNC(konmedal_state::vbl_ack_w));
 	m_k053252->int2_ack().set(FUNC(konmedal_state::nmi_ack_w));
 	m_k053252->int_time().set(FUNC(konmedal_state::ccu_int_time_w));
@@ -1010,10 +1002,10 @@ void konmedal_state::ddboy(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	OKIM6295(config, m_oki, XTAL(14'318'181)/14, okim6295_device::PIN7_HIGH);
+	OKIM6295(config, m_oki, 14.318181_MHz_XTAL / 14, okim6295_device::PIN7_HIGH);
 	m_oki->add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	K051649(config, "k051649", XTAL(14'318'181)/4).add_route(ALL_OUTPUTS, "mono", 0.45);
+	K051649(config, "k051649", 14.318181_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 0.45);
 }
 
 void konmedal_state::chusenoh(machine_config &config)
@@ -1030,7 +1022,7 @@ void konmedal_state::chusenoh(machine_config &config)
 	screen.set_screen_update(FUNC(konmedal_state::screen_update_konmedal));
 	screen.set_palette(m_palette);
 
-	I8251(config, m_usart, XTAL(18'432'000)/8);
+	I8251(config, m_usart, 18.432_MHz_XTAL / 8);
 
 	// I have no idea how this division happens.  There is a 74F161 4-bit counter nearby which likely is involved.
 	clock_device &clk(CLOCK(config, "clock", 18.432_MHz_XTAL / 1920));  // this gives 9600 baud, which may or may not be right
@@ -1094,69 +1086,22 @@ K052109_CB_MEMBER(konmedal_state::shuriboy_tile_callback)
 void konmedal_state::shuri_bank_w(uint8_t data)
 {
 	m_k052109->set_rmrd_line((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
-	membank("bank1")->set_entry(data&0x3);
-}
-
-uint8_t konmedal_state::shuri_irq_r()
-{
-	return m_shuri_irq;
-}
-
-void konmedal_state::shuri_irq_w(uint8_t data)
-{
-	if ((m_shuri_irq & 0x4) && !(data & 0x4))
-	{
-		m_maincpu->set_input_line(0, CLEAR_LINE);
-	}
-	else if ((m_shuri_irq & 0x1) && !(data & 0x1))
-	{
-		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	}
-
-	m_shuri_irq = data;
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(konmedal_state::shuri_scanline)
-{
-	int scanline = param;
-
-	if ((scanline == 240) && (m_shuri_irq & 0x4))
-	{
-		m_maincpu->set_input_line(0, ASSERT_LINE);
-	}
-
-	if ((scanline == 255) && (m_shuri_irq & 0x1))
-	{
-		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	}
-}
-
-void konmedal_state::mario_scrollhack_w(uint8_t data)
-{
-	// Mario Roulette enable X and Y scroll in the same time for both layers, which is currently not supported by emulated K052109.
-	// here we hacky disable Y scroll for layer A and X scroll for layer B.
-	if (data == 0x36)
-		data = 0x22;
-	m_k052109->write(0x1c80, data);
+	membank("bank1")->set_entry(data & 0x3);
 }
 
 void konmedal_state::shuriboy(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(24'000'000) / 4); // divisor unknown
+	Z80(config, m_maincpu, 24_MHz_XTAL / 4); // divisor unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal_state::shuriboy_main);
-	TIMER(config, "scantimer").configure_scanline(FUNC(konmedal_state::shuri_scanline), "screen", 0, 1);
 
 	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
 	m_nvram->set_custom_handler(FUNC(konmedal_state::shuriboy_nvram_init));
 	HOPPER(config, "hopper", attotime::from_msec(100));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // everything not verified, just a placeholder
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(30));
-	screen.set_size(64*8, 32*8);
-	screen.set_visarea(112, 400-1, 16, 240-1);
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240);
 	screen.set_screen_update(FUNC(konmedal_state::screen_update_shuriboy));
 	screen.set_palette(m_palette);
 
@@ -1164,19 +1109,21 @@ void konmedal_state::shuriboy(machine_config &config)
 	//m_palette->enable_shadows();
 	//m_palette->enable_highlights();
 
-	K052109(config, m_k052109, 0);
+	K052109(config, m_k052109, 24_MHz_XTAL);
 	m_k052109->set_palette(m_palette);
-	m_k052109->set_screen(nullptr);
+	m_k052109->set_screen("screen");
 	m_k052109->set_tile_callback(FUNC(konmedal_state::shuriboy_tile_callback));
+	m_k052109->irq_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_k052109->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	MCFG_MACHINE_START_OVERRIDE(konmedal_state, shuriboy)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	K051649(config, "k051649", XTAL(24'000'000) / 8).add_route(ALL_OUTPUTS, "mono", 0.45); // divisor unknown
+	K051649(config, "k051649", 24_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.45); // divisor unknown
 
-	UPD7759(config, m_upd7759, XTAL(640'000)).add_route(ALL_OUTPUTS, "mono", 0.60);
+	UPD7759(config, m_upd7759, 640_kHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.60);
 }
 
 void konmedal_state::fuusenpn(machine_config &config)
@@ -1195,11 +1142,14 @@ void konmedal_state::tsupenta(machine_config &config)
 {
 	shuriboy(config);
 	m_nvram->set_custom_handler(FUNC(konmedal_state::tsupenta_nvram_init));
+
+	// no NMI routine
+	m_k052109->nmi_handler().remove();
 }
 
 void konmedal_state::tsururin(machine_config &config)
 {
-	shuriboy(config);
+	tsupenta(config);
 	NVRAM(config.replace(), m_nvram, nvram_device::DEFAULT_ALL_0);
 }
 
@@ -1498,7 +1448,7 @@ ROM_END
 
 
 // Konami PWB 451847A and PWB 452093A boards (TMNT tilemaps)
-GAME( 1990, tsururin, 0,     tsururin, tsururin, konmedal_state, mario_init,   ROT0, "Konami", "Tsururin Kun", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING) // resets after start up test. Seems to be an IRQ problem
+GAME( 1990, tsururin, 0,     tsururin, tsururin, konmedal_state, mario_init,   ROT0, "Konami", "Tsururin Kun", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING)
 GAME( 1991, slimekun, 0,     tsupenta, slimekun, konmedal_state, mario_init,   ROT0, "Konami", "Slime Kun", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING)
 GAME( 1991, mariorou, 0,     mariorou, mario,    konmedal_state, mario_init,   ROT0, "Konami", "Mario Roulette", MACHINE_SUPPORTS_SAVE)
 GAME( 1991, tsupenta, 0,     tsupenta, tsupenta, konmedal_state, mario_init,   ROT0, "Konami", "Tsurikko Penta", MACHINE_SUPPORTS_SAVE)

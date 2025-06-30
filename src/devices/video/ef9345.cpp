@@ -473,7 +473,7 @@ std::tuple<uint8_t, uint8_t, bool> ef9345_device::makecolors(uint8_t c0, uint8_t
 
 	// Note: flashing characters blink on the opposite phase if negative.
 	if ((flash && (m_pat & 0x40) && negative == !!(m_blink_phase & 0x2)) ||
-	    (conceal && (m_pat & 0x08)))
+		(conceal && (m_pat & 0x08)))
 	{
 		c1 = c0; // make foreground same as background
 	}

@@ -165,16 +165,16 @@ private:
 // Try to more or less map to speaker.h positions
 
 const sound_pipewire::position_info sound_pipewire::position_infos[] = {
-	{ SPA_AUDIO_CHANNEL_MONO,    osd::channel_position::FC },
-	{ SPA_AUDIO_CHANNEL_FL,      osd::channel_position::FL },
-	{ SPA_AUDIO_CHANNEL_FR,      osd::channel_position::FR },
-	{ SPA_AUDIO_CHANNEL_FC,      osd::channel_position::FC },
-	{ SPA_AUDIO_CHANNEL_LFE,     osd::channel_position::LFE },
-	{ SPA_AUDIO_CHANNEL_RL,      osd::channel_position::RL },
-	{ SPA_AUDIO_CHANNEL_RR,      osd::channel_position::RR },
-	{ SPA_AUDIO_CHANNEL_RC,      osd::channel_position::RC },
-	{ SPA_AUDIO_CHANNEL_AUX0,    osd::channel_position::ONREQ },
-	{ SPA_AUDIO_CHANNEL_UNKNOWN, osd::channel_position::UNKNOWN }
+	{ SPA_AUDIO_CHANNEL_MONO,    osd::channel_position::FC() },
+	{ SPA_AUDIO_CHANNEL_FL,      osd::channel_position::FL() },
+	{ SPA_AUDIO_CHANNEL_FR,      osd::channel_position::FR() },
+	{ SPA_AUDIO_CHANNEL_FC,      osd::channel_position::FC() },
+	{ SPA_AUDIO_CHANNEL_LFE,     osd::channel_position::LFE() },
+	{ SPA_AUDIO_CHANNEL_RL,      osd::channel_position::RL() },
+	{ SPA_AUDIO_CHANNEL_RR,      osd::channel_position::RR() },
+	{ SPA_AUDIO_CHANNEL_RC,      osd::channel_position::RC() },
+	{ SPA_AUDIO_CHANNEL_AUX0,    osd::channel_position::ONREQ() },
+	{ SPA_AUDIO_CHANNEL_UNKNOWN, osd::channel_position::UNKNOWN() }
 
 };
 

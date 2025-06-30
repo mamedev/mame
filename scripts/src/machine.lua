@@ -1717,6 +1717,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/icd2053b.h,MACHINES["ICD2053B"] = true
+---------------------------------------------------
+
+if (MACHINES["ICD2053B"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/icd2053b.cpp",
+		MAME_DIR .. "src/devices/machine/icd2053b.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/icd2061a.h,MACHINES["ICD2061A"] = true
 ---------------------------------------------------
 

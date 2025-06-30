@@ -2096,10 +2096,12 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			m_inten = data & 0x1f;
 			if (!(data & 0x10))
 			{
+				m_intflag &= ~INTFLAG_QUARTER;
 				lower_irq(IRQS_QTRSEC);
 			}
 			if (!(data & 0x08))
 			{
+				m_intflag &= ~INTFLAG_VBL;
 				lower_irq(IRQS_VBL);
 			}
 			//printf("%02x to INTEN, now %02x\n", data, m_vgcint);

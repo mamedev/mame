@@ -255,7 +255,7 @@ void mz2000_state::draw_graphics_layer(bitmap_ind16 &bitmap, const rectangle &cl
 
 void mz2000_state::draw_text_layer(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-//	const u8 color = m_tvram_attr & 7;
+//  const u8 color = m_tvram_attr & 7;
 	const u8 x_size = (m_width80 + 1) * 40;
 	const u8 x_inc = m_width80 ? 8 : 16;
 	const u8 x_shift = m_width80 ? 0 : 1;
@@ -538,9 +538,9 @@ void mz2000_state::mz2000_map(address_map &map)
 	// theoretical, cpm22 executes stuff from GVRAM at 0xfa00 during bootstrap,
 	// core gets confused and execute from work RAM instead.
 	// wpset 0,ffff,r,1,{printf "%04x",wpaddr;g} will make this approach to work ...
-//	map(0xc000, 0xffff).view(m_vram_view);
-//	m_vram_view[0](0xc000, 0xffff).rw(FUNC(mz2000_state::gvram_r), FUNC(mz2000_state::gvram_w));
-//	m_vram_view[1](0xd000, 0xdfff).ram().share("tvram");
+//  map(0xc000, 0xffff).view(m_vram_view);
+//  m_vram_view[0](0xc000, 0xffff).rw(FUNC(mz2000_state::gvram_r), FUNC(mz2000_state::gvram_w));
+//  m_vram_view[1](0xd000, 0xdfff).ram().share("tvram");
 }
 
 void mz2000_state::mz80b_io(address_map &map)
@@ -637,7 +637,7 @@ void mz2000_state::ppi_porta_w(u8 data)
 	}
 
 	//if (BIT(data, 4))
-	//	popmessage("Reverse video");
+	//  popmessage("Reverse video");
 
 	if((m_tape_ctrl & 0x08) == 0 && data & 0x08) // stop
 	{
@@ -703,14 +703,14 @@ void mz2000_state::pio_porta_w(u8 data)
 	m_vram_overlay_enable = BIT(data, 7);
 	m_vram_overlay_select = BIT(data, 6);
 	//logerror("PIO PA vram %s %02x\n", m_vram_overlay_enable ? "select" : "disable", BIT(data, 6));
-//	if (BIT(data, 7))
-//	{
-//		m_vram_view.select(BIT(data, 6));
-//	}
-//	else
-//	{
-//		m_vram_view.disable();
-//	}
+//  if (BIT(data, 7))
+//  {
+//      m_vram_view.select(BIT(data, 6));
+//  }
+//  else
+//  {
+//      m_vram_view.disable();
+//  }
 
 	m_width80 = ((data & 0x20) >> 5);
 	m_key_mux = data & 0x1f;
@@ -986,18 +986,18 @@ static const gfx_layout charlayout_8x8 =
 
 //static const gfx_layout charlayout_8x16 =
 //{
-//	8, 16,
-//	256,
-//	1,
-//	{ 0 },
-//	{ STEP8(0,1) },
-//	{ STEP16(0,8) },
-//	8*16
+//  8, 16,
+//  256,
+//  1,
+//  { 0 },
+//  { STEP8(0,1) },
+//  { STEP16(0,8) },
+//  8*16
 //};
 
 static GFXDECODE_START( gfx_mz2000 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, charlayout_8x8, 0, 1 )
-//	GFXDECODE_ENTRY( "chargen", 0x0800, charlayout_8x16, 0, 1 )
+//  GFXDECODE_ENTRY( "chargen", 0x0800, charlayout_8x16, 0, 1 )
 GFXDECODE_END
 
 void mz2000_state::machine_start()
@@ -1092,7 +1092,7 @@ void mz2000_state::mz2000(machine_config &config)
 	Z80(config, m_maincpu, MASTER_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mz2000_state::mz2000_map);
 	m_maincpu->set_addrmap(AS_IO, &mz2000_state::mz2000_io);
-//	m_maincpu->set_addrmap(AS_OPCODES, &mz2000_state::mz2000_opcodes);
+//  m_maincpu->set_addrmap(AS_OPCODES, &mz2000_state::mz2000_opcodes);
 
 	i8255_device &ppi(I8255(config, "ppi"));
 	ppi.out_pa_callback().set(FUNC(mz2000_state::ppi_porta_w));
@@ -1180,7 +1180,7 @@ ROM_START( mz2000 )
 //  ROM_LOAD( "mzfont.rom", 0x0000, 0x0800, BAD_DUMP CRC(0631efc3) SHA1(99b206af5c9845995733d877e9e93e9681b982a8) ) //original has JP characters
 	/* these are hand-crafted roms, converted from bmps floating around the net */
 	ROM_LOAD( "font.bin",    0x0000, 0x0800, BAD_DUMP CRC(6ae6ce8e) SHA1(6adcdab9e4647429dd8deb73146264746b5eccda) )
-//	ROM_LOAD( "font400.bin", 0x0800, 0x1000, BAD_DUMP CRC(56c5d2bc) SHA1(fea655ff5eedacf8978fa3c185485db44376e24d) )
+//  ROM_LOAD( "font400.bin", 0x0800, 0x1000, BAD_DUMP CRC(56c5d2bc) SHA1(fea655ff5eedacf8978fa3c185485db44376e24d) )
 ROM_END
 
 ROM_START( mz2200 )
@@ -1191,7 +1191,7 @@ ROM_START( mz2200 )
 //  ROM_LOAD( "mzfont.rom", 0x0000, 0x0800, BAD_DUMP CRC(0631efc3) SHA1(99b206af5c9845995733d877e9e93e9681b982a8) ) //original has JP characters
 	/* these are hand-crafted roms, converted from bmps floating around the net */
 	ROM_LOAD( "font.bin",    0x0000, 0x0800, BAD_DUMP CRC(6ae6ce8e) SHA1(6adcdab9e4647429dd8deb73146264746b5eccda) )
-//	ROM_LOAD( "font400.bin", 0x0800, 0x1000, BAD_DUMP CRC(56c5d2bc) SHA1(fea655ff5eedacf8978fa3c185485db44376e24d) )
+//  ROM_LOAD( "font400.bin", 0x0800, 0x1000, BAD_DUMP CRC(56c5d2bc) SHA1(fea655ff5eedacf8978fa3c185485db44376e24d) )
 ROM_END
 
 } // anonymous namespace
