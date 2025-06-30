@@ -630,22 +630,17 @@ void mos6551_device::receiver_clock(int state)
 					 * Do two bits each iteration as shifting happens on both
 					 * clock phases.
 					 */
-					for (int i = 0; i < 2 && m_rx_shifted_bits < m_wordlength; i++) {
+					for (int i = 0; i < 2 && m_rx_shifted_bits < m_wordlength; i++)
+					{
 						if (m_rx_shift & (1 << m_rx_shifted_bits))
-						{
 							m_rdr |= (1 << m_rx_shifted_bits);
-						}
 						else
-						{
 							m_rdr &= ~(1 << m_rx_shifted_bits);
-						}
 						m_rx_shifted_bits++;
 					}
 
 					if (m_rx_counter < stoplength())
-					{
 						break;
-					}
 
 					/* Very last cycle of this byte: update status register,
 					 * trigger IRQ, etc.
@@ -655,14 +650,10 @@ void mos6551_device::receiver_clock(int state)
 					LOG("MOS6551: RX STOP BIT\n");
 
 					if ((m_status & SR_RDRF))
-					{
 						m_status |= SR_OVERRUN;
-					}
 
 					if (!m_rxd)
-					{
 						m_status |= SR_FRAMING_ERROR;
-					}
 
 					if ((m_parity == PARITY_ODD && !m_rx_parity) ||
 						(m_parity == PARITY_EVEN && m_rx_parity))

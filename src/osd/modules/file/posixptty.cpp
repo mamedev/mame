@@ -25,7 +25,7 @@
 #elif defined(__NetBSD__) || defined(__OpenBSD__) || defined(__APPLE__)
 #include <termios.h>
 #include <util.h>
-#elif defined(__linux__) || defined(__EMSCRIPTEN__) || defined(__GLIBC__)
+#elif defined(__linux__) || defined(__EMSCRIPTEN__)
 #include <pty.h>
 #elif defined(__HAIKU__)
 #include <bsd/pty.h>
@@ -192,16 +192,11 @@ std::error_condition posix_open_ptty(std::uint32_t openflags, osd_file::ptr &fil
 	std::vector<char> slavepath_storage;
 	try
 	{
-#if defined(PATH_MAX)
-		constexpr unsigned STARTING_SIZE = PATH_MAX;
-#else // defined PATH_MAX
-		constexpr unsigned STARTING_SIZE = 8192;
-#endif // defined PATH_MAX
 		int result;
 		do
 		{
 			if (slavepath_storage.empty())
-				slavepath_storage.resize(STARTING_SIZE);
+				slavepath_storage.resize(PATH_MAX);
 			else
 				slavepath_storage.resize(slavepath_storage.size() * 2);
 			result = ptsname_r(masterfd, slavepath_storage.data(), slavepath_storage.size());

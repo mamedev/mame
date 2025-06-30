@@ -210,7 +210,7 @@ void choose_image(device_image_interface &device, HWND owner, REFCLSID class_id,
 
 
 consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
-	disasmbasewin_info(debugger, true, "Debug", nullptr),
+	disasmbasewin_info(debugger, true, VIEW_IDX_DISASM, "Debug", nullptr),
 	m_current_cpu(nullptr),
 	m_devices_menu(nullptr)
 {
@@ -257,30 +257,29 @@ consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
 
 		// adjust the min/max sizes for the window style
 		bounds.top = bounds.left = 0;
-		bounds.right = bounds.bottom =
-			EDGE_WIDTH + m_views[VIEW_IDX_STATE]->maxwidth() +
-			(2 * EDGE_WIDTH) + 100 + EDGE_WIDTH;
+		bounds.right = bounds.bottom = EDGE_WIDTH + m_views[VIEW_IDX_STATE]->maxwidth() + (2 * EDGE_WIDTH) + 100 + EDGE_WIDTH;
 		AdjustWindowRectEx(&bounds, DEBUG_WINDOW_STYLE, FALSE, DEBUG_WINDOW_STYLE_EX);
 		set_minwidth(bounds.right - bounds.left);
 
 		bounds.top = bounds.left = 0;
 		bounds.right = bounds.bottom =
-			EDGE_WIDTH + m_views[VIEW_IDX_STATE]->maxwidth() +
-			(2 * EDGE_WIDTH) +
-			std::max(
-				m_views[VIEW_IDX_DISASM]->maxwidth(),
-				m_views[VIEW_IDX_CONSOLE]->maxwidth()) +
-			EDGE_WIDTH;
+				EDGE_WIDTH +
+				m_views[VIEW_IDX_STATE]->maxwidth() +
+				(2 * EDGE_WIDTH) +
+				std::max(m_views[VIEW_IDX_DISASM]->maxwidth(), m_views[VIEW_IDX_CONSOLE]->maxwidth()) +
+				EDGE_WIDTH;
 		AdjustWindowRectEx(&bounds, DEBUG_WINDOW_STYLE, FALSE, DEBUG_WINDOW_STYLE_EX);
 		set_maxwidth(bounds.right - bounds.left);
 
 		// position the window at the bottom-right
 		int const bestwidth = (std::min<uint32_t>)(maxwidth(), work_bounds.right - work_bounds.left);
 		int const bestheight = (std::min<uint32_t>)(500, work_bounds.bottom - work_bounds.top);
-		SetWindowPos(window(), HWND_TOP,
-					work_bounds.right - bestwidth, work_bounds.bottom - bestheight,
-					bestwidth, bestheight,
-					SWP_SHOWWINDOW);
+		SetWindowPos(
+				window(),
+				HWND_TOP,
+				work_bounds.right - bestwidth, work_bounds.bottom - bestheight,
+				bestwidth, bestheight,
+				SWP_SHOWWINDOW);
 	}
 
 	// recompute the children
