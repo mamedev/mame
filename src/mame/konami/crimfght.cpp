@@ -445,6 +445,7 @@ void crimfght_state::crimfght(machine_config &config)
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 320, 264, 16, 240); // measured 59.17
 	screen.set_screen_update(FUNC(crimfght_state::screen_update));
 	screen.set_palette(m_palette);

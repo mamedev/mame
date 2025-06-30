@@ -17,12 +17,18 @@ which uses 3 bits for the color code and 13 bits for the character code.
 The 051962 multiplexes the data of the three layers and converts it into
 palette indexes and transparency bits which will be mixed later in the video
 chain.
+
 Priority is handled externally: these chips only generate the tilemaps, they
 don't mix them.
+
 Both chips are interfaced with the main CPU. When the RMRD pin is asserted,
 the CPU can read the gfx ROM data. This is done by telling the 052109 which
 dword to read (this is a combination of some banking registers, and the CPU
 address lines), and then reading it from the 051962.
+
+The hardware does not support raster effects, meaning: writes to the scroll
+registers during active display don't immediately show on the screen. The same
+probably applies to tilemap writes.
 
 052109 inputs:
 - address lines (AB0-AB15, AB13-AB15 seem to have a different function)
