@@ -41,8 +41,6 @@ protected:
 	virtual uint8_t in1_r();
 	virtual void in0_w(uint8_t data);
 
-	void nes_vt32_map(address_map &map) ATTR_COLD;
-
 	optional_ioport m_io0;
 	optional_ioport m_io1;
 
@@ -108,12 +106,48 @@ public:
 	void init_g9_666();
 	void init_hhgc319();
 
-private:
+protected:
 	uint8_t vt_rom_banked_r(offs_t offset);
+
+private:
 	void vt_external_space_map_fp_2x32mbyte(address_map &map) ATTR_COLD;
 
 	uint8_t fcpocket_412d_r();
 	void fcpocket_412c_w(uint8_t data);
+};
+
+class nes_vt32_bitboy_state : public nes_vt32_unk_state
+{
+public:
+	nes_vt32_bitboy_state(const machine_config& mconfig, device_type type, const char* tag) :
+		nes_vt32_unk_state(mconfig, type, tag)
+	{ }
+
+	void nes_vt32_bitboy_2x16mb(machine_config& config);
+
+	void vt_external_space_map_bitboy_2x16mbyte(address_map &map) ATTR_COLD;
+
+private:
+	void bittboy_412c_w(u8 data);
+};
+
+class nes_vt32_fapocket_state : public nes_vt32_unk_state
+{
+public:
+	nes_vt32_fapocket_state(const machine_config& mconfig, device_type type, const char* tag) :
+		nes_vt32_unk_state(mconfig, type, tag)
+	{ }
+
+	void nes_vt32_fa(machine_config& config);
+
+protected:
+	virtual void machine_reset() override ATTR_COLD;
+
+private:
+	void vt_external_space_map_fa_4x16mbyte(address_map &map) ATTR_COLD;
+
+	u8 fapocket_412c_r();
+	void fapocket_412c_w(u8 data);
 };
 
 uint8_t nes_vt32_base_state::vt_rom_r(offs_t offset)
@@ -146,6 +180,16 @@ uint8_t nes_vt32_unk_state::vt_rom_banked_r(offs_t offset)
 void nes_vt32_unk_state::vt_external_space_map_fp_2x32mbyte(address_map &map)
 {
 	map(0x0000000, 0x1ffffff).r(FUNC(nes_vt32_unk_state::vt_rom_banked_r));
+}
+
+void nes_vt32_bitboy_state::vt_external_space_map_bitboy_2x16mbyte(address_map &map)
+{
+	map(0x0000000, 0x0ffffff).mirror(0x1000000).r(FUNC(nes_vt32_bitboy_state::vt_rom_banked_r));
+}
+
+void nes_vt32_fapocket_state::vt_external_space_map_fa_4x16mbyte(address_map &map)
+{
+	map(0x0000000, 0x0ffffff).mirror(0x1000000).r(FUNC(nes_vt32_fapocket_state::vt_rom_banked_r));
 }
 
 
@@ -221,6 +265,17 @@ void nes_vt32_base_state::machine_start()
 void nes_vt32_base_state::machine_reset()
 {
 
+}
+
+void nes_vt32_fapocket_state::machine_reset()
+{
+	nes_vt32_unk_state::machine_reset();
+
+	// fapocket needs this, fcpocket instead reads the switch in software?
+	if (m_cartsel)
+		m_ahigh = (m_cartsel->read() == 0x01) ? (1 << 25) : 0x0;
+	else
+		m_ahigh = 0;
 }
 
 void nes_vt32_base_state::configure_soc(nes_vt02_vt03_soc_device* soc)
@@ -331,6 +386,49 @@ void nes_vt32_unk_state::nes_vt32_32mb(machine_config& config)
 }
 
 
+void nes_vt32_bitboy_state::bittboy_412c_w(u8 data)
+{
+	// bittboy (ok)
+	logerror("%s: vt03_412c_extbank_w %02x\n", machine().describe_context(),  data);
+	m_ahigh = (data & 0x04) ? (1 << 24) : 0x0;
+}
+
+void nes_vt32_bitboy_state::nes_vt32_bitboy_2x16mb(machine_config& config)
+{
+	nes_vt32_fp(config);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt32_bitboy_state::vt_external_space_map_bitboy_2x16mbyte);
+
+	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_write_412c_callback().set(FUNC(nes_vt32_bitboy_state::bittboy_412c_w));
+}
+
+
+u8 nes_vt32_fapocket_state::fapocket_412c_r()
+{
+	if (m_cartsel)
+		return m_cartsel->read();
+	else
+		return 0;
+}
+
+void nes_vt32_fapocket_state::fapocket_412c_w(u8 data)
+{
+	// fapocket (ok?) (also uses bank from config switch for fake cartridge slot)
+	logerror("%s: vtfa_412c_extbank_w %02x\n", machine().describe_context(), data);
+	m_ahigh = 0;
+	m_ahigh |= (data & 0x01) ? (1 << 25) : 0x0;
+	m_ahigh |= (data & 0x02) ? (1 << 24) : 0x0;
+}
+
+void nes_vt32_fapocket_state::nes_vt32_fa(machine_config& config)
+{
+	nes_vt32_fp(config);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt32_fapocket_state::vt_external_space_map_fa_4x16mbyte);
+
+	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_read_412c_callback().set(FUNC(nes_vt32_fapocket_state::fapocket_412c_r));
+	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_write_412c_callback().set(FUNC(nes_vt32_fapocket_state::fapocket_412c_w));
+}
+
+
 static INPUT_PORTS_START( nes_vt32_fp )
 	PORT_INCLUDE(nes_vt32)
 
@@ -339,6 +437,16 @@ static INPUT_PORTS_START( nes_vt32_fp )
 	PORT_DIPSETTING(    0x00, "472-in-1" )
 	PORT_DIPSETTING(    0x06, "128-in-1" )
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( nes_vt32_fa )
+	PORT_INCLUDE(nes_vt32)
+
+	PORT_START("CARTSEL")
+	PORT_DIPNAME( 0x01, 0x00, "Cartridge Select" ) PORT_CODE(KEYCODE_3) PORT_TOGGLE
+	PORT_DIPSETTING(    0x00, "508-in-1" )
+	PORT_DIPSETTING(    0x01, "130-in-1" )
+INPUT_PORTS_END
+
 
 
 ROM_START( dgun2573 ) // this one lacked a DreamGear logo but was otherwise physically identical, is it a clone product or did DreamGear drop the logo in favor of just using the 'My Arcade' brand?
@@ -384,6 +492,11 @@ ROM_START( fcpocket )
 	ROM_LOAD( "s29gl01gp.bin", 0x00000, 0x8000000, CRC(8703b18a) SHA1(07943443294e80ca93f83181c8bdbf950b87c52f) ) // 2nd half = 0x00 (so 64MByte of content)
 ROM_END
 
+ROM_START( fapocket )
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "s29gl512n.bin", 0x00000, 0x4000000, CRC(37d0fb06) SHA1(0146a2fae32e23b65d4032c508f0d12cedd399c3) )
+ROM_END
+
 ROM_START( matet300 )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
 	ROM_LOAD( "tetris.bin", 0x00000, 0x2000000, CRC(73cbd40a) SHA1(5996c97cebd6cec42a0ba1fba9517adf1af00098) )
@@ -421,9 +534,39 @@ ROM_START( g9_666 )
 	ROM_LOAD( "666in1.u1", 0x00000, 0x1000000, CRC(e3a98465) SHA1(dfec3e74e36aef9bfa57ec530c37642015569dc5) )
 ROM_END
 
+ROM_START( q5_500in1 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "s29gl128.u1", 0x00000, 0x1000000, CRC(de779dd7) SHA1(ac6d3fa6f18ceb795532ba9e85edffc040d74347) )
+ROM_END
+
 ROM_START( hhgc319 )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
 	ROM_LOAD( "s29gl128n10tfi01.u3", 0x000000, 0x1000000, CRC(4b51125f) SHA1(bab3981ae1652cf6620c7c6769a6729a1e4d588f) )
+ROM_END
+
+ROM_START( bittboy )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "bittboy_flash_read_s29gl256n-tf-v2.bin", 0x00000, 0x2000000, CRC(24c802d7) SHA1(c1300ff799b93b9b53060b94d3985db4389c5d3a) )
+ROM_END
+
+ROM_START( mc_hh210 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "msp55lv128t.u4", 0x00000, 0x1000000, CRC(9ba520d4) SHA1(627f811b24314197e289a2ade668ff4115421bed) )
+ROM_END
+
+ROM_START( retro400 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "retro fc 400-in-1.bin", 0x00000, 0x1000000, CRC(4bf9991b) SHA1(ce9cac61cfc950d832d47afc76eb6c1488eeb2ca) ) // BGA on Subboard
+ROM_END
+
+ROM_START( unk2019hh )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "fgb2019.bin", 0x00000, 0x1000000, CRC(7ef130d5) SHA1(00f45974494707fdac78153b13d8cfb503716ad0) ) // flash ROM
+ROM_END
+
+ROM_START( unk2020hh )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "fgb2020.bin", 0x00000, 0x1000000, CRC(a685d943) SHA1(9b272daccd8fe244c910f031466a4fedd83d5236) ) // flash ROM
 ROM_END
 
 void nes_vt32_unk_state::init_rfcp168()
@@ -498,8 +641,28 @@ CONS( 201?, rfcp168,  0,  0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, init_
 // many duplicates, real game count to be confirmed, graphical issues in some games, lots of accesses to $42xx
 CONS( 202?, g9_666,   0,  0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, init_g9_666, "<unknown>", "G9 Game Box 666 Games", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
+// same bitswap as above, lots of accesses to $42xx
+CONS( 201?, q5_500in1, 0, 0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, init_g9_666, "<unknown>", "Q5 500 in 1 Handheld", MACHINE_NOT_WORKING )
+
 // lots of accesses to $42xx, highly scrambled
 CONS( 201?, hhgc319,  0,  0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, init_hhgc319, "<unknown>", "Handheld Game Console 319-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
+// lots of accesses to $42xx
+// Runs well, only issues in SMB3 which crashes
+CONS( 2017, bittboy,  0,  0,  nes_vt32_bitboy_2x16mb, nes_vt32, nes_vt32_bitboy_state, empty_init, "BittBoy",   "BittBoy Mini FC 300 in 1", MACHINE_IMPERFECT_GRAPHICS ) // has external banking (2x 16mbyte banks)
+
+// lots of accesses to $42xx
+// No title screen, but press start and menu and games run fine. Makes odd
+// memory accesses which probably explain broken title screen
+CONS( 201?, mc_hh210, 0,  0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "Handheld 210 in 1", MACHINE_NOT_WORKING )
+
+// lots of accesses to $42xx, M705-128A6 sub-board with BGA
+CONS( 201?, retro400, 0,  0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "Retro FC 400-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+
+// lots of accesses to $42xx, both boot, but banking is wrong (bad tiles)
+// menu in unk2020hh renders using incorrect gfx too (opcodes are scrambled)
+CONS( 2019, unk2019hh,  0,        0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "unknown VTxx based GameBoy style handheld (2019 PCB)", MACHINE_NOT_WORKING )
+CONS( 2020, unk2020hh,  unk2019hh,0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "unknown VTxx based GameBoy style handheld (2020 PCB)", MACHINE_NOT_WORKING )
 
 
 // Some games (eg F22) are scrambled like in myaass
@@ -512,7 +675,9 @@ CONS( 2021, matet300,  0,         0,  nes_vt32_32mb,     nes_vt32, nes_vt32_unk_
 CONS( 2021, matet100,  0,        0,  nes_vt32_32mb,      nes_vt32, nes_vt32_unk_state, empty_init, "dreamGEAR", "My Arcade Tetris (DGUNL-7027, Pico Player, with 100+ bonus games)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // box says 100+ bonus games
 
 // Use DIP switch to select console or cartridge, as cartridge is fake and just toggles a GPIO
+// fapocket has lots of accesses to $42xx
 CONS( 2016, fcpocket,  0,  0,  nes_vt32_4x16mb,   nes_vt32_fp, nes_vt32_unk_state, empty_init, "<unknown>",   "FC Pocket 600 in 1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )  // has external banking (2x 32mbyte banks)
+CONS( 2017, fapocket,  0,  0,  nes_vt32_fa,       nes_vt32_fa, nes_vt32_fapocket_state, empty_init, "<unknown>",   "Family Pocket 638 in 1", MACHINE_IMPERFECT_GRAPHICS ) // has external banking (4x 16mbyte banks)
 
 // aside from the boot screens these have no theming and all contain a barely disguised bootleg version of Nintendo's Pinball in the Games section
 CONS( 2020, lxpcsp,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console - Marvel Spider-Man", MACHINE_NOT_WORKING )

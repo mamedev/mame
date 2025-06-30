@@ -40,6 +40,7 @@ protected:
 
 	u8 vtfp_4119_r();
 	void vtfp_411e_encryption_state_w(u8 data);
+	u8 vtfp_412c_r();
 	void vtfp_412c_extbank_w(u8 data);
 	u8 vtfp_412d_r();
 	void vtfp_4242_w(u8 data);
