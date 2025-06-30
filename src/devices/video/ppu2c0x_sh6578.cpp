@@ -45,8 +45,6 @@ void ppu_sh6578_device::ppu_internal_map(address_map& map)
 	map(0x0000, 0x1fff).ram();
 	map(0x2000, 0x27ff).ram();
 	map(0x2800, 0x7fff).nopr();
-
-	map(0x8000, 0xffff).ram(); // machine specific?
 }
 
 void ppu_sh6578_device::device_start()
