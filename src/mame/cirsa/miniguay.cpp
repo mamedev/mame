@@ -136,10 +136,10 @@ void miniguay_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("maincpu", 0);
 	map(0x8000, 0x87ff).ram();
-	//map(0x9400, 0x940f).rw("muart1", FUNC(i8256_device::read), FUNC(i8256_device::write));
+	map(0x9400, 0x940f).rw("muart1", FUNC(i8256_device::read), FUNC(i8256_device::write));
 	map(0x9900, 0x9907).rw("i8155_1", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 	map(0x9d00, 0x9d07).rw("i8155_2", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
-	//map(0xb400, 0xb40f).rw("muart2", FUNC(i8256_device::read), FUNC(i8256_device::write));
+	map(0xb400, 0xb40f).rw("muart2", FUNC(i8256_device::read), FUNC(i8256_device::write));
 	map(0xb409, 0xb409).rw(FUNC(miniguay_state::psg_db_r), FUNC(miniguay_state::psg_db_w));
 	map(0xb900, 0xb907).rw("i8155_3", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 	map(0xbd00, 0xbd07).rw("i8155_4", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
