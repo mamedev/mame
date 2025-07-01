@@ -30,7 +30,6 @@
 #define LOG_ALL         (LOG_SETUP|LOG_PARAMS|LOG_CALC)
 
 //#define VERBOSE         (LOG_SETUP)
-
 #include "logmacro.h"
 
 // we need the M_SQRT2 constant
@@ -477,7 +476,7 @@ filter_biquad_device::biquad_params filter_biquad_device::opamp_diff_bandpass_ca
  *   A = gain * (w / Q)
  *   B = w / Q
  *   C = w ^ 2
- * The calculations of Fc, Q and gain in the _calc functions below are derived
+ * The calculations of Fc, Q and gain in the *_calc functions below are derived
  * from the equations above, with some algebra.
  */
 
@@ -505,7 +504,7 @@ filter_biquad_device::biquad_params filter_biquad_device::rc_rr_bandpass_calc(do
 	p.fc = 1.0 / (2.0 * M_PI * x);
 	p.q = x / y;
 	p.gain = z / y;
-	LOGMASKED(LOG_SETUP,"filter_biquad_device::rc_rr_bandpass_calc(%f %f %f %f) yields: fc = %f, Q = %f, gain = %f\n", r1, r2, c1, c2, p.fc, p.q, p.gain);
+	LOGMASKED(LOG_SETUP, "filter_biquad_device::rc_rr_bandpass_calc(%f %f %f %f) yields: fc = %f, Q = %f, gain = %f\n", r1, r2, c1, c2, p.fc, p.q, p.gain);
 	return p;
 }
 
@@ -533,7 +532,7 @@ filter_biquad_device::biquad_params filter_biquad_device::rc_cc_bandpass_calc(do
 	p.fc = 1.0 / (2.0 * M_PI * x);
 	p.q = x / y;
 	p.gain = z / y;
-	LOGMASKED(LOG_SETUP,"filter_biquad_device::rc_cc_bandpass_calc(%f %f %f %f) yields: fc = %f, Q = %f, gain = %f\n", r1, r2, c1, c2, p.fc, p.q, p.gain);
+	LOGMASKED(LOG_SETUP, "filter_biquad_device::rc_cc_bandpass_calc(%f %f %f %f) yields: fc = %f, Q = %f, gain = %f\n", r1, r2, c1, c2, p.fc, p.q, p.gain);
 	return p;
 }
 
