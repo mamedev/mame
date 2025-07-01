@@ -86,25 +86,29 @@ void i8256_device::write(offs_t offset, u8 data)
 		}
 	}
         
-	LOG("I8256 Write %02x to %02x\n", data, reg);
+	//LOG("I8256 Write %02x to %02x\n", data, reg);
 
 	switch (reg)
 	{
 		case REG_CMD1:
-            m_command1 = data;
-			if (BIT(m_command1,CMD1_8086))
-			{
-				LOG("I8256 Enabled 8086 mode\n");
-			}
-			LOG("I8256 Character length: %u\n", 8-(m_command1 & 0xC0));
+			if (m_command1 != data) {
+					m_command1 = data;
+				if (BIT(m_command1,CMD1_8086))
+				{
+					LOG("I8256 Enabled 8086 mode\n");
+				}
+				LOG("I8256 Character length: %u\n", 8-(m_command1 & 0xC0));
+			}            
 			break;
 		case REG_CMD2:
-            m_command2 = data;
-			LOG("I8256 Baud rate: %u\n", baudRates[m_command2 & 0x0F]);
-			if((clock() / sysclockDivider[(m_command2 & 0x30 >> 4)])!=1024000)
-			{
-				osd_printf_warning("I8256 Clock mismatch! Scale: %u\n", sysclockDivider[(m_command2 & 0x30 >> 4)]);
-				osd_printf_warning("I8256 Internal Clock should be 1024000, is: %u\n", (clock() / sysclockDivider[(m_command2 & 0x30 >> 4)]));
+			if (m_command2 != data) {
+            	m_command2 = data;
+				LOG("I8256 Baud rate: %u\n", baudRates[m_command2 & 0x0F]);
+				LOG("I8256 Clock Scale: %u\n", sysclockDivider[(m_command2 & 0x30 >> 4)]);
+				if((clock() / sysclockDivider[(m_command2 & 0x30 >> 4)])!=1024000)
+				{				
+					LOG("I8256 Internal Clock should be 1024000, calculated: %u\n", (clock() / sysclockDivider[(m_command2 & 0x30 >> 4)]));
+				}
 			}
 			break;
 		case REG_CMD3:
