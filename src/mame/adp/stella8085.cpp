@@ -163,7 +163,7 @@ void stella8085_state::doppelpot(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &stella8085_state::mc146818_io_map);
 
-	I8256(config, "muart", 6.144_MHz_XTAL);
+	I8256(config, "muart", 6.144_MHz_XTAL / 2);
 
 	I8279(config, m_kdc, 6.144_MHz_XTAL / 2);
 
