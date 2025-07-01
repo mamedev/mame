@@ -41,6 +41,12 @@ class i8256_device : public device_t, public device_serial_interface
 public:
     i8256_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+    devcb_read8 m_in_p1_cb;
+	devcb_read8 m_in_p2_cb;
+    
+	devcb_write8 m_out_p1_cb;
+	devcb_write8 m_out_p2_cb;
+
     auto in_p1_callback()  { return m_in_p1_cb.bind(); }
     auto in_p2_callback()  { return m_in_p2_cb.bind(); }
     auto out_p1_callback() { return m_out_p1_cb.bind(); }
@@ -49,11 +55,11 @@ public:
     virtual void device_start() override;
     virtual void device_reset() override;
 
-	void write_rxd(int state);
 	void write_cts(int state);
+    void write_rxd(int state);
+    void write_rxc(int state);
 	void write_txc(int state);
-	void write_rxc(int state);
-
+	
     void write(offs_t offset, u8 data);
     uint8_t read(offs_t offset);
 
@@ -69,12 +75,6 @@ private:
     uint8_t m_port2_int;
 
     void output_pc();
-
-    devcb_read8 m_in_p1_cb;
-	devcb_read8 m_in_p2_cb;
-    
-	devcb_write8 m_out_p1_cb;
-	devcb_write8 m_out_p2_cb;
 
     emu_timer *m_timers[5];
 
