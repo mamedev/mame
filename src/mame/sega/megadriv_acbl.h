@@ -4,7 +4,9 @@
 #define MAME_SEGA_MEGADRIV_ACBL_H
 
 #include "megadriv.h"
+
 #include "cpu/pic16c5x/pic16c5x.h"
+#include "sound/okim6295.h"
 
 
 class md_boot_state : public md_ctrl_state
@@ -115,5 +117,71 @@ protected:
 private:
 	void ssf2mdb_68k_map(address_map &map) ATTR_COLD;
 };
+
+
+class puckpkmn_state : public md_boot_state
+{
+public:
+	puckpkmn_state(const machine_config &mconfig, device_type type, const char *tag) :
+		md_boot_state(mconfig, type, tag)
+	{
+	}
+
+	void puckpkmn(machine_config &config) ATTR_COLD;
+	void jingling(machine_config &config) ATTR_COLD;
+	void puckpkmnb(machine_config &config) ATTR_COLD;
+
+	void init_puckpkmn() ATTR_COLD;
+
+protected:
+	void puckpkmn_base_map(address_map &map) ATTR_COLD;
+
+private:
+	void puckpkmn_map(address_map &map) ATTR_COLD;
+	void jingling_map(address_map &map) ATTR_COLD;
+	void puckpkmnb_map(address_map &map) ATTR_COLD;
+};
+
+
+class jzth_state : public puckpkmn_state
+{
+public:
+	using puckpkmn_state::puckpkmn_state;
+
+	void jzth(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+private:
+	void bl_710000_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t bl_710000_r();
+
+	void jzth_map(address_map &map) ATTR_COLD;
+
+	int m_protcount = 0;
+};
+
+class songjang_state : public puckpkmn_state
+{
+public:
+	using puckpkmn_state::puckpkmn_state;
+
+	void songjang(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+private:
+	uint16_t protval_r();
+	void protval_w(uint16_t data);
+
+	uint16_t sj_70001c_r();
+
+	void songjang_map(address_map &map) ATTR_COLD;
+
+	uint16_t m_protval;
+};
+
 
 #endif // MAME_SEGA_MEGADRIV_ACBL_H

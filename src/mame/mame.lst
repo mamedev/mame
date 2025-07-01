@@ -40232,14 +40232,20 @@ barek2mb
 barek3mb
 barek3mba
 bk3ssrmb
+jingling
 jparkmb
+jzth
 mk3mdb
+puckpkmn
+puckpkmnb
+songjang
 sonic2mb
 sonic3mb
 srmdb
 srssf2mb
 ssf2mdb
 twinktmb
+
 
 @source:sega/megadriv_rad.cpp
 atgame40
@@ -40830,13 +40836,6 @@ zombrvn
 zombrvne
 zombrvno
 zunou
-
-@source:sega/puckpkmn.cpp
-jingling
-jzth
-puckpkmn
-puckpkmnb
-songjang
 
 @source:sega/saturn.cpp
 hisaturn
