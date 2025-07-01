@@ -372,12 +372,12 @@ void songjang_state::songjang_map(address_map &map)
 
 	map(0x01c000, 0x01cfff).nopw(); // writes to ROM area, buggy code?
 
-	map(0x412302, 0x412303).w(FUNC(protval_w)); // used with 0x432100 read
-	map(0x426800, 0x426801).r(FUNC(protval_r)); // used with 0x468202 write
-	map(0x432100, 0x432101).r(FUNC(protval_r)); // used with 0x412302 write
-	map(0x468202, 0x468203).w(FUNC(protval_w)); // used with 0x426800 read
+	map(0x412302, 0x412303).w(FUNC(songjang_state::protval_w)); // used with 0x432100 read
+	map(0x426800, 0x426801).r(FUNC(songjang_state::protval_r)); // used with 0x468202 write
+	map(0x432100, 0x432101).r(FUNC(songjang_state::protval_r)); // used with 0x412302 write
+	map(0x468202, 0x468203).w(FUNC(songjang_state::protval_w)); // used with 0x426800 read
 
-	map(0x70001c, 0x70001d).r(FUNC(sj_70001c_r));
+	map(0x70001c, 0x70001d).r(FUNC(songjang_state::sj_70001c_r));
 }
 
 /*************************************
