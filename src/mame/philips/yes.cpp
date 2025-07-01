@@ -59,6 +59,8 @@ void yes_state::yes(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &yes_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &yes_state::io_map);
 
+	I8256(config, "uart", 16_MHz_XTAL / 8);
+
 	WD2793(config, m_fdc, 16_MHz_XTAL / 8);
 	//m_fdc->intrq_wr_callback().set(m_uart, FUNC(i8256_device::ir));
 	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq1_w));
