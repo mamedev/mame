@@ -41,6 +41,11 @@ class i8256_device : public device_t, public device_serial_interface
 public:
     i8256_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+    auto in_p1_callback()  { return m_in_p1_cb.bind(); }
+    auto in_p2_callback()  { return m_in_p2_cb.bind(); }
+    auto out_p1_callback() { return m_out_p1_cb.bind(); }
+    auto out_p2_callback() { return m_out_p2_cb.bind(); }
+
     virtual void device_start() override;
     virtual void device_reset() override;
 
@@ -50,6 +55,7 @@ public:
 	void write_rxc(int state);
 
     void write(offs_t offset, u8 data);
+    uint8_t read(offs_t offset);
 
 private:
 	bool m_cts;
@@ -59,30 +65,38 @@ private:
 
     uint8_t m_command1, m_command2, m_command3, m_mode, m_interrupts;
 
-    uint8_t m_port1_control, m_port1_int, m_port1_ext;
-    uint8_t m_port2_int, m_port2_ext;
+    uint8_t m_port1_control, m_port1_int;
+    uint8_t m_port2_int;
+
+    void output_pc();
+
+    devcb_read8 m_in_p1_cb;
+	devcb_read8 m_in_p2_cb;
+    
+	devcb_write8 m_out_p1_cb;
+	devcb_write8 m_out_p2_cb;
 
     emu_timer *m_timers[5];
 
 
     enum // MUART REGISTERS
 	{
-		I8256_REG_CMD1,
-        I8256_REG_CMD2,
-        I8256_REG_CMD3,
-        I8256_REG_MODE,
-        I8256_REG_PORT1C,
-        I8256_REG_INTEN,
-        I8256_REG_INTAD,
-        I8256_REG_BUFFER,
-        I8256_REG_PORT1,
-        I8256_REG_PORT2,
-        I8256_REG_TIMER1,
-        I8256_REG_TIMER2,
-        I8256_REG_TIMER3,
-        I8256_REG_TIMER4,
-        I8256_REG_TIMER5,
-        I8256_REG_STATUS,
+		REG_CMD1,
+        REG_CMD2,
+        REG_CMD3,
+        REG_MODE,
+        REG_PORT1C,
+        REG_INTEN,
+        REG_INTAD,
+        REG_BUFFER,
+        REG_PORT1,
+        REG_PORT2,
+        REG_TIMER1,
+        REG_TIMER2,
+        REG_TIMER3,
+        REG_TIMER4,
+        REG_TIMER5,
+        REG_STATUS,
 	};
 
     enum
@@ -143,7 +157,7 @@ private:
         BAUD_100,
         BAUD_75,
         BAUD_50
-    }
+    };
 
     enum
     {

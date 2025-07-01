@@ -2,11 +2,18 @@
 #include "emu.h"
 #include "i8256.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
+
 DEFINE_DEVICE_TYPE(I8256, i8256_device, "intel_8256", "Intel 8256AH MULTIFUNCTION MICROPROCESSOR SUPPORT CONTROLLER")
 
 i8256_device::i8256_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
     : device_t(mconfig, I8256, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
+	m_in_p1_cb(*this, 0),
+	m_in_p2_cb(*this, 0),
+	m_out_p1_cb(*this),	
+	m_out_p2_cb(*this),
 	m_cts(1),
 	m_rxd(1),
 	m_rxc(0),
@@ -29,6 +36,31 @@ void i8256_device::device_reset()
     m_interrupts = 0;
 }
 
+uint8_t i8256_device::read(offs_t offset);
+{
+    // In the 8-bit mode, AD0-AD3 are used to select the proper register, while AD1-AD4 are used in the 16-bit mode.
+    // AD4 in the 8-bit mote is ignored as an address, while AD0 in the 16-bit mode is used as a second chip select, active low.
+    if (BIT(m_command1,CMD1_8086))
+        offset = offset >> 1;
+	u8 reg = offset & 0x0F;
+
+	switch (reg)
+	{
+		case REG_CMD1:
+            return m_command1;
+		case REG_CMD2:
+            return m_command2;
+		case REG_CMD3:
+			return m_command3;
+		case REG_MODE:
+           return m_mode;
+		case REG_PORT1C:
+            return m_port1_control;
+		case REG_PORT1:
+			return m_port1_int;
+	};
+}
+
 void i8256_device::write(offs_t offset, u8 data)
 {
     // In the 8-bit mode, AD0-AD3 are used to select the proper register, while AD1-AD4 are used in the 16-bit mode.
@@ -39,43 +71,43 @@ void i8256_device::write(offs_t offset, u8 data)
 
 	switch (reg)
 	{
-		case I8256_REG_CMD1:
+		case REG_CMD1:
             m_command1 = data;
 			break;
-		case I8256_REG_CMD2:
+		case REG_CMD2:
             m_command2 = data;
 			break;
-		case I8256_REG_CMD3:
+		case REG_CMD3:
 			m_command3 = data;
             break;
-		case I8256_REG_MODE:
+		case REG_MODE:
             m_mode = data;
 			break;
-		case I8256_REG_PORT1C:
+		case REG_PORT1C:
             m_port1_control = data;
+			LOG("I8256 Port 1 Control Write: %02x\n", data);
 			break;
-		case I8256_REG_INTEN:
+		case REG_PORT1:
+			m_port1_int = data;
 			break;
-		case I8256_REG_INTAD:
-			break;
-		case I8256_REG_BUFFER:
-			break;
-		case I8256_REG_PORT1:
-			break;
-		case I8256_REG_PORT2:
-			break;
-		case I8256_REG_TIMER1:
-			break;
-		case I8256_REG_TIMER2:
-			break;
-		case I8256_REG_TIMER3:
-			break;
-		case I8256_REG_TIMER4:
-			break;
-		case I8256_REG_TIMER5:
-			break;
-		case I8256_REG_STATUS:
-			break;
+	};
+}
 
-	}
+void i8256_device::output_pc()
+{
+	m_out_p1_cb((offs_t)0, m_port1_int & m_port1_control);
+
+	uint8_t port2_data = 0;
+	switch (m_mode & 0x03) // Port 2 mode
+	{
+		case PORT2C_IO:
+			port2_data = m_port2_int & 0x0F;
+			break;
+		case PORT2C_OI:
+			port2_data = m_port2_int & 0xF0;
+			break;
+		case PORT2C_OO:
+			port2_data = m_port2_int;
+	};
+	m_out_p2_cb((offs_t)0, port2_data);
 }

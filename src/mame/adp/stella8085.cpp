@@ -29,7 +29,7 @@ Nova Kniffi reference: https://www.youtube.com/watch?v=YBq2Z1irXek
 #include "emu.h"
 
 #include "cpu/i8085/i8085.h"
-//#include "machine/i8256.h"
+#include "machine/i8256.h"
 #include "machine/i8279.h"
 #include "machine/mc146818.h"
 #include "machine/msm6242.h"
@@ -86,14 +86,14 @@ void stella8085_state::rtc62421_io_map(address_map &map)
 {
 	map(0x00, 0x0f).rw("rtc", FUNC(rtc62421_device::read), FUNC(rtc62421_device::write));
 	map(0x50, 0x51).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
-	//map(0x60, 0x6f).rw("muart", FUNC(i8256_device::read8), FUNC(i8256_device::write8));
+	map(0x60, 0x6f).rw("muart", FUNC(i8256_device::read), FUNC(i8256_device::write));
 }
 
 void stella8085_state::mc146818_io_map(address_map &map)
 {
 	// TODO: map RTC
 	map(0x50, 0x51).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
-	//map(0x60, 0x6f).rw("muart", FUNC(i8256_device::read8), FUNC(i8256_device::write8));
+	map(0x60, 0x6f).rw("muart", FUNC(i8256_device::read), FUNC(i8256_device::write));
 }
 
 
@@ -148,7 +148,7 @@ void stella8085_state::dicemstr(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::large_program_map);
 	m_maincpu->set_addrmap(AS_IO, &stella8085_state::rtc62421_io_map);
 
-	//I8256(config, "muart", 10.240_MHz_XTAL / 2); // divider not verified
+	I8256(config, "muart", 10.240_MHz_XTAL / 2); // divider not verified
 
 	I8279(config, m_kdc, 10.240_MHz_XTAL / 4); // divider not verified
 
@@ -163,7 +163,7 @@ void stella8085_state::doppelpot(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &stella8085_state::mc146818_io_map);
 
-	//I8256(config, "muart", 6.144_MHz_XTAL);
+	I8256(config, "muart", 6.144_MHz_XTAL);
 
 	I8279(config, m_kdc, 6.144_MHz_XTAL / 2);
 
