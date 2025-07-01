@@ -18,7 +18,8 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_fdc(*this, "fdc"),
-		m_crtc(*this, "crtc")
+		m_crtc(*this, "crtc"),
+		m_uart(*this, "uart"),
 		{ }
 
 	void yes(machine_config &config);
