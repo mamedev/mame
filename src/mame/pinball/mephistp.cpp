@@ -28,7 +28,7 @@ ToDo:
 #include "cpu/i86/i86.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/i8155.h"
-//#include "machine/i8256.h"
+#include "machine/i8256.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
@@ -132,7 +132,7 @@ void mephisto_state::mephisto_map(address_map &map)
 {
 	map(0x00000, 0x07fff).rom().region("maincpu", 0).mirror(0x8000);
 	map(0x10000, 0x107ff).ram().share("nvram");
-	map(0x12000, 0x1201f).noprw(); //.rw("muart", FUNC(i8256_device::read), FUNC(i8256_device::write));
+	map(0x12000, 0x1201f).rw("muart", FUNC(i8256_device::read), FUNC(i8256_device::write));
 	map(0x13000, 0x130ff).rw("ic20", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
 	map(0x13800, 0x13807).rw("ic20", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 	map(0x14000, 0x140ff).rw("ic9", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
@@ -146,7 +146,7 @@ void mephisto_state::sport2k_map(address_map &map)
 {
 	map(0x00000, 0x0ffff).rom().region("maincpu", 0);
 	map(0x20000, 0x21fff).ram().share("nvram");
-	map(0x2a000, 0x2a01f).noprw(); //.rw("muart", FUNC(i8256_device::read), FUNC(i8256_device::write));
+	map(0x2a000, 0x2a01f).rw("muart", FUNC(i8256_device::read), FUNC(i8256_device::write));
 	map(0x2b000, 0x2b0ff).rw("ic20", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
 	map(0x2b800, 0x2b807).rw("ic20", FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 	map(0x2c000, 0x2c0ff).rw("ic9", FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
@@ -210,16 +210,16 @@ void mephisto_state::mephisto(machine_config &config)
 	/* basic machine hardware */
 	I8088(config, m_maincpu, XTAL(18'000'000)/3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mephisto_state::mephisto_map);
-	//m_maincpu->set_irq_acknowledge_callback("muart", FUNC(i8256_device::inta_cb));
+	m_maincpu->set_irq_acknowledge_callback("muart", FUNC(i8256_device::inta_cb));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video */
 	//config.set_default_layout(layout_mephistp);
 
-	//i8256_device &muart(I8256(config, "muart", XTAL(18'000'000)/3));
-	//muart.irq_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	//muart.txd_handler().set_inputline("audiocpu", MCS51_RX_LINE);
+	i8256_device &muart(I8256(config, "muart", XTAL(18'000'000)/3));
+	muart.irq_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	muart.txd_handler().set_inputline("audiocpu", MCS51_RX_LINE);
 
 	I8155(config, "ic20", XTAL(18'000'000)/6);
 	//i8155_device &i8155_1(I8155(config, "ic20", XTAL(18'000'000)/6));
