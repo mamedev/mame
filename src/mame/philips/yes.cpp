@@ -19,16 +19,16 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_fdc(*this, "fdc"),
 		m_crtc(*this, "crtc"),
-		m_uart(*this, "uart"),
+		m_uart(*this, "uart")
 		{ }
 
 	void yes(machine_config &config);
 
 private:
 	required_device<i80186_cpu_device> m_maincpu;
-	required_device<i8256_device> m_uart;
 	required_device<wd2793_device> m_fdc;
 	required_device<hd6845s_device> m_crtc;
+	required_device<i8256_device> m_uart;
 	void io_map(address_map &map) ATTR_COLD;
 	void program_map(address_map &map) ATTR_COLD;
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -60,7 +60,7 @@ void yes_state::yes(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &yes_state::io_map);
 
 	WD2793(config, m_fdc, 16_MHz_XTAL / 8);
-	m_fdc->intrq_wr_callback().set(m_muart, FUNC(i8256_device::ir));
+	//m_fdc->intrq_wr_callback().set(m_uart, FUNC(i8256_device::ir));
 	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq1_w));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

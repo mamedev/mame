@@ -10,6 +10,8 @@ DEFINE_DEVICE_TYPE(I8256, i8256_device, "intel_8256", "Intel 8256AH MULTIFUNCTIO
 i8256_device::i8256_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
     : device_t(mconfig, I8256, tag, owner, clock),
 	device_serial_interface(mconfig, *this),
+	m_extint_cb(*this),
+	m_inta_cb(*this),
 	m_in_p1_cb(*this, 0),
 	m_in_p2_cb(*this, 0),
 	m_out_p1_cb(*this),	

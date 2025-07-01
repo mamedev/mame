@@ -41,16 +41,12 @@ class i8256_device : public device_t, public device_serial_interface
 public:
     i8256_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-    devcb_read8 m_in_p1_cb;
-	devcb_read8 m_in_p2_cb;
-    
-	devcb_write8 m_out_p1_cb;
-	devcb_write8 m_out_p2_cb;
-
-    auto in_p1_callback()  { return m_in_p1_cb.bind(); }
-    auto in_p2_callback()  { return m_in_p2_cb.bind(); }
-    auto out_p1_callback() { return m_out_p1_cb.bind(); }
-    auto out_p2_callback() { return m_out_p2_cb.bind(); }
+    auto extint_callback()  { return m_extint_cb.bind(); }
+    auto inta_callback()    { return m_inta_cb.bind(); }
+    auto in_p1_callback()   { return m_in_p1_cb.bind(); }
+    auto in_p2_callback()   { return m_in_p2_cb.bind(); }
+    auto out_p1_callback()  { return m_out_p1_cb.bind(); }
+    auto out_p2_callback()  { return m_out_p2_cb.bind(); }
 
     virtual void device_start() override;
     virtual void device_reset() override;
@@ -68,6 +64,13 @@ private:
 	bool m_rxd;
 	bool m_rxc;
 	bool m_txc;
+
+    devcb_write_line m_extint_cb;
+    devcb_write_line m_inta_cb;
+    devcb_read8 m_in_p1_cb;
+	devcb_read8 m_in_p2_cb;
+	devcb_write8 m_out_p1_cb;
+	devcb_write8 m_out_p2_cb;
 
     uint8_t m_command1, m_command2, m_command3, m_mode, m_interrupts;
 
