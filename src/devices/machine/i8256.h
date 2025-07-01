@@ -57,7 +57,10 @@ private:
 	bool m_rxc;
 	bool m_txc;
 
-    uint8_t m_command1, m_command2, m_command3, m_mode, m_port1_control, m_interrupts;
+    uint8_t m_command1, m_command2, m_command3, m_mode, m_interrupts;
+
+    uint8_t m_port1_control, m_port1_int, m_port1_ext;
+    uint8_t m_port2_int, m_port2_ext;
 
     emu_timer *m_timers[5];
 
@@ -96,6 +99,22 @@ private:
 
     enum
     {
+        STOP_1,
+        STOP_15,
+        STOP_2,
+        STOP_075
+    };
+
+    enum
+    {
+        CHARLEN_8,
+        CHARLEN_7,
+        CHARLEN_6,
+        CHARLEN_5
+    };
+
+    enum
+    {
         CMD2_B0,
         CMD2_B1,
         CMD2_B2,
@@ -104,6 +123,34 @@ private:
         CMD2_C1,
         CMD2_EP,
         CMD2_PEN
+    };
+
+    enum
+    {
+        BAUD_TXC,
+        BAUD_TXC64,
+        BAUD_TXC32,
+        BAUD_19200,
+        BAUD_9600,
+        BAUD_4800,
+        BAUD_2400,
+        BAUD_1200,
+        BAUD_600,
+        BAUD_300,
+        BAUD_200,
+        BAUD_150,
+        BAUD_110,
+        BAUD_100,
+        BAUD_75,
+        BAUD_50
+    }
+
+    enum
+    {
+        SCLK_DIV5, // 5.12 MHz
+        SCLK_DIV3, // 3.072 MHz
+        SCLK_DIV2, // 2.048 MHz
+        SCLK_DIV1  // 1.024 MHz
     };
 
     enum
@@ -128,6 +175,18 @@ private:
         MODE_T5C,
         MODE_T24,
         MODE_T35
+    };
+
+    enum // Upper / Lower
+    {
+        PORT2C_II,
+        PORT2C_IO,
+        PORT2C_OI,
+        PORT2C_OO,
+        PORT2C_HI,
+        PORT2C_HO,
+        PORT2C_DNU,
+        PORT2C_TEST
     };
 
     enum
