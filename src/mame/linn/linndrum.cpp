@@ -908,6 +908,8 @@ void linndrum_audio_device::update_volume_and_pan(int channel)
 	// Using -gain_*, because the summing op-amps are inverting.
 	mixer_input->set_route_gain(0, m_left_mixer, 0, -gain_left);
 	mixer_input->set_route_gain(0, m_right_mixer, 0, -gain_right);
+	LOGMASKED(LOG_MIX, "Gain update for %s - left: %f, right: %f\n",
+	          MIXER_CHANNEL_NAMES[channel], gain_left, gain_right);
 
 	if (channel == MIX_CLICK)
 	{
@@ -931,59 +933,36 @@ void linndrum_audio_device::update_volume_and_pan(int channel)
 		// For now, scale by some number to match the volume of other voices.
 		static constexpr const float CLICK_GAIN_CORRECTION = 5;
 
-		float fc = 0;
-		float q = 1;
-		float gain = 1;
 		if (volume >= 100)
 		{
 			// HPF transfer function: H(s) = (g * s) / (s + w) where
 			//   g = C1 / (C1 + C2)
 			//   w = 1 / (R * (C1 + C2))
-			fc = 1.0F / (2 * float(M_PI) * r_voice_gnd * (C_CLICK_DCBLOCK + C_CLICK_WIPER));
-			gain = C_CLICK_DCBLOCK / (C_CLICK_DCBLOCK + C_CLICK_WIPER);
+			const float fc = 1.0F / (2 * float(M_PI) * r_voice_gnd * (C_CLICK_DCBLOCK + C_CLICK_WIPER));
+			const float gain = C_CLICK_DCBLOCK / (C_CLICK_DCBLOCK + C_CLICK_WIPER);
 			m_click_bpf->modify(filter_biquad_device::biquad_type::HIGHPASS1P1Z, fc, 1, gain * CLICK_GAIN_CORRECTION);
+			LOGMASKED(LOG_MIX, "- HPF cutoff: %.2f Hz, Gain: %.3f\n", fc, gain);
 		}
 		else if (volume > 0)
 		{
-			// BPF transfer function: H(s) = (A * s) / (s ^ 2 + B * s + C)
-			// Where:
-			//   A = 1 / (R1 * C2)
-			//   B = (C1 * R1 + C1 * R2 + C2 * R2) / (R1 * R2 * C1 * C2)
-			//   C = 1 / (R1 * R2 * C1 * C2).
-			// From the standard transfer function for BPFs, we have:
-			//   A = gain * (w / Q)
-			//   B = w / Q
-			//   C = w ^ 2
-			// The calculations of Fc, Q and gain below are derived from the
-			// equations above, with some algebra.
-
-			const float x = sqrtf(r0 * r_wiper_gnd * C_CLICK_DCBLOCK * C_CLICK_WIPER);
-			const float y = C_CLICK_DCBLOCK * r0 + C_CLICK_DCBLOCK * r_wiper_gnd + C_CLICK_WIPER * r_wiper_gnd;
-			fc = 1.0F / (2 * float(M_PI) * x);
-			q = x / y;
-			gain = r_wiper_gnd * C_CLICK_DCBLOCK / y;
-
-			// The transfer function above includes the effect of the volume
+			filter_biquad_device::biquad_params p = m_click_bpf->rc_rr_bandpass_calc(r0, r_wiper_gnd, C_CLICK_DCBLOCK, C_CLICK_WIPER);
+			// The filter params above include the effect of the volume
 			// potentiometer. But `gain_left` and `gain_right` already incorporate
 			// that effect. So it needs to be undone from the filter's gain.
-			gain *= 1.0F / RES_VOLTAGE_DIVIDER(r0, r_wiper_gnd);
-
-			m_click_bpf->modify(filter_biquad_device::biquad_type::BANDPASS, fc, q, gain * CLICK_GAIN_CORRECTION);
+			p.gain /= RES_VOLTAGE_DIVIDER(r0, r_wiper_gnd);
+			// See comments for CLICK_GAIN_CORRECTION.
+			p.gain *= CLICK_GAIN_CORRECTION;
+			m_click_bpf->modify(p);
+			LOGMASKED(LOG_MIX, "- BPF cutoff: %.2f Hz, Q: %.3f, Gain: %.3f\n", p.fc, p.q, p.gain);
 		}
 		// Else, if the volume is 0, don't change the BPF's configuration to avoid divisions by 0.
-
-		LOGMASKED(LOG_MIX, "Gain update for %s - left: %f, right: %f, %s cutoff: %.2f Hz, Q: %.3f, Gain: %.3f\n",
-				  MIXER_CHANNEL_NAMES[MIX_CLICK], gain_left, gain_right,
-				  (volume >= 100) ? "HPF" : "BPF", fc, q, gain);
 	}
 	else
 	{
 		// The rest of the voices just have a DC-blocking filter. Its exact cutoff
 		// will depend on the volume and pan settings, but it won't be audible.
 		m_voice_hpf[channel]->filter_rc_set_RC(filter_rc_device::HIGHPASS, r_voice_gnd, 0, 0, C_VOICE);
-		LOGMASKED(LOG_MIX, "Gain update for %s - left: %f, right: %f, HPF cutoff: %.2f Hz\n",
-				  MIXER_CHANNEL_NAMES[channel], gain_left, gain_right,
-				  1.0F / (2 * float(M_PI) * r_voice_gnd * C_VOICE));
+		LOGMASKED(LOG_MIX, "- HPF cutoff: %.2f Hz\n", 1.0F / (2 * float(M_PI) * r_voice_gnd * C_VOICE));
 	}
 }
 
