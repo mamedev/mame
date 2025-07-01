@@ -105,6 +105,28 @@ private:
 	int m_protcount = 0;
 };
 
+class songjang_state : public puckpkmn_state
+{
+public:
+	using puckpkmn_state::puckpkmn_state;
+
+	void songjang(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
+private:
+	uint16_t protval_r();
+	void protval_w(uint16_t data);
+
+	uint16_t sj_70001c_r();
+
+	void songjang_map(address_map &map) ATTR_COLD;
+
+	uint16_t m_protval;
+};
+
+
 
 // Puckman Pockimon Input Ports
 INPUT_PORTS_START( puckpkmn )
@@ -264,6 +286,89 @@ INPUT_PORTS_START( jzth )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+
+INPUT_PORTS_START( songjang )
+	PORT_START("P2")    // $700011.b
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+
+	PORT_START("P1")    // $700013.b
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(10)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+
+	PORT_START("UNK")   // $700015.b - P1/P2 swapped compared to jzth
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+
+	PORT_START("DSW1")  // $700017.b
+	PORT_DIPNAME( 0x0001, 0x0001, "DSW1" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("DSW2")  // $700019.b
+	PORT_SERVICE( 0x0001, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x0002, 0x0002, "DSW2" )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
 
 void puckpkmn_state::puckpkmn_base_map(address_map &map)
 {
@@ -449,6 +554,59 @@ void jzth_state::machine_start()
 	m_protcount = 0;
 
 	save_item(NAME(m_protcount));
+}
+
+
+void songjang_state::machine_start()
+{
+	puckpkmn_state::machine_start();
+	m_protval = 0;
+	save_item(NAME(m_protval));
+}
+
+uint16_t songjang_state::protval_r()
+{
+	logerror("%s: reading from sj_432100_r\n", machine().describe_context());
+	// written to 412302 prior to this
+	return m_protval;
+}
+
+void songjang_state::protval_w(uint16_t data)
+{
+	logerror("%s: protval_w %04x\n", machine().describe_context(), data);
+	m_protval = data & 0xff00;
+}
+
+uint16_t songjang_state::sj_70001c_r()
+{
+	logerror("%s: reading from sj_70001c_r\n", machine().describe_context());
+	return 0x0002;
+}
+
+void songjang_state::songjang_map(address_map &map)
+{
+	puckpkmn_base_map(map);
+
+	map(0x01c000, 0x01cfff).nopw(); // writes to ROM area, buggy code?
+
+	map(0x412302, 0x412303).w(FUNC(protval_w)); // used with 0x432100 read
+	map(0x426800, 0x426801).r(FUNC(protval_r)); // used with 0x468202 write
+	map(0x432100, 0x432101).r(FUNC(protval_r)); // used with 0x412302 write
+	map(0x468202, 0x468203).w(FUNC(protval_w)); // used with 0x426800 read
+
+	map(0x70001c, 0x70001d).r(FUNC(sj_70001c_r));
+
+	// uploads a Z80 program here like a regular Genesis, suggesting this hardware DOES have one, even if the other games don't need it
+	// the driver should probably just moved to be a derived class in megadriv_acbl.cpp with the M6295 etc. added
+	map(0xa00000, 0xa01fff).ram();
+}
+
+
+void songjang_state::songjang(machine_config &config)
+{
+	puckpkmn(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &songjang_state::songjang_map);
 }
 
 
@@ -641,6 +799,17 @@ ROM_START( jzth )
 	ROM_CONTINUE(0x40000,0x40000)
 ROM_END
 
+ROM_START( songjang )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "rom.u5", 0x000000, 0x080000, CRC(3de4aea5) SHA1(a4fd0799a6fd86ba3f0c4b4277190f4c332e48d6) )
+	ROM_LOAD16_BYTE( "rom.u4", 0x000001, 0x080000, CRC(dc6cfc29) SHA1(e15d6e2187befbbd791c5046cb6d156801095203) )
+	ROM_LOAD16_BYTE( "rom.u8", 0x100000, 0x080000, CRC(d4d2b262) SHA1(2023128b187a8cd1a3f021861da559b5ad48e984) )
+	ROM_LOAD16_BYTE( "rom.u7", 0x100001, 0x080000, CRC(1e24f2c9) SHA1(562249b08a8fe317a606c16ce07a8009a0c5418a) )
+
+	ROM_REGION( 0x80000, "oki", 0 ) // only one bank (2nd half is blank)
+	ROM_LOAD( "rom.u3", 0x00000, 0x80000, CRC(44287ab4) SHA1(42de2010e73c036a2a0e01c9dd3c1c8aef1a54a1) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -650,3 +819,4 @@ GAME( 2000, puckpkmn,  0,        puckpkmn,  puckpkmn, puckpkmn_state, init_puckp
 GAME( 2000, jingling,  puckpkmn, jingling,  puckpkmn, puckpkmn_state, init_puckpkmn, ROT0, "IBS Co. Ltd", "Jingling Jiazu Genie 2000",             0 )
 GAME( 2000, puckpkmnb, puckpkmn, puckpkmnb, puckpkmn, puckpkmn_state, init_puckpkmn, ROT0, "bootleg",     "Puckman Pockimon Genie 2000 (bootleg)", 0 )
 GAME( 2000, jzth,      0,        jzth,      jzth,     jzth_state,     init_puckpkmn, ROT0, "<unknown>",   "Juezhan Tianhuang",                     MACHINE_IMPERFECT_SOUND )
+GAME( 200?, songjang,  0,        songjang,  songjang, songjang_state, init_puckpkmn, ROT0, "WAH LAP",     "Songjiangyanyi Final",                  MACHINE_NOT_WORKING )
