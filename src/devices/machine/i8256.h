@@ -158,6 +158,7 @@ private:
         BAUD_75,
         BAUD_50
     };
+    const int baudRates[16] = { 0, 0, 0, 19200, 9600, 4800, 2400, 1200, 600, 300, 200, 150, 110, 100, 75, 50 };
 
     enum
     {
@@ -166,6 +167,7 @@ private:
         SCLK_DIV2, // 2.048 MHz
         SCLK_DIV1  // 1.024 MHz
     };
+    const int sysclockDivider[4] = {5,3,2,1};
 
     enum
     {
