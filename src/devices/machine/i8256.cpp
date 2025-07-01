@@ -86,6 +86,10 @@ void i8256_device::write(offs_t offset, u8 data)
 	{
 		case REG_CMD1:
             m_command1 = data;
+			if (BIT(m_command1,CMD1_8086))
+			{
+				LOG("I8256 Enabled 8086 mode\n");
+			}
 			LOG("I8256 Character length: %u\n", 8-(m_command1 & 0xC0));
 			break;
 		case REG_CMD2:
