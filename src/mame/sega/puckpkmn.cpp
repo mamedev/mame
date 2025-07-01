@@ -566,8 +566,7 @@ void songjang_state::machine_start()
 
 uint16_t songjang_state::protval_r()
 {
-	logerror("%s: reading from sj_432100_r\n", machine().describe_context());
-	// written to 412302 prior to this
+	logerror("%s: protval_r\n", machine().describe_context());
 	return m_protval;
 }
 
