@@ -1741,11 +1741,9 @@ void sound_manager::startup_cleanups()
 			for(auto &config : m_configs) {
 				if(is_output_device(config.m_name))
 					continue;
-				for(auto &nmap : config.m_node_mappings) {
-					fprintf(stderr, "*** %s\n", config.m_name.c_str());
+				for(auto &nmap : config.m_node_mappings)
 					if(nmap.first == "")
 						nmap.first = first_source_name;
-				}
 				for(auto &cmap : config.m_channel_mappings)
 					if(std::get<1>(cmap) == "")
 						std::get<1>(cmap) = first_source_name;
