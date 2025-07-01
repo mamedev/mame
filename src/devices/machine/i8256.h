@@ -60,17 +60,17 @@ public:
     uint8_t read(offs_t offset);
 
 private:
-	bool m_cts;
-	bool m_rxd;
-	bool m_rxc;
-	bool m_txc;
-
     devcb_write_line m_extint_cb;
     devcb_write_line m_inta_cb;
     devcb_read8 m_in_p1_cb;
 	devcb_read8 m_in_p2_cb;
 	devcb_write8 m_out_p1_cb;
 	devcb_write8 m_out_p2_cb;
+
+	bool m_cts;
+	bool m_rxd;
+	bool m_rxc;
+	bool m_txc;
 
     uint8_t m_command1, m_command2, m_command3, m_mode, m_interrupts;
 
