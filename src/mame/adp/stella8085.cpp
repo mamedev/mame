@@ -38,6 +38,9 @@ Nova Kniffi reference: https://www.youtube.com/watch?v=YBq2Z1irXek
 
 #include "stellafr.lh"
 
+#define VERBOSE 1
+#include "logmacro.h"
+
 namespace {
 
 class stella8085_state : public driver_device
@@ -70,7 +73,15 @@ private:
 	void rtc62421_io_map(address_map &map) ATTR_COLD;
 	void mc146818_io_map(address_map &map) ATTR_COLD;
 
-	void makesound(uint8_t channel, uint8_t length)
+	// I8279 Interface
+	u8 kbd_rl_r();
+	void kbd_sl_w(u8 data);
+	void disp_w(u8 data);
+	void rst65_w(u8 state);
+	void output_digit(u8 i, u8 data);
+	u8 m_kbd_sl = 0x00;
+
+	void makesound(uint8_t channel, uint8_t length);
 	int soundfreq(uint8_t channel);
 };
 
@@ -110,6 +121,57 @@ void stella8085_state::mc146818_io_map(address_map &map)
 	// TODO: map RTC
 	map(0x50, 0x51).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
 	map(0x60, 0x6f).rw("muart", FUNC(i8256_device::read), FUNC(i8256_device::write));
+}
+
+/*********************************************
+*      I8279 Keyboard-Disply Interface       *
+*                                            *
+*********************************************/
+
+void stella8085_state::kbd_sl_w(u8 data)
+{
+	m_kbd_sl = data;// & 0x07;
+	LOG("I8279: Scan Line: %02X\n", m_kbd_sl);
+}
+
+u8 stella8085_state::kbd_rl_r()
+{
+//  Keyboard read (only scan line 0 is used)
+	u8 ret = 0xff;
+	if((m_kbd_sl & 0x07) == 6)
+		ret = ioport("SERVICE0")->read();
+	else if((m_kbd_sl & 0x07) == 7)
+		ret = ioport("SERVICE1")->read();
+	return ret;
+}
+
+void stella8085_state::disp_w(u8 data)
+{
+//  Display data
+	data = bitswap(data, 4, 5, 6, 7, 0, 1, 2, 3);
+	output_digit(m_kbd_sl, data >> 4);
+	LOG("I8279: Data Display: %02X\n", data);
+}
+
+void stella8085_state::output_digit(u8 i, u8 data)
+{
+//  Segment decode
+	static const u8 led_map[16] =
+		{ 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0x00 };
+
+//  Show layout
+//  The i8279 is configured to display 8 digits, so we need to use 8 "m_lamps" elements.
+//  The actual hardware only has two 7-segment displays.
+
+	//m_lamps[55 + i] = led_map[data & 0x0f];  // lamps 55 to 62
+}
+
+void stella8085_state::rst65_w(u8 state)
+{
+//  KBD Interrupt
+
+	//m_maincpu->set_input_line(I8085_RST55_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	LOG("I8279: irq state: %s - state:%02x time:%s\n", state ? "Assert Line":"Clear Line", state, machine().time().as_string());
 }
 
 void stella8085_state::makesound(uint8_t channel, uint8_t length)
