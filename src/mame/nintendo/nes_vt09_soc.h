@@ -6,12 +6,6 @@
 #pragma once
 
 #include "nes_vt_soc.h"
-#include "cpu/m6502/rp2a03.h"
-#include "sound/nes_apu_vt.h"
-#include "m6502_swap_op_d5_d6.h"
-#include "video/ppu2c0x_vt.h"
-#include "screen.h"
-#include "speaker.h"
 
 class nes_vt09_soc_device : public nes_vt02_vt03_soc_device
 {

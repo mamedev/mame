@@ -5,8 +5,13 @@ license:CC0-1.0
 
 BASIC-M25 caveats (needed for Dust Box and unk* disks):
 - files is the equivalent of DIR in DOS env
-- chdir swaps current directory (not cd), going back one level is chdir ".."
+- chdir swaps current directory (not cd), going back one level is chdir "..
 - BTX files are executables
+
+Hold HELP key during basicv1 / basicv2 bootstrap to select S25 BASIC mode.
+
+Dust Box: double click with space key to startup any item, later versions allows starting up with
+mouse by holding right button then press left.
 
 TODO:
 - [Missing] Hashire! Skyline / 走れ!スカイライン: heavy GFX artifacts;
@@ -497,10 +502,19 @@ Moans about missing Master Disk after title screen
 		</part>
 	</software>
 
+	<!-- NOTE: using left to right for listing in notes -->
+
 	<software name="dustbx01" supported="partial">
 		<description>Dust Box Vol. 1 - '90/4</description>
 		<year>1990</year>
 		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+Columns: missing pointer on main menu, uses reverse on [PCG]
+Vector: doesn't upload [PCG] if run first (works by loading Columns first), missing stars [GVRAM] layer, seems too fast
+Free Basket Ball:
+Chack N Kun no Koubou:
+]]></notes>
+
 		<info name="usage" value="Incompatible with MZ-1E30 bios 0 (crashes at startup)" />
 
 		<part name="flop1" interface="floppy_3_5">
@@ -510,10 +524,15 @@ Moans about missing Master Disk after title screen
 		</part>
 	</software>
 
-	<software name="dustbx02" supported="no">
+	<software name="dustbx02" supported="partial">
 		<description>Dust Box Vol. 2</description>
 		<year>1990</year>
 		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+Ball Race: requires an analog joystick, [XE-1AP] doesn't detect any input even if should be supported
+Knight of Legend:
+Atatepon!:
+]]></notes>
 		<info name="usage" value="Incompatible with MZ-1E30 bios 0 (crashes at startup)" />
 
 		<part name="flop1" interface="floppy_3_5">
@@ -527,23 +546,19 @@ Moans about missing Master Disk after title screen
 		<description>Dust Box Vol. 3 - '90/9</description>
 		<year>1990</year>
 		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+Versus ??? Tetris: doesn't load [PCG] when run from dashboard
+Reader ??? Tetris:
+Return of Columns: uses Basic default for [PCG]
+???:
+Pit Gal Plus: crashes if attempted to load or save
+Abstract World:
+]]></notes>
 		<info name="usage" value="Incompatible with MZ-1E30 bios 0 (crashes at startup)" />
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
 				<rom name="dust box vol 3.d88" size="697008" crc="84e61343" sha1="721d2369a268ddef97a363f35ed7bbb4974ae79b" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="dustbx91" supported="no">
-		<description>Dust Box '91 Special</description>
-		<year>19??</year>
-		<publisher>&lt;coverdisk&gt;</publisher>
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="697008">
-				<rom name="dust_box_91_special.d88" size="697008" crc="aaec667d" sha1="0adaf4e0b306ac8389bd202ce0a1b11c29ffa52c"/>
 			</dataarea>
 		</part>
 	</software>
@@ -554,6 +569,10 @@ Moans about missing Master Disk after title screen
 		<publisher>&lt;coverdisk&gt;</publisher>
 		<notes><![CDATA[
 Buggy window clip transition on title screen
+Solitaire:
+Rock'N Bomb!:
+Dot Race:
+???:
 ]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -572,6 +591,9 @@ Buggy window clip transition on title screen
 		<publisher>&lt;coverdisk&gt;</publisher>
 		<notes><![CDATA[
 First SW that tests [MZ-1E35] ADPCM ports
+???:
+???:
+???:
 ]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -581,10 +603,35 @@ First SW that tests [MZ-1E35] ADPCM ports
 		</part>
 	</software>
 
-	<software name="dustbx06">
+	<software name="dustbx91" supported="partial">
+		<description>Dust Box '91 Special - August '91</description>
+		<year>1991</year>
+		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+Demo section
+???: uses unimplemented [CG] mode 0x93
+Basic 3 ???:
+DNA Modoki:
+???:
+]]></notes>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="697008">
+				<rom name="dust_box_91_special.d88" size="697008" crc="aaec667d" sha1="0adaf4e0b306ac8389bd202ce0a1b11c29ffa52c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dustbx06" supported="partial">
 		<description>Dust Box Vol. 6 - December '91</description>
 		<year>1991</year>
 		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+???:
+Bean Ball:
+???:
+???:
+]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -593,10 +640,16 @@ First SW that tests [MZ-1E35] ADPCM ports
 		</part>
 	</software>
 
-	<software name="dustbx07">
+	<software name="dustbx07" supported="partial">
 		<description>Dust Box Vol. 7 - April '92</description>
 		<year>1992</year>
 		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+Zeldis:
+??? Smow:
+Bara-Noia II:
+Blue Ribbon:
+]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -605,10 +658,19 @@ First SW that tests [MZ-1E35] ADPCM ports
 		</part>
 	</software>
 
-	<software name="dustbx08">
+	<software name="dustbx08" supported="partial">
 		<description>Dust Box Vol. 8 - August '92</description>
 		<year>1992</year>
 		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+Bound Ball:
+Funny Ball:
+Kuruper:
+???:
+???:
+Diamond is Forever:
+C??? K and R:
+]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -617,10 +679,18 @@ First SW that tests [MZ-1E35] ADPCM ports
 		</part>
 	</software>
 
-	<software name="dustbx09">
+	<software name="dustbx09" supported="partial">
 		<description>Dust Box Vol. 9 - June '93</description>
 		<year>1993</year>
 		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+???:
+Super Angel:
+Block:
+Sigma's:
+6x6:
+???:
+]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -629,10 +699,20 @@ First SW that tests [MZ-1E35] ADPCM ports
 		</part>
 	</software>
 
-	<software name="dustbx10">
+	<software name="dustbx10" supported="partial">
 		<description>Dust Box Vol. 10 - August '93</description>
 		<year>1993</year>
 		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+Parabolic Ball:
+Nantekotai ??? 99:
+3-D ???:
+Fighters II:
+???:
+Loopasser:
+Toshi Jong:
+Nekkoro:
+]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="784048">
@@ -641,10 +721,20 @@ First SW that tests [MZ-1E35] ADPCM ports
 		</part>
 	</software>
 
-	<software name="dustbx11">
+	<software name="dustbx11" supported="partial">
 		<description>Dust Box Vol. 11 - December '93</description>
 		<year>1993</year>
 		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+Space Bluster FX:
+???:
+Invader (MZ80):
+??? (MZ80):
+Zalion (MZ80):
+Batting (MZ80):
+The Chanbara (MZ80):
+???:
+]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="784048">
@@ -653,10 +743,17 @@ First SW that tests [MZ-1E35] ADPCM ports
 		</part>
 	</software>
 
-	<software name="dustbx12">
+	<software name="dustbx12" supported="partial">
 		<description>Dust Box Vol. 12 - May '94</description>
 		<year>1994</year>
 		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+??? ver.3.0:
+Border:
+Bakea:
+Titlis:
+Kurukuru:
+]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -665,10 +762,18 @@ First SW that tests [MZ-1E35] ADPCM ports
 		</part>
 	</software>
 
-	<software name="dustbx13">
+	<software name="dustbx13" supported="partial">
 		<description>Dust Box Vol. 13 - August '94</description>
 		<year>1994</year>
 		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+Gernion:
+Othello:
+??? ver3.1:
+Tama:
+???:
+Cosmic Cruiser II:
+]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -677,10 +782,16 @@ First SW that tests [MZ-1E35] ADPCM ports
 		</part>
 	</software>
 
-	<software name="dustbx14">
+	<software name="dustbx14" supported="partial">
 		<description>Dust Box Vol. 14 - December '94</description>
 		<year>1994</year>
 		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+Illegal Mission:
+???:
+Car:
+???:
+]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -689,10 +800,19 @@ First SW that tests [MZ-1E35] ADPCM ports
 		</part>
 	</software>
 
-	<software name="dustbx15">
+	<software name="dustbx15" supported="partial">
 		<description>Dust Box Vol. 15 - August '95</description>
 		<year>1995</year>
 		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+??? Quarth:
+???:
+??? Heptas:
+???:
+3-D ???:
+Monster Road:
+Card Game Uno:
+]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">
@@ -703,10 +823,16 @@ First SW that tests [MZ-1E35] ADPCM ports
 
 	<!-- Back to numerical format ... -->
 
-	<software name="dustbx16">
+	<software name="dustbx16" supported="partial">
 		<description>Dust Box Vol. 16 - 1996/10 (Pre-Release ver.)</description>
 		<year>1996</year>
 		<publisher>&lt;coverdisk&gt;</publisher>
+		<notes><![CDATA[
+vs ???:
+Super Mahjong:
+Zones ???:
+???:
+]]></notes>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="697008">

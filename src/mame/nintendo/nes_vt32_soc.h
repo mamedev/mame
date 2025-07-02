@@ -71,8 +71,18 @@ protected:
 	virtual void do_pal_timings_and_ppu_replacement(machine_config& config) override;
 };
 
+class nes_vt32_soc_unk_device : public nes_vt32_soc_device
+{
+public:
+	nes_vt32_soc_unk_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
+
+protected:
+	virtual void device_add_mconfig(machine_config& config) override ATTR_COLD;
+};
+
 
 DECLARE_DEVICE_TYPE(NES_VT32_SOC, nes_vt32_soc_device)
 DECLARE_DEVICE_TYPE(NES_VT32_SOC_PAL, nes_vt32_soc_pal_device)
+DECLARE_DEVICE_TYPE(NES_VT32_SOC_UNK, nes_vt32_soc_unk_device)
 
 #endif // MAME_NINTENDO_NES_VT32_SOC_H
