@@ -1,4 +1,3 @@
-
 #include "emu.h"
 #include "i8256.h"
 
@@ -126,21 +125,47 @@ void i8256_device::write(offs_t offset, u8 data)
 	};
 }
 
-void i8256_device::output_pc()
+uint8_t i8256_device::p1_r()
 {
-	m_out_p1_cb((offs_t)0, m_port1_int & m_port1_control);
+    // if control bit is 0 (input), read from callback else use output latch
+    uint8_t input = m_in_p1_cb(0);
+    uint8_t result = 0;
+    for (int i = 0; i < 8; i++) {
+        if (BIT(m_port1_control, i)) // output
+            result |= (m_port1_int & (1 << i));
+        else // input
+            result |= (input & (1 << i));
+    }
+    return result;
+}
 
-	uint8_t port2_data = 0;
-	switch (m_mode & 0x03) // Port 2 mode
-	{
-		case PORT2C_IO:
-			port2_data = m_port2_int & 0x0F;
-			break;
-		case PORT2C_OI:
-			port2_data = m_port2_int & 0xF0;
-			break;
-		case PORT2C_OO:
-			port2_data = m_port2_int;
-	};
-	m_out_p2_cb((offs_t)0, port2_data);
+void i8256_device::p1_w(uint8_t data)
+{
+    m_port1_int = (m_port1_int & ~m_port1_control) | (data & m_port1_control);
+    m_out_p1_cb(0, m_port1_int & m_port1_control);
+}
+
+uint8_t i8256_device::p2_r()
+{
+    uint8_t p2c = m_mode & 0x03;
+    if (p2c == PORT2C_II || p2c == PORT2C_IO)
+        return m_in_p2_cb(0);
+    else
+        return m_port2_int;
+}
+
+void i8256_device::p2_w(uint8_t data)
+{
+    uint8_t p2c = m_mode & 0x03;
+    m_port2_int = data;
+    uint8_t port2_data = 0;
+    switch (p2c)
+    {
+        case PORT2C_IO: port2_data = m_port2_int & 0x0F; break;
+        case PORT2C_OI: port2_data = m_port2_int & 0xF0; break;
+        case PORT2C_OO: port2_data = m_port2_int; break;
+        default: port2_data = 0; break;
+    }
+    if (p2c == PORT2C_IO || p2c == PORT2C_OI || p2c == PORT2C_OO)
+        m_out_p2_cb(0, port2_data);
 }

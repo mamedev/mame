@@ -59,6 +59,11 @@ public:
     void write(offs_t offset, u8 data);
     uint8_t read(offs_t offset);
 
+    uint8_t p1_r();
+    void    p1_w(uint8_t data);
+    uint8_t p2_r();
+    void    p2_w(uint8_t data);
+
 private:
     devcb_write_line m_extint_cb;
     devcb_write_line m_inta_cb;
@@ -76,8 +81,6 @@ private:
 
     uint8_t m_port1_control, m_port1_int;
     uint8_t m_port2_int;
-
-    void output_pc();
 
     emu_timer *m_timers[5];
 
