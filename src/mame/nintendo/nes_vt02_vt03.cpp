@@ -87,11 +87,11 @@ public:
 	void nes_vt_4mb(machine_config& config) ATTR_COLD;
 	void nes_vt_8mb(machine_config& config) ATTR_COLD;
 	void nes_vt_16mb(machine_config& config) ATTR_COLD;
-	void nes_vt_32mb(machine_config& config) ATTR_COLD;
+	[[maybe_unused]] void nes_vt_32mb(machine_config& config) ATTR_COLD;
 
 	void nes_vt_1mb_majkon(machine_config& config) ATTR_COLD;
 
-	void vt_external_space_map_32mbyte(address_map &map) ATTR_COLD;
+	[[maybe_unused]] void vt_external_space_map_32mbyte(address_map &map) ATTR_COLD;
 	void vt_external_space_map_16mbyte(address_map &map) ATTR_COLD;
 	void vt_external_space_map_8mbyte(address_map &map) ATTR_COLD;
 	void vt_external_space_map_4mbyte(address_map &map) ATTR_COLD;
