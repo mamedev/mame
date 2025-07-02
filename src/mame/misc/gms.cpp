@@ -80,6 +80,7 @@ TODO:
 - work out remaining magslot lamps and add layout
 - work out remaining jinpaish lamps and update layout
 - work out remaining sball2k1 I/O and update layout
+- verify if sscs0118 uses the same I/O as the parent (seems so)
 - use real values for reel tilemaps offsets instead of hardcoded ones (would fix
   magslot)
 - game logic seems broken in mahjong games (Reach permitted when it shouldn't
@@ -171,6 +172,7 @@ public:
 	void init_sball2k1() ATTR_COLD;
 	void init_ssanguoj() ATTR_COLD;
 	void init_sscs() ATTR_COLD;
+	void init_sscs0118() ATTR_COLD;
 	void init_super555() ATTR_COLD;
 
 	template <unsigned Shift> ioport_value keyboard_r();
@@ -2893,7 +2895,7 @@ Notes:
 
 ROM_START( sscs )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
-	ROM_LOAD( "p1_7177.u64", 0x00000, 0x80000, CRC(687ad5c8) SHA1(176a635753243882933e8db1aebcde142dc611f9 ) )
+	ROM_LOAD( "p1_7177.u64", 0x00000, 0x80000, CRC(687ad5c8) SHA1(176a635753243882933e8db1aebcde142dc611f9) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "s1_sh-s1-s08.u83", 0x00000, 0x80000, CRC(9112ece2) SHA1(0ec9859b8925cdda2edfb93c8fc0d747933b365f) )
@@ -2908,6 +2910,22 @@ ROM_START( sscs )
 	ROM_LOAD16_WORD_SWAP( "93c46.u136", 0x00, 0x080, CRC(9ad1b39c) SHA1(2fed7e0918119b2354a9f1944d501dc817ffd5dc) )
 ROM_END
 
+ROM_START( sscs0118 ) // GMS PCB NO: 99-6-8, ROM stickers mostly scratched off / unreadable
+	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
+	ROM_LOAD( "rom.u64", 0x00000, 0x80000, SHA1(0e06a519) SHA1(8b1f0dbfa57415e2d8fd06ed9a8c57e58409ad32) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "u83", 0x00000, 0x80000, CRC(9112ece2) SHA1(0ec9859b8925cdda2edfb93c8fc0d747933b365f) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "a1_049d.u41", 0x000000, 0x100000, CRC(f758d95e) SHA1(d1da16f3ef618a8c1118784bdc39dd93acf86aff) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD( "u39", 0x000000, 0x100000, CRC(f0ecbc72) SHA1(536288d21a5720111cb3392c974ee5ccdc4a2c6b) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD_SWAP( "93c46.u136", 0x00, 0x080, CRC(6475eac2) SHA1(bc970e68bfa178286e191494e5b4822f8a40e952) )
+ROM_END
 
 // Basically same PCB as magslot, but with only 1 dip bank. Most labels have been covered with other labels with 'TETRIS' hand-written
 // GMS-branded chips: A66, A89, A201, A202. Not populated: M88
@@ -3363,6 +3381,24 @@ void gms_2layers_state::init_sscs()
 	rom[0x19c1a / 2] = 0x6000; // U85 ERROR
 }
 
+void gms_2layers_state::init_sscs0118()
+{
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+
+	rom[0x1af6 / 2] = 0x6008; // loops endlessly later on
+	rom[0x3d22 / 2] = 0x6000; // loops endlessly after ROM / RAM test
+	rom[0xd6b2 / 2] = 0x6000; // U135 ERROR
+	rom[0xd6c4 / 2] = 0x4e71; // U135 ERROR
+	rom[0xd6c6 / 2] = 0x4e71; // U135 ERROR
+	rom[0xd740 / 2] = 0x6000; // U136 ERROR
+	rom[0xd882 / 2] = 0x6000; // U136 ERROR
+	rom[0xd894 / 2] = 0x4e71; // U136 ERROR
+	rom[0xd896 / 2] = 0x4e71; // U136 ERROR
+	rom[0x1b57c / 2] = 0x6000; // U85 ERROR
+	rom[0x1b594 / 2] = 0x4e71; // loops
+	rom[0x1b596 / 2] = 0x4e71; // loops
+}
+
 void gms_2layers_state::init_cjdlz()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
@@ -3391,27 +3427,28 @@ void gms_2layers_state::init_hgly()
 
 
 // mahjong
-GAME( 1998, rbmk,     0, rbmk,     rbmk,     gms_2layers_state, empty_init,    ROT0,  "GMS", "Shizhan Majiang Wang (Version 8.8)",                    MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // misses YM2151 hookup
-GAME( 1998, rbspm,    0, rbspm,    rbspm,    gms_2layers_state, init_rbspm,    ROT0,  "GMS", "Shizhan Ding Huang Maque (Version 4.1)",                MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Misses YM2151 hookup
-GAME( 1998, ssanguoj, 0, ssanguoj, ssanguoj, gms_2layers_state, init_ssanguoj, ROT0,  "GMS", "Shizhan Sanguo Ji Jiaqiang Ban (Version 8.9 980413)",   MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now. YM3812 isn't hooked up (goes through undumped MCU).
-GAME( 1999, cjdlz,    0, super555, cjdlz,    gms_2layers_state, init_cjdlz,    ROT0,  "GMS", "Chaoji Da Lianzhuang (Version 1.1)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // stops during boot, patched for now. EEPROM interface doesn't quite work.
-GAME( 2005, yyhm,     0, magslot,  yyhm,     gms_3layers_state, init_yyhm,     ROT0,  "GMS", "Yuanyang Hudie Meng (Version 8.8A 2005-09-25)",         MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now.
+GAME( 1998, rbmk,     0,    rbmk,     rbmk,     gms_2layers_state, empty_init,    ROT0,  "GMS", "Shizhan Majiang Wang (Version 8.8)",                    MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // misses YM2151 hookup
+GAME( 1998, rbspm,    0,    rbspm,    rbspm,    gms_2layers_state, init_rbspm,    ROT0,  "GMS", "Shizhan Ding Huang Maque (Version 4.1)",                MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now. Misses YM2151 hookup
+GAME( 1998, ssanguoj, 0,    ssanguoj, ssanguoj, gms_2layers_state, init_ssanguoj, ROT0,  "GMS", "Shizhan Sanguo Ji Jiaqiang Ban (Version 8.9 980413)",   MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now. YM3812 isn't hooked up (goes through undumped MCU).
+GAME( 1999, cjdlz,    0,    super555, cjdlz,    gms_2layers_state, init_cjdlz,    ROT0,  "GMS", "Chaoji Da Lianzhuang (Version 1.1)",                    MACHINE_IMPERFECT_GRAPHICS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // stops during boot, patched for now. EEPROM interface doesn't quite work.
+GAME( 2005, yyhm,     0,    magslot,  yyhm,     gms_3layers_state, init_yyhm,     ROT0,  "GMS", "Yuanyang Hudie Meng (Version 8.8A 2005-09-25)",         MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // stops during boot, patched for now.
 
 // card games
-GAME( 1999, super555, 0, super555, super555, gms_2layers_state, init_super555, ROT0,  "GMS", "Super 555 (English version V1.5)",                      MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                  // stops during boot, patched for now.
-GAME( 1999, sscs,     0, super555, sscs,     gms_2layers_state, init_sscs,     ROT0,  "GMS", "San Se Caishen (Version 0502)",                         MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                  // stops during boot, patched for now. EEPROM interface isn't fully understood.
-GAMEL(2001, sball2k1, 0, super555, sball2k1, gms_2layers_state, init_sball2k1, ROT0,  "GMS", "Super Ball 2001 (Italy version 5.23)",                  MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_sball2k1 ) // stops during boot, patched for now.
-GAMEL(2001, sc2in1,   0, magslot,  sc2in1,   gms_3layers_state, init_sc2in1,   ROT0,  "GMS", "Super Card 2 in 1 (English version 03.23)",             MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_sc2in1 )   // stops during boot, patched for now.
-GAMEL(2004, jinpaish, 0, magslot,  jinpaish, gms_3layers_state, init_jinpaish, ROT0,  "GMS", "Jinpai Suoha - Show Hand (Chinese version 2004-09-22)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_jinpaish ) // stops during boot, patched for now. EEPROM interface isn't fully understood.
-GAME( 2005, baile,    0, magslot,  baile,    gms_3layers_state, init_baile,    ROT0,  "GMS", "Baile 2005 (V3.2 2005-01-12)",                          MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                  // stops during boot, patched for now.
+GAME( 1999, super555, 0,    super555, super555, gms_2layers_state, init_super555, ROT0,  "GMS", "Super 555 (English version V1.5)",                      MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                  // stops during boot, patched for now.
+GAME( 1999, sscs,     0,    super555, sscs,     gms_2layers_state, init_sscs,     ROT0,  "GMS", "San Se Caishen (Version 0502)",                         MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                  // stops during boot, patched for now. EEPROM interface isn't fully understood.
+GAME( 1999, sscs0118, sscs, super555, sscs,     gms_2layers_state, init_sscs0118, ROT0,  "GMS", "San Se Caishen (Version 0118)",                         MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                  // stops during boot, patched for now. EEPROM interface isn't fully understood.
+GAMEL(2001, sball2k1, 0,    super555, sball2k1, gms_2layers_state, init_sball2k1, ROT0,  "GMS", "Super Ball 2001 (Italy version 5.23)",                  MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_sball2k1 ) // stops during boot, patched for now.
+GAMEL(2001, sc2in1,   0,    magslot,  sc2in1,   gms_3layers_state, init_sc2in1,   ROT0,  "GMS", "Super Card 2 in 1 (English version 03.23)",             MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_sc2in1 )   // stops during boot, patched for now.
+GAMEL(2004, jinpaish, 0,    magslot,  jinpaish, gms_3layers_state, init_jinpaish, ROT0,  "GMS", "Jinpai Suoha - Show Hand (Chinese version 2004-09-22)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_jinpaish ) // stops during boot, patched for now. EEPROM interface isn't fully understood.
+GAME( 2005, baile,    0,    magslot,  baile,    gms_3layers_state, init_baile,    ROT0,  "GMS", "Baile 2005 (V3.2 2005-01-12)",                          MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                  // stops during boot, patched for now.
 
 // slots
-GAME( 2003, magslot,  0, magslot,  magslot,  gms_3layers_state, empty_init,    ROT0,  "GMS", "Magic Slot (normal 1.0C)",                              MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // reel / tilemaps priorities are wrong, inputs to be verified.
+GAME( 2003, magslot,  0,    magslot,  magslot,  gms_3layers_state, empty_init,    ROT0,  "GMS", "Magic Slot (normal 1.0C)",                              MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // reel / tilemaps priorities are wrong, inputs to be verified.
 
 // train games
-GAME( 1999, hgly,     0, hgly,     hgly,     gms_2layers_state, init_hgly,     ROT0,  "GMS", "Huangguan Leyuan (990726 CRG1.1)",                      MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                // stops during boot, patched for now. EEPROM interface isn't fully understood.
-GAMEL(2002, ballch,   0, super555, ballch,   gms_2layers_state, init_ballch,   ROT0,  "TVE", "Ball Challenge (20020607 1.0 OVERSEA)",                 MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_ballch ) // stops during boot, patched for now.
-GAMEL(2005, cots,     0, hgly,     cots,     gms_2layers_state, init_cots,     ROT0,  "ECM", "Creatures of the Sea (20050328 USA 6.3)",               MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_cots )   // stops during boot, patched for now. EEPROM interface isn't fully understood.
+GAME( 1999, hgly,     0,    hgly,     hgly,     gms_2layers_state, init_hgly,     ROT0,  "GMS", "Huangguan Leyuan (990726 CRG1.1)",                      MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                // stops during boot, patched for now. EEPROM interface isn't fully understood.
+GAMEL(2002, ballch,   0,    super555, ballch,   gms_2layers_state, init_ballch,   ROT0,  "TVE", "Ball Challenge (20020607 1.0 OVERSEA)",                 MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_ballch ) // stops during boot, patched for now.
+GAMEL(2005, cots,     0,    hgly,     cots,     gms_2layers_state, init_cots,     ROT0,  "ECM", "Creatures of the Sea (20050328 USA 6.3)",               MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_cots )   // stops during boot, patched for now. EEPROM interface isn't fully understood.
 
 // roulette games
-GAME( 2003, smatch03, 0, smatch03, hgly,     gms_2layers_state, empty_init,    ROT0,  "GMS", "Super Match 2003 (Version 3.1 2003-11-04)",             MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                // stops during boot, patched for now. EEPROM interface isn't fully understood.
+GAME( 2003, smatch03, 0,    smatch03, hgly,     gms_2layers_state, empty_init,    ROT0,  "GMS", "Super Match 2003 (Version 3.1 2003-11-04)",             MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )                // stops during boot, patched for now. EEPROM interface isn't fully understood.
