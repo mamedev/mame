@@ -33,7 +33,7 @@ Nova Kniffi reference: https://www.youtube.com/watch?v=YBq2Z1irXek
 #include "machine/i8279.h"
 #include "machine/mc146818.h"
 #include "machine/msm6242.h"
-
+#include "sound/beep.h"
 #include "speaker.h"
 
 #include "stellafr.lh"
@@ -47,7 +47,8 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_kdc(*this, "kdc"),
-		m_digits(*this, "digit%u", 0U)
+		m_digits(*this, "digit%u", 0U),
+		m_beep(*this, "beeper")
 	{ }
 
 	void dicemstr(machine_config &config);
@@ -59,6 +60,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<i8279_device> m_kdc;
 	output_finder<8> m_digits;
+	required_device<beep_device> m_beep;
 
 	void machine_start() override ATTR_COLD;
 
@@ -67,6 +69,9 @@ private:
 	void excellent_program_map(address_map &map) ATTR_COLD;
 	void rtc62421_io_map(address_map &map) ATTR_COLD;
 	void mc146818_io_map(address_map &map) ATTR_COLD;
+
+	void makesound(uint8_t channel, uint8_t length)
+	int soundfreq(uint8_t channel);
 };
 
 void stella8085_state::machine_start()
@@ -105,6 +110,59 @@ void stella8085_state::mc146818_io_map(address_map &map)
 	// TODO: map RTC
 	map(0x50, 0x51).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
 	map(0x60, 0x6f).rw("muart", FUNC(i8256_device::read), FUNC(i8256_device::write));
+}
+
+void stella8085_state::makesound(uint8_t channel, uint8_t length)
+{
+	int sfrq = soundfreq(channel);
+	m_beep->set_clock(sfrq);
+}
+
+int stella8085_state::soundfreq(uint8_t channel)
+{
+	const int int_clock = 2000240;
+	const int c8sharp = int_clock / 451;
+	const int d8 = int_clock / 426;
+	const int d8sharp = int_clock / 402;
+	const int e8 = int_clock / 379;
+	const int f8 = int_clock / 358;
+	const int f8sharp = int_clock / 338;
+	const int g8 = int_clock / 319;
+	const int g8sharp = int_clock / 301;
+	const int a8 = int_clock / 284;
+	const int a8sharp = int_clock / 268;
+	const int b8 = int_clock / 253;
+	const int c9 = int_clock / 239;
+	const int c8 = int_clock / 478;
+	switch (channel)
+	{
+		case 1:
+			return c9;
+		case 2:
+			return b8;
+		case 3:
+			return a8sharp;
+		case 4:
+			return a8;
+		case 5:
+			return g8sharp;
+		case 6:
+			return g8;
+		case 7:
+			return f8sharp;
+		case 8:
+			return f8;
+		case 9:
+			return e8;
+		case 10:
+			return d8sharp;
+		case 11:
+			return d8;
+		case 12:
+			return c8sharp;
+		default:
+			return 0;
+	}
 }
 
 
@@ -169,6 +227,8 @@ void stella8085_state::dicemstr(machine_config &config)
 	RTC62421(config, "rtc", 32.768_kHz_XTAL);
 
 	SPEAKER(config, "mono").front_center();
+	BEEP(config, "beeper", 0)
+		.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 void stella8085_state::doppelpot(machine_config &config)
@@ -184,6 +244,8 @@ void stella8085_state::doppelpot(machine_config &config)
 	MC146818(config, "rtc", 32.768_kHz_XTAL);
 
 	SPEAKER(config, "mono").front_center();
+	BEEP(config, "beeper", 0)
+		.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 void stella8085_state::excellent(machine_config &config)
