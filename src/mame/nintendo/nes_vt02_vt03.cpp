@@ -103,7 +103,6 @@ public:
 
 	void init_protpp() ATTR_COLD;
 	void init_gamezn2() ATTR_COLD;
-	void init_hs36in1() ATTR_COLD;
 
 protected:
 	required_device<nes_vt02_vt03_soc_device> m_soc;
@@ -151,6 +150,8 @@ public:
 	void nes_vt_waixing_512kb(machine_config& config) ATTR_COLD;
 	void nes_vt_waixing_512kb_rasterhack(machine_config& config) ATTR_COLD;
 	void nes_vt_waixing_2mb(machine_config& config) ATTR_COLD;
+
+	void init_hs36in1() ATTR_COLD;
 };
 
 class nes_vt_waixing_alt_state : public nes_vt_waixing_state
@@ -1361,7 +1362,7 @@ void nes_vt_state::init_gamezn2()
 	}
 }
 
-void nes_vt_state::init_hs36in1()
+void nes_vt_waixing_state::init_hs36in1()
 {
 	u8 *src = memregion("mainrom")->base();
 	int len = memregion("mainrom")->bytes();
@@ -1510,8 +1511,8 @@ CONS( 2006, dbdancem,   0,        0,  nes_vt_2mb, dbdancem, nes_vt_state, empty_
 CONS( 2009, sen101,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "Senario", "101 Games in 1 (Senario, NES/Famicom bootlegs)", MACHINE_IMPERFECT_GRAPHICS )
 
 // possibly designed by wellminds (M350 etc.)
-CONS( 2010, hs36red,  0,        0,  nes_vt_2mb,    nes_vt, nes_vt_state, init_hs36in1, "HengSheng", "HengSheng 36-in-1 (Red pad)", MACHINE_NOT_WORKING )
-CONS( 2010, hs36blk,  0,        0,  nes_vt_2mb,    nes_vt, nes_vt_state, init_hs36in1, "HengSheng", "HengSheng 36-in-1 (Black pad)", MACHINE_NOT_WORKING )
+CONS( 2010, hs36red,  0,        0,  nes_vt_waixing_2mb, nes_vt, nes_vt_waixing_state, init_hs36in1, "HengSheng", "HengSheng 36-in-1 (Red pad)", MACHINE_NOT_WORKING )
+CONS( 2010, hs36blk,  0,        0,  nes_vt_waixing_2mb, nes_vt, nes_vt_waixing_state, init_hs36in1, "HengSheng", "HengSheng 36-in-1 (Black pad)", MACHINE_NOT_WORKING )
 
 // unsorted, these were all in nes.xml listed as ONE BUS systems
 CONS( 200?, mc_dg101,   0,        0,  nes_vt_4mb,    nes_vt, nes_vt_state, empty_init, "dreamGEAR", "dreamGEAR 101 in 1", MACHINE_IMPERFECT_GRAPHICS ) // dreamGear, but no enhanced games?
