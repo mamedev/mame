@@ -80,6 +80,10 @@ public:
 		m_soc(*this, "soc")
 	{ }
 
+	void vt_external_space_map_1mbyte(address_map &map) ATTR_COLD;
+	void vt_external_space_map_2mbyte(address_map &map) ATTR_COLD;
+	void vt_external_space_map_4mbyte(address_map &map) ATTR_COLD;
+	void vt_external_space_map_8mbyte(address_map &map) ATTR_COLD;
 	void vt_external_space_map_16mbyte(address_map &map) ATTR_COLD;
 	void vt_external_space_map_32mbyte(address_map &map) ATTR_COLD;
 
@@ -95,6 +99,10 @@ public:
 	{ }
 
 	void nes_vt32_fp(machine_config& config);
+	void nes_vt32_1mb(machine_config& config);
+	void nes_vt32_2mb(machine_config& config);
+	void nes_vt32_4mb(machine_config& config);
+	void nes_vt32_8mb(machine_config& config);
 	void nes_vt32_16mb(machine_config& config);
 	void nes_vt32_32mb(machine_config& config);
 	void nes_vt32_4x16mb(machine_config& config);
@@ -123,11 +131,13 @@ public:
 	{ }
 
 	void nes_vt32_bitboy_2x16mb(machine_config& config);
+	void nes_vt32_gprnrs16_2x16mb(machine_config& config);
 
 	void vt_external_space_map_bitboy_2x16mbyte(address_map &map) ATTR_COLD;
 
 private:
 	void bittboy_412c_w(u8 data);
+	void gprnrs16_412c_w(u8 data);
 };
 
 class nes_vt32_fapocket_state : public nes_vt32_unk_state
@@ -160,6 +170,26 @@ void nes_vt32_base_state::vtspace_w(offs_t offset, uint8_t data)
 }
 
 // VTxx can address 25-bit address space (32MB of ROM) so use maps with mirroring in depending on ROM size
+void nes_vt32_state::vt_external_space_map_1mbyte(address_map &map)
+{
+	map(0x0000000, 0x00fffff).mirror(0x1f00000).r(FUNC(nes_vt32_state::vt_rom_r));
+}
+
+void nes_vt32_state::vt_external_space_map_2mbyte(address_map &map)
+{
+	map(0x0000000, 0x01fffff).mirror(0x1e00000).r(FUNC(nes_vt32_state::vt_rom_r));
+}
+
+void nes_vt32_state::vt_external_space_map_4mbyte(address_map &map)
+{
+	map(0x0000000, 0x03fffff).mirror(0x1c00000).r(FUNC(nes_vt32_state::vt_rom_r));
+}
+
+void nes_vt32_state::vt_external_space_map_8mbyte(address_map &map)
+{
+	map(0x0000000, 0x07fffff).mirror(0x1800000).r(FUNC(nes_vt32_state::vt_rom_r));
+}
+
 void nes_vt32_state::vt_external_space_map_16mbyte(address_map &map)
 {
 	map(0x0000000, 0x0ffffff).mirror(0x1000000).r(FUNC(nes_vt32_state::vt_rom_r));
@@ -368,6 +398,30 @@ void nes_vt32_unk_state::nes_vt32_4x16mb(machine_config& config)
 	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_read_412d_callback().set(FUNC(nes_vt32_unk_state::fcpocket_412d_r));
 }
 
+void nes_vt32_unk_state::nes_vt32_1mb(machine_config& config)
+{
+	nes_vt32_fp(config);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt32_unk_state::vt_external_space_map_1mbyte);
+}
+
+void nes_vt32_unk_state::nes_vt32_2mb(machine_config& config)
+{
+	nes_vt32_fp(config);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt32_unk_state::vt_external_space_map_2mbyte);
+}
+
+void nes_vt32_unk_state::nes_vt32_4mb(machine_config& config)
+{
+	nes_vt32_fp(config);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt32_unk_state::vt_external_space_map_4mbyte);
+}
+
+void nes_vt32_unk_state::nes_vt32_8mb(machine_config& config)
+{
+	nes_vt32_fp(config);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt32_unk_state::vt_external_space_map_8mbyte);
+}
+
 void nes_vt32_unk_state::nes_vt32_16mb(machine_config& config)
 {
 	nes_vt32_fp(config);
@@ -388,12 +442,26 @@ void nes_vt32_bitboy_state::bittboy_412c_w(u8 data)
 	m_ahigh = (data & 0x04) ? (1 << 24) : 0x0;
 }
 
+void nes_vt32_bitboy_state::gprnrs16_412c_w(u8 data)
+{
+	logerror("%s: vt03_412c_extbank_w %02x\n", machine().describe_context(),  data);
+	m_ahigh = (data & 0x02) ? (1 << 24) : 0x0;
+}
+
 void nes_vt32_bitboy_state::nes_vt32_bitboy_2x16mb(machine_config& config)
 {
 	nes_vt32_fp(config);
 	m_soc->set_addrmap(AS_PROGRAM, &nes_vt32_bitboy_state::vt_external_space_map_bitboy_2x16mbyte);
 
 	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_write_412c_callback().set(FUNC(nes_vt32_bitboy_state::bittboy_412c_w));
+}
+
+void nes_vt32_bitboy_state::nes_vt32_gprnrs16_2x16mb(machine_config& config)
+{
+	nes_vt32_fp(config);
+	m_soc->set_addrmap(AS_PROGRAM, &nes_vt32_bitboy_state::vt_external_space_map_bitboy_2x16mbyte);
+
+	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_write_412c_callback().set(FUNC(nes_vt32_bitboy_state::gprnrs16_412c_w));
 }
 
 
@@ -554,14 +622,42 @@ ROM_START( retro400 )
 	ROM_LOAD( "retro fc 400-in-1.bin", 0x00000, 0x1000000, CRC(4bf9991b) SHA1(ce9cac61cfc950d832d47afc76eb6c1488eeb2ca) ) // BGA on Subboard
 ROM_END
 
-ROM_START( unk2019hh )
+ROM_START( gbox2019 )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
 	ROM_LOAD( "fgb2019.bin", 0x00000, 0x1000000, CRC(7ef130d5) SHA1(00f45974494707fdac78153b13d8cfb503716ad0) ) // flash ROM
 ROM_END
 
-ROM_START( unk2020hh )
-	ROM_REGION( 0x1000000, "mainrom", 0 )
-	ROM_LOAD( "fgb2020.bin", 0x00000, 0x1000000, CRC(a685d943) SHA1(9b272daccd8fe244c910f031466a4fedd83d5236) ) // flash ROM
+ROM_START( gprnrs1 )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "gprnrs1.bin", 0x00000, 0x800000, CRC(c3ffcec8) SHA1(313a790fb51d0b155257f9de84726ed67da43a8f) )
+ROM_END
+
+ROM_START( gprnrs16 )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "gprnrs16.bin", 0x00000, 0x2000000, CRC(bdffa40a) SHA1(3d01907211f18e8415171dfc6c1d23cf5952e7bb) )
+ROM_END
+
+ROM_START( mc_7x6ss )
+	ROM_REGION( 0x100000, "mainrom", 0 )
+	ROM_LOAD( "777777-in-1, 8 bit slim station, newpxp-dvt22-a pcb.bin", 0x00000, 0x100000, CRC(7790c21a) SHA1(f320f3dd18b88ae5f65bb51f58d4cb869997bab3) )
+ROM_END
+
+ROM_START( mc_8x6ss )
+	ROM_REGION( 0x100000, "mainrom", 0 ) // odd size rom, does it need stripping?
+	ROM_LOAD( "888888-in-1, 8 bit slim station, newpxp-dvt22-a pcb.bin", 0x00000, 0x100000, CRC(47149d0b) SHA1(5a8733886b550e3235dd90fb415b5a602e967f91) )
+	ROM_IGNORE(0xce1)
+ROM_END
+
+// PXP2 8Bit Slim Station
+ROM_START( mc_9x6ss )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "s29gl032.u3", 0x00000, 0x400000, CRC(9f4194e8) SHA1(bd2a356aea56188ea78169095cbbe603d00e0063) )
+ROM_END
+
+// same machine as above? is one of these bad?
+ROM_START( mc_9x6sa )
+	ROM_REGION( 0x200000, "mainrom", 0 )
+	ROM_LOAD( "999999-in-1, 8 bit slim station, newpxp-dvt22-a pcb.bin", 0x00000, 0x200000, CRC(6a47c6a0) SHA1(b4dd376167a57dbee3dea70eb16f1a38e16bcdaa) )
 ROM_END
 
 void nes_vt32_unk_state::init_rfcp168()
@@ -654,10 +750,18 @@ CONS( 201?, mc_hh210, 0,  0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, empty
 // lots of accesses to $42xx, M705-128A6 sub-board with BGA
 CONS( 201?, retro400, 0,  0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "Retro FC 400-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
-// lots of accesses to $42xx, both boot, but banking is wrong (bad tiles)
-// menu in unk2020hh renders using incorrect gfx too (opcodes are scrambled)
-CONS( 2019, unk2019hh,  0,        0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "unknown VTxx based GameBoy style handheld (2019 PCB)", MACHINE_NOT_WORKING )
-CONS( 2020, unk2020hh,  unk2019hh,0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "unknown VTxx based GameBoy style handheld (2020 PCB)", MACHINE_NOT_WORKING )
+// lots of accesses to $42xx
+CONS( 2019, gbox2019, 0,  0,  nes_vt32_16mb, nes_vt32, nes_vt32_unk_state, empty_init, "Sup", "Game Box 400 in 1 (2019 PCB)", MACHINE_NOT_WORKING )
+
+// lots of accesses to $42xx
+CONS( 200?, gprnrs1,  0,  0,  nes_vt32_8mb,  nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "Game Prince RS-1", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, gprnrs16, 0,  0,  nes_vt32_gprnrs16_2x16mb, nes_vt32, nes_vt32_bitboy_state, empty_init, "<unknown>", "Game Prince RS-16", MACHINE_IMPERFECT_GRAPHICS )
+
+// lots of accesses to $42xx
+CONS( 200?, mc_9x6ss, 0,        0, nes_vt32_4mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "999999 in 1 (PXP2 Slim Station)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, mc_9x6sa, mc_9x6ss, 0, nes_vt32_2mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "999999 in 1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, mc_7x6ss, 0,        0, nes_vt32_1mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "777777 in 1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, mc_8x6ss, 0,        0, nes_vt32_1mb, nes_vt32, nes_vt32_unk_state, empty_init, "<unknown>", "888888 in 1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)", MACHINE_IMPERFECT_GRAPHICS )
 
 
 // Some games (eg F22) are scrambled like in myaass

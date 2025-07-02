@@ -35349,9 +35349,6 @@ dgun851
 dgun853
 fccomp88
 gamezn2
-gprnrs1
-gprnrs16
-gujtv108
 hs36blk
 hs36red
 joysti30
@@ -35361,15 +35358,8 @@ majkon
 mc_105te
 mc_110cb
 mc_138cb
-mc_7x6ss
-mc_89in1
 mc_8x6cb
-mc_8x6ss
-mc_9x6sa
-mc_9x6ss
 mc_aa2
-mc_dcat8
-mc_dcat8a
 mc_dg101
 mc_dgear
 mc_sam60
@@ -35383,7 +35373,6 @@ pjoys60
 polmega
 ppgc200g
 protpp
-pumpactv
 sen101
 senwld
 silv35
@@ -35394,7 +35383,6 @@ sporzpp
 sporztn
 sudo6in1
 sudopptv
-techni4
 timetp36
 timetp7
 tvmjfc
@@ -35416,8 +35404,10 @@ zudugo
 @source:nintendo/nes_vt09.cpp
 cybar120
 dturbogt
-jl2050
+gujtv108
 joypad65
+mc_dcat8
+mc_dcat8a
 msiwwe
 msiwwea
 msidd
@@ -35426,8 +35416,10 @@ msimm2
 msinamco
 msisinv
 msifrog
+pumpactv
 rcapnp
 senario25
+techni4
 timetp25
 ventur25
 vgtablet
@@ -35445,12 +35437,19 @@ dgunl3202
 fapocket
 fcpocket
 g9_666
+gbox2019
+gprnrs1
+gprnrs16
 hhgc319
 lxpcli
 lxpcsp
 matet100
 matet220
 matet300
+mc_7x6ss
+mc_8x6ss
+mc_9x6sa
+mc_9x6ss
 mc_hh210
 myaasa
 myaass
@@ -35458,8 +35457,6 @@ q5_500in1
 retro400
 rfcp168
 rminitv
-unk2019hh
-unk2020hh
 
 @source:nintendo/nes_vt369_vtunknown.cpp
 36pcase
@@ -35471,10 +35468,12 @@ dgun2577
 dgun2593
 dvnimbus
 egame150
+gbox2020
 gcs2mgp
 gtct885
 hkb502
 hkb502a
+jl2050
 lexi30
 lpgm240
 lxcap
@@ -35499,6 +35498,7 @@ lxcypkdp
 lxcypksp
 matet10
 matetsl
+mc_89in1
 mc_cb280
 mog_m320
 myarccn
