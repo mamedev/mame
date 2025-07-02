@@ -35,6 +35,7 @@ void i8256_device::device_reset()
     m_mode = 0;
     m_port1_control = 0;
     m_interrupts = 0;
+	m_status = 0x30;
 }
 
 uint8_t i8256_device::read(offs_t offset)
@@ -55,14 +56,21 @@ uint8_t i8256_device::read(offs_t offset)
 		case REG_CMD2:
             return m_command2;
 		case REG_CMD3:
-			return m_command3;
+			return m_command3 & 0x76; // When command Register 3 is read, bits 0, 3, and 7 will always be zero.
 		case REG_MODE:
            return m_mode;
+		case REG_INTEN:
+			return m_interrupts;
 		case REG_PORT1C:
             return m_port1_control;
 		case REG_PORT1:
 			return m_port1_int;
+		case REG_PORT2:
+			return m_port2_int;
+		case REG_STATUS:
+			return m_status;
 		default:
+			LOG("I8256 Read unmapped register: %u\n", reg);
 			return 0xFF;
 	};
 }
@@ -112,7 +120,18 @@ void i8256_device::write(offs_t offset, u8 data)
 			break;
 		case REG_CMD3:
 			m_command3 = data;
+			if (BIT(m_command3,CMD3_RST)) {
+				m_interrupts = 0;
+				m_status = 0x30;
+			}
             break;
+		case REG_INTEN:
+			m_interrupts = m_interrupts | data;
+			LOG("I8256 Enabled interrupts: %u\n", m_interrupts);
+			break;
+		case REG_INTAD: // reset interrupt
+			m_interrupts = m_interrupts & ~data;
+			break;
 		case REG_MODE:
             m_mode = data;
 			break;
@@ -121,6 +140,9 @@ void i8256_device::write(offs_t offset, u8 data)
 			break;
 		case REG_PORT1:
 			m_port1_int = data;
+			break;
+		case REG_PORT2:
+			m_port2_int = data;
 			break;
 	};
 }

@@ -82,6 +82,8 @@ private:
     uint8_t m_port1_control, m_port1_int;
     uint8_t m_port2_int;
 
+    uint8_t m_status;
+
     emu_timer *m_timers[5];
 
 
@@ -185,6 +187,18 @@ private:
         CMD3_IAE,
         CMD3_RxE,
         CMD3_SET
+    };
+
+    enum
+    {
+        INT_TIMER1,
+        INT_TIMER2,
+        INT_EXTINT,
+        INT_TIMER3,
+        INT_RX,
+        INT_TX,
+        INT_TIMER4,
+        INT_TIMER5
     };
 
     enum
