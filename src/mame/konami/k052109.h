@@ -98,6 +98,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info0);
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	TILE_GET_INFO_MEMBER(get_tile_info2);
+	TILE_BLITTER_MEMBER(tile_blitter);
 
 	void get_tile_info(tile_data &tileinfo, int tile_index, int layer, uint8_t *cram, uint8_t *vram1, uint8_t *vram2);
 	void tileflip_reset();
