@@ -1430,7 +1430,7 @@ CONS( 200?, sudo6in1,  0,  0,  nes_vt_pal_1mb,    nes_vt, nes_vt_state, empty_in
 // small black unit, dpad on left, 4 buttons (A,B,X,Y) on right, Start/Reset/Select in middle, unit text "Sudoku Plug & Play TV Game"
 CONS( 200?, sudopptv,  0, 0,  nes_vt_waixing_512kb_rasterhack,        nes_vt, nes_vt_waixing_state, empty_init, "Smart Planet", "Sudoku Plug & Play TV Game '6 Intelligent Games'", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-CONS( 200?, megapad,   0, 0,  nes_vt_waixing_2mb,        nes_vt, nes_vt_waixing_state, empty_init, "Waixing", "Megapad 31-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Happy Biqi has broken sprites, investigate before promoting
+CONS( 200?, megapad,   0, 0,  nes_vt_waixing_2mb,        nes_vt, nes_vt_waixing_state, empty_init, "Waixing", "Megapad 31-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Happy Biqi has broken sprites just like standalone cart (nes:happybiqa)
 
 // 060303 date code on PCB
 CONS( 2006, ablmini,   0, 0,  nes_vt_waixing_alt_pal_8mb, nes_vt, nes_vt_waixing_alt_state, empty_init, "Advance Bright Ltd", "Double Players Mini Joystick 80-in-1 (MJ8500, ABL TV Game)", MACHINE_IMPERFECT_GRAPHICS )
