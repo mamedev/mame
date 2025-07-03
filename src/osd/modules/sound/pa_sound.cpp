@@ -140,7 +140,7 @@ int sound_pa::init(osd_interface &osd, osd_options const &options)
 	m_info.m_default_sink = dc(Pa_GetDefaultOutputDevice());
 	m_info.m_default_source = dc(Pa_GetDefaultInputDevice());
 
-	std::map<std::string, int> namecount;
+	std::unordered_map<std::string, int> namecount;
 
 	for(PaDeviceIndex dev = 0; dev != Pa_GetDeviceCount(); dev++) {
 		const PaDeviceInfo *di = Pa_GetDeviceInfo(dev);

@@ -731,7 +731,6 @@ TILE_BLITTER_MEMBER(k052109_device::tile_blitter)
 			// iterate to handle wraparound
 			for (int xpos = scrollx - tilemap.width(); xpos <= cliprect.right(); xpos += tilemap.width())
 			{
-				// iterate over Y to handle wraparound
 				for (int ypos = scrolly - tilemap.height(); ypos <= cliprect.bottom(); ypos += tilemap.height())
 				{
 					// update the cliprect just for this block
