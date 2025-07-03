@@ -99,8 +99,6 @@ void i8256_device::write(offs_t offset, u8 data)
 		}
 	}
         
-	//LOG("I8256 Write %02x to %02x\n", data, reg);
-
 	switch (reg)
 	{
 		case REG_CMD1:
@@ -149,6 +147,9 @@ void i8256_device::write(offs_t offset, u8 data)
 			break;
 		case REG_PORT2:
 			m_port2_int = data;
+			break;
+		default:
+			LOG("I8256 Unmapped write %02x to %02x\n", data, reg);
 			break;
 	};
 }
