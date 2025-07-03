@@ -81,8 +81,11 @@ private:
 	void output_digit(u8 i, u8 data);
 	u8 m_kbd_sl = 0x00;
 
+	/*
+	void sounddev(offs_t offset, u8 data) ATTR_COLD;
 	void makesound(uint8_t channel, uint8_t length);
 	int soundfreq(uint8_t channel);
+*/
 };
 
 void stella8085_state::machine_start()
@@ -121,6 +124,7 @@ void stella8085_state::mc146818_io_map(address_map &map)
 	// TODO: map RTC
 	map(0x50, 0x51).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
 	map(0x60, 0x6f).rw("muart", FUNC(i8256_device::read), FUNC(i8256_device::write));
+	//map(0x70, 0x73).w(FUNC(stella8085_state::makesound));
 }
 
 /*********************************************
@@ -156,8 +160,8 @@ void stella8085_state::disp_w(u8 data)
 void stella8085_state::output_digit(u8 i, u8 data)
 {
 //  Segment decode
-	static const u8 led_map[16] =
-		{ 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0x00 };
+	//static const u8 led_map[16] =
+	//	{ 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0x00 };
 
 //  Show layout
 //  The i8279 is configured to display 8 digits, so we need to use 8 "m_lamps" elements.
@@ -172,6 +176,12 @@ void stella8085_state::rst65_w(u8 state)
 
 	//m_maincpu->set_input_line(I8085_RST55_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 	LOG("I8279: irq state: %s - state:%02x time:%s\n", state ? "Assert Line":"Clear Line", state, machine().time().as_string());
+}
+
+/*
+void stella8085_state::sounddev(offs_t offset, u8 data)
+{
+	makesound(offset & 0x0F,data & 0xF0);
 }
 
 void stella8085_state::makesound(uint8_t channel, uint8_t length)
@@ -195,7 +205,7 @@ int stella8085_state::soundfreq(uint8_t channel)
 	const int a8sharp = int_clock / 268;
 	const int b8 = int_clock / 253;
 	const int c9 = int_clock / 239;
-	const int c8 = int_clock / 478;
+	//const int c8 = int_clock / 478;
 	switch (channel)
 	{
 		case 1:
@@ -226,7 +236,7 @@ int stella8085_state::soundfreq(uint8_t channel)
 			return 0;
 	}
 }
-
+*/
 
 static INPUT_PORTS_START( dicemstr )
 	PORT_START("DSW")
@@ -282,6 +292,10 @@ void stella8085_state::dicemstr(machine_config &config)
 	I8256(config, "muart", 10.240_MHz_XTAL / 2); // divider not verified
 
 	I8279(config, m_kdc, 10.240_MHz_XTAL / 4); // divider not verified
+	m_kdc->out_sl_callback().set(FUNC(stella8085_state::kbd_sl_w));  // scan SL lines
+	m_kdc->out_disp_callback().set(FUNC(stella8085_state::disp_w));  // display A&B
+	m_kdc->in_rl_callback().set(FUNC(stella8085_state::kbd_rl_r));   // kbd RL lines
+	m_kdc->out_irq_callback().set(FUNC(stella8085_state::rst65_w));  // irq line
 
 	/* video hardware */
 	config.set_default_layout(layout_stellafr);
