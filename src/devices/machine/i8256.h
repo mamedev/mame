@@ -51,6 +51,8 @@ public:
     virtual void device_start() override;
     virtual void device_reset() override;
 
+    TIMER_CALLBACK_MEMBER(timer_check);
+
 	void write_cts(int state);
     void write_rxd(int state);
     void write_rxc(int state);
@@ -84,7 +86,8 @@ private:
 
     uint8_t m_status;
 
-    emu_timer *m_timers[5];
+    uint8_t m_timers[5];
+    emu_timer *m_timer;
 
 
     enum // MUART REGISTERS

@@ -18,13 +18,14 @@ i8256_device::i8256_device(const machine_config &mconfig, const char *tag, devic
 	m_cts(1),
 	m_rxd(1),
 	m_rxc(0),
-	m_txc(0)
+	m_txc(0),
+	m_timer(nullptr)
 {
 }
 
 void i8256_device::device_start()
 {
-
+	m_timer = timer_alloc(FUNC(i8256_device::timer_check), this);
 }
 
 void i8256_device::device_reset()
@@ -35,7 +36,23 @@ void i8256_device::device_reset()
     m_mode = 0;
     m_port1_control = 0;
     m_interrupts = 0;
+
+	m_timers[0] = 0;
+	m_timers[1] = 0;
+	m_timers[2] = 0;
+	m_timers[3] = 0;
+	m_timers[4] = 0;
+
 	m_status = 0x30;
+}
+
+TIMER_CALLBACK_MEMBER(i8256_device::timer_check)
+{
+    m_timers[0]++;
+	m_timers[1]++;
+	m_timers[2]++;
+	m_timers[3]++;
+	m_timers[4]++;
 }
 
 uint8_t i8256_device::read(offs_t offset)
@@ -67,6 +84,12 @@ uint8_t i8256_device::read(offs_t offset)
 			return m_port1_int;
 		case REG_PORT2:
 			return m_port2_int;
+		case REG_TIMER1:
+		case REG_TIMER2:
+		case REG_TIMER3:
+		case REG_TIMER4:
+		case REG_TIMER5:
+			return m_timers[reg-10];
 		case REG_STATUS:
 			return m_status;
 		default:
@@ -97,7 +120,15 @@ void i8256_device::write(offs_t offset, u8 data)
 	{
 		case REG_CMD1:
 			if (m_command1 != data) {
-					m_command1 = data;
+				m_command1 = data;
+				
+				if (BIT(m_command1,CMD1_FRQ))
+				{
+					m_timer->adjust(attotime::from_hz(1000), 0, attotime::from_hz(1000));
+				} else {
+					m_timer->adjust(attotime::from_hz(16000), 0, attotime::from_hz(16000));
+				}
+				
 				if (BIT(m_command1,CMD1_8086))
 				{
 					LOG("I8256 Enabled 8086 mode\n");
@@ -141,6 +172,13 @@ void i8256_device::write(offs_t offset, u8 data)
 			break;
 		case REG_PORT2:
 			m_port2_int = data;
+			break;
+		case REG_TIMER1:
+		case REG_TIMER2:
+		case REG_TIMER3:
+		case REG_TIMER4:
+		case REG_TIMER5:
+			m_timers[reg-10] = data;
 			break;
 		default:
 			LOG("I8256 Unmapped write %02x to %02x\n", data, reg);
