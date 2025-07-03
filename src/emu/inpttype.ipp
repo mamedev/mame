@@ -874,7 +874,7 @@ namespace {
 		CORE_INPUT_TYPES_BEGIN(ui) \
 		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_MENU,              N_p("input-name", "Show/Hide Menu"),         input_seq(KEYCODE_TAB) ) \
 		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_SELECT,            N_p("input-name", "UI Select"),              input_seq(KEYCODE_ENTER, input_seq::not_code, KEYCODE_LALT, input_seq::not_code, KEYCODE_RALT, input_seq::or_code, KEYCODE_ENTER_PAD) ) \
-		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_BACK,              N_p("input-name", "UI Back"),                input_seq(KEYCODE_ESC) ) \
+		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_BACK,              N_p("input-name", "UI Back"),                input_seq(KEYCODE_ESC, input_seq::or_code, KEYCODE_BACKSPACE) ) \
 		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_CANCEL,            N_p("input-name", "UI Cancel"),              input_seq(KEYCODE_ESC) ) \
 		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_CLEAR,             N_p("input-name", "UI Clear"),               input_seq(KEYCODE_DEL) ) \
 		INPUT_PORT_DIGITAL_TYPE( 0, UI,       UI_HELP,              N_p("input-name", "UI Help"),                input_seq(KEYCODE_F1) ) \
