@@ -178,7 +178,7 @@ private:
         SCLK_DIV2, // 2.048 MHz
         SCLK_DIV1  // 1.024 MHz
     };
-    const int sysclockDivider[4] = {5,3,2,1};
+    const char sysclockDivider[4] = {5,3,2,1};
 
     enum
     {
@@ -203,6 +203,8 @@ private:
         INT_TIMER4,
         INT_TIMER5
     };
+
+    const char timer_interrupt[5] = {INT_TIMER1, INT_TIMER2, INT_TIMER3, INT_TIMER4, INT_TIMER5};
 
     enum
     {

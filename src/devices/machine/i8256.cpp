@@ -63,11 +63,14 @@ void i8256_device::device_reset()
 
 TIMER_CALLBACK_MEMBER(i8256_device::timer_check)
 {
-    m_timers[0]++;
-	m_timers[1]++;
-	m_timers[2]++;
-	m_timers[3]++;
-	m_timers[4]++;
+    for (int i = 0; i < 5; ++i) {
+        if (m_timers[i] < UINT16_MAX) {
+            m_timers[i]++;
+        } else {
+            m_timers[i] = 0;
+            //trigger_interrupt(timer_interrupt[i]);
+        }
+    }
 }
 
 uint8_t i8256_device::read(offs_t offset)
