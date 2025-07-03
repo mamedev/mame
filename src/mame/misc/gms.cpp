@@ -2912,7 +2912,7 @@ ROM_END
 
 ROM_START( sscs0118 ) // GMS PCB NO: 99-6-8, ROM stickers mostly scratched off / unreadable
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code
-	ROM_LOAD( "rom.u64", 0x00000, 0x80000, SHA1(0e06a519) SHA1(8b1f0dbfa57415e2d8fd06ed9a8c57e58409ad32) )
+	ROM_LOAD( "rom.u64", 0x00000, 0x80000, CRC(0e06a519) SHA1(8b1f0dbfa57415e2d8fd06ed9a8c57e58409ad32) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "u83", 0x00000, 0x80000, CRC(9112ece2) SHA1(0ec9859b8925cdda2edfb93c8fc0d747933b365f) )
