@@ -267,6 +267,7 @@ inline void unsp_device::execute_fxxx_100_group(uint16_t op)
 
 void unsp_12_device::execute_divq(uint16_t op)
 {
+	//TODO: it is not implemented correct in MAME. Implement it correctly when it would be needed by code.
 	if (m_core->m_divq_bit == UINT_MAX)
 	{
 		m_core->m_divq_bit = 15;
@@ -374,8 +375,9 @@ void unsp_12_device::execute_fxxx_101_group(uint16_t op)
 	case 0xf16a: case 0xf36a: case 0xf56a: case 0xf76a: case 0xf96a: case 0xfb6a: case 0xfd6a: case 0xff6a:
 	case 0xf172: case 0xf372: case 0xf572: case 0xf772: case 0xf972: case 0xfb72: case 0xfd72: case 0xff72:
 	case 0xf17a: case 0xf37a: case 0xf57a: case 0xf77a: case 0xf97a: case 0xfb7a: case 0xfd7a: case 0xff7a:
+		//TODO: it is not implemented in MAME at all. Implement it correctly when it would be needed by code.
 		logerror("divs mr, r2\n");
-		unimplemented_opcode(op);
+		unimplemented_opcode(op); //well, no words! SOME PRO-LEVEL DEBUGGING
 		return;
 
 	case 0xf163: case 0xf363: case 0xf563: case 0xf763: case 0xf963: case 0xfb63: case 0xfd63: case 0xff63:
