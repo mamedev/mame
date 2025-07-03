@@ -13,7 +13,7 @@ i8256_device::i8256_device(const machine_config &mconfig, const char *tag, devic
 	m_inta_cb(*this),
 	m_in_p1_cb(*this, 0),
 	m_in_p2_cb(*this, 0),
-	m_out_p1_cb(*this),	
+	m_out_p1_cb(*this),
 	m_out_p2_cb(*this),
 	m_cts(1),
 	m_rxd(1),
@@ -25,6 +25,17 @@ i8256_device::i8256_device(const machine_config &mconfig, const char *tag, devic
 
 void i8256_device::device_start()
 {
+	save_item(NAME(m_command1));
+	save_item(NAME(m_command2));
+	save_item(NAME(m_command3));
+	save_item(NAME(m_mode));
+	save_item(NAME(m_port1_control));
+	save_item(NAME(m_interrupts));
+	save_item(NAME(m_status));
+	for (int i = 0; i < 5; ++i) {
+		save_item(NAME(m_timers[i]));
+	}
+
 	m_timer = timer_alloc(FUNC(i8256_device::timer_check), this);
 }
 
@@ -44,6 +55,10 @@ void i8256_device::device_reset()
 	m_timers[4] = 0;
 
 	m_status = 0x30;
+	m_port1_int = 0;
+    m_port2_int = 0;
+
+	m_timer->adjust(attotime::from_hz(16000), 0, attotime::from_hz(16000));
 }
 
 TIMER_CALLBACK_MEMBER(i8256_device::timer_check)
