@@ -143,31 +143,22 @@ u8 stella8085_state::kbd_rl_r()
 //  Keyboard read (only scan line 0 is used)
 	u8 ret = 0xff;
 	if((m_kbd_sl & 0x07) == 6)
-		ret = ioport("SERVICE0")->read();
+		;//ret = ioport("SERVICE0")->read();
 	else if((m_kbd_sl & 0x07) == 7)
-		ret = ioport("SERVICE1")->read();
+		;//ret = ioport("SERVICE1")->read();
 	return ret;
 }
 
 void stella8085_state::disp_w(u8 data)
 {
 //  Display data
-	data = bitswap(data, 4, 5, 6, 7, 0, 1, 2, 3);
-	output_digit(m_kbd_sl, data >> 4);
 	LOG("I8279: Data Display: %02X\n", data);
+	output_digit(m_kbd_sl, data);
 }
 
 void stella8085_state::output_digit(u8 i, u8 data)
 {
-//  Segment decode
-	//static const u8 led_map[16] =
-	//	{ 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0x00 };
-
-//  Show layout
-//  The i8279 is configured to display 8 digits, so we need to use 8 "m_lamps" elements.
-//  The actual hardware only has two 7-segment displays.
-
-	//m_lamps[55 + i] = led_map[data & 0x0f];  // lamps 55 to 62
+    m_digits[i] = data;
 }
 
 void stella8085_state::rst65_w(u8 state)
@@ -316,6 +307,10 @@ void stella8085_state::doppelpot(machine_config &config)
 	I8256(config, "muart", 6.144_MHz_XTAL / 2);
 
 	I8279(config, m_kdc, 6.144_MHz_XTAL / 2);
+	m_kdc->out_sl_callback().set(FUNC(stella8085_state::kbd_sl_w));  // scan SL lines
+	m_kdc->out_disp_callback().set(FUNC(stella8085_state::disp_w));  // display A&B
+	//m_kdc->in_rl_callback().set(FUNC(stella8085_state::kbd_rl_r));   // kbd RL lines
+	m_kdc->out_irq_callback().set(FUNC(stella8085_state::rst65_w));  // irq line
 
 	MC146818(config, "rtc", 32.768_kHz_XTAL);
 
