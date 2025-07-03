@@ -40,14 +40,20 @@ void i8256_device::device_reset()
 
 uint8_t i8256_device::read(offs_t offset)
 {
+	u8 reg = offset & 0x0F;
+
     // In the 8-bit mode, AD0-AD3 are used to select the proper register, while AD1-AD4 are used in the 16-bit mode.
-    // AD4 in the 8-bit mote is ignored as an address, while AD0 in the 16-bit mode is used as a second chip select, active low.
+    // AD4 in the 8-bit mote is ignored as an address.
+
     if (BIT(m_command1,CMD1_8086))
 	{
-		offset = offset >> 1;
-	}	
-    	
-	u8 reg = offset & 0x0F;
+		if (!BIT(offset,0)) // AD0 in the 16-bit mode is used as a second chip select, active low.
+		{
+			reg = (offset >> 1) & 0x0F;
+		} else {
+			return;
+		}
+	}
 
 	switch (reg)
 	{
