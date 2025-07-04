@@ -13,9 +13,9 @@ NOTES:
 #include "emu.h"
 #include "atm.h"
 
+#include "bus/spectrum/ay/slot.h"
 #include "bus/ata/atapicdr.h"
 #include "bus/ata/hdd.h"
-#include "sound/ay8910.h"
 
 #define LOG_MEM   (1U << 1)
 #define LOG_VIDEO (1U << 2)
@@ -381,8 +381,8 @@ void atm_state::atm_io(address_map &map)
 	map(0x00fd, 0x00fd).mirror(0xff00).w(FUNC(atm_state::atm_port_7ffd_w));
 
 	map(0xfadf, 0xfadf).mirror(0x0500).nopr(); // TODO 0xfadf, 0xfbdf, 0xffdf Kempston Mouse
-	map(0x8000, 0x8000).mirror(0x3ffd).w("ay8912", FUNC(ay8910_device::data_w));
-	map(0xc000, 0xc000).mirror(0x3ffd).rw("ay8912", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
+	map(0x8000, 0x8000).mirror(0x3ffd).w("ay_slot", FUNC(ay_slot_device::data_w));
+	map(0xc000, 0xc000).mirror(0x3ffd).rw("ay_slot", FUNC(ay_slot_device::data_r), FUNC(ay_slot_device::address_w));
 
 	// PORTS: Shadow
 	map(0x0000, 0xffff).view(m_io_view);
@@ -431,8 +431,6 @@ void atm_state::machine_start()
 
 	ram_pages_mask = (m_ram->size() - 1) / 0x4000;
 	m_bank_ram[0]->configure_entries(0, ram_pages_mask + 1, m_ram->pointer(), 0x4000);
-
-	m_maincpu->space(AS_PROGRAM).specific(m_program);
 }
 
 void atm_state::machine_reset()
@@ -505,7 +503,7 @@ void atm_state::atm(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &atm_state::atm_io);
 	m_maincpu->set_addrmap(AS_OPCODES, &atm_state::atm_switch);
 	m_maincpu->set_vblank_int("screen", FUNC(atm_state::atm_interrupt));
-	m_maincpu->nomreq_cb().set_nop();
+	m_maincpu->nomreq_cb().remove();
 
 	m_screen->set_raw(X1_128_SINCLAIR / 5, 448, 312, {get_screen_area().left() - 40, get_screen_area().right() + 40, get_screen_area().top() - 40, get_screen_area().bottom() + 40});
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_atm);

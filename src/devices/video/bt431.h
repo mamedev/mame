@@ -54,15 +54,6 @@ public:
 	};
 
 	void map(address_map &map) ATTR_COLD;
-	bool cur_r(unsigned x, unsigned y) const;
-
-protected:
-	static constexpr u16 ADDRESS_MASK = 0x01ff;
-
-	// device_t overrides
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
-
 	template <unsigned S> u8 addr_r() { return m_address >> S; }
 	template <unsigned S> void addr_w(u8 data) { m_address = ((m_address & (0xff00 >> S)) | (u16(data) << S)) & ADDRESS_MASK; }
 
@@ -71,6 +62,15 @@ protected:
 
 	u8 reg_r();
 	void reg_w(u8 data);
+
+	bool cur_r(unsigned x, unsigned y) const;
+
+protected:
+	static constexpr u16 ADDRESS_MASK = 0x01ff;
+
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	void update();

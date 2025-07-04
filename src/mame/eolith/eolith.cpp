@@ -690,7 +690,8 @@ INPUT_PORTS_END
 
 void eolith_state::eolith45(machine_config &config)
 {
-	E132N(config, m_maincpu, 45000000);         /* 45 MHz */
+	// TODO: turning off single instruction mode makes Raccoon World slow due to constant recompilation
+	E132(config, m_maincpu, 45_MHz_XTAL).set_single_instruction_mode(true);         // E1-32N (PQFP)
 	m_maincpu->set_addrmap(AS_PROGRAM, &eolith_state::eolith_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(eolith_state::eolith_speedup), "screen", 0, 1);
 
@@ -722,8 +723,7 @@ void eolith_state::eolith45(machine_config &config)
 	PALETTE(config, m_palette, palette_device::RGB_555);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_soundcpu, MCS51_INT0_LINE);
 
@@ -732,8 +732,8 @@ void eolith_state::eolith45(machine_config &config)
 	m_qs1000->p1_in().set(FUNC(eolith_state::qs1000_p1_r));
 	m_qs1000->p1_out().set(FUNC(eolith_state::qs1000_p1_w));
 	m_qs1000->p3_in().set(FUNC(eolith_state::qs1000_p3_r));
-	m_qs1000->add_route(0, "lspeaker", 1.0);
-	m_qs1000->add_route(1, "rspeaker", 1.0);
+	m_qs1000->add_route(0, "speaker", 1.0, 0);
+	m_qs1000->add_route(1, "speaker", 1.0, 1);
 }
 
 void eolith_state::eolith50(machine_config &config)

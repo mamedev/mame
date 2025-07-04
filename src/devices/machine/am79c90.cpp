@@ -709,8 +709,6 @@ void am7990_device_base::initialize()
 
 	m_mode = init_block[0];
 
-	set_promisc(m_mode & MODE_PROM);
-
 	put_u16le(&m_physical_addr[0], init_block[1]);
 	put_u16le(&m_physical_addr[2], init_block[2]);
 	put_u16le(&m_physical_addr[4], init_block[3]);

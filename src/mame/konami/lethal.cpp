@@ -685,21 +685,20 @@ void lethal_state::lethalen(machine_config &config)
 	K053244(config, m_k053244, 0);
 	m_k053244->set_palette(m_palette);
 	m_k053244->set_bpp(6);
-	m_k053244->set_offsets(95, 0);
+	m_k053244->set_offsets(191, 0);
 	m_k053244->set_sprite_callback(FUNC(lethal_state::sprite_callback));
 
 	K054000(config, "k054000", 0);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	K054321(config, m_k054321, "lspeaker", "rspeaker");
+	K054321(config, m_k054321, "speaker");
 
 	k054539_device &k054539(K054539(config, "k054539", SOUND_CLOCK));
 	k054539.timer_handler().set_inputline("soundcpu", INPUT_LINE_NMI);
-	k054539.add_route(0, "rspeaker", 1.0);
-	k054539.add_route(1, "lspeaker", 1.0);
+	k054539.add_route(0, "speaker", 1.0, 0);
+	k054539.add_route(1, "speaker", 1.0, 1);
 }
 
 void lethal_state::lethalej(machine_config &config)
@@ -708,7 +707,7 @@ void lethal_state::lethalej(machine_config &config)
 
 	subdevice<screen_device>("screen")->set_visarea(224, 512-1, 16, 240-1);
 
-	m_k053244->set_offsets(-105, 0);
+	m_k053244->set_offsets(-9, 0);
 }
 
 ROM_START( lethalen )   // US version UAE

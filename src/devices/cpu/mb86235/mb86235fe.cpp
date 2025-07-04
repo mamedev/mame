@@ -256,7 +256,6 @@ void mb86235_frontend::describe_reg_read(opcode_desc &desc, int reg)
 			break;
 
 		case 0x32:      // FO0
-			break;
 		case 0x33:      // FO1
 			break;
 
@@ -311,11 +310,8 @@ void mb86235_frontend::describe_reg_write(opcode_desc &desc, int reg)
 			break;
 
 		case 0x32:      // FO0
-			desc.userflags |= OP_USERFLAG_FIFOOUT0;
-			desc.flags |= OPFLAG_IS_BRANCH_TARGET;      // fifo check makes this a branch target
-			break;
 		case 0x33:      // FO1
-			desc.userflags |= OP_USERFLAG_FIFOOUT1;
+			desc.userflags |= OP_USERFLAG_FIFOOUT;
 			desc.flags |= OPFLAG_IS_BRANCH_TARGET;      // fifo check makes this a branch target
 			break;
 

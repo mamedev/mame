@@ -11,31 +11,44 @@
 #include "bus/rs232/rs232.h"
 #include "bus/rs232/terminal.h"
 #include "bus/rs232/null_modem.h"
+#include "machine/z80scc.h"
 #include "screen.h"
 
-static void isa_com(device_slot_interface &device)
+namespace {
+class nubus_quadralink_device : public device_t,
+								public device_nubus_card_interface
+{
+public:
+	// construction/destruction
+	nubus_quadralink_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	nubus_quadralink_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
+	required_device<z80scc_device> m_scc1, m_scc2;
+
+	// device-level overrides
+	virtual void device_start() override ATTR_COLD;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+private:
+	u32 dev_r(offs_t offset, u32 mem_mask = ~0);
+	void dev_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+};
+
+static void ql_com(device_slot_interface &device)
 {
 	device.option_add("terminal", SERIAL_TERMINAL);
 	device.option_add("null_modem", NULL_MODEM);
 }
 
-#define QUADRALINK_ROM_REGION  "qdlink_rom"
-
 ROM_START( quadralink )
-	ROM_REGION(0x4000, QUADRALINK_ROM_REGION, 0)
+	ROM_REGION(0x4000, "declrom", 0)
 	ROM_LOAD( "ql_2.2.bin",   0x000000, 0x004000, CRC(88c323b8) SHA1(d70bc32ad50ceb5cb75c6251293cacd65d8313aa) )
 ROM_END
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-DEFINE_DEVICE_TYPE(NUBUS_QUADRALINK, nubus_quadralink_device, "nb_qdlink", "Applied Engineering Quadralink serial card")
-
-
-//-------------------------------------------------
-//  device_add_mconfig - add device configuration
-//-------------------------------------------------
 
 void nubus_quadralink_device::device_add_mconfig(machine_config &config)
 {
@@ -47,50 +60,38 @@ void nubus_quadralink_device::device_add_mconfig(machine_config &config)
 	m_scc2->out_txda_callback().set("serport2", FUNC(rs232_port_device::write_txd));
 	m_scc2->out_txdb_callback().set("serport3", FUNC(rs232_port_device::write_txd));
 
-	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, nullptr));
+	rs232_port_device &serport0(RS232_PORT(config, "serport0", ql_com, nullptr));
 	serport0.rxd_handler().set(m_scc1, FUNC(z80scc_device::rxa_w));
 	serport0.dcd_handler().set(m_scc1, FUNC(z80scc_device::dcda_w));
 	serport0.cts_handler().set(m_scc1, FUNC(z80scc_device::ctsa_w));
 
-	rs232_port_device &serport1(RS232_PORT(config, "serport1", isa_com, nullptr));
+	rs232_port_device &serport1(RS232_PORT(config, "serport1", ql_com, nullptr));
 	serport1.rxd_handler().set(m_scc1, FUNC(z80scc_device::rxb_w));
 	serport1.dcd_handler().set(m_scc1, FUNC(z80scc_device::dcdb_w));
 	serport1.cts_handler().set(m_scc1, FUNC(z80scc_device::ctsb_w));
 
-	rs232_port_device &serport2(RS232_PORT(config, "serport2", isa_com, nullptr));
+	rs232_port_device &serport2(RS232_PORT(config, "serport2", ql_com, nullptr));
 	serport2.rxd_handler().set(m_scc2, FUNC(z80scc_device::rxa_w));
 	serport2.dcd_handler().set(m_scc2, FUNC(z80scc_device::dcda_w));
 	serport2.cts_handler().set(m_scc2, FUNC(z80scc_device::ctsa_w));
 
-	rs232_port_device &serport3(RS232_PORT(config, "serport3", isa_com, nullptr));
+	rs232_port_device &serport3(RS232_PORT(config, "serport3", ql_com, nullptr));
 	serport3.rxd_handler().set(m_scc2, FUNC(z80scc_device::rxb_w));
 	serport3.dcd_handler().set(m_scc2, FUNC(z80scc_device::dcdb_w));
 	serport3.cts_handler().set(m_scc2, FUNC(z80scc_device::ctsb_w));
 }
-
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
 
 const tiny_rom_entry *nubus_quadralink_device::device_rom_region() const
 {
 	return ROM_NAME( quadralink );
 }
 
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  nubus_quadralink_device - constructor
-//-------------------------------------------------
-
-nubus_quadralink_device::nubus_quadralink_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+nubus_quadralink_device::nubus_quadralink_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	nubus_quadralink_device(mconfig, NUBUS_QUADRALINK, tag, owner, clock)
 {
 }
 
-nubus_quadralink_device::nubus_quadralink_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+nubus_quadralink_device::nubus_quadralink_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_nubus_card_interface(mconfig, *this),
 	m_scc1(*this, "scc1"),
@@ -98,30 +99,18 @@ nubus_quadralink_device::nubus_quadralink_device(const machine_config &mconfig, 
 {
 }
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
 void nubus_quadralink_device::device_start()
 {
-	uint32_t slotspace;
+	u32 slotspace;
 
-	install_declaration_rom(QUADRALINK_ROM_REGION);
+	install_declaration_rom("declrom");
 
 	slotspace = get_slotspace();
 
 	nubus().install_device(slotspace, slotspace+0xefffff, read32s_delegate(*this, FUNC(nubus_quadralink_device::dev_r)), write32s_delegate(*this, FUNC(nubus_quadralink_device::dev_w)));
 }
 
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void nubus_quadralink_device::device_reset()
-{
-}
-
-void nubus_quadralink_device::dev_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void nubus_quadralink_device::dev_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	//printf("write %x to QL space @ %x, mask %08x\n", data, offset, mem_mask);
 	switch (offset)
@@ -160,7 +149,7 @@ void nubus_quadralink_device::dev_w(offs_t offset, uint32_t data, uint32_t mem_m
 	}
 }
 
-uint32_t nubus_quadralink_device::dev_r(offs_t offset, uint32_t mem_mask)
+u32 nubus_quadralink_device::dev_r(offs_t offset, u32 mem_mask)
 {
 	//printf("read QL space @ %x, mask %08x\n", offset, mem_mask);
 	switch (offset)
@@ -191,3 +180,7 @@ uint32_t nubus_quadralink_device::dev_r(offs_t offset, uint32_t mem_mask)
 	}
 	return 0xffffffff;
 }
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(NUBUS_QUADRALINK, device_nubus_card_interface, nubus_quadralink_device, "nb_qdlink", "Applied Engineering Quadralink serial card")

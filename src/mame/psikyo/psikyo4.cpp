@@ -633,18 +633,17 @@ void psikyo4_state::ps4big(machine_config &config)
 	m_rscreen->set_palette(m_palette[1]);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ymf278b_device &ymf(YMF278B(config, "ymf", 57272700/2));
 	ymf.set_addrmap(0, &psikyo4_state::ps4_ymf_map);
 	ymf.irq_handler().set_inputline("maincpu", 12);
-	ymf.add_route(0, "rspeaker", 1.0); // Output for each screen
-	ymf.add_route(1, "lspeaker", 1.0);
-	ymf.add_route(2, "rspeaker", 1.0);
-	ymf.add_route(3, "lspeaker", 1.0);
-	ymf.add_route(4, "rspeaker", 1.0);
-	ymf.add_route(5, "lspeaker", 1.0);
+	ymf.add_route(0, "speaker", 1.0, 1); // Output for each screen
+	ymf.add_route(1, "speaker", 1.0, 0);
+	ymf.add_route(2, "speaker", 1.0, 1);
+	ymf.add_route(3, "speaker", 1.0, 0);
+	ymf.add_route(4, "speaker", 1.0, 1);
+	ymf.add_route(5, "speaker", 1.0, 0);
 }
 
 void psikyo4_state::ps4small(machine_config &config)

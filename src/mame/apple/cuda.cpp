@@ -218,7 +218,7 @@ void cuda_device::pc_w(u8 data)
 				}
 
 				system_time systime;
-				struct tm cur_time, macref;
+				struct tm cur_time;
 				machine().current_datetime(systime);
 
 				cur_time.tm_sec = systime.local_time.second;
@@ -229,16 +229,8 @@ void cuda_device::pc_w(u8 data)
 				cur_time.tm_year = systime.local_time.year - 1900;
 				cur_time.tm_isdst = 0;
 
-				macref.tm_sec = 0;
-				macref.tm_min = 0;
-				macref.tm_hour = 0;
-				macref.tm_mday = 1;
-				macref.tm_mon = 0;
-				macref.tm_year = 4;
-				macref.tm_isdst = 0;
-				u32 ref = (u32)mktime(&macref);
-
-				u32 seconds = (u32)((u32)mktime(&cur_time) - ref);
+				// add the offset between the Unix epoch and the classic Mac OS epoch (hat tip to https://www.epochconverter.com/mac)
+				u32 seconds = (u32)(mktime(&cur_time) + 2082844800);
 				m_maincpu->write_internal_ram(0xae - 0x90, seconds & 0xff);
 				m_maincpu->write_internal_ram(0xad - 0x90, (seconds >> 8) & 0xff);
 				m_maincpu->write_internal_ram(0xac - 0x90, (seconds >> 16) & 0xff);

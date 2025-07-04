@@ -453,15 +453,14 @@ void pcfx_state::pcfx(machine_config &config)
 	SOFTWARE_LIST(config, "cd_list").set_original("pcfx");
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	huc6230_device &huc6230(HuC6230(config, "huc6230", XTAL(21'477'272)));
 	huc6230.adpcm_update_cb<0>().set("huc6272", FUNC(huc6272_device::adpcm_update_0));
 	huc6230.adpcm_update_cb<1>().set("huc6272", FUNC(huc6272_device::adpcm_update_1));
 	huc6230.vca_callback().set("huc6272", FUNC(huc6272_device::cdda_update));
-	huc6230.add_route(0, "lspeaker", 1.0);
-	huc6230.add_route(1, "rspeaker", 1.0);
+	huc6230.add_route(0, "speaker", 1.0, 0);
+	huc6230.add_route(1, "speaker", 1.0, 1);
 }
 
 

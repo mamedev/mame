@@ -100,8 +100,7 @@ void magiceyes_vr3520f_game_state::leapfrog_didj(machine_config &config)
 	screen.set_visarea(0, 640-1, 0, 480-1);
 	screen.set_screen_update(FUNC(magiceyes_vr3520f_game_state::screen_update));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "leapfrog_didj_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);

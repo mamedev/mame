@@ -1234,11 +1234,11 @@ s32 aica_device::UpdateSlot(AICA_SLOT *slot)
 	return sample;
 }
 
-void aica_device::DoMasterSamples(std::vector<read_stream_view> const &inputs, write_stream_view &bufl, write_stream_view &bufr)
+void aica_device::DoMasterSamples(sound_stream &stream)
 {
 	int i;
 
-	for (int s = 0; s < bufl.samples(); ++s)
+	for (int s = 0; s < stream.samples(); ++s)
 	{
 		s32 smpl = 0, smpr = 0;
 
@@ -1279,7 +1279,7 @@ void aica_device::DoMasterSamples(std::vector<read_stream_view> const &inputs, w
 		{
 			if (EFSDL(i + 16)) // 16,17 for EXTS
 			{
-				m_DSP.EXTS[i] = s16(inputs[i].get(s) * 32767.0);
+				m_DSP.EXTS[i] = s16(stream.get(i, s) * 32767.0);
 				u32 Enc = ((EFPAN(i + 16)) << 0x8) | ((EFSDL(i + 16)) << 0xd);
 				smpl += (m_DSP.EXTS[i] * m_LPANTABLE[Enc]) >> SHIFT;
 				smpr += (m_DSP.EXTS[i] * m_RPANTABLE[Enc]) >> SHIFT;
@@ -1297,9 +1297,9 @@ void aica_device::DoMasterSamples(std::vector<read_stream_view> const &inputs, w
 			smpr = clip16(smpr >> 3);
 		}
 
-		bufl.put_int(s, smpl * m_LPANTABLE[MVOL() << 0xd], 32768 << SHIFT);
+		stream.put_int(0, s, smpl * m_LPANTABLE[MVOL() << 0xd], 32768 << SHIFT);
 		// TODO: diverges with SCSP, also wut?
-		bufr.put_int(s, smpr * m_LPANTABLE[MVOL() << 0xd], 32768 << SHIFT);
+		stream.put_int(1, s, smpr * m_LPANTABLE[MVOL() << 0xd], 32768 << SHIFT);
 	}
 }
 
@@ -1385,9 +1385,9 @@ void aica_device::exec_dma()
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void aica_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void aica_device::sound_stream_update(sound_stream &stream)
 {
-	DoMasterSamples(inputs, outputs[0], outputs[1]);
+	DoMasterSamples(stream);
 }
 
 //-------------------------------------------------

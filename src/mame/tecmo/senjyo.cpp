@@ -171,9 +171,9 @@ void senjyo_state::senjyo_sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x4000, 0x43ff).ram();
-	map(0x8000, 0x8000).w("sn1", FUNC(sn76496_device::write));
-	map(0x9000, 0x9000).w("sn2", FUNC(sn76496_device::write));
-	map(0xa000, 0xa000).w("sn3", FUNC(sn76496_device::write));
+	map(0x8000, 0x8000).w("sn1", FUNC(sn76489a_device::write));
+	map(0x9000, 0x9000).w("sn2", FUNC(sn76489a_device::write));
+	map(0xa000, 0xa000).w("sn3", FUNC(sn76489a_device::write));
 	map(0xd000, 0xd000).w(FUNC(senjyo_state::dac_volume_w));
 	map(0xe000, 0xe000).w(FUNC(senjyo_state::dac_enable_w));
 }
@@ -238,9 +238,9 @@ void senjyo_state::starforb_sound_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
 	map(0x4000, 0x43ff).ram();
-	map(0x8000, 0x8000).w("sn1", FUNC(sn76496_device::write));
-	map(0x9000, 0x9000).w("sn2", FUNC(sn76496_device::write));
-	map(0xa000, 0xa000).w("sn3", FUNC(sn76496_device::write));
+	map(0x8000, 0x8000).w("sn1", FUNC(sn76489a_device::write));
+	map(0x9000, 0x9000).w("sn2", FUNC(sn76489a_device::write));
+	map(0xa000, 0xa000).w("sn3", FUNC(sn76489a_device::write));
 	map(0xd000, 0xd000).w(FUNC(senjyo_state::dac_volume_w));
 	map(0xe000, 0xe000).w(FUNC(senjyo_state::dac_enable_w));
 	map(0xf000, 0xffff).ram();
@@ -601,9 +601,9 @@ void senjyo_state::senjyo(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker").front_center();
 
-	SN76496(config, "sn1", 2000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
-	SN76496(config, "sn2", 2000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
-	SN76496(config, "sn3", 2000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	SN76489A(config, "sn1", 2000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	SN76489A(config, "sn2", 2000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
+	SN76489A(config, "sn3", 2000000).add_route(ALL_OUTPUTS, "speaker", 0.5);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set(m_pio, FUNC(z80pio_device::strobe_a)).invert();

@@ -68,9 +68,6 @@ class i960_cpu_device :  public cpu_device
 public:
 	static constexpr uint16_t BURST = 0x0001;
 
-	// construction/destruction
-	i960_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
 	void i960_stall()
 	{
 		m_stalled = true;
@@ -78,6 +75,8 @@ public:
 	}
 
 protected:
+	i960_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	enum { I960_RCACHE_SIZE = 4 };
 
 	// device-level overrides
@@ -180,7 +179,21 @@ private:
 	void do_ret();
 };
 
+class i80960ka_device : public i960_cpu_device
+{
+public:
+	// construction/destruction
+	i80960ka_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
 
-DECLARE_DEVICE_TYPE(I960, i960_cpu_device)
+class i80960kb_device : public i960_cpu_device
+{
+public:
+	// construction/destruction
+	i80960kb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+DECLARE_DEVICE_TYPE(I80960KA, i80960ka_device)
+DECLARE_DEVICE_TYPE(I80960KB, i80960kb_device)
 
 #endif // MAME_CPU_I960_I960_H

@@ -208,7 +208,6 @@ void lua_engine::initialize_input(sol::table &emu)
 	natkeyboard_type["paste"] = &natural_keyboard::paste;
 	natkeyboard_type["dump"] = static_cast<std::string (natural_keyboard::*)() const>(&natural_keyboard::dump);
 	natkeyboard_type["empty"] = sol::property(&natural_keyboard::empty);
-	natkeyboard_type["full"] = sol::property(&natural_keyboard::full);
 	natkeyboard_type["can_post"] = sol::property(&natural_keyboard::can_post);
 	natkeyboard_type["is_posting"] = sol::property(&natural_keyboard::is_posting);
 	natkeyboard_type["in_use"] = sol::property(&natural_keyboard::in_use, &natural_keyboard::set_in_use);
@@ -469,7 +468,7 @@ void lua_engine::initialize_input(sol::table &emu)
 
 	auto input_class_type = sol().registry().new_usertype<input_class>("input_class", sol::no_constructor);
 	input_class_type["name"] = sol::property(&input_class::name);
-	input_class_type["enabled"] = sol::property(&input_class::enabled);
+	input_class_type["enabled"] = sol::property(&input_class::enabled, &input_class::enable);
 	input_class_type["multi"] = sol::property(&input_class::multi);
 	input_class_type["devices"] = sol::property(
 			[this] (input_class &devclass)

@@ -1182,8 +1182,7 @@ void macpdm_state::macpdm(machine_config &config)
 	m_video->set_PDM();
 	m_video->screen_vblank().set(FUNC(macpdm_state::vblank_irq));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	AWACS(config, m_awacs, SOUND_CLOCK/2);
 	m_awacs->irq_out_cb().set(FUNC(macpdm_state::sndo_dma_irq));
@@ -1191,8 +1190,8 @@ void macpdm_state::macpdm(machine_config &config)
 	m_awacs->dma_output().set(FUNC(macpdm_state::sound_dma_output));
 	m_awacs->dma_input().set(FUNC(macpdm_state::sound_dma_input));
 
-	m_awacs->add_route(0, "lspeaker", 1.0);
-	m_awacs->add_route(1, "rspeaker", 1.0);
+	m_awacs->add_route(0, "speaker", 1.0, 0);
+	m_awacs->add_route(1, "speaker", 1.0, 1);
 
 	NSCSI_BUS(config, m_scsibus);
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, "harddisk");
@@ -1201,8 +1200,8 @@ void macpdm_state::macpdm(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
 		[](device_t *device)
 		{
-			device->subdevice<cdda_device>("cdda")->add_route(0, "^^lspeaker", 1.0);
-			device->subdevice<cdda_device>("cdda")->add_route(1, "^^rspeaker", 1.0);
+			device->subdevice<cdda_device>("cdda")->add_route(0, "^^speaker", 1.0, 0);
+			device->subdevice<cdda_device>("cdda")->add_route(1, "^^speaker", 1.0, 1);
 		});
 	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);

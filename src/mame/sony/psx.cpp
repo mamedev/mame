@@ -518,11 +518,10 @@ void psx1_state::psx_base(machine_config &config)
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	spu_device &spu(SPU(config, "spu", XTAL(67'737'600)/2, m_maincpu.target()));
-	spu.add_route(0, "lspeaker", 1.00);
-	spu.add_route(1, "rspeaker", 1.00);
+	spu.add_route(0, "speaker", 1.00, 0);
+	spu.add_route(1, "speaker", 1.00, 1);
 
 	QUICKLOAD(config, "quickload", "cpe,exe,psf,psx").set_load_callback(FUNC(psx1_state::quickload_exe));
 

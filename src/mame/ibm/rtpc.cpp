@@ -13,6 +13,7 @@
  *   - finish refactoring iocc
  *   - additional machine variants
  *   - configurable RAM size
+ *   - kls locator
  */
 /*
  * https://www-01.ibm.com/common/ssi/ShowDoc.wss?docURL=/common/ssi/rep_ca/6/897/ENUS186-006/index.html
@@ -74,42 +75,40 @@
 
 #include "emu.h"
 
+#include "rosetta.h"
+#include "rtpc_iocc.h"
+#include "rtpc_kbd.h"
+#include "rtpc_kbdc.h"
+
 // cpu and memory
 #include "cpu/romp/romp.h"
 #include "cpu/mcs51/mcs51.h"
 
 // various hardware
-#include "rosetta.h"
-#include "rtpc_iocc.h"
+#include "imagedev/floppy.h"
 #include "machine/am9517a.h"
-#include "machine/pic8259.h"
+#include "machine/clock.h"
 #include "machine/i8255.h"
+#include "machine/input_merger.h"
 #include "machine/mc146818.h"
+#include "machine/pic8259.h"
 #include "machine/z80scc.h"
-#include "machine/timer.h"
-
-// isa bus
-#include "bus/isa/isa.h"
-#include "bus/isa/isa_cards.h"
-#include "bus/isa/mda.h"
-#include "bus/isa/fdc.h"
+#include "sound/spkrdev.h"
 
 // busses and connectors
+#include "bus/isa/isa.h"
+#include "bus/isa/isa_cards.h"
+#include "bus/isa/fdc.h"
+#include "bus/isa/ide.h"
+#include "bus/isa/mda.h"
 #include "bus/rs232/rs232.h"
-#include "bus/rtpc/kbd_con.h"
-#include "bus/rtpc/kbd.h"
 
-#include "sound/spkrdev.h"
-#include "machine/input_merger.h"
-
-#include "imagedev/floppy.h"
+#include "rtpc.lh"
 
 #define LOG_KLS     (1U << 1)
 
 //#define VERBOSE (LOG_GENERAL|LOG_KLS)
 #include "logmacro.h"
-
-#include "rtpc.lh"
 
 namespace {
 
@@ -128,8 +127,9 @@ public:
 		, m_rtc(*this, "rtc")
 		, m_scc(*this, "scc")
 		, m_isa(*this, "isa")
-		, m_kbd_con(*this, "kbd_con")
-		, m_speaker(*this, "kbd_con:kbd:speaker")
+		, m_slot(*this, "isa%u", 1U)
+		, m_kbdc(*this, "kbdc")
+		, m_speaker(*this, "kbdc:kbd:speaker")
 		, m_ipl(*this, "ipl")
 	{
 	}
@@ -140,11 +140,10 @@ public:
 	void init_common();
 
 protected:
-	// driver_device overrides
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	void iocc_mem_map(address_map &map) { map.unmap_value_high(); }
+	void iocc_mem_map(address_map &map);
 	template <bool SCC> void iocc_pio_map(address_map &map) ATTR_COLD;
 	void mcu_pgm_map(address_map &map) ATTR_COLD;
 
@@ -160,16 +159,10 @@ protected:
 	void crrb_w(u8 data);
 	void dia_w(u8 data);
 
-	void mcu_timer(timer_device &timer, s32 param)
-	{
-		m_mcu->set_input_line(MCS51_T0_LINE, 1);
-		m_mcu->set_input_line(MCS51_T0_LINE, 0);
-	}
-
 	void speaker()
 	{
 		if (m_speaker)
-			m_speaker->level_w(!BIT(m_mcu_p2, 7) ? m_mcu_p1 >> 6 : 0);
+			m_speaker->level_w((m_mcu_p2 & KLS_P27) ? 0 : m_mcu_p1 >> 6);
 	}
 
 	// devices
@@ -185,7 +178,8 @@ protected:
 	optional_device<z80scc_device> m_scc;
 
 	required_device<isa16_device> m_isa;
-	required_device<rtpc_kbd_con_device> m_kbd_con;
+	optional_device_array<device_t, 8> m_slot;
+	required_device<rtpc_kbdc_device> m_kbdc;
 	optional_device<speaker_sound_device> m_speaker;
 
 	required_region_ptr<u32> m_ipl;
@@ -193,8 +187,49 @@ protected:
 	u8 m_kls_cmd;
 
 	u8 m_mcu_p0;
+	enum kls_p1_mask : u8
+	{
+		KLS_P10 = 0x01, // cmd08 (i)
+		KLS_P11 = 0x02, // cmd09 (i)
+		KLS_P12 = 0x04, // cmd10 (i)
+		KLS_P13 = 0x08, // cmd11 (i)
+		KLS_P14 = 0x10, // cmd12 (i)
+		KLS_P15 = 0x20, // keylock switch (i)
+		KLS_P16 = 0x40, // speaker volume 0 (o)
+		KLS_P17 = 0x80, // speaker volume 1 (o)
+
+		KLS_CMD = 0x1f,
+		KLS_P1O = 0xc0, // port 1 outputs
+	};
 	u8 m_mcu_p1;
+	enum kls_p2_mask : u8
+	{
+		KLS_P20 = 0x01, // iid0 (o)
+		KLS_P21 = 0x02, // iid1 (o)
+		KLS_P22 = 0x04, // iid2 (o)
+		KLS_P23 = 0x08, // i/o channel system reset, active low (o)
+		KLS_P24 = 0x10, // ppi -stb (o)
+		KLS_P25 = 0x20, // ppi ibf (i)
+		KLS_P26 = 0x40, // ppi -ack (o)
+		KLS_P27 = 0x80, // speaker frequency (o)
+
+		KLS_IID = 0x07,
+		KLS_P2O = 0xdf, // port 2 outputs
+	};
 	u8 m_mcu_p2;
+	enum kls_p3_mask : u8
+	{
+		KLS_P30 = 0x01, // uart rx (i)
+		KLS_P31 = 0x02, // uart tx (o)
+		KLS_P32 = 0x04, // kbd clock/-int0 (i)
+		KLS_P33 = 0x08, // ppi -obf/-int1 (i)
+		KLS_P34 = 0x10, // 32kHz/t0 (i)
+		KLS_P35 = 0x20, // kbd data (i)
+		KLS_P36 = 0x40, // kbd data (o)
+		KLS_P37 = 0x80, // kbd clock (o)
+
+		KLS_P3O = 0xc2, // port 3 outputs
+	};
 	u8 m_mcu_p3;
 
 	u8 m_ppi_pa;
@@ -214,10 +249,10 @@ void rtpc_state::machine_start()
 {
 	m_kls_cmd = 0;
 
-	m_mcu_p0 = 0;
-	m_mcu_p1 = 0;
-	m_mcu_p2 = 0;
-	m_mcu_p3 = 0;
+	m_mcu_p0 = 0xff;
+	m_mcu_p1 = 0xff & ~KLS_P15;
+	m_mcu_p2 = 0xff;
+	m_mcu_p3 = 0xff;
 
 	m_ppi_pa = 0;
 	m_ppi_pb = 0;
@@ -237,9 +272,20 @@ void rtpc_state::init_common()
 		m_speaker->set_levels(4, speaker_levels);
 }
 
+void rtpc_state::iocc_mem_map(address_map &map)
+{
+	map.unmap_value_high();
+
+	// HACK: temporarily silence noisy probing for absent hardware
+	map(0x0b'8000, 0x0b'8fff).noprw();
+	map(0xe0'0000, 0xe1'ffff).noprw();
+}
+
 template <bool SCC> void rtpc_state::iocc_pio_map(address_map &map)
 {
-	map(0x00'01e8, 0x00'01ef).noprw(); // FIXME: silence streaming tape drive adapter probes
+	// HACK: temporarily silence noisy probing for absent hardware
+	map(0x00'0110, 0x00'0113).noprw();
+	map(0x00'01e8, 0x00'01ef).noprw();
 
 	if (SCC)
 	{
@@ -287,11 +333,8 @@ void rtpc_state::mcu_pgm_map(address_map &map)
 
 void rtpc_state::mcu_port1_w(u8 data)
 {
-	// bit  function
-	//  6   speaker volume 0
-	//  7   speaker volume 1
 	LOGMASKED(LOG_KLS, "kls volume %d\n", data >> 6);
-	m_mcu_p1 = (m_mcu_p1 & 0x3f) | (data & 0xc0);
+	m_mcu_p1 = (m_mcu_p1 & ~KLS_P1O) | (data & KLS_P1O);
 
 	// speaker volume wraps to ppi port b.6 and b.5
 	m_ppi_pb &= ~0x60;
@@ -302,17 +345,7 @@ void rtpc_state::mcu_port1_w(u8 data)
 
 void rtpc_state::mcu_port2_w(u8 data)
 {
-	// bit  i/o  function
-	//  0    o   ppi port c.0 (iid0)
-	//  1    o   ppi port c.1 (iid1)
-	//  2    o   ppi port c.2 (iid2)
-	//  3    o   i/o channel system reset (active low)
-	//  4    o   ppi port c.4 (-stb)
-	//  5    i   ppi port c.5 (ibf)
-	//  6    o   ppi port c.6 (-ack)
-	//  7    o   speaker frequency
-
-	if ((data ^ m_mcu_p2) & 7)
+	if ((data ^ m_mcu_p2) & KLS_IID)
 	{
 		static const char *const mcu_code[] =
 		{
@@ -322,10 +355,10 @@ void rtpc_state::mcu_port2_w(u8 data)
 		LOGMASKED(LOG_KLS, "kls mcu iid %d: %s\n", data & 7, mcu_code[data & 7]);
 	}
 
-	if ((data ^ m_mcu_p2) & 8)
+	if ((data ^ m_mcu_p2) & KLS_P23)
 		LOGMASKED(LOG_KLS, "kls mcu system reset %d\n", BIT(data, 3));
 
-	if ((data ^ m_mcu_p2) & 0x10)
+	if ((data ^ m_mcu_p2) & KLS_P24)
 	{
 		if (!BIT(data, 4))
 		{
@@ -335,7 +368,7 @@ void rtpc_state::mcu_port2_w(u8 data)
 		m_ppi->pc4_w(BIT(data, 4));
 	}
 
-	if ((data ^ m_mcu_p2) & 0x40)
+	if ((data ^ m_mcu_p2) & KLS_P26)
 	{
 
 		m_ppi->pc6_w(BIT(data, 6));
@@ -346,7 +379,7 @@ void rtpc_state::mcu_port2_w(u8 data)
 		}
 	}
 
-	m_mcu_p2 = (m_mcu_p2 & ~0xdf) | (data & 0xdf);
+	m_mcu_p2 = (m_mcu_p2 & ~KLS_P2O) | (data & KLS_P2O);
 
 	// speaker frequency wraps to ppi port b.7
 	m_ppi_pb = (m_ppi_pb & ~0x80) | (~data & 0x80);
@@ -359,29 +392,25 @@ void rtpc_state::mcu_port2_w(u8 data)
 
 void rtpc_state::mcu_port3_w(u8 data)
 {
-	// bit  i/o  function
-	//  0    i   uart rx
-	//  1    o   uart tx
-	//  2    i   kbd clock in (-int0)
-	//  3    i   ppi -obf (-int1)
-	//  4    i   32 kHz (t0)
-	//  5    i   kbd data in
-	//  6    o   kbd data out
-	//  7    o   kbd clock out
-
 	// uart txd -> rxd wrap
 	if (BIT(m_kls_cmd, 5))
 	{
 		if (BIT(data, 1))
-			m_mcu_p3 |= 1;
+		{
+			m_ppi_pb |= 0x01;
+			m_mcu_p3 |= KLS_P30;
+		}
 		else
-			m_mcu_p3 &= ~1;
+		{
+			m_ppi_pb &= ~0x01;
+			m_mcu_p3 &= ~KLS_P30;
+		}
 	}
 
-	m_kbd_con->data_write_from_mb(BIT(data, 6));
-	m_kbd_con->clock_write_from_mb(BIT(data, 7));
+	m_kbdc->data_write_from_mb(BIT(data, 6));
+	m_kbdc->clock_write_from_mb(BIT(data, 7));
 
-	m_mcu_p3 = (m_mcu_p3 & ~0xc2) | (data & 0xc2);
+	m_mcu_p3 = (m_mcu_p3 & ~KLS_P3O) | (data & KLS_P3O);
 }
 
 /*
@@ -410,14 +439,21 @@ void rtpc_state::ppi_portc_w(u8 data)
 	if (BIT(m_ppi_pc ^ data, 5))
 	{
 		if (BIT(data, 5))
-			m_mcu_p2 |= 0x20;
+			m_mcu_p2 |= KLS_P25;
 		else
-			m_mcu_p2 &= ~0x20;
+			m_mcu_p2 &= ~KLS_P25;
 	}
 
 	// bit 7 (-obf) -> mcu p3.3 (-int1)
 	if (BIT(m_ppi_pc ^ data, 7))
+	{
+		if (BIT(data, 7))
+			m_mcu_p3 |= KLS_P33;
+		else
+			m_mcu_p3 &= ~KLS_P33;
+
 		m_mcu->set_input_line(MCS51_INT1_LINE, !BIT(data, 7));
+	}
 
 	m_ppi_pc = (m_ppi_pc & ~0xa8) | (data & 0xa8);
 }
@@ -426,10 +462,10 @@ void rtpc_state::kls_cmd_w(u16 data)
 {
 	LOGMASKED(LOG_KLS, "kls command 0x%02x data 0x%02x (%s)\n", data >> 8, u8(data), machine().describe_context());
 
-	// 00cc cccc dddd dddd
+	// 00rc cccc dddd dddd
 	m_kls_cmd = BIT(data, 8, 6);
 
-	switch (m_kls_cmd & 0x1f)
+	switch (m_kls_cmd & KLS_CMD)
 	{
 	case 0x0: // extended command
 		switch (u8(data))
@@ -461,23 +497,18 @@ void rtpc_state::kls_cmd_w(u16 data)
 		break;
 	}
 
-	m_mcu_p1 = (m_mcu_p1 & 0xe0) | (m_kls_cmd & 0x1f);
+	m_mcu_p1 = (m_mcu_p1 & ~KLS_CMD) | (m_kls_cmd & KLS_CMD);
 	m_ppi->write(0, data);
 }
 
 void rtpc_state::crra_w(u8 data)
 {
-	LOG("crra_w 0x%02x\n", data);
+	LOG("crra_w 0x%02x (%s)\n", data, machine().describe_context());
 
-	// bit  function
-	//  0   i/o slot 1
-	//  1   i/o slot 2
-	//  2   i/o slot 3
-	//  3   i/o slot 4
-	//  4   i/o slot 5
-	//  5   i/o slot 6
-	//  6   i/o slot 7
-	//  7   i/o slot 8
+	// selectively reset i/o slots 1..8
+	for (unsigned i = 0; i < 8; i++)
+		if (BIT(data, i) && !BIT(m_crra, i) && m_slot[i].found())
+			m_slot[i]->reset();
 
 	m_crra = data;
 }
@@ -575,14 +606,23 @@ void rtpc_state::common(machine_config &config)
 	m_mcu->set_addrmap(AS_PROGRAM, &rtpc_state::mcu_pgm_map);
 	m_mcu->port_in_cb<0>().set([this]() { return m_mcu_p0; });
 	m_mcu->port_out_cb<0>().set([this](u8 data) { m_mcu_p0 = data; });
-	m_mcu->port_in_cb<1>().set([this]() { return m_mcu_p1 | 0xc0; });
+	m_mcu->port_in_cb<1>().set([this]() { return m_mcu_p1; });
 	m_mcu->port_out_cb<1>().set(FUNC(rtpc_state::mcu_port1_w));
-	m_mcu->port_in_cb<2>().set([this]() { return m_mcu_p2 | 0xdf; });
+	m_mcu->port_in_cb<2>().set([this]() { return m_mcu_p2; });
 	m_mcu->port_out_cb<2>().set(FUNC(rtpc_state::mcu_port2_w));
-	m_mcu->port_in_cb<3>().set([this]() { return m_mcu_p3 | 0xce; });
+	m_mcu->port_in_cb<3>().set([this]() { return m_mcu_p3; });
 	m_mcu->port_out_cb<3>().set(FUNC(rtpc_state::mcu_port3_w));
 
-	TIMER(config, "mcu_timer").configure_periodic(FUNC(rtpc_state::mcu_timer), attotime::from_hz(32768));
+	CLOCK(config, "mcu_t0", 32'768).signal_handler().set(
+		[this](int state)
+		{
+			if (state)
+				m_mcu_p3 |= KLS_P34;
+			else
+				m_mcu_p3 &= ~KLS_P34;
+
+			m_mcu->set_input_line(MCS51_T0_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+		});
 
 	RTPC_IOCC(config, m_iocc, 0);
 	m_iocc->set_addrmap(0, &rtpc_state::iocc_mem_map);
@@ -716,11 +756,27 @@ void rtpc_state::common(machine_config &config)
 	m_ppi->out_pc_callback().set(FUNC(rtpc_state::ppi_portc_w));
 	m_ppi->in_pc_callback().set([this]() { return m_ppi_pc; });
 
-	RTPC_KBD_CON(config, m_kbd_con);
-	m_kbd_con->option_add("kbd", RTPC_KBD);
-	m_kbd_con->set_default_option("kbd");
-	m_kbd_con->out_data_cb().set([this](int state) { if (state) m_mcu_p3 |= 0x20; else m_mcu_p3 &= ~0x20; });
-	m_kbd_con->out_clock_cb().set_inputline(m_mcu, MCS51_INT0_LINE).invert();
+	RTPC_KBDC(config, m_kbdc);
+	m_kbdc->option_add("kbd", RTPC_KBD);
+	m_kbdc->set_default_option("kbd");
+	m_kbdc->out_data_cb().set(
+		[this](int state)
+		{
+			if (state)
+				m_mcu_p3 |= KLS_P35;
+			else
+				m_mcu_p3 &= ~KLS_P35;
+		});
+	m_kbdc->out_clock_cb().set(
+		[this](int state)
+		{
+			if (state)
+				m_mcu_p3 |= KLS_P32;
+			else
+				m_mcu_p3 &= ~KLS_P32;
+
+			m_mcu->set_input_line(MCS51_INT0_LINE, state ? CLEAR_LINE : ASSERT_LINE);
+		});
 
 	// MC146818AP
 	// IL 0A46D8729
@@ -756,6 +812,7 @@ void rtpc_isa16_cards(device_slot_interface &device)
 {
 	// FIXME: need 16-bit combined hdc/fdc card
 	device.option_add("fdc", ISA8_FDC_AT);
+	device.option_add("ide", ISA16_IDE);
 }
 
 void rtpc_state::ibm6150(machine_config &config)
@@ -788,14 +845,14 @@ void rtpc_state::ibm6150(machine_config &config)
 	m_scc->out_txdb_callback().set(port1, FUNC(rs232_port_device::write_txd));
 
 	// ISA slots
-	ISA16_SLOT(config, "isa1", 0, m_isa, rtpc_isa16_cards, "fdc",   false); // slot 1: disk/diskette adapter
-	ISA16_SLOT(config, "isa2", 0, m_isa, rtpc_isa16_cards, nullptr, false); // slot 2: option
-	ISA8_SLOT(config,  "isa3", 0, m_isa, rtpc_isa8_cards,  "mda",   false); // slot 3: option
-	ISA16_SLOT(config, "isa4", 0, m_isa, rtpc_isa16_cards, nullptr, false); // slot 4: option
-	ISA16_SLOT(config, "isa5", 0, m_isa, rtpc_isa16_cards, nullptr, false); // slot 5: option
-	ISA8_SLOT(config,  "isa6", 0, m_isa, rtpc_isa8_cards,  nullptr, false); // slot 6: option
-	ISA16_SLOT(config, "isa7", 0, m_isa, rtpc_isa16_cards, nullptr, false); // slot 7: option
-	ISA16_SLOT(config, "isa8", 0, m_isa, rtpc_isa16_cards, nullptr, false); // slot 8: coprocessor/option
+	ISA16_SLOT(config, m_slot[0], 0, m_isa, rtpc_isa16_cards, "fdc",   false); // slot 1: disk/diskette adapter
+	ISA16_SLOT(config, m_slot[1], 0, m_isa, rtpc_isa16_cards, nullptr, false); // slot 2: option
+	ISA8_SLOT(config,  m_slot[2], 0, m_isa, rtpc_isa8_cards,  "mda",   false); // slot 3: option
+	ISA16_SLOT(config, m_slot[3], 0, m_isa, rtpc_isa16_cards, nullptr, false); // slot 4: option
+	ISA16_SLOT(config, m_slot[4], 0, m_isa, rtpc_isa16_cards, nullptr, false); // slot 5: option
+	ISA8_SLOT(config,  m_slot[5], 0, m_isa, rtpc_isa8_cards,  nullptr, false); // slot 6: option
+	ISA16_SLOT(config, m_slot[6], 0, m_isa, rtpc_isa16_cards, nullptr, false); // slot 7: option
+	ISA16_SLOT(config, m_slot[7], 0, m_isa, rtpc_isa16_cards, nullptr, false); // slot 8: coprocessor/option
 }
 
 void rtpc_state::ibm6151(machine_config &config)
@@ -804,12 +861,12 @@ void rtpc_state::ibm6151(machine_config &config)
 	m_iocc->set_addrmap(2, &rtpc_state::iocc_pio_map<false>);
 
 	// ISA slots
-	ISA8_SLOT(config,  "isa1", 0, m_isa, rtpc_isa8_cards,  "mda",   false); // slot 1: option
-	ISA16_SLOT(config, "isa2", 0, m_isa, rtpc_isa16_cards, nullptr, false); // slot 2: option
-	ISA16_SLOT(config, "isa3", 0, m_isa, rtpc_isa16_cards, nullptr, false); // slot 2: option
-	ISA16_SLOT(config, "isa4", 0, m_isa, rtpc_isa16_cards, nullptr, false); // slot 4: option
-	ISA16_SLOT(config, "isa5", 0, m_isa, rtpc_isa16_cards, nullptr, false); // slot 5: coprocessor/option
-	ISA16_SLOT(config, "isa6", 0, m_isa, rtpc_isa16_cards, "fdc",   false); // slot 6: disk/diskette adapter
+	ISA8_SLOT(config,  m_slot[0], 0, m_isa, rtpc_isa8_cards,  "mda",   false); // slot 1: option
+	ISA16_SLOT(config, m_slot[1], 0, m_isa, rtpc_isa16_cards, nullptr, false); // slot 2: option
+	ISA16_SLOT(config, m_slot[2], 0, m_isa, rtpc_isa16_cards, nullptr, false); // slot 2: option
+	ISA16_SLOT(config, m_slot[3], 0, m_isa, rtpc_isa16_cards, nullptr, false); // slot 4: option
+	ISA16_SLOT(config, m_slot[4], 0, m_isa, rtpc_isa16_cards, nullptr, false); // slot 5: coprocessor/option
+	ISA16_SLOT(config, m_slot[5], 0, m_isa, rtpc_isa16_cards, "fdc",   false); // slot 6: disk/diskette adapter
 }
 
 ROM_START(ibm6150)

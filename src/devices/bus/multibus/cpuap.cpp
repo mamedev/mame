@@ -39,7 +39,6 @@ cpuap_device::cpuap_device(machine_config const &mconfig, char const *tag, devic
 	, m_s7(*this, "S7")
 	, m_s8(*this, "S8")
 	, m_boot(*this, "boot")
-	, m_installed(false)
 {
 }
 
@@ -139,22 +138,6 @@ void cpuap_device::device_start()
 
 void cpuap_device::device_reset()
 {
-	if (!m_installed)
-	{
-		// TODO: what's exposed to the Multibus?
-
-		m_bus->int_callback<0>().set(m_icu, FUNC(ns32202_device::ir_w<0>));
-		m_bus->int_callback<1>().set(m_icu, FUNC(ns32202_device::ir_w<1>));
-		m_bus->int_callback<2>().set(m_icu, FUNC(ns32202_device::ir_w<3>));
-		m_bus->int_callback<3>().set(m_icu, FUNC(ns32202_device::ir_w<4>));
-		m_bus->int_callback<4>().set(m_icu, FUNC(ns32202_device::ir_w<6>));
-		m_bus->int_callback<5>().set(m_icu, FUNC(ns32202_device::ir_w<7>));
-		m_bus->int_callback<6>().set(m_icu, FUNC(ns32202_device::ir_w<8>));
-		m_bus->int_callback<7>().set([this](int state) { m_s8->read() ? m_cpu->set_input_line(INPUT_LINE_NMI, !state) : m_icu->ir_w<11>(state); });
-
-		m_installed = true;
-	}
-
 	m_boot.select(0);
 	m_nmi = 0xff;
 }
@@ -181,6 +164,15 @@ void cpuap_device::device_add_mconfig(machine_config &config)
 
 	NS32202(config, m_icu, 20_MHz_XTAL / 2);
 	m_icu->out_int().set_inputline(m_cpu, INPUT_LINE_IRQ0).invert();
+
+	int_callback<0>().set(m_icu, FUNC(ns32202_device::ir_w<0>));
+	int_callback<1>().set(m_icu, FUNC(ns32202_device::ir_w<1>));
+	int_callback<2>().set(m_icu, FUNC(ns32202_device::ir_w<3>));
+	int_callback<3>().set(m_icu, FUNC(ns32202_device::ir_w<4>));
+	int_callback<4>().set(m_icu, FUNC(ns32202_device::ir_w<6>));
+	int_callback<5>().set(m_icu, FUNC(ns32202_device::ir_w<7>));
+	int_callback<6>().set(m_icu, FUNC(ns32202_device::ir_w<8>));
+	int_callback<7>().set([this](int state) { m_s8->read() ? m_cpu->set_input_line(INPUT_LINE_NMI, !state) : m_icu->ir_w<11>(state); });
 
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
 }

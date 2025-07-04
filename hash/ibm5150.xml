@@ -6043,6 +6043,85 @@ Stalls or throws either "Bad command or file name", "disk read error" or "divide
 		</part>
 	</software>
 
+	<software name="freedos14_720">
+		<description>FreeDOS 1.4 (Floppy-Only Edition, 3.5" 720k)</description>
+		<year>2025</year>
+		<publisher>The FreeDOS Project</publisher>
+		<info name="version" value="1.4" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Installer" />
+			<dataarea name="flop" size="737280">
+				<rom name="x86BOOT.img" size="737280" crc="0d52c73c" sha1="8a8e8d43ad11817661ae9cbbff6a0fa372ea76fa" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1" />
+			<dataarea name="flop" size="737280">
+				<rom name="x86DSK01.img" size="737280" crc="3f879626" sha1="1a9eed17c9f9f708fddecb31c764786a80c9ebce" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2" />
+			<dataarea name="flop" size="737280">
+				<rom name="x86DSK02.img" size="737280" crc="5cb6a495" sha1="cf401c8280598e388d6a988c51fd6c17cd6b9ab4" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3" />
+			<dataarea name="flop" size="737280">
+				<rom name="x86DSK03.img" size="737280" crc="6252dc59" sha1="8b0e4acc9efcecae78e922c35fb0f8dc6830baee" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4" />
+			<dataarea name="flop" size="737280">
+				<rom name="x86DSK04.img" size="737280" crc="1197a133" sha1="4bf43573e3fe73d58071d680bbbb00fc32237f15" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5" />
+			<dataarea name="flop" size="737280">
+				<rom name="x86DSK05.img" size="737280" crc="fcdcfe15" sha1="5ff2e3ec4d68802bc59c8f95713a24775d86f745" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6" />
+			<dataarea name="flop" size="737280">
+				<rom name="x86DSK06.img" size="737280" crc="c3246fa2" sha1="2ef78ec8c42b64aaf55273b76cbf3610db0c2885" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 7" />
+			<dataarea name="flop" size="737280">
+				<rom name="x86DSK07.img" size="737280" crc="62545372" sha1="e8be09b41a2f07e183fc5284a3a5b3b76d0c04f5" />
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 8" />
+			<dataarea name="flop" size="737280">
+				<rom name="x86DSK08.img" size="737280" crc="42845f50" sha1="e6ef0bb133dfa86fffe48d1c75162f1f17c8642e" />
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 9" />
+			<dataarea name="flop" size="737280">
+				<rom name="x86DSK09.img" size="737280" crc="b48f740c" sha1="4d995317845a88e5e310a632acaa07cdecd83358" />
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 10" />
+			<dataarea name="flop" size="737280">
+				<rom name="x86DSK10.img" size="737280" crc="7747ce58" sha1="41620723781d8379cb60125cc643d4690667f636" />
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 11" />
+			<dataarea name="flop" size="737280">
+				<rom name="x86DSK11.img" size="737280" crc="09e61f03" sha1="05b019c750f8fa0b0f59dd42760300576edc1b5e" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="k16auto">
 		<description>Kaypro 16 Autoload</description>
 		<year>1984</year>

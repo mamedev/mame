@@ -57,15 +57,15 @@ static int phc25_output_bit(int16_t *buffer, int sample_pos, bool bit)
 
 	if (bit)
 	{
-		samples += phc25_put_samples(buffer, sample_pos + samples, 2, WAVEENTRY_LOW);
 		samples += phc25_put_samples(buffer, sample_pos + samples, 2, WAVEENTRY_HIGH);
 		samples += phc25_put_samples(buffer, sample_pos + samples, 2, WAVEENTRY_LOW);
 		samples += phc25_put_samples(buffer, sample_pos + samples, 2, WAVEENTRY_HIGH);
+		samples += phc25_put_samples(buffer, sample_pos + samples, 2, WAVEENTRY_LOW);
 	}
 	else
 	{
-		samples += phc25_put_samples(buffer, sample_pos + samples, 4, WAVEENTRY_LOW);
 		samples += phc25_put_samples(buffer, sample_pos + samples, 4, WAVEENTRY_HIGH);
+		samples += phc25_put_samples(buffer, sample_pos + samples, 4, WAVEENTRY_LOW);
 	}
 
 	return samples;
@@ -129,7 +129,7 @@ static int phc25_handle_cassette(int16_t *buffer, const uint8_t *bytes)
    Generate samples for the tape image
 ********************************************************************/
 
-static int phc25_cassette_fill_wave(int16_t *buffer, int length, const uint8_t *bytes)
+static int phc25_cassette_fill_wave(int16_t *buffer, int length, const uint8_t *bytes, int)
 {
 	return phc25_handle_cassette(buffer, bytes);
 }

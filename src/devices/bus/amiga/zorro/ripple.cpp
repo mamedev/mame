@@ -29,12 +29,12 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(ZORRO_RIPPLE, bus::amiga::zorro::ripple_ide_device, "zorro_ripple", "RIPPLE IDE Interface")
+DEFINE_DEVICE_TYPE(AMIGA_RIPPLE, bus::amiga::zorro::ripple_ide_device, "amiga_ripple", "RIPPLE IDE Interface")
 
 namespace bus::amiga::zorro {
 
 ripple_ide_device::ripple_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ZORRO_RIPPLE, tag, owner, clock),
+	device_t(mconfig, AMIGA_RIPPLE, tag, owner, clock),
 	device_zorro2_card_interface(mconfig, *this),
 	m_ata_0(*this, "ata_0"),
 	m_ata_1(*this, "ata_1"),
@@ -175,62 +175,39 @@ void ripple_ide_device::autoconfig_base_address(offs_t address)
 	m_base_address = address;
 
 	// stop responding to default autoconfig
-	m_slot->space().unmap_readwrite(0xe80000, 0xe8007f);
+	m_zorro->space().unmap_readwrite(0xe80000, 0xe8007f);
 
 	// flash occupies our space until the ide registers are switched in
-	m_slot->space().install_readwrite_handler(address, address + 0x1ffff,
+	m_zorro->space().install_readwrite_handler(address, address + 0x1ffff,
 		emu::rw_delegate(m_flash, FUNC(intelfsh8_device::read)),
-		emu::rw_delegate(m_flash, FUNC(intelfsh8_device::write)), 0xff00ff00);
+		emu::rw_delegate(m_flash, FUNC(intelfsh8_device::write)), 0xff00);
 
 	// install write tap to handle switching in ide registers
 	m_write_tap.remove();
+	m_write_tap = m_zorro->space().install_write_tap(
+		address, address + 0x1ffff,
+		"flash_disable_w",
+		[this] (offs_t offset, uint16_t &data, uint16_t mem_mask)
+		{
+			m_write_tap.remove();
 
-	if (m_slot->space().data_width() == 16)
-	{
-		m_write_tap = m_slot->space().install_write_tap(
-			address, address + 0x1ffff,
-			"flash_disable_w",
-			[this] (offs_t offset, uint16_t &data, uint16_t mem_mask)
-			{
-				m_write_tap.remove();
+			// ripple registers are now available
+			m_zorro->space().install_device(m_base_address, m_base_address + 0x1ffff, *this, &ripple_ide_device::mmio_map);
 
-				// ripple registers are now available
-				m_slot->space().install_device(m_base_address, m_base_address + 0x1ffff, *this, &ripple_ide_device::mmio_map);
-
-				// we need to repeat the write here as this tap won't hit it yet
-				// the initial write will instead hit the flash, but it's harmless
-				m_slot->space().write_word(offset, data, mem_mask);
-			},
-			&m_write_tap
-		);
-	}
-	else
-	{
-		m_write_tap = m_slot->space().install_write_tap(
-			address, address + 0x1ffff,
-			"flash_disable_w",
-			[this] (offs_t offset, uint32_t &data, uint32_t mem_mask)
-			{
-				m_write_tap.remove();
-
-				// ripple registers are now available
-				m_slot->space().install_device(m_base_address, m_base_address + 0x1ffff, *this, &ripple_ide_device::mmio_map);
-
-				// we need to repeat the write here as this tap won't hit it yet
-				// the initial write will instead hit the flash, but it's harmless
-				m_slot->space().write_dword(offset, data, mem_mask);
-			},
-			&m_write_tap
-		);
-	}
+			// we need to repeat the write here as this tap won't hit it yet
+			// the initial write will instead hit the flash, but it's harmless
+			m_zorro->space().write_word(offset, data, mem_mask);
+		},
+		&m_write_tap
+	);
 
 	// we're done
-	m_slot->cfgout_w(0);
+	m_zorro->cfgout_w(0);
 }
 
 void ripple_ide_device::cfgin_w(int state)
 {
-	LOG("configin_w (%d)\n", state);
+	LOG("cfgin_w (%d)\n", state);
 
 	if (state == 0)
 	{
@@ -248,9 +225,9 @@ void ripple_ide_device::cfgin_w(int state)
 		autoconfig_rom_vector(0x0008);
 
 		// install autoconfig handler
-		m_slot->space().install_readwrite_handler(0xe80000, 0xe8007f,
+		m_zorro->space().install_readwrite_handler(0xe80000, 0xe8007f,
 			read16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_read)),
-			write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffffffff);
+			write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffff);
 	}
 }
 

@@ -14,6 +14,7 @@
 #include "debugcpu.h"
 #include "dvbpoints.h"
 #include "dvdisasm.h"
+#include "dvepoints.h"
 #include "dvmemory.h"
 #include "dvrpoints.h"
 #include "dvstate.h"
@@ -369,6 +370,9 @@ debug_view *debug_view_manager::alloc_view(debug_view_type type, debug_view_osd_
 		case DVT_REGISTER_POINTS:
 			return append(new debug_view_registerpoints(machine(), osdupdate, osdprivate));
 
+		case DVT_EXCEPTION_POINTS:
+			return append(new debug_view_exceptionpoints(machine(), osdupdate, osdprivate));
+
 		default:
 			fatalerror("Attempt to create invalid debug view type %d\n", type);
 	}
@@ -505,9 +509,21 @@ bool debug_view_expression::recompute()
 		{
 			m_parsed.parse(m_string);
 		}
-		catch (expression_error &)
+		catch (expression_error const &)
 		{
-			m_parsed.parse(oldstring);
+			try
+			{
+				// If we got here because the user typed in a new expression,
+				// then going back to the previous expression should work
+				m_parsed.parse(oldstring);
+			}
+			catch (expression_error const &)
+			{
+				// If that didn't work, perhaps the user switched sources
+				// and the previous expression doesn't evaluate with the
+				// new symbol table.  Try "0" as last resort
+				m_parsed.parse("0");
+			}
 		}
 	}
 
@@ -524,7 +540,7 @@ bool debug_view_expression::recompute()
 				changed = true;
 			}
 		}
-		catch (expression_error &)
+		catch (expression_error const &)
 		{
 		}
 	}

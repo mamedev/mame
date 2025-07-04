@@ -59,6 +59,7 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 	virtual void io_w(uint8_t data);
+	virtual uint8_t extio_r();
 	virtual void extio_w(uint8_t data);
 	bool m_isbanked;
 	required_memory_bank m_bank;
@@ -162,6 +163,18 @@ public:
 protected:
 	virtual void extio_w(uint8_t data) override;
 	virtual void machine_reset() override ATTR_COLD;
+};
+
+class nes_sh6578_cjz_state : public nes_sh6578_state
+{
+public:
+	nes_sh6578_cjz_state(const machine_config& mconfig, device_type type, const char* tag) :
+		nes_sh6578_state(mconfig, type, tag)
+	{ }
+
+protected:
+	// TODO, work out the I/O and anything else specific to this machine
+	virtual uint8_t extio_r() override { return machine().rand(); }
 };
 
 uint8_t nes_sh6578_state::bank_r(int bank, uint16_t offset)
@@ -428,6 +441,12 @@ void nes_sh6578_abl_wikid_state::io_w(uint8_t data)
 	}
 }
 
+uint8_t nes_sh6578_state::extio_r()
+{
+	logerror("%s: extio_r\n", machine().describe_context());
+	return 0x00;
+}
+
 void nes_sh6578_state::extio_w(uint8_t data)
 {
 	logerror("%s: extio_w : %02x\n", machine().describe_context(), data);
@@ -476,8 +495,8 @@ void nes_sh6578_state::nes_sh6578_map(address_map& map)
 	//4023 read/write joystick,mouse control
 	//4024 read - mouse port / write - mouse baud
 	//4025 write - Printer Port
-	map(0x4026, 0x4026).w(FUNC(nes_sh6578_state::extio_w));
-	//4027 read/write - DAC data register
+	map(0x4026, 0x4026).rw(FUNC(nes_sh6578_state::extio_r), FUNC(nes_sh6578_state::extio_w));
+	map(0x4027, 0x4027).ram(); //4027 read/write - DAC data register
 
 	map(0x4031, 0x4031).w(FUNC(nes_sh6578_state::initial_startup_w));
 	map(0x4032, 0x4032).w(FUNC(nes_sh6578_state::irq_mask_w));
@@ -517,6 +536,15 @@ static INPUT_PORTS_START(nes_sh6578)
 	PORT_START("IN1")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+static INPUT_PORTS_START(bancook)
+	PORT_START("IN0")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
 
 void nes_sh6578_state::video_start()
 {
@@ -654,7 +682,10 @@ ROM_START( bandggcn )
 	ROM_LOAD( "gogoconniechan.bin", 0x00000, 0x100000, CRC(715d66ae) SHA1(9326c227bad86eea85194a90f746c60dc032a323) )
 ROM_END
 
-
+ROM_START( bancook )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "mx27c8000.ic2", 0x00000, 0x100000, CRC(865bef26) SHA1(82820eac162a2b4b4b5da894df4bfc5521d4f89b) )
+ROM_END
 
 ROM_START( ts_handy11 )
 	ROM_REGION( 0x100000, "maincpu", 0 )
@@ -664,6 +695,21 @@ ROM_END
 ROM_START( cpatrolm )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "citypatrolman.bin", 0x00000, 0x100000, CRC(4b139c67) SHA1(a5b03f472a94ee879f58bbff201b671fbf4f1ea1) )
+ROM_END
+
+ROM_START( bb6578 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "tv game baseball.bin", 0x00000, 0x80000, CRC(dec862b2) SHA1(fb3d97ccde17ab6ead8eafb4e0aafb72fbb6674c) )
+ROM_END
+
+ROM_START( 6578cjz1 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "tv game1.bin", 0x00000, 0x100000, CRC(161c4119) SHA1(b2ce91b070bcaba73c8a23e7067fe8ba41151a40) )
+ROM_END
+
+ROM_START( 6578cjz2 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "tv game2.bin", 0x00000, 0x100000, CRC(cda1395c) SHA1(b0fdf1d3ebd9b7138ec907a0acdf0ea2d275c990) )
 ROM_END
 
 ROM_START( ablwikid )
@@ -700,8 +746,6 @@ ROM_START( dgun806 )
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "dgpnpdgu806as29lv160be_000422c4.bin", 0x00000, 0x200000, CRC(576d6caf) SHA1(fdfa4712e6ed66d2af41ccfbfbf870cd01f7b0f7) )
 ROM_END
-
-
 
 ROM_START( dancmix3 )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
@@ -742,7 +786,17 @@ CONS( 1997, bandgpad,    0,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_state, i
 
 CONS( 1997, bandggcn,    0,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Bandai", "Go! Go! Connie-chan! Asobou Mouse", MACHINE_NOT_WORKING )
 
+// おジャ魔女どれみのTVでマジカルクッキング
+CONS( 2001, bancook,     0,  0,  nes_sh6578,     bancook,    nes_sh6578_cjz_state, init_nes_sh6578, "Bandai", "Ojamajo Doremi no TV de Magical Cooking (Japan)", MACHINE_NOT_WORKING )
+
 CONS( 200?, cpatrolm,    0,  0,  nes_sh6578_pal, nes_sh6578, nes_sh6578_state, init_nes_sh6578, "TimeTop", "City Patrolman", MACHINE_NOT_WORKING )
+
+CONS( 200?, bb6578,      0,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_state, init_nes_sh6578, "DaiDaiXing Electronics", "TV Games Baseball (SH6578 hardware)", MACHINE_NOT_WORKING )
+
+// these don't boot much further than the timetop logo and a splash screen
+// 超级知识大富翁 (Chāojí Zhīshì Dà Fùwēng)
+CONS( 200?, 6578cjz1,     0,         0,  nes_sh6578,     nes_sh6578, nes_sh6578_cjz_state, init_nes_sh6578, "TimeTop", "Chaoji Zhishi Da Fuweng 1", MACHINE_NOT_WORKING )
+CONS( 200?, 6578cjz2,     0,         0,  nes_sh6578,     nes_sh6578, nes_sh6578_cjz_state, init_nes_sh6578, "TimeTop", "Chaoji Zhishi Da Fuweng 2", MACHINE_NOT_WORKING )
 
 // Super Moto 3 https://youtu.be/DR5Y_r6C_qk - has JungleTac copyrights intact, and appears to have the SH6578 versions of the games
 

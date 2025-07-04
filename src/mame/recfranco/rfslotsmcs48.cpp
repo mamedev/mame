@@ -553,7 +553,7 @@ void rfslotsmcs48_state::hopper_decode()
 
 */
 	u8 res = 0xff;
-	if(!BIT(m_hdecode, 0) & (!BIT(m_hdecode, 1)))  // g1&g2=0
+	if(!BIT(m_hdecode, 0, 2))  // active low
 	{
 		u8 a, b, c, d;
 		d = BIT(m_maincpu->p1_r(), 6);

@@ -5122,6 +5122,46 @@ Works only on Oric Atmos
 		</part>
 	</software>
 
+	<software name="hnefataf">
+		<description>Hnefatafl</description>
+		<year>2013</year>
+		<publisher>Defence Force</publisher>
+		<info name="language" value="English" />
+		<sharedfeat name="compatibility" value="Atmos"/>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="37449">
+				<rom name="Hnefatafl-Lite.tap" size="37449" crc="c2993775" sha1="ac88a3a39abbafd44bbb5c5f8c73fbd8d671bb4a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mieyen">
+		<description>Mieyen</description>
+		<year>2025</year>
+		<publisher>Inufuto</publisher>
+		<info name="developer" value="Inufuto" />
+		<info name="language" value="English" />
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="11575">
+				<rom name="mieyen.tap" size="11575" crc="2c08de94" sha1="41ecfd070c39462fa34aba685b75bcc91ef853d2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="othrust">
+		<description>O-Thrust (v1.2)</description>
+		<year>2010</year>
+		<publisher>Defence Force</publisher>
+		<info name="developer" value="Nox" />
+		<info name="language" value="English" />
+		<sharedfeat name="compatibility" value="Atmos"/>
+		<part name="cass" interface="oric1_cass">
+			<dataarea name="cass" size="36747">
+				<rom name="othrust.tap" size="36747" crc="cf44e2ed" sha1="cdb4e93085a1fd428de8c31a5c9730cbade674b1"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pulsoids">
 		<description>Pulsoids</description>
 		<year>2002</year>

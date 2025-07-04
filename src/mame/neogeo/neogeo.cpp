@@ -1968,13 +1968,12 @@ void neogeo_base_state::neogeo_base(machine_config &config)
 
 void neogeo_base_state::neogeo_stereo(machine_config &config)
 {
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	m_ym->add_route(0, "lspeaker", 0.28);
-	m_ym->add_route(0, "rspeaker", 0.28);
-	m_ym->add_route(1, "lspeaker", 0.98);
-	m_ym->add_route(2, "rspeaker", 0.98);
+	m_ym->add_route(0, "speaker", 0.84, 0);
+	m_ym->add_route(0, "speaker", 0.84, 1);
+	m_ym->add_route(1, "speaker", 0.98, 0);
+	m_ym->add_route(2, "speaker", 0.98, 1);
 }
 
 
@@ -2009,7 +2008,7 @@ void ngarcade_base_state::neogeo_mono(machine_config &config)
 {
 	SPEAKER(config, "speaker").front_center();
 
-	m_ym->add_route(0, "speaker", 0.28);
+	m_ym->add_route(0, "speaker", 0.84);
 	m_ym->add_route(1, "speaker", 0.49);
 	m_ym->add_route(2, "speaker", 0.49);
 }
@@ -3294,8 +3293,9 @@ ROM_START( ridhero ) /* MVS AND AES VERSION */
 	ROM_REGION( 0x100000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
 	ROM_LOAD16_WORD_SWAP( "006-p1.p1", 0x000000, 0x080000, CRC(d4aaf597) SHA1(34d35b71adb5bd06f4f1b50ffd9c58ab9c440a84) ) /* MB834200 */
 
+	// dumped from a prototype with external ROM, not 100% confirmed as being the same on a final, or other games (lbowling, trally)
 	ROM_REGION( 0x2000, "mcu", 0 )    /* Hitachi HD6301V1 MCU */
-	ROM_LOAD( "rhcom.bin", 0x0000, 0x2000, CRC(e5cd6306) SHA1(f6bbb8ae562804d67e137290c765c3589fa334c0) ) // dumped from a prototype with external ROM, not 100% confirmed as being the same on a final, or other games (lbowling, trally)
+	ROM_LOAD( "hd6301v1p_k78.com", 0x0000, 0x2000, CRC(e5cd6306) SHA1(f6bbb8ae562804d67e137290c765c3589fa334c0) )
 
 	NEO_SFIX_128K( "006-s1.s1", CRC(eb5189f0) SHA1(0239c342ea62e73140a2306052f226226461a478) ) /* TC531000 */
 
@@ -3323,8 +3323,9 @@ ROM_START( ridheroh )
 	ROM_LOAD16_WORD_SWAP( "006-pg1.p1", 0x000000, 0x080000, BAD_DUMP CRC(52445646) SHA1(647bb31f2f68453c1366cb6e2e867e37d1df7a54) )
 	/* Chip label p1h does not exist, renamed temporarily to pg1, marked BAD_DUMP. This needs to be verified. */
 
+	// dumped from a prototype with external ROM, not 100% confirmed as being the same on a final, or other games (lbowling, trally)
 	ROM_REGION( 0x2000, "mcu", 0 )    /* Hitachi HD6301V1 MCU */
-	ROM_LOAD( "rhcom.bin", 0x0000, 0x2000, CRC(e5cd6306) SHA1(f6bbb8ae562804d67e137290c765c3589fa334c0) ) // dumped from a prototype with external ROM, not 100% confirmed as being the same on a final, or other games (lbowling, trally)
+	ROM_LOAD( "hd6301v1p_k78.com", 0x0000, 0x2000, CRC(e5cd6306) SHA1(f6bbb8ae562804d67e137290c765c3589fa334c0) )
 
 	NEO_SFIX_128K( "006-s1.s1", CRC(eb5189f0) SHA1(0239c342ea62e73140a2306052f226226461a478) ) /* TC531000 */
 
@@ -3686,6 +3687,7 @@ ROM_END
  NEO-MVS PROG42G / NEO-MVS CHA42G
  . NGH-018
  NEO-AEG PROG42G / NEO-AEG CHA42G
+ NEO-AEG PROG42G-1 / NEO-AEG CHA42-G1
  . prototype
  NEO-AEG PROG-EP / NEO-AEG CHA-EP
 ****************************************/
@@ -3822,7 +3824,7 @@ ROM_START( lbowling ) /* MVS AND AES VERSION */
 	ROM_LOAD16_WORD_SWAP( "019-p1.p1", 0x000000, 0x080000, CRC(a2de8445) SHA1(893d7ae72b4644123469de143fa35fac1cbcd61e) ) /* TC534200 */
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* Hitachi HD6301V1 MCU */
-	ROM_LOAD( "hd6301v1p.com", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "hd6301v1p_k78.com", 0x0000, 0x1000, NO_DUMP )
 
 	NEO_SFIX_128K( "019-s1.s1", CRC(5fcdc0ed) SHA1(86415077e7adc3ba6153eeb4fb0c62cf36e903fa) ) /* TC531000 */
 
@@ -4167,6 +4169,7 @@ ROM_END
  . ??M-029
  NEO-MVS PROG42G-1 / NEO-MVS CHA42G-1
  . ??H-029
+ NEO-AEG PROG42G / NEO-AEG CHA42G
 ****************************************/
 
 ROM_START( legendos )
@@ -4485,7 +4488,7 @@ ROM_START( trally ) /* MVS AND AES VERSION */
 	ROM_LOAD16_WORD_SWAP( "038-p2.p2", 0x080000, 0x080000, CRC(a5193e2f) SHA1(96803480439e90da23cdca70d59ff519ee85beeb) ) /* TC534200 */
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* Hitachi HD6301V1 MCU */
-	ROM_LOAD( "hd6301v1p.hd6301v1", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "hd6301v1p_m58_neo-coma", 0x0000, 0x1000, NO_DUMP )
 
 	NEO_SFIX_128K( "038-s1.s1", CRC(fff62ae3) SHA1(6510a762ea41557a8938cbfc0557cd5921306061) ) /* TC531000 */
 
@@ -4726,6 +4729,7 @@ ROM_START( aof ) /* MVS AND AES VERSION */
 	ROM_REGION( 0x400000, "cslot1:ymsnd:adpcma", 0 )
 	ROM_LOAD( "044-v2.v2", 0x000000, 0x200000, CRC(3ec632ea) SHA1(e3f413f580b57f70d2dae16dbdacb797884d3fce) ) /* TC5316200 */
 	ROM_LOAD( "044-v4.v4", 0x200000, 0x200000, CRC(4b0f8e23) SHA1(105da0cc5ba19869c7147fba8b177500758c232b) ) /* TC5316200 */
+	/* Also found MVS set with different label: 044-v2.v1 and 044-v4.v2 */
 
 	ROM_REGION( 0x800000, "cslot1:sprites", 0 )
 	ROM_LOAD16_BYTE( "044-c1.c1", 0x000000, 0x100000, CRC(ddab98a7) SHA1(f20eb81ec431268798c142c482146c1545af1c24) ) /* Plane 0,1 */ /* TC5316200 */
@@ -4856,6 +4860,7 @@ ROM_END
  ID-0047
  . NGM-047
  NEO-MVS PROG-G2 (SNK-9201) / NEO-MVS CHA42G-1
+ NEO-MVS PROG-G2 (SNK-9201) / NEO-MVS CHA42G-2
  . NGH-047
  NEO-AEG PROG-G2 (PRO-CT0) / NEO-AEG CHA42G-2B
  NEO-AEG PROG-G2 (PRO-CT0) / NEO-AEG CHA42G-2
@@ -4864,7 +4869,7 @@ ROM_END
 ROM_START( fatfury2 ) /* MVS AND AES VERSION */
 	ROM_REGION( 0x100000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
 	ROM_LOAD16_WORD_SWAP( "047-p1.p1", 0x000000, 0x100000, CRC(ecfdbb69) SHA1(59e2f137c6eaf043df4ddae865a9159a10265c60) ) /* TC538200 */
-	/* The original P1 is 8mbit; also found sets with P1 / P2 4mbit on eprom. */
+	/* The original P1 is 8mbit; also found sets with EP1 / EP2 4mbit on eprom. */
 
 	NEO_SFIX_128K( "047-s1.s1", CRC(d7dbbf39) SHA1(29253e596f475ebd41a6e3bb53952e3a0ccd2eed) ) /* TC531000 */
 
@@ -4968,6 +4973,7 @@ ROM_END
  NEO-MVS PROG-G2 / NEO-MVS CHA42G-1
  NEO-MVS PROG 4096 / NEO-MVS CHA 42G-2
  . AIH-051
+ NEO-AEG PROG16 / NEO-AEG CHA42G-1
 ****************************************/
 
 ROM_START( viewpoin )
@@ -5048,7 +5054,7 @@ ROM_END
  NEO-MVS PROG16 / NEO-MVS CHA42G-1
  . ALH-005
  NEO-AEG PROG16 / NEO-AEG CHA42G-1
- NEO-AEG PROG-G2 / NEO-AEG CHA42G-2C
+ NEO-AEG PROG-G2 (SNK-9201) / NEO-AEG CHA42G-2C
 ****************************************/
 
 ROM_START( wh1 ) /* MVS VERSION */
@@ -5194,6 +5200,7 @@ ROM_END
 
 ROM_START( aof2a ) /* AES VERSION */
 	ROM_REGION( 0x100000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
+	/* Also found AES sets with P1 and SP2 on maskrom; chip label are 056-P1 and 056-SP2G */
 	ROM_LOAD16_WORD_SWAP( "056-p1.p1",  0x000000, 0x100000, CRC(a3b1d021) SHA1(ee42f3ca4516226b0088d0303ed28e3ecdabcd71) ) /* TC538200 */
 	/* the rom below acts as a patch to the program rom in the cart, replacing the first 512kb */
 	ROM_LOAD16_WORD_SWAP( "056-epr.ep1", 0x000000, 0x80000, CRC(75d6301c) SHA1(e72d15fba55f96be7b4fa29e705a7b78f56edf7d) ) /* M27C4002 */
@@ -5209,6 +5216,7 @@ ROM_START( aof2a ) /* AES VERSION */
 	ROM_LOAD( "056-v3.v3", 0x400000, 0x100000, CRC(d168c301) SHA1(969273d1d11943e81560959359a2c4e69522af0e) ) /* TC538200 */
 
 	ROM_REGION( 0x1000000, "cslot1:sprites", 0 )
+	/* Different layout with 4xC (32mbit) also exists; chip labels are 056-C13, 056-C24, 056-C57 and 056-C68 */
 	ROM_LOAD16_BYTE( "056-c1.c1", 0x000000, 0x200000, CRC(17b9cbd2) SHA1(1eee81e02763d384bd1c10a6012473ca931e4093) ) /* Plane 0,1 */ /* TC5316200 */
 	ROM_LOAD16_BYTE( "056-c2.c2", 0x000001, 0x200000, CRC(5fd76b67) SHA1(11925a41a53b53c6df4a5ebd28f98300950f743b) ) /* Plane 2,3 */ /* TC5316200 */
 	ROM_LOAD16_BYTE( "056-c3.c3", 0x400000, 0x200000, CRC(d2c88768) SHA1(22e2d84aa0c095944190e249ce87ef50d3f7b8ce) ) /* Plane 0,1 */ /* TC5316200 */
@@ -5284,6 +5292,7 @@ ROM_START( fatfursp ) /* MVS AND AES VERSION */
 	ROM_REGION( 0x180000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
 	ROM_LOAD16_WORD_SWAP( "058-p1.p1",  0x000000, 0x100000, CRC(2f585ba2) SHA1(429b4bf43fb9b1082c15d645ca328f9d175b976b) ) /* mask rom TC538200 */
 	ROM_LOAD16_WORD_SWAP( "058-p2.sp2", 0x100000, 0x080000, CRC(d7c71a6b) SHA1(b3428063031a2e5857da40a5d2ffa87fb550c1bb) ) /* mask rom TC534200 */
+	/* also found MVS set with EP1 / EP2 / SP2 on eprom; correct chip label unknown */
 
 	NEO_SFIX_128K( "058-s1.s1", CRC(2df03197) SHA1(24083cfc97e720ac9e131c9fe37df57e27c49294) ) /* mask rom TC531000 */
 
@@ -5414,6 +5423,7 @@ ROM_END
  ID-0061
  . NGM-061
  NEO-MVS PROGGSC / NEO-MVS CHA256
+ NEO-MVS PROGGSC / NEO-MVS CHA256B
  NEO-MVS PROGTOP / NEO-MVS CHA256
  NEO-MVS PROG 4096 B / NEO-MVS CHA256
  . NGH-061
@@ -6071,6 +6081,7 @@ ROM_END
  NEO-MVS PROGBK1 / NEO-MVS CHA256
  NEO-MVS PROGTOP / NEO-MVS CHA256B
  NEO-MVS PROG 4096 B / NEO-MVS CHA 42G-3
+ NEO-MVS PROGGSC / NEO-MVS CHA 42G-3B
  . NGH-082
  NEO-AEG PROGTOP2 / NEO-AEG CHA256 B
 ****************************************/
@@ -6418,6 +6429,7 @@ ROM_END
  ID-0089
  . NGM-089
  NEO-MVS PROGBK1 / NEO-MVS CHA256
+ NEO-MVS PROGBK1 / NEO-MVS CHA256B
  . NGH-089
  NEO-AEG PROGBK1Y / NEO-AEG CHA256RY
 ****************************************/
@@ -6426,6 +6438,7 @@ ROM_START( pulstar )
 	ROM_REGION( 0x300000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
 	ROM_LOAD16_WORD_SWAP( "089-p1.p1",  0x000000, 0x100000, CRC(5e5847a2) SHA1(b864d0ec4184b785569ddbf67c2115b5ab86ee3e) ) /* mask rom TC538200 */
 	ROM_LOAD16_WORD_SWAP( "089-p2.sp2", 0x100000, 0x200000, CRC(028b774c) SHA1(fc5da2821a5072f2b78245fc59b6e3eeef116d16) ) /* mask rom TC5316200 */
+	/* also found MVS sets with EP1 / EP2 on M27C4002 eprom with sticker and P1 / SP2 on TC578200D eprom with sticker; chip label are 089-P1, 089-SP2, EP1 and EP2 */
 
 	NEO_SFIX_128K( "089-s1.s1", CRC(c79fc2c8) SHA1(914c224fb3c461a68d7425cae724cf22bd5f985d) ) /* mask rom TC531000 */
 
@@ -7161,7 +7174,34 @@ ROM_START( kof96 ) /* MVS VERSION */
 	ROM_REGION( 0x300000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
 	ROM_LOAD16_WORD_SWAP( "214-p1.p1",  0x000000, 0x100000, CRC(52755d74) SHA1(4232d627f1d2e6ea9fc8cf01571d77d4d5b8a1bb) ) /* TC538200 */
 	ROM_LOAD16_WORD_SWAP( "214-p2.sp2", 0x100000, 0x200000, CRC(002ccb73) SHA1(3ae8df682c75027ca82db25491021eeba00a267e) ) /* TC5316200 */
-	/* also found sets with EP1 / EP2 / EP3 / EP4 on eprom and P5 on TC5316200 with chip label 214-P5; correct chip labels for eproms is unknown */
+
+	NEO_SFIX_128K( "214-s1.s1", CRC(1254cbdb) SHA1(fce5cf42588298711a3633e9c9c1d4dcb723ac76) ) /* TC531000 */
+
+	NEO_BIOS_AUDIO_128K( "214-m1.m1", CRC(dabc427c) SHA1(b76722ed142ee7addceb4757424870dbd003e8b3) ) /* TC531001 */
+
+	ROM_REGION( 0xa00000, "cslot1:ymsnd:adpcma", 0 )
+	ROM_LOAD( "214-v1.v1", 0x000000, 0x400000, CRC(63f7b045) SHA1(1353715f1a8476dca6f8031d9e7a401eacab8159) ) /* TC5332204 */
+	ROM_LOAD( "214-v2.v2", 0x400000, 0x400000, CRC(25929059) SHA1(6a721c4cb8f8dc772774023877d4a9f50d5a9e31) ) /* TC5332204 */
+	ROM_LOAD( "214-v3.v3", 0x800000, 0x200000, CRC(92a2257d) SHA1(5064aec78fa0d104e5dd5869b95382aa170214ee) ) /* TC5316200 */
+
+	ROM_REGION( 0x2000000, "cslot1:sprites", 0 )
+	ROM_LOAD16_BYTE( "214-c1.c1", 0x0000000, 0x400000, CRC(7ecf4aa2) SHA1(f773c4c1f05d58dd37e7bb2ac1d1e0ec43998a71) ) /* Plane 0,1 */ /* TC5332205 */
+	ROM_LOAD16_BYTE( "214-c2.c2", 0x0000001, 0x400000, CRC(05b54f37) SHA1(cc31653fe4cb05201fba234e080cb9c7a7592b1b) ) /* Plane 2,3 */ /* TC5332205 */
+	ROM_LOAD16_BYTE( "214-c3.c3", 0x0800000, 0x400000, CRC(64989a65) SHA1(e6f3749d43be0afa9dad7b085cb782ba694252ca) ) /* Plane 0,1 */ /* TC5332205 */
+	ROM_LOAD16_BYTE( "214-c4.c4", 0x0800001, 0x400000, CRC(afbea515) SHA1(ae875052728de33174827705646bd14cf3937b5c) ) /* Plane 2,3 */ /* TC5332205 */
+	ROM_LOAD16_BYTE( "214-c5.c5", 0x1000000, 0x400000, CRC(2a3bbd26) SHA1(7c1a7e50a10a1b082e0d0d515c34135ee9f995ac) ) /* Plane 0,1 */ /* TC5332205 */
+	ROM_LOAD16_BYTE( "214-c6.c6", 0x1000001, 0x400000, CRC(44d30dc7) SHA1(c8ae001e37224b55d9e4a4d99f6578b4f6eb055f) ) /* Plane 2,3 */ /* TC5332205 */
+	ROM_LOAD16_BYTE( "214-c7.c7", 0x1800000, 0x400000, CRC(3687331b) SHA1(2be95caab76d7af51674f93884330ba73a6053e4) ) /* Plane 0,1 */ /* TC5332205 */
+	ROM_LOAD16_BYTE( "214-c8.c8", 0x1800001, 0x400000, CRC(fa1461ad) SHA1(6c71a7f08e4044214223a6bf80984582ab5e0328) ) /* Plane 2,3 */ /* TC5332205 */
+ROM_END
+
+ROM_START( kof96a ) /* MVS VERSION */
+	ROM_REGION( 0x300000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
+	ROM_LOAD16_WORD_SWAP( "blue.ep1",   0x000000, 0x080000, CRC(a6101486) SHA1(51357c216cc8e52fc4ecf5b2db4814e87d016132) ) // 27C4096DC, no label
+	ROM_LOAD16_WORD_SWAP( "red.ep2",    0x080000, 0x080000, CRC(6abc7ae5) SHA1(1bcbed38ef1934a0701d1c95b30ffe63316f92a8) ) // "
+	ROM_LOAD16_WORD_SWAP( "orange.ep3", 0x100000, 0x080000, CRC(a588dff4) SHA1(32d30bdf9b7bc9201b3930f5a0f126c79af97f3d) ) // "
+	ROM_LOAD16_WORD_SWAP( "yellow.ep4", 0x180000, 0x080000, CRC(6d6f17eb) SHA1(51f61c9a4215584493cf1dc37c4e307e1216626c) ) // "
+	ROM_LOAD16_WORD_SWAP( "214-p5.p5",  0x200000, 0x100000, CRC(9f3c6bc9) SHA1(90370a2ad42421a533182569e63ab81822e37878) ) // TC5316200
 
 	NEO_SFIX_128K( "214-s1.s1", CRC(1254cbdb) SHA1(fce5cf42588298711a3633e9c9c1d4dcb723ac76) ) /* TC531000 */
 
@@ -7621,6 +7661,7 @@ ROM_END
  . SUM-225
  NEO-MVS PROGBK1 / NEO-MVS CHA256B
  . SUH-225
+ NEO-AEG PROGBK1Y / NEO-AEG CHA256RY
 ****************************************/
 
 ROM_START( wakuwak7 )
@@ -7849,6 +7890,7 @@ ROM_END
  ID-0233
  . NGM-2330
  NEO-MVS PROGBK1 / NEO-MVS CHA256
+ NEO-MVS PROGBK1 / NEO-MVS CHA256B
  . NGH-2330
  NEO-AEG PROGBK1Y / NEO-AEG CHA256RY
 ****************************************/
@@ -9085,7 +9127,10 @@ ROM_END
  Non SMA protected version found on:
  NEO-MVS PROGBK1 / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7042)
  . NGH-2560
+ SMA protected version found on:
  NEO-AEG PROGLBA (1999.7.6) (NEO-SMA)(LBA-SUB) / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7042)
+ Non SMA protected version found on:
+ NEO-AEG PROGBK1F / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7042)
 ****************************************/
 
 ROM_START( mslug3 ) /* Original Version - Encrypted Code & GFX */ /* revision 2000.4.1 */ /* MVS VERSION */
@@ -9574,7 +9619,7 @@ ROM_END
  . NGM-264?
  NEO-MVS PROGBK2 (2000.3.21) (NEO-PCM2 SNK) / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7050)
  . NGH-2641
- NEO-AEG PROGBK2 (2002.4.1) (NEO-PCM2 SNK) / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7050)
+ NEO-AEG PROGBK2 (2002.4.1) (NEO-PCM2 PLAYMORE) / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7050)
   - Distribution by BrezzaSoft
 ****************************************/
 
@@ -9647,9 +9692,9 @@ ROM_END
 /****************************************
  ID-0265
  . NGM-2650
- NEO-MVS PROGBK2 (2000.3.21) (NEO-PCM2 PLAYMORE) / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7050)
+ NEO-MVS PROGBK2 (2000.3.21) (NEO-PCM2 SNK) / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7050)
  . NGH-2650
- NEO-AEG PROGBK2 (NEO-PCM2 PLAYMORE) / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7050)
+ NEO-AEG PROGBK2 (2002.4.1) (NEO-PCM2 PLAYMORE) / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7050)
 ****************************************/
 
 ROM_START( kof2002 ) /* Encrypted Set */ /* MVS AND AES VERSION */
@@ -9688,7 +9733,7 @@ ROM_END
 /****************************************
  ID-0266
  . NGM-2660
- NEO-MVS PROGBK2 (2000.3.21) (NEO-PCM2 PLAYMORE) / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7050)
+ NEO-MVS PROGBK2 (2000.3.21) (NEO-PCM2 SNK) / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7050)
  . NGH-2660
  NEO-AEG PROGBK2 (2002.4.1) (NEO-PCM2 PLAYMORE) / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7050)
 ****************************************/
@@ -9861,9 +9906,9 @@ ROM_END
 /****************************************
  ID-0269
  . NGM-2690
- NEO-MVS PROGBK3R (2003.9.2) (NEO-PCM2 PLAYMORE) (NEO-PVC) / NEO-MVS CHAFIO (2003.7.24) (NEO-CMC 7050)
+ NEO-MVS PROGBK3R (2003.9.2) (NEO-PCM2 SNKPLAYMORE) (NEO-PVC) / NEO-MVS CHAFIO (2003.7.24) (NEO-CMC 7050)
  . NGH-2690
- NEO-AEG PROGBK3R (2003.8.29) (NEO-PCM2 PLAYMORE) (NEO-PVC) / NEO-AEG CHAFIO (2003.7.24) (NEO-CMC 7050)
+ NEO-AEG PROGBK3R (2003.8.29) (NEO-PCM2 SNKPLAYMORE) (NEO-PVC) / NEO-AEG CHAFIO (2003.7.24) (NEO-CMC 7050)
 ****************************************/
 
 ROM_START( svc ) /* Encrypted Set */ /* MVS AND AES VERSION */
@@ -9902,9 +9947,9 @@ ROM_END
 /****************************************
  ID-0270
  . NGM-2700
- NEO-MVS PROGBK2R (2003.8.26) (NEO-PCM2 PLAYMORE) / NEO-MVS CHAFIO (2003.7.24) (NEO-CMC 7050)
+ NEO-MVS PROGBK2R (2003.8.26) (NEO-PCM2 SNKPLAYMORE) / NEO-MVS CHAFIO (2003.7.24) (NEO-CMC 7050)
  . NGH-2700
- NEO-AEG PROGBK2S (2003.10.16) (NEO-PCM2 PLAYMORE) / NEO-AEG CHAFIO (2003.7.24) (NEO-CMC 7050)
+ NEO-AEG PROGBK2S (2003.10.16) (NEO-PCM2 SNKPLAYMORE) / NEO-AEG CHAFIO (2003.7.24) (NEO-CMC 7050)
 ****************************************/
 
 ROM_START( samsho5 ) /* Encrypted Set */ /* MVS VERSION, Build Date: Tue Aug 26 22:27:30 2003 */
@@ -10013,9 +10058,9 @@ ROM_END
 /****************************************
  ID-0271
  . NGM-2710
- NEO-MVS PROGBK3S (2003.10.1) (NEO-PCM2 PLAYMORE) (NEO-PVC) / NEO-MVS CHAFIO (2003.7.24) (NEO-CMC 7050)
+ NEO-MVS PROGBK3S (2003.10.1) (NEO-PCM2 SNKPLAYMORE) (NEO-PVC) / NEO-MVS CHAFIO (2003.7.24) (NEO-CMC 7050)
  . NGH-2710
- NEO-AEG PROGBK3S (2003.10.6) (NEO-PCM2 PLAYMORE) (NEO-PVC) / NEO-AEG CHAFIO (2003.7.24) (NEO-CMC 7050)
+ NEO-AEG PROGBK3S (2003.10.6) (NEO-PCM2 SNKPLAYMORE) (NEO-PVC) / NEO-AEG CHAFIO (2003.7.24) (NEO-CMC 7050)
 ****************************************/
 
 ROM_START( kof2003 ) /* Encrypted Code + Sound + GFX Roms */ /* MVS VERSION */
@@ -10090,9 +10135,9 @@ ROM_END
 /****************************************
  ID-0272
  . NGM-2720
- NEO-MVS PROGBK2S (2003.10.18) (NEO-PCM2 PLAYMORE) / NEO-MVS CHAFIO (2003.7.24) (NEO-CMC 7050)
+ NEO-MVS PROGBK2S (2003.10.18) (NEO-PCM2 SNKPLAYMORE) / NEO-MVS CHAFIO (2003.7.24) (NEO-CMC 7050)
  . NGH-2720
- NEO-AEG PROGBK2S (2003.10.16) (NEO-PCM2 PLAYMORE) / NEO-MVS CHAFIO (2003.7.24) (NEO-CMC 7050)
+ NEO-AEG PROGBK2S (2003.10.16) (NEO-PCM2 SNKPLAYMORE) / NEO-MVS CHAFIO (2003.7.24) (NEO-CMC 7050)
 ****************************************/
 
 ROM_START( samsh5sp ) /* Encrypted Set */ /* MVS VERSION */
@@ -11941,6 +11986,7 @@ GAME( 1995, rbff1ka,    rbff1,    neobase,   neogeo,    mvs_led_state, empty_ini
 GAME( 1996, aof3,       neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Art of Fighting 3 - The Path of the Warrior / Art of Fighting - Ryuuko no Ken Gaiden", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, aof3k,      aof3,     neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Art of Fighting 3 - The Path of the Warrior (Korean release)", MACHINE_SUPPORTS_SAVE ) // no Japanese title / mode
 GAME( 1996, kof96,      neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters '96 (NGM-214)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, kof96a,     kof96,    neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters '96 (bug fix revision)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, kof96h,     kof96,    neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters '96 (NGH-214)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, ssideki4,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The Ultimate 11 - The SNK Football Championship / Tokuten Ou - Honoo no Libero", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, kizuna,     neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Kizuna Encounter - Super Tag Battle / Fu'un Super Tag Battle", MACHINE_SUPPORTS_SAVE )
@@ -11972,37 +12018,37 @@ GAME( 1998, kof98h,     kof98,    neobase,   neogeo,    mvs_led_state, empty_ini
 GAME( 1998, lastbld2,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The Last Blade 2 / Bakumatsu Roman - Dai Ni Maku Gekka no Kenshi (NGM-2430 ~ NGH-2430)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, neocup98,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Neo-Geo Cup '98 - The Road to the Victory", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, mslugx,     neogeo,   mslugx,    neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Metal Slug X - Super Vehicle-001 (NGM-2500 ~ NGH-2500)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, kof99,      neogeo,   kof99,     neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (NGM-2510)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
-GAME( 1999, kof99h,     kof99,    kof99,     neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (NGH-2510)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX, crashes going into attract demo */
-GAME( 1999, kof99e,     kof99,    kof99,     neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (earlier)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
-GAME( 1999, kof99k,     kof99,    kof99,     neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (Korean release)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
-GAME( 1999, kof99ka,    kof99,    kof99k,    neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (Korean release, non-encrypted program)" , MACHINE_SUPPORTS_SAVE )   /* Encrypted GFX */
+GAME( 1999, kof99,      neogeo,   kof99,     neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (NGM-2510)", MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
+GAME( 1999, kof99h,     kof99,    kof99,     neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (NGH-2510)", MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX, crashes going into attract demo */
+GAME( 1999, kof99e,     kof99,    kof99,     neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (earlier)", MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
+GAME( 1999, kof99k,     kof99,    kof99,     neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (Korean release)", MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
+GAME( 1999, kof99ka,    kof99,    kof99k,    neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (Korean release, non-encrypted program)", MACHINE_SUPPORTS_SAVE )   /* Encrypted GFX */
 GAME( 1999, kof99p,     kof99,    neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (prototype)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, garou,      neogeo,   garou,     neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Garou - Mark of the Wolves (NGM-2530)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
-GAME( 1999, garouh,     garou,    garouh,    neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Garou - Mark of the Wolves (NGM-2530 ~ NGH-2530)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
-GAME( 1999, garouha,    garou,    garou,     neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Garou - Mark of the Wolves (NGH-2530)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
+GAME( 1999, garou,      neogeo,   garou,     neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Garou - Mark of the Wolves (NGM-2530)", MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
+GAME( 1999, garouh,     garou,    garouh,    neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Garou - Mark of the Wolves (NGM-2530 ~ NGH-2530)", MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
+GAME( 1999, garouha,    garou,    garou,     neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Garou - Mark of the Wolves (NGH-2530)", MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
 GAME( 1999, garoup,     garou,    neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Garou - Mark of the Wolves (prototype)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, garoubl,    garou,    garoubl,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "Garou - Mark of the Wolves (bootleg)", MACHINE_SUPPORTS_SAVE ) /* Bootleg of garoup */
-GAME( 2000, mslug3,     neogeo,   mslug3,    neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Metal Slug 3 (NGM-2560)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
-GAME( 2000, mslug3a,    mslug3,   mslug3a,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Metal Slug 3 (NGM-2560, earlier)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX - revision Mar/17/2000 1:36 (from SMA rom) */
-GAME( 2000, mslug3h,    mslug3,   mslug3h,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Metal Slug 3 (NGH-2560)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
+GAME( 2000, mslug3,     neogeo,   mslug3,    neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Metal Slug 3 (NGM-2560)", MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
+GAME( 2000, mslug3a,    mslug3,   mslug3a,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Metal Slug 3 (NGM-2560, earlier)", MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX - revision Mar/17/2000 1:36 (from SMA rom) */
+GAME( 2000, mslug3h,    mslug3,   mslug3h,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Metal Slug 3 (NGH-2560)", MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
 GAME( 2000, mslug3b6,   mslug3,   mslug3b6,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "Metal Slug 6 (bootleg of Metal Slug 3)", MACHINE_SUPPORTS_SAVE ) /* real Metal Slug 6 is an Atomiswave HW game, see naomi.cpp ;-) */
-GAME( 2000, kof2000,    neogeo,   kof2000,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters 2000 (NGM-2570 ~ NGH-2570)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
-GAME( 2000, kof2000n,   kof2000,  kof2000n,  neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters 2000 (not encrypted)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
-GAME( 2001, zupapa,     neogeo,   zupapa,    neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Zupapa!" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
-GAME( 2001, sengoku3,   neogeo,   sengoku3,  neogeo,    mvs_led_state, empty_init, ROT0, "Noise Factory / SNK", "Sengoku 3 / Sengoku Densho 2001 (set 1)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
-GAME( 2001, sengoku3a,  sengoku3, sengoku3,  neogeo,    mvs_led_state, empty_init, ROT0, "Noise Factory / SNK", "Sengoku 3 / Sengoku Densho 2001 (set 2)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
-GAME( 2001, kof2001,    neogeo,   kof2001,   neogeo,    mvs_led_state, empty_init, ROT0, "Eolith / SNK", "The King of Fighters 2001 (NGM-262?)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
-GAME( 2001, kof2001h,   kof2001,  kof2001,   neogeo,    mvs_led_state, empty_init, ROT0, "Eolith / SNK", "The King of Fighters 2001 (NGH-2621)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
+GAME( 2000, kof2000,    neogeo,   kof2000,   neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters 2000 (NGM-2570 ~ NGH-2570)", MACHINE_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
+GAME( 2000, kof2000n,   kof2000,  kof2000n,  neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "The King of Fighters 2000 (not encrypted)", MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
+GAME( 2001, zupapa,     neogeo,   zupapa,    neogeo,    mvs_led_state, empty_init, ROT0, "SNK", "Zupapa!", MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
+GAME( 2001, sengoku3,   neogeo,   sengoku3,  neogeo,    mvs_led_state, empty_init, ROT0, "Noise Factory / SNK", "Sengoku 3 / Sengoku Densho 2001 (set 1)", MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
+GAME( 2001, sengoku3a,  sengoku3, sengoku3,  neogeo,    mvs_led_state, empty_init, ROT0, "Noise Factory / SNK", "Sengoku 3 / Sengoku Densho 2001 (set 2)", MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
+GAME( 2001, kof2001,    neogeo,   kof2001,   neogeo,    mvs_led_state, empty_init, ROT0, "Eolith / SNK", "The King of Fighters 2001 (NGM-262?)", MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
+GAME( 2001, kof2001h,   kof2001,  kof2001,   neogeo,    mvs_led_state, empty_init, ROT0, "Eolith / SNK", "The King of Fighters 2001 (NGH-2621)", MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
 GAME( 2003, cthd2003,   kof2001,  cthd2k3,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg (Phenixsoft)", "Crouching Tiger Hidden Dragon 2003 (hack of The King of Fighters 2001)", MACHINE_SUPPORTS_SAVE ) /* Protected Hack / Bootleg of kof2001 */
 GAME( 2003, ct2k3sp,    kof2001,  ct2k3sp,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg (Phenixsoft)", "Crouching Tiger Hidden Dragon 2003 Super Plus (hack of The King of Fighters 2001)", MACHINE_SUPPORTS_SAVE ) /* Protected Hack / Bootleg of kof2001 */
 GAME( 2003, ct2k3sa,    kof2001,  ct2k3sa,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg (Phenixsoft)", "Crouching Tiger Hidden Dragon 2003 Super Plus (hack of The King of Fighters 2001, alternate)", MACHINE_SUPPORTS_SAVE ) /* Hack / Bootleg of kof2001 */
-GAME( 2002, kof2002,    neogeo,   kof2002,   neogeo,    mvs_led_state, empty_init, ROT0, "Eolith / Playmore", "The King of Fighters 2002 (NGM-2650 ~ NGH-2650)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
+GAME( 2002, kof2002,    neogeo,   kof2002,   neogeo,    mvs_led_state, empty_init, ROT0, "Eolith / Playmore", "The King of Fighters 2002 (NGM-2650 ~ NGH-2650)", MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
 GAME( 2002, kof2002b,   kof2002,  kof2002b,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 2002 (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 2002, kf2k2pls,   kof2002,  kf2k2pls,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 2002 Plus (bootleg set 1)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
-GAME( 2002, kf2k2pla,   kof2002,  kf2k2pls,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 2002 Plus (bootleg set 2)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
-GAME( 2002, kf2k2mp,    kof2002,  kf2k2mp,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 2002 Magic Plus (bootleg)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
-GAME( 2002, kf2k2mp2,   kof2002,  kf2k2mp2,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 2002 Magic Plus II (bootleg)" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
+GAME( 2002, kf2k2pls,   kof2002,  kf2k2pls,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 2002 Plus (bootleg set 1)", MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
+GAME( 2002, kf2k2pla,   kof2002,  kf2k2pls,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 2002 Plus (bootleg set 2)", MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
+GAME( 2002, kf2k2mp,    kof2002,  kf2k2mp,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 2002 Magic Plus (bootleg)", MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
+GAME( 2002, kf2k2mp2,   kof2002,  kf2k2mp2,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 2002 Magic Plus II (bootleg)", MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
 GAME( 2002, kof10th,    kof2002,  kof10th,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 10th Anniversary (bootleg of The King of Fighters 2002)", MACHINE_SUPPORTS_SAVE ) // fake SNK copyright
 GAME( 2005, kf10thep,   kof2002,  kf10thep,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 10th Anniversary Extra Plus (bootleg of The King of Fighters 2002)", MACHINE_SUPPORTS_SAVE ) // fake SNK copyright
 GAME( 2004, kf2k5uni,   kof2002,  kf2k5uni,  neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "The King of Fighters 10th Anniversary 2005 Unique (bootleg of The King of Fighters 2002)", MACHINE_SUPPORTS_SAVE ) // fake SNK copyright
@@ -12062,7 +12108,7 @@ GAME( 1992, viewpoinp,  viewpoin, neobase,   neogeo,    mvs_led_state, empty_ini
 GAME( 1994, janshin,    neogeo,   neogeo_mj, neogeo_mj, mvs_led_state, empty_init, ROT0, "Aicom", "Janshin Densetsu - Quest of Jongmaster", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, pulstar,    neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Aicom", "Pulstar", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, blazstar,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Yumekobo", "Blazing Star", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, preisle2,   neogeo,   preisle2,  neogeo,    mvs_led_state, empty_init, ROT0, "Yumekobo / Saurus", "Prehistoric Isle 2" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
+GAME( 1999, preisle2,   neogeo,   preisle2,  neogeo,    mvs_led_state, empty_init, ROT0, "Yumekobo / Saurus", "Prehistoric Isle 2", MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
 
 // Data East Corporation
 GAME( 1993, spinmast,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Data East Corporation", "Spin Master / Miracle Adventure", MACHINE_SUPPORTS_SAVE )
@@ -12074,8 +12120,8 @@ GAME( 1996, magdrop2,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_ini
 GAME( 1997, magdrop3,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Data East Corporation", "Magical Drop III", MACHINE_SUPPORTS_SAVE )
 
 // Eleven
-GAME( 2000, nitd,       neogeo,   nitd,      neogeo,    mvs_led_state, empty_init, ROT0, "Eleven / Gavaking", "Nightmare in the Dark" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
-GAME( 2001, nitdbl,     nitd,     neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "Nightmare in the Dark (bootleg)" , MACHINE_SUPPORTS_SAVE )
+GAME( 2000, nitd,       neogeo,   nitd,      neogeo,    mvs_led_state, empty_init, ROT0, "Eleven / Gavaking", "Nightmare in the Dark", MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
+GAME( 2001, nitdbl,     nitd,     neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "bootleg", "Nightmare in the Dark (bootleg)", MACHINE_SUPPORTS_SAVE )
 
 // Face
 GAME( 1994, gururin,    neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Face", "Gururin", MACHINE_SUPPORTS_SAVE )
@@ -12100,7 +12146,7 @@ GAME( 1995?,mvstemp,    neogeo,   neobase,   neogeo,    mvs_led_state, empty_ini
 GAME( 1994, zedblade,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "NMK", "Zed Blade / Operation Ragnarok", MACHINE_SUPPORTS_SAVE )
 
 // Psikyo
-GAME( 1999, s1945p,     neogeo,   s1945p,    neogeo,    mvs_led_state, empty_init, ROT0, "Psikyo", "Strikers 1945 Plus" , MACHINE_SUPPORTS_SAVE )   /* Encrypted GFX */
+GAME( 1999, s1945p,     neogeo,   s1945p,    neogeo,    mvs_led_state, empty_init, ROT0, "Psikyo", "Strikers 1945 Plus", MACHINE_SUPPORTS_SAVE )   /* Encrypted GFX */
 
 // Saurus
 GAME( 1995, quizkof,    neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Saurus (SNK license)", "Quiz King of Fighters (SAM-080 ~ SAH-080)", MACHINE_SUPPORTS_SAVE )
@@ -12161,9 +12207,9 @@ GAME( 1997, puzzldpr,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_ini
 GAME( 1998, breakrev,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Breakers Revenge", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, flipshot,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Battle Flip Shot", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, ctomaday,   neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Captain Tomaday", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, ganryu,     neogeo,   ganryu,    neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Ganryu / Musashi Ganryuki" , MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
+GAME( 1999, ganryu,     neogeo,   ganryu,    neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Ganryu / Musashi Ganryuki", MACHINE_SUPPORTS_SAVE ) /* Encrypted GFX */
 GAME( 2000, bangbead,   neogeo,   bangbead,  neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Bang Bead", MACHINE_SUPPORTS_SAVE )
-GAME( 2000, b2b,        neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Bang Bang Busters (2010 NCI release)" , MACHINE_SUPPORTS_SAVE )
+GAME( 2000, b2b,        neogeo,   neobase,   neogeo,    mvs_led_state, empty_init, ROT0, "Visco", "Bang Bang Busters (2010 NCI release)", MACHINE_SUPPORTS_SAVE )
 
 // Mega Enterprise
 GAME( 2002, mslug4,     neogeo,   mslug4,    neogeo,    mvs_led_state, empty_init, ROT0, "Mega / Noise Factory / Playmore", "Metal Slug 4 (NGM-2630)", MACHINE_SUPPORTS_SAVE )

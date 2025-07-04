@@ -638,7 +638,7 @@ void cadash_state::main_map(address_map &map)
 }
 
 void base_state::eto_map(address_map &map)
-{ // N.B. tc100scn mirror overlaps spriteram
+{
 	map(0x000000, 0x0fffff).rom();
 	map(0x100000, 0x10000f).rw("tc0110pcr", FUNC(tc0110pcr_device::word_r), FUNC(tc0110pcr_device::step1_word_w));
 	map(0x200000, 0x203fff).ram();
@@ -648,7 +648,7 @@ void base_state::eto_map(address_map &map)
 	map(0x4e0000, 0x4e0001).nopr();
 	map(0x4e0001, 0x4e0001).w("ciu", FUNC(pc060ha_device::master_port_w));
 	map(0x4e0003, 0x4e0003).rw("ciu", FUNC(pc060ha_device::master_comm_r), FUNC(pc060ha_device::master_comm_w));
-	map(0xc00000, 0xc0ffff).w(m_tc0100scn, FUNC(tc0100scn_device::ram_w));
+	map(0xc00000, 0xc0ffff).w(m_tc0100scn, FUNC(tc0100scn_device::ram_w)); // N.B. tc100scn mirror overlaps spriteram
 	map(0xc00000, 0xc03fff).rw(m_pc090oj, FUNC(pc090oj_device::word_r), FUNC(pc090oj_device::word_w));  // sprite RAM
 	map(0xd00000, 0xd0ffff).rw(m_tc0100scn, FUNC(tc0100scn_device::ram_r), FUNC(tc0100scn_device::ram_w));    // tilemaps
 	map(0xd20000, 0xd2000f).rw(m_tc0100scn, FUNC(tc0100scn_device::ctrl_r), FUNC(tc0100scn_device::ctrl_w));
@@ -1126,7 +1126,7 @@ void bonzeadv_state::bonzeadv(machine_config &config)
 
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(16'000'000)/2));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "mono", 0.25);
+	ymsnd.add_route(0, "mono", 0.75);
 	ymsnd.add_route(1, "mono", 1.0);
 	ymsnd.add_route(2, "mono", 1.0);
 
@@ -2024,6 +2024,32 @@ ROM_START( cadashs ) // no labels on the program ROMs
 	ROM_LOAD( "pal20l8b-c21-12.ic47",   0x0600, 0x0144, CRC(bbc2cc97) SHA1(d4a68f28e0d3f5a3b39ecc25640bc9197ad0260b) )
 ROM_END
 
+ROM_START( cadashso ) // Taito PCB: K1100526A / J1100218A
+	ROM_REGION( 0x80000, "maincpu", 0 )     // 512k for 68000 code
+	ROM_LOAD16_BYTE( "conchimatic_c_31.ic11", 0x00000, 0x20000, CRC(091e71de) SHA1(b4b7346538866866ab92b59fad00d0ba7747d115) )
+	ROM_LOAD16_BYTE( "conchimatic_c_33.ic15", 0x00001, 0x20000, CRC(64722757) SHA1(c59dd101d7b2bd3c23672faeac53a5ffcd25cfc3) )
+	ROM_LOAD16_BYTE( "conchimatic_c_30.ic10", 0x40000, 0x20000, CRC(f7572e71) SHA1(7471bc8e0773b2cf0f8b3a89bfcc4388a5c21ef1) )
+	ROM_LOAD16_BYTE( "conchimatic_c_32.ic14", 0x40001, 0x20000, CRC(3947b8b5) SHA1(10a692d0f881923002db7855293a406d089e6441) )
+
+	ROM_REGION( 0x80000, "tc0100scn", 0 )
+	ROM_LOAD16_WORD_SWAP( "c21-02.9",  0x00000, 0x80000, CRC(205883b9) SHA1(5aafee8cab3f949a7db91bcc26912f331041b51e) ) // SCR tiles (8 x 8)
+
+	ROM_REGION( 0x80000, "pc090oj", 0 )
+	ROM_LOAD16_WORD_SWAP( "c21-01.1",  0x00000, 0x80000, CRC(1ff6f39c) SHA1(742f296efc8073fafa73da2c8d7d26ca9514b6bf) ) // Sprites (16 x 16)
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "c21-08.38",   0x00000, 0x10000, CRC(dca495a0) SHA1(4e0f401f1b967da75f33fd7294860ad0b4bf2dce) ) // banked
+
+	ROM_REGION( 0x08000, "subcpu", 0 )  // HD64180RP8 code (link)
+	ROM_LOAD( "c21-07.57",   0x00000, 0x08000, CRC(f02292bd) SHA1(0a5c06a048ad67f90e0d766b504582e9eef035f7) )
+
+	ROM_REGION( 0x0800, "plds", 0 )
+	ROM_LOAD( "pal16l8b-c21-09.ic34",   0x0000, 0x0104, CRC(4b296700) SHA1(79d6c8fb13e30795d9c1f49885ada658f9722b68) )
+	ROM_LOAD( "pal16l8b-c21-10.ic45",   0x0200, 0x0104, CRC(35642f00) SHA1(a04403536b0ef7e8e7251dfc47274a6c8772fd2d) )
+	ROM_LOAD( "pal16l8b-c21-11-1.ic46", 0x0400, 0x0104, CRC(f4791e24) SHA1(7e3bbffec7b8f9171e6e09706e5622fef3c99ca0) )
+	ROM_LOAD( "pal20l8b-c21-12.ic47",   0x0600, 0x0144, CRC(bbc2cc97) SHA1(d4a68f28e0d3f5a3b39ecc25640bc9197ad0260b) )
+ROM_END
+
 ROM_START( galmedes ) // Taito PCB: K1100388A / J1100169A
 	ROM_REGION( 0x100000, "maincpu", 0 )     // 1024k for 68000 code
 	ROM_LOAD16_BYTE( "gm-prg1.ic23", 0x00000, 0x20000, CRC(32a70753) SHA1(3bd094b7ae600dbc87ba74e8b2d6b86a68346f4f) )
@@ -2208,32 +2234,33 @@ void base_state::init_earthjkr()
 } // Anonymous namespace
 
 
-GAME( 1988, bonzeadv,  0,        bonzeadv, bonzeadv,  bonzeadv_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Bonze Adventure (World, rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, bonzeadvo, bonzeadv, bonzeadv, bonzeadv,  bonzeadv_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Bonze Adventure (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, bonzeadvu, bonzeadv, bonzeadv, jigkmgri,  bonzeadv_state, empty_init,    ROT0,   "Taito America Corporation", "Bonze Adventure (US, rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, jigkmgri,  bonzeadv, bonzeadv, jigkmgri,  bonzeadv_state, empty_init,    ROT0,   "Taito Corporation",         "Jigoku Meguri (Japan, rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, jigkmgria, bonzeadv, bonzeadv, jigkmgri,  bonzeadv_state, empty_init,    ROT0,   "Taito Corporation",         "Jigoku Meguri (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, bonzeadv,  0,        bonzeadv, bonzeadv,  bonzeadv_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Bonze Adventure (World, rev 1)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1988, bonzeadvo, bonzeadv, bonzeadv, bonzeadv,  bonzeadv_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Bonze Adventure (World)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1988, bonzeadvu, bonzeadv, bonzeadv, jigkmgri,  bonzeadv_state, empty_init,    ROT0,   "Taito America Corporation", "Bonze Adventure (US, rev 1)",               MACHINE_SUPPORTS_SAVE )
+GAME( 1988, jigkmgri,  bonzeadv, bonzeadv, jigkmgri,  bonzeadv_state, empty_init,    ROT0,   "Taito Corporation",         "Jigoku Meguri (Japan, rev 1)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1988, jigkmgria, bonzeadv, bonzeadv, jigkmgri,  bonzeadv_state, empty_init,    ROT0,   "Taito Corporation",         "Jigoku Meguri (Japan)",                     MACHINE_SUPPORTS_SAVE )
 GAME( 1988, bonzeadvp, bonzeadv, bonzeadv, jigkmgri,  bonzeadv_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Bonze Adventure (World, prototype, newer)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, bonzeadvp2,bonzeadv, bonzeadv, jigkmgri,  bonzeadv_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Bonze Adventure (World, prototype, older)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, asuka,     0,        asuka,    asuka,     msm_state,      empty_init,    ROT270, "Taito Corporation",         "Asuka & Asuka (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, asuka,     0,        asuka,    asuka,     msm_state,      empty_init,    ROT270, "Taito Corporation",         "Asuka & Asuka (World)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1988, asukaj,    asuka,    asuka,    asuka,     msm_state,      empty_init,    ROT270, "Taito Corporation",         "Asuka & Asuka (Japan, rev 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, asukaja,   asuka,    asuka,    asuka,     msm_state,      empty_init,    ROT270, "Taito Corporation",         "Asuka & Asuka (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, asukaja,   asuka,    asuka,    asuka,     msm_state,      empty_init,    ROT270, "Taito Corporation",         "Asuka & Asuka (Japan)",        MACHINE_SUPPORTS_SAVE )
 
 GAME( 1989, mofflott,  0,        mofflott, mofflott,  msm_state,      empty_init,    ROT270, "Taito Corporation",         "Maze of Flott (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, cadash,    0,        cadash,   cadash,    cadash_state,   empty_init,    ROT0,   "Taito Corporation Japan",   "Cadash (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 1989, cadashj,   cadash,   cadash,   cadashj,   cadash_state,   empty_init,    ROT0,   "Taito Corporation",         "Cadash (Japan, rev 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 1989, cadashj1,  cadash,   cadash,   cadashj,   cadash_state,   empty_init,    ROT0,   "Taito Corporation",         "Cadash (Japan, rev 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 1989, cadashjo,  cadash,   cadash,   cadashj,   cadash_state,   empty_init,    ROT0,   "Taito Corporation",         "Cadash (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 1989, cadashu,   cadash,   cadash,   cadashu,   cadash_state,   empty_init,    ROT0,   "Taito America Corporation", "Cadash (US, rev 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 1989, cadashu1,  cadash,   cadash,   cadashu,   cadash_state,   empty_init,    ROT0,   "Taito America Corporation", "Cadash (US, rev 1?)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 1989, cadashi,   cadash,   cadash,   cadash,    cadash_state,   empty_init,    ROT0,   "Taito Corporation Japan",   "Cadash (Italy)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 1989, cadashf,   cadash,   cadash,   cadash,    cadash_state,   empty_init,    ROT0,   "Taito Corporation Japan",   "Cadash (France)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 1989, cadashg,   cadash,   cadash,   cadash,    cadash_state,   empty_init,    ROT0,   "Taito Corporation Japan",   "Cadash (Germany, rev 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 1989, cadashgo,  cadash,   cadash,   cadash,    cadash_state,   empty_init,    ROT0,   "Taito Corporation Japan",   "Cadash (Germany)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
-GAME( 1989, cadashp,   cadash,   cadash,   cadashj,   cadash_state,   empty_init,    ROT0,   "Taito Corporation Japan",   "Cadash (World, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN)
-GAME( 1989, cadashs,   cadash,   cadash,   cadash,    cadash_state,   empty_init,    ROT0,   "Taito Corporation Japan",   "Cadash (Spain, rev 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadash,    0,        cadash,   cadash,    cadash_state,   empty_init,    ROT0,   "Taito Corporation Japan",   "Cadash (World)",            MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashj,   cadash,   cadash,   cadashj,   cadash_state,   empty_init,    ROT0,   "Taito Corporation",         "Cadash (Japan, rev 2)",     MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashj1,  cadash,   cadash,   cadashj,   cadash_state,   empty_init,    ROT0,   "Taito Corporation",         "Cadash (Japan, rev 1)",     MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashjo,  cadash,   cadash,   cadashj,   cadash_state,   empty_init,    ROT0,   "Taito Corporation",         "Cadash (Japan)",            MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashu,   cadash,   cadash,   cadashu,   cadash_state,   empty_init,    ROT0,   "Taito America Corporation", "Cadash (US, rev 2)",        MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashu1,  cadash,   cadash,   cadashu,   cadash_state,   empty_init,    ROT0,   "Taito America Corporation", "Cadash (US, rev 1?)",       MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashi,   cadash,   cadash,   cadash,    cadash_state,   empty_init,    ROT0,   "Taito Corporation Japan",   "Cadash (Italy)",            MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashf,   cadash,   cadash,   cadash,    cadash_state,   empty_init,    ROT0,   "Taito Corporation Japan",   "Cadash (France)",           MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashg,   cadash,   cadash,   cadash,    cadash_state,   empty_init,    ROT0,   "Taito Corporation Japan",   "Cadash (Germany, rev 1)",   MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashgo,  cadash,   cadash,   cadash,    cadash_state,   empty_init,    ROT0,   "Taito Corporation Japan",   "Cadash (Germany)",          MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashp,   cadash,   cadash,   cadashj,   cadash_state,   empty_init,    ROT0,   "Taito Corporation Japan",   "Cadash (World, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashs,   cadash,   cadash,   cadash,    cadash_state,   empty_init,    ROT0,   "Taito Corporation Japan",   "Cadash (Spain, rev 1)",     MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashso,  cadash,   cadash,   cadash,    cadash_state,   empty_init,    ROT0,   "Taito Corporation Japan",   "Cadash (Spain)",            MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
 
 GAME( 1992, galmedes,  0,        asuka,    galmedes,  msm_state,      empty_init,    ROT270, "Visco",                     "Galmedes (Japan)", MACHINE_SUPPORTS_SAVE )
 
@@ -2242,5 +2269,5 @@ GAME( 1993, earthjkra, earthjkr, asuka,    earthjkr,  msm_state,      empty_init
 GAME( 1993, earthjkrb, earthjkr, asuka,    earthjkr,  msm_state,      empty_init,    ROT270, "Visco",                     "U.N. Defense Force: Earth Joker (US / Japan, set 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, earthjkrp, earthjkr, asuka,    earthjkrp, msm_state,      empty_init,    ROT270, "Visco",                     "U.N. Defense Force: Earth Joker (Japan, prototype?)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, eto,       0,        eto,      eto,       base_state,     empty_init,    ROT0,   "Visco",                     "Kokontouzai Eto Monogatari (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, eto,       0,        eto,      eto,       base_state,     empty_init,    ROT0,   "Visco",                     "Kokontouzai Eto Monogatari (Japan)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1994, etoa,      eto,      eto,      eto,       base_state,     empty_init,    ROT0,   "Visco",                     "Kokontouzai Eto Monogatari (Japan, prototype?)", MACHINE_SUPPORTS_SAVE )

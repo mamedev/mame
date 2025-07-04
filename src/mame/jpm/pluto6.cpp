@@ -79,8 +79,7 @@ void pluto6_state::pluto6(machine_config &config)
 
 	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0, m_maincpu);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 }
 
 

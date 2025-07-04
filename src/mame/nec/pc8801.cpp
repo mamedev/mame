@@ -1706,18 +1706,16 @@ void pc8801_state::pc8801(machine_config &config)
 
 	// Note: original models up to OPNA variants really have an internal mono speaker,
 	// but user eventually can have a stereo mixing audio card mounted so for simplicity we MCM here.
-	SPEAKER(config, m_lspeaker).front_left();
-	SPEAKER(config, m_rspeaker).front_right();
+	SPEAKER(config, m_speaker, 2).front();
 
 	// TODO: DAC_1BIT
 	// 2400 Hz according to schematics, unaffected by clock speed setting (confirmed on real HW)
 	BEEP(config, m_beeper, MASTER_CLOCK / 16 / 13 / 8);
 
-	for (auto &speaker : { m_lspeaker, m_rspeaker })
-	{
-		m_cassette->add_route(ALL_OUTPUTS, speaker, 0.025);
-		m_beeper->add_route(ALL_OUTPUTS, speaker, 0.10);
-	}
+	m_cassette->add_route(ALL_OUTPUTS, m_speaker, 0.025, 0);
+	m_cassette->add_route(ALL_OUTPUTS, m_speaker, 0.025, 1);
+	m_beeper->add_route(ALL_OUTPUTS, m_speaker, 0.10, 0);
+	m_beeper->add_route(ALL_OUTPUTS, m_speaker, 0.10, 1);
 
 	MSX_GENERAL_PURPOSE_PORT(config, m_mouse_port, msx_general_purpose_port_devices, "joystick");
 
@@ -1738,14 +1736,15 @@ void pc8801mk2sr_state::pc8801mk2sr(machine_config &config)
 	m_opn->port_b_read_callback().set(FUNC(pc8801mk2sr_state::opn_portb_r));
 	m_opn->port_b_write_callback().set(FUNC(pc8801mk2sr_state::opn_portb_w));
 
-	for (auto &speaker : { m_lspeaker, m_rspeaker })
-	{
-		// TODO: per-channel mixing is unconfirmed
-		m_opn->add_route(0, speaker, 0.125);
-		m_opn->add_route(1, speaker, 0.125);
-		m_opn->add_route(2, speaker, 0.125);
-		m_opn->add_route(3, speaker, 0.125);
-	}
+	// TODO: per-channel mixing is unconfirmed
+	m_opn->add_route(0, m_speaker, 0.125, 0);
+	m_opn->add_route(1, m_speaker, 0.125, 0);
+	m_opn->add_route(2, m_speaker, 0.125, 0);
+	m_opn->add_route(3, m_speaker, 0.125, 0);
+	m_opn->add_route(0, m_speaker, 0.125, 1);
+	m_opn->add_route(1, m_speaker, 0.125, 1);
+	m_opn->add_route(2, m_speaker, 0.125, 1);
+	m_opn->add_route(3, m_speaker, 0.125, 1);
 }
 
 void pc8801mk2sr_state::pc8801mk2mr(machine_config &config)
@@ -1768,10 +1767,10 @@ void pc8801fh_state::pc8801fh(machine_config &config)
 	m_opna->port_b_write_callback().set(FUNC(pc8801fh_state::opn_portb_w));
 
 	// TODO: per-channel mixing is unconfirmed
-	m_opna->add_route(0, m_lspeaker, 0.25);
-	m_opna->add_route(0, m_rspeaker, 0.25);
-	m_opna->add_route(1, m_lspeaker, 0.75);
-	m_opna->add_route(2, m_rspeaker, 0.75);
+	m_opna->add_route(0, m_speaker, 0.75, 0);
+	m_opna->add_route(0, m_speaker, 0.75, 1);
+	m_opna->add_route(1, m_speaker, 0.75, 0);
+	m_opna->add_route(2, m_speaker, 0.75, 1);
 
 	// TODO: add possible configuration override for baudrate here
 	// ...

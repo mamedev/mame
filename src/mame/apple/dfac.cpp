@@ -122,25 +122,19 @@ void dfac_device::device_start()
 	save_item(NAME(m_settings_byte));
 }
 
-void dfac_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void dfac_device::sound_stream_update(sound_stream &stream)
 {
 	if (BIT(m_settings_byte, 1))    // LPF In can go through to Amp Out
 	{
-		for (int i = 0; i < inputs[0].samples(); i++)
-		{
-			stream_buffer::sample_t l = inputs[0].get(i);
-			stream_buffer::sample_t r = inputs[1].get(i);
-			outputs[0].put(i, l * atten_table[m_settings_byte >> 5]);
-			outputs[1].put(i, r * atten_table[m_settings_byte >> 5]);
-		}
+		sound_stream::sample_t l = stream.get(0, 0);
+		sound_stream::sample_t r = stream.get(1, 0);
+		stream.put(0, 0, l * atten_table[m_settings_byte >> 5]);
+		stream.put(1, 0, r * atten_table[m_settings_byte >> 5]);
 	}
 	else
 	{
-		for (int i = 0; i < inputs[0].samples(); i++)
-		{
-			outputs[0].put(i, 0.0);
-			outputs[1].put(i, 0.0);
-		}
+		stream.put(0, 0, 0.0);
+		stream.put(1, 0, 0.0);
 	}
 }
 

@@ -182,7 +182,7 @@ private:
 	void refresh_filelist();
 	void refresh_typelist();
 	void update_cpu_view(device_t* device);
-	static bool get_view_source(void* data, int idx, const char** out_text);
+	static const char* get_view_source(void* data, int idx);
 	static int history_set(ImGuiInputTextCallbackData* data);
 
 	running_machine* m_machine;
@@ -268,11 +268,10 @@ static inline void map_attr_to_fg_bg(unsigned char attr, rgb_t *fg, rgb_t *bg)
 	}
 }
 
-bool debug_imgui::get_view_source(void* data, int idx, const char** out_text)
+const char* debug_imgui::get_view_source(void* data, int idx)
 {
 	auto* vw = static_cast<debug_view*>(data);
-	*out_text = vw->source(idx)->name();
-	return true;
+	return vw->source(idx)->name();
 }
 
 void debug_imgui::handle_events()
@@ -290,18 +289,9 @@ void debug_imgui::handle_events()
 		if(view_main_disasm->has_focus)
 			focus_view = view_main_disasm;
 
-	if(m_machine->input().code_pressed(KEYCODE_LCONTROL))
-		io.KeyCtrl = true;
-	else
-		io.KeyCtrl = false;
-	if(m_machine->input().code_pressed(KEYCODE_LSHIFT))
-		io.KeyShift = true;
-	else
-		io.KeyShift = false;
-	if(m_machine->input().code_pressed(KEYCODE_LALT))
-		io.KeyAlt = true;
-	else
-		io.KeyAlt = false;
+	io.KeyCtrl = m_machine->input().code_pressed(KEYCODE_LCONTROL);
+	io.KeyShift = m_machine->input().code_pressed(KEYCODE_LSHIFT);
+	io.KeyAlt = m_machine->input().code_pressed(KEYCODE_LALT);
 
 	for(input_item_id id = ITEM_ID_A; id <= ITEM_ID_CANCEL; ++id)
 	{

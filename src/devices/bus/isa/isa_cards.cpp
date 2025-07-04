@@ -26,32 +26,40 @@
 #include "vga.h"
 #include "vga_ati.h"
 
-// storage
+// storage (floppy only)
+#include "fdc.h"
+#include "mufdc.h"
+
+// storage (MFM/RLL/ESDI)
 #include "acb2072.h"
+#include "cl_sh260.h"
+#include "hdc.h"
+#include "lrk330.h"
+#include "omti8621.h"
+#include "ultra12f.h"
+#include "wd1002a_wx1.h"
+#include "wd1007a.h"
+#include "wdxt_gen.h"
+
+// storage (SCSI)
 #include "aha1542b.h"
 #include "aha1542c.h"
 #include "aha174x.h"
 #include "asc88.h"
 #include "bt54x.h"
-#include "cl_sh260.h"
 #include "dcb.h"
-#include "fdc.h"
-#include "hdc.h"
-#include "ide.h"
-#include "lbaenhancer.h"
-#include "lrk330.h"
-#include "mcd.h"
-#include "mufdc.h"
-#include "omti8621.h"
-#include "side116.h"
 #include "tekram_dc820.h"
-#include "ultra12f.h"
 #include "ultra14f.h"
 #include "ultra24f.h"
-#include "wd1002a_wx1.h"
-#include "wd1007a.h"
-#include "wdxt_gen.h"
+
+// storage (IDE/XT-IDE)
+#include "ide.h"
+#include "side116.h"
 #include "xtide.h"
+
+// storage (miscellaneous)
+#include "lbaenhancer.h"
+#include "mcd.h"
 
 // sound
 #include "adlib.h"

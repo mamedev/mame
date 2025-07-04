@@ -175,17 +175,15 @@ license:CC0-1.0
 	</software>
 
 	<software name="btlchess">
-		<description>Battle Chess (cleanly cracked)</description>
+		<description>Battle Chess (trex crack)</description>
 		<year>1989</year>
-		<publisher>Interplay</publisher>
+		<publisher>Interplay Productions</publisher>
 		<info name="programmer" value="Jim Sproul, Todd J. Camasta, Bruce Schlickbernd, Kurt Heiden, Bill (Weez) Dugan, Thomas R. Decker, Troy P. Worrell, Michael Quarles, Rebecca Heineman, and Alan Pavlish" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 512K Apple IIgs. -->
-		<!-- "Battle Chess" is a 1989 board game developed by Jim Sproul, Todd J. Camasta, Bruce Schlickbernd, Kurt Heiden, Bill (Weez) Dugan, Thomas R. Decker, Troy P. Worrell, Michael Quarles, Rebecca Heineman, and Alan Pavlish, and distributed by Interplay. -->
+		<!-- board game. The manual at https://archive.org/details/Battle_Chess_Manual contains the information you need for the copy protection questions -->
 		<!-- Protection: Key-Word, A manual is required to look up a letter / word or use of code wheel for a specific response -->
-
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="battle chess iigs (trex crack).2mg" size="819264" crc="f40de0f7" sha1="8cd2fc36064fe531172d532db948865bce36307a"/>
@@ -252,19 +250,17 @@ license:CC0-1.0
 	</software>
 
 	<software name="calcraft">
-		<description>Calendar Crafter (A-194 version 1.2) (cleanly cracked)</description>
+		<description>Calendar Crafter (A-194 version 1.2) (trex crack)</description>
 		<year>1987</year>
 		<publisher>MECC</publisher>
 		<info name="partno" value="A-194" />
 		<info name="programmer" value="Gene Breault, Charolyn Kapplinger, Diane Portner, Steven D. Splinter, and Paul R. Wenker" />
-		<info name="version" value="1.2" />
 		<info name="usage" value="Requires a 768K Apple IIgs ROM 01 or later." />
+		<info name="version" value="1.2" />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 768K Apple IIgs ROM 01 or later. -->
-		<!-- "Calendar Crafter" is a utility that allows you to design and print customized calendars to help organize your month / year. -->
+		<!-- productivity program -->
 		<!-- Protection: Bad block check for block $8 -->
-
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="calendar crafter v1.2 iigs(trex crack).2mg" size="819264" crc="65717231" sha1="2f2415385a699fc78a68a3a73ff8470a5fc8df6f"/>
@@ -273,17 +269,15 @@ license:CC0-1.0
 	</software>
 
 	<software name="calgames">
-		<description>California Games (cleanly cracked)</description>
+		<description>California Games (trex crack)</description>
 		<year>1988</year>
 		<publisher>Epyx</publisher>
 		<info name="programmer" value="Jimmy Huey, Dan Chang, Jenny Martin, Sheryl Knowles, Bill Bogenreif, Matt Householder, and Ron Fortier" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 512K Apple IIgs. -->
-		<!-- "California Games" is a 1988 sports game developed by Jimmy Huey, Dan Chang, Jenny Martin, Sheryl Knowles, Bill Bogenreif, Matt Householder, and Ron Fortier, and distributed by Epyx. -->
 		<!-- Protection: Nibble count on tracks $20 & $21 -->
-
+		<!-- sports game -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="california games iigs (trex crack).2mg" size="819264" crc="908b7825" sha1="d276969f7e11b493d10fb2d7b2943c3e668864aa"/>
@@ -292,17 +286,15 @@ license:CC0-1.0
 	</software>
 
 	<software name="captbld">
-		<description>Captain Blood (cleanly cracked)</description>
+		<description>Captain Blood (trex crack)</description>
 		<year>1989</year>
 		<publisher>Mindscape</publisher>
 		<info name="programmer" value="Philippe Ulrich, Didier Bouchon, Jean-Michel Jarre, Alexis Martial, and Michael Rho" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
-		<sharedfeat name="compatibility" value="A2GS"/>
+		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 512K Apple IIgs. -->
-		<!-- "Captain Blood" is a 1989 simulation game developed by Philippe Ulrich, Didier Bouchon, Jean-Michel Jarre, Alexis Martial, and Michael Rho, and distributed by Mindscape. -->
+		<!-- simulation game -->
 		<!-- Protection: Key-Word, A manual is required to look up a letter / word or use of code wheel for a specific response -->
-
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="captain blood iigs (trex crack).2mg" size="819264" crc="7b2dede6" sha1="6ead26e7e2c4d3bb65b3d91e13df784503c9e643"/>
@@ -475,19 +467,17 @@ license:CC0-1.0
 	</software>
 
 	<software name="dsgnprnt">
-		<description>Designer Prints (A-252 version 1.0) (cleanly cracked)</description>
+		<description>Designer Prints (A-252 version 1.0) (trex crack)</description>
 		<year>1989</year>
 		<publisher>MECC</publisher>
 		<info name="partno" value="A-252" />
 		<info name="programmer" value="Diane Portner, Michael Stein, Brian Walker, and Paul Wenker" />
-		<info name="version" value="1.0" />
 		<info name="usage" value="Requires a 768K Apple IIgs ROM 01 or later." />
+		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 768K Apple IIgs ROM 01 or later. -->
-		<!-- "Designer Prints" is a versatile desktop publishing program for making worksheets, certificates, posters and other printed materials. -->
+		<!-- desktop publishing program -->
 		<!-- Protection: Bad block check for block $8 -->
-
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1 - System disk"/>
 			<dataarea name="flop" size="819264">
@@ -503,19 +493,17 @@ license:CC0-1.0
 	</software>
 
 	<software name="dsgnpuzl">
-		<description>Designer Puzzles (A-223 version 1.0) (cleanly cracked)</description>
+		<description>Designer Puzzles (A-223 version 1.0) (trex crack)</description>
 		<year>1989</year>
 		<publisher>MECC</publisher>
 		<info name="partno" value="A-223" />
 		<info name="programmer" value="Susan Gabrys, John J. Krenz, Diane Portner, and Steve Splinter" />
-		<info name="version" value="1.0" />
 		<info name="usage" value="Requires a 768K Apple IIgs ROM 01 or later." />
+		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 768K Apple IIgs ROM 01 or later. -->
-		<!-- "Designer Puzzles" is a versatile desktop publishing program for making word scrambles and crossword puzzles -->
+		<!-- desktop publishing program -->
 		<!-- Protection: Bad block check for block $8 -->
-
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1 - System disk"/>
 			<dataarea name="flop" size="819264">
@@ -531,17 +519,15 @@ license:CC0-1.0
 	</software>
 
 	<software name="destryr">
-		<description>Destroyer (cleanly cracked)</description>
+		<description>Destroyer (trex crack)</description>
 		<year>1987</year>
 		<publisher>Epyx</publisher>
 		<info name="programmer" value="Michael Kosaka and Chuck Sommerville" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 512K Apple IIgs. -->
-		<!-- "Destroyer" is a 1987 simulation game developed by Michael Kosaka and Chuck Sommerville, and distributed by Epyx. -->
 		<!-- Protection: Nibble count on tracks $20 & $21 - 10 separate occurrences (Yes 10!) -->
-
+		<!-- simulation game -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="destroyer iigs (trex crack).2mg" size="819264" crc="a6943b6d" sha1="2160a034da86a894a0615490d55b8c585f0e1fcc"/>
@@ -681,13 +667,12 @@ license:CC0-1.0
 		<description>Gauntlet (cleanly cracked)</description>
 		<year>1988</year>
 		<publisher>Mindscape</publisher>
+		<info name="developer" value="Atari Games" />
 		<info name="usage" value="Requires a 256K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 256K Apple IIgs. -->
-		<!-- "Gauntlet" is a 1988 action game distributed by Mindscape. -->
 		<!-- Protection: Bad block check for block $7 -->
-
+		<!-- arcade game -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="gauntlet iigs (trex crack).2mg" size="819264" crc="9350598a" sha1="e594829ae86956a4e86a5e7243e82bf7d3606c17"/>
@@ -857,16 +842,15 @@ license:CC0-1.0
 	</software>
 
 	<software name="hostage">
-		<description>Hostage: Rescue Mission (cleanly cracked)</description>
+		<description>Hostage: Rescue Mission (trex crack)</description>
 		<year>1990</year>
 		<publisher>Mindscape</publisher>
+		<info name="developer" value="Infogrames" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
-		<sharedfeat name="compatibility" value="A2GS"/>
+		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 512K Apple IIgs. -->
-		<!-- "Hostage: Rescue Mission" is a 1990 simulation game developed by Infogrames and distributed by Mindscape. -->
+		<!-- simulation game -->
 		<!-- Protection: Key-Word, A manual is required to look up a letter / word or use of code wheel for a specific response -->
-
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="hostage - rescue mission iigs (trex crack).2mg" size="819264" crc="96b1c5b2" sha1="8c541ef7455a4cd5f9cb90093b158b618cdb131c"/>
@@ -875,17 +859,15 @@ license:CC0-1.0
 	</software>
 
 	<software name="impmiss2">
-		<description>Impossible Mission II (cleanly cracked)</description>
+		<description>Impossible Mission II (trex crack)</description>
 		<year>1989</year>
 		<publisher>Epyx</publisher>
 		<info name="programmer" value="Istvan Cseri, Gyula Horvath, Pal Komondi, and Sultan" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 512K Apple IIgs. -->
-		<!-- "Impossible Mission II" is a 1989 action game developed by Istvan Cseri, Gyula Horvath, Pal Komondi, and Sultan, and distributed by Epyx. -->
+		<!-- action game -->
 		<!-- Protection: Nibble count on tracks $20 & $21 -->
-
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="impossible mission ii iigs (trex crack).2mg" size="819264" crc="74ff8279" sha1="53daf3ca16a5f2bee0104e1d6688ce45ead599bc"/>
@@ -976,19 +958,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="kingqst">
-		<description>King's Quest - Quest for the Crown (cleanly cracked)</description>
+	<software name="kquest">
+		<description>King's Quest - Quest for the Crown (trex crack)</description>
 		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="author" value="Roberta Williams, Al Lowe, Charles Tingley, Ken MacNeill, Chris Iden, Doug MacNeill, Greg Rowland, and Chris Iden" />
 		<info name="programmer" value="Carlos Escobar" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
-		<sharedfeat name="compatibility" value="A2GS"/>
+		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 512K Apple IIgs. -->
-		<!-- "King's Quest - Quest for the Crown" is a 1987 adventure game developed by Roberta Williams, Al Lowe, Bob Kernaghan, Robert E. Heitman, Jeff Stephenson, Chris Iden, Doug MacNeill, Margaret Lowe, Dale Carlson, Jennifer Cobb, Chad Bye, Jeremy T. Cromwell, Carlos Escobar, Annette Childs, Greg Steffen, and Ken Williams, and distributed by Sierra On-Line. -->
 		<!-- Protection: Bad block check for block $634 -->
-
+		<!-- adventure game -->
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="819264">
@@ -1003,18 +983,16 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="kingqst2">
-		<description>King's Quest II - Romancing The Throne (cleanly cracked)</description>
+	<software name="kquest2">
+		<description>King's Quest II - Romancing The Throne (trex crack)</description>
 		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="programmer" value="Roberta Williams, Jeff Stephenson, Chris Iden, Robert Heitman, Ken Williams, Sol Ackerman, Scott Murphy, Doug MacNeill, Mark Crowe, and Al Lowe" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 512K Apple IIgs. -->
-		<!-- "King's Quest II - Romancing The Throne" is a 1987 adventure game developed by Roberta Williams, Al Lowe, Bob Kernaghan, Robert E. Heitman, Jeff Stephenson, Chris Iden, Doug MacNeill, Margaret Lowe, Dale Carlson, Jennifer Cobb, Chad Bye, Jeremy T. Cromwell, Carlos Escobar, Annette Childs, Greg Steffen, and Ken Williams, and distributed by Sierra On-Line. -->
 		<!-- Protection: Bad block check for block $634 -->
-
+		<!-- adventure game -->
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="819264">
@@ -1029,18 +1007,16 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="kingqst3">
-		<description>King's Quest III - To Hier is Human (cleanly cracked)</description>
+	<software name="kquest3">
+		<description>King's Quest III - To Hier is Human (trex crack)</description>
 		<year>1988</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="programmer" value="Roberta Williams, Al Lowe, Bob Kernaghan, Robert E. Heitman, Jeff Stephenson, Chris Iden, Doug MacNeill, Margaret Lowe, Dale Carlson, Jennifer Cobb, Chad Bye, Jeremy T. Cromwell, Carlos Escobar, Annette Childs, Greg Steffen, and Ken Williams" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 512K Apple IIgs. -->
-		<!-- "King's Quest III - To Hier is Human" is a 1988 adventure game developed by Roberta Williams, Al Lowe, Bob Kernaghan, Robert E. Heitman, Jeff Stephenson, Chris Iden, Doug MacNeill, Margaret Lowe, Dale Carlson, Jennifer Cobb, Chad Bye, Jeremy T. Cromwell, Carlos Escobar, Annette Childs, Greg Steffen, and Ken Williams, and distributed by Sierra On-Line. -->
 		<!-- Protection: Bad block check for block $634 -->
-
+		<!-- adventure game -->
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="819264">
@@ -1081,18 +1057,16 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="lslarry">
-		<description>Leisure Suit Larry in the Land of the Lounge Lizards (cleanly cracked)</description>
+	<software name="lsl1">
+		<description>Leisure Suit Larry in The Land of the Lounge Lizards (trex crack)</description>
 		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="programmer" value="Al Lowe, Chuck Benton, Mark Crowe, Jeff Stephenson, Chris Iden, Bob Heitman, Ken Williams, and Carlos Escobar" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 512K Apple IIgs. -->
-		<!-- "Leisure Suit Larry in the Land of the Lounge Lizards" is a 1987 adventure game developed by Al Lowe, Chuck Benton, Mark Crowe, Jeff Stephenson, Chris Iden, Bob Heitman, Ken Williams, and Carlos Escobar, and distributed by Sierra On-Line. -->
 		<!-- Protection: Bad block check for block $634 -->
-
+		<!-- adventure game -->
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="819264">
@@ -1154,7 +1128,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="marble">
-		<description>Marble Madness (cleanly cracked)</description>
+		<description>Marble Madness (trex crack)</description>
 		<year>1986</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="programmer" value="Will Harvey" />
@@ -1162,10 +1136,8 @@ license:CC0-1.0
 		<info name="programmer" value="Will Harvey"/>
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 512K Apple IIgs. -->
-		<!-- "Marble Madness" is a 1986 action game developed by Will Harvey and distributed by Electronic Arts. -->
+		<!-- action game -->
 		<!-- Protection: Nibble count on tracks $20 & $21 -->
-
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="marble madness iigs (trex crack).2mg" size="819264" crc="d400455e" sha1="68526119d1f3b31e01d9b9b52a364323f88b2b58"/>
@@ -1173,44 +1145,40 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="mathblst">
-		<description>Math Blaster Plus! (version 1.1) (cleanly cracked)</description>
-		<year>1989</year>
-		<publisher>Davidson and Associates</publisher>
-		<info name="author" value="Jan Davidson and Cathy Johnson" />
-		<info name="programmer" value="C.K. Haun" />
-		<info name="version" value="1.1" />
-		<info name="usage" value="Requires a 512K Apple IIgs ROM1 or later." />
-		<sharedfeat name="compatibility" value="A2GS"/>
-		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 512K Apple IIgs ROM1 or later. -->
-		<!-- "Math Blaster Plus!" is a 1989 educational program designed by Jan Davidson and Cathy Johnson, written by C.K. Haun, and distributed by Davidson and Associates. -->
-		<!-- Protection: Bad block check for block $308 -->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="819264">
-				<rom name="math blaster plus v1.1 iigs (trex crack).2mg" size="819264" crc="96b3a909" sha1="5c7a1e8172f25ef328239971175b1f28a317fe2a" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="mathblsta" cloneof="mathblst">
-		<description>Math Blaster Plus! (version 1.0) (cleanly cracked)</description>
+		<description>Math Blaster Plus! (version 1.0) (trex crack)</description>
 		<year>1989</year>
-		<publisher>Davidson and Associates</publisher>
+		<publisher>Davidson &amp; Associates</publisher>
 		<info name="author" value="Jan Davidson and Cathy Johnson" />
 		<info name="programmer" value="C.K. Haun" />
 		<info name="version" value="1.0" />
 		<info name="usage" value="Requires a 512K Apple IIgs ROM1 or later." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 512K Apple IIgs ROM1 or later. -->
-		<!-- "Math Blaster Plus!" is a 1989 educational program designed by Jan Davidson and Cathy Johnson, written by C.K. Haun, and distributed by Davidson and Associates. -->
+		<!-- educational program -->
 		<!-- Protection: Bad block check for block $308 -->
-
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="math blaster plus v1.0 iigs (trex crack).2mg" size="819264" crc="37120366" sha1="b6a585415cbac0f69182da911bf7ec298df5fcbc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathblst">
+		<description>Math Blaster Plus! (version 1.1) (trex crack)</description>
+		<year>1989</year>
+		<publisher>Davidson &amp; Associates</publisher>
+		<info name="author" value="Jan Davidson and Cathy Johnson" />
+		<info name="programmer" value="C.K. Haun" />
+		<info name="version" value="1.1" />
+		<info name="usage" value="Requires a 512K Apple IIgs ROM1 or later." />
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- Dump released: 2021-08-13 -->
+		<!-- educational program -->
+		<!-- It requires a 512K Apple IIgs ROM1 or later. -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819264">
+				<rom name="math blaster plus v1.1 iigs (trex crack).2mg" size="819264" crc="96b3a909" sha1="5c7a1e8172f25ef328239971175b1f28a317fe2a" />
 			</dataarea>
 		</part>
 	</software>
@@ -1361,7 +1329,8 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 
-	</software> <software name="mulscribe">
+	</software>
+	<software name="mulscribe">
 		<description>MultiScribe IIgs (version 3.01c) (cleanly cracked)</description>
 		<year>1987</year>
 		<publisher>StyleWare</publisher>
@@ -1390,7 +1359,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="mcs">
-		<description>Music Construction Set (version 1.0) (cleanly cracked)</description>
+		<description>Music Construction Set (version 1.0) (trex crack)</description>
 		<year>1986</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="programmer" value="Will Harvey, Jim Nitchals, and Doug Fulton" />
@@ -1398,10 +1367,8 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 256K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 256K Apple IIgs. -->
-		<!-- "Music Construction Set" is a 1986 audio program developed by Will Harvey, Jim Nitchals, and Doug Fulton, and distributed by Electronic Arts. -->
+		<!-- audio program -->
 		<!-- Protection: Nibble count on tracks $20 & $21 -->
-
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="music construction set v1.0 iigs (trex crack).2mg" size="819264" crc="278ef676" sha1="22808e777a37118c7cfd0bc639aac756843ce8ce"/>
@@ -1410,17 +1377,15 @@ license:CC0-1.0
 	</software>
 
 	<software name="neuromnc">
-		<description>Neuromancer (cleanly cracked)</description>
+		<description>Neuromancer (trex crack)</description>
 		<year>1989</year>
 		<publisher>Interplay Productions</publisher>
 		<info name="programmer" value="Rebecca Heineman" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 512K Apple IIgs. -->
-		<!-- "Neuromancer" is a 1989 adventure game developed by Rebecca Heineman and distributed by Interplay Productions. -->
+		<!-- adventure game -->
 		<!-- Protection: Key-Word, A manual is required to look up a letter / word or use of code wheel for a specific response -->
-
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="neuromancer iigs (trex crack).2mg" size="819264" crc="158c6c93" sha1="aee79701fdcbc9204f979087cd420c4b462c3b66"/>
@@ -1436,10 +1401,8 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 256K Apple IIgs ROM 01." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 256K Apple IIgs ROM 01 -->
-		<!-- "Paperboy" is a 1988 action game developed by Tengen and distributed by Mindscape. -->
 		<!-- Protection: Bad block check for block $7 -->
-
+		<!-- arcade game -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="paperboy iigs (trex crack).2mg" size="819264" crc="a914d4a0" sha1="16990a565fdd157e58481113f30bb6725b38e958"/>
@@ -1604,19 +1567,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="readingme">
-		<description>Reading and Me (version 1.0) (cleanly cracked)</description>
+	<software name="readandme">
+		<description>Reading and Me (version 1.0) (trex crack)</description>
 		<year>1988</year>
-		<publisher>Davidson and Associates</publisher>
+		<publisher>Davidson &amp; Associates</publisher>
 		<info name="programmer" value="Louis X. Savain and C. K. Haun" />
 		<info name="version" value="1.0" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 512K Apple IIgs. -->
-		<!-- "Reading and Me" is a 1988 educational program developed by Louis X. Savain and C. K. Haun, and distributed by Davidson & Associates. -->
 		<!-- Protection: Bad block check for block $308 -->
-
+		<!-- educational program -->
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1 - Program disk"/>
 			<dataarea name="flop" size="819264">
@@ -1822,17 +1783,15 @@ license:CC0-1.0
 	</software>
 
 	<software name="silpheed">
-		<description>Silpheed - Super Dogfighter (cleanly cracked)</description>
+		<description>Silpheed - Super Dogfighter (trex crack)</description>
 		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="programmer" value="John Rettig, Stuart Goldstein, Mark Seibert, Satoshi Uesaki, Nobuyuki Ogawa, Akira Eye, Fumihito Kasatani, Nobuyuki Aoshima, Hiromi Ohba, Takeshi Miyaji, Osamu Harada, and Youichi Miyaji" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 512K Apple IIgs. -->
-		<!-- "Silpheed" is a 1987 action game developed by John Rettig, Stuart Goldstein, Mark Seibert, Satoshi Uesaki, Nobuyuki Ogawa, Akira Eye, Fumihito Kasatani, Nobuyuki Aoshima, Hiromi Ohba, Takeshi Miyaji, Osamu Harada, and Youichi Miyaji, and distributed by Sierra On-Line. -->
 		<!-- Protection: Key-Word, A manual is required to look up a letter / word or use of code wheel for a specific response -->
-
+		<!-- action game -->
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="819264">
@@ -1848,20 +1807,19 @@ license:CC0-1.0
 	</software>
 
 	<software name="skatedie">
-		<description>Skate or Die! IIgs (version 1.1 07-Oct-88) (cleanly cracked)</description>
+		<description>Skate or Die! IIgs (version 1.1 07-Oct-88) (trex crack)</description>
 		<year>1988</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="programmer" value="Michael Kosaka, Stephen Landrum, David Bunch, and Michelle Shelfer" />
-		<info name="version" value="1.1 07-Oct-88 - ROM 03 compatible" />
 		<info name="usage" value="Requires a 512K Apple IIgs. Music requires 768K." />
+		<info name="version" value="1.1 07-Oct-88 - ROM 03 compatible" />
+		<!-- sod.sys16 dated 07-Oct-88 -->
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 512K Apple IIgs. Music requires 768K. -->
-		<!-- "Skate or Die" is a 1988 sports game developed by Michael Kosaka, Stephen Landrum, David Bunch, and Michelle Shelfer, and distributed by Electronic Arts. -->
+		<!-- sports game -->
 		<!-- Patched to be compatible with ROM03 -->
 		<!-- sod.sys16 dated 07-Oct-88 -->
 		<!-- Protection: Nibble count on tracks $20 & $21 -->
-
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="skate or die v1.1 iigs (trex crack).2mg" size="819264" crc="dde655cd" sha1="cf40c92a699cf9e7c79f1a25c3f22f32f5a28d46"/>
@@ -1870,21 +1828,19 @@ license:CC0-1.0
 	</software>
 
 	<software name="skatediea" cloneof="skatedie">
-		<description>Skate or Die! IIgs (version 1.0 12-Aug-88) (cleanly cracked)</description>
+		<description>Skate or Die! IIgs (version 1.0 12-Aug-88) (trex crack)</description>
 		<year>1988</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="programmer" value="Michael Kosaka, Stephen Landrum, David Bunch, and Michelle Shelfer" />
-		<info name="version" value="1.0 12-Aug-88 - ROM 03 compatible" />
 		<info name="usage" value="Requires a 512K Apple IIgs. Music requires 768K." />
+		<info name="version" value="1.0 12-Aug-88 - ROM 03 compatible" />
 		<!-- sod.sys16 dated 12-Aug-88 -->
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2025-01-25, redump based on WOZ released on 2024-09-02 -->
-		<!-- It requires a 512K Apple IIgs. Music requires 768K. -->
-		<!-- "Skate or Die" is a 1988 sports game developed by Michael Kosaka, Stephen Landrum, David Bunch, and Michelle Shelfer, and distributed by Electronic Arts. -->
+		<!-- sports game -->
 		<!-- Patched to be compatible with ROM03 -->
 		<!-- sod.sys16 dated 12-Aug-88 -->
 		<!-- Protection: Nibble count on tracks $20 & $21 -->
-
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="skate or die v1.0 iigs (trex crack).2mg" size="819264" crc="f87d1ec3" sha1="9e28b572f9d53fd276066b3701de42d45ee9cc51"/>
@@ -1892,18 +1848,16 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="spquest">
-		<description>Space Quest - The Sarien Encounter (cleanly cracked)</description>
+	<software name="squest">
+		<description>Space Quest: The Sarien Encounter (trex crack)</description>
 		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
-		<info name="release" value="2021-08-13"/>
+		<info name="programmer" value="Scott Murphy, Mark Crowe, Jeff Stephenson, Chris Iden, Sol Ackerman, and Ken Williams" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
-		<sharedfeat name="compatibility" value="A2GS"/>
+		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 512K Apple IIgs. -->
-		<!-- "Space Quest: The Sarien Encounter" is a 1987 adventure game developed by Scott Murphy, Mark Crowe, Jeff Stephenson, Chris Iden, Sol Ackerman, and Ken Williams, and distributed by Sierra On-Line. -->
 		<!-- Protection: Bad block check for block $634 -->
-
+		<!-- adventure game -->
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="819264">
@@ -1918,18 +1872,16 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="spquest2">
-		<description>Space Quest II - Vohual's Revenge (cleanly cracked)</description>
+	<software name="squest2">
+		<description>Space Quest II: Vohaul's Revenge (trex crack)</description>
 		<year>1988</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="programmer" value="Scott Murphy, Mark Crowe, Jeff Stephenson, Chris Iden, Sol Ackerman, and Ken Williams" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 512K Apple IIgs. -->
-		<!-- "Space Quest II" is a 1988 adventure game developed by Mark Crowe, Scott Murphy, Jeff Stephenson, Chris Iden, Robert Heitman, and Carlos Escobar, and distributed by Sierra On-Line. -->
 		<!-- Protection: Bad block check for block $634 -->
-
+		<!-- adventure game -->
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="819264">
@@ -2061,17 +2013,15 @@ license:CC0-1.0
 	</software>
 
 	<software name="strsoccr">
-		<description>Street Sports Soccer (cleanly cracked)</description>
+		<description>Street Sports Soccer (trex crack)</description>
 		<year>1988</year>
 		<publisher>Epyx</publisher>
 		<info name="developer" value="Designer Software" />
 		<info name="usage" value="Requires a 512K Apple IIgs ROM 01 or earlier." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 512K Apple IIgs ROM 01 or earlier. -->
-		<!-- "Street Sports Soccer" is a 1988 sports game developed by Designer Software and distributed by Epyx. -->
+		<!-- sports game -->
 		<!-- Protection: Nibble count on tracks $20 & $21 -->
-
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="street sports soccer iigs (trex crack).2mg" size="819264" crc="28862df6" sha1="8154843041284a59017021d4783cbe2c4f22c929"/>
@@ -2079,18 +2029,16 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="sshockey">
-		<description>Superstar Ice Hockey (cleanly cracked)</description>
+	<software name="ssicehock">
+		<description>Superstar Ice Hockey (trex crack)</description>
 		<year>1988</year>
 		<publisher>Mindscape</publisher>
 		<info name="programmer" value="Ed Ringler, Andrew Caldwell, Clayton Wishoff, Simon Ffinch, Ed Ringler Sr., and Chris Oke" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
-		<sharedfeat name="compatibility" value="A2GS"/>
+		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 512K Apple IIgs. -->
-		<!-- "Superstar Ice Hockey" is a 1988 sports game developed by Ed Ringler, Andrew Caldwell, Clayton Wishoff, Simon Ffinch, Ed Ringler Sr., and Chris Oke, and distributed by Mindscape. -->
+		<!-- sports game -->
 		<!-- Protection: Key-Word, A manual is required to look up a letter / word or use of code wheel for a specific response -->
-
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="superstar ice hockey iigs (trex crack).2mg" size="819264" crc="6f405a10" sha1="41e963da1f389f94697c024190bbb89ac3c14421"/>
@@ -2316,25 +2264,23 @@ license:CC0-1.0
 	</software>
 
 	<software name="immortal">
-		<description>The Immortal (cleanly cracked)</description>
+		<description>The Immortal (trex crack)</description>
 		<year>1990</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="programmer" value="Will Harvey, Ian Gooding, Michael Marcanted, Brett G. Durrett, and Douglas Fulton" />
 		<info name="usage" value="Requires a 1MB Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 1MB Apple IIgs. -->
-		<!-- "The Immortal" is a 1990 roleplaying game developed by Will Harvey, Ian Gooding, Michael Marcanted, Brett G. Durrett, and Douglas Fulton, and distributed by Electronic Arts. -->
+		<!-- roleplaying game -->
 		<!-- Protection: Key-Word, A manual is required to look up a letter / word or use of code wheel for a specific response -->
-
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1 - Play disk"/>
+			<feature name="part_id" value="Disk 1 - Play"/>
 			<dataarea name="flop" size="819264">
 				<rom name="the immortal iigs - disk 1 - play (trex crack).2mg" size="819264" crc="d63f3611" sha1="5ddefe34356f43f4af3d8dff6c3c4dc4180fcdb0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2 - Graphics disk"/>
+			<feature name="part_id" value="Disk 2 - Graphics"/>
 			<dataarea name="flop" size="819264">
 				<rom name="the immortal iigs - disk 2 - graphics (trex crack).2mg" size="819264" crc="c7a0e1a2" sha1="71d2811ed2c00f78de995e96f577874503d12a69"/>
 			</dataarea>
@@ -2622,8 +2568,28 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="thexder10" cloneof="thexder">
+		<description>Thexder (version 1.0) (trex crack) (No OS, not self booting)</description>
+		<year>1987</year>
+		<publisher>Sierra On-Line</publisher>
+		<info name="programmer" value="H. Godai, S. Uesaka, Michael D. Branham, Robert C. Clardy, John P. Conley, Lloyd Ollmann Jr., and Michael Ormsby" />
+		<info name="version" value="1.0" />
+		<info name="usage" value="Requires a 512K Apple IIgs." />
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- Dump released: 2021-08-13 -->
+		<!-- Original release by Sierra On-Line - Did NOT come with OS and was NOT self bootable -->
+		<!-- The file "othexder" had been undeleted (and cracked) and is closer to v2.7 in how it's demo sounds fade -->
+		<!-- Protection: Bad block check for block $634 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819264">
+				<rom name="thexder v1.0 iigs (trex crack).2mg" size="819264" crc="5a105720" sha1="31061b4561c967d824936c94ce882f2efcb017da"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="thexder">
-		<description>Thexder (version 2.7) (cleanly cracked)</description>
+		<description>Thexder (version 2.7) (trex crack)</description>
 		<year>1987</year>
 		<publisher>Sierra On-Line</publisher>
 		<info name="programmer" value="H. Godai, S. Uesaka, Michael D. Branham, Robert C. Clardy, John P. Conley, Lloyd Ollmann Jr., and Michael Ormsby" />
@@ -2631,35 +2597,11 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 512K Apple IIgs. -->
-		<!-- "Thexder" is a 1987 action game developed by H. Godai, S. Uesaka, Michael D. Branham, Robert C. Clardy, John P. Conley, Lloyd Ollmann Jr., and Michael Ormsby, and distributed by Sierra On-Line. -->
 		<!-- Protection: Bad block check for block $634 -->
-
+		<!-- action game -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="thexder v2.7 iigs (trex crack).2mg" size="819264" crc="7fa5ad73" sha1="acb227363d426c86ab5ac80c126fc430616cb535"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="thexdero" cloneof="thexder">
-		<description>Thexder (version 1.0) (cleanly cracked) (No OS, not self booting)</description>
-		<year>1987</year>
-		<publisher>Sierra</publisher>
-		<info name="programmer" value="H. Godai, S. Uesaka, Michael D. Branham, Robert C. Clardy, John P. Conley, Lloyd Ollmann Jr., and Michael Ormsby" />
-		<info name="version" value="1.0 - No OS, not self booting" />
-		<info name="usage" value="Requires a 512K Apple IIgs." />
-		<sharedfeat name="compatibility" value="A2GS"/>
-		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 512K Apple IIgs. -->
-		<!-- "Thexder" is a 1987 action game developed by H. Godai, S. Uesaka, Michael D. Branham, Robert C. Clardy, John P. Conley, Lloyd Ollmann Jr., and Michael Ormsby, and distributed by Sierra On-Line. -->
-		<!-- Original release by Sierra On-Line - Did NOT come with OS and was NOT self bootable -->
-		<!-- The file "othexder" had been undeleted (and cracked) and is closer to v2.7 in how it's demo sounds fade -->
-		<!-- Protection: Bad block check for block $634 -->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="819264">
-				<rom name="thexder v1.0 iigs (trex crack).2mg" size="819264" crc="5a105720" sha1="31061b4561c967d824936c94ce882f2efcb017da"/>
 			</dataarea>
 		</part>
 	</software>
@@ -2689,14 +2631,13 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>StyleWare</publisher>
 		<info name="programmer" value="Robert A. Hearn and Jeff G. Erickson" />
+		<info name="usage" value="Requires a 1MB Apple IIgs." />
 		<info name="version" value="1.00A (7/12/87)" />
-		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 512K Apple IIgs. -->
-		<!-- "TopDraw" is a professional object-oriented graphics drawing environment. Beagle Bros Software later acquired the StyleWare library and rebranded TopDraw as BeagleDraw. -->
+		<!-- graphics program -->
+		<!-- TopDraw later became Beagle Draw sold under the Beagle Brothers banner. -->
 		<!-- Protection: Nibble count on tracks $20 & $21 -->
-
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="topdraw v1.00a iigs (trex crack).2mg" size="819264" crc="39e7967f" sha1="35746bbc2232251d96264989705a6e6286bafef5"/>
@@ -2918,17 +2859,15 @@ license:CC0-1.0
 	</software>
 
 	<software name="wingames">
-		<description>Winter Games (cleanly cracked)</description>
+		<description>Winter Games (trex crack)</description>
 		<year>1987</year>
 		<publisher>Epyx</publisher>
 		<info name="developer" value="Westwood Studios" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 512K Apple IIgs. -->
-		<!-- "Winter Games" is a 1987 sports game developed by Westwood Studios and distributed by Epyx. -->
+		<!-- sports game -->
 		<!-- Protection: Nibble count on tracks $20 & $21 -->
-
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="winter games iigs (trex crack).2mg" size="819264" crc="03f522af" sha1="467d2782f572c107f2b9fa7789761d789ce21763"/>
@@ -2937,17 +2876,15 @@ license:CC0-1.0
 	</software>
 
 	<software name="wldgames">
-		<description>World Games (cleanly cracked)</description>
+		<description>World Games (trex crack)</description>
 		<year>1987</year>
 		<publisher>Epyx</publisher>
 		<info name="developer" value="Westwood Studios" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 512K Apple IIgs. -->
-		<!-- "World Games" is a 1987 sports game developed by Westwood and distributed by Epyx. -->
+		<!-- sports game -->
 		<!-- Protection: Nibble count on tracks $20 & $21 -->
-
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="world games iigs (trex crack).2mg" size="819264" crc="6b94c2b7" sha1="34bb9fbd79847d2cbf7c1ad9ba087faa986a16a0"/>
@@ -2983,17 +2920,15 @@ license:CC0-1.0
 	</software>
 
 	<software name="wltrgolf">
-		<description>World Tour Golf (cleanly cracked)</description>
+		<description>World Tour Golf (trex crack)</description>
 		<year>1987</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="author" value="Evan and Nicky Robinson and Paul Reiche III" />
 		<info name="programmer" value="John Selhorst" />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 512K Apple IIgs. -->
-		<!-- "World Tour Golf" is a 1987 sports game developed by Evan and Nicky Robinson and Paul Reiche III, ported to the Apple IIgs by John Selhorst, and distributed by Electronic Arts. -->
+		<!-- sports game -->
 		<!-- Protection: Key-Word, A manual is required to look up a letter / word or use of code wheel for a specific response -->
-
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="world tour golf iigs (trex crack).2mg" size="819264" crc="bf54fe36" sha1="3b1082b75860d10493c9015c5fd22ef3150c686b"/>
@@ -3063,17 +2998,15 @@ license:CC0-1.0
 	</software>
 
 	<software name="zanygolf">
-		<description>Zany Golf (cleanly cracked)</description>
+		<description>Zany Golf (trex crack)</description>
 		<year>1988</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="programmer" value="Will Harvey, Jim Nitchals, Ian Gooding, and Doug Fulton" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 512K Apple IIgs. -->
-		<!-- "Zany Golf" is a 1988 sports game developed by Will Harvey, Jim Nitchals, Ian Gooding, and Doug Fulton, and distributed by Electronic Arts. -->
+		<!-- sports game -->
 		<!-- Protection: Nibble count on tracks $20 & $21 -->
-
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="zany golf iigs (trex crack).2mg" size="819264" crc="5e917b13" sha1="37658ef75ca9a35277023e66fe0280058d8a237a"/>

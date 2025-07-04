@@ -339,18 +339,17 @@ void mu80_state::mu80(machine_config &config)
 
 	MULCD(config, m_lcd);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	SWP20(config, m_swp20_0);
 	m_swp20_0->set_device_rom_tag("swp20");
-	m_swp20_0->add_route(0, "lspeaker", 1.0);
-	m_swp20_0->add_route(1, "rspeaker", 1.0);
+	m_swp20_0->add_route(0, "speaker", 1.0, 0);
+	m_swp20_0->add_route(1, "speaker", 1.0, 1);
 
 	SWP20(config, m_swp20_1);
 	m_swp20_1->set_device_rom_tag("swp20");
-	m_swp20_1->add_route(0, "lspeaker", 1.0);
-	m_swp20_1->add_route(1, "rspeaker", 1.0);
+	m_swp20_1->add_route(0, "speaker", 1.0, 0);
+	m_swp20_1->add_route(1, "speaker", 1.0, 1);
 
 	MEG(config, m_meg);
 

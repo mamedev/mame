@@ -5,8 +5,7 @@
 
 
 #define OP_USERFLAG_FIFOIN              0x1
-#define OP_USERFLAG_FIFOOUT0            0x2
-#define OP_USERFLAG_FIFOOUT1            0x4
+#define OP_USERFLAG_FIFOOUT             0x2
 #define OP_USERFLAG_REPEAT              0x8
 #define OP_USERFLAG_REPEATED_OP         0x10
 #define OP_USERFLAG_PR_MASK             0x300

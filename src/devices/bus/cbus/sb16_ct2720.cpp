@@ -39,15 +39,14 @@ sb16_ct2720_device::sb16_ct2720_device(const machine_config &mconfig, const char
 
 void sb16_ct2720_device::device_add_mconfig(machine_config &config)
 {
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	CT1745(config, m_mixer);
 	m_mixer->set_fm_tag(m_opl3);
 	m_mixer->set_ldac_tag(m_ldac);
 	m_mixer->set_rdac_tag(m_rdac);
-	m_mixer->add_route(0, "lspeaker", 1.0);
-	m_mixer->add_route(1, "rspeaker", 1.0);
+	m_mixer->add_route(0, "speaker", 1.0, 0);
+	m_mixer->add_route(1, "speaker", 1.0, 1);
 	m_mixer->irq_status_cb().set([this] () {
 		(void)this;
 		return 0;
@@ -59,14 +58,14 @@ void sb16_ct2720_device::device_add_mconfig(machine_config &config)
 //  MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(FUNC(sb_device::midi_rx_w));
 //  MIDI_PORT(config, "mdout", midiout_slot, "midiout");
 
-	DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, m_mixer, 0.5, AUTO_ALLOC_INPUT, 0); // unknown DAC
-	DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, m_mixer, 0.5, AUTO_ALLOC_INPUT, 1); // unknown DAC
+	DAC_16BIT_R2R(config, m_ldac, 0).add_route(ALL_OUTPUTS, m_mixer, 0.5, 0); // unknown DAC
+	DAC_16BIT_R2R(config, m_rdac, 0).add_route(ALL_OUTPUTS, m_mixer, 0.5, 1); // unknown DAC
 
 	YMF262(config, m_opl3, XTAL(14'318'181));
-	m_opl3->add_route(0, m_mixer, 1.00, AUTO_ALLOC_INPUT, 0);
-	m_opl3->add_route(1, m_mixer, 1.00, AUTO_ALLOC_INPUT, 1);
-	m_opl3->add_route(2, m_mixer, 1.00, AUTO_ALLOC_INPUT, 0);
-	m_opl3->add_route(3, m_mixer, 1.00, AUTO_ALLOC_INPUT, 1);
+	m_opl3->add_route(0, m_mixer, 1.00, 0);
+	m_opl3->add_route(1, m_mixer, 1.00, 1);
+	m_opl3->add_route(2, m_mixer, 1.00, 0);
+	m_opl3->add_route(3, m_mixer, 1.00, 1);
 }
 
 void sb16_ct2720_device::device_start()

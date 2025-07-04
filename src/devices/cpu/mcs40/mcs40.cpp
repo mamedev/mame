@@ -580,7 +580,7 @@ inline void mcs40_cpu_device_base::do_a1()
 	if (cycle::OP == m_cycle)
 	{
 		m_pcbase = rom_bank() | m_rom_addr;
-		if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+		if (debugger_enabled())
 			debugger_instruction_hook(pc());
 		if (m_stop_latch)
 		{

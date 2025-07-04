@@ -283,9 +283,9 @@ void zsg2_device::filter_samples(zchan *ch)
 //  sound_stream_update - handle a stream update
 //-------------------------------------------------
 
-void zsg2_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void zsg2_device::sound_stream_update(sound_stream &stream)
 {
-	for (int i = 0; i < outputs[0].samples(); i++)
+	for (int i = 0; i < stream.samples(); i++)
 	{
 		int32_t mix[4] = {};
 
@@ -322,7 +322,7 @@ void zsg2_device::sound_stream_update(sound_stream &stream, std::vector<read_str
 			int32_t sample = elem.samples[sample_pos];
 
 			// linear interpolation (hardware certainly does something similar)
-			sample += ((uint16_t)(elem.step_ptr << 2 & 0xffff) * (int16_t)(elem.samples[sample_pos+1] - sample)) >> 16;
+			sample += (uint16_t(elem.step_ptr << 2 & 0xffff) * int16_t(elem.samples[sample_pos+1] - sample)) >> 16;
 
 			// another filter...
 			elem.output_filter_state += (sample - (elem.output_filter_state >> 16)) * elem.output_cutoff;
@@ -355,7 +355,7 @@ void zsg2_device::sound_stream_update(sound_stream &stream, std::vector<read_str
 		}
 
 		for (int output = 0; output < 4; output++)
-			outputs[output].put_int_clamp(i, mix[output], 32768);
+			stream.put_int_clamp(output, i, mix[output], 32768);
 	}
 	m_sample_count++;
 }

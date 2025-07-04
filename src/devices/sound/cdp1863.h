@@ -54,7 +54,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 
 	// internal callbacks
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	sound_stream *m_stream;
@@ -65,7 +65,7 @@ private:
 	// sound state
 	int m_oe;                       // output enable
 	int m_latch;                    // sound latch
-	stream_buffer::sample_t m_signal;// current signal
+	sound_stream::sample_t m_signal;// current signal
 	int m_incr;                     // initial wave state
 };
 

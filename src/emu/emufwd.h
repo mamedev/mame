@@ -235,7 +235,9 @@ class sound_manager;
 class sound_stream;
 
 // declared in speaker.h
+class sound_io_device;
 class speaker_device;
+class microphone_device;
 
 // declared in tilemap.h
 class tilemap_device;

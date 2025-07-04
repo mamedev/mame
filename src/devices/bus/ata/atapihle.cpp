@@ -47,7 +47,10 @@ void atapi_hle_device::process_buffer()
 		GetLength(&m_data_size);
 
 		if (m_status_code == SCSI_STATUS_CODE_CHECK_CONDITION)
+		{
 			m_status |= IDE_STATUS_ERR;
+			m_error |= (m_sense_key << 4);
+		}
 
 		m_buffer_size = (m_cylinder_high << 8) | m_cylinder_low;
 		if (m_buffer_size == 0xffff)

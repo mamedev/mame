@@ -35,7 +35,7 @@ DECLARE_DEVICE_TYPE(VGMVIZ, vgmviz_device)
 
 // ======================> vgmviz_device
 
-class vgmviz_device : public device_t, public device_mixer_interface
+class vgmviz_device : public device_t, public device_sound_interface
 {
 public:
 	// construction/destruction
@@ -91,7 +91,7 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	// device_sound_interface-level overrides
-	void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	void sound_stream_update(sound_stream &stream) override;
 
 	void update_waveform();
 	void update_fft();

@@ -274,8 +274,8 @@ void calcune_state::calcune(machine_config &config)
 	m_vdp[0]->lv6_irq().set(FUNC(calcune_state::vdp_lv6irqline_callback_genesis_68k));
 	m_vdp[0]->lv4_irq().set(FUNC(calcune_state::vdp_lv4irqline_callback_genesis_68k));
 	m_vdp[0]->set_alt_timing(1);
-	m_vdp[0]->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-	m_vdp[0]->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	m_vdp[0]->add_route(ALL_OUTPUTS, "speaker", 0.25, 0);
+	m_vdp[0]->add_route(ALL_OUTPUTS, "speaker", 0.25, 1);
 
 	SEGA315_5313(config, m_vdp[1], OSC1_CLOCK, m_maincpu);
 	m_vdp[1]->set_is_pal(false);
@@ -284,8 +284,8 @@ void calcune_state::calcune(machine_config &config)
 //  m_vdp[1]->lv6_irq().set(FUNC(calcune_state::vdp_lv6irqline_callback_genesis_68k));
 //  m_vdp[1]->lv4_irq().set(FUNC(calcune_state::vdp_lv4irqline_callback_genesis_68k));
 	m_vdp[1]->set_alt_timing(1);
-	m_vdp[1]->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-	m_vdp[1]->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	m_vdp[1]->add_route(ALL_OUTPUTS, "speaker", 0.25, 0);
+	m_vdp[1]->add_route(ALL_OUTPUTS, "speaker", 0.25, 1);
 
 	TIMER(config, "scantimer").configure_scanline(m_vdp[0], FUNC(sega315_5313_device::megadriv_scanline_timer_callback_alt_timing), "megadriv", 0, 1);
 	TIMER(config, "scantimer2").configure_scanline(m_vdp[1], FUNC(sega315_5313_device::megadriv_scanline_timer_callback_alt_timing), "megadriv", 0, 1);
@@ -293,12 +293,11 @@ void calcune_state::calcune(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ymz280b_device &ymz(YMZ280B(config, "ymz", XTAL(16'934'400)));
-	ymz.add_route(0, "lspeaker", 1.0);
-	ymz.add_route(1, "rspeaker", 1.0);
+	ymz.add_route(0, "speaker", 1.0, 0);
+	ymz.add_route(1, "speaker", 1.0, 1);
 }
 
 void calcune_state::init_calcune()

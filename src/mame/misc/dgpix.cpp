@@ -210,11 +210,6 @@ private:
 
 	u32 vblank_r();
 
-	void mpu401_data_w(offs_t, u32 data, u32 mem_mask);
-	void mpu401_ctrl_w(offs_t, u32 data, u32 mem_mask);
-	u32 mpu401_data_r(offs_t, u32 mem_mask);
-	u32 mpu401_status_r();
-
 	u16 flash_raw_rom_r(offs_t offset);
 
 	required_ioport m_vblank;
@@ -271,30 +266,6 @@ private:
 
 	required_memory_region m_ks0164_bank;
 };
-
-void dgpix_state::mpu401_data_w(offs_t, u32 data, u32 mem_mask)
-{
-	if(ACCESSING_BITS_0_7)
-		m_sound->mpu401_data_w(data);
-}
-
-void dgpix_state::mpu401_ctrl_w(offs_t, u32 data, u32 mem_mask)
-{
-	if(ACCESSING_BITS_0_7)
-		m_sound->mpu401_ctrl_w(data);
-}
-
-u32 dgpix_state::mpu401_data_r(offs_t, u32 mem_mask)
-{
-	if(ACCESSING_BITS_0_7)
-		return m_sound->mpu401_data_r();
-	return 0;
-}
-
-u32 dgpix_state::mpu401_status_r()
-{
-	return m_sound->mpu401_status_r();
-}
 
 u16 dgpix_state::flash_r(offs_t offset)
 {
@@ -398,13 +369,13 @@ void dgpix_bmkey_state::mem_map(address_map &map)
 
 void dgpix_state::io_map(address_map &map)
 {
-	map(0x0200, 0x0203).nopr(); // used to sync with the protecion PIC? tested bits 0 and 1
-	map(0x0400, 0x0403).rw(FUNC(dgpix_state::vblank_r), FUNC(dgpix_state::vbuffer_w));
-	map(0x0a10, 0x0a13).portr("INPUTS");
-	map(0x0200, 0x0203).w(FUNC(dgpix_state::coin_w));
-	map(0x0c00, 0x0c03).nopw(); // writes only: 1, 0, 1 at startup
-	map(0x0c80, 0x0c83).rw(FUNC(dgpix_state::mpu401_data_r), FUNC(dgpix_state::mpu401_data_w));
-	map(0x0c84, 0x0c87).rw(FUNC(dgpix_state::mpu401_status_r), FUNC(dgpix_state::mpu401_ctrl_w));
+	map(0x0080, 0x0080).nopr(); // used to sync with the protecion PIC? tested bits 0 and 1
+	map(0x0080, 0x0080).w(FUNC(dgpix_state::coin_w));
+	map(0x0100, 0x0100).rw(FUNC(dgpix_state::vblank_r), FUNC(dgpix_state::vbuffer_w));
+	map(0x0284, 0x0284).portr("INPUTS");
+	map(0x0300, 0x0300).nopw(); // writes only: 1, 0, 1 at startup
+	map(0x0320, 0x0320).umask32(0x000000ff).rw(m_sound, FUNC(ks0164_device::mpu401_data_r), FUNC(ks0164_device::mpu401_data_w));
+	map(0x0321, 0x0321).umask32(0x000000ff).rw(m_sound, FUNC(ks0164_device::mpu401_status_r), FUNC(ks0164_device::mpu401_ctrl_w));
 }
 
 static INPUT_PORTS_START( dgpix )
@@ -523,7 +494,7 @@ void dgpix_bmkey_state::machine_reset()
 
 void dgpix_state::dgpix_base(machine_config &config)
 {
-	E132XT(config, m_maincpu, 20000000*4); /* 4x internal multiplier */
+	E132X(config, m_maincpu, 20'000'000*4); // E1-32XT (TQFP), 4x internal multiplier
 	m_maincpu->set_addrmap(AS_IO, &dgpix_state::io_map);
 
 	/* video hardware */
@@ -537,12 +508,11 @@ void dgpix_state::dgpix_base(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::BGR_555);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	KS0164(config, m_sound, 16.9344_MHz_XTAL);
-	m_sound->add_route(0, "lspeaker", 1.0);
-	m_sound->add_route(1, "rspeaker", 1.0);
+	m_sound->add_route(0, "speaker", 1.0, 0);
+	m_sound->add_route(1, "speaker", 1.0, 1);
 
 	INTEL_28F320J5(config, m_flash[6]);
 	INTEL_28F320J5(config, m_flash[7]);
@@ -990,10 +960,10 @@ void dgpix_bmkey_state::init_btplay2k()
 } // anonymous namespace
 
 
-GAME( 1999, elfin,     0,      dgpix,          dgpix,    dgpix_typea_state, init_elfin,     ROT0, "dgPIX Entertainment Inc.", "Elfin",                             MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, elfin,     0,      dgpix,          dgpix,    dgpix_typea_state, init_elfin,     ROT0, "dgPIX Entertainment Inc.", "Elfin",                             MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1999, jumpjump,  0,      dgpix,          dgpix,    dgpix_typea_state, init_jumpjump,  ROT0, "dgPIX Entertainment Inc.", "Jump Jump",                         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, xfiles,    0,      dgpix,          dgpix,    dgpix_typea_state, init_xfiles,    ROT0, "dgPIX Entertainment Inc.", "The X-Files",                       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, xfilesk,   xfiles, dgpix,          dgpix,    dgpix_typea_state, init_xfilesk,   ROT0, "dgPIX Entertainment Inc.", "The X-Files (Censored, Korea)",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, xfiles,    0,      dgpix,          dgpix,    dgpix_typea_state, init_xfiles,    ROT0, "dgPIX Entertainment Inc.", "The X-Files",                       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, xfilesk,   xfiles, dgpix,          dgpix,    dgpix_typea_state, init_xfilesk,   ROT0, "dgPIX Entertainment Inc.", "The X-Files (censored, Korea)",     MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1999, kdynastg,  0,      dgpix_kdynastg, dgpix,    dgpix_typea_state, init_kdynastg,  ROT0, "EZ Graphics",              "King of Dynast Gear (version 1.8)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1999, letsdnce,  0,      dgpix,          letsdnce, dgpix_bmkey_state, init_letsdnce,  ROT0, "dgPIX Entertainment Inc.", "Let's Dance",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 2000, btplay2k,  0,      dgpix,          btplay2k, dgpix_bmkey_state, init_btplay2k,  ROT0, "dgPIX Entertainment Inc.", "Beat Player 2000",                  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

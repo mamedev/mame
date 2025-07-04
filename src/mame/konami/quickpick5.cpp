@@ -635,11 +635,7 @@ void waijockey_state::waijockey(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(61.04);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(20));
-	m_screen->set_size(64*8, 33*8);
-	m_screen->set_visarea(0, 400-1, 0, 226-1);
-	m_screen->set_visarea_full();
+	m_screen->set_raw(32_MHz_XTAL/4, 512, 0, 400, 256, 0, 226); // from CRTC
 	m_screen->set_screen_update(FUNC(waijockey_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -648,7 +644,7 @@ void waijockey_state::waijockey(machine_config &config)
 
 	K053245(config, m_k053245, 0);
 	m_k053245->set_palette(m_palette);
-	m_k053245->set_offsets(-96, 16);
+	m_k053245->set_offsets(0, 16);
 	m_k053245->set_sprite_callback(FUNC(waijockey_state::sprite_callback));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
@@ -667,7 +663,7 @@ void quickpick5_state::quickpick5(machine_config &config)
 	waijockey(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &quickpick5_state::quickpick5_main);
 
-	m_k053245->set_offsets(-(44+80), 20);
+	m_k053245->set_offsets(-28, 20);
 	m_screen->set_visarea(0, 384-1, 0, 232-1);
 }
 

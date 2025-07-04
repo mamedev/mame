@@ -34,6 +34,7 @@
 # NO_USE_MIDI = 1
 # NO_USE_PORTAUDIO = 1
 # NO_USE_PULSEAUDIO = 1
+# NO_USE_PIPEWIRE = 1
 # USE_TAPTUN = 1
 # USE_PCAP = 1
 # USE_QTDEBUG = 1
@@ -142,99 +143,122 @@ MAKEPARAMS := -R
 ifeq ($(OS),Windows_NT)
 OS := windows
 GENIEOS := windows
+
+ifeq ($(MSYSTEM),MINGW32)
 PLATFORM := x86
-else
+else ifeq ($(MSYSTEM),MINGW64)
+PLATFORM := x86
+else ifeq ($(MSYSTEM),CLANGARM64)
+PLATFORM := arm64
+else # MSYSTEM
+
+# Get system processor architecture. Note that PROCESSOR_ARCHITECTURE local
+# environment variable is for the currently running process, so we go through
+# the registry instead.
+OSARCH := $(shell reg query "HKLM\System\CurrentControlSet\Control\Session Manager\Environment" -v PROCESSOR_ARCHITECTURE)
+ifneq ($(findstring ARM64,$(OSARCH)),)
+PLATFORM := arm64
+else # OSARCH
+PLATFORM := x86
+endif # OSARCH
+endif # MSYSTEM
+
+else # Windows_NT
 UNAME := $(shell uname -mps)
 UNAME_M := $(shell uname -m)
 UNAME_P := $(shell uname -p)
 GENIEOS := linux
 PLATFORM := unknown
-ifneq ($(filter x86_64,$(UNAME_P)),)
+
+ifneq ($(filter %86,$(UNAME_M)),)
+PLATFORM := x86
+else ifneq ($(filter %86,$(UNAME_P)),)
 PLATFORM := x86
 endif
-ifneq ($(filter %86,$(UNAME_P)),)
+
+ifneq ($(filter x86_64,$(UNAME_M)),)
 PLATFORM := x86
-endif
-ifneq ($(filter alpha,$(UNAME_M)),)
+else ifneq ($(filter x86_64,$(UNAME_P)),)
+PLATFORM := x86
+else ifneq ($(filter alpha,$(UNAME_M)),)
 PLATFORM := alpha
-endif
-ifneq ($(filter alpha,$(UNAME_P)),)
+else ifneq ($(filter alpha,$(UNAME_P)),)
 PLATFORM := alpha
-endif
-ifneq ($(filter arm%,$(UNAME_M)),)
+else ifneq ($(filter aarch64%,$(UNAME_M)),)
+PLATFORM := arm64
+else ifneq ($(filter aarch64%,$(UNAME_P)),)
+PLATFORM := arm64
+else ifneq ($(filter arm64%,$(UNAME_M)),)
+PLATFORM := arm64
+else ifneq ($(filter arm%,$(UNAME_M)),)
 PLATFORM := arm
-endif
-ifneq ($(filter arm%,$(UNAME_P)),)
+else ifneq ($(filter arm%,$(UNAME_P)),)
 PLATFORM := arm
-endif
-ifneq ($(filter aarch64%,$(UNAME_M)),)
-PLATFORM := arm64
-endif
-ifneq ($(filter arm64%,$(UNAME_M)),)
-PLATFORM := arm64
-endif
-ifneq ($(filter aarch64%,$(UNAME_P)),)
-PLATFORM := arm64
-endif
-ifneq ($(filter powerpc,$(UNAME_P)),)
+else ifneq ($(filter powerpc,$(UNAME_P)),)
 PLATFORM := powerpc
-endif
-ifneq ($(filter riscv64%,$(UNAME_M)),)
+else ifneq ($(filter riscv64%,$(UNAME_M)),)
 PLATFORM := riscv64
-endif
-ifneq ($(filter riscv64%,$(UNAME_P)),)
+else ifneq ($(filter riscv64%,$(UNAME_P)),)
 PLATFORM := riscv64
-endif
-ifneq ($(filter mips64%,$(UNAME_M)),)
+else ifneq ($(filter mips64%,$(UNAME_M)),)
 ifeq ($(shell getconf LONG_BIT),64)
 PLATFORM := mips64
 endif
 endif
+
 ifeq ($(firstword $(filter Linux,$(UNAME))),Linux)
 OS := linux
-endif
-ifeq ($(firstword $(filter Solaris,$(UNAME))),Solaris)
+else ifeq ($(firstword $(filter Solaris,$(UNAME))),Solaris)
 OS := solaris
 GENIEOS := solaris
-endif
-ifeq ($(firstword $(filter SunOS,$(UNAME))),SunOS)
+else ifeq ($(firstword $(filter SunOS,$(UNAME))),SunOS)
 OS := solaris
 GENIEOS := solaris
-endif
-ifeq ($(firstword $(filter FreeBSD,$(UNAME))),FreeBSD)
+else ifeq ($(firstword $(filter FreeBSD,$(UNAME))),FreeBSD)
 OS := freebsd
 GENIEOS := bsd
-endif
-ifeq ($(firstword $(filter GNU/kFreeBSD,$(UNAME))),GNU/kFreeBSD)
+else ifeq ($(firstword $(filter GNU/kFreeBSD,$(UNAME))),GNU/kFreeBSD)
 OS := freebsd
 GENIEOS := freebsd
-endif
-ifeq ($(firstword $(filter NetBSD,$(UNAME))),NetBSD)
+else ifeq ($(firstword $(filter NetBSD,$(UNAME))),NetBSD)
 OS := netbsd
 GENIEOS := freebsd
-endif
-ifeq ($(firstword $(filter OpenBSD,$(UNAME))),OpenBSD)
+else ifeq ($(firstword $(filter OpenBSD,$(UNAME))),OpenBSD)
 OS := openbsd
 GENIEOS := freebsd
-endif
-ifeq ($(firstword $(filter Darwin,$(UNAME))),Darwin)
+else ifeq ($(firstword $(filter Darwin,$(UNAME))),Darwin)
 OS := macosx
 GENIEOS := darwin
-endif
-ifeq ($(firstword $(filter Haiku,$(UNAME))),Haiku)
+else ifeq ($(firstword $(filter Haiku,$(UNAME))),Haiku)
 OS := haiku
 endif
+
 ifndef OS
 $(error Unable to detect OS from uname -a: $(UNAME))
 endif
-endif
 
-MINGW:=
+endif # Windows_NT
+
+ifdef MSYSTEM
+MINGW := $(MINGW_PREFIX)
+ifeq ($(MSYSTEM),MINGW32)
+	MINGW32 := $(MINGW_PREFIX)
+else ifeq ($(MSYSTEM),MINGW64)
+	MINGW64 := $(MINGW_PREFIX)
+else ifeq ($(MSYSTEM),CLANGARM64)
+	MINGW64 := $(MINGW_PREFIX)
+endif # MSYSTEM
+ifndef TOOLCHAIN
+	TOOLCHAIN := $(MINGW_PREFIX)/bin/
+endif # TOOLCHAIN
+else # MSYSTEM
+MINGW :=
 ifdef MINGW64
 	MINGW := $(MINGW64)
-else
+else # MINGW64
 	MINGW := $(MINGW32)
-endif
+endif # MINGW64
+endif # MSYSTEM
 
 #-------------------------------------------------
 # specify core target: mame, ldplayer
@@ -287,60 +311,48 @@ ifndef TARGETOS
 
 ifeq ($(OS),windows)
 TARGETOS := windows
-ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
+
+ifeq ($(MSYSTEM),MINGW32)
+ARCHITECTURE = _x86
+else ifeq ($(MSYSTEM),MINGW64)
 ARCHITECTURE := _x64
-endif
-ifeq ($(PROCESSOR_ARCHITECTURE),x86)
+else ifeq ($(MSYSTEM),CLANGARM64)
 ARCHITECTURE := _x64
+else ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
+ARCHITECTURE := _x64
+else ifeq ($(PROCESSOR_ARCHITECTURE),x86)
 ifeq ($(PROCESSOR_ARCHITEW6432),AMD64)
-else
+ARCHITECTURE := _x64
+else # PROCESSOR_ARCHITEW6432
 ARCHITECTURE := _x86
+endif # PROCESSOR_ARCHITEW6432
 endif
-endif
-else
+
+else # windows
 UNAME    := $(shell uname -mps)
 TARGETOS := $(OS)
 
-#-------------------------------------------------
-# determine the whether -m32, -m64 or nothing
-# should be passed to gcc when building genie
-#-------------------------------------------------
-
-ifeq ($(ARCHITECTURE),_x86)
-MPARAM := -m32
-else
-ifeq ($(ARCHITECTURE),_x64)
-MPARAM := -m64
-else
-MPARAM :=
-endif
-endif
-
-ARCHITECTURE := _x86
-
 ifeq ($(firstword $(filter x86_64,$(UNAME))),x86_64)
 ARCHITECTURE := _x64
-endif
-ifeq ($(firstword $(filter amd64,$(UNAME))),amd64)
+else ifeq ($(firstword $(filter amd64,$(UNAME))),amd64)
 ARCHITECTURE := _x64
-endif
-ifeq ($(firstword $(filter ppc64,$(UNAME))),ppc64)
+else ifeq ($(firstword $(filter ppc64le,$(UNAME))),ppc64le)
 ARCHITECTURE := _x64
-endif
-ifeq ($(firstword $(filter powerpc64,$(UNAME))),powerpc64)
+else ifeq ($(firstword $(filter ppc64,$(UNAME))),ppc64)
 ARCHITECTURE := _x64
-endif
-ifeq ($(firstword $(filter ppc64le,$(UNAME))),ppc64le)
+else ifeq ($(firstword $(filter powerpc64,$(UNAME))),powerpc64)
 ARCHITECTURE := _x64
-endif
-ifeq ($(firstword $(filter s390x,$(UNAME))),s390x)
+else ifeq ($(firstword $(filter s390x,$(UNAME))),s390x)
 ARCHITECTURE := _x64
-endif
+else
+ARCHITECTURE := _x86
 endif
 
-else
+endif # windows
+
+else # TARGETOS
 CROSS_BUILD := 1
-endif # TARGET_OS
+endif # TARGETOS
 
 ifdef PTR64
 ifeq ($(PTR64),1)
@@ -351,21 +363,25 @@ endif
 endif
 
 ifeq ($(OS),windows)
+
 ifndef MINGW64
 ARCHITECTURE := _x86
-endif
-ifeq ($(ARCHITECTURE),_x64)
-WINDRES  := $(MINGW64)/bin/windres
-else
+endif # MINGW64
+ifeq ($(ARCHITECTURE),_x86)
 WINDRES  := $(MINGW32)/bin/windres
-endif
-else
-ifeq ($(ARCHITECTURE),_x64)
-WINDRES  := $(word 1,$(TOOLCHAIN) x86_64-w64-mingw32-)windres
-else
+else # ARCHITECTURE
+WINDRES  := $(MINGW64)/bin/windres
+endif # ARCHITECTURE
+
+else # windows
+
+ifeq ($(ARCHITECTURE),_x86)
 WINDRES  := $(word 1,$(TOOLCHAIN) i686-w64-mingw32-)windres
-endif
-endif
+else # ARCHITECTURE
+WINDRES  := $(word 1,$(TOOLCHAIN) x86_64-w64-mingw32-)windres
+endif # ARCHITECTURE
+
+endif # windows
 
 # Emscripten
 ifeq ($(findstring emcc,$(CC)),emcc)
@@ -376,42 +392,8 @@ ifndef NOASM
 endif
 endif
 
-ifeq ($(findstring ppc,$(UNAME)),ppc)
-ifndef FORCE_DRC_C_BACKEND
-	FORCE_DRC_C_BACKEND := 1
-endif
-endif
-
-ifeq ($(findstring powerpc,$(UNAME)),powerpc)
-ifndef FORCE_DRC_C_BACKEND
-	FORCE_DRC_C_BACKEND := 1
-endif
-endif
-
-ifeq ($(findstring arm,$(UNAME)),arm)
-ARCHITECTURE :=
-ifneq ($(PLATFORM),arm64)
-	ifndef FORCE_DRC_C_BACKEND
-		FORCE_DRC_C_BACKEND := 1
-	endif
-endif
-endif
-
 ifeq ($(findstring aarch64,$(UNAME)),aarch64)
 ARCHITECTURE :=
-endif
-
-ifeq ($(findstring s390x,$(UNAME)),s390x)
-ifndef FORCE_DRC_C_BACKEND
-	FORCE_DRC_C_BACKEND := 1
-endif
-endif
-
-ifeq ($(findstring riscv64,$(UNAME)),riscv64)
-ARCHITECTURE :=
-ifndef FORCE_DRC_C_BACKEND
-	FORCE_DRC_C_BACKEND := 1
-endif
 endif
 
 # Autodetect BIGENDIAN
@@ -465,36 +447,23 @@ OSD := sdl
 
 ifeq ($(TARGETOS),windows)
 OSD := windows
-endif
-
-ifeq ($(TARGETOS),linux)
+else ifeq ($(TARGETOS),linux)
 OSD := sdl
-endif
-
-ifeq ($(TARGETOS),freebsd)
+else ifeq ($(TARGETOS),freebsd)
 OSD := sdl
-endif
-
-ifeq ($(TARGETOS),netbsd)
+else ifeq ($(TARGETOS),netbsd)
 OSD := sdl
-endif
-
-ifeq ($(TARGETOS),openbsd)
+else ifeq ($(TARGETOS),openbsd)
 OSD := sdl
-endif
-
-ifeq ($(TARGETOS),solaris)
+else ifeq ($(TARGETOS),solaris)
 OSD := sdl
-endif
-
-ifeq ($(TARGETOS),macosx)
+else ifeq ($(TARGETOS),macosx)
 OSD := sdl
-endif
-
-ifeq ($(TARGETOS),asmjs)
+else ifeq ($(TARGETOS),asmjs)
 OSD := sdl
-endif
-endif
+endif # TARGETOS
+
+endif # OSD
 
 #-------------------------------------------------
 # which 3rdparty library to build;
@@ -555,21 +524,6 @@ endif
 ifdef USE_SYSTEM_LIB_PUGIXML
 PARAMS += --with-system-pugixml='$(USE_SYSTEM_LIB_PUGIXML)'
 endif
-
-#-------------------------------------------------
-# distribution may change things
-#-------------------------------------------------
-
-ifeq ($(DISTRO),)
-DISTRO := generic
-else
-ifeq ($(DISTRO),debian-stable)
-else
-$(error DISTRO $(DISTRO) unknown)
-endif
-endif
-
-PARAMS+= --distro=$(DISTRO)
 
 ifdef TOOLCHAIN
 PARAMS += --TOOLCHAIN='$(TOOLCHAIN)'
@@ -779,6 +733,10 @@ endif
 
 ifdef NO_USE_PULSEAUDIO
 PARAMS += --NO_USE_PULSEAUDIO='$(NO_USE_PULSEAUDIO)'
+endif
+
+ifdef NO_USE_PIPEWIRE
+PARAMS += --NO_USE_PIPEWIRE='$(NO_USE_PIPEWIRE)'
 endif
 
 ifdef USE_QTDEBUG
@@ -1046,20 +1004,18 @@ endif
 
 ifeq ($(CLANG_VERSION),)
 $(info GCC $(GCC_VERSION) detected)
-else
+else # CLANG_VERSION
 $(info Clang $(CLANG_VERSION) detected)
 ifneq ($(TARGETOS),asmjs)
 ifeq ($(ARCHITECTURE),_x64)
 ARCHITECTURE := _x64_clang
-else
-ifneq ($(filter arm64%,$(UNAME_M)),)
+else ifneq ($(filter arm64%,$(UNAME_M)),)
 ARCHITECTURE := _arm64_clang
 else
 ARCHITECTURE := _x86_clang
 endif
-endif
-endif
-endif
+endif # asmjs
+endif # CLANG_VERSION
 
 ifneq ($(PYTHON_AVAILABLE),python)
 $(error Python is not available in path)
@@ -1522,13 +1478,13 @@ openbsd_x86_clang: generate $(PROJECTDIR)/$(MAKETYPE)-openbsd-clang/Makefile
 GENIE_SRC=$(wildcard 3rdparty/genie/src/host/*.c)
 
 $(GENIE): $(GENIE_SRC)
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C 3rdparty/genie/build/gmake.$(GENIEOS) -f genie.make MPARAM=$(MPARAM)
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C 3rdparty/genie/build/gmake.$(GENIEOS) -f genie.make
 
 3rdparty/genie/src/hosts/%.c:
 
 .PHONY: genieclean
 genieclean:
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C 3rdparty/genie/build/gmake.$(GENIEOS) -f genie.make MPARAM=$(MPARAM) clean
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C 3rdparty/genie/build/gmake.$(GENIEOS) -f genie.make clean
 
 clean: genieclean
 	@echo Cleaning...
@@ -1572,7 +1528,7 @@ endif
 
 ifeq (posix,$(SHELLTYPE))
 $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo '#define BARE_BUILD_VERSION "0.274"' > $@
+	@echo '#define BARE_BUILD_VERSION "0.278"' > $@
 	@echo '#define BARE_VCS_REVISION "$(NEW_GIT_VERSION)"' >> $@
 	@echo 'extern const char bare_build_version[];' >> $@
 	@echo 'extern const char bare_vcs_revision[];' >> $@
@@ -1582,7 +1538,7 @@ $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
 	@echo 'const char build_version[] = BARE_BUILD_VERSION " (" BARE_VCS_REVISION ")";' >> $@
 else
 $(GENDIR)/version.cpp: makefile $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo #define BARE_BUILD_VERSION "0.274" > $@
+	@echo #define BARE_BUILD_VERSION "0.278" > $@
 	@echo #define BARE_VCS_REVISION "$(NEW_GIT_VERSION)" >> $@
 	@echo extern const char bare_build_version[]; >> $@
 	@echo extern const char bare_vcs_revision[]; >> $@
@@ -1680,8 +1636,6 @@ CPPCHECK_PARAMS += -I3rdparty/bx/include
 CPPCHECK_PARAMS += -I$(BUILDDIR)/generated/emu
 CPPCHECK_PARAMS += -I$(BUILDDIR)/generated/emu/layout
 CPPCHECK_PARAMS += -I$(BUILDDIR)/generated/mame/layout
-CPPCHECK_PARAMS += -DX64_WINDOWS_ABI
-CPPCHECK_PARAMS += -DPTR64=1
 CPPCHECK_PARAMS += -DMAME_DEBUG
 CPPCHECK_PARAMS += -DMAME_PROFILER
 CPPCHECK_PARAMS += -DCRLF=3
@@ -1689,7 +1643,6 @@ CPPCHECK_PARAMS += -DLSB_FIRST
 ifndef USE_SYSTEM_LIB_FLAC
 CPPCHECK_PARAMS += -DFLAC__NO_DLL
 endif
-CPPCHECK_PARAMS += -DNATIVE_DRC=drcbe_x64
 CPPCHECK_PARAMS += -DLUA_COMPAT_APIINTCASTS
 CPPCHECK_PARAMS += -DWIN32
 CPPCHECK_PARAMS += -D__GNUC__

@@ -33,12 +33,12 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(ZORRO_MERLIN, bus::amiga::zorro::merlin_device, "zorro_merlin", "Merlin RTG")
+DEFINE_DEVICE_TYPE(AMIGA_MERLIN, bus::amiga::zorro::merlin_device, "amiga_merlin", "Merlin RTG")
 
 namespace bus::amiga::zorro {
 
 merlin_device::merlin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, ZORRO_MERLIN, tag, owner, clock),
+	device_t(mconfig, AMIGA_MERLIN, tag, owner, clock),
 	device_zorro2_card_interface(mconfig, *this),
 	m_vga(*this, "vga"),
 	m_ramdac(*this, "ramdac"),
@@ -75,7 +75,7 @@ void merlin_device::device_add_mconfig(machine_config &config)
 	ET4KW32I_VGA(config, m_vga, 0); // should be ET4000W32
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(0x200000);
-	m_vga->vsync_cb().set([this](int state) { m_slot->int6_w(state); });
+	m_vga->vsync_cb().set([this](int state) { m_zorro->int6_w(state); });
 
 	BT482(config, m_ramdac, 0);
 }
@@ -116,9 +116,9 @@ void merlin_device::autoconfig_base_address(offs_t address)
 	{
 		LOG("-> installing merlin memory\n");
 
-		m_slot->space().install_readwrite_handler(address, address + 0x1fffff,
+		m_zorro->space().install_readwrite_handler(address, address + 0x1fffff,
 			emu::rw_delegate(m_vga, FUNC(et4kw32i_vga_device::mem_r)),
-			emu::rw_delegate(m_vga, FUNC(et4kw32i_vga_device::mem_w)), 0xffffffff);
+			emu::rw_delegate(m_vga, FUNC(et4kw32i_vga_device::mem_w)), 0xffff);
 
 		m_autoconfig_memory_done = true;
 
@@ -130,19 +130,19 @@ void merlin_device::autoconfig_base_address(offs_t address)
 		LOG("-> installing merlin registers\n");
 
 		// install merlin registers
-		m_slot->space().install_device(address, address + 0x0ffff, *this, &merlin_device::mmio_map);
+		m_zorro->space().install_device(address, address + 0x0ffff, *this, &merlin_device::mmio_map);
 
 		// stop responding to default autoconfig
-		m_slot->space().unmap_readwrite(0xe80000, 0xe8007f);
+		m_zorro->space().unmap_readwrite(0xe80000, 0xe8007f);
 
 		// we're done
-		m_slot->cfgout_w(0);
+		m_zorro->cfgout_w(0);
 	}
 }
 
 void merlin_device::cfgin_w(int state)
 {
-	LOG("configin_w (%d)\n", state);
+	LOG("cfgin_w (%d)\n", state);
 
 	if (state != 0)
 		return;
@@ -165,9 +165,9 @@ void merlin_device::cfgin_w(int state)
 		autoconfig_rom_vector(0x0000);
 
 		// install autoconfig handler
-		m_slot->space().install_readwrite_handler(0xe80000, 0xe8007f,
+		m_zorro->space().install_readwrite_handler(0xe80000, 0xe8007f,
 			read16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_read)),
-			write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffffffff);
+			write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffff);
 	}
 	else
 	{

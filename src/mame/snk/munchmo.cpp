@@ -51,7 +51,7 @@ public:
 		, m_videoram(*this, "videoram")
 		, m_status_vram(*this, "status_vram")
 		, m_vreg(*this, "vreg")
-		, m_tiles_rom(*this, "tiles")
+		, m_tiles_rom(*this, "tilelut")
 		, m_maincpu(*this, "maincpu")
 		, m_audiocpu(*this, "audiocpu")
 		, m_mainlatch(*this, "mainlatch")
@@ -82,7 +82,7 @@ private:
 	void palette(palette_device &palette) const;
 	void vblank_irq(int state);
 
-	IRQ_CALLBACK_MEMBER(generic_irq_ack);
+	IRQ_CALLBACK_MEMBER(irq_ack);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_status(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -102,12 +102,12 @@ private:
 	required_region_ptr<u8> m_tiles_rom;
 
 	// video-related
-	std::unique_ptr<bitmap_ind16> m_tmpbitmap;
+	bitmap_ind16 m_tmpbitmap;
 	u8 m_palette_bank = 0U;
-	u8 m_flipscreen = 0U;
+	bool m_flipscreen = false;
 
 	// misc
-	u8 m_nmi_enable = 0U;
+	bool m_nmi_enable = false;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -173,7 +173,11 @@ void munchmo_state::flipscreen_w(int state)
 
 void munchmo_state::video_start()
 {
-	m_tmpbitmap = std::make_unique<bitmap_ind16>(512, 512);
+	m_tmpbitmap.allocate(512, 512);
+
+	save_item(NAME(m_tmpbitmap));
+	save_item(NAME(m_palette_bank));
+	save_item(NAME(m_flipscreen));
 }
 
 void munchmo_state::draw_status(bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -208,15 +212,15 @@ void munchmo_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipr
 
 	for (int offs = 0; offs < 0x100; offs++)
 	{
-		int const sy = (offs % 16) * 32;
-		int const sx = (offs / 16) * 32;
+		int const sy = (offs & 0xf) * 32;
+		int const sx = (offs >> 4) * 32;
 		int const tile_number = m_videoram[offs];
 
 		for (int row = 0; row < 4; row++)
 		{
 			for (int col = 0; col < 4; col++)
 			{
-				gfx->opaque(*m_tmpbitmap, m_tmpbitmap->cliprect(),
+				gfx->opaque(m_tmpbitmap, m_tmpbitmap.cliprect(),
 						m_tiles_rom[col + tile_number * 4 + row * 0x400],
 						m_palette_bank,
 						0, 0, // flip
@@ -228,15 +232,15 @@ void munchmo_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipr
 	int const scrollx = -(m_vreg[2] *2 + (m_vreg[3] >> 7)) - 64 - 128 - 16;
 	int const scrolly = 0;
 
-	copyscrollbitmap(bitmap, *m_tmpbitmap, 1, &scrollx, 1, &scrolly, cliprect);
+	copyscrollbitmap(bitmap, m_tmpbitmap, 1, &scrollx, 1, &scrolly, cliprect);
 }
 
 void munchmo_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int const scroll = m_vreg[2];
 	int const flags = m_vreg[3];                            //   XB??????
-	int const xadjust = - 128 - 16 - ((flags & 0x80) ? 1 : 0);
-	int const bank = (flags & 0x40) ? 1 : 0;
+	int const xadjust = - 128 - 16 - BIT(flags, 7);
+	int const bank = BIT(flags, 6);
 	gfx_element *const gfx = m_gfxdecode->gfx(2 + bank);
 	int const color_base = m_palette_bank * 4 + 3;
 	int const firstsprite = m_vreg[0] & 0x3f;
@@ -252,7 +256,7 @@ void munchmo_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 			int sy = (offs >> 6) << 5;                      // Y YY------
 			sy += (attributes >> 2) & 0x1f;
 
-			if (attributes & 0x80)
+			if (BIT(attributes, 7))
 			{
 				sx = (sx >> 1) | (tile_number & 0x80);
 				sx = 2 * ((-32 - scroll - sx) & 0xff) + xadjust;
@@ -300,7 +304,7 @@ void munchmo_state::vblank_irq(int state)
 	}
 }
 
-IRQ_CALLBACK_MEMBER(munchmo_state::generic_irq_ack)
+IRQ_CALLBACK_MEMBER(munchmo_state::irq_ack)
 {
 	device.execute().set_input_line(0, CLEAR_LINE);
 	return 0xff;
@@ -473,70 +477,52 @@ INPUT_PORTS_END
 static const gfx_layout char_layout =
 {
 	8,8,
-	256,
+	RGN_FRAC(1,2),
 	4,
-	{ 0, 8, 256*128,256*128+8 },
-	{ 7,6,5,4,3,2,1,0 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	{ 0, 8, RGN_FRAC(1,2), RGN_FRAC(1,2)+8 },
+	{ STEP8(7,-1) },
+	{ STEP8(0,8*2) },
 	128
 };
 
 static const gfx_layout tile_layout =
 {
-	8,8,
-	0x100,
+	4,8,
+	RGN_FRAC(1,1),
 	4,
-	{ 8,12,0,4 },
-	{ 0,0,1,1,2,2,3,3 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
+	{ STEP4(0,4) },
+	{ STEP4(0,1) },
+	{ STEP8(0,4*4) },
 	128
 };
 
 static const gfx_layout sprite_layout1 =
 {
-	32,32,
+	16,32,
 	128,
 	3,
-	{ 0x4000*8,0x2000*8,0 },
-	{
-		7,7,6,6,5,5,4,4,3,3,2,2,1,1,0,0,
-		0x8000+7,0x8000+7,0x8000+6,0x8000+6,0x8000+5,0x8000+5,0x8000+4,0x8000+4,
-		0x8000+3,0x8000+3,0x8000+2,0x8000+2,0x8000+1,0x8000+1,0x8000+0,0x8000+0
-	},
-	{
-		0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-		8*8, 9*8, 10*8,11*8,12*8,13*8,14*8,15*8,
-		16*8,17*8,18*8,19*8,20*8,21*8,22*8,23*8,
-		24*8,25*8,26*8,27*8,28*8,29*8,30*8,31*8
-	},
+	{ 0x4000*8, 0x2000*8, 0 },
+	{ STEP8(7,-1),STEP8(0x8000+7,-1) },
+	{ STEP32(0,8) },
 	256
 };
 
 static const gfx_layout sprite_layout2 =
 {
-	32,32,
+	16,32,
 	128,
 	3,
-	{ 0,0,0 },
-	{
-		7,7,6,6,5,5,4,4,3,3,2,2,1,1,0,0,
-		0x8000+7,0x8000+7,0x8000+6,0x8000+6,0x8000+5,0x8000+5,0x8000+4,0x8000+4,
-		0x8000+3,0x8000+3,0x8000+2,0x8000+2,0x8000+1,0x8000+1,0x8000+0,0x8000+0
-	},
-	{
-		0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-		8*8, 9*8, 10*8,11*8,12*8,13*8,14*8,15*8,
-		16*8,17*8,18*8,19*8,20*8,21*8,22*8,23*8,
-		24*8,25*8,26*8,27*8,28*8,29*8,30*8,31*8
-	},
+	{ 0, 0, 0 },
+	{ STEP8(7,-1),STEP8(0x8000+7,-1) },
+	{ STEP32(0,8) },
 	256
 };
 
 static GFXDECODE_START( gfx_mnchmobl )
 	GFXDECODE_ENTRY( "chars",              0,  char_layout,      0,  4 ) // colors   0- 63
-	GFXDECODE_ENTRY( "tiles",         0x1000,  tile_layout,     64,  4 ) // colors  64-127
-	GFXDECODE_ENTRY( "sprites",            0,  sprite_layout1, 128, 16 ) // colors 128-255
-	GFXDECODE_ENTRY( "monochrome_sprites", 0,  sprite_layout2, 128, 16 ) // colors 128-255
+	GFXDECODE_SCALE( "tiles",              0,  tile_layout,     64,  4, 2, 1 ) // colors  64-127
+	GFXDECODE_SCALE( "sprites",            0,  sprite_layout1, 128, 16, 2, 1 ) // colors 128-255
+	GFXDECODE_SCALE( "monochrome_sprites", 0,  sprite_layout2, 128, 16, 2, 1 ) // colors 128-255
 GFXDECODE_END
 
 
@@ -548,8 +534,6 @@ GFXDECODE_END
 
 void munchmo_state::machine_start()
 {
-	save_item(NAME(m_palette_bank));
-	save_item(NAME(m_flipscreen));
 	save_item(NAME(m_nmi_enable));
 }
 
@@ -558,11 +542,11 @@ void munchmo_state::mnchmobl(machine_config &config)
 	// basic machine hardware
 	Z80(config, m_maincpu, XTAL(15'000'000) / 4); // from pin 13 of XTAL-driven 163
 	m_maincpu->set_addrmap(AS_PROGRAM, &munchmo_state::main_map);
-	m_maincpu->set_irq_acknowledge_callback(FUNC(munchmo_state::generic_irq_ack)); // IORQ clears flip-flop at 1-2C
+	m_maincpu->set_irq_acknowledge_callback(FUNC(munchmo_state::irq_ack)); // IORQ clears flip-flop at 1-2C
 
 	Z80(config, m_audiocpu, XTAL(15'000'000) / 8); // from pin 12 of XTAL-driven 163
 	m_audiocpu->set_addrmap(AS_PROGRAM, &munchmo_state::sound_map);
-	m_audiocpu->set_irq_acknowledge_callback(FUNC(munchmo_state::generic_irq_ack)); // IORQ clears flip-flop at 1-7H
+	m_audiocpu->set_irq_acknowledge_callback(FUNC(munchmo_state::irq_ack)); // IORQ clears flip-flop at 1-7H
 
 	LS259(config, m_mainlatch, 0); // 12E
 	m_mainlatch->q_out_cb<0>().set(FUNC(munchmo_state::palette_bank_0_w)); // BCL0 2-11E
@@ -578,7 +562,7 @@ void munchmo_state::mnchmobl(machine_config &config)
 	screen.set_refresh_hz(57);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(256+32+32, 256);
-	screen.set_visarea(0, 255+32+32,0, 255-16);
+	screen.set_visarea(0, 255+32+32, 0, 255-16);
 	screen.set_screen_update(FUNC(munchmo_state::screen_update));
 	screen.screen_vblank().set(FUNC(munchmo_state::vblank_irq));
 	screen.set_palette(m_palette);
@@ -620,9 +604,11 @@ ROM_START( joyfulr )
 	ROM_LOAD( "s1.10a",  0x0000, 0x1000, CRC(c0bcc301) SHA1(b8961e7bbced4dfe9c72f839ea9b89d3f2e629b2) )
 	ROM_LOAD( "s2.10b",  0x1000, 0x1000, CRC(96aa11ca) SHA1(84438d6b27d520e95b8706c91c5c20de1785604c) )
 
-	ROM_REGION( 0x2000, "tiles", 0 ) // 4x8
+	ROM_REGION( 0x1000, "tilelut", 0 )
 	ROM_LOAD( "b1.2c",   0x0000, 0x1000, CRC(8ce3a403) SHA1(eec5813076c31bb8534f7d1f83f2a397e552ed69) )
-	ROM_LOAD( "b2.2b",   0x1000, 0x1000, CRC(0df28913) SHA1(485700d3b7f2bfcb970e8f9edb7d18ed9a708bd2) )
+
+	ROM_REGION( 0x1000, "tiles", 0 ) // 4x8
+	ROM_LOAD16_WORD_SWAP( "b2.2b",   0x0000, 0x1000, CRC(0df28913) SHA1(485700d3b7f2bfcb970e8f9edb7d18ed9a708bd2) )
 
 	ROM_REGION( 0x6000, "sprites", 0 )
 	ROM_LOAD( "f1j.1g",  0x0000, 0x2000, CRC(93c3c17e) SHA1(902f458c4efe74187a58a3c1ecd146e343657977) )
@@ -648,9 +634,11 @@ ROM_START( mnchmobl )
 	ROM_LOAD( "s1.10a",  0x0000, 0x1000, CRC(c0bcc301) SHA1(b8961e7bbced4dfe9c72f839ea9b89d3f2e629b2) )
 	ROM_LOAD( "s2.10b",  0x1000, 0x1000, CRC(96aa11ca) SHA1(84438d6b27d520e95b8706c91c5c20de1785604c) )
 
-	ROM_REGION( 0x2000, "tiles", 0 ) // 4x8
+	ROM_REGION( 0x1000, "tilelut", 0 )
 	ROM_LOAD( "b1.2c",   0x0000, 0x1000, CRC(8ce3a403) SHA1(eec5813076c31bb8534f7d1f83f2a397e552ed69) )
-	ROM_LOAD( "b2.2b",   0x1000, 0x1000, CRC(0df28913) SHA1(485700d3b7f2bfcb970e8f9edb7d18ed9a708bd2) )
+
+	ROM_REGION( 0x1000, "tiles", 0 ) // 4x8
+	ROM_LOAD16_WORD_SWAP( "b2.2b",   0x0000, 0x1000, CRC(0df28913) SHA1(485700d3b7f2bfcb970e8f9edb7d18ed9a708bd2) )
 
 	ROM_REGION( 0x6000, "sprites", 0 )
 	ROM_LOAD( "f1.1g",   0x0000, 0x2000, CRC(b75411d4) SHA1(d058a6c219676f8ba4e498215f5716c630bb1d20) )

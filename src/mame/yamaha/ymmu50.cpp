@@ -21,6 +21,7 @@
 #include "bus/midi/midioutport.h"
 #include "cpu/h8/h83003.h"
 #include "machine/nvram.h"
+#include "sound/adc.h"
 #include "sound/swp00.h"
 
 #include "mulcd.h"
@@ -70,6 +71,8 @@ public:
 		, m_ioport_o1(*this, "O1")
 		, m_ioport_o2(*this, "O2")
 		, m_ram(*this, "ram")
+		, m_ad(*this, "ad")
+		, m_adc(*this, "adc%u", 0U)
 	{ }
 
 	void mu50(machine_config &config);
@@ -89,6 +92,8 @@ private:
 	required_ioport m_ioport_o1;
 	required_ioport m_ioport_o2;
 	required_shared_ptr<u16> m_ram;
+	required_device<microphone_device> m_ad;
+	required_device_array<adc10_device, 2> m_adc;
 
 	u8 cur_p6, cur_p9, cur_pa, cur_pb, cur_pc;
 
@@ -135,13 +140,19 @@ void mu50_state::mu50_map(address_map &map)
 // Analog input right (not sent to the swp, mixing is analog)
 u16 mu50_state::adc_ar_r()
 {
-	return 0x3ff;
+	s16 v = m_adc[0]->read();
+	if(v < 0)
+		v = -v;
+	return 0x3ff - v;
 }
 
 // Analog input left (not sent to the swp, mixing is analog)
 u16 mu50_state::adc_al_r()
 {
-	return 0x3ff;
+	s16 v = m_adc[1]->read();
+	if(v < 0)
+		v = -v;
+	return 0x3ff - v;
 }
 
 // Put the host switch to pure midi
@@ -269,12 +280,20 @@ void mu50_state::mu50(machine_config &config)
 
 	MULCD(config, m_lcd);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	MICROPHONE(config, m_ad, 2).front();
+	m_ad->add_route(0, "speakers", 1.0, 0);
+	m_ad->add_route(1, "speakers", 1.0, 1);
+	m_ad->add_route(0, "adc0", 1.0);
+	m_ad->add_route(1, "adc1", 1.0);
+
+	ADC10(config, m_adc[0]);
+	ADC10(config, m_adc[1]);
+
+	SPEAKER(config, "speakers", 2).front();
 
 	SWP00(config, m_swp00);
-	m_swp00->add_route(0, "lspeaker", 1.0);
-	m_swp00->add_route(1, "rspeaker", 1.0);
+	m_swp00->add_route(0, "speakers", 1.0, 0);
+	m_swp00->add_route(1, "speakers", 1.0, 1);
 
 	auto &mdin(MIDI_PORT(config, "mdin"));
 	midiin_slot(mdin);

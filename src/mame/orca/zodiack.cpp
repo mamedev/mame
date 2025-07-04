@@ -712,6 +712,7 @@ ROM_START( dogfight )
 
 	ROM_REGION( 0x2800, "videopcb", 0 )
 	ROM_LOAD( "df-6.3s",    0x0000, 0x0800, CRC(3059b515) SHA1(849e99a04ddcdfcf097cc3ac17e9edf12b51cd69) )
+	// the ROM at 3s has been found also as a 0x1000 ROM with the second half filled with possibly leftover Z80 code (the dogfightp set has it preserved)
 	ROM_LOAD( "df-7.7n",    0x0800, 0x1000, CRC(ffe05fee) SHA1(70b9d0808defd936e2c3567f8e6996a19753de81) )
 	ROM_LOAD( "df-8.7r",    0x1800, 0x1000, CRC(2cb51793) SHA1(d90177ef28730774202a04a0846281537a1883df) )
 

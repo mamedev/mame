@@ -64,8 +64,6 @@ public:
 		m_dy = dy;
 	}
 
-	void clear_all();
-
 	u16 k055673_rom_word_r(offs_t offset);
 	u16 k055673_ps_rom_word_r(offs_t offset);
 	u16 k055673_gr_rom_word_r(offs_t offset);
@@ -98,7 +96,7 @@ public:
 
 	u8    m_kx46_regs[8];
 	u16   m_kx47_regs[16];
-	int   m_dx = 0, m_dy = 0;
+	int   m_dx, m_dy;
 	u8    m_objcha_line;
 	int   m_z_rejection;
 
@@ -106,13 +104,13 @@ public:
 
 	required_region_ptr<u8> m_gfxrom;
 	int m_gfx_num;
-	int m_bpp = 0;
+	int m_bpp;
 
 	/* alt implementation - to be collapsed */
 	void zdrawgfxzoom32GP(
 			bitmap_rgb32 &bitmap, const rectangle &cliprect,
-			u32 code, u32 color, int flipx, int flipy, int sx, int sy,
-			int scalex, int scaley, int alpha, int drawmode, int zcode, int pri, u8* gx_objzbuf, u8* gx_shdzbuf);
+			u32 code, u32 color, bool flipx, bool flipy, int sx, int sy,
+			int scalex, int scaley, int alpha, int drawmode, int zcode, u8 pri, u8* gx_objzbuf, u8* gx_shdzbuf);
 
 	void zdrawgfxzoom32GP(
 			bitmap_ind16 &bitmap, const rectangle &cliprect,
@@ -242,7 +240,7 @@ public:
 				pri,
 				zcode, alpha, drawmode,
 				gx_objzbuf, gx_shdzbuf,
-				0,nullptr
+				0, nullptr
 				);
 
 		}

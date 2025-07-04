@@ -39,7 +39,7 @@ public:
 
 protected:
 	void device_start() override ATTR_COLD;
-	void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	void sound_stream_update(sound_stream &stream) override;
 
 private:
 	sound_stream *m_stream;
@@ -61,9 +61,9 @@ void psion3a_codec_device::device_start()
 	m_stream = stream_alloc(0, 1, 8000);
 }
 
-void psion3a_codec_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void psion3a_codec_device::sound_stream_update(sound_stream &stream)
 {
-	outputs[0].fill(stream_buffer::sample_t(m_audio_out) * (1.0 / 4096.0));
+	stream.fill(0, sound_stream::sample_t(m_audio_out) * (1.0 / 4096.0));
 }
 
 void psion3a_codec_device::pcm_in(uint8_t data)
@@ -119,7 +119,6 @@ protected:
 	required_device<psion3a_codec_device> m_codec;
 	required_device_array<psion_ssd_device, 2> m_ssd;
 
-private:
 	void palette_init(palette_device &palette);
 
 	uint16_t kbd_r();
@@ -368,7 +367,10 @@ static INPUT_PORTS_START( psion3a_fr )
 	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)          PORT_CHAR('"')  PORT_CHAR('3') PORT_CHAR('\\')
 
 	PORT_MODIFY("COL6")
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)          PORT_CHAR('y')  PORT_CHAR('Y')
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)          PORT_CHAR('a')  PORT_CHAR('A')
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)          PORT_CHAR('q')  PORT_CHAR('Q')
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)          PORT_CHAR('w')  PORT_CHAR('W')
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)          PORT_CHAR('z')  PORT_CHAR('Z')
 
 	PORT_MODIFY("COL7")
 	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)          PORT_CHAR('&')  PORT_CHAR('1')                  PORT_NAME("& 1 Off")
@@ -481,8 +483,14 @@ uint16_t psion3a_base_state::kbd_r()
 void psion3a_base_state::palette_init(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(190, 220, 190));
-	palette.set_pen_color(1, rgb_t(130, 130, 110));
-	palette.set_pen_color(2, rgb_t(190, 210, 180));
+
+	for (int i = 1; i < 3; i++)
+	{
+		const int r = (0x99 * i) / 2;
+		const int g = (0xaa * i) / 2;
+		const int b = (0x88 * i) / 2;
+		m_palette->set_pen_color(i, rgb_t(r, g, b));
+	}
 }
 
 
@@ -520,6 +528,7 @@ void psion3a_base_state::psion_asic9(machine_config &config)
 	m_ssd[1]->door_cb().set(m_asic9, FUNC(psion_asic9_device::medchng_w));
 
 	SOFTWARE_LIST(config, "ssd_list").set_original("psion_ssd").set_filter("S3,S3A");
+	//SOFTWARE_LIST(config, "flop_list").set_original("psion_flop").set_filter("S3A");
 }
 
 void psion3a_state::psion3a(machine_config &config)
@@ -554,7 +563,7 @@ void psion3c_state::psion3c(machine_config &config)
 	PSION_S3A_CODEC(config, m_codec).add_route(ALL_OUTPUTS, "mono", 1.00); // TODO: M7702-03
 	m_asic9->pcm_out().set(m_codec, FUNC(psion3a_codec_device::pcm_in));
 
-	PSION_CONDOR(config, m_condor);
+	PSION_CONDOR(config, m_condor, 3'686'400); // FIXME: unknown clock source
 	m_condor->txd_handler().set(m_honda, FUNC(psion_honda_slot_device::write_txd));
 	m_condor->rts_handler().set(m_honda, FUNC(psion_honda_slot_device::write_rts));
 	m_condor->dtr_handler().set(m_honda, FUNC(psion_honda_slot_device::write_dtr));
@@ -575,7 +584,17 @@ void psion3mx_state::psion3mx(machine_config &config)
 {
 	psion_asic9(config);
 
-	m_asic9->set_clock(3.6864_MHz_XTAL * 15 / 2); // V30MX
+	PSION_ASIC9MX(config.replace(), m_asic9, 3.6864_MHz_XTAL * 15 / 2); // V30MX
+	m_asic9->set_screen("screen");
+	m_asic9->set_ram_rom("ram", "rom");
+	m_asic9->port_ab_r().set(FUNC(psion3mx_state::kbd_r));
+	m_asic9->buz_cb().set(m_speaker, FUNC(speaker_sound_device::level_w));
+	//m_asic9->buzvol_cb().set([this](int state) { m_speaker->set_output_gain(ALL_OUTPUTS, state ? 1.0 : 0.25); });
+	m_asic9->col_cb().set([this](uint8_t data) { m_key_col = data; });
+	m_asic9->data_r<0>().set(m_ssd[1], FUNC(psion_ssd_device::data_r));      // SSD Pack 2
+	m_asic9->data_w<0>().set(m_ssd[1], FUNC(psion_ssd_device::data_w));
+	m_asic9->data_r<1>().set(m_ssd[0], FUNC(psion_ssd_device::data_r));      // SSD Pack 1
+	m_asic9->data_w<1>().set(m_ssd[0], FUNC(psion_ssd_device::data_w));
 
 	m_ram->set_default_size("2M").set_extra_options("");
 

@@ -33,6 +33,7 @@ protected:
 	// device_execute_interface overrides
 	virtual u64 execute_clocks_to_cycles(u64 clocks) const noexcept override { return (clocks + 4 - 1) / 4; }
 	virtual u64 execute_cycles_to_clocks(u64 cycles) const noexcept override { return (cycles * 4); }
+	virtual void execute_run() override;
 
 	// device_disasm_interface implementation
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
@@ -40,8 +41,6 @@ protected:
 	u8 r800_sll(u8 value);
 	void mulub(u8 value);
 	void muluw(u16 value);
-
-	virtual void do_op() override;
 };
 
 // device type declaration

@@ -342,12 +342,11 @@ void gumbo_state::gumbo(machine_config &config)
 
 	PALETTE(config, "palette").set_format(palette_device::xRGB_555, 0x200);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	okim6295_device &oki(OKIM6295(config, "oki", XTAL(14'318'181) / 16, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
-	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.47);
-	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.47);
+	oki.add_route(ALL_OUTPUTS, "speaker", 0.47, 0);
+	oki.add_route(ALL_OUTPUTS, "speaker", 0.47, 1);
 }
 
 void gumbo_state::mspuzzle(machine_config &config)

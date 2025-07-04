@@ -34,7 +34,7 @@
 #define LAST_CHR_REG_A 0
 #define LAST_CHR_REG_B 1
 
-static const int m_mmc5_attrib[4] = {0x00, 0x55, 0xaa, 0xff};
+static const uint8_t m_mmc5_attrib[4] = {0x00, 0x55, 0xaa, 0xff};
 
 //-------------------------------------------------
 //  constructor
@@ -45,11 +45,11 @@ DEFINE_DEVICE_TYPE(NES_EXROM, nes_exrom_device, "nes_exrom", "NES Cart ExROM (MM
 
 nes_exrom_device::nes_exrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_EXROM, tag, owner, clock), m_irq_count(0)
-	, m_irq_status(0), m_irq_enable(0), m_mult1(0), m_mult2(0), m_mmc5_scanline(0), m_vrom_page_a(0), m_vrom_page_b(0), m_floodtile(0), m_floodattr(0)
+	, m_irq_status(0), m_irq_enable(false), m_pcm_irq(false), m_mult1(0), m_mult2(0), m_mmc5_scanline(0), m_vrom_page_a(0), m_vrom_page_b(0), m_floodtile(0), m_floodattr(0)
 	, m_prg_mode(0), m_chr_mode(0), m_wram_protect_1(0), m_wram_protect_2(0), m_exram_control(0), m_wram_base(0), m_last_chr(0), m_ex1_chr(0)
 	, m_split_chr(0), m_ex1_bank(0), m_ex1_attrib(0), m_high_chr(0), m_split_scr(0), m_split_rev(0), m_split_ctrl(0), m_split_yst(0), m_split_bank(0), m_vcount(0)
 	, m_ppu(*this, ":ppu") // FIXME: this dependency should not exist
-	, m_sound(*this, "mmc5snd") // FIXME: this is a hack, it should be separated device, similar not same as NES APU!!!
+	, m_sound(*this, "mmc5snd")
 {
 }
 
@@ -64,6 +64,7 @@ void nes_exrom_device::device_start()
 	save_item(NAME(m_irq_count));
 	save_item(NAME(m_irq_status));
 	save_item(NAME(m_irq_enable));
+	save_item(NAME(m_pcm_irq));
 	save_item(NAME(m_mult1));
 	save_item(NAME(m_mult2));
 	save_item(NAME(m_vrom_page_a));
@@ -104,7 +105,8 @@ void nes_exrom_device::pcb_reset()
 
 	m_irq_count = 0;
 	m_irq_status = 0;
-	m_irq_enable = 0;
+	m_irq_enable = false;
+	m_pcm_irq = false;
 
 	m_mult1 = m_mult2 = 0;
 	m_vrom_page_a = m_vrom_page_b = 0;
@@ -237,16 +239,20 @@ void nes_exrom_device::update_prg()
 	}
 }
 
+void nes_exrom_device::update_irq()
+{
+	set_irq_line(((BIT(m_irq_status, 7) && m_irq_enable) || m_pcm_irq) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+
 void nes_exrom_device::hblank_irq(int scanline, bool vblank, bool blanked)
 {
 	m_vcount = scanline;
 
 	if (scanline == m_irq_count)
 	{
-		if (m_irq_enable)
-			set_irq_line(ASSERT_LINE);
-
 		m_irq_status = 0xff;
+		update_irq();
 	}
 
 	// "In Frame" flag
@@ -254,6 +260,13 @@ void nes_exrom_device::hblank_irq(int scanline, bool vblank, bool blanked)
 		m_irq_status |= 0x40;
 	else if (scanline > ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE)
 		m_irq_status &= ~0x40;
+}
+
+
+void nes_exrom_device::pcm_irq(int state)
+{
+	m_pcm_irq = state;
+	update_irq();
 }
 
 
@@ -280,7 +293,7 @@ void nes_exrom_device::set_mirror(int page, int src)
 
 inline bool nes_exrom_device::in_split()
 {
-	int tile = m_ppu->get_tilenum();
+	int const tile = m_ppu->get_tilenum();
 
 	if (tile < 34)
 	{
@@ -294,7 +307,7 @@ inline bool nes_exrom_device::in_split()
 
 uint8_t nes_exrom_device::nt_r(offs_t offset)
 {
-	int page = ((offset & 0xc00) >> 10);
+	int const page = ((offset & 0xc00) >> 10);
 
 	switch (m_nt_src[page])
 	{
@@ -316,16 +329,16 @@ uint8_t nes_exrom_device::nt_r(offs_t offset)
 		// but it does not work yet
 		if (m_split_scr && !(m_exram_control & 0x02) && in_split())
 		{
-			int tile = m_ppu->get_tilenum();
+			int const tile = m_ppu->get_tilenum();
 
 			if ((offset & 0x3ff) >= 0x3c0)
 			{
-				int pos = (((m_split_yst + m_vcount) & ~0x1f) | (tile & 0x1f)) >> 2;
+				int const pos = (((m_split_yst + m_vcount) & ~0x1f) | (tile & 0x1f)) >> 2;
 				return m_exram[0x3c0 | pos];
 			}
 			else
 			{
-				int pos = (((m_split_yst + m_vcount) & 0xf8) << 2) | (tile & 0x1f);
+				int const pos = (((m_split_yst + m_vcount) & 0xf8) << 2) | (tile & 0x1f);
 				return m_exram[pos];
 			}
 		}
@@ -347,7 +360,7 @@ uint8_t nes_exrom_device::nt_r(offs_t offset)
 
 void nes_exrom_device::nt_w(offs_t offset, uint8_t data)
 {
-	int page = ((offset & 0xc00) >> 10);
+	int const page = ((offset & 0xc00) >> 10);
 
 	if (!m_nt_writable[page])
 		return;
@@ -393,19 +406,19 @@ inline uint8_t nes_exrom_device::base_chr_r(int bank, uint32_t offset)
 
 inline uint8_t nes_exrom_device::split_chr_r(uint32_t offset)
 {
-	uint32_t helper = (m_split_bank * 0x1000) + (offset & 0x3f8) + (m_split_yst & 7);
+	uint32_t const helper = (m_split_bank * 0x1000) + (offset & 0x3f8) + (m_split_yst & 7);
 	return m_vrom[helper & (m_vrom_size - 1)];
 }
 
 inline uint8_t nes_exrom_device::bg_ex1_chr_r(uint32_t offset)
 {
-	uint32_t helper = (m_ex1_bank * 0x1000) + (offset & 0xfff);
+	uint32_t const helper = (m_ex1_bank * 0x1000) + (offset & 0xfff);
 	return m_vrom[helper & (m_vrom_size - 1)];
 }
 
 uint8_t nes_exrom_device::chr_r(offs_t offset)
 {
-	int bank = offset >> 10;
+	int const bank = offset >> 10;
 
 	// Extended Attribute Mode (Ex1) does affect BG drawing even for 8x16 sprites (JustBreed uses it extensively!)
 	// However, if a game enables Ex1 but does not write a new m_ex1_bank, I'm not sure here we get the correct behavior
@@ -437,6 +450,9 @@ uint8_t nes_exrom_device::read_l(offs_t offset)
 	LOG("exrom read_l, offset: %04x\n", offset);
 	offset += 0x100;
 
+	if ((offset >= 0x1000) && (offset <= 0x1015))
+		return m_sound->read(offset & 0x1f);
+
 	if ((offset >= 0x1c00) && (offset <= 0x1fff))
 	{
 		// EXRAM
@@ -453,7 +469,7 @@ uint8_t nes_exrom_device::read_l(offs_t offset)
 		if (!machine().side_effects_disabled())
 		{
 			m_irq_status &= ~0x80;
-			set_irq_line(CLEAR_LINE);
+			update_irq();
 		}
 		return value;
 
@@ -489,7 +505,7 @@ void nes_exrom_device::write_l(offs_t offset, uint8_t data)
 			m_exram[offset - 0x1c00] = data;
 		else if (m_exram_control != 0x03)   // Modes 0,1 = write data in frame / write 0 otherwise
 		{
-			if (m_irq_status & 0x40)
+			if (BIT(m_irq_status, 6))
 				m_exram[offset - 0x1c00] = data;
 			else
 				m_exram[offset - 0x1c00] = 0x00;
@@ -609,7 +625,7 @@ void nes_exrom_device::write_l(offs_t offset, uint8_t data)
 		break;
 
 	case 0x1204:
-		m_irq_enable = data & 0x80;
+		m_irq_enable = BIT(data, 7);
 		LOG("MMC5 irq enable: %02x\n", data);
 		break;
 
@@ -636,7 +652,7 @@ uint8_t nes_exrom_device::read_m(offs_t offset)
 	LOG("exrom read_m, offset: %04x\n", offset);
 	if (!m_battery.empty() && !m_prgram.empty())  // 2 chips present: first is BWRAM, second is WRAM
 	{
-		if (m_wram_base & 0x04)
+		if (BIT(m_wram_base, 2))
 			return m_prgram[(offset + (m_wram_base & 0x03) * 0x2000) & (m_prgram.size() - 1)];
 		else
 			return m_battery[(offset + (m_wram_base & 0x03) * 0x2000) & (m_battery.size() - 1)];
@@ -665,23 +681,30 @@ void nes_exrom_device::write_m(offs_t offset, uint8_t data)
 uint8_t nes_exrom_device::read_h(offs_t offset)
 {
 	LOG("exrom read_h, offset: %04x\n", offset);
-	int bank = offset / 0x2000;
+	int const bank = offset / 0x2000;
+	uint8_t ret = 0;
 
 	if (bank < 3 && offset >= bank * 0x2000 && offset < (bank + 1) * 0x2000 && m_prg_ram_mapped[bank])
 	{
 		if (!m_battery.empty() && m_ram_hi_banks[bank] < 4)
-			return m_battery[((m_ram_hi_banks[bank] * 0x2000) + (offset & 0x1fff)) & (m_battery.size() - 1)];
+			ret = m_battery[((m_ram_hi_banks[bank] * 0x2000) + (offset & 0x1fff)) & (m_battery.size() - 1)];
 		else if (!m_prgram.empty())
-			return m_prgram[(((m_ram_hi_banks[bank] & 3) * 0x2000) + (offset & 0x1fff)) & (m_prgram.size() - 1)];
+			ret = m_prgram[(((m_ram_hi_banks[bank] & 3) * 0x2000) + (offset & 0x1fff)) & (m_prgram.size() - 1)];
 	}
-
-	return hi_access_rom(offset);
+	else
+		ret = hi_access_rom(offset);
+	if (!machine().side_effects_disabled())
+	{
+		if (BIT(~offset, 14))
+			m_sound->pcm_w(ret);
+	}
+	return ret;
 }
 
 void nes_exrom_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG("exrom write_h, offset: %04x, data: %02x\n", offset, data);
-	int bank = offset / 0x2000;
+	int const bank = offset / 0x2000;
 	if (m_wram_protect_1 != 0x02 || m_wram_protect_2 != 0x01 || bank == 3 || !m_prg_ram_mapped[bank])
 		return;
 
@@ -700,6 +723,7 @@ void nes_exrom_device::device_add_mconfig(machine_config &config)
 	// additional sound hardware
 	SPEAKER(config, "addon").front_center();
 
-	// TODO: temporary; will be separated device
-	NES_APU(config, m_sound, XTAL(21'477'272)/12).add_route(ALL_OUTPUTS, "addon", 0.90);
+	MMC5_SOUND(config, m_sound, XTAL(21'477'272)/12);
+	m_sound->irq().set(FUNC(nes_exrom_device::pcm_irq));
+	m_sound->add_route(ALL_OUTPUTS, "addon", 0.90);
 }
