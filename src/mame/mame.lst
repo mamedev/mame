@@ -35464,6 +35464,7 @@ rminitv
 240in1ar
 denv150
 dgun2561
+dgun2572
 dgun2577
 dgun2593
 dvnimbus
@@ -35756,9 +35757,6 @@ wowwg
 xing48
 zone7in1
 zone7in1p
-
-@source:nintendo/vt_unknown.cpp
-dgun2572
 
 @source:nix/fitfight.cpp
 bbprot
